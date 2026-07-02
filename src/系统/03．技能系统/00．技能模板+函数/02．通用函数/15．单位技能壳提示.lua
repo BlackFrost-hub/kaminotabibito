@@ -4,6 +4,7 @@ local ____exports = {}
 -- @noSelfInFile
 local japi = require("jass.japi")
 local DzSetUnitAbilityTip = japi.DzSetUnitAbilityTip
+local DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip
 local DzSetUnitAbilityUpdate = japi.DzSetUnitAbilityUpdate
 local function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
@@ -12,7 +13,7 @@ ____exports["设置单位技能壳普通提示"] = function(_____5355_4F4D, ____
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return
     end
-    if type(DzSetUnitAbilityTip) ~= "function" then
+    if type(DzSetUnitAbilityTip) ~= "function" and type(DzSetUnitAbilityUberTip) ~= "function" then
         return
     end
     do
@@ -24,7 +25,12 @@ ____exports["设置单位技能壳普通提示"] = function(_____5355_4F4D, ____
                     goto __continue7
                 end
                 local _____6280_80FDID = stringToFourCC(_____914D_7F6E["技能ID"])
-                DzSetUnitAbilityTip(_____5355_4F4D, _____6280_80FDID, _____914D_7F6E["提示"])
+                if type(DzSetUnitAbilityTip) == "function" then
+                    DzSetUnitAbilityTip(_____5355_4F4D, _____6280_80FDID, _____914D_7F6E["提示"])
+                end
+                if type(DzSetUnitAbilityUberTip) == "function" and _____914D_7F6E["扩展提示"] ~= nil then
+                    DzSetUnitAbilityUberTip(_____5355_4F4D, _____6280_80FDID, _____914D_7F6E["扩展提示"])
+                end
                 if type(DzSetUnitAbilityUpdate) == "function" then
                     DzSetUnitAbilityUpdate(_____5355_4F4D, _____6280_80FDID)
                 end

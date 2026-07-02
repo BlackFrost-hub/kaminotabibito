@@ -7,6 +7,7 @@ export * from "./00．冷却常量";
 export * from "./01．冷却缩减计算";
 export * from "./02．特殊技能处理";
 export * from "./03．QWERD冷却显示";
+export * from "./05．技能冷却查询";
 
 const jass = require("jass.common") as any;
 

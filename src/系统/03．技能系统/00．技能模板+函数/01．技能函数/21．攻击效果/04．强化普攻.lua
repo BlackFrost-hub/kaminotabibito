@@ -116,6 +116,9 @@ local function _____5F3A_5316_666E_653B_6761_4EF6_901A_8FC7(_____72B6_6001, cont
     if context == nil or context.isNormalAttack ~= true then
         return false
     end
+    if not _____72B6_6001["允许技能普攻"] and (context.isSkillAttack == true or context.isSkillDamage == true) then
+        return false
+    end
     if context.attacker ~= _____72B6_6001["单位"] then
         return false
     end
@@ -143,10 +146,10 @@ local function ____on_5F3A_5316_666E_653B_4F24_5BB3_4FEE_6B63(context)
         do
             local _____72B6_6001 = _____5F3A_5316_666E_653B_72B6_6001_8868[key]
             if _____72B6_6001 == nil then
-                goto __continue41
+                goto __continue42
             end
             if not _____5F3A_5316_666E_653B_6761_4EF6_901A_8FC7(_____72B6_6001, context) then
-                goto __continue41
+                goto __continue42
             end
             local _____539F_4F24_5BB3 = _____5F53_524D_4F24_5BB3
             _____5F53_524D_4F24_5BB3 = _____5F53_524D_4F24_5BB3 * _____72B6_6001["伤害倍率"] + _____72B6_6001["额外伤害"]
@@ -167,7 +170,7 @@ local function ____on_5F3A_5316_666E_653B_4F24_5BB3_4FEE_6B63(context)
                 _____7ED3_675F_5F3A_5316_666E_653B_72B6_6001(key, "次数耗尽")
             end
         end
-        ::__continue41::
+        ::__continue42::
     end
     return _____5F53_524D_4F24_5BB3
 end
@@ -205,6 +208,7 @@ ____exports["添加强化普攻"] = function(_____53C2_6570)
         ["额外伤害"] = _____53C2_6570["额外伤害"] or 0,
         ["仅远程"] = _____53C2_6570["仅远程"] == true,
         ["仅近战"] = _____53C2_6570["仅近战"] == true,
+        ["允许技能普攻"] = _____53C2_6570["允许技能普攻"] == true,
         ["恢复弹道"] = _____53C2_6570["恢复弹道"],
         ["on命中"] = _____53C2_6570["on命中"],
         ["on结束"] = _____53C2_6570["on结束"]

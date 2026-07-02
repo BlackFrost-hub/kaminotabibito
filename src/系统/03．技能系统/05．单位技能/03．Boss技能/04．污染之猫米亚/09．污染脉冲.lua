@@ -1,8 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.01．场地配置")
-local _____7C73_4E9A_5E73_53F0_4E2D_5FC3X = ____01_FF0E_573A_5730_914D_7F6E["米亚平台中心X"]
-local _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E["米亚平台中心Y"]
+local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心X"]
+local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心Y"]
 local _____53D6_7C73_4E9A_5355_4F4D_6240_5728_5B89_5168_57DF = ____01_FF0E_573A_5730_914D_7F6E["取米亚单位所在安全域"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.02．数值与表现配置")
 local _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚技能数值配置"]
@@ -23,7 +23,6 @@ local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSa
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local AddSpecialEffect = jass.AddSpecialEffect
-local BlzSetSpecialEffectYaw = jass.BlzSetSpecialEffectYaw
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -31,9 +30,9 @@ local IsUnitType = jass.IsUnitType
 local UnitDamageTarget = jass.UnitDamageTarget
 local EXSetEffectSize = japi.EXSetEffectSize
 local EXSetEffectZ = japi.EXSetEffectZ
+local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local BJ_DEGTORAD = 0.017453292519943295
 local function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
@@ -67,8 +66,8 @@ local function _____521B_5EFA_671D_5411_70B9_7279_6548(model, x, y, scale, durat
     if z ~= nil and z ~= 0 and type(EXSetEffectZ) == "function" then
         EXSetEffectZ(effect, z)
     end
-    if type(BlzSetSpecialEffectYaw) == "function" then
-        BlzSetSpecialEffectYaw(effect, yawDeg * BJ_DEGTORAD)
+    if type(EXEffectMatRotateZ) == "function" then
+        EXEffectMatRotateZ(effect, yawDeg)
     end
     YDWETimerDestroyEffectSafe(duration, effect)
 end
@@ -76,8 +75,8 @@ local function _____64AD_653E_8109_51B2_4E2D_5FC3_9884_8B66()
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
     _____521B_5EFA_671D_5411_70B9_7279_6548(
         config["中心预警特效"],
-        _____7C73_4E9A_5E73_53F0_4E2D_5FC3X,
-        _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y,
+        _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
+        _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y(),
         1.4,
         config["预警秒"] + 0.2,
         0,
@@ -86,6 +85,8 @@ local function _____64AD_653E_8109_51B2_4E2D_5FC3_9884_8B66()
 end
 local function _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
+    local centerX = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X()
+    local centerY = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y()
     local waveNo = waveIndex + 1
     local angles = {0, 90, 180, 270}
     do
@@ -93,8 +94,8 @@ local function _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
         while i < #angles do
             _____521B_5EFA_671D_5411_70B9_7279_6548(
                 config["脉冲中心特效"],
-                _____7C73_4E9A_5E73_53F0_4E2D_5FC3X,
-                _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y,
+                centerX,
+                centerY,
                 1,
                 1.2,
                 angles[i + 1],
@@ -105,8 +106,8 @@ local function _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
     end
     _____521B_5EFA_671D_5411_70B9_7279_6548(
         config["扩散波特效"],
-        _____7C73_4E9A_5E73_53F0_4E2D_5FC3X,
-        _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y,
+        centerX,
+        centerY,
         1.5 * waveNo,
         2,
         270,
@@ -121,6 +122,8 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
     local radius = config["波次半径"][waveIndex + 1]
     local radius2 = radius * radius
+    local centerX = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X()
+    local centerY = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y()
     _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污染脉冲", waveIndex + 2)
     local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
@@ -136,8 +139,8 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex)
                     goto __continue20
                 end
                 if _____8DDD_79BB_5E73_65B9(
-                    _____7C73_4E9A_5E73_53F0_4E2D_5FC3X,
-                    _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y,
+                    centerX,
+                    centerY,
                     GetUnitX(target),
                     GetUnitY(target)
                 ) > radius2 then

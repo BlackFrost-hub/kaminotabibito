@@ -143,3 +143,171 @@ createEquipmentItem('I0EQ', '菲尼克斯尔的宠物蛋', {
   tooltipExtended = '|cffccffff[道具/特殊]-全能/召唤|r|n|cffffcc99等级：B++|n评分：10000|r|n|cffffffcc[基础属性]|r|n全属性+45|n生命值+1800|n火属性伤害+18%|n召唤物伤害+25%|n|cFF808080这枚蛋仍在轻轻发热，像把一次未完成的重生交给了新的主人。|r',
   description = '|cffccffff[道具/特殊]-全能/召唤|r|n|cffffcc99等级：B++|n评分：10000|r|n|cffffffcc[基础属性]|r|n全属性+45|n生命值+1800|n火属性伤害+18%|n召唤物伤害+25%|n|cFF808080这枚蛋仍在轻轻发热，像把一次未完成的重生交给了新的主人。|r',
 })
+
+createEquipmentItem('I0FD', '菲利斯的统御纹章', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\phyllis_command_emblem.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[饰品]-法术/统御|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+34|n魔法值+900|n冷却缩减+8%|n全属性+10|n|cFF808080纹章背面刻着攻城军令，银白边缘仍有号令战场的冷光。|r',
+  description = '|cffccffff[饰品]-法术/统御|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+34|n魔法值+900|n冷却缩减+8%|n全属性+10|n|cFF808080纹章背面刻着攻城军令，银白边缘仍有号令战场的冷光。|r',
+})
+
+createEquipmentItem('I0FE', '剑魂狼牙坠', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\sword_soul_wolf_fang_pendant.blp',
+  model = 'war3mapImported\\SpiderRingItem.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[饰品]-法术/召唤|r|n|cffffcc99等级：B|n评分：6200|r|n|cffffffcc[基础属性]|r|n智力+32|n精神+18|n魔法恢复+18|n风属性伤害+12%|n|cFF808080狼牙里封着一缕剑魂，贴近耳边时能听见奔袭前的低鸣。|r',
+  description = '|cffccffff[饰品]-法术/召唤|r|n|cffffcc99等级：B|n评分：6200|r|n|cffffffcc[基础属性]|r|n智力+32|n精神+18|n魔法恢复+18|n风属性伤害+12%|n|cFF808080狼牙里封着一缕剑魂，贴近耳边时能听见奔袭前的低鸣。|r',
+})
+
+createEquipmentItem('I0ET', '封印斩护腕', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Gloves\\seal_slash_bracer.blp',
+  model = 'war3mapImported\\Gloves.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[手套]-冷却/防护|r|n|cffffcc99等级：B|n评分：6050|r|n|cffffffcc[基础属性]|r|n冷却缩减+9%|n魔法抗性+15%|n韧性+15%|n护甲+12|n|cFF808080护腕内侧刻有封印斩的短咒，适合在技能空窗期护住施法者。|r',
+  description = '|cffccffff[手套]-冷却/防护|r|n|cffffcc99等级：B|n评分：6050|r|n|cffffffcc[基础属性]|r|n冷却缩减+9%|n魔法抗性+15%|n韧性+15%|n护甲+12|n|cFF808080护腕内侧刻有封印斩的短咒，适合在技能空窗期护住施法者。|r',
+})
+
+createEquipmentItem('I0EV', '攻城号令圣印', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\siege_command_signet.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[饰品/辅助]-团队续航|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n冷却缩减+10%|n技能治疗率+16%|n魔法消耗减少+8%|n生命值+1200|n|cFF808080圣印曾用于传达攻城号令，如今更适合稳住队伍的治疗节奏。|r',
+  description = '|cffccffff[饰品/辅助]-团队续航|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n冷却缩减+10%|n技能治疗率+16%|n魔法消耗减少+8%|n生命值+1200|n|cFF808080圣印曾用于传达攻城号令，如今更适合稳住队伍的治疗节奏。|r',
+})
+
+createEquipmentItem('I0EW', '灵心之碎片', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\spirit_heart_shard.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[特殊/饰品]-剧情/风灵|r|n|cffffcc99等级：B|n评分：6450|r|n|cffffffcc[基础属性]|r|n智力+30|n全属性+18|n精神+22|n冷却缩减+8%|n风属性抗性+15%|n|cFF808080碎片中仍有一颗灵心跳动，像把死神阴影外的微光留了下来。|r',
+  description = '|cffccffff[特殊/饰品]-剧情/风灵|r|n|cffffcc99等级：B|n评分：6450|r|n|cffffffcc[基础属性]|r|n智力+30|n全属性+18|n精神+22|n冷却缩减+8%|n风属性抗性+15%|n|cFF808080碎片中仍有一颗灵心跳动，像把死神阴影外的微光留了下来。|r',
+})
+
+createEquipmentItem('I0EZ', '湮灭之风戒指', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\annihilation_wind_ring.blp',
+  model = 'war3mapImported\\SpiderRingItem.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[戒指]-法术/风压|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n智力+34|n技能伤害+14%|n控制命中+10%|n精神+20|n|cFF808080戒面里的小型风眼不断收束，仿佛下一瞬就要卷走声音。|r',
+  description = '|cffccffff[戒指]-法术/风压|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n智力+34|n技能伤害+14%|n控制命中+10%|n精神+20|n|cFF808080戒面里的小型风眼不断收束，仿佛下一瞬就要卷走声音。|r',
+})
+
+createEquipmentItem('I0F0', '卡瑟拉深渊法典', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\kasera_abyss_codex.blp',
+  model = 'war3mapImported\\TomeOfRetraining.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[副手/书]-水雷法术|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n智力+46|n魔法值+1200|n水属性伤害+18%|n雷属性伤害+18%|n冷却缩减+10%|n|cFF808080法典页角渗着深海盐痕，翻页时有细小电弧在墨迹间游动。|r',
+  description = '|cffccffff[副手/书]-水雷法术|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n智力+46|n魔法值+1200|n水属性伤害+18%|n雷属性伤害+18%|n冷却缩减+10%|n|cFF808080法典页角渗着深海盐痕，翻页时有细小电弧在墨迹间游动。|r',
+})
+
+createEquipmentItem('I0F1', '电鳗共生指环', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\electric_eel_symbiosis_ring.blp',
+  model = 'war3mapImported\\SpiderRingItem.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[戒指]-雷法/恢复|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+42|n雷属性伤害+20%|n雷属性抗性+18%|n魔法恢复+24|n|cFF808080银环内侧嵌着共生电鳗的鳞片，潮湿时会发出细微蓝光。|r',
+  description = '|cffccffff[戒指]-雷法/恢复|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+42|n雷属性伤害+20%|n雷属性抗性+18%|n魔法恢复+24|n|cFF808080银环内侧嵌着共生电鳗的鳞片，潮湿时会发出细微蓝光。|r',
+})
+
+createEquipmentItem('I0F2', '触手残片护符', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\tentacle_fragment_amulet.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[饰品]-生存/水抗|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+2800|n水属性抗性+25%|n治疗效果+18%|n全属性+12|n|cFF808080残片被银链牢牢扣住，偶尔仍会像活物一样轻轻收缩。|r',
+  description = '|cffccffff[饰品]-生存/水抗|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+2800|n水属性抗性+25%|n治疗效果+18%|n全属性+12|n|cFF808080残片被银链牢牢扣住，偶尔仍会像活物一样轻轻收缩。|r',
+})
+
+createEquipmentItem('I0F5', '绝缘珊瑚圣瓶', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\insulating_coral_sacred_bottle.blp',
+  model = 'war3mapImported\\Urn.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[特殊/辅助]-治疗/护盾|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n生命值+1400|n魔法抗性+15%|n|cFF808080圣瓶中的珊瑚水隔绝杂乱电流，适合在漫长战斗里稳定队伍。|r',
+  description = '|cffccffff[特殊/辅助]-治疗/护盾|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n生命值+1400|n魔法抗性+15%|n|cFF808080圣瓶中的珊瑚水隔绝杂乱电流，适合在漫长战斗里稳定队伍。|r',
+})
+
+createEquipmentItem('I0F7', '古树之心护符', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\ancient_tree_heart_amulet.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[饰品]-守护/治疗|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n生命值+2600|n自然抗性+18%|n暗属性抗性+18%|n治疗效果+18%|n|cFF808080古树心核尚未完全枯死，贴近胸口时会传来缓慢而沉重的脉动。|r',
+  description = '|cffccffff[饰品]-守护/治疗|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n生命值+2600|n自然抗性+18%|n暗属性抗性+18%|n治疗效果+18%|n|cFF808080古树心核尚未完全枯死，贴近胸口时会传来缓慢而沉重的脉动。|r',
+})
+
+createEquipmentItem('I0F9', '净化者手套', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Gloves\\purifier_gloves.blp',
+  model = 'war3mapImported\\Gloves.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[手套]-辅助/循环|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+36|n冷却缩减+12%|n治疗效果+20%|n魔法恢复+22|n|cFF808080手套掌心有净叶纹路，施法时会散出极淡的草木清香。|r',
+  description = '|cffccffff[手套]-辅助/循环|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+36|n冷却缩减+12%|n治疗效果+20%|n魔法恢复+22|n|cFF808080手套掌心有净叶纹路，施法时会散出极淡的草木清香。|r',
+})
+
+createEquipmentItem('I0FB', '腐朽孢子秘瓶', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\decayed_spore_secret_vial.blp',
+  model = 'war3mapImported\\Urn.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+18%|n持续伤害提升+16%|n暗属性穿透+16%|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
+  description = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+18%|n持续伤害提升+16%|n暗属性穿透+16%|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
+})
+
+createEquipmentItem('I0FC', '净土萌芽圣铃', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\pureland_sprout_bell.blp',
+  model = 'Objects\\InventoryItems\\runicobject\\runicobject.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[饰品/辅助]-净化/续航|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n自然抗性+16%|n生命值+1200|n|cFF808080铃声很轻，却能让腐土中重新冒出第一点嫩芽。|r',
+  description = '|cffccffff[饰品/辅助]-净化/续航|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n自然抗性+16%|n生命值+1200|n|cFF808080铃声很轻，却能让腐土中重新冒出第一点嫩芽。|r',
+})

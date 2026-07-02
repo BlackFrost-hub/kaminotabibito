@@ -54,6 +54,7 @@ export interface 范围光环参数 {
   最小生命值?: number;
   额外筛选?: (this: void, target: any, holder: any) => boolean;
   应用目标效果: (this: void, target: any, holder: any, currentCount: number) => void;
+  同步目标效果?: (this: void, target: any, holder: any, currentCount: number) => void;
   移除目标效果: (this: void, target: any, holder: any, currentCount: number) => void;
 }
 
@@ -209,6 +210,10 @@ function 同步单个持有者光环(this: void, 配置: 范围光环实例, hol
     const 新键 = 新索引 < 新键列表.length ? 新键列表[新索引] : 2147483647;
 
     if (旧键 === 新键) {
+      const sameTarget = 新单位列表[新索引];
+      if (sameTarget != null && sameTarget !== 0 && 配置.同步目标效果 != null) {
+        配置.同步目标效果(sameTarget, holder, currentCount);
+      }
       旧索引 += 1;
       新索引 += 1;
       continue;

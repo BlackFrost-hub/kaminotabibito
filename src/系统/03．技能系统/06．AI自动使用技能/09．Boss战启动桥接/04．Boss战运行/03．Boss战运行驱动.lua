@@ -63,6 +63,7 @@ local GetPlayersAll = ____require_result_1.GetPlayersAll
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_2.debugLogForce
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
 local ____require_result_4 = require("系统.03．技能系统.05．单位技能.05．异界Boss.02．赫萝.index")
@@ -97,6 +98,20 @@ local function _____505C_6B62_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(bossUnit)
     end
     _____6E05_7406_745F_5170_8FEA_5C14_4E0A_4E0B_6587(bossUnit)
 end
+local function _____5199_5165_5F53_524DBoss_5168_5C40(bossUnit)
+    if bossUnit == nil or bossUnit == 0 then
+        return
+    end
+    jglobals.udg_Boss = bossUnit
+end
+local function _____6E05_7406_5F53_524DBoss_5168_5C40(bossUnit)
+    if bossUnit == nil or bossUnit == 0 then
+        return
+    end
+    if jglobals.udg_Boss == bossUnit then
+        jglobals.udg_Boss = nil
+    end
+end
 local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
     if context["是否已结束"] then
         return
@@ -106,6 +121,7 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
     _____5904_7406Boss_6218_62A4_536B_7ED3_675F(context)
     _____505C_6B62_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
     _____505C_6B62_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(context["Boss单位"])
+    _____6E05_7406_5F53_524DBoss_5168_5C40(context["Boss单位"])
     _____6E05_7406Boss_6218_8FD0_884C_4E0A_4E0B_6587(context["Boss单位"])
     _____6E05_7406Boss_6218_5355_4F4D_5B57_6BB5(context["Boss单位"])
     _____6E05_7406Boss_7BAD_5934_7279_6548(context["Boss单位"])
@@ -191,22 +207,22 @@ local function ____onBoss_6218_8FD0_884CTick()
             do
                 local context = activeContexts[i + 1]
                 if context == nil or context["是否已结束"] then
-                    goto __continue25
+                    goto __continue30
                 end
                 _____63A8_8FDBBoss_6218_542F_52A8_72B6_6001(context, nowMs)
                 if not context["是否已激活"] then
-                    goto __continue25
+                    goto __continue30
                 end
                 if _____5355_4F4D_662F_5426_6B7B_4EA1(context["Boss单位"]) then
                     _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
-                    goto __continue25
+                    goto __continue30
                 end
                 _____7EA0_504FBoss_4F4D_7F6E(context)
                 _____7EA0_504F_73A9_5BB6_82F1_96C4_4F4D_7F6E_5230Boss(context)
                 _____5904_7406Boss_6218_62A4_536BTick(context, nowMs)
                 _____5C1D_8BD5_515C_5E95_641C_654C_5E76_4E0B_4EE4(context, nowMs)
             end
-            ::__continue25::
+            ::__continue30::
             i = i + 1
         end
     end
@@ -236,6 +252,7 @@ ____exports["启动Boss战运行"] = function(bossUnit)
     if bossUnit == nil or bossUnit == 0 then
         return
     end
+    _____5199_5165_5F53_524DBoss_5168_5C40(bossUnit)
     local oldContext = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(bossUnit)
     if oldContext ~= nil and not oldContext["是否已结束"] then
         return

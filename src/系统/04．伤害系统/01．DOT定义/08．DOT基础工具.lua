@@ -137,10 +137,6 @@ function ____exports.createDotBaseUtils(self, deps)
         if not targetUnit then
             return 0
         end
-        local m = jass.BlzGetUnitMaxHP(targetUnit)
-        if type(m) == "number" and __TS__NumberIsFinite(__TS__Number(m)) and m > 0 then
-            return m
-        end
         local maxLifeState = nil
         if jass.UNIT_STATE_MAX_LIFE ~= nil then
             maxLifeState = jass.UNIT_STATE_MAX_LIFE

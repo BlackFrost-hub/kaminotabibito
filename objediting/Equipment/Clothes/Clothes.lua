@@ -23,3 +23,39 @@ createEquipmentItem('I0EO', '骸骨烈焰之翼', {
   tooltipExtended = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：B++|n评分：9800|r|n|cffffffcc[基础属性]|r|n敏捷+42|n生命值+2200|n闪避+12%|n移动速度+10%|n火属性伤害+15%|n|cFF808080骸骨凤凰残翼被重新缝合，羽骨间仍有暗红色火星明灭。|r',
   description = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：B++|n评分：9800|r|n|cffffffcc[基础属性]|r|n敏捷+42|n生命值+2200|n闪避+12%|n移动速度+10%|n火属性伤害+15%|n|cFF808080骸骨凤凰残翼被重新缝合，羽骨间仍有暗红色火星明灭。|r',
 })
+
+createEquipmentItem('I0EY', '神风护体披风', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Clothes\\divine_wind_cloak.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[披风]-机动/生存|r|n|cffffcc99等级：B|n评分：6300|r|n|cffffffcc[基础属性]|r|n闪避+14%|n移动速度+10%|n风属性抗性+18%|n冷却缩减+6%|n|cFF808080披风的羽纹永远向同一方向飘动，像有一阵神风藏在布料里。|r',
+  description = '|cffccffff[披风]-机动/生存|r|n|cffffcc99等级：B|n评分：6300|r|n|cffffffcc[基础属性]|r|n闪避+14%|n移动速度+10%|n风属性抗性+18%|n冷却缩减+6%|n|cFF808080披风的羽纹永远向同一方向飘动，像有一阵神风藏在布料里。|r',
+})
+
+createEquipmentItem('I0F3', '墨潮行者长袍', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Clothes\\ink_tide_robe.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[衣服/长袍]-法师防具|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n智力+36|n魔法抗性+20%|n水属性抗性+22%|n沉默抗性+15%|n|cFF808080长袍下摆像墨潮一样沉静铺开，能遮住施法者的微弱气息。|r',
+  description = '|cffccffff[衣服/长袍]-法师防具|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n智力+36|n魔法抗性+20%|n水属性抗性+22%|n沉默抗性+15%|n|cFF808080长袍下摆像墨潮一样沉静铺开，能遮住施法者的微弱气息。|r',
+})
+
+createEquipmentItem('I0F8', '荆棘行者披风', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Clothes\\thornwalker_cloak.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[披风]-自然/机动|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n护甲+26|n自然伤害+15%|n闪避+10%|n移动速度+8%|n|cFF808080披风边缘缠着干枯荆棘，走动时会留下细碎绿光。|r',
+  description = '|cffccffff[披风]-自然/机动|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n护甲+26|n自然伤害+15%|n闪避+10%|n移动速度+8%|n|cFF808080披风边缘缠着干枯荆棘，走动时会留下细碎绿光。|r',
+})

@@ -1,0 +1,89 @@
+﻿/** @noSelfInFile */
+
+import { 获取或创建菲尼克斯尔上下文 } from "./03．运行时上下文";
+import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
+import { 菲尼克斯尔单位技能配置 } from "./00．配置";
+import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import { 播放菲尼克斯尔台词 } from "./17．台词播放";
+import {
+  stringToFourCC,
+  单位存活,
+  取目标或随机玩家,
+  面向单位,
+  设置单位动画,
+  显示常规读条,
+  开始施法硬直,
+  延迟,
+  周期,
+  停止周期,
+  创建预警扇形,
+  播放点特效,
+  单位在扇形内,
+  取菲尼克斯尔玩家英雄列表,
+  计算攻击最大生命伤害,
+  造成火焰伤害,
+  添加元素层数,
+  施加减速,
+  取单位X,
+  取单位Y,
+} from "./19．公共工具";
+
+const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
+  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
+};
+const jass = require("jass.common") as any;
+const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
+
+const 菲尼克斯尔单位类型ID = stringToFourCC(菲尼克斯尔单位技能配置.单位ID);
+const 熔岩吐息技能ID = stringToFourCC(菲尼克斯尔单位技能配置.技能壳.熔岩吐息);
+let 熔岩吐息已注册 = false;
+
+export function 释放菲尼克斯尔熔岩吐息(this: void, context: 菲尼克斯尔运行时上下文, target?: any): void {
+  if (context.当前形态 !== "第一形态" || !单位存活(context.Boss)) return;
+  const boss = context.Boss;
+  const realTarget = 取目标或随机玩家(boss, target);
+  if (!单位存活(realTarget)) return;
+  const config = 菲尼克斯尔数值与表现配置.熔岩吐息;
+  const hitCount: Record<number, number> = {};
+  面向单位(boss, realTarget);
+  播放菲尼克斯尔台词(boss, "熔岩吐息");
+  开始施法硬直(boss, config.预警秒 + config.持续秒);
+  设置单位动画(boss, 菲尼克斯尔数值与表现配置.动画.第一形态.蓄力张口.编号, 菲尼克斯尔数值与表现配置.动画.第一形态.蓄力张口.倍速);
+  显示常规读条(config.预警秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
+  创建预警扇形(boss, config.半径, config.预警秒);
+  延迟(config.预警秒 * 1000, function 菲尼克斯尔熔岩吐息开始(this: void): void {
+    let elapsed = 0;
+    const tick = 周期(config.Tick秒 * 1000, function 菲尼克斯尔熔岩吐息Tick(this: void): void {
+      elapsed += config.Tick秒;
+      if (单位存活(realTarget)) 面向单位(boss, realTarget);
+      播放点特效(菲尼克斯尔数值与表现配置.特效.吐息, 取单位X(boss), 取单位Y(boss), 700);
+      const heroes = 取菲尼克斯尔玩家英雄列表();
+      for (let i = 0; i < heroes.length; i++) {
+        const hero = heroes[i];
+        if (!单位在扇形内(boss, hero, config.半径, config.角度)) continue;
+        造成火焰伤害(boss, hero, 计算攻击最大生命伤害(boss, hero, config.伤害Boss攻击力比例, config.伤害目标最大生命比例));
+        添加元素层数(hero, "火", config.火印层数);
+        const id = GetHandleId(hero) || 0;
+        hitCount[id] = (hitCount[id] ?? 0) + 1;
+        if (hitCount[id] >= config.减速命中次数) 施加减速(boss, hero, config.减速比例, config.减速持续秒);
+      }
+      if (elapsed >= config.持续秒) 停止周期(tick);
+    });
+    context.清理.登记周期回调("菲尼克斯尔熔岩吐息Tick", tick);
+  });
+}
+
+function on菲尼克斯尔熔岩吐息生效(this: void, castingUnit: any, spellAbilityId: number): void {
+  if (spellAbilityId !== 熔岩吐息技能ID) return;
+  if (!单位存活(castingUnit) || GetUnitTypeId(castingUnit) !== 菲尼克斯尔单位类型ID) return;
+  const context = 获取或创建菲尼克斯尔上下文(castingUnit);
+  if (context != null) 释放菲尼克斯尔熔岩吐息(context);
+}
+
+export function 注册菲尼克斯尔熔岩吐息(this: void): void {
+  if (熔岩吐息已注册) return;
+  熔岩吐息已注册 = true;
+  registerSpellEffectListener(on菲尼克斯尔熔岩吐息生效);
+}
+

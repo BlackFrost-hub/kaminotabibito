@@ -34,6 +34,7 @@ export interface 最终伤害攻击效果上下文 {
 export interface 普攻攻击效果监听参数 {
   名称: string;
   冷却毫秒?: number;
+  允许技能普攻?: boolean;
   条件?: (this: void, ctx: 普攻攻击效果上下文) => boolean;
   命中后: (this: void, ctx: 普攻攻击效果上下文) => void;
 }
@@ -91,6 +92,7 @@ function dispatch普攻攻击效果监听器(this: void, ctx: 普攻攻击效果
     if (实例 == null) continue;
     if (实例.条件 != null && 实例.条件(ctx) === false) continue;
     if (ctx.isNormalAttack !== true) continue;
+    if (实例.允许技能普攻 !== true && (ctx.snapshot?.isSkillAttack === true || ctx.snapshot?.isSkillDamage === true)) continue;
     if (攻击效果是否在冷却中(实例.名称, ctx.source, 实例.冷却毫秒 ?? 0)) continue;
     if (!攻击效果开始执行(实例.名称, ctx.source)) continue;
 

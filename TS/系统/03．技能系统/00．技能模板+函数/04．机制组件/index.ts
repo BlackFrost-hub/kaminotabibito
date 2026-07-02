@@ -9,3 +9,8 @@ export * from "./01．层数状态/index";
 export * from "./02．战斗区域/index";
 export * from "./03．持续危险区/index";
 export * from "./04．单位显隐位移表现/index";
+export * from "./05．机制单位/index";
+export * from "./06．机制清理/index";
+export * from "./07．机制连线/index";
+export * from "./08．机制触发/index";
+export * from "./09．装备通用机制/index";

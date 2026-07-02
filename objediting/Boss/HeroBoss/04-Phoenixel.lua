@@ -1,21 +1,21 @@
 -- Chapter 3 main boss: Phoenixel.
 -- Reuses the historical Undying Phoenix raw id N00U.
 
-createRangedBossHeroUnit('N00U', '不死火鸟·菲尼克斯', {
-  modelFile = 'war3mapImported\\Alisrazor.mdl',
+createRangedBossHeroUnit('N00U', '双重凤凰·菲尼克斯尔', {
+  modelFile = 'Boss\\Phoenixel\\HolyPhoenix.mdx',
   icon = 'Boss\\Phoenixel\\Phoenixel.blp',
-  properNames = '不死火鸟·菲尼克斯',
-  tooltipBasic = '不死火鸟·菲尼克斯',
-  tooltipExtended = '不死火鸟·菲尼克斯',
-  description = '不死火鸟·菲尼克斯',
+  properNames = '双重凤凰·菲尼克斯尔',
+  tooltipBasic = '双重凤凰·菲尼克斯尔',
+  tooltipExtended = '双重凤凰·菲尼克斯尔',
+  description = '双重凤凰·菲尼克斯尔',
 
   level = 40,
-  hp = 46000,
+  hp = 55000,
   mana = 2000,
   initialMana = 2000,
   manaRegen = 20.0,
   speed = 322,
-  movementType = MovementType.Fly,
+  movementType = MovementType.Foot,
   minHeight = 850.0,
   height = 850.0,
   turnRate = 0.6,
@@ -25,7 +25,7 @@ createRangedBossHeroUnit('N00U', '不死火鸟·菲尼克斯', {
   strengthPerLevel = 2.0,
   agilityPerLevel = 2.4,
   intelligencePerLevel = 2.0,
-  damageBase = 1400,
+  damageBase = 2500,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 1.6,

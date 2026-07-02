@@ -1,9 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.01．场地配置")
-local _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E = ____01_FF0E_573A_5730_914D_7F6E["米亚平台中心配置"]
-local _____7C73_4E9A_5E73_53F0_4E2D_5FC3X = ____01_FF0E_573A_5730_914D_7F6E["米亚平台中心X"]
-local _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E["米亚平台中心Y"]
+local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心配置"]
+local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心X"]
+local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心Y"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.00．配置")
 local _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["米亚单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.02．数值与表现配置")
@@ -61,7 +61,8 @@ end
 local function _____53D6_6838_5FC3_51FA_751F_70B9_8868()
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["终极污染"]
     local inset = config["核心内缩距离"]
-    return {{x = _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E["左"] + inset, y = _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E["下"] + inset}, {x = _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E["右"] - inset, y = _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E["下"] + inset}, {x = _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E["左"] + inset, y = _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E["上"] - inset}, {x = _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E["右"] - inset, y = _____7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E["上"] - inset}}
+    local platform = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3_914D_7F6E()
+    return {{x = platform["左"] + inset, y = platform["下"] + inset}, {x = platform["右"] - inset, y = platform["下"] + inset}, {x = platform["左"] + inset, y = platform["上"] - inset}, {x = platform["右"] - inset, y = platform["上"] - inset}}
 end
 local function _____64AD_653E_7EC8_6781_6C61_67D3_5F15_5BFC_8868_73B0(context)
     local boss = context["Boss单位"]
@@ -81,8 +82,8 @@ local function _____64AD_653E_7EC8_6781_6C61_67D3_5F15_5BFC_8868_73B0(context)
     })
     _____521B_5EFA_5FAA_73AF_70B9_7279_6548({
         ["模型路径"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["特效"]["终极污染中心柱"],
-        X = _____7C73_4E9A_5E73_53F0_4E2D_5FC3X,
-        Y = _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y,
+        X = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
+        Y = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y(),
         Z = 0,
         ["缩放"] = 1.2,
         ["总持续秒"] = seconds,
@@ -312,16 +313,16 @@ local function _____5B8C_6210_7EC8_6781_6C61_67D3(context)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "终极污染", 9)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["特效"]["终极污染完成冲击"],
-        X = _____7C73_4E9A_5E73_53F0_4E2D_5FC3X,
-        Y = _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y,
+        X = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
+        Y = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y(),
         Z = 0,
         ["缩放"] = 4,
         ["持续秒"] = 2
     })
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["特效"]["终极污染完成毒爆"],
-        X = _____7C73_4E9A_5E73_53F0_4E2D_5FC3X,
-        Y = _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y,
+        X = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
+        Y = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y(),
         Z = 60,
         ["缩放"] = 1.5,
         ["持续秒"] = 2

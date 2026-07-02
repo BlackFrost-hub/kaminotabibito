@@ -1,5 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__Number = ____lualib.__TS__Number
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__Delete = ____lualib.__TS__Delete
 local Map = ____lualib.Map
@@ -98,13 +99,13 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
             local id = idText
             local _____8BB0_5F55 = _____5FAA_73AF_70B9_7279_6548_8868[id]
             if _____8BB0_5F55 == nil then
-                goto __continue39
+                goto __continue44
             end
             local _____53C2_6570 = _____8BB0_5F55["参数"]
             local alive = _____53C2_6570["存活条件"] == nil or _____53C2_6570["存活条件"]()
             if _____8BB0_5F55["已停止"] or not alive or _____8BB0_5F55["结束毫秒"] > 0 and now >= _____8BB0_5F55["结束毫秒"] then
                 _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55(id, _____8BB0_5F55)
-                goto __continue39
+                goto __continue44
             end
             if now >= _____8BB0_5F55["下次重建毫秒"] then
                 _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4(_____8BB0_5F55["当前特效"])
@@ -115,7 +116,7 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
                 _____8BB0_5F55["当前特效"] = nil
             end
         end
-        ::__continue39::
+        ::__continue44::
     end
     if _____5FAA_73AF_70B9_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick()
@@ -262,6 +263,9 @@ EXSetEffectXY = japi.EXSetEffectXY
 EXSetEffectZ = japi.EXSetEffectZ
 EXSetEffectSize = japi.EXSetEffectSize
 EXSetEffectSpeed = japi.EXSetEffectSpeed
+local EXEffectMatRotateX = japi.EXEffectMatRotateX
+local EXEffectMatRotateY = japi.EXEffectMatRotateY
+local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 EXEffectMatScale = japi.EXEffectMatScale
 DzSetEffectScale = japi.DzSetEffectScale
 DzGetColor = japi.DzGetColor
@@ -301,6 +305,23 @@ function ____exports.createTimedEffect(modelPath, x, y, z, duration)
     end
     _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548(eff, duration)
     return eff
+end
+____exports["设置特效XYZ轴旋转"] = function(effect, _____53C2_6570)
+    if effect == nil or effect == 0 or _____53C2_6570 == nil then
+        return
+    end
+    local x = __TS__Number(_____53C2_6570["X轴角度"]) or 0
+    local y = __TS__Number(_____53C2_6570["Y轴角度"]) or 0
+    local z = __TS__Number(_____53C2_6570["Z轴角度"]) or 0
+    if x ~= 0 and type(EXEffectMatRotateX) == "function" then
+        EXEffectMatRotateX(effect, x)
+    end
+    if y ~= 0 and type(EXEffectMatRotateY) == "function" then
+        EXEffectMatRotateY(effect, y)
+    end
+    if z ~= 0 and type(EXEffectMatRotateZ) == "function" then
+        EXEffectMatRotateZ(effect, z)
+    end
 end
 ____exports["创建点特效"] = function(_____53C2_6570)
     if _____53C2_6570["模型路径"] == nil or _____53C2_6570["模型路径"] == "" then
@@ -520,11 +541,11 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
         do
             local record = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key]
             if record == nil then
-                goto __continue109
+                goto __continue114
             end
             if not _____5355_4F4D_53EF_5750_6807_8DDF_968F(record.unit) then
                 _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548_8BB0_5F55(key, record)
-                goto __continue109
+                goto __continue114
             end
             DzSetEffectPos(
                 record.effect,
@@ -533,7 +554,7 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
                 record.height
             )
         end
-        ::__continue109::
+        ::__continue114::
     end
     if _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()

@@ -25,6 +25,9 @@ const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) 
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const EXSetEffectSpeed = japi.EXSetEffectSpeed as (effect: any, speed: number) => void;
+const EXEffectMatRotateX = japi.EXEffectMatRotateX as ((effect: any, angle: number) => void) | undefined;
+const EXEffectMatRotateY = japi.EXEffectMatRotateY as ((effect: any, angle: number) => void) | undefined;
+const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, angle: number) => void) | undefined;
 const EXEffectMatScale = japi.EXEffectMatScale as ((effect: any, x: number, y: number, z: number) => void) | undefined;
 const DzSetEffectScale = japi.DzSetEffectScale as ((effect: any, scale: number) => void) | undefined;
 const DzGetColor = japi.DzGetColor as ((alpha: number, red: number, green: number, blue: number) => number) | undefined;
@@ -87,6 +90,22 @@ export interface 点特效参数 {
 }
 
 export type 单位脚下点特效参数 = Omit<点特效参数, "X" | "Y">;
+
+export interface 特效XYZ轴旋转参数 {
+  X轴角度?: number;
+  Y轴角度?: number;
+  Z轴角度?: number;
+}
+
+export function 设置特效XYZ轴旋转(effect: any, 参数: 特效XYZ轴旋转参数): void {
+  if (effect == null || effect === 0 || 参数 == null) return;
+  const x = Number(参数.X轴角度) || 0;
+  const y = Number(参数.Y轴角度) || 0;
+  const z = Number(参数.Z轴角度) || 0;
+  if (x !== 0 && typeof EXEffectMatRotateX === "function") EXEffectMatRotateX(effect, x);
+  if (y !== 0 && typeof EXEffectMatRotateY === "function") EXEffectMatRotateY(effect, y);
+  if (z !== 0 && typeof EXEffectMatRotateZ === "function") EXEffectMatRotateZ(effect, z);
+}
 
 export function 创建点特效(参数: 点特效参数): any {
   if (参数.模型路径 == null || 参数.模型路径 === "") return null;

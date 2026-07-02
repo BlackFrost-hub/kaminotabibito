@@ -63,6 +63,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, moduleName: string, ...args: any[]) => void;
 };
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
@@ -108,6 +109,16 @@ function 停止瑟兰迪尔Boss运行时(this: void, bossUnit: any): void {
   清理瑟兰迪尔上下文(bossUnit);
 }
 
+function 写入当前Boss全局(this: void, bossUnit: any): void {
+  if (bossUnit == null || bossUnit === 0) return;
+  jglobals.udg_Boss = bossUnit;
+}
+
+function 清理当前Boss全局(this: void, bossUnit: any): void {
+  if (bossUnit == null || bossUnit === 0) return;
+  if (jglobals.udg_Boss === bossUnit) jglobals.udg_Boss = null;
+}
+
 function 结束Boss战运行上下文(this: void, context: Boss战运行上下文, nowMs: number): void {
   if (context.是否已结束) return;
 
@@ -116,6 +127,7 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
   处理Boss战护卫结束(context);
   停止赫萝昼夜被动(context.Boss单位);
   停止瑟兰迪尔Boss运行时(context.Boss单位);
+  清理当前Boss全局(context.Boss单位);
   清理Boss战运行上下文(context.Boss单位);
   清理Boss战单位字段(context.Boss单位);
   清理Boss箭头特效(context.Boss单位);
@@ -220,6 +232,8 @@ export function 停止Boss战运行驱动(this: void): void {
 
 export function 启动Boss战运行(this: void, bossUnit: any): void {
   if (bossUnit == null || bossUnit === 0) return;
+
+  写入当前Boss全局(bossUnit);
 
   const oldContext = 读取Boss战运行上下文(bossUnit);
   if (oldContext != null && !oldContext.是否已结束) return;

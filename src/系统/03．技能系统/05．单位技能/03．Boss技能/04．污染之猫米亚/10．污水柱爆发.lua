@@ -2,8 +2,8 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.01．场地配置")
-local _____7C73_4E9A_5E73_53F0_4E2D_5FC3X = ____01_FF0E_573A_5730_914D_7F6E["米亚平台中心X"]
-local _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E["米亚平台中心Y"]
+local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心X"]
+local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心Y"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.00．配置")
 local _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["米亚单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.02．数值与表现配置")
@@ -99,7 +99,10 @@ local function _____9009_62E9_6C61_6C34_67F1_843D_70B9(boss)
         }
     end
     while #result < count do
-        result[#result + 1] = {x = _____7C73_4E9A_5E73_53F0_4E2D_5FC3X, y = _____7C73_4E9A_5E73_53F0_4E2D_5FC3Y}
+        result[#result + 1] = {
+            x = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
+            y = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y()
+        }
     end
     return result
 end

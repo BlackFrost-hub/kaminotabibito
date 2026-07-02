@@ -66,13 +66,14 @@ local function _____6CE8_518C_6700_7EC8_4F24_5BB3_56DE_8C03(cb)
 end
 local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 getRegisteredPlayerHero = ____require_result_3.getRegisteredPlayerHero
+local ____require_result_4 = require("系统.00．核心系统.03．脱战系统.00．脱战规则")
+local _____8131_6218_5F00_5173 = ____require_result_4["脱战开关"]
+local _____73A9_5BB6_82F1_96C4_8131_6218_65F6_95F4_79D2 = ____require_result_4["玩家英雄脱战时间秒"]
+local ____Boss_8131_6218_65F6_95F4_79D2 = ____require_result_4["Boss脱战时间秒"]
+_____8131_6218_79FB_901F_6280_80FDID = ____require_result_4["脱战移速技能ID"]
+local _____8131_6218BuffID = ____require_result_4["脱战BuffID"]
+local _____8131_6218_4F24_5BB3_9608_503C_6BD4_4F8B = ____require_result_4["脱战伤害阈值比例"]
 local centerTimer = _G
-local _____8131_6218_5F00_5173 = true
-local _____82F1_96C4_8131_6218_65F6_95F4_79D2 = 18
-local ____Boss_8131_6218_65F6_95F4_79D2 = 10
-_____8131_6218_79FB_901F_6280_80FDID = 1093677378
-local _____8131_6218BuffID = 1110454321
-local _____4F24_5BB3_9608_503C_6BD4_4F8B = 0.012
 local _____82F1_96C4_8131_6218_8BA1_65F6_5668ID = {
     0,
     0,
@@ -107,7 +108,7 @@ local function _____542F_52A8_82F1_96C4_8131_6218_8BA1_65F6(_____73A9_5BB6_7F16_
         centerTimer.removeDelayedCallback(_____65E7_4EFB_52A1ID)
     end
     _____82F1_96C4_8131_6218_8BA1_65F6_5668ID[_____7D22_5F15 + 1] = centerTimer.addDelayedCallback(
-        _____82F1_96C4_8131_6218_65F6_95F4_79D2 * 1000,
+        _____73A9_5BB6_82F1_96C4_8131_6218_65F6_95F4_79D2 * 1000,
         function()
             if _____82F1_96C4_8131_6218_8BA1_65F6_5668ID[_____7D22_5F15 + 1] == 0 then
                 return
@@ -137,7 +138,7 @@ local function _____68C0_67E5_79FB_9664_8131_6218Buff(unit, damage)
         return
     end
     local _____6700_5927_751F_547D = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
-    local _____9608_503C = _____6700_5927_751F_547D * _____4F24_5BB3_9608_503C_6BD4_4F8B
+    local _____9608_503C = _____6700_5927_751F_547D * _____8131_6218_4F24_5BB3_9608_503C_6BD4_4F8B
     if damage >= _____9608_503C then
         jass.UnitRemoveAbility(unit, _____8131_6218_79FB_901F_6280_80FDID)
         jass.UnitRemoveAbility(unit, _____8131_6218BuffID)

@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
-import { 米亚平台中心X, 米亚平台中心Y } from "./01．场地配置";
+import { 取米亚平台中心X, 取米亚平台中心Y } from "./01．场地配置";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚技能数值配置 } from "./02．数值与表现配置";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
@@ -102,7 +102,7 @@ function 选择污水柱落点(this: void, boss: any): 污水柱落点[] {
     result.push({ x: GetUnitX(hero), y: GetUnitY(hero) });
   }
   while (result.length < count) {
-    result.push({ x: 米亚平台中心X, y: 米亚平台中心Y });
+    result.push({ x: 取米亚平台中心X(), y: 取米亚平台中心Y() });
   }
   return result;
 }

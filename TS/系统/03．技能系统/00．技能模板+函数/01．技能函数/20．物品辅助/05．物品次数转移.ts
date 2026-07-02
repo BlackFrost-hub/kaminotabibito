@@ -11,7 +11,7 @@ const {
   获取物品次数,
   设置物品次数,
   增加物品次数,
-} = require("系统.02．物品系统.15．装备技能.05．物品使用.00．公共.02．物品使用工具") as {
+} = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具") as {
   获取物品次数: (this: void, 单位: any, 物品类型ID: number) => number;
   设置物品次数: (this: void, 单位: any, 物品类型ID: number, 次数: number) => void;
   增加物品次数: (this: void, 单位: any, 物品类型ID: number, 次数: number, 最大值: number) => void;

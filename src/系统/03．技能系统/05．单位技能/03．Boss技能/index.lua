@@ -40,4 +40,20 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.03．Boss技能.06．双重凤凰菲尼克斯尔.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

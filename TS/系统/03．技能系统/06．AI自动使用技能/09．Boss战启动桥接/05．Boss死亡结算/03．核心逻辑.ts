@@ -54,8 +54,8 @@ const { 调整玩家属性 } = require("系统.02．物品系统.15．装备技�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
-const { 创建首领奖励宝箱 } = require("系统.06．经济系统.00．宝箱系统.10．首领奖励宝箱") as {
-  创建首领奖励宝箱: (this: void, 奖励池ID: string, x: number, y: number, 打开范围?: "开启者" | "所有玩家英雄") => any;
+const { 打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
+  打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
 };
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
@@ -76,6 +76,7 @@ const 攻击力属性ID = 1;
 const BJ修改增加 = 0;
 
 let 当前全员奖励: Boss死亡全员奖励 | undefined;
+let 当前Boss死亡首领奖励池ID = "";
 let 豺狼异变累计次数 = 0;
 
 function 读取玩家英雄组(this: void): any {
@@ -150,6 +151,21 @@ function 发放Boss死亡击杀者奖励(this: void, 奖励: Boss死亡击杀者
   }
 }
 
+function on打开Boss死亡首领奖励UI(this: void): void {
+  const 英雄 = GetEnumUnit();
+  if (英雄 == null || 英雄 === 0 || 当前Boss死亡首领奖励池ID === "") return;
+  打开首领奖励选择界面(当前Boss死亡首领奖励池ID, GetOwningPlayer(英雄));
+}
+
+function 打开Boss死亡首领奖励UI(this: void, 奖励池ID: string | undefined): void {
+  if (奖励池ID == null || 奖励池ID === "") return;
+  const 玩家英雄组 = 读取玩家英雄组();
+  if (玩家英雄组 == null || 玩家英雄组 === 0) return;
+  当前Boss死亡首领奖励池ID = 奖励池ID;
+  ForGroup(玩家英雄组, on打开Boss死亡首领奖励UI);
+  当前Boss死亡首领奖励池ID = "";
+}
+
 function 执行清理项(this: void, 清理项: Boss死亡清理项, Boss单位: any): void {
   if (清理项.表名 == null || 清理项.表名 === "") return;
 
@@ -222,18 +238,21 @@ function 处理Boss死亡特殊逻辑掉落(this: void, 配置: Boss死亡结算
 
 function 掉落Boss死亡直接物品(this: void, 配置: Boss死亡结算配置, Boss单位: any, 击杀者: any): void {
   const 物品列表 = 配置.直接掉落物品名列表;
-  if (物品列表 == null || 物品列表.length <= 0) return;
+  const 物品ID列表 = 配置.直接掉落物品ID列表;
+  if ((物品列表 == null || 物品列表.length <= 0) && (物品ID列表 == null || 物品ID列表.length <= 0)) return;
   const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
-  for (let i = 0; i < 物品列表.length; i++) {
-    const 物品ID = stringToFourCCSafe(按名字反查物品ID(物品列表[i]));
-    if (物品ID > 0) CreateItem(物品ID, 位置.x, 位置.y);
+  if (物品列表 != null) {
+    for (let i = 0; i < 物品列表.length; i++) {
+      const 物品ID = stringToFourCCSafe(按名字反查物品ID(物品列表[i]));
+      if (物品ID > 0) CreateItem(物品ID, 位置.x, 位置.y);
+    }
   }
-}
-
-function 创建Boss死亡首领奖励宝箱(this: void, 配置: Boss死亡结算配置, Boss单位: any, 击杀者: any): void {
-  if (配置.首领奖励池ID == null || 配置.首领奖励池ID === "") return;
-  const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
-  创建首领奖励宝箱(配置.首领奖励池ID, 位置.x, 位置.y, "所有玩家英雄");
+  if (物品ID列表 != null) {
+    for (let i = 0; i < 物品ID列表.length; i++) {
+      const 物品ID = stringToFourCCSafe(物品ID列表[i]);
+      if (物品ID > 0) CreateItem(物品ID, 位置.x, 位置.y);
+    }
+  }
 }
 
 function 延迟执行Boss死亡奖励与提示(this: void, 配置: Boss死亡结算配置, 全员奖励: Boss死亡全员奖励 | undefined): void {
@@ -317,7 +336,7 @@ export function 执行Boss死亡结算(this: void, 配置: Boss死亡结算配�
   const 运行Boss单位 = 解析Boss单位(配置, Boss单位);
   if (!处理Boss死亡特殊逻辑前置(配置, 击杀者)) return false;
 
-  创建Boss死亡首领奖励宝箱(配置, 运行Boss单位, 击杀者);
+  打开Boss死亡首领奖励UI(配置.首领奖励池ID);
   掉落Boss死亡直接物品(配置, 运行Boss单位, 击杀者);
   处理Boss死亡特殊逻辑掉落(配置, 运行Boss单位, 击杀者);
   执行Boss死亡清理(配置, 运行Boss单位);

@@ -44,8 +44,8 @@ local ____require_result_12 = require("系统.02．物品系统.15．装备技�
 local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_12["调整玩家属性"]
 local ____require_result_13 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_13.addDelayedCallback
-local ____require_result_14 = require("系统.06．经济系统.00．宝箱系统.10．首领奖励宝箱")
-local _____521B_5EFA_9996_9886_5956_52B1_5B9D_7BB1 = ____require_result_14["创建首领奖励宝箱"]
+local ____require_result_14 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面")
+local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_14["打开首领奖励选择界面"]
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -62,6 +62,7 @@ local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____653B_51FB_529B_5C5E_6027ID = 1
 local ____BJ_4FEE_6539_589E_52A0 = 0
 local _____5F53_524D_5168_5458_5956_52B1
+local _____5F53_524DBoss_6B7B_4EA1_9996_9886_5956_52B1_6C60ID = ""
 local _____8C7A_72FC_5F02_53D8_7D2F_8BA1_6B21_6570 = 0
 local function _____8BFB_53D6_73A9_5BB6_82F1_96C4_7EC4()
     return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
@@ -186,6 +187,28 @@ local function _____53D1_653EBoss_6B7B_4EA1_51FB_6740_8005_5956_52B1(_____5956_5
         end
     end
 end
+local function ____on_6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI()
+    local _____82F1_96C4 = GetEnumUnit()
+    if _____82F1_96C4 == nil or _____82F1_96C4 == 0 or _____5F53_524DBoss_6B7B_4EA1_9996_9886_5956_52B1_6C60ID == "" then
+        return
+    end
+    _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(
+        _____5F53_524DBoss_6B7B_4EA1_9996_9886_5956_52B1_6C60ID,
+        GetOwningPlayer(_____82F1_96C4)
+    )
+end
+local function _____6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI(_____5956_52B1_6C60ID)
+    if _____5956_52B1_6C60ID == nil or _____5956_52B1_6C60ID == "" then
+        return
+    end
+    local _____73A9_5BB6_82F1_96C4_7EC4 = _____8BFB_53D6_73A9_5BB6_82F1_96C4_7EC4()
+    if _____73A9_5BB6_82F1_96C4_7EC4 == nil or _____73A9_5BB6_82F1_96C4_7EC4 == 0 then
+        return
+    end
+    _____5F53_524DBoss_6B7B_4EA1_9996_9886_5956_52B1_6C60ID = _____5956_52B1_6C60ID
+    ForGroup(_____73A9_5BB6_82F1_96C4_7EC4, ____on_6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI)
+    _____5F53_524DBoss_6B7B_4EA1_9996_9886_5956_52B1_6C60ID = ""
+end
 local function _____6267_884C_6E05_7406_9879(_____6E05_7406_9879, ____Boss_5355_4F4D)
     if _____6E05_7406_9879["表名"] == nil or _____6E05_7406_9879["表名"] == "" then
         return
@@ -288,27 +311,35 @@ local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____9
 end
 local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
     local _____7269_54C1_5217_8868 = _____914D_7F6E["直接掉落物品名列表"]
-    if _____7269_54C1_5217_8868 == nil or #_____7269_54C1_5217_8868 <= 0 then
+    local _____7269_54C1ID_5217_8868 = _____914D_7F6E["直接掉落物品ID列表"]
+    if (_____7269_54C1_5217_8868 == nil or #_____7269_54C1_5217_8868 <= 0) and (_____7269_54C1ID_5217_8868 == nil or #_____7269_54C1ID_5217_8868 <= 0) then
         return
     end
     local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
-    do
-        local i = 0
-        while i < #_____7269_54C1_5217_8868 do
-            local _____7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_5217_8868[i + 1]))
-            if _____7269_54C1ID > 0 then
-                CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+    if _____7269_54C1_5217_8868 ~= nil then
+        do
+            local i = 0
+            while i < #_____7269_54C1_5217_8868 do
+                local _____7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_5217_8868[i + 1]))
+                if _____7269_54C1ID > 0 then
+                    CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+                end
+                i = i + 1
             end
-            i = i + 1
         end
     end
-end
-local function _____521B_5EFABoss_6B7B_4EA1_9996_9886_5956_52B1_5B9D_7BB1(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
-    if _____914D_7F6E["首领奖励池ID"] == nil or _____914D_7F6E["首领奖励池ID"] == "" then
-        return
+    if _____7269_54C1ID_5217_8868 ~= nil then
+        do
+            local i = 0
+            while i < #_____7269_54C1ID_5217_8868 do
+                local _____7269_54C1ID = stringToFourCCSafe(_____7269_54C1ID_5217_8868[i + 1])
+                if _____7269_54C1ID > 0 then
+                    CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+                end
+                i = i + 1
+            end
+        end
     end
-    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
-    _____521B_5EFA_9996_9886_5956_52B1_5B9D_7BB1(_____914D_7F6E["首领奖励池ID"], _____4F4D_7F6E.x, _____4F4D_7F6E.y, "所有玩家英雄")
 end
 local function _____5EF6_8FDF_6267_884CBoss_6B7B_4EA1_5956_52B1_4E0E_63D0_793A(_____914D_7F6E, _____5168_5458_5956_52B1)
     if _____5168_5458_5956_52B1 ~= nil then
@@ -423,7 +454,7 @@ ____exports["执行Boss死亡结算"] = function(_____914D_7F6E, ____Boss_5355_4
     if not _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_524D_7F6E(_____914D_7F6E, _____51FB_6740_8005) then
         return false
     end
-    _____521B_5EFABoss_6B7B_4EA1_9996_9886_5956_52B1_5B9D_7BB1(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
+    _____6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI(_____914D_7F6E["首领奖励池ID"])
     _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
     _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
     _____6267_884CBoss_6B7B_4EA1_6E05_7406(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D)

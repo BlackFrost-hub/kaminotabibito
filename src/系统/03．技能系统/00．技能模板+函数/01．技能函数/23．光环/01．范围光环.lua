@@ -188,6 +188,10 @@ local function _____540C_6B65_5355_4E2A_6301_6709_8005_5149_73AF(_____914D_7F6E,
             local _____65E7_952E = _____65E7_7D22_5F15 < #_____65E7_952E_5217_8868 and _____65E7_952E_5217_8868[_____65E7_7D22_5F15 + 1] or 2147483647
             local _____65B0_952E = _____65B0_7D22_5F15 < #_____65B0_952E_5217_8868 and _____65B0_952E_5217_8868[_____65B0_7D22_5F15 + 1] or 2147483647
             if _____65E7_952E == _____65B0_952E then
+                local sameTarget = _____65B0_5355_4F4D_5217_8868[_____65B0_7D22_5F15 + 1]
+                if sameTarget ~= nil and sameTarget ~= 0 and _____914D_7F6E["同步目标效果"] ~= nil then
+                    _____914D_7F6E["同步目标效果"](sameTarget, holder, currentCount)
+                end
                 _____65E7_7D22_5F15 = _____65E7_7D22_5F15 + 1
                 _____65B0_7D22_5F15 = _____65B0_7D22_5F15 + 1
                 goto __continue37
@@ -219,11 +223,11 @@ local function ____on_8303_56F4_5149_73AF_5468_671F(unit, _currentCount)
                 local _____914D_7F6E = _____8303_56F4_5149_73AF_5B9E_4F8B_8868[i + 1]
                 local _____5F53_524D_6570_91CF = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(unit, _____914D_7F6E["物品类型ID"])
                 if _____5F53_524D_6570_91CF <= 0 then
-                    goto __continue44
+                    goto __continue45
                 end
                 _____540C_6B65_5355_4E2A_6301_6709_8005_5149_73AF(_____914D_7F6E, unit, _____5F53_524D_6570_91CF)
             end
-            ::__continue44::
+            ::__continue45::
             i = i + 1
         end
     end
@@ -236,11 +240,11 @@ local function ____on_8303_56F4_5149_73AF_4E22_5F03(unit)
                 local _____914D_7F6E = _____8303_56F4_5149_73AF_5B9E_4F8B_8868[i + 1]
                 local _____5F53_524D_6570_91CF = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(unit, _____914D_7F6E["物品类型ID"])
                 if _____5F53_524D_6570_91CF > 0 then
-                    goto __continue48
+                    goto __continue49
                 end
                 _____6E05_7406_6301_6709_8005_5149_73AF(_____914D_7F6E, unit, 1)
             end
-            ::__continue48::
+            ::__continue49::
             i = i + 1
         end
     end

@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
-import { 米亚平台中心X, 米亚平台中心Y, 取米亚单位所在安全域 } from "./01．场地配置";
+import { 取米亚平台中心X, 取米亚平台中心Y, 取米亚单位所在安全域 } from "./01．场地配置";
 import { 米亚技能数值配置 } from "./02．数值与表现配置";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 播放米亚台词 } from "./15．台词播放";
@@ -24,7 +24,6 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
-const BlzSetSpecialEffectYaw = jass.BlzSetSpecialEffectYaw as ((effect: any, yaw: number) => void) | undefined;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -32,9 +31,9 @@ const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
+const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, angle: number) => void) | undefined;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const BJ_DEGTORAD = 0.017453292519943295;
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
@@ -60,23 +59,25 @@ function 创建朝向点特效(this: void, model: string, x: number, y: number, 
   if (effect == null || effect === 0) return;
   if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, scale);
   if (z != null && z !== 0 && typeof EXSetEffectZ === "function") EXSetEffectZ(effect, z);
-  if (typeof BlzSetSpecialEffectYaw === "function") BlzSetSpecialEffectYaw(effect, yawDeg * BJ_DEGTORAD);
+  if (typeof EXEffectMatRotateZ === "function") EXEffectMatRotateZ(effect, yawDeg);
   YDWETimerDestroyEffectSafe(duration, effect);
 }
 
 function 播放脉冲中心预警(this: void): void {
   const config = 米亚技能数值配置.污染脉冲;
-  创建朝向点特效(config.中心预警特效, 米亚平台中心X, 米亚平台中心Y, 1.4, config.预警秒 + 0.2, 0, 30);
+  创建朝向点特效(config.中心预警特效, 取米亚平台中心X(), 取米亚平台中心Y(), 1.4, config.预警秒 + 0.2, 0, 30);
 }
 
 function 播放脉冲波表现(this: void, waveIndex: number): void {
   const config = 米亚技能数值配置.污染脉冲;
+  const centerX = 取米亚平台中心X();
+  const centerY = 取米亚平台中心Y();
   const waveNo = waveIndex + 1;
   const angles = [0, 90, 180, 270];
   for (let i = 0; i < angles.length; i++) {
-    创建朝向点特效(config.脉冲中心特效, 米亚平台中心X, 米亚平台中心Y, 1.0, 1.2, angles[i], 0);
+    创建朝向点特效(config.脉冲中心特效, centerX, centerY, 1.0, 1.2, angles[i], 0);
   }
-  创建朝向点特效(config.扩散波特效, 米亚平台中心X, 米亚平台中心Y, 1.5 * waveNo, 2.0, 270, 0);
+  创建朝向点特效(config.扩散波特效, centerX, centerY, 1.5 * waveNo, 2.0, 270, 0);
 }
 
 function 结算污染脉冲波(this: void, context: 米亚运行时上下文, waveIndex: number): void {
@@ -86,6 +87,8 @@ function 结算污染脉冲波(this: void, context: 米亚运行时上下文, wa
   const config = 米亚技能数值配置.污染脉冲;
   const radius = config.波次半径[waveIndex];
   const radius2 = radius * radius;
+  const centerX = 取米亚平台中心X();
+  const centerY = 取米亚平台中心Y();
   播放脉冲波表现(waveIndex);
   播放米亚台词(boss, "污染脉冲", waveIndex + 2);
 
@@ -94,7 +97,7 @@ function 结算污染脉冲波(this: void, context: 米亚运行时上下文, wa
     const target = targets[i];
     if (!单位有效(target)) continue;
     if (单位在有效安全域内(context, target)) continue;
-    if (距离平方(米亚平台中心X, 米亚平台中心Y, GetUnitX(target), GetUnitY(target)) > radius2) continue;
+    if (距离平方(centerX, centerY, GetUnitX(target), GetUnitY(target)) > radius2) continue;
     const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
     UnitDamageTarget(boss, target, maxLife * config.每波最大生命伤害比例 * 取米亚平台超载伤害倍率(target), false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_POISON, jass.WEAPON_TYPE_WHOKNOWS);
     添加米亚腐化感染(context, target, config.每波腐化层数, "污染脉冲");

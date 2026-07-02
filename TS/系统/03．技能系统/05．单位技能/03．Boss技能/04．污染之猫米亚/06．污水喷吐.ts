@@ -42,12 +42,11 @@ const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const BlzSetSpecialEffectYaw = jass.BlzSetSpecialEffectYaw as ((effect: any, yaw: number) => void) | undefined;
 const GetUnitStateJapi = japi.GetUnitState as ((unit: any, state: any) => number) | undefined;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
+const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, angle: number) => void) | undefined;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
-const BJ_DEGTORAD = 0.017453292519943295;
 const BJ_RADTODEG = 57.29577951308232;
 const 米亚单位类型ID = stringToFourCC(米亚单位技能配置.Boss单位ID);
 const 污水喷吐技能ID = stringToFourCC(米亚单位技能配置.污水喷吐技能);
@@ -100,7 +99,7 @@ function 播放喷吐表现(this: void, boss: any): void {
   const effect = AddSpecialEffect("Common\\Effect\\Element\\poison\\[AKE]war3AKE.com - 6158867876016216905550325.mdx", x, y);
   if (effect != null && effect !== 0) {
     if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, 1.2);
-    if (typeof BlzSetSpecialEffectYaw === "function") BlzSetSpecialEffectYaw(effect, facing * BJ_DEGTORAD);
+    if (typeof EXEffectMatRotateZ === "function") EXEffectMatRotateZ(effect, facing);
     YDWETimerDestroyEffectSafe(1.5, effect);
   }
   SetUnitAnimationByIndex(boss, 5);

@@ -12,6 +12,9 @@ const ENABLE_BROADCAST_HINT_TEST = true;
 const ENABLE_BOSS_REWARD_SELECTION_TEST = true;
 const ENABLE_THRANDUIL_BOSS_SKILL_TEST = true;
 const ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST = true;
+const ENABLE_BALZAROTH_BOSS_SKILL_TEST = true;
+const ENABLE_PHOENIXEL_BOSS_SKILL_TEST = true;
+const ENABLE_MIA_BOSS_SKILL_TEST = true;
 
 function loadTests(): void {
   if (ENABLE_STES_EVENT_TEST) {
@@ -44,6 +47,18 @@ function loadTests(): void {
 
   if (ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST) {
     require("系统.12．测试系统.07．伤害数字前缀模型测试");
+  }
+
+  if (ENABLE_BALZAROTH_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.08．巴尔扎罗斯Boss技能测试");
+  }
+
+  if (ENABLE_PHOENIXEL_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.09．菲尼克斯尔Boss技能测试");
+  }
+
+  if (ENABLE_MIA_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.10．米亚Boss技能测试");
   }
 
 }

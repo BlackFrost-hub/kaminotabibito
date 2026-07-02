@@ -31,17 +31,25 @@ function 注册最终伤害回调(this: void, cb: (target: any, attacker: any, a
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
 };
+const {
+  脱战开关,
+  玩家英雄脱战时间秒,
+  Boss脱战时间秒,
+  脱战移速技能ID,
+  脱战BuffID,
+  脱战伤害阈值比例,
+} = require("系统.00．核心系统.03．脱战系统.00．脱战规则") as {
+  脱战开关: boolean;
+  玩家英雄脱战时间秒: number;
+  Boss脱战时间秒: number;
+  脱战移速技能ID: number;
+  脱战BuffID: number;
+  脱战伤害阈值比例: number;
+};
 const centerTimer = globalThis as unknown as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
   removeDelayedCallback: (this: void, id: number) => void;
 };
-
-const 脱战开关 = true;
-const 英雄脱战时间秒 = 18.0;
-const Boss脱战时间秒 = 10.0;
-const 脱战移速技能ID = 0x41303142; // A01B
-const 脱战BuffID = 0x42303031; // B001
-const 伤害阈值比例 = 0.012;
 
 const 英雄脱战计时器ID: number[] = [0, 0, 0, 0, 0];
 let Boss脱战计时器ID = 0;
@@ -67,7 +75,7 @@ function 启动英雄脱战计时(this: void, 玩家编号: number): void {
     centerTimer.removeDelayedCallback(旧任务ID);
   }
 
-  英雄脱战计时器ID[索引] = centerTimer.addDelayedCallback(英雄脱战时间秒 * 1000, () => {
+  英雄脱战计时器ID[索引] = centerTimer.addDelayedCallback(玩家英雄脱战时间秒 * 1000, () => {
     if (英雄脱战计时器ID[索引] === 0) return;
     英雄脱战计时器ID[索引] = 0;
     英雄脱战完成(玩家编号);
@@ -119,7 +127,7 @@ function 检查移除脱战Buff(this: void, unit: any, damage: number): void {
   if (!拥有Buff(unit, 脱战BuffID)) return;
 
   const 最大生命 = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
-  const 阈值 = 最大生命 * 伤害阈值比例;
+  const 阈值 = 最大生命 * 脱战伤害阈值比例;
 
   if (damage >= 阈值) {
     jass.UnitRemoveAbility(unit, 脱战移速技能ID);

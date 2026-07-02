@@ -57,6 +57,25 @@ function ____dispatch_666E_653B_653B_51FB_6548_679C_76D1_542C_5668(ctx)
                 if ctx.isNormalAttack ~= true then
                     goto __continue9
                 end
+                local ____temp_11 = _____5B9E_4F8B["允许技能普攻"] ~= true
+                if ____temp_11 then
+                    local ____opt_6 = ctx.snapshot
+                    if ____opt_6 ~= nil then
+                        ____opt_6 = ____opt_6.isSkillAttack
+                    end
+                    local ____temp_10 = ____opt_6 == true
+                    if not ____temp_10 then
+                        local ____opt_8 = ctx.snapshot
+                        if ____opt_8 ~= nil then
+                            ____opt_8 = ____opt_8.isSkillDamage
+                        end
+                        ____temp_10 = ____opt_8 == true
+                    end
+                    ____temp_11 = ____temp_10
+                end
+                if ____temp_11 then
+                    goto __continue9
+                end
                 if _____653B_51FB_6548_679C_662F_5426_5728_51B7_5374_4E2D(_____5B9E_4F8B["名称"], ctx.source, _____5B9E_4F8B["冷却毫秒"] or 0) then
                     goto __continue9
                 end
@@ -88,16 +107,16 @@ function ____dispatch_6700_7EC8_4F24_5BB3_76D1_542C_5668(ctx)
             do
                 local _____5B9E_4F8B = _____6700_7EC8_4F24_5BB3_76D1_542C_5217_8868[i + 1]
                 if _____5B9E_4F8B == nil then
-                    goto __continue19
+                    goto __continue20
                 end
                 if _____5B9E_4F8B["条件"] ~= nil and _____5B9E_4F8B["条件"](ctx) == false then
-                    goto __continue19
+                    goto __continue20
                 end
                 if _____653B_51FB_6548_679C_662F_5426_5728_51B7_5374_4E2D(_____5B9E_4F8B["名称"], ctx.source, _____5B9E_4F8B["冷却毫秒"] or 0) then
-                    goto __continue19
+                    goto __continue20
                 end
                 if not _____653B_51FB_6548_679C_5F00_59CB_6267_884C(_____5B9E_4F8B["名称"], ctx.source) then
-                    goto __continue19
+                    goto __continue20
                 end
                 do
                     local ____try, ____error = pcall(function()
@@ -112,7 +131,7 @@ function ____dispatch_6700_7EC8_4F24_5BB3_76D1_542C_5668(ctx)
                     end
                 end
             end
-            ::__continue19::
+            ::__continue20::
             i = i + 1
         end
     end

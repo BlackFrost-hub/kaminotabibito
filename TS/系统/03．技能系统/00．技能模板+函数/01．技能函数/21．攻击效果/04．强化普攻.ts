@@ -59,6 +59,7 @@ export interface 强化普攻参数 {
   额外伤害?: number;
   仅远程?: boolean;
   仅近战?: boolean;
+  允许技能普攻?: boolean;
   弹道?: 强化普攻弹道配置;
   恢复弹道?: 强化普攻弹道配置;
   on命中?: (this: void, 上下文: 强化普攻命中上下文) => void;
@@ -77,6 +78,7 @@ export interface 强化普攻状态快照 {
 interface 强化普攻状态 extends 强化普攻状态快照 {
   仅远程: boolean;
   仅近战: boolean;
+  允许技能普攻: boolean;
   恢复弹道?: 强化普攻弹道配置;
   on命中?: (this: void, 上下文: 强化普攻命中上下文) => void;
   on结束?: (this: void, 上下文: 强化普攻结束上下文) => void;
@@ -165,6 +167,7 @@ function 确保强化普攻清理(this: void): void {
 
 function 强化普攻条件通过(this: void, 状态: 强化普攻状态, context: any): boolean {
   if (context == null || context.isNormalAttack !== true) return false;
+  if (!状态.允许技能普攻 && (context.isSkillAttack === true || context.isSkillDamage === true)) return false;
   if (context.attacker !== 状态.单位) return false;
   if (!单位有效(状态.单位) || !单位有效(context.target)) return false;
   if (状态.仅远程 && context.isRangedAttack !== true) return false;
@@ -236,6 +239,7 @@ export function 添加强化普攻(this: void, 参数: 强化普攻参数): bool
     额外伤害: 参数.额外伤害 ?? 0,
     仅远程: 参数.仅远程 === true,
     仅近战: 参数.仅近战 === true,
+    允许技能普攻: 参数.允许技能普攻 === true,
     恢复弹道: 参数.恢复弹道,
     on命中: 参数.on命中,
     on结束: 参数.on结束,

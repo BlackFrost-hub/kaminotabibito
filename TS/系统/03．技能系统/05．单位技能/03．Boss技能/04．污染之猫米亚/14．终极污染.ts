@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
-import { 米亚平台中心配置, 米亚平台中心X, 米亚平台中心Y } from "./01．场地配置";
+import { 取米亚平台中心配置, 取米亚平台中心X, 取米亚平台中心Y } from "./01．场地配置";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚技能数值配置, 米亚腐化感染配置 } from "./02．数值与表现配置";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
@@ -73,11 +73,12 @@ function 取单位ID(this: void, unit: any): number {
 function 取核心出生点表(this: void): 终极污染核心点[] {
   const config = 米亚技能数值配置.终极污染;
   const inset = config.核心内缩距离;
+  const platform = 取米亚平台中心配置();
   return [
-    { x: 米亚平台中心配置.左 + inset, y: 米亚平台中心配置.下 + inset },
-    { x: 米亚平台中心配置.右 - inset, y: 米亚平台中心配置.下 + inset },
-    { x: 米亚平台中心配置.左 + inset, y: 米亚平台中心配置.上 - inset },
-    { x: 米亚平台中心配置.右 - inset, y: 米亚平台中心配置.上 - inset },
+    { x: platform.左 + inset, y: platform.下 + inset },
+    { x: platform.右 - inset, y: platform.下 + inset },
+    { x: platform.左 + inset, y: platform.上 - inset },
+    { x: platform.右 - inset, y: platform.上 - inset },
   ];
 }
 
@@ -99,8 +100,8 @@ function 播放终极污染引导表现(this: void, context: 米亚运行时上�
   });
   创建循环点特效({
     模型路径: 米亚单位技能配置.特效.终极污染中心柱,
-    X: 米亚平台中心X,
-    Y: 米亚平台中心Y,
+    X: 取米亚平台中心X(),
+    Y: 取米亚平台中心Y(),
     Z: 0,
     缩放: 1.2,
     总持续秒: seconds,
@@ -276,8 +277,8 @@ function 完成终极污染(this: void, context: 米亚运行时上下文): void
   清理终极污染核心(context);
   SetUnitTimeScale(context.Boss单位, 1);
   播放米亚台词(context.Boss单位, "终极污染", 9);
-  创建点特效({ 模型路径: 米亚单位技能配置.特效.终极污染完成冲击, X: 米亚平台中心X, Y: 米亚平台中心Y, Z: 0, 缩放: 4, 持续秒: 2 });
-  创建点特效({ 模型路径: 米亚单位技能配置.特效.终极污染完成毒爆, X: 米亚平台中心X, Y: 米亚平台中心Y, Z: 60, 缩放: 1.5, 持续秒: 2 });
+  创建点特效({ 模型路径: 米亚单位技能配置.特效.终极污染完成冲击, X: 取米亚平台中心X(), Y: 取米亚平台中心Y(), Z: 0, 缩放: 4, 持续秒: 2 });
+  创建点特效({ 模型路径: 米亚单位技能配置.特效.终极污染完成毒爆, X: 取米亚平台中心X(), Y: 取米亚平台中心Y(), Z: 60, 缩放: 1.5, 持续秒: 2 });
 
   const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   for (let i = 0; i < heroes.length; i++) {

@@ -47,6 +47,8 @@ export interface Boss死亡结算配置 {
   首领奖励池ID?: string;
   /** 旧固定掉落语义：Boss 死亡后把列表里的物品全部直接掉出来。 */
   直接掉落物品名列表?: string[];
+  /** 无法通过装备数据表反查时使用，例如剧情任务物品或旧 JASS raw id。 */
+  直接掉落物品ID列表?: string[];
   非装备批量掉落物品名?: string;
   非装备批量掉落最小数量?: number;
   非装备批量掉落最大数量?: number;

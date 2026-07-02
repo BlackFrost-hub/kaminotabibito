@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____53D6_5355_4F4D_653B_51FB_529B, _____8BA1_7B97_6C61_6C34_55B7_5410_76F4_63A5_4F24_5BB3, _____70B9_5728_524D_65B9_6247_5F62_5185, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____64AD_653E_55B7_5410_8868_73B0, _____521B_5EFA_6C61_6C34_55B7_5410_6B8B_7559_533A, ____on_7C73_4E9A_6C61_6C34_55B7_5410_751F_6548, getServerTime, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868Ex, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, jass, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitFacing, GetUnitState, SetUnitFacing, SetUnitAnimationByIndex, UnitDamageTarget, ConvertUnitState, CosBJ, SinBJ, Atan2, AddSpecialEffect, BlzSetSpecialEffectYaw, GetUnitStateJapi, EXSetEffectSize, UNIT_STATE_MAX_LIFE, BJ_DEGTORAD, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____6C61_6C34_55B7_5410_6280_80FDID
+local stringToFourCC, _____5355_4F4D_6709_6548, _____53D6_5355_4F4D_653B_51FB_529B, _____8BA1_7B97_6C61_6C34_55B7_5410_76F4_63A5_4F24_5BB3, _____70B9_5728_524D_65B9_6247_5F62_5185, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____64AD_653E_55B7_5410_8868_73B0, _____521B_5EFA_6C61_6C34_55B7_5410_6B8B_7559_533A, ____on_7C73_4E9A_6C61_6C34_55B7_5410_751F_6548, getServerTime, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868Ex, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, jass, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitFacing, GetUnitState, SetUnitFacing, SetUnitAnimationByIndex, UnitDamageTarget, ConvertUnitState, CosBJ, SinBJ, Atan2, AddSpecialEffect, GetUnitStateJapi, EXSetEffectSize, EXEffectMatRotateZ, UNIT_STATE_MAX_LIFE, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____6C61_6C34_55B7_5410_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_7C73_4E9A_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建米亚上下文"]
 local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.04．腐化感染")
@@ -71,8 +71,8 @@ function _____64AD_653E_55B7_5410_8868_73B0(boss)
         if type(EXSetEffectSize) == "function" then
             EXSetEffectSize(effect, 1.2)
         end
-        if type(BlzSetSpecialEffectYaw) == "function" then
-            BlzSetSpecialEffectYaw(effect, facing * BJ_DEGTORAD)
+        if type(EXEffectMatRotateZ) == "function" then
+            EXEffectMatRotateZ(effect, facing)
         end
         YDWETimerDestroyEffectSafe(1.5, effect)
     end
@@ -184,11 +184,10 @@ CosBJ = jass.CosBJ
 SinBJ = jass.SinBJ
 Atan2 = jass.Atan2
 AddSpecialEffect = jass.AddSpecialEffect
-BlzSetSpecialEffectYaw = jass.BlzSetSpecialEffectYaw
 GetUnitStateJapi = japi.GetUnitState
 EXSetEffectSize = japi.EXSetEffectSize
+EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-BJ_DEGTORAD = 0.017453292519943295
 BJ_RADTODEG = 57.29577951308232
 _____7C73_4E9A_5355_4F4D_7C7B_578BID = stringToFourCC(_____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["Boss单位ID"])
 _____6C61_6C34_55B7_5410_6280_80FDID = stringToFourCC(_____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["污水喷吐技能"])

@@ -3,7 +3,7 @@ const runtime = require("jass.runtime") as { console?: boolean; handle_level?: n
 runtime.console = true;
 runtime.handle_level = 0;
 const jassConsole = require("jass.console") as { write: (s: string) => void };
-require("jass.japi"); // 扩展 JASS 原生 (Blz* 等)
+require("jass.japi"); // 1.27 平台扩展入口；不要假设存在 Blz* 原生函数
 const jass = require("jass.common") as Record<string, unknown>;
 const jglobals = require("jass.globals") as Record<string, unknown>;
 const slk = require("jass.slk") as Record<string, Record<string, Record<string, string>>>;

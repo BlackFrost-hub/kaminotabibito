@@ -1875,7 +1875,7 @@ ____exports.items.I0C7 = {
     name = "|cff993300巨魔头颅|r",
     goldPrice = 350,
     score = 5896,
-    level = "B-",
+    level = "C++",
     dmg = 100,
     critRate = 0.1,
     hp = 800
@@ -1893,12 +1893,13 @@ ____exports.items.I0CA = {
     name = "|cffff6600巨魔大剑（唯一）|r",
     goldPrice = 2500,
     score = 6000,
-    level = "B-",
+    level = "C++",
     dmg = 150,
     critDmg = 0.3,
     cdReduction = 0.15,
     weaponType = "剑"
 }
+____exports.items.I0ES = {type = "任务", name = "残缺的魔法信件", goldPrice = 0}
 ____exports.items.I000 = {type = "主武器", name = "精灵藤杖", goldPrice = 0}
 ____exports.items.I001 = {type = "主武器", name = "精灵魔杖", goldPrice = 0}
 ____exports.items.I003 = {type = "鞋子", name = "精灵鞋", goldPrice = 0}
@@ -3395,6 +3396,7 @@ ____exports.items.I0C3 = {
     type = "主武器",
     name = "森魔战斧",
     goldPrice = 2500,
+    score = 5900,
     level = "C++",
     dmg = 75,
     str = 30,
@@ -3816,6 +3818,304 @@ ____exports.items.I0EQ = {
     fireDmg = 0.18,
     summonDmg = 0.25
 }
+____exports.items.I0FD = {
+    type = "道具/戒指/饰品",
+    name = "菲利斯的统御纹章",
+    goldPrice = 1000,
+    score = 6250,
+    level = "B",
+    int = 34,
+    mp = 900,
+    cdReduction = 0.08,
+    all = 10
+}
+____exports.items.I0FE = {
+    type = "道具/戒指/饰品",
+    name = "剑魂狼牙坠",
+    goldPrice = 1000,
+    score = 6200,
+    level = "B",
+    int = 32,
+    mpRegen = 18,
+    magicDmg = 0.12
+}
+____exports.items.I0ET = {
+    type = "道具/戒指/饰品",
+    name = "封印斩护腕",
+    goldPrice = 1000,
+    score = 6050,
+    level = "B",
+    cdReduction = 0.09,
+    magicResist = 0.15,
+    stunResist = 0.15,
+    armor = 12
+}
+____exports.items.I0EU = {
+    type = "主武器",
+    name = "异形化残刃",
+    goldPrice = 1000,
+    score = 6350,
+    level = "B",
+    dmg = 150,
+    int = 28,
+    darkDmg = 0.16,
+    magicLifeSteal = 0.06,
+    weaponType = "剑"
+}
+____exports.items.I0EV = {
+    type = "道具/戒指/饰品",
+    name = "攻城号令圣印",
+    goldPrice = 1000,
+    score = 6250,
+    level = "B",
+    cdReduction = 0.1,
+    skillHeal = 0.16,
+    mpCost = -0.08,
+    hp = 1200
+}
+____exports.items.I0EW = {
+    type = "道具/戒指/饰品",
+    name = "灵心之碎片",
+    goldPrice = 1000,
+    score = 6450,
+    level = "B",
+    int = 30,
+    all = 18,
+    cdReduction = 0.08,
+    magicResist = 0.15
+}
+____exports.items.I0EX = {
+    type = "主武器",
+    name = "克林姆德风纹法杖",
+    goldPrice = 1000,
+    score = 6400,
+    level = "B",
+    dmg = 150,
+    int = 42,
+    magicDmg = 0.22,
+    magicPierce = 0.16,
+    weaponType = "法杖"
+}
+____exports.items.I0EY = {
+    type = "衣服",
+    name = "神风护体披风",
+    goldPrice = 1000,
+    score = 6300,
+    level = "B",
+    dodge = 0.14,
+    movespeed2 = 0.1,
+    magicResist = 0.18,
+    cdReduction = 0.06
+}
+____exports.items.I0EZ = {
+    type = "道具/戒指/饰品",
+    name = "湮灭之风戒指",
+    goldPrice = 1000,
+    score = 6350,
+    level = "B",
+    int = 34,
+    magicDmg = 0.14,
+    accuracy = 0.1,
+    mpRegen = 20
+}
+____exports.items.I0F0 = {
+    type = "副武器",
+    name = "卡瑟拉深渊法典",
+    goldPrice = 1000,
+    score = 7000,
+    level = "B",
+    int = 46,
+    mp = 1200,
+    waterDmg = 0.18,
+    thunderDmg = 0.18,
+    cdReduction = 0.1
+}
+____exports.items.I0F1 = {
+    type = "道具/戒指/饰品",
+    name = "电鳗共生指环",
+    goldPrice = 1000,
+    score = 6900,
+    level = "B",
+    int = 42,
+    thunderDmg = 0.2,
+    thunderResist = 0.18,
+    mpRegen = 24
+}
+____exports.items.I0F2 = {
+    type = "道具/戒指/饰品",
+    name = "触手残片护符",
+    goldPrice = 1000,
+    score = 6800,
+    level = "B",
+    hp = 2800,
+    waterResist = 0.25,
+    skillHeal = 0.18,
+    all = 12
+}
+____exports.items.I0F3 = {
+    type = "衣服",
+    name = "墨潮行者长袍",
+    goldPrice = 1000,
+    score = 6850,
+    level = "B",
+    int = 36,
+    magicResist = 0.2,
+    waterResist = 0.22,
+    stunResist = 0.15
+}
+____exports.items.I0F4 = {
+    type = "主武器",
+    name = "高压水脊法杖",
+    goldPrice = 1000,
+    score = 6950,
+    level = "B",
+    dmg = 170,
+    int = 48,
+    magicDmg = 0.18,
+    sight = 150,
+    waterDmg = 0.2,
+    weaponType = "法杖"
+}
+____exports.items.I0F5 = {
+    type = "道具/戒指/饰品",
+    name = "绝缘珊瑚圣瓶",
+    goldPrice = 1000,
+    score = 6900,
+    level = "B",
+    cdReduction = 0.12,
+    skillHeal = 0.2,
+    mpCost = -0.1,
+    hp = 1400,
+    magicResist = 0.15
+}
+____exports.items.I0F6 = {
+    type = "主武器",
+    name = "腐败根须法杖",
+    goldPrice = 1000,
+    score = 7000,
+    level = "B",
+    dmg = 170,
+    int = 50,
+    woodDmg = 0.2,
+    darkDmg = 0.18,
+    cdReduction = 0.1,
+    weaponType = "法杖"
+}
+____exports.items.I0F7 = {
+    type = "道具/戒指/饰品",
+    name = "古树之心护符",
+    goldPrice = 1000,
+    score = 6850,
+    level = "B",
+    hp = 2600,
+    woodResist = 0.18,
+    darkResist = 0.18,
+    skillHeal = 0.18
+}
+____exports.items.I0F8 = {
+    type = "衣服",
+    name = "荆棘行者披风",
+    goldPrice = 1000,
+    score = 6800,
+    level = "B",
+    armor = 26,
+    woodDmg = 0.15,
+    dodge = 0.1,
+    movespeed2 = 0.08
+}
+____exports.items.I0F9 = {
+    type = "道具/戒指/饰品",
+    name = "净化者手套",
+    goldPrice = 1000,
+    score = 6900,
+    level = "B",
+    int = 36,
+    cdReduction = 0.12,
+    skillHeal = 0.2,
+    mpRegen = 22
+}
+____exports.items.I0FA = {
+    type = "副武器",
+    name = "莫尔特斯树皮盾",
+    goldPrice = 1000,
+    score = 6800,
+    level = "B",
+    armor = 42,
+    hp = 2400,
+    woodResist = 0.22,
+    physResist = 0.12
+}
+____exports.items.I0FB = {
+    type = "道具/戒指/饰品",
+    name = "腐朽孢子秘瓶",
+    goldPrice = 1000,
+    score = 6950,
+    level = "B",
+    int = 45,
+    magicDmg = 0.22,
+    darkDmg = 0.16,
+    magicPierce = 0.16
+}
+____exports.items.I0FC = {
+    type = "道具/戒指/饰品",
+    name = "净土萌芽圣铃",
+    goldPrice = 1000,
+    score = 6900,
+    level = "B",
+    cdReduction = 0.12,
+    skillHeal = 0.2,
+    mpCost = -0.1,
+    woodResist = 0.16,
+    hp = 1200
+}
+____exports.items.I0FF = {
+    type = "衣服",
+    name = "影骨披风",
+    goldPrice = 1000,
+    score = 3820,
+    level = "C",
+    agi = 22,
+    armor = 12,
+    dodge = 0.08,
+    movespeed2 = 0.06
+}
+____exports.items.I0FG = {
+    type = "主武器",
+    name = "幽影匕首",
+    goldPrice = 1000,
+    score = 3890,
+    level = "C",
+    dmg = 92,
+    agi = 18,
+    critRate = 0.1,
+    critDmg = 0.2,
+    darkDmg = 0.08,
+    weaponType = "匕首"
+}
+____exports.items.I0FH = {
+    type = "道具/戒指/饰品",
+    name = "盗贼首领徽记",
+    goldPrice = 1000,
+    score = 3660,
+    level = "C",
+    all = 14,
+    mpRegen = 12,
+    cdReduction = 0.06,
+    movespeed2 = 0.05
+}
+____exports.items.I0FI = {
+    type = "道具/戒指/饰品",
+    name = "阴影陷阱装置",
+    goldPrice = 1000,
+    score = 3520,
+    level = "C",
+    int = 14,
+    hp = 900,
+    cdReduction = 0.05,
+    darkDmg = 0.1,
+    stunResist = 0.12
+}
+____exports.items.I0FJ = {type = "任务", name = "骸骨圣杯碎片", goldPrice = 0}
 ____exports.items.azhr = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "A0HC"}
 ____exports.items.ches = {
     type = "药剂/食品",

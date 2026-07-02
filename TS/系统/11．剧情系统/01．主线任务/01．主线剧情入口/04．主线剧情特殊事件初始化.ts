@@ -80,6 +80,7 @@ const SetUnitState = jass.SetUnitState as (this: void, whichUnit: any, whichStat
 const ShowUnit = jass.ShowUnit as (this: void, whichUnit: any, show: boolean) => void;
 
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const bj_QUESTMESSAGE_ALWAYSHINT = jglobals.bj_QUESTMESSAGE_ALWAYSHINT as number;
 const bj_QUESTTYPE_OPT_UNDISCOVERED = jglobals.bj_QUESTTYPE_OPT_UNDISCOVERED as number;
@@ -195,7 +196,7 @@ function 命中最终伤害事件配置(this: void, 配置: 主线剧情最终�
   if (GetUnitTypeId(target) !== stringToFourCCSafe(配置.单位ID)) return false;
 
   const currentLife = GetUnitState(target, UNIT_STATE_LIFE);
-  const maxLife = BlzGetUnitMaxHP(target);
+  const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
   if (!(currentLife > 0) || !(maxLife > 0)) return false;
 
   const afterHitLife = currentLife - applied;
@@ -211,7 +212,7 @@ function 执行技能推进剧情(this: void, 配置: 主线剧情技能通道�
 }
 
 function 执行最终伤害推进剧情(this: void, 配置: 主线剧情最终伤害事件配置, target: any, attacker: any): void {
-  const maxLife = BlzGetUnitMaxHP(target);
+  const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
   YDWESetEventDamage(0);
   写入剧情进度(配置.目标剧情进度);
   SetUnitState(target, UNIT_STATE_LIFE, maxLife * 配置.保底生命比例);

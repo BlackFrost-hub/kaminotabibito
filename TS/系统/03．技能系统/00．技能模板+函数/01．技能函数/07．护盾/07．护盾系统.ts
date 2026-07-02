@@ -29,6 +29,10 @@ import { 吸收伤害, 注册护盾吸收钩子 } from "./04．护盾伤害结�
 import { 初始化护盾生命周期 } from "./05．护盾生命周期";
 import { 创建护盾条, 删除护盾条, 护盾条闪色 } from "./06．护盾条表现";
 
+const { 通知获得护盾事件 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.05．治疗护盾联动") as {
+  通知获得护盾事件: (this: void, source: any, target: any, amount: number, tag?: string, rawParams?: any) => void;
+};
+
 const jass = require("jass.common") as any;
 
 // ==========================================================================================
@@ -84,6 +88,8 @@ export function 开始护盾(单位: any, 参数: 护盾参数): number {
   if (typeof 实例.开始回调 === "function") {
     实例.开始回调(单位, 实例.id);
   }
+
+  通知获得护盾事件(实例.来源单位 ?? 单位, 单位, 实例.当前值, 实例.标签, 参数);
 
   return 实例.id;
 }
@@ -196,15 +202,18 @@ export function 充能单位标签护盾(单位: any, 标签: string, 数值: nu
   if (已有护盾 == null) {
     const 初始值 = 数值 > 最大值 ? 最大值 : 数值;
     if (!(初始值 > 0)) return 0;
-    开始护盾(单位, {
+    const 护盾ID = 开始护盾(单位, {
       ...(参数 ?? {}),
       数值: 初始值,
       标签,
     });
+    if (护盾ID === 0) return 0;
     return 初始值;
   }
 
-  return 充能单位指定标签护盾(单位ID, 标签, 数值, 最大值);
+  const 实际增加 = 充能单位指定标签护盾(单位ID, 标签, 数值, 最大值);
+  if (实际增加 > 0) 通知获得护盾事件(已有护盾.来源单位 ?? 单位, 单位, 实际增加, 标签, 参数);
+  return 实际增加;
 }
 
 export function 移除单位标签护盾(单位: any, 标签: string): void {

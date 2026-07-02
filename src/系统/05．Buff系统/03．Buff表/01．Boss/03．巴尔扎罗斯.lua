@@ -20,7 +20,7 @@ ____exports["巴尔扎罗斯Buff表"] = {
         effectAttachPoint = "origin",
         type = "Debuff:fire:stack",
         interval = 1,
-        maxStack = 10,
+        maxStack = 12,
         stackRule = "stack",
         stackRefresh = true,
         dispelLevel = 3,
@@ -77,7 +77,7 @@ ____exports["巴尔扎罗斯Buff表"] = {
         dispelLevel = 3,
         priority = 88,
         canPurge = false,
-        tooltip = "巴尔扎罗斯获得熔岩护盾，吸收伤害并反弹近战伤害；冰霜相关伤害可以更有效削弱护盾。"
+        tooltip = "巴尔扎罗斯获得持续10秒的熔岩护盾，吸收最大生命值7%的伤害；近战攻击者每1秒最多受到一次来源最大生命值2%+Boss攻击力20%的火焰反弹，水/冰伤害使护盾消耗提高50%。"
     },
     [____exports["巴尔扎罗斯BuffID"]["炙热奉献"]] = {
         buffID = ____exports["巴尔扎罗斯BuffID"]["炙热奉献"],
@@ -111,7 +111,7 @@ ____exports["巴尔扎罗斯Buff表"] = {
         dispelLevel = 3,
         priority = 82,
         canPurge = false,
-        tooltip = "塞拉切换为火焰形态，火焰技能更强，但自身冰霜抗性降低。"
+        tooltip = "塞拉切换为火焰形态，火焰技能伤害提高25%，自身受到水/冰属性伤害提高20%。"
     },
     [____exports["巴尔扎罗斯BuffID"]["塞拉冰霜形态"]] = {
         buffID = ____exports["巴尔扎罗斯BuffID"]["塞拉冰霜形态"],
@@ -128,7 +128,7 @@ ____exports["巴尔扎罗斯Buff表"] = {
         dispelLevel = 3,
         priority = 82,
         canPurge = false,
-        tooltip = "塞拉切换为冰霜形态，冰霜技能更强，但自身火焰抗性降低。"
+        tooltip = "塞拉切换为冰霜形态，冰霜技能伤害提高25%，自身受到火属性伤害提高20%。"
     },
     [____exports["巴尔扎罗斯BuffID"]["熔岩暴走"]] = {
         buffID = ____exports["巴尔扎罗斯BuffID"]["熔岩暴走"],

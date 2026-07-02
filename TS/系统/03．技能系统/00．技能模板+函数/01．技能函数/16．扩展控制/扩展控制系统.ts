@@ -43,6 +43,17 @@ const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 通知控制Debuff事件 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.06．控制Debuff联动") as {
+  通知控制Debuff事件: (this: void, event: {
+    来源单位: any;
+    目标单位: any;
+    类型: string;
+    持续时间?: number;
+    BuffID?: string;
+    是否控制?: boolean;
+    原始参数?: any;
+  }) => void;
+};
 const {
   获取扩展控制定义,
   获取控制效果定义,
@@ -484,6 +495,7 @@ export function 施加扩展控制(
   if (定义.类型分类 === "快速控制") {
     if (定义.快速控制ID == null) return 0;
     施加快速控制Buff(来源单位, 目标单位, 定义.快速控制ID, 实际持续时间);
+    通知控制Debuff事件({ 来源单位, 目标单位, 类型: 类型 as string, 持续时间: 实际持续时间, 是否控制: true, 原始参数: 规范参数 });
     debugLogForce(模块名, "施加扩展控制", "类型=", 类型, "来源=", 取单位ID(来源单位), "目标=", 目标ID, "持续=", 实际持续时间);
     return 目标ID;
   }
@@ -496,6 +508,7 @@ export function 施加扩展控制(
   加入目标ID(目标ID);
   registerManualBuff(目标单位, 记录.BuffID, 实际持续时间, 0, { sourceName: GetUnitName(来源单位) });
   生效扩展控制首帧(记录);
+  通知控制Debuff事件({ 来源单位, 目标单位, 类型: 类型 as string, 持续时间: 实际持续时间, BuffID: 记录.BuffID, 是否控制: true, 原始参数: 规范参数 });
   debugLogForce(模块名, "施加扩展控制", "类型=", 类型, "来源=", 取单位ID(来源单位), "目标=", 目标ID, "持续=", 实际持续时间);
   return 目标ID;
 }

@@ -16,6 +16,7 @@ export * from "../../lib/扩展函数/封装函数/index";
 export * from "./01．颜色常量";
 export * from "./03．UI函数";
 export * from "./01．事件中心/index";
+export * from "./03．脱战系统/index";
 export * from "./05．中心计时器";
 export * from "./06．特效绑定系统";
 

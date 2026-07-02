@@ -105,8 +105,6 @@ export function createDotBaseUtils(deps: {
   // ========== 虚拟分区：数值读取 ==========
   function getUnitMaxHp(targetUnit: any): number {
     if (!targetUnit) return 0;
-    const m = jass.BlzGetUnitMaxHP(targetUnit);
-    if (typeof m === "number" && isFinite(m) && m > 0) return m;
     let maxLifeState: any = null;
     if (jass.UNIT_STATE_MAX_LIFE != null) maxLifeState = jass.UNIT_STATE_MAX_LIFE;
     else if (g.UNIT_STATE_MAX_LIFE != null) maxLifeState = g.UNIT_STATE_MAX_LIFE;

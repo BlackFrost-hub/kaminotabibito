@@ -3,8 +3,6 @@
 declare function GetUnitState(unit: any, state: any): number;
 /** 伤害事件内同步读取；勿用 g:GetEventDamageSource（TSTL 会编成冒号调用） */
 declare function GetEventDamageSource(): any;
-/** 1.29+ 最大生命，无 UNIT_STATE_MAX_LIFE 时可用 */
-declare function BlzGetUnitMaxHP(unit: any): number;
 /** 地图运行时 require 为单参；@noSelf 避免 TSTL 生成 require(nil, "…")。需配合 tsconfig tstl.noResolvePaths，否则 TSTL 会报 Could not resolve。 */
 /** @noSelf */
 declare function require(mod: string): any;
@@ -66,8 +64,6 @@ interface JassCommon {
   EVENT_PLAYER_UNIT_DAMAGED: number;
   GetEventDamage: () => number;
   GetEventDamageSource: () => any;
-  BlzGetEventDamageTarget: () => any;
-  BlzSetEventDamage: (damage: number) => void;
   YDWESyStemAnyUnitDamagedRegistTrigger?: (trg: any) => void;
   YDWEOperatorString3?: (a: string, b: string, c: string) => string;
   YDUserDataGet2?: (type: any, handle: any, name: string, kind: any) => any;
@@ -147,7 +143,7 @@ interface JassCommon {
   GetUnitName: (unit: any) => string;
 }
 
-/** jass.japi - 扩展 JASS 原生函数 (Blz* 等)，require 后注入到 jass.common */
+/** jass.japi - 1.27 平台扩展函数入口；本项目不要假设存在 Blz* 原生函数。 */
 /** Lua global print - variadic */
 declare var print: (...args: any[]) => void;
 

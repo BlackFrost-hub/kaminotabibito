@@ -17,8 +17,14 @@ const { 监听指定物品获取丢弃, 获取单位当前持有指定物品数�
 const { 获取单位玩家英雄配置 } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as {
   获取单位玩家英雄配置: (this: void, unit: any) => Record<string, any> | null;
 };
-const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+const { 创建战斗状态触发器 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.07．战斗状态触发器") as {
+  创建战斗状态触发器: (this: void, 参数: {
+    名称?: string;
+    单位: any;
+    主体类型?: "玩家英雄" | "Boss" | "普通单位";
+    周期触发秒?: number;
+    on周期触发?: (this: void, event: { 单位: any }) => void;
+  }) => { 停止: (this: void) => void };
 };
 const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS") as {
   SGSS_SetState: (this: void, unit: any, id: number, value: number) => void;
@@ -61,7 +67,7 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const 冥炎之裙配置 = {
   物品名: "冥炎之裙",
   女性全属性加成: 15,
-  周期毫秒: 1000,
+  周期秒: 1,
   作用范围: 300,
   每层每秒火焰伤害: 200,
   特效路径: "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdl",
@@ -71,8 +77,7 @@ const 冥炎之裙配置 = {
 
 const 冥炎之裙物品ID = stringToFourCCSafe(resolveItemIdByName(冥炎之裙配置.物品名));
 
-const 冥炎之裙持有者列表: any[] = [];
-const 冥炎之裙持有者表: Record<number, any | undefined> = {};
+const 冥炎之裙战斗状态表: Record<number, { 停止: (this: void) => void } | undefined> = {};
 
 let 已初始化冥炎之裙 = false;
 
@@ -97,19 +102,23 @@ function 单位是女性英雄(this: void, unit: any): boolean {
 
 function 加入冥炎之裙持有者(this: void, unit: any): void {
   const unitId = 获取单位ID(unit);
-  if (unitId === 0 || 冥炎之裙持有者表[unitId] != null) return;
-  冥炎之裙持有者表[unitId] = unit;
-  冥炎之裙持有者列表.push(unit);
+  if (unitId === 0 || 冥炎之裙战斗状态表[unitId] != null) return;
+  冥炎之裙战斗状态表[unitId] = 创建战斗状态触发器({
+    名称: "冥炎之裙",
+    单位: unit,
+    主体类型: "玩家英雄",
+    周期触发秒: 冥炎之裙配置.周期秒,
+    on周期触发: on冥炎之裙战斗周期,
+  });
 }
 
 function 移除冥炎之裙持有者(this: void, unit: any): void {
   const unitId = 获取单位ID(unit);
   if (unitId === 0) return;
-  delete 冥炎之裙持有者表[unitId];
-  for (let i = 冥炎之裙持有者列表.length - 1; i >= 0; i--) {
-    if (获取单位ID(冥炎之裙持有者列表[i]) === unitId) {
-      冥炎之裙持有者列表.splice(i, 1);
-    }
+  const 控制器 = 冥炎之裙战斗状态表[unitId];
+  if (控制器 != null) {
+    控制器.停止();
+    delete 冥炎之裙战斗状态表[unitId];
   }
   销毁Dz绑定单位特效(unit, 冥炎之裙配置.特效键);
 }
@@ -146,34 +155,32 @@ function on失去冥炎之裙(this: void, unit: any, _item: any, currentCount: n
   同步冥炎之裙持有表现(unit, currentCount > 0 ? 1 : 0);
 }
 
-function on冥炎之裙周期(this: void): void {
-  for (let i = 冥炎之裙持有者列表.length - 1; i >= 0; i--) {
-    const unit = 冥炎之裙持有者列表[i];
-    if (!单位是英雄(unit)) {
-      移除冥炎之裙持有者(unit);
-      continue;
-    }
+function on冥炎之裙战斗周期(this: void, event: { 单位: any }): void {
+  const unit = event.单位;
+  if (!单位是英雄(unit)) {
+    移除冥炎之裙持有者(unit);
+    return;
+  }
 
-    const count = 获取单位当前持有指定物品数量(unit, 冥炎之裙物品ID);
-    if (count <= 0) {
-      移除冥炎之裙持有者(unit);
-      continue;
-    }
+  const count = 获取单位当前持有指定物品数量(unit, 冥炎之裙物品ID);
+  if (count <= 0) {
+    移除冥炎之裙持有者(unit);
+    return;
+  }
 
-    if (!是否已有Dz绑定单位特效(unit, 冥炎之裙配置.特效键)) {
-      创建Dz绑定单位特效(unit, 冥炎之裙配置.特效挂点, 冥炎之裙配置.特效路径, 冥炎之裙配置.特效键);
-    }
+  if (!是否已有Dz绑定单位特效(unit, 冥炎之裙配置.特效键)) {
+    创建Dz绑定单位特效(unit, 冥炎之裙配置.特效挂点, 冥炎之裙配置.特效路径, 冥炎之裙配置.特效键);
+  }
 
-    if (!单位存活(unit)) continue;
+  if (!单位存活(unit)) return;
 
-    const damage = 冥炎之裙配置.每层每秒火焰伤害;
-    const targets = getUnitsInRange(GetUnitX(unit), GetUnitY(unit), 冥炎之裙配置.作用范围);
-    for (let j = 0; j < targets.length; j++) {
-      const target = targets[j];
-      if (target == null || target === 0 || target === unit) continue;
-      if (!单位存活(target)) continue;
-      UnitDamageTarget(unit, target, damage, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
-    }
+  const damage = 冥炎之裙配置.每层每秒火焰伤害;
+  const targets = getUnitsInRange(GetUnitX(unit), GetUnitY(unit), 冥炎之裙配置.作用范围);
+  for (let j = 0; j < targets.length; j++) {
+    const target = targets[j];
+    if (target == null || target === 0 || target === unit) continue;
+    if (!单位存活(target)) continue;
+    UnitDamageTarget(unit, target, damage, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
   }
 }
 
@@ -183,7 +190,6 @@ export function 初始化冥炎之裙持有效果(this: void): void {
   if (冥炎之裙物品ID === 0) return;
 
   监听指定物品获取丢弃(冥炎之裙物品ID, on获得冥炎之裙, on失去冥炎之裙);
-  addPeriodicCallback(冥炎之裙配置.周期毫秒, on冥炎之裙周期);
 }
 
 初始化冥炎之裙持有效果();
