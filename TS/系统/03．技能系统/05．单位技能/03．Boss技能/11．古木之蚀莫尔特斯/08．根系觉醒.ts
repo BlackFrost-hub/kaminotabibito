@@ -89,17 +89,35 @@ function 创建腐败之源目标列表(this: void, context: 莫尔特斯运行�
       Y: cell.中心Y,
       最大生命: cfg.腐败之源生命值,
       缩放: cfg.腐败之源缩放,
-      on死亡: function 莫尔特斯腐败之源死亡(this: void, unit: any): void {
-        AddSpecialEffect(cfg.腐败之源摧毁特效路径, GetUnitX(unit), GetUnitY(unit));
-      },
-      on销毁: function 莫尔特斯腐败之源销毁(this: void, unit: any): void {
-        AddSpecialEffect(cfg.腐败之源摧毁特效路径, GetUnitX(unit), GetUnitY(unit));
-      },
+      on死亡: 莫尔特斯腐败之源死亡,
+      on销毁: 莫尔特斯腐败之源销毁,
     });
     const circle = AddSpecialEffect(cfg.腐败之源脚下特效路径, cell.中心X, cell.中心Y);
     context.清理.登记特效("莫尔特斯-腐败之源脚下圈", circle);
   }
   return targets;
+}
+
+function 莫尔特斯腐败之源死亡(this: void, unit: any): void {
+  const cfg = 莫尔特斯数值与表现配置.根系觉醒;
+  AddSpecialEffect(cfg.腐败之源摧毁特效路径, GetUnitX(unit), GetUnitY(unit));
+}
+
+function 莫尔特斯腐败之源销毁(this: void, unit: any): void {
+  const cfg = 莫尔特斯数值与表现配置.根系觉醒;
+  AddSpecialEffect(cfg.腐败之源摧毁特效路径, GetUnitX(unit), GetUnitY(unit));
+}
+
+function 莫尔特斯根系觉醒超时(this: void, _剩余数量: number, context: 莫尔特斯运行时上下文): void {
+  根系觉醒失败爆发(context);
+}
+
+function 莫尔特斯根系觉醒结束(this: void, _是否成功: boolean, _剩余数量: number, context: 莫尔特斯运行时上下文): void {
+  if (单位有效(context.Boss单位)) {
+    ShowUnit(context.Boss单位, true);
+    PauseUnit(context.Boss单位, false);
+  }
+  context.腐败之源组 = undefined;
 }
 
 export function 尝试触发莫尔特斯根系觉醒(this: void, context: 莫尔特斯运行时上下文): void {
@@ -114,16 +132,9 @@ export function 尝试触发莫尔特斯根系觉醒(this: void, context: 莫尔
     名称: "莫尔特斯-根系觉醒",
     持续秒: cfg.限时秒,
     目标列表: 创建腐败之源目标列表(context),
-    on超时: function 莫尔特斯根系觉醒超时(this: void): void {
-      根系觉醒失败爆发(context);
-    },
-    on结束: function 莫尔特斯根系觉醒结束(this: void): void {
-      if (单位有效(context.Boss单位)) {
-        ShowUnit(context.Boss单位, true);
-        PauseUnit(context.Boss单位, false);
-      }
-      context.腐败之源组 = undefined;
-    },
+    变量: context,
+    on超时: 莫尔特斯根系觉醒超时,
+    on结束: 莫尔特斯根系觉醒结束,
   });
 }
 

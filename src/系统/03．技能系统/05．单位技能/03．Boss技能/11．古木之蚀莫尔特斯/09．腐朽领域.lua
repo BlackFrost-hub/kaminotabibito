@@ -14,6 +14,8 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetRandomInt = jass.GetRandomInt
+local Location = jass.Location
+local RemoveLocation = jass.RemoveLocation
 local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
@@ -32,6 +34,49 @@ local ____require_result_5 = require("系统.03．技能系统.05．单位技能
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
 local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯")
 local _____83AB_5C14_7279_65AFBuffID = ____require_result_6["莫尔特斯BuffID"]
+local ____require_result_7 = require("lib.扩展函数.BJ函数.11．贴图函数")
+local CreateUbersplatBJ = ____require_result_7.CreateUbersplatBJ
+local ShowUbersplatBJ = ____require_result_7.ShowUbersplatBJ
+local _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587 = nil
+local function _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
+    local grid = context["根须宫格"]
+    if grid == nil then
+        return
+    end
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
+    local color = cfg["沼泽贴图颜色"]
+    do
+        local i = 0
+        while i < grid["格子列表"].length do
+            do
+                local cell = grid["格子列表"][i]
+                if cell == nil then
+                    goto __continue5
+                end
+                local loc = Location(cell["中心X"], cell["中心Y"])
+                local ubersplat = CreateUbersplatBJ(
+                    cfg["沼泽贴图类型"],
+                    loc,
+                    color.r,
+                    color.g,
+                    color.b,
+                    color.a,
+                    cfg["沼泽贴图强制暂停"],
+                    cfg["沼泽贴图无出生时间"]
+                )
+                RemoveLocation(loc)
+                if ubersplat == nil or ubersplat == 0 then
+                    goto __continue5
+                end
+                ShowUbersplatBJ(true, ubersplat)
+                local ____self_8 = context["清理"]
+                ____self_8["登记贴图"](____self_8, "莫尔特斯-腐朽领域沼泽", ubersplat)
+            end
+            ::__continue5::
+            i = i + 1
+        end
+    end
+end
 local function _____521B_5EFA_51C0_5316_7B26_6587(context)
     local grid = context["根须宫格"]
     if grid == nil then
@@ -50,11 +95,11 @@ local function _____521B_5EFA_51C0_5316_7B26_6587(context)
             do
                 local cell = cells[i + 1]
                 if cell == nil then
-                    goto __continue5
+                    goto __continue11
                 end
                 local effect = AddSpecialEffect(cfg["净化符文模型路径"], cell["中心X"], cell["中心Y"])
-                local ____self_7 = context["清理"]
-                ____self_7["登记特效"](____self_7, "莫尔特斯-净化符文", effect)
+                local ____self_9 = context["清理"]
+                ____self_9["登记特效"](____self_9, "莫尔特斯-净化符文", effect)
                 _____521B_5EFA_6280_80FD_63D0_793A_5708({
                     ["类型"] = "白色安全圆",
                     X = cell["中心X"],
@@ -63,7 +108,7 @@ local function _____521B_5EFA_51C0_5316_7B26_6587(context)
                     ["持续时间"] = cfg["净化持续秒"]
                 })
             end
-            ::__continue5::
+            ::__continue11::
             i = i + 1
         end
     end
@@ -86,7 +131,7 @@ local function _____5904_7406_51C0_5316_7B26_6587(context, hero)
             do
                 local cell = cells[i + 1]
                 if cell == nil then
-                    goto __continue10
+                    goto __continue16
                 end
                 local dx = GetUnitX(hero) - cell["中心X"]
                 local dy = GetUnitY(hero) - cell["中心Y"]
@@ -102,11 +147,35 @@ local function _____5904_7406_51C0_5316_7B26_6587(context, hero)
                     return true
                 end
             end
-            ::__continue10::
+            ::__continue16::
             i = i + 1
         end
     end
     return false
+end
+local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B()
+    local variable = _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587
+    _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587 = nil
+    if variable == nil then
+        return
+    end
+    local context = variable.context
+    local target = variable.target
+    if not _____5355_4F4D_6709_6548(context["Boss单位"]) or not _____5355_4F4D_6709_6548(target) then
+        return
+    end
+    AddSpecialEffect(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["穿刺特效路径"], variable.X, variable.Y)
+    UnitDamageTarget(
+        context["Boss单位"],
+        target,
+        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["Boss单位"]),
+        false,
+        false,
+        ATTACK_TYPE_NORMAL,
+        DAMAGE_TYPE_PLANT,
+        WEAPON_TYPE_WHOKNOWS
+    )
+    _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, target, _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["腐败值"])
 end
 ____exports["尝试触发莫尔特斯腐朽领域"] = function(context)
     if context["腐朽领域已触发"] or context["阶段"] < 3 or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
@@ -114,6 +183,7 @@ ____exports["尝试触发莫尔特斯腐朽领域"] = function(context)
     end
     context["腐朽领域已触发"] = true
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(context["Boss单位"], "低血量")
+    _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
     _____521B_5EFA_51C0_5316_7B26_6587(context)
 end
 ____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
@@ -135,10 +205,10 @@ ____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue20
+                    goto __continue29
                 end
                 if _____5904_7406_51C0_5316_7B26_6587(context, hero) then
-                    goto __continue20
+                    goto __continue29
                 end
                 _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                     context["Boss单位"],
@@ -149,7 +219,7 @@ ____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
                 )
                 _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, hero, cfg["沼泽每跳腐败值"])
             end
-            ::__continue20::
+            ::__continue29::
             i = i + 1
         end
     end
@@ -169,28 +239,10 @@ ____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
                 ["半径"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"] * 0.5,
                 ["持续时间"] = 1
             })
-            local id = addDelayedCallback(
-                1000,
-                function()
-                    if not _____5355_4F4D_6709_6548(context["Boss单位"]) or not _____5355_4F4D_6709_6548(target) then
-                        return
-                    end
-                    AddSpecialEffect(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["穿刺特效路径"], x, y)
-                    UnitDamageTarget(
-                        context["Boss单位"],
-                        target,
-                        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["Boss单位"]),
-                        false,
-                        false,
-                        ATTACK_TYPE_NORMAL,
-                        DAMAGE_TYPE_PLANT,
-                        WEAPON_TYPE_WHOKNOWS
-                    )
-                    _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, target, _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["腐败值"])
-                end
-            )
-            local ____self_8 = context["清理"]
-            ____self_8["登记延迟回调"](____self_8, "莫尔特斯-腐朽沼泽根须", id)
+            _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587 = {context = context, target = target, X = x, Y = y}
+            local id = addDelayedCallback(1000, _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B)
+            local ____self_10 = context["清理"]
+            ____self_10["登记延迟回调"](____self_10, "莫尔特斯-腐朽沼泽根须", id)
         end
     end
 end

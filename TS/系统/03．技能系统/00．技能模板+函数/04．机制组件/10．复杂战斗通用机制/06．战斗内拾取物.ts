@@ -31,15 +31,16 @@ export interface 战斗内拾取物参数 {
   缩放?: number;
   持续秒?: number;
   拾取半径: number;
-  可拾取单位列表: any[] | ((this: void) => any[]);
+  可拾取单位列表: any[] | ((this: void, 变量?: any) => any[]);
   吸附目标?: any;
   吸附速度?: number;
   吸附半径?: number;
   Tick间隔毫秒?: number;
-  on拾取?: (this: void, 拾取者: any, 实例: 战斗内拾取物实例) => void;
-  on吸收?: (this: void, 吸附目标: any, 实例: 战斗内拾取物实例) => void;
-  on过期?: (this: void, 实例: 战斗内拾取物实例) => void;
-  on销毁?: (this: void, 实例: 战斗内拾取物实例, 原因: 战斗内拾取物结束原因) => void;
+  变量?: any;
+  on拾取?: (this: void, 拾取者: any, 实例: 战斗内拾取物实例, 变量?: any) => void;
+  on吸收?: (this: void, 吸附目标: any, 实例: 战斗内拾取物实例, 变量?: any) => void;
+  on过期?: (this: void, 实例: 战斗内拾取物实例, 变量?: any) => void;
+  on销毁?: (this: void, 实例: 战斗内拾取物实例, 原因: 战斗内拾取物结束原因, 变量?: any) => void;
 }
 
 export type 战斗内拾取物结束原因 = "拾取" | "吸收" | "过期" | "手动销毁";
@@ -124,14 +125,14 @@ class 战斗内拾取物实现 implements 战斗内拾取物实例 {
     this.已销毁 = true;
     delete 拾取物表[this.ID];
     if (this.特效 != null && this.特效 !== 0) DestroyEffect(this.特效);
-    if (this.参数.on销毁 != null) this.参数.on销毁(this, 原因);
+    if (this.参数.on销毁 != null) this.参数.on销毁(this, 原因, this.参数.变量);
     尝试停止驱动();
   }
 
   推进(now: number): void {
     if (this.已销毁) return;
     if (this.到期时间 > 0 && now >= this.到期时间) {
-      if (this.参数.on过期 != null) this.参数.on过期(this);
+      if (this.参数.on过期 != null) this.参数.on过期(this, this.参数.变量);
       this.销毁("过期");
       return;
     }
@@ -141,7 +142,7 @@ class 战斗内拾取物实现 implements 战斗内拾取物实例 {
 
   private 读取可拾取单位(): any[] {
     const raw = this.参数.可拾取单位列表;
-    return typeof raw === "function" ? raw() : raw;
+    return typeof raw === "function" ? raw(this.参数.变量) : raw;
   }
 
   private 检查拾取(): void {
@@ -151,7 +152,7 @@ class 战斗内拾取物实现 implements 战斗内拾取物实例 {
       const unit = units[i];
       if (unit == null || unit === 0) continue;
       if (距离(this.x, this.y, GetUnitX(unit), GetUnitY(unit)) <= radius) {
-        if (this.参数.on拾取 != null) this.参数.on拾取(unit, this);
+        if (this.参数.on拾取 != null) this.参数.on拾取(unit, this, this.参数.变量);
         this.销毁("拾取");
         return;
       }
@@ -165,7 +166,7 @@ class 战斗内拾取物实现 implements 战斗内拾取物实例 {
     const ty = GetUnitY(target);
     const dist = 距离(this.x, this.y, tx, ty);
     if (dist <= (this.参数.吸附半径 ?? this.参数.拾取半径)) {
-      if (this.参数.on吸收 != null) this.参数.on吸收(target, this);
+      if (this.参数.on吸收 != null) this.参数.on吸收(target, this, this.参数.变量);
       this.销毁("吸收");
       return true;
     }

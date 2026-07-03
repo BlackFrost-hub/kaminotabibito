@@ -23,7 +23,7 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
@@ -46,6 +46,12 @@ let 已注册幽影爆发 = false;
 let 已注册幽影承伤 = false;
 const 幽影爆发周期表: Record<number, { context: 影骨莫特斯运行时上下文; count: number; id: number } | undefined> = {};
 let 下一个幽影周期ID = 0;
+
+interface 影骨幽影爆发结束变量 {
+  context: 影骨莫特斯运行时上下文;
+  aura: any;
+  已销毁: boolean;
+}
 
 function on影骨幽影承伤修正(this: void, damageContext: any): number {
   if (!单位有效(damageContext.target) || GetUnitTypeId(damageContext.target) !== 影骨单位类型ID) return damageContext.currentDamage;
@@ -103,18 +109,25 @@ function 结束影骨幽影爆发(this: void, context: 影骨莫特斯运行时�
   context.幽影召唤物 = [];
 }
 
+function 销毁影骨幽灵形态特效(this: void, variable: 影骨幽影爆发结束变量): void {
+  if (variable == null || variable.已销毁 || variable.aura == null || variable.aura === 0) return;
+  variable.已销毁 = true;
+  DestroyEffect(variable.aura);
+}
+
+function 影骨幽影爆发结束(this: void, variable: 影骨幽影爆发结束变量): void {
+  if (variable == null) return;
+  结束影骨幽影爆发(variable.context);
+  销毁影骨幽灵形态特效(variable);
+}
+
 function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运行时上下文): void {
   if (!单位有效(context.Boss单位)) return;
   播放影骨莫特斯台词(context.Boss单位, "幽影爆发");
   AddSpecialEffect(影骨莫特斯表现配置.幽影爆发开场, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心X, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心Y);
   const aura = AddSpecialEffectTarget(影骨莫特斯表现配置.幽灵形态持续, context.Boss单位, "origin");
-  let 幽灵形态特效已销毁 = false;
-  function 销毁影骨幽灵形态特效(this: void): void {
-    if (幽灵形态特效已销毁 || aura == null || aura === 0) return;
-    幽灵形态特效已销毁 = true;
-    DestroyEffect(aura);
-  }
-  if (aura != null && aura !== 0) context.清理.登记清理("影骨-幽灵形态", 销毁影骨幽灵形态特效);
+  const endVariable = { context, aura, 已销毁: false } as 影骨幽影爆发结束变量;
+  if (aura != null && aura !== 0) context.清理.登记清理("影骨-幽灵形态", 销毁影骨幽灵形态特效, endVariable);
   context.幽影爆发中 = true;
   context.幽影召唤物 = [];
   刷新影骨幽灵形态Buff(context);
@@ -134,10 +147,7 @@ function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运行时�
   const id = addPeriodicCallback(影骨莫特斯数值与表现配置.幽影爆发.召唤间隔秒 * 1000, 幽影爆发召唤Tick);
   幽影爆发周期表[key] = { context, count: 0, id };
   context.清理.登记周期回调("影骨-幽影爆发召唤", id);
-  context.清理.登记延迟回调("影骨-幽影爆发结束", addDelayedCallback(影骨莫特斯数值与表现配置.幽影爆发.持续秒 * 1000, function 影骨幽影爆发结束(this: void): void {
-    结束影骨幽影爆发(context);
-    销毁影骨幽灵形态特效();
-  }));
+  context.清理.登记延迟回调("影骨-幽影爆发结束", addDelayedCallback(影骨莫特斯数值与表现配置.幽影爆发.持续秒 * 1000, 影骨幽影爆发结束, endVariable));
 }
 
 function on影骨幽影爆发施法(this: void, castingUnit: any, spellAbilityId: number): void {

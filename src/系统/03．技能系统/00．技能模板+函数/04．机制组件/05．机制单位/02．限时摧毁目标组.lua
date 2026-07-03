@@ -72,14 +72,14 @@ _____9650_65F6_6467_6BC1_76EE_6807_7EC4_5B9E_73B0.prototype["推进"] = function
     local _____5269_4F59_6570_91CF = self["取剩余数量"](self)
     if _____5269_4F59_6570_91CF <= 0 then
         if self["参数"]["on全部摧毁"] ~= nil then
-            self["参数"]["on全部摧毁"]()
+            self["参数"]["on全部摧毁"](self["参数"]["变量"])
         end
         self["结束"](self, true)
         return
     end
     if now >= self["到期Ms"] then
         if self["参数"]["on超时"] ~= nil then
-            self["参数"]["on超时"](_____5269_4F59_6570_91CF)
+            self["参数"]["on超时"](_____5269_4F59_6570_91CF, self["参数"]["变量"])
         end
         self["结束"](self, false)
     end
@@ -103,7 +103,7 @@ _____9650_65F6_6467_6BC1_76EE_6807_7EC4_5B9E_73B0.prototype["结束"] = function
         end
     end
     if self["参数"]["on结束"] ~= nil then
-        self["参数"]["on结束"](_____662F_5426_6210_529F, _____5269_4F59_6570_91CF)
+        self["参数"]["on结束"](_____662F_5426_6210_529F, _____5269_4F59_6570_91CF, self["参数"]["变量"])
     end
     _____5C1D_8BD5_505C_6B62_9650_65F6_6467_6BC1_76EE_6807_7EC4_9A71_52A8()
 end

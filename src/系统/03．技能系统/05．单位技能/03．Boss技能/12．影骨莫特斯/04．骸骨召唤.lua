@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____767B_8BB0_5F71_9AA8_53EC_5524_7269, _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0, _____521B_5EFA_9AB8_9AA8_7B26_5492, _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, AddSpecialEffect, IssueTargetOrder, addDelayedCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6218_6597_5185_62FE_53D6_7269, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, registerManualBuff, _____5F71_9AA8_83AB_7279_65AFBuffID, _____9AB8_9AA8_6218_58EBID, _____5F71_9AA8_53EC_5524_7269_4E0A_4E0B_6587_8868
+local _____767B_8BB0_5F71_9AA8_53EC_5524_7269, _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0, _____5F71_9AA8_7B26_5492_53EF_62FE_53D6_5355_4F4D, _____5F71_9AA8_7B26_5492_62FE_53D6, _____521B_5EFA_9AB8_9AA8_7B26_5492, _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4, _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB, _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1, _____5F71_9AA8_53EC_5524_7269_9500_6BC1, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, AddSpecialEffect, IssueTargetOrder, addDelayedCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6218_6597_5185_62FE_53D6_7269, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, registerManualBuff, _____5F71_9AA8_83AB_7279_65AFBuffID, _____9AB8_9AA8_6218_58EBID, _____5F71_9AA8_53EC_5524_7269_4E0A_4E0B_6587_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.00．配置")
 local _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["影骨莫特斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.01．运行时上下文")
@@ -30,6 +30,26 @@ function _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0(unit)
         __TS__Delete(_____5F71_9AA8_53EC_5524_7269_4E0A_4E0B_6587_8868, id)
     end
 end
+function _____5F71_9AA8_7B26_5492_53EF_62FE_53D6_5355_4F4D(variable)
+    if variable == nil or not _____5355_4F4D_6709_6548(variable.context["Boss单位"]) then
+        return {}
+    end
+    return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(variable.context["Boss单位"])
+end
+function _____5F71_9AA8_7B26_5492_62FE_53D6(hero, ______5B9E_4F8B, _variable)
+    AddSpecialEffect(
+        _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["骸骨符咒拾取"],
+        GetUnitX(hero),
+        GetUnitY(hero)
+    )
+    registerManualBuff(
+        hero,
+        _____5F71_9AA8_83AB_7279_65AFBuffID["骸骨符咒"],
+        12,
+        1,
+        {sourceName = "影骨-骸骨符咒"}
+    )
+end
 function _____521B_5EFA_9AB8_9AA8_7B26_5492(context, x, y)
     _____521B_5EFA_6218_6597_5185_62FE_53D6_7269({
         ["清理"] = context["清理"],
@@ -39,60 +59,65 @@ function _____521B_5EFA_9AB8_9AA8_7B26_5492(context, x, y)
         ["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["骸骨符咒掉落"],
         ["持续秒"] = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["符咒持续秒"],
         ["拾取半径"] = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["符咒拾取半径"],
-        ["可拾取单位列表"] = function()
-            return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
-        end,
-        ["on拾取"] = function(hero)
-            AddSpecialEffect(
-                _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["骸骨符咒拾取"],
-                GetUnitX(hero),
-                GetUnitY(hero)
-            )
-            registerManualBuff(
-                hero,
-                _____5F71_9AA8_83AB_7279_65AFBuffID["骸骨符咒"],
-                12,
-                1,
-                {sourceName = "影骨-骸骨符咒"}
-            )
-        end
+        ["变量"] = {context = context},
+        ["可拾取单位列表"] = _____5F71_9AA8_7B26_5492_53EF_62FE_53D6_5355_4F4D,
+        ["on拾取"] = _____5F71_9AA8_7B26_5492_62FE_53D6
     })
+end
+function _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4(variable)
+    if variable == nil or not _____5355_4F4D_6709_6548(variable.context["Boss单位"]) then
+        return
+    end
+    local context = variable.context
+    local angle = GetRandomReal(0, 360)
+    local x = _____6781_5750_6807X(
+        GetUnitX(context["Boss单位"]),
+        _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["召唤偏移半径"],
+        angle
+    )
+    local y = _____6781_5750_6807Y(
+        GetUnitY(context["Boss单位"]),
+        _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["召唤偏移半径"],
+        angle
+    )
+    ____exports["创建影骨召唤物"](
+        context,
+        _____9AB8_9AA8_6218_58EBID,
+        x,
+        y,
+        nil,
+        false
+    )
+    AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["骸骨战士重组"], x, y)
 end
 function _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB(context, group)
     if group["已重组"] or group["阶段"] >= 3 or group["死亡数"] < group["总数"] then
         return
     end
     group["已重组"] = true
-    local id = addDelayedCallback(
-        _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["重组延迟秒"] * 1000,
-        function()
-            if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                return
-            end
-            local angle = GetRandomReal(0, 360)
-            local x = _____6781_5750_6807X(
-                GetUnitX(context["Boss单位"]),
-                _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["召唤偏移半径"],
-                angle
-            )
-            local y = _____6781_5750_6807Y(
-                GetUnitY(context["Boss单位"]),
-                _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["召唤偏移半径"],
-                angle
-            )
-            ____exports["创建影骨召唤物"](
-                context,
-                _____9AB8_9AA8_6218_58EBID,
-                x,
-                y,
-                nil,
-                false
-            )
-            AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["骸骨战士重组"], x, y)
-        end
-    )
+    local id = addDelayedCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["重组延迟秒"] * 1000, _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4, {context = context})
     local ____self_9 = context["清理"]
     ____self_9["登记延迟回调"](____self_9, "影骨-骸骨重组", id)
+end
+function _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1(unit, _killer, variable)
+    _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0(unit)
+    if variable == nil then
+        return
+    end
+    local context = variable.context
+    _____521B_5EFA_9AB8_9AA8_7B26_5492(
+        context,
+        GetUnitX(unit),
+        GetUnitY(unit)
+    )
+    if variable.group ~= nil and variable.canReform then
+        local ____variable_group_10, _____6B7B_4EA1_6570_11 = variable.group, "死亡数"
+        ____variable_group_10[_____6B7B_4EA1_6570_11] = ____variable_group_10[_____6B7B_4EA1_6570_11] + 1
+        _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB(context, variable.group)
+    end
+end
+function _____5F71_9AA8_53EC_5524_7269_9500_6BC1(unit, variable)
+    _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0(unit)
 end
 ____exports["创建影骨召唤物"] = function(context, unitType, x, y, group, canReform)
     if canReform == nil then
@@ -110,21 +135,9 @@ ____exports["创建影骨召唤物"] = function(context, unitType, x, y, group, 
         ["朝向"] = GetRandomReal(0, 360),
         ["最大生命"] = unitType == _____9AB8_9AA8_6218_58EBID and cfg["骸骨战士生命值"] or cfg["骷髅生命值"],
         ["持续时间"] = unitType == _____9AB8_9AA8_6218_58EBID and cfg["骸骨战士持续秒"] or cfg["骷髅持续秒"],
-        ["on死亡"] = function(unit)
-            _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0(unit)
-            _____521B_5EFA_9AB8_9AA8_7B26_5492(
-                context,
-                GetUnitX(unit),
-                GetUnitY(unit)
-            )
-            if group ~= nil and canReform then
-                group["死亡数"] = group["死亡数"] + 1
-                _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB(context, group)
-            end
-        end,
-        ["on销毁"] = function(unit)
-            _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0(unit)
-        end
+        ["变量"] = {context = context, group = group, canReform = canReform},
+        ["on死亡"] = _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1,
+        ["on销毁"] = _____5F71_9AA8_53EC_5524_7269_9500_6BC1
     })
     if instance ~= nil and instance["单位"] ~= nil then
         _____767B_8BB0_5F71_9AA8_53EC_5524_7269(instance["单位"], context)
@@ -238,13 +251,19 @@ local function _____53EC_5524_5F71_9AA8_9AB7_9AC5(context, group, count)
         end
     end
 end
+local function _____5F71_9AA8_9AB8_9AA8_53EC_5524_5206_6BB5(variable)
+    if variable == nil then
+        return
+    end
+    _____53EC_5524_5F71_9AA8_9AB7_9AC5(variable.context, variable.group, variable.count)
+end
 local function _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "骸骨召唤")
-    local ____context_10, _____4E0B_4E00_4E2A_53EC_5524_7EC4ID_11 = context, "下一个召唤组ID"
-    local ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_12 = ____context_10[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_11] + 1
-    ____context_10[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_11] = ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_12
+    local ____context_12, _____4E0B_4E00_4E2A_53EC_5524_7EC4ID_13 = context, "下一个召唤组ID"
+    local ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_14 = ____context_12[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_13] + 1
+    ____context_12[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_13] = ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_14
     local group = {
-        ID = ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_12,
+        ID = ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_14,
         ["阶段"] = _____5237_65B0_5F71_9AA8_83AB_7279_65AF_9636_6BB5(context),
         ["总数"] = 4,
         ["死亡数"] = 0,
@@ -252,27 +271,17 @@ local function _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
     }
     context["当前召唤组"] = group
     _____53EC_5524_5F71_9AA8_9AB7_9AC5(context, group, 2)
-    local ____self_13 = context["清理"]
-    ____self_13["登记延迟回调"](
-        ____self_13,
+    local ____self_15 = context["清理"]
+    ____self_15["登记延迟回调"](
+        ____self_15,
         "影骨-骸骨召唤2",
-        addDelayedCallback(
-            1000,
-            function()
-                _____53EC_5524_5F71_9AA8_9AB7_9AC5(context, group, 1)
-            end
-        )
+        addDelayedCallback(1000, _____5F71_9AA8_9AB8_9AA8_53EC_5524_5206_6BB5, {context = context, group = group, count = 1})
     )
-    local ____self_14 = context["清理"]
-    ____self_14["登记延迟回调"](
-        ____self_14,
+    local ____self_16 = context["清理"]
+    ____self_16["登记延迟回调"](
+        ____self_16,
         "影骨-骸骨召唤3",
-        addDelayedCallback(
-            2000,
-            function()
-                _____53EC_5524_5F71_9AA8_9AB7_9AC5(context, group, 1)
-            end
-        )
+        addDelayedCallback(2000, _____5F71_9AA8_9AB8_9AA8_53EC_5524_5206_6BB5, {context = context, group = group, count = 1})
     )
 end
 local function ____on_5F71_9AA8_9AB8_9AA8_53EC_5524_65BD_6CD5(castingUnit, spellAbilityId)

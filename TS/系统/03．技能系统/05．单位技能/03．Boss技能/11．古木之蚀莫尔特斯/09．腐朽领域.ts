@@ -11,6 +11,8 @@ const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number,
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
+const Location = jass.Location as (x: number, y: number) => any;
+const RemoveLocation = jass.RemoveLocation as (whichLocation: any) => void;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
@@ -37,6 +39,36 @@ const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位�
 const { 莫尔特斯BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯") as {
   莫尔特斯BuffID: { 净化庇护: string };
 };
+const { CreateUbersplatBJ, ShowUbersplatBJ } = require("lib.扩展函数.BJ函数.11．贴图函数") as {
+  CreateUbersplatBJ: (this: void, file: string, where: any, red: number, green: number, blue: number, alpha: number, forcePaused: boolean, noBirthTime: boolean) => any;
+  ShowUbersplatBJ: (this: void, flag: boolean, whichUbersplat: any) => void;
+};
+
+interface 莫尔特斯腐朽领域根须延迟上下文 {
+  context: 莫尔特斯运行时上下文;
+  target: any;
+  X: number;
+  Y: number;
+}
+
+let 腐朽领域根须延迟上下文: 莫尔特斯腐朽领域根须延迟上下文 | undefined = undefined;
+
+function 创建腐朽领域沼泽地表(this: void, context: 莫尔特斯运行时上下文): void {
+  const grid = context.根须宫格;
+  if (grid == null) return;
+  const cfg = 莫尔特斯数值与表现配置.腐朽领域;
+  const color = cfg.沼泽贴图颜色;
+  for (let i = 0; i < grid.格子列表.length; i++) {
+    const cell = grid.格子列表[i];
+    if (cell == null) continue;
+    const loc = Location(cell.中心X, cell.中心Y);
+    const ubersplat = CreateUbersplatBJ(cfg.沼泽贴图类型, loc, color.r, color.g, color.b, color.a, cfg.沼泽贴图强制暂停, cfg.沼泽贴图无出生时间);
+    RemoveLocation(loc);
+    if (ubersplat == null || ubersplat === 0) continue;
+    ShowUbersplatBJ(true, ubersplat);
+    context.清理.登记贴图("莫尔特斯-腐朽领域沼泽", ubersplat);
+  }
+}
 
 function 创建净化符文(this: void, context: 莫尔特斯运行时上下文): void {
   const grid = context.根须宫格;
@@ -89,10 +121,23 @@ function 处理净化符文(this: void, context: 莫尔特斯运行时上下文,
   return false;
 }
 
+function 莫尔特斯腐朽沼泽根须(this: void): void {
+  const variable = 腐朽领域根须延迟上下文;
+  腐朽领域根须延迟上下文 = undefined;
+  if (variable == null) return;
+  const context = variable.context;
+  const target = variable.target;
+  if (!单位有效(context.Boss单位) || !单位有效(target)) return;
+  AddSpecialEffect(莫尔特斯数值与表现配置.腐朽根须穿刺.穿刺特效路径, variable.X, variable.Y);
+  UnitDamageTarget(context.Boss单位, target, 读取单位攻击力(context.Boss单位), false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS);
+  增加玩家腐败值(context, target, 莫尔特斯数值与表现配置.腐朽根须穿刺.腐败值);
+}
+
 export function 尝试触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯运行时上下文): void {
   if (context.腐朽领域已触发 || context.阶段 < 3 || !单位有效(context.Boss单位)) return;
   context.腐朽领域已触发 = true;
   播放莫尔特斯台词(context.Boss单位, "低血量");
+  创建腐朽领域沼泽地表(context);
   创建净化符文(context);
 }
 
@@ -124,12 +169,8 @@ export function 处理莫尔特斯腐朽领域周期(this: void, context: 莫尔
         半径: 莫尔特斯数值与表现配置.根须领域.单格边长 * 0.5,
         持续时间: 1,
       });
-      const id = addDelayedCallback(1000, function 莫尔特斯腐朽沼泽根须(this: void): void {
-        if (!单位有效(context.Boss单位) || !单位有效(target)) return;
-        AddSpecialEffect(莫尔特斯数值与表现配置.腐朽根须穿刺.穿刺特效路径, x, y);
-        UnitDamageTarget(context.Boss单位, target, 读取单位攻击力(context.Boss单位), false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS);
-        增加玩家腐败值(context, target, 莫尔特斯数值与表现配置.腐朽根须穿刺.腐败值);
-      });
+      腐朽领域根须延迟上下文 = { context, target, X: x, Y: y };
+      const id = addDelayedCallback(1000, 莫尔特斯腐朽沼泽根须);
       context.清理.登记延迟回调("莫尔特斯-腐朽沼泽根须", id);
     }
   }

@@ -10,6 +10,7 @@ local RemoveUnit = jass.RemoveUnit
 local DestroyLightning = jass.DestroyLightning
 local RemoveRect = jass.RemoveRect
 local RemoveRegion = jass.RemoveRegion
+local DestroyUbersplat = jass.DestroyUbersplat
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
 local removeDelayedCallback = ____require_result_0.removeDelayedCallback
@@ -23,12 +24,12 @@ end
 _____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["已清理"] = function(self)
     return self["已经清理"]
 end
-_____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["登记清理"] = function(self, _____540D_79F0, _____6E05_7406)
+_____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["登记清理"] = function(self, _____540D_79F0, _____6E05_7406, _____53D8_91CF)
     if self["已经清理"] or _____6E05_7406 == nil then
         return
     end
     local ____self__6E05_7406_9879_5217_8868_1 = self["清理项列表"]
-    ____self__6E05_7406_9879_5217_8868_1[#____self__6E05_7406_9879_5217_8868_1 + 1] = {["名称"] = _____540D_79F0, ["清理"] = _____6E05_7406}
+    ____self__6E05_7406_9879_5217_8868_1[#____self__6E05_7406_9879_5217_8868_1 + 1] = {["名称"] = _____540D_79F0, ["清理"] = _____6E05_7406, ["变量"] = _____53D8_91CF}
 end
 _____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["登记周期回调"] = function(self, _____540D_79F0, _____56DE_8C03ID)
     if _____56DE_8C03ID == nil or _____56DE_8C03ID == 0 then
@@ -114,6 +115,18 @@ _____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["登记区域"] = functio
         end
     )
 end
+_____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["登记贴图"] = function(self, _____540D_79F0, _____8D34_56FE)
+    if _____8D34_56FE == nil or _____8D34_56FE == 0 then
+        return
+    end
+    self["登记清理"](
+        self,
+        _____540D_79F0,
+        function()
+            DestroyUbersplat(_____8D34_56FE)
+        end
+    )
+end
 _____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["清理全部"] = function(self)
     if self["已经清理"] then
         return
@@ -124,7 +137,7 @@ _____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["清理全部"] = functio
         while i >= 0 do
             local _____9879 = self["清理项列表"][i + 1]
             if _____9879 ~= nil and _____9879["清理"] ~= nil then
-                _____9879["清理"]()
+                _____9879["清理"](_____9879["变量"])
             end
             i = i - 1
         end

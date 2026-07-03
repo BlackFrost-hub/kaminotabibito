@@ -39,9 +39,9 @@ const centerTimer = require("系统.00．核心系统.05．中心计时器") as 
   getDateTimeStringWithMs: () => string;
   setGameDifficulty: (difficulty: number) => void;
   getGameDifficulty: () => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
-  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
   onSecond: (this: void, callback: () => void) => void;
   offSecond: (this: void, callback: () => void) => void;

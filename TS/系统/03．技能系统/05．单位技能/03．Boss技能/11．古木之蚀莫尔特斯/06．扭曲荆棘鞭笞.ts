@@ -24,7 +24,7 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -49,6 +49,17 @@ interface 鞭笞通道 {
   X: number;
   Y: number;
   朝向: number;
+}
+
+interface 鞭笞命中变量 {
+  context: 莫尔特斯运行时上下文;
+  channel: 鞭笞通道;
+  命中次数表: Record<number, number | undefined>;
+}
+
+interface 鞭笞波次变量 {
+  context: 莫尔特斯运行时上下文;
+  命中次数表: Record<number, number | undefined>;
 }
 
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
@@ -120,6 +131,12 @@ function 单通道鞭笞命中(this: void, context: 莫尔特斯运行时上下�
   }
 }
 
+function 莫尔特斯荆棘鞭笞命中(this: void, variable?: any): void {
+  const data = variable as 鞭笞命中变量 | undefined;
+  if (data == null) return;
+  单通道鞭笞命中(data.context, data.channel, data.命中次数表);
+}
+
 function 执行一波鞭笞(this: void, context: 莫尔特斯运行时上下文, 命中次数表: Record<number, number | undefined>): void {
   const cfg = 莫尔特斯数值与表现配置.扭曲荆棘鞭笞;
   const channels = 选择本波通道(context);
@@ -134,11 +151,15 @@ function 执行一波鞭笞(this: void, context: 莫尔特斯运行时上下文,
       朝向: channel.朝向,
       持续时间: cfg.预警秒,
     });
-    const id = addDelayedCallback(cfg.预警秒 * 1000, function 莫尔特斯荆棘鞭笞命中(this: void): void {
-      单通道鞭笞命中(context, channel, 命中次数表);
-    });
+    const id = addDelayedCallback(cfg.预警秒 * 1000, 莫尔特斯荆棘鞭笞命中, { context, channel, 命中次数表 } as 鞭笞命中变量);
     context.清理.登记延迟回调("莫尔特斯-荆棘鞭笞命中", id);
   }
+}
+
+function 莫尔特斯荆棘鞭笞波次(this: void, variable?: any): void {
+  const data = variable as 鞭笞波次变量 | undefined;
+  if (data == null) return;
+  执行一波鞭笞(data.context, data.命中次数表);
 }
 
 function 释放莫尔特斯扭曲荆棘鞭笞(this: void, context: 莫尔特斯运行时上下文): void {
@@ -149,9 +170,7 @@ function 释放莫尔特斯扭曲荆棘鞭笞(this: void, context: 莫尔特斯�
   const hitMap: Record<number, number | undefined> = {};
   for (let wave = 0; wave < cfg.扫击次数; wave++) {
     const delay = (cfg.开始延迟秒 + wave * cfg.波次间隔秒) * 1000;
-    const id = addDelayedCallback(delay, function 莫尔特斯荆棘鞭笞波次(this: void): void {
-      执行一波鞭笞(context, hitMap);
-    });
+    const id = addDelayedCallback(delay, 莫尔特斯荆棘鞭笞波次, { context, 命中次数表: hitMap } as 鞭笞波次变量);
     context.清理.登记延迟回调("莫尔特斯-荆棘鞭笞波次", id);
   }
 }

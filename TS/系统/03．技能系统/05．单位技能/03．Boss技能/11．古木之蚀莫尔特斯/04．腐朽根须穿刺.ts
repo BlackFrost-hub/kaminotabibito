@@ -30,7 +30,7 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -45,6 +45,11 @@ const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位�
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
 const 腐朽根须穿刺技能ID = stringToFourCC(莫尔特斯数值与表现配置.腐朽根须穿刺.技能槽位);
 let 已注册 = false;
+
+interface 根须穿刺延迟变量 {
+  context: 莫尔特斯运行时上下文;
+  cell: any;
+}
 
 function 选择根须穿刺格子(this: void, context: 莫尔特斯运行时上下文): any[] {
   const grid = context.根须宫格;
@@ -94,6 +99,12 @@ function 结算单格根须穿刺(this: void, context: 莫尔特斯运行时上�
   DestroyGroup(group);
 }
 
+function 莫尔特斯根须穿刺延迟结算(this: void, variable?: any): void {
+  const data = variable as 根须穿刺延迟变量 | undefined;
+  if (data == null) return;
+  结算单格根须穿刺(data.context, data.cell);
+}
+
 function 释放莫尔特斯腐朽根须穿刺(this: void, context: 莫尔特斯运行时上下文): void {
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.腐朽根须穿刺;
@@ -111,9 +122,7 @@ function 释放莫尔特斯腐朽根须穿刺(this: void, context: 莫尔特斯�
       朝向: 0,
       持续时间: cfg.预警秒,
     });
-    const id = addDelayedCallback(cfg.预警秒 * 1000, function 莫尔特斯根须穿刺延迟结算(this: void): void {
-      结算单格根须穿刺(context, cell);
-    });
+    const id = addDelayedCallback(cfg.预警秒 * 1000, 莫尔特斯根须穿刺延迟结算, { context, cell } as 根须穿刺延迟变量);
     context.清理.登记延迟回调("莫尔特斯-腐朽根须穿刺", id);
   }
 }

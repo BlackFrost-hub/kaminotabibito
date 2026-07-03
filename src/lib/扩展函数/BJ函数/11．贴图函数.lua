@@ -18,6 +18,7 @@ function ____exports.CreateUbersplatBJ(file, where, red, green, blue, alpha, for
     ____exports.bj_lastCreatedUbersplat = jass.CreateUbersplat(
         x,
         y,
+        file,
         red,
         green,
         blue,

@@ -13,7 +13,7 @@ export function CreateUbersplatBJ(file: string, where: any, red: number, green: 
   const x = jass.GetLocationX(where);
   const y = jass.GetLocationY(where);
 
-  bj_lastCreatedUbersplat = jass.CreateUbersplat(x, y, red, green, blue, alpha, forcePaused, noBirthTime);
+  bj_lastCreatedUbersplat = jass.CreateUbersplat(x, y, file, red, green, blue, alpha, forcePaused, noBirthTime);
   return bj_lastCreatedUbersplat;
 }
 

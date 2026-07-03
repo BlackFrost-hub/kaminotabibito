@@ -15,7 +15,7 @@ const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { 获取Boss技能随机敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
@@ -32,12 +32,15 @@ function 当前生命百分比档位(this: void, boss: any): number {
   return percent;
 }
 
+function 莫尔特斯腐败传输连线销毁(this: void, variable?: any): void {
+  const lightning = variable as any;
+  if (lightning != null && lightning !== 0) DestroyLightning(lightning);
+}
+
 function 创建腐败传输连线(this: void, context: 莫尔特斯运行时上下文, target: any): void {
   const cfg = 莫尔特斯数值与表现配置.腐败传输;
   const lightning = AddLightning(cfg.连线效果, false, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), GetUnitX(target), GetUnitY(target));
-  const id = addDelayedCallback(700, function 莫尔特斯腐败传输连线销毁(this: void): void {
-    if (lightning != null && lightning !== 0) DestroyLightning(lightning);
-  });
+  const id = addDelayedCallback(700, 莫尔特斯腐败传输连线销毁, lightning);
   context.清理.登记延迟回调("莫尔特斯-腐败传输连线", id);
 }
 

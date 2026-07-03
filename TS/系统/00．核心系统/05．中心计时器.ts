@@ -163,27 +163,45 @@ interface PeriodicCallback {
   id: number;
   intervalMs: number;
   lastRunTime: number;
-  callback: (this: void) => void;
+  callback: (this: void, variable?: any) => void;
+  variable?: any;
 }
 
 interface DelayedCallback {
   id: number;
   dueTime: number;
   active: boolean;
-  callback: (this: void) => void;
+  callback: (this: void, variable?: any) => void;
+  variable?: any;
 }
 
 let _periodicCallbackIdCounter = 0;
 const _periodicCallbacks: PeriodicCallback[] = [];
 let _delayedCallbackIdCounter = 0;
 const _delayedCallbacks: DelayedCallback[] = [];
+let _currentPeriodicCallback: ((this: void, variable?: any) => void) | undefined = undefined;
+let _currentPeriodicVariable: any = undefined;
+let _currentDelayedCallback: ((this: void, variable?: any) => void) | undefined = undefined;
+let _currentDelayedVariable: any = undefined;
+
+function executeCurrentPeriodicCallback(this: void): void {
+  if (_currentPeriodicCallback != null) _currentPeriodicCallback(_currentPeriodicVariable);
+}
+
+function executeCurrentDelayedCallback(this: void): void {
+  if (_currentDelayedCallback != null) _currentDelayedCallback(_currentDelayedVariable);
+}
 
 function runPeriodicCallbacks(): void {
   const now = nowMs();
   for (const p of _periodicCallbacks) {
     if (now - p.lastRunTime >= p.intervalMs) {
       p.lastRunTime = now;
-      调试输出.safeExecute("中心计时器-周期回调", p.callback);
+      _currentPeriodicCallback = p.callback;
+      _currentPeriodicVariable = p.variable;
+      调试输出.safeExecute("中心计时器-周期回调", executeCurrentPeriodicCallback);
+      _currentPeriodicCallback = undefined;
+      _currentPeriodicVariable = undefined;
     }
   }
 }
@@ -196,7 +214,11 @@ function runDelayedCallbacks(): void {
     if (!d.active) continue;
     if (now >= d.dueTime) {
       d.active = false;
-      调试输出.safeExecute("中心计时器-延迟回调", d.callback);
+      _currentDelayedCallback = d.callback;
+      _currentDelayedVariable = d.variable;
+      调试输出.safeExecute("中心计时器-延迟回调", executeCurrentDelayedCallback);
+      _currentDelayedCallback = undefined;
+      _currentDelayedVariable = undefined;
     } else {
       _delayedCallbacks[writeIndex] = d;
       writeIndex++;
@@ -316,9 +338,9 @@ export function getGameDifficulty(): number {
   return _gameDifficulty;
 }
 
-export function addPeriodicCallback(intervalMs: number, callback: () => void): number {
+export function addPeriodicCallback(intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any): number {
   const id = ++_periodicCallbackIdCounter;
-  _periodicCallbacks.push({ id, intervalMs, lastRunTime: nowMs(), callback });
+  _periodicCallbacks.push({ id, intervalMs, lastRunTime: nowMs(), callback, variable });
   return id;
 }
 
@@ -327,10 +349,10 @@ export function removePeriodicCallback(id: number): void {
   if (idx > -1) _periodicCallbacks.splice(idx, 1);
 }
 
-export function addDelayedCallback(delayMs: number, callback: () => void): number {
+export function addDelayedCallback(delayMs: number, callback: (this: void, variable?: any) => void, variable?: any): number {
   const id = ++_delayedCallbackIdCounter;
   const safeDelay = maxNum(0, intFloor(delayMs));
-  _delayedCallbacks.push({ id, dueTime: nowMs() + safeDelay, active: true, callback });
+  _delayedCallbacks.push({ id, dueTime: nowMs() + safeDelay, active: true, callback, variable });
   return id;
 }
 

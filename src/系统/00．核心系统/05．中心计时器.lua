@@ -196,12 +196,30 @@ local _periodicCallbackIdCounter = 0
 local _periodicCallbacks = {}
 local _delayedCallbackIdCounter = 0
 local _delayedCallbacks = {}
+local _currentPeriodicCallback = nil
+local _currentPeriodicVariable = nil
+local _currentDelayedCallback = nil
+local _currentDelayedVariable = nil
+local function executeCurrentPeriodicCallback()
+    if _currentPeriodicCallback ~= nil then
+        _currentPeriodicCallback(_currentPeriodicVariable)
+    end
+end
+local function executeCurrentDelayedCallback()
+    if _currentDelayedCallback ~= nil then
+        _currentDelayedCallback(_currentDelayedVariable)
+    end
+end
 local function runPeriodicCallbacks()
     local now = nowMs()
     for ____, p in ipairs(_periodicCallbacks) do
         if now - p.lastRunTime >= p.intervalMs then
             p.lastRunTime = now
-            _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-周期回调", p.callback)
+            _currentPeriodicCallback = p.callback
+            _currentPeriodicVariable = p.variable
+            _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-周期回调", executeCurrentPeriodicCallback)
+            _currentPeriodicCallback = nil
+            _currentPeriodicVariable = nil
         end
     end
 end
@@ -214,17 +232,21 @@ local function runDelayedCallbacks()
             do
                 local d = _delayedCallbacks[i + 1]
                 if not d.active then
-                    goto __continue30
+                    goto __continue34
                 end
                 if now >= d.dueTime then
                     d.active = false
-                    _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-延迟回调", d.callback)
+                    _currentDelayedCallback = d.callback
+                    _currentDelayedVariable = d.variable
+                    _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-延迟回调", executeCurrentDelayedCallback)
+                    _currentDelayedCallback = nil
+                    _currentDelayedVariable = nil
                 else
                     _delayedCallbacks[writeIndex + 1] = d
                     writeIndex = writeIndex + 1
                 end
             end
-            ::__continue30::
+            ::__continue34::
             i = i + 1
         end
     end
@@ -343,14 +365,15 @@ end
 function ____exports.getGameDifficulty()
     return _gameDifficulty
 end
-function ____exports.addPeriodicCallback(intervalMs, callback)
+function ____exports.addPeriodicCallback(intervalMs, callback, variable)
     _periodicCallbackIdCounter = _periodicCallbackIdCounter + 1
     local id = _periodicCallbackIdCounter
     _periodicCallbacks[#_periodicCallbacks + 1] = {
         id = id,
         intervalMs = intervalMs,
         lastRunTime = nowMs(),
-        callback = callback
+        callback = callback,
+        variable = variable
     }
     return id
 end
@@ -363,7 +386,7 @@ function ____exports.removePeriodicCallback(id)
         __TS__ArraySplice(_periodicCallbacks, idx, 1)
     end
 end
-function ____exports.addDelayedCallback(delayMs, callback)
+function ____exports.addDelayedCallback(delayMs, callback, variable)
     _delayedCallbackIdCounter = _delayedCallbackIdCounter + 1
     local id = _delayedCallbackIdCounter
     local safeDelay = maxNum(
@@ -374,7 +397,8 @@ function ____exports.addDelayedCallback(delayMs, callback)
         id = id,
         dueTime = nowMs() + safeDelay,
         active = true,
-        callback = callback
+        callback = callback,
+        variable = variable
     }
     return id
 end

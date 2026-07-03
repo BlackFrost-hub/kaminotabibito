@@ -18,7 +18,7 @@ const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位") as {
@@ -52,10 +52,34 @@ interface 甲虫追击实例 {
   周期ID: number;
 }
 
+interface 莫尔特斯虫尸变量 {
+  context: 莫尔特斯运行时上下文;
+}
+
+interface 莫尔特斯甲虫死亡变量 {
+  context: 莫尔特斯运行时上下文;
+}
+
 function 取甲虫目标(this: void, context: 莫尔特斯运行时上下文): any {
   const target = 取腐败值最高玩家(context);
   if (单位有效(target)) return target;
   return 获取Boss技能随机敌对英雄(context.Boss单位);
+}
+
+function 莫尔特斯虫尸可拾取单位(this: void, variable?: any): any[] {
+  const data = variable as 莫尔特斯虫尸变量 | undefined;
+  if (data == null) return [];
+  return 获取Boss技能敌对英雄列表(data.context.Boss单位);
+}
+
+function 莫尔特斯虫尸拾取(this: void, picker: any, _实例: any, variable?: any): void {
+  const data = variable as 莫尔特斯虫尸变量 | undefined;
+  if (data == null) return;
+  const amount = 莫尔特斯数值与表现配置.腐败值.虫尸清除值;
+  清除玩家腐败值(data.context, picker, amount);
+  registerManualBuff(picker, 莫尔特斯BuffID.腐败虫尸净化, 3, amount, {
+    sourceName: "莫尔特斯-腐败虫尸",
+  });
 }
 
 function 创建虫尸拾取物(this: void, context: 莫尔特斯运行时上下文, x: number, y: number): void {
@@ -69,16 +93,9 @@ function 创建虫尸拾取物(this: void, context: 莫尔特斯运行时上下�
     缩放: 0.55,
     持续秒: cfg.虫尸持续秒,
     拾取半径: cfg.虫尸拾取半径,
-    可拾取单位列表: function 莫尔特斯虫尸可拾取单位(this: void): any[] {
-      return 获取Boss技能敌对英雄列表(context.Boss单位);
-    },
-    on拾取: function 莫尔特斯虫尸拾取(this: void, picker: any): void {
-      const amount = 莫尔特斯数值与表现配置.腐败值.虫尸清除值;
-      清除玩家腐败值(context, picker, amount);
-      registerManualBuff(picker, 莫尔特斯BuffID.腐败虫尸净化, 3, amount, {
-        sourceName: "莫尔特斯-腐败虫尸",
-      });
-    },
+    变量: { context } as 莫尔特斯虫尸变量,
+    可拾取单位列表: 莫尔特斯虫尸可拾取单位,
+    on拾取: 莫尔特斯虫尸拾取,
   });
 }
 
@@ -120,6 +137,18 @@ function 甲虫追击Tick(this: void, data: 甲虫追击实例): void {
   }
 }
 
+function 莫尔特斯甲虫追击周期(this: void, variable?: any): void {
+  const data = variable as 甲虫追击实例 | undefined;
+  if (data == null) return;
+  甲虫追击Tick(data);
+}
+
+function 莫尔特斯甲虫死亡(this: void, unit: any, _击杀者: any, variable?: any): void {
+  const data = variable as 莫尔特斯甲虫死亡变量 | undefined;
+  if (data == null) return;
+  创建虫尸拾取物(data.context, GetUnitX(unit), GetUnitY(unit));
+}
+
 function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文, angle: number): void {
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
@@ -137,16 +166,13 @@ function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文,
     朝向: angle,
     最大生命: cfg.甲虫生命值,
     缩放: cfg.甲虫缩放,
-    on死亡: function 莫尔特斯甲虫死亡(this: void, unit: any): void {
-      创建虫尸拾取物(context, GetUnitX(unit), GetUnitY(unit));
-    },
+    变量: { context } as 莫尔特斯甲虫死亡变量,
+    on死亡: 莫尔特斯甲虫死亡,
   });
   if (instance == null || !单位有效(instance.单位)) return;
   临时调整攻击(instance.单位, cfg.甲虫攻击力);
   const data: 甲虫追击实例 = { context, 甲虫单位: instance.单位, 接触目标: null, 接触Ticks: 0, 周期ID: 0 };
-  data.周期ID = addPeriodicCallback(1000, function 莫尔特斯甲虫追击周期(this: void): void {
-    甲虫追击Tick(data);
-  });
+  data.周期ID = addPeriodicCallback(1000, 莫尔特斯甲虫追击周期, data);
   context.清理.登记周期回调("莫尔特斯-甲虫追击", data.周期ID);
 }
 

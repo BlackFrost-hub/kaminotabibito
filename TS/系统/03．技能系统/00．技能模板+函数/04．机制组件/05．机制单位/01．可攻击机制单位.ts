@@ -33,8 +33,9 @@ export interface 可攻击机制单位参数 {
   飞行高度?: number;
   缩放?: number;
   持续时间?: number;
-  on死亡?: (this: void, 单位: any, 击杀者: any) => void;
-  on销毁?: (this: void, 单位: any) => void;
+  变量?: any;
+  on死亡?: (this: void, 单位: any, 击杀者: any, 变量?: any) => void;
+  on销毁?: (this: void, 单位: any, 变量?: any) => void;
 }
 
 export interface 可攻击机制单位实例 {
@@ -92,7 +93,7 @@ class 可攻击机制单位实现 implements 可攻击机制单位实例 {
     if (this.已经死亡 || this.已经销毁) return;
     this.已经死亡 = true;
     delete 机制单位表[this.ID];
-    if (this.参数.on死亡 != null) this.参数.on死亡(this.单位, 击杀者);
+    if (this.参数.on死亡 != null) this.参数.on死亡(this.单位, 击杀者, this.参数.变量);
     尝试取消机制单位死亡监听();
   }
 
@@ -100,7 +101,7 @@ class 可攻击机制单位实现 implements 可攻击机制单位实例 {
     if (this.已经销毁) return;
     this.已经销毁 = true;
     delete 机制单位表[this.ID];
-    if (this.参数.on销毁 != null) this.参数.on销毁(this.单位);
+    if (this.参数.on销毁 != null) this.参数.on销毁(this.单位, this.参数.变量);
     if (this.单位 != null && this.单位 !== 0) RemoveUnit(this.单位);
     尝试取消机制单位死亡监听();
   }
@@ -132,4 +133,3 @@ export function 创建可攻击机制单位(this: void, 参数: 可攻击机制�
   }
   return 实例;
 }
-

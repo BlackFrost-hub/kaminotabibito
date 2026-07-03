@@ -27,8 +27,8 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位") as {
@@ -48,6 +48,18 @@ interface 孢子云实例 {
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
 const 腐败孢子云技能ID = stringToFourCC(莫尔特斯数值与表现配置.腐败孢子云.技能槽位);
 let 已注册 = false;
+
+function 莫尔特斯孢子云周期(this: void, variable?: any): void {
+  const data = variable as 孢子云实例 | undefined;
+  if (data == null) return;
+  孢子云Tick(data);
+}
+
+function 莫尔特斯延迟创建孢子云(this: void, variable?: any): void {
+  const context = variable as 莫尔特斯运行时上下文 | undefined;
+  if (context == null) return;
+  创建单团孢子云(context);
+}
 
 function 孢子云Tick(this: void, data: 孢子云实例): void {
   const cfg = 莫尔特斯数值与表现配置.腐败孢子云;
@@ -99,9 +111,7 @@ function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下�
     剩余跳数: cfg.持续秒,
     周期ID: 0,
   };
-  data.周期ID = addPeriodicCallback(1000, function 莫尔特斯孢子云周期(this: void): void {
-    孢子云Tick(data);
-  });
+  data.周期ID = addPeriodicCallback(1000, 莫尔特斯孢子云周期, data);
   context.清理.登记周期回调("莫尔特斯-腐败孢子云周期", data.周期ID);
 }
 
@@ -111,9 +121,7 @@ function 释放莫尔特斯腐败孢子云(this: void, context: 莫尔特斯运�
   const cfg = 莫尔特斯数值与表现配置.腐败孢子云;
   播放莫尔特斯台词(boss, "腐败孢子云");
   for (let i = 0; i < cfg.数量; i++) {
-    const id = addDelayedCallback(i * 1000, function 莫尔特斯延迟创建孢子云(this: void): void {
-      创建单团孢子云(context);
-    });
+    const id = addDelayedCallback(i * 1000, 莫尔特斯延迟创建孢子云, context);
     context.清理.登记延迟回调("莫尔特斯-创建腐败孢子云", id);
   }
 }

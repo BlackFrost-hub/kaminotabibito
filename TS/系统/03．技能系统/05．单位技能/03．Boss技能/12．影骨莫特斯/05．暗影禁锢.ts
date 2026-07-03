@@ -19,7 +19,7 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { 获取Boss技能随机敌对英雄, 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能随机敌对英雄: (this: void, boss: any, centerUnit?: any, radius?: number) => any;
@@ -45,6 +45,39 @@ const 影骨单位类型ID = stringToFourCC(影骨莫特斯单位技能配置.�
 const 暗影禁锢技能ID = stringToFourCC(影骨莫特斯单位技能配置.技能壳.暗影禁锢);
 let 已注册暗影禁锢 = false;
 
+interface 影骨暗影禁锢法阵变量 {
+  context: 影骨莫特斯运行时上下文;
+}
+
+interface 影骨暗影禁锢延迟变量 {
+  context: 影骨莫特斯运行时上下文;
+  x: number;
+  y: number;
+}
+
+function 影骨暗影禁锢取目标列表(this: void, variable?: any): any[] {
+  const data = variable as 影骨暗影禁锢法阵变量 | undefined;
+  if (data == null) return [];
+  return 获取Boss技能敌对英雄列表(data.context.Boss单位);
+}
+
+function 影骨暗影禁锢目标有效(this: void, target: any): boolean {
+  return 单位有效(target);
+}
+
+function 影骨暗影禁锢施加控制(this: void, target: any, duration: number, variable?: any): void {
+  const data = variable as 影骨暗影禁锢法阵变量 | undefined;
+  if (data == null) return;
+  施加禁锢({ 来源单位: data.context.Boss单位, 目标单位: target, 持续时间: duration });
+  registerManualBuff(target, 影骨莫特斯BuffID.暗影禁锢, duration, 1, { sourceName: "影骨-暗影禁锢" });
+}
+
+function 影骨暗影禁锢生效(this: void, variable?: any): void {
+  const data = variable as 影骨暗影禁锢延迟变量 | undefined;
+  if (data == null) return;
+  创建影骨暗影法阵(data.context, data.x, data.y);
+}
+
 function 创建影骨暗影法阵(this: void, context: 影骨莫特斯运行时上下文, x: number, y: number): void {
   const cfg = 影骨莫特斯数值与表现配置.暗影禁锢;
   创建可攻击控制法阵({
@@ -61,16 +94,10 @@ function 创建影骨暗影法阵(this: void, context: 影骨莫特斯运行时�
     缩放: cfg.法阵缩放,
     持续秒: cfg.禁锢秒,
     摧毁后剩余秒: cfg.摧毁后剩余秒,
-    取目标列表: function 影骨暗影禁锢取目标列表(this: void): any[] {
-      return 获取Boss技能敌对英雄列表(context.Boss单位);
-    },
-    目标有效: function 影骨暗影禁锢目标有效(this: void, target: any): boolean {
-      return 单位有效(target);
-    },
-    施加控制: function 影骨暗影禁锢施加控制(this: void, target: any, duration: number): void {
-      施加禁锢({ 来源单位: context.Boss单位, 目标单位: target, 持续时间: duration });
-      registerManualBuff(target, 影骨莫特斯BuffID.暗影禁锢, duration, 1, { sourceName: "影骨-暗影禁锢" });
-    },
+    变量: { context } as 影骨暗影禁锢法阵变量,
+    取目标列表: 影骨暗影禁锢取目标列表,
+    目标有效: 影骨暗影禁锢目标有效,
+    施加控制: 影骨暗影禁锢施加控制,
     创建特效路径: 影骨莫特斯表现配置.暗影禁锢法阵,
     摧毁特效路径: 影骨莫特斯表现配置.暗影禁锢摧毁,
   });
@@ -90,9 +117,7 @@ export function 释放影骨暗影禁锢(this: void, context: 影骨莫特斯运
     持续时间: cfg.预警秒,
     模型路径: 影骨莫特斯表现配置.暗影禁锢预警,
   });
-  const id = addDelayedCallback(cfg.预警秒 * 1000, function 影骨暗影禁锢生效(this: void): void {
-    创建影骨暗影法阵(context, x, y);
-  });
+  const id = addDelayedCallback(cfg.预警秒 * 1000, 影骨暗影禁锢生效, { context, x, y } as 影骨暗影禁锢延迟变量);
   context.清理.登记延迟回调("影骨-暗影禁锢", id);
 }
 

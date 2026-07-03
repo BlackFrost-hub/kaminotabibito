@@ -170,6 +170,13 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
         end
     end
 end
+local function _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_547D_4E2D(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____5355_901A_9053_97AD_7B1E_547D_4E2D(data.context, data.channel, data["命中次数表"])
+end
 local function _____6267_884C_4E00_6CE2_97AD_7B1E(context, _____547D_4E2D_6B21_6570_8868)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["扭曲荆棘鞭笞"]
     local channels = _____9009_62E9_672C_6CE2_901A_9053(context)
@@ -186,17 +193,19 @@ local function _____6267_884C_4E00_6CE2_97AD_7B1E(context, _____547D_4E2D_6B21_6
                 ["朝向"] = channel["朝向"],
                 ["持续时间"] = cfg["预警秒"]
             })
-            local id = addDelayedCallback(
-                cfg["预警秒"] * 1000,
-                function()
-                    _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____547D_4E2D_6B21_6570_8868)
-                end
-            )
+            local id = addDelayedCallback(cfg["预警秒"] * 1000, _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_547D_4E2D, {context = context, channel = channel, ["命中次数表"] = _____547D_4E2D_6B21_6570_8868})
             local ____self_8 = context["清理"]
             ____self_8["登记延迟回调"](____self_8, "莫尔特斯-荆棘鞭笞命中", id)
             i = i + 1
         end
     end
+end
+local function _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_6CE2_6B21(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____6267_884C_4E00_6CE2_97AD_7B1E(data.context, data["命中次数表"])
 end
 local function _____91CA_653E_83AB_5C14_7279_65AF_626D_66F2_8346_68D8_97AD_7B1E(context)
     local boss = context["Boss单位"]
@@ -210,12 +219,7 @@ local function _____91CA_653E_83AB_5C14_7279_65AF_626D_66F2_8346_68D8_97AD_7B1E(
         local wave = 0
         while wave < cfg["扫击次数"] do
             local delay = (cfg["开始延迟秒"] + wave * cfg["波次间隔秒"]) * 1000
-            local id = addDelayedCallback(
-                delay,
-                function()
-                    _____6267_884C_4E00_6CE2_97AD_7B1E(context, hitMap)
-                end
-            )
+            local id = addDelayedCallback(delay, _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_6CE2_6B21, {context = context, ["命中次数表"] = hitMap})
             local ____self_9 = context["清理"]
             ____self_9["登记延迟回调"](____self_9, "莫尔特斯-荆棘鞭笞波次", id)
             wave = wave + 1

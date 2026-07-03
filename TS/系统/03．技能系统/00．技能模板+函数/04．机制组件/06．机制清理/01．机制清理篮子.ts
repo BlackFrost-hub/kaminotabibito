@@ -7,23 +7,25 @@ const RemoveUnit = jass.RemoveUnit as (whichUnit: any) => void;
 const DestroyLightning = jass.DestroyLightning as (whichLightning: any) => boolean;
 const RemoveRect = jass.RemoveRect as (whichRect: any) => void;
 const RemoveRegion = jass.RemoveRegion as (whichRegion: any) => void;
+const DestroyUbersplat = jass.DestroyUbersplat as (whichUbersplat: any) => void;
 
 const { removePeriodicCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   removePeriodicCallback: (this: void, id: number) => void;
   removeDelayedCallback: (this: void, id: number) => void;
 };
 
-export type 机制清理函数 = (this: void) => void;
+export type 机制清理函数 = (this: void, 变量?: any) => void;
 
 interface 清理项 {
   名称: string;
   清理: 机制清理函数;
+  变量?: any;
 }
 
 export interface 机制清理篮子 {
   readonly 名称: string;
   已清理(): boolean;
-  登记清理(名称: string, 清理: 机制清理函数): void;
+  登记清理(名称: string, 清理: 机制清理函数, 变量?: any): void;
   登记周期回调(名称: string, 回调ID: number): void;
   登记延迟回调(名称: string, 回调ID: number): void;
   登记特效(名称: string, 特效: any): void;
@@ -31,6 +33,7 @@ export interface 机制清理篮子 {
   登记闪电(名称: string, 闪电: any): void;
   登记矩形(名称: string, 矩形: any): void;
   登记区域(名称: string, 区域: any): void;
+  登记贴图(名称: string, 贴图: any): void;
   清理全部(): void;
 }
 
@@ -47,9 +50,9 @@ class 机制清理篮子实现 implements 机制清理篮子 {
     return this.已经清理;
   }
 
-  登记清理(名称: string, 清理: 机制清理函数): void {
+  登记清理(名称: string, 清理: 机制清理函数, 变量?: any): void {
     if (this.已经清理 || 清理 == null) return;
-    this.清理项列表.push({ 名称, 清理 });
+    this.清理项列表.push({ 名称, 清理, 变量 });
   }
 
   登记周期回调(名称: string, 回调ID: number): void {
@@ -101,13 +104,20 @@ class 机制清理篮子实现 implements 机制清理篮子 {
     });
   }
 
+  登记贴图(名称: string, 贴图: any): void {
+    if (贴图 == null || 贴图 === 0) return;
+    this.登记清理(名称, function 机制清理篮子销毁贴图(this: void): void {
+      DestroyUbersplat(贴图);
+    });
+  }
+
   清理全部(): void {
     if (this.已经清理) return;
     this.已经清理 = true;
     for (let i = this.清理项列表.length - 1; i >= 0; i--) {
       const 项 = this.清理项列表[i];
       if (项 != null && 项.清理 != null) {
-        项.清理();
+        项.清理(项.变量);
       }
     }
     this.清理项列表 = [];

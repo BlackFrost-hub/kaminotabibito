@@ -47,6 +47,28 @@ local function _____53D6_7532_866B_76EE_6807(context)
     end
     return _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(context["Boss单位"])
 end
+local function _____83AB_5C14_7279_65AF_866B_5C38_53EF_62FE_53D6_5355_4F4D(variable)
+    local data = variable
+    if data == nil then
+        return {}
+    end
+    return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(data.context["Boss单位"])
+end
+local function _____83AB_5C14_7279_65AF_866B_5C38_62FE_53D6(picker, ______5B9E_4F8B, variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    local amount = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败值"]["虫尸清除值"]
+    _____6E05_9664_73A9_5BB6_8150_8D25_503C(data.context, picker, amount)
+    registerManualBuff(
+        picker,
+        _____83AB_5C14_7279_65AFBuffID["腐败虫尸净化"],
+        3,
+        amount,
+        {sourceName = "莫尔特斯-腐败虫尸"}
+    )
+end
 local function _____521B_5EFA_866B_5C38_62FE_53D6_7269(context, x, y)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
     _____521B_5EFA_6218_6597_5185_62FE_53D6_7269({
@@ -58,20 +80,9 @@ local function _____521B_5EFA_866B_5C38_62FE_53D6_7269(context, x, y)
         ["缩放"] = 0.55,
         ["持续秒"] = cfg["虫尸持续秒"],
         ["拾取半径"] = cfg["虫尸拾取半径"],
-        ["可拾取单位列表"] = function()
-            return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
-        end,
-        ["on拾取"] = function(picker)
-            local amount = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败值"]["虫尸清除值"]
-            _____6E05_9664_73A9_5BB6_8150_8D25_503C(context, picker, amount)
-            registerManualBuff(
-                picker,
-                _____83AB_5C14_7279_65AFBuffID["腐败虫尸净化"],
-                3,
-                amount,
-                {sourceName = "莫尔特斯-腐败虫尸"}
-            )
-        end
+        ["变量"] = {context = context},
+        ["可拾取单位列表"] = _____83AB_5C14_7279_65AF_866B_5C38_53EF_62FE_53D6_5355_4F4D,
+        ["on拾取"] = _____83AB_5C14_7279_65AF_866B_5C38_62FE_53D6
     })
 end
 local function _____7206_70B8_7532_866B(data)
@@ -124,6 +135,24 @@ local function _____7532_866B_8FFD_51FBTick(data)
         data["接触Ticks"] = 0
     end
 end
+local function _____83AB_5C14_7279_65AF_7532_866B_8FFD_51FB_5468_671F(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____7532_866B_8FFD_51FBTick(data)
+end
+local function _____83AB_5C14_7279_65AF_7532_866B_6B7B_4EA1(unit, ______51FB_6740_8005, variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____521B_5EFA_866B_5C38_62FE_53D6_7269(
+        data.context,
+        GetUnitX(unit),
+        GetUnitY(unit)
+    )
+end
 local function _____521B_5EFA_8150_5316_7532_866B(context, angle)
     local boss = context["Boss单位"]
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
@@ -149,13 +178,8 @@ local function _____521B_5EFA_8150_5316_7532_866B(context, angle)
         ["朝向"] = angle,
         ["最大生命"] = cfg["甲虫生命值"],
         ["缩放"] = cfg["甲虫缩放"],
-        ["on死亡"] = function(unit)
-            _____521B_5EFA_866B_5C38_62FE_53D6_7269(
-                context,
-                GetUnitX(unit),
-                GetUnitY(unit)
-            )
-        end
+        ["变量"] = {context = context},
+        ["on死亡"] = _____83AB_5C14_7279_65AF_7532_866B_6B7B_4EA1
     })
     if instance == nil or not _____5355_4F4D_6709_6548(instance["单位"]) then
         return
@@ -168,12 +192,7 @@ local function _____521B_5EFA_8150_5316_7532_866B(context, angle)
         ["接触Ticks"] = 0,
         ["周期ID"] = 0
     }
-    data["周期ID"] = addPeriodicCallback(
-        1000,
-        function()
-            _____7532_866B_8FFD_51FBTick(data)
-        end
-    )
+    data["周期ID"] = addPeriodicCallback(1000, _____83AB_5C14_7279_65AF_7532_866B_8FFD_51FB_5468_671F, data)
     local ____self_8 = context["清理"]
     ____self_8["登记周期回调"](____self_8, "莫尔特斯-甲虫追击", data["周期ID"])
 end

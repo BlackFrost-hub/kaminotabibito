@@ -28,8 +28,8 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
@@ -65,6 +65,13 @@ interface 幼树实例 {
   周期ID: number;
 }
 
+interface 种子成长变量 {
+  context: 莫尔特斯运行时上下文;
+  seed: any;
+  x: number;
+  y: number;
+}
+
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
 const 腐败之种技能ID = stringToFourCC(莫尔特斯数值与表现配置.腐败之种.技能槽位);
 let 已注册 = false;
@@ -72,6 +79,26 @@ let 已注册 = false;
 function 贝塞尔位置(this: void, a: number, b: number, c: number, t: number): number {
   const u = 1 - t;
   return u * u * a + 2 * u * t * b + t * t * c;
+}
+
+function 莫尔特斯腐败幼树波动(this: void, variable?: any): void {
+  const data = variable as 幼树实例 | undefined;
+  if (data == null) return;
+  幼树波动Tick(data);
+}
+
+function 莫尔特斯腐败之种弹道(this: void, variable?: any): void {
+  const data = variable as 种子弹道 | undefined;
+  if (data == null) return;
+  弹道Tick(data);
+}
+
+function 莫尔特斯腐败种子成长(this: void, variable?: any): void {
+  const data = variable as 种子成长变量 | undefined;
+  if (data == null) return;
+  if (!data.seed.是否存活()) return;
+  data.seed.销毁();
+  创建腐败幼树(data.context, data.x, data.y);
 }
 
 function 创建腐败幼树(this: void, context: 莫尔特斯运行时上下文, x: number, y: number): void {
@@ -97,9 +124,7 @@ function 创建腐败幼树(this: void, context: 莫尔特斯运行时上下文,
     剩余跳数: cfg.持续秒 / cfg.波动间隔秒,
     周期ID: 0,
   };
-  data.周期ID = addPeriodicCallback(cfg.波动间隔秒 * 1000, function 莫尔特斯腐败幼树波动(this: void): void {
-    幼树波动Tick(data);
-  });
+  data.周期ID = addPeriodicCallback(cfg.波动间隔秒 * 1000, 莫尔特斯腐败幼树波动, data);
   context.清理.登记周期回调("莫尔特斯-腐败幼树波动", data.周期ID);
 }
 
@@ -142,11 +167,7 @@ function 创建落地种子(this: void, context: 莫尔特斯运行时上下文,
     持续时间: cfg.生长延迟秒 + 1,
   });
   if (seed == null) return;
-  const id = addDelayedCallback(cfg.生长延迟秒 * 1000, function 莫尔特斯腐败种子成长(this: void): void {
-    if (!seed.是否存活()) return;
-    seed.销毁();
-    创建腐败幼树(context, x, y);
-  });
+  const id = addDelayedCallback(cfg.生长延迟秒 * 1000, 莫尔特斯腐败种子成长, { context, seed, x, y } as 种子成长变量);
   context.清理.登记延迟回调("莫尔特斯-腐败种子成长", id);
 }
 
@@ -191,9 +212,7 @@ function 发射腐败之种(this: void, context: 莫尔特斯运行时上下文,
     持续毫秒: cfg.飞行秒 * 1000,
     周期ID: 0,
   };
-  data.周期ID = addPeriodicCallback(50, function 莫尔特斯腐败之种弹道(this: void): void {
-    弹道Tick(data);
-  });
+  data.周期ID = addPeriodicCallback(50, 莫尔特斯腐败之种弹道, data);
   context.清理.登记周期回调("莫尔特斯-腐败之种弹道", data.周期ID);
 }
 

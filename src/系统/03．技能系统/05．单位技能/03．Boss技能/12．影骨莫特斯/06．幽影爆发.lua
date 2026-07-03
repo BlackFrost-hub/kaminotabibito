@@ -145,6 +145,20 @@ local function _____7ED3_675F_5F71_9AA8_5E7D_5F71_7206_53D1(context)
     end
     context["幽影召唤物"] = {}
 end
+local function _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548(variable)
+    if variable == nil or variable["已销毁"] or variable.aura == nil or variable.aura == 0 then
+        return
+    end
+    variable["已销毁"] = true
+    DestroyEffect(variable.aura)
+end
+local function _____5F71_9AA8_5E7D_5F71_7206_53D1_7ED3_675F(variable)
+    if variable == nil then
+        return
+    end
+    _____7ED3_675F_5F71_9AA8_5E7D_5F71_7206_53D1(variable.context)
+    _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548(variable)
+end
 local function _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1(context)
     if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return
@@ -152,17 +166,10 @@ local function _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1(context)
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "幽影爆发")
     AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["幽影爆发开场"], _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤中心X"], _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤中心Y"])
     local aura = AddSpecialEffectTarget(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["幽灵形态持续"], context["Boss单位"], "origin")
-    local _____5E7D_7075_5F62_6001_7279_6548_5DF2_9500_6BC1 = false
-    local function _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548()
-        if _____5E7D_7075_5F62_6001_7279_6548_5DF2_9500_6BC1 or aura == nil or aura == 0 then
-            return
-        end
-        _____5E7D_7075_5F62_6001_7279_6548_5DF2_9500_6BC1 = true
-        DestroyEffect(aura)
-    end
+    local endVariable = {context = context, aura = aura, ["已销毁"] = false}
     if aura ~= nil and aura ~= 0 then
         local ____self_6 = context["清理"]
-        ____self_6["登记清理"](____self_6, "影骨-幽灵形态", _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548)
+        ____self_6["登记清理"](____self_6, "影骨-幽灵形态", _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548, endVariable)
     end
     context["幽影爆发中"] = true
     context["幽影召唤物"] = {}
@@ -194,13 +201,7 @@ local function _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1(context)
     ____self_8["登记延迟回调"](
         ____self_8,
         "影骨-幽影爆发结束",
-        addDelayedCallback(
-            _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["持续秒"] * 1000,
-            function()
-                _____7ED3_675F_5F71_9AA8_5E7D_5F71_7206_53D1(context)
-                _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548()
-            end
-        )
+        addDelayedCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["持续秒"] * 1000, _____5F71_9AA8_5E7D_5F71_7206_53D1_7ED3_675F, endVariable)
     )
 end
 local function ____on_5F71_9AA8_5E7D_5F71_7206_53D1_65BD_6CD5(castingUnit, spellAbilityId)

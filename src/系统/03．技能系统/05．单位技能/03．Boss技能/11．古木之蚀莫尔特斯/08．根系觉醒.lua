@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
+local _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_6B7B_4EA1, _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1, GetUnitX, GetUnitY, AddSpecialEffect
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.01．运行时上下文")
 local _____589E_52A0_73A9_5BB6_8150_8D25_503C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["增加玩家腐败值"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.02．数值与表现配置")
@@ -9,13 +10,29 @@ local ____13_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_653E["播放莫尔特斯台词"]
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
+function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_6B7B_4EA1(unit)
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根系觉醒"]
+    AddSpecialEffect(
+        cfg["腐败之源摧毁特效路径"],
+        GetUnitX(unit),
+        GetUnitY(unit)
+    )
+end
+function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1(unit)
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根系觉醒"]
+    AddSpecialEffect(
+        cfg["腐败之源摧毁特效路径"],
+        GetUnitX(unit),
+        GetUnitY(unit)
+    )
+end
 local jass = require("jass.common")
 local GetOwningPlayer = jass.GetOwningPlayer
-local GetUnitX = jass.GetUnitX
-local GetUnitY = jass.GetUnitY
+GetUnitX = jass.GetUnitX
+GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
-local AddSpecialEffect = jass.AddSpecialEffect
+AddSpecialEffect = jass.AddSpecialEffect
 local UnitDamageTarget = jass.UnitDamageTarget
 local GetRandomInt = jass.GetRandomInt
 local ShowUnit = jass.ShowUnit
@@ -122,20 +139,8 @@ local function _____521B_5EFA_8150_8D25_4E4B_6E90_76EE_6807_5217_8868(context)
                 Y = cell["中心Y"],
                 ["最大生命"] = cfg["腐败之源生命值"],
                 ["缩放"] = cfg["腐败之源缩放"],
-                ["on死亡"] = function(unit)
-                    AddSpecialEffect(
-                        cfg["腐败之源摧毁特效路径"],
-                        GetUnitX(unit),
-                        GetUnitY(unit)
-                    )
-                end,
-                ["on销毁"] = function(unit)
-                    AddSpecialEffect(
-                        cfg["腐败之源摧毁特效路径"],
-                        GetUnitX(unit),
-                        GetUnitY(unit)
-                    )
-                end
+                ["on死亡"] = _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_6B7B_4EA1,
+                ["on销毁"] = _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1
             }
             local circle = AddSpecialEffect(cfg["腐败之源脚下特效路径"], cell["中心X"], cell["中心Y"])
             local ____self_3 = context["清理"]
@@ -144,6 +149,16 @@ local function _____521B_5EFA_8150_8D25_4E4B_6E90_76EE_6807_5217_8868(context)
         end
     end
     return targets
+end
+local function _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_8D85_65F6(______5269_4F59_6570_91CF, context)
+    _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
+end
+local function _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_7ED3_675F(______662F_5426_6210_529F, ______5269_4F59_6570_91CF, context)
+    if _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        ShowUnit(context["Boss单位"], true)
+        PauseUnit(context["Boss单位"], false)
+    end
+    context["腐败之源组"] = nil
 end
 ____exports["尝试触发莫尔特斯根系觉醒"] = function(context)
     if context["根系觉醒已触发"] or context["阶段"] < 2 or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
@@ -159,16 +174,9 @@ ____exports["尝试触发莫尔特斯根系觉醒"] = function(context)
         ["名称"] = "莫尔特斯-根系觉醒",
         ["持续秒"] = cfg["限时秒"],
         ["目标列表"] = _____521B_5EFA_8150_8D25_4E4B_6E90_76EE_6807_5217_8868(context),
-        ["on超时"] = function()
-            _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
-        end,
-        ["on结束"] = function()
-            if _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                ShowUnit(context["Boss单位"], true)
-                PauseUnit(context["Boss单位"], false)
-            end
-            context["腐败之源组"] = nil
-        end
+        ["变量"] = context,
+        ["on超时"] = _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_8D85_65F6,
+        ["on结束"] = _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_7ED3_675F
     })
 end
 ____exports["注册莫尔特斯根系觉醒"] = function()

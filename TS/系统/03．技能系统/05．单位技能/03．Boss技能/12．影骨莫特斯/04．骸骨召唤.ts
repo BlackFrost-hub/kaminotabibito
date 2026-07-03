@@ -25,7 +25,7 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位") as {
   创建可攻击机制单位: (this: void, 参数: any) => any;
@@ -54,6 +54,26 @@ const 影骨单位类型ID = stringToFourCC(影骨莫特斯单位技能配置.�
 const 骸骨召唤技能ID = stringToFourCC(影骨莫特斯单位技能配置.技能壳.骸骨召唤);
 const 骷髅盗贼ID = stringToFourCC(影骨莫特斯数值与表现配置.骸骨召唤.骷髅盗贼单位类型);
 const 骸骨战士ID = stringToFourCC(影骨莫特斯数值与表现配置.骸骨召唤.骸骨战士单位类型);
+
+interface 影骨符咒变量 {
+  context: 影骨莫特斯运行时上下文;
+}
+
+interface 影骨召唤物变量 {
+  context: 影骨莫特斯运行时上下文;
+  group?: 影骨召唤组;
+  canReform: boolean;
+}
+
+interface 影骨骸骨重组变量 {
+  context: 影骨莫特斯运行时上下文;
+}
+
+interface 影骨骸骨召唤分段变量 {
+  context: 影骨莫特斯运行时上下文;
+  group: 影骨召唤组;
+  count: number;
+}
 
 let 已注册骸骨召唤 = false;
 let 已注册骷髅偷窃 = false;
@@ -92,6 +112,16 @@ function 确保骷髅偷窃修正(this: void): void {
   registerDamageModifier(on影骨骷髅偷窃修正, 50);
 }
 
+function 影骨符咒可拾取单位(this: void, variable: 影骨符咒变量): any[] {
+  if (variable == null || !单位有效(variable.context.Boss单位)) return [];
+  return 获取Boss技能敌对英雄列表(variable.context.Boss单位);
+}
+
+function 影骨符咒拾取(this: void, hero: any, _实例: any, _variable: 影骨符咒变量): void {
+  AddSpecialEffect(影骨莫特斯表现配置.骸骨符咒拾取, GetUnitX(hero), GetUnitY(hero));
+  registerManualBuff(hero, 影骨莫特斯BuffID.骸骨符咒, 12, 1, { sourceName: "影骨-骸骨符咒" });
+}
+
 function 创建骸骨符咒(this: void, context: 影骨莫特斯运行时上下文, x: number, y: number): void {
   创建战斗内拾取物({
     清理: context.清理,
@@ -101,28 +131,42 @@ function 创建骸骨符咒(this: void, context: 影骨莫特斯运行时上下�
     模型路径: 影骨莫特斯表现配置.骸骨符咒掉落,
     持续秒: 影骨莫特斯数值与表现配置.骸骨召唤.符咒持续秒,
     拾取半径: 影骨莫特斯数值与表现配置.骸骨召唤.符咒拾取半径,
-    可拾取单位列表: function 影骨符咒可拾取单位(this: void): any[] {
-      return 获取Boss技能敌对英雄列表(context.Boss单位);
-    },
-    on拾取: function 影骨符咒拾取(this: void, hero: any): void {
-      AddSpecialEffect(影骨莫特斯表现配置.骸骨符咒拾取, GetUnitX(hero), GetUnitY(hero));
-      registerManualBuff(hero, 影骨莫特斯BuffID.骸骨符咒, 12, 1, { sourceName: "影骨-骸骨符咒" });
-    },
+    变量: { context } as 影骨符咒变量,
+    可拾取单位列表: 影骨符咒可拾取单位,
+    on拾取: 影骨符咒拾取,
   });
+}
+
+function 影骨骸骨战士重组(this: void, variable: 影骨骸骨重组变量): void {
+  if (variable == null || !单位有效(variable.context.Boss单位)) return;
+  const context = variable.context;
+  const angle = GetRandomReal(0, 360);
+  const x = 极坐标X(GetUnitX(context.Boss单位), 影骨莫特斯数值与表现配置.骸骨召唤.召唤偏移半径, angle);
+  const y = 极坐标Y(GetUnitY(context.Boss单位), 影骨莫特斯数值与表现配置.骸骨召唤.召唤偏移半径, angle);
+  创建影骨召唤物(context, 骸骨战士ID, x, y, undefined, false);
+  AddSpecialEffect(影骨莫特斯表现配置.骸骨战士重组, x, y);
 }
 
 function 尝试重组骸骨战士(this: void, context: 影骨莫特斯运行时上下文, group: 影骨召唤组): void {
   if (group.已重组 || group.阶段 >= 3 || group.死亡数 < group.总数) return;
   group.已重组 = true;
-  const id = addDelayedCallback(影骨莫特斯数值与表现配置.骸骨召唤.重组延迟秒 * 1000, function 影骨骸骨战士重组(this: void): void {
-    if (!单位有效(context.Boss单位)) return;
-    const angle = GetRandomReal(0, 360);
-    const x = 极坐标X(GetUnitX(context.Boss单位), 影骨莫特斯数值与表现配置.骸骨召唤.召唤偏移半径, angle);
-    const y = 极坐标Y(GetUnitY(context.Boss单位), 影骨莫特斯数值与表现配置.骸骨召唤.召唤偏移半径, angle);
-    创建影骨召唤物(context, 骸骨战士ID, x, y, undefined, false);
-    AddSpecialEffect(影骨莫特斯表现配置.骸骨战士重组, x, y);
-  });
+  const id = addDelayedCallback(影骨莫特斯数值与表现配置.骸骨召唤.重组延迟秒 * 1000, 影骨骸骨战士重组, { context } as 影骨骸骨重组变量);
   context.清理.登记延迟回调("影骨-骸骨重组", id);
+}
+
+function 影骨召唤物死亡(this: void, unit: any, _killer: any, variable: 影骨召唤物变量): void {
+  清除影骨召唤物登记(unit);
+  if (variable == null) return;
+  const context = variable.context;
+  创建骸骨符咒(context, GetUnitX(unit), GetUnitY(unit));
+  if (variable.group != null && variable.canReform) {
+    variable.group.死亡数 += 1;
+    尝试重组骸骨战士(context, variable.group);
+  }
+}
+
+function 影骨召唤物销毁(this: void, unit: any, variable: 影骨召唤物变量): void {
+  清除影骨召唤物登记(unit);
 }
 
 export function 创建影骨召唤物(this: void, context: 影骨莫特斯运行时上下文, unitType: number, x: number, y: number, group?: 影骨召唤组, canReform: boolean = true): any {
@@ -138,17 +182,9 @@ export function 创建影骨召唤物(this: void, context: 影骨莫特斯运行
     朝向: GetRandomReal(0, 360),
     最大生命: unitType === 骸骨战士ID ? cfg.骸骨战士生命值 : cfg.骷髅生命值,
     持续时间: unitType === 骸骨战士ID ? cfg.骸骨战士持续秒 : cfg.骷髅持续秒,
-    on死亡: function 影骨召唤物死亡(this: void, unit: any): void {
-      清除影骨召唤物登记(unit);
-      创建骸骨符咒(context, GetUnitX(unit), GetUnitY(unit));
-      if (group != null && canReform) {
-        group.死亡数 += 1;
-        尝试重组骸骨战士(context, group);
-      }
-    },
-    on销毁: function 影骨召唤物销毁(this: void, unit: any): void {
-      清除影骨召唤物登记(unit);
-    },
+    变量: { context, group, canReform } as 影骨召唤物变量,
+    on死亡: 影骨召唤物死亡,
+    on销毁: 影骨召唤物销毁,
   });
   if (instance != null && instance.单位 != null) {
     登记影骨召唤物(instance.单位, context);
@@ -171,6 +207,11 @@ function 召唤影骨骷髅(this: void, context: 影骨莫特斯运行时上下�
   }
 }
 
+function 影骨骸骨召唤分段(this: void, variable: 影骨骸骨召唤分段变量): void {
+  if (variable == null) return;
+  召唤影骨骷髅(variable.context, variable.group, variable.count);
+}
+
 function 释放影骨骸骨召唤(this: void, context: 影骨莫特斯运行时上下文): void {
   播放影骨莫特斯台词(context.Boss单位, "骸骨召唤");
   const group: 影骨召唤组 = {
@@ -182,8 +223,8 @@ function 释放影骨骸骨召唤(this: void, context: 影骨莫特斯运行时�
   };
   context.当前召唤组 = group;
   召唤影骨骷髅(context, group, 2);
-  context.清理.登记延迟回调("影骨-骸骨召唤2", addDelayedCallback(1000, function 影骨骸骨召唤第二段(this: void): void { 召唤影骨骷髅(context, group, 1); }));
-  context.清理.登记延迟回调("影骨-骸骨召唤3", addDelayedCallback(2000, function 影骨骸骨召唤第三段(this: void): void { 召唤影骨骷髅(context, group, 1); }));
+  context.清理.登记延迟回调("影骨-骸骨召唤2", addDelayedCallback(1000, 影骨骸骨召唤分段, { context, group, count: 1 } as 影骨骸骨召唤分段变量));
+  context.清理.登记延迟回调("影骨-骸骨召唤3", addDelayedCallback(2000, 影骨骸骨召唤分段, { context, group, count: 1 } as 影骨骸骨召唤分段变量));
 }
 
 function on影骨骸骨召唤施法(this: void, castingUnit: any, spellAbilityId: number): void {

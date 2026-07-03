@@ -116,6 +116,13 @@ local function _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(context, cell)
     end
     DestroyGroup(group)
 end
+local function _____83AB_5C14_7279_65AF_6839_987B_7A7F_523A_5EF6_8FDF_7ED3_7B97(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(data.context, data.cell)
+end
 local function _____91CA_653E_83AB_5C14_7279_65AF_8150_673D_6839_987B_7A7F_523A(context)
     local boss = context["Boss单位"]
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]
@@ -137,12 +144,7 @@ local function _____91CA_653E_83AB_5C14_7279_65AF_8150_673D_6839_987B_7A7F_523A(
                 ["朝向"] = 0,
                 ["持续时间"] = cfg["预警秒"]
             })
-            local id = addDelayedCallback(
-                cfg["预警秒"] * 1000,
-                function()
-                    _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(context, cell)
-                end
-            )
+            local id = addDelayedCallback(cfg["预警秒"] * 1000, _____83AB_5C14_7279_65AF_6839_987B_7A7F_523A_5EF6_8FDF_7ED3_7B97, {context = context, cell = cell})
             local ____self_5 = context["清理"]
             ____self_5["登记延迟回调"](____self_5, "莫尔特斯-腐朽根须穿刺", id)
             i = i + 1

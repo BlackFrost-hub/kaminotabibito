@@ -15,9 +15,10 @@ export interface 限时摧毁目标组参数 {
   持续秒: number;
   目标列表: 可攻击机制单位参数[];
   Tick间隔毫秒?: number;
-  on全部摧毁?: (this: void) => void;
-  on超时?: (this: void, 剩余数量: number) => void;
-  on结束?: (this: void, 是否成功: boolean, 剩余数量: number) => void;
+  变量?: any;
+  on全部摧毁?: (this: void, 变量?: any) => void;
+  on超时?: (this: void, 剩余数量: number, 变量?: any) => void;
+  on结束?: (this: void, 是否成功: boolean, 剩余数量: number, 变量?: any) => void;
 }
 
 export interface 限时摧毁目标组实例 {
@@ -81,12 +82,12 @@ class 限时摧毁目标组实现 implements 限时摧毁目标组实例 {
     if (this.已结束) return;
     const 剩余数量 = this.取剩余数量();
     if (剩余数量 <= 0) {
-      if (this.参数.on全部摧毁 != null) this.参数.on全部摧毁();
+      if (this.参数.on全部摧毁 != null) this.参数.on全部摧毁(this.参数.变量);
       this.结束(true);
       return;
     }
     if (now >= this.到期Ms) {
-      if (this.参数.on超时 != null) this.参数.on超时(剩余数量);
+      if (this.参数.on超时 != null) this.参数.on超时(剩余数量, this.参数.变量);
       this.结束(false);
     }
   }
@@ -101,7 +102,7 @@ class 限时摧毁目标组实现 implements 限时摧毁目标组实例 {
         if (this.目标单位列表[i].是否存活()) this.目标单位列表[i].销毁();
       }
     }
-    if (this.参数.on结束 != null) this.参数.on结束(是否成功, 剩余数量);
+    if (this.参数.on结束 != null) this.参数.on结束(是否成功, 剩余数量, this.参数.变量);
     尝试停止限时摧毁目标组驱动();
   }
 

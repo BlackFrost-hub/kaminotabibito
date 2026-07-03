@@ -31,6 +31,12 @@ local function _____5F53_524D_751F_547D_767E_5206_6BD4_6863_4F4D(boss)
     end
     return percent
 end
+local function _____83AB_5C14_7279_65AF_8150_8D25_4F20_8F93_8FDE_7EBF_9500_6BC1(variable)
+    local lightning = variable
+    if lightning ~= nil and lightning ~= 0 then
+        DestroyLightning(lightning)
+    end
+end
 local function _____521B_5EFA_8150_8D25_4F20_8F93_8FDE_7EBF(context, target)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败传输"]
     local lightning = AddLightning(
@@ -41,14 +47,7 @@ local function _____521B_5EFA_8150_8D25_4F20_8F93_8FDE_7EBF(context, target)
         GetUnitX(target),
         GetUnitY(target)
     )
-    local id = addDelayedCallback(
-        700,
-        function()
-            if lightning ~= nil and lightning ~= 0 then
-                DestroyLightning(lightning)
-            end
-        end
-    )
+    local id = addDelayedCallback(700, _____83AB_5C14_7279_65AF_8150_8D25_4F20_8F93_8FDE_7EBF_9500_6BC1, lightning)
     local ____self_2 = context["清理"]
     ____self_2["登记延迟回调"](____self_2, "莫尔特斯-腐败传输连线", id)
 end

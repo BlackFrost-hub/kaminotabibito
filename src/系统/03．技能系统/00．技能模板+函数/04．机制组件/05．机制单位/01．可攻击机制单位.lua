@@ -64,7 +64,7 @@ _____53EF_653B_51FB_673A_5236_5355_4F4D_5B9E_73B0.prototype["处理死亡"] = fu
     self["已经死亡"] = true
     __TS__Delete(_____673A_5236_5355_4F4D_8868, self.ID)
     if self["参数"]["on死亡"] ~= nil then
-        self["参数"]["on死亡"](self["单位"], _____51FB_6740_8005)
+        self["参数"]["on死亡"](self["单位"], _____51FB_6740_8005, self["参数"]["变量"])
     end
     _____5C1D_8BD5_53D6_6D88_673A_5236_5355_4F4D_6B7B_4EA1_76D1_542C()
 end
@@ -75,7 +75,7 @@ _____53EF_653B_51FB_673A_5236_5355_4F4D_5B9E_73B0.prototype["销毁"] = function
     self["已经销毁"] = true
     __TS__Delete(_____673A_5236_5355_4F4D_8868, self.ID)
     if self["参数"]["on销毁"] ~= nil then
-        self["参数"]["on销毁"](self["单位"])
+        self["参数"]["on销毁"](self["单位"], self["参数"]["变量"])
     end
     if self["单位"] ~= nil and self["单位"] ~= 0 then
         RemoveUnit(self["单位"])
