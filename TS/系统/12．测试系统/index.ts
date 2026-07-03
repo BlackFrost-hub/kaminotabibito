@@ -15,6 +15,7 @@ const ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST = true;
 const ENABLE_BALZAROTH_BOSS_SKILL_TEST = true;
 const ENABLE_PHOENIXEL_BOSS_SKILL_TEST = true;
 const ENABLE_MIA_BOSS_SKILL_TEST = true;
+const ENABLE_TREE_LORD_BOSS_SKILL_TEST = true;
 
 function loadTests(): void {
   if (ENABLE_STES_EVENT_TEST) {
@@ -59,6 +60,10 @@ function loadTests(): void {
 
   if (ENABLE_MIA_BOSS_SKILL_TEST) {
     require("系统.12．测试系统.10．米亚Boss技能测试");
+  }
+
+  if (ENABLE_TREE_LORD_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.11．树魔首领Boss技能测试");
   }
 
 }

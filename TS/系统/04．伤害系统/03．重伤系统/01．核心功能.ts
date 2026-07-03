@@ -56,7 +56,7 @@ const {
 
 const GetPlayerId = jass.GetPlayerId as (whichPlayer: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
-const 重伤特效挂点 = "overhead";
+const 重伤特效挂点 = "origin";
 const 重伤特效Key = "buff_wound_c021";
 const 重伤特效模型 = buffs[重伤BuffID]?.effect ?? "";
 

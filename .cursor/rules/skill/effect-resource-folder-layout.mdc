@@ -1,0 +1,43 @@
+---
+description: Warcraft 3 特效模型资源目录布局规则：分类目录直接放模型，共用 Texture 贴图目录
+globs: imports/Common/Effect/**/*.mdx, imports/Common/Effect/**/*.mdl, imports/Common/Effect/**/*.blp, TS/系统/03．技能系统/**/*.ts, TS/系统/03．技能系统/**/*.md
+alwaysApply: false
+---
+
+# 特效资源目录布局规则
+
+## 基本结构
+
+- 不要为每个特效模型单独创建一个同名子文件夹。
+- 同一个分类目录下，所有 `.mdx` / `.mdl` 模型直接放在分类目录中。
+- 同一个分类目录只保留一个共享 `Texture` 文件夹，用来放该分类下所有模型贴图。
+
+正确示例：
+
+```text
+imports\Common\Effect\Form\Aura\HolyAura.mdx
+imports\Common\Effect\Form\Aura\BloodAura.mdx
+imports\Common\Effect\Form\Aura\Texture\Shockwave10.blp
+```
+
+错误示例：
+
+```text
+imports\Common\Effect\Form\Aura\HolyAura\HolyAura.mdx
+imports\Common\Effect\Form\Aura\BloodAura\BloodAura.mdx
+```
+
+## 路径规则
+
+- 游戏内模型路径必须去掉 `imports\` 前缀，例如 `Common\Effect\Form\Aura\HolyAura.mdx`。
+- MDX / MDL 内部贴图路径也必须去掉 `imports\` 前缀。
+- 内部贴图路径应指向分类目录共享 `Texture`，例如 `Common\Effect\Form\Aura\Texture\Shockwave10.blp`。
+- 只有模型名是 `file_000123`、`unnamed`、纯数字等无语义名字时，才按用途改成语义化名字；原本有明确语义的模型名不要无脑改名。
+
+## 整理已有资源时
+
+1. 先把旧子目录里的贴图复制到父分类目录的共享 `Texture`。
+2. 把模型移动到父分类目录。
+3. 修改模型内部贴图路径，从 `...\模型子目录\Texture\...` 改为 `...\Texture\...`。
+4. 修改 TS / 文档里的模型引用路径。
+5. 确认旧子目录没有唯一资源后再删除。

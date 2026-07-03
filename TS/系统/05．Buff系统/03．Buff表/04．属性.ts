@@ -8,7 +8,7 @@ export const 属性Buff表: Record<string, BuffData> = {
       buffID: "C021",
       buffName: "重伤",
       icon: "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp",
-      effect: "Abilities\\Spells\\Other\\Doom\\DoomTarget.mdl",
+      effect: "Common\\Effect\\Form\\Debuff\\BloodBanish.mdx",
       type: "Debuff:wound:strong",
       interval: 0,
       maxStack: 1,

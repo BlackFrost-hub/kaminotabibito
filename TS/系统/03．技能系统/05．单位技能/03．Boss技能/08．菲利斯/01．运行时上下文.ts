@@ -1,0 +1,119 @@
+/** @noSelfInFile */
+
+import { 创建机制清理篮子, 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理";
+import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
+import { 菲利斯单位技能配置 } from "./00．配置";
+
+const jass = require("jass.common") as any;
+
+const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
+
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  getServerTime: (this: void) => number;
+};
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
+  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
+};
+
+export type 菲利斯阶段 = 1 | 2;
+
+export interface 菲利斯剑魂狼记录 {
+  Boss单位: any;
+  大狼: boolean;
+  伤害比例: number;
+}
+
+export interface 菲利斯运行时上下文 {
+  Boss单位: any;
+  阶段: 菲利斯阶段;
+  开战时间Ms: number;
+  清理: 机制清理篮子;
+  当前魔法充能: number;
+  当前领袖光环低血: boolean;
+  异形化中: boolean;
+  异形化结束Ms: number;
+  已初始化: boolean;
+}
+
+const 菲利斯上下文表: Record<number, 菲利斯运行时上下文 | undefined> = {};
+const 菲利斯剑魂狼表: Record<number, 菲利斯剑魂狼记录 | undefined> = {};
+let 菲利斯死亡清理已注册 = false;
+
+function 取单位ID(this: void, unit: any): number {
+  if (unit == null || unit === 0) return 0;
+  return GetHandleId(unit) || 0;
+}
+
+export function 获取菲利斯上下文(this: void, boss: any): 菲利斯运行时上下文 | undefined {
+  const id = 取单位ID(boss);
+  return id === 0 ? undefined : 菲利斯上下文表[id];
+}
+
+export function 获取或创建菲利斯上下文(this: void, boss: any): 菲利斯运行时上下文 | undefined {
+  const id = 取单位ID(boss);
+  if (id === 0) return undefined;
+  let context = 菲利斯上下文表[id];
+  if (context != null) return context;
+  context = {
+    Boss单位: boss,
+    阶段: 1,
+    开战时间Ms: getServerTime(),
+    清理: 创建机制清理篮子("菲利斯"),
+    当前魔法充能: 0,
+    当前领袖光环低血: false,
+    异形化中: false,
+    异形化结束Ms: 0,
+    已初始化: false,
+  };
+  设置单位技能壳普通提示(boss, 菲利斯单位技能配置.主动技能提示);
+  菲利斯上下文表[id] = context;
+  return context;
+}
+
+export function 清理菲利斯上下文(this: void, boss: any): void {
+  const id = 取单位ID(boss);
+  if (id === 0) return;
+  const context = 菲利斯上下文表[id];
+  if (context == null) return;
+  context.清理.清理全部();
+  delete 菲利斯上下文表[id];
+}
+
+export function 获取全部菲利斯上下文(this: void): 菲利斯运行时上下文[] {
+  const list: 菲利斯运行时上下文[] = [];
+  for (const key in 菲利斯上下文表) {
+    const context = 菲利斯上下文表[key];
+    if (context != null) list.push(context);
+  }
+  return list;
+}
+
+export function 登记菲利斯剑魂狼(this: void, wolf: any, record: 菲利斯剑魂狼记录): void {
+  const id = 取单位ID(wolf);
+  if (id === 0) return;
+  菲利斯剑魂狼表[id] = record;
+}
+
+export function 注销菲利斯剑魂狼(this: void, wolf: any): void {
+  const id = 取单位ID(wolf);
+  if (id !== 0) delete 菲利斯剑魂狼表[id];
+}
+
+export function 获取菲利斯剑魂狼记录(this: void, wolf: any): 菲利斯剑魂狼记录 | undefined {
+  const id = 取单位ID(wolf);
+  return id === 0 ? undefined : 菲利斯剑魂狼表[id];
+}
+
+function on菲利斯单位死亡(this: void, dyingUnit: any): void {
+  const id = 取单位ID(dyingUnit);
+  if (id === 0) return;
+  if (菲利斯上下文表[id] != null) 清理菲利斯上下文(dyingUnit);
+  if (菲利斯剑魂狼表[id] != null) delete 菲利斯剑魂狼表[id];
+}
+
+export function 注册菲利斯运行时(this: void): void {
+  if (菲利斯死亡清理已注册) return;
+  菲利斯死亡清理已注册 = true;
+  registerDeathListener(on菲利斯单位死亡);
+}
+

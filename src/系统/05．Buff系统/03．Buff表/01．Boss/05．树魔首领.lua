@@ -1,0 +1,112 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+____exports["树魔首领BuffID"] = {
+    ["兽群号令"] = "BTL1",
+    ["无从暴怒"] = "BTL2",
+    ["古树衰弱"] = "BTL3",
+    ["远古诅咒"] = "BTL4",
+    ["治疗枯竭"] = "BTL5",
+    ["静止陷阱眩晕"] = "BTL6"
+}
+____exports["树魔首领Buff表"] = {
+    [____exports["树魔首领BuffID"]["兽群号令"]] = {
+        buffID = ____exports["树魔首领BuffID"]["兽群号令"],
+        buffName = "兽群号令",
+        icon = "BuffIcon\\Boss\\TreeLord\\pack_command.blp",
+        effect = "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl",
+        effectMode = "attach",
+        effectAttachPoint = "origin",
+        type = "Buff:boss:stack",
+        interval = 0,
+        maxStack = 4,
+        stackRule = "stack",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 84,
+        canPurge = false,
+        tooltip = "场上每存在1个树魔首领随从，Boss攻击力提高20%，最多叠加4层；随从死亡后动态扣层。"
+    },
+    [____exports["树魔首领BuffID"]["无从暴怒"]] = {
+        buffID = ____exports["树魔首领BuffID"]["无从暴怒"],
+        buffName = "无从暴怒",
+        icon = "BuffIcon\\Boss\\TreeLord\\minionless_rage.blp",
+        effect = "Common\\Effect\\Element\\Fire\\fireaura.mdx",
+        effectMode = "attach",
+        effectAttachPoint = "origin",
+        type = "Buff:boss:rage",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 88,
+        canPurge = false,
+        tooltip = "场上没有任何自身随从时，树魔首领进入暴怒：攻击速度提高100%，移动速度提高50%，直到新随从入场后移除。"
+    },
+    [____exports["树魔首领BuffID"]["古树衰弱"]] = {
+        buffID = ____exports["树魔首领BuffID"]["古树衰弱"],
+        buffName = "古树衰弱",
+        icon = "BuffIcon\\Boss\\TreeLord\\ancient_weakness.blp",
+        effect = "",
+        type = "Debuff:attack",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 2,
+        priority = 62,
+        canPurge = true,
+        tooltip = "被扩散冲击波削弱，攻击力降低40%，持续7秒。"
+    },
+    [____exports["树魔首领BuffID"]["远古诅咒"]] = {
+        buffID = ____exports["树魔首领BuffID"]["远古诅咒"],
+        buffName = "远古诅咒",
+        icon = "BuffIcon\\Boss\\TreeLord\\ancient_curse.blp",
+        effect = "Common\\Effect\\Form\\Aura\\LightningAura.mdx",
+        effectMode = "attach",
+        effectAttachPoint = "origin",
+        type = "Debuff:magic",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 2,
+        priority = 78,
+        canPurge = true,
+        tooltip = "被远古诅咒点名。3秒后承受当前生命百分比精神伤害，400范围内其他玩家可分摊。"
+    },
+    [____exports["树魔首领BuffID"]["治疗枯竭"]] = {
+        buffID = ____exports["树魔首领BuffID"]["治疗枯竭"],
+        buffName = "治疗枯竭",
+        icon = "BuffIcon\\Boss\\TreeLord\\healing_exhaustion.blp",
+        effect = "",
+        type = "Debuff:magic:heal",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 2,
+        priority = 66,
+        canPurge = true,
+        tooltip = "受到生命陷阱影响，受到的治疗效果降低，难度越高降低幅度越高。"
+    },
+    [____exports["树魔首领BuffID"]["静止陷阱眩晕"]] = {
+        buffID = ____exports["树魔首领BuffID"]["静止陷阱眩晕"],
+        buffName = "静止陷阱眩晕",
+        icon = "BuffIcon\\Boss\\TreeLord\\stasis_stun.blp",
+        effect = "Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdl",
+        effectMode = "attach",
+        effectAttachPoint = "overhead",
+        type = "Debuff:control",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 82,
+        canPurge = false,
+        tooltip = "触发静止陷阱后被无视韧性眩晕8秒。"
+    }
+}
+____exports.default = ____exports["树魔首领Buff表"]
+return ____exports

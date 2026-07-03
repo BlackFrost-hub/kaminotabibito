@@ -14,6 +14,7 @@ local ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST = true
 local ENABLE_BALZAROTH_BOSS_SKILL_TEST = true
 local ENABLE_PHOENIXEL_BOSS_SKILL_TEST = true
 local ENABLE_MIA_BOSS_SKILL_TEST = true
+local ENABLE_TREE_LORD_BOSS_SKILL_TEST = true
 local function loadTests(self)
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")
@@ -47,6 +48,9 @@ local function loadTests(self)
     end
     if ENABLE_MIA_BOSS_SKILL_TEST then
         require("系统.12．测试系统.10．米亚Boss技能测试")
+    end
+    if ENABLE_TREE_LORD_BOSS_SKILL_TEST then
+        require("系统.12．测试系统.11．树魔首领Boss技能测试")
     end
 end
 loadTests(nil)

@@ -1,0 +1,148 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+---
+-- @noSelfInFile
+____exports["莫尔特斯数值与表现配置"] = {
+    ["腐败值"] = {
+        ["上限"] = 100,
+        ["缠绕阈值"] = 100,
+        ["Buff显示秒"] = 120,
+        ["满层缠绕秒"] = 4,
+        ["满层缠绕每秒伤害"] = 120,
+        ["净化光斑每秒清除"] = 10,
+        ["虫尸清除值"] = 30
+    },
+    ["根须领域"] = {
+        ["行数"] = 3,
+        ["列数"] = 3,
+        ["中心X"] = 5392,
+        ["中心Y"] = -12976,
+        ["单格边长"] = 512,
+        ["闪电效果"] = "DRAB",
+        ["闪电高度"] = 80
+    },
+    ["腐朽根须穿刺"] = {
+        ["技能槽位"] = "AN00",
+        ["预警秒"] = 1.5,
+        ["区域数量"] = 3,
+        ["腐败值"] = 15,
+        ["根须停留秒"] = 5,
+        ["Boss攻击力比例"] = 1.2,
+        ["根须模型路径"] = "war3mapImported\\2144.mdx",
+        ["穿刺特效路径"] = "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdl",
+        ["障碍单位类型"] = "hfoo",
+        ["障碍生命值"] = 800,
+        ["障碍缩放"] = 1.1
+    },
+    ["腐败孢子云"] = {
+        ["技能槽位"] = "AN01",
+        ["数量"] = 3,
+        ["驱散所需伤害"] = 500,
+        ["每秒腐败值"] = 10,
+        ["持续秒"] = 10,
+        ["半径"] = 200,
+        ["移动距离"] = 200,
+        ["每秒目标最大生命比例"] = 0.04,
+        ["单位类型"] = "hfoo",
+        ["模型路径"] = "units\\undead\\PlagueCloud\\PlagueCloud.mdl",
+        ["受小怪倍率生命"] = false,
+        ["缩放"] = 1,
+        ["命中特效路径"] = "war3mapImported\\AncientsWrath.mdl"
+    },
+    ["扭曲荆棘鞭笞"] = {
+        ["技能槽位"] = "AT12",
+        ["藤蔓数量"] = 3,
+        ["扫击次数"] = 3,
+        ["开始延迟秒"] = 1.5,
+        ["波次间隔秒"] = 1.5,
+        ["预警秒"] = 1,
+        ["矩形宽度"] = 512,
+        ["矩形长度"] = 1536,
+        ["Boss攻击力比例"] = 1,
+        ["重复命中增伤比例"] = 0.3,
+        ["寄生持续秒"] = 12,
+        ["寄生每跳伤害"] = 90,
+        ["寄生伤害间隔秒"] = 3,
+        ["藤蔓模型路径"] = "Units\\Creeps\\ForgottenOne\\ForgottenOneTent.mdl",
+        ["藤蔓缩放"] = 2,
+        ["路径爆点特效路径"] = "war3mapImported\\explosion.mdl"
+    },
+    ["腐败之种"] = {
+        ["技能槽位"] = "BT08",
+        ["飞行秒"] = 1.2,
+        ["弧线高度"] = 260,
+        ["中点偏移比例"] = 0.25,
+        ["生长延迟秒"] = 3,
+        ["波动半径"] = 360,
+        ["波动间隔秒"] = 1,
+        ["持续秒"] = 18,
+        ["每跳腐败值"] = 8,
+        ["每跳Boss攻击力比例"] = 0.35,
+        ["种子单位类型"] = "hfoo",
+        ["幼树单位类型"] = "hfoo",
+        ["种子生命值"] = 350,
+        ["幼树生命值"] = 1400,
+        ["投射物模型路径"] = "war3mapImported\\StrangeSeeds.mdl",
+        ["幼树模型路径"] = "war3mapImported\\g1 (4).mdl",
+        ["幼树缩放"] = 1.25
+    },
+    ["根系觉醒"] = {
+        ["腐败之源数量"] = 3,
+        ["限时秒"] = 30,
+        ["失败回血比例"] = 0.15,
+        ["腐败之源单位类型"] = "hfoo",
+        ["腐败之源生命值"] = 2600,
+        ["腐败之源模型路径"] = "Common\\Model\\Monster\\Mortus\\CorruptionSource\\CorruptionSource.mdx",
+        ["腐败之源缩放"] = 1.45,
+        ["腐败之源脚下特效路径"] = "Common\\Effect\\Form\\MagicCircle\\CorruptionSourceCircle.mdx",
+        ["腐败之源摧毁特效路径"] = "Common\\Effect\\Form\\Explosion\\CorruptionSourceBurst.mdx",
+        ["全屏爆发特效路径"] = "Common\\Effect\\Element\\Nature\\EarthNova.mdx",
+        ["全屏爆发伤害Boss攻击力比例"] = 2.2,
+        ["全屏爆发腐败值"] = 25
+    },
+    ["腐朽领域"] = {
+        ["减速比例"] = 0.3,
+        ["根须触发间隔秒"] = 5,
+        ["沼泽腐败间隔秒"] = 1,
+        ["沼泽每跳腐败值"] = 5,
+        ["净化符文数量"] = 4,
+        ["净化符文半径"] = 260,
+        ["净化持续秒"] = 8,
+        ["净化符文模型路径"] = "Common\\Effect\\Form\\MagicCircle\\GaiaShield.mdx"
+    },
+    ["共生腐朽虫群"] = {
+        ["触发间隔秒"] = 18,
+        ["甲虫数量"] = 4,
+        ["甲虫单位类型"] = "hfoo",
+        ["甲虫模型路径"] = "units\\undead\\scarab\\scarab.mdl",
+        ["甲虫生命值"] = 650,
+        ["甲虫攻击力"] = 85,
+        ["甲虫缩放"] = 0.9,
+        ["接触半径"] = 150,
+        ["接触爆炸秒"] = 2,
+        ["爆炸腐败值"] = 20,
+        ["爆炸伤害Boss攻击力比例"] = 0.8,
+        ["虫尸模型路径"] = "units\\undead\\scarab\\scarab.mdl",
+        ["虫尸持续秒"] = 18,
+        ["虫尸拾取半径"] = 160
+    },
+    ["古木悲鸣"] = {
+        ["技能槽位"] = "AN02",
+        ["腐败值"] = 25,
+        ["恐惧阈值"] = 60,
+        ["恐惧秒"] = 2,
+        ["悲鸣特效路径"] = "Common\\Effect\\Element\\Nature\\gaiawave.mdx",
+        ["巨型蘑菇模型列表"] = {"Doodads\\Ashenvale\\Plants\\AshenShrooms\\AshenShrooms0.mdl", "Doodads\\Ashenvale\\Plants\\AshenShrooms\\AshenShrooms1.mdl", "Doodads\\Ashenvale\\Plants\\AshenShrooms\\AshenShrooms2.mdl", "Doodads\\Ashenvale\\Plants\\AshenShrooms\\AshenShrooms3.mdl"},
+        ["蘑菇遮挡半径"] = 180,
+        ["蘑菇遮挡角度"] = 24
+    },
+    ["腐败传输"] = {
+        ["每档生命比例"] = 0.05,
+        ["转移腐败值"] = 10,
+        ["护盾持续秒"] = 10,
+        ["护盾每点腐败值"] = 80,
+        ["连线效果"] = "DRAB",
+        ["护盾破裂特效路径"] = "Common\\Effect\\Form\\Explosion\\CorruptionShieldBreak.mdx"
+    }
+}
+return ____exports
