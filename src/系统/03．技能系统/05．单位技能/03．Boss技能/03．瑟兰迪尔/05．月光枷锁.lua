@@ -1,16 +1,19 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWETimerDestroyEffectSafe, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffectTarget, UnitRemoveAbility, GetUnitState, UnitDamageTarget, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, UNIT_STATE_MAX_LIFE, _____6708_5149_67B7_9501_7ED1_5B9A_8868
+local _____5355_4F4D_6709_6548, _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWETimerDestroyEffectSafe, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffectTarget, UnitRemoveAbility, GetUnitState, UnitDamageTarget, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, UNIT_STATE_MAX_LIFE, _____6708_5149_67B7_9501_7ED1_5B9A_8868
+local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.03．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
 local _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["瑟兰迪尔数值与表现配置"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.00．配置")
 local _____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["瑟兰迪尔单位技能配置"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.15．台词播放")
 local _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放瑟兰迪尔台词"]
-function stringToFourCC(s)
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____19_FF0EBoss_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．Boss公共工具")
+local stringToFourCC = ____19_FF0EBoss_516C_5171_5DE5_5177.stringToFourCC
 function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0
 end
@@ -184,32 +187,30 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster
     end
 end
 jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____5F00_59CB_786C_76F4 = ____require_result_2["开始硬直"]
-local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-_____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_3["显示常规技能吟唱条"]
-_____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
-_____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．轨迹.index")
-_____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9 = ____require_result_5["创建追踪插值轨迹"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
-_____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_6["施加扩展控制"]
-local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_7.registerManualBuff
-_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_7["移除单位指定Buff"]
-local ____require_result_8 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_8.registerAppliedFinalDamageListener
-local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.14．月光碎片")
-local _____521B_5EFA_745F_5170_8FEA_5C14_6708_5149_788E_7247 = ____require_result_9["创建瑟兰迪尔月光碎片"]
-local ____require_result_10 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDWETimerDestroyEffectSafe = ____require_result_10.YDWETimerDestroyEffectSafe
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_11["读取单位攻击力"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____5F00_59CB_786C_76F4 = ____require_result_1["开始硬直"]
+local ____require_result_2 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+_____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_2["显示常规技能吟唱条"]
+_____5173_95ED_541F_5531_6761 = ____require_result_2["关闭吟唱条"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+_____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_3["创建原生弹幕"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．轨迹.index")
+_____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9 = ____require_result_4["创建追踪插值轨迹"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
+_____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_5["施加扩展控制"]
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_6.registerManualBuff
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
+local ____require_result_7 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_7.registerAppliedFinalDamageListener
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.14．月光碎片")
+local _____521B_5EFA_745F_5170_8FEA_5C14_6708_5149_788E_7247 = ____require_result_8["创建瑟兰迪尔月光碎片"]
+local ____require_result_9 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDWETimerDestroyEffectSafe = ____require_result_9.YDWETimerDestroyEffectSafe
+local ____require_result_10 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_10["读取单位攻击力"]
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitName = jass.GetUnitName
@@ -309,7 +310,15 @@ ____exports["注册瑟兰迪尔月光枷锁"] = function()
         return
     end
     _____6708_5149_67B7_9501_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_745F_5170_8FEA_5C14_6708_5149_67B7_9501_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "瑟兰迪尔月光枷锁",
+        ["Boss单位类型ID"] = _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____6708_5149_67B7_9501_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_745F_5170_8FEA_5C14_6708_5149_67B7_9501_751F_6548(boss, _____6708_5149_67B7_9501_6280_80FDID)
+        end
+    })
     registerAppliedFinalDamageListener(____on_6708_5149_67B7_9501_627F_53D7_4F24_5BB3)
 end
 return ____exports

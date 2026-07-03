@@ -1,12 +1,11 @@
 /** @noSelfInFile */
 
-import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
-import { 创建机制清理篮子, type 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import { 创建Boss运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．Boss运行时上下文工厂";
 import { 里科特单位技能配置 } from "./00．配置";
 import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 
 const jass = require("jass.common") as any;
-const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -24,53 +23,43 @@ export interface 里科特运行时上下文 {
   破魔反击中: boolean;
 }
 
-const 里科特上下文表: Record<number, 里科特运行时上下文 | undefined> = {};
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
-export function 获取里科特上下文(this: void, boss: any): 里科特运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  return id === 0 ? undefined : 里科特上下文表[id];
-}
-
-export function 获取或创建里科特上下文(this: void, boss: any): 里科特运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  let context = 里科特上下文表[id];
-  if (context != null) return context;
-  context = {
+function 创建里科特上下文(this: void, boss: any, 清理: 机制清理篮子): 里科特运行时上下文 {
+  return {
     Boss单位: boss,
     阶段: 取里科特当前阶段(boss),
     已初始化: false,
-    清理: 创建机制清理篮子("里科特"),
+    清理,
     神风护体层数: 0,
     神风印记表: {},
     神风印记单位表: {},
     破魔反击中: false,
   };
-  设置单位技能壳普通提示(boss, 里科特单位技能配置.主动技能提示);
-  里科特上下文表[id] = context;
-  return context;
+}
+
+const 里科特上下文工厂 = 创建Boss运行时上下文工厂<里科特运行时上下文>({
+  名称: "里科特",
+  主动技能提示: 里科特单位技能配置.主动技能提示,
+  创建上下文: 创建里科特上下文,
+});
+
+function 取单位ID(this: void, unit: any): number {
+  return 里科特上下文工厂.取单位ID(unit);
+}
+
+export function 获取里科特上下文(this: void, boss: any): 里科特运行时上下文 | undefined {
+  return 里科特上下文工厂.获取(boss);
+}
+
+export function 获取或创建里科特上下文(this: void, boss: any): 里科特运行时上下文 | undefined {
+  return 里科特上下文工厂.获取或创建(boss);
 }
 
 export function 获取全部里科特上下文(this: void): 里科特运行时上下文[] {
-  const result: 里科特运行时上下文[] = [];
-  for (const key in 里科特上下文表) {
-    const context = 里科特上下文表[key];
-    if (context != null) result.push(context);
-  }
-  return result;
+  return 里科特上下文工厂.获取全部();
 }
 
 export function 清理里科特上下文(this: void, boss: any): void {
-  const id = 取单位ID(boss);
-  if (id === 0) return;
-  const context = 里科特上下文表[id];
-  if (context != null) context.清理.清理全部();
-  delete 里科特上下文表[id];
+  里科特上下文工厂.清理上下文(boss);
 }
 
 export function 取里科特当前阶段(this: void, boss: any): 里科特阶段 {

@@ -7,6 +7,8 @@ import { 巴尔扎罗斯技能数值配置 } from "./02．数值与表现配置"
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 施加巴尔扎罗斯灼热 } from "./16．灼热层数工具";
 import { 开始原地击飞 } from "../../../00．技能模板+函数/01．技能函数/03．跳跃·击飞/index";
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
 
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -22,9 +24,6 @@ const { 创建持续危险区域 } = require("系统.03．技能系统.00．技�
 };
 const { 获取Boss技能随机敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
-};
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -60,10 +59,6 @@ let 熔岩喷发已注册 = false;
 interface 熔岩喷发落点 {
   X: number;
   Y: number;
-}
-
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
 }
 
 function 单位有效(this: void, unit: any): boolean {
@@ -209,7 +204,15 @@ export function 释放巴尔扎罗斯熔岩喷发(this: void, context: 巴尔扎
 export function 注册巴尔扎罗斯熔岩喷发(this: void): void {
   if (熔岩喷发已注册) return;
   熔岩喷发已注册 = true;
-  registerSpellEffectListener(on巴尔扎罗斯熔岩喷发生效);
+  注册Boss技能壳监听({
+    名称: "巴尔扎罗斯熔岩喷发",
+    Boss单位类型ID: 巴尔扎罗斯单位类型ID,
+    技能ID: 熔岩喷发技能ID,
+    获取或创建上下文: 获取或创建巴尔扎罗斯上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 巴尔扎罗斯运行时上下文, boss: any): void {
+      on巴尔扎罗斯熔岩喷发生效(boss, 熔岩喷发技能ID);
+    },
+  });
 }
 
 function on巴尔扎罗斯熔岩喷发生效(this: void, castingUnit: any, spellAbilityId: number): void {

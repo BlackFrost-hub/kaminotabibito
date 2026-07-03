@@ -29,8 +29,8 @@ local _____6DFB_52A0_5143_7D20_5C42_6570 = ____19_FF0E_516C_5171_5DE5_5177["添�
 local _____65BD_52A0_51CF_901F = ____19_FF0E_516C_5171_5DE5_5177["施加减速"]
 local _____53D6_5355_4F4DX = ____19_FF0E_516C_5171_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____19_FF0E_516C_5171_5DE5_5177["取单位Y"]
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetHandleId = jass.GetHandleId
@@ -102,8 +102,8 @@ ____exports["释放菲尼克斯尔熔岩吐息"] = function(context, target)
                     end
                 end
             )
-            local ____self_1 = context["清理"]
-            ____self_1["登记周期回调"](____self_1, "菲尼克斯尔熔岩吐息Tick", tick)
+            local ____self_0 = context["清理"]
+            ____self_0["登记周期回调"](____self_0, "菲尼克斯尔熔岩吐息Tick", tick)
         end
     )
 end
@@ -124,6 +124,14 @@ ____exports["注册菲尼克斯尔熔岩吐息"] = function()
         return
     end
     _____7194_5CA9_5410_606F_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_83F2_5C3C_514B_65AF_5C14_7194_5CA9_5410_606F_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "菲尼克斯尔熔岩吐息",
+        ["Boss单位类型ID"] = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____7194_5CA9_5410_606F_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83F2_5C3C_514B_65AF_5C14_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_83F2_5C3C_514B_65AF_5C14_7194_5CA9_5410_606F_751F_6548(boss, _____7194_5CA9_5410_606F_6280_80FDID)
+        end
+    })
 end
 return ____exports

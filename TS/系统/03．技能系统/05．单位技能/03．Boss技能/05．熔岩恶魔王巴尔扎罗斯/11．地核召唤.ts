@@ -4,6 +4,7 @@ import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下�
 import { 巴尔扎罗斯技能数值配置 } from "./02．数值与表现配置";
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 施加巴尔扎罗斯灼热 } from "./16．灼热层数工具";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -52,11 +53,6 @@ interface 地核状态 {
   coreUnit: any;
   tickId: number;
   stopped: boolean;
-}
-
-function stringToFourCC(this: void, s: string): number {
-  if (s == null || s.length < 4) return 0;
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
 }
 
 function 单位有效(this: void, unit: any): boolean {

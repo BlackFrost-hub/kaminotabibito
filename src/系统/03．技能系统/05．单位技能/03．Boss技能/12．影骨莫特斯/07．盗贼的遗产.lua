@@ -14,20 +14,20 @@ local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local AddSpecialEffect = jass.AddSpecialEffect
 local IssueTargetOrder = jass.IssueTargetOrder
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.12．交互宝箱桥接")
-local _____521B_5EFA_4EA4_4E92_5B9D_7BB1 = ____require_result_2["创建交互宝箱"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具")
-local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_3["临时调整攻击"]
-local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.12．交互宝箱桥接")
+local _____521B_5EFA_4EA4_4E92_5B9D_7BB1 = ____require_result_1["创建交互宝箱"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具")
+local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_2["临时调整攻击"]
+local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____76D7_8D3C_9057_4EA7_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["盗贼的遗产"])
 local _____5DF2_6CE8_518C_76D7_8D3C_9057_4EA7 = false
@@ -127,8 +127,8 @@ local function _____6CE8_518C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(
     end
     _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_4E0A_4E0B_6587_8868[index] = {context = context, index = index}
     local id = addDelayedCallback(index * 500, callback)
-    local ____self_5 = context["清理"]
-    ____self_5["登记延迟回调"](____self_5, "影骨-盗贼遗产宝箱", id)
+    local ____self_4 = context["清理"]
+    ____self_4["登记延迟回调"](____self_4, "影骨-盗贼遗产宝箱", id)
 end
 local function _____91CA_653E_5F71_9AA8_76D7_8D3C_9057_4EA7(context)
     if context["遗产宝箱已生成"] then
@@ -162,6 +162,14 @@ ____exports["注册影骨莫特斯盗贼的遗产"] = function()
         return
     end
     _____5DF2_6CE8_518C_76D7_8D3C_9057_4EA7 = true
-    registerSpellEffectListener(____on_5F71_9AA8_76D7_8D3C_9057_4EA7_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "07．盗贼的遗产",
+        ["Boss单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____76D7_8D3C_9057_4EA7_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_5F71_9AA8_76D7_8D3C_9057_4EA7_65BD_6CD5(boss, _____76D7_8D3C_9057_4EA7_6280_80FDID)
+        end
+    })
 end
 return ____exports

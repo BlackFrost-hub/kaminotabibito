@@ -6,6 +6,8 @@ import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
 import { 巴尔扎罗斯技能数值配置 } from "./02．数值与表现配置";
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 施加巴尔扎罗斯灼热 } from "./16．灼热层数工具";
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
 
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -21,9 +23,6 @@ const { 施加单体攻击力提高Buff } = require("系统.03．技能系统.00
 };
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -59,10 +58,6 @@ interface 天罚波次 {
   Y: number;
   半径: number;
   延迟秒: number;
-}
-
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
 }
 
 function 单位有效(this: void, unit: any): boolean {
@@ -212,7 +207,15 @@ export function 释放巴尔扎罗斯王者天罚(this: void, context: 巴尔扎
 export function 注册巴尔扎罗斯王者天罚(this: void): void {
   if (王者天罚已注册) return;
   王者天罚已注册 = true;
-  registerSpellEffectListener(on巴尔扎罗斯王者天罚生效);
+  注册Boss技能壳监听({
+    名称: "巴尔扎罗斯王者天罚",
+    Boss单位类型ID: 巴尔扎罗斯单位类型ID,
+    技能ID: 王者天罚技能ID,
+    获取或创建上下文: 获取或创建巴尔扎罗斯上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 巴尔扎罗斯运行时上下文, boss: any): void {
+      on巴尔扎罗斯王者天罚生效(boss, 王者天罚技能ID);
+    },
+  });
 }
 
 function on巴尔扎罗斯王者天罚生效(this: void, castingUnit: any, spellAbilityId: number): void {

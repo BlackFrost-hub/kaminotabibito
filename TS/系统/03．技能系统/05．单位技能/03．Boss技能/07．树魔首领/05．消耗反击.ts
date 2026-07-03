@@ -5,6 +5,7 @@ import { 获取或创建树魔首领上下文, 树魔首领运行时上下文 } 
 import { 树魔首领数值与表现配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 两点方向角, 单位是否在来源正面扇区, 单位是否在来源背后扇区 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/08．方位判定工具";
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 
 const jass = require("jass.common") as any;
 
@@ -30,9 +31,6 @@ const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
-};
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -248,7 +246,15 @@ function 树魔首领消耗反击伤害修正(this: void, damageContext: any): n
 export function 注册树魔首领消耗反击(this: void): void {
   if (消耗反击已注册) return;
   消耗反击已注册 = true;
-  registerSpellEffectListener(on树魔首领消耗反击生效);
+  注册Boss技能壳监听({
+    名称: "树魔首领-消耗反击",
+    Boss单位类型ID: 树魔首领单位类型ID,
+    技能ID: 消耗反击技能ID,
+    获取或创建上下文: 获取或创建树魔首领上下文,
+    释放技能: function 树魔首领消耗反击监听释放(this: void, _context: 树魔首领运行时上下文, boss: any): void {
+      on树魔首领消耗反击生效(boss, 消耗反击技能ID);
+    },
+  });
   registerDamageModifier(树魔首领消耗反击伤害修正, 65);
 }
 

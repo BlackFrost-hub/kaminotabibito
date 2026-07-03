@@ -40,6 +40,11 @@ local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jassGlobals = require("jass.globals")
+local R2I = jass.R2I
+local CreateTimer = jass.CreateTimer
+local DestroyTimer = jass.DestroyTimer
+local TimerStart = jass.TimerStart
+local DzAPI_Map_GetGameStartTime = japi.DzAPI_Map_GetGameStartTime
 local _____8C03_8BD5_8F93_51FA = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local NORMAL_MON_DAYS = {
     0,
@@ -83,7 +88,7 @@ local function nowMs()
     return _serverTime + _millisCounter * 10
 end
 local function intFloor(value)
-    return jass.R2I(value)
+    return R2I(value)
 end
 local function maxNum(a, b)
     return a > b and a or b
@@ -426,11 +431,11 @@ function ____exports.initCenterTimer()
         return
     end
     if bootstrapTimer then
-        jass.DestroyTimer(bootstrapTimer)
+        DestroyTimer(bootstrapTimer)
         bootstrapTimer = nil
     end
     _initialized = true
-    local startTime = japi.DzAPI_Map_GetGameStartTime()
+    local startTime = DzAPI_Map_GetGameStartTime()
     _serverTime = startTime * 1000
     local dr = jassGlobals.udg_N
     if dr ~= nil then
@@ -440,9 +445,9 @@ function ____exports.initCenterTimer()
         )
     end
     calcDate(_serverTime / 1000)
-    local timer = jass.CreateTimer()
-    jass.TimerStart(timer, 0.01, true, onTick)
+    local timer = CreateTimer()
+    TimerStart(timer, 0.01, true, onTick)
 end
-bootstrapTimer = jass.CreateTimer()
-jass.TimerStart(bootstrapTimer, 0, false, ____exports.initCenterTimer)
+bootstrapTimer = CreateTimer()
+TimerStart(bootstrapTimer, 0, false, ____exports.initCenterTimer)
 return ____exports

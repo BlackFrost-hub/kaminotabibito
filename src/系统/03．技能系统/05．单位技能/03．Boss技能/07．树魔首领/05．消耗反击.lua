@@ -14,6 +14,8 @@ local ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177 = require("系统.03．技能系
 local _____4E24_70B9_65B9_5411_89D2 = ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177["两点方向角"]
 local _____5355_4F4D_662F_5426_5728_6765_6E90_6B63_9762_6247_533A = ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177["单位是否在来源正面扇区"]
 local _____5355_4F4D_662F_5426_5728_6765_6E90_80CC_540E_6247_533A = ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177["单位是否在来源背后扇区"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
@@ -135,30 +137,28 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_2.registerDamageModifier
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_3.addDelayedCallback
-removeDelayedCallback = ____require_result_3.removeDelayedCallback
-addPeriodicCallback = ____require_result_3.addPeriodicCallback
-removePeriodicCallback = ____require_result_3.removePeriodicCallback
-getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____5F00_59CB_786C_76F4 = ____require_result_4["开始硬直"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
-local _____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_5["创建线段危险区"]
-local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_6["获取Boss技能敌对英雄列表"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedEffect = ____require_result_7.createTimedEffect
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local ____require_result_8 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_8.YDWETimerDestroyEffectSafe
-local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_9.CosBJ
-local SinBJ = ____require_result_9.SinBJ
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_1.registerDamageModifier
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_2.addDelayedCallback
+removeDelayedCallback = ____require_result_2.removeDelayedCallback
+addPeriodicCallback = ____require_result_2.addPeriodicCallback
+removePeriodicCallback = ____require_result_2.removePeriodicCallback
+getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____5F00_59CB_786C_76F4 = ____require_result_3["开始硬直"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
+local _____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_4["创建线段危险区"]
+local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedEffect = ____require_result_6.createTimedEffect
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_7.YDWETimerDestroyEffectSafe
+local ____require_result_8 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_8.CosBJ
+local SinBJ = ____require_result_8.SinBJ
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____6D88_8017_53CD_51FB_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]["技能槽位"])
 _____6D88_8017_53CD_51FB_72B6_6001_8868 = {}
@@ -304,7 +304,15 @@ ____exports["注册树魔首领消耗反击"] = function()
         return
     end
     _____6D88_8017_53CD_51FB_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "树魔首领-消耗反击",
+        ["Boss单位类型ID"] = _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____6D88_8017_53CD_51FB_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_6811_9B54_9996_9886_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548(boss, _____6D88_8017_53CD_51FB_6280_80FDID)
+        end
+    })
     registerDamageModifier(_____6811_9B54_9996_9886_6D88_8017_53CD_51FB_4F24_5BB3_4FEE_6B63, 65)
 end
 return ____exports

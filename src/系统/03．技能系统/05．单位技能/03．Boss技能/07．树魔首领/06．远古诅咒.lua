@@ -9,6 +9,8 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["树魔首领数值与表现配置"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.08．台词播放")
 local _____64AD_653E_6811_9B54_9996_9886_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放树魔首领台词"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
@@ -51,8 +53,8 @@ function _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708(context, target)
             _____521B_5EFA_6280_80FD_63D0_793A_5708({["类型"] = "圆形", ["锚点单位"] = target, ["半径"] = cfg["分摊半径"], ["持续时间"] = cfg["跟随提示圈刷新毫秒"] / 1000 + 0.05})
         end
     )
-    local ____self_11 = context["清理"]
-    ____self_11["登记周期回调"](____self_11, "树魔首领-远古诅咒分摊提示", id)
+    local ____self_10 = context["清理"]
+    ____self_10["登记周期回调"](____self_10, "树魔首领-远古诅咒分摊提示", id)
 end
 function _____64AD_653E_70B9_540D_7279_6548(target)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["远古诅咒"]
@@ -229,8 +231,8 @@ function _____8C03_5EA6_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context)
             _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, center.x, center.y)
         end
     )
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "树魔首领-远古诅咒二段", delayedID)
+    local ____self_11 = context["清理"]
+    ____self_11["登记延迟回调"](____self_11, "树魔首领-远古诅咒二段", delayedID)
 end
 function _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5(context, target)
     local boss = context["Boss单位"]
@@ -353,23 +355,21 @@ local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统
 _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807 = ____require_result_3["获取Boss技能最高仇恨目标"]
 _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local ____require_result_4 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_4.registerSpellEffectListener
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_5.addDelayedCallback
-addPeriodicCallback = ____require_result_5.addPeriodicCallback
-removePeriodicCallback = ____require_result_5.removePeriodicCallback
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_6.registerManualBuff
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.05．树魔首领")
-_____6811_9B54_9996_9886BuffID = ____require_result_7["树魔首领BuffID"]
-local ____require_result_8 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-doHeal = ____require_result_8.doHeal
-local ____require_result_9 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
-_____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_9["取当前有效玩家人数"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedEffect = ____require_result_10.createTimedEffect
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_4.addDelayedCallback
+addPeriodicCallback = ____require_result_4.addPeriodicCallback
+removePeriodicCallback = ____require_result_4.removePeriodicCallback
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.05．树魔首领")
+_____6811_9B54_9996_9886BuffID = ____require_result_6["树魔首领BuffID"]
+local ____require_result_7 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+doHeal = ____require_result_7.doHeal
+local ____require_result_8 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
+_____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_8["取当前有效玩家人数"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedEffect = ____require_result_9.createTimedEffect
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____8FDC_53E4_8BC5_5492_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["远古诅咒"]["技能槽位"])
 local _____8FDC_53E4_8BC5_5492_5DF2_6CE8_518C = false
@@ -378,6 +378,14 @@ ____exports["注册树魔首领远古诅咒"] = function()
         return
     end
     _____8FDC_53E4_8BC5_5492_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "树魔首领-远古诅咒",
+        ["Boss单位类型ID"] = _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____8FDC_53E4_8BC5_5492_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_6811_9B54_9996_9886_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548(boss, _____8FDC_53E4_8BC5_5492_6280_80FDID)
+        end
+    })
 end
 return ____exports

@@ -12,7 +12,7 @@ import {
 import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC } from "./13．公共工具";
-
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
@@ -29,9 +29,6 @@ const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
-};
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
@@ -174,6 +171,14 @@ function on里科特神风护体施法(this: void, castingUnit: any, spellAbilit
 export function 注册里科特神风护体与粉碎(this: void): void {
   if (已注册) return;
   已注册 = true;
-  registerSpellEffectListener(on里科特神风护体施法);
+  注册Boss技能壳监听({
+    名称: "06．神风护体与粉碎",
+    Boss单位类型ID: 里科特单位类型ID,
+    技能ID: 神风护体技能ID,
+    获取或创建上下文: 获取或创建里科特上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 里科特运行时上下文, boss: any): void {
+      on里科特神风护体施法(boss, 神风护体技能ID);
+    },
+  });
   registerDamageModifier(on里科特神风护体受伤修正, 70);
 }

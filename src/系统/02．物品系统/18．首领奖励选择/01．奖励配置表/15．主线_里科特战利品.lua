@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports["里科特奖励池ID"] = "chapter2.main.rikot"
-____exports["主线_里科特战利品配置"] = {["奖励池ID"] = ____exports["里科特奖励池ID"], ["标题"] = "里科特的战利品", ["可选数量"] = 1, ["选项"] = {{
+____exports["主线_里科特战利品配置"] = {["奖励池ID"] = ____exports["里科特奖励池ID"], ["标题"] = "里科特的战利品", ["可选数量"] = 2, ["选项"] = {{
     ["装备名"] = "灵心之碎片",
     ["排序"] = 1,
     ["图标"] = "Equipment\\Icon\\Item\\spirit_heart_shard.blp",

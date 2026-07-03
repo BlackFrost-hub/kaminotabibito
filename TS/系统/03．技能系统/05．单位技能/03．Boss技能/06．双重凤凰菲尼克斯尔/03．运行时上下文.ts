@@ -1,16 +1,13 @@
 /** @noSelfInFile */
 
-import { 创建机制清理篮子, 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理";
-import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
+import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理";
+import { 创建Boss运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．Boss运行时上下文工厂";
 import { 菲尼克斯尔场地配置 } from "./01．场地配置";
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 
-const jass = require("jass.common") as any;
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
-
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
 export type 菲尼克斯尔形态 = "第一形态" | "第二形态" | "永恒轮回";
 export type 菲尼克斯尔元素类型 = "火" | "冰" | "毒" | "暗";
@@ -22,6 +19,7 @@ export interface 菲尼克斯尔机制单位 {
 
 export interface 菲尼克斯尔运行时上下文 {
   Boss: any;
+  Boss单位: any;
   当前形态: 菲尼克斯尔形态;
   开战时间Ms: number;
   清理: 机制清理篮子;
@@ -40,29 +38,13 @@ export interface 菲尼克斯尔运行时上下文 {
   当前主导元素: 菲尼克斯尔元素类型;
 }
 
-const 菲尼克斯尔上下文表: Record<number, 菲尼克斯尔运行时上下文 | undefined> = {};
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
-export function 获取菲尼克斯尔上下文(this: void, boss: any): 菲尼克斯尔运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  return id === 0 ? undefined : 菲尼克斯尔上下文表[id];
-}
-
-export function 获取或创建菲尼克斯尔上下文(this: void, boss: any): 菲尼克斯尔运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  let context = 菲尼克斯尔上下文表[id];
-  if (context != null) return context;
-
-  context = {
+function 创建菲尼克斯尔上下文(this: void, boss: any, 清理: 机制清理篮子): 菲尼克斯尔运行时上下文 {
+  return {
     Boss: boss,
+    Boss单位: boss,
     当前形态: "第一形态",
     开战时间Ms: getServerTime(),
-    清理: 创建机制清理篮子("菲尼克斯尔"),
+    清理,
     已摧毁导管数: 0,
     导管列表: [],
     凤凰蛋列表: [],
@@ -77,9 +59,20 @@ export function 获取或创建菲尼克斯尔上下文(this: void, boss: any): 
     怨火核心暴露中: false,
     当前主导元素: "火",
   };
-  设置单位技能壳普通提示(boss, 菲尼克斯尔单位技能配置.主动技能提示);
-  菲尼克斯尔上下文表[id] = context;
-  return context;
+}
+
+const 菲尼克斯尔上下文工厂 = 创建Boss运行时上下文工厂<菲尼克斯尔运行时上下文>({
+  名称: "菲尼克斯尔",
+  主动技能提示: 菲尼克斯尔单位技能配置.主动技能提示,
+  创建上下文: 创建菲尼克斯尔上下文,
+});
+
+export function 获取菲尼克斯尔上下文(this: void, boss: any): 菲尼克斯尔运行时上下文 | undefined {
+  return 菲尼克斯尔上下文工厂.获取(boss);
+}
+
+export function 获取或创建菲尼克斯尔上下文(this: void, boss: any): 菲尼克斯尔运行时上下文 | undefined {
+  return 菲尼克斯尔上下文工厂.获取或创建(boss);
 }
 
 export function 创建菲尼克斯尔运行时上下文(this: void, boss: any): 菲尼克斯尔运行时上下文 {
@@ -88,12 +81,7 @@ export function 创建菲尼克斯尔运行时上下文(this: void, boss: any): 
 }
 
 export function 清理菲尼克斯尔上下文(this: void, boss: any): void {
-  const id = 取单位ID(boss);
-  if (id === 0) return;
-  const context = 菲尼克斯尔上下文表[id];
-  if (context == null) return;
-  context.清理.清理全部();
-  delete 菲尼克斯尔上下文表[id];
+  菲尼克斯尔上下文工厂.清理上下文(boss);
 }
 
 export function 取菲尼克斯尔战场中心(this: void): { x: number; y: number } {

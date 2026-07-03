@@ -4,6 +4,7 @@ import { 树魔首领单位技能配置 } from "./00．配置";
 import { 获取或创建树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
 import { 树魔首领数值与表现配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 
 const jass = require("jass.common") as any;
 
@@ -29,9 +30,6 @@ const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能�
 };
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -186,7 +184,15 @@ function 古树衰弱伤害修正(this: void, damageContext: any): number {
 export function 注册树魔首领扩散冲击波(this: void): void {
   if (扩散冲击波已注册) return;
   扩散冲击波已注册 = true;
-  registerSpellEffectListener(on树魔首领扩散冲击波生效);
+  注册Boss技能壳监听({
+    名称: "树魔首领-扩散冲击波",
+    Boss单位类型ID: 树魔首领单位类型ID,
+    技能ID: 扩散冲击波技能ID,
+    获取或创建上下文: 获取或创建树魔首领上下文,
+    释放技能: function 树魔首领扩散冲击波监听释放(this: void, _context: 树魔首领运行时上下文, boss: any): void {
+      on树魔首领扩散冲击波生效(boss, 扩散冲击波技能ID);
+    },
+  });
   registerDamageModifier(古树衰弱伤害修正, 35);
 }
 

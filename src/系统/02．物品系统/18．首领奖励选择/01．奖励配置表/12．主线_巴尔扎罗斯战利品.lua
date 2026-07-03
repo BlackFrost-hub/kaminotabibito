@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports["巴尔扎罗斯奖励池ID"] = "chapter3.main.balzaroth"
-____exports["主线_巴尔扎罗斯战利品配置"] = {["奖励池ID"] = ____exports["巴尔扎罗斯奖励池ID"], ["标题"] = "熔岩恶魔王·巴尔扎罗斯的战利品", ["可选数量"] = 1, ["选项"] = {
+____exports["主线_巴尔扎罗斯战利品配置"] = {["奖励池ID"] = ____exports["巴尔扎罗斯奖励池ID"], ["标题"] = "熔岩恶魔王·巴尔扎罗斯的战利品", ["可选数量"] = 2, ["选项"] = {
     {
         ["装备名"] = "地核熔炉之心",
         ["排序"] = 1,

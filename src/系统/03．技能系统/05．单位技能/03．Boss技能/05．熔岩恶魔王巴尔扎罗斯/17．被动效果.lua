@@ -1,6 +1,5 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local stringToFourCC
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.00．配置")
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["巴尔扎罗斯单位技能配置"]
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
@@ -20,9 +19,8 @@ local ____13_FF0E_672B_65E5_7194_7206 = require("系统.03．技能系统.05．�
 local _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_672B_65E5_7194_7206_8282_70B9 = ____13_FF0E_672B_65E5_7194_7206["初始化巴尔扎罗斯末日熔爆节点"]
 local ____15_FF0E_6280_80FD_5165_53E3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.15．技能入口")
 local _____6CE8_518C_5DF4_5C14_624E_7F57_65AF_6280_80FD_7ED3_6784 = ____15_FF0E_6280_80FD_5165_53E3["注册巴尔扎罗斯技能结构"]
-function stringToFourCC(s)
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
+local ____19_FF0EBoss_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．Boss公共工具")
+local stringToFourCC = ____19_FF0EBoss_516C_5171_5DE5_5177.stringToFourCC
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local ____require_result_1 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.01．Boss自动技能注册表")
@@ -46,7 +44,7 @@ local function _____626B_63CF_5DF4_5C14_624E_7F57_65AF_542F_52A8_4E0A_4E0B_6587(
                 end
                 local boss = ____temp_2
                 if boss == nil or boss == 0 or GetUnitTypeId(boss) ~= _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID then
-                    goto __continue5
+                    goto __continue4
                 end
                 local context = _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587(boss)
                 if context ~= nil then
@@ -58,7 +56,7 @@ local function _____626B_63CF_5DF4_5C14_624E_7F57_65AF_542F_52A8_4E0A_4E0B_6587(
                     _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_672B_65E5_7194_7206_8282_70B9(context)
                 end
             end
-            ::__continue5::
+            ::__continue4::
             i = i + 1
         end
     end

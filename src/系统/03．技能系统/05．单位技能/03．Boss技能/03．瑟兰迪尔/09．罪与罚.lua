@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, YDWETimerDestroyEffectSafe, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, jass, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, Atan2, AddSpecialEffect, AddSpecialEffectTarget, UnitDamageTarget, R2I, EXSetEffectSize, DzSetEffectVertexColor, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
+local _____5355_4F4D_6709_6548, _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, YDWETimerDestroyEffectSafe, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, jass, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, Atan2, AddSpecialEffect, AddSpecialEffectTarget, UnitDamageTarget, R2I, EXSetEffectSize, DzSetEffectVertexColor, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
@@ -9,9 +9,10 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["瑟兰迪尔单位技能配置"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.15．台词播放")
 local _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放瑟兰迪尔台词"]
-function stringToFourCC(s)
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____19_FF0EBoss_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．Boss公共工具")
+local stringToFourCC = ____19_FF0EBoss_516C_5171_5DE5_5177.stringToFourCC
 function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0
 end
@@ -122,15 +123,15 @@ ____exports["释放瑟兰迪尔罪与罚"] = function(context, target)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["罪与罚"]
     local boss = context["Boss单位"]
     local threatTarget = _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807(boss)
-    local ____target_9 = target
-    if ____target_9 == nil then
-        ____target_9 = threatTarget and threatTarget.targetRef
+    local ____target_8 = target
+    if ____target_8 == nil then
+        ____target_8 = threatTarget and threatTarget.targetRef
     end
-    local ____target_9_10 = ____target_9
-    if ____target_9_10 == nil then
-        ____target_9_10 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
+    local ____target_8_9 = ____target_8
+    if ____target_8_9 == nil then
+        ____target_8_9 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
     end
-    local actualTarget = ____target_9_10
+    local actualTarget = ____target_8_9
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(actualTarget) then
         return
     end
@@ -305,8 +306,6 @@ YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
 local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807 = ____require_result_5["获取Boss技能应攻击目标"]
 _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_5["获取Boss技能最近敌对英雄"]
-local ____require_result_6 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_6.registerSpellEffectListener
 jass = require("jass.common")
 local japi = require("jass.japi")
 GetRandomInt = jass.GetRandomInt
@@ -338,6 +337,14 @@ ____exports["注册瑟兰迪尔罪与罚"] = function()
         return
     end
     _____7F6A_4E0E_7F5A_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "瑟兰迪尔罪与罚",
+        ["Boss单位类型ID"] = _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____7F6A_4E0E_7F5A_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548(boss, _____7F6A_4E0E_7F5A_6280_80FDID)
+        end
+    })
 end
 return ____exports

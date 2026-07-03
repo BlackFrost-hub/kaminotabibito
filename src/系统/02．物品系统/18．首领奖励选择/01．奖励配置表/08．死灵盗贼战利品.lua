@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports["死灵盗贼奖励池ID"] = "boss.death.死灵盗贼"
-____exports["死灵盗贼首领奖励池配置"] = {["奖励池ID"] = ____exports["死灵盗贼奖励池ID"], ["标题"] = "死灵盗贼战利品选择", ["可选数量"] = 1, ["选项"] = {
+____exports["死灵盗贼首领奖励池配置"] = {["奖励池ID"] = ____exports["死灵盗贼奖励池ID"], ["标题"] = "死灵盗贼战利品选择", ["可选数量"] = 2, ["选项"] = {
     {
         ["装备名"] = "影骨披风",
         ["排序"] = 1,

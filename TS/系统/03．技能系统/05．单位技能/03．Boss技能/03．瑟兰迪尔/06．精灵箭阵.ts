@@ -5,6 +5,8 @@ import { 获取或创建瑟兰迪尔上下文 } from "./03．运行时上下文"
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
 import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
 
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
@@ -27,10 +29,6 @@ const { 获取Boss技能最近敌对英雄Ex } = require("系统.01．单位系�
 const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
   getBuffRuntime: (this: void, unit: any, buffID: string) => any;
 };
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
-};
-
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -47,10 +45,6 @@ const 基础攻击力状态 = ConvertUnitState(0x12);
 const 瑟兰迪尔单位类型ID = stringToFourCC(瑟兰迪尔单位技能配置.单位ID);
 const 精灵箭阵技能ID = stringToFourCC(瑟兰迪尔数值与表现配置.精灵箭阵.技能槽位);
 let 精灵箭阵已注册 = false;
-
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
-}
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0;
@@ -176,7 +170,15 @@ export function 释放瑟兰迪尔精灵箭阵(this: void, context: 瑟兰迪尔
 export function 注册瑟兰迪尔精灵箭阵(this: void): void {
   if (精灵箭阵已注册) return;
   精灵箭阵已注册 = true;
-  registerSpellEffectListener(on瑟兰迪尔精灵箭阵生效);
+  注册Boss技能壳监听({
+    名称: "瑟兰迪尔精灵箭阵",
+    Boss单位类型ID: 瑟兰迪尔单位类型ID,
+    技能ID: 精灵箭阵技能ID,
+    获取或创建上下文: 获取或创建瑟兰迪尔上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 瑟兰迪尔运行时上下文, boss: any): void {
+      on瑟兰迪尔精灵箭阵生效(boss, 精灵箭阵技能ID);
+    },
+  });
 }
 
 function on瑟兰迪尔精灵箭阵生效(this: void, castingUnit: any, spellAbilityId: number): void {

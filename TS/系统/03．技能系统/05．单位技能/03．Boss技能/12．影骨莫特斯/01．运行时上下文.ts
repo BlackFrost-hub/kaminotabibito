@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
-import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
-import { 创建机制清理篮子, type 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import { 创建Boss运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．Boss运行时上下文工厂";
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 影骨莫特斯数值与表现配置 } from "./02．数值与表现配置";
 import { 单位有效, 取单位ID } from "./11．公共工具";
@@ -49,23 +49,12 @@ export interface 影骨莫特斯运行时上下文 {
   遗产宝箱已生成: boolean;
 }
 
-const 影骨莫特斯上下文表: Record<number, 影骨莫特斯运行时上下文 | undefined> = {};
-
-export function 获取影骨莫特斯上下文(this: void, boss: any): 影骨莫特斯运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  return id === 0 ? undefined : 影骨莫特斯上下文表[id];
-}
-
-export function 获取或创建影骨莫特斯上下文(this: void, boss: any): 影骨莫特斯运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  let context = 影骨莫特斯上下文表[id];
-  if (context != null) return context;
-  context = {
+function 创建影骨莫特斯上下文(this: void, boss: any, 清理: 机制清理篮子): 影骨莫特斯运行时上下文 {
+  return {
     Boss单位: boss,
     阶段: 取影骨莫特斯当前阶段(boss),
     已初始化: false,
-    清理: 创建机制清理篮子("影骨莫特斯"),
+    清理,
     已开启遗产宝箱数: 0,
     背刺准备: false,
     幽影爆发中: false,
@@ -75,26 +64,28 @@ export function 获取或创建影骨莫特斯上下文(this: void, boss: any): 
     下一个召唤组ID: 0,
     遗产宝箱已生成: false,
   };
-  设置单位技能壳普通提示(boss, 影骨莫特斯单位技能配置.主动技能提示);
-  影骨莫特斯上下文表[id] = context;
-  return context;
+}
+
+const 影骨莫特斯上下文工厂 = 创建Boss运行时上下文工厂<影骨莫特斯运行时上下文>({
+  名称: "影骨莫特斯",
+  主动技能提示: 影骨莫特斯单位技能配置.主动技能提示,
+  创建上下文: 创建影骨莫特斯上下文,
+});
+
+export function 获取影骨莫特斯上下文(this: void, boss: any): 影骨莫特斯运行时上下文 | undefined {
+  return 影骨莫特斯上下文工厂.获取(boss);
+}
+
+export function 获取或创建影骨莫特斯上下文(this: void, boss: any): 影骨莫特斯运行时上下文 | undefined {
+  return 影骨莫特斯上下文工厂.获取或创建(boss);
 }
 
 export function 清理影骨莫特斯上下文(this: void, boss: any): void {
-  const id = 取单位ID(boss);
-  if (id === 0) return;
-  const context = 影骨莫特斯上下文表[id];
-  if (context != null) context.清理.清理全部();
-  delete 影骨莫特斯上下文表[id];
+  影骨莫特斯上下文工厂.清理上下文(boss);
 }
 
 export function 获取全部影骨莫特斯上下文(this: void): 影骨莫特斯运行时上下文[] {
-  const result: 影骨莫特斯运行时上下文[] = [];
-  for (const key in 影骨莫特斯上下文表) {
-    const context = 影骨莫特斯上下文表[key];
-    if (context != null) result.push(context);
-  }
-  return result;
+  return 影骨莫特斯上下文工厂.获取全部();
 }
 
 export function 取影骨莫特斯当前阶段(this: void, boss: any): 影骨莫特斯阶段 {

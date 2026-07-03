@@ -112,4 +112,52 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．Boss运行时上下文工厂")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．Boss周期机制调度器")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.18．Boss召唤组模板")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.19．延迟改向弹幕模板")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.20．下一次普攻强化模板")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

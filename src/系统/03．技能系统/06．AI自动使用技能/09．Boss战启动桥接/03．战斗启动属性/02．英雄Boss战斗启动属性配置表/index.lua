@@ -20,6 +20,10 @@ local ____09_FF0E_53CC_91CD_51E4_51F0_B7_83F2_5C3C_514B_65AF_5C14 = require("系
 local _____5355_4F4DN00U_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____09_FF0E_53CC_91CD_51E4_51F0_B7_83F2_5C3C_514B_65AF_5C14["单位N00U战斗启动属性配置"]
 local ____10_FF0E_6C61_67D3_4E4B_732B_B7_8150_5316_8005_7C73_4E9A = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.10．污染之猫·腐化者米亚")
 local _____5355_4F4DN00V_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____10_FF0E_6C61_67D3_4E4B_732B_B7_8150_5316_8005_7C73_4E9A["单位N00V战斗启动属性配置"]
+local ____11_FF0E_53E4_6728_4E4B_8680_B7_83AB_5C14_7279_65AF = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.11．古木之蚀·莫尔特斯")
+local _____5355_4F4DN05W_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____11_FF0E_53E4_6728_4E4B_8680_B7_83AB_5C14_7279_65AF["单位N05W战斗启动属性配置"]
+local ____12_FF0E_5F71_9AA8_B7_83AB_7279_65AF = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.12．影骨·莫特斯")
+local _____5355_4F4DN01Y_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____12_FF0E_5F71_9AA8_B7_83AB_7279_65AF["单位N01Y战斗启动属性配置"]
 ____exports["英雄Boss战斗启动属性配置表"] = {
     _____5355_4F4DN00C_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
     _____5355_4F4DN05J_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
@@ -30,7 +34,9 @@ ____exports["英雄Boss战斗启动属性配置表"] = {
     _____5355_4F4DN057_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
     _____5355_4F4DN03G_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
     _____5355_4F4DN00U_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
-    _____5355_4F4DN00V_6218_6597_542F_52A8_5C5E_6027_914D_7F6E
+    _____5355_4F4DN00V_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
+    _____5355_4F4DN05W_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
+    _____5355_4F4DN01Y_6218_6597_542F_52A8_5C5E_6027_914D_7F6E
 }
 ____exports["英雄Boss分类战斗启动护卫配置表"] = {}
 do
@@ -107,6 +113,22 @@ do
 end
 do
     local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.10．污染之猫·腐化者米亚")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.11．古木之蚀·莫尔特斯")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.12．影骨·莫特斯")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

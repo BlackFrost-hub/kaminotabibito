@@ -19,6 +19,8 @@ local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetRandomReal = jass.GetRandomReal
@@ -29,18 +31,16 @@ local SetUnitVertexColor = jass.SetUnitVertexColor
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_2.registerDamageModifier
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.10．战斗视野压制")
-local _____65BD_52A0_6218_6597_89C6_91CE_538B_5236 = ____require_result_4["施加战斗视野压制"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_1.registerDamageModifier
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.10．战斗视野压制")
+local _____65BD_52A0_6218_6597_89C6_91CE_538B_5236 = ____require_result_3["施加战斗视野压制"]
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____5E7D_5F71_7206_53D1_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["幽影爆发"])
 local _____9AB7_9AC5_76D7_8D3CID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["骷髅盗贼单位类型"])
@@ -101,8 +101,8 @@ local function _____5E7D_5F71_7206_53D1_53EC_5524Tick()
                 true
             )
             if instance ~= nil and instance["单位"] ~= nil then
-                local ____context__5E7D_5F71_53EC_5524_7269_5 = context["幽影召唤物"]
-                ____context__5E7D_5F71_53EC_5524_7269_5[#____context__5E7D_5F71_53EC_5524_7269_5 + 1] = instance["单位"]
+                local ____context__5E7D_5F71_53EC_5524_7269_4 = context["幽影召唤物"]
+                ____context__5E7D_5F71_53EC_5524_7269_4[#____context__5E7D_5F71_53EC_5524_7269_4 + 1] = instance["单位"]
             end
             if data.count * cfg["召唤间隔秒"] >= cfg["召唤持续秒"] then
                 removePeriodicCallback(data.id)
@@ -168,8 +168,8 @@ local function _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1(context)
     local aura = AddSpecialEffectTarget(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["幽灵形态持续"], context["Boss单位"], "origin")
     local endVariable = {context = context, aura = aura, ["已销毁"] = false}
     if aura ~= nil and aura ~= 0 then
-        local ____self_6 = context["清理"]
-        ____self_6["登记清理"](____self_6, "影骨-幽灵形态", _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548, endVariable)
+        local ____self_5 = context["清理"]
+        ____self_5["登记清理"](____self_5, "影骨-幽灵形态", _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548, endVariable)
     end
     context["幽影爆发中"] = true
     context["幽影召唤物"] = {}
@@ -195,11 +195,11 @@ local function _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1(context)
     local key = _____4E0B_4E00_4E2A_5E7D_5F71_5468_671FID
     local id = addPeriodicCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤间隔秒"] * 1000, _____5E7D_5F71_7206_53D1_53EC_5524Tick)
     _____5E7D_5F71_7206_53D1_5468_671F_8868[key] = {context = context, count = 0, id = id}
+    local ____self_6 = context["清理"]
+    ____self_6["登记周期回调"](____self_6, "影骨-幽影爆发召唤", id)
     local ____self_7 = context["清理"]
-    ____self_7["登记周期回调"](____self_7, "影骨-幽影爆发召唤", id)
-    local ____self_8 = context["清理"]
-    ____self_8["登记延迟回调"](
-        ____self_8,
+    ____self_7["登记延迟回调"](
+        ____self_7,
         "影骨-幽影爆发结束",
         addDelayedCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["持续秒"] * 1000, _____5F71_9AA8_5E7D_5F71_7206_53D1_7ED3_675F, endVariable)
     )
@@ -222,6 +222,14 @@ ____exports["注册影骨莫特斯幽影爆发"] = function()
     end
     _____5DF2_6CE8_518C_5E7D_5F71_7206_53D1 = true
     _____786E_4FDD_5E7D_5F71_627F_4F24_4FEE_6B63()
-    registerSpellEffectListener(____on_5F71_9AA8_5E7D_5F71_7206_53D1_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "06．幽影爆发",
+        ["Boss单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____5E7D_5F71_7206_53D1_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_5F71_9AA8_5E7D_5F71_7206_53D1_65BD_6CD5(boss, _____5E7D_5F71_7206_53D1_6280_80FDID)
+        end
+    })
 end
 return ____exports

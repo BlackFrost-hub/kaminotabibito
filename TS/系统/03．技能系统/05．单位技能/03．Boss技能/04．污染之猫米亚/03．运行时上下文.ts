@@ -13,7 +13,8 @@ import { 刷新米亚平台超载惩罚 } from "./12．平台超载惩罚";
 import { 刷新米亚腐化黏液涂层 } from "./13．腐化黏液涂层";
 import { 尝试触发米亚终极污染, 清理米亚终极污染 } from "./14．终极污染";
 import { 播放米亚台词 } from "./15．台词播放";
-import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
+import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import { 创建Boss运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．Boss运行时上下文工厂";
 
 const jass = require("jass.common") as any;
 const { getServerTime, addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -21,7 +22,6 @@ const { getServerTime, addPeriodicCallback } = require("系统.00．核心系统
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
 };
 
-const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
@@ -34,6 +34,7 @@ export interface 米亚运行时上下文 {
   Boss单位: any;
   阶段: 米亚阶段;
   开战时间Ms: number;
+  清理: 机制清理篮子;
   安全域区域组: 米亚安全域运行时矩形组;
   腐化层数控制器: 可配置层数状态控制器;
   已触发分身80: boolean;
@@ -63,13 +64,7 @@ export interface 米亚运行时上下文 {
   终极污染本次叠层表: Record<number, number | undefined>;
 }
 
-const 米亚上下文表: Record<number, 米亚运行时上下文 | undefined> = {};
 let 米亚运行时已注册 = false;
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
@@ -102,22 +97,12 @@ function 创建米亚腐化层数控制器(this: void, context: 米亚运行时�
   });
 }
 
-export function 获取米亚上下文(this: void, boss: any): 米亚运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  return 米亚上下文表[id];
-}
-
-export function 获取或创建米亚上下文(this: void, boss: any): 米亚运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  let context = 米亚上下文表[id];
-  if (context != null) return context;
-
-  context = {
+function 创建米亚上下文(this: void, boss: any, 清理: 机制清理篮子): 米亚运行时上下文 {
+  const context: 米亚运行时上下文 = {
     Boss单位: boss,
     阶段: 1,
     开战时间Ms: getServerTime(),
+    清理,
     安全域区域组: 创建米亚安全域矩形组(),
     腐化层数控制器: undefined as any,
     已触发分身80: false,
@@ -147,21 +132,33 @@ export function 获取或创建米亚上下文(this: void, boss: any): 米亚运
     终极污染本次叠层表: {},
   };
   context.腐化层数控制器 = 创建米亚腐化层数控制器(context);
-  米亚上下文表[id] = context;
-  设置单位技能壳普通提示(boss, 米亚单位技能配置.主动技能提示);
   播放米亚台词(boss, "开场", 0);
   return context;
 }
 
-export function 清理米亚上下文(this: void, boss: any): void {
-  const id = 取单位ID(boss);
-  if (id === 0) return;
-  const context = 米亚上下文表[id];
-  if (context == null) return;
+function 清理米亚上下文机制(this: void, context: 米亚运行时上下文): void {
   清理米亚终极污染(context);
   context.腐化层数控制器.销毁();
   清理米亚安全域矩形组(context.安全域区域组);
-  delete 米亚上下文表[id];
+}
+
+const 米亚上下文工厂 = 创建Boss运行时上下文工厂<米亚运行时上下文>({
+  名称: "米亚",
+  主动技能提示: 米亚单位技能配置.主动技能提示,
+  创建上下文: 创建米亚上下文,
+  on清理: 清理米亚上下文机制,
+});
+
+export function 获取米亚上下文(this: void, boss: any): 米亚运行时上下文 | undefined {
+  return 米亚上下文工厂.获取(boss);
+}
+
+export function 获取或创建米亚上下文(this: void, boss: any): 米亚运行时上下文 | undefined {
+  return 米亚上下文工厂.获取或创建(boss);
+}
+
+export function 清理米亚上下文(this: void, boss: any): void {
+  米亚上下文工厂.清理上下文(boss);
 }
 
 function 刷新米亚阶段(this: void, context: 米亚运行时上下文): void {
@@ -181,8 +178,9 @@ function 刷新米亚阶段(this: void, context: 米亚运行时上下文): void
 
 function 推进米亚运行时(this: void): void {
   const nowMs = getServerTime();
-  for (const id in 米亚上下文表) {
-    const context = 米亚上下文表[id as any];
+  const contexts = 米亚上下文工厂.获取全部();
+  for (let i = 0; i < contexts.length; i++) {
+    const context = contexts[i];
     if (context == null) continue;
     if (!单位有效(context.Boss单位)) {
       清理米亚上下文(context.Boss单位);

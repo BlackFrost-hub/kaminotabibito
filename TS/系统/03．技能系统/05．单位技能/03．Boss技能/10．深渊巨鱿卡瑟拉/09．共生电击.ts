@@ -3,7 +3,8 @@
 import { type 卡瑟拉运行时上下文, 消耗玩家触手残片, 刷新卡瑟拉阶段 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y, 距离平方XY } from "./14．公共工具";
+import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY } from "./14．公共工具";
+import { 创建动态装饰物安全区组 } from "../../../00．技能模板+函数/04．机制组件/02．战斗区域/06．动态装饰物安全区组";
 
 const jass = require("jass.common") as any;
 
@@ -20,16 +21,8 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
-const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
-  创建技能提示圈: (this: void, 配置: any) => any;
-};
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { DzDoodadCreate, DzDoodadSetModel, DzDoodadSetVisible } = require("lib.扩展函数.KK扩展API.00．装饰物函数") as {
-  DzDoodadCreate: (this: void, id: number, varId: number, x: number, y: number, z: number, rotate: number, scale: number) => number;
-  DzDoodadSetModel: (this: void, doodad: number, modelFile: string) => void;
-  DzDoodadSetVisible: (this: void, doodad: number, enable: boolean) => void;
 };
 const { 施加快速控制Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   施加快速控制Buff: (this: void, source: any, target: any, controlType: number, duration: number) => void;
@@ -54,26 +47,39 @@ function 播放单位特效(this: void, model: string, unit: any): void {
 }
 
 function 确保绝缘珊瑚(this: void, context: 卡瑟拉运行时上下文): void {
-  if (context.绝缘珊瑚列表.length > 0) return;
+  if (context.绝缘珊瑚安全区组 != null && context.绝缘珊瑚列表.length > 0) return;
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 卡瑟拉数值与表现配置.共生电击;
   const bx = GetUnitX(boss);
   const by = GetUnitY(boss);
+  const 点位列表: { ID: string; X: number; Y: number; 半径: number; 朝向: number }[] = [];
   for (let i = 0; i < cfg.珊瑚数量; i++) {
     const angle = i * 120 + 40;
     const x = 极坐标X(bx, angle, cfg.珊瑚距离);
     const y = 极坐标Y(by, angle, cfg.珊瑚距离);
-    const doodad = DzDoodadCreate(stringToFourCC(cfg.珊瑚装饰物ID), 1, x, y, 0, angle, cfg.珊瑚缩放);
-    DzDoodadSetModel(doodad, cfg.珊瑚模型路径);
-    context.清理.登记清理("卡瑟拉-绝缘珊瑚装饰物", function 卡瑟拉绝缘珊瑚隐藏(this: void): void {
-      DzDoodadSetVisible(doodad, false);
-    });
-    context.绝缘珊瑚列表.push({ X: x, Y: y, 半径: cfg.安全半径, 装饰单位: doodad });
+    点位列表.push({ ID: "绝缘珊瑚" + (i + 1), X: x, Y: y, 半径: cfg.安全半径, 朝向: angle });
+  }
+  const 安全区组 = 创建动态装饰物安全区组({
+    清理: context.清理,
+    名称: "卡瑟拉-绝缘珊瑚",
+    装饰物ID: cfg.珊瑚装饰物ID,
+    点位列表,
+    默认模型路径: cfg.珊瑚模型路径,
+    缩放: cfg.珊瑚缩放,
+    来源单位: boss,
+  });
+  context.绝缘珊瑚安全区组 = 安全区组;
+  const 安全区列表 = 安全区组.取列表();
+  context.绝缘珊瑚列表 = [];
+  for (let i = 0; i < 安全区列表.length; i++) {
+    const 区 = 安全区列表[i];
+    context.绝缘珊瑚列表.push({ X: 区.X, Y: 区.Y, 半径: 区.半径, 装饰单位: 区.装饰物 });
   }
 }
 
 function 玩家在绝缘珊瑚内(this: void, context: 卡瑟拉运行时上下文, hero: any): boolean {
+  if (context.绝缘珊瑚安全区组 != null) return context.绝缘珊瑚安全区组.单位是否安全(hero);
   const hx = GetUnitX(hero);
   const hy = GetUnitY(hero);
   for (let i = 0; i < context.绝缘珊瑚列表.length; i++) {
@@ -85,17 +91,7 @@ function 玩家在绝缘珊瑚内(this: void, context: 卡瑟拉运行时上下�
 
 function 预警绝缘珊瑚(this: void, context: 卡瑟拉运行时上下文): void {
   const cfg = 卡瑟拉数值与表现配置.共生电击;
-  for (let i = 0; i < context.绝缘珊瑚列表.length; i++) {
-    const coral = context.绝缘珊瑚列表[i];
-    创建技能提示圈({
-      类型: "白色安全圆",
-      X: coral.X,
-      Y: coral.Y,
-      半径: coral.半径,
-      持续时间: cfg.预警秒,
-      来源单位: context.Boss单位,
-    });
-  }
+  if (context.绝缘珊瑚安全区组 != null) context.绝缘珊瑚安全区组.显示提示(cfg.预警秒);
 }
 
 function 结算卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上下文): void {

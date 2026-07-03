@@ -75,6 +75,7 @@ const GetRectMaxX = jass.GetRectMaxX as (this: void, whichRect: any) => number;
 const GetRectMinY = jass.GetRectMinY as (this: void, whichRect: any) => number;
 const GetRectMaxY = jass.GetRectMaxY as (this: void, whichRect: any) => number;
 const ShowUnit = jass.ShowUnit as (this: void, whichUnit: any, show: boolean) => void;
+const R2I = jass.R2I as (this: void, r: number) => number;
 const 中立敌对玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 中立被动玩家ID = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const 世界地图随机单位默认玩家ID = 中立被动玩家ID;
@@ -282,7 +283,7 @@ export function 启动世界地图单位缓步创建任务(
   const 每批创建数量 = 每批创建数量原值 > 0 ? 每批创建数量原值 : 世界地图单位默认每批创建数量;
   const 批次间隔秒原值 = 选项?.批次间隔秒 ?? 世界地图单位默认批次间隔秒;
   const 批次间隔秒 = 批次间隔秒原值 >= 0 ? 批次间隔秒原值 : 世界地图单位默认批次间隔秒;
-  const 批次间隔毫秒 = 批次间隔秒 <= 0 ? 1 : jass.R2I(批次间隔秒 * 1000);
+  const 批次间隔毫秒 = 批次间隔秒 <= 0 ? 1 : R2I(批次间隔秒 * 1000);
   const 任务ID = 下一个缓步创建任务ID;
   下一个缓步创建任务ID++;
 

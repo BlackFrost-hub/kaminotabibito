@@ -9,6 +9,7 @@ import { 初始化巴尔扎罗斯地核召唤节点 } from "./11．地核召唤"
 import { 初始化巴尔扎罗斯熔岩护盾节点 } from "./12．熔岩护盾";
 import { 初始化巴尔扎罗斯末日熔爆节点 } from "./13．末日熔爆";
 import { 注册巴尔扎罗斯技能结构 } from "./15．技能入口";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
 
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -22,10 +23,6 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 
 const 巴尔扎罗斯单位类型ID = stringToFourCC(巴尔扎罗斯单位技能配置.单位ID);
 let 巴尔扎罗斯被动已注册 = false;
-
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
-}
 
 function 扫描巴尔扎罗斯启动上下文(this: void): void {
   const contexts = 获取所有Boss自动技能启动上下文();

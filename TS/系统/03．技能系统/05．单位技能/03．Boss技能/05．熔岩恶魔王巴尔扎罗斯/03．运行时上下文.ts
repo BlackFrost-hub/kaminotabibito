@@ -1,16 +1,13 @@
 /** @noSelfInFile */
 
-import { 创建机制清理篮子, 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理";
-import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
+import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理";
+import { 创建Boss运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．Boss运行时上下文工厂";
 import { 巴尔扎罗斯场地矩形组, 创建巴尔扎罗斯战斗区域组, 清理巴尔扎罗斯战斗区域组 } from "./01．场地配置";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
 
-const jass = require("jass.common") as any;
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
-
-const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 
 export type 巴尔扎罗斯阶段 = 1 | 2 | 3;
 
@@ -39,29 +36,12 @@ export interface 巴尔扎罗斯运行时上下文 {
   王者天罚命中记录: Record<number, number>;
 }
 
-const 巴尔扎罗斯上下文表: Record<number, 巴尔扎罗斯运行时上下文 | undefined> = {};
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
-export function 获取巴尔扎罗斯上下文(this: void, boss: any): 巴尔扎罗斯运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  return id === 0 ? undefined : 巴尔扎罗斯上下文表[id];
-}
-
-export function 获取或创建巴尔扎罗斯上下文(this: void, boss: any): 巴尔扎罗斯运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  let context = 巴尔扎罗斯上下文表[id];
-  if (context != null) return context;
-
-  context = {
+function 创建巴尔扎罗斯上下文(this: void, boss: any, 清理: 机制清理篮子): 巴尔扎罗斯运行时上下文 {
+  return {
     Boss单位: boss,
     阶段: 1,
     开战时间Ms: getServerTime(),
-    清理: 创建机制清理篮子("巴尔扎罗斯"),
+    清理,
     战斗区域组: 创建巴尔扎罗斯战斗区域组(),
     护卫机制已初始化: false,
     格鲁姆技能已初始化: false,
@@ -77,19 +57,27 @@ export function 获取或创建巴尔扎罗斯上下文(this: void, boss: any): 
     恶魔咆哮波命中记录: {},
     王者天罚命中记录: {},
   };
-  设置单位技能壳普通提示(boss, 巴尔扎罗斯单位技能配置.主动技能提示);
-  巴尔扎罗斯上下文表[id] = context;
-  return context;
+}
+
+const 巴尔扎罗斯上下文工厂 = 创建Boss运行时上下文工厂<巴尔扎罗斯运行时上下文>({
+  名称: "巴尔扎罗斯",
+  主动技能提示: 巴尔扎罗斯单位技能配置.主动技能提示,
+  创建上下文: 创建巴尔扎罗斯上下文,
+  on清理: function 巴尔扎罗斯上下文清理战斗区域(this: void, context: 巴尔扎罗斯运行时上下文): void {
+    清理巴尔扎罗斯战斗区域组(context.战斗区域组);
+  },
+});
+
+export function 获取巴尔扎罗斯上下文(this: void, boss: any): 巴尔扎罗斯运行时上下文 | undefined {
+  return 巴尔扎罗斯上下文工厂.获取(boss);
+}
+
+export function 获取或创建巴尔扎罗斯上下文(this: void, boss: any): 巴尔扎罗斯运行时上下文 | undefined {
+  return 巴尔扎罗斯上下文工厂.获取或创建(boss);
 }
 
 export function 清理巴尔扎罗斯上下文(this: void, boss: any): void {
-  const id = 取单位ID(boss);
-  if (id === 0) return;
-  const context = 巴尔扎罗斯上下文表[id];
-  if (context == null) return;
-  context.清理.清理全部();
-  清理巴尔扎罗斯战斗区域组(context.战斗区域组);
-  delete 巴尔扎罗斯上下文表[id];
+  巴尔扎罗斯上下文工厂.清理上下文(boss);
 }
 
 export function 注册巴尔扎罗斯运行时(this: void): void {

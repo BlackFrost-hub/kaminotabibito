@@ -5,7 +5,7 @@ import { 获取或创建里科特上下文, 获取全部里科特上下文, type
 import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 距离平方XY } from "./13．公共工具";
-
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -15,9 +15,6 @@ const GetRandomReal = jass.GetRandomReal as (lowBound: number, highBound: number
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
-};
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
@@ -137,6 +134,14 @@ function on里科特破魔反击施法(this: void, castingUnit: any, spellAbilit
 export function 注册里科特破魔反击(this: void): void {
   if (已注册) return;
   已注册 = true;
-  registerSpellEffectListener(on里科特破魔反击施法);
+  注册Boss技能壳监听({
+    名称: "09．破魔反击",
+    Boss单位类型ID: 里科特单位类型ID,
+    技能ID: 破魔反击技能ID,
+    获取或创建上下文: 获取或创建里科特上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 里科特运行时上下文, boss: any): void {
+      on里科特破魔反击施法(boss, 破魔反击技能ID);
+    },
+  });
   registerDamageModifier(on里科特破魔反击伤害修正, 85);
 }

@@ -37,6 +37,11 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const jassGlobals = require("jass.globals") as any;
+const R2I = jass.R2I as (value: number) => number;
+const CreateTimer = jass.CreateTimer as () => any;
+const DestroyTimer = jass.DestroyTimer as (whichTimer: any) => void;
+const TimerStart = jass.TimerStart as (whichTimer: any, timeout: number, periodic: boolean, handlerFunc: (this: void) => void) => void;
+const DzAPI_Map_GetGameStartTime = japi.DzAPI_Map_GetGameStartTime as () => number;
 const 调试输出 = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   safeExecute: (this: void, module: string, callback: (this: void) => void) => boolean;
 };
@@ -74,7 +79,7 @@ function nowMs(): number {
 }
 
 function intFloor(value: number): number {
-  return jass.R2I(value);
+  return R2I(value);
 }
 
 function maxNum(a: number, b: number): number {
@@ -381,12 +386,12 @@ export function offTick10ms(callback: () => void): void {
 export function initCenterTimer(): void {
   if (_initialized) return;
   if (bootstrapTimer) {
-    jass.DestroyTimer(bootstrapTimer);
+    DestroyTimer(bootstrapTimer);
     bootstrapTimer = null;
   }
   _initialized = true;
 
-  const startTime = japi.DzAPI_Map_GetGameStartTime();
+  const startTime = DzAPI_Map_GetGameStartTime();
   _serverTime = startTime * 1000;
 
   const dr = jassGlobals.udg_N as number | undefined;
@@ -396,11 +401,11 @@ export function initCenterTimer(): void {
 
   calcDate(_serverTime / 1000);
 
-  const timer = jass.CreateTimer();
-  jass.TimerStart(timer, 0.01, true, onTick);
+  const timer = CreateTimer();
+  TimerStart(timer, 0.01, true, onTick);
 }
 
-bootstrapTimer = jass.CreateTimer();
-jass.TimerStart(bootstrapTimer, 0.0, false, initCenterTimer);
+bootstrapTimer = CreateTimer();
+TimerStart(bootstrapTimer, 0.0, false, initCenterTimer);
 
 export {};

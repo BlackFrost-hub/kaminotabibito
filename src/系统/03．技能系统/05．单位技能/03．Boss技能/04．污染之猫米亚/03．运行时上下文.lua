@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_5C42_6570_72B6_6001 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.01．层数状态.index")
 local _____521B_5EFA_53EF_914D_7F6E_5C42_6570_72B6_6001 = ____01_FF0E_5C42_6570_72B6_6001["创建可配置层数状态"]
@@ -31,26 +30,18 @@ local _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3 = ____14_FF0E_7EC8_
 local _____6E05_7406_7C73_4E9A_7EC8_6781_6C61_67D3 = ____14_FF0E_7EC8_6781_6C61_67D3["清理米亚终极污染"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.15．台词播放")
 local _____64AD_653E_7C73_4E9A_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放米亚台词"]
-local ____15_FF0E_5355_4F4D_6280_80FD_58F3_63D0_793A = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.15．单位技能壳提示")
-local _____8BBE_7F6E_5355_4F4D_6280_80FD_58F3_666E_901A_63D0_793A = ____15_FF0E_5355_4F4D_6280_80FD_58F3_63D0_793A["设置单位技能壳普通提示"]
+local ____15_FF0EBoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．Boss运行时上下文工厂")
+local _____521B_5EFABoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0EBoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建Boss运行时上下文工厂"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local GetUnitState = jass.GetUnitState
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local _____7C73_4E9A_4E0A_4E0B_6587_8868 = {}
 local _____7C73_4E9A_8FD0_884C_65F6_5DF2_6CE8_518C = false
-local function _____53D6_5355_4F4DID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
@@ -82,26 +73,12 @@ local function _____521B_5EFA_7C73_4E9A_8150_5316_5C42_6570_63A7_5236_5668(conte
         ["表现档位"] = {{["键"] = "低层", ["最小层数"] = 1, ["最大层数"] = 6}, {["键"] = "中层", ["最小层数"] = 7, ["最大层数"] = 11}, {["键"] = "高层", ["最小层数"] = 12, ["最大层数"] = 15}}
     })
 end
-____exports["获取米亚上下文"] = function(boss)
-    local id = _____53D6_5355_4F4DID(boss)
-    if id == 0 then
-        return nil
-    end
-    return _____7C73_4E9A_4E0A_4E0B_6587_8868[id]
-end
-____exports["获取或创建米亚上下文"] = function(boss)
-    local id = _____53D6_5355_4F4DID(boss)
-    if id == 0 then
-        return nil
-    end
-    local context = _____7C73_4E9A_4E0A_4E0B_6587_8868[id]
-    if context ~= nil then
-        return context
-    end
-    context = {
+local function _____521B_5EFA_7C73_4E9A_4E0A_4E0B_6587(boss, _____6E05_7406)
+    local context = {
         ["Boss单位"] = boss,
         ["阶段"] = 1,
         ["开战时间Ms"] = getServerTime(),
+        ["清理"] = _____6E05_7406,
         ["安全域区域组"] = _____521B_5EFA_7C73_4E9A_5B89_5168_57DF_77E9_5F62_7EC4(),
         ["腐化层数控制器"] = nil,
         ["已触发分身80"] = false,
@@ -131,25 +108,24 @@ ____exports["获取或创建米亚上下文"] = function(boss)
         ["终极污染本次叠层表"] = {}
     }
     context["腐化层数控制器"] = _____521B_5EFA_7C73_4E9A_8150_5316_5C42_6570_63A7_5236_5668(context)
-    _____7C73_4E9A_4E0A_4E0B_6587_8868[id] = context
-    _____8BBE_7F6E_5355_4F4D_6280_80FD_58F3_666E_901A_63D0_793A(boss, _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"])
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "开场", 0)
     return context
 end
-____exports["清理米亚上下文"] = function(boss)
-    local id = _____53D6_5355_4F4DID(boss)
-    if id == 0 then
-        return
-    end
-    local context = _____7C73_4E9A_4E0A_4E0B_6587_8868[id]
-    if context == nil then
-        return
-    end
+local function _____6E05_7406_7C73_4E9A_4E0A_4E0B_6587_673A_5236(context)
     _____6E05_7406_7C73_4E9A_7EC8_6781_6C61_67D3(context)
     local ____self_1 = context["腐化层数控制器"]
     ____self_1["销毁"](____self_1)
     _____6E05_7406_7C73_4E9A_5B89_5168_57DF_77E9_5F62_7EC4(context["安全域区域组"])
-    __TS__Delete(_____7C73_4E9A_4E0A_4E0B_6587_8868, id)
+end
+local _____7C73_4E9A_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFABoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "米亚", ["主动技能提示"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_7C73_4E9A_4E0A_4E0B_6587, ["on清理"] = _____6E05_7406_7C73_4E9A_4E0A_4E0B_6587_673A_5236})
+____exports["获取米亚上下文"] = function(boss)
+    return _____7C73_4E9A_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
+end
+____exports["获取或创建米亚上下文"] = function(boss)
+    return _____7C73_4E9A_4E0A_4E0B_6587_5DE5_5382["获取或创建"](boss)
+end
+____exports["清理米亚上下文"] = function(boss)
+    _____7C73_4E9A_4E0A_4E0B_6587_5DE5_5382["清理上下文"](boss)
 end
 local function _____5237_65B0_7C73_4E9A_9636_6BB5(context)
     local boss = context["Boss单位"]
@@ -169,27 +145,32 @@ local function _____5237_65B0_7C73_4E9A_9636_6BB5(context)
 end
 local function _____63A8_8FDB_7C73_4E9A_8FD0_884C_65F6()
     local nowMs = getServerTime()
-    for id in pairs(_____7C73_4E9A_4E0A_4E0B_6587_8868) do
-        do
-            local context = _____7C73_4E9A_4E0A_4E0B_6587_8868[id]
-            if context == nil then
-                goto __continue23
+    local contexts = _____7C73_4E9A_4E0A_4E0B_6587_5DE5_5382["获取全部"]()
+    do
+        local i = 0
+        while i < #contexts do
+            do
+                local context = contexts[i + 1]
+                if context == nil then
+                    goto __continue19
+                end
+                if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+                    ____exports["清理米亚上下文"](context["Boss单位"])
+                    goto __continue19
+                end
+                _____5237_65B0_7C73_4E9A_9636_6BB5(context)
+                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
+                _____5237_65B0_7C73_4E9A_6C61_67D3_6807_8BB0(context, nowMs)
+                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_67D3_8109_51B2(context, nowMs)
+                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_6C34_67F1_7206_53D1(context, nowMs)
+                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_8150_5316_8F6C_79FB(context, nowMs)
+                _____5237_65B0_7C73_4E9A_5E73_53F0_8D85_8F7D_60E9_7F5A(context, nowMs)
+                _____5237_65B0_7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42(context, nowMs)
+                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3(context)
             end
-            if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                ____exports["清理米亚上下文"](context["Boss单位"])
-                goto __continue23
-            end
-            _____5237_65B0_7C73_4E9A_9636_6BB5(context)
-            _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
-            _____5237_65B0_7C73_4E9A_6C61_67D3_6807_8BB0(context, nowMs)
-            _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_67D3_8109_51B2(context, nowMs)
-            _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_6C34_67F1_7206_53D1(context, nowMs)
-            _____5C1D_8BD5_89E6_53D1_7C73_4E9A_8150_5316_8F6C_79FB(context, nowMs)
-            _____5237_65B0_7C73_4E9A_5E73_53F0_8D85_8F7D_60E9_7F5A(context, nowMs)
-            _____5237_65B0_7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42(context, nowMs)
-            _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3(context)
+            ::__continue19::
+            i = i + 1
         end
-        ::__continue23::
     end
 end
 ____exports["注册米亚运行时"] = function()

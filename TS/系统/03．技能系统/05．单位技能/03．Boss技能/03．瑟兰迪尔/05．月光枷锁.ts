@@ -1,14 +1,14 @@
 /** @noSelfInFile */
 
 import type { 瑟兰迪尔运行时上下文 } from "./03．运行时上下文";
+import { 获取或创建瑟兰迪尔上下文 } from "./03．运行时上下文";
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
 import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
 
 const jass = require("jass.common") as any;
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
-};
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
@@ -90,10 +90,6 @@ interface 月光枷锁绑定记录 {
 }
 
 const 月光枷锁绑定表: Record<number, 月光枷锁绑定记录 | undefined> = {};
-
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
-}
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0;
@@ -302,6 +298,14 @@ function on瑟兰迪尔月光枷锁生效(this: void, castingUnit: any, spellAbi
 export function 注册瑟兰迪尔月光枷锁(this: void): void {
   if (月光枷锁已注册) return;
   月光枷锁已注册 = true;
-  registerSpellEffectListener(on瑟兰迪尔月光枷锁生效);
+  注册Boss技能壳监听({
+    名称: "瑟兰迪尔月光枷锁",
+    Boss单位类型ID: 瑟兰迪尔单位类型ID,
+    技能ID: 月光枷锁技能ID,
+    获取或创建上下文: 获取或创建瑟兰迪尔上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 瑟兰迪尔运行时上下文, boss: any): void {
+      on瑟兰迪尔月光枷锁生效(boss, 月光枷锁技能ID);
+    },
+  });
   registerAppliedFinalDamageListener(on月光枷锁承受伤害);
 }

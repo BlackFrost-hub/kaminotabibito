@@ -11,13 +11,15 @@ local ____require_result_1 = require("系统.00．核心系统.00．玩家系统
 local getRegisteredPlayerHero = ____require_result_1.getRegisteredPlayerHero
 local ____require_result_2 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．沙漠食人魔.00．配置")
 local _____6C99_6F20_98DF_4EBA_9B54_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_2["沙漠食人魔单位技能配置"]
+local jass = require("jass.common")
+local GetOwningPlayer = jass.GetOwningPlayer
 local _____6C99_6F20_98DF_4EBA_9B54_5355_4F4D_7C7B_578BID = _____8F6C_56DB_4F4DID(_____6C99_6F20_98DF_4EBA_9B54_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6C99_6F20_98DF_4EBA_9B54_89E6_53D1BuffID = _____8F6C_56DB_4F4DID(_____6C99_6F20_98DF_4EBA_9B54_5355_4F4D_6280_80FD_914D_7F6E["触发BuffID"])
 local function _____76EE_6807_662F_5DF2_6CE8_518C_73A9_5BB6_82F1_96C4(unit)
     if unit == nil or unit == 0 then
         return false
     end
-    local owner = jass.GetOwningPlayer(unit)
+    local owner = GetOwningPlayer(unit)
     if owner == nil or owner == 0 then
         return false
     end

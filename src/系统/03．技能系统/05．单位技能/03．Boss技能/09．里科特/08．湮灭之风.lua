@@ -13,6 +13,8 @@ local ____13_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____13_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____13_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____8DDD_79BB_5E73_65B9XY = ____13_FF0E_516C_5171_5DE5_5177["距离平方XY"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -27,22 +29,20 @@ local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local addPeriodicCallback = ____require_result_2.addPeriodicCallback
-local removePeriodicCallback = ____require_result_2.removePeriodicCallback
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_5["施加快速控制Buff"]
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_5["施加快速减速Buff"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具")
-local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_4["施加快速控制Buff"]
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_4["施加快速减速Buff"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具")
+local _____65BD_52A0_7729_6655 = ____require_result_5["施加眩晕"]
 local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6E6E_706D_4E4B_98CE_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之风"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -167,8 +167,8 @@ local function _____91CA_653E_91CC_79D1_7279_6E6E_706D_4E4B_98CE(context)
             _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
         end
     )
-    local ____self_7 = context["清理"]
-    ____self_7["登记周期回调"](____self_7, "里科特-湮灭之风周期", data["周期ID"])
+    local ____self_6 = context["清理"]
+    ____self_6["登记周期回调"](____self_6, "里科特-湮灭之风周期", data["周期ID"])
     local id = addDelayedCallback(
         cfg["持续秒"] * 1000,
         function()
@@ -176,8 +176,8 @@ local function _____91CA_653E_91CC_79D1_7279_6E6E_706D_4E4B_98CE(context)
             removePeriodicCallback(data["周期ID"])
         end
     )
-    local ____self_8 = context["清理"]
-    ____self_8["登记延迟回调"](____self_8, "里科特-湮灭之风结束", id)
+    local ____self_7 = context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "里科特-湮灭之风结束", id)
 end
 local function ____on_91CC_79D1_7279_6E6E_706D_4E4B_98CE_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____6E6E_706D_4E4B_98CE_6280_80FDID then
@@ -197,6 +197,14 @@ ____exports["注册里科特湮灭之风"] = function()
         return
     end
     _____5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_91CC_79D1_7279_6E6E_706D_4E4B_98CE_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "08．湮灭之风",
+        ["Boss单位类型ID"] = _____91CC_79D1_7279_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____6E6E_706D_4E4B_98CE_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_91CC_79D1_7279_6E6E_706D_4E4B_98CE_65BD_6CD5(boss, _____6E6E_706D_4E4B_98CE_6280_80FDID)
+        end
+    })
 end
 return ____exports

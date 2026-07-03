@@ -20,5 +20,22 @@ export * from "./15．单位技能壳提示";
 export * from "./16．技能提示圈工厂";
 export * from "./17．闪电效果代码";
 export * from "./18．单位动画守护";
+export {
+  stringToFourCC as BossStringToFourCC,
+  取单位ID as Boss取单位ID,
+  单位有效 as Boss单位有效,
+  距离平方XY as Boss距离平方XY,
+  距离XY as Boss距离XY,
+  两点角度 as Boss两点角度,
+  单位间角度 as Boss单位间角度,
+  角度差绝对值 as Boss角度差绝对值,
+  目标正面朝向来源 as Boss目标正面朝向来源,
+  极坐标X as Boss极坐标X,
+  极坐标Y as Boss极坐标Y,
+  限制数值 as Boss限制数值,
+  点到线段距离平方 as Boss点到线段距离平方,
+  播放点特效 as Boss播放点特效,
+  播放单位特效 as Boss播放单位特效,
+} from "./19．Boss公共工具";
 
 export * from "./01．便捷短函数集合/index";

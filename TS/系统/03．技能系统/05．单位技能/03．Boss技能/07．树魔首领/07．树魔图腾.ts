@@ -4,6 +4,7 @@ import { 树魔首领单位技能配置 } from "./00．配置";
 import { 获取或创建树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
 import { 树魔首领数值与表现配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 
 const jass = require("jass.common") as any;
 
@@ -40,9 +41,6 @@ const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．�
 const { 获取Boss技能敌对英雄列表, 获取Boss技能最近敌对英雄Ex } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
   获取Boss技能最近敌对英雄Ex: (this: void, boss: any, centerUnit?: any, radius?: number) => any;
-};
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getGameDifficulty } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -382,7 +380,15 @@ export function 注册树魔首领树魔图腾(this: void): void {
   }
   if (树魔图腾已注册) return;
   树魔图腾已注册 = true;
-  registerSpellEffectListener(on树魔首领树魔图腾生效);
+  注册Boss技能壳监听({
+    名称: "树魔首领-树魔图腾",
+    Boss单位类型ID: 树魔首领单位类型ID,
+    技能ID: 树魔图腾技能ID,
+    获取或创建上下文: 获取或创建树魔首领上下文,
+    释放技能: function 树魔首领树魔图腾监听释放(this: void, _context: 树魔首领运行时上下文, boss: any): void {
+      on树魔首领树魔图腾生效(boss, 树魔图腾技能ID);
+    },
+  });
 }
 
 function on树魔首领树魔图腾生效(this: void, castingUnit: any, spellAbilityId: number): void {

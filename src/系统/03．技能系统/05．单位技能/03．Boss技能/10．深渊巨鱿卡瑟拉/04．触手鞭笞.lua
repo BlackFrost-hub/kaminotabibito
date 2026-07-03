@@ -15,6 +15,8 @@ local _____5355_4F4D_6709_6548 = ____14_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____14_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____6781_5750_6807X = ____14_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____14_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -31,25 +33,23 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local addPeriodicCallback = ____require_result_2.addPeriodicCallback
-local removePeriodicCallback = ____require_result_2.removePeriodicCallback
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_5["创建可攻击机制单位"]
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_6.registerManualBuff
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.08．卡瑟拉")
-local _____5361_745F_62C9BuffID = ____require_result_7["卡瑟拉BuffID"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_8["施加快速减速Buff"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_4["创建可攻击机制单位"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.08．卡瑟拉")
+local _____5361_745F_62C9BuffID = ____require_result_6["卡瑟拉BuffID"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_7["施加快速减速Buff"]
 local _____5361_745F_62C9_5355_4F4D_7C7B_578BID = stringToFourCC(_____5361_745F_62C9_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____89E6_624B_97AD_7B1E_6280_80FDID = stringToFourCC(_____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手鞭笞"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -76,13 +76,13 @@ local function _____9009_62E9_89E6_624B_97AD_7B1E_76EE_6807(context)
             i = i + 1
         end
     end
-    local _____5355_4F4D_6709_6548_result_9
+    local _____5355_4F4D_6709_6548_result_8
     if _____5355_4F4D_6709_6548(best) then
-        _____5355_4F4D_6709_6548_result_9 = best
+        _____5355_4F4D_6709_6548_result_8 = best
     else
-        _____5355_4F4D_6709_6548_result_9 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
+        _____5355_4F4D_6709_6548_result_8 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
     end
-    return _____5355_4F4D_6709_6548_result_9
+    return _____5355_4F4D_6709_6548_result_8
 end
 local function _____6389_843D_89E6_624B_6B8B_7247_7ED9_51FB_6740_8005(context, killer)
     if not _____5355_4F4D_6709_6548(killer) then
@@ -178,8 +178,8 @@ local function _____521B_5EFA_5355_6761_89E6_624B(context, target, x, y)
             _____89E6_624B_97AD_7B1E_4E00_8DF3(data)
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记周期回调"](____self_10, "卡瑟拉-触手鞭笞周期", data["周期ID"])
+    local ____self_9 = context["清理"]
+    ____self_9["登记周期回调"](____self_9, "卡瑟拉-触手鞭笞周期", data["周期ID"])
 end
 local function _____91CA_653E_89E6_624B_56F4_653B(context, target)
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手鞭笞"]
@@ -226,8 +226,8 @@ local function _____91CA_653E_5361_745F_62C9_89E6_624B_97AD_7B1E(context)
             end
         end
     )
-    local ____self_11 = context["清理"]
-    ____self_11["登记延迟回调"](____self_11, "卡瑟拉-触手鞭笞围攻", id)
+    local ____self_10 = context["清理"]
+    ____self_10["登记延迟回调"](____self_10, "卡瑟拉-触手鞭笞围攻", id)
 end
 local function ____on_5361_745F_62C9_89E6_624B_97AD_7B1E_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____89E6_624B_97AD_7B1E_6280_80FDID then
@@ -247,6 +247,14 @@ ____exports["注册卡瑟拉触手鞭笞"] = function()
         return
     end
     _____5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_5361_745F_62C9_89E6_624B_97AD_7B1E_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "04．触手鞭笞",
+        ["Boss单位类型ID"] = _____5361_745F_62C9_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____89E6_624B_97AD_7B1E_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5361_745F_62C9_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_5361_745F_62C9_89E6_624B_97AD_7B1E_65BD_6CD5(boss, _____89E6_624B_97AD_7B1E_6280_80FDID)
+        end
+    })
 end
 return ____exports

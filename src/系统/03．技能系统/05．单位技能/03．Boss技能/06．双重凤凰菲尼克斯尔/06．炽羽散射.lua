@@ -29,8 +29,8 @@ local _____9020_6210_706B_7130_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造�
 local _____6DFB_52A0_5143_7D20_5C42_6570 = ____19_FF0E_516C_5171_5DE5_5177["添加元素层数"]
 local _____6781_5750_6807X = ____19_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____19_FF0E_516C_5171_5DE5_5177["极坐标Y"]
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetRandomReal = jass.GetRandomReal
@@ -65,8 +65,8 @@ local function _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x
             end
         end
     )
-    local ____self_1 = context["清理"]
-    ____self_1["登记周期回调"](____self_1, "菲尼克斯尔燃烧区", tick)
+    local ____self_0 = context["清理"]
+    ____self_0["登记周期回调"](____self_0, "菲尼克斯尔燃烧区", tick)
 end
 ____exports["释放菲尼克斯尔炽羽散射"] = function(context, target)
     if context["当前形态"] ~= "第一形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
@@ -135,6 +135,14 @@ ____exports["注册菲尼克斯尔炽羽散射"] = function()
         return
     end
     _____70BD_7FBD_6563_5C04_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_6563_5C04_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "菲尼克斯尔炽羽散射",
+        ["Boss单位类型ID"] = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____70BD_7FBD_6563_5C04_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83F2_5C3C_514B_65AF_5C14_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_6563_5C04_751F_6548(boss, _____70BD_7FBD_6563_5C04_6280_80FDID)
+        end
+    })
 end
 return ____exports

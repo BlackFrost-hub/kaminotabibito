@@ -1,11 +1,8 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local GetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
-local ____15_FF0E_5355_4F4D_6280_80FD_58F3_63D0_793A = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.15．单位技能壳提示")
-local _____8BBE_7F6E_5355_4F4D_6280_80FD_58F3_666E_901A_63D0_793A = ____15_FF0E_5355_4F4D_6280_80FD_58F3_63D0_793A["设置单位技能壳普通提示"]
-local ____01_FF0E_673A_5236_6E05_7406_7BEE_5B50 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.06．机制清理.01．机制清理篮子")
-local _____521B_5EFA_673A_5236_6E05_7406_7BEE_5B50 = ____01_FF0E_673A_5236_6E05_7406_7BEE_5B50["创建机制清理篮子"]
+local ____15_FF0EBoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．Boss运行时上下文工厂")
+local _____521B_5EFABoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0EBoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建Boss运行时上下文工厂"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.00．配置")
 local _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["莫尔特斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.02．数值与表现配置")
@@ -42,31 +39,12 @@ local ____require_result_1 = require("系统.05．Buff系统.03．Buff表.01．B
 local _____83AB_5C14_7279_65AFBuffID = ____require_result_1["莫尔特斯BuffID"]
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
-local _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_8868 = {}
-____exports["获取莫尔特斯上下文"] = function(boss)
-    local id = _____53D6_5355_4F4DID(boss)
-    local ____temp_3
-    if id == 0 then
-        ____temp_3 = nil
-    else
-        ____temp_3 = _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_8868[id]
-    end
-    return ____temp_3
-end
-____exports["获取或创建莫尔特斯上下文"] = function(boss)
-    local id = _____53D6_5355_4F4DID(boss)
-    if id == 0 then
-        return nil
-    end
-    local context = _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_8868[id]
-    if context ~= nil then
-        return context
-    end
-    context = {
+local function _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587(boss, _____6E05_7406)
+    return {
         ["Boss单位"] = boss,
         ["阶段"] = ____exports["取莫尔特斯当前阶段"](boss),
         ["已初始化"] = false,
-        ["清理"] = _____521B_5EFA_673A_5236_6E05_7406_7BEE_5B50("莫尔特斯"),
+        ["清理"] = _____6E05_7406,
         ["玩家腐败值表"] = {},
         ["玩家腐败值单位表"] = {},
         ["根系觉醒已触发"] = false,
@@ -77,31 +55,19 @@ ____exports["获取或创建莫尔特斯上下文"] = function(boss)
         ["下次腐败传输档位"] = 95,
         ["腐败护盾值"] = 0
     }
-    _____8BBE_7F6E_5355_4F4D_6280_80FD_58F3_666E_901A_63D0_793A(boss, _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"])
-    _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_8868[id] = context
-    return context
+end
+local _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFABoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "莫尔特斯", ["主动技能提示"] = _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587})
+____exports["获取莫尔特斯上下文"] = function(boss)
+    return _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
+end
+____exports["获取或创建莫尔特斯上下文"] = function(boss)
+    return _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取或创建"](boss)
 end
 ____exports["获取全部莫尔特斯上下文"] = function()
-    local result = {}
-    for key in pairs(_____83AB_5C14_7279_65AF_4E0A_4E0B_6587_8868) do
-        local context = _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_8868[key]
-        if context ~= nil then
-            result[#result + 1] = context
-        end
-    end
-    return result
+    return _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取全部"]()
 end
 ____exports["清理莫尔特斯上下文"] = function(boss)
-    local id = _____53D6_5355_4F4DID(boss)
-    if id == 0 then
-        return
-    end
-    local context = _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_8868[id]
-    if context ~= nil then
-        local ____self_4 = context["清理"]
-        ____self_4["清理全部"](____self_4)
-    end
-    __TS__Delete(_____83AB_5C14_7279_65AF_4E0A_4E0B_6587_8868, id)
+    _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["清理上下文"](boss)
 end
 ____exports["刷新莫尔特斯阶段"] = function(context)
     context["阶段"] = ____exports["取莫尔特斯当前阶段"](context["Boss单位"])
@@ -173,14 +139,14 @@ ____exports["取腐败值最高玩家"] = function(context)
             local value = context["玩家腐败值表"][key] or 0
             local unit = context["玩家腐败值单位表"][key]
             if not _____5355_4F4D_6709_6548(unit) then
-                goto __continue30
+                goto __continue24
             end
             if value > bestValue then
                 bestValue = value
                 best = unit
             end
         end
-        ::__continue30::
+        ::__continue24::
     end
     return best
 end

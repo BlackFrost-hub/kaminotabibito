@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports["米亚奖励池ID"] = "chapter2.hidden.mia"
-____exports["污染之猫米亚战利品配置"] = {["奖励池ID"] = ____exports["米亚奖励池ID"], ["标题"] = "污染之猫米亚的战利品", ["可选数量"] = 1, ["选项"] = {
+____exports["污染之猫米亚战利品配置"] = {["奖励池ID"] = ____exports["米亚奖励池ID"], ["标题"] = "污染之猫米亚的战利品", ["可选数量"] = 2, ["选项"] = {
     {
         ["装备名"] = "腐化猫爪手套",
         ["排序"] = 1,

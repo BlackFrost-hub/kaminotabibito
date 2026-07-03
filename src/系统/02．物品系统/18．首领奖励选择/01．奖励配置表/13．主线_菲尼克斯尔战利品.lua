@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports["菲尼克斯尔奖励池ID"] = "chapter3.main.phoenixel"
-____exports["主线_菲尼克斯尔战利品配置"] = {["奖励池ID"] = ____exports["菲尼克斯尔奖励池ID"], ["标题"] = "双重凤凰·菲尼克斯尔的战利品", ["可选数量"] = 1, ["选项"] = {
+____exports["主线_菲尼克斯尔战利品配置"] = {["奖励池ID"] = ____exports["菲尼克斯尔奖励池ID"], ["标题"] = "双重凤凰·菲尼克斯尔的战利品", ["可选数量"] = 2, ["选项"] = {
     {
         ["装备名"] = "炽凰尾羽",
         ["排序"] = 1,

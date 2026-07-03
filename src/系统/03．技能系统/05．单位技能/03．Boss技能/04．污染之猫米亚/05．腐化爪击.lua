@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D6_5355_4F4D_653B_51FB_529B, _____64AD_653E_722A_51FB_8868_73B0, _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A, ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548, getServerTime, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, jass, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, UnitDamageTarget, ConvertUnitState, Atan2, AddSpecialEffect, GetUnitStateJapi, EXSetEffectSize, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____8150_5316_722A_51FB_6280_80FDID
+local _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D6_5355_4F4D_653B_51FB_529B, _____64AD_653E_722A_51FB_8868_73B0, _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A, ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548, getServerTime, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, jass, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, UnitDamageTarget, ConvertUnitState, Atan2, AddSpecialEffect, GetUnitStateJapi, EXSetEffectSize, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____8150_5316_722A_51FB_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_7C73_4E9A_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建米亚上下文"]
 local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.04．腐化感染")
@@ -15,12 +15,11 @@ local ____08_FF0E_6C61_67D3_6807_8BB0 = require("系统.03．技能系统.05．�
 local _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387 = ____08_FF0E_6C61_67D3_6807_8BB0["取米亚污染标记伤害倍率"]
 local ____12_FF0E_5E73_53F0_8D85_8F7D_60E9_7F5A = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.12．平台超载惩罚")
 local _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387 = ____12_FF0E_5E73_53F0_8D85_8F7D_60E9_7F5A["取米亚平台超载伤害倍率"]
-function stringToFourCC(s)
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
-function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0
-end
+local ____19_FF0EBoss_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．Boss公共工具")
+local stringToFourCC = ____19_FF0EBoss_516C_5171_5DE5_5177.stringToFourCC
+local _____5355_4F4D_6709_6548 = ____19_FF0EBoss_516C_5171_5DE5_5177["单位有效"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function _____8BA9_5355_4F4D_9762_5411_76EE_6807(caster, target)
     if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
         return
@@ -128,7 +127,6 @@ function ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548(castingUnit, spellAbilit
 end
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 getServerTime = ____require_result_0.getServerTime
-local _____6280_80FD_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 YDWETimerDestroyEffectSafe = ____require_result_1.YDWETimerDestroyEffectSafe
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
@@ -156,6 +154,14 @@ ____exports["注册米亚腐化爪击"] = function()
         return
     end
     _____7C73_4E9A_8150_5316_722A_51FB_5DF2_6CE8_518C = true
-    _____6280_80FD_4E8B_4EF6_4E2D_5FC3.registerSpellEffectListener(____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "米亚-腐化爪击",
+        ["Boss单位类型ID"] = _____7C73_4E9A_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____8150_5316_722A_51FB_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_7C73_4E9A_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548(boss, _____8150_5316_722A_51FB_6280_80FDID)
+        end
+    })
 end
 return ____exports

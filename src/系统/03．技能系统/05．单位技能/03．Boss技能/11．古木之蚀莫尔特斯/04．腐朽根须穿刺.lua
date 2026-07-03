@@ -14,6 +14,8 @@ local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -31,16 +33,14 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_3["创建可攻击机制单位"]
-local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
+local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____8150_673D_6839_987B_7A7F_523A_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -145,8 +145,8 @@ local function _____91CA_653E_83AB_5C14_7279_65AF_8150_673D_6839_987B_7A7F_523A(
                 ["持续时间"] = cfg["预警秒"]
             })
             local id = addDelayedCallback(cfg["预警秒"] * 1000, _____83AB_5C14_7279_65AF_6839_987B_7A7F_523A_5EF6_8FDF_7ED3_7B97, {context = context, cell = cell})
-            local ____self_5 = context["清理"]
-            ____self_5["登记延迟回调"](____self_5, "莫尔特斯-腐朽根须穿刺", id)
+            local ____self_4 = context["清理"]
+            ____self_4["登记延迟回调"](____self_4, "莫尔特斯-腐朽根须穿刺", id)
             i = i + 1
         end
     end
@@ -169,6 +169,14 @@ ____exports["注册莫尔特斯腐朽根须穿刺"] = function()
         return
     end
     _____5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_83AB_5C14_7279_65AF_8150_673D_6839_987B_7A7F_523A_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "04．腐朽根须穿刺",
+        ["Boss单位类型ID"] = _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____8150_673D_6839_987B_7A7F_523A_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_83AB_5C14_7279_65AF_8150_673D_6839_987B_7A7F_523A_65BD_6CD5(boss, _____8150_673D_6839_987B_7A7F_523A_6280_80FDID)
+        end
+    })
 end
 return ____exports

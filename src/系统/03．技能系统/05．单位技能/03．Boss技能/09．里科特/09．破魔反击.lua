@@ -13,6 +13,8 @@ local ____13_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____13_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____13_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____8DDD_79BB_5E73_65B9XY = ____13_FF0E_516C_5171_5DE5_5177["距离平方XY"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -20,23 +22,21 @@ local GetUnitY = jass.GetUnitY
 local GetRandomReal = jass.GetRandomReal
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_1.registerDamageModifier
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除")
-local _____6309_6BD4_4F8B_79FB_9664_5F53_524D_751F_547D = ____require_result_4["按比例移除当前生命"]
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_5.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_5["移除单位指定Buff"]
-local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.07．里科特")
-local _____91CC_79D1_7279BuffID = ____require_result_6["里科特BuffID"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具")
-local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
+local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_0.registerDamageModifier
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除")
+local _____6309_6BD4_4F8B_79FB_9664_5F53_524D_751F_547D = ____require_result_3["按比例移除当前生命"]
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_4.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_4["移除单位指定Buff"]
+local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.07．里科特")
+local _____91CC_79D1_7279BuffID = ____require_result_5["里科特BuffID"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具")
+local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
 local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____7834_9B54_53CD_51FB_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["破魔反击"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -99,8 +99,8 @@ local function _____5F00_59CB_7834_9B54_53CD_51FB_7A97_53E3(context)
             _____7ED3_675F_7834_9B54_53CD_51FB_7A97_53E3(context)
         end
     )
-    local ____self_8 = context["清理"]
-    ____self_8["登记延迟回调"](____self_8, "里科特-破魔反击窗口", id)
+    local ____self_7 = context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "里科特-破魔反击窗口", id)
 end
 local function _____91CA_653E_91CC_79D1_7279_7834_9B54_53CD_51FB(context)
     local boss = context["Boss单位"]
@@ -124,8 +124,8 @@ local function _____91CA_653E_91CC_79D1_7279_7834_9B54_53CD_51FB(context)
             _____5F00_59CB_7834_9B54_53CD_51FB_7A97_53E3(context)
         end
     )
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "里科特-破魔反击预备", id)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "里科特-破魔反击预备", id)
 end
 local function ____on_91CC_79D1_7279_7834_9B54_53CD_51FB_4F24_5BB3_4FEE_6B63(damageContext)
     local context = _____53D6_53CD_51FB_4E0A_4E0B_6587(damageContext.target)
@@ -170,7 +170,15 @@ ____exports["注册里科特破魔反击"] = function()
         return
     end
     _____5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_91CC_79D1_7279_7834_9B54_53CD_51FB_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "09．破魔反击",
+        ["Boss单位类型ID"] = _____91CC_79D1_7279_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____7834_9B54_53CD_51FB_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_91CC_79D1_7279_7834_9B54_53CD_51FB_65BD_6CD5(boss, _____7834_9B54_53CD_51FB_6280_80FDID)
+        end
+    })
     registerDamageModifier(____on_91CC_79D1_7279_7834_9B54_53CD_51FB_4F24_5BB3_4FEE_6B63, 85)
 end
 return ____exports

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____53D6_76EE_6807_5355_4F4D, _____53D6_65B9_5411_89D2, _____662F_5DF4_5C14_624E_7F57_65AF_62A4_536B, _____6536_96C6_5486_54EE_6CE2_5019_9009_5355_4F4D, _____9650_5236_751F_547D_503C, _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5486_54EE_6CE2_4F24_5BB3, _____8BB0_5F55_5486_54EE_6CE2_73A9_5BB6_547D_4E2D, _____64AD_653E_6076_9B54_5486_54EE_6CE2_84C4_529B_7279_6548, _____64AD_653E_6076_9B54_5486_54EE_6CE2_51B2_51FB_7279_6548, _____521B_5EFA_5486_54EE_6CE2_9884_8B66, _____6267_884C_5486_54EE_6CE2_547D_4E2D, _____521B_5EFA_5486_54EE_6CE2_5224_5B9A, ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_7EBF_6BB5_5371_9669_533A, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, getServerTime, YDWETimerDestroyEffectSafe, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, _____65BD_52A0_5FEB_901F_63A7_5236Buff, CosBJ, SinBJ, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, IsUnitType, UnitDamageTarget, AddSpecialEffect, Atan2, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, EXSetEffectZ, EXSetEffectSize, BJ_RADTODEG, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____6076_9B54_5486_54EE_6CE2_6280_80FDID, _____5FEB_901F_63A7_5236__51FB_6655
+local _____5355_4F4D_6709_6548, _____53D6_76EE_6807_5355_4F4D, _____53D6_65B9_5411_89D2, _____662F_5DF4_5C14_624E_7F57_65AF_62A4_536B, _____6536_96C6_5486_54EE_6CE2_5019_9009_5355_4F4D, _____9650_5236_751F_547D_503C, _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5486_54EE_6CE2_4F24_5BB3, _____8BB0_5F55_5486_54EE_6CE2_73A9_5BB6_547D_4E2D, _____64AD_653E_6076_9B54_5486_54EE_6CE2_84C4_529B_7279_6548, _____64AD_653E_6076_9B54_5486_54EE_6CE2_51B2_51FB_7279_6548, _____521B_5EFA_5486_54EE_6CE2_9884_8B66, _____6267_884C_5486_54EE_6CE2_547D_4E2D, _____521B_5EFA_5486_54EE_6CE2_5224_5B9A, ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_7EBF_6BB5_5371_9669_533A, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, getServerTime, YDWETimerDestroyEffectSafe, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, _____65BD_52A0_5FEB_901F_63A7_5236Buff, CosBJ, SinBJ, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, IsUnitType, UnitDamageTarget, AddSpecialEffect, Atan2, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, EXSetEffectZ, EXSetEffectSize, BJ_RADTODEG, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____6076_9B54_5486_54EE_6CE2_6280_80FDID, _____5FEB_901F_63A7_5236__51FB_6655
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -9,9 +9,10 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯技能数值配置"]
 local ____14_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.14．台词播放")
 local _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD = ____14_FF0E_53F0_8BCD_64AD_653E["播放巴尔扎罗斯台词"]
-function stringToFourCC(s)
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____19_FF0EBoss_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．Boss公共工具")
+local stringToFourCC = ____19_FF0EBoss_516C_5171_5DE5_5177.stringToFourCC
 function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
@@ -239,19 +240,17 @@ local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统
 _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807 = ____require_result_4["获取Boss技能最高仇恨目标"]
 _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local ____require_result_5 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_5.registerSpellEffectListener
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-getServerTime = ____require_result_6.getServerTime
-local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDWETimerDestroyEffectSafe = ____require_result_7.YDWETimerDestroyEffectSafe
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_8["设置特效XYZ轴旋转"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_9["施加快速控制Buff"]
-local ____require_result_10 = require("lib.扩展函数.BJ函数.12．数学函数")
-CosBJ = ____require_result_10.CosBJ
-SinBJ = ____require_result_10.SinBJ
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+getServerTime = ____require_result_5.getServerTime
+local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDWETimerDestroyEffectSafe = ____require_result_6.YDWETimerDestroyEffectSafe
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_7["设置特效XYZ轴旋转"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_8["施加快速控制Buff"]
+local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
+CosBJ = ____require_result_9.CosBJ
+SinBJ = ____require_result_9.SinBJ
 local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
@@ -282,6 +281,14 @@ ____exports["注册巴尔扎罗斯恶魔咆哮波"] = function()
         return
     end
     _____6076_9B54_5486_54EE_6CE2_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "巴尔扎罗斯恶魔咆哮波",
+        ["Boss单位类型ID"] = _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____6076_9B54_5486_54EE_6CE2_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548(boss, _____6076_9B54_5486_54EE_6CE2_6280_80FDID)
+        end
+    })
 end
 return ____exports

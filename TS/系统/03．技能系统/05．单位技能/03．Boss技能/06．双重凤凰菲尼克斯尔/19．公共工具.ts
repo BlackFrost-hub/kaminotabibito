@@ -11,6 +11,7 @@ const Player = jass.Player as (id: number) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
@@ -261,7 +262,7 @@ export function 单位在扇形内(this: void, source: any, target: any, radius:
   const ty = GetUnitY(target);
   const d = 两点距离(sx, sy, tx, ty);
   if (d > radius) return false;
-  const facing = jass.GetUnitFacing(source) as number;
+  const facing = GetUnitFacing(source);
   let diff = Atan2(ty - sy, tx - sx) * RAD_TO_DEG - facing;
   while (diff > 180) diff -= 360;
   while (diff < -180) diff += 360;

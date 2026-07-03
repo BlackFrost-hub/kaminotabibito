@@ -6,6 +6,8 @@ local ____14_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD = ____14_FF0E_53F0_8BCD_64AD_653E["播放巴尔扎罗斯台词"]
 local ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.16．灼热层数工具")
 local _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED = ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177["施加巴尔扎罗斯灼热"]
+local ____19_FF0EBoss_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．Boss公共工具")
+local stringToFourCC = ____19_FF0EBoss_516C_5171_5DE5_5177.stringToFourCC
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
@@ -37,12 +39,6 @@ local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local EXSetEffectZ = japi.EXSetEffectZ
 local EXSetEffectSize = japi.EXSetEffectSize
-local function stringToFourCC(s)
-    if s == nil or #s < 4 then
-        return 0
-    end
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
 local function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
@@ -65,7 +61,7 @@ local function _____64AD_653E_5730_6838Tick_7279_6548(x, y)
             do
                 local effect = AddSpecialEffect(paths[i + 1], x, y)
                 if effect == nil or effect == 0 then
-                    goto __continue8
+                    goto __continue6
                 end
                 if type(EXSetEffectZ) == "function" then
                     EXSetEffectZ(effect, config["Tick特效高度"])
@@ -75,7 +71,7 @@ local function _____64AD_653E_5730_6838Tick_7279_6548(x, y)
                 end
                 YDWETimerDestroyEffectSafe(config["Tick特效持续秒"], effect)
             end
-            ::__continue8::
+            ::__continue6::
             i = i + 1
         end
     end

@@ -18,6 +18,8 @@ local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____53D6_5355_4F4DID = ____11_FF0E_516C_5171_5DE5_5177["取单位ID"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function _____767B_8BB0_5F71_9AA8_53EC_5524_7269(unit, context)
     local id = _____53D6_5355_4F4DID(unit)
     if id ~= 0 then
@@ -96,8 +98,8 @@ function _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB(context, group)
     end
     group["已重组"] = true
     local id = addDelayedCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["重组延迟秒"] * 1000, _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4, {context = context})
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "影骨-骸骨重组", id)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "影骨-骸骨重组", id)
 end
 function _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1(unit, _killer, variable)
     _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0(unit)
@@ -111,8 +113,8 @@ function _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1(unit, _killer, variable)
         GetUnitY(unit)
     )
     if variable.group ~= nil and variable.canReform then
-        local ____variable_group_10, _____6B7B_4EA1_6570_11 = variable.group, "死亡数"
-        ____variable_group_10[_____6B7B_4EA1_6570_11] = ____variable_group_10[_____6B7B_4EA1_6570_11] + 1
+        local ____variable_group_9, _____6B7B_4EA1_6570_10 = variable.group, "死亡数"
+        ____variable_group_9[_____6B7B_4EA1_6570_10] = ____variable_group_9[_____6B7B_4EA1_6570_10] + 1
         _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB(context, variable.group)
     end
 end
@@ -171,25 +173,23 @@ local SetPlayerState = jass.SetPlayerState
 local GetUnitState = jass.GetUnitState
 local PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-_____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物")
-_____521B_5EFA_6218_6597_5185_62FE_53D6_7269 = ____require_result_3["创建战斗内拾取物"]
-local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
-local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_5.registerDamageModifier
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_6.registerManualBuff
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.10．影骨莫特斯")
-_____5F71_9AA8_83AB_7279_65AFBuffID = ____require_result_7["影骨莫特斯BuffID"]
-local ____require_result_8 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+_____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_1["创建可攻击机制单位"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物")
+_____521B_5EFA_6218_6597_5185_62FE_53D6_7269 = ____require_result_2["创建战斗内拾取物"]
+local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
+_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
+local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_4.registerDamageModifier
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.10．影骨莫特斯")
+_____5F71_9AA8_83AB_7279_65AFBuffID = ____require_result_6["影骨莫特斯BuffID"]
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____9AB8_9AA8_53EC_5524_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["骸骨召唤"])
 local _____9AB7_9AC5_76D7_8D3CID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["骷髅盗贼单位类型"])
@@ -259,11 +259,11 @@ local function _____5F71_9AA8_9AB8_9AA8_53EC_5524_5206_6BB5(variable)
 end
 local function _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "骸骨召唤")
-    local ____context_12, _____4E0B_4E00_4E2A_53EC_5524_7EC4ID_13 = context, "下一个召唤组ID"
-    local ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_14 = ____context_12[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_13] + 1
-    ____context_12[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_13] = ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_14
+    local ____context_11, _____4E0B_4E00_4E2A_53EC_5524_7EC4ID_12 = context, "下一个召唤组ID"
+    local ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_13 = ____context_11[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_12] + 1
+    ____context_11[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_12] = ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_13
     local group = {
-        ID = ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_14,
+        ID = ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_13,
         ["阶段"] = _____5237_65B0_5F71_9AA8_83AB_7279_65AF_9636_6BB5(context),
         ["总数"] = 4,
         ["死亡数"] = 0,
@@ -271,15 +271,15 @@ local function _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
     }
     context["当前召唤组"] = group
     _____53EC_5524_5F71_9AA8_9AB7_9AC5(context, group, 2)
-    local ____self_15 = context["清理"]
-    ____self_15["登记延迟回调"](
-        ____self_15,
+    local ____self_14 = context["清理"]
+    ____self_14["登记延迟回调"](
+        ____self_14,
         "影骨-骸骨召唤2",
         addDelayedCallback(1000, _____5F71_9AA8_9AB8_9AA8_53EC_5524_5206_6BB5, {context = context, group = group, count = 1})
     )
-    local ____self_16 = context["清理"]
-    ____self_16["登记延迟回调"](
-        ____self_16,
+    local ____self_15 = context["清理"]
+    ____self_15["登记延迟回调"](
+        ____self_15,
         "影骨-骸骨召唤3",
         addDelayedCallback(2000, _____5F71_9AA8_9AB8_9AA8_53EC_5524_5206_6BB5, {context = context, group = group, count = 1})
     )
@@ -302,6 +302,14 @@ ____exports["注册影骨莫特斯骸骨召唤"] = function()
     end
     _____5DF2_6CE8_518C_9AB8_9AA8_53EC_5524 = true
     _____786E_4FDD_9AB7_9AC5_5077_7A83_4FEE_6B63()
-    registerSpellEffectListener(____on_5F71_9AA8_9AB8_9AA8_53EC_5524_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "04．骸骨召唤",
+        ["Boss单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____9AB8_9AA8_53EC_5524_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_5F71_9AA8_9AB8_9AA8_53EC_5524_65BD_6CD5(boss, _____9AB8_9AA8_53EC_5524_6280_80FDID)
+        end
+    })
 end
 return ____exports

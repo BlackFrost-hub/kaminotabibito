@@ -6,7 +6,7 @@ import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置"
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 取坐标角度, 极坐标X, 极坐标Y, stringToFourCC } from "./16．公共工具";
-
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -24,9 +24,6 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectXY = japi.EXSetEffectXY as ((effect: any, x: number, y: number) => void) | undefined;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
 
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
-};
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -237,5 +234,13 @@ function on莫尔特斯腐败之种施法(this: void, castingUnit: any, spellAbi
 export function 注册莫尔特斯腐败之种(this: void): void {
   if (已注册) return;
   已注册 = true;
-  registerSpellEffectListener(on莫尔特斯腐败之种施法);
+  注册Boss技能壳监听({
+    名称: "07．腐败之种",
+    Boss单位类型ID: 莫尔特斯单位类型ID,
+    技能ID: 腐败之种技能ID,
+    获取或创建上下文: 获取或创建莫尔特斯上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 莫尔特斯运行时上下文, boss: any): void {
+      on莫尔特斯腐败之种施法(boss, 腐败之种技能ID);
+    },
+  });
 }

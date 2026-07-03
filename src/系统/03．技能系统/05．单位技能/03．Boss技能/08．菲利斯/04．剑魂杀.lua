@@ -19,6 +19,8 @@ local _____53D6_5355_4F4D_95F4_89D2_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取�
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____8DDD_79BB_5E73_65B9XY = ____11_FF0E_516C_5171_5DE5_5177["距离平方XY"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function _____53D6_76EE_6807(boss)
     local spellTarget = GetSpellTargetUnit()
     if _____5355_4F4D_6709_6548(spellTarget) then
@@ -109,12 +111,12 @@ function _____6267_884C_5251_9B42_8DEF_5F84(context, paths)
     callbackID = addPeriodicCallback(
         cfg["Tick间隔毫秒"],
         function()
-            local ____temp_12 = not _____5355_4F4D_6709_6548(boss)
-            if not ____temp_12 then
-                local ____self_11 = context["清理"]
-                ____temp_12 = ____self_11["已清理"](____self_11)
+            local ____temp_11 = not _____5355_4F4D_6709_6548(boss)
+            if not ____temp_11 then
+                local ____self_10 = context["清理"]
+                ____temp_11 = ____self_10["已清理"](____self_10)
             end
-            if ____temp_12 then
+            if ____temp_11 then
                 removePeriodicCallback(callbackID)
                 return
             end
@@ -200,8 +202,8 @@ function _____6267_884C_5251_9B42_8DEF_5F84(context, paths)
             end
         end
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记周期回调"](____self_13, "菲利斯-剑魂杀飞行", callbackID)
+    local ____self_12 = context["清理"]
+    ____self_12["登记周期回调"](____self_12, "菲利斯-剑魂杀飞行", callbackID)
 end
 ____exports["释放菲利斯剑魂杀"] = function(context)
     local boss = context["Boss单位"]
@@ -278,19 +280,17 @@ _____521B_5EFA_56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D = ____require_r
 local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex = ____require_result_4["获取Boss技能最近敌对英雄Ex"]
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local ____require_result_5 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_5.registerSpellEffectListener
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_6.addPeriodicCallback
-removePeriodicCallback = ____require_result_6.removePeriodicCallback
-local ____require_result_7 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_7.registerAppliedFinalDamageListener
-local ____require_result_8 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_8.registerManualBuff
-local ____require_result_9 = require("系统.05．Buff系统.03．Buff表.01．Boss.06．菲利斯")
-_____83F2_5229_65AFBuffID = ____require_result_9["菲利斯BuffID"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_5.addPeriodicCallback
+removePeriodicCallback = ____require_result_5.removePeriodicCallback
+local ____require_result_6 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_6.registerAppliedFinalDamageListener
+local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_7.registerManualBuff
+local ____require_result_8 = require("系统.05．Buff系统.03．Buff表.01．Boss.06．菲利斯")
+_____83F2_5229_65AFBuffID = ____require_result_8["菲利斯BuffID"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
 _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____5251_9B42_6740_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑魂杀"]["技能槽位"])
 local _____5251_9B42_6740_5DF2_6CE8_518C = false
@@ -355,6 +355,14 @@ ____exports["注册菲利斯剑魂杀"] = function()
         return
     end
     _____5251_9B42_6740_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_83F2_5229_65AF_5251_9B42_6740_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "04．剑魂杀",
+        ["Boss单位类型ID"] = _____83F2_5229_65AF_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____5251_9B42_6740_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_83F2_5229_65AF_5251_9B42_6740_751F_6548(boss, _____5251_9B42_6740_6280_80FDID)
+        end
+    })
 end
 return ____exports

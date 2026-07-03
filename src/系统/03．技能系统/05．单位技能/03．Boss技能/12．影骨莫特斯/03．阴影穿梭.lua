@@ -19,6 +19,8 @@ local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____76EE_6807_6B63_9762_671D_5411_6765_6E90 = ____11_FF0E_516C_5171_5DE5_5177["目标正面朝向来源"]
 local _____53D6_5355_4F4DID = ____11_FF0E_516C_5171_5DE5_5177["取单位ID"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -32,14 +34,12 @@ local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitX = jass.SetUnitX
 local SetUnitY = jass.SetUnitY
 local IssueTargetOrder = jass.IssueTargetOrder
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
-local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_3.registerDamageModifier
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_1["获取Boss技能随机敌对英雄"]
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_2.registerDamageModifier
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____9634_5F71_7A7F_68AD_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["阴影穿梭"])
 local _____5DF2_6CE8_518C_9634_5F71_7A7F_68AD = false
@@ -155,9 +155,9 @@ local function _____91CA_653E_5F71_9AA8_9634_5F71_7A7F_68AD(context)
         return
     end
     _____5F85_7A7F_68AD_4E0A_4E0B_6587[id] = context
-    local ____self_4 = context["清理"]
-    ____self_4["登记延迟回调"](
-        ____self_4,
+    local ____self_3 = context["清理"]
+    ____self_3["登记延迟回调"](
+        ____self_3,
         "影骨-阴影穿梭",
         addDelayedCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]["消失秒"] * 1000, _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210)
     )
@@ -181,6 +181,14 @@ ____exports["注册影骨莫特斯阴影穿梭"] = function()
     end
     _____5DF2_6CE8_518C_9634_5F71_7A7F_68AD = true
     _____786E_4FDD_5F71_9AA8_80CC_523A_4FEE_6B63()
-    registerSpellEffectListener(____on_5F71_9AA8_9634_5F71_7A7F_68AD_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "03．阴影穿梭",
+        ["Boss单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____9634_5F71_7A7F_68AD_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_5F71_9AA8_9634_5F71_7A7F_68AD_65BD_6CD5(boss, _____9634_5F71_7A7F_68AD_6280_80FDID)
+        end
+    })
 end
 return ____exports

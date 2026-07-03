@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
 
 const jass = require("jass.common") as any;
 const { onItemPickup } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
@@ -22,10 +23,6 @@ const RemoveItem = jass.RemoveItem as (item: any) => void;
 
 const 月光碎片物品类型ID = stringToFourCC(瑟兰迪尔数值与表现配置.月光碎片.物品ID);
 let 月光碎片已注册 = false;
-
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
-}
 
 function 是月光碎片物品(this: void, item: any): boolean {
   return item != null && item !== 0 && GetItemTypeId(item) === 月光碎片物品类型ID;

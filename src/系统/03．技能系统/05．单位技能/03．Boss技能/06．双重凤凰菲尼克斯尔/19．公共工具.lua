@@ -29,6 +29,7 @@ local Player = jass.Player
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitFacing = jass.GetUnitFacing
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local SetUnitFacing = jass.SetUnitFacing
@@ -305,7 +306,7 @@ ____exports["单位在扇形内"] = function(source, target, radius, angleDeg)
     if d > radius then
         return false
     end
-    local facing = jass.GetUnitFacing(source)
+    local facing = GetUnitFacing(source)
     local diff = Atan2(ty - sy, tx - sx) * RAD_TO_DEG - facing
     while diff > 180 do
         diff = diff - 360

@@ -7,7 +7,8 @@ import { 刷新瑟兰迪尔秩序领域, 清理瑟兰迪尔秩序领域 } from "
 import { 尝试触发瑟兰迪尔审判之环 } from "./08．审判之环";
 import { 尝试触发瑟兰迪尔月光灌注, 清理瑟兰迪尔月光灌注 } from "./11．月光灌注";
 import { 尝试触发瑟兰迪尔终末审判 } from "./12．终末审判";
-import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
+import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import { 创建Boss运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．Boss运行时上下文工厂";
 export { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 
@@ -17,7 +18,6 @@ const { getServerTime, addPeriodicCallback } = require("系统.00．核心系统
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
 };
 
-const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
@@ -30,6 +30,7 @@ export interface 瑟兰迪尔运行时上下文 {
   Boss单位: any;
   阶段: 瑟兰迪尔阶段;
   开战时间Ms: number;
+  清理: 机制清理篮子;
   上次执法印记Ms: number;
   上次审判之环Ms: number;
   审判之环进行中: boolean;
@@ -37,46 +38,44 @@ export interface 瑟兰迪尔运行时上下文 {
   已触发月光灌注: boolean;
 }
 
-const 瑟兰迪尔上下文表: Record<number, 瑟兰迪尔运行时上下文 | undefined> = {};
 let 瑟兰迪尔运行时已注册 = false;
 
-function 取单位ID(unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
-export function 获取瑟兰迪尔上下文(this: void, boss: any): 瑟兰迪尔运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  return 瑟兰迪尔上下文表[id];
-}
-
-export function 获取或创建瑟兰迪尔上下文(this: void, boss: any): 瑟兰迪尔运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  let context = 瑟兰迪尔上下文表[id];
-  if (context != null) return context;
-  context = {
+function 创建瑟兰迪尔上下文(this: void, boss: any, 清理: 机制清理篮子): 瑟兰迪尔运行时上下文 {
+  return {
     Boss单位: boss,
     阶段: 1,
     开战时间Ms: getServerTime(),
+    清理,
     上次执法印记Ms: 0,
     上次审判之环Ms: 0,
     审判之环进行中: false,
     上次终末审判Ms: 0,
     已触发月光灌注: false,
   };
-  瑟兰迪尔上下文表[id] = context;
-  设置单位技能壳普通提示(boss, 瑟兰迪尔单位技能配置.主动技能提示);
-  return context;
+}
+
+function 清理瑟兰迪尔上下文机制(this: void, context: 瑟兰迪尔运行时上下文): void {
+  清理瑟兰迪尔秩序领域(context.Boss单位);
+  清理瑟兰迪尔月光灌注();
+}
+
+const 瑟兰迪尔上下文工厂 = 创建Boss运行时上下文工厂<瑟兰迪尔运行时上下文>({
+  名称: "瑟兰迪尔",
+  主动技能提示: 瑟兰迪尔单位技能配置.主动技能提示,
+  创建上下文: 创建瑟兰迪尔上下文,
+  on清理: 清理瑟兰迪尔上下文机制,
+});
+
+export function 获取瑟兰迪尔上下文(this: void, boss: any): 瑟兰迪尔运行时上下文 | undefined {
+  return 瑟兰迪尔上下文工厂.获取(boss);
+}
+
+export function 获取或创建瑟兰迪尔上下文(this: void, boss: any): 瑟兰迪尔运行时上下文 | undefined {
+  return 瑟兰迪尔上下文工厂.获取或创建(boss);
 }
 
 export function 清理瑟兰迪尔上下文(this: void, boss: any): void {
-  const id = 取单位ID(boss);
-  if (id === 0) return;
-  清理瑟兰迪尔秩序领域(boss);
-  清理瑟兰迪尔月光灌注();
-  delete 瑟兰迪尔上下文表[id];
+  瑟兰迪尔上下文工厂.清理上下文(boss);
 }
 
 function 单位有效(this: void, unit: any): boolean {
@@ -99,13 +98,12 @@ function 刷新瑟兰迪尔阶段(this: void, context: 瑟兰迪尔运行时上�
 }
 
 function 推进瑟兰迪尔运行时(this: void): void {
-  for (const id in 瑟兰迪尔上下文表) {
-    const context = 瑟兰迪尔上下文表[id as any];
+  const contexts = 瑟兰迪尔上下文工厂.获取全部();
+  for (let i = 0; i < contexts.length; i++) {
+    const context = contexts[i];
     if (context == null) continue;
     if (!单位有效(context.Boss单位)) {
-      清理瑟兰迪尔秩序领域(context.Boss单位);
-      清理瑟兰迪尔月光灌注();
-      delete 瑟兰迪尔上下文表[id as any];
+      清理瑟兰迪尔上下文(context.Boss单位);
       continue;
     }
     刷新瑟兰迪尔阶段(context);

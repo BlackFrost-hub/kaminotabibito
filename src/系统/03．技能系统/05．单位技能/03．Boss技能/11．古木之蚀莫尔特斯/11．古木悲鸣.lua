@@ -15,17 +15,17 @@ local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____16_FF0E_516C_5171_5DE5_5177["点到线段距离平方"]
 local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local AddSpecialEffect = jass.AddSpecialEffect
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
-local _____65BD_52A0_6050_60E7 = ____require_result_2["施加恐惧"]
+local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
+local _____65BD_52A0_6050_60E7 = ____require_result_1["施加恐惧"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____53E4_6728_60B2_9E23_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["古木悲鸣"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -103,8 +103,8 @@ local function _____786E_4FDD_60B2_9E23_8611_83C7_8868_73B0(context)
                     goto __continue13
                 end
                 local effect = AddSpecialEffect(cfg["巨型蘑菇模型列表"][i + 1], cell["中心X"], cell["中心Y"])
-                local ____self_3 = context["清理"]
-                ____self_3["登记特效"](____self_3, "莫尔特斯-古木悲鸣蘑菇", effect)
+                local ____self_2 = context["清理"]
+                ____self_2["登记特效"](____self_2, "莫尔特斯-古木悲鸣蘑菇", effect)
             end
             ::__continue13::
             i = i + 1
@@ -165,6 +165,14 @@ ____exports["注册莫尔特斯古木悲鸣"] = function()
         return
     end
     _____5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "11．古木悲鸣",
+        ["Boss单位类型ID"] = _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____53E4_6728_60B2_9E23_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23_65BD_6CD5(boss, _____53E4_6728_60B2_9E23_6280_80FDID)
+        end
+    })
 end
 return ____exports

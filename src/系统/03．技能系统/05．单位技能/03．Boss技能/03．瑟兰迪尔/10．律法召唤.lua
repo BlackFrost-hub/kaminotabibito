@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____542F_52A8_5F8B_6CD5_94FE_8DEF, _____6267_884C_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524, ____on_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524_751F_6548, _____521B_5EFA_53EC_5524_7269, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____542F_52A8_72EC_5360_5355_4F4D_8FDE_63A5, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, jass, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitType, UnitDamageTarget, Cos, Sin, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____5F8B_6CD5_53EC_5524_6280_80FDID, bj_DEGTORAD
+local _____5355_4F4D_6709_6548, _____542F_52A8_5F8B_6CD5_94FE_8DEF, _____6267_884C_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524, ____on_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524_751F_6548, _____521B_5EFA_53EC_5524_7269, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____542F_52A8_72EC_5360_5355_4F4D_8FDE_63A5, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, jass, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitType, UnitDamageTarget, Cos, Sin, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____5F8B_6CD5_53EC_5524_6280_80FDID, bj_DEGTORAD
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
@@ -9,9 +9,10 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["瑟兰迪尔单位技能配置"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.15．台词播放")
 local _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放瑟兰迪尔台词"]
-function stringToFourCC(s)
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____19_FF0EBoss_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．Boss公共工具")
+local stringToFourCC = ____19_FF0EBoss_516C_5171_5DE5_5177.stringToFourCC
 function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
@@ -141,8 +142,6 @@ local ____require_result_4 = require("系统.00．核心系统.00．玩家系统
 _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_4["取当前有效玩家人数"]
 local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
-local ____require_result_6 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_6.registerSpellEffectListener
 jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
@@ -163,6 +162,14 @@ ____exports["注册瑟兰迪尔律法召唤"] = function()
         return
     end
     _____5F8B_6CD5_53EC_5524_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "瑟兰迪尔律法召唤",
+        ["Boss单位类型ID"] = _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____5F8B_6CD5_53EC_5524_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524_751F_6548(boss, _____5F8B_6CD5_53EC_5524_6280_80FDID)
+        end
+    })
 end
 return ____exports

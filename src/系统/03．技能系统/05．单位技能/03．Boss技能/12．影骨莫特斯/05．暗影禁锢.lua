@@ -13,6 +13,8 @@ local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function _____5F71_9AA8_6697_5F71_7981_9522_53D6_76EE_6807_5217_8868(variable)
     local data = variable
     if data == nil then
@@ -68,23 +70,21 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomReal = jass.GetRandomReal
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.04．可攻击控制法阵")
-_____521B_5EFA_53EF_653B_51FB_63A7_5236_6CD5_9635 = ____require_result_4["创建可攻击控制法阵"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.18．周期范围效果.06．对外接口")
-_____65BD_52A0_7981_9522 = ____require_result_5["施加禁锢"]
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_6.registerManualBuff
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.10．影骨莫特斯")
-_____5F71_9AA8_83AB_7279_65AFBuffID = ____require_result_7["影骨莫特斯BuffID"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_1["获取Boss技能随机敌对英雄"]
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.04．可攻击控制法阵")
+_____521B_5EFA_53EF_653B_51FB_63A7_5236_6CD5_9635 = ____require_result_3["创建可攻击控制法阵"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.18．周期范围效果.06．对外接口")
+_____65BD_52A0_7981_9522 = ____require_result_4["施加禁锢"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.10．影骨莫特斯")
+_____5F71_9AA8_83AB_7279_65AFBuffID = ____require_result_6["影骨莫特斯BuffID"]
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6697_5F71_7981_9522_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["暗影禁锢"])
 local _____5DF2_6CE8_518C_6697_5F71_7981_9522 = false
@@ -112,8 +112,8 @@ ____exports["释放影骨暗影禁锢"] = function(context, target)
         ["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["暗影禁锢预警"]
     })
     local id = addDelayedCallback(cfg["预警秒"] * 1000, _____5F71_9AA8_6697_5F71_7981_9522_751F_6548, {context = context, x = x, y = y})
-    local ____self_8 = context["清理"]
-    ____self_8["登记延迟回调"](____self_8, "影骨-暗影禁锢", id)
+    local ____self_7 = context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "影骨-暗影禁锢", id)
 end
 ____exports["尝试触发影骨暗影禁锢"] = function(context, nowMs)
     local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["暗影禁锢"]
@@ -147,13 +147,13 @@ local function ____on_5F71_9AA8_6697_5F71_7981_9522_65BD_6CD5(castingUnit, spell
         return
     end
     local spellTarget = GetSpellTargetUnit()
-    local _____5355_4F4D_6709_6548_result_9
+    local _____5355_4F4D_6709_6548_result_8
     if _____5355_4F4D_6709_6548(spellTarget) then
-        _____5355_4F4D_6709_6548_result_9 = spellTarget
+        _____5355_4F4D_6709_6548_result_8 = spellTarget
     else
-        _____5355_4F4D_6709_6548_result_9 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(castingUnit)
+        _____5355_4F4D_6709_6548_result_8 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(castingUnit)
     end
-    local target = _____5355_4F4D_6709_6548_result_9
+    local target = _____5355_4F4D_6709_6548_result_8
     ____exports["释放影骨暗影禁锢"](context, target)
 end
 ____exports["注册影骨莫特斯暗影禁锢"] = function()
@@ -161,6 +161,14 @@ ____exports["注册影骨莫特斯暗影禁锢"] = function()
         return
     end
     _____5DF2_6CE8_518C_6697_5F71_7981_9522 = true
-    registerSpellEffectListener(____on_5F71_9AA8_6697_5F71_7981_9522_65BD_6CD5)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "05．暗影禁锢",
+        ["Boss单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____6697_5F71_7981_9522_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_5F71_9AA8_6697_5F71_7981_9522_65BD_6CD5(boss, _____6697_5F71_7981_9522_6280_80FDID)
+        end
+    })
 end
 return ____exports

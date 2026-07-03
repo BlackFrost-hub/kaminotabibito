@@ -7,7 +7,7 @@ export const 菲利斯奖励池ID = "chapter2.main.phyllis";
 export const 主线_菲利斯战利品配置: 首领奖励池配置 = {
   奖励池ID: 菲利斯奖励池ID,
   标题: "菲利斯的战利品",
-  可选数量: 1,
+  可选数量: 2,
   选项: [
     {
       装备名: "菲利斯的统御纹章",

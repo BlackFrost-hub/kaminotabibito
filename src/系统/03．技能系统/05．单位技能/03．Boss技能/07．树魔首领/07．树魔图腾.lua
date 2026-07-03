@@ -9,6 +9,8 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["树魔首领数值与表现配置"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.08．台词播放")
 local _____64AD_653E_6811_9B54_9996_9886_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放树魔首领台词"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
@@ -32,8 +34,8 @@ function _____53D6_56FE_817E_4E2D_5FC3(boss)
 end
 function _____9009_62E9_56FE_817E_5206_652F(context)
     local candidates = {}
-    local ____self_12 = context["随从组"]
-    local list = ____self_12["取单位列表"](____self_12)
+    local ____self_11 = context["随从组"]
+    local list = ____self_11["取单位列表"](____self_11)
     do
         local i = 0
         while i < #list do
@@ -188,8 +190,8 @@ function _____521B_5EFA_9759_6B62_9677_9631(context)
             end
         end
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记周期回调"](____self_13, "树魔首领-静止陷阱Tick", tickID)
+    local ____self_12 = context["清理"]
+    ____self_12["登记周期回调"](____self_12, "树魔首领-静止陷阱Tick", tickID)
 end
 function _____521B_5EFA_751F_547D_9677_9631(context)
     local boss = context["Boss单位"]
@@ -253,8 +255,8 @@ function _____521B_5EFA_751F_547D_9677_9631(context)
             end
         end
     )
-    local ____self_14 = context["清理"]
-    ____self_14["登记周期回调"](____self_14, "树魔首领-生命陷阱Tick", tickID)
+    local ____self_13 = context["清理"]
+    ____self_13["登记周期回调"](____self_13, "树魔首领-生命陷阱Tick", tickID)
 end
 function _____7206_70B8_9677_9631_9020_6210_4F24_5BB3(boss, x, y)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["树魔图腾"]
@@ -311,8 +313,8 @@ function _____8C03_5EA6_7206_70B8_9677_9631_7206_70B8(context, x, y)
             _____7206_70B8_9677_9631_9020_6210_4F24_5BB3(boss, x, y)
         end
     )
-    local ____self_15 = context["清理"]
-    ____self_15["登记延迟回调"](____self_15, "树魔首领-爆炸陷阱爆炸", delayedID)
+    local ____self_14 = context["清理"]
+    ____self_14["登记延迟回调"](____self_14, "树魔首领-爆炸陷阱爆炸", delayedID)
 end
 function _____521B_5EFA_7206_70B8_9677_9631(context)
     local boss = context["Boss单位"]
@@ -349,8 +351,8 @@ function _____521B_5EFA_7206_70B8_9677_9631(context)
             end
         end
     )
-    local ____self_16 = context["清理"]
-    ____self_16["登记延迟回调"](____self_16, "树魔首领-爆炸陷阱自然结束", naturalEndID)
+    local ____self_15 = context["清理"]
+    ____self_15["登记延迟回调"](____self_15, "树魔首领-爆炸陷阱自然结束", naturalEndID)
     local interval = math.max(
         1.2,
         cfg["爆炸陷阱传送基础间隔秒"] - cfg["爆炸陷阱传送每难度减少秒"] * _____53D6_96BE_5EA6()
@@ -378,8 +380,8 @@ function _____521B_5EFA_7206_70B8_9677_9631(context)
             })
         end
     )
-    local ____self_17 = context["清理"]
-    ____self_17["登记周期回调"](____self_17, "树魔首领-爆炸陷阱传送", teleportID)
+    local ____self_16 = context["清理"]
+    ____self_16["登记周期回调"](____self_16, "树魔首领-爆炸陷阱传送", teleportID)
 end
 function _____521B_5EFA_6811_9B54_56FE_817E_5206_652F(context)
     local branch = _____9009_62E9_56FE_817E_5206_652F(context)
@@ -462,27 +464,25 @@ _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建
 local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
 _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex = ____require_result_3["获取Boss技能最近敌对英雄Ex"]
-local ____require_result_4 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_4.registerSpellEffectListener
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_5.addDelayedCallback
-addPeriodicCallback = ____require_result_5.addPeriodicCallback
-removePeriodicCallback = ____require_result_5.removePeriodicCallback
-getGameDifficulty = ____require_result_5.getGameDifficulty
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_6.registerManualBuff
-local getBuffRuntime = ____require_result_6.getBuffRuntime
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.05．树魔首领")
-_____6811_9B54_9996_9886BuffID = ____require_result_7["树魔首领BuffID"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_8["施加快速控制Buff"]
-local ____require_result_9 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local registerHealCallback = ____require_result_9.registerHealCallback
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedEffect = ____require_result_10.createTimedEffect
-local ____require_result_11 = require("lib.扩展函数.BJ函数.12．数学函数")
-CosBJ = ____require_result_11.CosBJ
-SinBJ = ____require_result_11.SinBJ
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_4.addDelayedCallback
+addPeriodicCallback = ____require_result_4.addPeriodicCallback
+removePeriodicCallback = ____require_result_4.removePeriodicCallback
+getGameDifficulty = ____require_result_4.getGameDifficulty
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_5.registerManualBuff
+local getBuffRuntime = ____require_result_5.getBuffRuntime
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.05．树魔首领")
+_____6811_9B54_9996_9886BuffID = ____require_result_6["树魔首领BuffID"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_7["施加快速控制Buff"]
+local ____require_result_8 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local registerHealCallback = ____require_result_8.registerHealCallback
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedEffect = ____require_result_9.createTimedEffect
+local ____require_result_10 = require("lib.扩展函数.BJ函数.12．数学函数")
+CosBJ = ____require_result_10.CosBJ
+SinBJ = ____require_result_10.SinBJ
 _____5FEB_901F_63A7_5236__51FB_6655 = 0
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____6811_9B54_56FE_817E_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["树魔图腾"]["技能槽位"])
@@ -508,6 +508,14 @@ ____exports["注册树魔首领树魔图腾"] = function()
         return
     end
     _____6811_9B54_56FE_817E_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_6811_9B54_9996_9886_6811_9B54_56FE_817E_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "树魔首领-树魔图腾",
+        ["Boss单位类型ID"] = _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____6811_9B54_56FE_817E_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_6811_9B54_9996_9886_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_6811_9B54_9996_9886_6811_9B54_56FE_817E_751F_6548(boss, _____6811_9B54_56FE_817E_6280_80FDID)
+        end
+    })
 end
 return ____exports

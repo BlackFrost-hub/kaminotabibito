@@ -1,12 +1,12 @@
 /** @noSelfInFile */
 
-import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
-import { 创建机制清理篮子, type 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import { 创建Boss运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．Boss运行时上下文工厂";
+import type { 动态装饰物安全区组 } from "../../../00．技能模板+函数/04．机制组件/02．战斗区域/06．动态装饰物安全区组";
 import { 卡瑟拉单位技能配置 } from "./00．配置";
 import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 
 const jass = require("jass.common") as any;
-const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -45,6 +45,7 @@ export interface 卡瑟拉运行时上下文 {
   玩家触手残片单位表: Record<number, any>;
   场上触手残片列表: 卡瑟拉地面触手残片[];
   绝缘珊瑚列表: 卡瑟拉绝缘珊瑚点[];
+  绝缘珊瑚安全区组?: 动态装饰物安全区组;
   触手解放已触发: boolean;
   Boss潜入中: boolean;
   上次触手再生档位: number;
@@ -55,28 +56,12 @@ export interface 卡瑟拉运行时上下文 {
   触手精华层数: number;
 }
 
-const 卡瑟拉上下文表: Record<number, 卡瑟拉运行时上下文 | undefined> = {};
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
-export function 获取卡瑟拉上下文(this: void, boss: any): 卡瑟拉运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  return id === 0 ? undefined : 卡瑟拉上下文表[id];
-}
-
-export function 获取或创建卡瑟拉上下文(this: void, boss: any): 卡瑟拉运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  let context = 卡瑟拉上下文表[id];
-  if (context != null) return context;
-  context = {
+function 创建卡瑟拉上下文(this: void, boss: any, 清理: 机制清理篮子): 卡瑟拉运行时上下文 {
+  return {
     Boss单位: boss,
     阶段: 取卡瑟拉当前阶段(boss),
     已初始化: false,
-    清理: 创建机制清理篮子("卡瑟拉"),
+    清理,
     触手残片数量: 0,
     玩家触手残片表: {},
     玩家触手残片单位表: {},
@@ -91,26 +76,32 @@ export function 获取或创建卡瑟拉上下文(this: void, boss: any): 卡瑟
     下次残片牵引时间: 0,
     触手精华层数: 0,
   };
-  设置单位技能壳普通提示(boss, 卡瑟拉单位技能配置.主动技能提示);
-  卡瑟拉上下文表[id] = context;
-  return context;
+}
+
+const 卡瑟拉上下文工厂 = 创建Boss运行时上下文工厂<卡瑟拉运行时上下文>({
+  名称: "卡瑟拉",
+  主动技能提示: 卡瑟拉单位技能配置.主动技能提示,
+  创建上下文: 创建卡瑟拉上下文,
+});
+
+function 取单位ID(this: void, unit: any): number {
+  return 卡瑟拉上下文工厂.取单位ID(unit);
+}
+
+export function 获取卡瑟拉上下文(this: void, boss: any): 卡瑟拉运行时上下文 | undefined {
+  return 卡瑟拉上下文工厂.获取(boss);
+}
+
+export function 获取或创建卡瑟拉上下文(this: void, boss: any): 卡瑟拉运行时上下文 | undefined {
+  return 卡瑟拉上下文工厂.获取或创建(boss);
 }
 
 export function 获取全部卡瑟拉上下文(this: void): 卡瑟拉运行时上下文[] {
-  const result: 卡瑟拉运行时上下文[] = [];
-  for (const key in 卡瑟拉上下文表) {
-    const context = 卡瑟拉上下文表[key];
-    if (context != null) result.push(context);
-  }
-  return result;
+  return 卡瑟拉上下文工厂.获取全部();
 }
 
 export function 清理卡瑟拉上下文(this: void, boss: any): void {
-  const id = 取单位ID(boss);
-  if (id === 0) return;
-  const context = 卡瑟拉上下文表[id];
-  if (context != null) context.清理.清理全部();
-  delete 卡瑟拉上下文表[id];
+  卡瑟拉上下文工厂.清理上下文(boss);
 }
 
 export function 取卡瑟拉当前阶段(this: void, boss: any): 卡瑟拉阶段 {

@@ -6,7 +6,7 @@ import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置"
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, stringToFourCC } from "./16．公共工具";
-
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -26,9 +26,6 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
-};
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
@@ -138,5 +135,13 @@ function on莫尔特斯腐朽根须穿刺施法(this: void, castingUnit: any, sp
 export function 注册莫尔特斯腐朽根须穿刺(this: void): void {
   if (已注册) return;
   已注册 = true;
-  registerSpellEffectListener(on莫尔特斯腐朽根须穿刺施法);
+  注册Boss技能壳监听({
+    名称: "04．腐朽根须穿刺",
+    Boss单位类型ID: 莫尔特斯单位类型ID,
+    技能ID: 腐朽根须穿刺技能ID,
+    获取或创建上下文: 获取或创建莫尔特斯上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 莫尔特斯运行时上下文, boss: any): void {
+      on莫尔特斯腐朽根须穿刺施法(boss, 腐朽根须穿刺技能ID);
+    },
+  });
 }

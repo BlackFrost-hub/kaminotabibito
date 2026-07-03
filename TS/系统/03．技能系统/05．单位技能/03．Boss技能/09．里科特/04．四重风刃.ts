@@ -5,7 +5,7 @@ import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科�
 import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度 } from "./13．公共工具";
-
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -42,9 +42,6 @@ const { 设置原生弹幕指定角度飞行 } = require("系统.03．技能系�
 const { 获取Boss技能随机敌对英雄, 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能随机敌对英雄: (this: void, boss: any, centerUnit?: any, radius?: number) => any;
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -172,7 +169,15 @@ export function 释放里科特四重风刃(this: void, context: 里科特运行
 export function 注册里科特四重风刃(this: void): void {
   if (已注册) return;
   已注册 = true;
-  registerSpellEffectListener(on里科特四重风刃生效);
+  注册Boss技能壳监听({
+    名称: "04．四重风刃",
+    Boss单位类型ID: 里科特单位类型ID,
+    技能ID: 四重风刃技能ID,
+    获取或创建上下文: 获取或创建里科特上下文,
+    释放技能: function Boss技能壳监听释放(this: void, _context: 里科特运行时上下文, boss: any): void {
+      on里科特四重风刃生效(boss, 四重风刃技能ID);
+    },
+  });
 }
 
 function on里科特四重风刃生效(this: void, castingUnit: any, spellAbilityId: number): void {

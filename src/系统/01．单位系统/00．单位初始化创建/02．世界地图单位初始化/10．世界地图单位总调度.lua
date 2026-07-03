@@ -20,6 +20,7 @@ local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+local R2I = jass.R2I
 local _____7A7A_72B6_6001 = {
     ["当前阶段"] = "未启动",
     ["是否运行中"] = false,
@@ -175,7 +176,7 @@ local function _____603B_8C03_5EA6_76D1_89C6_56DE_8C03()
 end
 local function _____542F_52A8_603B_8C03_5EA6_76D1_89C6(_____95F4_9694_79D2)
     _____505C_6B62_603B_8C03_5EA6_76D1_89C6()
-    local _____95F4_9694_6BEB_79D2 = _____95F4_9694_79D2 <= 0 and 100 or jass.R2I(_____95F4_9694_79D2 * 1000)
+    local _____95F4_9694_6BEB_79D2 = _____95F4_9694_79D2 <= 0 and 100 or R2I(_____95F4_9694_79D2 * 1000)
     _____76D1_89C6_56DE_8C03ID = addPeriodicCallback(_____95F4_9694_6BEB_79D2, _____603B_8C03_5EA6_76D1_89C6_56DE_8C03)
 end
 ____exports["获取世界地图全部单位创建状态"] = function()

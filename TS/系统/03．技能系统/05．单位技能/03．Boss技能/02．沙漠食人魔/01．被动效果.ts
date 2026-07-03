@@ -28,12 +28,15 @@ const { 沙漠食人魔单位技能配置 } = require("系统.03．技能系统.
   };
 };
 
+const jass = require("jass.common") as any;
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+
 const 沙漠食人魔单位类型ID = 转四位ID(沙漠食人魔单位技能配置.单位ID);
 const 沙漠食人魔触发BuffID = 转四位ID(沙漠食人魔单位技能配置.触发BuffID);
 
 function 目标是已注册玩家英雄(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
-  const owner = jass.GetOwningPlayer(unit);
+  const owner = GetOwningPlayer(unit);
   if (owner == null || owner === 0) return false;
   return getRegisteredPlayerHero(owner) === unit;
 }

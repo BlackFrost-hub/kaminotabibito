@@ -16,6 +16,8 @@ local _____53D6_96BE_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取难度"]
 local _____53D6_5355_4F4D_95F4_89D2_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取单位间角度"]
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function _____9009_62E9_5C01_5370_76EE_6807(boss)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     local result = {}
@@ -153,8 +155,8 @@ ____exports["释放菲利斯全力封印斩"] = function(context)
             end
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记延迟回调"](____self_10, "菲利斯-封印无敌结束", invulID)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "菲利斯-封印无敌结束", invulID)
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
         ["施法者"] = boss,
         ["目标X"] = GetUnitX(boss),
@@ -222,21 +224,19 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
-local ____require_result_3 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_3.registerSpellEffectListener
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_4.addDelayedCallback
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_5.registerManualBuff
-local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.06．菲利斯")
-_____83F2_5229_65AFBuffID = ____require_result_6["菲利斯BuffID"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.14．命令卡技能冷却查询")
-_____547D_4EE4_5361_6280_80FD_662F_5426_5168_90E8_51B7_5374_4E2D = ____require_result_7["命令卡技能是否全部冷却中"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_8["施加快速控制Buff"]
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
-createUnitEffect = ____require_result_9.createUnitEffect
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_3.addDelayedCallback
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_4.registerManualBuff
+local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.06．菲利斯")
+_____83F2_5229_65AFBuffID = ____require_result_5["菲利斯BuffID"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.14．命令卡技能冷却查询")
+_____547D_4EE4_5361_6280_80FD_662F_5426_5168_90E8_51B7_5374_4E2D = ____require_result_6["命令卡技能是否全部冷却中"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_7["施加快速控制Buff"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+createUnitEffect = ____require_result_8.createUnitEffect
 _____5FEB_901F_63A7_5236__51FB_6655 = 0
 _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____5168_529B_5C01_5370_65A9_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["全力封印斩"]["技能槽位"])
@@ -246,6 +246,14 @@ ____exports["注册菲利斯全力封印斩"] = function()
         return
     end
     _____5168_529B_5C01_5370_65A9_5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_83F2_5229_65AF_5168_529B_5C01_5370_65A9_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "06．全力封印斩",
+        ["Boss单位类型ID"] = _____83F2_5229_65AF_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____5168_529B_5C01_5370_65A9_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_83F2_5229_65AF_5168_529B_5C01_5370_65A9_751F_6548(boss, _____5168_529B_5C01_5370_65A9_6280_80FDID)
+        end
+    })
 end
 return ____exports

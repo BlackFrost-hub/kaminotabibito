@@ -4,6 +4,10 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local GetLocationX = jass.GetLocationX
+local GetLocationY = jass.GetLocationY
+local CreateUbersplat = jass.CreateUbersplat
+local ShowUbersplat = jass.ShowUbersplat
 local ____jglobals_bj_lastCreatedUbersplat_0 = jglobals.bj_lastCreatedUbersplat
 if ____jglobals_bj_lastCreatedUbersplat_0 == nil then
     ____jglobals_bj_lastCreatedUbersplat_0 = nil
@@ -13,9 +17,9 @@ function ____exports.CreateUbersplatBJ(file, where, red, green, blue, alpha, for
     if where == nil or where == 0 then
         return nil
     end
-    local x = jass.GetLocationX(where)
-    local y = jass.GetLocationY(where)
-    ____exports.bj_lastCreatedUbersplat = jass.CreateUbersplat(
+    local x = GetLocationX(where)
+    local y = GetLocationY(where)
+    ____exports.bj_lastCreatedUbersplat = CreateUbersplat(
         x,
         y,
         file,
@@ -32,7 +36,7 @@ function ____exports.ShowUbersplatBJ(flag, whichUbersplat)
     if whichUbersplat == nil or whichUbersplat == 0 then
         return
     end
-    jass.ShowUbersplat(whichUbersplat, flag)
+    ShowUbersplat(whichUbersplat, flag)
 end
 function ____exports.GetLastCreatedUbersplat()
     return ____exports.bj_lastCreatedUbersplat

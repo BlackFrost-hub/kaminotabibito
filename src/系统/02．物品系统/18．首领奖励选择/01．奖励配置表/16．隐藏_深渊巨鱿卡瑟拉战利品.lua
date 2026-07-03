@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports["卡瑟拉奖励池ID"] = "chapter2.hidden.kasera"
-____exports["隐藏_深渊巨鱿卡瑟拉战利品配置"] = {["奖励池ID"] = ____exports["卡瑟拉奖励池ID"], ["标题"] = "深渊巨鱿·卡瑟拉的战利品", ["可选数量"] = 1, ["选项"] = {
+____exports["隐藏_深渊巨鱿卡瑟拉战利品配置"] = {["奖励池ID"] = ____exports["卡瑟拉奖励池ID"], ["标题"] = "深渊巨鱿·卡瑟拉的战利品", ["可选数量"] = 2, ["选项"] = {
     {
         ["装备名"] = "卡瑟拉深渊法典",
         ["排序"] = 1,

@@ -14,15 +14,17 @@ local ____13_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____13_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____13_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____53D6_5355_4F4D_95F4_89D2_5EA6 = ____13_FF0E_516C_5171_5DE5_5177["取单位间角度"]
+local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
+local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
 function _____53D6_56DB_91CD_98CE_5203_76EE_6807(boss)
     local target = GetSpellTargetUnit()
-    local _____5355_4F4D_6709_6548_result_9
+    local _____5355_4F4D_6709_6548_result_8
     if _____5355_4F4D_6709_6548(target) then
-        _____5355_4F4D_6709_6548_result_9 = target
+        _____5355_4F4D_6709_6548_result_8 = target
     else
-        _____5355_4F4D_6709_6548_result_9 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]["施法距离"] + 300)
+        _____5355_4F4D_6709_6548_result_8 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]["施法距离"] + 300)
     end
-    return _____5355_4F4D_6709_6548_result_9
+    return _____5355_4F4D_6709_6548_result_8
 end
 function _____7ED3_7B97_8DF3_5288(boss, target)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]
@@ -102,8 +104,8 @@ function _____8C03_5EA6_9F99_5377_98CE_9636_6BB5_6539_5411(context, _____5F39_5E
             )
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记延迟回调"](____self_10, "里科特-龙卷风改向", id)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "里科特-龙卷风改向", id)
 end
 function _____53D1_5C04_5355_4E2A_9F99_5377_98CE(context, angle)
     local boss = context["Boss单位"]
@@ -193,8 +195,8 @@ ____exports["释放里科特四重风刃"] = function(context)
                     _____53D1_5C04_56DB_91CD_9F99_5377_98CE(context)
                 end
             )
-            local ____self_11 = context["清理"]
-            ____self_11["登记延迟回调"](____self_11, "里科特-四重龙卷风", id)
+            local ____self_10 = context["清理"]
+            ____self_10["登记延迟回调"](____self_10, "里科特-四重龙卷风", id)
         end
     })
 end
@@ -239,10 +241,8 @@ _____8BBE_7F6E_539F_751F_5F39_5E55_6307_5B9A_89D2_5EA6_98DE_884C = ____require_r
 local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_6["获取Boss技能随机敌对英雄"]
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_6["获取Boss技能敌对英雄列表"]
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_7.registerSpellEffectListener
-local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_8.addDelayedCallback
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_7.addDelayedCallback
 _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____56DB_91CD_98CE_5203_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -251,6 +251,14 @@ ____exports["注册里科特四重风刃"] = function()
         return
     end
     _____5DF2_6CE8_518C = true
-    registerSpellEffectListener(____on_91CC_79D1_7279_56DB_91CD_98CE_5203_751F_6548)
+    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+        ["名称"] = "04．四重风刃",
+        ["Boss单位类型ID"] = _____91CC_79D1_7279_5355_4F4D_7C7B_578BID,
+        ["技能ID"] = _____56DB_91CD_98CE_5203_6280_80FDID,
+        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587,
+        ["释放技能"] = function(_context, boss)
+            ____on_91CC_79D1_7279_56DB_91CD_98CE_5203_751F_6548(boss, _____56DB_91CD_98CE_5203_6280_80FDID)
+        end
+    })
 end
 return ____exports

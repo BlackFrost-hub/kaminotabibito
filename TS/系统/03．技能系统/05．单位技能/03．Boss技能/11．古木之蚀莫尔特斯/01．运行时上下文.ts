@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
-import { 设置单位技能壳普通提示 } from "../../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
-import { 创建机制清理篮子, type 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
+import { 创建Boss运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．Boss运行时上下文工厂";
 import { 莫尔特斯单位技能配置 } from "./00．配置";
 import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置";
 import { 单位有效, 取单位ID } from "./16．公共工具";
@@ -50,23 +50,12 @@ export interface 莫尔特斯运行时上下文 {
   腐败护盾值: number;
 }
 
-const 莫尔特斯上下文表: Record<number, 莫尔特斯运行时上下文 | undefined> = {};
-
-export function 获取莫尔特斯上下文(this: void, boss: any): 莫尔特斯运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  return id === 0 ? undefined : 莫尔特斯上下文表[id];
-}
-
-export function 获取或创建莫尔特斯上下文(this: void, boss: any): 莫尔特斯运行时上下文 | undefined {
-  const id = 取单位ID(boss);
-  if (id === 0) return undefined;
-  let context = 莫尔特斯上下文表[id];
-  if (context != null) return context;
-  context = {
+function 创建莫尔特斯上下文(this: void, boss: any, 清理: 机制清理篮子): 莫尔特斯运行时上下文 {
+  return {
     Boss单位: boss,
     阶段: 取莫尔特斯当前阶段(boss),
     已初始化: false,
-    清理: 创建机制清理篮子("莫尔特斯"),
+    清理,
     玩家腐败值表: {},
     玩家腐败值单位表: {},
     根系觉醒已触发: false,
@@ -77,26 +66,28 @@ export function 获取或创建莫尔特斯上下文(this: void, boss: any): 莫
     下次腐败传输档位: 95,
     腐败护盾值: 0,
   };
-  设置单位技能壳普通提示(boss, 莫尔特斯单位技能配置.主动技能提示);
-  莫尔特斯上下文表[id] = context;
-  return context;
+}
+
+const 莫尔特斯上下文工厂 = 创建Boss运行时上下文工厂<莫尔特斯运行时上下文>({
+  名称: "莫尔特斯",
+  主动技能提示: 莫尔特斯单位技能配置.主动技能提示,
+  创建上下文: 创建莫尔特斯上下文,
+});
+
+export function 获取莫尔特斯上下文(this: void, boss: any): 莫尔特斯运行时上下文 | undefined {
+  return 莫尔特斯上下文工厂.获取(boss);
+}
+
+export function 获取或创建莫尔特斯上下文(this: void, boss: any): 莫尔特斯运行时上下文 | undefined {
+  return 莫尔特斯上下文工厂.获取或创建(boss);
 }
 
 export function 获取全部莫尔特斯上下文(this: void): 莫尔特斯运行时上下文[] {
-  const result: 莫尔特斯运行时上下文[] = [];
-  for (const key in 莫尔特斯上下文表) {
-    const context = 莫尔特斯上下文表[key];
-    if (context != null) result.push(context);
-  }
-  return result;
+  return 莫尔特斯上下文工厂.获取全部();
 }
 
 export function 清理莫尔特斯上下文(this: void, boss: any): void {
-  const id = 取单位ID(boss);
-  if (id === 0) return;
-  const context = 莫尔特斯上下文表[id];
-  if (context != null) context.清理.清理全部();
-  delete 莫尔特斯上下文表[id];
+  莫尔特斯上下文工厂.清理上下文(boss);
 }
 
 export function 取莫尔特斯当前阶段(this: void, boss: any): 莫尔特斯阶段 {

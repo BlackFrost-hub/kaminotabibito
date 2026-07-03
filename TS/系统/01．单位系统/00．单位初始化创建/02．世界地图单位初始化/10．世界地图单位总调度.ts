@@ -6,6 +6,8 @@ const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核
   removePeriodicCallback: (this: void, id: number) => void;
 };
 
+const R2I = jass.R2I as (this: void, r: number) => number;
+
 import type { 世界地图单位缓步创建状态, 世界地图单位缓步创建选项 } from "./00．开关与类型";
 import { 世界地图杂鱼出生配置表, 世界地图杂鱼默认缓步创建选项 } from "./01．杂鱼出生配置";
 import { 世界地图精英出生配置表, 世界地图精英默认缓步创建选项 } from "./02．精英出生配置";
@@ -208,7 +210,7 @@ function 总调度监视回调(this: void): void {
 
 function 启动总调度监视(this: void, 间隔秒: number): void {
   停止总调度监视();
-  const 间隔毫秒 = 间隔秒 <= 0 ? 100 : jass.R2I(间隔秒 * 1000);
+  const 间隔毫秒 = 间隔秒 <= 0 ? 100 : R2I(间隔秒 * 1000);
   监视回调ID = addPeriodicCallback(间隔毫秒, 总调度监视回调);
 }
 

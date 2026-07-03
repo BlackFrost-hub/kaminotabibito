@@ -8,12 +8,11 @@ import { 米亚技能数值配置 } from "./02．数值与表现配置";
 import { 播放米亚台词 } from "./15．台词播放";
 import { 取米亚污染标记伤害倍率 } from "./08．污染标记";
 import { 取米亚平台超载伤害倍率 } from "./12．平台超载惩罚";
+import { stringToFourCC, 单位有效 } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
+import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
 
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
-};
-const 技能事件中心 = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { 获取Boss技能敌对英雄列表Ex, 获取Boss技能应攻击目标 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表Ex: (this: void, boss: any, centerUnit?: any, radius?: number) => any[];
@@ -51,14 +50,6 @@ const BJ_RADTODEG = 57.29577951308232;
 const 米亚单位类型ID = stringToFourCC(米亚单位技能配置.Boss单位ID);
 const 污水喷吐技能ID = stringToFourCC(米亚单位技能配置.污水喷吐技能);
 let 米亚污水喷吐已注册 = false;
-
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0;
-}
 
 function 取单位攻击力(this: void, unit: any): number {
   if (!单位有效(unit) || typeof GetUnitStateJapi !== "function") return 1000;
@@ -154,7 +145,15 @@ export function 释放米亚污水喷吐(this: void, context: 米亚运行时上
 export function 注册米亚污水喷吐(this: void): void {
   if (米亚污水喷吐已注册) return;
   米亚污水喷吐已注册 = true;
-  技能事件中心.registerSpellEffectListener(on米亚污水喷吐生效);
+  注册Boss技能壳监听({
+    名称: "米亚-污水喷吐",
+    Boss单位类型ID: 米亚单位类型ID,
+    技能ID: 污水喷吐技能ID,
+    获取或创建上下文: 获取或创建米亚上下文,
+    释放技能: function 米亚污水喷吐监听释放(this: void, _context: 米亚运行时上下文, boss: any): void {
+      on米亚污水喷吐生效(boss, 污水喷吐技能ID);
+    },
+  });
 }
 
 function on米亚污水喷吐生效(this: void, castingUnit: any, spellAbilityId: number): void {

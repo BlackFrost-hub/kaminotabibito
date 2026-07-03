@@ -205,6 +205,13 @@ export const Boss死亡奖励与清理配置表: Boss死亡结算配置[] = [
     首领奖励池ID: "chapter2.hidden.mia",
   },
   {
+    键: "隐藏_古木之蚀莫尔特斯",
+    Boss单位名: "古木之蚀·莫尔特斯",
+    Boss引用键: "Boss.古木之蚀",
+    首领奖励池ID: "chapter2.hidden.mortes",
+    清理列表: [{ 表名: "Boss", 键名: "古木之蚀" }],
+  },
+  {
     键: "主线_巴尔扎罗斯",
     Boss单位名: "熔岩恶魔王·巴尔扎罗斯",
     首领奖励池ID: "chapter3.main.balzaroth",
