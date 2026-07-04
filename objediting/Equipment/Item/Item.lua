@@ -80,8 +80,8 @@ createEquipmentItem('I0EJ', '冰焰宝珠', {
   classification = 'PowerUp',
   level = 7,
   priority = 1000,
-  tooltipExtended = '|cffccffff[道具/饰品]-法术/元素|r|n|cffffcc99等级：B+|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n法术伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n|cffffffcc[特效]|r|n冰焰回响：攻击效果有12%概率额外造成700点通用伤害。|n|cFF808080塞拉凝结的冰焰在珠心缓慢翻涌，冷光与火光互不退让。|r',
-  description = '|cffccffff[道具/饰品]-法术/元素|r|n|cffffcc99等级：B+|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n法术伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n|cffffffcc[特效]|r|n冰焰回响：攻击效果有12%概率额外造成700点通用伤害。|n|cFF808080塞拉凝结的冰焰在珠心缓慢翻涌，冷光与火光互不退让。|r',
+  tooltipExtended = '|cffccffff[道具/饰品]-法术/元素|r|n|cffffcc99等级：B+|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n法术伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n|cffffffcc[特效]|r|n冰焰回响：攻击效果有12%概率额外造成700点精神伤害。|n|cFF808080塞拉凝结的冰焰在珠心缓慢翻涌，冷光与火光互不退让。|r',
+  description = '|cffccffff[道具/饰品]-法术/元素|r|n|cffffcc99等级：B+|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n法术伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n|cffffffcc[特效]|r|n冰焰回响：攻击效果有12%概率额外造成700点精神伤害。|n|cFF808080塞拉凝结的冰焰在珠心缓慢翻涌，冷光与火光互不退让。|r',
 })
 
 createEquipmentItem('I0EK', '双卫之誓', {
@@ -296,8 +296,8 @@ createEquipmentItem('I0FB', '腐朽孢子秘瓶', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+18%|n持续伤害提升+16%|n暗属性穿透+16%|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
-  description = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+18%|n持续伤害提升+16%|n暗属性穿透+16%|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
+  tooltipExtended = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+18%|n持续伤害提升+16%|n魔法穿透+16%|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
+  description = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+18%|n持续伤害提升+16%|n魔法穿透+16%|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
 })
 
 createEquipmentItem('I0FC', '净土萌芽圣铃', {
@@ -310,4 +310,30 @@ createEquipmentItem('I0FC', '净土萌芽圣铃', {
   priority = 1000,
   tooltipExtended = '|cffccffff[饰品/辅助]-净化/续航|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n自然抗性+16%|n生命值+1200|n|cFF808080铃声很轻，却能让腐土中重新冒出第一点嫩芽。|r',
   description = '|cffccffff[饰品/辅助]-净化/续航|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n自然抗性+16%|n生命值+1200|n|cFF808080铃声很轻，却能让腐土中重新冒出第一点嫩芽。|r',
+})
+
+createEquipmentItem('I0FH', '盗贼首领徽记', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\rogue_leader_emblem.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  priority = 1000,
+  tooltipExtended = '|cffccffff[道具/戒指/饰品]-循环/资源|r|n|cffffcc99等级：C|n评分：3660|r|n|cffffffcc[基础属性]|r|n全属性+14|n魔法恢复+12|n冷却缩减+6%|n移动速度+5%|n|cffffffcc[特效]|r|n暗影收割：击杀单位后恢复40点魔法值和4%最大魔法值，冷却0.5秒。|n|cFF808080徽记背面有死灵盗贼的暗号，握紧时能听见短促的撤离哨声。|r',
+  description = '|cffccffff[道具/戒指/饰品]-循环/资源|r|n|cffffcc99等级：C|n评分：3660|r|n|cffffffcc[基础属性]|r|n全属性+14|n魔法恢复+12|n冷却缩减+6%|n移动速度+5%|n|cffffffcc[特效]|r|n暗影收割：击杀单位后恢复40点魔法值和4%最大魔法值，冷却0.5秒。|n|cFF808080徽记背面有死灵盗贼的暗号，握紧时能听见短促的撤离哨声。|r',
+})
+
+createEquipmentItem('I0FI', '阴影陷阱装置', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\shadow_trap_device.blp',
+  model = 'war3mapImported\\Urn.mdl',
+  abilities = 'IP00',
+  cooldownGroup = 'IP00',
+  classification = 'PowerUp',
+  level = 5,
+  priority = 1000,
+  activelyUsed = true,
+  tooltipExtended = '|cffccffff[道具/饰品]-控制/暗影功能|r|n|cffffcc99等级：C|n评分：3520|r|n|cffffffcc[基础属性]|r|n智力+14|n生命值+900|n冷却缩减+5%|n暗属性伤害+10%|n眩晕抗性+12%|n|cffffffcc[使用]|r|n在目标点放置阴影陷阱，持续30秒；敌人触发后被禁锢2秒，最多使用3次，冷却30秒。|n|cFF808080装置里折着一小片影骨符文，落地后会安静等待第一个粗心的脚步。|r',
+  description = '|cffccffff[道具/饰品]-控制/暗影功能|r|n|cffffcc99等级：C|n评分：3520|r|n|cffffffcc[基础属性]|r|n智力+14|n生命值+900|n冷却缩减+5%|n暗属性伤害+10%|n眩晕抗性+12%|n|cffffffcc[使用]|r|n在目标点放置阴影陷阱，持续30秒；敌人触发后被禁锢2秒，最多使用3次，冷却30秒。|n|cFF808080装置里折着一小片影骨符文，落地后会安静等待第一个粗心的脚步。|r',
 })

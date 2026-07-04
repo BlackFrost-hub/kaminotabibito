@@ -37,7 +37,7 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
 const { 莫尔特斯BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯") as {
   莫尔特斯BuffID: { 腐败虫尸净化: string };
 };
-const { 临时调整攻击 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具") as {
+const { 临时调整攻击 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   临时调整攻击: (this: void, unit: any, value: number) => void;
 };
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {

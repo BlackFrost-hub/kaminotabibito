@@ -40,8 +40,8 @@ local _____5DE8_9B54_6218_5251 = require("系统.02．物品系统.15．装备�
 local _____7CBE_7CB9_6CD5_523A = require("系统.02．物品系统.15．装备技能.00．物品.48．精粹法刺")
 local _____55DC_72F1_6076_5251 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑")
 local _____7CBE_6C99_6218_65A7 = require("系统.02．物品系统.15．装备技能.00．物品.83．精沙战斧")
-local _____6708_5149_9501_94FE_62A4_8155 = require("系统.02．物品系统.15．装备技能.00．物品.133．月光锁链护腕")
-local _____5BA1_5224_4E4B_950B_957F_5251 = require("系统.02．物品系统.15．装备技能.00．物品.134．审判之锋长剑")
+local _____6708_5149_9501_94FE_62A4_8155 = require("系统.02．物品系统.15．装备技能.00．物品.159．月光锁链护腕")
+local _____5BA1_5224_4E4B_950B_957F_5251 = require("系统.02．物品系统.15．装备技能.00．物品.160．审判之锋长剑")
 local ____WPSHJS_8FC1_79FB_6838_5FC3 = require("系统.02．物品系统.15．装备技能.04．伤害事件.02．WPSHJS迁移核心")
 local ____B00H_6307_6325BuffID = stringToFourCCSafe("B00H")
 local ____B00V_6697_9ED1_4FB5_8680BuffID = stringToFourCCSafe("B00V")
@@ -136,7 +136,6 @@ local function _____5904_7406_6700_7EC8_4F24_5BB3(target, attacker, applied, sna
     _____950B_5229_5DE8_9B54_722A["处理锋利巨魔爪物理触发"](ctx)
     _____5DE8_9B54_6218_5251["处理巨魔战剑强化触发"](ctx)
     _____7CBE_7CB9_6CD5_523A["处理精粹法刺魔法触发"](ctx)
-    _____5BA1_5224_4E4B_950B_957F_5251["处理审判之锋长剑伤害触发"](ctx)
     _____6C99_6F20_8725_8734_4E4B_9B42["处理沙漠蜥蜴之魂造成伤害"](ctx)
     local ____opt_6 = _____55DC_72F1_6076_5251["处理嗜狱恶剑造成伤害"]
     if ____opt_6 ~= nil then
@@ -160,6 +159,9 @@ local function _____4F24_5BB3_4E8B_4EF6_4FEE_6B63(context)
     context.currentDamage = _____7ED3_679C
     _____7ED3_679C = _____6708_5149_9501_94FE_62A4_8155["处理月光锁链护腕伤害修正"](context)
     _____7ED3_679C = ____WPSHJS_8FC1_79FB_6838_5FC3["处理WPSHJS伤害修正"](context, _____7ED3_679C)
+    context.currentDamage = _____7ED3_679C
+    _____7ED3_679C = _____5BA1_5224_4E4B_950B_957F_5251["处理审判之锋长剑伤害修正"](context)
+    context.currentDamage = _____7ED3_679C
     if ____B00V_6697_9ED1_4FB5_8680BuffID ~= 0 and context.target ~= nil and _____5355_4F4D_62E5_6709Buff(context.target, ____B00V_6697_9ED1_4FB5_8680BuffID) then
         if context.currentDamage >= _____7ED3_679C and _____7ED3_679C >= _____53D6_5F53_524D_751F_547D(context.target) then
             _____5B89_6392_6697_9ED1_4FB5_8680_590D_6D3B(context.attacker, context.target)

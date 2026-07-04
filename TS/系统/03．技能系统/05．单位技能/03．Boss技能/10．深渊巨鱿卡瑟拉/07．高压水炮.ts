@@ -37,7 +37,7 @@ const { 取单位属性抗性 } = require("系统.03．技能系统.00．技能�
 const { 开始击退 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口") as {
   开始击退: (this: void, unit: any, params: any) => number;
 };
-const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具") as {
+const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   施加眩晕: (this: void, source: any, target: any, duration: number) => void;
 };
 

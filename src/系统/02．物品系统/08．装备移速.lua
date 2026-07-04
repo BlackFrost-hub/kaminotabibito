@@ -1,13 +1,22 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local ____exports = {}
-local fourCCToStringCompat, getMaxMovespeed2Info, jass, GetItemTypeId, itemsData, R2I, stringChar
+local fourCCToStringCompat, normalizeMovespeed2, getMaxMovespeed2Info, jass, GetItemTypeId, GetUnitDefaultMoveSpeed, itemsData, R2I, stringChar
 function fourCCToStringCompat(four)
     local c1 = stringChar(four % 256)
     local c2 = stringChar(R2I(four / 256) % 256)
     local c3 = stringChar(R2I(four / 65536) % 256)
     local c4 = stringChar(R2I(four / 16777216) % 256)
     return ((tostring(c4) .. tostring(c3)) .. tostring(c2)) .. tostring(c1)
+end
+function normalizeMovespeed2(unit, value)
+    if not (value > 0) then
+        return 0
+    end
+    if value < 1 then
+        return GetUnitDefaultMoveSpeed(unit) * value
+    end
+    return value
 end
 function getMaxMovespeed2Info(unit, ignoreItem)
     local max = 0
@@ -19,17 +28,17 @@ function getMaxMovespeed2Info(unit, ignoreItem)
             do
                 local item = jass.UnitItemInSlot(unit, slot)
                 if not item then
-                    goto __continue7
+                    goto __continue10
                 end
                 if ignoreItem and item == ignoreItem then
-                    goto __continue7
+                    goto __continue10
                 end
                 local tid = GetItemTypeId(item)
                 local idStr = fourCCToStringCompat(tid)
                 local entry = itemsData[idStr]
                 local typ = entry and entry.type
                 if typ == "任务" or typ == "药剂" or typ == "食品" then
-                    goto __continue7
+                    goto __continue10
                 end
                 local v = entry and entry.movespeed2
                 if type(v) == "number" and v > 0 then
@@ -40,7 +49,7 @@ function getMaxMovespeed2Info(unit, ignoreItem)
                     name = (entry and entry.name) ~= nil and __TS__StringTrim(tostring(entry.name)) or "" or "未知"
                 end
             end
-            ::__continue7::
+            ::__continue10::
             slot = slot + 1
         end
     end
@@ -48,6 +57,7 @@ function getMaxMovespeed2Info(unit, ignoreItem)
 end
 jass = require("jass.common")
 GetItemTypeId = jass.GetItemTypeId
+GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local onItemPickup = ____require_result_0.onItemPickup
 local onItemDrop = ____require_result_0.onItemDrop
@@ -76,7 +86,7 @@ local function getUnitKey(unit)
 end
 local function getMaxMovespeed2(unit, ignoreItem)
     local info = getMaxMovespeed2Info(unit, ignoreItem)
-    return info.value
+    return normalizeMovespeed2(unit, info.value)
 end
 local function applyMovespeed2(unit, newSpeed)
     local key = getUnitKey(unit)

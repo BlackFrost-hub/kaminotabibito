@@ -6,6 +6,7 @@
  */
 const jass = require("jass.common") as JassCommon;
 const GetItemTypeId = (jass as any).GetItemTypeId as (this: void, item: any) => number;
+const GetUnitDefaultMoveSpeed = (jass as any).GetUnitDefaultMoveSpeed as (this: void, unit: any) => number;
 const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
   onItemDrop: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
@@ -39,7 +40,13 @@ function fourCCToStringCompat(four: number): string {
 
 function getMaxMovespeed2(unit: any, ignoreItem?: any): number {
   const info = getMaxMovespeed2Info(unit, ignoreItem);
-  return info.value;
+  return normalizeMovespeed2(unit, info.value);
+}
+
+function normalizeMovespeed2(unit: any, value: number): number {
+  if (!(value > 0)) return 0;
+  if (value < 1) return GetUnitDefaultMoveSpeed(unit) * value;
+  return value;
 }
 
 /** 返回当前生效的移速值、提供该移速的装备名、以及带移速的装备件数（≥2 时才提示“只生效某装备”） */

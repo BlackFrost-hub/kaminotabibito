@@ -15,7 +15,11 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
 
 const jass = require("jass.common") as any;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
+const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
+
+import { 瑟兰迪尔的决心物品ID } from "../../03．主动技能/00．公共/01．主动技能物品ID";
+import { 物品使用装备ID } from "./01．物品使用配置表";
 
 export type 物品技能事件上下文 = {
   施法单位: any;
@@ -66,9 +70,9 @@ const 嗜狱恶剑 = require("系统.02．物品系统.15．装备技能.00．�
 const 盗贼神符魔抗 = require("系统.02．物品系统.15．装备技能.00．物品.70．盗贼神符魔抗") as { 处理盗贼神符魔抗使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 火把 = require("系统.02．物品系统.15．装备技能.00．物品.71．火把") as { 处理火把使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 抗毒药水 = require("系统.02．物品系统.15．装备技能.00．物品.114．抗毒药水") as { 处理抗毒药水使用: (this: void, ctx: 物品技能事件上下文) => void };
-const 瑟兰迪尔的决心 = require("系统.02．物品系统.15．装备技能.00．物品.136．瑟兰迪尔的决心") as { 处理瑟兰迪尔的决心使用: (this: void, ctx: 物品技能事件上下文) => void };
-const 影骨披风 = require("系统.02．物品系统.15．装备技能.00．物品.150．影骨披风") as { 处理影骨披风使用: (this: void, ctx: 物品技能事件上下文) => void };
-const 阴影陷阱装置 = require("系统.02．物品系统.15．装备技能.00．物品.153．阴影陷阱装置") as { 处理阴影陷阱装置使用: (this: void, ctx: 物品技能事件上下文) => void };
+const 瑟兰迪尔的决心 = require("系统.02．物品系统.15．装备技能.00．物品.162．瑟兰迪尔的决心") as { 处理瑟兰迪尔的决心使用: (this: void, ctx: 物品技能事件上下文) => void };
+const 影骨披风 = require("系统.02．物品系统.15．装备技能.00．物品.131．影骨披风") as { 处理影骨披风使用: (this: void, ctx: 物品技能事件上下文) => void };
+const 阴影陷阱装置 = require("系统.02．物品系统.15．装备技能.00．物品.134．阴影陷阱装置") as { 处理阴影陷阱装置使用: (this: void, ctx: 物品技能事件上下文) => void };
 
 let 已初始化 = false;
 
@@ -79,33 +83,91 @@ function 物品使用单位是英雄(this: void, ctx: 物品技能事件上下�
 
 function on物品使用链路(this: void, ctx: 物品技能事件上下文): void {
   if (!物品使用单位是英雄(ctx)) return;
-  狱妖魔盾.处理狱妖魔盾使用(ctx);
-  商人之书.处理商人之书使用(ctx);
-  狂暴树枝.处理狂暴树枝使用(ctx);
-  首领号角.处理首领号角使用(ctx);
-  精灵号角.处理精灵号角使用(ctx);
-  守卫大剑.处理守卫大剑使用(ctx);
-  斯尔能量之心.处理斯尔能量之心使用(ctx);
-  熔岩地狱之敲钟.处理熔岩地狱之敲钟使用(ctx);
-  阴暗之敲钟.处理阴暗之敲钟使用(ctx);
-  地狱火卡牌攻击.处理地狱火卡牌攻击使用(ctx);
-  焰混能量体.处理焰混能量体使用(ctx);
-  恶斯胸甲.处理恶斯胸甲使用(ctx);
-  亡灵魔鞋.处理亡灵魔鞋使用(ctx);
-  恶魔铃铛.处理恶魔铃铛使用(ctx);
-  魔古战刃.处理魔古战刃使用(ctx);
-  女妖魔甲.处理女妖魔甲使用(ctx);
-  熔灵宝石之戒.处理熔灵宝石之戒使用(ctx);
-  浴血药剂.处理浴血药剂使用(ctx);
-  浴魔药剂.处理浴魔药剂使用(ctx);
-  浴灵药剂.处理浴灵药剂使用(ctx);
-  嗜狱恶剑.处理嗜狱恶剑使用(ctx);
-  盗贼神符魔抗.处理盗贼神符魔抗使用(ctx);
-  火把.处理火把使用(ctx);
-  抗毒药水.处理抗毒药水使用(ctx);
-  瑟兰迪尔的决心.处理瑟兰迪尔的决心使用(ctx);
-  影骨披风.处理影骨披风使用(ctx);
-  阴影陷阱装置.处理阴影陷阱装置使用(ctx);
+  if (ctx.物品 == null || ctx.物品 === 0) return;
+  const 物品类型ID = GetItemTypeId(ctx.物品);
+  switch (物品类型ID) {
+    case 物品使用装备ID.狱妖魔盾:
+      狱妖魔盾.处理狱妖魔盾使用(ctx);
+      break;
+    case 物品使用装备ID.商人之书:
+      商人之书.处理商人之书使用(ctx);
+      break;
+    case 物品使用装备ID.狂暴树枝:
+      狂暴树枝.处理狂暴树枝使用(ctx);
+      break;
+    case 物品使用装备ID.首领号角:
+      首领号角.处理首领号角使用(ctx);
+      break;
+    case 物品使用装备ID.精灵号角:
+      精灵号角.处理精灵号角使用(ctx);
+      break;
+    case 物品使用装备ID.守卫大剑:
+      守卫大剑.处理守卫大剑使用(ctx);
+      break;
+    case 物品使用装备ID.斯尔能量之心:
+      斯尔能量之心.处理斯尔能量之心使用(ctx);
+      break;
+    case 物品使用装备ID.熔岩地狱之敲钟:
+      熔岩地狱之敲钟.处理熔岩地狱之敲钟使用(ctx);
+      break;
+    case 物品使用装备ID.阴暗之敲钟:
+      阴暗之敲钟.处理阴暗之敲钟使用(ctx);
+      break;
+    case 物品使用装备ID.地狱火卡牌攻击:
+      地狱火卡牌攻击.处理地狱火卡牌攻击使用(ctx);
+      break;
+    case 物品使用装备ID.焰混能量体:
+      焰混能量体.处理焰混能量体使用(ctx);
+      break;
+    case 物品使用装备ID.恶斯胸甲:
+      恶斯胸甲.处理恶斯胸甲使用(ctx);
+      break;
+    case 物品使用装备ID.亡灵魔鞋:
+      亡灵魔鞋.处理亡灵魔鞋使用(ctx);
+      break;
+    case 物品使用装备ID.恶魔铃铛:
+      恶魔铃铛.处理恶魔铃铛使用(ctx);
+      break;
+    case 物品使用装备ID.魔古战刃:
+      魔古战刃.处理魔古战刃使用(ctx);
+      break;
+    case 物品使用装备ID.女妖魔甲:
+      女妖魔甲.处理女妖魔甲使用(ctx);
+      break;
+    case 物品使用装备ID.熔灵宝石之戒:
+      熔灵宝石之戒.处理熔灵宝石之戒使用(ctx);
+      break;
+    case 物品使用装备ID.浴血药剂:
+      浴血药剂.处理浴血药剂使用(ctx);
+      break;
+    case 物品使用装备ID.浴魔药剂:
+      浴魔药剂.处理浴魔药剂使用(ctx);
+      break;
+    case 物品使用装备ID.浴灵药剂:
+      浴灵药剂.处理浴灵药剂使用(ctx);
+      break;
+    case 物品使用装备ID.嗜狱恶剑:
+      嗜狱恶剑.处理嗜狱恶剑使用(ctx);
+      break;
+    case 物品使用装备ID.盗贼神符魔抗:
+      盗贼神符魔抗.处理盗贼神符魔抗使用(ctx);
+      break;
+    case 物品使用装备ID.火把:
+      火把.处理火把使用(ctx);
+      break;
+    case 物品使用装备ID.抗毒药水:
+      抗毒药水.处理抗毒药水使用(ctx);
+      break;
+    case 瑟兰迪尔的决心物品ID:
+      瑟兰迪尔的决心.处理瑟兰迪尔的决心使用(ctx);
+      break;
+    case 物品使用装备ID.影骨披风:
+      影骨披风.处理影骨披风使用(ctx);
+      break;
+    case 物品使用装备ID.阴影陷阱装置:
+      阴影陷阱装置.处理阴影陷阱装置使用(ctx);
+      break;
+  }
 }
 
 function on物品使用死亡事件(this: void, dyingUnit: any, killingUnit: any): void {

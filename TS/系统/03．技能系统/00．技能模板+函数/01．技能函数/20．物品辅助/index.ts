@@ -6,6 +6,8 @@ export * from "./03．条件开关效果";
 export * from "./04．范围脉冲效果";
 export * from "./05．物品次数转移";
 export * from "./06．暴击属性工具";
+export * from "./08．装备识别与冷却";
+export * from "./11．装备常量";
 export {
   是否为使用物品,
   单位持有物品,
@@ -54,4 +56,4 @@ export {
   命令攻击来源,
   取玩家ID,
   创建火把单位,
-} from "./07．物品技能工具";
+} from "./17．物品技能工具兼容";

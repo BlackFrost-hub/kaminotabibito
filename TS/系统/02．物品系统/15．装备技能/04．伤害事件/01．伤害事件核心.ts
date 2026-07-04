@@ -43,8 +43,8 @@ const 巨魔战剑 = require("系统.02．物品系统.15．装备技能.00．�
 const 精粹法刺 = require("系统.02．物品系统.15．装备技能.00．物品.48．精粹法刺") as { 处理精粹法刺魔法触发: (this: void, ctx: any) => void };
 const 嗜狱恶剑 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑") as { 处理嗜狱恶剑使用?: (this: void, ctx: any) => void; 处理嗜狱恶剑伤害修正?: (this: void, context: any) => number; 处理嗜狱恶剑造成伤害?: (this: void, ctx: any) => void };
 const 精沙战斧 = require("系统.02．物品系统.15．装备技能.00．物品.83．精沙战斧") as { 处理精沙战斧伤害修正?: (this: void, context: any) => number };
-const 月光锁链护腕 = require("系统.02．物品系统.15．装备技能.00．物品.133．月光锁链护腕") as { 处理月光锁链护腕伤害修正: (this: void, context: any) => number };
-const 审判之锋长剑 = require("系统.02．物品系统.15．装备技能.00．物品.134．审判之锋长剑") as { 处理审判之锋长剑伤害触发: (this: void, ctx: any) => void };
+const 月光锁链护腕 = require("系统.02．物品系统.15．装备技能.00．物品.159．月光锁链护腕") as { 处理月光锁链护腕伤害修正: (this: void, context: any) => number };
+const 审判之锋长剑 = require("系统.02．物品系统.15．装备技能.00．物品.160．审判之锋长剑") as { 处理审判之锋长剑伤害修正: (this: void, context: any) => number };
 const WPSHJS迁移核心 = require("系统.02．物品系统.15．装备技能.04．伤害事件.02．WPSHJS迁移核心") as {
   处理WPSHJS伤害修正: (this: void, context: any, 初始伤害?: number) => number;
   处理WPSHJS最终伤害: (this: void, ctx: any) => void;
@@ -125,7 +125,6 @@ function 处理最终伤害(this: void, target: any, attacker: any, applied: num
   锋利巨魔爪.处理锋利巨魔爪物理触发(ctx);
   巨魔战剑.处理巨魔战剑强化触发(ctx);
   精粹法刺.处理精粹法刺魔法触发(ctx);
-  审判之锋长剑.处理审判之锋长剑伤害触发(ctx);
   沙漠蜥蜴之魂.处理沙漠蜥蜴之魂造成伤害(ctx);
   嗜狱恶剑.处理嗜狱恶剑造成伤害?.(ctx);
   WPSHJS迁移核心.处理WPSHJS最终伤害(ctx);
@@ -141,6 +140,9 @@ function 伤害事件修正(this: void, context: any): number {
   context.currentDamage = 结果;
   结果 = 月光锁链护腕.处理月光锁链护腕伤害修正(context);
   结果 = WPSHJS迁移核心.处理WPSHJS伤害修正(context, 结果);
+  context.currentDamage = 结果;
+  结果 = 审判之锋长剑.处理审判之锋长剑伤害修正(context);
+  context.currentDamage = 结果;
   if (B00V暗黑侵蚀BuffID !== 0 && context.target != null && 单位拥有Buff(context.target, B00V暗黑侵蚀BuffID)) {
     if (context.currentDamage >= 结果 && 结果 >= 取当前生命(context.target)) {
       安排暗黑侵蚀复活(context.attacker, context.target);

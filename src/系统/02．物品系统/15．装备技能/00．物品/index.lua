@@ -1049,7 +1049,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.131．触手残片")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.131．影骨披风")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1057,7 +1057,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.132．执法者徽记")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.132．幽影匕首")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1065,7 +1065,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.133．月光锁链护腕")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.133．盗贼首领徽记")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1073,7 +1073,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.134．审判之锋长剑")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.134．阴影陷阱装置")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1081,7 +1081,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.135．精灵执法披风")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.135．菲利斯的统御纹章")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1089,7 +1089,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.136．瑟兰迪尔的决心")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.136．剑魂狼牙坠")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1097,7 +1097,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.137．米亚战利品公共")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.137．封印斩护腕")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1105,7 +1105,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.138．腐化猫爪手套")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.138．异形化残刃")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1113,7 +1113,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.139．纯净水源吊坠")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.139．攻城号令圣印")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1121,7 +1121,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.140．灵猫步伐之靴")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.140．灵心之碎片")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1129,7 +1129,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.141．腐化核心法杖")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.141．克林姆德风纹法杖")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1137,7 +1137,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.142．米亚的项圈")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.142．神风护体披风")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1145,7 +1145,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.143．第三章主线Boss战利品公共")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.143．湮灭之风戒指")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1153,7 +1153,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.144．地核熔炉之心")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.144．卡瑟拉深渊法典")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1161,7 +1161,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.145．锻造者手套")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.145．电鳗共生指环")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1169,7 +1169,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.146．冰焰宝珠")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.146．触手残片护符")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1177,7 +1177,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.147．怨火核心碎片")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.147．墨潮行者长袍")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1185,7 +1185,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.148．永恒轮回法典")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.148．高压水脊法杖")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1193,7 +1193,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.149．影骨战利品公共")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.149．绝缘珊瑚圣瓶")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1201,7 +1201,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.150．影骨披风")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.150．腐败根须法杖")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1209,7 +1209,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.151．幽影匕首")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.151．古树之心护符")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1217,7 +1217,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.152．盗贼首领徽记")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.152．荆棘行者披风")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1225,7 +1225,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.153．阴影陷阱装置")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.153．净化者手套")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1233,7 +1233,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.155．菲利斯的统御纹章")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.154．莫尔特斯树皮盾")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1241,7 +1241,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.156．剑魂狼牙坠")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.155．腐朽孢子秘瓶")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1249,7 +1249,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.157．封印斩护腕")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.156．净土萌芽圣铃")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1257,7 +1257,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.158．异形化残刃")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.157．触手残片")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1265,7 +1265,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.159．攻城号令圣印")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.158．执法者徽记")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1273,7 +1273,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.160．灵心之碎片")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.159．月光锁链护腕")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1281,7 +1281,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.161．克林姆德风纹法杖")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.160．审判之锋长剑")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1289,7 +1289,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.162．神风护体披风")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.161．精灵执法披风")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1297,7 +1297,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.163．湮灭之风戒指")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.162．瑟兰迪尔的决心")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1305,7 +1305,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.164．卡瑟拉深渊法典")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.163．腐化猫爪手套")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1313,7 +1313,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.165．电鳗共生指环")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.164．纯净水源吊坠")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1321,7 +1321,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.166．触手残片护符")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.165．灵猫步伐之靴")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1329,7 +1329,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.167．墨潮行者长袍")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.166．腐化核心法杖")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1337,7 +1337,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.168．高压水脊法杖")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.167．米亚的项圈")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1345,7 +1345,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.169．绝缘珊瑚圣瓶")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.168．地核熔炉之心")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1353,7 +1353,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.170．腐败根须法杖")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.169．锻造者手套")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1361,7 +1361,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.171．古树之心护符")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.170．冰焰宝珠")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1369,7 +1369,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.172．荆棘行者披风")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.171．怨火核心碎片")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -1377,31 +1377,7 @@ do
     end
 end
 do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.173．净化者手套")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.174．莫尔特斯树皮盾")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.175．腐朽孢子秘瓶")
-    for ____exportKey, ____exportValue in pairs(____export) do
-        if ____exportKey ~= "default" then
-            ____exports[____exportKey] = ____exportValue
-        end
-    end
-end
-do
-    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.176．净土萌芽圣铃")
+    local ____export = require("系统.02．物品系统.15．装备技能.00．物品.172．永恒轮回法典")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

@@ -25,7 +25,7 @@ export const STAT_CONFIG: { name: string; key: string }[] = [
   { name: "普攻伤害", key: "atkDmg" }, { name: "普攻抗性", key: "atkResist" },
   { name: "光属性伤害", key: "lightDmg" }, { name: "光属性抗性", key: "lightResist" },
   { name: "暗属性伤害", key: "darkDmg" }, { name: "暗属性抗性", key: "darkResist" },
-  { name: "木属性伤害", key: "woodDmg" }, { name: "木属性抗性", key: "woodResist" },
+  { name: "风/木属性伤害", key: "woodDmg" }, { name: "风/木属性抗性", key: "woodResist" },
   { name: "火属性伤害", key: "fireDmg" }, { name: "火属性抗性", key: "fireResist" },
   { name: "雷属性伤害", key: "thunderDmg" }, { name: "雷属性抗性", key: "thunderResist" },
   { name: "水属性伤害", key: "waterDmg" }, { name: "水属性抗性", key: "waterResist" },

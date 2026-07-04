@@ -22,6 +22,6 @@ createEquipmentItem('I0E4', '瑟兰迪尔的决心', {
   level = 6,
   priority = 1000,
   activelyUsed = true,
-  tooltipExtended = '|cffccffff[灵魂]-召唤|r|n|cffffcc99等级：B-|n评分：6100|r|n|cffffffcc[基础属性]|r|n全属性+15|n|cffffffcc[使用]|r|n召唤瑟兰迪尔幻影协助战斗30秒，仅精灵城内可用。|n|cFF808080这枚灵魂碎片承载着瑟兰迪尔未竟的誓言，仍会回应精灵城的召唤。|r',
-  description = '|cffccffff[灵魂]-召唤|r|n|cffffcc99等级：B-|n评分：6100|r|n|cffffffcc[基础属性]|r|n全属性+15|n|cffffffcc[使用]|r|n召唤瑟兰迪尔幻影协助战斗30秒，仅精灵城内可用。|n|cFF808080这枚灵魂碎片承载着瑟兰迪尔未竟的誓言，仍会回应精灵城的召唤。|r',
+  tooltipExtended = '|cffccffff[灵魂]-召唤|r|n|cffffcc99等级：B-|n评分：6100|r|n|cffffffcc[基础属性]|r|n全属性+15|n|cffffffcc[使用]|r|n召唤瑟兰迪尔幻影协助战斗30秒，幻影拥有5000生命、350基础攻击、35护甲，额外获得召唤者25%攻击力，仅精灵城内可用。|n|cFF808080这枚灵魂碎片承载着瑟兰迪尔未竟的誓言，仍会回应精灵城的召唤。|r',
+  description = '|cffccffff[灵魂]-召唤|r|n|cffffcc99等级：B-|n评分：6100|r|n|cffffffcc[基础属性]|r|n全属性+15|n|cffffffcc[使用]|r|n召唤瑟兰迪尔幻影协助战斗30秒，幻影拥有5000生命、350基础攻击、35护甲，额外获得召唤者25%攻击力，仅精灵城内可用。|n|cFF808080这枚灵魂碎片承载着瑟兰迪尔未竟的誓言，仍会回应精灵城的召唤。|r',
 })

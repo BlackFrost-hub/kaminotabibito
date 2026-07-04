@@ -8,8 +8,8 @@ createEquipmentItem('I0E2', '审判之锋长剑', {
   classification = 'Campaign',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[主武器/剑]-物理输出|r|n|cffffcc99等级：B-|n评分：6500|r|n|cffffffcc[基础属性]|r|n攻击力+175|n力量+25|n护甲穿透+25%|n|cffffffcc[特效]|r|n罪与罚：攻击生命值高于70%的目标时，额外造成20%物理伤害。|n|cFF808080长剑由审判之环的残辉淬成，剑脊上还留着划分罪责的冷光。|r',
-  description = '|cffccffff[主武器/剑]-物理输出|r|n|cffffcc99等级：B-|n评分：6500|r|n|cffffffcc[基础属性]|r|n攻击力+175|n力量+25|n护甲穿透+25%|n|cffffffcc[特效]|r|n罪与罚：攻击生命值高于70%的目标时，额外造成20%物理伤害。|n|cFF808080长剑由审判之环的残辉淬成，剑脊上还留着划分罪责的冷光。|r',
+  tooltipExtended = '|cffccffff[主武器/剑]-物理输出|r|n|cffffcc99等级：B-|n评分：6500|r|n|cffffffcc[基础属性]|r|n攻击力+175|n力量+25|n护甲穿透+25%|n|cffffffcc[特效]|r|n罪与罚：攻击生命值高于70%的目标时，本次物理伤害追加20%。|n|cFF808080长剑由审判之环的残辉淬成，剑脊上还留着划分罪责的冷光。|r',
+  description = '|cffccffff[主武器/剑]-物理输出|r|n|cffffcc99等级：B-|n评分：6500|r|n|cffffffcc[基础属性]|r|n攻击力+175|n力量+25|n护甲穿透+25%|n|cffffffcc[特效]|r|n罪与罚：攻击生命值高于70%的目标时，本次物理伤害追加20%。|n|cFF808080长剑由审判之环的残辉淬成，剑脊上还留着划分罪责的冷光。|r',
 })
 
 createEquipmentItem('I0EU', '异形化残刃', {

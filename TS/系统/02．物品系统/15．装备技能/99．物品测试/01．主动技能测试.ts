@@ -9,6 +9,9 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
   注册聊天命令监听: (this: void, 命令: string, 回调: (this: void, player: any, command: string) => void) => void;
 };
+const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
+};
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
 };
@@ -18,7 +21,12 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.index") as {
   创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
 };
+const platformAbilityAction = require("平台扩展API动作") as {
+  技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
+};
 
+import { items as 装备数据 } from "../../01．装备数据";
+import { 通用物品技能槽位配置表 } from "../03．主动技能/00．公共/02．通用物品技能槽位配置";
 import {
   物品主动技能测试发放顺序,
   物品主动技能测试命令列表,
@@ -34,8 +42,26 @@ const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const UnitItemInSlot = jass.UnitItemInSlot as (unit: any, slot: number) => any;
+const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const GetPlayerName = jass.GetPlayerName as (player: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
+const CreateGroup = jass.CreateGroup as () => any;
+const DestroyGroup = jass.DestroyGroup as (whichGroup: any) => void;
+const GroupEnumUnitsOfPlayer = jass.GroupEnumUnitsOfPlayer as (whichGroup: any, whichPlayer: any, filter: any) => void;
+const FirstOfGroup = jass.FirstOfGroup as (whichGroup: any) => any;
+const GroupRemoveUnit = jass.GroupRemoveUnit as (whichGroup: any, whichUnit: any) => void;
+const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
+const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 const 模块名 = "物品主动技能测试";
+const 物品冷却刷新命令 = "wpcd";
+const 打印注册命令日志 = false;
+const 测试玩家名称 = "WorldEdit";
+const 红色玩家ID = 0;
+const 测试物品技能ID表: Record<number, number[] | undefined> = {};
+let 已初始化测试物品技能ID表 = false;
 
 function 获取测试单位(this: void): any {
   return g.gg_unit_Hamg_0002 ?? (globalThis as any).bj_lastCreatedUnit ?? null;
@@ -64,6 +90,55 @@ function 丢弃测试装备(this: void, unit: any): void {
   }
 }
 
+function 是允许物品测试玩家(this: void, player: any): boolean {
+  if (player == null || player === 0) return false;
+  if (GetPlayerId(player) !== 红色玩家ID) return false;
+  const playerName = GetPlayerName(player) ?? "";
+  return playerName === 测试玩家名称 || playerName === 测试玩家名称 + ":";
+}
+
+function 是有效英雄(this: void, unit: any): boolean {
+  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_HERO) === true && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
+}
+
+function 单位属于玩家(this: void, unit: any, player: any): boolean {
+  if (!是有效英雄(unit)) return false;
+  return GetPlayerId(GetOwningPlayer(unit)) === GetPlayerId(player);
+}
+
+function 收集玩家英雄(this: void, player: any): any[] {
+  const result: any[] = [];
+  const seen: Record<number, boolean> = {};
+
+  function 添加英雄(this: void, hero: any): void {
+    if (!单位属于玩家(hero, player)) return;
+    const handleId = GetHandleId(hero);
+    if (handleId > 0 && seen[handleId] === true) return;
+    if (handleId > 0) seen[handleId] = true;
+    result.push(hero);
+  }
+
+  添加英雄(getRegisteredPlayerHero(player));
+  添加英雄(获取测试单位());
+
+  const group = CreateGroup();
+  GroupEnumUnitsOfPlayer(group, player, null);
+  let unit = FirstOfGroup(group);
+  while (unit != null && unit !== 0) {
+    GroupRemoveUnit(group, unit);
+    添加英雄(unit);
+    unit = FirstOfGroup(group);
+  }
+  DestroyGroup(group);
+  return result;
+}
+
+function 获取玩家测试单位(this: void, player: any): any {
+  const heroes = 收集玩家英雄(player);
+  if (heroes.length > 0) return heroes[0];
+  return null;
+}
+
 function 发放装备(this: void, unit: any, 装备名: string): boolean {
   const rawId = 按名字反查物品ID(装备名);
   if (rawId == null || rawId === "") {
@@ -81,6 +156,82 @@ function 发放装备(this: void, unit: any, 装备名: string): boolean {
   return true;
 }
 
+function 添加测试物品技能ID(this: void, rawId: string | undefined, abilList: string | undefined): void {
+  if (rawId == null || rawId === "" || abilList == null || abilList === "") return;
+  const itemTypeId = stringToFourCCSafe(rawId);
+  if (itemTypeId === 0) return;
+
+  const abilityIds = 测试物品技能ID表[itemTypeId] ?? [];
+  const rawAbilityList = abilList.split(",");
+  for (let i = 0; i < rawAbilityList.length; i++) {
+    const abilityRawId = rawAbilityList[i].trim();
+    if (abilityRawId === "") continue;
+    const abilityId = stringToFourCCSafe(abilityRawId);
+    if (abilityId !== 0 && abilityIds.indexOf(abilityId) < 0) {
+      abilityIds.push(abilityId);
+    }
+  }
+  if (abilityIds.length > 0) {
+    测试物品技能ID表[itemTypeId] = abilityIds;
+  }
+}
+
+function 初始化测试物品技能ID表(this: void): void {
+  if (已初始化测试物品技能ID表) return;
+  已初始化测试物品技能ID表 = true;
+
+  const 测试物品RawID表: Record<string, boolean> = {};
+  for (let i = 0; i < 物品主动技能测试发放顺序.length; i++) {
+    const 装备名 = 物品主动技能测试发放顺序[i];
+    const rawId = 按名字反查物品ID(装备名);
+    if (rawId != null && rawId !== "") 测试物品RawID表[rawId] = true;
+    const 装备项 = rawId != null ? 装备数据[rawId] : undefined;
+    添加测试物品技能ID(rawId, 装备项?.abilList);
+  }
+
+  for (let i = 0; i < 通用物品技能槽位配置表.length; i++) {
+    const 配置 = 通用物品技能槽位配置表[i];
+    if (测试物品RawID表[配置.物编ID] === true) {
+      添加测试物品技能ID(配置.物编ID, 配置.技能ID);
+    }
+  }
+}
+
+function 刷新英雄装备冷却(this: void, hero: any): number {
+  if (!是有效英雄(hero)) return 0;
+  初始化测试物品技能ID表();
+
+  let 刷新数量 = 0;
+  for (let 槽位 = 0; 槽位 < 6; 槽位++) {
+    const item = UnitItemInSlot(hero, 槽位);
+    if (item == null || item === 0) continue;
+    const abilityIds = 测试物品技能ID表[GetItemTypeId(item)];
+    if (abilityIds == null) continue;
+    for (let i = 0; i < abilityIds.length; i++) {
+      if (platformAbilityAction.技能_设置技能冷却时间(hero, abilityIds[i], 0, 0)) {
+        刷新数量++;
+      }
+    }
+  }
+  return 刷新数量;
+}
+
+function on聊天刷新物品冷却(this: void, player: any, _command: string): void {
+  if (!是允许物品测试玩家(player)) return;
+
+  const heroes = 收集玩家英雄(player);
+  if (heroes.length <= 0) {
+    debugLogForce(模块名, "未找到红色测试玩家英雄");
+    return;
+  }
+
+  let 刷新数量 = 0;
+  for (let i = 0; i < heroes.length; i++) {
+    刷新数量 += 刷新英雄装备冷却(heroes[i]);
+  }
+  debugLogForce(模块名, "已刷新测试物品冷却", "英雄数", heroes.length, "技能数", 刷新数量);
+}
+
 function 发放单个装备(this: void, unit: any, 序号: number): void {
   丢弃测试装备(unit);
   if (序号 > 0 && 序号 <= 物品主动技能测试发放顺序.length) {
@@ -91,10 +242,12 @@ function 发放单个装备(this: void, unit: any, 序号: number): void {
   }
 }
 
-function on聊天wp测试(this: void, _player: any, command: string): void {
-  const unit = 获取测试单位();
+function on聊天wp测试(this: void, player: any, command: string): void {
+  if (!是允许物品测试玩家(player)) return;
+
+  const unit = 获取玩家测试单位(player);
   if (unit == null || unit === 0) {
-    debugLogForce(模块名, "未找到大法师单位");
+    debugLogForce(模块名, "未找到红色测试玩家英雄");
     return;
   }
 
@@ -109,7 +262,10 @@ function on聊天wp测试(this: void, _player: any, command: string): void {
 for (let i = 0; i < 物品主动技能测试命令列表.length; i++) {
   注册聊天命令监听(物品主动技能测试命令列表[i], on聊天wp测试);
 }
+注册聊天命令监听(物品冷却刷新命令, on聊天刷新物品冷却);
 
-debugLogForce(模块名, "已注册测试命令", 物品主动技能测试命令说明文本列表.join(" | "));
+if (打印注册命令日志) {
+  debugLogForce(模块名, "已注册测试命令", 物品主动技能测试命令说明文本列表.join(" | "), 物品冷却刷新命令 + "=刷新当前玩家英雄装备冷却");
+}
 
 export {};

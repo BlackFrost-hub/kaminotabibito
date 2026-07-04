@@ -59,3 +59,17 @@ createEquipmentItem('I0F8', '荆棘行者披风', {
   tooltipExtended = '|cffccffff[披风]-自然/机动|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n护甲+26|n自然伤害+15%|n闪避+10%|n移动速度+8%|n|cFF808080披风边缘缠着干枯荆棘，走动时会留下细碎绿光。|r',
   description = '|cffccffff[披风]-自然/机动|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n护甲+26|n自然伤害+15%|n闪避+10%|n移动速度+8%|n|cFF808080披风边缘缠着干枯荆棘，走动时会留下细碎绿光。|r',
 })
+
+createEquipmentItem('I0FF', '影骨披风', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Clothes\\shadowbone_cloak.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = 'IN01',
+  cooldownGroup = 'IN01',
+  classification = 'Permanent',
+  level = 5,
+  priority = 1000,
+  activelyUsed = true,
+  tooltipExtended = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：C|n评分：3820|r|n|cffffffcc[基础属性]|r|n敏捷+22|n护甲+12|n闪避+8%|n移动速度+6%|n|cffffffcc[使用]|r|n进入潜行6秒，期间移动速度提高15%，破隐后下一次伤害获得强化，冷却90秒。|n|cFF808080披风由影骨莫特斯的残影缝成，披上时脚步会先于身形消失。|r',
+  description = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：C|n评分：3820|r|n|cffffffcc[基础属性]|r|n敏捷+22|n护甲+12|n闪避+8%|n移动速度+6%|n|cffffffcc[使用]|r|n进入潜行6秒，期间移动速度提高15%，破隐后下一次伤害获得强化，冷却90秒。|n|cFF808080披风由影骨莫特斯的残影缝成，披上时脚步会先于身形消失。|r',
+})

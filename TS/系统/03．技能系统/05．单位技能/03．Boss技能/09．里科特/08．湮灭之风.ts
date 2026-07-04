@@ -39,7 +39,7 @@ const { 施加快速控制Buff, 施加快速减速Buff } = require("系统.03．
   施加快速控制Buff: (this: void, source: any, target: any, controlType: number, duration: number) => void;
   施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number) => void;
 };
-const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．物品技能工具") as {
+const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   施加眩晕: (this: void, source: any, target: any, duration: number) => void;
 };
 

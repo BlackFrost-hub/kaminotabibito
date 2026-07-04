@@ -1,5 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.01．主动技能物品ID")
+local _____745F_5170_8FEA_5C14_7684_51B3_5FC3_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["瑟兰迪尔的决心物品ID"]
+local ____01_FF0E_7269_54C1_4F7F_7528_914D_7F6E_8868 = require("系统.02．物品系统.15．装备技能.05．物品使用.00．公共.01．物品使用配置表")
+local _____7269_54C1_4F7F_7528_88C5_5907ID = ____01_FF0E_7269_54C1_4F7F_7528_914D_7F6E_8868["物品使用装备ID"]
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.13．物品技能事件中心")
 local _____6CE8_518C_7269_54C1_6280_80FD_4E8B_4EF6_76D1_542C = ____require_result_0["注册物品技能事件监听"]
 local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
@@ -10,6 +14,7 @@ local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算
 local registerDamageModifier = ____require_result_3.registerDamageModifier
 local jass = require("jass.common")
 local IsUnitType = jass.IsUnitType
+local GetItemTypeId = jass.GetItemTypeId
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local _____72F1_5996_9B54_76FE = require("系统.02．物品系统.15．装备技能.00．物品.49．狱妖魔盾")
 local _____5546_4EBA_4E4B_4E66 = require("系统.02．物品系统.15．装备技能.00．物品.50．商人之书")
@@ -35,9 +40,9 @@ local _____55DC_72F1_6076_5251 = require("系统.02．物品系统.15．装备�
 local _____76D7_8D3C_795E_7B26_9B54_6297 = require("系统.02．物品系统.15．装备技能.00．物品.70．盗贼神符魔抗")
 local _____706B_628A = require("系统.02．物品系统.15．装备技能.00．物品.71．火把")
 local _____6297_6BD2_836F_6C34 = require("系统.02．物品系统.15．装备技能.00．物品.114．抗毒药水")
-local _____745F_5170_8FEA_5C14_7684_51B3_5FC3 = require("系统.02．物品系统.15．装备技能.00．物品.136．瑟兰迪尔的决心")
-local _____5F71_9AA8_62AB_98CE = require("系统.02．物品系统.15．装备技能.00．物品.150．影骨披风")
-local _____9634_5F71_9677_9631_88C5_7F6E = require("系统.02．物品系统.15．装备技能.00．物品.153．阴影陷阱装置")
+local _____745F_5170_8FEA_5C14_7684_51B3_5FC3 = require("系统.02．物品系统.15．装备技能.00．物品.162．瑟兰迪尔的决心")
+local _____5F71_9AA8_62AB_98CE = require("系统.02．物品系统.15．装备技能.00．物品.131．影骨披风")
+local _____9634_5F71_9677_9631_88C5_7F6E = require("系统.02．物品系统.15．装备技能.00．物品.134．阴影陷阱装置")
 local _____5DF2_521D_59CB_5316 = false
 local function _____7269_54C1_4F7F_7528_5355_4F4D_662F_82F1_96C4(ctx)
     local unit = ctx["施法单位"]
@@ -47,33 +52,148 @@ local function ____on_7269_54C1_4F7F_7528_94FE_8DEF(ctx)
     if not _____7269_54C1_4F7F_7528_5355_4F4D_662F_82F1_96C4(ctx) then
         return
     end
-    _____72F1_5996_9B54_76FE["处理狱妖魔盾使用"](ctx)
-    _____5546_4EBA_4E4B_4E66["处理商人之书使用"](ctx)
-    _____72C2_66B4_6811_679D["处理狂暴树枝使用"](ctx)
-    _____9996_9886_53F7_89D2["处理首领号角使用"](ctx)
-    _____7CBE_7075_53F7_89D2["处理精灵号角使用"](ctx)
-    _____5B88_536B_5927_5251["处理守卫大剑使用"](ctx)
-    _____65AF_5C14_80FD_91CF_4E4B_5FC3["处理斯尔能量之心使用"](ctx)
-    _____7194_5CA9_5730_72F1_4E4B_6572_949F["处理熔岩地狱之敲钟使用"](ctx)
-    _____9634_6697_4E4B_6572_949F["处理阴暗之敲钟使用"](ctx)
-    _____5730_72F1_706B_5361_724C_653B_51FB["处理地狱火卡牌攻击使用"](ctx)
-    _____7130_6DF7_80FD_91CF_4F53["处理焰混能量体使用"](ctx)
-    _____6076_65AF_80F8_7532["处理恶斯胸甲使用"](ctx)
-    _____4EA1_7075_9B54_978B["处理亡灵魔鞋使用"](ctx)
-    _____6076_9B54_94C3_94DB["处理恶魔铃铛使用"](ctx)
-    _____9B54_53E4_6218_5203["处理魔古战刃使用"](ctx)
-    _____5973_5996_9B54_7532["处理女妖魔甲使用"](ctx)
-    _____7194_7075_5B9D_77F3_4E4B_6212["处理熔灵宝石之戒使用"](ctx)
-    _____6D74_8840_836F_5242["处理浴血药剂使用"](ctx)
-    _____6D74_9B54_836F_5242["处理浴魔药剂使用"](ctx)
-    _____6D74_7075_836F_5242["处理浴灵药剂使用"](ctx)
-    _____55DC_72F1_6076_5251["处理嗜狱恶剑使用"](ctx)
-    _____76D7_8D3C_795E_7B26_9B54_6297["处理盗贼神符魔抗使用"](ctx)
-    _____706B_628A["处理火把使用"](ctx)
-    _____6297_6BD2_836F_6C34["处理抗毒药水使用"](ctx)
-    _____745F_5170_8FEA_5C14_7684_51B3_5FC3["处理瑟兰迪尔的决心使用"](ctx)
-    _____5F71_9AA8_62AB_98CE["处理影骨披风使用"](ctx)
-    _____9634_5F71_9677_9631_88C5_7F6E["处理阴影陷阱装置使用"](ctx)
+    if ctx["物品"] == nil or ctx["物品"] == 0 then
+        return
+    end
+    local _____7269_54C1_7C7B_578BID = GetItemTypeId(ctx["物品"])
+    repeat
+        local ____switch6 = _____7269_54C1_7C7B_578BID
+        local ____cond6 = ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["狱妖魔盾"]
+        if ____cond6 then
+            _____72F1_5996_9B54_76FE["处理狱妖魔盾使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["商人之书"]
+        if ____cond6 then
+            _____5546_4EBA_4E4B_4E66["处理商人之书使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["狂暴树枝"]
+        if ____cond6 then
+            _____72C2_66B4_6811_679D["处理狂暴树枝使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["首领号角"]
+        if ____cond6 then
+            _____9996_9886_53F7_89D2["处理首领号角使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["精灵号角"]
+        if ____cond6 then
+            _____7CBE_7075_53F7_89D2["处理精灵号角使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["守卫大剑"]
+        if ____cond6 then
+            _____5B88_536B_5927_5251["处理守卫大剑使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["斯尔能量之心"]
+        if ____cond6 then
+            _____65AF_5C14_80FD_91CF_4E4B_5FC3["处理斯尔能量之心使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["熔岩地狱之敲钟"]
+        if ____cond6 then
+            _____7194_5CA9_5730_72F1_4E4B_6572_949F["处理熔岩地狱之敲钟使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["阴暗之敲钟"]
+        if ____cond6 then
+            _____9634_6697_4E4B_6572_949F["处理阴暗之敲钟使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["地狱火卡牌攻击"]
+        if ____cond6 then
+            _____5730_72F1_706B_5361_724C_653B_51FB["处理地狱火卡牌攻击使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["焰混能量体"]
+        if ____cond6 then
+            _____7130_6DF7_80FD_91CF_4F53["处理焰混能量体使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["恶斯胸甲"]
+        if ____cond6 then
+            _____6076_65AF_80F8_7532["处理恶斯胸甲使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["亡灵魔鞋"]
+        if ____cond6 then
+            _____4EA1_7075_9B54_978B["处理亡灵魔鞋使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["恶魔铃铛"]
+        if ____cond6 then
+            _____6076_9B54_94C3_94DB["处理恶魔铃铛使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["魔古战刃"]
+        if ____cond6 then
+            _____9B54_53E4_6218_5203["处理魔古战刃使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["女妖魔甲"]
+        if ____cond6 then
+            _____5973_5996_9B54_7532["处理女妖魔甲使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["熔灵宝石之戒"]
+        if ____cond6 then
+            _____7194_7075_5B9D_77F3_4E4B_6212["处理熔灵宝石之戒使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["浴血药剂"]
+        if ____cond6 then
+            _____6D74_8840_836F_5242["处理浴血药剂使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["浴魔药剂"]
+        if ____cond6 then
+            _____6D74_9B54_836F_5242["处理浴魔药剂使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["浴灵药剂"]
+        if ____cond6 then
+            _____6D74_7075_836F_5242["处理浴灵药剂使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["嗜狱恶剑"]
+        if ____cond6 then
+            _____55DC_72F1_6076_5251["处理嗜狱恶剑使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["盗贼神符魔抗"]
+        if ____cond6 then
+            _____76D7_8D3C_795E_7B26_9B54_6297["处理盗贼神符魔抗使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["火把"]
+        if ____cond6 then
+            _____706B_628A["处理火把使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["抗毒药水"]
+        if ____cond6 then
+            _____6297_6BD2_836F_6C34["处理抗毒药水使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____745F_5170_8FEA_5C14_7684_51B3_5FC3_7269_54C1ID
+        if ____cond6 then
+            _____745F_5170_8FEA_5C14_7684_51B3_5FC3["处理瑟兰迪尔的决心使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["影骨披风"]
+        if ____cond6 then
+            _____5F71_9AA8_62AB_98CE["处理影骨披风使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["阴影陷阱装置"]
+        if ____cond6 then
+            _____9634_5F71_9677_9631_88C5_7F6E["处理阴影陷阱装置使用"](ctx)
+            break
+        end
+    until true
 end
 local function ____on_7269_54C1_4F7F_7528_6B7B_4EA1_4E8B_4EF6(dyingUnit, killingUnit)
     _____65AF_5C14_80FD_91CF_4E4B_5FC3["处理斯尔能量之心击杀"](dyingUnit, killingUnit)
