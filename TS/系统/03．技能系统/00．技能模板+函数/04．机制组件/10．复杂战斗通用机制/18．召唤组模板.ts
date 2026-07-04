@@ -14,37 +14,37 @@ const jass = require("jass.common") as any;
 const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, targetWidget: any) => boolean;
 const IssuePointOrder = jass.IssuePointOrder as (whichUnit: any, order: string, x: number, y: number) => boolean;
 
-export interface Boss召唤单位参数 extends 机制单位生命周期参数 {
+export interface 召唤单位参数 extends 机制单位生命周期参数 {
   攻击目标?: any;
   命令?: string;
   命令X?: number;
   命令Y?: number;
 }
 
-export interface Boss召唤组模板参数 {
+export interface 召唤组模板参数 {
   清理?: 机制清理篮子;
   名称: string;
-  单位列表: Boss召唤单位参数[];
+  单位列表: 召唤单位参数[];
   全灭延迟秒?: number;
   on单位创建?: (this: void, 实例: 机制单位生命周期实例, index: number) => void;
   on单位结束?: (this: void, 实例: 机制单位生命周期实例, 原因: 机制单位生命周期结束原因, index: number) => void;
   on全部死亡?: (this: void, 组: 召唤物组状态) => void;
 }
 
-export interface Boss召唤组实例 {
+export interface 召唤组实例 {
   readonly 组状态: 召唤物组状态;
   取实例列表(): 机制单位生命周期实例[];
   创建全部(): void;
   销毁(): void;
 }
 
-class Boss召唤组实现 implements Boss召唤组实例 {
+class 召唤组实现 implements 召唤组实例 {
   readonly 组状态: 召唤物组状态;
-  private 参数: Boss召唤组模板参数;
+  private 参数: 召唤组模板参数;
   private 实例列表: 机制单位生命周期实例[] = [];
   private 已创建 = false;
 
-  constructor(参数: Boss召唤组模板参数) {
+  constructor(参数: 召唤组模板参数) {
     this.参数 = 参数;
     this.组状态 = 创建召唤物组状态({
       清理: 参数.清理,
@@ -77,18 +77,18 @@ class Boss召唤组实现 implements Boss召唤组实例 {
     this.组状态.销毁();
   }
 
-  private 创建单个(index: number, 单位参数: Boss召唤单位参数): void {
+  private 创建单个(index: number, 单位参数: 召唤单位参数): void {
     const self = this;
     const 实例 = 创建机制单位生命周期({
       ...单位参数,
       清理: 单位参数.清理 ?? this.参数.清理,
-      on创建: function Boss召唤组单位创建(this: void, created: 机制单位生命周期实例): void {
+      on创建: function 召唤组单位创建(this: void, created: 机制单位生命周期实例): void {
         self.组状态.登记(created.单位);
         self.下达命令(created, 单位参数);
         if (单位参数.on创建 != null) 单位参数.on创建(created);
         if (self.参数.on单位创建 != null) self.参数.on单位创建(created, index);
       },
-      on结束: function Boss召唤组单位结束(this: void, ended: 机制单位生命周期实例, 原因: 机制单位生命周期结束原因): void {
+      on结束: function 召唤组单位结束(this: void, ended: 机制单位生命周期实例, 原因: 机制单位生命周期结束原因): void {
         if (单位参数.on结束 != null) 单位参数.on结束(ended, 原因);
         if (self.参数.on单位结束 != null) self.参数.on单位结束(ended, 原因, index);
       },
@@ -96,7 +96,7 @@ class Boss召唤组实现 implements Boss召唤组实例 {
     if (实例 != null) this.实例列表.push(实例);
   }
 
-  private 下达命令(实例: 机制单位生命周期实例, 单位参数: Boss召唤单位参数): void {
+  private 下达命令(实例: 机制单位生命周期实例, 单位参数: 召唤单位参数): void {
     const order = 单位参数.命令 ?? "attack";
     if (单位参数.攻击目标 != null && 单位参数.攻击目标 !== 0) {
       IssueTargetOrder(实例.单位, order, 单位参数.攻击目标);
@@ -108,10 +108,10 @@ class Boss召唤组实现 implements Boss召唤组实例 {
   }
 }
 
-export function 创建Boss召唤组(this: void, 参数: Boss召唤组模板参数): Boss召唤组实例 {
-  const 实例 = new Boss召唤组实现(参数);
+export function 创建召唤组(this: void, 参数: 召唤组模板参数): 召唤组实例 {
+  const 实例 = new 召唤组实现(参数);
   if (参数.清理 != null) {
-    参数.清理.登记清理(参数.名称, function Boss召唤组清理(this: void): void {
+    参数.清理.登记清理(参数.名称, function 召唤组清理(this: void): void {
       实例.销毁();
     });
   }

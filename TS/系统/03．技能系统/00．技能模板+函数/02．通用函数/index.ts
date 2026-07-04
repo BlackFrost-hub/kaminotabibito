@@ -36,6 +36,6 @@ export {
   点到线段距离平方 as Boss点到线段距离平方,
   播放点特效 as Boss播放点特效,
   播放单位特效 as Boss播放单位特效,
-} from "./19．Boss公共工具";
+} from "./19．战斗公共工具";
 
 export * from "./01．便捷短函数集合/index";

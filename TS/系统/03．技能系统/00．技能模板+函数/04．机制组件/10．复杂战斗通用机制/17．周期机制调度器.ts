@@ -7,7 +7,7 @@ const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核
   removePeriodicCallback: (this: void, id: number) => void;
 };
 
-export interface Boss周期机制调度器参数<T> {
+export interface 周期机制调度器参数<T> {
   名称: string;
   清理?: 机制清理篮子;
   间隔毫秒: number;
@@ -18,28 +18,28 @@ export interface Boss周期机制调度器参数<T> {
   自动启动?: boolean;
 }
 
-export interface Boss周期机制调度器 {
+export interface 周期机制调度器 {
   启动(): void;
   停止(): void;
   是否运行中(): boolean;
 }
 
-function onBoss周期机制调度器Tick(this: void, variable?: any): void {
-  const 实例 = variable as Boss周期机制调度器实现<any> | undefined;
+function on周期机制调度器Tick(this: void, variable?: any): void {
+  const 实例 = variable as 周期机制调度器实现<any> | undefined;
   if (实例 != null) 实例.执行Tick();
 }
 
-class Boss周期机制调度器实现<T> implements Boss周期机制调度器 {
-  private 参数: Boss周期机制调度器参数<T>;
+class 周期机制调度器实现<T> implements 周期机制调度器 {
+  private 参数: 周期机制调度器参数<T>;
   private 回调ID = 0;
 
-  constructor(参数: Boss周期机制调度器参数<T>) {
+  constructor(参数: 周期机制调度器参数<T>) {
     this.参数 = 参数;
   }
 
   启动(): void {
     if (this.回调ID !== 0) return;
-    this.回调ID = addPeriodicCallback(this.参数.间隔毫秒, onBoss周期机制调度器Tick, this);
+    this.回调ID = addPeriodicCallback(this.参数.间隔毫秒, on周期机制调度器Tick, this);
   }
 
   停止(): void {
@@ -64,10 +64,10 @@ class Boss周期机制调度器实现<T> implements Boss周期机制调度器 {
   }
 }
 
-export function 创建Boss周期机制调度器<T>(this: void, 参数: Boss周期机制调度器参数<T>): Boss周期机制调度器 {
-  const 实例 = new Boss周期机制调度器实现(参数);
+export function 创建周期机制调度器<T>(this: void, 参数: 周期机制调度器参数<T>): 周期机制调度器 {
+  const 实例 = new 周期机制调度器实现(参数);
   if (参数.清理 != null) {
-    参数.清理.登记清理(参数.名称, function Boss周期机制调度器清理(this: void): void {
+    参数.清理.登记清理(参数.名称, function 周期机制调度器清理(this: void): void {
       实例.停止();
     });
   }

@@ -27,6 +27,7 @@ import {
 } from "./00．测试配置";
 
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
+const CreateItem = jass.CreateItem as (itemId: number, x: number, y: number) => any;
 const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
 const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => boolean;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
@@ -63,26 +64,30 @@ function 丢弃测试装备(this: void, unit: any): void {
   }
 }
 
-function 发放装备(this: void, unit: any, 装备名: string): void {
+function 发放装备(this: void, unit: any, 装备名: string): boolean {
   const rawId = 按名字反查物品ID(装备名);
   if (rawId == null || rawId === "") {
     debugLogForce(模块名, "未找到装备ID", 装备名);
-    return;
+    return false;
   }
-  const item = 创建物品并注册排泄监听(stringToFourCCSafe(rawId), GetUnitX(unit), GetUnitY(unit));
+  const itemTypeId = stringToFourCCSafe(rawId);
+  const item = CreateItem(itemTypeId, GetUnitX(unit), GetUnitY(unit));
   if (item == null || item === 0) {
-    debugLogForce(模块名, "创建装备失败", 装备名, rawId);
-    return;
+    debugLogForce(模块名, "创建装备失败", 装备名, rawId, itemTypeId);
+    return false;
   }
-  const ok = IssueTargetOrder(unit, "smart", item);
-  debugLogForce(模块名, "已创建并下达拾取命令", 装备名, ok);
+  UnitAddItem(unit, item);
+  debugLogForce(模块名, "已创建并加入背包", 装备名, rawId);
+  return true;
 }
 
 function 发放单个装备(this: void, unit: any, 序号: number): void {
   丢弃测试装备(unit);
   if (序号 > 0 && 序号 <= 物品主动技能测试发放顺序.length) {
-    发放装备(unit, 物品主动技能测试发放顺序[序号 - 1]);
-    debugLogForce(模块名, "已发放测试装备", 序号, 物品主动技能测试发放顺序[序号 - 1]);
+    const 装备名 = 物品主动技能测试发放顺序[序号 - 1];
+    if (发放装备(unit, 装备名)) {
+      debugLogForce(模块名, "已发放测试装备", 序号, 装备名);
+    }
   }
 }
 

@@ -5,5 +5,4 @@
 export * from "./00．技能模板/index";
 export * from "./01．技能函数/index";
 export * from "./02．通用函数/index";
-export * from "./03．技能测试/index";
 export * from "./04．机制组件/index";

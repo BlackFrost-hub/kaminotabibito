@@ -10,15 +10,15 @@ local _____521B_5EFA_53EC_5524_7269_7EC4_72B6_6001 = ____03_FF0E_53EC_5524_7269_
 local jass = require("jass.common")
 local IssueTargetOrder = jass.IssueTargetOrder
 local IssuePointOrder = jass.IssuePointOrder
-local ____Boss_53EC_5524_7EC4_5B9E_73B0 = __TS__Class()
-____Boss_53EC_5524_7EC4_5B9E_73B0.name = "Boss召唤组实现"
-function ____Boss_53EC_5524_7EC4_5B9E_73B0.prototype.____constructor(self, _____53C2_6570)
+local _____53EC_5524_7EC4_5B9E_73B0 = __TS__Class()
+_____53EC_5524_7EC4_5B9E_73B0.name = "召唤组实现"
+function _____53EC_5524_7EC4_5B9E_73B0.prototype.____constructor(self, _____53C2_6570)
     self["实例列表"] = {}
     self["已创建"] = false
     self["参数"] = _____53C2_6570
     self["组状态"] = _____521B_5EFA_53EC_5524_7269_7EC4_72B6_6001({["清理"] = _____53C2_6570["清理"], ["名称"] = _____53C2_6570["名称"], ["全灭延迟秒"] = _____53C2_6570["全灭延迟秒"], ["on全部死亡"] = _____53C2_6570["on全部死亡"]})
 end
-____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["取实例列表"] = function(self)
+_____53EC_5524_7EC4_5B9E_73B0.prototype["取实例列表"] = function(self)
     local result = {}
     do
         local i = 0
@@ -29,7 +29,7 @@ ____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["取实例列表"] = function(self)
     end
     return result
 end
-____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["创建全部"] = function(self)
+_____53EC_5524_7EC4_5B9E_73B0.prototype["创建全部"] = function(self)
     if self["已创建"] then
         return
     end
@@ -42,7 +42,7 @@ ____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["创建全部"] = function(self)
         end
     end
 end
-____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["销毁"] = function(self)
+_____53EC_5524_7EC4_5B9E_73B0.prototype["销毁"] = function(self)
     do
         local i = 0
         while i < #self["实例列表"] do
@@ -57,7 +57,7 @@ ____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["销毁"] = function(self)
     local ____self_0 = self["组状态"]
     ____self_0["销毁"](____self_0)
 end
-____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["创建单个"] = function(self, index, _____5355_4F4D_53C2_6570)
+_____53EC_5524_7EC4_5B9E_73B0.prototype["创建单个"] = function(self, index, _____5355_4F4D_53C2_6570)
     local ____self = self
     local _____5B9E_4F8B = _____521B_5EFA_673A_5236_5355_4F4D_751F_547D_5468_671F(__TS__ObjectAssign(
         {},
@@ -90,7 +90,7 @@ ____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["创建单个"] = function(self, ind
         ____self__5B9E_4F8B_5217_8868_2[#____self__5B9E_4F8B_5217_8868_2 + 1] = _____5B9E_4F8B
     end
 end
-____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["下达命令"] = function(self, _____5B9E_4F8B, _____5355_4F4D_53C2_6570)
+_____53EC_5524_7EC4_5B9E_73B0.prototype["下达命令"] = function(self, _____5B9E_4F8B, _____5355_4F4D_53C2_6570)
     local order = _____5355_4F4D_53C2_6570["命令"] or "attack"
     if _____5355_4F4D_53C2_6570["攻击目标"] ~= nil and _____5355_4F4D_53C2_6570["攻击目标"] ~= 0 then
         IssueTargetOrder(_____5B9E_4F8B["单位"], order, _____5355_4F4D_53C2_6570["攻击目标"])
@@ -100,8 +100,8 @@ ____Boss_53EC_5524_7EC4_5B9E_73B0.prototype["下达命令"] = function(self, ___
         IssuePointOrder(_____5B9E_4F8B["单位"], order, _____5355_4F4D_53C2_6570["命令X"], _____5355_4F4D_53C2_6570["命令Y"])
     end
 end
-____exports["创建Boss召唤组"] = function(_____53C2_6570)
-    local _____5B9E_4F8B = __TS__New(____Boss_53EC_5524_7EC4_5B9E_73B0, _____53C2_6570)
+____exports["创建召唤组"] = function(_____53C2_6570)
+    local _____5B9E_4F8B = __TS__New(_____53EC_5524_7EC4_5B9E_73B0, _____53C2_6570)
     if _____53C2_6570["清理"] ~= nil then
         local ____self_3 = _____53C2_6570["清理"]
         ____self_3["登记清理"](

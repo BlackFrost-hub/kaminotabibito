@@ -4,3 +4,6 @@ export * from "./03．延迟承伤";
 export * from "./04．失去资源属性转换";
 export * from "./05．治疗护盾联动";
 export * from "./06．控制Debuff联动";
+export * from "./07．击杀回复触发模板";
+export * from "./08．潜行状态模板";
+export * from "./09．主动陷阱模板";

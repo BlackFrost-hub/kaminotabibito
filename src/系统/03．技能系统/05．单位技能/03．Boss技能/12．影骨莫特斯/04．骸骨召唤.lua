@@ -18,8 +18,8 @@ local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____53D6_5355_4F4DID = ____11_FF0E_516C_5171_5DE5_5177["取单位ID"]
-local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
-local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 function _____767B_8BB0_5F71_9AA8_53EC_5524_7269(unit, context)
     local id = _____53D6_5355_4F4DID(unit)
     if id ~= 0 then
@@ -257,7 +257,7 @@ local function _____5F71_9AA8_9AB8_9AA8_53EC_5524_5206_6BB5(variable)
     end
     _____53EC_5524_5F71_9AA8_9AB7_9AC5(variable.context, variable.group, variable.count)
 end
-local function _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
+____exports["释放影骨骸骨召唤"] = function(context)
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "骸骨召唤")
     local ____context_11, _____4E0B_4E00_4E2A_53EC_5524_7EC4ID_12 = context, "下一个召唤组ID"
     local ____context__4E0B_4E00_4E2A_53EC_5524_7EC4ID_13 = ____context_11[_____4E0B_4E00_4E2A_53EC_5524_7EC4ID_12] + 1
@@ -293,7 +293,7 @@ local function ____on_5F71_9AA8_9AB8_9AA8_53EC_5524_65BD_6CD5(castingUnit, spell
     end
     local context = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587(castingUnit)
     if context ~= nil then
-        _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
+        ____exports["释放影骨骸骨召唤"](context)
     end
 end
 ____exports["注册影骨莫特斯骸骨召唤"] = function()
@@ -302,9 +302,9 @@ ____exports["注册影骨莫特斯骸骨召唤"] = function()
     end
     _____5DF2_6CE8_518C_9AB8_9AA8_53EC_5524 = true
     _____786E_4FDD_9AB7_9AC5_5077_7A83_4FEE_6B63()
-    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+    _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "04．骸骨召唤",
-        ["Boss单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
+        ["单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____9AB8_9AA8_53EC_5524_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
         ["释放技能"] = function(_context, boss)

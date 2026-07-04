@@ -2,7 +2,7 @@
 
 import type { 瑟兰迪尔运行时上下文 } from "./03．运行时上下文";
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
-import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;

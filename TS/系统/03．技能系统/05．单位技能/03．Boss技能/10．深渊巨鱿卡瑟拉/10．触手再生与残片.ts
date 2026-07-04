@@ -2,6 +2,7 @@
 
 import {
   获取全部卡瑟拉上下文,
+  清理卡瑟拉上下文,
   设置玩家触手残片,
   刷新卡瑟拉阶段,
   type 卡瑟拉运行时上下文,
@@ -284,7 +285,10 @@ function on卡瑟拉运行时周期(this: void): void {
   const contexts = 获取全部卡瑟拉上下文();
   for (let i = 0; i < contexts.length; i++) {
     const context = contexts[i];
-    if (!单位有效(context.Boss单位)) continue;
+    if (!单位有效(context.Boss单位)) {
+      清理卡瑟拉上下文(context.Boss单位);
+      continue;
+    }
     刷新卡瑟拉阶段(context);
     处理深渊召唤(context, now);
     尝试触发卡瑟拉触手解放(context);

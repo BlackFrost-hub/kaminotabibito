@@ -4,7 +4,7 @@ const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
 import type { Boss死亡全员奖励, Boss死亡击杀者奖励, Boss死亡结算配置, Boss死亡清理项, Boss死亡结算提示类型 } from "./00．类型";
-import { Boss死亡奖励与清理配置表, Boss死亡结算提示文本表 } from "./02．Boss死亡奖励与清理配置表";
+import { Boss死亡非UI掉落与清理配置表, Boss死亡结算提示文本表 } from "./02．Boss死亡非UI掉落与清理配置表";
 import { Boss死亡结算特殊逻辑标签 } from "./01．常量定义";
 
 const { YDUserDataGetSafe, YDUserDataClearSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
@@ -298,7 +298,7 @@ function Boss单位匹配配置(this: void, 配置: Boss死亡结算配置, Boss
 
   if (配置.Boss引用键 != null && 配置.Boss引用键 !== "") {
     const 引用单位 = 解析Boss单位(配置);
-    if (引用单位 != null && 引用单位 !== 0 && 引用单位 === Boss单位) return true;
+    return 引用单位 != null && 引用单位 !== 0 && 引用单位 === Boss单位;
   }
 
   const 单位类型ID = GetUnitTypeId(Boss单位);
@@ -318,16 +318,16 @@ function Boss单位匹配配置(this: void, 配置: Boss死亡结算配置, Boss
 
 export function 获取Boss死亡结算配置(this: void, Boss单位: any): Boss死亡结算配置 | undefined {
   if (Boss单位 == null || Boss单位 === 0) return undefined;
-  for (let i = 0; i < Boss死亡奖励与清理配置表.length; i++) {
-    const 配置 = Boss死亡奖励与清理配置表[i];
+  for (let i = 0; i < Boss死亡非UI掉落与清理配置表.length; i++) {
+    const 配置 = Boss死亡非UI掉落与清理配置表[i];
     if (Boss单位匹配配置(配置, Boss单位)) return 配置;
   }
   return undefined;
 }
 
 export function 按结算键获取Boss死亡结算配置(this: void, 结算键: string): Boss死亡结算配置 | undefined {
-  for (let i = 0; i < Boss死亡奖励与清理配置表.length; i++) {
-    if (Boss死亡奖励与清理配置表[i].键 === 结算键) return Boss死亡奖励与清理配置表[i];
+  for (let i = 0; i < Boss死亡非UI掉落与清理配置表.length; i++) {
+    if (Boss死亡非UI掉落与清理配置表[i].键 === 结算键) return Boss死亡非UI掉落与清理配置表[i];
   }
   return undefined;
 }

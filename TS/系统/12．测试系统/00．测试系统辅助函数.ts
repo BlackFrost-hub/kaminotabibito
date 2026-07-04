@@ -1,5 +1,11 @@
 /** @noSelfInFile */
 
+const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+};
+
+export const 测试Boss跳过死亡结算字段 = "测试Boss跳过死亡结算";
+
 export interface 测试二维点 {
   x: number;
   y: number;
@@ -103,4 +109,9 @@ export function 复制平移测试矩形数组(this: void, 矩形列表: 测试�
     result.push(按测试映射平移矩形(矩形列表[i], 映射));
   }
   return result;
+}
+
+export function 标记测试Boss跳过死亡结算(this: void, boss: any): void {
+  if (boss == null || boss === 0) return;
+  YDUserDataSetSafe("unit", boss, 测试Boss跳过死亡结算字段, "boolean", true);
 }

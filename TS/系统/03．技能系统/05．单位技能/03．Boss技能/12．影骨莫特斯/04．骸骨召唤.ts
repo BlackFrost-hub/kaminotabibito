@@ -5,7 +5,7 @@ import { 获取或创建影骨莫特斯上下文, 刷新影骨莫特斯阶段, t
 import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y, 取单位ID } from "./11．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -209,7 +209,7 @@ function 影骨骸骨召唤分段(this: void, variable: 影骨骸骨召唤分段
   召唤影骨骷髅(variable.context, variable.group, variable.count);
 }
 
-function 释放影骨骸骨召唤(this: void, context: 影骨莫特斯运行时上下文): void {
+export function 释放影骨骸骨召唤(this: void, context: 影骨莫特斯运行时上下文): void {
   播放影骨莫特斯台词(context.Boss单位, "骸骨召唤");
   const group: 影骨召唤组 = {
     ID: ++context.下一个召唤组ID,
@@ -235,12 +235,12 @@ export function 注册影骨莫特斯骸骨召唤(this: void): void {
   if (已注册骸骨召唤) return;
   已注册骸骨召唤 = true;
   确保骷髅偷窃修正();
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "04．骸骨召唤",
-    Boss单位类型ID: 影骨单位类型ID,
+    单位类型ID: 影骨单位类型ID,
     技能ID: 骸骨召唤技能ID,
     获取或创建上下文: 获取或创建影骨莫特斯上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 影骨莫特斯运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 影骨莫特斯运行时上下文, boss: any): void {
       on影骨骸骨召唤施法(boss, 骸骨召唤技能ID);
     },
   });

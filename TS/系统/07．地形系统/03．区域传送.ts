@@ -6,8 +6,9 @@
  * - 只对非中立敌对玩家生效，传送后立刻下达 stop 命令防止继续走回去
  */
 const jass = require("jass.common") as Record<string, unknown>;
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  getServerTime: (this: void) => number;
 };
 import 区域传送配置 from "./02．区域传送配置";
 import type { RegionConfig } from "./02．区域传送配置";
@@ -23,6 +24,9 @@ const regionEventCenter = require("系统.00．核心系统.01．事件中心.02
 
 // 运行时：Region -> 配置行 的映射，用于在回调里从 Region 反查到表格配置
 const regionMap = new Map<number, RegionConfig>();
+let 区域传送已初始化 = false;
+const 单位区域传送冷却: Record<number, number> = {};
+const 区域传送连触发保护Ms = 500;
 
 // 简易调试输出：把关键信息打到玩家 0 屏幕上，便于排查区域是否创建/触发
 // function dbg(msg: string): void {
@@ -159,11 +163,28 @@ function runRegionRule(rule: string, unit: any, owner: any): void {
   }
 }
 
+function isAliveHero(this: void, unit: any): boolean {
+  return unit != null &&
+    unit !== 0 &&
+    (jass as any).IsUnitType(unit, (jass as any).UNIT_TYPE_HERO) === true &&
+    (jass as any).IsUnitType(unit, (jass as any).UNIT_TYPE_DEAD) !== true;
+}
+
+function isRegionTeleportCoolingDown(this: void, unit: any): boolean {
+  const id = (jass as any).GetHandleId(unit);
+  const now = getServerTime();
+  const last = 单位区域传送冷却[id] || 0;
+  if (last > 0 && now - last < 区域传送连触发保护Ms) return true;
+  单位区域传送冷却[id] = now;
+  return false;
+}
+
 function onRegionEnter(this: void): void {
   const unit = (jass as any).GetTriggerUnit();
   const region = (jass as any).GetTriggeringRegion();
   // dbg("单位进入区域，region=" + (region != null ? "(handle)" : "null"));
   if (unit == null || region == null) return;
+  if (!isAliveHero(unit)) return;
   // 前置条件：不处理中立敌对单位
   const owner = (jass as any).GetOwningPlayer(unit);
   if (
@@ -180,6 +201,7 @@ function onRegionEnter(this: void): void {
   if (cfg == null) return;
   // 先检查配置里的前置 condition（目前仅 always/空，复杂语法预留）
   if (!checkRegionCondition(cfg.condition, unit)) return;
+  if (isRegionTeleportCoolingDown(unit)) return;
 
   // 若 teleportX/Y 都为 0 且存在 rule，则走自定义 rule 流程，否则走普通固定传送
   const useRule = cfg.teleportX === 0 && cfg.teleportY === 0 && typeof cfg.rule === "string" && cfg.rule.length > 0;
@@ -204,8 +226,15 @@ function onRegionEnter(this: void): void {
   }
 }
 
+function isValidRegionRect(this: void, cfg: RegionConfig): boolean {
+  return cfg.left < cfg.right && cfg.bottom < cfg.top;
+}
+
 // 实际初始化逻辑：创建所有启用的 Region 并注册同一个进入触发
 function initRegionTeleport(): void {
+  if (区域传送已初始化) return;
+  区域传送已初始化 = true;
+
   const trig = (jass as any).CreateTrigger();
 
   let total = 0;
@@ -224,6 +253,7 @@ function initRegionTeleport(): void {
   for (const k in 区域传送配置) {
     const cfg = (区域传送配置 as Record<string, RegionConfig>)[k];
     if (cfg == null || !cfg.enabled) continue;
+    if (!isValidRegionRect(cfg)) continue;
 
     const region = (jass as any).CreateRegion();
     // dbg("已创建区域: " + cfg.id);

@@ -7,6 +7,8 @@ local _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
+local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
+local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local jass = require("jass.common")
 local GetUnitState = jass.GetUnitState
 local SetUnitAbilityLevel = jass.SetUnitAbilityLevel
@@ -14,17 +16,15 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitAlly = jass.IsUnitAlly
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_1.registerDamageModifier
-local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_2.registerManualBuff
-local ____require_result_3 = require("系统.05．Buff系统.03．Buff表.01．Boss.06．菲利斯")
-local _____83F2_5229_65AFBuffID = ____require_result_3["菲利斯BuffID"]
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_4["创建Dz绑定单位特效"]
-local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_4["销毁Dz绑定单位特效"]
+local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_0.registerDamageModifier
+local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_1.registerManualBuff
+local ____require_result_2 = require("系统.05．Buff系统.03．Buff表.01．Boss.06．菲利斯")
+local _____83F2_5229_65AFBuffID = ____require_result_2["菲利斯BuffID"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_3["创建Dz绑定单位特效"]
+local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_3["销毁Dz绑定单位特效"]
 local _____9886_8896_5149_73AF_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["领袖光环"]["技能槽位"])
 local _____9886_8896_5149_73AF_5DF2_6CE8_518C = false
 local _____9886_8896_5149_73AF_7279_6548_952E = "菲利斯-领袖光环"
@@ -60,16 +60,6 @@ local function _____5237_65B0_5355_4E2A_9886_8896_5149_73AF(context)
         cfg["光环特效缩放"]
     )
 end
-local function ____on_9886_8896_5149_73AFTick()
-    local list = _____83B7_53D6_5168_90E8_83F2_5229_65AF_4E0A_4E0B_6587()
-    do
-        local i = 0
-        while i < #list do
-            _____5237_65B0_5355_4E2A_9886_8896_5149_73AF(list[i + 1])
-            i = i + 1
-        end
-    end
-end
 local function _____9886_8896_5149_73AF_4F24_5BB3_4FEE_6B63(damageContext)
     if damageContext == nil or damageContext.isNormalAttack ~= true then
         return damageContext.currentDamage
@@ -86,20 +76,20 @@ local function _____9886_8896_5149_73AF_4F24_5BB3_4FEE_6B63(damageContext)
             do
                 local boss = list[i + 1]["Boss单位"]
                 if not _____5355_4F4D_6709_6548(boss) or attacker == boss then
-                    goto __continue13
+                    goto __continue10
                 end
                 if IsUnitAlly(
                     attacker,
                     GetOwningPlayer(boss)
                 ) ~= true then
-                    goto __continue13
+                    goto __continue10
                 end
                 if list[i + 1]["当前领袖光环低血"] then
                     return damageContext.currentDamage * (1 - cfg["低血友军攻击降低"])
                 end
                 return damageContext.currentDamage * (1 + cfg["高血友军攻击提高"])
             end
-            ::__continue13::
+            ::__continue10::
             i = i + 1
         end
     end
@@ -110,7 +100,7 @@ ____exports["注册菲利斯领袖光环"] = function()
         return
     end
     _____9886_8896_5149_73AF_5DF2_6CE8_518C = true
-    addPeriodicCallback(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["领袖光环"]["检查间隔毫秒"], ____on_9886_8896_5149_73AFTick)
+    _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({["名称"] = "菲利斯-领袖光环", ["间隔毫秒"] = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["领袖光环"]["检查间隔毫秒"], ["取上下文列表"] = _____83B7_53D6_5168_90E8_83F2_5229_65AF_4E0A_4E0B_6587, ["执行"] = _____5237_65B0_5355_4E2A_9886_8896_5149_73AF})
     registerDamageModifier(_____9886_8896_5149_73AF_4F24_5BB3_4FEE_6B63, 34)
 end
 return ____exports

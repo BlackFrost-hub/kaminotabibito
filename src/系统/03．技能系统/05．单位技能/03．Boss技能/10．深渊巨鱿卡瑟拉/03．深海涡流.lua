@@ -13,8 +13,8 @@ local _____5355_4F4D_6709_6548 = ____14_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____14_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____8DDD_79BBXY = ____14_FF0E_516C_5171_5DE5_5177["距离XY"]
 local _____9650_5236_6570_503C = ____14_FF0E_516C_5171_5DE5_5177["限制数值"]
-local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
-local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -100,7 +100,7 @@ local function _____7ED3_7B97_6DF1_6D77_6DA1_6D41_7206_53D1(context, x, y)
         end
     end
 end
-local function _____91CA_653E_5361_745F_62C9_6DF1_6D77_6DA1_6D41(context)
+____exports["释放卡瑟拉深海涡流"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
         return
@@ -151,16 +151,16 @@ local function ____on_5361_745F_62C9_6DF1_6D77_6DA1_6D41_65BD_6CD5(castingUnit, 
     if context == nil then
         return
     end
-    _____91CA_653E_5361_745F_62C9_6DF1_6D77_6DA1_6D41(context)
+    ____exports["释放卡瑟拉深海涡流"](context)
 end
 ____exports["注册卡瑟拉深海涡流"] = function()
     if _____5DF2_6CE8_518C then
         return
     end
     _____5DF2_6CE8_518C = true
-    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+    _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "03．深海涡流",
-        ["Boss单位类型ID"] = _____5361_745F_62C9_5355_4F4D_7C7B_578BID,
+        ["单位类型ID"] = _____5361_745F_62C9_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____6DF1_6D77_6DA1_6D41_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5361_745F_62C9_4E0A_4E0B_6587,
         ["释放技能"] = function(_context, boss)

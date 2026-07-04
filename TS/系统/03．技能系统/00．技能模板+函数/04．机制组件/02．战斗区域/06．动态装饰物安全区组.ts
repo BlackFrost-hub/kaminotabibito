@@ -2,7 +2,7 @@
 
 import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
 import { 创建技能提示圈 } from "../../02．通用函数/16．技能提示圈工厂";
-import { stringToFourCC, 距离平方XY } from "../../02．通用函数/19．Boss公共工具";
+import { stringToFourCC, 距离平方XY } from "../../02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
 

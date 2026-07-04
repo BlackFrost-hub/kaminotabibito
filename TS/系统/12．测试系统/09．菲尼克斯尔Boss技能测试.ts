@@ -71,10 +71,11 @@ const { 添加元素层数 } = require("系统.03．技能系统.05．单位技�
 const { 菲尼克斯尔场地配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.06．双重凤凰菲尼克斯尔.01．场地配置") as {
   菲尼克斯尔场地配置: any;
 };
-const { 创建测试中心平移映射, 按测试映射平移坐标, 按测试映射平移矩形 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
+const { 创建测试中心平移映射, 按测试映射平移坐标, 按测试映射平移矩形, 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
   创建测试中心平移映射: (this: void, 正式中心X: number, 正式中心Y: number, 测试中心X: number, 测试中心Y: number) => any;
   按测试映射平移坐标: (this: void, 点: any, 映射: any) => any;
   按测试映射平移矩形: (this: void, 矩形: any, 映射: any) => any;
+  标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
 };
 
 const 测试命令 = "phtest";
@@ -228,12 +229,14 @@ function 获取或创建测试Boss(this: void, player: any): any {
     SetUnitPosition(cached, 临时测试BossX, 临时测试BossY);
     SetUnitFacing(cached, 270);
     设置测试单位满血(cached);
+    标记测试Boss跳过死亡结算(cached);
     return cached;
   }
 
   const boss = CreateUnit(Player(中立敌对玩家ID), 菲尼克斯尔单位ID, 临时测试BossX, 临时测试BossY, 270);
   if (boss != null && boss !== 0) {
     最近测试Boss[pid] = boss;
+    标记测试Boss跳过死亡结算(boss);
     SetHeroLevel(boss, 40, false);
     设置测试单位满血(boss);
   }

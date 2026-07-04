@@ -60,6 +60,21 @@ export const 扩展控制效果定义表 = {
   fear: { 类型键: "fear", 显示名: "恐惧", BuffID: "C023", 类型分类: "扩展控制", 吃控制抗性: true, 屏蔽控制命令: true, 需要周期驱动: true },
 } as const satisfies Record<扩展控制类型, 控制效果定义>;
 
+const 快速控制效果定义列表: readonly 控制效果定义[] = [
+  快速控制效果定义表.击晕,
+  快速控制效果定义表.冰冻,
+  快速控制效果定义表.沉默,
+  快速控制效果定义表.变形,
+  快速控制效果定义表.缴械,
+  快速控制效果定义表.减速,
+  快速控制效果定义表.硬直,
+  快速控制效果定义表.暂停,
+  快速控制效果定义表.EX暂停,
+  快速控制效果定义表.睡眠,
+  快速控制效果定义表.纠缠根须,
+  快速控制效果定义表.飓风,
+];
+
 export const 默认魅惑跟随半径 = 160;
 export const 默认恐惧逃离距离 = 500;
 export const 默认恐惧随机半径 = 450;
@@ -75,9 +90,8 @@ export function 获取扩展控制定义(this: void, 类型: 扩展控制类型)
 export function 获取控制效果定义(this: void, 类型: 扩展控制兼容类型 | string): 控制效果定义 | undefined {
   const 扩展定义 = 扩展控制效果定义表[类型 as 扩展控制类型];
   if (扩展定义 != null) return 扩展定义;
-  const 快速键列表 = Object.keys(快速控制效果定义表) as Array<keyof typeof 快速控制效果定义表>;
-  for (let i = 0; i < 快速键列表.length; i++) {
-    const 定义 = 快速控制效果定义表[快速键列表[i]];
+  for (let i = 0; i < 快速控制效果定义列表.length; i++) {
+    const 定义 = 快速控制效果定义列表[i];
     if (定义.类型键 === 类型) return 定义;
   }
   return undefined;

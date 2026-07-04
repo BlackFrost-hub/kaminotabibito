@@ -5,7 +5,7 @@ import { 获取或创建里科特上下文, 获取全部里科特上下文, type
 import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 距离平方XY } from "./13．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -85,7 +85,7 @@ function 开始破魔反击窗口(this: void, context: 里科特运行时上下�
   context.清理.登记延迟回调("里科特-破魔反击窗口", id);
 }
 
-function 释放里科特破魔反击(this: void, context: 里科特运行时上下文): void {
+export function 释放里科特破魔反击(this: void, context: 里科特运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 里科特数值与表现配置.破魔反击;
@@ -134,12 +134,12 @@ function on里科特破魔反击施法(this: void, castingUnit: any, spellAbilit
 export function 注册里科特破魔反击(this: void): void {
   if (已注册) return;
   已注册 = true;
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "09．破魔反击",
-    Boss单位类型ID: 里科特单位类型ID,
+    单位类型ID: 里科特单位类型ID,
     技能ID: 破魔反击技能ID,
     获取或创建上下文: 获取或创建里科特上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 里科特运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 里科特运行时上下文, boss: any): void {
       on里科特破魔反击施法(boss, 破魔反击技能ID);
     },
   });

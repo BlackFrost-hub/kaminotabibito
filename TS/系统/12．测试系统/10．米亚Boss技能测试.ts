@@ -76,10 +76,11 @@ const {
 const { 创建米亚安全域矩形组 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.01．场地配置") as {
   创建米亚安全域矩形组: (this: void) => any;
 };
-const { 创建测试中心平移映射, 按测试映射平移矩形, 复制平移测试矩形数组 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
+const { 创建测试中心平移映射, 按测试映射平移矩形, 复制平移测试矩形数组, 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
   创建测试中心平移映射: (this: void, 正式中心X: number, 正式中心Y: number, 测试中心X: number, 测试中心Y: number) => any;
   按测试映射平移矩形: (this: void, 矩形: any, 映射: any) => any;
   复制平移测试矩形数组: (this: void, 矩形列表: any[], 映射: any) => any[];
+  标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
 };
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
@@ -181,12 +182,14 @@ function 获取或创建测试Boss(this: void, player: any): any {
     SetUnitPosition(cached, 临时测试场地中心X, 临时测试场地中心Y);
     SetUnitFacing(cached, 270);
     设置测试单位满血(cached);
+    标记测试Boss跳过死亡结算(cached);
     return cached;
   }
 
   const boss = CreateUnit(Player(中立敌对玩家ID), 米亚单位ID, 临时测试场地中心X, 临时测试场地中心Y, 270);
   if (boss != null && boss !== 0) {
     最近测试Boss[pid] = boss;
+    标记测试Boss跳过死亡结算(boss);
     SetHeroLevel(boss, 40, false);
     设置测试单位满血(boss);
   }

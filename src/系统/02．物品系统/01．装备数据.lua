@@ -4077,7 +4077,8 @@ ____exports.items.I0FF = {
     agi = 22,
     armor = 12,
     dodge = 0.08,
-    movespeed2 = 0.06
+    movespeed2 = 0.06,
+    abilList = "IN01"
 }
 ____exports.items.I0FG = {
     type = "主武器",
@@ -4113,7 +4114,8 @@ ____exports.items.I0FI = {
     hp = 900,
     cdReduction = 0.05,
     darkDmg = 0.1,
-    stunResist = 0.12
+    stunResist = 0.12,
+    abilList = "IP00"
 }
 ____exports.items.I0FJ = {type = "任务", name = "骸骨圣杯碎片", goldPrice = 0}
 ____exports.items.azhr = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "A0HC"}

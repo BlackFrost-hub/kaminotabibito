@@ -20,6 +20,7 @@ local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
 local ____require_result_4 = require("lib.扩展函数.物品相关函数.index")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_4["创建物品并注册排泄监听"]
 local IssueTargetOrder = jass.IssueTargetOrder
+local CreateItem = jass.CreateItem
 local UnitAddItem = jass.UnitAddItem
 local UnitRemoveItem = jass.UnitRemoveItem
 local GetUnitX = jass.GetUnitX
@@ -83,25 +84,35 @@ local function _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D)
     local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D)
     if rawId == nil or rawId == "" then
         debugLogForce(_____6A21_5757_540D, "未找到装备ID", _____88C5_5907_540D)
-        return
+        return false
     end
-    local item = _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C(
-        stringToFourCCSafe(rawId),
+    local itemTypeId = stringToFourCCSafe(rawId)
+    local item = CreateItem(
+        itemTypeId,
         GetUnitX(unit),
         GetUnitY(unit)
     )
     if item == nil or item == 0 then
-        debugLogForce(_____6A21_5757_540D, "创建装备失败", _____88C5_5907_540D, rawId)
-        return
+        debugLogForce(
+            _____6A21_5757_540D,
+            "创建装备失败",
+            _____88C5_5907_540D,
+            rawId,
+            itemTypeId
+        )
+        return false
     end
-    local ok = IssueTargetOrder(unit, "smart", item)
-    debugLogForce(_____6A21_5757_540D, "已创建并下达拾取命令", _____88C5_5907_540D, ok)
+    UnitAddItem(unit, item)
+    debugLogForce(_____6A21_5757_540D, "已创建并加入背包", _____88C5_5907_540D, rawId)
+    return true
 end
 local function _____53D1_653E_5355_4E2A_88C5_5907(unit, _____5E8F_53F7)
     _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)
     if _____5E8F_53F7 > 0 and _____5E8F_53F7 <= #_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F then
-        _____53D1_653E_88C5_5907(unit, _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[_____5E8F_53F7])
-        debugLogForce(_____6A21_5757_540D, "已发放测试装备", _____5E8F_53F7, _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[_____5E8F_53F7])
+        local _____88C5_5907_540D = _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[_____5E8F_53F7]
+        if _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D) then
+            debugLogForce(_____6A21_5757_540D, "已发放测试装备", _____5E8F_53F7, _____88C5_5907_540D)
+        end
     end
 end
 local function ____on_804A_5929wp_6D4B_8BD5(_player, command)

@@ -43,6 +43,9 @@ const { 释放树魔首领树魔图腾 } = require("系统.03．技能系统.05�
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
+const { 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
+  标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
+};
 
 const 测试命令 = "smltest";
 const 树魔首领单位ID = stringToFourCC("N05S");
@@ -133,6 +136,7 @@ function 获取或创建测试Boss(this: void, player: any): any {
     SetUnitPosition(cached, 临时测试场地中心X, 临时测试场地中心Y);
     SetUnitFacing(cached, 270);
     设置测试单位满血(cached);
+    标记测试Boss跳过死亡结算(cached);
     globals.udg_Boss = cached;
     return cached;
   }
@@ -140,6 +144,7 @@ function 获取或创建测试Boss(this: void, player: any): any {
   const boss = CreateUnit(Player(中立敌对玩家ID), 树魔首领单位ID, 临时测试场地中心X, 临时测试场地中心Y, 270);
   if (boss != null && boss !== 0) {
     最近测试Boss[pid] = boss;
+    标记测试Boss跳过死亡结算(boss);
     SetHeroLevel(boss, 35, false);
     设置测试单位满血(boss);
     globals.udg_Boss = boss;

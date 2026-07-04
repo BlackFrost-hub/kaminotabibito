@@ -35,6 +35,8 @@ local ____require_result_11 = require("系统.03．技能系统.05．单位技�
 local _____91CA_653E_6811_9B54_9996_9886_6811_9B54_56FE_817E = ____require_result_11["释放树魔首领树魔图腾"]
 local ____require_result_12 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_12.getServerTime
+local ____require_result_13 = require("系统.12．测试系统.00．测试系统辅助函数")
+local _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97 = ____require_result_13["标记测试Boss跳过死亡结算"]
 local _____6D4B_8BD5_547D_4EE4 = "smltest"
 local _____6811_9B54_9996_9886_5355_4F4DID = stringToFourCC("N05S")
 local _____6D4B_8BD5_8F85_52A9_82F1_96C4ID = stringToFourCC("Hpal")
@@ -122,6 +124,7 @@ local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player)
         SetUnitPosition(cached, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3Y)
         SetUnitFacing(cached, 270)
         _____8BBE_7F6E_6D4B_8BD5_5355_4F4D_6EE1_8840(cached)
+        _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97(cached)
         globals.udg_Boss = cached
         return cached
     end
@@ -134,6 +137,7 @@ local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player)
     )
     if boss ~= nil and boss ~= 0 then
         _____6700_8FD1_6D4B_8BD5Boss[pid] = boss
+        _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97(boss)
         SetHeroLevel(boss, 35, false)
         _____8BBE_7F6E_6D4B_8BD5_5355_4F4D_6EE1_8840(boss)
         globals.udg_Boss = boss

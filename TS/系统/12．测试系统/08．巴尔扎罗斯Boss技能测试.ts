@@ -81,10 +81,11 @@ const { 创建动态矩形区域组, 销毁动态矩形区域组 } = require("�
   创建动态矩形区域组: (this: void, 名称: string, 配置列表: any[]) => any;
   销毁动态矩形区域组: (this: void, 区域组: any) => void;
 };
-const { 创建测试中心平移映射, 按测试映射平移矩形, 复制平移测试矩形数组 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
+const { 创建测试中心平移映射, 按测试映射平移矩形, 复制平移测试矩形数组, 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
   创建测试中心平移映射: (this: void, 正式中心X: number, 正式中心Y: number, 测试中心X: number, 测试中心Y: number) => any;
   按测试映射平移矩形: (this: void, 矩形: any, 映射: any) => any;
   复制平移测试矩形数组: (this: void, 矩形列表: any[], 映射: any) => any[];
+  标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
 };
 
 const 测试命令 = "bztest";
@@ -212,12 +213,14 @@ function 获取或创建测试Boss(this: void, player: any): any {
     SetUnitPosition(cached, 临时测试场地中心X, 临时测试场地中心Y);
     SetUnitFacing(cached, 270);
     设置测试单位满血(cached);
+    标记测试Boss跳过死亡结算(cached);
     return cached;
   }
 
   const boss = CreateUnit(Player(中立敌对玩家ID), 巴尔扎罗斯单位ID, 临时测试场地中心X, 临时测试场地中心Y, 270);
   if (boss != null && boss !== 0) {
     最近测试Boss[pid] = boss;
+    标记测试Boss跳过死亡结算(boss);
     SetHeroLevel(boss, 40, false);
     设置测试单位满血(boss);
   }

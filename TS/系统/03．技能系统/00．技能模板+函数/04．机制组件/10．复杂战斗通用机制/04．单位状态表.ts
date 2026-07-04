@@ -1,17 +1,17 @@
 /** @noSelfInFile */
 
-import { 创建Boss层数状态集, Boss层数状态定义, Boss层数状态集 } from "../01．层数状态/02．Boss层数状态集";
+import { 创建层数状态集, 层数状态定义, 层数状态集 } from "../01．层数状态/02．层数状态集";
 import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
 
 export interface 单位状态表参数 {
   清理?: 机制清理篮子;
   名称: string;
   单位列表?: any[];
-  层数状态列表: Boss层数状态定义[];
+  层数状态列表: 层数状态定义[];
 }
 
 export interface 单位状态表 {
-  readonly 层数状态: Boss层数状态集;
+  readonly 层数状态: 层数状态集;
   设置单位列表(单位列表: any[]): void;
   取单位列表(): any[];
   增加(状态ID: string, 单位: any, 层数?: number, 原因?: string): number;
@@ -24,11 +24,11 @@ export interface 单位状态表 {
 }
 
 class 单位状态表实现 implements 单位状态表 {
-  readonly 层数状态: Boss层数状态集;
+  readonly 层数状态: 层数状态集;
   private 单位列表: any[] = [];
 
   constructor(参数: 单位状态表参数) {
-    this.层数状态 = 创建Boss层数状态集(参数.层数状态列表);
+    this.层数状态 = 创建层数状态集(参数.层数状态列表);
     this.设置单位列表(参数.单位列表 ?? []);
   }
 

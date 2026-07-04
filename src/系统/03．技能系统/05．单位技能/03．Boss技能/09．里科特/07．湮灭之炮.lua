@@ -16,8 +16,8 @@ local _____53D6_5750_6807_89D2_5EA6 = ____13_FF0E_516C_5171_5DE5_5177["取坐标
 local _____6781_5750_6807X = ____13_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____13_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____13_FF0E_516C_5171_5DE5_5177["点到线段距离平方"]
-local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
-local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -290,7 +290,7 @@ local function _____8C03_5EA6P3_7729_6655_70AE(context)
     local ____self_10 = context["清理"]
     ____self_10["登记延迟回调"](____self_10, "里科特-P3湮灭眩晕炮", id)
 end
-local function _____91CA_653E_91CC_79D1_7279_6E6E_706D_4E4B_70AE(context)
+____exports["释放里科特湮灭之炮"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
         return
@@ -317,16 +317,16 @@ local function ____on_91CC_79D1_7279_6E6E_706D_4E4B_70AE_65BD_6CD5(castingUnit, 
     if context == nil then
         return
     end
-    _____91CA_653E_91CC_79D1_7279_6E6E_706D_4E4B_70AE(context)
+    ____exports["释放里科特湮灭之炮"](context)
 end
 ____exports["注册里科特湮灭之炮"] = function()
     if _____5DF2_6CE8_518C then
         return
     end
     _____5DF2_6CE8_518C = true
-    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+    _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "07．湮灭之炮",
-        ["Boss单位类型ID"] = _____91CC_79D1_7279_5355_4F4D_7C7B_578BID,
+        ["单位类型ID"] = _____91CC_79D1_7279_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____6E6E_706D_4E4B_70AE_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587,
         ["释放技能"] = function(_context, boss)

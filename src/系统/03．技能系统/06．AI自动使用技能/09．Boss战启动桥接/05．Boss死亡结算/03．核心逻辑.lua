@@ -2,9 +2,9 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
-local ____02_FF0EBoss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.02．Boss死亡奖励与清理配置表")
-local ____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868 = ____02_FF0EBoss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868["Boss死亡奖励与清理配置表"]
-local ____Boss_6B7B_4EA1_7ED3_7B97_63D0_793A_6587_672C_8868 = ____02_FF0EBoss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868["Boss死亡结算提示文本表"]
+local ____02_FF0EBoss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.02．Boss死亡非UI掉落与清理配置表")
+local ____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868 = ____02_FF0EBoss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868["Boss死亡非UI掉落与清理配置表"]
+local ____Boss_6B7B_4EA1_7ED3_7B97_63D0_793A_6587_672C_8868 = ____02_FF0EBoss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868["Boss死亡结算提示文本表"]
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.01．常量定义")
 local ____Boss_6B7B_4EA1_7ED3_7B97_7279_6B8A_903B_8F91_6807_7B7E = ____01_FF0E_5E38_91CF_5B9A_4E49["Boss死亡结算特殊逻辑标签"]
 ---
@@ -395,9 +395,7 @@ local function ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, ____Boss_5
     end
     if _____914D_7F6E["Boss引用键"] ~= nil and _____914D_7F6E["Boss引用键"] ~= "" then
         local _____5F15_7528_5355_4F4D = _____89E3_6790Boss_5355_4F4D(_____914D_7F6E)
-        if _____5F15_7528_5355_4F4D ~= nil and _____5F15_7528_5355_4F4D ~= 0 and _____5F15_7528_5355_4F4D == ____Boss_5355_4F4D then
-            return true
-        end
+        return _____5F15_7528_5355_4F4D ~= nil and _____5F15_7528_5355_4F4D ~= 0 and _____5F15_7528_5355_4F4D == ____Boss_5355_4F4D
     end
     local _____5355_4F4D_7C7B_578BID = GetUnitTypeId(____Boss_5355_4F4D)
     if _____5355_4F4D_7C7B_578BID <= 0 then
@@ -427,8 +425,8 @@ ____exports["获取Boss死亡结算配置"] = function(____Boss_5355_4F4D)
     end
     do
         local i = 0
-        while i < #____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868 do
-            local _____914D_7F6E = ____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
+        while i < #____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868 do
+            local _____914D_7F6E = ____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
             if ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, ____Boss_5355_4F4D) then
                 return _____914D_7F6E
             end
@@ -440,9 +438,9 @@ end
 ____exports["按结算键获取Boss死亡结算配置"] = function(_____7ED3_7B97_952E)
     do
         local i = 0
-        while i < #____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868 do
-            if ____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868[i + 1]["键"] == _____7ED3_7B97_952E then
-                return ____Boss_6B7B_4EA1_5956_52B1_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
+        while i < #____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868 do
+            if ____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868[i + 1]["键"] == _____7ED3_7B97_952E then
+                return ____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
             end
             i = i + 1
         end

@@ -24,6 +24,14 @@ local ____11_FF0E_53E4_6728_4E4B_8680_B7_83AB_5C14_7279_65AF = require("系统.0
 local _____5355_4F4DN05W_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____11_FF0E_53E4_6728_4E4B_8680_B7_83AB_5C14_7279_65AF["单位N05W战斗启动属性配置"]
 local ____12_FF0E_5F71_9AA8_B7_83AB_7279_65AF = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.12．影骨·莫特斯")
 local _____5355_4F4DN01Y_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____12_FF0E_5F71_9AA8_B7_83AB_7279_65AF["单位N01Y战斗启动属性配置"]
+local ____13_FF0E_6811_9B54_9996_9886 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.13．树魔首领")
+local _____5355_4F4DN05S_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____13_FF0E_6811_9B54_9996_9886["单位N05S战斗启动属性配置"]
+local ____14_FF0E_83F2_5229_65AF = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.14．菲利斯")
+local _____5355_4F4DN05T_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____14_FF0E_83F2_5229_65AF["单位N05T战斗启动属性配置"]
+local ____15_FF0E_91CC_79D1_7279 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.15．里科特")
+local _____5355_4F4DN05U_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____15_FF0E_91CC_79D1_7279["单位N05U战斗启动属性配置"]
+local ____16_FF0E_6DF1_6E0A_5DE8_9C7F_5361_745F_62C9 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.16．深渊巨鱿卡瑟拉")
+local _____5355_4F4DN05V_6218_6597_542F_52A8_5C5E_6027_914D_7F6E = ____16_FF0E_6DF1_6E0A_5DE8_9C7F_5361_745F_62C9["单位N05V战斗启动属性配置"]
 ____exports["英雄Boss战斗启动属性配置表"] = {
     _____5355_4F4DN00C_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
     _____5355_4F4DN05J_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
@@ -36,7 +44,11 @@ ____exports["英雄Boss战斗启动属性配置表"] = {
     _____5355_4F4DN00U_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
     _____5355_4F4DN00V_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
     _____5355_4F4DN05W_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
-    _____5355_4F4DN01Y_6218_6597_542F_52A8_5C5E_6027_914D_7F6E
+    _____5355_4F4DN01Y_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
+    _____5355_4F4DN05S_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
+    _____5355_4F4DN05T_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
+    _____5355_4F4DN05U_6218_6597_542F_52A8_5C5E_6027_914D_7F6E,
+    _____5355_4F4DN05V_6218_6597_542F_52A8_5C5E_6027_914D_7F6E
 }
 ____exports["英雄Boss分类战斗启动护卫配置表"] = {}
 do
@@ -129,6 +141,38 @@ do
 end
 do
     local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.12．影骨·莫特斯")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.13．树魔首领")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.14．菲利斯")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.15．里科特")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.02．英雄Boss战斗启动属性配置表.16．深渊巨鱿卡瑟拉")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

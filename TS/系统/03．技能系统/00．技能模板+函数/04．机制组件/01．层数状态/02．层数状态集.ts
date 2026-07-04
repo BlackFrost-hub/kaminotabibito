@@ -6,16 +6,16 @@ import {
   可配置层数状态控制器,
 } from "./01．可配置层数状态";
 
-export interface Boss层数状态定义 extends 可配置层数状态配置 {
+export interface 层数状态定义 extends 可配置层数状态配置 {
   ID: string;
 }
 
-export interface Boss层数最高结果 {
+export interface 层数最高结果 {
   ID: string;
   层数: number;
 }
 
-export interface Boss层数状态集 {
+export interface 层数状态集 {
   取控制器(ID: string): 可配置层数状态控制器 | undefined;
   增加(ID: string, 单位: any, 层数?: number, 原因?: string): number;
   设置(ID: string, 单位: any, 层数: number, 原因?: string): number;
@@ -23,15 +23,15 @@ export interface Boss层数状态集 {
   清空(ID: string, 单位: any, 原因?: string): void;
   清空单位全部(单位: any, 原因?: string): void;
   取层数(ID: string, 单位: any): number;
-  取最高层数(单位: any): Boss层数最高结果;
+  取最高层数(单位: any): 层数最高结果;
   销毁(): void;
 }
 
-class Boss层数状态集实现 implements Boss层数状态集 {
+class 层数状态集实现 implements 层数状态集 {
   private 控制器表: Record<string, 可配置层数状态控制器 | undefined> = {};
   private ID列表: string[] = [];
 
-  constructor(定义列表: Boss层数状态定义[]) {
+  constructor(定义列表: 层数状态定义[]) {
     for (let i = 0; i < 定义列表.length; i++) {
       const 定义 = 定义列表[i];
       this.ID列表.push(定义.ID);
@@ -74,7 +74,7 @@ class Boss层数状态集实现 implements Boss层数状态集 {
     return 控制器 == null ? 0 : 控制器.取层数(单位);
   }
 
-  取最高层数(单位: any): Boss层数最高结果 {
+  取最高层数(单位: any): 层数最高结果 {
     let 最高ID = "";
     let 最高层数 = 0;
     for (let i = 0; i < this.ID列表.length; i++) {
@@ -99,6 +99,6 @@ class Boss层数状态集实现 implements Boss层数状态集 {
   }
 }
 
-export function 创建Boss层数状态集(this: void, 定义列表: Boss层数状态定义[]): Boss层数状态集 {
-  return new Boss层数状态集实现(定义列表);
+export function 创建层数状态集(this: void, 定义列表: 层数状态定义[]): 层数状态集 {
+  return new 层数状态集实现(定义列表);
 }

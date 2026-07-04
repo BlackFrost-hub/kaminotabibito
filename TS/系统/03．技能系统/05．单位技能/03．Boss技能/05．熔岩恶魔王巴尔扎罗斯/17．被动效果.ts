@@ -9,7 +9,7 @@ import { 初始化巴尔扎罗斯地核召唤节点 } from "./11．地核召唤"
 import { 初始化巴尔扎罗斯熔岩护盾节点 } from "./12．熔岩护盾";
 import { 初始化巴尔扎罗斯末日熔爆节点 } from "./13．末日熔爆";
 import { 注册巴尔扎罗斯技能结构 } from "./15．技能入口";
-import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;

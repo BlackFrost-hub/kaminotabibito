@@ -1,8 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local GetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
-local ____15_FF0EBoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．Boss运行时上下文工厂")
-local _____521B_5EFABoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0EBoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建Boss运行时上下文工厂"]
+local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
+local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.00．配置")
 local _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["影骨莫特斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.02．数值与表现配置")
@@ -51,7 +51,7 @@ local function _____521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587(boss, ____
         ["遗产宝箱已生成"] = false
     }
 end
-local _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFABoss_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "影骨莫特斯", ["主动技能提示"] = _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587})
+local _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "影骨莫特斯", ["主动技能提示"] = _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587})
 ____exports["获取影骨莫特斯上下文"] = function(boss)
     return _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
 end

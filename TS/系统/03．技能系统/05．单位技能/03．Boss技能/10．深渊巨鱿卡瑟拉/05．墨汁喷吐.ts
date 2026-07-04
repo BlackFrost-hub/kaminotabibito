@@ -5,7 +5,7 @@ import { 获取或创建卡瑟拉上下文, type 卡瑟拉运行时上下文 } f
 import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度, 取坐标角度, 距离XY, 角度差, 极坐标X, 极坐标Y } from "./14．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -140,7 +140,7 @@ function 开始墨汁残留区域(this: void, context: 卡瑟拉运行时上下�
   context.清理.登记周期回调("卡瑟拉-墨汁残留周期", area.周期ID);
 }
 
-function 释放卡瑟拉墨汁喷吐(this: void, context: 卡瑟拉运行时上下文): void {
+export function 释放卡瑟拉墨汁喷吐(this: void, context: 卡瑟拉运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const target = 取墨汁喷吐目标(boss);
@@ -192,12 +192,12 @@ function on卡瑟拉墨汁喷吐施法(this: void, castingUnit: any, spellAbilit
 export function 注册卡瑟拉墨汁喷吐(this: void): void {
   if (已注册) return;
   已注册 = true;
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "05．墨汁喷吐",
-    Boss单位类型ID: 卡瑟拉单位类型ID,
+    单位类型ID: 卡瑟拉单位类型ID,
     技能ID: 墨汁喷吐技能ID,
     获取或创建上下文: 获取或创建卡瑟拉上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 卡瑟拉运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 卡瑟拉运行时上下文, boss: any): void {
       on卡瑟拉墨汁喷吐施法(boss, 墨汁喷吐技能ID);
     },
   });

@@ -52,6 +52,9 @@ const { 创建单位坐标跟随特效, 创建循环点特效 } = require("lib.�
   创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
   创建循环点特效: (this: void, 参数: any) => any;
 };
+const { 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
+  标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
+};
 
 const 测试命令 = "thtest";
 const 瑟兰迪尔单位ID = stringToFourCC("N057");
@@ -139,11 +142,15 @@ function 获取或创建测试Boss(this: void, player: any, hero: any): any {
   const cached = 最近测试Boss[pid];
   const x = GetUnitX(hero) + 测试Boss初始距离;
   const y = GetUnitY(hero);
-  if (是有效存活单位(cached)) return cached;
+  if (是有效存活单位(cached)) {
+    标记测试Boss跳过死亡结算(cached);
+    return cached;
+  }
 
   const boss = CreateUnit(Player(中立敌对玩家ID), 瑟兰迪尔单位ID, x, y, 180);
   if (boss != null && boss !== 0) {
     最近测试Boss[pid] = boss;
+    标记测试Boss跳过死亡结算(boss);
     SetHeroLevel(boss, 10, false);
     SelectUnitForPlayerSingle(boss, player);
     StarOther_PanCameraToTimedForPlayer(player, x, y, 0.2);

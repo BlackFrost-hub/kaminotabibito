@@ -5,7 +5,7 @@ import { 获取或创建菲利斯上下文, 菲利斯运行时上下文 } from "
 import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位到线段距离平方, 单位有效, stringToFourCC, 取单位间角度, 极坐标X, 极坐标Y } from "./11．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -175,12 +175,12 @@ export function 释放菲利斯剑气灵斩(this: void, context: 菲利斯运行
 export function 注册菲利斯剑气灵斩(this: void): void {
   if (剑气灵斩已注册) return;
   剑气灵斩已注册 = true;
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "05．剑气灵斩",
-    Boss单位类型ID: 菲利斯单位类型ID,
+    单位类型ID: 菲利斯单位类型ID,
     技能ID: 剑气灵斩技能ID,
     获取或创建上下文: 获取或创建菲利斯上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 菲利斯运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 菲利斯运行时上下文, boss: any): void {
       on菲利斯剑气灵斩生效(boss, 剑气灵斩技能ID);
     },
   });

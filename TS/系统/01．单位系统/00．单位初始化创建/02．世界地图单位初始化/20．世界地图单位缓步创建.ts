@@ -41,8 +41,9 @@ const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品�
 const { AddItemToStockBJ } = require("lib.扩展函数.BJ函数.03．物品与库存") as {
   AddItemToStockBJ: (this: void, itemId: number, whichUnit: any, currentStock: number, stockMax: number) => void;
 };
-const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataSetSafe, YDUserDataClearSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+  YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
 };
 
 import type {
@@ -80,6 +81,11 @@ const 中立敌对玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 中立被动玩家ID = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const 世界地图随机单位默认玩家ID = 中立被动玩家ID;
 const 世界地图随机单位默认朝向 = 0.0;
+const 初始注册Boss跳过死亡结算字段 = "初始注册Boss跳过死亡结算";
+const 初始注册Boss死亡结算保护毫秒 = 3000;
+
+let 初始注册Boss死亡结算保护清理已安排 = false;
+const 待清理初始注册Boss死亡结算保护单位: any[] = [];
 
 interface 世界地图单位缓步创建任务 {
   任务ID: number;
@@ -325,9 +331,30 @@ export function 立即创建世界地图单位(this: void, 配置: 世界地图�
   return 执行单条世界地图单位创建(配置);
 }
 
+function 清理初始注册Boss死亡结算保护(this: void): void {
+  for (let i = 0; i < 待清理初始注册Boss死亡结算保护单位.length; i++) {
+    const 单位 = 待清理初始注册Boss死亡结算保护单位[i];
+    if (单位 != null && 单位 !== 0) {
+      YDUserDataClearSafe("unit", 单位, 初始注册Boss跳过死亡结算字段, "boolean");
+    }
+  }
+  待清理初始注册Boss死亡结算保护单位.length = 0;
+  初始注册Boss死亡结算保护清理已安排 = false;
+}
+
+function 标记初始注册Boss临时跳过死亡结算(this: void, 单位: any): void {
+  if (单位 == null || 单位 === 0) return;
+  YDUserDataSetSafe("unit", 单位, 初始注册Boss跳过死亡结算字段, "boolean", true);
+  待清理初始注册Boss死亡结算保护单位.push(单位);
+  if (初始注册Boss死亡结算保护清理已安排) return;
+  初始注册Boss死亡结算保护清理已安排 = true;
+  addDelayedCallback(初始注册Boss死亡结算保护毫秒, 清理初始注册Boss死亡结算保护);
+}
+
 function 执行单条世界地图Boss初始注册(this: void, 配置: 世界地图Boss初始注册配置): any {
   const 单位 = 创建世界地图单位实例(配置);
   if (单位 == null) return undefined;
+  标记初始注册Boss临时跳过死亡结算(单位);
 
   if (配置.记录到Boss表键名 != null && 配置.记录到Boss表键名 !== "") {
     YDUserDataSetSafe("string", "Boss", 配置.记录到Boss表键名, "unit", 单位);

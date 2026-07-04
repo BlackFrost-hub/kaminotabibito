@@ -42,6 +42,8 @@ local _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____require_
 local ____require_result_14 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_14["创建单位坐标跟随特效"]
 local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_14["创建循环点特效"]
+local ____require_result_15 = require("系统.12．测试系统.00．测试系统辅助函数")
+local _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97 = ____require_result_15["标记测试Boss跳过死亡结算"]
 local _____6D4B_8BD5_547D_4EE4 = "thtest"
 local _____745F_5170_8FEA_5C14_5355_4F4DID = stringToFourCC("N057")
 local _____6D4B_8BD5_6B65_5175_5355_4F4DID = stringToFourCC("hfoo")
@@ -127,6 +129,7 @@ local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player, hero)
     local x = GetUnitX(hero) + _____6D4B_8BD5Boss_521D_59CB_8DDD_79BB
     local y = GetUnitY(hero)
     if _____662F_6709_6548_5B58_6D3B_5355_4F4D(cached) then
+        _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97(cached)
         return cached
     end
     local boss = CreateUnit(
@@ -138,6 +141,7 @@ local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player, hero)
     )
     if boss ~= nil and boss ~= 0 then
         _____6700_8FD1_6D4B_8BD5Boss[pid] = boss
+        _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97(boss)
         SetHeroLevel(boss, 10, false)
         SelectUnitForPlayerSingle(boss, player)
         StarOther_PanCameraToTimedForPlayer(player, x, y, 0.2)

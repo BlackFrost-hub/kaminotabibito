@@ -3,8 +3,9 @@ local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ObjectValues = ____lualib.__TS__ObjectValues
 local __TS__Delete = ____lualib.__TS__Delete
+local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
 local ____exports = {}
-local _____5F52_7C7B_53CD_67E5_5355_4F4DID, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_671D_5411, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_73A9_5BB6, _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B, _____6267_884C_5355_6761_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C, _____6267_884C_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_914D_7F6E_8868, stringToFourCC, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, GetRandomDirectionDeg, _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID, _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID, YDUserDataSetSafe, Player, ShowUnit, _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID
+local _____5F52_7C7B_53CD_67E5_5355_4F4DID, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_671D_5411, _____89E3_6790_4E16_754C_5730_56FE_5355_4F4D_73A9_5BB6, _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B, _____6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4, _____6807_8BB0_521D_59CB_6CE8_518CBoss_4E34_65F6_8DF3_8FC7_6B7B_4EA1_7ED3_7B97, _____6267_884C_5355_6761_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C, _____6267_884C_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C_914D_7F6E_8868, stringToFourCC, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, GetRandomDirectionDeg, addDelayedCallback, _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID, _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID, _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID, YDUserDataSetSafe, YDUserDataClearSafe, Player, ShowUnit, _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID, _____521D_59CB_6CE8_518CBoss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97_5B57_6BB5, _____521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_6BEB_79D2, _____521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_6E05_7406_5DF2_5B89_6392, _____5F85_6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_5355_4F4D
 local ____00_FF0E_5F00_5173_4E0E_7C7B_578B = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.00．开关与类型")
 local _____4E16_754C_5730_56FE_5355_4F4D_9ED8_8BA4_6279_6B21_95F4_9694_79D2 = ____00_FF0E_5F00_5173_4E0E_7C7B_578B["世界地图单位默认批次间隔秒"]
 local _____4E16_754C_5730_56FE_5355_4F4D_9ED8_8BA4_6BCF_6279_521B_5EFA_6570_91CF = ____00_FF0E_5F00_5173_4E0E_7C7B_578B["世界地图单位默认每批创建数量"]
@@ -79,11 +80,44 @@ function _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B(_____914D_7F6E)
         _____9762_5411_89D2_5EA6
     )
 end
+function _____6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4()
+    do
+        local i = 0
+        while i < #_____5F85_6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_5355_4F4D do
+            local _____5355_4F4D = _____5F85_6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_5355_4F4D[i + 1]
+            if _____5355_4F4D ~= nil and _____5355_4F4D ~= 0 then
+                YDUserDataClearSafe("unit", _____5355_4F4D, _____521D_59CB_6CE8_518CBoss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97_5B57_6BB5, "boolean")
+            end
+            i = i + 1
+        end
+    end
+    __TS__ArraySetLength(_____5F85_6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_5355_4F4D, 0)
+    _____521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_6E05_7406_5DF2_5B89_6392 = false
+end
+function _____6807_8BB0_521D_59CB_6CE8_518CBoss_4E34_65F6_8DF3_8FC7_6B7B_4EA1_7ED3_7B97(_____5355_4F4D)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
+        return
+    end
+    YDUserDataSetSafe(
+        "unit",
+        _____5355_4F4D,
+        _____521D_59CB_6CE8_518CBoss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97_5B57_6BB5,
+        "boolean",
+        true
+    )
+    _____5F85_6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_5355_4F4D[#_____5F85_6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_5355_4F4D + 1] = _____5355_4F4D
+    if _____521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_6E05_7406_5DF2_5B89_6392 then
+        return
+    end
+    _____521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_6E05_7406_5DF2_5B89_6392 = true
+    addDelayedCallback(_____521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_6BEB_79D2, _____6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4)
+end
 function _____6267_884C_5355_6761_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C(_____914D_7F6E)
     local _____5355_4F4D = _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B(_____914D_7F6E)
     if _____5355_4F4D == nil then
         return nil
     end
+    _____6807_8BB0_521D_59CB_6CE8_518CBoss_4E34_65F6_8DF3_8FC7_6B7B_4EA1_7ED3_7B97(_____5355_4F4D)
     if _____914D_7F6E["记录到Boss表键名"] ~= nil and _____914D_7F6E["记录到Boss表键名"] ~= "" then
         YDUserDataSetSafe(
             "string",
@@ -121,7 +155,7 @@ _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result
 local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
 GetRandomDirectionDeg = ____require_result_2.GetRandomDirectionDeg
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
+addDelayedCallback = ____require_result_3.addDelayedCallback
 local addPeriodicCallback = ____require_result_3.addPeriodicCallback
 local removePeriodicCallback = ____require_result_3.removePeriodicCallback
 local ____require_result_4 = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表")
@@ -142,6 +176,7 @@ local ____require_result_11 = require("lib.扩展函数.BJ函数.03．物品与�
 local AddItemToStockBJ = ____require_result_11.AddItemToStockBJ
 local ____require_result_12 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 YDUserDataSetSafe = ____require_result_12.YDUserDataSetSafe
+YDUserDataClearSafe = ____require_result_12.YDUserDataClearSafe
 Player = jass.Player
 local GetRandomReal = jass.GetRandomReal
 local GetRectMinX = jass.GetRectMinX
@@ -154,6 +189,10 @@ _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = jass.PLAYER_NEUTRAL_PASSIVE
 local _____4E16_754C_5730_56FE_968F_673A_5355_4F4D_9ED8_8BA4_73A9_5BB6ID = _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID
 local _____4E16_754C_5730_56FE_968F_673A_5355_4F4D_9ED8_8BA4_671D_5411 = 0
+_____521D_59CB_6CE8_518CBoss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97_5B57_6BB5 = "初始注册Boss跳过死亡结算"
+_____521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_6BEB_79D2 = 3000
+_____521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_6E05_7406_5DF2_5B89_6392 = false
+_____5F85_6E05_7406_521D_59CB_6CE8_518CBoss_6B7B_4EA1_7ED3_7B97_4FDD_62A4_5355_4F4D = {}
 local _____7F13_6B65_521B_5EFA_8C03_5EA6_5668_95F4_9694_6BEB_79D2 = 10
 local _____5F53_524D_9ED8_8BA4_4EFB_52A1ID
 local _____4E0B_4E00_4E2A_7F13_6B65_521B_5EFA_4EFB_52A1ID = 1

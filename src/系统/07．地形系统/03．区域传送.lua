@@ -16,12 +16,16 @@ local _____533A_57DF_4F20_9001_914D_7F6E = ____02_FF0E_533A_57DF_4F20_9001_914D_
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
+local getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.index")
 local StarOther_PanCameraToTimedForPlayer = ____require_result_1.StarOther_PanCameraToTimedForPlayer
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local YDUserDataGet = ____require_result_2.YDUserDataGet
 local regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
 local regionMap = __TS__New(Map)
+local _____533A_57DF_4F20_9001_5DF2_521D_59CB_5316 = false
+local _____5355_4F4D_533A_57DF_4F20_9001_51B7_5374 = {}
+local _____533A_57DF_4F20_9001_8FDE_89E6_53D1_4FDD_62A4Ms = 500
 local function dbg(_msg)
 end
 local function getStoryProgress()
@@ -205,10 +209,26 @@ local function runRegionRule(rule, unit, owner)
         end
     end
 end
+local function isAliveHero(unit)
+    return unit ~= nil and unit ~= 0 and jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) == true and jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD) ~= true
+end
+local function isRegionTeleportCoolingDown(unit)
+    local id = jass.GetHandleId(unit)
+    local now = getServerTime()
+    local last = _____5355_4F4D_533A_57DF_4F20_9001_51B7_5374[id] or 0
+    if last > 0 and now - last < _____533A_57DF_4F20_9001_8FDE_89E6_53D1_4FDD_62A4Ms then
+        return true
+    end
+    _____5355_4F4D_533A_57DF_4F20_9001_51B7_5374[id] = now
+    return false
+end
 local function onRegionEnter()
     local unit = jass.GetTriggerUnit()
     local region = jass.GetTriggeringRegion()
     if unit == nil or region == nil then
+        return
+    end
+    if not isAliveHero(unit) then
         return
     end
     local owner = jass.GetOwningPlayer(unit)
@@ -223,6 +243,9 @@ local function onRegionEnter()
         return
     end
     if not checkRegionCondition(cfg.condition, unit) then
+        return
+    end
+    if isRegionTeleportCoolingDown(unit) then
         return
     end
     local useRule = cfg.teleportX == 0 and cfg.teleportY == 0 and type(cfg.rule) == "string" and #cfg.rule > 0
@@ -244,7 +267,14 @@ local function onRegionEnter()
         )
     end
 end
+local function isValidRegionRect(cfg)
+    return cfg.left < cfg.right and cfg.bottom < cfg.top
+end
 local function initRegionTeleport()
+    if _____533A_57DF_4F20_9001_5DF2_521D_59CB_5316 then
+        return
+    end
+    _____533A_57DF_4F20_9001_5DF2_521D_59CB_5316 = true
     local trig = jass.CreateTrigger()
     local total = 0
     local enabledCount = 0
@@ -260,7 +290,10 @@ local function initRegionTeleport()
         do
             local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
             if cfg == nil or not cfg.enabled then
-                goto __continue60
+                goto __continue67
+            end
+            if not isValidRegionRect(cfg) then
+                goto __continue67
             end
             local region = jass.CreateRegion()
             local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
@@ -272,7 +305,7 @@ local function initRegionTeleport()
                 cfg
             )
         end
-        ::__continue60::
+        ::__continue67::
     end
     jass.TriggerAddAction(trig, onRegionEnter)
 end

@@ -19,8 +19,8 @@ local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
-local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
-local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetRandomReal = jass.GetRandomReal
@@ -159,7 +159,7 @@ local function _____5F71_9AA8_5E7D_5F71_7206_53D1_7ED3_675F(variable)
     _____7ED3_675F_5F71_9AA8_5E7D_5F71_7206_53D1(variable.context)
     _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548(variable)
 end
-local function _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1(context)
+____exports["释放影骨幽影爆发"] = function(context)
     if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return
     end
@@ -213,7 +213,7 @@ local function ____on_5F71_9AA8_5E7D_5F71_7206_53D1_65BD_6CD5(castingUnit, spell
     end
     local context = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587(castingUnit)
     if context ~= nil then
-        _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1(context)
+        ____exports["释放影骨幽影爆发"](context)
     end
 end
 ____exports["注册影骨莫特斯幽影爆发"] = function()
@@ -222,9 +222,9 @@ ____exports["注册影骨莫特斯幽影爆发"] = function()
     end
     _____5DF2_6CE8_518C_5E7D_5F71_7206_53D1 = true
     _____786E_4FDD_5E7D_5F71_627F_4F24_4FEE_6B63()
-    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+    _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "06．幽影爆发",
-        ["Boss单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
+        ["单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____5E7D_5F71_7206_53D1_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
         ["释放技能"] = function(_context, boss)

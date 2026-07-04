@@ -51,7 +51,13 @@ _____5EF6_8FDF_6539_5411_5F39_5E55_5B9E_73B0.prototype["立即改向"] = functio
     end
     self["延迟回调ID"] = 0
     local _____4E0A_4E0B_6587 = self["创建上下文"](self)
-    local angle = self["参数"]["取改向角度"] ~= nil and self["参数"]["取改向角度"](_____4E0A_4E0B_6587) or self["参数"]["改向角度"]
+    local ____temp_1
+    if self["参数"]["取改向角度"] ~= nil then
+        ____temp_1 = self["参数"]["取改向角度"](_____4E0A_4E0B_6587)
+    else
+        ____temp_1 = self["参数"]["改向角度"]
+    end
+    local angle = ____temp_1
     if angle == nil then
         if self["参数"]["on改向失败"] ~= nil then
             self["参数"]["on改向失败"](_____4E0A_4E0B_6587)
@@ -82,8 +88,8 @@ _____5EF6_8FDF_6539_5411_5F39_5E55_5B9E_73B0.prototype["安排改向"] = functio
     end
     self["延迟回调ID"] = addDelayedCallback(delay, ____on_5EF6_8FDF_6539_5411_5F39_5E55, self)
     if self["参数"]["清理"] ~= nil then
-        local ____self_1 = self["参数"]["清理"]
-        ____self_1["登记延迟回调"](____self_1, self["参数"]["名称"] or "延迟改向弹幕", self["延迟回调ID"])
+        local ____self_2 = self["参数"]["清理"]
+        ____self_2["登记延迟回调"](____self_2, self["参数"]["名称"] or "延迟改向弹幕", self["延迟回调ID"])
     end
 end
 _____5EF6_8FDF_6539_5411_5F39_5E55_5B9E_73B0.prototype["创建上下文"] = function(self)
@@ -92,9 +98,9 @@ end
 ____exports["创建延迟改向弹幕"] = function(_____53C2_6570)
     local _____5B9E_4F8B = __TS__New(_____5EF6_8FDF_6539_5411_5F39_5E55_5B9E_73B0, _____53C2_6570)
     if _____53C2_6570["清理"] ~= nil and _____53C2_6570["清理时销毁弹幕"] == true then
-        local ____self_2 = _____53C2_6570["清理"]
-        ____self_2["登记清理"](
-            ____self_2,
+        local ____self_3 = _____53C2_6570["清理"]
+        ____self_3["登记清理"](
+            ____self_3,
             _____53C2_6570["名称"] or "延迟改向弹幕",
             function()
                 _____5B9E_4F8B["销毁弹幕"](_____5B9E_4F8B)
@@ -102,8 +108,5 @@ ____exports["创建延迟改向弹幕"] = function(_____53C2_6570)
         )
     end
     return _____5B9E_4F8B
-end
-____exports["创建Boss延迟改向弹幕"] = function(_____53C2_6570)
-    return ____exports["创建延迟改向弹幕"](_____53C2_6570)
 end
 return ____exports

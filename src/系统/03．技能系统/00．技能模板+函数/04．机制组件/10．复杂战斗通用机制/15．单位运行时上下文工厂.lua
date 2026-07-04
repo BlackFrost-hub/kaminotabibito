@@ -13,10 +13,10 @@ local function _____9ED8_8BA4_53D6_5355_4F4DID(unit)
     end
     return GetHandleId(unit) or 0
 end
-____exports["创建Boss运行时上下文工厂"] = function(_____53C2_6570)
+____exports["创建单位运行时上下文工厂"] = function(_____53C2_6570)
     local _____4E0A_4E0B_6587_8868 = {}
-    local function _____83B7_53D6(boss)
-        local id = _____9ED8_8BA4_53D6_5355_4F4DID(boss)
+    local function _____83B7_53D6(unit)
+        local id = _____9ED8_8BA4_53D6_5355_4F4DID(unit)
         local ____temp_0
         if id == 0 then
             ____temp_0 = nil
@@ -25,8 +25,8 @@ ____exports["创建Boss运行时上下文工厂"] = function(_____53C2_6570)
         end
         return ____temp_0
     end
-    local function _____83B7_53D6_6216_521B_5EFA(boss)
-        local id = _____9ED8_8BA4_53D6_5355_4F4DID(boss)
+    local function _____83B7_53D6_6216_521B_5EFA(unit)
+        local id = _____9ED8_8BA4_53D6_5355_4F4DID(unit)
         if id == 0 then
             return nil
         end
@@ -35,9 +35,9 @@ ____exports["创建Boss运行时上下文工厂"] = function(_____53C2_6570)
             return context
         end
         local _____6E05_7406 = _____521B_5EFA_673A_5236_6E05_7406_7BEE_5B50(_____53C2_6570["名称"])
-        context = _____53C2_6570["创建上下文"](boss, _____6E05_7406)
+        context = _____53C2_6570["创建上下文"](unit, _____6E05_7406)
         if _____53C2_6570["主动技能提示"] ~= nil then
-            _____8BBE_7F6E_5355_4F4D_6280_80FD_58F3_666E_901A_63D0_793A(boss, _____53C2_6570["主动技能提示"])
+            _____8BBE_7F6E_5355_4F4D_6280_80FD_58F3_666E_901A_63D0_793A(unit, _____53C2_6570["主动技能提示"])
         end
         _____4E0A_4E0B_6587_8868[id] = context
         if _____53C2_6570["on创建"] ~= nil then
@@ -55,8 +55,8 @@ ____exports["创建Boss运行时上下文工厂"] = function(_____53C2_6570)
         end
         return result
     end
-    local function _____6E05_7406_4E0A_4E0B_6587(boss)
-        local id = _____9ED8_8BA4_53D6_5355_4F4DID(boss)
+    local function _____6E05_7406_4E0A_4E0B_6587(unit)
+        local id = _____9ED8_8BA4_53D6_5355_4F4DID(unit)
         if id == 0 then
             return
         end

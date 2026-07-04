@@ -6,7 +6,7 @@ import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置"
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y, stringToFourCC } from "./16．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -112,7 +112,7 @@ function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下�
   context.清理.登记周期回调("莫尔特斯-腐败孢子云周期", data.周期ID);
 }
 
-function 释放莫尔特斯腐败孢子云(this: void, context: 莫尔特斯运行时上下文): void {
+export function 释放莫尔特斯腐败孢子云(this: void, context: 莫尔特斯运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.腐败孢子云;
@@ -134,12 +134,12 @@ function on莫尔特斯腐败孢子云施法(this: void, castingUnit: any, spell
 export function 注册莫尔特斯腐败孢子云(this: void): void {
   if (已注册) return;
   已注册 = true;
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "05．腐败孢子云",
-    Boss单位类型ID: 莫尔特斯单位类型ID,
+    单位类型ID: 莫尔特斯单位类型ID,
     技能ID: 腐败孢子云技能ID,
     获取或创建上下文: 获取或创建莫尔特斯上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 莫尔特斯运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 莫尔特斯运行时上下文, boss: any): void {
       on莫尔特斯腐败孢子云施法(boss, 腐败孢子云技能ID);
     },
   });

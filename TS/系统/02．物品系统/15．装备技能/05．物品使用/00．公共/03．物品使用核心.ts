@@ -67,6 +67,8 @@ const 盗贼神符魔抗 = require("系统.02．物品系统.15．装备技能.0
 const 火把 = require("系统.02．物品系统.15．装备技能.00．物品.71．火把") as { 处理火把使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 抗毒药水 = require("系统.02．物品系统.15．装备技能.00．物品.114．抗毒药水") as { 处理抗毒药水使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 瑟兰迪尔的决心 = require("系统.02．物品系统.15．装备技能.00．物品.136．瑟兰迪尔的决心") as { 处理瑟兰迪尔的决心使用: (this: void, ctx: 物品技能事件上下文) => void };
+const 影骨披风 = require("系统.02．物品系统.15．装备技能.00．物品.150．影骨披风") as { 处理影骨披风使用: (this: void, ctx: 物品技能事件上下文) => void };
+const 阴影陷阱装置 = require("系统.02．物品系统.15．装备技能.00．物品.153．阴影陷阱装置") as { 处理阴影陷阱装置使用: (this: void, ctx: 物品技能事件上下文) => void };
 
 let 已初始化 = false;
 
@@ -102,6 +104,8 @@ function on物品使用链路(this: void, ctx: 物品技能事件上下文): voi
   火把.处理火把使用(ctx);
   抗毒药水.处理抗毒药水使用(ctx);
   瑟兰迪尔的决心.处理瑟兰迪尔的决心使用(ctx);
+  影骨披风.处理影骨披风使用(ctx);
+  阴影陷阱装置.处理阴影陷阱装置使用(ctx);
 }
 
 function on物品使用死亡事件(this: void, dyingUnit: any, killingUnit: any): void {

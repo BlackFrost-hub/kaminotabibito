@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports["快速控制效果定义表"] = {
     ["击晕"] = {
@@ -148,6 +147,20 @@ ____exports["扩展控制效果定义表"] = {taunt = {
     ["屏蔽控制命令"] = true,
     ["需要周期驱动"] = true
 }}
+local _____5FEB_901F_63A7_5236_6548_679C_5B9A_4E49_5217_8868 = {
+    ____exports["快速控制效果定义表"]["击晕"],
+    ____exports["快速控制效果定义表"]["冰冻"],
+    ____exports["快速控制效果定义表"]["沉默"],
+    ____exports["快速控制效果定义表"]["变形"],
+    ____exports["快速控制效果定义表"]["缴械"],
+    ____exports["快速控制效果定义表"]["减速"],
+    ____exports["快速控制效果定义表"]["硬直"],
+    ____exports["快速控制效果定义表"]["暂停"],
+    ____exports["快速控制效果定义表"]["EX暂停"],
+    ____exports["快速控制效果定义表"]["睡眠"],
+    ____exports["快速控制效果定义表"]["纠缠根须"],
+    ____exports["快速控制效果定义表"]["飓风"]
+}
 ____exports["默认魅惑跟随半径"] = 160
 ____exports["默认恐惧逃离距离"] = 500
 ____exports["默认恐惧随机半径"] = 450
@@ -163,11 +176,10 @@ ____exports["获取控制效果定义"] = function(_____7C7B_578B)
     if _____6269_5C55_5B9A_4E49 ~= nil then
         return _____6269_5C55_5B9A_4E49
     end
-    local _____5FEB_901F_952E_5217_8868 = __TS__ObjectKeys(____exports["快速控制效果定义表"])
     do
         local i = 0
-        while i < #_____5FEB_901F_952E_5217_8868 do
-            local _____5B9A_4E49 = ____exports["快速控制效果定义表"][_____5FEB_901F_952E_5217_8868[i + 1]]
+        while i < #_____5FEB_901F_63A7_5236_6548_679C_5B9A_4E49_5217_8868 do
+            local _____5B9A_4E49 = _____5FEB_901F_63A7_5236_6548_679C_5B9A_4E49_5217_8868[i + 1]
             if _____5B9A_4E49["类型键"] == _____7C7B_578B then
                 return _____5B9A_4E49
             end

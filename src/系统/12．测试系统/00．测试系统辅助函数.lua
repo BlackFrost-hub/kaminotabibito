@@ -1,5 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
+____exports["测试Boss跳过死亡结算字段"] = "测试Boss跳过死亡结算"
 ____exports["创建测试中心平移映射"] = function(_____6B63_5F0F_4E2D_5FC3X, _____6B63_5F0F_4E2D_5FC3Y, _____6D4B_8BD5_4E2D_5FC3X, _____6D4B_8BD5_4E2D_5FC3Y)
     return {["偏移X"] = _____6D4B_8BD5_4E2D_5FC3X - _____6B63_5F0F_4E2D_5FC3X, ["偏移Y"] = _____6D4B_8BD5_4E2D_5FC3Y - _____6B63_5F0F_4E2D_5FC3Y}
 end
@@ -58,5 +61,17 @@ ____exports["复制平移测试矩形数组"] = function(_____77E9_5F62_5217_886
         end
     end
     return result
+end
+____exports["标记测试Boss跳过死亡结算"] = function(boss)
+    if boss == nil or boss == 0 then
+        return
+    end
+    YDUserDataSetSafe(
+        "unit",
+        boss,
+        ____exports["测试Boss跳过死亡结算字段"],
+        "boolean",
+        true
+    )
 end
 return ____exports

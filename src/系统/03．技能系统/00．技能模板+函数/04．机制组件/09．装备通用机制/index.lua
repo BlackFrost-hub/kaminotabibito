@@ -48,4 +48,28 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.07．击杀回复触发模板")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.08．潜行状态模板")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.09．主动陷阱模板")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

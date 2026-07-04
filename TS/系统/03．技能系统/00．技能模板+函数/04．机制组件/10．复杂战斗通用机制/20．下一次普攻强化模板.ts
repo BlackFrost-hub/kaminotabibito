@@ -12,7 +12,6 @@ import {
 } from "../../01．技能函数/21．攻击效果/04．强化普攻";
 
 export interface 下一次普攻强化参数 {
-  Boss单位?: any;
   单位?: any;
   名称?: string;
   持续秒?: number;
@@ -32,10 +31,7 @@ export interface 下一次普攻强化参数 {
   on结束?: (this: void, 上下文: 强化普攻结束上下文) => void;
 }
 
-export type Boss下一次普攻强化参数 = 下一次普攻强化参数;
-
 function 取强化普攻单位(this: void, 参数: 下一次普攻强化参数): any {
-  if (参数.Boss单位 != null && 参数.Boss单位 !== 0) return 参数.Boss单位;
   return 参数.单位;
 }
 
@@ -74,22 +70,6 @@ export function 获取下一次普攻强化状态(this: void, 单位: any, 名�
 
 export function 单位拥有下一次普攻强化(this: void, 单位: any, 名称?: string): boolean {
   return 单位拥有强化普攻(单位, 名称);
-}
-
-export function 添加Boss下一次普攻强化(this: void, 参数: Boss下一次普攻强化参数): boolean {
-  return 添加下一次普攻强化(参数);
-}
-
-export function 清除Boss下一次普攻强化(this: void, 单位: any, 名称?: string): void {
-  清除下一次普攻强化(单位, 名称);
-}
-
-export function 获取Boss下一次普攻强化状态(this: void, 单位: any, 名称?: string): 强化普攻状态快照 | null {
-  return 获取下一次普攻强化状态(单位, 名称);
-}
-
-export function Boss拥有下一次普攻强化(this: void, 单位: any, 名称?: string): boolean {
-  return 单位拥有下一次普攻强化(单位, 名称);
 }
 
 export {};

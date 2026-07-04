@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_56DB_91CD_98CE_5203_76EE_6807, _____7ED3_7B97_8DF3_5288, _____8C03_5EA6_9F99_5377_98CE_9636_6BB5_6539_5411, _____53D1_5C04_5355_4E2A_9F99_5377_98CE, _____53D1_5C04_56DB_91CD_9F99_5377_98CE, ____on_91CC_79D1_7279_56DB_91CD_98CE_5203_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetSpellTargetUnit, GetOwningPlayer, UnitDamageTarget, ATTACK_TYPE_MAGIC, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____65BD_52A0_5FEB_901F_51CF_901FBuff, _____521B_5EFA_539F_751F_5F39_5E55, _____83B7_53D6_539F_751F_5F39_5E55, _____8BBE_7F6E_539F_751F_5F39_5E55_6307_5B9A_89D2_5EA6_98DE_884C, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, _____91CC_79D1_7279_5355_4F4D_7C7B_578BID, _____56DB_91CD_98CE_5203_6280_80FDID
+local _____53D6_56DB_91CD_98CE_5203_76EE_6807, _____7ED3_7B97_8DF3_5288, _____53D6_9F99_5377_98CE_9636_6BB5_6539_5411_89D2_5EA6, _____53D1_5C04_5355_4E2A_9F99_5377_98CE, _____53D1_5C04_56DB_91CD_9F99_5377_98CE, ____on_91CC_79D1_7279_56DB_91CD_98CE_5203_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetSpellTargetUnit, GetOwningPlayer, UnitDamageTarget, ATTACK_TYPE_MAGIC, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____65BD_52A0_5FEB_901F_51CF_901FBuff, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, _____91CC_79D1_7279_5355_4F4D_7C7B_578BID, _____56DB_91CD_98CE_5203_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.09．里科特.00．配置")
 local _____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["里科特单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.09．里科特.01．运行时上下文")
@@ -14,17 +14,19 @@ local ____13_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____13_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____13_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____53D6_5355_4F4D_95F4_89D2_5EA6 = ____13_FF0E_516C_5171_5DE5_5177["取单位间角度"]
-local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
-local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____19_FF0E_5EF6_8FDF_6539_5411_5F39_5E55_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.19．延迟改向弹幕模板")
+local _____521B_5EFA_5EF6_8FDF_6539_5411_5F39_5E55 = ____19_FF0E_5EF6_8FDF_6539_5411_5F39_5E55_6A21_677F["创建延迟改向弹幕"]
 function _____53D6_56DB_91CD_98CE_5203_76EE_6807(boss)
     local target = GetSpellTargetUnit()
-    local _____5355_4F4D_6709_6548_result_8
+    local _____5355_4F4D_6709_6548_result_6
     if _____5355_4F4D_6709_6548(target) then
-        _____5355_4F4D_6709_6548_result_8 = target
+        _____5355_4F4D_6709_6548_result_6 = target
     else
-        _____5355_4F4D_6709_6548_result_8 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]["施法距离"] + 300)
+        _____5355_4F4D_6709_6548_result_6 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]["施法距离"] + 300)
     end
-    return _____5355_4F4D_6709_6548_result_8
+    return _____5355_4F4D_6709_6548_result_6
 end
 function _____7ED3_7B97_8DF3_5288(boss, target)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]
@@ -69,80 +71,64 @@ function _____7ED3_7B97_8DF3_5288(boss, target)
         end
     end
 end
-function _____8C03_5EA6_9F99_5377_98CE_9636_6BB5_6539_5411(context, _____5F39_5E55ID)
+function _____53D6_9F99_5377_98CE_9636_6BB5_6539_5411_89D2_5EA6(context, _____4E0A_4E0B_6587)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]
-    local stage = _____5237_65B0_91CC_79D1_7279_9636_6BB5(context)
-    if stage == 1 then
-        return
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(_____4E0A_4E0B_6587["弹幕单位"]) then
+        return nil
     end
-    local id = addDelayedCallback(
-        (stage >= 3 and cfg["P3追踪延迟秒"] or cfg["P2回转延迟秒"]) * 1000,
-        function()
-            local boss = context["Boss单位"]
-            if not _____5355_4F4D_6709_6548(boss) then
-                return
-            end
-            local bullet = _____83B7_53D6_539F_751F_5F39_5E55(_____5F39_5E55ID)
-            if bullet == nil or not _____5355_4F4D_6709_6548(bullet["弹幕单位"]) then
-                return
-            end
-            if _____5237_65B0_91CC_79D1_7279_9636_6BB5(context) >= 3 then
-                local target = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
-                if _____5355_4F4D_6709_6548(target) then
-                    _____8BBE_7F6E_539F_751F_5F39_5E55_6307_5B9A_89D2_5EA6_98DE_884C(
-                        _____5F39_5E55ID,
-                        _____53D6_5355_4F4D_95F4_89D2_5EA6(bullet["弹幕单位"], target),
-                        cfg["龙卷风速度"]
-                    )
-                end
-                return
-            end
-            _____8BBE_7F6E_539F_751F_5F39_5E55_6307_5B9A_89D2_5EA6_98DE_884C(
-                _____5F39_5E55ID,
-                _____53D6_5355_4F4D_95F4_89D2_5EA6(bullet["弹幕单位"], boss),
-                cfg["龙卷风速度"]
-            )
-        end
-    )
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "里科特-龙卷风改向", id)
+    if _____5237_65B0_91CC_79D1_7279_9636_6BB5(context) >= 3 then
+        local target = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
+        return _____5355_4F4D_6709_6548(target) and _____53D6_5355_4F4D_95F4_89D2_5EA6(_____4E0A_4E0B_6587["弹幕单位"], target) or nil
+    end
+    return _____53D6_5355_4F4D_95F4_89D2_5EA6(_____4E0A_4E0B_6587["弹幕单位"], boss)
 end
 function _____53D1_5C04_5355_4E2A_9F99_5377_98CE(context, angle)
     local boss = context["Boss单位"]
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["龙卷风Boss攻击力比例"]
-    local bullet = _____521B_5EFA_539F_751F_5F39_5E55({
-        ["所有者"] = boss,
-        ["所属玩家"] = GetOwningPlayer(boss),
-        X = GetUnitX(boss),
-        Y = GetUnitY(boss),
-        ["方向角"] = angle,
-        ["速度"] = cfg["龙卷风速度"],
-        ["最大距离"] = cfg["龙卷风射程"],
-        ["命中半径"] = cfg["龙卷风命中半径"],
-        ["影响目标"] = "敌方",
-        ["碰撞消失"] = false,
-        ["每单位最大命中次数"] = 1,
-        ["模型"] = cfg["龙卷风模型路径"],
-        ["缩放"] = cfg["龙卷风缩放"],
-        ["飞行高度"] = cfg["龙卷风飞行高度"],
-        ["on命中"] = function(target)
-            if not _____5355_4F4D_6709_6548(target) then
-                return
+    local stage = _____5237_65B0_91CC_79D1_7279_9636_6BB5(context)
+    _____521B_5EFA_5EF6_8FDF_6539_5411_5F39_5E55({
+        ["名称"] = "里科特-龙卷风改向",
+        ["清理"] = context["清理"],
+        ["弹幕"] = {
+            ["所有者"] = boss,
+            ["所属玩家"] = GetOwningPlayer(boss),
+            X = GetUnitX(boss),
+            Y = GetUnitY(boss),
+            ["方向角"] = angle,
+            ["速度"] = cfg["龙卷风速度"],
+            ["最大距离"] = cfg["龙卷风射程"],
+            ["命中半径"] = cfg["龙卷风命中半径"],
+            ["影响目标"] = "敌方",
+            ["碰撞消失"] = false,
+            ["每单位最大命中次数"] = 1,
+            ["模型"] = cfg["龙卷风模型路径"],
+            ["缩放"] = cfg["龙卷风缩放"],
+            ["飞行高度"] = cfg["龙卷风飞行高度"],
+            ["on命中"] = function(target)
+                if not _____5355_4F4D_6709_6548(target) then
+                    return
+                end
+                UnitDamageTarget(
+                    boss,
+                    target,
+                    damage,
+                    false,
+                    false,
+                    ATTACK_TYPE_MAGIC,
+                    DAMAGE_TYPE_MAGIC,
+                    WEAPON_TYPE_WHOKNOWS
+                )
             end
-            UnitDamageTarget(
-                boss,
-                target,
-                damage,
-                false,
-                false,
-                ATTACK_TYPE_MAGIC,
-                DAMAGE_TYPE_MAGIC,
-                WEAPON_TYPE_WHOKNOWS
-            )
+        },
+        ["自动改向"] = stage ~= 1,
+        ["改向延迟秒"] = stage >= 3 and cfg["P3追踪延迟秒"] or cfg["P2回转延迟秒"],
+        ["新速度"] = cfg["龙卷风速度"],
+        ["取改向角度"] = function(_____4E0A_4E0B_6587)
+            return _____53D6_9F99_5377_98CE_9636_6BB5_6539_5411_89D2_5EA6(context, _____4E0A_4E0B_6587)
         end
     })
-    _____8C03_5EA6_9F99_5377_98CE_9636_6BB5_6539_5411(context, bullet["弹幕ID"])
 end
 function _____53D1_5C04_56DB_91CD_9F99_5377_98CE(context)
     do
@@ -195,8 +181,8 @@ ____exports["释放里科特四重风刃"] = function(context)
                     _____53D1_5C04_56DB_91CD_9F99_5377_98CE(context)
                 end
             )
-            local ____self_10 = context["清理"]
-            ____self_10["登记延迟回调"](____self_10, "里科特-四重龙卷风", id)
+            local ____self_7 = context["清理"]
+            ____self_7["登记延迟回调"](____self_7, "里科特-四重龙卷风", id)
         end
     })
 end
@@ -233,16 +219,11 @@ local ____require_result_2 = require("系统.03．技能系统.00．技能模板
 _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_3["施加快速减速Buff"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
-_____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
-_____83B7_53D6_539F_751F_5F39_5E55 = ____require_result_4["获取原生弹幕"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.06．改向与反弹.00．弹幕改向")
-_____8BBE_7F6E_539F_751F_5F39_5E55_6307_5B9A_89D2_5EA6_98DE_884C = ____require_result_5["设置原生弹幕指定角度飞行"]
-local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_6["获取Boss技能随机敌对英雄"]
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_6["获取Boss技能敌对英雄列表"]
-local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_7.addDelayedCallback
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_5.addDelayedCallback
 _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____56DB_91CD_98CE_5203_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -251,9 +232,9 @@ ____exports["注册里科特四重风刃"] = function()
         return
     end
     _____5DF2_6CE8_518C = true
-    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+    _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "04．四重风刃",
-        ["Boss单位类型ID"] = _____91CC_79D1_7279_5355_4F4D_7C7B_578BID,
+        ["单位类型ID"] = _____91CC_79D1_7279_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____56DB_91CD_98CE_5203_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587,
         ["释放技能"] = function(_context, boss)

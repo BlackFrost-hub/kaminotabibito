@@ -5,7 +5,7 @@ import { 获取或创建卡瑟拉上下文, 取玩家触手残片, 刷新卡瑟�
 import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 取坐标角度, 极坐标X, 极坐标Y, 点到线段距离平方, 距离平方XY } from "./14．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -108,7 +108,7 @@ function 结算高压水炮(this: void, context: 卡瑟拉运行时上下文, st
   }
 }
 
-function 释放卡瑟拉高压水炮(this: void, context: 卡瑟拉运行时上下文): void {
+export function 释放卡瑟拉高压水炮(this: void, context: 卡瑟拉运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.Boss潜入中) return;
   if (刷新卡瑟拉阶段(context) < 2) return;
@@ -149,12 +149,12 @@ function on卡瑟拉高压水炮施法(this: void, castingUnit: any, spellAbilit
 export function 注册卡瑟拉高压水炮(this: void): void {
   if (已注册) return;
   已注册 = true;
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "07．高压水炮",
-    Boss单位类型ID: 卡瑟拉单位类型ID,
+    单位类型ID: 卡瑟拉单位类型ID,
     技能ID: 高压水炮技能ID,
     获取或创建上下文: 获取或创建卡瑟拉上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 卡瑟拉运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 卡瑟拉运行时上下文, boss: any): void {
       on卡瑟拉高压水炮施法(boss, 高压水炮技能ID);
     },
   });

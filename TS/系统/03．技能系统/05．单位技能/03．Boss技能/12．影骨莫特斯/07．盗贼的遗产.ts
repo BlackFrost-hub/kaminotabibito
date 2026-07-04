@@ -5,7 +5,7 @@ import { 获取或创建影骨莫特斯上下文, 刷新影骨盗贼遗产Buff, 
 import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC } from "./11．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -124,7 +124,7 @@ function 注册影骨遗产宝箱延迟生成(this: void, context: 影骨莫特�
   context.清理.登记延迟回调("影骨-盗贼遗产宝箱", id);
 }
 
-function 释放影骨盗贼遗产(this: void, context: 影骨莫特斯运行时上下文): void {
+export function 释放影骨盗贼遗产(this: void, context: 影骨莫特斯运行时上下文): void {
   if (context.遗产宝箱已生成) return;
   context.遗产宝箱已生成 = true;
   播放影骨莫特斯台词(context.Boss单位, "盗贼的遗产");
@@ -144,12 +144,12 @@ function on影骨盗贼遗产施法(this: void, castingUnit: any, spellAbilityId
 export function 注册影骨莫特斯盗贼的遗产(this: void): void {
   if (已注册盗贼遗产) return;
   已注册盗贼遗产 = true;
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "07．盗贼的遗产",
-    Boss单位类型ID: 影骨单位类型ID,
+    单位类型ID: 影骨单位类型ID,
     技能ID: 盗贼遗产技能ID,
     获取或创建上下文: 获取或创建影骨莫特斯上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 影骨莫特斯运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 影骨莫特斯运行时上下文, boss: any): void {
       on影骨盗贼遗产施法(boss, 盗贼遗产技能ID);
     },
   });

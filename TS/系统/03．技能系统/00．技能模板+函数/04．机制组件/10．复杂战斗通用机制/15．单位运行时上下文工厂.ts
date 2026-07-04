@@ -7,24 +7,23 @@ const jass = require("jass.common") as any;
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 
-export interface Boss运行时上下文基础 {
-  Boss单位: any;
+export interface 单位运行时上下文基础 {
   清理: 机制清理篮子;
 }
 
-export interface Boss运行时上下文工厂参数<T extends Boss运行时上下文基础> {
+export interface 单位运行时上下文工厂参数<T extends 单位运行时上下文基础> {
   名称: string;
   主动技能提示?: any;
-  创建上下文: (this: void, boss: any, 清理: 机制清理篮子) => T;
+  创建上下文: (this: void, unit: any, 清理: 机制清理篮子) => T;
   on创建?: (this: void, context: T) => void;
   on清理?: (this: void, context: T) => void;
 }
 
-export interface Boss运行时上下文工厂<T extends Boss运行时上下文基础> {
-  获取(this: void, boss: any): T | undefined;
-  获取或创建(this: void, boss: any): T | undefined;
+export interface 单位运行时上下文工厂<T extends 单位运行时上下文基础> {
+  获取(this: void, unit: any): T | undefined;
+  获取或创建(this: void, unit: any): T | undefined;
   获取全部(this: void): T[];
-  清理上下文(this: void, boss: any): void;
+  清理上下文(this: void, unit: any): void;
   取单位ID(this: void, unit: any): number;
 }
 
@@ -33,25 +32,25 @@ function 默认取单位ID(this: void, unit: any): number {
   return GetHandleId(unit) || 0;
 }
 
-export function 创建Boss运行时上下文工厂<T extends Boss运行时上下文基础>(
+export function 创建单位运行时上下文工厂<T extends 单位运行时上下文基础>(
   this: void,
-  参数: Boss运行时上下文工厂参数<T>,
-): Boss运行时上下文工厂<T> {
+  参数: 单位运行时上下文工厂参数<T>,
+): 单位运行时上下文工厂<T> {
   const 上下文表: Record<number, T | undefined> = {};
 
-  function 获取(this: void, boss: any): T | undefined {
-    const id = 默认取单位ID(boss);
+  function 获取(this: void, unit: any): T | undefined {
+    const id = 默认取单位ID(unit);
     return id === 0 ? undefined : 上下文表[id];
   }
 
-  function 获取或创建(this: void, boss: any): T | undefined {
-    const id = 默认取单位ID(boss);
+  function 获取或创建(this: void, unit: any): T | undefined {
+    const id = 默认取单位ID(unit);
     if (id === 0) return undefined;
     let context = 上下文表[id];
     if (context != null) return context;
     const 清理 = 创建机制清理篮子(参数.名称);
-    context = 参数.创建上下文(boss, 清理);
-    if (参数.主动技能提示 != null) 设置单位技能壳普通提示(boss, 参数.主动技能提示);
+    context = 参数.创建上下文(unit, 清理);
+    if (参数.主动技能提示 != null) 设置单位技能壳普通提示(unit, 参数.主动技能提示);
     上下文表[id] = context;
     if (参数.on创建 != null) 参数.on创建(context);
     return context;
@@ -66,8 +65,8 @@ export function 创建Boss运行时上下文工厂<T extends Boss运行时上下
     return result;
   }
 
-  function 清理上下文(this: void, boss: any): void {
-    const id = 默认取单位ID(boss);
+  function 清理上下文(this: void, unit: any): void {
+    const id = 默认取单位ID(unit);
     if (id === 0) return;
     const context = 上下文表[id];
     if (context != null) {

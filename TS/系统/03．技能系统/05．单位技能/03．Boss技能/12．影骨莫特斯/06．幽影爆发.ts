@@ -6,7 +6,7 @@ import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } fro
 import { 创建影骨召唤物 } from "./04．骸骨召唤";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y } from "./11．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -118,7 +118,7 @@ function 影骨幽影爆发结束(this: void, variable: 影骨幽影爆发结束
   销毁影骨幽灵形态特效(variable);
 }
 
-function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运行时上下文): void {
+export function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运行时上下文): void {
   if (!单位有效(context.Boss单位)) return;
   播放影骨莫特斯台词(context.Boss单位, "幽影爆发");
   AddSpecialEffect(影骨莫特斯表现配置.幽影爆发开场, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心X, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心Y);
@@ -158,12 +158,12 @@ export function 注册影骨莫特斯幽影爆发(this: void): void {
   if (已注册幽影爆发) return;
   已注册幽影爆发 = true;
   确保幽影承伤修正();
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "06．幽影爆发",
-    Boss单位类型ID: 影骨单位类型ID,
+    单位类型ID: 影骨单位类型ID,
     技能ID: 幽影爆发技能ID,
     获取或创建上下文: 获取或创建影骨莫特斯上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 影骨莫特斯运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 影骨莫特斯运行时上下文, boss: any): void {
       on影骨幽影爆发施法(boss, 幽影爆发技能ID);
     },
   });

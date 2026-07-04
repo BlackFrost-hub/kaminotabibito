@@ -16,8 +16,8 @@ local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____6781_5750_6807X = ____16_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____16_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
-local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
-local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 function _____83AB_5C14_7279_65AF_5B62_5B50_4E91_5468_671F(variable)
     local data = variable
     if data == nil then
@@ -144,7 +144,7 @@ local function _____83AB_5C14_7279_65AF_5EF6_8FDF_521B_5EFA_5B62_5B50_4E91(varia
     end
     _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
 end
-local function _____91CA_653E_83AB_5C14_7279_65AF_8150_8D25_5B62_5B50_4E91(context)
+____exports["释放莫尔特斯腐败孢子云"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
         return
@@ -172,16 +172,16 @@ local function ____on_83AB_5C14_7279_65AF_8150_8D25_5B62_5B50_4E91_65BD_6CD5(cas
     if context == nil then
         return
     end
-    _____91CA_653E_83AB_5C14_7279_65AF_8150_8D25_5B62_5B50_4E91(context)
+    ____exports["释放莫尔特斯腐败孢子云"](context)
 end
 ____exports["注册莫尔特斯腐败孢子云"] = function()
     if _____5DF2_6CE8_518C then
         return
     end
     _____5DF2_6CE8_518C = true
-    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+    _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "05．腐败孢子云",
-        ["Boss单位类型ID"] = _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID,
+        ["单位类型ID"] = _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____8150_8D25_5B62_5B50_4E91_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587,
         ["释放技能"] = function(_context, boss)

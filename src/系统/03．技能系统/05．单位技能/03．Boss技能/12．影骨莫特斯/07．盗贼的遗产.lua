@@ -14,8 +14,8 @@ local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
-local ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．Boss技能壳监听注册器")
-local _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C = ____16_FF0EBoss_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册Boss技能壳监听"]
+local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -130,7 +130,7 @@ local function _____6CE8_518C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(
     local ____self_4 = context["清理"]
     ____self_4["登记延迟回调"](____self_4, "影骨-盗贼遗产宝箱", id)
 end
-local function _____91CA_653E_5F71_9AA8_76D7_8D3C_9057_4EA7(context)
+____exports["释放影骨盗贼遗产"] = function(context)
     if context["遗产宝箱已生成"] then
         return
     end
@@ -154,7 +154,7 @@ local function ____on_5F71_9AA8_76D7_8D3C_9057_4EA7_65BD_6CD5(castingUnit, spell
     end
     local context = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587(castingUnit)
     if context ~= nil then
-        _____91CA_653E_5F71_9AA8_76D7_8D3C_9057_4EA7(context)
+        ____exports["释放影骨盗贼遗产"](context)
     end
 end
 ____exports["注册影骨莫特斯盗贼的遗产"] = function()
@@ -162,9 +162,9 @@ ____exports["注册影骨莫特斯盗贼的遗产"] = function()
         return
     end
     _____5DF2_6CE8_518C_76D7_8D3C_9057_4EA7 = true
-    _____6CE8_518CBoss_6280_80FD_58F3_76D1_542C({
+    _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "07．盗贼的遗产",
-        ["Boss单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
+        ["单位类型ID"] = _____5F71_9AA8_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____76D7_8D3C_9057_4EA7_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
         ["释放技能"] = function(_context, boss)

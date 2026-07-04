@@ -2,7 +2,7 @@
 
 import { 巴尔扎罗斯技能数值配置 } from "./02．数值与表现配置";
 import { 清除巴尔扎罗斯灼热 } from "./16．灼热层数工具";
-import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．Boss公共工具";
+import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
 const { onItemPickup } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {

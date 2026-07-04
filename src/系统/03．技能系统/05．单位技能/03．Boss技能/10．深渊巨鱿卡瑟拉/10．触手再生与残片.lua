@@ -3,6 +3,7 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.10．深渊巨鱿卡瑟拉.01．运行时上下文")
 local _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取全部卡瑟拉上下文"]
+local _____6E05_7406_5361_745F_62C9_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["清理卡瑟拉上下文"]
 local _____8BBE_7F6E_73A9_5BB6_89E6_624B_6B8B_7247 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["设置玩家触手残片"]
 local _____5237_65B0_5361_745F_62C9_9636_6BB5 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["刷新卡瑟拉阶段"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.10．深渊巨鱿卡瑟拉.02．数值与表现配置")
@@ -368,6 +369,7 @@ local function ____on_5361_745F_62C9_8FD0_884C_65F6_5468_671F()
             do
                 local context = contexts[i + 1]
                 if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+                    _____6E05_7406_5361_745F_62C9_4E0A_4E0B_6587(context["Boss单位"])
                     goto __continue59
                 end
                 _____5237_65B0_5361_745F_62C9_9636_6BB5(context)

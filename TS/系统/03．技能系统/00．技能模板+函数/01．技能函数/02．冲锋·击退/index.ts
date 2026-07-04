@@ -5,3 +5,4 @@
 export * from "./击退系统";
 export * from "./冲锋残影表现";
 export * from "./冲锋路径区域结算";
+export * from "./位移回调模板";

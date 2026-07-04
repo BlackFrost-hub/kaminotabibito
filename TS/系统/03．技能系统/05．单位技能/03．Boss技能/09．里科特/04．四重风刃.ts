@@ -5,7 +5,8 @@ import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科�
 import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度 } from "./13．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 创建延迟改向弹幕, type 延迟改向弹幕上下文 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/19．延迟改向弹幕模板";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -31,13 +32,6 @@ const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能�
 };
 const { 施加快速减速Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number) => void;
-};
-const { 创建原生弹幕, 获取原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
-  创建原生弹幕: (this: void, 参数: any) => { 弹幕ID: number };
-  获取原生弹幕: (this: void, 弹幕ID: number) => { 弹幕单位: any } | undefined;
-};
-const { 设置原生弹幕指定角度飞行 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.06．改向与反弹.00．弹幕改向") as {
-  设置原生弹幕指定角度飞行: (this: void, 弹幕ID: number, 朝向角度: number, 新速度?: number) => boolean;
 };
 const { 获取Boss技能随机敌对英雄, 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能随机敌对英雄: (this: void, boss: any, centerUnit?: any, radius?: number) => any;
@@ -74,50 +68,52 @@ function 结算跳劈(this: void, boss: any, target: any): void {
   }
 }
 
-function 调度龙卷风阶段改向(this: void, context: 里科特运行时上下文, 弹幕ID: number): void {
+function 取龙卷风阶段改向角度(this: void, context: 里科特运行时上下文, 上下文: 延迟改向弹幕上下文): number | undefined {
   const cfg = 里科特数值与表现配置.四重风刃;
-  const stage = 刷新里科特阶段(context);
-  if (stage === 1) return;
-  const id = addDelayedCallback((stage >= 3 ? cfg.P3追踪延迟秒 : cfg.P2回转延迟秒) * 1000, function 里科特龙卷风延迟改向(this: void): void {
-    const boss = context.Boss单位;
-    if (!单位有效(boss)) return;
-    const bullet = 获取原生弹幕(弹幕ID);
-    if (bullet == null || !单位有效(bullet.弹幕单位)) return;
-    if (刷新里科特阶段(context) >= 3) {
-      const target = 获取Boss技能随机敌对英雄(boss, boss, 2000);
-      if (单位有效(target)) 设置原生弹幕指定角度飞行(弹幕ID, 取单位间角度(bullet.弹幕单位, target), cfg.龙卷风速度);
-      return;
-    }
-    设置原生弹幕指定角度飞行(弹幕ID, 取单位间角度(bullet.弹幕单位, boss), cfg.龙卷风速度);
-  });
-  context.清理.登记延迟回调("里科特-龙卷风改向", id);
+  const boss = context.Boss单位;
+  if (!单位有效(boss) || !单位有效(上下文.弹幕单位)) return undefined;
+  if (刷新里科特阶段(context) >= 3) {
+    const target = 获取Boss技能随机敌对英雄(boss, boss, 2000);
+    return 单位有效(target) ? 取单位间角度(上下文.弹幕单位, target) : undefined;
+  }
+  return 取单位间角度(上下文.弹幕单位, boss);
 }
 
 function 发射单个龙卷风(this: void, context: 里科特运行时上下文, angle: number): void {
   const boss = context.Boss单位;
   const cfg = 里科特数值与表现配置.四重风刃;
   const damage = 读取单位攻击力(boss) * cfg.龙卷风Boss攻击力比例;
-  const bullet = 创建原生弹幕({
-    所有者: boss,
-    所属玩家: GetOwningPlayer(boss),
-    X: GetUnitX(boss),
-    Y: GetUnitY(boss),
-    方向角: angle,
-    速度: cfg.龙卷风速度,
-    最大距离: cfg.龙卷风射程,
-    命中半径: cfg.龙卷风命中半径,
-    影响目标: "敌方",
-    碰撞消失: false,
-    每单位最大命中次数: 1,
-    模型: cfg.龙卷风模型路径,
-    缩放: cfg.龙卷风缩放,
-    飞行高度: cfg.龙卷风飞行高度,
-    on命中: function 里科特龙卷风命中(this: void, target: any): void {
-      if (!单位有效(target)) return;
-      UnitDamageTarget(boss, target, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
+  const stage = 刷新里科特阶段(context);
+  创建延迟改向弹幕({
+    名称: "里科特-龙卷风改向",
+    清理: context.清理,
+    弹幕: {
+      所有者: boss,
+      所属玩家: GetOwningPlayer(boss),
+      X: GetUnitX(boss),
+      Y: GetUnitY(boss),
+      方向角: angle,
+      速度: cfg.龙卷风速度,
+      最大距离: cfg.龙卷风射程,
+      命中半径: cfg.龙卷风命中半径,
+      影响目标: "敌方",
+      碰撞消失: false,
+      每单位最大命中次数: 1,
+      模型: cfg.龙卷风模型路径,
+      缩放: cfg.龙卷风缩放,
+      飞行高度: cfg.龙卷风飞行高度,
+      on命中: function 里科特龙卷风命中(this: void, target: any): void {
+        if (!单位有效(target)) return;
+        UnitDamageTarget(boss, target, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
+      },
+    },
+    自动改向: stage !== 1,
+    改向延迟秒: stage >= 3 ? cfg.P3追踪延迟秒 : cfg.P2回转延迟秒,
+    新速度: cfg.龙卷风速度,
+    取改向角度: function 里科特龙卷风取改向角度(this: void, 上下文: 延迟改向弹幕上下文): number | undefined {
+      return 取龙卷风阶段改向角度(context, 上下文);
     },
   });
-  调度龙卷风阶段改向(context, bullet.弹幕ID);
 }
 
 function 发射四重龙卷风(this: void, context: 里科特运行时上下文): void {
@@ -169,12 +165,12 @@ export function 释放里科特四重风刃(this: void, context: 里科特运行
 export function 注册里科特四重风刃(this: void): void {
   if (已注册) return;
   已注册 = true;
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "04．四重风刃",
-    Boss单位类型ID: 里科特单位类型ID,
+    单位类型ID: 里科特单位类型ID,
     技能ID: 四重风刃技能ID,
     获取或创建上下文: 获取或创建里科特上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 里科特运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 里科特运行时上下文, boss: any): void {
       on里科特四重风刃生效(boss, 四重风刃技能ID);
     },
   });

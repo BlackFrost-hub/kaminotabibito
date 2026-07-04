@@ -5,7 +5,7 @@ import { 获取或创建卡瑟拉上下文, type 卡瑟拉运行时上下文 } f
 import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 距离XY, 限制数值 } from "./14．公共工具";
-import { 注册Boss技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．Boss技能壳监听注册器";
+import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -68,7 +68,7 @@ function 结算深海涡流爆发(this: void, context: 卡瑟拉运行时上下�
   }
 }
 
-function 释放卡瑟拉深海涡流(this: void, context: 卡瑟拉运行时上下文): void {
+export function 释放卡瑟拉深海涡流(this: void, context: 卡瑟拉运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 卡瑟拉数值与表现配置.深海涡流;
@@ -114,12 +114,12 @@ function on卡瑟拉深海涡流施法(this: void, castingUnit: any, spellAbilit
 export function 注册卡瑟拉深海涡流(this: void): void {
   if (已注册) return;
   已注册 = true;
-  注册Boss技能壳监听({
+  注册单位技能壳监听({
     名称: "03．深海涡流",
-    Boss单位类型ID: 卡瑟拉单位类型ID,
+    单位类型ID: 卡瑟拉单位类型ID,
     技能ID: 深海涡流技能ID,
     获取或创建上下文: 获取或创建卡瑟拉上下文,
-    释放技能: function Boss技能壳监听释放(this: void, _context: 卡瑟拉运行时上下文, boss: any): void {
+    释放技能: function 单位技能壳监听释放(this: void, _context: 卡瑟拉运行时上下文, boss: any): void {
       on卡瑟拉深海涡流施法(boss, 深海涡流技能ID);
     },
   });

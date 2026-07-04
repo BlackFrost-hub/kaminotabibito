@@ -77,6 +77,7 @@ local ____require_result_23 = require("系统.12．测试系统.00．测试系�
 local _____521B_5EFA_6D4B_8BD5_4E2D_5FC3_5E73_79FB_6620_5C04 = ____require_result_23["创建测试中心平移映射"]
 local _____6309_6D4B_8BD5_6620_5C04_5E73_79FB_77E9_5F62 = ____require_result_23["按测试映射平移矩形"]
 local _____590D_5236_5E73_79FB_6D4B_8BD5_77E9_5F62_6570_7EC4 = ____require_result_23["复制平移测试矩形数组"]
+local _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97 = ____require_result_23["标记测试Boss跳过死亡结算"]
 local _____6D4B_8BD5_547D_4EE4 = "bztest"
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4DID = stringToFourCC("N03G")
 local _____6D4B_8BD5_6B65_5175_5355_4F4DID = stringToFourCC("hfoo")
@@ -185,6 +186,7 @@ local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player)
         SetUnitPosition(cached, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3Y)
         SetUnitFacing(cached, 270)
         _____8BBE_7F6E_6D4B_8BD5_5355_4F4D_6EE1_8840(cached)
+        _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97(cached)
         return cached
     end
     local boss = CreateUnit(
@@ -196,6 +198,7 @@ local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player)
     )
     if boss ~= nil and boss ~= 0 then
         _____6700_8FD1_6D4B_8BD5Boss[pid] = boss
+        _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97(boss)
         SetHeroLevel(boss, 40, false)
         _____8BBE_7F6E_6D4B_8BD5_5355_4F4D_6EE1_8840(boss)
     end

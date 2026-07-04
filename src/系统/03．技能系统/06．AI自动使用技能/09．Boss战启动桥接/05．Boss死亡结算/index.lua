@@ -17,7 +17,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.02．Boss死亡奖励与清理配置表")
+    local ____export = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.02．Boss死亡非UI掉落与清理配置表")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
