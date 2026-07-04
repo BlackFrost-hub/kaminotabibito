@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__NumberToFixed = ____lualib.__TS__NumberToFixed
 local ____exports = {}
-local multiboardSetItemValue, getPlayerAttr, formatPercent, formatNumber, formatReal, updateMultiboard, updatePlayerSpeed, onRefreshTick, onRefresh, registerToCenterTimer, jass, getGameTimeFormatted, getGameDifficulty, onTick10ms, YDUserDataGet, YDUserDataSet, forEachUnitInGroup, multiboards, _registered, _refreshCounter
+local multiboardSetItemValue, getPlayerAttr, getPlayerHero, formatPercent, formatNumber, formatReal, updateMultiboard, updatePlayerSpeed, onRefreshTick, onRefresh, registerToCenterTimer, jass, getGameTimeFormatted, getGameDifficulty, onTick10ms, YDUserDataGet, YDUserDataSet, forEachUnitInGroup, multiboards, _registered, _refreshCounter
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.01．单位系统.01．多面板属性.00．常量定义")
 local MULTIBOARD_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTIBOARD_SYSTEM_ENABLED
 local MULTIBOARD_ROWS = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTIBOARD_ROWS
@@ -30,6 +30,30 @@ function getPlayerAttr(self, playerId, attrName)
         "real"
     )
     return type(value) == "number" and value or 0
+end
+function getPlayerHero(self, playerId)
+    local heroGroup = YDUserDataGet(
+        nil,
+        "string",
+        "玩家英雄",
+        "单位组",
+        "group"
+    )
+    if heroGroup == nil then
+        return nil
+    end
+    local player = jass.Player(playerId - 1)
+    local foundUnit = nil
+    forEachUnitInGroup(
+        nil,
+        heroGroup,
+        function(____, u)
+            if u ~= nil and jass.GetOwningPlayer(u) == player then
+                foundUnit = u
+            end
+        end
+    )
+    return foundUnit
 end
 function formatPercent(self, value)
     local pct = jass.R2I(value * 100 + 0.5)
@@ -379,27 +403,8 @@ function updateMultiboard(self, mb, playerId)
     )
 end
 function updatePlayerSpeed(self, playerId)
-    local heroGroup = YDUserDataGet(
-        nil,
-        "string",
-        "玩家英雄",
-        "单位组",
-        "group"
-    )
-    if heroGroup == nil then
-        return
-    end
     local player = jass.Player(playerId - 1)
-    local foundUnit = nil
-    forEachUnitInGroup(
-        nil,
-        heroGroup,
-        function(____, u)
-            if u ~= nil and jass.GetOwningPlayer(u) == player then
-                foundUnit = u
-            end
-        end
-    )
+    local foundUnit = getPlayerHero(nil, playerId)
     if foundUnit == nil then
         return
     end
@@ -440,15 +445,15 @@ function onRefresh(self)
             do
                 local mb = multiboards[i + 1]
                 if mb == nil then
-                    goto __continue27
+                    goto __continue28
                 end
                 if not jass.IsMultiboardDisplayed(mb) then
-                    goto __continue27
+                    goto __continue28
                 end
                 updatePlayerSpeed(nil, i + 1)
                 updateMultiboard(nil, mb, i + 1)
             end
-            ::__continue27::
+            ::__continue28::
             i = i + 1
         end
     end

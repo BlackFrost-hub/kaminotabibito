@@ -20,6 +20,6 @@ createEquipmentItem('I0EU', '异形化残刃', {
   classification = 'Campaign',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[主武器/剑]-混合爆发|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n攻击力+150|n智力+28|n暗属性伤害+16%|n魔法吸血+6%|n|cFF808080残刃像被异形力量咬碎后重新拼合，裂缝中浮着不稳定的紫黑光。|r',
-  description = '|cffccffff[主武器/剑]-混合爆发|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n攻击力+150|n智力+28|n暗属性伤害+16%|n魔法吸血+6%|n|cFF808080残刃像被异形力量咬碎后重新拼合，裂缝中浮着不稳定的紫黑光。|r',
+  tooltipExtended = '|cffccffff[主武器/剑]-混合爆发|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n攻击力+150|n智力+28|n暗属性伤害+16%|n魔法吸血+6%|n|cffffffcc[特效]|r|n异形充能：每5次技能伤害消耗5%当前生命，额外造成本次伤害30%的暗影伤害，内置冷却5秒。|n|cFF808080残刃像被异形力量咬碎后重新拼合，裂缝中浮着不稳定的紫黑光。|r',
+  description = '|cffccffff[主武器/剑]-混合爆发|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n攻击力+150|n智力+28|n暗属性伤害+16%|n魔法吸血+6%|n|cffffffcc[特效]|r|n异形充能：每5次技能伤害消耗5%当前生命，额外造成本次伤害30%的暗影伤害，内置冷却5秒。|n|cFF808080残刃像被异形力量咬碎后重新拼合，裂缝中浮着不稳定的紫黑光。|r',
 })

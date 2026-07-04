@@ -14,9 +14,13 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 
+export type 固定受击次数计数模式 = "任意伤害" | "纯普攻" | "最终伤害阈值" | "纯普攻或最终伤害阈值";
+
 export interface 固定受击次数机制单位参数 extends 可攻击机制单位参数 {
   受击次数: number;
   每次伤害扣除次数?: number;
+  计数模式?: 固定受击次数计数模式;
+  最终伤害计数阈值?: number;
   过滤伤害?: (this: void, context: any) => boolean;
   on受击?: (this: void, 单位: any, 剩余次数: number, context: any) => void;
   on击破?: (this: void, 单位: any, context: any) => void;
@@ -45,6 +49,21 @@ function 规整次数(this: void, 次数: number): number {
   return math.floor(次数);
 }
 
+function 最终伤害达到计数阈值(this: void, 参数: 固定受击次数机制单位参数, context: any): boolean {
+  const 阈值 = 参数.最终伤害计数阈值 ?? 0;
+  return context.currentDamage > 阈值;
+}
+
+function 本次伤害是否计数(this: void, 参数: 固定受击次数机制单位参数, context: any): boolean {
+  const 模式 = 参数.计数模式 ?? "任意伤害";
+  if (模式 === "任意伤害") return true;
+  const 是纯普攻 = context.isNormalAttack === true && context.isSkillAttack !== true && context.isSkillDamage !== true;
+  if (模式 === "纯普攻") return 是纯普攻;
+  const 达到阈值 = 最终伤害达到计数阈值(参数, context);
+  if (模式 === "最终伤害阈值") return 达到阈值;
+  return 是纯普攻 || 达到阈值;
+}
+
 function 固定受击次数伤害修正(this: void, context: any): number {
   const id = 取单位ID(context.target);
   if (id === 0) return context.currentDamage;
@@ -52,6 +71,7 @@ function 固定受击次数伤害修正(this: void, context: any): number {
   if (记录 == null) return context.currentDamage;
   if (context.currentDamage <= 0) return context.currentDamage;
   if (记录.参数.过滤伤害 != null && !记录.参数.过滤伤害(context)) return context.currentDamage;
+  if (!本次伤害是否计数(记录.参数, context)) return context.currentDamage;
 
   const 扣除次数 = 规整次数(记录.参数.每次伤害扣除次数 ?? 1);
   if (扣除次数 <= 0) return 0;

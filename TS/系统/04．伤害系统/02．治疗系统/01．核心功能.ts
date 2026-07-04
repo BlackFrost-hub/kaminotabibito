@@ -18,6 +18,7 @@ const japi = require("jass.japi") as any;
 const GetUnitStateJass = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitStateJass = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 
 import {
   HEAL_SYSTEM_ENABLED,
@@ -155,8 +156,12 @@ export function setHealRate(unit: any, rate: number): void {
 /** 获取单位治疗率 */
 export function getHealRate(unit: any): number {
   if (unit == null) return 0;
-  const v = YDUserDataGet("unit", unit, ATTR_HEAL_RATE, "real");
-  return typeof v === "number" ? v : 0;
+  const unitValue = YDUserDataGet("unit", unit, ATTR_HEAL_RATE, "real");
+  const player = GetOwningPlayer(unit);
+  const playerValue = player != null ? YDUserDataGet("player", player, ATTR_HEAL_RATE, "real") : 0;
+  const unitRate = typeof unitValue === "number" ? unitValue : 0;
+  const playerRate = typeof playerValue === "number" ? playerValue : 0;
+  return unitRate + playerRate;
 }
 
 /** 设置单位受到治疗率（被治疗时生效） */
@@ -168,8 +173,12 @@ export function setReceivedHealRate(unit: any, rate: number): void {
 /** 获取单位受到治疗率 */
 export function getReceivedHealRate(unit: any): number {
   if (unit == null) return 0;
-  const v = YDUserDataGet("unit", unit, ATTR_RECEIVED_HEAL_RATE, "real");
-  return typeof v === "number" ? v : 0;
+  const unitValue = YDUserDataGet("unit", unit, ATTR_RECEIVED_HEAL_RATE, "real");
+  const player = GetOwningPlayer(unit);
+  const playerValue = player != null ? YDUserDataGet("player", player, ATTR_RECEIVED_HEAL_RATE, "real") : 0;
+  const unitRate = typeof unitValue === "number" ? unitValue : 0;
+  const playerRate = typeof playerValue === "number" ? playerValue : 0;
+  return unitRate + playerRate;
 }
 
 // ==========================================================================================

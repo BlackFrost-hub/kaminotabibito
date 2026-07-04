@@ -6,8 +6,11 @@ export * from "./03．条件开关效果";
 export * from "./04．范围脉冲效果";
 export * from "./05．物品次数转移";
 export * from "./06．暴击属性工具";
+export * from "./18．尝试拾取物品中心";
 export * from "./08．装备识别与冷却";
 export * from "./11．装备常量";
+export * from "./19．临时属性效果";
+export * from "./20．延迟动作";
 export {
   是否为使用物品,
   单位持有物品,
@@ -44,6 +47,7 @@ export {
   临时调整攻击,
   临时调整护甲,
   临时调整攻速,
+  调整状态ID属性,
   调整玩家属性,
   调整单位属性,
   读取玩家属性,

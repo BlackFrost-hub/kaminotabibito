@@ -1,18 +1,17 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_653B_51FB_6548_679C_5DE5_5177 = require("系统.02．物品系统.15．装备技能.08．攻击效果.00．公共.01．攻击效果工具")
-local _____5355_4F4D_6301_6709_653B_51FB_6548_679C_88C5_5907 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["单位持有攻击效果装备"]
 local _____5355_4F4D_6709_6548_5B58_6D3B = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["单位有效存活"]
 local _____653B_51FB_8005_7C7B_578B_6EE1_8DB3 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["攻击者类型满足"]
 local _____53D6_5F53_524D_751F_547D = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["取当前生命"]
 local _____53D6_6700_5927_751F_547D = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["取最大生命"]
-local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local SFB_setSlow = ____require_result_2.SFB_setSlow
+local ____09_FF0E_88C5_5907_901A_7528_673A_5236 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.index")
+local _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F = ____09_FF0E_88C5_5907_901A_7528_673A_5236["注册最终伤害触发模板"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local SFB_setSlow = ____require_result_1.SFB_setSlow
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local UnitDamageTarget = jass.UnitDamageTarget
@@ -135,30 +134,27 @@ local function _____65BD_52A0_6216_5237_65B0_6495_88C2(source, target)
     }
     _____786E_4FDD_6CE8_518C_6495_88C2Tick()
 end
-local function ____on_6076_9B54_738B_722A_6700_7EC8_4F24_5BB3(target, attacker, applied, snapshot)
-    if not (applied > 0) then
-        return
+_____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
+    ["名称"] = "恶魔王爪",
+    ["装备名"] = _____88C5_5907_540D,
+    ["持有者"] = "攻击者",
+    ["伤害过滤"] = "任意",
+    ["自定义过滤"] = function(event)
+        local snapshot = event["伤害快照"]
+        if snapshot == nil or snapshot.isPhysicalDamage ~= true or snapshot.isTrueDamage == true then
+            return false
+        end
+        return _____653B_51FB_8005_7C7B_578B_6EE1_8DB3(event["攻击者"], "近战")
+    end,
+    ["on触发"] = function(event)
+        SFB_setSlow(
+            event["攻击者"],
+            event["目标"],
+            0,
+            _____51CF_901F_6BD4_4F8B,
+            _____51CF_901F_6301_7EED_79D2
+        )
+        _____65BD_52A0_6216_5237_65B0_6495_88C2(event["攻击者"], event["目标"])
     end
-    if snapshot == nil or snapshot.isPhysicalDamage ~= true or snapshot.isTrueDamage == true then
-        return
-    end
-    if not _____5355_4F4D_6709_6548_5B58_6D3B(attacker) or not _____5355_4F4D_6709_6548_5B58_6D3B(target) then
-        return
-    end
-    if not _____5355_4F4D_6301_6709_653B_51FB_6548_679C_88C5_5907(attacker, _____88C5_5907_540D) then
-        return
-    end
-    if not _____653B_51FB_8005_7C7B_578B_6EE1_8DB3(attacker, "近战") then
-        return
-    end
-    SFB_setSlow(
-        attacker,
-        target,
-        0,
-        _____51CF_901F_6BD4_4F8B,
-        _____51CF_901F_6301_7EED_79D2
-    )
-    _____65BD_52A0_6216_5237_65B0_6495_88C2(attacker, target)
-end
-registerAppliedFinalDamageListener(____on_6076_9B54_738B_722A_6700_7EC8_4F24_5BB3)
+})
 return ____exports

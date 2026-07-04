@@ -3,27 +3,16 @@
 import type { 攻击效果上下文 } from "../08．攻击效果/00．公共/00．攻击效果类型";
 import { 注册攻击效果配置 } from "../08．攻击效果/00．公共/02．攻击效果注册表";
 import { 施加攻击效果眩晕 } from "../08．攻击效果/00．公共/01．攻击效果工具";
-
-const jass = require("jass.common") as any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
+import { 取单位对单位冷却键, 装备冷却就绪, 进入装备冷却 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
 
 const { 施加单体护甲降低Buff } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.04．护甲降低") as {
   施加单体护甲降低Buff: (this: void, source: any, target: any, params: { 持续时间: number; 护甲: number; 叠加键?: string }) => boolean;
 };
 
-const 沙之猎弓目标冷却: Record<string, number> = {};
-const 取服务器时间 = require("系统.00．核心系统.05．中心计时器") as { getServerTime: (this: void) => number };
-
-const getServerTime = 取服务器时间.getServerTime;
-
 function 执行沙之猎弓(this: void, 上下文: 攻击效果上下文): void {
-  const sourceId = GetHandleId(上下文.source);
-  const targetId = GetHandleId(上下文.target);
-  const key = String(sourceId) + ":" + String(targetId);
-  const now = getServerTime();
-  const last = 沙之猎弓目标冷却[key];
-  if (last != null && now - last < 6000) return;
-  沙之猎弓目标冷却[key] = now;
+  const key = 取单位对单位冷却键(上下文.source, 上下文.target, "沙之猎弓");
+  if (!装备冷却就绪(key)) return;
+  进入装备冷却(key, 6);
 
   施加单体护甲降低Buff(上下文.source, 上下文.target, {
     持续时间: 6,

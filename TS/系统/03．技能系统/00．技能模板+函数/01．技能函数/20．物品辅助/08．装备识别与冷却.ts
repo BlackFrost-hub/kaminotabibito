@@ -17,6 +17,9 @@ const { getServerTime } = require("系统.00．核心系统.05．中心计时器
 const { 装备触发概率通过 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统") as {
   装备触发概率通过: (this: void, 原始概率: number, 触发单位: any) => boolean;
 };
+const { 监听指定物品获取丢弃 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听") as {
+  监听指定物品获取丢弃: (this: void, itemTypeId: number, 获取回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void, 丢弃回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void) => void;
+};
 
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
@@ -40,6 +43,11 @@ export function 单位持有装备(this: void, unit: any, 装备名: string): bo
 export function 取装备冷却键(this: void, unit: any, tag: string, 前缀: string = "装备"): string {
   if (unit == null || unit === 0 || tag === "") return "";
   return 前缀 + ":" + tag + ":" + String(GetHandleId(unit));
+}
+
+export function 取单位对单位冷却键(this: void, source: any, target: any, tag: string, 前缀: string = "装备单位对单位"): string {
+  if (source == null || source === 0 || target == null || target === 0 || tag === "") return "";
+  return 前缀 + ":" + tag + ":" + String(GetHandleId(source)) + ":" + String(GetHandleId(target));
 }
 
 export function 装备冷却就绪(this: void, key: string): boolean {
@@ -81,6 +89,14 @@ export function 进入冷却(this: void, key: string, 秒数: number): void {
 
 export function 概率通过(this: void, unit: any, chance: number): boolean {
   return 装备概率通过(unit, chance);
+}
+
+export function 监听装备丢弃清理(this: void, 装备名: string, 清理回调: (this: void, unit: any) => void): void {
+  const itemId = 取装备物品ID(装备名);
+  if (itemId === 0) return;
+  监听指定物品获取丢弃(itemId, undefined, function on装备丢弃清理(this: void, unit: any): void {
+    清理回调(unit);
+  });
 }
 
 export {};

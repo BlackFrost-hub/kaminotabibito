@@ -94,6 +94,23 @@ function getPlayerAttr(playerId: number, attrName: string): number {
   return typeof value === "number" ? value : 0;
 }
 
+/** 获取玩家当前英雄 */
+function getPlayerHero(playerId: number): any {
+  const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group");
+  if (heroGroup == null) return null;
+
+  const player = jass.Player(playerId - 1);  // 0-based 索引
+  let foundUnit: any = null;
+
+  forEachUnitInGroup(heroGroup, (u) => {
+    if (u != null && jass.GetOwningPlayer(u) === player) {
+      foundUnit = u;
+    }
+  });
+
+  return foundUnit;
+}
+
 /** 格式化百分比 */
 function formatPercent(value: number): string {
   const pct = jass.R2I(value * 100 + 0.5);
@@ -271,18 +288,8 @@ function updateMultiboard(mb: any, playerId: number): void {
 
 /** 更新玩家攻速和移速 */
 function updatePlayerSpeed(playerId: number): void {
-  const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group");
-  if (heroGroup == null) return;
-
   const player = jass.Player(playerId - 1);  // 0-based 索引
-  let foundUnit: any = null;
-
-  forEachUnitInGroup(heroGroup, (u) => {
-    if (u != null && jass.GetOwningPlayer(u) === player) {
-      foundUnit = u;
-    }
-  });
-
+  const foundUnit = getPlayerHero(playerId);
   if (foundUnit == null) return;
 
   // 计算攻速

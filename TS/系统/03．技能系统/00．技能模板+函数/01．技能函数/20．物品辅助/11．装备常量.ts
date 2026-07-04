@@ -8,7 +8,6 @@ const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
-const DAMAGE_TYPE_FORCE = jass.DAMAGE_TYPE_FORCE as any;
 
 export const 第二章后段Boss战利品装备名 = {
   菲利斯的统御纹章: "菲利斯的统御纹章",
@@ -48,7 +47,7 @@ export const 装备伤害类型 = {
   水: DAMAGE_TYPE_COLD,
   暗影: DAMAGE_TYPE_SHADOW_STRIKE,
   自然: DAMAGE_TYPE_PLANT,
-  风: DAMAGE_TYPE_FORCE,
+  风: DAMAGE_TYPE_PLANT,
 } as const;
 
 export {};

@@ -139,6 +139,9 @@ end
 ____exports["临时调整攻速"] = function(_____5355_4F4D, _____6570_503C)
     SGSS_SetState(_____5355_4F4D, 10, _____6570_503C)
 end
+____exports["调整状态ID属性"] = function(_____5355_4F4D, _____5C5E_6027ID, _____6570_503C)
+    SGSS_SetState(_____5355_4F4D, _____5C5E_6027ID, _____6570_503C)
+end
 ____exports["调整玩家属性"] = function(_____5355_4F4D, _____5C5E_6027_540D, _____589E_91CF)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return

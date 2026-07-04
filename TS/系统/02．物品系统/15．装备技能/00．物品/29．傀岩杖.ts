@@ -2,7 +2,7 @@
 
 import { 伤害事件装备ID } from "../04．伤害事件/00．公共/00．伤害事件配置表";
 import { 单位持有伤害事件装备, 取最大生命, 造成伤害事件伤害, 伤害事件伤害类型, type 伤害事件上下文 } from "../04．伤害事件/00．公共/01．伤害事件工具";
-import { 单位冷却中, 设置单位冷却 } from "../04．伤害事件/00．公共/02．伤害事件状态";
+import { 取装备冷却键, 装备冷却中, 进入装备冷却 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
 
 const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
   创建原生弹幕: (this: void, 参数: any) => any;
@@ -15,7 +15,6 @@ const { 施加扩展控制 } = require("系统.03．技能系统.00．技能模�
 };
 
 const jass = require("jass.common") as any;
-const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
@@ -35,9 +34,9 @@ export function 处理傀岩杖受伤(this: void, ctx: 伤害事件上下文): v
   if (!单位持有伤害事件装备(ctx.target, 伤害事件装备ID.傀岩杖)) return;
   if (ctx.attacker == null || ctx.attacker === 0) return;
   if (ctx.applied < 取最大生命(ctx.target) * 0.1) return;
-  const 冷却键 = "傀岩杖:" + String(GetHandleId(ctx.target));
-  if (单位冷却中(冷却键)) return;
-  设置单位冷却(冷却键, 5);
+  const 冷却键 = 取装备冷却键(ctx.target, "傀岩杖", "伤害事件装备");
+  if (装备冷却中(冷却键)) return;
+  进入装备冷却(冷却键, 5);
   const 实例 = 创建原生弹幕({
     所有者: ctx.target,
     X: GetUnitX(ctx.target),

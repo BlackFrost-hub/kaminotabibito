@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 取装备冷却键, 装备冷却中, 进入装备冷却, 延迟执行单位动作 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
+
 const jass = require("jass.common") as any;
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -35,15 +37,13 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
     ManaShowText?: boolean;
   }) => number;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
-};
-
-const GetHandleId = jass.GetHandleId as (h: any) => number;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, target: any, point: string) => any;
 
-const 回沙CD表: Record<number, boolean | undefined> = {};
 const 回沙之书ID = stringToFourCCSafe(resolveItemIdByName(回沙之书累计配置.物品名));
+
+function 执行回沙之书无敌帧(this: void, target: any): void {
+  开始无敌帧(target, 1.25);
+}
 
 export function 处理回沙之书累计(this: void, target: any, _attacker: any, applied: number): void {
   if (target == null || target === 0 || !(applied > 0)) {
@@ -54,8 +54,9 @@ export function 处理回沙之书累计(this: void, target: any, _attacker: any
     return;
   }
 
+  const 冷却键 = 取装备冷却键(target, "回沙之书", "累计伤害装备");
   const 达到阈值 = 单位物品累伤次数(target, 回沙之书累计配置.物品名, applied, 1, 回沙之书累计配置.累计阈值, {
-    是否在CD中: 回沙CD表[GetHandleId(target)] === true,
+    是否在CD中: 装备冷却中(冷却键),
     达到阈值后重置: true,
   });
   const gain = applied * 回沙之书累计配置.法力恢复倍率;
@@ -73,22 +74,15 @@ export function 处理回沙之书累计(this: void, target: any, _attacker: any
   }
 
   if (达到阈值) {
-    const hid = GetHandleId(target);
-    if (回沙CD表[hid]) {
+    if (装备冷却中(冷却键)) {
       return;
     }
     const eff = AddSpecialEffectTarget(回沙之书累计配置.特效路径, target, "overhead");
     if (eff != null) {
       YDWETimerDestroyEffectSafe(回沙之书累计配置.特效持续时间, eff);
     }
-    回沙CD表[hid] = true;
-    addDelayedCallback(回沙之书累计配置.冷却时间 * 1000, () => {
-      delete 回沙CD表[hid];
-    });
-
-    addDelayedCallback(500, () => {
-      开始无敌帧(target, 1.25);
-    });
+    进入装备冷却(冷却键, 回沙之书累计配置.冷却时间);
+    延迟执行单位动作(target, 500, 执行回沙之书无敌帧);
   }
 }
 

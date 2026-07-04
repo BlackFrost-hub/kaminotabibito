@@ -1,27 +1,15 @@
 /** @noSelfInFile */
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-};
-
 import type { 物品技能事件上下文 } from "../05．物品使用/00．公共/03．物品使用核心";
 import { 物品使用装备ID, 物品使用数值配置 } from "../05．物品使用/00．公共/01．物品使用配置表";
-import { 是否为使用物品, 调整玩家属性 } from "../05．物品使用/00．公共/02．物品使用工具";
-
-const 回退队列: any[] = [];
-
-function 回退浴灵药剂魔抗(this: void): void {
-  const unit = 回退队列.shift();
-  if (unit == null || unit === 0) return;
-  调整玩家属性(unit, "魔抗", -物品使用数值配置.浴灵药剂.魔抗提升);
-}
+import { 是否为使用物品 } from "../05．物品使用/00．公共/02．物品使用工具";
+import { 施加临时属性效果 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 export function 处理浴灵药剂使用(this: void, ctx: 物品技能事件上下文): void {
   if (!是否为使用物品(ctx.物品, 物品使用装备ID.浴灵药剂)) return;
   const unit = ctx.施法单位;
-  调整玩家属性(unit, "魔抗", 物品使用数值配置.浴灵药剂.魔抗提升);
-  回退队列.push(unit);
-  addDelayedCallback(物品使用数值配置.浴灵药剂.持续毫秒, 回退浴灵药剂魔抗);
+  const cfg = 物品使用数值配置.浴灵药剂;
+  施加临时属性效果(unit, cfg.持续毫秒, [{ 类型: "玩家属性", 属性名: "魔抗", 数值: cfg.魔抗提升 }]);
 }
 
 export {};

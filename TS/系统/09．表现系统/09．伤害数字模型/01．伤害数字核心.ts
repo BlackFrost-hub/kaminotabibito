@@ -99,6 +99,7 @@ const 基础Z偏移 = 110;
 const 暴击前缀模型 = "UI\\DamageNumbers\\DmgPfxC.mdx";
 const 闪避前缀模型 = "UI\\DamageNumbers\\DmgPfxD.mdx";
 const 未命中前缀模型 = "UI\\DamageNumbers\\DmgPfxM.mdx";
+const 风木属性伤害颜色 = { r: 0, g: 255, b: 0 };
 
 let 已初始化 = false;
 let 已注册Tick = false;
@@ -158,7 +159,7 @@ function 选取伤害颜色(this: void, damageType: 伤害类型快照): { r: nu
   if (damageType.isWaterDamage) return { r: 80, g: 190, b: 255 };//水/冰属性伤害
   if (damageType.isThunderDamage) return { r: 170, g: 220, b: 255 };//雷属性伤害
   if (damageType.isMetalDamage) return { r: 255, g: 210, b: 80 };//毒/金属性伤害
-  if (damageType.isWoodDamage) return { r: 120, g: 255, b: 120 };//风/木属性伤害
+  if (damageType.isWoodDamage) return 风木属性伤害颜色;//风/木属性伤害
   if (damageType.isLightDamage) return { r: 255, g: 255, b: 170 };//光属性伤害
   if (damageType.isDarkDamage) return { r: 180, g: 130, b: 255 };//暗属性伤害
   if (damageType.isPhysicalDamage) return { r: 160, g: 82, b: 45 };//物理伤害（棕色）
@@ -173,7 +174,7 @@ function 选取伤害颜色(this: void, damageType: 伤害类型快照): { r: nu
   if (damageType.rawDamageType === jass.DAMAGE_TYPE_SLOW_POISON) return { r: 255, g: 210, b: 80 };//金/毒属性伤害兜底
   if (damageType.rawDamageType === jass.DAMAGE_TYPE_ACID) return { r: 255, g: 210, b: 80 };//金/毒属性伤害兜底
   if (damageType.rawDamageType === jass.DAMAGE_TYPE_DISEASE) return { r: 255, g: 210, b: 80 };//金/毒属性伤害兜底
-  if (damageType.rawDamageType === jass.DAMAGE_TYPE_PLANT) return { r: 120, g: 255, b: 120 };//风/木属性伤害兜底
+  if (damageType.rawDamageType === jass.DAMAGE_TYPE_PLANT) return 风木属性伤害颜色;//风/木属性伤害兜底
   if (damageType.rawDamageType === jass.DAMAGE_TYPE_DIVINE) return { r: 255, g: 255, b: 170 };//光属性伤害兜底
   if (damageType.rawDamageType === jass.DAMAGE_TYPE_SHADOW_STRIKE) return { r: 180, g: 130, b: 255 };//暗属性伤害兜底
   if (damageType.rawDamageType === jass.DAMAGE_TYPE_SONIC) return { r: 255, g: 160, b: 255 };//音速属性伤害兜底

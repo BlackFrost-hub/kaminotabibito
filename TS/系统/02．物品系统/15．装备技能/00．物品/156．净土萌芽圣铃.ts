@@ -10,12 +10,15 @@ function on净土萌芽圣铃治疗(this: void, source: any, target: any, amount
   if (!(amount > 0) || source == null || source === 0 || target == null || target === 0) return;
   if (是敌对单位(source, target)) return;
   if (!单位持有第二章后段Boss战利品(source, 第二章后段Boss战利品装备名.净土萌芽圣铃)) return;
-  if (!概率通过(source, 0.18)) return;
+  if (!概率通过(source, 0.22)) return;
   const key = 取冷却键(source, "净土萌芽圣铃");
   if (!冷却就绪(key)) return;
   进入冷却(key, 6);
-  if (!净化负面(target)) return;
-  临时受到治疗率(target, 0.15, 5);
+  if (净化负面(target)) {
+    临时受到治疗率(target, 0.18, 5);
+  } else {
+    临时受到治疗率(target, 0.08, 4);
+  }
   播放单位特效(装备小特效.护盾闪光, target, "origin", 0.8);
 }
 

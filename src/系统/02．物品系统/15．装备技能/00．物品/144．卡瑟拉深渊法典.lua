@@ -1,45 +1,44 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____07_FF0E_88C5_5907_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．装备辅助")
-local _____5355_4F4D_6301_6709_7B2C_4E8C_7AE0_540E_6BB5Boss_6218_5229_54C1 = ____07_FF0E_88C5_5907_8F85_52A9["单位持有第二章后段Boss战利品"]
-local _____662F_6280_80FD_4F24_5BB3 = ____07_FF0E_88C5_5907_8F85_52A9["是技能伤害"]
 local _____662F_5143_7D20_4F24_5BB3 = ____07_FF0E_88C5_5907_8F85_52A9["是元素伤害"]
-local _____53D6_5355_4F4DID = ____07_FF0E_88C5_5907_8F85_52A9["取单位ID"]
 local _____9020_6210_88C5_5907_4F24_5BB3 = ____07_FF0E_88C5_5907_8F85_52A9["造成装备伤害"]
 local _____64AD_653E_5355_4F4D_7279_6548 = ____07_FF0E_88C5_5907_8F85_52A9["播放单位特效"]
 local _____7B2C_4E8C_7AE0_540E_6BB5Boss_6218_5229_54C1_88C5_5907_540D = ____07_FF0E_88C5_5907_8F85_52A9["第二章后段Boss战利品装备名"]
 local _____88C5_5907_4F24_5BB3_7C7B_578B = ____07_FF0E_88C5_5907_8F85_52A9["装备伤害类型"]
 local _____88C5_5907_5C0F_7279_6548 = ____07_FF0E_88C5_5907_8F85_52A9["装备小特效"]
-local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_1.getServerTime
-local _____6E7F_75D5_5230_671F_8868 = {}
-local function ____on_5361_745F_62C9_6DF1_6E0A_6CD5_5178_4F24_5BB3(target, attacker, applied, snapshot)
-    if not (applied > 0) or not _____662F_6280_80FD_4F24_5BB3(snapshot) then
-        return
-    end
-    if not _____5355_4F4D_6301_6709_7B2C_4E8C_7AE0_540E_6BB5Boss_6218_5229_54C1(attacker, _____7B2C_4E8C_7AE0_540E_6BB5Boss_6218_5229_54C1_88C5_5907_540D["卡瑟拉深渊法典"]) then
-        return
-    end
-    local targetId = _____53D6_5355_4F4DID(target)
-    if targetId == 0 then
-        return
-    end
-    if _____662F_5143_7D20_4F24_5BB3(snapshot, _____88C5_5907_4F24_5BB3_7C7B_578B["水"]) then
-        _____6E7F_75D5_5230_671F_8868[targetId] = getServerTime() + 6000
-        _____64AD_653E_5355_4F4D_7279_6548(_____88C5_5907_5C0F_7279_6548["湿痕"], target, "origin", 1.2)
-        return
-    end
-    if not _____662F_5143_7D20_4F24_5BB3(snapshot, _____88C5_5907_4F24_5BB3_7C7B_578B["闪电"]) then
-        return
-    end
-    if (_____6E7F_75D5_5230_671F_8868[targetId] or 0) < getServerTime() then
-        return
-    end
-    __TS__Delete(_____6E7F_75D5_5230_671F_8868, targetId)
-    _____9020_6210_88C5_5907_4F24_5BB3(attacker, target, applied * 0.22, _____88C5_5907_4F24_5BB3_7C7B_578B["闪电"])
+local ____09_FF0E_88C5_5907_901A_7528_673A_5236 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.index")
+local _____521B_5EFA_5355_4F4D_65F6_9650_6807_8BB0 = ____09_FF0E_88C5_5907_901A_7528_673A_5236["创建单位时限标记"]
+local _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F = ____09_FF0E_88C5_5907_901A_7528_673A_5236["注册最终伤害触发模板"]
+local _____5361_745F_62C9_6E7F_75D5 = _____521B_5EFA_5355_4F4D_65F6_9650_6807_8BB0("卡瑟拉深渊法典湿痕")
+local function _____5361_745F_62C9_6C34_4F24_8FC7_6EE4(event)
+    return _____662F_5143_7D20_4F24_5BB3(event["伤害快照"], _____88C5_5907_4F24_5BB3_7C7B_578B["水"])
 end
-registerAppliedFinalDamageListener(____on_5361_745F_62C9_6DF1_6E0A_6CD5_5178_4F24_5BB3)
+local function _____5361_745F_62C9_95EA_7535_8FC7_6EE4(event)
+    return _____662F_5143_7D20_4F24_5BB3(event["伤害快照"], _____88C5_5907_4F24_5BB3_7C7B_578B["闪电"]) and _____5361_745F_62C9_6E7F_75D5["存在"](_____5361_745F_62C9_6E7F_75D5, event["目标"])
+end
+_____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
+    ["名称"] = "卡瑟拉深渊法典-湿痕",
+    ["装备名"] = _____7B2C_4E8C_7AE0_540E_6BB5Boss_6218_5229_54C1_88C5_5907_540D["卡瑟拉深渊法典"],
+    ["伤害过滤"] = "技能",
+    ["要求双方存活"] = false,
+    ["自定义过滤"] = _____5361_745F_62C9_6C34_4F24_8FC7_6EE4,
+    ["on触发"] = function(event)
+        _____5361_745F_62C9_6E7F_75D5["标记"](_____5361_745F_62C9_6E7F_75D5, event["目标"], 6)
+        _____64AD_653E_5355_4F4D_7279_6548(_____88C5_5907_5C0F_7279_6548["湿痕"], event["目标"], "origin", 1.2)
+    end
+})
+_____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
+    ["名称"] = "卡瑟拉深渊法典-闪电引爆",
+    ["装备名"] = _____7B2C_4E8C_7AE0_540E_6BB5Boss_6218_5229_54C1_88C5_5907_540D["卡瑟拉深渊法典"],
+    ["伤害过滤"] = "技能",
+    ["要求双方存活"] = false,
+    ["自定义过滤"] = _____5361_745F_62C9_95EA_7535_8FC7_6EE4,
+    ["on触发"] = function(event)
+        if not _____5361_745F_62C9_6E7F_75D5["消耗"](_____5361_745F_62C9_6E7F_75D5, event["目标"]) then
+            return
+        end
+        _____9020_6210_88C5_5907_4F24_5BB3(event["攻击者"], event["目标"], event["本次伤害"] * 0.22, _____88C5_5907_4F24_5BB3_7C7B_578B["闪电"])
+    end
+})
 return ____exports

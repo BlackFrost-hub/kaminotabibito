@@ -9,17 +9,8 @@ local _____5355_4F4D_6301_6709_7269_54C1 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_
 local _____589E_52A0_7269_54C1_6B21_6570 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["增加物品次数"]
 local _____83B7_53D6_7269_54C1_6B21_6570 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["获取物品次数"]
 local _____8BBE_7F6E_7269_54C1_6B21_6570 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["设置物品次数"]
-local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["调整玩家属性"]
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local _____56DE_9000_961F_5217 = {}
-local function _____56DE_9000_65AF_5C14_80FD_91CF_4E4B_5FC3_589E_4F24()
-    local unit = table.remove(_____56DE_9000_961F_5217, 1)
-    if unit == nil or unit == 0 then
-        return
-    end
-    _____8C03_6574_73A9_5BB6_5C5E_6027(unit, "伤害%", -_____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["斯尔能量之心"]["伤害提升"])
-end
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C = ____20_FF0E_7269_54C1_8F85_52A9["施加临时属性效果"]
 ____exports["处理斯尔能量之心击杀"] = function(_dyingUnit, killingUnit)
     if not _____5355_4F4D_6301_6709_7269_54C1(killingUnit, _____7269_54C1_4F7F_7528_88C5_5907ID["斯尔能量之心"]) then
         return
@@ -37,8 +28,6 @@ ____exports["处理斯尔能量之心使用"] = function(ctx)
         return
     end
     _____8BBE_7F6E_7269_54C1_6B21_6570(unit, _____7269_54C1_4F7F_7528_88C5_5907ID["斯尔能量之心"], 0)
-    _____8C03_6574_73A9_5BB6_5C5E_6027(unit, "伤害%", cfg["伤害提升"])
-    _____56DE_9000_961F_5217[#_____56DE_9000_961F_5217 + 1] = unit
-    addDelayedCallback(cfg["持续毫秒"], _____56DE_9000_65AF_5C14_80FD_91CF_4E4B_5FC3_589E_4F24)
+    _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C(unit, cfg["持续毫秒"], {{["类型"] = "玩家属性", ["属性名"] = "伤害%", ["数值"] = cfg["伤害提升"]}})
 end
 return ____exports

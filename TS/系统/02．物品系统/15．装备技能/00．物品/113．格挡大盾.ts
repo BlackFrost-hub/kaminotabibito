@@ -9,12 +9,10 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, cb: (this: void, context: any) => number, priority?: number) => number;
 };
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
 const { 是否在前方 } = require("lib.扩展函数.Star扩展函数.Star扩展库.11．方位判断函数") as {
   是否在前方: (this: void, unit: any, target: any) => boolean;
 };
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -96,7 +94,6 @@ function on格挡大盾盾击(this: void, target: any, attacker: any, applied: n
   if (target == null || target === 0 || attacker == null || attacker === 0) return;
   if (!(applied >= 1)) return;
   if (snapshot != null && snapshot.isTrueDamage === true) return;
-  if (!单位持有格挡大盾(attacker)) return;
   if (!是否近战普攻(attacker, target, snapshot)) return;
 
   const 伤害值 = 取单位护甲(attacker) * 格挡大盾盾击护甲系数;
@@ -108,7 +105,20 @@ export function 初始化格挡大盾(this: void): void {
   if (已初始化格挡大盾 || 格挡大盾物品ID === 0) return;
   已初始化格挡大盾 = true;
   registerDamageModifier(on格挡大盾伤害修正, 35);
-  registerAppliedFinalDamageListener(on格挡大盾盾击);
+  注册最终伤害触发模板({
+    名称: "格挡大盾盾击",
+    装备名: "格挡大盾",
+    持有者: "攻击者",
+    伤害过滤: "任意",
+    自定义过滤: function 格挡大盾盾击过滤(this: void, event): boolean {
+      const snapshot = event.伤害快照;
+      if (snapshot != null && snapshot.isTrueDamage === true) return false;
+      return 是否近战普攻(event.攻击者, event.目标, snapshot);
+    },
+    on触发: function on格挡大盾盾击触发(this: void, event): void {
+      on格挡大盾盾击(event.目标, event.攻击者, event.本次伤害, event.伤害快照);
+    },
+  });
 }
 
 初始化格挡大盾();

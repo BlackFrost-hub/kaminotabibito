@@ -1,32 +1,40 @@
 /** @noSelfInFile */
 
-import { 单位持有第二章后段Boss战利品, 是技能伤害, 是元素伤害, 取单位ID, 造成装备伤害, 播放单位特效, 第二章后段Boss战利品装备名, 装备伤害类型, 装备小特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 是元素伤害, 造成装备伤害, 播放单位特效, 第二章后段Boss战利品装备名, 装备伤害类型, 装备小特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 创建单位时限标记, 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
-const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  getServerTime: (this: void) => number;
-};
+const 卡瑟拉湿痕 = 创建单位时限标记("卡瑟拉深渊法典湿痕");
 
-const 湿痕到期表: Record<number, number | undefined> = {};
-
-function on卡瑟拉深渊法典伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0) || !是技能伤害(snapshot)) return;
-  if (!单位持有第二章后段Boss战利品(attacker, 第二章后段Boss战利品装备名.卡瑟拉深渊法典)) return;
-  const targetId = 取单位ID(target);
-  if (targetId === 0) return;
-  if (是元素伤害(snapshot, 装备伤害类型.水)) {
-    湿痕到期表[targetId] = getServerTime() + 6000;
-    播放单位特效(装备小特效.湿痕, target, "origin", 1.2);
-    return;
-  }
-  if (!是元素伤害(snapshot, 装备伤害类型.闪电)) return;
-  if ((湿痕到期表[targetId] ?? 0) < getServerTime()) return;
-  delete 湿痕到期表[targetId];
-  造成装备伤害(attacker, target, applied * 0.22, 装备伤害类型.闪电);
+function 卡瑟拉水伤过滤(this: void, event: any): boolean {
+  return 是元素伤害(event.伤害快照, 装备伤害类型.水);
 }
 
-registerAppliedFinalDamageListener(on卡瑟拉深渊法典伤害);
+function 卡瑟拉闪电过滤(this: void, event: any): boolean {
+  return 是元素伤害(event.伤害快照, 装备伤害类型.闪电) && 卡瑟拉湿痕.存在(event.目标);
+}
+
+注册最终伤害触发模板({
+  名称: "卡瑟拉深渊法典-湿痕",
+  装备名: 第二章后段Boss战利品装备名.卡瑟拉深渊法典,
+  伤害过滤: "技能",
+  要求双方存活: false,
+  自定义过滤: 卡瑟拉水伤过滤,
+  on触发: function on卡瑟拉深渊法典水伤(this: void, event): void {
+    卡瑟拉湿痕.标记(event.目标, 6);
+    播放单位特效(装备小特效.湿痕, event.目标, "origin", 1.2);
+  },
+});
+
+注册最终伤害触发模板({
+  名称: "卡瑟拉深渊法典-闪电引爆",
+  装备名: 第二章后段Boss战利品装备名.卡瑟拉深渊法典,
+  伤害过滤: "技能",
+  要求双方存活: false,
+  自定义过滤: 卡瑟拉闪电过滤,
+  on触发: function on卡瑟拉深渊法典闪电(this: void, event): void {
+    if (!卡瑟拉湿痕.消耗(event.目标)) return;
+    造成装备伤害(event.攻击者, event.目标, event.本次伤害 * 0.22, 装备伤害类型.闪电);
+  },
+});
 
 export {};

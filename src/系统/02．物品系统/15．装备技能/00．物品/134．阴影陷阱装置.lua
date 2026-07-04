@@ -46,15 +46,6 @@ end
 local function ____on_9634_5F71_9677_9631_89E6_53D1(target)
     _____64AD_653E_5355_4F4D_7279_6548(_____7EA0_7F20_6839_987B_76EE_6807_7279_6548, target, "origin", _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["阴影陷阱装置"]["控制持续秒数"])
 end
-local function _____6D88_8017_9634_5F71_9677_9631_6B21_6570(item)
-    _____521D_59CB_5316_9634_5F71_9677_9631_6B21_6570(item)
-    local charges = GetItemCharges(item)
-    if not (charges > 0) then
-        return false
-    end
-    SetItemCharges(item, charges - 1)
-    return true
-end
 local function _____9634_5F71_9677_9631_8FD8_6709_6B21_6570(item)
     _____521D_59CB_5316_9634_5F71_9677_9631_6B21_6570(item)
     return GetItemCharges(item) > 0
@@ -92,7 +83,6 @@ ____exports["处理阴影陷阱装置使用"] = function(ctx)
     if trap == nil then
         return
     end
-    _____6D88_8017_9634_5F71_9677_9631_6B21_6570(ctx["物品"])
 end
 onItemPickup(____on_9634_5F71_9677_9631_88C5_7F6E_62FE_53D6)
 return ____exports

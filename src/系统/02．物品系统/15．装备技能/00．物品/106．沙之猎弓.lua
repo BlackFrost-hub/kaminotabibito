@@ -4,23 +4,18 @@ local ____02_FF0E_653B_51FB_6548_679C_6CE8_518C_8868 = require("系统.02．物�
 local _____6CE8_518C_653B_51FB_6548_679C_914D_7F6E = ____02_FF0E_653B_51FB_6548_679C_6CE8_518C_8868["注册攻击效果配置"]
 local ____01_FF0E_653B_51FB_6548_679C_5DE5_5177 = require("系统.02．物品系统.15．装备技能.08．攻击效果.00．公共.01．攻击效果工具")
 local _____65BD_52A0_653B_51FB_6548_679C_7729_6655 = ____01_FF0E_653B_51FB_6548_679C_5DE5_5177["施加攻击效果眩晕"]
-local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
+local ____07_FF0E_88C5_5907_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．装备辅助")
+local _____53D6_5355_4F4D_5BF9_5355_4F4D_51B7_5374_952E = ____07_FF0E_88C5_5907_8F85_52A9["取单位对单位冷却键"]
+local _____88C5_5907_51B7_5374_5C31_7EEA = ____07_FF0E_88C5_5907_8F85_52A9["装备冷却就绪"]
+local _____8FDB_5165_88C5_5907_51B7_5374 = ____07_FF0E_88C5_5907_8F85_52A9["进入装备冷却"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.04．护甲降低")
 local _____65BD_52A0_5355_4F53_62A4_7532_964D_4F4EBuff = ____require_result_0["施加单体护甲降低Buff"]
-local _____6C99_4E4B_730E_5F13_76EE_6807_51B7_5374 = {}
-local _____53D6_670D_52A1_5668_65F6_95F4 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = _____53D6_670D_52A1_5668_65F6_95F4.getServerTime
 local function _____6267_884C_6C99_4E4B_730E_5F13(_____4E0A_4E0B_6587)
-    local sourceId = GetHandleId(_____4E0A_4E0B_6587.source)
-    local targetId = GetHandleId(_____4E0A_4E0B_6587.target)
-    local key = (tostring(sourceId) .. ":") .. tostring(targetId)
-    local now = getServerTime()
-    local last = _____6C99_4E4B_730E_5F13_76EE_6807_51B7_5374[key]
-    if last ~= nil and now - last < 6000 then
+    local key = _____53D6_5355_4F4D_5BF9_5355_4F4D_51B7_5374_952E(_____4E0A_4E0B_6587.source, _____4E0A_4E0B_6587.target, "沙之猎弓")
+    if not _____88C5_5907_51B7_5374_5C31_7EEA(key) then
         return
     end
-    _____6C99_4E4B_730E_5F13_76EE_6807_51B7_5374[key] = now
+    _____8FDB_5165_88C5_5907_51B7_5374(key, 6)
     _____65BD_52A0_5355_4F53_62A4_7532_964D_4F4EBuff(_____4E0A_4E0B_6587.source, _____4E0A_4E0B_6587.target, {["持续时间"] = 6, ["护甲"] = 15, ["叠加键"] = "沙之猎弓"})
     _____65BD_52A0_653B_51FB_6548_679C_7729_6655(_____4E0A_4E0B_6587.source, _____4E0A_4E0B_6587.target, 1)
 end

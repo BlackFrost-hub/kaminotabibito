@@ -529,6 +529,18 @@ function ____exports.getBuffRuntime(unit, buffID)
     local hid = toHid(unit)
     return ____exports.getBuffRuntimeByHid(hid, buffID)
 end
+____exports["单位拥有任意Buff"] = function(unit, buffIDs)
+    do
+        local i = 0
+        while i < #buffIDs do
+            if ____exports.getBuffRuntime(unit, buffIDs[i + 1]) ~= nil then
+                return true
+            end
+            i = i + 1
+        end
+    end
+    return false
+end
 ____exports["获取单位Buff层数"] = function(unit, buffID)
     local row = ____exports.getBuffRuntime(unit, buffID)
     return row ~= nil and normalizeBuffStack(row.stack) or 0

@@ -1,22 +1,28 @@
 /** @noSelfInFile */
 
-import { 单位持有第二章后段Boss战利品, 是技能伤害, 是元素伤害, 取冷却键, 冷却就绪, 进入冷却, 造成装备伤害, 播放单位特效, 第二章后段Boss战利品装备名, 装备伤害类型, 装备小特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 是元素伤害, 造成装备伤害, 播放单位特效, 取攻击力, 第二章后段Boss战利品装备名, 装备伤害类型, 装备小特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
-
-function on高压水脊法杖伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0) || !是技能伤害(snapshot)) return;
-  if (!是元素伤害(snapshot, 装备伤害类型.水)) return;
-  if (!单位持有第二章后段Boss战利品(attacker, 第二章后段Boss战利品装备名.高压水脊法杖)) return;
-  const key = 取冷却键(attacker, "高压水脊法杖");
-  if (!冷却就绪(key)) return;
-  进入冷却(key, 10);
-  播放单位特效(装备小特效.湿痕, target, "origin", 1);
-  造成装备伤害(attacker, target, 450, 装备伤害类型.水);
+function 高压水脊法杖过滤(this: void, event: any): boolean {
+  return 是元素伤害(event.伤害快照, 装备伤害类型.水);
 }
 
-registerAppliedFinalDamageListener(on高压水脊法杖伤害);
+function on高压水脊法杖触发(this: void, event: any): void {
+  const target = event.目标;
+  const attacker = event.攻击者;
+  播放单位特效(装备小特效.湿痕, target, "origin", 1);
+  造成装备伤害(attacker, target, 取攻击力(attacker) * 0.6, 装备伤害类型.水);
+}
+
+注册最终伤害触发模板({
+  名称: "高压水脊法杖",
+  装备名: 第二章后段Boss战利品装备名.高压水脊法杖,
+  伤害过滤: "技能",
+  冷却秒数: 9,
+  冷却前缀: "第二章后段Boss战利品",
+  要求双方存活: false,
+  自定义过滤: 高压水脊法杖过滤,
+  on触发: on高压水脊法杖触发,
+});
 
 export {};

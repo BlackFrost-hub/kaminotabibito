@@ -1,31 +1,47 @@
 /** @noSelfInFile */
 
-import { 单位持有第二章后段Boss战利品, 是技能伤害, 取单位ID, 扣除当前生命比例, 播放单位特效, 第二章后段Boss战利品装备名 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
-
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
+import { 造成装备伤害, 播放单位特效, 监听装备丢弃清理, 第二章后段Boss战利品装备名, 装备伤害类型 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
+const { 按比例移除当前生命 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除") as {
+  按比例移除当前生命: (this: void, target: any, ratio: number, nonlethal?: boolean) => number;
 };
 
-const 异形化能量表: Record<number, number | undefined> = {};
+const 异形化残刃内置CD秒 = 5;
+let 异形化残刃派生伤害中 = false;
 
-function on异形化残刃伤害修正(this: void, context: any): number {
-  let result = context.currentDamage;
-  const attacker = context.attacker;
-  if (!(result > 0) || !是技能伤害(context)) return result;
-  if (!单位持有第二章后段Boss战利品(attacker, 第二章后段Boss战利品装备名.异形化残刃)) return result;
-  const id = 取单位ID(attacker);
-  if (id === 0) return result;
-  const next = (异形化能量表[id] ?? 0) + 1;
-  if (next < 5) {
-    异形化能量表[id] = next;
-    return result;
-  }
-  异形化能量表[id] = 0;
-  扣除当前生命比例(attacker, 0.05);
-  播放单位特效("Common\\Effect\\Element\\Dark\\ShadowHitBurst.mdx", context.target, "origin", 0.8);
-  return result * 1.3;
+function 造成异形化残刃额外伤害(this: void, source: any, target: any, amount: number): void {
+  if (!(amount > 0)) return;
+  异形化残刃派生伤害中 = true;
+  造成装备伤害(source, target, amount, 装备伤害类型.暗影);
+  异形化残刃派生伤害中 = false;
 }
 
-registerDamageModifier(on异形化残刃伤害修正, 29);
+function 异形化残刃过滤(this: void): boolean {
+  return 异形化残刃派生伤害中 !== true;
+}
+
+function on异形化残刃触发(this: void, event: any): void {
+  const attacker = event.攻击者;
+  const target = event.目标;
+  按比例移除当前生命(attacker, 0.05, true);
+  播放单位特效("Common\\Effect\\Element\\Dark\\ShadowHitBurst.mdx", target, "origin", 0.8);
+  造成异形化残刃额外伤害(attacker, target, event.本次伤害 * 0.3);
+}
+
+const 异形化残刃触发 = 注册最终伤害触发模板({
+  名称: "异形化残刃",
+  装备名: 第二章后段Boss战利品装备名.异形化残刃,
+  伤害过滤: "技能",
+  次数阈值: 5,
+  冷却秒数: 异形化残刃内置CD秒,
+  冷却前缀: "第二章后段Boss战利品",
+  要求双方存活: false,
+  自定义过滤: 异形化残刃过滤,
+  on触发: on异形化残刃触发,
+});
+
+监听装备丢弃清理(第二章后段Boss战利品装备名.异形化残刃, function 清空异形化残刃能量(this: void, unit: any): void {
+  异形化残刃触发.清空(unit);
+});
 
 export {};

@@ -1,16 +1,13 @@
 /** @noSelfInFile */
 
 import {
-  单位持有攻击效果装备,
   单位有效存活,
   攻击者类型满足,
   取当前生命,
   取最大生命,
 } from "../08．攻击效果/00．公共/01．攻击效果工具";
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
 const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
@@ -123,16 +120,20 @@ function 施加或刷新撕裂(this: void, source: any, target: any): void {
   确保注册撕裂Tick();
 }
 
-function on恶魔王爪最终伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0)) return;
-  if (snapshot == null || snapshot.isPhysicalDamage !== true || snapshot.isTrueDamage === true) return;
-  if (!单位有效存活(attacker) || !单位有效存活(target)) return;
-  if (!单位持有攻击效果装备(attacker, 装备名)) return;
-  if (!攻击者类型满足(attacker, "近战")) return;
-  SFB_setSlow(attacker, target, 0, 减速比例, 减速持续秒);
-  施加或刷新撕裂(attacker, target);
-}
-
-registerAppliedFinalDamageListener(on恶魔王爪最终伤害);
+注册最终伤害触发模板({
+  名称: "恶魔王爪",
+  装备名,
+  持有者: "攻击者",
+  伤害过滤: "任意",
+  自定义过滤: function 恶魔王爪触发过滤(this: void, event): boolean {
+    const snapshot = event.伤害快照;
+    if (snapshot == null || snapshot.isPhysicalDamage !== true || snapshot.isTrueDamage === true) return false;
+    return 攻击者类型满足(event.攻击者, "近战");
+  },
+  on触发: function on恶魔王爪最终伤害(this: void, event): void {
+    SFB_setSlow(event.攻击者, event.目标, 0, 减速比例, 减速持续秒);
+    施加或刷新撕裂(event.攻击者, event.目标);
+  },
+});
 
 export {};

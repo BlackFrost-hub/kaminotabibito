@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 /**
  * 物品叠加函数
  * 基于 StarItem.j 重构，移除合成系统相关代码
@@ -115,12 +117,34 @@ function ItemStacked(): void {
     }
 }
 
+function ExecuteTryPickUpTriggers(u: any, item: any): void {
+    if (StarItem_TryPickUpTrig_Index <= 0 || u === null || item === null) return;
+
+    let i = 0;
+    StarItem_TryPickUp_item = item;
+    StarItem_CallBackUnit = u;
+    while (i < StarItem_TryPickUpTrig_Index) {
+        if (StarItem_TryPickUp_item !== null) {
+            if (StarItem_TryPickUpTrigs[i] === null) {
+                StarItem_TryPickUpTrigs[i] = StarItem_TryPickUpTrigs[StarItem_TryPickUpTrig_Index];
+                StarItem_TryPickUpTrig_Index -= 1;
+            }
+            jass.TriggerExecute(StarItem_TryPickUpTrigs[i]);
+        } else {
+            break;
+        }
+        i += 1;
+    }
+    StarItem_TryPickUp_item = null;
+}
+
 /** 地上 wp 与背包同类可叠：合并充能、回调、移除地上物；成功返回 true */
-function tryMergeGroundItemIntoInventory(wp: any, u: any): boolean {
+function tryMergeGroundItemIntoInventory(wp: any, u: any, fireTryPickUp = true): boolean {
     for (let i = 0; i < 6; i++) {
         const wp2 = jass.UnitItemInSlot(u, i);
         if (wp2 !== null && jass.GetItemTypeId(wp) === jass.GetItemTypeId(wp2) && wp !== wp2) {
             faceUnitTowardGroundItem(u, wp);
+            if (fireTryPickUp) ExecuteTryPickUpTriggers(u, wp);
             jass.SetItemCharges(wp2, jass.GetItemCharges(wp2) + jass.GetItemCharges(wp));
             StarItem_TryPickUp_item = wp2;
             StarItem_CallBackUnit = u;
@@ -298,7 +322,7 @@ export function StarItem_ItemStack_Act2(): void {
 export function StarItem_ItemStack_Act(): void {
     const wp = jass.GetOrderTargetItem();
     const u = jass.GetTriggerUnit();
-    if (wp === null || u === null || !tryMergeGroundItemIntoInventory(wp, u)) return;
+    if (wp === null || u === null || !tryMergeGroundItemIntoInventory(wp, u, false)) return;
     StackStatus = false;
     suppressPendingMoveAfterGroundStack(u);
     StackStatus = true;
@@ -315,6 +339,18 @@ export function StarItem_ItemStack_Cond(): boolean {
     let i = 0;
     const orderId = jass.GetIssuedOrderId();
 
+    if (StarItem_TryPickUpTrig_Index > 0) {
+        if (isIssuedMoveOrSmartOrder(orderId)) {
+            const targetItem = jass.GetOrderTargetItem();
+            if (targetItem !== null) {
+                const triggerUnit = jass.GetTriggerUnit();
+                if (hasInventoryAbility(triggerUnit)) {
+                    ExecuteTryPickUpTriggers(triggerUnit, targetItem);
+                }
+            }
+        }
+    }
+
     if (StackStatus) {
         if (isIssuedMoveOrSmartOrder(orderId)) {
             const targetItem = jass.GetOrderTargetItem();
@@ -327,33 +363,6 @@ export function StarItem_ItemStack_Cond(): boolean {
                     } else {
                         StarItem_ItemStack_Act2();
                     }
-                }
-            }
-        }
-    }
-
-    if (StarItem_TryPickUpTrig_Index > 0) {
-        if (isIssuedMoveOrSmartOrder(orderId)) {
-            const targetItem = jass.GetOrderTargetItem();
-            if (targetItem !== null) {
-                const triggerUnit = jass.GetTriggerUnit();
-                if (hasInventoryAbility(triggerUnit)) {
-                    i = 0;
-                    StarItem_TryPickUp_item = targetItem;
-                    StarItem_CallBackUnit = triggerUnit;
-                    while (i < StarItem_TryPickUpTrig_Index) {
-                        if (StarItem_TryPickUp_item !== null) {
-                            if (StarItem_TryPickUpTrigs[i] === null) {
-                                StarItem_TryPickUpTrigs[i] = StarItem_TryPickUpTrigs[StarItem_TryPickUpTrig_Index];
-                                StarItem_TryPickUpTrig_Index -= 1;
-                            }
-                            jass.TriggerExecute(StarItem_TryPickUpTrigs[i]);
-                        } else {
-                            break;
-                        }
-                        i += 1;
-                    }
-                    StarItem_TryPickUp_item = null;
                 }
             }
         }
@@ -423,6 +432,7 @@ export function StarItem_ItemStack_Cond2(): boolean {
             while (i < 6) {
                 const itemInSlot = triggerUnit !== null ? jass.UnitItemInSlot(triggerUnit, i) : null;
                 if (itemInSlot !== null && jass.GetItemTypeId(manipulatedItem) === jass.GetItemTypeId(itemInSlot) && manipulatedItem !== itemInSlot) {
+                    ExecuteTryPickUpTriggers(triggerUnit, manipulatedItem);
                     jass.SetItemCharges(itemInSlot, jass.GetItemCharges(itemInSlot) + jass.GetItemCharges(manipulatedItem));
                     StarItem_TryPickUp_item = itemInSlot;
                     StarItem_CallBackUnit = triggerUnit;

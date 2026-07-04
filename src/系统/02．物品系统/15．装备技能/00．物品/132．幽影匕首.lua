@@ -9,7 +9,7 @@ local GetUnitFacing = jass.GetUnitFacing
 local Atan2 = jass.Atan2
 local bj_RADTODEG = jass.bj_RADTODEG
 local _____5E7D_5F71_547D_4E2D_5C0F_7206_70B9_7279_6548 = "Common\\Effect\\Element\\Dark\\ShadowHitBurst.mdx"
-local _____5E7D_5F71_5315_9996_4FA7_540E_65B9_89E6_53D1_6982_7387 = 0.25
+local _____5E7D_5F71_5315_9996_4FA7_540E_65B9_89E6_53D1_6982_7387 = 0.3
 local function _____5F52_4E00_89D2_5EA6(angle)
     local result = angle
     while result < 0 do
@@ -49,8 +49,8 @@ _____6CE8_518C_653B_51FB_6548_679C_914D_7F6E({
     ["效果类型"] = "额外伤害",
     ["仅普通攻击"] = true,
     ["概率计算"] = _____8BA1_7B97_5E7D_5F71_5315_9996_89E6_53D1_6982_7387,
-    ["固定伤害"] = 260,
-    ["攻击系数"] = 0.35,
+    ["固定伤害"] = 300,
+    ["攻击系数"] = 0.45,
     ["伤害类型"] = "暗影",
     ["特效"] = _____5E7D_5F71_547D_4E2D_5C0F_7206_70B9_7279_6548
 })

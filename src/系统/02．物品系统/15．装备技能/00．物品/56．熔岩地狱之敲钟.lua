@@ -14,22 +14,17 @@ local _____8BBE_7F6E_9B54_6CD5 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["设�
 local _____65BD_52A0_51CF_901F = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["施加减速"]
 local _____9020_6210_706B_7130_4F24_5BB3 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["造成火焰伤害"]
 local _____65BD_52A0_7729_6655 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["施加眩晕"]
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____5EF6_8FDF_6267_884C = ____20_FF0E_7269_54C1_8F85_52A9["延迟执行"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
 local GetHeroInt = jass.GetHeroInt
-local _____7ED3_7B97_961F_5217 = {}
-local function _____7ED3_7B97_7194_5CA9_5730_72F1_4E4B_6572_949F()
-    local item = table.remove(_____7ED3_7B97_961F_5217, 1)
-    if item == nil then
-        return
-    end
-    local damage = GetHeroInt(item["来源"], true) * _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["地狱敲钟"]["智力伤害倍率"]
-    for ____, target in ipairs(item["目标列表"]) do
-        _____9020_6210_706B_7130_4F24_5BB3(item["来源"], target, damage)
-        _____65BD_52A0_7729_6655(item["来源"], target, _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["地狱敲钟"]["熔岩眩晕"])
+local function _____7ED3_7B97_7194_5CA9_5730_72F1_4E4B_6572_949F(_____6765_6E90, _____76EE_6807_5217_8868)
+    local damage = GetHeroInt(_____6765_6E90, true) * _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["地狱敲钟"]["智力伤害倍率"]
+    for ____, target in ipairs(_____76EE_6807_5217_8868) do
+        _____9020_6210_706B_7130_4F24_5BB3(_____6765_6E90, target, damage)
+        _____65BD_52A0_7729_6655(_____6765_6E90, target, _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["地狱敲钟"]["熔岩眩晕"])
     end
 end
 ____exports["处理熔岩地狱之敲钟使用"] = function(ctx)
@@ -51,7 +46,11 @@ ____exports["处理熔岩地狱之敲钟使用"] = function(ctx)
     for ____, target in ipairs(targets) do
         _____65BD_52A0_51CF_901F(unit, target, cfg["熔岩减速"], cfg["熔岩延迟毫秒"] / 1000)
     end
-    _____7ED3_7B97_961F_5217[#_____7ED3_7B97_961F_5217 + 1] = {["来源"] = unit, ["目标列表"] = targets}
-    addDelayedCallback(cfg["熔岩延迟毫秒"], _____7ED3_7B97_7194_5CA9_5730_72F1_4E4B_6572_949F)
+    _____5EF6_8FDF_6267_884C(
+        cfg["熔岩延迟毫秒"],
+        function()
+            _____7ED3_7B97_7194_5CA9_5730_72F1_4E4B_6572_949F(unit, targets)
+        end
+    )
 end
 return ____exports

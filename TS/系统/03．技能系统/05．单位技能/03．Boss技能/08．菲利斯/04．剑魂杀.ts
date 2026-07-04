@@ -140,6 +140,8 @@ function 生成剑魂狼(this: void, context: 菲利斯运行时上下文, x: nu
     Y: y,
     最大生命: 999999,
     受击次数: big ? cfg.大狼生命点 : cfg.小狼生命点,
+    计数模式: "纯普攻或最终伤害阈值",
+    最终伤害计数阈值: 1000,
     缩放: big ? cfg.大狼缩放 : cfg.小狼缩放,
     持续时间: cfg.狼持续秒,
     on死亡: function 菲利斯剑魂狼死亡(this: void, unit: any): void {

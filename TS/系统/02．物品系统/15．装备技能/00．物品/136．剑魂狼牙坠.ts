@@ -1,20 +1,23 @@
 /** @noSelfInFile */
 
-import { 单位持有第二章后段Boss战利品, 是技能伤害, 概率通过, 造成装备伤害, 恢复生命魔法, 播放点特效, 取单位X, 取单位Y, 第二章后段Boss战利品装备名, 装备伤害类型, 装备小特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 造成装备伤害, 恢复生命魔法, 播放点特效, 取单位X, 取单位Y, 取攻击力, 第二章后段Boss战利品装备名, 装备伤害类型, 装备小特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
-
-function on剑魂狼牙坠伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0) || !是技能伤害(snapshot)) return;
-  if (!单位持有第二章后段Boss战利品(attacker, 第二章后段Boss战利品装备名.剑魂狼牙坠)) return;
-  if (!概率通过(attacker, 0.12)) return;
+function on剑魂狼牙坠触发(this: void, event: any): void {
+  const target = event.目标;
+  const attacker = event.攻击者;
   播放点特效(装备小特效.小风爆, 取单位X(target), 取单位Y(target), 0.8);
-  造成装备伤害(attacker, target, 360, 装备伤害类型.风);
-  恢复生命魔法(attacker, attacker, 0, 60, true);
+  造成装备伤害(attacker, target, 取攻击力(attacker) * 0.35, 装备伤害类型.风);
+  恢复生命魔法(attacker, attacker, 0, 80, true);
 }
 
-registerAppliedFinalDamageListener(on剑魂狼牙坠伤害);
+注册最终伤害触发模板({
+  名称: "剑魂狼牙坠",
+  装备名: 第二章后段Boss战利品装备名.剑魂狼牙坠,
+  伤害过滤: "技能",
+  概率: 0.15,
+  要求双方存活: false,
+  on触发: on剑魂狼牙坠触发,
+});
 
 export {};

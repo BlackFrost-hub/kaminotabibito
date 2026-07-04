@@ -9,14 +9,9 @@ local _____64AD_653E_70B9_7279_6548 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177[
 local _____53D6_5355_4F4DX = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位Y"]
 local _____9020_6210_5F3A_5316_4F24_5BB3 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["造成强化伤害"]
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local _____5F85_81EA_4F24_5355_4F4D = {}
-local function _____6267_884C_72C2_66B4_6811_679D_81EA_4F24()
-    local unit = table.remove(_____5F85_81EA_4F24_5355_4F4D, 1)
-    if unit == nil or unit == 0 then
-        return
-    end
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____5EF6_8FDF_6267_884C_5355_4F4D_52A8_4F5C = ____20_FF0E_7269_54C1_8F85_52A9["延迟执行单位动作"]
+local function _____6267_884C_72C2_66B4_6811_679D_81EA_4F24(unit)
     _____9020_6210_5F3A_5316_4F24_5BB3(unit, unit, _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["狂暴树枝"]["自伤"])
 end
 ____exports["处理狂暴树枝使用"] = function(ctx)
@@ -29,7 +24,6 @@ ____exports["处理狂暴树枝使用"] = function(ctx)
         _____53D6_5355_4F4DX(unit),
         _____53D6_5355_4F4DY(unit)
     )
-    _____5F85_81EA_4F24_5355_4F4D[#_____5F85_81EA_4F24_5355_4F4D + 1] = unit
-    addDelayedCallback(_____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["狂暴树枝"]["延迟毫秒"], _____6267_884C_72C2_66B4_6811_679D_81EA_4F24)
+    _____5EF6_8FDF_6267_884C_5355_4F4D_52A8_4F5C(unit, _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["狂暴树枝"]["延迟毫秒"], _____6267_884C_72C2_66B4_6811_679D_81EA_4F24)
 end
 return ____exports

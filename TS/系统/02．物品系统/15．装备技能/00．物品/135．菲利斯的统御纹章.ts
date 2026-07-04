@@ -1,24 +1,31 @@
 /** @noSelfInFile */
 
-import { 临时玩家属性, 取冷却键, 冷却就绪, 进入冷却, 取范围友方, 单位持有第二章后段Boss战利品, 是技能伤害, 第二章后段Boss战利品装备名, 装备小特效, 播放单位特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 临时玩家属性, 取范围友方, 第二章后段Boss战利品装备名, 装备小特效, 播放单位特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
+import { registerManualBuff } from "../../../05．Buff系统/00．Buff系统";
+import { 常规BuffID } from "../../../05．Buff系统/03．Buff表/00．Buff登记";
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
-
-function on菲利斯的统御纹章伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0) || !是技能伤害(snapshot)) return;
-  if (!单位持有第二章后段Boss战利品(attacker, 第二章后段Boss战利品装备名.菲利斯的统御纹章)) return;
-  const key = 取冷却键(attacker, "菲利斯的统御纹章");
-  if (!冷却就绪(key)) return;
-  进入冷却(key, 12);
+function on菲利斯的统御纹章触发(this: void, event: any): void {
+  const attacker = event.攻击者;
   const allies = 取范围友方(attacker, 650);
   for (let i = 0; i < allies.length; i++) {
-    临时玩家属性(allies[i], "魔法伤害", 0.08, 6);
+    临时玩家属性(allies[i], "魔法伤害", 0.10, 6);
+    registerManualBuff(allies[i], 常规BuffID.菲利斯的统御纹章_统御号令, 6, 10, {
+      sourceName: "菲利斯的统御纹章",
+      iconOverride: "Equipment\\Icon\\Item\\phyllis_command_emblem.blp",
+    });
     播放单位特效(装备小特效.护盾闪光, allies[i], "origin", 0.8);
   }
 }
 
-registerAppliedFinalDamageListener(on菲利斯的统御纹章伤害);
+注册最终伤害触发模板({
+  名称: "菲利斯的统御纹章",
+  装备名: 第二章后段Boss战利品装备名.菲利斯的统御纹章,
+  伤害过滤: "技能",
+  冷却秒数: 10,
+  冷却前缀: "第二章后段Boss战利品",
+  要求双方存活: false,
+  on触发: on菲利斯的统御纹章触发,
+});
 
 export {};

@@ -2,6 +2,7 @@
 
 import { 单位存活, 取当前生命, 取最大生命 } from "./09．装备战斗判断";
 import { 装备小特效 } from "./11．装备常量";
+import { 施加临时属性效果 } from "./19．临时属性效果";
 
 const jass = require("jass.common") as any;
 
@@ -12,12 +13,8 @@ const { getUnitsInRange, getEnemyUnitsInRange } = require("lib.扩展函数.自�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
-const { doHeal, getHealRate, setHealRate, getReceivedHealRate, setReceivedHealRate } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
   doHeal: (this: void, params: any) => number;
-  getHealRate: (this: void, unit: any) => number;
-  setHealRate: (this: void, unit: any, rate: number) => void;
-  getReceivedHealRate: (this: void, unit: any) => number;
-  setReceivedHealRate: (this: void, unit: any, rate: number) => void;
 };
 const { 开始护盾, 护盾类型 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾") as {
   开始护盾: (this: void, unit: any, params: any) => number;
@@ -26,11 +23,6 @@ const { 开始护盾, 护盾类型 } = require("系统.03．技能系统.00．�
 const { 清除单位负面Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   清除单位负面Buff: (this: void, unit: any, onlyPurgable?: boolean) => number;
 };
-const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
-};
-
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IsUnitAlly = jass.IsUnitAlly as (unit: any, player: any) => boolean;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
@@ -122,29 +114,15 @@ export function 开始通用护盾(this: void, source: any, target: any, amount:
 
 export function 临时玩家属性(this: void, unit: any, attr: string, delta: number, duration: number): void {
   if (unit == null || unit === 0 || delta === 0 || !(duration > 0)) return;
-  const player = GetOwningPlayer(unit);
-  const oldValue = Number(YDUserDataGetSafe("player", player, attr, "real")) || 0;
-  YDUserDataSetSafe("player", player, attr, "real", oldValue + delta);
-  addDelayedCallback(duration * 1000, function 回退临时玩家属性(this: void): void {
-    const current = Number(YDUserDataGetSafe("player", player, attr, "real")) || 0;
-    YDUserDataSetSafe("player", player, attr, "real", current - delta);
-  });
+  施加临时属性效果(unit, duration * 1000, [{ 类型: "玩家属性", 属性名: attr, 数值: delta }]);
 }
 
 export function 临时治疗率(this: void, unit: any, delta: number, duration: number): void {
-  if (unit == null || unit === 0 || delta === 0 || !(duration > 0)) return;
-  setHealRate(unit, getHealRate(unit) + delta);
-  addDelayedCallback(duration * 1000, function 回退临时治疗率(this: void): void {
-    setHealRate(unit, getHealRate(unit) - delta);
-  });
+  临时玩家属性(unit, "技能治疗率", delta, duration);
 }
 
 export function 临时受到治疗率(this: void, unit: any, delta: number, duration: number): void {
-  if (unit == null || unit === 0 || delta === 0 || !(duration > 0)) return;
-  setReceivedHealRate(unit, getReceivedHealRate(unit) + delta);
-  addDelayedCallback(duration * 1000, function 回退临时受到治疗率(this: void): void {
-    setReceivedHealRate(unit, getReceivedHealRate(unit) - delta);
-  });
+  临时玩家属性(unit, "受到的治疗率", delta, duration);
 }
 
 export function 净化负面(this: void, unit: any): boolean {

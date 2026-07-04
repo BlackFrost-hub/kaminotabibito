@@ -1,20 +1,21 @@
 /** @noSelfInFile */
 
-import { 单位持有第二章后段Boss战利品, 是技能伤害, 取冷却键, 冷却就绪, 进入冷却, 开始通用护盾, 第二章后段Boss战利品装备名 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 开始通用护盾, 取最大生命, 第二章后段Boss战利品装备名 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
-
-function on墨潮行者长袍伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0) || !是技能伤害(snapshot)) return;
-  if (!单位持有第二章后段Boss战利品(attacker, 第二章后段Boss战利品装备名.墨潮行者长袍)) return;
-  const key = 取冷却键(attacker, "墨潮行者长袍");
-  if (!冷却就绪(key)) return;
-  进入冷却(key, 12);
-  开始通用护盾(attacker, attacker, 900, 5, "墨潮行者长袍");
+function on墨潮行者长袍触发(this: void, event: any): void {
+  const attacker = event.攻击者;
+  开始通用护盾(attacker, attacker, 500 + 取最大生命(attacker) * 0.15, 5, "墨潮行者长袍");
 }
 
-registerAppliedFinalDamageListener(on墨潮行者长袍伤害);
+注册最终伤害触发模板({
+  名称: "墨潮行者长袍",
+  装备名: 第二章后段Boss战利品装备名.墨潮行者长袍,
+  伤害过滤: "技能",
+  冷却秒数: 12,
+  冷却前缀: "第二章后段Boss战利品",
+  要求双方存活: false,
+  on触发: on墨潮行者长袍触发,
+});
 
 export {};

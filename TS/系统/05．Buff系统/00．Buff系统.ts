@@ -370,6 +370,13 @@ export function getBuffRuntime(unit: any, buffID: string): BuffRuntime | null {
   return getBuffRuntimeByHid(hid, buffID);
 }
 
+export function 单位拥有任意Buff(unit: any, buffIDs: string[]): boolean {
+  for (let i = 0; i < buffIDs.length; i++) {
+    if (getBuffRuntime(unit, buffIDs[i]) != null) return true;
+  }
+  return false;
+}
+
 export function getBuffRuntimeByHid(hid: number, buffID: string): BuffRuntime | null {
   if (hid === 0) return null;
   return getBuffFromFlat(hid, buffID);

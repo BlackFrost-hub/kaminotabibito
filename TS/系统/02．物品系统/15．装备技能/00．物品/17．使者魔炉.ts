@@ -30,15 +30,8 @@ const { 注册持有型范围光环 } = require("系统.03．技能系统.00．�
     移除目标效果: (this: void, target: any, holder: any, currentCount: number) => void;
   }) => void;
 };
-const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.index") as {
-  YDUserDataGet: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataSet: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
-};
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-};
-const { 调整玩家属性 } = require("../05．物品使用/00．公共/02．物品使用工具") as {
-  调整玩家属性: (this: void, unit: any, attrName: string, delta: number) => void;
 };
 
 const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
@@ -51,6 +44,7 @@ const EXSetEffectSize = japi.EXSetEffectSize as (this: void, effect: any, size: 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 使者魔炉物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 使者魔炉配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
+import { 调整玩家属性, 调整单位属性 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const 命中率字段 = "命中率";
 const 玩家英雄单位组键 = "单位组";
@@ -81,10 +75,7 @@ function 是否为使者魔炉(this: void, 物品: any): boolean {
 }
 
 function 调整命中率(this: void, 单位: any, 变化值: number): void {
-  if (单位 == null || 单位 === 0) return;
-  const 已存值 = YDUserDataGet("unit", 单位, 命中率字段, "real");
-  const 当前值 = 已存值 == null ? 0 : 已存值 as number;
-  YDUserDataSet("unit", 单位, 命中率字段, "real", 当前值 + 变化值);
+  调整单位属性(单位, 命中率字段, 变化值);
 }
 
 function 获取玩家英雄单位组(this: void): any {

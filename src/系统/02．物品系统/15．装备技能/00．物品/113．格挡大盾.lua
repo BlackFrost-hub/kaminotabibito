@@ -1,15 +1,15 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____09_FF0E_88C5_5907_901A_7528_673A_5236 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.index")
+local _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F = ____09_FF0E_88C5_5907_901A_7528_673A_5236["注册最终伤害触发模板"]
 local ____require_result_0 = require("系统.02．物品系统.13．物品名反查")
 local resolveItemIdByName = ____require_result_0.resolveItemIdByName
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_2.registerDamageModifier
-local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_3.registerAppliedFinalDamageListener
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.11．方位判断函数")
-local _____662F_5426_5728_524D_65B9 = ____require_result_4["是否在前方"]
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.11．方位判断函数")
+local _____662F_5426_5728_524D_65B9 = ____require_result_3["是否在前方"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local UnitItemInSlot = jass.UnitItemInSlot
@@ -102,9 +102,6 @@ local function ____on_683C_6321_5927_76FE_76FE_51FB(target, attacker, applied, s
     if snapshot ~= nil and snapshot.isTrueDamage == true then
         return
     end
-    if not _____5355_4F4D_6301_6709_683C_6321_5927_76FE(attacker) then
-        return
-    end
     if not _____662F_5426_8FD1_6218_666E_653B(attacker, target, snapshot) then
         return
     end
@@ -129,7 +126,22 @@ ____exports["初始化格挡大盾"] = function()
     end
     _____5DF2_521D_59CB_5316_683C_6321_5927_76FE = true
     registerDamageModifier(____on_683C_6321_5927_76FE_4F24_5BB3_4FEE_6B63, 35)
-    registerAppliedFinalDamageListener(____on_683C_6321_5927_76FE_76FE_51FB)
+    _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
+        ["名称"] = "格挡大盾盾击",
+        ["装备名"] = "格挡大盾",
+        ["持有者"] = "攻击者",
+        ["伤害过滤"] = "任意",
+        ["自定义过滤"] = function(event)
+            local snapshot = event["伤害快照"]
+            if snapshot ~= nil and snapshot.isTrueDamage == true then
+                return false
+            end
+            return _____662F_5426_8FD1_6218_666E_653B(event["攻击者"], event["目标"], snapshot)
+        end,
+        ["on触发"] = function(event)
+            ____on_683C_6321_5927_76FE_76FE_51FB(event["目标"], event["攻击者"], event["本次伤害"], event["伤害快照"])
+        end
+    })
 end
 ____exports["初始化格挡大盾"]()
 return ____exports

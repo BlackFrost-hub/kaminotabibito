@@ -3,7 +3,7 @@ local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5904_7406_5F85_9500_6BC1_6CBB_7597_7279_6548, _____5B89_6392_6CBB_7597_7279_6548_9500_6BC1, cloneHealParams, _____6267_884C_5EF6_8FDF_6CBB_7597_961F_5217, calcHealAmount, getMissingLife, playHealEffect, addHealStats, shouldRecordPlayerHeal, addPlayerHealStats, jass, GetUnitStateJass, SetUnitStateJass, GetUnitStateJapi, YDUserDataGet, YDUserDataSet, STES_FireWithParams, _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57, addDelayedCallback, addPeriodicCallback, getServerTime, healCallbacks, healEventListeners, totalHealStats, delayedHealQueue, delayedHealScheduled, _____5F85_9500_6BC1_6CBB_7597_7279_6548_5217_8868, _____5DF2_6CE8_518C_6CBB_7597_7279_6548_9A71_52A8
+local _____5904_7406_5F85_9500_6BC1_6CBB_7597_7279_6548, _____5B89_6392_6CBB_7597_7279_6548_9500_6BC1, cloneHealParams, _____6267_884C_5EF6_8FDF_6CBB_7597_961F_5217, calcHealAmount, getMissingLife, playHealEffect, addHealStats, shouldRecordPlayerHeal, addPlayerHealStats, jass, GetUnitStateJass, SetUnitStateJass, GetUnitStateJapi, GetOwningPlayer, YDUserDataGet, YDUserDataSet, STES_FireWithParams, _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57, addDelayedCallback, addPeriodicCallback, getServerTime, healCallbacks, healEventListeners, totalHealStats, delayedHealQueue, delayedHealScheduled, _____5F85_9500_6BC1_6CBB_7597_7279_6548_5217_8868, _____5DF2_6CE8_518C_6CBB_7597_7279_6548_9A71_52A8
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.04．伤害系统.02．治疗系统.00．常量定义")
 local HEAL_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_SYSTEM_ENABLED
 local HEAL_EVENTS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_EVENTS
@@ -84,28 +84,60 @@ function ____exports.getHealRate(unit)
     if unit == nil then
         return 0
     end
-    local v = YDUserDataGet(
+    local unitValue = YDUserDataGet(
         nil,
         "unit",
         unit,
         ATTR_HEAL_RATE,
         "real"
     )
-    return type(v) == "number" and v or 0
+    local player = GetOwningPlayer(unit)
+    local ____temp_4
+    if player ~= nil then
+        ____temp_4 = YDUserDataGet(
+            nil,
+            "player",
+            player,
+            ATTR_HEAL_RATE,
+            "real"
+        )
+    else
+        ____temp_4 = 0
+    end
+    local playerValue = ____temp_4
+    local unitRate = type(unitValue) == "number" and unitValue or 0
+    local playerRate = type(playerValue) == "number" and playerValue or 0
+    return unitRate + playerRate
 end
 --- 获取单位受到治疗率
 function ____exports.getReceivedHealRate(unit)
     if unit == nil then
         return 0
     end
-    local v = YDUserDataGet(
+    local unitValue = YDUserDataGet(
         nil,
         "unit",
         unit,
         ATTR_RECEIVED_HEAL_RATE,
         "real"
     )
-    return type(v) == "number" and v or 0
+    local player = GetOwningPlayer(unit)
+    local ____temp_5
+    if player ~= nil then
+        ____temp_5 = YDUserDataGet(
+            nil,
+            "player",
+            player,
+            ATTR_RECEIVED_HEAL_RATE,
+            "real"
+        )
+    else
+        ____temp_5 = 0
+    end
+    local playerValue = ____temp_5
+    local unitRate = type(unitValue) == "number" and unitValue or 0
+    local playerRate = type(playerValue) == "number" and playerValue or 0
+    return unitRate + playerRate
 end
 function calcHealAmount(source, target, baseAmount)
     if baseAmount <= 0 then
@@ -237,32 +269,32 @@ function ____exports.doHeal(params)
         end
         return 0
     end
-    local ____params_ManaEffect_4 = params.ManaEffect
-    if ____params_ManaEffect_4 == nil then
-        ____params_ManaEffect_4 = (params.HealManaAmount or 0) > 0
+    local ____params_ManaEffect_6 = params.ManaEffect
+    if ____params_ManaEffect_6 == nil then
+        ____params_ManaEffect_6 = (params.HealManaAmount or 0) > 0
     end
-    local manaEffectEnabled = ____params_ManaEffect_4
-    local ____params_5 = params
-    local HealSource = ____params_5.HealSource
-    local HealTarget = ____params_5.HealTarget
-    local HealAmount = ____params_5.HealAmount
-    local HealManaAmount = ____params_5.HealManaAmount
+    local manaEffectEnabled = ____params_ManaEffect_6
+    local ____params_7 = params
+    local HealSource = ____params_7.HealSource
+    local HealTarget = ____params_7.HealTarget
+    local HealAmount = ____params_7.HealAmount
+    local HealManaAmount = ____params_7.HealManaAmount
     if HealManaAmount == nil then
         HealManaAmount = 0
     end
-    local ItemHeal = ____params_5.ItemHeal
-    local HealEffect = ____params_5.HealEffect
-    local HealEffectPath = ____params_5.HealEffectPath
-    local UseDefaultHealEffect = ____params_5.UseDefaultHealEffect
+    local ItemHeal = ____params_7.ItemHeal
+    local HealEffect = ____params_7.HealEffect
+    local HealEffectPath = ____params_7.HealEffectPath
+    local UseDefaultHealEffect = ____params_7.UseDefaultHealEffect
     if UseDefaultHealEffect == nil then
         UseDefaultHealEffect = false
     end
-    local ManaEffectPath = ____params_5.ManaEffectPath
-    local UseDefaultManaEffect = ____params_5.UseDefaultManaEffect
+    local ManaEffectPath = ____params_7.ManaEffectPath
+    local UseDefaultManaEffect = ____params_7.UseDefaultManaEffect
     if UseDefaultManaEffect == nil then
         UseDefaultManaEffect = false
     end
-    local ManaShowText = ____params_5.ManaShowText
+    local ManaShowText = ____params_7.ManaShowText
     if ManaShowText == nil then
         ManaShowText = true
     end
@@ -309,8 +341,8 @@ function ____exports.doHeal(params)
         end
     end
     if HealManaAmount > 0 then
-        local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
-        local _____9B54_6CD5_589E_51CF = ____require_result_6["魔法增减"]
+        local ____require_result_8 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
+        local _____9B54_6CD5_589E_51CF = ____require_result_8["魔法增减"]
         _____9B54_6CD5_589E_51CF(HealTarget, HealManaAmount, ManaShowText, manaEffectEnabled or UseDefaultManaEffect)
     end
     return actualHeal
@@ -320,6 +352,7 @@ local japi = require("jass.japi")
 GetUnitStateJass = jass.GetUnitState
 SetUnitStateJass = jass.SetUnitState
 GetUnitStateJapi = japi.GetUnitState
+GetOwningPlayer = jass.GetOwningPlayer
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 YDUserDataGet = ____require_result_0.YDUserDataGet
 YDUserDataSet = ____require_result_0.YDUserDataSet

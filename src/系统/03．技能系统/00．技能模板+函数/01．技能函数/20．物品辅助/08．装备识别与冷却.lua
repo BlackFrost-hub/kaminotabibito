@@ -13,6 +13,8 @@ local ____require_result_3 = require("系统.00．核心系统.05．中心计时
 local getServerTime = ____require_result_3.getServerTime
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
 local _____88C5_5907_89E6_53D1_6982_7387_901A_8FC7 = ____require_result_4["装备触发概率通过"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听")
+local _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03 = ____require_result_5["监听指定物品获取丢弃"]
 local GetHandleId = jass.GetHandleId
 local _____88C5_5907_7269_54C1ID_7F13_5B58 = {}
 local _____88C5_5907_51B7_5374_8868 = {}
@@ -40,6 +42,15 @@ ____exports["取装备冷却键"] = function(unit, tag, _____524D_7F00)
         return ""
     end
     return (((_____524D_7F00 .. ":") .. tag) .. ":") .. tostring(GetHandleId(unit))
+end
+____exports["取单位对单位冷却键"] = function(source, target, tag, _____524D_7F00)
+    if _____524D_7F00 == nil then
+        _____524D_7F00 = "装备单位对单位"
+    end
+    if source == nil or source == 0 or target == nil or target == 0 or tag == "" then
+        return ""
+    end
+    return (((((_____524D_7F00 .. ":") .. tag) .. ":") .. tostring(GetHandleId(source))) .. ":") .. tostring(GetHandleId(target))
 end
 ____exports["装备冷却就绪"] = function(key)
     return key ~= "" and (_____88C5_5907_51B7_5374_8868[key] or 0) <= getServerTime()
@@ -73,5 +84,18 @@ ____exports["进入冷却"] = function(key, _____79D2_6570)
 end
 ____exports["概率通过"] = function(unit, chance)
     return ____exports["装备概率通过"](unit, chance)
+end
+____exports["监听装备丢弃清理"] = function(_____88C5_5907_540D, _____6E05_7406_56DE_8C03)
+    local itemId = ____exports["取装备物品ID"](_____88C5_5907_540D)
+    if itemId == 0 then
+        return
+    end
+    _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03(
+        itemId,
+        nil,
+        function(unit)
+            _____6E05_7406_56DE_8C03(unit)
+        end
+    )
 end
 return ____exports

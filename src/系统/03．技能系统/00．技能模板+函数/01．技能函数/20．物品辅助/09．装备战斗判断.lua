@@ -9,6 +9,7 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitType = jass.IsUnitType
 local GetUnitState = jass.GetUnitState
+local ConvertUnitState = jass.ConvertUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
@@ -38,6 +39,12 @@ ____exports["取当前生命"] = function(unit)
 end
 ____exports["取最大生命"] = function(unit)
     return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) or GetUnitState(unit, UNIT_STATE_MAX_LIFE) or 0
+end
+____exports["取攻击力"] = function(unit)
+    return GetUnitStateJapi(
+        unit,
+        ConvertUnitState(21)
+    ) or 0
 end
 ____exports["是敌对单位"] = function(source, target)
     return source ~= nil and source ~= 0 and target ~= nil and target ~= 0 and IsUnitEnemy(

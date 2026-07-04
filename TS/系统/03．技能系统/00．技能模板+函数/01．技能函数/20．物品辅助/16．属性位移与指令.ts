@@ -150,6 +150,10 @@ export function 临时调整攻速(this: void, 单位: any, 数值: number): voi
   SGSS_SetState(单位, 10, 数值);
 }
 
+export function 调整状态ID属性(this: void, 单位: any, 属性ID: number, 数值: number): void {
+  SGSS_SetState(单位, 属性ID, 数值);
+}
+
 export function 调整玩家属性(this: void, 单位: any, 属性名: string, 增量: number): void {
   if (单位 == null || 单位 === 0) return;
   const owner = GetOwningPlayer(单位);

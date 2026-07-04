@@ -1,27 +1,15 @@
 /** @noSelfInFile */
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-};
-
 import type { 物品技能事件上下文 } from "../05．物品使用/00．公共/03．物品使用核心";
 import { 物品使用装备ID, 物品使用数值配置 } from "../05．物品使用/00．公共/01．物品使用配置表";
-import { 是否为使用物品, 取句柄ID, 取当前生命, 设置生命, 造成火焰伤害 } from "../05．物品使用/00．公共/02．物品使用工具";
+import { 是否为使用物品, 取当前生命, 设置生命, 造成火焰伤害 } from "../05．物品使用/00．公共/02．物品使用工具";
+import { 创建单位时限数值 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
+import { 延迟执行 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
-const 窗口表: Record<number, { 消耗生命: number } | undefined> = {};
-const 到期队列: any[] = [];
-const 后续伤害队列: Array<{ 来源: any; 目标: any; 伤害: number }> = [];
+const 恶斯胸甲窗口 = 创建单位时限数值("恶斯胸甲窗口");
 
-function 清除恶斯胸甲窗口(this: void): void {
-  const unit = 到期队列.shift();
-  const id = 取句柄ID(unit);
-  if (id !== 0) delete 窗口表[id];
-}
-
-function 执行恶斯胸甲后续伤害(this: void): void {
-  const item = 后续伤害队列.shift();
-  if (item == null) return;
-  造成火焰伤害(item.来源, item.目标, item.伤害);
+function 执行恶斯胸甲后续伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
+  造成火焰伤害(来源, 目标, 伤害);
 }
 
 export function 处理恶斯胸甲使用(this: void, ctx: 物品技能事件上下文): void {
@@ -32,24 +20,20 @@ export function 处理恶斯胸甲使用(this: void, ctx: 物品技能事件上�
   if (cost < 物品使用数值配置.恶斯胸甲.最低消耗) cost = 物品使用数值配置.恶斯胸甲.最低消耗;
   if (cost > currentLife - 1) cost = currentLife - 1;
   if (cost > 0) 设置生命(unit, currentLife - cost);
-  窗口表[取句柄ID(unit)] = { 消耗生命: cost };
-  到期队列.push(unit);
-  addDelayedCallback(物品使用数值配置.恶斯胸甲.持续毫秒, 清除恶斯胸甲窗口);
+  恶斯胸甲窗口.写入(unit, cost, 物品使用数值配置.恶斯胸甲.持续毫秒 / 1000);
 }
 
 export function 处理恶斯胸甲伤害修正(this: void, context: any): number {
   const attacker = context.attacker;
-  const id = 取句柄ID(attacker);
-  const state = id === 0 ? undefined : 窗口表[id];
-  if (state == null) return context.currentDamage;
+  const cost = 恶斯胸甲窗口.读取(attacker);
+  if (cost == null) return context.currentDamage;
   if (!(context.currentDamage > 物品使用数值配置.恶斯胸甲.触发伤害阈值)) return context.currentDamage;
-  delete 窗口表[id];
-  后续伤害队列.push({
-    来源: attacker,
-    目标: context.target,
-    伤害: state.消耗生命 * 物品使用数值配置.恶斯胸甲.后续伤害倍率,
+  恶斯胸甲窗口.清空(attacker);
+  const target = context.target;
+  const damage = cost * 物品使用数值配置.恶斯胸甲.后续伤害倍率;
+  延迟执行(0, function on恶斯胸甲后续伤害(this: void): void {
+    执行恶斯胸甲后续伤害(attacker, target, damage);
   });
-  addDelayedCallback(0, 执行恶斯胸甲后续伤害);
   return context.currentDamage * 物品使用数值配置.恶斯胸甲.伤害提升倍率;
 }
 

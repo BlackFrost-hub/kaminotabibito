@@ -8,6 +8,7 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IsUnitEnemy = jass.IsUnitEnemy as (unit: any, player: any) => boolean;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const ConvertUnitState = jass.ConvertUnitState as (value: number) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
@@ -42,6 +43,10 @@ export function 取当前生命(this: void, unit: any): number {
 
 export function 取最大生命(this: void, unit: any): number {
   return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || GetUnitState(unit, UNIT_STATE_MAX_LIFE) || 0;
+}
+
+export function 取攻击力(this: void, unit: any): number {
+  return GetUnitStateJapi(unit, ConvertUnitState(0x15)) || 0;
 }
 
 export function 是敌对单位(this: void, source: any, target: any): boolean {

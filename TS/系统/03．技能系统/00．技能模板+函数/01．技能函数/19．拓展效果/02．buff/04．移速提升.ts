@@ -98,10 +98,12 @@ function on移速提升移除(this: void, 单位: any, BuffID: string, _row: { e
   if (记录 == null) return;
 
   const 实际单位 = typeof 单位 === "number" ? 记录.单位 : 单位;
+  const 当前突破移速 = SOS_GetUnitSpeed(实际单位) || 0;
   应用移速属性(实际单位, -记录.应用移速);
 
-  if (记录.原突破移速 > 引擎移速上限) {
-    SOS_SetUnitSpeed(实际单位, 记录.原突破移速);
+  const 移除后突破移速 = 当前突破移速 > 引擎移速上限 ? 当前突破移速 - 记录.应用移速 : 记录.原突破移速;
+  if (移除后突破移速 > 引擎移速上限) {
+    SOS_SetUnitSpeed(实际单位, 移除后突破移速);
   } else {
     SOS_UnSetUnitSpeed(实际单位);
   }

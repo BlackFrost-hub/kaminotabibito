@@ -3,7 +3,7 @@
 const jass = require("jass.common") as any;
 
 const { 施加隐身, 移除隐身, 单位是否隐身中 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.15．隐身.隐身系统") as {
-  施加隐身: (this: void, unit: any, params: { 持续时间: number; 破隐固定额外伤害?: number; 破隐伤害倍率?: number; 来源单位?: any }) => number;
+  施加隐身: (this: void, unit: any, params: { 持续时间: number; 破隐固定额外伤害?: number; 破隐伤害倍率?: number; 破隐额外暗属性伤害倍率?: number; 来源单位?: any }) => number;
   移除隐身: (this: void, unit: any) => boolean;
   单位是否隐身中: (this: void, unit: any) => boolean;
 };
@@ -36,6 +36,7 @@ export interface 潜行状态参数 {
   移速BuffID?: string;
   破隐固定额外伤害?: number;
   破隐伤害倍率?: number;
+  破隐额外暗属性伤害倍率?: number;
   on开始?: (this: void, 状态: 潜行状态实例) => void;
   on结束?: (this: void, 状态: 潜行状态实例, 原因: 潜行结束原因) => void;
 }
@@ -106,6 +107,7 @@ export function 施加潜行状态(this: void, 参数: 潜行状态参数): 潜�
     持续时间: 参数.持续秒数,
     破隐固定额外伤害: 参数.破隐固定额外伤害 ?? 0,
     破隐伤害倍率: 参数.破隐伤害倍率 ?? 1,
+    破隐额外暗属性伤害倍率: 参数.破隐额外暗属性伤害倍率 ?? 0,
     来源单位: 参数.来源单位 ?? 参数.单位,
   });
 

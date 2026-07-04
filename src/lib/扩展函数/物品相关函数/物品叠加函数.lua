@@ -1,8 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local ensureMoveSmartOrderIds, isIssuedMoveOrSmartOrder, faceUnitTowardGroundItem, suppressPendingMoveAfterGroundStack, initHashtable, ItemStacked, tryMergeGroundItemIntoInventory, cleanupTempTrigger, CheakPickUpForTrigger, CheakPickUp, hasInventoryAbility, isItemInRange, schedulePickUpCheck, isStackableItemType, jass, unitSpecificEventCenter, centerTimer, _____7269_54C1_5728_53E0_52A0_767D_540D_5355, ABIL_INVENTORY, PICKUP_RECHECK_DELAY_MS, STOP_QUEUE_DEFER_MS, FALLBACK_ORDER_MOVE, FALLBACK_ORDER_SMART, BJ_RADTODEG, cachedOrderMove, cachedOrderSmart, HT, StackStatus, ItemRange, StarItem_TryPickUp_item, StarItem_bagLoc, StarItem_CallBackUnit, temp_trig, tempTrigUnregisters, StarItem_TryPickUpTrigs, StarItem_TryPickUpTrig_Index, StarItem_MoveItemTrigs, StarItem_MoveItemTrig_Index, StarItem_StackItemTrigs, StarItem_StackItemTrig_Index
-function ensureMoveSmartOrderIds(self)
+local ensureMoveSmartOrderIds, isIssuedMoveOrSmartOrder, faceUnitTowardGroundItem, suppressPendingMoveAfterGroundStack, initHashtable, ItemStacked, ExecuteTryPickUpTriggers, tryMergeGroundItemIntoInventory, cleanupTempTrigger, CheakPickUpForTrigger, CheakPickUp, hasInventoryAbility, isItemInRange, schedulePickUpCheck, isStackableItemType, jass, unitSpecificEventCenter, centerTimer, _____7269_54C1_5728_53E0_52A0_767D_540D_5355, ABIL_INVENTORY, PICKUP_RECHECK_DELAY_MS, STOP_QUEUE_DEFER_MS, FALLBACK_ORDER_MOVE, FALLBACK_ORDER_SMART, BJ_RADTODEG, cachedOrderMove, cachedOrderSmart, HT, StackStatus, ItemRange, StarItem_TryPickUp_item, StarItem_bagLoc, StarItem_CallBackUnit, temp_trig, tempTrigUnregisters, StarItem_TryPickUpTrigs, StarItem_TryPickUpTrig_Index, StarItem_MoveItemTrigs, StarItem_MoveItemTrig_Index, StarItem_StackItemTrigs, StarItem_StackItemTrig_Index
+function ensureMoveSmartOrderIds()
     if cachedOrderMove ~= 0 then
         return
     end
@@ -11,11 +11,11 @@ function ensureMoveSmartOrderIds(self)
     cachedOrderMove = m ~= 0 and m or FALLBACK_ORDER_MOVE
     cachedOrderSmart = s ~= 0 and s or FALLBACK_ORDER_SMART
 end
-function isIssuedMoveOrSmartOrder(self, orderId)
-    ensureMoveSmartOrderIds(nil)
+function isIssuedMoveOrSmartOrder(orderId)
+    ensureMoveSmartOrderIds()
     return orderId == cachedOrderMove or orderId == cachedOrderSmart
 end
-function faceUnitTowardGroundItem(self, u, item)
+function faceUnitTowardGroundItem(u, item)
     if u == nil or u == 0 or item == nil or item == 0 then
         return
     end
@@ -25,7 +25,7 @@ function faceUnitTowardGroundItem(self, u, item)
     ) * BJ_RADTODEG
     jass.SetUnitFacing(u, angleDeg)
 end
-function suppressPendingMoveAfterGroundStack(self, u)
+function suppressPendingMoveAfterGroundStack(u)
     if u == nil or u == 0 then
         return
     end
@@ -40,7 +40,7 @@ function suppressPendingMoveAfterGroundStack(self, u)
         end
     )
 end
-function initHashtable(self)
+function initHashtable()
     local ____temp_2
     if HT ~= nil then
         ____temp_2 = HT
@@ -50,7 +50,7 @@ function initHashtable(self)
     end
     return ____temp_2
 end
-function ItemStacked(self)
+function ItemStacked()
     local i = 0
     while i < StarItem_StackItemTrig_Index do
         if StarItem_StackItemTrigs[i + 1] == nil then
@@ -61,20 +61,47 @@ function ItemStacked(self)
         i = i + 1
     end
 end
-function tryMergeGroundItemIntoInventory(self, wp, u)
+function ExecuteTryPickUpTriggers(u, item)
+    if StarItem_TryPickUpTrig_Index <= 0 or u == nil or item == nil then
+        return
+    end
+    local i = 0
+    StarItem_TryPickUp_item = item
+    StarItem_CallBackUnit = u
+    while i < StarItem_TryPickUpTrig_Index do
+        if StarItem_TryPickUp_item ~= nil then
+            if StarItem_TryPickUpTrigs[i + 1] == nil then
+                StarItem_TryPickUpTrigs[i + 1] = StarItem_TryPickUpTrigs[StarItem_TryPickUpTrig_Index + 1]
+                StarItem_TryPickUpTrig_Index = StarItem_TryPickUpTrig_Index - 1
+            end
+            jass.TriggerExecute(StarItem_TryPickUpTrigs[i + 1])
+        else
+            break
+        end
+        i = i + 1
+    end
+    StarItem_TryPickUp_item = nil
+end
+function tryMergeGroundItemIntoInventory(wp, u, fireTryPickUp)
+    if fireTryPickUp == nil then
+        fireTryPickUp = true
+    end
     do
         local i = 0
         while i < 6 do
             local wp2 = jass.UnitItemInSlot(u, i)
             if wp2 ~= nil and jass.GetItemTypeId(wp) == jass.GetItemTypeId(wp2) and wp ~= wp2 then
-                faceUnitTowardGroundItem(nil, u, wp)
+                faceUnitTowardGroundItem(u, wp)
+                if fireTryPickUp then
+                    ExecuteTryPickUpTriggers(u, wp)
+                end
                 jass.SetItemCharges(
                     wp2,
                     jass.GetItemCharges(wp2) + jass.GetItemCharges(wp)
                 )
                 StarItem_TryPickUp_item = wp2
                 StarItem_CallBackUnit = u
-                ItemStacked(nil)
+                ItemStacked()
                 jass.RemoveItem(wp)
                 return true
             end
@@ -83,7 +110,7 @@ function tryMergeGroundItemIntoInventory(self, wp, u)
     end
     return false
 end
-function cleanupTempTrigger(self, triggeringTrigger)
+function cleanupTempTrigger(triggeringTrigger)
     if triggeringTrigger == nil then
         return
     end
@@ -93,20 +120,20 @@ function cleanupTempTrigger(self, triggeringTrigger)
         do
             local i = 0
             while i < #unregisters do
-                unregisters[i + 1](unregisters)
+                unregisters[i + 1]()
                 i = i + 1
             end
         end
         __TS__Delete(tempTrigUnregisters, tid)
     end
-    local ht = initHashtable(nil)
+    local ht = initHashtable()
     if ht ~= nil then
         jass.FlushChildHashtable(ht, tid)
     end
     jass.DestroyTrigger(triggeringTrigger)
 end
-function CheakPickUpForTrigger(self, triggeringTrigger, fromTimer)
-    local ht = initHashtable(nil)
+function CheakPickUpForTrigger(triggeringTrigger, fromTimer)
+    local ht = initHashtable()
     if ht == nil then
         return false
     end
@@ -120,14 +147,14 @@ function CheakPickUpForTrigger(self, triggeringTrigger, fromTimer)
     local wp = jass.LoadItemHandle(ht, tid, 10034)
     local u = jass.LoadUnitHandle(ht, tid, 10035)
     if wp == nil or u == nil then
-        cleanupTempTrigger(nil, triggeringTrigger)
+        cleanupTempTrigger(triggeringTrigger)
         return false
     end
-    if isItemInRange(nil, u, wp, ItemRange + 50) then
-        tryMergeGroundItemIntoInventory(nil, wp, u)
-        cleanupTempTrigger(nil, triggeringTrigger)
+    if isItemInRange(u, wp, ItemRange + 50) then
+        tryMergeGroundItemIntoInventory(wp, u)
+        cleanupTempTrigger(triggeringTrigger)
         StackStatus = false
-        suppressPendingMoveAfterGroundStack(nil, u)
+        suppressPendingMoveAfterGroundStack(u)
         StackStatus = true
         return false
     end
@@ -136,18 +163,18 @@ function CheakPickUpForTrigger(self, triggeringTrigger, fromTimer)
     end
     return true
 end
-function CheakPickUp(self)
+function CheakPickUp()
     local trig = jass.GetTriggeringTrigger()
     if jass.GetTriggerEventId() == jass.EVENT_UNIT_DEATH then
-        cleanupTempTrigger(nil, trig)
+        cleanupTempTrigger(trig)
         return false
     end
-    return CheakPickUpForTrigger(nil, trig, false)
+    return CheakPickUpForTrigger(trig, false)
 end
-function hasInventoryAbility(self, unit)
+function hasInventoryAbility(unit)
     return unit ~= nil and unit ~= 0 and jass.GetUnitAbilityLevel(unit, ABIL_INVENTORY) ~= 0
 end
-function isItemInRange(self, unit, item, range)
+function isItemInRange(unit, item, range)
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return false
     end
@@ -155,17 +182,17 @@ function isItemInRange(self, unit, item, range)
     local dy = jass.GetUnitY(unit) - jass.GetItemY(item)
     return dx * dx + dy * dy <= range * range
 end
-function schedulePickUpCheck(self, triggeringTrigger)
+function schedulePickUpCheck(triggeringTrigger)
     centerTimer.addDelayedCallback(
         PICKUP_RECHECK_DELAY_MS,
         function()
-            if CheakPickUpForTrigger(nil, triggeringTrigger, true) then
-                schedulePickUpCheck(nil, triggeringTrigger)
+            if CheakPickUpForTrigger(triggeringTrigger, true) then
+                schedulePickUpCheck(triggeringTrigger)
             end
         end
     )
 end
-function isStackableItemType(self, item)
+function isStackableItemType(item)
     if item == nil then
         return false
     end
@@ -187,7 +214,7 @@ function isStackableItemType(self, item)
     local purchasableType = ____temp_4
     return itemType == chargedType or itemType == purchasableType or _____7269_54C1_5728_53E0_52A0_767D_540D_5355(itemTypeId)
 end
-function ____exports.StarItem_ItemStack_Act2(self)
+function ____exports.StarItem_ItemStack_Act2()
     local i = 0
     local wp = jass.GetOrderTargetItem()
     local u = jass.GetTriggerUnit()
@@ -197,7 +224,7 @@ function ____exports.StarItem_ItemStack_Act2(self)
     while i < 6 do
         local wp2 = jass.UnitItemInSlot(u, i)
         if wp2 ~= nil and jass.GetItemTypeId(wp) == jass.GetItemTypeId(wp2) and wp ~= wp2 then
-            ensureMoveSmartOrderIds(nil)
+            ensureMoveSmartOrderIds()
             StackStatus = false
             jass.IssuePointOrderById(
                 u,
@@ -220,8 +247,8 @@ function ____exports.StarItem_ItemStack_Act2(self)
                     currentTrig,
                     jass.Condition(CheakPickUp)
                 )
-                schedulePickUpCheck(nil, currentTrig)
-                local ht = initHashtable(nil)
+                schedulePickUpCheck(currentTrig)
+                local ht = initHashtable()
                 if ht ~= nil then
                     jass.SaveItemHandle(ht, tid, 10034, wp)
                     jass.SaveUnitHandle(ht, tid, 10035, u)
@@ -232,56 +259,41 @@ function ____exports.StarItem_ItemStack_Act2(self)
         i = i + 1
     end
 end
-function ____exports.StarItem_ItemStack_Act(self)
+function ____exports.StarItem_ItemStack_Act()
     local wp = jass.GetOrderTargetItem()
     local u = jass.GetTriggerUnit()
-    if wp == nil or u == nil or not tryMergeGroundItemIntoInventory(nil, wp, u) then
+    if wp == nil or u == nil or not tryMergeGroundItemIntoInventory(wp, u, false) then
         return
     end
     StackStatus = false
-    suppressPendingMoveAfterGroundStack(nil, u)
+    suppressPendingMoveAfterGroundStack(u)
     StackStatus = true
 end
-function ____exports.StarItem_ItemStack_Cond(self)
+function ____exports.StarItem_ItemStack_Cond()
     local i = 0
     local orderId = jass.GetIssuedOrderId()
-    if StackStatus then
-        if isIssuedMoveOrSmartOrder(nil, orderId) then
+    if StarItem_TryPickUpTrig_Index > 0 then
+        if isIssuedMoveOrSmartOrder(orderId) then
             local targetItem = jass.GetOrderTargetItem()
             if targetItem ~= nil then
                 local triggerUnit = jass.GetTriggerUnit()
-                if hasInventoryAbility(nil, triggerUnit) and isStackableItemType(nil, targetItem) then
-                    if isItemInRange(nil, triggerUnit, targetItem, ItemRange + 50) then
-                        ____exports.StarItem_ItemStack_Act(nil)
-                    else
-                        ____exports.StarItem_ItemStack_Act2(nil)
-                    end
+                if hasInventoryAbility(triggerUnit) then
+                    ExecuteTryPickUpTriggers(triggerUnit, targetItem)
                 end
             end
         end
     end
-    if StarItem_TryPickUpTrig_Index > 0 then
-        if isIssuedMoveOrSmartOrder(nil, orderId) then
+    if StackStatus then
+        if isIssuedMoveOrSmartOrder(orderId) then
             local targetItem = jass.GetOrderTargetItem()
             if targetItem ~= nil then
                 local triggerUnit = jass.GetTriggerUnit()
-                if hasInventoryAbility(nil, triggerUnit) then
-                    i = 0
-                    StarItem_TryPickUp_item = targetItem
-                    StarItem_CallBackUnit = triggerUnit
-                    while i < StarItem_TryPickUpTrig_Index do
-                        if StarItem_TryPickUp_item ~= nil then
-                            if StarItem_TryPickUpTrigs[i + 1] == nil then
-                                StarItem_TryPickUpTrigs[i + 1] = StarItem_TryPickUpTrigs[StarItem_TryPickUpTrig_Index + 1]
-                                StarItem_TryPickUpTrig_Index = StarItem_TryPickUpTrig_Index - 1
-                            end
-                            jass.TriggerExecute(StarItem_TryPickUpTrigs[i + 1])
-                        else
-                            break
-                        end
-                        i = i + 1
+                if hasInventoryAbility(triggerUnit) and isStackableItemType(targetItem) then
+                    if isItemInRange(triggerUnit, targetItem, ItemRange + 50) then
+                        ____exports.StarItem_ItemStack_Act()
+                    else
+                        ____exports.StarItem_ItemStack_Act2()
                     end
-                    StarItem_TryPickUp_item = nil
                 end
             end
         end
@@ -313,11 +325,11 @@ function ____exports.StarItem_ItemStack_Cond(self)
     end
     return true
 end
-function ____exports.StarItem_ItemStack_Cond2(self)
+function ____exports.StarItem_ItemStack_Cond2()
     local i = 0
     if StackStatus then
         local manipulatedItem = jass.GetManipulatedItem()
-        if manipulatedItem ~= nil and isStackableItemType(nil, manipulatedItem) then
+        if manipulatedItem ~= nil and isStackableItemType(manipulatedItem) then
             local triggerUnit = jass.GetTriggerUnit()
             while i < 6 do
                 local ____temp_5
@@ -328,13 +340,14 @@ function ____exports.StarItem_ItemStack_Cond2(self)
                 end
                 local itemInSlot = ____temp_5
                 if itemInSlot ~= nil and jass.GetItemTypeId(manipulatedItem) == jass.GetItemTypeId(itemInSlot) and manipulatedItem ~= itemInSlot then
+                    ExecuteTryPickUpTriggers(triggerUnit, manipulatedItem)
                     jass.SetItemCharges(
                         itemInSlot,
                         jass.GetItemCharges(itemInSlot) + jass.GetItemCharges(manipulatedItem)
                     )
                     StarItem_TryPickUp_item = itemInSlot
                     StarItem_CallBackUnit = triggerUnit
-                    ItemStacked(nil)
+                    ItemStacked()
                     jass.RemoveItem(manipulatedItem)
                     return true
                 end
@@ -388,24 +401,24 @@ StarItem_MoveItemTrigs = {}
 StarItem_MoveItemTrig_Index = 0
 StarItem_StackItemTrigs = {}
 StarItem_StackItemTrig_Index = 0
-function ____exports.StarItem_GetTriggerUnit(self)
+function ____exports.StarItem_GetTriggerUnit()
     return StarItem_CallBackUnit
 end
-local function isHeroTriggerUnit(self)
+local function isHeroTriggerUnit()
     local u = jass.GetTriggerUnit()
     return u ~= nil and u ~= 0 and jass.IsUnitType(u, jass.UNIT_TYPE_HERO)
 end
-local function isHeroFilterUnit(self)
+local function isHeroFilterUnit()
     local u = jass.GetFilterUnit()
     return u ~= nil and u ~= 0 and jass.IsUnitType(u, jass.UNIT_TYPE_HERO)
 end
-local function StarItem_UnitOrderCond(self)
-    return isHeroTriggerUnit(nil) and ____exports.StarItem_ItemStack_Cond(nil)
+local function StarItem_UnitOrderCond()
+    return isHeroTriggerUnit() and ____exports.StarItem_ItemStack_Cond()
 end
-local function StarItem_ItemPickUpCond(self)
-    return isHeroTriggerUnit(nil) and ____exports.StarItem_ItemStack_Cond2(nil)
+local function StarItem_ItemPickUpCond()
+    return isHeroTriggerUnit() and ____exports.StarItem_ItemStack_Cond2()
 end
-local function ensureStackEventTriggers(self)
+local function ensureStackEventTriggers()
     if StackRegd then
         return
     end
@@ -423,21 +436,21 @@ local function ensureStackEventTriggers(self)
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(____exports.StarTrig_ItemPickUP, STACK_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_PICKUP_ITEM, heroFilter)
 end
 ____exports.StarItem_IsItemInRange = isItemInRange
-function ____exports.StarItem_UnitMoveItem(self, t)
+function ____exports.StarItem_UnitMoveItem(t)
     StarItem_MoveItemTrigs[StarItem_MoveItemTrig_Index + 1] = t
     StarItem_MoveItemTrig_Index = StarItem_MoveItemTrig_Index + 1
 end
-function ____exports.StarItem_GetTriggerItem(self)
+function ____exports.StarItem_GetTriggerItem()
     return StarItem_TryPickUp_item
 end
-function ____exports.StarItem_GetItemLocOnBag(self)
+function ____exports.StarItem_GetItemLocOnBag()
     return StarItem_bagLoc
 end
-function ____exports.StarItem_TryPickUpItem(self, t)
+function ____exports.StarItem_TryPickUpItem(t)
     StarItem_TryPickUpTrigs[StarItem_TryPickUpTrig_Index + 1] = t
     StarItem_TryPickUpTrig_Index = StarItem_TryPickUpTrig_Index + 1
 end
-function ____exports.GetUnitHaveItemLoc(self, u, wplx)
+function ____exports.GetUnitHaveItemLoc(u, wplx)
     local i = 0
     while i < 6 do
         local itemInSlot = jass.UnitItemInSlot(u, i)
@@ -448,32 +461,32 @@ function ____exports.GetUnitHaveItemLoc(self, u, wplx)
     end
     return -1
 end
-function ____exports.StarItem_OpenStack(self, r)
+function ____exports.StarItem_OpenStack(r)
     ItemRange = r > 0 and r or DEFAULT_ITEM_PICKUP_RANGE
-    ensureStackEventTriggers(nil)
+    ensureStackEventTriggers()
     StackStatus = true
 end
-function ____exports.StarItem_TriggerAddItemStackedEvent(self, t)
+function ____exports.StarItem_TriggerAddItemStackedEvent(t)
     StarItem_StackItemTrigs[StarItem_StackItemTrig_Index + 1] = t
     StarItem_StackItemTrig_Index = StarItem_StackItemTrig_Index + 1
 end
-function ____exports.StarItem_CloseStack(self)
+function ____exports.StarItem_CloseStack()
     StackStatus = false
 end
-function ____exports.GetItemUnderMouse(self)
-    local ht = initHashtable(nil)
+function ____exports.GetItemUnderMouse()
+    local ht = initHashtable()
     if ht == nil then
         return nil
     end
     jass.FlushChildHashtable(ht, 1)
     return nil
 end
-function ____exports.GetItemByHandle(self, i)
-    local ht = initHashtable(nil)
+function ____exports.GetItemByHandle(i)
+    local ht = initHashtable()
     if ht == nil then
         return nil
     end
     return nil
 end
-____exports.StarItem_OpenStack(nil, ItemRange)
+____exports.StarItem_OpenStack(ItemRange)
 return ____exports

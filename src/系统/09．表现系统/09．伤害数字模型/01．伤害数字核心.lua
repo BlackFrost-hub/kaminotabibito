@@ -148,6 +148,7 @@ _____57FA_7840Z_504F_79FB = 110
 local _____66B4_51FB_524D_7F00_6A21_578B = "UI\\DamageNumbers\\DmgPfxC.mdx"
 local _____95EA_907F_524D_7F00_6A21_578B = "UI\\DamageNumbers\\DmgPfxD.mdx"
 local _____672A_547D_4E2D_524D_7F00_6A21_578B = "UI\\DamageNumbers\\DmgPfxM.mdx"
+local _____98CE_6728_5C5E_6027_4F24_5BB3_989C_8272 = {r = 0, g = 255, b = 0}
 local _____5DF2_521D_59CB_5316 = false
 _____5DF2_6CE8_518CTick = false
 local _____4E0B_4E00_4E2A_5B9E_4F8BID = 0
@@ -220,7 +221,7 @@ local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
         return {r = 255, g = 210, b = 80}
     end
     if damageType.isWoodDamage then
-        return {r = 120, g = 255, b = 120}
+        return _____98CE_6728_5C5E_6027_4F24_5BB3_989C_8272
     end
     if damageType.isLightDamage then
         return {r = 255, g = 255, b = 170}
@@ -262,7 +263,7 @@ local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
         return {r = 255, g = 210, b = 80}
     end
     if damageType.rawDamageType == jass.DAMAGE_TYPE_PLANT then
-        return {r = 120, g = 255, b = 120}
+        return _____98CE_6728_5C5E_6027_4F24_5BB3_989C_8272
     end
     if damageType.rawDamageType == jass.DAMAGE_TYPE_DIVINE then
         return {r = 255, g = 255, b = 170}

@@ -24,6 +24,25 @@ local function _____89C4_6574_6B21_6570(_____6B21_6570)
     end
     return math.floor(_____6B21_6570)
 end
+local function _____6700_7EC8_4F24_5BB3_8FBE_5230_8BA1_6570_9608_503C(_____53C2_6570, context)
+    local _____9608_503C = _____53C2_6570["最终伤害计数阈值"] or 0
+    return context.currentDamage > _____9608_503C
+end
+local function _____672C_6B21_4F24_5BB3_662F_5426_8BA1_6570(_____53C2_6570, context)
+    local _____6A21_5F0F = _____53C2_6570["计数模式"] or "任意伤害"
+    if _____6A21_5F0F == "任意伤害" then
+        return true
+    end
+    local _____662F_7EAF_666E_653B = context.isNormalAttack == true and context.isSkillAttack ~= true and context.isSkillDamage ~= true
+    if _____6A21_5F0F == "纯普攻" then
+        return _____662F_7EAF_666E_653B
+    end
+    local _____8FBE_5230_9608_503C = _____6700_7EC8_4F24_5BB3_8FBE_5230_8BA1_6570_9608_503C(_____53C2_6570, context)
+    if _____6A21_5F0F == "最终伤害阈值" then
+        return _____8FBE_5230_9608_503C
+    end
+    return _____662F_7EAF_666E_653B or _____8FBE_5230_9608_503C
+end
 local function _____56FA_5B9A_53D7_51FB_6B21_6570_4F24_5BB3_4FEE_6B63(context)
     local id = _____53D6_5355_4F4DID(context.target)
     if id == 0 then
@@ -37,6 +56,9 @@ local function _____56FA_5B9A_53D7_51FB_6B21_6570_4F24_5BB3_4FEE_6B63(context)
         return context.currentDamage
     end
     if _____8BB0_5F55["参数"]["过滤伤害"] ~= nil and not _____8BB0_5F55["参数"]["过滤伤害"](context) then
+        return context.currentDamage
+    end
+    if not _____672C_6B21_4F24_5BB3_662F_5426_8BA1_6570(_____8BB0_5F55["参数"], context) then
         return context.currentDamage
     end
     local _____6263_9664_6B21_6570 = _____89C4_6574_6B21_6570(_____8BB0_5F55["参数"]["每次伤害扣除次数"] or 1)

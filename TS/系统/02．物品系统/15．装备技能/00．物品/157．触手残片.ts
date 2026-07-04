@@ -1,19 +1,13 @@
 /** @noSelfInFile */
 
-const { onItemPickup } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
-  onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
+const { onTryPickupItem } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.18．尝试拾取物品中心") as {
+  onTryPickupItem: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
-const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
-  doHeal: (this: void, params: {
-    HealSource: any;
-    HealTarget: any;
-    HealAmount: number;
-    ItemHeal: boolean;
-    HealEffect: boolean;
-  }) => number;
+const { 恢复生命魔法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
+  恢复生命魔法: (this: void, source: any, target: any, hp: number, mp?: number, 默认魔法特效?: boolean) => void;
 };
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
@@ -40,6 +34,7 @@ const 触手残片配置 = {
 
 type 待处理触手残片拾取 = {
   单位: any;
+  拾取前已有次数: number;
   拾取次数: number;
 };
 
@@ -58,28 +53,24 @@ function 查找单位触手残片(this: void, 单位: any): any {
   return null;
 }
 
-function 处理单个触手残片拾取(this: void, 单位: any, 拾取次数: number): void {
+function 处理单个触手残片拾取(this: void, 单位: any, 拾取前已有次数: number, 拾取次数: number): void {
   const 触手残片 = 查找单位触手残片(单位);
   if (触手残片 == null || 触手残片 === 0) return;
 
   const 当前次数 = GetItemCharges(触手残片);
+  const 已实际拾取到残片 = 当前次数 > 拾取前已有次数;
   if (当前次数 > 触手残片配置.最大次数) {
     SetItemCharges(触手残片, 触手残片配置.最大次数);
   }
 
+  if (!已实际拾取到残片) return;
   if (拾取次数 !== 1) return;
-  if (当前次数 < 触手残片配置.触发最低已有次数 + 1) return;
+  if (拾取前已有次数 < 触手残片配置.触发最低已有次数) return;
 
   const 已损生命 = GetUnitState(单位, UNIT_STATE_MAX_LIFE) - GetUnitState(单位, UNIT_STATE_LIFE);
   if (已损生命 <= 0) return;
 
-  doHeal({
-    HealSource: 单位,
-    HealTarget: 单位,
-    HealAmount: 已损生命 * 触手残片配置.每次拾取治疗已损生命比例,
-    ItemHeal: true,
-    HealEffect: true,
-  });
+  恢复生命魔法(单位, 单位, 已损生命 * 触手残片配置.每次拾取治疗已损生命比例);
 }
 
 function 处理待处理触手残片拾取(this: void): void {
@@ -87,17 +78,21 @@ function 处理待处理触手残片拾取(this: void): void {
   while (待处理触手残片拾取列表.length > 0) {
     const 上下文 = 待处理触手残片拾取列表.shift();
     if (上下文 == null) continue;
-    处理单个触手残片拾取(上下文.单位, 上下文.拾取次数);
+    处理单个触手残片拾取(上下文.单位, 上下文.拾取前已有次数, 上下文.拾取次数);
   }
 }
 
-function on触手残片拾取(this: void, 单位: any, 物品: any): void {
+function on触手残片尝试拾取(this: void, 单位: any, 物品: any): void {
   if (触手残片物品类型ID === 0) return;
   if (物品 == null || 物品 === 0) return;
   if (GetItemTypeId(物品) !== 触手残片物品类型ID) return;
 
+  const 已持有触手残片 = 查找单位触手残片(单位);
+  const 拾取前已有次数 = 已持有触手残片 != null && 已持有触手残片 !== 0 ? GetItemCharges(已持有触手残片) : 0;
+
   待处理触手残片拾取列表.push({
     单位,
+    拾取前已有次数,
     拾取次数: GetItemCharges(物品),
   });
   if (已安排触手残片拾取处理) return;
@@ -107,7 +102,7 @@ function on触手残片拾取(this: void, 单位: any, 物品: any): void {
 
 function 初始化触手残片(this: void): void {
   if (触手残片物品类型ID === 0) return;
-  onItemPickup(on触手残片拾取);
+  onTryPickupItem(on触手残片尝试拾取);
 }
 
 初始化触手残片();

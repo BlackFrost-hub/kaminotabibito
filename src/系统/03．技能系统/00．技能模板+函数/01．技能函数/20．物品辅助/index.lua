@@ -49,6 +49,14 @@ do
     end
 end
 do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.18．尝试拾取物品中心")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.08．装备识别与冷却")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
@@ -58,6 +66,22 @@ do
 end
 do
     local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.11．装备常量")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.19．临时属性效果")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.20．延迟动作")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -101,6 +125,7 @@ do
     ____exports["临时调整攻击"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["临时调整攻击"]
     ____exports["临时调整护甲"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["临时调整护甲"]
     ____exports["临时调整攻速"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["临时调整攻速"]
+    ____exports["调整状态ID属性"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["调整状态ID属性"]
     ____exports["调整玩家属性"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["调整玩家属性"]
     ____exports["调整单位属性"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["调整单位属性"]
     ____exports["读取玩家属性"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["读取玩家属性"]

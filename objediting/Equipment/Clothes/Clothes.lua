@@ -32,8 +32,8 @@ createEquipmentItem('I0EY', '神风护体披风', {
   classification = 'Permanent',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[披风]-机动/生存|r|n|cffffcc99等级：B|n评分：6300|r|n|cffffffcc[基础属性]|r|n闪避+14%|n移动速度+10%|n风属性抗性+18%|n冷却缩减+6%|n|cFF808080披风的羽纹永远向同一方向飘动，像有一阵神风藏在布料里。|r',
-  description = '|cffccffff[披风]-机动/生存|r|n|cffffcc99等级：B|n评分：6300|r|n|cffffffcc[基础属性]|r|n闪避+14%|n移动速度+10%|n风属性抗性+18%|n冷却缩减+6%|n|cFF808080披风的羽纹永远向同一方向飘动，像有一阵神风藏在布料里。|r',
+  tooltipExtended = '|cffccffff[披风]-机动/生存|r|n|cffffcc99等级：B|n评分：6300|r|n|cffffffcc[基础属性]|r|n生命值+1200|n闪避+16%|n移动速度+12%|n风/木属性抗性+22%|n冷却缩减+8%|n|cffffffcc[特效]|r|n神风护体：受到超过最大生命12%的单次伤害时，本次伤害降低32%，并获得500+最大生命10%的护盾，持续5秒，冷却14秒。|n|cFF808080披风的羽纹永远向同一方向飘动，像有一阵神风藏在布料里。|r',
+  description = '|cffccffff[披风]-机动/生存|r|n|cffffcc99等级：B|n评分：6300|r|n|cffffffcc[基础属性]|r|n生命值+1200|n闪避+16%|n移动速度+12%|n风/木属性抗性+22%|n冷却缩减+8%|n|cffffffcc[特效]|r|n神风护体：受到超过最大生命12%的单次伤害时，本次伤害降低32%，并获得500+最大生命10%的护盾，持续5秒，冷却14秒。|n|cFF808080披风的羽纹永远向同一方向飘动，像有一阵神风藏在布料里。|r',
 })
 
 createEquipmentItem('I0F3', '墨潮行者长袍', {
@@ -44,8 +44,8 @@ createEquipmentItem('I0F3', '墨潮行者长袍', {
   classification = 'Permanent',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[衣服/长袍]-法师防具|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n智力+36|n魔法抗性+20%|n水属性抗性+22%|n沉默抗性+15%|n|cFF808080长袍下摆像墨潮一样沉静铺开，能遮住施法者的微弱气息。|r',
-  description = '|cffccffff[衣服/长袍]-法师防具|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n智力+36|n魔法抗性+20%|n水属性抗性+22%|n沉默抗性+15%|n|cFF808080长袍下摆像墨潮一样沉静铺开，能遮住施法者的微弱气息。|r',
+  tooltipExtended = '|cffccffff[衣服/长袍]-法师防具|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n智力+42|n生命值+1400|n魔法抗性+22%|n水属性抗性+25%|n沉默抗性+20%|n|cffffffcc[特效]|r|n墨潮护幕：技能造成伤害时，为自身附加500+最大生命15%的护盾，持续5秒，冷却12秒。|n|cFF808080长袍下摆像墨潮一样沉静铺开，能遮住施法者的微弱气息。|r',
+  description = '|cffccffff[衣服/长袍]-法师防具|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n智力+42|n生命值+1400|n魔法抗性+22%|n水属性抗性+25%|n沉默抗性+20%|n|cffffffcc[特效]|r|n墨潮护幕：技能造成伤害时，为自身附加500+最大生命15%的护盾，持续5秒，冷却12秒。|n|cFF808080长袍下摆像墨潮一样沉静铺开，能遮住施法者的微弱气息。|r',
 })
 
 createEquipmentItem('I0F8', '荆棘行者披风', {
@@ -56,8 +56,8 @@ createEquipmentItem('I0F8', '荆棘行者披风', {
   classification = 'Permanent',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[披风]-自然/机动|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n护甲+26|n自然伤害+15%|n闪避+10%|n移动速度+8%|n|cFF808080披风边缘缠着干枯荆棘，走动时会留下细碎绿光。|r',
-  description = '|cffccffff[披风]-自然/机动|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n护甲+26|n自然伤害+15%|n闪避+10%|n移动速度+8%|n|cFF808080披风边缘缠着干枯荆棘，走动时会留下细碎绿光。|r',
+  tooltipExtended = '|cffccffff[披风]-自然/机动|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+1400|n护甲+30|n风/木属性伤害+18%|n闪避+12%|n移动速度+10%|n|cffffffcc[特效]|r|n荆棘反刺：受到纯普攻伤害时，对攻击者造成自身攻击力25%的风/木属性伤害。|n|cFF808080披风边缘缠着干枯荆棘，走动时会留下细碎绿光。|r',
+  description = '|cffccffff[披风]-自然/机动|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+1400|n护甲+30|n风/木属性伤害+18%|n闪避+12%|n移动速度+10%|n|cffffffcc[特效]|r|n荆棘反刺：受到纯普攻伤害时，对攻击者造成自身攻击力25%的风/木属性伤害。|n|cFF808080披风边缘缠着干枯荆棘，走动时会留下细碎绿光。|r',
 })
 
 createEquipmentItem('I0FF', '影骨披风', {
@@ -70,6 +70,6 @@ createEquipmentItem('I0FF', '影骨披风', {
   level = 5,
   priority = 1000,
   activelyUsed = true,
-  tooltipExtended = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：C|n评分：3820|r|n|cffffffcc[基础属性]|r|n敏捷+22|n护甲+12|n闪避+8%|n移动速度+6%|n|cffffffcc[使用]|r|n进入潜行6秒，期间移动速度提高15%，破隐后下一次伤害获得强化，冷却90秒。|n|cFF808080披风由影骨莫特斯的残影缝成，披上时脚步会先于身形消失。|r',
-  description = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：C|n评分：3820|r|n|cffffffcc[基础属性]|r|n敏捷+22|n护甲+12|n闪避+8%|n移动速度+6%|n|cffffffcc[使用]|r|n进入潜行6秒，期间移动速度提高15%，破隐后下一次伤害获得强化，冷却90秒。|n|cFF808080披风由影骨莫特斯的残影缝成，披上时脚步会先于身形消失。|r',
+  tooltipExtended = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：C|n评分：3820|r|n|cffffffcc[基础属性]|r|n敏捷+22|n护甲+12|n闪避+8%|n移动速度+6%|n|cffffffcc[使用]|r|n进入潜行6秒，期间移动速度提高15%，破隐后的下一次普攻额外造成100%攻击力暗属性伤害，冷却90秒。|n|cFF808080披风由影骨莫特斯的残影缝成，披上时脚步会先于身形消失。|r',
+  description = '|cffccffff[衣服/披风]-敏捷/机动|r|n|cffffcc99等级：C|n评分：3820|r|n|cffffffcc[基础属性]|r|n敏捷+22|n护甲+12|n闪避+8%|n移动速度+6%|n|cffffffcc[使用]|r|n进入潜行6秒，期间移动速度提高15%，破隐后的下一次普攻额外造成100%攻击力暗属性伤害，冷却90秒。|n|cFF808080披风由影骨莫特斯的残影缝成，披上时脚步会先于身形消失。|r',
 })

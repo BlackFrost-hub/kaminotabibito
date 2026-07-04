@@ -8,17 +8,8 @@ local _____662F_5426_4E3A_4F7F_7528_7269_54C1 = ____02_FF0E_7269_54C1_4F7F_7528_
 local _____83B7_53D6_8303_56F4_53CB_519B = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["获取范围友军"]
 local _____53D6_5355_4F4DX = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位Y"]
-local _____4E34_65F6_8C03_6574_653B_51FB = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["临时调整攻击"]
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local _____56DE_9000_961F_5217 = {}
-local function _____56DE_9000_7CBE_7075_53F7_89D2_52A0_6210()
-    local item = table.remove(_____56DE_9000_961F_5217, 1)
-    if item == nil then
-        return
-    end
-    _____4E34_65F6_8C03_6574_653B_51FB(item["单位"], -item["攻击"])
-end
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C = ____20_FF0E_7269_54C1_8F85_52A9["施加临时属性效果"]
 ____exports["处理精灵号角使用"] = function(ctx)
     if not _____662F_5426_4E3A_4F7F_7528_7269_54C1(ctx["物品"], _____7269_54C1_4F7F_7528_88C5_5907ID["精灵号角"]) then
         return
@@ -35,8 +26,6 @@ ____exports["处理精灵号角使用"] = function(ctx)
         return
     end
     local attack = cfg["精灵号角每单位攻击"] * count
-    _____4E34_65F6_8C03_6574_653B_51FB(unit, attack)
-    _____56DE_9000_961F_5217[#_____56DE_9000_961F_5217 + 1] = {["单位"] = unit, ["攻击"] = attack}
-    addDelayedCallback(cfg["持续毫秒"], _____56DE_9000_7CBE_7075_53F7_89D2_52A0_6210)
+    _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C(unit, cfg["持续毫秒"], {{["类型"] = "攻击", ["数值"] = attack}})
 end
 return ____exports

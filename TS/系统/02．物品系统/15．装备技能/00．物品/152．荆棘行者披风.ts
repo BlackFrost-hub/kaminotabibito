@@ -1,17 +1,21 @@
 /** @noSelfInFile */
 
-import { 单位持有第二章后段Boss战利品, 是纯普攻, 造成装备伤害, 第二章后段Boss战利品装备名, 装备伤害类型 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 造成装备伤害, 取攻击力, 第二章后段Boss战利品装备名, 装备伤害类型 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
-
-function on荆棘行者披风受击(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (!(applied > 0) || !是纯普攻(snapshot)) return;
-  if (!单位持有第二章后段Boss战利品(target, 第二章后段Boss战利品装备名.荆棘行者披风)) return;
-  造成装备伤害(target, attacker, 190, 装备伤害类型.自然);
+function on荆棘行者披风触发(this: void, event: any): void {
+  const target = event.目标;
+  const attacker = event.攻击者;
+  造成装备伤害(target, attacker, 取攻击力(target) * 0.25, 装备伤害类型.自然);
 }
 
-registerAppliedFinalDamageListener(on荆棘行者披风受击);
+注册最终伤害触发模板({
+  名称: "荆棘行者披风",
+  装备名: 第二章后段Boss战利品装备名.荆棘行者披风,
+  持有者: "受击者",
+  伤害过滤: "纯普攻",
+  要求双方存活: false,
+  on触发: on荆棘行者披风触发,
+});
 
 export {};

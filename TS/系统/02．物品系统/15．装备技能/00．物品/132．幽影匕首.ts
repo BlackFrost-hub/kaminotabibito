@@ -11,7 +11,7 @@ const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const bj_RADTODEG = jass.bj_RADTODEG as number;
 
 const 幽影命中小爆点特效 = "Common\\Effect\\Element\\Dark\\ShadowHitBurst.mdx";
-const 幽影匕首侧后方触发概率 = 0.25;
+const 幽影匕首侧后方触发概率 = 0.30;
 
 function 归一角度(this: void, angle: number): number {
   let result = angle;
@@ -42,8 +42,8 @@ function 计算幽影匕首触发概率(this: void, ctx: any): number {
   效果类型: "额外伤害",
   仅普通攻击: true,
   概率计算: 计算幽影匕首触发概率,
-  固定伤害: 260,
-  攻击系数: 0.35,
+  固定伤害: 300,
+  攻击系数: 0.45,
   伤害类型: "暗影",
   特效: 幽影命中小爆点特效,
 });

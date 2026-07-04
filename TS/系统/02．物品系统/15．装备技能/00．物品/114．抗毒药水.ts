@@ -2,29 +2,22 @@
 
 import type { 物品技能事件上下文 } from "../05．物品使用/00．公共/03．物品使用核心";
 import { 物品使用装备ID, 物品使用数值配置 } from "../05．物品使用/00．公共/01．物品使用配置表";
-import { 是否为使用物品, 取句柄ID } from "../05．物品使用/00．公共/02．物品使用工具";
+import { 是否为使用物品 } from "../05．物品使用/00．公共/02．物品使用工具";
+import { 取装备冷却键, 装备冷却中, 进入装备冷却 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
 
-const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  getServerTime: (this: void) => number;
-};
 const { 开始属性护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾") as {
   开始属性护盾: (this: void, unit: any, 属性: "毒", params: any) => number;
 };
 
 const 抗毒药水ID = 物品使用装备ID.抗毒药水;
 const 抗毒药水配置 = 物品使用数值配置.抗毒药水;
-const 冷却到期时间: Record<number, number | undefined> = {};
 
 export function 处理抗毒药水使用(this: void, ctx: 物品技能事件上下文): void {
   if (!是否为使用物品(ctx.物品, 抗毒药水ID)) return;
   const unit = ctx.施法单位;
-  const hid = 取句柄ID(unit);
-  if (hid === 0) return;
-
-  const now = getServerTime();
-  const cooldownEnd = 冷却到期时间[hid] ?? 0;
-  if (cooldownEnd > now) return;
-  冷却到期时间[hid] = now + 抗毒药水配置.冷却毫秒;
+  const 冷却键 = 取装备冷却键(unit, "抗毒药水", "物品使用");
+  if (装备冷却中(冷却键)) return;
+  进入装备冷却(冷却键, 抗毒药水配置.冷却毫秒 / 1000);
 
   开始属性护盾(unit, "毒", {
     数值: 抗毒药水配置.护盾值,

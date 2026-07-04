@@ -8,11 +8,10 @@ local _____53D6_6700_5927_751F_547D = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177[
 local _____53D6_6700_5927_9B54_6CD5 = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["取最大魔法"]
 local _____9020_6210_4F24_5BB3_4E8B_4EF6_4F24_5BB3 = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["造成伤害事件伤害"]
 local _____4F24_5BB3_4E8B_4EF6_4F24_5BB3_7C7B_578B = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["伤害事件伤害类型"]
-local ____02_FF0E_4F24_5BB3_4E8B_4EF6_72B6_6001 = require("系统.02．物品系统.15．装备技能.04．伤害事件.00．公共.02．伤害事件状态")
-local _____5355_4F4D_51B7_5374_4E2D = ____02_FF0E_4F24_5BB3_4E8B_4EF6_72B6_6001["单位冷却中"]
-local _____8BBE_7F6E_5355_4F4D_51B7_5374 = ____02_FF0E_4F24_5BB3_4E8B_4EF6_72B6_6001["设置单位冷却"]
-local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
+local ____07_FF0E_88C5_5907_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．装备辅助")
+local _____53D6_88C5_5907_51B7_5374_952E = ____07_FF0E_88C5_5907_8F85_52A9["取装备冷却键"]
+local _____88C5_5907_51B7_5374_4E2D = ____07_FF0E_88C5_5907_8F85_52A9["装备冷却中"]
+local _____8FDB_5165_88C5_5907_51B7_5374 = ____07_FF0E_88C5_5907_8F85_52A9["进入装备冷却"]
 ____exports["处理地狱火卡牌魔法造成伤害"] = function(ctx)
     if not _____5355_4F4D_6301_6709_4F24_5BB3_4E8B_4EF6_88C5_5907(ctx.attacker, _____4F24_5BB3_4E8B_4EF6_88C5_5907ID["地狱火卡牌魔法"]) then
         return
@@ -20,11 +19,11 @@ ____exports["处理地狱火卡牌魔法造成伤害"] = function(ctx)
     if ctx.applied < 200 or ctx.applied < _____53D6_6700_5927_751F_547D(ctx.target) * 0.01 then
         return
     end
-    local _____51B7_5374_952E = "地狱火卡牌魔法:" .. tostring(GetHandleId(ctx.attacker))
-    if _____5355_4F4D_51B7_5374_4E2D(_____51B7_5374_952E) then
+    local _____51B7_5374_952E = _____53D6_88C5_5907_51B7_5374_952E(ctx.attacker, "地狱火卡牌魔法", "伤害事件装备")
+    if _____88C5_5907_51B7_5374_4E2D(_____51B7_5374_952E) then
         return
     end
-    _____8BBE_7F6E_5355_4F4D_51B7_5374(_____51B7_5374_952E, 1)
+    _____8FDB_5165_88C5_5907_51B7_5374(_____51B7_5374_952E, 1)
     _____9020_6210_4F24_5BB3_4E8B_4EF6_4F24_5BB3(
         ctx.attacker,
         ctx.target,

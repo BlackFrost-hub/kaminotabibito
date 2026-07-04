@@ -6,14 +6,17 @@ local ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177 = require("系统.02．物品系
 local _____5355_4F4D_6301_6709_4F24_5BB3_4E8B_4EF6_88C5_5907 = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["单位持有伤害事件装备"]
 local _____9020_6210_4F24_5BB3_4E8B_4EF6_4F24_5BB3 = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["造成伤害事件伤害"]
 local _____4F24_5BB3_4E8B_4EF6_4F24_5BB3_7C7B_578B = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5DE5_5177["伤害事件伤害类型"]
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local getServerTime = ____require_result_0.getServerTime
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
-local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
+local ____09_FF0E_88C5_5907_901A_7528_673A_5236 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.index")
+local _____521B_5EFA_5355_4F4D_65F6_9650_6807_8BB0 = ____09_FF0E_88C5_5907_901A_7528_673A_5236["创建单位时限标记"]
+local ____07_FF0E_88C5_5907_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.07．装备辅助")
+local _____53D6_88C5_5907_51B7_5374_952E = ____07_FF0E_88C5_5907_8F85_52A9["取装备冷却键"]
+local _____88C5_5907_51B7_5374_5C31_7EEA = ____07_FF0E_88C5_5907_8F85_52A9["装备冷却就绪"]
+local _____8FDB_5165_88C5_5907_51B7_5374 = ____07_FF0E_88C5_5907_8F85_52A9["进入装备冷却"]
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____5EF6_8FDF_6267_884C = ____20_FF0E_7269_54C1_8F85_52A9["延迟执行"]
+local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
+local _____5355_4F4D_62E5_6709_4EFB_610FBuff = ____require_result_0["单位拥有任意Buff"]
+local _____6708_5149_9501_94FE_62A4_8155_51CF_4F24_6807_8BB0 = _____521B_5EFA_5355_4F4D_65F6_9650_6807_8BB0("月光锁链护腕减伤")
 local _____6708_5149_9501_94FE_62A4_8155_63A7_5236Buff_5217_8868 = {
     "C001",
     "C002",
@@ -26,78 +29,19 @@ local _____6708_5149_9501_94FE_62A4_8155_63A7_5236Buff_5217_8868 = {
     "C009",
     "C023"
 }
-local _____6708_5149_9501_94FE_62A4_8155_63A7_5236BuffID_5217_8868 = {}
-local _____6708_5149_9501_94FE_62A4_8155_51B7_5374_8868 = {}
-local _____6708_5149_9501_94FE_62A4_8155_51CF_4F24_5230_671F_8868 = {}
-local _____6708_5149_9501_94FE_62A4_8155_53CD_4F24_961F_5217 = {}
-local function _____521D_59CB_5316_6708_5149_9501_94FE_62A4_8155BuffID()
-    if #_____6708_5149_9501_94FE_62A4_8155_63A7_5236BuffID_5217_8868 > 0 then
+local function _____89E6_53D1_6708_5149_9501_94FE_62A4_8155(target, attacker, amount)
+    local key = _____53D6_88C5_5907_51B7_5374_952E(target, "月光锁链护腕", "伤害事件装备")
+    if not _____88C5_5907_51B7_5374_5C31_7EEA(key) then
         return
     end
-    do
-        local i = 0
-        while i < #_____6708_5149_9501_94FE_62A4_8155_63A7_5236Buff_5217_8868 do
-            local id = stringToFourCCSafe(_____6708_5149_9501_94FE_62A4_8155_63A7_5236Buff_5217_8868[i + 1])
-            if id ~= 0 then
-                _____6708_5149_9501_94FE_62A4_8155_63A7_5236BuffID_5217_8868[#_____6708_5149_9501_94FE_62A4_8155_63A7_5236BuffID_5217_8868 + 1] = id
-            end
-            i = i + 1
+    _____8FDB_5165_88C5_5907_51B7_5374(key, 12)
+    _____6708_5149_9501_94FE_62A4_8155_51CF_4F24_6807_8BB0["标记"](_____6708_5149_9501_94FE_62A4_8155_51CF_4F24_6807_8BB0, target, 2)
+    _____5EF6_8FDF_6267_884C(
+        1,
+        function()
+            _____9020_6210_4F24_5BB3_4E8B_4EF6_4F24_5BB3(target, attacker, amount, _____4F24_5BB3_4E8B_4EF6_4F24_5BB3_7C7B_578B["强化"])
         end
-    end
-end
-local function _____5355_4F4D_5904_4E8E_63A7_5236_4E2D(unit)
-    if unit == nil or unit == 0 then
-        return false
-    end
-    _____521D_59CB_5316_6708_5149_9501_94FE_62A4_8155BuffID()
-    do
-        local i = 0
-        while i < #_____6708_5149_9501_94FE_62A4_8155_63A7_5236BuffID_5217_8868 do
-            if GetUnitAbilityLevel(unit, _____6708_5149_9501_94FE_62A4_8155_63A7_5236BuffID_5217_8868[i + 1]) > 0 then
-                return true
-            end
-            i = i + 1
-        end
-    end
-    return false
-end
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
-local function _____6708_5149_9501_94FE_62A4_8155_51B7_5374_901A_8FC7(unitId)
-    if unitId == 0 then
-        return false
-    end
-    local now = getServerTime()
-    local last = _____6708_5149_9501_94FE_62A4_8155_51B7_5374_8868[unitId]
-    if last ~= nil and now - last < 12000 then
-        return false
-    end
-    _____6708_5149_9501_94FE_62A4_8155_51B7_5374_8868[unitId] = now
-    _____6708_5149_9501_94FE_62A4_8155_51CF_4F24_5230_671F_8868[unitId] = now + 2000
-    return true
-end
-local function _____6708_5149_9501_94FE_62A4_8155_51CF_4F24_4E2D(unitId)
-    if unitId == 0 then
-        return false
-    end
-    local ____end = _____6708_5149_9501_94FE_62A4_8155_51CF_4F24_5230_671F_8868[unitId]
-    return ____end ~= nil and getServerTime() < ____end
-end
-local function _____6267_884C_6708_5149_9501_94FE_62A4_8155_53CD_4F24()
-    while #_____6708_5149_9501_94FE_62A4_8155_53CD_4F24_961F_5217 > 0 do
-        do
-            local item = table.remove(_____6708_5149_9501_94FE_62A4_8155_53CD_4F24_961F_5217, 1)
-            if item == nil then
-                goto __continue20
-            end
-            _____9020_6210_4F24_5BB3_4E8B_4EF6_4F24_5BB3(item.source, item.target, item.amount, _____4F24_5BB3_4E8B_4EF6_4F24_5BB3_7C7B_578B["强化"])
-        end
-        ::__continue20::
-    end
+    )
 end
 ____exports["处理月光锁链护腕伤害修正"] = function(context)
     local target = context.target
@@ -108,12 +52,10 @@ ____exports["处理月光锁链护腕伤害修正"] = function(context)
     if not _____5355_4F4D_6301_6709_4F24_5BB3_4E8B_4EF6_88C5_5907(target, _____4F24_5BB3_4E8B_4EF6_88C5_5907ID["月光锁链护腕"]) then
         return context.currentDamage
     end
-    local targetId = _____53D6_5355_4F4D_53E5_67C4ID(target)
-    if _____5355_4F4D_5904_4E8E_63A7_5236_4E2D(target) and _____6708_5149_9501_94FE_62A4_8155_51B7_5374_901A_8FC7(targetId) then
-        _____6708_5149_9501_94FE_62A4_8155_53CD_4F24_961F_5217[#_____6708_5149_9501_94FE_62A4_8155_53CD_4F24_961F_5217 + 1] = {source = target, target = attacker, amount = context.currentDamage * 0.3}
-        addDelayedCallback(1, _____6267_884C_6708_5149_9501_94FE_62A4_8155_53CD_4F24)
+    if _____5355_4F4D_62E5_6709_4EFB_610FBuff(target, _____6708_5149_9501_94FE_62A4_8155_63A7_5236Buff_5217_8868) then
+        _____89E6_53D1_6708_5149_9501_94FE_62A4_8155(target, attacker, context.currentDamage * 0.3)
     end
-    if not _____6708_5149_9501_94FE_62A4_8155_51CF_4F24_4E2D(targetId) then
+    if not _____6708_5149_9501_94FE_62A4_8155_51CF_4F24_6807_8BB0["存在"](_____6708_5149_9501_94FE_62A4_8155_51CF_4F24_6807_8BB0, target) then
         return context.currentDamage
     end
     return context.currentDamage * 0.7

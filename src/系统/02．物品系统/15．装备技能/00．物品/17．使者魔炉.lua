@@ -5,6 +5,9 @@ local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品�
 local _____4F7F_8005_9B54_7089_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["使者魔炉物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____4F7F_8005_9B54_7089_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["使者魔炉配置"]
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____20_FF0E_7269_54C1_8F85_52A9["调整玩家属性"]
+local _____8C03_6574_5355_4F4D_5C5E_6027 = ____20_FF0E_7269_54C1_8F85_52A9["调整单位属性"]
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_0.debugLogForce
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
@@ -17,13 +20,8 @@ local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_2["获�
 local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_2["单位是否有效且敌对"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.23．光环.01．范围光环")
 local _____6CE8_518C_6301_6709_578B_8303_56F4_5149_73AF = ____require_result_3["注册持有型范围光环"]
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_4.YDUserDataGet
-local YDUserDataSet = ____require_result_4.YDUserDataSet
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_5.YDUserDataGetSafe
-local ____require_result_6 = require("系统.02．物品系统.15．装备技能.05．物品使用.00．公共.02．物品使用工具")
-local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_6["调整玩家属性"]
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -46,18 +44,7 @@ local function _____662F_5426_4E3A_4F7F_8005_9B54_7089(_____7269_54C1)
     return GetItemTypeId(_____7269_54C1) == _____4F7F_8005_9B54_7089_7269_54C1ID
 end
 local function _____8C03_6574_547D_4E2D_7387(_____5355_4F4D, _____53D8_5316_503C)
-    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
-        return
-    end
-    local _____5DF2_5B58_503C = YDUserDataGet("unit", _____5355_4F4D, _____547D_4E2D_7387_5B57_6BB5, "real")
-    local _____5F53_524D_503C = _____5DF2_5B58_503C == nil and 0 or _____5DF2_5B58_503C
-    YDUserDataSet(
-        "unit",
-        _____5355_4F4D,
-        _____547D_4E2D_7387_5B57_6BB5,
-        "real",
-        _____5F53_524D_503C + _____53D8_5316_503C
-    )
+    _____8C03_6574_5355_4F4D_5C5E_6027(_____5355_4F4D, _____547D_4E2D_7387_5B57_6BB5, _____53D8_5316_503C)
 end
 local function _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4()
     return YDUserDataGetSafe("string", "玩家英雄", _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4_952E, "group")
@@ -95,20 +82,20 @@ local function ____on_4F7F_8005_9B54_7089_7279_6548_9A71_52A8()
                 local _____4E0A_4E0B_6587 = _____4F7F_8005_9B54_7089_7279_6548_4E0A_4E0B_6587_5217_8868[i + 1]
                 if _____4E0A_4E0B_6587["特效"] == nil or _____4E0A_4E0B_6587["特效"] == 0 then
                     __TS__ArraySplice(_____4F7F_8005_9B54_7089_7279_6548_4E0A_4E0B_6587_5217_8868, i, 1)
-                    goto __continue17
+                    goto __continue16
                 end
                 if _____5F53_524D_65F6_95F4 < _____4E0A_4E0B_6587["下次触发时间"] then
-                    goto __continue17
+                    goto __continue16
                 end
                 _____4E0A_4E0B_6587["次数"] = _____4E0A_4E0B_6587["次数"] + 1
                 if _____4E0A_4E0B_6587["次数"] >= _____4F7F_8005_9B54_7089_914D_7F6E["特效放大次数"] then
                     __TS__ArraySplice(_____4F7F_8005_9B54_7089_7279_6548_4E0A_4E0B_6587_5217_8868, i, 1)
-                    goto __continue17
+                    goto __continue16
                 end
                 EXSetEffectSize(_____4E0A_4E0B_6587["特效"], _____4F7F_8005_9B54_7089_914D_7F6E["特效放大基值"] + _____4E0A_4E0B_6587["次数"])
                 _____4E0A_4E0B_6587["下次触发时间"] = _____5F53_524D_65F6_95F4 + _____4F7F_8005_9B54_7089_914D_7F6E["特效放大周期"] * 1000
             end
-            ::__continue17::
+            ::__continue16::
             i = i - 1
         end
     end
@@ -121,7 +108,7 @@ local function ____on_4F7F_8005_9B54_7089_6062_590D_9A71_52A8()
             do
                 local _____4E0A_4E0B_6587 = _____4F7F_8005_9B54_7089_6062_590D_4E0A_4E0B_6587_5217_8868[i + 1]
                 if _____5F53_524D_65F6_95F4 < _____4E0A_4E0B_6587["到期时间"] then
-                    goto __continue23
+                    goto __continue22
                 end
                 do
                     local j = 0
@@ -136,7 +123,7 @@ local function ____on_4F7F_8005_9B54_7089_6062_590D_9A71_52A8()
                 end
                 __TS__ArraySplice(_____4F7F_8005_9B54_7089_6062_590D_4E0A_4E0B_6587_5217_8868, i, 1)
             end
-            ::__continue23::
+            ::__continue22::
             i = i - 1
         end
     end
@@ -224,12 +211,12 @@ ____exports["处理使者魔炉使用"] = function(_____4E0A_4E0B_6587)
             do
                 local _____654C_4EBA = _____654C_4EBA_5217_8868[i + 1]
                 if not _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9(_____654C_4EBA, _____65BD_6CD5_5355_4F4D) then
-                    goto __continue44
+                    goto __continue43
                 end
                 _____8C03_6574_547D_4E2D_7387(_____654C_4EBA, -_____4F7F_8005_9B54_7089_914D_7F6E["命中率削减"])
                 _____547D_4E2D_76EE_6807_5217_8868[#_____547D_4E2D_76EE_6807_5217_8868 + 1] = _____654C_4EBA
             end
-            ::__continue44::
+            ::__continue43::
             i = i + 1
         end
     end

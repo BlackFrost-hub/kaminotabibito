@@ -8,8 +8,8 @@ createEquipmentItem('I0EA', '腐化猫爪手套', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[道具/手套]-攻击效果|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n攻击力+155|n敏捷+38|n暴击率+18%|n攻击速度+35%|n|cffffffcc[特效]|r|n腐化撕裂：攻击效果有15%概率额外造成750点毒素伤害。|n|cFF808080米亚失控后残留的爪痕凝成手套，仍带着潮湿的腐化气味。|r',
-  description = '|cffccffff[道具/手套]-攻击效果|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n攻击力+155|n敏捷+38|n暴击率+18%|n攻击速度+35%|n|cffffffcc[特效]|r|n腐化撕裂：攻击效果有15%概率额外造成750点毒素伤害。|n|cFF808080米亚失控后残留的爪痕凝成手套，仍带着潮湿的腐化气味。|r',
+  tooltipExtended = '|cffccffff[道具/手套]-攻击效果|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n攻击力+130|n敏捷+38|n暴击率+18%|n攻击速度+35%|n|cffffffcc[特效]|r|n腐化撕裂：攻击效果有15%概率额外造成攻击力50%的毒素伤害。|n|cFF808080米亚失控后残留的爪痕凝成手套，仍带着潮湿的腐化气味。|r',
+  description = '|cffccffff[道具/手套]-攻击效果|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n攻击力+130|n敏捷+38|n暴击率+18%|n攻击速度+35%|n|cffffffcc[特效]|r|n腐化撕裂：攻击效果有15%概率额外造成攻击力50%的毒素伤害。|n|cFF808080米亚失控后残留的爪痕凝成手套，仍带着潮湿的腐化气味。|r',
 })
 
 createEquipmentItem('I0EB', '纯净水源吊坠', {
@@ -56,8 +56,8 @@ createEquipmentItem('I0EF', '地核熔炉之心', {
   classification = 'PowerUp',
   level = 7,
   priority = 1000,
-  tooltipExtended = '|cffccffff[道具/饰品]-力量/火焰|r|n|cffffcc99等级：B+|n评分：9300|r|n|cffffffcc[基础属性]|r|n力量+45|n智力+45|n生命值+1800|n火属性伤害+22%|n|cffffffcc[特效]|r|n熔炉余烬：攻击效果有10%概率对目标周围敌人造成550点火焰伤害。|n|cFF808080地核熔炉的余温被封入核心，握住它时能听见深处的低鸣。|r',
-  description = '|cffccffff[道具/饰品]-力量/火焰|r|n|cffffcc99等级：B+|n评分：9300|r|n|cffffffcc[基础属性]|r|n力量+45|n智力+45|n生命值+1800|n火属性伤害+22%|n|cffffffcc[特效]|r|n熔炉余烬：攻击效果有10%概率对目标周围敌人造成550点火焰伤害。|n|cFF808080地核熔炉的余温被封入核心，握住它时能听见深处的低鸣。|r',
+  tooltipExtended = '|cffccffff[道具/饰品]-力量/火焰|r|n|cffffcc99等级：B+|n评分：9300|r|n|cffffffcc[基础属性]|r|n力量+45|n智力+45|n生命值+1800|n火属性伤害+22%|n|cffffffcc[特效]|r|n熔炉余烬：攻击效果有10%概率对目标周围敌人造成攻击力40%的火焰伤害。|n|cFF808080地核熔炉的余温被封入核心，握住它时能听见深处的低鸣。|r',
+  description = '|cffccffff[道具/饰品]-力量/火焰|r|n|cffffcc99等级：B+|n评分：9300|r|n|cffffffcc[基础属性]|r|n力量+45|n智力+45|n生命值+1800|n火属性伤害+22%|n|cffffffcc[特效]|r|n熔炉余烬：攻击效果有10%概率对目标周围敌人造成攻击力40%的火焰伤害。|n|cFF808080地核熔炉的余温被封入核心，握住它时能听见深处的低鸣。|r',
 })
 
 createEquipmentItem('I0EI', '锻造者手套', {
@@ -68,8 +68,8 @@ createEquipmentItem('I0EI', '锻造者手套', {
   classification = 'PowerUp',
   level = 7,
   priority = 1000,
-  tooltipExtended = '|cffccffff[道具/手套]-普攻/破甲|r|n|cffffcc99等级：B+|n评分：8700|r|n|cffffffcc[基础属性]|r|n攻击力+170|n力量+35|n护甲穿透+18%|n攻击速度+25%|n|cffffffcc[特效]|r|n熔锤烙印：普通攻击有15%概率额外造成650点火焰伤害。|n|cFF808080格鲁姆的炉火仍留在指节之间，每次握拳都像一次锻打。|r',
-  description = '|cffccffff[道具/手套]-普攻/破甲|r|n|cffffcc99等级：B+|n评分：8700|r|n|cffffffcc[基础属性]|r|n攻击力+170|n力量+35|n护甲穿透+18%|n攻击速度+25%|n|cffffffcc[特效]|r|n熔锤烙印：普通攻击有15%概率额外造成650点火焰伤害。|n|cFF808080格鲁姆的炉火仍留在指节之间，每次握拳都像一次锻打。|r',
+  tooltipExtended = '|cffccffff[道具/手套]-普攻/破甲|r|n|cffffcc99等级：B+|n评分：8700|r|n|cffffffcc[基础属性]|r|n攻击力+160|n力量+35|n护甲穿透+18%|n攻击速度+25%|n|cffffffcc[特效]|r|n熔锤烙印：普通攻击有15%概率额外造成攻击力50%的火焰伤害。|n|cFF808080格鲁姆的炉火仍留在指节之间，每次握拳都像一次锻打。|r',
+  description = '|cffccffff[道具/手套]-普攻/破甲|r|n|cffffcc99等级：B+|n评分：8700|r|n|cffffffcc[基础属性]|r|n攻击力+160|n力量+35|n护甲穿透+18%|n攻击速度+25%|n|cffffffcc[特效]|r|n熔锤烙印：普通攻击有15%概率额外造成攻击力50%的火焰伤害。|n|cFF808080格鲁姆的炉火仍留在指节之间，每次握拳都像一次锻打。|r',
 })
 
 createEquipmentItem('I0EJ', '冰焰宝珠', {
@@ -80,8 +80,8 @@ createEquipmentItem('I0EJ', '冰焰宝珠', {
   classification = 'PowerUp',
   level = 7,
   priority = 1000,
-  tooltipExtended = '|cffccffff[道具/饰品]-法术/元素|r|n|cffffcc99等级：B+|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n法术伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n|cffffffcc[特效]|r|n冰焰回响：攻击效果有12%概率额外造成700点精神伤害。|n|cFF808080塞拉凝结的冰焰在珠心缓慢翻涌，冷光与火光互不退让。|r',
-  description = '|cffccffff[道具/饰品]-法术/元素|r|n|cffffcc99等级：B+|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n法术伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n|cffffffcc[特效]|r|n冰焰回响：攻击效果有12%概率额外造成700点精神伤害。|n|cFF808080塞拉凝结的冰焰在珠心缓慢翻涌，冷光与火光互不退让。|r',
+  tooltipExtended = '|cffccffff[道具/饰品]-法术/元素|r|n|cffffcc99等级：B+|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n法术伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n|cffffffcc[特效]|r|n冰焰回响：攻击效果有12%概率额外造成攻击力120%的通用伤害。|n|cFF808080塞拉凝结的冰焰在珠心缓慢翻涌，冷光与火光互不退让。|r',
+  description = '|cffccffff[道具/饰品]-法术/元素|r|n|cffffcc99等级：B+|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n法术伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n|cffffffcc[特效]|r|n冰焰回响：攻击效果有12%概率额外造成攻击力120%的通用伤害。|n|cFF808080塞拉凝结的冰焰在珠心缓慢翻涌，冷光与火光互不退让。|r',
 })
 
 createEquipmentItem('I0EK', '双卫之誓', {
@@ -128,8 +128,8 @@ createEquipmentItem('I0EN', '怨火核心碎片', {
   classification = 'PowerUp',
   level = 7,
   priority = 1000,
-  tooltipExtended = '|cffccffff[道具/材料]-法术/怨火|r|n|cffffcc99等级：B++|n评分：9600|r|n|cffffffcc[基础属性]|r|n智力+60|n法术伤害+22%|n暗属性伤害+20%|n魔法穿透+18%|n|cffffffcc[特效]|r|n怨火灼痕：技能造成伤害时，额外附加260点暗影伤害，冷却2秒。|n|cFF808080凤凰骸骨中剥落的核心碎片，灼热里混着不肯熄灭的怨念。|r',
-  description = '|cffccffff[道具/材料]-法术/怨火|r|n|cffffcc99等级：B++|n评分：9600|r|n|cffffffcc[基础属性]|r|n智力+60|n法术伤害+22%|n暗属性伤害+20%|n魔法穿透+18%|n|cffffffcc[特效]|r|n怨火灼痕：技能造成伤害时，额外附加260点暗影伤害，冷却2秒。|n|cFF808080凤凰骸骨中剥落的核心碎片，灼热里混着不肯熄灭的怨念。|r',
+  tooltipExtended = '|cffccffff[道具/材料]-法术/怨火|r|n|cffffcc99等级：B++|n评分：9600|r|n|cffffffcc[基础属性]|r|n智力+60|n法术伤害+22%|n暗属性伤害+20%|n魔法穿透+18%|n|cffffffcc[特效]|r|n怨火灼痕：技能造成伤害时，额外附加攻击力100%的暗影伤害，冷却2秒。|n|cFF808080凤凰骸骨中剥落的核心碎片，灼热里混着不肯熄灭的怨念。|r',
+  description = '|cffccffff[道具/材料]-法术/怨火|r|n|cffffcc99等级：B++|n评分：9600|r|n|cffffffcc[基础属性]|r|n智力+60|n法术伤害+22%|n暗属性伤害+20%|n魔法穿透+18%|n|cffffffcc[特效]|r|n怨火灼痕：技能造成伤害时，额外附加攻击力100%的暗影伤害，冷却2秒。|n|cFF808080凤凰骸骨中剥落的核心碎片，灼热里混着不肯熄灭的怨念。|r',
 })
 
 createEquipmentItem('I0EQ', '菲尼克斯尔的宠物蛋', {
@@ -152,8 +152,8 @@ createEquipmentItem('I0FD', '菲利斯的统御纹章', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[饰品]-法术/统御|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+34|n魔法值+900|n冷却缩减+8%|n全属性+10|n|cFF808080纹章背面刻着攻城军令，银白边缘仍有号令战场的冷光。|r',
-  description = '|cffccffff[饰品]-法术/统御|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+34|n魔法值+900|n冷却缩减+8%|n全属性+10|n|cFF808080纹章背面刻着攻城军令，银白边缘仍有号令战场的冷光。|r',
+  tooltipExtended = '|cffccffff[饰品]-法术/统御|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+38|n魔法值+1000|n冷却缩减+10%|n全属性+14|n|cffffffcc[特效]|r|n统御号令：技能造成伤害时，使650范围内友方获得10%魔法伤害，持续6秒，冷却10秒。|n|cFF808080纹章背面刻着攻城军令，银白边缘仍有号令战场的冷光。|r',
+  description = '|cffccffff[饰品]-法术/统御|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+38|n魔法值+1000|n冷却缩减+10%|n全属性+14|n|cffffffcc[特效]|r|n统御号令：技能造成伤害时，使650范围内友方获得10%魔法伤害，持续6秒，冷却10秒。|n|cFF808080纹章背面刻着攻城军令，银白边缘仍有号令战场的冷光。|r',
 })
 
 createEquipmentItem('I0FE', '剑魂狼牙坠', {
@@ -164,8 +164,8 @@ createEquipmentItem('I0FE', '剑魂狼牙坠', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[饰品]-法术/召唤|r|n|cffffcc99等级：B|n评分：6200|r|n|cffffffcc[基础属性]|r|n智力+32|n精神+18|n魔法恢复+18|n风属性伤害+12%|n|cFF808080狼牙里封着一缕剑魂，贴近耳边时能听见奔袭前的低鸣。|r',
-  description = '|cffccffff[饰品]-法术/召唤|r|n|cffffcc99等级：B|n评分：6200|r|n|cffffffcc[基础属性]|r|n智力+32|n精神+18|n魔法恢复+18|n风属性伤害+12%|n|cFF808080狼牙里封着一缕剑魂，贴近耳边时能听见奔袭前的低鸣。|r',
+  tooltipExtended = '|cffccffff[饰品]-法术/召唤|r|n|cffffcc99等级：B|n评分：6200|r|n|cffffffcc[基础属性]|r|n智力+40|n魔法恢复+24|n法术伤害+16%|n|cffffffcc[特效]|r|n剑魂奔袭：技能造成伤害时，有15%概率额外造成攻击力35%的风属性伤害，并恢复80点魔法。|n|cFF808080狼牙里封着一缕剑魂，贴近耳边时能听见奔袭前的低鸣。|r',
+  description = '|cffccffff[饰品]-法术/召唤|r|n|cffffcc99等级：B|n评分：6200|r|n|cffffffcc[基础属性]|r|n智力+40|n魔法恢复+24|n法术伤害+16%|n|cffffffcc[特效]|r|n剑魂奔袭：技能造成伤害时，有15%概率额外造成攻击力35%的风属性伤害，并恢复80点魔法。|n|cFF808080狼牙里封着一缕剑魂，贴近耳边时能听见奔袭前的低鸣。|r',
 })
 
 createEquipmentItem('I0ET', '封印斩护腕', {
@@ -176,8 +176,8 @@ createEquipmentItem('I0ET', '封印斩护腕', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[手套]-冷却/防护|r|n|cffffcc99等级：B|n评分：6050|r|n|cffffffcc[基础属性]|r|n冷却缩减+9%|n魔法抗性+15%|n韧性+15%|n护甲+12|n|cFF808080护腕内侧刻有封印斩的短咒，适合在技能空窗期护住施法者。|r',
-  description = '|cffccffff[手套]-冷却/防护|r|n|cffffcc99等级：B|n评分：6050|r|n|cffffffcc[基础属性]|r|n冷却缩减+9%|n魔法抗性+15%|n韧性+15%|n护甲+12|n|cFF808080护腕内侧刻有封印斩的短咒，适合在技能空窗期护住施法者。|r',
+  tooltipExtended = '|cffccffff[手套]-冷却/防护|r|n|cffffcc99等级：B|n评分：6050|r|n|cffffffcc[基础属性]|r|n生命值+1600|n护甲+22|n魔法抗性+22%|n韧性+25%|n冷却缩减+10%|n|cffffffcc[特效]|r|n封印护体：受到超过最大生命10%的单次伤害时，本次伤害降低35%，并获得40%韧性，持续4秒，冷却14秒。|n|cFF808080护腕内侧刻有封印斩的短咒，适合在技能空窗期护住施法者。|r',
+  description = '|cffccffff[手套]-冷却/防护|r|n|cffffcc99等级：B|n评分：6050|r|n|cffffffcc[基础属性]|r|n生命值+1600|n护甲+22|n魔法抗性+22%|n韧性+25%|n冷却缩减+10%|n|cffffffcc[特效]|r|n封印护体：受到超过最大生命10%的单次伤害时，本次伤害降低35%，并获得40%韧性，持续4秒，冷却14秒。|n|cFF808080护腕内侧刻有封印斩的短咒，适合在技能空窗期护住施法者。|r',
 })
 
 createEquipmentItem('I0EV', '攻城号令圣印', {
@@ -188,8 +188,8 @@ createEquipmentItem('I0EV', '攻城号令圣印', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[饰品/辅助]-团队续航|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n冷却缩减+10%|n技能治疗率+16%|n魔法消耗减少+8%|n生命值+1200|n|cFF808080圣印曾用于传达攻城号令，如今更适合稳住队伍的治疗节奏。|r',
-  description = '|cffccffff[饰品/辅助]-团队续航|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n冷却缩减+10%|n技能治疗率+16%|n魔法消耗减少+8%|n生命值+1200|n|cFF808080圣印曾用于传达攻城号令，如今更适合稳住队伍的治疗节奏。|r',
+  tooltipExtended = '|cffccffff[饰品/辅助]-团队续航|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n生命值+1600|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n|cffffffcc[特效]|r|n攻城号令：技能造成伤害时，使650范围内友方受到治疗率提高16%，持续6秒；生命低于50%的友方额外获得850护盾，持续5秒，冷却12秒。|n|cFF808080圣印曾用于传达攻城号令，如今更适合稳住队伍的治疗节奏。|r',
+  description = '|cffccffff[饰品/辅助]-团队续航|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n生命值+1600|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n|cffffffcc[特效]|r|n攻城号令：技能造成伤害时，使650范围内友方受到治疗率提高16%，持续6秒；生命低于50%的友方额外获得850护盾，持续5秒，冷却12秒。|n|cFF808080圣印曾用于传达攻城号令，如今更适合稳住队伍的治疗节奏。|r',
 })
 
 createEquipmentItem('I0EW', '灵心之碎片', {
@@ -200,8 +200,8 @@ createEquipmentItem('I0EW', '灵心之碎片', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[特殊/饰品]-剧情/风灵|r|n|cffffcc99等级：B|n评分：6450|r|n|cffffffcc[基础属性]|r|n智力+30|n全属性+18|n精神+22|n冷却缩减+8%|n风属性抗性+15%|n|cFF808080碎片中仍有一颗灵心跳动，像把死神阴影外的微光留了下来。|r',
-  description = '|cffccffff[特殊/饰品]-剧情/风灵|r|n|cffffcc99等级：B|n评分：6450|r|n|cffffffcc[基础属性]|r|n智力+30|n全属性+18|n精神+22|n冷却缩减+8%|n风属性抗性+15%|n|cFF808080碎片中仍有一颗灵心跳动，像把死神阴影外的微光留了下来。|r',
+  tooltipExtended = '|cffccffff[特殊/饰品]-剧情/风灵|r|n|cffffcc99等级：B|n评分：6450|r|n|cffffffcc[基础属性]|r|n智力+30|n全属性+18|n冷却缩减+8%|n魔法抗性+15%|n|cffffffcc[特效]|r|n灵心微光：受到致命伤害时保留1点生命，短暂无敌1秒并恢复10%最大生命，冷却120秒。|n|cFF808080碎片中仍有一颗灵心跳动，像把死神阴影外的微光留了下来。|r',
+  description = '|cffccffff[特殊/饰品]-剧情/风灵|r|n|cffffcc99等级：B|n评分：6450|r|n|cffffffcc[基础属性]|r|n智力+30|n全属性+18|n冷却缩减+8%|n魔法抗性+15%|n|cffffffcc[特效]|r|n灵心微光：受到致命伤害时保留1点生命，短暂无敌1秒并恢复10%最大生命，冷却120秒。|n|cFF808080碎片中仍有一颗灵心跳动，像把死神阴影外的微光留了下来。|r',
 })
 
 createEquipmentItem('I0EZ', '湮灭之风戒指', {
@@ -212,8 +212,8 @@ createEquipmentItem('I0EZ', '湮灭之风戒指', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[戒指]-法术/风压|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n智力+34|n技能伤害+14%|n控制命中+10%|n精神+20|n|cFF808080戒面里的小型风眼不断收束，仿佛下一瞬就要卷走声音。|r',
-  description = '|cffccffff[戒指]-法术/风压|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n智力+34|n技能伤害+14%|n控制命中+10%|n精神+20|n|cFF808080戒面里的小型风眼不断收束，仿佛下一瞬就要卷走声音。|r',
+  tooltipExtended = '|cffccffff[戒指]-法术/风压|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n智力+40|n法术伤害+18%|n控制命中+12%|n魔法恢复+24|n|cffffffcc[特效]|r|n湮灭风压：技能造成伤害时，额外造成攻击力30%的风属性伤害并沉默目标1.5秒，冷却11秒。|n|cFF808080戒面里的小型风眼不断收束，仿佛下一瞬就要卷走声音。|r',
+  description = '|cffccffff[戒指]-法术/风压|r|n|cffffcc99等级：B|n评分：6350|r|n|cffffffcc[基础属性]|r|n智力+40|n法术伤害+18%|n控制命中+12%|n魔法恢复+24|n|cffffffcc[特效]|r|n湮灭风压：技能造成伤害时，额外造成攻击力30%的风属性伤害并沉默目标1.5秒，冷却11秒。|n|cFF808080戒面里的小型风眼不断收束，仿佛下一瞬就要卷走声音。|r',
 })
 
 createEquipmentItem('I0F0', '卡瑟拉深渊法典', {
@@ -224,8 +224,8 @@ createEquipmentItem('I0F0', '卡瑟拉深渊法典', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[副手/书]-水雷法术|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n智力+46|n魔法值+1200|n水属性伤害+18%|n雷属性伤害+18%|n冷却缩减+10%|n|cFF808080法典页角渗着深海盐痕，翻页时有细小电弧在墨迹间游动。|r',
-  description = '|cffccffff[副手/书]-水雷法术|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n智力+46|n魔法值+1200|n水属性伤害+18%|n雷属性伤害+18%|n冷却缩减+10%|n|cFF808080法典页角渗着深海盐痕，翻页时有细小电弧在墨迹间游动。|r',
+  tooltipExtended = '|cffccffff[副手/书]-水雷法术|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n智力+46|n魔法值+1200|n水属性伤害+18%|n雷属性伤害+18%|n冷却缩减+10%|n|cffffffcc[特效]|r|n深渊湿痕：水属性技能伤害会给目标留下湿痕6秒；随后雷属性技能命中该目标时，额外造成本次伤害22%的雷属性伤害。|n|cFF808080法典页角渗着深海盐痕，翻页时有细小电弧在墨迹间游动。|r',
+  description = '|cffccffff[副手/书]-水雷法术|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n智力+46|n魔法值+1200|n水属性伤害+18%|n雷属性伤害+18%|n冷却缩减+10%|n|cffffffcc[特效]|r|n深渊湿痕：水属性技能伤害会给目标留下湿痕6秒；随后雷属性技能命中该目标时，额外造成本次伤害22%的雷属性伤害。|n|cFF808080法典页角渗着深海盐痕，翻页时有细小电弧在墨迹间游动。|r',
 })
 
 createEquipmentItem('I0F1', '电鳗共生指环', {
@@ -236,8 +236,8 @@ createEquipmentItem('I0F1', '电鳗共生指环', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[戒指]-雷法/恢复|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+42|n雷属性伤害+20%|n雷属性抗性+18%|n魔法恢复+24|n|cFF808080银环内侧嵌着共生电鳗的鳞片，潮湿时会发出细微蓝光。|r',
-  description = '|cffccffff[戒指]-雷法/恢复|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+42|n雷属性伤害+20%|n雷属性抗性+18%|n魔法恢复+24|n|cFF808080银环内侧嵌着共生电鳗的鳞片，潮湿时会发出细微蓝光。|r',
+  tooltipExtended = '|cffccffff[戒指]-雷法/恢复|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+42|n雷属性伤害+20%|n雷属性抗性+18%|n魔法恢复+24|n|cffffffcc[特效]|r|n共生电弧：技能造成伤害时，对目标附近最多3名敌人各造成攻击力35%的雷属性伤害，冷却8秒。|n|cFF808080银环内侧嵌着共生电鳗的鳞片，潮湿时会发出细微蓝光。|r',
+  description = '|cffccffff[戒指]-雷法/恢复|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+42|n雷属性伤害+20%|n雷属性抗性+18%|n魔法恢复+24|n|cffffffcc[特效]|r|n共生电弧：技能造成伤害时，对目标附近最多3名敌人各造成攻击力35%的雷属性伤害，冷却8秒。|n|cFF808080银环内侧嵌着共生电鳗的鳞片，潮湿时会发出细微蓝光。|r',
 })
 
 createEquipmentItem('I0F2', '触手残片护符', {
@@ -248,8 +248,8 @@ createEquipmentItem('I0F2', '触手残片护符', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[饰品]-生存/水抗|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+2800|n水属性抗性+25%|n治疗效果+18%|n全属性+12|n|cFF808080残片被银链牢牢扣住，偶尔仍会像活物一样轻轻收缩。|r',
-  description = '|cffccffff[饰品]-生存/水抗|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+2800|n水属性抗性+25%|n治疗效果+18%|n全属性+12|n|cFF808080残片被银链牢牢扣住，偶尔仍会像活物一样轻轻收缩。|r',
+  tooltipExtended = '|cffccffff[饰品]-生存/水抗|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+2800|n水属性抗性+25%|n治疗效果+18%|n全属性+12|n|cffffffcc[特效]|r|n残片收缩：受到超过最大生命15%的单次伤害时，恢复12%最大生命并获得25%水属性抗性，持续5秒，冷却20秒。|n|cFF808080残片被银链牢牢扣住，偶尔仍会像活物一样轻轻收缩。|r',
+  description = '|cffccffff[饰品]-生存/水抗|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+2800|n水属性抗性+25%|n治疗效果+18%|n全属性+12|n|cffffffcc[特效]|r|n残片收缩：受到超过最大生命15%的单次伤害时，恢复12%最大生命并获得25%水属性抗性，持续5秒，冷却20秒。|n|cFF808080残片被银链牢牢扣住，偶尔仍会像活物一样轻轻收缩。|r',
 })
 
 createEquipmentItem('I0F5', '绝缘珊瑚圣瓶', {
@@ -260,8 +260,8 @@ createEquipmentItem('I0F5', '绝缘珊瑚圣瓶', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[特殊/辅助]-治疗/护盾|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n生命值+1400|n魔法抗性+15%|n|cFF808080圣瓶中的珊瑚水隔绝杂乱电流，适合在漫长战斗里稳定队伍。|r',
-  description = '|cffccffff[特殊/辅助]-治疗/护盾|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n生命值+1400|n魔法抗性+15%|n|cFF808080圣瓶中的珊瑚水隔绝杂乱电流，适合在漫长战斗里稳定队伍。|r',
+  tooltipExtended = '|cffccffff[特殊/辅助]-治疗/护盾|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n生命值+1400|n魔法抗性+15%|n|cffffffcc[特效]|r|n绝缘珊瑚：治疗友方时，为目标附加300+最大生命8%的护盾并提高12%受到治疗率，持续5秒，冷却10秒。|n|cFF808080圣瓶中的珊瑚水隔绝杂乱电流，适合在漫长战斗里稳定队伍。|r',
+  description = '|cffccffff[特殊/辅助]-治疗/护盾|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n生命值+1400|n魔法抗性+15%|n|cffffffcc[特效]|r|n绝缘珊瑚：治疗友方时，为目标附加300+最大生命8%的护盾并提高12%受到治疗率，持续5秒，冷却10秒。|n|cFF808080圣瓶中的珊瑚水隔绝杂乱电流，适合在漫长战斗里稳定队伍。|r',
 })
 
 createEquipmentItem('I0F7', '古树之心护符', {
@@ -272,8 +272,8 @@ createEquipmentItem('I0F7', '古树之心护符', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[饰品]-守护/治疗|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n生命值+2600|n自然抗性+18%|n暗属性抗性+18%|n治疗效果+18%|n|cFF808080古树心核尚未完全枯死，贴近胸口时会传来缓慢而沉重的脉动。|r',
-  description = '|cffccffff[饰品]-守护/治疗|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n生命值+2600|n自然抗性+18%|n暗属性抗性+18%|n治疗效果+18%|n|cFF808080古树心核尚未完全枯死，贴近胸口时会传来缓慢而沉重的脉动。|r',
+  tooltipExtended = '|cffccffff[饰品]-守护/治疗|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n生命值+2600|n自然抗性+18%|n暗属性抗性+18%|n治疗效果+18%|n|cffffffcc[特效]|r|n古树脉动：每承受4次伤害，净化自身负面效果并恢复8%最大生命。|n|cFF808080古树心核尚未完全枯死，贴近胸口时会传来缓慢而沉重的脉动。|r',
+  description = '|cffccffff[饰品]-守护/治疗|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n生命值+2600|n自然抗性+18%|n暗属性抗性+18%|n治疗效果+18%|n|cffffffcc[特效]|r|n古树脉动：每承受4次伤害，净化自身负面效果并恢复8%最大生命。|n|cFF808080古树心核尚未完全枯死，贴近胸口时会传来缓慢而沉重的脉动。|r',
 })
 
 createEquipmentItem('I0F9', '净化者手套', {
@@ -284,8 +284,8 @@ createEquipmentItem('I0F9', '净化者手套', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[手套]-辅助/循环|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+36|n冷却缩减+12%|n治疗效果+20%|n魔法恢复+22|n|cFF808080手套掌心有净叶纹路，施法时会散出极淡的草木清香。|r',
-  description = '|cffccffff[手套]-辅助/循环|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+36|n冷却缩减+12%|n治疗效果+20%|n魔法恢复+22|n|cFF808080手套掌心有净叶纹路，施法时会散出极淡的草木清香。|r',
+  tooltipExtended = '|cffccffff[手套]-辅助/循环|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+42|n冷却缩减+12%|n治疗效果+22%|n魔法恢复+26|n魔法抗性+12%|n|cffffffcc[特效]|r|n净化回流：技能造成伤害时，有22%概率净化自身负面效果；净化成功后治疗率提高22%，持续6秒；若没有负面效果可净化，则治疗率提高10%，持续4秒，冷却8秒。|n|cFF808080手套掌心有净叶纹路，施法时会散出极淡的草木清香。|r',
+  description = '|cffccffff[手套]-辅助/循环|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n智力+42|n冷却缩减+12%|n治疗效果+22%|n魔法恢复+26|n魔法抗性+12%|n|cffffffcc[特效]|r|n净化回流：技能造成伤害时，有22%概率净化自身负面效果；净化成功后治疗率提高22%，持续6秒；若没有负面效果可净化，则治疗率提高10%，持续4秒，冷却8秒。|n|cFF808080手套掌心有净叶纹路，施法时会散出极淡的草木清香。|r',
 })
 
 createEquipmentItem('I0FB', '腐朽孢子秘瓶', {
@@ -296,8 +296,8 @@ createEquipmentItem('I0FB', '腐朽孢子秘瓶', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+18%|n持续伤害提升+16%|n魔法穿透+16%|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
-  description = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+18%|n持续伤害提升+16%|n魔法穿透+16%|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
+  tooltipExtended = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+22%|n暗属性伤害+16%|n魔法穿透+16%|n|cffffffcc[特效]|r|n腐朽孢子：技能造成伤害时，有12%概率对目标300范围敌人造成攻击力25%的暗属性伤害，冷却4秒。|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
+  description = '|cffccffff[特殊/饰品]-持续伤害|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法伤害+22%|n暗属性伤害+16%|n魔法穿透+16%|n|cffffffcc[特效]|r|n腐朽孢子：技能造成伤害时，有12%概率对目标300范围敌人造成攻击力25%的暗属性伤害，冷却4秒。|n|cFF808080瓶中孢子像灰绿色星尘一样浮沉，越靠近魔力越躁动。|r',
 })
 
 createEquipmentItem('I0FC', '净土萌芽圣铃', {
@@ -308,8 +308,8 @@ createEquipmentItem('I0FC', '净土萌芽圣铃', {
   classification = 'PowerUp',
   level = 6,
   priority = 1000,
-  tooltipExtended = '|cffccffff[饰品/辅助]-净化/续航|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n自然抗性+16%|n生命值+1200|n|cFF808080铃声很轻，却能让腐土中重新冒出第一点嫩芽。|r',
-  description = '|cffccffff[饰品/辅助]-净化/续航|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+20%|n魔法消耗减少+10%|n自然抗性+16%|n生命值+1200|n|cFF808080铃声很轻，却能让腐土中重新冒出第一点嫩芽。|r',
+  tooltipExtended = '|cffccffff[饰品/辅助]-净化/续航|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n生命值+1600|n冷却缩减+12%|n技能治疗率+22%|n魔法消耗减少+10%|n风/木属性抗性+20%|n魔法抗性+12%|n|cffffffcc[特效]|r|n萌芽净铃：治疗友方时，有22%概率净化目标负面效果；净化成功后目标受到治疗率提高18%，持续5秒；若没有负面效果可净化，则目标受到治疗率提高8%，持续4秒，冷却6秒。|n|cFF808080铃声很轻，却能让腐土中重新冒出第一点嫩芽。|r',
+  description = '|cffccffff[饰品/辅助]-净化/续航|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n生命值+1600|n冷却缩减+12%|n技能治疗率+22%|n魔法消耗减少+10%|n风/木属性抗性+20%|n魔法抗性+12%|n|cffffffcc[特效]|r|n萌芽净铃：治疗友方时，有22%概率净化目标负面效果；净化成功后目标受到治疗率提高18%，持续5秒；若没有负面效果可净化，则目标受到治疗率提高8%，持续4秒，冷却6秒。|n|cFF808080铃声很轻，却能让腐土中重新冒出第一点嫩芽。|r',
 })
 
 createEquipmentItem('I0FH', '盗贼首领徽记', {
@@ -320,8 +320,8 @@ createEquipmentItem('I0FH', '盗贼首领徽记', {
   classification = 'PowerUp',
   level = 5,
   priority = 1000,
-  tooltipExtended = '|cffccffff[道具/戒指/饰品]-循环/资源|r|n|cffffcc99等级：C|n评分：3660|r|n|cffffffcc[基础属性]|r|n全属性+14|n魔法恢复+12|n冷却缩减+6%|n移动速度+5%|n|cffffffcc[特效]|r|n暗影收割：击杀单位后恢复40点魔法值和4%最大魔法值，冷却0.5秒。|n|cFF808080徽记背面有死灵盗贼的暗号，握紧时能听见短促的撤离哨声。|r',
-  description = '|cffccffff[道具/戒指/饰品]-循环/资源|r|n|cffffcc99等级：C|n评分：3660|r|n|cffffffcc[基础属性]|r|n全属性+14|n魔法恢复+12|n冷却缩减+6%|n移动速度+5%|n|cffffffcc[特效]|r|n暗影收割：击杀单位后恢复40点魔法值和4%最大魔法值，冷却0.5秒。|n|cFF808080徽记背面有死灵盗贼的暗号，握紧时能听见短促的撤离哨声。|r',
+  tooltipExtended = '|cffccffff[道具/戒指/饰品]-循环/资源|r|n|cffffcc99等级：C|n评分：3660|r|n|cffffffcc[基础属性]|r|n全属性+16|n魔法恢复+16|n冷却缩减+7%|n移动速度+6%|n|cffffffcc[特效]|r|n暗影收割：击杀单位后恢复50点魔法值和5%最大魔法值，冷却0.5秒。|n|cFF808080徽记背面有死灵盗贼的暗号，握紧时能听见短促的撤离哨声。|r',
+  description = '|cffccffff[道具/戒指/饰品]-循环/资源|r|n|cffffcc99等级：C|n评分：3660|r|n|cffffffcc[基础属性]|r|n全属性+16|n魔法恢复+16|n冷却缩减+7%|n移动速度+6%|n|cffffffcc[特效]|r|n暗影收割：击杀单位后恢复50点魔法值和5%最大魔法值，冷却0.5秒。|n|cFF808080徽记背面有死灵盗贼的暗号，握紧时能听见短促的撤离哨声。|r',
 })
 
 createEquipmentItem('I0FI', '阴影陷阱装置', {

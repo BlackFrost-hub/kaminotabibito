@@ -28,17 +28,17 @@ function getMaxMovespeed2Info(unit, ignoreItem)
             do
                 local item = jass.UnitItemInSlot(unit, slot)
                 if not item then
-                    goto __continue10
+                    goto __continue15
                 end
                 if ignoreItem and item == ignoreItem then
-                    goto __continue10
+                    goto __continue15
                 end
                 local tid = GetItemTypeId(item)
                 local idStr = fourCCToStringCompat(tid)
                 local entry = itemsData[idStr]
                 local typ = entry and entry.type
                 if typ == "任务" or typ == "药剂" or typ == "食品" then
-                    goto __continue10
+                    goto __continue15
                 end
                 local v = entry and entry.movespeed2
                 if type(v) == "number" and v > 0 then
@@ -49,7 +49,7 @@ function getMaxMovespeed2Info(unit, ignoreItem)
                     name = (entry and entry.name) ~= nil and __TS__StringTrim(tostring(entry.name)) or "" or "未知"
                 end
             end
-            ::__continue10::
+            ::__continue15::
             slot = slot + 1
         end
     end
@@ -58,14 +58,19 @@ end
 jass = require("jass.common")
 GetItemTypeId = jass.GetItemTypeId
 GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed
+local GetUnitMoveSpeed = jass.GetUnitMoveSpeed
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local onItemPickup = ____require_result_0.onItemPickup
 local onItemDrop = ____require_result_0.onItemDrop
 itemsData = require("系统.02．物品系统.01．装备数据").default
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.00．SGSS")
 local SGSS_SetState = ____require_result_1.SGSS_SetState
-local ____require_result_2 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-local IsUnitIllusionBJ = ____require_result_2.IsUnitIllusionBJ
+local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.05．移动速度突破系统")
+local SOS_SetUnitSpeed = ____require_result_2.SOS_SetUnitSpeed
+local SOS_GetUnitSpeed = ____require_result_2.SOS_GetUnitSpeed
+local SOS_UnSetUnitSpeed = ____require_result_2.SOS_UnSetUnitSpeed
+local ____require_result_3 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local IsUnitIllusionBJ = ____require_result_3.IsUnitIllusionBJ
 R2I = jass.R2I
 stringChar = string.char
 --- 单位已应用的 movespeed2 值（仅用于 SGSS 先减后加）
@@ -81,6 +86,7 @@ local EQUIP_SPEED_EVENT_PLAYER_IDS = {
     7,
     13
 }
+local _____5F15_64CE_79FB_901F_4E0A_9650 = 522
 local function getUnitKey(unit)
     return tostring(unit)
 end
@@ -88,18 +94,36 @@ local function getMaxMovespeed2(unit, ignoreItem)
     local info = getMaxMovespeed2Info(unit, ignoreItem)
     return normalizeMovespeed2(unit, info.value)
 end
+local function _____53D6_5355_4F4D_771F_5B9E_79FB_901F(unit)
+    local _____7A81_7834_79FB_901F = SOS_GetUnitSpeed(unit) or 0
+    if _____7A81_7834_79FB_901F > _____5F15_64CE_79FB_901F_4E0A_9650 then
+        return _____7A81_7834_79FB_901F
+    end
+    return GetUnitMoveSpeed(unit) or 0
+end
+local function _____540C_6B65_88C5_5907_79FB_901F_7A81_7834(unit, _____53D8_5316_524D_771F_5B9E_79FB_901F, _____79FB_901F_5DEE_503C)
+    local _____53D8_5316_540E_771F_5B9E_79FB_901F = _____53D8_5316_524D_771F_5B9E_79FB_901F + _____79FB_901F_5DEE_503C
+    if _____53D8_5316_540E_771F_5B9E_79FB_901F > _____5F15_64CE_79FB_901F_4E0A_9650 then
+        SOS_SetUnitSpeed(unit, _____53D8_5316_540E_771F_5B9E_79FB_901F)
+    else
+        SOS_UnSetUnitSpeed(unit)
+    end
+end
 local function applyMovespeed2(unit, newSpeed)
     local key = getUnitKey(unit)
     local oldSpeed = applied[key] ~= nil and applied[key] or 0
     if newSpeed == oldSpeed then
         return
     end
+    local _____53D8_5316_524D_771F_5B9E_79FB_901F = _____53D6_5355_4F4D_771F_5B9E_79FB_901F(unit)
+    local _____79FB_901F_5DEE_503C = newSpeed - oldSpeed
     if oldSpeed ~= 0 then
         SGSS_SetState(unit, 9, -oldSpeed)
     end
     if newSpeed ~= 0 then
         SGSS_SetState(unit, 9, newSpeed)
     end
+    _____540C_6B65_88C5_5907_79FB_901F_7A81_7834(unit, _____53D8_5316_524D_771F_5B9E_79FB_901F, _____79FB_901F_5DEE_503C)
     applied[key] = newSpeed
 end
 local function onItemChange(unit, item, isPickup)

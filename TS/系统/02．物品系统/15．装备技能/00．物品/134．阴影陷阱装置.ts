@@ -43,14 +43,6 @@ function on阴影陷阱触发(this: void, target: any): void {
   播放单位特效(纠缠根须目标特效, target, "origin", 物品使用数值配置.阴影陷阱装置.控制持续秒数);
 }
 
-function 消耗阴影陷阱次数(this: void, item: any): boolean {
-  初始化阴影陷阱次数(item);
-  const charges = GetItemCharges(item);
-  if (!(charges > 0)) return false;
-  SetItemCharges(item, charges - 1);
-  return true;
-}
-
 function 阴影陷阱还有次数(this: void, item: any): boolean {
   初始化阴影陷阱次数(item);
   return GetItemCharges(item) > 0;
@@ -82,7 +74,6 @@ export function 处理阴影陷阱装置使用(this: void, ctx: 物品技能事�
     on触发: on阴影陷阱触发,
   });
   if (trap == null) return;
-  消耗阴影陷阱次数(ctx.物品);
 }
 
 onItemPickup(on阴影陷阱装置拾取);
