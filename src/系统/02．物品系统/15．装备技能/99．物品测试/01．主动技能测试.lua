@@ -7,6 +7,8 @@ local ____01_FF0E_88C5_5907_6570_636E = require("系统.02．物品系统.01．�
 local _____88C5_5907_6570_636E = ____01_FF0E_88C5_5907_6570_636E.items
 local ____02_FF0E_901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.02．通用物品技能槽位配置")
 local _____901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E_8868 = ____02_FF0E_901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E["通用物品技能槽位配置表"]
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____5237_65B0_7269_54C1CD = ____20_FF0E_7269_54C1_8F85_52A9["刷新物品CD"]
 local ____00_FF0E_6D4B_8BD5_914D_7F6E = require("系统.02．物品系统.15．装备技能.99．物品测试.00．测试配置")
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试发放顺序"]
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试命令列表"]
@@ -28,7 +30,6 @@ local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
 local ____require_result_5 = require("lib.扩展函数.物品相关函数.index")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_5["创建物品并注册排泄监听"]
-local platformAbilityAction = require("平台扩展API动作")
 local IssueTargetOrder = jass.IssueTargetOrder
 local CreateItem = jass.CreateItem
 local UnitAddItem = jass.UnitAddItem
@@ -55,6 +56,7 @@ local _____6253_5370_6CE8_518C_547D_4EE4_65E5_5FD7 = false
 local _____6D4B_8BD5_73A9_5BB6_540D_79F0 = "WorldEdit"
 local _____7EA2_8272_73A9_5BB6ID = 0
 local _____6D4B_8BD5_7269_54C1_6280_80FDID_8868 = {}
+local _____6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374_79D2_8868 = {}
 local _____5DF2_521D_59CB_5316_6D4B_8BD5_7269_54C1_6280_80FDID_8868 = false
 local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
     local ____g_gg_unit_Hamg_0002_6 = g.gg_unit_Hamg_0002
@@ -220,6 +222,19 @@ local function _____6DFB_52A0_6D4B_8BD5_7269_54C1_6280_80FDID(rawId, abilList)
         _____6D4B_8BD5_7269_54C1_6280_80FDID_8868[itemTypeId] = abilityIds
     end
 end
+local function _____8BB0_5F55_6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374(rawId, _____79D2_6570)
+    if rawId == nil or rawId == "" or not (_____79D2_6570 > 0) then
+        return
+    end
+    local itemTypeId = stringToFourCCSafe(rawId)
+    if itemTypeId == 0 then
+        return
+    end
+    local old = _____6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374_79D2_8868[itemTypeId] or 0
+    if _____79D2_6570 > old then
+        _____6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374_79D2_8868[itemTypeId] = _____79D2_6570
+    end
+end
 local function _____521D_59CB_5316_6D4B_8BD5_7269_54C1_6280_80FDID_8868()
     if _____5DF2_521D_59CB_5316_6D4B_8BD5_7269_54C1_6280_80FDID_8868 then
         return
@@ -245,6 +260,7 @@ local function _____521D_59CB_5316_6D4B_8BD5_7269_54C1_6280_80FDID_8868()
             local _____914D_7F6E = _____901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E_8868[i + 1]
             if _____6D4B_8BD5_7269_54C1RawID_8868[_____914D_7F6E["物编ID"]] == true then
                 _____6DFB_52A0_6D4B_8BD5_7269_54C1_6280_80FDID(_____914D_7F6E["物编ID"], _____914D_7F6E["技能ID"])
+                _____8BB0_5F55_6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374(_____914D_7F6E["物编ID"], _____914D_7F6E["冷却时间"])
             end
             i = i + 1
         end
@@ -262,23 +278,20 @@ local function _____5237_65B0_82F1_96C4_88C5_5907_51B7_5374(hero)
             do
                 local item = UnitItemInSlot(hero, _____69FD_4F4D)
                 if item == nil or item == 0 then
-                    goto __continue48
+                    goto __continue52
                 end
-                local abilityIds = _____6D4B_8BD5_7269_54C1_6280_80FDID_8868[GetItemTypeId(item)]
-                if abilityIds == nil then
-                    goto __continue48
-                end
-                do
-                    local i = 0
-                    while i < #abilityIds do
-                        if platformAbilityAction["技能_设置技能冷却时间"](hero, abilityIds[i + 1], 0, 0) then
-                            _____5237_65B0_6570_91CF = _____5237_65B0_6570_91CF + 1
-                        end
-                        i = i + 1
-                    end
-                end
+                local itemTypeId = GetItemTypeId(item)
+                local abilityIds = _____6D4B_8BD5_7269_54C1_6280_80FDID_8868[itemTypeId]
+                local activeMaxSec = _____6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374_79D2_8868[itemTypeId]
+                _____5237_65B0_6570_91CF = _____5237_65B0_6570_91CF + _____5237_65B0_7269_54C1CD({
+                    unit = hero,
+                    item = item,
+                    ["主动技能ID"] = abilityIds,
+                    ["主动最大冷却秒数"] = activeMaxSec,
+                    ["范围"] = "全部"
+                })
             end
-            ::__continue48::
+            ::__continue52::
             _____69FD_4F4D = _____69FD_4F4D + 1
         end
     end

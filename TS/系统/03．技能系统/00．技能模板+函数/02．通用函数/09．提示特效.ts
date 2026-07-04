@@ -78,9 +78,23 @@ const 提示圈敌方色 = 0xFFFF2020;
 // ==========================================================================================
 
 const 提示特效销毁检查间隔毫秒 = 10;
+const 特效步进缩放检查间隔毫秒 = 20;
 const 待销毁提示特效列表: any[] = [];
 const 待销毁提示特效到期毫秒列表: number[] = [];
 let 提示特效销毁检查回调ID = 0;
+
+interface 特效步进缩放上下文 {
+  特效: any;
+  当前次数: number;
+  最大次数: number;
+  基础尺寸: number;
+  每次增量: number;
+  周期秒: number;
+  下次触发时间: number;
+}
+
+const 特效步进缩放上下文列表: 特效步进缩放上下文[] = [];
+let 特效步进缩放检查回调ID = 0;
 
 function 停止提示特效销毁检查(): void {
   if (提示特效销毁检查回调ID <= 0) return;
@@ -119,6 +133,42 @@ function 确保提示特效销毁检查(): void {
   提示特效销毁检查回调ID = addPeriodicCallback(提示特效销毁检查间隔毫秒, on提示特效销毁检查);
 }
 
+function 停止特效步进缩放检查(): void {
+  if (特效步进缩放检查回调ID <= 0) return;
+  removePeriodicCallback(特效步进缩放检查回调ID);
+  特效步进缩放检查回调ID = 0;
+}
+
+function on特效步进缩放检查(this: void): void {
+  const now = getServerTime();
+  for (let i = 特效步进缩放上下文列表.length - 1; i >= 0; i--) {
+    const 上下文 = 特效步进缩放上下文列表[i];
+    if (!上下文.特效) {
+      特效步进缩放上下文列表.splice(i, 1);
+      continue;
+    }
+    if (now < 上下文.下次触发时间) continue;
+
+    上下文.当前次数 += 1;
+    if (上下文.当前次数 >= 上下文.最大次数) {
+      特效步进缩放上下文列表.splice(i, 1);
+      continue;
+    }
+
+    EXSetEffectSize(上下文.特效, 上下文.基础尺寸 + 上下文.当前次数 * 上下文.每次增量);
+    上下文.下次触发时间 = now + 上下文.周期秒 * 1000;
+  }
+
+  if (特效步进缩放上下文列表.length <= 0) {
+    停止特效步进缩放检查();
+  }
+}
+
+function 确保特效步进缩放检查(): void {
+  if (特效步进缩放检查回调ID > 0) return;
+  特效步进缩放检查回调ID = addPeriodicCallback(特效步进缩放检查间隔毫秒, on特效步进缩放检查);
+}
+
 function 安全销毁特效(duration: number, effect: any): void {
   if (!effect) return;
 
@@ -152,6 +202,44 @@ export function 按所属单位设置提示圈颜色(e: any, 来源单位: any):
   }
 
   设置提示特效顶点颜色(e, 提示圈敌方色);
+}
+
+/**
+ * 让一个已创建的特效按固定周期逐步放大。
+ */
+export function 启动特效步进缩放(
+  特效: any,
+  基础尺寸: number,
+  最大次数: number,
+  周期秒: number,
+  每次增量: number = 1
+): void {
+  if (!特效 || 最大次数 <= 0 || 周期秒 <= 0) return;
+
+  移除特效步进缩放(特效);
+  特效步进缩放上下文列表.push({
+    特效,
+    当前次数: 0,
+    最大次数,
+    基础尺寸,
+    每次增量,
+    周期秒,
+    下次触发时间: getServerTime() + 周期秒 * 1000,
+  });
+  确保特效步进缩放检查();
+}
+
+export function 移除特效步进缩放(特效: any): void {
+  if (!特效) return;
+  for (let i = 特效步进缩放上下文列表.length - 1; i >= 0; i--) {
+    if (特效步进缩放上下文列表[i].特效 === 特效) {
+      特效步进缩放上下文列表.splice(i, 1);
+    }
+  }
+
+  if (特效步进缩放上下文列表.length <= 0) {
+    停止特效步进缩放检查();
+  }
 }
 
 // ==========================================================================================

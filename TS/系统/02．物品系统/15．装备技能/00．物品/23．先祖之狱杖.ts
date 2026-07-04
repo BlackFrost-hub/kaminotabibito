@@ -1,9 +1,8 @@
 /** @noSelfInFile */
 
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
+import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
+import { 造成装备伤害 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/10．装备战斗执行";
 
 const jass = require("jass.common") as any;
 
@@ -18,11 +17,8 @@ const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
-const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 先祖之狱杖物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
@@ -35,16 +31,7 @@ function 是否为先祖之狱杖(this: void, 物品: any): boolean {
 }
 
 function 执行先祖延迟伤害(this: void, 施法单位: any, 目标单位: any): void {
-  UnitDamageTarget(
-    施法单位,
-    目标单位,
-    GetUnitState(目标单位, UNIT_STATE_MAX_LIFE) * 先祖之狱杖配置.伤害生命比例,
-    false,
-    true,
-    ATTACK_TYPE_NORMAL,
-    DAMAGE_TYPE_SHADOW_STRIKE,
-    WEAPON_TYPE_WHOKNOWS,
-  );
+  造成装备伤害(施法单位, 目标单位, GetUnitState(目标单位, UNIT_STATE_MAX_LIFE) * 先祖之狱杖配置.伤害生命比例, DAMAGE_TYPE_SHADOW_STRIKE, true);
 }
 
 function 启动先祖延迟伤害(this: void, 施法单位: any, 目标单位: any): void {
@@ -52,7 +39,7 @@ function 启动先祖延迟伤害(this: void, 施法单位: any, 目标单位: a
 }
 
 export function 处理先祖之狱杖使用(this: void, 上下文: 物品技能事件上下文): void {
-  debugLogForce("24．先祖之狱杖", "进入", "处理先祖之狱杖使用");
+  主动物品调试日志("24．先祖之狱杖", "进入", "处理先祖之狱杖使用");
 
   if (!是否为先祖之狱杖(上下文.物品)) return;
   const 施法单位 = 上下文.施法单位;

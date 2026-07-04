@@ -23,7 +23,7 @@ const { SFB_setBuff, SFB_setSlow } = require("lib.扩展函数.Star扩展函数.
   SFB_setSlow: (this: void, sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
 };
 
-import type { 位移结束原因 } from "./击退系统";
+import type { 位移结束原因 } from "../../01．技能函数/02．冲锋·击退/击退系统";
 
 type 控制类型 = 0 | 1 | 2 | 3 | 5 | 21 | 22 | 23;
 

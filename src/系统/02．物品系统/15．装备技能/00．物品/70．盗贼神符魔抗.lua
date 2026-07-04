@@ -7,16 +7,15 @@ local ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177 = require("系统.02．物品系
 local _____662F_5426_4E3A_4F7F_7528_7269_54C1 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["是否为使用物品"]
 local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
 local _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C = ____20_FF0E_7269_54C1_8F85_52A9["施加临时属性效果"]
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
-local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
+local _____88C5_5907_8C03_8BD5_65E5_5FD7 = ____20_FF0E_7269_54C1_8F85_52A9["装备调试日志"]
+local ____09_FF0E_88C5_5907_6218_6597_5224_65AD = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.09．装备战斗判断")
+local _____53D6_5355_4F4DID = ____09_FF0E_88C5_5907_6218_6597_5224_65AD["取单位ID"]
 local _____8C03_8BD5_6A21_5757_540D = "盗贼神符魔抗"
 local function _____8BB0_5F55_76D7_8D3C_795E_7B26_9B54_6297_56DE_9000(unit)
-    debugLogForce(
+    _____88C5_5907_8C03_8BD5_65E5_5FD7(
         _____8C03_8BD5_6A21_5757_540D,
         "回退魔抗",
-        "unitId=" .. tostring(GetHandleId(unit)),
+        "unitId=" .. tostring(_____53D6_5355_4F4DID(unit)),
         "delta=" .. tostring(-_____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["盗贼神符魔抗"]["魔抗提升"])
     )
 end
@@ -25,10 +24,10 @@ ____exports["处理盗贼神符魔抗使用"] = function(ctx)
         return
     end
     local unit = ctx["施法单位"]
-    debugLogForce(
+    _____88C5_5907_8C03_8BD5_65E5_5FD7(
         _____8C03_8BD5_6A21_5757_540D,
         "使用命中",
-        "unitId=" .. tostring(GetHandleId(unit)),
+        "unitId=" .. tostring(_____53D6_5355_4F4DID(unit)),
         "delta=" .. tostring(_____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["盗贼神符魔抗"]["魔抗提升"]),
         "durationMs=" .. tostring(_____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["盗贼神符魔抗"]["持续毫秒"])
     )

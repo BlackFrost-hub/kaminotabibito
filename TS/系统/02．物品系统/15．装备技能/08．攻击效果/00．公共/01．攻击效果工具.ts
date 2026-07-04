@@ -54,6 +54,9 @@ const { YDWEIsEventDamageType, YDWEIsEventAttackType } = require("lib.扩展函�
 const { 装备触发概率通过 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统") as {
   装备触发概率通过: (this: void, 原始概率: number, 触发单位: any) => boolean;
 };
+const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean) => void;
+};
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -63,16 +66,6 @@ const ConvertUnitState = jass.ConvertUnitState as (value: number) => any;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetHeroStr = jass.GetHeroStr as (unit: any, includeBonuses: boolean) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any,
-) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, target: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
@@ -93,7 +86,6 @@ const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const DAMAGE_TYPE_DIVINE = (jass.DAMAGE_TYPE_DIVINE ?? jass.DAMAGE_TYPE_UNIVERSAL) as any;
 const DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED as any;
 const DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL as any;
-const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const 装备ID缓存: Record<string, number> = {};
 const 跳过单位ID缓存: Record<string, number> = {};
@@ -246,8 +238,7 @@ export function 解析攻击效果伤害类型(this: void, 类型?: 攻击效果
 }
 
 export function 攻击效果造成伤害(this: void, source: any, target: any, amount: number, 类型?: 攻击效果伤害类型): void {
-  if (!单位有效存活(source) || !单位有效存活(target) || !(amount > 0)) return;
-  UnitDamageTarget(source, target, amount, false, false, ATTACK_TYPE_NORMAL, 解析攻击效果伤害类型(类型), WEAPON_TYPE_WHOKNOWS);
+  造成装备伤害(source, target, amount, 解析攻击效果伤害类型(类型));
 }
 
 export function 攻击效果治疗生命魔法(this: void, source: any, target: any, lifeAmount: number, manaAmount: number = 0): void {

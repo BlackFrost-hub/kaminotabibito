@@ -25,7 +25,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.位移回调模板")
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.11．回调模板.00．位移回调模板")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

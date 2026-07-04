@@ -15,14 +15,13 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local getEnemyUnitsInRange = ____require_result_1.getEnemyUnitsInRange
 local isValidUnit = ____require_result_1.isValidUnit
 local isUnitEnemy = ____require_result_1.isUnitEnemy
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____9020_6210_88C5_5907_4F24_5BB3 = ____require_result_2["造成装备伤害"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitDamageTarget = jass.UnitDamageTarget
-local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
-local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_2 = require("lib.扩展函数.物品相关函数.物品判断函数")
-local UnitHasItemOfTypeBJ = ____require_result_2.UnitHasItemOfTypeBJ
+local ____require_result_3 = require("lib.扩展函数.物品相关函数.物品判断函数")
+local UnitHasItemOfTypeBJ = ____require_result_3.UnitHasItemOfTypeBJ
 local function _____5355_4F4D_662F_5426_6301_6709_9ED1_7267_6756(unit)
     if not isValidUnit(unit) then
         return false
@@ -36,16 +35,7 @@ local function _____5BF9_654C_4EBA_9020_6210_9ED1_7267_6756_4F24_5BB3(_____65BD_
     if not isValidUnit(_____65BD_6CD5_8005) or not isValidUnit(_____76EE_6807) then
         return
     end
-    UnitDamageTarget(
-        _____65BD_6CD5_8005,
-        _____76EE_6807,
-        _____9ED1_7267_6756_914D_7F6E["伤害值"],
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_SHADOW_STRIKE,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_88C5_5907_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, _____9ED1_7267_6756_914D_7F6E["伤害值"], DAMAGE_TYPE_SHADOW_STRIKE)
     createTimedEffect(
         _____9ED1_7267_6756_914D_7F6E["特效路径"],
         GetUnitX(_____76EE_6807),

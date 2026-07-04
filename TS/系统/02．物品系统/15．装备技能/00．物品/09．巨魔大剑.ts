@@ -31,7 +31,7 @@ const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
 
 import { 巨魔大剑物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 巨魔大剑配置 } from "../03．主动技能/02．施法触发/00．施法触发配置";
-import { 创建施法后首伤窗口 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
+import { 创建施法后首伤窗口 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制/12．施法后首伤窗口";
 
 function 单位持有巨魔大剑(this: void, 单位: any): boolean {
   if (单位 == null || 单位 === 0) return false;

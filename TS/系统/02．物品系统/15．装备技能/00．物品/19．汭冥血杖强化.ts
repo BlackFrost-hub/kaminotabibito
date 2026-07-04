@@ -1,9 +1,7 @@
 /** @noSelfInFile */
 
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
+import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const jass = require("jass.common") as any;
 
@@ -19,7 +17,7 @@ function 是否为汭冥血杖强化(this: void, 物品: any): boolean {
 }
 
 export function 处理汭冥血杖强化使用(this: void, 上下文: 物品技能事件上下文): void {
-  debugLogForce("20．汭冥血杖强化", "进入", "处理汭冥血杖强化使用");
+  主动物品调试日志("20．汭冥血杖强化", "进入", "处理汭冥血杖强化使用");
 
   if (!是否为汭冥血杖强化(上下文.物品)) return;
   执行汭冥血杖献祭(上下文, true);

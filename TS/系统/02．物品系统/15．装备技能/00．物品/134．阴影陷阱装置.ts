@@ -3,11 +3,12 @@
 import type { 物品技能事件上下文 } from "../05．物品使用/00．公共/03．物品使用核心";
 import { 物品使用装备ID, 物品使用数值配置 } from "../05．物品使用/00．公共/01．物品使用配置表";
 import { 是否为使用物品, 单位是英雄, 取单位X, 取单位Y, 播放单位特效 } from "../05．物品使用/00．公共/02．物品使用工具";
+import { 创建句柄永久标记 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制/23．句柄永久标记";
 
 const { onItemPickup } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
-const { 创建主动陷阱, 默认主动陷阱模型 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.09．主动陷阱模板") as {
+const { 创建主动陷阱, 默认主动陷阱模型 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.08．装备触发模板.02．主动陷阱模板") as {
   创建主动陷阱: (this: void, 参数: any) => any;
   默认主动陷阱模型: string;
 };
@@ -15,22 +16,14 @@ const { 创建主动陷阱, 默认主动陷阱模型 } = require("系统.03．�
 const jass = require("jass.common") as any;
 const GetItemCharges = jass.GetItemCharges as (item: any) => number;
 const SetItemCharges = jass.SetItemCharges as (item: any, charges: number) => void;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
 const 阴影陷阱触发特效 = "Common\\Effect\\Form\\MagicCircle\\ShadowTrapRune.mdx";
 const 纠缠根须目标特效 = "Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl";
 
-const 已初始化次数物品表: Record<number, boolean | undefined> = {};
-
-function 取物品句柄ID(this: void, item: any): number {
-  if (item == null || item === 0) return 0;
-  return GetHandleId(item) || 0;
-}
+const 阴影陷阱已初始化次数 = 创建句柄永久标记("阴影陷阱已初始化次数");
 
 function 初始化阴影陷阱次数(this: void, item: any): void {
-  const id = 取物品句柄ID(item);
-  if (id === 0 || 已初始化次数物品表[id] === true) return;
-  已初始化次数物品表[id] = true;
+  if (!阴影陷阱已初始化次数.标记若不存在(item)) return;
   if (GetItemCharges(item) <= 0) SetItemCharges(item, 物品使用数值配置.阴影陷阱装置.最大次数);
 }
 

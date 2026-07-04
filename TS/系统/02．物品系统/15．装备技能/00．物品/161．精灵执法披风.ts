@@ -28,9 +28,9 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
 const { 常规BuffID } = require("系统.05．Buff系统.03．Buff表.00．Buff登记") as {
   常规BuffID: { 精灵执法披风_秩序领域: string };
 };
+import { 创建句柄上下文托管器 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制/24．句柄上下文托管";
 
 const jass = require("jass.common") as any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
 
 const 精灵执法披风配置 = {
@@ -44,23 +44,23 @@ const 精灵执法披风配置 = {
 } as const;
 
 const 精灵执法披风物品ID = stringToFourCCSafe(resolveItemIdByName(精灵执法披风配置.物品名));
-const 精灵执法披风影响层数表: Record<number, number | undefined> = {};
-const 精灵执法披风影响单位表: Record<number, any | undefined> = {};
-const 精灵执法披风来源名称表: Record<number, string | undefined> = {};
+
+type 精灵执法披风影响上下文 = {
+  层数: number;
+  单位: any;
+  来源名称?: string;
+};
+
+const 精灵执法披风影响托管器 = 创建句柄上下文托管器<精灵执法披风影响上下文>("精灵执法披风影响");
 
 let 已初始化精灵执法披风 = false;
 
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 记录精灵执法披风来源(this: void, source: any, unit: any): void {
-  const id = 取单位ID(unit);
-  if (id === 0) return;
-  精灵执法披风影响单位表[id] = unit;
+  const 上下文 = 精灵执法披风影响托管器.读取(unit);
+  if (上下文 == null) return;
+  上下文.单位 = unit;
   if (source != null && source !== 0) {
-    精灵执法披风来源名称表[id] = "『精灵执法披风』「" + GetUnitName(source) + "」";
+    上下文.来源名称 = "『精灵执法披风』「" + GetUnitName(source) + "」";
   }
 }
 
@@ -70,18 +70,22 @@ function 调整精灵执法披风影响层数(this: void, unit: any, delta: numb
 }
 
 function 刷新精灵执法披风Buff(this: void, unit: any): void {
-  const id = 取单位ID(unit);
-  if (id === 0 || (精灵执法披风影响层数表[id] ?? 0) <= 0) return;
+  const 上下文 = 精灵执法披风影响托管器.读取(unit);
+  if (上下文 == null || 上下文.层数 <= 0) return;
   registerManualBuff(unit, 精灵执法披风配置.BuffID, 精灵执法披风配置.Buff持续时间, 15, {
-    sourceName: 精灵执法披风来源名称表[id],
+    sourceName: 上下文.来源名称,
   });
 }
 
 function 应用精灵执法披风光环(this: void, target: any, holder: any, currentCount: number): void {
-  const id = 取单位ID(target);
-  if (id === 0) return;
   const count = currentCount <= 0 ? 1 : currentCount;
-  精灵执法披风影响层数表[id] = (精灵执法披风影响层数表[id] ?? 0) + count;
+  const 当前上下文 = 精灵执法披风影响托管器.读取(target);
+  const nextCount = (当前上下文?.层数 ?? 0) + count;
+  精灵执法披风影响托管器.写入(target, {
+    层数: nextCount,
+    单位: target,
+    来源名称: 当前上下文?.来源名称,
+  });
   记录精灵执法披风来源(holder, target);
   调整精灵执法披风影响层数(target, count);
   刷新精灵执法披风Buff(target);
@@ -93,20 +97,21 @@ function 同步精灵执法披风光环(this: void, target: any, holder: any, _c
 }
 
 function 移除精灵执法披风光环(this: void, target: any, _holder: any, currentCount: number): void {
-  const id = 取单位ID(target);
-  if (id === 0) return;
   const count = currentCount <= 0 ? 1 : currentCount;
-  const nextCount = (精灵执法披风影响层数表[id] ?? 0) - count;
+  const 当前上下文 = 精灵执法披风影响托管器.读取(target);
+  const nextCount = (当前上下文?.层数 ?? 0) - count;
   调整精灵执法披风影响层数(target, -count);
   if (nextCount > 0) {
-    精灵执法披风影响层数表[id] = nextCount;
+    精灵执法披风影响托管器.写入(target, {
+      层数: nextCount,
+      单位: target,
+      来源名称: 当前上下文?.来源名称,
+    });
     刷新精灵执法披风Buff(target);
     return;
   }
   移除单位指定Buff(target, 精灵执法披风配置.BuffID);
-  delete 精灵执法披风影响层数表[id];
-  delete 精灵执法披风影响单位表[id];
-  delete 精灵执法披风来源名称表[id];
+  精灵执法披风影响托管器.清空(target);
 }
 
 export function 初始化精灵执法披风效果(this: void): void {

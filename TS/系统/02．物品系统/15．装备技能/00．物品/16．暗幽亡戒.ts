@@ -1,9 +1,7 @@
 /** @noSelfInFile */
 
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
+import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const jass = require("jass.common") as any;
 
@@ -26,7 +24,7 @@ function 是否为暗幽亡戒(this: void, 物品: any): boolean {
 }
 
 export function 处理暗幽亡戒使用(this: void, 上下文: 物品技能事件上下文): void {
-  debugLogForce("17．暗幽亡戒", "进入", "处理暗幽亡戒使用");
+  主动物品调试日志("17．暗幽亡戒", "进入", "处理暗幽亡戒使用");
 
   if (!是否为暗幽亡戒(上下文.物品)) return;
   const 施法单位 = 上下文.施法单位;

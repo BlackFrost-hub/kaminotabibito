@@ -4,30 +4,21 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local getObjectPropertyIntegerSafe = ____require_result_0.getObjectPropertyIntegerSafe
+local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = ____require_result_1["获取玩家英雄单位组"]
+local _____6838_5FC3_662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
 local GetItemType = jass.GetItemType
 local GetItemTypeId = jass.GetItemTypeId
 local GetItemCharges = jass.GetItemCharges
 local GetHandleId = jass.GetHandleId
 local IsItemPowerup = jass.IsItemPowerup
-local IsUnitInGroup = jass.IsUnitInGroup
 local RemoveItem = jass.RemoveItem
 local ITEM_TYPE_CHARGED = jass.ITEM_TYPE_CHARGED
 local ITEM_TYPE_PURCHASABLE = jass.ITEM_TYPE_PURCHASABLE
 local _____7269_7F16_7C7B_578B__7269_54C1 = 3
-____exports["获取玩家英雄单位组"] = function()
-    return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
-end
 ____exports["是玩家英雄组单位"] = function(_____5355_4F4D)
-    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
-        return false
-    end
-    local _____73A9_5BB6_82F1_96C4_7EC4 = ____exports["获取玩家英雄单位组"]()
-    if _____73A9_5BB6_82F1_96C4_7EC4 == nil or _____73A9_5BB6_82F1_96C4_7EC4 == 0 then
-        return false
-    end
-    return IsUnitInGroup(_____5355_4F4D, _____73A9_5BB6_82F1_96C4_7EC4) == true
+    return _____6838_5FC3_662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____5355_4F4D)
 end
 ____exports["物品类型ID在列表中"] = function(_____7269_54C1_7C7B_578BID, _____5217_8868)
     do

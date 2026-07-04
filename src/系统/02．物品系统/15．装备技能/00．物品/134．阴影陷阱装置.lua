@@ -9,30 +9,23 @@ local _____5355_4F4D_662F_82F1_96C4 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177[
 local _____53D6_5355_4F4DX = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位Y"]
 local _____64AD_653E_5355_4F4D_7279_6548 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["播放单位特效"]
+local ____23_FF0E_53E5_67C4_6C38_4E45_6807_8BB0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.23．句柄永久标记")
+local _____521B_5EFA_53E5_67C4_6C38_4E45_6807_8BB0 = ____23_FF0E_53E5_67C4_6C38_4E45_6807_8BB0["创建句柄永久标记"]
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local onItemPickup = ____require_result_0.onItemPickup
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.09．主动陷阱模板")
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.08．装备触发模板.02．主动陷阱模板")
 local _____521B_5EFA_4E3B_52A8_9677_9631 = ____require_result_1["创建主动陷阱"]
 local _____9ED8_8BA4_4E3B_52A8_9677_9631_6A21_578B = ____require_result_1["默认主动陷阱模型"]
 local jass = require("jass.common")
 local GetItemCharges = jass.GetItemCharges
 local SetItemCharges = jass.SetItemCharges
-local GetHandleId = jass.GetHandleId
 local _____9634_5F71_9677_9631_89E6_53D1_7279_6548 = "Common\\Effect\\Form\\MagicCircle\\ShadowTrapRune.mdx"
 local _____7EA0_7F20_6839_987B_76EE_6807_7279_6548 = "Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl"
-local _____5DF2_521D_59CB_5316_6B21_6570_7269_54C1_8868 = {}
-local function _____53D6_7269_54C1_53E5_67C4ID(item)
-    if item == nil or item == 0 then
-        return 0
-    end
-    return GetHandleId(item) or 0
-end
+local _____9634_5F71_9677_9631_5DF2_521D_59CB_5316_6B21_6570 = _____521B_5EFA_53E5_67C4_6C38_4E45_6807_8BB0("阴影陷阱已初始化次数")
 local function _____521D_59CB_5316_9634_5F71_9677_9631_6B21_6570(item)
-    local id = _____53D6_7269_54C1_53E5_67C4ID(item)
-    if id == 0 or _____5DF2_521D_59CB_5316_6B21_6570_7269_54C1_8868[id] == true then
+    if not _____9634_5F71_9677_9631_5DF2_521D_59CB_5316_6B21_6570["标记若不存在"](item) then
         return
     end
-    _____5DF2_521D_59CB_5316_6B21_6570_7269_54C1_8868[id] = true
     if GetItemCharges(item) <= 0 then
         SetItemCharges(item, _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["阴影陷阱装置"]["最大次数"])
     end

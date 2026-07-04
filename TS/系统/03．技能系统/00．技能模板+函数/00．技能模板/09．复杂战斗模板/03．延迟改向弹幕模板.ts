@@ -3,7 +3,7 @@
 import type { 原生弹幕参数, 原生弹幕实例 } from "../../01．技能函数/01．弹幕/01．TS原生弹幕/00．类型";
 import { 创建原生弹幕 } from "../../01．技能函数/01．弹幕/01．TS原生弹幕/03．对外接口";
 import { 设置原生弹幕指定角度飞行 } from "../../01．技能函数/01．弹幕/01．TS原生弹幕/06．改向与反弹/00．弹幕改向";
-import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
+import type { 机制清理篮子 } from "../../04．机制组件/06．机制清理/01．机制清理篮子";
 
 const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;

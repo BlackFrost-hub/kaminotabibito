@@ -1,9 +1,12 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const { YDUserDataGetSafe, getObjectPropertyIntegerSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+const { getObjectPropertyIntegerSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   getObjectPropertyIntegerSafe: (this: void, objectType: number, objectId: number | string, property: string) => number;
+};
+const { 获取玩家英雄单位组, 是玩家英雄组单位: 核心是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  获取玩家英雄单位组: (this: void) => any;
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
 
 const GetItemType = jass.GetItemType as (item: any) => any;
@@ -11,22 +14,14 @@ const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetItemCharges = jass.GetItemCharges as (item: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const IsItemPowerup = jass.IsItemPowerup as (item: any) => boolean;
-const IsUnitInGroup = jass.IsUnitInGroup as (unit: any, whichGroup: any) => boolean;
 const RemoveItem = jass.RemoveItem as (item: any) => void;
 const ITEM_TYPE_CHARGED = jass.ITEM_TYPE_CHARGED as any;
 const ITEM_TYPE_PURCHASABLE = jass.ITEM_TYPE_PURCHASABLE as any;
 
 const 物编类型_物品 = 3;
 
-export function 获取玩家英雄单位组(this: void): any {
-  return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
-}
-
 export function 是玩家英雄组单位(this: void, 单位: any): boolean {
-  if (单位 == null || 单位 === 0) return false;
-  const 玩家英雄组 = 获取玩家英雄单位组();
-  if (玩家英雄组 == null || 玩家英雄组 === 0) return false;
-  return IsUnitInGroup(单位, 玩家英雄组) === true;
+  return 核心是玩家英雄组单位(单位);
 }
 
 export function 物品类型ID在列表中(this: void, 物品类型ID: number, 列表: readonly number[]): boolean {

@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 高原魔力灯笼配置, 获得物品装备ID } from "../07．获得物品/00．公共/00．获得物品配置表";
+import { 创建单位动态加成同步器 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const { 注册持有型周期效果 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.02．持有型周期效果") as {
   注册持有型周期效果: (this: void, params: {
@@ -26,51 +27,22 @@ const { 获取范围友军, 取单位X, 取单位Y, 取最大生命, 执行治�
 };
 
 const jass = require("jass.common") as any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 
-type 高原魔力灯笼状态 = {
-  当前伤害减少层数: number;
-};
-
-const 高原魔力灯笼状态表: Record<number, 高原魔力灯笼状态 | undefined> = {};
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
-function 取或创建高原魔力灯笼状态(this: void, unit: any): 高原魔力灯笼状态 {
-  const id = 取单位ID(unit);
-  const state = 高原魔力灯笼状态表[id];
-  if (state != null) return state;
-  const nextState: 高原魔力灯笼状态 = { 当前伤害减少层数: 0 };
-  高原魔力灯笼状态表[id] = nextState;
-  return nextState;
-}
+const 高原魔力灯笼夜晚减伤 = 创建单位动态加成同步器<"伤害减少%">(
+  function 应用高原魔力灯笼夜晚减伤(this: void, unit: any, _key: "伤害减少%", delta: number): void {
+    调整玩家属性(unit, "伤害减少%", delta);
+  },
+);
 
 function 同步夜晚减伤(this: void, unit: any, currentCount: number): void {
-  const state = 取或创建高原魔力灯笼状态(unit);
   const nextCount = 是否白天() ? 0 : currentCount;
-  if (state.当前伤害减少层数 === nextCount) return;
-  if (state.当前伤害减少层数 > 0) {
-    调整玩家属性(unit, "伤害减少%", -高原魔力灯笼配置.夜晚伤害减少增加 * state.当前伤害减少层数);
-  }
-  if (nextCount > 0) {
-    调整玩家属性(unit, "伤害减少%", 高原魔力灯笼配置.夜晚伤害减少增加 * nextCount);
-  }
-  state.当前伤害减少层数 = nextCount;
+  高原魔力灯笼夜晚减伤.同步(unit, nextCount > 0 ? "伤害减少%" : null, 高原魔力灯笼配置.夜晚伤害减少增加 * nextCount);
 }
 
 function 清理高原魔力灯笼状态(this: void, unit: any): void {
-  const id = 取单位ID(unit);
-  if (id === 0) return;
-  const state = 高原魔力灯笼状态表[id];
-  if (state != null && state.当前伤害减少层数 > 0) {
-    调整玩家属性(unit, "伤害减少%", -高原魔力灯笼配置.夜晚伤害减少增加 * state.当前伤害减少层数);
-  }
-  delete 高原魔力灯笼状态表[id];
+  高原魔力灯笼夜晚减伤.清理(unit);
 }
 
 function on高原魔力灯笼周期(this: void, unit: any, currentCount: number): void {

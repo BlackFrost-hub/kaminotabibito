@@ -180,9 +180,63 @@ local function ____on_6301_6709_578B_5468_671F_6548_679C_4E22_5F03(unit, item, c
         end
     end
 end
+local function _____8865_767B_8BB0_521D_59CB_5355_4F4D(_____914D_7F6E)
+    if _____914D_7F6E["初始单位列表"] == nil then
+        return
+    end
+    local _____5355_4F4D_5217_8868 = _____914D_7F6E["初始单位列表"]()
+    if _____5355_4F4D_5217_8868 == nil then
+        return
+    end
+    do
+        local i = 0
+        while i < #_____5355_4F4D_5217_8868 do
+            do
+                local unit = _____5355_4F4D_5217_8868[i + 1]
+                local unitId = _____83B7_53D6_5355_4F4DID(unit)
+                if unitId == 0 then
+                    goto __continue44
+                end
+                local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(unit, _____914D_7F6E["物品类型ID"])
+                if currentCount <= 0 then
+                    goto __continue44
+                end
+                _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = 1}
+                local ____opt_10 = _____914D_7F6E["获取回调"]
+                if ____opt_10 ~= nil then
+                    ____opt_10(unit, 1)
+                end
+            end
+            ::__continue44::
+            i = i + 1
+        end
+    end
+end
+local function _____521B_5EFA_6301_6709_578B_5468_671F_6548_679C_63A7_5236_5668(_____914D_7F6E)
+    return {
+        ["获取单位列表"] = function()
+            local result = {}
+            local ids = _____83B7_53D6_6709_5E8F_5355_4F4D_72B6_6001ID_5217_8868(_____914D_7F6E["单位状态"])
+            do
+                local i = 0
+                while i < #ids do
+                    local _____72B6_6001 = _____914D_7F6E["单位状态"][ids[i + 1]]
+                    if _____72B6_6001 ~= nil and _____72B6_6001["单位"] ~= nil and _____72B6_6001["单位"] ~= 0 then
+                        result[#result + 1] = _____72B6_6001["单位"]
+                    end
+                    i = i + 1
+                end
+            end
+            return result
+        end,
+        ["获取单位数量"] = function()
+            return #_____83B7_53D6_6709_5E8F_5355_4F4D_72B6_6001ID_5217_8868(_____914D_7F6E["单位状态"])
+        end
+    }
+end
 ____exports["注册持有型周期效果"] = function(_____53C2_6570)
     if _____53C2_6570 == nil or _____53C2_6570["物品类型ID"] == 0 or _____53C2_6570["间隔毫秒"] <= 0 or _____53C2_6570["周期回调"] == nil then
-        return
+        return nil
     end
     _____786E_4FDD_6301_6709_578B_5468_671F_6548_679C_4E2D_5FC3_5DF2_6CE8_518C()
     local _____914D_7F6E = __TS__ObjectAssign(
@@ -193,10 +247,15 @@ ____exports["注册持有型周期效果"] = function(_____53C2_6570)
             ["单位状态"] = {}
         }
     )
+    local _____63A7_5236_5668 = _____521B_5EFA_6301_6709_578B_5468_671F_6548_679C_63A7_5236_5668(_____914D_7F6E)
+    _____914D_7F6E["获取单位列表"] = _____63A7_5236_5668["获取单位列表"]
+    _____914D_7F6E["获取单位数量"] = _____63A7_5236_5668["获取单位数量"]
     _____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868[#_____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868 + 1] = _____914D_7F6E
+    _____8865_767B_8BB0_521D_59CB_5355_4F4D(_____914D_7F6E)
     if _____5DF2_6CE8_518C_76D1_542C_7269_54C1_7C7B_578B[_____53C2_6570["物品类型ID"]] ~= true then
         _____5DF2_6CE8_518C_76D1_542C_7269_54C1_7C7B_578B[_____53C2_6570["物品类型ID"]] = true
         _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03(_____53C2_6570["物品类型ID"], ____on_6301_6709_578B_5468_671F_6548_679C_83B7_53D6, ____on_6301_6709_578B_5468_671F_6548_679C_4E22_5F03)
     end
+    return _____63A7_5236_5668
 end
 return ____exports

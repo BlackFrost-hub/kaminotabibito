@@ -1,5 +1,4 @@
 /** @noSelfInFile */
-const jass = require("jass.common") as any;
 const { resolveItemIdByName } = require("系统.02．物品系统.13．物品名反查") as {
   resolveItemIdByName: (this: void, name: string) => string | undefined;
 };
@@ -37,28 +36,17 @@ const { 女妖头饰强化累计配置 } = require("系统.02．物品系统.15�
   女妖头饰强化累计配置: { 物品名: string; 命中次数阈值: number; 触发单位类型: string };
 };
 
-const GetHandleId = jass.GetHandleId as (h: any) => number;
+const jass = require("jass.common") as any;
 const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (u: any, state: any, value: number) => void;
 const GetItemCharges = jass.GetItemCharges as (it: any) => number;
 const SetItemCharges = jass.SetItemCharges as (it: any, charges: number) => void;
-const GetItemTypeId = jass.GetItemTypeId as (it: any) => number;
-const UnitItemInSlot = jass.UnitItemInSlot as (u: any, slot: number) => any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
 
 const 女妖头饰ID = stringToFourCCSafe(resolveItemIdByName(女妖头饰累计配置.物品名));
 const 女妖头饰强化ID = stringToFourCCSafe(resolveItemIdByName(女妖头饰强化累计配置.物品名));
-
-function 单位拥有装备(this: void, unit: any, itemTypeId: number): boolean {
-  if (unit == null || unit === 0 || itemTypeId <= 0) return false;
-  for (let slot = 0; slot < 6; slot++) {
-    const item = UnitItemInSlot(unit, slot);
-    if (item != null && item !== 0 && GetItemTypeId(item) === itemTypeId) return true;
-  }
-  return false;
-}
 
 export function 处理女妖头饰累计(this: void, target: any, attacker: any, applied: number): void {
   if (target == null || target === 0 || attacker == null || attacker === 0 || !(applied > 0)) {
@@ -72,7 +60,6 @@ export function 处理女妖头饰累计(this: void, target: any, attacker: any,
   const 有女妖头饰强化 = 女妖头饰强化物品 != null;
   if (!有女妖头饰 && !有女妖头饰强化) return;
 
-  const hid = GetHandleId(target);
   if (有女妖头饰 || 有女妖头饰强化) {
     const 到达阈值 = 单位物品累伤次数(target, 女妖头饰累计配置.物品名, applied, 1, 女妖头饰累计配置.累计阈值, {
       是否在CD中: false,

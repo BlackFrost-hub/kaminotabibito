@@ -14,11 +14,10 @@ local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
 local ____require_result_4 = require("lib.扩展函数.物品相关函数.物品判断函数")
 local UnitHasItemOfTypeBJ = ____require_result_4.UnitHasItemOfTypeBJ
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____9020_6210_88C5_5907_4F24_5BB3 = ____require_result_5["造成装备伤害"]
 local GetUnitStateJapi = japi.GetUnitState
-local UnitDamageTarget = jass.UnitDamageTarget
-local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
-local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____5730_72F1_706B_5361_724C_5E78_8FD0_7269_54C1ID = stringToFourCCSafe(resolveItemIdByName("|cffff6800地狱火卡牌|r|cffff0000（幸运）|r"))
 local function _____6062_590D_81EA_8EAB_6700_5927_751F_547D_767E_5206_6BD4(source)
@@ -35,16 +34,7 @@ local function _____6062_590D_81EA_8EAB_6700_5927_751F_547D_767E_5206_6BD4(sourc
     })
 end
 local function _____9020_6210_989D_5916_7269_7406_4F24_5BB3(source, target)
-    UnitDamageTarget(
-        source,
-        target,
-        100,
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_NORMAL,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_88C5_5907_4F24_5BB3(source, target, 100, DAMAGE_TYPE_NORMAL)
 end
 local function _____5730_72F1_706B_5361_724C_5E78_8FD0_66B4_51FB_76D1_542C(record, _applied, _snapshot)
     if _____5730_72F1_706B_5361_724C_5E78_8FD0_7269_54C1ID == 0 then

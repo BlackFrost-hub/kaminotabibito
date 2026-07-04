@@ -41,7 +41,13 @@ ____exports["扣除当前生命比例"] = function(unit, ratio)
     local cost = life * ratio
     SetUnitState(unit, UNIT_STATE_LIFE, life - cost > 1 and life - cost or 1)
 end
-____exports["造成装备伤害"] = function(source, target, amount, damageType)
+____exports["造成装备伤害"] = function(source, target, amount, damageType, ranged, weaponType)
+    if ranged == nil then
+        ranged = false
+    end
+    if weaponType == nil then
+        weaponType = WEAPON_TYPE_WHOKNOWS
+    end
     if not _____5355_4F4D_5B58_6D3B(source) or not _____5355_4F4D_5B58_6D3B(target) or not (amount > 0) then
         return
     end
@@ -50,10 +56,10 @@ ____exports["造成装备伤害"] = function(source, target, amount, damageType)
         target,
         amount,
         false,
-        false,
+        ranged,
         ATTACK_TYPE_NORMAL,
         damageType,
-        WEAPON_TYPE_WHOKNOWS
+        weaponType
     )
 end
 ____exports["恢复生命魔法"] = function(source, target, hp, mp, _____9ED8_8BA4_9B54_6CD5_7279_6548)

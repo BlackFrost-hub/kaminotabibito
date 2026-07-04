@@ -12,7 +12,7 @@
 import { 护盾实例, 护盾类型, 伤害信息 } from "./01．护盾类型";
 import { 获取单位护盾实例列表, 删除护盾实例, 取句柄ID, 获取所有活动护盾实例 } from "./02．护盾实例";
 import { 获取可匹配护盾列表 } from "./03．护盾优先级";
-import { 显示护盾破碎漂浮文字 } from "./08．护盾回调模板";
+import { 显示护盾破碎漂浮文字 } from "../../00．技能模板/11．回调模板/03．护盾回调模板";
 const { RMinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   RMinBJ: (this: void, a: number, b: number) => number;
 };

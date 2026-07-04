@@ -1,23 +1,25 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____4E3B_52A8_7269_54C1_8C03_8BD5_65E5_5FD7 = ____20_FF0E_7269_54C1_8F85_52A9["主动物品调试日志"]
+local ____10_FF0E_88C5_5907_6218_6597_6267_884C = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____9020_6210_88C5_5907_4F24_5BB3 = ____10_FF0E_88C5_5907_6218_6597_6267_884C["造成装备伤害"]
 local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.01．主动技能物品ID")
 local _____6C6D_51A5_8840_6756_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["汭冥血杖物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____6C6D_51A5_8840_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["汭冥血杖配置"]
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_1["获取坐标范围敌人"]
-local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_1["单位是否有效且敌对"]
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_2.createUnitEffect
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local getObjectPropertyRealSafe = ____require_result_3.getObjectPropertyRealSafe
-local ObjectType = ____require_result_3.ObjectType
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.02．buff.01．持续恢复生命魔法")
-local _____65BD_52A0_6301_7EED_6062_590D_751F_547D_9B54_6CD5 = ____require_result_4["施加持续恢复生命魔法"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_0["获取坐标范围敌人"]
+local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_0["单位是否有效且敌对"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____require_result_1.createUnitEffect
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local getObjectPropertyRealSafe = ____require_result_2.getObjectPropertyRealSafe
+local ObjectType = ____require_result_2.ObjectType
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.02．buff.01．持续恢复生命魔法")
+local _____65BD_52A0_6301_7EED_6062_590D_751F_547D_9B54_6CD5 = ____require_result_3["施加持续恢复生命魔法"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -27,13 +29,10 @@ local GetUnitLevel = jass.GetUnitLevel
 local IsUnitRace = jass.IsUnitRace
 local IsHeroUnitId = jass.IsHeroUnitId
 local KillUnit = jass.KillUnit
-local UnitDamageTarget = jass.UnitDamageTarget
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local RACE_DEMON = jass.RACE_DEMON
-local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
-local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local EXSetEffectSize = japi.EXSetEffectSize
 local function _____662F_5426_4E3A_6C6D_51A5_8840_6756(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
@@ -67,7 +66,7 @@ local function _____65BD_52A0_6C6D_51A5_8840_6756_6062_590D(_____65BD_6CD5_5355_
     })
 end
 ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662F_5426_5F3A_5316)
-    debugLogForce("19．汭冥血杖", "进入", "执行汭冥血杖献祭")
+    _____4E3B_52A8_7269_54C1_8C03_8BD5_65E5_5FD7("19．汭冥血杖", "进入", "执行汭冥血杖献祭")
     local _____65BD_6CD5_5355_4F4D = _____4E0A_4E0B_6587["施法单位"]
     local _____76EE_6807_5355_4F4D = _____4E0A_4E0B_6587["目标单位"]
     if _____65BD_6CD5_5355_4F4D == nil or _____65BD_6CD5_5355_4F4D == 0 or _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
@@ -108,15 +107,12 @@ ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662
                 if not _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9(_____654C_4EBA, _____65BD_6CD5_5355_4F4D) then
                     goto __continue14
                 end
-                UnitDamageTarget(
+                _____9020_6210_88C5_5907_4F24_5BB3(
                     _____65BD_6CD5_5355_4F4D,
                     _____654C_4EBA,
                     _____76EE_6807_6700_5927_751F_547D * _____6C6D_51A5_8840_6756_914D_7F6E["伤害生命系数"],
-                    false,
-                    true,
-                    ATTACK_TYPE_NORMAL,
                     DAMAGE_TYPE_MAGIC,
-                    WEAPON_TYPE_WHOKNOWS
+                    true
                 )
             end
             ::__continue14::
@@ -127,7 +123,7 @@ ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662
     _____65BD_52A0_6C6D_51A5_8840_6756_6062_590D(_____65BD_6CD5_5355_4F4D, _____751F_547D_6062_590D_503C, _____9B54_6CD5_6062_590D_503C)
 end
 ____exports["处理汭冥血杖使用"] = function(_____4E0A_4E0B_6587)
-    debugLogForce("19．汭冥血杖", "进入", "处理汭冥血杖使用")
+    _____4E3B_52A8_7269_54C1_8C03_8BD5_65E5_5FD7("19．汭冥血杖", "进入", "处理汭冥血杖使用")
     if not _____662F_5426_4E3A_6C6D_51A5_8840_6756(_____4E0A_4E0B_6587["物品"]) then
         return
     end

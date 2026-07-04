@@ -1,6 +1,11 @@
-local ____lualib = require("lualib_bundle")
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____88C5_5907_8C03_8BD5_65E5_5FD7 = ____20_FF0E_7269_54C1_8F85_52A9["装备调试日志"]
+local ____10_FF0E_88C5_5907_6218_6597_6267_884C = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____9020_6210_88C5_5907_4F24_5BB3 = ____10_FF0E_88C5_5907_6218_6597_6267_884C["造成装备伤害"]
+local _____64AD_653E_88C5_5907_70B9_7279_6548 = ____10_FF0E_88C5_5907_6218_6597_6267_884C["播放点特效"]
+local _____64AD_653E_88C5_5907_5355_4F4D_7279_6548 = ____10_FF0E_88C5_5907_6218_6597_6267_884C["播放单位特效"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -9,59 +14,14 @@ local ____require_result_0 = require("lib.扩展函数.物品相关函数.物品
 local UnitHasItemOfTypeBJ = ____require_result_0.UnitHasItemOfTypeBJ
 local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_1.doHeal
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_2.debugLogForce
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_3.addPeriodicCallback
-local getServerTime = ____require_result_3.getServerTime
 local GetUnitState = jass.GetUnitState
 local GetUnitStateJapi = japi.GetUnitState
-local UnitDamageTarget = jass.UnitDamageTarget
 local IsUnitType = jass.IsUnitType
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitName = jass.GetUnitName
-local AddSpecialEffect = jass.AddSpecialEffect
-local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
-local DestroyEffect = jass.DestroyEffect
 local GetRandomReal = jass.GetRandomReal
 local ConvertUnitState = jass.ConvertUnitState
-local _____5F85_9500_6BC1_7279_6548_5217_8868 = {}
-local _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = false
-local function _____5904_7406_5F85_9500_6BC1_7279_6548()
-    local _____5F53_524D_65F6_95F4 = getServerTime()
-    do
-        local i = #_____5F85_9500_6BC1_7279_6548_5217_8868 - 1
-        while i >= 0 do
-            do
-                local _____8BB0_5F55 = _____5F85_9500_6BC1_7279_6548_5217_8868[i + 1]
-                if _____5F53_524D_65F6_95F4 < _____8BB0_5F55["到期时间"] then
-                    goto __continue4
-                end
-                DestroyEffect(_____8BB0_5F55["句柄"])
-                __TS__ArraySplice(_____5F85_9500_6BC1_7279_6548_5217_8868, i, 1)
-            end
-            ::__continue4::
-            i = i - 1
-        end
-    end
-end
-local function _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
-    if _____6301_7EED_79D2 == nil then
-        _____6301_7EED_79D2 = 1
-    end
-    if effect == nil or effect == 0 then
-        return
-    end
-    if not _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 then
-        _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = true
-        addPeriodicCallback(100, _____5904_7406_5F85_9500_6BC1_7279_6548)
-    end
-    _____5F85_9500_6BC1_7279_6548_5217_8868[#_____5F85_9500_6BC1_7279_6548_5217_8868 + 1] = {
-        ["句柄"] = effect,
-        ["到期时间"] = getServerTime() + _____6301_7EED_79D2 * 1000
-    }
-end
 ____exports["伤害事件攻击类型"] = {["普通"] = jass.ATTACK_TYPE_NORMAL, ["混乱"] = jass.ATTACK_TYPE_CHAOS}
 ____exports["伤害事件伤害类型"] = {
     ["普通"] = jass.DAMAGE_TYPE_NORMAL,
@@ -113,19 +73,7 @@ ____exports["取单位护甲"] = function(_____5355_4F4D)
     )
 end
 ____exports["造成伤害事件伤害"] = function(_____6765_6E90, _____76EE_6807, _____4F24_5BB3, _____4F24_5BB3_7C7B_578B)
-    if not ____exports["单位有效存活"](_____6765_6E90) or not ____exports["单位有效存活"](_____76EE_6807) or not (_____4F24_5BB3 > 0) then
-        return
-    end
-    UnitDamageTarget(
-        _____6765_6E90,
-        _____76EE_6807,
-        _____4F24_5BB3,
-        false,
-        false,
-        ____exports["伤害事件攻击类型"]["普通"],
-        _____4F24_5BB3_7C7B_578B,
-        ____exports["伤害事件武器类型"]
-    )
+    _____9020_6210_88C5_5907_4F24_5BB3(_____6765_6E90, _____76EE_6807, _____4F24_5BB3, _____4F24_5BB3_7C7B_578B)
 end
 ____exports["执行物品治疗"] = function(_____6765_6E90, _____76EE_6807, _____751F_547D_503C, _____7279_6548_8DEF_5F84, _____9B54_6CD5_503C, _____9B54_6CD5_7279_6548_8DEF_5F84, _____5EF6_8FDF_4E00_5E27, _____4F7F_7528_9ED8_8BA4_751F_547D_7279_6548, _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548)
     if _____9B54_6CD5_503C == nil then
@@ -140,7 +88,7 @@ ____exports["执行物品治疗"] = function(_____6765_6E90, _____76EE_6807, ___
     if _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548 == nil then
         _____4F7F_7528_9ED8_8BA4_9B54_6CD5_7279_6548 = false
     end
-    debugLogForce(
+    _____88C5_5907_8C03_8BD5_65E5_5FD7(
         "执行物品治疗",
         "source=",
         _____6765_6E90 ~= nil and _____6765_6E90 ~= 0 and GetUnitName(_____6765_6E90) or "nil",
@@ -180,11 +128,7 @@ ____exports["播放点特效"] = function(_____6A21_578B, x, y, _____6301_7EED_7
     if _____6301_7EED_79D2 == nil then
         _____6301_7EED_79D2 = 1
     end
-    if _____6A21_578B == "" then
-        return
-    end
-    local effect = AddSpecialEffect(_____6A21_578B, x, y)
-    _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
+    _____64AD_653E_88C5_5907_70B9_7279_6548(_____6A21_578B, x, y, _____6301_7EED_79D2)
 end
 ____exports["播放单位特效"] = function(_____5355_4F4D, _____6A21_578B, _____6302_70B9, _____6301_7EED_79D2)
     if _____6302_70B9 == nil then
@@ -193,11 +137,7 @@ ____exports["播放单位特效"] = function(_____5355_4F4D, _____6A21_578B, ___
     if _____6301_7EED_79D2 == nil then
         _____6301_7EED_79D2 = 1
     end
-    if _____5355_4F4D == nil or _____5355_4F4D == 0 or _____6A21_578B == "" then
-        return
-    end
-    local effect = AddSpecialEffectTarget(_____6A21_578B, _____5355_4F4D, _____6302_70B9)
-    _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
+    _____64AD_653E_88C5_5907_5355_4F4D_7279_6548(_____6A21_578B, _____5355_4F4D, _____6302_70B9, _____6301_7EED_79D2)
 end
 ____exports["取单位X"] = function(_____5355_4F4D)
     return GetUnitX(_____5355_4F4D)

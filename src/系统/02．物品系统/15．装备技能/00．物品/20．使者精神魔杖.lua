@@ -1,18 +1,18 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____4E3B_52A8_7269_54C1_8C03_8BD5_65E5_5FD7 = ____20_FF0E_7269_54C1_8F85_52A9["主动物品调试日志"]
 local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.01．主动技能物品ID")
 local _____4F7F_8005_7CBE_795E_9B54_6756_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["使者精神魔杖物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____4F7F_8005_7CBE_795E_9B54_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["使者精神魔杖配置"]
-local ____09_FF0E_88C5_5907_901A_7528_673A_5236 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.index")
-local _____521B_5EFA_5355_4F4D_65F6_9650_6570_503C = ____09_FF0E_88C5_5907_901A_7528_673A_5236["创建单位时限数值"]
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
+local ____16_FF0E_5355_4F4D_65F6_9650_6570_503C = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.16．单位时限数值")
+local _____521B_5EFA_5355_4F4D_65F6_9650_6570_503C = ____16_FF0E_5355_4F4D_65F6_9650_6570_503C["创建单位时限数值"]
 local jass = require("jass.common")
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_2["创建单位并登记排泄安全"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -42,7 +42,7 @@ local function _____76EE_6807_53EF_5B58_50A8(_____76EE_6807_5355_4F4D)
     return not IsHeroUnitId(GetUnitTypeId(_____76EE_6807_5355_4F4D))
 end
 ____exports["处理使者精神魔杖使用"] = function(_____4E0A_4E0B_6587)
-    debugLogForce("21．使者精神魔杖", "进入", "处理使者精神魔杖使用")
+    _____4E3B_52A8_7269_54C1_8C03_8BD5_65E5_5FD7("21．使者精神魔杖", "进入", "处理使者精神魔杖使用")
     if not _____662F_5426_4E3A_4F7F_8005_7CBE_795E_9B54_6756(_____4E0A_4E0B_6587["物品"]) then
         return
     end

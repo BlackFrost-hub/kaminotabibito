@@ -9,7 +9,7 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____5355_4F4D_6301_6709_88C5_5907 = ____require_result_1["单位持有装备"]
 local _____53D6_88C5_5907_51B7_5374_952E = ____require_result_1["取装备冷却键"]
 local _____88C5_5907_51B7_5374_5C31_7EEA = ____require_result_1["装备冷却就绪"]
-local _____8FDB_5165_88C5_5907_51B7_5374 = ____require_result_1["进入装备冷却"]
+local _____8FDB_5165_88C5_5907_51B7_5374_5E76_663E_793A = ____require_result_1["进入装备冷却并显示"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.09．装备战斗判断")
 local _____53D6_6700_5927_751F_547D = ____require_result_2["取最大生命"]
 local _____4F24_5BB3_4FEE_6B63_9608_503C_5B9E_73B0 = __TS__Class()
@@ -102,7 +102,7 @@ _____4F24_5BB3_4FEE_6B63_9608_503C_5B9E_73B0.prototype["冷却通过并记录"] 
     if not _____88C5_5907_51B7_5374_5C31_7EEA(key) then
         return false
     end
-    _____8FDB_5165_88C5_5907_51B7_5374(key, cd)
+    _____8FDB_5165_88C5_5907_51B7_5374_5E76_663E_793A(key, cd, unit, self["配置"]["装备名"])
     return true
 end
 ____exports["创建伤害修正阈值触发"] = function(_____914D_7F6E)

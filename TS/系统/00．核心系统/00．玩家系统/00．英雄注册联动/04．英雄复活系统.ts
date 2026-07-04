@@ -36,6 +36,17 @@ const { onTick10ms, offTick10ms } = globalThis as unknown as {
   onTick10ms: (this: void, callback: () => void) => void;
   offTick10ms: (this: void, callback: () => void) => void;
 };
+const 冷却数字文本模块 = require("系统.09．表现系统.01．UI工具.06．冷却数字文本") as {
+  创建冷却数字文本组: (this: void, 配置: any) => any;
+  设置冷却数字文本锚点: (this: void, 文本组: any, relativeFrame: number, point: number, relativePoint: number, x: number, y: number) => void;
+  设置冷却数字文本: (this: void, 文本组: any, text: string) => void;
+  显示冷却数字文本: (this: void, 文本组: any, visible: boolean) => void;
+  英雄栏冷却数字层: any[];
+};
+const 创建冷却数字文本组 = 冷却数字文本模块.创建冷却数字文本组;
+const 设置冷却数字文本锚点 = 冷却数字文本模块.设置冷却数字文本锚点;
+const 设置冷却数字文本 = 冷却数字文本模块.设置冷却数字文本;
+const 显示冷却数字文本 = 冷却数字文本模块.显示冷却数字文本;
 
 function 移动镜头到玩家(this: void, 玩家: any, x: number, y: number): void {
   StarOther_PanCameraToTimedForPlayer(玩家, x, y, 0.1);
@@ -123,6 +134,7 @@ const 英雄栏倒计时左描边框体表: number[] = [0, 0, 0, 0, 0];
 const 英雄栏倒计时右描边框体表: number[] = [0, 0, 0, 0, 0];
 const 英雄栏倒计时阴影框体表: number[] = [0, 0, 0, 0, 0];
 const 英雄栏倒计时框体表: number[] = [0, 0, 0, 0, 0];
+const 英雄栏倒计时文本组表: any[] = [null, null, null, null, null];
 const 英雄栏倒计时剩余秒表: number[] = [0, 0, 0, 0, 0];
 
 function 是否有效(this: void, handle: any): boolean {
@@ -175,6 +187,12 @@ function 是否有英雄栏倒计时在运行(this: void): boolean {
 function 隐藏英雄栏倒计时(this: void, 槽位: number): void {
   if (槽位 < 0 || 槽位 >= 英雄栏倒计时框体表.length) return;
   英雄栏倒计时剩余秒表[槽位] = 0;
+  const 文本组 = 英雄栏倒计时文本组表[槽位];
+  if (文本组 != null) {
+    设置冷却数字文本(文本组, "");
+    显示冷却数字文本(文本组, false);
+    return;
+  }
   const 底阴影框体 = 英雄栏倒计时底阴影框体表[槽位];
   const 左描边框体 = 英雄栏倒计时左描边框体表[槽位];
   const 右描边框体 = 英雄栏倒计时右描边框体表[槽位];
@@ -188,6 +206,12 @@ function 隐藏英雄栏倒计时(this: void, 槽位: number): void {
 }
 
 function 刷新英雄栏倒计时文本(this: void, 槽位: number): void {
+  const 文本组 = 英雄栏倒计时文本组表[槽位];
+  if (文本组 != null) {
+    设置冷却数字文本(文本组, 十倍精度文本(英雄栏倒计时剩余秒表[槽位]));
+    显示冷却数字文本(文本组, true);
+    return;
+  }
   const 底阴影框体 = 英雄栏倒计时底阴影框体表[槽位];
   const 左描边框体 = 英雄栏倒计时左描边框体表[槽位];
   const 右描边框体 = 英雄栏倒计时右描边框体表[槽位];
@@ -208,92 +232,23 @@ function 创建英雄栏倒计时框体(this: void, 槽位: number): number {
   const button = DzFrameGetHeroBarButton(槽位);
   if (button === 0) return 0;
 
-  const 底阴影框体 = DzCreateFrameByTagName("TEXT", `英雄复活倒计时底阴影_${槽位}`, gameUI, "template", 0);
-  const 左描边框体 = DzCreateFrameByTagName("TEXT", `英雄复活倒计时左描边_${槽位}`, gameUI, "template", 0);
-  const 右描边框体 = DzCreateFrameByTagName("TEXT", `英雄复活倒计时右描边_${槽位}`, gameUI, "template", 0);
-  const 阴影框体 = DzCreateFrameByTagName("TEXT", `英雄复活倒计时阴影_${槽位}`, gameUI, "template", 0);
-  const 文字框体 = DzCreateFrameByTagName("TEXT", `英雄复活倒计时_${槽位}`, gameUI, "template", 0);
-  if (底阴影框体 === 0 || 左描边框体 === 0 || 右描边框体 === 0 || 阴影框体 === 0 || 文字框体 === 0) return 0;
+  const 文本组 = 创建冷却数字文本组({
+    名称前缀: `英雄复活倒计时_${槽位}_`,
+    父级: gameUI,
+    宽度: 英雄栏倒计时文字宽度,
+    高度: 英雄栏倒计时文字高度,
+    字体大小: 英雄栏倒计时字体大小,
+    优先级: 英雄栏倒计时文字优先级,
+    对齐: 文本对齐居中,
+    层: 冷却数字文本模块.英雄栏冷却数字层,
+  });
+  if (文本组 == null) return 0;
 
-  DzFrameSetSize(底阴影框体, 英雄栏倒计时文字宽度, 英雄栏倒计时文字高度);
-  DzFrameSetPoint(
-    底阴影框体,
-    帧点中心,
-    button,
-    帧点中心,
-    英雄栏倒计时偏移X + 英雄栏倒计时底阴影偏移X,
-    英雄栏倒计时偏移Y + 英雄栏倒计时底阴影偏移Y
-  );
-  DzFrameSetTextAlignment(底阴影框体, -1);
-  DzFrameSetTextAlignment(底阴影框体, 文本对齐居中);
-  DzFrameSetFont(底阴影框体, 英雄栏倒计时字体, 英雄栏倒计时字体大小, 0);
-  DzFrameSetTextColor(底阴影框体, 8, 8, 8, 255);
-  DzFrameSetPriority(底阴影框体, 英雄栏倒计时文字优先级 - 2);
-  DzFrameShow(底阴影框体, false);
-
-  DzFrameSetSize(左描边框体, 英雄栏倒计时文字宽度, 英雄栏倒计时文字高度);
-  DzFrameSetPoint(
-    左描边框体,
-    帧点中心,
-    button,
-    帧点中心,
-    英雄栏倒计时偏移X + 英雄栏倒计时左描边偏移X,
-    英雄栏倒计时偏移Y + 英雄栏倒计时左描边偏移Y
-  );
-  DzFrameSetTextAlignment(左描边框体, -1);
-  DzFrameSetTextAlignment(左描边框体, 文本对齐居中);
-  DzFrameSetFont(左描边框体, 英雄栏倒计时字体, 英雄栏倒计时字体大小, 0);
-  DzFrameSetTextColor(左描边框体, 58, 42, 24, 255);
-  DzFrameSetPriority(左描边框体, 英雄栏倒计时文字优先级 - 1);
-  DzFrameShow(左描边框体, false);
-
-  DzFrameSetSize(右描边框体, 英雄栏倒计时文字宽度, 英雄栏倒计时文字高度);
-  DzFrameSetPoint(
-    右描边框体,
-    帧点中心,
-    button,
-    帧点中心,
-    英雄栏倒计时偏移X + 英雄栏倒计时右描边偏移X,
-    英雄栏倒计时偏移Y + 英雄栏倒计时右描边偏移Y
-  );
-  DzFrameSetTextAlignment(右描边框体, -1);
-  DzFrameSetTextAlignment(右描边框体, 文本对齐居中);
-  DzFrameSetFont(右描边框体, 英雄栏倒计时字体, 英雄栏倒计时字体大小, 0);
-  DzFrameSetTextColor(右描边框体, 58, 42, 24, 255);
-  DzFrameSetPriority(右描边框体, 英雄栏倒计时文字优先级 - 1);
-  DzFrameShow(右描边框体, false);
-
-  DzFrameSetSize(阴影框体, 英雄栏倒计时文字宽度, 英雄栏倒计时文字高度);
-  DzFrameSetPoint(
-    阴影框体,
-    帧点中心,
-    button,
-    帧点中心,
-    英雄栏倒计时偏移X + 英雄栏倒计时阴影偏移X,
-    英雄栏倒计时偏移Y + 英雄栏倒计时阴影偏移Y
-  );
-  DzFrameSetTextAlignment(阴影框体, -1);
-  DzFrameSetTextAlignment(阴影框体, 文本对齐居中);
-  DzFrameSetFont(阴影框体, 英雄栏倒计时字体, 英雄栏倒计时字体大小, 0);
-  DzFrameSetTextColor(阴影框体, 16, 16, 16, 255);
-  DzFrameSetPriority(阴影框体, 英雄栏倒计时文字优先级 - 1);
-  DzFrameShow(阴影框体, false);
-
-  DzFrameSetSize(文字框体, 英雄栏倒计时文字宽度, 英雄栏倒计时文字高度);
-  DzFrameSetPoint(文字框体, 帧点中心, button, 帧点中心, 英雄栏倒计时偏移X, 英雄栏倒计时偏移Y);
-  DzFrameSetTextAlignment(文字框体, -1);
-  DzFrameSetTextAlignment(文字框体, 文本对齐居中);
-  DzFrameSetFont(文字框体, 英雄栏倒计时字体, 英雄栏倒计时字体大小, 0);
-  DzFrameSetTextColor(文字框体, 255, 242, 216, 255);
-  DzFrameSetPriority(文字框体, 英雄栏倒计时文字优先级);
-  DzFrameShow(文字框体, false);
-
-  英雄栏倒计时底阴影框体表[槽位] = 底阴影框体;
-  英雄栏倒计时左描边框体表[槽位] = 左描边框体;
-  英雄栏倒计时右描边框体表[槽位] = 右描边框体;
-  英雄栏倒计时阴影框体表[槽位] = 阴影框体;
-  英雄栏倒计时框体表[槽位] = 文字框体;
-  return 文字框体;
+  设置冷却数字文本锚点(文本组, button, 帧点中心, 帧点中心, 英雄栏倒计时偏移X, 英雄栏倒计时偏移Y);
+  显示冷却数字文本(文本组, false);
+  英雄栏倒计时文本组表[槽位] = 文本组;
+  英雄栏倒计时框体表[槽位] = 文本组.主文本框体;
+  return 文本组.主文本框体;
 }
 
 function 确保英雄栏倒计时框体(this: void, 槽位: number): number {

@@ -12,8 +12,8 @@ local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.02．易伤")
 local _____65BD_52A0_6613_4F24 = ____require_result_3["施加易伤"]
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.25．延迟批处理队列")
+local _____521B_5EFA_5EF6_8FDF_6279_5904_7406_961F_5217 = ____require_result_4["创建延迟批处理队列"]
 local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
 local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_5["创建单位并登记排泄安全"]
 local _____8C7A_72FC_76AE_7532 = require("系统.02．物品系统.15．装备技能.00．物品.27．豺狼皮甲")
@@ -48,7 +48,6 @@ local ____B00V_6697_9ED1_4FB5_8680BuffID = stringToFourCCSafe("B00V")
 local _____6697_9ED1_4FB5_8680_590D_6D3B_5355_4F4DID = stringToFourCCSafe("e00D")
 local _____6697_9ED1_4FB5_8680_590D_6D3B_6280_80FDID = stringToFourCCSafe("A0AB")
 local _____5DF2_521D_59CB_5316 = false
-local _____6697_9ED1_4FB5_8680_590D_6D3B_961F_5217 = {}
 local jass = require("jass.common")
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
@@ -77,15 +76,16 @@ local function _____5904_7406_6307_6325_6613_4F24(ctx)
     end
     _____65BD_52A0_6613_4F24(ctx.attacker, ctx.target, {["持续时间"] = 5, ["伤害增加百分比"] = 0.15})
 end
-local function _____6267_884C_6697_9ED1_4FB5_8680_590D_6D3B()
-    while #_____6697_9ED1_4FB5_8680_590D_6D3B_961F_5217 > 0 do
-        do
-            local _____8BB0_5F55 = table.remove(_____6697_9ED1_4FB5_8680_590D_6D3B_961F_5217, 1)
+local _____6697_9ED1_4FB5_8680_590D_6D3B_961F_5217 = _____521B_5EFA_5EF6_8FDF_6279_5904_7406_961F_5217(
+    "暗黑侵蚀复活",
+    {
+        ["延迟毫秒"] = 1200,
+        ["处理"] = function(_____8BB0_5F55)
             if _____8BB0_5F55 == nil or _____8BB0_5F55["来源"] == nil or _____8BB0_5F55["目标"] == nil then
-                goto __continue10
+                return
             end
             if _____6697_9ED1_4FB5_8680_590D_6D3B_5355_4F4DID == 0 or _____6697_9ED1_4FB5_8680_590D_6D3B_6280_80FDID == 0 then
-                goto __continue10
+                return
             end
             local _____9A6C_7532 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
                 GetOwningPlayer(_____8BB0_5F55["来源"]),
@@ -95,17 +95,15 @@ local function _____6267_884C_6697_9ED1_4FB5_8680_590D_6D3B()
                 0
             )
             if _____9A6C_7532 == nil or _____9A6C_7532 == 0 then
-                goto __continue10
+                return
             end
             UnitAddAbility(_____9A6C_7532, _____6697_9ED1_4FB5_8680_590D_6D3B_6280_80FDID)
             IssueImmediateOrder(_____9A6C_7532, "animatedead")
         end
-        ::__continue10::
-    end
-end
+    }
+)
 local function _____5B89_6392_6697_9ED1_4FB5_8680_590D_6D3B(_____6765_6E90, _____76EE_6807)
-    _____6697_9ED1_4FB5_8680_590D_6D3B_961F_5217[#_____6697_9ED1_4FB5_8680_590D_6D3B_961F_5217 + 1] = {["来源"] = _____6765_6E90, ["目标"] = _____76EE_6807}
-    addDelayedCallback(1200, _____6267_884C_6697_9ED1_4FB5_8680_590D_6D3B)
+    _____6697_9ED1_4FB5_8680_590D_6D3B_961F_5217["加入"]({["来源"] = _____6765_6E90, ["目标"] = _____76EE_6807})
 end
 local function _____5904_7406_6700_7EC8_4F24_5BB3(target, attacker, applied, snapshot)
     if not (applied >= 1) then

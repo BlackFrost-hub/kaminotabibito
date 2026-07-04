@@ -1,9 +1,8 @@
 /** @noSelfInFile */
 
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
+import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
+import { 造成装备伤害 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/10．装备战斗执行";
 
 const jass = require("jass.common") as any;
 
@@ -17,12 +16,9 @@ const { createUnitEffect } = require("lib.扩展函数.封装函数.01．通用�
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
-const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
-const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 熔岩恶魔之灵眼物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
@@ -37,7 +33,7 @@ function 是否为熔岩恶魔之灵眼(this: void, 物品: any): boolean {
 }
 
 export function 处理熔岩恶魔之灵眼使用(this: void, 上下文: 物品技能事件上下文): void {
-  debugLogForce("16．熔岩恶魔之灵眼", "进入", "处理熔岩恶魔之灵眼使用");
+  主动物品调试日志("16．熔岩恶魔之灵眼", "进入", "处理熔岩恶魔之灵眼使用");
 
   if (!是否为熔岩恶魔之灵眼(上下文.物品)) return;
   const 施法单位 = 上下文.施法单位;
@@ -49,7 +45,7 @@ export function 处理熔岩恶魔之灵眼使用(this: void, 上下文: 物品�
   SetUnitState(施法单位, UNIT_STATE_MANA, GetUnitState(施法单位, UNIT_STATE_MANA) - GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.魔法消耗比例);
   createUnitEffect(目标单位, 熔岩恶魔之灵眼配置.特效挂点, 熔岩恶魔之灵眼配置.特效路径, 熔岩恶魔之灵眼配置.特效持续时间, "熔岩恶魔之灵眼");
   施加临时属性效果(目标单位, 熔岩恶魔之灵眼配置.命中率恢复延迟 * 1000, [{ 类型: "单位属性", 属性名: 命中率字段, 数值: -熔岩恶魔之灵眼配置.命中率削减 }]);
-  UnitDamageTarget(施法单位, 目标单位, GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.伤害魔法系数, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS);
+  造成装备伤害(施法单位, 目标单位, GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.伤害魔法系数, DAMAGE_TYPE_SHADOW_STRIKE, true);
 }
 
 export {};

@@ -1,9 +1,7 @@
 /** @noSelfInFile */
 
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
+import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const jass = require("jass.common") as any;
 
@@ -29,7 +27,7 @@ const RACE_DEMON = jass.RACE_DEMON as any;
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 使者精神魔杖物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 使者精神魔杖配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
-import { 创建单位时限数值 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
+import { 创建单位时限数值 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制/16．单位时限数值";
 
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
 const 使者精神魔杖存储 = 创建单位时限数值("使者精神魔杖存储");
@@ -46,7 +44,7 @@ function 目标可存储(this: void, 目标单位: any): boolean {
 }
 
 export function 处理使者精神魔杖使用(this: void, 上下文: 物品技能事件上下文): void {
-  debugLogForce("21．使者精神魔杖", "进入", "处理使者精神魔杖使用");
+  主动物品调试日志("21．使者精神魔杖", "进入", "处理使者精神魔杖使用");
 
   if (!是否为使者精神魔杖(上下文.物品)) return;
   const 施法单位 = 上下文.施法单位;

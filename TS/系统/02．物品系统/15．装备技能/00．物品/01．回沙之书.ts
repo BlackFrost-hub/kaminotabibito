@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 取装备冷却键, 装备冷却中, 进入装备冷却, 延迟执行单位动作 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
+import { 取装备冷却键, 装备冷却中, 进入装备冷却并显示, 延迟执行单位动作 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const jass = require("jass.common") as any;
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
@@ -81,7 +81,7 @@ export function 处理回沙之书累计(this: void, target: any, _attacker: any
     if (eff != null) {
       YDWETimerDestroyEffectSafe(回沙之书累计配置.特效持续时间, eff);
     }
-    进入装备冷却(冷却键, 回沙之书累计配置.冷却时间);
+    进入装备冷却并显示(冷却键, 回沙之书累计配置.冷却时间, target, 回沙之书累计配置.物品名);
     延迟执行单位动作(target, 500, 执行回沙之书无敌帧);
   }
 }

@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
-import { 单位是否在来源正面扇区, 单位是否在来源背后扇区 } from "./08．方位判定工具";
-import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
+import { 单位是否在来源正面扇区, 单位是否在来源背后扇区 } from "../../04．机制组件/10．复杂战斗通用机制/08．方位判定工具";
+import type { 机制清理篮子 } from "../../04．机制组件/06．机制清理/01．机制清理篮子";
 
 export interface DamageModifierContext {
   target: any;

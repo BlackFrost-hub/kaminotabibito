@@ -9,22 +9,13 @@ const { getEnemyUnitsInRange, isValidUnit, isUnitEnemy } = require("系统.03．
   isValidUnit: (this: void, unit: any) => boolean;
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
+const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any) => void;
+};
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any,
-) => boolean;
-const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
-const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
   UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemType: number) => boolean;
 };
@@ -41,7 +32,7 @@ function 单位是否持有黑牧杖(this: void, unit: any): boolean {
 
 function 对敌人造成黑牧杖伤害(this: void, 施法者: any, 目标: any): void {
   if (!isValidUnit(施法者) || !isValidUnit(目标)) return;
-  UnitDamageTarget(施法者, 目标, 黑牧杖配置.伤害值, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS);
+  造成装备伤害(施法者, 目标, 黑牧杖配置.伤害值, DAMAGE_TYPE_SHADOW_STRIKE);
   createTimedEffect(黑牧杖配置.特效路径, GetUnitX(目标), GetUnitY(目标), 0, 1);
 }
 

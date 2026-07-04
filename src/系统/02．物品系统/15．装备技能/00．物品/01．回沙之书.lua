@@ -3,7 +3,7 @@ local ____exports = {}
 local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
 local _____53D6_88C5_5907_51B7_5374_952E = ____20_FF0E_7269_54C1_8F85_52A9["取装备冷却键"]
 local _____88C5_5907_51B7_5374_4E2D = ____20_FF0E_7269_54C1_8F85_52A9["装备冷却中"]
-local _____8FDB_5165_88C5_5907_51B7_5374 = ____20_FF0E_7269_54C1_8F85_52A9["进入装备冷却"]
+local _____8FDB_5165_88C5_5907_51B7_5374_5E76_663E_793A = ____20_FF0E_7269_54C1_8F85_52A9["进入装备冷却并显示"]
 local _____5EF6_8FDF_6267_884C_5355_4F4D_52A8_4F5C = ____20_FF0E_7269_54C1_8F85_52A9["延迟执行单位动作"]
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
@@ -67,7 +67,7 @@ ____exports["处理回沙之书累计"] = function(target, _attacker, applied)
         if eff ~= nil then
             YDWETimerDestroyEffectSafe(_____56DE_6C99_4E4B_4E66_7D2F_8BA1_914D_7F6E["特效持续时间"], eff)
         end
-        _____8FDB_5165_88C5_5907_51B7_5374(_____51B7_5374_952E, _____56DE_6C99_4E4B_4E66_7D2F_8BA1_914D_7F6E["冷却时间"])
+        _____8FDB_5165_88C5_5907_51B7_5374_5E76_663E_793A(_____51B7_5374_952E, _____56DE_6C99_4E4B_4E66_7D2F_8BA1_914D_7F6E["冷却时间"], target, _____56DE_6C99_4E4B_4E66_7D2F_8BA1_914D_7F6E["物品名"])
         _____5EF6_8FDF_6267_884C_5355_4F4D_52A8_4F5C(target, 500, _____6267_884C_56DE_6C99_4E4B_4E66_65E0_654C_5E27)
     end
 end

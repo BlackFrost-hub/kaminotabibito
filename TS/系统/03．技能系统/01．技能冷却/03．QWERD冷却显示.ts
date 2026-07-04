@@ -25,87 +25,63 @@ const fourCCTools = require("lib.扩展函数.封装函数.01．通用工具.ind
   fourCCToString: (this: void, four: number) => string;
 };
 const fourCCToStringRaw = fourCCTools.fourCCToString;
+const 冷却数字文本模块 = require("系统.09．表现系统.01．UI工具.06．冷却数字文本") as {
+  创建冷却数字文本组: (this: void, 配置: any) => any;
+  设置冷却数字文本锚点: (this: void, 文本组: any, relativeFrame: number, point: number, relativePoint: number, x: number, y: number) => void;
+  设置冷却数字文本: (this: void, 文本组: any, text: string) => void;
+  显示冷却数字文本: (this: void, 文本组: any, visible: boolean) => void;
+  技能冷却数字层: any[];
+};
+const 创建冷却数字文本组 = 冷却数字文本模块.创建冷却数字文本组;
+const 设置冷却数字文本锚点 = 冷却数字文本模块.设置冷却数字文本锚点;
+const 设置冷却数字文本 = 冷却数字文本模块.设置冷却数字文本;
+const 显示冷却数字文本 = 冷却数字文本模块.显示冷却数字文本;
 
 type 热键位 = "Q" | "W" | "E" | "R" | "D";
-type 文本框表 = Record<热键位, number>;
-type 分层文本框表 = {
-  主文本: 文本框表;
-  阴影文本: 文本框表;
-};
+type 文本组表 = Record<热键位, any>;
 
 const DzGetGameUI = japi.DzGetGameUI as () => number;
-const DzCreateFrameByTagName = japi.DzCreateFrameByTagName as (type: string, name: string, parent: number, template: string, id: number) => number;
 const DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton as (row: number, column: number) => number;
-const DzFrameSetPoint = japi.DzFrameSetPoint as (frame: number, point: number, relativeFrame: number, relativePoint: number, x: number, y: number) => void;
-const DzFrameSetSize = japi.DzFrameSetSize as (frame: number, width: number, height: number) => void;
-const DzFrameSetFont = japi.DzFrameSetFont as (frame: number, fontFile: string, height: number, flag: number) => void;
-const DzFrameSetText = japi.DzFrameSetText as (frame: number, text: string) => void;
-const DzFrameSetTextColor = japi.DzFrameSetTextColor as (frame: number, r: number, g: number, b: number, a: number) => void;
-const DzFrameSetTextAlignment = japi.DzFrameSetTextAlignment as (frame: number, align: number) => void;
-const DzFrameShow = japi.DzFrameShow as (frame: number, visible: boolean) => void;
 
 const DEBUG_FORCE_PLACEHOLDER = true;
 const REFRESH_MS = 100;
 const OFFSET_X = 0.010;
 const OFFSET_Y = 0.006;
-const SHADOW_OFFSET_X = -0.0012;
-const SHADOW_OFFSET_Y = -0.0012;
-const FONT_FILE = "UI\\uizt.ttf";
 const FONT_SIZE = 0.020;
 const TEXT_W = 0.042;
 const TEXT_H = 0.020;
 
 let initialized = false;
-let 文本框缓存: 分层文本框表 | null = null;
+let 文本组缓存: 文本组表 | null = null;
 
 function isValidHandle(handle: any): boolean {
   return handle != null && handle !== 0;
-}
-
-function 安全设置文本(this: void, frame: number, text: string): void {
-  if (!isValidHandle(frame)) return;
-  DzFrameSetText(frame, text);
-}
-
-function 安全显示框体(this: void, frame: number, visible: boolean): void {
-  if (!isValidHandle(frame)) return;
-  DzFrameShow(frame, visible);
-}
-
-function 安全设置锚点(this: void, frame: number, relativeFrame: number, x: number, y: number): void {
-  if (!isValidHandle(frame) || !isValidHandle(relativeFrame)) return;
-  DzFrameSetPoint(frame, 8, relativeFrame, 8, x, y);
 }
 
 function getLocalHero(this: void): any | null {
   return selectionSnapshotSystem.获取本地选中技能快照().hero;
 }
 
-function createTextFrame(this: void, name: string, r: number, g: number, b: number, a: number): number {
+function createTextGroup(this: void, name: string): any {
   const gameUI = DzGetGameUI();
-  if (!isValidHandle(gameUI)) return 0;
-
-  const frame = DzCreateFrameByTagName("TEXT", name, gameUI, "template", 0);
-  if (!isValidHandle(frame)) return 0;
-
-  DzFrameSetSize(frame, TEXT_W, TEXT_H);
-  DzFrameSetText(frame, "");
-  DzFrameSetFont(frame, FONT_FILE, FONT_SIZE, 0);
-  DzFrameSetTextAlignment(frame, -1);
-  DzFrameSetTextAlignment(frame, 8);
-  DzFrameSetTextColor(frame, r, g, b, a);
-  DzFrameShow(frame, false);
-  return frame;
+  if (!isValidHandle(gameUI)) return null;
+  return 创建冷却数字文本组({
+    名称前缀: name,
+    父级: gameUI,
+    宽度: TEXT_W,
+    高度: TEXT_H,
+    字体大小: FONT_SIZE,
+    优先级: 0,
+    对齐: 8,
+    层: 冷却数字文本模块.技能冷却数字层,
+  });
 }
 
-function 确保文本框缓存(this: void): 分层文本框表 | null {
-  if (文本框缓存 != null) return 文本框缓存;
+function 确保文本组缓存(this: void): 文本组表 | null {
+  if (文本组缓存 != null) return 文本组缓存;
 
-  文本框缓存 = {
-    主文本: { Q: 0, W: 0, E: 0, R: 0, D: 0 },
-    阴影文本: { Q: 0, W: 0, E: 0, R: 0, D: 0 },
-  };
-  return 文本框缓存;
+  文本组缓存 = { Q: null, W: null, E: null, R: null, D: null };
+  return 文本组缓存;
 }
 
 function fourCCText(this: void, abilityId: number): string {
@@ -127,16 +103,6 @@ function formatCooldown(this: void, cooldown: number): string {
   return jass.I2S(sec) + "." + jass.I2S(decimal);
 }
 
-function toWhiteText(this: void, text: string): string {
-  if (text === "") return "";
-  return `|cfffff2d8${text}|r`;
-}
-
-function toShadowText(this: void, text: string): string {
-  if (text === "") return "";
-  return `|cff101010${text}|r`;
-}
-
 function 构建显示文本(this: void, hotkey: 热键位, abilityId: number, cooldown: number): string {
   const cdText = formatCooldown(cooldown);
   if (cdText !== "") return cdText;
@@ -153,76 +119,53 @@ function 获取技能Id(this: void, hotkey: 热键位): number {
   return selectionSnapshotSystem.获取本地选中技能快照().skills[hotkey];
 }
 
-function 刷新单个技能(this: void, whichHero: any, hotkey: 热键位, textFrame: number, shadowFrame: number): void {
+function 刷新单个技能(this: void, whichHero: any, hotkey: 热键位, textGroup: any): void {
   const buttonFrame = 获取按钮框(hotkey);
   if (!isValidHandle(buttonFrame)) {
-    安全设置文本(textFrame, "");
-    安全显示框体(textFrame, false);
-    安全设置文本(shadowFrame, "");
-    安全显示框体(shadowFrame, false);
+    设置冷却数字文本(textGroup, "");
+    显示冷却数字文本(textGroup, false);
     return;
   }
 
-  let currentTextFrame = textFrame;
-  let currentShadowFrame = shadowFrame;
-  if (!isValidHandle(currentTextFrame)) {
-    currentTextFrame = createTextFrame(`SkillCooldown${hotkey}Text2`, 255, 242, 216, 255);
-    if (!isValidHandle(currentTextFrame)) return;
-    if (文本框缓存 != null) 文本框缓存.主文本[hotkey] = currentTextFrame;
-  }
-  if (!isValidHandle(currentShadowFrame)) {
-    currentShadowFrame = createTextFrame(`SkillCooldown${hotkey}Shadow2`, 16, 16, 16, 255);
-    if (!isValidHandle(currentShadowFrame)) return;
-    if (文本框缓存 != null) 文本框缓存.阴影文本[hotkey] = currentShadowFrame;
+  let currentTextGroup = textGroup;
+  if (currentTextGroup == null) {
+    currentTextGroup = createTextGroup(`SkillCooldown${hotkey}`);
+    if (currentTextGroup == null) return;
+    if (文本组缓存 != null) 文本组缓存[hotkey] = currentTextGroup;
   }
 
-  安全设置锚点(currentShadowFrame, buttonFrame, OFFSET_X + SHADOW_OFFSET_X, OFFSET_Y + SHADOW_OFFSET_Y);
-  安全设置锚点(currentTextFrame, buttonFrame, OFFSET_X, OFFSET_Y);
+  设置冷却数字文本锚点(currentTextGroup, buttonFrame, 8, 8, OFFSET_X, OFFSET_Y);
 
   const abilityId = 获取技能Id(hotkey);
   if (abilityId === 0) {
-    安全设置文本(currentTextFrame, "");
-    安全显示框体(currentTextFrame, false);
-    安全设置文本(currentShadowFrame, "");
-    安全显示框体(currentShadowFrame, false);
+    设置冷却数字文本(currentTextGroup, "");
+    显示冷却数字文本(currentTextGroup, false);
     return;
   }
 
   const cooldown = getCooldown(whichHero, abilityId);
   const text = 构建显示文本(hotkey, abilityId, cooldown);
-  安全设置文本(currentShadowFrame, toShadowText(text));
-  安全显示框体(currentShadowFrame, text !== "");
-  安全设置文本(currentTextFrame, toWhiteText(text));
-  安全显示框体(currentTextFrame, text !== "");
+  设置冷却数字文本(currentTextGroup, text);
+  显示冷却数字文本(currentTextGroup, text !== "");
 }
 
 function hideAll(this: void): void {
-  if (文本框缓存 == null) return;
-  安全设置文本(文本框缓存.主文本.Q, "");
-  安全显示框体(文本框缓存.主文本.Q, false);
-  安全设置文本(文本框缓存.主文本.W, "");
-  安全显示框体(文本框缓存.主文本.W, false);
-  安全设置文本(文本框缓存.主文本.E, "");
-  安全显示框体(文本框缓存.主文本.E, false);
-  安全设置文本(文本框缓存.主文本.R, "");
-  安全显示框体(文本框缓存.主文本.R, false);
-  安全设置文本(文本框缓存.主文本.D, "");
-  安全显示框体(文本框缓存.主文本.D, false);
-  安全设置文本(文本框缓存.阴影文本.Q, "");
-  安全显示框体(文本框缓存.阴影文本.Q, false);
-  安全设置文本(文本框缓存.阴影文本.W, "");
-  安全显示框体(文本框缓存.阴影文本.W, false);
-  安全设置文本(文本框缓存.阴影文本.E, "");
-  安全显示框体(文本框缓存.阴影文本.E, false);
-  安全设置文本(文本框缓存.阴影文本.R, "");
-  安全显示框体(文本框缓存.阴影文本.R, false);
-  安全设置文本(文本框缓存.阴影文本.D, "");
-  安全显示框体(文本框缓存.阴影文本.D, false);
+  if (文本组缓存 == null) return;
+  设置冷却数字文本(文本组缓存.Q, "");
+  显示冷却数字文本(文本组缓存.Q, false);
+  设置冷却数字文本(文本组缓存.W, "");
+  显示冷却数字文本(文本组缓存.W, false);
+  设置冷却数字文本(文本组缓存.E, "");
+  显示冷却数字文本(文本组缓存.E, false);
+  设置冷却数字文本(文本组缓存.R, "");
+  显示冷却数字文本(文本组缓存.R, false);
+  设置冷却数字文本(文本组缓存.D, "");
+  显示冷却数字文本(文本组缓存.D, false);
 }
 
 function onTick(this: void): void {
-  const currentFrames = 确保文本框缓存();
-  if (currentFrames == null) return;
+  const currentGroups = 确保文本组缓存();
+  if (currentGroups == null) return;
   if (功能开关模块.本地玩家是否开启冷却显示() !== true) {
     hideAll();
     return;
@@ -234,11 +177,11 @@ function onTick(this: void): void {
     return;
   }
 
-  刷新单个技能(hero, "Q", currentFrames.主文本.Q, currentFrames.阴影文本.Q);
-  刷新单个技能(hero, "W", currentFrames.主文本.W, currentFrames.阴影文本.W);
-  刷新单个技能(hero, "E", currentFrames.主文本.E, currentFrames.阴影文本.E);
-  刷新单个技能(hero, "R", currentFrames.主文本.R, currentFrames.阴影文本.R);
-  刷新单个技能(hero, "D", currentFrames.主文本.D, currentFrames.阴影文本.D);
+  刷新单个技能(hero, "Q", currentGroups.Q);
+  刷新单个技能(hero, "W", currentGroups.W);
+  刷新单个技能(hero, "E", currentGroups.E);
+  刷新单个技能(hero, "R", currentGroups.R);
+  刷新单个技能(hero, "D", currentGroups.D);
 }
 
 export function 获取QWERD冷却调试快照(this: void): string {

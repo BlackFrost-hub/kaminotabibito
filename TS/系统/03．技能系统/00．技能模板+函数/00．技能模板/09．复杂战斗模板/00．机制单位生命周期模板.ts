@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
-import { 创建可攻击机制单位, 可攻击机制单位参数, 可攻击机制单位实例 } from "../05．机制单位/01．可攻击机制单位";
-import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
+import { 创建可攻击机制单位, 可攻击机制单位参数, 可攻击机制单位实例 } from "../../04．机制组件/05．机制单位/01．可攻击机制单位";
+import type { 机制清理篮子 } from "../../04．机制组件/06．机制清理/01．机制清理篮子";
 
 const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;

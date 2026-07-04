@@ -7,6 +7,7 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
+const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
@@ -17,6 +18,9 @@ const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_ATTACK1_BASE = 0x12;
+const UNIT_STATE_ATTACK1_BONUS = 0x10;
+const UNIT_STATE_ATTACK1_COUNT = 0x11;
 
 const { stringToFourCC: 转四字码 } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string | undefined | null) => number;
@@ -38,6 +42,14 @@ export function 单位有效(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
   if (IsUnitType(unit, UNIT_TYPE_DEAD) === true) return false;
   return GetUnitState(unit, UNIT_STATE_LIFE) > 0.405;
+}
+
+export function 读取单位攻击力(this: void, unit: any): number {
+  if (unit == null || unit === 0) return 0;
+  const base = GetUnitState(unit, ConvertUnitState(UNIT_STATE_ATTACK1_BASE)) || 0;
+  const bonus = GetUnitState(unit, ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)) || 0;
+  const diceCount = GetUnitState(unit, ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)) || 0;
+  return base + bonus * (diceCount + 1) / 2;
 }
 
 export function 距离平方XY(this: void, x1: number, y1: number, x2: number, y2: number): number {

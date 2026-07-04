@@ -13,14 +13,13 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____5FEB_901F_63A7_5236Buff = ____require_result_1["快速控制Buff"]
 local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C = ____require_result_2["延后一帧执行伤害派生效果"]
-local ____require_result_3 = require("lib.扩展函数.物品相关函数.物品判断函数")
-local UnitHasItemOfTypeBJ = ____require_result_3.UnitHasItemOfTypeBJ
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____9020_6210_88C5_5907_4F24_5BB3 = ____require_result_3["造成装备伤害"]
+local ____require_result_4 = require("lib.扩展函数.物品相关函数.物品判断函数")
+local UnitHasItemOfTypeBJ = ____require_result_4.UnitHasItemOfTypeBJ
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitDamageTarget = jass.UnitDamageTarget
-local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
-local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local function _____662F_5426_4E3A_7194_5CA9_6743_6756(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
@@ -49,16 +48,7 @@ local function _____53D1_5C04_7194_5CA9_5F39_5E55(_____65BD_6CD5_8005, _____76EE
             if _____547D_4E2D_5355_4F4D == nil or _____547D_4E2D_5355_4F4D == 0 then
                 return
             end
-            UnitDamageTarget(
-                _____65BD_6CD5_8005,
-                _____547D_4E2D_5355_4F4D,
-                _____7194_5CA9_6743_6756_914D_7F6E["伤害值"],
-                false,
-                false,
-                ATTACK_TYPE_NORMAL,
-                DAMAGE_TYPE_FIRE,
-                WEAPON_TYPE_WHOKNOWS
-            )
+            _____9020_6210_88C5_5907_4F24_5BB3(_____65BD_6CD5_8005, _____547D_4E2D_5355_4F4D, _____7194_5CA9_6743_6756_914D_7F6E["伤害值"], DAMAGE_TYPE_FIRE)
             _____5FEB_901F_63A7_5236Buff(_____65BD_6CD5_8005, _____547D_4E2D_5355_4F4D, 0, _____7194_5CA9_6743_6756_914D_7F6E["控制时间"])
         end
     })

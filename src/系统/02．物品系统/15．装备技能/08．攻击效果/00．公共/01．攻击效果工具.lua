@@ -36,6 +36,8 @@ local YDWEIsEventDamageType = ____require_result_13.YDWEIsEventDamageType
 local YDWEIsEventAttackType = ____require_result_13.YDWEIsEventAttackType
 local ____require_result_14 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
 local _____88C5_5907_89E6_53D1_6982_7387_901A_8FC7 = ____require_result_14["装备触发概率通过"]
+local ____require_result_15 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____9020_6210_88C5_5907_4F24_5BB3 = ____require_result_15["造成装备伤害"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -44,7 +46,6 @@ local ConvertUnitState = jass.ConvertUnitState
 local IsUnitType = jass.IsUnitType
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetHeroStr = jass.GetHeroStr
-local UnitDamageTarget = jass.UnitDamageTarget
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
@@ -61,14 +62,13 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
-local ____jass_DAMAGE_TYPE_DIVINE_15 = jass.DAMAGE_TYPE_DIVINE
-if ____jass_DAMAGE_TYPE_DIVINE_15 == nil then
-    ____jass_DAMAGE_TYPE_DIVINE_15 = jass.DAMAGE_TYPE_UNIVERSAL
+local ____jass_DAMAGE_TYPE_DIVINE_16 = jass.DAMAGE_TYPE_DIVINE
+if ____jass_DAMAGE_TYPE_DIVINE_16 == nil then
+    ____jass_DAMAGE_TYPE_DIVINE_16 = jass.DAMAGE_TYPE_UNIVERSAL
 end
-local DAMAGE_TYPE_DIVINE = ____jass_DAMAGE_TYPE_DIVINE_15
+local DAMAGE_TYPE_DIVINE = ____jass_DAMAGE_TYPE_DIVINE_16
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL
-local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local _____88C5_5907ID_7F13_5B58 = {}
 local _____8DF3_8FC7_5355_4F4DID_7F13_5B58 = {}
 local function _____83B7_53D6_8DF3_8FC7_5355_4F4DID(unitId)
@@ -263,18 +263,11 @@ ____exports["解析攻击效果伤害类型"] = function(_____7C7B_578B)
     return DAMAGE_TYPE_NORMAL
 end
 ____exports["攻击效果造成伤害"] = function(source, target, amount, _____7C7B_578B)
-    if not ____exports["单位有效存活"](source) or not ____exports["单位有效存活"](target) or not (amount > 0) then
-        return
-    end
-    UnitDamageTarget(
+    _____9020_6210_88C5_5907_4F24_5BB3(
         source,
         target,
         amount,
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
-        ____exports["解析攻击效果伤害类型"](_____7C7B_578B),
-        WEAPON_TYPE_WHOKNOWS
+        ____exports["解析攻击效果伤害类型"](_____7C7B_578B)
     )
 end
 ____exports["攻击效果治疗生命魔法"] = function(source, target, lifeAmount, manaAmount)
@@ -335,17 +328,17 @@ ____exports["获取敌方范围单位"] = function(source, center, radius, inclu
             do
                 local unit = list[i + 1]
                 if not ____exports["单位有效存活"](unit) then
-                    goto __continue70
+                    goto __continue69
                 end
                 if not includeCenter and unit == center then
-                    goto __continue70
+                    goto __continue69
                 end
                 if isUnitEnemy(unit, source) ~= true then
-                    goto __continue70
+                    goto __continue69
                 end
                 result[#result + 1] = unit
             end
-            ::__continue70::
+            ::__continue69::
             i = i + 1
         end
     end

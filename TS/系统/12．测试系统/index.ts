@@ -17,6 +17,7 @@ const ENABLE_PHOENIXEL_BOSS_SKILL_TEST = true;
 const ENABLE_MIA_BOSS_SKILL_TEST = true;
 const ENABLE_TREE_LORD_BOSS_SKILL_TEST = true;
 const ENABLE_LATER_BOSS_SKILL_TEST = true;
+const ENABLE_PASSIVE_ITEM_COOLDOWN_UI_TEST = true;
 
 function loadTests(): void {
   if (ENABLE_STES_EVENT_TEST) {
@@ -69,6 +70,10 @@ function loadTests(): void {
 
   if (ENABLE_LATER_BOSS_SKILL_TEST) {
     require("系统.12．测试系统.12．后续Boss技能测试");
+  }
+
+  if (ENABLE_PASSIVE_ITEM_COOLDOWN_UI_TEST) {
+    require("系统.12．测试系统.13．物品栏被动冷却UI测试");
   }
 
 }

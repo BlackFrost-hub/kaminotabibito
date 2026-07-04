@@ -1,8 +1,5 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
----
--- @noSelfInFile
-local jass = require("jass.common")
 local ____require_result_0 = require("系统.02．物品系统.13．物品名反查")
 local resolveItemIdByName = ____require_result_0.resolveItemIdByName
 local ____require_result_1 = require("lib.扩展函数.物品相关函数.物品累伤次数函数")
@@ -18,33 +15,15 @@ local ____require_result_5 = require("系统.02．物品系统.15．装备技能
 local _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E = ____require_result_5["女妖头饰累计配置"]
 local ____require_result_6 = require("系统.02．物品系统.15．装备技能.02．累计伤害.01．累计伤害配置表")
 local _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E = ____require_result_6["女妖头饰强化累计配置"]
-local GetHandleId = jass.GetHandleId
+local jass = require("jass.common")
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local GetItemCharges = jass.GetItemCharges
 local SetItemCharges = jass.SetItemCharges
-local GetItemTypeId = jass.GetItemTypeId
-local UnitItemInSlot = jass.UnitItemInSlot
 local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
 local _____5973_5996_5934_9970ID = stringToFourCCSafe(resolveItemIdByName(_____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["物品名"]))
 local _____5973_5996_5934_9970_5F3A_5316ID = stringToFourCCSafe(resolveItemIdByName(_____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["物品名"]))
-local function _____5355_4F4D_62E5_6709_88C5_5907(unit, itemTypeId)
-    if unit == nil or unit == 0 or itemTypeId <= 0 then
-        return false
-    end
-    do
-        local slot = 0
-        while slot < 6 do
-            local item = UnitItemInSlot(unit, slot)
-            if item ~= nil and item ~= 0 and GetItemTypeId(item) == itemTypeId then
-                return true
-            end
-            slot = slot + 1
-        end
-    end
-    return false
-end
 ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
     if target == nil or target == 0 or attacker == nil or attacker == 0 or not (applied > 0) then
         return
@@ -62,7 +41,6 @@ ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
     if not _____6709_5973_5996_5934_9970 and not _____6709_5973_5996_5934_9970_5F3A_5316 then
         return
     end
-    local hid = GetHandleId(target)
     if _____6709_5973_5996_5934_9970 or _____6709_5973_5996_5934_9970_5F3A_5316 then
         local _____5230_8FBE_9608_503C = _____5355_4F4D_7269_54C1_7D2F_4F24_6B21_6570(
             target,

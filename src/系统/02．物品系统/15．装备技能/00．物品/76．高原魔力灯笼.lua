@@ -1,9 +1,10 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____00_FF0E_83B7_5F97_7269_54C1_914D_7F6E_8868 = require("系统.02．物品系统.15．装备技能.07．获得物品.00．公共.00．获得物品配置表")
 local _____9AD8_539F_9B54_529B_706F_7B3C_914D_7F6E = ____00_FF0E_83B7_5F97_7269_54C1_914D_7F6E_8868["高原魔力灯笼配置"]
 local _____83B7_5F97_7269_54C1_88C5_5907ID = ____00_FF0E_83B7_5F97_7269_54C1_914D_7F6E_8868["获得物品装备ID"]
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____521B_5EFA_5355_4F4D_52A8_6001_52A0_6210_540C_6B65_5668 = ____20_FF0E_7269_54C1_8F85_52A9["创建单位动态加成同步器"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.02．持有型周期效果")
 local _____6CE8_518C_6301_6709_578B_5468_671F_6548_679C = ____require_result_0["注册持有型周期效果"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.05．昼夜状态")
@@ -18,50 +19,17 @@ local _____53D6_6700_5927_751F_547D = ____require_result_3["取最大生命"]
 local _____6267_884C_6CBB_7597 = ____require_result_3["执行治疗"]
 local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_3["调整玩家属性"]
 local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
-local _____9AD8_539F_9B54_529B_706F_7B3C_72B6_6001_8868 = {}
-local function _____53D6_5355_4F4DID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
-local function _____53D6_6216_521B_5EFA_9AD8_539F_9B54_529B_706F_7B3C_72B6_6001(unit)
-    local id = _____53D6_5355_4F4DID(unit)
-    local state = _____9AD8_539F_9B54_529B_706F_7B3C_72B6_6001_8868[id]
-    if state ~= nil then
-        return state
-    end
-    local nextState = {["当前伤害减少层数"] = 0}
-    _____9AD8_539F_9B54_529B_706F_7B3C_72B6_6001_8868[id] = nextState
-    return nextState
-end
+local _____9AD8_539F_9B54_529B_706F_7B3C_591C_665A_51CF_4F24 = _____521B_5EFA_5355_4F4D_52A8_6001_52A0_6210_540C_6B65_5668(function(unit, _key, delta)
+    _____8C03_6574_73A9_5BB6_5C5E_6027(unit, "伤害减少%", delta)
+end)
 local function _____540C_6B65_591C_665A_51CF_4F24(unit, currentCount)
-    local state = _____53D6_6216_521B_5EFA_9AD8_539F_9B54_529B_706F_7B3C_72B6_6001(unit)
     local nextCount = _____662F_5426_767D_5929() and 0 or currentCount
-    if state["当前伤害减少层数"] == nextCount then
-        return
-    end
-    if state["当前伤害减少层数"] > 0 then
-        _____8C03_6574_73A9_5BB6_5C5E_6027(unit, "伤害减少%", -_____9AD8_539F_9B54_529B_706F_7B3C_914D_7F6E["夜晚伤害减少增加"] * state["当前伤害减少层数"])
-    end
-    if nextCount > 0 then
-        _____8C03_6574_73A9_5BB6_5C5E_6027(unit, "伤害减少%", _____9AD8_539F_9B54_529B_706F_7B3C_914D_7F6E["夜晚伤害减少增加"] * nextCount)
-    end
-    state["当前伤害减少层数"] = nextCount
+    _____9AD8_539F_9B54_529B_706F_7B3C_591C_665A_51CF_4F24["同步"](unit, nextCount > 0 and "伤害减少%" or nil, _____9AD8_539F_9B54_529B_706F_7B3C_914D_7F6E["夜晚伤害减少增加"] * nextCount)
 end
 local function _____6E05_7406_9AD8_539F_9B54_529B_706F_7B3C_72B6_6001(unit)
-    local id = _____53D6_5355_4F4DID(unit)
-    if id == 0 then
-        return
-    end
-    local state = _____9AD8_539F_9B54_529B_706F_7B3C_72B6_6001_8868[id]
-    if state ~= nil and state["当前伤害减少层数"] > 0 then
-        _____8C03_6574_73A9_5BB6_5C5E_6027(unit, "伤害减少%", -_____9AD8_539F_9B54_529B_706F_7B3C_914D_7F6E["夜晚伤害减少增加"] * state["当前伤害减少层数"])
-    end
-    __TS__Delete(_____9AD8_539F_9B54_529B_706F_7B3C_72B6_6001_8868, id)
+    _____9AD8_539F_9B54_529B_706F_7B3C_591C_665A_51CF_4F24["清理"](unit)
 end
 local function ____on_9AD8_539F_9B54_529B_706F_7B3C_5468_671F(unit, currentCount)
     local manaCost = GetUnitState(unit, UNIT_STATE_MAX_MANA) * _____9AD8_539F_9B54_529B_706F_7B3C_914D_7F6E["最大魔法消耗比例"] * currentCount

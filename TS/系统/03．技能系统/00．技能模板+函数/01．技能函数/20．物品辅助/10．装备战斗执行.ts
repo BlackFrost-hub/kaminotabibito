@@ -44,9 +44,9 @@ export function 扣除当前生命比例(this: void, unit: any, ratio: number): 
   SetUnitState(unit, UNIT_STATE_LIFE, life - cost > 1 ? life - cost : 1);
 }
 
-export function 造成装备伤害(this: void, source: any, target: any, amount: number, damageType: any): void {
+export function 造成装备伤害(this: void, source: any, target: any, amount: number, damageType: any, ranged: boolean = false, weaponType: any = WEAPON_TYPE_WHOKNOWS): void {
   if (!单位存活(source) || !单位存活(target) || !(amount > 0)) return;
-  UnitDamageTarget(source, target, amount, false, false, ATTACK_TYPE_NORMAL, damageType, WEAPON_TYPE_WHOKNOWS);
+  UnitDamageTarget(source, target, amount, false, ranged, ATTACK_TYPE_NORMAL, damageType, weaponType);
 }
 
 export function 恢复生命魔法(this: void, source: any, target: any, hp: number, mp: number = 0, 默认魔法特效: boolean = false): void {

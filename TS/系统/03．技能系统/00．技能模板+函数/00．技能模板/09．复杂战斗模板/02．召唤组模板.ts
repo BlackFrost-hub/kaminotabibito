@@ -5,9 +5,9 @@ import {
   type 机制单位生命周期参数,
   type 机制单位生命周期实例,
   type 机制单位生命周期结束原因,
-} from "./02．机制单位生命周期模板";
-import { 创建召唤物组状态, type 召唤物组状态 } from "./03．召唤物组状态管理";
-import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
+} from "./00．机制单位生命周期模板";
+import { 创建召唤物组状态, type 召唤物组状态 } from "../../04．机制组件/10．复杂战斗通用机制/03．召唤物组状态管理";
+import type { 机制清理篮子 } from "../../04．机制组件/06．机制清理/01．机制清理篮子";
 
 const jass = require("jass.common") as any;
 

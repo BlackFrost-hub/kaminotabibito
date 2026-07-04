@@ -8,13 +8,13 @@ const {
   单位持有装备,
   取装备冷却键,
   装备冷却中,
-  进入装备冷却,
+  进入装备冷却并显示,
   装备概率通过,
 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.08．装备识别与冷却") as {
   单位持有装备: (this: void, unit: any, 装备名: string) => boolean;
   取装备冷却键: (this: void, unit: any, tag: string, 前缀?: string) => string;
   装备冷却中: (this: void, key: string) => boolean;
-  进入装备冷却: (this: void, key: string, 秒数: number) => void;
+  进入装备冷却并显示: (this: void, key: string, 秒数: number, unit: any, 装备名: string) => void;
   装备概率通过: (this: void, unit: any, chance: number) => boolean;
 };
 const { 单位存活, 是技能伤害, 是纯普攻 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.09．装备战斗判断") as {
@@ -101,7 +101,7 @@ function 冷却允许(this: void, holder: any, record: 最终伤害触发记录)
 function 记录冷却(this: void, holder: any, record: 最终伤害触发记录): void {
   const cd = record.配置.冷却秒数 ?? 0;
   if (!(cd > 0)) return;
-  进入装备冷却(取冷却键(holder, record), cd);
+  进入装备冷却并显示(取冷却键(holder, record), cd, holder, record.配置.装备名);
 }
 
 function 通过次数并记录(this: void, holder: any, record: 最终伤害触发记录): boolean {

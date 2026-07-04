@@ -1,30 +1,23 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____09_FF0E_88C5_5907_901A_7528_673A_5236 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.index")
-local _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F = ____09_FF0E_88C5_5907_901A_7528_673A_5236["注册最终伤害触发模板"]
-local ____require_result_0 = require("系统.02．物品系统.13．物品名反查")
-local resolveItemIdByName = ____require_result_0.resolveItemIdByName
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_2.registerDamageModifier
-local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.11．方位判断函数")
-local _____662F_5426_5728_524D_65B9 = ____require_result_3["是否在前方"]
+local ____08_FF0E_88C5_5907_89E6_53D1_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.08．装备触发模板.index")
+local _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F = ____08_FF0E_88C5_5907_89E6_53D1_6A21_677F["注册最终伤害触发模板"]
+local ____13_FF0E_4F24_5BB3_4FEE_6B63_9608_503C_89E6_53D1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.13．伤害修正阈值触发")
+local _____521B_5EFA_4F24_5BB3_4FEE_6B63_9608_503C_89E6_53D1 = ____13_FF0E_4F24_5BB3_4FEE_6B63_9608_503C_89E6_53D1["创建伤害修正阈值触发"]
+local ____10_FF0E_88C5_5907_6218_6597_6267_884C = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____9020_6210_88C5_5907_4F24_5BB3 = ____10_FF0E_88C5_5907_6218_6597_6267_884C["造成装备伤害"]
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.11．方位判断函数")
+local _____662F_5426_5728_524D_65B9 = ____require_result_0["是否在前方"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local UnitItemInSlot = jass.UnitItemInSlot
-local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
-local UnitDamageTarget = jass.UnitDamageTarget
 local ConvertUnitState = jass.ConvertUnitState
 local UNIT_TYPE_MELEE_ATTACKER = jass.UNIT_TYPE_MELEE_ATTACKER
-local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH
 local GetUnitStateJapi = japi.GetUnitState
-local _____683C_6321_5927_76FE_7269_54C1ID = stringToFourCCSafe(resolveItemIdByName("格挡大盾"))
 local _____683C_6321_5927_76FE_8FD1_6218_8303_56F4 = 200
 local _____683C_6321_5927_76FE_8FD1_6218_8303_56F4_5E73_65B9 = _____683C_6321_5927_76FE_8FD1_6218_8303_56F4 * _____683C_6321_5927_76FE_8FD1_6218_8303_56F4
 local _____683C_6321_5927_76FE_666E_901A_524D_65B9_51CF_4F24 = 0.15
@@ -32,22 +25,6 @@ local _____683C_6321_5927_76FE_8FD1_6218_524D_65B9_51CF_4F24 = 0.3
 local _____683C_6321_5927_76FE_76FE_51FB_62A4_7532_7CFB_6570 = 1.4
 local _____5355_4F4D_62A4_7532_72B6_6001 = ConvertUnitState(32)
 local _____5DF2_521D_59CB_5316_683C_6321_5927_76FE = false
-local function _____5355_4F4D_6301_6709_683C_6321_5927_76FE(unit)
-    if unit == nil or unit == 0 or _____683C_6321_5927_76FE_7269_54C1ID == 0 then
-        return false
-    end
-    do
-        local i = 0
-        while i < 6 do
-            local item = UnitItemInSlot(unit, i)
-            if item ~= nil and item ~= 0 and GetItemTypeId(item) == _____683C_6321_5927_76FE_7269_54C1ID then
-                return true
-            end
-            i = i + 1
-        end
-    end
-    return false
-end
 local function _____53D6_5355_4F4D_8DDD_79BB_5E73_65B9(unitA, unitB)
     local dx = GetUnitX(unitA) - GetUnitX(unitB)
     local dy = GetUnitY(unitA) - GetUnitY(unitB)
@@ -71,24 +48,22 @@ local function _____53D6_5355_4F4D_62A4_7532(unit)
     end
     return GetUnitStateJapi(unit, _____5355_4F4D_62A4_7532_72B6_6001)
 end
-local function ____on_683C_6321_5927_76FE_4F24_5BB3_4FEE_6B63(context)
-    if not (context.currentDamage >= 1) then
-        return context.currentDamage
-    end
+local function _____683C_6321_5927_76FE_51CF_4F24_8FC7_6EE4(event)
+    local context = event["上下文"]
     if context.isTrueDamage == true then
-        return context.currentDamage
+        return false
     end
     local target = context.target
     local attacker = context.attacker
     if target == nil or target == 0 or attacker == nil or attacker == 0 then
-        return context.currentDamage
+        return false
     end
-    if not _____5355_4F4D_6301_6709_683C_6321_5927_76FE(target) then
-        return context.currentDamage
-    end
-    if not _____662F_5426_5728_524D_65B9(target, attacker) then
-        return context.currentDamage
-    end
+    return _____662F_5426_5728_524D_65B9(target, attacker)
+end
+local function _____8BA1_7B97_683C_6321_5927_76FE_51CF_4F24(event)
+    local context = event["上下文"]
+    local target = context.target
+    local attacker = context.attacker
     local _____51CF_4F24_6BD4_4F8B = _____662F_5426_8FD1_6218_666E_653B(attacker, target, context) and _____683C_6321_5927_76FE_8FD1_6218_524D_65B9_51CF_4F24 or _____683C_6321_5927_76FE_666E_901A_524D_65B9_51CF_4F24
     return context.currentDamage * (1 - _____51CF_4F24_6BD4_4F8B)
 end
@@ -109,23 +84,28 @@ local function ____on_683C_6321_5927_76FE_76FE_51FB(target, attacker, applied, s
     if not (_____4F24_5BB3_503C > 0) then
         return
     end
-    UnitDamageTarget(
+    _____9020_6210_88C5_5907_4F24_5BB3(
         attacker,
         target,
         _____4F24_5BB3_503C,
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
         DAMAGE_TYPE_ENHANCED,
+        false,
         WEAPON_TYPE_METAL_HEAVY_BASH
     )
 end
 ____exports["初始化格挡大盾"] = function()
-    if _____5DF2_521D_59CB_5316_683C_6321_5927_76FE or _____683C_6321_5927_76FE_7269_54C1ID == 0 then
+    if _____5DF2_521D_59CB_5316_683C_6321_5927_76FE then
         return
     end
     _____5DF2_521D_59CB_5316_683C_6321_5927_76FE = true
-    registerDamageModifier(____on_683C_6321_5927_76FE_4F24_5BB3_4FEE_6B63, 35)
+    _____521B_5EFA_4F24_5BB3_4FEE_6B63_9608_503C_89E6_53D1({
+        ["名称"] = "格挡大盾前方减伤",
+        ["装备名"] = "格挡大盾",
+        ["持有者"] = "受击者",
+        ["优先级"] = 35,
+        ["过滤伤害"] = _____683C_6321_5927_76FE_51CF_4F24_8FC7_6EE4,
+        ["计算伤害"] = _____8BA1_7B97_683C_6321_5927_76FE_51CF_4F24
+    })
     _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
         ["名称"] = "格挡大盾盾击",
         ["装备名"] = "格挡大盾",

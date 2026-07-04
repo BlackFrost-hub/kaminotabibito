@@ -8,7 +8,7 @@ const { 开始护盾, 护盾类型, 查询单位标签护盾值, 充能单位标
   查询单位标签护盾值: (this: void, unit: any, tag: string) => number;
   充能单位标签护盾: (this: void, unit: any, tag: string, amount: number, maxValue: number, params?: any) => number;
 };
-const { 注册最终伤害触发模板 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.11．最终伤害触发模板") as {
+const { 注册最终伤害触发模板 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.08．装备触发模板.03．最终伤害触发模板") as {
   注册最终伤害触发模板: (this: void, 配置: any) => any;
 };
 

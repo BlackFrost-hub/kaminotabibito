@@ -6,7 +6,7 @@ import {
   取攻击力,
   攻击效果造成伤害,
 } from "../08．攻击效果/00．公共/01．攻击效果工具";
-import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
+import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/00．技能模板/08．装备触发模板";
 
 const { SFB_setCurse } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
   SFB_setCurse: (this: void, sourceUnit: any, u: any, time: number) => void;

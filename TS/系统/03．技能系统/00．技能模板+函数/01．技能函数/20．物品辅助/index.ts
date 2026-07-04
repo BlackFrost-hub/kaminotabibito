@@ -11,6 +11,8 @@ export * from "./08．装备识别与冷却";
 export * from "./11．装备常量";
 export * from "./19．临时属性效果";
 export * from "./20．延迟动作";
+export * from "./21．单位动态加成同步";
+export * from "./22．装备调试日志";
 export {
   是否为使用物品,
   单位持有物品,

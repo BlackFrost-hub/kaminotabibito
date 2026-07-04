@@ -97,7 +97,7 @@ function dispatch普攻攻击效果监听器(this: void, ctx: 普攻攻击效果
     if (!攻击效果开始执行(实例.名称, ctx.source)) continue;
 
     try {
-      攻击效果进入冷却(实例.名称, ctx.source);
+      攻击效果进入冷却(实例.名称, ctx.source, 实例.冷却毫秒 ?? 0);
       实例.命中后(ctx);
     } finally {
       攻击效果结束执行(实例.名称, ctx.source);
@@ -114,7 +114,7 @@ function dispatch最终伤害监听器(this: void, ctx: 最终伤害攻击效果
     if (!攻击效果开始执行(实例.名称, ctx.source)) continue;
 
     try {
-      攻击效果进入冷却(实例.名称, ctx.source);
+      攻击效果进入冷却(实例.名称, ctx.source, 实例.冷却毫秒 ?? 0);
       实例.命中后(ctx);
     } finally {
       攻击效果结束执行(实例.名称, ctx.source);

@@ -20,15 +20,19 @@ import {
   配置型攻击效果造成伤害,
 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/21．攻击效果/01．配置型攻击效果";
 
-const { registerAppliedFinalDamageListener, 延后一帧执行伤害派生效果 } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-  延后一帧执行伤害派生效果: (this: void, cb: (this: void) => void) => void;
 };
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { 装备触发概率通过 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统") as {
   装备触发概率通过: (this: void, 原始概率: number, 触发单位: any) => boolean;
+};
+const { 创建伤害派生批处理队列 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.27．伤害派生批处理队列") as {
+  创建伤害派生批处理队列: <T>(this: void, 名称: string, 选项: { 处理: (this: void, 上下文: T) => void }) => {
+    加入: (this: void, 上下文: T) => void;
+  };
 };
 
 interface 延迟伤害记录 {
@@ -38,14 +42,18 @@ interface 延迟伤害记录 {
   damageType: any;
 }
 
-const 延迟伤害队列: 延迟伤害记录[] = [];
-
 let 已初始化 = false;
+
+const 攻击效果延迟伤害队列 = 创建伤害派生批处理队列<延迟伤害记录>("攻击效果延迟伤害", {
+  处理: function on攻击效果延迟伤害(this: void, record: 延迟伤害记录): void {
+    配置型攻击效果造成伤害(record.source, record.target, record.amount, record.damageType);
+  },
+});
 
 function 冷却通过(this: void, 配置: 攻击效果配置项, unit: any): boolean {
   if (配置.冷却毫秒 == null || 配置.冷却毫秒 <= 0) return true;
   if (攻击效果是否在冷却中(配置.装备名, unit, 配置.冷却毫秒)) return false;
-  攻击效果进入冷却(配置.装备名, unit);
+  攻击效果进入冷却(配置.装备名, unit, 配置.冷却毫秒);
   return true;
 }
 
@@ -112,20 +120,11 @@ function on攻击效果伤害修正(this: void, context: any): number {
     if (!单位持有攻击效果装备(context.attacker, cfg.装备名)) continue;
     const amount = result * (cfg.伤害倍率 ?? 0.8);
     if (amount > 0) {
-      延迟伤害队列.push({ source: context.attacker, target: context.target, amount, damageType: cfg.伤害类型 });
-      延后一帧执行伤害派生效果(on攻击效果延迟伤害);
+      攻击效果延迟伤害队列.加入({ source: context.attacker, target: context.target, amount, damageType: cfg.伤害类型 });
     }
     result = 0;
   }
   return result;
-}
-
-function on攻击效果延迟伤害(this: void): void {
-  while (延迟伤害队列.length > 0) {
-    const record = 延迟伤害队列.shift();
-    if (record == null) continue;
-    配置型攻击效果造成伤害(record.source, record.target, record.amount, record.damageType);
-  }
 }
 
 export function init攻击效果事件(this: void): void {

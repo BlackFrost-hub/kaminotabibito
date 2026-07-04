@@ -27,6 +27,12 @@ export interface 持有型周期效果参数 {
   周期回调: (this: void, unit: any, currentCount: number) => void;
   获取回调?: (this: void, unit: any, currentCount: number) => void;
   丢弃回调?: (this: void, unit: any, currentCount: number) => void;
+  初始单位列表?: (this: void) => any[];
+}
+
+export interface 持有型周期效果控制器 {
+  获取单位列表(this: void): any[];
+  获取单位数量(this: void): number;
 }
 
 type 持有型周期效果状态 = {
@@ -34,7 +40,7 @@ type 持有型周期效果状态 = {
   数量: number;
 };
 
-type 持有型周期效果实例 = 持有型周期效果参数 & {
+type 持有型周期效果实例 = 持有型周期效果参数 & 持有型周期效果控制器 & {
   下次触发时间: number;
   单位状态: Record<number, 持有型周期效果状态 | undefined>;
 };
@@ -154,21 +160,60 @@ function on持有型周期效果丢弃(this: void, unit: any, item: any, current
   }
 }
 
-export function 注册持有型周期效果(this: void, 参数: 持有型周期效果参数): void {
-  if (参数 == null || 参数.物品类型ID === 0 || 参数.间隔毫秒 <= 0 || 参数.周期回调 == null) return;
+function 补登记初始单位(this: void, 配置: 持有型周期效果实例): void {
+  if (配置.初始单位列表 == null) return;
+  const 单位列表 = 配置.初始单位列表();
+  if (单位列表 == null) return;
+  for (let i = 0; i < 单位列表.length; i++) {
+    const unit = 单位列表[i];
+    const unitId = 获取单位ID(unit);
+    if (unitId === 0) continue;
+    const currentCount = 获取单位当前持有指定物品数量(unit, 配置.物品类型ID);
+    if (currentCount <= 0) continue;
+    配置.单位状态[unitId] = { 单位: unit, 数量: 1 };
+    配置.获取回调?.(unit, 1);
+  }
+}
+
+function 创建持有型周期效果控制器(this: void, 配置: 持有型周期效果实例): 持有型周期效果控制器 {
+  return {
+    获取单位列表: function 获取持有型周期效果单位列表(this: void): any[] {
+      const result: any[] = [];
+      const ids = 获取有序单位状态ID列表(配置.单位状态);
+      for (let i = 0; i < ids.length; i++) {
+        const 状态 = 配置.单位状态[ids[i]];
+        if (状态 != null && 状态.单位 != null && 状态.单位 !== 0) {
+          result.push(状态.单位);
+        }
+      }
+      return result;
+    },
+    获取单位数量: function 获取持有型周期效果单位数量(this: void): number {
+      return 获取有序单位状态ID列表(配置.单位状态).length;
+    },
+  };
+}
+
+export function 注册持有型周期效果(this: void, 参数: 持有型周期效果参数): 持有型周期效果控制器 | null {
+  if (参数 == null || 参数.物品类型ID === 0 || 参数.间隔毫秒 <= 0 || 参数.周期回调 == null) return null;
   确保持有型周期效果中心已注册();
 
-  const 配置: 持有型周期效果实例 = {
+  const 配置 = {
     ...参数,
     下次触发时间: getServerTime() + 参数.间隔毫秒,
     单位状态: {},
-  };
+  } as 持有型周期效果实例;
+  const 控制器 = 创建持有型周期效果控制器(配置);
+  配置.获取单位列表 = 控制器.获取单位列表;
+  配置.获取单位数量 = 控制器.获取单位数量;
   持有型周期效果实例表.push(配置);
+  补登记初始单位(配置);
 
   if (已注册监听物品类型[参数.物品类型ID] !== true) {
     已注册监听物品类型[参数.物品类型ID] = true;
     监听指定物品获取丢弃(参数.物品类型ID, on持有型周期效果获取, on持有型周期效果丢弃);
   }
+  return 控制器;
 }
 
 export {};

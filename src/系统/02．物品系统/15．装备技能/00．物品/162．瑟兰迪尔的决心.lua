@@ -2,6 +2,8 @@
 local ____exports = {}
 local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.01．主动技能物品ID")
 local _____745F_5170_8FEA_5C14_7684_51B3_5FC3_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["瑟兰迪尔的决心物品ID"]
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
 local _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
 local jass = require("jass.common")
@@ -9,11 +11,6 @@ local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
-local GetUnitState = jass.GetUnitState
-local ConvertUnitState = jass.ConvertUnitState
-local UNIT_STATE_ATTACK1_BASE = 18
-local UNIT_STATE_ATTACK1_BONUS = 16
-local UNIT_STATE_ATTACK1_COUNT = 17
 local _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E = {
     ["单位类型"] = "e08P",
     ModelFileID = "war3mapImported\\ArcherGryphonKotSHV1.01.mdl",
@@ -36,24 +33,6 @@ local _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E = {
 local function _____662F_745F_5170_8FEA_5C14_7684_51B3_5FC3_7269_54C1(item)
     return item ~= nil and item ~= 0 and _____745F_5170_8FEA_5C14_7684_51B3_5FC3_7269_54C1ID ~= 0 and GetItemTypeId(item) == _____745F_5170_8FEA_5C14_7684_51B3_5FC3_7269_54C1ID
 end
-local function readUnitAttack(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    local base = GetUnitState(
-        unit,
-        ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
-    ) or 0
-    local bonus = GetUnitState(
-        unit,
-        ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
-    ) or 0
-    local diceCount = GetUnitState(
-        unit,
-        ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)
-    ) or 0
-    return base + bonus * (diceCount + 1) / 2
-end
 ____exports["处理瑟兰迪尔的决心使用"] = function(ctx)
     local caster = ctx["施法单位"]
     if caster == nil or caster == 0 then
@@ -71,7 +50,7 @@ ____exports["处理瑟兰迪尔的决心使用"] = function(ctx)
         ModelFileID = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E.ModelFileID,
         ["持续时间"] = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E["持续时间"],
         ["生命值"] = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E["生命值"],
-        ["攻击力"] = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E["攻击力"] + readUnitAttack(caster) * _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E["召唤者攻击力继承比例"],
+        ["攻击力"] = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E["攻击力"] + _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E["召唤者攻击力继承比例"],
         atkCd = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E.atkCd,
         range = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E.range,
         missileModel = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E.missileModel,

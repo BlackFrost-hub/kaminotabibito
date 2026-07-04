@@ -1,9 +1,8 @@
 /** @noSelfInFile */
 
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
+import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
+import { 造成装备伤害 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/10．装备战斗执行";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -42,13 +41,10 @@ const GetUnitLevel = jass.GetUnitLevel as (unit: any) => number;
 const IsUnitRace = jass.IsUnitRace as (unit: any, race: any) => boolean;
 const IsHeroUnitId = jass.IsHeroUnitId as (unitId: number) => boolean;
 const KillUnit = jass.KillUnit as (unit: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const RACE_DEMON = jass.RACE_DEMON as any;
-const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
-const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
@@ -82,7 +78,7 @@ function 施加汭冥血杖恢复(this: void, 施法单位: any, 生命恢复值
 }
 
 export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事件上下文, 是否强化: boolean): void {
-  debugLogForce("19．汭冥血杖", "进入", "执行汭冥血杖献祭");
+  主动物品调试日志("19．汭冥血杖", "进入", "执行汭冥血杖献祭");
 
   const 施法单位 = 上下文.施法单位;
   const 目标单位 = 上下文.目标单位;
@@ -106,14 +102,14 @@ export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事�
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];
     if (!单位是否有效且敌对(敌人, 施法单位)) continue;
-    UnitDamageTarget(施法单位, 敌人, 目标最大生命 * 汭冥血杖配置.伤害生命系数, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
+    造成装备伤害(施法单位, 敌人, 目标最大生命 * 汭冥血杖配置.伤害生命系数, DAMAGE_TYPE_MAGIC, true);
   }
 
   KillUnit(目标单位);
   施加汭冥血杖恢复(施法单位, 生命恢复值, 魔法恢复值);
 }
 
-export function 处理汭冥血杖使用(this: void, 上下文: 物品技能事件上下文): void {  debugLogForce("19．汭冥血杖", "进入", "处理汭冥血杖使用");
+export function 处理汭冥血杖使用(this: void, 上下文: 物品技能事件上下文): void {  主动物品调试日志("19．汭冥血杖", "进入", "处理汭冥血杖使用");
 
   if (!是否为汭冥血杖(上下文.物品)) return;
   执行汭冥血杖献祭(上下文, false);

@@ -9,7 +9,7 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____5355_4F4D_6301_6709_88C5_5907 = ____require_result_1["单位持有装备"]
 local _____53D6_88C5_5907_51B7_5374_952E = ____require_result_1["取装备冷却键"]
 local _____88C5_5907_51B7_5374_4E2D = ____require_result_1["装备冷却中"]
-local _____8FDB_5165_88C5_5907_51B7_5374 = ____require_result_1["进入装备冷却"]
+local _____8FDB_5165_88C5_5907_51B7_5374_5E76_663E_793A = ____require_result_1["进入装备冷却并显示"]
 local _____88C5_5907_6982_7387_901A_8FC7 = ____require_result_1["装备概率通过"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.09．装备战斗判断")
 local _____5355_4F4D_5B58_6D3B = ____require_result_2["单位存活"]
@@ -63,9 +63,11 @@ local function _____8BB0_5F55_51B7_5374(holder, record)
     if not (cd > 0) then
         return
     end
-    _____8FDB_5165_88C5_5907_51B7_5374(
+    _____8FDB_5165_88C5_5907_51B7_5374_5E76_663E_793A(
         _____53D6_51B7_5374_952E(holder, record),
-        cd
+        cd,
+        holder,
+        record["配置"]["装备名"]
     )
 end
 local function _____901A_8FC7_6B21_6570_5E76_8BB0_5F55(holder, record)

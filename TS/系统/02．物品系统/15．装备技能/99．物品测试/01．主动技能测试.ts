@@ -21,12 +21,9 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.index") as {
   创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
 };
-const platformAbilityAction = require("平台扩展API动作") as {
-  技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
-};
-
 import { items as 装备数据 } from "../../01．装备数据";
 import { 通用物品技能槽位配置表 } from "../03．主动技能/00．公共/02．通用物品技能槽位配置";
+import { 刷新物品CD } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 import {
   物品主动技能测试发放顺序,
   物品主动技能测试命令列表,
@@ -61,6 +58,7 @@ const 打印注册命令日志 = false;
 const 测试玩家名称 = "WorldEdit";
 const 红色玩家ID = 0;
 const 测试物品技能ID表: Record<number, number[] | undefined> = {};
+const 测试物品主动最大冷却秒表: Record<number, number | undefined> = {};
 let 已初始化测试物品技能ID表 = false;
 
 function 获取测试单位(this: void): any {
@@ -176,6 +174,14 @@ function 添加测试物品技能ID(this: void, rawId: string | undefined, abilL
   }
 }
 
+function 记录测试物品主动最大冷却(this: void, rawId: string | undefined, 秒数: number): void {
+  if (rawId == null || rawId === "" || !(秒数 > 0)) return;
+  const itemTypeId = stringToFourCCSafe(rawId);
+  if (itemTypeId === 0) return;
+  const old = 测试物品主动最大冷却秒表[itemTypeId] ?? 0;
+  if (秒数 > old) 测试物品主动最大冷却秒表[itemTypeId] = 秒数;
+}
+
 function 初始化测试物品技能ID表(this: void): void {
   if (已初始化测试物品技能ID表) return;
   已初始化测试物品技能ID表 = true;
@@ -193,6 +199,7 @@ function 初始化测试物品技能ID表(this: void): void {
     const 配置 = 通用物品技能槽位配置表[i];
     if (测试物品RawID表[配置.物编ID] === true) {
       添加测试物品技能ID(配置.物编ID, 配置.技能ID);
+      记录测试物品主动最大冷却(配置.物编ID, 配置.冷却时间);
     }
   }
 }
@@ -205,13 +212,10 @@ function 刷新英雄装备冷却(this: void, hero: any): number {
   for (let 槽位 = 0; 槽位 < 6; 槽位++) {
     const item = UnitItemInSlot(hero, 槽位);
     if (item == null || item === 0) continue;
-    const abilityIds = 测试物品技能ID表[GetItemTypeId(item)];
-    if (abilityIds == null) continue;
-    for (let i = 0; i < abilityIds.length; i++) {
-      if (platformAbilityAction.技能_设置技能冷却时间(hero, abilityIds[i], 0, 0)) {
-        刷新数量++;
-      }
-    }
+    const itemTypeId = GetItemTypeId(item);
+    const abilityIds = 测试物品技能ID表[itemTypeId];
+    const activeMaxSec = 测试物品主动最大冷却秒表[itemTypeId];
+    刷新数量 += 刷新物品CD({ unit: hero, item, 主动技能ID: abilityIds, 主动最大冷却秒数: activeMaxSec, 范围: "全部" });
   }
   return 刷新数量;
 }

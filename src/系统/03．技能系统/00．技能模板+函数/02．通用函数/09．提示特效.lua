@@ -1,6 +1,14 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272, CosBJ, SinBJ, AddSpecialEffect, DestroyEffect, GetOwningPlayer, GetPlayerId, EXSetEffectSpeed, EXSetEffectSize, EXEffectMatRotateZ, EXEffectMatScale, DzSetEffectVertexColor, DzSetEffectVertexAlpha, MODEL_SQUARE1X, MODEL_SQUARE2X, MODEL_SQUARE3X, MODEL_SQUARE4X, MODEL_SQUARE5X, MODEL_SQUARE6X, MODEL_RING, _____63D0_793A_5708_53CB_65B9_8272, _____63D0_793A_5708_654C_65B9_8272
+local _____505C_6B62_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5, _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272, removePeriodicCallback, CosBJ, SinBJ, AddSpecialEffect, DestroyEffect, GetOwningPlayer, GetPlayerId, EXSetEffectSpeed, EXSetEffectSize, EXEffectMatRotateZ, EXEffectMatScale, DzSetEffectVertexColor, DzSetEffectVertexAlpha, MODEL_SQUARE1X, MODEL_SQUARE2X, MODEL_SQUARE3X, MODEL_SQUARE4X, MODEL_SQUARE5X, MODEL_SQUARE6X, MODEL_RING, _____63D0_793A_5708_53CB_65B9_8272, _____63D0_793A_5708_654C_65B9_8272, _____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868, _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID
+function _____505C_6B62_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
+    if _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID <= 0 then
+        return
+    end
+    removePeriodicCallback(_____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID)
+    _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID = 0
+end
 function _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272(e, color)
     if not e then
         return
@@ -23,6 +31,23 @@ ____exports["按所属单位设置提示圈颜色"] = function(e, _____6765_6E90
         return
     end
     _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272(e, _____63D0_793A_5708_654C_65B9_8272)
+end
+____exports["移除特效步进缩放"] = function(_____7279_6548)
+    if not _____7279_6548 then
+        return
+    end
+    do
+        local i = #_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868 - 1
+        while i >= 0 do
+            if _____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868[i + 1]["特效"] == _____7279_6548 then
+                __TS__ArraySplice(_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868, i, 1)
+            end
+            i = i - 1
+        end
+    end
+    if #_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868 <= 0 then
+        _____505C_6B62_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
+    end
 end
 --- 创建一个需要手动销毁的矩形提示圈特效句柄
 ____exports["创建矩形提示圈特效"] = function(x, y, width, long, fac, speed)
@@ -114,7 +139,7 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
 local getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.BJ函数.12．数学函数")
 local RMaxBJ = ____require_result_1.RMaxBJ
@@ -156,9 +181,12 @@ local MODEL_RING_C = MODEL_DIR .. "Tip_ring_C.mdx"
 _____63D0_793A_5708_53CB_65B9_8272 = 4282449728
 _____63D0_793A_5708_654C_65B9_8272 = 4294909984
 local _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2 = 10
+local _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_95F4_9694_6BEB_79D2 = 20
 local _____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868 = {}
 local _____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868 = {}
 local _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = 0
+_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868 = {}
+_____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID = 0
 local function _____505C_6B62_63D0_793A_7279_6548_9500_6BC1_68C0_67E5()
     if _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID <= 0 then
         return
@@ -203,6 +231,42 @@ local function _____786E_4FDD_63D0_793A_7279_6548_9500_6BC1_68C0_67E5()
     end
     _____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID = addPeriodicCallback(_____63D0_793A_7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, ____on_63D0_793A_7279_6548_9500_6BC1_68C0_67E5)
 end
+local function ____on_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
+    local now = getServerTime()
+    do
+        local i = #_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868 - 1
+        while i >= 0 do
+            do
+                local _____4E0A_4E0B_6587 = _____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868[i + 1]
+                if not _____4E0A_4E0B_6587["特效"] then
+                    __TS__ArraySplice(_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868, i, 1)
+                    goto __continue19
+                end
+                if now < _____4E0A_4E0B_6587["下次触发时间"] then
+                    goto __continue19
+                end
+                _____4E0A_4E0B_6587["当前次数"] = _____4E0A_4E0B_6587["当前次数"] + 1
+                if _____4E0A_4E0B_6587["当前次数"] >= _____4E0A_4E0B_6587["最大次数"] then
+                    __TS__ArraySplice(_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868, i, 1)
+                    goto __continue19
+                end
+                EXSetEffectSize(_____4E0A_4E0B_6587["特效"], _____4E0A_4E0B_6587["基础尺寸"] + _____4E0A_4E0B_6587["当前次数"] * _____4E0A_4E0B_6587["每次增量"])
+                _____4E0A_4E0B_6587["下次触发时间"] = now + _____4E0A_4E0B_6587["周期秒"] * 1000
+            end
+            ::__continue19::
+            i = i - 1
+        end
+    end
+    if #_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868 <= 0 then
+        _____505C_6B62_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
+    end
+end
+local function _____786E_4FDD_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
+    if _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID > 0 then
+        return
+    end
+    _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID = addPeriodicCallback(_____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_95F4_9694_6BEB_79D2, ____on_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5)
+end
 local function _____5B89_5168_9500_6BC1_7279_6548(duration, effect)
     if not effect then
         return
@@ -214,6 +278,26 @@ local function _____5B89_5168_9500_6BC1_7279_6548(duration, effect)
     _____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868[#_____5F85_9500_6BC1_63D0_793A_7279_6548_5217_8868 + 1] = effect
     _____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868[#_____5F85_9500_6BC1_63D0_793A_7279_6548_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + duration * 1000
     _____786E_4FDD_63D0_793A_7279_6548_9500_6BC1_68C0_67E5()
+end
+--- 让一个已创建的特效按固定周期逐步放大。
+____exports["启动特效步进缩放"] = function(_____7279_6548, _____57FA_7840_5C3A_5BF8, _____6700_5927_6B21_6570, _____5468_671F_79D2, _____6BCF_6B21_589E_91CF)
+    if _____6BCF_6B21_589E_91CF == nil then
+        _____6BCF_6B21_589E_91CF = 1
+    end
+    if not _____7279_6548 or _____6700_5927_6B21_6570 <= 0 or _____5468_671F_79D2 <= 0 then
+        return
+    end
+    ____exports["移除特效步进缩放"](_____7279_6548)
+    _____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868[#_____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868 + 1] = {
+        ["特效"] = _____7279_6548,
+        ["当前次数"] = 0,
+        ["最大次数"] = _____6700_5927_6B21_6570,
+        ["基础尺寸"] = _____57FA_7840_5C3A_5BF8,
+        ["每次增量"] = _____6BCF_6B21_589E_91CF,
+        ["周期秒"] = _____5468_671F_79D2,
+        ["下次触发时间"] = getServerTime() + _____5468_671F_79D2 * 1000
+    }
+    _____786E_4FDD_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
 end
 --- /严格且仅支持宽长比 1:1, 1:2, 1:3, 1:4, 1:5, 1:6不支持1:7及以上，否则会出现视觉错误（菱形），因为模型是固定的。
 -- 如宽sw=300, 那么长sl=1800

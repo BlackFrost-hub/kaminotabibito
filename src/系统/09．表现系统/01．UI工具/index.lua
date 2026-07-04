@@ -48,4 +48,20 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.09．表现系统.01．UI工具.06．冷却数字文本")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.09．表现系统.01．UI工具.07．物品栏冷却显示")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

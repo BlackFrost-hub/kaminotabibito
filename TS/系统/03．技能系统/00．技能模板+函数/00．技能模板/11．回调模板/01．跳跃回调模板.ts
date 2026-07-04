@@ -22,7 +22,7 @@ const { SFB_setBuff } = require("lib.扩展函数.Star扩展函数.Star扩展库
   SFB_setBuff: (this: void, sourceUnit: any, u: any, id: number, time: number) => void;
 };
 
-import type { 跳跃结束原因 } from "./跳跃系统";
+import type { 跳跃结束原因 } from "../../01．技能函数/03．跳跃·击飞/跳跃系统";
 
 type 控制类型 = 0 | 1 | 2 | 3 | 5 | 21 | 22 | 23;
 

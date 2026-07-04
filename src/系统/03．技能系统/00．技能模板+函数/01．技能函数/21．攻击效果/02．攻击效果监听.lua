@@ -84,7 +84,7 @@ function ____dispatch_666E_653B_653B_51FB_6548_679C_76D1_542C_5668(ctx)
                 end
                 do
                     local ____try, ____error = pcall(function()
-                        _____653B_51FB_6548_679C_8FDB_5165_51B7_5374(_____5B9E_4F8B["名称"], ctx.source)
+                        _____653B_51FB_6548_679C_8FDB_5165_51B7_5374(_____5B9E_4F8B["名称"], ctx.source, _____5B9E_4F8B["冷却毫秒"] or 0)
                         _____5B9E_4F8B["命中后"](ctx)
                     end)
                     do
@@ -120,7 +120,7 @@ function ____dispatch_6700_7EC8_4F24_5BB3_76D1_542C_5668(ctx)
                 end
                 do
                     local ____try, ____error = pcall(function()
-                        _____653B_51FB_6548_679C_8FDB_5165_51B7_5374(_____5B9E_4F8B["名称"], ctx.source)
+                        _____653B_51FB_6548_679C_8FDB_5165_51B7_5374(_____5B9E_4F8B["名称"], ctx.source, _____5B9E_4F8B["冷却毫秒"] or 0)
                         _____5B9E_4F8B["命中后"](ctx)
                     end)
                     do

@@ -10,25 +10,16 @@ const { 快速控制Buff } = require("系统.03．技能系统.00．技能模板
 const { 延后一帧执行伤害派生效果 } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   延后一帧执行伤害派生效果: (this: void, callback: () => void) => void;
 };
+const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any) => void;
+};
 const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
   UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
 };
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any,
-) => boolean;
-const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
-const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 import { 熔岩权杖物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
 import { 熔岩权杖配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
@@ -56,7 +47,7 @@ function 发射熔岩弹幕(this: void, 施法者: any, 目标单位: any): void
     模型: 熔岩权杖配置.弹幕模型,
     on命中单位: function 处理熔岩弹幕命中(this: void, 命中单位: any): void {
       if (命中单位 == null || 命中单位 === 0) return;
-      UnitDamageTarget(施法者, 命中单位, 熔岩权杖配置.伤害值, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+      造成装备伤害(施法者, 命中单位, 熔岩权杖配置.伤害值, DAMAGE_TYPE_FIRE);
       快速控制Buff(施法者, 命中单位, 0, 熔岩权杖配置.控制时间);
     },
   });

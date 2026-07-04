@@ -1,15 +1,15 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
+local _____4E3B_52A8_7269_54C1_8C03_8BD5_65E5_5FD7 = ____20_FF0E_7269_54C1_8F85_52A9["主动物品调试日志"]
 local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.01．主动技能物品ID")
 local _____7130_865A_5B9D_73E0_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["焰虚宝珠物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____7130_865A_5B9D_73E0_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["焰虚宝珠配置"]
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_1.createUnitEffect
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____require_result_0.createUnitEffect
 local GetItemTypeId = jass.GetItemTypeId
 local UnitRemoveBuffsEx = jass.UnitRemoveBuffsEx
 local EXSetEffectSize = japi.EXSetEffectSize
@@ -20,7 +20,7 @@ local function _____662F_5426_4E3A_7130_865A_5B9D_73E0(_____7269_54C1)
     return GetItemTypeId(_____7269_54C1) == _____7130_865A_5B9D_73E0_7269_54C1ID
 end
 ____exports["处理焰虚宝珠使用"] = function(_____4E0A_4E0B_6587)
-    debugLogForce("23．焰虚宝珠", "进入", "处理焰虚宝珠使用")
+    _____4E3B_52A8_7269_54C1_8C03_8BD5_65E5_5FD7("23．焰虚宝珠", "进入", "处理焰虚宝珠使用")
     if not _____662F_5426_4E3A_7130_865A_5B9D_73E0(_____4E0A_4E0B_6587["物品"]) then
         return
     end

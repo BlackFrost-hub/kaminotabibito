@@ -6,7 +6,7 @@ import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度 } from "./13．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 创建延迟改向弹幕, type 延迟改向弹幕上下文 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/19．延迟改向弹幕模板";
+import { 创建延迟改向弹幕, type 延迟改向弹幕上下文 } from "../../../00．技能模板+函数/00．技能模板/09．复杂战斗模板/03．延迟改向弹幕模板";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;

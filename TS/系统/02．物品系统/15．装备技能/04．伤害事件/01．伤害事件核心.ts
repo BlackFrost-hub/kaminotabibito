@@ -12,8 +12,10 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { 施加易伤 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.02．易伤") as {
   施加易伤: (this: void, source: any, target: any, params: any) => void;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+const { 创建延迟批处理队列 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.25．延迟批处理队列") as {
+  创建延迟批处理队列: <T>(this: void, 名称: string, 选项: { 延迟毫秒: number; 处理: (this: void, 上下文: T) => void }) => {
+    加入: (this: void, 上下文: T) => void;
+  };
 };
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -58,7 +60,7 @@ const 暗黑侵蚀复活单位ID = stringToFourCCSafe("e00D");
 const 暗黑侵蚀复活技能ID = stringToFourCCSafe("A0AB");
 
 let 已初始化 = false;
-const 暗黑侵蚀复活队列: Array<{ 来源: any; 目标: any }> = [];
+type 暗黑侵蚀复活记录 = { 来源: any; 目标: any };
 
 const jass = require("jass.common") as any;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
@@ -81,21 +83,20 @@ function 处理指挥易伤(this: void, ctx: any): void {
   施加易伤(ctx.attacker, ctx.target, { 持续时间: 5, 伤害增加百分比: 0.15 });
 }
 
-function 执行暗黑侵蚀复活(this: void): void {
-  while (暗黑侵蚀复活队列.length > 0) {
-    const 记录 = 暗黑侵蚀复活队列.shift();
-    if (记录 == null || 记录.来源 == null || 记录.目标 == null) continue;
-    if (暗黑侵蚀复活单位ID === 0 || 暗黑侵蚀复活技能ID === 0) continue;
+const 暗黑侵蚀复活队列 = 创建延迟批处理队列<暗黑侵蚀复活记录>("暗黑侵蚀复活", {
+  延迟毫秒: 1200,
+  处理: function 执行暗黑侵蚀复活(this: void, 记录: 暗黑侵蚀复活记录): void {
+    if (记录 == null || 记录.来源 == null || 记录.目标 == null) return;
+    if (暗黑侵蚀复活单位ID === 0 || 暗黑侵蚀复活技能ID === 0) return;
     const 马甲 = 创建单位并登记排泄安全(GetOwningPlayer(记录.来源), 暗黑侵蚀复活单位ID, GetUnitX(记录.目标), GetUnitY(记录.目标), 0);
-    if (马甲 == null || 马甲 === 0) continue;
+    if (马甲 == null || 马甲 === 0) return;
     UnitAddAbility(马甲, 暗黑侵蚀复活技能ID);
     IssueImmediateOrder(马甲, "animatedead");
-  }
-}
+  },
+});
 
 function 安排暗黑侵蚀复活(this: void, 来源: any, 目标: any): void {
-  暗黑侵蚀复活队列.push({ 来源, 目标 });
-  addDelayedCallback(1200, 执行暗黑侵蚀复活);
+  暗黑侵蚀复活队列.加入({ 来源, 目标 });
 }
 
 function 处理最终伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {

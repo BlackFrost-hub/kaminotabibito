@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
+import type { 机制清理篮子 } from "../../04．机制组件/06．机制清理/01．机制清理篮子";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;

@@ -8,6 +8,7 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local GetUnitFacing = jass.GetUnitFacing
+local ConvertUnitState = jass.ConvertUnitState
 local IsUnitType = jass.IsUnitType
 local Atan2 = jass.Atan2
 local SquareRoot = jass.SquareRoot
@@ -18,6 +19,9 @@ local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_ATTACK1_BASE = 18
+local UNIT_STATE_ATTACK1_BONUS = 16
+local UNIT_STATE_ATTACK1_COUNT = 17
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local _____8F6C_56DB_5B57_7801 = ____require_result_0.stringToFourCC
 local _____5F27_5EA6_8F6C_89D2_5EA6 = 57.29577951308232
@@ -39,6 +43,24 @@ ____exports["单位有效"] = function(unit)
         return false
     end
     return GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
+end
+____exports["读取单位攻击力"] = function(unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    local base = GetUnitState(
+        unit,
+        ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
+    ) or 0
+    local bonus = GetUnitState(
+        unit,
+        ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
+    ) or 0
+    local diceCount = GetUnitState(
+        unit,
+        ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)
+    ) or 0
+    return base + bonus * (diceCount + 1) / 2
 end
 ____exports["距离平方XY"] = function(x1, y1, x2, y2)
     local dx = x2 - x1

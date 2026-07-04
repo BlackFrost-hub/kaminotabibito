@@ -145,13 +145,15 @@ local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local YDUserDataSet = ____require_result_0.YDUserDataSet
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
 registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
 petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
 heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index")
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
-debugLog = ____require_result_1.debugLog
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
+debugLog = ____require_result_2.debugLog
 _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2 = 150
 local _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF_6BEB_79D2 = 800
 --- 只接受玩家 1-5 当前操作的英雄，且排除电脑玩家。
@@ -236,6 +238,23 @@ function ____exports.getRegisteredPlayerHero(whichPlayer)
         C.YD_ATTR_PLAYER_HERO_UNIT,
         "unit"
     )
+end
+____exports["获取玩家英雄单位组"] = function()
+    return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
+end
+____exports["是玩家英雄组单位"] = function(unit)
+    if unit == nil or unit == 0 then
+        return false
+    end
+    local _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = ____exports["获取玩家英雄单位组"]()
+    if _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 ~= 0 then
+        return jass.IsUnitInGroup(unit, _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4) == true
+    end
+    local owner = jass.GetOwningPlayer(unit)
+    if owner == nil or owner == 0 then
+        return false
+    end
+    return ____exports.getRegisteredPlayerHero(owner) == unit
 end
 local function registerSingleHero(whichHero)
     if not isPlayableHero(whichHero) then

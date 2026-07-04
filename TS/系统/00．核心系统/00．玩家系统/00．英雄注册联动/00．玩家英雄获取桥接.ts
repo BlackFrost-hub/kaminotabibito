@@ -24,6 +24,9 @@ const { YDUserDataGet, YDUserDataSet } = require("lib.扩展函数.YDWE函数.01
   YDUserDataGet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
   YDUserDataSet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string, value: any) => void;
 };
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+};
 
 const moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效") as {
   registerMoveSpeedTornadoHero?: (this: void, whichHero: any) => void;
@@ -253,6 +256,23 @@ export function directRegisterPlayerHero(this: void, whichPlayer: any, whichHero
 export function getRegisteredPlayerHero(this: void, whichPlayer: any): any {
   if (whichPlayer == null || whichPlayer === 0) return null;
   return YDUserDataGet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit");
+}
+
+export function 获取玩家英雄单位组(this: void): any {
+  return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
+}
+
+export function 是玩家英雄组单位(this: void, unit: any): boolean {
+  if (unit == null || unit === 0) return false;
+
+  const 玩家英雄单位组 = 获取玩家英雄单位组();
+  if (玩家英雄单位组 != null && 玩家英雄单位组 !== 0) {
+    return jass.IsUnitInGroup(unit, 玩家英雄单位组) === true;
+  }
+
+  const owner = jass.GetOwningPlayer(unit);
+  if (owner == null || owner === 0) return false;
+  return getRegisteredPlayerHero(owner) === unit;
 }
 
 function registerSingleHero(whichHero: any): void {

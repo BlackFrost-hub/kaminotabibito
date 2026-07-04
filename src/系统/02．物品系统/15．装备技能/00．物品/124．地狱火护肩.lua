@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____09_FF0E_88C5_5907_901A_7528_673A_5236 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.index")
-local _____521B_5EFA_5355_4F4D_5BF9_5355_4F4D_6682_5B58_6570_503C = ____09_FF0E_88C5_5907_901A_7528_673A_5236["创建单位对单位暂存数值"]
+local ____18_FF0E_5355_4F4D_5BF9_5355_4F4D_6682_5B58_6570_503C = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.18．单位对单位暂存数值")
+local _____521B_5EFA_5355_4F4D_5BF9_5355_4F4D_6682_5B58_6570_503C = ____18_FF0E_5355_4F4D_5BF9_5355_4F4D_6682_5B58_6570_503C["创建单位对单位暂存数值"]
 local ____require_result_0 = require("系统.02．物品系统.13．物品名反查")
 local resolveItemIdByName = ____require_result_0.resolveItemIdByName
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")

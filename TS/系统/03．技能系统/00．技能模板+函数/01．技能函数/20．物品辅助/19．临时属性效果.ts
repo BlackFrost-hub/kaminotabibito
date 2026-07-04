@@ -3,6 +3,8 @@
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
+const jass = require("jass.common") as any;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
 import { 临时调整攻击, 临时调整护甲, 临时调整攻速, 调整玩家属性, 调整单位属性, 调整状态ID属性 } from "./16．属性位移与指令";
 
@@ -25,6 +27,13 @@ export interface 临时属性效果实例 {
   读取剩余次数(this: void): number | undefined;
   消耗次数(this: void, 次数?: number): number | undefined;
   清除(this: void): void;
+}
+
+export interface 单位临时属性效果托管器 {
+  施加(this: void, 单位: any, 持续毫秒: number, 属性项: 临时属性效果项[], 选项?: 临时属性效果选项): 临时属性效果实例;
+  读取(this: void, 单位: any): 临时属性效果实例 | null;
+  清除(this: void, 单位: any): void;
+  消耗次数(this: void, 单位: any, 次数?: number): number | undefined;
 }
 
 function 应用临时属性效果项(this: void, 单位: any, 项: 临时属性效果项, 方向: number): void {
@@ -81,6 +90,55 @@ export function 施加临时属性效果(this: void, 单位: any, 持续毫秒: 
     });
   }
   return 实例;
+}
+
+function 取单位临时属性效果键(this: void, 单位: any): number {
+  if (单位 == null || 单位 === 0) return 0;
+  return GetHandleId(单位) || 0;
+}
+
+export function 创建单位临时属性效果托管器(this: void): 单位临时属性效果托管器 {
+  const 实例表: Record<number, 临时属性效果实例 | undefined> = {};
+
+  function 清除(this: void, 单位: any): void {
+    const id = 取单位临时属性效果键(单位);
+    if (id === 0) return;
+    const 实例 = 实例表[id];
+    if (实例 == null) return;
+    delete 实例表[id];
+    实例.清除();
+  }
+
+  function 读取(this: void, 单位: any): 临时属性效果实例 | null {
+    const id = 取单位临时属性效果键(单位);
+    if (id === 0) return null;
+    const 实例 = 实例表[id];
+    return 实例 != null && 实例.是否激活() ? 实例 : null;
+  }
+
+  function 施加(this: void, 单位: any, 持续毫秒: number, 属性项: 临时属性效果项[], 选项?: 临时属性效果选项): 临时属性效果实例 {
+    const id = 取单位临时属性效果键(单位);
+    if (id !== 0) 清除(单位);
+    let 当前实例: 临时属性效果实例 | null = null;
+    const 实例 = 施加临时属性效果(单位, 持续毫秒, 属性项, {
+      次数: 选项?.次数,
+      on清除: function on托管临时属性效果清除(this: void, u: any): void {
+        if (id !== 0 && 实例表[id] === 当前实例) delete 实例表[id];
+        if (选项?.on清除 != null) 选项.on清除(u);
+      },
+    });
+    当前实例 = 实例;
+    if (id !== 0 && 实例.是否激活()) 实例表[id] = 实例;
+    return 实例;
+  }
+
+  function 消耗次数(this: void, 单位: any, 次数?: number): number | undefined {
+    const 实例 = 读取(单位);
+    if (实例 == null) return undefined;
+    return 实例.消耗次数(次数);
+  }
+
+  return { 施加, 读取, 清除, 消耗次数 };
 }
 
 export {};

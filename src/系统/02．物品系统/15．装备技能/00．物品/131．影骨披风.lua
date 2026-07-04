@@ -7,7 +7,7 @@ local ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177 = require("系统.02．物品系
 local _____662F_5426_4E3A_4F7F_7528_7269_54C1 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["是否为使用物品"]
 local _____5355_4F4D_662F_82F1_96C4 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["单位是英雄"]
 local _____64AD_653E_5355_4F4D_7279_6548 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["播放单位特效"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.08．潜行状态模板")
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.08．装备触发模板.01．潜行状态模板")
 local _____65BD_52A0_6F5C_884C_72B6_6001 = ____require_result_0["施加潜行状态"]
 local _____5F71_9AA8_6F5C_884C_70DF_96FE_7279_6548 = "Common\\Effect\\Element\\Dark\\ShadowStealthSmoke.mdx"
 local function ____on_5F71_9AA8_62AB_98CE_6F5C_884C_5F00_59CB(_____72B6_6001)

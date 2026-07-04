@@ -15,7 +15,7 @@ const { 单位持有伤害事件装备, 取最大生命, 造成伤害事件伤�
 const { 装备触发概率通过 } = require("../../../03．技能系统/00．技能模板+函数/01．技能函数/22．幸运值") as {
   装备触发概率通过: (this: void, rate: number, unit: any) => boolean;
 };
-import { 创建单位对单位暂存数值 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制";
+import { 创建单位对单位暂存数值 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制/18．单位对单位暂存数值";
 
 const jass = require("jass.common") as any;
 const GetHeroStr = jass.GetHeroStr as (whichHero: any, includeBonuses: boolean) => number;
