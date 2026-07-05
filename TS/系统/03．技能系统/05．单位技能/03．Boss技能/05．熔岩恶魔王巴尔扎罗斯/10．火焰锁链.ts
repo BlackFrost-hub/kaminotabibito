@@ -37,6 +37,10 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
 };
 
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
+
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -44,7 +48,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 const Player = jass.Player as (id: number) => any;
@@ -144,7 +147,18 @@ function on火焰锁链Tick(this: void, state: 火焰锁链状态): void {
   const now = getServerTime();
   if (state.lastDamageMs > 0 && now - state.lastDamageMs < config.超距Tick秒 * 1000) return;
   state.lastDamageMs = now;
-  UnitDamageTarget(boss, target, 计算超距伤害(boss, target), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+  造成单体技能伤害({
+    技能ID: 火焰锁链技能ID,
+    来源: boss,
+    目标: target,
+    伤害: 计算超距伤害(boss, target),
+    attack: false,
+    ranged: true,
+    attackType: ATTACK_TYPE_CHAOS,
+    伤害类型: DAMAGE_TYPE_FIRE,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
 }
 
 function 创建火焰锁链(this: void, context: 巴尔扎罗斯运行时上下文, target: any): void {

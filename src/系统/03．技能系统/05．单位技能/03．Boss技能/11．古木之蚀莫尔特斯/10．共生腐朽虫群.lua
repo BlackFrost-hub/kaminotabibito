@@ -12,34 +12,35 @@ local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____6781_5750_6807X = ____16_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____16_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 local IssueTargetOrder = jass.IssueTargetOrder
 local KillUnit = jass.KillUnit
-local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local removePeriodicCallback = ____require_result_0.removePeriodicCallback
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_1["创建可攻击机制单位"]
-local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物")
-local _____521B_5EFA_6218_6597_5185_62FE_53D6_7269 = ____require_result_3["创建战斗内拾取物"]
-local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_4.registerManualBuff
-local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯")
-local _____83AB_5C14_7279_65AFBuffID = ____require_result_5["莫尔特斯BuffID"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_6["临时调整攻击"]
-local ____require_result_7 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
+local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物")
+local _____521B_5EFA_6218_6597_5185_62FE_53D6_7269 = ____require_result_4["创建战斗内拾取物"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯")
+local _____83AB_5C14_7279_65AFBuffID = ____require_result_6["莫尔特斯BuffID"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_7["临时调整攻击"]
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
 local function _____53D6_7532_866B_76EE_6807(context)
     local target = _____53D6_8150_8D25_503C_6700_9AD8_73A9_5BB6(context)
     if _____5355_4F4D_6709_6548(target) then
@@ -92,16 +93,17 @@ local function _____7206_70B8_7532_866B(data)
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
-    UnitDamageTarget(
-        boss,
-        target,
-        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["爆炸伤害Boss攻击力比例"],
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_PLANT,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+        ["来源"] = boss,
+        ["目标"] = target,
+        ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["爆炸伤害Boss攻击力比例"],
+        attack = false,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_PLANT,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能"
+    })
     _____589E_52A0_73A9_5BB6_8150_8D25_503C(data.context, target, cfg["爆炸腐败值"])
 end
 local function _____7532_866B_8FFD_51FBTick(data)
@@ -193,8 +195,8 @@ local function _____521B_5EFA_8150_5316_7532_866B(context, angle)
         ["周期ID"] = 0
     }
     data["周期ID"] = addPeriodicCallback(1000, _____83AB_5C14_7279_65AF_7532_866B_8FFD_51FB_5468_671F, data)
-    local ____self_8 = context["清理"]
-    ____self_8["登记周期回调"](____self_8, "莫尔特斯-甲虫追击", data["周期ID"])
+    local ____self_9 = context["清理"]
+    ____self_9["登记周期回调"](____self_9, "莫尔特斯-甲虫追击", data["周期ID"])
 end
 ____exports["尝试释放莫尔特斯共生腐朽虫群"] = function(context, nowMs)
     if context["阶段"] < 2 or not _____5355_4F4D_6709_6548(context["Boss单位"]) then

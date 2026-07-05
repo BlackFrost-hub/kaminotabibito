@@ -17,13 +17,14 @@ local _____5355_4F4D_6709_6548 = ____13_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____13_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitDamageTarget = jass.UnitDamageTarget
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
@@ -31,17 +32,17 @@ local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_0.registerDamageModifier
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_2.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
-local ____require_result_3 = require("系统.05．Buff系统.03．Buff表.01．Boss.07．里科特")
-local _____91CC_79D1_7279BuffID = ____require_result_3["里科特BuffID"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____65BD_52A0_7729_6655 = ____require_result_4["施加眩晕"]
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_1.registerDamageModifier
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_3.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
+local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.01．Boss.07．里科特")
+local _____91CC_79D1_7279BuffID = ____require_result_4["里科特BuffID"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____65BD_52A0_7729_6655 = ____require_result_5["施加眩晕"]
 local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____795E_98CE_62A4_4F53_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["神风护体"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -140,16 +141,17 @@ local function _____7ED3_7B97_5355_4E2A_795E_98CE_7C89_788E(context, target)
     local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
     local damage = maxLife * cfg["粉碎每层最大生命比例"] * stack
     local stun = cfg["粉碎基础眩晕秒"] + cfg["粉碎每层眩晕秒"] * stack
-    UnitDamageTarget(
-        context["Boss单位"],
-        target,
-        damage,
-        false,
-        false,
-        ATTACK_TYPE_MAGIC,
-        DAMAGE_TYPE_MAGIC,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+        ["来源"] = context["Boss单位"],
+        ["目标"] = target,
+        ["伤害"] = damage,
+        attack = false,
+        ranged = false,
+        attackType = ATTACK_TYPE_MAGIC,
+        ["伤害类型"] = DAMAGE_TYPE_MAGIC,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能"
+    })
     _____65BD_52A0_7729_6655(context["Boss单位"], target, stun)
     _____64AD_653E_9650_65F6_70B9_7279_6548(
         cfg["粉碎特效路径"],
@@ -191,8 +193,8 @@ local function _____8C03_5EA6_795E_98CE_7C89_788E(context)
             _____7ED3_7B97_795E_98CE_7C89_788E(context)
         end
     )
-    local ____self_5 = context["清理"]
-    ____self_5["登记延迟回调"](____self_5, "里科特-神风粉碎", id)
+    local ____self_6 = context["清理"]
+    ____self_6["登记延迟回调"](____self_6, "里科特-神风粉碎", id)
 end
 local function ____on_91CC_79D1_7279_795E_98CE_62A4_4F53_53D7_4F24_4FEE_6B63(damageContext)
     local context = _____53D6_91CC_79D1_7279_4E0A_4E0B_6587ByBoss(damageContext.target)

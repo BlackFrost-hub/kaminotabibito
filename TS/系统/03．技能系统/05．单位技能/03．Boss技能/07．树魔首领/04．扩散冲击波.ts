@@ -6,6 +6,9 @@ import { 树魔首领数值与表现配置 } from "./02．数值与表现配置"
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -13,7 +16,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
@@ -128,7 +130,18 @@ function 执行扩散冲击波(this: void, context: 树魔首领运行时上下�
       if (hid === 0 || hit[hid] === true) continue;
       if (距离平方XY(bossX, bossY, GetUnitX(target), GetUnitY(target)) > radius2) continue;
       hit[hid] = true;
-      UnitDamageTarget(boss, target, damage, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS);
+      造成AOE技能伤害({
+        技能ID: 扩散冲击波技能ID,
+        来源: boss,
+        目标: target,
+        伤害: damage,
+        attack: false,
+        ranged: false,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_PLANT,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
       施加古树衰弱(target);
     }
 

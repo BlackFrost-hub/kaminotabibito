@@ -85,7 +85,7 @@ export const 控制Buff表: Record<string, BuffData> = {
       buffName: "减速",
       icon: "ReplaceableTextures\\CommandButtons\\BTNSlow.blp",
       effect: "",
-      type: "Debuff:control:soft",
+      type: "Debuff:control:soft:slow",
       interval: 0,
       maxStack: 1,
       stackRule: 'highest',

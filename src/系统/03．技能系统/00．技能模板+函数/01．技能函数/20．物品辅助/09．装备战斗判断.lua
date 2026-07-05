@@ -20,10 +20,22 @@ ____exports["单位存活"] = function(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
 end
 ____exports["是技能伤害"] = function(snapshot)
-    return snapshot ~= nil and (snapshot.isSkillDamage == true or snapshot.isSkillAttack == true)
+    return snapshot ~= nil and (snapshot.isSkillDamage == true or snapshot.isSkillAttack == true or snapshot.isWrappedSkillDamage == true)
+end
+____exports["是AOE技能伤害"] = function(snapshot)
+    return snapshot ~= nil and snapshot.isAoeSkillDamage == true
+end
+____exports["是单体技能伤害"] = function(snapshot)
+    return snapshot ~= nil and snapshot.isSingleTargetSkillDamage == true
+end
+____exports["是指定形态技能伤害"] = function(snapshot, _____5F62_6001)
+    if _____5F62_6001 == "AOE" then
+        return ____exports["是AOE技能伤害"](snapshot)
+    end
+    return ____exports["是单体技能伤害"](snapshot)
 end
 ____exports["是纯普攻"] = function(snapshot)
-    return snapshot ~= nil and snapshot.isNormalAttack == true and snapshot.isSkillDamage ~= true and snapshot.isSkillAttack ~= true
+    return snapshot ~= nil and snapshot.isNormalAttack == true and snapshot.isSkillDamage ~= true and snapshot.isSkillAttack ~= true and snapshot.isWrappedSkillDamage ~= true
 end
 ____exports["是元素伤害"] = function(snapshot, damageType)
     return snapshot ~= nil and snapshot.rawDamageType == damageType

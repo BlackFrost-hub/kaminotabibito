@@ -28,6 +28,9 @@ const { 获取Boss技能应攻击目标, 获取Boss技能最近敌对英雄 } = 
   获取Boss技能应攻击目标: (this: void, boss: any) => { targetRef: any } | null;
   获取Boss技能最近敌对英雄: (this: void, boss: any) => any;
 };
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
@@ -43,7 +46,6 @@ const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => 
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const R2I = jass.R2I as (value: number) => number;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as ((effect: any, color: number) => void) | undefined;
@@ -61,7 +63,18 @@ function 单位有效(this: void, unit: any): boolean {
 
 function 造成伤害(this: void, boss: any, target: any, amount: number, damageType: any): void {
   if (!单位有效(boss) || !单位有效(target) || amount <= 0) return;
-  UnitDamageTarget(boss, target, amount, false, false, jass.ATTACK_TYPE_NORMAL, damageType, jass.WEAPON_TYPE_WHOKNOWS);
+  造成单体技能伤害({
+    技能ID: 罪与罚技能ID,
+    来源: boss,
+    目标: target,
+    伤害: amount,
+    attack: false,
+    ranged: false,
+    attackType: jass.ATTACK_TYPE_NORMAL,
+    伤害类型: damageType,
+    weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
 }
 
 function 播放点名特效(this: void, target: any, duration: number): void {

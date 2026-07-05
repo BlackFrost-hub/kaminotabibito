@@ -13,14 +13,13 @@ const jass = require("jass.common") as any;
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
+
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -79,6 +78,11 @@ export interface 纯跳链参数 {
   闪电效果代码?: string;
   闪电持续时间?: number;
   治疗特效路径?: string;
+  来源类型?: "单位技能" | "Boss技能" | "召唤物技能" | "其他";
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  参与技能伤害加成?: boolean;
   目标筛选?: 跳链目标筛选;
   每跳回调?: 跳链每跳回调;
   结束回调?: 跳链结束回调;
@@ -267,16 +271,20 @@ function 执行当前一跳(实例: 纯跳链内部实例): void {
       HealEffectPath: 实例.参数.治疗特效路径,
     });
   } else {
-    UnitDamageTarget(
-      实例.参数.来源单位 ?? 当前目标,
-      当前目标,
-      实例.当前数值,
-      false,
-      false,
-      ATTACK_TYPE_NORMAL,
-      DAMAGE_TYPE_NORMAL,
-      WEAPON_TYPE_WHOKNOWS
-    );
+    造成单体技能伤害({
+      来源: 实例.参数.来源单位 ?? 当前目标,
+      目标: 当前目标,
+      伤害: 实例.当前数值,
+      伤害类型: DAMAGE_TYPE_NORMAL,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: 实例.参数.来源类型 ?? "单位技能",
+      技能ID: 实例.参数.技能ID,
+      技能实例ID: 实例.参数.技能实例ID,
+      标签: 实例.参数.技能标签,
+      参与技能伤害加成: 实例.参数.参与技能伤害加成,
+    });
   }
 
   const 当前目标ID = 取句柄ID(当前目标);

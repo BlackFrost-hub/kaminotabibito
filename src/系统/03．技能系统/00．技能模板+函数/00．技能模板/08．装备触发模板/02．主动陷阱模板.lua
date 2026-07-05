@@ -12,13 +12,14 @@ local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.01�
 local getUnitsInRange = ____require_result_1.getUnitsInRange
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
 local _____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_2["施加扩展控制"]
+local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3 = ____require_result_3["造成装备技能伤害"]
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
 local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitType = jass.IsUnitType
 local GetUnitState = jass.GetUnitState
-local UnitDamageTarget = jass.UnitDamageTarget
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -122,31 +123,31 @@ _____4E3B_52A8_9677_9631_5B9E_73B0.prototype["触发"] = function(self, target)
         end
     end
     if (self["参数"]["触发伤害"] or 0) > 0 then
-        local ____self__53C2_6570__653B_51FB_7C7B_578B_3 = self["参数"]["攻击类型"]
-        if ____self__53C2_6570__653B_51FB_7C7B_578B_3 == nil then
-            ____self__53C2_6570__653B_51FB_7C7B_578B_3 = ATTACK_TYPE_NORMAL
+        local ____self__53C2_6570__653B_51FB_7C7B_578B_4 = self["参数"]["攻击类型"]
+        if ____self__53C2_6570__653B_51FB_7C7B_578B_4 == nil then
+            ____self__53C2_6570__653B_51FB_7C7B_578B_4 = ATTACK_TYPE_NORMAL
         end
-        local attackType = ____self__53C2_6570__653B_51FB_7C7B_578B_3
-        local ____self__53C2_6570__4F24_5BB3_7C7B_578B_4 = self["参数"]["伤害类型"]
-        if ____self__53C2_6570__4F24_5BB3_7C7B_578B_4 == nil then
-            ____self__53C2_6570__4F24_5BB3_7C7B_578B_4 = DAMAGE_TYPE_MAGIC
+        local attackType = ____self__53C2_6570__653B_51FB_7C7B_578B_4
+        local ____self__53C2_6570__4F24_5BB3_7C7B_578B_5 = self["参数"]["伤害类型"]
+        if ____self__53C2_6570__4F24_5BB3_7C7B_578B_5 == nil then
+            ____self__53C2_6570__4F24_5BB3_7C7B_578B_5 = DAMAGE_TYPE_MAGIC
         end
-        local damageType = ____self__53C2_6570__4F24_5BB3_7C7B_578B_4
-        local ____self__53C2_6570__6B66_5668_7C7B_578B_5 = self["参数"]["武器类型"]
-        if ____self__53C2_6570__6B66_5668_7C7B_578B_5 == nil then
-            ____self__53C2_6570__6B66_5668_7C7B_578B_5 = WEAPON_TYPE_WHOKNOWS
+        local damageType = ____self__53C2_6570__4F24_5BB3_7C7B_578B_5
+        local ____self__53C2_6570__6B66_5668_7C7B_578B_6 = self["参数"]["武器类型"]
+        if ____self__53C2_6570__6B66_5668_7C7B_578B_6 == nil then
+            ____self__53C2_6570__6B66_5668_7C7B_578B_6 = WEAPON_TYPE_WHOKNOWS
         end
-        local weaponType = ____self__53C2_6570__6B66_5668_7C7B_578B_5
-        UnitDamageTarget(
-            self["参数"]["施法者"],
-            target,
-            self["参数"]["触发伤害"] or 0,
-            false,
-            false,
-            attackType,
-            damageType,
-            weaponType
-        )
+        local weaponType = ____self__53C2_6570__6B66_5668_7C7B_578B_6
+        _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3({
+            ["来源"] = self["参数"]["施法者"],
+            ["目标"] = target,
+            ["伤害"] = self["参数"]["触发伤害"] or 0,
+            attackType = attackType,
+            ["伤害类型"] = damageType,
+            weaponType = weaponType,
+            ["装备技能类型"] = "装备主动",
+            ["伤害形态"] = "单体"
+        })
     end
     if self["参数"]["控制类型"] ~= nil and (self["参数"]["控制持续秒数"] or 0) > 0 then
         _____65BD_52A0_6269_5C55_63A7_5236(self["参数"]["施法者"], target, self["参数"]["控制类型"], {["持续时间"] = self["参数"]["控制持续秒数"] or 0})
@@ -172,14 +173,14 @@ ____exports["创建主动陷阱"] = function(_____53C2_6570)
     if _____53C2_6570["缩放"] ~= nil and type(EXSetEffectSize) == "function" then
         EXSetEffectSize(effect, _____53C2_6570["缩放"])
     end
-    local ____4E3B_52A8_9677_9631_5B9E_73B0_6 = _____4E3B_52A8_9677_9631_5B9E_73B0
+    local ____4E3B_52A8_9677_9631_5B9E_73B0_7 = _____4E3B_52A8_9677_9631_5B9E_73B0
     _____4E0B_4E00_4E2A_4E3B_52A8_9677_9631ID = _____4E0B_4E00_4E2A_4E3B_52A8_9677_9631ID + 1
-    local _____5B9E_4F8B = __TS__New(____4E3B_52A8_9677_9631_5B9E_73B0_6, _____4E0B_4E00_4E2A_4E3B_52A8_9677_9631ID, _____53C2_6570, effect)
+    local _____5B9E_4F8B = __TS__New(____4E3B_52A8_9677_9631_5B9E_73B0_7, _____4E0B_4E00_4E2A_4E3B_52A8_9677_9631ID, _____53C2_6570, effect)
     _____5B9E_4F8B["启动"](_____5B9E_4F8B)
     if _____53C2_6570["清理"] ~= nil then
-        local ____self_7 = _____53C2_6570["清理"]
-        ____self_7["登记清理"](
-            ____self_7,
+        local ____self_8 = _____53C2_6570["清理"]
+        ____self_8["登记清理"](
+            ____self_8,
             _____5B9E_4F8B["名称"],
             function()
                 _____5B9E_4F8B["销毁"](_____5B9E_4F8B)

@@ -70,6 +70,12 @@ export interface 原生弹幕参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  来源类型?: "单位技能" | "Boss技能" | "召唤物技能" | "其他";
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  伤害形态?: "单体" | "AOE" | "未知";
+  参与技能伤害加成?: boolean;
 
   弹幕生命值?: number;
   被阻挡时销毁?: boolean;

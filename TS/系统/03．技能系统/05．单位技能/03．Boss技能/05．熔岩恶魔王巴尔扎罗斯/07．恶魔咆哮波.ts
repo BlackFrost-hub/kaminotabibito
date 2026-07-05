@@ -42,6 +42,10 @@ const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") 
   SinBJ: (this: void, degrees: number) => number;
 };
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -52,7 +56,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -177,7 +180,18 @@ function 执行咆哮波命中(this: void, context: 巴尔扎罗斯运行时上�
     治疗单位(unit, GetUnitState(unit, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.恶魔咆哮波.护卫命中治疗最大生命比例);
     return;
   }
-  UnitDamageTarget(boss, unit, 计算咆哮波伤害(boss, unit), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+  造成AOE技能伤害({
+    技能ID: 恶魔咆哮波技能ID,
+    来源: boss,
+    目标: unit,
+    伤害: 计算咆哮波伤害(boss, unit),
+    attack: false,
+    ranged: true,
+    attackType: ATTACK_TYPE_CHAOS,
+    伤害类型: DAMAGE_TYPE_FIRE,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
   记录咆哮波玩家命中(context, unit);
 }
 

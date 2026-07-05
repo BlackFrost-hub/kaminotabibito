@@ -26,11 +26,12 @@ local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_resul
 local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_6.addDelayedCallback
 local getServerTime = ____require_result_6.getServerTime
+local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_7["造成单体技能伤害"]
 local jass = require("jass.common")
 local GetUnitState = jass.GetUnitState
 local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
-local UnitDamageTarget = jass.UnitDamageTarget
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -70,30 +71,30 @@ local function _____79FB_9664_4E00_5C42_7194_5CA9_66B4_8D70(boss)
     if runtime == nil then
         return
     end
-    local ____runtime_stack_7 = runtime.stack
-    if ____runtime_stack_7 == nil then
-        ____runtime_stack_7 = 1
+    local ____runtime_stack_8 = runtime.stack
+    if ____runtime_stack_8 == nil then
+        ____runtime_stack_8 = 1
     end
-    local stack = ____runtime_stack_7
+    local stack = ____runtime_stack_8
     if stack <= 1 then
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(boss, buffID)
         return
     end
-    local ____registerManualBuff_11 = registerManualBuff
-    local ____boss_10 = boss
-    local ____runtime_remaining_8 = runtime.remaining
-    if ____runtime_remaining_8 == nil then
-        ____runtime_remaining_8 = 10
+    local ____registerManualBuff_12 = registerManualBuff
+    local ____boss_11 = boss
+    local ____runtime_remaining_9 = runtime.remaining
+    if ____runtime_remaining_9 == nil then
+        ____runtime_remaining_9 = 10
     end
-    local ____runtime_effect_9 = runtime.effect
-    if ____runtime_effect_9 == nil then
-        ____runtime_effect_9 = 0
+    local ____runtime_effect_10 = runtime.effect
+    if ____runtime_effect_10 == nil then
+        ____runtime_effect_10 = 0
     end
-    ____registerManualBuff_11(
-        ____boss_10,
+    ____registerManualBuff_12(
+        ____boss_11,
         buffID,
-        ____runtime_remaining_8,
-        ____runtime_effect_9,
+        ____runtime_remaining_9,
+        ____runtime_effect_10,
         {stack = stack - 1, sourceName = "巴尔扎罗斯"}
     )
 end
@@ -167,16 +168,17 @@ local function _____5C1D_8BD5_5B89_6392_8FD1_6218_53CD_5F39(boss, attacker)
             if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(attacker) then
                 return
             end
-            UnitDamageTarget(
-                boss,
-                attacker,
-                _____8BA1_7B97_53CD_5F39_4F24_5BB3(boss, attacker),
-                false,
-                true,
-                ATTACK_TYPE_CHAOS,
-                DAMAGE_TYPE_FIRE,
-                WEAPON_TYPE_WHOKNOWS
-            )
+            _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+                ["来源"] = boss,
+                ["目标"] = attacker,
+                ["伤害"] = _____8BA1_7B97_53CD_5F39_4F24_5BB3(boss, attacker),
+                attack = false,
+                ranged = true,
+                attackType = ATTACK_TYPE_CHAOS,
+                ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                weaponType = WEAPON_TYPE_WHOKNOWS,
+                ["来源类型"] = "Boss技能"
+            })
         end
     )
 end

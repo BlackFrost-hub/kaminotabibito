@@ -14,26 +14,27 @@ local _____6781_5750_6807Y = ____14_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____8DDD_79BB_5E73_65B9XY = ____14_FF0E_516C_5171_5DE5_5177["距离平方XY"]
 local ____06_FF0E_52A8_6001_88C5_9970_7269_5B89_5168_533A_7EC4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.06．动态装饰物安全区组")
 local _____521B_5EFA_52A8_6001_88C5_9970_7269_5B89_5168_533A_7EC4 = ____06_FF0E_52A8_6001_88C5_9970_7269_5B89_5168_533A_7EC4["创建动态装饰物安全区组"]
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
-local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_LIGHTNING = jass.DAMAGE_TYPE_LIGHTNING
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_2["施加快速控制Buff"]
-local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_3.registerManualBuff
-local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.01．Boss.08．卡瑟拉")
-local _____5361_745F_62C9BuffID = ____require_result_4["卡瑟拉BuffID"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_3["施加快速控制Buff"]
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_4.registerManualBuff
+local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.08．卡瑟拉")
+local _____5361_745F_62C9BuffID = ____require_result_5["卡瑟拉BuffID"]
 local function _____64AD_653E_70B9_7279_6548(model, x, y)
     if model == "" then
         return
@@ -92,16 +93,16 @@ local function _____786E_4FDD_7EDD_7F18_73CA_745A(context)
         local i = 0
         while i < #_____5B89_5168_533A_5217_8868 do
             local _____533A = _____5B89_5168_533A_5217_8868[i + 1]
-            local ____context__7EDD_7F18_73CA_745A_5217_8868_5 = context["绝缘珊瑚列表"]
-            ____context__7EDD_7F18_73CA_745A_5217_8868_5[#____context__7EDD_7F18_73CA_745A_5217_8868_5 + 1] = {X = _____533A.X, Y = _____533A.Y, ["半径"] = _____533A["半径"], ["装饰单位"] = _____533A["装饰物"]}
+            local ____context__7EDD_7F18_73CA_745A_5217_8868_6 = context["绝缘珊瑚列表"]
+            ____context__7EDD_7F18_73CA_745A_5217_8868_6[#____context__7EDD_7F18_73CA_745A_5217_8868_6 + 1] = {X = _____533A.X, Y = _____533A.Y, ["半径"] = _____533A["半径"], ["装饰单位"] = _____533A["装饰物"]}
             i = i + 1
         end
     end
 end
 local function _____73A9_5BB6_5728_7EDD_7F18_73CA_745A_5185(context, hero)
     if context["绝缘珊瑚安全区组"] ~= nil then
-        local ____self_6 = context["绝缘珊瑚安全区组"]
-        return ____self_6["单位是否安全"](____self_6, hero)
+        local ____self_7 = context["绝缘珊瑚安全区组"]
+        return ____self_7["单位是否安全"](____self_7, hero)
     end
     local hx = GetUnitX(hero)
     local hy = GetUnitY(hero)
@@ -120,8 +121,8 @@ end
 local function _____9884_8B66_7EDD_7F18_73CA_745A(context)
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["共生电击"]
     if context["绝缘珊瑚安全区组"] ~= nil then
-        local ____self_7 = context["绝缘珊瑚安全区组"]
-        ____self_7["显示提示"](____self_7, cfg["预警秒"])
+        local ____self_8 = context["绝缘珊瑚安全区组"]
+        ____self_8["显示提示"](____self_8, cfg["预警秒"])
     end
 end
 local function _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context)
@@ -157,16 +158,17 @@ local function _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context)
                 if _____6D88_8017_73A9_5BB6_89E6_624B_6B8B_7247(context, hero, cfg["抵消残片数"]) then
                     goto __continue23
                 end
-                UnitDamageTarget(
-                    boss,
-                    hero,
-                    cfg["雷伤害"],
-                    false,
-                    false,
-                    ATTACK_TYPE_NORMAL,
-                    DAMAGE_TYPE_LIGHTNING,
-                    WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = boss,
+                    ["目标"] = hero,
+                    ["伤害"] = cfg["雷伤害"],
+                    attack = false,
+                    ranged = false,
+                    attackType = ATTACK_TYPE_NORMAL,
+                    ["伤害类型"] = DAMAGE_TYPE_LIGHTNING,
+                    weaponType = WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = "Boss技能"
+                })
                 _____64AD_653E_5355_4F4D_7279_6548(cfg["麻痹命中特效路径"], hero)
                 _____65BD_52A0_5FEB_901F_63A7_5236Buff(boss, hero, 0, cfg["麻痹秒"])
                 registerManualBuff(
@@ -213,8 +215,8 @@ ____exports["尝试释放卡瑟拉共生电击"] = function(context, nowMs)
             _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context)
         end
     )
-    local ____self_8 = context["清理"]
-    ____self_8["登记延迟回调"](____self_8, "卡瑟拉-共生电击结算", id)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "卡瑟拉-共生电击结算", id)
 end
 ____exports["注册卡瑟拉共生电击"] = function()
 end

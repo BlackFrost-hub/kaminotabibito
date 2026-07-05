@@ -12,6 +12,9 @@ const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
+const { 创建窗口事件计数器 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.15．单位窗口累计值") as {
+  创建窗口事件计数器: (this: void, 名称: string) => 窗口事件计数器控制器;
+};
 
 export type 同目标普攻计数冷却作用域 = "攻击者目标" | "攻击者";
 
@@ -46,14 +49,16 @@ export interface 同目标普攻计数触发控制器 {
   停止(): void;
 }
 
-interface 普攻计数记录 {
-  时间毫秒: number;
+interface 窗口事件计数器控制器 {
+  readonly 名称: string;
+  增加(key: string, 窗口秒: number, 触发后清空?: boolean, 触发阈值?: number): number;
+  读取(key: string, 窗口秒?: number): number;
+  清空(key?: string): void;
 }
 
 interface 普攻计数状态 {
   source: any;
   target: any;
-  记录: 普攻计数记录[];
 }
 
 const 同目标普攻计数控制器表: Record<number, 同目标普攻计数触发实现> = {};
@@ -94,12 +99,14 @@ class 同目标普攻计数触发实现 implements 同目标普攻计数触发�
   readonly 控制器ID: number;
   private 参数: 同目标普攻计数触发参数;
   private 状态表: Record<string, 普攻计数状态 | undefined> = {};
+  private 计数器: 窗口事件计数器控制器;
   private 冷却表: Record<string, number | undefined> = {};
   private 已停止 = false;
 
   constructor(名称: string, 参数: 同目标普攻计数触发参数) {
     this.名称 = 名称;
     this.参数 = 参数;
+    this.计数器 = 创建窗口事件计数器(名称);
     this.控制器ID = ++同目标普攻计数控制器计数;
     同目标普攻计数控制器表[this.控制器ID] = this;
   }
@@ -117,11 +124,9 @@ class 同目标普攻计数触发实现 implements 同目标普攻计数触发�
     const now = getServerTime();
     if (this.是否冷却中(attacker, target, now)) return;
 
-    const 状态 = this.取或建状态(key, attacker, target);
-    状态.记录.push({ 时间毫秒: now });
-    this.清理过期记录(状态, now);
+    this.取或建状态(key, attacker, target);
 
-    const 当前次数 = 状态.记录.length;
+    const 当前次数 = this.计数器.增加(key, this.参数.窗口秒);
     const 阈值 = this.参数.次数阈值;
     if (!(阈值 > 0) || 当前次数 < 阈值) return;
 
@@ -137,23 +142,21 @@ class 同目标普攻计数触发实现 implements 同目标普攻计数触发�
     if (this.参数.过滤 != null && !this.参数.过滤(event)) return;
 
     this.参数.on触发(event);
-    状态.记录 = [];
+    this.计数器.清空(key);
     this.进入冷却(attacker, target, now);
   }
 
   读取次数(攻击者: any, 目标: any): number {
     const key = 取配对键(攻击者, 目标);
     if (key === "") return 0;
-    const 状态 = this.状态表[key];
-    if (状态 == null) return 0;
-    this.清理过期记录(状态, getServerTime());
-    return 状态.记录.length;
+    return this.计数器.读取(key, this.参数.窗口秒);
   }
 
   清空(攻击者?: any, 目标?: any): void {
     if (攻击者 == null && 目标 == null) {
       this.状态表 = {};
       this.冷却表 = {};
+      this.计数器.清空();
       return;
     }
     if (攻击者 != null && 目标 != null) {
@@ -161,6 +164,7 @@ class 同目标普攻计数触发实现 implements 同目标普攻计数触发�
       if (key !== "") {
         delete this.状态表[key];
         delete this.冷却表[key];
+        this.计数器.清空(key);
       }
       return;
     }
@@ -173,6 +177,7 @@ class 同目标普攻计数触发实现 implements 同目标普攻计数触发�
       if (目标ID > 0 && 取单位ID(状态.target) !== 目标ID) continue;
       delete this.状态表[key];
       delete this.冷却表[key];
+      this.计数器.清空(key);
     }
   }
 
@@ -181,24 +186,17 @@ class 同目标普攻计数触发实现 implements 同目标普攻计数触发�
     this.已停止 = true;
     this.状态表 = {};
     this.冷却表 = {};
+    this.计数器.清空();
     delete 同目标普攻计数控制器表[this.控制器ID];
   }
 
   private 取或建状态(key: string, source: any, target: any): 普攻计数状态 {
     let 状态 = this.状态表[key];
     if (状态 == null) {
-      状态 = { source, target, 记录: [] };
+      状态 = { source, target };
       this.状态表[key] = 状态;
     }
     return 状态;
-  }
-
-  private 清理过期记录(状态: 普攻计数状态, now: number): void {
-    const 最早毫秒 = now - this.参数.窗口秒 * 1000;
-    for (let i = 状态.记录.length - 1; i >= 0; i--) {
-      if (状态.记录[i].时间毫秒 >= 最早毫秒) continue;
-      状态.记录.splice(i, 1);
-    }
   }
 
   private 取冷却键(source: any, target: any): string {

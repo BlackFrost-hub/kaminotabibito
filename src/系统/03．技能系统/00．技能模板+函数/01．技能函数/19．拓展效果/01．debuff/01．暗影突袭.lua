@@ -23,7 +23,6 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitName = jass.GetUnitName
-local UnitDamageTarget = jass.UnitDamageTarget
 local R2I = jass.R2I
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -33,6 +32,8 @@ local ____require_result_7 = require("系统.00．核心系统.05．中心计时
 local addPeriodicCallback = ____require_result_7.addPeriodicCallback
 local removePeriodicCallback = ____require_result_7.removePeriodicCallback
 local getServerTime = ____require_result_7.getServerTime
+local ____require_result_8 = require("系统.04．伤害系统.07．持续伤害系统")
+local _____9020_6210_6301_7EED_4F24_5BB3 = ____require_result_8["造成持续伤害"]
 local _____6697_5F71_7A81_88ADBuffID = "C025"
 local _____6697_5F71_7A81_88AD_5F39_5E55_6A21_578B = "Abilities\\Spells\\NightElf\\shadowstrike\\ShadowStrikeMissile.mdl"
 local function _____8BFB_53D6Buff_56FE_6807(BuffID)
@@ -88,14 +89,13 @@ local function _____6697_5F71_7A81_88AD_6BD2_7D20tick(_____6BD2_7D20ID)
             "remaining:",
             state.remainingTicks
         )
-        UnitDamageTarget(
+        _____9020_6210_6301_7EED_4F24_5BB3(
             state.source,
             target,
             state.damagePerTick,
-            false,
+            DAMAGE_TYPE_POISON,
             false,
             ATTACK_TYPE_NORMAL,
-            DAMAGE_TYPE_POISON,
             WEAPON_TYPE_WHOKNOWS
         )
         local current = _____6697_5F71_7A81_88AD_6BD2_7D20_6807_8BB0_8868[targetHid] or 0

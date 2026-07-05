@@ -36,6 +36,13 @@ ____exports["获取属性值"] = function(unit, _____5C5E_6027)
                 ConvertUnitState(21)
             )
         end
+        ____cond3 = ____cond3 or ____switch3 == "护甲"
+        if ____cond3 then
+            return GetUnitStateJapi(
+                unit,
+                ConvertUnitState(32)
+            )
+        end
         ____cond3 = ____cond3 or ____switch3 == "当前生命值"
         if ____cond3 then
             return GetUnitState(unit, jass.UNIT_STATE_LIFE)

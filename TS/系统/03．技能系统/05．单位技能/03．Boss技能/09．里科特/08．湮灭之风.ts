@@ -6,6 +6,9 @@ import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 距离平方XY } from "./13．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -14,7 +17,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const ShowUnit = jass.ShowUnit as (whichUnit: any, show: boolean) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) => number;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -101,7 +103,18 @@ function 结算湮灭之风一跳(this: void, data: 湮灭风场): void {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     if (距离平方XY(GetUnitX(hero), GetUnitY(hero), bx, by) > radius2) continue;
-    UnitDamageTarget(boss, hero, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      技能ID: 湮灭之风技能ID,
+      来源: boss,
+      目标: hero,
+      伤害: damage,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_MAGIC,
+      伤害类型: DAMAGE_TYPE_MAGIC,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
     施加快速控制Buff(boss, hero, 2, cfg.沉默秒);
   }
   const randomHero = 获取Boss技能随机敌对英雄(boss, boss, cfg.半径);

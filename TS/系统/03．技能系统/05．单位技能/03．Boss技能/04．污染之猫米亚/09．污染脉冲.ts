@@ -19,6 +19,9 @@ const { 显示场地常驻AOE吟唱条 } = require("系统.09．表现系统.08�
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -28,7 +31,6 @@ const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
 const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, angle: number) => void) | undefined;
@@ -99,7 +101,15 @@ function 结算污染脉冲波(this: void, context: 米亚运行时上下文, wa
     if (单位在有效安全域内(context, target)) continue;
     if (距离平方(centerX, centerY, GetUnitX(target), GetUnitY(target)) > radius2) continue;
     const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
-    UnitDamageTarget(boss, target, maxLife * config.每波最大生命伤害比例 * 取米亚平台超载伤害倍率(target), false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_POISON, jass.WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      来源: boss,
+      目标: target,
+      伤害: maxLife * config.每波最大生命伤害比例 * 取米亚平台超载伤害倍率(target),
+      attackType: jass.ATTACK_TYPE_CHAOS,
+      伤害类型: jass.DAMAGE_TYPE_POISON,
+      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
     添加米亚腐化感染(context, target, config.每波腐化层数, "污染脉冲");
   }
 }

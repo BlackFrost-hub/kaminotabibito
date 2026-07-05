@@ -12,37 +12,39 @@ local _____51CF_5C11_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570 = ____16_FF0E_
 local _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED = ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177["施加巴尔扎罗斯灼热"]
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_3["施加快速减速Buff"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
-local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
-local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_5["获取Boss技能随机敌对英雄"]
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_6.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
-local ____require_result_7 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_7.registerDamageModifier
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
-local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_8["创建循环点特效"]
-local _____505C_6B62_5FAA_73AF_70B9_7279_6548 = ____require_result_8["停止循环点特效"]
-local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_9.getUnitsInRange
-local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-local isUnitEnemy = ____require_result_10.isUnitEnemy
-local ____require_result_11 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_11.addPeriodicCallback
-local removePeriodicCallback = ____require_result_11.removePeriodicCallback
-local getServerTime = ____require_result_11.getServerTime
-local ____require_result_12 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_12.CosBJ
-local SinBJ = ____require_result_12.SinBJ
+local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_1["造成技能伤害"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_4["施加快速减速Buff"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_5["创建原生弹幕"]
+local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_6["获取Boss技能随机敌对英雄"]
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_6["获取Boss技能敌对英雄列表"]
+local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_7.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_7["移除单位指定Buff"]
+local ____require_result_8 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_8.registerDamageModifier
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
+local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_9["创建循环点特效"]
+local _____505C_6B62_5FAA_73AF_70B9_7279_6548 = ____require_result_9["停止循环点特效"]
+local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_10.getUnitsInRange
+local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+local isUnitEnemy = ____require_result_11.isUnitEnemy
+local ____require_result_12 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_12.addPeriodicCallback
+local removePeriodicCallback = ____require_result_12.removePeriodicCallback
+local getServerTime = ____require_result_12.getServerTime
+local ____require_result_13 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_13.CosBJ
+local SinBJ = ____require_result_13.SinBJ
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
@@ -52,7 +54,6 @@ local GetUnitFlyHeight = jass.GetUnitFlyHeight
 local IsUnitType = jass.IsUnitType
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
-local UnitDamageTarget = jass.UnitDamageTarget
 local Atan2 = jass.Atan2
 local SquareRoot = jass.SquareRoot
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -192,6 +193,22 @@ local function _____521B_5EFA_585E_62C9_70B9_7279_6548(_____6A21_578B_8DEF_5F84,
         ["持续秒"] = duration
     })
 end
+local function _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3(source, target, amount, damageType, _____4F24_5BB3_5F62_6001)
+    if not _____5355_4F4D_6709_6548(source) or not _____5355_4F4D_6709_6548(target) or not (amount > 0) then
+        return
+    end
+    _____9020_6210_6280_80FD_4F24_5BB3({
+        ["来源"] = source,
+        ["目标"] = target,
+        ["伤害"] = amount,
+        ranged = true,
+        attackType = ATTACK_TYPE_CHAOS,
+        ["伤害类型"] = damageType,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能",
+        ["伤害形态"] = _____4F24_5BB3_5F62_6001
+    })
+end
 ____exports["塞拉公共"] = {
     ["巴尔扎罗斯单位技能配置"] = _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E,
     ["巴尔扎罗斯技能数值配置"] = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E,
@@ -227,7 +244,6 @@ ____exports["塞拉公共"] = {
     IsUnitType = IsUnitType,
     SetUnitAnimationByIndex = SetUnitAnimationByIndex,
     SetUnitTimeScale = SetUnitTimeScale,
-    UnitDamageTarget = UnitDamageTarget,
     Atan2 = Atan2,
     SquareRoot = SquareRoot,
     UNIT_STATE_MAX_LIFE = UNIT_STATE_MAX_LIFE,
@@ -256,6 +272,7 @@ ____exports["塞拉公共"] = {
     ["取最高灼热英雄"] = _____53D6_6700_9AD8_707C_70ED_82F1_96C4,
     ["取塞拉技能目标"] = _____53D6_585E_62C9_6280_80FD_76EE_6807,
     ["计算冰焰目标位置"] = _____8BA1_7B97_51B0_7130_76EE_6807_4F4D_7F6E,
-    ["创建塞拉点特效"] = _____521B_5EFA_585E_62C9_70B9_7279_6548
+    ["创建塞拉点特效"] = _____521B_5EFA_585E_62C9_70B9_7279_6548,
+    ["造成塞拉Boss技能伤害"] = _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3
 }
 return ____exports

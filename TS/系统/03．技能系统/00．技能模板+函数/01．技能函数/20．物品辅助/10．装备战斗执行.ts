@@ -3,6 +3,7 @@
 import { 单位存活, 取当前生命, 取最大生命 } from "./09．装备战斗判断";
 import { 装备小特效 } from "./11．装备常量";
 import { 施加临时属性效果 } from "./19．临时属性效果";
+import { 造成装备技能伤害, type 装备技能伤害类型, type 技能伤害形态 } from "../../../../04．伤害系统/08．技能伤害系统";
 
 const jass = require("jass.common") as any;
 
@@ -31,7 +32,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, target: any, attach: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -44,9 +44,34 @@ export function 扣除当前生命比例(this: void, unit: any, ratio: number): 
   SetUnitState(unit, UNIT_STATE_LIFE, life - cost > 1 ? life - cost : 1);
 }
 
-export function 造成装备伤害(this: void, source: any, target: any, amount: number, damageType: any, ranged: boolean = false, weaponType: any = WEAPON_TYPE_WHOKNOWS): void {
+export interface 造成装备伤害选项 {
+  装备技能类型?: 装备技能伤害类型;
+  物品ID?: number;
+  物品实例?: any;
+  技能ID?: number;
+  标签?: string;
+  伤害形态?: 技能伤害形态;
+  参与技能伤害加成?: boolean;
+}
+
+export function 造成装备伤害(this: void, source: any, target: any, amount: number, damageType: any, ranged: boolean = false, weaponType: any = WEAPON_TYPE_WHOKNOWS, 选项?: 造成装备伤害选项): void {
   if (!单位存活(source) || !单位存活(target) || !(amount > 0)) return;
-  UnitDamageTarget(source, target, amount, false, ranged, ATTACK_TYPE_NORMAL, damageType, weaponType);
+  造成装备技能伤害({
+    来源: source,
+    目标: target,
+    伤害: amount,
+    伤害类型: damageType,
+    ranged,
+    attackType: ATTACK_TYPE_NORMAL,
+    weaponType,
+    装备技能类型: 选项?.装备技能类型 ?? "装备技能",
+    物品ID: 选项?.物品ID,
+    物品实例: 选项?.物品实例,
+    技能ID: 选项?.技能ID,
+    标签: 选项?.标签,
+    伤害形态: 选项?.伤害形态,
+    参与技能伤害加成: 选项?.参与技能伤害加成,
+  });
 }
 
 export function 恢复生命魔法(this: void, source: any, target: any, hp: number, mp: number = 0, 默认魔法特效: boolean = false): void {

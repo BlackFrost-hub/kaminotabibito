@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, YDWETimerDestroyEffectSafe, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, jass, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, Atan2, AddSpecialEffect, AddSpecialEffectTarget, UnitDamageTarget, R2I, EXSetEffectSize, DzSetEffectVertexColor, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
+local _____5355_4F4D_6709_6548, _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, YDWETimerDestroyEffectSafe, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, Atan2, AddSpecialEffect, AddSpecialEffectTarget, R2I, EXSetEffectSize, DzSetEffectVertexColor, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
@@ -20,16 +20,17 @@ function _____9020_6210_4F24_5BB3(boss, target, amount, damageType)
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(target) or amount <= 0 then
         return
     end
-    UnitDamageTarget(
-        boss,
-        target,
-        amount,
-        false,
-        false,
-        jass.ATTACK_TYPE_NORMAL,
-        damageType,
-        jass.WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["来源"] = boss,
+        ["目标"] = target,
+        ["伤害"] = amount,
+        attack = false,
+        ranged = false,
+        attackType = jass.ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = damageType,
+        weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能"
+    })
 end
 function _____64AD_653E_70B9_540D_7279_6548(target, duration)
     local effect = AddSpecialEffectTarget("Common\\Effect\\Element\\Light\\protectionaura.mdx", target, "origin")
@@ -123,15 +124,15 @@ ____exports["释放瑟兰迪尔罪与罚"] = function(context, target)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["罪与罚"]
     local boss = context["Boss单位"]
     local threatTarget = _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807(boss)
-    local ____target_8 = target
-    if ____target_8 == nil then
-        ____target_8 = threatTarget and threatTarget.targetRef
+    local ____target_9 = target
+    if ____target_9 == nil then
+        ____target_9 = threatTarget and threatTarget.targetRef
     end
-    local ____target_8_9 = ____target_8
-    if ____target_8_9 == nil then
-        ____target_8_9 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
+    local ____target_9_10 = ____target_9
+    if ____target_9_10 == nil then
+        ____target_9_10 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
     end
-    local actualTarget = ____target_8_9
+    local actualTarget = ____target_9_10
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(actualTarget) then
         return
     end
@@ -306,6 +307,8 @@ YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
 local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807 = ____require_result_5["获取Boss技能应攻击目标"]
 _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_5["获取Boss技能最近敌对英雄"]
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_6["造成单体技能伤害"]
 jass = require("jass.common")
 local japi = require("jass.japi")
 GetRandomInt = jass.GetRandomInt
@@ -321,7 +324,6 @@ SetUnitTimeScale = jass.SetUnitTimeScale
 Atan2 = jass.Atan2
 AddSpecialEffect = jass.AddSpecialEffect
 AddSpecialEffectTarget = jass.AddSpecialEffectTarget
-UnitDamageTarget = jass.UnitDamageTarget
 R2I = jass.R2I
 EXSetEffectSize = japi.EXSetEffectSize
 DzSetEffectVertexColor = japi.DzSetEffectVertexColor

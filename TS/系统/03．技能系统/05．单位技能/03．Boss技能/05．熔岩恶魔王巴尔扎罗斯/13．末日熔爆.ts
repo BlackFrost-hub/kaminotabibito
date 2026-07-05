@@ -44,13 +44,16 @@ const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") 
   SinBJ: (this: void, degrees: number) => number;
 };
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+
 const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
@@ -239,10 +242,30 @@ function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下�
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     if (点在安全区(hero, safePoints)) {
-      UnitDamageTarget(boss, hero, 计算安全区余波伤害(hero), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+      造成AOE技能伤害({
+        来源: boss,
+        目标: hero,
+        伤害: 计算安全区余波伤害(hero),
+        attack: false,
+        ranged: true,
+        attackType: ATTACK_TYPE_CHAOS,
+        伤害类型: DAMAGE_TYPE_FIRE,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
       减少巴尔扎罗斯灼热层数(hero, config.安全区清除灼热层数);
     } else {
-      UnitDamageTarget(boss, hero, 计算外圈伤害(boss, hero), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+      造成AOE技能伤害({
+        来源: boss,
+        目标: hero,
+        伤害: 计算外圈伤害(boss, hero),
+        attack: false,
+        ranged: true,
+        attackType: ATTACK_TYPE_CHAOS,
+        伤害类型: DAMAGE_TYPE_FIRE,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
     }
   }
   播放巴尔扎罗斯台词(boss, "末日熔爆爆发");

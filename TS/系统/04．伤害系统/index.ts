@@ -13,6 +13,7 @@ export function init(this: void): void {
   伤害系统已初始化 = true;
 
   require("系统.04．伤害系统.01．伤害事件");
+  require("系统.04．伤害系统.07．持续伤害系统");
   require("系统.04．伤害系统.02．dot伤害");
   require("系统.04．伤害系统.01．DOT定义.index");
   const 模型伤害数字 = require("系统.09．表现系统.09．伤害数字模型.index") as {

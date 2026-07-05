@@ -7,6 +7,9 @@ import { 播放树魔首领台词 } from "./08．台词播放";
 import { 两点方向角, 单位是否在来源正面扇区, 单位是否在来源背后扇区 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/08．方位判定工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -19,7 +22,6 @@ const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, value: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, target: any, attachPoint: string) => any;
 const AddLightning = jass.AddLightning as (codeName: string, checkVisibility: boolean, x1: number, y1: number, x2: number, y2: number) => any;
 const DestroyLightning = jass.DestroyLightning as (whichLightning: any) => boolean;
@@ -176,7 +178,18 @@ function 执行反击(this: void, state: 消耗反击状态, attacker: any, 触�
     on进入: function 树魔首领消耗反击命中(this: void, unit: any): void {
       if (!单位有效(unit)) return;
       const damage = 读取单位攻击力(boss) * cfg.反击Boss攻击力比例;
-      UnitDamageTarget(boss, unit, damage, true, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_SLICE);
+      造成AOE技能伤害({
+        技能ID: 消耗反击技能ID,
+        来源: boss,
+        目标: unit,
+        伤害: damage,
+        attack: true,
+        ranged: false,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_NORMAL,
+        weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+        来源类型: "Boss技能",
+      });
     },
   });
 }

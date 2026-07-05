@@ -1,6 +1,7 @@
 import type { DotState, DotTypeConfig } from "./01．DOT配置";
 import { clearIgnoredTarget, getDotState, isIgnoredTarget, isValidDotStateRow, setIgnoredTarget } from "./04．DOT工具";
 import { DOT_TYPE_TO_BUFF_ID, getBuffRuntimeByHid } from "../../05．Buff系统/00．Buff系统";
+import { 计算持续伤害最终值 } from "../07．持续伤害系统";
 
 const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
@@ -76,6 +77,8 @@ export function createDotExecutor(deps: {
     if (isDotTargetPaused(target)) return;
     const cfg = dotTypes.find(c => c.id === typeId);
     if (cfg == null) return;
+    const finalAmount = 计算持续伤害最终值(source, amount);
+    if (!(finalAmount > 0)) return;
     const dh = unitHid(target);
     // 使用扁平化 API 设置忽略目标
     for (let di = 0; di < dotTypes.length; di++) {
@@ -88,7 +91,7 @@ export function createDotExecutor(deps: {
     jass.UnitDamageTarget(
       source,
       target,
-      amount,
+      finalAmount,
       false,
       false,
       jass.ATTACK_TYPE_NORMAL,

@@ -6,6 +6,9 @@ import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度, 取坐标角度, 距离XY, 角度差, 极坐标X, 极坐标Y } from "./14．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -14,7 +17,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -106,7 +108,18 @@ function 结算墨汁区域一跳(this: void, area: 墨汁区域): void {
     if (!单位有效(hero) || !单位在墨汁扇形内(hero, area)) continue;
     const resisted = 满足属性抗性门槛(hero, "水", cfg.水抗门槛, true);
     const factor = resisted ? cfg.达标效果倍率 : 1;
-    UnitDamageTarget(boss, hero, baseDamage * factor, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_COLD, WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      技能ID: 墨汁喷吐技能ID,
+      来源: boss,
+      目标: hero,
+      伤害: baseDamage * factor,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_COLD,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
     施加快速控制Buff(boss, hero, 2, cfg.tick秒 * factor);
     registerManualBuff(hero, 卡瑟拉BuffID.墨汁遮蔽, cfg.tick秒 + 0.2, factor, { sourceName: "卡瑟拉-墨汁遮蔽" });
     affected.push(hero);

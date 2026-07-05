@@ -14,16 +14,13 @@ local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____683C_9C81_59C6_516C_5171_0["�
 local GetUnitX = ____683C_9C81_59C6_516C_5171_0.GetUnitX
 local GetUnitY = ____683C_9C81_59C6_516C_5171_0.GetUnitY
 local GetUnitState = ____683C_9C81_59C6_516C_5171_0.GetUnitState
-local UnitDamageTarget = ____683C_9C81_59C6_516C_5171_0.UnitDamageTarget
 local UNIT_STATE_MAX_LIFE = ____683C_9C81_59C6_516C_5171_0.UNIT_STATE_MAX_LIFE
-local ATTACK_TYPE_CHAOS = ____683C_9C81_59C6_516C_5171_0.ATTACK_TYPE_CHAOS
-local DAMAGE_TYPE_FIRE = ____683C_9C81_59C6_516C_5171_0.DAMAGE_TYPE_FIRE
-local WEAPON_TYPE_WHOKNOWS = ____683C_9C81_59C6_516C_5171_0.WEAPON_TYPE_WHOKNOWS
 local _____5FEB_901F_63A7_5236__51FB_6655 = ____683C_9C81_59C6_516C_5171_0["快速控制_击晕"]
 local _____5355_4F4D_6709_6548 = ____683C_9C81_59C6_516C_5171_0["单位有效"]
 local _____70B9_5230_5355_4F4D_8DDD_79BB_5E73_65B9 = ____683C_9C81_59C6_516C_5171_0["点到单位距离平方"]
 local _____53D6_65B9_5411_89D2 = ____683C_9C81_59C6_516C_5171_0["取方向角"]
 local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____683C_9C81_59C6_516C_5171_0["角度差绝对值"]
+local _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3 = ____683C_9C81_59C6_516C_5171_0["造成格鲁姆Boss技能伤害"]
 local _____64AD_653E_70B9_7279_6548 = ____683C_9C81_59C6_516C_5171_0["播放点特效"]
 local function _____76EE_6807_5728_91CD_9524_6247_5F62_5185(grum, target, facing)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩重锤"]
@@ -88,15 +85,11 @@ local function _____7ED3_7B97_91CD_9524(context, angle)
                 if not _____76EE_6807_5728_91CD_9524_6247_5F62_5185(grum, hero, angle) then
                     goto __continue10
                 end
-                UnitDamageTarget(
+                _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(
                     grum,
                     hero,
                     _____8BA1_7B97_91CD_9524_4F24_5BB3(grum, hero),
-                    false,
-                    true,
-                    ATTACK_TYPE_CHAOS,
-                    DAMAGE_TYPE_FIRE,
-                    WEAPON_TYPE_WHOKNOWS
+                    "AOE"
                 )
                 _____65BD_52A0_5FEB_901F_63A7_5236Buff(grum, hero, _____5FEB_901F_63A7_5236__51FB_6655, config["眩晕秒"])
                 _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(hero, config["灼热层数"])

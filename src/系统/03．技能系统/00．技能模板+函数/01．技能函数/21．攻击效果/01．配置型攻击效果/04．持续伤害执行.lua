@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____on_914D_7F6E_578B_6301_7EED_4F24_5BB3Tick, getServerTime, _____914D_7F6E_578B_6301_7EED_4F24_5BB3_5217_8868
+local ____on_914D_7F6E_578B_6301_7EED_4F24_5BB3Tick, _____8BA1_7B97_6301_7EED_4F24_5BB3_6700_7EC8_503C, getServerTime, _____914D_7F6E_578B_6301_7EED_4F24_5BB3_5217_8868
 local ____02_FF0E_4F24_5BB3_8BA1_7B97 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.21．攻击效果.01．配置型攻击效果.02．伤害计算")
 local _____8BA1_7B97_914D_7F6E_578B_653B_51FB_6548_679C_4F24_5BB3 = ____02_FF0E_4F24_5BB3_8BA1_7B97["计算配置型攻击效果伤害"]
 local ____01_FF0E_57FA_7840_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.21．攻击效果.01．配置型攻击效果.01．基础工具")
@@ -23,7 +23,16 @@ function ____on_914D_7F6E_578B_6301_7EED_4F24_5BB3Tick()
                     if record.effect ~= "" then
                         _____914D_7F6E_578B_64AD_653E_76EE_6807_7279_6548(record.target, record.effect)
                     end
-                    _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(record.source, record.target, record.amount, record.damageType)
+                    local finalAmount = _____8BA1_7B97_6301_7EED_4F24_5BB3_6700_7EC8_503C(record.source, record.amount)
+                    if finalAmount > 0 then
+                        _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+                            record.source,
+                            record.target,
+                            finalAmount,
+                            record.damageType,
+                            {["伤害形态"] = "单体", ["装备技能类型"] = "装备持续伤害"}
+                        )
+                    end
                     record.remainTicks = record.remainTicks - 1
                     record.nextTime = now + record.intervalMs
                 end
@@ -40,10 +49,12 @@ function ____on_914D_7F6E_578B_6301_7EED_4F24_5BB3Tick()
         table.remove(_____914D_7F6E_578B_6301_7EED_4F24_5BB3_5217_8868)
     end
 end
+local ____require_result_0 = require("系统.04．伤害系统.07．持续伤害系统")
+_____8BA1_7B97_6301_7EED_4F24_5BB3_6700_7EC8_503C = ____require_result_0["计算持续伤害最终值"]
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+getServerTime = ____require_result_1.getServerTime
 local R2I = jass.R2I
 _____914D_7F6E_578B_6301_7EED_4F24_5BB3_5217_8868 = {}
 local _____914D_7F6E_578B_6301_7EED_4F24_5BB3Tick_5DF2_6CE8_518C = false

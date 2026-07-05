@@ -29,6 +29,9 @@ const { 显示场地常驻AOE吟唱条, 关闭吟唱条 } = require("系统.09�
   关闭吟唱条: (this: void, 通道?: string) => void;
 };
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
@@ -36,7 +39,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const R2I = jass.R2I as (value: number) => number;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -58,7 +60,17 @@ function 播放点特效(this: void, model: string, x: number, y: number, durati
 
 function 造成伤害(this: void, boss: any, target: any, amount: number, damageType: any): void {
   if (!单位有效(boss) || !单位有效(target) || amount <= 0) return;
-  UnitDamageTarget(boss, target, amount, false, false, jass.ATTACK_TYPE_NORMAL, damageType, jass.WEAPON_TYPE_WHOKNOWS);
+  造成AOE技能伤害({
+    来源: boss,
+    目标: target,
+    伤害: amount,
+    attack: false,
+    ranged: false,
+    attackType: jass.ATTACK_TYPE_NORMAL,
+    伤害类型: damageType,
+    weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
 }
 
 function 按攻击和最大生命计算伤害(this: void, boss: any, target: any, 攻击力比例: number, 最大生命比例: number): number {

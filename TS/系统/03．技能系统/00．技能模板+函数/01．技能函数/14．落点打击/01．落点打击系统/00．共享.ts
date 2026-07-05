@@ -9,11 +9,6 @@ import type { 技能提示圈配置 } from "../../../02．通用函数/16．技�
 export const AddSpecialEffect = jass.AddSpecialEffect as (path: string, x: number, y: number) => any;
 export const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 export const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
-export const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 
 export const 默认落雷特效 = "Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdl";
 export const 默认攻击类型 = jass.ATTACK_TYPE_NORMAL;
@@ -60,6 +55,11 @@ export interface 落点打击参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  来源类型?: "单位技能" | "Boss技能" | "召唤物技能" | "其他";
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  参与技能伤害加成?: boolean;
   on单次命中?: (this: void, 单位: any, 落点序号: number, 实例ID: number) => void;
   on单次生效?: (this: void, X: number, Y: number, 落点序号: number, 实例ID: number) => void;
   on全部完成?: (this: void, 实例ID: number) => void;

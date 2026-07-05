@@ -31,30 +31,13 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
   getServerTime: (this: void) => number;
 };
 
+const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
+  buffs: Record<string, { type?: string } | undefined>;
+};
+
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
-
-export {
-  GS_Suspend,
-  GS_IsUnitSuspending,
-  GS_LoadSuspend,
-  GS_UnitSuspend,
-} from "../../../../lib/扩展函数/Star扩展函数/Star扩展库/03．硬直暂停系统";
-
-export {
-  SFB_Init,
-  SFB_setBuff,
-  SFB_setSlow,
-  SFB_施加通用Buff,
-} from "../../../../lib/扩展函数/Star扩展函数/Star扩展库/04．快速Buff系统";
-
-export {
-  getBuffRuntime,
-  getBuffIdsOnUnit,
-  isUnitInBuffPool,
-  移除单位指定Buff,
-} from "../../../05．Buff系统/00．Buff系统";
 
 export { getUnitBurn } from "../../../04．伤害系统/02．dot伤害";
 
@@ -71,15 +54,6 @@ export {
 export {
   施加视野变化Buff,
 } from "../01．技能函数/19．拓展效果/02．buff/05．视野变化";
-
-export {
-  移除单位指定类型Buff,
-  移除单位增益Buff,
-  移除单位负面Buff,
-  按驱散等级移除单位Buff,
-  一级驱散单位Buff,
-  二级驱散单位Buff,
-} from "../../../05．Buff系统/05．Buff清除函数";
 
 export {
   施加单位负面效果免疫,
@@ -125,6 +99,27 @@ import {
   施加重伤,
   移除单位重伤,
 } from "../../../04．伤害系统/03．重伤系统/01．核心功能";
+
+export {
+  GS_Suspend,
+  GS_IsUnitSuspending,
+  GS_LoadSuspend,
+  GS_UnitSuspend,
+  SFB_Init,
+  SFB_setBuff,
+  SFB_setSlow,
+  SFB_施加通用Buff,
+  getBuffRuntime,
+  getBuffIdsOnUnit,
+  isUnitInBuffPool,
+  移除单位指定Buff,
+  移除单位指定类型Buff,
+  移除单位增益Buff,
+  移除单位负面Buff,
+  按驱散等级移除单位Buff,
+  一级驱散单位Buff,
+  二级驱散单位Buff,
+};
 
 export const 施法硬直显示BuffID = "C037";
 export const 施法硬直显示Buff图标 = "ReplaceableTextures\\CommandButtons\\BTNReplay-Pause.blp";
@@ -219,39 +214,9 @@ export function 单位是否拥有指定Buff(单位: any, BuffID: string): boole
   return getBuffRuntime(单位, BuffID) != null;
 }
 
-/** 清除单位可驱散增益 Buff（只清 Buff 表 `canPurge: true` 的 `Buff:` 条目）。 */
-export function 清除单位可驱散增益Buff(单位: any): number {
-  return 移除单位增益Buff(单位, true);
-}
-
-/** 清除单位可驱散负面 Buff（只清 Buff 表 `canPurge: true` 的 `Debuff:` 条目）。 */
-export function 清除单位可驱散负面Buff(单位: any): number {
-  return 移除单位负面Buff(单位, true);
-}
-
-/** 清除单位燃烧 Buff（会同步结束 D002 对应的 DOT）。 */
-export function 清除单位燃烧Buff(单位: any): number {
-  return 移除单位指定Buff(单位, "D002") ? 1 : 0;
-}
-
-/** 清除单位护甲降低 Buff（会触发 C032 的护甲回滚）。 */
-export function 清除单位护甲降低Buff(单位: any): number {
-  return 移除单位指定Buff(单位, "C032") ? 1 : 0;
-}
-
-/** 清除单位视野变化 Buff（会回滚所有未到期的视野变化叠加）。 */
-export function 清除单位视野变化Buff(单位: any): number {
-  return 移除单位指定Buff(单位, "C035") ? 1 : 0;
-}
-
 /** 清除单位控制类负面 Buff（Buff 表 type 以 `Debuff:control` 开头）。 */
 export function 清除单位控制类负面Buff(单位: any, 只清可驱散: boolean = false): number {
   return 移除单位指定类型Buff(单位, "Debuff:control", 只清可驱散);
-}
-
-/** 清除单位魔法类负面 Buff（Buff 表 type 以 `Debuff:magic` 开头）。 */
-export function 清除单位魔法类负面Buff(单位: any, 只清可驱散: boolean = false): number {
-  return 移除单位指定类型Buff(单位, "Debuff:magic", 只清可驱散);
 }
 
 /**
@@ -289,10 +254,13 @@ const 硬控制Buff_飓风附加 = 1113815346; // 'Bcy2'
 const 软控制Buff_减速 = 1114860655; // 'Bslo'
 const 软控制Buff_残废 = 1113813609; // 'Bcri'
 const 软控制Buff_诅咒 = 1113813619; // 'Bcrs'
-const 削弱Buff_残废 = 1113813609; // 'Bcri'
 const 削弱Buff_精灵之火 = 1114005861; // 'Bfae'
-const 削弱Buff_诅咒 = 1113813619; // 'Bcrs'
 const 持续伤害Buff_寄生 = 1112436833; // 'BNpa'
+const Buff类型字段_负面 = "debuff";
+const Buff类型字段_控制 = "control";
+const Buff类型字段_软控制 = "soft";
+const Buff类型字段_减速 = "slow";
+const Buff类型字段_持续伤害 = "dot";
 
 const 硬控制Buff合集: number[] = [
   硬控制Buff_眩晕,
@@ -317,25 +285,23 @@ const 软控制Buff合集: number[] = [
   软控制Buff_诅咒,
 ];
 
-const 削弱Buff合集: number[] = [
-  削弱Buff_残废,
-  削弱Buff_精灵之火,
-  削弱Buff_诅咒,
+const 减速Buff合集: number[] = [
+  软控制Buff_减速,
 ];
 
-const 持续伤害Buff合集: number[] = [
+const 原生持续伤害Buff合集: number[] = [
   持续伤害Buff_寄生,
 ];
 
-const 负面Buff合集: number[] = [
+const 原生控制Buff合集: number[] = [
   ...硬控制Buff合集,
   ...软控制Buff合集,
 ];
 
-const 全部负面Buff合集: number[] = [
-  ...负面Buff合集,
-  ...削弱Buff合集,
-  ...持续伤害Buff合集,
+const 原生负面Buff合集: number[] = [
+  ...原生控制Buff合集,
+  削弱Buff_精灵之火,
+  ...原生持续伤害Buff合集,
 ];
 
 function 单位拥有Buff效果(单位: any, BuffID: number): boolean {
@@ -351,6 +317,85 @@ function 单位拥有任意Buff效果合集(单位: any, Buff列表: number[]): 
     index++;
   }
   return false;
+}
+
+type Buff表类型匹配函数 = (this: void, typeName: string) => boolean;
+
+function Buff类型拥有字段(typeName: string, 字段: string): boolean {
+  const lowerType = typeName.toLowerCase();
+  const lowerField = 字段.toLowerCase();
+  let start = 0;
+  while (start <= lowerType.length) {
+    const end = lowerType.indexOf(":", start);
+    const part = end >= 0 ? lowerType.substring(start, end) : lowerType.substring(start);
+    if (part === lowerField) return true;
+    if (end < 0) break;
+    start = end + 1;
+  }
+  return false;
+}
+
+function Buff表类型是负面(typeName: string): boolean {
+  return Buff类型拥有字段(typeName, Buff类型字段_负面);
+}
+
+function Buff表类型是控制(typeName: string): boolean {
+  return Buff类型拥有字段(typeName, Buff类型字段_控制);
+}
+
+function Buff表类型是软控制(typeName: string): boolean {
+  return Buff类型拥有字段(typeName, Buff类型字段_软控制) || Buff表类型是减速(typeName);
+}
+
+function Buff表类型是硬控制(typeName: string): boolean {
+  return Buff表类型是控制(typeName) && !Buff表类型是软控制(typeName);
+}
+
+function Buff表类型是减速(typeName: string): boolean {
+  return Buff类型拥有字段(typeName, Buff类型字段_减速);
+}
+
+function Buff表类型是控制效果(typeName: string): boolean {
+  return Buff表类型是硬控制(typeName) || Buff表类型是软控制(typeName);
+}
+
+function Buff表类型是持续伤害(typeName: string): boolean {
+  return Buff类型拥有字段(typeName, Buff类型字段_持续伤害);
+}
+
+function 单位拥有匹配Buff池条目(单位: any, 匹配函数: Buff表类型匹配函数): boolean {
+  if (单位 == null || 单位 === 0) return false;
+  const ids = getBuffIdsOnUnit(单位);
+  for (let i = 0; i < ids.length; i++) {
+    const meta = buffTableMod.buffs[ids[i]];
+    const typeName = meta != null ? meta.type : undefined;
+    if (typeof typeName !== "string") continue;
+    if (匹配函数(typeName)) return true;
+  }
+  return false;
+}
+
+function 单位拥有组合Buff合集(单位: any, 匹配函数: Buff表类型匹配函数, 原生Buff列表: number[]): boolean {
+  return 单位拥有匹配Buff池条目(单位, 匹配函数) || 单位拥有任意Buff效果合集(单位, 原生Buff列表);
+}
+
+function 清除单位匹配Buff池条目(单位: any, 匹配函数: Buff表类型匹配函数): number {
+  if (单位 == null || 单位 === 0) return 0;
+  const ids = getBuffIdsOnUnit(单位);
+  let removed = 0;
+  for (let i = 0; i < ids.length; i++) {
+    const buffID = ids[i];
+    const meta = buffTableMod.buffs[buffID];
+    const typeName = meta != null ? meta.type : undefined;
+    if (typeof typeName !== "string") continue;
+    if (!匹配函数(typeName)) continue;
+    if (移除单位指定Buff(单位, buffID)) removed++;
+  }
+  return removed;
+}
+
+function 清除单位组合Buff合集(单位: any, 匹配函数: Buff表类型匹配函数, 原生Buff列表: number[]): number {
+  return 清除单位匹配Buff池条目(单位, 匹配函数) + 清除单位Buff效果合集(单位, 原生Buff列表);
 }
 
 function 清除单位Buff效果合集(单位: any, Buff列表: number[]): number {
@@ -383,49 +428,50 @@ export function 单位是否处于施法硬直效果(单位: any): boolean {
 }
 
 export function 单位是否处于硬控制效果合集(单位: any): boolean {
-  return 单位拥有任意Buff效果合集(单位, 硬控制Buff合集);
+  return 单位拥有组合Buff合集(单位, Buff表类型是硬控制, 硬控制Buff合集);
 }
 
 export function 单位是否处于软控制效果合集(单位: any): boolean {
-  return 单位拥有任意Buff效果合集(单位, 软控制Buff合集);
+  return 单位拥有组合Buff合集(单位, Buff表类型是软控制, 软控制Buff合集);
 }
 
-export function 单位是否处于削弱Buff合集(单位: any): boolean {
-  return 单位拥有任意Buff效果合集(单位, 削弱Buff合集);
+export function 单位是否处于减速效果合集(单位: any): boolean {
+  return 单位拥有组合Buff合集(单位, Buff表类型是减速, 减速Buff合集);
 }
 
-export function 单位是否处于持续伤害Buff合集(单位: any): boolean {
-  return 单位拥有任意Buff效果合集(单位, 持续伤害Buff合集);
+/** 控制合集：硬控制 + 软控制。 */
+export function 单位是否处于控制效果合集(单位: any): boolean {
+  return 单位拥有组合Buff合集(单位, Buff表类型是控制效果, 原生控制Buff合集);
 }
 
 export function 单位是否处于负面Buff合集(单位: any): boolean {
-  return 单位拥有任意Buff效果合集(单位, 负面Buff合集);
+  return 单位拥有组合Buff合集(单位, Buff表类型是负面, 原生负面Buff合集);
 }
 
-export function 单位是否处于全部负面Buff合集(单位: any): boolean {
-  return 单位拥有任意Buff效果合集(单位, 全部负面Buff合集);
+export function 单位是否处于持续伤害效果合集(单位: any): boolean {
+  return 单位拥有组合Buff合集(单位, Buff表类型是持续伤害, 原生持续伤害Buff合集);
 }
 
 export function 清除单位硬控制Buff合集(单位: any): number {
-  return 清除单位Buff效果合集(单位, 硬控制Buff合集);
+  return 清除单位组合Buff合集(单位, Buff表类型是硬控制, 硬控制Buff合集);
 }
 
 export function 清除单位软控制Buff合集(单位: any): number {
-  return 清除单位Buff效果合集(单位, 软控制Buff合集);
+  return 清除单位组合Buff合集(单位, Buff表类型是软控制, 软控制Buff合集);
 }
 
-export function 清除单位削弱Buff合集(单位: any): number {
-  return 清除单位Buff效果合集(单位, 削弱Buff合集);
+export function 清除单位减速Buff合集(单位: any): number {
+  return 清除单位组合Buff合集(单位, Buff表类型是减速, 减速Buff合集);
 }
 
-export function 清除单位持续伤害Buff合集(单位: any): number {
-  return 清除单位Buff效果合集(单位, 持续伤害Buff合集);
+export function 清除单位控制Buff合集(单位: any): number {
+  return 清除单位组合Buff合集(单位, Buff表类型是控制效果, 原生控制Buff合集);
 }
 
 export function 清除单位负面Buff合集(单位: any): number {
-  return 清除单位Buff效果合集(单位, 负面Buff合集);
+  return 清除单位组合Buff合集(单位, Buff表类型是负面, 原生负面Buff合集);
 }
 
-export function 清除单位全部负面Buff合集(单位: any): number {
-  return 清除单位Buff效果合集(单位, 全部负面Buff合集);
+export function 清除单位持续伤害Buff合集(单位: any): number {
+  return 清除单位组合Buff合集(单位, Buff表类型是持续伤害, 原生持续伤害Buff合集);
 }

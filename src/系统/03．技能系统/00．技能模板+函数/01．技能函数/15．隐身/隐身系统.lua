@@ -1,11 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
---- 隐身 + 破隐一击系统
--- 
--- 施加隐身（复用快速Buff C005），破隐条件：
--- 1. 隐身单位普攻造成伤害 → 破隐 + 附加额外伤害
--- 2. 隐身单位释放技能 → 破隐（无额外伤害）
 local jass = require("jass.common")
 local fastBuff = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
@@ -20,10 +15,11 @@ local registerSpellEffectListener = ____require_result_3.registerSpellEffectList
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_4.addDelayedCallback
 local removeDelayedCallback = ____require_result_4.removeDelayedCallback
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_5.debugLogForce
+local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_6.debugLogForce
 local GetHandleId = jass.GetHandleId
-local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -59,16 +55,24 @@ local function _____6267_884C_5F85_5904_7406_7834_9690_989D_5916_6697_5C5E_6027_
             if _____8BB0_5F55 == nil or not (_____8BB0_5F55["伤害"] > 0) then
                 goto __continue8
             end
-            UnitDamageTarget(
-                _____8BB0_5F55["来源"],
-                _____8BB0_5F55["目标"],
-                _____8BB0_5F55["伤害"],
-                false,
-                false,
-                ATTACK_TYPE_NORMAL,
-                DAMAGE_TYPE_SHADOW_STRIKE,
-                WEAPON_TYPE_WHOKNOWS
-            )
+            local _____6807_8BB0 = _____8BB0_5F55["技能伤害标记"]
+            _____9020_6210_6280_80FD_4F24_5BB3({
+                ["来源"] = _____8BB0_5F55["来源"],
+                ["目标"] = _____8BB0_5F55["目标"],
+                ["伤害"] = _____8BB0_5F55["伤害"],
+                attackType = ATTACK_TYPE_NORMAL,
+                ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
+                weaponType = WEAPON_TYPE_WHOKNOWS,
+                ["来源类型"] = _____6807_8BB0 and _____6807_8BB0["来源类型"] or _____6807_8BB0 and _____6807_8BB0["装备技能类型"] or "其他",
+                ["装备技能类型"] = _____6807_8BB0 and _____6807_8BB0["装备技能类型"],
+                ["伤害形态"] = _____6807_8BB0 and _____6807_8BB0["伤害形态"] or "单体",
+                ["物品ID"] = _____6807_8BB0 and _____6807_8BB0["物品ID"],
+                ["物品实例"] = _____6807_8BB0 and _____6807_8BB0["物品实例"],
+                ["技能ID"] = _____6807_8BB0 and _____6807_8BB0["技能ID"],
+                ["技能实例ID"] = _____6807_8BB0 and _____6807_8BB0["技能实例ID"],
+                ["标签"] = _____6807_8BB0 and _____6807_8BB0["标签"],
+                ["参与技能伤害加成"] = _____6807_8BB0 and _____6807_8BB0["参与技能伤害加成"]
+            })
         end
         ::__continue8::
     end
@@ -93,7 +97,7 @@ local function ____on_7834_9690_6700_7EC8_4F24_5BB3(target, attacker, applied, s
     if not (_____989D_5916_6697_5C5E_6027_4F24_5BB3 > 0) then
         return
     end
-    _____5F85_5904_7406_7834_9690_989D_5916_6697_5C5E_6027_4F24_5BB3_961F_5217[#_____5F85_5904_7406_7834_9690_989D_5916_6697_5C5E_6027_4F24_5BB3_961F_5217 + 1] = {["来源"] = _____8BB0_5F55["来源"], ["目标"] = _____8BB0_5F55["目标"], ["伤害"] = _____989D_5916_6697_5C5E_6027_4F24_5BB3}
+    _____5F85_5904_7406_7834_9690_989D_5916_6697_5C5E_6027_4F24_5BB3_961F_5217[#_____5F85_5904_7406_7834_9690_989D_5916_6697_5C5E_6027_4F24_5BB3_961F_5217 + 1] = {["来源"] = _____8BB0_5F55["来源"], ["目标"] = _____8BB0_5F55["目标"], ["伤害"] = _____989D_5916_6697_5C5E_6027_4F24_5BB3, ["技能伤害标记"] = _____8BB0_5F55["技能伤害标记"]}
     addDelayedCallback(0, _____6267_884C_5F85_5904_7406_7834_9690_989D_5916_6697_5C5E_6027_4F24_5BB3)
 end
 local function ____on_7834_9690_4F24_5BB3_4FEE_6B63(context)
@@ -123,7 +127,7 @@ local function ____on_7834_9690_4F24_5BB3_4FEE_6B63(context)
     _____5185_90E8_79FB_9664_9690_8EAB(_____5355_4F4DID)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(attacker, _____9690_8EABBuffID)
     if _____8BB0_5F55["破隐额外暗属性伤害倍率"] > 0 then
-        _____7834_9690_989D_5916_6697_5C5E_6027_8868[_____5355_4F4DID] = {["来源"] = attacker, ["目标"] = target, ["倍率"] = _____8BB0_5F55["破隐额外暗属性伤害倍率"]}
+        _____7834_9690_989D_5916_6697_5C5E_6027_8868[_____5355_4F4DID] = {["来源"] = attacker, ["目标"] = target, ["倍率"] = _____8BB0_5F55["破隐额外暗属性伤害倍率"], ["技能伤害标记"] = _____8BB0_5F55["技能伤害标记"]}
     end
     debugLogForce(
         _____6A21_5757_540D,
@@ -163,11 +167,11 @@ ____exports["施加隐身"] = function(_____5355_4F4D, _____53C2_6570)
         return 0
     end
     _____521D_59CB_5316_7834_9690_76D1_542C()
-    local ____53C2_6570__6765_6E90_5355_4F4D_6 = _____53C2_6570["来源单位"]
-    if ____53C2_6570__6765_6E90_5355_4F4D_6 == nil then
-        ____53C2_6570__6765_6E90_5355_4F4D_6 = _____5355_4F4D
+    local ____53C2_6570__6765_6E90_5355_4F4D_27 = _____53C2_6570["来源单位"]
+    if ____53C2_6570__6765_6E90_5355_4F4D_27 == nil then
+        ____53C2_6570__6765_6E90_5355_4F4D_27 = _____5355_4F4D
     end
-    local _____6765_6E90 = ____53C2_6570__6765_6E90_5355_4F4D_6
+    local _____6765_6E90 = ____53C2_6570__6765_6E90_5355_4F4D_27
     fastBuff["SFB_施加通用Buff"](_____6765_6E90, _____5355_4F4D, _____9690_8EABBuff_7C7B_578B, _____53C2_6570["持续时间"])
     local _____5355_4F4DID = _____53D6_5355_4F4DID(_____5355_4F4D)
     if _____9690_8EAB_6620_5C04_8868[_____5355_4F4DID] ~= nil then
@@ -186,6 +190,7 @@ ____exports["施加隐身"] = function(_____5355_4F4D, _____53C2_6570)
         ["破隐固定额外伤害"] = _____53C2_6570["破隐固定额外伤害"] or 0,
         ["破隐伤害倍率"] = _____53C2_6570["破隐伤害倍率"] or 1,
         ["破隐额外暗属性伤害倍率"] = _____53C2_6570["破隐额外暗属性伤害倍率"] or 0,
+        ["技能伤害标记"] = _____53C2_6570["技能伤害标记"],
         ["延迟回调ID"] = _____5EF6_8FDF_56DE_8C03ID
     }
     debugLogForce(_____6A21_5757_540D, "施加隐身 持续=", _____53C2_6570["持续时间"], "秒")

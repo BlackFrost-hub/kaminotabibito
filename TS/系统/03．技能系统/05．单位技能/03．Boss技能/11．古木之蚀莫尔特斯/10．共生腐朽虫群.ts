@@ -5,6 +5,9 @@ import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置"
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y } from "./16．公共工具";
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -12,7 +15,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const KillUnit = jass.KillUnit as (unit: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -104,7 +106,17 @@ function 爆炸甲虫(this: void, data: 甲虫追击实例): void {
   const target = data.接触目标;
   if (!单位有效(boss) || !单位有效(target)) return;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
-  UnitDamageTarget(boss, target, 读取单位攻击力(boss) * cfg.爆炸伤害Boss攻击力比例, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS);
+  造成AOE技能伤害({
+    来源: boss,
+    目标: target,
+    伤害: 读取单位攻击力(boss) * cfg.爆炸伤害Boss攻击力比例,
+    attack: false,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_PLANT,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
   增加玩家腐败值(data.context, target, cfg.爆炸腐败值);
 }
 

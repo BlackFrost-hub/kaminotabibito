@@ -15,11 +15,6 @@ const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") 
   SinBJ: (this: void, degrees: number) => number;
 };
 
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
@@ -42,6 +37,9 @@ const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
+const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
+  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any) => boolean;
+};
 
 export interface 地面路径持续区域参数 {
   起点X: number;
@@ -55,6 +53,7 @@ export interface 地面路径持续区域参数 {
   铺设间隔?: number;
   检测间隔?: number;
   周期伤害?: number;
+  周期伤害类型?: any;
   整体伤害长度?: number;
   整体伤害半径?: number;
   影响目标?: "敌方" | "友方" | "全部";
@@ -146,6 +145,7 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
       显示提示圈: this.参数.显示提示圈,
       提示圈: this.参数.提示圈,
       周期伤害: this.参数.伤害模式 === "整体矩形" ? 0 : this.参数.周期伤害,
+      周期伤害类型: this.参数.周期伤害类型,
       周期伤害去重组: this.实例ID,
       周期伤害去重间隔: this.参数.检测间隔,
     });
@@ -219,14 +219,13 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
       if (!this.整体伤害单位筛选(单位)) {
         continue;
       }
-      UnitDamageTarget(
+      造成持续伤害(
         this.参数.所有者 ?? 单位,
         单位,
         this.参数.周期伤害 ?? 0,
-        false,
+        this.参数.周期伤害类型 ?? DAMAGE_TYPE_NORMAL,
         false,
         ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_NORMAL,
         WEAPON_TYPE_WHOKNOWS
       );
     }

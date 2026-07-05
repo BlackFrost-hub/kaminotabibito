@@ -9,10 +9,11 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitDamageTarget = jass.UnitDamageTarget
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
-local SFB_setBuff = ____require_result_0.SFB_setBuff
-local SFB_setSlow = ____require_result_0.SFB_setSlow
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
+local SFB_setBuff = ____require_result_1.SFB_setBuff
+local SFB_setSlow = ____require_result_1.SFB_setSlow
 ____exports["创建位移开始特效回调"] = function(_____6A21_578B_8DEF_5F84)
     return function(_____5355_4F4D, _ID)
         local _____7279_6548 = AddSpecialEffect(
@@ -37,26 +38,30 @@ ____exports["创建位移结束特效回调"] = function(_____6A21_578B_8DEF_5F8
         end
     end
 end
-____exports["创建位移结束伤害回调"] = function(_____4F24_5BB3, _____6765_6E90)
+____exports["创建位移结束伤害回调"] = function(_____4F24_5BB3, _____6765_6E90, _____6807_8BB0)
     return function(_____5355_4F4D, _____539F_56E0, _ID)
         if _____539F_56E0 == "死亡" or _____539F_56E0 == "主单位死亡" then
             return
         end
-        local ____6765_6E90_1 = _____6765_6E90
-        if ____6765_6E90_1 == nil then
-            ____6765_6E90_1 = _____5355_4F4D
+        local ____6765_6E90_2 = _____6765_6E90
+        if ____6765_6E90_2 == nil then
+            ____6765_6E90_2 = _____5355_4F4D
         end
-        local _____4F24_5BB3_6765_6E90 = ____6765_6E90_1
-        UnitDamageTarget(
-            _____4F24_5BB3_6765_6E90,
-            _____5355_4F4D,
-            _____4F24_5BB3,
-            false,
-            false,
-            jass.ATTACK_TYPE_NORMAL,
-            jass.DAMAGE_TYPE_NORMAL,
-            jass.WEAPON_TYPE_WHOKNOWS
-        )
+        local _____4F24_5BB3_6765_6E90 = ____6765_6E90_2
+        _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+            ["来源"] = _____4F24_5BB3_6765_6E90,
+            ["目标"] = _____5355_4F4D,
+            ["伤害"] = _____4F24_5BB3,
+            ["伤害类型"] = jass.DAMAGE_TYPE_NORMAL,
+            ranged = false,
+            attackType = jass.ATTACK_TYPE_NORMAL,
+            weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+            ["来源类型"] = _____6807_8BB0 and _____6807_8BB0["来源类型"] or "单位技能",
+            ["技能ID"] = _____6807_8BB0 and _____6807_8BB0["技能ID"],
+            ["技能实例ID"] = _____6807_8BB0 and _____6807_8BB0["技能实例ID"],
+            ["标签"] = _____6807_8BB0 and _____6807_8BB0["技能标签"],
+            ["参与技能伤害加成"] = _____6807_8BB0 and _____6807_8BB0["参与技能伤害加成"]
+        })
     end
 end
 ____exports["创建位移结束控制回调"] = function(_____63A7_5236ID, _____6301_7EED_65F6_95F4)
@@ -94,7 +99,7 @@ ____exports["创建位移回调"] = function(_____9009_9879)
         _____7ED3_675F_56DE_8C03_5217_8868[#_____7ED3_675F_56DE_8C03_5217_8868 + 1] = ____exports["创建位移结束特效回调"](_____9009_9879["结束特效"])
     end
     if _____9009_9879["结束伤害"] ~= nil and _____9009_9879["结束伤害"] > 0 then
-        _____7ED3_675F_56DE_8C03_5217_8868[#_____7ED3_675F_56DE_8C03_5217_8868 + 1] = ____exports["创建位移结束伤害回调"](_____9009_9879["结束伤害"], _____9009_9879["结束伤害来源"])
+        _____7ED3_675F_56DE_8C03_5217_8868[#_____7ED3_675F_56DE_8C03_5217_8868 + 1] = ____exports["创建位移结束伤害回调"](_____9009_9879["结束伤害"], _____9009_9879["结束伤害来源"], _____9009_9879["结束伤害标记"])
     end
     if _____9009_9879["结束控制"] ~= nil and _____9009_9879["结束控制时间"] ~= nil and _____9009_9879["结束控制时间"] > 0 then
         _____7ED3_675F_56DE_8C03_5217_8868[#_____7ED3_675F_56DE_8C03_5217_8868 + 1] = ____exports["创建位移结束控制回调"](_____9009_9879["结束控制"], _____9009_9879["结束控制时间"])

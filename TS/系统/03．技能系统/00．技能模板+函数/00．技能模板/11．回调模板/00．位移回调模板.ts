@@ -12,11 +12,10 @@ const AddSpecialEffect = jass["AddSpecialEffect"] as (modelPath: string, x: numb
 const DestroyEffect = jass["DestroyEffect"] as (effect: any) => void;
 const GetUnitX = jass["GetUnitX"] as (u: any) => number;
 const GetUnitY = jass["GetUnitY"] as (u: any) => number;
-const UnitDamageTarget = jass["UnitDamageTarget"] as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
+
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const { SFB_setBuff, SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统") as {
   SFB_setBuff: (this: void, sourceUnit: any, u: any, id: number, time: number) => void;
@@ -26,6 +25,14 @@ const { SFB_setBuff, SFB_setSlow } = require("lib.扩展函数.Star扩展函数.
 import type { 位移结束原因 } from "../../01．技能函数/02．冲锋·击退/击退系统";
 
 type 控制类型 = 0 | 1 | 2 | 3 | 5 | 21 | 22 | 23;
+
+export interface 位移伤害标记选项 {
+  来源类型?: "单位技能" | "Boss技能" | "召唤物技能" | "其他";
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  参与技能伤害加成?: boolean;
+}
 
 // ─── 单功能工厂函数 ──────────────────────────────────────
 
@@ -47,11 +54,24 @@ export function 创建位移结束特效回调(模型路径: string): (单位: a
   };
 }
 
-export function 创建位移结束伤害回调(伤害: number, 来源?: any): (单位: any, 原因: 位移结束原因, ID: number) => void {
+export function 创建位移结束伤害回调(伤害: number, 来源?: any, 标记?: 位移伤害标记选项): (单位: any, 原因: 位移结束原因, ID: number) => void {
   return function 位移结束伤害回调(单位: any, 原因: 位移结束原因, _ID: number): void {
     if (原因 === "死亡" || 原因 === "主单位死亡") return;
     const 伤害来源 = 来源 ?? 单位;
-    UnitDamageTarget(伤害来源, 单位, 伤害, false, false, jass.ATTACK_TYPE_NORMAL, jass.DAMAGE_TYPE_NORMAL, jass.WEAPON_TYPE_WHOKNOWS);
+    造成单体技能伤害({
+      来源: 伤害来源,
+      目标: 单位,
+      伤害,
+      伤害类型: jass.DAMAGE_TYPE_NORMAL,
+      ranged: false,
+      attackType: jass.ATTACK_TYPE_NORMAL,
+      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+      来源类型: 标记?.来源类型 ?? "单位技能",
+      技能ID: 标记?.技能ID,
+      技能实例ID: 标记?.技能实例ID,
+      标签: 标记?.技能标签,
+      参与技能伤害加成: 标记?.参与技能伤害加成,
+    });
   };
 }
 
@@ -84,6 +104,7 @@ export interface 位移回调选项 {
   结束特效?: string;
   结束伤害?: number;
   结束伤害来源?: any;
+  结束伤害标记?: 位移伤害标记选项;
   结束控制?: 控制类型;
   结束控制时间?: number;
   命中特效?: string;
@@ -109,7 +130,7 @@ export function 创建位移回调(选项: 位移回调选项): 位移回调结�
     结束回调列表.push(创建位移结束特效回调(选项.结束特效));
   }
   if (选项.结束伤害 != null && 选项.结束伤害 > 0) {
-    结束回调列表.push(创建位移结束伤害回调(选项.结束伤害, 选项.结束伤害来源));
+    结束回调列表.push(创建位移结束伤害回调(选项.结束伤害, 选项.结束伤害来源, 选项.结束伤害标记));
   }
   if (选项.结束控制 != null && 选项.结束控制时间 != null && 选项.结束控制时间 > 0) {
     结束回调列表.push(创建位移结束控制回调(选项.结束控制, 选项.结束控制时间));

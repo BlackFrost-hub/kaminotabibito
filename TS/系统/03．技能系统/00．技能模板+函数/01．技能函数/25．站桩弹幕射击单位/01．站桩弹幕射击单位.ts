@@ -42,16 +42,6 @@ const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: strin
 const IsUnitPaused = jass.IsUnitPaused as (unit: any) => boolean;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const ConvertUnitState = jass.ConvertUnitState as (i: number) => any;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any,
-) => boolean;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
@@ -59,6 +49,10 @@ const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: any, value: number) => void;
 const DzSetUnitMissileModel = japi.DzSetUnitMissileModel as ((unit: any, model: string) => void) | undefined;
@@ -108,6 +102,11 @@ export interface 站桩弹幕射击单位参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  来源类型?: "单位技能" | "Boss技能" | "召唤物技能" | "其他";
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  参与技能伤害加成?: boolean;
 }
 
 interface 站桩弹幕射击状态 {
@@ -252,16 +251,20 @@ function 发射站桩直线弹幕(this: void, 状态: 站桩弹幕射击状态):
 
   function 站桩直线弹幕命中伤害(this: void, 目标单位: any): void {
     if (!单位有效且存活(参数.来源单位) || !单位有效且存活(目标单位) || !(参数.伤害值 > 0)) return;
-    UnitDamageTarget(
-      参数.来源单位,
-      目标单位,
-      参数.伤害值,
-      false,
-      false,
-      参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
-      参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
-      参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,
-    );
+    造成单体技能伤害({
+      来源: 参数.来源单位,
+      目标: 目标单位,
+      伤害: 参数.伤害值,
+      伤害类型: 参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
+      ranged: false,
+      attackType: 参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
+      weaponType: 参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,
+      来源类型: 参数.来源类型 ?? "单位技能",
+      技能ID: 参数.技能ID,
+      技能实例ID: 参数.技能实例ID,
+      标签: 参数.技能标签,
+      参与技能伤害加成: 参数.参与技能伤害加成,
+    });
   }
 
   创建原生弹幕({

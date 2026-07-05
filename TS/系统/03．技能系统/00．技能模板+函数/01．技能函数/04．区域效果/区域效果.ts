@@ -19,11 +19,6 @@ const GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange as (
 const FirstOfGroup = jass.FirstOfGroup as (whichGroup: any) => any;
 const GroupRemoveUnit = jass.GroupRemoveUnit as (whichGroup: any, whichUnit: any) => void;
 const DestroyGroup = jass.DestroyGroup as (whichGroup: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
@@ -45,6 +40,9 @@ const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01�
 const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
+};
+const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
+  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any) => boolean;
 };
 
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
@@ -68,6 +66,7 @@ export interface 区域效果参数 {
   显示提示圈?: boolean;
   提示圈?: 技能提示圈配置 | false;
   周期伤害?: number;
+  周期伤害类型?: any;
   周期伤害去重组?: number;
   周期伤害去重间隔?: number;
   回调上下文ID?: number;
@@ -280,14 +279,13 @@ class 区域效果实现 implements 区域效果实例 {
           区域效果周期伤害去重记录[去重Key] = 当前时间;
         }
 
-        UnitDamageTarget(
+        造成持续伤害(
           this.参数.所有者 ?? 单位,
           单位,
           this.参数.周期伤害,
-          false,
+          this.参数.周期伤害类型 ?? DAMAGE_TYPE_NORMAL,
           false,
           ATTACK_TYPE_NORMAL,
-          DAMAGE_TYPE_NORMAL,
           null
         );
       }

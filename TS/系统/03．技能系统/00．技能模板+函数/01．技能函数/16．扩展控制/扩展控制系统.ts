@@ -12,6 +12,9 @@ const { String2OrderIdBJ } = require("lib.扩展函数.BJ函数.07．杂项") as
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, callback: (this: void, target: any, attacker: any, applied: number, damageType: any) => void) => void;
 };
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
+};
 const { calcReducedControlDuration, isExcludedFromControlResist } = require("系统.05．Buff系统.01．控制抗性.index") as {
   calcReducedControlDuration: (this: void, target: any, originalDuration: number) => number;
   isExcludedFromControlResist: (this: void, unit: any) => boolean;
@@ -103,17 +106,6 @@ const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const IsUnitType = jass.IsUnitType as (u: any, whichType: any) => boolean;
 const SetUnitMoveSpeed = jass.SetUnitMoveSpeed as (u: any, speed: number) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  whichUnit: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any
-) => boolean;
-
 const DzSetUnitDisableControlOrder = japi.DzSetUnitDisableControlOrder as (单位: any, 是否禁用: boolean) => void;
 const DzGetUnitDisableControlOrder = japi.DzGetUnitDisableControlOrder as (单位: any) => boolean;
 const DzUnitOrdersForceStop = japi.DzUnitOrdersForceStop as (单位: any, 清空队列: boolean) => void;
@@ -360,7 +352,16 @@ function flush反伤队列(this: void): void {
     if (记录 == null) continue;
     if (!单位有效且存活(记录.攻击者)) continue;
     if (记录.伤害 <= 0) continue;
-    UnitDamageTarget(记录.攻击者, 记录.攻击者, 记录.伤害, false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_UNIVERSAL, null);
+    造成技能伤害({
+      来源: 记录.攻击者,
+      目标: 记录.攻击者,
+      伤害: 记录.伤害,
+      attackType: jass.ATTACK_TYPE_CHAOS,
+      伤害类型: jass.DAMAGE_TYPE_UNIVERSAL,
+      weaponType: null,
+      来源类型: "其他",
+      伤害形态: "单体",
+    });
   }
 }
 

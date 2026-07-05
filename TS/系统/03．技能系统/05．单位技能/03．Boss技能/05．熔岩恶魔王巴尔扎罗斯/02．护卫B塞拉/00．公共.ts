@@ -5,9 +5,13 @@ import { 巴尔扎罗斯单位技能配置 } from "../00．配置";
 import { 巴尔扎罗斯技能数值配置 } from "../02．数值与表现配置";
 import { 播放巴尔扎罗斯台词 } from "../14．台词播放";
 import { 获取巴尔扎罗斯灼热层数, 减少巴尔扎罗斯灼热层数, 施加巴尔扎罗斯灼热 } from "../16．灼热层数工具";
+import type { 技能伤害形态 } from "../../../../../04．伤害系统/08．技能伤害系统";
 
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
+};
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
 };
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -63,7 +67,6 @@ const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, timeScale: number) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -182,6 +185,21 @@ function 创建塞拉点特效(this: void, 模型路径: string, x: number, y: n
   });
 }
 
+function 造成塞拉Boss技能伤害(this: void, source: any, target: any, amount: number, damageType: any, 伤害形态: 技能伤害形态): void {
+  if (!单位有效(source) || !单位有效(target) || !(amount > 0)) return;
+  造成技能伤害({
+    来源: source,
+    目标: target,
+    伤害: amount,
+    ranged: true,
+    attackType: ATTACK_TYPE_CHAOS,
+    伤害类型: damageType,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+    伤害形态,
+  });
+}
+
 
 export const 塞拉公共 = {
   巴尔扎罗斯单位技能配置,
@@ -218,7 +236,6 @@ export const 塞拉公共 = {
   IsUnitType,
   SetUnitAnimationByIndex,
   SetUnitTimeScale,
-  UnitDamageTarget,
   Atan2,
   SquareRoot,
   UNIT_STATE_MAX_LIFE,
@@ -248,4 +265,5 @@ export const 塞拉公共 = {
   取塞拉技能目标,
   计算冰焰目标位置,
   创建塞拉点特效,
+  造成塞拉Boss技能伤害,
 };

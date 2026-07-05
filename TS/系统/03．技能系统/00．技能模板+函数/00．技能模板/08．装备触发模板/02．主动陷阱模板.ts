@@ -16,6 +16,9 @@ const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01�
 const { 施加扩展控制 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统") as {
   施加扩展控制: (this: void, 来源单位: any, 目标单位: any, 类型: 主动陷阱控制类型, 参数: { 持续时间: number }) => number;
 };
+const { 造成装备技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成装备技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
@@ -23,16 +26,6 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IsUnitEnemy = jass.IsUnitEnemy as (whichUnit: any, whichPlayer: any) => boolean;
 const IsUnitType = jass.IsUnitType as (unit: any, whichType: any) => boolean;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  whichUnit: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any
-) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -173,16 +166,16 @@ class 主动陷阱实现 implements 主动陷阱实例 {
       const attackType = this.参数.攻击类型 ?? ATTACK_TYPE_NORMAL;
       const damageType = this.参数.伤害类型 ?? DAMAGE_TYPE_MAGIC;
       const weaponType = this.参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS;
-      UnitDamageTarget(
-        this.参数.施法者,
-        target,
-        this.参数.触发伤害 ?? 0,
-        false,
-        false,
+      造成装备技能伤害({
+        来源: this.参数.施法者,
+        目标: target,
+        伤害: this.参数.触发伤害 ?? 0,
         attackType,
-        damageType,
-        weaponType
-      );
+        伤害类型: damageType,
+        weaponType,
+        装备技能类型: "装备主动",
+        伤害形态: "单体",
+      });
     }
     if (this.参数.控制类型 != null && (this.参数.控制持续秒数 ?? 0) > 0) {
       施加扩展控制(this.参数.施法者, target, this.参数.控制类型, { 持续时间: this.参数.控制持续秒数 ?? 0 });

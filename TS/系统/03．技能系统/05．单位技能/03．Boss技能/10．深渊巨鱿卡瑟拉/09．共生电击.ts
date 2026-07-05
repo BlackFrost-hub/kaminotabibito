@@ -6,6 +6,9 @@ import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY } from "./14．公共工具";
 import { 创建动态装饰物安全区组 } from "../../../00．技能模板+函数/04．机制组件/02．战斗区域/06．动态装饰物安全区组";
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -13,7 +16,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_LIGHTNING = jass.DAMAGE_TYPE_LIGHTNING as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -108,7 +110,17 @@ function 结算卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上�
       continue;
     }
     if (消耗玩家触手残片(context, hero, cfg.抵消残片数)) continue;
-    UnitDamageTarget(boss, hero, cfg.雷伤害, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_LIGHTNING, WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      来源: boss,
+      目标: hero,
+      伤害: cfg.雷伤害,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_LIGHTNING,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
     播放单位特效(cfg.麻痹命中特效路径, hero);
     施加快速控制Buff(boss, hero, 0, cfg.麻痹秒);
     registerManualBuff(hero, 卡瑟拉BuffID.麻痹电流, cfg.麻痹秒, 1, { sourceName: "卡瑟拉-麻痹电流" });

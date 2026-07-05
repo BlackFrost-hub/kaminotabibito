@@ -132,6 +132,8 @@ call DzFrameSetTexture(YDLocal1Get(frame, "主线任务"), "war3mapImported\\wen
 
 12. **纯显示 `TEXT` 帧也可能吃鼠标命中**：如果大段正文、属性、特效等 `TEXT` 帧覆盖到按钮区域，会导致下面的 `GLUETEXTBUTTON` 只有未被覆盖的一小条能点。纯展示文本创建时默认加 `enable: false` / `DzFrameSetEnable(textFrame, false)`，或调整层级与范围避免覆盖可点击帧。排查“按钮视觉区域正常但只有细条可点”时，优先检查上层/同层 TEXT、TEXTAREA、BACKDROP 是否覆盖并抢焦点。
 
+13. **FDF 图标 BACKDROP 不要复用文本帧创建流程**：社区 FDF 图标可用 `Frame "BACKDROP"` + `BackdropBackground "xxx.blp"` 定义，再用 `DzCreateFrame("图标FDF名", parent, contextId)` 创建。但图标 BACKDROP 不要套用文本帧的后处理，尤其不要调用 `DzFrameSetEnable(iconFrame, false)`；实测会导致 1.27e/Dz 在显示或渲染阶段直接崩溃。文本帧为了不挡鼠标可以禁用，图标帧应单独创建、锚定、显示。
+
 ## 事件 ID（`DzFrameSetScriptByCode`）
 
 | 事件 | ID |

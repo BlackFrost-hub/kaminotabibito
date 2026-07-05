@@ -191,6 +191,7 @@ export function 创建位移实例(单位: any, 角度: number, 参数: 通用�
     攻击类型: 参数.攻击类型 ?? DEFAULT_ATTACK_TYPE,
     伤害类型: 参数.伤害类型 ?? DEFAULT_DAMAGE_TYPE,
     武器类型: 参数.武器类型 ?? DEFAULT_WEAPON_TYPE,
+    技能伤害标记: 参数.技能伤害标记,
     命中过滤: 参数.命中过滤,
     命中回调: 参数.命中回调,
     撞墙回调: 参数.撞墙回调,

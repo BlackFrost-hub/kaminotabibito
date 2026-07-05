@@ -6,12 +6,11 @@ import { 创建单位时限标记 } from "../../../03．技能系统/00．技能
 import { 取装备冷却键, 装备冷却就绪, 进入装备冷却并显示 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
 import { 延迟执行 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
-const { 单位拥有任意Buff } = require("系统.05．Buff系统.00．Buff系统") as {
-  单位拥有任意Buff: (this: void, unit: any, buffIDs: string[]) => boolean;
+const { 单位是否处于硬控制效果合集 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  单位是否处于硬控制效果合集: (this: void, unit: any) => boolean;
 };
 
 const 月光锁链护腕减伤标记 = 创建单位时限标记("月光锁链护腕减伤");
-const 月光锁链护腕控制Buff列表 = ["C001", "C002", "C003", "C004", "C005", "C006", "C007", "C008", "C009", "C023"];
 
 function 触发月光锁链护腕(this: void, target: any, attacker: any, amount: number): void {
   const key = 取装备冷却键(target, "月光锁链护腕", "伤害事件装备");
@@ -29,7 +28,7 @@ export function 处理月光锁链护腕伤害修正(this: void, context: any): 
   if (target == null || target === 0 || attacker == null || attacker === 0) return context.currentDamage;
   if (!单位持有伤害事件装备(target, 伤害事件装备ID.月光锁链护腕)) return context.currentDamage;
 
-  if (单位拥有任意Buff(target, 月光锁链护腕控制Buff列表)) {
+  if (单位是否处于硬控制效果合集(target)) {
     触发月光锁链护腕(target, attacker, context.currentDamage * 0.3);
   }
 

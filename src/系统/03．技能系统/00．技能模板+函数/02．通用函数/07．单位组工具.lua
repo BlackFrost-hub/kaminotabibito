@@ -9,6 +9,8 @@ local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
 local SFB_setBuff = ____require_result_0.SFB_setBuff
 local SFB_setSlow = ____require_result_0.SFB_setSlow
+local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_1["造成AOE技能伤害"]
 local ForGroup = jass.ForGroup
 local GetEnumUnit = jass.GetEnumUnit
 local _____5FEB_7167_7F13_5B58 = {}
@@ -36,35 +38,38 @@ end
 -- @param 来源 伤害来源单位
 -- @param 伤害值 伤害数值
 -- @param 伤害类型 可选，默认 DAMAGE_TYPE_NORMAL
-____exports["单位组造成伤害"] = function(_____5355_4F4D_5217_8868, _____6765_6E90, _____4F24_5BB3_503C, _____4F24_5BB3_7C7B_578B)
+____exports["单位组造成伤害"] = function(_____5355_4F4D_5217_8868, _____6765_6E90, _____4F24_5BB3_503C, _____4F24_5BB3_7C7B_578B, _____6807_8BB0)
     if not _____5355_4F4D_5217_8868 or #_____5355_4F4D_5217_8868 == 0 then
         return
     end
     if _____4F24_5BB3_503C <= 0 then
         return
     end
-    local ____4F24_5BB3_7C7B_578B_1 = _____4F24_5BB3_7C7B_578B
-    if ____4F24_5BB3_7C7B_578B_1 == nil then
-        ____4F24_5BB3_7C7B_578B_1 = jass.DAMAGE_TYPE_NORMAL
+    local ____4F24_5BB3_7C7B_578B_2 = _____4F24_5BB3_7C7B_578B
+    if ____4F24_5BB3_7C7B_578B_2 == nil then
+        ____4F24_5BB3_7C7B_578B_2 = jass.DAMAGE_TYPE_NORMAL
     end
-    local _____7C7B_578B = ____4F24_5BB3_7C7B_578B_1
+    local _____7C7B_578B = ____4F24_5BB3_7C7B_578B_2
     for ____, _____5355_4F4D in ipairs(_____5355_4F4D_5217_8868) do
-        local ____jass_UnitDamageTarget_3 = jass.UnitDamageTarget
-        local ____6765_6E90_2 = _____6765_6E90
-        if ____6765_6E90_2 == nil then
-            ____6765_6E90_2 = _____5355_4F4D
+        local ____9020_6210AOE_6280_80FD_4F24_5BB3_14 = _____9020_6210AOE_6280_80FD_4F24_5BB3
+        local ____6765_6E90_3 = _____6765_6E90
+        if ____6765_6E90_3 == nil then
+            ____6765_6E90_3 = _____5355_4F4D
         end
-        ____jass_UnitDamageTarget_3(
-            jass,
-            ____6765_6E90_2,
-            _____5355_4F4D,
-            _____4F24_5BB3_503C,
-            false,
-            false,
-            jass.ATTACK_TYPE_NORMAL,
-            _____7C7B_578B,
-            jass.WEAPON_TYPE_WHOKNOWS
-        )
+        ____9020_6210AOE_6280_80FD_4F24_5BB3_14({
+            ["来源"] = ____6765_6E90_3,
+            ["目标"] = _____5355_4F4D,
+            ["伤害"] = _____4F24_5BB3_503C,
+            ["伤害类型"] = _____7C7B_578B,
+            ranged = false,
+            attackType = jass.ATTACK_TYPE_NORMAL,
+            weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+            ["来源类型"] = _____6807_8BB0 and _____6807_8BB0["来源类型"] or "单位技能",
+            ["技能ID"] = _____6807_8BB0 and _____6807_8BB0["技能ID"],
+            ["技能实例ID"] = _____6807_8BB0 and _____6807_8BB0["技能实例ID"],
+            ["标签"] = _____6807_8BB0 and _____6807_8BB0["技能标签"],
+            ["参与技能伤害加成"] = _____6807_8BB0 and _____6807_8BB0["参与技能伤害加成"]
+        })
     end
 end
 --- 对单位组内所有单位施加控制 Buff

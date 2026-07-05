@@ -90,7 +90,40 @@ const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害�
     isRangedAttack?: boolean;
     isSkillAttack: boolean;
     isSkillDamage: boolean;
+    isWrappedSkillDamage?: boolean;
+    isEquipmentSkillDamage?: boolean;
+    isNonEquipmentSkillDamage?: boolean;
+    skillDamageSourceKind?: string;
+    equipmentSkillDamageKind?: string;
+    itemTypeId?: number;
+    itemHandle?: any;
+    abilityId?: number;
+    skillInstanceId?: number;
+    skillDamageTag?: string;
+    skillDamageShape?: string;
+    isIndependentSkillDamage?: boolean;
+    isSingleTargetSkillDamage?: boolean;
+    isAoeSkillDamage?: boolean;
   }) => number;
+};
+const { 获取当前技能伤害上下文 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  获取当前技能伤害上下文: (this: void) => {
+    isWrappedSkillDamage: boolean;
+    isEquipmentSkillDamage: boolean;
+    isNonEquipmentSkillDamage: boolean;
+    sourceKind: string;
+    equipmentSkillKind?: string;
+    itemTypeId?: number;
+    itemHandle?: any;
+    abilityId?: number;
+    skillInstanceId?: number;
+    tag?: string;
+    damageShape: string;
+    isIndependentSkillDamage: boolean;
+    isSingleTargetSkillDamage: boolean;
+    isAoeSkillDamage: boolean;
+    participatesInSkillDamageBonus: boolean;
+  } | null;
 };
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.02．计时器") as {
   createDelayedCall: (this: void, delaySec: number, callback: () => void) => any;
@@ -138,6 +171,20 @@ export interface DamageTypeSnapshot {
   isRangedAttack: boolean;
   isSkillAttack: boolean;
   isSkillDamage: boolean;
+  isWrappedSkillDamage: boolean;
+  isEquipmentSkillDamage: boolean;
+  isNonEquipmentSkillDamage: boolean;
+  skillDamageSourceKind?: string;
+  equipmentSkillDamageKind?: string;
+  itemTypeId?: number;
+  itemHandle?: any;
+  abilityId?: number;
+  skillInstanceId?: number;
+  skillDamageTag?: string;
+  skillDamageShape: string;
+  isIndependentSkillDamage: boolean;
+  isSingleTargetSkillDamage: boolean;
+  isAoeSkillDamage: boolean;
   isMetalDamage: boolean;
   isWoodDamage: boolean;
   isWaterDamage: boolean;
@@ -172,6 +219,7 @@ function notifyAppliedFinalDamageListeners(target: any, attacker: any, applied: 
 }
 
 function captureDamageTypeSnapshot(this: void): DamageTypeSnapshot {
+  const skillContext = 获取当前技能伤害上下文();
   return {
     rawAttackType: ConvertAttackType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_ATTACK_TYPE)),
     rawDamageType: ConvertDamageType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_DAMAGE_TYPE)),
@@ -184,6 +232,20 @@ function captureDamageTypeSnapshot(this: void): DamageTypeSnapshot {
     isRangedAttack: 伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_IS_RANGED) === 1,
     isSkillAttack: 伤害函数.isSkillAttack(),
     isSkillDamage: 伤害函数.isSkillDamage(),
+    isWrappedSkillDamage: skillContext?.isWrappedSkillDamage === true,
+    isEquipmentSkillDamage: skillContext?.isEquipmentSkillDamage === true,
+    isNonEquipmentSkillDamage: skillContext?.isNonEquipmentSkillDamage === true,
+    skillDamageSourceKind: skillContext?.sourceKind,
+    equipmentSkillDamageKind: skillContext?.equipmentSkillKind,
+    itemTypeId: skillContext?.itemTypeId,
+    itemHandle: skillContext?.itemHandle,
+    abilityId: skillContext?.abilityId,
+    skillInstanceId: skillContext?.skillInstanceId,
+    skillDamageTag: skillContext?.tag,
+    skillDamageShape: skillContext?.damageShape ?? "未知",
+    isIndependentSkillDamage: skillContext?.isIndependentSkillDamage === true,
+    isSingleTargetSkillDamage: skillContext?.isSingleTargetSkillDamage === true,
+    isAoeSkillDamage: skillContext?.isAoeSkillDamage === true,
     isMetalDamage: 伤害函数.isMetalDamage(),
     isWoodDamage: 伤害函数.isWoodDamage(),
     isWaterDamage: 伤害函数.isWaterDamage(),
@@ -258,6 +320,9 @@ export function calculateDamage(
   const isMagicDmg = 伤害函数.isMagicDamage();
   const isEnhanceDmg = 伤害函数.isEnhancedDamage();
   const isTrueDmg = 伤害函数.isTrueDamage();
+  const skillContext = 获取当前技能伤害上下文();
+  const isWrappedSkillDmg = skillContext?.isWrappedSkillDamage === true && skillContext.participatesInSkillDamageBonus !== false;
+  const isAnySkillDmg = 伤害函数.isSkillAttack() || 伤害函数.isSkillDamage() || isWrappedSkillDmg;
 
   // 真实伤害：跳过所有计算
   if (isTrueDmg) {
@@ -268,7 +333,7 @@ export function calculateDamage(
   let dmgReduction = getRealAttr(target, "伤害减少", 0);
   if (isPhysDmg) dmgReduction += getRealAttr(target, "物理固伤减少", 0);
   if (isMagicDmg) dmgReduction += getRealAttr(target, "魔法固伤减少", 0);
-  if (伤害函数.isSkillAttack() || 伤害函数.isSkillDamage()) dmgReduction += getRealAttr(target, "技能固伤减少", 0);
+  if (isAnySkillDmg) dmgReduction += getRealAttr(target, "技能固伤减少", 0);
   damage -= dmgReduction;
   const dmgIncrease = getRealAttr(attacker, "伤害增加", 0);
   damage += dmgIncrease;
@@ -348,7 +413,7 @@ export function calculateDamage(
   }
 
   // Step 10: 技能伤害修正
-  if (伤害函数.isSkillAttack() || 伤害函数.isSkillDamage()) {
+  if (isAnySkillDmg) {
     const skillMod = getSkillDamageModifier(attacker, target, isPlayer);
     addDamage += skillMod.addDamage;
     finalMultiplier *= skillMod.multiplier;
@@ -556,6 +621,20 @@ export function onDamageEvent(
       isRangedAttack: snapshot.isRangedAttack,
       isSkillAttack: snapshot.isSkillAttack,
       isSkillDamage: snapshot.isSkillDamage,
+      isWrappedSkillDamage: snapshot.isWrappedSkillDamage,
+      isEquipmentSkillDamage: snapshot.isEquipmentSkillDamage,
+      isNonEquipmentSkillDamage: snapshot.isNonEquipmentSkillDamage,
+      skillDamageSourceKind: snapshot.skillDamageSourceKind,
+      equipmentSkillDamageKind: snapshot.equipmentSkillDamageKind,
+      itemTypeId: snapshot.itemTypeId,
+      itemHandle: snapshot.itemHandle,
+      abilityId: snapshot.abilityId,
+      skillInstanceId: snapshot.skillInstanceId,
+      skillDamageTag: snapshot.skillDamageTag,
+      skillDamageShape: snapshot.skillDamageShape,
+      isIndependentSkillDamage: snapshot.isIndependentSkillDamage,
+      isSingleTargetSkillDamage: snapshot.isSingleTargetSkillDamage,
+      isAoeSkillDamage: snapshot.isAoeSkillDamage,
     });
   }
 

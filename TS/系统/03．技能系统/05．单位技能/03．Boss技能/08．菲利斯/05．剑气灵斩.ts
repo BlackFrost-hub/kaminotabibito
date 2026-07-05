@@ -6,6 +6,9 @@ import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位到线段距离平方, 单位有效, stringToFourCC, 取单位间角度, 极坐标X, 极坐标Y } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -14,7 +17,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
@@ -88,7 +90,18 @@ function 结算剑气初始命中(this: void, context: 菲利斯运行时上下�
     if (单位到线段距离平方(hero, ax, ay, bx, by) > width2) continue;
     const damage = 读取单位攻击力(boss) * cfg.Boss攻击力比例
       + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.目标最大生命比例;
-    UnitDamageTarget(boss, hero, damage, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      技能ID: 剑气灵斩技能ID,
+      来源: boss,
+      目标: hero,
+      伤害: damage,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_ENHANCED,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
   }
 }
 
@@ -128,7 +141,18 @@ function 创建侵蚀残留(this: void, context: 菲利斯运行时上下文, ax
       if (单位到线段距离平方(hero, ax, ay, bx, by) > width2) continue;
       const damage = 读取单位攻击力(boss) * cfg.侵蚀Boss攻击力比例
         + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.侵蚀目标最大生命比例;
-      UnitDamageTarget(boss, hero, damage, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
+      造成AOE技能伤害({
+        技能ID: 剑气灵斩技能ID,
+        来源: boss,
+        目标: hero,
+        伤害: damage,
+        attack: false,
+        ranged: false,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_MAGIC,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
       const mana = GetUnitState(hero, UNIT_STATE_MANA);
       const lostMana = mana * cfg.侵蚀扣魔当前魔法比例;
       if (lostMana > 0) {

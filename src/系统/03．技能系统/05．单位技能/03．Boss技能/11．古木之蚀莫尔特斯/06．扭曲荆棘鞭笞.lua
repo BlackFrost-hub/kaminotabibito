@@ -19,31 +19,32 @@ local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____16_FF0E_516C_5171_5DE5_
 local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
 local GetRandomInt = jass.GetRandomInt
-local UnitDamageTarget = jass.UnitDamageTarget
 local AddSpecialEffect = jass.AddSpecialEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
-local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.18．周期范围效果.06．对外接口")
-local _____65BD_52A0_5BC4_751F = ____require_result_3["施加寄生"]
-local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_4.registerManualBuff
-local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯")
-local _____83AB_5C14_7279_65AFBuffID = ____require_result_5["莫尔特斯BuffID"]
-local ____require_result_6 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.18．周期范围效果.06．对外接口")
+local _____65BD_52A0_5BC4_751F = ____require_result_4["施加寄生"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯")
+local _____83AB_5C14_7279_65AFBuffID = ____require_result_6["莫尔特斯BuffID"]
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____626D_66F2_8346_68D8_97AD_7B1E_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["扭曲荆棘鞭笞"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -139,16 +140,17 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
                 local oldHits = _____547D_4E2D_6B21_6570_8868[hid] or 0
                 _____547D_4E2D_6B21_6570_8868[hid] = oldHits + 1
                 local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["Boss攻击力比例"] * (1 + oldHits * cfg["重复命中增伤比例"])
-                UnitDamageTarget(
-                    boss,
-                    hero,
-                    damage,
-                    false,
-                    false,
-                    ATTACK_TYPE_NORMAL,
-                    DAMAGE_TYPE_PLANT,
-                    WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = boss,
+                    ["目标"] = hero,
+                    ["伤害"] = damage,
+                    attack = false,
+                    ranged = false,
+                    attackType = ATTACK_TYPE_NORMAL,
+                    ["伤害类型"] = DAMAGE_TYPE_PLANT,
+                    weaponType = WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = "Boss技能"
+                })
                 _____5E94_7528_83AB_5C14_7279_65AF_8150_8D25_503C(context, hero, 8)
                 _____65BD_52A0_5BC4_751F({
                     ["来源单位"] = boss,
@@ -194,8 +196,8 @@ local function _____6267_884C_4E00_6CE2_97AD_7B1E(context, _____547D_4E2D_6B21_6
                 ["持续时间"] = cfg["预警秒"]
             })
             local id = addDelayedCallback(cfg["预警秒"] * 1000, _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_547D_4E2D, {context = context, channel = channel, ["命中次数表"] = _____547D_4E2D_6B21_6570_8868})
-            local ____self_7 = context["清理"]
-            ____self_7["登记延迟回调"](____self_7, "莫尔特斯-荆棘鞭笞命中", id)
+            local ____self_8 = context["清理"]
+            ____self_8["登记延迟回调"](____self_8, "莫尔特斯-荆棘鞭笞命中", id)
             i = i + 1
         end
     end
@@ -220,8 +222,8 @@ ____exports["释放莫尔特斯扭曲荆棘鞭笞"] = function(context)
         while wave < cfg["扫击次数"] do
             local delay = (cfg["开始延迟秒"] + wave * cfg["波次间隔秒"]) * 1000
             local id = addDelayedCallback(delay, _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_6CE2_6B21, {context = context, ["命中次数表"] = hitMap})
-            local ____self_8 = context["清理"]
-            ____self_8["登记延迟回调"](____self_8, "莫尔特斯-荆棘鞭笞波次", id)
+            local ____self_9 = context["清理"]
+            ____self_9["登记延迟回调"](____self_9, "莫尔特斯-荆棘鞭笞波次", id)
             wave = wave + 1
         end
     end

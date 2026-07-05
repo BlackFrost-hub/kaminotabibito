@@ -59,6 +59,10 @@ Buff 新条目至少要明确这些字段：
 要求：
 
 - `type` 必须能表达驱散语义，例如 `Buff:`、`Debuff:`、`Debuff:control`、`Debuff:magic`、`Debuff:dot:soft`。
+- `type` 第一段必须是大类，统一使用 `Buff:` / `Debuff:` / `Aura:`，不要写成 `deBuff:` 这类大小写混用。
+- 持续伤害、周期伤害、站圈残留伤害、每秒结算的锁链/中毒/灼烧等，必须在 `type` 中包含 `:dot`，例如 `Debuff:dot:fire:stack`、`Debuff:dot:poison`、`Debuff:magic:dot`、`Debuff:control:dot`。
+- Buff 查询按 `:` 分隔后的字段精确命中，不依赖字段顺序：有 `Debuff` 字段就是负面，有 `control` 字段就是控制，有 `dot` 字段就是持续伤害；例如 `Debuff:control:dot` 和 `Debuff:dot:control` 都能同时被控制查询与持续伤害查询命中。
+- 减速类 Buff 必须在 `type` 中包含 `:slow`，例如 `Debuff:control:soft:slow`、`Debuff:dot:slow:magic`；只有确实降低移动/行动速度的条目才标 `:slow`，不要把所有软控都当减速。
 - `tooltip` 必须和实际代码一致。
 - 如果有真实效果，就必须在对应 TS 文件里实现，不允许只放表。
 - `effectMode` / `effectAttachPoint` / `effectModel` 这类表现字段如果存在，也必须和实际表现一致。
@@ -70,6 +74,8 @@ Buff 新条目至少要明确这些字段：
 常见原则：
 
 - DOT / HOT 每跳前都要检查对应 `BuffID` 是否还在 Buff 池。
+- 持续伤害的语义必须是“某个效果持续一段时间，并按 tick/每秒/周期结算伤害”，例如 DOT、燃烧、中毒、持续伤害区域、持续 Debuff；单次伤害、连击多段、持有装备后的常驻周期脉冲/光环伤害不自动算持续伤害。
+- DOT 秒跳和其它持续窗口内的 tick 伤害统一走 `TS/系统/04．伤害系统/07．持续伤害系统.ts` 计算来源玩家属性 `持续伤害`；旧 DOT 框架仍由 `TS/系统/04．伤害系统/02．dot伤害.ts` / `01．DOT定义` 管理状态和 Buff 同步。装备不要自己另造“持续伤害提升”字段或单件独立乘区。
 - `registerManualBuff` 只是登记，不代表逻辑已经自动支持驱散中断。
 - 属性型 Buff 必须通过 `onRemove` 回滚。
 - 如果效果和 `effect/effect2` 有语义，读写单位必须统一单位。

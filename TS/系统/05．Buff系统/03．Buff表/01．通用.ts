@@ -54,7 +54,7 @@ export const 通用Buff表: Record<string, BuffData> = {
       buffName: "残废",
       icon: "ReplaceableTextures\\CommandButtons\\BTNCripple.blp",
       effect: "",
-      type: "Debuff:magic:strong",
+      type: "Debuff:control:soft:slow:magic",
       interval: 0,
       maxStack: 1,
       stackRule: 'highest',

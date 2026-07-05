@@ -12,6 +12,17 @@ const { SFB_setBuff, SFB_setSlow } = require("lib.扩展函数.Star扩展函数.
   SFB_setBuff: (sourceUnit: any, u: any, id: number, time: number) => void;
   SFB_setSlow: (sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
 };
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+
+export interface 单位组伤害标记选项 {
+  来源类型?: "单位技能" | "Boss技能" | "召唤物技能" | "其他";
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  参与技能伤害加成?: boolean;
+}
 
 // ─── 单位组快照 ──────────────────────────────────────────
 
@@ -53,22 +64,27 @@ export function 单位组造成伤害(
   单位列表: any[],
   来源: any,
   伤害值: number,
-  伤害类型?: any
+  伤害类型?: any,
+  标记?: 单位组伤害标记选项
 ): void {
   if (!单位列表 || 单位列表.length === 0) return;
   if (伤害值 <= 0) return;
   const 类型 = 伤害类型 ?? jass.DAMAGE_TYPE_NORMAL;
   for (const 单位 of 单位列表) {
-    jass.UnitDamageTarget(
-      来源 ?? 单位,
-      单位,
-      伤害值,
-      false,
-      false,
-      jass.ATTACK_TYPE_NORMAL,
-      类型,
-      jass.WEAPON_TYPE_WHOKNOWS
-    );
+    造成AOE技能伤害({
+      来源: 来源 ?? 单位,
+      目标: 单位,
+      伤害: 伤害值,
+      伤害类型: 类型,
+      ranged: false,
+      attackType: jass.ATTACK_TYPE_NORMAL,
+      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+      来源类型: 标记?.来源类型 ?? "单位技能",
+      技能ID: 标记?.技能ID,
+      技能实例ID: 标记?.技能实例ID,
+      标签: 标记?.技能标签,
+      参与技能伤害加成: 标记?.参与技能伤害加成,
+    });
   }
 }
 

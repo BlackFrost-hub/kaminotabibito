@@ -42,7 +42,6 @@ local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local IsUnitType = jass.IsUnitType
 local IsUnitAlly = jass.IsUnitAlly
-local UnitDamageTarget = jass.UnitDamageTarget
 local GetHeroStr = jass.GetHeroStr
 local GetHeroAgi = jass.GetHeroAgi
 local GetHeroInt = jass.GetHeroInt

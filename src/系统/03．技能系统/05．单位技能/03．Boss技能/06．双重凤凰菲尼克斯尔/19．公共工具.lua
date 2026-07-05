@@ -25,6 +25,8 @@ ____exports["取菲尼克斯尔技能强度倍率"] = function(source)
 end
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_0["造成技能伤害"]
 local Player = jass.Player
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
@@ -39,7 +41,6 @@ local SetUnitTimeScale = jass.SetUnitTimeScale
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
-local UnitDamageTarget = jass.UnitDamageTarget
 local Cos = jass.Cos
 local Sin = jass.Sin
 local Atan2 = jass.Atan2
@@ -58,36 +59,36 @@ local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local DzSetUnitModel = japi.DzSetUnitModel
 local DzSetUnitName = japi.DzSetUnitName
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local removePeriodicCallback = ____require_result_0.removePeriodicCallback
-local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local getRegisteredPlayerHero = ____require_result_1.getRegisteredPlayerHero
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-isValidUnit = ____require_result_2.isValidUnit
-local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getEnemyUnitsInRange = ____require_result_3.getEnemyUnitsInRange
-local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_5.registerManualBuff
-local getBuffRuntime = ____require_result_5.getBuffRuntime
-_____83B7_53D6_5355_4F4DBuff_5C42_6570 = ____require_result_5["获取单位Buff层数"]
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_5["移除单位指定Buff"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_6["创建技能提示圈"]
-local ____require_result_7 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_7["显示常规技能吟唱条"]
-local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_7["显示大招吟唱条"]
-local _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761 = ____require_result_7["显示场地常驻AOE吟唱条"]
-local _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761 = ____require_result_7["显示致命惩罚吟唱条"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____5F00_59CB_786C_76F4 = ____require_result_8["开始硬直"]
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_8["施加快速减速Buff"]
-local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_8["施加快速控制Buff"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.index")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_9["创建可攻击机制单位"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local ____require_result_2 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local getRegisteredPlayerHero = ____require_result_2.getRegisteredPlayerHero
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+isValidUnit = ____require_result_3.isValidUnit
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getEnemyUnitsInRange = ____require_result_4.getEnemyUnitsInRange
+local ____require_result_5 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_6.registerManualBuff
+local getBuffRuntime = ____require_result_6.getBuffRuntime
+_____83B7_53D6_5355_4F4DBuff_5C42_6570 = ____require_result_6["获取单位Buff层数"]
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_7["创建技能提示圈"]
+local ____require_result_8 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_8["显示常规技能吟唱条"]
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_8["显示大招吟唱条"]
+local _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761 = ____require_result_8["显示场地常驻AOE吟唱条"]
+local _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761 = ____require_result_8["显示致命惩罚吟唱条"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_9["开始硬直"]
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_9["施加快速减速Buff"]
+local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_9["施加快速控制Buff"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.index")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_10["创建可攻击机制单位"]
 local DEG_TO_RAD = 0.017453292519943295
 local RAD_TO_DEG = 57.29577951308232
 local _____5FEB_901F_63A7_5236__51FB_6655 = 1
@@ -167,13 +168,13 @@ ____exports["取目标或随机玩家"] = function(boss, target)
         GetUnitX(boss),
         GetUnitY(boss)
     )
-    local _____5355_4F4D_5B58_6D3B_result_10
+    local _____5355_4F4D_5B58_6D3B_result_11
     if ____exports["单位存活"](nearest) then
-        _____5355_4F4D_5B58_6D3B_result_10 = nearest
+        _____5355_4F4D_5B58_6D3B_result_11 = nearest
     else
-        _____5355_4F4D_5B58_6D3B_result_10 = ____exports["取随机玩家英雄"]()
+        _____5355_4F4D_5B58_6D3B_result_11 = ____exports["取随机玩家英雄"]()
     end
-    return _____5355_4F4D_5B58_6D3B_result_10
+    return _____5355_4F4D_5B58_6D3B_result_11
 end
 ____exports["面向单位"] = function(source, target)
     if not ____exports["单位有效"](source) or not ____exports["单位有效"](target) then
@@ -337,75 +338,85 @@ end
 ____exports["范围敌人"] = function(boss, x, y, radius)
     return getEnemyUnitsInRange(boss, x, y, radius)
 end
-____exports["造成火焰伤害"] = function(source, target, amount)
+local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, target, amount, attackType, damageType, _____4F24_5BB3_5F62_6001)
     if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
-        UnitDamageTarget(
-            source,
-            target,
-            amount,
-            false,
-            true,
-            ATTACK_TYPE_MAGIC,
-            DAMAGE_TYPE_FIRE,
-            WEAPON_TYPE_WHOKNOWS
-        )
+        _____9020_6210_6280_80FD_4F24_5BB3({
+            ["来源"] = source,
+            ["目标"] = target,
+            ["伤害"] = amount,
+            ranged = true,
+            attackType = attackType,
+            ["伤害类型"] = damageType,
+            weaponType = WEAPON_TYPE_WHOKNOWS,
+            ["来源类型"] = "Boss技能",
+            ["伤害形态"] = _____4F24_5BB3_5F62_6001
+        })
     end
 end
-____exports["造成冰霜伤害"] = function(source, target, amount)
-    if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
-        UnitDamageTarget(
-            source,
-            target,
-            amount,
-            false,
-            true,
-            ATTACK_TYPE_MAGIC,
-            DAMAGE_TYPE_COLD,
-            WEAPON_TYPE_WHOKNOWS
-        )
+____exports["造成火焰伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+    if _____4F24_5BB3_5F62_6001 == nil then
+        _____4F24_5BB3_5F62_6001 = "单体"
     end
+    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
+        source,
+        target,
+        amount,
+        ATTACK_TYPE_MAGIC,
+        DAMAGE_TYPE_FIRE,
+        _____4F24_5BB3_5F62_6001
+    )
 end
-____exports["造成毒火伤害"] = function(source, target, amount)
-    if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
-        UnitDamageTarget(
-            source,
-            target,
-            amount,
-            false,
-            true,
-            ATTACK_TYPE_MAGIC,
-            DAMAGE_TYPE_POISON,
-            WEAPON_TYPE_WHOKNOWS
-        )
+____exports["造成冰霜伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+    if _____4F24_5BB3_5F62_6001 == nil then
+        _____4F24_5BB3_5F62_6001 = "单体"
     end
+    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
+        source,
+        target,
+        amount,
+        ATTACK_TYPE_MAGIC,
+        DAMAGE_TYPE_COLD,
+        _____4F24_5BB3_5F62_6001
+    )
 end
-____exports["造成暗火伤害"] = function(source, target, amount)
-    if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
-        UnitDamageTarget(
-            source,
-            target,
-            amount,
-            false,
-            true,
-            ATTACK_TYPE_NORMAL,
-            DAMAGE_TYPE_SHADOW_STRIKE,
-            WEAPON_TYPE_WHOKNOWS
-        )
+____exports["造成毒火伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+    if _____4F24_5BB3_5F62_6001 == nil then
+        _____4F24_5BB3_5F62_6001 = "单体"
     end
+    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
+        source,
+        target,
+        amount,
+        ATTACK_TYPE_MAGIC,
+        DAMAGE_TYPE_POISON,
+        _____4F24_5BB3_5F62_6001
+    )
 end
-____exports["造成普通伤害"] = function(source, target, amount)
-    if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
-        UnitDamageTarget(
-            source,
-            target,
-            amount,
-            false,
-            false,
-            ATTACK_TYPE_NORMAL,
-            DAMAGE_TYPE_NORMAL,
-            WEAPON_TYPE_WHOKNOWS
-        )
+____exports["造成暗火伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+    if _____4F24_5BB3_5F62_6001 == nil then
+        _____4F24_5BB3_5F62_6001 = "单体"
     end
+    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
+        source,
+        target,
+        amount,
+        ATTACK_TYPE_NORMAL,
+        DAMAGE_TYPE_SHADOW_STRIKE,
+        _____4F24_5BB3_5F62_6001
+    )
+end
+____exports["造成普通伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+    if _____4F24_5BB3_5F62_6001 == nil then
+        _____4F24_5BB3_5F62_6001 = "单体"
+    end
+    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
+        source,
+        target,
+        amount,
+        ATTACK_TYPE_NORMAL,
+        DAMAGE_TYPE_NORMAL,
+        _____4F24_5BB3_5F62_6001
+    )
 end
 ____exports["计算攻击最大生命伤害"] = function(source, target, attackRate, maxLifeRate)
     return (____exports["取攻击力"](source) * attackRate + ____exports["取最大生命"](target) * maxLifeRate) * ____exports["取菲尼克斯尔技能强度倍率"](source)
@@ -483,20 +494,20 @@ ____exports["减少元素层数"] = function(unit, _____5143_7D20, count)
         return
     end
     local runtime = getBuffRuntime(unit, buffID)
-    local ____registerManualBuff_16 = registerManualBuff
-    local ____unit_15 = unit
-    local ____opt_result_13
+    local ____registerManualBuff_17 = registerManualBuff
+    local ____unit_16 = unit
+    local ____opt_result_14
     if runtime ~= nil then
-        ____opt_result_13 = runtime.remaining
+        ____opt_result_14 = runtime.remaining
     end
-    local ____opt_result_13_14 = ____opt_result_13
-    if ____opt_result_13_14 == nil then
-        ____opt_result_13_14 = 30
+    local ____opt_result_14_15 = ____opt_result_14
+    if ____opt_result_14_15 == nil then
+        ____opt_result_14_15 = 30
     end
-    ____registerManualBuff_16(
-        ____unit_15,
+    ____registerManualBuff_17(
+        ____unit_16,
         buffID,
-        ____opt_result_13_14,
+        ____opt_result_14_15,
         next,
         {stack = next, sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
     )

@@ -8,6 +8,9 @@ import {
   配置型播放目标特效,
   配置型施加减速,
 } from "./01．基础工具";
+const { 计算持续伤害最终值 } = require("系统.04．伤害系统.07．持续伤害系统") as {
+  计算持续伤害最终值: (this: void, source: any, amount: number) => number;
+};
 
 const jass = require("jass.common") as any;
 const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
@@ -45,7 +48,8 @@ function on配置型持续伤害Tick(this: void): void {
     if (record == null || !配置型单位有效存活(record.source) || !配置型单位有效存活(record.target) || record.remainTicks <= 0) continue;
     if (now >= record.nextTime) {
       if (record.effect !== "") 配置型播放目标特效(record.target, record.effect);
-      配置型攻击效果造成伤害(record.source, record.target, record.amount, record.damageType);
+      const finalAmount = 计算持续伤害最终值(record.source, record.amount);
+      if (finalAmount > 0) 配置型攻击效果造成伤害(record.source, record.target, finalAmount, record.damageType, { 伤害形态: "单体", 装备技能类型: "装备持续伤害" });
       record.remainTicks -= 1;
       record.nextTime = now + record.intervalMs;
     }

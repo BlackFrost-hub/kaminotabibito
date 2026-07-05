@@ -20,6 +20,9 @@ const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09�
 const { 创建持续危险区域 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域") as {
   创建持续危险区域: (this: void, 参数: any) => any;
 };
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -30,7 +33,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
@@ -95,7 +97,16 @@ export function 释放米亚腐化爪击(this: void, context: 米亚运行时上
   播放米亚台词(boss, "腐化爪击");
   让单位面向目标(boss, actualTarget);
   播放爪击表现(boss, actualTarget);
-  UnitDamageTarget(boss, actualTarget, 取单位攻击力(boss) * config.攻击力倍率 * 取米亚污染标记伤害倍率(context, actualTarget) * 取米亚平台超载伤害倍率(actualTarget), false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_POISON, jass.WEAPON_TYPE_WHOKNOWS);
+  造成单体技能伤害({
+    技能ID: 腐化爪击技能ID,
+    来源: boss,
+    目标: actualTarget,
+    伤害: 取单位攻击力(boss) * config.攻击力倍率 * 取米亚污染标记伤害倍率(context, actualTarget) * 取米亚平台超载伤害倍率(actualTarget),
+    attackType: jass.ATTACK_TYPE_CHAOS,
+    伤害类型: jass.DAMAGE_TYPE_POISON,
+    weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
   添加米亚腐化感染(context, actualTarget, config.残留每秒腐化层数, "腐化爪击");
   创建腐化爪击残留区(context, GetUnitX(actualTarget), GetUnitY(actualTarget));
 }

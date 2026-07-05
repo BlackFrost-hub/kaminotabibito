@@ -42,6 +42,7 @@ export const ATTR_NAME_MAP: Record<string, string> = {
 
   // 魔法伤害
   "魔法伤害加成": "魔法伤害",
+  "持续伤害加成": "持续伤害",
   "魔法穿透": "魔法穿透",
   "魔抗": "魔抗",
 
@@ -122,6 +123,7 @@ export const ATTR_NAME_MAP: Record<string, string> = {
  */
 export const PRE_REGISTERED_ATTRS = [
   "强化抗性",
+  "持续伤害",
   "土属性伤害",
   "土属性抗性",
   "总生命恢复",

@@ -113,8 +113,10 @@ local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算
 local applyLifeAndManaSteal = ____require_result_2.applyLifeAndManaSteal
 local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local applyDamageModifiers = ____require_result_3.applyDamageModifiers
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
-local createDelayedCall = ____require_result_4.createDelayedCall
+local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587 = ____require_result_4["获取当前技能伤害上下文"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
+local createDelayedCall = ____require_result_5.createDelayedCall
 local ConvertDamageType = jass.ConvertDamageType
 local ConvertAttackType = jass.ConvertAttackType
 local ConvertWeaponType = jass.ConvertWeaponType
@@ -153,6 +155,7 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied, snap
     end
 end
 local function captureDamageTypeSnapshot()
+    local skillContext = _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587()
     return {
         rawAttackType = ConvertAttackType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_ATTACK_TYPE)),
         rawDamageType = ConvertDamageType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_DAMAGE_TYPE)),
@@ -165,6 +168,20 @@ local function captureDamageTypeSnapshot()
         isRangedAttack = _____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_IS_RANGED) == 1,
         isSkillAttack = _____4F24_5BB3_51FD_6570.isSkillAttack(),
         isSkillDamage = _____4F24_5BB3_51FD_6570.isSkillDamage(),
+        isWrappedSkillDamage = (skillContext and skillContext.isWrappedSkillDamage) == true,
+        isEquipmentSkillDamage = (skillContext and skillContext.isEquipmentSkillDamage) == true,
+        isNonEquipmentSkillDamage = (skillContext and skillContext.isNonEquipmentSkillDamage) == true,
+        skillDamageSourceKind = skillContext and skillContext.sourceKind,
+        equipmentSkillDamageKind = skillContext and skillContext.equipmentSkillKind,
+        itemTypeId = skillContext and skillContext.itemTypeId,
+        itemHandle = skillContext and skillContext.itemHandle,
+        abilityId = skillContext and skillContext.abilityId,
+        skillInstanceId = skillContext and skillContext.skillInstanceId,
+        skillDamageTag = skillContext and skillContext.tag,
+        skillDamageShape = skillContext and skillContext.damageShape or "未知",
+        isIndependentSkillDamage = (skillContext and skillContext.isIndependentSkillDamage) == true,
+        isSingleTargetSkillDamage = (skillContext and skillContext.isSingleTargetSkillDamage) == true,
+        isAoeSkillDamage = (skillContext and skillContext.isAoeSkillDamage) == true,
         isMetalDamage = _____4F24_5BB3_51FD_6570.isMetalDamage(),
         isWoodDamage = _____4F24_5BB3_51FD_6570.isWoodDamage(),
         isWaterDamage = _____4F24_5BB3_51FD_6570.isWaterDamage(),
@@ -198,6 +215,9 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
     local isMagicDmg = _____4F24_5BB3_51FD_6570.isMagicDamage()
     local isEnhanceDmg = _____4F24_5BB3_51FD_6570.isEnhancedDamage()
     local isTrueDmg = _____4F24_5BB3_51FD_6570.isTrueDamage()
+    local skillContext = _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587()
+    local isWrappedSkillDmg = (skillContext and skillContext.isWrappedSkillDamage) == true and skillContext.participatesInSkillDamageBonus ~= false
+    local isAnySkillDmg = _____4F24_5BB3_51FD_6570.isSkillAttack() or _____4F24_5BB3_51FD_6570.isSkillDamage() or isWrappedSkillDmg
     if isTrueDmg then
         return {finalDamage = damage, immune = false, showDodge = false}
     end
@@ -208,7 +228,7 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
     if isMagicDmg then
         dmgReduction = dmgReduction + getRealAttr(nil, target, "魔法固伤减少", 0)
     end
-    if _____4F24_5BB3_51FD_6570.isSkillAttack() or _____4F24_5BB3_51FD_6570.isSkillDamage() then
+    if isAnySkillDmg then
         dmgReduction = dmgReduction + getRealAttr(nil, target, "技能固伤减少", 0)
     end
     damage = damage - dmgReduction
@@ -260,7 +280,7 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
             finalMultiplier = finalMultiplier * (1 + enhanceDmg)
         end
     end
-    if _____4F24_5BB3_51FD_6570.isSkillAttack() or _____4F24_5BB3_51FD_6570.isSkillDamage() then
+    if isAnySkillDmg then
         local skillMod = getSkillDamageModifier(nil, attacker, target, isPlayer)
         addDamage = addDamage + skillMod.addDamage
         finalMultiplier = finalMultiplier * skillMod.multiplier
@@ -356,7 +376,21 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
             isNormalAttack = snapshot.isNormalAttack,
             isRangedAttack = snapshot.isRangedAttack,
             isSkillAttack = snapshot.isSkillAttack,
-            isSkillDamage = snapshot.isSkillDamage
+            isSkillDamage = snapshot.isSkillDamage,
+            isWrappedSkillDamage = snapshot.isWrappedSkillDamage,
+            isEquipmentSkillDamage = snapshot.isEquipmentSkillDamage,
+            isNonEquipmentSkillDamage = snapshot.isNonEquipmentSkillDamage,
+            skillDamageSourceKind = snapshot.skillDamageSourceKind,
+            equipmentSkillDamageKind = snapshot.equipmentSkillDamageKind,
+            itemTypeId = snapshot.itemTypeId,
+            itemHandle = snapshot.itemHandle,
+            abilityId = snapshot.abilityId,
+            skillInstanceId = snapshot.skillInstanceId,
+            skillDamageTag = snapshot.skillDamageTag,
+            skillDamageShape = snapshot.skillDamageShape,
+            isIndependentSkillDamage = snapshot.isIndependentSkillDamage,
+            isSingleTargetSkillDamage = snapshot.isSingleTargetSkillDamage,
+            isAoeSkillDamage = snapshot.isAoeSkillDamage
         })
     end
     if finalDamage ~= baseDamage then

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____8DDD_79BB_5E73_65B9, _____9009_62E9_706B_7130_9501_94FE_76EE_6807, _____8BA1_7B97_8D85_8DDD_4F24_5BB3, _____66F4_65B0_9501_94FE_5355_4F4D_4F4D_7F6E, _____505C_6B62_706B_7130_9501_94FE, ____on_706B_7130_9501_94FEBuff_79FB_9664, ____on_706B_7130_9501_94FETick, _____521B_5EFA_706B_7130_9501_94FE, ____on_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE_751F_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitType, UnitDamageTarget, SetUnitX, SetUnitY, Player, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, PLAYER_NEUTRAL_AGGRESSIVE, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____706B_7130_9501_94FE_6280_80FDID
+local _____5355_4F4D_6709_6548, _____8DDD_79BB_5E73_65B9, _____9009_62E9_706B_7130_9501_94FE_76EE_6807, _____8BA1_7B97_8D85_8DDD_4F24_5BB3, _____66F4_65B0_9501_94FE_5355_4F4D_4F4D_7F6E, _____505C_6B62_706B_7130_9501_94FE, ____on_706B_7130_9501_94FEBuff_79FB_9664, ____on_706B_7130_9501_94FETick, _____521B_5EFA_706B_7130_9501_94FE, ____on_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE_751F_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitType, SetUnitX, SetUnitY, Player, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, PLAYER_NEUTRAL_AGGRESSIVE, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____706B_7130_9501_94FE_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -79,21 +79,21 @@ function _____505C_6B62_706B_7130_9501_94FE(state, removeBuff)
         state.tickId = 0
     end
     if state.line ~= nil then
-        local ____self_8 = state.line
-        ____self_8["停止"](____self_8, "火焰锁链结束")
+        local ____self_9 = state.line
+        ____self_9["停止"](____self_9, "火焰锁链结束")
     end
     if removeBuff then
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(state.target, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E.BuffID["火焰锁链"])
     end
 end
 function ____on_706B_7130_9501_94FEBuff_79FB_9664(unit, _buffID, row)
-    local ____temp_9
+    local ____temp_10
     if row ~= nil then
-        ____temp_9 = row.chainState
+        ____temp_10 = row.chainState
     else
-        ____temp_9 = nil
+        ____temp_10 = nil
     end
-    local state = ____temp_9
+    local state = ____temp_10
     if state ~= nil then
         _____505C_6B62_706B_7130_9501_94FE(state, false)
     end
@@ -119,16 +119,17 @@ function ____on_706B_7130_9501_94FETick(state)
         return
     end
     state.lastDamageMs = now
-    UnitDamageTarget(
-        boss,
-        target,
-        _____8BA1_7B97_8D85_8DDD_4F24_5BB3(boss, target),
-        false,
-        true,
-        ATTACK_TYPE_CHAOS,
-        DAMAGE_TYPE_FIRE,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["来源"] = boss,
+        ["目标"] = target,
+        ["伤害"] = _____8BA1_7B97_8D85_8DDD_4F24_5BB3(boss, target),
+        attack = false,
+        ranged = true,
+        attackType = ATTACK_TYPE_CHAOS,
+        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能"
+    })
 end
 function _____521B_5EFA_706B_7130_9501_94FE(context, target)
     local boss = context["Boss单位"]
@@ -188,8 +189,8 @@ function _____521B_5EFA_706B_7130_9501_94FE(context, target)
             ____on_706B_7130_9501_94FETick(state)
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记周期回调"](____self_10, "巴尔扎罗斯-火焰锁链Tick", state.tickId)
+    local ____self_11 = context["清理"]
+    ____self_11["登记周期回调"](____self_11, "巴尔扎罗斯-火焰锁链Tick", state.tickId)
     registerManualBuff(
         target,
         _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E.BuffID["火焰锁链"],
@@ -270,13 +271,14 @@ getServerTime = ____require_result_6.getServerTime
 local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
 registerManualBuff = ____require_result_7.registerManualBuff
 _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_7["移除单位指定Buff"]
+local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_8["造成单体技能伤害"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
 IsUnitType = jass.IsUnitType
-UnitDamageTarget = jass.UnitDamageTarget
 SetUnitX = jass.SetUnitX
 SetUnitY = jass.SetUnitY
 Player = jass.Player

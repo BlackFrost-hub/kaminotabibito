@@ -10,14 +10,13 @@ const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
+
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const { 开始冲锋 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统") as {
   开始冲锋: (this: void, 单位: any, 参数: any) => number;
@@ -66,6 +65,11 @@ export interface 冲锋路径区域结算参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  来源类型?: "单位技能" | "Boss技能" | "召唤物技能" | "其他";
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  参与技能伤害加成?: boolean;
   单位筛选?: (this: void, 移动单位: any, 目标单位: any, 位移ID: number, 原因: 位移结束原因) => boolean;
   命中回调?: (this: void, 移动单位: any, 目标单位: any, 位移ID: number, 原因: 位移结束原因) => void;
 }
@@ -174,16 +178,20 @@ function 结算路径区域伤害(
       continue;
     }
 
-    UnitDamageTarget(
-      伤害来源,
-      目标单位,
-      结算参数.伤害值,
-      false,
-      false,
-      攻击类型,
+    造成AOE技能伤害({
+      来源: 伤害来源,
+      目标: 目标单位,
+      伤害: 结算参数.伤害值,
       伤害类型,
-      武器类型
-    );
+      ranged: false,
+      attackType: 攻击类型,
+      weaponType: 武器类型,
+      来源类型: 结算参数.来源类型 ?? "单位技能",
+      技能ID: 结算参数.技能ID,
+      技能实例ID: 结算参数.技能实例ID,
+      标签: 结算参数.技能标签,
+      参与技能伤害加成: 结算参数.参与技能伤害加成,
+    });
 
     结算参数.命中回调?.(上下文.单位, 目标单位, 位移ID, 原因);
   }

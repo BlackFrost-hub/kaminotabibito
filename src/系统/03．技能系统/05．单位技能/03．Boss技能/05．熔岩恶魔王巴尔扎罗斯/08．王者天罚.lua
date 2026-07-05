@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____8DDD_79BB_5E73_65B9XY, _____9650_5236_751F_547D_503C, _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5929_7F5A_534A_5F84, _____8BA1_7B97_5929_7F5A_4F24_5BB3, _____64AD_653E_5929_7F5A_7206_70B8_7279_6548, _____8BB0_5F55_5929_7F5A_73A9_5BB6_547D_4E2D, _____6536_96C6_5929_7F5A_547D_4E2D_5019_9009, _____662F_62A4_536B, _____89E6_53D1_5929_7F5A_6CE2_6B21, _____521B_5EFA_5929_7F5A_6CE2_6B21_5217_8868, ____on_5DF4_5C14_624E_7F57_65AF_738B_8005_5929_7F5A_751F_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_591A_6CE2_5EF6_8FDFAOE, _____65BD_52A0_5355_4F53_653B_51FB_529B_63D0_9AD8Buff, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, YDWETimerDestroyEffectSafe, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, IsUnitType, UnitDamageTarget, AddSpecialEffect, GetHandleId, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, EXSetEffectZ, EXSetEffectSize, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____738B_8005_5929_7F5A_6280_80FDID
+local _____5355_4F4D_6709_6548, _____8DDD_79BB_5E73_65B9XY, _____9650_5236_751F_547D_503C, _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5929_7F5A_534A_5F84, _____8BA1_7B97_5929_7F5A_4F24_5BB3, _____64AD_653E_5929_7F5A_7206_70B8_7279_6548, _____8BB0_5F55_5929_7F5A_73A9_5BB6_547D_4E2D, _____6536_96C6_5929_7F5A_547D_4E2D_5019_9009, _____662F_62A4_536B, _____89E6_53D1_5929_7F5A_6CE2_6B21, _____521B_5EFA_5929_7F5A_6CE2_6B21_5217_8868, ____on_5DF4_5C14_624E_7F57_65AF_738B_8005_5929_7F5A_751F_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_591A_6CE2_5EF6_8FDFAOE, _____65BD_52A0_5355_4F53_653B_51FB_529B_63D0_9AD8Buff, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, YDWETimerDestroyEffectSafe, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, IsUnitType, AddSpecialEffect, GetHandleId, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, EXSetEffectZ, EXSetEffectSize, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____738B_8005_5929_7F5A_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -127,16 +127,17 @@ function _____89E6_53D1_5929_7F5A_6CE2_6B21(context, _____6CE2_6B21)
                         }
                     )
                 else
-                    UnitDamageTarget(
-                        boss,
-                        unit,
-                        _____8BA1_7B97_5929_7F5A_4F24_5BB3(boss, unit),
-                        false,
-                        true,
-                        ATTACK_TYPE_CHAOS,
-                        DAMAGE_TYPE_FIRE,
-                        WEAPON_TYPE_WHOKNOWS
-                    )
+                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                        ["来源"] = boss,
+                        ["目标"] = unit,
+                        ["伤害"] = _____8BA1_7B97_5929_7F5A_4F24_5BB3(boss, unit),
+                        attack = false,
+                        ranged = true,
+                        attackType = ATTACK_TYPE_CHAOS,
+                        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                        weaponType = WEAPON_TYPE_WHOKNOWS,
+                        ["来源类型"] = "Boss技能"
+                    })
                     _____8BB0_5F55_5929_7F5A_73A9_5BB6_547D_4E2D(context, unit)
                 end
             end
@@ -240,6 +241,8 @@ local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
 local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_6["造成AOE技能伤害"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
@@ -248,7 +251,6 @@ GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
 SetUnitState = jass.SetUnitState
 IsUnitType = jass.IsUnitType
-UnitDamageTarget = jass.UnitDamageTarget
 AddSpecialEffect = jass.AddSpecialEffect
 GetHandleId = jass.GetHandleId
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE

@@ -20,17 +20,15 @@ local GetUnitX = ____585E_62C9_516C_5171_0.GetUnitX
 local GetUnitY = ____585E_62C9_516C_5171_0.GetUnitY
 local GetUnitState = ____585E_62C9_516C_5171_0.GetUnitState
 local GetUnitFlyHeight = ____585E_62C9_516C_5171_0.GetUnitFlyHeight
-local UnitDamageTarget = ____585E_62C9_516C_5171_0.UnitDamageTarget
 local SquareRoot = ____585E_62C9_516C_5171_0.SquareRoot
 local UNIT_STATE_MAX_LIFE = ____585E_62C9_516C_5171_0.UNIT_STATE_MAX_LIFE
-local ATTACK_TYPE_CHAOS = ____585E_62C9_516C_5171_0.ATTACK_TYPE_CHAOS
 local DAMAGE_TYPE_FIRE = ____585E_62C9_516C_5171_0.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_COLD = ____585E_62C9_516C_5171_0.DAMAGE_TYPE_COLD
-local WEAPON_TYPE_WHOKNOWS = ____585E_62C9_516C_5171_0.WEAPON_TYPE_WHOKNOWS
 local _____5355_4F4D_6709_6548 = ____585E_62C9_516C_5171_0["单位有效"]
 local _____53D6_65B9_5411_89D2 = ____585E_62C9_516C_5171_0["取方向角"]
 local _____53D6_5F62_6001_6280_80FD_500D_7387 = ____585E_62C9_516C_5171_0["取形态技能倍率"]
 local _____521B_5EFA_585E_62C9_70B9_7279_6548 = ____585E_62C9_516C_5171_0["创建塞拉点特效"]
+local _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3 = ____585E_62C9_516C_5171_0["造成塞拉Boss技能伤害"]
 local _____5F31_8FFD_8E2A_5F39_4F53_72B6_6001_8868 = ____585E_62C9_516C_5171_0["弱追踪弹体状态表"]
 local function _____8BA1_7B97_51B0_7403_4F24_5BB3(context, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["冰焰双星"]
@@ -79,15 +77,12 @@ local function _____7ED3_7B97_51B0_7130AOE(context, hitUnit, _____7C7B_578B)
                     goto __continue9
                 end
                 if _____7C7B_578B == "冰霜" then
-                    UnitDamageTarget(
+                    _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3(
                         sera,
                         unit,
                         _____8BA1_7B97_51B0_7403_4F24_5BB3(context, unit),
-                        false,
-                        true,
-                        ATTACK_TYPE_CHAOS,
                         DAMAGE_TYPE_COLD,
-                        WEAPON_TYPE_WHOKNOWS
+                        "AOE"
                     )
                     _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                         sera,
@@ -97,15 +92,12 @@ local function _____7ED3_7B97_51B0_7130AOE(context, hitUnit, _____7C7B_578B)
                         config["冰球减速持续秒"]
                     )
                 else
-                    UnitDamageTarget(
+                    _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3(
                         sera,
                         unit,
                         _____8BA1_7B97_706B_7403_4F24_5BB3(context, unit),
-                        false,
-                        true,
-                        ATTACK_TYPE_CHAOS,
                         DAMAGE_TYPE_FIRE,
-                        WEAPON_TYPE_WHOKNOWS
+                        "AOE"
                     )
                     _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["火球灼热层数"])
                 end

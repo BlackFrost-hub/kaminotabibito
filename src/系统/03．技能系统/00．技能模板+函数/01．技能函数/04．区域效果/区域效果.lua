@@ -60,7 +60,6 @@ local GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange
 local FirstOfGroup = jass.FirstOfGroup
 local GroupRemoveUnit = jass.GroupRemoveUnit
 local DestroyGroup = jass.DestroyGroup
-local UnitDamageTarget = jass.UnitDamageTarget
 local EXSetEffectZ = japi.EXSetEffectZ
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
@@ -73,8 +72,10 @@ local getUnitsInRange = ____require_result_1.getUnitsInRange
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 local isUnitEnemy = ____require_result_2.isUnitEnemy
 local isUnitAlly = ____require_result_2.isUnitAlly
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_3 = require("系统.04．伤害系统.07．持续伤害系统")
+local _____9020_6210_6301_7EED_4F24_5BB3 = ____require_result_3["造成持续伤害"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_4["创建技能提示圈"]
 local function _____6570_5B57_5347_5E8F_6392_5E8F(self, a, b)
     return a - b
 end
@@ -143,23 +144,23 @@ function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, ____
     end
     if _____53C2_6570["提示圈"] ~= false and _____53C2_6570["显示提示圈"] ~= false and _____53C2_6570["持续时间"] > 0 then
         local _____63D0_793A_5708_914D_7F6E = _____53C2_6570["提示圈"] or ({})
-        local ____521B_5EFA_6280_80FD_63D0_793A_5708_10 = _____521B_5EFA_6280_80FD_63D0_793A_5708
-        local ____temp_5 = _____63D0_793A_5708_914D_7F6E["类型"] or "渐变圆形"
-        local ____temp_6 = _____63D0_793A_5708_914D_7F6E.X or self["当前X"]
-        local ____temp_7 = _____63D0_793A_5708_914D_7F6E.Y or self["当前Y"]
-        local ____temp_8 = _____63D0_793A_5708_914D_7F6E["半径"] or _____53C2_6570["半径"]
-        local ____temp_9 = _____63D0_793A_5708_914D_7F6E["持续时间"] or _____53C2_6570["持续时间"]
-        local ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_4 = _____63D0_793A_5708_914D_7F6E["来源单位"]
-        if ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_4 == nil then
-            ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_4 = _____53C2_6570["所有者"]
+        local ____521B_5EFA_6280_80FD_63D0_793A_5708_11 = _____521B_5EFA_6280_80FD_63D0_793A_5708
+        local ____temp_6 = _____63D0_793A_5708_914D_7F6E["类型"] or "渐变圆形"
+        local ____temp_7 = _____63D0_793A_5708_914D_7F6E.X or self["当前X"]
+        local ____temp_8 = _____63D0_793A_5708_914D_7F6E.Y or self["当前Y"]
+        local ____temp_9 = _____63D0_793A_5708_914D_7F6E["半径"] or _____53C2_6570["半径"]
+        local ____temp_10 = _____63D0_793A_5708_914D_7F6E["持续时间"] or _____53C2_6570["持续时间"]
+        local ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_5 = _____63D0_793A_5708_914D_7F6E["来源单位"]
+        if ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_5 == nil then
+            ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_5 = _____53C2_6570["所有者"]
         end
-        self["提示圈特效"] = ____521B_5EFA_6280_80FD_63D0_793A_5708_10(__TS__ObjectAssign({}, _____63D0_793A_5708_914D_7F6E, {
-            ["类型"] = ____temp_5,
-            X = ____temp_6,
-            Y = ____temp_7,
-            ["半径"] = ____temp_8,
-            ["持续时间"] = ____temp_9,
-            ["来源单位"] = ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_4
+        self["提示圈特效"] = ____521B_5EFA_6280_80FD_63D0_793A_5708_11(__TS__ObjectAssign({}, _____63D0_793A_5708_914D_7F6E, {
+            ["类型"] = ____temp_6,
+            X = ____temp_7,
+            Y = ____temp_8,
+            ["半径"] = ____temp_9,
+            ["持续时间"] = ____temp_10,
+            ["来源单位"] = ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_5
         }))
     end
     _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B(self)
@@ -208,9 +209,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
             if not _____662F_9996_6B21 and not self["当前单位集合"][hid] then
                 local _____4E0A_6B21_79BB_5F00 = self["单位最后离开时间"][hid]
                 if _____4E0A_6B21_79BB_5F00 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_79BB_5F00 >= _____9632_6296_6BEB_79D2 then
-                    local ____opt_11 = self["参数"]["on进入"]
-                    if ____opt_11 ~= nil then
-                        ____opt_11(_____5355_4F4D, self["参数"]["回调上下文ID"])
+                    local ____opt_12 = self["参数"]["on进入"]
+                    if ____opt_12 ~= nil then
+                        ____opt_12(_____5355_4F4D, self["参数"]["回调上下文ID"])
                     end
                 end
                 self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
@@ -226,9 +227,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
             if not _____65B0_96C6_5408[hid] then
                 local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
                 if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-                    local ____opt_13 = self["参数"]["on离开"]
-                    if ____opt_13 ~= nil then
-                        ____opt_13(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
+                    local ____opt_14 = self["参数"]["on离开"]
+                    if ____opt_14 ~= nil then
+                        ____opt_14(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
                     end
                 end
                 self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
@@ -253,27 +254,32 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     end
                     _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey] = _____5F53_524D_65F6_95F4
                 end
-                local ____self__53C2_6570__6240_6709_8005_15 = self["参数"]["所有者"]
-                if ____self__53C2_6570__6240_6709_8005_15 == nil then
-                    ____self__53C2_6570__6240_6709_8005_15 = _____5355_4F4D
+                local ____9020_6210_6301_7EED_4F24_5BB3_19 = _____9020_6210_6301_7EED_4F24_5BB3
+                local ____self__53C2_6570__6240_6709_8005_16 = self["参数"]["所有者"]
+                if ____self__53C2_6570__6240_6709_8005_16 == nil then
+                    ____self__53C2_6570__6240_6709_8005_16 = _____5355_4F4D
                 end
-                UnitDamageTarget(
-                    ____self__53C2_6570__6240_6709_8005_15,
+                local ____self__53C2_6570__5468_671F_4F24_5BB3_18 = self["参数"]["周期伤害"]
+                local ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_17 = self["参数"]["周期伤害类型"]
+                if ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_17 == nil then
+                    ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_17 = DAMAGE_TYPE_NORMAL
+                end
+                ____9020_6210_6301_7EED_4F24_5BB3_19(
+                    ____self__53C2_6570__6240_6709_8005_16,
                     _____5355_4F4D,
-                    self["参数"]["周期伤害"],
-                    false,
+                    ____self__53C2_6570__5468_671F_4F24_5BB3_18,
+                    ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_17,
                     false,
                     ATTACK_TYPE_NORMAL,
-                    DAMAGE_TYPE_NORMAL,
                     nil
                 )
             end
             ::__continue37::
         end
     end
-    local ____opt_16 = self["参数"]["on周期"]
-    if ____opt_16 ~= nil then
-        ____opt_16(_____5F53_524D_5355_4F4D_6570_7EC4, self["参数"]["回调上下文ID"])
+    local ____opt_20 = self["参数"]["on周期"]
+    if ____opt_20 ~= nil then
+        ____opt_20(_____5F53_524D_5355_4F4D_6570_7EC4, self["参数"]["回调上下文ID"])
     end
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -304,9 +310,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["销毁"] = function(self)
         DestroyEffect(self["提示圈特效"])
         self["提示圈特效"] = nil
     end
-    local ____opt_18 = self["参数"]["on销毁"]
-    if ____opt_18 ~= nil then
-        ____opt_18(self["参数"]["回调上下文ID"])
+    local ____opt_22 = self["参数"]["on销毁"]
+    if ____opt_22 ~= nil then
+        ____opt_22(self["参数"]["回调上下文ID"])
     end
     self["当前单位集合"] = {}
     self["单位最后进入时间"] = {}
@@ -337,9 +343,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
             local hid = _____5F53_524D_5355_4F4DID_5217_8868[i + 1]
             local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
             if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-                local ____opt_20 = self["参数"]["on离开"]
-                if ____opt_20 ~= nil then
-                    ____opt_20(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
+                local ____opt_24 = self["参数"]["on离开"]
+                if ____opt_24 ~= nil then
+                    ____opt_24(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
                 end
             end
             self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4

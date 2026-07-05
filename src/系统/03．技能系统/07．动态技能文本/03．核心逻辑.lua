@@ -47,6 +47,7 @@ local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.ind
 local debugLog = ____require_result_0.debugLog
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetHandleId = jass.GetHandleId
+local R2I = jass.R2I
 local DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip
 local DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip
 local DzSetUnitAbilityUpdate = japi.DzSetUnitAbilityUpdate
@@ -277,6 +278,14 @@ end
 local function _____5305_88C5_52A8_6001_6570_503C(_____6570_503C_6587_672C)
     return (_____52A8_6001_6570_503C_6807_8BB0_524D_7F00 .. _____6570_503C_6587_672C) .. _____52A8_6001_6570_503C_6807_8BB0_540E_7F00
 end
+local function _____683C_5F0F_5316_52A8_6001_6574_6570(value)
+    if value >= 0 then
+        return tostring(R2I(value + 0.5)
+        )
+    end
+    return "-" .. tostring(R2I(-value + 0.5)
+    )
+end
 local function _____89E3_6790_52A8_6001_6570_503C_6807_8BB0(text, _____8D77_59CB_4F4D_7F6E)
     if __TS__StringSubstring(text, _____8D77_59CB_4F4D_7F6E, _____8D77_59CB_4F4D_7F6E + #_____52A8_6001_6570_503C_6807_8BB0_524D_7F00) ~= _____52A8_6001_6570_503C_6807_8BB0_524D_7F00 then
         return nil
@@ -307,7 +316,7 @@ local function _____5408_5E76_52A8_6001_6570_503C_52A0_6CD5(text)
             if _____7B2C_4E00_4E2A_6807_8BB0 == nil then
                 result = result .. __TS__StringCharAt(text, _____4F4D_7F6E)
                 _____4F4D_7F6E = _____4F4D_7F6E + 1
-                goto __continue54
+                goto __continue56
             end
             local _____6C42_548C = _____7B2C_4E00_4E2A_6807_8BB0["数值"]
             local _____5F53_524D_7ED3_675F = _____7B2C_4E00_4E2A_6807_8BB0["结束位置"]
@@ -328,7 +337,7 @@ local function _____5408_5E76_52A8_6001_6570_503C_52A0_6CD5(text)
             end
             _____4F4D_7F6E = _____5F53_524D_7ED3_675F
         end
-        ::__continue54::
+        ::__continue56::
     end
     return result
 end
@@ -352,12 +361,12 @@ local function _____83B7_53D6_5FEB_7167_6280_80FD_5217_8868(hero)
             do
                 local abilityId = _____5FEB_7167.skills[_____6280_80FD_70ED_952E_5217_8868[i + 1]]
                 if abilityId == nil or abilityId == 0 or seen[abilityId] == true then
-                    goto __continue63
+                    goto __continue65
                 end
                 seen[abilityId] = true
                 ids[#ids + 1] = abilityId
             end
-            ::__continue63::
+            ::__continue65::
             i = i + 1
         end
     end
@@ -383,24 +392,55 @@ local function _____67E5_627E_6700_540E_5339_914D_4F4D_7F6E(text, pattern, befor
     end
     return _____547D_4E2D_4F4D_7F6E
 end
+local function _____662F_5426_5341_516D_8FDB_5236_5B57_7B26(_____5B57_7B26)
+    if _____5B57_7B26 >= "0" and _____5B57_7B26 <= "9" then
+        return true
+    end
+    if _____5B57_7B26 >= "a" and _____5B57_7B26 <= "f" then
+        return true
+    end
+    return _____5B57_7B26 >= "A" and _____5B57_7B26 <= "F"
+end
+local function _____67E5_627E_6700_540E_989C_8272_7801_8D77_59CB(text, beforeIndex)
+    local _____547D_4E2D_4F4D_7F6E = -1
+    local _____641C_7D22_4F4D_7F6E = (string.find(text, "|c", nil, true) or 0) - 1
+    while _____641C_7D22_4F4D_7F6E >= 0 and _____641C_7D22_4F4D_7F6E < beforeIndex do
+        local _____662F_989C_8272_7801 = _____641C_7D22_4F4D_7F6E + 10 <= #text
+        do
+            local i = 0
+            while i < 8 and _____662F_989C_8272_7801 do
+                if not _____662F_5426_5341_516D_8FDB_5236_5B57_7B26(__TS__StringCharAt(text, _____641C_7D22_4F4D_7F6E + 2 + i)) then
+                    _____662F_989C_8272_7801 = false
+                end
+                i = i + 1
+            end
+        end
+        if _____662F_989C_8272_7801 then
+            _____547D_4E2D_4F4D_7F6E = _____641C_7D22_4F4D_7F6E
+        end
+        _____641C_7D22_4F4D_7F6E = (string.find(
+            text,
+            "|c",
+            math.max(_____641C_7D22_4F4D_7F6E + 2 + 1, 1),
+            true
+        ) or 0) - 1
+    end
+    return _____547D_4E2D_4F4D_7F6E
+end
 local function _____8C03_6574_524D_7F00_500D_7387_8D77_70B9_907F_5F00_989C_8272_7801(text, _____6570_5B57_8D77_59CB, _____5C5E_6027_4F4D_7F6E)
-    local _____989C_8272_8D77_59CB = _____67E5_627E_6700_540E_5339_914D_4F4D_7F6E(text, "|cff", _____5C5E_6027_4F4D_7F6E)
+    local _____989C_8272_8D77_59CB = _____67E5_627E_6700_540E_989C_8272_7801_8D77_59CB(text, _____5C5E_6027_4F4D_7F6E)
     if _____989C_8272_8D77_59CB < 0 then
         return _____6570_5B57_8D77_59CB
     end
     local _____989C_8272_7ED3_675F = _____989C_8272_8D77_59CB + 10
-    if _____989C_8272_7ED3_675F <= _____6570_5B57_8D77_59CB or _____989C_8272_7ED3_675F >= _____5C5E_6027_4F4D_7F6E then
+    if _____989C_8272_7ED3_675F <= _____6570_5B57_8D77_59CB or _____989C_8272_7ED3_675F > _____5C5E_6027_4F4D_7F6E then
         return _____6570_5B57_8D77_59CB
     end
     local _____989C_8272_503C = __TS__StringSubstring(text, _____989C_8272_8D77_59CB + 2, _____989C_8272_7ED3_675F)
     do
         local i = 0
         while i < #_____989C_8272_503C do
-            local _____5B57_7B26 = __TS__StringCharAt(_____989C_8272_503C, i)
-            local _____662F_6570_5B57 = _____5B57_7B26 >= "0" and _____5B57_7B26 <= "9"
-            local _____662F_5C0F_5199_5341_516D_8FDB_5236_5B57_6BCD = _____5B57_7B26 >= "a" and _____5B57_7B26 <= "f"
-            local _____662F_5927_5199_5341_516D_8FDB_5236_5B57_6BCD = _____5B57_7B26 >= "A" and _____5B57_7B26 <= "F"
-            if not _____662F_6570_5B57 and not _____662F_5C0F_5199_5341_516D_8FDB_5236_5B57_6BCD and not _____662F_5927_5199_5341_516D_8FDB_5236_5B57_6BCD then
+            if not _____662F_5426_5341_516D_8FDB_5236_5B57_7B26(__TS__StringCharAt(_____989C_8272_503C, i)) then
                 return _____6570_5B57_8D77_59CB
             end
             i = i + 1
@@ -420,49 +460,61 @@ local function _____63D0_53D6_524D_7F00_500D_7387_5339_914D(text, _____5C5E_6027
         true
     ) or 0) - 1
     while _____5C5E_6027_4F4D_7F6E >= 0 do
-        local _____6570_5B57_8D77_59CB = _____5C5E_6027_4F4D_7F6E
-        while _____6570_5B57_8D77_59CB > 0 do
-            local _____5B57_7B26 = __TS__StringCharAt(text, _____6570_5B57_8D77_59CB - 1)
-            if _____5B57_7B26 >= "0" and _____5B57_7B26 <= "9" or _____5B57_7B26 == "." or _____5B57_7B26 == "%" then
-                _____6570_5B57_8D77_59CB = _____6570_5B57_8D77_59CB - 1
-            else
-                break
-            end
-        end
-        if _____6570_5B57_8D77_59CB < _____5C5E_6027_4F4D_7F6E then
-            _____6570_5B57_8D77_59CB = _____8C03_6574_524D_7F00_500D_7387_8D77_70B9_907F_5F00_989C_8272_7801(text, _____6570_5B57_8D77_59CB, _____5C5E_6027_4F4D_7F6E)
-            local _____5B8C_6574_5339_914D_5F00_59CB = _____6570_5B57_8D77_59CB
-            if _____6570_5B57_8D77_59CB >= 2 and __TS__StringSubstring(text, _____6570_5B57_8D77_59CB - 2, _____6570_5B57_8D77_59CB) == "自身" then
-                _____5B8C_6574_5339_914D_5F00_59CB = _____6570_5B57_8D77_59CB - 2
-            end
-            local _____500D_7387 = __TS__StringSubstring(text, _____6570_5B57_8D77_59CB, _____5C5E_6027_4F4D_7F6E)
-            local _____672B_5B57_7B26 = __TS__StringCharAt(_____500D_7387, #_____500D_7387 - 1)
-            local _____542B_6570_5B57 = false
-            do
-                local i = 0
-                while i < #_____500D_7387 do
-                    local _____5B57_7B26 = __TS__StringCharAt(_____500D_7387, i)
-                    if _____5B57_7B26 >= "0" and _____5B57_7B26 <= "9" then
-                        _____542B_6570_5B57 = true
-                        break
-                    end
-                    i = i + 1
+        do
+            local _____6570_5B57_8D77_59CB = _____5C5E_6027_4F4D_7F6E
+            while _____6570_5B57_8D77_59CB > 0 do
+                local _____5B57_7B26 = __TS__StringCharAt(text, _____6570_5B57_8D77_59CB - 1)
+                if _____5B57_7B26 >= "0" and _____5B57_7B26 <= "9" or _____5B57_7B26 == "." or _____5B57_7B26 == "%" then
+                    _____6570_5B57_8D77_59CB = _____6570_5B57_8D77_59CB - 1
+                else
+                    break
                 end
             end
-            if _____542B_6570_5B57 and (_____672B_5B57_7B26 == "%" or _____672B_5B57_7B26 >= "0" and _____672B_5B57_7B26 <= "9" or _____672B_5B57_7B26 == ".") then
-                return {
-                    ["完整匹配"] = __TS__StringSubstring(text, _____5B8C_6574_5339_914D_5F00_59CB, _____5C5E_6027_4F4D_7F6E + #_____5C5E_6027_6587_672C_540D),
-                    ["倍率"] = _____500D_7387,
-                    ["开始位置"] = _____5B8C_6574_5339_914D_5F00_59CB
-                }
+            if _____6570_5B57_8D77_59CB < _____5C5E_6027_4F4D_7F6E then
+                _____6570_5B57_8D77_59CB = _____8C03_6574_524D_7F00_500D_7387_8D77_70B9_907F_5F00_989C_8272_7801(text, _____6570_5B57_8D77_59CB, _____5C5E_6027_4F4D_7F6E)
+                if _____6570_5B57_8D77_59CB >= _____5C5E_6027_4F4D_7F6E then
+                    _____5C5E_6027_4F4D_7F6E = (string.find(
+                        text,
+                        _____5C5E_6027_6587_672C_540D,
+                        math.max(_____5C5E_6027_4F4D_7F6E + #_____5C5E_6027_6587_672C_540D + 1, 1),
+                        true
+                    ) or 0) - 1
+                    goto __continue94
+                end
+                local _____5B8C_6574_5339_914D_5F00_59CB = _____6570_5B57_8D77_59CB
+                if _____6570_5B57_8D77_59CB >= 2 and __TS__StringSubstring(text, _____6570_5B57_8D77_59CB - 2, _____6570_5B57_8D77_59CB) == "自身" then
+                    _____5B8C_6574_5339_914D_5F00_59CB = _____6570_5B57_8D77_59CB - 2
+                end
+                local _____500D_7387 = __TS__StringSubstring(text, _____6570_5B57_8D77_59CB, _____5C5E_6027_4F4D_7F6E)
+                local _____672B_5B57_7B26 = __TS__StringCharAt(_____500D_7387, #_____500D_7387 - 1)
+                local _____542B_6570_5B57 = false
+                do
+                    local i = 0
+                    while i < #_____500D_7387 do
+                        local _____5B57_7B26 = __TS__StringCharAt(_____500D_7387, i)
+                        if _____5B57_7B26 >= "0" and _____5B57_7B26 <= "9" then
+                            _____542B_6570_5B57 = true
+                            break
+                        end
+                        i = i + 1
+                    end
+                end
+                if _____542B_6570_5B57 and (_____672B_5B57_7B26 == "%" or _____672B_5B57_7B26 >= "0" and _____672B_5B57_7B26 <= "9" or _____672B_5B57_7B26 == ".") then
+                    return {
+                        ["完整匹配"] = __TS__StringSubstring(text, _____5B8C_6574_5339_914D_5F00_59CB, _____5C5E_6027_4F4D_7F6E + #_____5C5E_6027_6587_672C_540D),
+                        ["倍率"] = _____500D_7387,
+                        ["开始位置"] = _____5B8C_6574_5339_914D_5F00_59CB
+                    }
+                end
             end
+            _____5C5E_6027_4F4D_7F6E = (string.find(
+                text,
+                _____5C5E_6027_6587_672C_540D,
+                math.max(_____5C5E_6027_4F4D_7F6E + #_____5C5E_6027_6587_672C_540D + 1, 1),
+                true
+            ) or 0) - 1
         end
-        _____5C5E_6027_4F4D_7F6E = (string.find(
-            text,
-            _____5C5E_6027_6587_672C_540D,
-            math.max(_____5C5E_6027_4F4D_7F6E + #_____5C5E_6027_6587_672C_540D + 1, 1),
-            true
-        ) or 0) - 1
+        ::__continue94::
     end
     return nil
 end
@@ -508,9 +560,7 @@ local function _____63D0_53D6_516C_5F0F_5339_914D(text, _____5C5E_6027_6587_672C
     end
     return _____63D0_53D6_524D_7F00_500D_7387_5339_914D(text, _____5C5E_6027_6587_672C_540D, _____8D77_59CB_4F4D_7F6E)
 end
---- 动态替换技能提示中的公式
--- 例如：智力×3 -> 150（假设英雄智力50）
-local function _____66FF_6362_516C_5F0F(unit, tip)
+local function _____66FF_6362_516C_5F0F(unit, tip, options)
     local _____4FDD_62A4_7ED3_679C = _____4FDD_62A4_76EE_6807_7C7B_516C_5F0F(tip)
     local result = _____4FDD_62A4_7ED3_679C[1]
     local _____4FDD_62A4_7247_6BB5_8868 = _____4FDD_62A4_7ED3_679C[2]
@@ -536,25 +586,31 @@ local function _____66FF_6362_516C_5F0F(unit, tip)
                     if ((string.find(_____5B8C_6574_5339_914D_6587_672C, "目标", nil, true) or 0) - 1 >= 0 or (string.find(_____5339_914D_524D_7A97_53E3, "目标", nil, true) or 0) - 1 >= 0 or (string.find(_____5339_914D_524D_7A97_53E3, "目标已损失", nil, true) or 0) - 1 >= 0) and (string.find(_____5B8C_6574_5339_914D_6587_672C, "自身", nil, true) or 0) - 1 < 0 and (string.find(_____5339_914D_524D_7A97_53E3, "自身", nil, true) or 0) - 1 < 0 then
                         _____641C_7D22_8D77_70B9 = _____5339_914D_5F00_59CB + #_____5B8C_6574_5339_914D_6587_672C
                         _____5339_914D_7ED3_679C = _____63D0_53D6_516C_5F0F_5339_914D(result, _____5C5E_6027_5339_914D_9879["文本名"], _____641C_7D22_8D77_70B9)
-                        goto __continue102
+                        goto __continue114
                     end
                     if _____662F_5426_547D_4E2D_8DF3_8FC7_7247_6BB5(_____5B8C_6574_5339_914D_6587_672C) or _____662F_5426_547D_4E2D_8DF3_8FC7_7247_6BB5(_____5339_914D_524D_7A97_53E3 .. _____5B8C_6574_5339_914D_6587_672C) then
                         _____641C_7D22_8D77_70B9 = _____5339_914D_5F00_59CB + #_____5B8C_6574_5339_914D_6587_672C
                         _____5339_914D_7ED3_679C = _____63D0_53D6_516C_5F0F_5339_914D(result, _____5C5E_6027_5339_914D_9879["文本名"], _____641C_7D22_8D77_70B9)
-                        goto __continue102
+                        goto __continue114
                     end
                     if _____662F_5426_4E3A_589E_51CF_7C7B_8BED_5883(result, _____5339_914D_5F00_59CB) then
                         _____641C_7D22_8D77_70B9 = _____5339_914D_5F00_59CB + #_____5B8C_6574_5339_914D_6587_672C
                         _____5339_914D_7ED3_679C = _____63D0_53D6_516C_5F0F_5339_914D(result, _____5C5E_6027_5339_914D_9879["文本名"], _____641C_7D22_8D77_70B9)
-                        goto __continue102
+                        goto __continue114
                     end
                     if _____662F_5426_4E3A_76EE_6807_7C7B_8BED_5883(result, _____5339_914D_5F00_59CB) and not _____662F_5426_4E3A_81EA_8EAB_7C7B_8BED_5883(result, _____5339_914D_5F00_59CB) then
                         _____641C_7D22_8D77_70B9 = _____5339_914D_5F00_59CB + #_____5B8C_6574_5339_914D_6587_672C
                         _____5339_914D_7ED3_679C = _____63D0_53D6_516C_5F0F_5339_914D(result, _____5C5E_6027_5339_914D_9879["文本名"], _____641C_7D22_8D77_70B9)
-                        goto __continue102
+                        goto __continue114
                     end
                     local _____4F24_5BB3 = _____8BA1_7B97_516C_5F0F_4F24_5BB3(unit, _____5C5E_6027_5339_914D_9879["计算属性名"], _____5339_914D_7ED3_679C["倍率"])
-                    local _____66FF_6362_503C = _____5305_88C5_52A8_6001_6570_503C(tostring(_____4F24_5BB3))
+                    local _____52A8_6001_6570_503C = _____5305_88C5_52A8_6001_6570_503C(_____683C_5F0F_5316_52A8_6001_6574_6570(_____4F24_5BB3))
+                    local _____66FF_6362_503C = _____52A8_6001_6570_503C
+                    if options ~= nil and options.preserveFormula == true then
+                        local _____4FDD_62A4_6807_8BB0 = ("__DYN_SKIP_" .. tostring(#_____4FDD_62A4_7247_6BB5_8868)) .. "__"
+                        _____4FDD_62A4_7247_6BB5_8868[#_____4FDD_62A4_7247_6BB5_8868 + 1] = {["标记"] = _____4FDD_62A4_6807_8BB0, ["原文"] = ((_____5B8C_6574_5339_914D_6587_672C .. "（") .. _____52A8_6001_6570_503C) .. "）"}
+                        _____66FF_6362_503C = _____4FDD_62A4_6807_8BB0
+                    end
                     result = (__TS__StringSubstring(result, 0, _____5339_914D_5F00_59CB) .. _____66FF_6362_503C) .. __TS__StringSubstring(result, _____5339_914D_5F00_59CB + #_____5B8C_6574_5339_914D_6587_672C)
                     _____66FF_6362_6B21_6570 = _____66FF_6362_6B21_6570 + 1
                     if _____66FF_6362_6B21_6570 >= _____5355_5C5E_6027_6700_5927_66FF_6362_6B21_6570 then
@@ -564,7 +620,7 @@ local function _____66FF_6362_516C_5F0F(unit, tip)
                     _____641C_7D22_8D77_70B9 = _____5339_914D_5F00_59CB + #_____66FF_6362_503C
                     _____5339_914D_7ED3_679C = _____63D0_53D6_516C_5F0F_5339_914D(result, _____5C5E_6027_5339_914D_9879["文本名"], _____641C_7D22_8D77_70B9)
                 end
-                ::__continue102::
+                ::__continue114::
             end
             i = i + 1
         end
@@ -572,8 +628,16 @@ local function _____66FF_6362_516C_5F0F(unit, tip)
     result = _____6062_590D_4FDD_62A4_7247_6BB5(result, _____4FDD_62A4_7247_6BB5_8868)
     result = _____5408_5E76_52A8_6001_6570_503C_52A0_6CD5(result)
     result = _____6D88_9664_9020_6210_81EA_8EAB_6570_503C_524D_7F00(result)
-    result = _____8FFD_52A0Alt_63D0_793A_5C3E_6CE8(result)
+    if options == nil or options.appendAltHint ~= false then
+        result = _____8FFD_52A0Alt_63D0_793A_5C3E_6CE8(result)
+    end
     return result
+end
+____exports["渲染动态文本"] = function(unit, tip, options)
+    if unit == nil or unit == 0 or tip == "" then
+        return tip
+    end
+    return _____66FF_6362_516C_5F0F(unit, tip, options)
 end
 --- 处理单个技能的提示文本
 local function _____5904_7406_6280_80FD_63D0_793A(unit, abilityId)

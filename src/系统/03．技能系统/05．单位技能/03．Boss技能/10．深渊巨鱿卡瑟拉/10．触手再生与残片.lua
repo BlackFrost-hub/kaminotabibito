@@ -20,6 +20,8 @@ local _____6781_5750_6807X = ____14_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____14_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____8DDD_79BBXY = ____14_FF0E_516C_5171_5DE5_5177["距离XY"]
 local _____53D6_5750_6807_89D2_5EA6 = ____14_FF0E_516C_5171_5DE5_5177["取坐标角度"]
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -28,30 +30,29 @@ local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
-local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local removePeriodicCallback = ____require_result_0.removePeriodicCallback
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local getServerTime = ____require_result_0.getServerTime
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
-local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_4["临时调整攻击"]
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_5.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_5["移除单位指定Buff"]
-local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.08．卡瑟拉")
-local _____5361_745F_62C9BuffID = ____require_result_6["卡瑟拉BuffID"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_3["创建可攻击机制单位"]
+local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_5["临时调整攻击"]
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_6.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
+local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.08．卡瑟拉")
+local _____5361_745F_62C9BuffID = ____require_result_7["卡瑟拉BuffID"]
 local _____5DF2_6CE8_518C = false
 local _____5468_671FID = 0
 local function _____6CBB_7597Boss_56FA_5B9A_503C(boss, amount)
@@ -106,8 +107,8 @@ end
 local function _____521B_5EFA_5730_9762_89E6_624B_6B8B_7247(context, x, y)
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]
     local effect = AddSpecialEffect(cfg["地面模型路径"], x, y)
-    local ____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_7 = context["场上触手残片列表"]
-    ____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_7[#____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_7 + 1] = {X = x, Y = y, ["特效"] = effect, ["已吸收"] = false}
+    local ____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_8 = context["场上触手残片列表"]
+    ____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_8[#____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_8 + 1] = {X = x, Y = y, ["特效"] = effect, ["已吸收"] = false}
 end
 local function _____7ED3_7B97_518D_751F_89E6_624B_4E00_8DF3(data)
     local context = data.context
@@ -131,16 +132,17 @@ local function _____7ED3_7B97_518D_751F_89E6_624B_4E00_8DF3(data)
         return
     end
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["再生触手Boss攻击力比例"]
-    UnitDamageTarget(
-        boss,
-        target,
-        damage,
-        true,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_NORMAL,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["来源"] = boss,
+        ["目标"] = target,
+        ["伤害"] = damage,
+        attack = true,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能"
+    })
     _____6CBB_7597Boss_56FA_5B9A_503C(boss, damage * cfg["再生触手吸血比例"])
 end
 local function _____751F_6210_518D_751F_89E6_624B(context)
@@ -196,8 +198,8 @@ local function _____751F_6210_518D_751F_89E6_624B(context)
             _____7ED3_7B97_518D_751F_89E6_624B_4E00_8DF3(data)
         end
     )
-    local ____self_8 = context["清理"]
-    ____self_8["登记周期回调"](____self_8, "卡瑟拉-再生触手周期", data["周期ID"])
+    local ____self_9 = context["清理"]
+    ____self_9["登记周期回调"](____self_9, "卡瑟拉-再生触手周期", data["周期ID"])
 end
 local function _____5904_7406_8840_91CF_518D_751F_89E6_624B(context)
     local boss = context["Boss单位"]
@@ -317,8 +319,8 @@ local function _____5E94_7528_89E6_624B_7CBE_534E(context, count)
                 end
             end
         )
-        local ____self_9 = context["清理"]
-        ____self_9["登记延迟回调"](____self_9, "卡瑟拉-触手精华攻击回滚", id)
+        local ____self_10 = context["清理"]
+        ____self_10["登记延迟回调"](____self_10, "卡瑟拉-触手精华攻击回滚", id)
     end
     registerManualBuff(
         boss,

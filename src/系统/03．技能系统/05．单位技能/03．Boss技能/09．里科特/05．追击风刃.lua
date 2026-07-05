@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_8FFD_51FB_76EE_6807, _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6, _____53D1_5C04_8FFD_51FB_98CE_5203, ____on_91CC_79D1_7279_8FFD_51FB_98CE_5203_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetSpellTargetUnit, GetOwningPlayer, UnitDamageTarget, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____91CC_79D1_7279_5355_4F4D_7C7B_578BID, _____8FFD_51FB_98CE_5203_6280_80FDID
+local _____53D6_8FFD_51FB_76EE_6807, _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6, _____53D1_5C04_8FFD_51FB_98CE_5203, ____on_91CC_79D1_7279_8FFD_51FB_98CE_5203_751F_6548, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetSpellTargetUnit, GetOwningPlayer, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____91CC_79D1_7279_5355_4F4D_7C7B_578BID, _____8FFD_51FB_98CE_5203_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.09．里科特.00．配置")
 local _____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["里科特单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.09．里科特.01．运行时上下文")
@@ -20,13 +20,13 @@ local ____03_FF0E_5EF6_8FDF_6539_5411_5F39_5E55_6A21_677F = require("系统.03�
 local _____521B_5EFA_5EF6_8FDF_6539_5411_5F39_5E55 = ____03_FF0E_5EF6_8FDF_6539_5411_5F39_5E55_6A21_677F["创建延迟改向弹幕"]
 function _____53D6_8FFD_51FB_76EE_6807(boss)
     local target = GetSpellTargetUnit()
-    local _____5355_4F4D_6709_6548_result_4
+    local _____5355_4F4D_6709_6548_result_5
     if _____5355_4F4D_6709_6548(target) then
-        _____5355_4F4D_6709_6548_result_4 = target
+        _____5355_4F4D_6709_6548_result_5 = target
     else
-        _____5355_4F4D_6709_6548_result_4 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["追击风刃"]["施法距离"] + 300)
+        _____5355_4F4D_6709_6548_result_5 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["追击风刃"]["施法距离"] + 300)
     end
-    return _____5355_4F4D_6709_6548_result_4
+    return _____5355_4F4D_6709_6548_result_5
 end
 function _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6(context, _____4E0A_4E0B_6587)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["追击风刃"]
@@ -67,16 +67,17 @@ function _____53D1_5C04_8FFD_51FB_98CE_5203(context, angle)
                 if not _____5355_4F4D_6709_6548(target) then
                     return
                 end
-                UnitDamageTarget(
-                    boss,
-                    target,
-                    damage,
-                    false,
-                    false,
-                    ATTACK_TYPE_MAGIC,
-                    DAMAGE_TYPE_MAGIC,
-                    WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+                    ["来源"] = boss,
+                    ["目标"] = target,
+                    ["伤害"] = damage,
+                    attack = false,
+                    ranged = false,
+                    attackType = ATTACK_TYPE_MAGIC,
+                    ["伤害类型"] = DAMAGE_TYPE_MAGIC,
+                    weaponType = WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = "Boss技能"
+                })
             end
         },
         ["自动改向"] = stage ~= 1,
@@ -136,24 +137,25 @@ function ____on_91CC_79D1_7279_8FFD_51FB_98CE_5203_751F_6548(castingUnit, spellA
     end
     ____exports["释放里科特追击风刃"](context)
 end
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetOwningPlayer = jass.GetOwningPlayer
-UnitDamageTarget = jass.UnitDamageTarget
 ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
+local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
 _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____8FFD_51FB_98CE_5203_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["追击风刃"]["技能槽位"])
 local _____5DF2_6CE8_518C = false

@@ -30,6 +30,9 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -40,7 +43,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const GetUnitStateJapi = japi.GetUnitState as ((unit: any, state: any) => number) | undefined;
@@ -151,7 +153,15 @@ function 创建污水柱残留水坑(this: void, context: 米亚运行时上下�
       for (let i = 0; i < 区域内单位.length; i++) {
         const target = 区域内单位[i];
         if (!单位有效(target)) continue;
-        UnitDamageTarget(context.Boss单位, target, 计算污水柱水坑伤害(context.Boss单位, target) * 取米亚平台超载伤害倍率(target), false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_POISON, jass.WEAPON_TYPE_WHOKNOWS);
+        造成AOE技能伤害({
+          来源: context.Boss单位,
+          目标: target,
+          伤害: 计算污水柱水坑伤害(context.Boss单位, target) * 取米亚平台超载伤害倍率(target),
+          attackType: jass.ATTACK_TYPE_CHAOS,
+          伤害类型: jass.DAMAGE_TYPE_POISON,
+          weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+          来源类型: "Boss技能",
+        });
         添加米亚腐化感染(context, target, config.水坑每秒腐化层数, "污水柱残留水坑");
       }
     },
@@ -172,7 +182,15 @@ function 结算污水柱爆发(this: void, context: 米亚运行时上下文, po
     const target = targets[i];
     if (!单位有效(target)) continue;
     if (距离平方(point.x, point.y, GetUnitX(target), GetUnitY(target)) > radius2) continue;
-    UnitDamageTarget(boss, target, 计算污水柱爆发伤害(boss, target) * 取米亚平台超载伤害倍率(target), false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_POISON, jass.WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      来源: boss,
+      目标: target,
+      伤害: 计算污水柱爆发伤害(boss, target) * 取米亚平台超载伤害倍率(target),
+      attackType: jass.ATTACK_TYPE_CHAOS,
+      伤害类型: jass.DAMAGE_TYPE_POISON,
+      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
     添加米亚腐化感染(context, target, config.命中腐化层数, "污水柱爆发");
     开始原地击飞(target, {
       持续时间: config.原地击飞持续秒,

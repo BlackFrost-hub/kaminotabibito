@@ -18,17 +18,12 @@ local CosBJ = ____683C_9C81_59C6_516C_5171_0.CosBJ
 local SinBJ = ____683C_9C81_59C6_516C_5171_0.SinBJ
 local GetUnitX = ____683C_9C81_59C6_516C_5171_0.GetUnitX
 local GetUnitY = ____683C_9C81_59C6_516C_5171_0.GetUnitY
-local GetUnitState = ____683C_9C81_59C6_516C_5171_0.GetUnitState
-local UnitDamageTarget = ____683C_9C81_59C6_516C_5171_0.UnitDamageTarget
-local UNIT_STATE_MAX_LIFE = ____683C_9C81_59C6_516C_5171_0.UNIT_STATE_MAX_LIFE
-local ATTACK_TYPE_CHAOS = ____683C_9C81_59C6_516C_5171_0.ATTACK_TYPE_CHAOS
-local DAMAGE_TYPE_FIRE = ____683C_9C81_59C6_516C_5171_0.DAMAGE_TYPE_FIRE
-local WEAPON_TYPE_WHOKNOWS = ____683C_9C81_59C6_516C_5171_0.WEAPON_TYPE_WHOKNOWS
 local _____5355_4F4D_6709_6548 = ____683C_9C81_59C6_516C_5171_0["单位有效"]
 local _____53D6_5355_4F4DID = ____683C_9C81_59C6_516C_5171_0["取单位ID"]
 local _____53D6_65B9_5411_89D2 = ____683C_9C81_59C6_516C_5171_0["取方向角"]
 local _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3 = ____683C_9C81_59C6_516C_5171_0["计算火径持续伤害"]
 local _____8BA1_7B97_706B_5F84_7A7F_8D8A_4F24_5BB3 = ____683C_9C81_59C6_516C_5171_0["计算火径穿越伤害"]
+local _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3 = ____683C_9C81_59C6_516C_5171_0["造成格鲁姆Boss技能伤害"]
 local _____64AD_653E_70B9_7279_6548 = ____683C_9C81_59C6_516C_5171_0["播放点特效"]
 local function _____53D6_706B_5F84_53C2_6570(grum, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
@@ -88,15 +83,11 @@ local function _____521B_5EFA_706B_5F84_7A7F_8D8A_68C0_6D4B(context, grum, cente
                             goto __continue7
                         end
                         nextAllowed[id] = now + config["穿越防抖秒"] * 1000
-                        UnitDamageTarget(
+                        _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(
                             grum,
                             hero,
                             _____8BA1_7B97_706B_5F84_7A7F_8D8A_4F24_5BB3(grum, hero),
-                            false,
-                            true,
-                            ATTACK_TYPE_CHAOS,
-                            DAMAGE_TYPE_FIRE,
-                            WEAPON_TYPE_WHOKNOWS
+                            "AOE"
                         )
                         _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(hero, config["灼热层数"])
                     end
@@ -145,15 +136,11 @@ local function _____521B_5EFA_706B_5F84(context, center, lineAngle, normalAngle)
             if not _____5355_4F4D_6709_6548(grum) or not _____5355_4F4D_6709_6548(unit) then
                 return
             end
-            UnitDamageTarget(
+            _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(
                 grum,
                 unit,
                 _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3(grum),
-                false,
-                true,
-                ATTACK_TYPE_CHAOS,
-                DAMAGE_TYPE_FIRE,
-                WEAPON_TYPE_WHOKNOWS
+                "AOE"
             )
             _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["灼热层数"])
         end

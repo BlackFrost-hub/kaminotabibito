@@ -34,7 +34,7 @@ export const 卡瑟拉Buff表: Record<string, BuffData> = {
     buffName: "墨汁遮蔽",
     icon: "BuffIcon\\Boss\\Kasela\\ink_shroud.blp",
     effect: "",
-    type: "Debuff:magic:silence",
+    type: "Debuff:control:dot:magic",
     interval: 1,
     maxStack: 1,
     stackRule: "highest",

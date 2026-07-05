@@ -30,6 +30,9 @@ const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位�
   读取单位攻击力: (this: void, unit: any) => number;
 };
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -39,7 +42,6 @@ const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, inde
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
 const R2I = jass.R2I as (value: number) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
@@ -163,7 +165,17 @@ export function 释放瑟兰迪尔终末审判(this: void, context: 瑟兰迪尔
         if (距离平方(GetUnitX(target), GetUnitY(target), bossX, bossY) > safeRadius2) {
           const damage = (读取单位攻击力(boss) * config.爆炸伤害Boss攻击力比例
             + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.爆炸伤害目标最大生命比例) * config.爆炸伤害总倍率;
-          UnitDamageTarget(boss, target, damage, false, false, jass.ATTACK_TYPE_NORMAL, jass.DAMAGE_TYPE_MAGIC, jass.WEAPON_TYPE_WHOKNOWS);
+          造成AOE技能伤害({
+            来源: boss,
+            目标: target,
+            伤害: damage,
+            attack: false,
+            ranged: false,
+            attackType: jass.ATTACK_TYPE_NORMAL,
+            伤害类型: jass.DAMAGE_TYPE_MAGIC,
+            weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+            来源类型: "Boss技能",
+          });
         }
       }
     });

@@ -7,6 +7,9 @@ import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度 } from "./13．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 创建延迟改向弹幕, type 延迟改向弹幕上下文 } from "../../../00．技能模板+函数/00．技能模板/09．复杂战斗模板/03．延迟改向弹幕模板";
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -14,7 +17,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -77,7 +79,18 @@ function 发射追击风刃(this: void, context: 里科特运行时上下文, an
       飞行高度: cfg.飞行高度,
       on命中: function 里科特追击风刃命中(this: void, target: any): void {
         if (!单位有效(target)) return;
-        UnitDamageTarget(boss, target, damage, false, false, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
+        造成单体技能伤害({
+          技能ID: 追击风刃技能ID,
+          来源: boss,
+          目标: target,
+          伤害: damage,
+          attack: false,
+          ranged: false,
+          attackType: ATTACK_TYPE_MAGIC,
+          伤害类型: DAMAGE_TYPE_MAGIC,
+          weaponType: WEAPON_TYPE_WHOKNOWS,
+          来源类型: "Boss技能",
+        });
       },
     },
     自动改向: stage !== 1,

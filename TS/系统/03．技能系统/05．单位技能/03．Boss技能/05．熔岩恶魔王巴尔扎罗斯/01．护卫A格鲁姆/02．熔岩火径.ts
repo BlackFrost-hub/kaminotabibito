@@ -17,17 +17,12 @@ const {  巴尔扎罗斯技能数值配置,
   SinBJ,
   GetUnitX,
   GetUnitY,
-  GetUnitState,
-  UnitDamageTarget,
-  UNIT_STATE_MAX_LIFE,
-  ATTACK_TYPE_CHAOS,
-  DAMAGE_TYPE_FIRE,
-  WEAPON_TYPE_WHOKNOWS,
   单位有效,
   取单位ID,
   取方向角,
   计算火径持续伤害,
   计算火径穿越伤害,
+  造成格鲁姆Boss技能伤害,
   播放点特效,
 } = 格鲁姆公共;
 
@@ -81,7 +76,7 @@ function 创建火径穿越检测(this: void, context: 巴尔扎罗斯运行时�
       if (oldSide == null || oldSide === side) continue;
       if (now < (nextAllowed[id] ?? 0)) continue;
       nextAllowed[id] = now + config.穿越防抖秒 * 1000;
-      UnitDamageTarget(grum, hero, 计算火径穿越伤害(grum, hero), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+      造成格鲁姆Boss技能伤害(grum, hero, 计算火径穿越伤害(grum, hero), "AOE");
       施加巴尔扎罗斯灼热(hero, config.灼热层数);
     }
   });
@@ -111,7 +106,7 @@ function 创建火径(this: void, context: 巴尔扎罗斯运行时上下文, ce
     提示圈: false,
     on周期: function 格鲁姆火径周期(this: void, unit: any): void {
       if (!单位有效(grum) || !单位有效(unit)) return;
-      UnitDamageTarget(grum, unit, 计算火径持续伤害(grum), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+      造成格鲁姆Boss技能伤害(grum, unit, 计算火径持续伤害(grum), "AOE");
       施加巴尔扎罗斯灼热(unit, config.灼热层数);
     },
   });
@@ -154,4 +149,3 @@ export function 释放格鲁姆火径(this: void, context: 巴尔扎罗斯运行
     },
   });
 }
-

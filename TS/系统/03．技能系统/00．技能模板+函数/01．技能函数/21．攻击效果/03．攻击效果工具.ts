@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import type { 技能伤害来源类型, 技能伤害形态, 装备技能伤害类型 } from "../../../../04．伤害系统/08．技能伤害系统";
+
 const jass = require("jass.common") as any;
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -20,22 +22,27 @@ const {
   创建Dz绑定单位特效: (this: void, unit: any, attachPoint: string, modelPath: string, effectKey?: string) => any;
   销毁Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => void;
 };
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any,
-) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+
+export interface 攻击效果伤害标记选项 {
+  来源类型?: 技能伤害来源类型;
+  装备技能类型?: 装备技能伤害类型;
+  伤害形态?: 技能伤害形态;
+  物品ID?: number;
+  物品实例?: any;
+  技能ID?: number;
+  技能实例ID?: number;
+  标签?: string;
+  参与技能伤害加成?: boolean;
+}
 
 export interface 攻击效果延迟伤害参数 {
   延迟毫秒: number;
@@ -45,6 +52,7 @@ export interface 攻击效果延迟伤害参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  伤害标记?: 攻击效果伤害标记选项;
   回调?: (this: void) => void;
 }
 
@@ -60,6 +68,7 @@ export interface 攻击效果范围伤害参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  伤害标记?: 攻击效果伤害标记选项;
 }
 
 export function 攻击效果创建地面特效(
@@ -102,16 +111,24 @@ export function 攻击效果延迟伤害(this: void, 参数: 攻击效果延迟�
   if (!(参数.伤害 > 0)) return 0;
 
   return 攻击效果延迟执行(参数.延迟毫秒, function 攻击效果延迟伤害回调(this: void): void {
-    UnitDamageTarget(
-      参数.来源单位,
-      参数.目标单位,
-      参数.伤害,
-      false,
-      false,
-      参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
-      参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
-      参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,
-    );
+    const 标记 = 参数.伤害标记;
+    造成技能伤害({
+      来源: 参数.来源单位,
+      目标: 参数.目标单位,
+      伤害: 参数.伤害,
+      attackType: 参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
+      伤害类型: 参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
+      weaponType: 参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,
+      来源类型: 标记?.来源类型 ?? 标记?.装备技能类型 ?? "装备被动",
+      装备技能类型: 标记?.装备技能类型,
+      伤害形态: 标记?.伤害形态 ?? "单体",
+      物品ID: 标记?.物品ID,
+      物品实例: 标记?.物品实例,
+      技能ID: 标记?.技能ID,
+      技能实例ID: 标记?.技能实例ID,
+      标签: 标记?.标签,
+      参与技能伤害加成: 标记?.参与技能伤害加成,
+    });
     if (参数.回调 != null) {
       参数.回调();
     }
@@ -162,16 +179,24 @@ export function 攻击效果范围伤害(this: void, 参数: 攻击效果范围�
   for (let i = 0; i < 单位列表.length; i++) {
     const unit = 单位列表[i];
     if (unit == null || unit === 0) continue;
-    UnitDamageTarget(
-      参数.来源单位,
-      unit,
-      参数.伤害,
-      false,
-      false,
-      参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
-      参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
-      参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,
-    );
+    const 标记 = 参数.伤害标记;
+    造成技能伤害({
+      来源: 参数.来源单位,
+      目标: unit,
+      伤害: 参数.伤害,
+      attackType: 参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
+      伤害类型: 参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
+      weaponType: 参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,
+      来源类型: 标记?.来源类型 ?? 标记?.装备技能类型 ?? "装备被动",
+      装备技能类型: 标记?.装备技能类型,
+      伤害形态: 标记?.伤害形态 ?? "AOE",
+      物品ID: 标记?.物品ID,
+      物品实例: 标记?.物品实例,
+      技能ID: 标记?.技能ID,
+      技能实例ID: 标记?.技能实例ID,
+      标签: 标记?.标签,
+      参与技能伤害加成: 标记?.参与技能伤害加成,
+    });
     if (参数.命中回调 != null) {
       参数.命中回调(unit);
     }

@@ -6,6 +6,9 @@ import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 取难度, 取单位间角度, 极坐标X, 极坐标Y } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -17,7 +20,6 @@ const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -93,7 +95,18 @@ function 执行封印惩罚(this: void, boss: any, target: any): void {
   const manaLoss = mana * (cfg.魔法扣除基础比例 + cfg.魔法扣除每难度追加比例 * n);
   if (manaLoss > 0) {
     SetUnitState(target, UNIT_STATE_MANA, mana - manaLoss);
-    UnitDamageTarget(boss, target, manaLoss, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
+    造成单体技能伤害({
+      技能ID: 全力封印斩技能ID,
+      来源: boss,
+      目标: target,
+      伤害: manaLoss,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_MAGIC,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
   }
   施加快速控制Buff(boss, target, 快速控制_击晕, cfg.基础眩晕秒 + cfg.每难度眩晕追加秒 * n);
   createUnitEffect(target, "origin", cfg.命中特效路径, cfg.特效持续秒, "菲利斯-封印命中");

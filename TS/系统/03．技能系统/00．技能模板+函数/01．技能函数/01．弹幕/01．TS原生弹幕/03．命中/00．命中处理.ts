@@ -7,10 +7,13 @@ import type { 原生弹幕内部实例 } from "../00．类型";
 import {
   ATTACK_TYPE_NORMAL,
   DAMAGE_TYPE_NORMAL,
-  UnitDamageTarget,
   WEAPON_TYPE_WHOKNOWS,
 } from "../01．共享";
 import { 触发原生弹幕STES事件 } from "../02．事件/index";
+
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
@@ -60,16 +63,21 @@ function 目标自定义允许(this: void, 实例: 原生弹幕内部实例, 目
 
 function 结算命中伤害(this: void, 实例: 原生弹幕内部实例, 目标单位: any): void {
   if (实例.当前伤害值 <= 0) return;
-  UnitDamageTarget(
-    实例.参数.所有者,
-    目标单位,
-    实例.当前伤害值,
-    false,
-    false,
-    实例.参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
-    实例.参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
-    实例.参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,
-  );
+  造成技能伤害({
+    来源: 实例.参数.所有者,
+    目标: 目标单位,
+    伤害: 实例.当前伤害值,
+    伤害类型: 实例.参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
+    ranged: false,
+    attackType: 实例.参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
+    weaponType: 实例.参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,
+    来源类型: 实例.参数.来源类型 ?? "单位技能",
+    技能ID: 实例.参数.技能ID,
+    技能实例ID: 实例.参数.技能实例ID,
+    标签: 实例.参数.技能标签,
+    伤害形态: 实例.参数.伤害形态 ?? "单体",
+    参与技能伤害加成: 实例.参数.参与技能伤害加成,
+  });
 }
 
 function 处理单个目标命中(this: void, 实例: 原生弹幕内部实例, 目标单位: any): boolean {

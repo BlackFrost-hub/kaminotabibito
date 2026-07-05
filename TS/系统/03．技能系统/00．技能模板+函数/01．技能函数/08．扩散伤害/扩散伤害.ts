@@ -12,11 +12,6 @@
 
 const jass = require("jass.common") as any;
 
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;
@@ -24,6 +19,13 @@ const GetHandleId = jass.GetHandleId as (h: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE;
+
+import type { 技能伤害来源类型 } from "../../../../04．伤害系统/08．技能伤害系统";
+
+const { 造成单体技能伤害, 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
@@ -47,6 +49,11 @@ export interface 扩散伤害参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  来源类型?: 技能伤害来源类型;
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  参与技能伤害加成?: boolean;
 }
 
 export function 扩散伤害(参数: 扩散伤害参数): void {
@@ -68,7 +75,20 @@ export function 扩散伤害(参数: 扩散伤害参数): void {
 
   const 主目标初始血量 = GetUnitState(主目标, UNIT_STATE_LIFE);
   if (是否包含主目标) {
-    UnitDamageTarget(来源单位, 主目标, 伤害值, false, false, 攻击类型, 伤害类型, 武器类型);
+    造成单体技能伤害({
+      来源: 来源单位,
+      目标: 主目标,
+      伤害: 伤害值,
+      伤害类型,
+      ranged: false,
+      attackType: 攻击类型,
+      weaponType: 武器类型,
+      来源类型: 参数.来源类型 ?? "单位技能",
+      技能ID: 参数.技能ID,
+      技能实例ID: 参数.技能实例ID,
+      标签: 参数.技能标签,
+      参与技能伤害加成: 参数.参与技能伤害加成,
+    });
     const 主目标剩余血量 = GetUnitState(主目标, UNIT_STATE_LIFE);
     debugLogForce("扩散伤害", "主目标 初始血量=", 主目标初始血量, "剩余血量=", 主目标剩余血量);
   } else {
@@ -100,7 +120,20 @@ export function 扩散伤害(参数: 扩散伤害参数): void {
     debugLogForce("扩散伤害", "副目标 hid=", 副目标hid, "是敌人=", 是敌人);
     if (!是敌人) continue;
     const 副目标初始血量 = GetUnitState(副目标, UNIT_STATE_LIFE);
-    UnitDamageTarget(来源单位, 副目标, 扩散伤害值, false, false, 攻击类型, 伤害类型, 武器类型);
+    造成AOE技能伤害({
+      来源: 来源单位,
+      目标: 副目标,
+      伤害: 扩散伤害值,
+      伤害类型,
+      ranged: false,
+      attackType: 攻击类型,
+      weaponType: 武器类型,
+      来源类型: 参数.来源类型 ?? "单位技能",
+      技能ID: 参数.技能ID,
+      技能实例ID: 参数.技能实例ID,
+      标签: 参数.技能标签,
+      参与技能伤害加成: 参数.参与技能伤害加成,
+    });
     const 副目标剩余血量 = GetUnitState(副目标, UNIT_STATE_LIFE);
     debugLogForce("扩散伤害", "副目标 hid=", 副目标hid, "初始血量=", 副目标初始血量, "剩余血量=", 副目标剩余血量);
   }

@@ -49,7 +49,6 @@ const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) 
 const SetUnitState = jass.SetUnitState as (whichUnit: any, whichUnitState: any, newVal: number) => void;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const IsUnitAlly = jass.IsUnitAlly as (whichUnit: any, whichPlayer: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const GetHeroStr = jass.GetHeroStr as (whichHero: any, includeBonuses: boolean) => number;
 const GetHeroAgi = jass.GetHeroAgi as (whichHero: any, includeBonuses: boolean) => number;
 const GetHeroInt = jass.GetHeroInt as (whichHero: any, includeBonuses: boolean) => number;

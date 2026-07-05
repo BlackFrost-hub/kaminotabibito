@@ -9,7 +9,6 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitDamageTarget = jass.UnitDamageTarget
 local GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange
 local FirstOfGroup = jass.FirstOfGroup
 local GroupRemoveUnit = jass.GroupRemoveUnit
@@ -17,8 +16,10 @@ local CreateGroup = jass.CreateGroup
 local DestroyGroup = jass.DestroyGroup
 local IsUnitEnemy = jass.IsUnitEnemy
 local GetOwningPlayer = jass.GetOwningPlayer
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
-local SFB_setBuff = ____require_result_0.SFB_setBuff
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
+local SFB_setBuff = ____require_result_1.SFB_setBuff
 ____exports["创建牵引开始特效回调"] = function(_____6A21_578B_8DEF_5F84)
     return function(_____5355_4F4D, ______7275_5F15ID)
         local _____7279_6548 = AddSpecialEffect(
@@ -63,15 +64,15 @@ ____exports["创建牵引到达特效回调"] = function(_____6A21_578B_8DEF_5F8
         end
     end
 end
-____exports["创建牵引到达伤害回调"] = function(_____534A_5F84, _____4F24_5BB3, _____6765_6E90)
+____exports["创建牵引到达伤害回调"] = function(_____534A_5F84, _____4F24_5BB3, _____6765_6E90, _____6807_8BB0)
     return function(_____5355_4F4D, ______7275_5F15ID)
         local _____4E2D_5FC3X = GetUnitX(_____5355_4F4D)
         local _____4E2D_5FC3Y = GetUnitY(_____5355_4F4D)
-        local ____6765_6E90_1 = _____6765_6E90
-        if ____6765_6E90_1 == nil then
-            ____6765_6E90_1 = _____5355_4F4D
+        local ____6765_6E90_2 = _____6765_6E90
+        if ____6765_6E90_2 == nil then
+            ____6765_6E90_2 = _____5355_4F4D
         end
-        local _____4F24_5BB3_6765_6E90 = ____6765_6E90_1
+        local _____4F24_5BB3_6765_6E90 = ____6765_6E90_2
         local _____6240_5C5E_73A9_5BB6 = GetOwningPlayer(_____4F24_5BB3_6765_6E90)
         local _____679A_4E3E_7EC4 = CreateGroup()
         GroupEnumUnitsInRange(
@@ -88,16 +89,20 @@ ____exports["创建牵引到达伤害回调"] = function(_____534A_5F84, _____4F
             end
             GroupRemoveUnit(_____679A_4E3E_7EC4, _____76EE_6807)
             if IsUnitEnemy(_____76EE_6807, _____6240_5C5E_73A9_5BB6) then
-                UnitDamageTarget(
-                    _____4F24_5BB3_6765_6E90,
-                    _____76EE_6807,
-                    _____4F24_5BB3,
-                    false,
-                    false,
-                    jass.ATTACK_TYPE_NORMAL,
-                    jass.DAMAGE_TYPE_NORMAL,
-                    jass.WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = _____4F24_5BB3_6765_6E90,
+                    ["目标"] = _____76EE_6807,
+                    ["伤害"] = _____4F24_5BB3,
+                    ["伤害类型"] = jass.DAMAGE_TYPE_NORMAL,
+                    ranged = false,
+                    attackType = jass.ATTACK_TYPE_NORMAL,
+                    weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = _____6807_8BB0 and _____6807_8BB0["来源类型"] or "单位技能",
+                    ["技能ID"] = _____6807_8BB0 and _____6807_8BB0["技能ID"],
+                    ["技能实例ID"] = _____6807_8BB0 and _____6807_8BB0["技能实例ID"],
+                    ["标签"] = _____6807_8BB0 and _____6807_8BB0["技能标签"],
+                    ["参与技能伤害加成"] = _____6807_8BB0 and _____6807_8BB0["参与技能伤害加成"]
+                })
             end
         end
         DestroyGroup(_____679A_4E3E_7EC4)
@@ -127,7 +132,7 @@ ____exports["创建牵引回调"] = function(_____9009_9879)
         _____5230_8FBE_56DE_8C03_5217_8868[#_____5230_8FBE_56DE_8C03_5217_8868 + 1] = ____exports["创建牵引到达特效回调"](_____9009_9879["到达特效"])
     end
     if _____9009_9879["到达伤害"] ~= nil and _____9009_9879["到达伤害"] > 0 and _____9009_9879["到达伤害半径"] ~= nil and _____9009_9879["到达伤害半径"] > 0 then
-        _____5230_8FBE_56DE_8C03_5217_8868[#_____5230_8FBE_56DE_8C03_5217_8868 + 1] = ____exports["创建牵引到达伤害回调"](_____9009_9879["到达伤害半径"], _____9009_9879["到达伤害"], _____9009_9879["到达伤害来源"])
+        _____5230_8FBE_56DE_8C03_5217_8868[#_____5230_8FBE_56DE_8C03_5217_8868 + 1] = ____exports["创建牵引到达伤害回调"](_____9009_9879["到达伤害半径"], _____9009_9879["到达伤害"], _____9009_9879["到达伤害来源"], _____9009_9879["到达伤害标记"])
     end
     if #_____5230_8FBE_56DE_8C03_5217_8868 > 0 then
         _____7ED3_679C["到达回调"] = function(self, _____5355_4F4D, _____7275_5F15ID)

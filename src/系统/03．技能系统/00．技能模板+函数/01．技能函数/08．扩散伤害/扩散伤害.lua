@@ -9,7 +9,6 @@ local ____exports = {}
 --   扩散伤害({ 来源单位, 主目标, 伤害值: 500, 扩散半径: 300, 扩散百分比: 0.5 });
 --   // 主目标受到500伤害，300范围内所有其他敌人受到250伤害
 local jass = require("jass.common")
-local UnitDamageTarget = jass.UnitDamageTarget
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -17,32 +16,35 @@ local GetHandleId = jass.GetHandleId
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_0.getUnitsInRange
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-local isUnitEnemy = ____require_result_1.isUnitEnemy
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLogForce = ____require_result_2.debugLogForce
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_1.getUnitsInRange
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+local isUnitEnemy = ____require_result_2.isUnitEnemy
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLogForce = ____require_result_3.debugLogForce
 ____exports["扩散伤害"] = function(_____53C2_6570)
-    local ____53C2_6570_3 = _____53C2_6570
-    local _____6765_6E90_5355_4F4D = ____53C2_6570_3["来源单位"]
-    local _____4E3B_76EE_6807 = ____53C2_6570_3["主目标"]
-    local _____4F24_5BB3_503C = ____53C2_6570_3["伤害值"]
-    local _____6269_6563_534A_5F84 = ____53C2_6570_3["扩散半径"]
-    local _____6269_6563_767E_5206_6BD4 = ____53C2_6570_3["扩散百分比"]
-    local _____662F_5426_5305_542B_4E3B_76EE_6807 = ____53C2_6570_3["是否包含主目标"]
+    local ____53C2_6570_4 = _____53C2_6570
+    local _____6765_6E90_5355_4F4D = ____53C2_6570_4["来源单位"]
+    local _____4E3B_76EE_6807 = ____53C2_6570_4["主目标"]
+    local _____4F24_5BB3_503C = ____53C2_6570_4["伤害值"]
+    local _____6269_6563_534A_5F84 = ____53C2_6570_4["扩散半径"]
+    local _____6269_6563_767E_5206_6BD4 = ____53C2_6570_4["扩散百分比"]
+    local _____662F_5426_5305_542B_4E3B_76EE_6807 = ____53C2_6570_4["是否包含主目标"]
     if _____662F_5426_5305_542B_4E3B_76EE_6807 == nil then
         _____662F_5426_5305_542B_4E3B_76EE_6807 = true
     end
-    local _____653B_51FB_7C7B_578B = ____53C2_6570_3["攻击类型"]
+    local _____653B_51FB_7C7B_578B = ____53C2_6570_4["攻击类型"]
     if _____653B_51FB_7C7B_578B == nil then
         _____653B_51FB_7C7B_578B = ATTACK_TYPE_NORMAL
     end
-    local _____4F24_5BB3_7C7B_578B = ____53C2_6570_3["伤害类型"]
+    local _____4F24_5BB3_7C7B_578B = ____53C2_6570_4["伤害类型"]
     if _____4F24_5BB3_7C7B_578B == nil then
         _____4F24_5BB3_7C7B_578B = DAMAGE_TYPE_NORMAL
     end
-    local _____6B66_5668_7C7B_578B = ____53C2_6570_3["武器类型"]
+    local _____6B66_5668_7C7B_578B = ____53C2_6570_4["武器类型"]
     if _____6B66_5668_7C7B_578B == nil then
         _____6B66_5668_7C7B_578B = nil
     end
@@ -58,16 +60,20 @@ ____exports["扩散伤害"] = function(_____53C2_6570)
     )
     local _____4E3B_76EE_6807_521D_59CB_8840_91CF = GetUnitState(_____4E3B_76EE_6807, UNIT_STATE_LIFE)
     if _____662F_5426_5305_542B_4E3B_76EE_6807 then
-        UnitDamageTarget(
-            _____6765_6E90_5355_4F4D,
-            _____4E3B_76EE_6807,
-            _____4F24_5BB3_503C,
-            false,
-            false,
-            _____653B_51FB_7C7B_578B,
-            _____4F24_5BB3_7C7B_578B,
-            _____6B66_5668_7C7B_578B
-        )
+        _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+            ["来源"] = _____6765_6E90_5355_4F4D,
+            ["目标"] = _____4E3B_76EE_6807,
+            ["伤害"] = _____4F24_5BB3_503C,
+            ["伤害类型"] = _____4F24_5BB3_7C7B_578B,
+            ranged = false,
+            attackType = _____653B_51FB_7C7B_578B,
+            weaponType = _____6B66_5668_7C7B_578B,
+            ["来源类型"] = _____53C2_6570["来源类型"] or "单位技能",
+            ["技能ID"] = _____53C2_6570["技能ID"],
+            ["技能实例ID"] = _____53C2_6570["技能实例ID"],
+            ["标签"] = _____53C2_6570["技能标签"],
+            ["参与技能伤害加成"] = _____53C2_6570["参与技能伤害加成"]
+        })
         local _____4E3B_76EE_6807_5269_4F59_8840_91CF = GetUnitState(_____4E3B_76EE_6807, UNIT_STATE_LIFE)
         debugLogForce(
             "扩散伤害",
@@ -123,16 +129,20 @@ ____exports["扩散伤害"] = function(_____53C2_6570)
                 goto __continue7
             end
             local _____526F_76EE_6807_521D_59CB_8840_91CF = GetUnitState(_____526F_76EE_6807, UNIT_STATE_LIFE)
-            UnitDamageTarget(
-                _____6765_6E90_5355_4F4D,
-                _____526F_76EE_6807,
-                _____6269_6563_4F24_5BB3_503C,
-                false,
-                false,
-                _____653B_51FB_7C7B_578B,
-                _____4F24_5BB3_7C7B_578B,
-                _____6B66_5668_7C7B_578B
-            )
+            _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                ["来源"] = _____6765_6E90_5355_4F4D,
+                ["目标"] = _____526F_76EE_6807,
+                ["伤害"] = _____6269_6563_4F24_5BB3_503C,
+                ["伤害类型"] = _____4F24_5BB3_7C7B_578B,
+                ranged = false,
+                attackType = _____653B_51FB_7C7B_578B,
+                weaponType = _____6B66_5668_7C7B_578B,
+                ["来源类型"] = _____53C2_6570["来源类型"] or "单位技能",
+                ["技能ID"] = _____53C2_6570["技能ID"],
+                ["技能实例ID"] = _____53C2_6570["技能实例ID"],
+                ["标签"] = _____53C2_6570["技能标签"],
+                ["参与技能伤害加成"] = _____53C2_6570["参与技能伤害加成"]
+            })
             local _____526F_76EE_6807_5269_4F59_8840_91CF = GetUnitState(_____526F_76EE_6807, UNIT_STATE_LIFE)
             debugLogForce(
                 "扩散伤害",

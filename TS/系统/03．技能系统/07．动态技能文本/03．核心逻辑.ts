@@ -31,6 +31,7 @@ import { 计算公式伤害 } from "./02．属性计算";
 
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilcode: number) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const R2I = jass.R2I as (value: number) => number;
 
 const DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip as (unit: any, abilityId: number) => string;
 const DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip as (unit: any, abilityId: number, tip: string) => boolean;
@@ -230,6 +231,11 @@ function 包装动态数值(this: void, 数值文本: string): string {
   return 动态数值标记前缀 + 数值文本 + 动态数值标记后缀;
 }
 
+function 格式化动态整数(this: void, value: number): string {
+  if (value >= 0) return tostring(R2I(value + 0.5));
+  return "-" + tostring(R2I(-value + 0.5));
+}
+
 type 动态数值标记解析结果 = {
   结束位置: number;
   数值文本: string;
@@ -349,20 +355,38 @@ function 查找最后匹配位置(this: void, text: string, pattern: string, bef
   return 命中位置;
 }
 
+function 是否十六进制字符(this: void, 字符: string): boolean {
+  if (字符 >= "0" && 字符 <= "9") return true;
+  if (字符 >= "a" && 字符 <= "f") return true;
+  return 字符 >= "A" && 字符 <= "F";
+}
+
+function 查找最后颜色码起始(this: void, text: string, beforeIndex: number): number {
+  let 命中位置 = -1;
+  let 搜索位置 = text.indexOf("|c");
+  while (搜索位置 >= 0 && 搜索位置 < beforeIndex) {
+    let 是颜色码 = 搜索位置 + 10 <= text.length;
+    for (let i = 0; i < 8 && 是颜色码; i++) {
+      if (!是否十六进制字符(text.charAt(搜索位置 + 2 + i))) {
+        是颜色码 = false;
+      }
+    }
+    if (是颜色码) 命中位置 = 搜索位置;
+    搜索位置 = text.indexOf("|c", 搜索位置 + 2);
+  }
+  return 命中位置;
+}
+
 function 调整前缀倍率起点避开颜色码(this: void, text: string, 数字起始: number, 属性位置: number): number {
-  const 颜色起始 = 查找最后匹配位置(text, "|cff", 属性位置);
+  const 颜色起始 = 查找最后颜色码起始(text, 属性位置);
   if (颜色起始 < 0) return 数字起始;
 
   const 颜色结束 = 颜色起始 + 10;
-  if (颜色结束 <= 数字起始 || 颜色结束 >= 属性位置) return 数字起始;
+  if (颜色结束 <= 数字起始 || 颜色结束 > 属性位置) return 数字起始;
 
   const 颜色值 = text.substring(颜色起始 + 2, 颜色结束);
   for (let i = 0; i < 颜色值.length; i++) {
-    const 字符 = 颜色值.charAt(i);
-    const 是数字 = 字符 >= "0" && 字符 <= "9";
-    const 是小写十六进制字母 = 字符 >= "a" && 字符 <= "f";
-    const 是大写十六进制字母 = 字符 >= "A" && 字符 <= "F";
-    if (!是数字 && !是小写十六进制字母 && !是大写十六进制字母) {
+    if (!是否十六进制字符(颜色值.charAt(i))) {
       return 数字起始;
     }
   }
@@ -388,6 +412,10 @@ function 提取前缀倍率匹配(this: void, text: string, 属性文本名: str
 
     if (数字起始 < 属性位置) {
       数字起始 = 调整前缀倍率起点避开颜色码(text, 数字起始, 属性位置);
+      if (数字起始 >= 属性位置) {
+        属性位置 = text.indexOf(属性文本名, 属性位置 + 属性文本名.length);
+        continue;
+      }
       let 完整匹配开始 = 数字起始;
       if (数字起始 >= 2 && text.substring(数字起始 - 2, 数字起始) === "自身") {
         完整匹配开始 = 数字起始 - 2;
@@ -462,7 +490,12 @@ function 提取公式匹配(this: void, text: string, 属性文本名: string, �
  * 动态替换技能提示中的公式
  * 例如：智力×3 -> 150（假设英雄智力50）
  */
-function 替换公式(this: void, unit: any, tip: string): string {
+export interface 动态文本渲染选项 {
+  appendAltHint?: boolean;
+  preserveFormula?: boolean;
+}
+
+function 替换公式(this: void, unit: any, tip: string, options?: 动态文本渲染选项): string {
   const 保护结果 = 保护目标类公式(tip);
   let result = 保护结果[0];
   const 保护片段表 = 保护结果[1];
@@ -513,7 +546,13 @@ function 替换公式(this: void, unit: any, tip: string): string {
       }
 
       const 伤害 = 计算公式伤害(unit, 属性匹配项.计算属性名, 匹配结果.倍率);
-      const 替换值 = 包装动态数值(伤害.toString());
+      const 动态数值 = 包装动态数值(格式化动态整数(伤害));
+      let 替换值 = 动态数值;
+      if (options != null && options.preserveFormula === true) {
+        const 保护标记 = "__DYN_SKIP_" + 保护片段表.length.toString() + "__";
+        保护片段表.push({ 标记: 保护标记, 原文: 完整匹配文本 + "（" + 动态数值 + "）" });
+        替换值 = 保护标记;
+      }
       result = result.substring(0, 匹配开始) + 替换值 + result.substring(匹配开始 + 完整匹配文本.length);
       替换次数++;
       if (替换次数 >= 单属性最大替换次数) {
@@ -528,8 +567,15 @@ function 替换公式(this: void, unit: any, tip: string): string {
   result = 恢复保护片段(result, 保护片段表);
   result = 合并动态数值加法(result);
   result = 消除造成自身数值前缀(result);
-  result = 追加Alt提示尾注(result);
+  if (options == null || options.appendAltHint !== false) {
+    result = 追加Alt提示尾注(result);
+  }
   return result;
+}
+
+export function 渲染动态文本(this: void, unit: any, tip: string, options?: 动态文本渲染选项): string {
+  if (unit == null || unit === 0 || tip === "") return tip;
+  return 替换公式(unit, tip, options);
 }
 
 /**

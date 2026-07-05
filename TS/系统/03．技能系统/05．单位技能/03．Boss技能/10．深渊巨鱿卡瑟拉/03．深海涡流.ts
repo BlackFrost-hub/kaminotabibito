@@ -6,13 +6,15 @@ import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 距离XY, 限制数值 } from "./14．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -63,7 +65,18 @@ function 结算深海涡流爆发(this: void, context: 卡瑟拉运行时上下�
     if (dist > cfg.最大半径) continue;
     const t = 限制数值(dist / cfg.最大半径, 0, 1);
     const coeff = cfg.最近伤害系数 - (cfg.最近伤害系数 - cfg.最远伤害系数) * t;
-    UnitDamageTarget(boss, hero, cfg.基础水伤害 * coeff, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_COLD, WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      技能ID: 深海涡流技能ID,
+      来源: boss,
+      目标: hero,
+      伤害: cfg.基础水伤害 * coeff,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_COLD,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
     施加眩晕(boss, hero, cfg.眩晕秒);
   }
 }

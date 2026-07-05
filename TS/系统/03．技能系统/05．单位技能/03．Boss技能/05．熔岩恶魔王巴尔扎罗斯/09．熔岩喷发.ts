@@ -33,6 +33,10 @@ const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") 
   SinBJ: (this: void, degrees: number) => number;
 };
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -41,7 +45,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -115,7 +118,18 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
         const unit = units[i];
         if (!单位有效(unit)) continue;
         const damage = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * config.残留伤害目标最大生命比例;
-        UnitDamageTarget(boss, unit, damage, false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+        造成AOE技能伤害({
+          技能ID: 熔岩喷发技能ID,
+          来源: boss,
+          目标: unit,
+          伤害: damage,
+          attack: false,
+          ranged: true,
+          attackType: ATTACK_TYPE_CHAOS,
+          伤害类型: DAMAGE_TYPE_FIRE,
+          weaponType: WEAPON_TYPE_WHOKNOWS,
+          来源类型: "Boss技能",
+        });
         施加巴尔扎罗斯灼热(unit, config.残留灼热层数);
       }
     },
@@ -141,7 +155,18 @@ function 执行熔岩喷发爆发(this: void, context: 巴尔扎罗斯运行时�
     显示提示圈: false,
     on进入: function 巴尔扎罗斯熔岩喷发爆发命中(this: void, unit: any): void {
       if (!单位有效(unit)) return;
-      UnitDamageTarget(boss, unit, 计算喷发伤害(boss, unit), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+      造成AOE技能伤害({
+        技能ID: 熔岩喷发技能ID,
+        来源: boss,
+        目标: unit,
+        伤害: 计算喷发伤害(boss, unit),
+        attack: false,
+        ranged: true,
+        attackType: ATTACK_TYPE_CHAOS,
+        伤害类型: DAMAGE_TYPE_FIRE,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
       施加巴尔扎罗斯灼热(unit, config.爆发灼热层数);
       开始原地击飞(unit, {
         持续时间: config.爆发持续顶飞秒,

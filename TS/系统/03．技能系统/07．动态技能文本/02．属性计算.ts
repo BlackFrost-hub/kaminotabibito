@@ -29,6 +29,8 @@ export function 获取属性值(this: void, unit: any, 属性: 属性类型): nu
       return GetHeroInt(unit, true);
     case "攻击力":
       return GetUnitStateJapi(unit, ConvertUnitState(0x15));
+    case "护甲":
+      return GetUnitStateJapi(unit, ConvertUnitState(0x20));
     case "当前生命值":
       return GetUnitState(unit, jass.UNIT_STATE_LIFE);
     case "生命值":

@@ -29,6 +29,19 @@ export interface DamageModifierContext {
   isRangedAttack?: boolean;
   isSkillAttack: boolean;
   isSkillDamage: boolean;
+  isWrappedSkillDamage?: boolean;
+  isEquipmentSkillDamage?: boolean;
+  isNonEquipmentSkillDamage?: boolean;
+  skillDamageSourceKind?: string;
+  equipmentSkillDamageKind?: string;
+  itemTypeId?: number;
+  itemHandle?: any;
+  abilityId?: number;
+  skillInstanceId?: number;
+  skillDamageTag?: string;
+  skillDamageShape?: string;
+  isSingleTargetSkillDamage?: boolean;
+  isAoeSkillDamage?: boolean;
 }
 
 export type DamageModifier = (this: void, context: DamageModifierContext) => number;

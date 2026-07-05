@@ -6,6 +6,9 @@ import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y } from "./14．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -13,7 +16,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetRandomReal = jass.GetRandomReal as (lowBound: number, highBound: number) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -105,7 +107,18 @@ function 触手鞭笞一跳(this: void, data: 触手鞭笞实例): void {
   const dx = GetUnitX(target) - GetUnitX(data.触手单位);
   const dy = GetUnitY(target) - GetUnitY(data.触手单位);
   if (dx * dx + dy * dy > cfg.触手攻击半径 * cfg.触手攻击半径) return;
-  UnitDamageTarget(boss, target, 读取单位攻击力(boss) * cfg.触手Boss攻击力比例, true, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+  造成单体技能伤害({
+    技能ID: 触手鞭笞技能ID,
+    来源: boss,
+    目标: target,
+    伤害: 读取单位攻击力(boss) * cfg.触手Boss攻击力比例,
+    attack: true,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_NORMAL,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
   施加快速减速Buff(boss, target, cfg.缠绕减速比例, cfg.缠绕减速比例, cfg.缠绕持续秒);
   registerManualBuff(target, 卡瑟拉BuffID.触手缠绕, cfg.缠绕持续秒, cfg.缠绕减速比例, {
     sourceName: "卡瑟拉-触手缠绕",

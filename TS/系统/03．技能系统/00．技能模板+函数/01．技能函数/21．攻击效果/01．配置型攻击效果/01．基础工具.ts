@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 配置型攻击效果伤害类型 } from "./00．类型定义";
+import type { 技能伤害形态, 装备技能伤害类型 } from "../../../../../04．伤害系统/08．技能伤害系统";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -33,6 +34,9 @@ const { 施加扩展控制 } = require("系统.03．技能系统.00．技能模�
 const { 开始原地击飞 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.02．原地击飞系统") as {
   开始原地击飞: (this: void, unit: any, params: any) => number;
 };
+const { 造成装备技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成装备技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -41,16 +45,6 @@ const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const ConvertUnitState = jass.ConvertUnitState as (value: number) => any;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const GetHeroStr = jass.GetHeroStr as (unit: any, includeBonuses: boolean) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any,
-) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, target: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
@@ -63,13 +57,29 @@ const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND as any;
+const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
+const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
+const DAMAGE_TYPE_LIGHTNING = jass.DAMAGE_TYPE_LIGHTNING as any;
 const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON as any;
+const DAMAGE_TYPE_SLOW_POISON = jass.DAMAGE_TYPE_SLOW_POISON as any;
+const DAMAGE_TYPE_ACID = jass.DAMAGE_TYPE_ACID as any;
+const DAMAGE_TYPE_DISEASE = jass.DAMAGE_TYPE_DISEASE as any;
+const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
+const DAMAGE_TYPE_SONIC = jass.DAMAGE_TYPE_SONIC as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const DAMAGE_TYPE_DIVINE = (jass.DAMAGE_TYPE_DIVINE ?? jass.DAMAGE_TYPE_UNIVERSAL) as any;
 const DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED as any;
 const DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+
+export interface 配置型攻击效果伤害标记 {
+  伤害形态?: 技能伤害形态;
+  装备技能类型?: 装备技能伤害类型;
+  标签?: string;
+  参与技能伤害加成?: boolean;
+}
 
 export function 配置型单位有效存活(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
@@ -110,19 +120,40 @@ export function 配置型取力量(this: void, unit: any): number {
   return GetHeroStr(unit, true);
 }
 
-export function 解析配置型攻击效果伤害类型(this: void, 类型?: 配置型攻击效果伤害类型): any {
-  if (类型 === "火焰") return DAMAGE_TYPE_FIRE;
-  if (类型 === "毒素") return DAMAGE_TYPE_POISON;
-  if (类型 === "暗影") return DAMAGE_TYPE_SHADOW_STRIKE;
-  if (类型 === "神圣") return DAMAGE_TYPE_DIVINE;
+export function 解析配置型攻击效果伤害类型(this: void, 类型?: 配置型攻击效果伤害类型 | any): any {
+  if (类型 != null && typeof 类型 !== "string") return 类型;
+  if (类型 === "精神") return DAMAGE_TYPE_MIND;
+  if (类型 === "魔法") return DAMAGE_TYPE_MAGIC;
+  if (类型 === "火焰" || 类型 === "火") return DAMAGE_TYPE_FIRE;
+  if (类型 === "水" || 类型 === "冰") return DAMAGE_TYPE_COLD;
+  if (类型 === "雷") return DAMAGE_TYPE_LIGHTNING;
+  if (类型 === "毒素" || 类型 === "毒" || 类型 === "金") return DAMAGE_TYPE_POISON;
+  if (类型 === "缓毒") return DAMAGE_TYPE_SLOW_POISON;
+  if (类型 === "酸") return DAMAGE_TYPE_ACID;
+  if (类型 === "疾病") return DAMAGE_TYPE_DISEASE;
+  if (类型 === "风" || 类型 === "木") return DAMAGE_TYPE_PLANT;
+  if (类型 === "暗影" || 类型 === "暗") return DAMAGE_TYPE_SHADOW_STRIKE;
+  if (类型 === "神圣" || 类型 === "光") return DAMAGE_TYPE_DIVINE;
+  if (类型 === "音速") return DAMAGE_TYPE_SONIC;
   if (类型 === "强化") return DAMAGE_TYPE_ENHANCED;
   if (类型 === "通用") return DAMAGE_TYPE_UNIVERSAL;
   return DAMAGE_TYPE_NORMAL;
 }
 
-export function 配置型攻击效果造成伤害(this: void, source: any, target: any, amount: number, 类型?: 配置型攻击效果伤害类型): void {
+export function 配置型攻击效果造成伤害(this: void, source: any, target: any, amount: number, 类型?: 配置型攻击效果伤害类型, 标记?: 配置型攻击效果伤害标记): void {
   if (!配置型单位有效存活(source) || !配置型单位有效存活(target) || !(amount > 0)) return;
-  UnitDamageTarget(source, target, amount, false, false, ATTACK_TYPE_NORMAL, 解析配置型攻击效果伤害类型(类型), WEAPON_TYPE_WHOKNOWS);
+  造成装备技能伤害({
+    来源: source,
+    目标: target,
+    伤害: amount,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: 解析配置型攻击效果伤害类型(类型),
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    装备技能类型: 标记?.装备技能类型 ?? "装备被动",
+    伤害形态: 标记?.伤害形态 ?? "单体",
+    标签: 标记?.标签,
+    参与技能伤害加成: 标记?.参与技能伤害加成,
+  });
 }
 
 export function 配置型攻击效果治疗生命魔法(this: void, source: any, target: any, lifeAmount: number, manaAmount: number = 0): void {

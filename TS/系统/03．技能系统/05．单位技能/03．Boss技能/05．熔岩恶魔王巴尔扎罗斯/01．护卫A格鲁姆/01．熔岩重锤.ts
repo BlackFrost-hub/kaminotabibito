@@ -13,16 +13,13 @@ const {  巴尔扎罗斯技能数值配置,
   GetUnitX,
   GetUnitY,
   GetUnitState,
-  UnitDamageTarget,
   UNIT_STATE_MAX_LIFE,
-  ATTACK_TYPE_CHAOS,
-  DAMAGE_TYPE_FIRE,
-  WEAPON_TYPE_WHOKNOWS,
   快速控制_击晕,
   单位有效,
   点到单位距离平方,
   取方向角,
   角度差绝对值,
+  造成格鲁姆Boss技能伤害,
   播放点特效,
 } = 格鲁姆公共;
 
@@ -63,7 +60,7 @@ function 结算重锤(this: void, context: 巴尔扎罗斯运行时上下文, an
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!目标在重锤扇形内(grum, hero, angle)) continue;
-    UnitDamageTarget(grum, hero, 计算重锤伤害(grum, hero), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+    造成格鲁姆Boss技能伤害(grum, hero, 计算重锤伤害(grum, hero), "AOE");
     施加快速控制Buff(grum, hero, 快速控制_击晕, config.眩晕秒);
     施加巴尔扎罗斯灼热(hero, config.灼热层数);
   }
@@ -96,4 +93,3 @@ export function 释放格鲁姆重锤(this: void, context: 巴尔扎罗斯运行
     },
   });
 }
-

@@ -1,7 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__Delete = ____lualib.__TS__Delete
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 ---
@@ -14,6 +13,8 @@ local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算
 local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.15．单位窗口累计值")
+local _____521B_5EFA_7A97_53E3_4E8B_4EF6_8BA1_6570_5668 = ____require_result_2["创建窗口事件计数器"]
 local _____540C_76EE_6807_666E_653B_8BA1_6570_63A7_5236_5668_8868 = {}
 local _____540C_76EE_6807_666E_653B_8BA1_6570_63A7_5236_5668_8BA1_6570 = 0
 local function _____5355_4F4D_6709_6548(_____5355_4F4D)
@@ -54,6 +55,7 @@ function _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype._
     self["已停止"] = false
     self["名称"] = _____540D_79F0
     self["参数"] = _____53C2_6570
+    self["计数器"] = _____521B_5EFA_7A97_53E3_4E8B_4EF6_8BA1_6570_5668(_____540D_79F0)
     _____540C_76EE_6807_666E_653B_8BA1_6570_63A7_5236_5668_8BA1_6570 = _____540C_76EE_6807_666E_653B_8BA1_6570_63A7_5236_5668_8BA1_6570 + 1
     self["控制器ID"] = _____540C_76EE_6807_666E_653B_8BA1_6570_63A7_5236_5668_8BA1_6570
     _____540C_76EE_6807_666E_653B_8BA1_6570_63A7_5236_5668_8868[self["控制器ID"]] = self
@@ -82,11 +84,9 @@ _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["处理伤
     if self["是否冷却中"](self, attacker, target, now) then
         return
     end
-    local _____72B6_6001 = self["取或建状态"](self, key, attacker, target)
-    local ____72B6_6001__8BB0_5F55_2 = _____72B6_6001["记录"]
-    ____72B6_6001__8BB0_5F55_2[#____72B6_6001__8BB0_5F55_2 + 1] = {["时间毫秒"] = now}
-    self["清理过期记录"](self, _____72B6_6001, now)
-    local _____5F53_524D_6B21_6570 = #_____72B6_6001["记录"]
+    self["取或建状态"](self, key, attacker, target)
+    local ____self_3 = self["计数器"]
+    local _____5F53_524D_6B21_6570 = ____self_3["增加"](____self_3, key, self["参数"]["窗口秒"])
     local _____9608_503C = self["参数"]["次数阈值"]
     if not (_____9608_503C > 0) or _____5F53_524D_6B21_6570 < _____9608_503C then
         return
@@ -104,7 +104,8 @@ _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["处理伤
         return
     end
     self["参数"]["on触发"](event)
-    _____72B6_6001["记录"] = {}
+    local ____self_4 = self["计数器"]
+    ____self_4["清空"](____self_4, key)
     self["进入冷却"](self, attacker, target, now)
 end
 _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["读取次数"] = function(self, _____653B_51FB_8005, _____76EE_6807)
@@ -112,21 +113,15 @@ _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["读取次
     if key == "" then
         return 0
     end
-    local _____72B6_6001 = self["状态表"][key]
-    if _____72B6_6001 == nil then
-        return 0
-    end
-    self["清理过期记录"](
-        self,
-        _____72B6_6001,
-        getServerTime()
-    )
-    return #_____72B6_6001["记录"]
+    local ____self_5 = self["计数器"]
+    return ____self_5["读取"](____self_5, key, self["参数"]["窗口秒"])
 end
 _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["清空"] = function(self, _____653B_51FB_8005, _____76EE_6807)
     if _____653B_51FB_8005 == nil and _____76EE_6807 == nil then
         self["状态表"] = {}
         self["冷却表"] = {}
+        local ____self_6 = self["计数器"]
+        ____self_6["清空"](____self_6)
         return
     end
     if _____653B_51FB_8005 ~= nil and _____76EE_6807 ~= nil then
@@ -134,6 +129,8 @@ _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["清空"] 
         if key ~= "" then
             __TS__Delete(self["状态表"], key)
             __TS__Delete(self["冷却表"], key)
+            local ____self_7 = self["计数器"]
+            ____self_7["清空"](____self_7, key)
         end
         return
     end
@@ -143,18 +140,20 @@ _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["清空"] 
         do
             local _____72B6_6001 = self["状态表"][key]
             if _____72B6_6001 == nil then
-                goto __continue29
+                goto __continue28
             end
             if _____653B_51FB_8005ID > 0 and _____53D6_5355_4F4DID(_____72B6_6001.source) ~= _____653B_51FB_8005ID then
-                goto __continue29
+                goto __continue28
             end
             if _____76EE_6807ID > 0 and _____53D6_5355_4F4DID(_____72B6_6001.target) ~= _____76EE_6807ID then
-                goto __continue29
+                goto __continue28
             end
             __TS__Delete(self["状态表"], key)
             __TS__Delete(self["冷却表"], key)
+            local ____self_8 = self["计数器"]
+            ____self_8["清空"](____self_8, key)
         end
-        ::__continue29::
+        ::__continue28::
     end
 end
 _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["停止"] = function(self)
@@ -164,31 +163,17 @@ _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["停止"] 
     self["已停止"] = true
     self["状态表"] = {}
     self["冷却表"] = {}
+    local ____self_9 = self["计数器"]
+    ____self_9["清空"](____self_9)
     __TS__Delete(_____540C_76EE_6807_666E_653B_8BA1_6570_63A7_5236_5668_8868, self["控制器ID"])
 end
 _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["取或建状态"] = function(self, key, source, target)
     local _____72B6_6001 = self["状态表"][key]
     if _____72B6_6001 == nil then
-        _____72B6_6001 = {source = source, target = target, ["记录"] = {}}
+        _____72B6_6001 = {source = source, target = target}
         self["状态表"][key] = _____72B6_6001
     end
     return _____72B6_6001
-end
-_____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["清理过期记录"] = function(self, _____72B6_6001, now)
-    local _____6700_65E9_6BEB_79D2 = now - self["参数"]["窗口秒"] * 1000
-    do
-        local i = #_____72B6_6001["记录"] - 1
-        while i >= 0 do
-            do
-                if _____72B6_6001["记录"][i + 1]["时间毫秒"] >= _____6700_65E9_6BEB_79D2 then
-                    goto __continue40
-                end
-                __TS__ArraySplice(_____72B6_6001["记录"], i, 1)
-            end
-            ::__continue40::
-            i = i - 1
-        end
-    end
 end
 _____540C_76EE_6807_666E_653B_8BA1_6570_89E6_53D1_5B9E_73B0.prototype["取冷却键"] = function(self, source, target)
     local sourceID = _____53D6_5355_4F4DID(source)

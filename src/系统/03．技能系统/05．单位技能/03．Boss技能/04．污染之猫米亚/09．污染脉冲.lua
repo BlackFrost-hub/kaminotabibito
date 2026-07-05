@@ -20,6 +20,8 @@ local ____require_result_2 = require("系统.09．表现系统.08．吟唱条.06
 local _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761 = ____require_result_2["显示场地常驻AOE吟唱条"]
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技能伤害"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -27,7 +29,6 @@ local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
-local UnitDamageTarget = jass.UnitDamageTarget
 local EXSetEffectSize = japi.EXSetEffectSize
 local EXSetEffectZ = japi.EXSetEffectZ
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
@@ -147,16 +148,15 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex)
                     goto __continue20
                 end
                 local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
-                UnitDamageTarget(
-                    boss,
-                    target,
-                    maxLife * config["每波最大生命伤害比例"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
-                    false,
-                    false,
-                    jass.ATTACK_TYPE_CHAOS,
-                    jass.DAMAGE_TYPE_POISON,
-                    jass.WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = boss,
+                    ["目标"] = target,
+                    ["伤害"] = maxLife * config["每波最大生命伤害比例"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
+                    attackType = jass.ATTACK_TYPE_CHAOS,
+                    ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
+                    weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = "Boss技能"
+                })
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["每波腐化层数"], "污染脉冲")
             end
             ::__continue20::

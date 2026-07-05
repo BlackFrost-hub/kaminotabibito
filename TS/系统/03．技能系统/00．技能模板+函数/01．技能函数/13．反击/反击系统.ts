@@ -8,6 +8,8 @@
  * 使用同类伤害类型检测防止死循环
  */
 
+import type { 技能伤害来源类型, 技能伤害形态, 装备技能伤害类型 } from "../../../../04．伤害系统/08．技能伤害系统";
+
 const jass = require("jass.common") as any;
 
 //=============================================================================
@@ -18,11 +20,6 @@ const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPoint: string) => any;
 const DestroyEffect = jass.DestroyEffect as (e: any) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
@@ -56,6 +53,9 @@ export interface 伤害类型快照 {
 
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (target: any, attacker: any, applied: number, snapshot: 伤害类型快照) => void) => void;
+};
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
 };
 
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
@@ -103,6 +103,18 @@ export interface 距离条件 {
   最大距离?: number;
 }
 
+export interface 反击技能伤害标记 {
+  来源类型?: 技能伤害来源类型;
+  装备技能类型?: 装备技能伤害类型;
+  伤害形态?: 技能伤害形态;
+  物品ID?: number;
+  物品实例?: any;
+  技能ID?: number;
+  技能实例ID?: number;
+  标签?: string;
+  参与技能伤害加成?: boolean;
+}
+
 /** 反击参数 */
 export interface 反击参数 {
   反击来源: any;
@@ -119,6 +131,7 @@ export interface 反击参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  技能伤害标记?: 反击技能伤害标记;
 }
 
 /** 反击实例 */
@@ -210,16 +223,24 @@ function 执行反击伤害(反击来源: any, 目标单位: any, 伤害值: num
   反击黑名单[来源hid] = true;
 
   try {
-    UnitDamageTarget(
-      反击来源,
-      目标单位,
-      伤害值,
-      false,
-      false,
-      参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
-      参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
-      参数.武器类型 ?? null
-    );
+    const 标记 = 参数.技能伤害标记;
+    造成技能伤害({
+      来源: 反击来源,
+      目标: 目标单位,
+      伤害: 伤害值,
+      attackType: 参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
+      伤害类型: 参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
+      weaponType: 参数.武器类型 ?? null,
+      来源类型: 标记?.来源类型 ?? 标记?.装备技能类型 ?? "其他",
+      装备技能类型: 标记?.装备技能类型,
+      伤害形态: 标记?.伤害形态 ?? (参数.是否AOE ? "AOE" : "单体"),
+      物品ID: 标记?.物品ID,
+      物品实例: 标记?.物品实例,
+      技能ID: 标记?.技能ID,
+      技能实例ID: 标记?.技能实例ID,
+      标签: 标记?.标签,
+      参与技能伤害加成: 标记?.参与技能伤害加成,
+    });
   } finally {
     反击黑名单[来源hid] = false;
   }

@@ -1,4 +1,6 @@
 /** @noSelfInFile */
+import type { 技能伤害来源类型, 技能伤害形态, 装备技能伤害类型 } from "../../../../../04．伤害系统/08．技能伤害系统";
+
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { X_GAFC, X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
@@ -50,6 +52,18 @@ export type 撞墙回调函数 = (this: void, 移动单位: any, 位移ID: numbe
 export type 结束回调函数 = (移动单位: any, 原因: 位移结束原因, 位移ID: number, 命中目标?: any) => void;
 export type 开始回调函数 = (单位: any, ID: number) => void;
 
+export interface 位移技能伤害标记 {
+  来源类型?: 技能伤害来源类型;
+  装备技能类型?: 装备技能伤害类型;
+  伤害形态?: 技能伤害形态;
+  物品ID?: number;
+  物品实例?: any;
+  技能ID?: number;
+  技能实例ID?: number;
+  标签?: string;
+  参与技能伤害加成?: boolean;
+}
+
 export interface 通用位移参数 {
   距离: number;
   主单位?: any;
@@ -73,6 +87,7 @@ export interface 通用位移参数 {
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;
+  技能伤害标记?: 位移技能伤害标记;
 
   命中过滤?: 命中过滤函数;
   命中回调?: 命中回调函数;
@@ -120,6 +135,7 @@ export interface 位移实例 {
   攻击类型: any;
   伤害类型: any;
   武器类型: any;
+  技能伤害标记?: 位移技能伤害标记;
   命中过滤?: 命中过滤函数;
   命中回调?: 命中回调函数;
   撞墙回调?: 撞墙回调函数;

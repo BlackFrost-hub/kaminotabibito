@@ -26,6 +26,8 @@ function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1(unit)
         GetUnitY(unit)
     )
 end
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 local GetOwningPlayer = jass.GetOwningPlayer
 GetUnitX = jass.GetUnitX
@@ -33,7 +35,6 @@ GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 AddSpecialEffect = jass.AddSpecialEffect
-local UnitDamageTarget = jass.UnitDamageTarget
 local GetRandomInt = jass.GetRandomInt
 local ShowUnit = jass.ShowUnit
 local PauseUnit = jass.PauseUnit
@@ -42,12 +43,12 @@ local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.02．限时摧毁目标组")
-local _____521B_5EFA_9650_65F6_6467_6BC1_76EE_6807_7EC4 = ____require_result_0["创建限时摧毁目标组"]
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_2["读取单位攻击力"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.02．限时摧毁目标组")
+local _____521B_5EFA_9650_65F6_6467_6BC1_76EE_6807_7EC4 = ____require_result_1["创建限时摧毁目标组"]
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
         return
@@ -102,16 +103,17 @@ local function _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
                 if not _____5355_4F4D_6709_6548(hero) then
                     goto __continue12
                 end
-                UnitDamageTarget(
-                    boss,
-                    hero,
-                    damage,
-                    false,
-                    false,
-                    ATTACK_TYPE_NORMAL,
-                    DAMAGE_TYPE_PLANT,
-                    WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = boss,
+                    ["目标"] = hero,
+                    ["伤害"] = damage,
+                    attack = false,
+                    ranged = false,
+                    attackType = ATTACK_TYPE_NORMAL,
+                    ["伤害类型"] = DAMAGE_TYPE_PLANT,
+                    weaponType = WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = "Boss技能"
+                })
                 _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, hero, cfg["全屏爆发腐败值"])
             end
             ::__continue12::
@@ -143,8 +145,8 @@ local function _____521B_5EFA_8150_8D25_4E4B_6E90_76EE_6807_5217_8868(context)
                 ["on销毁"] = _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1
             }
             local circle = AddSpecialEffect(cfg["腐败之源脚下特效路径"], cell["中心X"], cell["中心Y"])
-            local ____self_3 = context["清理"]
-            ____self_3["登记特效"](____self_3, "莫尔特斯-腐败之源脚下圈", circle)
+            local ____self_4 = context["清理"]
+            ____self_4["登记特效"](____self_4, "莫尔特斯-腐败之源脚下圈", circle)
             i = i + 1
         end
     end

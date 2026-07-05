@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D6_5355_4F4D_653B_51FB_529B, _____64AD_653E_722A_51FB_8868_73B0, _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A, ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548, getServerTime, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, jass, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, UnitDamageTarget, ConvertUnitState, Atan2, AddSpecialEffect, GetUnitStateJapi, EXSetEffectSize, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____8150_5316_722A_51FB_6280_80FDID
+local _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D6_5355_4F4D_653B_51FB_529B, _____64AD_653E_722A_51FB_8868_73B0, _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A, ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548, getServerTime, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, ConvertUnitState, Atan2, AddSpecialEffect, GetUnitStateJapi, EXSetEffectSize, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____8150_5316_722A_51FB_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_7C73_4E9A_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建米亚上下文"]
 local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.04．腐化感染")
@@ -92,16 +92,15 @@ ____exports["释放米亚腐化爪击"] = function(context, target)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "腐化爪击")
     _____8BA9_5355_4F4D_9762_5411_76EE_6807(boss, actualTarget)
     _____64AD_653E_722A_51FB_8868_73B0(boss, actualTarget)
-    UnitDamageTarget(
-        boss,
-        actualTarget,
-        _____53D6_5355_4F4D_653B_51FB_529B(boss) * config["攻击力倍率"] * _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387(context, actualTarget) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(actualTarget),
-        false,
-        false,
-        jass.ATTACK_TYPE_CHAOS,
-        jass.DAMAGE_TYPE_POISON,
-        jass.WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["来源"] = boss,
+        ["目标"] = actualTarget,
+        ["伤害"] = _____53D6_5355_4F4D_653B_51FB_529B(boss) * config["攻击力倍率"] * _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387(context, actualTarget) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(actualTarget),
+        attackType = jass.ATTACK_TYPE_CHAOS,
+        ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
+        weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能"
+    })
     _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, actualTarget, config["残留每秒腐化层数"], "腐化爪击")
     _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A(
         context,
@@ -131,6 +130,8 @@ local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 YDWETimerDestroyEffectSafe = ____require_result_1.YDWETimerDestroyEffectSafe
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
 _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_2["创建持续危险区域"]
+local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_3["造成单体技能伤害"]
 jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
@@ -139,7 +140,6 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 SetUnitFacing = jass.SetUnitFacing
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
-UnitDamageTarget = jass.UnitDamageTarget
 ConvertUnitState = jass.ConvertUnitState
 Atan2 = jass.Atan2
 AddSpecialEffect = jass.AddSpecialEffect

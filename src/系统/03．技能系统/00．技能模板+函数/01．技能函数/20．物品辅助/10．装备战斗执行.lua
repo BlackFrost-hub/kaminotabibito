@@ -7,6 +7,8 @@ local ____11_FF0E_88C5_5907_5E38_91CF = require("系统.03．技能系统.00．�
 local _____88C5_5907_5C0F_7279_6548 = ____11_FF0E_88C5_5907_5E38_91CF["装备小特效"]
 local ____19_FF0E_4E34_65F6_5C5E_6027_6548_679C = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.19．临时属性效果")
 local _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C = ____19_FF0E_4E34_65F6_5C5E_6027_6548_679C["施加临时属性效果"]
+local ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3 = ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF["造成装备技能伤害"]
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getUnitsInRange = ____require_result_0.getUnitsInRange
@@ -28,7 +30,6 @@ local GetUnitY = jass.GetUnitY
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
-local UnitDamageTarget = jass.UnitDamageTarget
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -41,7 +42,7 @@ ____exports["扣除当前生命比例"] = function(unit, ratio)
     local cost = life * ratio
     SetUnitState(unit, UNIT_STATE_LIFE, life - cost > 1 and life - cost or 1)
 end
-____exports["造成装备伤害"] = function(source, target, amount, damageType, ranged, weaponType)
+____exports["造成装备伤害"] = function(source, target, amount, damageType, ranged, weaponType, _____9009_9879)
     if ranged == nil then
         ranged = false
     end
@@ -51,16 +52,22 @@ ____exports["造成装备伤害"] = function(source, target, amount, damageType,
     if not _____5355_4F4D_5B58_6D3B(source) or not _____5355_4F4D_5B58_6D3B(target) or not (amount > 0) then
         return
     end
-    UnitDamageTarget(
-        source,
-        target,
-        amount,
-        false,
-        ranged,
-        ATTACK_TYPE_NORMAL,
-        damageType,
-        weaponType
-    )
+    _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3({
+        ["来源"] = source,
+        ["目标"] = target,
+        ["伤害"] = amount,
+        ["伤害类型"] = damageType,
+        ranged = ranged,
+        attackType = ATTACK_TYPE_NORMAL,
+        weaponType = weaponType,
+        ["装备技能类型"] = _____9009_9879 and _____9009_9879["装备技能类型"] or "装备技能",
+        ["物品ID"] = _____9009_9879 and _____9009_9879["物品ID"],
+        ["物品实例"] = _____9009_9879 and _____9009_9879["物品实例"],
+        ["技能ID"] = _____9009_9879 and _____9009_9879["技能ID"],
+        ["标签"] = _____9009_9879 and _____9009_9879["标签"],
+        ["伤害形态"] = _____9009_9879 and _____9009_9879["伤害形态"],
+        ["参与技能伤害加成"] = _____9009_9879 and _____9009_9879["参与技能伤害加成"]
+    })
 end
 ____exports["恢复生命魔法"] = function(source, target, hp, mp, _____9ED8_8BA4_9B54_6CD5_7279_6548)
     if mp == nil then

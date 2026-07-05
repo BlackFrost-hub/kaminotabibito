@@ -26,13 +26,15 @@ const { 取当前有效玩家人数 } = require("系统.00．核心系统.00．�
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -67,7 +69,18 @@ function 启动律法链路(this: void, boss: any, summon: any, 已连接目标:
     Tick间隔秒: config.链接伤害间隔秒,
     on距离超出: function 瑟兰迪尔律法链路距离惩罚(this: void, source: any, _connector: any, target: any): void {
       if (!单位有效(source) || !单位有效(target)) return;
-      UnitDamageTarget(boss, target, damage, false, false, jass.ATTACK_TYPE_NORMAL, jass.DAMAGE_TYPE_MIND, jass.WEAPON_TYPE_WHOKNOWS);
+      造成AOE技能伤害({
+        技能ID: 律法召唤技能ID,
+        来源: boss,
+        目标: target,
+        伤害: damage,
+        attack: false,
+        ranged: false,
+        attackType: jass.ATTACK_TYPE_NORMAL,
+        伤害类型: jass.DAMAGE_TYPE_MIND,
+        weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
     },
   });
 }

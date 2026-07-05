@@ -32,7 +32,6 @@ ____exports.UnitAddAbility = jass.UnitAddAbility
 ____exports.UnitRemoveAbility = jass.UnitRemoveAbility
 ____exports.UnitAddType = jass.UnitAddType
 ____exports.UnitRemoveType = jass.UnitRemoveType
-____exports.UnitDamageTarget = jass.UnitDamageTarget
 ____exports.Atan2 = jass.Atan2
 ____exports.CosBJ = require("lib.扩展函数.BJ函数.12．数学函数").CosBJ
 ____exports.SinBJ = require("lib.扩展函数.BJ函数.12．数学函数").SinBJ

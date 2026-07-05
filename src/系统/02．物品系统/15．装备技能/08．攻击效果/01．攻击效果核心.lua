@@ -28,7 +28,13 @@ local _____5DF2_521D_59CB_5316 = false
 local _____653B_51FB_6548_679C_5EF6_8FDF_4F24_5BB3_961F_5217 = _____521B_5EFA_4F24_5BB3_6D3E_751F_6279_5904_7406_961F_5217(
     "攻击效果延迟伤害",
     {["处理"] = function(record)
-        _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(record.source, record.target, record.amount, record.damageType)
+        _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+            record.source,
+            record.target,
+            record.amount,
+            record.damageType,
+            {["伤害形态"] = "单体"}
+        )
     end}
 )
 local function _____51B7_5374_901A_8FC7(_____914D_7F6E, unit)

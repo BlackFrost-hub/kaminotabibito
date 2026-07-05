@@ -10,13 +10,28 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 
+const { 创建独立技能伤害实例, 绑定单位当前独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  创建独立技能伤害实例: (this: void, 参数?: {
+    技能ID?: number;
+    来源类型?: string;
+    标签?: string;
+    持续时间Ms?: number;
+    持续时间秒?: number;
+  }) => number;
+  绑定单位当前独立技能伤害实例: (this: void, 单位: any, id: number | undefined) => void;
+};
+
 export interface 单位技能壳监听参数<T> {
   名称: string;
   单位类型ID: string | number;
   技能ID: string | number;
   获取或创建上下文: (this: void, unit: any) => T | undefined;
-  释放技能: (this: void, context: T, unit: any) => void;
+  释放技能: (this: void, context: T, unit: any, 技能实例ID?: number) => void;
   可释放?: (this: void, context: T, unit: any) => boolean;
+  创建独立技能实例?: boolean;
+  独立技能来源类型?: string;
+  技能实例持续时间Ms?: number;
+  技能实例持续时间秒?: number;
 }
 
 const 监听列表: 单位技能壳监听参数<any>[] = [];
@@ -36,7 +51,17 @@ function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilit
     const context = 参数.获取或创建上下文(castingUnit);
     if (context == null) continue;
     if (参数.可释放 != null && !参数.可释放(context, castingUnit)) continue;
-    参数.释放技能(context, castingUnit);
+    const 技能实例ID = 参数.创建独立技能实例 === false
+      ? undefined
+      : 创建独立技能伤害实例({
+        技能ID: spellAbilityId,
+        来源类型: 参数.独立技能来源类型 ?? "Boss技能",
+        标签: 参数.名称,
+        持续时间Ms: 参数.技能实例持续时间Ms,
+        持续时间秒: 参数.技能实例持续时间秒,
+      });
+    绑定单位当前独立技能伤害实例(castingUnit, 技能实例ID);
+    参数.释放技能(context, castingUnit, 技能实例ID);
   }
 }
 

@@ -4,10 +4,6 @@ import type { 持续原生效果参数 } from "./01．类型";
 
 const jass = require("jass.common") as any;
 
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any
-) => boolean;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (whichUnit: any, abilityId: number) => number;
 const IsUnitPaused = jass.IsUnitPaused as (whichUnit: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
@@ -23,6 +19,9 @@ const { SFB_setEntanglingRoots, SFB_setParasite } = require("lib.扩展函数.St
   SFB_setEntanglingRoots: (this: void, sourceUnit: any, u: any, time: number) => void;
   SFB_setParasite: (this: void, sourceUnit: any, u: any, time: number) => void;
 };
+const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
+  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any) => boolean;
+};
 
 const BUFF_纠缠根须 = 0x42456572;
 const BUFF_寄生 = 0x424E7061;
@@ -34,6 +33,7 @@ interface 持续伤害实例 {
   来源单位: any;
   目标单位: any;
   伤害: number;
+  伤害类型: any;
   伤害间隔毫秒: number;
   下次伤害时间: number;
   BuffID: number;
@@ -68,7 +68,11 @@ function 读取伤害间隔(this: void, 参数: 持续原生效果参数): numbe
   return interval > 0 ? interval : 默认伤害间隔;
 }
 
-function 注册持续伤害(this: void, 来源单位: any, 目标单位: any, 伤害: number, 伤害间隔: number, BuffID: number): number {
+function 读取伤害类型(this: void, 参数: 持续原生效果参数): any {
+  return 参数.伤害类型 ?? 参数.DamageType ?? DAMAGE_TYPE_PLANT;
+}
+
+function 注册持续伤害(this: void, 来源单位: any, 目标单位: any, 伤害: number, 伤害类型: any, 伤害间隔: number, BuffID: number): number {
   if (目标单位 == null || 目标单位 === 0) return 0;
   if (伤害 <= 0) return 0;
 
@@ -79,6 +83,7 @@ function 注册持续伤害(this: void, 来源单位: any, 目标单位: any, �
     来源单位,
     目标单位,
     伤害,
+    伤害类型,
     伤害间隔毫秒: 伤害间隔 * 1000,
     下次伤害时间: now + 伤害间隔 * 1000,
     BuffID,
@@ -121,7 +126,7 @@ function 持续伤害系统Tick(this: void): void {
     }
 
     if (!IsUnitPaused(实例.目标单位) && now >= 实例.下次伤害时间) {
-      UnitDamageTarget(实例.来源单位, 实例.目标单位, 实例.伤害, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS);
+      造成持续伤害(实例.来源单位, 实例.目标单位, 实例.伤害, 实例.伤害类型, false, ATTACK_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
       实例.下次伤害时间 = now + 实例.伤害间隔毫秒;
     }
 
@@ -136,7 +141,7 @@ export function 施加禁锢(this: void, 参数: 持续原生效果参数): void
   if (目标单位 == null || 目标单位 === 0 || 持续时间 <= 0) return;
 
   SFB_setEntanglingRoots(来源单位, 目标单位, 持续时间);
-  注册持续伤害(来源单位, 目标单位, 转数字(参数.伤害 ?? 参数.HitDamage), 读取伤害间隔(参数), BUFF_纠缠根须);
+  注册持续伤害(来源单位, 目标单位, 转数字(参数.伤害 ?? 参数.HitDamage), 读取伤害类型(参数), 读取伤害间隔(参数), BUFF_纠缠根须);
 }
 
 export function 施加寄生(this: void, 参数: 持续原生效果参数): void {
@@ -146,7 +151,7 @@ export function 施加寄生(this: void, 参数: 持续原生效果参数): void
   if (目标单位 == null || 目标单位 === 0 || 持续时间 <= 0) return;
 
   SFB_setParasite(来源单位, 目标单位, 持续时间);
-  注册持续伤害(来源单位, 目标单位, 转数字(参数.伤害 ?? 参数.HitDamage), 读取伤害间隔(参数), BUFF_寄生);
+  注册持续伤害(来源单位, 目标单位, 转数字(参数.伤害 ?? 参数.HitDamage), 读取伤害类型(参数), 读取伤害间隔(参数), BUFF_寄生);
 }
 
 export {};

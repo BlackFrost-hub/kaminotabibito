@@ -34,6 +34,8 @@ export interface 持续原生效果参数 {
   目标单位?: any;
   HitDamage?: number;
   伤害?: number;
+  DamageType?: any;
+  伤害类型?: any;
   DamageInterval?: number;
   伤害间隔?: number;
   time?: number;

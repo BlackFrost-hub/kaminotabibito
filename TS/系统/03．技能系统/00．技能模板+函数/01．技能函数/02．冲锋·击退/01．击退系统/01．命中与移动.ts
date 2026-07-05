@@ -31,6 +31,9 @@ const { 沿角度步进直到地形阻挡 } = require("lib.扩展函数.封装�
     是否提前停止: boolean;
   };
 };
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const 最小冲锋步进距离 = 30.0;
 
@@ -39,16 +42,24 @@ function 结算命中伤害(实例: 位移实例, 目标单位: any): void {
   const 来源单位 = 实例.伤害来源 != null && 实例.伤害来源 !== 0 ? 实例.伤害来源 : 实例.单位;
   if (!来源单位 || 来源单位 === 0) return;
 
-  jass.UnitDamageTarget(
-    来源单位,
-    目标单位,
-    实例.命中伤害,
-    false,
-    false,
-    实例.攻击类型 ?? DEFAULT_ATTACK_TYPE,
-    实例.伤害类型 ?? DEFAULT_DAMAGE_TYPE,
-    实例.武器类型 ?? DEFAULT_WEAPON_TYPE
-  );
+  const 标记 = 实例.技能伤害标记;
+  造成技能伤害({
+    来源: 来源单位,
+    目标: 目标单位,
+    伤害: 实例.命中伤害,
+    attackType: 实例.攻击类型 ?? DEFAULT_ATTACK_TYPE,
+    伤害类型: 实例.伤害类型 ?? DEFAULT_DAMAGE_TYPE,
+    weaponType: 实例.武器类型 ?? DEFAULT_WEAPON_TYPE,
+    来源类型: 标记?.来源类型 ?? 标记?.装备技能类型 ?? "其他",
+    装备技能类型: 标记?.装备技能类型,
+    伤害形态: 标记?.伤害形态 ?? (实例.命中后结束 ? "单体" : "AOE"),
+    物品ID: 标记?.物品ID,
+    物品实例: 标记?.物品实例,
+    技能ID: 标记?.技能ID,
+    技能实例ID: 标记?.技能实例ID,
+    标签: 标记?.标签,
+    参与技能伤害加成: 标记?.参与技能伤害加成,
+  });
 }
 
 function 可命中目标(实例: 位移实例, 目标单位: any): boolean {

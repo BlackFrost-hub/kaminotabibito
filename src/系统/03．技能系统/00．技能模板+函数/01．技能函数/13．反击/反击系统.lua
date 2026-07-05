@@ -1,11 +1,8 @@
 local ____lualib = require("lualib_bundle")
-local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
-local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
-local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____8BA1_7B97_4E24_70B9_8DDD_79BB, _____8DDD_79BB_6EE1_8DB3_6761_4EF6, _____8BA1_7B97_53CD_51FB_4F24_5BB3, _____6267_884C_53CD_51FB_4F24_5BB3, _____64AD_653E_53CD_51FB_7279_6548, _____8BA1_7B97_8DDD_79BB_5E76_68C0_67E5, _____6267_884C_5355_6B21_53CD_51FB, _____6267_884CAOE_53CD_51FB, jass, GetUnitX, GetUnitY, GetHandleId, UnitDamageTarget, AddSpecialEffectTarget, DestroyEffect, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, getEnemyUnitsInRange, getGameTime, debugLogForce, _____53CD_51FB_9ED1_540D_5355
+local _____8BA1_7B97_4E24_70B9_8DDD_79BB, _____8DDD_79BB_6EE1_8DB3_6761_4EF6, _____8BA1_7B97_53CD_51FB_4F24_5BB3, _____6267_884C_53CD_51FB_4F24_5BB3, _____64AD_653E_53CD_51FB_7279_6548, _____8BA1_7B97_8DDD_79BB_5E76_68C0_67E5, _____6267_884C_5355_6B21_53CD_51FB, _____6267_884CAOE_53CD_51FB, jass, GetUnitX, GetUnitY, GetHandleId, AddSpecialEffectTarget, DestroyEffect, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, _____9020_6210_6280_80FD_4F24_5BB3, getEnemyUnitsInRange, getGameTime, debugLogForce, _____53CD_51FB_9ED1_540D_5355
 function _____8BA1_7B97_4E24_70B9_8DDD_79BB(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
@@ -34,29 +31,40 @@ function _____6267_884C_53CD_51FB_4F24_5BB3(_____53CD_51FB_6765_6E90, _____76EE_
     _____53CD_51FB_9ED1_540D_5355[_____6765_6E90hid] = true
     do
         local ____try, ____error = pcall(function()
-            local ____array_8 = __TS__SparseArrayNew(
-                _____53CD_51FB_6765_6E90,
-                _____76EE_6807_5355_4F4D,
-                _____4F24_5BB3_503C,
-                false,
-                false
-            )
-            local ____53C2_6570__653B_51FB_7C7B_578B_5 = _____53C2_6570["攻击类型"]
-            if ____53C2_6570__653B_51FB_7C7B_578B_5 == nil then
-                ____53C2_6570__653B_51FB_7C7B_578B_5 = ATTACK_TYPE_NORMAL
+            local _____6807_8BB0 = _____53C2_6570["技能伤害标记"]
+            local ____9020_6210_6280_80FD_4F24_5BB3_32 = _____9020_6210_6280_80FD_4F24_5BB3
+            local ____53CD_51FB_6765_6E90_29 = _____53CD_51FB_6765_6E90
+            local ____76EE_6807_5355_4F4D_30 = _____76EE_6807_5355_4F4D
+            local ____4F24_5BB3_503C_31 = _____4F24_5BB3_503C
+            local ____53C2_6570__653B_51FB_7C7B_578B_6 = _____53C2_6570["攻击类型"]
+            if ____53C2_6570__653B_51FB_7C7B_578B_6 == nil then
+                ____53C2_6570__653B_51FB_7C7B_578B_6 = ATTACK_TYPE_NORMAL
             end
-            __TS__SparseArrayPush(____array_8, ____53C2_6570__653B_51FB_7C7B_578B_5)
-            local ____53C2_6570__4F24_5BB3_7C7B_578B_6 = _____53C2_6570["伤害类型"]
-            if ____53C2_6570__4F24_5BB3_7C7B_578B_6 == nil then
-                ____53C2_6570__4F24_5BB3_7C7B_578B_6 = DAMAGE_TYPE_NORMAL
+            local ____53C2_6570__4F24_5BB3_7C7B_578B_7 = _____53C2_6570["伤害类型"]
+            if ____53C2_6570__4F24_5BB3_7C7B_578B_7 == nil then
+                ____53C2_6570__4F24_5BB3_7C7B_578B_7 = DAMAGE_TYPE_NORMAL
             end
-            __TS__SparseArrayPush(____array_8, ____53C2_6570__4F24_5BB3_7C7B_578B_6)
-            local ____53C2_6570__6B66_5668_7C7B_578B_7 = _____53C2_6570["武器类型"]
-            if ____53C2_6570__6B66_5668_7C7B_578B_7 == nil then
-                ____53C2_6570__6B66_5668_7C7B_578B_7 = nil
+            local ____53C2_6570__6B66_5668_7C7B_578B_8 = _____53C2_6570["武器类型"]
+            if ____53C2_6570__6B66_5668_7C7B_578B_8 == nil then
+                ____53C2_6570__6B66_5668_7C7B_578B_8 = nil
             end
-            __TS__SparseArrayPush(____array_8, ____53C2_6570__6B66_5668_7C7B_578B_7)
-            UnitDamageTarget(__TS__SparseArraySpread(____array_8))
+            ____9020_6210_6280_80FD_4F24_5BB3_32({
+                ["来源"] = ____53CD_51FB_6765_6E90_29,
+                ["目标"] = ____76EE_6807_5355_4F4D_30,
+                ["伤害"] = ____4F24_5BB3_503C_31,
+                attackType = ____53C2_6570__653B_51FB_7C7B_578B_6,
+                ["伤害类型"] = ____53C2_6570__4F24_5BB3_7C7B_578B_7,
+                weaponType = ____53C2_6570__6B66_5668_7C7B_578B_8,
+                ["来源类型"] = _____6807_8BB0 and _____6807_8BB0["来源类型"] or _____6807_8BB0 and _____6807_8BB0["装备技能类型"] or "其他",
+                ["装备技能类型"] = _____6807_8BB0 and _____6807_8BB0["装备技能类型"],
+                ["伤害形态"] = _____6807_8BB0 and _____6807_8BB0["伤害形态"] or (_____53C2_6570["是否AOE"] and "AOE" or "单体"),
+                ["物品ID"] = _____6807_8BB0 and _____6807_8BB0["物品ID"],
+                ["物品实例"] = _____6807_8BB0 and _____6807_8BB0["物品实例"],
+                ["技能ID"] = _____6807_8BB0 and _____6807_8BB0["技能ID"],
+                ["技能实例ID"] = _____6807_8BB0 and _____6807_8BB0["技能实例ID"],
+                ["标签"] = _____6807_8BB0 and _____6807_8BB0["标签"],
+                ["参与技能伤害加成"] = _____6807_8BB0 and _____6807_8BB0["参与技能伤害加成"]
+            })
         end)
         do
             _____53CD_51FB_9ED1_540D_5355[_____6765_6E90hid] = false
@@ -151,7 +159,6 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
-UnitDamageTarget = jass.UnitDamageTarget
 AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 DestroyEffect = jass.DestroyEffect
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -159,14 +166,16 @@ DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-getEnemyUnitsInRange = ____require_result_1.getEnemyUnitsInRange
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-getGameTime = ____require_result_2.getGameTime
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.08．同类伤害类型")
-local _____83B7_53D6_540C_7C7B_4F24_5BB3_7C7B_578B = ____require_result_3["获取同类伤害类型"]
-local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.index")
-debugLogForce = ____require_result_4.debugLogForce
+local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_1["造成技能伤害"]
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+getEnemyUnitsInRange = ____require_result_2.getEnemyUnitsInRange
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+getGameTime = ____require_result_3.getGameTime
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.08．同类伤害类型")
+local _____83B7_53D6_540C_7C7B_4F24_5BB3_7C7B_578B = ____require_result_4["获取同类伤害类型"]
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.index")
+debugLogForce = ____require_result_5.debugLogForce
 --- 反击类型
 ____exports["反击类型"] = ____exports["反击类型"] or ({})
 ____exports["反击类型"]["任意伤害"] = 0
@@ -294,30 +303,30 @@ ____exports["注册反击"] = function(_____53C2_6570)
     if not _____53CD_51FB_5B9E_4F8B_6620_5C04[hid] then
         _____53CD_51FB_5B9E_4F8B_6620_5C04[hid] = {}
     end
-    local ____53C2_6570_11 = _____53C2_6570
-    local ____temp_12 = _____53C2_6570["反击类型"] or ____exports["反击类型"]["任意伤害"]
-    local ____temp_13 = _____53C2_6570["伤害计算方式"] or ____exports["反击伤害类型"]["固定值"]
-    local ____temp_14 = _____53C2_6570["距离条件"] or ({})
-    local ____53C2_6570__662F_5426AOE_9 = _____53C2_6570["是否AOE"]
-    if ____53C2_6570__662F_5426AOE_9 == nil then
-        ____53C2_6570__662F_5426AOE_9 = false
+    local ____53C2_6570_35 = _____53C2_6570
+    local ____temp_36 = _____53C2_6570["反击类型"] or ____exports["反击类型"]["任意伤害"]
+    local ____temp_37 = _____53C2_6570["伤害计算方式"] or ____exports["反击伤害类型"]["固定值"]
+    local ____temp_38 = _____53C2_6570["距离条件"] or ({})
+    local ____53C2_6570__662F_5426AOE_33 = _____53C2_6570["是否AOE"]
+    if ____53C2_6570__662F_5426AOE_33 == nil then
+        ____53C2_6570__662F_5426AOE_33 = false
     end
-    local ____53C2_6570__53EA_53CD_51FB_6765_6E90_10 = _____53C2_6570["只反击来源"]
-    if ____53C2_6570__53EA_53CD_51FB_6765_6E90_10 == nil then
-        ____53C2_6570__53EA_53CD_51FB_6765_6E90_10 = true
+    local ____53C2_6570__53EA_53CD_51FB_6765_6E90_34 = _____53C2_6570["只反击来源"]
+    if ____53C2_6570__53EA_53CD_51FB_6765_6E90_34 == nil then
+        ____53C2_6570__53EA_53CD_51FB_6765_6E90_34 = true
     end
     local _____5B9E_4F8B = {
-        ["参数"] = __TS__ObjectAssign({}, ____53C2_6570_11, {
-            ["反击类型"] = ____temp_12,
-            ["伤害计算方式"] = ____temp_13,
-            ["距离条件"] = ____temp_14,
-            ["是否AOE"] = ____53C2_6570__662F_5426AOE_9,
-            ["只反击来源"] = ____53C2_6570__53EA_53CD_51FB_6765_6E90_10
+        ["参数"] = __TS__ObjectAssign({}, ____53C2_6570_35, {
+            ["反击类型"] = ____temp_36,
+            ["伤害计算方式"] = ____temp_37,
+            ["距离条件"] = ____temp_38,
+            ["是否AOE"] = ____53C2_6570__662F_5426AOE_33,
+            ["只反击来源"] = ____53C2_6570__53EA_53CD_51FB_6765_6E90_34
         }),
         ["上次反击时间"] = 0
     }
-    local ____53CD_51FB_5B9E_4F8B_6620_5C04_hid_15 = _____53CD_51FB_5B9E_4F8B_6620_5C04[hid]
-    ____53CD_51FB_5B9E_4F8B_6620_5C04_hid_15[#____53CD_51FB_5B9E_4F8B_6620_5C04_hid_15 + 1] = _____5B9E_4F8B
+    local ____53CD_51FB_5B9E_4F8B_6620_5C04_hid_39 = _____53CD_51FB_5B9E_4F8B_6620_5C04[hid]
+    ____53CD_51FB_5B9E_4F8B_6620_5C04_hid_39[#____53CD_51FB_5B9E_4F8B_6620_5C04_hid_39 + 1] = _____5B9E_4F8B
     debugLogForce(
         "反击系统",
         "注册成功 单位hid=",

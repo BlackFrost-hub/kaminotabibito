@@ -6,9 +6,9 @@ local ____exports = {}
 -- 显眼入口：按 `01．Buff表.ts` 的 type 字段清除单位 Buff。
 -- 
 -- 常用：
--- - `移除单位增益Buff(unit)`：清除 `type` 以 `Buff:` 开头的条目。
--- - `移除单位负面Buff(unit)`：清除 `type` 以 `Debuff:` 开头的条目。
--- - `移除单位指定类型Buff(unit, "Debuff:control")`：清除指定 type 前缀。
+-- - `移除单位增益Buff(unit)`：清除 `type` 含 `Buff` 字段的条目。
+-- - `移除单位负面Buff(unit)`：清除 `type` 含 `Debuff` 字段的条目。
+-- - `移除单位指定类型Buff(unit, "Debuff:control")`：清除同时含 `Debuff` 和 `control` 字段的条目。
 -- 
 -- 说明：
 -- - D001-D004 是纯 TS DOT，没有原生魔法效果；清除时只停止 DOT 和自定义 BuffUI。
@@ -18,7 +18,62 @@ local buffTableMod = require("系统.05．Buff系统.01．Buff表")
 local BUFF_TABLE = buffTableMod.buffs
 local getBuffIdsOnUnit = buffPool.getBuffIdsOnUnit
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = buffPool["移除单位指定Buff"]
-local function isBuffTypeMatched(buffID, typePrefix, onlyPurgable)
+local function parseBuffTypeFields(typeName)
+    local fields = {}
+    local start = 0
+    local lowerType = string.lower(typeName)
+    while start <= #lowerType do
+        local ____end = (string.find(
+            lowerType,
+            ":",
+            math.max(start + 1, 1),
+            true
+        ) or 0) - 1
+        local field = ____end >= 0 and __TS__StringSubstring(lowerType, start, ____end) or __TS__StringSubstring(lowerType, start)
+        if field ~= "" then
+            fields[#fields + 1] = field
+        end
+        if ____end < 0 then
+            break
+        end
+        start = ____end + 1
+    end
+    return fields
+end
+local function hasBuffTypeField(typeFields, queryField)
+    local lowerField = string.lower(queryField)
+    do
+        local i = 0
+        while i < #typeFields do
+            if typeFields[i + 1] == lowerField then
+                return true
+            end
+            i = i + 1
+        end
+    end
+    return false
+end
+local function isBuffTypeQueryMatched(typeName, typeQuery)
+    if typeQuery == "" then
+        return true
+    end
+    local queryFields = parseBuffTypeFields(typeQuery)
+    if #queryFields == 0 then
+        return true
+    end
+    local typeFields = parseBuffTypeFields(typeName)
+    do
+        local i = 0
+        while i < #queryFields do
+            if not hasBuffTypeField(typeFields, queryFields[i + 1]) then
+                return false
+            end
+            i = i + 1
+        end
+    end
+    return true
+end
+local function isBuffTypeMatched(buffID, typeQuery, onlyPurgable)
     local meta = BUFF_TABLE[buffID]
     if meta == nil then
         return false
@@ -27,7 +82,7 @@ local function isBuffTypeMatched(buffID, typePrefix, onlyPurgable)
     if type(typeName) ~= "string" or typeName == "" then
         return false
     end
-    if __TS__StringSubstring(typeName, 0, #typePrefix) ~= typePrefix then
+    if not isBuffTypeQueryMatched(typeName, typeQuery) then
         return false
     end
     if onlyPurgable and meta.canPurge ~= true then
@@ -35,7 +90,7 @@ local function isBuffTypeMatched(buffID, typePrefix, onlyPurgable)
     end
     return true
 end
-local function isBuffDispelMatched(buffID, typePrefix, maxDispelLevel, onlyPurgable)
+local function isBuffDispelMatched(buffID, typeQuery, maxDispelLevel, onlyPurgable)
     local meta = BUFF_TABLE[buffID]
     if meta == nil then
         return false
@@ -44,7 +99,7 @@ local function isBuffDispelMatched(buffID, typePrefix, maxDispelLevel, onlyPurga
     if type(typeName) ~= "string" or typeName == "" then
         return false
     end
-    if typePrefix ~= "" and __TS__StringSubstring(typeName, 0, #typePrefix) ~= typePrefix then
+    if not isBuffTypeQueryMatched(typeName, typeQuery) then
         return false
     end
     if onlyPurgable and meta.canPurge ~= true then
@@ -59,12 +114,13 @@ local function isBuffDispelMatched(buffID, typePrefix, maxDispelLevel, onlyPurga
     end
     return dispelLevel <= maxDispelLevel
 end
---- 按 `01．Buff表.ts` 的 type 前缀清除单位 Buff。
+--- 按 `01．Buff表.ts` 的 type 字段清除单位 Buff。
 -- 
 -- - `Buff:`    增益类
 -- - `Debuff:` 负面类
 -- - `Debuff:control` 控制类负面
 -- - `Debuff:magic` 魔法类负面
+-- - 查询按 `:` 分隔字段命中，不依赖字段顺序
 -- - onlyPurgable=true 时只清 `canPurge: true` 的条目
 ____exports["移除单位指定类型Buff"] = function(unit, typePrefix, onlyPurgable)
     if onlyPurgable == nil then
@@ -81,26 +137,26 @@ ____exports["移除单位指定类型Buff"] = function(unit, typePrefix, onlyPur
             do
                 local buffID = ids[i + 1]
                 if not isBuffTypeMatched(buffID, typePrefix, onlyPurgable) then
-                    goto __continue17
+                    goto __continue31
                 end
                 if _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, buffID) then
                     removed = removed + 1
                 end
             end
-            ::__continue17::
+            ::__continue31::
             i = i + 1
         end
     end
     return removed
 end
---- 清除单位增益 Buff（Buff 表 type 以 `Buff:` 开头）。
+--- 清除单位增益 Buff（Buff 表 type 含 `Buff` 字段）。
 ____exports["移除单位增益Buff"] = function(unit, onlyPurgable)
     if onlyPurgable == nil then
         onlyPurgable = false
     end
     return ____exports["移除单位指定类型Buff"](unit, "Buff:", onlyPurgable)
 end
---- 清除单位负面 Buff（Buff 表 type 以 `Debuff:` 开头）。
+--- 清除单位负面 Buff（Buff 表 type 含 `Debuff` 字段）。
 ____exports["移除单位负面Buff"] = function(unit, onlyPurgable)
     if onlyPurgable == nil then
         onlyPurgable = false
@@ -112,6 +168,7 @@ end
 -- - `maxDispelLevel=1`：只驱散 1 级及以下
 -- - `maxDispelLevel=2`：驱散 2 级及以下
 -- - `typePrefix=""`：不限制类型；也可传 `Buff:` / `Debuff:` / `Debuff:control` / `Debuff:magic`
+-- - `typePrefix` 按 `:` 分隔字段命中，不依赖字段顺序
 -- - `onlyPurgable=true`：只驱散 `canPurge: true` 的条目
 ____exports["按驱散等级移除单位Buff"] = function(unit, maxDispelLevel, typePrefix, onlyPurgable)
     if typePrefix == nil then
@@ -134,13 +191,13 @@ ____exports["按驱散等级移除单位Buff"] = function(unit, maxDispelLevel, 
             do
                 local buffID = ids[i + 1]
                 if not isBuffDispelMatched(buffID, typePrefix, maxDispelLevel, onlyPurgable) then
-                    goto __continue26
+                    goto __continue40
                 end
                 if _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, buffID) then
                     removed = removed + 1
                 end
             end
-            ::__continue26::
+            ::__continue40::
             i = i + 1
         end
     end

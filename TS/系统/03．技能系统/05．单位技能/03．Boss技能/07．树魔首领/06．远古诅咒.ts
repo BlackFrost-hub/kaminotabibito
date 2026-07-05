@@ -6,6 +6,9 @@ import { 树魔首领数值与表现配置 } from "./02．数值与表现配置"
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -14,7 +17,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
@@ -181,7 +183,18 @@ function 执行远古诅咒后续爆发(this: void, context: 树魔首领运行�
     if (距离平方XY(centerX, centerY, GetUnitX(hero), GetUnitY(hero)) > radius2) continue;
     const damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.后续爆发目标最大生命比例
       + 读取单位攻击力(boss) * cfg.后续爆发Boss攻击力比例;
-    UnitDamageTarget(boss, hero, damage, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      技能ID: 远古诅咒技能ID,
+      来源: boss,
+      目标: hero,
+      伤害: damage,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_ENHANCED,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
   }
 }
 
@@ -217,10 +230,32 @@ function 执行远古诅咒第一段(this: void, context: 树魔首领运行时�
   const damagePerTarget = baseDamage / count;
   if (splitTargets.length >= 2) {
     for (let i = 0; i < splitTargets.length; i++) {
-      UnitDamageTarget(boss, splitTargets[i], damagePerTarget, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, WEAPON_TYPE_WHOKNOWS);
+      造成AOE技能伤害({
+        技能ID: 远古诅咒技能ID,
+        来源: boss,
+        目标: splitTargets[i],
+        伤害: damagePerTarget,
+        attack: false,
+        ranged: false,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_MIND,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
     }
   } else {
-    UnitDamageTarget(boss, target, baseDamage, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      技能ID: 远古诅咒技能ID,
+      来源: boss,
+      目标: target,
+      伤害: baseDamage,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_MIND,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
   }
   治疗全部玩家(boss, baseDamage);
   调度远古诅咒后续爆发(context);

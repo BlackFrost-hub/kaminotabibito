@@ -11,6 +11,7 @@ function ____exports.init()
     end
     _____4F24_5BB3_7CFB_7EDF_5DF2_521D_59CB_5316 = true
     require("系统.04．伤害系统.01．伤害事件")
+    require("系统.04．伤害系统.07．持续伤害系统")
     require("系统.04．伤害系统.02．dot伤害")
     require("系统.04．伤害系统.01．DOT定义.index")
     local _____6A21_578B_4F24_5BB3_6570_5B57 = require("系统.09．表现系统.09．伤害数字模型.index")

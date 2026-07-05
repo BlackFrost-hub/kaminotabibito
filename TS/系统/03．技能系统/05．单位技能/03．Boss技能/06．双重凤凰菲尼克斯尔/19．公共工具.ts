@@ -3,9 +3,13 @@
 import type { 菲尼克斯尔元素类型, 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import type { 技能伤害形态 } from "../../../../04．伤害系统/08．技能伤害系统";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const Player = jass.Player as (id: number) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
@@ -21,7 +25,6 @@ const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => 
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
@@ -286,34 +289,40 @@ export function 范围敌人(this: void, boss: any, x: number, y: number, radius
   return getEnemyUnitsInRange(boss, x, y, radius);
 }
 
-export function 造成火焰伤害(this: void, source: any, target: any, amount: number): void {
+function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, amount: number, attackType: any, damageType: any, 伤害形态: 技能伤害形态): void {
   if (amount > 0 && 单位存活(source) && 单位存活(target)) {
-    UnitDamageTarget(source, target, amount, false, true, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+    造成技能伤害({
+      来源: source,
+      目标: target,
+      伤害: amount,
+      ranged: true,
+      attackType,
+      伤害类型: damageType,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+      伤害形态,
+    });
   }
 }
 
-export function 造成冰霜伤害(this: void, source: any, target: any, amount: number): void {
-  if (amount > 0 && 单位存活(source) && 单位存活(target)) {
-    UnitDamageTarget(source, target, amount, false, true, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_COLD, WEAPON_TYPE_WHOKNOWS);
-  }
+export function 造成火焰伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_FIRE, 伤害形态);
 }
 
-export function 造成毒火伤害(this: void, source: any, target: any, amount: number): void {
-  if (amount > 0 && 单位存活(source) && 单位存活(target)) {
-    UnitDamageTarget(source, target, amount, false, true, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_POISON, WEAPON_TYPE_WHOKNOWS);
-  }
+export function 造成冰霜伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_COLD, 伤害形态);
 }
 
-export function 造成暗火伤害(this: void, source: any, target: any, amount: number): void {
-  if (amount > 0 && 单位存活(source) && 单位存活(target)) {
-    UnitDamageTarget(source, target, amount, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS);
-  }
+export function 造成毒火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_POISON, 伤害形态);
 }
 
-export function 造成普通伤害(this: void, source: any, target: any, amount: number): void {
-  if (amount > 0 && 单位存活(source) && 单位存活(target)) {
-    UnitDamageTarget(source, target, amount, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
-  }
+export function 造成暗火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, 伤害形态);
+}
+
+export function 造成普通伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, 伤害形态);
 }
 
 export function 计算攻击最大生命伤害(this: void, source: any, target: any, attackRate: number, maxLifeRate: number): number {

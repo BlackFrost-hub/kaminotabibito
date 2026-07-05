@@ -5,7 +5,6 @@ local jass = require("jass.common")
 ____exports.AddSpecialEffect = jass.AddSpecialEffect
 ____exports.DestroyEffect = jass.DestroyEffect
 ____exports.GetRandomReal = jass.GetRandomReal
-____exports.UnitDamageTarget = jass.UnitDamageTarget
 ____exports["默认落雷特效"] = "Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdl"
 ____exports["默认攻击类型"] = jass.ATTACK_TYPE_NORMAL
 ____exports["默认伤害类型"] = jass.DAMAGE_TYPE_NORMAL

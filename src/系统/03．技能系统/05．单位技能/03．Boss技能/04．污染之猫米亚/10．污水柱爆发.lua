@@ -30,6 +30,8 @@ local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用�
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
 local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_6.YDWETimerDestroyEffectSafe
+local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成AOE技能伤害"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -38,7 +40,6 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
-local UnitDamageTarget = jass.UnitDamageTarget
 local ConvertUnitState = jass.ConvertUnitState
 local EXSetEffectSize = japi.EXSetEffectSize
 local GetUnitStateJapi = japi.GetUnitState
@@ -170,16 +171,15 @@ local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point)
                         if not _____5355_4F4D_6709_6548(target) then
                             goto __continue24
                         end
-                        UnitDamageTarget(
-                            context["Boss单位"],
-                            target,
-                            _____8BA1_7B97_6C61_6C34_67F1_6C34_5751_4F24_5BB3(context["Boss单位"], target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
-                            false,
-                            false,
-                            jass.ATTACK_TYPE_CHAOS,
-                            jass.DAMAGE_TYPE_POISON,
-                            jass.WEAPON_TYPE_WHOKNOWS
-                        )
+                        _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                            ["来源"] = context["Boss单位"],
+                            ["目标"] = target,
+                            ["伤害"] = _____8BA1_7B97_6C61_6C34_67F1_6C34_5751_4F24_5BB3(context["Boss单位"], target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
+                            attackType = jass.ATTACK_TYPE_CHAOS,
+                            ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
+                            weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+                            ["来源类型"] = "Boss技能"
+                        })
                         _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["水坑每秒腐化层数"], "污水柱残留水坑")
                     end
                     ::__continue24::
@@ -215,16 +215,15 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point)
                 ) > radius2 then
                     goto __continue29
                 end
-                UnitDamageTarget(
-                    boss,
-                    target,
-                    _____8BA1_7B97_6C61_6C34_67F1_7206_53D1_4F24_5BB3(boss, target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
-                    false,
-                    false,
-                    jass.ATTACK_TYPE_CHAOS,
-                    jass.DAMAGE_TYPE_POISON,
-                    jass.WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = boss,
+                    ["目标"] = target,
+                    ["伤害"] = _____8BA1_7B97_6C61_6C34_67F1_7206_53D1_4F24_5BB3(boss, target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
+                    attackType = jass.ATTACK_TYPE_CHAOS,
+                    ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
+                    weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = "Boss技能"
+                })
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["命中腐化层数"], "污水柱爆发")
                 _____5F00_59CB_539F_5730_51FB_98DE(target, {
                     ["持续时间"] = config["原地击飞持续秒"],

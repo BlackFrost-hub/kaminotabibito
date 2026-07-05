@@ -46,7 +46,7 @@ let 已初始化 = false;
 
 const 攻击效果延迟伤害队列 = 创建伤害派生批处理队列<延迟伤害记录>("攻击效果延迟伤害", {
   处理: function on攻击效果延迟伤害(this: void, record: 延迟伤害记录): void {
-    配置型攻击效果造成伤害(record.source, record.target, record.amount, record.damageType);
+    配置型攻击效果造成伤害(record.source, record.target, record.amount, record.damageType, { 伤害形态: "单体" });
   },
 });
 

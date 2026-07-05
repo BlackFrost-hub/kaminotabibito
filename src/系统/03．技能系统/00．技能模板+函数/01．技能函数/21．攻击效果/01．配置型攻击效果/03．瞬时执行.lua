@@ -33,7 +33,13 @@ local function _____53D6_6CBB_7597_6982_7387(_____914D_7F6E, ctx)
 end
 ____exports["执行配置型单体伤害"] = function(_____914D_7F6E, ctx)
     local amount = _____8BA1_7B97_914D_7F6E_578B_653B_51FB_6548_679C_4F24_5BB3(_____914D_7F6E, ctx)
-    _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, ctx.target, amount, _____914D_7F6E["伤害类型"])
+    _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+        ctx.source,
+        ctx.target,
+        amount,
+        _____914D_7F6E["伤害类型"],
+        {["伤害形态"] = "单体"}
+    )
 end
 ____exports["执行配置型额外伤害"] = function(_____914D_7F6E, ctx, _____6982_7387_901A_8FC7)
     local damageChance = _____53D6_4F24_5BB3_6982_7387(_____914D_7F6E, ctx)
@@ -42,7 +48,13 @@ ____exports["执行配置型额外伤害"] = function(_____914D_7F6E, ctx, _____
     if (_____914D_7F6E["效果类型"] ~= "资源偷取" or _____8D44_6E90_5077_53D6_540C_65F6_9020_6210_4F24_5BB3) and damageChance > 0 then
         local amount = _____8BA1_7B97_914D_7F6E_578B_653B_51FB_6548_679C_4F24_5BB3(_____914D_7F6E, ctx)
         if amount > 0 and _____6982_7387_901A_8FC7(damageChance, ctx.source) then
-            _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, ctx.target, amount, _____914D_7F6E["伤害类型"])
+            _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+                ctx.source,
+                ctx.target,
+                amount,
+                _____914D_7F6E["伤害类型"],
+                {["伤害形态"] = "单体"}
+            )
         end
     end
     if ((_____914D_7F6E["治疗生命"] or 0) > 0 or (_____914D_7F6E["恢复魔法"] or 0) > 0) and healChance > 0 then
@@ -73,13 +85,25 @@ ____exports["执行配置型范围伤害"] = function(_____914D_7F6E, ctx)
     do
         local i = 0
         while i < #list do
-            _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, list[i + 1], amount, _____914D_7F6E["伤害类型"])
+            _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+                ctx.source,
+                list[i + 1],
+                amount,
+                _____914D_7F6E["伤害类型"],
+                {["伤害形态"] = "AOE"}
+            )
             spreadCount = spreadCount + 1
             i = i + 1
         end
     end
     if spreadCount > 0 and (_____914D_7F6E["扩散成功主目标伤害倍率"] or 0) > 0 then
-        _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, ctx.target, ctx.applied * (_____914D_7F6E["扩散成功主目标伤害倍率"] or 0), _____914D_7F6E["伤害类型"])
+        _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+            ctx.source,
+            ctx.target,
+            ctx.applied * (_____914D_7F6E["扩散成功主目标伤害倍率"] or 0),
+            _____914D_7F6E["伤害类型"],
+            {["伤害形态"] = "单体"}
+        )
     end
 end
 ____exports["执行配置型低血斩杀"] = function(_____914D_7F6E, ctx)
@@ -94,7 +118,13 @@ ____exports["执行配置型低血斩杀"] = function(_____914D_7F6E, ctx)
     if _____914D_7F6E_578B_53D6_5F53_524D_751F_547D(ctx.target) / maxLife > line then
         return
     end
-    _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, ctx.target, maxLife, _____914D_7F6E["伤害类型"])
+    _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+        ctx.source,
+        ctx.target,
+        maxLife,
+        _____914D_7F6E["伤害类型"],
+        {["伤害形态"] = "单体"}
+    )
 end
 ____exports["执行配置型范围击飞"] = function(_____914D_7F6E, ctx)
     local radius = _____914D_7F6E["范围"] or 0
@@ -104,7 +134,13 @@ ____exports["执行配置型范围击飞"] = function(_____914D_7F6E, ctx)
         local i = 0
         while i < #list do
             local unit = list[i + 1]
-            _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(ctx.source, unit, amount, _____914D_7F6E["伤害类型"])
+            _____914D_7F6E_578B_653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+                ctx.source,
+                unit,
+                amount,
+                _____914D_7F6E["伤害类型"],
+                {["伤害形态"] = "AOE"}
+            )
             _____914D_7F6E_578B_65BD_52A0_51FB_98DE(ctx.source, unit, _____914D_7F6E["持续时间"] or 1.5)
             _____914D_7F6E_578B_65BD_52A0_7729_6655(ctx.source, unit, _____914D_7F6E["持续时间"] or 1.5)
             i = i + 1

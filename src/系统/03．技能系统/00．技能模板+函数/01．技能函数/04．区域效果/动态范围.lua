@@ -51,7 +51,6 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
-local UnitDamageTarget = jass.UnitDamageTarget
 local EXSetEffectZ = japi.EXSetEffectZ
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
@@ -64,11 +63,13 @@ local getUnitsInRange = ____require_result_1.getUnitsInRange
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 local isUnitEnemy = ____require_result_2.isUnitEnemy
 local isUnitAlly = ____require_result_2.isUnitAlly
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
-local _____521B_5EFA_8584_5706_5F62_63D0_793A_5708_7279_6548 = ____require_result_3["创建薄圆形提示圈特效"]
-local _____7ACB_5373_9500_6BC1_63D0_793A_5708_7279_6548 = ____require_result_3["立即销毁提示圈特效"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_4["创建技能提示圈"]
+local ____require_result_3 = require("系统.04．伤害系统.07．持续伤害系统")
+local _____9020_6210_6301_7EED_4F24_5BB3 = ____require_result_3["造成持续伤害"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
+local _____521B_5EFA_8584_5706_5F62_63D0_793A_5708_7279_6548 = ____require_result_4["创建薄圆形提示圈特效"]
+local _____7ACB_5373_9500_6BC1_63D0_793A_5708_7279_6548 = ____require_result_4["立即销毁提示圈特效"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_5["创建技能提示圈"]
 local _____52A8_6001_8303_56F4_5B9E_73B0 = __TS__Class()
 _____52A8_6001_8303_56F4_5B9E_73B0.name = "动态范围实现"
 function _____52A8_6001_8303_56F4_5B9E_73B0.prototype.____constructor(self, _____53C2_6570)
@@ -140,25 +141,30 @@ _____52A8_6001_8303_56F4_5B9E_73B0.prototype["执行检测"] = function(self)
     end
     if (self["参数"]["伤害值"] or 0) > 0 and ATTACK_TYPE_NORMAL then
         for ____, _____5355_4F4D in ipairs(_____76EE_6807_5355_4F4D) do
-            local ____self__53C2_6570__6240_6709_8005_5 = self["参数"]["所有者"]
-            if ____self__53C2_6570__6240_6709_8005_5 == nil then
-                ____self__53C2_6570__6240_6709_8005_5 = _____5355_4F4D
+            local ____9020_6210_6301_7EED_4F24_5BB3_9 = _____9020_6210_6301_7EED_4F24_5BB3
+            local ____self__53C2_6570__6240_6709_8005_6 = self["参数"]["所有者"]
+            if ____self__53C2_6570__6240_6709_8005_6 == nil then
+                ____self__53C2_6570__6240_6709_8005_6 = _____5355_4F4D
             end
-            UnitDamageTarget(
-                ____self__53C2_6570__6240_6709_8005_5,
+            local ____temp_8 = self["参数"]["伤害值"] or 0
+            local ____self__53C2_6570__4F24_5BB3_7C7B_578B_7 = self["参数"]["伤害类型"]
+            if ____self__53C2_6570__4F24_5BB3_7C7B_578B_7 == nil then
+                ____self__53C2_6570__4F24_5BB3_7C7B_578B_7 = DAMAGE_TYPE_NORMAL
+            end
+            ____9020_6210_6301_7EED_4F24_5BB3_9(
+                ____self__53C2_6570__6240_6709_8005_6,
                 _____5355_4F4D,
-                self["参数"]["伤害值"] or 0,
-                false,
+                ____temp_8,
+                ____self__53C2_6570__4F24_5BB3_7C7B_578B_7,
                 false,
                 ATTACK_TYPE_NORMAL,
-                DAMAGE_TYPE_NORMAL,
                 nil
             )
         end
     end
-    local ____opt_6 = self["参数"]["on周期"]
-    if ____opt_6 ~= nil then
-        ____opt_6(_____76EE_6807_5355_4F4D, _____5F53_524D_534A_5F84)
+    local ____opt_10 = self["参数"]["on周期"]
+    if ____opt_10 ~= nil then
+        ____opt_10(_____76EE_6807_5355_4F4D, _____5F53_524D_534A_5F84)
     end
 end
 _____52A8_6001_8303_56F4_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -206,23 +212,23 @@ _____52A8_6001_8303_56F4_5B9E_73B0.prototype["创建当前段提示特效"] = fu
     local _____5269_4F59_6301_7EED_65F6_95F4_79D2 = _____5269_4F59_6301_7EED_65F6_95F4_6BEB_79D2 / 1000
     if self["参数"]["提示圈"] ~= nil then
         local _____63D0_793A_5708_914D_7F6E = self["参数"]["提示圈"]
-        local ____521B_5EFA_6280_80FD_63D0_793A_5708_14 = _____521B_5EFA_6280_80FD_63D0_793A_5708
-        local ____temp_9 = _____63D0_793A_5708_914D_7F6E["类型"] or "圆形"
-        local ____temp_10 = _____63D0_793A_5708_914D_7F6E.X or self["当前X"]
-        local ____temp_11 = _____63D0_793A_5708_914D_7F6E.Y or self["当前Y"]
-        local ____temp_12 = _____63D0_793A_5708_914D_7F6E["半径"] or _____5F53_524D_6BB5_76EE_6807_534A_5F84
-        local ____temp_13 = _____63D0_793A_5708_914D_7F6E["持续时间"] or _____5269_4F59_6301_7EED_65F6_95F4_79D2
-        local ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_8 = _____63D0_793A_5708_914D_7F6E["来源单位"]
-        if ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_8 == nil then
-            ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_8 = self["参数"]["所有者"]
+        local ____521B_5EFA_6280_80FD_63D0_793A_5708_18 = _____521B_5EFA_6280_80FD_63D0_793A_5708
+        local ____temp_13 = _____63D0_793A_5708_914D_7F6E["类型"] or "圆形"
+        local ____temp_14 = _____63D0_793A_5708_914D_7F6E.X or self["当前X"]
+        local ____temp_15 = _____63D0_793A_5708_914D_7F6E.Y or self["当前Y"]
+        local ____temp_16 = _____63D0_793A_5708_914D_7F6E["半径"] or _____5F53_524D_6BB5_76EE_6807_534A_5F84
+        local ____temp_17 = _____63D0_793A_5708_914D_7F6E["持续时间"] or _____5269_4F59_6301_7EED_65F6_95F4_79D2
+        local ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_12 = _____63D0_793A_5708_914D_7F6E["来源单位"]
+        if ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_12 == nil then
+            ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_12 = self["参数"]["所有者"]
         end
-        ____521B_5EFA_6280_80FD_63D0_793A_5708_14(__TS__ObjectAssign({}, _____63D0_793A_5708_914D_7F6E, {
-            ["类型"] = ____temp_9,
-            X = ____temp_10,
-            Y = ____temp_11,
-            ["半径"] = ____temp_12,
-            ["持续时间"] = ____temp_13,
-            ["来源单位"] = ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_8
+        ____521B_5EFA_6280_80FD_63D0_793A_5708_18(__TS__ObjectAssign({}, _____63D0_793A_5708_914D_7F6E, {
+            ["类型"] = ____temp_13,
+            X = ____temp_14,
+            Y = ____temp_15,
+            ["半径"] = ____temp_16,
+            ["持续时间"] = ____temp_17,
+            ["来源单位"] = ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_12
         }))
         return
     end
@@ -252,9 +258,9 @@ _____52A8_6001_8303_56F4_5B9E_73B0.prototype["销毁"] = function(self)
         self["特效句柄"] = nil
     end
     self["销毁当前段提示特效"](self)
-    local ____opt_15 = self["参数"]["on销毁"]
-    if ____opt_15 ~= nil then
-        ____opt_15()
+    local ____opt_19 = self["参数"]["on销毁"]
+    if ____opt_19 ~= nil then
+        ____opt_19()
     end
 end
 __TS__SetDescriptor(

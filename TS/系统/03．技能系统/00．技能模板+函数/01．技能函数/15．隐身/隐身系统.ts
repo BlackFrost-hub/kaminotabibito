@@ -7,6 +7,8 @@
  * 2. 隐身单位释放技能 → 破隐（无额外伤害）
  */
 
+import type { 技能伤害来源类型, 技能伤害形态, 装备技能伤害类型 } from "../../../../04．伤害系统/08．技能伤害系统";
+
 const jass = require("jass.common") as any;
 
 const fastBuff = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统") as {
@@ -34,13 +36,15 @@ const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核�
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
   removeDelayedCallback: (this: void, id: number) => void;
 };
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -49,12 +53,25 @@ const 隐身BuffID = "C005";
 const 隐身Buff类型 = 4;
 const 模块名 = "隐身系统";
 
+export interface 隐身技能伤害标记 {
+  来源类型?: 技能伤害来源类型;
+  装备技能类型?: 装备技能伤害类型;
+  伤害形态?: 技能伤害形态;
+  物品ID?: number;
+  物品实例?: any;
+  技能ID?: number;
+  技能实例ID?: number;
+  标签?: string;
+  参与技能伤害加成?: boolean;
+}
+
 export interface 隐身参数 {
   持续时间: number;
   破隐固定额外伤害?: number;
   破隐伤害倍率?: number;
   破隐额外暗属性伤害倍率?: number;
   来源单位?: any;
+  技能伤害标记?: 隐身技能伤害标记;
 }
 
 interface 隐身记录 {
@@ -62,6 +79,7 @@ interface 隐身记录 {
   破隐固定额外伤害: number;
   破隐伤害倍率: number;
   破隐额外暗属性伤害倍率: number;
+  技能伤害标记?: 隐身技能伤害标记;
   延迟回调ID: number;
 }
 
@@ -69,12 +87,14 @@ interface 破隐额外暗属性记录 {
   来源: any;
   目标: any;
   倍率: number;
+  技能伤害标记?: 隐身技能伤害标记;
 }
 
 interface 待处理破隐额外暗属性伤害 {
   来源: any;
   目标: any;
   伤害: number;
+  技能伤害标记?: 隐身技能伤害标记;
 }
 
 const 隐身映射表: Record<number, 隐身记录 | undefined> = {};
@@ -102,7 +122,24 @@ function 执行待处理破隐额外暗属性伤害(this: void): void {
   while (待处理破隐额外暗属性伤害队列.length > 0) {
     const 记录 = 待处理破隐额外暗属性伤害队列.shift();
     if (记录 == null || !(记录.伤害 > 0)) continue;
-    UnitDamageTarget(记录.来源, 记录.目标, 记录.伤害, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS);
+    const 标记 = 记录.技能伤害标记;
+    造成技能伤害({
+      来源: 记录.来源,
+      目标: 记录.目标,
+      伤害: 记录.伤害,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: 标记?.来源类型 ?? 标记?.装备技能类型 ?? "其他",
+      装备技能类型: 标记?.装备技能类型,
+      伤害形态: 标记?.伤害形态 ?? "单体",
+      物品ID: 标记?.物品ID,
+      物品实例: 标记?.物品实例,
+      技能ID: 标记?.技能ID,
+      技能实例ID: 标记?.技能实例ID,
+      标签: 标记?.标签,
+      参与技能伤害加成: 标记?.参与技能伤害加成,
+    });
   }
 }
 
@@ -122,6 +159,7 @@ function on破隐最终伤害(this: void, target: any, attacker: any, applied: n
     来源: 记录.来源,
     目标: 记录.目标,
     伤害: 额外暗属性伤害,
+    技能伤害标记: 记录.技能伤害标记,
   });
   addDelayedCallback(0, 执行待处理破隐额外暗属性伤害);
 }
@@ -154,6 +192,7 @@ function on破隐伤害修正(context: any): number {
       来源: attacker,
       目标: target,
       倍率: 记录.破隐额外暗属性伤害倍率,
+      技能伤害标记: 记录.技能伤害标记,
     };
   }
 
@@ -204,6 +243,7 @@ export function 施加隐身(单位: any, 参数: 隐身参数): number {
     破隐固定额外伤害: 参数.破隐固定额外伤害 ?? 0,
     破隐伤害倍率: 参数.破隐伤害倍率 ?? 1,
     破隐额外暗属性伤害倍率: 参数.破隐额外暗属性伤害倍率 ?? 0,
+    技能伤害标记: 参数.技能伤害标记,
     延迟回调ID,
   };
 

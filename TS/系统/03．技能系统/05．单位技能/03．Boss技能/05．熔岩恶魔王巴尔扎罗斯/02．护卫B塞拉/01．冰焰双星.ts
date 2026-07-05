@@ -18,17 +18,15 @@ const {  巴尔扎罗斯技能数值配置,
   GetUnitY,
   GetUnitState,
   GetUnitFlyHeight,
-  UnitDamageTarget,
   SquareRoot,
   UNIT_STATE_MAX_LIFE,
-  ATTACK_TYPE_CHAOS,
   DAMAGE_TYPE_FIRE,
   DAMAGE_TYPE_COLD,
-  WEAPON_TYPE_WHOKNOWS,
   单位有效,
   取方向角,
   取形态技能倍率,
   创建塞拉点特效,
+  造成塞拉Boss技能伤害,
   弱追踪弹体状态表,
 } = 塞拉公共;
 
@@ -66,10 +64,10 @@ function 结算冰焰AOE(this: void, context: 巴尔扎罗斯运行时上下文,
     const unit = targets[i];
     if (!单位有效(unit) || !isUnitEnemy(unit, sera)) continue;
     if (类型 === "冰霜") {
-      UnitDamageTarget(sera, unit, 计算冰球伤害(context, unit), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_COLD, WEAPON_TYPE_WHOKNOWS);
+      造成塞拉Boss技能伤害(sera, unit, 计算冰球伤害(context, unit), DAMAGE_TYPE_COLD, "AOE");
       施加快速减速Buff(sera, unit, config.冰球减速比例, config.冰球减速比例, config.冰球减速持续秒);
     } else {
-      UnitDamageTarget(sera, unit, 计算火球伤害(context, unit), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+      造成塞拉Boss技能伤害(sera, unit, 计算火球伤害(context, unit), DAMAGE_TYPE_FIRE, "AOE");
       施加巴尔扎罗斯灼热(unit, config.火球灼热层数);
     }
   }
@@ -191,4 +189,3 @@ export function 释放冰焰双星(this: void, context: 巴尔扎罗斯运行时
     },
   });
 }
-

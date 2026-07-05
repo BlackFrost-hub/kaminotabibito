@@ -33,7 +33,7 @@ export interface 配置型概率函数 {
 
 export function 执行配置型单体伤害(this: void, 配置: 配置型攻击效果配置, ctx: 配置型攻击效果上下文): void {
   const amount = 计算配置型攻击效果伤害(配置, ctx);
-  配置型攻击效果造成伤害(ctx.source, ctx.target, amount, 配置.伤害类型);
+  配置型攻击效果造成伤害(ctx.source, ctx.target, amount, 配置.伤害类型, { 伤害形态: "单体" });
 }
 
 export function 执行配置型额外伤害(this: void, 配置: 配置型攻击效果配置, ctx: 配置型攻击效果上下文, 概率通过: 配置型概率函数): void {
@@ -43,7 +43,7 @@ export function 执行配置型额外伤害(this: void, 配置: 配置型攻击�
   if ((配置.效果类型 !== "资源偷取" || 资源偷取同时造成伤害) && damageChance > 0) {
     const amount = 计算配置型攻击效果伤害(配置, ctx);
     if (amount > 0 && 概率通过(damageChance, ctx.source)) {
-      配置型攻击效果造成伤害(ctx.source, ctx.target, amount, 配置.伤害类型);
+      配置型攻击效果造成伤害(ctx.source, ctx.target, amount, 配置.伤害类型, { 伤害形态: "单体" });
     }
   }
   if (((配置.治疗生命 ?? 0) > 0 || (配置.恢复魔法 ?? 0) > 0) && healChance > 0) {
@@ -71,11 +71,11 @@ export function 执行配置型范围伤害(this: void, 配置: 配置型攻击�
   const amount = 计算配置型攻击效果伤害(配置, ctx);
   let spreadCount = 0;
   for (let i = 0; i < list.length; i++) {
-    配置型攻击效果造成伤害(ctx.source, list[i], amount, 配置.伤害类型);
+    配置型攻击效果造成伤害(ctx.source, list[i], amount, 配置.伤害类型, { 伤害形态: "AOE" });
     spreadCount++;
   }
   if (spreadCount > 0 && (配置.扩散成功主目标伤害倍率 ?? 0) > 0) {
-    配置型攻击效果造成伤害(ctx.source, ctx.target, ctx.applied * (配置.扩散成功主目标伤害倍率 ?? 0), 配置.伤害类型);
+    配置型攻击效果造成伤害(ctx.source, ctx.target, ctx.applied * (配置.扩散成功主目标伤害倍率 ?? 0), 配置.伤害类型, { 伤害形态: "单体" });
   }
 }
 
@@ -85,7 +85,7 @@ export function 执行配置型低血斩杀(this: void, 配置: 配置型攻击�
   const line = 配置型单位是精英目标(ctx.target) ? (配置.精英斩杀线 ?? 配置.普通斩杀线 ?? 0) : (配置.普通斩杀线 ?? 0);
   if (!(line > 0)) return;
   if (配置型取当前生命(ctx.target) / maxLife > line) return;
-  配置型攻击效果造成伤害(ctx.source, ctx.target, maxLife, 配置.伤害类型);
+  配置型攻击效果造成伤害(ctx.source, ctx.target, maxLife, 配置.伤害类型, { 伤害形态: "单体" });
 }
 
 export function 执行配置型范围击飞(this: void, 配置: 配置型攻击效果配置, ctx: 配置型攻击效果上下文): void {
@@ -94,7 +94,7 @@ export function 执行配置型范围击飞(this: void, 配置: 配置型攻击�
   const amount = 计算配置型攻击效果伤害(配置, ctx);
   for (let i = 0; i < list.length; i++) {
     const unit = list[i];
-    配置型攻击效果造成伤害(ctx.source, unit, amount, 配置.伤害类型);
+    配置型攻击效果造成伤害(ctx.source, unit, amount, 配置.伤害类型, { 伤害形态: "AOE" });
     配置型施加击飞(ctx.source, unit, 配置.持续时间 ?? 1.5);
     配置型施加眩晕(ctx.source, unit, 配置.持续时间 ?? 1.5);
   }

@@ -33,12 +33,15 @@ const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.
   getServerTime: (this: void) => number;
 };
 
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
+
 const jass = require("jass.common") as any;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, timeScale: number) => void;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -135,7 +138,17 @@ function 尝试安排近战反弹(this: void, boss: any, attacker: any): void {
   近战反弹冷却表[attackerId] = now + config.近战反弹冷却秒 * 1000;
   addDelayedCallback(0, function 巴尔扎罗斯熔岩护盾反弹(this: void): void {
     if (!单位有效(boss) || !单位有效(attacker)) return;
-    UnitDamageTarget(boss, attacker, 计算反弹伤害(boss, attacker), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+    造成单体技能伤害({
+      来源: boss,
+      目标: attacker,
+      伤害: 计算反弹伤害(boss, attacker),
+      attack: false,
+      ranged: true,
+      attackType: ATTACK_TYPE_CHAOS,
+      伤害类型: DAMAGE_TYPE_FIRE,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
   });
 }
 

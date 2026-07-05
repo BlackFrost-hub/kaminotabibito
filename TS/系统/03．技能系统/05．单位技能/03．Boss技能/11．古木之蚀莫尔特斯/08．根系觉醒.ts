@@ -5,6 +5,9 @@ import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置"
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效 } from "./16．公共工具";
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
@@ -13,7 +16,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const ShowUnit = jass.ShowUnit as (unit: any, show: boolean) => void;
 const PauseUnit = jass.PauseUnit as (unit: any, pause: boolean) => void;
@@ -66,7 +68,17 @@ function 根系觉醒失败爆发(this: void, context: 莫尔特斯运行时上�
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
-    UnitDamageTarget(boss, hero, damage, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      来源: boss,
+      目标: hero,
+      伤害: damage,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_PLANT,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
     增加玩家腐败值(context, hero, cfg.全屏爆发腐败值);
   }
 }

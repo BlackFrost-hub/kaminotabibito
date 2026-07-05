@@ -14,14 +14,15 @@ const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
+
+import type { 技能伤害来源类型 } from "../../../../04．伤害系统/08．技能伤害系统";
+
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const {
   addPeriodicCallback,
@@ -69,6 +70,14 @@ export interface 动态扇形参数 {
   影响目标?: "敌方" | "友方" | "全部";
   所有者?: any;
   伤害值?: number;
+  伤害类型?: any;
+  攻击类型?: any;
+  武器类型?: any;
+  来源类型?: 技能伤害来源类型;
+  技能ID?: number;
+  技能实例ID?: number;
+  技能标签?: string;
+  参与技能伤害加成?: boolean;
   只命中新增范围?: boolean;
   允许重复命中?: boolean;
   显示提示特效?: boolean;
@@ -236,16 +245,20 @@ class 动态扇形实现 implements 动态扇形实例 {
       this.命中记录[单位ID] = true;
 
       if ((this.参数.伤害值 ?? 0) > 0 && ATTACK_TYPE_NORMAL) {
-        UnitDamageTarget(
-          this.参数.所有者 ?? 单位,
-          单位,
-          this.参数.伤害值 ?? 0,
-          false,
-          false,
-          ATTACK_TYPE_NORMAL,
-          DAMAGE_TYPE_NORMAL,
-          null
-        );
+        造成AOE技能伤害({
+          来源: this.参数.所有者 ?? 单位,
+          目标: 单位,
+          伤害: this.参数.伤害值 ?? 0,
+          伤害类型: this.参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
+          ranged: false,
+          attackType: this.参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
+          weaponType: this.参数.武器类型,
+          来源类型: this.参数.来源类型 ?? "单位技能",
+          技能ID: this.参数.技能ID,
+          技能实例ID: this.参数.技能实例ID,
+          标签: this.参数.技能标签,
+          参与技能伤害加成: this.参数.参与技能伤害加成,
+        });
       }
 
       this.参数.on命中?.(单位, 当前半径);

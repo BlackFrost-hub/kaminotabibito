@@ -4059,7 +4059,8 @@ ____exports.items.I0FB = {
     int = 45,
     magicDmg = 0.22,
     darkDmg = 0.16,
-    magicPierce = 0.16
+    magicPierce = 0.16,
+    dotDmg = 0.16
 }
 ____exports.items.I0FC = {
     type = "道具/戒指/饰品",

@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 单位存活 } from "./12．物品与单位";
+import { 造成装备技能伤害 } from "../../../../04．伤害系统/08．技能伤害系统";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -51,7 +52,6 @@ const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) 
 const SetUnitState = jass.SetUnitState as (whichUnit: any, whichUnitState: any, newVal: number) => void;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const IsUnitAlly = jass.IsUnitAlly as (whichUnit: any, whichPlayer: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const GetHeroStr = jass.GetHeroStr as (whichHero: any, includeBonuses: boolean) => number;
 const GetHeroAgi = jass.GetHeroAgi as (whichHero: any, includeBonuses: boolean) => number;
 const GetHeroInt = jass.GetHeroInt as (whichHero: any, includeBonuses: boolean) => number;
@@ -176,27 +176,27 @@ export function 调整魔法(this: void, 单位: any, 数值: number): void {
 
 export function 造成强化伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
   if (!单位存活(来源) || !单位存活(目标) || !(伤害 > 0)) return;
-  UnitDamageTarget(来源, 目标, 伤害, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS);
+  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_ENHANCED, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
 }
 
 export function 造成火焰伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
   if (!单位存活(来源) || !单位存活(目标) || !(伤害 > 0)) return;
-  UnitDamageTarget(来源, 目标, 伤害, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_FIRE, ranged: true, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
 }
 
 export function 造成暗影伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
   if (!单位存活(来源) || !单位存活(目标) || !(伤害 > 0)) return;
-  UnitDamageTarget(来源, 目标, 伤害, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS);
+  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_SHADOW_STRIKE, ranged: true, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
 }
 
 export function 造成普通伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
   if (!单位存活(来源) || !单位存活(目标) || !(伤害 > 0)) return;
-  UnitDamageTarget(来源, 目标, 伤害, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_NORMAL, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
 }
 
 export function 造成精神自伤(this: void, 单位: any, 伤害: number): void {
   if (!单位存活(单位) || !(伤害 > 0)) return;
-  UnitDamageTarget(单位, 单位, 伤害, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, WEAPON_TYPE_WHOKNOWS);
+  造成装备技能伤害({ 来源: 单位, 目标: 单位, 伤害, 伤害类型: DAMAGE_TYPE_MIND, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
 }
 
 export function 执行治疗(this: void, 来源: any, 目标: any, 生命: number, 魔法: number = 0): void {

@@ -121,7 +121,6 @@ local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
 CosBJ = ____require_result_0.CosBJ
 SinBJ = ____require_result_0.SinBJ
-local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -132,6 +131,8 @@ getServerTime = ____require_result_1.getServerTime
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 local isUnitEnemy = ____require_result_2.isUnitEnemy
 local isUnitAlly = ____require_result_2.isUnitAlly
+local ____require_result_3 = require("系统.04．伤害系统.07．持续伤害系统")
+local _____9020_6210_6301_7EED_4F24_5BB3 = ____require_result_3["造成持续伤害"]
 local _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0 = __TS__Class()
 _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0.name = "地面路径持续区域实现"
 function _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0.prototype.____constructor(self, _____5B9E_4F8BID, _____53C2_6570)
@@ -202,15 +203,16 @@ _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0.prototype["创建下一�
         ["显示提示圈"] = self["参数"]["显示提示圈"],
         ["提示圈"] = self["参数"]["提示圈"],
         ["周期伤害"] = self["参数"]["伤害模式"] == "整体矩形" and 0 or self["参数"]["周期伤害"],
+        ["周期伤害类型"] = self["参数"]["周期伤害类型"],
         ["周期伤害去重组"] = self["实例ID"],
         ["周期伤害去重间隔"] = self["参数"]["检测间隔"]
     })
-    local ____self__533A_57DF_5B9E_4F8B_5217_8868_3 = self["区域实例列表"]
-    ____self__533A_57DF_5B9E_4F8B_5217_8868_3[#____self__533A_57DF_5B9E_4F8B_5217_8868_3 + 1] = _____533A_57DF_5B9E_4F8B
+    local ____self__533A_57DF_5B9E_4F8B_5217_8868_4 = self["区域实例列表"]
+    ____self__533A_57DF_5B9E_4F8B_5217_8868_4[#____self__533A_57DF_5B9E_4F8B_5217_8868_4 + 1] = _____533A_57DF_5B9E_4F8B
     self["下一个段索引"] = self["下一个段索引"] + 1
-    local ____opt_4 = self["参数"]["on单段创建"]
-    if ____opt_4 ~= nil then
-        ____opt_4(_____6BB5_7D22_5F15 + 1, _____8DEF_5F84_6BB5.X, _____8DEF_5F84_6BB5.Y)
+    local ____opt_5 = self["参数"]["on单段创建"]
+    if ____opt_5 ~= nil then
+        ____opt_5(_____6BB5_7D22_5F15 + 1, _____8DEF_5F84_6BB5.X, _____8DEF_5F84_6BB5.Y)
     end
     if self["下一个段索引"] >= #self["路径段列表"] then
         self["停止铺设任务"](self)
@@ -228,9 +230,9 @@ _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0.prototype["销毁"] = fun
     end
     _____6E05_7406_533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_7EC4(self["实例ID"])
     __TS__Delete(_____6D3B_8DC3_5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_4F8B, self["实例ID"])
-    local ____opt_6 = self["参数"]["on销毁"]
-    if ____opt_6 ~= nil then
-        ____opt_6(self["实例ID"])
+    local ____opt_7 = self["参数"]["on销毁"]
+    if ____opt_7 ~= nil then
+        ____opt_7(self["实例ID"])
     end
 end
 _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0.prototype["整体伤害系统Tick"] = function(self, _____5F53_524D_65F6_95F4_6BEB_79D2)
@@ -270,18 +272,23 @@ _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0.prototype["整体伤害�
             if not self["整体伤害单位筛选"](self, _____5355_4F4D) then
                 goto __continue25
             end
-            local ____self__53C2_6570__6240_6709_8005_8 = self["参数"]["所有者"]
-            if ____self__53C2_6570__6240_6709_8005_8 == nil then
-                ____self__53C2_6570__6240_6709_8005_8 = _____5355_4F4D
+            local ____9020_6210_6301_7EED_4F24_5BB3_12 = _____9020_6210_6301_7EED_4F24_5BB3
+            local ____self__53C2_6570__6240_6709_8005_9 = self["参数"]["所有者"]
+            if ____self__53C2_6570__6240_6709_8005_9 == nil then
+                ____self__53C2_6570__6240_6709_8005_9 = _____5355_4F4D
             end
-            UnitDamageTarget(
-                ____self__53C2_6570__6240_6709_8005_8,
+            local ____temp_11 = self["参数"]["周期伤害"] or 0
+            local ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_10 = self["参数"]["周期伤害类型"]
+            if ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_10 == nil then
+                ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_10 = DAMAGE_TYPE_NORMAL
+            end
+            ____9020_6210_6301_7EED_4F24_5BB3_12(
+                ____self__53C2_6570__6240_6709_8005_9,
                 _____5355_4F4D,
-                self["参数"]["周期伤害"] or 0,
-                false,
+                ____temp_11,
+                ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_10,
                 false,
                 ATTACK_TYPE_NORMAL,
-                DAMAGE_TYPE_NORMAL,
                 WEAPON_TYPE_WHOKNOWS
             )
         end
@@ -309,9 +316,9 @@ _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0.prototype["处理全部�
         return
     end
     self["已全部铺设"] = true
-    local ____opt_9 = self["参数"]["on全部铺设完成"]
-    if ____opt_9 ~= nil then
-        ____opt_9(self["实例ID"])
+    local ____opt_13 = self["参数"]["on全部铺设完成"]
+    if ____opt_13 ~= nil then
+        ____opt_13(self["实例ID"])
     end
 end
 local _____9ED8_8BA4_706B_7130_8DEF_5F84_7279_6548 = "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdl"

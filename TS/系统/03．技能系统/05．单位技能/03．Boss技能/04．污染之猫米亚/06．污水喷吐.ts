@@ -24,6 +24,9 @@ const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09�
 const { 创建持续危险区域 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域") as {
   创建持续危险区域: (this: void, 参数: any) => any;
 };
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -35,7 +38,6 @@ const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
@@ -137,7 +139,16 @@ export function 释放米亚污水喷吐(this: void, context: 米亚运行时上
   for (let i = 0; i < targets.length; i++) {
     const target = targets[i];
     if (!单位有效(target) || !点在前方扇形内(boss, target, config.喷吐距离, config.喷吐半角)) continue;
-    UnitDamageTarget(boss, target, 计算污水喷吐直接伤害(boss, target) * 取米亚污染标记伤害倍率(context, target) * 取米亚平台超载伤害倍率(target), false, false, jass.ATTACK_TYPE_CHAOS, jass.DAMAGE_TYPE_POISON, jass.WEAPON_TYPE_WHOKNOWS);
+    造成AOE技能伤害({
+      技能ID: 污水喷吐技能ID,
+      来源: boss,
+      目标: target,
+      伤害: 计算污水喷吐直接伤害(boss, target) * 取米亚污染标记伤害倍率(context, target) * 取米亚平台超载伤害倍率(target),
+      attackType: jass.ATTACK_TYPE_CHAOS,
+      伤害类型: jass.DAMAGE_TYPE_POISON,
+      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
     添加米亚腐化感染(context, target, config.直接腐化层数, "污水喷吐");
   }
 }

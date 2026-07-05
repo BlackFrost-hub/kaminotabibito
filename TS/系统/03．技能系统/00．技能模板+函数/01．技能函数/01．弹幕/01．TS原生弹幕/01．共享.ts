@@ -39,11 +39,6 @@ export const UnitAddAbility = jass.UnitAddAbility as (unit: any, abilityId: numb
 export const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
 export const UnitAddType = jass.UnitAddType as (unit: any, unitType: any) => boolean;
 export const UnitRemoveType = jass.UnitRemoveType as (unit: any, unitType: any) => boolean;
-export const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 
 export const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 export const CosBJ = (require("lib.扩展函数.BJ函数.12．数学函数") as {

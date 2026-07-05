@@ -13,11 +13,6 @@ const japi = require("jass.japi") as any;
 
 const AddSpecialEffect = jass.AddSpecialEffect as (modelPath: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  source: any, target: any, amount: number,
-  attack: boolean, ranged: boolean,
-  attackType: any, damageType: any, weaponType: any
-) => boolean;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
@@ -40,6 +35,9 @@ const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
+const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
+  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any) => boolean;
+};
 
 const { 创建薄圆形提示圈特效, 立即销毁提示圈特效 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
   创建薄圆形提示圈特效: (this: void, x: number, y: number, r: number, speed?: number, 来源单位?: any) => any;
@@ -60,6 +58,7 @@ export interface 动态范围参数 {
   影响目标?: "敌方" | "友方" | "全部";
   所有者?: any;
   伤害值?: number;
+  伤害类型?: any;
   模型路径?: string;
   特效高度?: number;
   提示圈?: 技能提示圈配置 | false;
@@ -183,14 +182,13 @@ class 动态范围实现 implements 动态范围实例 {
 
     if ((this.参数.伤害值 ?? 0) > 0 && ATTACK_TYPE_NORMAL) {
       for (const 单位 of 目标单位) {
-        UnitDamageTarget(
+        造成持续伤害(
           this.参数.所有者 ?? 单位,
           单位,
           this.参数.伤害值 ?? 0,
-          false,
+          this.参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
           false,
           ATTACK_TYPE_NORMAL,
-          DAMAGE_TYPE_NORMAL,
           null
         );
       }

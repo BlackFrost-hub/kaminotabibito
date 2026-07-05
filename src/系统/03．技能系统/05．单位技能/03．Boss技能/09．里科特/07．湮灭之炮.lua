@@ -18,6 +18,8 @@ local _____6781_5750_6807Y = ____13_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____13_FF0E_516C_5171_5DE5_5177["点到线段距离平方"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -31,27 +33,26 @@ local UnitAddAbility = jass.UnitAddAbility
 local SetUnitPathing = jass.SetUnitPathing
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
-local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
-local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_4.registerManualBuff
-local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.07．里科特")
-local _____91CC_79D1_7279BuffID = ____require_result_5["里科特BuffID"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
+local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local addPeriodicCallback = ____require_result_2.addPeriodicCallback
+local removePeriodicCallback = ____require_result_2.removePeriodicCallback
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.07．里科特")
+local _____91CC_79D1_7279BuffID = ____require_result_6["里科特BuffID"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
 local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6E6E_706D_4E4B_70AE_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]["技能槽位"])
 local _____8757_866B_6280_80FDID = stringToFourCC("Aloc")
@@ -138,16 +139,17 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_70AE_4E00_8DF3(data)
                     data["终点Y"]
                 )
                 if dist2 <= radius2 then
-                    UnitDamageTarget(
-                        boss,
-                        hero,
-                        damage,
-                        false,
-                        false,
-                        ATTACK_TYPE_MAGIC,
-                        DAMAGE_TYPE_MAGIC,
-                        WEAPON_TYPE_WHOKNOWS
-                    )
+                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                        ["来源"] = boss,
+                        ["目标"] = hero,
+                        ["伤害"] = damage,
+                        attack = false,
+                        ranged = false,
+                        attackType = ATTACK_TYPE_MAGIC,
+                        ["伤害类型"] = DAMAGE_TYPE_MAGIC,
+                        weaponType = WEAPON_TYPE_WHOKNOWS,
+                        ["来源类型"] = "Boss技能"
+                    })
                 end
             end
             ::__continue12::
@@ -164,8 +166,8 @@ local function _____5F00_59CB_6E6E_706D_6295_5F71_70AE_51FB(data)
             _____7ED3_7B97_6E6E_706D_4E4B_70AE_4E00_8DF3(data)
         end
     )
-    local ____self_7 = data.context["清理"]
-    ____self_7["登记周期回调"](____self_7, "里科特-湮灭之炮周期", data["周期ID"])
+    local ____self_8 = data.context["清理"]
+    ____self_8["登记周期回调"](____self_8, "里科特-湮灭之炮周期", data["周期ID"])
 end
 local function _____8C03_5EA6_5355_4E2A_6E6E_706D_6295_5F71(context, target)
     local boss = context["Boss单位"]
@@ -209,8 +211,8 @@ local function _____8C03_5EA6_5355_4E2A_6E6E_706D_6295_5F71(context, target)
         ["周期ID"] = 0
     }
     if projection ~= nil and projection ~= 0 then
-        local ____self_8 = context["清理"]
-        ____self_8["登记单位"](____self_8, "里科特-湮灭投影", projection)
+        local ____self_9 = context["清理"]
+        ____self_9["登记单位"](____self_9, "里科特-湮灭投影", projection)
     end
     registerManualBuff(
         target,
@@ -236,8 +238,8 @@ local function _____8C03_5EA6_5355_4E2A_6E6E_706D_6295_5F71(context, target)
             _____5F00_59CB_6E6E_706D_6295_5F71_70AE_51FB(data)
         end
     )
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "里科特-湮灭投影开炮", id)
+    local ____self_10 = context["清理"]
+    ____self_10["登记延迟回调"](____self_10, "里科特-湮灭投影开炮", id)
 end
 local function _____8C03_5EA6P3_7729_6655_70AE(context)
     if _____5237_65B0_91CC_79D1_7279_9636_6BB5(context) < 3 then
@@ -287,8 +289,8 @@ local function _____8C03_5EA6P3_7729_6655_70AE(context)
             end
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记延迟回调"](____self_10, "里科特-P3湮灭眩晕炮", id)
+    local ____self_11 = context["清理"]
+    ____self_11["登记延迟回调"](____self_11, "里科特-P3湮灭眩晕炮", id)
 end
 ____exports["释放里科特湮灭之炮"] = function(context)
     local boss = context["Boss单位"]

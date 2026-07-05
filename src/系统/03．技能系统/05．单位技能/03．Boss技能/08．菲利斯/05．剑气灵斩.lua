@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_76EE_6807, _____8865_5145Boss_9B54_6CD5, _____521B_5EFA_65B9_5411_7279_6548, _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D, _____521B_5EFA_4FB5_8680_6B8B_7559, ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, GetSpellTargetUnit, UnitDamageTarget, UNIT_STATE_MAX_LIFE, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_6C14_7075_65A9_6280_80FDID
+local _____53D6_76EE_6807, _____8865_5145Boss_9B54_6CD5, _____521B_5EFA_65B9_5411_7279_6548, _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D, _____521B_5EFA_4FB5_8680_6B8B_7559, ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, GetSpellTargetUnit, UNIT_STATE_MAX_LIFE, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_6C14_7075_65A9_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.01．运行时上下文")
@@ -70,16 +70,17 @@ function _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(context, ax, ay, bx, by, w
                     goto __continue10
                 end
                 local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["Boss攻击力比例"] + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["目标最大生命比例"]
-                UnitDamageTarget(
-                    boss,
-                    hero,
-                    damage,
-                    false,
-                    false,
-                    ATTACK_TYPE_NORMAL,
-                    DAMAGE_TYPE_ENHANCED,
-                    WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = boss,
+                    ["目标"] = hero,
+                    ["伤害"] = damage,
+                    attack = false,
+                    ranged = false,
+                    attackType = ATTACK_TYPE_NORMAL,
+                    ["伤害类型"] = DAMAGE_TYPE_ENHANCED,
+                    weaponType = WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = "Boss技能"
+                })
             end
             ::__continue10::
             i = i + 1
@@ -114,12 +115,12 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
     tickID = addPeriodicCallback(
         cfg["侵蚀Tick秒"] * 1000,
         function()
-            local ____temp_9 = not _____5355_4F4D_6709_6548(boss)
-            if not ____temp_9 then
-                local ____self_8 = context["清理"]
-                ____temp_9 = ____self_8["已清理"](____self_8)
+            local ____temp_10 = not _____5355_4F4D_6709_6548(boss)
+            if not ____temp_10 then
+                local ____self_9 = context["清理"]
+                ____temp_10 = ____self_9["已清理"](____self_9)
             end
-            if ____temp_9 then
+            if ____temp_10 then
                 removePeriodicCallback(tickID)
                 return
             end
@@ -148,16 +149,17 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
                             goto __continue18
                         end
                         local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["侵蚀Boss攻击力比例"] + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["侵蚀目标最大生命比例"]
-                        UnitDamageTarget(
-                            boss,
-                            hero,
-                            damage,
-                            false,
-                            false,
-                            ATTACK_TYPE_NORMAL,
-                            DAMAGE_TYPE_MAGIC,
-                            WEAPON_TYPE_WHOKNOWS
-                        )
+                        _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                            ["来源"] = boss,
+                            ["目标"] = hero,
+                            ["伤害"] = damage,
+                            attack = false,
+                            ranged = false,
+                            attackType = ATTACK_TYPE_NORMAL,
+                            ["伤害类型"] = DAMAGE_TYPE_MAGIC,
+                            weaponType = WEAPON_TYPE_WHOKNOWS,
+                            ["来源类型"] = "Boss技能"
+                        })
                         local mana = GetUnitState(hero, UNIT_STATE_MANA)
                         local lostMana = mana * cfg["侵蚀扣魔当前魔法比例"]
                         if lostMana > 0 then
@@ -184,8 +186,8 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
             end
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记周期回调"](____self_10, "菲利斯-剑气灵斩侵蚀", tickID)
+    local ____self_11 = context["清理"]
+    ____self_11["登记周期回调"](____self_11, "菲利斯-剑气灵斩侵蚀", tickID)
 end
 ____exports["释放菲利斯剑气灵斩"] = function(context)
     local boss = context["Boss单位"]
@@ -254,6 +256,8 @@ function ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548(castingUnit, spellA
     end
     ____exports["释放菲利斯剑气灵斩"](context)
 end
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
@@ -261,7 +265,6 @@ GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
 SetUnitState = jass.SetUnitState
 GetSpellTargetUnit = jass.GetSpellTargetUnit
-UnitDamageTarget = jass.UnitDamageTarget
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
@@ -269,25 +272,25 @@ ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex = ____require_result_3["获取Boss技能最近敌对英雄Ex"]
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_4.addPeriodicCallback
-removePeriodicCallback = ____require_result_4.removePeriodicCallback
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_5.registerManualBuff
-local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.06．菲利斯")
-_____83F2_5229_65AFBuffID = ____require_result_6["菲利斯BuffID"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-_____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_7["设置特效XYZ轴旋转"]
+local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex = ____require_result_4["获取Boss技能最近敌对英雄Ex"]
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_5.addPeriodicCallback
+removePeriodicCallback = ____require_result_5.removePeriodicCallback
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_6.registerManualBuff
+local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.06．菲利斯")
+_____83F2_5229_65AFBuffID = ____require_result_7["菲利斯BuffID"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+_____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_8["设置特效XYZ轴旋转"]
 _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____5251_6C14_7075_65A9_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]["技能槽位"])
 local _____5251_6C14_7075_65A9_5DF2_6CE8_518C = false

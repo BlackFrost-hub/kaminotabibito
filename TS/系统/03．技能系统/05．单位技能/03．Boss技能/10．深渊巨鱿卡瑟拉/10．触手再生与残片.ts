@@ -14,6 +14,9 @@ import { 尝试触发卡瑟拉触手解放 } from "./08．触手解放";
 import { 尝试释放卡瑟拉共生电击 } from "./09．共生电击";
 import { 单位有效, 极坐标X, 极坐标Y, 距离XY, 取坐标角度 } from "./14．公共工具";
 
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -23,7 +26,6 @@ const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -122,7 +124,17 @@ function 结算再生触手一跳(this: void, data: 再生触手实例): void {
   const cfg = 卡瑟拉数值与表现配置.触手残片;
   if (距离XY(GetUnitX(data.触手单位), GetUnitY(data.触手单位), GetUnitX(target), GetUnitY(target)) > cfg.再生触手攻击半径) return;
   const damage = 读取单位攻击力(boss) * cfg.再生触手Boss攻击力比例;
-  UnitDamageTarget(boss, target, damage, true, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+  造成单体技能伤害({
+    来源: boss,
+    目标: target,
+    伤害: damage,
+    attack: true,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_NORMAL,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
   治疗Boss固定值(boss, damage * cfg.再生触手吸血比例);
 }
 

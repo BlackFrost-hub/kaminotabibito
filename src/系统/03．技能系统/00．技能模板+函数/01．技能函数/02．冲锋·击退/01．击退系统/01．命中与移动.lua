@@ -15,48 +15,56 @@ local _____83B7_53D6_679A_4E3E_7EC4 = ____00_FF0E_5171_4EAB["获取枚举组"]
 local _____6E05_7A7A_679A_4E3E_7EC4 = ____00_FF0E_5171_4EAB["清空枚举组"]
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
 local _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_0["沿角度步进直到地形阻挡"]
+local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_1["造成技能伤害"]
 local _____6700_5C0F_51B2_950B_6B65_8FDB_8DDD_79BB = 30
 local function _____7ED3_7B97_547D_4E2D_4F24_5BB3(_____5B9E_4F8B, _____76EE_6807_5355_4F4D)
     if _____5B9E_4F8B["命中伤害"] <= 0 then
         return
     end
-    local ____temp_1
+    local ____temp_2
     if _____5B9E_4F8B["伤害来源"] ~= nil and _____5B9E_4F8B["伤害来源"] ~= 0 then
-        ____temp_1 = _____5B9E_4F8B["伤害来源"]
+        ____temp_2 = _____5B9E_4F8B["伤害来源"]
     else
-        ____temp_1 = _____5B9E_4F8B["单位"]
+        ____temp_2 = _____5B9E_4F8B["单位"]
     end
-    local _____6765_6E90_5355_4F4D = ____temp_1
+    local _____6765_6E90_5355_4F4D = ____temp_2
     if not _____6765_6E90_5355_4F4D or _____6765_6E90_5355_4F4D == 0 then
         return
     end
-    local ____jass_7 = jass
-    local ____jass_UnitDamageTarget_8 = jass.UnitDamageTarget
-    local ____76EE_6807_5355_4F4D_5 = _____76EE_6807_5355_4F4D
-    local ____5B9E_4F8B__547D_4E2D_4F24_5BB3_6 = _____5B9E_4F8B["命中伤害"]
-    local ____5B9E_4F8B__653B_51FB_7C7B_578B_2 = _____5B9E_4F8B["攻击类型"]
-    if ____5B9E_4F8B__653B_51FB_7C7B_578B_2 == nil then
-        ____5B9E_4F8B__653B_51FB_7C7B_578B_2 = DEFAULT_ATTACK_TYPE
+    local _____6807_8BB0 = _____5B9E_4F8B["技能伤害标记"]
+    local ____9020_6210_6280_80FD_4F24_5BB3_28 = _____9020_6210_6280_80FD_4F24_5BB3
+    local ____76EE_6807_5355_4F4D_26 = _____76EE_6807_5355_4F4D
+    local ____5B9E_4F8B__547D_4E2D_4F24_5BB3_27 = _____5B9E_4F8B["命中伤害"]
+    local ____5B9E_4F8B__653B_51FB_7C7B_578B_3 = _____5B9E_4F8B["攻击类型"]
+    if ____5B9E_4F8B__653B_51FB_7C7B_578B_3 == nil then
+        ____5B9E_4F8B__653B_51FB_7C7B_578B_3 = DEFAULT_ATTACK_TYPE
     end
-    local ____5B9E_4F8B__4F24_5BB3_7C7B_578B_3 = _____5B9E_4F8B["伤害类型"]
-    if ____5B9E_4F8B__4F24_5BB3_7C7B_578B_3 == nil then
-        ____5B9E_4F8B__4F24_5BB3_7C7B_578B_3 = DEFAULT_DAMAGE_TYPE
+    local ____5B9E_4F8B__4F24_5BB3_7C7B_578B_4 = _____5B9E_4F8B["伤害类型"]
+    if ____5B9E_4F8B__4F24_5BB3_7C7B_578B_4 == nil then
+        ____5B9E_4F8B__4F24_5BB3_7C7B_578B_4 = DEFAULT_DAMAGE_TYPE
     end
-    local ____5B9E_4F8B__6B66_5668_7C7B_578B_4 = _____5B9E_4F8B["武器类型"]
-    if ____5B9E_4F8B__6B66_5668_7C7B_578B_4 == nil then
-        ____5B9E_4F8B__6B66_5668_7C7B_578B_4 = DEFAULT_WEAPON_TYPE
+    local ____5B9E_4F8B__6B66_5668_7C7B_578B_5 = _____5B9E_4F8B["武器类型"]
+    if ____5B9E_4F8B__6B66_5668_7C7B_578B_5 == nil then
+        ____5B9E_4F8B__6B66_5668_7C7B_578B_5 = DEFAULT_WEAPON_TYPE
     end
-    ____jass_UnitDamageTarget_8(
-        ____jass_7,
-        _____6765_6E90_5355_4F4D,
-        ____76EE_6807_5355_4F4D_5,
-        ____5B9E_4F8B__547D_4E2D_4F24_5BB3_6,
-        false,
-        false,
-        ____5B9E_4F8B__653B_51FB_7C7B_578B_2,
-        ____5B9E_4F8B__4F24_5BB3_7C7B_578B_3,
-        ____5B9E_4F8B__6B66_5668_7C7B_578B_4
-    )
+    ____9020_6210_6280_80FD_4F24_5BB3_28({
+        ["来源"] = _____6765_6E90_5355_4F4D,
+        ["目标"] = ____76EE_6807_5355_4F4D_26,
+        ["伤害"] = ____5B9E_4F8B__547D_4E2D_4F24_5BB3_27,
+        attackType = ____5B9E_4F8B__653B_51FB_7C7B_578B_3,
+        ["伤害类型"] = ____5B9E_4F8B__4F24_5BB3_7C7B_578B_4,
+        weaponType = ____5B9E_4F8B__6B66_5668_7C7B_578B_5,
+        ["来源类型"] = _____6807_8BB0 and _____6807_8BB0["来源类型"] or _____6807_8BB0 and _____6807_8BB0["装备技能类型"] or "其他",
+        ["装备技能类型"] = _____6807_8BB0 and _____6807_8BB0["装备技能类型"],
+        ["伤害形态"] = _____6807_8BB0 and _____6807_8BB0["伤害形态"] or (_____5B9E_4F8B["命中后结束"] and "单体" or "AOE"),
+        ["物品ID"] = _____6807_8BB0 and _____6807_8BB0["物品ID"],
+        ["物品实例"] = _____6807_8BB0 and _____6807_8BB0["物品实例"],
+        ["技能ID"] = _____6807_8BB0 and _____6807_8BB0["技能ID"],
+        ["技能实例ID"] = _____6807_8BB0 and _____6807_8BB0["技能实例ID"],
+        ["标签"] = _____6807_8BB0 and _____6807_8BB0["标签"],
+        ["参与技能伤害加成"] = _____6807_8BB0 and _____6807_8BB0["参与技能伤害加成"]
+    })
 end
 local function _____53EF_547D_4E2D_76EE_6807(_____5B9E_4F8B, _____76EE_6807_5355_4F4D)
     if not _____5355_4F4D_5B58_6D3B(_____76EE_6807_5355_4F4D) then
@@ -72,13 +80,13 @@ local function _____53EF_547D_4E2D_76EE_6807(_____5B9E_4F8B, _____76EE_6807_5355
         end
     end
     if _____5B9E_4F8B["只命中敌人"] then
-        local ____temp_9
+        local ____temp_29
         if _____5B9E_4F8B["伤害来源"] ~= nil and _____5B9E_4F8B["伤害来源"] ~= 0 then
-            ____temp_9 = _____5B9E_4F8B["伤害来源"]
+            ____temp_29 = _____5B9E_4F8B["伤害来源"]
         else
-            ____temp_9 = _____5B9E_4F8B["单位"]
+            ____temp_29 = _____5B9E_4F8B["单位"]
         end
-        local _____53C2_8003_5355_4F4D = ____temp_9
+        local _____53C2_8003_5355_4F4D = ____temp_29
         local _____6240_5C5E_73A9_5BB6 = jass.GetOwningPlayer(_____53C2_8003_5355_4F4D)
         if not jass.IsUnitEnemy(_____76EE_6807_5355_4F4D, _____6240_5C5E_73A9_5BB6) then
             return false

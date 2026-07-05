@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____8BA1_7B97_55B7_53D1_4F24_5BB3, _____521B_5EFA_968F_673A_843D_70B9, _____64AD_653E_55B7_53D1_7279_6548, _____521B_5EFA_7194_5CA9_6B8B_7559_533A, _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1, ____on_5DF4_5C14_624E_7F57_65AF_7194_5CA9_55B7_53D1_751F_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, YDWETimerDestroyEffectSafe, CosBJ, SinBJ, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitType, UnitDamageTarget, AddSpecialEffect, GetRandomReal, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, EXSetEffectZ, EXSetEffectSize, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____7194_5CA9_55B7_53D1_6280_80FDID
+local _____5355_4F4D_6709_6548, _____8BA1_7B97_55B7_53D1_4F24_5BB3, _____521B_5EFA_968F_673A_843D_70B9, _____64AD_653E_55B7_53D1_7279_6548, _____521B_5EFA_7194_5CA9_6B8B_7559_533A, _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1, ____on_5DF4_5C14_624E_7F57_65AF_7194_5CA9_55B7_53D1_751F_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, YDWETimerDestroyEffectSafe, CosBJ, SinBJ, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitType, AddSpecialEffect, GetRandomReal, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, EXSetEffectZ, EXSetEffectSize, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____7194_5CA9_55B7_53D1_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -90,16 +90,17 @@ function _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, x, y)
                             goto __continue16
                         end
                         local damage = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * config["残留伤害目标最大生命比例"]
-                        UnitDamageTarget(
-                            boss,
-                            unit,
-                            damage,
-                            false,
-                            true,
-                            ATTACK_TYPE_CHAOS,
-                            DAMAGE_TYPE_FIRE,
-                            WEAPON_TYPE_WHOKNOWS
-                        )
+                        _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                            ["来源"] = boss,
+                            ["目标"] = unit,
+                            ["伤害"] = damage,
+                            attack = false,
+                            ranged = true,
+                            attackType = ATTACK_TYPE_CHAOS,
+                            ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                            weaponType = WEAPON_TYPE_WHOKNOWS,
+                            ["来源类型"] = "Boss技能"
+                        })
                         _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["残留灼热层数"])
                     end
                     ::__continue16::
@@ -108,9 +109,9 @@ function _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, x, y)
             end
         end
     })
-    local ____self_7 = context["清理"]
-    ____self_7["登记清理"](
-        ____self_7,
+    local ____self_8 = context["清理"]
+    ____self_8["登记清理"](
+        ____self_8,
         "巴尔扎罗斯-熔岩喷发残留",
         function()
             instance["销毁"](instance)
@@ -137,16 +138,17 @@ function _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1(context, _____843D_70B9)
             if not _____5355_4F4D_6709_6548(unit) then
                 return
             end
-            UnitDamageTarget(
-                boss,
-                unit,
-                _____8BA1_7B97_55B7_53D1_4F24_5BB3(boss, unit),
-                false,
-                true,
-                ATTACK_TYPE_CHAOS,
-                DAMAGE_TYPE_FIRE,
-                WEAPON_TYPE_WHOKNOWS
-            )
+            _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                ["来源"] = boss,
+                ["目标"] = unit,
+                ["伤害"] = _____8BA1_7B97_55B7_53D1_4F24_5BB3(boss, unit),
+                attack = false,
+                ranged = true,
+                attackType = ATTACK_TYPE_CHAOS,
+                ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                weaponType = WEAPON_TYPE_WHOKNOWS,
+                ["来源类型"] = "Boss技能"
+            })
             _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["爆发灼热层数"])
             _____5F00_59CB_539F_5730_51FB_98DE(unit, {
                 ["持续时间"] = config["爆发持续顶飞秒"],
@@ -160,16 +162,16 @@ function _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1(context, _____843D_70B9)
             })
         end,
         ["on销毁"] = function()
-            local ____self_8 = context["清理"]
-            if ____self_8["已清理"](____self_8) then
+            local ____self_9 = context["清理"]
+            if ____self_9["已清理"](____self_9) then
                 return
             end
             _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, _____843D_70B9.X, _____843D_70B9.Y)
         end
     })
-    local ____self_9 = context["清理"]
-    ____self_9["登记清理"](
-        ____self_9,
+    local ____self_10 = context["清理"]
+    ____self_10["登记清理"](
+        ____self_10,
         "巴尔扎罗斯-熔岩喷发爆发",
         function()
             instance["销毁"](instance)
@@ -242,6 +244,8 @@ YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
 local ____require_result_6 = require("lib.扩展函数.BJ函数.12．数学函数")
 CosBJ = ____require_result_6.CosBJ
 SinBJ = ____require_result_6.SinBJ
+local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成AOE技能伤害"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
@@ -249,7 +253,6 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
 IsUnitType = jass.IsUnitType
-UnitDamageTarget = jass.UnitDamageTarget
 AddSpecialEffect = jass.AddSpecialEffect
 GetRandomReal = jass.GetRandomReal
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE

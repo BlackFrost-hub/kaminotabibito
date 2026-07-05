@@ -8,6 +8,9 @@ import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -64,16 +67,6 @@ const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => 
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (
-  whichUnit: any,
-  target: any,
-  amount: number,
-  attack: boolean,
-  ranged: boolean,
-  attackType: any,
-  damageType: any,
-  weaponType: any
-) => boolean;
 
 const 瑟兰迪尔单位类型ID = stringToFourCC(瑟兰迪尔单位技能配置.单位ID);
 const 月光枷锁技能ID = stringToFourCC(瑟兰迪尔数值与表现配置.月光枷锁.技能槽位);
@@ -181,16 +174,18 @@ function 结算月光枷锁Tick伤害(this: void, caster: any, target: any, tick
     if (月光枷锁绑定表[targetId] == null) return;
     const damage = (读取单位攻击力(caster) * config.Tick伤害Boss攻击力比例
       + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.Tick伤害目标最大生命比例) * config.Tick伤害总倍率;
-    UnitDamageTarget(
-      caster,
-      target,
-      damage,
-      false,
-      false,
-      jass.ATTACK_TYPE_NORMAL,
-      jass.DAMAGE_TYPE_PLANT,
-      jass.WEAPON_TYPE_WHOKNOWS
-    );
+    造成单体技能伤害({
+      技能ID: 月光枷锁技能ID,
+      来源: caster,
+      目标: target,
+      伤害: damage,
+      attack: false,
+      ranged: false,
+      attackType: jass.ATTACK_TYPE_NORMAL,
+      伤害类型: jass.DAMAGE_TYPE_PLANT,
+      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+      来源类型: "Boss技能",
+    });
   });
 }
 

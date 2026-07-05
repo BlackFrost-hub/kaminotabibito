@@ -20,6 +20,8 @@ local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____14_FF0E_516C_5171_5DE5_
 local _____8DDD_79BB_5E73_65B9XY = ____14_FF0E_516C_5171_5DE5_5177["距离平方XY"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -27,24 +29,23 @@ local GetUnitY = jass.GetUnitY
 local SetUnitFacing = jass.SetUnitFacing
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
-local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.13．属性抗性门槛")
-local _____53D6_5355_4F4D_5C5E_6027_6297_6027 = ____require_result_4["取单位属性抗性"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
-local _____5F00_59CB_51FB_9000 = ____require_result_5["开始击退"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
+local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.13．属性抗性门槛")
+local _____53D6_5355_4F4D_5C5E_6027_6297_6027 = ____require_result_5["取单位属性抗性"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
+local _____5F00_59CB_51FB_9000 = ____require_result_6["开始击退"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
 local _____5361_745F_62C9_5355_4F4D_7C7B_578BID = stringToFourCC(_____5361_745F_62C9_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____9AD8_538B_6C34_70AE_6280_80FDID = stringToFourCC(_____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["高压水炮"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -127,16 +128,17 @@ local function _____7ED3_7B97_9AD8_538B_6C34_70AE(context, startX, startY, angle
                 ) > radius2 then
                     goto __continue13
                 end
-                UnitDamageTarget(
-                    boss,
-                    hero,
-                    damage,
-                    true,
-                    false,
-                    ATTACK_TYPE_NORMAL,
-                    DAMAGE_TYPE_NORMAL,
-                    WEAPON_TYPE_WHOKNOWS
-                )
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = boss,
+                    ["目标"] = hero,
+                    ["伤害"] = damage,
+                    attack = true,
+                    ranged = false,
+                    attackType = ATTACK_TYPE_NORMAL,
+                    ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+                    weaponType = WEAPON_TYPE_WHOKNOWS,
+                    ["来源类型"] = "Boss技能"
+                })
                 if _____73A9_5BB6_6C34_6297_8FBE_6807(context, hero) then
                     goto __continue13
                 end
@@ -202,8 +204,8 @@ ____exports["释放卡瑟拉高压水炮"] = function(context)
             _____7ED3_7B97_9AD8_538B_6C34_70AE(context, startX, startY, angle)
         end
     )
-    local ____self_7 = context["清理"]
-    ____self_7["登记延迟回调"](____self_7, "卡瑟拉-高压水炮结算", id)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "卡瑟拉-高压水炮结算", id)
 end
 local function ____on_5361_745F_62C9_9AD8_538B_6C34_70AE_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____9AD8_538B_6C34_70AE_6280_80FDID then

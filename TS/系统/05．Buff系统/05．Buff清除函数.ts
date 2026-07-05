@@ -5,9 +5,9 @@
  * 显眼入口：按 `01．Buff表.ts` 的 type 字段清除单位 Buff。
  *
  * 常用：
- * - `移除单位增益Buff(unit)`：清除 `type` 以 `Buff:` 开头的条目。
- * - `移除单位负面Buff(unit)`：清除 `type` 以 `Debuff:` 开头的条目。
- * - `移除单位指定类型Buff(unit, "Debuff:control")`：清除指定 type 前缀。
+ * - `移除单位增益Buff(unit)`：清除 `type` 含 `Buff` 字段的条目。
+ * - `移除单位负面Buff(unit)`：清除 `type` 含 `Debuff` 字段的条目。
+ * - `移除单位指定类型Buff(unit, "Debuff:control")`：清除同时含 `Debuff` 和 `control` 字段的条目。
  *
  * 说明：
  * - D001-D004 是纯 TS DOT，没有原生魔法效果；清除时只停止 DOT 和自定义 BuffUI。
@@ -26,22 +26,55 @@ const BUFF_TABLE = buffTableMod.buffs;
 const getBuffIdsOnUnit = buffPool.getBuffIdsOnUnit;
 const 移除单位指定Buff = buffPool.移除单位指定Buff;
 
-function isBuffTypeMatched(buffID: string, typePrefix: string, onlyPurgable: boolean): boolean {
+function parseBuffTypeFields(typeName: string): string[] {
+  const fields: string[] = [];
+  let start = 0;
+  const lowerType = typeName.toLowerCase();
+  while (start <= lowerType.length) {
+    const end = lowerType.indexOf(":", start);
+    const field = end >= 0 ? lowerType.substring(start, end) : lowerType.substring(start);
+    if (field !== "") fields.push(field);
+    if (end < 0) break;
+    start = end + 1;
+  }
+  return fields;
+}
+
+function hasBuffTypeField(typeFields: string[], queryField: string): boolean {
+  const lowerField = queryField.toLowerCase();
+  for (let i = 0; i < typeFields.length; i++) {
+    if (typeFields[i] === lowerField) return true;
+  }
+  return false;
+}
+
+function isBuffTypeQueryMatched(typeName: string, typeQuery: string): boolean {
+  if (typeQuery === "") return true;
+  const queryFields = parseBuffTypeFields(typeQuery);
+  if (queryFields.length === 0) return true;
+  const typeFields = parseBuffTypeFields(typeName);
+  for (let i = 0; i < queryFields.length; i++) {
+    if (!hasBuffTypeField(typeFields, queryFields[i])) return false;
+  }
+  return true;
+}
+
+function isBuffTypeMatched(buffID: string, typeQuery: string, onlyPurgable: boolean): boolean {
   const meta = BUFF_TABLE[buffID];
   if (meta == null) return false;
   const typeName = meta.type;
   if (typeof typeName !== "string" || typeName === "") return false;
-  if (typeName.substring(0, typePrefix.length) !== typePrefix) return false;
+  if (!isBuffTypeQueryMatched(typeName, typeQuery)) return false;
   if (onlyPurgable && meta.canPurge !== true) return false;
   return true;
 }
 
-function isBuffDispelMatched(buffID: string, typePrefix: string, maxDispelLevel: number, onlyPurgable: boolean): boolean {
+function isBuffDispelMatched(buffID: string, typeQuery: string, maxDispelLevel: number, onlyPurgable: boolean): boolean {
   const meta = BUFF_TABLE[buffID];
   if (meta == null) return false;
   const typeName = meta.type;
   if (typeof typeName !== "string" || typeName === "") return false;
-  if (typePrefix !== "" && typeName.substring(0, typePrefix.length) !== typePrefix) return false;
+  if (!isBuffTypeQueryMatched(typeName, typeQuery)) return false;
   if (onlyPurgable && meta.canPurge !== true) return false;
   const dispelLevel = meta.dispelLevel;
   if (typeof dispelLevel !== "number") return false;
@@ -50,12 +83,13 @@ function isBuffDispelMatched(buffID: string, typePrefix: string, maxDispelLevel:
 }
 
 /**
- * 按 `01．Buff表.ts` 的 type 前缀清除单位 Buff。
+ * 按 `01．Buff表.ts` 的 type 字段清除单位 Buff。
  *
  * - `Buff:`    增益类
  * - `Debuff:` 负面类
  * - `Debuff:control` 控制类负面
  * - `Debuff:magic` 魔法类负面
+ * - 查询按 `:` 分隔字段命中，不依赖字段顺序
  * - onlyPurgable=true 时只清 `canPurge: true` 的条目
  */
 export function 移除单位指定类型Buff(unit: any, typePrefix: string, onlyPurgable: boolean = false): number {
@@ -71,12 +105,12 @@ export function 移除单位指定类型Buff(unit: any, typePrefix: string, only
   return removed;
 }
 
-/** 清除单位增益 Buff（Buff 表 type 以 `Buff:` 开头）。 */
+/** 清除单位增益 Buff（Buff 表 type 含 `Buff` 字段）。 */
 export function 移除单位增益Buff(unit: any, onlyPurgable: boolean = false): number {
   return 移除单位指定类型Buff(unit, "Buff:", onlyPurgable);
 }
 
-/** 清除单位负面 Buff（Buff 表 type 以 `Debuff:` 开头）。 */
+/** 清除单位负面 Buff（Buff 表 type 含 `Debuff` 字段）。 */
 export function 移除单位负面Buff(unit: any, onlyPurgable: boolean = false): number {
   return 移除单位指定类型Buff(unit, "Debuff:", onlyPurgable);
 }
@@ -87,6 +121,7 @@ export function 移除单位负面Buff(unit: any, onlyPurgable: boolean = false)
  * - `maxDispelLevel=1`：只驱散 1 级及以下
  * - `maxDispelLevel=2`：驱散 2 级及以下
  * - `typePrefix=""`：不限制类型；也可传 `Buff:` / `Debuff:` / `Debuff:control` / `Debuff:magic`
+ * - `typePrefix` 按 `:` 分隔字段命中，不依赖字段顺序
  * - `onlyPurgable=true`：只驱散 `canPurge: true` 的条目
  */
 export function 按驱散等级移除单位Buff(

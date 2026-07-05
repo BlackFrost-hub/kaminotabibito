@@ -21,11 +21,24 @@ export function 单位存活(this: void, unit: any): boolean {
 }
 
 export function 是技能伤害(this: void, snapshot: any): boolean {
-  return snapshot != null && (snapshot.isSkillDamage === true || snapshot.isSkillAttack === true);
+  return snapshot != null && (snapshot.isSkillDamage === true || snapshot.isSkillAttack === true || snapshot.isWrappedSkillDamage === true);
+}
+
+export function 是AOE技能伤害(this: void, snapshot: any): boolean {
+  return snapshot != null && snapshot.isAoeSkillDamage === true;
+}
+
+export function 是单体技能伤害(this: void, snapshot: any): boolean {
+  return snapshot != null && snapshot.isSingleTargetSkillDamage === true;
+}
+
+export function 是指定形态技能伤害(this: void, snapshot: any, 形态: "单体" | "AOE"): boolean {
+  if (形态 === "AOE") return 是AOE技能伤害(snapshot);
+  return 是单体技能伤害(snapshot);
 }
 
 export function 是纯普攻(this: void, snapshot: any): boolean {
-  return snapshot != null && snapshot.isNormalAttack === true && snapshot.isSkillDamage !== true && snapshot.isSkillAttack !== true;
+  return snapshot != null && snapshot.isNormalAttack === true && snapshot.isSkillDamage !== true && snapshot.isSkillAttack !== true && snapshot.isWrappedSkillDamage !== true;
 }
 
 export function 是元素伤害(this: void, snapshot: any, damageType: any): boolean {

@@ -28,6 +28,10 @@ const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09�
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
 
+const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -37,7 +41,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -144,7 +147,18 @@ function 触发天罚波次(this: void, context: 巴尔扎罗斯运行时上下�
         攻击力: 读取单位攻击力(unit) * 巴尔扎罗斯技能数值配置.王者天罚.护卫命中增攻比例,
       });
     } else {
-      UnitDamageTarget(boss, unit, 计算天罚伤害(boss, unit), false, true, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS);
+      造成AOE技能伤害({
+        技能ID: 王者天罚技能ID,
+        来源: boss,
+        目标: unit,
+        伤害: 计算天罚伤害(boss, unit),
+        attack: false,
+        ranged: true,
+        attackType: ATTACK_TYPE_CHAOS,
+        伤害类型: DAMAGE_TYPE_FIRE,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
       记录天罚玩家命中(context, unit);
     }
   }

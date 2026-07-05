@@ -3,6 +3,8 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____12_FF0E_7269_54C1_4E0E_5355_4F4D = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.12．物品与单位")
 local _____5355_4F4D_5B58_6D3B = ____12_FF0E_7269_54C1_4E0E_5355_4F4D["单位存活"]
+local ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3 = ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF["造成装备技能伤害"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.物品相关函数.物品判断函数")
@@ -40,7 +42,6 @@ local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local IsUnitType = jass.IsUnitType
 local IsUnitAlly = jass.IsUnitAlly
-local UnitDamageTarget = jass.UnitDamageTarget
 local GetHeroStr = jass.GetHeroStr
 local GetHeroAgi = jass.GetHeroAgi
 local GetHeroInt = jass.GetHeroInt
@@ -170,76 +171,71 @@ ____exports["造成强化伤害"] = function(_____6765_6E90, _____76EE_6807, ___
     if not _____5355_4F4D_5B58_6D3B(_____6765_6E90) or not _____5355_4F4D_5B58_6D3B(_____76EE_6807) or not (_____4F24_5BB3 > 0) then
         return
     end
-    UnitDamageTarget(
-        _____6765_6E90,
-        _____76EE_6807,
-        _____4F24_5BB3,
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_ENHANCED,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3({
+        ["来源"] = _____6765_6E90,
+        ["目标"] = _____76EE_6807,
+        ["伤害"] = _____4F24_5BB3,
+        ["伤害类型"] = DAMAGE_TYPE_ENHANCED,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS
+    })
 end
 ____exports["造成火焰伤害"] = function(_____6765_6E90, _____76EE_6807, _____4F24_5BB3)
     if not _____5355_4F4D_5B58_6D3B(_____6765_6E90) or not _____5355_4F4D_5B58_6D3B(_____76EE_6807) or not (_____4F24_5BB3 > 0) then
         return
     end
-    UnitDamageTarget(
-        _____6765_6E90,
-        _____76EE_6807,
-        _____4F24_5BB3,
-        false,
-        true,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_FIRE,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3({
+        ["来源"] = _____6765_6E90,
+        ["目标"] = _____76EE_6807,
+        ["伤害"] = _____4F24_5BB3,
+        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+        ranged = true,
+        attackType = ATTACK_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS
+    })
 end
 ____exports["造成暗影伤害"] = function(_____6765_6E90, _____76EE_6807, _____4F24_5BB3)
     if not _____5355_4F4D_5B58_6D3B(_____6765_6E90) or not _____5355_4F4D_5B58_6D3B(_____76EE_6807) or not (_____4F24_5BB3 > 0) then
         return
     end
-    UnitDamageTarget(
-        _____6765_6E90,
-        _____76EE_6807,
-        _____4F24_5BB3,
-        false,
-        true,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_SHADOW_STRIKE,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3({
+        ["来源"] = _____6765_6E90,
+        ["目标"] = _____76EE_6807,
+        ["伤害"] = _____4F24_5BB3,
+        ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
+        ranged = true,
+        attackType = ATTACK_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS
+    })
 end
 ____exports["造成普通伤害"] = function(_____6765_6E90, _____76EE_6807, _____4F24_5BB3)
     if not _____5355_4F4D_5B58_6D3B(_____6765_6E90) or not _____5355_4F4D_5B58_6D3B(_____76EE_6807) or not (_____4F24_5BB3 > 0) then
         return
     end
-    UnitDamageTarget(
-        _____6765_6E90,
-        _____76EE_6807,
-        _____4F24_5BB3,
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_NORMAL,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3({
+        ["来源"] = _____6765_6E90,
+        ["目标"] = _____76EE_6807,
+        ["伤害"] = _____4F24_5BB3,
+        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS
+    })
 end
 ____exports["造成精神自伤"] = function(_____5355_4F4D, _____4F24_5BB3)
     if not _____5355_4F4D_5B58_6D3B(_____5355_4F4D) or not (_____4F24_5BB3 > 0) then
         return
     end
-    UnitDamageTarget(
-        _____5355_4F4D,
-        _____5355_4F4D,
-        _____4F24_5BB3,
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_MIND,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3({
+        ["来源"] = _____5355_4F4D,
+        ["目标"] = _____5355_4F4D,
+        ["伤害"] = _____4F24_5BB3,
+        ["伤害类型"] = DAMAGE_TYPE_MIND,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS
+    })
 end
 ____exports["执行治疗"] = function(_____6765_6E90, _____76EE_6807, _____751F_547D, _____9B54_6CD5)
     if _____9B54_6CD5 == nil then

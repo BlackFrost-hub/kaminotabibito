@@ -5,7 +5,7 @@ local __TS__ArrayUnshift = ____lualib.__TS__ArrayUnshift
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local _____53D6_53E5_67C4ID, _____5355_4F4D_6EE1_8DB3_5F71_54CD_76EE_6807, _____5355_4F4D_53EF_4F5C_4E3A_8DF3_94FE_76EE_6807, _____67E5_627E_4E0B_4E00_8DF3_76EE_6807, _____521B_5EFA_8DF3_94FE_95EA_7535, _____7ED3_675F_8DF3_94FE_5B9E_4F8B, _____5C1D_8BD5_505C_6B62_7EAF_8DF3_94FE_4E0B_4E00_8DF3_626B_63CF, _____53D6_6D88_7EAF_8DF3_94FE_4E0B_4E00_8DF3_4EFB_52A1, _____6DFB_52A0_7EAF_8DF3_94FE_4E0B_4E00_8DF3_4EFB_52A1, _____6267_884C_5F53_524D_4E00_8DF3, _____6267_884C_7EAF_8DF3_94FE_4E0B_4E00_8DF3_4EFB_52A1, ____on_7EAF_8DF3_94FE_4E0B_4E00_8DF3_626B_63CF, GetHandleId, GetUnitX, GetUnitY, UnitDamageTarget, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, addPeriodicCallback, removePeriodicCallback, getServerTime, isUnitEnemy, isUnitAlly, isValidUnit, doHeal, _____9009_62E9_8303_56F4_5185_6700_8FD1_76EE_6807, _____9ED8_8BA4_95EA_7535_6548_679C_4EE3_7801, _____6D3B_8DC3_8DF3_94FE_6620_5C04, _____4E0B_4E00_8DF3_4EFB_52A1_5217_8868, _____4E0B_4E00_4E2A_4E0B_4E00_8DF3_4EFB_52A1ID, _____4E0B_4E00_8DF3_4EFB_52A1_626B_63CF_56DE_8C03ID
+local _____53D6_53E5_67C4ID, _____5355_4F4D_6EE1_8DB3_5F71_54CD_76EE_6807, _____5355_4F4D_53EF_4F5C_4E3A_8DF3_94FE_76EE_6807, _____67E5_627E_4E0B_4E00_8DF3_76EE_6807, _____521B_5EFA_8DF3_94FE_95EA_7535, _____7ED3_675F_8DF3_94FE_5B9E_4F8B, _____5C1D_8BD5_505C_6B62_7EAF_8DF3_94FE_4E0B_4E00_8DF3_626B_63CF, _____53D6_6D88_7EAF_8DF3_94FE_4E0B_4E00_8DF3_4EFB_52A1, _____6DFB_52A0_7EAF_8DF3_94FE_4E0B_4E00_8DF3_4EFB_52A1, _____6267_884C_5F53_524D_4E00_8DF3, _____6267_884C_7EAF_8DF3_94FE_4E0B_4E00_8DF3_4EFB_52A1, ____on_7EAF_8DF3_94FE_4E0B_4E00_8DF3_626B_63CF, GetHandleId, GetUnitX, GetUnitY, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, addPeriodicCallback, removePeriodicCallback, getServerTime, isUnitEnemy, isUnitAlly, isValidUnit, doHeal, _____9009_62E9_8303_56F4_5185_6700_8FD1_76EE_6807, _____9ED8_8BA4_95EA_7535_6548_679C_4EE3_7801, _____6D3B_8DC3_8DF3_94FE_6620_5C04, _____4E0B_4E00_8DF3_4EFB_52A1_5217_8868, _____4E0B_4E00_4E2A_4E0B_4E00_8DF3_4EFB_52A1ID, _____4E0B_4E00_8DF3_4EFB_52A1_626B_63CF_56DE_8C03ID
 local _____5355_4F4D_7ED1_5B9A_95EA_7535 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电")
 local _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535 = _____5355_4F4D_7ED1_5B9A_95EA_7535["创建单位绑定闪电"]
 function _____53D6_53E5_67C4ID(handle)
@@ -144,13 +144,13 @@ function _____6267_884C_5F53_524D_4E00_8DF3(_____5B9E_4F8B)
     end
     local _____6A21_5F0F = _____5B9E_4F8B["参数"]["模式"] or "伤害"
     if _____6A21_5F0F == "治疗" then
-        local ____doHeal_5 = doHeal
-        local ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_4 = _____5B9E_4F8B["参数"]["来源单位"]
-        if ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_4 == nil then
-            ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_4 = _____5F53_524D_76EE_6807
+        local ____doHeal_6 = doHeal
+        local ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_5 = _____5B9E_4F8B["参数"]["来源单位"]
+        if ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_5 == nil then
+            ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_5 = _____5F53_524D_76EE_6807
         end
-        ____doHeal_5({
-            HealSource = ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_4,
+        ____doHeal_6({
+            HealSource = ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_5,
             HealTarget = _____5F53_524D_76EE_6807,
             HealAmount = _____5B9E_4F8B["当前数值"],
             ItemHeal = false,
@@ -158,20 +158,25 @@ function _____6267_884C_5F53_524D_4E00_8DF3(_____5B9E_4F8B)
             HealEffectPath = _____5B9E_4F8B["参数"]["治疗特效路径"]
         })
     else
-        local ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_6 = _____5B9E_4F8B["参数"]["来源单位"]
-        if ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_6 == nil then
-            ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_6 = _____5F53_524D_76EE_6807
+        local ____9020_6210_5355_4F53_6280_80FD_4F24_5BB3_8 = _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3
+        local ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_7 = _____5B9E_4F8B["参数"]["来源单位"]
+        if ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_7 == nil then
+            ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_7 = _____5F53_524D_76EE_6807
         end
-        UnitDamageTarget(
-            ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_6,
-            _____5F53_524D_76EE_6807,
-            _____5B9E_4F8B["当前数值"],
-            false,
-            false,
-            ATTACK_TYPE_NORMAL,
-            DAMAGE_TYPE_NORMAL,
-            WEAPON_TYPE_WHOKNOWS
-        )
+        ____9020_6210_5355_4F53_6280_80FD_4F24_5BB3_8({
+            ["来源"] = ____5B9E_4F8B__53C2_6570__6765_6E90_5355_4F4D_7,
+            ["目标"] = _____5F53_524D_76EE_6807,
+            ["伤害"] = _____5B9E_4F8B["当前数值"],
+            ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+            ranged = false,
+            attackType = ATTACK_TYPE_NORMAL,
+            weaponType = WEAPON_TYPE_WHOKNOWS,
+            ["来源类型"] = _____5B9E_4F8B["参数"]["来源类型"] or "单位技能",
+            ["技能ID"] = _____5B9E_4F8B["参数"]["技能ID"],
+            ["技能实例ID"] = _____5B9E_4F8B["参数"]["技能实例ID"],
+            ["标签"] = _____5B9E_4F8B["参数"]["技能标签"],
+            ["参与技能伤害加成"] = _____5B9E_4F8B["参数"]["参与技能伤害加成"]
+        })
     end
     local _____5F53_524D_76EE_6807ID = _____53D6_53E5_67C4ID(_____5F53_524D_76EE_6807)
     if _____5F53_524D_76EE_6807ID > 0 then
@@ -250,22 +255,23 @@ local jass = require("jass.common")
 GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-UnitDamageTarget = jass.UnitDamageTarget
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_0.addPeriodicCallback
-removePeriodicCallback = ____require_result_0.removePeriodicCallback
-getServerTime = ____require_result_0.getServerTime
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-isUnitEnemy = ____require_result_1.isUnitEnemy
-isUnitAlly = ____require_result_1.isUnitAlly
-isValidUnit = ____require_result_1.isValidUnit
-local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-doHeal = ____require_result_2.doHeal
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.02．选目标模板.00．目标筛选模板")
-_____9009_62E9_8303_56F4_5185_6700_8FD1_76EE_6807 = ____require_result_3["选择范围内最近目标"]
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_1.addPeriodicCallback
+removePeriodicCallback = ____require_result_1.removePeriodicCallback
+getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+isUnitEnemy = ____require_result_2.isUnitEnemy
+isUnitAlly = ____require_result_2.isUnitAlly
+isValidUnit = ____require_result_2.isValidUnit
+local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+doHeal = ____require_result_3.doHeal
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.02．选目标模板.00．目标筛选模板")
+_____9009_62E9_8303_56F4_5185_6700_8FD1_76EE_6807 = ____require_result_4["选择范围内最近目标"]
 _____9ED8_8BA4_95EA_7535_6548_679C_4EE3_7801 = "CLPB"
 _____6D3B_8DC3_8DF3_94FE_6620_5C04 = {}
 _____4E0B_4E00_8DF3_4EFB_52A1_5217_8868 = {}

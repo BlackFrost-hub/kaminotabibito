@@ -84,7 +84,7 @@ export const DOTBuff表: Record<string, BuffData> = {
       buffName: "寄生",
       icon: "ReplaceableTextures\\CommandButtons\\BTNParasite.blp",
       effect: "",
-      type: "Debuff:magic:dot",
+      type: "Debuff:dot:slow:magic",
       interval: 0,
       maxStack: 1,
       stackRule: 'highest',

@@ -36,12 +36,13 @@ local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_resul
 local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
 local CosBJ = ____require_result_9.CosBJ
 local SinBJ = ____require_result_9.SinBJ
+local ____require_result_10 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_10["造成AOE技能伤害"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
-local UnitDamageTarget = jass.UnitDamageTarget
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
@@ -265,28 +266,30 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints)
                     goto __continue36
                 end
                 if _____70B9_5728_5B89_5168_533A(hero, safePoints) then
-                    UnitDamageTarget(
-                        boss,
-                        hero,
-                        _____8BA1_7B97_5B89_5168_533A_4F59_6CE2_4F24_5BB3(hero),
-                        false,
-                        true,
-                        ATTACK_TYPE_CHAOS,
-                        DAMAGE_TYPE_FIRE,
-                        WEAPON_TYPE_WHOKNOWS
-                    )
+                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                        ["来源"] = boss,
+                        ["目标"] = hero,
+                        ["伤害"] = _____8BA1_7B97_5B89_5168_533A_4F59_6CE2_4F24_5BB3(hero),
+                        attack = false,
+                        ranged = true,
+                        attackType = ATTACK_TYPE_CHAOS,
+                        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                        weaponType = WEAPON_TYPE_WHOKNOWS,
+                        ["来源类型"] = "Boss技能"
+                    })
                     _____51CF_5C11_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570(hero, config["安全区清除灼热层数"])
                 else
-                    UnitDamageTarget(
-                        boss,
-                        hero,
-                        _____8BA1_7B97_5916_5708_4F24_5BB3(boss, hero),
-                        false,
-                        true,
-                        ATTACK_TYPE_CHAOS,
-                        DAMAGE_TYPE_FIRE,
-                        WEAPON_TYPE_WHOKNOWS
-                    )
+                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                        ["来源"] = boss,
+                        ["目标"] = hero,
+                        ["伤害"] = _____8BA1_7B97_5916_5708_4F24_5BB3(boss, hero),
+                        attack = false,
+                        ranged = true,
+                        attackType = ATTACK_TYPE_CHAOS,
+                        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                        weaponType = WEAPON_TYPE_WHOKNOWS,
+                        ["来源类型"] = "Boss技能"
+                    })
                 end
             end
             ::__continue36::
@@ -405,8 +408,8 @@ ____exports["初始化巴尔扎罗斯末日熔爆节点"] = function(context)
             _____5C1D_8BD5_5468_671F_89E6_53D1_672B_65E5_7194_7206(context)
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记周期回调"](____self_10, "巴尔扎罗斯-末日熔爆周期", tickId)
+    local ____self_11 = context["清理"]
+    ____self_11["登记周期回调"](____self_11, "巴尔扎罗斯-末日熔爆周期", tickId)
 end
 ____exports["注册巴尔扎罗斯末日熔爆"] = function()
 end

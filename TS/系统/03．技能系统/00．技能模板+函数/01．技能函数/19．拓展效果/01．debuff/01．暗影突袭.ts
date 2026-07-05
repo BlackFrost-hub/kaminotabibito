@@ -38,7 +38,6 @@ const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
 const GetUnitName = jass.GetUnitName as (u: any) => string;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const R2I = jass.R2I as (value: number) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -49,6 +48,9 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
+};
+const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
+  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any) => boolean;
 };
 
 const 暗影突袭BuffID = "C025";
@@ -128,7 +130,7 @@ function 暗影突袭毒素tick(this: void, 毒素ID: number): void {
     const targetHid = GetHandleId(target);
     暗影突袭毒素标记表[targetHid] = (暗影突袭毒素标记表[targetHid] ?? 0) + 1;
     debugLogForce("暗影突袭", "毒素tick", "source:", state.source, "target:", target, "damage:", state.damagePerTick, "remaining:", state.remainingTicks);
-    UnitDamageTarget(state.source, target, state.damagePerTick, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_POISON, WEAPON_TYPE_WHOKNOWS);
+    造成持续伤害(state.source, target, state.damagePerTick, DAMAGE_TYPE_POISON, false, ATTACK_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
     const current = 暗影突袭毒素标记表[targetHid] ?? 0;
     if (current <= 1) {
       delete 暗影突袭毒素标记表[targetHid];
