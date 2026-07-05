@@ -6,8 +6,9 @@ import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY } from "./14．公共工具";
 import { 创建动态装饰物安全区组 } from "../../../00．技能模板+函数/04．机制组件/02．战斗区域/06．动态装饰物安全区组";
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const jass = require("jass.common") as any;
 
@@ -96,7 +97,7 @@ function 预警绝缘珊瑚(this: void, context: 卡瑟拉运行时上下文): v
   if (context.绝缘珊瑚安全区组 != null) context.绝缘珊瑚安全区组.显示提示(cfg.预警秒);
 }
 
-function 结算卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上下文): void {
+function 结算卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上下文, 技能实例ID?: number): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.Boss潜入中) return;
   const cfg = 卡瑟拉数值与表现配置.共生电击;
@@ -120,6 +121,8 @@ function 结算卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上�
       伤害类型: DAMAGE_TYPE_LIGHTNING,
       weaponType: WEAPON_TYPE_WHOKNOWS,
       来源类型: "Boss技能",
+      技能实例ID,
+      标签: "卡瑟拉共生电击",
     });
     播放单位特效(cfg.麻痹命中特效路径, hero);
     施加快速控制Buff(boss, hero, 0, cfg.麻痹秒);
@@ -142,8 +145,13 @@ export function 尝试释放卡瑟拉共生电击(this: void, context: 卡瑟拉
   播放卡瑟拉台词(boss, "共生电击");
   播放点特效(cfg.蓄力特效路径, GetUnitX(boss), GetUnitY(boss));
   预警绝缘珊瑚(context);
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "卡瑟拉共生电击",
+    持续时间秒: cfg.预警秒 + 2,
+  });
   const id = addDelayedCallback(cfg.预警秒 * 1000, function 卡瑟拉共生电击结算(this: void): void {
-    结算卡瑟拉共生电击(context);
+    结算卡瑟拉共生电击(context, 技能实例ID);
   });
   context.清理.登记延迟回调("卡瑟拉-共生电击结算", id);
 }

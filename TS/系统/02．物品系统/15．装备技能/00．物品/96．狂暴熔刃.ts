@@ -46,7 +46,7 @@ function 施加狂暴熔刃攻速(this: void, attacker: any): void {
     const damage = 计算暴击伤害(event.攻击者);
     const enemies = 获取敌方范围单位(event.攻击者, event.目标, 范围, true);
     for (let i = 0; i < enemies.length; i++) {
-      攻击效果造成伤害(event.攻击者, enemies[i], damage, "物理");
+      攻击效果造成伤害(event.攻击者, enemies[i], damage, "物理", { 伤害形态: "AOE" });
     }
   },
 });

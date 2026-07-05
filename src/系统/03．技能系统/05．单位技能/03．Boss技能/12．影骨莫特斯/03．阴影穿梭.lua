@@ -19,6 +19,8 @@ local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____76EE_6807_6B63_9762_671D_5411_6765_6E90 = ____11_FF0E_516C_5171_5DE5_5177["目标正面朝向来源"]
 local _____53D6_5355_4F4DID = ____11_FF0E_516C_5171_5DE5_5177["取单位ID"]
+local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
+local _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身位移到坐标"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
@@ -31,8 +33,6 @@ local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local SetUnitVertexColor = jass.SetUnitVertexColor
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local SetUnitX = jass.SetUnitX
-local SetUnitY = jass.SetUnitY
 local IssueTargetOrder = jass.IssueTargetOrder
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -114,9 +114,18 @@ local function _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210()
                 distance,
                 angle
             )
+            if not _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807(boss, x, y) then
+                SetUnitInvulnerable(boss, false)
+                SetUnitVertexColor(
+                    boss,
+                    255,
+                    255,
+                    255,
+                    255
+                )
+                goto __continue12
+            end
             AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭落点"], x, y)
-            SetUnitX(boss, x)
-            SetUnitY(boss, y)
             SetUnitInvulnerable(boss, false)
             SetUnitVertexColor(
                 boss,

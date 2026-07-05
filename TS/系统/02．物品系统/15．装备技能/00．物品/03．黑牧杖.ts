@@ -10,7 +10,7 @@ const { getEnemyUnitsInRange, isValidUnit, isUnitEnemy } = require("系统.03．
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
-  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any) => void;
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, weaponType?: any, 选项?: any) => void;
 };
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
@@ -32,7 +32,7 @@ function 单位是否持有黑牧杖(this: void, unit: any): boolean {
 
 function 对敌人造成黑牧杖伤害(this: void, 施法者: any, 目标: any): void {
   if (!isValidUnit(施法者) || !isValidUnit(目标)) return;
-  造成装备伤害(施法者, 目标, 黑牧杖配置.伤害值, DAMAGE_TYPE_SHADOW_STRIKE);
+  造成装备伤害(施法者, 目标, 黑牧杖配置.伤害值, DAMAGE_TYPE_SHADOW_STRIKE, false, undefined, { 伤害形态: "AOE" });
   createTimedEffect(黑牧杖配置.特效路径, GetUnitX(目标), GetUnitY(目标), 0, 1);
 }
 

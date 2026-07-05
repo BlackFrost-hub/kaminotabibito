@@ -29,9 +29,11 @@ export type 技能伤害来源类型 =
   | "装备被动"
   | "物品技能"
   | "装备持续伤害"
+  | "攻击特效"
+  | "普攻强化"
   | "其他";
 
-export type 装备技能伤害类型 = "装备技能" | "装备主动" | "装备被动" | "物品技能" | "装备持续伤害";
+export type 装备技能伤害类型 = "装备技能" | "装备主动" | "装备被动" | "物品技能" | "装备持续伤害" | "攻击特效" | "普攻强化";
 export type 技能伤害形态 = "单体" | "AOE" | "未知";
 
 export interface 技能伤害实例参数 {
@@ -185,12 +187,9 @@ export function 绑定单位当前独立技能伤害实例(this: void, 单位: a
 
 function 取单位当前独立技能伤害实例(this: void, 单位: any, 技能ID?: number): number | undefined {
   if (单位 == null || 单位 === 0) return undefined;
+  if (技能ID == null || 技能ID <= 0) return undefined;
   const handleId = GetHandleId(单位);
-  if (技能ID != null && 技能ID > 0) {
-    const skillId = 单位技能当前独立技能实例表[String(handleId) + "#" + String(技能ID)];
-    if (技能伤害实例存在(skillId)) return skillId;
-  }
-  const id = 单位当前独立技能实例表[handleId];
+  const id = 单位技能当前独立技能实例表[String(handleId) + "#" + String(技能ID)];
   return 技能伤害实例存在(id) ? id : undefined;
 }
 
@@ -216,7 +215,9 @@ export function 是装备技能伤害来源类型(this: void, 来源类型: 技�
     || 来源类型 === "装备主动"
     || 来源类型 === "装备被动"
     || 来源类型 === "物品技能"
-    || 来源类型 === "装备持续伤害";
+    || 来源类型 === "装备持续伤害"
+    || 来源类型 === "攻击特效"
+    || 来源类型 === "普攻强化";
 }
 
 export function 获取当前技能伤害上下文(this: void): 技能伤害上下文 | null {
@@ -229,7 +230,7 @@ function 创建技能伤害上下文(this: void, 参数: 技能伤害参数): �
   const isEquipmentSkillDamage = 是装备技能伤害来源类型(来源类型);
   const equipmentSkillKind = 参数.装备技能类型 ?? (isEquipmentSkillDamage ? 来源类型 as 装备技能伤害类型 : undefined);
   const damageShape = 参数.伤害形态 ?? "未知";
-  const skillInstanceId = 参数.技能实例ID ?? (isEquipmentSkillDamage ? undefined : 取单位当前独立技能伤害实例(参数.来源, 参数.技能ID));
+  const skillInstanceId = isEquipmentSkillDamage ? undefined : (参数.技能实例ID ?? 取单位当前独立技能伤害实例(参数.来源, 参数.技能ID));
   return {
     isWrappedSkillDamage: true,
     isEquipmentSkillDamage,

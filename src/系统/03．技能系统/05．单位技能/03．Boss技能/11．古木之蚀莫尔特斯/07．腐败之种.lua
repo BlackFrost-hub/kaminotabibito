@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8D1D_585E_5C14_4F4D_7F6E, _____83AB_5C14_7279_65AF_8150_8D25_5E7C_6811_6CE2_52A8, _____83AB_5C14_7279_65AF_8150_8D25_79CD_5B50_6210_957F, _____521B_5EFA_8150_8D25_5E7C_6811, _____5E7C_6811_6CE2_52A8Tick, _____521B_5EFA_843D_5730_79CD_5B50, _____5F39_9053Tick, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitX, GetUnitY, GetOwningPlayer, DestroyEffect, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, EXSetEffectXY, EXSetEffectZ, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____8BFB_53D6_5355_4F4D_653B_51FB_529B
+local _____8D1D_585E_5C14_4F4D_7F6E, _____83AB_5C14_7279_65AF_8150_8D25_5E7C_6811_6CE2_52A8, _____83AB_5C14_7279_65AF_8150_8D25_79CD_5B50_6210_957F, _____521B_5EFA_8150_8D25_5E7C_6811, _____5E7C_6811_6CE2_52A8Tick, _____521B_5EFA_843D_5730_79CD_5B50, _____5F39_9053Tick, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitX, GetUnitY, GetOwningPlayer, DestroyEffect, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, EXSetEffectXY, EXSetEffectZ, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____8150_8D25_4E4B_79CD_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.00．配置")
 local _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["莫尔特斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.01．运行时上下文")
@@ -92,6 +92,7 @@ function _____5E7C_6811_6CE2_52A8Tick(data)
                     goto __continue15
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____8150_8D25_4E4B_79CD_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = damage,
@@ -184,7 +185,7 @@ _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_
 local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
-local _____8150_8D25_4E4B_79CD_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败之种"]["技能槽位"])
+_____8150_8D25_4E4B_79CD_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败之种"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
 local function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD_5F39_9053(variable)
     local data = variable

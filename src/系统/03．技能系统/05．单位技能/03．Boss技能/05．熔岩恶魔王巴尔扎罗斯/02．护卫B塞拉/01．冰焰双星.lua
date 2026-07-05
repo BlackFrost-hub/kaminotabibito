@@ -197,6 +197,7 @@ local function _____53D1_5C04_51B0_7130_5F39_4F53(context, target, _____7C7B_578
         ["最大总命中次数"] = 1,
         ["每单位最大命中次数"] = 1,
         ["伤害值"] = 0,
+        ["伤害形态"] = "AOE",
         ["on命中"] = function(hitUnit)
             _____7ED3_7B97_51B0_7130AOE(context, hitUnit, _____7C7B_578B)
         end,

@@ -19,7 +19,7 @@ const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物
   UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
 };
 const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
-  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean) => void;
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, weaponType?: any, 选项?: any) => void;
 };
 
 const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
@@ -41,7 +41,7 @@ function 恢复自身最大生命百分比(this: void, source: any): void {
 }
 
 function 造成额外物理伤害(this: void, source: any, target: any): void {
-  造成装备伤害(source, target, 100, DAMAGE_TYPE_NORMAL);
+  造成装备伤害(source, target, 100, DAMAGE_TYPE_NORMAL, false, undefined, { 伤害形态: "单体" });
 }
 
 function 地狱火卡牌幸运暴击监听(this: void, record: any, _applied: number, _snapshot: any): void {

@@ -15,6 +15,7 @@ import {
   快照单位组,
 } from "./00．共享";
 import { 创建位移实例, 结束位移ID, 停止单位位移 } from "./02．驱动与实例";
+import { 尝试阻止自身位移技能 } from "../../../02．通用函数/20．位移技能限制";
 
 function 计算冲锋行走动画倍率(持续时间?: number): number {
   if (持续时间 == null || 持续时间 <= 0) {
@@ -59,6 +60,8 @@ function 解析击退角度(单位: any, 参数: 击退参数): number | null {
 }
 
 export function 开始冲锋(单位: any, 参数: 冲锋参数): number {
+  if (尝试阻止自身位移技能(单位)) return 0;
+
   const 角度 = 解析冲锋角度(单位, 参数);
   if (角度 == null) return 0;
 

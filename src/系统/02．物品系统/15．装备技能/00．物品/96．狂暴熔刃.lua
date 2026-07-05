@@ -49,7 +49,13 @@ _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
         do
             local i = 0
             while i < #enemies do
-                _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(event["攻击者"], enemies[i + 1], damage, "物理")
+                _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(
+                    event["攻击者"],
+                    enemies[i + 1],
+                    damage,
+                    "物理",
+                    {["伤害形态"] = "AOE"}
+                )
                 i = i + 1
             end
         end

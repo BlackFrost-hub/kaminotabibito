@@ -113,6 +113,7 @@ function on聊天1013测试(): void {
     命中半径: 110,
     碰撞消失: true,
     伤害值: 55,
+    伤害形态: "单体",
     影响目标: "敌方",
     模型: "Abilities\\Spells\\Human\\StormBolt\\StormBoltMissile.mdl",
     轨迹采样器: 创建锁定单位二阶贝塞尔加速度XYZ轨迹(

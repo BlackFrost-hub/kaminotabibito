@@ -31,7 +31,7 @@ function 是否为先祖之狱杖(this: void, 物品: any): boolean {
 }
 
 function 执行先祖延迟伤害(this: void, 施法单位: any, 目标单位: any): void {
-  造成装备伤害(施法单位, 目标单位, GetUnitState(目标单位, UNIT_STATE_MAX_LIFE) * 先祖之狱杖配置.伤害生命比例, DAMAGE_TYPE_SHADOW_STRIKE, true);
+  造成装备伤害(施法单位, 目标单位, GetUnitState(目标单位, UNIT_STATE_MAX_LIFE) * 先祖之狱杖配置.伤害生命比例, DAMAGE_TYPE_SHADOW_STRIKE, true, undefined, { 伤害形态: "单体" });
 }
 
 function 启动先祖延迟伤害(this: void, 施法单位: any, 目标单位: any): void {

@@ -286,6 +286,7 @@ function 发射站桩直线弹幕(this: void, 状态: 站桩弹幕射击状态):
     缩放: 参数.弹道缩放 ?? 1,
     影响目标: "敌方",
     伤害值: 0,
+    伤害形态: "单体",
     攻击类型: 参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
     伤害类型: 参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
     武器类型: 参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,

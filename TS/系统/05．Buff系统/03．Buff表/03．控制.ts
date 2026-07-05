@@ -183,6 +183,7 @@ export const 控制Buff表: Record<string, BuffData> = {
       dispelLevel: 2,
       priority: 9,
       canPurge: true,
+      禁止位移: true,
       tooltip: "受到了『纠缠根须』，被藤蔓牢牢缠住，在time秒内无法移动。"
     },
   "C018": {

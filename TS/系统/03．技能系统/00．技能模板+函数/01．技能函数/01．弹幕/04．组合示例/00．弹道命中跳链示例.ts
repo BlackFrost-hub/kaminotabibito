@@ -42,6 +42,7 @@ export function 发射弹道命中跳链示例(this: void, 参数: 弹道命中�
     指定目标: 参数.初始目标,
     命中半径: 80,
     伤害值: 参数.主弹伤害 ?? 100,
+    伤害形态: "单体",
     碰撞消失: true,
     生命周期: 4,
     目标筛选: function 主弹目标筛选(this: void, 单位: any): boolean {

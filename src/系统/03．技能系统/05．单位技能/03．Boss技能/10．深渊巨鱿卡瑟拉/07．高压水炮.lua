@@ -129,6 +129,7 @@ local function _____7ED3_7B97_9AD8_538B_6C34_70AE(context, startX, startY, angle
                     goto __continue13
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____9AD8_538B_6C34_70AE_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = damage,

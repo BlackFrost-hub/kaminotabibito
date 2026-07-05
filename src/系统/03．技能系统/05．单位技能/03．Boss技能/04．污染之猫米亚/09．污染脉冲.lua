@@ -22,6 +22,7 @@ local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
 local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_4["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -115,7 +116,7 @@ local function _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
         0
     )
 end
-local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex)
+local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____6280_80FD_5B9E_4F8BID)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or context["阶段"] ~= 2 then
         return
@@ -155,7 +156,9 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex)
                     attackType = jass.ATTACK_TYPE_CHAOS,
                     ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
                     weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能"
+                    ["来源类型"] = "Boss技能",
+                    ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                    ["标签"] = "米亚污染脉冲"
                 })
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["每波腐化层数"], "污染脉冲")
             end
@@ -179,6 +182,7 @@ ____exports["尝试触发米亚污染脉冲"] = function(context, nowMs)
         return
     end
     context["上次污染脉冲Ms"] = nowMs
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "米亚污染脉冲", ["持续时间秒"] = config["预警秒"] + #config["波次半径"] + 2})
     _____64AD_653E_8109_51B2_4E2D_5FC3_9884_8B66()
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污染脉冲", 0)
     _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761({["总时长"] = config["预警秒"], ["颜色ID"] = 3, ["标题文本"] = "污染脉冲", ["提示文本"] = "水池污染正在扩散，请进入安全域。"})
@@ -198,7 +202,7 @@ ____exports["尝试触发米亚污染脉冲"] = function(context, nowMs)
             addDelayedCallback(
                 (config["预警秒"] + waveIndex) * 1000,
                 function()
-                    _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex)
+                    _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____6280_80FD_5B9E_4F8BID)
                 end
             )
             i = i + 1

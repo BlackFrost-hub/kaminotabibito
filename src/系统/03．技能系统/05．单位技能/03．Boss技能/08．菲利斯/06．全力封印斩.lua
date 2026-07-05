@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____9009_62E9_5C01_5370_76EE_6807, _____6807_8BB0_5C01_5370_76EE_6807, _____6267_884C_5C01_5370_60E9_7F5A, _____77AC_79FB_5230_5C01_5370_76EE_6807, ____on_83F2_5229_65AF_5168_529B_5C01_5370_65A9_751F_6548, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, SetUnitX, SetUnitY, SetUnitInvulnerable, GetRandomInt, UNIT_STATE_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____547D_4EE4_5361_6280_80FD_662F_5426_5168_90E8_51B7_5374_4E2D, _____65BD_52A0_5FEB_901F_63A7_5236Buff, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____5FEB_901F_63A7_5236__51FB_6655, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5168_529B_5C01_5370_65A9_6280_80FDID
+local _____9009_62E9_5C01_5370_76EE_6807, _____6807_8BB0_5C01_5370_76EE_6807, _____6267_884C_5C01_5370_60E9_7F5A, _____77AC_79FB_5230_5C01_5370_76EE_6807, ____on_83F2_5229_65AF_5168_529B_5C01_5370_65A9_751F_6548, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, SetUnitInvulnerable, GetRandomInt, UNIT_STATE_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____547D_4EE4_5361_6280_80FD_662F_5426_5168_90E8_51B7_5374_4E2D, _____65BD_52A0_5FEB_901F_63A7_5236Buff, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____5FEB_901F_63A7_5236__51FB_6655, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5168_529B_5C01_5370_65A9_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.01．运行时上下文")
@@ -16,6 +16,8 @@ local _____53D6_96BE_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取难度"]
 local _____53D6_5355_4F4D_95F4_89D2_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取单位间角度"]
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
+local _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身位移到坐标"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 function _____9009_62E9_5C01_5370_76EE_6807(boss)
@@ -82,6 +84,7 @@ function _____6267_884C_5C01_5370_60E9_7F5A(boss, target)
     if manaLoss > 0 then
         SetUnitState(target, UNIT_STATE_MANA, mana - manaLoss)
         _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+            ["技能ID"] = _____5168_529B_5C01_5370_65A9_6280_80FDID,
             ["来源"] = boss,
             ["目标"] = target,
             ["伤害"] = manaLoss,
@@ -108,16 +111,13 @@ function _____77AC_79FB_5230_5C01_5370_76EE_6807(boss, target)
     end
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["全力封印斩"]
     local angle = _____53D6_5355_4F4D_95F4_89D2_5EA6(target, boss)
-    SetUnitX(
+    _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807(
         boss,
         _____6781_5750_6807X(
             GetUnitX(target),
             angle,
             cfg["瞬移距离"]
-        )
-    )
-    SetUnitY(
-        boss,
+        ),
         _____6781_5750_6807Y(
             GetUnitY(target),
             angle,
@@ -212,8 +212,6 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
 SetUnitState = jass.SetUnitState
-SetUnitX = jass.SetUnitX
-SetUnitY = jass.SetUnitY
 SetUnitInvulnerable = jass.SetUnitInvulnerable
 GetRandomInt = jass.GetRandomInt
 UNIT_STATE_MANA = jass.UNIT_STATE_MANA

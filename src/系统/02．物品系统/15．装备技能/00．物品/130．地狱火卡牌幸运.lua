@@ -34,7 +34,15 @@ local function _____6062_590D_81EA_8EAB_6700_5927_751F_547D_767E_5206_6BD4(sourc
     })
 end
 local function _____9020_6210_989D_5916_7269_7406_4F24_5BB3(source, target)
-    _____9020_6210_88C5_5907_4F24_5BB3(source, target, 100, DAMAGE_TYPE_NORMAL)
+    _____9020_6210_88C5_5907_4F24_5BB3(
+        source,
+        target,
+        100,
+        DAMAGE_TYPE_NORMAL,
+        false,
+        nil,
+        {["伤害形态"] = "单体"}
+    )
 end
 local function _____5730_72F1_706B_5361_724C_5E78_8FD0_66B4_51FB_76D1_542C(record, _applied, _snapshot)
     if _____5730_72F1_706B_5361_724C_5E78_8FD0_7269_54C1ID == 0 then

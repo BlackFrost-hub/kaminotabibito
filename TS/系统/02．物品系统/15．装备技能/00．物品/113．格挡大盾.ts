@@ -71,7 +71,7 @@ function on格挡大盾盾击(this: void, target: any, attacker: any, applied: n
 
   const 伤害值 = 取单位护甲(attacker) * 格挡大盾盾击护甲系数;
   if (!(伤害值 > 0)) return;
-  造成装备伤害(attacker, target, 伤害值, DAMAGE_TYPE_ENHANCED, false, WEAPON_TYPE_METAL_HEAVY_BASH);
+  造成装备伤害(attacker, target, 伤害值, DAMAGE_TYPE_ENHANCED, false, WEAPON_TYPE_METAL_HEAVY_BASH, { 伤害形态: "单体" });
 }
 
 export function 初始化格挡大盾(this: void): void {

@@ -5,6 +5,7 @@ import { 获取或创建菲利斯上下文, 菲利斯运行时上下文 } from "
 import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 取难度, 取单位间角度, 极坐标X, 极坐标Y } from "./11．公共工具";
+import { 执行战斗自身位移到坐标 } from "../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
@@ -16,8 +17,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
-const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
-const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
@@ -116,8 +115,7 @@ function 瞬移到封印目标(this: void, boss: any, target: any): void {
   if (!单位有效(boss) || !单位有效(target)) return;
   const cfg = 菲利斯数值与表现配置.全力封印斩;
   const angle = 取单位间角度(target, boss);
-  SetUnitX(boss, 极坐标X(GetUnitX(target), angle, cfg.瞬移距离));
-  SetUnitY(boss, 极坐标Y(GetUnitY(target), angle, cfg.瞬移距离));
+  执行战斗自身位移到坐标(boss, 极坐标X(GetUnitX(target), angle, cfg.瞬移距离), 极坐标Y(GetUnitY(target), angle, cfg.瞬移距离));
 }
 
 export function 释放菲利斯全力封印斩(this: void, context: 菲利斯运行时上下文): void {
@@ -181,4 +179,3 @@ function on菲利斯全力封印斩生效(this: void, castingUnit: any, spellAbi
   if (context == null) return;
   释放菲利斯全力封印斩(context);
 }
-

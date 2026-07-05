@@ -144,6 +144,7 @@ function _____6267_884C_5486_54EE_6CE2_547D_4E2D(context, unit)
         return
     end
     _____9020_6210AOE_6280_80FD_4F24_5BB3({
+        ["技能ID"] = _____6076_9B54_5486_54EE_6CE2_6280_80FDID,
         ["来源"] = boss,
         ["目标"] = unit,
         ["伤害"] = _____8BA1_7B97_5486_54EE_6CE2_4F24_5BB3(boss, unit),

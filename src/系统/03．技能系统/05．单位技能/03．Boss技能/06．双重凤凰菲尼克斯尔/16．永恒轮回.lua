@@ -26,6 +26,7 @@ local _____8BBE_7F6E_5355_4F4D_52A8_753B = ____19_FF0E_516C_5171_5DE5_5177["设�
 local _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔玩家英雄列表"]
 local _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击最大生命伤害"]
 local _____9020_6210_6697_706B_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成暗火伤害"]
+local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587 = ____19_FF0E_516C_5171_5DE5_5177["创建菲尼克斯尔独立伤害上下文"]
 local jass = require("jass.common")
 local KillUnit = jass.KillUnit
 local RemoveUnit = jass.RemoveUnit
@@ -55,6 +56,7 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
     context["永恒轮回已触发"] = true
     context["当前形态"] = "永恒轮回"
     local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]
+    local _____4F24_5BB3_4E0A_4E0B_6587 = _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587("菲尼克斯尔永恒轮回", config["永恒轮回引导秒"] + 2)
     _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD(context.Boss, "永恒轮回")
     _____5F00_59CB_65BD_6CD5_786C_76F4(context.Boss, config["永恒轮回引导秒"])
     _____8BBE_7F6E_5355_4F4D_52A8_753B(context.Boss, _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第二形态"]["轮回死亡"]["编号"], _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第二形态"]["轮回死亡"]["倍速"])
@@ -106,7 +108,9 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                         _____9020_6210_6697_706B_4F24_5BB3(
                             context.Boss,
                             heroes[i + 1],
-                            _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, heroes[i + 1], config["轮回失败全场伤害Boss攻击力比例"], config["轮回失败全场伤害目标最大生命比例"])
+                            _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, heroes[i + 1], config["轮回失败全场伤害Boss攻击力比例"], config["轮回失败全场伤害目标最大生命比例"]),
+                            "AOE",
+                            _____4F24_5BB3_4E0A_4E0B_6587
                         )
                         i = i + 1
                     end

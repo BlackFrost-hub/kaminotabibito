@@ -13,8 +13,8 @@ import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC } from "./13．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const jass = require("jass.common") as any;
 
@@ -121,7 +121,7 @@ function 结算单个神风粉碎(this: void, context: 里科特运行时上下�
   const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
   const damage = maxLife * cfg.粉碎每层最大生命比例 * stack;
   const stun = cfg.粉碎基础眩晕秒 + cfg.粉碎每层眩晕秒 * stack;
-  造成AOE技能伤害({
+  造成单体技能伤害({
     技能ID: 神风护体技能ID,
     来源: context.Boss单位,
     目标: target,

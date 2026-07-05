@@ -10,7 +10,7 @@ function on电鳗共生指环触发(this: void, event: any): void {
   let count = 0;
   for (let i = 0; i < enemies.length && count < 3; i++) {
     播放单位特效("Abilities\\Weapons\\Bolt\\BoltImpact.mdl", enemies[i], "origin", 0.6);
-    造成装备伤害(attacker, enemies[i], 取攻击力(attacker) * 0.35, 装备伤害类型.闪电);
+    造成装备伤害(attacker, enemies[i], 取攻击力(attacker) * 0.35, 装备伤害类型.闪电, false, undefined, { 伤害形态: "AOE" });
     count++;
   }
 }

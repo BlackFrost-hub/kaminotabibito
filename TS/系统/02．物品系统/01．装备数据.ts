@@ -28,6 +28,10 @@
   armorPierce?: number;
   magicPierce?: number;
   skillDmg?: number;
+  activeSkillDmg?: number;
+  equipmentDmg?: number;
+  attackEffectDmg?: number;
+  normalAttackEnhanceDmg?: number;
   skillResist?: number;
   magicDmg?: number;
   physDmg?: number;

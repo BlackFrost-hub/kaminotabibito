@@ -2,6 +2,7 @@ import type { DotState, DotTypeConfig } from "./01．DOT配置";
 import { clearIgnoredTarget, getDotState, isIgnoredTarget, isValidDotStateRow, setIgnoredTarget } from "./04．DOT工具";
 import { DOT_TYPE_TO_BUFF_ID, getBuffRuntimeByHid } from "../../05．Buff系统/00．Buff系统";
 import { 计算持续伤害最终值 } from "../07．持续伤害系统";
+import { 造成装备技能伤害 } from "../08．技能伤害系统";
 
 const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
@@ -88,16 +89,18 @@ export function createDotExecutor(deps: {
     if (typeof damageEventModule.markNextPendingDamageAsDotTickBatch === "function") {
       damageEventModule.markNextPendingDamageAsDotTickBatch();
     }
-    jass.UnitDamageTarget(
-      source,
-      target,
-      finalAmount,
-      false,
-      false,
-      jass.ATTACK_TYPE_NORMAL,
-      cfg.damageType,
-      jass.WEAPON_TYPE_WHOKNOWS
-    );
+    造成装备技能伤害({
+      来源: source,
+      目标: target,
+      伤害: finalAmount,
+      伤害类型: cfg.damageType,
+      attack: false,
+      ranged: false,
+      attackType: jass.ATTACK_TYPE_NORMAL,
+      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+      装备技能类型: "装备持续伤害",
+      伤害形态: "单体",
+    });
     for (let ci = 0; ci < dotTypes.length; ci++) {
       clearIgnoredTarget(dotTypes[ci].id, dh);
     }

@@ -8,7 +8,7 @@ function on腐朽孢子秘瓶触发(this: void, event: any): void {
   const attacker = event.攻击者;
   const enemies = 取范围敌人(attacker, target, 300);
   for (let i = 0; i < enemies.length; i++) {
-    造成装备伤害(attacker, enemies[i], 取攻击力(attacker) * 0.25, 装备伤害类型.暗影);
+    造成装备伤害(attacker, enemies[i], 取攻击力(attacker) * 0.25, 装备伤害类型.暗影, false, undefined, { 伤害形态: "AOE" });
   }
 }
 

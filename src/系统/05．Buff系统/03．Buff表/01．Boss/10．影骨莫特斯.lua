@@ -39,6 +39,7 @@ ____exports["影骨莫特斯Buff表"] = {
         dispelLevel = 3,
         priority = 84,
         canPurge = false,
+        ["禁止位移"] = true,
         tooltip = "被暗影法阵禁锢，无法移动或施法。队友攻击并摧毁法阵后，剩余禁锢时间缩短到1秒。"
     },
     [____exports["影骨莫特斯BuffID"]["幽灵形态"]] = {

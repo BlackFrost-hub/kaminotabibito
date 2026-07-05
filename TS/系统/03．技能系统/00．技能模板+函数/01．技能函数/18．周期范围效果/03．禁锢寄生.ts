@@ -20,7 +20,7 @@ const { SFB_setEntanglingRoots, SFB_setParasite } = require("lib.扩展函数.St
   SFB_setParasite: (this: void, sourceUnit: any, u: any, time: number) => void;
 };
 const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
-  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any) => boolean;
+  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any, 选项?: any) => boolean;
 };
 
 const BUFF_纠缠根须 = 0x42456572;

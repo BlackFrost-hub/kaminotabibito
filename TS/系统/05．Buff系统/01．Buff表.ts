@@ -25,6 +25,8 @@ export interface BuffData {
   dispelLevel: number;
   priority: number;
   canPurge: boolean;
+  /** 为 true 时，该 Buff 会阻止冲锋、跳跃、闪烁等自身位移技能。 */
+  禁止位移?: boolean;
   tooltip: string;
   [key: string]: string | number | boolean | undefined;
 }

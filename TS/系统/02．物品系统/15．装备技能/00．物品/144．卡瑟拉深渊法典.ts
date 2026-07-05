@@ -34,7 +34,7 @@ function 卡瑟拉闪电过滤(this: void, event: any): boolean {
   自定义过滤: 卡瑟拉闪电过滤,
   on触发: function on卡瑟拉深渊法典闪电(this: void, event): void {
     if (!卡瑟拉湿痕.消耗(event.目标)) return;
-    造成装备伤害(event.攻击者, event.目标, event.本次伤害 * 0.22, 装备伤害类型.闪电);
+    造成装备伤害(event.攻击者, event.目标, event.本次伤害 * 0.22, 装备伤害类型.闪电, false, undefined, { 伤害形态: "单体" });
   },
 });
 

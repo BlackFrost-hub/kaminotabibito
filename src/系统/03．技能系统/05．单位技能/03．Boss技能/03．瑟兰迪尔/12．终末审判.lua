@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____8DDD_79BB_5E73_65B9, _____64AD_653E_70B9_7279_6548, _____64AD_653EBoss_84C4_529BTick, _____521B_5EFA_7EC8_672B_5BA1_5224_7206_70B8_7279_6548, _____8BA1_7B97_7206_70B8_7279_6548_524D_7F6E_5EF6_8FDF_6BEB_79D2, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, YDWETimerDestroyEffectSafe, _____5F00_59CB_786C_76F4, _____663E_793A_5927_62DB_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_767D_8272_5706_5F62_63D0_793A_5708, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____9020_6210AOE_6280_80FD_4F24_5BB3, jass, GetUnitX, GetUnitY, AddSpecialEffect, SetUnitAnimationByIndex, SetUnitTimeScale, R2I, GetUnitState, EXSetEffectSize, UNIT_STATE_MAX_LIFE
+local _____5355_4F4D_6709_6548, _____8DDD_79BB_5E73_65B9, _____64AD_653E_70B9_7279_6548, _____64AD_653EBoss_84C4_529BTick, _____521B_5EFA_7EC8_672B_5BA1_5224_7206_70B8_7279_6548, _____8BA1_7B97_7206_70B8_7279_6548_524D_7F6E_5EF6_8FDF_6BEB_79D2, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, YDWETimerDestroyEffectSafe, _____5F00_59CB_786C_76F4, _____663E_793A_5927_62DB_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_767D_8272_5706_5F62_63D0_793A_5708, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B, jass, GetUnitX, GetUnitY, AddSpecialEffect, SetUnitAnimationByIndex, SetUnitTimeScale, R2I, GetUnitState, EXSetEffectSize, UNIT_STATE_MAX_LIFE
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
 local _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["瑟兰迪尔数值与表现配置"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.15．台词播放")
@@ -69,6 +69,7 @@ ____exports["释放瑟兰迪尔终末审判"] = function(context)
     if not _____5355_4F4D_6709_6548(boss) then
         return
     end
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "瑟兰迪尔终末审判", ["持续时间秒"] = config["引导秒"] + config["爆炸延迟秒"] + 2})
     _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD(boss, "终末审判")
     _____5F00_59CB_786C_76F4(boss, config["引导秒"])
     _____663E_793A_5927_62DB_541F_5531_6761({["总时长"] = config["引导秒"], ["颜色ID"] = config["吟唱条颜色ID"], ["标题文本"] = config["吟唱条标题文本"], ["提示文本"] = config["吟唱条提示文本"]})
@@ -196,7 +197,9 @@ ____exports["释放瑟兰迪尔终末审判"] = function(context)
                                         attackType = jass.ATTACK_TYPE_NORMAL,
                                         ["伤害类型"] = jass.DAMAGE_TYPE_MAGIC,
                                         weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                                        ["来源类型"] = "Boss技能"
+                                        ["来源类型"] = "Boss技能",
+                                        ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                                        ["标签"] = "瑟兰迪尔终末审判"
                                     })
                                 end
                             end
@@ -229,6 +232,7 @@ local ____require_result_6 = require("系统.03．技能系统.05．单位技能
 _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
 local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成AOE技能伤害"]
+_____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_7["创建独立技能伤害实例"]
 jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitX = jass.GetUnitX

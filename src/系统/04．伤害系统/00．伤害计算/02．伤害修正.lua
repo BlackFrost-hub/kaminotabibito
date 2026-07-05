@@ -104,6 +104,28 @@ function ____exports.getSkillDamageModifier(self, attacker, target, isPlayer)
     OperatorRealMultiply(skillDmg, addDamage, multiplier)
     return {addDamage = addDamage.value, multiplier = multiplier.value}
 end
+--- 获取主动/独立技能伤害修正
+function ____exports.getActiveSkillDamageModifier(self, attacker)
+    local activeSkillDmg = getRealAttr(nil, attacker, "主动技能伤害", 0) + getRealAttr(nil, attacker, "独立技能伤害", 0)
+    local addDamage = createValueHolder(0)
+    local multiplier = createValueHolder(1)
+    OperatorRealMultiply(activeSkillDmg, addDamage, multiplier)
+    return {addDamage = addDamage.value, multiplier = multiplier.value}
+end
+--- 获取装备技能伤害修正。
+-- 装备伤害作用于所有装备技能伤害；攻击特效/普攻强化只作用于对应子类。
+function ____exports.getEquipmentSkillDamageModifier(self, attacker, equipmentSkillKind)
+    local equipmentDmg = getRealAttr(nil, attacker, "装备伤害", 0)
+    if equipmentSkillKind == "攻击特效" then
+        equipmentDmg = equipmentDmg + getRealAttr(nil, attacker, "攻击特效伤害", 0)
+    elseif equipmentSkillKind == "普攻强化" then
+        equipmentDmg = equipmentDmg + getRealAttr(nil, attacker, "普攻强化伤害", 0)
+    end
+    local addDamage = createValueHolder(0)
+    local multiplier = createValueHolder(1)
+    OperatorRealMultiply(equipmentDmg, addDamage, multiplier)
+    return {addDamage = addDamage.value, multiplier = multiplier.value}
+end
 --- 获取普攻伤害修正
 function ____exports.getNormalAttackModifier(self, attacker, target, isPlayer)
     local atkDmg = getRealAttr(nil, attacker, "普攻伤害", 0)

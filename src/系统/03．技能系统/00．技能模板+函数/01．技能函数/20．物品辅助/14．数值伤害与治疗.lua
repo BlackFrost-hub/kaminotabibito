@@ -178,7 +178,8 @@ ____exports["造成强化伤害"] = function(_____6765_6E90, _____76EE_6807, ___
         ["伤害类型"] = DAMAGE_TYPE_ENHANCED,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
-        weaponType = WEAPON_TYPE_WHOKNOWS
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["伤害形态"] = "单体"
     })
 end
 ____exports["造成火焰伤害"] = function(_____6765_6E90, _____76EE_6807, _____4F24_5BB3)
@@ -192,7 +193,8 @@ ____exports["造成火焰伤害"] = function(_____6765_6E90, _____76EE_6807, ___
         ["伤害类型"] = DAMAGE_TYPE_FIRE,
         ranged = true,
         attackType = ATTACK_TYPE_NORMAL,
-        weaponType = WEAPON_TYPE_WHOKNOWS
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["伤害形态"] = "单体"
     })
 end
 ____exports["造成暗影伤害"] = function(_____6765_6E90, _____76EE_6807, _____4F24_5BB3)
@@ -206,7 +208,8 @@ ____exports["造成暗影伤害"] = function(_____6765_6E90, _____76EE_6807, ___
         ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
         ranged = true,
         attackType = ATTACK_TYPE_NORMAL,
-        weaponType = WEAPON_TYPE_WHOKNOWS
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["伤害形态"] = "单体"
     })
 end
 ____exports["造成普通伤害"] = function(_____6765_6E90, _____76EE_6807, _____4F24_5BB3)
@@ -220,7 +223,8 @@ ____exports["造成普通伤害"] = function(_____6765_6E90, _____76EE_6807, ___
         ["伤害类型"] = DAMAGE_TYPE_NORMAL,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
-        weaponType = WEAPON_TYPE_WHOKNOWS
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["伤害形态"] = "单体"
     })
 end
 ____exports["造成精神自伤"] = function(_____5355_4F4D, _____4F24_5BB3)
@@ -234,7 +238,8 @@ ____exports["造成精神自伤"] = function(_____5355_4F4D, _____4F24_5BB3)
         ["伤害类型"] = DAMAGE_TYPE_MIND,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
-        weaponType = WEAPON_TYPE_WHOKNOWS
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["伤害形态"] = "单体"
     })
 end
 ____exports["执行治疗"] = function(_____6765_6E90, _____76EE_6807, _____751F_547D, _____9B54_6CD5)

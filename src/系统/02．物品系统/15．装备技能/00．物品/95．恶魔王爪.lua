@@ -38,7 +38,15 @@ local function _____9020_6210_6076_9B54_738B_722A_771F_5B9E_4F24_5BB3(source, ta
     if not (amount > 0) then
         return
     end
-    _____9020_6210_88C5_5907_4F24_5BB3(source, target, amount, DAMAGE_TYPE_MIND)
+    _____9020_6210_88C5_5907_4F24_5BB3(
+        source,
+        target,
+        amount,
+        DAMAGE_TYPE_MIND,
+        false,
+        nil,
+        {["伤害形态"] = "单体"}
+    )
 end
 local function _____65BD_52A0_6216_5237_65B0_6495_88C2(source, target)
     _____65BD_52A0_6216_5237_65B0_5468_671F_76EE_6807_6548_679C({

@@ -71,6 +71,7 @@ function _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(context, ax, ay, bx, by, w
                 end
                 local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["Boss攻击力比例"] + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["目标最大生命比例"]
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____5251_6C14_7075_65A9_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = damage,
@@ -150,6 +151,7 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
                         end
                         local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["侵蚀Boss攻击力比例"] + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["侵蚀目标最大生命比例"]
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                            ["技能ID"] = _____5251_6C14_7075_65A9_6280_80FDID,
                             ["来源"] = boss,
                             ["目标"] = hero,
                             ["伤害"] = damage,

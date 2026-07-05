@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_8FFD_51FB_76EE_6807, _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6, _____53D1_5C04_8FFD_51FB_98CE_5203, ____on_91CC_79D1_7279_8FFD_51FB_98CE_5203_751F_6548, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetSpellTargetUnit, GetOwningPlayer, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____91CC_79D1_7279_5355_4F4D_7C7B_578BID, _____8FFD_51FB_98CE_5203_6280_80FDID
+local _____53D6_8FFD_51FB_76EE_6807, _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6, _____53D1_5C04_8FFD_51FB_98CE_5203, ____on_91CC_79D1_7279_8FFD_51FB_98CE_5203_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetSpellTargetUnit, GetOwningPlayer, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____91CC_79D1_7279_5355_4F4D_7C7B_578BID, _____8FFD_51FB_98CE_5203_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.09．里科特.00．配置")
 local _____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["里科特单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.09．里科特.01．运行时上下文")
@@ -67,7 +67,8 @@ function _____53D1_5C04_8FFD_51FB_98CE_5203(context, angle)
                 if not _____5355_4F4D_6709_6548(target) then
                     return
                 end
-                _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____8FFD_51FB_98CE_5203_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = target,
                     ["伤害"] = damage,
@@ -138,7 +139,7 @@ function ____on_91CC_79D1_7279_8FFD_51FB_98CE_5203_751F_6548(castingUnit, spellA
     ____exports["释放里科特追击风刃"](context)
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
+_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX

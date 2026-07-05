@@ -18,6 +18,7 @@ local _____9020_6210_706B_7130_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造�
 local _____9020_6210_51B0_971C_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成冰霜伤害"]
 local _____9020_6210_6BD2_706B_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成毒火伤害"]
 local _____9020_6210_6697_706B_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成暗火伤害"]
+local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587 = ____19_FF0E_516C_5171_5DE5_5177["创建菲尼克斯尔独立伤害上下文"]
 local _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击最大生命伤害"]
 local _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击已损失伤害"]
 local _____53D6_6700_5927_751F_547D = ____19_FF0E_516C_5171_5DE5_5177["取最大生命"]
@@ -38,6 +39,7 @@ ____exports["结算菲尼克斯尔元素爆发"] = function(context)
         return
     end
     local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["元素爆发"]
+    local _____4F24_5BB3_4E0A_4E0B_6587 = _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587("菲尼克斯尔元素爆发", 3)
     _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD(context.Boss, "元素爆发")
     _____663E_793A_573A_5730_8BFB_6761(3, config["吟唱条颜色ID"], config["吟唱条标题文本"], config["吟唱条提示文本"])
     local heroes = _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868()
@@ -60,25 +62,33 @@ ____exports["结算菲尼克斯尔元素爆发"] = function(context)
                     _____9020_6210_51B0_971C_4F24_5BB3(
                         context.Boss,
                         hero,
-                        _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, hero, config["冰伤害Boss攻击力比例"], config["冰伤害目标最大生命比例"])
+                        _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, hero, config["冰伤害Boss攻击力比例"], config["冰伤害目标最大生命比例"]),
+                        "AOE",
+                        _____4F24_5BB3_4E0A_4E0B_6587
                     )
                 elseif top["元素"] == "毒" then
                     _____9020_6210_6BD2_706B_4F24_5BB3(
                         context.Boss,
                         hero,
-                        (_____53D6_6700_5927_751F_547D(hero) - 0) * 0 + _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3(context.Boss, hero, 0, config["毒伤害目标已损失生命比例"])
+                        (_____53D6_6700_5927_751F_547D(hero) - 0) * 0 + _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3(context.Boss, hero, 0, config["毒伤害目标已损失生命比例"]),
+                        "AOE",
+                        _____4F24_5BB3_4E0A_4E0B_6587
                     )
                 elseif top["元素"] == "暗" then
                     _____9020_6210_6697_706B_4F24_5BB3(
                         context.Boss,
                         hero,
-                        _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, hero, config["暗伤害Boss攻击力比例"], config["暗伤害目标最大生命比例"])
+                        _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, hero, config["暗伤害Boss攻击力比例"], config["暗伤害目标最大生命比例"]),
+                        "AOE",
+                        _____4F24_5BB3_4E0A_4E0B_6587
                     )
                 else
                     _____9020_6210_706B_7130_4F24_5BB3(
                         context.Boss,
                         hero,
-                        _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, hero, config["火伤害Boss攻击力比例"], config["火伤害目标最大生命比例"])
+                        _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, hero, config["火伤害Boss攻击力比例"], config["火伤害目标最大生命比例"]),
+                        "AOE",
+                        _____4F24_5BB3_4E0A_4E0B_6587
                     )
                 end
                 _____51CF_5C11_5143_7D20_5C42_6570(hero, top["元素"], config["结算后最高层降低"])

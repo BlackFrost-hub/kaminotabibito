@@ -5,8 +5,9 @@ import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置"
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y } from "./16．公共工具";
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const jass = require("jass.common") as any;
 
@@ -52,6 +53,7 @@ interface 甲虫追击实例 {
   接触目标: any;
   接触Ticks: number;
   周期ID: number;
+  技能实例ID?: number;
 }
 
 interface 莫尔特斯虫尸变量 {
@@ -106,7 +108,7 @@ function 爆炸甲虫(this: void, data: 甲虫追击实例): void {
   const target = data.接触目标;
   if (!单位有效(boss) || !单位有效(target)) return;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
-  造成AOE技能伤害({
+  造成单体技能伤害({
     来源: boss,
     目标: target,
     伤害: 读取单位攻击力(boss) * cfg.爆炸伤害Boss攻击力比例,
@@ -116,6 +118,8 @@ function 爆炸甲虫(this: void, data: 甲虫追击实例): void {
     伤害类型: DAMAGE_TYPE_PLANT,
     weaponType: WEAPON_TYPE_WHOKNOWS,
     来源类型: "Boss技能",
+    技能实例ID: data.技能实例ID,
+    标签: "莫尔特斯共生腐朽虫群",
   });
   增加玩家腐败值(data.context, target, cfg.爆炸腐败值);
 }
@@ -161,7 +165,7 @@ function 莫尔特斯甲虫死亡(this: void, unit: any, _击杀者: any, variab
   创建虫尸拾取物(data.context, GetUnitX(unit), GetUnitY(unit));
 }
 
-function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文, angle: number): void {
+function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文, angle: number, 技能实例ID?: number): void {
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
   const x = 极坐标X(GetUnitX(boss), angle, 360);
@@ -183,7 +187,7 @@ function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文,
   });
   if (instance == null || !单位有效(instance.单位)) return;
   临时调整攻击(instance.单位, cfg.甲虫攻击力);
-  const data: 甲虫追击实例 = { context, 甲虫单位: instance.单位, 接触目标: null, 接触Ticks: 0, 周期ID: 0 };
+  const data: 甲虫追击实例 = { context, 甲虫单位: instance.单位, 接触目标: null, 接触Ticks: 0, 周期ID: 0, 技能实例ID };
   data.周期ID = addPeriodicCallback(1000, 莫尔特斯甲虫追击周期, data);
   context.清理.登记周期回调("莫尔特斯-甲虫追击", data.周期ID);
 }
@@ -195,8 +199,13 @@ export function 尝试释放莫尔特斯共生腐朽虫群(this: void, context: 
   if (nowMs < context.下次虫群时间) return;
   context.下次虫群时间 = nowMs + cfg.触发间隔秒 * 1000;
   播放莫尔特斯台词(context.Boss单位, "腐败之种");
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "莫尔特斯共生腐朽虫群",
+    持续时间秒: cfg.接触爆炸秒 + 12,
+  });
   for (let i = 0; i < cfg.甲虫数量; i++) {
-    创建腐化甲虫(context, i * 90);
+    创建腐化甲虫(context, i * 90, 技能实例ID);
   }
 }
 

@@ -57,7 +57,15 @@ ____exports["处理远古毒咒护符使用"] = function(_____4E0A_4E0B_6587)
                 if not _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9(_____654C_4EBA, _____65BD_6CD5_5355_4F4D) then
                     goto __continue8
                 end
-                _____9020_6210_88C5_5907_4F24_5BB3(_____65BD_6CD5_5355_4F4D, _____654C_4EBA, _____4F24_5BB3_503C, DAMAGE_TYPE_POISON)
+                _____9020_6210_88C5_5907_4F24_5BB3(
+                    _____65BD_6CD5_5355_4F4D,
+                    _____654C_4EBA,
+                    _____4F24_5BB3_503C,
+                    DAMAGE_TYPE_POISON,
+                    false,
+                    nil,
+                    {["伤害形态"] = "AOE"}
+                )
             end
             ::__continue8::
             i = i + 1

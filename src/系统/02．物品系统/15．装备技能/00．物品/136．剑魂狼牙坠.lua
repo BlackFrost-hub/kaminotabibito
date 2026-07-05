@@ -25,7 +25,10 @@ local function ____on_5251_9B42_72FC_7259_5760_89E6_53D1(event)
         attacker,
         target,
         _____53D6_653B_51FB_529B(attacker) * 0.35,
-        _____88C5_5907_4F24_5BB3_7C7B_578B["风"]
+        _____88C5_5907_4F24_5BB3_7C7B_578B["风"],
+        false,
+        nil,
+        {["伤害形态"] = "单体"}
     )
     _____6062_590D_751F_547D_9B54_6CD5(
         attacker,

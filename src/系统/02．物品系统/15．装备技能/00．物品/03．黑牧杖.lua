@@ -35,7 +35,15 @@ local function _____5BF9_654C_4EBA_9020_6210_9ED1_7267_6756_4F24_5BB3(_____65BD_
     if not isValidUnit(_____65BD_6CD5_8005) or not isValidUnit(_____76EE_6807) then
         return
     end
-    _____9020_6210_88C5_5907_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, _____9ED1_7267_6756_914D_7F6E["伤害值"], DAMAGE_TYPE_SHADOW_STRIKE)
+    _____9020_6210_88C5_5907_4F24_5BB3(
+        _____65BD_6CD5_8005,
+        _____76EE_6807,
+        _____9ED1_7267_6756_914D_7F6E["伤害值"],
+        DAMAGE_TYPE_SHADOW_STRIKE,
+        false,
+        nil,
+        {["伤害形态"] = "AOE"}
+    )
     createTimedEffect(
         _____9ED1_7267_6756_914D_7F6E["特效路径"],
         GetUnitX(_____76EE_6807),

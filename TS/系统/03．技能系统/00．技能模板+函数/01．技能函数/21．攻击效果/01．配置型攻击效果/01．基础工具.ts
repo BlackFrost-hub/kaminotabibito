@@ -149,7 +149,7 @@ export function 配置型攻击效果造成伤害(this: void, source: any, targe
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: 解析配置型攻击效果伤害类型(类型),
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    装备技能类型: 标记?.装备技能类型 ?? "装备被动",
+    装备技能类型: 标记?.装备技能类型 ?? "攻击特效",
     伤害形态: 标记?.伤害形态 ?? "单体",
     标签: 标记?.标签,
     参与技能伤害加成: 标记?.参与技能伤害加成,

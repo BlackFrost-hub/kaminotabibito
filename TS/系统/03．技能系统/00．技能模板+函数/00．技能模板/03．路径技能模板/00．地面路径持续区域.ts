@@ -38,7 +38,7 @@ const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
-  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any) => boolean;
+  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any, 选项?: any) => boolean;
 };
 
 export interface 地面路径持续区域参数 {
@@ -226,7 +226,8 @@ class 地面路径持续区域实现 implements 地面路径持续区域实例 {
         this.参数.周期伤害类型 ?? DAMAGE_TYPE_NORMAL,
         false,
         ATTACK_TYPE_NORMAL,
-        WEAPON_TYPE_WHOKNOWS
+        WEAPON_TYPE_WHOKNOWS,
+        { 伤害形态: "AOE" }
       );
     }
   }

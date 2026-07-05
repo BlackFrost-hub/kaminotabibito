@@ -8,6 +8,8 @@ local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．�
 local _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3 = ____04_FF0E_8150_5316_611F_67D3["添加米亚腐化感染"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.15．台词播放")
 local _____64AD_653E_7C73_4E9A_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放米亚台词"]
+local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
+local _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身传送到坐标"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -29,7 +31,6 @@ local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitFacing = jass.SetUnitFacing
-local SetUnitPosition = jass.SetUnitPosition
 local SetUnitTimeScale = jass.SetUnitTimeScale
 local Atan2 = jass.Atan2
 local R2I = jass.R2I
@@ -236,13 +237,16 @@ local function _____542F_52A8_8150_5316_8F6C_79FB(context, nowMs, _____533A_57DF
                 return
             end
             _____5173_95ED_541F_5531_6761("常规技能")
-            _____64AD_653E_5165_51FA_6C34_8868_73B0(
-                GetUnitX(currentBoss),
-                GetUnitY(currentBoss)
-            )
+            local _____539FX = GetUnitX(currentBoss)
+            local _____539FY = GetUnitY(currentBoss)
+            if not _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(currentBoss, _____533A_57DF["中心X"], _____533A_57DF["中心Y"]) then
+                SetUnitTimeScale(currentBoss, 1)
+                SetUnitAnimationByIndex(currentBoss, 0)
+                return
+            end
+            _____64AD_653E_5165_51FA_6C34_8868_73B0(_____539FX, _____539FY)
             SetUnitTimeScale(currentBoss, 2)
             SetUnitAnimationByIndex(currentBoss, 7)
-            SetUnitPosition(currentBoss, _____533A_57DF["中心X"], _____533A_57DF["中心Y"])
             _____64AD_653E_5165_51FA_6C34_8868_73B0(_____533A_57DF["中心X"], _____533A_57DF["中心Y"])
             _____5F00_59CB_6C61_67D3_5E73_53F0(
                 context,

@@ -129,6 +129,7 @@ ____exports["释放米亚污水喷吐"] = function(context)
                     goto __continue22
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____6C61_6C34_55B7_5410_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = target,
                     ["伤害"] = _____8BA1_7B97_6C61_6C34_55B7_5410_76F4_63A5_4F24_5BB3(boss, target) * _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387(context, target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),

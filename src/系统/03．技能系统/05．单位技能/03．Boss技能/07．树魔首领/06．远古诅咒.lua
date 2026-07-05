@@ -192,6 +192,7 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, centerX
                 end
                 local damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["后续爆发目标最大生命比例"] + _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["后续爆发Boss攻击力比例"]
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____8FDC_53E4_8BC5_5492_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = damage,
@@ -251,6 +252,7 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5(context, target)
             local i = 0
             while i < #splitTargets do
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____8FDC_53E4_8BC5_5492_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = splitTargets[i + 1],
                     ["伤害"] = damagePerTarget,
@@ -266,6 +268,7 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5(context, target)
         end
     else
         _____9020_6210AOE_6280_80FD_4F24_5BB3({
+            ["技能ID"] = _____8FDC_53E4_8BC5_5492_6280_80FDID,
             ["来源"] = boss,
             ["目标"] = target,
             ["伤害"] = baseDamage,

@@ -8,6 +8,8 @@
  * 3. 重新选中是本地玩家表现：默认让单位拥有者重新选中该单位。
  */
 
+import { 尝试阻止自身位移技能 } from "./20．位移技能限制";
+
 const jass = require("jass.common") as any;
 
 const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
@@ -146,6 +148,7 @@ function 注册闪烁Tick(): void {
 
 export function 开始闪烁(单位: any, 参数: 闪烁参数): number {
   if (!单位存活(单位)) return 0;
+  if (尝试阻止自身位移技能(单位)) return 0;
 
   const 持续时间 = 参数.持续时间 > 0 ? 参数.持续时间 : 0;
   const 特效生命周期 = 参数.特效生命周期 != null && 参数.特效生命周期 > 0

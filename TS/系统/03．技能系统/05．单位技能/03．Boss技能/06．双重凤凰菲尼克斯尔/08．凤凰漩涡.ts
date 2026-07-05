@@ -29,6 +29,7 @@ import {
   极坐标Y,
   移动单位到,
 } from "./19．公共工具";
+import type { 菲尼克斯尔伤害上下文参数 } from "./19．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
@@ -40,12 +41,13 @@ const 菲尼克斯尔单位类型ID = stringToFourCC(菲尼克斯尔单位技能
 const 凤凰漩涡技能ID = stringToFourCC(菲尼克斯尔单位技能配置.技能壳.凤凰漩涡);
 let 凤凰漩涡已注册 = false;
 
-export function 释放菲尼克斯尔凤凰漩涡(this: void, context: 菲尼克斯尔运行时上下文, target?: any): void {
+export function 释放菲尼克斯尔凤凰漩涡(this: void, context: 菲尼克斯尔运行时上下文, target?: any, 技能实例ID?: number): void {
   if (context.当前形态 !== "第一形态" || !单位存活(context.Boss)) return;
   const boss = context.Boss;
   const realTarget = 取目标或随机玩家(boss, target);
   if (!单位存活(realTarget)) return;
   const config = 菲尼克斯尔数值与表现配置.凤凰漩涡;
+  const 伤害上下文: 菲尼克斯尔伤害上下文参数 = { 技能ID: 凤凰漩涡技能ID, 技能实例ID, 标签: "菲尼克斯尔凤凰漩涡" };
   const x = 取单位X(realTarget);
   const y = 取单位Y(realTarget);
   面向单位(boss, realTarget);
@@ -62,7 +64,7 @@ export function 释放菲尼克斯尔凤凰漩涡(this: void, context: 菲尼克
       const enemies = 范围敌人(boss, x, y, config.半径);
       for (let i = 0; i < enemies.length; i++) {
         const u = enemies[i];
-        造成火焰伤害(boss, u, 计算攻击已损失伤害(boss, u, config.伤害Boss攻击力比例, config.伤害目标已损失生命比例));
+        造成火焰伤害(boss, u, 计算攻击已损失伤害(boss, u, config.伤害Boss攻击力比例, config.伤害目标已损失生命比例), "AOE", 伤害上下文);
         添加元素层数(u, "火", config.火印层数);
         const d = 两点距离(取单位X(u), 取单位Y(u), x, y);
         if (d > config.中心半径) {
@@ -76,11 +78,11 @@ export function 释放菲尼克斯尔凤凰漩涡(this: void, context: 菲尼克
   });
 }
 
-function on菲尼克斯尔凤凰漩涡生效(this: void, castingUnit: any, spellAbilityId: number): void {
+function on菲尼克斯尔凤凰漩涡生效(this: void, castingUnit: any, spellAbilityId: number, 技能实例ID?: number): void {
   if (spellAbilityId !== 凤凰漩涡技能ID) return;
   if (!单位存活(castingUnit) || GetUnitTypeId(castingUnit) !== 菲尼克斯尔单位类型ID) return;
   const context = 获取或创建菲尼克斯尔上下文(castingUnit);
-  if (context != null) 释放菲尼克斯尔凤凰漩涡(context);
+  if (context != null) 释放菲尼克斯尔凤凰漩涡(context, undefined, 技能实例ID);
 }
 
 export function 注册菲尼克斯尔凤凰漩涡(this: void): void {
@@ -91,8 +93,8 @@ export function 注册菲尼克斯尔凤凰漩涡(this: void): void {
     单位类型ID: 菲尼克斯尔单位类型ID,
     技能ID: 凤凰漩涡技能ID,
     获取或创建上下文: 获取或创建菲尼克斯尔上下文,
-    释放技能: function 单位技能壳监听释放(this: void, _context: 菲尼克斯尔运行时上下文, boss: any): void {
-      on菲尼克斯尔凤凰漩涡生效(boss, 凤凰漩涡技能ID);
+    释放技能: function 单位技能壳监听释放(this: void, _context: 菲尼克斯尔运行时上下文, boss: any, 技能实例ID?: number): void {
+      on菲尼克斯尔凤凰漩涡生效(boss, 凤凰漩涡技能ID, 技能实例ID);
     },
   });
 }

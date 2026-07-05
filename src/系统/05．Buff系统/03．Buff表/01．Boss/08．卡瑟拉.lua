@@ -22,6 +22,7 @@ ____exports["卡瑟拉Buff表"] = {
         dispelLevel = 2,
         priority = 72,
         canPurge = true,
+        ["禁止位移"] = true,
         tooltip = "被触手鞭笞命中后缠绕，移动速度降低40%，必要时附加短暂无法移动。"
     },
     [____exports["卡瑟拉BuffID"]["墨汁遮蔽"]] = {

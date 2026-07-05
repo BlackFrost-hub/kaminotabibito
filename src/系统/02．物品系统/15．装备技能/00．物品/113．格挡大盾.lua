@@ -90,7 +90,8 @@ local function ____on_683C_6321_5927_76FE_76FE_51FB(target, attacker, applied, s
         _____4F24_5BB3_503C,
         DAMAGE_TYPE_ENHANCED,
         false,
-        WEAPON_TYPE_METAL_HEAVY_BASH
+        WEAPON_TYPE_METAL_HEAVY_BASH,
+        {["伤害形态"] = "单体"}
     )
 end
 ____exports["初始化格挡大盾"] = function()

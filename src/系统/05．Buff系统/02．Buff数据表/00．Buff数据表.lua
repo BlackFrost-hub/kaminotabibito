@@ -236,6 +236,7 @@ ____exports["Buff数据表"] = {
         Buffubertip = "该单位受到了缠绕，会在一定时间内无法移动",
         Bufftip = "缠绕",
         EditorName = "C缠绕",
+        ["禁止位移"] = true,
         key = "B00T"
     },
     B00U = {
@@ -297,6 +298,7 @@ ____exports["Buff数据表"] = {
         TargetArt = "war3mapImported\\hell roots buff.mdl",
         Buffart = "ReplaceableTextures\\CommandButtons\\BTNEredarWarlockPurple.blp",
         Spelldetail = 2,
+        ["禁止位移"] = true,
         key = "B012"
     },
     B013 = {
@@ -315,6 +317,7 @@ ____exports["Buff数据表"] = {
         TargetArt = "war3mapImported\\EntanglingBonesTarget.mdl",
         Buffart = "ReplaceableTextures\\CommandButtons\\BTNEredarWarlockPurple.blp",
         Spelldetail = 2,
+        ["禁止位移"] = true,
         key = "B014"
     },
     B015 = {
@@ -577,7 +580,13 @@ ____exports["Buff数据表"] = {
         EditorName = "BS-领袖光环",
         key = "B026"
     },
-    BEer = {_parent = "BEer", Buffubertip = "该单位受到了禁锢，因此暂时不能移动。|n|cFFFFFF00【可以被驱散】|r", Bufftip = "111禁锢", key = "BEer"},
+    BEer = {
+        _parent = "BEer",
+        Buffubertip = "该单位受到了禁锢，因此暂时不能移动。|n|cFFFFFF00【可以被驱散】|r",
+        Bufftip = "111禁锢",
+        ["禁止位移"] = true,
+        key = "BEer"
+    },
     BHav = {_parent = "BHav", Bufftip = "濒死狂暴", key = "BHav"},
     BIrg = {_parent = "BIrg", Bufftip = "buff-生命恢复", key = "BIrg"},
     BIrl = {_parent = "BIrl", Bufftip = "buff-再生物品", key = "BIrl"},

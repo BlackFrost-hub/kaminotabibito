@@ -176,27 +176,27 @@ export function 调整魔法(this: void, 单位: any, 数值: number): void {
 
 export function 造成强化伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
   if (!单位存活(来源) || !单位存活(目标) || !(伤害 > 0)) return;
-  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_ENHANCED, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
+  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_ENHANCED, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS, 伤害形态: "单体" });
 }
 
 export function 造成火焰伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
   if (!单位存活(来源) || !单位存活(目标) || !(伤害 > 0)) return;
-  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_FIRE, ranged: true, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
+  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_FIRE, ranged: true, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS, 伤害形态: "单体" });
 }
 
 export function 造成暗影伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
   if (!单位存活(来源) || !单位存活(目标) || !(伤害 > 0)) return;
-  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_SHADOW_STRIKE, ranged: true, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
+  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_SHADOW_STRIKE, ranged: true, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS, 伤害形态: "单体" });
 }
 
 export function 造成普通伤害(this: void, 来源: any, 目标: any, 伤害: number): void {
   if (!单位存活(来源) || !单位存活(目标) || !(伤害 > 0)) return;
-  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_NORMAL, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
+  造成装备技能伤害({ 来源, 目标, 伤害, 伤害类型: DAMAGE_TYPE_NORMAL, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS, 伤害形态: "单体" });
 }
 
 export function 造成精神自伤(this: void, 单位: any, 伤害: number): void {
   if (!单位存活(单位) || !(伤害 > 0)) return;
-  造成装备技能伤害({ 来源: 单位, 目标: 单位, 伤害, 伤害类型: DAMAGE_TYPE_MIND, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS });
+  造成装备技能伤害({ 来源: 单位, 目标: 单位, 伤害, 伤害类型: DAMAGE_TYPE_MIND, ranged: false, attackType: ATTACK_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS, 伤害形态: "单体" });
 }
 
 export function 执行治疗(this: void, 来源: any, 目标: any, 生命: number, 魔法: number = 0): void {

@@ -93,6 +93,7 @@ ____exports["释放米亚腐化爪击"] = function(context, target)
     _____8BA9_5355_4F4D_9762_5411_76EE_6807(boss, actualTarget)
     _____64AD_653E_722A_51FB_8868_73B0(boss, actualTarget)
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["技能ID"] = _____8150_5316_722A_51FB_6280_80FDID,
         ["来源"] = boss,
         ["目标"] = actualTarget,
         ["伤害"] = _____53D6_5355_4F4D_653B_51FB_529B(boss) * config["攻击力倍率"] * _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387(context, actualTarget) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(actualTarget),

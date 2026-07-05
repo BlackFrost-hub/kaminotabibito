@@ -21,7 +21,10 @@ local function ____on_9AD8_538B_6C34_810A_6CD5_6756_89E6_53D1(event)
         attacker,
         target,
         _____53D6_653B_51FB_529B(attacker) * 0.6,
-        _____88C5_5907_4F24_5BB3_7C7B_578B["水"]
+        _____88C5_5907_4F24_5BB3_7C7B_578B["水"],
+        false,
+        nil,
+        {["伤害形态"] = "单体"}
     )
 end
 _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({

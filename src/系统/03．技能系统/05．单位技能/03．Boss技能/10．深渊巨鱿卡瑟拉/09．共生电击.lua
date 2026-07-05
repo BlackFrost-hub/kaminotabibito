@@ -16,6 +16,7 @@ local ____06_FF0E_52A8_6001_88C5_9970_7269_5B89_5168_533A_7EC4 = require("系统
 local _____521B_5EFA_52A8_6001_88C5_9970_7269_5B89_5168_533A_7EC4 = ____06_FF0E_52A8_6001_88C5_9970_7269_5B89_5168_533A_7EC4["创建动态装饰物安全区组"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -125,7 +126,7 @@ local function _____9884_8B66_7EDD_7F18_73CA_745A(context)
         ____self_8["显示提示"](____self_8, cfg["预警秒"])
     end
 end
-local function _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context)
+local function _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context, _____6280_80FD_5B9E_4F8BID)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or context["Boss潜入中"] then
         return
@@ -167,7 +168,9 @@ local function _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context)
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_LIGHTNING,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能"
+                    ["来源类型"] = "Boss技能",
+                    ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                    ["标签"] = "卡瑟拉共生电击"
                 })
                 _____64AD_653E_5355_4F4D_7279_6548(cfg["麻痹命中特效路径"], hero)
                 _____65BD_52A0_5FEB_901F_63A7_5236Buff(boss, hero, 0, cfg["麻痹秒"])
@@ -209,10 +212,11 @@ ____exports["尝试释放卡瑟拉共生电击"] = function(context, nowMs)
         GetUnitY(boss)
     )
     _____9884_8B66_7EDD_7F18_73CA_745A(context)
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "卡瑟拉共生电击", ["持续时间秒"] = cfg["预警秒"] + 2})
     local id = addDelayedCallback(
         cfg["预警秒"] * 1000,
         function()
-            _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context)
+            _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context, _____6280_80FD_5B9E_4F8BID)
         end
     )
     local ____self_9 = context["清理"]

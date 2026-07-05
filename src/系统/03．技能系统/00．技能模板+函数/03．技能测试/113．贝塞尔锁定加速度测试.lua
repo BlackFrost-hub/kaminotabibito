@@ -123,6 +123,7 @@ local function ____on_804A_59291013_6D4B_8BD5()
         ["命中半径"] = 110,
         ["碰撞消失"] = true,
         ["伤害值"] = 55,
+        ["伤害形态"] = "单体",
         ["影响目标"] = "敌方",
         ["模型"] = "Abilities\\Spells\\Human\\StormBolt\\StormBoltMissile.mdl",
         ["轨迹采样器"] = _____521B_5EFA_9501_5B9A_5355_4F4D_4E8C_9636_8D1D_585E_5C14_52A0_901F_5EA6XYZ_8F68_8FF9(

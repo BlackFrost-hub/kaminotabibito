@@ -67,7 +67,9 @@ local function _____7ED3_7B97_7834_8840_4E4B_6212(_____65BD_6CD5_5355_4F4D)
                     _____654C_4EBA,
                     _____4F24_5BB3_503C,
                     DAMAGE_TYPE_ENHANCED,
-                    true
+                    true,
+                    nil,
+                    {["伤害形态"] = "AOE"}
                 )
             end
             ::__continue8::

@@ -36,6 +36,10 @@ ____exports.STAT_CONFIG = {
     {name = "护甲穿透", key = "armorPierce"},
     {name = "魔法穿透", key = "magicPierce"},
     {name = "技能伤害", key = "skillDmg"},
+    {name = "主动技能伤害", key = "activeSkillDmg"},
+    {name = "装备伤害", key = "equipmentDmg"},
+    {name = "攻击特效伤害", key = "attackEffectDmg"},
+    {name = "普攻强化伤害", key = "normalAttackEnhanceDmg"},
     {name = "技能抗性", key = "skillResist"},
     {name = "魔法伤害", key = "magicDmg"},
     {name = "持续伤害", key = "dotDmg"},
@@ -103,6 +107,9 @@ end
 if not ____exports.NAME_TO_KEY["移速"] then
     ____exports.NAME_TO_KEY["移速"] = "moveSpeed"
 end
+if not ____exports.NAME_TO_KEY["独立技能伤害"] then
+    ____exports.NAME_TO_KEY["独立技能伤害"] = "activeSkillDmg"
+end
 ____exports.PERCENT_STAT_NAMES = {
     "暴击率",
     "暴击伤害",
@@ -110,6 +117,11 @@ ____exports.PERCENT_STAT_NAMES = {
     "护甲穿透",
     "魔法穿透",
     "技能伤害",
+    "主动技能伤害",
+    "独立技能伤害",
+    "装备伤害",
+    "攻击特效伤害",
+    "普攻强化伤害",
     "闪避率",
     "魔抗",
     "冷却缩减",
@@ -193,14 +205,14 @@ ____exports["生成装备属性文本"] = function(data)
         do
             local value = data[stat.key]
             if type(value) ~= "number" or value == 0 then
-                goto __continue11
+                goto __continue12
             end
             if text ~= "" then
                 text = text .. "\n"
             end
             text = ((text .. stat.name) .. " ") .. ____exports["格式化装备属性数值"](stat.key, value)
         end
-        ::__continue11::
+        ::__continue12::
     end
     return text
 end

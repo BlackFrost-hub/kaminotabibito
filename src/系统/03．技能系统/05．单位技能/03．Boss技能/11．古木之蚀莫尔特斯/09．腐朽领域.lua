@@ -10,7 +10,8 @@ local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local AddSpecialEffect = jass.AddSpecialEffect
 local GetUnitX = jass.GetUnitX
@@ -166,7 +167,7 @@ local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B()
         return
     end
     AddSpecialEffect(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["穿刺特效路径"], variable.X, variable.Y)
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = context["Boss单位"],
         ["目标"] = target,
         ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["Boss单位"]),
@@ -175,7 +176,9 @@ local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B()
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_PLANT,
         weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能"
+        ["来源类型"] = "Boss技能",
+        ["技能实例ID"] = variable["技能实例ID"],
+        ["标签"] = "莫尔特斯腐朽领域根须"
     })
     _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, target, _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["腐败值"])
 end
@@ -234,6 +237,7 @@ ____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
         if _____5355_4F4D_6709_6548(target) then
             local x = GetUnitX(target)
             local y = GetUnitY(target)
+            local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "莫尔特斯腐朽领域根须", ["持续时间秒"] = 3})
             _____521B_5EFA_6280_80FD_63D0_793A_5708({
                 ["类型"] = "圆形",
                 X = x,
@@ -241,7 +245,13 @@ ____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
                 ["半径"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"] * 0.5,
                 ["持续时间"] = 1
             })
-            _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587 = {context = context, target = target, X = x, Y = y}
+            _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587 = {
+                context = context,
+                target = target,
+                X = x,
+                Y = y,
+                ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
+            }
             local id = addDelayedCallback(1000, _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B)
             local ____self_11 = context["清理"]
             ____self_11["登记延迟回调"](____self_11, "莫尔特斯-腐朽沼泽根须", id)

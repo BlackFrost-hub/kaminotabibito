@@ -38,6 +38,7 @@ local CosBJ = ____require_result_9.CosBJ
 local SinBJ = ____require_result_9.SinBJ
 local ____require_result_10 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_10["造成AOE技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_10["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -249,7 +250,7 @@ local function _____64AD_653E_7206_53D1_8868_73B0(center)
         end
     end
 end
-local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints)
+local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _____6280_80FD_5B9E_4F8BID)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
         return
@@ -275,7 +276,9 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints)
                         attackType = ATTACK_TYPE_CHAOS,
                         ["伤害类型"] = DAMAGE_TYPE_FIRE,
                         weaponType = WEAPON_TYPE_WHOKNOWS,
-                        ["来源类型"] = "Boss技能"
+                        ["来源类型"] = "Boss技能",
+                        ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                        ["标签"] = "巴尔扎罗斯末日熔爆"
                     })
                     _____51CF_5C11_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570(hero, config["安全区清除灼热层数"])
                 else
@@ -288,7 +291,9 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints)
                         attackType = ATTACK_TYPE_CHAOS,
                         ["伤害类型"] = DAMAGE_TYPE_FIRE,
                         weaponType = WEAPON_TYPE_WHOKNOWS,
-                        ["来源类型"] = "Boss技能"
+                        ["来源类型"] = "Boss技能",
+                        ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                        ["标签"] = "巴尔扎罗斯末日熔爆"
                     })
                 end
             end
@@ -306,6 +311,7 @@ ____exports["释放巴尔扎罗斯末日熔爆"] = function(context)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]
     local center = _____53D6_573A_5730_4E2D_5FC3(context)
     local safePoints = _____53D6_5B89_5168_70B9_5217_8868(context, center)
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "巴尔扎罗斯末日熔爆", ["持续时间秒"] = config["引导秒"] + 2})
     context["末日熔爆引导中"] = true
     _____521B_5EFA_672B_65E5_7194_7206_5F15_5BFC_8868_73B0(context, center, safePoints)
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
@@ -328,7 +334,7 @@ ____exports["释放巴尔扎罗斯末日熔爆"] = function(context)
         ["on生效"] = function()
             context["末日熔爆引导中"] = false
             _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(boss, config["Boss蓄力特效键"])
-            _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints)
+            _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _____6280_80FD_5B9E_4F8BID)
         end
     })
 end

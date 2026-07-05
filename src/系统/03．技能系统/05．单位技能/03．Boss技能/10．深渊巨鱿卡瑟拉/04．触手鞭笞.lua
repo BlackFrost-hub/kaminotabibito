@@ -119,6 +119,7 @@ local function _____89E6_624B_97AD_7B1E_4E00_8DF3(data)
         return
     end
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["技能ID"] = _____89E6_624B_97AD_7B1E_6280_80FDID,
         ["来源"] = boss,
         ["目标"] = target,
         ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["触手Boss攻击力比例"],

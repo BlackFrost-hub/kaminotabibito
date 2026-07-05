@@ -23,6 +23,7 @@ import {
   取菲尼克斯尔玩家英雄列表,
   计算攻击最大生命伤害,
   造成暗火伤害,
+  创建菲尼克斯尔独立伤害上下文,
 } from "./19．公共工具";
 
 const jass = require("jass.common") as any;
@@ -45,6 +46,7 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
   context.永恒轮回已触发 = true;
   context.当前形态 = "永恒轮回";
   const config = 菲尼克斯尔数值与表现配置.机制;
+  const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔永恒轮回", config.永恒轮回引导秒 + 2);
   播放菲尼克斯尔台词(context.Boss, "永恒轮回");
   开始施法硬直(context.Boss, config.永恒轮回引导秒);
   设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.轮回死亡.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.轮回死亡.倍速);
@@ -76,7 +78,7 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
       设置当前生命(context.Boss, nextLife);
       const heroes = 取菲尼克斯尔玩家英雄列表();
       for (let i = 0; i < heroes.length; i++) {
-        造成暗火伤害(context.Boss, heroes[i], 计算攻击最大生命伤害(context.Boss, heroes[i], config.轮回失败全场伤害Boss攻击力比例, config.轮回失败全场伤害目标最大生命比例));
+        造成暗火伤害(context.Boss, heroes[i], 计算攻击最大生命伤害(context.Boss, heroes[i], config.轮回失败全场伤害Boss攻击力比例, config.轮回失败全场伤害目标最大生命比例), "AOE", 伤害上下文);
       }
       清理菲尼克斯尔凤凰蛋(context);
       context.当前形态 = "第二形态";

@@ -5,6 +5,7 @@ import { 获取影骨莫特斯上下文, 获取或创建影骨莫特斯上下文
 import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y, 目标正面朝向来源, 取单位ID } from "./11．公共工具";
+import { 执行战斗自身位移到坐标 } from "../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
@@ -17,8 +18,6 @@ const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
-const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
-const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -80,9 +79,12 @@ function 影骨阴影穿梭完成(this: void): void {
     const distance = 影骨莫特斯数值与表现配置.阴影穿梭.出现距离;
     const x = 极坐标X(GetUnitX(target), distance, angle);
     const y = 极坐标Y(GetUnitY(target), distance, angle);
+    if (!执行战斗自身位移到坐标(boss, x, y)) {
+      SetUnitInvulnerable(boss, false);
+      SetUnitVertexColor(boss, 255, 255, 255, 255);
+      continue;
+    }
     AddSpecialEffect(影骨莫特斯表现配置.阴影穿梭落点, x, y);
-    SetUnitX(boss, x);
-    SetUnitY(boss, y);
     SetUnitInvulnerable(boss, false);
     SetUnitVertexColor(boss, 255, 255, 255, 255);
     设置影骨背刺准备(context, true);

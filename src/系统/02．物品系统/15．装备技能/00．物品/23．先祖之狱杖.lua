@@ -33,7 +33,9 @@ local function _____6267_884C_5148_7956_5EF6_8FDF_4F24_5BB3(_____65BD_6CD5_5355_
         _____76EE_6807_5355_4F4D,
         GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_MAX_LIFE) * _____5148_7956_4E4B_72F1_6756_914D_7F6E["伤害生命比例"],
         DAMAGE_TYPE_SHADOW_STRIKE,
-        true
+        true,
+        nil,
+        {["伤害形态"] = "单体"}
     )
 end
 local function _____542F_52A8_5148_7956_5EF6_8FDF_4F24_5BB3(_____65BD_6CD5_5355_4F4D, _____76EE_6807_5355_4F4D)

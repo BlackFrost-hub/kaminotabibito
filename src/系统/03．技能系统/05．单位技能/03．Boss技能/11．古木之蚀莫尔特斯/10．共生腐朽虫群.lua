@@ -13,7 +13,8 @@ local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____6781_5750_6807X = ____16_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____16_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -93,7 +94,7 @@ local function _____7206_70B8_7532_866B(data)
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = boss,
         ["目标"] = target,
         ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["爆炸伤害Boss攻击力比例"],
@@ -102,7 +103,9 @@ local function _____7206_70B8_7532_866B(data)
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_PLANT,
         weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能"
+        ["来源类型"] = "Boss技能",
+        ["技能实例ID"] = data["技能实例ID"],
+        ["标签"] = "莫尔特斯共生腐朽虫群"
     })
     _____589E_52A0_73A9_5BB6_8150_8D25_503C(data.context, target, cfg["爆炸腐败值"])
 end
@@ -155,7 +158,7 @@ local function _____83AB_5C14_7279_65AF_7532_866B_6B7B_4EA1(unit, ______51FB_674
         GetUnitY(unit)
     )
 end
-local function _____521B_5EFA_8150_5316_7532_866B(context, angle)
+local function _____521B_5EFA_8150_5316_7532_866B(context, angle, _____6280_80FD_5B9E_4F8BID)
     local boss = context["Boss单位"]
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
     local x = _____6781_5750_6807X(
@@ -192,7 +195,8 @@ local function _____521B_5EFA_8150_5316_7532_866B(context, angle)
         ["甲虫单位"] = instance["单位"],
         ["接触目标"] = nil,
         ["接触Ticks"] = 0,
-        ["周期ID"] = 0
+        ["周期ID"] = 0,
+        ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
     }
     data["周期ID"] = addPeriodicCallback(1000, _____83AB_5C14_7279_65AF_7532_866B_8FFD_51FB_5468_671F, data)
     local ____self_9 = context["清理"]
@@ -211,10 +215,11 @@ ____exports["尝试释放莫尔特斯共生腐朽虫群"] = function(context, no
     end
     context["下次虫群时间"] = nowMs + cfg["触发间隔秒"] * 1000
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(context["Boss单位"], "腐败之种")
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "莫尔特斯共生腐朽虫群", ["持续时间秒"] = cfg["接触爆炸秒"] + 12})
     do
         local i = 0
         while i < cfg["甲虫数量"] do
-            _____521B_5EFA_8150_5316_7532_866B(context, i * 90)
+            _____521B_5EFA_8150_5316_7532_866B(context, i * 90, _____6280_80FD_5B9E_4F8BID)
             i = i + 1
         end
     end

@@ -40,7 +40,7 @@ local RAD_TO_DEG = 57.29577951308232
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____51E4_51F0_6F29_6DA1_6280_80FDID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["凤凰漩涡"])
 local _____51E4_51F0_6F29_6DA1_5DF2_6CE8_518C = false
-____exports["释放菲尼克斯尔凤凰漩涡"] = function(context, target)
+____exports["释放菲尼克斯尔凤凰漩涡"] = function(context, target, _____6280_80FD_5B9E_4F8BID)
     if context["当前形态"] ~= "第一形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
         return
     end
@@ -50,6 +50,7 @@ ____exports["释放菲尼克斯尔凤凰漩涡"] = function(context, target)
         return
     end
     local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["凤凰漩涡"]
+    local _____4F24_5BB3_4E0A_4E0B_6587 = {["技能ID"] = _____51E4_51F0_6F29_6DA1_6280_80FDID, ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID, ["标签"] = "菲尼克斯尔凤凰漩涡"}
     local x = _____53D6_5355_4F4DX(realTarget)
     local y = _____53D6_5355_4F4DY(realTarget)
     _____9762_5411_5355_4F4D(boss, realTarget)
@@ -76,7 +77,9 @@ ____exports["释放菲尼克斯尔凤凰漩涡"] = function(context, target)
                             _____9020_6210_706B_7130_4F24_5BB3(
                                 boss,
                                 u,
-                                _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3(boss, u, config["伤害Boss攻击力比例"], config["伤害目标已损失生命比例"])
+                                _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3(boss, u, config["伤害Boss攻击力比例"], config["伤害目标已损失生命比例"]),
+                                "AOE",
+                                _____4F24_5BB3_4E0A_4E0B_6587
                             )
                             _____6DFB_52A0_5143_7D20_5C42_6570(u, "火", config["火印层数"])
                             local d = _____4E24_70B9_8DDD_79BB(
@@ -117,7 +120,7 @@ ____exports["释放菲尼克斯尔凤凰漩涡"] = function(context, target)
         end
     )
 end
-local function ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_6F29_6DA1_751F_6548(castingUnit, spellAbilityId)
+local function ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_6F29_6DA1_751F_6548(castingUnit, spellAbilityId, _____6280_80FD_5B9E_4F8BID)
     if spellAbilityId ~= _____51E4_51F0_6F29_6DA1_6280_80FDID then
         return
     end
@@ -126,7 +129,7 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_6F29_6DA1_751F_6548(cas
     end
     local context = _____83B7_53D6_6216_521B_5EFA_83F2_5C3C_514B_65AF_5C14_4E0A_4E0B_6587(castingUnit)
     if context ~= nil then
-        ____exports["释放菲尼克斯尔凤凰漩涡"](context)
+        ____exports["释放菲尼克斯尔凤凰漩涡"](context, nil, _____6280_80FD_5B9E_4F8BID)
     end
 end
 ____exports["注册菲尼克斯尔凤凰漩涡"] = function()
@@ -139,8 +142,8 @@ ____exports["注册菲尼克斯尔凤凰漩涡"] = function()
         ["单位类型ID"] = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____51E4_51F0_6F29_6DA1_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83F2_5C3C_514B_65AF_5C14_4E0A_4E0B_6587,
-        ["释放技能"] = function(_context, boss)
-            ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_6F29_6DA1_751F_6548(boss, _____51E4_51F0_6F29_6DA1_6280_80FDID)
+        ["释放技能"] = function(_context, boss, _____6280_80FD_5B9E_4F8BID)
+            ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_6F29_6DA1_751F_6548(boss, _____51E4_51F0_6F29_6DA1_6280_80FDID, _____6280_80FD_5B9E_4F8BID)
         end
     })
 end

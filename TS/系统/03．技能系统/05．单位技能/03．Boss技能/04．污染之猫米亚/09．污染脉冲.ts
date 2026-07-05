@@ -19,8 +19,9 @@ const { 显示场地常驻AOE吟唱条 } = require("系统.09．表现系统.08�
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
 const jass = require("jass.common") as any;
@@ -82,7 +83,7 @@ function 播放脉冲波表现(this: void, waveIndex: number): void {
   创建朝向点特效(config.扩散波特效, centerX, centerY, 1.5 * waveNo, 2.0, 270, 0);
 }
 
-function 结算污染脉冲波(this: void, context: 米亚运行时上下文, waveIndex: number): void {
+function 结算污染脉冲波(this: void, context: 米亚运行时上下文, waveIndex: number, 技能实例ID?: number): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.阶段 !== 2) return;
 
@@ -109,6 +110,8 @@ function 结算污染脉冲波(this: void, context: 米亚运行时上下文, wa
       伤害类型: jass.DAMAGE_TYPE_POISON,
       weaponType: jass.WEAPON_TYPE_WHOKNOWS,
       来源类型: "Boss技能",
+      技能实例ID,
+      标签: "米亚污染脉冲",
     });
     添加米亚腐化感染(context, target, config.每波腐化层数, "污染脉冲");
   }
@@ -125,6 +128,11 @@ export function 尝试触发米亚污染脉冲(this: void, context: 米亚运行
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   context.上次污染脉冲Ms = nowMs;
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "米亚污染脉冲",
+    持续时间秒: config.预警秒 + config.波次半径.length + 2,
+  });
   播放脉冲中心预警();
   播放米亚台词(boss, "污染脉冲", 0);
   显示场地常驻AOE吟唱条({
@@ -142,7 +150,7 @@ export function 尝试触发米亚污染脉冲(this: void, context: 米亚运行
   for (let i = 0; i < config.波次半径.length; i++) {
     const waveIndex = i;
     addDelayedCallback((config.预警秒 + waveIndex) * 1000, function 米亚污染脉冲波次结算(this: void): void {
-      结算污染脉冲波(context, waveIndex);
+      结算污染脉冲波(context, waveIndex, 技能实例ID);
     });
   }
 }

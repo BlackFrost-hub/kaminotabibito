@@ -17,6 +17,7 @@ import {
   造成冰霜伤害,
   造成毒火伤害,
   造成暗火伤害,
+  创建菲尼克斯尔独立伤害上下文,
   计算攻击最大生命伤害,
   计算攻击已损失伤害,
   取最大生命,
@@ -32,6 +33,7 @@ function 取元素特效(this: void, 元素: 菲尼克斯尔元素类型): strin
 export function 结算菲尼克斯尔元素爆发(this: void, context: 菲尼克斯尔运行时上下文): void {
   if (context.当前形态 !== "第二形态" || !单位存活(context.Boss)) return;
   const config = 菲尼克斯尔数值与表现配置.元素爆发;
+  const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔元素爆发", 3);
   播放菲尼克斯尔台词(context.Boss, "元素爆发");
   显示场地读条(3, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   const heroes = 取菲尼克斯尔玩家英雄列表();
@@ -41,13 +43,13 @@ export function 结算菲尼克斯尔元素爆发(this: void, context: 菲尼克
     if (top.层数 <= 0) continue;
     播放点特效(取元素特效(top.元素), 取单位X(hero), 取单位Y(hero), 1800);
     if (top.元素 === "冰") {
-      造成冰霜伤害(context.Boss, hero, 计算攻击最大生命伤害(context.Boss, hero, config.冰伤害Boss攻击力比例, config.冰伤害目标最大生命比例));
+      造成冰霜伤害(context.Boss, hero, 计算攻击最大生命伤害(context.Boss, hero, config.冰伤害Boss攻击力比例, config.冰伤害目标最大生命比例), "AOE", 伤害上下文);
     } else if (top.元素 === "毒") {
-      造成毒火伤害(context.Boss, hero, (取最大生命(hero) - 0) * 0 + 计算攻击已损失伤害(context.Boss, hero, 0, config.毒伤害目标已损失生命比例));
+      造成毒火伤害(context.Boss, hero, (取最大生命(hero) - 0) * 0 + 计算攻击已损失伤害(context.Boss, hero, 0, config.毒伤害目标已损失生命比例), "AOE", 伤害上下文);
     } else if (top.元素 === "暗") {
-      造成暗火伤害(context.Boss, hero, 计算攻击最大生命伤害(context.Boss, hero, config.暗伤害Boss攻击力比例, config.暗伤害目标最大生命比例));
+      造成暗火伤害(context.Boss, hero, 计算攻击最大生命伤害(context.Boss, hero, config.暗伤害Boss攻击力比例, config.暗伤害目标最大生命比例), "AOE", 伤害上下文);
     } else {
-      造成火焰伤害(context.Boss, hero, 计算攻击最大生命伤害(context.Boss, hero, config.火伤害Boss攻击力比例, config.火伤害目标最大生命比例));
+      造成火焰伤害(context.Boss, hero, 计算攻击最大生命伤害(context.Boss, hero, config.火伤害Boss攻击力比例, config.火伤害目标最大生命比例), "AOE", 伤害上下文);
     }
     减少元素层数(hero, top.元素, config.结算后最高层降低);
   }

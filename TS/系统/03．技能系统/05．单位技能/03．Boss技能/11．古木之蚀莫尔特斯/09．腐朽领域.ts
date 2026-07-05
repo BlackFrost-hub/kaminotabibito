@@ -5,8 +5,9 @@ import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置"
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效 } from "./16．公共工具";
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const jass = require("jass.common") as any;
 
@@ -51,6 +52,7 @@ interface 莫尔特斯腐朽领域根须延迟上下文 {
   target: any;
   X: number;
   Y: number;
+  技能实例ID?: number;
 }
 
 let 腐朽领域根须延迟上下文: 莫尔特斯腐朽领域根须延迟上下文 | undefined = undefined;
@@ -131,7 +133,7 @@ function 莫尔特斯腐朽沼泽根须(this: void): void {
   const target = variable.target;
   if (!单位有效(context.Boss单位) || !单位有效(target)) return;
   AddSpecialEffect(莫尔特斯数值与表现配置.腐朽根须穿刺.穿刺特效路径, variable.X, variable.Y);
-  造成AOE技能伤害({
+  造成单体技能伤害({
     来源: context.Boss单位,
     目标: target,
     伤害: 读取单位攻击力(context.Boss单位),
@@ -141,6 +143,8 @@ function 莫尔特斯腐朽沼泽根须(this: void): void {
     伤害类型: DAMAGE_TYPE_PLANT,
     weaponType: WEAPON_TYPE_WHOKNOWS,
     来源类型: "Boss技能",
+    技能实例ID: variable.技能实例ID,
+    标签: "莫尔特斯腐朽领域根须",
   });
   增加玩家腐败值(context, target, 莫尔特斯数值与表现配置.腐朽根须穿刺.腐败值);
 }
@@ -174,6 +178,11 @@ export function 处理莫尔特斯腐朽领域周期(this: void, context: 莫尔
     if (单位有效(target)) {
       const x = GetUnitX(target);
       const y = GetUnitY(target);
+      const 技能实例ID = 创建独立技能伤害实例({
+        来源类型: "Boss技能",
+        标签: "莫尔特斯腐朽领域根须",
+        持续时间秒: 3,
+      });
       创建技能提示圈({
         类型: "圆形",
         X: x,
@@ -181,7 +190,7 @@ export function 处理莫尔特斯腐朽领域周期(this: void, context: 莫尔
         半径: 莫尔特斯数值与表现配置.根须领域.单格边长 * 0.5,
         持续时间: 1,
       });
-      腐朽领域根须延迟上下文 = { context, target, X: x, Y: y };
+      腐朽领域根须延迟上下文 = { context, target, X: x, Y: y, 技能实例ID };
       const id = addDelayedCallback(1000, 莫尔特斯腐朽沼泽根须);
       context.清理.登记延迟回调("莫尔特斯-腐朽沼泽根须", id);
     }

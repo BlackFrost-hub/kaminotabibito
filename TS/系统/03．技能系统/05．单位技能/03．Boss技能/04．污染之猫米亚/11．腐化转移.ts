@@ -6,6 +6,7 @@ import { 米亚技能数值配置 } from "./02．数值与表现配置";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 播放米亚台词 } from "./15．台词播放";
+import { 执行战斗自身传送到坐标 } from "../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -36,7 +37,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
-const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const R2I = jass.R2I as (value: number) => number;
@@ -188,10 +188,16 @@ function 启动腐化转移(this: void, context: 米亚运行时上下文, nowMs
     const currentBoss = context.Boss单位;
     if (!单位有效(currentBoss) || context.阶段 < 2) return;
     关闭吟唱条("常规技能");
-    播放入出水表现(GetUnitX(currentBoss), GetUnitY(currentBoss));
+    const 原X = GetUnitX(currentBoss);
+    const 原Y = GetUnitY(currentBoss);
+    if (!执行战斗自身传送到坐标(currentBoss, 区域.中心X, 区域.中心Y)) {
+      SetUnitTimeScale(currentBoss, 1);
+      SetUnitAnimationByIndex(currentBoss, 0);
+      return;
+    }
+    播放入出水表现(原X, 原Y);
     SetUnitTimeScale(currentBoss, 2);
     SetUnitAnimationByIndex(currentBoss, 7);
-    SetUnitPosition(currentBoss, 区域.中心X, 区域.中心Y);
     播放入出水表现(区域.中心X, 区域.中心Y);
     开始污染平台(context, 区域, nowMs + R2I(config.预警秒 * 1000));
     addDelayedCallback(600, function 米亚腐化转移恢复动作(this: void): void {

@@ -13,6 +13,9 @@ const GetHeroInt = jass.GetHeroInt as (hero: any, includeBonuses: boolean) => nu
 const GetUnitState = jass.GetUnitState as (unit: any, whichState: number) => number;
 const GetUnitStateJapi = japi.GetUnitState as (unit: any, whichState: number) => number;
 const ConvertUnitState = jass.ConvertUnitState as (index: number) => number;
+const { getRealAttr } = require("系统.04．伤害系统.00．伤害计算.01．属性读取") as {
+  getRealAttr: (unit: any, attrName: string, defaultValue: number) => number;
+};
 
 import type { 属性类型 } from "./01．公式配置";
 
@@ -43,6 +46,16 @@ export function 获取属性值(this: void, unit: any, 属性: 属性类型): nu
       return GetUnitState(unit, jass.UNIT_STATE_MANA);
     case "最大魔法值":
       return GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA);
+    case "主动技能伤害":
+      return getRealAttr(unit, "主动技能伤害", 0);
+    case "独立技能伤害":
+      return getRealAttr(unit, "独立技能伤害", 0) + getRealAttr(unit, "主动技能伤害", 0);
+    case "装备伤害":
+      return getRealAttr(unit, "装备伤害", 0);
+    case "攻击特效伤害":
+      return getRealAttr(unit, "攻击特效伤害", 0);
+    case "普攻强化伤害":
+      return getRealAttr(unit, "普攻强化伤害", 0);
     default:
       return 0;
   }

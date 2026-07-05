@@ -11,7 +11,7 @@ function on高压水脊法杖触发(this: void, event: any): void {
   const target = event.目标;
   const attacker = event.攻击者;
   播放单位特效(装备小特效.湿痕, target, "origin", 1);
-  造成装备伤害(attacker, target, 取攻击力(attacker) * 0.6, 装备伤害类型.水);
+  造成装备伤害(attacker, target, 取攻击力(attacker) * 0.6, 装备伤害类型.水, false, undefined, { 伤害形态: "单体" });
 }
 
 注册最终伤害触发模板({

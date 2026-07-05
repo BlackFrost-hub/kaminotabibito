@@ -29,8 +29,9 @@ const { 显示场地常驻AOE吟唱条, 关闭吟唱条 } = require("系统.09�
   关闭吟唱条: (this: void, 通道?: string) => void;
 };
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -58,7 +59,7 @@ function 播放点特效(this: void, model: string, x: number, y: number, durati
   }
 }
 
-function 造成伤害(this: void, boss: any, target: any, amount: number, damageType: any): void {
+function 造成伤害(this: void, boss: any, target: any, amount: number, damageType: any, 技能实例ID?: number): void {
   if (!单位有效(boss) || !单位有效(target) || amount <= 0) return;
   造成AOE技能伤害({
     来源: boss,
@@ -70,6 +71,8 @@ function 造成伤害(this: void, boss: any, target: any, amount: number, damage
     伤害类型: damageType,
     weaponType: jass.WEAPON_TYPE_WHOKNOWS,
     来源类型: "Boss技能",
+    技能实例ID,
+    标签: "瑟兰迪尔审判之环",
   });
 }
 
@@ -128,6 +131,11 @@ function 启动瑟兰迪尔审判之环轮次(this: void, context: 瑟兰迪尔�
     return;
   }
   const color = GetRandomInt(1, 4);
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "瑟兰迪尔审判之环",
+    持续时间秒: config.周期秒 + 2,
+  });
   const 象限名称 = 取象限名称(color);
   const 表现中心 = { x: GetUnitX(boss), y: GetUnitY(boss) };
   显示场地常驻AOE吟唱条({
@@ -157,13 +165,13 @@ function 启动瑟兰迪尔审判之环轮次(this: void, context: 瑟兰迪尔�
       关闭吟唱条("场地常驻AOE");
       return;
     }
-    结算瑟兰迪尔审判之环象限(boss, color);
+    结算瑟兰迪尔审判之环象限(boss, color, 技能实例ID);
     context.上次审判之环Ms = getServerTime();
     启动瑟兰迪尔审判之环轮次(context);
   });
 }
 
-function 结算瑟兰迪尔审判之环象限(this: void, boss: any, color: number): void {
+function 结算瑟兰迪尔审判之环象限(this: void, boss: any, color: number, 技能实例ID?: number): void {
   const config = 瑟兰迪尔数值与表现配置.审判之环;
   if (color === 2) {
     const target = 获取Boss技能最远敌对英雄(boss);
@@ -185,15 +193,15 @@ function 结算瑟兰迪尔审判之环象限(this: void, boss: any, color: numb
     const y = GetUnitY(target);
     if (color === 1) {
       播放点特效(config.红特效, x, y, 1);
-      造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.红伤害Boss攻击力比例, config.红伤害目标最大生命比例), jass.DAMAGE_TYPE_FIRE);
+      造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.红伤害Boss攻击力比例, config.红伤害目标最大生命比例), jass.DAMAGE_TYPE_FIRE, 技能实例ID);
     } else if (color === 3) {
       播放点特效(config.绿特效, x, y, 1);
       const life = GetUnitState(target, UNIT_STATE_LIFE);
       const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
       if (maxLife > 0 && life / maxLife > 0.75) {
-        造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿高血伤害Boss攻击力比例, config.绿高血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING);
+        造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿高血伤害Boss攻击力比例, config.绿高血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING, 技能实例ID);
       } else {
-        造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿低血伤害Boss攻击力比例, config.绿低血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING);
+        造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿低血伤害Boss攻击力比例, config.绿低血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING, 技能实例ID);
       }
     } else {
       播放点特效(config.金特效, x, y, 1);
@@ -201,7 +209,7 @@ function 结算瑟兰迪尔审判之环象限(this: void, boss: any, color: numb
       const maxMana = GetUnitState(target, UNIT_STATE_MAX_MANA);
       const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
       const lostRatio = maxMana > 0 ? (maxMana - mana) / maxMana : 0;
-      造成伤害(boss, target, maxLife * lostRatio, jass.DAMAGE_TYPE_MIND);
+      造成伤害(boss, target, maxLife * lostRatio, jass.DAMAGE_TYPE_MIND, 技能实例ID);
     }
   }
 }

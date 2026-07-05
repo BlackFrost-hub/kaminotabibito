@@ -147,6 +147,7 @@ function 发射冰焰弹体(this: void, context: 巴尔扎罗斯运行时上下�
     最大总命中次数: 1,
     每单位最大命中次数: 1,
     伤害值: 0,
+    伤害形态: "AOE",
     on命中: function 塞拉冰焰弹体命中(this: void, hitUnit: any): void {
       结算冰焰AOE(context, hitUnit, 类型);
     },

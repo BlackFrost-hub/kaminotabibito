@@ -13,6 +13,8 @@ local GetHeroInt = jass.GetHeroInt
 local GetUnitState = jass.GetUnitState
 local GetUnitStateJapi = japi.GetUnitState
 local ConvertUnitState = jass.ConvertUnitState
+local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.01．属性读取")
+local getRealAttr = ____require_result_0.getRealAttr
 --- 根据属性类型获取英雄属性值。
 ____exports["获取属性值"] = function(unit, _____5C5E_6027)
     repeat
@@ -66,6 +68,26 @@ ____exports["获取属性值"] = function(unit, _____5C5E_6027)
         ____cond3 = ____cond3 or ____switch3 == "最大魔法值"
         if ____cond3 then
             return GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA)
+        end
+        ____cond3 = ____cond3 or ____switch3 == "主动技能伤害"
+        if ____cond3 then
+            return getRealAttr(nil, unit, "主动技能伤害", 0)
+        end
+        ____cond3 = ____cond3 or ____switch3 == "独立技能伤害"
+        if ____cond3 then
+            return getRealAttr(nil, unit, "独立技能伤害", 0) + getRealAttr(nil, unit, "主动技能伤害", 0)
+        end
+        ____cond3 = ____cond3 or ____switch3 == "装备伤害"
+        if ____cond3 then
+            return getRealAttr(nil, unit, "装备伤害", 0)
+        end
+        ____cond3 = ____cond3 or ____switch3 == "攻击特效伤害"
+        if ____cond3 then
+            return getRealAttr(nil, unit, "攻击特效伤害", 0)
+        end
+        ____cond3 = ____cond3 or ____switch3 == "普攻强化伤害"
+        if ____cond3 then
+            return getRealAttr(nil, unit, "普攻强化伤害", 0)
         end
         do
             return 0

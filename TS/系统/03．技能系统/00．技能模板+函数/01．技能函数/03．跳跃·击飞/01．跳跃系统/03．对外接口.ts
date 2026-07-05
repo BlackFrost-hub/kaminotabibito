@@ -14,8 +14,11 @@ import {
   快照单位组,
 } from "./00．共享";
 import { 创建跳跃实例, 解析跳跃角度, 结束跳跃ID, 停止单位跳跃 } from "./02．驱动与实例";
+import { 尝试阻止自身位移技能 } from "../../../02．通用函数/20．位移技能限制";
 
 export function 开始跳跃(单位: any, 参数: 跳跃参数): number {
+  if (尝试阻止自身位移技能(单位)) return 0;
+
   const 角度 = 解析跳跃角度(单位, 参数);
   if (角度 == null) return 0;
   return 创建跳跃实例(单位, 角度, 参数);

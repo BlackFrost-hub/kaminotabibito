@@ -11,6 +11,8 @@ local DOT_TYPE_TO_BUFF_ID = ____00_FF0EBuff_7CFB_7EDF.DOT_TYPE_TO_BUFF_ID
 local getBuffRuntimeByHid = ____00_FF0EBuff_7CFB_7EDF.getBuffRuntimeByHid
 local ____07_FF0E_6301_7EED_4F24_5BB3_7CFB_7EDF = require("系统.04．伤害系统.07．持续伤害系统")
 local _____8BA1_7B97_6301_7EED_4F24_5BB3_6700_7EC8_503C = ____07_FF0E_6301_7EED_4F24_5BB3_7CFB_7EDF["计算持续伤害最终值"]
+local ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3 = ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF["造成装备技能伤害"]
 local unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local YDWETimerDestroyEffect = ____require_result_0.YDWETimerDestroyEffect
@@ -84,16 +86,18 @@ function ____exports.createDotExecutor(self, deps)
         if type(damageEventModule.markNextPendingDamageAsDotTickBatch) == "function" then
             damageEventModule:markNextPendingDamageAsDotTickBatch()
         end
-        jass.UnitDamageTarget(
-            source,
-            target,
-            finalAmount,
-            false,
-            false,
-            jass.ATTACK_TYPE_NORMAL,
-            cfg.damageType,
-            jass.WEAPON_TYPE_WHOKNOWS
-        )
+        _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3({
+            ["来源"] = source,
+            ["目标"] = target,
+            ["伤害"] = finalAmount,
+            ["伤害类型"] = cfg.damageType,
+            attack = false,
+            ranged = false,
+            attackType = jass.ATTACK_TYPE_NORMAL,
+            weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+            ["装备技能类型"] = "装备持续伤害",
+            ["伤害形态"] = "单体"
+        })
         do
             local ci = 0
             while ci < #dotTypes do

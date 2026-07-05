@@ -18,7 +18,7 @@ local stringToFourCC = ____13_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -141,7 +141,8 @@ local function _____7ED3_7B97_5355_4E2A_795E_98CE_7C89_788E(context, target)
     local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
     local damage = maxLife * cfg["粉碎每层最大生命比例"] * stack
     local stun = cfg["粉碎基础眩晕秒"] + cfg["粉碎每层眩晕秒"] * stack
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["技能ID"] = _____795E_98CE_62A4_4F53_6280_80FDID,
         ["来源"] = context["Boss单位"],
         ["目标"] = target,
         ["伤害"] = damage,

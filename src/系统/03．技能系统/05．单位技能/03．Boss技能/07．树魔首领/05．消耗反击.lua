@@ -258,6 +258,7 @@ local function _____6267_884C_53CD_51FB(state, attacker, _____89E6_53D1_4F24_5BB
             end
             local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["反击Boss攻击力比例"]
             _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                ["技能ID"] = _____6D88_8017_53CD_51FB_6280_80FDID,
                 ["来源"] = boss,
                 ["目标"] = unit,
                 ["伤害"] = damage,

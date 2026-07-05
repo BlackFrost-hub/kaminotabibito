@@ -15,3 +15,4 @@ export * from "./07．机制连线/index";
 export * from "./08．机制触发/index";
 export * from "./09．装备通用机制/index";
 export * from "./10．复杂战斗通用机制/index";
+export * from "./11．技能属性修正/index";

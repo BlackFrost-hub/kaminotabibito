@@ -12,7 +12,7 @@ const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS")
   SGSS_SetState: (this: void, unit: any, id: number, value: number) => void;
 };
 const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
-  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean) => void;
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, weaponType?: any, 选项?: any) => void;
 };
 const { 注册持有战斗周期模板 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.08．装备触发模板.04．持有战斗周期模板") as {
   注册持有战斗周期模板: (this: void, 参数: {
@@ -129,7 +129,7 @@ function on冥炎之裙战斗周期(this: void, event: { 单位: any }): void {
     const target = targets[j];
     if (target == null || target === 0 || target === unit) continue;
     if (!单位存活(target)) continue;
-    造成装备伤害(unit, target, damage, DAMAGE_TYPE_FIRE, true);
+    造成装备伤害(unit, target, damage, DAMAGE_TYPE_FIRE, true, undefined, { 伤害形态: "AOE" });
   }
 }
 

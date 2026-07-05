@@ -56,7 +56,7 @@ export function 处理史诗远古魔刃使用(this: void, 上下文: 物品技�
     },
     on命中: (敌人: any, 扫掠上下文: any) => {
       const 伤害值 = GetUnitState(扫掠上下文.施法单位, ConvertUnitState(0x15)) * 史诗远古魔刃配置.力量系数;
-      造成装备伤害(扫掠上下文.施法单位, 敌人, 伤害值, DAMAGE_TYPE_NORMAL);
+      造成装备伤害(扫掠上下文.施法单位, 敌人, 伤害值, DAMAGE_TYPE_NORMAL, false, undefined, { 伤害形态: "AOE" });
       施加扩展控制(扫掠上下文.施法单位, 敌人, "stun", { 持续时间: 史诗远古魔刃配置.眩晕时间 });
     },
   });

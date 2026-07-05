@@ -20,6 +20,7 @@ import {
   开始施法硬直,
   添加元素层数,
   造成暗火伤害,
+  创建菲尼克斯尔独立伤害上下文,
   取当前生命,
 } from "./19．公共工具";
 import { 触发菲尼克斯尔怨火核心暴露 } from "./15．怨火核心暴露";
@@ -37,6 +38,7 @@ function 玩家在安全区(this: void, unit: any): boolean {
 export function 释放菲尼克斯尔凤凰挽歌(this: void, context: 菲尼克斯尔运行时上下文): void {
   if (context.当前形态 !== "第二形态" || !单位存活(context.Boss)) return;
   const config = 菲尼克斯尔数值与表现配置.凤凰挽歌;
+  const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔凤凰挽歌", config.引导秒 + 2);
   播放菲尼克斯尔台词(context.Boss, "凤凰挽歌");
   开始施法硬直(context.Boss, config.引导秒);
   设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.哀鸣引导.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.哀鸣引导.倍速);
@@ -52,7 +54,7 @@ export function 释放菲尼克斯尔凤凰挽歌(this: void, context: 菲尼克
     for (let i = 0; i < heroes.length; i++) {
       const hero = heroes[i];
       if (玩家在安全区(hero)) continue;
-      造成暗火伤害(context.Boss, hero, 取当前生命(hero) * config.当前生命损失比例);
+      造成暗火伤害(context.Boss, hero, 取当前生命(hero) * config.当前生命损失比例, "AOE", 伤害上下文);
       添加元素层数(hero, "暗", config.规避叠层);
       播放点特效(菲尼克斯尔数值与表现配置.特效.凤凰挽歌叠加, 取单位X(hero), 取单位Y(hero), 1200);
     }

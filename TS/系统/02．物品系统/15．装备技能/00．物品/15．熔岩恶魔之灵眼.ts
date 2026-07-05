@@ -45,7 +45,7 @@ export function 处理熔岩恶魔之灵眼使用(this: void, 上下文: 物品�
   SetUnitState(施法单位, UNIT_STATE_MANA, GetUnitState(施法单位, UNIT_STATE_MANA) - GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.魔法消耗比例);
   createUnitEffect(目标单位, 熔岩恶魔之灵眼配置.特效挂点, 熔岩恶魔之灵眼配置.特效路径, 熔岩恶魔之灵眼配置.特效持续时间, "熔岩恶魔之灵眼");
   施加临时属性效果(目标单位, 熔岩恶魔之灵眼配置.命中率恢复延迟 * 1000, [{ 类型: "单位属性", 属性名: 命中率字段, 数值: -熔岩恶魔之灵眼配置.命中率削减 }]);
-  造成装备伤害(施法单位, 目标单位, GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.伤害魔法系数, DAMAGE_TYPE_SHADOW_STRIKE, true);
+  造成装备伤害(施法单位, 目标单位, GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.伤害魔法系数, DAMAGE_TYPE_SHADOW_STRIKE, true, undefined, { 伤害形态: "单体" });
 }
 
 export {};

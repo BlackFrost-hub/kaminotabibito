@@ -44,6 +44,7 @@ export const 莫尔特斯Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 84,
     canPurge: true,
+    禁止位移: true,
     tooltip: "腐败值满或特定技能命中后被根须缠绕，无法移动并持续受到伤害。",
   },
   [莫尔特斯BuffID.荆棘寄生]: {

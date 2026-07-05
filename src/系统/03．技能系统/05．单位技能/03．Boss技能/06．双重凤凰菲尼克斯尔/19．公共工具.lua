@@ -27,6 +27,7 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_0["造成技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local Player = jass.Player
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
@@ -92,6 +93,12 @@ local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_10[
 local DEG_TO_RAD = 0.017453292519943295
 local RAD_TO_DEG = 57.29577951308232
 local _____5FEB_901F_63A7_5236__51FB_6655 = 1
+____exports["创建菲尼克斯尔独立伤害上下文"] = function(_____6807_7B7E, _____6301_7EED_65F6_95F4_79D2)
+    return {
+        ["技能实例ID"] = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = _____6807_7B7E, ["持续时间秒"] = _____6301_7EED_65F6_95F4_79D2}),
+        ["标签"] = _____6807_7B7E
+    }
+end
 function ____exports.stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
@@ -338,9 +345,12 @@ end
 ____exports["范围敌人"] = function(boss, x, y, radius)
     return getEnemyUnitsInRange(boss, x, y, radius)
 end
-local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, target, amount, attackType, damageType, _____4F24_5BB3_5F62_6001)
+local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, target, amount, attackType, damageType, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
     if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
         _____9020_6210_6280_80FD_4F24_5BB3({
+            ["技能ID"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["技能ID"],
+            ["技能实例ID"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["技能实例ID"],
+            ["标签"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["标签"],
             ["来源"] = source,
             ["目标"] = target,
             ["伤害"] = amount,
@@ -353,7 +363,7 @@ local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, tar
         })
     end
 end
-____exports["造成火焰伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+____exports["造成火焰伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
     if _____4F24_5BB3_5F62_6001 == nil then
         _____4F24_5BB3_5F62_6001 = "单体"
     end
@@ -363,10 +373,11 @@ ____exports["造成火焰伤害"] = function(source, target, amount, _____4F24_5
         amount,
         ATTACK_TYPE_MAGIC,
         DAMAGE_TYPE_FIRE,
-        _____4F24_5BB3_5F62_6001
+        _____4F24_5BB3_5F62_6001,
+        _____4E0A_4E0B_6587
     )
 end
-____exports["造成冰霜伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+____exports["造成冰霜伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
     if _____4F24_5BB3_5F62_6001 == nil then
         _____4F24_5BB3_5F62_6001 = "单体"
     end
@@ -376,10 +387,11 @@ ____exports["造成冰霜伤害"] = function(source, target, amount, _____4F24_5
         amount,
         ATTACK_TYPE_MAGIC,
         DAMAGE_TYPE_COLD,
-        _____4F24_5BB3_5F62_6001
+        _____4F24_5BB3_5F62_6001,
+        _____4E0A_4E0B_6587
     )
 end
-____exports["造成毒火伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+____exports["造成毒火伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
     if _____4F24_5BB3_5F62_6001 == nil then
         _____4F24_5BB3_5F62_6001 = "单体"
     end
@@ -389,10 +401,11 @@ ____exports["造成毒火伤害"] = function(source, target, amount, _____4F24_5
         amount,
         ATTACK_TYPE_MAGIC,
         DAMAGE_TYPE_POISON,
-        _____4F24_5BB3_5F62_6001
+        _____4F24_5BB3_5F62_6001,
+        _____4E0A_4E0B_6587
     )
 end
-____exports["造成暗火伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+____exports["造成暗火伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
     if _____4F24_5BB3_5F62_6001 == nil then
         _____4F24_5BB3_5F62_6001 = "单体"
     end
@@ -402,10 +415,11 @@ ____exports["造成暗火伤害"] = function(source, target, amount, _____4F24_5
         amount,
         ATTACK_TYPE_NORMAL,
         DAMAGE_TYPE_SHADOW_STRIKE,
-        _____4F24_5BB3_5F62_6001
+        _____4F24_5BB3_5F62_6001,
+        _____4E0A_4E0B_6587
     )
 end
-____exports["造成普通伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001)
+____exports["造成普通伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
     if _____4F24_5BB3_5F62_6001 == nil then
         _____4F24_5BB3_5F62_6001 = "单体"
     end
@@ -415,7 +429,8 @@ ____exports["造成普通伤害"] = function(source, target, amount, _____4F24_5
         amount,
         ATTACK_TYPE_NORMAL,
         DAMAGE_TYPE_NORMAL,
-        _____4F24_5BB3_5F62_6001
+        _____4F24_5BB3_5F62_6001,
+        _____4E0A_4E0B_6587
     )
 end
 ____exports["计算攻击最大生命伤害"] = function(source, target, attackRate, maxLifeRate)
@@ -494,20 +509,20 @@ ____exports["减少元素层数"] = function(unit, _____5143_7D20, count)
         return
     end
     local runtime = getBuffRuntime(unit, buffID)
-    local ____registerManualBuff_17 = registerManualBuff
-    local ____unit_16 = unit
-    local ____opt_result_14
+    local ____registerManualBuff_23 = registerManualBuff
+    local ____unit_22 = unit
+    local ____opt_result_20
     if runtime ~= nil then
-        ____opt_result_14 = runtime.remaining
+        ____opt_result_20 = runtime.remaining
     end
-    local ____opt_result_14_15 = ____opt_result_14
-    if ____opt_result_14_15 == nil then
-        ____opt_result_14_15 = 30
+    local ____opt_result_20_21 = ____opt_result_20
+    if ____opt_result_20_21 == nil then
+        ____opt_result_20_21 = 30
     end
-    ____registerManualBuff_17(
-        ____unit_16,
+    ____registerManualBuff_23(
+        ____unit_22,
         buffID,
-        ____opt_result_14_15,
+        ____opt_result_20_21,
         next,
         {stack = next, sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
     )

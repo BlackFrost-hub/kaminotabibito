@@ -32,6 +32,7 @@ local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWETimerDestroyEffectSafe = ____require_result_6.YDWETimerDestroyEffectSafe
 local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成AOE技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_7["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -149,7 +150,7 @@ local function _____64AD_653E_6C61_6C34_67F1_7206_53D1_8868_73B0(point)
         end
     end
 end
-local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point)
+local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point, _____6280_80FD_5B9E_4F8BID)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
     _____521B_5EFA_6301_7EED_5371_9669_533A_57DF({
         X = point.x,
@@ -178,7 +179,9 @@ local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point)
                             attackType = jass.ATTACK_TYPE_CHAOS,
                             ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
                             weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                            ["来源类型"] = "Boss技能"
+                            ["来源类型"] = "Boss技能",
+                            ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                            ["标签"] = "米亚污水柱爆发"
                         })
                         _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["水坑每秒腐化层数"], "污水柱残留水坑")
                     end
@@ -189,7 +192,7 @@ local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point)
         end
     })
 end
-local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point)
+local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point, _____6280_80FD_5B9E_4F8BID)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or context["阶段"] ~= 2 then
         return
@@ -222,7 +225,9 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point)
                     attackType = jass.ATTACK_TYPE_CHAOS,
                     ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
                     weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能"
+                    ["来源类型"] = "Boss技能",
+                    ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                    ["标签"] = "米亚污水柱爆发"
                 })
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["命中腐化层数"], "污水柱爆发")
                 _____5F00_59CB_539F_5730_51FB_98DE(target, {
@@ -239,7 +244,7 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point)
             i = i + 1
         end
     end
-    _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point)
+    _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point, _____6280_80FD_5B9E_4F8BID)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污水柱爆发", 3)
 end
 ____exports["注册米亚污水柱爆发"] = function()
@@ -257,6 +262,7 @@ ____exports["尝试触发米亚污水柱爆发"] = function(context, nowMs)
         return
     end
     context["上次污水柱爆发Ms"] = nowMs
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "米亚污水柱爆发", ["持续时间秒"] = config["预警秒"] + config["水坑持续秒"] + 2})
     local points = _____9009_62E9_6C61_6C34_67F1_843D_70B9(boss)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污水柱爆发", 0)
     do
@@ -281,7 +287,7 @@ ____exports["尝试触发米亚污水柱爆发"] = function(context, nowMs)
             do
                 local i = 0
                 while i < #points do
-                    _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, points[i + 1])
+                    _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, points[i + 1], _____6280_80FD_5B9E_4F8BID)
                     i = i + 1
                 end
             end

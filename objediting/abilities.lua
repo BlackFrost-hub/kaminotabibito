@@ -151,11 +151,12 @@ applyCommonBuffAbility(asbs, {
 })
 asbs:setStunDuration(1, 0)
 
-local asbt = createNamedAbilityFromBase('ASBT', 'Aenr', '[Buff系统]纠缠根须')
+local asbt = createNamedAbility(AbilityDefinitionEntanglingRootscreep, 'ASBT', '[Buff系统]纠缠根须')
 -- Aenr 本身是中立敌对非英雄纠缠；这里不要再写 heroAbility 字段，否则 ObjEditing 读对象会断言失败。
 applyCommonBuffAbility(asbt, {
   targetsAllowed = 'ground,air,enemy,friend,self,neutral,nonsapper',
 })
+asbt:setDamageperSecond(1, 0.0)
 
 -- ASBH 飓风：Cyclonecreep 生成母技能 ACcy 会导致地图加载闪退，改测普通 Cyclone(Acyc)。
 local asbh = createNamedAbility(AbilityDefinitionCyclone, 'ASBH', '[Buff系统]飓风')

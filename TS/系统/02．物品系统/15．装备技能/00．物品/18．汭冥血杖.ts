@@ -102,7 +102,7 @@ export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事�
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];
     if (!单位是否有效且敌对(敌人, 施法单位)) continue;
-    造成装备伤害(施法单位, 敌人, 目标最大生命 * 汭冥血杖配置.伤害生命系数, DAMAGE_TYPE_MAGIC, true);
+    造成装备伤害(施法单位, 敌人, 目标最大生命 * 汭冥血杖配置.伤害生命系数, DAMAGE_TYPE_MAGIC, true, undefined, { 伤害形态: "AOE" });
   }
 
   KillUnit(目标单位);

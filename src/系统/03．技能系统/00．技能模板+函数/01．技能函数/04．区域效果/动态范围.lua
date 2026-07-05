@@ -158,7 +158,8 @@ _____52A8_6001_8303_56F4_5B9E_73B0.prototype["执行检测"] = function(self)
                 ____self__53C2_6570__4F24_5BB3_7C7B_578B_7,
                 false,
                 ATTACK_TYPE_NORMAL,
-                nil
+                nil,
+                {["伤害形态"] = "AOE"}
             )
         end
     end

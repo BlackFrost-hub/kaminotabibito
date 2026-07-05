@@ -36,7 +36,7 @@ const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
-  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any) => boolean;
+  造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any, 选项?: any) => boolean;
 };
 
 const { 创建薄圆形提示圈特效, 立即销毁提示圈特效 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
@@ -189,7 +189,8 @@ class 动态范围实现 implements 动态范围实例 {
           this.参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
           false,
           ATTACK_TYPE_NORMAL,
-          null
+          null,
+          { 伤害形态: "AOE" }
         );
       }
     }

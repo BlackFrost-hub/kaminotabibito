@@ -9,7 +9,7 @@ const { 施加扩展控制 } = require("系统.03．技能系统.00．技能模�
 };
 
 function 延迟根须伤害(this: void, source: any, target: any): void {
-  造成装备伤害(source, target, 取攻击力(source) * 0.25, 装备伤害类型.自然);
+  造成装备伤害(source, target, 取攻击力(source) * 0.25, 装备伤害类型.自然, false, undefined, { 伤害形态: "单体" });
 }
 
 function on腐败根须法杖触发(this: void, event: any): void {
@@ -17,7 +17,7 @@ function on腐败根须法杖触发(this: void, event: any): void {
   const attacker = event.攻击者;
   播放单位特效(装备小特效.根须, target, "origin", 2.5);
   施加扩展控制(attacker, target, "roots", { 持续时间: 1.5 });
-  造成装备伤害(attacker, target, 取攻击力(attacker) * 0.3, 装备伤害类型.自然);
+  造成装备伤害(attacker, target, 取攻击力(attacker) * 0.3, 装备伤害类型.自然, false, undefined, { 伤害形态: "单体" });
   延迟执行双单位动作(attacker, target, 1000, 延迟根须伤害);
   延迟执行双单位动作(attacker, target, 2000, 延迟根须伤害);
 }

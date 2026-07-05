@@ -72,6 +72,7 @@ function on聊天1012测试(): void {
     生命周期: 6,
     命中半径: 96,
     伤害值: 25,
+    伤害形态: "AOE",
     影响目标: "敌方",
     模型: "Abilities\\Spells\\Human\\StormBolt\\StormBoltMissile.mdl",
     轨迹采样器: 创建二阶贝塞尔加速度抛物线轨迹(

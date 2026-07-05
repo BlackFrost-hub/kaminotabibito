@@ -17,8 +17,8 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
 
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
+const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成技能伤害: (this: void, 参数: any) => boolean;
 };
 
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
@@ -82,6 +82,7 @@ export interface 纯跳链参数 {
   技能ID?: number;
   技能实例ID?: number;
   技能标签?: string;
+  伤害形态?: "单体" | "AOE" | "未知";
   参与技能伤害加成?: boolean;
   目标筛选?: 跳链目标筛选;
   每跳回调?: 跳链每跳回调;
@@ -187,6 +188,12 @@ function 创建跳链闪电(起点单位: any, 终点单位: any, 效果代码: 
   });
 }
 
+function 推断跳链伤害形态(this: void, 实例: 纯跳链内部实例): "单体" | "AOE" | "未知" {
+  const 显式形态 = 实例.参数.伤害形态;
+  if (显式形态 != null) return 显式形态;
+  return 实例.参数.最大跳数 > 1 ? "AOE" : "单体";
+}
+
 function 结束跳链实例(实例: 纯跳链内部实例, 原因: 跳链结束原因): void {
   if (实例.已结束) return;
   实例.已结束 = true;
@@ -271,7 +278,7 @@ function 执行当前一跳(实例: 纯跳链内部实例): void {
       HealEffectPath: 实例.参数.治疗特效路径,
     });
   } else {
-    造成单体技能伤害({
+    造成技能伤害({
       来源: 实例.参数.来源单位 ?? 当前目标,
       目标: 当前目标,
       伤害: 实例.当前数值,
@@ -283,6 +290,7 @@ function 执行当前一跳(实例: 纯跳链内部实例): void {
       技能ID: 实例.参数.技能ID,
       技能实例ID: 实例.参数.技能实例ID,
       标签: 实例.参数.技能标签,
+      伤害形态: 推断跳链伤害形态(实例),
       参与技能伤害加成: 实例.参数.参与技能伤害加成,
     });
   }

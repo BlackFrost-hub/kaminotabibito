@@ -169,6 +169,7 @@ function _____6267_884C_5251_9B42_8DEF_5F84(context, paths)
                                     {sourceName = "菲利斯-剑魂杀"}
                                 )
                                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                                    ["技能ID"] = _____5251_9B42_6740_6280_80FDID,
                                     ["来源"] = boss,
                                     ["目标"] = hero,
                                     ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["路径伤害Boss攻击力比例"],
@@ -255,6 +256,7 @@ function ____on_83F2_5229_65AF_5251_9B42_6740_751F_6548(castingUnit, spellAbilit
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
@@ -329,7 +331,8 @@ local function ____on_5251_9B42_72FC_6700_7EC8_4F24_5BB3(target, attacker, _appl
         return
     end
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑魂杀"]
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["技能ID"] = _____5251_9B42_6740_6280_80FDID,
         ["来源"] = attacker,
         ["目标"] = target,
         ["伤害"] = GetUnitState(target, UNIT_STATE_MAX_LIFE) * record["伤害比例"],

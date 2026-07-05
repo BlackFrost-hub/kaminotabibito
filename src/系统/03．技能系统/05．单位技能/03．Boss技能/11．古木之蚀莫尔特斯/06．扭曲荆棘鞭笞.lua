@@ -141,6 +141,7 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
                 _____547D_4E2D_6B21_6570_8868[hid] = oldHits + 1
                 local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["Boss攻击力比例"] * (1 + oldHits * cfg["重复命中增伤比例"])
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____626D_66F2_8346_68D8_97AD_7B1E_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = damage,

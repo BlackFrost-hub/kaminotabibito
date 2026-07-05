@@ -30,8 +30,9 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
 const jass = require("jass.common") as any;
@@ -136,7 +137,7 @@ function 播放污水柱爆发表现(this: void, point: 污水柱落点): void {
   }
 }
 
-function 创建污水柱残留水坑(this: void, context: 米亚运行时上下文, point: 污水柱落点): void {
+function 创建污水柱残留水坑(this: void, context: 米亚运行时上下文, point: 污水柱落点, 技能实例ID?: number): void {
   const config = 米亚技能数值配置.污水柱爆发;
   创建持续危险区域({
     X: point.x,
@@ -161,6 +162,8 @@ function 创建污水柱残留水坑(this: void, context: 米亚运行时上下�
           伤害类型: jass.DAMAGE_TYPE_POISON,
           weaponType: jass.WEAPON_TYPE_WHOKNOWS,
           来源类型: "Boss技能",
+          技能实例ID,
+          标签: "米亚污水柱爆发",
         });
         添加米亚腐化感染(context, target, config.水坑每秒腐化层数, "污水柱残留水坑");
       }
@@ -168,7 +171,7 @@ function 创建污水柱残留水坑(this: void, context: 米亚运行时上下�
   });
 }
 
-function 结算污水柱爆发(this: void, context: 米亚运行时上下文, point: 污水柱落点): void {
+function 结算污水柱爆发(this: void, context: 米亚运行时上下文, point: 污水柱落点, 技能实例ID?: number): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.阶段 !== 2) return;
 
@@ -190,6 +193,8 @@ function 结算污水柱爆发(this: void, context: 米亚运行时上下文, po
       伤害类型: jass.DAMAGE_TYPE_POISON,
       weaponType: jass.WEAPON_TYPE_WHOKNOWS,
       来源类型: "Boss技能",
+      技能实例ID,
+      标签: "米亚污水柱爆发",
     });
     添加米亚腐化感染(context, target, config.命中腐化层数, "污水柱爆发");
     开始原地击飞(target, {
@@ -203,7 +208,7 @@ function 结算污水柱爆发(this: void, context: 米亚运行时上下文, po
     });
   }
 
-  创建污水柱残留水坑(context, point);
+  创建污水柱残留水坑(context, point, 技能实例ID);
   播放米亚台词(boss, "污水柱爆发", 3);
 }
 
@@ -218,6 +223,11 @@ export function 尝试触发米亚污水柱爆发(this: void, context: 米亚运
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   context.上次污水柱爆发Ms = nowMs;
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "米亚污水柱爆发",
+    持续时间秒: config.预警秒 + config.水坑持续秒 + 2,
+  });
 
   const points = 选择污水柱落点(boss);
   播放米亚台词(boss, "污水柱爆发", 0);
@@ -230,7 +240,7 @@ export function 尝试触发米亚污水柱爆发(this: void, context: 米亚运
   });
   addDelayedCallback(config.预警秒 * 1000, function 米亚污水柱爆发延迟结算(this: void): void {
     for (let i = 0; i < points.length; i++) {
-      结算污水柱爆发(context, points[i]);
+      结算污水柱爆发(context, points[i], 技能实例ID);
     }
   });
 }

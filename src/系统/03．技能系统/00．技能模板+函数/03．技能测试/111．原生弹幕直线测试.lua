@@ -83,6 +83,7 @@ local function ____on_804A_59291011_6D4B_8BD5()
         ["碰撞消失"] = false,
         ["每单位最大命中次数"] = 1,
         ["伤害值"] = 35,
+        ["伤害形态"] = "AOE",
         ["影响目标"] = "敌方",
         ["模型"] = "Abilities\\Spells\\Human\\StormBolt\\StormBoltMissile.mdl",
         ["飞行高度"] = 75,

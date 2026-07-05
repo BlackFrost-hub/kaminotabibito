@@ -102,6 +102,7 @@ local function _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(context, cell)
             GetOwningPlayer(boss)
         ) == true then
             _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                ["技能ID"] = _____8150_673D_6839_987B_7A7F_523A_6280_80FDID,
                 ["来源"] = boss,
                 ["目标"] = unit,
                 ["伤害"] = damage,

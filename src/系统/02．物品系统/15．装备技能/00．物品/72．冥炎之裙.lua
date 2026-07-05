@@ -123,7 +123,9 @@ local function ____on_51A5_708E_4E4B_88D9_6218_6597_5468_671F(event)
                     target,
                     damage,
                     DAMAGE_TYPE_FIRE,
-                    true
+                    true,
+                    nil,
+                    {["伤害形态"] = "AOE"}
                 )
             end
             ::__continue23::

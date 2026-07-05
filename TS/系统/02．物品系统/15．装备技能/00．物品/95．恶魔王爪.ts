@@ -36,7 +36,7 @@ function 造成恶魔王爪真实伤害(this: void, source: any, target: any): v
   if (!单位有效存活(source) || !单位有效存活(target)) return;
   const amount = 计算已损失生命真实伤害(target);
   if (!(amount > 0)) return;
-  造成装备伤害(source, target, amount, DAMAGE_TYPE_MIND);
+  造成装备伤害(source, target, amount, DAMAGE_TYPE_MIND, false, undefined, { 伤害形态: "单体" });
 }
 
 function 施加或刷新撕裂(this: void, source: any, target: any): void {

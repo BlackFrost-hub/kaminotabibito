@@ -12,7 +12,7 @@ function on克林姆德风纹法杖触发(this: void, event: any): void {
   播放点特效(装备小特效.小风爆, 取单位X(target), 取单位Y(target), 0.9);
   const enemies = 取范围敌人(attacker, target, 260);
   for (let i = 0; i < enemies.length; i++) {
-    造成装备伤害(attacker, enemies[i], 取攻击力(attacker) * 0.4, 装备伤害类型.风);
+    造成装备伤害(attacker, enemies[i], 取攻击力(attacker) * 0.4, 装备伤害类型.风, false, undefined, { 伤害形态: "AOE" });
   }
 }
 

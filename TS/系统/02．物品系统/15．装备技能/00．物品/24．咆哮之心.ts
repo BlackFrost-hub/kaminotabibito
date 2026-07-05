@@ -41,7 +41,7 @@ function on咆哮之心周期(this: void, 上下文: 咆哮之心上下文, 当�
     return false;
   }
   createTimedEffect(咆哮之心配置.特效路径, GetUnitX(上下文.目标单位), GetUnitY(上下文.目标单位), 0, 咆哮之心配置.特效持续时间);
-  造成装备伤害(上下文.施法单位, 上下文.目标单位, 咆哮之心配置.每跳伤害, DAMAGE_TYPE_MIND);
+  造成装备伤害(上下文.施法单位, 上下文.目标单位, 咆哮之心配置.每跳伤害, DAMAGE_TYPE_MIND, false, undefined, { 伤害形态: "单体" });
 }
 
 export function 处理咆哮之心使用(this: void, 上下文: 物品技能事件上下文): void {

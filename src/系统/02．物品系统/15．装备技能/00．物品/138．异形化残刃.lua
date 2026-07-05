@@ -17,7 +17,15 @@ local function _____9020_6210_5F02_5F62_5316_6B8B_5203_989D_5916_4F24_5BB3(sourc
         return
     end
     _____5F02_5F62_5316_6B8B_5203_6D3E_751F_4F24_5BB3_4E2D = true
-    _____9020_6210_88C5_5907_4F24_5BB3(source, target, amount, _____88C5_5907_4F24_5BB3_7C7B_578B["暗影"])
+    _____9020_6210_88C5_5907_4F24_5BB3(
+        source,
+        target,
+        amount,
+        _____88C5_5907_4F24_5BB3_7C7B_578B["暗影"],
+        false,
+        nil,
+        {["伤害形态"] = "单体"}
+    )
     _____5F02_5F62_5316_6B8B_5203_6D3E_751F_4F24_5BB3_4E2D = false
 end
 local function _____5F02_5F62_5316_6B8B_5203_8FC7_6EE4()

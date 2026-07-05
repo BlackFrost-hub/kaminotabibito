@@ -49,6 +49,7 @@ function _____7ED3_7B97_8DF3_5288(boss, target)
                     goto __continue5
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____56DB_91CD_98CE_5203_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = damage,
@@ -112,6 +113,7 @@ function _____53D1_5C04_5355_4E2A_9F99_5377_98CE(context, angle)
                     return
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____56DB_91CD_98CE_5203_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = target,
                     ["伤害"] = damage,

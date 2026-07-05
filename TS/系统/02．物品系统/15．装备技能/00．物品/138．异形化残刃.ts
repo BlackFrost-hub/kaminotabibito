@@ -12,7 +12,7 @@ let 异形化残刃派生伤害中 = false;
 function 造成异形化残刃额外伤害(this: void, source: any, target: any, amount: number): void {
   if (!(amount > 0)) return;
   异形化残刃派生伤害中 = true;
-  造成装备伤害(source, target, amount, 装备伤害类型.暗影);
+  造成装备伤害(source, target, amount, 装备伤害类型.暗影, false, undefined, { 伤害形态: "单体" });
   异形化残刃派生伤害中 = false;
 }
 

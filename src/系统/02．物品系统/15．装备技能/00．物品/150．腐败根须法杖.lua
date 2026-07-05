@@ -18,7 +18,10 @@ local function _____5EF6_8FDF_6839_987B_4F24_5BB3(source, target)
         source,
         target,
         _____53D6_653B_51FB_529B(source) * 0.25,
-        _____88C5_5907_4F24_5BB3_7C7B_578B["自然"]
+        _____88C5_5907_4F24_5BB3_7C7B_578B["自然"],
+        false,
+        nil,
+        {["伤害形态"] = "单体"}
     )
 end
 local function ____on_8150_8D25_6839_987B_6CD5_6756_89E6_53D1(event)
@@ -30,7 +33,10 @@ local function ____on_8150_8D25_6839_987B_6CD5_6756_89E6_53D1(event)
         attacker,
         target,
         _____53D6_653B_51FB_529B(attacker) * 0.3,
-        _____88C5_5907_4F24_5BB3_7C7B_578B["自然"]
+        _____88C5_5907_4F24_5BB3_7C7B_578B["自然"],
+        false,
+        nil,
+        {["伤害形态"] = "单体"}
     )
     _____5EF6_8FDF_6267_884C_53CC_5355_4F4D_52A8_4F5C(attacker, target, 1000, _____5EF6_8FDF_6839_987B_4F24_5BB3)
     _____5EF6_8FDF_6267_884C_53CC_5355_4F4D_52A8_4F5C(attacker, target, 2000, _____5EF6_8FDF_6839_987B_4F24_5BB3)

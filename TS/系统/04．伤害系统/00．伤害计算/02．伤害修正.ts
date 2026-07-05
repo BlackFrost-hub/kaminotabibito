@@ -197,6 +197,46 @@ export function getSkillDamageModifier(attacker: any, target: any, isPlayer: boo
 }
 
 /**
+ * 获取主动/独立技能伤害修正
+ */
+export function getActiveSkillDamageModifier(attacker: any): {
+  addDamage: number;
+  multiplier: number;
+} {
+  const activeSkillDmg = getRealAttr(attacker, "主动技能伤害", 0) + getRealAttr(attacker, "独立技能伤害", 0);
+
+  const addDamage = createValueHolder(0);
+  const multiplier = createValueHolder(1);
+
+  OperatorRealMultiply(activeSkillDmg, addDamage, multiplier);
+
+  return { addDamage: addDamage.value, multiplier: multiplier.value };
+}
+
+/**
+ * 获取装备技能伤害修正。
+ * 装备伤害作用于所有装备技能伤害；攻击特效/普攻强化只作用于对应子类。
+ */
+export function getEquipmentSkillDamageModifier(attacker: any, equipmentSkillKind?: string): {
+  addDamage: number;
+  multiplier: number;
+} {
+  let equipmentDmg = getRealAttr(attacker, "装备伤害", 0);
+  if (equipmentSkillKind === "攻击特效") {
+    equipmentDmg += getRealAttr(attacker, "攻击特效伤害", 0);
+  } else if (equipmentSkillKind === "普攻强化") {
+    equipmentDmg += getRealAttr(attacker, "普攻强化伤害", 0);
+  }
+
+  const addDamage = createValueHolder(0);
+  const multiplier = createValueHolder(1);
+
+  OperatorRealMultiply(equipmentDmg, addDamage, multiplier);
+
+  return { addDamage: addDamage.value, multiplier: multiplier.value };
+}
+
+/**
  * 获取普攻伤害修正
  */
 export function getNormalAttackModifier(attacker: any, target: any, isPlayer: boolean): {

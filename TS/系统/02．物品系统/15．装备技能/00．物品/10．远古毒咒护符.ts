@@ -13,7 +13,7 @@ const { 获取坐标范围敌人, 单位是否有效且敌对 } = require("系�
   单位是否有效且敌对: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
-  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any) => void;
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, weaponType?: any, 选项?: any) => void;
 };
 
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -48,7 +48,7 @@ export function 处理远古毒咒护符使用(this: void, 上下文: 物品技�
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];
     if (!单位是否有效且敌对(敌人, 施法单位)) continue;
-    造成装备伤害(施法单位, 敌人, 伤害值, DAMAGE_TYPE_POISON);
+    造成装备伤害(施法单位, 敌人, 伤害值, DAMAGE_TYPE_POISON, false, undefined, { 伤害形态: "AOE" });
   }
 }
 

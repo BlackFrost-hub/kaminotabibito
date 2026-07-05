@@ -30,8 +30,9 @@ const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位�
   读取单位攻击力: (this: void, unit: any) => number;
 };
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -99,6 +100,11 @@ export function 释放瑟兰迪尔终末审判(this: void, context: 瑟兰迪尔
   const config = 瑟兰迪尔数值与表现配置.终末审判;
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "瑟兰迪尔终末审判",
+    持续时间秒: config.引导秒 + config.爆炸延迟秒 + 2,
+  });
   播放瑟兰迪尔台词(boss, "终末审判");
   开始硬直(boss, config.引导秒);
   显示大招吟唱条({
@@ -175,6 +181,8 @@ export function 释放瑟兰迪尔终末审判(this: void, context: 瑟兰迪尔
             伤害类型: jass.DAMAGE_TYPE_MAGIC,
             weaponType: jass.WEAPON_TYPE_WHOKNOWS,
             来源类型: "Boss技能",
+            技能实例ID,
+            标签: "瑟兰迪尔终末审判",
           });
         }
       }

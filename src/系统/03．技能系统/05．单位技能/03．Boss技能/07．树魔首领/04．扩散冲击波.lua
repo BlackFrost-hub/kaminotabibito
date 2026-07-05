@@ -105,6 +105,7 @@ function _____6267_884C_6269_6563_51B2_51FB_6CE2(context)
                         end
                         hit[hid] = true
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                            ["技能ID"] = _____6269_6563_51B2_51FB_6CE2_6280_80FDID,
                             ["来源"] = boss,
                             ["目标"] = target,
                             ["伤害"] = damage,

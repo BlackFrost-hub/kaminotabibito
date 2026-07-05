@@ -58,7 +58,9 @@ ____exports["处理熔岩恶魔之灵眼使用"] = function(_____4E0A_4E0B_6587)
         _____76EE_6807_5355_4F4D,
         GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["伤害魔法系数"],
         DAMAGE_TYPE_SHADOW_STRIKE,
-        true
+        true,
+        nil,
+        {["伤害形态"] = "单体"}
     )
 end
 return ____exports

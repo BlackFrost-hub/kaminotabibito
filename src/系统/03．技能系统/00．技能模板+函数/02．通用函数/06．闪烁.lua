@@ -4,6 +4,8 @@ local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local _____5355_4F4D_5B58_6D3B, _____64AD_653E_95EA_70C1_7279_6548, _____672C_5730_4E3A_5355_4F4D_62E5_6709_8005_91CD_65B0_9009_4E2D_5355_4F4D, _____7ED3_675F_95EA_70C1_5B9E_4F8B, ____on_95EA_70C1Tick, jass, offTick10ms, YDWETimerDestroyEffect, AddSpecialEffect, GetOwningPlayer, GetLocalPlayer, ClearSelection, SelectUnit, ShowUnit, PauseUnit, SetUnitFacing, SetUnitPosition, GetUnitState, TICK_INTERVAL, UNIT_ALIVE_LIFE, _____6D3B_52A8_95EA_70C1_5217_8868, _____95EA_70C1_6620_5C04, _____5DF2_6CE8_518C_95EA_70C1Tick
+local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
+local _____5C1D_8BD5_963B_6B62_81EA_8EAB_4F4D_79FB_6280_80FD = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["尝试阻止自身位移技能"]
 function _____5355_4F4D_5B58_6D3B(unit)
     return unit ~= nil and unit ~= 0 and GetUnitState(unit, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE
 end
@@ -106,6 +108,9 @@ local function _____6CE8_518C_95EA_70C1Tick()
 end
 ____exports["开始闪烁"] = function(_____5355_4F4D, _____53C2_6570)
     if not _____5355_4F4D_5B58_6D3B(_____5355_4F4D) then
+        return 0
+    end
+    if _____5C1D_8BD5_963B_6B62_81EA_8EAB_4F4D_79FB_6280_80FD(_____5355_4F4D) then
         return 0
     end
     local _____6301_7EED_65F6_95F4 = _____53C2_6570["持续时间"] > 0 and _____53C2_6570["持续时间"] or 0

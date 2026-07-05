@@ -289,7 +289,8 @@ _____5730_9762_8DEF_5F84_6301_7EED_533A_57DF_5B9E_73B0.prototype["整体伤害�
                 ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_10,
                 false,
                 ATTACK_TYPE_NORMAL,
-                WEAPON_TYPE_WHOKNOWS
+                WEAPON_TYPE_WHOKNOWS,
+                {["伤害形态"] = "AOE"}
             )
         end
         ::__continue25::

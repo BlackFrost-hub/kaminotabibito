@@ -4,7 +4,7 @@
 import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 import { 创建句柄上下文托管器 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制/24．句柄上下文托管";
 const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
-  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean) => void;
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, weaponType?: any, 选项?: any) => void;
 };
 
 const jass = require("jass.common") as any;
@@ -56,7 +56,7 @@ function 结算破血之戒(this: void, 施法单位: any): void {
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];
     if (敌人 == null || 敌人 === 0) continue;
-    造成装备伤害(施法单位, 敌人, 伤害值, DAMAGE_TYPE_ENHANCED, true);
+    造成装备伤害(施法单位, 敌人, 伤害值, DAMAGE_TYPE_ENHANCED, true, undefined, { 伤害形态: "AOE" });
   }
 }
 

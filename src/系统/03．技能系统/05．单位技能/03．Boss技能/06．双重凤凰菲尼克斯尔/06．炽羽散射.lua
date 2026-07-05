@@ -37,7 +37,7 @@ local GetRandomReal = jass.GetRandomReal
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____70BD_7FBD_6563_5C04_6280_80FDID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["炽羽散射"])
 local _____70BD_7FBD_6563_5C04_5DF2_6CE8_518C = false
-local function _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x, y)
+local function _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x, y, _____4F24_5BB3_4E0A_4E0B_6587)
     local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["炽羽散射"]
     _____64AD_653E_70B9_7279_6548(_____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["燃烧区"], x, y, config["燃烧区持续秒"] * 1000)
     local elapsed = 0
@@ -54,7 +54,9 @@ local function _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x
                     _____9020_6210_706B_7130_4F24_5BB3(
                         context.Boss,
                         u,
-                        _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, u, 0, config["燃烧Tick目标最大生命比例"])
+                        _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, u, 0, config["燃烧Tick目标最大生命比例"]),
+                        "AOE",
+                        _____4F24_5BB3_4E0A_4E0B_6587
                     )
                     _____6DFB_52A0_5143_7D20_5C42_6570(u, "火", config["火印层数"])
                     i = i + 1
@@ -68,7 +70,7 @@ local function _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x
     local ____self_0 = context["清理"]
     ____self_0["登记周期回调"](____self_0, "菲尼克斯尔燃烧区", tick)
 end
-____exports["释放菲尼克斯尔炽羽散射"] = function(context, target)
+____exports["释放菲尼克斯尔炽羽散射"] = function(context, target, _____6280_80FD_5B9E_4F8BID)
     if context["当前形态"] ~= "第一形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
         return
     end
@@ -78,6 +80,7 @@ ____exports["释放菲尼克斯尔炽羽散射"] = function(context, target)
         return
     end
     local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["炽羽散射"]
+    local _____4F24_5BB3_4E0A_4E0B_6587 = {["技能ID"] = _____70BD_7FBD_6563_5C04_6280_80FDID, ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID, ["标签"] = "菲尼克斯尔炽羽散射"}
     _____9762_5411_5355_4F4D(boss, realTarget)
     _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD(boss, "炽羽散射")
     _____5F00_59CB_65BD_6CD5_786C_76F4(boss, config["读条秒"])
@@ -105,20 +108,22 @@ ____exports["释放菲尼克斯尔炽羽散射"] = function(context, target)
                             _____9020_6210_706B_7130_4F24_5BB3(
                                 boss,
                                 u,
-                                _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(boss, u, config["羽毛伤害Boss攻击力比例"], config["羽毛伤害目标最大生命比例"])
+                                _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(boss, u, config["羽毛伤害Boss攻击力比例"], config["羽毛伤害目标最大生命比例"]),
+                                "AOE",
+                                _____4F24_5BB3_4E0A_4E0B_6587
                             )
                             _____6DFB_52A0_5143_7D20_5C42_6570(u, "火", config["火印层数"])
                             j = j + 1
                         end
                     end
-                    _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x, y)
+                    _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x, y, _____4F24_5BB3_4E0A_4E0B_6587)
                 end
             )
             i = i + 1
         end
     end
 end
-local function ____on_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_6563_5C04_751F_6548(castingUnit, spellAbilityId)
+local function ____on_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_6563_5C04_751F_6548(castingUnit, spellAbilityId, _____6280_80FD_5B9E_4F8BID)
     if spellAbilityId ~= _____70BD_7FBD_6563_5C04_6280_80FDID then
         return
     end
@@ -127,7 +132,7 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_6563_5C04_751F_6548(cas
     end
     local context = _____83B7_53D6_6216_521B_5EFA_83F2_5C3C_514B_65AF_5C14_4E0A_4E0B_6587(castingUnit)
     if context ~= nil then
-        ____exports["释放菲尼克斯尔炽羽散射"](context)
+        ____exports["释放菲尼克斯尔炽羽散射"](context, nil, _____6280_80FD_5B9E_4F8BID)
     end
 end
 ____exports["注册菲尼克斯尔炽羽散射"] = function()
@@ -140,8 +145,8 @@ ____exports["注册菲尼克斯尔炽羽散射"] = function()
         ["单位类型ID"] = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID,
         ["技能ID"] = _____70BD_7FBD_6563_5C04_6280_80FDID,
         ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83F2_5C3C_514B_65AF_5C14_4E0A_4E0B_6587,
-        ["释放技能"] = function(_context, boss)
-            ____on_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_6563_5C04_751F_6548(boss, _____70BD_7FBD_6563_5C04_6280_80FDID)
+        ["释放技能"] = function(_context, boss, _____6280_80FD_5B9E_4F8BID)
+            ____on_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_6563_5C04_751F_6548(boss, _____70BD_7FBD_6563_5C04_6280_80FDID, _____6280_80FD_5B9E_4F8BID)
         end
     })
 end

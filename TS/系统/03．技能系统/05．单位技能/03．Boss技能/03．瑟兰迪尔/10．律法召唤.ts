@@ -26,8 +26,8 @@ const { 取当前有效玩家人数 } = require("系统.00．核心系统.00．�
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -69,7 +69,7 @@ function 启动律法链路(this: void, boss: any, summon: any, 已连接目标:
     Tick间隔秒: config.链接伤害间隔秒,
     on距离超出: function 瑟兰迪尔律法链路距离惩罚(this: void, source: any, _connector: any, target: any): void {
       if (!单位有效(source) || !单位有效(target)) return;
-      造成AOE技能伤害({
+      造成单体技能伤害({
         技能ID: 律法召唤技能ID,
         来源: boss,
         目标: target,

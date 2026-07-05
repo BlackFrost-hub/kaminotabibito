@@ -15,6 +15,7 @@ import {
   范围敌人,
   计算攻击最大生命伤害,
   造成暗火伤害,
+  创建菲尼克斯尔独立伤害上下文,
   添加元素层数,
   设置单位动画,
   显示常规读条,
@@ -24,6 +25,7 @@ import {
 export function 释放菲尼克斯尔骸骨弹幕(this: void, context: 菲尼克斯尔运行时上下文): void {
   if (context.当前形态 !== "第二形态" || !单位存活(context.Boss)) return;
   const config = 菲尼克斯尔数值与表现配置.骸骨弹幕;
+  const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔骸骨弹幕", config.读条秒 + config.波次数 * config.波次间隔秒 + 2);
   播放菲尼克斯尔台词(context.Boss, "骸骨弹幕");
   开始施法硬直(context.Boss, config.读条秒);
   设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.弹幕解体.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.弹幕解体.倍速);
@@ -40,7 +42,7 @@ export function 释放菲尼克斯尔骸骨弹幕(this: void, context: 菲尼克
         const enemies = 范围敌人(context.Boss, x, y, config.半径 * 0.18);
         for (let i = 0; i < enemies.length; i++) {
           const u = enemies[i];
-          造成暗火伤害(context.Boss, u, 计算攻击最大生命伤害(context.Boss, u, config.伤害Boss攻击力比例, config.伤害目标最大生命比例));
+          造成暗火伤害(context.Boss, u, 计算攻击最大生命伤害(context.Boss, u, config.伤害Boss攻击力比例, config.伤害目标最大生命比例), "AOE", 伤害上下文);
           添加元素层数(u, "暗", config.怨火层数);
         }
       });

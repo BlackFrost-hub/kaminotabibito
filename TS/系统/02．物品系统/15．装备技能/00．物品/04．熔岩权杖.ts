@@ -11,7 +11,7 @@ const { 延后一帧执行伤害派生效果 } = require("系统.04．伤害系�
   延后一帧执行伤害派生效果: (this: void, callback: () => void) => void;
 };
 const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
-  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any) => void;
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, weaponType?: any, 选项?: any) => void;
 };
 const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
   UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
@@ -47,7 +47,7 @@ function 发射熔岩弹幕(this: void, 施法者: any, 目标单位: any): void
     模型: 熔岩权杖配置.弹幕模型,
     on命中单位: function 处理熔岩弹幕命中(this: void, 命中单位: any): void {
       if (命中单位 == null || 命中单位 === 0) return;
-      造成装备伤害(施法者, 命中单位, 熔岩权杖配置.伤害值, DAMAGE_TYPE_FIRE);
+      造成装备伤害(施法者, 命中单位, 熔岩权杖配置.伤害值, DAMAGE_TYPE_FIRE, false, undefined, { 伤害形态: "单体" });
       快速控制Buff(施法者, 命中单位, 0, 熔岩权杖配置.控制时间);
     },
   });

@@ -5,8 +5,9 @@ import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置"
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效 } from "./16．公共工具";
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const jass = require("jass.common") as any;
 
@@ -63,6 +64,11 @@ function 根系觉醒失败爆发(this: void, context: 莫尔特斯运行时上�
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
   治疗Boss最大生命比例(boss, cfg.失败回血比例);
   AddSpecialEffect(cfg.全屏爆发特效路径, GetUnitX(boss), GetUnitY(boss));
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "莫尔特斯根系觉醒",
+    持续时间秒: 2,
+  });
   const heroes = 获取Boss技能敌对英雄列表(boss);
   const damage = 读取单位攻击力(boss) * cfg.全屏爆发伤害Boss攻击力比例;
   for (let i = 0; i < heroes.length; i++) {
@@ -78,6 +84,8 @@ function 根系觉醒失败爆发(this: void, context: 莫尔特斯运行时上�
       伤害类型: DAMAGE_TYPE_PLANT,
       weaponType: WEAPON_TYPE_WHOKNOWS,
       来源类型: "Boss技能",
+      技能实例ID,
+      标签: "莫尔特斯根系觉醒",
     });
     增加玩家腐败值(context, hero, cfg.全屏爆发腐败值);
   }

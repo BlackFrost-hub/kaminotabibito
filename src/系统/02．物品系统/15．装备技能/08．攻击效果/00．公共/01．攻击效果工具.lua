@@ -262,12 +262,15 @@ ____exports["解析攻击效果伤害类型"] = function(_____7C7B_578B)
     end
     return DAMAGE_TYPE_NORMAL
 end
-____exports["攻击效果造成伤害"] = function(source, target, amount, _____7C7B_578B)
+____exports["攻击效果造成伤害"] = function(source, target, amount, _____7C7B_578B, _____6807_8BB0)
     _____9020_6210_88C5_5907_4F24_5BB3(
         source,
         target,
         amount,
-        ____exports["解析攻击效果伤害类型"](_____7C7B_578B)
+        ____exports["解析攻击效果伤害类型"](_____7C7B_578B),
+        false,
+        nil,
+        {["装备技能类型"] = "攻击特效", ["伤害形态"] = _____6807_8BB0 and _____6807_8BB0["伤害形态"] or "单体"}
     )
 end
 ____exports["攻击效果治疗生命魔法"] = function(source, target, lifeAmount, manaAmount)

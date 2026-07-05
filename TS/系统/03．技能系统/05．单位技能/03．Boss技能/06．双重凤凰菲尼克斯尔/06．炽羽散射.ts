@@ -27,6 +27,7 @@ import {
   极坐标X,
   极坐标Y,
 } from "./19．公共工具";
+import type { 菲尼克斯尔伤害上下文参数 } from "./19．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
@@ -37,7 +38,7 @@ const 菲尼克斯尔单位类型ID = stringToFourCC(菲尼克斯尔单位技能
 const 炽羽散射技能ID = stringToFourCC(菲尼克斯尔单位技能配置.技能壳.炽羽散射);
 let 炽羽散射已注册 = false;
 
-function 创建菲尼克斯尔燃烧区(this: void, context: 菲尼克斯尔运行时上下文, x: number, y: number): void {
+function 创建菲尼克斯尔燃烧区(this: void, context: 菲尼克斯尔运行时上下文, x: number, y: number, 伤害上下文: 菲尼克斯尔伤害上下文参数): void {
   const config = 菲尼克斯尔数值与表现配置.炽羽散射;
   播放点特效(菲尼克斯尔数值与表现配置.特效.燃烧区, x, y, config.燃烧区持续秒 * 1000);
   let elapsed = 0;
@@ -46,7 +47,7 @@ function 创建菲尼克斯尔燃烧区(this: void, context: 菲尼克斯尔运�
     const enemies = 范围敌人(context.Boss, x, y, config.燃烧区半径);
     for (let i = 0; i < enemies.length; i++) {
       const u = enemies[i];
-      造成火焰伤害(context.Boss, u, 计算攻击最大生命伤害(context.Boss, u, 0, config.燃烧Tick目标最大生命比例));
+      造成火焰伤害(context.Boss, u, 计算攻击最大生命伤害(context.Boss, u, 0, config.燃烧Tick目标最大生命比例), "AOE", 伤害上下文);
       添加元素层数(u, "火", config.火印层数);
     }
     if (elapsed >= config.燃烧区持续秒) 停止周期(tick);
@@ -54,12 +55,13 @@ function 创建菲尼克斯尔燃烧区(this: void, context: 菲尼克斯尔运�
   context.清理.登记周期回调("菲尼克斯尔燃烧区", tick);
 }
 
-export function 释放菲尼克斯尔炽羽散射(this: void, context: 菲尼克斯尔运行时上下文, target?: any): void {
+export function 释放菲尼克斯尔炽羽散射(this: void, context: 菲尼克斯尔运行时上下文, target?: any, 技能实例ID?: number): void {
   if (context.当前形态 !== "第一形态" || !单位存活(context.Boss)) return;
   const boss = context.Boss;
   const realTarget = 取目标或随机玩家(boss, target);
   if (!单位存活(realTarget)) return;
   const config = 菲尼克斯尔数值与表现配置.炽羽散射;
+  const 伤害上下文: 菲尼克斯尔伤害上下文参数 = { 技能ID: 炽羽散射技能ID, 技能实例ID, 标签: "菲尼克斯尔炽羽散射" };
   面向单位(boss, realTarget);
   播放菲尼克斯尔台词(boss, "炽羽散射");
   开始施法硬直(boss, config.读条秒);
@@ -78,19 +80,19 @@ export function 释放菲尼克斯尔炽羽散射(this: void, context: 菲尼克
       const enemies = 范围敌人(boss, x, y, config.落点半径);
       for (let j = 0; j < enemies.length; j++) {
         const u = enemies[j];
-        造成火焰伤害(boss, u, 计算攻击最大生命伤害(boss, u, config.羽毛伤害Boss攻击力比例, config.羽毛伤害目标最大生命比例));
+        造成火焰伤害(boss, u, 计算攻击最大生命伤害(boss, u, config.羽毛伤害Boss攻击力比例, config.羽毛伤害目标最大生命比例), "AOE", 伤害上下文);
         添加元素层数(u, "火", config.火印层数);
       }
-      创建菲尼克斯尔燃烧区(context, x, y);
+      创建菲尼克斯尔燃烧区(context, x, y, 伤害上下文);
     });
   }
 }
 
-function on菲尼克斯尔炽羽散射生效(this: void, castingUnit: any, spellAbilityId: number): void {
+function on菲尼克斯尔炽羽散射生效(this: void, castingUnit: any, spellAbilityId: number, 技能实例ID?: number): void {
   if (spellAbilityId !== 炽羽散射技能ID) return;
   if (!单位存活(castingUnit) || GetUnitTypeId(castingUnit) !== 菲尼克斯尔单位类型ID) return;
   const context = 获取或创建菲尼克斯尔上下文(castingUnit);
-  if (context != null) 释放菲尼克斯尔炽羽散射(context);
+  if (context != null) 释放菲尼克斯尔炽羽散射(context, undefined, 技能实例ID);
 }
 
 export function 注册菲尼克斯尔炽羽散射(this: void): void {
@@ -101,8 +103,8 @@ export function 注册菲尼克斯尔炽羽散射(this: void): void {
     单位类型ID: 菲尼克斯尔单位类型ID,
     技能ID: 炽羽散射技能ID,
     获取或创建上下文: 获取或创建菲尼克斯尔上下文,
-    释放技能: function 单位技能壳监听释放(this: void, _context: 菲尼克斯尔运行时上下文, boss: any): void {
-      on菲尼克斯尔炽羽散射生效(boss, 炽羽散射技能ID);
+    释放技能: function 单位技能壳监听释放(this: void, _context: 菲尼克斯尔运行时上下文, boss: any, 技能实例ID?: number): void {
+      on菲尼克斯尔炽羽散射生效(boss, 炽羽散射技能ID, 技能实例ID);
     },
   });
 }

@@ -112,6 +112,7 @@ local function _____7ED3_7B97_58A8_6C41_533A_57DF_4E00_8DF3(area)
                 local resisted = _____6EE1_8DB3_5C5E_6027_6297_6027_95E8_69DB(hero, "水", cfg["水抗门槛"], true)
                 local factor = resisted and cfg["达标效果倍率"] or 1
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____58A8_6C41_55B7_5410_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = baseDamage * factor,

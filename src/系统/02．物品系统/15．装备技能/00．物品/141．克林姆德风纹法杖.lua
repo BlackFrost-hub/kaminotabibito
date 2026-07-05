@@ -31,7 +31,10 @@ local function ____on_514B_6797_59C6_5FB7_98CE_7EB9_6CD5_6756_89E6_53D1(event)
                 attacker,
                 enemies[i + 1],
                 _____53D6_653B_51FB_529B(attacker) * 0.4,
-                _____88C5_5907_4F24_5BB3_7C7B_578B["风"]
+                _____88C5_5907_4F24_5BB3_7C7B_578B["风"],
+                false,
+                nil,
+                {["伤害形态"] = "AOE"}
             )
             i = i + 1
         end

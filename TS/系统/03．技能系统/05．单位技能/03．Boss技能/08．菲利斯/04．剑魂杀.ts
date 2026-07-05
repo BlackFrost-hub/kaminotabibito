@@ -6,8 +6,9 @@ import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度, 极坐标X, 极坐标Y, 距离平方XY } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const jass = require("jass.common") as any;
 
@@ -257,7 +258,7 @@ function on剑魂狼最终伤害(this: void, target: any, attacker: any, _applie
   const context = 获取或创建菲利斯上下文(record.Boss单位);
   if (context == null) return;
   const cfg = 菲利斯数值与表现配置.剑魂杀;
-  造成AOE技能伤害({
+  造成单体技能伤害({
     技能ID: 剑魂杀技能ID,
     来源: attacker,
     目标: target,

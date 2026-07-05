@@ -6,7 +6,7 @@ import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．
 function on荆棘行者披风触发(this: void, event: any): void {
   const target = event.目标;
   const attacker = event.攻击者;
-  造成装备伤害(target, attacker, 取攻击力(target) * 0.25, 装备伤害类型.自然);
+  造成装备伤害(target, attacker, 取攻击力(target) * 0.25, 装备伤害类型.自然, false, undefined, { 伤害形态: "单体" });
 }
 
 注册最终伤害触发模板({

@@ -29,6 +29,8 @@ const {
   applyMagicResist,
   getPhysicalDamageModifier,
   getSkillDamageModifier,
+  getActiveSkillDamageModifier,
+  getEquipmentSkillDamageModifier,
   getNormalAttackModifier,
   getMagicDamageModifier,
   getEnhancedDamageModifier,
@@ -49,6 +51,8 @@ const {
   applyMagicResist: (damage: number, target: any, attacker: any) => number;
   getPhysicalDamageModifier: (attacker: any, target: any, isPlayer: boolean) => { addDamage: number; multiplier: number };
   getSkillDamageModifier: (attacker: any, target: any, isPlayer: boolean) => { addDamage: number; multiplier: number };
+  getActiveSkillDamageModifier: (attacker: any) => { addDamage: number; multiplier: number };
+  getEquipmentSkillDamageModifier: (attacker: any, equipmentSkillKind?: string) => { addDamage: number; multiplier: number };
   getNormalAttackModifier: (attacker: any, target: any, isPlayer: boolean) => { addDamage: number; multiplier: number };
   getMagicDamageModifier: (attacker: any) => number;
   getEnhancedDamageModifier: (attacker: any) => number;
@@ -417,6 +421,20 @@ export function calculateDamage(
     const skillMod = getSkillDamageModifier(attacker, target, isPlayer);
     addDamage += skillMod.addDamage;
     finalMultiplier *= skillMod.multiplier;
+  }
+
+  // Step 10B: 主动/独立技能伤害修正（不包含装备技能）
+  if (skillContext?.isIndependentSkillDamage === true) {
+    const activeSkillMod = getActiveSkillDamageModifier(attacker);
+    addDamage += activeSkillMod.addDamage;
+    finalMultiplier *= activeSkillMod.multiplier;
+  }
+
+  // Step 10C: 装备技能伤害修正
+  if (skillContext?.isEquipmentSkillDamage === true) {
+    const equipmentSkillMod = getEquipmentSkillDamageModifier(attacker, skillContext.equipmentSkillKind);
+    addDamage += equipmentSkillMod.addDamage;
+    finalMultiplier *= equipmentSkillMod.multiplier;
   }
 
   // Step 11-12: 普攻伤害修正

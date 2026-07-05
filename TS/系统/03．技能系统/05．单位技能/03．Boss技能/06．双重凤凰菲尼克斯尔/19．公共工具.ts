@@ -7,8 +7,9 @@ import type { 技能伤害形态 } from "../../../../04．伤害系统/08．技�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
 const Player = jass.Player as (id: number) => any;
@@ -90,6 +91,23 @@ const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．�
 const DEG_TO_RAD = 0.017453292519943295;
 const RAD_TO_DEG = 57.29577951308232;
 const 快速控制_击晕 = 1;
+
+export interface 菲尼克斯尔伤害上下文参数 {
+  技能ID?: number;
+  技能实例ID?: number;
+  标签?: string;
+}
+
+export function 创建菲尼克斯尔独立伤害上下文(this: void, 标签: string, 持续时间秒?: number): 菲尼克斯尔伤害上下文参数 {
+  return {
+    技能实例ID: 创建独立技能伤害实例({
+      来源类型: "Boss技能",
+      标签,
+      持续时间秒,
+    }),
+    标签,
+  };
+}
 
 export function stringToFourCC(this: void, s: string): number {
   return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
@@ -289,9 +307,12 @@ export function 范围敌人(this: void, boss: any, x: number, y: number, radius
   return getEnemyUnitsInRange(boss, x, y, radius);
 }
 
-function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, amount: number, attackType: any, damageType: any, 伤害形态: 技能伤害形态): void {
+function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, amount: number, attackType: any, damageType: any, 伤害形态: 技能伤害形态, 上下文?: 菲尼克斯尔伤害上下文参数): void {
   if (amount > 0 && 单位存活(source) && 单位存活(target)) {
     造成技能伤害({
+      技能ID: 上下文?.技能ID,
+      技能实例ID: 上下文?.技能实例ID,
+      标签: 上下文?.标签,
       来源: source,
       目标: target,
       伤害: amount,
@@ -305,24 +326,24 @@ function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, a
   }
 }
 
-export function 造成火焰伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_FIRE, 伤害形态);
+export function 造成火焰伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_FIRE, 伤害形态, 上下文);
 }
 
-export function 造成冰霜伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_COLD, 伤害形态);
+export function 造成冰霜伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_COLD, 伤害形态, 上下文);
 }
 
-export function 造成毒火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_POISON, 伤害形态);
+export function 造成毒火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_POISON, 伤害形态, 上下文);
 }
 
-export function 造成暗火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, 伤害形态);
+export function 造成暗火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, 伤害形态, 上下文);
 }
 
-export function 造成普通伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体"): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, 伤害形态);
+export function 造成普通伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
+  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, 伤害形态, 上下文);
 }
 
 export function 计算攻击最大生命伤害(this: void, source: any, target: any, attackRate: number, maxLifeRate: number): number {

@@ -91,6 +91,7 @@ function _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, x, y)
                         end
                         local damage = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * config["残留伤害目标最大生命比例"]
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                            ["技能ID"] = _____7194_5CA9_55B7_53D1_6280_80FDID,
                             ["来源"] = boss,
                             ["目标"] = unit,
                             ["伤害"] = damage,
@@ -139,6 +140,7 @@ function _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1(context, _____843D_70B9)
                 return
             end
             _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                ["技能ID"] = _____7194_5CA9_55B7_53D1_6280_80FDID,
                 ["来源"] = boss,
                 ["目标"] = unit,
                 ["伤害"] = _____8BA1_7B97_55B7_53D1_4F24_5BB3(boss, unit),

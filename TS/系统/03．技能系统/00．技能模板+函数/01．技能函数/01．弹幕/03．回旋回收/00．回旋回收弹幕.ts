@@ -104,6 +104,7 @@ export function 创建回旋回收弹幕(this: void, 参数: 回旋回收弹幕�
     轨迹采样器: 创建二阶贝塞尔轨迹(startX, startY, ctrlX, ctrlY, endX, endY),
     命中半径: 参数.命中半径 ?? 96,
     伤害值: 参数.去程伤害 ?? 0,
+    伤害形态: "AOE",
     每单位最大命中次数: 参数.去程每单位最大命中次数 ?? 1,
     on结束: function 回旋去程结束(this: void): void {
       const returnStartX = endX;
@@ -130,6 +131,7 @@ export function 创建回旋回收弹幕(this: void, 参数: 回旋回收弹幕�
           : 创建二阶贝塞尔轨迹(returnStartX, returnStartY, returnCtrlX, returnCtrlY, ownerX, ownerY),
         命中半径: 参数.命中半径 ?? 96,
         伤害值: 参数.回程伤害 ?? 参数.去程伤害 ?? 0,
+        伤害形态: "AOE",
         每单位最大命中次数: 参数.回程每单位最大命中次数 ?? 1,
         on结束: function 回旋回程结束(this: void): void {
           if (参数.on结束 != null) 参数.on结束();

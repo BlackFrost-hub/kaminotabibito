@@ -85,6 +85,7 @@ local function _____7ED3_7B97_6DF1_6D77_6DA1_6D41_7206_53D1(context, x, y)
                 local t = _____9650_5236_6570_503C(dist / cfg["最大半径"], 0, 1)
                 local coeff = cfg["最近伤害系数"] - (cfg["最近伤害系数"] - cfg["最远伤害系数"]) * t
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____6DF1_6D77_6DA1_6D41_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = cfg["基础水伤害"] * coeff,

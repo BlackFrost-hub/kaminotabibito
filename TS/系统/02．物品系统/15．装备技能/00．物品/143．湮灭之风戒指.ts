@@ -11,7 +11,7 @@ function on湮灭之风戒指触发(this: void, event: any): void {
   const target = event.目标;
   const attacker = event.攻击者;
   播放点特效(装备小特效.小风爆, 取单位X(target), 取单位Y(target), 0.8);
-  造成装备伤害(attacker, target, 取攻击力(attacker) * 0.3, 装备伤害类型.风);
+  造成装备伤害(attacker, target, 取攻击力(attacker) * 0.3, 装备伤害类型.风, false, undefined, { 伤害形态: "单体" });
   施加扩展控制(attacker, target, "silence", { 持续时间: 1.5 });
 }
 

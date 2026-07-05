@@ -100,8 +100,8 @@ export function 取单位护甲(this: void, 单位: any): number {
   return GetUnitStateJapi(单位, ConvertUnitState(0x20));
 }
 
-export function 造成伤害事件伤害(this: void, 来源: any, 目标: any, 伤害: number, 伤害类型: any): void {
-  造成装备伤害(来源, 目标, 伤害, 伤害类型);
+export function 造成伤害事件伤害(this: void, 来源: any, 目标: any, 伤害: number, 伤害类型: any, 标记?: { 伤害形态?: "单体" | "AOE" }): void {
+  造成装备伤害(来源, 目标, 伤害, 伤害类型, false, undefined, { 伤害形态: 标记?.伤害形态 ?? "单体" });
 }
 
 export function 执行物品治疗(this: void, 来源: any, 目标: any, 生命值: number, 特效路径?: string, 魔法值: number = 0, 魔法特效路径?: string, 延迟一帧: boolean = false, 使用默认生命特效: boolean = false, 使用默认魔法特效: boolean = false): void {

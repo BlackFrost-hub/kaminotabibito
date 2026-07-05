@@ -16,6 +16,8 @@ local ____02_FF0E_9A71_52A8_4E0E_5B9E_4F8B = require("系统.03．技能系统.0
 local _____521B_5EFA_4F4D_79FB_5B9E_4F8B = ____02_FF0E_9A71_52A8_4E0E_5B9E_4F8B["创建位移实例"]
 local _____7ED3_675F_4F4D_79FBID = ____02_FF0E_9A71_52A8_4E0E_5B9E_4F8B["结束位移ID"]
 local _____505C_6B62_5355_4F4D_4F4D_79FB = ____02_FF0E_9A71_52A8_4E0E_5B9E_4F8B["停止单位位移"]
+local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
+local _____5C1D_8BD5_963B_6B62_81EA_8EAB_4F4D_79FB_6280_80FD = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["尝试阻止自身位移技能"]
 local function _____8BA1_7B97_51B2_950B_884C_8D70_52A8_753B_500D_7387(_____6301_7EED_65F6_95F4)
     if _____6301_7EED_65F6_95F4 == nil or _____6301_7EED_65F6_95F4 <= 0 then
         return 1.5
@@ -69,6 +71,9 @@ local function _____89E3_6790_51FB_9000_89D2_5EA6(_____5355_4F4D, _____53C2_6570
     return nil
 end
 ____exports["开始冲锋"] = function(_____5355_4F4D, _____53C2_6570)
+    if _____5C1D_8BD5_963B_6B62_81EA_8EAB_4F4D_79FB_6280_80FD(_____5355_4F4D) then
+        return 0
+    end
     local _____89D2_5EA6 = _____89E3_6790_51B2_950B_89D2_5EA6(_____5355_4F4D, _____53C2_6570)
     if _____89D2_5EA6 == nil then
         return 0

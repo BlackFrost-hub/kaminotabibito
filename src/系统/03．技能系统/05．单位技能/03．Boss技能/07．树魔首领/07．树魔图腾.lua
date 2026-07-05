@@ -232,6 +232,7 @@ function _____521B_5EFA_751F_547D_9677_9631(context)
                             goto __continue35
                         end
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                            ["技能ID"] = _____6811_9B54_56FE_817E_6280_80FDID,
                             ["来源"] = boss,
                             ["目标"] = hero,
                             ["伤害"] = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["生命陷阱伤害目标最大生命比例"],
@@ -279,6 +280,7 @@ function _____7206_70B8_9677_9631_9020_6210_4F24_5BB3(boss, x, y)
                 end
                 local damage = GetUnitState(hero, UNIT_STATE_LIFE) * cfg["爆炸陷阱当前生命伤害比例"] + cfg["爆炸陷阱每难度固定伤害"] * _____53D6_96BE_5EA6()
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____6811_9B54_56FE_817E_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = damage,

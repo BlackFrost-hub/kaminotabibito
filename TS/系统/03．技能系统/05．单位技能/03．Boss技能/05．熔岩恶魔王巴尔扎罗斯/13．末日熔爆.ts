@@ -44,8 +44,9 @@ const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") 
   SinBJ: (this: void, degrees: number) => number;
 };
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
 const jass = require("jass.common") as any;
@@ -232,7 +233,7 @@ function 播放爆发表现(this: void, center: 末日熔爆点): void {
   }
 }
 
-function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下文, center: 末日熔爆点, safePoints: 末日熔爆点[]): void {
+function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下文, center: 末日熔爆点, safePoints: 末日熔爆点[], 技能实例ID?: number): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;
@@ -252,6 +253,8 @@ function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下�
         伤害类型: DAMAGE_TYPE_FIRE,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: "Boss技能",
+        技能实例ID,
+        标签: "巴尔扎罗斯末日熔爆",
       });
       减少巴尔扎罗斯灼热层数(hero, config.安全区清除灼热层数);
     } else {
@@ -265,6 +268,8 @@ function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下�
         伤害类型: DAMAGE_TYPE_FIRE,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: "Boss技能",
+        技能实例ID,
+        标签: "巴尔扎罗斯末日熔爆",
       });
     }
   }
@@ -277,6 +282,11 @@ export function 释放巴尔扎罗斯末日熔爆(this: void, context: 巴尔扎
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;
   const center = 取场地中心(context);
   const safePoints = 取安全点列表(context, center);
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "巴尔扎罗斯末日熔爆",
+    持续时间秒: config.引导秒 + 2,
+  });
   context.末日熔爆引导中 = true;
   创建末日熔爆引导表现(context, center, safePoints);
   启动基础施法时间线({
@@ -299,7 +309,7 @@ export function 释放巴尔扎罗斯末日熔爆(this: void, context: 巴尔扎
     on生效: function 巴尔扎罗斯末日熔爆生效(this: void): void {
       context.末日熔爆引导中 = false;
       销毁单位坐标跟随特效(boss, config.Boss蓄力特效键);
-      结算末日熔爆(context, center, safePoints);
+      结算末日熔爆(context, center, safePoints, 技能实例ID);
     },
   });
 }

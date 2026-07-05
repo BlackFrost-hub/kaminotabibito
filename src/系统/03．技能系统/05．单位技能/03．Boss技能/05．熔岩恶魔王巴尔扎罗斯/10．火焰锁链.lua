@@ -120,6 +120,7 @@ function ____on_706B_7130_9501_94FETick(state)
     end
     state.lastDamageMs = now
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["技能ID"] = _____706B_7130_9501_94FE_6280_80FDID,
         ["来源"] = boss,
         ["目标"] = target,
         ["伤害"] = _____8BA1_7B97_8D85_8DDD_4F24_5BB3(boss, target),

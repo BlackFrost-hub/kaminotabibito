@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____83AB_5C14_7279_65AF_5B62_5B50_4E91_5468_671F, _____5B62_5B50_4E91Tick, _____521B_5EFA_5355_56E2_5B62_5B50_4E91, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, IssuePointOrder, AddSpecialEffect, GetUnitState, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, UNIT_STATE_MAX_LIFE, addPeriodicCallback, removePeriodicCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868
+local _____83AB_5C14_7279_65AF_5B62_5B50_4E91_5468_671F, _____5B62_5B50_4E91Tick, _____521B_5EFA_5355_56E2_5B62_5B50_4E91, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, IssuePointOrder, AddSpecialEffect, GetUnitState, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, UNIT_STATE_MAX_LIFE, addPeriodicCallback, removePeriodicCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____8150_8D25_5B62_5B50_4E91_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.00．配置")
 local _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["莫尔特斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.01．运行时上下文")
@@ -65,6 +65,7 @@ function _____5B62_5B50_4E91Tick(data)
                 end
                 local damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["每秒目标最大生命比例"]
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    ["技能ID"] = _____8150_8D25_5B62_5B50_4E91_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
                     ["伤害"] = damage,
@@ -137,7 +138,7 @@ _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建
 local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
-local _____8150_8D25_5B62_5B50_4E91_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]["技能槽位"])
+_____8150_8D25_5B62_5B50_4E91_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
 local function _____83AB_5C14_7279_65AF_5EF6_8FDF_521B_5EFA_5B62_5B50_4E91(variable)
     local context = variable

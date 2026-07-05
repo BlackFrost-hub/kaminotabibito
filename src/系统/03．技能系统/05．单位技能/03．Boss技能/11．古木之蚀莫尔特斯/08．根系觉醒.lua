@@ -28,6 +28,7 @@ function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1(unit)
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local GetOwningPlayer = jass.GetOwningPlayer
 GetUnitX = jass.GetUnitX
@@ -93,6 +94,7 @@ local function _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
         GetUnitX(boss),
         GetUnitY(boss)
     )
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "莫尔特斯根系觉醒", ["持续时间秒"] = 2})
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["全屏爆发伤害Boss攻击力比例"]
     do
@@ -112,7 +114,9 @@ local function _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_PLANT,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能"
+                    ["来源类型"] = "Boss技能",
+                    ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                    ["标签"] = "莫尔特斯根系觉醒"
                 })
                 _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, hero, cfg["全屏爆发腐败值"])
             end

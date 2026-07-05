@@ -55,7 +55,7 @@ const { 装备触发概率通过 } = require("系统.03．技能系统.00．技�
   装备触发概率通过: (this: void, 原始概率: number, 触发单位: any) => boolean;
 };
 const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
-  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean) => void;
+  造成装备伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, weaponType?: any, 选项?: any) => void;
 };
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -237,8 +237,11 @@ export function 解析攻击效果伤害类型(this: void, 类型?: 攻击效果
   return DAMAGE_TYPE_NORMAL;
 }
 
-export function 攻击效果造成伤害(this: void, source: any, target: any, amount: number, 类型?: 攻击效果伤害类型): void {
-  造成装备伤害(source, target, amount, 解析攻击效果伤害类型(类型));
+export function 攻击效果造成伤害(this: void, source: any, target: any, amount: number, 类型?: 攻击效果伤害类型, 标记?: { 伤害形态?: "单体" | "AOE" }): void {
+  造成装备伤害(source, target, amount, 解析攻击效果伤害类型(类型), false, undefined, {
+    装备技能类型: "攻击特效",
+    伤害形态: 标记?.伤害形态 ?? "单体",
+  });
 }
 
 export function 攻击效果治疗生命魔法(this: void, source: any, target: any, lifeAmount: number, manaAmount: number = 0): void {

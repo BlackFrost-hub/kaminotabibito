@@ -94,6 +94,8 @@ local applyArmorPenetration = ____require_result_1.applyArmorPenetration
 local applyMagicResist = ____require_result_1.applyMagicResist
 local getPhysicalDamageModifier = ____require_result_1.getPhysicalDamageModifier
 local getSkillDamageModifier = ____require_result_1.getSkillDamageModifier
+local getActiveSkillDamageModifier = ____require_result_1.getActiveSkillDamageModifier
+local getEquipmentSkillDamageModifier = ____require_result_1.getEquipmentSkillDamageModifier
 local getNormalAttackModifier = ____require_result_1.getNormalAttackModifier
 local getMagicDamageModifier = ____require_result_1.getMagicDamageModifier
 local getEnhancedDamageModifier = ____require_result_1.getEnhancedDamageModifier
@@ -284,6 +286,16 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
         local skillMod = getSkillDamageModifier(nil, attacker, target, isPlayer)
         addDamage = addDamage + skillMod.addDamage
         finalMultiplier = finalMultiplier * skillMod.multiplier
+    end
+    if (skillContext and skillContext.isIndependentSkillDamage) == true then
+        local activeSkillMod = getActiveSkillDamageModifier(nil, attacker)
+        addDamage = addDamage + activeSkillMod.addDamage
+        finalMultiplier = finalMultiplier * activeSkillMod.multiplier
+    end
+    if (skillContext and skillContext.isEquipmentSkillDamage) == true then
+        local equipmentSkillMod = getEquipmentSkillDamageModifier(nil, attacker, skillContext.equipmentSkillKind)
+        addDamage = addDamage + equipmentSkillMod.addDamage
+        finalMultiplier = finalMultiplier * equipmentSkillMod.multiplier
     end
     if isNormalAtk then
         local atkMod = getNormalAttackModifier(nil, attacker, target, isPlayer)

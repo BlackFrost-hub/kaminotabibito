@@ -303,6 +303,10 @@ function 计算命中伤害(this: void, value: 命中伤害数值, event: 命中
   return value(event);
 }
 
+function 取命中派生装备技能类型(this: void, event: 命中派生触发事件): string {
+  return 是纯普攻(event.伤害快照) ? "普攻强化" : "装备被动";
+}
+
 export function 注册主动命中额外伤害(this: void, 配置: 主动命中额外伤害参数): 命中派生触发控制器 {
   return 注册命中派生触发模板({
     ...配置,
@@ -310,7 +314,7 @@ export function 注册主动命中额外伤害(this: void, 配置: 主动命中�
     on触发: function on主动命中额外伤害(this: void, event: 命中派生触发事件): void {
       const amount = 计算命中伤害(配置.伤害, event);
       造成装备伤害(event.持有者, event.目标, amount, 配置.伤害类型, 配置.ranged === true, 配置.weaponType, {
-        装备技能类型: "装备被动",
+        装备技能类型: 取命中派生装备技能类型(event),
         标签: 配置.伤害标签 ?? 配置.名称 ?? 配置.装备名,
         伤害形态: "单体",
       });
@@ -327,7 +331,7 @@ export function 注册主动命中AOE伤害(this: void, 配置: 主动命中AOE�
       const enemies = 取范围敌人(event.持有者, event.目标, 配置.范围);
       for (let i = 0; i < enemies.length; i++) {
         造成装备伤害(event.持有者, enemies[i], amount, 配置.伤害类型, 配置.ranged === true, 配置.weaponType, {
-          装备技能类型: "装备被动",
+          装备技能类型: 取命中派生装备技能类型(event),
           标签: 配置.伤害标签 ?? 配置.名称 ?? 配置.装备名,
           伤害形态: "AOE",
         });
