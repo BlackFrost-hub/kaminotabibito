@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__ArrayUnshift = ____lualib.__TS__ArrayUnshift
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local _____53D6_53E5_67C4ID, _____8BA1_7B97_8DDD_79BB, _____76EE_6807_5DF2_547D_4E2D, _____6807_8BB0_76EE_6807_547D_4E2D, _____7ED3_675F_5F39_9053_8DF3_94FE, _____9009_62E9_4E0B_4E00_8DF3_76EE_6807, _____5F53_524D_7B5B_9009_76EE_6807, _____7EE7_7EED_590D_7528_5F39_5E55_5230_76EE_6807, _____6DFB_52A0_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1, _____5B89_6392_53D1_5C04_5230_76EE_6807, _____5B89_6392_590D_7528_5F39_5E55_5230_76EE_6807, _____6267_884C_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_4EFB_52A1, ____on_5F39_9053_8DF3_94FE_5EF6_8FDF_53D1_5C04_626B_63CF, _____53D1_5C04_5230_76EE_6807, getUnitsInRange, isUnitEnemy, isSameUnit, GetHandleId, GetUnitX, GetUnitY, SquareRoot, addPeriodicCallback, removePeriodicCallback, getServerTime, _____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868, _____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID
 local ____03_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
@@ -229,19 +230,21 @@ function _____53D1_5C04_5230_76EE_6807(_____72B6_6001, _____8D77_70B9_5355_4F4D,
     })
 end
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-getUnitsInRange = ____require_result_0.getUnitsInRange
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-isUnitEnemy = ____require_result_1.isUnitEnemy
-isSameUnit = ____require_result_1.isSameUnit
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
+local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_0["按英雄技能距离修正上下文修正距离"]
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+getUnitsInRange = ____require_result_1.getUnitsInRange
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+isUnitEnemy = ____require_result_2.isUnitEnemy
+isSameUnit = ____require_result_2.isSameUnit
 GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 SquareRoot = jass.SquareRoot
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_2.addPeriodicCallback
-removePeriodicCallback = ____require_result_2.removePeriodicCallback
-getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_3.addPeriodicCallback
+removePeriodicCallback = ____require_result_3.removePeriodicCallback
+getServerTime = ____require_result_3.getServerTime
 _____5EF6_8FDF_53D1_5C04_4EFB_52A1_5217_8868 = {}
 _____5EF6_8FDF_53D1_5C04_626B_63CF_56DE_8C03ID = 0
 ____exports["开始弹道跳链"] = function(_____53C2_6570)
@@ -254,6 +257,11 @@ ____exports["开始弹道跳链"] = function(_____53C2_6570)
     if _____53C2_6570["跳跃次数"] <= 0 then
         return
     end
+    _____53C2_6570 = __TS__ObjectAssign(
+        {},
+        _____53C2_6570,
+        {["搜索半径"] = _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____53C2_6570["搜索半径"], _____53C2_6570["英雄技能距离修正"], "追踪最大距离")}
+    )
     local _____72B6_6001 = {
         ["参数"] = _____53C2_6570,
         ["已跳次数"] = 0,

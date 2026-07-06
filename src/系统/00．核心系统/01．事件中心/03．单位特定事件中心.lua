@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 ---
 -- @noSelfInFile
@@ -6,10 +7,12 @@ local jass = require("jass.common")
 local unitEventListeners = {}
 local unitEventRegistered = {}
 local unitEventMasters = {}
+local unitEventMasterActions = {}
 local unitEventKeyByMasterHid = {}
 local unitInRangeListeners = {}
 local unitInRangeRegistered = {}
 local unitInRangeMasters = {}
+local unitInRangeMasterActions = {}
 local unitInRangeKeyByMasterHid = {}
 local function handleKey(handle)
     return tostring(handle)
@@ -78,6 +81,74 @@ local function dispatchListeners(list)
         end
     end
 end
+local function compactListeners(list)
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #list do
+            local listener = list[i + 1]
+            if listener and listener.active and listener.trigger then
+                list[writeIndex + 1] = listener
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #list - 1
+        while i >= writeIndex do
+            table.remove(list)
+            i = i - 1
+        end
+    end
+    return writeIndex
+end
+local function cleanupUnitEventMaster(key)
+    local list = unitEventListeners[key]
+    if list and compactListeners(list) > 0 then
+        return
+    end
+    local master = unitEventMasters[key]
+    if master then
+        local action = unitEventMasterActions[key]
+        if action then
+            jass.TriggerRemoveAction(master, action)
+        end
+        jass.DestroyTrigger(master)
+    end
+    local hid = master and tostring(jass.GetHandleId(master)
+    ) or ""
+    if hid ~= "" then
+        __TS__Delete(unitEventKeyByMasterHid, hid)
+    end
+    __TS__Delete(unitEventMasters, key)
+    __TS__Delete(unitEventMasterActions, key)
+    __TS__Delete(unitEventRegistered, key)
+    __TS__Delete(unitEventListeners, key)
+end
+local function cleanupUnitInRangeMaster(key)
+    local list = unitInRangeListeners[key]
+    if list and compactListeners(list) > 0 then
+        return
+    end
+    local master = unitInRangeMasters[key]
+    if master then
+        local action = unitInRangeMasterActions[key]
+        if action then
+            jass.TriggerRemoveAction(master, action)
+        end
+        jass.DestroyTrigger(master)
+    end
+    local hid = master and tostring(jass.GetHandleId(master)
+    ) or ""
+    if hid ~= "" then
+        __TS__Delete(unitInRangeKeyByMasterHid, hid)
+    end
+    __TS__Delete(unitInRangeMasters, key)
+    __TS__Delete(unitInRangeMasterActions, key)
+    __TS__Delete(unitInRangeRegistered, key)
+    __TS__Delete(unitInRangeListeners, key)
+end
 local function dispatchUnitEventMaster()
     local trig = jass.GetTriggeringTrigger()
     if not trig then
@@ -89,6 +160,7 @@ local function dispatchUnitEventMaster()
         return
     end
     dispatchListeners(unitEventListeners[key] or ({}))
+    cleanupUnitEventMaster(key)
 end
 local function dispatchUnitInRangeMaster()
     local trig = jass.GetTriggeringTrigger()
@@ -101,8 +173,9 @@ local function dispatchUnitInRangeMaster()
         return
     end
     dispatchListeners(unitInRangeListeners[key] or ({}))
+    cleanupUnitInRangeMaster(key)
 end
-local function addListener(store, key, trigger, once)
+local function addListener(store, key, trigger, once, cleanupWhenEmpty)
     store[key] = store[key] or ({})
     local list = store[key]
     if hasListener(list, trigger) then
@@ -116,12 +189,14 @@ local function addListener(store, key, trigger, once)
                     i = i + 1
                 end
             end
+            cleanupWhenEmpty(key)
         end
     end
     local listener = {trigger = trigger, active = true, once = once}
     list[#list + 1] = listener
     return function()
         listener.active = false
+        cleanupWhenEmpty(key)
     end
 end
 --- 为指定单位注册特定原生事件。
@@ -144,9 +219,15 @@ function ____exports.registerUnitEventTrigger(trigger, unit, eventId, once)
         unitEventKeyByMasterHid[tostring(jass.GetHandleId(master)
         )] = key
         jass.TriggerRegisterUnitEvent(master, unit, eventId)
-        jass.TriggerAddAction(master, dispatchUnitEventMaster)
+        unitEventMasterActions[key] = jass.TriggerAddAction(master, dispatchUnitEventMaster)
     end
-    return addListener(unitEventListeners, key, trigger, once)
+    return addListener(
+        unitEventListeners,
+        key,
+        trigger,
+        once,
+        cleanupUnitEventMaster
+    )
 end
 --- 为指定单位注册“单位进入范围”事件。
 -- key 由 unit + range + filter 组成，保证同一组监听共享一个原生注册。
@@ -169,8 +250,14 @@ function ____exports.registerUnitInRangeTrigger(trigger, unit, range, filter, on
         unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(master)
         )] = key
         jass.TriggerRegisterUnitInRange(master, unit, range, normalizedFilter)
-        jass.TriggerAddAction(master, dispatchUnitInRangeMaster)
+        unitInRangeMasterActions[key] = jass.TriggerAddAction(master, dispatchUnitInRangeMaster)
     end
-    return addListener(unitInRangeListeners, key, trigger, once)
+    return addListener(
+        unitInRangeListeners,
+        key,
+        trigger,
+        once,
+        cleanupUnitInRangeMaster
+    )
 end
 return ____exports

@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____00_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享")
 local _____6D3B_52A8_8DF3_8DC3_5217_8868 = ____00_FF0E_5171_4EAB["活动跳跃列表"]
@@ -13,6 +14,8 @@ local _____7ED3_675F_8DF3_8DC3ID = ____02_FF0E_9A71_52A8_4E0E_5B9E_4F8B["结束�
 local _____505C_6B62_5355_4F4D_8DF3_8DC3 = ____02_FF0E_9A71_52A8_4E0E_5B9E_4F8B["停止单位跳跃"]
 local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
 local _____5C1D_8BD5_963B_6B62_81EA_8EAB_4F4D_79FB_6280_80FD = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["尝试阻止自身位移技能"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
+local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_0["按英雄技能距离修正上下文修正距离"]
 ____exports["开始跳跃"] = function(_____5355_4F4D, _____53C2_6570)
     if _____5C1D_8BD5_963B_6B62_81EA_8EAB_4F4D_79FB_6280_80FD(_____5355_4F4D) then
         return 0
@@ -21,7 +24,12 @@ ____exports["开始跳跃"] = function(_____5355_4F4D, _____53C2_6570)
     if _____89D2_5EA6 == nil then
         return 0
     end
-    return _____521B_5EFA_8DF3_8DC3_5B9E_4F8B(_____5355_4F4D, _____89D2_5EA6, _____53C2_6570)
+    local _____8DDD_79BB = _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____53C2_6570["距离"], _____53C2_6570["英雄技能距离修正"], "自身位移距离")
+    return _____521B_5EFA_8DF3_8DC3_5B9E_4F8B(
+        _____5355_4F4D,
+        _____89D2_5EA6,
+        __TS__ObjectAssign({}, _____53C2_6570, {["距离"] = _____8DDD_79BB})
+    )
 end
 ____exports["开始定向跳跃"] = function(_____5355_4F4D, _____53C2_6570)
     return ____exports["开始跳跃"](_____5355_4F4D, _____53C2_6570)

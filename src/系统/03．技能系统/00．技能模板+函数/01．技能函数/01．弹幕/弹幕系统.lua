@@ -32,16 +32,18 @@ local stringToFourCC = ____01_FF0EFourCC_8F6C_6362.stringToFourCC
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jglobals = require("jass.globals")
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
+local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_0["按英雄技能距离修正上下文修正距离"]
 local function _____83B7_53D6_5F39_5E55_7CFB_7EDF_89E6_53D1_5668()
-    local ____jglobals_gg_trg_____________DMXT_0 = jglobals.gg_trg_____________DMXT
-    if ____jglobals_gg_trg_____________DMXT_0 == nil then
-        ____jglobals_gg_trg_____________DMXT_0 = _G.gg_trg_____________DMXT
+    local ____jglobals_gg_trg_____________DMXT_1 = jglobals.gg_trg_____________DMXT
+    if ____jglobals_gg_trg_____________DMXT_1 == nil then
+        ____jglobals_gg_trg_____________DMXT_1 = _G.gg_trg_____________DMXT
     end
-    local ____jglobals_gg_trg_____________DMXT_0_1 = ____jglobals_gg_trg_____________DMXT_0
-    if ____jglobals_gg_trg_____________DMXT_0_1 == nil then
-        ____jglobals_gg_trg_____________DMXT_0_1 = nil
+    local ____jglobals_gg_trg_____________DMXT_1_2 = ____jglobals_gg_trg_____________DMXT_1
+    if ____jglobals_gg_trg_____________DMXT_1_2 == nil then
+        ____jglobals_gg_trg_____________DMXT_1_2 = nil
     end
-    return ____jglobals_gg_trg_____________DMXT_0_1
+    return ____jglobals_gg_trg_____________DMXT_1_2
 end
 local function _____83B7_53D6_5F39_5E55_7CFB_7EDF_5355_4F4D_7EC4()
     return YDUserDataGet(
@@ -194,7 +196,8 @@ local function _____8BBE_7F6E_5F39_5E55_7CFB_7EDF_5C5E_6027(_____5F39_5E55_5355_
         "real",
         _____53C2_6570["伤害系数"]
     )
-    _____5199_5165_5B9E_6570_5C5E_6027(_____5F39_5E55_5355_4F4D, "最远飞行距离", _____53C2_6570["最远飞行距离"])
+    local _____6700_8FDC_98DE_884C_8DDD_79BB = _____53C2_6570["最远飞行距离"] ~= nil and _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____53C2_6570["最远飞行距离"], _____53C2_6570["英雄技能距离修正"], "弹幕飞行距离") or nil
+    _____5199_5165_5B9E_6570_5C5E_6027(_____5F39_5E55_5355_4F4D, "最远飞行距离", _____6700_8FDC_98DE_884C_8DDD_79BB)
     _____5199_5165_5B9E_6570_5C5E_6027(_____5F39_5E55_5355_4F4D, "伤害绑定", _____53C2_6570["伤害绑定"])
     _____5199_5165_5B9E_6570_5C5E_6027(_____5F39_5E55_5355_4F4D, "强化伤害系数", _____53C2_6570["强化伤害系数"])
     _____5199_5165_5B9E_6570_5C5E_6027(_____5F39_5E55_5355_4F4D, "弹射角度", _____53C2_6570["弹射角度"])

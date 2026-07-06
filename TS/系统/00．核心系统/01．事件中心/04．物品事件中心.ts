@@ -10,6 +10,8 @@ const jass = require("jass.common") as any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetManipulatedItem = jass.GetManipulatedItem as (this: void) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
+const CreateTrigger = jass.CreateTrigger as (this: void) => any;
+const DestroyTrigger = jass.DestroyTrigger as (this: void, trigger: any) => void;
 const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
   registerPlayerUnitEventForPlayerIds: (
     this: void,
@@ -32,7 +34,15 @@ const useListenerIds: number[] = [];
 const pickupListeners: ItemEventCallback[] = [];
 const dropListeners: ItemEventCallback[] = [];
 const useListeners: ItemEventCallback[] = [];
-const 模块实例ID = "item-center-" + String(GetHandleId(jass.CreateTrigger()) || 0);
+
+function 创建物品事件中心实例ID(this: void): string {
+  const trigger = CreateTrigger();
+  const id = trigger ? GetHandleId(trigger) : 0;
+  if (trigger) DestroyTrigger(trigger);
+  return "item-center-" + String(id || 0);
+}
+
+const 模块实例ID = 创建物品事件中心实例ID();
 
 // 主触发器（每种事件只注册一次）
 let pickupTrigger: any = null;

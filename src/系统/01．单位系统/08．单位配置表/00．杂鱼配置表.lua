@@ -29,7 +29,6 @@ ____exports["杂鱼配置表"] = {
     nwlt = {
         _parent = "nwlt",
         Name = "森林之狼",
-        Propernames = "森林野狼",
         dmgplus1 = 10,
         HP = 150,
         cool1 = 1,
@@ -735,7 +734,6 @@ ____exports["杂鱼配置表"] = {
     n03M = {
         _parent = "nfov",
         Name = "恶魔战士",
-        Propernames = "恶魔剑客",
         dmgplus1 = 950,
         HP = 3200,
         def = 10,
@@ -927,7 +925,6 @@ ____exports["杂鱼配置表"] = {
     u002 = {
         _parent = "ugar",
         Name = "双翼恶魔",
-        Propernames = "双翼恶魔demon",
         dmgplus1 = 500,
         HP = 3300,
         def = 25,
@@ -1349,26 +1346,7 @@ ____exports["杂鱼配置表"] = {
         regenHP = 20,
         canFlee = 0,
         unit = "h00U"
-    },
-    ngns = {_parent = "ngns", Name = "豺狼刺客", unit = "ngns"},
-    ngna = {_parent = "ngna", Name = "豺狼偷猎者", unit = "ngna"},
-    ngrk = {_parent = "ngrk", Name = "泥潭傀儡", unit = "ngrk"},
-    ngst = {_parent = "ngst", Name = "岩石傀儡", unit = "ngst"},
-    nanw = {_parent = "nanw", Name = "阿卡那瑟德战士", unit = "nanw"},
-    nane = {_parent = "nane", Name = "阿卡那瑟德掘地者", unit = "nane"},
-    nanb = {_parent = "nanb", Name = "阿卡那瑟德刺人", unit = "nanb"},
-    nbds = {_parent = "nbds", Name = "蛇之看守者", unit = "nbds"},
-    nhrh = {_parent = "nhrh", Name = "女妖风暴巫师", unit = "nhrh"},
-    nhar = {_parent = "nhar", Name = "女妖侦察者", unit = "nhar"},
-    nhrw = {_parent = "nhrw", Name = "女妖巫婆", unit = "nhrw"},
-    n00Z = {_parent = "n00Z", Name = "火焰狼蛛", unit = "n00Z"},
-    nslr = {_parent = "nslr", Name = "蜥蜴怪物", unit = "nslr"},
-    n03N = {_parent = "n03N", Name = "恶魔队长", unit = "n03N"},
-    n04J = {_parent = "n04J", Name = "食人花", unit = "n04J"},
-    edry = {_parent = "edry", Name = "森林妖精", unit = "edry"},
-    n053 = {_parent = "n053", Name = "变异精灵", unit = "n053"},
-    nftr = {_parent = "nftr", Name = "森林巨魔", unit = "nftr"},
-    nftb = {_parent = "nftb", Name = "树魔狂战士", unit = "nftb"}
+    }
 }
 ____exports["按名字反查杂鱼单位ID"] = _____521B_5EFA_5355_4F4D_540D_53CD_67E5_5668(____exports["杂鱼配置表"])
 ____exports.default = ____exports["杂鱼配置表"]

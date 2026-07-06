@@ -8,6 +8,8 @@ local jass = require("jass.common")
 local GetTriggerUnit = jass.GetTriggerUnit
 local GetManipulatedItem = jass.GetManipulatedItem
 local GetHandleId = jass.GetHandleId
+local CreateTrigger = jass.CreateTrigger
+local DestroyTrigger = jass.DestroyTrigger
 local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
 local ITEM_EVENT_PLAYER_IDS = {
     0,
@@ -25,7 +27,15 @@ local useListenerIds = {}
 local pickupListeners = {}
 local dropListeners = {}
 local useListeners = {}
-local _____6A21_5757_5B9E_4F8BID = "item-center-" .. tostring(GetHandleId(jass.CreateTrigger()) or 0)
+local function _____521B_5EFA_7269_54C1_4E8B_4EF6_4E2D_5FC3_5B9E_4F8BID()
+    local trigger = CreateTrigger()
+    local id = trigger and GetHandleId(trigger) or 0
+    if trigger then
+        DestroyTrigger(trigger)
+    end
+    return "item-center-" .. tostring(id or 0)
+end
+local _____6A21_5757_5B9E_4F8BID = _____521B_5EFA_7269_54C1_4E8B_4EF6_4E2D_5FC3_5B9E_4F8BID()
 local pickupTrigger = nil
 local dropTrigger = nil
 local useTrigger = nil

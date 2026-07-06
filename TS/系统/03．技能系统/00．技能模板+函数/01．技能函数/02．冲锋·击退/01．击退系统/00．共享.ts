@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 import type { 技能伤害来源类型, 技能伤害形态, 装备技能伤害类型 } from "../../../../../04．伤害系统/08．技能伤害系统";
+import type { 英雄技能距离修正上下文 } from "../../../04．机制组件/11．技能属性修正";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -66,6 +67,7 @@ export interface 位移技能伤害标记 {
 
 export interface 通用位移参数 {
   距离: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   主单位?: any;
   主单位死亡时中断?: boolean;
   持续时间?: number;

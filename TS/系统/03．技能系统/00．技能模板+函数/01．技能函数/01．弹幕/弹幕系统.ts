@@ -31,6 +31,11 @@ const jglobals = require("jass.globals") as any;
 
 import { YDUserDataGet, YDUserDataSet } from "../../../../../lib/扩展函数/YDWE函数/01．YDUserData兼容";
 import { stringToFourCC } from "../../../../../lib/扩展函数/封装函数/01．通用工具/01．FourCC转换";
+import type { 英雄技能距离修正上下文 } from "../../04．机制组件/11．技能属性修正";
+
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
+};
 
 type 伤害类型 =
   | "普通"
@@ -60,6 +65,7 @@ export interface 弹幕系统参数 {
   生命周期Buff?: number | string;
 
   最远飞行距离?: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   伤害绑定?: number;
   指定敌人?: any;
   命中效果?: boolean;
@@ -192,7 +198,10 @@ function 设置弹幕系统属性(弹幕单位: any, 参数: 弹幕系统参数)
   YDUserDataSet("unit", 弹幕单位, "伤害半径", "real", 参数.伤害半径);
   YDUserDataSet("unit", 弹幕单位, "伤害系数", "real", 参数.伤害系数);
 
-  写入实数属性(弹幕单位, "最远飞行距离", 参数.最远飞行距离);
+  const 最远飞行距离 = 参数.最远飞行距离 != null
+    ? 按英雄技能距离修正上下文修正距离(参数.最远飞行距离, 参数.英雄技能距离修正, "弹幕飞行距离")
+    : undefined;
+  写入实数属性(弹幕单位, "最远飞行距离", 最远飞行距离);
   写入实数属性(弹幕单位, "伤害绑定", 参数.伤害绑定);
   写入实数属性(弹幕单位, "强化伤害系数", 参数.强化伤害系数);
   写入实数属性(弹幕单位, "弹射角度", 参数.弹射角度);

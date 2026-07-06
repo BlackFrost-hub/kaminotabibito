@@ -32,10 +32,14 @@ const {
 import { 创建区域效果, 清理区域效果周期伤害去重组, type 区域效果实例 } from "../../01．技能函数/04．区域效果/index";
 import { 获取矩形区域单位 } from "../../01．技能函数/09．形状区域/矩形区域";
 import type { 技能提示圈配置 } from "../../02．通用函数/16．技能提示圈工厂";
+import type { 英雄技能距离修正上下文 } from "../../04．机制组件/11．技能属性修正";
 
 const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
   isUnitAlly: (this: void, targetUnit: any, sourceUnit: any) => boolean;
+};
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
 };
 const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
   造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any, 选项?: any) => boolean;
@@ -47,6 +51,7 @@ export interface 地面路径持续区域参数 {
   方向角: number;
   路径长度: number;
   路径半径: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   区域持续时间: number;
   伤害模式?: "分段区域" | "整体矩形";
   段间距?: number;
@@ -282,6 +287,26 @@ let 下一个地面路径持续区域实例ID = 0;
 let 地面路径整体伤害系统回调ID = 0;
 let 地面路径铺设系统回调ID = 0;
 
+function 归一化地面路径距离参数(this: void, 参数: 地面路径持续区域参数): 地面路径持续区域参数 {
+  const 上下文 = 参数.英雄技能距离修正;
+  if (上下文 == null) return 参数;
+
+  const 修正参数: 地面路径持续区域参数 = {
+    ...参数,
+    路径长度: 按英雄技能距离修正上下文修正距离(参数.路径长度, 上下文, "路径长度"),
+  };
+  if (参数.整体伤害长度 != null && 参数.整体伤害长度 > 0) {
+    修正参数.整体伤害长度 = 按英雄技能距离修正上下文修正距离(参数.整体伤害长度, 上下文, "路径总长度");
+  }
+  if (参数.提示圈 != null && 参数.提示圈 !== false && 参数.提示圈.英雄技能距离修正 == null) {
+    修正参数.提示圈 = {
+      ...参数.提示圈,
+      英雄技能距离修正: 上下文,
+    };
+  }
+  return 修正参数;
+}
+
 function 数字升序排序(this: void, a: number, b: number): number {
   return a - b;
 }
@@ -388,6 +413,7 @@ function on地面路径整体伤害系统Tick(): void {
 }
 
 export function 创建地面路径持续区域(参数: 地面路径持续区域参数): 地面路径持续区域实例 {
+  参数 = 归一化地面路径距离参数(参数);
   const 实例ID = ++下一个地面路径持续区域实例ID;
   const 实例 = new 地面路径持续区域实现(实例ID, 参数);
   活跃地面路径持续区域实例[实例ID] = 实例;

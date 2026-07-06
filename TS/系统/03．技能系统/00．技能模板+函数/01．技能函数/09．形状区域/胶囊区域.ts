@@ -9,9 +9,13 @@
  */
 
 const jass = require("jass.common") as any;
+import type { 英雄技能距离修正上下文 } from "../../04．机制组件/11．技能属性修正";
 
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
+};
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
 };
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
@@ -25,6 +29,7 @@ export interface 胶囊区域参数 {
   终点X: number;
   终点Y: number;
   宽度: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   单位筛选?: (this: void, 单位: any) => boolean;
   包含边界?: boolean;
 }
@@ -111,9 +116,14 @@ export function 获取胶囊区域单位(参数: 胶囊区域参数): any[] {
     return [];
   }
 
-  const 中心X = (参数.起点X + 参数.终点X) / 2;
-  const 中心Y = (参数.起点Y + 参数.终点Y) / 2;
-  const 线段长度 = 计算坐标距离(参数.起点X, 参数.起点Y, 参数.终点X, 参数.终点Y);
+  const 原线段长度 = 计算坐标距离(参数.起点X, 参数.起点Y, 参数.终点X, 参数.终点Y);
+  const 线段长度 = 按英雄技能距离修正上下文修正距离(原线段长度, 参数.英雄技能距离修正, "胶囊长度");
+  const 方向X = 原线段长度 > 0 ? (参数.终点X - 参数.起点X) / 原线段长度 : 0;
+  const 方向Y = 原线段长度 > 0 ? (参数.终点Y - 参数.起点Y) / 原线段长度 : 0;
+  const 终点X = 参数.起点X + 方向X * 线段长度;
+  const 终点Y = 参数.起点Y + 方向Y * 线段长度;
+  const 中心X = (参数.起点X + 终点X) / 2;
+  const 中心Y = (参数.起点Y + 终点Y) / 2;
   const 粗筛半径 = 线段长度 / 2 + 参数.宽度 / 2;
   const 候选单位 = getUnitsInRange(中心X, 中心Y, 粗筛半径);
   const 结果: any[] = [];
@@ -123,8 +133,8 @@ export function 获取胶囊区域单位(参数: 胶囊区域参数): any[] {
       单位,
       参数.起点X,
       参数.起点Y,
-      参数.终点X,
-      参数.终点Y,
+      终点X,
+      终点Y,
       参数.宽度,
       参数.包含边界 ?? true
     )) {

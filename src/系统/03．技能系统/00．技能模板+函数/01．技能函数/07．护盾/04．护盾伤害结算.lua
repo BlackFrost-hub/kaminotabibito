@@ -14,10 +14,6 @@ local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函�
 local RMinBJ = ____require_result_0.RMinBJ
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_1.registerDamageModifier
---- 最近一次护盾吸收量（供伤害测试读取）
-____exports["最近护盾吸收量"] = 0
---- 最近一次护盾吸收类型（供伤害测试读取）
-____exports["最近护盾吸收类型"] = ""
 local shieldModifierRegistered = false
 local function _____53D6_62A4_76FE_95EA_8272_7C7B_578B(_____62A4_76FE)
     if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["物理"] then
@@ -52,45 +48,6 @@ local function _____53D6_62A4_76FE_95EA_8272_7C7B_578B(_____62A4_76FE)
     end
     return 0
 end
-local function _____53D6_62A4_76FE_5438_6536_7C7B_578B_540D_79F0(_____62A4_76FE, _____4F24_5BB3)
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["物理"] then
-        return "物理"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["魔法"] then
-        return "魔法"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["强化"] then
-        return "强化"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["金"] or _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["毒"] then
-        return _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["毒"] and "毒" or "金"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["木"] or _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["风"] then
-        return _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["风"] and "风" or "木"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["水"] or _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["冰"] then
-        return _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["冰"] and "冰" or "水"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["火"] then
-        return "火"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["雷"] then
-        return "雷"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["光"] then
-        return "光"
-    end
-    if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["暗"] then
-        return "暗"
-    end
-    if _____4F24_5BB3["是物理伤害"] then
-        return "物理"
-    end
-    if _____4F24_5BB3["是魔法伤害"] then
-        return "魔法"
-    end
-    return "通用"
-end
 local function _____6784_5EFA_4F24_5BB3_4FE1_606F(_____76EE_6807, _____4F24_5BB3_503C, _____662F_7269_7406_4F24_5BB3, _____662F_9B54_6CD5_4F24_5BB3, _____653B_51FB_8005, _____5C5E_6027)
     return {
         ["目标"] = _____76EE_6807,
@@ -123,11 +80,6 @@ end
 -- @returns 吸收结果
 ____exports["吸收伤害"] = function(_____76EE_6807, _____4F24_5BB3_503C, _____662F_7269_7406_4F24_5BB3, _____662F_9B54_6CD5_4F24_5BB3, _____653B_51FB_8005, _____5C5E_6027)
     local _____7ED3_679C = {["剩余伤害"] = _____4F24_5BB3_503C, ["总吸收量"] = 0, ["闪色类型"] = 0, ["破碎护盾"] = {}}
-    ____exports["最近护盾吸收量"] = 0
-    ____exports["最近护盾吸收类型"] = ""
-    local gReset = _G
-    gReset._shieldAbsorbAmount = 0
-    gReset._shieldAbsorbType = ""
     local _____5355_4F4DID = _____53D6_53E5_67C4ID(_____76EE_6807)
     if _____5355_4F4DID == 0 then
         return _____7ED3_679C
@@ -156,11 +108,6 @@ ____exports["吸收伤害"] = function(_____76EE_6807, _____4F24_5BB3_503C, ____
         _____62A4_76FE["当前值"] = _____62A4_76FE["当前值"] - _____5438_6536_91CF
         _____7ED3_679C["剩余伤害"] = _____7ED3_679C["剩余伤害"] - _____5438_6536_91CF
         _____7ED3_679C["总吸收量"] = _____7ED3_679C["总吸收量"] + _____5438_6536_91CF
-        ____exports["最近护盾吸收量"] = _____7ED3_679C["总吸收量"]
-        ____exports["最近护盾吸收类型"] = _____53D6_62A4_76FE_5438_6536_7C7B_578B_540D_79F0(_____62A4_76FE, _____4F24_5BB3)
-        local g = _G
-        g._shieldAbsorbAmount = ____exports["最近护盾吸收量"]
-        g._shieldAbsorbType = ____exports["最近护盾吸收类型"]
         if _____62A4_76FE["当前值"] <= 0 then
             local ____7ED3_679C__7834_788E_62A4_76FE_40 = _____7ED3_679C["破碎护盾"]
             ____7ED3_679C__7834_788E_62A4_76FE_40[#____7ED3_679C__7834_788E_62A4_76FE_40 + 1] = _____62A4_76FE
@@ -208,13 +155,6 @@ ____exports["注册护盾吸收钩子"] = function()
                     ["是普攻"] = context.isNormalAttack == true
                 }
             )
-            if _____7ED3_679C["总吸收量"] > 0 then
-                local g = _G
-                local _____62A4_76FE_6761_95EA_8272 = g._shieldBarFlashColor
-                if type(_____62A4_76FE_6761_95EA_8272) == "function" then
-                    _____62A4_76FE_6761_95EA_8272(context.target, _____7ED3_679C["闪色类型"])
-                end
-            end
             return _____7ED3_679C["剩余伤害"]
         end,
         100

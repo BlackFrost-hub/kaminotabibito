@@ -17,6 +17,10 @@ import {
 import { 创建位移实例, 结束位移ID, 停止单位位移 } from "./02．驱动与实例";
 import { 尝试阻止自身位移技能 } from "../../../02．通用函数/20．位移技能限制";
 
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
+};
+
 function 计算冲锋行走动画倍率(持续时间?: number): number {
   if (持续时间 == null || 持续时间 <= 0) {
     return 1.5;
@@ -68,8 +72,10 @@ export function 开始冲锋(单位: any, 参数: 冲锋参数): number {
   const 原开始回调 = 参数.开始回调;
   const 原结束回调 = 参数.结束回调;
   const 行走动画倍率 = 计算冲锋行走动画倍率(参数.持续时间);
+  const 距离 = 按英雄技能距离修正上下文修正距离(参数.距离, 参数.英雄技能距离修正, "自身位移距离");
   const 合并参数: 冲锋参数 = {
     ...参数,
+    距离,
     开始回调: function (this: void, 移动单位: any, 位移ID: number): void {
       if (移动单位 != null && 移动单位 !== 0 && typeof SetUnitAnimation === "function") {
         SetUnitAnimation(移动单位, "walk");

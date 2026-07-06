@@ -1,8 +1,5 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 跳跃系统 - 共享模块
--- 
--- 包含类型定义、常量、工具函数和状态容器。
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")

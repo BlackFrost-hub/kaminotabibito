@@ -10,9 +10,13 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+import type { 英雄技能距离修正上下文 } from "../../04．机制组件/11．技能属性修正";
 
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
+};
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
 };
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
@@ -27,6 +31,7 @@ export interface 扇形区域参数 {
   半径: number;
   方向角: number;
   扇形角度: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   单位筛选?: (this: void, 单位: any) => boolean;
   包含边界?: boolean;
 }
@@ -104,7 +109,8 @@ export function 获取扇形区域单位(参数: 扇形区域参数): any[] {
     return [];
   }
 
-  const 候选单位 = getUnitsInRange(参数.X, 参数.Y, 参数.半径);
+  const 半径 = 按英雄技能距离修正上下文修正距离(参数.半径, 参数.英雄技能距离修正, "扇形半径");
+  const 候选单位 = getUnitsInRange(参数.X, 参数.Y, 半径);
   const 结果: any[] = [];
 
   for (const 单位 of 候选单位) {
@@ -112,7 +118,7 @@ export function 获取扇形区域单位(参数: 扇形区域参数): any[] {
       单位,
       参数.X,
       参数.Y,
-      参数.半径,
+      半径,
       参数.方向角,
       参数.扇形角度,
       参数.包含边界 ?? true

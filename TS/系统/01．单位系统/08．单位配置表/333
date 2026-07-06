@@ -1,0 +1,329 @@
+Option Explicit
+
+Public Sub 生成玩家英雄TS()
+    Const SHEET_NAME As String = "英雄"
+    Const OUTPUT_RELATIVE_FILE As String = "TS\系统\01．单位系统\00．单位初始化创建\01．玩家英雄\00．玩家英雄配置.ts"
+    
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim lastCol As Long
+    Dim outputPath As String
+    Dim i As Long
+    Dim j As Long
+    
+    Dim headerDisplay() As String
+    Dim headerKey() As String
+    Dim headerMap As Object
+    
+    Dim heroId As String
+    Dim skipReason As String
+    Dim fileContent As String
+    Dim objectLines As String
+    Dim listLines As String
+    Dim skipReport As String
+    
+    Set ws = ThisWorkbook.Worksheets(SHEET_NAME)
+    
+    lastRow = ws.Cells(ws.Rows.Count, 2).End(xlUp).row
+    lastCol = ws.Cells(2, ws.Columns.Count).End(xlToLeft).Column
+    
+    If lastRow < 3 Then
+        MsgBox "【英雄】表没有可生成的数据。", vbExclamation
+        Exit Sub
+    End If
+    
+    ReDim headerDisplay(1 To lastCol)
+    ReDim headerKey(1 To lastCol)
+    Set headerMap = CreateObject("Scripting.Dictionary")
+    
+    For j = 1 To lastCol
+        headerDisplay(j) = Trim$(CStr(ws.Cells(1, j).Value2))
+        headerKey(j) = Trim$(CStr(ws.Cells(2, j).Value2))
+        If headerKey(j) <> "" Then
+            If Not headerMap.Exists(headerKey(j)) Then
+                headerMap.Add headerKey(j), j
+            End If
+        End If
+    Next j
+    
+    objectLines = ""
+    listLines = ""
+    skipReport = ""
+    
+    For i = 3 To lastRow
+        skipReason = 获取跳过原因(ws, i, headerMap)
+        If skipReason <> "" Then
+            skipReport = skipReport & "第 " & CStr(i) & " 行：" & skipReason & vbCrLf
+            GoTo ContinueRow
+        End If
+        
+        heroId = 读取字段文本(ws, i, headerMap, "unit")
+        If heroId = "" Then GoTo ContinueRow
+        
+        objectLines = objectLines & "  """ & 转义Ts字符串(heroId) & """: {" & vbCrLf
+        
+        For j = 1 To lastCol
+            If headerKey(j) <> "" Then
+                Dim rawValue As String
+                rawValue = 读取单元格文本(ws.Cells(i, j))
+                
+                If rawValue <> "" Then
+                    objectLines = objectLines _
+                        & "    """ & 转义Ts字符串(headerKey(j)) & """: " _
+                        & 转Ts字面量(headerKey(j), rawValue) & "," & vbCrLf
+                End If
+            End If
+        Next j
+        
+        objectLines = objectLines & "  }," & vbCrLf
+        listLines = listLines & "  玩家英雄配置表[""" & 转义Ts字符串(heroId) & """]," & vbCrLf
+        
+ContinueRow:
+    Next i
+    
+    fileContent = ""
+    fileContent = fileContent & "/** @noSelfInFile */" & vbCrLf
+    fileContent = fileContent & "/**" & vbCrLf
+    fileContent = fileContent & " * 自动生成文件，请勿手改。" & vbCrLf
+    fileContent = fileContent & " * 来源：" & ThisWorkbook.name & " / " & SHEET_NAME & vbCrLf
+    fileContent = fileContent & " */" & vbCrLf & vbCrLf
+    fileContent = fileContent & "import { 创建单位名反查器 } from ""../../08．单位配置表/00．单位名反查工具"";" & vbCrLf & vbCrLf
+    
+    fileContent = fileContent & "export const 玩家英雄配置表 = {" & vbCrLf
+    fileContent = fileContent & objectLines
+    fileContent = fileContent & "} as const;" & vbCrLf & vbCrLf
+    
+    fileContent = fileContent & "export const 玩家英雄配置列表 = [" & vbCrLf
+    fileContent = fileContent & listLines
+    fileContent = fileContent & "] as const;" & vbCrLf & vbCrLf
+    
+    fileContent = fileContent & "export const 玩家英雄单位名反查器 = 创建单位名反查器(玩家英雄配置表);" & vbCrLf & vbCrLf
+    fileContent = fileContent & "export function 按名字反查玩家英雄单位ID(this: void, name: string): string | undefined {" & vbCrLf
+    fileContent = fileContent & "  return 玩家英雄单位名反查器(name);" & vbCrLf
+    fileContent = fileContent & "}" & vbCrLf & vbCrLf
+    
+    fileContent = fileContent & "export default 玩家英雄配置表;" & vbCrLf
+    fileContent = fileContent & "export {};" & vbCrLf
+    
+    outputPath = ThisWorkbook.Path & "\" & OUTPUT_RELATIVE_FILE
+    创建目录递归 取父目录(outputPath)
+    写入UTF8文件 outputPath, fileContent
+    
+    If skipReport <> "" Then
+        MsgBox "生成完成：" & vbCrLf & outputPath & vbCrLf & vbCrLf & "已跳过这些脏行：" & vbCrLf & skipReport, vbInformation
+    Else
+        MsgBox "生成完成：" & vbCrLf & outputPath, vbInformation
+    End If
+End Sub
+
+Private Function 获取跳过原因(ByVal ws As Worksheet, ByVal rowIndex As Long, ByVal headerMap As Object) As String
+    Dim heroId As String
+    Dim heroName As String
+    Dim unitHero As String
+    Dim rangeN1 As String
+    Dim fileValue As String
+    
+    heroId = 读取字段文本(ws, rowIndex, headerMap, "unit")
+    heroName = 读取字段文本(ws, rowIndex, headerMap, "Name")
+    unitHero = 读取字段文本(ws, rowIndex, headerMap, "unit_hero")
+    rangeN1 = 读取字段文本(ws, rowIndex, headerMap, "rangeN1")
+    fileValue = 读取字段文本(ws, rowIndex, headerMap, "file")
+    
+    If heroId = "" Then
+        获取跳过原因 = "unit 为空"
+        Exit Function
+    End If
+    
+    If Not 是四位对象ID(heroId) Then
+        获取跳过原因 = "unit 非法：" & heroId
+        Exit Function
+    End If
+    
+    If heroName = "" Then
+        获取跳过原因 = "Name 为空"
+        Exit Function
+    End If
+    
+    If InStr(1, unitHero, "批注", vbTextCompare) > 0 Then
+        获取跳过原因 = "批注说明行"
+        Exit Function
+    End If
+    
+    If rangeN1 <> "" And fileValue <> "" Then
+        If InStr(1, rangeN1, ".mdl", vbTextCompare) > 0 And 是四位对象ID(fileValue) Then
+            获取跳过原因 = "疑似列错位：rangeN1 像模型路径，file 像 rawcode"
+            Exit Function
+        End If
+    End If
+    
+    获取跳过原因 = ""
+End Function
+
+Private Function 读取字段文本(ByVal ws As Worksheet, ByVal rowIndex As Long, ByVal headerMap As Object, ByVal keyName As String) As String
+    If Not headerMap.Exists(keyName) Then
+        读取字段文本 = ""
+        Exit Function
+    End If
+    
+    读取字段文本 = 读取单元格文本(ws.Cells(rowIndex, CLng(headerMap(keyName))))
+End Function
+
+Private Function 读取单元格文本(ByVal cell As Range) As String
+    Dim v As Variant
+    v = cell.Value2
+    
+    If IsError(v) Then
+        读取单元格文本 = ""
+    ElseIf IsEmpty(v) Or IsNull(v) Then
+        读取单元格文本 = ""
+    Else
+        读取单元格文本 = Trim$(CStr(v))
+    End If
+End Function
+
+Private Function 转Ts字面量(ByVal keyName As String, ByVal rawValue As String) As String
+    Dim lowerValue As String
+    lowerValue = LCase$(Trim$(rawValue))
+    
+    If 键强制字符串(keyName) Then
+        转Ts字面量 = """" & 转义Ts字符串(rawValue) & """"
+        Exit Function
+    End If
+    
+    If lowerValue = "true" Then
+        转Ts字面量 = "true"
+        Exit Function
+    End If
+    
+    If lowerValue = "false" Then
+        转Ts字面量 = "false"
+        Exit Function
+    End If
+    
+    If 是纯数字(rawValue) Then
+        转Ts字面量 = Trim$(rawValue)
+        Exit Function
+    End If
+    
+    转Ts字面量 = """" & 转义Ts字符串(rawValue) & """"
+End Function
+
+Private Function 键强制字符串(ByVal keyName As String) As Boolean
+    Select Case LCase$(keyName)
+        Case "unit_hero", "unit", "_parent", "name", "art", "file", "sellitems", _
+             "abillist", "heroabillist", "missileart_1", "atktype1", "race", _
+             "movetp", "armor", "primary", "regentype", "scorescreenicon", _
+             "propernames", "ubertip", "unubertip", "tip", "researchtip"
+            键强制字符串 = True
+        Case Else
+            键强制字符串 = False
+    End Select
+End Function
+
+Private Function 是纯数字(ByVal s As String) As Boolean
+    Dim i As Long
+    Dim ch As String
+    Dim dotCount As Long
+    
+    s = Trim$(s)
+    If s = "" Then
+        是纯数字 = False
+        Exit Function
+    End If
+    
+    If Left$(s, 1) = "-" Then
+        s = Mid$(s, 2)
+    End If
+    
+    If s = "" Then
+        是纯数字 = False
+        Exit Function
+    End If
+    
+    dotCount = 0
+    For i = 1 To Len(s)
+        ch = Mid$(s, i, 1)
+        If ch >= "0" And ch <= "9" Then
+        ElseIf ch = "." Then
+            dotCount = dotCount + 1
+            If dotCount > 1 Then
+                是纯数字 = False
+                Exit Function
+            End If
+        Else
+            是纯数字 = False
+            Exit Function
+        End If
+    Next i
+    
+    是纯数字 = True
+End Function
+
+Private Function 是四位对象ID(ByVal s As String) As Boolean
+    Dim i As Long
+    Dim ch As String
+    
+    s = Trim$(s)
+    If Len(s) <> 4 Then
+        是四位对象ID = False
+        Exit Function
+    End If
+    
+    For i = 1 To 4
+        ch = Mid$(s, i, 1)
+        If Not ((ch >= "0" And ch <= "9") Or (ch >= "A" And ch <= "Z") Or (ch >= "a" And ch <= "z")) Then
+            是四位对象ID = False
+            Exit Function
+        End If
+    Next i
+    
+    是四位对象ID = True
+End Function
+
+Private Function 转义Ts字符串(ByVal s As String) As String
+    s = Replace$(s, "\", "\\")
+    s = Replace$(s, """", "\""")
+    s = Replace$(s, vbCrLf, "\n")
+    s = Replace$(s, vbCr, "\n")
+    s = Replace$(s, vbLf, "\n")
+    转义Ts字符串 = s
+End Function
+
+Private Function 取父目录(ByVal filePath As String) As String
+    Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    取父目录 = fso.GetParentFolderName(filePath)
+End Function
+
+Private Sub 创建目录递归(ByVal folderPath As String)
+    Dim fso As Object
+    Dim parentPath As String
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    If folderPath = "" Then Exit Sub
+    If fso.FolderExists(folderPath) Then Exit Sub
+    
+    parentPath = fso.GetParentFolderName(folderPath)
+    If parentPath <> "" Then
+        If Not fso.FolderExists(parentPath) Then
+            创建目录递归 parentPath
+        End If
+    End If
+    
+    fso.CreateFolder folderPath
+End Sub
+
+Private Sub 写入UTF8文件(ByVal filePath As String, ByVal content As String)
+    Dim stm As Object
+    Set stm = CreateObject("ADODB.Stream")
+    
+    stm.Type = 2
+    stm.Charset = "utf-8"
+    stm.Open
+    stm.WriteText content
+    stm.SaveToFile filePath, 2
+    stm.Close
+End Sub
+
+

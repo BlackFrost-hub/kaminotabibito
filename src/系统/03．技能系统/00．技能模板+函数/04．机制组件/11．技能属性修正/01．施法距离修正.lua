@@ -138,11 +138,11 @@ ____exports["刷新英雄单位全部技能施法距离"] = function(_____5355_4
     for key in pairs(_____82F1_96C4_6280_80FD_65BD_6CD5_8DDD_79BB_914D_7F6E_8868) do
         do
             if (string.find(key, prefix, nil, true) or 0) - 1 ~= 0 then
-                goto __continue42
+                goto __continue44
             end
             local config = _____82F1_96C4_6280_80FD_65BD_6CD5_8DDD_79BB_914D_7F6E_8868[key]
             if config == nil or config["同步物遍施法距离"] == false then
-                goto __continue42
+                goto __continue44
             end
             local abilityId = __TS__ParseInt(
                 __TS__StringSubstring(key, #prefix),
@@ -152,7 +152,7 @@ ____exports["刷新英雄单位全部技能施法距离"] = function(_____5355_4
                 ____exports["刷新英雄技能物遍施法距离"](_____5355_4F4D, abilityId)
             end
         end
-        ::__continue42::
+        ::__continue44::
     end
 end
 ---
@@ -168,6 +168,21 @@ UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 _____82F1_96C4_6280_80FD_5168_5C40_65BD_6CD5_8DDD_79BB_4FEE_6B63_8868 = {}
 _____82F1_96C4_6280_80FD_5355_6280_80FD_65BD_6CD5_8DDD_79BB_4FEE_6B63_8868 = {}
 _____82F1_96C4_6280_80FD_65BD_6CD5_8DDD_79BB_914D_7F6E_8868 = {}
+____exports["按英雄技能距离修正上下文修正距离"] = function(_____57FA_7840_8DDD_79BB, _____4E0A_4E0B_6587, _____9ED8_8BA4_7528_9014)
+    if _____9ED8_8BA4_7528_9014 == nil then
+        _____9ED8_8BA4_7528_9014 = "施法距离派生距离"
+    end
+    if _____4E0A_4E0B_6587 == nil then
+        return _____57FA_7840_8DDD_79BB
+    end
+    return ____exports["取英雄技能修正距离"](
+        _____4E0A_4E0B_6587["单位"],
+        _____4E0A_4E0B_6587["技能ID"],
+        _____57FA_7840_8DDD_79BB,
+        _____4E0A_4E0B_6587["用途"] or _____9ED8_8BA4_7528_9014,
+        {["吃施法距离加成"] = _____4E0A_4E0B_6587["吃施法距离加成"], ["最小距离"] = _____4E0A_4E0B_6587["最小距离"], ["最大距离"] = _____4E0A_4E0B_6587["最大距离"]}
+    )
+end
 ____exports["取英雄技能施法距离派生距离"] = function(_____5355_4F4D, _____6280_80FDID, _____57FA_7840_8DDD_79BB, _____9009_9879)
     local ____exports__53D6_82F1_96C4_6280_80FD_4FEE_6B63_8DDD_79BB_22 = ____exports["取英雄技能修正距离"]
     local ____array_21 = __TS__SparseArrayNew(_____5355_4F4D, _____6280_80FDID, _____57FA_7840_8DDD_79BB, "施法距离派生距离")

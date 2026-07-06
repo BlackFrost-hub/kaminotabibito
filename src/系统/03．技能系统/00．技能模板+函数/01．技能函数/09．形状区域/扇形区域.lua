@@ -13,15 +13,17 @@ local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getUnitsInRange = ____require_result_0.getUnitsInRange
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
+local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_1["按英雄技能距离修正上下文修正距离"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local CreateGroup = jass.CreateGroup
 local GroupAddUnit = jass.GroupAddUnit
-local ____jglobals_bj_RADTODEG_1 = jglobals.bj_RADTODEG
-if ____jglobals_bj_RADTODEG_1 == nil then
-    ____jglobals_bj_RADTODEG_1 = 57.29577951308232
+local ____jglobals_bj_RADTODEG_2 = jglobals.bj_RADTODEG
+if ____jglobals_bj_RADTODEG_2 == nil then
+    ____jglobals_bj_RADTODEG_2 = 57.29577951308232
 end
-local bj_RADTODEG = ____jglobals_bj_RADTODEG_1
+local bj_RADTODEG = ____jglobals_bj_RADTODEG_2
 local function _____6807_51C6_5316_89D2_5EA6(_____89D2_5EA6)
     local _____7ED3_679C = _____89D2_5EA6
     while _____7ED3_679C < 0 do
@@ -83,25 +85,26 @@ ____exports["获取扇形区域单位"] = function(_____53C2_6570)
     if _____53C2_6570["半径"] <= 0 or _____53C2_6570["扇形角度"] <= 0 then
         return {}
     end
-    local _____5019_9009_5355_4F4D = getUnitsInRange(_____53C2_6570.X, _____53C2_6570.Y, _____53C2_6570["半径"])
+    local _____534A_5F84 = _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____53C2_6570["半径"], _____53C2_6570["英雄技能距离修正"], "扇形半径")
+    local _____5019_9009_5355_4F4D = getUnitsInRange(_____53C2_6570.X, _____53C2_6570.Y, _____534A_5F84)
     local _____7ED3_679C = {}
     for ____, _____5355_4F4D in ipairs(_____5019_9009_5355_4F4D) do
         do
-            local ____exports__5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF_4 = ____exports["单位是否在扇形区域"]
-            local ____array_3 = __TS__SparseArrayNew(
+            local ____exports__5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF_5 = ____exports["单位是否在扇形区域"]
+            local ____array_4 = __TS__SparseArrayNew(
                 _____5355_4F4D,
                 _____53C2_6570.X,
                 _____53C2_6570.Y,
-                _____53C2_6570["半径"],
+                _____534A_5F84,
                 _____53C2_6570["方向角"],
                 _____53C2_6570["扇形角度"]
             )
-            local ____53C2_6570__5305_542B_8FB9_754C_2 = _____53C2_6570["包含边界"]
-            if ____53C2_6570__5305_542B_8FB9_754C_2 == nil then
-                ____53C2_6570__5305_542B_8FB9_754C_2 = true
+            local ____53C2_6570__5305_542B_8FB9_754C_3 = _____53C2_6570["包含边界"]
+            if ____53C2_6570__5305_542B_8FB9_754C_3 == nil then
+                ____53C2_6570__5305_542B_8FB9_754C_3 = true
             end
-            __TS__SparseArrayPush(____array_3, ____53C2_6570__5305_542B_8FB9_754C_2)
-            if not ____exports__5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF_4(__TS__SparseArraySpread(____array_3)) then
+            __TS__SparseArrayPush(____array_4, ____53C2_6570__5305_542B_8FB9_754C_3)
+            if not ____exports__5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF_5(__TS__SparseArraySpread(____array_4)) then
                 goto __continue18
             end
             if _____53C2_6570["单位筛选"] ~= nil and not _____53C2_6570["单位筛选"](_____5355_4F4D) then

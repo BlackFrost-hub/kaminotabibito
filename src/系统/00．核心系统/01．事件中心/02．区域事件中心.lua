@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 ---
 -- @noSelfInFile
@@ -6,6 +7,7 @@ local jass = require("jass.common")
 local enterRegionListeners = {}
 local enterRegionRegistered = {}
 local enterRegionMasters = {}
+local enterRegionMasterActions = {}
 local enterRegionKeyByMasterHid = {}
 local function handleKey(handle)
     return tostring(handle)
@@ -71,6 +73,51 @@ local function dispatchListeners(list)
         end
     end
 end
+local function compactListeners(list)
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #list do
+            local listener = list[i + 1]
+            if listener and listener.active and listener.trigger then
+                list[writeIndex + 1] = listener
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #list - 1
+        while i >= writeIndex do
+            table.remove(list)
+            i = i - 1
+        end
+    end
+    return writeIndex
+end
+local function cleanupEnterRegionMaster(key)
+    local list = enterRegionListeners[key]
+    if list and compactListeners(list) > 0 then
+        return
+    end
+    local master = enterRegionMasters[key]
+    if master then
+        local action = enterRegionMasterActions[key]
+        if action then
+            jass.TriggerRemoveAction(master, action)
+        end
+        jass.DestroyTrigger(master)
+    end
+    local hid = master and tostring(jass.GetHandleId(master)
+    ) or ""
+    if hid ~= "" then
+        __TS__Delete(enterRegionKeyByMasterHid, hid)
+    end
+    __TS__Delete(enterRegionMasters, key)
+    __TS__Delete(enterRegionMasterActions, key)
+    __TS__Delete(enterRegionRegistered, key)
+    __TS__Delete(enterRegionListeners, key)
+end
 local function dispatchEnterRegionMaster()
     local trig = jass.GetTriggeringTrigger()
     if not trig then
@@ -82,6 +129,7 @@ local function dispatchEnterRegionMaster()
         return
     end
     dispatchListeners(enterRegionListeners[key] or ({}))
+    cleanupEnterRegionMaster(key)
 end
 local function addListener(store, key, trigger, once)
     store[key] = store[key] or ({})
@@ -97,12 +145,14 @@ local function addListener(store, key, trigger, once)
                     i = i + 1
                 end
             end
+            cleanupEnterRegionMaster(key)
         end
     end
     local listener = {trigger = trigger, active = true, once = once}
     list[#list + 1] = listener
     return function()
         listener.active = false
+        cleanupEnterRegionMaster(key)
     end
 end
 --- 为区域进入事件注册监听。
@@ -123,7 +173,7 @@ function ____exports.registerEnterRegionTrigger(trigger, region, filter)
         enterRegionKeyByMasterHid[tostring(jass.GetHandleId(master)
         )] = key
         jass.TriggerRegisterEnterRegion(master, region, normalizedFilter)
-        jass.TriggerAddAction(master, dispatchEnterRegionMaster)
+        enterRegionMasterActions[key] = jass.TriggerAddAction(master, dispatchEnterRegionMaster)
     end
     return addListener(enterRegionListeners, key, trigger, false)
 end

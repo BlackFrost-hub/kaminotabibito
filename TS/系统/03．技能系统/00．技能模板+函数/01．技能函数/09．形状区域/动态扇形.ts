@@ -8,6 +8,7 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+import type { 英雄技能距离修正上下文 } from "../../04．机制组件/11．技能属性修正";
 
 const AddSpecialEffect = jass.AddSpecialEffect as (modelPath: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
@@ -19,6 +20,10 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 
 import type { 技能伤害来源类型 } from "../../../../04．伤害系统/08．技能伤害系统";
+
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
+};
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -65,6 +70,7 @@ export interface 动态扇形参数 {
   扇形角度: number;
   起始半径: number;
   结束半径: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   变化时间: number;
   检测间隔?: number;
   影响目标?: "敌方" | "友方" | "全部";
@@ -115,6 +121,10 @@ class 动态扇形实现 implements 动态扇形实例 {
   private 命中记录: Record<number, true | undefined> = {};
 
   constructor(参数: 动态扇形参数) {
+    参数 = {
+      ...参数,
+      结束半径: 按英雄技能距离修正上下文修正距离(参数.结束半径, 参数.英雄技能距离修正, "扇形半径"),
+    };
     this.实例ID = ++动态扇形实例ID计数器;
     this.参数 = 参数;
     this.当前X = 参数.X;

@@ -6,8 +6,12 @@
  */
 
 import { 创建原生弹幕, 销毁原生弹幕, 获取原生弹幕 } from "../01．TS原生弹幕/03．对外接口";
+import type { 英雄技能距离修正上下文 } from "../../../04．机制组件/11．技能属性修正";
 
 const jass = require("jass.common") as any;
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
+};
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
@@ -32,6 +36,7 @@ export interface 弹道跳链参数 {
   初始目标: any;
   跳跃次数: number;
   搜索半径: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   弹幕速度: number;
   每跳延迟?: number;
   /** 默认复用同一个弹幕；需要旧表现时传“重建弹幕”。 */
@@ -262,6 +267,10 @@ export function 开始弹道跳链(this: void, 参数: 弹道跳链参数): void
   if (参数.施法者 == null || 参数.施法者 === 0) return;
   if (参数.初始目标 == null || 参数.初始目标 === 0) return;
   if (参数.跳跃次数 <= 0) return;
+  参数 = {
+    ...参数,
+    搜索半径: 按英雄技能距离修正上下文修正距离(参数.搜索半径, 参数.英雄技能距离修正, "追踪最大距离"),
+  };
 
   const 状态: 弹道跳链状态 = {
     参数,

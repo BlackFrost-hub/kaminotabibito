@@ -192,6 +192,21 @@ export function 获取单位总护盾值(单位ID: number): number {
 }
 
 /**
+ * 获取单位应显示到头顶血条的护盾值
+ */
+export function 获取单位可显示护盾值(单位ID: number): number {
+  const ids = 获取单位护盾列表(单位ID);
+  let total = 0;
+  for (const id of ids) {
+    const 实例 = 护盾映射.get(id);
+    if (实例 != null && 实例.显示护盾条) {
+      total += 实例.当前值;
+    }
+  }
+  return total;
+}
+
+/**
  * 获取单位指定类型护盾值
  */
 export function 获取单位类型护盾值(单位ID: number, 类型: 护盾类型): number {

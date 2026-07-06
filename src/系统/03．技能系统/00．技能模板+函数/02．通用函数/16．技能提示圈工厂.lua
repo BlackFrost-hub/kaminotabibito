@@ -18,6 +18,8 @@ local _____521B_5EFA_8584_5706_5F62_63D0_793A_5708 = ____require_result_0["创�
 local _____521B_5EFA_767D_8272_5706_5F62_63D0_793A_5708 = ____require_result_0["创建白色圆形提示圈"]
 local _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708 = ____require_result_0["创建渐变圆形提示圈"]
 local _____521B_5EFA_53CC_73AF_63D0_793A_5708 = ____require_result_0["创建双环提示圈"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
+local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_1["按英雄技能距离修正上下文修正距离"]
 local function _____8F6C_6570_5B57(value, _____9ED8_8BA4_503C)
     if value == nil or value == false or value == "" then
         return _____9ED8_8BA4_503C
@@ -76,29 +78,32 @@ local function _____53D6_6301_7EED_65F6_95F4(_____914D_7F6E)
     end
     return 1
 end
-local function _____53D6_534A_5F84(_____914D_7F6E)
+local function _____4FEE_6B63_63D0_793A_8DDD_79BB(_____914D_7F6E, _____57FA_7840_8DDD_79BB, _____9ED8_8BA4_7528_9014)
+    return _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____57FA_7840_8DDD_79BB, _____914D_7F6E["英雄技能距离修正"], _____9ED8_8BA4_7528_9014)
+end
+local function _____53D6_534A_5F84(_____914D_7F6E, _____9ED8_8BA4_7528_9014)
+    if _____9ED8_8BA4_7528_9014 == nil then
+        _____9ED8_8BA4_7528_9014 = "效果半径"
+    end
+    local _____534A_5F84 = 0
     if _____914D_7F6E["半径"] ~= nil then
-        return _____8F6C_6570_5B57(_____914D_7F6E["半径"], 0)
+        _____534A_5F84 = _____8F6C_6570_5B57(_____914D_7F6E["半径"], 0)
+    elseif _____914D_7F6E["提示半径"] ~= nil then
+        _____534A_5F84 = _____8F6C_6570_5B57(_____914D_7F6E["提示半径"], 0)
+    elseif _____914D_7F6E["伤害半径"] ~= nil then
+        _____534A_5F84 = _____8F6C_6570_5B57(_____914D_7F6E["伤害半径"], 0)
+    elseif _____914D_7F6E["安全区半径"] ~= nil then
+        _____534A_5F84 = _____8F6C_6570_5B57(_____914D_7F6E["安全区半径"], 0)
+    elseif _____914D_7F6E["外圈半径"] ~= nil then
+        _____534A_5F84 = _____8F6C_6570_5B57(_____914D_7F6E["外圈半径"], 0)
     end
-    if _____914D_7F6E["提示半径"] ~= nil then
-        return _____8F6C_6570_5B57(_____914D_7F6E["提示半径"], 0)
-    end
-    if _____914D_7F6E["伤害半径"] ~= nil then
-        return _____8F6C_6570_5B57(_____914D_7F6E["伤害半径"], 0)
-    end
-    if _____914D_7F6E["安全区半径"] ~= nil then
-        return _____8F6C_6570_5B57(_____914D_7F6E["安全区半径"], 0)
-    end
-    if _____914D_7F6E["外圈半径"] ~= nil then
-        return _____8F6C_6570_5B57(_____914D_7F6E["外圈半径"], 0)
-    end
-    return 0
+    return _____4FEE_6B63_63D0_793A_8DDD_79BB(_____914D_7F6E, _____534A_5F84, _____9ED8_8BA4_7528_9014)
 end
 local function _____53D6_6247_5F62_5C3A_5BF8(_____914D_7F6E)
     if _____914D_7F6E["扇形模型尺寸"] ~= nil then
         return _____8F6C_6570_5B57(_____914D_7F6E["扇形模型尺寸"], 0.01)
     end
-    local _____534A_5F84 = _____53D6_534A_5F84(_____914D_7F6E)
+    local _____534A_5F84 = _____53D6_534A_5F84(_____914D_7F6E, "扇形半径")
     if _____534A_5F84 <= 0 then
         return 0.01
     end
@@ -134,7 +139,11 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
     local _____52A8_753B_901F_5EA6 = _____914D_7F6E["动画速度"]
     if _____7C7B_578B == "矩形" then
         local _____5BBD_5EA6 = _____8F6C_6570_5B57(_____914D_7F6E["宽度"], 0)
-        local _____957F_5EA6 = _____8F6C_6570_5B57(_____914D_7F6E["长度"], 0)
+        local _____957F_5EA6 = _____4FEE_6B63_63D0_793A_8DDD_79BB(
+            _____914D_7F6E,
+            _____8F6C_6570_5B57(_____914D_7F6E["长度"], 0),
+            "矩形长度"
+        )
         if _____5BBD_5EA6 <= 0 or _____957F_5EA6 <= 0 then
             return nil
         end

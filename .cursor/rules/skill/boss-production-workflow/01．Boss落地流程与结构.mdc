@@ -53,6 +53,11 @@ alwaysApply: false
 - 新 Boss 目录必须接入父级：
   - `TS/系统/03．技能系统/05．单位技能/03．Boss技能/index.ts`
 - 新 Boss 默认同步创建 Boss 专属 Buff 表，见 `skill/boss-skill-runtime.mdc`。
+- 新建 Boss 物编单位后，必须同步登记单位配置表，不能只写 ObjEditing 或 Boss 技能目录：
+  - 常规 Boss：加入 `TS/系统/01．单位系统/08．单位配置表/02．Boss配置表.ts`
+  - 异界 / 隐藏等使用独立分类的 Boss：按语义加入 `03．异界Boss配置表.ts` 或对应分类表
+  - 所有新单位最终必须接入 `TS/系统/01．单位系统/08．单位配置表/04．总单位配置表.ts`
+  - 若缺少单位配置表登记，不能视为 Boss 已完整落地。
 
 ### Boss 护卫技能目录
 

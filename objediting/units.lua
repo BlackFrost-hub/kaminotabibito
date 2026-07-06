@@ -107,30 +107,6 @@ applyCommonDummyUnit(e011, {
   selectionScale = 0.0,
 })
 
--- Shield bar unit
--- [护盾系统]-显示马甲
-local sbar = UnitDefinition:new('sbar', 'ewsp')
-applyCommonDummyUnit(sbar, {
-  name = '[护盾系统]-显示马甲',
-  modelFile = 'S_Shiled.mdl',
-  icon = 'ReplaceableTextures\\CommandButtons\\BTNWisp.blp',
-  scale = 1.0,
-  speedBase = 270,
-  hp = 10000,
-  hpRegen = 100.0,
-  mana = 10000,
-  manaRegen = 1000.0,
-  initialMana = 1000,
-  sightDay = 1800,
-  sightNight = 1800,
-  selectionScale = 0.0,
-})
-sbar:setAllowCustomTeamColor(0)
-sbar:setTeamColor(-1)
-sbar:setTintingColorRed(100)
-sbar:setTintingColorGreen(200)
-sbar:setTintingColorBlue(255)
-
 -- 红色圆形提示圈单位
 local scir = UnitDefinition:new('scir', 'ewsp')
 applyCommonDummyUnit(scir, {

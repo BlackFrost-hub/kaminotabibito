@@ -36,6 +36,10 @@ import { 创建弹幕命中规则状态 } from "./03．命中/index";
 import { 结束原生弹幕实例, 确保原生弹幕驱动 } from "./04．驱动/index";
 import { 确保弹幕死亡事件监听 } from "./05．死亡事件/index";
 
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
+};
+
 function 解析弹幕玩家(this: void, 参数: 原生弹幕参数): any {
   if (参数.所属玩家 != null && 参数.所属玩家 !== 0) return 参数.所属玩家;
   if (参数.所有者 != null && 参数.所有者 !== 0) return GetOwningPlayer(参数.所有者);
@@ -121,6 +125,14 @@ function 初始化弹幕单位表现(this: void, 参数: 原生弹幕参数, 弹
   return null;
 }
 
+function 归一化弹幕距离参数(this: void, 参数: 原生弹幕参数): 原生弹幕参数 {
+  if (参数.最大距离 == null || 参数.最大距离 <= 0) return 参数;
+  return {
+    ...参数,
+    最大距离: 按英雄技能距离修正上下文修正距离(参数.最大距离, 参数.英雄技能距离修正, "弹幕飞行距离"),
+  };
+}
+
 function 创建弹幕实例对象(this: void, 实例: 原生弹幕内部实例): 原生弹幕实例 {
   return {
     弹幕ID: 实例.id,
@@ -139,6 +151,7 @@ function 创建弹幕实例对象(this: void, 实例: 原生弹幕内部实例):
 }
 
 export function 创建原生弹幕(this: void, 参数: 原生弹幕参数): 原生弹幕实例 {
+  参数 = 归一化弹幕距离参数(参数);
   const x = 解析弹幕X(参数);
   const y = 解析弹幕Y(参数);
   const face = 解析弹幕方向(参数);

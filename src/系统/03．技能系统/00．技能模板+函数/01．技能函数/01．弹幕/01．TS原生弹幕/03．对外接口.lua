@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____01_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．共享")
 local AddSpecialEffectTarget = ____01_FF0E_5171_4EAB.AddSpecialEffectTarget
@@ -63,21 +64,23 @@ ____exports["造成原生弹幕阻挡伤害"] = function(_____5F39_5E55ID, _____
     _____5B9E_4F8B["剩余生命"] = _____5B9E_4F8B["剩余生命"] - _____4F24_5BB3_503C
     local _____56DE_8C03 = _____5B9E_4F8B["参数"]["on阻挡"]
     if _____56DE_8C03 ~= nil then
-        local ____6765_6E90_5355_4F4D_0 = _____6765_6E90_5355_4F4D
-        if ____6765_6E90_5355_4F4D_0 == nil then
-            ____6765_6E90_5355_4F4D_0 = nil
+        local ____6765_6E90_5355_4F4D_1 = _____6765_6E90_5355_4F4D
+        if ____6765_6E90_5355_4F4D_1 == nil then
+            ____6765_6E90_5355_4F4D_1 = nil
         end
-        _____56DE_8C03(____6765_6E90_5355_4F4D_0, _____4F24_5BB3_503C, _____5F39_5E55ID)
+        _____56DE_8C03(____6765_6E90_5355_4F4D_1, _____4F24_5BB3_503C, _____5F39_5E55ID)
     end
-    local ____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6_3 = _____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6
-    local ____opt_1 = _____5B9E_4F8B["参数"].STES
-    ____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6_3(____opt_1 and ____opt_1["阻挡事件名"], _____5B9E_4F8B, {["来源单位"] = _____6765_6E90_5355_4F4D, ["伤害值"] = _____4F24_5BB3_503C})
+    local ____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6_4 = _____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6
+    local ____opt_2 = _____5B9E_4F8B["参数"].STES
+    ____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6_4(____opt_2 and ____opt_2["阻挡事件名"], _____5B9E_4F8B, {["来源单位"] = _____6765_6E90_5355_4F4D, ["伤害值"] = _____4F24_5BB3_503C})
     if _____5B9E_4F8B["参数"]["被阻挡时销毁"] == true or _____5B9E_4F8B["参数"]["弹幕生命值"] ~= nil and _____5B9E_4F8B["剩余生命"] <= 0 then
         _____7ED3_675F_539F_751F_5F39_5E55_5B9E_4F8B(_____5B9E_4F8B, "被阻挡")
         return true
     end
     return false
 end
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
+local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_0["按英雄技能距离修正上下文修正距离"]
 local function _____89E3_6790_5F39_5E55_73A9_5BB6(_____53C2_6570)
     if _____53C2_6570["所属玩家"] ~= nil and _____53C2_6570["所属玩家"] ~= 0 then
         return _____53C2_6570["所属玩家"]
@@ -174,6 +177,16 @@ local function _____521D_59CB_5316_5F39_5E55_5355_4F4D_8868_73B0(_____53C2_6570,
     end
     return nil
 end
+local function _____5F52_4E00_5316_5F39_5E55_8DDD_79BB_53C2_6570(_____53C2_6570)
+    if _____53C2_6570["最大距离"] == nil or _____53C2_6570["最大距离"] <= 0 then
+        return _____53C2_6570
+    end
+    return __TS__ObjectAssign(
+        {},
+        _____53C2_6570,
+        {["最大距离"] = _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____53C2_6570["最大距离"], _____53C2_6570["英雄技能距离修正"], "弹幕飞行距离")}
+    )
+end
 local function _____521B_5EFA_5F39_5E55_5B9E_4F8B_5BF9_8C61(_____5B9E_4F8B)
     return {
         ["弹幕ID"] = _____5B9E_4F8B.id,
@@ -191,6 +204,7 @@ local function _____521B_5EFA_5F39_5E55_5B9E_4F8B_5BF9_8C61(_____5B9E_4F8B)
     }
 end
 ____exports["创建原生弹幕"] = function(_____53C2_6570)
+    _____53C2_6570 = _____5F52_4E00_5316_5F39_5E55_8DDD_79BB_53C2_6570(_____53C2_6570)
     local x = _____89E3_6790_5F39_5E55X(_____53C2_6570)
     local y = _____89E3_6790_5F39_5E55Y(_____53C2_6570)
     local face = _____89E3_6790_5F39_5E55_65B9_5411(_____53C2_6570)

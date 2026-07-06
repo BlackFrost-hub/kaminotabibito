@@ -1,0 +1,221 @@
+Option Explicit
+
+Public Sub 导出总单位配置表()
+    Dim ws As Worksheet, outPath As String, ts As String
+    Set ws = ThisWorkbook.Worksheets("单位数据")
+
+    Call 补全单位数据空名字(ws)
+    ts = 生成总单位配置TS(ws)
+
+    If Len(ThisWorkbook.Path) = 0 Then
+        MsgBox "请先保存工作簿。", vbExclamation
+        Exit Sub
+    End If
+
+    outPath = ThisWorkbook.Path & "\TS\系统\01．单位系统\08．单位配置表\04．总单位配置表.ts"
+    Call 确保目录存在(GetParentFolder(outPath))
+    Call 写UTF8文本(outPath, ts)
+
+    MsgBox "已导出: " & outPath, vbInformation
+End Sub
+
+Private Sub 补全单位数据空名字(ByVal ws As Worksheet)
+    Dim lastRow As Long, r As Long
+    Dim rawId As String, parentId As String, nm As String
+
+    lastRow = ws.Cells(ws.Rows.Count, 2).End(xlUp).row
+    For r = 3 To lastRow
+        rawId = Trim$(CStr(ws.Cells(r, 2).Value2))
+        If rawId <> "" Then
+            nm = Trim$(CStr(ws.Cells(r, 4).Value2))
+            If nm = "" Then
+                parentId = Trim$(CStr(ws.Cells(r, 3).Value2))
+                nm = 获取原生单位名(rawId, parentId)
+                ws.Cells(r, 4).value = nm
+            End If
+        End If
+    Next r
+End Sub
+
+Private Function 生成总单位配置TS(ByVal ws As Worksheet) As String
+    Dim lastRow As Long, r As Long, i As Long
+    Dim rawId As String, parentId As String, nm As String
+    Dim key As String, colIdx As Long, v As String, obj As String, ts As String
+    Dim firstField As Boolean
+    Dim 保留字段 As Variant
+
+    保留字段 = Array( _
+        "id", "_parent", "Name", "Tip", "Ubertip", _
+        "dmgplus1", "dmgplus2", "HP", "def", "defUp", "cool1", _
+        "goldcost", "lumbercost", "Art", "file", "Sellitems", _
+        "Requires", "Requirescount", "Trains", "abilList", "heroAbilList", _
+        "level", "spd", "fused", "reptm", "pathTex", "targs1", _
+        "atkType1", "weapType1", "weapTp1", "race", "mana0", "manaN", _
+        "moveHeight", "modelScale", "scale", "STR", "AGI", "INT", _
+        "STRplus", "AGIplus", "INTplus", "regenHP", "regenMana", "acquire", _
+        "bountyplus", "lumberbountyplus", "deathType", "turnRate", "collision", "nsight", "sight" _
+    )
+
+    lastRow = ws.Cells(ws.Rows.Count, 2).End(xlUp).row
+
+    ts = "/** @noSelfInFile */" & vbCrLf & _
+         "/**" & vbCrLf & _
+         " * 自动生成文件，请勿手改。" & vbCrLf & _
+         " * 来源：lua生成物遍表格.xlsm / 总单位" & vbCrLf & _
+         " */" & vbCrLf & vbCrLf & _
+         "import { 创建单位名反查器 } from ""./00．单位名反查工具"";" & vbCrLf & vbCrLf & _
+         "export const 总单位配置表: Record<string, Record<string, any>> = {" & vbCrLf
+
+    For r = 3 To lastRow
+        rawId = Trim$(CStr(ws.Cells(r, 2).Value2))
+        If rawId <> "" Then
+            parentId = Trim$(CStr(ws.Cells(r, 3).Value2))
+            nm = Trim$(CStr(ws.Cells(r, 4).Value2))
+            If nm = "" Then nm = 获取原生单位名(rawId, parentId)
+
+            obj = "  " & Q(rawId) & ": {"
+            firstField = True
+
+            For i = LBound(保留字段) To UBound(保留字段)
+                key = 保留字段(i)
+                colIdx = 找到列号(ws, CStr(key))
+                If colIdx > 0 Then
+                    If LCase$(key) = "id" Then
+                        GoTo ContinueField
+                    ElseIf LCase$(key) = "name" Then
+                        v = Q(nm)
+                    Else
+                        v = 单元格转TS值(ws.Cells(r, colIdx))
+                    End If
+
+                    If v <> "" Then
+                        If Not firstField Then obj = obj & " "
+                        obj = obj & key & ": " & v & ","
+                        firstField = False
+                    End If
+                End If
+ContinueField:
+            Next i
+
+            If InStr(1, obj, "unit:", vbTextCompare) = 0 Then
+                If Not firstField Then obj = obj & " "
+                obj = obj & "unit: " & Q(rawId) & ","
+            End If
+
+            If Right$(obj, 1) = "," Then obj = Left$(obj, Len(obj) - 1)
+            obj = obj & "},"
+            ts = ts & obj & vbCrLf
+        End If
+    Next r
+
+    ts = ts & "};" & vbCrLf & vbCrLf & _
+         "export const 按名字反查总单位ID = 创建单位名反查器(总单位配置表);" & vbCrLf & vbCrLf & _
+         "export default 总单位配置表;" & vbCrLf
+
+    生成总单位配置TS = ts
+End Function
+
+Private Function 找到列号(ByVal ws As Worksheet, ByVal headerName As String) As Long
+    Dim lastCol As Long, c As Long, h As String
+    lastCol = ws.Cells(2, ws.Columns.Count).End(xlToLeft).Column
+    For c = 2 To lastCol
+        h = Trim$(CStr(ws.Cells(2, c).Value2))
+        If StrComp(h, headerName, vbTextCompare) = 0 Then
+            找到列号 = c
+            Exit Function
+        End If
+    Next c
+    找到列号 = 0
+End Function
+
+Private Function 获取原生单位名(ByVal rawId As String, ByVal parentId As String) As String
+    Dim ws As Worksheet, lastRow As Long, r As Long
+    Dim vId As String, vName As String
+
+    On Error Resume Next
+    Set ws = ThisWorkbook.Worksheets("原生单位名表")
+    On Error GoTo 0
+
+    If Not ws Is Nothing Then
+        lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).row
+        For r = 2 To lastRow
+            vId = Trim$(CStr(ws.Cells(r, 1).Value2))
+            vName = Trim$(CStr(ws.Cells(r, 2).Value2))
+            If vName <> "" Then
+                If vId = rawId Or (parentId <> "" And vId = parentId) Then
+                    获取原生单位名 = vName
+                    Exit Function
+                End If
+            End If
+        Next r
+    End If
+
+    获取原生单位名 = rawId
+End Function
+
+Private Function 单元格转TS值(ByVal cell As Range) As String
+    Dim v As Variant, s As String
+    v = cell.Value2
+
+    If IsEmpty(v) Then Exit Function
+
+    If VarType(v) = vbBoolean Then
+        If v Then
+            单元格转TS值 = "true"
+        Else
+            单元格转TS值 = "false"
+        End If
+        Exit Function
+    End If
+
+    If IsNumeric(v) Then
+        s = CStr(v)
+        s = Replace(s, ",", ".")
+        单元格转TS值 = s
+        Exit Function
+    End If
+
+    s = CStr(v)
+    If Trim$(s) = "" Then Exit Function
+    单元格转TS值 = Q(s)
+End Function
+
+Private Function Q(ByVal s As String) As String
+    s = Replace(s, "\", "\\")
+    s = Replace(s, """", "\""")
+    s = Replace(s, vbCrLf, "\n")
+    s = Replace(s, vbCr, "\n")
+    s = Replace(s, vbLf, "\n")
+    Q = """" & s & """"
+End Function
+
+Private Sub 写UTF8文本(ByVal filePath As String, ByVal text As String)
+    Dim stm As Object
+    Set stm = CreateObject("ADODB.Stream")
+    stm.Type = 2
+    stm.Charset = "utf-8"
+    stm.Open
+    stm.WriteText text
+    stm.SaveToFile filePath, 2
+    stm.Close
+End Sub
+
+Private Sub 确保目录存在(ByVal folderPath As String)
+    Dim fso As Object, parentPath As String
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    If folderPath = "" Then Exit Sub
+    If fso.FolderExists(folderPath) Then Exit Sub
+
+    parentPath = fso.GetParentFolderName(folderPath)
+    If parentPath <> "" And Not fso.FolderExists(parentPath) Then
+        Call 确保目录存在(parentPath)
+    End If
+    If Not fso.FolderExists(folderPath) Then fso.CreateFolder folderPath
+End Sub
+
+Private Function GetParentFolder(ByVal filePath As String) As String
+    Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    GetParentFolder = fso.GetParentFolderName(filePath)
+End Function
+

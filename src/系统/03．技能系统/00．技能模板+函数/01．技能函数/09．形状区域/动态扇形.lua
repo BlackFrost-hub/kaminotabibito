@@ -1,5 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
@@ -67,22 +68,24 @@ local GetUnitY = jass.GetUnitY
 local EXSetEffectZ = japi.EXSetEffectZ
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_1.addPeriodicCallback
-removePeriodicCallback = ____require_result_1.removePeriodicCallback
-getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-local isUnitEnemy = ____require_result_2.isUnitEnemy
-local isUnitAlly = ____require_result_2.isUnitAlly
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
-local _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_3["获取扇形区域单位"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
-local _____521B_5EFA_7EA2_8272_6247_5F62_63D0_793A_5708_7279_6548 = ____require_result_4["创建红色扇形提示圈特效"]
-local _____8BBE_7F6E_6247_5F62_63D0_793A_5708_671D_5411_4E0E_5C3A_5BF8 = ____require_result_4["设置扇形提示圈朝向与尺寸"]
-local _____91CD_64AD_63D0_793A_5708_52A8_753B = ____require_result_4["重播提示圈动画"]
-local _____7ACB_5373_9500_6BC1_63D0_793A_5708_7279_6548 = ____require_result_4["立即销毁提示圈特效"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
+local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_0["按英雄技能距离修正上下文修正距离"]
+local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_1["造成AOE技能伤害"]
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_2.addPeriodicCallback
+removePeriodicCallback = ____require_result_2.removePeriodicCallback
+getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+local isUnitEnemy = ____require_result_3.isUnitEnemy
+local isUnitAlly = ____require_result_3.isUnitAlly
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
+local _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_4["获取扇形区域单位"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
+local _____521B_5EFA_7EA2_8272_6247_5F62_63D0_793A_5708_7279_6548 = ____require_result_5["创建红色扇形提示圈特效"]
+local _____8BBE_7F6E_6247_5F62_63D0_793A_5708_671D_5411_4E0E_5C3A_5BF8 = ____require_result_5["设置扇形提示圈朝向与尺寸"]
+local _____91CD_64AD_63D0_793A_5708_52A8_753B = ____require_result_5["重播提示圈动画"]
+local _____7ACB_5373_9500_6BC1_63D0_793A_5708_7279_6548 = ____require_result_5["立即销毁提示圈特效"]
 local _____52A8_6001_6247_5F62_5B9E_73B0 = __TS__Class()
 _____52A8_6001_6247_5F62_5B9E_73B0.name = "动态扇形实现"
 function _____52A8_6001_6247_5F62_5B9E_73B0.prototype.____constructor(self, _____53C2_6570)
@@ -91,6 +94,11 @@ function _____52A8_6001_6247_5F62_5B9E_73B0.prototype.____constructor(self, ____
     self["特效句柄"] = nil
     self["提示圈特效"] = nil
     self["命中记录"] = {}
+    _____53C2_6570 = __TS__ObjectAssign(
+        {},
+        _____53C2_6570,
+        {["结束半径"] = _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____53C2_6570["结束半径"], _____53C2_6570["英雄技能距离修正"], "扇形半径")}
+    )
     _____52A8_6001_6247_5F62_5B9E_4F8BID_8BA1_6570_5668 = _____52A8_6001_6247_5F62_5B9E_4F8BID_8BA1_6570_5668 + 1
     self["实例ID"] = _____52A8_6001_6247_5F62_5B9E_4F8BID_8BA1_6570_5668
     self["参数"] = _____53C2_6570
@@ -171,16 +179,16 @@ _____52A8_6001_6247_5F62_5B9E_73B0.prototype["执行检测"] = function(self)
         ["包含边界"] = true
     })
     local _____5F53_524D_547D_4E2D_5355_4F4D = {}
-    local ____self__53C2_6570__53EA_547D_4E2D_65B0_589E_8303_56F4_5 = self["参数"]["只命中新增范围"]
-    if ____self__53C2_6570__53EA_547D_4E2D_65B0_589E_8303_56F4_5 == nil then
-        ____self__53C2_6570__53EA_547D_4E2D_65B0_589E_8303_56F4_5 = true
+    local ____self__53C2_6570__53EA_547D_4E2D_65B0_589E_8303_56F4_6 = self["参数"]["只命中新增范围"]
+    if ____self__53C2_6570__53EA_547D_4E2D_65B0_589E_8303_56F4_6 == nil then
+        ____self__53C2_6570__53EA_547D_4E2D_65B0_589E_8303_56F4_6 = true
     end
-    local _____53EA_547D_4E2D_65B0_589E_8303_56F4 = ____self__53C2_6570__53EA_547D_4E2D_65B0_589E_8303_56F4_5
-    local ____self__53C2_6570__5141_8BB8_91CD_590D_547D_4E2D_6 = self["参数"]["允许重复命中"]
-    if ____self__53C2_6570__5141_8BB8_91CD_590D_547D_4E2D_6 == nil then
-        ____self__53C2_6570__5141_8BB8_91CD_590D_547D_4E2D_6 = false
+    local _____53EA_547D_4E2D_65B0_589E_8303_56F4 = ____self__53C2_6570__53EA_547D_4E2D_65B0_589E_8303_56F4_6
+    local ____self__53C2_6570__5141_8BB8_91CD_590D_547D_4E2D_7 = self["参数"]["允许重复命中"]
+    if ____self__53C2_6570__5141_8BB8_91CD_590D_547D_4E2D_7 == nil then
+        ____self__53C2_6570__5141_8BB8_91CD_590D_547D_4E2D_7 = false
     end
-    local _____5141_8BB8_91CD_590D_547D_4E2D = ____self__53C2_6570__5141_8BB8_91CD_590D_547D_4E2D_6
+    local _____5141_8BB8_91CD_590D_547D_4E2D = ____self__53C2_6570__5141_8BB8_91CD_590D_547D_4E2D_7
     local _____5185_534A_5F84 = _____53EA_547D_4E2D_65B0_589E_8303_56F4 and _____53D6_8F83_5C0F_503C(self["上次半径值"], _____5F53_524D_534A_5F84) or 0
     local _____5916_534A_5F84 = _____53EA_547D_4E2D_65B0_589E_8303_56F4 and _____53D6_8F83_5927_503C(self["上次半径值"], _____5F53_524D_534A_5F84) or _____5F53_524D_534A_5F84
     for ____, _____5355_4F4D in ipairs(_____6240_6709_5355_4F4D) do
@@ -206,27 +214,27 @@ _____52A8_6001_6247_5F62_5B9E_73B0.prototype["执行检测"] = function(self)
             _____5F53_524D_547D_4E2D_5355_4F4D[#_____5F53_524D_547D_4E2D_5355_4F4D + 1] = _____5355_4F4D
             self["命中记录"][_____5355_4F4DID] = true
             if (self["参数"]["伤害值"] or 0) > 0 and ATTACK_TYPE_NORMAL then
-                local ____9020_6210AOE_6280_80FD_4F24_5BB3_11 = _____9020_6210AOE_6280_80FD_4F24_5BB3
-                local ____self__53C2_6570__6240_6709_8005_7 = self["参数"]["所有者"]
-                if ____self__53C2_6570__6240_6709_8005_7 == nil then
-                    ____self__53C2_6570__6240_6709_8005_7 = _____5355_4F4D
+                local ____9020_6210AOE_6280_80FD_4F24_5BB3_12 = _____9020_6210AOE_6280_80FD_4F24_5BB3
+                local ____self__53C2_6570__6240_6709_8005_8 = self["参数"]["所有者"]
+                if ____self__53C2_6570__6240_6709_8005_8 == nil then
+                    ____self__53C2_6570__6240_6709_8005_8 = _____5355_4F4D
                 end
-                local ____temp_10 = self["参数"]["伤害值"] or 0
-                local ____self__53C2_6570__4F24_5BB3_7C7B_578B_8 = self["参数"]["伤害类型"]
-                if ____self__53C2_6570__4F24_5BB3_7C7B_578B_8 == nil then
-                    ____self__53C2_6570__4F24_5BB3_7C7B_578B_8 = DAMAGE_TYPE_NORMAL
+                local ____temp_11 = self["参数"]["伤害值"] or 0
+                local ____self__53C2_6570__4F24_5BB3_7C7B_578B_9 = self["参数"]["伤害类型"]
+                if ____self__53C2_6570__4F24_5BB3_7C7B_578B_9 == nil then
+                    ____self__53C2_6570__4F24_5BB3_7C7B_578B_9 = DAMAGE_TYPE_NORMAL
                 end
-                local ____self__53C2_6570__653B_51FB_7C7B_578B_9 = self["参数"]["攻击类型"]
-                if ____self__53C2_6570__653B_51FB_7C7B_578B_9 == nil then
-                    ____self__53C2_6570__653B_51FB_7C7B_578B_9 = ATTACK_TYPE_NORMAL
+                local ____self__53C2_6570__653B_51FB_7C7B_578B_10 = self["参数"]["攻击类型"]
+                if ____self__53C2_6570__653B_51FB_7C7B_578B_10 == nil then
+                    ____self__53C2_6570__653B_51FB_7C7B_578B_10 = ATTACK_TYPE_NORMAL
                 end
-                ____9020_6210AOE_6280_80FD_4F24_5BB3_11({
-                    ["来源"] = ____self__53C2_6570__6240_6709_8005_7,
+                ____9020_6210AOE_6280_80FD_4F24_5BB3_12({
+                    ["来源"] = ____self__53C2_6570__6240_6709_8005_8,
                     ["目标"] = _____5355_4F4D,
-                    ["伤害"] = ____temp_10,
-                    ["伤害类型"] = ____self__53C2_6570__4F24_5BB3_7C7B_578B_8,
+                    ["伤害"] = ____temp_11,
+                    ["伤害类型"] = ____self__53C2_6570__4F24_5BB3_7C7B_578B_9,
                     ranged = false,
-                    attackType = ____self__53C2_6570__653B_51FB_7C7B_578B_9,
+                    attackType = ____self__53C2_6570__653B_51FB_7C7B_578B_10,
                     weaponType = self["参数"]["武器类型"],
                     ["来源类型"] = self["参数"]["来源类型"] or "单位技能",
                     ["技能ID"] = self["参数"]["技能ID"],
@@ -235,16 +243,16 @@ _____52A8_6001_6247_5F62_5B9E_73B0.prototype["执行检测"] = function(self)
                     ["参与技能伤害加成"] = self["参数"]["参与技能伤害加成"]
                 })
             end
-            local ____opt_12 = self["参数"]["on命中"]
-            if ____opt_12 ~= nil then
-                ____opt_12(_____5355_4F4D, _____5F53_524D_534A_5F84)
+            local ____opt_13 = self["参数"]["on命中"]
+            if ____opt_13 ~= nil then
+                ____opt_13(_____5355_4F4D, _____5F53_524D_534A_5F84)
             end
         end
         ::__continue15::
     end
-    local ____opt_14 = self["参数"]["on周期"]
-    if ____opt_14 ~= nil then
-        ____opt_14(_____5F53_524D_547D_4E2D_5355_4F4D, _____5F53_524D_534A_5F84, self["上次半径值"])
+    local ____opt_15 = self["参数"]["on周期"]
+    if ____opt_15 ~= nil then
+        ____opt_15(_____5F53_524D_547D_4E2D_5355_4F4D, _____5F53_524D_534A_5F84, self["上次半径值"])
     end
 end
 _____52A8_6001_6247_5F62_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -275,9 +283,9 @@ _____52A8_6001_6247_5F62_5B9E_73B0.prototype["销毁"] = function(self)
         _____7ACB_5373_9500_6BC1_63D0_793A_5708_7279_6548(self["提示圈特效"])
         self["提示圈特效"] = nil
     end
-    local ____opt_16 = self["参数"]["on销毁"]
-    if ____opt_16 ~= nil then
-        ____opt_16()
+    local ____opt_17 = self["参数"]["on销毁"]
+    if ____opt_17 ~= nil then
+        ____opt_17()
     end
 end
 __TS__SetDescriptor(

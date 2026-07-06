@@ -7,8 +7,12 @@
  * 2. 底层仍复用现有范围查询与敌友判断，避免每个技能自己重写筛选流程。
  * 3. 适合单目标、最近目标、最远目标、血量最低/最高、主目标+副目标这类常用技能选择。
  */
+import type { 英雄技能距离修正上下文 } from "../../04．机制组件/11．技能属性修正";
 
 const jass = require("jass.common") as any;
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
+};
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
@@ -32,6 +36,7 @@ const { 获取扇形区域单位 } = require("系统.03．技能系统.00．技�
     半径: number;
     方向角: number;
     扇形角度: number;
+    英雄技能距离修正?: any;
     单位筛选?: (this: void, 单位: any) => boolean;
     包含边界?: boolean;
   }) => any[];
@@ -44,6 +49,7 @@ const { 获取矩形区域单位 } = require("系统.03．技能系统.00．技�
     长度: number;
     宽度: number;
     方向角: number;
+    英雄技能距离修正?: any;
     单位筛选?: (this: void, 单位: any) => boolean;
     包含边界?: boolean;
   }) => any[];
@@ -56,6 +62,7 @@ export interface 范围目标筛选参数 {
   X: number;
   Y: number;
   半径: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   来源单位?: any;
   影响目标?: 技能筛选影响目标;
   排除单位?: any;
@@ -111,7 +118,8 @@ function 单位满足技能筛选条件(单位: any, 参数: 范围目标筛选�
 
 function 获取筛选后单位列表(参数: 范围目标筛选参数): any[] {
   if (参数.半径 <= 0) return [];
-  const 单位列表 = getUnitsInRange(参数.X, 参数.Y, 参数.半径);
+  const 半径 = 按英雄技能距离修正上下文修正距离(参数.半径, 参数.英雄技能距离修正, "效果半径");
+  const 单位列表 = getUnitsInRange(参数.X, 参数.Y, 半径);
   const 结果: any[] = [];
   for (const 单位 of 单位列表) {
     if (单位满足技能筛选条件(单位, 参数)) {
@@ -226,6 +234,7 @@ export function 选择扇形区域内最近目标(参数: 扇形目标筛选参�
     半径: 参数.半径,
     方向角: 参数.方向角,
     扇形角度: 参数.扇形角度,
+    英雄技能距离修正: 参数.英雄技能距离修正,
     包含边界: 参数.包含边界,
     单位筛选: function (单位: any): boolean {
       return 单位满足技能筛选条件(单位, 参数);
@@ -251,6 +260,7 @@ export function 选择矩形区域内最近目标(参数: 矩形目标筛选参�
     长度: 参数.长度,
     宽度: 参数.宽度,
     方向角: 参数.方向角,
+    英雄技能距离修正: 参数.英雄技能距离修正,
     包含边界: 参数.包含边界,
     单位筛选: function (单位: any): boolean {
       return 单位满足技能筛选条件(单位, 参数);

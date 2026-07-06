@@ -40,11 +40,6 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
   }) => number, priority?: number) => number;
 };
 
-/** 最近一次护盾吸收量（供伤害测试读取） */
-export let 最近护盾吸收量 = 0;
-/** 最近一次护盾吸收类型（供伤害测试读取） */
-export let 最近护盾吸收类型 = "";
-
 let shieldModifierRegistered = false;
 
 /**
@@ -73,22 +68,6 @@ function 取护盾闪色类型(this: void, 护盾: 护盾实例): number {
   if (护盾.类型 === 护盾类型.光) return 9;
   if (护盾.类型 === 护盾类型.暗) return 10;
   return 0;
-}
-
-function 取护盾吸收类型名称(this: void, 护盾: 护盾实例, 伤害: 伤害信息): string {
-  if (护盾.类型 === 护盾类型.物理) return "物理";
-  if (护盾.类型 === 护盾类型.魔法) return "魔法";
-  if (护盾.类型 === 护盾类型.强化) return "强化";
-  if (护盾.类型 === 护盾类型.金 || 护盾.类型 === 护盾类型.毒) return 护盾.类型 === 护盾类型.毒 ? "毒" : "金";
-  if (护盾.类型 === 护盾类型.木 || 护盾.类型 === 护盾类型.风) return 护盾.类型 === 护盾类型.风 ? "风" : "木";
-  if (护盾.类型 === 护盾类型.水 || 护盾.类型 === 护盾类型.冰) return 护盾.类型 === 护盾类型.冰 ? "冰" : "水";
-  if (护盾.类型 === 护盾类型.火) return "火";
-  if (护盾.类型 === 护盾类型.雷) return "雷";
-  if (护盾.类型 === 护盾类型.光) return "光";
-  if (护盾.类型 === 护盾类型.暗) return "暗";
-  if (伤害.是物理伤害) return "物理";
-  if (伤害.是魔法伤害) return "魔法";
-  return "通用";
 }
 
 function 构建伤害信息(
@@ -147,13 +126,6 @@ export function 吸收伤害(
     破碎护盾: [],
   };
 
-  // 重置上次吸收记录
-  最近护盾吸收量 = 0;
-  最近护盾吸收类型 = "";
-  const gReset = globalThis as any;
-  gReset._shieldAbsorbAmount = 0;
-  gReset._shieldAbsorbType = "";
-
   const 单位ID = 取句柄ID(目标);
   if (单位ID === 0) return 结果;
 
@@ -176,13 +148,6 @@ export function 吸收伤害(
     护盾.当前值 -= 吸收量;
     结果.剩余伤害 -= 吸收量;
     结果.总吸收量 += 吸收量;
-
-    // 记录最近吸收信息（供伤害测试显示）
-    最近护盾吸收量 = 结果.总吸收量;
-    最近护盾吸收类型 = 取护盾吸收类型名称(护盾, 伤害);
-    const g = globalThis as any;
-    g._shieldAbsorbAmount = 最近护盾吸收量;
-    g._shieldAbsorbType = 最近护盾吸收类型;
 
     // 护盾破碎
     if (护盾.当前值 <= 0) {
@@ -238,14 +203,6 @@ export function 注册护盾吸收钩子(): void {
         是普攻: context.isNormalAttack === true,
       }
     );
-    // 护盾条闪色
-    if (结果.总吸收量 > 0) {
-      const g = globalThis as any;
-      const 护盾条闪色 = (g as any)._shieldBarFlashColor;
-      if (typeof 护盾条闪色 === "function") {
-        护盾条闪色(context.target, 结果.闪色类型);
-      }
-    }
     return 结果.剩余伤害;
   }, 100);
 }

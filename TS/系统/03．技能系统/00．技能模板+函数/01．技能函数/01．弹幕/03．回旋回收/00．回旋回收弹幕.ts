@@ -6,8 +6,12 @@
  */
 
 import { 创建二阶贝塞尔轨迹, 创建原生弹幕, type 原生弹幕轨迹采样结果, type 原生弹幕内部实例 } from "../01．TS原生弹幕/index";
+import type { 英雄技能距离修正上下文 } from "../../../04．机制组件/11．技能属性修正";
 
 const jass = require("jass.common") as any;
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
+};
 
 const GetUnitX = jass.GetUnitX as (this: void, u: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, u: any) => number;
@@ -25,6 +29,7 @@ const SinBJ = (require("lib.扩展函数.BJ函数.12．数学函数") as {
 export interface 回旋回收弹幕参数 {
   施法者: any;
   距离: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   速度: number;
   曲线偏移?: number;
   命中半径?: number;
@@ -83,11 +88,12 @@ export function 创建回旋回收弹幕(this: void, 参数: 回旋回收弹幕�
   const startX = GetUnitX(施法者);
   const startY = GetUnitY(施法者);
   const face = GetUnitFacing(施法者);
-  const endX = startX + CosBJ(face) * 参数.距离;
-  const endY = startY + SinBJ(face) * 参数.距离;
+  const 距离 = 按英雄技能距离修正上下文修正距离(参数.距离, 参数.英雄技能距离修正, "弹幕飞行距离");
+  const endX = startX + CosBJ(face) * 距离;
+  const endY = startY + SinBJ(face) * 距离;
   const 偏移 = 参数.曲线偏移 ?? 180;
-  const ctrlX = startX + CosBJ(face + 90) * 偏移 + CosBJ(face) * 参数.距离 * 0.5;
-  const ctrlY = startY + SinBJ(face + 90) * 偏移 + SinBJ(face) * 参数.距离 * 0.5;
+  const ctrlX = startX + CosBJ(face + 90) * 偏移 + CosBJ(face) * 距离 * 0.5;
+  const ctrlY = startY + SinBJ(face + 90) * 偏移 + SinBJ(face) * 距离 * 0.5;
   const 去程距离 = 计算距离(startX, startY, endX, endY);
 
   创建原生弹幕({
@@ -125,7 +131,7 @@ export function 创建回旋回收弹幕(this: void, 参数: 回旋回收弹幕�
         附着特效模型: 参数.附着特效模型,
         速度: 参数.速度,
         生命周期: 回程锁定施法者 ? 5 : 计算持续时间(回程距离, 参数.速度),
-        最大距离: 回程锁定施法者 ? 参数.距离 * 3 : 回程距离,
+        最大距离: 回程锁定施法者 ? 距离 * 3 : 回程距离,
         轨迹采样器: 回程锁定施法者
           ? 创建回程锁定施法者轨迹(施法者, 参数.命中半径 ?? 96)
           : 创建二阶贝塞尔轨迹(returnStartX, returnStartY, returnCtrlX, returnCtrlY, ownerX, ownerY),

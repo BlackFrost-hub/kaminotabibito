@@ -1,0 +1,267 @@
+Option Explicit
+
+Public Sub 导出单位配置表()
+    Dim outDir As String
+    outDir = ThisWorkbook.Path & "\TS\系统\01．单位系统\08．单位配置表"
+    确保目录存在 outDir
+
+    导出单位表 ThisWorkbook, Array("杂鱼", "中立敌对"), outDir, "00．杂鱼配置表.ts", "杂鱼配置表"
+    导出单位表 ThisWorkbook, Array("精英"), outDir, "01．精英配置表.ts", "精英配置表"
+    导出单位表 ThisWorkbook, Array("Boss", "英雄Boss"), outDir, "02．Boss配置表.ts", "Boss配置表"
+    导出单位表 ThisWorkbook, Array("异界Boss"), outDir, "03．异界Boss配置表.ts", "异界Boss配置表"
+
+    MsgBox "单位配置表导出完成"
+End Sub
+
+Private Sub 导出单位表(ByVal wb As Workbook, ByVal sheetNames As Variant, ByVal outDir As String, ByVal fileName As String, ByVal tableName As String)
+    Dim ws As Worksheet
+    Dim fullPath As String
+    Dim lastRow As Long, lastCol As Long
+    Dim r As Long, c As Long
+    Dim idCol As Long
+    Dim s As String
+    Dim rowText As String
+    Dim hasField As Boolean
+    Dim fieldName As String
+    Dim fieldValue As String
+    Dim unitId As String
+    Dim reverseName As String
+
+    Set ws = 找到工作表(wb, sheetNames)
+    If ws Is Nothing Then
+        Debug.Print "未找到工作表: " & JoinVariant(sheetNames, "/")
+        Exit Sub
+    End If
+
+    lastRow = 获取最后行(ws)
+    lastCol = 获取最后列(ws)
+    idCol = 找字段列(ws, lastCol, "id")
+    If idCol = 0 Then
+        MsgBox "工作表【" & ws.name & "】找不到 id 列"
+        Exit Sub
+    End If
+
+    fullPath = outDir & "\" & fileName
+    reverseName = BuildReverseLookupName(tableName)
+
+    s = ""
+    s = s & "/** @noSelfInFile */" & vbCrLf
+    s = s & "/**" & vbCrLf
+    s = s & " * 自动生成文件，请勿手改。" & vbCrLf
+    s = s & " * 来源：lua生成物遍表格.xlsm / " & ws.name & vbCrLf
+    s = s & " */" & vbCrLf & vbCrLf
+    s = s & "import { 创建单位名反查器 } from ""./00．单位名反查工具"";" & vbCrLf & vbCrLf
+    s = s & "export const " & tableName & ": Record<string, Record<string, any>> = {" & vbCrLf
+
+    For r = 3 To lastRow
+        unitId = Trim$(CStr(ws.Cells(r, idCol).value))
+        If unitId <> "" Then
+            rowText = "  " & TsQuote(unitId) & ": {"
+            hasField = False
+
+            For c = 1 To lastCol
+                If c <> idCol Then
+                    If 列有有效数据(ws, c, 3, lastRow) Then
+                        fieldName = Trim$(CStr(ws.Cells(2, c).value))
+                        If fieldName <> "" Then
+                            fieldValue = 单元格转TS字面量(ws.Cells(r, c).value)
+                            If fieldValue <> "" Then
+                                If hasField Then rowText = rowText & ", "
+                                rowText = rowText & 字段名转TS键名(fieldName) & ": " & fieldValue
+                                hasField = True
+                            End If
+                        End If
+                    End If
+                End If
+            Next c
+
+            If hasField Then rowText = rowText & ", "
+            rowText = rowText & "unit: " & TsQuote(unitId)
+            rowText = rowText & "},"
+
+            s = s & rowText & vbCrLf
+        End If
+    Next r
+
+    s = s & "};" & vbCrLf & vbCrLf
+    If reverseName <> "" Then
+        s = s & "export const " & reverseName & " = 创建单位名反查器(" & tableName & ");" & vbCrLf & vbCrLf
+    End If
+    s = s & "export default " & tableName & ";" & vbCrLf
+
+    写UTF8文件 fullPath, s
+End Sub
+
+Private Function 找到工作表(ByVal wb As Workbook, ByVal sheetNames As Variant) As Worksheet
+    Dim i As Long
+    For i = LBound(sheetNames) To UBound(sheetNames)
+        On Error Resume Next
+        Set 找到工作表 = wb.Worksheets(CStr(sheetNames(i)))
+        On Error GoTo 0
+        If Not 找到工作表 Is Nothing Then Exit Function
+    Next i
+End Function
+
+Private Function 找字段列(ByVal ws As Worksheet, ByVal lastCol As Long, ByVal fieldName As String) As Long
+    Dim c As Long
+    Dim v1 As String
+    Dim v2 As String
+    Dim target As String
+
+    target = LCase$(Replace(Trim$(fieldName), " ", ""))
+
+    For c = 1 To lastCol
+        v1 = LCase$(Replace(Trim$(CStr(ws.Cells(1, c).value)), " ", ""))
+        v2 = LCase$(Replace(Trim$(CStr(ws.Cells(2, c).value)), " ", ""))
+
+        If v1 = target Or v2 = target Then
+            找字段列 = c
+            Exit Function
+        End If
+    Next c
+End Function
+
+Private Function 列有有效数据(ByVal ws As Worksheet, ByVal colIndex As Long, ByVal startRow As Long, ByVal endRow As Long) As Boolean
+    Dim r As Long
+    For r = startRow To endRow
+        If Trim$(CStr(ws.Cells(r, colIndex).value)) <> "" Then
+            列有有效数据 = True
+            Exit Function
+        End If
+    Next r
+End Function
+
+Private Function 获取最后行(ByVal ws As Worksheet) As Long
+    Dim lastCell As Range
+    Set lastCell = ws.Cells.Find(What:="*", After:=ws.Range("A1"), LookIn:=xlFormulas, LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlPrevious)
+    If lastCell Is Nothing Then
+        获取最后行 = 1
+    Else
+        获取最后行 = lastCell.row
+    End If
+End Function
+
+Private Function 获取最后列(ByVal ws As Worksheet) As Long
+    Dim lastCell As Range
+    Set lastCell = ws.Cells.Find(What:="*", After:=ws.Range("A1"), LookIn:=xlFormulas, LookAt:=xlPart, SearchOrder:=xlByColumns, SearchDirection:=xlPrevious)
+    If lastCell Is Nothing Then
+        获取最后列 = 1
+    Else
+        获取最后列 = lastCell.Column
+    End If
+End Function
+
+Private Function 单元格转TS字面量(ByVal v As Variant) As String
+    Dim s As String
+
+    If IsError(v) Then Exit Function
+    If IsEmpty(v) Then Exit Function
+
+    s = CStr(v)
+    If Trim$(s) = "" Then Exit Function
+
+    If LCase$(Trim$(s)) = "true" Or LCase$(Trim$(s)) = "false" Then
+        单元格转TS字面量 = LCase$(Trim$(s))
+        Exit Function
+    End If
+
+    If IsNumeric(v) Then
+        单元格转TS字面量 = CStr(v)
+        Exit Function
+    End If
+
+    s = Replace(s, vbCrLf, "\n")
+    s = Replace(s, vbCr, "\n")
+    s = Replace(s, vbLf, "\n")
+    s = Replace(s, "\", "\\")
+    s = Replace(s, Chr$(34), "\" & Chr$(34))
+
+    单元格转TS字面量 = Chr$(34) & s & Chr$(34)
+End Function
+
+Private Function 字段名转TS键名(ByVal s As String) As String
+    Dim i As Long
+    Dim ch As String
+    Dim ok As Boolean
+
+    s = Trim$(s)
+    If s = "" Then
+        字段名转TS键名 = ""
+        Exit Function
+    End If
+
+    ok = True
+    If Not ((Left$(s, 1) >= "A" And Left$(s, 1) <= "Z") Or (Left$(s, 1) >= "a" And Left$(s, 1) <= "z") Or Left$(s, 1) = "_") Then
+        ok = False
+    End If
+
+    For i = 1 To Len(s)
+        ch = Mid$(s, i, 1)
+        If Not ((ch >= "A" And ch <= "Z") Or (ch >= "a" And ch <= "z") Or (ch >= "0" And ch <= "9") Or ch = "_") Then
+            ok = False
+            Exit For
+        End If
+    Next i
+
+    If ok Then
+        字段名转TS键名 = s
+    Else
+        字段名转TS键名 = TsQuote(s)
+    End If
+End Function
+
+Private Function TsQuote(ByVal s As String) As String
+    s = Replace(s, "\", "\\")
+    s = Replace(s, Chr$(34), "\" & Chr$(34))
+    TsQuote = Chr$(34) & s & Chr$(34)
+End Function
+
+Private Sub 写UTF8文件(ByVal filePath As String, ByVal text As String)
+    Dim stm As Object
+    Set stm = CreateObject("ADODB.Stream")
+    stm.Type = 2
+    stm.Charset = "utf-8"
+    stm.Open
+    stm.WriteText text
+    stm.SaveToFile filePath, 2
+    stm.Close
+End Sub
+
+Private Sub 确保目录存在(ByVal folderPath As String)
+    Dim fso As Object
+    Dim parentPath As String
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    If fso.FolderExists(folderPath) Then Exit Sub
+
+    parentPath = fso.GetParentFolderName(folderPath)
+    If parentPath <> "" Then
+        If Not fso.FolderExists(parentPath) Then
+            确保目录存在 parentPath
+        End If
+    End If
+
+    If Not fso.FolderExists(folderPath) Then
+        fso.CreateFolder folderPath
+    End If
+End Sub
+
+Private Function JoinVariant(ByVal arr As Variant, ByVal sep As String) As String
+    Dim i As Long
+    For i = LBound(arr) To UBound(arr)
+        If i > LBound(arr) Then JoinVariant = JoinVariant & sep
+        JoinVariant = JoinVariant & CStr(arr(i))
+    Next i
+End Function
+
+Private Function BuildReverseLookupName(ByVal tableName As String) As String
+    If InStr(tableName, "杂鱼") > 0 Or InStr(tableName, "鏉傞奔") > 0 Then
+        BuildReverseLookupName = "按名字反查杂鱼单位ID"
+    ElseIf InStr(tableName, "精英") > 0 Or InStr(tableName, "绮捐嫳") > 0 Then
+        BuildReverseLookupName = "按名字反查精英单位ID"
+    ElseIf InStr(tableName, "异界Boss") > 0 Or InStr(tableName, "寮傜晫Boss") > 0 Then
+        BuildReverseLookupName = "按名字反查异界Boss单位ID"
+    ElseIf InStr(tableName, "Boss") > 0 Then
+        BuildReverseLookupName = "按名字反查Boss单位ID"
+    End If
+End Function

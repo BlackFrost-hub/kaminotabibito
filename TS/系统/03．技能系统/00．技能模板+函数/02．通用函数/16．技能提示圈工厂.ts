@@ -9,6 +9,7 @@
  */
 
 const jass = require("jass.common") as any;
+import type { 技能距离修正用途, 英雄技能距离修正上下文 } from "../04．机制组件/11．技能属性修正";
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
@@ -28,6 +29,9 @@ const {
   创建白色圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => void;
   创建渐变圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => any;
   创建双环提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => any;
+};
+const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
+  按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
 };
 
 export type 技能提示圈类型 =
@@ -57,6 +61,7 @@ export interface 技能提示圈配置 {
   外圈半径?: number;
   宽度?: number;
   长度?: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   朝向?: number;
   方向角?: number;
   扇形角度?: number;
@@ -107,18 +112,23 @@ function 取持续时间(this: void, 配置: 技能提示圈配置): number {
   return 1;
 }
 
-function 取半径(this: void, 配置: 技能提示圈配置): number {
-  if (配置.半径 != null) return 转数字(配置.半径, 0);
-  if (配置.提示半径 != null) return 转数字(配置.提示半径, 0);
-  if (配置.伤害半径 != null) return 转数字(配置.伤害半径, 0);
-  if (配置.安全区半径 != null) return 转数字(配置.安全区半径, 0);
-  if (配置.外圈半径 != null) return 转数字(配置.外圈半径, 0);
-  return 0;
+function 修正提示距离(this: void, 配置: 技能提示圈配置, 基础距离: number, 默认用途: 技能距离修正用途): number {
+  return 按英雄技能距离修正上下文修正距离(基础距离, 配置.英雄技能距离修正, 默认用途);
+}
+
+function 取半径(this: void, 配置: 技能提示圈配置, 默认用途: 技能距离修正用途 = "效果半径"): number {
+  let 半径 = 0;
+  if (配置.半径 != null) 半径 = 转数字(配置.半径, 0);
+  else if (配置.提示半径 != null) 半径 = 转数字(配置.提示半径, 0);
+  else if (配置.伤害半径 != null) 半径 = 转数字(配置.伤害半径, 0);
+  else if (配置.安全区半径 != null) 半径 = 转数字(配置.安全区半径, 0);
+  else if (配置.外圈半径 != null) 半径 = 转数字(配置.外圈半径, 0);
+  return 修正提示距离(配置, 半径, 默认用途);
 }
 
 function 取扇形尺寸(this: void, 配置: 技能提示圈配置): number {
   if (配置.扇形模型尺寸 != null) return 转数字(配置.扇形模型尺寸, 0.01);
-  const 半径 = 取半径(配置);
+  const 半径 = 取半径(配置, "扇形半径");
   if (半径 <= 0) return 0.01;
   return 半径 / 512;
 }
@@ -144,7 +154,7 @@ export function 创建技能提示圈(this: void, 配置: 技能提示圈配置)
 
   if (类型 === "矩形") {
     const 宽度 = 转数字(配置.宽度, 0);
-    const 长度 = 转数字(配置.长度, 0);
+    const 长度 = 修正提示距离(配置, 转数字(配置.长度, 0), "矩形长度");
     if (宽度 <= 0 || 长度 <= 0) return null;
     创建矩形提示圈(x, y, 宽度, 长度, 取朝向(配置), 持续时间, 动画速度);
     return null;

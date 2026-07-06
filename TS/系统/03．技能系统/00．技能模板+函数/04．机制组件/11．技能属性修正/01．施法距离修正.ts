@@ -52,6 +52,12 @@ export interface 技能距离修正选项 {
   最大距离?: number;
 }
 
+export interface 英雄技能距离修正上下文 extends 技能距离修正选项 {
+  单位: any;
+  技能ID: number | string;
+  用途?: 技能距离修正用途;
+}
+
 const 英雄技能全局施法距离修正表: Record<number, number | undefined> = {};
 const 英雄技能单技能施法距离修正表: Record<string, number | undefined> = {};
 const 英雄技能施法距离配置表: Record<string, 英雄技能施法距离配置 | undefined> = {};
@@ -123,6 +129,15 @@ export function 取英雄技能修正距离(this: void, 单位: any, 技能ID: n
   const min = 选项?.最小距离 ?? config?.最小距离;
   const max = 选项?.最大距离 ?? config?.最大距离;
   return 限制距离(基础距离 + 取英雄技能施法距离修正(单位, 技能ID), min, max);
+}
+
+export function 按英雄技能距离修正上下文修正距离(this: void, 基础距离: number, 上下文: 英雄技能距离修正上下文 | undefined, 默认用途: 技能距离修正用途 = "施法距离派生距离"): number {
+  if (上下文 == null) return 基础距离;
+  return 取英雄技能修正距离(上下文.单位, 上下文.技能ID, 基础距离, 上下文.用途 ?? 默认用途, {
+    吃施法距离加成: 上下文.吃施法距离加成,
+    最小距离: 上下文.最小距离,
+    最大距离: 上下文.最大距离,
+  });
 }
 
 export function 取英雄技能施法距离派生距离(this: void, 单位: any, 技能ID: number | string, 基础距离: number, 选项?: 技能距离修正选项): number {

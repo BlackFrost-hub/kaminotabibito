@@ -12,6 +12,8 @@ local ____exports = {}
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getUnitsInRange = ____require_result_0.getUnitsInRange
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
+local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_1["按英雄技能距离修正上下文修正距离"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local CreateGroup = jass.CreateGroup
@@ -83,26 +85,27 @@ ____exports["获取矩形区域单位"] = function(_____53C2_6570)
     if _____53C2_6570["长度"] <= 0 or _____53C2_6570["宽度"] <= 0 then
         return {}
     end
-    local _____7C97_7B5B_534A_5F84 = _____8BA1_7B97_77E9_5F62_7C97_7B5B_534A_5F84(_____53C2_6570["长度"], _____53C2_6570["宽度"])
+    local _____957F_5EA6 = _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____53C2_6570["长度"], _____53C2_6570["英雄技能距离修正"], "矩形长度")
+    local _____7C97_7B5B_534A_5F84 = _____8BA1_7B97_77E9_5F62_7C97_7B5B_534A_5F84(_____957F_5EA6, _____53C2_6570["宽度"])
     local _____5019_9009_5355_4F4D = getUnitsInRange(_____53C2_6570.X, _____53C2_6570.Y, _____7C97_7B5B_534A_5F84)
     local _____7ED3_679C = {}
     for ____, _____5355_4F4D in ipairs(_____5019_9009_5355_4F4D) do
         do
-            local ____exports__5355_4F4D_662F_5426_5728_77E9_5F62_533A_57DF_3 = ____exports["单位是否在矩形区域"]
-            local ____array_2 = __TS__SparseArrayNew(
+            local ____exports__5355_4F4D_662F_5426_5728_77E9_5F62_533A_57DF_4 = ____exports["单位是否在矩形区域"]
+            local ____array_3 = __TS__SparseArrayNew(
                 _____5355_4F4D,
                 _____53C2_6570.X,
                 _____53C2_6570.Y,
-                _____53C2_6570["长度"],
+                _____957F_5EA6,
                 _____53C2_6570["宽度"],
                 _____53C2_6570["方向角"]
             )
-            local ____53C2_6570__5305_542B_8FB9_754C_1 = _____53C2_6570["包含边界"]
-            if ____53C2_6570__5305_542B_8FB9_754C_1 == nil then
-                ____53C2_6570__5305_542B_8FB9_754C_1 = true
+            local ____53C2_6570__5305_542B_8FB9_754C_2 = _____53C2_6570["包含边界"]
+            if ____53C2_6570__5305_542B_8FB9_754C_2 == nil then
+                ____53C2_6570__5305_542B_8FB9_754C_2 = true
             end
-            __TS__SparseArrayPush(____array_2, ____53C2_6570__5305_542B_8FB9_754C_1)
-            if not ____exports__5355_4F4D_662F_5426_5728_77E9_5F62_533A_57DF_3(__TS__SparseArraySpread(____array_2)) then
+            __TS__SparseArrayPush(____array_3, ____53C2_6570__5305_542B_8FB9_754C_2)
+            if not ____exports__5355_4F4D_662F_5426_5728_77E9_5F62_533A_57DF_4(__TS__SparseArraySpread(____array_3)) then
                 goto __continue15
             end
             if _____53C2_6570["单位筛选"] ~= nil and not _____53C2_6570["单位筛选"](_____5355_4F4D) then
@@ -152,32 +155,37 @@ ____exports["获取条形区域单位"] = function(_____53C2_6570)
     if _____53C2_6570["宽度"] <= 0 then
         return {}
     end
-    local _____957F_5EA6 = _____8BA1_7B97_5750_6807_8DDD_79BB(_____53C2_6570["起点X"], _____53C2_6570["起点Y"], _____53C2_6570["终点X"], _____53C2_6570["终点Y"])
+    local _____539F_957F_5EA6 = _____8BA1_7B97_5750_6807_8DDD_79BB(_____53C2_6570["起点X"], _____53C2_6570["起点Y"], _____53C2_6570["终点X"], _____53C2_6570["终点Y"])
+    local _____957F_5EA6 = _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____539F_957F_5EA6, _____53C2_6570["英雄技能距离修正"], "直线长度")
     if _____957F_5EA6 <= 0 then
         return {}
     end
-    local _____4E2D_5FC3X = (_____53C2_6570["起点X"] + _____53C2_6570["终点X"]) / 2
-    local _____4E2D_5FC3Y = (_____53C2_6570["起点Y"] + _____53C2_6570["终点Y"]) / 2
+    local _____65B9_5411X = _____539F_957F_5EA6 > 0 and (_____53C2_6570["终点X"] - _____53C2_6570["起点X"]) / _____539F_957F_5EA6 or 0
+    local _____65B9_5411Y = _____539F_957F_5EA6 > 0 and (_____53C2_6570["终点Y"] - _____53C2_6570["起点Y"]) / _____539F_957F_5EA6 or 0
+    local _____7EC8_70B9X = _____53C2_6570["起点X"] + _____65B9_5411X * _____957F_5EA6
+    local _____7EC8_70B9Y = _____53C2_6570["起点Y"] + _____65B9_5411Y * _____957F_5EA6
+    local _____4E2D_5FC3X = (_____53C2_6570["起点X"] + _____7EC8_70B9X) / 2
+    local _____4E2D_5FC3Y = (_____53C2_6570["起点Y"] + _____7EC8_70B9Y) / 2
     local _____7C97_7B5B_534A_5F84 = _____8BA1_7B97_77E9_5F62_7C97_7B5B_534A_5F84(_____957F_5EA6, _____53C2_6570["宽度"])
     local _____5019_9009_5355_4F4D = getUnitsInRange(_____4E2D_5FC3X, _____4E2D_5FC3Y, _____7C97_7B5B_534A_5F84)
     local _____7ED3_679C = {}
     for ____, _____5355_4F4D in ipairs(_____5019_9009_5355_4F4D) do
         do
-            local ____exports__5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF_6 = ____exports["单位是否在条形区域"]
-            local ____array_5 = __TS__SparseArrayNew(
+            local ____exports__5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF_7 = ____exports["单位是否在条形区域"]
+            local ____array_6 = __TS__SparseArrayNew(
                 _____5355_4F4D,
                 _____53C2_6570["起点X"],
                 _____53C2_6570["起点Y"],
-                _____53C2_6570["终点X"],
-                _____53C2_6570["终点Y"],
+                _____7EC8_70B9X,
+                _____7EC8_70B9Y,
                 _____53C2_6570["宽度"]
             )
-            local ____53C2_6570__5305_542B_8FB9_754C_4 = _____53C2_6570["包含边界"]
-            if ____53C2_6570__5305_542B_8FB9_754C_4 == nil then
-                ____53C2_6570__5305_542B_8FB9_754C_4 = true
+            local ____53C2_6570__5305_542B_8FB9_754C_5 = _____53C2_6570["包含边界"]
+            if ____53C2_6570__5305_542B_8FB9_754C_5 == nil then
+                ____53C2_6570__5305_542B_8FB9_754C_5 = true
             end
-            __TS__SparseArrayPush(____array_5, ____53C2_6570__5305_542B_8FB9_754C_4)
-            if not ____exports__5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF_6(__TS__SparseArraySpread(____array_5)) then
+            __TS__SparseArrayPush(____array_6, ____53C2_6570__5305_542B_8FB9_754C_5)
+            if not ____exports__5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF_7(__TS__SparseArraySpread(____array_6)) then
                 goto __continue28
             end
             if _____53C2_6570["单位筛选"] ~= nil and not _____53C2_6570["单位筛选"](_____5355_4F4D) then

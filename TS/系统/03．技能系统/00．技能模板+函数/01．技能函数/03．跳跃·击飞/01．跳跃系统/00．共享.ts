@@ -4,6 +4,7 @@
  *
  * 包含类型定义、常量、工具函数和状态容器。
  */
+import type { 英雄技能距离修正上下文 } from "../../../04．机制组件/11．技能属性修正";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -79,6 +80,7 @@ export type 跳跃开始回调 = (单位: any, 跳跃ID: number) => void;
 
 export interface 通用跳跃参数 {
   距离: number;
+  英雄技能距离修正?: 英雄技能距离修正上下文;
   主单位?: any;
   主单位死亡时中断?: boolean;
   持续时间: number;

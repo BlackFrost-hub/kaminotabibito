@@ -149,6 +149,18 @@ ____exports["获取单位总护盾值"] = function(_____5355_4F4DID)
     end
     return total
 end
+--- 获取单位应显示到头顶血条的护盾值
+____exports["获取单位可显示护盾值"] = function(_____5355_4F4DID)
+    local ids = ____exports["获取单位护盾列表"](_____5355_4F4DID)
+    local total = 0
+    for ____, id in ipairs(ids) do
+        local _____5B9E_4F8B = _____62A4_76FE_6620_5C04:get(id)
+        if _____5B9E_4F8B ~= nil and _____5B9E_4F8B["显示护盾条"] then
+            total = total + _____5B9E_4F8B["当前值"]
+        end
+    end
+    return total
+end
 --- 获取单位指定类型护盾值
 ____exports["获取单位类型护盾值"] = function(_____5355_4F4DID, _____7C7B_578B)
     local ids = ____exports["获取单位护盾列表"](_____5355_4F4DID)
