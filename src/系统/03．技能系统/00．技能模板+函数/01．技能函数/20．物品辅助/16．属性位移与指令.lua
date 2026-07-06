@@ -45,8 +45,8 @@ local IsUnitAlly = jass.IsUnitAlly
 local GetHeroStr = jass.GetHeroStr
 local GetHeroAgi = jass.GetHeroAgi
 local GetHeroInt = jass.GetHeroInt
+local SetHeroInt = jass.SetHeroInt
 local AddHeroXP = jass.AddHeroXP
-local ModifyHeroStat = jass.ModifyHeroStat
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
@@ -86,13 +86,12 @@ local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local bj_HEROSTAT_INT = jass.bj_HEROSTAT_INT
-local bj_MODIFYMETHOD_ADD = jass.bj_MODIFYMETHOD_ADD
 local GetUnitStateJapi = japi.GetUnitState
 local DzSetUnitModel = japi.DzSetUnitModel
 local stringToFourCCSafe = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe
-local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e00D")
+local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e0FT")
 local _____9650_65F6_751F_547DBuffID = stringToFourCCSafe("BHwe")
+local _____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C = 0.000001
 local _____5F85_9500_6BC1_7279_6548_5217_8868 = {}
 local _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = false
 local function _____5904_7406_5F85_9500_6BC1_7279_6548()
@@ -147,12 +146,16 @@ ____exports["调整玩家属性"] = function(_____5355_4F4D, _____5C5E_6027_540D
     end
     local owner = GetOwningPlayer(_____5355_4F4D)
     local oldValue = __TS__Number(YDUserDataGetSafe("player", owner, _____5C5E_6027_540D, "real")) or 0
+    local newValue = oldValue + _____589E_91CF
+    if newValue < _____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C and newValue > -_____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C then
+        newValue = 0
+    end
     YDUserDataSetSafe(
         "player",
         owner,
         _____5C5E_6027_540D,
         "real",
-        oldValue + _____589E_91CF
+        newValue
     )
 end
 ____exports["调整单位属性"] = function(_____5355_4F4D, _____5C5E_6027_540D, _____589E_91CF)
@@ -160,12 +163,16 @@ ____exports["调整单位属性"] = function(_____5355_4F4D, _____5C5E_6027_540D
         return
     end
     local oldValue = __TS__Number(YDUserDataGetSafe("unit", _____5355_4F4D, _____5C5E_6027_540D, "real")) or 0
+    local newValue = oldValue + _____589E_91CF
+    if newValue < _____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C and newValue > -_____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C then
+        newValue = 0
+    end
     YDUserDataSetSafe(
         "unit",
         _____5355_4F4D,
         _____5C5E_6027_540D,
         "real",
-        oldValue + _____589E_91CF
+        newValue
     )
 end
 ____exports["读取玩家属性"] = function(_____5355_4F4D, _____5C5E_6027_540D)
@@ -200,7 +207,11 @@ ____exports["增加英雄经验与智力"] = function(_____82F1_96C4, _____6B21_
             i = i + 1
         end
     end
-    ModifyHeroStat(bj_HEROSTAT_INT, _____82F1_96C4, bj_MODIFYMETHOD_ADD, _____667A_529B)
+    SetHeroInt(
+        _____82F1_96C4,
+        GetHeroInt(_____82F1_96C4, false) + _____667A_529B,
+        true
+    )
 end
 ____exports["击退远离来源"] = function(_____6765_6E90, _____76EE_6807, _____8DDD_79BB, _____6301_7EED_65F6_95F4)
     if not _____5355_4F4D_5B58_6D3B(_____76EE_6807) then

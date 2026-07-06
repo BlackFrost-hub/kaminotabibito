@@ -23,7 +23,7 @@ const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品�
 };
 import { items as 装备数据 } from "../../01．装备数据";
 import { 通用物品技能槽位配置表 } from "../03．主动技能/00．公共/02．通用物品技能槽位配置";
-import { 刷新物品CD } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
+import { 刷新物品CD, 施加减速 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 import {
   物品主动技能测试发放顺序,
   物品主动技能测试命令列表,
@@ -33,7 +33,6 @@ import {
 
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const CreateItem = jass.CreateItem as (itemId: number, x: number, y: number) => any;
-const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
 const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => boolean;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
@@ -54,11 +53,13 @@ const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 const 模块名 = "物品主动技能测试";
 const 物品冷却刷新命令 = "wpcd";
+const 物品负面清除测试减速命令 = "wpslow";
 const 打印注册命令日志 = false;
 const 测试玩家名称 = "WorldEdit";
 const 红色玩家ID = 0;
 const 测试物品技能ID表: Record<number, number[] | undefined> = {};
 const 测试物品主动最大冷却秒表: Record<number, number | undefined> = {};
+const 盗贼神符远距测试距离 = 700;
 let 已初始化测试物品技能ID表 = false;
 
 function 获取测试单位(this: void): any {
@@ -144,13 +145,30 @@ function 发放装备(this: void, unit: any, 装备名: string): boolean {
     return false;
   }
   const itemTypeId = stringToFourCCSafe(rawId);
+  if (发放盗贼神符远距测试(unit, 装备名, rawId, itemTypeId)) return true;
   const item = CreateItem(itemTypeId, GetUnitX(unit), GetUnitY(unit));
   if (item == null || item === 0) {
     debugLogForce(模块名, "创建装备失败", 装备名, rawId, itemTypeId);
     return false;
   }
-  UnitAddItem(unit, item);
-  debugLogForce(模块名, "已创建并加入背包", 装备名, rawId);
+  IssueTargetOrder(unit, "smart", item);
+  debugLogForce(模块名, "已创建在脚下并命令拾取", 装备名, rawId);
+  return true;
+}
+
+function 发放盗贼神符远距测试(this: void, unit: any, 装备名: string, rawId: string, itemTypeId: number): boolean {
+  let offsetX = 0;
+  if (rawId === "I0FL") offsetX = 盗贼神符远距测试距离;
+  else if (rawId === "I0FK") offsetX = -盗贼神符远距测试距离;
+  else return false;
+
+  const item = CreateItem(itemTypeId, GetUnitX(unit) + offsetX, GetUnitY(unit));
+  if (item == null || item === 0) {
+    debugLogForce(模块名, "创建盗贼神符失败", 装备名, rawId, itemTypeId);
+    return true;
+  }
+  const orderOk = IssueTargetOrder(unit, "smart", item);
+  debugLogForce(模块名, "已创建盗贼神符远距测试并命令拾取", 装备名, rawId, "距离", 盗贼神符远距测试距离, "ownerPid", GetPlayerId(GetOwningPlayer(unit)), "orderOk", orderOk);
   return true;
 }
 
@@ -198,6 +216,8 @@ function 初始化测试物品技能ID表(this: void): void {
   for (let i = 0; i < 通用物品技能槽位配置表.length; i++) {
     const 配置 = 通用物品技能槽位配置表[i];
     if (测试物品RawID表[配置.物编ID] === true) {
+      const itemTypeId = stringToFourCCSafe(配置.物编ID);
+      if (itemTypeId !== 0) 测试物品技能ID表[itemTypeId] = [];
       添加测试物品技能ID(配置.物编ID, 配置.技能ID);
       记录测试物品主动最大冷却(配置.物编ID, 配置.冷却时间);
     }
@@ -236,6 +256,19 @@ function on聊天刷新物品冷却(this: void, player: any, _command: string): 
   debugLogForce(模块名, "已刷新测试物品冷却", "英雄数", heroes.length, "技能数", 刷新数量);
 }
 
+function on聊天挂载减速测试(this: void, player: any, _command: string): void {
+  if (!是允许物品测试玩家(player)) return;
+
+  const unit = 获取玩家测试单位(player);
+  if (unit == null || unit === 0) {
+    debugLogForce(模块名, "未找到红色测试玩家英雄");
+    return;
+  }
+
+  施加减速(unit, unit, 0.5, 12);
+  debugLogForce(模块名, "已给测试英雄施加减速Buff", "持续秒数", 12, "减速比例", 0.5);
+}
+
 function 发放单个装备(this: void, unit: any, 序号: number): void {
   丢弃测试装备(unit);
   if (序号 > 0 && 序号 <= 物品主动技能测试发放顺序.length) {
@@ -267,9 +300,10 @@ for (let i = 0; i < 物品主动技能测试命令列表.length; i++) {
   注册聊天命令监听(物品主动技能测试命令列表[i], on聊天wp测试);
 }
 注册聊天命令监听(物品冷却刷新命令, on聊天刷新物品冷却);
+注册聊天命令监听(物品负面清除测试减速命令, on聊天挂载减速测试);
 
 if (打印注册命令日志) {
-  debugLogForce(模块名, "已注册测试命令", 物品主动技能测试命令说明文本列表.join(" | "), 物品冷却刷新命令 + "=刷新当前玩家英雄装备冷却");
+  debugLogForce(模块名, "已注册测试命令", 物品主动技能测试命令说明文本列表.join(" | "), 物品冷却刷新命令 + "=刷新当前玩家英雄装备冷却", 物品负面清除测试减速命令 + "=给当前测试英雄挂减速Buff");
 }
 
 export {};

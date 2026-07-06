@@ -11,8 +11,10 @@ local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用�
 local createUnitEffect = ____require_result_0.createUnitEffect
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
+local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+local _____51CF_5C11_9B54_6CD5_503C = ____require_result_1["减少魔法值"]
+local _____589E_52A0_9B54_6CD5_503C = ____require_result_1["增加魔法值"]
 local function _____662F_5426_4E3A_6697_5E7D_4EA1_6212(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
@@ -30,22 +32,17 @@ ____exports["处理暗幽亡戒使用"] = function(_____4E0A_4E0B_6587)
         return
     end
     local _____8F6C_79FB_503C = GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MANA) * _____6697_5E7D_4EA1_6212_914D_7F6E["魔法转移比例"]
-    SetUnitState(
-        _____76EE_6807_5355_4F4D,
-        UNIT_STATE_MANA,
-        GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_MANA) + _____8F6C_79FB_503C
-    )
+    local _____5B9E_9645_8F6C_79FB_503C = -_____51CF_5C11_9B54_6CD5_503C(_____65BD_6CD5_5355_4F4D, _____8F6C_79FB_503C, true, false)
+    if not (_____5B9E_9645_8F6C_79FB_503C > 0) then
+        return
+    end
+    _____589E_52A0_9B54_6CD5_503C(_____76EE_6807_5355_4F4D, _____5B9E_9645_8F6C_79FB_503C, true, false)
     createUnitEffect(
         _____76EE_6807_5355_4F4D,
         _____6697_5E7D_4EA1_6212_914D_7F6E["特效挂点"],
         _____6697_5E7D_4EA1_6212_914D_7F6E["特效路径"],
         _____6697_5E7D_4EA1_6212_914D_7F6E["特效持续时间"],
         "暗幽亡戒"
-    )
-    SetUnitState(
-        _____65BD_6CD5_5355_4F4D,
-        UNIT_STATE_MANA,
-        GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MANA) - _____8F6C_79FB_503C
     )
 end
 return ____exports

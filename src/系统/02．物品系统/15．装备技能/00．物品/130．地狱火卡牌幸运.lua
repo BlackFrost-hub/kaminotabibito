@@ -30,7 +30,7 @@ local function _____6062_590D_81EA_8EAB_6700_5927_751F_547D_767E_5206_6BD4(sourc
         HealTarget = source,
         HealAmount = _____6700_5927_751F_547D * 0.02,
         ItemHeal = true,
-        HealEffect = false
+        HealEffect = true
     })
 end
 local function _____9020_6210_989D_5916_7269_7406_4F24_5BB3(source, target)

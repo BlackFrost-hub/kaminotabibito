@@ -10,6 +10,8 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createUnitEffect = ____require_result_0.createUnitEffect
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____6E05_9664_5355_4F4D_8D1F_9762Buff_5408_96C6 = ____require_result_1["清除单位负面Buff合集"]
 local GetItemTypeId = jass.GetItemTypeId
 local UnitRemoveBuffsEx = jass.UnitRemoveBuffsEx
 local EXSetEffectSize = japi.EXSetEffectSize
@@ -49,5 +51,6 @@ ____exports["处理焰虚宝珠使用"] = function(_____4E0A_4E0B_6587)
         false,
         true
     )
+    _____6E05_9664_5355_4F4D_8D1F_9762Buff_5408_96C6(_____76EE_6807_5355_4F4D)
 end
 return ____exports

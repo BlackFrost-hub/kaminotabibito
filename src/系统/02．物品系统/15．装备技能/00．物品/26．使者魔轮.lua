@@ -8,6 +8,11 @@ local ____13_FF0E_4F24_5BB3_4FEE_6B63_9608_503C_89E6_53D1 = require("系统.03�
 local _____521B_5EFA_4F24_5BB3_4FEE_6B63_9608_503C_89E6_53D1 = ____13_FF0E_4F24_5BB3_4FEE_6B63_9608_503C_89E6_53D1["创建伤害修正阈值触发"]
 local ____21_FF0E_533A_57DF_627F_4F24_5438_6536_573A = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.21．区域承伤吸收场")
 local _____521B_5EFA_533A_57DF_627F_4F24_5438_6536_573A = ____21_FF0E_533A_57DF_627F_4F24_5438_6536_573A["创建区域承伤吸收场"]
+local ____07_FF0E_62A4_76FE = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾")
+local _____521B_5EFA_4E16_754C_5750_6807_62A4_76FE_6761 = ____07_FF0E_62A4_76FE["创建世界坐标护盾条"]
+local _____66F4_65B0_4E16_754C_5750_6807_62A4_76FE_6761 = ____07_FF0E_62A4_76FE["更新世界坐标护盾条"]
+local _____9500_6BC1_4E16_754C_5750_6807_62A4_76FE_6761 = ____07_FF0E_62A4_76FE["销毁世界坐标护盾条"]
+local _____62A4_76FE_7C7B_578B = ____07_FF0E_62A4_76FE["护盾类型"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -23,7 +28,6 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local GetUnitStateJapi = japi.GetUnitState
-local SetUnitState = jass.SetUnitState
 local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local _____5DF2_6CE8_518C_4F7F_8005_9B54_8F6E_88AB_52A8_4FEE_6B63 = false
@@ -81,7 +85,7 @@ local function ____on_4F7F_8005_9B54_8F6E_88AB_52A8_4F24_5BB3_4FEE_6B63(context)
         return context.currentDamage
     end
     local _____6D88_8017_9B54_6CD5 = _____5438_6536_91CF / _____4F7F_8005_9B54_8F6E_914D_7F6E["被动每点魔法吸收伤害"]
-    _____51CF_5C11_9B54_6CD5_503C(_____53D7_4F24_5355_4F4D, _____6D88_8017_9B54_6CD5, true, true)
+    _____51CF_5C11_9B54_6CD5_503C(_____53D7_4F24_5355_4F4D, _____6D88_8017_9B54_6CD5, true, false)
     _____64AD_653E_9B54_6CD5_5438_6536_62A4_76FE_7279_6548({
         ["单位"] = _____53D7_4F24_5355_4F4D,
         ["是否有特效"] = _____4F7F_8005_9B54_8F6E_914D_7F6E["被动是否有特效"],
@@ -110,7 +114,17 @@ local function _____521D_59CB_5316_4F7F_8005_9B54_8F6E_88AB_52A8()
     })
 end
 local function _____6CE8_518C_4F7F_8005_9B54_8F6E_9B54_76FE(_____65BD_6CD5_5355_4F4D, x, y, _____62A4_76FE_503C)
-    _____521B_5EFA_533A_57DF_627F_4F24_5438_6536_573A({
+    local _____62A4_76FE_6761 = _____521B_5EFA_4E16_754C_5750_6807_62A4_76FE_6761({
+        X = x,
+        Y = y,
+        Z = 180,
+        ["最大值"] = _____62A4_76FE_503C,
+        ["当前值"] = _____62A4_76FE_503C,
+        ["类型"] = _____62A4_76FE_7C7B_578B["通用"],
+        ["持续时间"] = _____4F7F_8005_9B54_8F6E_914D_7F6E["持续时间"],
+        ["名称"] = "使者魔轮魔盾"
+    })
+    local _____5438_6536_573A = _____521B_5EFA_533A_57DF_627F_4F24_5438_6536_573A({
         ["名称"] = "使者魔轮魔盾",
         ["施法单位"] = _____65BD_6CD5_5355_4F4D,
         X = x,
@@ -122,8 +136,17 @@ local function _____6CE8_518C_4F7F_8005_9B54_8F6E_9B54_76FE(_____65BD_6CD5_5355_
         ["特效尺寸"] = _____4F7F_8005_9B54_8F6E_914D_7F6E["特效尺寸"],
         ["只影响友军"] = true,
         ["包含同玩家单位"] = true,
-        ["吸收量限制为剩余值"] = false
+        ["吸收量限制为剩余值"] = false,
+        ["on吸收"] = function(event)
+            _____66F4_65B0_4E16_754C_5750_6807_62A4_76FE_6761(_____62A4_76FE_6761, event["剩余吸收值"])
+        end,
+        ["on结束"] = function()
+            _____9500_6BC1_4E16_754C_5750_6807_62A4_76FE_6761(_____62A4_76FE_6761)
+        end
     })
+    if _____5438_6536_573A == nil then
+        _____9500_6BC1_4E16_754C_5750_6807_62A4_76FE_6761(_____62A4_76FE_6761)
+    end
 end
 ____exports["处理使者魔轮使用"] = function(_____4E0A_4E0B_6587)
     if not _____662F_5426_4E3A_4F7F_8005_9B54_8F6E(_____4E0A_4E0B_6587["物品"]) then
@@ -138,12 +161,11 @@ ____exports["处理使者魔轮使用"] = function(_____4E0A_4E0B_6587)
     if not (_____6D88_8017_9B54_6CD5 > 0) then
         return
     end
-    SetUnitState(
-        _____65BD_6CD5_5355_4F4D,
-        UNIT_STATE_MANA,
-        GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MANA) - _____6D88_8017_9B54_6CD5
-    )
-    _____6CE8_518C_4F7F_8005_9B54_8F6E_9B54_76FE(_____65BD_6CD5_5355_4F4D, _____4E0A_4E0B_6587["目标X"], _____4E0A_4E0B_6587["目标Y"], _____6D88_8017_9B54_6CD5)
+    local _____5B9E_9645_6D88_8017_9B54_6CD5 = -_____51CF_5C11_9B54_6CD5_503C(_____65BD_6CD5_5355_4F4D, _____6D88_8017_9B54_6CD5, true, false)
+    if not (_____5B9E_9645_6D88_8017_9B54_6CD5 > 0) then
+        return
+    end
+    _____6CE8_518C_4F7F_8005_9B54_8F6E_9B54_76FE(_____65BD_6CD5_5355_4F4D, _____4E0A_4E0B_6587["目标X"], _____4E0A_4E0B_6587["目标Y"], _____5B9E_9645_6D88_8017_9B54_6CD5)
 end
 _____521D_59CB_5316_4F7F_8005_9B54_8F6E_88AB_52A8()
 return ____exports

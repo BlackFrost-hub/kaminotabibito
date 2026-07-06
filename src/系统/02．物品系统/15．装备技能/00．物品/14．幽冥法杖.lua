@@ -9,13 +9,15 @@ local _____5E7D_51A5_6CD5_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_0.createUnitEffect
+local createTimedEffect = ____require_result_0.createTimedEffect
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local getObjectPropertyRealSafe = ____require_result_1.getObjectPropertyRealSafe
 local ObjectType = ____require_result_1.ObjectType
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local KillUnit = jass.KillUnit
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -38,13 +40,12 @@ ____exports["处理幽冥法杖使用"] = function(_____4E0A_4E0B_6587)
     if GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_MAX_LIFE) * _____5E7D_51A5_6CD5_6756_914D_7F6E["斩杀生命比例"] < GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_LIFE) then
         return
     end
-    KillUnit(_____76EE_6807_5355_4F4D)
-    local _____7279_6548 = createUnitEffect(
-        _____76EE_6807_5355_4F4D,
-        _____5E7D_51A5_6CD5_6756_914D_7F6E["特效挂点"],
+    local _____7279_6548 = createTimedEffect(
         _____5E7D_51A5_6CD5_6756_914D_7F6E["特效路径"],
-        _____5E7D_51A5_6CD5_6756_914D_7F6E["特效持续时间"],
-        "幽冥法杖"
+        GetUnitX(_____76EE_6807_5355_4F4D),
+        GetUnitY(_____76EE_6807_5355_4F4D),
+        0,
+        _____5E7D_51A5_6CD5_6756_914D_7F6E["特效持续时间"]
     )
     if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
         EXSetEffectSize(
@@ -56,5 +57,6 @@ ____exports["处理幽冥法杖使用"] = function(_____4E0A_4E0B_6587)
             )
         )
     end
+    KillUnit(_____76EE_6807_5355_4F4D)
 end
 return ____exports

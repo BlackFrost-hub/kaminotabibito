@@ -20,6 +20,9 @@ ____exports["单位存活"] = function(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
 end
 ____exports["是技能伤害"] = function(snapshot)
+    return snapshot ~= nil and snapshot.isEquipmentSkillDamage ~= true and (snapshot.isSkillDamage == true or snapshot.isSkillAttack == true or snapshot.isWrappedSkillDamage == true)
+end
+____exports["是任意封装技能伤害"] = function(snapshot)
     return snapshot ~= nil and (snapshot.isSkillDamage == true or snapshot.isSkillAttack == true or snapshot.isWrappedSkillDamage == true)
 end
 ____exports["是AOE技能伤害"] = function(snapshot)

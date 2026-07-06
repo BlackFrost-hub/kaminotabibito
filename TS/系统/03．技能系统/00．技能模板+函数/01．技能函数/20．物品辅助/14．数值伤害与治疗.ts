@@ -105,7 +105,7 @@ const stringToFourCCSafe = (require("lib.扩展函数.封装函数.01．通用�
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 }).stringToFourCCSafe;
 
-const 火把单位类型ID = stringToFourCCSafe("e00D");
+const 火把单位类型ID = stringToFourCCSafe("e0FT");
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
 
 type 待销毁特效记录 = {
@@ -207,11 +207,11 @@ export function 执行治疗(this: void, 来源: any, 目标: any, 生命: numbe
     HealAmount: 生命,
     HealManaAmount: 魔法,
     ItemHeal: true,
-    HealEffect: false,
-    UseDefaultHealEffect: false,
+    HealEffect: 生命 > 0,
+    UseDefaultHealEffect: 生命 > 0,
     HealEffectPath: undefined,
-    ManaEffect: false,
-    UseDefaultManaEffect: false,
+    ManaEffect: 魔法 > 0,
+    UseDefaultManaEffect: 魔法 > 0,
     ManaEffectPath: undefined,
   });
 }

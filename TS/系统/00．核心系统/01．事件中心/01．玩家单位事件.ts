@@ -6,9 +6,22 @@ const jass = require("jass.common") as any;
 
 export const DEFAULT_PLAYER_UNIT_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 13] as const;
 
+export interface PlayerUnitItemEventContext {
+  triggerUnit: any;
+  triggerPlayer: any;
+  triggerEventId: any;
+  manipulatedItem: any;
+}
+
 const dispatchTriggers: Record<string, any[]> = {};
 const registeredKeys: Record<string, boolean> = {};
+const itemEventContextStack: PlayerUnitItemEventContext[] = [];
 let masterTrigger: any = null;
+
+const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
+const GetTriggerPlayer = jass.GetTriggerPlayer as (this: void) => any;
+const GetTriggerEventId = jass.GetTriggerEventId as (this: void) => any;
+const GetManipulatedItem = jass.GetManipulatedItem as (this: void) => any;
 
 function normalizeFilter(filter?: any): any {
   return filter == null ? null : filter;
@@ -20,10 +33,30 @@ function eventKey(player: any, eventId: any): string {
 }
 
 function currentEventKey(): string {
-  const player = jass.GetTriggerPlayer();
+  const player = GetTriggerPlayer();
   const playerId = jass.GetPlayerId(player);
-  const eventId = jass.GetTriggerEventId();
+  const eventId = GetTriggerEventId();
   return tostring(playerId) + ":" + tostring(eventId);
+}
+
+function 是物品单位事件(eventId: any): boolean {
+  return eventId === jass.EVENT_PLAYER_UNIT_PICKUP_ITEM
+    || eventId === jass.EVENT_PLAYER_UNIT_DROP_ITEM
+    || eventId === jass.EVENT_PLAYER_UNIT_USE_ITEM;
+}
+
+function 捕获物品单位事件上下文(): PlayerUnitItemEventContext {
+  const eventId = GetTriggerEventId();
+  return {
+    triggerUnit: GetTriggerUnit(),
+    triggerPlayer: GetTriggerPlayer(),
+    triggerEventId: eventId,
+    manipulatedItem: 是物品单位事件(eventId) ? GetManipulatedItem() : null,
+  };
+}
+
+export function 取当前玩家单位物品事件上下文(this: void): PlayerUnitItemEventContext | undefined {
+  return itemEventContextStack[itemEventContextStack.length - 1];
 }
 
 function hasTrigger(list: any[], trig: any): boolean {
@@ -45,7 +78,10 @@ function dispatchPlayerUnitEvent(key: string): void {
 }
 
 function dispatchPlayerUnitEventMaster(): void {
+  const context = 捕获物品单位事件上下文();
+  itemEventContextStack.push(context);
   dispatchPlayerUnitEvent(currentEventKey());
+  itemEventContextStack.pop();
 }
 
 function ensureMasterTrigger(): any {

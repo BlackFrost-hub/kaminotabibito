@@ -32,6 +32,8 @@ const GetSpellTargetX = jass.GetSpellTargetX as () => number;
 const GetSpellTargetY = jass.GetSpellTargetY as () => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const GetSpellTargetDestructable = jass.GetSpellTargetDestructable as () => any;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const Location = jass.Location as (x: number, y: number) => any;
 const RemoveLocation = jass.RemoveLocation as (whichLocation: any) => void;
@@ -47,6 +49,7 @@ type 缓存技能上下文 = {
 
 const 监听列表: 物品技能事件回调[] = [];
 const 施法者技能上下文表: Record<number, 缓存技能上下文 | undefined> = {};
+const 施法者已兜底分发表: Record<number, boolean | undefined> = {};
 
 let 已初始化 = false;
 let 使用物品触发器: any = null;
@@ -106,6 +109,11 @@ function 分发物品技能事件监听(上下文: 物品技能事件上下文):
 function 处理物品技能生效(this: void, 施法单位: any, 技能ID: number): void {
   if (施法单位 == null || 施法单位 === 0) return;
   if (技能ID == null || 技能ID === 0) return;
+  const 施法者ID = 获取施法者缓存键(施法单位);
+  if (施法者ID !== 0 && 施法者已兜底分发表[施法者ID] === true) {
+    delete 施法者已兜底分发表[施法者ID];
+    return;
+  }
   缓存技能生效上下文(施法单位, 技能ID);
 }
 
@@ -121,7 +129,19 @@ function 处理使用物品事件(): void {
 
   const 已缓存上下文 = 施法者技能上下文表[施法者ID];
   delete 施法者技能上下文表[施法者ID];
-  if (已缓存上下文 == null) return;
+  if (已缓存上下文 == null) {
+    施法者已兜底分发表[施法者ID] = true;
+    分发物品技能事件监听({
+      施法单位,
+      物品,
+      技能ID: 0,
+      目标X: GetUnitX(施法单位),
+      目标Y: GetUnitY(施法单位),
+      目标单位: null,
+      目标可破坏物: null,
+    });
+    return;
+  }
   if (已缓存上下文.技能ID == null || 已缓存上下文.技能ID === 0) return;
 
   分发物品技能事件监听({

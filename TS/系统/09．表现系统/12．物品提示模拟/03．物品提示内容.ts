@@ -35,6 +35,45 @@ function 物品有主动技能(this: void, itemTypeId: number): boolean {
   return (abilityList.split(",")[0] || "").trim() !== "";
 }
 
+function 去除颜色控制码(this: void, text: string): string {
+  let result = "";
+  let index = 0;
+  while (index < text.length) {
+    const prefix = text.substring(index, index + 2);
+    if (prefix === "|r") {
+      index += 2;
+      continue;
+    }
+    if (prefix === "|c" && index + 10 <= text.length) {
+      index += 10;
+      continue;
+    }
+    result += text.charAt(index);
+    index++;
+  }
+  return result;
+}
+
+function 是否纯控制码行(this: void, text: string): boolean {
+  return 去除颜色控制码(text).trim() === "";
+}
+
+function 清理物品提示正文(this: void, text: string): string {
+  if (text === "") return "";
+  const 原文以颜色结束 = text.length >= 2 && text.substring(text.length - 2) === "|r";
+  const lines = text.split("|n");
+  const cleaned: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (是否纯控制码行(lines[i])) continue;
+    cleaned.push(lines[i]);
+  }
+  let result = cleaned.join("|n");
+  if (原文以颜色结束 && result !== "" && result.substring(result.length - 2) !== "|r") {
+    result += "|r";
+  }
+  return result;
+}
+
 function 取物品槽位小键盘(this: void, slot: number): string {
   if (slot === 0) return "7";
   if (slot === 1) return "8";
@@ -60,7 +99,8 @@ export function 构建物品提示内容(this: void, item: any, hero?: any): 物
 
   const name = GetItemName(item) || "";
   const rawText = 安全取物品实例数据字符串(item, itemTypeId, 3) || "";
-  const dynamicText = hero != null && hero !== 0 ? 渲染动态文本(hero, rawText, { appendAltHint: false, preserveFormula: true }) : rawText;
+  const renderedText = hero != null && hero !== 0 ? 渲染动态文本(hero, rawText, { appendAltHint: false, preserveFormula: true }) : rawText;
+  const dynamicText = 清理物品提示正文(renderedText);
   const manaCost = 取物品主动蓝耗(itemTypeId);
   const activeUsable = 物品有主动技能(itemTypeId);
   const activeUseHotkey = activeUsable ? 取物品当前小键盘快捷键(hero, item) : "";

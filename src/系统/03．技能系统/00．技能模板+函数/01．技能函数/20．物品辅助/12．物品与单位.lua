@@ -51,6 +51,7 @@ local DestroyEffect = jass.DestroyEffect
 local IsPointBlighted = jass.IsPointBlighted
 local SetItemCharges = jass.SetItemCharges
 local GetItemCharges = jass.GetItemCharges
+local RemoveItem = jass.RemoveItem
 local UnitApplyTimedLife = jass.UnitApplyTimedLife
 local SetUnitScale = jass.SetUnitScale
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
@@ -89,7 +90,7 @@ local bj_MODIFYMETHOD_ADD = jass.bj_MODIFYMETHOD_ADD
 local GetUnitStateJapi = japi.GetUnitState
 local DzSetUnitModel = japi.DzSetUnitModel
 local stringToFourCCSafe = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe
-local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e00D")
+local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e0FT")
 local _____9650_65F6_751F_547DBuffID = stringToFourCCSafe("BHwe")
 local _____5F85_9500_6BC1_7279_6548_5217_8868 = {}
 local _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = false
@@ -163,6 +164,14 @@ ____exports["增加物品次数"] = function(_____5355_4F4D, _____7269_54C1_7C7B
         next = _____6700_5927_503C
     end
     ____exports["设置物品次数"](_____5355_4F4D, _____7269_54C1_7C7B_578BID, next)
+end
+____exports["移除已用尽次数物品"] = function(_____7269_54C1)
+    if _____7269_54C1 == nil or _____7269_54C1 == 0 then
+        return
+    end
+    if GetItemCharges(_____7269_54C1) <= 0 then
+        RemoveItem(_____7269_54C1)
+    end
 end
 ____exports["单位存活"] = function(_____5355_4F4D)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then

@@ -3,7 +3,7 @@ local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
 local ____exports = {}
-local _____53D6_539F_751F_8840_6761_5E27, _____9690_85CF_5355_4F4D_539F_751F_8840_6761, _____5355_4F4D_5B58_6D3B, _____5355_4F4D_53EF_6CE8_518C_8840_6761, _____53D6_5934_9876_9AD8_5EA6, _____5E94_663E_793A_540D_5B57, _____53BB_9664_9B54_517D_989C_8272_7801, _____53D6_8840_6761_540D_5B57_6587_672C, _____53D6_751F_547D_8D34_56FE, _____66F4_65B0_751F_547D_8D34_56FE, _____9690_85CF_62A4_76FE_5206_6BB5, _____7ED1_5B9A_5E27_5230_5355_4F4D, _____6FC0_6D3B_7ED1_5B9A_663E_793A, _____8C03_6574_6839_6846_5C3A_5BF8, _____521D_59CB_5316_5E27_5185_5BB9, jass, GetHandleId, IsUnitType, IsUnitEnemy, GetLocalPlayer, GetUnitAbilityLevel, GetUnitState, GetUnitLevel, GetUnitName, GetUnitTypeId, DzFrameShow, DzFrameSetSize, DzFrameSetTexture, DzFrameSetText, DzFrameBindWidget, DzSetUnitPreselectUIVisible, DzFrameGetUnitHpBar, _____751F_547D_72B6_6001, _____6700_5927_751F_547D_72B6_6001, _____6700_5927_9B54_6CD5_72B6_6001, _____8757_866B_6280_80FDID, _____5355_4F4D_8840_6761_8868, _____5355_4F4DID_5217_8868
+local _____53D6_539F_751F_8840_6761_5E27, _____9690_85CF_5355_4F4D_539F_751F_8840_6761, _____9650_523601, _____5355_4F4D_5B58_6D3B, _____5355_4F4D_53EF_6CE8_518C_8840_6761, _____53D6_5934_9876_9AD8_5EA6, _____5E94_663E_793A_540D_5B57, _____53BB_9664_9B54_517D_989C_8272_7801, _____53D6_8840_6761_540D_5B57_6587_672C, _____53D6_751F_547D_8D34_56FE, _____66F4_65B0_751F_547D_8D34_56FE, _____9690_85CF_62A4_76FE_5206_6BB5, _____7ED1_5B9A_5E27_5230_5355_4F4D, _____6FC0_6D3B_7ED1_5B9A_663E_793A, _____8C03_6574_6839_6846_5C3A_5BF8, _____521D_59CB_5316_5E27_5185_5BB9, jass, GetHandleId, IsUnitType, IsUnitEnemy, GetLocalPlayer, GetUnitAbilityLevel, GetUnitState, GetUnitLevel, GetUnitName, GetUnitTypeId, DzFrameShow, DzFrameSetSize, DzFrameSetTexture, DzFrameSetText, DzFrameBindWidget, DzSetUnitPreselectUIVisible, DzFrameGetUnitHpBar, _____751F_547D_72B6_6001, _____6700_5927_751F_547D_72B6_6001, _____6700_5927_9B54_6CD5_72B6_6001, _____8757_866B_6280_80FDID, _____5355_4F4D_8840_6761_8868, _____5355_4F4DID_5217_8868
 local ____00_FF0E_5E38_91CF = require("系统.09．表现系统.13．单位头顶血条.00．常量")
 local _____542F_7528_5355_4F4D_5934_9876_8840_6761 = ____00_FF0E_5E38_91CF["启用单位头顶血条"]
 local _____8840_6761_5237_65B0_95F4_9694Tick = ____00_FF0E_5E38_91CF["血条刷新间隔Tick"]
@@ -25,6 +25,15 @@ function _____9690_85CF_5355_4F4D_539F_751F_8840_6761(unit)
         return
     end
     DzFrameShow(hpBar, false)
+end
+function _____9650_523601(value)
+    if not (value > 0) then
+        return 0
+    end
+    if value > 1 then
+        return 1
+    end
+    return value
 end
 function _____5355_4F4D_5B58_6D3B(unit)
     if unit == nil or unit == 0 then
@@ -150,13 +159,18 @@ end
 function _____521D_59CB_5316_5E27_5185_5BB9(binding)
     local _____5E27 = binding["帧"]
     local unit = binding["单位"]
-    _____66F4_65B0_751F_547D_8D34_56FE(binding, 1)
+    local lifePct = _____9650_523601(GetUnitState(unit, _____751F_547D_72B6_6001) / binding["最大生命缓存"])
+    binding["生命缓降比例"] = lifePct
+    _____66F4_65B0_751F_547D_8D34_56FE(binding, lifePct)
+    DzFrameSetSize(_____5E27.life, _____8840_6761_5C3A_5BF8["内条宽"] * lifePct, _____8840_6761_5C3A_5BF8["生命高"])
+    DzFrameSetSize(_____5E27.lifeLag, 0, _____8840_6761_5C3A_5BF8["生命高"])
     DzFrameSetText(
         _____5E27.name,
         _____53D6_8840_6761_540D_5B57_6587_672C(unit)
     )
     _____8C03_6574_6839_6846_5C3A_5BF8(binding)
     DzFrameShow(_____5E27.mana, binding["最大魔法缓存"] > 0)
+    DzFrameShow(_____5E27.lifeLag, false)
     _____9690_85CF_62A4_76FE_5206_6BB5(binding, 0)
     _____7ED1_5B9A_5E27_5230_5355_4F4D(
         _____5E27,
@@ -194,6 +208,7 @@ ____exports["注册单位头顶血条"] = function(unit)
         ["最大魔法缓存"] = maxMana > 0 and maxMana or 0,
         ["是否英雄"] = isHero,
         ["生命贴图缓存"] = "",
+        ["生命缓降比例"] = 1,
         ["护盾贴图缓存"] = {}
     }
     _____5355_4F4D_8840_6761_8868:set(unitId, binding)
@@ -256,15 +271,6 @@ _____5355_4F4DID_5217_8868 = {}
 local g = _G
 local _____5DF2_521D_59CB_5316 = false
 local ____tick_8BA1_6570 = 0
-local function _____9650_523601(value)
-    if not (value > 0) then
-        return 0
-    end
-    if value > 1 then
-        return 1
-    end
-    return value
-end
 local function _____5355_4F4D_662F_4F18_5148_8840_6761_5355_4F4D(unit)
     if IsUnitType(unit, jass.UNIT_TYPE_HERO) then
         return true
@@ -277,6 +283,29 @@ local function _____81EA_52A8_6CE8_518C_5355_4F4D_5934_9876_8840_6761(unit)
     end
     _____9690_85CF_5355_4F4D_539F_751F_8840_6761(unit)
     ____exports["注册单位头顶血条"](unit)
+end
+local function _____66F4_65B0_751F_547D_7F13_964D(binding, lifePct)
+    if lifePct >= binding["生命缓降比例"] then
+        binding["生命缓降比例"] = lifePct
+    else
+        local nextPct = binding["生命缓降比例"] - _____8840_6761_5C3A_5BF8["生命缓降追赶比例"]
+        binding["生命缓降比例"] = nextPct > lifePct and nextPct or lifePct
+    end
+    local lagPct = binding["生命缓降比例"] - lifePct
+    if lagPct > 0.003 then
+        DzFrameSetPoint(
+            binding["帧"].lifeLag,
+            0,
+            binding["帧"].root,
+            0,
+            _____8840_6761_5C3A_5BF8["内条左偏移"] + _____8840_6761_5C3A_5BF8["内条宽"] * lifePct,
+            _____8840_6761_5C3A_5BF8["生命Y"]
+        )
+        DzFrameSetSize(binding["帧"].lifeLag, _____8840_6761_5C3A_5BF8["内条宽"] * lagPct, _____8840_6761_5C3A_5BF8["生命高"])
+        DzFrameShow(binding["帧"].lifeLag, true)
+    else
+        DzFrameShow(binding["帧"].lifeLag, false)
+    end
 end
 local function _____53D6_62A4_76FE_8D34_56FE(shieldType)
     if shieldType == _____62A4_76FE_7C7B_578B["物理"] then
@@ -320,7 +349,7 @@ local function _____5408_5E76_62A4_76FE_663E_793A_5206_6BB5(unit)
             do
                 local shield = list[i + 1]
                 if shield == nil or not shield["显示护盾条"] or not (shield["当前值"] > 0) then
-                    goto __continue51
+                    goto __continue56
                 end
                 local found = false
                 do
@@ -339,7 +368,7 @@ local function _____5408_5E76_62A4_76FE_663E_793A_5206_6BB5(unit)
                     result[#result + 1] = {["类型"] = shield["类型"], ["数值"] = shield["当前值"]}
                 end
             end
-            ::__continue51::
+            ::__continue56::
             i = i + 1
         end
     end
@@ -428,6 +457,7 @@ local function _____5237_65B0_751F_547D_9B54_6CD5(binding)
     local lifeWidth = _____8840_6761_5C3A_5BF8["内条宽"] * lifePct
     _____66F4_65B0_751F_547D_8D34_56FE(binding, lifePct)
     DzFrameSetSize(binding["帧"].life, lifeWidth, _____8840_6761_5C3A_5BF8["生命高"])
+    _____66F4_65B0_751F_547D_7F13_964D(binding, lifePct)
     _____5237_65B0_62A4_76FE_5206_6BB5(binding, lifePct, maxLife)
     local maxManaNow = GetUnitState(unit, _____6700_5927_9B54_6CD5_72B6_6001)
     if maxManaNow > 0 then
@@ -459,18 +489,18 @@ local function _____5237_65B0_6240_6709_5355_4F4D_5934_9876_8840_6761()
                 local unitId = _____5355_4F4DID_5217_8868[i + 1]
                 local binding = _____5355_4F4D_8840_6761_8868:get(unitId)
                 if binding == nil then
-                    goto __continue93
+                    goto __continue98
                 end
                 if not _____5355_4F4D_5B58_6D3B(binding["单位"]) then
                     _____6CE8_9500_5355_4F4D_5934_9876_8840_6761(unitId)
-                    goto __continue93
+                    goto __continue98
                 end
                 _____5355_4F4DID_5217_8868[writeIndex + 1] = unitId
                 writeIndex = writeIndex + 1
                 _____9690_85CF_5355_4F4D_539F_751F_8840_6761(binding["单位"])
                 _____5237_65B0_751F_547D_9B54_6CD5(binding)
             end
-            ::__continue93::
+            ::__continue98::
             i = i + 1
         end
     end

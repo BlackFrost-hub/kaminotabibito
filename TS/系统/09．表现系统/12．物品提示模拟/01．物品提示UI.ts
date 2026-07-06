@@ -35,8 +35,9 @@ const HEADER_ICON_Y_OFFSET = -0.002;
 const NAME_Y = -0.006;
 const LINE_STEP = 0.015;
 const BODY_GAP = 0.009;
-const BODY_LINE_HEIGHT = 0.0125;
-const BODY_BOTTOM_PADDING = 0.012;
+const BODY_LINE_HEIGHT = 0.0130;
+const BODY_BOTTOM_PADDING = 0.008;
+const BODY_WRAP_VISIBLE_WIDTH = 42;
 const SELL_HINT_TEXT = "|cff808080将物品扔在商店上以卖出|r";
 const GOLD_TEXT_COLOR = "|cffffcc00";
 const COLOR_END = "|r";
@@ -113,14 +114,51 @@ function 格式化金色整数(this: void, value: number): string {
   return GOLD_TEXT_COLOR + 格式化整数(value) + COLOR_END;
 }
 
+function 取颜色码结束位置(this: void, text: string, index: number): number {
+  if (text.substr(index, 2) === "|r" || text.substr(index, 2) === "|n") return index + 2;
+  if (text.substr(index, 2) !== "|c") return index;
+  return index + 10 <= text.length ? index + 10 : index + 2;
+}
+
+function 计算可见文本宽度(this: void, text: string): number {
+  let width = 0;
+  let index = 0;
+  while (index < text.length) {
+    const code = string.byte(text, index + 1) || 0;
+    if (code === 124) {
+      const nextIndex = 取颜色码结束位置(text, index);
+      if (nextIndex > index) {
+        index = nextIndex;
+        continue;
+      }
+    }
+    if (code >= 240) {
+      width += 1.6;
+      index += 4;
+    } else if (code >= 224) {
+      width += 1.6;
+      index += 3;
+    } else if (code >= 192) {
+      width += 1.6;
+      index += 2;
+    } else {
+      width += 0.8;
+      index++;
+    }
+  }
+  return width;
+}
+
 function 计算提示正文行数(this: void, text: string): number {
   if (text === "") return 0;
-  let count = 1;
+  let count = 0;
   let searchIndex = 0;
   while (true) {
     const nextIndex = text.indexOf("|n", searchIndex);
+    const lineText = nextIndex < 0 ? text.substring(searchIndex) : text.substring(searchIndex, nextIndex);
+    const visibleWidth = 计算可见文本宽度(lineText);
+    count += 取较大数(1, Math.ceil(visibleWidth / BODY_WRAP_VISIBLE_WIDTH));
     if (nextIndex < 0) break;
-    count++;
     searchIndex = nextIndex + 2;
   }
   return count;

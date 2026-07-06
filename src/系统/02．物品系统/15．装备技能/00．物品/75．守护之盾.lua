@@ -58,7 +58,7 @@ local function ____on_5B88_62A4_4E4B_76FE_8F6C_79FB(event)
         -event["转移伤害"],
         "life",
         true,
-        true,
+        false,
         nil,
         0
     )

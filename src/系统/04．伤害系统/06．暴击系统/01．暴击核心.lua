@@ -204,6 +204,21 @@ local function _____8BFB_53D6_653B_51FB_8005_66B4_51FB_5C5E_6027(attacker)
         )
     }
 end
+local function _____8BFB_53D6_653B_51FB_8005_5FC5_5B9A_66B4_51FB(attacker)
+    if _____8C03_7528_73A9_5BB6_82F1_96C4_5224_5B9A(attacker) then
+        return _____8BFB_53D6_73A9_5BB6_5B9E_6570(
+            GetOwningPlayer(attacker),
+            "必定暴击"
+        ) > 0
+    end
+    if _____8BFB_53D6_5355_4F4D_5B9E_6570(attacker, "必定暴击") > 0 then
+        return true
+    end
+    return _____8BFB_53D6_73A9_5BB6_5B9E_6570(
+        GetOwningPlayer(attacker),
+        "必定暴击"
+    ) > 0
+end
 local function _____8BFB_53D6_76EE_6807_88AB_66B4_51FB_7387(target)
     if _____8C03_7528_73A9_5BB6_82F1_96C4_5224_5B9A(target) then
         return _____8BFB_53D6_73A9_5BB6_5B9E_6570(
@@ -251,30 +266,34 @@ ____exports["执行暴击判定"] = function(context)
     end
     local _____66B4_51FB_5F52_5C5E_5355_4F4D = _____83B7_53D6_66B4_51FB_5F52_5C5E_5355_4F4D(attacker, target)
     local _____6765_6E90_5C5E_6027 = _____8BFB_53D6_653B_51FB_8005_66B4_51FB_5C5E_6027(_____66B4_51FB_5F52_5C5E_5355_4F4D)
-    local _____4FEE_6B63_540E_66B4_51FB_7387 = _____5E94_7528_66B4_51FB_7387_4FEE_6B63({
-        attacker = attacker,
-        target = target,
-        ["暴击归属单位"] = _____66B4_51FB_5F52_5C5E_5355_4F4D,
-        currentDamage = currentDamage,
-        ["暴击率"] = _____6765_6E90_5C5E_6027["暴击率"],
-        isPhysicalDamage = context.isPhysicalDamage == true,
-        isEnhancedDamage = context.isEnhancedDamage == true,
-        isNormalAttack = context.isNormalAttack == true,
-        isRangedAttack = context.isRangedAttack == true,
-        isSkillAttack = context.isSkillAttack == true
-    })
-    if _____4FEE_6B63_540E_66B4_51FB_7387 <= 0.01 then
-        return {["伤害"] = currentDamage, ["暴击概率"] = 0, ["暴击倍率"] = 1, ["是否暴击"] = false}
-    end
-    local _____6709_6548_66B4_51FB_7387 = _____4FEE_6B63_540E_66B4_51FB_7387 - _____8BFB_53D6_76EE_6807_88AB_66B4_51FB_7387(target)
-    if _____6709_6548_66B4_51FB_7387 <= 0 then
-        return {["伤害"] = currentDamage, ["暴击概率"] = 0, ["暴击倍率"] = 1, ["是否暴击"] = false}
-    end
-    if _____6709_6548_66B4_51FB_7387 > 1 then
-        _____6709_6548_66B4_51FB_7387 = 1
-    end
-    if not _____66B4_51FB_6982_7387_901A_8FC7(_____6709_6548_66B4_51FB_7387, _____66B4_51FB_5F52_5C5E_5355_4F4D) then
-        return {["伤害"] = currentDamage, ["暴击概率"] = _____6709_6548_66B4_51FB_7387, ["暴击倍率"] = 1, ["是否暴击"] = false}
+    local _____662F_5426_5FC5_5B9A_66B4_51FB = _____8BFB_53D6_653B_51FB_8005_5FC5_5B9A_66B4_51FB(_____66B4_51FB_5F52_5C5E_5355_4F4D)
+    local _____6709_6548_66B4_51FB_7387 = 1
+    if not _____662F_5426_5FC5_5B9A_66B4_51FB then
+        local _____4FEE_6B63_540E_66B4_51FB_7387 = _____5E94_7528_66B4_51FB_7387_4FEE_6B63({
+            attacker = attacker,
+            target = target,
+            ["暴击归属单位"] = _____66B4_51FB_5F52_5C5E_5355_4F4D,
+            currentDamage = currentDamage,
+            ["暴击率"] = _____6765_6E90_5C5E_6027["暴击率"],
+            isPhysicalDamage = context.isPhysicalDamage == true,
+            isEnhancedDamage = context.isEnhancedDamage == true,
+            isNormalAttack = context.isNormalAttack == true,
+            isRangedAttack = context.isRangedAttack == true,
+            isSkillAttack = context.isSkillAttack == true
+        })
+        if _____4FEE_6B63_540E_66B4_51FB_7387 <= 0.01 then
+            return {["伤害"] = currentDamage, ["暴击概率"] = 0, ["暴击倍率"] = 1, ["是否暴击"] = false}
+        end
+        _____6709_6548_66B4_51FB_7387 = _____4FEE_6B63_540E_66B4_51FB_7387 - _____8BFB_53D6_76EE_6807_88AB_66B4_51FB_7387(target)
+        if _____6709_6548_66B4_51FB_7387 <= 0 then
+            return {["伤害"] = currentDamage, ["暴击概率"] = 0, ["暴击倍率"] = 1, ["是否暴击"] = false}
+        end
+        if _____6709_6548_66B4_51FB_7387 > 1 then
+            _____6709_6548_66B4_51FB_7387 = 1
+        end
+        if not _____66B4_51FB_6982_7387_901A_8FC7(_____6709_6548_66B4_51FB_7387, _____66B4_51FB_5F52_5C5E_5355_4F4D) then
+            return {["伤害"] = currentDamage, ["暴击概率"] = _____6709_6548_66B4_51FB_7387, ["暴击倍率"] = 1, ["是否暴击"] = false}
+        end
     end
     local _____57FA_7840_500D_7387 = context.isSkillAttack and _____66B4_51FB_7CFB_7EDF_914D_7F6E["技能攻击基础倍率"] or _____66B4_51FB_7CFB_7EDF_914D_7F6E["普通攻击基础倍率"]
     local _____66B4_51FB_500D_7387 = _____57FA_7840_500D_7387 + _____6765_6E90_5C5E_6027["暴击伤害"] - _____8BFB_53D6_76EE_6807_88AB_66B4_51FB_4F24_5BB3(attacker, target)

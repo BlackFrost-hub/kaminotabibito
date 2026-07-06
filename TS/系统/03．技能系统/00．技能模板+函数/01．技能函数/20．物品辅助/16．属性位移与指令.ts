@@ -54,8 +54,8 @@ const IsUnitAlly = jass.IsUnitAlly as (whichUnit: any, whichPlayer: any) => bool
 const GetHeroStr = jass.GetHeroStr as (whichHero: any, includeBonuses: boolean) => number;
 const GetHeroAgi = jass.GetHeroAgi as (whichHero: any, includeBonuses: boolean) => number;
 const GetHeroInt = jass.GetHeroInt as (whichHero: any, includeBonuses: boolean) => number;
+const SetHeroInt = jass.SetHeroInt as (whichHero: any, value: number, permanent: boolean) => void;
 const AddHeroXP = jass.AddHeroXP as (whichHero: any, xpToAdd: number, showEyeCandy: boolean) => void;
-const ModifyHeroStat = jass.ModifyHeroStat as (whichStat: any, whichHero: any, modifyMethod: any, value: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => boolean;
@@ -95,8 +95,6 @@ const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-const bj_HEROSTAT_INT = jass.bj_HEROSTAT_INT as any;
-const bj_MODIFYMETHOD_ADD = jass.bj_MODIFYMETHOD_ADD as any;
 const GetUnitStateJapi = japi.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const DzSetUnitModel = japi.DzSetUnitModel as (whichUnit: any, model: string) => void;
 
@@ -104,8 +102,9 @@ const stringToFourCCSafe = (require("lib.扩展函数.封装函数.01．通用�
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 }).stringToFourCCSafe;
 
-const 火把单位类型ID = stringToFourCCSafe("e00D");
+const 火把单位类型ID = stringToFourCCSafe("e0FT");
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
+const 属性浮点归零阈值 = 0.000001;
 
 type 待销毁特效记录 = {
   句柄: any;
@@ -157,13 +156,17 @@ export function 调整玩家属性(this: void, 单位: any, 属性名: string, �
   if (单位 == null || 单位 === 0) return;
   const owner = GetOwningPlayer(单位);
   const oldValue = Number(YDUserDataGetSafe("player", owner, 属性名, "real")) || 0;
-  YDUserDataSetSafe("player", owner, 属性名, "real", oldValue + 增量);
+  let newValue = oldValue + 增量;
+  if (newValue < 属性浮点归零阈值 && newValue > -属性浮点归零阈值) newValue = 0;
+  YDUserDataSetSafe("player", owner, 属性名, "real", newValue);
 }
 
 export function 调整单位属性(this: void, 单位: any, 属性名: string, 增量: number): void {
   if (单位 == null || 单位 === 0) return;
   const oldValue = Number(YDUserDataGetSafe("unit", 单位, 属性名, "real")) || 0;
-  YDUserDataSetSafe("unit", 单位, 属性名, "real", oldValue + 增量);
+  let newValue = oldValue + 增量;
+  if (newValue < 属性浮点归零阈值 && newValue > -属性浮点归零阈值) newValue = 0;
+  YDUserDataSetSafe("unit", 单位, 属性名, "real", newValue);
 }
 
 export function 读取玩家属性(this: void, 单位: any, 属性名: string): number {
@@ -186,7 +189,7 @@ export function 增加英雄经验与智力(this: void, 英雄: any, 次数: num
   for (let i = 0; i < 次数; i++) {
     AddHeroXP(英雄, 每次经验, true);
   }
-  ModifyHeroStat(bj_HEROSTAT_INT, 英雄, bj_MODIFYMETHOD_ADD, 智力);
+  SetHeroInt(英雄, GetHeroInt(英雄, false) + 智力, true);
 }
 
 export function 击退远离来源(this: void, 来源: any, 目标: any, 距离: number, 持续时间: number): void {

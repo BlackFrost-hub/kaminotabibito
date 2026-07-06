@@ -2,15 +2,21 @@
 local ____exports = {}
 local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
 local _____4E3B_52A8_7269_54C1_8C03_8BD5_65E5_5FD7 = ____20_FF0E_7269_54C1_8F85_52A9["主动物品调试日志"]
+local ____10_FF0E_88C5_5907_6218_6597_6267_884C = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____9020_6210_88C5_5907_4F24_5BB3 = ____10_FF0E_88C5_5907_6218_6597_6267_884C["造成装备伤害"]
+local _____64AD_653E_5355_4F4D_7279_6548 = ____10_FF0E_88C5_5907_6218_6597_6267_884C["播放单位特效"]
 local ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.01．主动技能物品ID")
 local _____796D_7940_4E4B_6756_7269_54C1ID = ____01_FF0E_4E3B_52A8_6280_80FD_7269_54C1ID["祭祀之杖物品ID"]
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____796D_7940_4E4B_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["祭祀之杖配置"]
 local jass = require("jass.common")
+local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+local _____51CF_5C11_751F_547D_503C = ____require_result_0["减少生命值"]
+local _____51CF_5C11_9B54_6CD5_503C = ____require_result_0["减少魔法值"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电")
+local _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535 = ____require_result_1["创建单位绑定闪电"]
 local GetItemTypeId = jass.GetItemTypeId
-local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local function _____662F_5426_4E3A_796D_7940_4E4B_6756(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
@@ -26,10 +32,29 @@ ____exports["处理祭祀之杖使用"] = function(_____4E0A_4E0B_6587)
     if _____65BD_6CD5_5355_4F4D == nil or _____65BD_6CD5_5355_4F4D == 0 then
         return
     end
-    SetUnitState(
+    local _____76EE_6807_5355_4F4D = _____4E0A_4E0B_6587["目标单位"]
+    if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
+        return
+    end
+    _____51CF_5C11_9B54_6CD5_503C(_____65BD_6CD5_5355_4F4D, _____796D_7940_4E4B_6756_914D_7F6E["魔法消耗"], true, false)
+    _____51CF_5C11_751F_547D_503C(
         _____65BD_6CD5_5355_4F4D,
-        UNIT_STATE_LIFE,
-        GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_LIFE) - _____796D_7940_4E4B_6756_914D_7F6E["生命消耗"]
+        _____796D_7940_4E4B_6756_914D_7F6E["生命消耗"],
+        true,
+        true,
+        _____796D_7940_4E4B_6756_914D_7F6E["生命消耗特效路径"],
+        1
+    )
+    _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535({["效果代码"] = _____796D_7940_4E4B_6756_914D_7F6E["闪电代码"], ["起点单位"] = _____65BD_6CD5_5355_4F4D, ["终点单位"] = _____76EE_6807_5355_4F4D, ["持续时间"] = _____796D_7940_4E4B_6756_914D_7F6E["闪电持续时间"]})
+    _____64AD_653E_5355_4F4D_7279_6548(_____796D_7940_4E4B_6756_914D_7F6E["特效路径"], _____76EE_6807_5355_4F4D, "origin", _____796D_7940_4E4B_6756_914D_7F6E["特效持续时间"])
+    _____9020_6210_88C5_5907_4F24_5BB3(
+        _____65BD_6CD5_5355_4F4D,
+        _____76EE_6807_5355_4F4D,
+        _____796D_7940_4E4B_6756_914D_7F6E["伤害值"],
+        DAMAGE_TYPE_MAGIC,
+        true,
+        nil,
+        {["伤害形态"] = "单体"}
     )
 end
 return ____exports

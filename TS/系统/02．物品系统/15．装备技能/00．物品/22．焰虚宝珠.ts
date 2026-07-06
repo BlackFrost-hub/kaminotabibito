@@ -9,6 +9,9 @@ const japi = require("jass.japi") as any;
 const { createUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
 };
+const { 清除单位负面Buff合集 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  清除单位负面Buff合集: (this: void, unit: any) => number;
+};
 
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const UnitRemoveBuffsEx = jass.UnitRemoveBuffsEx as (unit: any, removePositive: boolean, removeNegative: boolean, magic: boolean, physical: boolean, timedLife: boolean, aura: boolean, autoDispel: boolean) => void;
@@ -36,6 +39,7 @@ export function 处理焰虚宝珠使用(this: void, 上下文: 物品技能事�
     EXSetEffectSize(特效, 焰虚宝珠配置.特效大小);
   }
   UnitRemoveBuffsEx(目标单位, false, true, false, false, false, false, true);
+  清除单位负面Buff合集(目标单位);
 }
 
 export {};

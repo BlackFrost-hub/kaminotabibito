@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
-  registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
+const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: (this: void) => void) => void;
@@ -18,10 +18,7 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitAlly = jass.IsUnitAlly as (unit: any, player: any) => boolean;
 const IsUnitOwnedByPlayer = jass.IsUnitOwnedByPlayer as (unit: any, player: any) => boolean;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 
 export interface 区域承伤吸收场事件 {
   场ID: number;
@@ -117,7 +114,7 @@ function 尝试关闭区域承伤吸收场计时器(this: void): void {
 function 确保区域承伤吸收场伤害监听(this: void): void {
   if (已注册区域承伤吸收场伤害监听) return;
   已注册区域承伤吸收场伤害监听 = true;
-  registerAppliedFinalDamageListener(on区域承伤吸收场最终伤害);
+  registerDamageModifier(on区域承伤吸收场伤害修正, 80);
 }
 
 function 移除区域承伤吸收场(this: void, id: number, 是否耗尽: boolean): void {
@@ -167,8 +164,11 @@ function 计算区域承伤吸收量(this: void, 实例: 区域承伤吸收场�
   return damage;
 }
 
-function on区域承伤吸收场最终伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
-  if (target == null || target === 0 || !(applied > 0)) return;
+function on区域承伤吸收场伤害修正(this: void, context: any): number {
+  const target = context.target;
+  const attacker = context.attacker;
+  let currentDamage = context.currentDamage;
+  if (target == null || target === 0 || !(currentDamage > 0)) return currentDamage;
   for (let i = 区域承伤吸收场ID列表.length - 1; i >= 0; i--) {
     const id = 区域承伤吸收场ID列表[i];
     const 实例 = 区域承伤吸收场表[id];
@@ -177,27 +177,29 @@ function on区域承伤吸收场最终伤害(this: void, target: any, attacker: 
       continue;
     }
     if (!单位在吸收场内(实例, target)) continue;
-    if (实例.参数.可吸收单位 != null && !实例.参数.可吸收单位({ 场ID: id, 施法单位: 实例.参数.施法单位, 受伤单位: target, 攻击者: attacker, 伤害快照: snapshot })) continue;
+    if (实例.参数.可吸收单位 != null && !实例.参数.可吸收单位({ 场ID: id, 施法单位: 实例.参数.施法单位, 受伤单位: target, 攻击者: attacker, 伤害快照: context })) continue;
 
-    const absorb = 计算区域承伤吸收量(实例, applied);
+    const absorb = 计算区域承伤吸收量(实例, currentDamage);
     if (!(absorb > 0)) continue;
 
-    SetUnitState(target, UNIT_STATE_LIFE, GetUnitState(target, UNIT_STATE_LIFE) + absorb);
     实例.剩余吸收值 = 实例.剩余吸收值 - absorb;
+    currentDamage = currentDamage - absorb;
     if (实例.参数.on吸收 != null) {
       实例.参数.on吸收({
         场ID: id,
         施法单位: 实例.参数.施法单位,
         受伤单位: target,
         攻击者: attacker,
-        本次伤害: applied,
+        本次伤害: context.currentDamage,
         吸收量: absorb,
         剩余吸收值: 实例.剩余吸收值,
-        伤害快照: snapshot,
+        伤害快照: context,
       });
     }
     if (实例.剩余吸收值 <= 0) 移除区域承伤吸收场(id, true);
+    if (currentDamage <= 0) return 0;
   }
+  return currentDamage;
 }
 
 export function 创建区域承伤吸收场(this: void, 参数: 区域承伤吸收场参数): 区域承伤吸收场控制器 | null {

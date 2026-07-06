@@ -95,6 +95,7 @@ ____exports["创建单位血条帧组"] = function(_____69FD_4F4D)
         return nil
     end
     DzFrameSetSize(root, _____8840_6761_5C3A_5BF8["根宽"], _____8840_6761_5C3A_5BF8["根高"])
+    local lifeLag = _____521B_5EFA_8D34_56FE_5E27("UnitHeadHealthBarLifeLag_" .. suffix, root, _____8840_6761_8D44_6E90["生命缓降"], _____8840_6761_5C42_7EA7["生命缓降"])
     local life = _____521B_5EFA_8D34_56FE_5E27("UnitHeadHealthBarLife_" .. suffix, root, _____8840_6761_8D44_6E90["友方生命"], _____8840_6761_5C42_7EA7["生命"])
     local shields = {}
     do
@@ -127,9 +128,18 @@ ____exports["创建单位血条帧组"] = function(_____69FD_4F4D)
             i = i + 1
         end
     end
-    if life == 0 or not shieldOk or mana == 0 or name == nil or name == 0 then
+    if lifeLag == 0 or life == 0 or not shieldOk or mana == 0 or name == nil or name == 0 then
         return nil
     end
+    DzFrameSetSize(lifeLag, 0, _____8840_6761_5C3A_5BF8["生命高"])
+    DzFrameSetPoint(
+        lifeLag,
+        0,
+        root,
+        0,
+        _____8840_6761_5C3A_5BF8["内条左偏移"],
+        _____8840_6761_5C3A_5BF8["生命Y"]
+    )
     DzFrameSetSize(life, _____8840_6761_5C3A_5BF8["内条宽"], _____8840_6761_5C3A_5BF8["生命高"])
     DzFrameSetPoint(
         life,
@@ -186,6 +196,7 @@ ____exports["创建单位血条帧组"] = function(_____69FD_4F4D)
     DzFrameSetPriority(name, _____8840_6761_5C42_7EA7["名字"])
     DzFrameSetIgnoreTrackEvents(name, true)
     DzFrameShow(root, false)
+    DzFrameShow(lifeLag, false)
     DzFrameShow(life, true)
     do
         local i = 0
@@ -199,6 +210,7 @@ ____exports["创建单位血条帧组"] = function(_____69FD_4F4D)
     return {
         ["槽位"] = _____69FD_4F4D,
         root = root,
+        lifeLag = lifeLag,
         life = life,
         shields = shields,
         mana = mana,

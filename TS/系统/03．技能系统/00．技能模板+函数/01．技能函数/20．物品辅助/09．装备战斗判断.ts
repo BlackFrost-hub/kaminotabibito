@@ -21,6 +21,12 @@ export function 单位存活(this: void, unit: any): boolean {
 }
 
 export function 是技能伤害(this: void, snapshot: any): boolean {
+  return snapshot != null
+    && snapshot.isEquipmentSkillDamage !== true
+    && (snapshot.isSkillDamage === true || snapshot.isSkillAttack === true || snapshot.isWrappedSkillDamage === true);
+}
+
+export function 是任意封装技能伤害(this: void, snapshot: any): boolean {
   return snapshot != null && (snapshot.isSkillDamage === true || snapshot.isSkillAttack === true || snapshot.isWrappedSkillDamage === true);
 }
 

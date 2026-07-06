@@ -123,9 +123,11 @@ function 获取匹配前窗口(this: void, text: string, 匹配开始: number): 
   return text.substring(起点, 匹配开始);
 }
 
-function 是否命中跳过片段(this: void, text: string): boolean {
+function 是否命中跳过片段(this: void, text: string, 忽略通用消耗保护?: boolean): boolean {
   for (let i = 0; i < 动态文本跳过片段列表.length; i++) {
-    if (text.indexOf(动态文本跳过片段列表[i]) >= 0) return true;
+    const 片段 = 动态文本跳过片段列表[i];
+    if (忽略通用消耗保护 === true && 片段 === "消耗") continue;
+    if (text.indexOf(片段) >= 0) return true;
   }
   return false;
 }
@@ -361,6 +363,10 @@ function 是否十六进制字符(this: void, 字符: string): boolean {
   return 字符 >= "A" && 字符 <= "F";
 }
 
+function 倍率是否可隐式匹配(this: void, 倍率: string): boolean {
+  return 倍率.indexOf("%") >= 0;
+}
+
 function 查找最后颜色码起始(this: void, text: string, beforeIndex: number): number {
   let 命中位置 = -1;
   let 搜索位置 = text.indexOf("|c");
@@ -431,7 +437,7 @@ function 提取前缀倍率匹配(this: void, text: string, 属性文本名: str
         }
       }
 
-      if (含数字 && (末字符 === "%" || (末字符 >= "0" && 末字符 <= "9") || 末字符 === ".")) {
+      if (含数字 && 倍率是否可隐式匹配(倍率)) {
         return {
           完整匹配: text.substring(完整匹配开始, 属性位置 + 属性文本名.length),
           倍率,
@@ -472,7 +478,7 @@ function 提取公式匹配(this: void, text: string, 属性文本名: string, �
     const 首字符 = 数字起始 < text.length ? text.charAt(数字起始) : "";
     if ((首字符 >= "0" && 首字符 <= "9") || 首字符 === ".") {
       const 倍率 = 提取倍率(text, 数字起始);
-      if (倍率 != null) {
+      if (倍率 != null && 倍率是否可隐式匹配(倍率)) {
         return {
           完整匹配: 属性文本名 + 倍率,
           倍率,
@@ -527,7 +533,8 @@ function 替换公式(this: void, unit: any, tip: string, options?: 动态文本
         continue;
       }
 
-      if (是否命中跳过片段(完整匹配文本) || 是否命中跳过片段(匹配前窗口 + 完整匹配文本)) {
+      const 忽略通用消耗保护 = 属性匹配项.计算属性名 === "最大魔法值";
+      if (是否命中跳过片段(完整匹配文本, 忽略通用消耗保护) || 是否命中跳过片段(匹配前窗口 + 完整匹配文本, 忽略通用消耗保护)) {
         搜索起点 = 匹配开始 + 完整匹配文本.length;
         匹配结果 = 提取公式匹配(result, 属性匹配项.文本名, 搜索起点);
         continue;

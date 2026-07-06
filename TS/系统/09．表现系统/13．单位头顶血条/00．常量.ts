@@ -8,6 +8,7 @@ export const 血条资源 = {
   友方生命: "UI\\UnitHealthBar\\bar_life_green.tga",
   敌方生命: "UI\\UnitHealthBar\\bar_life_red.tga",
   自身生命: "UI\\UnitHealthBar\\bar_life_self.tga",
+  生命缓降: "UI\\UnitHealthBar\\bar_damage_lag_white.tga",
   生命低血渐变: [
     "UI\\UnitHealthBar\\bar_life_native_00.tga",
     "UI\\UnitHealthBar\\bar_life_native_05.tga",
@@ -43,6 +44,7 @@ export const 血条尺寸 = {
   初始血条容量: 1000,
   血条容量扩展步长: 50,
   最大护盾分段数: 4,
+  生命缓降追赶比例: 0.020,
   根宽: 0.0598,
   根高: 0.0109,
   仅生命根高: 0.0076,
@@ -64,10 +66,11 @@ export const 血条尺寸 = {
 
 export const 血条层级 = {
   根: 0,
-  生命: 1,
-  魔法: 2,
-  护盾: 3,
-  名字: 4,
+  生命缓降: 1,
+  生命: 2,
+  魔法: 3,
+  护盾: 4,
+  名字: 5,
   控制台遮罩: 100,
 } as const;
 

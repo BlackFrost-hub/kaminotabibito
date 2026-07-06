@@ -70,7 +70,7 @@ function 守护之盾可承受者(this: void, event: { 候选单位: any }): boo
 }
 
 function on守护之盾转移(this: void, event: { 承受者: any; 转移伤害: number }): void {
-  变更资源值(event.承受者, -event.转移伤害, "life", true, true, undefined, 0);
+  变更资源值(event.承受者, -event.转移伤害, "life", true, false, undefined, 0);
 }
 
 function 初始化守护之盾(this: void): void {

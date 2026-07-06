@@ -26,7 +26,7 @@ const { 注册持有型周期效果 } = require("系统.03．技能系统.00．�
 
 import type { 物品技能事件上下文 } from "../05．物品使用/00．公共/03．物品使用核心";
 import { 物品使用装备ID, 物品使用数值配置 } from "../05．物品使用/00．公共/01．物品使用配置表";
-import { 取装备冷却键, 装备冷却中, 进入装备冷却并显示 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
+import { 取装备冷却键, 装备冷却中, 进入装备冷却并显示, 设置物品CD } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 import {
   是否为使用物品,
   单位持有物品,
@@ -36,16 +36,19 @@ import {
   取单位X,
   取单位Y,
   取最大生命,
-  设置生命,
   获取范围敌人,
   造成强化伤害,
   施加眩晕,
   击退远离来源,
 } from "../05．物品使用/00．公共/02．物品使用工具";
+const { 减少生命值 } = require("系统.04．伤害系统.02．治疗系统.07．减少生命值") as {
+  减少生命值: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean, effectPath?: string, 最低保留生命?: number) => number;
+};
 
 const 狱妖魔盾配置 = 物品使用数值配置.狱妖魔盾;
 const 狱妖魔盾物品ID = 物品使用装备ID.狱妖魔盾;
 const 狱妖魔盾护盾标签 = "装备:狱妖魔盾";
+const 狱妖魔盾主动技能壳ID = "IN03";
 
 let 已初始化 = false;
 
@@ -75,17 +78,18 @@ function 尝试充能狱妖魔盾(this: void, 单位: any): void {
   if (amount > canPayLife) amount = canPayLife;
   if (!(amount > 0)) return;
 
-  设置生命(单位, currentLife - amount);
-  const added = 充能单位标签护盾(单位, 狱妖魔盾护盾标签, amount, maxShield, {
+  const paidLife = -减少生命值(单位, amount, true, false, undefined, 1);
+  if (!(paidLife > 0)) return;
+  const added = 充能单位标签护盾(单位, 狱妖魔盾护盾标签, paidLife, maxShield, {
     类型: 护盾类型.通用,
-    数值: amount,
+    数值: paidLife,
     持续时间: 0,
     来源单位: 单位,
     显示护盾条: true,
     可驱散: false,
   });
   if (!(added > 0) && 查询单位标签护盾值(单位, 狱妖魔盾护盾标签) <= 0) {
-    开始护盾(单位, { 类型: 护盾类型.通用, 数值: amount, 持续时间: 0, 来源单位: 单位, 标签: 狱妖魔盾护盾标签 });
+    开始护盾(单位, { 类型: 护盾类型.通用, 数值: paidLife, 持续时间: 0, 来源单位: 单位, 标签: 狱妖魔盾护盾标签 });
   }
 }
 
@@ -100,8 +104,17 @@ function on狱妖魔盾充能Tick(this: void, 单位: any): void {
   尝试充能狱妖魔盾(单位);
 }
 
-function 开始狱妖魔盾冷却(this: void, 单位: any): void {
-  进入装备冷却并显示(取狱妖魔盾冷却键(单位), 狱妖魔盾配置.冷却毫秒 / 1000, 单位, "狱妖魔盾");
+function 开始狱妖魔盾冷却(this: void, 单位: any, 物品: any): void {
+  const 冷却秒数 = 狱妖魔盾配置.冷却毫秒 / 1000;
+  进入装备冷却并显示(取狱妖魔盾冷却键(单位), 冷却秒数, 单位, "狱妖魔盾");
+  设置物品CD({
+    unit: 单位,
+    item: 物品,
+    秒数: 冷却秒数,
+    范围: "主动",
+    主动技能ID: 狱妖魔盾主动技能壳ID,
+    主动最大冷却秒数: 冷却秒数,
+  });
 }
 
 export function 初始化狱妖魔盾持有充能(this: void): void {
@@ -134,7 +147,7 @@ export function 处理狱妖魔盾使用(this: void, 上下文: 物品技能事�
     击退远离来源(单位, enemy, 250, 0.5);
   }
   移除单位标签护盾(单位, 狱妖魔盾护盾标签);
-  开始狱妖魔盾冷却(单位);
+  开始狱妖魔盾冷却(单位, 上下文.物品);
 }
 
 export {};

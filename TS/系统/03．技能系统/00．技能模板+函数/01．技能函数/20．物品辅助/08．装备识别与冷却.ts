@@ -311,7 +311,7 @@ function 取主动最大冷却秒数(this: void, 参数: 设置物品CD参数, �
   if (参数.主动最大冷却毫秒 != null && 参数.主动最大冷却毫秒 > 0) return 参数.主动最大冷却毫秒 / 1000;
   if (参数.主动最大冷却秒数 != null && 参数.主动最大冷却秒数 > 0) return 参数.主动最大冷却秒数;
   if (当前冷却秒数 > 0) return 当前冷却秒数;
-  return 1;
+  return 当前冷却秒数;
 }
 
 function 获取参数物品(this: void, 参数: 设置物品CD参数): any | null {

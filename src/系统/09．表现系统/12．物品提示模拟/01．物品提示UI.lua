@@ -1,5 +1,11 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__StringSubstr = ____lualib.__TS__StringSubstr
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
+local _____53D6_8F83_5927_6570
+function _____53D6_8F83_5927_6570(a, b)
+    return a > b and a or b
+end
 local japi = require("jass.japi")
 local DzGetGameUI = japi.DzGetGameUI
 local DzLoadToc = japi.DzLoadToc
@@ -31,8 +37,9 @@ local HEADER_ICON_Y_OFFSET = -0.002
 local NAME_Y = -0.006
 local LINE_STEP = 0.015
 local BODY_GAP = 0.009
-local BODY_LINE_HEIGHT = 0.0125
-local BODY_BOTTOM_PADDING = 0.012
+local BODY_LINE_HEIGHT = 0.013
+local BODY_BOTTOM_PADDING = 0.008
+local BODY_WRAP_VISIBLE_WIDTH = 42
 local SELL_HINT_TEXT = "|cff808080将物品扔在商店上以卖出|r"
 local GOLD_TEXT_COLOR = "|cffffcc00"
 local COLOR_END = "|r"
@@ -113,11 +120,51 @@ end
 local function _____683C_5F0F_5316_91D1_8272_6574_6570(value)
     return (GOLD_TEXT_COLOR .. _____683C_5F0F_5316_6574_6570(value)) .. COLOR_END
 end
+local function _____53D6_989C_8272_7801_7ED3_675F_4F4D_7F6E(text, index)
+    if __TS__StringSubstr(text, index, 2) == "|r" or __TS__StringSubstr(text, index, 2) == "|n" then
+        return index + 2
+    end
+    if __TS__StringSubstr(text, index, 2) ~= "|c" then
+        return index
+    end
+    return index + 10 <= #text and index + 10 or index + 2
+end
+local function _____8BA1_7B97_53EF_89C1_6587_672C_5BBD_5EA6(text)
+    local width = 0
+    local index = 0
+    while index < #text do
+        do
+            local code = string.byte(text, index + 1) or 0
+            if code == 124 then
+                local nextIndex = _____53D6_989C_8272_7801_7ED3_675F_4F4D_7F6E(text, index)
+                if nextIndex > index then
+                    index = nextIndex
+                    goto __continue24
+                end
+            end
+            if code >= 240 then
+                width = width + 1.6
+                index = index + 4
+            elseif code >= 224 then
+                width = width + 1.6
+                index = index + 3
+            elseif code >= 192 then
+                width = width + 1.6
+                index = index + 2
+            else
+                width = width + 0.8
+                index = index + 1
+            end
+        end
+        ::__continue24::
+    end
+    return width
+end
 local function _____8BA1_7B97_63D0_793A_6B63_6587_884C_6570(text)
     if text == "" then
         return 0
     end
-    local count = 1
+    local count = 0
     local searchIndex = 0
     while true do
         local nextIndex = (string.find(
@@ -126,16 +173,18 @@ local function _____8BA1_7B97_63D0_793A_6B63_6587_884C_6570(text)
             math.max(searchIndex + 1, 1),
             true
         ) or 0) - 1
+        local lineText = nextIndex < 0 and __TS__StringSubstring(text, searchIndex) or __TS__StringSubstring(text, searchIndex, nextIndex)
+        local visibleWidth = _____8BA1_7B97_53EF_89C1_6587_672C_5BBD_5EA6(lineText)
+        count = count + _____53D6_8F83_5927_6570(
+            1,
+            math.ceil(visibleWidth / BODY_WRAP_VISIBLE_WIDTH)
+        )
         if nextIndex < 0 then
             break
         end
-        count = count + 1
         searchIndex = nextIndex + 2
     end
     return count
-end
-local function _____53D6_8F83_5927_6570(a, b)
-    return a > b and a or b
 end
 ____exports["更新物品提示内容"] = function(_____5E27, _____5185_5BB9)
     local titleText = _____5185_5BB9.activeUseHotkey ~= nil and _____5185_5BB9.activeUseHotkey ~= "" and ((_____5185_5BB9.name .. " |cffffcc00（小键盘") .. _____5185_5BB9.activeUseHotkey) .. "）|r" or _____5185_5BB9.name

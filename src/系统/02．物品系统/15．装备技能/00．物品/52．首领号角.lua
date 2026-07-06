@@ -10,6 +10,10 @@ local _____53D6_5355_4F4DX = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单�
 local _____53D6_5355_4F4DY = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位Y"]
 local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
 local _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C = ____20_FF0E_7269_54C1_8F85_52A9["施加临时属性效果"]
+local ____00_FF0EBuff_7CFB_7EDF = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____00_FF0EBuff_7CFB_7EDF.registerManualBuff
+local ____00_FF0EBuff_767B_8BB0 = require("系统.05．Buff系统.03．Buff表.00．Buff登记")
+local _____5E38_89C4BuffID = ____00_FF0EBuff_767B_8BB0["常规BuffID"]
 ____exports["处理首领号角使用"] = function(ctx)
     if not _____662F_5426_4E3A_4F7F_7528_7269_54C1(ctx["物品"], _____7269_54C1_4F7F_7528_88C5_5907ID["首领号角"]) then
         return
@@ -28,5 +32,12 @@ ____exports["处理首领号角使用"] = function(ctx)
     local attack = cfg["首领号角每单位攻击"] * count
     local armor = cfg["首领号角每单位护甲"] * count
     _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C(unit, cfg["持续毫秒"], {{["类型"] = "攻击", ["数值"] = attack}, {["类型"] = "护甲", ["数值"] = armor}})
+    registerManualBuff(
+        unit,
+        _____5E38_89C4BuffID["首领号角_王之号角"],
+        cfg["持续毫秒"] / 1000,
+        attack,
+        {sourceName = "首领号角", effectValue2 = armor}
+    )
 end
 return ____exports

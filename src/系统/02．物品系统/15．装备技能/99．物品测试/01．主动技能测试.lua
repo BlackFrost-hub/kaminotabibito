@@ -3,23 +3,64 @@ local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local ____exports = {}
+local _____53D1_653E_76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5, debugLogForce, IssueTargetOrder, CreateItem, GetUnitX, GetUnitY, GetPlayerId, GetOwningPlayer, _____6A21_5757_540D, _____76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5_8DDD_79BB
 local ____01_FF0E_88C5_5907_6570_636E = require("系统.02．物品系统.01．装备数据")
 local _____88C5_5907_6570_636E = ____01_FF0E_88C5_5907_6570_636E.items
 local ____02_FF0E_901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.02．通用物品技能槽位配置")
 local _____901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E_8868 = ____02_FF0E_901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E["通用物品技能槽位配置表"]
 local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
 local _____5237_65B0_7269_54C1CD = ____20_FF0E_7269_54C1_8F85_52A9["刷新物品CD"]
+local _____65BD_52A0_51CF_901F = ____20_FF0E_7269_54C1_8F85_52A9["施加减速"]
 local ____00_FF0E_6D4B_8BD5_914D_7F6E = require("系统.02．物品系统.15．装备技能.99．物品测试.00．测试配置")
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试发放顺序"]
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试命令列表"]
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_8BF4_660E_6587_672C_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试命令说明文本列表"]
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_6E05_7406_88C5_5907_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试清理装备列表"]
+function _____53D1_653E_76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5(unit, _____88C5_5907_540D, rawId, itemTypeId)
+    local offsetX = 0
+    if rawId == "I0FL" then
+        offsetX = _____76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5_8DDD_79BB
+    elseif rawId == "I0FK" then
+        offsetX = -_____76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5_8DDD_79BB
+    else
+        return false
+    end
+    local item = CreateItem(
+        itemTypeId,
+        GetUnitX(unit) + offsetX,
+        GetUnitY(unit)
+    )
+    if item == nil or item == 0 then
+        debugLogForce(
+            _____6A21_5757_540D,
+            "创建盗贼神符失败",
+            _____88C5_5907_540D,
+            rawId,
+            itemTypeId
+        )
+        return true
+    end
+    local orderOk = IssueTargetOrder(unit, "smart", item)
+    debugLogForce(
+        _____6A21_5757_540D,
+        "已创建盗贼神符远距测试并命令拾取",
+        _____88C5_5907_540D,
+        rawId,
+        "距离",
+        _____76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5_8DDD_79BB,
+        "ownerPid",
+        GetPlayerId(GetOwningPlayer(unit)),
+        "orderOk",
+        orderOk
+    )
+    return true
+end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
+debugLogForce = ____require_result_0.debugLogForce
 local ____require_result_1 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
 local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_1["注册聊天命令监听"]
 local ____require_result_2 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
@@ -30,17 +71,16 @@ local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
 local ____require_result_5 = require("lib.扩展函数.物品相关函数.index")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_5["创建物品并注册排泄监听"]
-local IssueTargetOrder = jass.IssueTargetOrder
-local CreateItem = jass.CreateItem
-local UnitAddItem = jass.UnitAddItem
+IssueTargetOrder = jass.IssueTargetOrder
+CreateItem = jass.CreateItem
 local UnitRemoveItem = jass.UnitRemoveItem
-local GetUnitX = jass.GetUnitX
-local GetUnitY = jass.GetUnitY
+GetUnitX = jass.GetUnitX
+GetUnitY = jass.GetUnitY
 local GetItemTypeId = jass.GetItemTypeId
 local UnitItemInSlot = jass.UnitItemInSlot
-local GetPlayerId = jass.GetPlayerId
+GetPlayerId = jass.GetPlayerId
 local GetPlayerName = jass.GetPlayerName
-local GetOwningPlayer = jass.GetOwningPlayer
+GetOwningPlayer = jass.GetOwningPlayer
 local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local CreateGroup = jass.CreateGroup
@@ -50,13 +90,15 @@ local FirstOfGroup = jass.FirstOfGroup
 local GroupRemoveUnit = jass.GroupRemoveUnit
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local _____6A21_5757_540D = "物品主动技能测试"
+_____6A21_5757_540D = "物品主动技能测试"
 local _____7269_54C1_51B7_5374_5237_65B0_547D_4EE4 = "wpcd"
+local _____7269_54C1_8D1F_9762_6E05_9664_6D4B_8BD5_51CF_901F_547D_4EE4 = "wpslow"
 local _____6253_5370_6CE8_518C_547D_4EE4_65E5_5FD7 = false
 local _____6D4B_8BD5_73A9_5BB6_540D_79F0 = "WorldEdit"
 local _____7EA2_8272_73A9_5BB6ID = 0
 local _____6D4B_8BD5_7269_54C1_6280_80FDID_8868 = {}
 local _____6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374_79D2_8868 = {}
+_____76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5_8DDD_79BB = 700
 local _____5DF2_521D_59CB_5316_6D4B_8BD5_7269_54C1_6280_80FDID_8868 = false
 local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
     local ____g_gg_unit_Hamg_0002_6 = g.gg_unit_Hamg_0002
@@ -172,6 +214,9 @@ local function _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D)
         return false
     end
     local itemTypeId = stringToFourCCSafe(rawId)
+    if _____53D1_653E_76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5(unit, _____88C5_5907_540D, rawId, itemTypeId) then
+        return true
+    end
     local item = CreateItem(
         itemTypeId,
         GetUnitX(unit),
@@ -187,8 +232,8 @@ local function _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D)
         )
         return false
     end
-    UnitAddItem(unit, item)
-    debugLogForce(_____6A21_5757_540D, "已创建并加入背包", _____88C5_5907_540D, rawId)
+    IssueTargetOrder(unit, "smart", item)
+    debugLogForce(_____6A21_5757_540D, "已创建在脚下并命令拾取", _____88C5_5907_540D, rawId)
     return true
 end
 local function _____6DFB_52A0_6D4B_8BD5_7269_54C1_6280_80FDID(rawId, abilList)
@@ -207,14 +252,14 @@ local function _____6DFB_52A0_6D4B_8BD5_7269_54C1_6280_80FDID(rawId, abilList)
             do
                 local abilityRawId = __TS__StringTrim(rawAbilityList[i + 1])
                 if abilityRawId == "" then
-                    goto __continue33
+                    goto __continue39
                 end
                 local abilityId = stringToFourCCSafe(abilityRawId)
                 if abilityId ~= 0 and __TS__ArrayIndexOf(abilityIds, abilityId) < 0 then
                     abilityIds[#abilityIds + 1] = abilityId
                 end
             end
-            ::__continue33::
+            ::__continue39::
             i = i + 1
         end
     end
@@ -259,6 +304,10 @@ local function _____521D_59CB_5316_6D4B_8BD5_7269_54C1_6280_80FDID_8868()
         while i < #_____901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E_8868 do
             local _____914D_7F6E = _____901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E_8868[i + 1]
             if _____6D4B_8BD5_7269_54C1RawID_8868[_____914D_7F6E["物编ID"]] == true then
+                local itemTypeId = stringToFourCCSafe(_____914D_7F6E["物编ID"])
+                if itemTypeId ~= 0 then
+                    _____6D4B_8BD5_7269_54C1_6280_80FDID_8868[itemTypeId] = {}
+                end
                 _____6DFB_52A0_6D4B_8BD5_7269_54C1_6280_80FDID(_____914D_7F6E["物编ID"], _____914D_7F6E["技能ID"])
                 _____8BB0_5F55_6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374(_____914D_7F6E["物编ID"], _____914D_7F6E["冷却时间"])
             end
@@ -278,7 +327,7 @@ local function _____5237_65B0_82F1_96C4_88C5_5907_51B7_5374(hero)
             do
                 local item = UnitItemInSlot(hero, _____69FD_4F4D)
                 if item == nil or item == 0 then
-                    goto __continue52
+                    goto __continue59
                 end
                 local itemTypeId = GetItemTypeId(item)
                 local abilityIds = _____6D4B_8BD5_7269_54C1_6280_80FDID_8868[itemTypeId]
@@ -291,7 +340,7 @@ local function _____5237_65B0_82F1_96C4_88C5_5907_51B7_5374(hero)
                     ["范围"] = "全部"
                 })
             end
-            ::__continue52::
+            ::__continue59::
             _____69FD_4F4D = _____69FD_4F4D + 1
         end
     end
@@ -321,6 +370,25 @@ local function ____on_804A_5929_5237_65B0_7269_54C1_51B7_5374(player, _command)
         #heroes,
         "技能数",
         _____5237_65B0_6570_91CF
+    )
+end
+local function ____on_804A_5929_6302_8F7D_51CF_901F_6D4B_8BD5(player, _command)
+    if not _____662F_5141_8BB8_7269_54C1_6D4B_8BD5_73A9_5BB6(player) then
+        return
+    end
+    local unit = _____83B7_53D6_73A9_5BB6_6D4B_8BD5_5355_4F4D(player)
+    if unit == nil or unit == 0 then
+        debugLogForce(_____6A21_5757_540D, "未找到红色测试玩家英雄")
+        return
+    end
+    _____65BD_52A0_51CF_901F(unit, unit, 0.5, 12)
+    debugLogForce(
+        _____6A21_5757_540D,
+        "已给测试英雄施加减速Buff",
+        "持续秒数",
+        12,
+        "减速比例",
+        0.5
     )
 end
 local function _____53D1_653E_5355_4E2A_88C5_5907(unit, _____5E8F_53F7)
@@ -360,12 +428,14 @@ do
     end
 end
 _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____7269_54C1_51B7_5374_5237_65B0_547D_4EE4, ____on_804A_5929_5237_65B0_7269_54C1_51B7_5374)
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____7269_54C1_8D1F_9762_6E05_9664_6D4B_8BD5_51CF_901F_547D_4EE4, ____on_804A_5929_6302_8F7D_51CF_901F_6D4B_8BD5)
 if _____6253_5370_6CE8_518C_547D_4EE4_65E5_5FD7 then
     debugLogForce(
         _____6A21_5757_540D,
         "已注册测试命令",
         table.concat(_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_8BF4_660E_6587_672C_5217_8868, " | "),
-        _____7269_54C1_51B7_5374_5237_65B0_547D_4EE4 .. "=刷新当前玩家英雄装备冷却"
+        _____7269_54C1_51B7_5374_5237_65B0_547D_4EE4 .. "=刷新当前玩家英雄装备冷却",
+        _____7269_54C1_8D1F_9762_6E05_9664_6D4B_8BD5_51CF_901F_547D_4EE4 .. "=给当前测试英雄挂减速Buff"
     )
 end
 return ____exports

@@ -4,7 +4,7 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local _____4ECE_533A_57DF_627F_4F24_5438_6536_573A_5217_8868_79FB_9664, _____5C1D_8BD5_5173_95ED_533A_57DF_627F_4F24_5438_6536_573A_8BA1_65F6_5668, _____79FB_9664_533A_57DF_627F_4F24_5438_6536_573A, ____on_533A_57DF_627F_4F24_5438_6536_573ATick, _____5355_4F4D_5728_5438_6536_573A_5185, _____8BA1_7B97_533A_57DF_627F_4F24_5438_6536_91CF, ____on_533A_57DF_627F_4F24_5438_6536_573A_6700_7EC8_4F24_5BB3, offTick10ms, GetUnitX, GetUnitY, IsUnitAlly, IsUnitOwnedByPlayer, GetUnitState, SetUnitState, DestroyEffect, UNIT_STATE_LIFE, _____533A_57DF_627F_4F24_5438_6536_573A_8868, _____533A_57DF_627F_4F24_5438_6536_573AID_5217_8868, _____5DF2_6CE8_518C_533A_57DF_627F_4F24_5438_6536_573A_8BA1_65F6_5668
+local _____4ECE_533A_57DF_627F_4F24_5438_6536_573A_5217_8868_79FB_9664, _____5C1D_8BD5_5173_95ED_533A_57DF_627F_4F24_5438_6536_573A_8BA1_65F6_5668, _____79FB_9664_533A_57DF_627F_4F24_5438_6536_573A, ____on_533A_57DF_627F_4F24_5438_6536_573ATick, _____5355_4F4D_5728_5438_6536_573A_5185, _____8BA1_7B97_533A_57DF_627F_4F24_5438_6536_91CF, ____on_533A_57DF_627F_4F24_5438_6536_573A_4F24_5BB3_4FEE_6B63, offTick10ms, GetUnitX, GetUnitY, IsUnitAlly, IsUnitOwnedByPlayer, DestroyEffect, _____533A_57DF_627F_4F24_5438_6536_573A_8868, _____533A_57DF_627F_4F24_5438_6536_573AID_5217_8868, _____5DF2_6CE8_518C_533A_57DF_627F_4F24_5438_6536_573A_8BA1_65F6_5668
 function _____4ECE_533A_57DF_627F_4F24_5438_6536_573A_5217_8868_79FB_9664(id)
     do
         local i = #_____533A_57DF_627F_4F24_5438_6536_573AID_5217_8868 - 1
@@ -99,9 +99,12 @@ function _____8BA1_7B97_533A_57DF_627F_4F24_5438_6536_91CF(_____5B9E_4F8B, damag
     end
     return damage
 end
-function ____on_533A_57DF_627F_4F24_5438_6536_573A_6700_7EC8_4F24_5BB3(target, attacker, applied, snapshot)
-    if target == nil or target == 0 or not (applied > 0) then
-        return
+function ____on_533A_57DF_627F_4F24_5438_6536_573A_4F24_5BB3_4FEE_6B63(context)
+    local target = context.target
+    local attacker = context.attacker
+    local currentDamage = context.currentDamage
+    if target == nil or target == 0 or not (currentDamage > 0) then
+        return currentDamage
     end
     do
         local i = #_____533A_57DF_627F_4F24_5438_6536_573AID_5217_8868 - 1
@@ -121,43 +124,43 @@ function ____on_533A_57DF_627F_4F24_5438_6536_573A_6700_7EC8_4F24_5BB3(target, a
                     ["施法单位"] = _____5B9E_4F8B["参数"]["施法单位"],
                     ["受伤单位"] = target,
                     ["攻击者"] = attacker,
-                    ["伤害快照"] = snapshot
+                    ["伤害快照"] = context
                 }) then
                     goto __continue36
                 end
-                local absorb = _____8BA1_7B97_533A_57DF_627F_4F24_5438_6536_91CF(_____5B9E_4F8B, applied)
+                local absorb = _____8BA1_7B97_533A_57DF_627F_4F24_5438_6536_91CF(_____5B9E_4F8B, currentDamage)
                 if not (absorb > 0) then
                     goto __continue36
                 end
-                SetUnitState(
-                    target,
-                    UNIT_STATE_LIFE,
-                    GetUnitState(target, UNIT_STATE_LIFE) + absorb
-                )
                 _____5B9E_4F8B["剩余吸收值"] = _____5B9E_4F8B["剩余吸收值"] - absorb
+                currentDamage = currentDamage - absorb
                 if _____5B9E_4F8B["参数"]["on吸收"] ~= nil then
                     _____5B9E_4F8B["参数"]["on吸收"]({
                         ["场ID"] = id,
                         ["施法单位"] = _____5B9E_4F8B["参数"]["施法单位"],
                         ["受伤单位"] = target,
                         ["攻击者"] = attacker,
-                        ["本次伤害"] = applied,
+                        ["本次伤害"] = context.currentDamage,
                         ["吸收量"] = absorb,
                         ["剩余吸收值"] = _____5B9E_4F8B["剩余吸收值"],
-                        ["伤害快照"] = snapshot
+                        ["伤害快照"] = context
                     })
                 end
                 if _____5B9E_4F8B["剩余吸收值"] <= 0 then
                     _____79FB_9664_533A_57DF_627F_4F24_5438_6536_573A(id, true)
+                end
+                if currentDamage <= 0 then
+                    return 0
                 end
             end
             ::__continue36::
             i = i - 1
         end
     end
+    return currentDamage
 end
-local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
+local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_0.registerDamageModifier
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_1.onTick10ms
 offTick10ms = ____require_result_1.offTick10ms
@@ -170,10 +173,7 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 IsUnitAlly = jass.IsUnitAlly
 IsUnitOwnedByPlayer = jass.IsUnitOwnedByPlayer
-GetUnitState = jass.GetUnitState
-SetUnitState = jass.SetUnitState
 DestroyEffect = jass.DestroyEffect
-UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 _____533A_57DF_627F_4F24_5438_6536_573A_8868 = {}
 _____533A_57DF_627F_4F24_5438_6536_573AID_5217_8868 = {}
 local _____5DF2_6CE8_518C_533A_57DF_627F_4F24_5438_6536_573A_4F24_5BB3_76D1_542C = false
@@ -202,7 +202,7 @@ local function _____786E_4FDD_533A_57DF_627F_4F24_5438_6536_573A_4F24_5BB3_76D1_
         return
     end
     _____5DF2_6CE8_518C_533A_57DF_627F_4F24_5438_6536_573A_4F24_5BB3_76D1_542C = true
-    registerAppliedFinalDamageListener(____on_533A_57DF_627F_4F24_5438_6536_573A_6700_7EC8_4F24_5BB3)
+    registerDamageModifier(____on_533A_57DF_627F_4F24_5438_6536_573A_4F24_5BB3_4FEE_6B63, 80)
 end
 ____exports["创建区域承伤吸收场"] = function(_____53C2_6570)
     if _____53C2_6570["施法单位"] == nil or _____53C2_6570["施法单位"] == 0 then

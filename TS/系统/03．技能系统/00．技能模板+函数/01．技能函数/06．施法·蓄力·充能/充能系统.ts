@@ -16,11 +16,27 @@ const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中�
   onTick10ms: (this: void, callback: () => void) => void;
   offTick10ms: (this: void, callback: () => void) => void;
 };
+const {
+  registerImmediateOrderListener,
+  registerPointOrderListener,
+  registerTargetOrderListener,
+} = require("系统.00．核心系统.01．事件中心.11．单位指令事件中心") as {
+  registerImmediateOrderListener: (this: void, callback: (this: void, unit: any, orderId: number) => void) => void;
+  registerPointOrderListener: (this: void, callback: (this: void, unit: any, orderId: number, x: number, y: number) => void) => void;
+  registerTargetOrderListener: (this: void, callback: (this: void, unit: any, orderId: number, targetUnit: any, targetItem: any, targetDestructable: any) => void) => void;
+};
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   YDWETimerDestroyEffect: (duration: number, effect: any) => void;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const {
+  申请单位暂停占用,
+  释放单位暂停占用,
+} = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
+  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
 };
 
 import { 创建进度条特效, 销毁单位进度条特效 } from "./进度条特效";
@@ -65,6 +81,8 @@ export interface 充能参数 {
   持续时间: number;
   主单位?: any;
   主单位死亡时中断?: boolean;
+  指令中断?: boolean;
+  强制硬直?: boolean;
 
   显示进度条特效?: boolean;
   进度条特效高度偏移?: number;
@@ -92,6 +110,9 @@ interface 充能实例 {
   单位ID: number;
   主单位?: any;
   主单位死亡时中断: boolean;
+  指令中断: boolean;
+  强制硬直: boolean;
+  强制硬直来源?: string;
   总持续时间: number;
   剩余时间: number;
 
@@ -117,6 +138,7 @@ const 单位当前充能: Record<number, number | undefined> = {};
 const 充能打断回调列表: 充能打断回调[] = [];
 let 下一个充能ID = 1;
 let 已注册到中心计时器 = false;
+let 已注册指令中断监听 = false;
 let tick计数 = 0;
 let 地形采样点: any = null;
 
@@ -199,6 +221,36 @@ function 注册到中心计时器(): void {
   onTick10ms(on充能系统Tick);
 }
 
+function 尝试指令中断充能(this: void, 单位: any): void {
+  const 单位ID = 取句柄ID(单位);
+  if (单位ID === 0) return;
+  const 充能ID = 单位当前充能[单位ID];
+  if (充能ID == null) return;
+  const 实例 = 充能映射[充能ID];
+  if (实例 == null || 实例.强制硬直 === true || 实例.指令中断 !== true) return;
+  停止充能(充能ID);
+}
+
+function on充能单位立即指令(this: void, 单位: any, _orderId: number): void {
+  尝试指令中断充能(单位);
+}
+
+function on充能单位点指令(this: void, 单位: any, _orderId: number, _x: number, _y: number): void {
+  尝试指令中断充能(单位);
+}
+
+function on充能单位目标指令(this: void, 单位: any, _orderId: number, _targetUnit: any, _targetItem: any, _targetDestructable: any): void {
+  尝试指令中断充能(单位);
+}
+
+function 确保注册指令中断监听(this: void): void {
+  if (已注册指令中断监听) return;
+  已注册指令中断监听 = true;
+  registerImmediateOrderListener(on充能单位立即指令);
+  registerPointOrderListener(on充能单位点指令);
+  registerTargetOrderListener(on充能单位目标指令);
+}
+
 function 尝试关闭中心计时器(): void {
   if (活动充能列表.length > 0) return;
   从中心计时器注销();
@@ -227,6 +279,9 @@ function 结束充能实例(实例: 充能实例, 原因: 充能结束原因): v
 
   if (实例.显示进度条特效) {
     销毁单位进度条特效(实例.单位);
+  }
+  if (实例.强制硬直 && 实例.强制硬直来源 != null) {
+    释放单位暂停占用(实例.单位, 实例.强制硬直来源);
   }
 
   if (原因 === "完成" && 单位存活(实例.单位)) {
@@ -318,6 +373,8 @@ export function 开始充能(单位: any, 参数: 充能参数): number {
   const 完成特效 = 参数.完成特效;
   const 完成特效生命周期 = 归一化时间(参数.完成特效生命周期, DEFAULT_EFFECT_DURATION);
   const 周期回调间隔 = 归一化时间(参数.周期回调间隔, TICK_INTERVAL);
+  const 强制硬直 = 参数.强制硬直 === true;
+  const 强制硬直来源 = 强制硬直 ? `充能强制硬直#${充能ID}` : undefined;
 
   const 新实例: 充能实例 = {
     id: 充能ID,
@@ -325,6 +382,9 @@ export function 开始充能(单位: any, 参数: 充能参数): number {
     单位ID,
     主单位: 参数.主单位,
     主单位死亡时中断: 参数.主单位死亡时中断 !== false,
+    指令中断: !强制硬直 && 参数.指令中断 === true,
+    强制硬直,
+    强制硬直来源,
     总持续时间: 持续时间,
     剩余时间: 持续时间,
     显示进度条特效,
@@ -345,10 +405,12 @@ export function 开始充能(单位: any, 参数: 充能参数): number {
   活动充能列表.push(新实例);
   充能映射[充能ID] = 新实例;
   单位当前充能[单位ID] = 充能ID;
+  if (强制硬直 && 强制硬直来源 != null) 申请单位暂停占用(单位, 强制硬直来源);
+  if (新实例.指令中断) 确保注册指令中断监听();
 
   if (显示进度条特效) {
     创建进度条特效(单位, {
-      高度偏移: 参数.进度条特效高度偏移 ?? 275,
+      高度偏移: 参数.进度条特效高度偏移 ?? 233,
       动画序号: 参数.进度条特效动画序号 ?? 0,
       动画速度: 计算进度条动画速度(持续时间, 参数),
     });

@@ -32,6 +32,7 @@ export interface 技能收尾参数 {
 export interface 技能后摇参数 extends 技能收尾参数 {
   持续时间: number;
   显示进度条特效?: boolean;
+  强制硬直?: boolean;
   开始回调?: (this: void, 单位: any, 后摇ID: number) => void;
   完成回调?: (this: void, 单位: any, 后摇ID: number) => void;
 }
@@ -81,6 +82,7 @@ export function 开始技能后摇(单位: any, 参数: 技能后摇参数): num
   return 开始技能前摇(单位, {
     持续时间: 参数.持续时间,
     显示进度条特效: 参数.显示进度条特效,
+    强制硬直: 参数.强制硬直,
     开始回调: 参数.开始回调,
     前摇完成回调: 参数.完成回调,
     结束回调: function (this: void, 当前单位: any, 原因: 技能阶段结束原因, 后摇ID: number): void {
@@ -135,6 +137,7 @@ export function 开始技能生效帧(单位: any, 参数: 技能生效帧参数
         开始技能后摇(当前单位, {
           持续时间: 后摇时间,
           显示进度条特效: false,
+          强制硬直: 参数.强制硬直,
           恢复动作名: 参数.恢复动作名,
           恢复动画序号: 参数.恢复动画序号,
           清理函数列表: 参数.清理函数列表,

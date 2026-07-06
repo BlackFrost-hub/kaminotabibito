@@ -4,6 +4,8 @@ import type { 物品技能事件上下文 } from "../05．物品使用/00．公�
 import { 物品使用装备ID, 物品使用数值配置 } from "../05．物品使用/00．公共/01．物品使用配置表";
 import { 是否为使用物品, 获取范围友军, 取单位X, 取单位Y } from "../05．物品使用/00．公共/02．物品使用工具";
 import { 施加临时属性效果 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
+import { registerManualBuff } from "../../../05．Buff系统/00．Buff系统";
+import { 常规BuffID } from "../../../05．Buff系统/03．Buff表/00．Buff登记";
 
 export function 处理首领号角使用(this: void, ctx: 物品技能事件上下文): void {
   if (!是否为使用物品(ctx.物品, 物品使用装备ID.首领号角)) return;
@@ -17,6 +19,10 @@ export function 处理首领号角使用(this: void, ctx: 物品技能事件上�
     { 类型: "攻击", 数值: attack },
     { 类型: "护甲", 数值: armor },
   ]);
+  registerManualBuff(unit, 常规BuffID.首领号角_王之号角, cfg.持续毫秒 / 1000, attack, {
+    sourceName: "首领号角",
+    effectValue2: armor,
+  });
 }
 
 export {};

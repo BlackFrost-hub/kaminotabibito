@@ -9,6 +9,7 @@ local _____53F2_8BD7_8FDC_53E4_9B54_5203_7269_54C1ID = ____01_FF0E_4E3B_52A8_628
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____53F2_8BD7_8FDC_53E4_9B54_5203_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["史诗远古魔刃配置"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____require_result_0.createTimedEffect
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
@@ -18,10 +19,10 @@ local _____521B_5EFA_7EBF_6027_626B_63A0_547D_4E2D = ____require_result_2["创�
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local ConvertUnitState = jass.ConvertUnitState
 local Atan2 = jass.Atan2
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local GetUnitStateJapi = japi.GetUnitState
 local function _____662F_5426_4E3A_53F2_8BD7_8FDC_53E4_9B54_5203(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
@@ -58,7 +59,7 @@ ____exports["处理史诗远古魔刃使用"] = function(_____4E0A_4E0B_6587)
             )
         end,
         ["on命中"] = function(_____654C_4EBA, _____626B_63A0_4E0A_4E0B_6587)
-            local _____4F24_5BB3_503C = GetUnitState(
+            local _____4F24_5BB3_503C = GetUnitStateJapi(
                 _____626B_63A0_4E0A_4E0B_6587["施法单位"],
                 ConvertUnitState(21)
             ) * _____53F2_8BD7_8FDC_53E4_9B54_5203_914D_7F6E["力量系数"]

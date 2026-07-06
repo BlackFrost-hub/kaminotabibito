@@ -1,6 +1,8 @@
 dofile('Equipment/EquipmentItemTemplates.lua')
 dofile('Equipment/EquipmentAbilityTemplates.lua')
+dofile('Equipment/LegacyActiveItems.lua')
 
+dofile('Equipment/ItemUnits/FireTorchUnit.lua')
 dofile('Equipment/Consumable/Consumable.lua')
 dofile('Equipment/QuestItem/QuestItem.lua')
 dofile('Equipment/Item/Item.lua')

@@ -60,6 +60,7 @@ const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => boolean;
 const IsPointBlighted = jass.IsPointBlighted as (x: number, y: number) => boolean;
 const SetItemCharges = jass.SetItemCharges as (whichItem: any, charges: number) => void;
 const GetItemCharges = jass.GetItemCharges as (whichItem: any) => number;
+const RemoveItem = jass.RemoveItem as (whichItem: any) => void;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (whichUnit: any, buffId: number, duration: number) => void;
 const SetUnitScale = jass.SetUnitScale as (whichUnit: any, scaleX: number, scaleY: number, scaleZ: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (whichUnit: any, flag: boolean) => void;
@@ -102,7 +103,7 @@ const stringToFourCCSafe = (require("lib.扩展函数.封装函数.01．通用�
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 }).stringToFourCCSafe;
 
-const 火把单位类型ID = stringToFourCCSafe("e00D");
+const 火把单位类型ID = stringToFourCCSafe("e0FT");
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
 
 type 待销毁特效记录 = {
@@ -166,6 +167,11 @@ export function 增加物品次数(this: void, 单位: any, 物品类型ID: numb
   let next = current + 次数;
   if (next > 最大值) next = 最大值;
   设置物品次数(单位, 物品类型ID, next);
+}
+
+export function 移除已用尽次数物品(this: void, 物品: any): void {
+  if (物品 == null || 物品 === 0) return;
+  if (GetItemCharges(物品) <= 0) RemoveItem(物品);
 }
 
 export function 单位存活(this: void, 单位: any): boolean {

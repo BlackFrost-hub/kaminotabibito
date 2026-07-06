@@ -8,18 +8,22 @@ local _____662F_5426_4E3A_4F7F_7528_7269_54C1 = ____02_FF0E_7269_54C1_4F7F_7528_
 local _____83B7_53D6_8303_56F4_654C_4EBA = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["获取范围敌人"]
 local _____53D6_5355_4F4DX = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取单位Y"]
-local _____53D6_5F53_524D_9B54_6CD5 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取当前魔法"]
 local _____53D6_6700_5927_9B54_6CD5 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["取最大魔法"]
-local _____8BBE_7F6E_9B54_6CD5 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["设置魔法"]
 local _____8C03_6574_5355_4F4D_5C5E_6027 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["调整单位属性"]
 local _____9020_6210_6697_5F71_4F24_5BB3 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["造成暗影伤害"]
 local _____65BD_52A0_7729_6655 = ____02_FF0E_7269_54C1_4F7F_7528_5DE5_5177["施加眩晕"]
 local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
 local _____5EF6_8FDF_6267_884C = ____20_FF0E_7269_54C1_8F85_52A9["延迟执行"]
+local ____00_FF0EBuff_7CFB_7EDF = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____00_FF0EBuff_7CFB_7EDF.registerManualBuff
+local ____00_FF0EBuff_767B_8BB0 = require("系统.05．Buff系统.03．Buff表.00．Buff登记")
+local _____5E38_89C4BuffID = ____00_FF0EBuff_767B_8BB0["常规BuffID"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
 local GetHeroInt = jass.GetHeroInt
+local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+local _____51CF_5C11_9B54_6CD5_503C = ____require_result_0["减少魔法值"]
 local function _____7ED3_7B97_9634_6697_4E4B_6572_949F(_____6765_6E90, _____76EE_6807_5217_8868)
     local cfg = _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["地狱敲钟"]
     local damage = GetHeroInt(_____6765_6E90, true) * cfg["智力伤害倍率"]
@@ -35,9 +39,11 @@ ____exports["处理阴暗之敲钟使用"] = function(ctx)
     end
     local cfg = _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["地狱敲钟"]
     local unit = ctx["施法单位"]
-    _____8BBE_7F6E_9B54_6CD5(
+    _____51CF_5C11_9B54_6CD5_503C(
         unit,
-        _____53D6_5F53_524D_9B54_6CD5(unit) - (_____53D6_6700_5927_9B54_6CD5(unit) * cfg["消耗最大魔法比例"] + cfg["消耗固定魔法"])
+        _____53D6_6700_5927_9B54_6CD5(unit) * cfg["消耗最大魔法比例"] + cfg["消耗固定魔法"],
+        true,
+        false
     )
     local targets = _____83B7_53D6_8303_56F4_654C_4EBA(
         unit,
@@ -47,6 +53,13 @@ ____exports["处理阴暗之敲钟使用"] = function(ctx)
     )
     for ____, target in ipairs(targets) do
         _____8C03_6574_5355_4F4D_5C5E_6027(target, "伤害%", -cfg["阴暗减伤"])
+        registerManualBuff(
+            target,
+            _____5E38_89C4BuffID["伤害降低"],
+            cfg["阴暗持续毫秒"] / 1000,
+            cfg["阴暗减伤"] * 100,
+            {sourceName = "阴暗之敲钟"}
+        )
     end
     _____5EF6_8FDF_6267_884C(
         cfg["阴暗持续毫秒"],

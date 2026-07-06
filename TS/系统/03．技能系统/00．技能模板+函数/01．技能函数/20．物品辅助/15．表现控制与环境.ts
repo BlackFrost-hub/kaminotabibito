@@ -102,7 +102,7 @@ const stringToFourCCSafe = (require("lib.扩展函数.封装函数.01．通用�
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 }).stringToFourCCSafe;
 
-const 火把单位类型ID = stringToFourCCSafe("e00D");
+const 火把单位类型ID = stringToFourCCSafe("e0FT");
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
 
 type 待销毁特效记录 = {

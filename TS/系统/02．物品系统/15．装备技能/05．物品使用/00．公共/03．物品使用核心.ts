@@ -43,6 +43,7 @@ const 守卫大剑 = require("系统.02．物品系统.15．装备技能.00．�
 const 斯尔能量之心 = require("系统.02．物品系统.15．装备技能.00．物品.55．斯尔能量之心") as {
   处理斯尔能量之心使用: (this: void, ctx: 物品技能事件上下文) => void;
   处理斯尔能量之心击杀: (this: void, dyingUnit: any, killingUnit: any) => void;
+  处理斯尔能量之心伤害修正: (this: void, context: any) => number;
 };
 const 熔岩地狱之敲钟 = require("系统.02．物品系统.15．装备技能.00．物品.56．熔岩地狱之敲钟") as { 处理熔岩地狱之敲钟使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 阴暗之敲钟 = require("系统.02．物品系统.15．装备技能.00．物品.57．阴暗之敲钟") as { 处理阴暗之敲钟使用: (this: void, ctx: 物品技能事件上下文) => void };
@@ -50,6 +51,7 @@ const 地狱火卡牌攻击 = require("系统.02．物品系统.15．装备技�
 const 焰混能量体 = require("系统.02．物品系统.15．装备技能.00．物品.59．焰混能量体") as {
   处理焰混能量体使用: (this: void, ctx: 物品技能事件上下文) => void;
   处理焰混能量体伤害: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void;
+  初始化焰混能量体被动: (this: void) => void;
 };
 const 恶斯胸甲 = require("系统.02．物品系统.15．装备技能.00．物品.60．恶斯胸甲") as {
   处理恶斯胸甲使用: (this: void, ctx: 物品技能事件上下文) => void;
@@ -61,13 +63,15 @@ const 魔古战刃 = require("系统.02．物品系统.15．装备技能.00．�
   处理魔古战刃使用: (this: void, ctx: 物品技能事件上下文) => void;
   处理魔古战刃伤害: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void;
 };
-const 女妖魔甲 = require("系统.02．物品系统.15．装备技能.00．物品.64．女妖魔甲") as { 处理女妖魔甲使用: (this: void, ctx: 物品技能事件上下文) => void };
+const 女妖魔甲 = require("系统.02．物品系统.15．装备技能.00．物品.64．女妖魔甲") as {
+  处理女妖魔甲使用: (this: void, ctx: 物品技能事件上下文) => void;
+  处理女妖魔甲伤害修正: (this: void, context: any) => number;
+};
 const 熔灵宝石之戒 = require("系统.02．物品系统.15．装备技能.00．物品.65．熔灵宝石之戒") as { 处理熔灵宝石之戒使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 浴血药剂 = require("系统.02．物品系统.15．装备技能.00．物品.66．浴血药剂") as { 处理浴血药剂使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 浴魔药剂 = require("系统.02．物品系统.15．装备技能.00．物品.67．浴魔药剂") as { 处理浴魔药剂使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 浴灵药剂 = require("系统.02．物品系统.15．装备技能.00．物品.68．浴灵药剂") as { 处理浴灵药剂使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 嗜狱恶剑 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑") as { 处理嗜狱恶剑使用: (this: void, ctx: 物品技能事件上下文) => void };
-const 盗贼神符魔抗 = require("系统.02．物品系统.15．装备技能.00．物品.70．盗贼神符魔抗") as { 处理盗贼神符魔抗使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 火把 = require("系统.02．物品系统.15．装备技能.00．物品.71．火把") as { 处理火把使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 抗毒药水 = require("系统.02．物品系统.15．装备技能.00．物品.114．抗毒药水") as { 处理抗毒药水使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 瑟兰迪尔的决心 = require("系统.02．物品系统.15．装备技能.00．物品.162．瑟兰迪尔的决心") as { 处理瑟兰迪尔的决心使用: (this: void, ctx: 物品技能事件上下文) => void };
@@ -149,9 +153,6 @@ function on物品使用链路(this: void, ctx: 物品技能事件上下文): voi
     case 物品使用装备ID.嗜狱恶剑:
       嗜狱恶剑.处理嗜狱恶剑使用(ctx);
       break;
-    case 物品使用装备ID.盗贼神符魔抗:
-      盗贼神符魔抗.处理盗贼神符魔抗使用(ctx);
-      break;
     case 物品使用装备ID.火把:
       火把.处理火把使用(ctx);
       break;
@@ -184,13 +185,19 @@ function on物品使用最终伤害(this: void, target: any, attacker: any, appl
 function on物品使用伤害修正(this: void, context: any): number {
   if (!(context.currentDamage >= 1)) return context.currentDamage;
   if (context.isTrueDamage === true) return context.currentDamage;
-  return 恶斯胸甲.处理恶斯胸甲伤害修正(context);
+  let result = 恶斯胸甲.处理恶斯胸甲伤害修正(context);
+  context.currentDamage = result;
+  result = 女妖魔甲.处理女妖魔甲伤害修正(context);
+  context.currentDamage = result;
+  result = 斯尔能量之心.处理斯尔能量之心伤害修正(context);
+  return result;
 }
 
 export function 初始化装备物品使用链(this: void): void {
   if (已初始化) return;
   已初始化 = true;
   狱妖魔盾.初始化狱妖魔盾持有充能();
+  焰混能量体.初始化焰混能量体被动();
   注册物品技能事件监听(on物品使用链路);
   registerDeathListener(on物品使用死亡事件);
   registerAppliedFinalDamageListener(on物品使用最终伤害);

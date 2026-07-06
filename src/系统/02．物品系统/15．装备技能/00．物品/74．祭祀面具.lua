@@ -17,7 +17,7 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 local function ____on_796D_7940_9762_5177_5468_671F(unit)
     local amount = _____796D_7940_9762_5177_914D_7F6E["固定扣蓝"] + _____53D6_6700_5927_9B54_6CD5(unit) * _____796D_7940_9762_5177_914D_7F6E["最大魔法扣蓝比例"]
-    _____51CF_5C11_9B54_6CD5_503C(unit, amount, true, true)
+    _____51CF_5C11_9B54_6CD5_503C(unit, amount, true, false)
     if not _____5355_4F4D_5B58_6D3B(unit) then
         return
     end

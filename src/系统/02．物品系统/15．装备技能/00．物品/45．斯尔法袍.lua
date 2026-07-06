@@ -16,23 +16,39 @@ local ____10_FF0E_5468_671F_6267_884C_6A21_677F = require("系统.03．技能系
 local _____542F_52A8_8BA1_6570_5468_671F_6267_884C = ____10_FF0E_5468_671F_6267_884C_6A21_677F["启动计数周期执行"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧")
 local _____5F00_59CB_65E0_654C_5E27 = ____require_result_0["开始无敌帧"]
-local jass = require("jass.common")
-local SetUnitState = jass.SetUnitState
-local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
+local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+local _____53D8_66F4_8D44_6E90_503C = ____require_result_1["变更资源值"]
 local function _____7ED3_675F_65AF_5C14_6CD5_888D_7ED3_7B97(_____8BB0_5F55)
     if _____8BB0_5F55["目标"] == nil or _____8BB0_5F55["目标"] == 0 then
         return
     end
-    SetUnitState(_____8BB0_5F55["目标"], UNIT_STATE_MANA, 1)
+    local _____5F53_524D_9B54_6CD5 = _____53D6_5F53_524D_9B54_6CD5(_____8BB0_5F55["目标"])
+    if _____5F53_524D_9B54_6CD5 > 1 then
+        _____53D8_66F4_8D44_6E90_503C(
+            _____8BB0_5F55["目标"],
+            -(_____5F53_524D_9B54_6CD5 - 1),
+            "mana",
+            true,
+            false,
+            nil,
+            1
+        )
+    end
 end
 local function ____on_65AF_5C14_6CD5_888DTick(_____8BB0_5F55)
     if _____8BB0_5F55 == nil or _____8BB0_5F55["目标"] == nil or _____8BB0_5F55["目标"] == 0 then
         return false
     end
     _____6267_884C_7269_54C1_6CBB_7597(_____8BB0_5F55["目标"], _____8BB0_5F55["目标"], _____8BB0_5F55["每跳扣魔"] * 1.2, "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl")
-    local _____5F53_524D_9B54_6CD5 = _____53D6_5F53_524D_9B54_6CD5(_____8BB0_5F55["目标"])
-    local _____4E0B_6B21_9B54_6CD5 = _____5F53_524D_9B54_6CD5 - _____8BB0_5F55["每跳扣魔"]
-    SetUnitState(_____8BB0_5F55["目标"], UNIT_STATE_MANA, _____4E0B_6B21_9B54_6CD5 > 1 and _____4E0B_6B21_9B54_6CD5 or 1)
+    _____53D8_66F4_8D44_6E90_503C(
+        _____8BB0_5F55["目标"],
+        -_____8BB0_5F55["每跳扣魔"],
+        "mana",
+        true,
+        false,
+        nil,
+        1
+    )
 end
 ____exports["处理斯尔法袍伤害修正"] = function(context)
     local target = context.target

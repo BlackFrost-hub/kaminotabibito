@@ -11,8 +11,11 @@ const { createUnitEffect } = require("lib.扩展函数.封装函数.01．通用�
 
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
+const { 减少魔法值, 增加魔法值 } = require("系统.04．伤害系统.02．治疗系统.07．减少生命值") as {
+  减少魔法值: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean, effectPath?: string) => number;
+  增加魔法值: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean, effectPath?: string) => number;
+};
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 暗幽亡戒物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
@@ -32,9 +35,10 @@ export function 处理暗幽亡戒使用(this: void, 上下文: 物品技能事�
   if (施法单位 == null || 施法单位 === 0 || 目标单位 == null || 目标单位 === 0) return;
 
   const 转移值 = GetUnitState(施法单位, UNIT_STATE_MANA) * 暗幽亡戒配置.魔法转移比例;
-  SetUnitState(目标单位, UNIT_STATE_MANA, GetUnitState(目标单位, UNIT_STATE_MANA) + 转移值);
+  const 实际转移值 = -减少魔法值(施法单位, 转移值, true, false);
+  if (!(实际转移值 > 0)) return;
+  增加魔法值(目标单位, 实际转移值, true, false);
   createUnitEffect(目标单位, 暗幽亡戒配置.特效挂点, 暗幽亡戒配置.特效路径, 暗幽亡戒配置.特效持续时间, "暗幽亡戒");
-  SetUnitState(施法单位, UNIT_STATE_MANA, GetUnitState(施法单位, UNIT_STATE_MANA) - 转移值);
 }
 
 export {};

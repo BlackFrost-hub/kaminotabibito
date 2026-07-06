@@ -37,8 +37,6 @@ const { 女妖头饰强化累计配置 } = require("系统.02．物品系统.15�
 };
 
 const jass = require("jass.common") as any;
-const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (u: any, state: any, value: number) => void;
 const GetItemCharges = jass.GetItemCharges as (it: any) => number;
 const SetItemCharges = jass.SetItemCharges as (it: any, charges: number) => void;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {

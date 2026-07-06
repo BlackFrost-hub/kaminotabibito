@@ -46,6 +46,10 @@ const { 是否允许装备次数叠加 } = require("系统.02．物品系统.16�
 const EQUIP_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 13] as const;
 const 装备视野BuffID = "C034";
 const 装备视野Buff显示持续时间 = 999999;
+const 不走装备系统物品ID表: Record<string, true> = {
+  I0FK: true,
+  I0FL: true,
+};
 
 interface StatEntry {
   name: string;
@@ -101,6 +105,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     return;
   }
   const idStr = fourCCToString(GetItemTypeId(item));
+  if (不走装备系统物品ID表[idStr] === true) return;
   const itemData = itemRelatedFns.getItemDataEntry(item);
   if (!itemData) {
     if (isPickup) {

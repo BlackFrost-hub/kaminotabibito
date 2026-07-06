@@ -29,6 +29,9 @@ const { 注册持有型范围光环 } = require("系统.03．技能系统.00．�
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
+const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+};
 
 const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -42,6 +45,7 @@ import { 使者魔炉配置 } from "../03．主动技能/03．物品使用触发
 import { 调整玩家属性, 调整单位属性 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const 命中率字段 = "命中率";
+const 使者魔炉致盲BuffID = "C042";
 const 光环同步间隔毫秒 = 100;
 
 function 是否为使者魔炉(this: void, 物品: any): boolean {
@@ -118,6 +122,10 @@ export function 处理使者魔炉使用(this: void, 上下文: 物品技能事�
     const 敌人 = 敌人列表[i];
     if (!单位是否有效且敌对(敌人, 施法单位)) continue;
     调整命中率(敌人, -使者魔炉配置.命中率削减);
+    registerManualBuff(敌人, 使者魔炉致盲BuffID, 使者魔炉配置.恢复延迟, 使者魔炉配置.命中率削减 * 100, {
+      sourceName: "使者魔炉",
+      iconOverride: "ReplaceableTextures\\CommandButtons\\BTN000230.blp",
+    });
     命中目标列表.push(敌人);
   }
   启动命中恢复(特效, 命中目标列表);

@@ -10,9 +10,7 @@ export function 处理火把使用(this: void, ctx: 物品技能事件上下文)
   const cfg = 物品使用数值配置.火把;
   const sx = 取单位X(unit);
   const sy = 取单位Y(unit);
-  const tx = ctx.目标X !== 0 || ctx.目标Y !== 0 ? ctx.目标X : sx;
-  const ty = ctx.目标X !== 0 || ctx.目标Y !== 0 ? ctx.目标Y : sy;
-  const point = 限制目标点距离(sx, sy, tx, ty, cfg.最大距离);
+  const point = 限制目标点距离(sx, sy, ctx.目标X, ctx.目标Y, cfg.最大距离);
   创建火把单位(unit, point.x, point.y, point.angle, cfg.模型, cfg.持续时间);
 }
 

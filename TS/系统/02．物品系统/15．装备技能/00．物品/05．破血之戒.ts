@@ -17,15 +17,19 @@ const { createTimedEffect, 创建Dz绑定单位特效, 销毁Dz绑定单位特�
 const { 开始充能 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统") as {
   开始充能: (this: void, 单位: any, 参数: any) => number;
 };
+const { 创建单位绑定闪电 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电") as {
+  创建单位绑定闪电: (this: void, 参数: any) => any;
+};
 const { 获取坐标范围敌人 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围") as {
   获取坐标范围敌人: (this: void, centerUnit: any, x: number, y: number, radius: number) => any[];
 };
 
 const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (u: any, state: any, value: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED as any;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const { 减少生命值 } = require("系统.04．伤害系统.02．治疗系统.07．减少生命值") as {
+  减少生命值: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean, effectPath?: string, 最低保留生命?: number) => number;
+};
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 破血之戒物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
@@ -56,6 +60,15 @@ function 结算破血之戒(this: void, 施法单位: any): void {
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];
     if (敌人 == null || 敌人 === 0) continue;
+    创建单位绑定闪电({
+      效果代码: "AFOD",
+      起点单位: 施法单位,
+      终点单位: 敌人,
+      持续时间: 0.8,
+      起点高度偏移: 80,
+      终点高度偏移: 80,
+      任一死亡时销毁: true,
+    });
     造成装备伤害(施法单位, 敌人, 伤害值, DAMAGE_TYPE_ENHANCED, true, undefined, { 伤害形态: "AOE" });
   }
 }
@@ -66,7 +79,9 @@ function 开始破血之戒充能(this: void, 施法单位: any): void {
     持续时间: 破血之戒配置.充能时间,
     主单位: 施法单位,
     主单位死亡时中断: true,
+    指令中断: true,
     显示进度条特效: true,
+    进度条特效高度偏移: 233,
     充能完成回调: function 破血之戒完成回调(this: void, 单位: any, _充能ID: number): void {
       结算破血之戒(单位);
     },
@@ -90,8 +105,7 @@ export function 处理破血之戒使用(this: void, 上下文: 物品技能事�
     目标单位: 上下文.目标单位,
   });
 
-  const 当前生命 = GetUnitState(施法单位, UNIT_STATE_LIFE);
-  SetUnitState(施法单位, UNIT_STATE_LIFE, 当前生命 - 1000);
+  减少生命值(施法单位, 1000, true, false, undefined, 1);
   开始破血之戒充能(施法单位);
 }
 

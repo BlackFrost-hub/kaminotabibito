@@ -15,7 +15,12 @@ ____exports.DEFAULT_PLAYER_UNIT_EVENT_PLAYER_IDS = {
 }
 local dispatchTriggers = {}
 local registeredKeys = {}
+local itemEventContextStack = {}
 local masterTrigger = nil
+local GetTriggerUnit = jass.GetTriggerUnit
+local GetTriggerPlayer = jass.GetTriggerPlayer
+local GetTriggerEventId = jass.GetTriggerEventId
+local GetManipulatedItem = jass.GetManipulatedItem
 local function normalizeFilter(filter)
     local ____temp_0
     if filter == nil then
@@ -30,10 +35,28 @@ local function eventKey(player, eventId)
     return (tostring(playerId) .. ":") .. tostring(eventId)
 end
 local function currentEventKey()
-    local player = jass.GetTriggerPlayer()
+    local player = GetTriggerPlayer()
     local playerId = jass.GetPlayerId(player)
-    local eventId = jass.GetTriggerEventId()
+    local eventId = GetTriggerEventId()
     return (tostring(playerId) .. ":") .. tostring(eventId)
+end
+local function _____662F_7269_54C1_5355_4F4D_4E8B_4EF6(eventId)
+    return eventId == jass.EVENT_PLAYER_UNIT_PICKUP_ITEM or eventId == jass.EVENT_PLAYER_UNIT_DROP_ITEM or eventId == jass.EVENT_PLAYER_UNIT_USE_ITEM
+end
+local function _____6355_83B7_7269_54C1_5355_4F4D_4E8B_4EF6_4E0A_4E0B_6587()
+    local eventId = GetTriggerEventId()
+    local ____GetTriggerUnit_result_2 = GetTriggerUnit()
+    local ____GetTriggerPlayer_result_3 = GetTriggerPlayer()
+    local _____662F_7269_54C1_5355_4F4D_4E8B_4EF6_result_1
+    if _____662F_7269_54C1_5355_4F4D_4E8B_4EF6(eventId) then
+        _____662F_7269_54C1_5355_4F4D_4E8B_4EF6_result_1 = GetManipulatedItem()
+    else
+        _____662F_7269_54C1_5355_4F4D_4E8B_4EF6_result_1 = nil
+    end
+    return {triggerUnit = ____GetTriggerUnit_result_2, triggerPlayer = ____GetTriggerPlayer_result_3, triggerEventId = eventId, manipulatedItem = _____662F_7269_54C1_5355_4F4D_4E8B_4EF6_result_1}
+end
+____exports["取当前玩家单位物品事件上下文"] = function()
+    return itemEventContextStack[#itemEventContextStack]
 end
 local function hasTrigger(list, trig)
     do
@@ -58,26 +81,29 @@ local function dispatchPlayerUnitEvent(key)
             do
                 local trig = list[i + 1]
                 if not trig then
-                    goto __continue12
+                    goto __continue15
                 end
-                local ____temp_1
+                local ____temp_4
                 if type(jass.TriggerEvaluate) == "function" then
-                    ____temp_1 = jass.TriggerEvaluate(trig)
+                    ____temp_4 = jass.TriggerEvaluate(trig)
                 else
-                    ____temp_1 = true
+                    ____temp_4 = true
                 end
-                local passed = ____temp_1
+                local passed = ____temp_4
                 if passed then
                     jass.TriggerExecute(trig)
                 end
             end
-            ::__continue12::
+            ::__continue15::
             i = i + 1
         end
     end
 end
 local function dispatchPlayerUnitEventMaster()
+    local context = _____6355_83B7_7269_54C1_5355_4F4D_4E8B_4EF6_4E0A_4E0B_6587()
+    itemEventContextStack[#itemEventContextStack + 1] = context
     dispatchPlayerUnitEvent(currentEventKey())
+    table.remove(itemEventContextStack)
 end
 local function ensureMasterTrigger()
     if masterTrigger then

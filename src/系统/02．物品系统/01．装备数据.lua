@@ -1937,7 +1937,7 @@ ____exports.items.I017 = {type = "材料", name = "蛇鳞片", goldPrice = 0}
 ____exports.items.I018 = {type = "主武器", name = "银蛇剑", goldPrice = 0}
 ____exports.items.I019 = {type = "主武器", name = "蛇包剑", goldPrice = 0}
 ____exports.items.I01A = {type = "材料", name = "合成|打造", goldPrice = 0}
-____exports.items.I01B = {type = "神符", name = "盗贼神符（魔抗）", goldPrice = 0}
+____exports.items.I0FL = {type = "神符", name = "盗贼神符（魔抗）", goldPrice = 0, PowerUP = "20%magicResist;time10"}
 ____exports.items.I01I = {
     type = "灵魂",
     name = "邪恶之心（死亡掉落）",
@@ -2409,6 +2409,7 @@ ____exports.items.I06Q = {
     level = "D",
     dmg = 40,
     mpRegen = -10,
+    armorPierce = 0.5,
     abilList = "A083"
 }
 ____exports.items.I06R = {
@@ -4125,7 +4126,7 @@ ____exports.items.I0FI = {
     abilList = "IP00"
 }
 ____exports.items.I0FJ = {type = "任务", name = "骸骨圣杯碎片", goldPrice = 0}
-____exports.items.azhr = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "A0HC"}
+____exports.items.I0FM = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "IP01"}
 ____exports.items.ches = {
     type = "药剂/食品",
     name = "奶酪",
@@ -4137,7 +4138,7 @@ ____exports.items.ches = {
 ____exports.items.gmfr = {type = "货币", name = "帝国货币", goldPrice = 1000}
 ____exports.items.gold = {type = "神符", name = "金币", goldPrice = 0, PowerUP = "500-7500gold"}
 ____exports.items.manh = {type = "道具/戒指/饰品", name = "生命手册", goldPrice = 0, PowerUP = "50hp"}
-____exports.items.rdis = {type = "神符", name = "盗贼神符（护甲）", goldPrice = 0, PowerUP = "15armor;time10"}
+____exports.items.I0FK = {type = "神符", name = "盗贼神符（护甲）", goldPrice = 0, PowerUP = "15armor;time10"}
 ____exports.items.rump = {
     type = "副武器",
     name = "|cffffcc99沙漠矿铲|r",

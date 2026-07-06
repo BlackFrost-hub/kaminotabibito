@@ -45,10 +45,30 @@ local function getNextListenerId()
     listenerIdCounter = listenerIdCounter + 1
     return listenerIdCounter
 end
+local function _____53D6_5F53_524D_7269_54C1_4E8B_4EF6_5355_4F4D()
+    local context = playerUnitEvent["取当前玩家单位物品事件上下文"]()
+    local ____temp_0
+    if context ~= nil then
+        ____temp_0 = context.triggerUnit
+    else
+        ____temp_0 = GetTriggerUnit()
+    end
+    return ____temp_0
+end
+local function _____53D6_5F53_524D_7269_54C1_4E8B_4EF6_7269_54C1()
+    local context = playerUnitEvent["取当前玩家单位物品事件上下文"]()
+    local ____temp_1
+    if context ~= nil then
+        ____temp_1 = context.manipulatedItem
+    else
+        ____temp_1 = GetManipulatedItem()
+    end
+    return ____temp_1
+end
 --- 分发拾取事件到所有监听器
 local function dispatchPickupEvent()
-    local unit = GetTriggerUnit()
-    local item = GetManipulatedItem()
+    local unit = _____53D6_5F53_524D_7269_54C1_4E8B_4EF6_5355_4F4D()
+    local item = _____53D6_5F53_524D_7269_54C1_4E8B_4EF6_7269_54C1()
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return
     end
@@ -65,8 +85,8 @@ local function dispatchPickupEvent()
 end
 --- 分发丢弃事件到所有监听器
 local function dispatchDropEvent()
-    local unit = GetTriggerUnit()
-    local item = GetManipulatedItem()
+    local unit = _____53D6_5F53_524D_7269_54C1_4E8B_4EF6_5355_4F4D()
+    local item = _____53D6_5F53_524D_7269_54C1_4E8B_4EF6_7269_54C1()
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return
     end
@@ -83,8 +103,8 @@ local function dispatchDropEvent()
 end
 --- 分发使用事件到所有监听器
 local function dispatchUseEvent()
-    local unit = GetTriggerUnit()
-    local item = GetManipulatedItem()
+    local unit = _____53D6_5F53_524D_7269_54C1_4E8B_4EF6_5355_4F4D()
+    local item = _____53D6_5F53_524D_7269_54C1_4E8B_4EF6_7269_54C1()
     if unit == nil or unit == 0 or item == nil or item == 0 then
         return
     end

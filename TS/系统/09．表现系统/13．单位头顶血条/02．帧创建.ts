@@ -65,6 +65,7 @@ export function 创建单位血条帧组(this: void, 槽位: number): 单位血�
   if (root === 0) return null;
   DzFrameSetSize(root, 血条尺寸.根宽, 血条尺寸.根高);
 
+  const lifeLag = 创建贴图帧("UnitHeadHealthBarLifeLag_" + suffix, root, 血条资源.生命缓降, 血条层级.生命缓降);
   const life = 创建贴图帧("UnitHeadHealthBarLife_" + suffix, root, 血条资源.友方生命, 血条层级.生命);
   const shields: number[] = [];
   for (let i = 0; i < 血条尺寸.最大护盾分段数; i++) {
@@ -77,9 +78,12 @@ export function 创建单位血条帧组(this: void, 槽位: number): 单位血�
   for (let i = 0; i < shields.length; i++) {
     if (shields[i] === 0) shieldOk = false;
   }
-  if (life === 0 || !shieldOk || mana === 0 || name == null || name === 0) {
+  if (lifeLag === 0 || life === 0 || !shieldOk || mana === 0 || name == null || name === 0) {
     return null;
   }
+
+  DzFrameSetSize(lifeLag, 0.0, 血条尺寸.生命高);
+  DzFrameSetPoint(lifeLag, 0, root, 0, 血条尺寸.内条左偏移, 血条尺寸.生命Y);
 
   DzFrameSetSize(life, 血条尺寸.内条宽, 血条尺寸.生命高);
   DzFrameSetPoint(life, 0, root, 0, 血条尺寸.内条左偏移, 血条尺寸.生命Y);
@@ -103,10 +107,11 @@ export function 创建单位血条帧组(this: void, 槽位: number): 单位血�
   DzFrameSetIgnoreTrackEvents(name, true);
 
   DzFrameShow(root, false);
+  DzFrameShow(lifeLag, false);
   DzFrameShow(life, true);
   for (let i = 0; i < shields.length; i++) DzFrameShow(shields[i], false);
   DzFrameShow(mana, false);
   DzFrameShow(name, false);
 
-  return { 槽位, root, life, shields, mana, name };
+  return { 槽位, root, lifeLag, life, shields, mana, name };
 }

@@ -13,6 +13,7 @@ local onItemDrop = ____require_result_0.onItemDrop
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local platformAbilityAction = require("平台扩展API动作")
+local platformAbilityValue = require("平台扩展API取值")
 local GetItemTypeId = jass.GetItemTypeId
 local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
@@ -113,8 +114,12 @@ local function _____540C_6B65_4E3B_52A8_7269_54C1_6280_80FD_58F3_53C2_6570(unit,
     platformAbilityAction["技能_设置技能冷却时间"](unit, _____6280_80FDID, 0, _____914D_7F6E["冷却时间"])
     platformAbilityAction["技能_设置技能魔法消耗"](unit, _____6280_80FDID, _____914D_7F6E["魔法消耗"])
     platformAbilityAction["技能_设置技能施法距离"](unit, _____6280_80FDID, _____914D_7F6E["施法距离"])
-    local _____65BD_6CD5_533A_57DF = _____914D_7F6E["施法区域"] or 0
-    if _____65BD_6CD5_533A_57DF > 0 then
+    if _____914D_7F6E["目标允许"] ~= nil and _____914D_7F6E["目标允许"] ~= "" then
+        local _____76EE_6807_5141_8BB8 = platformAbilityValue["转化_目标允许字符串转整数"](_____914D_7F6E["目标允许"])
+        platformAbilityAction["技能_设置技能目标允许"](unit, _____6280_80FDID, _____76EE_6807_5141_8BB8)
+    end
+    local _____65BD_6CD5_533A_57DF = _____914D_7F6E["施法区域"]
+    if _____65BD_6CD5_533A_57DF ~= nil then
         platformAbilityAction["技能_设置技能施法范围"](unit, _____6280_80FDID, _____65BD_6CD5_533A_57DF)
     end
 end

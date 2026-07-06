@@ -37,7 +37,6 @@ local _____6D74_8840_836F_5242 = require("系统.02．物品系统.15．装备�
 local _____6D74_9B54_836F_5242 = require("系统.02．物品系统.15．装备技能.00．物品.67．浴魔药剂")
 local _____6D74_7075_836F_5242 = require("系统.02．物品系统.15．装备技能.00．物品.68．浴灵药剂")
 local _____55DC_72F1_6076_5251 = require("系统.02．物品系统.15．装备技能.00．物品.69．嗜狱恶剑")
-local _____76D7_8D3C_795E_7B26_9B54_6297 = require("系统.02．物品系统.15．装备技能.00．物品.70．盗贼神符魔抗")
 local _____706B_628A = require("系统.02．物品系统.15．装备技能.00．物品.71．火把")
 local _____6297_6BD2_836F_6C34 = require("系统.02．物品系统.15．装备技能.00．物品.114．抗毒药水")
 local _____745F_5170_8FEA_5C14_7684_51B3_5FC3 = require("系统.02．物品系统.15．装备技能.00．物品.162．瑟兰迪尔的决心")
@@ -163,11 +162,6 @@ local function ____on_7269_54C1_4F7F_7528_94FE_8DEF(ctx)
             _____55DC_72F1_6076_5251["处理嗜狱恶剑使用"](ctx)
             break
         end
-        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["盗贼神符魔抗"]
-        if ____cond6 then
-            _____76D7_8D3C_795E_7B26_9B54_6297["处理盗贼神符魔抗使用"](ctx)
-            break
-        end
         ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["火把"]
         if ____cond6 then
             _____706B_628A["处理火把使用"](ctx)
@@ -215,7 +209,12 @@ local function ____on_7269_54C1_4F7F_7528_4F24_5BB3_4FEE_6B63(context)
     if context.isTrueDamage == true then
         return context.currentDamage
     end
-    return _____6076_65AF_80F8_7532["处理恶斯胸甲伤害修正"](context)
+    local result = _____6076_65AF_80F8_7532["处理恶斯胸甲伤害修正"](context)
+    context.currentDamage = result
+    result = _____5973_5996_9B54_7532["处理女妖魔甲伤害修正"](context)
+    context.currentDamage = result
+    result = _____65AF_5C14_80FD_91CF_4E4B_5FC3["处理斯尔能量之心伤害修正"](context)
+    return result
 end
 ____exports["初始化装备物品使用链"] = function()
     if _____5DF2_521D_59CB_5316 then
@@ -223,6 +222,7 @@ ____exports["初始化装备物品使用链"] = function()
     end
     _____5DF2_521D_59CB_5316 = true
     _____72F1_5996_9B54_76FE["初始化狱妖魔盾持有充能"]()
+    _____7130_6DF7_80FD_91CF_4F53["初始化焰混能量体被动"]()
     _____6CE8_518C_7269_54C1_6280_80FD_4E8B_4EF6_76D1_542C(____on_7269_54C1_4F7F_7528_94FE_8DEF)
     registerDeathListener(____on_7269_54C1_4F7F_7528_6B7B_4EA1_4E8B_4EF6)
     registerAppliedFinalDamageListener(____on_7269_54C1_4F7F_7528_6700_7EC8_4F24_5BB3)

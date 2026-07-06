@@ -20,13 +20,15 @@ local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_1["创
 local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_1["销毁Dz绑定单位特效"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
 local _____5F00_59CB_5145_80FD = ____require_result_2["开始充能"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_3["获取坐标范围敌人"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电")
+local _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535 = ____require_result_3["创建单位绑定闪电"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_4["获取坐标范围敌人"]
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local ConvertUnitState = jass.ConvertUnitState
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+local _____51CF_5C11_751F_547D_503C = ____require_result_5["减少生命值"]
 local _____7834_8840_4E4B_6212_4E0A_4E0B_6587_6258_7BA1_5668 = _____521B_5EFA_53E5_67C4_4E0A_4E0B_6587_6258_7BA1_5668("破血之戒上下文")
 local function _____662F_5426_4E3A_7834_8840_4E4B_6212(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
@@ -62,6 +64,15 @@ local function _____7ED3_7B97_7834_8840_4E4B_6212(_____65BD_6CD5_5355_4F4D)
                 if _____654C_4EBA == nil or _____654C_4EBA == 0 then
                     goto __continue8
                 end
+                _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535({
+                    ["效果代码"] = "AFOD",
+                    ["起点单位"] = _____65BD_6CD5_5355_4F4D,
+                    ["终点单位"] = _____654C_4EBA,
+                    ["持续时间"] = 0.8,
+                    ["起点高度偏移"] = 80,
+                    ["终点高度偏移"] = 80,
+                    ["任一死亡时销毁"] = true
+                })
                 _____9020_6210_88C5_5907_4F24_5BB3(
                     _____65BD_6CD5_5355_4F4D,
                     _____654C_4EBA,
@@ -85,7 +96,9 @@ local function _____5F00_59CB_7834_8840_4E4B_6212_5145_80FD(_____65BD_6CD5_5355_
             ["持续时间"] = _____7834_8840_4E4B_6212_914D_7F6E["充能时间"],
             ["主单位"] = _____65BD_6CD5_5355_4F4D,
             ["主单位死亡时中断"] = true,
+            ["指令中断"] = true,
             ["显示进度条特效"] = true,
+            ["进度条特效高度偏移"] = 233,
             ["充能完成回调"] = function(_____5355_4F4D, ______5145_80FDID)
                 _____7ED3_7B97_7834_8840_4E4B_6212(_____5355_4F4D)
             end,
@@ -106,8 +119,14 @@ ____exports["处理破血之戒使用"] = function(_____4E0A_4E0B_6587)
     end
     local _____65BD_6CD5_5355_4F4D = _____4E0A_4E0B_6587["施法单位"]
     _____7834_8840_4E4B_6212_4E0A_4E0B_6587_6258_7BA1_5668["写入"](_____65BD_6CD5_5355_4F4D, {["施法单位"] = _____65BD_6CD5_5355_4F4D, ["目标X"] = _____4E0A_4E0B_6587["目标X"], ["目标Y"] = _____4E0A_4E0B_6587["目标Y"], ["目标单位"] = _____4E0A_4E0B_6587["目标单位"]})
-    local _____5F53_524D_751F_547D = GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_LIFE)
-    SetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_LIFE, _____5F53_524D_751F_547D - 1000)
+    _____51CF_5C11_751F_547D_503C(
+        _____65BD_6CD5_5355_4F4D,
+        1000,
+        true,
+        false,
+        nil,
+        1
+    )
     _____5F00_59CB_7834_8840_4E4B_6212_5145_80FD(_____65BD_6CD5_5355_4F4D)
 end
 return ____exports

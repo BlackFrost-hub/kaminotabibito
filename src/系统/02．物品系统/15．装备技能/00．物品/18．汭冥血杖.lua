@@ -17,7 +17,6 @@ local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用�
 local createUnitEffect = ____require_result_1.createUnitEffect
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local getObjectPropertyRealSafe = ____require_result_2.getObjectPropertyRealSafe
-local ObjectType = ____require_result_2.ObjectType
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.02．buff.01．持续恢复生命魔法")
 local _____65BD_52A0_6301_7EED_6062_590D_751F_547D_9B54_6CD5 = ____require_result_3["施加持续恢复生命魔法"]
 local GetItemTypeId = jass.GetItemTypeId
@@ -34,6 +33,7 @@ local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local RACE_DEMON = jass.RACE_DEMON
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local EXSetEffectSize = japi.EXSetEffectSize
+local YDWE_OBJECT_TYPE_UNIT = 2
 local function _____662F_5426_4E3A_6C6D_51A5_8840_6756(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
@@ -92,7 +92,7 @@ ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662
         EXSetEffectSize(
             _____7279_6548,
             getObjectPropertyRealSafe(
-                ObjectType.UNIT,
+                YDWE_OBJECT_TYPE_UNIT,
                 GetUnitTypeId(_____76EE_6807_5355_4F4D),
                 "modelScale"
             )

@@ -6,8 +6,8 @@ import { 主动物品调试日志 } from "../../../03．技能系统/00．技能
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-const { createUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
+const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
 const { getObjectPropertyRealSafe, ObjectType } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   getObjectPropertyRealSafe: (this: void, objectType: number, objectId: number | string, property: string) => number;
@@ -17,6 +17,8 @@ const { getObjectPropertyRealSafe, ObjectType } = require("lib.扩展函数.YDWE
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const KillUnit = jass.KillUnit as (unit: any) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -39,11 +41,11 @@ export function 处理幽冥法杖使用(this: void, 上下文: 物品技能事�
   if (目标单位 == null || 目标单位 === 0) return;
 
   if (GetUnitState(目标单位, UNIT_STATE_MAX_LIFE) * 幽冥法杖配置.斩杀生命比例 < GetUnitState(目标单位, UNIT_STATE_LIFE)) return;
-  KillUnit(目标单位);
-  const 特效 = createUnitEffect(目标单位, 幽冥法杖配置.特效挂点, 幽冥法杖配置.特效路径, 幽冥法杖配置.特效持续时间, "幽冥法杖");
+  const 特效 = createTimedEffect(幽冥法杖配置.特效路径, GetUnitX(目标单位), GetUnitY(目标单位), 0, 幽冥法杖配置.特效持续时间);
   if (特效 != null && 特效 !== 0) {
     EXSetEffectSize(特效, getObjectPropertyRealSafe(ObjectType.UNIT, GetUnitTypeId(目标单位), "modelScale"));
   }
+  KillUnit(目标单位);
 }
 
 export {};

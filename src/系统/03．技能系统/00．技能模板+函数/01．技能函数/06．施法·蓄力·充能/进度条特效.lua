@@ -37,7 +37,7 @@ end
 -- 说明：
 -- 1. 不使用 `特效绑定系统.ts`
 -- 2. 不使用 `AddSpecialEffectTarget` / `AddSpecialEffectTargetUnitBJ`
--- 3. 当前实现改为直接创建物编单位 `e011`（父 id: `ewsp`）
+-- 3. 当前实现改为直接创建物编单位 `e01O`（父 id: `ewsp`）
 -- 4. 进度条颜色、动画速度、动画序号都通过单位接口控制
 -- 5. 销毁时走统一单位排泄清理出口，不做特效式延迟回收
 local jass = require("jass.common")
@@ -51,9 +51,9 @@ local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_
 local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
 _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_3["立即移除单位并取消排泄登记"]
 local _____8C03_8BD5_6A21_5757_540D = "进度条特效"
-local PROGRESSBAR_UNIT_ID = 1697657137
+local PROGRESSBAR_UNIT_ID = 1697657167
 local PROGRESSBAR_OWNER_PLAYER_ID = 4
-local DEFAULT_HEIGHT_OFFSET = 275
+local DEFAULT_HEIGHT_OFFSET = 233
 local DEFAULT_SCALE = 1
 local DEFAULT_ANIM_INDEX = 0
 local DEFAULT_COLOR_RGBA = {r = 255, g = 255, b = 0, a = 255}

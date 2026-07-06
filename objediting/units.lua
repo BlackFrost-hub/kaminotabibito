@@ -97,13 +97,14 @@ createBuffUnit('sfb1', '[系统]增益buff')
 createBuffUnit('sfb2', '[系统]负面buff')
 
 -- Charge / cast progress bar unit
-local e011 = UnitDefinition:new('e011', 'ewsp')
-applyCommonDummyUnit(e011, {
+local e01O = UnitDefinition:new('e01O', 'ewsp')
+applyCommonDummyUnit(e01O, {
   name = '[系统]施法进度条',
-  modelFile = 'resource\\models\\Common\\Progressbar.mdx',
+  modelFile = 'war3mapImported\\Progressbar.mdx',
   scale = 1.0,
-  minHeight = 275.0,
-  height = 275.0,
+  movementType = MovementType.Fly,
+  minHeight = 233.0,
+  height = 233.0,
   selectionScale = 0.0,
 })
 

@@ -21,12 +21,15 @@ local ____require_result_2 = require("系统.03．技能系统.00．技能模板
 local _____6CE8_518C_6301_6709_578B_8303_56F4_5149_73AF = ____require_result_2["注册持有型范围光环"]
 local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_3["是玩家英雄组单位"]
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_4.registerManualBuff
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local _____547D_4E2D_7387_5B57_6BB5 = "命中率"
+local _____4F7F_8005_9B54_7089_81F4_76F2BuffID = "C042"
 local _____5149_73AF_540C_6B65_95F4_9694_6BEB_79D2 = 100
 local function _____662F_5426_4E3A_4F7F_8005_9B54_7089(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
@@ -114,6 +117,13 @@ ____exports["处理使者魔炉使用"] = function(_____4E0A_4E0B_6587)
                     goto __continue21
                 end
                 _____8C03_6574_547D_4E2D_7387(_____654C_4EBA, -_____4F7F_8005_9B54_7089_914D_7F6E["命中率削减"])
+                registerManualBuff(
+                    _____654C_4EBA,
+                    _____4F7F_8005_9B54_7089_81F4_76F2BuffID,
+                    _____4F7F_8005_9B54_7089_914D_7F6E["恢复延迟"],
+                    _____4F7F_8005_9B54_7089_914D_7F6E["命中率削减"] * 100,
+                    {sourceName = "使者魔炉", iconOverride = "ReplaceableTextures\\CommandButtons\\BTN000230.blp"}
+                )
                 _____547D_4E2D_76EE_6807_5217_8868[#_____547D_4E2D_76EE_6807_5217_8868 + 1] = _____654C_4EBA
             end
             ::__continue21::

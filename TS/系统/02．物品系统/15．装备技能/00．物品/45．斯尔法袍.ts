@@ -8,9 +8,9 @@ import { 启动计数周期执行 } from "../../../03．技能系统/00．技能
 const { 开始无敌帧 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧") as {
   开始无敌帧: (this: void, unit: any, duration: number) => number;
 };
-const jass = require("jass.common") as any;
-const SetUnitState = jass.SetUnitState as (u: any, state: any, value: number) => void;
-const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
+const { 变更资源值 } = require("系统.04．伤害系统.02．治疗系统.07．减少生命值") as {
+  变更资源值: (this: void, target: any, amount: number, resourceType: "life" | "mana", showText?: boolean, showEffect?: boolean, effectPath?: string, lowestValue?: number) => number;
+};
 
 type 斯尔法袍结算记录 = {
   目标: any;
@@ -19,15 +19,14 @@ type 斯尔法袍结算记录 = {
 
 function 结束斯尔法袍结算(this: void, 记录: 斯尔法袍结算记录): void {
   if (记录.目标 == null || 记录.目标 === 0) return;
-  SetUnitState(记录.目标, UNIT_STATE_MANA, 1);
+  const 当前魔法 = 取当前魔法(记录.目标);
+  if (当前魔法 > 1) 变更资源值(记录.目标, -(当前魔法 - 1), "mana", true, false, undefined, 1);
 }
 
 function on斯尔法袍Tick(this: void, 记录: 斯尔法袍结算记录): boolean | void {
   if (记录 == null || 记录.目标 == null || 记录.目标 === 0) return false;
   执行物品治疗(记录.目标, 记录.目标, 记录.每跳扣魔 * 1.2, "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl");
-  const 当前魔法 = 取当前魔法(记录.目标);
-  const 下次魔法 = 当前魔法 - 记录.每跳扣魔;
-  SetUnitState(记录.目标, UNIT_STATE_MANA, 下次魔法 > 1 ? 下次魔法 : 1);
+  变更资源值(记录.目标, -记录.每跳扣魔, "mana", true, false, undefined, 1);
 }
 
 export function 处理斯尔法袍伤害修正(this: void, context: any): number {

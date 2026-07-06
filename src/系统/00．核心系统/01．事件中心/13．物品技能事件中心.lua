@@ -34,12 +34,15 @@ local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetSpellTargetDestructable = jass.GetSpellTargetDestructable
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
 local Location = jass.Location
 local RemoveLocation = jass.RemoveLocation
 local EVENT_PLAYER_UNIT_USE_ITEM = jass.EVENT_PLAYER_UNIT_USE_ITEM
 local _____76D1_542C_5217_8868 = {}
 local _____65BD_6CD5_8005_6280_80FD_4E0A_4E0B_6587_8868 = {}
+local _____65BD_6CD5_8005_5DF2_515C_5E95_5206_53D1_8868 = {}
 local _____5DF2_521D_59CB_5316 = false
 local _____4F7F_7528_7269_54C1_89E6_53D1_5668 = nil
 local _____6700_8FD1_4E00_6B21_7269_54C1_6280_80FD_4E0A_4E0B_6587 = nil
@@ -111,6 +114,11 @@ local function _____5904_7406_7269_54C1_6280_80FD_751F_6548(_____65BD_6CD5_5355_
     if _____6280_80FDID == nil or _____6280_80FDID == 0 then
         return
     end
+    local _____65BD_6CD5_8005ID = _____83B7_53D6_65BD_6CD5_8005_7F13_5B58_952E(_____65BD_6CD5_5355_4F4D)
+    if _____65BD_6CD5_8005ID ~= 0 and _____65BD_6CD5_8005_5DF2_515C_5E95_5206_53D1_8868[_____65BD_6CD5_8005ID] == true then
+        __TS__Delete(_____65BD_6CD5_8005_5DF2_515C_5E95_5206_53D1_8868, _____65BD_6CD5_8005ID)
+        return
+    end
     _____7F13_5B58_6280_80FD_751F_6548_4E0A_4E0B_6587(_____65BD_6CD5_5355_4F4D, _____6280_80FDID)
 end
 local function _____5904_7406_4F7F_7528_7269_54C1_4E8B_4EF6()
@@ -129,6 +137,16 @@ local function _____5904_7406_4F7F_7528_7269_54C1_4E8B_4EF6()
     local _____5DF2_7F13_5B58_4E0A_4E0B_6587 = _____65BD_6CD5_8005_6280_80FD_4E0A_4E0B_6587_8868[_____65BD_6CD5_8005ID]
     __TS__Delete(_____65BD_6CD5_8005_6280_80FD_4E0A_4E0B_6587_8868, _____65BD_6CD5_8005ID)
     if _____5DF2_7F13_5B58_4E0A_4E0B_6587 == nil then
+        _____65BD_6CD5_8005_5DF2_515C_5E95_5206_53D1_8868[_____65BD_6CD5_8005ID] = true
+        _____5206_53D1_7269_54C1_6280_80FD_4E8B_4EF6_76D1_542C({
+            ["施法单位"] = _____65BD_6CD5_5355_4F4D,
+            ["物品"] = _____7269_54C1,
+            ["技能ID"] = 0,
+            ["目标X"] = GetUnitX(_____65BD_6CD5_5355_4F4D),
+            ["目标Y"] = GetUnitY(_____65BD_6CD5_5355_4F4D),
+            ["目标单位"] = nil,
+            ["目标可破坏物"] = nil
+        })
         return
     end
     if _____5DF2_7F13_5B58_4E0A_4E0B_6587["技能ID"] == nil or _____5DF2_7F13_5B58_4E0A_4E0B_6587["技能ID"] == 0 then

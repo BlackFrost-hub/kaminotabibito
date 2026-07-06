@@ -70,7 +70,7 @@ export const 史莱姆粘液瓶配置 = {
   装备名称: 主动技能装备名称.史莱姆粘液瓶,
   攻速减幅: 0.5,
   移速减幅: 0.5,
-  持续时间: 5,
+  持续时间: 2.0,
 } as const;
 
 export const 地精钥匙配置 = {
@@ -79,7 +79,14 @@ export const 地精钥匙配置 = {
 
 export const 祭祀之杖配置 = {
   装备名称: 主动技能装备名称.祭祀之杖,
+  魔法消耗: 100,
   生命消耗: 200,
+  伤害值: 300,
+  生命消耗特效路径: "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl",
+  特效路径: "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl",
+  特效持续时间: 1,
+  闪电代码: "AFOD",
+  闪电持续时间: 0.8,
 } as const;
 
 export const 幽冥法杖配置 = {

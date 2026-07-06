@@ -36,7 +36,7 @@ function 恢复自身最大生命百分比(this: void, source: any): void {
     HealTarget: source,
     HealAmount: 最大生命 * 0.02,
     ItemHeal: true,
-    HealEffect: false,
+    HealEffect: true,
   });
 }
 

@@ -192,6 +192,24 @@ function 更新生命贴图(this: void, binding: 单位血条绑定, lifePct: nu
   DzFrameSetTexture(binding.帧.life, texture, 0);
 }
 
+function 更新生命缓降(this: void, binding: 单位血条绑定, lifePct: number): void {
+  if (lifePct >= binding.生命缓降比例) {
+    binding.生命缓降比例 = lifePct;
+  } else {
+    const nextPct = binding.生命缓降比例 - 血条尺寸.生命缓降追赶比例;
+    binding.生命缓降比例 = nextPct > lifePct ? nextPct : lifePct;
+  }
+
+  const lagPct = binding.生命缓降比例 - lifePct;
+  if (lagPct > 0.003) {
+    DzFrameSetPoint(binding.帧.lifeLag, 0, binding.帧.root, 0, 血条尺寸.内条左偏移 + 血条尺寸.内条宽 * lifePct, 血条尺寸.生命Y);
+    DzFrameSetSize(binding.帧.lifeLag, 血条尺寸.内条宽 * lagPct, 血条尺寸.生命高);
+    DzFrameShow(binding.帧.lifeLag, true);
+  } else {
+    DzFrameShow(binding.帧.lifeLag, false);
+  }
+}
+
 function 取护盾贴图(this: void, shieldType: number): string {
   if (shieldType === 护盾类型.物理) return 血条资源.护盾.物理;
   if (shieldType === 护盾类型.魔法) return 血条资源.护盾.魔法;
@@ -309,10 +327,15 @@ function 调整根框尺寸(this: void, binding: 单位血条绑定): void {
 function 初始化帧内容(this: void, binding: 单位血条绑定): void {
   const 帧 = binding.帧;
   const unit = binding.单位;
-  更新生命贴图(binding, 1);
+  const lifePct = 限制01(GetUnitState(unit, 生命状态) / binding.最大生命缓存);
+  binding.生命缓降比例 = lifePct;
+  更新生命贴图(binding, lifePct);
+  DzFrameSetSize(帧.life, 血条尺寸.内条宽 * lifePct, 血条尺寸.生命高);
+  DzFrameSetSize(帧.lifeLag, 0, 血条尺寸.生命高);
   DzFrameSetText(帧.name, 取血条名字文本(unit));
   调整根框尺寸(binding);
   DzFrameShow(帧.mana, binding.最大魔法缓存 > 0);
+  DzFrameShow(帧.lifeLag, false);
   隐藏护盾分段(binding, 0);
   绑定帧到单位(帧, unit, 取头顶高度(unit, binding.是否英雄));
   隐藏单位原生血条(unit);
@@ -350,6 +373,7 @@ export function 注册单位头顶血条(this: void, unit: any): void {
     最大魔法缓存: maxMana > 0 ? maxMana : 0,
     是否英雄: isHero,
     生命贴图缓存: "",
+    生命缓降比例: 1,
     护盾贴图缓存: [],
   };
 
@@ -378,6 +402,7 @@ function 刷新生命魔法(this: void, binding: 单位血条绑定): void {
   const lifeWidth = 血条尺寸.内条宽 * lifePct;
   更新生命贴图(binding, lifePct);
   DzFrameSetSize(binding.帧.life, lifeWidth, 血条尺寸.生命高);
+  更新生命缓降(binding, lifePct);
 
   刷新护盾分段(binding, lifePct, maxLife);
 

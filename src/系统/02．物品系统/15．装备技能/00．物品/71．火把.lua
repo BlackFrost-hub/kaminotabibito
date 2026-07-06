@@ -17,13 +17,11 @@ ____exports["处理火把使用"] = function(ctx)
     local cfg = _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["火把"]
     local sx = _____53D6_5355_4F4DX(unit)
     local sy = _____53D6_5355_4F4DY(unit)
-    local tx = (ctx["目标X"] ~= 0 or ctx["目标Y"] ~= 0) and ctx["目标X"] or sx
-    local ty = (ctx["目标X"] ~= 0 or ctx["目标Y"] ~= 0) and ctx["目标Y"] or sy
     local point = _____9650_5236_76EE_6807_70B9_8DDD_79BB(
         sx,
         sy,
-        tx,
-        ty,
+        ctx["目标X"],
+        ctx["目标Y"],
         cfg["最大距离"]
     )
     _____521B_5EFA_706B_628A_5355_4F4D(

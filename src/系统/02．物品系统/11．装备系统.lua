@@ -48,6 +48,7 @@ local EQUIP_EVENT_PLAYER_IDS = {
 }
 local _____88C5_5907_89C6_91CEBuffID = "C034"
 local _____88C5_5907_89C6_91CEBuff_663E_793A_6301_7EED_65F6_95F4 = 999999
+local _____4E0D_8D70_88C5_5907_7CFB_7EDF_7269_54C1ID_8868 = {I0FK = true, I0FL = true}
 local function _____5237_65B0_88C5_5907_89C6_91CE_663E_793ABuff(self, unit, _____5F53_524D_89C6_91CE_52A0_6210)
     if unit == nil or unit == 0 then
         return
@@ -114,6 +115,9 @@ local function handleItemEvent(self, unit, item, isPickup)
         return
     end
     local idStr = fourCCToString(GetItemTypeId(item))
+    if _____4E0D_8D70_88C5_5907_7CFB_7EDF_7269_54C1ID_8868[idStr] == true then
+        return
+    end
     local itemData = itemRelatedFns.getItemDataEntry(item)
     if not itemData then
         if isPickup then
@@ -236,7 +240,7 @@ local function handleItemEvent(self, unit, item, isPickup)
             do
                 local statName = playerStats[i + 1].name
                 if statName == "移动速度" then
-                    goto __continue34
+                    goto __continue35
                 end
                 local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
                 local num = __TS__Number(val)
@@ -246,7 +250,7 @@ local function handleItemEvent(self, unit, item, isPickup)
                 ) .. "%") or (nearZero and "0" or tostring(num))
                 test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
             end
-            ::__continue34::
+            ::__continue35::
             i = i + 1
         end
     end

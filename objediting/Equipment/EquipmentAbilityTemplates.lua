@@ -88,10 +88,10 @@ local function createEquipmentItemAbilitySlot(groupName, slotIndex, id, name, ta
     targetType = targetType,
     orderId = orderId,
     castRange = castRange,
-    channelOptions = targetType == 2 and 3 or 1,
+    channelOptions = 1,
     buttonX = slotIndex % 4,
     buttonY = targetType == 0 and 1 or 2,
-    targetsAllowed = targetsAllowed,
+    targetsAllowed = (targetsAllowed ~= nil and targetsAllowed ~= '') and targetsAllowed or nil,
   })
 
   registerEquipmentItemAbilitySlot(groupName, {
@@ -106,13 +106,13 @@ end
 for index = 0, 14 do
   local id = string.format('IU%02d', index)
   local name = '[系统]装备通用单位目标技能槽位' .. tostring(index + 1)
-  createEquipmentItemAbilitySlot('unitTarget', index, id, name, 1, equipmentItemAbilityOrderIds.unitTarget[index + 1], 500, 'ground,air,enemy,neutral,friend,self,nonsapper')
+  createEquipmentItemAbilitySlot('unitTarget', index, id, name, 1, equipmentItemAbilityOrderIds.unitTarget[index + 1], 500, '')
 end
 
 for index = 0, 14 do
   local id = string.format('IP%02d', index)
   local name = '[系统]装备通用点目标技能槽位' .. tostring(index + 1)
-  createEquipmentItemAbilitySlot('pointTarget', index, id, name, 2, equipmentItemAbilityOrderIds.pointTarget[index + 1], 500, 'ground,air,enemy,neutral,friend,self')
+  createEquipmentItemAbilitySlot('pointTarget', index, id, name, 2, equipmentItemAbilityOrderIds.pointTarget[index + 1], 500, '')
 end
 
 for index = 0, 14 do

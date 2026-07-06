@@ -4,6 +4,7 @@
 import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
@@ -19,8 +20,8 @@ const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模�
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON as any;
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
@@ -43,7 +44,7 @@ export function 处理远古毒咒护符使用(this: void, 上下文: 物品技�
   const y = GetUnitY(施法单位);
   createTimedEffect(远古毒咒护符配置.特效路径, x, y, 0, 远古毒咒护符配置.特效持续时间);
 
-  const 伤害值 = GetUnitState(施法单位, ConvertUnitState(0x15)) * 远古毒咒护符配置.力量系数;
+  const 伤害值 = GetUnitStateJapi(施法单位, ConvertUnitState(0x15)) * 远古毒咒护符配置.力量系数;
   const 敌人列表 = 获取坐标范围敌人(施法单位, x, y, 远古毒咒护符配置.作用范围);
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];

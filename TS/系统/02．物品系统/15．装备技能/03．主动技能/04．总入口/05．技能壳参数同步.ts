@@ -14,6 +14,10 @@ const platformAbilityAction = require("平台扩展API动作") as {
   技能_设置技能施法距离: (this: void, 单位: any, 技能代码: number, 值: number) => boolean;
   技能_设置技能施法范围: (this: void, 单位: any, 技能代码: number, 值: number) => boolean;
   技能_设置技能命令编号: (this: void, 单位: any, 技能代码: number, 命令ID: number) => boolean;
+  技能_设置技能目标允许: (this: void, 单位: any, 技能代码: number, 值: number) => boolean;
+};
+const platformAbilityValue = require("平台扩展API取值") as {
+  转化_目标允许字符串转整数: (this: void, 目标类型: string) => number;
 };
 
 import {
@@ -107,8 +111,13 @@ function 同步主动物品技能壳参数(this: void, unit: any, 配置: 通用
   platformAbilityAction.技能_设置技能魔法消耗(unit, 技能ID, 配置.魔法消耗);
   platformAbilityAction.技能_设置技能施法距离(unit, 技能ID, 配置.施法距离);
 
-  const 施法区域 = 配置.施法区域 ?? 0;
-  if (施法区域 > 0) {
+  if (配置.目标允许 != null && 配置.目标允许 !== "") {
+    const 目标允许 = platformAbilityValue.转化_目标允许字符串转整数(配置.目标允许);
+    platformAbilityAction.技能_设置技能目标允许(unit, 技能ID, 目标允许);
+  }
+
+  const 施法区域 = 配置.施法区域;
+  if (施法区域 != null) {
     platformAbilityAction.技能_设置技能施法范围(unit, 技能ID, 施法区域);
   }
 }

@@ -217,6 +217,12 @@ function 读取攻击者暴击属性(this: void, attacker: any): 暴击来源属
   };
 }
 
+function 读取攻击者必定暴击(this: void, attacker: any): boolean {
+  if (调用玩家英雄判定(attacker)) return 读取玩家实数(GetOwningPlayer(attacker), "必定暴击") > 0;
+  if (读取单位实数(attacker, "必定暴击") > 0) return true;
+  return 读取玩家实数(GetOwningPlayer(attacker), "必定暴击") > 0;
+}
+
 function 读取目标被暴击率(this: void, target: any): number {
   if (调用玩家英雄判定(target)) return 读取玩家实数(GetOwningPlayer(target), "被暴击率");
   return 读取单位实数(target, "被暴击率");
@@ -253,31 +259,35 @@ export function 执行暴击判定(this: void, context: 暴击判定上下文): 
 
   const 暴击归属单位 = 获取暴击归属单位(attacker, target);
   const 来源属性 = 读取攻击者暴击属性(暴击归属单位);
-  // 先执行装备/特殊规则的暴击率修正，再扣目标被暴击率，最后由幸运值系统掷点。
-  const 修正后暴击率 = 应用暴击率修正({
-    attacker,
-    target,
-    暴击归属单位,
-    currentDamage,
-    暴击率: 来源属性.暴击率,
-    isPhysicalDamage: context.isPhysicalDamage === true,
-    isEnhancedDamage: context.isEnhancedDamage === true,
-    isNormalAttack: context.isNormalAttack === true,
-    isRangedAttack: context.isRangedAttack === true,
-    isSkillAttack: context.isSkillAttack === true,
-  });
-  if (修正后暴击率 <= 0.01) {
-    return { 伤害: currentDamage, 暴击概率: 0, 暴击倍率: 1, 是否暴击: false };
-  }
+  const 是否必定暴击 = 读取攻击者必定暴击(暴击归属单位);
+  let 有效暴击率 = 1;
+  if (!是否必定暴击) {
+    // 先执行装备/特殊规则的暴击率修正，再扣目标被暴击率，最后由幸运值系统掷点。
+    const 修正后暴击率 = 应用暴击率修正({
+      attacker,
+      target,
+      暴击归属单位,
+      currentDamage,
+      暴击率: 来源属性.暴击率,
+      isPhysicalDamage: context.isPhysicalDamage === true,
+      isEnhancedDamage: context.isEnhancedDamage === true,
+      isNormalAttack: context.isNormalAttack === true,
+      isRangedAttack: context.isRangedAttack === true,
+      isSkillAttack: context.isSkillAttack === true,
+    });
+    if (修正后暴击率 <= 0.01) {
+      return { 伤害: currentDamage, 暴击概率: 0, 暴击倍率: 1, 是否暴击: false };
+    }
 
-  let 有效暴击率 = 修正后暴击率 - 读取目标被暴击率(target);
-  if (有效暴击率 <= 0) {
-    return { 伤害: currentDamage, 暴击概率: 0, 暴击倍率: 1, 是否暴击: false };
-  }
-  if (有效暴击率 > 1) 有效暴击率 = 1;
+    有效暴击率 = 修正后暴击率 - 读取目标被暴击率(target);
+    if (有效暴击率 <= 0) {
+      return { 伤害: currentDamage, 暴击概率: 0, 暴击倍率: 1, 是否暴击: false };
+    }
+    if (有效暴击率 > 1) 有效暴击率 = 1;
 
-  if (!暴击概率通过(有效暴击率, 暴击归属单位)) {
-    return { 伤害: currentDamage, 暴击概率: 有效暴击率, 暴击倍率: 1, 是否暴击: false };
+    if (!暴击概率通过(有效暴击率, 暴击归属单位)) {
+      return { 伤害: currentDamage, 暴击概率: 有效暴击率, 暴击倍率: 1, 是否暴击: false };
+    }
   }
 
   // 普攻和技能攻击使用不同基础倍率；暴击伤害和被暴击伤害只影响倍率，不影响是否暴击。

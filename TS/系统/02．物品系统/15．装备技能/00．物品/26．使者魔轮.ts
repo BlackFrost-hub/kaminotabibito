@@ -32,7 +32,6 @@ const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const GetUnitStateJapi = japi.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
-const SetUnitState = jass.SetUnitState as (whichUnit: any, whichUnitState: any, newVal: number) => void;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 
@@ -41,6 +40,7 @@ import { 使者魔轮物品ID } from "../03．主动技能/00．公共/01．主�
 import { 使者魔轮配置 } from "../03．主动技能/03．物品使用触发/00．物品使用触发配置";
 import { 创建伤害修正阈值触发 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制/13．伤害修正阈值触发";
 import { 创建区域承伤吸收场 } from "../../../03．技能系统/00．技能模板+函数/04．机制组件/09．装备通用机制/21．区域承伤吸收场";
+import { 创建世界坐标护盾条, 更新世界坐标护盾条, 销毁世界坐标护盾条, 护盾类型 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/07．护盾";
 
 let 已注册使者魔轮被动修正 = false;
 
@@ -102,7 +102,7 @@ function on使者魔轮被动伤害修正(
   if (!(吸收量 > 0)) return context.currentDamage;
 
   const 消耗魔法 = 吸收量 / 使者魔轮配置.被动每点魔法吸收伤害;
-  减少魔法值(受伤单位, 消耗魔法, true, true);
+  减少魔法值(受伤单位, 消耗魔法, true, false);
   播放魔法吸收护盾特效({
     单位: 受伤单位,
     是否有特效: 使者魔轮配置.被动是否有特效,
@@ -132,7 +132,17 @@ function 初始化使者魔轮被动(this: void): void {
 }
 
 function 注册使者魔轮魔盾(this: void, 施法单位: any, x: number, y: number, 护盾值: number): void {
-  创建区域承伤吸收场({
+  const 护盾条 = 创建世界坐标护盾条({
+    X: x,
+    Y: y,
+    Z: 180,
+    最大值: 护盾值,
+    当前值: 护盾值,
+    类型: 护盾类型.通用,
+    持续时间: 使者魔轮配置.持续时间,
+    名称: "使者魔轮魔盾",
+  });
+  const 吸收场 = 创建区域承伤吸收场({
     名称: "使者魔轮魔盾",
     施法单位,
     X: x,
@@ -145,7 +155,14 @@ function 注册使者魔轮魔盾(this: void, 施法单位: any, x: number, y: n
     只影响友军: true,
     包含同玩家单位: true,
     吸收量限制为剩余值: false,
+    on吸收: function on使者魔轮魔盾吸收(this: void, event: { 剩余吸收值: number }): void {
+      更新世界坐标护盾条(护盾条, event.剩余吸收值);
+    },
+    on结束: function on使者魔轮魔盾结束(this: void): void {
+      销毁世界坐标护盾条(护盾条);
+    },
   });
+  if (吸收场 == null) 销毁世界坐标护盾条(护盾条);
 }
 
 export function 处理使者魔轮使用(this: void, 上下文: 物品技能事件上下文): void {
@@ -157,8 +174,9 @@ export function 处理使者魔轮使用(this: void, 上下文: 物品技能事�
   const 消耗魔法 = 最大魔法 * 使者魔轮配置.消耗魔法比例;
   if (!(消耗魔法 > 0)) return;
 
-  SetUnitState(施法单位, UNIT_STATE_MANA, GetUnitState(施法单位, UNIT_STATE_MANA) - 消耗魔法);
-  注册使者魔轮魔盾(施法单位, 上下文.目标X, 上下文.目标Y, 消耗魔法);
+  const 实际消耗魔法 = -减少魔法值(施法单位, 消耗魔法, true, false);
+  if (!(实际消耗魔法 > 0)) return;
+  注册使者魔轮魔盾(施法单位, 上下文.目标X, 上下文.目标Y, 实际消耗魔法);
 }
 初始化使者魔轮被动();
 

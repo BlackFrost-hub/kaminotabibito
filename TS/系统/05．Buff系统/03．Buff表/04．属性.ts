@@ -23,7 +23,7 @@ export const 属性Buff表: Record<string, BuffData> = {
       buffID: "C026",
       buffName: "易伤",
       icon: "BuffIcon\\Vulnerable.blp",
-      effect: "Abilities\\Spells\\Other\\ANrm\\ANrmTarget.mdl",
+      effect: "Common\\Effect\\Form\\Debuff\\redchakra.mdx",
       effectMode: 'attach',
       effectAttachPoint: "origin",
       type: "Debuff:magic:full",

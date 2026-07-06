@@ -17,10 +17,10 @@ local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用�
 local createUnitEffect = ____require_result_1.createUnitEffect
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
-local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
+local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+local _____51CF_5C11_9B54_6CD5_503C = ____require_result_2["减少魔法值"]
 local _____547D_4E2D_7387_5B57_6BB5 = "命中率"
 local function _____662F_5426_4E3A_7194_5CA9_6076_9B54_4E4B_7075_773C(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
@@ -40,10 +40,11 @@ ____exports["处理熔岩恶魔之灵眼使用"] = function(_____4E0A_4E0B_6587)
     end
     _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535({["效果代码"] = _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["魔力之焰闪电"], ["起点单位"] = _____65BD_6CD5_5355_4F4D, ["终点单位"] = _____76EE_6807_5355_4F4D, ["持续时间"] = _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["闪电持续时间"]})
     _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535({["效果代码"] = _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["死亡之指闪电"], ["起点单位"] = _____65BD_6CD5_5355_4F4D, ["终点单位"] = _____76EE_6807_5355_4F4D, ["持续时间"] = _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["闪电持续时间"]})
-    SetUnitState(
+    _____51CF_5C11_9B54_6CD5_503C(
         _____65BD_6CD5_5355_4F4D,
-        UNIT_STATE_MANA,
-        GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MANA) - GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["魔法消耗比例"]
+        GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["魔法消耗比例"],
+        true,
+        false
     )
     createUnitEffect(
         _____76EE_6807_5355_4F4D,

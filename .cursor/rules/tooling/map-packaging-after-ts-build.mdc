@@ -1,0 +1,37 @@
+---
+description: 修改 TS/Lua 后刷新测试地图的打包规则，避免只 build 但 .build/war3map.lua 或测试 w3x 仍是旧代码
+globs: TS/**/*.ts, src/**/*.lua, .build/war3map.lua
+alwaysApply: false
+---
+
+# TS 修改后的测试地图打包规则
+
+## 核心结论
+
+`npm run build` 只保证 TypeScript 编译并同步 `src/**/*.lua`，不保证 `.build/war3map.lua` 和 `.build/_warcraft_vscode_test.w3x` 已经刷新。
+
+默认不要每次修改后都打包地图。只有本轮修改需要进图验证、用户明确要求测试图、或你确认 `.build` 产物会被马上使用时，才按下面顺序处理。
+
+## 标准流程
+
+1. 运行 `npm run build`。
+2. 检查敏感生成物，例如 JASS/JAPI/DzAPI 调用、回调参数、`nil/self` 形态，优先看 `src/**/*.lua`。
+3. 确认 `.build/war3map.lua` 是否已经包含本次修改。
+4. 如果 `.build/war3map.lua` 仍是旧代码，先刷新或同步它，再打包测试图。
+5. 用现有 packlist 重新生成测试图：
+
+```powershell
+& 'C:\Users\Administrator\.vscode\extensions\dencer.warcraft-vscode-0.3.6\bin\MopaqPack-rs.exe' generate -i .build\packlist.json -o .build\_warcraft_vscode_test.w3x
+```
+
+## 验证点
+
+- `.build/war3map.lua` 里能搜到本次修改后的关键代码。
+- `.build/_warcraft_vscode_test.w3x` 的 `LastWriteTime` 晚于 `.build/war3map.lua`。
+- 如果打包失败并提示占用，优先关闭正在运行的 Warcraft/WorldEdit 测试图，再重试。
+
+## 常见坑
+
+- 不要只看 `src/**/*.lua` 就让用户进图测；测试图实际可能仍在用旧 `.build/war3map.lua`。
+- 不要把打包失败误判成业务代码没生效；先确认 `.build` 产物和测试图时间戳。
+- 改 DzAPI UI、物品主动技能、事件中心、伤害流程这类进图表现时，尤其要做 `.build` 和 `.w3x` 双确认。

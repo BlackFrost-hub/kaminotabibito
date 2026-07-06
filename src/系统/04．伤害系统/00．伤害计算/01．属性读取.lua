@@ -7,8 +7,8 @@ local ____exports = {}
 -- 
 -- 重要：YDUserData 的属性名必须使用中文（STAT_CONFIG.name），不能使用英文key
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_0.YDUserDataGet
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定")
 local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
 local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.00．伤害常量")
@@ -48,13 +48,7 @@ function ____exports.getUnitAttr(self, unit, attrName, valueType, defaultValue)
     if unit == nil then
         return defaultValue
     end
-    local unitValue = YDUserDataGet(
-        nil,
-        "unit",
-        unit,
-        attrName,
-        valueType
-    )
+    local unitValue = YDUserDataGetSafe("unit", unit, attrName, valueType)
     if valueType == "real" or valueType == "integer" then
         local numValue = __TS__Number(unitValue)
         if numValue ~= 0 then
@@ -70,13 +64,7 @@ function ____exports.getUnitAttr(self, unit, attrName, valueType, defaultValue)
     end
     local player = GetOwningPlayer(nil, unit)
     if player ~= nil then
-        local playerValue = YDUserDataGet(
-            nil,
-            "player",
-            player,
-            attrName,
-            valueType
-        )
+        local playerValue = YDUserDataGetSafe("player", player, attrName, valueType)
         if valueType == "real" or valueType == "integer" then
             local numValue = __TS__Number(playerValue)
             if numValue ~= 0 then

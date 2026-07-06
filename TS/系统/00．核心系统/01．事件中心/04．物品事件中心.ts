@@ -20,6 +20,7 @@ const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01�
     eventId: any,
     filter?: any
   ) => void;
+  取当前玩家单位物品事件上下文: (this: void) => { triggerUnit: any; manipulatedItem: any } | undefined;
 };
 
 const ITEM_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 13] as const;
@@ -59,12 +60,22 @@ function getNextListenerId(): number {
   return ++listenerIdCounter;
 }
 
+function 取当前物品事件单位(this: void): any {
+  const context = playerUnitEvent.取当前玩家单位物品事件上下文();
+  return context != null ? context.triggerUnit : GetTriggerUnit();
+}
+
+function 取当前物品事件物品(this: void): any {
+  const context = playerUnitEvent.取当前玩家单位物品事件上下文();
+  return context != null ? context.manipulatedItem : GetManipulatedItem();
+}
+
 /**
  * 分发拾取事件到所有监听器
  */
 function dispatchPickupEvent(): void {
-  const unit = GetTriggerUnit();
-  const item = GetManipulatedItem();
+  const unit = 取当前物品事件单位();
+  const item = 取当前物品事件物品();
   if (unit === null || unit === 0 || item === null || item === 0) return;
 
   for (let i = 0; i < pickupListeners.length; i++) {
@@ -79,8 +90,8 @@ function dispatchPickupEvent(): void {
  * 分发丢弃事件到所有监听器
  */
 function dispatchDropEvent(): void {
-  const unit = GetTriggerUnit();
-  const item = GetManipulatedItem();
+  const unit = 取当前物品事件单位();
+  const item = 取当前物品事件物品();
   if (unit === null || unit === 0 || item === null || item === 0) return;
 
   for (let i = 0; i < dropListeners.length; i++) {
@@ -95,8 +106,8 @@ function dispatchDropEvent(): void {
  * 分发使用事件到所有监听器
  */
 function dispatchUseEvent(): void {
-  const unit = GetTriggerUnit();
-  const item = GetManipulatedItem();
+  const unit = 取当前物品事件单位();
+  const item = 取当前物品事件物品();
   if (unit === null || unit === 0 || item === null || item === 0) return;
 
   for (let i = 0; i < useListeners.length; i++) {

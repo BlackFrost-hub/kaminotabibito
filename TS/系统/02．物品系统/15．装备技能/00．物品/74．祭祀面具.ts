@@ -25,7 +25,7 @@ const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (player: any, 
 
 function on祭祀面具周期(this: void, unit: any): void {
   const amount = 祭祀面具配置.固定扣蓝 + 取最大魔法(unit) * 祭祀面具配置.最大魔法扣蓝比例;
-  减少魔法值(unit, amount, true, true);
+  减少魔法值(unit, amount, true, false);
   if (!单位存活(unit)) return;
   if (取最大魔法(unit) < 祭祀面具配置.死亡最小最大魔法 || 取当前魔法(unit) < 祭祀面具配置.死亡最小当前魔法) {
     KillUnit(unit);

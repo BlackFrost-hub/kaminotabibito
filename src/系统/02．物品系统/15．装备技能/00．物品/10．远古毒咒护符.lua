@@ -7,6 +7,7 @@ local _____8FDC_53E4_6BD2_5492_62A4_7B26_7269_54C1ID = ____01_FF0E_4E3B_52A8_628
 local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02．物品系统.15．装备技能.03．主动技能.03．物品使用触发.00．物品使用触发配置")
 local _____8FDC_53E4_6BD2_5492_62A4_7B26_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["远古毒咒护符配置"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____require_result_0.createTimedEffect
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
@@ -17,8 +18,8 @@ local _____9020_6210_88C5_5907_4F24_5BB3 = ____require_result_2["造成装备伤
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local ConvertUnitState = jass.ConvertUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON
 local function _____662F_5426_4E3A_8FDC_53E4_6BD2_5492_62A4_7B26(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
@@ -44,7 +45,7 @@ ____exports["处理远古毒咒护符使用"] = function(_____4E0A_4E0B_6587)
         0,
         _____8FDC_53E4_6BD2_5492_62A4_7B26_914D_7F6E["特效持续时间"]
     )
-    local _____4F24_5BB3_503C = GetUnitState(
+    local _____4F24_5BB3_503C = GetUnitStateJapi(
         _____65BD_6CD5_5355_4F4D,
         ConvertUnitState(21)
     ) * _____8FDC_53E4_6BD2_5492_62A4_7B26_914D_7F6E["力量系数"]

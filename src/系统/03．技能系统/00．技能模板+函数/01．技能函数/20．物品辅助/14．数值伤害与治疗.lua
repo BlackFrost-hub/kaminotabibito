@@ -91,7 +91,7 @@ local bj_MODIFYMETHOD_ADD = jass.bj_MODIFYMETHOD_ADD
 local GetUnitStateJapi = japi.GetUnitState
 local DzSetUnitModel = japi.DzSetUnitModel
 local stringToFourCCSafe = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe
-local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e00D")
+local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e0FT")
 local _____9650_65F6_751F_547DBuffID = stringToFourCCSafe("BHwe")
 local _____5F85_9500_6BC1_7279_6548_5217_8868 = {}
 local _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = false
@@ -255,11 +255,11 @@ ____exports["执行治疗"] = function(_____6765_6E90, _____76EE_6807, _____751F
         HealAmount = _____751F_547D,
         HealManaAmount = _____9B54_6CD5,
         ItemHeal = true,
-        HealEffect = false,
-        UseDefaultHealEffect = false,
+        HealEffect = _____751F_547D > 0,
+        UseDefaultHealEffect = _____751F_547D > 0,
         HealEffectPath = nil,
-        ManaEffect = false,
-        UseDefaultManaEffect = false,
+        ManaEffect = _____9B54_6CD5 > 0,
+        UseDefaultManaEffect = _____9B54_6CD5 > 0,
         ManaEffectPath = nil
     })
 end

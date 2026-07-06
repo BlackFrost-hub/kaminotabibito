@@ -70,7 +70,7 @@ export * from "./66．浴血药剂";
 export * from "./67．浴魔药剂";
 export * from "./68．浴灵药剂";
 export * from "./69．嗜狱恶剑";
-export * from "./70．盗贼神符魔抗";
+export * from "./70．盗贼神符";
 export * from "./71．火把";
 export * from "./72．冥炎之裙";
 export * from "./73．邪恶之心";

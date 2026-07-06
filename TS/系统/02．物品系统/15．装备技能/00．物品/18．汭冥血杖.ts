@@ -14,9 +14,8 @@ const { 获取坐标范围敌人, 单位是否有效且敌对 } = require("系�
 const { createUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
 };
-const { getObjectPropertyRealSafe, ObjectType } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { getObjectPropertyRealSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   getObjectPropertyRealSafe: (this: void, objectType: number, objectId: number | string, property: string) => number;
-  ObjectType: { UNIT: number };
 };
 const { 施加持续恢复生命魔法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.02．buff.01．持续恢复生命魔法") as {
   施加持续恢复生命魔法: (this: void, source: any, target: any, 参数: {
@@ -46,6 +45,7 @@ const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const RACE_DEMON = jass.RACE_DEMON as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
+const YDWE_OBJECT_TYPE_UNIT = 2;
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 汭冥血杖物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
@@ -95,7 +95,7 @@ export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事�
 
   const 特效 = createUnitEffect(目标单位, 汭冥血杖配置.特效挂点, 汭冥血杖配置.特效路径, 汭冥血杖配置.特效持续时间, "汭冥血杖");
   if (特效 != null && 特效 !== 0) {
-    EXSetEffectSize(特效, getObjectPropertyRealSafe(ObjectType.UNIT, GetUnitTypeId(目标单位), "modelScale"));
+    EXSetEffectSize(特效, getObjectPropertyRealSafe(YDWE_OBJECT_TYPE_UNIT, GetUnitTypeId(目标单位), "modelScale"));
   }
 
   const 敌人列表 = 获取坐标范围敌人(施法单位, 目标X, 目标Y, 汭冥血杖配置.作用范围);

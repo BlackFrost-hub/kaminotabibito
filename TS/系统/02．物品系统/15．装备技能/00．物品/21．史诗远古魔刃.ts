@@ -5,6 +5,7 @@ import { 主动物品调试日志 } from "../../../03．技能系统/00．技能
 import { 造成装备伤害 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/10．装备战斗执行";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
@@ -19,10 +20,10 @@ const { 创建线性扫掠命中 } = require("系统.03．技能系统.00．技�
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 
 import type { 物品技能事件上下文 } from "../03．主动技能/03．物品使用触发/01．物品使用触发常量";
 import { 史诗远古魔刃物品ID } from "../03．主动技能/00．公共/01．主动技能物品ID";
@@ -55,7 +56,7 @@ export function 处理史诗远古魔刃使用(this: void, 上下文: 物品技�
       createTimedEffect(史诗远古魔刃配置.特效路径, 扫掠上下文.当前X, 扫掠上下文.当前Y, 0, 史诗远古魔刃配置.特效持续时间);
     },
     on命中: (敌人: any, 扫掠上下文: any) => {
-      const 伤害值 = GetUnitState(扫掠上下文.施法单位, ConvertUnitState(0x15)) * 史诗远古魔刃配置.力量系数;
+      const 伤害值 = GetUnitStateJapi(扫掠上下文.施法单位, ConvertUnitState(0x15)) * 史诗远古魔刃配置.力量系数;
       造成装备伤害(扫掠上下文.施法单位, 敌人, 伤害值, DAMAGE_TYPE_NORMAL, false, undefined, { 伤害形态: "AOE" });
       施加扩展控制(扫掠上下文.施法单位, 敌人, "stun", { 持续时间: 史诗远古魔刃配置.眩晕时间 });
     },

@@ -5,7 +5,7 @@
  * 说明：
  * 1. 不使用 `特效绑定系统.ts`
  * 2. 不使用 `AddSpecialEffectTarget` / `AddSpecialEffectTargetUnitBJ`
- * 3. 当前实现改为直接创建物编单位 `e011`（父 id: `ewsp`）
+ * 3. 当前实现改为直接创建物编单位 `e01O`（父 id: `ewsp`）
  * 4. 进度条颜色、动画速度、动画序号都通过单位接口控制
  * 5. 销毁时走统一单位排泄清理出口，不做特效式延迟回收
  */
@@ -28,9 +28,9 @@ const { 立即移除单位并取消排泄登记 } = require("系统.00．核心�
 };
 
 const 调试模块名 = "进度条特效";
-const PROGRESSBAR_UNIT_ID = 1697657137; // 'e011'
+const PROGRESSBAR_UNIT_ID = 1697657167; // 'e01O'
 const PROGRESSBAR_OWNER_PLAYER_ID = 4;
-const DEFAULT_HEIGHT_OFFSET = 275.0;
+const DEFAULT_HEIGHT_OFFSET = 233.0;
 const DEFAULT_SCALE = 1.0;
 const DEFAULT_ANIM_INDEX = 0;
 const DEFAULT_COLOR_RGBA = { r: 255, g: 255, b: 0, a: 255 };

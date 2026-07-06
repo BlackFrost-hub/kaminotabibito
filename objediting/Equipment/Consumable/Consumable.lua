@@ -1,5 +1,10 @@
 -- Consumables, potion-like pickups, and one-time battle items.
 
+local rogueRuneUseAbility = AbilityDefinitionExperienceMod:new('A0MZ')
+rogueRuneUseAbility:setName('[系统]盗贼神符使用壳')
+rogueRuneUseAbility:setItemAbility(true)
+rogueRuneUseAbility:setExperienceGained(1, 0)
+
 createEquipmentItem('I0E5', '月光碎片', {
   baseId = 'rde1',
   icon = 'BuffIcon\\Boss\\Thranduil\\yueguangsuipian.blp',
@@ -27,6 +32,56 @@ createEquipmentItem('I0ER', '冷却水晶', {
   tooltipExtended = '|cffccffff[战斗道具]|r|n拾取后清除自身全部 |cffff6600灼热|r 层数。',
   description = '|cffccffff[战斗道具]|r|n拾取后清除自身全部 |cffff6600灼热|r 层数。',
 })
+
+local function createRogueAutoUseRune(id, name, description, priority)
+  local item = ItemDefinition:new(id, 'rdis')
+  item:setName(name)
+  item:setTooltipBasic(name)
+  item:setTooltipExtended(description)
+  item:setDescription(description)
+  item:setClassification('Purchasable')
+  item:setGoldCost(75)
+  item:setLumberCost(0)
+  item:setHitPoints(75)
+  item:setPriority(priority)
+  item:setStockMaximum(1)
+  item:setStockReplenishInterval(60)
+  item:setStockStartDelay(0)
+  item:setAbilities('A0MZ')
+  item:setNumberofCharges(1)
+  item:setCanBeDropped(true)
+  item:setDroppedWhenCarrierDies(false)
+  item:setCanBeSoldByMerchants(false)
+  item:setCanBeSoldToMerchants(false)
+  item:setActivelyUsed(true)
+  item:setPerishable(true)
+  item:setUseAutomaticallyWhenAcquired(true)
+  item:setIncludeAsRandomChoice(false)
+  item:setValidTargetForTransformation(false)
+  return item
+end
+
+createRogueAutoUseRune('I0FK', '盗贼神符（护甲）', '拾取后在10秒内提高15点护甲', 200)
+createRogueAutoUseRune('I0FL', '盗贼神符（魔抗）', '拾取后在10秒内提高20%魔抗', 200)
+
+local torchDescription = '|cffffff00道具|r|n在最远800码的目标位置立一个火把，提供600点视野，持续10秒|n|cffc0c0c0冷却：2秒|r'
+local torchItem = ItemDefinition:new('I0FM', 'azhr')
+torchItem:setName('火把')
+torchItem:setTooltipBasic('火把')
+torchItem:setTooltipExtended(torchDescription)
+torchItem:setDescription(torchDescription)
+torchItem:setInterfaceIcon('ReplaceableTextures\\WorldEditUI\\Doodad-Prop.blp')
+torchItem:setAbilities('IP01')
+torchItem:setClassification('Purchasable')
+torchItem:setCooldownGroup('IP01')
+torchItem:setGoldCost(200)
+torchItem:setLumberCost(0)
+torchItem:setPriority(200)
+torchItem:setCanBeSoldByMerchants(false)
+torchItem:setCanBeSoldToMerchants(true)
+torchItem:setActivelyUsed(true)
+torchItem:setPerishable(true)
+torchItem:setNumberofCharges(1)
 
 createEquipmentItem('I00Y', '|cFF800000触手残片|r', {
   baseId = 'azhr',
