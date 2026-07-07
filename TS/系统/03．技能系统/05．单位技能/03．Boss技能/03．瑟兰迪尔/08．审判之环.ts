@@ -28,6 +28,9 @@ const { 显示场地常驻AOE吟唱条, 关闭吟唱条 } = require("系统.09�
   显示场地常驻AOE吟唱条: (this: void, 参数: any) => void;
   关闭吟唱条: (this: void, 通道?: string) => void;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+};
 
 const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -138,6 +141,7 @@ function 启动瑟兰迪尔审判之环轮次(this: void, context: 瑟兰迪尔�
   });
   const 象限名称 = 取象限名称(color);
   const 表现中心 = { x: GetUnitX(boss), y: GetUnitY(boss) };
+  Sound3DII_CooPlayReuse(config.展开音效, 表现中心.x, 表现中心.y, 0, config.展开音效裁断距离);
   显示场地常驻AOE吟唱条({
     总时长: config.周期秒,
     颜色ID: 取象限吟唱条颜色(color),

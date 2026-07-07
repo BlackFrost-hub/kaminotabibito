@@ -32,6 +32,9 @@ const { 显示常规技能吟唱条, 显示致命惩罚吟唱条, 关闭吟唱�
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+};
 
 const jass = require("jass.common") as any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -161,6 +164,7 @@ function 结算瑟兰迪尔月光灌注(this: void, boss: any): void {
   });
   const 狂暴模型缩放 = config.基础模型缩放 * (1 + config.模型缩放加成);
   SetUnitScale(boss, 狂暴模型缩放, 狂暴模型缩放, 狂暴模型缩放);
+  Sound3DII_CooPlayReuse(config.灌注完成音效, GetUnitX(boss), GetUnitY(boss), 0, config.灌注完成音效裁断距离);
 
   显示致命惩罚吟唱条({
     总时长: duration,
@@ -180,6 +184,7 @@ function 结算瑟兰迪尔月光灌注(this: void, boss: any): void {
 
 function 结算瑟兰迪尔精灵神罚(this: void, boss: any): void {
   const config = 瑟兰迪尔数值与表现配置.月光灌注;
+  Sound3DII_CooPlayReuse(config.神罚结算音效, GetUnitX(boss), GetUnitY(boss), 0, config.神罚结算音效裁断距离);
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
     const target = heroes[i];

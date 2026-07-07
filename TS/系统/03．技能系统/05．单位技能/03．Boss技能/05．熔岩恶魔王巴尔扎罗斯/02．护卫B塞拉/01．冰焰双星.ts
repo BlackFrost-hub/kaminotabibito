@@ -2,6 +2,8 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
+import { 巴尔扎罗斯音效配置 } from "../02．数值与表现配置";
+import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 const {  巴尔扎罗斯技能数值配置,
   播放巴尔扎罗斯台词,
   施加巴尔扎罗斯灼热,
@@ -185,6 +187,7 @@ export function 释放冰焰双星(this: void, context: 巴尔扎罗斯运行时
       播放巴尔扎罗斯台词(context.Boss单位, "冰焰双星");
     },
     on生效: function 塞拉冰焰双星生效(this: void): void {
+      播放Boss坐标音效(巴尔扎罗斯音效配置.塞拉.冰焰双星发射, GetUnitX(sera), GetUnitY(sera), 巴尔扎罗斯音效配置.默认裁断距离);
       发射冰焰弹体(context, target, "冰霜", 1);
       发射冰焰弹体(context, target, "火焰", -1);
     },

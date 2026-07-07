@@ -1,5 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
 local _____9650_523601, _____683C_5F0F_5316_6570_503C, _____683C_5F0F_5316_79D2_6570, _____4ECE_4E16_754C_62A4_76FE_6761_5217_8868_79FB_9664, _____4E16_754C_62A4_76FE_6761_5DF2_5728_5217_8868, _____786E_4FDD_4E16_754C_62A4_76FE_6761_5728_5217_8868, _____5C1D_8BD5_5173_95ED_4E16_754C_62A4_76FE_6761_8BA1_65F6_5668, _____786E_4FDD_4E16_754C_62A4_76FE_6761_8BA1_65F6_5668, _____5237_65B0_4E16_754C_62A4_76FE_6761_6587_672C, _____5237_65B0_4E16_754C_62A4_76FE_6761_7F13_964D, ____on_4E16_754C_62A4_76FE_6761Tick, onTick10ms, offTick10ms, DzFrameSetSize, DzFrameSetPoint, DzFrameSetText, DzFrameShow, DzDestroyFrame, _____70B9_5DE6_4E0A, _____4E16_754C_62A4_76FE_6761_5185_5BBD, _____4E16_754C_62A4_76FE_6761_5185_9AD8, _____4E16_754C_62A4_76FE_6761_5185X, _____4E16_754C_62A4_76FE_6761_5185Y, _____4E16_754C_62A4_76FE_6761_7F13_964D_8FFD_8D76_6BD4_4F8B, _____5DF2_6CE8_518C_4E16_754C_62A4_76FE_6761_8BA1_65F6_5668, _____4E16_754C_62A4_76FE_6761_5217_8868
 local ____01_FF0E_62A4_76FE_7C7B_578B = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.01．护盾类型")
@@ -344,45 +347,50 @@ ____exports["创建世界坐标护盾条"] = function(_____53C2_6570)
     DzFrameSetFont(text, "UI\\unit_name_zcool_qingke.ttf", 0.01, 0)
     DzFrameSetPriority(text, _____4E16_754C_62A4_76FE_6761_5C42_7EA7 + 2)
     DzFrameSetIgnoreTrackEvents(text, true)
-    DzFrameBindWorldPos(
+    local ____array_2 = __TS__SparseArrayNew(
         root,
         _____53C2_6570.X,
         _____53C2_6570.Y,
         _____53C2_6570.Z or 180,
         0,
-        0,
-        true
+        0
     )
+    local ____53C2_6570__96FE_4E2D_53EF_89C1_1 = _____53C2_6570["雾中可见"]
+    if ____53C2_6570__96FE_4E2D_53EF_89C1_1 == nil then
+        ____53C2_6570__96FE_4E2D_53EF_89C1_1 = false
+    end
+    __TS__SparseArrayPush(____array_2, ____53C2_6570__96FE_4E2D_53EF_89C1_1)
+    DzFrameBindWorldPos(__TS__SparseArraySpread(____array_2))
     DzFrameShow(root, true)
     DzFrameShow(lag, false)
     DzFrameShow(fill, true)
     DzFrameShow(text, true)
     local currentValue = _____53C2_6570["当前值"] or _____53C2_6570["最大值"]
     local duration = _____53C2_6570["持续时间"] or 0
-    local ____id_2 = id
-    local ____root_3 = root
-    local ____lag_4 = lag
-    local ____fill_5 = fill
-    local ____text_6 = text
-    local ____53C2_6570__6700_5927_503C_7 = _____53C2_6570["最大值"]
-    local ____9650_523601_result_8 = _____9650_523601(currentValue / _____53C2_6570["最大值"])
-    local ____temp_9 = duration > 0
-    local ____53C2_6570__663E_793A_5012_8BA1_65F6_1 = _____53C2_6570["显示倒计时"]
-    if ____53C2_6570__663E_793A_5012_8BA1_65F6_1 == nil then
-        ____53C2_6570__663E_793A_5012_8BA1_65F6_1 = true
+    local ____id_4 = id
+    local ____root_5 = root
+    local ____lag_6 = lag
+    local ____fill_7 = fill
+    local ____text_8 = text
+    local ____53C2_6570__6700_5927_503C_9 = _____53C2_6570["最大值"]
+    local ____9650_523601_result_10 = _____9650_523601(currentValue / _____53C2_6570["最大值"])
+    local ____temp_11 = duration > 0
+    local ____53C2_6570__663E_793A_5012_8BA1_65F6_3 = _____53C2_6570["显示倒计时"]
+    if ____53C2_6570__663E_793A_5012_8BA1_65F6_3 == nil then
+        ____53C2_6570__663E_793A_5012_8BA1_65F6_3 = true
     end
     local bar = {
-        id = ____id_2,
-        root = ____root_3,
-        lag = ____lag_4,
-        fill = ____fill_5,
-        text = ____text_6,
-        ["最大值"] = ____53C2_6570__6700_5927_503C_7,
+        id = ____id_4,
+        root = ____root_5,
+        lag = ____lag_6,
+        fill = ____fill_7,
+        text = ____text_8,
+        ["最大值"] = ____53C2_6570__6700_5927_503C_9,
         ["当前值"] = currentValue,
-        ["缓降比例"] = ____9650_523601_result_8,
+        ["缓降比例"] = ____9650_523601_result_10,
         ["剩余时间"] = duration,
-        ["持续计时"] = ____temp_9,
-        ["显示倒计时"] = ____53C2_6570__663E_793A_5012_8BA1_65F6_1 and duration > 0,
+        ["持续计时"] = ____temp_11,
+        ["显示倒计时"] = ____53C2_6570__663E_793A_5012_8BA1_65F6_3 and duration > 0,
         ["名称"] = _____53C2_6570["名称"] or "魔盾",
         ["刷新Tick"] = 0,
         ["已销毁"] = false

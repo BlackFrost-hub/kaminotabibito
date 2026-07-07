@@ -61,6 +61,7 @@ export interface 世界坐标护盾条参数 {
   类型?: number;
   持续时间?: number;
   显示倒计时?: boolean;
+  雾中可见?: boolean;
   名称?: string;
 }
 
@@ -246,7 +247,7 @@ export function 创建世界坐标护盾条(this: void, 参数: 世界坐标护�
   DzFrameSetPriority(text, 世界护盾条层级 + 2);
   DzFrameSetIgnoreTrackEvents(text, true);
 
-  DzFrameBindWorldPos(root, 参数.X, 参数.Y, 参数.Z ?? 180, 0, 0, true);
+  DzFrameBindWorldPos(root, 参数.X, 参数.Y, 参数.Z ?? 180, 0, 0, 参数.雾中可见 ?? false);
   DzFrameShow(root, true);
   DzFrameShow(lag, false);
   DzFrameShow(fill, true);

@@ -29,6 +29,9 @@ const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+};
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -69,6 +72,7 @@ function 启动律法链路(this: void, boss: any, summon: any, 已连接目标:
     Tick间隔秒: config.链接伤害间隔秒,
     on距离超出: function 瑟兰迪尔律法链路距离惩罚(this: void, source: any, _connector: any, target: any): void {
       if (!单位有效(source) || !单位有效(target)) return;
+      Sound3DII_CooPlayReuse(config.链接惩罚音效, GetUnitX(target), GetUnitY(target), 0, config.链接惩罚音效裁断距离);
       造成单体技能伤害({
         技能ID: 律法召唤技能ID,
         来源: boss,

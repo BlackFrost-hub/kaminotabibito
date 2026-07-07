@@ -2,8 +2,9 @@
 
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import { 米亚单位技能配置 } from "./00．配置";
-import { 米亚技能数值配置 } from "./02．数值与表现配置";
+import { 米亚技能数值配置, 米亚音效配置 } from "./02．数值与表现配置";
 import { 播放米亚台词 } from "./15．台词播放";
+import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
@@ -113,6 +114,8 @@ function 触发米亚灵猫分身(this: void, context: 米亚运行时上下文)
   const summons: any[] = [];
 
   播放米亚台词(boss, "灵猫分身", 0);
+  播放Boss坐标音效(米亚音效配置.灵猫分身.主辨识音, bossX, bossY, 米亚音效配置.默认裁断距离);
+  延迟播放Boss坐标音效(米亚音效配置.灵猫分身.凝形补层, bossX, bossY, 米亚音效配置.灵猫分身.凝形补层延迟Ms, 米亚音效配置.默认裁断距离);
   创建单位脚下点特效(boss, {
     模型路径: "war3mapImported\\blackblink.mdx",
     持续秒: 1.2,

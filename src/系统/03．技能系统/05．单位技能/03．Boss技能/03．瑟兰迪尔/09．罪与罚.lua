@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, YDWETimerDestroyEffectSafe, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, Atan2, AddSpecialEffect, AddSpecialEffectTarget, R2I, EXSetEffectSize, DzSetEffectVertexColor, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
+local _____5355_4F4D_6709_6548, _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, YDWETimerDestroyEffectSafe, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, Sound3DII_CooPlayReuse, jass, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, Atan2, AddSpecialEffect, AddSpecialEffectTarget, R2I, EXSetEffectSize, DzSetEffectVertexColor, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
@@ -125,15 +125,15 @@ ____exports["释放瑟兰迪尔罪与罚"] = function(context, target)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["罪与罚"]
     local boss = context["Boss单位"]
     local threatTarget = _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807(boss)
-    local ____target_9 = target
-    if ____target_9 == nil then
-        ____target_9 = threatTarget and threatTarget.targetRef
+    local ____target_10 = target
+    if ____target_10 == nil then
+        ____target_10 = threatTarget and threatTarget.targetRef
     end
-    local ____target_9_10 = ____target_9
-    if ____target_9_10 == nil then
-        ____target_9_10 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
+    local ____target_10_11 = ____target_10
+    if ____target_10_11 == nil then
+        ____target_10_11 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
     end
-    local actualTarget = ____target_9_10
+    local actualTarget = ____target_10_11
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(actualTarget) then
         return
     end
@@ -166,6 +166,13 @@ ____exports["释放瑟兰迪尔罪与罚"] = function(context, target)
             _____8BA9_5355_4F4D_9762_5411_76EE_6807(boss, actualTarget)
             SetUnitTimeScale(boss, 1)
             SetUnitAnimationByIndex(boss, 0)
+            Sound3DII_CooPlayReuse(
+                config["点名音效"],
+                GetUnitX(actualTarget),
+                GetUnitY(actualTarget),
+                0,
+                config["点名音效裁断距离"]
+            )
             _____64AD_653E_70B9_540D_7279_6548(actualTarget, config["延迟秒"])
         end
     )
@@ -310,6 +317,8 @@ _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807 = ____require_result_5["�
 _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_5["获取Boss技能最近敌对英雄"]
 local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_6["造成单体技能伤害"]
+local ____require_result_7 = require("lib.扩展函数.封装函数.02．音效系统.index")
+Sound3DII_CooPlayReuse = ____require_result_7.Sound3DII_CooPlayReuse
 jass = require("jass.common")
 local japi = require("jass.japi")
 GetRandomInt = jass.GetRandomInt

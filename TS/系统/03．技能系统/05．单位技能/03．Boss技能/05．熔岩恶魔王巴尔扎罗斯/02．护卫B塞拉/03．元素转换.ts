@@ -2,6 +2,8 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
+import { 巴尔扎罗斯音效配置 } from "../02．数值与表现配置";
+import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 const {  巴尔扎罗斯单位技能配置,
   巴尔扎罗斯技能数值配置,
   播放巴尔扎罗斯台词,
@@ -9,6 +11,8 @@ const {  巴尔扎罗斯单位技能配置,
   移除单位指定Buff,
   registerDamageModifier,
   getServerTime,
+  GetUnitX,
+  GetUnitY,
   SetUnitAnimationByIndex,
   SetUnitTimeScale,
   单位有效,
@@ -36,6 +40,7 @@ export function 切换塞拉形态(this: void, context: 巴尔扎罗斯运行时
   );
   SetUnitTimeScale(sera, config.动画速度);
   SetUnitAnimationByIndex(sera, config.动画编号);
+  播放Boss坐标音效(next === "火焰" ? 巴尔扎罗斯音效配置.塞拉.冰转火 : 巴尔扎罗斯音效配置.塞拉.火转冰, GetUnitX(sera), GetUnitY(sera), 巴尔扎罗斯音效配置.默认裁断距离);
   if (播放台词) 播放巴尔扎罗斯台词(context.Boss单位, "元素转换");
 }
 
@@ -66,4 +71,3 @@ export function 确保塞拉伤害修正(this: void): void {
   塞拉伤害修正已注册 = true;
   registerDamageModifier(塞拉伤害修正, 65);
 }
-

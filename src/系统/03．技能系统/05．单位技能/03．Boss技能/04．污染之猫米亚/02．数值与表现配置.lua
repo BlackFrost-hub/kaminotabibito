@@ -13,6 +13,16 @@ ____exports["米亚腐化感染配置"] = {
     ["安全平台衰减间隔秒"] = 1
 }
 ____exports["米亚平台配置"] = {["单双人平台容量"] = 1, ["三四人平台容量"] = 2, ["超载检测间隔Ms"] = 500}
+____exports["米亚音效配置"] = {
+    ["默认裁断距离"] = 2800,
+    ["转阶段2"] = {["跳入水池"] = "Sound\\Boss\\Mia\\SFX\\mia_phase2_pool_jump_splash_01.mp3", ["毒水喷涌"] = "Sound\\Boss\\Mia\\SFX\\mia_phase2_poison_surge_02.mp3", ["毒水喷涌延迟Ms"] = 650},
+    ["污水喷吐"] = {["前摇蓄力"] = "Sound\\Boss\\Mia\\SFX\\mia_sewage_spit_burst_01.mp3", ["持续喷射"] = "Sound\\Boss\\Mia\\SFX\\mia_sewage_spit_stream_01.mp3", ["持续喷射延迟Ms"] = 1000},
+    ["灵猫分身"] = {["主辨识音"] = "Sound\\Boss\\Mia\\SFX\\mia_spirit_cat_clone_spawn_01.mp3", ["凝形补层"] = "Sound\\Boss\\Mia\\SFX\\mia_spirit_cat_clone_spawn_03.mp3", ["凝形补层延迟Ms"] = 250},
+    ["污染脉冲"] = {["扩散波"] = "Sound\\Boss\\Mia\\SFX\\mia_pollution_pulse_wave_01.mp3"},
+    ["污水柱爆发"] = {["爆发"] = "Sound\\Boss\\Mia\\SFX\\mia_sewage_geyser_burst_01.mp3"},
+    ["腐化转移"] = {["平台污染"] = "Sound\\Boss\\Mia\\SFX\\mia_corruption_transfer_platform_01.mp3"},
+    ["终极污染"] = {["开始引导"] = "Sound\\Boss\\Mia\\SFX\\mia_ultimate_corruption_start_01.mp3", ["引导完成"] = "Sound\\Boss\\Mia\\SFX\\mia_ultimate_corruption_complete_01_twostage_v3_heavy_80k.mp3"}
+}
 ____exports["米亚技能数值配置"] = {
     ["腐化爪击"] = {
         ["冷却Ms"] = 12000,

@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWETimerDestroyEffectSafe, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffectTarget, UnitRemoveAbility, GetUnitState, _____6708_5149_67B7_9501_6280_80FDID, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, UNIT_STATE_MAX_LIFE, _____6708_5149_67B7_9501_7ED1_5B9A_8868
+local _____5355_4F4D_6709_6548, _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWETimerDestroyEffectSafe, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, Sound3DII_CooPlayReuse, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffectTarget, UnitRemoveAbility, GetUnitState, _____6708_5149_67B7_9501_6280_80FDID, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, UNIT_STATE_MAX_LIFE, _____6708_5149_67B7_9501_7ED1_5B9A_8868
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
@@ -166,6 +166,13 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster
         return
     end
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
+    Sound3DII_CooPlayReuse(
+        config["命中音效"],
+        GetUnitX(target),
+        GetUnitY(target),
+        0,
+        config["命中音效裁断距离"]
+    )
     _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548(target)
     _____65BD_52A0_6269_5C55_63A7_5236(caster, target, "roots", {["持续时间"] = config["定身秒"]})
     _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(caster, target)
@@ -215,6 +222,8 @@ local ____require_result_10 = require("lib.扩展函数.YDWE函数.09．YDUserDa
 YDWETimerDestroyEffectSafe = ____require_result_10.YDWETimerDestroyEffectSafe
 local ____require_result_11 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_11["读取单位攻击力"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.index")
+Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitName = jass.GetUnitName

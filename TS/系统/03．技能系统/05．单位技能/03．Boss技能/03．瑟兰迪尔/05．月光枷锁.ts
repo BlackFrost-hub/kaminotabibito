@@ -51,6 +51,9 @@ const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09�
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+};
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
@@ -262,6 +265,7 @@ export function 释放瑟兰迪尔月光枷锁效果(this: void, caster: any, ta
 function 结算瑟兰迪尔月光枷锁命中(this: void, caster: any, target: any): void {
   if (!单位有效(caster) || !单位有效(target)) return;
   const config = 瑟兰迪尔数值与表现配置.月光枷锁;
+  Sound3DII_CooPlayReuse(config.命中音效, GetUnitX(target), GetUnitY(target), 0, config.命中音效裁断距离);
   播放月光枷锁命中特效(target);
   施加扩展控制(caster, target, "roots", { 持续时间: config.定身秒 });
   创建月光枷锁绑定记录(caster, target);

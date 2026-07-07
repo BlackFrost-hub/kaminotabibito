@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____53D6_6708_5149_704C_6CE8Key, _____56DE_6EDA_6708_5149_704C_6CE8_72B6_6001, ____on_6708_5149_704C_6CE8Buff_79FB_9664, _____64AD_653E_795E_7F5A_7279_6548, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_704C_6CE8, _____7ED3_7B97_745F_5170_8FEA_5C14_7CBE_7075_795E_7F5A, addDelayedCallback, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, SGSS_SetState, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5BF9_5355_4F4D_9020_6210_5F3A_5316_4F24_5BB3, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761, _____5173_95ED_541F_5531_6761, YDWETimerDestroyEffectSafe, GetUnitState, GetHandleId, GetUnitName, GetUnitX, GetUnitY, SetUnitScale, GetUnitDefaultMoveSpeed, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffect, AddSpecialEffectTarget, R2I, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, _____653B_51FB_529B_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, _____6708_5149_704C_6CE8_72B6_6001_8868, _____5F53_524D_6708_5149_704C_6CE8Boss
+local _____5355_4F4D_6709_6548, _____53D6_6708_5149_704C_6CE8Key, _____56DE_6EDA_6708_5149_704C_6CE8_72B6_6001, ____on_6708_5149_704C_6CE8Buff_79FB_9664, _____64AD_653E_795E_7F5A_7279_6548, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_704C_6CE8, _____7ED3_7B97_745F_5170_8FEA_5C14_7CBE_7075_795E_7F5A, addDelayedCallback, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, SGSS_SetState, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5BF9_5355_4F4D_9020_6210_5F3A_5316_4F24_5BB3, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761, _____5173_95ED_541F_5531_6761, YDWETimerDestroyEffectSafe, Sound3DII_CooPlayReuse, GetUnitState, GetHandleId, GetUnitName, GetUnitX, GetUnitY, SetUnitScale, GetUnitDefaultMoveSpeed, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffect, AddSpecialEffectTarget, R2I, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, _____653B_51FB_529B_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, _____6708_5149_704C_6CE8_72B6_6001_8868, _____5F53_524D_6708_5149_704C_6CE8Boss
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置")
 local _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["瑟兰迪尔数值与表现配置"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.15．台词播放")
@@ -114,6 +114,13 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_704C_6CE8(boss)
     )
     local _____72C2_66B4_6A21_578B_7F29_653E = config["基础模型缩放"] * (1 + config["模型缩放加成"])
     SetUnitScale(boss, _____72C2_66B4_6A21_578B_7F29_653E, _____72C2_66B4_6A21_578B_7F29_653E, _____72C2_66B4_6A21_578B_7F29_653E)
+    Sound3DII_CooPlayReuse(
+        config["灌注完成音效"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        config["灌注完成音效裁断距离"]
+    )
     _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761({["总时长"] = duration, ["颜色ID"] = config["惩罚吟唱条颜色ID"], ["标题文本"] = config["惩罚吟唱条标题文本"], ["提示文本"] = config["惩罚吟唱条提示文本"]})
     addDelayedCallback(
         R2I(duration * 1000),
@@ -130,6 +137,13 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_704C_6CE8(boss)
 end
 function _____7ED3_7B97_745F_5170_8FEA_5C14_7CBE_7075_795E_7F5A(boss)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光灌注"]
+    Sound3DII_CooPlayReuse(
+        config["神罚结算音效"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        config["神罚结算音效裁断距离"]
+    )
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     do
         local i = 0
@@ -174,6 +188,8 @@ _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761 = ____require_result_6["显示
 _____5173_95ED_541F_5531_6761 = ____require_result_6["关闭吟唱条"]
 local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 YDWETimerDestroyEffectSafe = ____require_result_7.YDWETimerDestroyEffectSafe
+local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.index")
+Sound3DII_CooPlayReuse = ____require_result_8.Sound3DII_CooPlayReuse
 local jass = require("jass.common")
 GetUnitState = jass.GetUnitState
 GetHandleId = jass.GetHandleId

@@ -77,6 +77,8 @@ local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____req
 local _____6E05_7406_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____require_result_6["清理瑟兰迪尔上下文"]
 local _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD = ____require_result_6["播放瑟兰迪尔台词"]
 local GetUnitTypeId = jass.GetUnitTypeId
+local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.08．Boss死亡音效")
+local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_97F3_6548 = ____require_result_7["尝试播放Boss死亡音效"]
 ____Boss_6218_8FD0_884C_5468_671F_56DE_8C03ID = 0
 local _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local function _____662F_745F_5170_8FEA_5C14Boss(bossUnit)
@@ -117,6 +119,7 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
         return
     end
     context["是否已结束"] = true
+    _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_97F3_6548(context["Boss单位"])
     _____7ED3_675FBoss_8840_6761_5F31_70B9_97E7_6027(context)
     _____5904_7406Boss_6218_62A4_536B_7ED3_675F(context)
     _____505C_6B62_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
@@ -127,11 +130,11 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
     _____6E05_7406Boss_7BAD_5934_7279_6548(context["Boss单位"])
     _____767B_8BB0Boss_6B7B_4EA1_5EF6_8FDF_6E05_7406YD_6570_636E(context, nowMs)
     _____7ED3_675FBoss_6218_533A_57DF_97F3_9891(context, nowMs)
-    local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.07．异界Boss死亡奖励")
-    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_7["发放异界Boss死亡奖励"]
+    local ____require_result_8 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.07．异界Boss死亡奖励")
+    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_8["发放异界Boss死亡奖励"]
     _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1(context["Boss单位"])
-    local ____require_result_8 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
-    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_8["尝试播放Boss死亡主线剧情"]
+    local ____require_result_9 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
+    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_9["尝试播放Boss死亡主线剧情"]
     _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5(context["Boss单位"])
     QuestMessageBJ(
         GetPlayersAll(),

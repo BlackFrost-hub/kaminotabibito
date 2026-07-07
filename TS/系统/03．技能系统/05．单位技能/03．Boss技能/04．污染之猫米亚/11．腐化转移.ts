@@ -2,10 +2,11 @@
 
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import type { 米亚安全域运行时矩形 } from "./01．场地配置";
-import { 米亚技能数值配置 } from "./02．数值与表现配置";
+import { 米亚技能数值配置, 米亚音效配置 } from "./02．数值与表现配置";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 播放米亚台词 } from "./15．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 执行战斗自身传送到坐标 } from "../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -114,6 +115,7 @@ function 开始污染平台(this: void, context: 米亚运行时上下文, 区�
   context.腐化转移污染平台ID = id;
   context.腐化转移污染结束Ms = nowMs + config.平台污染持续秒 * 1000;
   context.腐化转移下次叠层Ms = nowMs + 1000;
+  播放Boss坐标音效(米亚音效配置.腐化转移.平台污染, 区域.中心X, 区域.中心Y, 米亚音效配置.默认裁断距离);
   创建循环点特效({
     模型路径: 米亚单位技能配置.特效.腐化残留云,
     X: 区域.中心X,

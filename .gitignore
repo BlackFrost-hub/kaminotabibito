@@ -15,6 +15,7 @@
 /.opencode
 /map
 /map01
+/audio_temp
 /%APPDATA%
 node_modules/
 npm-debug.log*

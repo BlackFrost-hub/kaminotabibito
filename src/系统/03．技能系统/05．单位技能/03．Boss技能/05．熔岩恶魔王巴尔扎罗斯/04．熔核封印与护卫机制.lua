@@ -7,6 +7,9 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["巴尔扎罗斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
 local _____5DF4_5C14_624E_7F57_65AF_62A4_536B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯护卫配置"]
+local _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯音效配置"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
 local _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
 local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
@@ -22,6 +25,8 @@ local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算
 local registerDamageModifier = ____require_result_4.registerDamageModifier
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____62A4_536B_5F52_5C5EBoss_8868 = {}
@@ -108,6 +113,12 @@ local function _____89E3_9664_7194_6838_5C01_5370(context)
     context["熔核封印已解除"] = true
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(boss, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E.BuffID["熔核封印"])
     X_RestoreUnitStandingSafe(boss)
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["转阶段2"]["封印破碎"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
 end
 local function _____53CC_62A4_536B_90FD_5DF2_6B7B_4EA1(context)
     return not _____5355_4F4D_6709_6548(context["格鲁姆"]) and not _____5355_4F4D_6709_6548(context["塞拉"])

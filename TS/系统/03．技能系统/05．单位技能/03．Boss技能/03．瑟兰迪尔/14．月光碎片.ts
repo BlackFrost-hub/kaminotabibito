@@ -16,6 +16,9 @@ const { 施加移速提升Buff } = require("系统.03．技能系统.00．技能
     特效路径?: string;
   }) => boolean;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+};
 
 const CreateItem = jass.CreateItem as (itemId: number, x: number, y: number) => any;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -42,6 +45,8 @@ function on月光碎片拾取(this: void, unit: any, item: any): void {
 }
 
 export function 创建瑟兰迪尔月光碎片(this: void, x: number, y: number): any {
+  const config = 瑟兰迪尔数值与表现配置.月光碎片;
+  Sound3DII_CooPlayReuse(config.破裂音效, x, y, 0, config.破裂音效裁断距离);
   return CreateItem(月光碎片物品类型ID, x, y);
 }
 

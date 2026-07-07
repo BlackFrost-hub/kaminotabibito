@@ -4,8 +4,11 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["巴尔扎罗斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
 local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯技能数值配置"]
+local _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯音效配置"]
 local ____14_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.05．熔岩恶魔王巴尔扎罗斯.14．台词播放")
 local _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD = ____14_FF0E_53F0_8BCD_64AD_653E["播放巴尔扎罗斯台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.index")
@@ -31,6 +34,8 @@ local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_7["造�
 local jass = require("jass.common")
 local GetUnitState = jass.GetUnitState
 local GetHandleId = jass.GetHandleId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
@@ -107,6 +112,12 @@ local function _____521B_5EFA_7194_5CA9_62A4_76FE(context)
     local shieldValue = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config["护盾Boss最大生命比例"]
     local bossId = _____53D6_5355_4F4DID(boss)
     _____64AD_653E_62A4_76FE_77ED_52A8_4F5C(boss)
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["熔岩护盾"]["护盾生成"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD(boss, "熔岩护盾")
     _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
         boss,

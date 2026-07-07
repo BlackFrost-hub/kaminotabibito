@@ -2,10 +2,11 @@
 
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import { 取米亚平台中心X, 取米亚平台中心Y, 取米亚单位所在安全域 } from "./01．场地配置";
-import { 米亚技能数值配置 } from "./02．数值与表现配置";
+import { 米亚技能数值配置, 米亚音效配置 } from "./02．数值与表现配置";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 播放米亚台词 } from "./15．台词播放";
 import { 取米亚平台超载伤害倍率 } from "./12．平台超载惩罚";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -92,6 +93,7 @@ function 结算污染脉冲波(this: void, context: 米亚运行时上下文, wa
   const radius2 = radius * radius;
   const centerX = 取米亚平台中心X();
   const centerY = 取米亚平台中心Y();
+  if (waveIndex === 0) 播放Boss坐标音效(米亚音效配置.污染脉冲.扩散波, centerX, centerY, 米亚音效配置.默认裁断距离);
   播放脉冲波表现(waveIndex);
   播放米亚台词(boss, "污染脉冲", waveIndex + 2);
 

@@ -6,12 +6,15 @@ local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E
 local _____53D6_7C73_4E9A_5355_4F4D_6240_5728_5B89_5168_57DF = ____01_FF0E_573A_5730_914D_7F6E["取米亚单位所在安全域"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.02．数值与表现配置")
 local _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚技能数值配置"]
+local _____7C73_4E9A_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚音效配置"]
 local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.04．腐化感染")
 local _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3 = ____04_FF0E_8150_5316_611F_67D3["添加米亚腐化感染"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.15．台词播放")
 local _____64AD_653E_7C73_4E9A_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放米亚台词"]
 local ____12_FF0E_5E73_53F0_8D85_8F7D_60E9_7F5A = require("系统.03．技能系统.05．单位技能.03．Boss技能.04．污染之猫米亚.12．平台超载惩罚")
 local _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387 = ____12_FF0E_5E73_53F0_8D85_8F7D_60E9_7F5A["取米亚平台超载伤害倍率"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -126,6 +129,9 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
     local radius2 = radius * radius
     local centerX = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X()
     local centerY = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y()
+    if waveIndex == 0 then
+        _____64AD_653EBoss_5750_6807_97F3_6548(_____7C73_4E9A_97F3_6548_914D_7F6E["污染脉冲"]["扩散波"], centerX, centerY, _____7C73_4E9A_97F3_6548_914D_7F6E["默认裁断距离"])
+    end
     _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污染脉冲", waveIndex + 2)
     local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
@@ -135,10 +141,10 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
             do
                 local target = targets[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue20
+                    goto __continue21
                 end
                 if _____5355_4F4D_5728_6709_6548_5B89_5168_57DF_5185(context, target) then
-                    goto __continue20
+                    goto __continue21
                 end
                 if _____8DDD_79BB_5E73_65B9(
                     centerX,
@@ -146,7 +152,7 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
                     GetUnitX(target),
                     GetUnitY(target)
                 ) > radius2 then
-                    goto __continue20
+                    goto __continue21
                 end
                 local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -162,7 +168,7 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
                 })
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["每波腐化层数"], "污染脉冲")
             end
-            ::__continue20::
+            ::__continue21::
             i = i + 1
         end
     end

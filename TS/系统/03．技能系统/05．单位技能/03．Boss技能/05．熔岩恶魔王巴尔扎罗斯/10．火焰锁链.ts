@@ -3,8 +3,9 @@
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取或创建巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
-import { 巴尔扎罗斯技能数值配置 } from "./02．数值与表现配置";
+import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
@@ -195,6 +196,7 @@ function 创建火焰锁链(this: void, context: 巴尔扎罗斯运行时上下�
   });
   if (chain == null || !单位有效(chain.单位)) return;
   state.chainUnit = chain.单位;
+  播放Boss坐标音效(巴尔扎罗斯音效配置.火焰锁链.锁定生成, centerX, centerY, 巴尔扎罗斯音效配置.默认裁断距离);
   state.line = 创建持续单位连线({
     清理: context.清理,
     名称: "巴尔扎罗斯-火焰锁链闪电",

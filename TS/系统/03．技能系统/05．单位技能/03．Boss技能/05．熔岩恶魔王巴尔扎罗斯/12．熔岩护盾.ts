@@ -2,8 +2,9 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
-import { 巴尔扎罗斯技能数值配置 } from "./02．数值与表现配置";
+import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -41,6 +42,8 @@ const jass = require("jass.common") as any;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, timeScale: number) => void;
@@ -96,6 +99,7 @@ function 创建熔岩护盾(this: void, context: 巴尔扎罗斯运行时上下�
   const bossId = 取单位ID(boss);
 
   播放护盾短动作(boss);
+  播放Boss坐标音效(巴尔扎罗斯音效配置.熔岩护盾.护盾生成, GetUnitX(boss), GetUnitY(boss), 巴尔扎罗斯音效配置.默认裁断距离);
   播放巴尔扎罗斯台词(boss, "熔岩护盾");
   创建单位坐标跟随特效(boss, config.特效路径, config.特效键, config.特效缩放, config.特效高度);
   registerManualBuff(boss, 巴尔扎罗斯单位技能配置.BuffID.熔岩护盾, config.持续秒, shieldValue, {

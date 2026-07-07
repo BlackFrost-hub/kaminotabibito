@@ -87,6 +87,9 @@ const {
 };
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
+const { 尝试播放Boss死亡音效 } = require("./08．Boss死亡音效") as {
+  尝试播放Boss死亡音效: (this: void, bossUnit: any) => void;
+};
 
 let Boss战运行周期回调ID = 0;
 const 瑟兰迪尔单位类型ID = stringToFourCCSafe(瑟兰迪尔单位技能配置.单位ID);
@@ -123,6 +126,7 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
   if (context.是否已结束) return;
 
   context.是否已结束 = true;
+  尝试播放Boss死亡音效(context.Boss单位);
   结束Boss血条弱点韧性(context);
   处理Boss战护卫结束(context);
   停止赫萝昼夜被动(context.Boss单位);

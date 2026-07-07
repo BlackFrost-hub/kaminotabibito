@@ -3,7 +3,8 @@
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
-import { 巴尔扎罗斯护卫配置 } from "./02．数值与表现配置";
+import { 巴尔扎罗斯护卫配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
@@ -27,6 +28,8 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
 const jass = require("jass.common") as any;
 
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
@@ -104,6 +107,7 @@ function 解除熔核封印(this: void, context: 巴尔扎罗斯运行时上下�
   context.熔核封印已解除 = true;
   移除单位指定Buff(boss, 巴尔扎罗斯单位技能配置.BuffID.熔核封印);
   X_RestoreUnitStandingSafe(boss);
+  播放Boss坐标音效(巴尔扎罗斯音效配置.转阶段2.封印破碎, GetUnitX(boss), GetUnitY(boss), 巴尔扎罗斯音效配置.默认裁断距离);
 }
 
 function 双护卫都已死亡(this: void, context: 巴尔扎罗斯运行时上下文): boolean {

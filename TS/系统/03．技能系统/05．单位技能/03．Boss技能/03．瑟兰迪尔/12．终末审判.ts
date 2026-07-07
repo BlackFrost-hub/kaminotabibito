@@ -29,6 +29,9 @@ const { 创建白色圆形提示圈 } = require("系统.03．技能系统.00．�
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+};
 
 const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -79,6 +82,14 @@ function 创建终末审判爆炸特效(this: void, x: number, y: number): void 
   播放点特效(config.爆炸特效, x, y, 2);
   播放点特效(config.爆炸特效2, x, y, 2);
   播放点特效(config.爆炸特效3, x, y, 2);
+}
+
+function 播放终末审判结算音效(this: void, x: number, y: number): void {
+  const config = 瑟兰迪尔数值与表现配置.终末审判;
+  Sound3DII_CooPlayReuse(config.结算主冲击音效, x, y, 0, config.结算音效裁断距离);
+  addDelayedCallback(config.结算扩散音效延迟毫秒, function 瑟兰迪尔终末审判扩散音效(this: void): void {
+    Sound3DII_CooPlayReuse(config.结算扩散音效, x, y, 0, config.结算音效裁断距离);
+  });
 }
 
 function 计算爆炸特效前置延迟毫秒(this: void): number {
@@ -164,6 +175,7 @@ export function 释放瑟兰迪尔终末审判(this: void, context: 瑟兰迪尔
       if (!单位有效(boss)) return;
       const bossX = GetUnitX(boss);
       const bossY = GetUnitY(boss);
+      播放终末审判结算音效(bossX, bossY);
       const safeRadius2 = config.安全区半径 * config.安全区半径;
       for (let i = 0; i < targets.length; i++) {
         const target = targets[i];

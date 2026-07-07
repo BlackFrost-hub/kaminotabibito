@@ -12,6 +12,28 @@ local hash = ____02_FF0E_97F3_6548_6C60.hash
 -- 在坐标、单位、点位置播放3D音效
 local jass = require("jass.common")
 ____exports.lastPlayedSound = nil
+local cooReuseSoundByPath = {}
+local cooReuseHadStartedByPath = {}
+local function getOrCreateCooReuseSound(path, model)
+    local cache = cooReuseSoundByPath
+    local hit = cache[path]
+    if hit then
+        return hit
+    end
+    local sound = jass.CreateSound(
+        path,
+        false,
+        true,
+        false,
+        model.fadeInRate,
+        model.fadeOutRate,
+        model.soundType
+    )
+    if sound then
+        cache[path] = sound
+    end
+    return sound
+end
 --- 在坐标处播放3D音效
 -- 
 -- @param path 音效路径
@@ -66,6 +88,39 @@ function ____exports.Sound3DII_CooPlay(path, x, y, z, cutoff, model)
         jass.StartSound(sound)
         ____exports.lastPlayedSound = sound
     end
+    return sound
+end
+--- 在坐标处播放3D音效（单句柄复用）。
+-- 
+-- 同一路径只常驻1个 sound 句柄；重复播放时更新坐标并 Stop+Start。
+-- 适合 Boss 机制提示、UI化战斗反馈等不需要多声叠放的高频同路径音效。
+-- 如果需要同一音效多实例同时叠放，请继续使用 Sound3DII_CooPlay。
+function ____exports.Sound3DII_CooPlayReuse(path, x, y, z, cutoff, model)
+    if model == nil then
+        model = getDefaultSoundModel()
+    end
+    if path == "" then
+        return nil
+    end
+    local sound = getOrCreateCooReuseSound(path, model)
+    if not sound then
+        return nil
+    end
+    model:applyToSound(
+        sound,
+        x,
+        y,
+        z,
+        cutoff
+    )
+    local started = cooReuseHadStartedByPath
+    if started[path] then
+        jass.StopSound(sound, false, false)
+    else
+        started[path] = true
+    end
+    jass.StartSound(sound)
+    ____exports.lastPlayedSound = sound
     return sound
 end
 --- 在单位位置播放3D音效

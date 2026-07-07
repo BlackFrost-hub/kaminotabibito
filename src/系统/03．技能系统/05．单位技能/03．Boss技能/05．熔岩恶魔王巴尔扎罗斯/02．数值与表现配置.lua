@@ -25,6 +25,24 @@ ____exports["巴尔扎罗斯护卫配置"] = {["格鲁姆"] = {
     ["面向"] = 270
 }}
 ____exports["巴尔扎罗斯阶段阈值"] = {["第二阶段生命比例"] = 0.7, ["第三阶段生命比例"] = 0.35}
+____exports["巴尔扎罗斯音效配置"] = {
+    ["默认裁断距离"] = 2800,
+    ["转阶段2"] = {["封印破碎"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_phase2_seal_break_01_80k.mp3"},
+    ["恶魔咆哮波"] = {["发射"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_demon_roar_wave_01_80k.mp3"},
+    ["王者天罚"] = {["落点爆炸"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_king_punishment_impact_03.mp3"},
+    ["熔岩喷发"] = {
+        ["地面开裂"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_lava_eruption_crack_04_64k.mp3",
+        ["熔岩上冲"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_lava_eruption_column_02_64k.mp3",
+        ["最后爆裂"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_lava_eruption_final_burst_02_64k.mp3",
+        ["熔岩上冲延迟Ms"] = 150,
+        ["最后爆裂延迟Ms"] = 320
+    },
+    ["火焰锁链"] = {["锁定生成"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_fire_chain_bind_01.mp3"},
+    ["地核召唤"] = {["地核出现"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_earthcore_summon_01.mp3"},
+    ["熔岩护盾"] = {["护盾生成"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_lava_shield_combo_01.mp3"},
+    ["末日熔爆"] = {["开始引导"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_doom_molten_start_01_80k.mp3", ["爆发结算"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_doom_molten_blast_01_80k.mp3"},
+    ["塞拉"] = {["冰焰双星发射"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_sera_icefire_twinstar_cast_03.mp3", ["冰转火"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_sera_element_shift_ice_to_fire_combo_03.mp3", ["火转冰"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_sera_element_shift_fire_to_ice_combo_03.mp3"}
+}
 ____exports["巴尔扎罗斯技能数值配置"] = {
     ["熔岩重锤"] = {
         ["冷却秒"] = 10,

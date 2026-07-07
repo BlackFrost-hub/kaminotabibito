@@ -3,9 +3,10 @@
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import { 取米亚平台中心配置, 取米亚平台中心X, 取米亚平台中心Y } from "./01．场地配置";
 import { 米亚单位技能配置 } from "./00．配置";
-import { 米亚技能数值配置, 米亚腐化感染配置 } from "./02．数值与表现配置";
+import { 米亚技能数值配置, 米亚腐化感染配置, 米亚音效配置 } from "./02．数值与表现配置";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 播放米亚台词 } from "./15．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -277,6 +278,7 @@ function 完成终极污染(this: void, context: 米亚运行时上下文): void
   清理终极污染核心(context);
   SetUnitTimeScale(context.Boss单位, 1);
   播放米亚台词(context.Boss单位, "终极污染", 9);
+  播放Boss坐标音效(米亚音效配置.终极污染.引导完成, 取米亚平台中心X(), 取米亚平台中心Y(), 米亚音效配置.默认裁断距离);
   创建点特效({ 模型路径: 米亚单位技能配置.特效.终极污染完成冲击, X: 取米亚平台中心X(), Y: 取米亚平台中心Y(), Z: 0, 缩放: 4, 持续秒: 2 });
   创建点特效({ 模型路径: 米亚单位技能配置.特效.终极污染完成毒爆, X: 取米亚平台中心X(), Y: 取米亚平台中心Y(), Z: 60, 缩放: 1.5, 持续秒: 2 });
 
@@ -344,6 +346,7 @@ function 启动终极污染(this: void, context: 米亚运行时上下文): void
   播放米亚台词(context.Boss单位, "终极污染", 0);
   播放终极污染引导表现(context);
   创建终极污染核心组(context);
+  播放Boss坐标音效(米亚音效配置.终极污染.开始引导, 取米亚平台中心X(), 取米亚平台中心Y(), 米亚音效配置.默认裁断距离);
   安排终极污染时点(context);
 }
 

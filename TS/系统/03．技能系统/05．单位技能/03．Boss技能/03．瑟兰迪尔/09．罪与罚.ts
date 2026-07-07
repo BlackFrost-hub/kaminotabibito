@@ -31,6 +31,9 @@ const { 获取Boss技能应攻击目标, 获取Boss技能最近敌对英雄 } = 
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+};
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
@@ -163,6 +166,7 @@ export function 释放瑟兰迪尔罪与罚(this: void, context: 瑟兰迪尔运
     让单位面向目标(boss, actualTarget);
     SetUnitTimeScale(boss, 1);
     SetUnitAnimationByIndex(boss, 0);
+    Sound3DII_CooPlayReuse(config.点名音效, GetUnitX(actualTarget), GetUnitY(actualTarget), 0, config.点名音效裁断距离);
     播放点名特效(actualTarget, config.延迟秒);
   });
 

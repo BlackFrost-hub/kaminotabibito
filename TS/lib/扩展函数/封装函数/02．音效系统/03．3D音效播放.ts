@@ -13,6 +13,26 @@ import { createSoundInternal, getSoundInternal, getDefaultSoundModel, KEY_COUNT,
 // 最后播放的音效
 export let lastPlayedSound: any = null;
 
+const cooReuseSoundByPath: Record<string, any> = {};
+const cooReuseHadStartedByPath: Record<string, boolean> = {};
+
+function getOrCreateCooReuseSound(this: void, path: string, model: SoundModel): any {
+  const cache = cooReuseSoundByPath as any;
+  const hit = cache[path];
+  if (hit) return hit;
+  const sound = (jass as any).CreateSound(
+    path,
+    false,
+    true,
+    false,
+    model.fadeInRate,
+    model.fadeOutRate,
+    model.soundType
+  );
+  if (sound) cache[path] = sound;
+  return sound;
+}
+
 /**
  * 在坐标处播放3D音效
  * @param path 音效路径
@@ -53,6 +73,37 @@ export function Sound3DII_CooPlay(
     (jass as any).StartSound(sound);
     lastPlayedSound = sound;
   }
+  return sound;
+}
+
+/**
+ * 在坐标处播放3D音效（单句柄复用）。
+ *
+ * 同一路径只常驻1个 sound 句柄；重复播放时更新坐标并 Stop+Start。
+ * 适合 Boss 机制提示、UI化战斗反馈等不需要多声叠放的高频同路径音效。
+ * 如果需要同一音效多实例同时叠放，请继续使用 Sound3DII_CooPlay。
+ */
+export function Sound3DII_CooPlayReuse(
+  path: string,
+  x: number,
+  y: number,
+  z: number,
+  cutoff: number,
+  model: SoundModel = getDefaultSoundModel()
+): any {
+  if (path === "") return null;
+  const sound = getOrCreateCooReuseSound(path, model);
+  if (!sound) return null;
+  model.applyToSound(sound, x, y, z, cutoff);
+
+  const started = cooReuseHadStartedByPath as any;
+  if (started[path]) {
+    (jass as any).StopSound(sound, false, false);
+  } else {
+    started[path] = true;
+  }
+  (jass as any).StartSound(sound);
+  lastPlayedSound = sound;
   return sound;
 }
 

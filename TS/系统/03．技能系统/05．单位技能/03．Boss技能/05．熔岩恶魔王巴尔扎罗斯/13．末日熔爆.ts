@@ -3,9 +3,10 @@
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
 import { 巴尔扎罗斯固定安全区配置表 } from "./01．场地配置";
-import { 巴尔扎罗斯技能数值配置 } from "./02．数值与表现配置";
+import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 减少巴尔扎罗斯灼热层数 } from "./16．灼热层数工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -238,6 +239,7 @@ function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下�
   if (!单位有效(boss)) return;
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;
   播放爆发表现(center);
+  播放Boss坐标音效(巴尔扎罗斯音效配置.末日熔爆.爆发结算, center.X, center.Y, 巴尔扎罗斯音效配置.默认裁断距离);
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
@@ -289,6 +291,7 @@ export function 释放巴尔扎罗斯末日熔爆(this: void, context: 巴尔扎
   });
   context.末日熔爆引导中 = true;
   创建末日熔爆引导表现(context, center, safePoints);
+  播放Boss坐标音效(巴尔扎罗斯音效配置.末日熔爆.开始引导, center.X, center.Y, 巴尔扎罗斯音效配置.默认裁断距离);
   启动基础施法时间线({
     施法者: boss,
     目标X: center.X,

@@ -1,9 +1,9 @@
 /** @noSelfInFile */
 
 import { 创建可配置层数状态, 可配置层数状态控制器 } from "../../../00．技能模板+函数/04．机制组件/01．层数状态";
-import { 米亚安全域运行时矩形组, 创建米亚安全域矩形组, 清理米亚安全域矩形组, 取米亚单位所在安全域 } from "./01．场地配置";
+import { 米亚安全域运行时矩形组, 创建米亚安全域矩形组, 清理米亚安全域矩形组, 取米亚单位所在安全域, 取米亚平台中心X, 取米亚平台中心Y } from "./01．场地配置";
 import { 米亚单位技能配置 } from "./00．配置";
-import { 米亚腐化感染配置, 米亚阶段阈值 } from "./02．数值与表现配置";
+import { 米亚腐化感染配置, 米亚阶段阈值, 米亚音效配置 } from "./02．数值与表现配置";
 import { 尝试触发米亚灵猫分身 } from "./07．灵猫分身";
 import { 刷新米亚污染标记 } from "./08．污染标记";
 import { 尝试触发米亚污染脉冲 } from "./09．污染脉冲";
@@ -13,6 +13,7 @@ import { 刷新米亚平台超载惩罚 } from "./12．平台超载惩罚";
 import { 刷新米亚腐化黏液涂层 } from "./13．腐化黏液涂层";
 import { 尝试触发米亚终极污染, 清理米亚终极污染 } from "./14．终极污染";
 import { 播放米亚台词 } from "./15．台词播放";
+import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
 import { 创建单位运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
 
@@ -23,6 +24,8 @@ const { getServerTime, addPeriodicCallback } = require("系统.00．核心系统
 };
 
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
+const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
+const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -168,6 +171,8 @@ function 刷新米亚阶段(this: void, context: 米亚运行时上下文): void
   const ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife;
   if (context.阶段 === 1 && ratio <= 米亚阶段阈值.第二阶段生命比例) {
     context.阶段 = 2;
+    播放Boss坐标音效(米亚音效配置.转阶段2.跳入水池, GetUnitX(boss), GetUnitY(boss), 米亚音效配置.默认裁断距离);
+    延迟播放Boss坐标音效(米亚音效配置.转阶段2.毒水喷涌, 取米亚平台中心X(), 取米亚平台中心Y(), 米亚音效配置.转阶段2.毒水喷涌延迟Ms, 米亚音效配置.默认裁断距离);
     播放米亚台词(boss, "转阶段2", 0);
   }
   if (context.阶段 === 2 && ratio <= 米亚阶段阈值.第三阶段生命比例) {
