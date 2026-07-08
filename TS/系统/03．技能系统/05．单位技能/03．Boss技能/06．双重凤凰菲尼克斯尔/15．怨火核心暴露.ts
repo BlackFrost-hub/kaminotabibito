@@ -3,8 +3,9 @@
 import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 import { 菲尼克斯尔场地配置 } from "./01．场地配置";
-import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import {
   延迟,
   周期,
@@ -71,6 +72,7 @@ export function 触发菲尼克斯尔怨火核心暴露(this: void, context: 菲
   const id = GetHandleId(context.怨火核心) || 0;
   if (id !== 0) 怨火核心上下文表[id] = context;
   播放点特效(菲尼克斯尔数值与表现配置.特效.核心暴露, center.x, center.y, 2500);
+  播放Boss坐标音效(菲尼克斯尔音效配置.怨火核心.暴露, center.x, center.y, 菲尼克斯尔音效配置.默认裁断距离);
   延迟(菲尼克斯尔数值与表现配置.机制.怨火核心暴露持续秒 * 1000, function 菲尼克斯尔怨火核心暴露结束(this: void): void {
     if (单位存活(context.怨火核心)) {
       const coreId = GetHandleId(context.怨火核心) || 0;

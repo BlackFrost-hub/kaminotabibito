@@ -130,3 +130,27 @@ export const 菲利斯数值与表现配置 = {
     特效持续秒: 1.0,
   },
 } as const;
+
+export const 菲利斯音效配置 = {
+  默认裁断距离: 2800,
+  领袖光环: {
+    低血切换: "Sound\\Boss\\Felice\\SFX\\felice_leader_aura_lowhp_shift_01.mp3",
+  },
+  剑魂杀: {
+    路径释放: "Sound\\Boss\\Felice\\SFX\\felice_sword_soul_wolves_path_release_03.mp3",
+    小狼成形: "Sound\\Boss\\Felice\\SFX\\felice_sword_soul_wolf_form_01.mp3",
+    大狼合并: "Sound\\Boss\\Felice\\SFX\\felice_sword_soul_wolf_form_02.mp3",
+  },
+  剑气灵斩: {
+    斩出侵蚀: "Sound\\Boss\\Felice\\SFX\\felice_crimson_soul_slash_erosion_01.mp3",
+  },
+  全力封印斩: {
+    起手标记: "Sound\\Boss\\Felice\\SFX\\felice_full_seal_slash_mark_start_03.mp3",
+    结算: "Sound\\Boss\\Felice\\SFX\\felice_full_seal_slash_execute_02.mp3",
+  },
+  异形化: {
+    启动: "Sound\\Boss\\Felice\\SFX\\felice_aberration_transform_start_01.mp3",
+    牵引波动: "Sound\\Boss\\Felice\\SFX\\felice_aberration_pull_wave_combo_03.mp3",
+    牵引波动延迟Ms: 650,
+  },
+} as const;

@@ -1,8 +1,9 @@
 ﻿/** @noSelfInFile */
 
 import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
-import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
+import { 播放Boss坐标音效, 延迟播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import {
   周期,
   延迟,
@@ -31,6 +32,8 @@ export function 释放菲尼克斯尔骸骨弹幕(this: void, context: 菲尼克
   设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.弹幕解体.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.弹幕解体.倍速);
   显示常规读条(config.读条秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   延迟(config.读条秒 * 1000, function 菲尼克斯尔骸骨弹幕开始(this: void): void {
+    播放Boss坐标音效(菲尼克斯尔音效配置.骸骨弹幕.起手层, 取单位X(context.Boss), 取单位Y(context.Boss), 菲尼克斯尔音效配置.默认裁断距离);
+    延迟播放Boss坐标音效(菲尼克斯尔音效配置.骸骨弹幕.飞射层, 取单位X(context.Boss), 取单位Y(context.Boss), 菲尼克斯尔音效配置.骸骨弹幕.飞射层延迟Ms, 菲尼克斯尔音效配置.默认裁断距离);
     for (let wave = 0; wave < config.波次数; wave++) {
       延迟(wave * config.波次间隔秒 * 1000, function 菲尼克斯尔骸骨弹幕波次(this: void): void {
         const target = 取随机玩家英雄();

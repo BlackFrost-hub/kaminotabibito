@@ -2,8 +2,9 @@
 
 import { 树魔首领单位技能配置 } from "./00．配置";
 import { 获取树魔首领上下文, 获取或创建树魔首领上下文, 获取全部树魔首领上下文, 清理树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
-import { 树魔首领数值与表现配置 } from "./02．数值与表现配置";
+import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
@@ -94,14 +95,34 @@ function 召唤树魔随从(this: void, context: 树魔首领运行时上下文,
   return minion;
 }
 
+function 随机取音效路径(this: void, list: readonly string[]): string {
+  if (list.length <= 0) return "";
+  return list[GetRandomInt(0, list.length - 1)];
+}
+
+function 尝试播放树魔首领怪叫(this: void, boss: any, 触发概率百分比: number): void {
+  const soundCfg = 树魔首领音效配置;
+  尝试播放Boss拟声池({
+    标识: soundCfg.怪物拟声.标识,
+    音效路径列表: soundCfg.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: soundCfg.默认裁断距离,
+    冷却Ms: soundCfg.怪物拟声.冷却Ms,
+    触发概率百分比,
+  });
+}
+
 function 召唤一波随从(this: void, context: 树魔首领运行时上下文): void {
   const roll = GetRandomInt(1, 3);
+  let 已召唤随从 = false;
   if (roll === 1) {
-    召唤树魔随从(context, 猎头者单位类型ID);
-    召唤树魔随从(context, 猎头者单位类型ID);
+    if (召唤树魔随从(context, 猎头者单位类型ID) != null) 已召唤随从 = true;
+    if (召唤树魔随从(context, 猎头者单位类型ID) != null) 已召唤随从 = true;
   } else if (roll === 2) {
     const witchDoctor = 召唤树魔随从(context, 巫医单位类型ID);
     if (witchDoctor != null && witchDoctor !== 0) {
+      已召唤随从 = true;
       let healId = 0;
       healId = addPeriodicCallback(树魔首领数值与表现配置.随从特性.巫医治疗间隔秒 * 1000, function 树魔巫医治疗Tick(this: void): void {
         if (!单位存活(witchDoctor) || !单位存活(context.Boss单位)) {
@@ -113,7 +134,17 @@ function 召唤一波随从(this: void, context: 树魔首领运行时上下文)
       context.清理.登记周期回调("树魔巫医治疗", healId);
     }
   } else {
-    召唤树魔随从(context, 投掷者单位类型ID);
+    if (召唤树魔随从(context, 投掷者单位类型ID) != null) 已召唤随从 = true;
+  }
+  if (已召唤随从) {
+    const soundCfg = 树魔首领音效配置;
+    播放Boss坐标音效(
+      随机取音效路径(soundCfg.随从特性.召唤号令列表),
+      GetUnitX(context.Boss单位),
+      GetUnitY(context.Boss单位),
+      soundCfg.默认裁断距离,
+    );
+    尝试播放树魔首领怪叫(context.Boss单位, soundCfg.怪物拟声.召唤触发概率百分比);
   }
   播放树魔首领台词(context.Boss单位, "随从特性");
 }
@@ -126,6 +157,8 @@ function 进入无从暴怒(this: void, context: 树魔首领运行时上下文)
   context.暴怒移速增量 = GetUnitDefaultMoveSpeed(context.Boss单位) * cfg.无小弟移速提高;
   SGSS_SetState(context.Boss单位, 攻速属性ID, context.暴怒攻速增量);
   SGSS_SetState(context.Boss单位, 叠加移动速度属性ID, context.暴怒移速增量);
+  播放Boss坐标音效(树魔首领音效配置.随从特性.无从暴怒, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 树魔首领音效配置.默认裁断距离);
+  尝试播放树魔首领怪叫(context.Boss单位, 树魔首领音效配置.怪物拟声.暴怒触发概率百分比);
 }
 
 function 退出无从暴怒(this: void, context: 树魔首领运行时上下文): void {

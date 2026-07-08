@@ -162,4 +162,16 @@ ____exports["菲尼克斯尔数值与表现配置"] = {
     },
     ["闪电"] = {["冰核导管推荐效果代码"] = "BLSB"}
 }
+____exports["菲尼克斯尔音效配置"] = {
+    ["默认裁断距离"] = 2800,
+    ["转第二形态"] = {["冰核破碎重生"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_phase2_ice_core_shatter_rebirth_02.mp3"},
+    ["导管死亡"] = {["小封印破口"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_conduit_seal_break_01.mp3"},
+    ["熔岩吐息"] = {["张口蓄力"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_lava_breath_charge_start_01.mp3", ["持续喷吐"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_lava_breath_stream_02.mp3", ["持续喷吐延迟Ms"] = 450},
+    ["凤凰漩涡"] = {["形成牵引"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_phoenix_vortex_form_02_80k.mp3"},
+    ["骸骨弹幕"] = {["起手层"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_bonefire_barrage_start_02.mp3", ["飞射层"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_bonefire_barrage_start_05.mp3", ["飞射层延迟Ms"] = 300},
+    ["怨火链接"] = {["链接生成"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_resentfire_link_bind_02.mp3"},
+    ["凤凰挽歌"] = {["引导开始"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_phoenix_lament_channel_combo_05.mp3"},
+    ["怨火核心"] = {["暴露"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_resentfire_core_expose_01.mp3"},
+    ["永恒轮回"] = {["开始"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_eternal_cycle_start_eggs_02_64k.mp3", ["凤凰蛋摧毁"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_eternal_cycle_egg_break_combo_12.mp3", ["失败结算"] = "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_eternal_cycle_fail_rebirth_blast_02.mp3"}
+}
 return ____exports

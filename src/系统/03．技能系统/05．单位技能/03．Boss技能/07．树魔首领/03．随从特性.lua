@@ -10,8 +10,12 @@ local _____83B7_53D6_5168_90E8_6811_9B54_9996_9886_4E0A_4E0B_6587 = ____01_FF0E_
 local _____6E05_7406_6811_9B54_9996_9886_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["清理树魔首领上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.02．数值与表现配置")
 local _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["树魔首领数值与表现配置"]
+local _____6811_9B54_9996_9886_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["树魔首领音效配置"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.08．台词播放")
 local _____64AD_653E_6811_9B54_9996_9886_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放树魔首领台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
 function stringToFourCC(s)
     return (string.byte(s, 1) << 24) + (string.byte(s, 2) << 16) + (string.byte(s, 3) << 8) + string.byte(s, 4)
 end
@@ -89,14 +93,38 @@ local function _____53EC_5524_6811_9B54_968F_4ECE(context, unitTypeId)
     IssueTargetOrder(minion, "patrol", boss)
     return minion
 end
+local function _____968F_673A_53D6_97F3_6548_8DEF_5F84(list)
+    if #list <= 0 then
+        return ""
+    end
+    return list[GetRandomInt(0, #list - 1) + 1]
+end
+local function _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB(boss, _____89E6_53D1_6982_7387_767E_5206_6BD4)
+    local soundCfg = _____6811_9B54_9996_9886_97F3_6548_914D_7F6E
+    _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60({
+        ["标识"] = soundCfg["怪物拟声"]["标识"],
+        ["音效路径列表"] = soundCfg["怪物拟声"]["音效路径列表"],
+        X = GetUnitX(boss),
+        Y = GetUnitY(boss),
+        ["裁断距离"] = soundCfg["默认裁断距离"],
+        ["冷却Ms"] = soundCfg["怪物拟声"]["冷却Ms"],
+        ["触发概率百分比"] = _____89E6_53D1_6982_7387_767E_5206_6BD4
+    })
+end
 local function _____53EC_5524_4E00_6CE2_968F_4ECE(context)
     local roll = GetRandomInt(1, 3)
+    local _____5DF2_53EC_5524_968F_4ECE = false
     if roll == 1 then
-        _____53EC_5524_6811_9B54_968F_4ECE(context, _____730E_5934_8005_5355_4F4D_7C7B_578BID)
-        _____53EC_5524_6811_9B54_968F_4ECE(context, _____730E_5934_8005_5355_4F4D_7C7B_578BID)
+        if _____53EC_5524_6811_9B54_968F_4ECE(context, _____730E_5934_8005_5355_4F4D_7C7B_578BID) ~= nil then
+            _____5DF2_53EC_5524_968F_4ECE = true
+        end
+        if _____53EC_5524_6811_9B54_968F_4ECE(context, _____730E_5934_8005_5355_4F4D_7C7B_578BID) ~= nil then
+            _____5DF2_53EC_5524_968F_4ECE = true
+        end
     elseif roll == 2 then
         local witchDoctor = _____53EC_5524_6811_9B54_968F_4ECE(context, _____5DEB_533B_5355_4F4D_7C7B_578BID)
         if witchDoctor ~= nil and witchDoctor ~= 0 then
+            _____5DF2_53EC_5524_968F_4ECE = true
             local healId = 0
             healId = addPeriodicCallback(
                 _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["巫医治疗间隔秒"] * 1000,
@@ -112,7 +140,19 @@ local function _____53EC_5524_4E00_6CE2_968F_4ECE(context)
             ____self_9["登记周期回调"](____self_9, "树魔巫医治疗", healId)
         end
     else
-        _____53EC_5524_6811_9B54_968F_4ECE(context, _____6295_63B7_8005_5355_4F4D_7C7B_578BID)
+        if _____53EC_5524_6811_9B54_968F_4ECE(context, _____6295_63B7_8005_5355_4F4D_7C7B_578BID) ~= nil then
+            _____5DF2_53EC_5524_968F_4ECE = true
+        end
+    end
+    if _____5DF2_53EC_5524_968F_4ECE then
+        local soundCfg = _____6811_9B54_9996_9886_97F3_6548_914D_7F6E
+        _____64AD_653EBoss_5750_6807_97F3_6548(
+            _____968F_673A_53D6_97F3_6548_8DEF_5F84(soundCfg["随从特性"]["召唤号令列表"]),
+            GetUnitX(context["Boss单位"]),
+            GetUnitY(context["Boss单位"]),
+            soundCfg["默认裁断距离"]
+        )
+        _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB(context["Boss单位"], soundCfg["怪物拟声"]["召唤触发概率百分比"])
     end
     _____64AD_653E_6811_9B54_9996_9886_53F0_8BCD(context["Boss单位"], "随从特性")
 end
@@ -126,6 +166,13 @@ local function _____8FDB_5165_65E0_4ECE_66B4_6012(context)
     context["暴怒移速增量"] = GetUnitDefaultMoveSpeed(context["Boss单位"]) * cfg["无小弟移速提高"]
     SGSS_SetState(context["Boss单位"], _____653B_901F_5C5E_6027ID, context["暴怒攻速增量"])
     SGSS_SetState(context["Boss单位"], _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, context["暴怒移速增量"])
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["随从特性"]["无从暴怒"],
+        GetUnitX(context["Boss单位"]),
+        GetUnitY(context["Boss单位"]),
+        _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
+    _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB(context["Boss单位"], _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["怪物拟声"]["暴怒触发概率百分比"])
 end
 local function _____9000_51FA_65E0_4ECE_66B4_6012(context)
     if not context["无从暴怒中"] then
@@ -220,7 +267,7 @@ local function _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick()
             do
                 local context = list[i + 1]
                 if context == nil then
-                    goto __continue36
+                    goto __continue43
                 end
                 _____5237_65B0_968F_4ECE_72B6_6001(context)
                 if context["下一次召唤Ms"] > 0 and now >= context["下一次召唤Ms"] then
@@ -228,7 +275,7 @@ local function _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick()
                     context["下一次召唤Ms"] = now + _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["召唤间隔秒"] * 1000
                 end
             end
-            ::__continue36::
+            ::__continue43::
             i = i + 1
         end
     end

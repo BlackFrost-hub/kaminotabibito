@@ -2,9 +2,10 @@
 
 import { 菲利斯单位技能配置 } from "./00．配置";
 import { 登记菲利斯剑魂狼, 获取或创建菲利斯上下文, 获取菲利斯剑魂狼记录, 注销菲利斯剑魂狼, 菲利斯运行时上下文 } from "./01．运行时上下文";
-import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
+import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度, 极坐标X, 极坐标Y, 距离平方XY } from "./11．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成AOE技能伤害, 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -155,6 +156,12 @@ function 生成剑魂狼(this: void, context: 菲利斯运行时上下文, x: nu
     },
   });
   if (wolf == null) return;
+  播放Boss坐标音效(
+    big ? 菲利斯音效配置.剑魂杀.大狼合并 : 菲利斯音效配置.剑魂杀.小狼成形,
+    x,
+    y,
+    菲利斯音效配置.默认裁断距离,
+  );
   登记菲利斯剑魂狼(wolf.单位, {
     Boss单位: boss,
     大狼: big,
@@ -168,6 +175,7 @@ function 生成剑魂狼(this: void, context: 菲利斯运行时上下文, x: nu
 function 执行剑魂路径(this: void, context: 菲利斯运行时上下文, paths: 剑魂路径[]): void {
   const boss = context.Boss单位;
   const cfg = 菲利斯数值与表现配置.剑魂杀;
+  播放Boss坐标音效(菲利斯音效配置.剑魂杀.路径释放, GetUnitX(boss), GetUnitY(boss), 菲利斯音效配置.默认裁断距离);
   let elapsedMs = 0;
   let hitCount = 0;
   let callbackID = 0;

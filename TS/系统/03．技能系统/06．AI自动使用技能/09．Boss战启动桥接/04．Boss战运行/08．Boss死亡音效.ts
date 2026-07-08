@@ -26,6 +26,21 @@ const Boss死亡音效配置表: Boss死亡音效配置[] = [
       { 音效路径: "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_defeat_embers_settle_01.mp3", 延迟Ms: 1900 },
     ],
   },
+  {
+    单位ID: "N00U",
+    音效路径: "Sound\\Boss\\Phoenixel\\SFX\\phoenixel_defeat_cycle_cut_ashes_02_64k.mp3",
+    裁断距离: 2800,
+  },
+  {
+    单位ID: "N05S",
+    音效路径: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_defeat_forest_falls_quiet_01.mp3",
+    裁断距离: 2800,
+  },
+  {
+    单位ID: "N05T",
+    音效路径: "Sound\\Boss\\Felice\\SFX\\felice_defeat_soul_command_fades_puremix_12_fade.mp3",
+    裁断距离: 2800,
+  },
 ];
 
 const jass = require("jass.common") as any;

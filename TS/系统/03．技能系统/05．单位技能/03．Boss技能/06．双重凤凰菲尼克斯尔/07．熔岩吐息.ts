@@ -3,8 +3,9 @@
 import { 获取或创建菲尼克斯尔上下文 } from "./03．运行时上下文";
 import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
-import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
+import { 播放Boss坐标音效, 延迟播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import {
   stringToFourCC,
   单位存活,
@@ -52,6 +53,8 @@ export function 释放菲尼克斯尔熔岩吐息(this: void, context: 菲尼克
   设置单位动画(boss, 菲尼克斯尔数值与表现配置.动画.第一形态.蓄力张口.编号, 菲尼克斯尔数值与表现配置.动画.第一形态.蓄力张口.倍速);
   显示常规读条(config.预警秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   创建预警扇形(boss, config.半径, config.预警秒);
+  播放Boss坐标音效(菲尼克斯尔音效配置.熔岩吐息.张口蓄力, 取单位X(boss), 取单位Y(boss), 菲尼克斯尔音效配置.默认裁断距离);
+  延迟播放Boss坐标音效(菲尼克斯尔音效配置.熔岩吐息.持续喷吐, 取单位X(boss), 取单位Y(boss), 菲尼克斯尔音效配置.熔岩吐息.持续喷吐延迟Ms, 菲尼克斯尔音效配置.默认裁断距离);
   延迟(config.预警秒 * 1000, function 菲尼克斯尔熔岩吐息开始(this: void): void {
     let elapsed = 0;
     const tick = 周期(config.Tick秒 * 1000, function 菲尼克斯尔熔岩吐息Tick(this: void): void {

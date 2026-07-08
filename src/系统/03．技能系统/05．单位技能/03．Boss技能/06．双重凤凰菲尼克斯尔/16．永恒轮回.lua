@@ -6,8 +6,11 @@ local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．�
 local _____83F2_5C3C_514B_65AF_5C14_573A_5730_914D_7F6E = ____01_FF0E_573A_5730_914D_7F6E["菲尼克斯尔场地配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.06．双重凤凰菲尼克斯尔.02．数值与表现配置")
 local _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["菲尼克斯尔数值与表现配置"]
+local _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["菲尼克斯尔音效配置"]
 local ____17_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.06．双重凤凰菲尼克斯尔.17．台词播放")
 local _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD = ____17_FF0E_53F0_8BCD_64AD_653E["播放菲尼克斯尔台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____19_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.06．双重凤凰菲尼克斯尔.19．公共工具")
 local _____5468_671F = ____19_FF0E_516C_5171_5DE5_5177["周期"]
 local _____5EF6_8FDF = ____19_FF0E_516C_5171_5DE5_5177["延迟"]
@@ -34,20 +37,60 @@ local function _____6E05_7406_83F2_5C3C_514B_65AF_5C14_51E4_51F0_86CB(context)
     do
         local i = 0
         while i < #context["凤凰蛋列表"] do
-            local egg = context["凤凰蛋列表"][i + 1]["单位"]
+            local item = context["凤凰蛋列表"][i + 1]
+            local egg = item["单位"]
             if egg ~= nil and egg ~= 0 then
-                _____64AD_653E_70B9_7279_6548(
-                    _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回星屑残留"],
-                    _____53D6_5355_4F4DX(egg),
-                    _____53D6_5355_4F4DY(egg),
-                    1200
-                )
+                if not item["已摧毁"] then
+                    _____64AD_653E_70B9_7279_6548(
+                        _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回星屑残留"],
+                        _____53D6_5355_4F4DX(egg),
+                        _____53D6_5355_4F4DY(egg),
+                        1200
+                    )
+                end
                 RemoveUnit(egg)
             end
             i = i + 1
         end
     end
     context["凤凰蛋列表"] = {}
+end
+local function ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_86CB_6B7B_4EA1(context, unit)
+    do
+        local i = 0
+        while i < #context["凤凰蛋列表"] do
+            do
+                local item = context["凤凰蛋列表"][i + 1]
+                if item["单位"] ~= unit then
+                    goto __continue9
+                end
+                if item["已摧毁"] then
+                    return
+                end
+                item["已摧毁"] = true
+                _____64AD_653E_70B9_7279_6548(
+                    _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回星屑残留"],
+                    _____53D6_5355_4F4DX(unit),
+                    _____53D6_5355_4F4DY(unit),
+                    1200
+                )
+                _____64AD_653EBoss_5750_6807_97F3_6548(
+                    _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["永恒轮回"]["凤凰蛋摧毁"],
+                    _____53D6_5355_4F4DX(unit),
+                    _____53D6_5355_4F4DY(unit),
+                    _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["默认裁断距离"]
+                )
+                return
+            end
+            ::__continue9::
+            i = i + 1
+        end
+    end
+end
+local function _____521B_5EFA_51E4_51F0_86CB_6B7B_4EA1_56DE_8C03(context)
+    return function(unit)
+        ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_86CB_6B7B_4EA1(context, unit)
+    end
 end
 ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
     if context["永恒轮回已触发"] or context["当前形态"] ~= "第二形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
@@ -61,6 +104,12 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
     _____5F00_59CB_65BD_6CD5_786C_76F4(context.Boss, config["永恒轮回引导秒"])
     _____8BBE_7F6E_5355_4F4D_52A8_753B(context.Boss, _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第二形态"]["轮回死亡"]["编号"], _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第二形态"]["轮回死亡"]["倍速"])
     _____663E_793A_81F4_547D_8BFB_6761(config["永恒轮回引导秒"], 3, "永恒轮回倒计时", "摧毁凤凰之卵，否则菲尼克斯尔将恢复生命")
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["永恒轮回"]["开始"],
+        _____53D6_5355_4F4DX(context.Boss),
+        _____53D6_5355_4F4DY(context.Boss),
+        _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     local points = _____83F2_5C3C_514B_65AF_5C14_573A_5730_914D_7F6E["导管点位"]
     do
         local i = 0
@@ -73,7 +122,8 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                 _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["模型"]["凤凰之卵"],
                 p.x,
                 p.y,
-                _____53D6_6700_5927_751F_547D(context.Boss) * config["凤凰蛋生命Boss最大生命比例"]
+                _____53D6_6700_5927_751F_547D(context.Boss) * config["凤凰蛋生命Boss最大生命比例"],
+                _____521B_5EFA_51E4_51F0_86CB_6B7B_4EA1_56DE_8C03(context)
             )
             local ____context__51E4_51F0_86CB_5217_8868_0 = context["凤凰蛋列表"]
             ____context__51E4_51F0_86CB_5217_8868_0[#____context__51E4_51F0_86CB_5217_8868_0 + 1] = {["单位"] = egg, ["已摧毁"] = false}
@@ -95,6 +145,12 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                 end
             end
             if aliveEggs > 0 then
+                _____64AD_653EBoss_5750_6807_97F3_6548(
+                    _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["永恒轮回"]["失败结算"],
+                    _____53D6_5355_4F4DX(context.Boss),
+                    _____53D6_5355_4F4DY(context.Boss),
+                    _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["默认裁断距离"]
+                )
                 local heal = _____53D6_6700_5927_751F_547D(context.Boss) * config["每枚存活凤凰蛋回血Boss最大生命比例"] * aliveEggs
                 local nextLife = _____53D6_5F53_524D_751F_547D(context.Boss) + heal
                 if nextLife > _____53D6_6700_5927_751F_547D(context.Boss) then

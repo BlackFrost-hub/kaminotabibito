@@ -2,10 +2,11 @@
 
 import { 菲利斯单位技能配置 } from "./00．配置";
 import { 获取全部菲利斯上下文, 获取或创建菲利斯上下文, 菲利斯运行时上下文 } from "./01．运行时上下文";
-import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
+import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
 import { 释放菲利斯剑气灵斩 } from "./05．剑气灵斩";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 取难度, 距离平方XY } from "./11．公共工具";
+import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
@@ -173,12 +174,16 @@ function 异形化Tick(this: void, context: 菲利斯运行时上下文, callbac
 function 启动异形化状态(this: void, context: 菲利斯运行时上下文): void {
   const boss = context.Boss单位;
   const cfg = 菲利斯数值与表现配置.异形化;
+  const x = GetUnitX(boss);
+  const y = GetUnitY(boss);
   context.当前魔法充能 = 0;
   更新魔法显示(context);
   context.异形化中 = true;
   context.异形化结束Ms = getServerTime() + cfg.持续秒 * 1000;
   registerManualBuff(boss, 菲利斯BuffID.异形化, cfg.持续秒, cfg.造成和受到伤害提高, { sourceName: "菲利斯-异形化" });
-  创建点特效({ 模型路径: cfg.爆发柱特效路径, X: GetUnitX(boss), Y: GetUnitY(boss), 缩放: 1.75, 持续秒: cfg.特效持续秒 });
+  播放Boss坐标音效(菲利斯音效配置.异形化.启动, x, y, 菲利斯音效配置.默认裁断距离);
+  延迟播放Boss坐标音效(菲利斯音效配置.异形化.牵引波动, x, y, 菲利斯音效配置.异形化.牵引波动延迟Ms, 菲利斯音效配置.默认裁断距离);
+  创建点特效({ 模型路径: cfg.爆发柱特效路径, X: x, Y: y, 缩放: 1.75, 持续秒: cfg.特效持续秒 });
   createUnitEffect(boss, "origin", cfg.持续气场特效路径, cfg.持续秒, "菲利斯-异形化持续气场");
   释放菲利斯剑气灵斩(context);
 
@@ -247,4 +252,3 @@ function on菲利斯异形化生效(this: void, castingUnit: any, spellAbilityId
   if (context == null) return;
   释放菲利斯异形化(context);
 }
-

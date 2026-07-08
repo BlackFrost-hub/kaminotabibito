@@ -3,8 +3,9 @@
 import { 获取或创建菲尼克斯尔上下文 } from "./03．运行时上下文";
 import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
-import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import {
   stringToFourCC,
   单位存活,
@@ -58,6 +59,7 @@ export function 释放菲尼克斯尔凤凰漩涡(this: void, context: 菲尼克
   创建预警圆(x, y, config.半径, config.预警秒);
   延迟(config.预警秒 * 1000, function 菲尼克斯尔凤凰漩涡开始(this: void): void {
     播放点特效(菲尼克斯尔数值与表现配置.特效.漩涡, x, y, config.持续秒 * 1000);
+    播放Boss坐标音效(菲尼克斯尔音效配置.凤凰漩涡.形成牵引, x, y, 菲尼克斯尔音效配置.默认裁断距离);
     let elapsed = 0;
     const tick = 周期(config.Tick秒 * 1000, function 菲尼克斯尔凤凰漩涡Tick(this: void): void {
       elapsed += config.Tick秒;

@@ -130,3 +130,43 @@ export const 树魔首领数值与表现配置 = {
     爆炸陷阱爆炸特效持续秒: 1,
   },
 } as const;
+
+export const 树魔首领音效配置 = {
+  默认裁断距离: 2800,
+  随从特性: {
+    召唤号令列表: [
+      "Sound\\Boss\\TrollChief\\SFX\\troll_chief_minion_call_summon_combo_06_64k.mp3",
+      "Sound\\Boss\\TrollChief\\SFX\\troll_chief_minion_call_summon_combo_07_64k.mp3",
+    ],
+    无从暴怒: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_minionless_rage_start_01.mp3",
+  },
+  怪物拟声: {
+    标识: "TrollChiefCreature",
+    音效路径列表: [
+      "Sound\\Boss\\TrollChief\\SFX\\troll_chief_creature_gaga_laugh_01.mp3",
+      "Sound\\Boss\\TrollChief\\SFX\\troll_chief_creature_gaga_laugh_02.mp3",
+      "Sound\\Boss\\TrollChief\\SFX\\troll_chief_creature_gaga_laugh_03.mp3",
+    ],
+    冷却Ms: 8000,
+    召唤触发概率百分比: 45,
+    关键机制触发概率百分比: 60,
+    暴怒触发概率百分比: 100,
+  },
+  扩散冲击波: {
+    生效: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_expanding_shockwave_release_03.mp3",
+  },
+  消耗反击: {
+    正面反击: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_counter_mana_burn_retaliation_08.mp3",
+    背后破招: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_counter_backbreak_guard_shatter_02.mp3",
+  },
+  远古诅咒: {
+    点名Boss: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_ancient_curse_mark_share_03.mp3",
+    点名分摊圈: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_ancient_curse_mark_share_04.mp3",
+    点名分摊圈延迟Ms: 200,
+    二段爆发: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_ancient_curse_center_blast_04.mp3",
+  },
+  树魔图腾: {
+    生成: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_totem_rise_spawn_02.mp3",
+    陷阱触发: "Sound\\Boss\\TrollChief\\SFX\\troll_chief_totem_trap_trigger_burst_combo_07.mp3",
+  },
+} as const;

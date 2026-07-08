@@ -2,9 +2,10 @@
 
 import { 菲利斯单位技能配置 } from "./00．配置";
 import { 获取或创建菲利斯上下文, 菲利斯运行时上下文 } from "./01．运行时上下文";
-import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
+import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 取难度, 取单位间角度, 极坐标X, 极坐标Y } from "./11．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 执行战斗自身位移到坐标 } from "../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -124,6 +125,9 @@ export function 释放菲利斯全力封印斩(this: void, context: 菲利斯运
   const cfg = 菲利斯数值与表现配置.全力封印斩;
   const targets = 选择封印目标(boss);
   标记封印目标(boss, targets);
+  if (targets.length > 0) {
+    播放Boss坐标音效(菲利斯音效配置.全力封印斩.起手标记, GetUnitX(boss), GetUnitY(boss), 菲利斯音效配置.默认裁断距离);
+  }
   创建点特效({ 模型路径: cfg.Boss起手特效路径, X: GetUnitX(boss), Y: GetUnitY(boss), 缩放: 1.2, 持续秒: cfg.特效持续秒 });
   createUnitEffect(boss, "origin", cfg.Boss附身特效路径, cfg.特效持续秒, "菲利斯-全力封印斩附身");
   SetUnitInvulnerable(boss, true);
@@ -151,8 +155,9 @@ export function 释放菲利斯全力封印斩(this: void, context: 菲利斯运
     },
     on生效: function 菲利斯全力封印斩生效(this: void): void {
       if (targets.length <= 0) return;
-      for (let i = 0; i < targets.length; i++) 执行封印惩罚(boss, targets[i]);
       const teleportTarget = targets[GetRandomInt(0, targets.length - 1)];
+      播放Boss坐标音效(菲利斯音效配置.全力封印斩.结算, GetUnitX(teleportTarget), GetUnitY(teleportTarget), 菲利斯音效配置.默认裁断距离);
+      for (let i = 0; i < targets.length; i++) 执行封印惩罚(boss, targets[i]);
       瞬移到封印目标(boss, teleportTarget);
     },
   });

@@ -2,9 +2,10 @@
 
 import { 菲利斯单位技能配置 } from "./00．配置";
 import { 获取或创建菲利斯上下文, 菲利斯运行时上下文 } from "./01．运行时上下文";
-import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
+import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位到线段距离平方, 单位有效, stringToFourCC, 取单位间角度, 极坐标X, 极坐标Y } from "./11．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -189,6 +190,7 @@ export function 释放菲利斯剑气灵斩(this: void, context: 菲利斯运行
       播放菲利斯台词(boss, "剑气灵斩");
     },
     on生效: function 菲利斯剑气灵斩生效(this: void): void {
+      播放Boss坐标音效(菲利斯音效配置.剑气灵斩.斩出侵蚀, ax, ay, 菲利斯音效配置.默认裁断距离);
       创建方向特效(cfg.剑气特效路径, ax, ay, angle, cfg.剑气特效缩放, cfg.剑气特效持续秒);
       结算剑气初始命中(context, ax, ay, bx, by, width);
       创建侵蚀残留(context, ax, ay, bx, by, angle, width);
@@ -217,4 +219,3 @@ function on菲利斯剑气灵斩生效(this: void, castingUnit: any, spellAbilit
   if (context == null) return;
   释放菲利斯剑气灵斩(context);
 }
-

@@ -2,8 +2,9 @@
 
 import { 树魔首领单位技能配置 } from "./00．配置";
 import { 获取或创建树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
-import { 树魔首领数值与表现配置 } from "./02．数值与表现配置";
+import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
+import { 播放Boss坐标音效, 播放Boss坐标音效编排, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -123,6 +124,19 @@ function 播放点名特效(this: void, target: any): void {
   createTimedEffect(cfg.点名叠加特效路径, GetUnitX(target), GetUnitY(target), 0, cfg.点名特效持续秒);
 }
 
+function 尝试播放树魔首领关键怪叫(this: void, boss: any): void {
+  const soundCfg = 树魔首领音效配置;
+  尝试播放Boss拟声池({
+    标识: soundCfg.怪物拟声.标识,
+    音效路径列表: soundCfg.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: soundCfg.默认裁断距离,
+    冷却Ms: soundCfg.怪物拟声.冷却Ms,
+    触发概率百分比: soundCfg.怪物拟声.关键机制触发概率百分比,
+  });
+}
+
 function 收集分摊目标(this: void, boss: any, target: any): any[] {
   const cfg = 树魔首领数值与表现配置.远古诅咒;
   const result: any[] = [];
@@ -174,6 +188,7 @@ function 执行远古诅咒后续爆发(this: void, context: 树魔首领运行�
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 树魔首领数值与表现配置.远古诅咒;
+  播放Boss坐标音效(树魔首领音效配置.远古诅咒.二段爆发, centerX, centerY, 树魔首领音效配置.默认裁断距离);
   createTimedEffect(cfg.后续爆发特效路径, centerX, centerY, 0, cfg.后续爆发特效持续秒);
   const radius2 = cfg.后续爆发半径 * cfg.后续爆发半径;
   const heroes = 获取Boss技能敌对英雄列表(boss);
@@ -273,6 +288,24 @@ export function 释放树魔首领远古诅咒(this: void, context: 树魔首领
   });
   播放点名特效(target);
   启动跟随分摊提示圈(context, target);
+  尝试播放树魔首领关键怪叫(boss);
+  播放Boss坐标音效编排({
+    默认裁断距离: 树魔首领音效配置.默认裁断距离,
+    模式: "同步延迟",
+    音效列表: [
+      {
+        音效路径: 树魔首领音效配置.远古诅咒.点名Boss,
+        X: GetUnitX(boss),
+        Y: GetUnitY(boss),
+      },
+      {
+        音效路径: 树魔首领音效配置.远古诅咒.点名分摊圈,
+        X: GetUnitX(target),
+        Y: GetUnitY(target),
+        延迟Ms: 树魔首领音效配置.远古诅咒.点名分摊圈延迟Ms,
+      },
+    ],
+  });
 
   启动基础施法时间线({
     施法者: boss,

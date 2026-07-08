@@ -7,6 +7,7 @@ local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系
 local _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建菲利斯上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.02．数值与表现配置")
 local _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["菲利斯数值与表现配置"]
+local _____83F2_5229_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["菲利斯音效配置"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.08．台词播放")
 local _____64AD_653E_83F2_5229_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放菲利斯台词"]
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.11．公共工具")
@@ -16,6 +17,8 @@ local _____53D6_96BE_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取难度"]
 local _____53D6_5355_4F4D_95F4_89D2_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取单位间角度"]
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
 local _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身位移到坐标"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
@@ -133,6 +136,14 @@ ____exports["释放菲利斯全力封印斩"] = function(context)
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["全力封印斩"]
     local targets = _____9009_62E9_5C01_5370_76EE_6807(boss)
     _____6807_8BB0_5C01_5370_76EE_6807(boss, targets)
+    if #targets > 0 then
+        _____64AD_653EBoss_5750_6807_97F3_6548(
+            _____83F2_5229_65AF_97F3_6548_914D_7F6E["全力封印斩"]["起手标记"],
+            GetUnitX(boss),
+            GetUnitY(boss),
+            _____83F2_5229_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+        )
+    end
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = cfg["Boss起手特效路径"],
         X = GetUnitX(boss),
@@ -179,6 +190,13 @@ ____exports["释放菲利斯全力封印斩"] = function(context)
             if #targets <= 0 then
                 return
             end
+            local teleportTarget = targets[GetRandomInt(0, #targets - 1) + 1]
+            _____64AD_653EBoss_5750_6807_97F3_6548(
+                _____83F2_5229_65AF_97F3_6548_914D_7F6E["全力封印斩"]["结算"],
+                GetUnitX(teleportTarget),
+                GetUnitY(teleportTarget),
+                _____83F2_5229_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+            )
             do
                 local i = 0
                 while i < #targets do
@@ -186,7 +204,6 @@ ____exports["释放菲利斯全力封印斩"] = function(context)
                     i = i + 1
                 end
             end
-            local teleportTarget = targets[GetRandomInt(0, #targets - 1) + 1]
             _____77AC_79FB_5230_5C01_5370_76EE_6807(boss, teleportTarget)
         end
     })

@@ -3,8 +3,9 @@
 import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 import { 菲尼克斯尔场地配置 } from "./01．场地配置";
-import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import {
   周期,
   延迟,
@@ -72,6 +73,7 @@ export function 释放菲尼克斯尔怨火链接(this: void, context: 菲尼克
       任一死亡时销毁: true,
     });
     context.清理.登记闪电("菲尼克斯尔怨火链接", lightning);
+    播放Boss坐标音效(菲尼克斯尔音效配置.怨火链接.链接生成, (取单位X(a) + 取单位X(b)) * 0.5, (取单位Y(a) + 取单位Y(b)) * 0.5, 菲尼克斯尔音效配置.默认裁断距离);
     const tick = 周期(config.Tick秒 * 1000, function 菲尼克斯尔怨火链接Tick(this: void): void {
       if (!单位存活(a) || !单位存活(b)) return;
       if (两点距离(取单位X(a), 取单位Y(a), 取单位X(b), 取单位Y(b)) > config.断链距离) {

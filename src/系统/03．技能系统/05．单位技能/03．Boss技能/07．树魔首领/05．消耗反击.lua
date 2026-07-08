@@ -1,15 +1,19 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001, _____64AD_653E_9632_5FA1_59FF_6001_7279_6548, ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, IsUnitType, UNIT_TYPE_DEAD, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, _____5F00_59CB_786C_76F4, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6D88_8017_53CD_51FB_6280_80FDID, _____6D88_8017_53CD_51FB_72B6_6001_8868
+local stringToFourCC, _____5355_4F4D_6709_6548, _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001, _____64AD_653E_9632_5FA1_59FF_6001_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, IsUnitType, UNIT_TYPE_DEAD, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, _____5F00_59CB_786C_76F4, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6D88_8017_53CD_51FB_6280_80FDID, _____6D88_8017_53CD_51FB_72B6_6001_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.01．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_6811_9B54_9996_9886_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建树魔首领上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.02．数值与表现配置")
 local _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["树魔首领数值与表现配置"]
+local _____6811_9B54_9996_9886_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["树魔首领音效配置"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.08．台词播放")
 local _____64AD_653E_6811_9B54_9996_9886_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放树魔首领台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
 local ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.08．方位判定工具")
 local _____4E24_70B9_65B9_5411_89D2 = ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177["两点方向角"]
 local _____5355_4F4D_662F_5426_5728_6765_6E90_6B63_9762_6247_533A = ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177["单位是否在来源正面扇区"]
@@ -52,6 +56,18 @@ function _____64AD_653E_9632_5FA1_59FF_6001_7279_6548(boss)
         cfg["防御特效持续秒"]
     )
 end
+function _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB(boss)
+    local soundCfg = _____6811_9B54_9996_9886_97F3_6548_914D_7F6E
+    _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60({
+        ["标识"] = soundCfg["怪物拟声"]["标识"],
+        ["音效路径列表"] = soundCfg["怪物拟声"]["音效路径列表"],
+        X = GetUnitX(boss),
+        Y = GetUnitY(boss),
+        ["裁断距离"] = soundCfg["默认裁断距离"],
+        ["冷却Ms"] = soundCfg["怪物拟声"]["冷却Ms"],
+        ["触发概率百分比"] = soundCfg["怪物拟声"]["关键机制触发概率百分比"]
+    })
+end
 ____exports["释放树魔首领消耗反击"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
@@ -64,6 +80,7 @@ ____exports["释放树魔首领消耗反击"] = function(context)
     end
     _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001(boss)
     _____64AD_653E_6811_9B54_9996_9886_53F0_8BCD(boss, "消耗反击")
+    _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB(boss)
     _____5F00_59CB_786C_76F4(boss, cfg["持续秒"])
     SetUnitTimeScale(boss, cfg["动画速度"])
     SetUnitAnimationByIndex(boss, cfg["动画编号"])
@@ -229,6 +246,12 @@ local function _____6267_884C_53CD_51FB(state, attacker, _____89E6_53D1_4F24_5BB
     end
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]
     local angle = _____53D6_65B9_5411_89D2(boss, attacker)
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["消耗反击"]["正面反击"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     SetUnitFacing(boss, angle)
     SetUnitAnimationByIndex(boss, 4)
     _____521B_5EFA_53CD_51FB_5F39_9053_8868_73B0(boss, angle)
@@ -292,6 +315,12 @@ local function _____6811_9B54_9996_9886_6D88_8017_53CD_51FB_4F24_5BB3_4FEE_6B63(
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]
     if _____662F_80CC_540E_7834_62DB_89D2_5EA6(target, attacker) then
         _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001(target)
+        _____64AD_653EBoss_5750_6807_97F3_6548(
+            _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["消耗反击"]["背后破招"],
+            GetUnitX(target),
+            GetUnitY(target),
+            _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["默认裁断距离"]
+        )
         _____5F00_59CB_786C_76F4(target, cfg["硬直秒"])
         return damageContext.currentDamage * (1 + cfg["背后增伤比例"])
     end

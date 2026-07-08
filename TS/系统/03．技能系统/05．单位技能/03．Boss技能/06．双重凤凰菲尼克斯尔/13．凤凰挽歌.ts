@@ -2,8 +2,9 @@
 
 import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
 import { 菲尼克斯尔场地配置 } from "./01．场地配置";
-import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import {
   周期,
   延迟,
@@ -44,6 +45,7 @@ export function 释放菲尼克斯尔凤凰挽歌(this: void, context: 菲尼克
   设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.哀鸣引导.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.哀鸣引导.倍速);
   显示大招读条(config.引导秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   播放点特效(菲尼克斯尔数值与表现配置.特效.凤凰挽歌主体, 取单位X(context.Boss), 取单位Y(context.Boss), config.引导秒 * 1000);
+  播放Boss坐标音效(菲尼克斯尔音效配置.凤凰挽歌.引导开始, 取单位X(context.Boss), 取单位Y(context.Boss), 菲尼克斯尔音效配置.默认裁断距离);
   const points = 菲尼克斯尔场地配置.挽歌安全区点位;
   for (let i = 0; i < points.length; i++) {
     创建安全圆(points[i].x, points[i].y, config.安全区半径, config.引导秒);

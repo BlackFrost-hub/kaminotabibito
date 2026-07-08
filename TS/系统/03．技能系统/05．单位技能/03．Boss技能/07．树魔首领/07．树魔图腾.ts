@@ -2,8 +2,9 @@
 
 import { 树魔首领单位技能配置 } from "./00．配置";
 import { 获取或创建树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
-import { 树魔首领数值与表现配置 } from "./02．数值与表现配置";
+import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -120,6 +121,19 @@ function 选择图腾分支(this: void, context: 树魔首领运行时上下文)
   return candidates[GetRandomInt(0, candidates.length - 1)];
 }
 
+function 尝试播放树魔首领关键怪叫(this: void, boss: any): void {
+  const soundCfg = 树魔首领音效配置;
+  尝试播放Boss拟声池({
+    标识: soundCfg.怪物拟声.标识,
+    音效路径列表: soundCfg.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: soundCfg.默认裁断距离,
+    冷却Ms: soundCfg.怪物拟声.冷却Ms,
+    触发概率百分比: soundCfg.怪物拟声.关键机制触发概率百分比,
+  });
+}
+
 function 创建图腾单位(this: void, context: 树魔首领运行时上下文, 名称: string, 模型路径: string, 最大生命: number, 持续秒: number, on死亡?: (this: void, unit: any, killer: any) => void): any {
   const boss = context.Boss单位;
   const cfg = 树魔首领数值与表现配置.树魔图腾;
@@ -132,7 +146,7 @@ function 创建图腾单位(this: void, context: 树魔首领运行时上下文,
     持续时间: 0.6,
     来源单位: boss,
   });
-  return 创建可攻击机制单位({
+  const totem = 创建可攻击机制单位({
     清理: context.清理,
     名称,
     主人单位: boss,
@@ -147,6 +161,10 @@ function 创建图腾单位(this: void, context: 树魔首领运行时上下文,
     持续时间: 持续秒,
     on死亡,
   });
+  if (totem != null) {
+    播放Boss坐标音效(树魔首领音效配置.树魔图腾.生成, center.x, center.y, 树魔首领音效配置.默认裁断距离);
+  }
+  return totem;
 }
 
 function 对所有玩家施加静止眩晕(this: void, boss: any): void {
@@ -208,6 +226,7 @@ function 创建静止陷阱(this: void, context: 树魔首领运行时上下文)
       const hero = heroes[i];
       if (!单位有效(hero)) continue;
       if (距离平方XY(GetUnitX(trap.单位), GetUnitY(trap.单位), GetUnitX(hero), GetUnitY(hero)) > radius2) continue;
+      播放Boss坐标音效(树魔首领音效配置.树魔图腾.陷阱触发, GetUnitX(trap.单位), GetUnitY(trap.单位), 树魔首领音效配置.默认裁断距离);
       SetUnitAnimationByIndex(trap.单位, 3);
       对所有玩家施加静止眩晕(boss);
       trap.销毁();
@@ -268,6 +287,7 @@ function 创建生命陷阱(this: void, context: 树魔首领运行时上下文)
 
 function 爆炸陷阱造成伤害(this: void, boss: any, x: number, y: number): void {
   const cfg = 树魔首领数值与表现配置.树魔图腾;
+  播放Boss坐标音效(树魔首领音效配置.树魔图腾.陷阱触发, x, y, 树魔首领音效配置.默认裁断距离);
   createTimedEffect(cfg.爆炸陷阱爆炸特效路径, x, y, 0, cfg.爆炸陷阱爆炸特效持续秒);
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
@@ -367,6 +387,7 @@ export function 释放树魔首领树魔图腾(this: void, context: 树魔首领
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 树魔首领数值与表现配置.树魔图腾;
+  尝试播放树魔首领关键怪叫(boss);
   启动基础施法时间线({
     施法者: boss,
     目标X: GetUnitX(boss),

@@ -1,13 +1,16 @@
 /** @noSelfInFile */
 
 import { 获取全部菲利斯上下文, type 菲利斯运行时上下文 } from "./01．运行时上下文";
-import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
+import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
 import { 单位有效, stringToFourCC } from "./11．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 创建周期机制调度器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器";
 
 const jass = require("jass.common") as any;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitAbilityLevel = jass.SetUnitAbilityLevel as (unit: any, abilityId: number, level: number) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IsUnitAlly = jass.IsUnitAlly as (unit: any, whichPlayer: any) => boolean;
@@ -43,7 +46,11 @@ function 刷新单个领袖光环(this: void, context: 菲利斯运行时上下�
   if (!单位有效(boss)) return;
   const cfg = 菲利斯数值与表现配置.领袖光环;
   const low = 生命比例(boss) < cfg.生命切换阈值;
+  const wasLow = context.当前领袖光环低血;
   context.当前领袖光环低血 = low;
+  if (!wasLow && low) {
+    播放Boss坐标音效(菲利斯音效配置.领袖光环.低血切换, GetUnitX(boss), GetUnitY(boss), 菲利斯音效配置.默认裁断距离);
+  }
   SetUnitAbilityLevel(boss, 领袖光环技能ID, low ? cfg.低血物编等级 : cfg.高血物编等级);
   registerManualBuff(boss, 菲利斯BuffID.领袖光环, 1.4, low ? -cfg.低血友军攻击降低 : cfg.高血友军攻击提高, {
     sourceName: "菲利斯-领袖光环",

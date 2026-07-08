@@ -2,9 +2,10 @@
 
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 import { 菲尼克斯尔场地配置 } from "./01．场地配置";
-import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
+import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import {
   创建菲尼克斯尔机制单位,
   取最大生命,
@@ -29,6 +30,7 @@ function on菲尼克斯尔导管死亡(this: void, context: 菲尼克斯尔运�
   if (context.当前形态 !== "第一形态") return;
   context.已摧毁导管数 += 1;
   播放点特效(菲尼克斯尔数值与表现配置.特效.导管死亡, GetUnitX(unit), GetUnitY(unit), 1800);
+  播放Boss坐标音效(菲尼克斯尔音效配置.导管死亡.小封印破口, GetUnitX(unit), GetUnitY(unit), 菲尼克斯尔音效配置.默认裁断距离);
   registerManualBuff(context.Boss, 菲尼克斯尔单位技能配置.BuffID.导管破封, 3600, context.已摧毁导管数, {
     stack: context.已摧毁导管数,
     sourceName: 菲尼克斯尔单位技能配置.单位名称,

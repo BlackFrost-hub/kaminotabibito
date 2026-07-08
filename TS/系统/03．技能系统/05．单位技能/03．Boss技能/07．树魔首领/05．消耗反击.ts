@@ -2,8 +2,9 @@
 
 import { 树魔首领单位技能配置 } from "./00．配置";
 import { 获取或创建树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
-import { 树魔首领数值与表现配置 } from "./02．数值与表现配置";
+import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 import { 两点方向角, 单位是否在来源正面扇区, 单位是否在来源背后扇区 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/08．方位判定工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
@@ -149,11 +150,25 @@ function 创建反击弹道表现(this: void, boss: any, angle: number): void {
   });
 }
 
+function 尝试播放树魔首领关键怪叫(this: void, boss: any): void {
+  const soundCfg = 树魔首领音效配置;
+  尝试播放Boss拟声池({
+    标识: soundCfg.怪物拟声.标识,
+    音效路径列表: soundCfg.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: soundCfg.默认裁断距离,
+    冷却Ms: soundCfg.怪物拟声.冷却Ms,
+    触发概率百分比: soundCfg.怪物拟声.关键机制触发概率百分比,
+  });
+}
+
 function 执行反击(this: void, state: 消耗反击状态, attacker: any, 触发伤害: number): void {
   const boss = state.Boss;
   if (!单位有效(boss) || !单位有效(attacker)) return;
   const cfg = 树魔首领数值与表现配置.消耗反击;
   const angle = 取方向角(boss, attacker);
+  播放Boss坐标音效(树魔首领音效配置.消耗反击.正面反击, GetUnitX(boss), GetUnitY(boss), 树魔首领音效配置.默认裁断距离);
   SetUnitFacing(boss, angle);
   SetUnitAnimationByIndex(boss, 4);
   创建反击弹道表现(boss, angle);
@@ -203,6 +218,7 @@ export function 释放树魔首领消耗反击(this: void, context: 树魔首领
   清除消耗反击状态(boss);
 
   播放树魔首领台词(boss, "消耗反击");
+  尝试播放树魔首领关键怪叫(boss);
   开始硬直(boss, cfg.持续秒);
   SetUnitTimeScale(boss, cfg.动画速度);
   SetUnitAnimationByIndex(boss, cfg.动画编号);
@@ -245,6 +261,7 @@ function 树魔首领消耗反击伤害修正(this: void, damageContext: any): n
   const cfg = 树魔首领数值与表现配置.消耗反击;
   if (是背后破招角度(target, attacker)) {
     清除消耗反击状态(target);
+    播放Boss坐标音效(树魔首领音效配置.消耗反击.背后破招, GetUnitX(target), GetUnitY(target), 树魔首领音效配置.默认裁断距离);
     开始硬直(target, cfg.硬直秒);
     return damageContext.currentDamage * (1 + cfg.背后增伤比例);
   }
