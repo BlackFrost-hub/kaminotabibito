@@ -109,11 +109,17 @@ getStealBeneficiary(source)            // 获取吸血受益单位（马甲->玩
 **核心函数**：
 ```typescript
 // 计算最终伤害
-calculateDamage(target, attacker, baseDamage): DamageResult
+calculateDamage(target, attacker, baseDamage, originalAttacker?): DamageResult
 
 // 伤害事件处理（在回调中调用）
 onDamageEvent(target, attacker, baseDamage)
 ```
+
+**伤害来源映射**：
+- `onDamageEvent` 会先调用 `04．伤害映射.ts` 的 `获取伤害归属单位(attacker, target)`。
+- 玩家 0-4 的非英雄单位（召唤物、马甲、宠物等）会归属到该玩家英雄；后续属性修正、伤害修正回调、最终伤害监听和吸血吸魔都按归属后的主人单位结算。
+- `snapshot.originalAttacker` / `context.originalAttacker` 保留原始伤害来源；召唤物伤害层用原始来源判断是否为召唤物，并用归属后的主人读取 `召唤物伤害`。
+- 特殊代理单位可显式调用 `登记伤害来源主人(source, owner)`，不用时调用 `清除伤害来源主人(source)`。
 
 **计算流程（17步）**：
 1. 固定伤害减少/增加

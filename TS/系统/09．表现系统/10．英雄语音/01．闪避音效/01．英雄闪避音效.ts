@@ -3,9 +3,6 @@
 const jass = require("jass.common") as any;
 
 import { 英雄闪避音效冷却, 取英雄闪避音效配置 } from "./00．配置";
-const { 是玩家英雄组单位 } = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定") as {
-  是玩家英雄组单位: (this: void, unit: any) => boolean;
-};
 const { 获取单位玩家英雄配置 } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as {
   获取单位玩家英雄配置: (this: void, unit: any) => Record<string, any> | null;
 };
@@ -25,6 +22,7 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: number) => boolean;
 const PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ as (this: void, soundHandle: any, volumePercent: number, whichUnit: any) => void;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
@@ -62,7 +60,11 @@ function 取闪避音效(this: void, unit: any): any {
 
 function 允许播放(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
-  if (!是玩家英雄组单位(unit)) return false;
+  const owner = GetOwningPlayer(unit);
+  if (owner == null || owner === 0) return false;
+  const hero = YDUserDataGetSafe("player", owner, "英雄", "unit");
+  if (hero == null || hero === 0) return false;
+  if (hero !== unit && GetHandleId(hero) !== GetHandleId(unit)) return false;
   if (IsUnitType(unit, jass.UNIT_TYPE_DEAD)) return false;
   if (IsUnitType(unit, jass.UNIT_TYPE_SUMMONED)) return false;
   return true;

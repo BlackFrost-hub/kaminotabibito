@@ -14,7 +14,6 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const ShowUnit = jass.ShowUnit as (unit: any, show: boolean) => void;
-const PauseUnit = jass.PauseUnit as (unit: any, pause: boolean) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -32,6 +31,12 @@ const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．�
 const { 临时调整护甲 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   临时调整护甲: (this: void, unit: any, value: number) => void;
 };
+const { 申请单位暂停占用, 释放单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
+  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
+};
+
+const 卡瑟拉触手解放暂停来源 = "Boss:Kasela:触手解放";
 
 interface 触手解放实例 {
   context: 卡瑟拉运行时上下文;
@@ -63,7 +68,7 @@ function 回归卡瑟拉(this: void, data: 触手解放实例, success: boolean)
   context.Boss潜入中 = false;
   if (!单位有效(boss)) return;
   ShowUnit(boss, true);
-  PauseUnit(boss, false);
+  释放单位暂停占用(boss, 卡瑟拉触手解放暂停来源);
   播放潜入特效(GetUnitX(boss), GetUnitY(boss));
   const cfg = 卡瑟拉数值与表现配置.触手解放;
   if (success) {
@@ -128,7 +133,7 @@ export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉
   });
   播放潜入特效(GetUnitX(boss), GetUnitY(boss));
   ShowUnit(boss, false);
-  PauseUnit(boss, true);
+  申请单位暂停占用(boss, 卡瑟拉触手解放暂停来源);
   创建技能提示圈({
     类型: "双环",
     X: GetUnitX(boss),

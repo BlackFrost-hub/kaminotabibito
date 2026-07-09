@@ -10,6 +10,7 @@ local _____8BBE_7F6E_5F71_9AA8_80CC_523A_51C6_5907 = ____01_FF0E_8FD0_884C_65F6_
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.02．数值与表现配置")
 local _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯数值与表现配置"]
 local _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯表现配置"]
+local _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯音效配置"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.08．台词播放")
 local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放影骨莫特斯台词"]
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.11．公共工具")
@@ -23,6 +24,9 @@ local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系
 local _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身位移到坐标"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -68,6 +72,12 @@ local function ____on_5F71_9AA8_80CC_523A_4F24_5BB3_4FEE_6B63(damageContext)
         if effect ~= nil and effect ~= 0 then
             DestroyEffect(effect)
         end
+        _____64AD_653EBoss_5750_6807_97F3_6548(
+            _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["阴影穿梭"]["背刺命中"],
+            GetUnitX(damageContext.target),
+            GetUnitY(damageContext.target),
+            _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+        )
     end
     return damage
 end
@@ -126,6 +136,7 @@ local function _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210()
                 goto __continue12
             end
             AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭落点"], x, y)
+            _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["阴影穿梭"]["落点闪现"], x, y, _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
             SetUnitInvulnerable(boss, false)
             SetUnitVertexColor(
                 boss,
@@ -151,6 +162,21 @@ ____exports["释放影骨阴影穿梭"] = function(context)
         GetUnitX(boss),
         GetUnitY(boss)
     )
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["阴影穿梭"]["消失残影"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
+    _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60({
+        ["标识"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["标识"],
+        ["音效路径列表"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["音效路径列表"],
+        X = GetUnitX(boss),
+        Y = GetUnitY(boss),
+        ["裁断距离"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"],
+        ["冷却Ms"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["冷却Ms"],
+        ["触发概率百分比"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["关键机制触发概率百分比"]
+    })
     SetUnitVertexColor(
         boss,
         255,

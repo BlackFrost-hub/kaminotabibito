@@ -8,13 +8,14 @@ local ____Boss_6B7B_4EA1_97F3_6548_914D_7F6E_8868 = {
     {["单位ID"] = "N05S", ["音效路径"] = "Sound\\Boss\\TrollChief\\SFX\\troll_chief_defeat_forest_falls_quiet_01.mp3", ["裁断距离"] = 2800},
     {["单位ID"] = "N05T", ["音效路径"] = "Sound\\Boss\\Felice\\SFX\\felice_defeat_soul_command_fades_puremix_12_fade.mp3", ["裁断距离"] = 2800},
     {["单位ID"] = "N05V", ["音效路径"] = "Sound\\Boss\\Kasela\\SFX\\kasela_defeat_abyss_squid_sinks_01.mp3", ["裁断距离"] = 2800},
-    {["单位ID"] = "N05W", ["音效路径"] = "Sound\\Boss\\Moltes\\SFX\\moltes_defeat_rotten_tree_quiet_11_subtle_tailfade.mp3", ["裁断距离"] = 2800}
+    {["单位ID"] = "N05W", ["音效路径"] = "Sound\\Boss\\Moltes\\SFX\\moltes_defeat_rotten_tree_quiet_11_subtle_tailfade.mp3", ["裁断距离"] = 2800},
+    {["单位ID"] = "N01Y", ["音效路径"] = "Sound\\Boss\\ShadowboneMortes\\SFX\\shadowbone_mortes_defeat_shadowbone_falls_05_sandy_layered.mp3", ["裁断距离"] = 2800}
 }
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效系统.index")
-local Sound3DII_CooPlay = ____require_result_1.Sound3DII_CooPlay
+local Sound3DII_CooPlayReuse = ____require_result_1.Sound3DII_CooPlayReuse
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_2.addDelayedCallback
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -44,7 +45,7 @@ ____exports["尝试播放Boss死亡音效"] = function(bossUnit)
     end
     local x = GetUnitX(bossUnit)
     local y = GetUnitY(bossUnit)
-    Sound3DII_CooPlay(
+    Sound3DII_CooPlayReuse(
         config["音效路径"],
         x,
         y,
@@ -62,7 +63,7 @@ ____exports["尝试播放Boss死亡音效"] = function(bossUnit)
             addDelayedCallback(
                 item["延迟Ms"],
                 function()
-                    Sound3DII_CooPlay(
+                    Sound3DII_CooPlayReuse(
                         item["音效路径"],
                         x,
                         y,

@@ -7,7 +7,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local ____exports = {}
-local makeBuffKey, parseStrictPositiveInt, parseBuffKey, getBuffFromFlat, removeBuffFromFlat, hasAnyBuffOnHid, collectActiveBuffPairs, __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, processBuffsForUnit, cleanupExpiredNativeBuffs, cleanupBuffOnRemove, cleanupBuffVisualEffect, removeBuffRuntimeByKey, onBuffPoolCenterTimerTick, ensureSyncTimer, maybeStopSyncTimer, unitBjExt, UnitRemoveAbility, buffEffectTools, DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID, buffByUnitAndId, unitRefByHid, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
+local makeBuffKey, parseStrictPositiveInt, parseBuffKey, getBuffFromFlat, removeBuffFromFlat, hasAnyBuffOnHid, collectActiveBuffPairs, __pcallIsUnitPausedBody, __pcallNotifyExpiredBody, __pcallSyncDotBody, isBuffPoolUnitPaused, notifyDotBuffExpiredFromPool, syncDotFromPoolTick, tickBuffPool, processBuffsForUnit, cleanupExpiredNativeBuffs, cleanupBuffOnRemove, cleanupBuffVisualEffect, removeBuffRuntimeByKey, onBuffPoolCenterTimerTick, ensureSyncTimer, maybeStopSyncTimer, UnitRemoveAbility, buffEffectTools, IsUnitPausedBJ, DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID, buffByUnitAndId, unitRefByHid, __pcallIsPausedUnit, __pcallIsPausedResult, __pcallExpiredBuffId, __pcallExpiredHid, _registeredToCenterTimer, _tickCounter
 function makeBuffKey(hid, buffID)
     return (tostring(hid) .. "|") .. buffID
 end
@@ -95,8 +95,8 @@ function collectActiveBuffPairs()
     return out
 end
 function __pcallIsUnitPausedBody(self)
-    if unitBjExt.IsUnitPausedBJ ~= nil then
-        __pcallIsPausedResult = unitBjExt:IsUnitPausedBJ(__pcallIsPausedUnit) == true
+    if IsUnitPausedBJ ~= nil then
+        __pcallIsPausedResult = IsUnitPausedBJ(__pcallIsPausedUnit) == true
     end
 end
 function __pcallNotifyExpiredBody(self)
@@ -117,7 +117,7 @@ function isBuffPoolUnitPaused(u)
     if u == nil or u == 0 then
         return false
     end
-    if unitBjExt.IsUnitPausedBJ == nil then
+    if IsUnitPausedBJ == nil then
         return false
     end
     __pcallIsPausedUnit = u
@@ -172,20 +172,24 @@ function processBuffsForUnit(hid, buffs)
         return
     end
     local unitRef = unitRefByHid[hid]
-    if unitRef ~= nil and isBuffPoolUnitPaused(unitRef) then
-        return
-    end
+    local paused = unitRef ~= nil and isBuffPoolUnitPaused(unitRef)
     local expired = {}
     do
         local i = 0
         while i < #buffs do
-            local ____buffs_index_18 = buffs[i + 1]
-            local buffID = ____buffs_index_18.buffID
-            local row = ____buffs_index_18.row
-            row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
-            if row.remaining <= 0 then
-                expired[#expired + 1] = {buffID = buffID, row = row}
+            do
+                local ____buffs_index_18 = buffs[i + 1]
+                local buffID = ____buffs_index_18.buffID
+                local row = ____buffs_index_18.row
+                if paused and row.tickWhilePaused ~= true then
+                    goto __continue105
+                end
+                row.remaining = row.remaining - ____exports.BUFF_POOL_TICK
+                if row.remaining <= 0 then
+                    expired[#expired + 1] = {buffID = buffID, row = row}
+                end
             end
+            ::__continue105::
             i = i + 1
         end
     end
@@ -274,12 +278,12 @@ end
 -- - **DOT（D001–D004）剩余时间由本模块以固定步长递减**；`dot伤害` 施加/刷新时 `syncDotBuff` 写入满额 remaining，不在此用 `getUnitPoison` 回写覆盖。
 -- - 非 DOT 的 `manual` 条同样由本计时器递减。
 -- - 每 tick 末调用 `dot伤害.syncDotRemainingFromBuffPool`，使逻辑层 `stateByType` 与池一致。
--- - **单位被 `PauseUnit` 暂停时**（`IsUnitPausedBJ`）：该单位在池内所有 Buff **不扣** `remaining`，与引擎时间冻结一致；恢复暂停后照常递减。
+-- - **单位被 `PauseUnit` 暂停时**（`IsUnitPausedBJ`）：默认 Buff **不扣** `remaining`，与引擎时间冻结一致；少数控制源可用 `tickWhilePaused` 继续计时。
 -- 
 -- 扁平化改造：禁止 state[x][y] 二级链式，全部改用单层 flat[key]
 -- key 格式："hid|buffId"（排序：先 hid 数值，再 buffID 字典序）
 local jass = require("jass.common")
-unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index")
 local ____leakCore_LeakWatcher_0 = leakCore.LeakWatcher
 if ____leakCore_LeakWatcher_0 == nil then
@@ -297,6 +301,7 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local R2I = jass.R2I
 local _____5355_4F4D_662F_5426_514D_75AB_8D1F_9762_6548_679CBuffID = negativeEffectImmunity["单位是否免疫负面效果BuffID"]
+IsUnitPausedBJ = unitBjExt.IsUnitPausedBJ
 DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID = {
     C001 = {1112560453},
     C002 = {1114010234},
@@ -480,6 +485,9 @@ function ____exports.registerManualBuff(target, buffID, durationSec, effectValue
         end
         if extras.onRemove ~= nil then
             row.onRemove = extras.onRemove
+        end
+        if extras.tickWhilePaused == true then
+            row.tickWhilePaused = true
         end
     end
     setBuffToFlat(hid, buffID, row)

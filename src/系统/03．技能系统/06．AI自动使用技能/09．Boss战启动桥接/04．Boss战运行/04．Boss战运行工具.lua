@@ -203,11 +203,11 @@ ____exports["尝试兜底搜敌并下令"] = function(context, nowMs)
         context["最近兜底目标ID"] = 0
         return
     end
-    local ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_14 = _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA(context)
-    if ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_14 == nil then
-        ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_14 = _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA(context)
+    local ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_15 = _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA(context)
+    if ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_15 == nil then
+        ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_15 = _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA(context)
     end
-    local fallbackTarget = ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_14
+    local fallbackTarget = ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_15
     if fallbackTarget == nil or fallbackTarget == 0 then
         return
     end
@@ -258,6 +258,8 @@ local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.02
 isValidCombatEnemyUnit = ____require_result_11.isValidCombatEnemyUnit
 local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 debugLogForce = ____require_result_12.debugLogForce
+local ____require_result_13 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____5237_65B0_5355_4F4D_6682_505C_5E95_5C42_72B6_6001 = ____require_result_13["刷新单位暂停底层状态"]
 GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -268,7 +270,6 @@ local SquareRoot = jass.SquareRoot
 local IsUnitType = jass.IsUnitType
 local IsUnitInvulnerable = jass.IsUnitInvulnerable
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local PauseUnit = jass.PauseUnit
 local PingMinimap = jass.PingMinimap
 IssueTargetOrder = jass.IssueTargetOrder
 local IssueImmediateOrder = jass.IssueImmediateOrder
@@ -346,11 +347,11 @@ local function ____on_73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_5355_4F4D()
     SetUnitPosition(unit, _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3X, _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3Y)
 end
 local function _____8BFB_53D6_73A9_5BB6_7EC4()
-    local ____YDUserDataGetSafe_result_13 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
-    if ____YDUserDataGetSafe_result_13 == nil then
-        ____YDUserDataGetSafe_result_13 = GetPlayersAll()
+    local ____YDUserDataGetSafe_result_14 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
+    if ____YDUserDataGetSafe_result_14 == nil then
+        ____YDUserDataGetSafe_result_14 = GetPlayersAll()
     end
-    return ____YDUserDataGetSafe_result_13
+    return ____YDUserDataGetSafe_result_14
 end
 ____exports["单位是否死亡"] = function(unit)
     if unit == nil or unit == 0 then
@@ -474,7 +475,7 @@ ____exports["完成Boss战启动"] = function(context)
     _____63A5_7BA1Boss_6218_533A_57DF_97F3_9891(context)
     ____exports["确保Boss战区域视野"](context["地点矩形"])
     SetUnitInvulnerable(context["Boss单位"], false)
-    PauseUnit(context["Boss单位"], false)
+    _____5237_65B0_5355_4F4D_6682_505C_5E95_5C42_72B6_6001(context["Boss单位"])
     if context["地点矩形"] ~= nil and context["地点矩形"] ~= 0 then
         PingMinimap(
             GetRectCenterX(context["地点矩形"]),

@@ -10,11 +10,11 @@ function _____901A_77E5_672A_547D_4E2D_6700_7EC8_4F24_5BB3_76D1_542C(record, app
             do
                 local callback = _____672A_547D_4E2D_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868[i + 1]
                 if callback == nil then
-                    goto __continue13
+                    goto __continue16
                 end
                 callback(record, applied, snapshot)
             end
-            ::__continue13::
+            ::__continue16::
             i = i + 1
         end
     end
@@ -26,16 +26,16 @@ function _____672A_547D_4E2D_6700_7EC8_4F24_5BB3_6865_63A5(target, attacker, app
             do
                 local record = _____672A_547D_4E2D_8BB0_5F55_5217_8868[i + 1]
                 if record == nil then
-                    goto __continue17
+                    goto __continue20
                 end
                 if record.target ~= target or record.attacker ~= attacker then
-                    goto __continue17
+                    goto __continue20
                 end
                 __TS__ArraySplice(_____672A_547D_4E2D_8BB0_5F55_5217_8868, i, 1)
                 _____901A_77E5_672A_547D_4E2D_6700_7EC8_4F24_5BB3_76D1_542C(record, applied, snapshot)
                 return
             end
-            ::__continue17::
+            ::__continue20::
             i = i + 1
         end
     end
@@ -52,17 +52,27 @@ end
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
-local _____547D_4E2D_6982_7387_901A_8FC7 = ____require_result_2["命中概率通过"]
-local ____require_result_3 = require("系统.04．伤害系统.04．命中系统.00．命中配置")
-local _____547D_4E2D_7CFB_7EDF_914D_7F6E = ____require_result_3["命中系统配置"]
-local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-registerAppliedFinalDamageListener = ____require_result_4.registerAppliedFinalDamageListener
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
+local _____547D_4E2D_6982_7387_901A_8FC7 = ____require_result_1["命中概率通过"]
+local ____require_result_2 = require("系统.04．伤害系统.04．命中系统.00．命中配置")
+local _____547D_4E2D_7CFB_7EDF_914D_7F6E = ____require_result_2["命中系统配置"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+registerAppliedFinalDamageListener = ____require_result_3.registerAppliedFinalDamageListener
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetHandleId = jass.GetHandleId
 local function _____8C03_7528_73A9_5BB6_82F1_96C4_5224_5B9A(unit)
-    return _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(unit) == true
+    if unit == nil or unit == 0 then
+        return false
+    end
+    local owner = GetOwningPlayer(unit)
+    if owner == nil or owner == 0 then
+        return false
+    end
+    local hero = YDUserDataGetSafe("player", owner, "英雄", "unit")
+    if hero == nil or hero == 0 then
+        return false
+    end
+    return hero == unit or GetHandleId(hero) == GetHandleId(unit)
 end
 _____672A_547D_4E2D_8BB0_5F55_5217_8868 = {}
 _____672A_547D_4E2D_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868 = {}

@@ -9,6 +9,7 @@ local _____5237_65B0_5F71_9AA8_76D7_8D3C_9057_4EA7Buff = ____01_FF0E_8FD0_884C_6
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.02．数值与表现配置")
 local _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯数值与表现配置"]
 local _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯表现配置"]
+local _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯音效配置"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.08．台词播放")
 local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放影骨莫特斯台词"]
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.11．公共工具")
@@ -16,8 +17,12 @@ local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local AddSpecialEffect = jass.AddSpecialEffect
 local IssueTargetOrder = jass.IssueTargetOrder
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
@@ -41,6 +46,12 @@ end
 local function _____5F00_542F_5F71_9AA8_5B9D_7BB1(context, x, y)
     _____7ED9Boss_53E0_52A0_76D7_8D3C_9057_4EA7(context)
     AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["宝箱出现"], x, y)
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["盗贼的遗产"]["增益回流"],
+        GetUnitX(context["Boss单位"]),
+        GetUnitY(context["Boss单位"]),
+        _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
 end
 local function _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5F00_542F_4E2D(opener, _chest, _elapsed, _config, variable)
     if variable == nil or not _____5355_4F4D_6709_6548(opener) then
@@ -73,6 +84,7 @@ local function _____521B_5EFA_5F71_9AA8_5B9D_7BB1(context, index)
         return
     end
     AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["宝箱出现"], point.X, point.Y)
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["盗贼的遗产"]["宝箱出现"], point.X, point.Y, _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
     _____521B_5EFA_4EA4_4E92_5B9D_7BB1({
         ["清理"] = context["清理"],
         ["名称"] = "影骨-盗贼遗产宝箱",

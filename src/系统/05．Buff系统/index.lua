@@ -7,6 +7,7 @@ local ____exports = {}
 local buffPoolCore = require("系统.05．Buff系统.00．Buff系统")
 local buffUIMod = require("系统.05．Buff系统.02．BuffUI")
 local controlResistMod = require("系统.05．Buff系统.01．控制抗性.index")
+local sleepMod = require("系统.05．Buff系统.07．睡眠系统")
 local ____Buff_7CFB_7EDF_5DF2_521D_59CB_5316 = false
 function ____exports.init()
     if ____Buff_7CFB_7EDF_5DF2_521D_59CB_5316 then
@@ -19,5 +20,6 @@ function ____exports.init()
     require("系统.05．Buff系统.03．BuffJASS桥接")
     require("系统.05．Buff系统.05．Buff清除函数")
     controlResistMod.initControlResist()
+    sleepMod["初始化睡眠系统"]()
 end
 return ____exports

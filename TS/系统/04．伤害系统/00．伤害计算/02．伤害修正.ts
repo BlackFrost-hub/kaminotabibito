@@ -395,7 +395,7 @@ export function isSummonedUnit(unit: any): boolean {
 /**
  * 获取召唤物伤害修正
  */
-export function getSummonDamageModifier(attacker: any, target: any, isPlayer: boolean): {
+export function getSummonDamageModifier(attacker: any, target: any, isPlayer: boolean, attrSource?: any): {
   addDamage: number;
   multiplier: number;
 } {
@@ -404,7 +404,8 @@ export function getSummonDamageModifier(attacker: any, target: any, isPlayer: bo
     return { addDamage: 0, multiplier: 1 };
   }
 
-  const summonDmg = getRealAttr(attacker, "召唤物伤害", 0);
+  const source = attrSource != null && attrSource !== 0 ? attrSource : attacker;
+  const summonDmg = getRealAttr(source, "召唤物伤害", 0);
   const summonResist = getRealAttr(target, "召唤物抗性", 0);
 
   const addDamage = createValueHolder(0);

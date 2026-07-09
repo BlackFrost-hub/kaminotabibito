@@ -1,0 +1,7 @@
+[
+  {
+    "source": "C:/Users/Administrator/Desktop/syzl/audio_temp/Boss/Thranduil/Voice/thranduil_opening_law_warning_jude_02_v3_64k.mp3",
+    "target": "Sound/Boss/Thranduil/Voice/thranduil_opening_law_warning_jude_02_v3_64k.mp3",
+    "note": "example only; copy this file to voice_pack_manifest.json and keep only confirmed voice lines"
+  }
+]

@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____767B_8BB0_5F71_9AA8_53EC_5524_7269, _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0, _____5F71_9AA8_7B26_5492_53EF_62FE_53D6_5355_4F4D, _____5F71_9AA8_7B26_5492_62FE_53D6, _____521B_5EFA_9AB8_9AA8_7B26_5492, _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4, _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB, _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1, _____5F71_9AA8_53EC_5524_7269_9500_6BC1, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, AddSpecialEffect, IssueTargetOrder, addDelayedCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6218_6597_5185_62FE_53D6_7269, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, registerManualBuff, _____5F71_9AA8_83AB_7279_65AFBuffID, _____9AB8_9AA8_6218_58EBID, _____5F71_9AA8_53EC_5524_7269_4E0A_4E0B_6587_8868
+local _____968F_673A_53D6_5F71_9AA8_97F3_6548_8DEF_5F84, _____767B_8BB0_5F71_9AA8_53EC_5524_7269, _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0, _____5F71_9AA8_7B26_5492_53EF_62FE_53D6_5355_4F4D, _____5F71_9AA8_7B26_5492_62FE_53D6, _____521B_5EFA_9AB8_9AA8_7B26_5492, _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4, _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB, _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1, _____5F71_9AA8_53EC_5524_7269_9500_6BC1, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, GetRandomInt, AddSpecialEffect, IssueTargetOrder, addDelayedCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6218_6597_5185_62FE_53D6_7269, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, registerManualBuff, _____5F71_9AA8_83AB_7279_65AFBuffID, _____9AB8_9AA8_6218_58EBID, _____5F71_9AA8_53EC_5524_7269_4E0A_4E0B_6587_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.00．配置")
 local _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["影骨莫特斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.01．运行时上下文")
@@ -10,6 +10,7 @@ local _____5237_65B0_5F71_9AA8_83AB_7279_65AF_9636_6BB5 = ____01_FF0E_8FD0_884C_
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.02．数值与表现配置")
 local _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯数值与表现配置"]
 local _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯表现配置"]
+local _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯音效配置"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.08．台词播放")
 local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放影骨莫特斯台词"]
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.11．公共工具")
@@ -20,6 +21,18 @@ local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____53D6_5355_4F4DID = ____11_FF0E_516C_5171_5DE5_5177["取单位ID"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+function _____968F_673A_53D6_5F71_9AA8_97F3_6548_8DEF_5F84(list)
+    local count = #list
+    if count <= 0 then
+        return ""
+    end
+    if count == 1 then
+        return list[1]
+    end
+    return list[GetRandomInt(0, count - 1) + 1]
+end
 function _____767B_8BB0_5F71_9AA8_53EC_5524_7269(unit, context)
     local id = _____53D6_5355_4F4DID(unit)
     if id ~= 0 then
@@ -91,6 +104,12 @@ function _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4(variable)
         false
     )
     AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["骸骨战士重组"], x, y)
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____968F_673A_53D6_5F71_9AA8_97F3_6548_8DEF_5F84(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["骸骨召唤"]["骸骨战士重组列表"]),
+        x,
+        y,
+        _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
 end
 function _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB(context, group)
     if group["已重组"] or group["阶段"] >= 3 or group["死亡数"] < group["总数"] then
@@ -166,6 +185,7 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetOwningPlayer = jass.GetOwningPlayer
 GetRandomReal = jass.GetRandomReal
+GetRandomInt = jass.GetRandomInt
 AddSpecialEffect = jass.AddSpecialEffect
 IssueTargetOrder = jass.IssueTargetOrder
 local GetPlayerState = jass.GetPlayerState
@@ -223,6 +243,8 @@ local function _____786E_4FDD_9AB7_9AC5_5077_7A83_4FEE_6B63()
     registerDamageModifier(____on_5F71_9AA8_9AB7_9AC5_5077_7A83_4FEE_6B63, 50)
 end
 local function _____53EC_5524_5F71_9AA8_9AB7_9AC5(context, group, count)
+    local soundX = GetUnitX(context["Boss单位"])
+    local soundY = GetUnitY(context["Boss单位"])
     do
         local i = 0
         while i < count do
@@ -238,6 +260,10 @@ local function _____53EC_5524_5F71_9AA8_9AB7_9AC5(context, group, count)
                 dist,
                 angle
             )
+            if i == 0 then
+                soundX = x
+                soundY = y
+            end
             AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["骸骨召唤预警"], x, y)
             ____exports["创建影骨召唤物"](
                 context,
@@ -250,6 +276,7 @@ local function _____53EC_5524_5F71_9AA8_9AB7_9AC5(context, group, count)
             i = i + 1
         end
     end
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["骸骨召唤"]["骷髅盗贼出生"], soundX, soundY, _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
 end
 local function _____5F71_9AA8_9AB8_9AA8_53EC_5524_5206_6BB5(variable)
     if variable == nil then

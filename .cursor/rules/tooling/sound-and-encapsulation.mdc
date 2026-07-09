@@ -9,9 +9,9 @@ alwaysApply: false
 ## 音效
 
 - **需要播放音效时**：使用 `TS/系统/00．核心系统/音效函数.ts` 提供的 API。
-  - 3D/坐标/单位/点：`Sound3DII_CooPlay`、`Sound3DII_UnitPlay`、`Sound3DII_LocPlay`
+  - 3D/坐标/单位/点默认：`Sound3DII_CooPlayReuse`、`Sound3DII_UnitPlay`、`Sound3DII_LocPlay`。其中 `UnitPlay/LocPlay` 内部也走单句柄复用。
   - **3D 同路径高频但不需要叠放**：`Sound3DII_CooPlayReuse(path, x, y, z, cutoff)` —— 单句柄复用，重复播放时更新坐标后 Stop+Start，适合 Boss 机制提示音、场地提示音、短促反馈音，常驻约 +1/path。
-  - **3D 需要多实例叠放**：继续使用 `Sound3DII_CooPlay` / `Sound3DII_UnitPlay` / `Sound3DII_LocPlay`，同一路径最多 4 路池化，前几次播放会把池子建到最多 +4/path，后续复用池内句柄。
+  - **3D 需要多实例叠放（稀有）**：使用 `Sound3DII_CooPlayPool4MultiInstanceRare`。这个名字故意很长，只用于同一路径必须同时叠放多声的场景；最多 4 路池化，前几次播放会把池子建到最多 +4/path，后续复用池内句柄。
   - 仅指定玩家听到（如 UI 音效）：`Sound3DII_Mp3Play(path, whichPlayer)`（内部 CreateSound 后 `KillSoundWhenDone` / 泄露审计 `killSoundWhenDone`，无则定时 `DestroySound` 兜底）
   - **同路径高频重复**（1 秒内多连同一 wav）：`Sound3DII_Mp3PlayReuse(path, whichPlayer)` — **单句柄** Stop+Start，不每遍 CreateSound；dbg **常驻 +1/path**（非每遍 +1）
   - **UI 按钮/面板点击**：`SoundUI_ClickPlay(path?)` — 内部即 `Sound3DII_Mp3PlayReuse`。`initSound3DII` 会 **`prewarmUiClickSound`**，开局 +snd **多 1**（故意）

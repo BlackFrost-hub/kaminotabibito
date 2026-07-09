@@ -23,6 +23,9 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: { sourceName?: string }) => void;
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
 };
+const { 施加睡眠 } = require("系统.05．Buff系统.07．睡眠系统") as {
+  施加睡眠: (this: void, 参数: { 来源单位?: any; 目标单位: any; 持续时间: number; 伤害阈值?: number; 保底时间?: number }) => boolean;
+};
 const { 施加快速控制Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   施加快速控制Buff: (this: void, 来源单位: any, 目标单位: any, 控制ID: number, 持续时间: number) => void;
 };
@@ -493,6 +496,20 @@ export function 施加扩展控制(
   if (定义 == null) return 0;
   const 目标ID = 取单位ID(目标单位);
   if (目标ID === 0) return 0;
+  if (类型 === "sleep") {
+    const 睡眠参数 = 规范参数 as any;
+    const ok = 施加睡眠({
+      来源单位,
+      目标单位,
+      持续时间: 实际持续时间,
+      伤害阈值: 睡眠参数.伤害阈值,
+      保底时间: 睡眠参数.保底时间,
+    });
+    if (!ok) return 0;
+    通知控制Debuff事件({ 来源单位, 目标单位, 类型: 类型 as string, 持续时间: 实际持续时间, BuffID: "C016", 是否控制: true, 原始参数: 规范参数 });
+    debugLogForce(模块名, "施加扩展控制", "类型=", 类型, "来源=", 取单位ID(来源单位), "目标=", 目标ID, "持续=", 实际持续时间);
+    return 目标ID;
+  }
   if (定义.类型分类 === "快速控制") {
     if (定义.快速控制ID == null) return 0;
     施加快速控制Buff(来源单位, 目标单位, 定义.快速控制ID, 实际持续时间);

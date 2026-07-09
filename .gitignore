@@ -16,6 +16,7 @@
 /map
 /map01
 /audio_temp
+/build
 /%APPDATA%
 node_modules/
 npm-debug.log*

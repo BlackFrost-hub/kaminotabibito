@@ -8,7 +8,7 @@
 const jass = require("jass.common") as any;
 
 import { SoundModel } from "./01．声音模型";
-import { createSoundInternal, getSoundInternal, getDefaultSoundModel, KEY_COUNT, KEY_INDEX, KEY_ENABLED_SLOT_BASE, POOL_MAX, hash } from "./02．音效池";
+import { createSoundInternal, getSoundInternal, getDefaultSoundModel, KEY_COUNT, KEY_INDEX, POOL_MAX, hash } from "./02．音效池";
 
 // 最后播放的音效
 export let lastPlayedSound: any = null;
@@ -34,7 +34,10 @@ function getOrCreateCooReuseSound(this: void, path: string, model: SoundModel): 
 }
 
 /**
- * 在坐标处播放3D音效
+ * 稀有用法：在坐标处播放同一路径 3D 音效，最多允许 4 路同时叠放。
+ *
+ * 默认不要用这个。普通 Boss 机制、单位/点位/坐标音效请用 Sound3DII_CooPlayReuse。
+ * 只有明确需要同一路径同时叠多声时，才使用这个 4 槽池化入口。
  * @param path 音效路径
  * @param x X坐标
  * @param y Y坐标
@@ -43,7 +46,7 @@ function getOrCreateCooReuseSound(this: void, path: string, model: SoundModel): 
  * @param model 声音模型（可选）
  * @returns 播放的音效句柄
  */
-export function Sound3DII_CooPlay(
+export function Sound3DII_CooPlayPool4MultiInstanceRare(
   path: string,
   x: number,
   y: number,
@@ -81,7 +84,7 @@ export function Sound3DII_CooPlay(
  *
  * 同一路径只常驻1个 sound 句柄；重复播放时更新坐标并 Stop+Start。
  * 适合 Boss 机制提示、UI化战斗反馈等不需要多声叠放的高频同路径音效。
- * 如果需要同一音效多实例同时叠放，请继续使用 Sound3DII_CooPlay。
+ * 默认 3D 音效入口应走这里，避免同一路径不断扩池。
  */
 export function Sound3DII_CooPlayReuse(
   path: string,
@@ -123,7 +126,19 @@ export function Sound3DII_UnitPlay(
   const x = (jass as any).GetUnitX(unit);
   const y = (jass as any).GetUnitY(unit);
   const z = (jass as any).GetUnitFlyHeight(unit);
-  return Sound3DII_CooPlay(path, x, y, z, cutoff, model);
+  return Sound3DII_CooPlayReuse(path, x, y, z, cutoff, model);
+}
+
+export function Sound3DII_UnitPlayReuse(
+  path: string,
+  unit: any,
+  cutoff: number,
+  model?: SoundModel
+): any {
+  const x = (jass as any).GetUnitX(unit);
+  const y = (jass as any).GetUnitY(unit);
+  const z = (jass as any).GetUnitFlyHeight(unit);
+  return Sound3DII_CooPlayReuse(path, x, y, z, cutoff, model);
 }
 
 /**
@@ -142,5 +157,17 @@ export function Sound3DII_LocPlay(
   const x = (jass as any).GetLocationX(loc);
   const y = (jass as any).GetLocationY(loc);
   const z = (jass as any).GetLocationZ(loc);
-  return Sound3DII_CooPlay(path, x, y, z, cutoff, model);
+  return Sound3DII_CooPlayReuse(path, x, y, z, cutoff, model);
+}
+
+export function Sound3DII_LocPlayReuse(
+  path: string,
+  loc: any,
+  cutoff: number,
+  model?: SoundModel
+): any {
+  const x = (jass as any).GetLocationX(loc);
+  const y = (jass as any).GetLocationY(loc);
+  const z = (jass as any).GetLocationZ(loc);
+  return Sound3DII_CooPlayReuse(path, x, y, z, cutoff, model);
 }

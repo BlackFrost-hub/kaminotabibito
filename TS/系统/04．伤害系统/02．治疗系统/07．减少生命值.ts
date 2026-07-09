@@ -3,6 +3,7 @@
 const jass = require("jass.common") as any;
 
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitStateJass = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitStateJass = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
@@ -23,10 +24,6 @@ const { fireShowDamageEvent } = require("系统.04．伤害系统.02．治疗系
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
-const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
-  getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
-};
-
 export type 资源类型 = "life" | "mana";
 
 export interface 资源增减选项 {
@@ -52,7 +49,9 @@ function 取绝对值(this: void, value: number): number {
 function 读取魔法消耗减少(this: void, target: any): number {
   const owner = GetOwningPlayer(target);
   if (owner == null || owner === 0) return 0;
-  if (getRegisteredPlayerHero(owner) !== target) return 0;
+  const hero = YDUserDataGetSafe("player", owner, "英雄", "unit");
+  if (hero == null || hero === 0) return 0;
+  if (hero !== target && GetHandleId(hero) !== GetHandleId(target)) return 0;
 
   const value = YDUserDataGetSafe("player", owner, "魔法消耗", "real");
   if (typeof value !== "number") return 0;

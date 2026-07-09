@@ -54,7 +54,6 @@ local SetUnitState = jass.SetUnitState
 AddSpecialEffect = jass.AddSpecialEffect
 local GetRandomInt = jass.GetRandomInt
 local ShowUnit = jass.ShowUnit
-local PauseUnit = jass.PauseUnit
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -66,6 +65,10 @@ local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
 local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["申请单位暂停占用"]
+local _____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["释放单位暂停占用"]
+local _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90 = "Boss:Moltes:根系觉醒"
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
         return
@@ -171,8 +174,8 @@ local function _____521B_5EFA_8150_8D25_4E4B_6E90_76EE_6807_5217_8868(context)
                 ["on销毁"] = _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1
             }
             local circle = AddSpecialEffect(cfg["腐败之源脚下特效路径"], cell["中心X"], cell["中心Y"])
-            local ____self_4 = context["清理"]
-            ____self_4["登记特效"](____self_4, "莫尔特斯-腐败之源脚下圈", circle)
+            local ____self_5 = context["清理"]
+            ____self_5["登记特效"](____self_5, "莫尔特斯-腐败之源脚下圈", circle)
             i = i + 1
         end
     end
@@ -184,7 +187,7 @@ end
 local function _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_7ED3_675F(______662F_5426_6210_529F, ______5269_4F59_6570_91CF, context)
     if _____5355_4F4D_6709_6548(context["Boss单位"]) then
         ShowUnit(context["Boss单位"], true)
-        PauseUnit(context["Boss单位"], false)
+        _____91CA_653E_5355_4F4D_6682_505C_5360_7528(context["Boss单位"], _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90)
     end
     context["腐败之源组"] = nil
 end
@@ -210,7 +213,7 @@ ____exports["尝试触发莫尔特斯根系觉醒"] = function(context)
         ["触发概率百分比"] = _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["转阶段触发概率百分比"]
     })
     ShowUnit(context["Boss单位"], false)
-    PauseUnit(context["Boss单位"], true)
+    _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(context["Boss单位"], _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根系觉醒"]
     context["腐败之源组"] = _____521B_5EFA_9650_65F6_6467_6BC1_76EE_6807_7EC4({
         ["清理"] = context["清理"],

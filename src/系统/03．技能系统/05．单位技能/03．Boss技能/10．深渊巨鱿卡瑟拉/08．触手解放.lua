@@ -21,7 +21,6 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local ShowUnit = jass.ShowUnit
-local PauseUnit = jass.PauseUnit
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
@@ -34,6 +33,10 @@ local ____require_result_2 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
 local _____4E34_65F6_8C03_6574_62A4_7532 = ____require_result_3["临时调整护甲"]
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["申请单位暂停占用"]
+local _____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["释放单位暂停占用"]
+local _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90 = "Boss:Kasela:触手解放"
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
         return
@@ -63,7 +66,7 @@ local function _____56DE_5F52_5361_745F_62C9(data, success)
         return
     end
     ShowUnit(boss, true)
-    PauseUnit(boss, false)
+    _____91CA_653E_5355_4F4D_6682_505C_5360_7528(boss, _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90)
     _____64AD_653E_6F5C_5165_7279_6548(
         GetUnitX(boss),
         GetUnitY(boss)
@@ -166,7 +169,7 @@ ____exports["尝试触发卡瑟拉触手解放"] = function(context)
         GetUnitY(boss)
     )
     ShowUnit(boss, false)
-    PauseUnit(boss, true)
+    _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(boss, _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "双环",
         X = GetUnitX(boss),
@@ -197,8 +200,8 @@ ____exports["尝试触发卡瑟拉触手解放"] = function(context)
             end
         end
     )
-    local ____self_4 = context["清理"]
-    ____self_4["登记延迟回调"](____self_4, "卡瑟拉-触手解放限时", id)
+    local ____self_5 = context["清理"]
+    ____self_5["登记延迟回调"](____self_5, "卡瑟拉-触手解放限时", id)
 end
 ____exports["注册卡瑟拉触手解放"] = function()
 end

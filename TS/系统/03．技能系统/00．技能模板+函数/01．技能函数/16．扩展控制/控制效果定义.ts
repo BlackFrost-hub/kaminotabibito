@@ -26,7 +26,13 @@ export interface 恐惧参数 {
   移动速度?: number;
 }
 
-export type 扩展控制参数 = 嘲讽参数 | 魅惑参数 | 恐惧参数;
+export interface 睡眠控制参数 {
+  持续时间: number;
+  伤害阈值?: number;
+  保底时间?: number;
+}
+
+export type 扩展控制参数 = 嘲讽参数 | 魅惑参数 | 恐惧参数 | 睡眠控制参数;
 
 export interface 控制效果定义 {
   类型键: string;

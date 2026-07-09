@@ -11,6 +11,7 @@
 export interface DamageModifierContext {
   target: any;
   attacker: any;
+  originalAttacker?: any;
   baseDamage: number;
   currentDamage: number;
   isPhysicalDamage: boolean;

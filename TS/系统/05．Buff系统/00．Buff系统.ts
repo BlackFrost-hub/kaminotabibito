@@ -5,7 +5,7 @@
  * - **DOT（D001–D004）剩余时间由本模块以固定步长递减**；`dot伤害` 施加/刷新时 `syncDotBuff` 写入满额 remaining，不在此用 `getUnitPoison` 回写覆盖。
  * - 非 DOT 的 `manual` 条同样由本计时器递减。
  * - 每 tick 末调用 `dot伤害.syncDotRemainingFromBuffPool`，使逻辑层 `stateByType` 与池一致。
- * - **单位被 `PauseUnit` 暂停时**（`IsUnitPausedBJ`）：该单位在池内所有 Buff **不扣** `remaining`，与引擎时间冻结一致；恢复暂停后照常递减。
+ * - **单位被 `PauseUnit` 暂停时**（`IsUnitPausedBJ`）：默认 Buff **不扣** `remaining`，与引擎时间冻结一致；少数控制源可用 `tickWhilePaused` 继续计时。
  *
  * 扁平化改造：禁止 state[x][y] 二级链式，全部改用单层 flat[key]
  * key 格式："hid|buffId"（排序：先 hid 数值，再 buffID 字典序）
@@ -35,6 +35,7 @@ const GetUnitX = jass["GetUnitX"] as (whichUnit: any) => number;
 const GetUnitY = jass["GetUnitY"] as (whichUnit: any) => number;
 const R2I = jass["R2I"] as (r: number) => number;
 const 单位是否免疫负面效果BuffID = negativeEffectImmunity.单位是否免疫负面效果BuffID;
+const IsUnitPausedBJ = unitBjExt.IsUnitPausedBJ as ((this: void, unit: any) => boolean) | undefined;
 
 const DEFAULT_NATIVE_BUFF_IDS_BY_BUFF_ID: Record<string, number[]> = {
   C001: [1112560453], // 'BPSE'
@@ -90,6 +91,8 @@ export interface BuffRuntime {
   nativeBuffAbilityIds?: number[];
   /** Buff 被移除或到期时触发的纯 TS 清理回调。 */
   onRemove?: (this: void, unit: any, buffID: string, row: BuffRuntime) => void;
+  /** 单位被暂停时仍继续倒计时。用于睡眠这类“自身会暂停单位”的控制。 */
+  tickWhilePaused?: boolean;
 }
 
 // ========== 虚拟分区：扁平化存储（禁止 state[x][y] 二级链式） ==========
@@ -172,7 +175,7 @@ let syncTimer: any = undefined;
 let __pcallIsPausedUnit: any = 0;
 let __pcallIsPausedResult = false;
 function __pcallIsUnitPausedBody(this: any): void {
-  if (unitBjExt.IsUnitPausedBJ != null) __pcallIsPausedResult = (unitBjExt as any).IsUnitPausedBJ(__pcallIsPausedUnit) === true;
+  if (IsUnitPausedBJ != null) __pcallIsPausedResult = IsUnitPausedBJ(__pcallIsPausedUnit) === true;
 }
 
 let __pcallExpiredBuffId = "";
@@ -196,7 +199,7 @@ function __pcallSyncDotBody(this: any): void {
 /** 与 `PauseUnit` 一致：暂停中的单位 Buff 池不计时（由中心计时器驱动，见 `tickBuffPool`） */
 function isBuffPoolUnitPaused(u: any): boolean {
   if (u == null || u === 0) return false;
-  if (unitBjExt.IsUnitPausedBJ == null) return false;
+  if (IsUnitPausedBJ == null) return false;
   __pcallIsPausedUnit = u;
   __pcallIsPausedResult = false;
   pcall(__pcallIsUnitPausedBody);
@@ -275,6 +278,7 @@ export interface RegisterManualBuffExtras {
   stack?: number;
   nativeBuffAbilityIds?: number[];
   onRemove?: (this: void, unit: any, buffID: string, row: BuffRuntime) => void;
+  tickWhilePaused?: boolean;
 }
 
 function playManualBuffEffect(target: any, buffID: string, row: BuffRuntime, durationSec: number): void {
@@ -333,6 +337,7 @@ export function registerManualBuff(
     if (extras.nativeBuffAbilityIds !== undefined && extras.nativeBuffAbilityIds.length > 0)
       row.nativeBuffAbilityIds = extras.nativeBuffAbilityIds;
     if (extras.onRemove !== undefined) row.onRemove = extras.onRemove;
+    if (extras.tickWhilePaused === true) row.tickWhilePaused = true;
   }
   setBuffToFlat(hid, buffID, row);
   if (typeof target !== "number") unitRefByHid[hid] = target;
@@ -432,11 +437,12 @@ function processBuffsForUnit(hid: number, buffs: { buffID: string; row: BuffRunt
   if (hid <= 0 || buffs.length === 0) return;
   // 检查暂停
   const unitRef = unitRefByHid[hid];
-  if (unitRef != null && isBuffPoolUnitPaused(unitRef)) return;
+  const paused = unitRef != null && isBuffPoolUnitPaused(unitRef);
 
   const expired: { buffID: string; row: BuffRuntime }[] = [];
   for (let i = 0; i < buffs.length; i++) {
     const { buffID, row } = buffs[i];
+    if (paused && row.tickWhilePaused !== true) continue;
     row.remaining = row.remaining - BUFF_POOL_TICK;
     if (row.remaining <= 0) {
       expired.push({ buffID, row });

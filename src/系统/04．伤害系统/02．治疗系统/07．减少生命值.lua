@@ -4,6 +4,7 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetHandleId = jass.GetHandleId
 local GetUnitStateJass = jass.GetUnitState
 local SetUnitStateJass = jass.SetUnitState
 local IsUnitType = jass.IsUnitType
@@ -20,8 +21,6 @@ local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统
 local fireShowDamageEvent = ____require_result_1.fireShowDamageEvent
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
-local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local getRegisteredPlayerHero = ____require_result_3.getRegisteredPlayerHero
 local _____9ED8_8BA4_751F_547D_51CF_5C11_7279_6548_8DEF_5F84 = "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl"
 local _____9ED8_8BA4_9B54_6CD5_6062_590D_7279_6548_8DEF_5F84 = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl"
 local _____9ED8_8BA4_9B54_6CD5_51CF_5C11_7279_6548_8DEF_5F84 = "Abilities\\Spells\\Human\\Feedback\\SpellBreakerAttack.mdl"
@@ -33,7 +32,11 @@ local function _____8BFB_53D6_9B54_6CD5_6D88_8017_51CF_5C11(target)
     if owner == nil or owner == 0 then
         return 0
     end
-    if getRegisteredPlayerHero(owner) ~= target then
+    local hero = YDUserDataGetSafe("player", owner, "英雄", "unit")
+    if hero == nil or hero == 0 then
+        return 0
+    end
+    if hero ~= target and GetHandleId(hero) ~= GetHandleId(target) then
         return 0
     end
     local value = YDUserDataGetSafe("player", owner, "魔法消耗", "real")

@@ -4,7 +4,7 @@
  */
 
 import {
-  IsUnitPaused, SetUnitPathing, PauseUnit,
+  IsUnitPaused, SetUnitPathing,
   GetUnitX, GetUnitY,
   SetUnitX, SetUnitY, SetUnitFacing,
   AddLightning, MoveLightning, MoveLightningEx, DestroyLightning,
@@ -15,6 +15,12 @@ import {
   单位存活, 在可玩区域内, 计算坐标距离, 计算朝向角度,
   X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY,
 } from "./00．共享";
+
+const { 释放单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
+};
+
+const 牵引暂停来源 = "牵引系统";
 
 function 尝试触发到达回调(实例: 牵引实例, 距离中心: number): boolean {
   if (实例.已触发到达回调 || 实例.到达距离 <= 0) return false;
@@ -127,7 +133,7 @@ export function 结束牵引实例(实例: 牵引实例, 原因: 牵引结束原
     SetUnitPathing(实例.单位, true);
   }
   if (实例.暂停单位) {
-    PauseUnit(实例.单位, false);
+    释放单位暂停占用(实例.单位, 牵引暂停来源);
   }
 
   const 单位 = 实例.单位;

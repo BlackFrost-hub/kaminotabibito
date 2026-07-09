@@ -1,14 +1,14 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local _____5355_4F4D_6709_6548_5B58_6D3B, ____on_6301_7EED_4F24_5BB3_8C03_5EA6Tick, jass, YDUserDataGetSafe, getServerTime, ATTACK_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitTypeId, GetUnitState, UNIT_STATE_LIFE, _____6301_7EED_4F24_5BB3_8C03_5EA6_5217_8868
+local _____5355_4F4D_6709_6548_5B58_6D3B, ____on_6301_7EED_4F24_5BB3_8C03_5EA6Tick, YDUserDataGetSafe, getServerTime, _____83B7_53D6_4F24_5BB3_5F52_5C5E_5355_4F4D, ATTACK_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetOwningPlayer, GetUnitTypeId, GetUnitState, UNIT_STATE_LIFE, _____6301_7EED_4F24_5BB3_8C03_5EA6_5217_8868
 local ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_6280_80FD_4F24_5BB3 = ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF["造成技能伤害"]
 ____exports["读取持续伤害加成"] = function(source)
     if source == nil or source == 0 then
         return 0
     end
-    local owner = jass.GetOwningPlayer(source)
+    local owner = GetOwningPlayer(source)
     if owner == nil then
         return 0
     end
@@ -79,7 +79,8 @@ ____exports["造成持续伤害"] = function(source, target, amount, damageType,
     if weaponType == nil then
         weaponType = WEAPON_TYPE_WHOKNOWS
     end
-    local finalAmount = ____exports["计算持续伤害最终值"](source, amount)
+    local mappedSource = _____83B7_53D6_4F24_5BB3_5F52_5C5E_5355_4F4D(source, target)
+    local finalAmount = ____exports["计算持续伤害最终值"](mappedSource, amount)
     if not (finalAmount > 0) then
         return false
     end
@@ -101,14 +102,19 @@ ____exports["造成持续伤害"] = function(source, target, amount, damageType,
         ["参与技能伤害加成"] = _____9009_9879 and _____9009_9879["参与技能伤害加成"]
     })
 end
-jass = require("jass.common")
+---
+-- @noSelfInFile
+local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_1.addPeriodicCallback
 getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("系统.04．伤害系统.04．伤害映射")
+_____83B7_53D6_4F24_5BB3_5F52_5C5E_5355_4F4D = ____require_result_2["获取伤害归属单位"]
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
+GetOwningPlayer = jass.GetOwningPlayer
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitState = jass.GetUnitState
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
@@ -138,27 +144,27 @@ ____exports["开始持续伤害"] = function(_____53C2_6570)
     if not (ticks > 0) then
         return 0
     end
-    local ____53C2_6570__6765_6E90_20 = _____53C2_6570["来源"]
-    local ____53C2_6570__76EE_6807_21 = _____53C2_6570["目标"]
-    local ____temp_22 = _____53C2_6570["总伤害"] / ticks
-    local ____53C2_6570__4F24_5BB3_7C7B_578B_23 = _____53C2_6570["伤害类型"]
-    local ____temp_24 = _____53C2_6570.ranged == true
-    local ____53C2_6570_attackType_18 = _____53C2_6570.attackType
-    if ____53C2_6570_attackType_18 == nil then
-        ____53C2_6570_attackType_18 = ATTACK_TYPE_NORMAL
+    local ____53C2_6570__6765_6E90_21 = _____53C2_6570["来源"]
+    local ____53C2_6570__76EE_6807_22 = _____53C2_6570["目标"]
+    local ____temp_23 = _____53C2_6570["总伤害"] / ticks
+    local ____53C2_6570__4F24_5BB3_7C7B_578B_24 = _____53C2_6570["伤害类型"]
+    local ____temp_25 = _____53C2_6570.ranged == true
+    local ____53C2_6570_attackType_19 = _____53C2_6570.attackType
+    if ____53C2_6570_attackType_19 == nil then
+        ____53C2_6570_attackType_19 = ATTACK_TYPE_NORMAL
     end
-    local ____53C2_6570_weaponType_19 = _____53C2_6570.weaponType
-    if ____53C2_6570_weaponType_19 == nil then
-        ____53C2_6570_weaponType_19 = WEAPON_TYPE_WHOKNOWS
+    local ____53C2_6570_weaponType_20 = _____53C2_6570.weaponType
+    if ____53C2_6570_weaponType_20 == nil then
+        ____53C2_6570_weaponType_20 = WEAPON_TYPE_WHOKNOWS
     end
     _____6301_7EED_4F24_5BB3_8C03_5EA6_5217_8868[#_____6301_7EED_4F24_5BB3_8C03_5EA6_5217_8868 + 1] = {
-        ["来源"] = ____53C2_6570__6765_6E90_20,
-        ["目标"] = ____53C2_6570__76EE_6807_21,
-        ["每跳伤害"] = ____temp_22,
-        ["伤害类型"] = ____53C2_6570__4F24_5BB3_7C7B_578B_23,
-        ranged = ____temp_24,
-        attackType = ____53C2_6570_attackType_18,
-        weaponType = ____53C2_6570_weaponType_19,
+        ["来源"] = ____53C2_6570__6765_6E90_21,
+        ["目标"] = ____53C2_6570__76EE_6807_22,
+        ["每跳伤害"] = ____temp_23,
+        ["伤害类型"] = ____53C2_6570__4F24_5BB3_7C7B_578B_24,
+        ranged = ____temp_25,
+        attackType = ____53C2_6570_attackType_19,
+        weaponType = ____53C2_6570_weaponType_20,
         ["选项"] = _____53C2_6570["选项"],
         ["剩余跳数"] = ticks,
         ["下次跳时刻"] = getServerTime() + intervalSec * 1000,

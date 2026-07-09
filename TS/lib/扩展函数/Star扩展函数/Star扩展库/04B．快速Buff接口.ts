@@ -34,6 +34,10 @@ import {
 import { SFB_施加自定义诅咒Buff } from "./04C．快速Buff诅咒";
 import { initItemIllusionSummonBridge, SFB_清空幻象物品上下文, SFB_记录幻象物品上下文 } from "./04D．快速Buff幻象物品";
 
+const { 施加睡眠 } = require("系统.05．Buff系统.07．睡眠系统") as {
+  施加睡眠: (this: void, 参数: { 来源单位?: any; 目标单位: any; 持续时间: number; 伤害阈值?: number; 保底时间?: number }) => boolean;
+};
+
 export { SFB_增益BUFF, SFB_负面BUFF, SFB_Unit, SFB_Init };
 
 initItemIllusionSummonBridge();
@@ -59,7 +63,7 @@ export function SFB_setNegativeBuff(sourceUnit: any, u: any, id: number, time: n
   } else if (id === SFB_负面BUFF.诅咒) {
     SFB_施加自定义诅咒Buff(sourceUnit, u, time);
   } else if (id === SFB_负面BUFF.睡眠) {
-    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.SLEEP, ORDER.SLEEP);
+    施加睡眠({ 来源单位: sourceUnit, 目标单位: u, 持续时间: time });
   } else if (id === SFB_负面BUFF.纠缠根须) {
     SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.ENTANGLING_ROOTS, ORDER.ENTANGLING_ROOTS);
   } else if (id === SFB_负面BUFF.飓风) {

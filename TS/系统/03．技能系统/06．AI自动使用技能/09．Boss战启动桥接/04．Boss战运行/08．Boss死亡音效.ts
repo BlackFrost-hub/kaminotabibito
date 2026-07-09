@@ -51,14 +51,19 @@ const Boss死亡音效配置表: Boss死亡音效配置[] = [
     音效路径: "Sound\\Boss\\Moltes\\SFX\\moltes_defeat_rotten_tree_quiet_11_subtle_tailfade.mp3",
     裁断距离: 2800,
   },
+  {
+    单位ID: "N01Y",
+    音效路径: "Sound\\Boss\\ShadowboneMortes\\SFX\\shadowbone_mortes_defeat_shadowbone_falls_05_sandy_layered.mp3",
+    裁断距离: 2800,
+  },
 ];
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { Sound3DII_CooPlay } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
-  Sound3DII_CooPlay: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -83,13 +88,13 @@ export function 尝试播放Boss死亡音效(this: void, bossUnit: any): void {
   if (config == null) return;
   const x = GetUnitX(bossUnit);
   const y = GetUnitY(bossUnit);
-  Sound3DII_CooPlay(config.音效路径, x, y, 0, config.裁断距离);
+  Sound3DII_CooPlayReuse(config.音效路径, x, y, 0, config.裁断距离);
   const list = config.延迟音效列表;
   if (list == null) return;
   for (let i = 0; i < list.length; i++) {
     const item = list[i];
     addDelayedCallback(item.延迟Ms, function Boss死亡延迟音效(this: void): void {
-      Sound3DII_CooPlay(item.音效路径, x, y, 0, config.裁断距离);
+      Sound3DII_CooPlayReuse(item.音效路径, x, y, 0, config.裁断距离);
     });
   }
 }

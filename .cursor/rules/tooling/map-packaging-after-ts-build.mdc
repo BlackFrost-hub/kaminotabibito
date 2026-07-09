@@ -35,3 +35,17 @@ alwaysApply: false
 - 不要只看 `src/**/*.lua` 就让用户进图测；测试图实际可能仍在用旧 `.build/war3map.lua`。
 - 不要把打包失败误判成业务代码没生效；先确认 `.build` 产物和测试图时间戳。
 - 改 DzAPI UI、物品主动技能、事件中心、伤害流程这类进图表现时，尤其要做 `.build` 和 `.w3x` 双确认。
+
+## Warcraft VSCode 命令 ID
+
+如果需要让 Warcraft VSCode 插件刷新 `.build/war3map.lua`，优先使用 VSCode 命令面板中的插件命令，而不是只运行 `npm run build`。
+
+命令 ID：
+
+```text
+extension.warcraft.compile.debug  -> Warcraft: Compile Script，刷新 `.build/war3map.lua`
+extension.warcraft.pack.debug     -> Warcraft: Pack Map，按 packlist 打包测试图
+extension.warcraft.run.debug      -> Warcraft: Run Map，compile + pack + 启动测试图
+```
+
+当前 Codex shell 不能直接通过 `code` CLI 调用 VSCode command ID；需要用户在 VSCode 命令面板执行，或使用 Computer Use 操作 VSCode。若只在 shell 中运行，则只能在 `.build/war3map.lua` 已确认最新后，使用 `MopaqPack-rs.exe generate -i .build\packlist.json -o .build\_warcraft_vscode_test.w3x` 重新打包。

@@ -17,6 +17,7 @@ local ENABLE_MIA_BOSS_SKILL_TEST = true
 local ENABLE_TREE_LORD_BOSS_SKILL_TEST = true
 local ENABLE_LATER_BOSS_SKILL_TEST = true
 local ENABLE_PASSIVE_ITEM_COOLDOWN_UI_TEST = true
+local ENABLE_EXTERNAL_VOICE_PACK_TEST = true
 local function loadTests(self)
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")
@@ -59,6 +60,9 @@ local function loadTests(self)
     end
     if ENABLE_PASSIVE_ITEM_COOLDOWN_UI_TEST then
         require("系统.12．测试系统.13．物品栏被动冷却UI测试")
+    end
+    if ENABLE_EXTERNAL_VOICE_PACK_TEST then
+        require("系统.12．测试系统.14．外置语音包测试")
     end
 end
 loadTests(nil)

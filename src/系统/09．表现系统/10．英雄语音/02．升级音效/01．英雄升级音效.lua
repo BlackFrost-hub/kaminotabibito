@@ -8,8 +8,8 @@ local _____82F1_96C4_5347_7EA7_97F3_6548_914D_7F6E_5217_8868 = ____00_FF0E_914D_
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.06．英雄升级事件中心")
 local registerHeroLevelListener = ____require_result_0.registerHeroLevelListener
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local ____require_result_2 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
 local _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_914D_7F6E = ____require_result_2["获取单位玩家英雄配置"]
 local ____require_result_3 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名")
@@ -18,6 +18,7 @@ local ____require_result_4 = require("lib.扩展函数.BJ函数.14．音效函�
 local PlaySoundBJ = ____require_result_4.PlaySoundBJ
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local _____82F1_96C4_5347_7EA7_97F3_6548_5DF2_521D_59CB_5316 = false
 local function _____53D6_5355_4F4D_5339_914D_540D_5217_8868(unit)
@@ -74,7 +75,15 @@ local function ____on_82F1_96C4_5347_7EA7_8BED_97F3(heroUnit)
     if heroUnit == nil or heroUnit == 0 then
         return
     end
-    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(heroUnit) then
+    local owner = GetOwningPlayer(heroUnit)
+    if owner == nil or owner == 0 then
+        return
+    end
+    local registeredHero = YDUserDataGetSafe("player", owner, "英雄", "unit")
+    if registeredHero == nil or registeredHero == 0 then
+        return
+    end
+    if registeredHero ~= heroUnit and GetHandleId(registeredHero) ~= GetHandleId(heroUnit) then
         return
     end
     if IsUnitType(heroUnit, jass.UNIT_TYPE_DEAD) then

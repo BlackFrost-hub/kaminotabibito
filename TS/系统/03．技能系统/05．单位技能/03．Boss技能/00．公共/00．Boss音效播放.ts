@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
-const { Sound3DII_CooPlay } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
-  Sound3DII_CooPlay: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -52,7 +52,7 @@ const Boss拟声池上次下标: Record<string, number | undefined> = {};
 
 export function 播放Boss坐标音效(this: void, path: string, x: number, y: number, cutoff: number): void {
   if (path === "") return;
-  Sound3DII_CooPlay(path, x, y, 0, cutoff);
+  Sound3DII_CooPlayReuse(path, x, y, 0, cutoff);
 }
 
 export function 延迟播放Boss坐标音效(this: void, path: string, x: number, y: number, delayMs: number, cutoff: number): void {

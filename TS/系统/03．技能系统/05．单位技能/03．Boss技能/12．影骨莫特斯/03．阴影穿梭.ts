@@ -2,11 +2,12 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取影骨莫特斯上下文, 获取或创建影骨莫特斯上下文, 设置影骨背刺准备, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y, 目标正面朝向来源, 取单位ID } from "./11．公共工具";
 import { 执行战斗自身位移到坐标 } from "../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -52,6 +53,7 @@ function on影骨背刺伤害修正(this: void, damageContext: any): number {
   if (单位有效(damageContext.target)) {
     const effect = AddSpecialEffectTarget(影骨莫特斯表现配置.背刺命中, damageContext.target, "chest");
     if (effect != null && effect !== 0) DestroyEffect(effect);
+    播放Boss坐标音效(影骨莫特斯音效配置.阴影穿梭.背刺命中, GetUnitX(damageContext.target), GetUnitY(damageContext.target), 影骨莫特斯音效配置.默认裁断距离);
   }
   return damage;
 }
@@ -85,6 +87,7 @@ function 影骨阴影穿梭完成(this: void): void {
       continue;
     }
     AddSpecialEffect(影骨莫特斯表现配置.阴影穿梭落点, x, y);
+    播放Boss坐标音效(影骨莫特斯音效配置.阴影穿梭.落点闪现, x, y, 影骨莫特斯音效配置.默认裁断距离);
     SetUnitInvulnerable(boss, false);
     SetUnitVertexColor(boss, 255, 255, 255, 255);
     设置影骨背刺准备(context, true);
@@ -97,6 +100,16 @@ export function 释放影骨阴影穿梭(this: void, context: 影骨莫特斯运
   if (!单位有效(boss)) return;
   播放影骨莫特斯台词(boss, "阴影穿梭");
   AddSpecialEffect(影骨莫特斯表现配置.阴影穿梭残影, GetUnitX(boss), GetUnitY(boss));
+  播放Boss坐标音效(影骨莫特斯音效配置.阴影穿梭.消失残影, GetUnitX(boss), GetUnitY(boss), 影骨莫特斯音效配置.默认裁断距离);
+  尝试播放Boss拟声池({
+    标识: 影骨莫特斯音效配置.怪物拟声.标识,
+    音效路径列表: 影骨莫特斯音效配置.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: 影骨莫特斯音效配置.默认裁断距离,
+    冷却Ms: 影骨莫特斯音效配置.怪物拟声.冷却Ms,
+    触发概率百分比: 影骨莫特斯音效配置.怪物拟声.关键机制触发概率百分比,
+  });
   SetUnitVertexColor(boss, 255, 255, 255, 80);
   SetUnitInvulnerable(boss, true);
   const id = 取单位ID(boss);

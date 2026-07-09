@@ -2,10 +2,11 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, 刷新影骨莫特斯阶段, type 影骨莫特斯运行时上下文, type 影骨召唤组 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y, 取单位ID } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -13,6 +14,7 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
+const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const GetPlayerState = jass.GetPlayerState as (whichPlayer: any, whichPlayerState: any) => number;
@@ -73,6 +75,13 @@ interface 影骨骸骨召唤分段变量 {
 }
 
 let 已注册骸骨召唤 = false;
+
+function 随机取影骨音效路径(this: void, list: readonly string[]): string {
+  const count = list.length;
+  if (count <= 0) return "";
+  if (count === 1) return list[0];
+  return list[GetRandomInt(0, count - 1)];
+}
 let 已注册骷髅偷窃 = false;
 const 影骨召唤物上下文表: Record<number, 影骨莫特斯运行时上下文 | undefined> = {};
 
@@ -142,6 +151,7 @@ function 影骨骸骨战士重组(this: void, variable: 影骨骸骨重组变量
   const y = 极坐标Y(GetUnitY(context.Boss单位), 影骨莫特斯数值与表现配置.骸骨召唤.召唤偏移半径, angle);
   创建影骨召唤物(context, 骸骨战士ID, x, y, undefined, false);
   AddSpecialEffect(影骨莫特斯表现配置.骸骨战士重组, x, y);
+  播放Boss坐标音效(随机取影骨音效路径(影骨莫特斯音效配置.骸骨召唤.骸骨战士重组列表), x, y, 影骨莫特斯音效配置.默认裁断距离);
 }
 
 function 尝试重组骸骨战士(this: void, context: 影骨莫特斯运行时上下文, group: 影骨召唤组): void {
@@ -194,14 +204,21 @@ export function 创建影骨召唤物(this: void, context: 影骨莫特斯运行
 }
 
 function 召唤影骨骷髅(this: void, context: 影骨莫特斯运行时上下文, group: 影骨召唤组, count: number): void {
+  let soundX = GetUnitX(context.Boss单位);
+  let soundY = GetUnitY(context.Boss单位);
   for (let i = 0; i < count; i++) {
     const angle = GetRandomReal(0, 360);
     const dist = GetRandomReal(80, 影骨莫特斯数值与表现配置.骸骨召唤.召唤偏移半径);
     const x = 极坐标X(GetUnitX(context.Boss单位), dist, angle);
     const y = 极坐标Y(GetUnitY(context.Boss单位), dist, angle);
+    if (i === 0) {
+      soundX = x;
+      soundY = y;
+    }
     AddSpecialEffect(影骨莫特斯表现配置.骸骨召唤预警, x, y);
     创建影骨召唤物(context, 骷髅盗贼ID, x, y, group, true);
   }
+  播放Boss坐标音效(影骨莫特斯音效配置.骸骨召唤.骷髅盗贼出生, soundX, soundY, 影骨莫特斯音效配置.默认裁断距离);
 }
 
 function 影骨骸骨召唤分段(this: void, variable: 影骨骸骨召唤分段变量): void {

@@ -248,11 +248,18 @@ function ____exports.isSummonedUnit(self, unit)
     return jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED)
 end
 --- 获取召唤物伤害修正
-function ____exports.getSummonDamageModifier(self, attacker, target, isPlayer)
+function ____exports.getSummonDamageModifier(self, attacker, target, isPlayer, attrSource)
     if not ____exports.isSummonedUnit(nil, attacker) then
         return {addDamage = 0, multiplier = 1}
     end
-    local summonDmg = getRealAttr(nil, attacker, "召唤物伤害", 0)
+    local ____temp_3
+    if attrSource ~= nil and attrSource ~= 0 then
+        ____temp_3 = attrSource
+    else
+        ____temp_3 = attacker
+    end
+    local source = ____temp_3
+    local summonDmg = getRealAttr(nil, source, "召唤物伤害", 0)
     local summonResist = getRealAttr(nil, target, "召唤物抗性", 0)
     local addDamage = createValueHolder(0)
     local multiplier = createValueHolder(1 - summonResist)

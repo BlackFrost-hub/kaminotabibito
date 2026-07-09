@@ -9,20 +9,30 @@ local ____exports = {}
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.00．伤害常量")
-local STAT_LIMITS = ____require_result_2.STAT_LIMITS
-local ENEMY_STAT_LIMITS = ____require_result_2.ENEMY_STAT_LIMITS
-local BREAKABLE_LIMITS = ____require_result_2.BREAKABLE_LIMITS
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.06．护甲获取")
-local YDWEGetUnitArmor = ____require_result_3.YDWEGetUnitArmor
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.00．伤害常量")
+local STAT_LIMITS = ____require_result_1.STAT_LIMITS
+local ENEMY_STAT_LIMITS = ____require_result_1.ENEMY_STAT_LIMITS
+local BREAKABLE_LIMITS = ____require_result_1.BREAKABLE_LIMITS
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.06．护甲获取")
+local YDWEGetUnitArmor = ____require_result_2.YDWEGetUnitArmor
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
+local GetHandleId = jass.GetHandleId
 --- 判断单位是否为玩家英雄
--- 以玩家英雄单位组为准；组未就绪时由独立 helper 回退到注册英雄桥接。
+-- 只读玩家侧已登记的“英雄”单位，避免伤害底层反向依赖英雄注册桥接。
 function ____exports.isPlayerUnit(self, unit)
-    return _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(nil, unit)
+    if unit == nil or unit == 0 then
+        return false
+    end
+    local owner = GetOwningPlayer(nil, unit)
+    if owner == nil or owner == 0 then
+        return false
+    end
+    local hero = YDUserDataGetSafe("player", owner, "英雄", "unit")
+    if hero == nil or hero == 0 then
+        return false
+    end
+    return hero == unit or GetHandleId(nil, hero) == GetHandleId(nil, unit)
 end
 --- 获取单位所属玩家ID
 function ____exports.getPlayerId(self, unit)

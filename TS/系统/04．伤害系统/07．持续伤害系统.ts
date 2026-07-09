@@ -9,9 +9,13 @@ const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
+const { 获取伤害归属单位 } = require("系统.04．伤害系统.04．伤害映射") as {
+  获取伤害归属单位: (this: void, attacker: any, target: any) => any;
+};
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -21,7 +25,7 @@ export const 持续伤害属性名 = "持续伤害";
 
 export function 读取持续伤害加成(this: void, source: any): number {
   if (source == null || source === 0) return 0;
-  const owner = jass.GetOwningPlayer(source);
+  const owner = GetOwningPlayer(source);
   if (owner == null) return 0;
   const value = Number(YDUserDataGetSafe("player", owner, 持续伤害属性名, "real")) || 0;
   return value > -0.95 ? value : -0.95;
@@ -115,7 +119,8 @@ export function 造成持续伤害(
   weaponType: any = WEAPON_TYPE_WHOKNOWS,
   选项?: 持续伤害选项
 ): boolean {
-  const finalAmount = 计算持续伤害最终值(source, amount);
+  const mappedSource = 获取伤害归属单位(source, target);
+  const finalAmount = 计算持续伤害最终值(mappedSource, amount);
   if (!(finalAmount > 0)) return false;
   return 造成技能伤害({
     来源: source,

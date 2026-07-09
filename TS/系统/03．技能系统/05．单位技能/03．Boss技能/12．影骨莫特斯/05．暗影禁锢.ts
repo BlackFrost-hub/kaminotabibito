@@ -2,10 +2,11 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -77,6 +78,7 @@ function 影骨暗影禁锢生效(this: void, variable?: any): void {
 
 function 创建影骨暗影法阵(this: void, context: 影骨莫特斯运行时上下文, x: number, y: number): void {
   const cfg = 影骨莫特斯数值与表现配置.暗影禁锢;
+  播放Boss坐标音效(影骨莫特斯音效配置.暗影禁锢.法阵生效, x, y, 影骨莫特斯音效配置.默认裁断距离);
   创建可攻击控制法阵({
     清理: context.清理,
     名称: "影骨-暗影禁锢法阵",
@@ -114,6 +116,7 @@ export function 释放影骨暗影禁锢(this: void, context: 影骨莫特斯运
     持续时间: cfg.预警秒,
     模型路径: 影骨莫特斯表现配置.暗影禁锢预警,
   });
+  播放Boss坐标音效(影骨莫特斯音效配置.暗影禁锢.预警, x, y, 影骨莫特斯音效配置.默认裁断距离);
   const id = addDelayedCallback(cfg.预警秒 * 1000, 影骨暗影禁锢生效, { context, x, y } as 影骨暗影禁锢延迟变量);
   context.清理.登记延迟回调("影骨-暗影禁锢", id);
 }

@@ -28,7 +28,7 @@ const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any | null;
 };
-const { 是玩家英雄组单位 } = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定") as {
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {

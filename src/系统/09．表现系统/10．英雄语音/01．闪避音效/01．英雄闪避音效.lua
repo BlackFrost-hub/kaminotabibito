@@ -7,21 +7,20 @@ local _____53D6_82F1_96C4_95EA_907F_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E[
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_0["是玩家英雄组单位"]
-local ____require_result_1 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
-local _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_914D_7F6E = ____require_result_1["获取单位玩家英雄配置"]
-local ____require_result_2 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名")
-local _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_5168_90E8_540D_79F0 = ____require_result_2["获取单位玩家英雄全部名称"]
-local ____require_result_3 = require("系统.04．伤害系统.05．闪避系统.01．闪避核心")
-local registerDodgeAppliedFinalDamageListener = ____require_result_3.registerDodgeAppliedFinalDamageListener
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_4.YDUserDataSetSafe
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_5.addDelayedCallback
+local ____require_result_0 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
+local _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_914D_7F6E = ____require_result_0["获取单位玩家英雄配置"]
+local ____require_result_1 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名")
+local _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_5168_90E8_540D_79F0 = ____require_result_1["获取单位玩家英雄全部名称"]
+local ____require_result_2 = require("系统.04．伤害系统.05．闪避系统.01．闪避核心")
+local registerDodgeAppliedFinalDamageListener = ____require_result_2.registerDodgeAppliedFinalDamageListener
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ
 local GetRandomInt = jass.GetRandomInt
@@ -36,19 +35,19 @@ local function _____53D6_82F1_96C4_540D(unit)
     if config == nil then
         return ""
     end
-    local ____config_Name_6 = config.Name
-    if ____config_Name_6 == nil then
-        ____config_Name_6 = ""
+    local ____config_Name_5 = config.Name
+    if ____config_Name_5 == nil then
+        ____config_Name_5 = ""
     end
-    local _____540D_79F0 = __TS__StringTrim(tostring(____config_Name_6))
+    local _____540D_79F0 = __TS__StringTrim(tostring(____config_Name_5))
     if _____540D_79F0 ~= "" then
         return _____540D_79F0
     end
-    local ____config_Propernames_7 = config.Propernames
-    if ____config_Propernames_7 == nil then
-        ____config_Propernames_7 = ""
+    local ____config_Propernames_6 = config.Propernames
+    if ____config_Propernames_6 == nil then
+        ____config_Propernames_6 = ""
     end
-    return __TS__StringTrim(tostring(____config_Propernames_7))
+    return __TS__StringTrim(tostring(____config_Propernames_6))
 end
 local function _____53D6_95EA_907F_97F3_6548(unit)
     local _____540D_79F0_5217_8868 = _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_5168_90E8_540D_79F0(unit)
@@ -59,11 +58,11 @@ local function _____53D6_95EA_907F_97F3_6548(unit)
             return nil
         end
         local _____7D22_5F15 = GetRandomInt(1, #_____914D_7F6E["音效列表"]) - 1
-        local ____914D_7F6E__97F3_6548_5217_8868_index_8 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
-        if ____914D_7F6E__97F3_6548_5217_8868_index_8 == nil then
-            ____914D_7F6E__97F3_6548_5217_8868_index_8 = nil
+        local ____914D_7F6E__97F3_6548_5217_8868_index_7 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
+        if ____914D_7F6E__97F3_6548_5217_8868_index_7 == nil then
+            ____914D_7F6E__97F3_6548_5217_8868_index_7 = nil
         end
-        return ____914D_7F6E__97F3_6548_5217_8868_index_8
+        return ____914D_7F6E__97F3_6548_5217_8868_index_7
     end
     do
         local i = 0
@@ -74,11 +73,11 @@ local function _____53D6_95EA_907F_97F3_6548(unit)
                     goto __continue10
                 end
                 local _____7D22_5F15 = GetRandomInt(1, #_____914D_7F6E["音效列表"]) - 1
-                local ____914D_7F6E__97F3_6548_5217_8868_index_9 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
-                if ____914D_7F6E__97F3_6548_5217_8868_index_9 == nil then
-                    ____914D_7F6E__97F3_6548_5217_8868_index_9 = nil
+                local ____914D_7F6E__97F3_6548_5217_8868_index_8 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
+                if ____914D_7F6E__97F3_6548_5217_8868_index_8 == nil then
+                    ____914D_7F6E__97F3_6548_5217_8868_index_8 = nil
                 end
-                return ____914D_7F6E__97F3_6548_5217_8868_index_9
+                return ____914D_7F6E__97F3_6548_5217_8868_index_8
             end
             ::__continue10::
             i = i + 1
@@ -90,7 +89,15 @@ local function _____5141_8BB8_64AD_653E(unit)
     if unit == nil or unit == 0 then
         return false
     end
-    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(unit) then
+    local owner = GetOwningPlayer(unit)
+    if owner == nil or owner == 0 then
+        return false
+    end
+    local hero = YDUserDataGetSafe("player", owner, "英雄", "unit")
+    if hero == nil or hero == 0 then
+        return false
+    end
+    if hero ~= unit and GetHandleId(hero) ~= GetHandleId(unit) then
         return false
     end
     if IsUnitType(unit, jass.UNIT_TYPE_DEAD) then

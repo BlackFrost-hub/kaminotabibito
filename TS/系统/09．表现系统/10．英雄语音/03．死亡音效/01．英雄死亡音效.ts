@@ -12,9 +12,6 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
-const { 是玩家英雄组单位 } = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定") as {
-  是玩家英雄组单位: (this: void, unit: any) => boolean;
-};
 const { 获取单位玩家英雄全部名称 } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名") as {
   获取单位玩家英雄全部名称: (this: void, unit: any) => string[];
 };
@@ -22,13 +19,19 @@ import { 英雄死亡音效冷却, 取英雄死亡音效配置 } from "./00．�
 
 const PlaySoundBJ = jass.PlaySoundBJ as (this: void, soundHandle: any) => void;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 
 let 英雄死亡音效已初始化 = false;
 const 死亡音效冷却结束单位队列: any[] = [];
 
 function 允许播放(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
-  if (!是玩家英雄组单位(unit)) return false;
+  const owner = GetOwningPlayer(unit);
+  if (owner == null || owner === 0) return false;
+  const hero = YDUserDataGetSafe("player", owner, "英雄", "unit");
+  if (hero == null || hero === 0) return false;
+  if (hero !== unit && GetHandleId(hero) !== GetHandleId(unit)) return false;
   return true;
 }
 

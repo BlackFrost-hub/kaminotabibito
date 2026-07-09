@@ -10,9 +10,6 @@ const jass = require("jass.common") as any;
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
-const { 是玩家英雄组单位 } = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定") as {
-  是玩家英雄组单位: (unit: any) => boolean;
-};
 const { STAT_LIMITS, ENEMY_STAT_LIMITS, BREAKABLE_LIMITS } = require("系统.04．伤害系统.00．伤害计算.00．伤害常量") as {
   STAT_LIMITS: Record<string, { max: number; min: number }>;
   ENEMY_STAT_LIMITS: Record<string, { max: number; min: number }>;
@@ -23,6 +20,7 @@ const { YDWEGetUnitArmor } = require("lib.扩展函数.YDWE函数.06．护甲获
 };
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
 //=============================================================================
 // 一、玩家判定
@@ -30,10 +28,15 @@ const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 
 /**
  * 判断单位是否为玩家英雄
- * 以玩家英雄单位组为准；组未就绪时由独立 helper 回退到注册英雄桥接。
+ * 只读玩家侧已登记的“英雄”单位，避免伤害底层反向依赖英雄注册桥接。
  */
 export function isPlayerUnit(unit: any): boolean {
-  return 是玩家英雄组单位(unit);
+  if (unit == null || unit === 0) return false;
+  const owner = GetOwningPlayer(unit);
+  if (owner == null || owner === 0) return false;
+  const hero = YDUserDataGetSafe("player", owner, "英雄", "unit");
+  if (hero == null || hero === 0) return false;
+  return hero === unit || GetHandleId(hero) === GetHandleId(unit);
 }
 
 /**

@@ -65,7 +65,7 @@ const {
   getEliteResistPct: (target: any, attacker: any) => number;
   getDemonDmgPctBonus: (attacker: any, target: any) => number;
   getDemonResistPct: (target: any, attacker: any) => number;
-  getSummonDamageModifier: (attacker: any, target: any, isPlayer: boolean) => { addDamage: number; multiplier: number };
+  getSummonDamageModifier: (attacker: any, target: any, isPlayer: boolean, attrSource?: any) => { addDamage: number; multiplier: number };
   calcElementalDamageBonus: (attacker: any, damageAttr: string) => number;
   calcElementalResistReduction: (target: any, resistAttr: string, isPlayer: boolean) => number;
 };
@@ -76,6 +76,7 @@ const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害�
   applyDamageModifiers: (this: void, context: {
     target: any;
     attacker: any;
+    originalAttacker?: any;
     baseDamage: number;
     currentDamage: number;
     isPhysicalDamage: boolean;
@@ -129,6 +130,9 @@ const { 获取当前技能伤害上下文 } = require("系统.04．伤害系统.
     participatesInSkillDamageBonus: boolean;
   } | null;
 };
+const { 获取伤害归属单位 } = require("系统.04．伤害系统.04．伤害映射") as {
+  获取伤害归属单位: (this: void, attacker: any, target: any) => any;
+};
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.02．计时器") as {
   createDelayedCall: (this: void, delaySec: number, callback: () => void) => any;
 };
@@ -164,6 +168,8 @@ const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.in
 //=============================================================================
 
 export interface DamageTypeSnapshot {
+  originalAttacker?: any;
+  mappedAttacker?: any;
   rawAttackType: any;
   rawDamageType: any;
   rawWeaponType: any;
@@ -314,10 +320,12 @@ function checkImmune(
 export function calculateDamage(
   target: any,
   attacker: any,
-  baseDamage: number
+  baseDamage: number,
+  originalAttacker?: any
 ): DamageResult {
   // 初始化
   let damage = baseDamage;
+  const rawAttacker = originalAttacker != null && originalAttacker !== 0 ? originalAttacker : attacker;
   const isPlayer = isPlayerUnit(target);
   const isNormalAtk = 伤害函数.isNormalAttack();
   const isPhysDmg = 伤害函数.isPhysicalDamage();
@@ -454,7 +462,7 @@ export function calculateDamage(
   finalMultiplier *= elementalResult.multiplier;
 
   // Step 14: 召唤物伤害修正
-  const summonMod = getSummonDamageModifier(attacker, target, isPlayer);
+  const summonMod = getSummonDamageModifier(rawAttacker, target, isPlayer, attacker);
   addDamage += summonMod.addDamage;
   finalMultiplier *= summonMod.multiplier;
 
@@ -601,9 +609,14 @@ export function onDamageEvent(
 ): void {
   if (target == null || baseDamage < 0.1) return;
   const snapshot = captureDamageTypeSnapshot();
+  const originalAttacker = attacker;
+  const mappedAttacker = 获取伤害归属单位(attacker, target);
+  snapshot.originalAttacker = originalAttacker;
+  snapshot.mappedAttacker = mappedAttacker;
+  attacker = mappedAttacker;
 
   // 计算最终伤害
-  const result = calculateDamage(target, attacker, baseDamage);
+  const result = calculateDamage(target, attacker, baseDamage, originalAttacker);
 
   // 免疫
   if (result.immune) {
@@ -621,6 +634,7 @@ export function onDamageEvent(
     finalDamage = applyDamageModifiers({
       target,
       attacker,
+      originalAttacker,
       baseDamage,
       currentDamage: finalDamage,
       isPhysicalDamage: snapshot.isPhysicalDamage,

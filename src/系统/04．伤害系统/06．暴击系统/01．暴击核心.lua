@@ -10,11 +10,11 @@ function _____901A_77E5_66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C(record, applied,
             do
                 local callback = _____66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868[i + 1]
                 if callback == nil then
-                    goto __continue26
+                    goto __continue29
                 end
                 callback(record, applied, snapshot)
             end
-            ::__continue26::
+            ::__continue29::
             i = i + 1
         end
     end
@@ -26,16 +26,16 @@ function _____66B4_51FB_6700_7EC8_4F24_5BB3_6865_63A5(target, attacker, applied,
             do
                 local record = _____66B4_51FB_6210_529F_8BB0_5F55_5217_8868[i + 1]
                 if record == nil then
-                    goto __continue30
+                    goto __continue33
                 end
                 if record.target ~= target or record.attacker ~= attacker then
-                    goto __continue30
+                    goto __continue33
                 end
                 __TS__ArraySplice(_____66B4_51FB_6210_529F_8BB0_5F55_5217_8868, i, 1)
                 _____901A_77E5_66B4_51FB_6700_7EC8_4F24_5BB3_76D1_542C(record, applied, snapshot)
                 return
             end
-            ::__continue30::
+            ::__continue33::
             i = i + 1
         end
     end
@@ -52,22 +52,30 @@ end
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
-local _____66B4_51FB_6982_7387_901A_8FC7 = ____require_result_2["暴击概率通过"]
-local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local getRegisteredPlayerHero = ____require_result_3.getRegisteredPlayerHero
-local ____require_result_4 = require("系统.04．伤害系统.06．暴击系统.00．暴击配置")
-local _____66B4_51FB_7CFB_7EDF_914D_7F6E = ____require_result_4["暴击系统配置"]
-local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-registerAppliedFinalDamageListener = ____require_result_5.registerAppliedFinalDamageListener
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
+local _____66B4_51FB_6982_7387_901A_8FC7 = ____require_result_1["暴击概率通过"]
+local ____require_result_2 = require("系统.04．伤害系统.06．暴击系统.00．暴击配置")
+local _____66B4_51FB_7CFB_7EDF_914D_7F6E = ____require_result_2["暴击系统配置"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+registerAppliedFinalDamageListener = ____require_result_3.registerAppliedFinalDamageListener
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
+local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local function _____8C03_7528_73A9_5BB6_82F1_96C4_5224_5B9A(unit)
-    return _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(unit) == true
+    if unit == nil or unit == 0 then
+        return false
+    end
+    local owner = GetOwningPlayer(unit)
+    if owner == nil or owner == 0 then
+        return false
+    end
+    local hero = YDUserDataGetSafe("player", owner, "英雄", "unit")
+    if hero == nil or hero == 0 then
+        return false
+    end
+    return hero == unit or GetHandleId(hero) == GetHandleId(unit)
 end
 local _____66B4_51FB_7387_4FEE_6B63_5668_5217_8868 = {}
 _____66B4_51FB_6210_529F_8BB0_5F55_5217_8868 = {}
@@ -116,7 +124,7 @@ local function _____5E94_7528_66B4_51FB_7387_4FEE_6B63(context)
             do
                 local callback = _____66B4_51FB_7387_4FEE_6B63_5668_5217_8868[i + 1]
                 if callback == nil then
-                    goto __continue16
+                    goto __continue19
                 end
                 context["暴击率"] = rate
                 local nextRate = callback(context)
@@ -124,7 +132,7 @@ local function _____5E94_7528_66B4_51FB_7387_4FEE_6B63(context)
                     rate = nextRate
                 end
             end
-            ::__continue16::
+            ::__continue19::
             i = i + 1
         end
     end
@@ -168,14 +176,14 @@ local function _____83B7_53D6_66B4_51FB_5F52_5C5E_5355_4F4D(attacker, target)
     if playerId < 0 or playerId > 4 then
         return attacker
     end
-    local hero = getRegisteredPlayerHero(owner)
-    local ____temp_6
+    local hero = YDUserDataGetSafe("player", owner, "英雄", "unit")
+    local ____temp_4
     if hero ~= nil and hero ~= 0 then
-        ____temp_6 = hero
+        ____temp_4 = hero
     else
-        ____temp_6 = attacker
+        ____temp_4 = attacker
     end
-    return ____temp_6
+    return ____temp_4
 end
 local function _____8BFB_53D6_653B_51FB_8005_66B4_51FB_5C5E_6027(attacker)
     if _____8C03_7528_73A9_5BB6_82F1_96C4_5224_5B9A(attacker) then

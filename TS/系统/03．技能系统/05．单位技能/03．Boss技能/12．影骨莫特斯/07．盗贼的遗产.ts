@@ -2,13 +2,16 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, 刷新影骨盗贼遗产Buff, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 
@@ -51,6 +54,7 @@ function 给Boss叠加盗贼遗产(this: void, context: 影骨莫特斯运行时
 function 开启影骨宝箱(this: void, context: 影骨莫特斯运行时上下文, x: number, y: number): void {
   给Boss叠加盗贼遗产(context);
   AddSpecialEffect(影骨莫特斯表现配置.宝箱出现, x, y);
+  播放Boss坐标音效(影骨莫特斯音效配置.盗贼的遗产.增益回流, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 影骨莫特斯音效配置.默认裁断距离);
 }
 
 function 影骨遗产宝箱开启中(this: void, opener: any, _chest: any, _elapsed: number, _config: any, variable: 影骨遗产宝箱变量): void {
@@ -72,6 +76,7 @@ function 创建影骨宝箱(this: void, context: 影骨莫特斯运行时上下�
   const point = 影骨莫特斯数值与表现配置.盗贼的遗产.宝箱点[index];
   if (point == null) return;
   AddSpecialEffect(影骨莫特斯表现配置.宝箱出现, point.X, point.Y);
+  播放Boss坐标音效(影骨莫特斯音效配置.盗贼的遗产.宝箱出现, point.X, point.Y, 影骨莫特斯音效配置.默认裁断距离);
   创建交互宝箱({
     清理: context.清理,
     名称: "影骨-盗贼遗产宝箱",

@@ -2,15 +2,18 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取影骨莫特斯上下文, 获取或创建影骨莫特斯上下文, 刷新影骨幽灵形态Buff, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 创建影骨召唤物 } from "./04．骸骨召唤";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, target: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
@@ -122,6 +125,17 @@ export function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运
   if (!单位有效(context.Boss单位)) return;
   播放影骨莫特斯台词(context.Boss单位, "幽影爆发");
   AddSpecialEffect(影骨莫特斯表现配置.幽影爆发开场, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心X, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心Y);
+  播放Boss坐标音效(影骨莫特斯音效配置.幽影爆发.领域展开, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心X, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心Y, 影骨莫特斯音效配置.默认裁断距离);
+  播放Boss坐标音效(影骨莫特斯音效配置.幽影爆发.召唤潮开始, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心X, 影骨莫特斯数值与表现配置.幽影爆发.召唤中心Y, 影骨莫特斯音效配置.默认裁断距离);
+  尝试播放Boss拟声池({
+    标识: 影骨莫特斯音效配置.怪物拟声.标识,
+    音效路径列表: 影骨莫特斯音效配置.怪物拟声.音效路径列表,
+    X: GetUnitX(context.Boss单位),
+    Y: GetUnitY(context.Boss单位),
+    裁断距离: 影骨莫特斯音效配置.默认裁断距离,
+    冷却Ms: 影骨莫特斯音效配置.怪物拟声.冷却Ms,
+    触发概率百分比: 影骨莫特斯音效配置.怪物拟声.爆发触发概率百分比,
+  });
   const aura = AddSpecialEffectTarget(影骨莫特斯表现配置.幽灵形态持续, context.Boss单位, "origin");
   const endVariable = { context, aura, 已销毁: false } as 影骨幽影爆发结束变量;
   if (aura != null && aura !== 0) context.清理.登记清理("影骨-幽灵形态", 销毁影骨幽灵形态特效, endVariable);

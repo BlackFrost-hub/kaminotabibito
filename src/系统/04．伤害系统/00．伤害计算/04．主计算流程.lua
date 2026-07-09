@@ -117,8 +117,10 @@ local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算
 local applyDamageModifiers = ____require_result_3.applyDamageModifiers
 local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587 = ____require_result_4["获取当前技能伤害上下文"]
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
-local createDelayedCall = ____require_result_5.createDelayedCall
+local ____require_result_5 = require("系统.04．伤害系统.04．伤害映射")
+local _____83B7_53D6_4F24_5BB3_5F52_5C5E_5355_4F4D = ____require_result_5["获取伤害归属单位"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
+local createDelayedCall = ____require_result_6.createDelayedCall
 local ConvertDamageType = jass.ConvertDamageType
 local ConvertAttackType = jass.ConvertAttackType
 local ConvertWeaponType = jass.ConvertWeaponType
@@ -209,8 +211,15 @@ end
 -- @param attacker 攻击者
 -- @param baseDamage 基础伤害
 -- @returns 伤害计算结果
-function ____exports.calculateDamage(target, attacker, baseDamage)
+function ____exports.calculateDamage(target, attacker, baseDamage, originalAttacker)
     local damage = baseDamage
+    local ____temp_35
+    if originalAttacker ~= nil and originalAttacker ~= 0 then
+        ____temp_35 = originalAttacker
+    else
+        ____temp_35 = attacker
+    end
+    local rawAttacker = ____temp_35
     local isPlayer = isPlayerUnit(nil, target)
     local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()
     local isPhysDmg = _____4F24_5BB3_51FD_6570.isPhysicalDamage()
@@ -307,7 +316,13 @@ function ____exports.calculateDamage(target, attacker, baseDamage)
     local elementalResult = applyElementalDamage(attacker, target, isPlayer)
     addDamage = addDamage + elementalResult.addDamage
     finalMultiplier = finalMultiplier * elementalResult.multiplier
-    local summonMod = getSummonDamageModifier(nil, attacker, target, isPlayer)
+    local summonMod = getSummonDamageModifier(
+        nil,
+        rawAttacker,
+        target,
+        isPlayer,
+        attacker
+    )
     addDamage = addDamage + summonMod.addDamage
     finalMultiplier = finalMultiplier * summonMod.multiplier
     local antBonus = getAntMasteryBonus(nil, attacker, target)
@@ -358,7 +373,12 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
         return
     end
     local snapshot = captureDamageTypeSnapshot()
-    local result = ____exports.calculateDamage(target, attacker, baseDamage)
+    local originalAttacker = attacker
+    local mappedAttacker = _____83B7_53D6_4F24_5BB3_5F52_5C5E_5355_4F4D(attacker, target)
+    snapshot.originalAttacker = originalAttacker
+    snapshot.mappedAttacker = mappedAttacker
+    attacker = mappedAttacker
+    local result = ____exports.calculateDamage(target, attacker, baseDamage, originalAttacker)
     if result.immune then
         _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
         notifyAppliedFinalDamageListeners(target, attacker, 0, snapshot)
@@ -371,6 +391,7 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
         finalDamage = applyDamageModifiers({
             target = target,
             attacker = attacker,
+            originalAttacker = originalAttacker,
             baseDamage = baseDamage,
             currentDamage = finalDamage,
             isPhysicalDamage = snapshot.isPhysicalDamage,

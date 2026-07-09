@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local _____65BD_52A0_7761_7720
 local ____04A_FF0E_5FEB_901FBuff_5171_4EAB = require("lib.扩展函数.Star扩展函数.Star扩展库.04A．快速Buff共享")
 local ABILITY = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.ABILITY
 local EXSetUnitFacing = ____04A_FF0E_5FEB_901FBuff_5171_4EAB.EXSetUnitFacing
@@ -77,14 +78,7 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
     elseif id == ____SFB__8D1F_9762BUFF["诅咒"] then
         ____SFB__65BD_52A0_81EA_5B9A_4E49_8BC5_5492Buff(sourceUnit, u, time)
     elseif id == ____SFB__8D1F_9762BUFF["睡眠"] then
-        ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
-            sourceUnit,
-            u,
-            id,
-            time,
-            ABILITY.SLEEP,
-            ORDER.SLEEP
-        )
+        _____65BD_52A0_7761_7720({["来源单位"] = sourceUnit, ["目标单位"] = u, ["持续时间"] = time})
     elseif id == ____SFB__8D1F_9762BUFF["纠缠根须"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
             sourceUnit,
@@ -241,6 +235,8 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
         IssueTargetOrderById(caster, orderStr, u)
     end
 end
+local ____require_result_0 = require("系统.05．Buff系统.07．睡眠系统")
+_____65BD_52A0_7761_7720 = ____require_result_0["施加睡眠"]
 ____exports["SFB_增益BUFF"] = ____SFB__589E_76CABUFF
 ____exports["SFB_负面BUFF"] = ____SFB__8D1F_9762BUFF
 ____exports.SFB_Unit = SFB_Unit

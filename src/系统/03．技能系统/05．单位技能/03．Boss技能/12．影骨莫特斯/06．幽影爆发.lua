@@ -10,6 +10,7 @@ local _____5237_65B0_5F71_9AA8_5E7D_7075_5F62_6001Buff = ____01_FF0E_8FD0_884C_6
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.02．数值与表现配置")
 local _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯数值与表现配置"]
 local _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯表现配置"]
+local _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯音效配置"]
 local ____04_FF0E_9AB8_9AA8_53EC_5524 = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.04．骸骨召唤")
 local _____521B_5EFA_5F71_9AA8_53EC_5524_7269 = ____04_FF0E_9AB8_9AA8_53EC_5524["创建影骨召唤物"]
 local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.12．影骨莫特斯.08．台词播放")
@@ -21,9 +22,14 @@ local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetRandomReal = jass.GetRandomReal
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
@@ -165,6 +171,17 @@ ____exports["释放影骨幽影爆发"] = function(context)
     end
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "幽影爆发")
     AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["幽影爆发开场"], _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤中心X"], _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤中心Y"])
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["幽影爆发"]["领域展开"], _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤中心X"], _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤中心Y"], _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["幽影爆发"]["召唤潮开始"], _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤中心X"], _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤中心Y"], _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
+    _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60({
+        ["标识"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["标识"],
+        ["音效路径列表"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["音效路径列表"],
+        X = GetUnitX(context["Boss单位"]),
+        Y = GetUnitY(context["Boss单位"]),
+        ["裁断距离"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"],
+        ["冷却Ms"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["冷却Ms"],
+        ["触发概率百分比"] = _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["爆发触发概率百分比"]
+    })
     local aura = AddSpecialEffectTarget(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["幽灵形态持续"], context["Boss单位"], "origin")
     local endVariable = {context = context, aura = aura, ["已销毁"] = false}
     if aura ~= nil and aura ~= 0 then

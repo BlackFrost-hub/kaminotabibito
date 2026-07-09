@@ -4,7 +4,6 @@ local ____exports = {}
 local ____00_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.01．牵引系统.00．共享")
 local IsUnitPaused = ____00_FF0E_5171_4EAB.IsUnitPaused
 local SetUnitPathing = ____00_FF0E_5171_4EAB.SetUnitPathing
-local PauseUnit = ____00_FF0E_5171_4EAB.PauseUnit
 local GetUnitX = ____00_FF0E_5171_4EAB.GetUnitX
 local GetUnitY = ____00_FF0E_5171_4EAB.GetUnitY
 local SetUnitX = ____00_FF0E_5171_4EAB.SetUnitX
@@ -35,6 +34,9 @@ ____exports["销毁闪电"] = function(_____5B9E_4F8B)
     end
     _____5B9E_4F8B["闪电句柄"] = nil
 end
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_0["释放单位暂停占用"]
+local _____7275_5F15_6682_505C_6765_6E90 = "牵引系统"
 local function _____5C1D_8BD5_89E6_53D1_5230_8FBE_56DE_8C03(_____5B9E_4F8B, _____8DDD_79BB_4E2D_5FC3)
     if _____5B9E_4F8B["已触发到达回调"] or _____5B9E_4F8B["到达距离"] <= 0 then
         return false
@@ -158,7 +160,7 @@ ____exports["结束牵引实例"] = function(_____5B9E_4F8B, _____539F_56E0)
         SetUnitPathing(_____5B9E_4F8B["单位"], true)
     end
     if _____5B9E_4F8B["暂停单位"] then
-        PauseUnit(_____5B9E_4F8B["单位"], false)
+        _____91CA_653E_5355_4F4D_6682_505C_5360_7528(_____5B9E_4F8B["单位"], _____7275_5F15_6682_505C_6765_6E90)
     end
     local _____5355_4F4D = _____5B9E_4F8B["单位"]
     local _____7275_5F15ID = _____5B9E_4F8B.id

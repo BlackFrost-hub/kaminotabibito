@@ -5,9 +5,6 @@ const jass = require("jass.common") as any;
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
-const { 是玩家英雄组单位 } = require("系统.04．伤害系统.00．伤害计算.01A．玩家英雄判定") as {
-  是玩家英雄组单位: (this: void, unit: any) => boolean;
-};
 const { 闪避概率通过 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统") as {
   闪避概率通过: (this: void, 原始概率: number, 受击者: any) => boolean;
 };
@@ -29,11 +26,17 @@ const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统
 };
 
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 function 调用玩家英雄判定(this: void, unit: any): boolean {
-  return 是玩家英雄组单位(unit) === true;
+  if (unit == null || unit === 0) return false;
+  const owner = GetOwningPlayer(unit);
+  if (owner == null || owner === 0) return false;
+  const hero = YDUserDataGetSafe("player", owner, "英雄", "unit");
+  if (hero == null || hero === 0) return false;
+  return hero === unit || GetHandleId(hero) === GetHandleId(unit);
 }
 
 export interface 闪避判定上下文 {

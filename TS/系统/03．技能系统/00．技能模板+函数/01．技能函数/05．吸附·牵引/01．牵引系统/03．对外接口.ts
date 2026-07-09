@@ -9,11 +9,17 @@ import {
   单位当前牵引,
   单位存活, 取句柄ID, 快照单位组,
   计算每Tick位移, 计算持续Tick数, 解析中心坐标,
-  SetUnitPathing, PauseUnit,
+  SetUnitPathing,
   活动牵引列表, 牵引映射,
 } from "./00．共享";
 import { 更新闪电, 结束牵引实例 } from "./01．移动与闪电";
 import { 结束牵引ID, 注册到中心计时器 } from "./02．驱动与实例";
+
+const { 申请单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
+};
+
+const 牵引暂停来源 = "牵引系统";
 
 function 创建牵引实例(单位: any, 参数: 牵引参数): 牵引实例 | null {
   if (!单位存活(单位)) return null;
@@ -66,7 +72,7 @@ function 创建牵引实例(单位: any, 参数: 牵引参数): 牵引实例 | n
     SetUnitPathing(单位, false);
   }
   if (实例.暂停单位) {
-    PauseUnit(单位, true);
+    申请单位暂停占用(单位, 牵引暂停来源);
   }
 
   活动牵引列表.push(实例);

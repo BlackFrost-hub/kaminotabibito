@@ -34,7 +34,10 @@ local function getOrCreateCooReuseSound(path, model)
     end
     return sound
 end
---- 在坐标处播放3D音效
+--- 稀有用法：在坐标处播放同一路径 3D 音效，最多允许 4 路同时叠放。
+-- 
+-- 默认不要用这个。普通 Boss 机制、单位/点位/坐标音效请用 Sound3DII_CooPlayReuse。
+-- 只有明确需要同一路径同时叠多声时，才使用这个 4 槽池化入口。
 -- 
 -- @param path 音效路径
 -- @param x X坐标
@@ -43,7 +46,7 @@ end
 -- @param cutoff 裁断距离
 -- @param model 声音模型（可选）
 -- @returns 播放的音效句柄
-function ____exports.Sound3DII_CooPlay(path, x, y, z, cutoff, model)
+function ____exports.Sound3DII_CooPlayPool4MultiInstanceRare(path, x, y, z, cutoff, model)
     if model == nil then
         model = getDefaultSoundModel()
     end
@@ -94,7 +97,7 @@ end
 -- 
 -- 同一路径只常驻1个 sound 句柄；重复播放时更新坐标并 Stop+Start。
 -- 适合 Boss 机制提示、UI化战斗反馈等不需要多声叠放的高频同路径音效。
--- 如果需要同一音效多实例同时叠放，请继续使用 Sound3DII_CooPlay。
+-- 默认 3D 音效入口应走这里，避免同一路径不断扩池。
 function ____exports.Sound3DII_CooPlayReuse(path, x, y, z, cutoff, model)
     if model == nil then
         model = getDefaultSoundModel()
@@ -133,7 +136,20 @@ function ____exports.Sound3DII_UnitPlay(path, unit, cutoff, model)
     local x = jass.GetUnitX(unit)
     local y = jass.GetUnitY(unit)
     local z = jass.GetUnitFlyHeight(unit)
-    return ____exports.Sound3DII_CooPlay(
+    return ____exports.Sound3DII_CooPlayReuse(
+        path,
+        x,
+        y,
+        z,
+        cutoff,
+        model
+    )
+end
+function ____exports.Sound3DII_UnitPlayReuse(path, unit, cutoff, model)
+    local x = jass.GetUnitX(unit)
+    local y = jass.GetUnitY(unit)
+    local z = jass.GetUnitFlyHeight(unit)
+    return ____exports.Sound3DII_CooPlayReuse(
         path,
         x,
         y,
@@ -152,7 +168,20 @@ function ____exports.Sound3DII_LocPlay(path, loc, cutoff, model)
     local x = jass.GetLocationX(loc)
     local y = jass.GetLocationY(loc)
     local z = jass.GetLocationZ(loc)
-    return ____exports.Sound3DII_CooPlay(
+    return ____exports.Sound3DII_CooPlayReuse(
+        path,
+        x,
+        y,
+        z,
+        cutoff,
+        model
+    )
+end
+function ____exports.Sound3DII_LocPlayReuse(path, loc, cutoff, model)
+    local x = jass.GetLocationX(loc)
+    local y = jass.GetLocationY(loc)
+    local z = jass.GetLocationZ(loc)
+    return ____exports.Sound3DII_CooPlayReuse(
         path,
         x,
         y,

@@ -53,6 +53,21 @@ export function registerBridge(): void {
   expose("GS_IsUnitSuspending", suspend.GS_IsUnitSuspending);
   expose("GS_LoadSuspend", suspend.GS_LoadSuspend);
   expose("GS_UnitSuspend", suspend.GS_UnitSuspend);
+  expose("GS_AcquireUnitPause", suspend.申请单位暂停占用);
+  expose("GS_ReleaseUnitPause", suspend.释放单位暂停占用);
+  expose("GS_AcquireUnitPauseUnique", suspend.申请单位暂停独立占用);
+  expose("GS_SetUnitPauseUnique", suspend.设置单位暂停独立占用);
+  expose("GS_ReleaseUnitPauseSourceAll", suspend.释放单位暂停来源全部);
+  expose("GS_ClearUnitPauseAll", suspend.清除单位全部暂停占用);
+  expose("GS_AcquireUnitPauseTimed", suspend.申请单位暂停占用定时);
+  expose("GS_CancelUnitPauseTimed", suspend.取消单位暂停占用定时);
+  expose("GS_HasUnitPauseOccupancy", suspend.单位是否存在暂停占用);
+  expose("GS_HasOtherUnitPauseOccupancy", suspend.单位是否存在其他暂停占用);
+  expose("GS_GetUnitPauseOccupancyCount", suspend.获取单位暂停占用总数);
+  expose("GS_GetUnitPauseSourceCount", suspend.获取单位暂停来源计数);
+  expose("GS_GetUnitPauseSources", suspend.获取单位暂停来源列表);
+  expose("GS_GetUnitPauseSnapshot", suspend.获取单位暂停快照);
+  expose("GS_RefreshUnitPauseState", suspend.刷新单位暂停底层状态);
   // 快速Buff系统
   expose("SFB_setBuff", fastBuff.SFB_setBuff);
   expose("SFB_setSlow", fastBuff.SFB_setSlow);
