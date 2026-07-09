@@ -149,4 +149,24 @@ ____exports["莫尔特斯数值与表现配置"] = {
         ["护盾破裂特效路径"] = "Common\\Effect\\Form\\Explosion\\CorruptionShieldBreak.mdx"
     }
 }
+____exports["莫尔特斯音效配置"] = {
+    ["默认裁断距离"] = 2800,
+    ["怪物拟声"] = {
+        ["标识"] = "MoltesCreature",
+        ["音效路径列表"] = {"Sound\\Boss\\Moltes\\SFX\\moltes_corrupted_tree_creature_moan_01_80k.mp3", "Sound\\Boss\\Moltes\\SFX\\moltes_corrupted_tree_creature_moan_02_80k.mp3", "Sound\\Boss\\Moltes\\SFX\\moltes_corrupted_tree_creature_moan_03_80k.mp3"},
+        ["冷却Ms"] = 9000,
+        ["关键机制触发概率百分比"] = 55,
+        ["转阶段触发概率百分比"] = 100
+    },
+    ["腐败值"] = {["满层缠绕"] = "Sound\\Boss\\Moltes\\SFX\\moltes_corruption_full_root_bind_02.mp3"},
+    ["腐朽根须穿刺"] = {["结算"] = "Sound\\Boss\\Moltes\\SFX\\moltes_rotten_root_impale_barrier_13.mp3"},
+    ["腐败孢子云"] = {["成形"] = "Sound\\Boss\\Moltes\\SFX\\moltes_spore_cloud_bloom_form_01.mp3"},
+    ["扭曲荆棘鞭笞"] = {["扫击"] = "Sound\\Boss\\Moltes\\SFX\\moltes_twisted_thorn_lash_sweep_01.mp3"},
+    ["腐败之种"] = {["扎根成长"] = "Sound\\Boss\\Moltes\\SFX\\moltes_corruption_seed_root_sapling_01.mp3"},
+    ["根系觉醒"] = {["机制开始"] = "Sound\\Boss\\Moltes\\SFX\\moltes_root_awaken_sources_rise_03.mp3", ["腐败之源摧毁"] = "Sound\\Boss\\Moltes\\SFX\\moltes_corruption_source_shatter_05_softened.mp3", ["失败爆发"] = "Sound\\Boss\\Moltes\\SFX\\moltes_root_awaken_fail_roots_nova_overlap_02.mp3"},
+    ["腐朽领域"] = {["展开"] = "Sound\\Boss\\Moltes\\SFX\\moltes_rotten_domain_marsh_runes_open_07_ducked_dang_80k.mp3"},
+    ["共生腐朽虫群"] = {["甲虫入场"] = "Sound\\Boss\\Moltes\\SFX\\moltes_symbiotic_rotten_beetles_spawn_07_puchi_clear.mp3"},
+    ["古木悲鸣"] = {["悲鸣波"] = "Sound\\Boss\\Moltes\\SFX\\moltes_ancient_tree_lament_fear_wave_06_water_muted_swarm.mp3"},
+    ["腐败传输"] = {["护盾增长"] = "Sound\\Boss\\Moltes\\SFX\\moltes_corruption_transfer_shield_gain_04_tail_heavy_soft.mp3"}
+}
 return ____exports

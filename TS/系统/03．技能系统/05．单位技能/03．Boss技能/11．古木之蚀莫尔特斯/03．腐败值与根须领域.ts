@@ -9,12 +9,13 @@ import {
   清除玩家腐败值,
   type 莫尔特斯运行时上下文,
 } from "./01．运行时上下文";
-import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置";
+import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 尝试触发莫尔特斯根系觉醒 } from "./08．根系觉醒";
 import { 处理莫尔特斯腐朽领域周期, 尝试触发莫尔特斯腐朽领域 } from "./09．腐朽领域";
 import { 尝试释放莫尔特斯共生腐朽虫群 } from "./10．共生腐朽虫群";
 import { 处理莫尔特斯腐败传输 } from "./12．腐败传输";
 import { 单位有效 } from "./16．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 
 const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -32,6 +33,10 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
 const { 莫尔特斯BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯") as {
   莫尔特斯BuffID: { 根须缠绕: string; 净化庇护: string; 腐败虫尸净化: string };
 };
+const jass = require("jass.common") as any;
+
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 
 let 已注册 = false;
 
@@ -54,6 +59,7 @@ function 确保根须宫格(this: void, context: 莫尔特斯运行时上下文)
 
 function 触发腐败满层缠绕(this: void, context: 莫尔特斯运行时上下文, unit: any): void {
   const cfg = 莫尔特斯数值与表现配置.腐败值;
+  播放Boss坐标音效(莫尔特斯音效配置.腐败值.满层缠绕, GetUnitX(unit), GetUnitY(unit), 莫尔特斯音效配置.默认裁断距离);
   施加禁锢({
     来源单位: context.Boss单位,
     目标单位: unit,

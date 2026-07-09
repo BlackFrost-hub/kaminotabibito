@@ -120,4 +120,21 @@ ____exports["卡瑟拉数值与表现配置"] = {
         ["再生触手持续秒"] = 18
     }
 }
+____exports["卡瑟拉音效配置"] = {
+    ["默认裁断距离"] = 2800,
+    ["怪物拟声"] = {
+        ["标识"] = "KaselaCreature",
+        ["音效路径列表"] = {"Sound\\Boss\\Kasela\\SFX\\kasela_deep_creature_groan_01_80k.mp3", "Sound\\Boss\\Kasela\\SFX\\kasela_deep_creature_groan_02_80k.mp3", "Sound\\Boss\\Kasela\\SFX\\kasela_deep_creature_groan_03_80k.mp3", "Sound\\Boss\\Kasela\\SFX\\kasela_deep_creature_groan_04_80k.mp3"},
+        ["冷却Ms"] = 9000,
+        ["关键机制触发概率百分比"] = 55,
+        ["转阶段触发概率百分比"] = 100
+    },
+    ["深海涡流"] = {["形成牵引"] = "Sound\\Boss\\Kasela\\SFX\\kasela_deep_vortex_form_pull_02.mp3", ["爆发"] = "Sound\\Boss\\Kasela\\SFX\\kasela_deep_vortex_pressure_blast_02.mp3"},
+    ["触手鞭笞"] = {["小触手出现"] = "Sound\\Boss\\Kasela\\SFX\\kasela_tentacle_lash_minions_emerge_02.mp3"},
+    ["墨汁喷吐"] = {["主段"] = "Sound\\Boss\\Kasela\\SFX\\kasela_ink_breath_stream_obscure_02.mp3"},
+    ["深渊召唤"] = {["幼鱿入场"] = "Sound\\Boss\\Kasela\\SFX\\kasela_abyss_spawn_young_squid_combo_06.mp3"},
+    ["高压水炮"] = {["发射"] = "Sound\\Boss\\Kasela\\SFX\\kasela_high_pressure_water_cannon_fire_01.mp3"},
+    ["触手解放"] = {["Boss下潜"] = "Sound\\Boss\\Kasela\\SFX\\kasela_tentacle_release_boss_dive_01.mp3", ["巨型触手出水"] = "Sound\\Boss\\Kasela\\SFX\\kasela_giant_tentacles_emerge_phase_start_02.mp3", ["成功破甲"] = "Sound\\Boss\\Kasela\\SFX\\kasela_tentacle_release_success_armor_break_01.mp3", ["失败回血"] = "Sound\\Boss\\Kasela\\SFX\\kasela_tentacle_release_fail_heal_return_02.mp3"},
+    ["共生电击"] = {["预警"] = "Sound\\Boss\\Kasela\\SFX\\kasela_symbiotic_shock_charge_warning_05.mp3", ["爆发"] = "Sound\\Boss\\Kasela\\SFX\\kasela_symbiotic_shock_fullscreen_blast_combo_04.mp3"}
+}
 return ____exports

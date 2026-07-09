@@ -2,9 +2,10 @@
 
 import { 卡瑟拉单位技能配置 } from "./00．配置";
 import { 获取或创建卡瑟拉上下文, 取玩家触手残片, 刷新卡瑟拉阶段, type 卡瑟拉运行时上下文 } from "./01．运行时上下文";
-import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
+import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 取坐标角度, 极坐标X, 极坐标Y, 点到线段距离平方, 距离平方XY } from "./14．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -90,6 +91,7 @@ function 结算高压水炮(this: void, context: 卡瑟拉运行时上下文, st
   const heroes = 获取Boss技能敌对英雄列表(boss);
   const radius2 = (cfg.宽度 * 0.5) * (cfg.宽度 * 0.5);
   const damage = 读取单位攻击力(boss) * cfg.Boss攻击力比例;
+  播放Boss坐标音效(卡瑟拉音效配置.高压水炮.发射, startX, startY, 卡瑟拉音效配置.默认裁断距离);
   播放水炮路径特效(context, startX, startY, angle);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];

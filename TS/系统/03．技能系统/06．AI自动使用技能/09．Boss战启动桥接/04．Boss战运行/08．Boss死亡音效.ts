@@ -41,6 +41,16 @@ const Boss死亡音效配置表: Boss死亡音效配置[] = [
     音效路径: "Sound\\Boss\\Felice\\SFX\\felice_defeat_soul_command_fades_puremix_12_fade.mp3",
     裁断距离: 2800,
   },
+  {
+    单位ID: "N05V",
+    音效路径: "Sound\\Boss\\Kasela\\SFX\\kasela_defeat_abyss_squid_sinks_01.mp3",
+    裁断距离: 2800,
+  },
+  {
+    单位ID: "N05W",
+    音效路径: "Sound\\Boss\\Moltes\\SFX\\moltes_defeat_rotten_tree_quiet_11_subtle_tailfade.mp3",
+    裁断距离: 2800,
+  },
 ];
 
 const jass = require("jass.common") as any;

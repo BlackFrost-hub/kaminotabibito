@@ -9,6 +9,7 @@ local _____589E_52A0_73A9_5BB6_8150_8D25_503C = ____01_FF0E_8FD0_884C_65F6_4E0A_
 local _____6E05_9664_73A9_5BB6_8150_8D25_503C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["清除玩家腐败值"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.02．数值与表现配置")
 local _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["莫尔特斯数值与表现配置"]
+local _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["莫尔特斯音效配置"]
 local ____08_FF0E_6839_7CFB_89C9_9192 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.08．根系觉醒")
 local _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_6839_7CFB_89C9_9192 = ____08_FF0E_6839_7CFB_89C9_9192["尝试触发莫尔特斯根系觉醒"]
 local ____09_FF0E_8150_673D_9886_57DF = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.09．腐朽领域")
@@ -20,6 +21,8 @@ local ____12_FF0E_8150_8D25_4F20_8F93 = require("系统.03．技能系统.05．�
 local _____5904_7406_83AB_5C14_7279_65AF_8150_8D25_4F20_8F93 = ____12_FF0E_8150_8D25_4F20_8F93["处理莫尔特斯腐败传输"]
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local getServerTime = ____require_result_0.getServerTime
@@ -31,6 +34,9 @@ local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_3.registerManualBuff
 local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯")
 local _____83AB_5C14_7279_65AFBuffID = ____require_result_4["莫尔特斯BuffID"]
+local jass = require("jass.common")
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local _____5DF2_6CE8_518C = false
 local function _____786E_4FDD_6839_987B_5BAB_683C(context)
     if context["根须宫格"] ~= nil then
@@ -52,6 +58,12 @@ local function _____786E_4FDD_6839_987B_5BAB_683C(context)
 end
 local function _____89E6_53D1_8150_8D25_6EE1_5C42_7F20_7ED5(context, unit)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败值"]
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["腐败值"]["满层缠绕"],
+        GetUnitX(unit),
+        GetUnitY(unit),
+        _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     _____65BD_52A0_7981_9522({
         ["来源单位"] = context["Boss单位"],
         ["目标单位"] = unit,

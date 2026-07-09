@@ -2,9 +2,10 @@
 
 import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科特运行时上下文 } from "./01．运行时上下文";
-import { 里科特数值与表现配置 } from "./02．数值与表现配置";
+import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度 } from "./13．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 创建延迟改向弹幕, type 延迟改向弹幕上下文 } from "../../../00．技能模板+函数/00．技能模板/09．复杂战斗模板/03．延迟改向弹幕模板";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -135,6 +136,7 @@ export function 释放里科特追击风刃(this: void, context: 里科特运行
       播放里科特台词(boss, "追击风刃");
     },
     on生效: function 里科特追击风刃生效(this: void): void {
+      播放Boss坐标音效(里科特音效配置.追击风刃.发射, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
       发射追击风刃(context, angle);
     },
   });

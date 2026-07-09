@@ -1,9 +1,10 @@
 /** @noSelfInFile */
 
 import { 增加玩家腐败值, 清除玩家腐败值, 取腐败值最高玩家, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
-import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置";
+import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y } from "./16．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 
 const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
@@ -199,6 +200,7 @@ export function 尝试释放莫尔特斯共生腐朽虫群(this: void, context: 
   if (nowMs < context.下次虫群时间) return;
   context.下次虫群时间 = nowMs + cfg.触发间隔秒 * 1000;
   播放莫尔特斯台词(context.Boss单位, "腐败之种");
+  播放Boss坐标音效(莫尔特斯音效配置.共生腐朽虫群.甲虫入场, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
   const 技能实例ID = 创建独立技能伤害实例({
     来源类型: "Boss技能",
     标签: "莫尔特斯共生腐朽虫群",

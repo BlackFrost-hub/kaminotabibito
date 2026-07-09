@@ -2,9 +2,10 @@
 
 import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科特运行时上下文 } from "./01．运行时上下文";
-import { 里科特数值与表现配置 } from "./02．数值与表现配置";
+import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 取坐标角度, 极坐标X, 极坐标Y, 点到线段距离平方 } from "./13．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -141,6 +142,7 @@ function 结算湮灭之炮一跳(this: void, data: 湮灭投影): void {
 
 function 开始湮灭投影炮击(this: void, data: 湮灭投影): void {
   const cfg = 里科特数值与表现配置.湮灭之炮;
+  播放Boss坐标音效(里科特音效配置.湮灭之炮.射线开火, data.起点X, data.起点Y, 里科特音效配置.默认裁断距离);
   data.剩余跳数 = cfg.锁定持续秒 / cfg.tick秒;
   data.周期ID = addPeriodicCallback(cfg.tick秒 * 1000, function 里科特湮灭投影周期炮击(this: void): void {
     结算湮灭之炮一跳(data);
@@ -157,6 +159,7 @@ function 调度单个湮灭投影(this: void, context: 里科特运行时上下�
   const py = 极坐标Y(GetUnitY(target), angle, cfg.投影距离);
   const face = 取坐标角度(px, py, GetUnitX(target), GetUnitY(target));
   const projection = 创建湮灭投影单位(boss, px, py, face);
+  播放Boss坐标音效(里科特音效配置.湮灭之炮.投影锁定, px, py, 里科特音效配置.默认裁断距离);
   const data: 湮灭投影 = {
     context,
     投影: projection,

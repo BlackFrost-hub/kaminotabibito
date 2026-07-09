@@ -2,11 +2,12 @@
 
 import { 莫尔特斯单位技能配置 } from "./00．配置";
 import { 获取或创建莫尔特斯上下文, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
-import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置";
+import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
@@ -70,6 +71,7 @@ function 结算单格根须穿刺(this: void, context: 莫尔特斯运行时上�
   if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.腐朽根须穿刺;
   AddSpecialEffect(cfg.穿刺特效路径, cell.中心X, cell.中心Y);
+  播放Boss坐标音效(莫尔特斯音效配置.腐朽根须穿刺.结算, cell.中心X, cell.中心Y, 莫尔特斯音效配置.默认裁断距离);
   创建可攻击机制单位({
     清理: context.清理,
     名称: "莫尔特斯-残留根须",

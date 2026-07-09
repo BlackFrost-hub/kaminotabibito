@@ -9,9 +9,10 @@ import {
   清除里科特神风印记,
   type 里科特运行时上下文,
 } from "./01．运行时上下文";
-import { 里科特数值与表现配置 } from "./02．数值与表现配置";
+import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC } from "./13．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
@@ -134,6 +135,7 @@ function 结算单个神风粉碎(this: void, context: 里科特运行时上下�
     来源类型: "Boss技能",
   });
   施加眩晕(context.Boss单位, target, stun);
+  播放Boss坐标音效(里科特音效配置.神风护体.粉碎清算, GetUnitX(target), GetUnitY(target), 里科特音效配置.默认裁断距离);
   播放限时点特效(cfg.粉碎特效路径, GetUnitX(target), GetUnitY(target), 1);
   清除里科特神风印记(context, target);
   移除单位指定Buff(target, 里科特BuffID.神风印记);
@@ -177,6 +179,7 @@ function on里科特神风护体施法(this: void, castingUnit: any, spellAbilit
   const context = 获取或创建里科特上下文(castingUnit);
   if (context == null) return;
   播放里科特台词(castingUnit, "神风护体");
+  播放Boss坐标音效(里科特音效配置.神风护体.展开, GetUnitX(castingUnit), GetUnitY(castingUnit), 里科特音效配置.默认裁断距离);
   设置神风护体层数(context);
   调度神风粉碎(context);
 }

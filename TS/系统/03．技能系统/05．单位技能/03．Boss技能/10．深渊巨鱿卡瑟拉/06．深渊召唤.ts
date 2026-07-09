@@ -1,9 +1,10 @@
 /** @noSelfInFile */
 
 import { type 卡瑟拉运行时上下文, 增加玩家触手残片 } from "./01．运行时上下文";
-import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
+import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y } from "./14．公共工具";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 
 const jass = require("jass.common") as any;
 
@@ -77,6 +78,16 @@ export function 释放卡瑟拉深渊召唤(this: void, context: 卡瑟拉运行
   if (!单位有效(boss) || context.Boss潜入中) return;
   const cfg = 卡瑟拉数值与表现配置.深渊召唤;
   播放卡瑟拉台词(boss, "深渊召唤");
+  播放Boss坐标音效(卡瑟拉音效配置.深渊召唤.幼鱿入场, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
+  尝试播放Boss拟声池({
+    标识: 卡瑟拉音效配置.怪物拟声.标识,
+    音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: 卡瑟拉音效配置.默认裁断距离,
+    冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
+    触发概率百分比: 卡瑟拉音效配置.怪物拟声.关键机制触发概率百分比,
+  });
   for (let i = 0; i < cfg.幼鱿数量; i++) {
     创建深渊幼鱿(context, i * 120);
   }

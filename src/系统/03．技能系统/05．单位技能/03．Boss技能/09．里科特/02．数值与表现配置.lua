@@ -112,4 +112,13 @@ ____exports["里科特数值与表现配置"] = {
         ["反击特效路径"] = "Common\\Effect\\Form\\Shield\\CounterShieldImpact.mdx"
     }
 }
+____exports["里科特音效配置"] = {
+    ["默认裁断距离"] = 2800,
+    ["四重风刃"] = {["跳劈身法掠风"] = "Sound\\Boss\\Ricote\\SFX\\ricote_quad_windblade_leap_impact_07.mp3", ["四龙卷发射"] = "Sound\\Boss\\Ricote\\SFX\\ricote_quad_windblade_tornado_x_release_03.mp3"},
+    ["追击风刃"] = {["发射"] = "Sound\\Boss\\Ricote\\SFX\\ricote_chasing_windblade_release_01.mp3"},
+    ["神风护体"] = {["展开"] = "Sound\\Boss\\Ricote\\SFX\\ricote_divine_wind_shield_open_01.mp3", ["粉碎清算"] = "Sound\\Boss\\Ricote\\SFX\\ricote_divine_wind_mark_shatter_resolve_02.mp3"},
+    ["湮灭之炮"] = {["投影锁定"] = "Sound\\Boss\\Ricote\\SFX\\ricote_annihilation_cannon_projection_lock_02.mp3", ["射线开火"] = "Sound\\Boss\\Ricote\\SFX\\ricote_annihilation_cannon_beam_fire_01.mp3"},
+    ["湮灭之风"] = {["风场展开"] = "Sound\\Boss\\Ricote\\SFX\\ricote_annihilation_wind_field_open_02.mp3"},
+    ["破魔反击"] = {["窗口开启"] = "Sound\\Boss\\Ricote\\SFX\\ricote_counter_window_open_04.mp3", ["触发剥离"] = "Sound\\Boss\\Ricote\\SFX\\ricote_counter_trigger_life_strip_01.mp3"}
+}
 return ____exports

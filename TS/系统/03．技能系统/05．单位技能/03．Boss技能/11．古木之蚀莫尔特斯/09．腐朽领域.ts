@@ -1,9 +1,10 @@
 /** @noSelfInFile */
 
 import { 增加玩家腐败值, 清除玩家腐败值, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
-import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置";
+import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效 } from "./16．公共工具";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 
 const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
@@ -155,6 +156,16 @@ export function 尝试触发莫尔特斯腐朽领域(this: void, context: 莫尔
   播放莫尔特斯台词(context.Boss单位, "低血量");
   创建腐朽领域沼泽地表(context);
   创建净化符文(context);
+  播放Boss坐标音效(莫尔特斯音效配置.腐朽领域.展开, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
+  尝试播放Boss拟声池({
+    标识: 莫尔特斯音效配置.怪物拟声.标识,
+    音效路径列表: 莫尔特斯音效配置.怪物拟声.音效路径列表,
+    X: GetUnitX(context.Boss单位),
+    Y: GetUnitY(context.Boss单位),
+    裁断距离: 莫尔特斯音效配置.默认裁断距离,
+    冷却Ms: 莫尔特斯音效配置.怪物拟声.冷却Ms,
+    触发概率百分比: 莫尔特斯音效配置.怪物拟声.转阶段触发概率百分比,
+  });
 }
 
 export function 处理莫尔特斯腐朽领域周期(this: void, context: 莫尔特斯运行时上下文, nowMs: number): void {

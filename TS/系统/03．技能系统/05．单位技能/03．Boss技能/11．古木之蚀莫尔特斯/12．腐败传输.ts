@@ -1,8 +1,9 @@
 /** @noSelfInFile */
 
 import { 增加玩家腐败值, 刷新Boss腐败护盾Buff, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
-import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置";
+import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 单位有效 } from "./16．公共工具";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 
 const jass = require("jass.common") as any;
 
@@ -52,6 +53,16 @@ function 执行一次腐败传输(this: void, context: 莫尔特斯运行时上�
   context.腐败护盾值 = context.腐败护盾值 + cfg.转移腐败值 * cfg.护盾每点腐败值;
   刷新Boss腐败护盾Buff(context);
   创建腐败传输连线(context, target);
+  播放Boss坐标音效(莫尔特斯音效配置.腐败传输.护盾增长, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
+  尝试播放Boss拟声池({
+    标识: 莫尔特斯音效配置.怪物拟声.标识,
+    音效路径列表: 莫尔特斯音效配置.怪物拟声.音效路径列表,
+    X: GetUnitX(context.Boss单位),
+    Y: GetUnitY(context.Boss单位),
+    裁断距离: 莫尔特斯音效配置.默认裁断距离,
+    冷却Ms: 莫尔特斯音效配置.怪物拟声.冷却Ms,
+    触发概率百分比: 莫尔特斯音效配置.怪物拟声.关键机制触发概率百分比,
+  });
 }
 
 export function 处理莫尔特斯腐败传输(this: void, context: 莫尔特斯运行时上下文, _nowMs: number): void {

@@ -1,9 +1,10 @@
 /** @noSelfInFile */
 
 import { type 卡瑟拉运行时上下文, 刷新卡瑟拉阶段 } from "./01．运行时上下文";
-import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
+import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y } from "./14．公共工具";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 
 const jass = require("jass.common") as any;
 
@@ -66,9 +67,11 @@ function 回归卡瑟拉(this: void, data: 触手解放实例, success: boolean)
   播放潜入特效(GetUnitX(boss), GetUnitY(boss));
   const cfg = 卡瑟拉数值与表现配置.触手解放;
   if (success) {
+    播放Boss坐标音效(卡瑟拉音效配置.触手解放.成功破甲, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
     const armorDown = data.击破数量 * cfg.每条破甲比例 * 100;
     if (armorDown > 0) 临时调整护甲(boss, -armorDown);
   } else {
+    播放Boss坐标音效(卡瑟拉音效配置.触手解放.失败回血, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
     治疗Boss最大生命比例(boss, cfg.失败回血比例);
   }
 }
@@ -113,6 +116,16 @@ export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉
   context.触手解放已触发 = true;
   context.Boss潜入中 = true;
   播放卡瑟拉台词(boss, "触手解放");
+  播放Boss坐标音效(卡瑟拉音效配置.触手解放.Boss下潜, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
+  尝试播放Boss拟声池({
+    标识: 卡瑟拉音效配置.怪物拟声.标识,
+    音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: 卡瑟拉音效配置.默认裁断距离,
+    冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
+    触发概率百分比: 卡瑟拉音效配置.怪物拟声.转阶段触发概率百分比,
+  });
   播放潜入特效(GetUnitX(boss), GetUnitY(boss));
   ShowUnit(boss, false);
   PauseUnit(boss, true);
@@ -125,6 +138,7 @@ export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉
     来源单位: boss,
   });
   const data: 触手解放实例 = { context, 已结束: false, 击破数量: 0, 总数量: cfg.触手数量 };
+  播放Boss坐标音效(卡瑟拉音效配置.触手解放.巨型触手出水, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
   for (let i = 0; i < cfg.触手数量; i++) {
     创建巨型触手(data, i * 90);
   }

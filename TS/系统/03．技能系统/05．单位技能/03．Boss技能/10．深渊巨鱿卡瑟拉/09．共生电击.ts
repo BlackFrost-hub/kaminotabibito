@@ -1,9 +1,10 @@
 /** @noSelfInFile */
 
 import { type 卡瑟拉运行时上下文, 消耗玩家触手残片, 刷新卡瑟拉阶段 } from "./01．运行时上下文";
-import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
+import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY } from "./14．公共工具";
+import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../00．公共/00．Boss音效播放";
 import { 创建动态装饰物安全区组 } from "../../../00．技能模板+函数/04．机制组件/02．战斗区域/06．动态装饰物安全区组";
 
 const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -101,6 +102,7 @@ function 结算卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上�
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.Boss潜入中) return;
   const cfg = 卡瑟拉数值与表现配置.共生电击;
+  播放Boss坐标音效(卡瑟拉音效配置.共生电击.爆发, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
   播放点特效(cfg.全屏命中特效路径, GetUnitX(boss), GetUnitY(boss));
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
@@ -143,6 +145,16 @@ export function 尝试释放卡瑟拉共生电击(this: void, context: 卡瑟拉
   if (nowMs < context.下次共生电击时间) return;
   context.下次共生电击时间 = nowMs + cfg.间隔秒 * 1000;
   播放卡瑟拉台词(boss, "共生电击");
+  播放Boss坐标音效(卡瑟拉音效配置.共生电击.预警, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
+  尝试播放Boss拟声池({
+    标识: 卡瑟拉音效配置.怪物拟声.标识,
+    音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: 卡瑟拉音效配置.默认裁断距离,
+    冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
+    触发概率百分比: 卡瑟拉音效配置.怪物拟声.关键机制触发概率百分比,
+  });
   播放点特效(cfg.蓄力特效路径, GetUnitX(boss), GetUnitY(boss));
   预警绝缘珊瑚(context);
   const 技能实例ID = 创建独立技能伤害实例({

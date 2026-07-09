@@ -2,9 +2,10 @@
 
 import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 获取全部里科特上下文, type 里科特运行时上下文 } from "./01．运行时上下文";
-import { 里科特数值与表现配置 } from "./02．数值与表现配置";
+import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 距离平方XY } from "./13．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 
@@ -70,6 +71,7 @@ function 开始破魔反击窗口(this: void, context: 里科特运行时上下�
   const cfg = 里科特数值与表现配置.破魔反击;
   context.破魔反击中 = true;
   registerManualBuff(boss, 里科特BuffID.破魔反击, cfg.反击窗口秒, 1, { sourceName: "里科特-破魔反击" });
+  播放Boss坐标音效(里科特音效配置.破魔反击.窗口开启, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
   播放限时反击特效(boss);
   创建技能提示圈({
     类型: "圆形",
@@ -118,6 +120,7 @@ function on里科特破魔反击伤害修正(this: void, damageContext: any): nu
   const ratio = distance2 <= near2 ? cfg.近距离当前生命移除比例 : cfg.远距离当前生命移除比例;
   按比例移除当前生命(attacker, ratio, true);
   施加眩晕(boss, attacker, cfg.眩晕秒);
+  播放Boss坐标音效(里科特音效配置.破魔反击.触发剥离, GetUnitX(attacker), GetUnitY(attacker), 里科特音效配置.默认裁断距离);
   播放限时反击特效(attacker);
   结束破魔反击窗口(context);
   return damageContext.currentDamage;

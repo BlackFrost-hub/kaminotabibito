@@ -2,9 +2,10 @@
 
 import { 卡瑟拉单位技能配置 } from "./00．配置";
 import { 获取或创建卡瑟拉上下文, 增加玩家触手残片, 取玩家触手残片, type 卡瑟拉运行时上下文 } from "./01．运行时上下文";
-import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
+import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y } from "./14．公共工具";
+import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
@@ -163,6 +164,7 @@ function 释放触手围攻(this: void, context: 卡瑟拉运行时上下文, ta
   const cfg = 卡瑟拉数值与表现配置.触手鞭笞;
   const cx = GetUnitX(target);
   const cy = GetUnitY(target);
+  播放Boss坐标音效(卡瑟拉音效配置.触手鞭笞.小触手出现, cx, cy, 卡瑟拉音效配置.默认裁断距离);
   for (let i = 0; i < cfg.触手数量; i++) {
     const angle = i * 120;
     创建单条触手(context, target, 极坐标X(cx, angle, cfg.触手半径), 极坐标Y(cy, angle, cfg.触手半径));
