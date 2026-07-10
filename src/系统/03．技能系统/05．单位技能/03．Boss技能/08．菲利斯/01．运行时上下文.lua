@@ -5,13 +5,21 @@ local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("�
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
+local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.08．台词播放")
+local _____64AD_653E_83F2_5229_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放菲利斯台词"]
+local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.11．公共工具")
+local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_1.registerDeathListener
+local jass = require("jass.common")
+local GetUnitTypeId = jass.GetUnitTypeId
+local _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____83F2_5229_65AF_5251_9B42_72FC_8868 = {}
 local _____83F2_5229_65AF_6B7B_4EA1_6E05_7406_5DF2_6CE8_518C = false
 local function _____521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587(boss, _____6E05_7406)
+    _____64AD_653E_83F2_5229_65AF_53F0_8BCD(boss, "开场", 0)
     return {
         ["Boss单位"] = boss,
         ["阶段"] = 1,
@@ -64,6 +72,9 @@ ____exports["获取菲利斯剑魂狼记录"] = function(wolf)
     return ____temp_2
 end
 local function ____on_83F2_5229_65AF_5355_4F4D_6B7B_4EA1(dyingUnit)
+    if GetUnitTypeId(dyingUnit) == _____83F2_5229_65AF_5355_4F4D_7C7B_578BID then
+        _____64AD_653E_83F2_5229_65AF_53F0_8BCD(dyingUnit, "死亡", 0)
+    end
     local id = _____53D6_5355_4F4DID(dyingUnit)
     if id == 0 then
         return

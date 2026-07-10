@@ -1,0 +1,28 @@
+---
+description: 技能与 Boss 制作规则入口：按任务路由到通用技能规则、Boss 落地、奖励装备、踩坑经验和验收清单
+globs: TS/系统/03．技能系统/05．单位技能/03．Boss技能/**/*.ts, TS/系统/03．技能系统/05．单位技能/03．Boss技能/**/*.md, TS/系统/03．技能系统/06．AI自动使用技能/**/*.ts, TS/系统/02．物品系统/**/*.ts, TS/系统/12．测试系统/**/*.ts, objediting/Equipment/**/*.lua
+alwaysApply: false
+---
+
+# 技能与 Boss 制作规则入口
+
+这个文件只做路由，不再承载所有细节。制作、维护、测试英雄主动、Boss 主动、单位技能、装备技能或 Boss 落地时，先读本入口，再按任务类型读取通用技能规则和 `boss-production-workflow/` 下的具体规则。
+
+## 必读顺序
+
+1. 制作任意技能：先读 `.cursor/rules/gameplay/skills/skill-damage-shape-and-independent-skill.mdc`，完成 `AOE` / `单体` / `独立技能` / `位移技能` 四项判定，再读 `02．技能实现与表现规则.mdc`。
+2. 新建或完整落地 Boss：先读 `01．Boss落地流程与结构.mdc`，再读 `.cursor/rules/gameplay/skills/skill-damage-shape-and-independent-skill.mdc` 和 `02．技能实现与表现规则.mdc`，最后读 `05．验收清单.mdc`。
+3. 制作 Boss 技能或护卫技能：先读 `.cursor/rules/gameplay/skills/skill-damage-shape-and-independent-skill.mdc`，再读 `02．技能实现与表现规则.mdc`；涉及护卫目录时补读 `01．Boss落地流程与结构.mdc` 的护卫部分。
+4. 接入 Boss AI、Boss 战启动、死亡结算、首领奖励或 Boss 装备：读 `03．接入奖励与装备规则.mdc`。
+5. 写测试命令、临时测试场、排查进图表现：读 `.cursor/rules/gameplay/skills/skill-test-rules.mdc`，并补读 `04．踩坑经验.mdc` 的测试与构建部分。
+6. 处理特效路径、贴图、模型导入：读 `.cursor/rules/resources/visual/model-texture-asset-rules.mdc` 和 `.cursor/rules/resources/visual/effect-resource-folder-layout.mdc`，并补读 `04．踩坑经验.mdc` 的特效部分。
+7. 做最终交付前：读 `05．验收清单.mdc`。
+
+## 核心原则
+
+- Boss 文档语义必须逐条落地，不要只按关键词实现。
+- 数值、时间、范围、动画、特效、Buff、召唤物和台词优先集中到 Boss 配置表，技能文件只读配置并执行逻辑。
+- 有延迟伤害就必须有预警；有目标导向就必须朝向目标；视觉时点必须和真实伤害/控制时点一致。
+- 护卫、核心、分身等拥有独立技能组的长期单位，必须拆成 Boss 目录下的独立子文件夹。
+- 正式 Boss 战、测试场、奖励 UI、AI 自动施法、物编技能名、Boss 科技加成、死亡结算都接上后，才算完整落地。
+- 本项目目标魔兽版本是 1.27 / 1.27e，不要使用 `Blz*` 原生函数；需要平台扩展时先搜索项目已有 Dz/JAPI/EX 封装。

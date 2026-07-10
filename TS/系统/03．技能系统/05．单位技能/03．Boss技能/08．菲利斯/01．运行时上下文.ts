@@ -3,6 +3,8 @@
 import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．机制组件/06．机制清理";
 import { 创建单位运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
 import { 菲利斯单位技能配置 } from "./00．配置";
+import { 播放菲利斯台词 } from "./08．台词播放";
+import { stringToFourCC } from "./11．公共工具";
 
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
@@ -10,6 +12,10 @@ const { getServerTime } = require("系统.00．核心系统.05．中心计时器
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+
+const jass = require("jass.common") as any;
+const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const 菲利斯单位类型ID = stringToFourCC(菲利斯单位技能配置.单位ID);
 
 export type 菲利斯阶段 = 1 | 2;
 
@@ -35,6 +41,7 @@ const 菲利斯剑魂狼表: Record<number, 菲利斯剑魂狼记录 | undefined
 let 菲利斯死亡清理已注册 = false;
 
 function 创建菲利斯上下文(this: void, boss: any, 清理: 机制清理篮子): 菲利斯运行时上下文 {
+  播放菲利斯台词(boss, "开场", 0);
   return {
     Boss单位: boss,
     阶段: 1,
@@ -91,6 +98,9 @@ export function 获取菲利斯剑魂狼记录(this: void, wolf: any): 菲利斯
 }
 
 function on菲利斯单位死亡(this: void, dyingUnit: any): void {
+  if (GetUnitTypeId(dyingUnit) === 菲利斯单位类型ID) {
+    播放菲利斯台词(dyingUnit, "死亡", 0);
+  }
   const id = 取单位ID(dyingUnit);
   if (id === 0) return;
   if (菲利斯上下文工厂.获取(dyingUnit) != null) 清理菲利斯上下文(dyingUnit);

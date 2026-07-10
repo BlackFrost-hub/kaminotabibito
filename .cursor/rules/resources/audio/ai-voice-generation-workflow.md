@@ -3,15 +3,16 @@
 这份文件只保留入口索引。具体规则和声线库已经拆分到：
 
 ```text
-.cursor/rules/tooling/ai-voice-generation/
+.cursor/rules/resources/audio/ai-voice-generation/
 ```
 
 ## 阅读顺序
 
 1. `ai-voice-generation/README.md`：总指引和目录说明。
-2. `ai-voice-generation/00-生成工作流.md`：生成、压缩、模型、回传规则。
-3. `ai-voice-generation/07-选型速查.md`：按角色类型快速选声线。
-4. 需要具体声线时，再打开对应分类文件：
+2. `ai-voice-generation/00-生成工作流.md`：生成、压缩、模型、确认与接入边界。
+3. `ai-voice-generation/09-配音台词与分段提示词.md`：英文改写、情绪弧线和分段标签。
+4. `ai-voice-generation/07-选型速查.md`：按角色类型快速选声线。
+5. 需要具体声线时，再打开对应分类文件：
    - `01-精灵贵族与人类统帅.md`
    - `02-恶魔与黑暗反派.md`
    - `03-兽族巨魔地精.md`
@@ -22,7 +23,8 @@
 ## 核心规则
 
 - Boss Voice 试听稿只生成到 `audio_temp`。
-- 用户确认前不要迁入 `imports`，不要接入代码播放。
+- Voice 不迁入地图 `imports`；用户确认后登记 `voice_pack_manifest/Boss/<BossKey>.json`，代码使用外置 MIX 内部路径。
+- 用户确认只表示候选通过；是否接入配置、重建 MIX 仍按明确指令执行。
 - 游戏内中文系统消息和 AI 配音文本可以分开：`台词` 保持中文，`配音台词` 记录英文 TTS 文本。
 - 带 `[angry]`、`[stern]`、`[fading]` 等情绪标签的英文台词优先用 `eleven_v3`。
 - 不要用 `eleven_multilingual_v2` 生成带英文情绪标签的台词，它可能把标签读出来。
@@ -31,8 +33,9 @@
 ## 默认路径
 
 ```text
-C:\Users\Administrator\Desktop\syzl\audio_temp\Boss\<BossKey>\Voice\
-imports/Sound/Boss/<BossKey>/Voice/
+试听源文件：C:\Users\Administrator\Desktop\syzl\audio_temp\Boss\<BossKey>\Voice\
+MIX 内部路径：Sound/Boss/<BossKey>/Voice/
+manifest：voice_pack_manifest/Boss/<BossKey>.json
 ```
 
 ## 快速命令

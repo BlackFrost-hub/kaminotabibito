@@ -2,6 +2,7 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取巴尔扎罗斯上下文 } from "./03．运行时上下文";
+import { 播放巴尔扎罗斯台词, 播放格鲁姆台词, 播放塞拉台词 } from "./14．台词播放";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
 import { 巴尔扎罗斯护卫配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
 import { 播放Boss坐标音效 } from "../00．公共/00．Boss音效播放";
@@ -23,6 +24,10 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
 };
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
+};
+const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  getServerTime: (this: void) => number;
 };
 
 const jass = require("jass.common") as any;
@@ -122,9 +127,22 @@ function on巴尔扎罗斯护卫死亡(this: void, dyingUnit: any): void {
   delete 护卫归属Boss表[guardId];
   const context = 获取巴尔扎罗斯上下文(boss);
   if (context == null) return;
-  if (dyingUnit === context.格鲁姆) context.格鲁姆 = undefined;
-  if (dyingUnit === context.塞拉) context.塞拉 = undefined;
-  if (双护卫都已死亡(context)) 解除熔核封印(context);
+  if (dyingUnit === context.格鲁姆) {
+    播放格鲁姆台词(dyingUnit, "死亡", 0);
+    context.格鲁姆 = undefined;
+  }
+  if (dyingUnit === context.塞拉) {
+    播放塞拉台词(dyingUnit, "死亡", 0);
+    context.塞拉 = undefined;
+  }
+  if (!双护卫都已死亡(context)) return;
+  解除熔核封印(context);
+  context.阶段 = 2;
+  const bossUnit = context.Boss单位;
+  context.阶段3台词最早Ms = getServerTime() + 14500;
+  addDelayedCallback(6000, function 巴尔扎罗斯护卫尽灭台词(this: void): void {
+    if (单位有效(bossUnit)) 播放巴尔扎罗斯台词(bossUnit, "转阶段2", 0);
+  });
 }
 
 function on熔核封印伤害修正(this: void, context: any): number {
@@ -157,6 +175,15 @@ export function 初始化巴尔扎罗斯熔核封印与护卫机制(this: void, 
   context.清理.登记单位("巴尔扎罗斯-塞拉", context.塞拉);
   登记护卫归属(context, context.格鲁姆);
   登记护卫归属(context, context.塞拉);
+
+  const grum = context.格鲁姆;
+  const sera = context.塞拉;
+  addDelayedCallback(7000, function 格鲁姆登场回应(this: void): void {
+    if (单位有效(grum)) 播放格鲁姆台词(grum, "响应召令", 0);
+  });
+  addDelayedCallback(10300, function 塞拉登场回应(this: void): void {
+    if (单位有效(sera)) 播放塞拉台词(sera, "响应召令", 0);
+  });
 }
 
 export function 注册巴尔扎罗斯熔核封印与护卫机制(this: void): void {

@@ -1,41 +1,34 @@
-# Global Agent Prompt for This Project
+---
+description: Syzl 项目规则总纲与五类规则路由；进入仓库工作时先按 core/engine/gameplay/resources/tooling 定位具体规则
+alwaysApply: true
+---
 
-你在维护一个 Warcraft 3 + TypeScriptToLua + Lua + JASS/DzAPI 项目。
+# 项目规则总纲
 
-这份文件只保留总纲，不重复子规则正文。具体细则优先看：
-
-- `README.md`
-- `agent-shared/global-engine-rules.mdc`
-- `agent-shared/tstl-hard-rules.mdc`
-- `agent-shared/中文命名.mdc`
-- `tooling/encoding-and-patch-safety.mdc`
-- `dzapi/lua-gc-desync-heuristics.mdc`
-- `dzapi/n-slot-ui-symmetric-execution.mdc`
-- `equipment/物品系统与装备技能规则.md`
-- `equipment/buff经验/00．Buff经验规则.mdc`
-
-## 核心原则
-
-- 先看生成 Lua 的调用形态，再相信 TS 源码
-- 涉及 `jass` / `japi` / 事件中心 / timer / frame / bridge 的改动，优先检查 `self`、`nil`、参数错位
-- 涉及 Lua/JASS/Dz 回调、timer、sync/async、本机玩家分支时，先判断上下文：同步 / 本机异步 / 桥接
-- 运行时逻辑不要用 Lua/TS `Math.*`
-- JASS / Dz 回调只用长寿命具名函数
-- 不要在入口全局 monkey patch 基础 API
-- `GetLocalPlayer()` 只做最终本地展示，不做共享逻辑计算
-- 物品、装备、Buff、音效、STES、YDLocal 都按各自子规则处理
+本项目使用 Warcraft 3 + TypeScriptToLua + Lua + JASS/DzAPI。此文件只规定执行方式；具体语义以分类正文为准。
 
 ## 工作顺序
 
-1. 先读本文件
-2. 再读具体子系统规则
-3. 先改 TS 源码，后 build
-4. 涉及异步回调时，检查错误处理是否会让单客户端中断并造成状态分叉
-5. 需要时检查生成 Lua 的调用形态
-6. 再报告改了什么，验证了什么，还剩什么风险
+1. 从 [规则导航](README.md) 选择 `core / engine / gameplay / resources / tooling`。
+2. 读取 [核心规则](core/README.md) 中与任务相关的全局约束。
+3. 只读取当前任务涉及的最具体规则，修改最小范围。
+4. TS 改动完成后运行必要构建；只在调用形态、桥接、事件、回调或 UI 等高风险面核对相关生成 Lua。
+5. 用户未明确要求时，不手动打包地图；正常测试由 Warcraft VSCode `Run Map` 完成。
+6. 交付时说明实际改动、验证结果和未覆盖风险。
 
-## 记录习惯
+## 高风险路由
 
-- 调试输出优先用 `print`
-- 规则有重复时，只保留一个 canonical source
-- 需要补规则时，优先补到最相关的子目录，不要再复制一份全局说明
+| 场景 | 正文 |
+|------|------|
+| JASS、JAPI、BJ、模块、事件中心、API 边界 | [全局引擎规则](core/global-engine-rules.mdc) |
+| self/nil、this、导入导出、生成 Lua、fix-lua | [TSTL 硬规则](core/tstl-hard-rules.mdc) |
+| Dz 回调、pcall、同步/本机异步、GetLocalPlayer | [DzAPI 索引](engine/dzapi/README.md) |
+| STES、YDLocal、JASS/Lua 桥接 | [桥接规则](engine/bridges/README.md) |
+| 中文文件、编码或局部补丁 | [编码与补丁安全](tooling/patch/encoding-and-patch-safety.mdc) |
+| 技能、Boss、装备、剧情与对象数据 | [玩法规则](gameplay/README.md) |
+| 音效、配音、模型、贴图与特效 | [资源规则](resources/README.md) |
+
+## 维护原则
+
+- 一个主题只有一个正文真源；索引、总纲与 Codex 技能不复制长规则。
+- 新规则放到最具体的分类；移动后必须修复所有链接与技能路由。

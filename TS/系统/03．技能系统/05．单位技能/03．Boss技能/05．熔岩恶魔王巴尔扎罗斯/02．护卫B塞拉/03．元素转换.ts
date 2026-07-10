@@ -6,7 +6,7 @@ import { 巴尔扎罗斯音效配置 } from "../02．数值与表现配置";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 const {  巴尔扎罗斯单位技能配置,
   巴尔扎罗斯技能数值配置,
-  播放巴尔扎罗斯台词,
+  播放塞拉台词,
   registerManualBuff,
   移除单位指定Buff,
   registerDamageModifier,
@@ -41,7 +41,7 @@ export function 切换塞拉形态(this: void, context: 巴尔扎罗斯运行时
   SetUnitTimeScale(sera, config.动画速度);
   SetUnitAnimationByIndex(sera, config.动画编号);
   播放Boss坐标音效(next === "火焰" ? 巴尔扎罗斯音效配置.塞拉.冰转火 : 巴尔扎罗斯音效配置.塞拉.火转冰, GetUnitX(sera), GetUnitY(sera), 巴尔扎罗斯音效配置.默认裁断距离);
-  if (播放台词) 播放巴尔扎罗斯台词(context.Boss单位, "元素转换");
+  if (播放台词) 播放塞拉台词(sera, next === "火焰" ? "元素转换火焰" : "元素转换冰霜");
 }
 
 function 塞拉伤害修正(this: void, context: any): number {

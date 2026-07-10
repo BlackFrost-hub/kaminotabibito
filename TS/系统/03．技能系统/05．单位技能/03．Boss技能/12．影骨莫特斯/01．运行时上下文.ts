@@ -4,12 +4,20 @@ import type { 机制清理篮子 } from "../../../00．技能模板+函数/04．
 import { 创建单位运行时上下文工厂 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 影骨莫特斯数值与表现配置 } from "./02．数值与表现配置";
-import { 单位有效, 取单位ID } from "./11．公共工具";
+import { 播放影骨莫特斯台词 } from "./08．台词播放";
+import { 单位有效, 取单位ID, stringToFourCC } from "./11．公共工具";
 
 const jass = require("jass.common") as any;
+const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
+  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
+};
+
+const 影骨莫特斯单位类型ID = stringToFourCC(影骨莫特斯单位技能配置.单位ID);
+let 影骨莫特斯死亡监听已注册 = false;
 
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -50,6 +58,7 @@ export interface 影骨莫特斯运行时上下文 {
 }
 
 function 创建影骨莫特斯上下文(this: void, boss: any, 清理: 机制清理篮子): 影骨莫特斯运行时上下文 {
+  播放影骨莫特斯台词(boss, "开场", 0);
   return {
     Boss单位: boss,
     阶段: 取影骨莫特斯当前阶段(boss),
@@ -131,4 +140,13 @@ export function 刷新影骨盗贼遗产Buff(this: void, context: 影骨莫特�
 }
 
 export function 注册影骨莫特斯运行时(this: void): void {
+  if (影骨莫特斯死亡监听已注册) return;
+  影骨莫特斯死亡监听已注册 = true;
+  registerDeathListener(on影骨莫特斯死亡);
+}
+
+function on影骨莫特斯死亡(this: void, dyingUnit: any): void {
+  if (GetUnitTypeId(dyingUnit) !== 影骨莫特斯单位类型ID) return;
+  播放影骨莫特斯台词(dyingUnit, "死亡", 0);
+  清理影骨莫特斯上下文(dyingUnit);
 }

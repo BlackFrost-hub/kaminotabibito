@@ -1,0 +1,13 @@
+{
+  "sourceDir": "audio_temp/Boss/ShadowboneMortes/Voice",
+  "targetDir": "Sound/Boss/ShadowboneMortes/Voice",
+  "files": [
+    "shadowbone_mortes_opening_every_coin_trail_gork_01_v3.mp3",
+    "shadowbone_mortes_shadow_slip_behind_you_gork_01_v3.mp3",
+    "shadowbone_mortes_skeletal_summon_steal_all_gork_01_v3.mp3",
+    "shadowbone_mortes_shadow_bind_nailed_gork_01_v3.mp3",
+    "shadowbone_mortes_phantom_burst_crew_in_dark_gork_01_v3.mp3",
+    "shadowbone_mortes_legacy_open_pay_price_gork_01_v3.mp3",
+    "shadowbone_mortes_defeat_shadows_collect_debt_gork_01_v3.mp3"
+  ]
+}

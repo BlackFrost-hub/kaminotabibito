@@ -8,14 +8,24 @@ alwaysApply: false
 
 ## 总原则
 
-- Boss 音效和配音先生成到临时试听目录，不要直接生成或移动到正式 `imports/Sound/...` 资源目录。
-- 只有用户试听确认可用后，才允许迁入正式资源打包目录并接入代码配置。
-- 未迁入正式资源前，不要在文档或回复里声称资源已经接入项目。
+- Boss SFX 和 Voice 都先生成到临时试听目录；试听阶段不要直接写入正式资源位置。
+- 用户确认只表示“候选已通过”，不自动等于迁移、接入或重建资源包；后续操作仍以用户的明确指令为准。
+- 已确认 SFX 按指令迁入 `imports/Sound/...`，随地图资源打包并接入代码。
+- 已确认 Voice 默认保留在 `audio_temp` 作为源文件，登记到 `voice_pack_manifest/Boss/<BossKey>.json`，以 `Sound/Boss/<BossKey>/Voice/...` 作为外置 MIX 内部路径；不要迁入地图 `imports`。
+- 未完成对应迁移或 manifest/代码接入前，不要声称资源已经正式接入项目。
 - 单个 Boss 的生成/接入 SFX 文件数量由机制密度决定：建议至少 7 个核心反馈，最多 16 个文件；不要少到缺少战斗辨识，也不要把画蛇添足、锦上添花的小动作都做成独立资源。
 - 资源预算优先级：核心阶段变化、关键机制启动、关键命中/惩罚、最终大招结算优先；普通前摇、小型碎裂、颜色差异、循环氛围、死亡装饰音默认低优先级。
 - 音效时长按动作和听感动态决定，不要机械压到 1 秒内，也不要为了显得宏大而全部拉长。部分 AI 音效在 1 秒内会过快或像划过声；关键机制、阶段强化、大招结算可先生成 1.5-4.5 秒试听版，再按实际效果裁剪、压缩或拆段。
 - Boss SFX 需求默认优先评估拆分生成；除极简单、单一动作、单一材质的短促反馈外，尽量拆分为多个声音层分别生成，再叠加、延迟、裁剪或混音合成。例如起手层 / 主冲击层 / 尾音层，怪物拟声层 / 机制能量层 / 低频确认层。中间层只作为素材，不迁入正式资源，最终只记录用户确认的混音版或明确的组合播放方案。
 - Boss SFX 压缩默认按用途分层：短促命中、爆发、点击式反馈优先 `80kbps mono`；持续喷射、低频场地、阶段变化、关键机制和战败收束优先 `96kbps mono`。若试听明显损失质感，以实际听感为准。
+
+## 状态决策
+
+| 状态 | SFX | Voice |
+|------|-----|-------|
+| 生成与试听 | 只放 `audio_temp/Boss/<BossKey>/SFX/` | 只放 `audio_temp/Boss/<BossKey>/Voice/` |
+| 用户确认 | 记录确认文件和建议 `imports` 路径，仍不自动迁移 | 记录确认文件、MIX target 和 manifest 项，仍不自动重建 MIX |
+| 正式接入 | 按明确指令迁入 `imports/Sound/...` 并接代码 | 按明确指令更新配置/manifest；需要时重建外置 MIX，不进入 `imports` |
 
 ## 临时目录
 
@@ -38,13 +48,13 @@ audio_temp\Boss\<BossKey>\Voice\
 示例：
 
 ```text
-正式资源规划：imports/Sound/Boss/Kasela/
+SFX 正式资源规划：imports/Sound/Boss/Kasela/
 实际试听目录：C:\Users\Administrator\Desktop\syzl\audio_temp\Boss\Kasela\SFX\
 ```
 
 ## 需求格式解释
 
-音效需求里的 `文件分类` 可以写最终正式资源分类，例如：
+SFX 需求里的 `文件分类` 可以写最终正式资源分类，例如：
 
 ```text
 文件分类: imports/Sound/Boss/Kasela/
@@ -56,20 +66,25 @@ audio_temp\Boss\<BossKey>\Voice\
 C:\Users\Administrator\Desktop\syzl\audio_temp\Boss\Kasela\SFX\
 ```
 
-如果是配音，则转换到：
+如果是配音，试听源文件放到：
 
 ```text
 C:\Users\Administrator\Desktop\syzl\audio_temp\Boss\Kasela\Voice\
+```
+
+配音的正式逻辑路径写成外置 MIX 内部路径：
+
+```text
+Sound/Boss/Kasela/Voice/<file>.mp3
 ```
 
 ## 音效线程输出要求
 
 音效线程生成后应返回：
 
-- 临时文件绝对路径。
-- 推荐版本。
-- 建议最终 `imports/Sound/...` 路径。
-- 是否仍待试听确认。
-- 音效线程回传时应优先说明是否采用分层合成或组合播放；若采用，必须说明哪些文件只是中间素材、哪些是最终候选；组合播放还要写清播放顺序、延迟、用途定位和是否需要随机/降音量处理。
+- 临时文件绝对路径、推荐版本、规格和确认状态。
+- SFX：建议最终 `imports/Sound/...` 路径，以及是否已迁移/接入。
+- Voice：建议 MIX 内部 `Sound/Boss/.../Voice/...` 路径，以及是否已登记 manifest、接入配置或重建 MIX。
+- 采用分层合成或组合播放时，说明哪些文件只是中间素材、哪些是最终候选；组合播放还要写清播放顺序、延迟、用途定位和是否需要随机/降音量处理。
 
-除非用户明确确认并完成迁移，不要把 `audio_temp` 里的试听文件当作正式项目资源。
+除非已经完成对应的 SFX 迁移，或 Voice manifest/配置接入，不要把 `audio_temp` 里的试听文件声称为正式项目资源。

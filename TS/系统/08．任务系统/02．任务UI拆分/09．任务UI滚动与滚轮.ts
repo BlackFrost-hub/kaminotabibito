@@ -229,7 +229,7 @@ function onScrollBarTrackClick(ctx: TaskUIScrollContext): void {
   updateTaskUIScrollThumbPosition(ctx, pageCount);
 }
 
-/** 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/dzapi/ui-frame-types.mdc */
+/** 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/engine/dzapi/ui-frame-types.mdc */
 function taskUIThumbPressPcallBody(): void {
   const ctx = findVisibleWheelCtx();
   if (!ctx || !ctx.isVisible()) return;

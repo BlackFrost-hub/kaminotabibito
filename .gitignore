@@ -47,3 +47,6 @@ Desktop.ini
 # build artifacts
 /backups/
 /logs/
+
+# generated legacy flat voice manifest
+/voice_pack_manifest.json

@@ -1,0 +1,13 @@
+{
+  "sourceDir": "audio_temp/Boss/Felice/Voice",
+  "targetDir": "Sound/Boss/Felice/Voice",
+  "files": [
+    "felice_opening_imperial_hounds_maverick_02_v3.mp3",
+    "felice_leader_aura_hold_line_maverick_02_v3.mp3",
+    "felice_sword_soul_hunt_maverick_03_heavy_command_v3.mp3",
+    "felice_spirit_slash_wound_maverick_03_heavy_warning_v3.mp3",
+    "felice_seal_only_blade_speaks_maverick_02_v3.mp3",
+    "felice_aberration_war_weapon_maverick_02_v3.mp3",
+    "felice_defeat_trial_maverick_05_short_superior_v3.mp3"
+  ]
+}

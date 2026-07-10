@@ -1,0 +1,12 @@
+---
+description: 跨智能体规则桥接：提醒先从 `.cursor/rules/README.md` 进入并保持 AGENTS/规则索引一致；用于维护规则系统本身或排查代理规则入口时
+alwaysApply: false
+---
+
+# 跨智能体规则桥接
+
+仅在维护规则系统或排查代理入口时使用。
+
+1. 从 `.cursor/rules/README.md` 进入，再按任务读取最具体的正文。
+2. 规则按 `core / engine / gameplay / resources / tooling` 五类归档，不在根目录或临时说明中散放正文。
+3. 规则变更后更新总索引、分类 README、交叉链接、`syzl-project-rules` 技能，以及存在时的根目录 `AGENTS.md`。

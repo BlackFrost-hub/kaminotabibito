@@ -1,0 +1,13 @@
+{
+  "sourceDir": "audio_temp/Boss/TrollChief/Voice",
+  "targetDir": "Sound/Boss/TrollChief/Voice",
+  "files": [
+    "troll_chief_opening_hunting_grounds_dante_01_v3.mp3",
+    "troll_chief_minion_tribe_answers_dante_01_v3.mp3",
+    "troll_chief_shockwave_wind_tear_dante_02_heavy_warning_v3.mp3",
+    "troll_chief_counter_face_me_dante_01_v3.mp3",
+    "troll_chief_ancient_curse_weakest_flesh_dante_02_heavy_warning_v3.mp3",
+    "troll_chief_totem_hunt_begins_dante_02_heavy_warning_v3.mp3",
+    "troll_chief_death_tribe_not_silenced_dante_01_v3.mp3"
+  ]
+}

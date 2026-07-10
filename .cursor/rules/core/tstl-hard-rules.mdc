@@ -1,0 +1,120 @@
+---
+description: 全局高优先级：TSTL 生成 Lua 的调用形态、self / nil 与验收规则
+alwaysApply: true
+---
+
+# TSTL 生成 Lua 规则
+
+适用：本仓库所有 TypeScriptToLua 改动。目标不是“TS 看起来对”，而是“生成 Lua 和游戏内行为真的对”。
+
+## 执行摘要
+
+1. 函数不是方法时，签名和承载它的字段都明确 `this: void`。
+2. JASS/JAPI 成员先绑定局部别名；模块导出函数不要当对象方法调用。
+3. 回调、桥接、事件、UI、计时器和导出函数改动后，构建并检查对应 Lua 调用形态。
+4. 优先修 TypeScript 源码；`@noSelfInFile` 和 `fix-lua-for-pack.js` 都不是默认解法。
+5. 只检查有风险的生成片段，不泛查整份 Lua。
+
+## 何时检查生成 Lua
+
+| 改动类型 | 验证要求 |
+|----------|----------|
+| 普通配置、常量、文案或纯数值逻辑 | 构建通过即可；没有调用形态风险时不必手查 Lua |
+| helper、导出函数、回调、计时器、桥接、事件中心、UI 注册、Dz/JASS 交互 | 构建后检查对应模块的 `self/nil`、参数位置和 `.`/`:` 形态 |
+| 需要修改 fix 脚本或底层 no-self 约定 | 先证明源码层无法合理规避，再记录原因并检查所有受影响调用方 |
+
+## 调用形态
+
+- `require("jass.common")`、`require("jass.japi")` 的成员，先绑定局部别名再调用。
+- 禁止在运行时敏感路径里直接写 `jass.Xxx(...)` / `japi.Xxx(...)`。
+- 禁止把模块导出函数挂到对象字段后再以“方法”形式调用，除非该字段声明了 `this: void` 包装。
+- 禁止对模块导出函数、注册函数、本地 helper 使用冒号调用。
+
+## 回调与 pcall
+
+JASS / Dz 回调、pcall 与跨帧上下文统一遵循 [DzAPI 回调安全规则](../engine/dzapi/lua-gc-desync-heuristics.mdc)。本文件只处理 TSTL 调用形态，不重复回调正文。
+
+## Self 策略选择
+
+| 场景 | 优先策略 |
+|------|----------|
+| 函数本质不是方法，或会被解构、注册、放入对象字段 | 函数签名及字段/接口签名都写 `this: void` |
+| 只有当前文件出现调用形态污染 | 使用局部别名或具名 wrapper，限制影响范围 |
+| 底层文件调用面很广 | 不加 `@noSelfInFile`；修具体导出签名或调用点 |
+| 引用面很小且所有调用方已核对 | 才考虑 `@noSelfInFile` |
+
+### `this: void` 写法
+
+- 给函数签名显式写 `this: void`：
+
+```ts
+function 注册滚轮(this: void, sync: boolean, cb: () => void): void {
+  registerMouseWheelHardware(sync, cb);
+}
+```
+
+- 对象字段与类型 / 接口签名也同步写 `this: void`，避免调用点再次被当成方法。
+
+### 局部包装模式
+
+- 在当前文件定义具名 wrapper 直接转发，不要继续向外透传原函数。
+- 对 `jass` / `japi` 调用，优先局部别名：
+
+```ts
+const DestroyEffect = jass.DestroyEffect as (e: any) => void;
+```
+
+- 对 `require("...")` 得到的模块字段函数，如果生成 Lua 出现 `moduleTable, nil, ...` 这类首参污染，
+  不要继续直接写 `module.fn(...)`。
+  先提取局部函数别名，再通过本地 wrapper 调用：
+
+```ts
+const 创建单位并登记排泄: any = unitRelated.创建单位并登记排泄;
+
+export function CreateUnit(this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number): any {
+  return 创建单位并登记排泄(undefined as any, owner, unitTypeId, x, y, facing);
+}
+```
+
+- 这是本仓库已经踩过的实战坑：TS 源看起来只是 `module.fn(nil, ...)`，
+  生成 Lua 仍可能变成 `module["fn"](module, nil, ...)`，导致参数整体右移。
+
+## Build 后验收
+
+- 敏感改动不能只看 TS 过编译；build 后按需确认：
+  - `foo(x)` 不是 `foo(nil, x)`
+  - `ctx.fn(...)` 没被编成 `ctx:fn(...)`
+  - 注册回调参数没有整体右移
+  - 导出函数签名没有继续带错位 `self`
+- 只检查相关模块与调用点，不评价整份生成 Lua 是否“整体长得顺眼”。
+
+## `fix-lua-for-pack.js` 不是默认修复入口
+
+- 默认策略：优先改 TS 源码，避免生成错误形态。
+- 只有已确认是“编译器 / 运行时缝隙，且源码层确实无合理规避”的历史遗留场景，才允许延续现有 fix 规则。
+- 新问题默认不要再把 `fix-lua-for-pack.js` 当第一反应。
+
+## Lua 语义与运行时数学
+
+- 不准在运行时敏感路径里用 Lua / TS `Math.*`。
+- 随机数、取整、三角函数走项目数学封装或 JASS 对齐函数。
+- Lua 表是 1-based；任何 `random(1, n)` 后接 `[idx - 1]` 都要高度警惕。
+- Lua 里 `""` 为真，空字符串判断必须显式写。
+
+## 其他高风险点
+
+- 如果一个延迟清理系统用 `GetHandleId` 做 key，必须考虑句柄复用：
+  - 重新登记同 handleId 时，要先清掉旧的延迟队列条目。
+  - 否则旧条目可能会把新创建的单位/物品误删。
+- 避免 `Object.keys(luaTable)` 这类 TS 直觉写法；Lua table 遍历优先稳定数组或显式有序 key。
+- `DzTriggerRegisterKeyEvent` 这类键码注册，不要把数字 VK 误写成字符路径。
+- `CreateUnit` 后立刻挂头顶特效，再异步 `DzSetUnitModel`，容易把头顶特效冲掉；先换模，再挂特效。
+
+## 相关正文
+
+| 场景 | 正文 |
+|------|------|
+| JASS / JAPI API 存在性判断、事件中心与引擎边界 | [全局引擎规则](global-engine-rules.mdc) |
+| JASS / Dz 回调、pcall、异步上下文与 UI GC | [DzAPI 回调安全](../engine/dzapi/lua-gc-desync-heuristics.mdc) |
+| 中文文件、UTF-8 与局部补丁 | [编码与补丁安全](../tooling/patch/encoding-and-patch-safety.mdc) |
+| 魔兽随机数与随机种子 | [随机数规则](../engine/tstl/math-randomseed.md) |

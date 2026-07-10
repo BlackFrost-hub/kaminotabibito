@@ -1,0 +1,97 @@
+---
+description: STES 自定义事件与 YDLocal 传参/返回值规则，重点防止 TSTL self 错位、JASS/Lua 不同表、YDLocal 页错位。
+globs: TS/lib/扩展函数/Star扩展函数/Star扩展库/02．Star自定义事件.ts, TS/lib/扩展函数/Star扩展函数/Star扩展库/index.ts, TS/lib/扩展函数/YDWE函数/02．YDLocal兼容.ts, TS/lib/扩展函数/YDWE函数/05．STES子触发公共工具.ts, TS/系统/**/*STES*.ts, TS/系统/**/BuffJASS桥接.ts, TS/系统/02．物品系统/07．装备提取.ts, scripts/fix-lua-for-pack.js
+alwaysApply: false
+---
+
+# STES + YDLocal 规则
+
+## 执行摘要
+
+| 问题 | 先查 |
+|------|------|
+| STES 注册数为 0 | 事件名、JASS/Lua 是否共用同一 hashtable、生成 Lua 是否多传 `nil/self` |
+| 子触发读参全 0 | 是否先同步当前 YDLocal 页、参数类型和 key 是否与父侧一致 |
+| 父侧读不到返回值 | 子侧是否用 `YDLocal7Set`、是否恢复父页、父侧是否过早 Release |
+| 调用时报 nil 或参数右移 | 导入导出名、`this: void`、生成 Lua call shape |
+
+## 必守原则
+- STES 事件表必须与 JASS 的 `STES___HT` / `STES_GetTable()` 是同一张 hashtable。不要用新 `InitHashtable` 覆盖 JASS 全局表，否则 JASS 注册与 Lua 读写不同表，`LoadInteger(..., skey_index)` 会一直是 0。
+- 事件名必须与 JASS `StringHash("事件名")` 完全一致，包括中文。
+- STES / YDLocal 桥接先按 JASS 原始写法对齐，不要猜测字段名；父触发 `YDLocal5Set(type, "key", value)`，Lua 子触发就必须用同一个 `type` 和 `"key"` 读。
+- 改 STES/YDLocal/TSTL self 相关代码后，必须 `npm run build`，再检查生成 Lua 的关键调用形态。
+
+## STES 注册
+- 推荐注册流程：`CreateTrigger()` -> `TriggerAddAction(trig, namedCallback)` -> `STES_GetTable()` -> `STES_Register(trig, eventName)`。
+- 从模块导出的 `STES_Register`、`registerStesListener` 等函数要特别注意 TSTL self。若调用方用普通函数调用，导出函数应声明 `this: void`，或实现必须兼容隐式 self。
+- 生成 Lua 必须是 `STES_Register(trig, eventName)` 或兼容等价形态。若出现 `STES_Register(nil, trig, eventName)`，通常就是 self 错位，会导致 trigger / eventName 整体错位。
+- 如果注册日志显示 `最后计数=0`，先查生成 Lua：注册函数签名、调用参数、`STES_GetTable()` 返回表、`LoadInteger(ht, StringHash(eventName), skey_index)` 是否读的是 JASS 表。
+- 若 Lua 加载早于 JASS 绑表，可能注册进 Lua 自用表。需要在 JASS 全局候选表上校验监听数，失败则短延时重试并设上限。参考 `TS/系统/02．物品系统/07．装备提取.ts`。
+
+## YDLocal 子触发读参
+- JASS 父触发典型顺序：
+  `YDLocalInitialize()` -> 遍历 `LoadTriggerHandle(STES_GetTable(), hash, i)` -> `YDLocalExecuteTrigger(ydl_trigger)` -> `YDLocal5Set(...)` -> `YDTriggerExecuteTrigger(ydl_trigger, false)` -> 父侧读返回 -> `YDLocal1Release()`。
+- Lua 子触发在任何 `YDLocal5Get` 前，必须同步当前触发器页：`YDLocalExecuteTrigger(jass.GetTriggeringTrigger())`。否则读参常表现为全 0 或空字符串。
+- 子触发读取父侧传参用 `YDLocal5Get(type, key)`；写回父侧返回值用 `YDLocal7Set(type, key, value)`。
+- 父侧读取返回值用 `YDLocal1Get(type, key)`，且必须在 `YDLocal1Release()` 前读取。
+- 父写入的传参名和子写回的返回名是两套语义，不要混用。父用 `YDLocal5Set(real, "ScoreMin", ...)` 给子读，不代表父能用 `YDLocal1Get(real, "ScoreMin")` 读返回。
+
+## 子触发收尾
+- 子触发结束前要恢复父 YDLOC 页，再清理 `Star_PIndex`。
+- 推荐 `finally`：
+  `flushYDLocal5ParamPage()` -> `getParentYdlocPageForReturnValue()` -> `setG_SIndex(page)` / `setG_LIndex(page)` -> `clearStar_PIndex()`。
+- 如果先 `clearStar_PIndex()`、不恢复父页，父侧 `YDLocal1Get` 可能读到错误页，表现为返回值 0。
+
+## TSTL Self 规则
+- 低层公共函数不要随便给整文件加 `@noSelfInFile`。如果只为绕一个调用错位，优先改具体导出函数签名 `this: void`，或在函数内部兼容二参/三参。
+- 从 `@noSelfInFile` 文件调用非 no-self 导出函数时，很容易少传一个占位参数。重点检查生成 Lua 是否从 `fn(nil, "key")` 变成了 `fn("key")`，导致被调函数的 `name` 变成 `nil`。
+- 公共 YDLocal 读参函数若被多种文件调用，建议兼容两种形态：`readX(self, key)` 和 `readX(key)`。生成 Lua 可用 `realName = name or _self` 兜底。
+- 不要为了 TSTL 问题直接改 `scripts/fix-lua-for-pack.js`，除非已经确认 TS 源码无法规避，且规则文件同步记录原因。
+
+## JASS 触发示例
+```jass
+call YDLocalInitialize()
+set star_hash = StringHash("注册吟唱条")
+set star_loopIndex = LoadInteger(STES_GetTable(), star_hash, skey_index)
+set star_loopA = 0
+loop
+    exitwhen star_loopA >= star_loopIndex
+    set ydl_trigger = LoadTriggerHandle(STES_GetTable(), star_hash, star_loopA)
+    call YDLocalExecuteTrigger(ydl_trigger)
+    call YDLocal5Set(real, "sj", 30.00)
+    call YDLocal5Set(string, "string", "测试")
+    call YDLocal5Set(integer, "颜色ID", 4)
+    call YDTriggerExecuteTrigger(ydl_trigger, false)
+    set star_loopA = star_loopA + 1
+endloop
+call YDLocal1Release()
+```
+
+## Lua/TS 子触发模板
+```ts
+function onStesEvent(this: void): void {
+  try {
+    ydlStes_syncTriggerStep(undefined);
+    const value = ydlStes_readReal5(undefined, "sj");
+    // business...
+    // ydlStes_write/ YDLocal7Set(...) if parent needs return value
+  } finally {
+    ydlStes_finishChildCleanup(undefined);
+  }
+}
+```
+
+## 快速排错
+- `注册失败 / 最后计数=0`：查事件名、同表绑定、`STES_Register` 参数、生成 Lua 是否多了 `nil self`。
+- `YDLocal5Get` 全 0：查子触发是否先 `YDLocalExecuteTrigger(GetTriggeringTrigger())`，以及读参函数是否 self 错位导致 key 为 `nil`。
+- 父侧 `YDLocal1Get` 为 0：查子是否 `YDLocal7Set` 到父约定名、是否恢复父页后再清理、父是否过早 `YDLocal1Release()`。
+- `attempt to call nil value`：查导入导出名是否一致，尤其是把 `显示xxx` 当成 `启动xxx` 解构时。
+- 日志刷屏：定位完成后删除临时 `debugLogForce`，只保留真正错误或失败路径日志。
+
+## 参考路径
+- `TS/lib/扩展函数/YDWE函数/05．STES子触发公共工具.ts`
+- `TS/lib/扩展函数/Star扩展函数/Star扩展库/02．Star自定义事件.ts`
+- `TS/系统/02．物品系统/07．装备提取.ts`
+- `TS/系统/05．Buff系统/03．BuffJASS桥接.ts`
+- `TS/系统/12．测试系统/STES事件测试.ts`
+- `TS/系统/12．测试系统/YDLocal返回值测试.ts`

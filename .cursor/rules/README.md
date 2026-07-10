@@ -1,48 +1,51 @@
-# Cursor 工程规则（索引）
+# Syzl 工程规则导航
 
-规则按主题拆到子目录，便于维护。
+> 本页是 `.cursor/rules/` 的唯一总入口。先按任务选择分类，再读取最具体的正文；索引只负责路由，不复制规则内容。
 
-## 规则目录
+## 规则结构
 
-| 目录 | 内容 |
+| 分类 | 负责内容 | 入口 |
+|------|----------|------|
+| `core/` | 全仓库通用约束、JASS/JAPI/BJ 边界、TSTL 硬规则、中文命名、项目 API 速查 | [核心规则](core/README.md) |
+| `engine/` | Warcraft 运行时专项：DzAPI UI、联机同步、TSTL 补充、STES/YDLocal 桥接 | [引擎规则](engine/README.md) |
+| `gameplay/` | 玩法生产：技能与 Boss、装备与 Buff、ObjEditing、剧情任务 | [玩法规则](gameplay/README.md) |
+| `resources/` | 资源生产：Boss SFX、Voice、外置 MIX、模型、贴图、特效 | [资源规则](resources/README.md) |
+| `tooling/` | 工程操作：构建、Run Map/打包边界、编码与安全补丁 | [工具规则](tooling/README.md) |
+
+## 默认阅读顺序
+
+1. 从本页定位任务分类。
+2. 阅读 [项目规则总纲](GLOBAL_AGENT_PROMPT.mdc)。
+3. 确认 [核心规则](core/README.md) 中与任务相关的全局约束。
+4. 进入最具体的分类 README，只读取当前改动真正涉及的规则。
+5. 规则冲突时，用户/系统指令优先，其次是离目标文件更近、适用范围更具体的规则。
+
+## 按任务快速进入
+
+| 任务 | 先读 |
 |------|------|
-| [`war3-tstl/`](war3-tstl/) | War3 + TSTL 编译坑：jass/japi 调用、回调注册、随机数、全局数组、伤害事件等 |
-| [`dzapi/`](dzapi/) | DzAPI UI Frame 类型、联机 desync / 对称执行 / N 槽、Lua GC 安全、运行时安全代码 |
-| [`dzapi/unit-state-jass-japi-boundary.mdc`](dzapi/unit-state-jass-japi-boundary.mdc) | UnitState 写入时区分 JASS / JAPI `SetUnitState` |
-| [`equipment/`](equipment/) | 装备属性、装备 Buff、hot 字段、USE_ITEM 双触发等约定 |
-| [`stes-ydlocal/`](stes-ydlocal/) | STES 事件、YDLocal 传参与返回值、释放约束 |
-| [`tooling/`](tooling/) | 调试输出、音效与封装约定、编码与补丁安全 |
-| [`story/`](story/) | 剧情任务迁移、紧凑剧情片段维护、对白时长与动作挂点规则 |
-| [`objediting/`](objediting/) | ObjEditing 敌方/Boss 技能模板、通魔目标类型与命令 ID 约定 |
-| [`skill/`](skill/) | Boss 技能运行时、玩家人数获取、动态人数变量、模型贴图资源经验 |
-| [`agent-shared/`](agent-shared/) | 跨代理共享规则、全局高优先级规则 |
+| TypeScript、Lua、JASS、JAPI、BJ、require、事件中心 | [核心规则](core/README.md) |
+| self/nil、回调调用形态、生成 Lua、随机数、JASS 数组 | [引擎规则](engine/README.md) |
+| DzAPI、FDF、Frame、GetLocalPlayer、联机 UI 或 desync | [DzAPI 索引](engine/dzapi/README.md) |
+| STES、YDLocal、JASS 与 Lua 传参/返回值 | [桥接规则](engine/bridges/README.md) |
+| Boss、英雄、单位或装备技能，技能测试 | [技能与 Boss 索引](gameplay/skills/README.md) |
+| 物品、装备、Buff、HOT/DOT、评分 | [装备与物品索引](gameplay/equipment/README.md) |
+| ObjEditing 敌方技能或对象数据 | [ObjEditing 索引](gameplay/objediting/README.md) |
+| 剧情迁移、对白时长、动作挂点 | [剧情规则](gameplay/story/README.md) |
+| 音效、配音、MIX、模型、贴图、特效 | [资源规则](resources/README.md) |
+| 构建、打包、中文文件安全修改 | [工具规则](tooling/README.md) |
+| 维护规则目录或同步 Codex 技能 | [规则系统维护](core/codex-reference.mdc) |
 
-带 YAML frontmatter 的 `.mdc` 文件可通过 `description`、`globs`、`alwaysApply` 控制注入行为。纯 `.md` 文件为参考文档，不自动注入。
+## 自动注入与参考文档
 
-## 全局高优先级规则
-
-- [`agent-shared/global-engine-rules.mdc`](agent-shared/global-engine-rules.mdc) - `alwaysApply: true`，包含 jass/japi/BJ 边界、require 路径、事件中心、安全检查等
-- [`agent-shared/tstl-hard-rules.mdc`](agent-shared/tstl-hard-rules.mdc) - `alwaysApply: true`，包含 TSTL 生成 Lua 的硬规则、`self/nil` 错位、回调形态、`@noSelfInFile`、UTF-8 补丁纪律
-- [`agent-shared/中文命名.mdc`](agent-shared/中文命名.mdc) - `alwaysApply: true`，新代码中文命名偏好
+- 带 YAML frontmatter 的 `.mdc` 可通过 `description`、`globs`、`alwaysApply` 控制注入。
+- 纯 `.md` 是按需读取的参考文档，不自动注入。
+- `core/global-engine-rules.mdc`、`core/tstl-hard-rules.mdc`、`core/中文命名.mdc` 是当前全局自动规则。
 
 ## 维护约定
 
-1. README 只做索引，不堆具体规则。
-2. 全局规则放到 `agent-shared/*.mdc` 并使用 `alwaysApply: true`。
-3. 子系统规则放到最相关的子目录中。
-4. 新增项目规则时，在这里补一条入口。
-5. Buff 相关规则统一以 `equipment/buff经验/00．Buff经验规则.mdc` 为唯一经验入口，旧的 `buff-system.md` / `buff-system.mdc` 不再单独维护。
-
-## 调试输出约定
-
-- 默认统一使用 `TS/lib/扩展函数/自定义扩展函数/03．调试输出.ts`
-- 需要强制输出时优先使用 `debugLogForce`
-- 需要模块级开关调试时使用 `setDebug` 与 `debugLog`
-- 不要在普通业务代码、测试代码里继续把 `DisplayTimedTextToPlayer` 当作默认调试输出手段
-
-## JASS 调用约定
-
-- 对 `require("jass.common")`、`require("jass.japi")` 得到的模块表，默认不要直接写 `jass.Xxx(...)`、`japi.Xxx(...)`
-- 统一先绑定局部函数别名，再调用别名，例如 `const PauseUnit = jass.PauseUnit as ...`，随后调用 `PauseUnit(...)`
-- 这样做是为了避免 TSTL 把点调用错误生成为 `jass:Xxx(...)` / `japi:Xxx(...)`
-- 这条规则同样适用于测试文件、临时代码、技能文件，不允许因为“只是测试”就省略
+1. 一个主题只保留一个正文真源；总纲、README 和技能只做路由。
+2. 新规则放进最具体的分类，不在根目录新增散文件。
+3. 移动或重命名规则时，同步更新 README、源码注释、交叉链接和 `syzl-project-rules/SKILL.md`。
+4. 不创建指向不存在文件的“预留链接”；规则尚未拆出时，链接到当前真实正文。
+5. 普通代码接入默认只做必要构建验证，不自动手动打包地图；打包边界以 `tooling/build/` 为准。

@@ -114,7 +114,7 @@
 
 后续 AI 编写代码时的硬规则
 
-- 先读 `.cursor/rules/README.md`、`.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`、`.cursor/rules/agent-shared/tstl-hard-rules.mdc`，再读相关子系统文件。
+- 先读 `.cursor/rules/README.md`、`.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`、`.cursor/rules/core/tstl-hard-rules.mdc`，再读相关子系统文件。
 - 中文文件必须按 UTF-8 处理，优先 `apply_patch` 小补丁。
 - 不准为了 TSTL 去改 `fix-lua-for-pack.js`，优先改 TS 源码规避。
 - JASS / Dz 回调必须用长寿命具名函数，不要传匿名闭包。

@@ -23,16 +23,49 @@ ____exports["里科特单位技能配置"] = {
         {["技能ID"] = "AN03", ["提示"] = "克林姆德格斗术·破魔反击", ["扩展提示"] = "短暂进入反击窗口，受击后按距离移除目标当前生命值。"}
     },
     ["广播持续时间Ms"] = 4200,
+    ["配音裁断距离"] = 4000,
+    ["配音生成配置"] = {
+        ["显示台词字段"] = "台词",
+        ["配音台词字段"] = "配音台词",
+        ["声线名称"] = "Blackwood - Sinister, Posh and British",
+        ["声线ID"] = "agL69Vji082CshT65Tcy",
+        ["模型ID"] = "eleven_v3",
+        ["语言"] = "en",
+        ["整体提示词"] = "A young exiled elven prince of royal blood who has betrayed his homeland for forbidden power. Refined British aristocratic diction, quiet superiority, sardonic amusement, and effortless magical confidence. In ordinary combat he treats the heroes as an interruption and rarely needs to shout. For annihilation magic and the power of Death, let restraint fracture into intoxicating triumph while preserving the same elegant identity. Clear Warcraft-style combat pacing; not a military commander, not a theatrical narrator, and not a mindless demon.",
+        ["说明"] = "里科特全阶段使用 Blackwood 保持同一位背叛王子的身份连续。常态强调王族教养、讥讽与居高临下；湮灭之风和挑战结束通过更低稳定度、更高表演强度表现为对死神力量的陶醉，但不切换成纯恶魔声线。"
+    },
     ["台词"] = {
-        ["开场"] = {"汝等的行动，皆在掌握之中。"},
-        ["四重风刃"] = {"风，剿灭敌人。"},
-        ["追击风刃"] = {"风，为我引路。"},
-        ["神风护体"] = {"风，守护躯体。"},
-        ["粉碎"] = {"为汝等的鲁莽付出代价吧。"},
-        ["湮灭之炮"] = {"这一击之下，汝等灰飞烟灭。"},
-        ["湮灭之风"] = {"便让汝等感受这绝对的力量吧！"},
-        ["破魔反击"] = {"汝等的行动，皆在掌握之中。"},
-        ["死亡"] = {"克林姆德的风...不会止息..."}
+        ["开场"] = {"既然你们执意挡路，我便陪你们稍稍玩一会。"},
+        ["四重风刃"] = {"王族之风，撕碎他们。"},
+        ["追击风刃"] = {"逃吧。风会替我追上你们。"},
+        ["神风护体"] = {"王族之风，岂会容许你们触及我。"},
+        ["粉碎"] = {"攻击我，是你们犯下的最后一个错误。"},
+        ["湮灭之炮"] = {"看清楚了，这就是你们永远无法企及的魔法。"},
+        ["湮灭之风"] = {"感受吧！死神之力与克林姆德血脉结合后的强大！"},
+        ["破魔反击"] = {"你们的每一步，都在我的预料之中。"},
+        ["死亡"] = {"还有两下子。那么，就让你们见识一下死神的力量吧！"}
+    },
+    ["配音台词"] = {
+        ["开场"] = {"[amused superiority] If you insist on standing in my way... [dismissive] then I shall indulge you for a moment."},
+        ["四重风刃"] = {"[aristocratic command] Royal winds... tear them apart!"},
+        ["追击风刃"] = {"[mocking] Run. [predatory command] The wind will hunt you down for me."},
+        ["神风护体"] = {"[cold arrogance] The royal wind will not permit your touch."},
+        ["粉碎"] = {"[merciless punishment] Striking me was your final mistake."},
+        ["湮灭之炮"] = {"[contemptuous warning] Behold the magic forever beyond your reach. [cold execution] Be erased."},
+        ["湮灭之风"] = {"[exultant power] Feel it! [dark triumph] The power of Death itself, bound to royal blood!"},
+        ["破魔反击"] = {"[coldly amused] Every move you make... was foreseen."},
+        ["死亡"] = {"[surprised amusement] Impressive. [rising dark power] Now witness the power of Death itself!"}
+    },
+    ["配音资源"] = {
+        ["开场"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_opening_indulge_you_blackwood_01_v3.mp3"},
+        ["四重风刃"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_quad_windblades_royal_winds_blackwood_01_v3.mp3"},
+        ["追击风刃"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_chasing_windblade_hunt_you_blackwood_01_v3.mp3"},
+        ["神风护体"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_divine_wind_guard_no_touch_blackwood_01_v3.mp3"},
+        ["粉碎"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_mark_shatter_final_mistake_blackwood_01_v3.mp3"},
+        ["湮灭之炮"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_annihilation_cannon_beyond_reach_blackwood_01_v3.mp3"},
+        ["湮灭之风"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_annihilation_wind_royal_death_power_blackwood_01_v3.mp3"},
+        ["破魔反击"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_counter_every_move_foreseen_blackwood_01_v3.mp3"},
+        ["死亡"] = {"Sound\\Boss\\Ricote\\Voice\\ricote_challenge_end_death_power_blackwood_01_v3.mp3"}
     }
 }
 return ____exports

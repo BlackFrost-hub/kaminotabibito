@@ -3,7 +3,7 @@
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 格鲁姆公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
-  播放巴尔扎罗斯台词,
+  播放格鲁姆台词,
   施加巴尔扎罗斯灼热,
   读取单位攻击力,
   启动基础施法时间线,
@@ -86,7 +86,7 @@ export function 释放格鲁姆重锤(this: void, context: 巴尔扎罗斯运行
       提示文本: config.吟唱条提示文本,
     },
     播放台词: function 格鲁姆重锤台词(this: void): void {
-      播放巴尔扎罗斯台词(context.Boss单位, "熔岩重锤");
+      播放格鲁姆台词(grum, "熔岩重锤");
     },
     on生效: function 格鲁姆重锤生效(this: void): void {
       结算重锤(context, angle);

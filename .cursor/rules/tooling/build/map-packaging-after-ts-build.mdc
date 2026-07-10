@@ -10,19 +10,41 @@ alwaysApply: false
 
 `npm run build` 只保证 TypeScript 编译并同步 `src/**/*.lua`，不保证 `.build/war3map.lua` 和 `.build/_warcraft_vscode_test.w3x` 已经刷新。
 
-默认不要每次修改后都打包地图。只有本轮修改需要进图验证、用户明确要求测试图、或你确认 `.build` 产物会被马上使用时，才按下面顺序处理。
+默认不要在代码修改后手动打包地图。用户平时固定通过 Warcraft VSCode 的 `Run Map` 启动地图，该命令会自行完成 compile + pack；插件正常工作时，AI 无需替它重复打包。
 
-## 标准流程
+只有以下情况才允许 AI 手动刷新 `.build` 或打包 W3X：
+
+- 用户明确说“打包地图”“生成测试图”“刷新 `.build`”或指定要一个 W3X 文件。
+- 用户明确要求 AI 代为执行 `Run Map` / `Pack Map`。
+- 当前任务本身是在诊断插件编译、打包、地图未更新或产物错误。
+
+“接入代码”“生成资源”“更新配置”“构建验证”“可以进游戏测试”都不等于要求打包。遇到这些普通任务，只运行与改动相称的检查，通常到 `npm run build` 成功为止；不要因为觉得用户可能马上测试就自行打包。
+
+| 用户意图 | 默认动作 |
+|----------|----------|
+| 只改文档、规则或注释 | 不构建、不打包 |
+| 接入或修改 TS/Lua 业务代码 | 运行必要构建；不手动打包 |
+| 用户正常进图测试 | 由用户执行 Warcraft VSCode `Run Map` |
+| 用户明确要求 W3X、Pack Map 或排查地图未更新 | 才进入下方手动流程 |
+
+## 明确要求打包时的流程
 
 1. 运行 `npm run build`。
 2. 检查敏感生成物，例如 JASS/JAPI/DzAPI 调用、回调参数、`nil/self` 形态，优先看 `src/**/*.lua`。
-3. 确认 `.build/war3map.lua` 是否已经包含本次修改。
+3. 仅在本轮确实需要产出测试图时，确认 `.build/war3map.lua` 是否已经包含本次修改。
 4. 如果 `.build/war3map.lua` 仍是旧代码，先刷新或同步它，再打包测试图。
-5. 用现有 packlist 重新生成测试图：
+5. 优先使用当前已安装的 Warcraft VSCode `wc3.exe` 完整编译并打包：
 
 ```powershell
-& 'C:\Users\Administrator\.vscode\extensions\dencer.warcraft-vscode-0.3.6\bin\MopaqPack-rs.exe' generate -i .build\packlist.json -o .build\_warcraft_vscode_test.w3x
+$extension = Get-ChildItem 'C:\Users\Administrator\.vscode\extensions' -Directory |
+  Where-Object Name -Like 'dencer.warcraft-vscode-*-win32-x64' |
+  Sort-Object Name -Descending |
+  Select-Object -First 1
+$wc3 = Join-Path $extension.FullName 'bin\wc3.exe'
+& $wc3 build (Get-Location).Path -c
 ```
+
+不要把插件版本写死为 `0.3.6`；当前环境可能已经升级。旧版 `MopaqPack-rs.exe` 只作为确实仍安装旧插件时的备用工具。
 
 ## 验证点
 
@@ -32,9 +54,19 @@ alwaysApply: false
 
 ## 常见坑
 
-- 不要只看 `src/**/*.lua` 就让用户进图测；测试图实际可能仍在用旧 `.build/war3map.lua`。
+- 用户未要求手动打包时，不要为了检查 `.build` 而额外生成地图；让用户正常使用 `Run Map` 即可。
+- 用户明确要求 AI 产出测试图时，不要只看 `src/**/*.lua` 就让用户进图测；测试图实际可能仍在用旧 `.build/war3map.lua`。
 - 不要把打包失败误判成业务代码没生效；先确认 `.build` 产物和测试图时间戳。
 - 改 DzAPI UI、物品主动技能、事件中心、伤害流程这类进图表现时，尤其要做 `.build` 和 `.w3x` 双确认。
+- Warcraft VSCode `0.3.7` 的 Classic CLI 会按 UTF-8 读取地图内 `war3map.j`。如果原地图脚本是合法 GBK，会报 `stream did not contain valid UTF-8`。不要重写 TS 源文件，也不要只转换 `.build/war3map.j`，因为 `wc3 compile` 会重新从地图提取并覆盖它。
+- 遇到上述 GBK 错误时，在 `.build` 创建临时 `map.w3x` 副本；从原图提取 `war3map.j`，按 GBK 解码并显式写成无 BOM UTF-8，再用 `mpqcli add -p war3map.j -w -g warcraft3-map` 替换临时副本中的脚本。随后对临时副本运行：
+
+```powershell
+& $wc3 compile (Get-Location).Path -c -m '<临时 UTF-8 地图副本.w3x>'
+& $wc3 pack (Get-Location).Path -c -m '<临时 UTF-8 地图副本.w3x>' -o '.build\_warcraft_vscode_test.w3x'
+```
+
+- 若 `_warcraft_vscode_test.w3x` 被 Warcraft 占用，不要结束用户进程；改用带任务名或时间戳的新输出文件。打包后从成品 W3X 重新提取 `war3map.lua`，检查本次关键代码确实存在，再清理临时副本。
 
 ## Warcraft VSCode 命令 ID
 
@@ -48,4 +80,4 @@ extension.warcraft.pack.debug     -> Warcraft: Pack Map，按 packlist 打包测
 extension.warcraft.run.debug      -> Warcraft: Run Map，compile + pack + 启动测试图
 ```
 
-当前 Codex shell 不能直接通过 `code` CLI 调用 VSCode command ID；需要用户在 VSCode 命令面板执行，或使用 Computer Use 操作 VSCode。若只在 shell 中运行，则只能在 `.build/war3map.lua` 已确认最新后，使用 `MopaqPack-rs.exe generate -i .build\packlist.json -o .build\_warcraft_vscode_test.w3x` 重新打包。
+当前 Codex shell 不能直接通过 `code` CLI 调用 VSCode command ID；需要用户在 VSCode 命令面板执行、使用 Computer Use 操作 VSCode，或直接调用当前插件目录下的 `bin\wc3.exe`。直接调用 CLI 时仍需遵守上面的 Classic GBK 兼容流程与成品验证要求。

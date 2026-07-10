@@ -7,9 +7,12 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["莫尔特斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.02．数值与表现配置")
 local _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["莫尔特斯数值与表现配置"]
+local ____13_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.13．台词播放")
+local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_653E["播放莫尔特斯台词"]
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.11．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____53D6_5355_4F4DID = ____16_FF0E_516C_5171_5DE5_5177["取单位ID"]
+local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
 ____exports["取莫尔特斯当前阶段"] = function(boss)
     if not _____5355_4F4D_6709_6548(boss) then
         return 1
@@ -28,18 +31,24 @@ ____exports["取莫尔特斯当前阶段"] = function(boss)
     return 1
 end
 local jass = require("jass.common")
+local GetUnitTypeId = jass.GetUnitTypeId
 GetUnitState = jass.GetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_0.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_0["移除单位指定Buff"]
-local ____require_result_1 = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯")
-local _____83AB_5C14_7279_65AFBuffID = ____require_result_1["莫尔特斯BuffID"]
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_0.registerDeathListener
+local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
+local _____83AB_5C14_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
+local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_1.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
+local ____require_result_2 = require("系统.05．Buff系统.03．Buff表.01．Boss.09．莫尔特斯")
+local _____83AB_5C14_7279_65AFBuffID = ____require_result_2["莫尔特斯BuffID"]
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
 local function _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587(boss, _____6E05_7406)
+    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "开场", 0)
     return {
         ["Boss单位"] = boss,
         ["阶段"] = ____exports["取莫尔特斯当前阶段"](boss),
@@ -166,6 +175,18 @@ ____exports["刷新Boss腐败护盾Buff"] = function(context)
         {stack = context["腐败护盾值"], sourceName = "莫尔特斯-腐败护盾"}
     )
 end
+local function ____on_83AB_5C14_7279_65AF_6B7B_4EA1(dyingUnit)
+    if GetUnitTypeId(dyingUnit) ~= _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID then
+        return
+    end
+    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(dyingUnit, "死亡", 0)
+    ____exports["清理莫尔特斯上下文"](dyingUnit)
+end
 ____exports["注册莫尔特斯运行时"] = function()
+    if _____83AB_5C14_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C then
+        return
+    end
+    _____83AB_5C14_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = true
+    registerDeathListener(____on_83AB_5C14_7279_65AF_6B7B_4EA1)
 end
 return ____exports

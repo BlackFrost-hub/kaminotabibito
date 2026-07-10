@@ -2,7 +2,7 @@
  * 在 tstl 之后修正生成的 Lua，适配魔兽/YDWE 运行环境。
  * 背景：TSTL 默认把不少 TS 调用当成「带 self 的 Lua 方法」，会生成 table:fn(...)、多传 nil、
  * 以及 export 与点号调用错位等；地图侧 require 与原生 API 与 Node 不一致，不能指望上游改完。
- * 详细坑位见 .cursor/rules/war3-tstl/jass-pitfalls.mdc
+ * 详细规则见 .cursor/rules/core/tstl-hard-rules.mdc 与 .cursor/rules/engine/tstl/README.md
  *
  * require("…")：已在 TS/global.d.ts 对 declare require 使用 @noSelf，并由 tsconfig tstl.noResolvePaths
  * 避免 TSTL 解析点分路径失败；此处不再做 require(nil, …) 替换。

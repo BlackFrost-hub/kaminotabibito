@@ -1,0 +1,15 @@
+{
+  "sourceDir": "audio_temp/Boss/Ricote/Voice",
+  "targetDir": "Sound/Boss/Ricote/Voice",
+  "files": [
+    "ricote_opening_indulge_you_blackwood_01_v3.mp3",
+    "ricote_quad_windblades_royal_winds_blackwood_01_v3.mp3",
+    "ricote_chasing_windblade_hunt_you_blackwood_01_v3.mp3",
+    "ricote_divine_wind_guard_no_touch_blackwood_01_v3.mp3",
+    "ricote_mark_shatter_final_mistake_blackwood_01_v3.mp3",
+    "ricote_annihilation_cannon_beyond_reach_blackwood_01_v3.mp3",
+    "ricote_annihilation_wind_royal_death_power_blackwood_01_v3.mp3",
+    "ricote_counter_every_move_foreseen_blackwood_01_v3.mp3",
+    "ricote_challenge_end_death_power_blackwood_01_v3.mp3"
+  ]
+}

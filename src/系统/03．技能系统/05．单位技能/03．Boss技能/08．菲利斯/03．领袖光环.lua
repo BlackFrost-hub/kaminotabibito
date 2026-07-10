@@ -10,6 +10,8 @@ local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.08．菲利斯.08．台词播放")
+local _____64AD_653E_83F2_5229_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放菲利斯台词"]
 local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
 local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local jass = require("jass.common")
@@ -56,6 +58,7 @@ local function _____5237_65B0_5355_4E2A_9886_8896_5149_73AF(context)
             GetUnitY(boss),
             _____83F2_5229_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
         )
+        _____64AD_653E_83F2_5229_65AF_53F0_8BCD(boss, "领袖光环", 0)
     end
     SetUnitAbilityLevel(boss, _____9886_8896_5149_73AF_6280_80FDID, low and cfg["低血物编等级"] or cfg["高血物编等级"])
     registerManualBuff(

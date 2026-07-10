@@ -2,10 +2,17 @@
 
 本文给后续 AI / 接力线程使用。目标是把已确认的 Boss Voice 打成可选外置语音包 `.mix`，放进 Warcraft III 目录。语音包缺失时，地图机制、中文系统消息和关键 SFX 必须仍然正常。
 
+## 何时执行
+
+- 只有 manifest 新增、替换或删除了已确认 Voice，或用户明确要求重建语音包时，才重新打 MPQ/MIX。
+- 普通代码、SFX、规则或中文台词修改不触发语音包重建。
+- 重建前先验证 manifest source 全部存在、target 无重复且与代码路径一致。
+- 游戏或 MPQEditor 占用目标 MIX 时，不结束用户进程；等用户关闭，或输出带时间戳的测试包。
+
 ## 固定约定
 
 - 项目根目录：`C:\Users\Administrator\Desktop\syzl`
-- manifest：`voice_pack_manifest.json`
+- manifest 目录：`voice_pack_manifest/Boss/`
 - 收集脚本：`scripts/voice_pack_collect.py`
 - MPQ 根目录：`build\voice-pack\mpq-root`
 - MPQ 文件：`build\voice-pack\syzl_voice_pack_v001.mpq`
@@ -25,22 +32,23 @@ Sound/Boss/<BossKey>/Voice/<file>.mp3
 
 ## manifest 写法
 
-`voice_pack_manifest.json` 只记录用户已经确认的 Voice，不记录试听废稿。
+`voice_pack_manifest/Boss/<BossKey>.json` 只记录用户已经确认的 Voice，不记录试听废稿。
 
 ```json
-[
-  {
-    "source": "C:/Users/Administrator/Desktop/syzl/audio_temp/Boss/Thranduil/Voice/file.mp3",
-    "target": "Sound/Boss/Thranduil/Voice/file.mp3",
-    "note": "确认用途说明，可选"
-  }
-]
+{
+  "sourceDir": "audio_temp/Boss/Thranduil/Voice",
+  "targetDir": "Sound/Boss/Thranduil/Voice",
+  "files": [
+    "file.mp3"
+  ]
+}
 ```
 
 要求：
 
-- `source` 是本机真实文件，通常来自 `audio_temp/Boss/<BossKey>/Voice/`。
-- `target` 是 MPQ/MIX 内部相对路径，不能写盘符，不能写绝对路径。
+- `sourceDir` 是项目内试听源目录，通常为 `audio_temp/Boss/<BossKey>/Voice`。
+- `targetDir` 是 MPQ/MIX 内部目录，固定为 `Sound/Boss/<BossKey>/Voice`。
+- `files` 只写确认文件名，不重复完整 source/target。
 - Boss Voice 建议放外置包；关键战斗 SFX 仍优先放地图内资源。
 
 ## 自动流程
@@ -48,7 +56,7 @@ Sound/Boss/<BossKey>/Voice/<file>.mp3
 在项目根目录执行：
 
 ```powershell
-python scripts/voice_pack_collect.py --manifest voice_pack_manifest.json --out build/voice-pack/mpq-root
+python scripts/voice_pack_collect.py --manifest voice_pack_manifest --out build/voice-pack/mpq-root
 ```
 
 这一步会清空并重建：
@@ -180,7 +188,7 @@ testvoice
 ## 后续 AI 接力检查清单
 
 1. 先确认用户要打包的是 Voice，不是核心 SFX。
-2. 检查 `voice_pack_manifest.json` 是否包含所有已确认 Voice。
+2. 检查 `voice_pack_manifest/Boss/` 是否包含所有已确认 Voice。
 3. 跑 `voice_pack_collect.py`。
 4. 如 manifest 内容变化，优先用 `mpqcli create --game warcraft3` 重新生成 MPQ；`mpqcli` 不可用时才用 MPQEditor GUI。
 5. 跑 `make_mix.bat` 合成 MIX。

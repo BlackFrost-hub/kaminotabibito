@@ -101,12 +101,44 @@ let StarItem_MoveItemTrig_Index = 0;
 const StarItem_StackItemTrigs: any[] = [];
 let StarItem_StackItemTrig_Index = 0;
 
+export type 任意单位物品叠加回调 = (
+    this: void,
+    单位: any,
+    合并后物品: any,
+    被叠加物品: any,
+    叠加前次数: number,
+    新增次数: number,
+    叠加后次数: number
+) => void;
+
+const 任意单位物品叠加回调列表: Array<任意单位物品叠加回调 | undefined> = [];
+let StarItem_StackedSourceItem: any = null;
+let StarItem_StackedBeforeCharges = 0;
+let StarItem_StackedAddedCharges = 0;
+let StarItem_StackedAfterCharges = 0;
+
 export function StarItem_GetTriggerUnit(): any {
     return StarItem_CallBackUnit;
 }
 
 function ItemStacked(): void {
     let i = 0;
+    while (i < 任意单位物品叠加回调列表.length) {
+        const callback = 任意单位物品叠加回调列表[i];
+        if (callback != null) {
+            callback(
+                StarItem_CallBackUnit,
+                StarItem_TryPickUp_item,
+                StarItem_StackedSourceItem,
+                StarItem_StackedBeforeCharges,
+                StarItem_StackedAddedCharges,
+                StarItem_StackedAfterCharges
+            );
+        }
+        i += 1;
+    }
+
+    i = 0;
     while (i < StarItem_StackItemTrig_Index) {
         if (StarItem_StackItemTrigs[i] === null) {
             StarItem_StackItemTrigs[i] = StarItem_StackItemTrigs[StarItem_StackItemTrig_Index];
@@ -115,6 +147,20 @@ function ItemStacked(): void {
         jass.TriggerExecute(StarItem_StackItemTrigs[i]);
         i += 1;
     }
+}
+
+function FireItemStacked(stackedItem: any, sourceItem: any, unit: any, beforeCharges: number, addedCharges: number, afterCharges: number): void {
+    StarItem_TryPickUp_item = stackedItem;
+    StarItem_CallBackUnit = unit;
+    StarItem_StackedSourceItem = sourceItem;
+    StarItem_StackedBeforeCharges = beforeCharges;
+    StarItem_StackedAddedCharges = addedCharges;
+    StarItem_StackedAfterCharges = afterCharges;
+    ItemStacked();
+    StarItem_StackedSourceItem = null;
+    StarItem_StackedBeforeCharges = 0;
+    StarItem_StackedAddedCharges = 0;
+    StarItem_StackedAfterCharges = 0;
 }
 
 function ExecuteTryPickUpTriggers(u: any, item: any): void {
@@ -145,10 +191,11 @@ function tryMergeGroundItemIntoInventory(wp: any, u: any, fireTryPickUp = true):
         if (wp2 !== null && jass.GetItemTypeId(wp) === jass.GetItemTypeId(wp2) && wp !== wp2) {
             faceUnitTowardGroundItem(u, wp);
             if (fireTryPickUp) ExecuteTryPickUpTriggers(u, wp);
-            jass.SetItemCharges(wp2, jass.GetItemCharges(wp2) + jass.GetItemCharges(wp));
-            StarItem_TryPickUp_item = wp2;
-            StarItem_CallBackUnit = u;
-            ItemStacked();
+            const beforeCharges = jass.GetItemCharges(wp2) as number;
+            const addedCharges = jass.GetItemCharges(wp) as number;
+            const afterCharges = beforeCharges + addedCharges;
+            jass.SetItemCharges(wp2, afterCharges);
+            FireItemStacked(wp2, wp, u, beforeCharges, addedCharges, afterCharges);
             jass.RemoveItem(wp);
             return true;
         }
@@ -433,10 +480,11 @@ export function StarItem_ItemStack_Cond2(): boolean {
                 const itemInSlot = triggerUnit !== null ? jass.UnitItemInSlot(triggerUnit, i) : null;
                 if (itemInSlot !== null && jass.GetItemTypeId(manipulatedItem) === jass.GetItemTypeId(itemInSlot) && manipulatedItem !== itemInSlot) {
                     ExecuteTryPickUpTriggers(triggerUnit, manipulatedItem);
-                    jass.SetItemCharges(itemInSlot, jass.GetItemCharges(itemInSlot) + jass.GetItemCharges(manipulatedItem));
-                    StarItem_TryPickUp_item = itemInSlot;
-                    StarItem_CallBackUnit = triggerUnit;
-                    ItemStacked();
+                    const beforeCharges = jass.GetItemCharges(itemInSlot) as number;
+                    const addedCharges = jass.GetItemCharges(manipulatedItem) as number;
+                    const afterCharges = beforeCharges + addedCharges;
+                    jass.SetItemCharges(itemInSlot, afterCharges);
+                    FireItemStacked(itemInSlot, manipulatedItem, triggerUnit, beforeCharges, addedCharges, afterCharges);
                     jass.RemoveItem(manipulatedItem);
                     return true;
                 }
@@ -457,6 +505,32 @@ export function StarItem_OpenStack(r: number): void {
 export function StarItem_TriggerAddItemStackedEvent(t: any): void {
     StarItem_StackItemTrigs[StarItem_StackItemTrig_Index] = t;
     StarItem_StackItemTrig_Index += 1;
+}
+
+export function onAnyUnitItemStacked(this: void, callback: 任意单位物品叠加回调): number {
+    任意单位物品叠加回调列表.push(callback);
+    return 任意单位物品叠加回调列表.length - 1;
+}
+
+export function offAnyUnitItemStacked(this: void, id: number): void {
+    if (id < 0 || id >= 任意单位物品叠加回调列表.length) return;
+    任意单位物品叠加回调列表[id] = undefined;
+}
+
+export function StarItem_GetStackedSourceItem(): any {
+    return StarItem_StackedSourceItem;
+}
+
+export function StarItem_GetStackedBeforeCharges(): number {
+    return StarItem_StackedBeforeCharges;
+}
+
+export function StarItem_GetStackedAddedCharges(): number {
+    return StarItem_StackedAddedCharges;
+}
+
+export function StarItem_GetStackedAfterCharges(): number {
+    return StarItem_StackedAfterCharges;
 }
 
 export function StarItem_CloseStack(): void {

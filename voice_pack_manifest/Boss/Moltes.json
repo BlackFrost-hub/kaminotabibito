@@ -1,0 +1,15 @@
+{
+  "sourceDir": "audio_temp/Boss/Moltes/Voice",
+  "targetDir": "Sound/Boss/Moltes/Voice",
+  "files": [
+    "moltes_opening_roots_domain_elderbark_01_v3.mp3",
+    "moltes_root_awaken_earth_remembers_elderbark_01_v3.mp3",
+    "moltes_low_health_draw_more_rot_elderbark_01_v3.mp3",
+    "moltes_defeat_roots_no_longer_ache_elderbark_01_v3.mp3",
+    "moltes_rotten_roots_hungry_beneath_elderbark_01_v3.mp3",
+    "moltes_spore_cloud_breathe_rot_elderbark_01_v3.mp3",
+    "moltes_thorn_lash_intruders_elderbark_01_v3.mp3",
+    "moltes_corruption_seed_grow_for_me_elderbark_01_v3.mp3",
+    "moltes_ancient_lament_forest_agony_elderbark_01_v3.mp3"
+  ]
+}

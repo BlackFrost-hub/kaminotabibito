@@ -1,4 +1,4 @@
 interface:
   display_name: "Syzl Project Rules"
-  short_description: "Route work through the current .cursor rules, jass/japi runtime truth, TSTL call-shape checks, and UTF-8-safe patching."
-  default_prompt: "Use $syzl-project-rules to work inside this repository by reading `.cursor/rules/README.md` first, then `.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`, then the most specific subsystem rules needed for the files being changed."
+  short_description: "按项目规则路由 Syzl 的代码、玩法、资源与构建工作"
+  default_prompt: "Use $syzl-project-rules to route this repository task through the relevant core, engine, gameplay, resources, and tooling rules before making changes."

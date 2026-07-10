@@ -14,6 +14,7 @@ export const 瑟兰迪尔单位技能配置 = {
     { 技能ID: "AN01", 提示: "律法召唤" },
   ],
   广播持续时间Ms: 4200,
+  配音裁断距离: 4000,
   配音生成配置: {
     显示台词字段: "台词",
     配音台词字段: "配音台词",
@@ -129,57 +130,57 @@ export const 瑟兰迪尔单位技能配置 = {
       "[fading] May moonlight guide your path... not your weapons...",
     ],
   },
-  配音试听资源: {
+  配音资源: {
     开战: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_opening_law_warning_jude_02_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_opening_moonlit_grove_jude_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_opening_court_enforcer_jude_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_opening_law_warning_jude_02_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_opening_moonlit_grove_jude_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_opening_court_enforcer_jude_01_v3_64k.mp3",
     ],
     转阶段70: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_phase70_warning_failed_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_phase70_offences_weighed_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_phase70_warning_failed_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_phase70_offences_weighed_01_v3_64k.mp3",
     ],
     转阶段40: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_phase40_order_endure_02_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_phase40_moonlight_strength_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_phase40_final_judgment_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_phase40_order_endure_02_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_phase40_moonlight_strength_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_phase40_final_judgment_01_v3_64k.mp3",
     ],
     月光枷锁: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_moon_shackle_bind_steps_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_moon_shackle_defier_still_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_moon_shackle_bind_steps_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_moon_shackle_defier_still_01_v3_64k.mp3",
     ],
     精灵箭阵: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_arrow_array_archers_position_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_arrow_array_royal_arrow_line_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_arrow_array_archers_position_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_arrow_array_royal_arrow_line_01_v3_64k.mp3",
     ],
     审判之环: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_judgment_ring_step_wrongly_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_judgment_ring_colors_fate_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_judgment_ring_step_wrongly_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_judgment_ring_colors_fate_01_v3_64k.mp3",
     ],
     罪与罚: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_sin_punishment_never_parted_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_sin_punishment_choice_sentence_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_sin_punishment_never_parted_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_sin_punishment_choice_sentence_01_v3_64k.mp3",
     ],
     律法召唤: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_law_summon_enforcers_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_law_summon_chains_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_law_summon_enforcers_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_law_summon_chains_01_v3_64k.mp3",
     ],
     月光灌注: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_moon_infusion_blade_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_moon_infusion_end_conflict_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_moon_infusion_blade_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_moon_infusion_end_conflict_01_v3_64k.mp3",
     ],
     精灵神罚: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_elven_smite_time_up_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_elven_smite_no_mercy_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_elven_smite_time_up_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_elven_smite_no_mercy_01_v3_64k.mp3",
     ],
     终末审判: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_final_judgment_silence_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_final_judgment_erased_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_final_judgment_silence_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_final_judgment_erased_01_v3_64k.mp3",
     ],
     胜利: [
-      "audio_temp/Boss/Thranduil/Voice/thranduil_defeat_order_not_die_03_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_defeat_grove_peace_01_v3_64k.mp3",
-      "audio_temp/Boss/Thranduil/Voice/thranduil_defeat_moonlight_path_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_defeat_order_not_die_03_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_defeat_grove_peace_01_v3_64k.mp3",
+      "Sound\\Boss\\Thranduil\\Voice\\thranduil_defeat_moonlight_path_01_v3_64k.mp3",
     ],
   },
 } as const;

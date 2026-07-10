@@ -348,6 +348,20 @@ local function _____8FDB_5165_7B2C_4E09_9636_6BB5(context)
         return
     end
     context["阶段"] = 3
+    local boss = context["Boss单位"]
+    local delayMs = context["阶段3台词最早Ms"] - getServerTime()
+    if delayMs <= 0 then
+        _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD(boss, "转阶段3", 0)
+    else
+        addDelayedCallback(
+            delayMs,
+            function()
+                if _____5355_4F4D_6709_6548(boss) then
+                    _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD(boss, "转阶段3", 0)
+                end
+            end
+        )
+    end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]
     context["末日熔爆下一次允许Ms"] = getServerTime() + config["周期冷却秒"] * 1000
     registerManualBuff(

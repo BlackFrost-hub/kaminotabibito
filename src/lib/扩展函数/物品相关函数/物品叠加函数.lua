@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local ensureMoveSmartOrderIds, isIssuedMoveOrSmartOrder, faceUnitTowardGroundItem, suppressPendingMoveAfterGroundStack, initHashtable, ItemStacked, ExecuteTryPickUpTriggers, tryMergeGroundItemIntoInventory, cleanupTempTrigger, CheakPickUpForTrigger, CheakPickUp, hasInventoryAbility, isItemInRange, schedulePickUpCheck, isStackableItemType, jass, unitSpecificEventCenter, centerTimer, _____7269_54C1_5728_53E0_52A0_767D_540D_5355, ABIL_INVENTORY, PICKUP_RECHECK_DELAY_MS, STOP_QUEUE_DEFER_MS, FALLBACK_ORDER_MOVE, FALLBACK_ORDER_SMART, BJ_RADTODEG, cachedOrderMove, cachedOrderSmart, HT, StackStatus, ItemRange, StarItem_TryPickUp_item, StarItem_bagLoc, StarItem_CallBackUnit, temp_trig, tempTrigUnregisters, StarItem_TryPickUpTrigs, StarItem_TryPickUpTrig_Index, StarItem_MoveItemTrigs, StarItem_MoveItemTrig_Index, StarItem_StackItemTrigs, StarItem_StackItemTrig_Index
+local ensureMoveSmartOrderIds, isIssuedMoveOrSmartOrder, faceUnitTowardGroundItem, suppressPendingMoveAfterGroundStack, initHashtable, ItemStacked, FireItemStacked, ExecuteTryPickUpTriggers, tryMergeGroundItemIntoInventory, cleanupTempTrigger, CheakPickUpForTrigger, CheakPickUp, hasInventoryAbility, isItemInRange, schedulePickUpCheck, isStackableItemType, jass, unitSpecificEventCenter, centerTimer, _____7269_54C1_5728_53E0_52A0_767D_540D_5355, ABIL_INVENTORY, PICKUP_RECHECK_DELAY_MS, STOP_QUEUE_DEFER_MS, FALLBACK_ORDER_MOVE, FALLBACK_ORDER_SMART, BJ_RADTODEG, cachedOrderMove, cachedOrderSmart, HT, StackStatus, ItemRange, StarItem_TryPickUp_item, StarItem_bagLoc, StarItem_CallBackUnit, temp_trig, tempTrigUnregisters, StarItem_TryPickUpTrigs, StarItem_TryPickUpTrig_Index, StarItem_MoveItemTrigs, StarItem_MoveItemTrig_Index, StarItem_StackItemTrigs, StarItem_StackItemTrig_Index, _____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868, StarItem_StackedSourceItem, StarItem_StackedBeforeCharges, StarItem_StackedAddedCharges, StarItem_StackedAfterCharges
 function ensureMoveSmartOrderIds()
     if cachedOrderMove ~= 0 then
         return
@@ -52,6 +52,21 @@ function initHashtable()
 end
 function ItemStacked()
     local i = 0
+    while i < #_____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868 do
+        local callback = _____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868[i + 1]
+        if callback ~= nil then
+            callback(
+                StarItem_CallBackUnit,
+                StarItem_TryPickUp_item,
+                StarItem_StackedSourceItem,
+                StarItem_StackedBeforeCharges,
+                StarItem_StackedAddedCharges,
+                StarItem_StackedAfterCharges
+            )
+        end
+        i = i + 1
+    end
+    i = 0
     while i < StarItem_StackItemTrig_Index do
         if StarItem_StackItemTrigs[i + 1] == nil then
             StarItem_StackItemTrigs[i + 1] = StarItem_StackItemTrigs[StarItem_StackItemTrig_Index + 1]
@@ -60,6 +75,19 @@ function ItemStacked()
         jass.TriggerExecute(StarItem_StackItemTrigs[i + 1])
         i = i + 1
     end
+end
+function FireItemStacked(stackedItem, sourceItem, unit, beforeCharges, addedCharges, afterCharges)
+    StarItem_TryPickUp_item = stackedItem
+    StarItem_CallBackUnit = unit
+    StarItem_StackedSourceItem = sourceItem
+    StarItem_StackedBeforeCharges = beforeCharges
+    StarItem_StackedAddedCharges = addedCharges
+    StarItem_StackedAfterCharges = afterCharges
+    ItemStacked()
+    StarItem_StackedSourceItem = nil
+    StarItem_StackedBeforeCharges = 0
+    StarItem_StackedAddedCharges = 0
+    StarItem_StackedAfterCharges = 0
 end
 function ExecuteTryPickUpTriggers(u, item)
     if StarItem_TryPickUpTrig_Index <= 0 or u == nil or item == nil then
@@ -95,13 +123,18 @@ function tryMergeGroundItemIntoInventory(wp, u, fireTryPickUp)
                 if fireTryPickUp then
                     ExecuteTryPickUpTriggers(u, wp)
                 end
-                jass.SetItemCharges(
+                local beforeCharges = jass.GetItemCharges(wp2)
+                local addedCharges = jass.GetItemCharges(wp)
+                local afterCharges = beforeCharges + addedCharges
+                jass.SetItemCharges(wp2, afterCharges)
+                FireItemStacked(
                     wp2,
-                    jass.GetItemCharges(wp2) + jass.GetItemCharges(wp)
+                    wp,
+                    u,
+                    beforeCharges,
+                    addedCharges,
+                    afterCharges
                 )
-                StarItem_TryPickUp_item = wp2
-                StarItem_CallBackUnit = u
-                ItemStacked()
                 jass.RemoveItem(wp)
                 return true
             end
@@ -341,13 +374,18 @@ function ____exports.StarItem_ItemStack_Cond2()
                 local itemInSlot = ____temp_5
                 if itemInSlot ~= nil and jass.GetItemTypeId(manipulatedItem) == jass.GetItemTypeId(itemInSlot) and manipulatedItem ~= itemInSlot then
                     ExecuteTryPickUpTriggers(triggerUnit, manipulatedItem)
-                    jass.SetItemCharges(
+                    local beforeCharges = jass.GetItemCharges(itemInSlot)
+                    local addedCharges = jass.GetItemCharges(manipulatedItem)
+                    local afterCharges = beforeCharges + addedCharges
+                    jass.SetItemCharges(itemInSlot, afterCharges)
+                    FireItemStacked(
                         itemInSlot,
-                        jass.GetItemCharges(itemInSlot) + jass.GetItemCharges(manipulatedItem)
+                        manipulatedItem,
+                        triggerUnit,
+                        beforeCharges,
+                        addedCharges,
+                        afterCharges
                     )
-                    StarItem_TryPickUp_item = itemInSlot
-                    StarItem_CallBackUnit = triggerUnit
-                    ItemStacked()
                     jass.RemoveItem(manipulatedItem)
                     return true
                 end
@@ -401,6 +439,11 @@ StarItem_MoveItemTrigs = {}
 StarItem_MoveItemTrig_Index = 0
 StarItem_StackItemTrigs = {}
 StarItem_StackItemTrig_Index = 0
+_____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868 = {}
+StarItem_StackedSourceItem = nil
+StarItem_StackedBeforeCharges = 0
+StarItem_StackedAddedCharges = 0
+StarItem_StackedAfterCharges = 0
 function ____exports.StarItem_GetTriggerUnit()
     return StarItem_CallBackUnit
 end
@@ -469,6 +512,28 @@ end
 function ____exports.StarItem_TriggerAddItemStackedEvent(t)
     StarItem_StackItemTrigs[StarItem_StackItemTrig_Index + 1] = t
     StarItem_StackItemTrig_Index = StarItem_StackItemTrig_Index + 1
+end
+function ____exports.onAnyUnitItemStacked(callback)
+    _____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868[#_____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868 + 1] = callback
+    return #_____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868 - 1
+end
+function ____exports.offAnyUnitItemStacked(id)
+    if id < 0 or id >= #_____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868 then
+        return
+    end
+    _____4EFB_610F_5355_4F4D_7269_54C1_53E0_52A0_56DE_8C03_5217_8868[id + 1] = nil
+end
+function ____exports.StarItem_GetStackedSourceItem()
+    return StarItem_StackedSourceItem
+end
+function ____exports.StarItem_GetStackedBeforeCharges()
+    return StarItem_StackedBeforeCharges
+end
+function ____exports.StarItem_GetStackedAddedCharges()
+    return StarItem_StackedAddedCharges
+end
+function ____exports.StarItem_GetStackedAfterCharges()
+    return StarItem_StackedAfterCharges
 end
 function ____exports.StarItem_CloseStack()
     StackStatus = false

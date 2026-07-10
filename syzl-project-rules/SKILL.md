@@ -1,62 +1,52 @@
 ---
 name: syzl-project-rules
-description: Route work in the syzl repository through its current project-specific engineering rules. Use when working anywhere in this repo. Read `.cursor/rules/README.md` first, then `.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`, then only the most specific subsystem rules needed for the files being changed.
+description: Route all work in the syzl Warcraft 3 TypeScriptToLua repository through its project-specific rules. Use whenever Codex edits, reviews, diagnoses, builds, or produces gameplay, engine, resource, tooling, Boss, equipment, UI, audio, voice, ObjEditing, or story content in this repository.
 ---
 
 # Syzl Project Rules
 
-## Purpose
+Use this skill as a router into the repository rules. Do not copy full rule bodies into this skill.
 
-Use this skill to route into the repo rule system before making changes.
+## Start Here
 
-Do not use this skill as a second full copy of the repo rules.
-
-Authoritative rule sources are:
-
-1. `.cursor/rules/README.md`
-2. `.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`
-3. the most specific subsystem rule files for the code being changed
-
-## First Pass
-
-0. Read the project-root `jass表.txt` and `japi表.txt` first when the task touches engine APIs, JASS, DzAPI, BJ wrappers, or Lua/JASS interop.
 1. Read `.cursor/rules/README.md`.
 2. Read `.cursor/rules/GLOBAL_AGENT_PROMPT.mdc`.
-3. Read the most relevant rule files under `.cursor/rules/` for the files or subsystem being touched.
-4. Prefer the more specific rule when multiple rules apply.
-5. Fall back to `.cursor/rules/agent-shared/global-engine-rules.mdc` when no subsystem rule is more specific.
-6. Before rewriting Chinese-heavy files or touching TSTL callback / `@noSelfInFile` issues, read `.cursor/rules/tooling/encoding-and-patch-safety.mdc`.
+3. Read only the most specific category and rule files needed for the task.
+4. Prefer user/system instructions, then the rule closest to the files being changed.
 
-## Rule Routing
+When engine APIs, JASS, JAPI, BJ, DzAPI, or Lua/JASS interop are involved, also check the project-root `jass表.txt` and `japi表.txt` as runtime truth.
 
-- DzAPI, task UI, FDF, LoadToc, frame callbacks, hotkeys, `GetLocalPlayer`, `sync=true`, timers, desync, N-slot UI:
-  Read `.cursor/rules/dzapi/n-slot-ui-symmetric-execution.mdc` first, then `ui-frame-types.mdc`, `loadtoc-ui.mdc`, or `fdf-crash.mdc` as needed.
-- General engine boundaries, `require(...)`, jass/japi/BJ separation, `globalThis`, event-center usage:
-  Read `.cursor/rules/agent-shared/global-engine-rules.mdc`.
-- TSTL, Lua/JASS runtime pitfalls, random seed, arrays, damage, `self/nil` drift, callback shape, or `@noSelfInFile`:
-  Read `.cursor/rules/agent-shared/tstl-hard-rules.mdc` and then `.cursor/rules/war3-tstl/*` as needed.
-- Equipment data, `hot`, `USE_ITEM`, equipment triggers:
-  Read `.cursor/rules/equipment/*`.
-- STES, YDLocal return values, or memory-release rules:
-  Read `.cursor/rules/stes-ydlocal/*`.
-- Debug output, `print`, sound, encoding, or patch safety:
-  Read `.cursor/rules/tooling/*`.
+## Category Routing
 
-## Routing Notes
+- Cross-project constraints, JASS/JAPI/BJ boundaries, require paths, TSTL hard rules, Chinese naming, existing APIs:
+  Read `.cursor/rules/core/README.md`.
+- DzAPI UI, FDF/Frame, GetLocalPlayer, desync, callback lifecycle, Warcraft/TSTL details, STES or YDLocal:
+  Read `.cursor/rules/engine/README.md`, then its `dzapi/`, `tstl/`, or `bridges/` entry.
+- Skills, Bosses, equipment, Buffs, ObjEditing, tests, rewards, or story content:
+  Read `.cursor/rules/gameplay/README.md`, then the relevant subsystem entry.
+- SFX, Voice, external MIX packs, models, textures, effects, temporary assets, or import paths:
+  Read `.cursor/rules/resources/README.md`.
+- Build behavior, Run Map boundaries, packaging diagnostics, encoding, or patch safety:
+  Read `.cursor/rules/tooling/README.md`.
 
-- Keep this skill short. High-priority engine, TSTL, desync, callback, pcall, tooltip, no-self, and encoding rules belong in `GLOBAL_AGENT_PROMPT.mdc`.
-- Do not duplicate long rule bodies here. This file should tell the agent where to look, not restate the entire repo contract.
-- Re-open the specific rule file before changing a high-risk area instead of relying on memory.
-- This repo may not always have a root `AGENTS.md`; the actual rule entry remains `.cursor/rules/`.
+## High-Risk Checks
+
+- Before editing Chinese-heavy TS/MD/FDF or diagnosing mojibake, read `.cursor/rules/tooling/patch/encoding-and-patch-safety.mdc` and use small patches.
+- After sensitive TSTL callback, bridge, event, UI, or no-self changes, run the build and inspect only the relevant generated Lua call shape.
+- Treat `jass表.txt`, `japi表.txt`, and existing wrappers as API truth; do not invent engine natives or bypass established encapsulation.
+- Ordinary code integration does not authorize manual map packaging. Run `npm run build` when appropriate; let the user use Warcraft VSCode `Run Map` unless they explicitly request packing or packaging diagnosis.
+- Voice and SFX follow different workflows. Keep unconfirmed generated assets in `audio_temp`; only confirmed external Voice entries belong in the voice-pack manifest.
+
+## Rule Maintenance
+
+- Keep `.cursor/rules/README.md` as the only top-level navigation page.
+- Classify rules under `core / engine / gameplay / resources / tooling`.
+- Keep one authoritative body per topic; README files and this skill only route.
+- When moving a rule, update category indexes, relative links, source comments, and this skill.
+- Do not add links to planned files that do not exist.
 
 ## Working Style
 
-- Keep explanations short and repo-specific.
-- Cite concrete rule files when making recommendations.
-- If rules seem to conflict, prefer the file closest to the code being changed.
-- Run `npm run build` after actual code changes are complete, and report the result.
-- Use `apply_patch` for manual edits; avoid whole-file rewrites unless truly necessary.
-- Before rewriting Chinese-heavy files or fixing TSTL callback/no-self issues, read `.cursor/rules/tooling/encoding-and-patch-safety.mdc`.
-- Prefer local patch edits over whole-file rewrites; verify generated `src/**/*.lua` only after a successful build.
-- Do not treat terminal mojibake as proof that a source file is already damaged. Distinguish display/code-page problems from real byte corruption before rewriting Chinese-heavy files.
-- Do not change `fix-lua-for-pack.js` just to work around TSTL; prefer fixing the TypeScript source shape.
+- Read first, patch the smallest relevant surface, and preserve unrelated dirty-worktree changes.
+- Use `apply_patch` for manual edits; avoid whole-file rewrites for localized changes.
+- Report what was changed and what was actually verified.

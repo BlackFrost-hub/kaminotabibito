@@ -320,6 +320,15 @@ export function 释放巴尔扎罗斯末日熔爆(this: void, context: 巴尔扎
 function 进入第三阶段(this: void, context: 巴尔扎罗斯运行时上下文): void {
   if (context.阶段 === 3) return;
   context.阶段 = 3;
+  const boss = context.Boss单位;
+  const delayMs = context.阶段3台词最早Ms - getServerTime();
+  if (delayMs <= 0) {
+    播放巴尔扎罗斯台词(boss, "转阶段3", 0);
+  } else {
+    addDelayedCallback(delayMs, function 巴尔扎罗斯延迟阶段3台词(this: void): void {
+      if (单位有效(boss)) 播放巴尔扎罗斯台词(boss, "转阶段3", 0);
+    });
+  }
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;
   context.末日熔爆下一次允许Ms = getServerTime() + config.周期冷却秒 * 1000;
   registerManualBuff(context.Boss单位, 巴尔扎罗斯单位技能配置.BuffID.熔岩暴走, 3600, 1, {

@@ -20,12 +20,12 @@ Sound/Boss/<BossKey>/Voice/<file>.mp3
 
 ## 清单驱动收集
 
-1. 复制 `voice_pack_manifest.example.json` 为 `voice_pack_manifest.json`。
-2. 只把用户确认过的语音写进 manifest。
+1. 在 `voice_pack_manifest/Boss/` 中按 BossKey 维护分类 JSON。
+2. 每个文件只把用户确认过的语音文件名写进 `files`。
 3. 执行：
 
 ```powershell
-python scripts/voice_pack_collect.py --manifest voice_pack_manifest.json --out build/voice-pack/mpq-root
+python scripts/voice_pack_collect.py --manifest voice_pack_manifest --out build/voice-pack/mpq-root
 ```
 
 脚本会生成：

@@ -2,7 +2,7 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 巴尔扎罗斯技能数值配置 } from "../02．数值与表现配置";
-import { 播放巴尔扎罗斯台词 } from "../14．台词播放";
+import { 播放格鲁姆台词 } from "../14．台词播放";
 import { 施加巴尔扎罗斯灼热 } from "../16．灼热层数工具";
 import type { 技能伤害形态 } from "../../../../../04．伤害系统/08．技能伤害系统";
 
@@ -142,7 +142,7 @@ function 播放点特效(this: void, model: string, x: number, y: number, z: num
 
 export const 格鲁姆公共 = {
   巴尔扎罗斯技能数值配置,
-  播放巴尔扎罗斯台词,
+  播放格鲁姆台词,
   施加巴尔扎罗斯灼热,
   读取单位攻击力,
   启动基础施法时间线,

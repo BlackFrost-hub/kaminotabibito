@@ -1,7 +1,7 @@
 /**
  * STES事件测试 — Lua 仅通过事件名 STES_Fire，与 JASS STES_Register 共用 STES___HT
  *
- * 调试输出：遵循 `.cursor/rules/feedback_debug_output.md`，用 print（经 log）而非 DisplayTimedTextToPlayer。
+ * 调试输出：遵循 `.cursor/rules/core/项目通用函数与API经验.md`，优先用 debugLog/print，而非 DisplayTimedTextToPlayer。
  *
  * 与 GUI「333」一致：YDLocal 变量名由常量 YD_LOCAL_REAL_KEY 与地图 JASS 对齐（可为中文/英文/数字等，非库默认）。
  *

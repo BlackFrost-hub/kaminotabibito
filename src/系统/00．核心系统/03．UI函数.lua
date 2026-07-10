@@ -34,7 +34,7 @@ local tryOccupyNpc = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.tryOccupy
 -- - 勿用会走 `ExecuteFunc` 的 `DzFrameSetScript` 同步字符串去驱动 Lua 逻辑。
 -- - 若 UI 回调里要 **发同步数据**，应走项目既有 **Sync** 封装，勿在帧回调里直接改游戏状态而不同步。
 -- 
--- 详细避坑经验见 `.cursor/rules/dzapi/ui-frame-types.mdc`。
+-- 详细避坑经验见 `.cursor/rules/engine/dzapi/ui-frame-types.mdc`。
 local japi = require("jass.japi")
 local jass = require("jass.common")
 --- 通用 NPC 对话框入口。

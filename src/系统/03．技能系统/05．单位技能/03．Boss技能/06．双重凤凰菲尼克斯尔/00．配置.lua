@@ -12,6 +12,17 @@ ____exports["菲尼克斯尔单位技能配置"] = {
     ["主动技能提示"] = {{["技能ID"] = "A0F8", ["提示"] = "炽羽散射", ["扩展提示"] = "振翼散射炽焰羽毛，落地后留下短暂燃烧区。"}, {["技能ID"] = "A0F7", ["提示"] = "熔岩吐息", ["扩展提示"] = "朝目标方向持续喷吐熔岩，对扇形区域造成连续伤害。"}, {["技能ID"] = "A0F9", ["提示"] = "凤凰漩涡", ["扩展提示"] = "锁定玩家当前位置生成漩涡，延迟后牵引并造成持续伤害。"}},
     ["机制单位ID"] = {["永恒冰核"] = "N0P0", ["能量导管"] = "N0P1", ["怨火核心"] = "N0P2", ["凤凰之卵"] = "N0P3"},
     ["广播持续时间Ms"] = 4200,
+    ["配音裁断距离"] = 4000,
+    ["配音生成配置"] = {
+        ["显示台词字段"] = "台词",
+        ["配音台词字段"] = "配音台词",
+        ["声线名称"] = "Elariel X - Epic Queen Ethereal",
+        ["声线ID"] = "ksryVoNAGZT8GxWCTiVm",
+        ["模型ID"] = "eleven_v3",
+        ["语言"] = "en",
+        ["整体提示词"] = "An ancient dual-form phoenix queen, first radiant with molten majesty beneath an eternal ice seal, then reborn as a hollow skeletal flame spirit. Ethereal feminine authority, avian resonance, controlled combat pace, and clear fantasy RPG delivery. Keep P1 regal and smoldering; make P2 hollow, vengeful, and deathless. Not human screaming, not a witch narrator, not a dragon growl.",
+        ["说明"] = "菲尼克斯尔两种形态共用 Elariel X。第一形态强调高贵神性、熔火与戏谑；第二形态通过分段提示词转为空洞、怨怒、骸骨烈焰与轮回执念。避免人类尖叫、温和旁白和巨龙咆哮感。"
+    },
     BuffID = {
         ["凤凰火印"] = "BPH1",
         ["冷焰印记"] = "BPH2",
@@ -44,6 +55,38 @@ ____exports["菲尼克斯尔单位技能配置"] = {
         ["元素爆发"] = {"你们身上的印记，正在回应我。"},
         ["怨火核心暴露"] = {"核心已裂，来证明你们的锋刃。"},
         ["永恒轮回"] = {"摧毁那些卵，否则我将再次归来。"}
+    },
+    ["配音台词"] = {
+        ["开场"] = {"[smoldering amusement] Two embers. One frame of bone. [taunting] Which flame will you try to extinguish first?"},
+        ["转第二形态"] = {"[in searing agony] Let the flesh burn away... [reborn in fury] the fire still remembers how to fly."},
+        ["死亡"] = {"[shaken, weakening] Can even the cycle... [fading disbelief] truly come to an end...?"},
+        ["炽羽散射"] = {"[fierce warning] The burning feathers are loose! [predatory threat] Do not let them catch even your shadow."},
+        ["熔岩吐息"] = {"[severe warning] Run if you wish. [smoldering menace] The lava will remember exactly where you fled."},
+        ["凤凰漩涡"] = {"[drawing power inward] The wind draws every flame back to its heart."},
+        ["导管摧毁"] = {"[raging through pain] Another chain breaks... [vengeful warning] and now the seal turns its fury upon you!"},
+        ["浴火重生准备"] = {"[smoldering rebirth] Ash is merely the pause before my wings beat again."},
+        ["骸骨弹幕"] = {"[hollow menace] Bonefire has no eyes... [predatory] but it knows how to hunt the living."},
+        ["怨火链接"] = {"[cold warning] Vengeful flame binds you. [cruel menace] Sever it... and pay the price."},
+        ["凤凰挽歌"] = {"[funereal resonance] Listen. This is the lament sung before the cycle begins anew."},
+        ["元素爆发"] = {"[commanding] The marks upon you... [rising power] answer to me."},
+        ["怨火核心暴露"] = {"[defiant challenge] My core lies open. Come... prove your blades can reach it."},
+        ["永恒轮回"] = {"[deathless warning] Shatter every egg! [rising wrath] Leave even one... and I will rise again!"}
+    },
+    ["配音资源"] = {
+        ["开场"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_opening_two_embers_elariel_x_01_v3.mp3"},
+        ["转第二形态"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_phase2_flesh_burns_rebirth_elariel_x_01_v3.mp3"},
+        ["死亡"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_death_cycle_ends_elariel_x_01_v3.mp3"},
+        ["炽羽散射"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_burning_feathers_scatter_elariel_x_02_heavy_warning_v3.mp3"},
+        ["熔岩吐息"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_lava_breath_remembers_elariel_x_02_heavy_warning_v3.mp3"},
+        ["凤凰漩涡"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_vortex_flames_return_elariel_x_01_v3.mp3"},
+        ["导管摧毁"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_conduit_chain_breaks_elariel_x_02_heavy_warning_v3.mp3"},
+        ["浴火重生准备"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_rebirth_ash_wings_elariel_x_01_v3.mp3"},
+        ["骸骨弹幕"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_bonefire_barrage_elariel_x_01_v3.mp3"},
+        ["怨火链接"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_vengeful_flame_link_elariel_x_02_heavy_warning_v3.mp3"},
+        ["凤凰挽歌"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_lament_cycle_begins_elariel_x_01_v3.mp3"},
+        ["元素爆发"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_element_marks_answer_elariel_x_01_v3.mp3"},
+        ["怨火核心暴露"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_wrath_core_exposed_elariel_x_01_v3.mp3"},
+        ["永恒轮回"] = {"Sound\\Boss\\Phoenixel\\Voice\\phoenixel_eternal_cycle_eggs_rebirth_elariel_x_02_heavy_warning_v3.mp3"}
     }
 }
 return ____exports

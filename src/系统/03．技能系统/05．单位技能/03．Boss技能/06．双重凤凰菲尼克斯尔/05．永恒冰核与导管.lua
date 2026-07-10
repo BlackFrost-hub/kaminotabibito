@@ -49,10 +49,11 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_5BFC_7BA1_6B7B_4EA1(context, unit
         context["已摧毁导管数"],
         {stack = context["已摧毁导管数"], sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
     )
-    _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD(context.Boss, context["已摧毁导管数"] >= _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["导管数量"] and "浴火重生准备" or "导管摧毁")
     if context["已摧毁导管数"] >= _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["导管数量"] then
         local mod = require("系统.03．技能系统.05．单位技能.03．Boss技能.06．双重凤凰菲尼克斯尔.09．浴火重生准备")
         mod["触发菲尼克斯尔P1转场"](context)
+    else
+        _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD(context.Boss, "导管摧毁")
     end
 end
 local function _____521B_5EFA_5BFC_7BA1_6B7B_4EA1_56DE_8C03(context)

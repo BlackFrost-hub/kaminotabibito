@@ -1,0 +1,20 @@
+{
+  "sourceDir": "audio_temp/Boss/Phoenixel/Voice",
+  "targetDir": "Sound/Boss/Phoenixel/Voice",
+  "files": [
+    "phoenixel_opening_two_embers_elariel_x_01_v3.mp3",
+    "phoenixel_phase2_flesh_burns_rebirth_elariel_x_01_v3.mp3",
+    "phoenixel_death_cycle_ends_elariel_x_01_v3.mp3",
+    "phoenixel_burning_feathers_scatter_elariel_x_02_heavy_warning_v3.mp3",
+    "phoenixel_lava_breath_remembers_elariel_x_02_heavy_warning_v3.mp3",
+    "phoenixel_vortex_flames_return_elariel_x_01_v3.mp3",
+    "phoenixel_conduit_chain_breaks_elariel_x_02_heavy_warning_v3.mp3",
+    "phoenixel_rebirth_ash_wings_elariel_x_01_v3.mp3",
+    "phoenixel_bonefire_barrage_elariel_x_01_v3.mp3",
+    "phoenixel_vengeful_flame_link_elariel_x_02_heavy_warning_v3.mp3",
+    "phoenixel_lament_cycle_begins_elariel_x_01_v3.mp3",
+    "phoenixel_element_marks_answer_elariel_x_01_v3.mp3",
+    "phoenixel_wrath_core_exposed_elariel_x_01_v3.mp3",
+    "phoenixel_eternal_cycle_eggs_rebirth_elariel_x_02_heavy_warning_v3.mp3"
+  ]
+}

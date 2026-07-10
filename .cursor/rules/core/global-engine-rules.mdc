@@ -1,0 +1,76 @@
+---
+description: 全局高优先级：jass/japi/BJ/本地库边界、require、封装与 STES 约定
+alwaysApply: true
+---
+
+# 全局引擎边界
+
+## 执行摘要
+
+1. 调用引擎 API 前先在 `jass表.txt` / `japi表.txt` 或现有封装中确认来源。
+2. JASS、JAPI、BJ、本地模块各走自己的入口；不要互相挂表冒充。
+3. 新业务先找项目封装；涉及玩家单位事件时优先走事件中心。
+4. 业务对象需要判空，但已确认存在的 API 不加 `typeof === "function"` 一类防御判断。
+
+## 命名空间
+
+| 来源 | 含义 | 用法 |
+|------|------|------|
+| **jass** | `require("jass.common")`，**common.j 原生** | 仅调表里有的原生；常量用 `jass.EVENT_*` 等，勿手写魔数 |
+| **japi** | `require("jass.japi")`，**扩展（Dz/EX 等）** | 与 jass 区分，勿混名 |
+| **BJ** | **Blizzard.j**，Lua 里**不一定**挂在 `jass` 上 | 用项目封装：`require("lib.扩展函数.BJ函数…")`，**禁止** `(jass as any).IsUnitIllusionBJ` 这类冒充 |
+| **本地库** | `TS/lib`、`系统/*` 等 | 只通过 **require 调本地导出**；**禁止**挂到 `jass`/`japi` 表冒充原生，也禁止让引擎 API「反向依赖」本地实现 |
+
+- 运行时 API 真源：根目录 `jass表.txt`、`japi表.txt`；需要 BJ 语义时走 BJ 封装模块。
+
+## 模块与目录
+
+- 绝对模块路径：`require("lib.…")`、`require("系统.…")`；**禁止** `./` 相对路径（Lua 无法解析）。
+- 新增逻辑前先查既有封装；通用逻辑放入既有封装或 `自定义扩展函数`。
+- **勿用 `globalThis` 代替 JASS 全局**；不要在入口全局 monkey patch 基础 API。
+- 新目录提供 `index` 并在父级登记；跨模块入口、核心流程与难读函数保留短注释。
+- 新完整系统补简短说明文档，便于接手。
+
+## 桥接与执行边界
+
+- JASS 不能直接调用 Lua；需要 JASS 触发、传参或返回值时走 [STES / YDLocal 规则](../engine/bridges/README.md)。
+- 本地输入和 `sync=false` 回调默认只改本地状态；不得让后续全端 timer、tick 或 `sync=true` 回调消费其结果。
+
+## API 安全检查
+
+| 判断对象 | 处理方式 |
+|----------|----------|
+| 已在 jass/japi 表或项目封装确认存在的 API | 直接按正确调用形态使用，不加 `typeof === "function"` 或可选链 |
+| 句柄、配置、索引、玩家、单位等业务对象 | 保留必要判空；这与 API 是否存在是两类问题 |
+| 动态字符串取表、多运行时兼容、已复现的不确定 API | 仅在规则或用户明确要求时保留存在性判断 |
+
+巡检 API 防御代码时同时搜索 `=== "function"` 与 `!== "function"`；调用形态按 [TSTL 硬规则](tstl-hard-rules.mdc) 处理。
+
+## 玩家单位事件
+
+同一 `(玩家, eventId)` 重复原生注册会浪费句柄并增加审计成本。新业务统一从事件中心选择入口。
+
+### 选择入口
+
+| 场景 | 入口 |
+|------|------|
+| 通用玩家单位事件（拾取/丢弃/使用物品/死亡/选中/升级等） | `require("系统.00．核心系统.01．事件中心.01．玩家单位事件")` 的 `registerPlayerUnitEvent` / `registerPlayerUnitEventForPlayerIds` / `registerDefaultPlayerUnitEvent` / `registerPlayerUnitEventById` |
+| 区域进入 | `require("系统.00．核心系统.01．事件中心.02．区域事件中心")` 的 `registerEnterRegionTrigger` |
+| 单位特定事件、单位+范围 | `require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")` 的 `registerUnitEventTrigger` / `registerUnitInRangeTrigger` |
+| **仅** `EVENT_PLAYER_UNIT_SPELL_CHANNEL` / `EVENT_PLAYER_UNIT_SPELL_EFFECT` | `require("系统.03．技能系统.00．技能事件.01．核心功能")` 的 `registerSpellChannelListener` / `registerSpellEffectListener`（由该模块 `init` 统一注册原生事件） |
+
+### 禁止与例外
+
+- 业务/系统模块里手写 `jass.TriggerRegisterPlayerUnitEvent(...)`，或自写 `for i=0..n` 对每个玩家循环注册同一事件（应改用上表 API）。
+- 事件中心内部的 master 注册、区域/单位特定事件中心、技能事件核心的 CHANNEL/EFFECT 注册属于实现层例外。
+- Timer、STES、Dz 键鼠不是玩家单位事件；按各自子系统入口处理。
+- 仅作封装的 lib 可以保留底层原生包装，但新业务仍优先走事件中心。
+
+## 相关正文
+
+| 主题 | 正文 |
+|------|------|
+| TSTL 调用形态、self / nil、生成 Lua 与 fix-lua | [TSTL 硬规则](tstl-hard-rules.mdc) |
+| JASS / Dz 回调、pcall、异步上下文与 GC | [DzAPI 回调安全](../engine/dzapi/lua-gc-desync-heuristics.mdc) |
+| Dz 联机 UI、GetLocalPlayer 与 N 槽 | [DzAPI 对称执行](../engine/dzapi/n-slot-ui-symmetric-execution.mdc) |
+| 中文文件、UTF-8 与局部补丁 | [编码与补丁安全](../tooling/patch/encoding-and-patch-safety.mdc) |

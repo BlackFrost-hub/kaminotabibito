@@ -10,7 +10,7 @@ local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_65
 local ____585E_62C9_516C_5171_0 = _____585E_62C9_516C_5171
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯单位技能配置"]
 local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯技能数值配置"]
-local _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD = ____585E_62C9_516C_5171_0["播放巴尔扎罗斯台词"]
+local _____64AD_653E_585E_62C9_53F0_8BCD = ____585E_62C9_516C_5171_0["播放塞拉台词"]
 local registerManualBuff = ____585E_62C9_516C_5171_0.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____585E_62C9_516C_5171_0["移除单位指定Buff"]
 local registerDamageModifier = ____585E_62C9_516C_5171_0.registerDamageModifier
@@ -50,7 +50,7 @@ ____exports["切换塞拉形态"] = function(context, next, _____64AD_653E_53F0_
         _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
     )
     if _____64AD_653E_53F0_8BCD then
-        _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD(context["Boss单位"], "元素转换")
+        _____64AD_653E_585E_62C9_53F0_8BCD(sera, next == "火焰" and "元素转换火焰" or "元素转换冰霜")
     end
 end
 local function _____585E_62C9_4F24_5BB3_4FEE_6B63(context)

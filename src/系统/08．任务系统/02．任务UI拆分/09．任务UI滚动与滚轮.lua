@@ -267,7 +267,7 @@ local function onScrollBarTrackClick(self, ctx)
     ctx:onPageChanged(currentPage, targetPage)
     updateTaskUIScrollThumbPosition(nil, ctx, pageCount)
 end
---- 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/dzapi/ui-frame-types.mdc
+--- 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/engine/dzapi/ui-frame-types.mdc
 local function taskUIThumbPressPcallBody(self)
     local ctx = findVisibleWheelCtx(nil)
     if not ctx or not ctx:isVisible() then

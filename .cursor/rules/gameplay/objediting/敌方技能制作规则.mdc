@@ -1,0 +1,147 @@
+---
+description: ObjEditing 敌方/Boss 技能制作规则，约束 Boss 通魔技能模板、目标类型和命令 ID
+globs: objediting/Boss/**/*.lua
+alwaysApply: false
+---
+
+# 敌方技能制作规则
+
+适用范围：`objediting/Boss/**/*.lua` 中制作 Boss / 敌方单位对象编辑技能。
+
+## 执行摘要
+
+1. 先按施法行为选择单位目标或无目标通魔，不新增点目标 Boss 通魔模板。
+2. 同一 Boss 的每个主动技能使用独立槽位和基础命令 ID；目标类型相同也不能共用 raw id。
+3. 通用壳与通用单位字段放模板文件，具体 Boss 只定义自身单位、挂载槽位和特殊字段。
+4. 新 Boss 同步完成 `upgrades`、TS 单位配置表、总单位配置表、专属 Buff 表和技能提示配置。
+5. 资源引用去掉 `imports\` 前缀；自定义贴图归入对应 `Texture` 子目录，图标最终只保留验证通过的 BLP。
+
+## Boss 通魔技能目标类型
+
+- 本图 Boss 技能只使用通魔技能。
+- Boss 通魔技能只分两类：单位目标、无目标。
+- 锁定单位技能和点地面技能，都用单位目标通魔。
+- 对自身周围造成伤害、以自身为中心 AOE、对自己使用的技能，都用无目标通魔。
+- 不新增点目标通魔作为 Boss 技能模板。
+
+| 施法语义 | 选择的通魔壳 | 说明 |
+|----------|--------------|------|
+| 锁定单位、锁定目标点或需要施法距离 | 单位目标 `ATxx/BTxx/CTxx` | 点地面行为仍由运行时读取目标坐标，不新增点目标模板 |
+| 自身周围 AOE、自身强化、无目标释放 | 无目标 `ANxx` | 每个主动技能占用独立槽位 |
+| 原生行为无法由通魔壳表达 | 单独评估专用技能 | 只有确认模板能力不足时才新增，不以数值差异为理由 |
+
+## 通用模板与具体 Boss 文件边界
+
+- 通用 Boss 技能模板、通用系统技能，放在 `objediting/Boss/BossAbilityTemplates.lua`。
+- 通用 Boss 单位模板，放在 `objediting/Boss/BossUnitTemplates.lua`。
+- 具体 Boss 自己的技能，放在对应 Boss 文件，例如 `objediting/Boss/Thranduil.lua`。
+- 具体 Boss 自己的单位定义，也放在对应 Boss 文件，并优先调用通用 Boss 单位模板。
+- 不要把 `[系统]` 通用技能写进具体 Boss 文件。
+- ObjEditing 阶段优先复用通用通魔技能模板 ID，例如 `AT00`、`AT01`、`AN00`。
+- 具体 Boss 文件通常只把通用技能 ID 挂到单位技能列表，不为每个 Boss 新建专属通魔物编技能。
+- 后续具体技能行为、数值、语义，可在运行时代码或配置层绑定到这些通用技能 ID。
+- 具体 Boss 单位定义必须显式写 `upgrades = 'R001,R002'`，让 Boss 生命吃难度科技加成。不要只依赖 `BossUnitTemplates.lua` 的默认值；如果某个 Boss 使用特殊科技，也要在具体 Boss 文件里显式写清楚。
+- 物编新建 Boss / 敌方关键单位后，必须同步登记 TS 单位配置表：
+  - 常规 Boss 写入 `TS/系统/01．单位系统/08．单位配置表/02．Boss配置表.ts`
+  - 异界 / 隐藏等独立分类 Boss 写入对应分类表，例如 `03．异界Boss配置表.ts`
+  - 同步接入 `TS/系统/01．单位系统/08．单位配置表/04．总单位配置表.ts`
+  - 只新增 ObjEditing 单位、未登记单位配置表，视为未完整落地。
+- 复用通用通魔技能壳时，运行时必须给 Boss 单位实例改 `Tip/UberTip`：`Tip` 写真实技能按钮名，`UberTip` 写扩展说明。当前 1.27 + DzAPI 不要求运行时修改物编 `Name`；如果新建专属壳子，ObjEditing 侧仍应用 `setName` 写清楚对象编辑器名称。新增 Boss 主动技能后，同步检查 Boss `00．配置.ts` 的 `主动技能提示` 和运行时 `设置单位技能壳普通提示` 调用。
+- 同一个 Boss 的多个主动技能必须使用不同通魔槽位；不能因为“都是无目标”就共用 `AN00` 再在 TS 里路由，否则 AI 冷却、施法事件、命令 ID 和调试语义都会混在一起。
+- 单位目标通魔按槽位组复用：`ATxx`、`BTxx`、`CTxx` 分别是一组 400~2000 施法距离模板。
+- 同一个 Boss 如果需要多个相同施法距离的单位目标技能，使用不同槽位组，例如 3 个 1000 距离技能用 `AT06,BT06,CT06`。
+- 同一个 Boss 如果需要多个无目标主动技能，按顺序使用不同无目标槽位，例如 `AN00,AN01,AN02,AN03`；物编槽位够用时不要做共享 raw id 的运行时路由。
+- 新建具体 Boss 结构时，默认同步创建该 Boss 的专属 Buff 表文件；即使暂时没有 Buff，也保留空表并接入 Buff 聚合入口，避免后续制作技能时漏建。
+
+## Boss 英雄母单位
+
+- 远程英雄 Boss 单位走 `Nbrn`。
+- 近战英雄 Boss 单位走 `Npbm`。
+- 具体 Boss 文件中优先调用模板快捷函数区分近战/远程，不要手写重复字段。
+
+## imports 资源路径
+
+### 路径规范
+
+- ObjEditing 中填写模型、图标、特效等导入资源路径时，必须去掉 `imports\` 前缀。
+- 例如本地文件 `imports\Boss\Thranduil\Thranduil.blp`，物编路径写 `Boss\Thranduil\Thranduil.blp`。
+- 例如本地文件 `imports\Boss\Thranduil\Archangel_IncarnationofRedemption.mdx`，物编路径写 `Boss\Thranduil\Archangel_IncarnationofRedemption.mdx`。
+- `imports` 下资源目录和资源文件名优先使用英文，避免 Warcraft 资源路径不支持中文导致加载失败。
+- 多系统复用资源放 `imports\Common\`。
+- 通用特效先按父级分类，再按英文子类放入。
+- 属性特效放 `imports\Common\Effect\Element\`：
+  - `imports\Common\Effect\Element\Thunder`
+  - `imports\Common\Effect\Element\Wind`
+  - `imports\Common\Effect\Element\Ice`
+  - `imports\Common\Effect\Element\Fire`
+  - `imports\Common\Effect\Element\Light`
+  - `imports\Common\Effect\Element\Dark`
+  - `imports\Common\Effect\Element\Fantasy`
+- 表现形态特效放 `imports\Common\Effect\Form\`：
+  - `imports\Common\Effect\Form\MagicCircle`
+  - `imports\Common\Effect\Form\Spread`
+  - `imports\Common\Effect\Form\Line`
+  - `imports\Common\Effect\Form\RiseFall`
+  - `imports\Common\Effect\Form\Rotate`
+  - `imports\Common\Effect\Form\Explosion`
+- 每个特效分类目录下统一使用 `Texture` 子目录存放该分类特效专属贴图，例如 `imports\Common\Effect\Element\Light\Texture`。
+- 用户给出模型、图标、特效、贴图路径时，必须主动规范为物编/TS/模型内部可用路径：去掉开头的 `imports\`，保留后续英文目录。
+- 如果用户给出 `imports\Common\Effect\Element\Light\Texture\Mark_Checkable.blp`，物编/TS 中应写 `Common\Effect\Element\Light\Texture\Mark_Checkable.blp`。
+- 添加或整理 `.mdx` / `.mdl` 模型资源时，应同时检查模型内部引用的贴图路径；模型内部贴图路径同样不能带 `imports\` 前缀。自定义贴图默认统一放到对应分类的 `Texture` 子目录，不要继续散落在模型同级目录或 `war3mapImported` 子目录。若发现旧资源散落，默认移动到对应分类的 `Texture` 子目录，再把模型内部贴图引用同步改成实际导入路径，例如 `Common\Effect\Element\Light\Texture\Mark_Checkable.blp`。
+- 模型贴图引用中确认是 Warcraft 自带路径的不要修改，例如 `Textures\...`、`ReplaceableTextures\...`、`UI\...`、`Units\...`、`Abilities\...`。
+- 模型文件名已有清晰语义时不要强行改名，例如 `GaiaShield.mdx`、`HolyPhoenix.mdx` 这类名称可以原样保留；只有 `file_002480.mdx`、`unnamed.mdx`、纯数字编号等看不出用途或语义混乱的名字，才根据截图/用途自主改成清晰英文名。
+- 如果只是讨论技能需求，用户没有特别声明“不要改路径”，后续默认自动完成上述资源路径规范。
+
+### 通用资源目录
+
+- 通用图标、模型、音效分别放：
+  - `imports\Common\Icon`
+  - `imports\Common\Model`
+  - `imports\Common\Sound`
+
+### 图标产物
+
+- 生成或整理图标资源时，默认尺寸约定：
+  - Buff / 技能图标默认输出 `64x64`。
+  - 单位头像、Boss 头像默认输出 `64x64`；如需保留高清源图，单独保存为源图，不作为默认导入头像尺寸。
+- Buff / 技能图标、单位头像、Boss 头像默认带 Warcraft / BTN 风格边框；除非用户明确要求无边框，不要输出纯裸图。
+- 图标可先生成 PNG 作为中间产物，但最终导入资源默认转换为 `.blp`；项目资源目录内只保留最终 `.blp`，删除 PNG 中间文件，避免打包进地图增加体积。
+- 转换 BLP 优先复用本机 VSCode 插件 `war3-texture-preview` 的转换能力；可直接调用插件内 `out/conversion/textureConvert.js` 的编码/解码函数，转换后用同插件解码回读确认尺寸和显示正常。
+- Boss / Buff / 技能图标风格默认使用 Warcraft / BTN 风格边框：暗色金属或黑色厚边、左上角高光、右下角暗角，主体高对比居中，64x64 下仍可辨认。
+- Buff / 技能图标压缩到 `64x64` 时，默认只做等比例高质量缩放后直接转 BLP；不要额外做强锐化、强对比、强饱和或二次锐化。这类处理会让 64 图标出现碎线、白噪点和脏边。除非用户明确要求优化清晰度，否则保持“原图 -> 64x64 -> BLP”的简单流程。
+- Boss 专属 Buff 图标优先放 `imports\BuffIcon\Boss\<Boss英文名>\`，TS/物编引用路径去掉 `imports\` 前缀，例如 `BuffIcon\Boss\Thranduil\yueguangguanzhu.blp`。
+
+## ObjEditing Lua 命名
+
+- ObjEditing Lua 文件中的函数名、变量名使用英文标识符，避免 VSCode / Lua 解析报错。
+- 中文可以用于注释、技能名称、提示文本、编辑器说明。
+
+## 通魔命令 ID
+
+- 通魔技能真正用于施法命令、会互相冲突的是 `数据 - 基础命令ID`。
+- ObjEditing setter 对应 `setBaseOrderID(...)`。
+- 同一个单位可能同时拥有多个通魔技能时，必须给每个技能分配不同基础命令 ID。
+- 不要只改 `文本 - 命令串 - 使用/打开` 等文本命令字段来规避冲突。
+
+## 通用模板默认清理
+
+通用通魔模板默认应尽量保持空白，避免复制后带出视觉或动画残留：
+
+- `EffectArt` 为空。
+- `TargetArt` 为空。
+- `Targetattachcount` 为 `0`。
+- `Targetattach` 为空。
+- `CasterArt` 为空。
+- `Casterattachcount` 为 `0`。
+- `Casterattach` 为空。
+- `Animnames` 为空。
+- `DataA` / `DataC` 等模板数据默认用 `0`，除非具体技能明确需要。
+
+## 完成检查
+
+- 技能目标类型与通魔壳一致。
+- 同一 Boss 的主动技能 raw id、槽位和基础命令 ID 不冲突。
+- 具体 Boss 显式设置 `upgrades`，并已登记对应 TS 单位配置表与总单位配置表。
+- Boss 专属 Buff 表、技能提示配置和父级入口已经接入。
+- 物编/TS/模型内部资源路径均去掉 `imports\` 前缀，自定义贴图路径与实际目录一致。
+- 新图标已转换为 BLP、回读验证尺寸和画面，并清理不需要的 PNG 中间文件。

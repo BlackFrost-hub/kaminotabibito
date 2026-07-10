@@ -35,12 +35,13 @@ function on菲尼克斯尔导管死亡(this: void, context: 菲尼克斯尔运�
     stack: context.已摧毁导管数,
     sourceName: 菲尼克斯尔单位技能配置.单位名称,
   });
-  播放菲尼克斯尔台词(context.Boss, context.已摧毁导管数 >= 菲尼克斯尔数值与表现配置.机制.导管数量 ? "浴火重生准备" : "导管摧毁");
   if (context.已摧毁导管数 >= 菲尼克斯尔数值与表现配置.机制.导管数量) {
     const mod = require("系统.03．技能系统.05．单位技能.03．Boss技能.06．双重凤凰菲尼克斯尔.09．浴火重生准备") as {
       触发菲尼克斯尔P1转场: (this: void, context: 菲尼克斯尔运行时上下文) => void;
     };
     mod.触发菲尼克斯尔P1转场(context);
+  } else {
+    播放菲尼克斯尔台词(context.Boss, "导管摧毁");
   }
 }
 

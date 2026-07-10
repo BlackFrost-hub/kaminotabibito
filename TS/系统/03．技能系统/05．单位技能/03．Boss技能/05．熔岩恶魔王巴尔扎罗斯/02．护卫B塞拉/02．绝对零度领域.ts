@@ -3,7 +3,7 @@
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
-  播放巴尔扎罗斯台词,
+  播放塞拉台词,
   减少巴尔扎罗斯灼热层数,
   启动基础施法时间线,
   创建技能提示圈,
@@ -105,11 +105,10 @@ export function 释放绝对零度领域(this: void, context: 巴尔扎罗斯运
       提示文本: config.吟唱条提示文本,
     },
     播放台词: function 塞拉绝对零度领域台词(this: void): void {
-      播放巴尔扎罗斯台词(context.Boss单位, "绝对零度领域");
+      播放塞拉台词(sera, "绝对零度领域");
     },
     on生效: function 塞拉绝对零度领域生效(this: void): void {
       创建绝对零度领域(context, center.X, center.Y);
     },
   });
 }
-
