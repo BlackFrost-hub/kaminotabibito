@@ -27,5 +27,5 @@ Buff系统说明
 - `01．Buff表.ts` 和 `02．Buff数据表/00．Buff数据表.ts` 不是一回事，前者是业务层定义，后者是原生物编导出。
 - `Buff数据表.ts` 不是完整原生 Buff 总表，一些默认 Buff 不一定在里面，例如风暴之锤的眩晕。
 - 后续新增通用、DOT、控制、属性、光环 Buff，优先放 `03．Buff表/01．通用.ts`、`03．Buff表/02．DOT.ts`、`03．Buff表/03．控制.ts`、`03．Buff表/04．属性.ts`、`03．Buff表/05．光环.ts`。
-- Boss 专属 Buff 放 `03．Buff表/01．Boss/` 下的单 Boss 文件，例如 `01．瑟兰迪尔.ts`。
+- Boss 专属 Buff 放 `03．Buff表/01．Boss/`，并镜像 Boss 技能的 `主线Boss / 挑战与隐藏Boss / 异界Boss` 分类；例如瑟兰迪尔放在 `01．Boss/01．主线Boss/01．瑟兰迪尔.ts`。
 - 英雄专属 Buff 放 `03．Buff表/02．英雄/` 下的单英雄文件，并在该目录 `index.ts` 聚合。

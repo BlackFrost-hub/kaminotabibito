@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ---
 -- @noSelfInFile
@@ -25,11 +24,8 @@ local ____require_result_6 = require("系统.03．技能系统.00．技能模板
 local _____6E05_9664_5355_4F4D_8D1F_9762Buff = ____require_result_6["清除单位负面Buff"]
 local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
 local _____5F00_59CB_51FB_9000 = ____require_result_7["开始击退"]
-local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_8.addPeriodicCallback
-local getServerTime = ____require_result_8.getServerTime
-local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_9["创建单位并登记排泄安全"]
+local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_8["创建单位并登记排泄安全"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -45,9 +41,6 @@ local GetHeroAgi = jass.GetHeroAgi
 local GetHeroInt = jass.GetHeroInt
 local AddHeroXP = jass.AddHeroXP
 local ModifyHeroStat = jass.ModifyHeroStat
-local AddSpecialEffect = jass.AddSpecialEffect
-local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
-local DestroyEffect = jass.DestroyEffect
 local IsPointBlighted = jass.IsPointBlighted
 local SetItemCharges = jass.SetItemCharges
 local GetItemCharges = jass.GetItemCharges
@@ -92,42 +85,6 @@ local DzSetUnitModel = japi.DzSetUnitModel
 local stringToFourCCSafe = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe
 local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e0FT")
 local _____9650_65F6_751F_547DBuffID = stringToFourCCSafe("BHwe")
-local _____5F85_9500_6BC1_7279_6548_5217_8868 = {}
-local _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = false
-local function _____5904_7406_5F85_9500_6BC1_7279_6548()
-    local _____5F53_524D_65F6_95F4 = getServerTime()
-    do
-        local i = #_____5F85_9500_6BC1_7279_6548_5217_8868 - 1
-        while i >= 0 do
-            do
-                local _____8BB0_5F55 = _____5F85_9500_6BC1_7279_6548_5217_8868[i + 1]
-                if _____5F53_524D_65F6_95F4 < _____8BB0_5F55["到期时间"] then
-                    goto __continue4
-                end
-                DestroyEffect(_____8BB0_5F55["句柄"])
-                __TS__ArraySplice(_____5F85_9500_6BC1_7279_6548_5217_8868, i, 1)
-            end
-            ::__continue4::
-            i = i - 1
-        end
-    end
-end
-local function _____5B89_6392_7279_6548_9500_6BC1(effect, _____6301_7EED_79D2)
-    if _____6301_7EED_79D2 == nil then
-        _____6301_7EED_79D2 = 1
-    end
-    if effect == nil or effect == 0 then
-        return
-    end
-    if not _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 then
-        _____5DF2_6CE8_518C_7279_6548_9500_6BC1_9A71_52A8 = true
-        addPeriodicCallback(100, _____5904_7406_5F85_9500_6BC1_7279_6548)
-    end
-    _____5F85_9500_6BC1_7279_6548_5217_8868[#_____5F85_9500_6BC1_7279_6548_5217_8868 + 1] = {
-        ["句柄"] = effect,
-        ["到期时间"] = getServerTime() + _____6301_7EED_79D2 * 1000
-    }
-end
 ____exports["是否为使用物品"] = function(_____7269_54C1, _____7269_54C1_7C7B_578BID)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 or _____7269_54C1_7C7B_578BID == 0 then
         return false

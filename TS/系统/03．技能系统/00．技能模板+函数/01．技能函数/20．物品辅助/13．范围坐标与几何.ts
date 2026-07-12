@@ -31,10 +31,6 @@ const { 清除单位负面Buff } = require("系统.03．技能系统.00．技能
 const { 开始击退 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统") as {
   开始击退: (this: void, unit: any, params: any) => number;
 };
-const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
-  getServerTime: (this: void) => number;
-};
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
@@ -54,9 +50,6 @@ const GetHeroAgi = jass.GetHeroAgi as (whichHero: any, includeBonuses: boolean) 
 const GetHeroInt = jass.GetHeroInt as (whichHero: any, includeBonuses: boolean) => number;
 const AddHeroXP = jass.AddHeroXP as (whichHero: any, xpToAdd: number, showEyeCandy: boolean) => void;
 const ModifyHeroStat = jass.ModifyHeroStat as (whichStat: any, whichHero: any, modifyMethod: any, value: number) => void;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
-const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => boolean;
 const IsPointBlighted = jass.IsPointBlighted as (x: number, y: number) => boolean;
 const SetItemCharges = jass.SetItemCharges as (whichItem: any, charges: number) => void;
 const GetItemCharges = jass.GetItemCharges as (whichItem: any) => number;
@@ -104,36 +97,6 @@ const stringToFourCCSafe = (require("lib.扩展函数.封装函数.01．通用�
 
 const 火把单位类型ID = stringToFourCCSafe("e0FT");
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
-
-type 待销毁特效记录 = {
-  句柄: any;
-  到期时间: number;
-};
-
-const 待销毁特效列表: 待销毁特效记录[] = [];
-let 已注册特效销毁驱动 = false;
-
-function 处理待销毁特效(): void {
-  const 当前时间 = getServerTime();
-  for (let i = 待销毁特效列表.length - 1; i >= 0; i--) {
-    const 记录 = 待销毁特效列表[i];
-    if (当前时间 < 记录.到期时间) continue;
-    DestroyEffect(记录.句柄);
-    待销毁特效列表.splice(i, 1);
-  }
-}
-
-function 安排特效销毁(effect: any, 持续秒: number = 1): void {
-  if (effect == null || effect === 0) return;
-  if (!已注册特效销毁驱动) {
-    已注册特效销毁驱动 = true;
-    addPeriodicCallback(100, 处理待销毁特效);
-  }
-  待销毁特效列表.push({
-    句柄: effect,
-    到期时间: getServerTime() + 持续秒 * 1000,
-  });
-}
 
 export function 获取范围敌人(this: void, 来源: any, x: number, y: number, 半径: number): any[] {
   return getEnemyUnitsInRange(来源, x, y, 半径);

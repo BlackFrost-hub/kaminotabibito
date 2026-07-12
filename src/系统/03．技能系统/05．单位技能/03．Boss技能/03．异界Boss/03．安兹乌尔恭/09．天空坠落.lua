@@ -1,0 +1,14 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+---
+-- @noSelfInFile
+____exports["天空坠落技能状态"] = {
+    ["已完成设计"] = true,
+    ["已完成实现"] = false,
+    ["已注册"] = false,
+    ["伤害形态"] = "AOE",
+    ["类型"] = "超位魔法阶段技",
+    ["语义"] = "高空白金法阵蓄势，玩家进入墓碑阴影规避贯穿场地的致命光柱。",
+    ["实现要求"] = "破解后必须保留稳定输出窗口，禁止护盾、时间停止和护卫拦截立即覆盖。"
+}
+return ____exports

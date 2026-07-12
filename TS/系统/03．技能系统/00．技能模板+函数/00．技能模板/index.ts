@@ -14,3 +14,5 @@ export * from "./09．复杂战斗模板/index";
 export * from "./10．周期执行模板/index";
 export * from "./11．回调模板/index";
 export * from "./12．技能伤害触发模板/index";
+export * from "./13．战斗技能调度模板/index";
+export * from "./14．固定组合技能模板/index";

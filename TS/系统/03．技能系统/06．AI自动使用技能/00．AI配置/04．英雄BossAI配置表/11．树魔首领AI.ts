@@ -2,7 +2,7 @@
 
 import type { 单位AI配置 } from "../01．AI配置类型";
 import { 创建单位AI配置 } from "../02．AI配置工具";
-import { 树魔首领单位技能配置 } from "../../../05．单位技能/03．Boss技能/07．树魔首领/00．配置";
+import { 树魔首领单位技能配置 } from "../../../05．单位技能/03．Boss技能/01．主线Boss/05．树魔首领/00．配置";
 
 export const 树魔首领AI配置: 单位AI配置 = 创建单位AI配置({
   AI配置ID: "树魔首领AI",

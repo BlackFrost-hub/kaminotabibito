@@ -2,7 +2,7 @@
 
 import type { 单位AI配置 } from "../01．AI配置类型";
 import { 创建单位AI配置 } from "../02．AI配置工具";
-import { 瑟兰迪尔单位技能配置 } from "../../../05．单位技能/03．Boss技能/03．瑟兰迪尔/00．配置";
+import { 瑟兰迪尔单位技能配置 } from "../../../05．单位技能/03．Boss技能/01．主线Boss/02．瑟兰迪尔/00．配置";
 
 export const 瑟兰迪尔AI配置: 单位AI配置 = 创建单位AI配置({
   AI配置ID: "瑟兰迪尔AI",

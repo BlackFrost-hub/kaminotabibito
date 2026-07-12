@@ -3,3 +3,4 @@ export * from "./02．层数状态集";
 export * from "./03．战斗节奏层数";
 export * from "./04．移动累计层数";
 export * from "./05．事件叠层状态";
+export * from "./06．Buff层数状态";

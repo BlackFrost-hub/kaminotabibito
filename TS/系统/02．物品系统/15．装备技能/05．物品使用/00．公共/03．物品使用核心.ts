@@ -3,9 +3,6 @@
 const { 注册物品技能事件监听 } = require("系统.00．核心系统.01．事件中心.13．物品技能事件中心") as {
   注册物品技能事件监听: (this: void, callback: (this: void, ctx: 物品技能事件上下文) => void) => void;
 };
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
@@ -42,7 +39,6 @@ const 精灵号角 = require("系统.02．物品系统.15．装备技能.00．�
 const 守卫大剑 = require("系统.02．物品系统.15．装备技能.00．物品.54．守卫大剑") as { 处理守卫大剑使用: (this: void, ctx: 物品技能事件上下文) => void };
 const 斯尔能量之心 = require("系统.02．物品系统.15．装备技能.00．物品.55．斯尔能量之心") as {
   处理斯尔能量之心使用: (this: void, ctx: 物品技能事件上下文) => void;
-  处理斯尔能量之心击杀: (this: void, dyingUnit: any, killingUnit: any) => void;
   处理斯尔能量之心伤害修正: (this: void, context: any) => number;
 };
 const 熔岩地狱之敲钟 = require("系统.02．物品系统.15．装备技能.00．物品.56．熔岩地狱之敲钟") as { 处理熔岩地狱之敲钟使用: (this: void, ctx: 物品技能事件上下文) => void };
@@ -171,10 +167,6 @@ function on物品使用链路(this: void, ctx: 物品技能事件上下文): voi
   }
 }
 
-function on物品使用死亡事件(this: void, dyingUnit: any, killingUnit: any): void {
-  斯尔能量之心.处理斯尔能量之心击杀(dyingUnit, killingUnit);
-}
-
 function on物品使用最终伤害(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
   if (!(applied >= 1)) return;
   if (snapshot != null && snapshot.isTrueDamage === true) return;
@@ -199,7 +191,6 @@ export function 初始化装备物品使用链(this: void): void {
   狱妖魔盾.初始化狱妖魔盾持有充能();
   焰混能量体.初始化焰混能量体被动();
   注册物品技能事件监听(on物品使用链路);
-  registerDeathListener(on物品使用死亡事件);
   registerAppliedFinalDamageListener(on物品使用最终伤害);
   registerDamageModifier(on物品使用伤害修正, 30);
 }

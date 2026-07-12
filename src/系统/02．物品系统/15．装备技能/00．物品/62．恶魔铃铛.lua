@@ -14,8 +14,6 @@ local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．�
 local _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C = ____20_FF0E_7269_54C1_8F85_52A9["施加临时属性效果"]
 local ____16_FF0E_5C5E_6027_4F4D_79FB_4E0E_6307_4EE4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
 local _____8C03_6574_72B6_6001ID_5C5E_6027 = ____16_FF0E_5C5E_6027_4F4D_79FB_4E0E_6307_4EE4["调整状态ID属性"]
-local ____24_FF0E_53E5_67C4_4E0A_4E0B_6587_6258_7BA1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.24．句柄上下文托管")
-local _____521B_5EFA_53E5_67C4_4E0A_4E0B_6587_6258_7BA1_5668 = ____24_FF0E_53E5_67C4_4E0A_4E0B_6587_6258_7BA1["创建句柄上下文托管器"]
 local ____00_FF0EBuff_7CFB_7EDF = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____00_FF0EBuff_7CFB_7EDF.registerManualBuff
 local getBuffRuntime = ____00_FF0EBuff_7CFB_7EDF.getBuffRuntime
@@ -23,29 +21,21 @@ local ____00_FF0EBuff_767B_8BB0 = require("系统.05．Buff系统.03．Buff表.0
 local _____5E38_89C4BuffID = ____00_FF0EBuff_767B_8BB0["常规BuffID"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
 local _____65BD_52A0_6050_60E7 = ____require_result_0["施加恐惧"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.23．光环.01．范围光环")
-local _____6CE8_518C_6301_6709_578B_8303_56F4_5149_73AF = ____require_result_1["注册持有型范围光环"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.23．光环.02．数值Buff范围光环")
+local _____6CE8_518C_6570_503CBuff_8303_56F4_5149_73AF = ____require_result_1["注册数值Buff范围光环"]
 local _____653B_51FB_5C5E_6027ID = 1
 local _____6076_9B54_94C3_94DB_5149_73AF_5468_671F_6BEB_79D2 = 500
 local _____6076_9B54_94C3_94DB_5149_73AFBuff_6301_7EED_79D2 = 1
-local _____6076_9B54_94C3_94DB_5149_73AF_6258_7BA1_5668 = _____521B_5EFA_53E5_67C4_4E0A_4E0B_6587_6258_7BA1_5668("恶魔铃铛光环")
 local _____5DF2_521D_59CB_5316_6076_9B54_94C3_94DB_5149_73AF = false
-local function _____8BA1_7B97_6076_9B54_94C3_94DB_5149_73AF_653B_51FB_964D_4F4E(target, _____5DF2_964D_653B_51FB, _____5C42_6570)
-    local baseAttack = _____53D6_5355_4F4D_653B_51FB(target) + _____5DF2_964D_653B_51FB
+local function _____8BA1_7B97_6076_9B54_94C3_94DB_5149_73AF_653B_51FB_964D_4F4E(target, _____5C42_6570, _____5DF2_5E94_7528_503C)
+    local baseAttack = _____53D6_5355_4F4D_653B_51FB(target) - _____5DF2_5E94_7528_503C
     if not (baseAttack > 0) or _____5C42_6570 <= 0 then
         return 0
     end
-    return baseAttack * _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["恶魔铃铛"]["光环攻击降低比例"] * _____5C42_6570
+    return -baseAttack * _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["恶魔铃铛"]["光环攻击降低比例"] * _____5C42_6570
 end
-local function _____540C_6B65_6076_9B54_94C3_94DB_5149_73AF_5C5E_6027(target, _____5C42_6570)
-    local old = _____6076_9B54_94C3_94DB_5149_73AF_6258_7BA1_5668["读取"](target)
-    local oldAttack = old and old["已降攻击"] or 0
-    local nextAttack = _____8BA1_7B97_6076_9B54_94C3_94DB_5149_73AF_653B_51FB_964D_4F4E(target, oldAttack, _____5C42_6570)
-    local deltaAttack = oldAttack - nextAttack
-    if deltaAttack ~= 0 then
-        _____8C03_6574_72B6_6001ID_5C5E_6027(target, _____653B_51FB_5C5E_6027ID, deltaAttack)
-    end
-    _____6076_9B54_94C3_94DB_5149_73AF_6258_7BA1_5668["写入"](target, {["层数"] = _____5C42_6570, ["已降攻击"] = nextAttack})
+local function _____5E94_7528_6076_9B54_94C3_94DB_653B_51FB_5DEE_503C(target, delta)
+    _____8C03_6574_72B6_6001ID_5C5E_6027(target, _____653B_51FB_5C5E_6027ID, delta)
 end
 local function _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(target, _____653B_51FB_964D_4F4E, _____6301_7EED_79D2, _____6765_6E90_540D_79F0)
     if not (_____653B_51FB_964D_4F4E > 0) or _____6301_7EED_79D2 <= 0 then
@@ -63,40 +53,9 @@ local function _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(target
         {sourceName = _____6765_6E90_540D_79F0}
     )
 end
-local function _____5237_65B0_6076_9B54_94C3_94DB_5149_73AFBuff(target)
-    local ctx = _____6076_9B54_94C3_94DB_5149_73AF_6258_7BA1_5668["读取"](target)
-    if ctx == nil or ctx["层数"] <= 0 then
-        return
-    end
-    _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(target, ctx["已降攻击"], _____6076_9B54_94C3_94DB_5149_73AFBuff_6301_7EED_79D2, "恶魔铃铛光环")
-end
-local function _____5E94_7528_6076_9B54_94C3_94DB_5149_73AF(target, _holder, currentCount)
-    local count = currentCount <= 0 and 1 or currentCount
-    local old = _____6076_9B54_94C3_94DB_5149_73AF_6258_7BA1_5668["读取"](target)
-    _____540C_6B65_6076_9B54_94C3_94DB_5149_73AF_5C5E_6027(target, (old and old["层数"] or 0) + count)
-    _____5237_65B0_6076_9B54_94C3_94DB_5149_73AFBuff(target)
-end
-local function _____540C_6B65_6076_9B54_94C3_94DB_5149_73AF(target, _holder, _currentCount)
-    local old = _____6076_9B54_94C3_94DB_5149_73AF_6258_7BA1_5668["读取"](target)
-    if old == nil or old["层数"] <= 0 then
-        return
-    end
-    _____540C_6B65_6076_9B54_94C3_94DB_5149_73AF_5C5E_6027(target, old["层数"])
-    _____5237_65B0_6076_9B54_94C3_94DB_5149_73AFBuff(target)
-end
-local function _____79FB_9664_6076_9B54_94C3_94DB_5149_73AF(target, _holder, currentCount)
-    local count = currentCount <= 0 and 1 or currentCount
-    local old = _____6076_9B54_94C3_94DB_5149_73AF_6258_7BA1_5668["读取"](target)
-    local next = (old and old["层数"] or 0) - count
-    if next > 0 then
-        _____540C_6B65_6076_9B54_94C3_94DB_5149_73AF_5C5E_6027(target, next)
-        _____5237_65B0_6076_9B54_94C3_94DB_5149_73AFBuff(target)
-        return
-    end
-    if old ~= nil and old["已降攻击"] ~= 0 then
-        _____8C03_6574_72B6_6001ID_5C5E_6027(target, _____653B_51FB_5C5E_6027ID, old["已降攻击"])
-    end
-    _____6076_9B54_94C3_94DB_5149_73AF_6258_7BA1_5668["清空"](target)
+local function _____540C_6B65_6076_9B54_94C3_94DB_5149_73AFBuff(target, ______5C42_6570, _holder, _____5DF2_5E94_7528_503C_8868)
+    local attackReduction = -(_____5DF2_5E94_7528_503C_8868["攻击降低"] or 0)
+    _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(target, attackReduction, _____6076_9B54_94C3_94DB_5149_73AFBuff_6301_7EED_79D2, "恶魔铃铛光环")
 end
 ____exports["初始化恶魔铃铛光环"] = function()
     if _____5DF2_521D_59CB_5316_6076_9B54_94C3_94DB_5149_73AF then
@@ -106,14 +65,14 @@ ____exports["初始化恶魔铃铛光环"] = function()
     if _____7269_54C1_4F7F_7528_88C5_5907ID["恶魔铃铛"] == 0 then
         return
     end
-    _____6CE8_518C_6301_6709_578B_8303_56F4_5149_73AF({
+    _____6CE8_518C_6570_503CBuff_8303_56F4_5149_73AF({
+        ["状态ID"] = "恶魔铃铛光环",
         ["物品类型ID"] = _____7269_54C1_4F7F_7528_88C5_5907ID["恶魔铃铛"],
         ["间隔毫秒"] = _____6076_9B54_94C3_94DB_5149_73AF_5468_671F_6BEB_79D2,
         ["半径"] = _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["恶魔铃铛"]["光环半径"],
         ["目标类型"] = "敌人",
-        ["应用目标效果"] = _____5E94_7528_6076_9B54_94C3_94DB_5149_73AF,
-        ["同步目标效果"] = _____540C_6B65_6076_9B54_94C3_94DB_5149_73AF,
-        ["移除目标效果"] = _____79FB_9664_6076_9B54_94C3_94DB_5149_73AF
+        ["数值效果列表"] = {{key = "攻击降低", ["计算总值"] = _____8BA1_7B97_6076_9B54_94C3_94DB_5149_73AF_653B_51FB_964D_4F4E, ["应用差值"] = _____5E94_7528_6076_9B54_94C3_94DB_653B_51FB_5DEE_503C}},
+        Buff = {BuffID = _____5E38_89C4BuffID["攻击力降低"], ["持续秒"] = _____6076_9B54_94C3_94DB_5149_73AFBuff_6301_7EED_79D2, ["自定义同步"] = _____540C_6B65_6076_9B54_94C3_94DB_5149_73AFBuff, ["归零移除"] = false}
     })
 end
 ____exports["处理恶魔铃铛使用"] = function(ctx)

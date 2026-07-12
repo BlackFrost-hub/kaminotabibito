@@ -67,11 +67,11 @@ const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { 启动赫萝昼夜被动, 停止赫萝昼夜被动 } = require("../../../05．单位技能/05．异界Boss/02．赫萝/index") as {
+const { 启动赫萝昼夜被动, 停止赫萝昼夜被动 } = require("../../../05．单位技能/03．Boss技能/03．异界Boss/02．赫萝/index") as {
   启动赫萝昼夜被动: (this: void, unit: any) => void;
   停止赫萝昼夜被动: (this: void, unit: any) => void;
 };
-const { 瑟兰迪尔单位技能配置 } = require("../../../05．单位技能/03．Boss技能/03．瑟兰迪尔/00．配置") as {
+const { 瑟兰迪尔单位技能配置 } = require("../../../05．单位技能/03．Boss技能/01．主线Boss/02．瑟兰迪尔/00．配置") as {
   瑟兰迪尔单位技能配置: { 单位ID: string };
 };
 const {
@@ -79,7 +79,7 @@ const {
   获取或创建瑟兰迪尔上下文,
   清理瑟兰迪尔上下文,
   播放瑟兰迪尔台词,
-} = require("../../../05．单位技能/03．Boss技能/03．瑟兰迪尔/03．运行时上下文") as {
+} = require("../../../05．单位技能/03．Boss技能/01．主线Boss/02．瑟兰迪尔/03．运行时上下文") as {
   获取瑟兰迪尔上下文: (this: void, boss: any) => any;
   获取或创建瑟兰迪尔上下文: (this: void, boss: any) => any;
   清理瑟兰迪尔上下文: (this: void, boss: any) => void;

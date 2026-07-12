@@ -13,3 +13,7 @@ export * from "./14．命令卡技能冷却查询";
 export * from "./15．单位运行时上下文工厂";
 export * from "./16．单位技能壳监听注册器";
 export * from "./17．周期机制调度器";
+export * from "./18．技能互斥锁";
+export * from "./19．可抢占独占状态";
+export * from "./20．联合战斗成员生命周期";
+export * from "./21．不同技能序列状态";

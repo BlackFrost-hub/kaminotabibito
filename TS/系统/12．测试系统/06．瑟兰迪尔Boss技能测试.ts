@@ -16,36 +16,36 @@ const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index")
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数") as {
   StarOther_PanCameraToTimedForPlayer: (this: void, whichPlayer: any, x: number, y: number, duration: number) => void;
 };
-const { 获取或创建瑟兰迪尔上下文, 注册瑟兰迪尔运行时 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.03．运行时上下文") as {
+const { 获取或创建瑟兰迪尔上下文, 注册瑟兰迪尔运行时 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文") as {
   获取或创建瑟兰迪尔上下文: (this: void, boss: any) => any;
   注册瑟兰迪尔运行时: (this: void) => void;
 };
-const { 刷新瑟兰迪尔秩序领域 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.07．秩序领域") as {
+const { 刷新瑟兰迪尔秩序领域 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.07．秩序领域") as {
   刷新瑟兰迪尔秩序领域: (this: void, context: any) => void;
 };
-const { 释放瑟兰迪尔月光枷锁效果, 立即打断瑟兰迪尔月光枷锁 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.05．月光枷锁") as {
+const { 释放瑟兰迪尔月光枷锁效果, 立即打断瑟兰迪尔月光枷锁 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.05．月光枷锁") as {
   释放瑟兰迪尔月光枷锁效果: (this: void, caster: any, target: any) => void;
   立即打断瑟兰迪尔月光枷锁: (this: void, caster: any, target: any) => boolean;
 };
-const { 释放瑟兰迪尔精灵箭阵 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.06．精灵箭阵") as {
+const { 释放瑟兰迪尔精灵箭阵 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.06．精灵箭阵") as {
   释放瑟兰迪尔精灵箭阵: (this: void, context: any) => void;
 };
-const { 释放瑟兰迪尔审判之环 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.08．审判之环") as {
+const { 释放瑟兰迪尔审判之环 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.08．审判之环") as {
   释放瑟兰迪尔审判之环: (this: void, context: any) => void;
 };
-const { 释放瑟兰迪尔罪与罚 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.09．罪与罚") as {
+const { 释放瑟兰迪尔罪与罚 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.09．罪与罚") as {
   释放瑟兰迪尔罪与罚: (this: void, context: any, target?: any) => void;
 };
-const { 释放瑟兰迪尔律法召唤 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.10．律法召唤") as {
+const { 释放瑟兰迪尔律法召唤 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.10．律法召唤") as {
   释放瑟兰迪尔律法召唤: (this: void, context: any) => void;
 };
-const { 释放瑟兰迪尔月光灌注 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.11．月光灌注") as {
+const { 释放瑟兰迪尔月光灌注 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.11．月光灌注") as {
   释放瑟兰迪尔月光灌注: (this: void, context: any) => void;
 };
-const { 释放瑟兰迪尔终末审判 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.12．终末审判") as {
+const { 释放瑟兰迪尔终末审判 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.12．终末审判") as {
   释放瑟兰迪尔终末审判: (this: void, context: any) => void;
 };
-const { 瑟兰迪尔数值与表现配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．瑟兰迪尔.02．数值与表现配置") as {
+const { 瑟兰迪尔数值与表现配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置") as {
   瑟兰迪尔数值与表现配置: any;
 };
 const { 创建单位坐标跟随特效, 创建循环点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {

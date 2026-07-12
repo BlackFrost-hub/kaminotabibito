@@ -9,6 +9,7 @@
 | 生成 Boss 技能音效 / SFX | [`audio-temp-workflow.mdc`](audio-temp-workflow.mdc)、[`ai-audio-generation-workflow.md`](ai-audio-generation-workflow.md) |
 | 生成 Boss 台词配音 / Voice | [`ai-voice-generation-workflow.md`](ai-voice-generation-workflow.md)、[`ai-voice-generation/README.md`](ai-voice-generation/README.md) |
 | 选择 ElevenLabs 声线 | [`ai-voice-generation/07-选型速查.md`](ai-voice-generation/07-选型速查.md)，再按角色类型打开分类文件 |
+| 启动或训练 GPT-SoVITS | [`ai-voice-generation/10-GPT-SoVITS本地训练与启动.md`](ai-voice-generation/10-GPT-SoVITS本地训练与启动.md) |
 | 外置语音 MIX 包制作 | [`ai-voice-generation/08-外置语音MIX包操作指令.md`](ai-voice-generation/08-外置语音MIX包操作指令.md) |
 | 游戏内播放音效函数 | [`sound-and-encapsulation.mdc`](sound-and-encapsulation.mdc) |
 

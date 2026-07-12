@@ -21,6 +21,7 @@ export * from "./16．技能提示圈工厂";
 export * from "./17．闪电效果代码";
 export * from "./18．单位动画守护";
 export * from "./20．位移技能限制";
+export * from "./21．组合技能伤害";
 export {
   stringToFourCC as BossStringToFourCC,
   取单位ID as Boss取单位ID,

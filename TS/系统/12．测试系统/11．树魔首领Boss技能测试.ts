@@ -22,22 +22,22 @@ const { 记录Boss自动技能启动 } = require("系统.03．技能系统.06．
 const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.04．战斗启动属性应用") as {
   应用Boss战启动属性配置: (this: void, unit: any) => void;
 };
-const { 获取或创建树魔首领上下文 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.01．运行时上下文") as {
+const { 获取或创建树魔首领上下文 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文") as {
   获取或创建树魔首领上下文: (this: void, boss: any) => any;
 };
-const { 注册树魔首领被动效果 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.10．被动效果") as {
+const { 注册树魔首领被动效果 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.10．被动效果") as {
   注册树魔首领被动效果: (this: void) => void;
 };
-const { 释放树魔首领扩散冲击波 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.04．扩散冲击波") as {
+const { 释放树魔首领扩散冲击波 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.04．扩散冲击波") as {
   释放树魔首领扩散冲击波: (this: void, context: any) => void;
 };
-const { 释放树魔首领消耗反击 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.05．消耗反击") as {
+const { 释放树魔首领消耗反击 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.05．消耗反击") as {
   释放树魔首领消耗反击: (this: void, context: any) => void;
 };
-const { 释放树魔首领远古诅咒 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.06．远古诅咒") as {
+const { 释放树魔首领远古诅咒 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.06．远古诅咒") as {
   释放树魔首领远古诅咒: (this: void, context: any) => void;
 };
-const { 释放树魔首领树魔图腾 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.07．树魔首领.07．树魔图腾") as {
+const { 释放树魔首领树魔图腾 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.07．树魔图腾") as {
   释放树魔首领树魔图腾: (this: void, context: any) => void;
 };
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {

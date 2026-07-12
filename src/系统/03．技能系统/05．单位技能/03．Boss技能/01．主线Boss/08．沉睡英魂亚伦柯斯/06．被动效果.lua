@@ -1,0 +1,6 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+--- 亚伦柯斯的阶段与周期机制已有设计，但尚未注册。
+-- 本文件不执行自动注册，避免在设计完成前改变地图运行行为。
+____exports["亚伦柯斯被动效果状态"] = {["已设计"] = true, ["已实现"] = false, ["已注册"] = false, ["包含机制"] = {"阶段生命阈值", "墓碑血量锁", "不灭军魂", "战败归静"}}
+return ____exports

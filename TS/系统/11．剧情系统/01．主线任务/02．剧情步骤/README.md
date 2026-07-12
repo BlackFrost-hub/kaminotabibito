@@ -16,6 +16,10 @@
   - 精灵村、沙漠、蛇人族与第一章 Boss 的剧情集合，章内文件按全局进度号命名，从 `01` 到 `18`。
 - `02．第二章`
   - 精灵城与第二章 Boss 承接剧情集合，章内文件按全局进度号命名，从 `19` 起一直到 `34`；当前只剩 `32` 是过程占位文件。
+- `03．第三章`
+  - 从王城战后启程，经第一章沙漠、熔岩小镇进入万浴熔灵；当前正式接入 `35-38`，后续熔岩核心、双重凤凰与英灵封印节点已写入章内总案。
+- `04．第四章`
+  - 从万浴熔灵返回奥斯特利帝国；当前仅预设计边境哨卡、风啸峡谷、山顶风龙、枫叶村大教堂与帝都山路，尚未正式挂表。
 - `06．Boss死亡剧情索引.ts`
   - Boss 死亡事件到主线剧情片段的轻量索引。
 - `01．主线剧情入口/05．主线剧情事件配置表.ts`
@@ -61,6 +65,11 @@
   - `elven_city_emergency_meeting`
   - `elven_city_chapter_boss_death_bridge`
   - `elven_city_chapter_end`
+- `03．第三章` 当前正式挂表片段：
+  - `molten_realm_departure_from_elven_city`
+  - `molten_realm_lava_town_arrival`
+  - `molten_realm_demon_city_call`
+  - `molten_realm_avar_audience`
 
 ## 迁移原则
 

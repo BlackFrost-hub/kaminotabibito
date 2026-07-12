@@ -1,0 +1,13 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+---
+-- @noSelfInFile
+____exports["侵蚀择形机制状态"] = {
+    ["类型"] = "血量阶段机制",
+    ["已完成设计"] = true,
+    ["已完成实现"] = false,
+    ["已注册"] = false,
+    ["语义"] = "第一名到达阶段阈值的守卫率先变异，并决定混合形态阶段的解法。",
+    ["实现要求"] = "形态变化需要迁移生命比例、仇恨和共享阶段状态；另一名守卫在混合阶段不得瞬间跳过机制。"
+}
+return ____exports

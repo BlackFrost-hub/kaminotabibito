@@ -2,35 +2,12 @@
 
 import type { 物品技能事件上下文 } from "../05．物品使用/00．公共/03．物品使用核心";
 import { 物品使用装备ID, 物品使用数值配置 } from "../05．物品使用/00．公共/01．物品使用配置表";
-import { 是否为使用物品, 单位持有物品, 增加物品次数, 获取物品次数, 设置物品次数, 读取单位属性 } from "../05．物品使用/00．公共/02．物品使用工具";
+import { 是否为使用物品, 获取物品次数, 设置物品次数, 读取单位属性 } from "../05．物品使用/00．公共/02．物品使用工具";
 import { 施加临时属性效果, 延迟执行, 播放单位特效 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 import { registerManualBuff } from "../../../05．Buff系统/00．Buff系统";
 import { 常规BuffID } from "../../../05．Buff系统/03．Buff表/00．Buff登记";
 
-const jass = require("jass.common") as any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
-
 const 斯尔能量之心临时伤害属性名 = "wp55斯尔能量之心伤害加成";
-const 已处理斯尔能量之心击杀表: Record<number, boolean | undefined> = {};
-
-function 记录斯尔能量之心击杀(this: void, dyingUnit: any): boolean {
-  if (dyingUnit == null || dyingUnit === 0) return true;
-  const id = GetHandleId(dyingUnit);
-  if (id <= 0) return true;
-  if (已处理斯尔能量之心击杀表[id] === true) return false;
-  已处理斯尔能量之心击杀表[id] = true;
-  延迟执行(1000, function on斯尔能量之心击杀去重过期(this: void): void {
-    delete 已处理斯尔能量之心击杀表[id];
-  });
-  return true;
-}
-
-export function 处理斯尔能量之心击杀(this: void, dyingUnit: any, killingUnit: any): void {
-  if (!单位持有物品(killingUnit, 物品使用装备ID.斯尔能量之心)) return;
-  if (!记录斯尔能量之心击杀(dyingUnit)) return;
-  const cfg = 物品使用数值配置.斯尔能量之心;
-  增加物品次数(killingUnit, 物品使用装备ID.斯尔能量之心, cfg.击杀层数, cfg.触发层数);
-}
 
 export function 处理斯尔能量之心使用(this: void, ctx: 物品技能事件上下文): void {
   if (!是否为使用物品(ctx.物品, 物品使用装备ID.斯尔能量之心)) return;

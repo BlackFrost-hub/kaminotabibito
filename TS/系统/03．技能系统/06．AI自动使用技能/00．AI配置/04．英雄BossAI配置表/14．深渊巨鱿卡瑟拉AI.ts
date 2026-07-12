@@ -2,7 +2,7 @@
 
 import type { 单位AI配置 } from "../01．AI配置类型";
 import { 创建单位AI配置 } from "../02．AI配置工具";
-import { 卡瑟拉单位技能配置 } from "../../../05．单位技能/03．Boss技能/10．深渊巨鱿卡瑟拉/00．配置";
+import { 卡瑟拉单位技能配置 } from "../../../05．单位技能/03．Boss技能/02．挑战与隐藏Boss/03．深渊巨鱿卡瑟拉/00．配置";
 
 export const 卡瑟拉AI配置: 单位AI配置 = 创建单位AI配置({
   AI配置ID: "深渊巨鱿卡瑟拉AI",

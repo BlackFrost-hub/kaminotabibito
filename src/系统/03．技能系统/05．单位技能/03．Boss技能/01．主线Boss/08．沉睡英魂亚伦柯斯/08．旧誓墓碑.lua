@@ -1,0 +1,13 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+---
+-- @noSelfInFile
+____exports["旧誓墓碑机制状态"] = {
+    ["类型"] = "P2阶段机制",
+    ["已完成设计"] = true,
+    ["已完成实现"] = false,
+    ["已注册"] = false,
+    ["语义"] = "固定生成三座誓约墓碑，玩家站入范围完成安魂；未安魂墓碑提供减伤并阻止Boss进入P3。",
+    ["实现要求"] = "墓碑不承受普通伤害，安魂进度、残影斩击、减伤层数与35%血量锁必须统一清理。"
+}
+return ____exports

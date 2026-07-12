@@ -6,12 +6,10 @@ local ____01_FF0E_7269_54C1_4F7F_7528_914D_7F6E_8868 = require("系统.02．物�
 local _____7269_54C1_4F7F_7528_88C5_5907ID = ____01_FF0E_7269_54C1_4F7F_7528_914D_7F6E_8868["物品使用装备ID"]
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.13．物品技能事件中心")
 local _____6CE8_518C_7269_54C1_6280_80FD_4E8B_4EF6_76D1_542C = ____require_result_0["注册物品技能事件监听"]
-local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_1.registerDeathListener
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_2.registerAppliedFinalDamageListener
-local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_3.registerDamageModifier
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_1.registerAppliedFinalDamageListener
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_2.registerDamageModifier
 local jass = require("jass.common")
 local IsUnitType = jass.IsUnitType
 local GetItemTypeId = jass.GetItemTypeId
@@ -189,9 +187,6 @@ local function ____on_7269_54C1_4F7F_7528_94FE_8DEF(ctx)
         end
     until true
 end
-local function ____on_7269_54C1_4F7F_7528_6B7B_4EA1_4E8B_4EF6(dyingUnit, killingUnit)
-    _____65AF_5C14_80FD_91CF_4E4B_5FC3["处理斯尔能量之心击杀"](dyingUnit, killingUnit)
-end
 local function ____on_7269_54C1_4F7F_7528_6700_7EC8_4F24_5BB3(target, attacker, applied, snapshot)
     if not (applied >= 1) then
         return
@@ -224,7 +219,6 @@ ____exports["初始化装备物品使用链"] = function()
     _____72F1_5996_9B54_76FE["初始化狱妖魔盾持有充能"]()
     _____7130_6DF7_80FD_91CF_4F53["初始化焰混能量体被动"]()
     _____6CE8_518C_7269_54C1_6280_80FD_4E8B_4EF6_76D1_542C(____on_7269_54C1_4F7F_7528_94FE_8DEF)
-    registerDeathListener(____on_7269_54C1_4F7F_7528_6B7B_4EA1_4E8B_4EF6)
     registerAppliedFinalDamageListener(____on_7269_54C1_4F7F_7528_6700_7EC8_4F24_5BB3)
     registerDamageModifier(____on_7269_54C1_4F7F_7528_4F24_5BB3_4FEE_6B63, 30)
 end

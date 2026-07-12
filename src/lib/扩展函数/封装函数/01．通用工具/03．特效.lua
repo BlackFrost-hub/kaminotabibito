@@ -99,13 +99,13 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
             local id = idText
             local _____8BB0_5F55 = _____5FAA_73AF_70B9_7279_6548_8868[id]
             if _____8BB0_5F55 == nil then
-                goto __continue44
+                goto __continue47
             end
             local _____53C2_6570 = _____8BB0_5F55["参数"]
             local alive = _____53C2_6570["存活条件"] == nil or _____53C2_6570["存活条件"]()
             if _____8BB0_5F55["已停止"] or not alive or _____8BB0_5F55["结束毫秒"] > 0 and now >= _____8BB0_5F55["结束毫秒"] then
                 _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55(id, _____8BB0_5F55)
-                goto __continue44
+                goto __continue47
             end
             if now >= _____8BB0_5F55["下次重建毫秒"] then
                 _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4(_____8BB0_5F55["当前特效"])
@@ -116,7 +116,7 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
                 _____8BB0_5F55["当前特效"] = nil
             end
         end
-        ::__continue44::
+        ::__continue47::
     end
     if _____5FAA_73AF_70B9_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick()
@@ -253,6 +253,7 @@ getServerTime = ____require_result_0.getServerTime
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 AddSpecialEffect = jass.AddSpecialEffect
+local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 DestroyEffect = jass.DestroyEffect
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
@@ -305,6 +306,24 @@ function ____exports.createTimedEffect(modelPath, x, y, z, duration)
     end
     _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548(eff, duration)
     return eff
+end
+function ____exports.createTimedUnitEffect(unit, attachPoint, modelPath, duration)
+    if duration == nil then
+        duration = 2
+    end
+    if unit == nil or unit == 0 or modelPath == "" then
+        return nil
+    end
+    local effect = AddSpecialEffectTarget(
+        _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84(modelPath),
+        unit,
+        attachPoint
+    )
+    if effect == nil or effect == 0 then
+        return nil
+    end
+    _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548(effect, duration)
+    return effect
 end
 ____exports["设置特效XYZ轴旋转"] = function(effect, _____53C2_6570)
     if effect == nil or effect == 0 or _____53C2_6570 == nil then
@@ -541,11 +560,11 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
         do
             local record = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key]
             if record == nil then
-                goto __continue114
+                goto __continue117
             end
             if not _____5355_4F4D_53EF_5750_6807_8DDF_968F(record.unit) then
                 _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548_8BB0_5F55(key, record)
-                goto __continue114
+                goto __continue117
             end
             DzSetEffectPos(
                 record.effect,
@@ -554,7 +573,7 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
                 record.height
             )
         end
-        ::__continue114::
+        ::__continue117::
     end
     if _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()

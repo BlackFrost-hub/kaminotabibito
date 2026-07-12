@@ -1,0 +1,6 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+--- 联合战斗被动与阶段驱动尚未注册。
+-- 后续由本文件统一启动双灵同誓、血量阈值、阶段推进和死亡拦截。
+____exports["祖地双灵卫被动效果状态"] = {["已设计"] = true, ["已实现"] = false, ["已注册"] = false, ["包含机制"] = {"双灵同誓", "侵蚀择形", "同息归寂"}}
+return ____exports

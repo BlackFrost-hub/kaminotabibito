@@ -44,8 +44,25 @@ ____exports["停止技能阶段链"] = function(_____9636_6BB5_94FEID, _____539F
     _____5B8C_6210_9636_6BB5_94FE(_____8FD0_884C_65F6, _____539F_56E0)
     return true
 end
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local removeDelayedCallback = ____require_result_0.removeDelayedCallback
 _____9636_6BB5_94FE_6620_5C04 = {}
 local _____4E0B_4E00_4E2A_9636_6BB5_94FEID = 1
+local function ____on_6280_80FD_5EF6_8FDF_9636_6BB5_5230_671F(variable)
+    local data = variable
+    if data == nil or data["已结束"] then
+        return
+    end
+    data["已结束"] = true
+    if data["执行"] ~= nil then
+        data["执行"](data["上下文"], data["控制器"])
+    end
+    data["控制器"]["完成当前阶段"]()
+end
+local function _____53D6_9636_6BB5_5EF6_8FDF_6BEB_79D2(_____5EF6_8FDF_6BEB_79D2, _____4E0A_4E0B_6587)
+    return type(_____5EF6_8FDF_6BEB_79D2) == "number" and _____5EF6_8FDF_6BEB_79D2 or _____5EF6_8FDF_6BEB_79D2(_____4E0A_4E0B_6587)
+end
 local function _____8FDB_5165_4E0B_4E00_9636_6BB5(_____8FD0_884C_65F6)
     if _____8FD0_884C_65F6["已结束"] then
         return
@@ -86,9 +103,9 @@ ____exports["开始技能阶段链"] = function(_____5355_4F4D, _____9636_6BB5_5
     if #_____9636_6BB5_5217_8868 <= 0 then
         return 0
     end
-    local ____4E0B_4E00_4E2A_9636_6BB5_94FEID_0 = _____4E0B_4E00_4E2A_9636_6BB5_94FEID
-    _____4E0B_4E00_4E2A_9636_6BB5_94FEID = ____4E0B_4E00_4E2A_9636_6BB5_94FEID_0 + 1
-    local _____9636_6BB5_94FEID = ____4E0B_4E00_4E2A_9636_6BB5_94FEID_0
+    local ____4E0B_4E00_4E2A_9636_6BB5_94FEID_1 = _____4E0B_4E00_4E2A_9636_6BB5_94FEID
+    _____4E0B_4E00_4E2A_9636_6BB5_94FEID = ____4E0B_4E00_4E2A_9636_6BB5_94FEID_1 + 1
+    local _____9636_6BB5_94FEID = ____4E0B_4E00_4E2A_9636_6BB5_94FEID_1
     local _____8FD0_884C_65F6 = {
         id = _____9636_6BB5_94FEID,
         ["单位"] = _____5355_4F4D,
@@ -110,6 +127,36 @@ ____exports["创建立即执行阶段"] = function(_____6267_884C, _____540D_79F
             _____63A7_5236_5668["完成当前阶段"]()
         end
     }
+end
+____exports["创建延迟执行阶段"] = function(_____5EF6_8FDF_6BEB_79D2, _____6267_884C, _____540D_79F0)
+    return {
+        ["名称"] = _____540D_79F0,
+        ["开始"] = function(_____4E0A_4E0B_6587, _____63A7_5236_5668)
+            local delayMs = _____53D6_9636_6BB5_5EF6_8FDF_6BEB_79D2(_____5EF6_8FDF_6BEB_79D2, _____4E0A_4E0B_6587)
+            if delayMs <= 0 then
+                _____6267_884C(_____4E0A_4E0B_6587, _____63A7_5236_5668)
+                _____63A7_5236_5668["完成当前阶段"]()
+                return
+            end
+            local data = {["上下文"] = _____4E0A_4E0B_6587, ["控制器"] = _____63A7_5236_5668, ["执行"] = _____6267_884C, ["已结束"] = false}
+            local callbackId = addDelayedCallback(delayMs, ____on_6280_80FD_5EF6_8FDF_9636_6BB5_5230_671F, data)
+            _____63A7_5236_5668["设置当前阶段停止函数"](function()
+                if data["已结束"] then
+                    return
+                end
+                data["已结束"] = true
+                removeDelayedCallback(callbackId)
+            end)
+        end
+    }
+end
+____exports["创建延迟阶段"] = function(_____5EF6_8FDF_6BEB_79D2, _____540D_79F0)
+    return ____exports["创建延迟执行阶段"](
+        _____5EF6_8FDF_6BEB_79D2,
+        function()
+        end,
+        _____540D_79F0
+    )
 end
 ____exports["创建前摇阶段"] = function(_____53C2_6570)
     return {

@@ -15,6 +15,7 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
+const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
@@ -72,6 +73,19 @@ export function createTimedEffect(
 
   安排定时销毁特效(eff, duration);
   return eff;
+}
+
+export function createTimedUnitEffect(
+  unit: any,
+  attachPoint: string,
+  modelPath: string,
+  duration: number = 2,
+): any {
+  if (unit == null || unit === 0 || modelPath === "") return null;
+  const effect = AddSpecialEffectTarget(规范化特效模型路径(modelPath), unit, attachPoint);
+  if (effect == null || effect === 0) return null;
+  安排定时销毁特效(effect, duration);
+  return effect;
 }
 
 export interface 点特效参数 {
