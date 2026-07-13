@@ -4125,6 +4125,223 @@ ____exports.items.I0FI = {
     stunResist = 0.12,
     abilList = "IP00"
 }
+____exports.items.I0FN = {
+    type = "双手武器",
+    name = "亡冥归魂巨剑",
+    goldPrice = 1000,
+    score = 10500,
+    level = "B++",
+    dmg = 250,
+    str = 65,
+    armorPierce = 0.26,
+    critDmg = 0.35,
+    weaponType = "剑"
+}
+____exports.items.I0FO = {
+    type = "衣服",
+    name = "最后阵地重铠",
+    goldPrice = 1000,
+    score = 10200,
+    level = "B++",
+    hp = 4200,
+    armor = 50,
+    str = 45,
+    stunResist = 0.3
+}
+____exports.items.I0FP = {
+    type = "头盔",
+    name = "亡者凝视面甲",
+    goldPrice = 1000,
+    score = 9800,
+    level = "B++",
+    hp = 3500,
+    armor = 42,
+    magicResist = 0.22,
+    physResist = 0.14
+}
+____exports.items.I0FQ = {
+    type = "副武器",
+    name = "英灵送葬法典",
+    goldPrice = 1000,
+    score = 10400,
+    level = "B++",
+    int = 72,
+    magicDmg = 0.26,
+    magicPierce = 0.22,
+    cdReduction = 0.14
+}
+____exports.items.I0FR = {
+    type = "灵魂",
+    name = "旧誓残响徽记",
+    goldPrice = 1000,
+    score = 10000,
+    level = "B++",
+    all = 42,
+    dmg = 120,
+    skillDmg = 0.18,
+    cdReduction = 0.12
+}
+____exports.items.I0FS = {
+    type = "道具/戒指/饰品",
+    name = "安魂守墓灯",
+    goldPrice = 1000,
+    score = 10100,
+    level = "B++",
+    cdReduction = 0.14,
+    skillHeal = 0.25,
+    mpRegen = 32,
+    hp = 2200,
+    stunResist = 0.22
+}
+____exports.items.I0FT = {
+    type = "主武器",
+    name = "赤誓断界剑",
+    goldPrice = 1000,
+    score = 7000,
+    level = "B",
+    dmg = 180,
+    str = 35,
+    armorPierce = 0.22,
+    hp = 1200,
+    weaponType = "剑"
+}
+____exports.items.I0FU = {
+    type = "衣服",
+    name = "裂誓战躯重铠",
+    goldPrice = 1000,
+    score = 6900,
+    level = "B",
+    hp = 3000,
+    armor = 38,
+    str = 30,
+    stunResist = 0.25
+}
+____exports.items.I0FV = {
+    type = "副武器",
+    name = "苍影校魂法典",
+    goldPrice = 1000,
+    score = 7000,
+    level = "B",
+    int = 50,
+    magicDmg = 0.2,
+    magicPierce = 0.2,
+    cdReduction = 0.1
+}
+____exports.items.I0FW = {
+    type = "头盔",
+    name = "无面记忆面纱",
+    goldPrice = 1000,
+    score = 6850,
+    level = "B",
+    int = 32,
+    magicResist = 0.22,
+    dodge = 0.1,
+    hp = 1800
+}
+____exports.items.I0FX = {
+    type = "鞋子",
+    name = "灵印折步靴",
+    goldPrice = 1000,
+    score = 6800,
+    level = "B",
+    movespeed2 = 0.12,
+    dodge = 0.1,
+    all = 20,
+    cdReduction = 0.08
+}
+____exports.items.I0FY = {
+    type = "道具/戒指/饰品",
+    name = "双钥归一棱镜",
+    goldPrice = 1000,
+    score = 6950,
+    level = "B",
+    all = 28,
+    dmg = 90,
+    skillDmg = 0.16,
+    cdReduction = 0.08
+}
+____exports.items.I0FZ = {
+    type = "道具/戒指/饰品",
+    name = "月白归静圣铃",
+    goldPrice = 1000,
+    score = 6900,
+    level = "B",
+    cdReduction = 0.12,
+    skillHeal = 0.22,
+    mpCost = -0.1,
+    hp = 1500,
+    stunResist = 0.18
+}
+____exports.items.I0G0 = {
+    type = "副武器",
+    name = "超位魔法残章·天空坠落",
+    goldPrice = 1000,
+    score = 12500,
+    level = "A",
+    int = 90,
+    magicDmg = 0.3,
+    magicPierce = 0.26,
+    mp = 1800,
+    cdReduction = 0.15
+}
+____exports.items.I0G1 = {
+    type = "道具/戒指/饰品",
+    name = "光辉翠绿宝石",
+    goldPrice = 1000,
+    score = 11500,
+    level = "A",
+    hp = 4500,
+    armor = 55,
+    magicResist = 0.25,
+    all = 40
+}
+____exports.items.I0G2 = {
+    type = "副武器",
+    name = "黑翼守护重盾",
+    goldPrice = 1000,
+    score = 12000,
+    level = "A",
+    hp = 4800,
+    armor = 60,
+    physResist = 0.18,
+    stunResist = 0.3,
+    all = 30
+}
+____exports.items.I0G3 = {
+    type = "双手武器",
+    name = "滴管长枪投影",
+    goldPrice = 1000,
+    score = 10500,
+    level = "B++",
+    dmg = 245,
+    atkSpeed = 0.45,
+    str = 55,
+    armorPierce = 0.24,
+    weaponType = "长枪"
+}
+____exports.items.I0G4 = {
+    type = "衣服",
+    name = "真祖女武神血铠",
+    goldPrice = 1000,
+    score = 10200,
+    level = "B++",
+    hp = 4000,
+    armor = 48,
+    atkSpeed = 0.3,
+    stunResist = 0.25,
+    magicResist = 0.18
+}
+____exports.items.I0G5 = {
+    type = "灵魂",
+    name = "英灵战乙女蔷薇镜",
+    goldPrice = 1000,
+    score = 10000,
+    level = "B++",
+    all = 42,
+    skillDmg = 0.2,
+    cdReduction = 0.12,
+    atkSpeed = 0.25
+}
 ____exports.items.I0FJ = {type = "任务", name = "骸骨圣杯碎片", goldPrice = 0}
 ____exports.items.I0FM = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "IP01"}
 ____exports.items.ches = {

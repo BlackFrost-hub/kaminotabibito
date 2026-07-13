@@ -3,7 +3,7 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.03．核心逻辑")
+local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑")
 local _____6309_7ED3_7B97_952E_83B7_53D6Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E = ____require_result_0["按结算键获取Boss死亡结算配置"]
 local _____6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_0["执行Boss死亡结算"]
 do

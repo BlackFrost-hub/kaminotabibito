@@ -1,17 +1,5 @@
--- Hero Boss object data entry.
+-- Hero Boss object data root entry.
 
-dofile('Boss/HeroBoss/01-Thranduil.lua')
-dofile('Boss/HeroBoss/02-Mia.lua')
-dofile('Boss/HeroBoss/03-BalzarothAbilities.lua')
-dofile('Boss/HeroBoss/03-Balzaroth.lua')
-dofile('Boss/HeroBoss/03-BalzarothMechanicUnits.lua')
-dofile('Boss/HeroBoss/04-PhoenixelAbilities.lua')
-dofile('Boss/HeroBoss/04-Phoenixel.lua')
-dofile('Boss/HeroBoss/04-PhoenixelMechanicUnits.lua')
-dofile('Boss/HeroBoss/05-TreeLord.lua')
-dofile('Boss/HeroBoss/06-Felice.lua')
-dofile('Boss/HeroBoss/07-Ricote.lua')
-dofile('Boss/HeroBoss/08-Kasela.lua')
-dofile('Boss/HeroBoss/09-Moltes.lua')
-dofile('Boss/HeroBoss/10-ShadowboneMotes.lua')
-dofile('Boss/HeroBoss/11-SleepingHeroAronkos.lua')
+dofile('Boss/HeroBoss/01-MainlineBoss/MainlineBoss.lua')
+dofile('Boss/HeroBoss/02-ChallengeHiddenBoss/ChallengeHiddenBoss.lua')
+dofile('Boss/HeroBoss/03-OtherworldBoss/OtherworldBoss.lua')

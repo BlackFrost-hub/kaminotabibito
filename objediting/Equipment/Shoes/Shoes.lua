@@ -23,3 +23,15 @@ createEquipmentItem('I0EH', '熔岩行者胫甲', {
   tooltipExtended = '|cffccffff[鞋子]-机动/火抗|r|n|cffffcc99等级：B+|n评分：8500|r|n|cffffffcc[基础属性]|r|n移动速度+12%|n护甲+18|n生命值+1600|n火属性抗性+20%|n|cFF808080胫甲底部覆着冷却后的熔岩壳，足以让穿戴者踏过滚烫岩面。|r',
   description = '|cffccffff[鞋子]-机动/火抗|r|n|cffffcc99等级：B+|n评分：8500|r|n|cffffffcc[基础属性]|r|n移动速度+12%|n护甲+18|n生命值+1600|n火属性抗性+20%|n|cFF808080胫甲底部覆着冷却后的熔岩壳，足以让穿戴者踏过滚烫岩面。|r',
 })
+
+createEquipmentItem('I0FX', '灵印折步靴', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Shoes\\ancestral_twin_spirit_step_boots.blp',
+  model = 'war3mapImported\\PVP_Rune_Speed_Icon.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  score = 6800,
+  tooltipExtended = '|cffccffff[鞋子]-机动/回身防守|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n移动速度+12%|n闪避+10%|n全属性+20|n冷却缩减+8%|n|cffffffcc[装备效果规划]|r|n折步留印：完成战斗自身位移后在原位置留下镇魂印，短时间内返回可获得减伤与控制抗性。装备技能后续接入。|n|cFF808080靴底的灵印不会催促前进，只会记住最值得回去的位置。|r',
+  description = '|cffccffff[鞋子]-机动/回身防守|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n移动速度+12%|n闪避+10%|n全属性+20|n冷却缩减+8%|n|cffffffcc[装备效果规划]|r|n折步留印：完成战斗自身位移后在原位置留下镇魂印，短时间内返回可获得减伤与控制抗性。装备技能后续接入。|n|cFF808080靴底的灵印不会催促前进，只会记住最值得回去的位置。|r',
+})

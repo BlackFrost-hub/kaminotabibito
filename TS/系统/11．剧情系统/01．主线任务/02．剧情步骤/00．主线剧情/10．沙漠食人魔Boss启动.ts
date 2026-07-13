@@ -16,7 +16,7 @@ const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") a
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
 };
-const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动") as {
+const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动") as {
   启动Boss战运行: (this: void, bossUnit: any) => void;
 };
 

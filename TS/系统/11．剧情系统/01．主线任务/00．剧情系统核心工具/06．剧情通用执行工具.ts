@@ -59,7 +59,7 @@ const { questManager } = require("系统.08．任务系统.02．任务管理器"
 const { 创建并冻结剧情Boss预置 } = require("./03．剧情Boss预置桥接") as {
   创建并冻结剧情Boss预置: (this: void, 参数: any) => any;
 };
-const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动") as {
+const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动") as {
   启动Boss战运行: (this: void, bossUnit: any) => void;
 };
 

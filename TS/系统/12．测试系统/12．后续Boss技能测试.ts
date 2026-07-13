@@ -16,10 +16,10 @@ const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index")
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数") as {
   StarOther_PanCameraToTimedForPlayer: (this: void, whichPlayer: any, x: number, y: number, duration: number) => void;
 };
-const { 记录Boss自动技能启动 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.01．Boss自动技能注册表") as {
+const { 记录Boss自动技能启动 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表") as {
   记录Boss自动技能启动: (this: void, unit: any, source: any) => any;
 };
-const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.03．战斗启动属性.04．战斗启动属性应用") as {
+const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用") as {
   应用Boss战启动属性配置: (this: void, unit: any) => void;
 };
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {

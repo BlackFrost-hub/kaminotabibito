@@ -117,7 +117,7 @@ export const 巴尔扎罗斯单位技能配置 = {
     熔岩暴走: "BBZ8",
   },
   模型: {
-    Boss: "war3mapImported\\2.mdl",
+    Boss: "Boss\\Balzaroth\\Balzaroth.mdx",
   },
   台词: {
     开场: ["地核的锁链，终将为王让路。"],

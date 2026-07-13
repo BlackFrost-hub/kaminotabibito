@@ -72,7 +72,7 @@ export const 里科特数值与表现配置 = {
     射程: 1200,
     投影距离: 300,
     投影单位类型: "hfoo",
-    投影模型路径: "war3mapImported\\CW_Galen_Trollbane.mdl",
+    投影模型路径: "Boss\\Ricote\\Ricote.mdx",
     投影缩放: 1.35,
     投影透明度: 135,
     出现特效路径: "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx",

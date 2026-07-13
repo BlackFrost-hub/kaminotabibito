@@ -14,7 +14,7 @@ import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
 };
-const { 获取所有Boss自动技能启动上下文 } = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.01．Boss自动技能注册表") as {
+const { 获取所有Boss自动技能启动上下文 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表") as {
   获取所有Boss自动技能启动上下文: (this: void) => any[];
 };
 

@@ -5,7 +5,7 @@ export const 亚伦柯斯单位技能配置 = {
   单位ID: 'U006',
   单位名称: '沉睡英魂·亚伦柯斯',
   基础对象ID: 'Udea',
-  模型路径: 'war3mapImported\\UndeadArthas.mdl',
+  模型路径: 'Boss\\SleepingHeroAronkos\\SleepingHeroAronkos.mdx',
   技能壳: {
     亡冥英斩: 'AT00',
     英灵陨星: 'AN00',

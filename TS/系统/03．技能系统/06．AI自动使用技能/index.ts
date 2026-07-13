@@ -5,7 +5,7 @@
  */
 
 export * from "./00．AI配置";
-export * from "./09．Boss战启动桥接";
+export * from "./03．Boss战启动桥接";
 export * from "./01．受击反应施法";
 export * from "./02．Boss主动扫描施法";
 
@@ -16,7 +16,7 @@ export function init(this: void): void {
   const 受击反应模块 = require("./01．受击反应施法") as {
     init受击反应施法?: (this: void) => void;
   };
-  const Boss战启动桥接模块 = require("./09．Boss战启动桥接") as {
+  const Boss战启动桥接模块 = require("./03．Boss战启动桥接") as {
     注册Boss战启动Stes桥接?: (this: void) => void;
   };
   const Boss主动扫描模块 = require("./02．Boss主动扫描施法") as {

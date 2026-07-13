@@ -112,17 +112,6 @@ ____exports["玩家英雄配置表"] = {
         castpt = 0.3,
         gender = "female"
     },
-    E005 = {
-        unit = "E005",
-        _parent = "Emoo",
-        Name = "安兹乌尔恭",
-        file = "war3mapImported\\cyt-anzi222.mdl",
-        abilList = "Aloc,AInv,Ault",
-        sight = 1600,
-        nsight = 1100,
-        Propernames = "纳萨力克坟墓统治者",
-        gender = "male"
-    },
     E008 = {
         unit = "E008",
         _parent = "Emoo",
@@ -1055,7 +1044,6 @@ ____exports["玩家英雄配置列表"] = {
     ____exports["玩家英雄配置表"].E000,
     ____exports["玩家英雄配置表"].E001,
     ____exports["玩家英雄配置表"].E004,
-    ____exports["玩家英雄配置表"].E005,
     ____exports["玩家英雄配置表"].E008,
     ____exports["玩家英雄配置表"].E009,
     ____exports["玩家英雄配置表"].E00A,

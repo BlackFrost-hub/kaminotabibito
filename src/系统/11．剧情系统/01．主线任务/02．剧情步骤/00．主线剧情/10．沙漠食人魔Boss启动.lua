@@ -15,7 +15,7 @@ local ____require_result_2 = require("lib.扩展函数.BJ函数.14．音效函�
 local PlaySoundBJ = ____require_result_2.PlaySoundBJ
 local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local IsUnitAliveBJ = ____require_result_3.IsUnitAliveBJ
-local ____require_result_4 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动")
+local ____require_result_4 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
 local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_4["启动Boss战运行"]
 do
     local ____10_FF0E_6C99_6F20_98DF_4EBA_9B54Boss_542F_52A8 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.10．沙漠食人魔Boss启动")

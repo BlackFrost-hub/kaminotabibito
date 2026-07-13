@@ -11,10 +11,10 @@ local ____require_result_1 = require("系统.01．单位系统.08．单位配置
 local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_1["按名字反查Boss单位ID"]
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
-local ____require_result_3 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.05．Boss死亡结算.03．核心逻辑")
+local ____require_result_3 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑")
 local _____6309_7ED3_7B97_952E_83B7_53D6Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E = ____require_result_3["按结算键获取Boss死亡结算配置"]
 local _____6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_3["执行Boss死亡结算"]
-local ____require_result_4 = require("系统.03．技能系统.06．AI自动使用技能.09．Boss战启动桥接.04．Boss战运行.03．Boss战运行驱动")
+local ____require_result_4 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
 local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_4["启动Boss战运行"]
 do
     local ____11_FF0E_6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.11．沙漠食人魔一阶段死亡")

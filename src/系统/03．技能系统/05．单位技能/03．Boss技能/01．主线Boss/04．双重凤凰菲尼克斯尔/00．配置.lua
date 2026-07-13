@@ -34,7 +34,7 @@ ____exports["菲尼克斯尔单位技能配置"] = {
     },
     ["模型"] = {
         ["第一形态"] = "Boss\\Phoenixel\\HolyPhoenix.mdx",
-        ["第二形态"] = "war3mapImported\\Alisrazor.mdl",
+        ["第二形态"] = "Boss\\Phoenixel\\UndyingPhoenix.mdx",
         ["永恒冰核"] = "Common\\Effect\\Element\\Ice\\Ice_egg.mdx",
         ["能量导管"] = "Common\\Effect\\Element\\Ice\\FrozenMana.mdx",
         ["怨火核心"] = "Common\\Effect\\Element\\Fire\\Burning Core.mdx",
