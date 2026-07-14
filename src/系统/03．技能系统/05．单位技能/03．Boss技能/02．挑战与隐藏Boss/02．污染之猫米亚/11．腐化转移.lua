@@ -219,18 +219,18 @@ local function _____542F_52A8_8150_5316_8F6C_79FB(context, nowMs, _____533A_57DF
     context["上次腐化转移Ms"] = nowMs
     _____9762_5411_5E73_53F0(boss, _____533A_57DF)
     _____5F00_59CB_786C_76F4(boss, config["预警秒"])
-    SetUnitTimeScale(boss, 1)
-    SetUnitAnimationByIndex(boss, 5)
+    SetUnitTimeScale(boss, config["预警动画速度"])
+    SetUnitAnimationByIndex(boss, config["预警动画编号"])
     _____64AD_653E_5E73_53F0_9884_8B66(_____533A_57DF)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "腐化转移", 0)
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = config["预警秒"], ["颜色ID"] = 3, ["标题文本"] = "腐化转移", ["提示文本"] = "米亚正在污染安全区！离开目标平台！"})
     addDelayedCallback(
-        750,
+        config["弓背冻结延迟Ms"],
         function()
             if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
                 return
             end
-            SetUnitTimeScale(context["Boss单位"], 0)
+            SetUnitTimeScale(context["Boss单位"], config["弓背冻结动画速度"])
         end
     )
     addDelayedCallback(
@@ -244,13 +244,13 @@ local function _____542F_52A8_8150_5316_8F6C_79FB(context, nowMs, _____533A_57DF
             local _____539FX = GetUnitX(currentBoss)
             local _____539FY = GetUnitY(currentBoss)
             if not _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(currentBoss, _____533A_57DF["中心X"], _____533A_57DF["中心Y"]) then
-                SetUnitTimeScale(currentBoss, 1)
-                SetUnitAnimationByIndex(currentBoss, 0)
+                SetUnitTimeScale(currentBoss, config["恢复动画速度"])
+                SetUnitAnimationByIndex(currentBoss, config["恢复动画编号"])
                 return
             end
             _____64AD_653E_5165_51FA_6C34_8868_73B0(_____539FX, _____539FY)
-            SetUnitTimeScale(currentBoss, 2)
-            SetUnitAnimationByIndex(currentBoss, 7)
+            SetUnitTimeScale(currentBoss, config["出水动画速度"])
+            SetUnitAnimationByIndex(currentBoss, config["出水动画编号"])
             _____64AD_653E_5165_51FA_6C34_8868_73B0(_____533A_57DF["中心X"], _____533A_57DF["中心Y"])
             _____5F00_59CB_6C61_67D3_5E73_53F0(
                 context,
@@ -258,13 +258,13 @@ local function _____542F_52A8_8150_5316_8F6C_79FB(context, nowMs, _____533A_57DF
                 nowMs + R2I(config["预警秒"] * 1000)
             )
             addDelayedCallback(
-                600,
+                config["恢复动作延迟Ms"],
                 function()
                     if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
                         return
                     end
-                    SetUnitTimeScale(context["Boss单位"], 1)
-                    SetUnitAnimationByIndex(context["Boss单位"], 0)
+                    SetUnitTimeScale(context["Boss单位"], config["恢复动画速度"])
+                    SetUnitAnimationByIndex(context["Boss单位"], config["恢复动画编号"])
                 end
             )
         end

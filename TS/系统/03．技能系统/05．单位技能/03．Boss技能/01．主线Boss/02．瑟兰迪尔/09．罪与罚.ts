@@ -152,11 +152,11 @@ export function 释放瑟兰迪尔罪与罚(this: void, context: 瑟兰迪尔运
     标题文本: config.吟唱条标题文本 + "：" + 象限名称,
     提示文本: "常规技能：即将赐予" + 象限名称 + "象限",
   });
-  SetUnitTimeScale(boss, 1);
+  SetUnitTimeScale(boss, config.动画速度);
   SetUnitAnimationByIndex(boss, config.动画编号);
-  addDelayedCallback(30, function 重播瑟兰迪尔罪与罚施法动作(this: void): void {
+  addDelayedCallback(config.动画重播延迟Ms, function 重播瑟兰迪尔罪与罚施法动作(this: void): void {
     if (!单位有效(boss)) return;
-    SetUnitTimeScale(boss, 1);
+    SetUnitTimeScale(boss, config.动画速度);
     SetUnitAnimationByIndex(boss, config.动画编号);
   });
 
@@ -164,8 +164,8 @@ export function 释放瑟兰迪尔罪与罚(this: void, context: 瑟兰迪尔运
     关闭吟唱条("常规技能");
     if (!单位有效(boss) || !单位有效(actualTarget)) return;
     让单位面向目标(boss, actualTarget);
-    SetUnitTimeScale(boss, 1);
-    SetUnitAnimationByIndex(boss, 0);
+    SetUnitTimeScale(boss, config.恢复动画速度);
+    SetUnitAnimationByIndex(boss, config.恢复动画编号);
     Sound3DII_CooPlayReuse(config.点名音效, GetUnitX(actualTarget), GetUnitY(actualTarget), 0, config.点名音效裁断距离);
     播放点名特效(actualTarget, config.延迟秒);
   });

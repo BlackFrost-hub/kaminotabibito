@@ -11,6 +11,7 @@ local ____13_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_653E["播放莫尔特斯台词"]
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
+local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
@@ -68,7 +69,14 @@ local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单�
 local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
 local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_5.addDelayedCallback
 local _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90 = "Boss:Moltes:根系觉醒"
+local function _____5EF6_8FDF_9690_85CF_6839_7CFB_89C9_9192Boss(context)
+    if context["腐败之源组"] ~= nil and _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        ShowUnit(context["Boss单位"], false)
+    end
+end
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
         return
@@ -128,7 +136,7 @@ local function _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue12
+                    goto __continue14
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
@@ -145,7 +153,7 @@ local function _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
                 })
                 _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, hero, cfg["全屏爆发腐败值"])
             end
-            ::__continue12::
+            ::__continue14::
             i = i + 1
         end
     end
@@ -174,8 +182,8 @@ local function _____521B_5EFA_8150_8D25_4E4B_6E90_76EE_6807_5217_8868(context)
                 ["on销毁"] = _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1
             }
             local circle = AddSpecialEffect(cfg["腐败之源脚下特效路径"], cell["中心X"], cell["中心Y"])
-            local ____self_5 = context["清理"]
-            ____self_5["登记特效"](____self_5, "莫尔特斯-腐败之源脚下圈", circle)
+            local ____self_6 = context["清理"]
+            ____self_6["登记特效"](____self_6, "莫尔特斯-腐败之源脚下圈", circle)
             i = i + 1
         end
     end
@@ -196,6 +204,8 @@ ____exports["尝试触发莫尔特斯根系觉醒"] = function(context)
         return
     end
     context["根系觉醒已触发"] = true
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根系觉醒"]
+    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(context["Boss单位"], "根系觉醒")
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["根系觉醒"]["机制开始"],
@@ -212,9 +222,7 @@ ____exports["尝试触发莫尔特斯根系觉醒"] = function(context)
         ["冷却Ms"] = _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["冷却Ms"],
         ["触发概率百分比"] = _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["转阶段触发概率百分比"]
     })
-    ShowUnit(context["Boss单位"], false)
     _____6DFB_52A0_5355_4F4D_6682_505C(context["Boss单位"], _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90)
-    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根系觉醒"]
     context["腐败之源组"] = _____521B_5EFA_9650_65F6_6467_6BC1_76EE_6807_7EC4({
         ["清理"] = context["清理"],
         ["名称"] = "莫尔特斯-根系觉醒",
@@ -224,6 +232,9 @@ ____exports["尝试触发莫尔特斯根系觉醒"] = function(context)
         ["on超时"] = _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_8D85_65F6,
         ["on结束"] = _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_7ED3_675F
     })
+    local hideId = addDelayedCallback(cfg["显形动作秒"] * 1000, _____5EF6_8FDF_9690_85CF_6839_7CFB_89C9_9192Boss, context)
+    local ____self_7 = context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "莫尔特斯-根系觉醒显形动作", hideId)
 end
 ____exports["注册莫尔特斯根系觉醒"] = function()
 end

@@ -3,7 +3,7 @@
 import { 增加玩家腐败值, 清除玩家腐败值, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效 } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作 } from "./16．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 
 const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -153,6 +153,8 @@ function 莫尔特斯腐朽沼泽根须(this: void): void {
 export function 尝试触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯运行时上下文): void {
   if (context.腐朽领域已触发 || context.阶段 < 3 || !单位有效(context.Boss单位)) return;
   context.腐朽领域已触发 = true;
+  const cfg = 莫尔特斯数值与表现配置.腐朽领域;
+  播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(context.Boss单位, "低血量");
   创建腐朽领域沼泽地表(context);
   创建净化符文(context);

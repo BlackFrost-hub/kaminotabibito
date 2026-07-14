@@ -3,7 +3,7 @@
 import { type 卡瑟拉运行时上下文, 消耗玩家触手残片, 刷新卡瑟拉阶段 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY } from "./14．公共工具";
+import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY, 播放卡瑟拉限时动作 } from "./14．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 创建动态装饰物安全区组 } from "../../../../00．技能模板+函数/04．机制组件/02．战斗区域/06．动态装饰物安全区组";
 
@@ -144,6 +144,7 @@ export function 尝试释放卡瑟拉共生电击(this: void, context: 卡瑟拉
   }
   if (nowMs < context.下次共生电击时间) return;
   context.下次共生电击时间 = nowMs + cfg.间隔秒 * 1000;
+  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.预警秒);
   播放卡瑟拉台词(boss, "共生电击");
   播放Boss坐标音效(卡瑟拉音效配置.共生电击.预警, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
   尝试播放Boss拟声池({

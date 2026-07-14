@@ -246,7 +246,7 @@ local function _____6253_65AD_7EC8_6781_6C61_67D3(context)
     _____6E05_9000_7EC8_6781_6C61_67D3_672C_6B21_53E0_5C42(context)
     _____6E05_7406_7EC8_6781_6C61_67D3_6838_5FC3(context)
     if _____5355_4F4D_6709_6548(context["Boss单位"]) then
-        SetUnitTimeScale(context["Boss单位"], 1)
+        SetUnitTimeScale(context["Boss单位"], _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["终极污染"]["恢复动画速度"])
         _____5F00_59CB_786C_76F4(context["Boss单位"], _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["终极污染"]["打断Boss虚弱秒"])
         _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "终极污染", 8)
     end
@@ -312,7 +312,7 @@ local function _____5B8C_6210_7EC8_6781_6C61_67D3(context)
     context["终极污染引导中"] = false
     _____5173_95ED_541F_5531_6761("致命惩罚")
     _____6E05_7406_7EC8_6781_6C61_67D3_6838_5FC3(context)
-    SetUnitTimeScale(context["Boss单位"], 1)
+    SetUnitTimeScale(context["Boss单位"], _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["终极污染"]["恢复动画速度"])
     _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "终极污染", 9)
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____7C73_4E9A_97F3_6548_914D_7F6E["终极污染"]["引导完成"],
@@ -359,28 +359,24 @@ local function _____5B8C_6210_7EC8_6781_6C61_67D3(context)
 end
 local function _____5B89_6392_7EC8_6781_6C61_67D3_65F6_70B9(context)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["终极污染"]
-    SetUnitTimeScale(context["Boss单位"], 1)
-    SetUnitAnimationByIndex(context["Boss单位"], 5)
-    addDelayedCallback(
-        3330,
-        function()
-            if not context["终极污染引导中"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                return
-            end
-            SetUnitTimeScale(context["Boss单位"], 1)
-            SetUnitAnimationByIndex(context["Boss单位"], 5)
+    SetUnitTimeScale(context["Boss单位"], config["引导动画速度"])
+    SetUnitAnimationByIndex(context["Boss单位"], config["引导动画编号"])
+    do
+        local i = 0
+        while i < #config["动画重播时点Ms"] do
+            addDelayedCallback(
+                config["动画重播时点Ms"][i + 1],
+                function()
+                    if not context["终极污染引导中"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+                        return
+                    end
+                    SetUnitTimeScale(context["Boss单位"], config["引导动画速度"])
+                    SetUnitAnimationByIndex(context["Boss单位"], config["引导动画编号"])
+                end
+            )
+            i = i + 1
         end
-    )
-    addDelayedCallback(
-        6660,
-        function()
-            if not context["终极污染引导中"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                return
-            end
-            SetUnitTimeScale(context["Boss单位"], 1)
-            SetUnitAnimationByIndex(context["Boss单位"], 5)
-        end
-    )
+    end
     do
         local i = 1
         while i <= config["引导秒"] do

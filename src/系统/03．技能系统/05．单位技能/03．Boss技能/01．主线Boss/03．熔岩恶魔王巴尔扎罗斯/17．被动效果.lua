@@ -21,44 +21,19 @@ local ____15_FF0E_6280_80FD_5165_53E3 = require("系统.03．技能系统.05．�
 local _____6CE8_518C_5DF4_5C14_624E_7F57_65AF_6280_80FD_7ED3_6784 = ____15_FF0E_6280_80FD_5165_53E3["注册巴尔扎罗斯技能结构"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local ____require_result_1 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表")
-local _____83B7_53D6_6240_6709Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587 = ____require_result_1["获取所有Boss自动技能启动上下文"]
-local jass = require("jass.common")
-local GetUnitTypeId = jass.GetUnitTypeId
+local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表")
+local _____6CE8_518CBoss_81EA_52A8_6280_80FD_542F_52A8_76D1_542C = ____require_result_0["注册Boss自动技能启动监听"]
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____5DF4_5C14_624E_7F57_65AF_88AB_52A8_5DF2_6CE8_518C = false
-local function _____626B_63CF_5DF4_5C14_624E_7F57_65AF_542F_52A8_4E0A_4E0B_6587()
-    local contexts = _____83B7_53D6_6240_6709Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587()
-    do
-        local i = 0
-        while i < #contexts do
-            do
-                local item = contexts[i + 1]
-                local ____temp_2
-                if item ~= nil then
-                    ____temp_2 = item["Boss单位"]
-                else
-                    ____temp_2 = nil
-                end
-                local boss = ____temp_2
-                if boss == nil or boss == 0 or GetUnitTypeId(boss) ~= _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID then
-                    goto __continue4
-                end
-                local context = _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587(boss)
-                if context ~= nil then
-                    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_7194_6838_5C01_5370_4E0E_62A4_536B_673A_5236(context)
-                    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_683C_9C81_59C6_6280_80FD(context)
-                    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_585E_62C9_6280_80FD(context)
-                    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_5730_6838_53EC_5524_8282_70B9(context)
-                    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_7194_5CA9_62A4_76FE_8282_70B9(context)
-                    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_672B_65E5_7194_7206_8282_70B9(context)
-                end
-            end
-            ::__continue4::
-            i = i + 1
-        end
+local function ____on_5DF4_5C14_624E_7F57_65AFBoss_542F_52A8(_____542F_52A8_4E0A_4E0B_6587)
+    local context = _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587(_____542F_52A8_4E0A_4E0B_6587["Boss单位"])
+    if context ~= nil then
+        _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_7194_6838_5C01_5370_4E0E_62A4_536B_673A_5236(context)
+        _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_683C_9C81_59C6_6280_80FD(context)
+        _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_585E_62C9_6280_80FD(context)
+        _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_5730_6838_53EC_5524_8282_70B9(context)
+        _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_7194_5CA9_62A4_76FE_8282_70B9(context)
+        _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_672B_65E5_7194_7206_8282_70B9(context)
     end
 end
 ____exports["注册巴尔扎罗斯被动效果"] = function()
@@ -68,7 +43,7 @@ ____exports["注册巴尔扎罗斯被动效果"] = function()
     _____5DF4_5C14_624E_7F57_65AF_88AB_52A8_5DF2_6CE8_518C = true
     _____6CE8_518C_5DF4_5C14_624E_7F57_65AF_8FD0_884C_65F6()
     _____6CE8_518C_5DF4_5C14_624E_7F57_65AF_6280_80FD_7ED3_6784()
-    addPeriodicCallback(1000, _____626B_63CF_5DF4_5C14_624E_7F57_65AF_542F_52A8_4E0A_4E0B_6587)
+    _____6CE8_518CBoss_81EA_52A8_6280_80FD_542F_52A8_76D1_542C({["名称"] = "巴尔扎罗斯运行时上下文绑定", ["单位类型ID"] = _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, ["on启动"] = ____on_5DF4_5C14_624E_7F57_65AFBoss_542F_52A8})
 end
 ____exports["注册巴尔扎罗斯被动效果"]()
 return ____exports

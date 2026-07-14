@@ -5,7 +5,7 @@ import { 获取或创建莫尔特斯上下文, type 莫尔特斯运行时上下�
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 取坐标角度, 极坐标X, 极坐标Y, stringToFourCC } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作, 取坐标角度, 极坐标X, 极坐标Y, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -231,9 +231,11 @@ function 发射腐败之种(this: void, context: 莫尔特斯运行时上下文,
 export function 释放莫尔特斯腐败之种(this: void, context: 莫尔特斯运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
+  const cfg = 莫尔特斯数值与表现配置.腐败之种;
   const spellTarget = GetSpellTargetUnit();
   const target = 单位有效(spellTarget) ? spellTarget : 获取Boss技能随机敌对英雄(boss);
   if (!单位有效(target)) return;
+  播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(boss, "腐败之种");
   发射腐败之种(context, target);
 }

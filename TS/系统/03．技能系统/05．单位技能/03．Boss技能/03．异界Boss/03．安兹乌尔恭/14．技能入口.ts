@@ -1,8 +1,10 @@
 /** @noSelfInFile */
 
 import { 现实断裂技能状态 } from './03．现实断裂';
+import { 注册安兹现实断裂 } from './03．现实断裂';
 import { 心脏掌握技能状态 } from './04．心脏掌握';
 import { 高阶魔法箭技能状态 } from './05．高阶魔法箭';
+import { 注册安兹高阶魔法箭 } from './05．高阶魔法箭';
 import { 光辉翠绿体技能状态 } from './06．光辉翠绿体';
 import { 时间停止技能状态 } from './07．时间停止';
 import { 高阶亡灵召唤技能状态 } from './08．高阶亡灵召唤';
@@ -20,3 +22,8 @@ export const 安兹技能入口状态 = {
   守护者模式: 安兹守护者模式状态,
   挑战入口与收束: 安兹挑战入口与收束状态,
 } as const;
+
+export function 注册安兹技能结构(this: void): void {
+  注册安兹现实断裂();
+  注册安兹高阶魔法箭();
+}

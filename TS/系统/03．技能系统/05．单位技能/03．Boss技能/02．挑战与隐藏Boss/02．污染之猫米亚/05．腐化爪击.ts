@@ -33,6 +33,7 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
+const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
@@ -58,12 +59,14 @@ function 取单位攻击力(this: void, unit: any): number {
 
 function 播放爪击表现(this: void, boss: any, target: any): void {
   if (!单位有效(target)) return;
+  const config = 米亚技能数值配置.腐化爪击;
   const effect = AddSpecialEffect("Common\\Effect\\Form\\ClawMark\\reapers_claws_green.mdx", GetUnitX(target), GetUnitY(target));
   if (effect != null && effect !== 0) {
     if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, 1.3);
     YDWETimerDestroyEffectSafe(1.2, effect);
   }
-  SetUnitAnimationByIndex(boss, 7);
+  SetUnitTimeScale(boss, config.动画速度);
+  SetUnitAnimationByIndex(boss, config.动画编号);
 }
 
 function 创建腐化爪击残留区(this: void, context: 米亚运行时上下文, x: number, y: number): void {

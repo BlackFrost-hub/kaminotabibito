@@ -234,7 +234,7 @@ function 打断终极污染(this: void, context: 米亚运行时上下文): void
   清退终极污染本次叠层(context);
   清理终极污染核心(context);
   if (单位有效(context.Boss单位)) {
-    SetUnitTimeScale(context.Boss单位, 1);
+    SetUnitTimeScale(context.Boss单位, 米亚技能数值配置.终极污染.恢复动画速度);
     开始硬直(context.Boss单位, 米亚技能数值配置.终极污染.打断Boss虚弱秒);
     播放米亚台词(context.Boss单位, "终极污染", 8);
   }
@@ -276,7 +276,7 @@ function 完成终极污染(this: void, context: 米亚运行时上下文): void
   context.终极污染引导中 = false;
   关闭吟唱条("致命惩罚");
   清理终极污染核心(context);
-  SetUnitTimeScale(context.Boss单位, 1);
+  SetUnitTimeScale(context.Boss单位, 米亚技能数值配置.终极污染.恢复动画速度);
   播放米亚台词(context.Boss单位, "终极污染", 9);
   播放Boss坐标音效(米亚音效配置.终极污染.引导完成, 取米亚平台中心X(), 取米亚平台中心Y(), 米亚音效配置.默认裁断距离);
   创建点特效({ 模型路径: 米亚单位技能配置.特效.终极污染完成冲击, X: 取米亚平台中心X(), Y: 取米亚平台中心Y(), Z: 0, 缩放: 4, 持续秒: 2 });
@@ -294,19 +294,16 @@ function 完成终极污染(this: void, context: 米亚运行时上下文): void
 
 function 安排终极污染时点(this: void, context: 米亚运行时上下文): void {
   const config = 米亚技能数值配置.终极污染;
-  SetUnitTimeScale(context.Boss单位, 1);
-  SetUnitAnimationByIndex(context.Boss单位, 5);
+  SetUnitTimeScale(context.Boss单位, config.引导动画速度);
+  SetUnitAnimationByIndex(context.Boss单位, config.引导动画编号);
 
-  addDelayedCallback(3330, function 米亚终极污染第二次动作(this: void): void {
-    if (!context.终极污染引导中 || !单位有效(context.Boss单位)) return;
-    SetUnitTimeScale(context.Boss单位, 1);
-    SetUnitAnimationByIndex(context.Boss单位, 5);
-  });
-  addDelayedCallback(6660, function 米亚终极污染第三次动作(this: void): void {
-    if (!context.终极污染引导中 || !单位有效(context.Boss单位)) return;
-    SetUnitTimeScale(context.Boss单位, 1);
-    SetUnitAnimationByIndex(context.Boss单位, 5);
-  });
+  for (let i = 0; i < config.动画重播时点Ms.length; i++) {
+    addDelayedCallback(config.动画重播时点Ms[i], function 米亚终极污染重播动作(this: void): void {
+      if (!context.终极污染引导中 || !单位有效(context.Boss单位)) return;
+      SetUnitTimeScale(context.Boss单位, config.引导动画速度);
+      SetUnitAnimationByIndex(context.Boss单位, config.引导动画编号);
+    });
+  }
 
   for (let i = 1; i <= config.引导秒; i++) {
     addDelayedCallback(i * 1000, function 米亚终极污染每秒(this: void): void {

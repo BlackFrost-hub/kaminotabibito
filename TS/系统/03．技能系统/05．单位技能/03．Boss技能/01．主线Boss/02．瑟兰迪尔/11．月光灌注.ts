@@ -128,16 +128,16 @@ export function 释放瑟兰迪尔月光灌注(this: void, context: 瑟兰迪尔
     YDWETimerDestroyEffectSafe(config.施法硬直秒, castEffect);
   }
 
-  addDelayedCallback(500, function 瑟兰迪尔月光灌注举剑停顿(this: void): void {
+  addDelayedCallback(config.举剑冻结延迟Ms, function 瑟兰迪尔月光灌注举剑停顿(this: void): void {
     if (!单位有效(boss)) return;
-    SetUnitTimeScale(boss, 0);
+    SetUnitTimeScale(boss, config.冻结动画速度);
   });
 
   addDelayedCallback(R2I(config.施法硬直秒 * 1000), function 瑟兰迪尔月光灌注生效(this: void): void {
     关闭吟唱条("常规技能");
     if (!单位有效(boss)) return;
-    SetUnitTimeScale(boss, 1);
-    SetUnitAnimationByIndex(boss, 0);
+    SetUnitTimeScale(boss, config.恢复动画速度);
+    SetUnitAnimationByIndex(boss, config.恢复动画编号);
     结算瑟兰迪尔月光灌注(boss);
   });
 }

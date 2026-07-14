@@ -71,7 +71,7 @@ createTwinSpiritGuardForm(
   'Boss\\AncestralTwinSpiritGuards\\RedOathGuard.mdx',
   'Boss\\AncestralTwinSpiritGuards\\Icon\\BTNRedOathGuard.blp',
   1.78,
-  '祖地封门的正面守卫，以誓约、剑盾和武魂阻止入侵者。'
+  '祖地灵印的赤誓守卫，以剑术、折步和灵印判断阻止入侵者。'
 )
 
 createTwinSpiritGuardForm(
@@ -89,7 +89,7 @@ createTwinSpiritGuardForm(
   'Boss\\AncestralTwinSpiritGuards\\AzureShadeGuard.mdx',
   'Boss\\AncestralTwinSpiritGuards\\Icon\\BTNAzureShadeGuard.blp',
   1.50,
-  '祖地灵印的校准守卫，以灵识、影步和封印术辨认来者。'
+  '祖地封门的苍影守卫，以灵识、剑盾和防御阵线阻止入侵者。'
 )
 
 createTwinSpiritGuardForm(

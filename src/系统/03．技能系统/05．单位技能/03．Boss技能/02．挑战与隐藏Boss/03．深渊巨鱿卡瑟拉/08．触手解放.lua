@@ -11,6 +11,7 @@ local ____14_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____14_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____6781_5750_6807X = ____14_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____14_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C = ____14_FF0E_516C_5171_5DE5_5177["播放卡瑟拉限时动作"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
@@ -134,36 +135,12 @@ local function _____521B_5EFA_5DE8_578B_89E6_624B(data, angle)
         end
     })
 end
-____exports["尝试触发卡瑟拉触手解放"] = function(context)
+local function _____6267_884C_5361_745F_62C9_6F5C_5165_4E0E_89E6_624B_89E3_653E(context)
     local boss = context["Boss单位"]
-    if not _____5355_4F4D_6709_6548(boss) then
-        return
-    end
-    if context["触手解放已触发"] or context["Boss潜入中"] then
-        return
-    end
-    if _____5237_65B0_5361_745F_62C9_9636_6BB5(context) < 3 then
+    if not _____5355_4F4D_6709_6548(boss) or not context["Boss潜入中"] then
         return
     end
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手解放"]
-    context["触手解放已触发"] = true
-    context["Boss潜入中"] = true
-    _____64AD_653E_5361_745F_62C9_53F0_8BCD(boss, "触手解放")
-    _____64AD_653EBoss_5750_6807_97F3_6548(
-        _____5361_745F_62C9_97F3_6548_914D_7F6E["触手解放"]["Boss下潜"],
-        GetUnitX(boss),
-        GetUnitY(boss),
-        _____5361_745F_62C9_97F3_6548_914D_7F6E["默认裁断距离"]
-    )
-    _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60({
-        ["标识"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["标识"],
-        ["音效路径列表"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["音效路径列表"],
-        X = GetUnitX(boss),
-        Y = GetUnitY(boss),
-        ["裁断距离"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["默认裁断距离"],
-        ["冷却Ms"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["冷却Ms"],
-        ["触发概率百分比"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["转阶段触发概率百分比"]
-    })
     _____64AD_653E_6F5C_5165_7279_6548(
         GetUnitX(boss),
         GetUnitY(boss)
@@ -202,6 +179,46 @@ ____exports["尝试触发卡瑟拉触手解放"] = function(context)
     )
     local ____self_5 = context["清理"]
     ____self_5["登记延迟回调"](____self_5, "卡瑟拉-触手解放限时", id)
+end
+____exports["尝试触发卡瑟拉触手解放"] = function(context)
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) then
+        return
+    end
+    if context["触手解放已触发"] or context["Boss潜入中"] then
+        return
+    end
+    if _____5237_65B0_5361_745F_62C9_9636_6BB5(context) < 3 then
+        return
+    end
+    local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手解放"]
+    context["触手解放已触发"] = true
+    context["Boss潜入中"] = true
+    _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作原始时长秒"])
+    _____64AD_653E_5361_745F_62C9_53F0_8BCD(boss, "触手解放")
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5361_745F_62C9_97F3_6548_914D_7F6E["触手解放"]["Boss下潜"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5361_745F_62C9_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
+    _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60({
+        ["标识"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["标识"],
+        ["音效路径列表"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["音效路径列表"],
+        X = GetUnitX(boss),
+        Y = GetUnitY(boss),
+        ["裁断距离"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["默认裁断距离"],
+        ["冷却Ms"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["冷却Ms"],
+        ["触发概率百分比"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["转阶段触发概率百分比"]
+    })
+    local _____6F5C_5165ID = addDelayedCallback(
+        cfg["动作原始时长秒"] * 1000,
+        function()
+            _____6267_884C_5361_745F_62C9_6F5C_5165_4E0E_89E6_624B_89E3_653E(context)
+        end
+    )
+    local ____self_6 = context["清理"]
+    ____self_6["登记延迟回调"](____self_6, "卡瑟拉-触手解放潜入", _____6F5C_5165ID)
 end
 ____exports["注册卡瑟拉触手解放"] = function()
 end

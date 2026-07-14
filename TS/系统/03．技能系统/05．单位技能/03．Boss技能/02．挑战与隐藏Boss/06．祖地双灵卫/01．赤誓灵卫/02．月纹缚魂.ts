@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 export const 月纹缚魂技能状态 = {
+  所属守卫: '赤誓灵卫',
   所属形态: '正常',
   已完成设计: true,
   已完成实现: false,

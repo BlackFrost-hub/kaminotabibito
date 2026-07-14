@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____66F4_65B0_9B54_6CD5_663E_793A, _____7ED3_675F_5F02_5F62_5316, _____5F02_5F62_5316Tick, _____542F_52A8_5F02_5F62_5316_72B6_6001, ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, getBuffRuntime, _____83F2_5229_65AFBuffID, _____5F00_59CB_7275_5F15, _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5F02_5F62_5316_6280_80FDID
+local _____66F4_65B0_9B54_6CD5_663E_793A, _____7ED3_675F_5F02_5F62_5316, _____5F02_5F62_5316Tick, _____542F_52A8_5F02_5F62_5316_72B6_6001, ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, DzSetUnitModel, _____8BBE_7F6EBoss_8840_6761_5934_50CF, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, getBuffRuntime, _____83F2_5229_65AFBuffID, _____5F00_59CB_7275_5F15, _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5F02_5F62_5316_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
@@ -39,18 +39,26 @@ function _____66F4_65B0_9B54_6CD5_663E_793A(context)
     )
 end
 function _____7ED3_675F_5F02_5F62_5316(context)
+    local boss = context["Boss单位"]
+    local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]
+    if _____5355_4F4D_6709_6548(boss) and DzSetUnitModel ~= nil then
+        DzSetUnitModel(boss, cfg["常态模型路径"])
+    end
+    if boss ~= nil and boss ~= 0 then
+        _____8BBE_7F6EBoss_8840_6761_5934_50CF(boss, cfg["常态头像路径"])
+    end
     context["异形化中"] = false
     context["异形化结束Ms"] = 0
 end
 function _____5F02_5F62_5316Tick(context, callbackID)
     local boss = context["Boss单位"]
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]
-    local ____temp_12 = not _____5355_4F4D_6709_6548(boss)
-    if not ____temp_12 then
-        local ____self_11 = context["清理"]
-        ____temp_12 = ____self_11["已清理"](____self_11)
+    local ____temp_13 = not _____5355_4F4D_6709_6548(boss)
+    if not ____temp_13 then
+        local ____self_12 = context["清理"]
+        ____temp_13 = ____self_12["已清理"](____self_12)
     end
-    if ____temp_12 or getServerTime() >= context["异形化结束Ms"] or getBuffRuntime(boss, _____83F2_5229_65AFBuffID["异形化"]) == nil then
+    if ____temp_13 or getServerTime() >= context["异形化结束Ms"] or getBuffRuntime(boss, _____83F2_5229_65AFBuffID["异形化"]) == nil then
         removePeriodicCallback(callbackID)
         _____7ED3_675F_5F02_5F62_5316(context)
         return
@@ -74,7 +82,7 @@ function _____5F02_5F62_5316Tick(context, callbackID)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue25
+                    goto __continue27
                 end
                 local distance2 = _____8DDD_79BB_5E73_65B9XY(
                     GetUnitX(boss),
@@ -111,7 +119,7 @@ function _____5F02_5F62_5316Tick(context, callbackID)
                     })
                 end
             end
-            ::__continue25::
+            ::__continue27::
             i = i + 1
         end
     end
@@ -132,6 +140,10 @@ function _____542F_52A8_5F02_5F62_5316_72B6_6001(context)
         cfg["造成和受到伤害提高"],
         {sourceName = "菲利斯-异形化"}
     )
+    if DzSetUnitModel ~= nil then
+        DzSetUnitModel(boss, cfg["异形模型路径"])
+    end
+    _____8BBE_7F6EBoss_8840_6761_5934_50CF(boss, cfg["异形头像路径"])
     _____64AD_653EBoss_5750_6807_97F3_6548(_____83F2_5229_65AF_97F3_6548_914D_7F6E["异形化"]["启动"], x, y, _____83F2_5229_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
     _____5EF6_8FDF_64AD_653EBoss_5750_6807_97F3_6548(
         _____83F2_5229_65AF_97F3_6548_914D_7F6E["异形化"]["牵引波动"],
@@ -162,8 +174,8 @@ function _____542F_52A8_5F02_5F62_5316_72B6_6001(context)
             _____5F02_5F62_5316Tick(context, tickID)
         end
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记周期回调"](____self_13, "菲利斯-异形化Tick", tickID)
+    local ____self_14 = context["清理"]
+    ____self_14["登记周期回调"](____self_14, "菲利斯-异形化Tick", tickID)
 end
 ____exports["释放菲利斯异形化"] = function(context)
     local boss = context["Boss单位"]
@@ -211,6 +223,7 @@ function ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548(castingUnit, spellAbilit
     ____exports["释放菲利斯异形化"](context)
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -219,32 +232,35 @@ SetUnitState = jass.SetUnitState
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 UNIT_STATE_MANA = jass.UNIT_STATE_MANA
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
-local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_3.addPeriodicCallback
-removePeriodicCallback = ____require_result_3.removePeriodicCallback
-getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_4.registerAppliedFinalDamageListener
-local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_5.registerDamageModifier
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_6.registerManualBuff
-getBuffRuntime = ____require_result_6.getBuffRuntime
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.05．菲利斯")
-_____83F2_5229_65AFBuffID = ____require_result_7["菲利斯BuffID"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.吸附牵引系统")
-_____5F00_59CB_7275_5F15 = ____require_result_8["开始牵引"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除")
-_____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664 = ____require_result_9["执行非伤害生命移除"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
-createUnitEffect = ____require_result_10.createUnitEffect
+DzSetUnitModel = japi.DzSetUnitModel
+local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.03．Boss血条弱点韧性.08．对外接口")
+_____8BBE_7F6EBoss_8840_6761_5934_50CF = ____require_result_0["设置Boss血条头像"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_4.addPeriodicCallback
+removePeriodicCallback = ____require_result_4.removePeriodicCallback
+getServerTime = ____require_result_4.getServerTime
+local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_5.registerAppliedFinalDamageListener
+local ____require_result_6 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_6.registerDamageModifier
+local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_7.registerManualBuff
+getBuffRuntime = ____require_result_7.getBuffRuntime
+local ____require_result_8 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.05．菲利斯")
+_____83F2_5229_65AFBuffID = ____require_result_8["菲利斯BuffID"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.吸附牵引系统")
+_____5F00_59CB_7275_5F15 = ____require_result_9["开始牵引"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除")
+_____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664 = ____require_result_10["执行非伤害生命移除"]
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
+createUnitEffect = ____require_result_11.createUnitEffect
 _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____5F02_5F62_5316_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]["技能槽位"])
 local _____5F02_5F62_5316_5DF2_6CE8_518C = false

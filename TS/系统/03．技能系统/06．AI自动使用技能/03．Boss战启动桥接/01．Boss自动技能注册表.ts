@@ -13,8 +13,34 @@ export interface Boss自动技能启动上下文 {
   注册时间: number;
 }
 
+export interface Boss自动技能启动监听参数 {
+  名称: string;
+  单位类型ID?: number;
+  回放已有?: boolean;
+  on启动: (this: void, context: Boss自动技能启动上下文) => void;
+}
+
+interface Boss自动技能启动监听记录 extends Boss自动技能启动监听参数 {
+  ID: number;
+}
+
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
+const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const Boss自动技能上下文表: Record<number, Boss自动技能启动上下文 | undefined> = {};
+const Boss自动技能启动监听表: Record<number, Boss自动技能启动监听记录 | undefined> = {};
+let 下一个Boss自动技能启动监听ID = 0;
+
+function 启动监听匹配(this: void, 监听: Boss自动技能启动监听记录, context: Boss自动技能启动上下文): boolean {
+  if (监听.单位类型ID == null) return true;
+  return GetUnitTypeId(context.Boss单位) === 监听.单位类型ID;
+}
+
+function 通知Boss自动技能启动(this: void, context: Boss自动技能启动上下文): void {
+  for (const key in Boss自动技能启动监听表) {
+    const 监听 = Boss自动技能启动监听表[key];
+    if (监听 != null && 启动监听匹配(监听, context)) 监听.on启动(context);
+  }
+}
 
 export function 记录Boss自动技能启动(this: void, unit: any, source: Boss自动技能来源): Boss自动技能启动上下文 | undefined {
   if (unit == null || unit === 0) return undefined;
@@ -25,6 +51,7 @@ export function 记录Boss自动技能启动(this: void, unit: any, source: Boss
     注册时间: getServerTime(),
   };
   Boss自动技能上下文表[handleId] = context;
+  通知Boss自动技能启动(context);
   return context;
 }
 
@@ -39,15 +66,30 @@ export function 是否已登记Boss自动技能(this: void, unit: any): boolean 
 
 export function 获取所有Boss自动技能启动上下文(this: void): Boss自动技能启动上下文[] {
   const result: Boss自动技能启动上下文[] = [];
-  const ids = Object.keys(Boss自动技能上下文表);
-  for (let i = 0; i < ids.length; i++) {
-    const context = Boss自动技能上下文表[Number(ids[i]) || 0];
-    if (context != null) {
-      result.push(context);
-    }
+  for (const key in Boss自动技能上下文表) {
+    const context = Boss自动技能上下文表[key];
+    if (context != null) result.push(context);
   }
   result.sort((a, b) => a.注册时间 - b.注册时间);
   return result;
+}
+
+export function 注册Boss自动技能启动监听(this: void, 参数: Boss自动技能启动监听参数): number {
+  const ID = ++下一个Boss自动技能启动监听ID;
+  const 监听: Boss自动技能启动监听记录 = { ...参数, ID };
+  Boss自动技能启动监听表[ID] = 监听;
+  if (参数.回放已有 !== false) {
+    const contexts = 获取所有Boss自动技能启动上下文();
+    for (let i = 0; i < contexts.length; i++) {
+      const context = contexts[i];
+      if (context != null && 启动监听匹配(监听, context)) 监听.on启动(context);
+    }
+  }
+  return ID;
+}
+
+export function 注销Boss自动技能启动监听(this: void, ID: number): void {
+  Boss自动技能启动监听表[ID] = undefined;
 }
 
 export function 清理Boss自动技能启动上下文(this: void, unit: any): void {

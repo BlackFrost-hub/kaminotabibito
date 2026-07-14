@@ -32,8 +32,8 @@ function _____64AD_653EBoss_84C4_529BTick(boss)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["终末审判"]
     local x = GetUnitX(boss)
     local y = GetUnitY(boss)
-    SetUnitTimeScale(boss, 1)
-    SetUnitAnimationByIndex(boss, 8)
+    SetUnitTimeScale(boss, config["蓄力动画速度"])
+    SetUnitAnimationByIndex(boss, config["蓄力动画编号"])
     _____64AD_653E_70B9_7279_6548(
         config["蓄力特效"],
         x,
@@ -116,7 +116,8 @@ ____exports["释放瑟兰迪尔终末审判"] = function(context)
             if not _____5355_4F4D_6709_6548(boss) then
                 return
             end
-            SetUnitAnimationByIndex(boss, 5)
+            SetUnitTimeScale(boss, config["结算动画速度"])
+            SetUnitAnimationByIndex(boss, config["结算动画编号"])
             local bossX = GetUnitX(boss)
             local bossY = GetUnitY(boss)
             _____64AD_653E_70B9_7279_6548(
@@ -156,13 +157,13 @@ ____exports["释放瑟兰迪尔终末审判"] = function(context)
                 end
             end
             addDelayedCallback(
-                500,
+                config["恢复动作延迟Ms"],
                 function()
                     if not _____5355_4F4D_6709_6548(boss) then
                         return
                     end
-                    SetUnitTimeScale(boss, 1)
-                    SetUnitAnimationByIndex(boss, 0)
+                    SetUnitTimeScale(boss, config["恢复动画速度"])
+                    SetUnitAnimationByIndex(boss, config["恢复动画编号"])
                 end
             )
             addDelayedCallback(

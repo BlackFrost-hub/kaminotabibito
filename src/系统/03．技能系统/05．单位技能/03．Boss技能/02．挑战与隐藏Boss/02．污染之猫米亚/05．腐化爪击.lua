@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D6_5355_4F4D_653B_51FB_529B, _____64AD_653E_722A_51FB_8868_73B0, _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A, ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548, getServerTime, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, ConvertUnitState, Atan2, AddSpecialEffect, GetUnitStateJapi, EXSetEffectSize, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____8150_5316_722A_51FB_6280_80FDID
+local _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D6_5355_4F4D_653B_51FB_529B, _____64AD_653E_722A_51FB_8868_73B0, _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A, ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548, getServerTime, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, ConvertUnitState, Atan2, AddSpecialEffect, GetUnitStateJapi, EXSetEffectSize, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____8150_5316_722A_51FB_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_7C73_4E9A_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建米亚上下文"]
 local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.04．腐化感染")
@@ -44,6 +44,7 @@ function _____64AD_653E_722A_51FB_8868_73B0(boss, target)
     if not _____5355_4F4D_6709_6548(target) then
         return
     end
+    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化爪击"]
     local effect = AddSpecialEffect(
         "Common\\Effect\\Form\\ClawMark\\reapers_claws_green.mdx",
         GetUnitX(target),
@@ -55,7 +56,8 @@ function _____64AD_653E_722A_51FB_8868_73B0(boss, target)
         end
         YDWETimerDestroyEffectSafe(1.2, effect)
     end
-    SetUnitAnimationByIndex(boss, 7)
+    SetUnitTimeScale(boss, config["动画速度"])
+    SetUnitAnimationByIndex(boss, config["动画编号"])
 end
 function _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A(context, x, y)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化爪击"]
@@ -141,6 +143,7 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 SetUnitFacing = jass.SetUnitFacing
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
+SetUnitTimeScale = jass.SetUnitTimeScale
 ConvertUnitState = jass.ConvertUnitState
 Atan2 = jass.Atan2
 AddSpecialEffect = jass.AddSpecialEffect

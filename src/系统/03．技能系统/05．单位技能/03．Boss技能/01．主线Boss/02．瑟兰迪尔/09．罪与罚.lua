@@ -144,15 +144,15 @@ ____exports["释放瑟兰迪尔罪与罚"] = function(context, target)
     _____5F00_59CB_786C_76F4(boss, config["施法硬直秒"])
     _____64AD_653E_65BD_6CD5_6CD5_9635(boss, ____type, config)
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = config["施法硬直秒"], ["颜色ID"] = config["吟唱条颜色ID"], ["标题文本"] = (config["吟唱条标题文本"] .. "：") .. _____8C61_9650_540D_79F0, ["提示文本"] = ("常规技能：即将赐予" .. _____8C61_9650_540D_79F0) .. "象限"})
-    SetUnitTimeScale(boss, 1)
+    SetUnitTimeScale(boss, config["动画速度"])
     SetUnitAnimationByIndex(boss, config["动画编号"])
     addDelayedCallback(
-        30,
+        config["动画重播延迟Ms"],
         function()
             if not _____5355_4F4D_6709_6548(boss) then
                 return
             end
-            SetUnitTimeScale(boss, 1)
+            SetUnitTimeScale(boss, config["动画速度"])
             SetUnitAnimationByIndex(boss, config["动画编号"])
         end
     )
@@ -164,8 +164,8 @@ ____exports["释放瑟兰迪尔罪与罚"] = function(context, target)
                 return
             end
             _____8BA9_5355_4F4D_9762_5411_76EE_6807(boss, actualTarget)
-            SetUnitTimeScale(boss, 1)
-            SetUnitAnimationByIndex(boss, 0)
+            SetUnitTimeScale(boss, config["恢复动画速度"])
+            SetUnitAnimationByIndex(boss, config["恢复动画编号"])
             Sound3DII_CooPlayReuse(
                 config["点名音效"],
                 GetUnitX(actualTarget),

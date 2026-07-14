@@ -39,6 +39,7 @@ const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
+const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
@@ -87,6 +88,7 @@ function 让单位面向目标(this: void, caster: any, target: any): void {
 }
 
 function 播放喷吐表现(this: void, boss: any): void {
+  const config = 米亚技能数值配置.污水喷吐;
   const facing = GetUnitFacing(boss);
   const x = GetUnitX(boss) + CosBJ(facing) * 120;
   const y = GetUnitY(boss) + SinBJ(facing) * 120;
@@ -96,7 +98,8 @@ function 播放喷吐表现(this: void, boss: any): void {
     if (typeof EXEffectMatRotateZ === "function") EXEffectMatRotateZ(effect, facing);
     YDWETimerDestroyEffectSafe(1.5, effect);
   }
-  SetUnitAnimationByIndex(boss, 5);
+  SetUnitTimeScale(boss, config.动画速度);
+  SetUnitAnimationByIndex(boss, config.动画编号);
 }
 
 function 创建污水喷吐残留区(this: void, context: 米亚运行时上下文): void {

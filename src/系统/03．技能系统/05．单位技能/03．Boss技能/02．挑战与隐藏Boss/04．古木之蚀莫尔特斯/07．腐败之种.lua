@@ -14,6 +14,7 @@ local ____13_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_653E["播放莫尔特斯台词"]
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
+local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
 local _____53D6_5750_6807_89D2_5EA6 = ____16_FF0E_516C_5171_5DE5_5177["取坐标角度"]
 local _____6781_5750_6807X = ____16_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____16_FF0E_516C_5171_5DE5_5177["极坐标Y"]
@@ -232,6 +233,7 @@ ____exports["释放莫尔特斯腐败之种"] = function(context)
     if not _____5355_4F4D_6709_6548(boss) then
         return
     end
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败之种"]
     local spellTarget = GetSpellTargetUnit()
     local _____5355_4F4D_6709_6548_result_10
     if _____5355_4F4D_6709_6548(spellTarget) then
@@ -243,6 +245,7 @@ ____exports["释放莫尔特斯腐败之种"] = function(context)
     if not _____5355_4F4D_6709_6548(target) then
         return
     end
+    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "腐败之种")
     _____53D1_5C04_8150_8D25_4E4B_79CD(context, target)
 end

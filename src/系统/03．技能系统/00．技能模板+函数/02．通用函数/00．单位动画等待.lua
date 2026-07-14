@@ -11,10 +11,14 @@ local addPeriodicCallback = ____require_result_1.addPeriodicCallback
 local getServerTime = ____require_result_1.getServerTime
 local SetUnitAnimation = jass.SetUnitAnimation
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
+local SetUnitTimeScale = jass.SetUnitTimeScale
+local GetHandleId = jass.GetHandleId
 local SetUnitFacing = jass.SetUnitFacing
 local DEGREES_TO_RADIANS = jass.bj_DEGTORAD
 local _____52A8_753B_7B49_5F85_4EFB_52A1_5217_8868 = {}
+local _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_8868 = {}
 local _____52A8_753B_7B49_5F85_4EFB_52A1ID_5E8F_53F7 = 0
+local _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_5E8F_53F7 = 0
 local _____52A8_753B_7B49_5F85_9A71_52A8_5DF2_6CE8_518C = false
 local function _____91CD_7F6E_5355_4F4D_5F85_673A_52A8_753B(_____5355_4F4D)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
@@ -127,6 +131,52 @@ ____exports["播放单位动画并等待后恢复待机"] = function(_____5355_4
     end
     SetUnitAnimationByIndex(_____5355_4F4D, _____52A8_753B_5E8F_53F7)
     return _____521B_5EFA_52A8_753B_7B49_5F85_4EFB_52A1({["单位"] = _____5355_4F4D, ["恢复待机"] = true, ["下一步"] = _____4E0B_4E00_6B65}, _____7B49_5F85_79D2_6570)
+end
+____exports["播放限时单位动画"] = function(_____53C2_6570)
+    local _____5355_4F4D = _____53C2_6570["单位"]
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
+        return nil
+    end
+    if _____53C2_6570["动画编号"] == nil and (_____53C2_6570["动画名"] == nil or _____53C2_6570["动画名"] == "") then
+        return nil
+    end
+    local _____5355_4F4DID = GetHandleId(_____5355_4F4D)
+    if _____5355_4F4DID == 0 then
+        return nil
+    end
+    local _____6301_7EED_79D2 = _____53C2_6570["持续秒"]
+    if _____6301_7EED_79D2 < 0 then
+        _____6301_7EED_79D2 = 0
+    end
+    _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_5E8F_53F7 = _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_5E8F_53F7 + 1
+    local _____4EE4_724C = _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_5E8F_53F7
+    _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_8868[_____5355_4F4DID] = _____4EE4_724C
+    SetUnitTimeScale(_____5355_4F4D, _____53C2_6570["动画速度"] or 1)
+    if _____53C2_6570["动画编号"] ~= nil then
+        SetUnitAnimationByIndex(_____5355_4F4D, _____53C2_6570["动画编号"])
+    else
+        SetUnitAnimation(_____5355_4F4D, _____53C2_6570["动画名"])
+    end
+    return _____521B_5EFA_52A8_753B_7B49_5F85_4EFB_52A1(
+        {["下一步"] = function()
+            if _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_8868[_____5355_4F4DID] ~= _____4EE4_724C then
+                return
+            end
+            _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_8868[_____5355_4F4DID] = nil
+            SetUnitTimeScale(_____5355_4F4D, _____53C2_6570["恢复动画速度"] or 1)
+            if _____53C2_6570["恢复动画编号"] ~= nil then
+                SetUnitAnimationByIndex(_____5355_4F4D, _____53C2_6570["恢复动画编号"])
+            elseif _____53C2_6570["恢复动画名"] ~= nil and _____53C2_6570["恢复动画名"] ~= "" then
+                SetUnitAnimation(_____5355_4F4D, _____53C2_6570["恢复动画名"])
+            else
+                SetUnitAnimation(_____5355_4F4D, "stand")
+            end
+            if _____53C2_6570["完成回调"] ~= nil then
+                _____53C2_6570["完成回调"]()
+            end
+        end},
+        _____6301_7EED_79D2
+    )
 end
 ____exports["延迟播放单位动画"] = function(_____5355_4F4D, _____52A8_753B_5E8F_53F7, _____5EF6_8FDF_79D2_6570, _____4E0B_4E00_6B65)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then

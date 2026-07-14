@@ -3,7 +3,7 @@
 import { 增加玩家腐败值, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效 } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作 } from "./16．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 
 const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -39,8 +39,17 @@ const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Sta
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, data: any) => void, data?: any) => number;
+};
 
 const 莫尔特斯根系觉醒暂停来源 = "Boss:Moltes:根系觉醒";
+
+function 延迟隐藏根系觉醒Boss(this: void, context: 莫尔特斯运行时上下文): void {
+  if (context.腐败之源组 != null && 单位有效(context.Boss单位)) {
+    ShowUnit(context.Boss单位, false);
+  }
+}
 
 function 治疗Boss最大生命比例(this: void, boss: any, ratio: number): void {
   if (!单位有效(boss) || !(ratio > 0)) return;
@@ -152,6 +161,8 @@ function 莫尔特斯根系觉醒结束(this: void, _是否成功: boolean, _剩
 export function 尝试触发莫尔特斯根系觉醒(this: void, context: 莫尔特斯运行时上下文): void {
   if (context.根系觉醒已触发 || context.阶段 < 2 || !单位有效(context.Boss单位)) return;
   context.根系觉醒已触发 = true;
+  const cfg = 莫尔特斯数值与表现配置.根系觉醒;
+  播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(context.Boss单位, "根系觉醒");
   播放Boss坐标音效(莫尔特斯音效配置.根系觉醒.机制开始, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
   尝试播放Boss拟声池({
@@ -163,9 +174,7 @@ export function 尝试触发莫尔特斯根系觉醒(this: void, context: 莫尔
     冷却Ms: 莫尔特斯音效配置.怪物拟声.冷却Ms,
     触发概率百分比: 莫尔特斯音效配置.怪物拟声.转阶段触发概率百分比,
   });
-  ShowUnit(context.Boss单位, false);
   添加单位暂停(context.Boss单位, 莫尔特斯根系觉醒暂停来源);
-  const cfg = 莫尔特斯数值与表现配置.根系觉醒;
   context.腐败之源组 = 创建限时摧毁目标组({
     清理: context.清理,
     名称: "莫尔特斯-根系觉醒",
@@ -175,6 +184,8 @@ export function 尝试触发莫尔特斯根系觉醒(this: void, context: 莫尔
     on超时: 莫尔特斯根系觉醒超时,
     on结束: 莫尔特斯根系觉醒结束,
   });
+  const hideId = addDelayedCallback(cfg.显形动作秒 * 1000, 延迟隐藏根系觉醒Boss, context);
+  context.清理.登记延迟回调("莫尔特斯-根系觉醒显形动作", hideId);
 }
 
 export function 注册莫尔特斯根系觉醒(this: void): void {

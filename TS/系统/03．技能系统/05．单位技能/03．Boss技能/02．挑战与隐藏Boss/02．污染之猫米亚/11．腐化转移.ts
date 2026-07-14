@@ -170,8 +170,8 @@ function 启动腐化转移(this: void, context: 米亚运行时上下文, nowMs
   context.上次腐化转移Ms = nowMs;
   面向平台(boss, 区域);
   开始硬直(boss, config.预警秒);
-  SetUnitTimeScale(boss, 1);
-  SetUnitAnimationByIndex(boss, 5);
+  SetUnitTimeScale(boss, config.预警动画速度);
+  SetUnitAnimationByIndex(boss, config.预警动画编号);
   播放平台预警(区域);
   播放米亚台词(boss, "腐化转移", 0);
   显示常规技能吟唱条({
@@ -181,9 +181,9 @@ function 启动腐化转移(this: void, context: 米亚运行时上下文, nowMs
     提示文本: "米亚正在污染安全区！离开目标平台！",
   });
 
-  addDelayedCallback(750, function 米亚腐化转移弓背冻结(this: void): void {
+  addDelayedCallback(config.弓背冻结延迟Ms, function 米亚腐化转移弓背冻结(this: void): void {
     if (!单位有效(context.Boss单位)) return;
-    SetUnitTimeScale(context.Boss单位, 0);
+    SetUnitTimeScale(context.Boss单位, config.弓背冻结动画速度);
   });
 
   addDelayedCallback(R2I(config.预警秒 * 1000), function 米亚腐化转移落点生效(this: void): void {
@@ -193,19 +193,19 @@ function 启动腐化转移(this: void, context: 米亚运行时上下文, nowMs
     const 原X = GetUnitX(currentBoss);
     const 原Y = GetUnitY(currentBoss);
     if (!执行战斗自身传送到坐标(currentBoss, 区域.中心X, 区域.中心Y)) {
-      SetUnitTimeScale(currentBoss, 1);
-      SetUnitAnimationByIndex(currentBoss, 0);
+      SetUnitTimeScale(currentBoss, config.恢复动画速度);
+      SetUnitAnimationByIndex(currentBoss, config.恢复动画编号);
       return;
     }
     播放入出水表现(原X, 原Y);
-    SetUnitTimeScale(currentBoss, 2);
-    SetUnitAnimationByIndex(currentBoss, 7);
+    SetUnitTimeScale(currentBoss, config.出水动画速度);
+    SetUnitAnimationByIndex(currentBoss, config.出水动画编号);
     播放入出水表现(区域.中心X, 区域.中心Y);
     开始污染平台(context, 区域, nowMs + R2I(config.预警秒 * 1000));
-    addDelayedCallback(600, function 米亚腐化转移恢复动作(this: void): void {
+    addDelayedCallback(config.恢复动作延迟Ms, function 米亚腐化转移恢复动作(this: void): void {
       if (!单位有效(context.Boss单位)) return;
-      SetUnitTimeScale(context.Boss单位, 1);
-      SetUnitAnimationByIndex(context.Boss单位, 0);
+      SetUnitTimeScale(context.Boss单位, config.恢复动画速度);
+      SetUnitAnimationByIndex(context.Boss单位, config.恢复动画编号);
     });
   });
 }

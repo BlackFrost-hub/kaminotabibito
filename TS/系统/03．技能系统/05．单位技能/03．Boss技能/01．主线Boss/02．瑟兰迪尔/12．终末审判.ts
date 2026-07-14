@@ -71,8 +71,8 @@ function 播放Boss蓄力Tick(this: void, boss: any): void {
   const config = 瑟兰迪尔数值与表现配置.终末审判;
   const x = GetUnitX(boss);
   const y = GetUnitY(boss);
-  SetUnitTimeScale(boss, 1);
-  SetUnitAnimationByIndex(boss, 8);
+  SetUnitTimeScale(boss, config.蓄力动画速度);
+  SetUnitAnimationByIndex(boss, config.蓄力动画编号);
   播放点特效(config.蓄力特效, x, y, 0.6, config.蓄力法阵缩放);
   播放点特效(config.法阵叠加特效, x, y, 0.6, config.蓄力法阵缩放);
 }
@@ -139,7 +139,8 @@ export function 释放瑟兰迪尔终末审判(this: void, context: 瑟兰迪尔
     removePeriodicCallback(蓄力TickID);
     关闭吟唱条("大招");
     if (!单位有效(boss)) return;
-    SetUnitAnimationByIndex(boss, 5);
+    SetUnitTimeScale(boss, config.结算动画速度);
+    SetUnitAnimationByIndex(boss, config.结算动画编号);
     const bossX = GetUnitX(boss);
     const bossY = GetUnitY(boss);
     播放点特效(config.蓄力完成特效, bossX, bossY, 2, config.蓄力完成冲击缩放);
@@ -157,10 +158,10 @@ export function 释放瑟兰迪尔终末审判(this: void, context: 瑟兰迪尔
       targets.push(target);
     }
 
-    addDelayedCallback(500, function 瑟兰迪尔终末审判恢复动作(this: void): void {
+    addDelayedCallback(config.恢复动作延迟Ms, function 瑟兰迪尔终末审判恢复动作(this: void): void {
       if (!单位有效(boss)) return;
-      SetUnitTimeScale(boss, 1);
-      SetUnitAnimationByIndex(boss, 0);
+      SetUnitTimeScale(boss, config.恢复动画速度);
+      SetUnitAnimationByIndex(boss, config.恢复动画编号);
     });
 
     addDelayedCallback(计算爆炸特效前置延迟毫秒(), function 瑟兰迪尔终末审判爆炸预表现(this: void): void {

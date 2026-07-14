@@ -1,0 +1,18 @@
+# Form / Explosion
+
+| 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
+| --- | --- | --- | --- | --- | ---: | --- |
+| `Common\Effect\Form\Explosion\AlbedoDarkGoldBarrierBreak.mdx` | 暗金盾片向外裂开，配短促放射光线和碎裂辉光。 | 瞬时向外破碎；`Birth / Stand / Death`。 | 暗金屏障破碎、护盾失效。 | 只作破碎层，不能代替屏障展开和维持。 | 15916 | `E9E3F02BFAC37E71` |
+| `Common\Effect\Form\Explosion\dustwave.mdx` | 灰白尘浪贴地扩散，具有古战场重击的厚重感。 | 从落点向外形成短促冲击环；迁移版补齐包围盒。 | 亚伦柯斯重斩落地、英灵陨星尘土层。 | 轮廓偏亮，需实机压透明度；不作坠落主体。 | 6993 | `321854534E4162EB` |
+| `Common\Effect\Form\Explosion\ShalltearRebirthBurst.mdx` | 红色能量柱、方形碎光和放射线组成强烈阶段爆发。 | 从中心瞬时向上、向外爆发；迁移版补齐 `Stand / Death`。 | 夏提雅复生成功的短促结算层。 | 缺少血晶和蔷薇语义，必须控制持续时间与遮挡。 | 4819 | `D72BC69924027450` |
+| `Common\Effect\Form\Explosion\zdgq.mdx` | 蓝白环形冲击配放射魂光，强化和魂压语义明显。 | 从中心向外爆发。 | 亚伦柯斯 P3 转阶段、魂压结算。 | 亮度和爆发性较强，不宜普通阶段反复播放。 | 7829 | `D77E19B72F0603C0` |
+| `Common\Effect\Form\Explosion\BloodSlam.mdx` | 候选截图观察：本批夏提雅候选中冲击层次最完整，深红法阵与血色爆发符合高阶血族；中央造型偏重、遮挡风险较高。 | 迁移后序列：`Birth / Stand / Death`；完成 3 项结构修复。 | 夏提雅·血月轮舞 / 真祖血宴命中；源候选 `BloodSlam.mdx`。 | 接入时检查俯视边界和缩放表现。 | 9228 | `05D1AF778E0C295C` |
+| `Common\Effect\Form\Explosion\AinzFallingSkyImpact.mdx` | 候选截图观察：金白竖向光柱、低位环形冲击和少量升腾烟尘具备超位魔法落地结算的层次，明显优于纯色爆炸。 | 迁移后序列：`Birth / Stand / Death`；完成 17 项结构修复。 | 安兹·天空坠落光柱/冲击；源候选 `JNTX (159).mdx`。 | 仍缺高空巨大白金法阵；实机检查其暖金色是否过黄、中心是否遮挡安全信息。 | 77229 | `1B2F40E29F9563F7` |
+| `Common\Effect\Form\Explosion\ShalltearRebirthImpact.mdx` | 候选截图观察：红色版本能表达复生完成瞬间的强烈能量回归，但中心严重过曝、缺少血晶和蔷薇结构，持续稍长就会遮挡战场。 | 迁移后序列：`Stand / Birth / Death`；完成 2 项结构修复。 | 夏提雅·血之复生成功爆发；源候选 `JNTX (371).mdx`。 | 仅允许极短播放并限制缩放；不替换已有 `yaya morph texiao.mdx` 复生备选。 | 6458 | `A264A914678B9621` |
+| `Common\Effect\Form\Explosion\AlbedoDarkGoldHeavyImpact.mdx` | 候选截图观察：暖金爆点配竖向刀光具有沉重结算感，可补本体翅膀动作后的重击；但画面里没有暗色翼压，单独使用会像普通金色剑技。 | 迁移后序列：`Stand / Death`；完成 3 项结构修复。 | 雅儿贝德·至尊拦截结算 / 黑翼横扫暗金重击；源候选 `JNTX (428).mdx`。 | 与本体翅膀动作、扇形翼压及少量 `tx132.mdx` 羽屑组合，不要求额外翅膀模型。 | 9279 | `47A92188FEEDCA1B` |
+| `Common\Effect\Form\Explosion\AronkosGraveDustWhirl.mdx` | 候选截图观察：灰土喷柱与褐色碎石团能够补足古墓、尘土和重击语义，本批中适合亚伦柯斯的环境层候选。 | 迁移后序列：`Death / Birth / Stand`；完成 6 项结构修复。 | 亚伦柯斯·墓土震击 / 坠星落点；源候选 `jrfb10.mdx`。 | 接入时检查是否含火焰及生命周期。 | 21191 | `AE3B6216549C78F0` |
+| `Common\Effect\Form\Explosion\AronkosGraveDustImpact.mdx` | 候选截图观察：灰土喷柱与褐色碎石团能够补足古墓、尘土和重击语义，本批中适合亚伦柯斯的环境层候选。 | 迁移后序列：`Birth / Stand / Death`；完成 4 项结构修复。 | 亚伦柯斯·墓土震击 / 坠星落点；源候选 `newdirtexnofire.mdx`。 | 接入时检查是否含火焰及生命周期。 | 10141 | `DFF10B4582960A77` |
+| `Common\Effect\Form\Explosion\ShalltearBloodMoonImpact.mdx` | 候选截图观察：红黑地面爆发带弧形血刃，适合短促结算；但中心偏亮、造型较凶暴，不如现有首选优雅。 | 迁移后序列：`Stand / Death`；完成 2 项结构修复。 | 夏提雅·血月轮舞命中 / 真祖血宴冲击；源候选 `tx103.mdx`。 | 只作命中辅助，不替换 `BloodSlam.mdx` 和 `BlightwalkerAura.mdx`。 | 9190 | `E262E1F1C6406093` |
+| `Common\Effect\Form\Explosion\AronkosGraveSmokeBurst.mdx` | 候选截图观察：蓝白小环可表现灵魂升起，灰烟可补墓土氛围，蓝色小型落柱可作为较克制的落地替代；三者均不足以单独承担核心技能。 | 迁移后序列：`Birth / Stand / Death`；完成 15 项结构修复。 | 亚伦柯斯·墓碑安魂 / 陨星落地辅助；源候选 `tx23.mdx`。 | 分别保留为安魂、烟尘和小范围落地辅助层。 | 14555 | `37253ED006EA445E` |
+| `Common\Effect\Form\Explosion\AronkosMeteorAftershock.mdx` | 候选截图观察：蓝白低位冲击环与短促辉光向外散开，适合表现英灵陨星落地后的余波。 | 迁移后序列：`Stand / Death`；完成 8 项结构修复。 | 亚伦柯斯·英灵陨星落地后的短余波；源候选 `JNTX (151).mdx`。 | 只作落地后补层，不替代坠落主体、落点预警或主冲击。 | 8242 | `2D823A2004375D70` |
+| `Common\Effect\Form\Explosion\AronkosMeteorLandingBurst.mdx` | 候选截图观察：蓝白闪电与落点放射能量从中心扩散，补足英灵陨星接地瞬间的电光爆发。 | 迁移后序列：`Stand / Birth / Death`；完成 4 项结构修复。 | 亚伦柯斯·英灵陨星落地爆发；源候选 `JNTX (160).mdx`。 | 与坠落先导和余波按时序使用，不能三个主层同时满亮度叠放。 | 12633 | `7AE420E527D657D9` |

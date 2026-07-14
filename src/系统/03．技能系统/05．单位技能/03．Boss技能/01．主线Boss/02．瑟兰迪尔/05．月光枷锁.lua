@@ -21,15 +21,15 @@ function _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C(caster)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
     _____5F00_59CB_786C_76F4(caster, config["施法硬直秒"])
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = config["施法硬直秒"], ["颜色ID"] = config["吟唱条颜色ID"], ["标题文本"] = config["吟唱条标题文本"], ["提示文本"] = config["吟唱条提示文本"]})
-    SetUnitTimeScale(caster, 1)
+    SetUnitTimeScale(caster, config["动画速度"])
     SetUnitAnimationByIndex(caster, config["动画编号"])
     addDelayedCallback(
-        30,
+        config["动画重播延迟Ms"],
         function()
             if not _____5355_4F4D_6709_6548(caster) then
                 return
             end
-            SetUnitTimeScale(caster, 1)
+            SetUnitTimeScale(caster, config["动画速度"])
             SetUnitAnimationByIndex(caster, config["动画编号"])
         end
     )
@@ -155,8 +155,8 @@ ____exports["释放瑟兰迪尔月光枷锁效果"] = function(caster, target)
                 return
             end
             _____8BA9_5355_4F4D_9762_5411_76EE_6807(caster, target)
-            SetUnitTimeScale(caster, 1)
-            SetUnitAnimationByIndex(caster, 0)
+            SetUnitTimeScale(caster, config["恢复动画速度"])
+            SetUnitAnimationByIndex(caster, config["恢复动画编号"])
             _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55(caster, target)
         end
     )

@@ -14,6 +14,8 @@ local Cos = jass.Cos
 local Sin = jass.Sin
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____require_result_0["播放限时单位动画"]
 local BJ_RADTODEG = 57.29577951308232
 local BJ_DEGTORAD = 0.017453292519943295
 function ____exports.stringToFourCC(s)
@@ -27,6 +29,16 @@ ____exports["取单位ID"] = function(unit)
 end
 ____exports["单位有效"] = function(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
+end
+____exports["播放莫尔特斯限时动作"] = function(unit, _____52A8_753B_7F16_53F7, _____52A8_753B_901F_5EA6, _____6301_7EED_79D2)
+    return _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({
+        ["单位"] = unit,
+        ["动画编号"] = _____52A8_753B_7F16_53F7,
+        ["动画速度"] = _____52A8_753B_901F_5EA6,
+        ["持续秒"] = _____6301_7EED_79D2,
+        ["恢复动画编号"] = 0,
+        ["恢复动画速度"] = 1
+    })
 end
 ____exports["距离平方XY"] = function(x1, y1, x2, y2)
     local dx = x1 - x2

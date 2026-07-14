@@ -9,6 +9,7 @@ import { 单位有效, stringToFourCC, 取难度, 距离平方XY } from "./11．
 import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -18,6 +19,11 @@ const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number)
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
+const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => void) | undefined;
+
+const { 设置Boss血条头像 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.03．Boss血条弱点韧性.08．对外接口") as {
+  设置Boss血条头像: (this: void, Boss单位: any, 头像贴图路径: string) => boolean;
+};
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -112,6 +118,10 @@ function 异形化伤害修正(this: void, damageContext: any): number {
 }
 
 function 结束异形化(this: void, context: 菲利斯运行时上下文): void {
+  const boss = context.Boss单位;
+  const cfg = 菲利斯数值与表现配置.异形化;
+  if (单位有效(boss) && DzSetUnitModel != null) DzSetUnitModel(boss, cfg.常态模型路径);
+  if (boss != null && boss !== 0) 设置Boss血条头像(boss, cfg.常态头像路径);
   context.异形化中 = false;
   context.异形化结束Ms = 0;
 }
@@ -181,6 +191,8 @@ function 启动异形化状态(this: void, context: 菲利斯运行时上下文)
   context.异形化中 = true;
   context.异形化结束Ms = getServerTime() + cfg.持续秒 * 1000;
   registerManualBuff(boss, 菲利斯BuffID.异形化, cfg.持续秒, cfg.造成和受到伤害提高, { sourceName: "菲利斯-异形化" });
+  if (DzSetUnitModel != null) DzSetUnitModel(boss, cfg.异形模型路径);
+  设置Boss血条头像(boss, cfg.异形头像路径);
   播放Boss坐标音效(菲利斯音效配置.异形化.启动, x, y, 菲利斯音效配置.默认裁断距离);
   延迟播放Boss坐标音效(菲利斯音效配置.异形化.牵引波动, x, y, 菲利斯音效配置.异形化.牵引波动延迟Ms, 菲利斯音效配置.默认裁断距离);
   创建点特效({ 模型路径: cfg.爆发柱特效路径, X: x, Y: y, 缩放: 1.75, 持续秒: cfg.特效持续秒 });

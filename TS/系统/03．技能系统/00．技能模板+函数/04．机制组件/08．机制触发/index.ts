@@ -5,3 +5,5 @@ export * from "./04．单次承伤上限";
 export * from "./05．持续条件触发器";
 export * from "./06．单位停留触发器";
 export * from "./07．战斗状态触发器";
+export * from "./08．次数型伤害免疫";
+export * from "./09．伤害生命下限保护";

@@ -14,6 +14,7 @@ local _____5355_4F4D_6709_6548 = ____14_FF0E_516C_5171_5DE5_5177["单位有效"]
 local stringToFourCC = ____14_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____8DDD_79BBXY = ____14_FF0E_516C_5171_5DE5_5177["距离XY"]
 local _____9650_5236_6570_503C = ____14_FF0E_516C_5171_5DE5_5177["限制数值"]
+local _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C = ____14_FF0E_516C_5171_5DE5_5177["播放卡瑟拉限时动作"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
@@ -113,6 +114,7 @@ ____exports["释放卡瑟拉深海涡流"] = function(context)
         return
     end
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["深海涡流"]
+    _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["爆发延迟秒"])
     local x = GetUnitX(boss)
     local y = GetUnitY(boss)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)

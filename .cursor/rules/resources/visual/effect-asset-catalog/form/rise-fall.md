@@ -1,0 +1,19 @@
+# Form / RiseFall
+
+| 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
+| --- | --- | --- | --- | --- | ---: | --- |
+| `Common\Effect\Form\RiseFall\AinzUndeadArrowVolley.mdx` | 七支完整骸骨箭，具有骨白箭头、骨节箭杆、钩状尾羽和黑紫长光轨。 | 多箭从高处错位、错峰坠落；`Birth / Stand / Death`。 | 高阶亡灵箭雨、高阶魔法箭。 | 不承担地面预警；高度、覆盖范围和节奏需进图校准。 | 26219 | `614DA3BF32B94438` |
+| `Common\Effect\Form\RiseFall\ShalltearHolyLance.mdx` | 苍白金实体长枪，枪身细长，带交叉辉光和小型圣辉落点环。 | 从高处高速坠落；`Birth / Stand / Death`。 | 净化投枪、神圣坠枪。 | 落点环只作命中装饰，不代替范围预警。 | 16466 | `6FC59C46CBC966F3` |
+| `Common\Effect\Form\RiseFall\ShalltearBloodMoonDisc.mdx` | 写实深红血月主体，外有双层暗红月晕和尖刺血冠；月面有真实陨坑纹理。 | 空中正面展示；月晕与血冠缓慢旋转；`Birth / Stand / Death`。 | 血月主体、空中阶段物件。 | 月体是单层凸面，不使用透明背面；需叠加 Aux 才有竖向月光和坠落。 | 36695 | `2454CA0F3512CB1A` |
+| `Common\Effect\Form\RiseFall\ShalltearBloodMoonAux.mdx` | 多层竖向月光、血色能量和向下坠落的辅助光层。 | 竖向展开与坠落；`Birth / Stand / Death`。 | 血月月光、降临和坠落辅助层。 | 不能单独代替完整血月圆盘。 | 19468 | `6308F9BEA39FE3E5` |
+| `Common\Effect\Form\RiseFall\ShalltearBloodRebirthWeave.mdx` | 深红细丝从下向上交织，像血液沿身体轮廓重新编织铠甲与肉身。 | 向上回填和交织；`Birth / Stand / Death`。 | 血晶破裂后的身体重构过程。 | 只是过程层，不能单独代替球壳或人物身体。 | 19644 | `9233E3EFFB10A995` |
+| `Common\Effect\Form\RiseFall\ShalltearBloodRebirthShell.mdx` | 深血红分块球壳，表面有明显裂隙，像包裹目标的血晶容器。 | 展开包裹、维持、破裂；`Birth / Stand / Death`。 | 血之复生结晶、血晶包裹与破裂。 | 破裂后接重构丝流；人物主体仍复用正式模型或低成本轮廓。 | 59569 | `5BDAEA268DB92CC3` |
+| `Common\Effect\Form\RiseFall\AronkosDefeatDissolve.mdx` | 低亮冷青碎光从人物周围缓慢上升并向内收束，整体安静，没有爆炸感。 | 缓慢升起、收束和淡出；`Birth / Stand / Death`。 | 英魂战败消散、人物透明淡出辅助。 | 正式人物需同步降低透明度；不能单独替代人物消失。 | 7590 | `B71793C11830194E` |
+| `Common\Effect\Form\RiseFall\ElectricBlizzTarget2.mdx` | 苍白蓝白流星从天空坠落，没有燃烧岩石，英魂感明确。 | 清楚的自上而下坠落；迁移版补齐安全 `Stand / Death`。 | 亚伦柯斯英灵陨星坠落主体。 | 落地需叠光柱与尘土层；不能单独承担落点预警。 | 10213 | `8992F530674935CE` |
+| `Common\Effect\Form\RiseFall\AronkosSoulReleasePillar.mdx` | 候选截图观察：`348.mdx` 是低矮的冷蓝魂纹范围，能清楚圈出墓碑安魂区域；`368.mdx` 则以短暂向上的蓝白光柱和碎光表现灵魂离开。二者都克制、无爆炸，符合完成后安静归魂的语义。 | 迁移后序列：`Stand / Death`；完成 1 项结构修复。 | 亚伦柯斯·墓碑安魂范围 / 完成；源候选 `368.mdx`。 | `348.mdx` 持续显示并与真实安魂范围一致；完成时关闭它，短促播放 `368.mdx`，不与英灵陨星的高亮光柱同时叠放。 | 5101 | `4CA1079C09EACCF5` |
+| `Common\Effect\Form\RiseFall\AronkosMeteorDescentGuide.mdx` | 候选截图观察：`JNTX (161).mdx` 可承担极短的竖向蓝白坠落先导，`JNTX (160).mdx` 是落点的放射扩散，`JNTX (151).mdx` 可留作落地后的短余波；三者按时序使用能组成完整链条。 | 迁移后序列：`Stand / Death`；完成 7 项结构修复。 | 亚伦柯斯·英灵陨星坠落、落地与余波的补层组合；源候选 `JNTX (161).mdx`。 | 不同时叠为三个主特效；`JNTX (161).mdx` 的直线感过硬且整体偏冷蓝，不替换安兹的 `JNTX (159).mdx`。更适合作为亚伦柯斯既有 `ElectricBlizzTarget2.mdx` 落地方案的可选补层，需实机确认与现有蓝白天柱不会重复或过亮。 | 5843 | `281C71C0759D1947` |
+| `Common\Effect\Form\RiseFall\AronkosSoulReleaseAux.mdx` | 候选截图观察：小型蓝白法阵和中心魂光适合安魂完成的一瞬，但造型较通用，不能单独承担墓碑主体或完整安魂过程。 | 迁移后序列：`stand / Death`；完成 1 项结构修复。 | 亚伦柯斯·墓碑安魂范围 / 完成辅助；源候选 `JNTX (553).mdx`。 | 只保留为完成节点短促亮起的辅助层。 | 2952 | `2A70C3A8B8524671` |
+| `Common\Effect\Form\RiseFall\AronkosSoulRiseRing.mdx` | 候选截图观察：蓝白小环可表现灵魂升起，灰烟可补墓土氛围，蓝色小型落柱可作为较克制的落地替代；三者均不足以单独承担核心技能。 | 迁移后序列：`Stand / Death`；完成 1 项结构修复。 | 亚伦柯斯·墓碑安魂 / 陨星落地辅助；源候选 `tx116.mdx`。 | 分别保留为安魂、烟尘和小范围落地辅助层。 | 5101 | `9AFB4876C0FD614C` |
+| `Common\Effect\Form\RiseFall\AronkosMeteorImpactPillar.mdx` | 候选截图观察：蓝白天柱与多层圆环形成明确的自上而下结算，和 `ElectricBlizzTarget2.mdx` 的苍白坠星能够自然衔接；缺点是亮度较高。 | 迁移后序列：`birth / Stand / Death`；完成 6 项结构修复。 | 亚伦柯斯·英灵陨星落地光柱 / 冲击层；源候选 `yhxingluoblue.mdx`。 | 作为当前落地主层，接入时降低尺寸与亮度，避免遮住安全信息。 | 9207 | `809349D8E1D098D9` |
+| `Common\Effect\Form\RiseFall\AinzFallingSkyLaser.mdx` | 候选截图观察：自带从高处直达地面的竖向光线与贴地环形结算，能够把天空法阵、坠落过程和落点读成同一招式；适合作为现有金白冲击层的方向性补足。 | 迁移后序列：`birth / Stand / Death`；完成 6 项结构修复。 | 安兹·天空坠落的竖向落线 / 落点环；源候选 `LaserCannon.mdx`。 | 与 `JNTX (159).mdx` 按时序叠加：先短暂显示 `LaserCannon.mdx` 的落线和落点环，再结算金白冲击；不可同帧满亮度重叠，实机检查冷蓝与暖金的协调度。 | 6240 | `6FC1FF925AB2716F` |
+| `Common\Effect\Form\RiseFall\AronkosSoulLightPillar.mdx` | 候选截图观察：蓝白小环可表现灵魂升起，灰烟可补墓土氛围，蓝色小型落柱可作为较克制的落地替代；三者均不足以单独承担核心技能。 | 迁移后序列：`Birth / Stand / Death`；完成 5 项结构修复。 | 亚伦柯斯·墓碑安魂 / 陨星落地辅助；源候选 `tx27.mdx`。 | 分别保留为安魂、烟尘和小范围落地辅助层。 | 14748 | `835F00AF3F62B0D9` |

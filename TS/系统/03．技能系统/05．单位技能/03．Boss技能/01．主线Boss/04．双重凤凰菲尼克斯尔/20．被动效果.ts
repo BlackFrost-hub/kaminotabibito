@@ -7,11 +7,8 @@ import { 初始化菲尼克斯尔永恒冰核与导管 } from "./05．永恒冰�
 import { 注册菲尼克斯尔技能结构 } from "./18．技能入口";
 import { stringToFourCC } from "./19．公共工具";
 
-const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-};
-const { 获取所有Boss自动技能启动上下文 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表") as {
-  获取所有Boss自动技能启动上下文: (this: void) => any[];
+const { 注册Boss自动技能启动监听 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表") as {
+  注册Boss自动技能启动监听: (this: void, 参数: any) => number;
 };
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -27,15 +24,9 @@ const 菲尼克斯尔单位类型ID = stringToFourCC(菲尼克斯尔单位技能
 let 菲尼克斯尔被动已注册 = false;
 let 菲尼克斯尔承伤修正已注册 = false;
 
-function 扫描菲尼克斯尔启动上下文(this: void): void {
-  const contexts = 获取所有Boss自动技能启动上下文();
-  for (let i = 0; i < contexts.length; i++) {
-    const item = contexts[i];
-    const boss = item != null ? item.Boss单位 : undefined;
-    if (boss == null || boss === 0 || GetUnitTypeId(boss) !== 菲尼克斯尔单位类型ID) continue;
-    const context = 获取或创建菲尼克斯尔上下文(boss);
-    if (context != null) 初始化菲尼克斯尔永恒冰核与导管(context);
-  }
+function on菲尼克斯尔Boss启动(this: void, 启动上下文: any): void {
+  const context = 获取或创建菲尼克斯尔上下文(启动上下文.Boss单位);
+  if (context != null) 初始化菲尼克斯尔永恒冰核与导管(context);
 }
 
 function 菲尼克斯尔导管破封承伤修正(this: void, damageContext: any): number {
@@ -58,7 +49,11 @@ export function 注册菲尼克斯尔被动效果(this: void): void {
   注册菲尼克斯尔运行时();
   注册菲尼克斯尔技能结构();
   确保菲尼克斯尔承伤修正();
-  addPeriodicCallback(1000, 扫描菲尼克斯尔启动上下文);
+  注册Boss自动技能启动监听({
+    名称: "菲尼克斯尔运行时上下文绑定",
+    单位类型ID: 菲尼克斯尔单位类型ID,
+    on启动: on菲尼克斯尔Boss启动,
+  });
 }
 
 注册菲尼克斯尔被动效果();

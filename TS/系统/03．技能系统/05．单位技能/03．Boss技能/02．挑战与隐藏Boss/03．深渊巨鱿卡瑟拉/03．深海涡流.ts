@@ -4,7 +4,7 @@ import { 卡瑟拉单位技能配置 } from "./00．配置";
 import { 获取或创建卡瑟拉上下文, type 卡瑟拉运行时上下文 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, stringToFourCC, 距离XY, 限制数值 } from "./14．公共工具";
+import { 单位有效, stringToFourCC, 距离XY, 限制数值, 播放卡瑟拉限时动作 } from "./14．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -87,6 +87,7 @@ export function 释放卡瑟拉深海涡流(this: void, context: 卡瑟拉运行
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 卡瑟拉数值与表现配置.深海涡流;
+  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.爆发延迟秒);
   const x = GetUnitX(boss);
   const y = GetUnitY(boss);
   const heroes = 获取Boss技能敌对英雄列表(boss);

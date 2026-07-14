@@ -100,11 +100,11 @@ function 播放月光枷锁施法动作(this: void, caster: any): void {
     标题文本: config.吟唱条标题文本,
     提示文本: config.吟唱条提示文本,
   });
-  SetUnitTimeScale(caster, 1);
+  SetUnitTimeScale(caster, config.动画速度);
   SetUnitAnimationByIndex(caster, config.动画编号);
-  addDelayedCallback(30, function 重播月光枷锁施法动作(this: void): void {
+  addDelayedCallback(config.动画重播延迟Ms, function 重播月光枷锁施法动作(this: void): void {
     if (!单位有效(caster)) return;
-    SetUnitTimeScale(caster, 1);
+    SetUnitTimeScale(caster, config.动画速度);
     SetUnitAnimationByIndex(caster, config.动画编号);
   });
 }
@@ -256,8 +256,8 @@ export function 释放瑟兰迪尔月光枷锁效果(this: void, caster: any, ta
     关闭吟唱条("常规技能");
     if (!单位有效(caster) || !单位有效(target)) return;
     让单位面向目标(caster, target);
-    SetUnitTimeScale(caster, 1);
-    SetUnitAnimationByIndex(caster, 0);
+    SetUnitTimeScale(caster, config.恢复动画速度);
+    SetUnitAnimationByIndex(caster, config.恢复动画编号);
     发射月光枷锁弹幕(caster, target);
   });
 }

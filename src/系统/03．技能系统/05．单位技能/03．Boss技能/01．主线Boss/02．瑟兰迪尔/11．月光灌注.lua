@@ -68,12 +68,12 @@ ____exports["释放瑟兰迪尔月光灌注"] = function(context)
         YDWETimerDestroyEffectSafe(config["施法硬直秒"], castEffect)
     end
     addDelayedCallback(
-        500,
+        config["举剑冻结延迟Ms"],
         function()
             if not _____5355_4F4D_6709_6548(boss) then
                 return
             end
-            SetUnitTimeScale(boss, 0)
+            SetUnitTimeScale(boss, config["冻结动画速度"])
         end
     )
     addDelayedCallback(
@@ -83,8 +83,8 @@ ____exports["释放瑟兰迪尔月光灌注"] = function(context)
             if not _____5355_4F4D_6709_6548(boss) then
                 return
             end
-            SetUnitTimeScale(boss, 1)
-            SetUnitAnimationByIndex(boss, 0)
+            SetUnitTimeScale(boss, config["恢复动画速度"])
+            SetUnitAnimationByIndex(boss, config["恢复动画编号"])
             _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_704C_6CE8(boss)
         end
     )

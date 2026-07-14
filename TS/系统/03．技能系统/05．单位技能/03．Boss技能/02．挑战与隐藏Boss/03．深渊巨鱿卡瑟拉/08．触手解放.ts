@@ -3,7 +3,7 @@
 import { type 卡瑟拉运行时上下文, 刷新卡瑟拉阶段 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, 极坐标X, 极坐标Y } from "./14．公共工具";
+import { 单位有效, 极坐标X, 极坐标Y, 播放卡瑟拉限时动作 } from "./14．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 
 const jass = require("jass.common") as any;
@@ -112,25 +112,10 @@ function 创建巨型触手(this: void, data: 触手解放实例, angle: number)
   });
 }
 
-export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉运行时上下文): void {
+function 执行卡瑟拉潜入与触手解放(this: void, context: 卡瑟拉运行时上下文): void {
   const boss = context.Boss单位;
-  if (!单位有效(boss)) return;
-  if (context.触手解放已触发 || context.Boss潜入中) return;
-  if (刷新卡瑟拉阶段(context) < 3) return;
+  if (!单位有效(boss) || !context.Boss潜入中) return;
   const cfg = 卡瑟拉数值与表现配置.触手解放;
-  context.触手解放已触发 = true;
-  context.Boss潜入中 = true;
-  播放卡瑟拉台词(boss, "触手解放");
-  播放Boss坐标音效(卡瑟拉音效配置.触手解放.Boss下潜, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
-  尝试播放Boss拟声池({
-    标识: 卡瑟拉音效配置.怪物拟声.标识,
-    音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
-    X: GetUnitX(boss),
-    Y: GetUnitY(boss),
-    裁断距离: 卡瑟拉音效配置.默认裁断距离,
-    冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
-    触发概率百分比: 卡瑟拉音效配置.怪物拟声.转阶段触发概率百分比,
-  });
   播放潜入特效(GetUnitX(boss), GetUnitY(boss));
   ShowUnit(boss, false);
   添加单位暂停(boss, 卡瑟拉触手解放暂停来源);
@@ -151,6 +136,32 @@ export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉
     if (!data.已结束) 回归卡瑟拉(data, false);
   });
   context.清理.登记延迟回调("卡瑟拉-触手解放限时", id);
+}
+
+export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉运行时上下文): void {
+  const boss = context.Boss单位;
+  if (!单位有效(boss)) return;
+  if (context.触手解放已触发 || context.Boss潜入中) return;
+  if (刷新卡瑟拉阶段(context) < 3) return;
+  const cfg = 卡瑟拉数值与表现配置.触手解放;
+  context.触手解放已触发 = true;
+  context.Boss潜入中 = true;
+  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作原始时长秒);
+  播放卡瑟拉台词(boss, "触手解放");
+  播放Boss坐标音效(卡瑟拉音效配置.触手解放.Boss下潜, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
+  尝试播放Boss拟声池({
+    标识: 卡瑟拉音效配置.怪物拟声.标识,
+    音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    裁断距离: 卡瑟拉音效配置.默认裁断距离,
+    冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
+    触发概率百分比: 卡瑟拉音效配置.怪物拟声.转阶段触发概率百分比,
+  });
+  const 潜入ID = addDelayedCallback(cfg.动作原始时长秒 * 1000, function 卡瑟拉触手解放动作结束(this: void): void {
+    执行卡瑟拉潜入与触手解放(context);
+  });
+  context.清理.登记延迟回调("卡瑟拉-触手解放潜入", 潜入ID);
 }
 
 export function 注册卡瑟拉触手解放(this: void): void {
