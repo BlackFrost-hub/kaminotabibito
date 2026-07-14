@@ -16,12 +16,12 @@ const { X_GAFC, X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetA
   X_GetAbleY: () => number;
 };
 const {
-  申请单位暂停占用,
-  释放单位暂停占用,
+  添加单位暂停,
+  移除单位暂停,
   单位是否存在其他暂停占用,
 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  申请单位暂停占用: (this: void, 单位: any, 来源: string) => boolean;
-  释放单位暂停占用: (this: void, 单位: any, 来源: string) => boolean;
+  添加单位暂停: (this: void, 单位: any, 来源: string) => boolean;
+  移除单位暂停: (this: void, 单位: any, 来源: string) => boolean;
   单位是否存在其他暂停占用: (this: void, 单位: any, 自身来源: string) => boolean;
 };
 const { 零秒后重置单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
@@ -53,7 +53,7 @@ const ForGroup = jass["ForGroup"] as (whichGroup: any, callback: () => void) => 
 const GetEnumUnit = jass["GetEnumUnit"] as () => any;
 
 export { jass, jglobals, X_GAFC, X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY };
-export { 申请单位暂停占用, 释放单位暂停占用, 单位是否存在其他暂停占用 };
+export { 添加单位暂停, 移除单位暂停, 单位是否存在其他暂停占用 };
 export { 零秒后重置单位动画 };
 export {
   GetHandleId, GetUnitState, GetRectMinX, GetRectMinY, GetRectMaxX, GetRectMaxY,

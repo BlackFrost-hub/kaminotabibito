@@ -51,3 +51,5 @@ Desktop.ini
 
 # generated legacy flat voice manifest
 /voice_pack_manifest.json
+/voice_pack_manifest
+/image_temp

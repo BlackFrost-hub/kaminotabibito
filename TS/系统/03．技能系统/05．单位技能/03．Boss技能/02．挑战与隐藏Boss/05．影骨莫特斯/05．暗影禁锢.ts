@@ -114,7 +114,7 @@ export function 释放影骨暗影禁锢(this: void, context: 影骨莫特斯运
     Y: y,
     半径: cfg.半径,
     持续时间: cfg.预警秒,
-    模型路径: 影骨莫特斯表现配置.暗影禁锢预警,
+    来源单位: context.Boss单位,
   });
   播放Boss坐标音效(影骨莫特斯音效配置.暗影禁锢.预警, x, y, 影骨莫特斯音效配置.默认裁断距离);
   const id = addDelayedCallback(cfg.预警秒 * 1000, 影骨暗影禁锢生效, { context, x, y } as 影骨暗影禁锢延迟变量);

@@ -3,14 +3,19 @@
  * Star扩展库 - 硬直/暂停系统
  *
  * 来源于 SUSPEND.j，提供单位暂停控制功能。
- * 通过 EXPauseUnit(japi) 暂停单位，中心计时器驱动到期后自动恢复。
+ * 优先通过 EXPauseUnit(japi) 暂停单位，缺失时回退到 PauseUnit；两者统一由来源管理池调度。
+ * 只有 EXPauseUnit 自带引用计数语义，PauseUnit 本身不要求调用次数配平。
  * 支持暂停时间累加、减少、取最大值等操作。
  *
- * 公开接口：
- *   GS_Suspend(u, time)          - 暂停单位一段时间
- *   GS_IsUnitSuspending(u)       - 检查单位是否处于暂停状态
- *   GS_LoadSuspend(u)            - 获取单位剩余暂停时间
- *   GS_UnitSuspend(u, i, r)      - 修改暂停时间（0=增加，1=减少，2=取最大值）
+ * 业务统一接口（参数顺序统一为：单位、来源、时间）：
+ *   添加单位暂停(u, 来源)
+ *   移除单位暂停(u, 来源)
+ *   设置单位暂停时间(u, 来源, 秒)
+ *   增加单位暂停时间(u, 来源, 秒)
+ *   减少单位暂停时间(u, 来源, 秒)
+ *   单位是否暂停(u)
+ *   获取单位暂停剩余时间(u, 来源)
+ * GS_* 与申请/释放占用系列仅保留给旧代码兼容，新业务不要继续使用。
  */
 
 const jass = require("jass.common") as any;
@@ -99,6 +104,8 @@ function 通知暂停占用变化(event: 单位暂停占用变化事件): void {
 function 设置底层暂停状态(u: any, 是否暂停: boolean): void {
   if (u == null || u === 0) return;
 
+  // EXPauseUnit 自带计数语义，只能在管理池总占用 0↔1 时成对调用，禁止周期性重复补写 true。
+  // PauseUnit 本身没有这项计数要求；这里只是让两种底层 API 共用同一套来源管理。
   if (EXPauseUnit != null) {
     EXPauseUnit(u, 是否暂停);
     return;
@@ -145,26 +152,7 @@ function 复制单位暂停来源列表(单位ID: number): string[] {
   return out;
 }
 
-let 暂停占用校正驱动已注册 = false;
 let 清理单位暂停来源定时任务: (this: void, 单位ID: number, 来源: string) => void = function (_单位ID: number, _来源: string): void {};
-let 清理单位硬直到期任务: (this: void, 单位ID: number) => void = function (_单位ID: number): void {};
-
-function on暂停占用校正驱动(this: void): void {
-  for (const key in 单位暂停占用总表) {
-    const 单位ID = parseInt(key, 10);
-    if (isNaN(单位ID)) continue;
-    const 总计数 = 单位暂停占用总表[单位ID] ?? 0;
-    if (总计数 <= 0) continue;
-    const u = 单位暂停占用单位表[单位ID];
-    if (u != null && u !== 0) 设置底层暂停状态(u, true);
-  }
-}
-
-function 确保暂停占用校正驱动(): void {
-  if (暂停占用校正驱动已注册) return;
-  暂停占用校正驱动已注册 = true;
-  addPeriodicCallback(250, on暂停占用校正驱动);
-}
 
 export function 申请单位暂停占用(u: any, 来源: string): boolean {
   if (u == null || u === 0 || 来源 == null || 来源 === "") return false;
@@ -180,7 +168,6 @@ export function 申请单位暂停占用(u: any, 来源: string): boolean {
 
   if (原来源计数 > 0) {
     通知暂停占用变化({ 单位: u, 单位ID, 来源, 来源计数: 新来源计数, 总计数: 单位暂停占用总表[单位ID] ?? 0, 操作: "申请" });
-    确保暂停占用校正驱动();
     return true;
   }
 
@@ -193,7 +180,6 @@ export function 申请单位暂停占用(u: any, 来源: string): boolean {
     设置底层暂停状态(u, true);
     通知暂停事件(任意单位被暂停监听列表, { 单位: u, 单位ID, 来源, 来源计数: 新来源计数, 总计数: 新总计数 });
   }
-  确保暂停占用校正驱动();
   return true;
 }
 
@@ -241,7 +227,6 @@ export function 释放单位暂停来源全部(u: any, 来源: string): boolean 
   const 单位ID = hid(u);
   if (单位ID === 0) return false;
   清理单位暂停来源定时任务(单位ID, 来源);
-  if (来源 === "GS_Suspend") 清理单位硬直到期任务(单位ID);
   let changed = false;
   while (获取单位暂停来源计数(u, 来源) > 0) {
     if (!释放单位暂停占用(u, 来源)) break;
@@ -333,9 +318,8 @@ export function 刷新单位暂停底层状态(u: any): boolean {
   if (u == null || u === 0) return false;
   const 单位ID = hid(u);
   if (单位ID === 0) return false;
-  const 应暂停 = (单位暂停占用总表[单位ID] ?? 0) > 0;
-  设置底层暂停状态(u, 应暂停);
-  return 应暂停;
+  // 兼容旧接口：EXPauseUnit 是引用计数 API，不能通过重复写入当前状态来“刷新”，这里只返回管理池状态。
+  return (单位暂停占用总表[单位ID] ?? 0) > 0;
 }
 
 export function 注册任意单位被暂停监听(cb: 单位暂停事件监听): void {
@@ -383,7 +367,9 @@ function on暂停来源到期驱动(this: void): void {
   for (let i = 0; i < 暂停来源到期任务列表.length; i++) {
     const 任务 = 暂停来源到期任务列表[i];
     if (当前时间毫秒 >= 任务.到期时间毫秒) {
-      释放单位暂停占用(任务.单位, 任务.来源);
+      while (获取单位暂停来源计数(任务.单位, 任务.来源) > 0) {
+        if (!释放单位暂停占用(任务.单位, 任务.来源)) break;
+      }
     } else {
       暂停来源到期任务列表[写入位置] = 任务;
       写入位置++;
@@ -414,7 +400,7 @@ export function 申请单位暂停占用定时(u: any, 来源: string, 持续时
   const 任务索引 = 查找暂停来源到期任务索引(单位ID, 来源);
   const 当前模式 = 模式 ?? "刷新";
   if (任务索引 < 0) {
-    const ok = 申请单位暂停占用(u, 来源);
+    const ok = 申请单位暂停独立占用(u, 来源);
     if (!ok) return false;
     暂停来源到期任务列表.push({ 单位: u, 单位ID, 来源, 到期时间毫秒: 当前时间毫秒 + 持续毫秒 });
     确保暂停来源到期驱动();
@@ -440,53 +426,61 @@ export function 取消单位暂停占用定时(u: any, 来源: string): boolean 
   if (单位ID === 0) return false;
   const 任务索引 = 查找暂停来源到期任务索引(单位ID, 来源);
   if (任务索引 >= 0) 暂停来源到期任务列表.splice(任务索引, 1);
-  return 释放单位暂停占用(u, 来源);
+  return 释放单位暂停来源全部(u, 来源);
 }
 
-interface 硬直到期任务 {
-  单位: any;
-  单位ID: number;
-  到期时间毫秒: number;
+/**
+ * 业务层暂停接口：所有调用都必须传稳定且唯一的来源名。
+ * 外部业务不要直接调用 EXPauseUnit / PauseUnit：前者需要配平计数，后者仅纳入同一管理入口。
+ */
+export function 添加单位暂停(u: any, 来源: string): boolean {
+  if (u == null || u === 0 || 来源 == null || 来源 === "") return false;
+  const 单位ID = hid(u);
+  if (单位ID === 0) return false;
+  清理单位暂停来源定时任务(单位ID, 来源);
+  return 申请单位暂停独立占用(u, 来源);
 }
 
-const 硬直到期任务列表: 硬直到期任务[] = [];
-let 硬直到期驱动已注册 = false;
-
-function 查找硬直到期任务索引(单位ID: number): number {
-  for (let i = 0; i < 硬直到期任务列表.length; i++) {
-    if (硬直到期任务列表[i].单位ID === 单位ID) return i;
-  }
-  return -1;
+export function 移除单位暂停(u: any, 来源: string): boolean {
+  return 释放单位暂停来源全部(u, 来源);
 }
 
-清理单位硬直到期任务 = function (单位ID: number): void {
-  const 任务索引 = 查找硬直到期任务索引(单位ID);
-  if (任务索引 >= 0) 硬直到期任务列表.splice(任务索引, 1);
-};
-
-function on硬直到期驱动(this: void): void {
-  if (硬直到期任务列表.length === 0) return;
-
-  const 当前时间毫秒 = getServerTime();
-  let 写入位置 = 0;
-  for (let i = 0; i < 硬直到期任务列表.length; i++) {
-    const 任务 = 硬直到期任务列表[i];
-    if (当前时间毫秒 >= 任务.到期时间毫秒) {
-      释放单位暂停占用(任务.单位, "GS_Suspend");
-    } else {
-      硬直到期任务列表[写入位置] = 任务;
-      写入位置++;
-    }
-  }
-  while (硬直到期任务列表.length > 写入位置) {
-    硬直到期任务列表.pop();
-  }
+export function 单位是否暂停(u: any): boolean {
+  return 单位是否存在暂停占用(u);
 }
 
-function 确保硬直到期驱动(): void {
-  if (硬直到期驱动已注册) return;
-  硬直到期驱动已注册 = true;
-  addPeriodicCallback(10, on硬直到期驱动);
+export function 设置单位暂停时间(u: any, 来源: string, 持续时间: number): boolean {
+  if (持续时间 <= 0) return 移除单位暂停(u, 来源);
+  return 申请单位暂停占用定时(u, 来源, 持续时间, "刷新");
+}
+
+export function 增加单位暂停时间(u: any, 来源: string, 增加时间: number): boolean {
+  if (增加时间 <= 0) return false;
+  return 申请单位暂停占用定时(u, 来源, 增加时间, "叠加");
+}
+
+export function 减少单位暂停时间(u: any, 来源: string, 减少时间: number): boolean {
+  if (u == null || u === 0 || 来源 == null || 来源 === "" || 减少时间 <= 0) return false;
+  const 单位ID = hid(u);
+  if (单位ID === 0) return false;
+  const 任务索引 = 查找暂停来源到期任务索引(单位ID, 来源);
+  if (任务索引 < 0) return false;
+
+  const 任务 = 暂停来源到期任务列表[任务索引];
+  任务.到期时间毫秒 -= 减少时间 * 1000;
+  if (任务.到期时间毫秒 > getServerTime()) return true;
+
+  暂停来源到期任务列表.splice(任务索引, 1);
+  return 释放单位暂停来源全部(u, 来源);
+}
+
+export function 获取单位暂停剩余时间(u: any, 来源: string): number {
+  if (u == null || u === 0 || 来源 == null || 来源 === "") return 0;
+  const 单位ID = hid(u);
+  if (单位ID === 0) return 0;
+  const 任务索引 = 查找暂停来源到期任务索引(单位ID, 来源);
+  if (任务索引 < 0) return 0;
+  return RMaxBJ(0, 暂停来源到期任务列表[任务索引].到期时间毫秒 - getServerTime()) * 0.001;
 }
 
 /**
@@ -496,25 +490,7 @@ function 确保硬直到期驱动(): void {
  * @param time 暂停时间（秒）
  */
 export function GS_Suspend(u: any, time: number): void {
-  if (u == null || u === 0) return;
-
-  const uid = hid(u);
-  if (uid === 0) return;
-  if (time <= 0) {
-    释放单位暂停来源全部(u, "GS_Suspend");
-    return;
-  }
-  const 到期时间毫秒 = getServerTime() + RMaxBJ(0, time) * 1000;
-  const 任务索引 = 查找硬直到期任务索引(uid);
-  if (任务索引 < 0) {
-    申请单位暂停占用(u, "GS_Suspend");
-    硬直到期任务列表.push({ 单位: u, 单位ID: uid, 到期时间毫秒 });
-  } else {
-    const 任务 = 硬直到期任务列表[任务索引];
-    任务.单位 = u;
-    任务.到期时间毫秒 = 到期时间毫秒;
-  }
-  确保硬直到期驱动();
+  设置单位暂停时间(u, "GS_Suspend", time);
 }
 
 /**
@@ -530,13 +506,7 @@ export function GS_IsUnitSuspending(u: any): boolean {
 
 /** 获取单位剩余暂停时间（秒）。 */
 export function GS_LoadSuspend(u: any): number {
-  if (u == null || u === 0) return 0;
-
-  const uid = hid(u);
-  if (uid === 0) return 0;
-  const 任务索引 = 查找硬直到期任务索引(uid);
-  if (任务索引 < 0) return 0;
-  return RMaxBJ(0, 硬直到期任务列表[任务索引].到期时间毫秒 - getServerTime()) * 0.001;
+  return 获取单位暂停剩余时间(u, "GS_Suspend");
 }
 
 /**
@@ -547,15 +517,12 @@ export function GS_LoadSuspend(u: any): number {
  */
 export function GS_UnitSuspend(u: any, i: number, r: number): void {
   if (u == null || u === 0) return;
-
-  const currentRemain = GS_LoadSuspend(u);
-
   if (i === 0) {
-    GS_Suspend(u, currentRemain + r);
+    增加单位暂停时间(u, "GS_Suspend", r);
   } else if (i === 1) {
-    GS_Suspend(u, RMaxBJ(0, currentRemain - r));
-  } else if (i === 2) {
-    GS_Suspend(u, RMaxBJ(currentRemain, r));
+    减少单位暂停时间(u, "GS_Suspend", r);
+  } else if (i === 2 && r > 0) {
+    申请单位暂停占用定时(u, "GS_Suspend", r, "取最大");
   }
 }
 

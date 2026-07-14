@@ -16,22 +16,21 @@ const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事�
 const { 启动单位倒计时 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.17．单位倒计时.04．对外接口") as {
   启动单位倒计时: (this: void, 参数: any) => number;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
-};
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { 设置单位暂停时间 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  设置单位暂停时间: (this: void, unit: any, 来源: string, 持续时间: number) => boolean;
 };
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 
 const 模块名 = "单位倒计时测试";
 const 普通倒计时命令 = "1029";
 const 强化倒计时命令 = "1030";
 const 暂停倒计时命令 = "1031";
-let 暂停测试单位: any = null;
+const 暂停测试来源 = "单位倒计时测试:暂停推进";
 
 function 获取测试单位(this: void): any {
   return g.gg_unit_Hamg_0002 ?? (globalThis as any).bj_lastCreatedUnit;
@@ -75,13 +74,6 @@ function 启动强化倒计时测试(this: void): void {
   debugLogForce(模块名, "强化2倒计时启动", "id=", id, "unit=", unit);
 }
 
-function on恢复暂停测试单位(this: void): void {
-  if (暂停测试单位 == null || 暂停测试单位 === 0) return;
-  PauseUnit(暂停测试单位, false);
-  debugLogForce(模块名, "暂停测试单位已恢复");
-  暂停测试单位 = null;
-}
-
 function 启动暂停倒计时测试(this: void): void {
   const unit = 获取测试单位();
   if (unit == null || unit === 0) {
@@ -89,8 +81,7 @@ function 启动暂停倒计时测试(this: void): void {
     return;
   }
 
-  暂停测试单位 = unit;
-  PauseUnit(unit, true);
+  设置单位暂停时间(unit, 暂停测试来源, 2.0);
   const id = 启动单位倒计时({
     单位: unit,
     持续时间: 2.0,
@@ -98,7 +89,6 @@ function 启动暂停倒计时测试(this: void): void {
     Y: GetUnitY(unit),
     到期效果ID: 0,
   });
-  addDelayedCallback(2000, on恢复暂停测试单位);
   debugLogForce(模块名, "暂停倒计时启动：单位暂停2秒，倒计时应暂停推进", "id=", id);
 }
 

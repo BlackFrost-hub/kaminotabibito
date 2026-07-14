@@ -34,8 +34,8 @@ local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
 local _____4E34_65F6_8C03_6574_62A4_7532 = ____require_result_3["临时调整护甲"]
 local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["申请单位暂停占用"]
-local _____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["释放单位暂停占用"]
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
 local _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90 = "Boss:Kasela:触手解放"
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
@@ -66,7 +66,7 @@ local function _____56DE_5F52_5361_745F_62C9(data, success)
         return
     end
     ShowUnit(boss, true)
-    _____91CA_653E_5355_4F4D_6682_505C_5360_7528(boss, _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90)
+    _____79FB_9664_5355_4F4D_6682_505C(boss, _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90)
     _____64AD_653E_6F5C_5165_7279_6548(
         GetUnitX(boss),
         GetUnitY(boss)
@@ -169,7 +169,7 @@ ____exports["尝试触发卡瑟拉触手解放"] = function(context)
         GetUnitY(boss)
     )
     ShowUnit(boss, false)
-    _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(boss, _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90)
+    _____6DFB_52A0_5355_4F4D_6682_505C(boss, _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "双环",
         X = GetUnitX(boss),

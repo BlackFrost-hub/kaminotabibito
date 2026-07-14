@@ -2,6 +2,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const 猎魂接见暂停来源 = "剧情系统:猎魂接见";
 
 const { YDUserDataClearSafe, YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
@@ -17,7 +21,6 @@ import { 发送剧情任务消息 } from "../../00．剧情系统核心工具/02
 export { 克林姆德国王委托剧情片段 } from "../02．第二章/24．克林姆德王接见";
 
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
@@ -31,7 +34,7 @@ export function 执行克林姆德王接见(this: void, 参数: 剧情动作参�
   const 猎魂引用 = YDUserDataGetSafe("string", "jq", "npc", "unit");
   if (猎魂引用 != null && 猎魂引用 !== 0) {
     SetUnitInvulnerable(猎魂引用, true);
-    PauseUnit(猎魂引用, true);
+    添加单位暂停(猎魂引用, 猎魂接见暂停来源);
   }
 
   const 卫队单位 = YDUserDataGetSafe("string", "主线NPC", "jlw", "unit");

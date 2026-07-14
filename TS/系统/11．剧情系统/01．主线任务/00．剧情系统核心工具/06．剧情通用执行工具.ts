@@ -15,6 +15,10 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
 const { AdjustPlayerStateBJ } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   AdjustPlayerStateBJ: (this: void, delta: number, whichPlayer: any, whichPlayerState: any) => void;
 };
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
 const { ModifyGateBJ, ForGroupBJ, SetTimeOfDay } = require("lib.扩展函数.BJ函数.07．杂项") as {
   ModifyGateBJ: (this: void, gateOperation: number, d: any) => void;
   ForGroupBJ: (this: void, whichGroup: any, callback: (this: void) => void) => void;
@@ -87,7 +91,6 @@ const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, whichUnit: any) => number;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
 const RemoveItem = jass.RemoveItem as (this: void, whichItem: any) => void;
@@ -114,6 +117,8 @@ const PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD as number;
 const 主线运行时任务ID = "main_story_runtime";
 let 当前玩家英雄控制暂停 = false;
 let 当前玩家英雄无敌 = false;
+const 剧情玩家英雄控制暂停来源 = "剧情系统:玩家英雄控制";
+const 剧情触发单位控制暂停来源 = "剧情系统:触发单位控制";
 const 已创建视野修整器: Record<string, true | undefined> = {};
 interface 延迟执行记录 {
   类型: "消息" | "开门";
@@ -257,7 +262,11 @@ function 从单位移除指定物品(this: void, unit: any, 物品名: string): 
 function on设置枚举英雄暂停无敌(this: void): void {
   const unit = GetEnumUnit();
   if (unit == null || unit === 0) return;
-  PauseUnit(unit, 当前玩家英雄控制暂停);
+  if (当前玩家英雄控制暂停) {
+    添加单位暂停(unit, 剧情玩家英雄控制暂停来源);
+  } else {
+    移除单位暂停(unit, 剧情玩家英雄控制暂停来源);
+  }
   SetUnitInvulnerable(unit, 当前玩家英雄无敌);
 }
 
@@ -289,7 +298,11 @@ export function 设置玩家英雄组控制状态(this: void, 暂停: boolean, �
 export function 设置触发单位控制状态(this: void, 暂停: boolean, 无敌: boolean): void {
   const unit = 读取触发单位();
   if (unit == null || unit === 0) return;
-  PauseUnit(unit, 暂停);
+  if (暂停) {
+    添加单位暂停(unit, 剧情触发单位控制暂停来源);
+  } else {
+    移除单位暂停(unit, 剧情触发单位控制暂停来源);
+  }
   SetUnitInvulnerable(unit, 无敌);
 }
 

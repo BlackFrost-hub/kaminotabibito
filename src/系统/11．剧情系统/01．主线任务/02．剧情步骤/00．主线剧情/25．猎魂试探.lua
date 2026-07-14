@@ -6,14 +6,16 @@ local _____505C_6B62_89E6_53D1_5355_4F4D = ____06_FF0E_5267_60C5_901A_7528_6267_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataClearSafe = ____require_result_0.YDUserDataClearSafe
-local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_0["移除单位暂停"]
+local _____730E_9B42_63A5_89C1_6682_505C_6765_6E90 = "剧情系统:猎魂接见"
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataClearSafe = ____require_result_1.YDUserDataClearSafe
+local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 do
     local ____25_FF0E_730E_9B42_8BD5_63A2 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．第二章.25．猎魂试探")
     ____exports["猎魂试探剧情片段"] = ____25_FF0E_730E_9B42_8BD5_63A2["猎魂试探剧情片段"]
 end
-local PauseUnit = jass.PauseUnit
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 ____exports["执行猎魂试探"] = function()
     _____505C_6B62_89E6_53D1_5355_4F4D()
@@ -24,7 +26,7 @@ ____exports["执行猎魂后任务推进"] = function()
     local npc = YDUserDataGetSafe("string", "jq", "npc", "unit")
     if npc ~= nil and npc ~= 0 then
         SetUnitInvulnerable(npc, false)
-        PauseUnit(npc, false)
+        _____79FB_9664_5355_4F4D_6682_505C(npc, _____730E_9B42_63A5_89C1_6682_505C_6765_6E90)
     end
     YDUserDataClearSafe("string", "jq", "npc", "unit")
 end

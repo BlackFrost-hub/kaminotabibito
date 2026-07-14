@@ -14,6 +14,9 @@ const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．�
 const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
   TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
 };
+const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+};
 
 import { 写入当前剧情动作上下文 } from "./01．剧情动作上下文";
 import { 读取剧情进度 } from "./01．剧情动作上下文";
@@ -23,7 +26,6 @@ const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: numbe
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const StopMusic = jass.StopMusic as (this: void, fadeOut: boolean) => void;
@@ -35,6 +37,8 @@ interface 剧情Boss范围预置触发配置 {
   Boss键?: string;
   需要剧情进度?: number;
 }
+
+export const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 
 interface 剧情Boss预置参数 {
   Boss键?: string;
@@ -118,7 +122,7 @@ export function 创建并冻结剧情Boss预置(this: void, 参数: 剧情Boss�
   if (bossUnit == null || bossUnit === 0) return null;
 
   if (参数.预创建后暂停 === true) {
-    PauseUnit(bossUnit, true);
+    添加单位暂停(bossUnit, 剧情Boss预置暂停来源);
   }
   if (参数.预创建后无敌 === true) {
     SetUnitInvulnerable(bossUnit, true);

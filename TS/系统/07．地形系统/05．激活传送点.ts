@@ -4,7 +4,7 @@
  * - **enabled: false**：该条不启用，不创建单位、不注册任何触发器（与配置中其它字段无关）。
  * - **有 teleportX + teleportY + UnitID（四位 rawcode）**：进入游戏后在坐标处 CreateUnit，再对该单位注册接近检测；
  * - **仅有 UnitID 且为地图已创建的 gg_unit_***：依次尝试 jass.globals → jass.common → globalThis 上的同名键，注册接近检测；
- * - 首次有**任意单位**进入范围：将传送点单位交给玩家 7、若有 reveal 则 **SetFogStateRect(Player(0), FOG_OF_WAR_VISIBLE, rect, true)**（单份矩形雾，不创建多份修饰器）、**仅玩家 1～4** 显示提示文本；**DestroyTrigger** 排泄事件，不保留检测。
+ * - 首次有**已注册玩家英雄**进入范围：将传送点单位交给玩家 7、若有 reveal 则 **SetFogStateRect(Player(0), FOG_OF_WAR_VISIBLE, rect, true)**（单份矩形雾，不创建多份修饰器）、**仅玩家 1～4** 显示提示文本；**DestroyTrigger** 排泄事件，不保留检测。
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
@@ -13,6 +13,9 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
 import 激活传送点配置, { PointConfig } from "./04．激活传送点配置";
 const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
@@ -227,6 +230,7 @@ function onActivationPointEnter(): void {
   if (activationPointTriggerFiredByKey[key] === true) return;
   const enterer = (jass as any).GetTriggerUnit();
   if (enterer == null || enterer === 0) return;
+  if (!是玩家英雄组单位(enterer)) return;
   const cfg = 激活传送点配置[key];
   const watchUnit = activationPointTriggerWatchUnitByKey[key];
   if (!cfg || watchUnit == null || watchUnit === 0) return;
@@ -257,7 +261,7 @@ function registerOnePoint(cfg: PointConfig, key: string): void {
     watchUnit,
     ACTIVATION_RANGE,
     null,
-    true
+    false
   );
 
   activationPointTriggerKeyByHid[(jass as any).GetHandleId(trig) as number] = key;

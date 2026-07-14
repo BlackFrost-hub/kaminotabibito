@@ -10,16 +10,19 @@ local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____02_FF0E_5267_60C5_6B65_
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local removePeriodicCallback = ____require_result_0.removePeriodicCallback
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
-local ____require_result_2 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local IsUnitAliveBJ = ____require_result_2.IsUnitAliveBJ
-local ____require_result_3 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterUnitInRangeSimple = ____require_result_3.TriggerRegisterUnitInRangeSimple
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_0["添加单位暂停"]
+local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
+local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_3.IsUnitAliveBJ
+local ____require_result_4 = require("lib.扩展函数.BJ函数.01．触发与事件")
+local TriggerRegisterUnitInRangeSimple = ____require_result_4.TriggerRegisterUnitInRangeSimple
 local CreateTrigger = jass.CreateTrigger
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetTriggerUnit = jass.GetTriggerUnit
@@ -55,15 +58,14 @@ ____exports["执行地精祭祀Boss前导激活"] = function(_____53C2_6570)
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 2 or not ____Boss_4ECD_662F_524D_5BFC_72B6_6001(bossUnit) or not _____89E6_53D1_5355_4F4D_662F_73A9_5BB6_82F1_96C4(_____89E6_53D1_5355_4F4D) then
         return
     end
-    local ____require_result_4 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
-    local _____5199_5165_5267_60C5_8FDB_5EA6 = ____require_result_4["写入剧情进度"]
+    local ____require_result_5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
+    local _____5199_5165_5267_60C5_8FDB_5EA6 = ____require_result_5["写入剧情进度"]
     _____5199_5165_5267_60C5_8FDB_5EA6(__TS__Number(_____53C2_6570["设置剧情进度"]) or 3)
     local _____8840_6761Boss_7EC4 = YDUserDataGetSafe("string", "血条Boss", "单位组", "group")
     if _____8840_6761Boss_7EC4 ~= nil and _____8840_6761Boss_7EC4 ~= 0 then
         local GroupAddUnit = jass.GroupAddUnit
         GroupAddUnit(_____8840_6761Boss_7EC4, bossUnit)
     end
-    local PauseUnit = jass.PauseUnit
     local SetUnitInvulnerable = jass.SetUnitInvulnerable
     local SetUnitOwner = jass.SetUnitOwner
     SetUnitOwner(
@@ -71,7 +73,7 @@ ____exports["执行地精祭祀Boss前导激活"] = function(_____53C2_6570)
         Player(PLAYER_NEUTRAL_AGGRESSIVE),
         true
     )
-    PauseUnit(bossUnit, true)
+    _____6DFB_52A0_5355_4F4D_6682_505C(bossUnit, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
     SetUnitInvulnerable(bossUnit, true)
 end
 ____exports["执行地精祭祀Boss战正式注册"] = function(_____53C2_6570)
@@ -79,18 +81,18 @@ ____exports["执行地精祭祀Boss战正式注册"] = function(_____53C2_6570)
     if bossUnit == nil or bossUnit == 0 or not IsUnitAliveBJ(bossUnit) then
         return
     end
-    local ____53C2_6570__6CE8_518CBoss_6280_80FD_4E8B_4EF6_5 = _____53C2_6570["注册Boss技能事件"]
-    if ____53C2_6570__6CE8_518CBoss_6280_80FD_4E8B_4EF6_5 == nil then
-        ____53C2_6570__6CE8_518CBoss_6280_80FD_4E8B_4EF6_5 = ""
+    local ____53C2_6570__6CE8_518CBoss_6280_80FD_4E8B_4EF6_6 = _____53C2_6570["注册Boss技能事件"]
+    if ____53C2_6570__6CE8_518CBoss_6280_80FD_4E8B_4EF6_6 == nil then
+        ____53C2_6570__6CE8_518CBoss_6280_80FD_4E8B_4EF6_6 = ""
     end
-    local _____6280_80FD_89E6_53D1_5668_540D = tostring(____53C2_6570__6CE8_518CBoss_6280_80FD_4E8B_4EF6_5)
-    local ____temp_6
+    local _____6280_80FD_89E6_53D1_5668_540D = tostring(____53C2_6570__6CE8_518CBoss_6280_80FD_4E8B_4EF6_6)
+    local ____temp_7
     if _____6280_80FD_89E6_53D1_5668_540D ~= "" then
-        ____temp_6 = jglobals[_____6280_80FD_89E6_53D1_5668_540D]
+        ____temp_7 = jglobals[_____6280_80FD_89E6_53D1_5668_540D]
     else
-        ____temp_6 = nil
+        ____temp_7 = nil
     end
-    local _____6280_80FD_89E6_53D1_5668 = ____temp_6
+    local _____6280_80FD_89E6_53D1_5668 = ____temp_7
     if _____6280_80FD_89E6_53D1_5668 ~= nil and _____6280_80FD_89E6_53D1_5668 ~= 0 then
         TriggerRegisterUnitEvent(_____6280_80FD_89E6_53D1_5668, bossUnit, EVENT_UNIT_SPELL_EFFECT)
     end

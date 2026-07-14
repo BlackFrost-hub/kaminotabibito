@@ -35,9 +35,9 @@ const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
-const { 申请单位暂停占用, 释放单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
-  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 
 const 莫尔特斯根系觉醒暂停来源 = "Boss:Moltes:根系觉醒";
@@ -144,7 +144,7 @@ function 莫尔特斯根系觉醒超时(this: void, _剩余数量: number, conte
 function 莫尔特斯根系觉醒结束(this: void, _是否成功: boolean, _剩余数量: number, context: 莫尔特斯运行时上下文): void {
   if (单位有效(context.Boss单位)) {
     ShowUnit(context.Boss单位, true);
-    释放单位暂停占用(context.Boss单位, 莫尔特斯根系觉醒暂停来源);
+    移除单位暂停(context.Boss单位, 莫尔特斯根系觉醒暂停来源);
   }
   context.腐败之源组 = undefined;
 }
@@ -164,7 +164,7 @@ export function 尝试触发莫尔特斯根系觉醒(this: void, context: 莫尔
     触发概率百分比: 莫尔特斯音效配置.怪物拟声.转阶段触发概率百分比,
   });
   ShowUnit(context.Boss单位, false);
-  申请单位暂停占用(context.Boss单位, 莫尔特斯根系觉醒暂停来源);
+  添加单位暂停(context.Boss单位, 莫尔特斯根系觉醒暂停来源);
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
   context.腐败之源组 = 创建限时摧毁目标组({
     清理: context.清理,

@@ -22,9 +22,9 @@ const {
   getBuffRuntime: (this: void, unit: any, buffID: string) => any | null;
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
 };
-const { 申请单位暂停占用, 释放单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
-  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 const { Sound3DII_UnitPlay } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_UnitPlay: (this: void, path: string, unit: any, cutoff: number, model?: any) => any;
@@ -167,7 +167,7 @@ function 清除睡眠状态(状态: 睡眠状态, 原因: 睡眠结束原因): v
   delete 睡眠状态表[状态.目标单位ID];
   delete 睡眠结束原因表[状态.目标单位ID];
   移除睡眠目标ID(状态.目标单位ID);
-  释放单位暂停占用(状态.目标单位, 状态.暂停来源);
+  移除单位暂停(状态.目标单位, 状态.暂停来源);
 
   const event = 构建睡眠事件(状态, 原因);
   if (原因 === "伤害打破") {
@@ -328,7 +328,7 @@ export function 施加睡眠(this: void, 参数: 睡眠参数): boolean {
     return false;
   }
 
-  if (!申请单位暂停占用(目标单位, 暂停来源)) {
+  if (!添加单位暂停(目标单位, 暂停来源)) {
     睡眠结束原因表[目标单位ID] = "手动";
     移除单位指定Buff(目标单位, 睡眠BuffID);
     return false;

@@ -153,6 +153,18 @@ MPQ 准备好后执行：
 tools\voice-pack-loader\make_mix.bat tools\voice-pack-loader\build\syzl_voice_pack_loader.dll build\voice-pack\syzl_voice_pack_v001.mpq build\voice-pack\syzl_voice_pack_v001.mix
 ```
 
+MIX 的组成关系是：
+
+```text
+MIX = loader DLL + MPQ 资源数据
+```
+
+- MPQ 是语音资源主体。
+- loader DLL 负责调用 Storm 的 `SFileOpenArchive` 加载 MPQ。
+- 普通外置语音包优先级使用 `0x0A`。
+- 只有明确需要覆盖地图内同路径资源时才使用 `0x11`。
+- 这是 DLL 加载路线，只用于项目认可的发布和测试环境。
+
 成功后复制到 Warcraft III 目录：
 
 ```powershell
@@ -167,6 +179,25 @@ Copy-Item -LiteralPath "build\voice-pack\syzl_voice_pack_v001.mix" -Destination 
 ```powershell
 Copy-Item -LiteralPath "build\voice-pack\syzl_voice_pack_v001.mix" -Destination "F:\Warcraft III Frozen Throne\syzl_voice_pack_v001_YYYYMMDD_HHMM.mix" -Force
 ```
+
+## 发布文件与版本清单
+
+正式发布时至少随地图提供：
+
+```text
+syzl_voice_pack_v001.mix
+syzl_voice_pack_manifest.txt
+```
+
+`syzl_voice_pack_manifest.txt` 至少记录：
+
+- 外置语音包版本。
+- 包含的 BossKey。
+- Voice 文件总数。
+- 生成日期。
+- 对应地图版本。
+
+地图本体继续包含战斗机制、中文系统台词和关键 SFX。玩家没有安装外置 MIX 时，只缺少可选 Boss Voice，战斗和剧情推进仍必须正常。
 
 ## 验证方式
 

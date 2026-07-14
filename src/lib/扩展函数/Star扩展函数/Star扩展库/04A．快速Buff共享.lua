@@ -6,7 +6,7 @@ local YDWESetUnitAbilityDataReal = ____00_FF0EYDWE_51FD_6570.YDWESetUnitAbilityD
 local EXSetUnitFacing = ____00_FF0EYDWE_51FD_6570.EXSetUnitFacing
 local ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local GS_Suspend = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF.GS_Suspend
-local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528_5B9A_65F6 = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF["申请单位暂停占用定时"]
+local _____8BBE_7F6E_5355_4F4D_6682_505C_65F6_95F4 = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF["设置单位暂停时间"]
 local ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570 = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数")
 local SUC_IsUnitStructure = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570.SUC_IsUnitStructure
 local SUC_IsValidUnit = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570.SUC_IsValidUnit
@@ -469,11 +469,11 @@ ____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time)
         0
     )
     if id == 21 then
-        GS_Suspend(u, time)
+        _____8BBE_7F6E_5355_4F4D_6682_505C_65F6_95F4(u, "SFB_Stun", time)
     elseif id == 22 then
-        _____7533_8BF7_5355_4F4D_6682_505C_5360_7528_5B9A_65F6(u, "SFB_Pause", time, "刷新")
+        _____8BBE_7F6E_5355_4F4D_6682_505C_65F6_95F4(u, "SFB_Pause", time)
     elseif id == 23 then
-        _____7533_8BF7_5355_4F4D_6682_505C_5360_7528_5B9A_65F6(u, "SFB_EXPause", time, "刷新")
+        _____8BBE_7F6E_5355_4F4D_6682_505C_65F6_95F4(u, "SFB_EXPause", time)
     end
 end
 ____exports.SFB_Init()

@@ -16,16 +16,18 @@ local ____require_result_2 = require("系统.01．单位系统.08．单位配置
 local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_2["按名字反查Boss单位ID"]
 local ____require_result_3 = require("lib.扩展函数.BJ函数.01．触发与事件")
 local TriggerRegisterUnitInRangeSimple = ____require_result_3.TriggerRegisterUnitInRangeSimple
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
 local CreateTrigger = jass.CreateTrigger
 local CreateUnit = jass.CreateUnit
 local GetHandleId = jass.GetHandleId
 local GetTriggerUnit = jass.GetTriggerUnit
 local GetTriggeringTrigger = jass.GetTriggeringTrigger
-local PauseUnit = jass.PauseUnit
 local Player = jass.Player
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local StopMusic = jass.StopMusic
 local TriggerAddAction = jass.TriggerAddAction
+____exports["剧情Boss预置暂停来源"] = "剧情系统:Boss预置"
 local _____8303_56F4_9884_7F6E_89E6_53D1_914D_7F6E_8868 = {}
 local function _____89E3_6790Boss_8868_952E(____boss_952E)
     if ____boss_952E == nil or ____boss_952E == "" then
@@ -58,8 +60,8 @@ local function ____on_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1()
         ["触发单位"] = GetTriggerUnit()
     })
     if _____914D_7F6E["剧情片段ID"] ~= nil and _____914D_7F6E["剧情片段ID"] ~= "" then
-        local ____require_result_4 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-        local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_4["播放主线剧情片段"]
+        local ____require_result_5 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+        local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_5["播放主线剧情片段"]
         _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____914D_7F6E["剧情片段ID"])
     end
 end
@@ -94,7 +96,7 @@ ____exports["创建并冻结剧情Boss预置"] = function(_____53C2_6570)
         return nil
     end
     if _____53C2_6570["预创建后暂停"] == true then
-        PauseUnit(bossUnit, true)
+        _____6DFB_52A0_5355_4F4D_6682_505C(bossUnit, ____exports["剧情Boss预置暂停来源"])
     end
     if _____53C2_6570["预创建后无敌"] == true then
         SetUnitInvulnerable(bossUnit, true)

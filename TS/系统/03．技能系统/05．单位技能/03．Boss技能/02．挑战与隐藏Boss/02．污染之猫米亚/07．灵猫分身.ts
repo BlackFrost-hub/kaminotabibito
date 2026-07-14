@@ -86,7 +86,7 @@ function 安排分身到期结算(this: void, context: 米亚运行时上下文,
       if (!单位有效(summon)) continue;
       aliveCount++;
       创建单位脚下点特效(summon, {
-        模型路径: "war3mapImported\\blackblink.mdx",
+        模型路径: "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx",
         持续秒: 1.2,
         缩放: 1,
       });
@@ -117,7 +117,7 @@ function 触发米亚灵猫分身(this: void, context: 米亚运行时上下文)
   播放Boss坐标音效(米亚音效配置.灵猫分身.主辨识音, bossX, bossY, 米亚音效配置.默认裁断距离);
   延迟播放Boss坐标音效(米亚音效配置.灵猫分身.凝形补层, bossX, bossY, 米亚音效配置.灵猫分身.凝形补层延迟Ms, 米亚音效配置.默认裁断距离);
   创建单位脚下点特效(boss, {
-    模型路径: "war3mapImported\\blackblink.mdx",
+    模型路径: "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx",
     持续秒: 1.2,
     缩放: 1,
   });

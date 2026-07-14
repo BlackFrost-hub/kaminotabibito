@@ -259,7 +259,8 @@ isValidCombatEnemyUnit = ____require_result_11.isValidCombatEnemyUnit
 local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 debugLogForce = ____require_result_12.debugLogForce
 local ____require_result_13 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____5237_65B0_5355_4F4D_6682_505C_5E95_5C42_72B6_6001 = ____require_result_13["刷新单位暂停底层状态"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_13["移除单位暂停"]
+local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
 GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -475,7 +476,7 @@ ____exports["完成Boss战启动"] = function(context)
     _____63A5_7BA1Boss_6218_533A_57DF_97F3_9891(context)
     ____exports["确保Boss战区域视野"](context["地点矩形"])
     SetUnitInvulnerable(context["Boss单位"], false)
-    _____5237_65B0_5355_4F4D_6682_505C_5E95_5C42_72B6_6001(context["Boss单位"])
+    _____79FB_9664_5355_4F4D_6682_505C(context["Boss单位"], _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
     if context["地点矩形"] ~= nil and context["地点矩形"] ~= 0 then
         PingMinimap(
             GetRectCenterX(context["地点矩形"]),

@@ -66,8 +66,8 @@ local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_r
 local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
 local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["申请单位暂停占用"]
-local _____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["释放单位暂停占用"]
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
 local _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90 = "Boss:Moltes:根系觉醒"
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
@@ -187,7 +187,7 @@ end
 local function _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_7ED3_675F(______662F_5426_6210_529F, ______5269_4F59_6570_91CF, context)
     if _____5355_4F4D_6709_6548(context["Boss单位"]) then
         ShowUnit(context["Boss单位"], true)
-        _____91CA_653E_5355_4F4D_6682_505C_5360_7528(context["Boss单位"], _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90)
+        _____79FB_9664_5355_4F4D_6682_505C(context["Boss单位"], _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90)
     end
     context["腐败之源组"] = nil
 end
@@ -213,7 +213,7 @@ ____exports["尝试触发莫尔特斯根系觉醒"] = function(context)
         ["触发概率百分比"] = _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["转阶段触发概率百分比"]
     })
     ShowUnit(context["Boss单位"], false)
-    _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(context["Boss单位"], _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90)
+    _____6DFB_52A0_5355_4F4D_6682_505C(context["Boss单位"], _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根系觉醒"]
     context["腐败之源组"] = _____521B_5EFA_9650_65F6_6467_6BC1_76EE_6807_7EC4({
         ["清理"] = context["清理"],

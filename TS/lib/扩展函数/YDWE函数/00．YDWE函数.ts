@@ -172,7 +172,7 @@ export function EXSetUnitFacing(u: any, angle: number): void {
   japi.EXSetUnitFacing(u, angle);
 }
 
-// 暂停/恢复单位（flag=true暂停，false恢复）
+// JAPI 底层兼容接口。EXPauseUnit 自带引用计数，业务统一通过硬直暂停系统的中文接口调用。
 export function EXPauseUnit(u: any, flag: boolean): void {
   japi.EXPauseUnit(u, flag);
 }
@@ -187,12 +187,12 @@ export function EXSetUnitMoveType(u: any, t: number): void {
   japi.EXSetUnitMoveType(u, t);
 }
 
-// 眩晕单位
+// 旧代码兼容：新业务请使用“添加单位暂停”。
 export function YDWEUnitAddStun(u: any): void {
   EXPauseUnit(u, true);
 }
 
-// 解除眩晕
+// 旧代码兼容：新业务请使用“移除单位暂停”。
 export function YDWEUnitRemoveStun(u: any): void {
   EXPauseUnit(u, false);
 }

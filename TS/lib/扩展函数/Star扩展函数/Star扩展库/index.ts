@@ -53,6 +53,13 @@ export function registerBridge(): void {
   expose("GS_IsUnitSuspending", suspend.GS_IsUnitSuspending);
   expose("GS_LoadSuspend", suspend.GS_LoadSuspend);
   expose("GS_UnitSuspend", suspend.GS_UnitSuspend);
+  expose("添加单位暂停", suspend.添加单位暂停);
+  expose("移除单位暂停", suspend.移除单位暂停);
+  expose("设置单位暂停时间", suspend.设置单位暂停时间);
+  expose("增加单位暂停时间", suspend.增加单位暂停时间);
+  expose("减少单位暂停时间", suspend.减少单位暂停时间);
+  expose("单位是否暂停", suspend.单位是否暂停);
+  expose("获取单位暂停剩余时间", suspend.获取单位暂停剩余时间);
   expose("GS_AcquireUnitPause", suspend.申请单位暂停占用);
   expose("GS_ReleaseUnitPause", suspend.释放单位暂停占用);
   expose("GS_AcquireUnitPauseUnique", suspend.申请单位暂停独立占用);

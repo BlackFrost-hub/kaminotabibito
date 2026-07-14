@@ -2,6 +2,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const 剧情特殊事件暂停来源 = "剧情系统:特殊事件";
 
 const { registerSpellChannelListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellChannelListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
@@ -68,7 +72,6 @@ const GetUnitName = jass.GetUnitName as (this: void, whichUnit: any) => string;
 const GetUnitState = jass.GetUnitState as (this: void, whichUnit: any, whichState: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
 const IsUnitInRangeXY = jass.IsUnitInRangeXY as (this: void, whichUnit: any, x: number, y: number, distance: number) => boolean;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const PingMinimap = jass.PingMinimap as (this: void, x: number, y: number, duration: number) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveUnit = jass.RemoveUnit as (this: void, whichUnit: any) => void;
@@ -224,7 +227,7 @@ function 执行最终伤害推进剧情(this: void, 配置: 主线剧情最终�
     SetUnitOwner(target, Player(配置.切换所属玩家ID), true);
   }
   if (配置.暂停目标单位 === true) {
-    PauseUnit(target, true);
+    添加单位暂停(target, 剧情特殊事件暂停来源);
   }
 
   执行区域音乐切换(配置);

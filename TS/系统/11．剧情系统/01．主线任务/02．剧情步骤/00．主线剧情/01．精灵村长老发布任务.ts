@@ -1,6 +1,11 @@
 /** @noSelfInFile */
 
 const jglobals = require("jass.globals") as any;
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 const { SetUnitFacingToFaceUnitTimed, ModifyHeroStat } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   SetUnitFacingToFaceUnitTimed: (this: void, whichUnit: any, target: any, duration: number) => void;
   ModifyHeroStat: (this: void, whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
@@ -52,7 +57,6 @@ const {
   IssueImmediateOrder,
   IsUnitInGroup,
   Location,
-  PauseUnit,
   Player,
   PLAYER_NEUTRAL_PASSIVE,
   RemoveLocation,
@@ -87,7 +91,6 @@ const {
   IssueImmediateOrder: (this: void, whichUnit: any, order: string) => boolean;
   IsUnitInGroup: (this: void, whichUnit: any, whichGroup: any) => boolean;
   Location: (this: void, x: number, y: number) => any;
-  PauseUnit: (this: void, whichUnit: any, flag: boolean) => void;
   Player: (this: void, whichPlayer: number) => any;
   PLAYER_NEUTRAL_PASSIVE: number;
   RemoveLocation: (this: void, whichLocation: any) => void;
@@ -245,7 +248,11 @@ export function 执行地精祭祀Boss预备(this: void, 参数: 剧情动作参
   const bossUnit = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), bossTypeId, Number(参数.X) || -26032.4, Number(参数.Y) || -13789.5, Number(参数.朝向) || 270);
   if (bossUnit == null || bossUnit === 0) return;
   YDUserDataSetSafe("string", "Boss", "地精巫师", "unit", bossUnit);
-  PauseUnit(bossUnit, 参数.预创建后暂停 === true);
+  if (参数.预创建后暂停 === true) {
+    添加单位暂停(bossUnit, 剧情Boss预置暂停来源);
+  } else {
+    移除单位暂停(bossUnit, 剧情Boss预置暂停来源);
+  }
   SetUnitInvulnerable(bossUnit, 参数.预创建后无敌 === true);
 }
 

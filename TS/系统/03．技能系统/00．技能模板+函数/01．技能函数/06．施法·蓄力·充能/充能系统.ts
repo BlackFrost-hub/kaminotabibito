@@ -32,11 +32,11 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index"
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 const {
-  申请单位暂停占用,
-  释放单位暂停占用,
+  添加单位暂停,
+  移除单位暂停,
 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
-  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 
 import { 创建进度条特效, 销毁单位进度条特效 } from "./进度条特效";
@@ -281,7 +281,7 @@ function 结束充能实例(实例: 充能实例, 原因: 充能结束原因): v
     销毁单位进度条特效(实例.单位);
   }
   if (实例.强制硬直 && 实例.强制硬直来源 != null) {
-    释放单位暂停占用(实例.单位, 实例.强制硬直来源);
+    移除单位暂停(实例.单位, 实例.强制硬直来源);
   }
 
   if (原因 === "完成" && 单位存活(实例.单位)) {
@@ -405,7 +405,7 @@ export function 开始充能(单位: any, 参数: 充能参数): number {
   活动充能列表.push(新实例);
   充能映射[充能ID] = 新实例;
   单位当前充能[单位ID] = 充能ID;
-  if (强制硬直 && 强制硬直来源 != null) 申请单位暂停占用(单位, 强制硬直来源);
+  if (强制硬直 && 强制硬直来源 != null) 添加单位暂停(单位, 强制硬直来源);
   if (新实例.指令中断) 确保注册指令中断监听();
 
   if (显示进度条特效) {

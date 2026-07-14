@@ -31,9 +31,9 @@ const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．�
 const { 临时调整护甲 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   临时调整护甲: (this: void, unit: any, value: number) => void;
 };
-const { 申请单位暂停占用, 释放单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
-  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 
 const 卡瑟拉触手解放暂停来源 = "Boss:Kasela:触手解放";
@@ -68,7 +68,7 @@ function 回归卡瑟拉(this: void, data: 触手解放实例, success: boolean)
   context.Boss潜入中 = false;
   if (!单位有效(boss)) return;
   ShowUnit(boss, true);
-  释放单位暂停占用(boss, 卡瑟拉触手解放暂停来源);
+  移除单位暂停(boss, 卡瑟拉触手解放暂停来源);
   播放潜入特效(GetUnitX(boss), GetUnitY(boss));
   const cfg = 卡瑟拉数值与表现配置.触手解放;
   if (success) {
@@ -133,7 +133,7 @@ export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉
   });
   播放潜入特效(GetUnitX(boss), GetUnitY(boss));
   ShowUnit(boss, false);
-  申请单位暂停占用(boss, 卡瑟拉触手解放暂停来源);
+  添加单位暂停(boss, 卡瑟拉触手解放暂停来源);
   创建技能提示圈({
     类型: "双环",
     X: GetUnitX(boss),

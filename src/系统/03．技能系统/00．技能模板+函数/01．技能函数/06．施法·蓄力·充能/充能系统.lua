@@ -3,7 +3,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____83B7_53D6_5730_5F62_9AD8_5EA6, _____8BA1_7B97_5145_80FD_8FDB_5EA6, _____64AD_653E_5355_4F4D_5750_6807_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668, _____89E6_53D1_5145_80FD_6253_65AD_56DE_8C03, _____7ED3_675F_5145_80FD_5B9E_4F8B, ____on_5145_80FD_7CFB_7EDFTick, jass, offTick10ms, YDWETimerDestroyEffect, _____91CA_653E_5355_4F4D_6682_505C_5360_7528, GetUnitTypeId, GetUnitState, IsUnitType, GetUnitX, GetUnitY, GetUnitFlyHeight, AddSpecialEffect, Location, MoveLocation, GetLocationZ, EXSetEffectZ, TICK_INTERVAL, CENTER_TIMER_TICKS, UNIT_ALIVE_LIFE, _____6D3B_52A8_5145_80FD_5217_8868, _____5145_80FD_6620_5C04, _____5355_4F4D_5F53_524D_5145_80FD, _____5145_80FD_6253_65AD_56DE_8C03_5217_8868, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570, _____5730_5F62_91C7_6837_70B9
+local _____5355_4F4D_5B58_6D3B, _____83B7_53D6_5730_5F62_9AD8_5EA6, _____8BA1_7B97_5145_80FD_8FDB_5EA6, _____64AD_653E_5355_4F4D_5750_6807_7279_6548, _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_5173_95ED_4E2D_5FC3_8BA1_65F6_5668, _____89E6_53D1_5145_80FD_6253_65AD_56DE_8C03, _____7ED3_675F_5145_80FD_5B9E_4F8B, ____on_5145_80FD_7CFB_7EDFTick, jass, offTick10ms, YDWETimerDestroyEffect, _____79FB_9664_5355_4F4D_6682_505C, GetUnitTypeId, GetUnitState, IsUnitType, GetUnitX, GetUnitY, GetUnitFlyHeight, AddSpecialEffect, Location, MoveLocation, GetLocationZ, EXSetEffectZ, TICK_INTERVAL, CENTER_TIMER_TICKS, UNIT_ALIVE_LIFE, _____6D3B_52A8_5145_80FD_5217_8868, _____5145_80FD_6620_5C04, _____5355_4F4D_5F53_524D_5145_80FD, _____5145_80FD_6253_65AD_56DE_8C03_5217_8868, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570, _____5730_5F62_91C7_6837_70B9
 local _____8FDB_5EA6_6761_7279_6548 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.进度条特效")
 local _____521B_5EFA_8FDB_5EA6_6761_7279_6548 = _____8FDB_5EA6_6761_7279_6548["创建进度条特效"]
 local _____9500_6BC1_5355_4F4D_8FDB_5EA6_6761_7279_6548 = _____8FDB_5EA6_6761_7279_6548["销毁单位进度条特效"]
@@ -92,7 +92,7 @@ function _____7ED3_675F_5145_80FD_5B9E_4F8B(_____5B9E_4F8B, _____539F_56E0)
         _____9500_6BC1_5355_4F4D_8FDB_5EA6_6761_7279_6548(_____5B9E_4F8B["单位"])
     end
     if _____5B9E_4F8B["强制硬直"] and _____5B9E_4F8B["强制硬直来源"] ~= nil then
-        _____91CA_653E_5355_4F4D_6682_505C_5360_7528(_____5B9E_4F8B["单位"], _____5B9E_4F8B["强制硬直来源"])
+        _____79FB_9664_5355_4F4D_6682_505C(_____5B9E_4F8B["单位"], _____5B9E_4F8B["强制硬直来源"])
     end
     if _____539F_56E0 == "完成" and _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) then
         _____64AD_653E_5355_4F4D_5750_6807_7279_6548(_____5B9E_4F8B["单位"], _____5B9E_4F8B["完成特效"], _____5B9E_4F8B["完成特效生命周期"])
@@ -180,8 +180,8 @@ YDWETimerDestroyEffect = ____require_result_2.YDWETimerDestroyEffect
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLogForce = ____require_result_3.debugLogForce
 local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["申请单位暂停占用"]
-_____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_4["释放单位暂停占用"]
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
+_____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
 local _____8C03_8BD5_6A21_5757_540D = "充能系统"
 local GetHandleId = jass.GetHandleId
 GetUnitTypeId = jass.GetUnitTypeId
@@ -384,7 +384,7 @@ ____exports["开始充能"] = function(_____5355_4F4D, _____53C2_6570)
     _____5145_80FD_6620_5C04[_____5145_80FDID] = _____65B0_5B9E_4F8B
     _____5355_4F4D_5F53_524D_5145_80FD[_____5355_4F4DID] = _____5145_80FDID
     if _____5F3A_5236_786C_76F4 and _____5F3A_5236_786C_76F4_6765_6E90 ~= nil then
-        _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(_____5355_4F4D, _____5F3A_5236_786C_76F4_6765_6E90)
+        _____6DFB_52A0_5355_4F4D_6682_505C(_____5355_4F4D, _____5F3A_5236_786C_76F4_6765_6E90)
     end
     if _____65B0_5B9E_4F8B["指令中断"] then
         _____786E_4FDD_6CE8_518C_6307_4EE4_4E2D_65AD_76D1_542C()

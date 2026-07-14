@@ -8,27 +8,31 @@
 
 const jass = require("jass.common") as any;
 const GetUnitFacing = jass.GetUnitFacing as (whichUnit: any) => number;
-const PauseUnit = jass.PauseUnit as (whichUnit: any, flag: boolean) => void;
 const g = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   createDelayedCall: (this: void, delaySec: number, callback: () => { id: number } | unknown) => unknown;
+};
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, 来源: string) => boolean;
+  移除单位暂停: (this: void, unit: any, 来源: string) => boolean;
 };
 
 import { 开始击退 } from "../01．技能函数/02．冲锋·击退/index";
 
 let 当前测试单位: any | undefined;
+const 测试暂停来源 = "冲锋击退测试:短暂停";
 
 function 恢复测试单位暂停(): void {
   const 测试单位 = 当前测试单位;
   if (测试单位 != null && 测试单位 !== 0) {
-    PauseUnit(测试单位, false);
+    移除单位暂停(测试单位, 测试暂停来源);
   }
 }
 
 function 暂停测试单位(): void {
   const 测试单位 = 当前测试单位;
   if (测试单位 != null && 测试单位 !== 0) {
-    PauseUnit(测试单位, true);
+    添加单位暂停(测试单位, 测试暂停来源);
     createDelayedCall(0.03, 恢复测试单位暂停);
   }
 }

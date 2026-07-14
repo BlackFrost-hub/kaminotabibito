@@ -16,8 +16,8 @@ import {
   X_IsTerrainWalkable, X_GetAbleX, X_GetAbleY,
 } from "./00．共享";
 
-const { 释放单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
+const { 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 
 const 牵引暂停来源 = "牵引系统";
@@ -133,7 +133,7 @@ export function 结束牵引实例(实例: 牵引实例, 原因: 牵引结束原
     SetUnitPathing(实例.单位, true);
   }
   if (实例.暂停单位) {
-    释放单位暂停占用(实例.单位, 牵引暂停来源);
+    移除单位暂停(实例.单位, 牵引暂停来源);
   }
 
   const 单位 = 实例.单位;

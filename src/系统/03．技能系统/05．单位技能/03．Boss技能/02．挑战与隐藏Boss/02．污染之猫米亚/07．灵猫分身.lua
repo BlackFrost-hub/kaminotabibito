@@ -101,7 +101,7 @@ local function _____5B89_6392_5206_8EAB_5230_671F_7ED3_7B97(context, summons)
                             goto __continue16
                         end
                         aliveCount = aliveCount + 1
-                        _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(summon, {["模型路径"] = "war3mapImported\\blackblink.mdx", ["持续秒"] = 1.2, ["缩放"] = 1})
+                        _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(summon, {["模型路径"] = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx", ["持续秒"] = 1.2, ["缩放"] = 1})
                         RemoveUnit(summon)
                     end
                     ::__continue16::
@@ -138,7 +138,7 @@ local function _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
         _____7C73_4E9A_97F3_6548_914D_7F6E["灵猫分身"]["凝形补层延迟Ms"],
         _____7C73_4E9A_97F3_6548_914D_7F6E["默认裁断距离"]
     )
-    _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(boss, {["模型路径"] = "war3mapImported\\blackblink.mdx", ["持续秒"] = 1.2, ["缩放"] = 1})
+    _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(boss, {["模型路径"] = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx", ["持续秒"] = 1.2, ["缩放"] = 1})
     local offsets = {-1, 1}
     do
         local i = 0

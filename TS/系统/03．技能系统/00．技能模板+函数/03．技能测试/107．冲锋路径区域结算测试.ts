@@ -19,7 +19,6 @@ const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事�
 
 import { 开始冲锋并在结束时结算路径区域 } from "../01．技能函数/02．冲锋·击退/index";
 import { 开始技能前摇, 创建冲锋路径前摇提示 } from "../00．技能模板/01．多阶段技能编排/index";
-import { 开始硬直 } from "../02．通用函数/01．控制与Buff";
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
@@ -101,8 +100,7 @@ function 执行冲锋路径斩杀(大法师: any): void {
 }
 
 function 前摇开始_播放施法动作(单位: any, 前摇ID: number): void {
-  开始硬直(单位, 前摇时间);
-  debugLogForce(模块名, "前摇开始：前摇ID=", 前摇ID, "先硬直，再由前摇模块零秒后播放动作=attack 硬直=", 前摇时间);
+  debugLogForce(模块名, "前摇开始：前摇ID=", 前摇ID, "由前摇模块托管强制硬直并播放动作=attack 硬直=", 前摇时间);
 }
 
 function 前摇结束_恢复待机动作(单位: any, 原因: string, 前摇ID: number): void {
@@ -121,6 +119,7 @@ function on聊天1007测试(): void {
 
   const 前摇ID = 开始技能前摇(大法师, {
     持续时间: 前摇时间,
+    强制硬直: true,
     施法动作名: "attack",
     创建提示特效: 冲锋路径前摇提示.创建提示特效,
     销毁提示特效: 冲锋路径前摇提示.销毁提示特效,

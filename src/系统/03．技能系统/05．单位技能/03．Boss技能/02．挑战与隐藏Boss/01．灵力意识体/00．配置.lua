@@ -5,7 +5,6 @@ local ____exports = {}
 ____exports["灵力意识体单位技能配置"] = {
     ["单位ID"] = "N05D",
     ["单位名"] = "灵力意识体",
-    ["预警特效"] = "war3mapImported\\mr.war3_ring.mdl",
     ["爆点特效1"] = "war3mapImported\\superdarkflash.mdl",
     ["爆点特效2"] = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl",
     ["伤害半径"] = 240,

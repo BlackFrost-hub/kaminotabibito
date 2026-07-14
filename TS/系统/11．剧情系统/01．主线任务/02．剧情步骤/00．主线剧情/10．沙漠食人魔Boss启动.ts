@@ -2,6 +2,11 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const 沙漠食人魔待战暂停来源 = "剧情系统:沙漠食人魔待战";
 
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -26,7 +31,6 @@ export { 沙漠食人魔Boss启动剧情片段 } from "../01．第一章/10．�
 
 const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUnit: any) => boolean;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
@@ -46,7 +50,7 @@ export function 执行沙漠食人魔Boss前置(this: void): void {
   }
 
   SetUnitOwner(bossUnit, Player(PLAYER_NEUTRAL_AGGRESSIVE), true);
-  PauseUnit(bossUnit, true);
+  添加单位暂停(bossUnit, 沙漠食人魔待战暂停来源);
   SetUnitInvulnerable(bossUnit, true);
 
   const 上下文 = 读取当前剧情动作上下文();
@@ -73,7 +77,7 @@ export function 执行沙漠食人魔Boss开战(this: void, 参数: 剧情动作
   }
 
   SetUnitInvulnerable(bossUnit, false);
-  PauseUnit(bossUnit, false);
+  移除单位暂停(bossUnit, 沙漠食人魔待战暂停来源);
   启动Boss战运行(bossUnit);
 }
 

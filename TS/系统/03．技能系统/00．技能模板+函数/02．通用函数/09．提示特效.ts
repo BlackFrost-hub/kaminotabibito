@@ -58,19 +58,33 @@ const RemoveUnit = jass.RemoveUnit as (u: any) => void;
 // ==========================================================================================
 
 const MODEL_DIR = "resource\\models\\Tip\\skillTip\\";
-const MODEL_SQUARE1X = MODEL_DIR + "Abiltip_Square1x.mdx";
-const MODEL_SQUARE2X = MODEL_DIR + "Abiltip_Square2x.mdx";
-const MODEL_SQUARE3X = MODEL_DIR + "Abiltip_Square3x.mdx";
-const MODEL_SQUARE4X = MODEL_DIR + "Abiltip_Square4x.mdx";
-const MODEL_SQUARE5X = MODEL_DIR + "Abiltip_Square5x.mdx";
-const MODEL_SQUARE6X = MODEL_DIR + "Abiltip_Square6x.mdx";
-const MODEL_SECTOR = MODEL_DIR + "AbilTipSX.mdx";
-const MODEL_RING = MODEL_DIR + "mr.war3_ring.mdx";
-const MODEL_RING_THICK = MODEL_DIR + "Abiltip_ring.mdx";
-const MODEL_RING_A = MODEL_DIR + "Tip_ring_A.mdx";
-const MODEL_RING_B = MODEL_DIR + "Tip_ring_B.mdx";
-const MODEL_RING_C = MODEL_DIR + "Tip_ring_C.mdx";
-const 提示圈友方色 = 0xFF40FF40;
+const MODEL_SQUARE1X = MODEL_DIR + "UnifiedTip_Rect1x.mdx";
+const MODEL_SQUARE1_5X = MODEL_DIR + "UnifiedTip_Rect1_5x.mdx";
+const MODEL_SQUARE2X = MODEL_DIR + "UnifiedTip_Rect2x.mdx";
+const MODEL_SQUARE2_5X = MODEL_DIR + "UnifiedTip_Rect2_5x.mdx";
+const MODEL_SQUARE3X = MODEL_DIR + "UnifiedTip_Rect3x.mdx";
+const MODEL_SQUARE3_5X = MODEL_DIR + "UnifiedTip_Rect3_5x.mdx";
+const MODEL_SQUARE4X = MODEL_DIR + "UnifiedTip_Rect4x.mdx";
+const MODEL_SQUARE5X = MODEL_DIR + "UnifiedTip_Rect5x.mdx";
+const MODEL_SQUARE6X = MODEL_DIR + "UnifiedTip_Rect6x.mdx";
+const MODEL_LINE1X = MODEL_DIR + "UnifiedTip_Line1x.mdx";
+const MODEL_LINE1_5X = MODEL_DIR + "UnifiedTip_Line1_5x.mdx";
+const MODEL_LINE2X = MODEL_DIR + "UnifiedTip_Line2x.mdx";
+const MODEL_LINE2_5X = MODEL_DIR + "UnifiedTip_Line2_5x.mdx";
+const MODEL_LINE3X = MODEL_DIR + "UnifiedTip_Line3x.mdx";
+const MODEL_LINE3_5X = MODEL_DIR + "UnifiedTip_Line3_5x.mdx";
+const MODEL_LINE4X = MODEL_DIR + "UnifiedTip_Line4x.mdx";
+const MODEL_LINE5X = MODEL_DIR + "UnifiedTip_Line5x.mdx";
+const MODEL_LINE6X = MODEL_DIR + "UnifiedTip_Line6x.mdx";
+const MODEL_SECTOR = MODEL_DIR + "SimpleSectorTip.mdx";
+const MODEL_RING = MODEL_DIR + "UnifiedTip_Ring.mdx";
+const MODEL_RING_THICK = MODEL_DIR + "UnifiedTip_RingThick.mdx";
+const MODEL_RING_A = MODEL_DIR + "UnifiedTip_Ring_A.mdx";
+const MODEL_RING_B = MODEL_DIR + "UnifiedTip_Ring_B.mdx";
+const MODEL_RING_C = MODEL_DIR + "UnifiedTip_Ring_C.mdx";
+// 所有资源保持中性白色，仅在运行时按来源单位染色。
+// 若后续确定改用淡金色，只需将此常量改为 0xFFFFE6A0。
+const 提示圈友方色 = 0xFFFFFFFF;
 const 提示圈敌方色 = 0xFFFF2020;
 
 // ==========================================================================================
@@ -189,11 +203,18 @@ function 设置提示特效顶点颜色(e: any, color: number): void {
   }
 }
 
-export function 按所属单位设置提示圈颜色(e: any, 来源单位: any): void {
-  if (!e || !来源单位) return;
+export function 按所属单位设置提示圈颜色(e: any, 来源单位: any, 无来源默认颜色: number = 提示圈敌方色): void {
+  if (!e) return;
+  if (!来源单位) {
+    设置提示特效顶点颜色(e, 无来源默认颜色);
+    return;
+  }
 
   const 所属玩家 = GetOwningPlayer(来源单位);
-  if (!所属玩家) return;
+  if (!所属玩家) {
+    设置提示特效顶点颜色(e, 无来源默认颜色);
+    return;
+  }
 
   const 玩家ID = GetPlayerId(所属玩家);
   if (玩家ID >= 0 && 玩家ID <= 5) {
@@ -246,9 +267,10 @@ export function 移除特效步进缩放(特效: any): void {
 // 矩形提示圈
 // ==========================================================================================
 
- /**   
- * /严格且仅支持宽长比 1:1, 1:2, 1:3, 1:4, 1:5, 1:6不支持1:7及以上，否则会出现视觉错误（菱形），因为模型是固定的。
- * 如宽sw=300, 那么长sl=1800
+/**
+ * 精确无变形比例：1:1、1:1.5、1:2、1:2.5、1:3、1:3.5、1:4、1:5、1:6。
+ * 其他比例会选用最接近的预制模型，仍可能出现轻微的非等比拉伸。
+ * 如宽度为 300、比例为 1:1.5，则长度应为 450。
  *
  * @param x X坐标
  * @param y Y坐标
@@ -257,14 +279,15 @@ export function 移除特效步进缩放(特效: any): void {
  * @param fac 朝向角度
  * @param time 持续时间（<=0 表示1秒）
  * @param speed 动画速率（可选，默认 1/time）
- * 严格且仅支持宽长比 1:1~1:6，否则会出现菱形视觉错误
+ * 超过 1:6 时固定使用 6X 模型，比例越大视觉变形越明显。
  */
 export function 创建矩形提示圈(
-  x: number, y: number, width: number, long: number, fac: number, time: number, speed?: number
+  x: number, y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any
 ): void {
   const e = 创建矩形提示圈特效(x, y, width, long, fac, speed);
   if (!e) return;
 
+  按所属单位设置提示圈颜色(e, 来源单位);
   const duration = time <= 0 ? 1 : time + 0.05;
   安全销毁特效(duration, e);
 }
@@ -287,19 +310,28 @@ export function 创建矩形提示圈特效(
   let sl: number;
   const ratio = long / width;
 
-  if (ratio <= 1.0) {
+  if (ratio <= 1.25) {
     model = MODEL_SQUARE1X;
     sl = long / 1000;
-  } else if (ratio <= 2.0) {
+  } else if (ratio <= 1.75) {
+    model = MODEL_SQUARE1_5X;
+    sl = long / 1500;
+  } else if (ratio <= 2.25) {
     model = MODEL_SQUARE2X;
     sl = long / 2000;
-  } else if (ratio <= 3.0) {
+  } else if (ratio <= 2.75) {
+    model = MODEL_SQUARE2_5X;
+    sl = long / 2500;
+  } else if (ratio <= 3.25) {
     model = MODEL_SQUARE3X;
     sl = long / 3000;
-  } else if (ratio <= 4.0) {
+  } else if (ratio <= 3.75) {
+    model = MODEL_SQUARE3_5X;
+    sl = long / 3500;
+  } else if (ratio <= 4.5) {
     model = MODEL_SQUARE4X;
     sl = long / 4000;
-  } else if (ratio <= 5.0) {
+  } else if (ratio <= 5.5) {
     model = MODEL_SQUARE5X;
     sl = long / 5000;
   } else {
@@ -318,6 +350,70 @@ export function 创建矩形提示圈特效(
   return e;
 }
 
+/**
+ * 创建带中轴延伸箭头的方向直线提示。
+ * 预制比例与矩形一致，精确命中时只进行等比缩放。
+ */
+export function 创建方向直线提示圈(
+  x: number, y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any
+): void {
+  const e = 创建方向直线提示圈特效(x, y, width, long, fac, speed);
+  if (!e) return;
+  按所属单位设置提示圈颜色(e, 来源单位);
+  安全销毁特效(time <= 0 ? 1 : time + 0.05, e);
+}
+
+export function 创建方向直线提示圈特效(
+  x: number, y: number, width: number, long: number, fac: number, speed?: number
+): any {
+  if (width <= 0 || long <= 0) return null;
+  if (width > 1500) width = 1500;
+  if (long > 7500) long = 7500;
+
+  let model: string;
+  let modelLong: number;
+  const ratio = long / width;
+  if (ratio <= 1.25) {
+    model = MODEL_LINE1X;
+    modelLong = 1000;
+  } else if (ratio <= 1.75) {
+    model = MODEL_LINE1_5X;
+    modelLong = 1500;
+  } else if (ratio <= 2.25) {
+    model = MODEL_LINE2X;
+    modelLong = 2000;
+  } else if (ratio <= 2.75) {
+    model = MODEL_LINE2_5X;
+    modelLong = 2500;
+  } else if (ratio <= 3.25) {
+    model = MODEL_LINE3X;
+    modelLong = 3000;
+  } else if (ratio <= 3.75) {
+    model = MODEL_LINE3_5X;
+    modelLong = 3500;
+  } else if (ratio <= 4.5) {
+    model = MODEL_LINE4X;
+    modelLong = 4000;
+  } else if (ratio <= 5.5) {
+    model = MODEL_LINE5X;
+    modelLong = 5000;
+  } else {
+    model = MODEL_LINE6X;
+    modelLong = 6000;
+  }
+
+  const dis = long / 2;
+  x += CosBJ(fac) * dis;
+  y += SinBJ(fac) * dis;
+  const e = AddSpecialEffect(model, x, y);
+  if (!e) return null;
+
+  EXEffectMatRotateZ(e, fac + 270);
+  EXEffectMatScale(e, long / modelLong, width / 1000, 1);
+  EXSetEffectSpeed(e, speed ?? 1.0);
+  return e;
+}
+
 // ==========================================================================================
 // 扇形提示圈
 // ==========================================================================================
@@ -327,7 +423,7 @@ export function 创建矩形提示圈特效(
  * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
  */
 export function 创建白色扇形提示圈(
-  x: number, y: number, fac: number, size: number, time: number, speed?: number
+  x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any
 ): void {
   x += CosBJ(fac) * 10;
   y += SinBJ(fac) * 10;
@@ -335,7 +431,7 @@ export function 创建白色扇形提示圈(
   const e = AddSpecialEffect(MODEL_SECTOR, x, y);
   if (!e) return;
 
-  设置提示特效顶点颜色(e, 0xFFFFFFFF);
+  按所属单位设置提示圈颜色(e, 来源单位, 提示圈友方色);
   EXEffectMatRotateZ(e, fac);
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
@@ -349,7 +445,7 @@ export function 创建白色扇形提示圈(
  * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
  */
 export function 创建红色扇形提示圈(
-  x: number, y: number, fac: number, size: number, time: number, speed?: number
+  x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any
 ): void {
   x += CosBJ(fac) * 10;
   y += SinBJ(fac) * 10;
@@ -357,7 +453,7 @@ export function 创建红色扇形提示圈(
   const e = AddSpecialEffect(MODEL_SECTOR, x, y);
   if (!e) return;
 
-  设置提示特效顶点颜色(e, 提示圈敌方色);
+  按所属单位设置提示圈颜色(e, 来源单位);
   EXEffectMatRotateZ(e, fac);
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
@@ -371,7 +467,7 @@ export function 创建红色扇形提示圈(
  * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
  */
 export function 创建红色扇形提示圈特效(
-  x: number, y: number, fac: number, size: number, speed?: number
+  x: number, y: number, fac: number, size: number, speed?: number, 来源单位?: any
 ): any {
   x += CosBJ(fac) * 10;
   y += SinBJ(fac) * 10;
@@ -379,7 +475,7 @@ export function 创建红色扇形提示圈特效(
   const e = AddSpecialEffect(MODEL_SECTOR, x, y);
   if (!e) return;
 
-  设置提示特效顶点颜色(e, 提示圈敌方色);
+  按所属单位设置提示圈颜色(e, 来源单位);
   设置扇形提示圈朝向与尺寸(e, fac, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
   return e;
@@ -407,9 +503,9 @@ export function 设置扇形提示圈朝向与尺寸(e: any, fac: number, size: 
  * @param speed 动画速率（可选，默认 1/time）
  */
 export function 创建薄圆形提示圈(
-  x: number, y: number, r: number, time: number, speed?: number
+  x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any
 ): void {
-  const e = 创建薄圆形提示圈特效(x, y, r, speed);
+  const e = 创建薄圆形提示圈特效(x, y, r, speed, 来源单位);
   if (!e) return;
   const duration = time <= 0 ? 0.5 : time + 0.05;
   安全销毁特效(duration, e);
@@ -482,7 +578,7 @@ export function 立即销毁提示圈特效(e: any): void {
  * @param speed 动画速率（可选，默认 1/time）
  */
 export function 创建厚圆形提示圈(
-  x: number, y: number, r: number, time: number, speed?: number
+  x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any
 ): void {
   const e = AddSpecialEffect(MODEL_RING_THICK, x, y);
   if (!e) return;
@@ -493,15 +589,16 @@ export function 创建厚圆形提示圈(
 
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, s);
+  按所属单位设置提示圈颜色(e, 来源单位);
   安全销毁特效(duration, e);
 }
 
 /**
  * 快速创建白色圆形提示圈
- * 固定表示安全区域，不参与按所属单位着色。
+ * 无来源时表示白色安全区域；传入来源单位时按阵营着色。
  */
 export function 创建白色圆形提示圈(
-  x: number, y: number, r: number, time: number, speed?: number
+  x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any
 ): void {
   const e = AddSpecialEffect(MODEL_RING_A, x, y);
   if (!e) return;
@@ -512,6 +609,7 @@ export function 创建白色圆形提示圈(
   DzSetEffectAnimation?.(e, 0, 0);
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
+  按所属单位设置提示圈颜色(e, 来源单位, 提示圈友方色);
   安全销毁特效(duration, e);
 }
 
@@ -519,7 +617,7 @@ export function 创建白色圆形提示圈(
  * 快速创建渐变圆形提示圈（白→红）
  */
 export function 创建渐变圆形提示圈(
-  x: number, y: number, r: number, time: number, speed?: number
+  x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any
 ): any {
   const e = AddSpecialEffect(MODEL_RING_B, x, y);
   if (!e) return;
@@ -529,6 +627,7 @@ export function 创建渐变圆形提示圈(
   DzSetEffectAnimation?.(e, 1, 0);
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
+  按所属单位设置提示圈颜色(e, 来源单位);
 
   let duration = time <= 0 ? 0.1 : time + 0.05;
   if (duration < 0.1) duration = 0.1;
@@ -549,7 +648,7 @@ export function 创建渐变圆形提示圈(
  * @param speed 动画速率（可选，默认 1）
  */
 export function 创建双环提示圈(
-  x: number, y: number, r: number, time: number, speed?: number
+  x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any
 ): any {
   const e = AddSpecialEffect(MODEL_RING_C, x, y);
   if (!e) return;
@@ -558,6 +657,7 @@ export function 创建双环提示圈(
 
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
+  按所属单位设置提示圈颜色(e, 来源单位);
 
   const duration = time <= 0 ? 1 : time + 0.05;
   安全销毁特效(duration, e);

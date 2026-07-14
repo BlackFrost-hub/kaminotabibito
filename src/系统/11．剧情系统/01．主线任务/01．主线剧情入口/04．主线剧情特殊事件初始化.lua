@@ -16,36 +16,38 @@ local _____5904_7406_6280_80FD_63A8_8FDB_4E3B_7EBF_5267_60C5 = ____07_FF0E_5267_
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellChannelListener = ____require_result_0.registerSpellChannelListener
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_1.registerAppliedFinalDamageListener
-local ____require_result_2 = require("lib.扩展函数.封装函数.06．伤害函数.index")
-local YDWESetEventDamage = ____require_result_2.YDWESetEventDamage
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_3.addPeriodicCallback
-local removePeriodicCallback = ____require_result_3.removePeriodicCallback
-local getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataClearSafe = ____require_result_4.YDUserDataClearSafe
-local YDUserDataClearTableSafe = ____require_result_4.YDUserDataClearTableSafe
-local ____require_result_5 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-local SetStackedSoundBJ = ____require_result_5.SetStackedSoundBJ
-local ____require_result_6 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_6.GetPlayersAll
-local ____require_result_7 = require("lib.扩展函数.BJ函数.05A．电影函数")
-local TransmissionFromUnitWithNameBJ = ____require_result_7.TransmissionFromUnitWithNameBJ
-local ____require_result_8 = require("lib.扩展函数.BJ函数.06．任务消息")
-local CreateQuestBJ = ____require_result_8.CreateQuestBJ
-local GetLastCreatedQuestBJ = ____require_result_8.GetLastCreatedQuestBJ
-local QuestMessageBJ = ____require_result_8.QuestMessageBJ
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_0["添加单位暂停"]
+local _____5267_60C5_7279_6B8A_4E8B_4EF6_6682_505C_6765_6E90 = "剧情系统:特殊事件"
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellChannelListener = ____require_result_1.registerSpellChannelListener
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_2.registerAppliedFinalDamageListener
+local ____require_result_3 = require("lib.扩展函数.封装函数.06．伤害函数.index")
+local YDWESetEventDamage = ____require_result_3.YDWESetEventDamage
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_4.addPeriodicCallback
+local removePeriodicCallback = ____require_result_4.removePeriodicCallback
+local getServerTime = ____require_result_4.getServerTime
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataClearSafe = ____require_result_5.YDUserDataClearSafe
+local YDUserDataClearTableSafe = ____require_result_5.YDUserDataClearTableSafe
+local ____require_result_6 = require("lib.扩展函数.BJ函数.04．矩形与区域")
+local SetStackedSoundBJ = ____require_result_6.SetStackedSoundBJ
+local ____require_result_7 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_7.GetPlayersAll
+local ____require_result_8 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local TransmissionFromUnitWithNameBJ = ____require_result_8.TransmissionFromUnitWithNameBJ
+local ____require_result_9 = require("lib.扩展函数.BJ函数.06．任务消息")
+local CreateQuestBJ = ____require_result_9.CreateQuestBJ
+local GetLastCreatedQuestBJ = ____require_result_9.GetLastCreatedQuestBJ
+local QuestMessageBJ = ____require_result_9.QuestMessageBJ
+local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_10.stringToFourCCSafe
 local GetUnitName = jass.GetUnitName
 local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local IsUnitInRangeXY = jass.IsUnitInRangeXY
-local PauseUnit = jass.PauseUnit
 local PingMinimap = jass.PingMinimap
 local Player = jass.Player
 local RemoveUnit = jass.RemoveUnit
@@ -250,7 +252,7 @@ local function _____6267_884C_6700_7EC8_4F24_5BB3_63A8_8FDB_5267_60C5(_____914D_
         )
     end
     if _____914D_7F6E["暂停目标单位"] == true then
-        PauseUnit(target, true)
+        _____6DFB_52A0_5355_4F4D_6682_505C(target, _____5267_60C5_7279_6B8A_4E8B_4EF6_6682_505C_6765_6E90)
     end
     _____6267_884C_533A_57DF_97F3_4E50_5207_6362(_____914D_7F6E)
     _____64AD_653E_6700_7EC8_4F24_5BB3_5BF9_767D_5217_8868(_____914D_7F6E, attacker)

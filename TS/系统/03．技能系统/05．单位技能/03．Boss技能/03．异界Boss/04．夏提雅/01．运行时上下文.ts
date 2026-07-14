@@ -11,6 +11,7 @@ export interface 夏提雅运行时上下文 {
   血印句柄列表: any[];
   血宴层数: number;
   英灵战乙女句柄?: any;
+  镜像夹击句柄?: any;
   已触发复生: boolean;
   当前大型技能?: string;
   已初始化: boolean;

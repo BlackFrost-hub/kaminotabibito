@@ -1,6 +1,10 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const 沙漠食人魔待战暂停来源 = "剧情系统:沙漠食人魔待战";
 
 const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -28,7 +32,6 @@ export { 蛇人族接受食人魔任务剧情片段 } from "../01．第一章/09
 const CreatePermanentCorpseLocBJ = jass.CreatePermanentCorpseLocBJ as (this: void, style: number, unitid: number, whichPlayer: any, loc: any, facing: number) => void;
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const GetUnitLoc = jass.GetUnitLoc as (this: void, whichUnit: any) => any;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveLocation = jass.RemoveLocation as (this: void, whichLocation: any) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
@@ -68,7 +71,7 @@ export function 执行蛇人族接受食人魔任务(this: void, 参数: 剧情�
 
   YDUserDataSetSafe("string", "Boss", "沙漠食人魔", "unit", bossUnit);
   SetUnitInvulnerable(bossUnit, true);
-  PauseUnit(bossUnit, true);
+  添加单位暂停(bossUnit, 沙漠食人魔待战暂停来源);
   注册剧情Boss范围预置触发器(
     bossUnit,
     Number(参数.注册范围) || 850,

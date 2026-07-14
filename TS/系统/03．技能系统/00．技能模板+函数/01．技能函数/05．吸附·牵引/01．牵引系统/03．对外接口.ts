@@ -15,8 +15,8 @@ import {
 import { 更新闪电, 结束牵引实例 } from "./01．移动与闪电";
 import { 结束牵引ID, 注册到中心计时器 } from "./02．驱动与实例";
 
-const { 申请单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
+const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 
 const 牵引暂停来源 = "牵引系统";
@@ -72,7 +72,7 @@ function 创建牵引实例(单位: any, 参数: 牵引参数): 牵引实例 | n
     SetUnitPathing(单位, false);
   }
   if (实例.暂停单位) {
-    申请单位暂停占用(单位, 牵引暂停来源);
+    添加单位暂停(单位, 牵引暂停来源);
   }
 
   活动牵引列表.push(实例);

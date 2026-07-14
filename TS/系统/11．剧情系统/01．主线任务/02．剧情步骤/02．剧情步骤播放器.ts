@@ -2,6 +2,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -55,7 +59,6 @@ import type { 剧情片段配置, 剧情步骤 } from "./00．剧情步骤类型
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerPlayer = jass.GetTriggerPlayer as (this: void) => any;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
@@ -370,7 +373,7 @@ function 执行Boss战启动步骤(this: void, 步骤: 剧情步骤): void {
     if (触发单位 != null && 触发单位 !== 0) {
       YDUserDataSetSafe("string", Boss战表名, Boss战触发玩家字段, "unit", 触发单位);
     }
-    PauseUnit(bossUnit, false);
+    移除单位暂停(bossUnit, 剧情Boss预置暂停来源);
     SetUnitInvulnerable(bossUnit, false);
     启动Boss战运行(bossUnit);
   }
@@ -404,7 +407,7 @@ function 执行跳过模式步骤逻辑(this: void, 步骤: 剧情步骤): void 
         if (触发单位 != null && 触发单位 !== 0) {
           YDUserDataSetSafe("string", Boss战表名, Boss战触发玩家字段, "unit", 触发单位);
         }
-        PauseUnit(bossUnit, false);
+        移除单位暂停(bossUnit, 剧情Boss预置暂停来源);
         SetUnitInvulnerable(bossUnit, false);
         启动Boss战运行(bossUnit);
       }

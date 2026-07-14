@@ -50,8 +50,8 @@ local registerManualBuff = ____require_result_2.registerManualBuff
 local getBuffRuntime = ____require_result_2.getBuffRuntime
 _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
 local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528 = ____require_result_3["申请单位暂停占用"]
-local _____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_3["释放单位暂停占用"]
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_3["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_3["移除单位暂停"]
 local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_UnitPlay = ____require_result_4.Sound3DII_UnitPlay
 local GetHandleId = jass.GetHandleId
@@ -161,7 +161,7 @@ local function _____6E05_9664_7761_7720_72B6_6001(_____72B6_6001, _____539F_56E0
     __TS__Delete(_____7761_7720_72B6_6001_8868, _____72B6_6001["目标单位ID"])
     __TS__Delete(_____7761_7720_7ED3_675F_539F_56E0_8868, _____72B6_6001["目标单位ID"])
     _____79FB_9664_7761_7720_76EE_6807ID(_____72B6_6001["目标单位ID"])
-    _____91CA_653E_5355_4F4D_6682_505C_5360_7528(_____72B6_6001["目标单位"], _____72B6_6001["暂停来源"])
+    _____79FB_9664_5355_4F4D_6682_505C(_____72B6_6001["目标单位"], _____72B6_6001["暂停来源"])
     local event = _____6784_5EFA_7761_7720_4E8B_4EF6(_____72B6_6001, _____539F_56E0)
     if _____539F_56E0 == "伤害打破" then
         _____901A_77E5_7761_7720_76D1_542C(_____7761_7720_6253_7834_76D1_542C_5217_8868, event)
@@ -316,7 +316,7 @@ ____exports["施加睡眠"] = function(_____53C2_6570)
         _____79FB_9664_7761_7720_76EE_6807ID(_____76EE_6807_5355_4F4DID)
         return false
     end
-    if not _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(_____76EE_6807_5355_4F4D, _____6682_505C_6765_6E90) then
+    if not _____6DFB_52A0_5355_4F4D_6682_505C(_____76EE_6807_5355_4F4D, _____6682_505C_6765_6E90) then
         _____7761_7720_7ED3_675F_539F_56E0_8868[_____76EE_6807_5355_4F4DID] = "手动"
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____76EE_6807_5355_4F4D, ____exports["睡眠BuffID"])
         return false

@@ -2,6 +2,10 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 
 const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -67,11 +71,10 @@ export function 执行地精祭祀Boss前导激活(this: void, 参数: 剧情动
     const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUnit: any) => boolean;
     GroupAddUnit(血条Boss组, bossUnit);
   }
-  const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
   const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
   const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
   SetUnitOwner(bossUnit, Player(PLAYER_NEUTRAL_AGGRESSIVE), true);
-  PauseUnit(bossUnit, true);
+  添加单位暂停(bossUnit, 剧情Boss预置暂停来源);
   SetUnitInvulnerable(bossUnit, true);
 }
 

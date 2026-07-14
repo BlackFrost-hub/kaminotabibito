@@ -20,9 +20,9 @@ const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中�
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   YDWETimerDestroyEffect: (duration: number, effect: any) => void;
 };
-const { 申请单位暂停占用, 释放单位暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  申请单位暂停占用: (this: void, unit: any, source: string) => boolean;
-  释放单位暂停占用: (this: void, unit: any, source: string) => boolean;
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 
 const AddSpecialEffect = jass["AddSpecialEffect"] as (model: string, x: number, y: number) => any;
@@ -108,14 +108,14 @@ function 结束闪烁实例(实例: 闪烁实例, 是否完成: boolean): void {
     }
     ShowUnit(实例.单位, true);
     if (实例.闪烁期间暂停单位 && !实例.单位原本已暂停) {
-      释放单位暂停占用(实例.单位, 闪烁暂停来源);
+      移除单位暂停(实例.单位, 闪烁暂停来源);
     }
     播放闪烁特效(实例.结束特效, 实例.目标X, 实例.目标Y, 实例.特效生命周期);
     if (实例.结束后选中单位) {
       本地为单位拥有者重新选中单位(实例.单位);
     }
   } else if (实例.闪烁期间暂停单位 && 单位存活(实例.单位) && !实例.单位原本已暂停) {
-    释放单位暂停占用(实例.单位, 闪烁暂停来源);
+    移除单位暂停(实例.单位, 闪烁暂停来源);
     ShowUnit(实例.单位, true);
   }
 
@@ -168,7 +168,7 @@ export function 开始闪烁(单位: any, 参数: 闪烁参数): number {
 
   const 原本已暂停 = IsUnitPaused(单位);
   if (闪烁期间暂停单位 && !原本已暂停) {
-    申请单位暂停占用(单位, 闪烁暂停来源);
+    添加单位暂停(单位, 闪烁暂停来源);
   }
 
   ShowUnit(单位, false);
@@ -182,7 +182,7 @@ export function 开始闪烁(单位: any, 参数: 闪烁参数): number {
     }
     ShowUnit(单位, true);
     if (闪烁期间暂停单位 && !原本已暂停) {
-      释放单位暂停占用(单位, 闪烁暂停来源);
+      移除单位暂停(单位, 闪烁暂停来源);
     }
     播放闪烁特效(参数.结束特效, 参数.目标X, 参数.目标Y, 特效生命周期);
     if (结束后选中单位) {

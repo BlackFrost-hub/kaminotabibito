@@ -1,6 +1,11 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const 沙漠食人魔二阶段待战暂停来源 = "剧情系统:沙漠食人魔二阶段待战";
 
 const { YDUserDataGetSafe, YDUserDataSetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -30,7 +35,6 @@ const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const IssuePointOrder = jass.IssuePointOrder as (this: void, whichUnit: any, order: string, x: number, y: number) => boolean;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (this: void, whichUnit: any, order: string, targetWidget: any) => boolean;
@@ -78,7 +82,7 @@ export function 执行沙漠食人魔一阶段死亡前置(this: void, 参数: �
   const bossUnit = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), bossTypeId, x, y, 270);
   if (bossUnit == null || bossUnit === 0) return;
   YDUserDataSetSafe("string", "Boss", "杀戮食人魔", "unit", bossUnit);
-  PauseUnit(bossUnit, true);
+  添加单位暂停(bossUnit, 沙漠食人魔二阶段待战暂停来源);
   SetUnitInvulnerable(bossUnit, true);
   待开战杀戮食人魔 = bossUnit;
   待开战目标单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
@@ -92,7 +96,7 @@ export function 执行沙漠食人魔二阶段开战(this: void): void {
     IssueTargetOrder(bossUnit, "attack", 待开战目标单位);
   }
   SetUnitInvulnerable(bossUnit, false);
-  PauseUnit(bossUnit, false);
+  移除单位暂停(bossUnit, 沙漠食人魔二阶段待战暂停来源);
   启动Boss战运行(bossUnit);
   待处理一阶段死亡单位 = null;
   待开战杀戮食人魔 = null;

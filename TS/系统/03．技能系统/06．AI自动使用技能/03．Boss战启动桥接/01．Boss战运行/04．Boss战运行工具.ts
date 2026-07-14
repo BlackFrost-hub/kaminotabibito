@@ -92,10 +92,11 @@ const { isValidCombatEnemyUnit } = require("lib.扩展函数.自定义扩展函�
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, moduleName: string, ...args: any[]) => void;
 };
-const { 刷新单位暂停底层状态 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  刷新单位暂停底层状态: (this: void, unit: any) => boolean;
+const { 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 
+const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
@@ -407,7 +408,7 @@ export function 完成Boss战启动(this: void, context: Boss战运行上下文)
   确保Boss战区域视野(context.地点矩形);
 
   SetUnitInvulnerable(context.Boss单位, false);
-  刷新单位暂停底层状态(context.Boss单位);
+  移除单位暂停(context.Boss单位, 剧情Boss预置暂停来源);
 
   if (context.地点矩形 != null && context.地点矩形 !== 0) {
     PingMinimap(GetRectCenterX(context.地点矩形), GetRectCenterY(context.地点矩形), 15);

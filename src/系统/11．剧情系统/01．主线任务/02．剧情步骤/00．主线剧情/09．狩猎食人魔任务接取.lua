@@ -6,18 +6,21 @@ local _____6CE8_518C_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1_5668 = ____03_F
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
-local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_1["按名字反查Boss单位ID"]
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
-local ____require_result_3 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterUnitInRangeSimple = ____require_result_3.TriggerRegisterUnitInRangeSimple
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.GS扩展库.00．极坐标投影")
-local GS_PolarProjectionBJ = ____require_result_4.GS_PolarProjectionBJ
-local ____require_result_5 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetRandomDirectionDeg = ____require_result_5.GetRandomDirectionDeg
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_0["添加单位暂停"]
+local _____6C99_6F20_98DF_4EBA_9B54_5F85_6218_6682_505C_6765_6E90 = "剧情系统:沙漠食人魔待战"
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
+local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_2["按名字反查Boss单位ID"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local ____require_result_4 = require("lib.扩展函数.BJ函数.01．触发与事件")
+local TriggerRegisterUnitInRangeSimple = ____require_result_4.TriggerRegisterUnitInRangeSimple
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.GS扩展库.00．极坐标投影")
+local GS_PolarProjectionBJ = ____require_result_5.GS_PolarProjectionBJ
+local ____require_result_6 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetRandomDirectionDeg = ____require_result_6.GetRandomDirectionDeg
 do
     local ____09_FF0E_72E9_730E_98DF_4EBA_9B54_4EFB_52A1_63A5_53D6 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.09．狩猎食人魔任务接取")
     ____exports["蛇人族接受食人魔任务剧情片段"] = ____09_FF0E_72E9_730E_98DF_4EBA_9B54_4EFB_52A1_63A5_53D6["蛇人族接受食人魔任务剧情片段"]
@@ -25,7 +28,6 @@ end
 local CreatePermanentCorpseLocBJ = jass.CreatePermanentCorpseLocBJ
 local CreateUnit = jass.CreateUnit
 local GetUnitLoc = jass.GetUnitLoc
-local PauseUnit = jass.PauseUnit
 local Player = jass.Player
 local RemoveLocation = jass.RemoveLocation
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
@@ -101,7 +103,7 @@ ____exports["执行蛇人族接受食人魔任务"] = function(_____53C2_6570)
         bossUnit
     )
     SetUnitInvulnerable(bossUnit, true)
-    PauseUnit(bossUnit, true)
+    _____6DFB_52A0_5355_4F4D_6682_505C(bossUnit, _____6C99_6F20_98DF_4EBA_9B54_5F85_6218_6682_505C_6765_6E90)
     _____6CE8_518C_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1_5668(
         bossUnit,
         __TS__Number(_____53C2_6570["注册范围"]) or 850,

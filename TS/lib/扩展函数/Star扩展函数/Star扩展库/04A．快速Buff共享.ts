@@ -17,7 +17,7 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
   safeDestroyTimer: (timer: any) => void;
 };
 import { YDWESetUnitAbilityDataReal, EXSetUnitFacing } from "../../YDWE函数/00．YDWE函数";
-import { GS_Suspend, 申请单位暂停占用定时 } from "./03．硬直暂停系统";
+import { GS_Suspend, 设置单位暂停时间 } from "./03．硬直暂停系统";
 import { SUC_IsUnitStructure, SUC_IsValidUnit } from "./08．单位判定与筛选函数";
 
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
@@ -364,11 +364,11 @@ export function SFB_施加原生目标技能(this: void, u: any, abilityId: numb
 export function SFB_施加暂停类Buff(this: void, sourceUnit: any, u: any, id: number, time: number): void {
   registerSfbManualBuff(sourceUnit, u, id, time, 0);
   if (id === 21) {
-    GS_Suspend(u, time);
+    设置单位暂停时间(u, "SFB_Stun", time);
   } else if (id === 22) {
-    申请单位暂停占用定时(u, "SFB_Pause", time, "刷新");
+    设置单位暂停时间(u, "SFB_Pause", time);
   } else if (id === 23) {
-    申请单位暂停占用定时(u, "SFB_EXPause", time, "刷新");
+    设置单位暂停时间(u, "SFB_EXPause", time);
   }
 }
 

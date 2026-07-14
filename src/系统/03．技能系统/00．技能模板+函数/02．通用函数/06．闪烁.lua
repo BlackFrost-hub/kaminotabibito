@@ -3,7 +3,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____64AD_653E_95EA_70C1_7279_6548, _____672C_5730_4E3A_5355_4F4D_62E5_6709_8005_91CD_65B0_9009_4E2D_5355_4F4D, _____7ED3_675F_95EA_70C1_5B9E_4F8B, ____on_95EA_70C1Tick, jass, offTick10ms, YDWETimerDestroyEffect, _____91CA_653E_5355_4F4D_6682_505C_5360_7528, AddSpecialEffect, GetOwningPlayer, GetLocalPlayer, ClearSelection, SelectUnit, ShowUnit, SetUnitFacing, SetUnitPosition, GetUnitState, TICK_INTERVAL, UNIT_ALIVE_LIFE, _____95EA_70C1_6682_505C_6765_6E90, _____6D3B_52A8_95EA_70C1_5217_8868, _____95EA_70C1_6620_5C04, _____5DF2_6CE8_518C_95EA_70C1Tick
+local _____5355_4F4D_5B58_6D3B, _____64AD_653E_95EA_70C1_7279_6548, _____672C_5730_4E3A_5355_4F4D_62E5_6709_8005_91CD_65B0_9009_4E2D_5355_4F4D, _____7ED3_675F_95EA_70C1_5B9E_4F8B, ____on_95EA_70C1Tick, jass, offTick10ms, YDWETimerDestroyEffect, _____79FB_9664_5355_4F4D_6682_505C, AddSpecialEffect, GetOwningPlayer, GetLocalPlayer, ClearSelection, SelectUnit, ShowUnit, SetUnitFacing, SetUnitPosition, GetUnitState, TICK_INTERVAL, UNIT_ALIVE_LIFE, _____95EA_70C1_6682_505C_6765_6E90, _____6D3B_52A8_95EA_70C1_5217_8868, _____95EA_70C1_6620_5C04, _____5DF2_6CE8_518C_95EA_70C1Tick
 local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
 local _____5C1D_8BD5_963B_6B62_81EA_8EAB_4F4D_79FB_6280_80FD = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["尝试阻止自身位移技能"]
 function _____5355_4F4D_5B58_6D3B(unit)
@@ -39,14 +39,14 @@ function _____7ED3_675F_95EA_70C1_5B9E_4F8B(_____5B9E_4F8B, _____662F_5426_5B8C_
         end
         ShowUnit(_____5B9E_4F8B["单位"], true)
         if _____5B9E_4F8B["闪烁期间暂停单位"] and not _____5B9E_4F8B["单位原本已暂停"] then
-            _____91CA_653E_5355_4F4D_6682_505C_5360_7528(_____5B9E_4F8B["单位"], _____95EA_70C1_6682_505C_6765_6E90)
+            _____79FB_9664_5355_4F4D_6682_505C(_____5B9E_4F8B["单位"], _____95EA_70C1_6682_505C_6765_6E90)
         end
         _____64AD_653E_95EA_70C1_7279_6548(_____5B9E_4F8B["结束特效"], _____5B9E_4F8B["目标X"], _____5B9E_4F8B["目标Y"], _____5B9E_4F8B["特效生命周期"])
         if _____5B9E_4F8B["结束后选中单位"] then
             _____672C_5730_4E3A_5355_4F4D_62E5_6709_8005_91CD_65B0_9009_4E2D_5355_4F4D(_____5B9E_4F8B["单位"])
         end
     elseif _____5B9E_4F8B["闪烁期间暂停单位"] and _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) and not _____5B9E_4F8B["单位原本已暂停"] then
-        _____91CA_653E_5355_4F4D_6682_505C_5360_7528(_____5B9E_4F8B["单位"], _____95EA_70C1_6682_505C_6765_6E90)
+        _____79FB_9664_5355_4F4D_6682_505C(_____5B9E_4F8B["单位"], _____95EA_70C1_6682_505C_6765_6E90)
         ShowUnit(_____5B9E_4F8B["单位"], true)
     end
     if #_____6D3B_52A8_95EA_70C1_5217_8868 == 0 and _____5DF2_6CE8_518C_95EA_70C1Tick then
@@ -80,8 +80,8 @@ offTick10ms = ____require_result_0.offTick10ms
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 YDWETimerDestroyEffect = ____require_result_1.YDWETimerDestroyEffect
 local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____7533_8BF7_5355_4F4D_6682_505C_5360_7528 = ____require_result_2["申请单位暂停占用"]
-_____91CA_653E_5355_4F4D_6682_505C_5360_7528 = ____require_result_2["释放单位暂停占用"]
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_2["添加单位暂停"]
+_____79FB_9664_5355_4F4D_6682_505C = ____require_result_2["移除单位暂停"]
 AddSpecialEffect = jass.AddSpecialEffect
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -125,7 +125,7 @@ ____exports["开始闪烁"] = function(_____5355_4F4D, _____53C2_6570)
     _____64AD_653E_95EA_70C1_7279_6548(_____53C2_6570["开始特效"], _____5F53_524DX, _____5F53_524DY, _____7279_6548_751F_547D_5468_671F)
     local _____539F_672C_5DF2_6682_505C = IsUnitPaused(_____5355_4F4D)
     if _____95EA_70C1_671F_95F4_6682_505C_5355_4F4D and not _____539F_672C_5DF2_6682_505C then
-        _____7533_8BF7_5355_4F4D_6682_505C_5360_7528(_____5355_4F4D, _____95EA_70C1_6682_505C_6765_6E90)
+        _____6DFB_52A0_5355_4F4D_6682_505C(_____5355_4F4D, _____95EA_70C1_6682_505C_6765_6E90)
     end
     ShowUnit(_____5355_4F4D, false)
     if _____6301_7EED_65F6_95F4 <= 0 then
@@ -140,7 +140,7 @@ ____exports["开始闪烁"] = function(_____5355_4F4D, _____53C2_6570)
         end
         ShowUnit(_____5355_4F4D, true)
         if _____95EA_70C1_671F_95F4_6682_505C_5355_4F4D and not _____539F_672C_5DF2_6682_505C then
-            _____91CA_653E_5355_4F4D_6682_505C_5360_7528(_____5355_4F4D, _____95EA_70C1_6682_505C_6765_6E90)
+            _____79FB_9664_5355_4F4D_6682_505C(_____5355_4F4D, _____95EA_70C1_6682_505C_6765_6E90)
         end
         _____64AD_653E_95EA_70C1_7279_6548(_____53C2_6570["结束特效"], _____53C2_6570["目标X"], _____53C2_6570["目标Y"], _____7279_6548_751F_547D_5468_671F)
         if _____7ED3_675F_540E_9009_4E2D_5355_4F4D then
