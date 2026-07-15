@@ -4,13 +4,14 @@ import type { 菲尼克斯尔元素类型, 菲尼克斯尔运行时上下文 } f
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
 import type { 技能伤害形态 } from "../../../../../04．伤害系统/08．技能伤害系统";
-import { stringToFourCC, 距离XY, 极坐标X as 公共极坐标X, 极坐标Y as 公共极坐标Y } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 距离XY, 点到线段距离平方, 极坐标X as 公共极坐标X, 极坐标Y as 公共极坐标Y } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 提交预计算Boss技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
+import { 单位是否在扇形区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const { 造成技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成技能伤害: (this: void, 参数: any) => boolean;
+const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
@@ -25,7 +26,6 @@ const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, whichAnimation: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (x: number) => number;
@@ -43,8 +43,8 @@ const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
 
-const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => boolean) | undefined;
-const DzSetUnitName = japi.DzSetUnitName as ((unit: any, name: string) => boolean) | undefined;
+const DzSetUnitModel = japi.DzSetUnitModel as (unit: any, model: string) => boolean;
+const DzSetUnitName = japi.DzSetUnitName as (unit: any, name: string) => boolean;
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -86,8 +86,8 @@ const { 开始硬直, 施加快速减速Buff, 施加快速控制Buff } = require
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.index") as {
   创建可攻击机制单位: (this: void, 参数: any) => any;
 };
-const { createTimedEffect, createTimedUnitEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
-  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+const { 创建点特效, createTimedUnitEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  创建点特效: (this: void, 参数: any) => any;
   createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
 };
 
@@ -213,7 +213,7 @@ export function 停止周期(this: void, id: number): void {
 
 export function 播放点特效(this: void, model: string, x: number, y: number, lifeMs: number = 1200): any {
   if (model == null || model === "") return null;
-  return lifeMs > 0 ? createTimedEffect(model, x, y, 0, lifeMs / 1000) : AddSpecialEffect(model, x, y);
+  return 创建点特效({ 模型路径: model, X: x, Y: y, 持续秒: lifeMs > 0 ? lifeMs / 1000 : undefined });
 }
 
 export function 播放单位特效(this: void, model: string, unit: any, attach: string = "origin", lifeMs: number = 1200): any {
@@ -261,30 +261,11 @@ export function 极坐标Y(this: void, y: number, distance: number, angleDeg: nu
 
 export function 单位在扇形内(this: void, source: any, target: any, radius: number, angleDeg: number): boolean {
   if (!单位存活(source) || !单位存活(target)) return false;
-  const sx = GetUnitX(source);
-  const sy = GetUnitY(source);
-  const tx = GetUnitX(target);
-  const ty = GetUnitY(target);
-  const d = 两点距离(sx, sy, tx, ty);
-  if (d > radius) return false;
-  const facing = GetUnitFacing(source);
-  let diff = Atan2(ty - sy, tx - sx) * RAD_TO_DEG - facing;
-  while (diff > 180) diff -= 360;
-  while (diff < -180) diff += 360;
-  return diff <= angleDeg * 0.5 && diff >= -angleDeg * 0.5;
+  return 单位是否在扇形区域(target, GetUnitX(source), GetUnitY(source), radius, GetUnitFacing(source), angleDeg);
 }
 
 export function 线段到点距离(this: void, ax: number, ay: number, bx: number, by: number, px: number, py: number): number {
-  const abx = bx - ax;
-  const aby = by - ay;
-  const apx = px - ax;
-  const apy = py - ay;
-  const abLenSq = abx * abx + aby * aby;
-  if (abLenSq <= 0.01) return 两点距离(ax, ay, px, py);
-  let t = (apx * abx + apy * aby) / abLenSq;
-  if (t < 0) t = 0;
-  if (t > 1) t = 1;
-  return 两点距离(ax + abx * t, ay + aby * t, px, py);
+  return SquareRoot(点到线段距离平方(px, py, ax, ay, bx, by));
 }
 
 export function 范围敌人(this: void, boss: any, x: number, y: number, radius: number): any[] {
@@ -293,7 +274,7 @@ export function 范围敌人(this: void, boss: any, x: number, y: number, radius
 
 function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, amount: number, attackType: any, damageType: any, 伤害形态: 技能伤害形态, 上下文?: 菲尼克斯尔伤害上下文参数): void {
   if (amount > 0 && 单位存活(source) && 单位存活(target)) {
-    造成技能伤害({
+    提交预计算Boss技能伤害({
       技能ID: 上下文?.技能ID,
       技能实例ID: 上下文?.技能实例ID,
       标签: 上下文?.标签,
@@ -304,7 +285,6 @@ function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, a
       attackType,
       伤害类型: damageType,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
       伤害形态,
     });
   }
@@ -436,12 +416,12 @@ export function 创建菲尼克斯尔机制单位(this: void, context: 菲尼克
     on死亡,
   });
   if (inst == null) return null;
-  if (typeof DzSetUnitName === "function") DzSetUnitName(inst.单位, name);
+  DzSetUnitName(inst.单位, name);
   return inst.单位;
 }
 
 export function 设置单位模型(this: void, unit: any, model: string): void {
-  if (typeof DzSetUnitModel === "function" && 单位有效(unit)) DzSetUnitModel(unit, model);
+  if (单位有效(unit)) DzSetUnitModel(unit, model);
 }
 
 export function 移动单位到(this: void, unit: any, x: number, y: number): void {

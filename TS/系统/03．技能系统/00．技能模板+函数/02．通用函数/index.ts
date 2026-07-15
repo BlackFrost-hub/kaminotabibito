@@ -22,9 +22,14 @@ export * from "./17．闪电效果代码";
 export * from "./18．单位动画守护";
 export * from "./20．位移技能限制";
 export * from "./21．组合技能伤害";
+export * from "./22．Boss技能伤害执行器";
 export {
   stringToFourCC as BossStringToFourCC,
   取单位ID as Boss取单位ID,
+  单位句柄存在 as Boss单位句柄存在,
+  单位未标记死亡 as Boss单位未标记死亡,
+  单位已标记死亡 as Boss单位已标记死亡,
+  单位存活 as Boss单位存活,
   单位有效 as Boss单位有效,
   距离平方XY as Boss距离平方XY,
   距离XY as Boss距离XY,

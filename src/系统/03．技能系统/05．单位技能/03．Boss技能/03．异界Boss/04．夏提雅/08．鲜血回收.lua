@@ -1,6 +1,10 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
 local _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["重置夏提雅猎血连击"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
@@ -14,27 +18,17 @@ local doHeal = ____require_result_0.doHeal
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_2.YDWETimerDestroyEffectSafe
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local GetRandomReal = jass.GetRandomReal
-local SquareRoot = jass.SquareRoot
-local Atan2 = jass.Atan2
-local AddSpecialEffect = jass.AddSpecialEffect
-local GetUnitState = japi.GetUnitState
-local EXSetEffectSize = japi.EXSetEffectSize
-local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
+local GetUnitState = jass.GetUnitState
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local RAD_TO_DEG = 57.29577951308232
 local _____9C9C_8840_56DE_6536_6280_80FDKey = "鲜血回收"
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____9650_5236_8FDE_7EBF_7F29_653E(value)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
     if value < cfg["回收连线最小缩放"] then
@@ -48,25 +42,16 @@ end
 local function _____521B_5EFA_9C9C_8840_56DE_6536_8FDE_7EBF(context, mark)
     local boss = context["Boss单位"]
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
-    local dx = GetUnitX(boss) - mark.X
-    local dy = GetUnitY(boss) - mark.Y
-    local effect = AddSpecialEffect(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["鲜血回收连线特效路径"], mark.X, mark.Y)
-    if effect == nil or effect == 0 then
-        return
-    end
-    if type(EXSetEffectSize) == "function" then
-        EXSetEffectSize(
-            effect,
-            _____9650_5236_8FDE_7EBF_7F29_653E(SquareRoot(dx * dx + dy * dy) / cfg["回收连线基准长度"])
-        )
-    end
-    if type(EXEffectMatRotateZ) == "function" then
-        EXEffectMatRotateZ(
-            effect,
-            Atan2(dy, dx) * RAD_TO_DEG
-        )
-    end
-    YDWETimerDestroyEffectSafe(cfg["回收连线持续秒"], effect)
+    local bossX = GetUnitX(boss)
+    local bossY = GetUnitY(boss)
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["鲜血回收连线特效路径"],
+        X = mark.X,
+        Y = mark.Y,
+        ["缩放"] = _____9650_5236_8FDE_7EBF_7F29_653E(_____8DDD_79BBXY(mark.X, mark.Y, bossX, bossY) / cfg["回收连线基准长度"]),
+        ["Z轴角度"] = _____4E24_70B9_89D2_5EA6(mark.X, mark.Y, bossX, bossY),
+        ["持续秒"] = cfg["回收连线持续秒"]
+    })
 end
 local function _____7ED3_675F_9C9C_8840_56DE_6536(context)
     if context["当前大型技能"] == _____9C9C_8840_56DE_6536_6280_80FDKey then

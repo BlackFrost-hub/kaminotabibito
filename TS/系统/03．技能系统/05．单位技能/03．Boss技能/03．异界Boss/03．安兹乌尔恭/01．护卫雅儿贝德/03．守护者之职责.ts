@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 获取全部安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
@@ -27,9 +28,9 @@ const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const EXSetEffectXY = japi.EXSetEffectXY as ((effect: any, x: number, y: number) => void) | undefined;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
-const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, degrees: number) => void) | undefined;
+const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) => void;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
+const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, degrees: number) => void;
 const RAD_TO_DEG = 57.29577951308232;
 let 守护职责伤害修正已注册 = false;
 
@@ -39,10 +40,6 @@ interface 守护职责表现状态 {
   特效: any;
   刷新ID: number;
   已结束: boolean;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 是否直接伤害(this: void, damage: any): boolean {
@@ -99,12 +96,10 @@ function 刷新守护职责连接表现(this: void, visual: 守护职责表现�
   const dx = bx - ax;
   const dy = by - ay;
   if (visual.特效 == null || visual.特效 === 0) return;
-  if (typeof EXSetEffectXY === 'function') EXSetEffectXY(visual.特效, (ax + bx) * 0.5, (ay + by) * 0.5);
-  if (typeof EXEffectMatRotateZ === 'function') EXEffectMatRotateZ(visual.特效, Atan2(dy, dx) * RAD_TO_DEG);
-  if (typeof EXSetEffectSize === 'function') {
-    EXSetEffectSize(visual.特效, SquareRoot(dx * dx + dy * dy)
-      / 安兹乌尔恭数值与表现配置.守护者模式.守护者之职责连接基础长度);
-  }
+  EXSetEffectXY(visual.特效, (ax + bx) * 0.5, (ay + by) * 0.5);
+  EXEffectMatRotateZ(visual.特效, Atan2(dy, dx) * RAD_TO_DEG);
+  EXSetEffectSize(visual.特效, SquareRoot(dx * dx + dy * dy)
+    / 安兹乌尔恭数值与表现配置.守护者模式.守护者之职责连接基础长度);
 }
 
 function 清理守护职责表现(this: void, visual: 守护职责表现状态): void {
@@ -145,7 +140,7 @@ export function 释放雅儿贝德守护者之职责(this: void, context: 安兹
     (GetUnitY(boss) + GetUnitY(albedo)) * 0.5);
   visual = { context, token, 特效: effect, 刷新ID: 0, 已结束: false };
   刷新守护职责连接表现(visual);
-  visual.刷新ID = addPeriodicCallback(50, function 守护职责连接刷新(this: void): void {
+  visual.刷新ID = addPeriodicCallback(cfg.守护者之职责连接刷新间隔毫秒, function 守护职责连接刷新(this: void): void {
     if (context.当前大型技能 != null || state.阶段状态 === '失衡') {
       state.独占状态?.结束(token, '抢占', context.当前大型技能 ?? '雅儿贝德失衡');
       return;

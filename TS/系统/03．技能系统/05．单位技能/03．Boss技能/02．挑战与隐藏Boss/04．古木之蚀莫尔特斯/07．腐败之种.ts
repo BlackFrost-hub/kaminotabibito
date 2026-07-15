@@ -224,7 +224,7 @@ function 发射腐败之种(this: void, context: 莫尔特斯运行时上下文,
     持续毫秒: cfg.飞行秒 * 1000,
     周期ID: 0,
   };
-  data.周期ID = addPeriodicCallback(50, 莫尔特斯腐败之种弹道, data);
+  data.周期ID = addPeriodicCallback(cfg.弹道刷新间隔毫秒, 莫尔特斯腐败之种弹道, data);
   context.清理.登记周期回调("莫尔特斯-腐败之种弹道", data.周期ID);
 }
 

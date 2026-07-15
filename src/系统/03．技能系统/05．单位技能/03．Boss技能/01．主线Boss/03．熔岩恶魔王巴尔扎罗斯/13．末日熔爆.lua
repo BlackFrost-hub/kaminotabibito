@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["巴尔扎罗斯单位技能配置"]
 local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．场地配置")
@@ -13,8 +15,8 @@ local ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177 = require("系统.03．技能系
 local _____51CF_5C11_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570 = ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177["减少巴尔扎罗斯灼热层数"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
@@ -53,9 +55,6 @@ local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____53D6_573A_5730_4E2D_5FC3(context)
     local boss = context["Boss单位"]
     local fallbackX = GetUnitX(boss)
@@ -205,7 +204,7 @@ local function _____70B9_5728_5B89_5168_533A(unit, safePoints)
                     if x >= point["左"] and x <= point["右"] and y >= point["下"] and y <= point["上"] then
                         return true
                     end
-                    goto __continue24
+                    goto __continue23
                 end
                 local dx = x - safePoints[i + 1].X
                 local dy = y - safePoints[i + 1].Y
@@ -213,7 +212,7 @@ local function _____70B9_5728_5B89_5168_533A(unit, safePoints)
                     return true
                 end
             end
-            ::__continue24::
+            ::__continue23::
             i = i + 1
         end
     end
@@ -221,7 +220,7 @@ local function _____70B9_5728_5B89_5168_533A(unit, safePoints)
 end
 local function _____8BA1_7B97_5916_5708_4F24_5BB3(boss, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]
-    return (GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["外圈伤害目标最大生命比例"] + _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * config["外圈伤害Boss攻击力比例"]) * config["外圈伤害总倍率"]
+    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["外圈伤害Boss攻击力比例"], ["目标最大生命比例"] = config["外圈伤害目标最大生命比例"], ["总倍率"] = config["外圈伤害总倍率"]})
 end
 local function _____8BA1_7B97_5B89_5168_533A_4F59_6CE2_4F24_5BB3(target)
     return GetUnitState(target, UNIT_STATE_MAX_LIFE) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]["安全区余波目标最大生命比例"]
@@ -268,7 +267,7 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue36
+                    goto __continue35
                 end
                 if _____70B9_5728_5B89_5168_533A(hero, safePoints) then
                     _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -301,7 +300,7 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _
                     })
                 end
             end
-            ::__continue36::
+            ::__continue35::
             i = i + 1
         end
     end
@@ -427,7 +426,7 @@ ____exports["初始化巴尔扎罗斯末日熔爆节点"] = function(context)
         }}
     })
     local tickId = addPeriodicCallback(
-        1000,
+        config["运行检查间隔毫秒"],
         function()
             _____5C1D_8BD5_4F4E_8840_91CF_989D_5916_89E6_53D1(context)
             _____5C1D_8BD5_5468_671F_89E6_53D1_672B_65E5_7194_7206(context)

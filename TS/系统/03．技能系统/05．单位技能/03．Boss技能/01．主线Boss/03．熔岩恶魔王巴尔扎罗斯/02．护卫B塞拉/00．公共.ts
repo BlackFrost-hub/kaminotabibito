@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 取单位ID, 距离平方XY as 点距离平方 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 提交预计算Boss技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "../00．配置";
 import { 巴尔扎罗斯技能数值配置 } from "../02．数值与表现配置";
@@ -9,9 +11,6 @@ import type { 技能伤害形态 } from "../../../../../../04．伤害系统/08�
 
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
-};
-const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成技能伤害: (this: void, 参数: any) => boolean;
 };
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -77,33 +76,14 @@ const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const BJ_RADTODEG = 57.29577951308232;
-const 塞拉冰焰双星下次Ms表: Record<number, number | undefined> = {};
-const 塞拉绝对零度下次Ms表: Record<number, number | undefined> = {};
-const 塞拉元素转换下次Ms表: Record<number, number | undefined> = {};
-const 塞拉忙碌到Ms表: Record<number, number | undefined> = {};
 const 塞拉形态表: Record<number, "火焰" | "冰霜" | undefined> = {};
 const 零度领域减伤到期Ms表: Record<number, number | undefined> = {};
 const 绝对零度领域状态表: Record<number, { X: number; Y: number; 结束Ms: number } | undefined> = {};
 const 弱追踪弹体状态表: Record<number, { 锁定: boolean; 锁定角: number } | undefined> = {};
 let 塞拉伤害修正已注册 = false;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 取方向角(this: void, fromX: number, fromY: number, toX: number, toY: number): number {
   return Atan2(toY - fromY, toX - fromX) * BJ_RADTODEG;
-}
-
-function 点距离平方(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  return dx * dx + dy * dy;
 }
 
 function 点在圆内(this: void, x: number, y: number, cx: number, cy: number, radius: number): boolean {
@@ -187,7 +167,7 @@ function 创建塞拉点特效(this: void, 模型路径: string, x: number, y: n
 
 function 造成塞拉Boss技能伤害(this: void, source: any, target: any, amount: number, damageType: any, 伤害形态: 技能伤害形态): void {
   if (!单位有效(source) || !单位有效(target) || !(amount > 0)) return;
-  造成技能伤害({
+  提交预计算Boss技能伤害({
     来源: source,
     目标: target,
     伤害: amount,
@@ -195,7 +175,6 @@ function 造成塞拉Boss技能伤害(this: void, source: any, target: any, amou
     attackType: ATTACK_TYPE_CHAOS,
     伤害类型: damageType,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
     伤害形态,
   });
 }
@@ -245,10 +224,6 @@ export const 塞拉公共 = {
   DAMAGE_TYPE_COLD,
   WEAPON_TYPE_WHOKNOWS,
   BJ_RADTODEG,
-  塞拉冰焰双星下次Ms表,
-  塞拉绝对零度下次Ms表,
-  塞拉元素转换下次Ms表,
-  塞拉忙碌到Ms表,
   塞拉形态表,
   零度领域减伤到期Ms表,
   绝对零度领域状态表,

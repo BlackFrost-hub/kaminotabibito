@@ -161,9 +161,21 @@ do
     end
 end
 do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
     ____exports.BossStringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
     ____exports["Boss取单位ID"] = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+    ____exports["Boss单位句柄存在"] = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位句柄存在"]
+    ____exports["Boss单位未标记死亡"] = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+    ____exports["Boss单位已标记死亡"] = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位已标记死亡"]
+    ____exports["Boss单位存活"] = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
     ____exports["Boss单位有效"] = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位有效"]
     ____exports["Boss距离平方XY"] = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离平方XY"]
     ____exports["Boss距离XY"] = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]

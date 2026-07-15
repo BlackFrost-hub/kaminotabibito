@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
 
@@ -36,7 +37,7 @@ const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
 export interface 生命锚点封锁目标 {
   单位: any;
@@ -51,10 +52,6 @@ export interface 生命锚点封锁控制器 {
 
 const 锚点溢出伤害保护表: Record<number, true | undefined> = {};
 let 锚点溢出伤害保护已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 锚点溢出伤害保护(this: void, damage: any): number {
   if (damage.target == null || damage.target === 0) return damage.currentDamage;
@@ -173,10 +170,10 @@ export function 启动雅儿贝德生命锚点封锁(
   }
   SetUnitInvulnerable(unit, false);
   barrierEffect = AddSpecialEffectTarget(cfg.表现资源.雅儿贝德共同护盾特效路径, unit, 'origin');
-  if (barrierEffect != null && barrierEffect !== 0 && typeof EXSetEffectSize === 'function') {
+  if (barrierEffect != null && barrierEffect !== 0) {
     EXSetEffectSize(barrierEffect, cfg.守护者模式.生命锚点封锁屏障缩放);
   }
-  periodicId = addPeriodicCallback(100, on封锁状态检查);
+  periodicId = addPeriodicCallback(cfg.守护者模式.生命锚点封锁状态检查间隔毫秒, on封锁状态检查);
   context.清理.登记清理('雅儿贝德-生命锚点封锁', function 生命锚点封锁清理(this: void): void {
     结束封锁('挑战清理');
   });

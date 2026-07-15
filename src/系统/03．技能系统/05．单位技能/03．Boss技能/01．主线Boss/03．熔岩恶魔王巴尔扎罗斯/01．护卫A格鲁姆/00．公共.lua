@@ -1,15 +1,21 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____70B9_5230_5355_4F4D_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位到点距离平方"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss技能伤害"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
 local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯技能数值配置"]
 local ____14_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.14．台词播放")
 local _____64AD_653E_683C_9C81_59C6_53F0_8BCD = ____14_FF0E_53F0_8BCD_64AD_653E["播放格鲁姆台词"]
 local ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.16．灼热层数工具")
 local _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED = ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177["施加巴尔扎罗斯灼热"]
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
-local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_1["造成技能伤害"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
+local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
@@ -28,11 +34,10 @@ local ____require_result_7 = require("系统.03．技能系统.00．技能模板
 local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_7["施加快速控制Buff"]
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_8["设置特效XYZ轴旋转"]
-local ____require_result_9 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_9.YDWETimerDestroyEffectSafe
-local ____require_result_10 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_10.CosBJ
-local SinBJ = ____require_result_10.SinBJ
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_9.CosBJ
+local SinBJ = ____require_result_9.SinBJ
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetHandleId = jass.GetHandleId
@@ -51,17 +56,6 @@ local EXSetEffectZ = japi.EXSetEffectZ
 local EXSetEffectSize = japi.EXSetEffectSize
 local BJ_RADTODEG = 57.29577951308232
 local _____5FEB_901F_63A7_5236__51FB_6655 = 0
-local _____683C_9C81_59C6_91CD_9524_4E0B_6B21Ms_8868 = {}
-local _____683C_9C81_59C6_706B_5F84_4E0B_6B21Ms_8868 = {}
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
-local function _____53D6_5355_4F4DID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local function _____53D6_76EE_6807_5355_4F4D(context)
     local entry = _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807(context["Boss单位"])
     if entry ~= nil and _____5355_4F4D_6709_6548(entry.targetRef) then
@@ -88,23 +82,18 @@ local function _____89D2_5EA6_5DEE_7EDD_5BF9_503C(a, b)
     end
     return diff >= 0 and diff or -diff
 end
-local function _____70B9_5230_5355_4F4D_8DDD_79BB_5E73_65B9(unit, x, y)
-    local dx = GetUnitX(unit) - x
-    local dy = GetUnitY(unit) - y
-    return dx * dx + dy * dy
-end
 local function _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3(grum)
     return _____8BFB_53D6_5355_4F4D_653B_51FB_529B(grum) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]["持续伤害攻击力比例"] * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]["伤害总倍率"]
 end
 local function _____8BA1_7B97_706B_5F84_7A7F_8D8A_4F24_5BB3(grum, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
-    return (_____8BFB_53D6_5355_4F4D_653B_51FB_529B(grum) * config["穿越伤害攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["穿越伤害目标最大生命比例"]) * config["伤害总倍率"]
+    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(grum, target, {["来源攻击力比例"] = config["穿越伤害攻击力比例"], ["目标最大生命比例"] = config["穿越伤害目标最大生命比例"], ["总倍率"] = config["伤害总倍率"]})
 end
 local function _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(source, target, amount, _____4F24_5BB3_5F62_6001)
     if not _____5355_4F4D_6709_6548(source) or not _____5355_4F4D_6709_6548(target) or not (amount > 0) then
         return
     end
-    _____9020_6210_6280_80FD_4F24_5BB3({
+    _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3({
         ["来源"] = source,
         ["目标"] = target,
         ["伤害"] = amount,
@@ -112,26 +101,19 @@ local function _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(source, tar
         attackType = ATTACK_TYPE_CHAOS,
         ["伤害类型"] = DAMAGE_TYPE_FIRE,
         weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能",
         ["伤害形态"] = _____4F24_5BB3_5F62_6001
     })
 end
 local function _____64AD_653E_70B9_7279_6548(model, x, y, z, scale, duration, angle)
-    local effect = AddSpecialEffect(model, x, y)
-    if effect == nil or effect == 0 then
-        return nil
-    end
-    if type(EXSetEffectZ) == "function" then
-        EXSetEffectZ(effect, z)
-    end
-    if type(EXSetEffectSize) == "function" then
-        EXSetEffectSize(effect, scale)
-    end
-    if angle ~= nil then
-        _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C(effect, {["Z轴角度"] = angle})
-    end
-    YDWETimerDestroyEffectSafe(duration, effect)
-    return effect
+    return _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = model,
+        X = x,
+        Y = y,
+        Z = z,
+        ["缩放"] = scale,
+        ["Z轴角度"] = angle,
+        ["持续秒"] = duration
+    })
 end
 ____exports["格鲁姆公共"] = {
     ["巴尔扎罗斯技能数值配置"] = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E,
@@ -149,7 +131,6 @@ ____exports["格鲁姆公共"] = {
     getServerTime = getServerTime,
     ["施加快速控制Buff"] = _____65BD_52A0_5FEB_901F_63A7_5236Buff,
     ["设置特效XYZ轴旋转"] = _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C,
-    YDWETimerDestroyEffectSafe = YDWETimerDestroyEffectSafe,
     CosBJ = CosBJ,
     SinBJ = SinBJ,
     GetHandleId = GetHandleId,
@@ -168,8 +149,6 @@ ____exports["格鲁姆公共"] = {
     EXSetEffectSize = EXSetEffectSize,
     BJ_RADTODEG = BJ_RADTODEG,
     ["快速控制_击晕"] = _____5FEB_901F_63A7_5236__51FB_6655,
-    ["格鲁姆重锤下次Ms表"] = _____683C_9C81_59C6_91CD_9524_4E0B_6B21Ms_8868,
-    ["格鲁姆火径下次Ms表"] = _____683C_9C81_59C6_706B_5F84_4E0B_6B21Ms_8868,
     ["单位有效"] = _____5355_4F4D_6709_6548,
     ["取单位ID"] = _____53D6_5355_4F4DID,
     ["取目标单位"] = _____53D6_76EE_6807_5355_4F4D,

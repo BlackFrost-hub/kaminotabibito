@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
 local _____83B7_53D6_5168_90E8_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取全部安兹运行时上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
@@ -30,9 +32,6 @@ local EXSetEffectSize = japi.EXSetEffectSize
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local RAD_TO_DEG = 57.29577951308232
 local _____5B88_62A4_804C_8D23_4F24_5BB3_4FEE_6B63_5DF2_6CE8_518C = false
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____662F_5426_76F4_63A5_4F24_5BB3(damage)
     if not _____5355_4F4D_6709_6548(damage.attacker) or damage.attacker == damage.target then
         return false
@@ -59,7 +58,7 @@ local function _____5B88_62A4_804C_8D23_4F24_5BB3_5171_4EAB_4FEE_6B63(damage)
                 local state = context["雅儿贝德"]
                 local albedo = state and state["单位"]
                 if state == nil or not state["守护连接生效"] or not _____5355_4F4D_6709_6548(albedo) then
-                    goto __continue10
+                    goto __continue9
                 end
                 local other = nil
                 if damage.target == context["安兹单位"] then
@@ -68,7 +67,7 @@ local function _____5B88_62A4_804C_8D23_4F24_5BB3_5171_4EAB_4FEE_6B63(damage)
                     other = context["安兹单位"]
                 end
                 if not _____5355_4F4D_6709_6548(other) then
-                    goto __continue10
+                    goto __continue9
                 end
                 local share = damage.currentDamage * _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["守护者之职责共享比例"]
                 local minimumLife = other == albedo and GetUnitState(albedo, UNIT_STATE_MAX_LIFE) * _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["雅儿贝德锁血比例"] or 1
@@ -81,7 +80,7 @@ local function _____5B88_62A4_804C_8D23_4F24_5BB3_5171_4EAB_4FEE_6B63(damage)
                 })
                 return damage.currentDamage - share
             end
-            ::__continue10::
+            ::__continue9::
             i = i + 1
         end
     end
@@ -113,21 +112,15 @@ local function _____5237_65B0_5B88_62A4_804C_8D23_8FDE_63A5_8868_73B0(visual)
     if visual["特效"] == nil or visual["特效"] == 0 then
         return
     end
-    if type(EXSetEffectXY) == "function" then
-        EXSetEffectXY(visual["特效"], (ax + bx) * 0.5, (ay + by) * 0.5)
-    end
-    if type(EXEffectMatRotateZ) == "function" then
-        EXEffectMatRotateZ(
-            visual["特效"],
-            Atan2(dy, dx) * RAD_TO_DEG
-        )
-    end
-    if type(EXSetEffectSize) == "function" then
-        EXSetEffectSize(
-            visual["特效"],
-            SquareRoot(dx * dx + dy * dy) / _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["守护者之职责连接基础长度"]
-        )
-    end
+    EXSetEffectXY(visual["特效"], (ax + bx) * 0.5, (ay + by) * 0.5)
+    EXEffectMatRotateZ(
+        visual["特效"],
+        Atan2(dy, dx) * RAD_TO_DEG
+    )
+    EXSetEffectSize(
+        visual["特效"],
+        SquareRoot(dx * dx + dy * dy) / _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["守护者之职责连接基础长度"]
+    )
 end
 local function _____6E05_7406_5B88_62A4_804C_8D23_8868_73B0(visual)
     if visual["已结束"] then
@@ -196,7 +189,7 @@ ____exports["释放雅儿贝德守护者之职责"] = function(context)
     }
     _____5237_65B0_5B88_62A4_804C_8D23_8FDE_63A5_8868_73B0(visual)
     visual["刷新ID"] = addPeriodicCallback(
-        50,
+        cfg["守护者之职责连接刷新间隔毫秒"],
         function()
             if context["当前大型技能"] ~= nil or state["阶段状态"] == "失衡" then
                 local ____opt_10 = state["独占状态"]

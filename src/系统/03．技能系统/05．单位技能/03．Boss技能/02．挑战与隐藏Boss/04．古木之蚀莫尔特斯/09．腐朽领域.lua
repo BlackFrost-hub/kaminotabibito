@@ -17,6 +17,8 @@ local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local jass = require("jass.common")
 local AddSpecialEffect = jass.AddSpecialEffect
 local GetUnitX = jass.GetUnitX
@@ -27,24 +29,23 @@ local RemoveLocation = jass.RemoveLocation
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_3["施加快速减速Buff"]
-local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_4.registerManualBuff
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_5.addDelayedCallback
-local ____require_result_6 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
-local _____83AB_5C14_7279_65AFBuffID = ____require_result_7["莫尔特斯BuffID"]
-local ____require_result_8 = require("lib.扩展函数.BJ函数.11．贴图函数")
-local CreateUbersplatBJ = ____require_result_8.CreateUbersplatBJ
-local ShowUbersplatBJ = ____require_result_8.ShowUbersplatBJ
-local _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587 = nil
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_4["施加快速减速Buff"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_6.addDelayedCallback
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
+local ____require_result_8 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
+local _____83AB_5C14_7279_65AFBuffID = ____require_result_8["莫尔特斯BuffID"]
+local ____require_result_9 = require("lib.扩展函数.BJ函数.11．贴图函数")
+local CreateUbersplatBJ = ____require_result_9.CreateUbersplatBJ
+local ShowUbersplatBJ = ____require_result_9.ShowUbersplatBJ
 local function _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
     local grid = context["根须宫格"]
     if grid == nil then
@@ -76,8 +77,8 @@ local function _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
                     goto __continue5
                 end
                 ShowUbersplatBJ(true, ubersplat)
-                local ____self_9 = context["清理"]
-                ____self_9["登记贴图"](____self_9, "莫尔特斯-腐朽领域沼泽", ubersplat)
+                local ____self_10 = context["清理"]
+                ____self_10["登记贴图"](____self_10, "莫尔特斯-腐朽领域沼泽", ubersplat)
             end
             ::__continue5::
             i = i + 1
@@ -105,8 +106,8 @@ local function _____521B_5EFA_51C0_5316_7B26_6587(context)
                     goto __continue11
                 end
                 local effect = AddSpecialEffect(cfg["净化符文模型路径"], cell["中心X"], cell["中心Y"])
-                local ____self_10 = context["清理"]
-                ____self_10["登记特效"](____self_10, "莫尔特斯-净化符文", effect)
+                local ____self_11 = context["清理"]
+                ____self_11["登记特效"](____self_11, "莫尔特斯-净化符文", effect)
                 _____521B_5EFA_6280_80FD_63D0_793A_5708({
                     ["类型"] = "白色安全圆",
                     X = cell["中心X"],
@@ -160,18 +161,18 @@ local function _____5904_7406_51C0_5316_7B26_6587(context, hero)
     end
     return false
 end
-local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B()
-    local variable = _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587
-    _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587 = nil
-    if variable == nil then
+local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B(variable)
+    local data = variable
+    if data == nil then
         return
     end
-    local context = variable.context
-    local target = variable.target
+    local context = data.context
+    local target = data.target
     if not _____5355_4F4D_6709_6548(context["Boss单位"]) or not _____5355_4F4D_6709_6548(target) then
         return
     end
-    AddSpecialEffect(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["穿刺特效路径"], variable.X, variable.Y)
+    local _____7A7F_523A_914D_7F6E = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]
+    _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____7A7F_523A_914D_7F6E["穿刺特效路径"], X = data.X, Y = data.Y, ["持续秒"] = _____7A7F_523A_914D_7F6E["瞬时特效持续秒"]})
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = context["Boss单位"],
         ["目标"] = target,
@@ -182,13 +183,13 @@ local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B()
         ["伤害类型"] = DAMAGE_TYPE_PLANT,
         weaponType = WEAPON_TYPE_WHOKNOWS,
         ["来源类型"] = "Boss技能",
-        ["技能实例ID"] = variable["技能实例ID"],
+        ["技能实例ID"] = data["技能实例ID"],
         ["标签"] = "莫尔特斯腐朽领域根须"
     })
     _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, target, _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["腐败值"])
 end
-____exports["尝试触发莫尔特斯腐朽领域"] = function(context)
-    if context["腐朽领域已触发"] or context["阶段"] < 3 or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+____exports["触发莫尔特斯腐朽领域"] = function(context)
+    if context["腐朽领域已触发"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return
     end
     context["腐朽领域已触发"] = true
@@ -213,18 +214,11 @@ ____exports["尝试触发莫尔特斯腐朽领域"] = function(context)
         ["触发概率百分比"] = _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["转阶段触发概率百分比"]
     })
 end
-____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
+____exports["处理莫尔特斯沼泽腐败"] = function(context)
     if not context["腐朽领域已触发"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-        return
+        return false
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
-    if context["下次沼泽腐败时间"] <= 0 then
-        context["下次沼泽腐败时间"] = nowMs
-    end
-    if nowMs < context["下次沼泽腐败时间"] then
-        return
-    end
-    context["下次沼泽腐败时间"] = nowMs + cfg["沼泽腐败间隔秒"] * 1000
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
     do
         local i = 0
@@ -232,10 +226,10 @@ ____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue29
+                    goto __continue27
                 end
                 if _____5904_7406_51C0_5316_7B26_6587(context, hero) then
-                    goto __continue29
+                    goto __continue27
                 end
                 _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                     context["Boss单位"],
@@ -246,40 +240,45 @@ ____exports["处理莫尔特斯腐朽领域周期"] = function(context, nowMs)
                 )
                 _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, hero, cfg["沼泽每跳腐败值"])
             end
-            ::__continue29::
+            ::__continue27::
             i = i + 1
         end
     end
-    if context["下次沼泽根须时间"] <= 0 then
-        context["下次沼泽根须时间"] = nowMs + cfg["根须触发间隔秒"] * 1000
-    end
-    if nowMs >= context["下次沼泽根须时间"] and #heroes > 0 then
-        context["下次沼泽根须时间"] = nowMs + cfg["根须触发间隔秒"] * 1000
-        local target = heroes[GetRandomInt(0, #heroes - 1) + 1]
-        if _____5355_4F4D_6709_6548(target) then
-            local x = GetUnitX(target)
-            local y = GetUnitY(target)
-            local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "莫尔特斯腐朽领域根须", ["持续时间秒"] = 3})
-            _____521B_5EFA_6280_80FD_63D0_793A_5708({
-                ["类型"] = "圆形",
-                X = x,
-                Y = y,
-                ["半径"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"] * 0.5,
-                ["持续时间"] = 1
-            })
-            _____8150_673D_9886_57DF_6839_987B_5EF6_8FDF_4E0A_4E0B_6587 = {
-                context = context,
-                target = target,
-                X = x,
-                Y = y,
-                ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
-            }
-            local id = addDelayedCallback(1000, _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B)
-            local ____self_11 = context["清理"]
-            ____self_11["登记延迟回调"](____self_11, "莫尔特斯-腐朽沼泽根须", id)
-        end
-    end
+    return true
 end
-____exports["注册莫尔特斯腐朽领域"] = function()
+____exports["处理莫尔特斯沼泽根须"] = function(context)
+    if not context["腐朽领域已触发"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        return false
+    end
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
+    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
+    if #heroes <= 0 then
+        return false
+    end
+    local target = heroes[GetRandomInt(0, #heroes - 1) + 1]
+    if not _____5355_4F4D_6709_6548(target) then
+        return true
+    end
+    local x = GetUnitX(target)
+    local y = GetUnitY(target)
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "莫尔特斯腐朽领域根须", ["持续时间秒"] = 3})
+    _____521B_5EFA_6280_80FD_63D0_793A_5708({
+        ["类型"] = "圆形",
+        X = x,
+        Y = y,
+        ["半径"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"] * 0.5,
+        ["持续时间"] = 1
+    })
+    local data = {
+        context = context,
+        target = target,
+        X = x,
+        Y = y,
+        ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
+    }
+    local id = addDelayedCallback(cfg["根须结算延迟毫秒"], _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B, data)
+    local ____self_12 = context["清理"]
+    ____self_12["登记延迟回调"](____self_12, "莫尔特斯-腐朽沼泽根须", id)
+    return true
 end
 return ____exports

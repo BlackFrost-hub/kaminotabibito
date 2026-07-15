@@ -10,6 +10,9 @@ const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("�
   造成单体技能伤害: (this: void, 参数: any) => boolean;
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 const jass = require("jass.common") as any;
 
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
@@ -35,7 +38,7 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -55,8 +58,6 @@ interface 莫尔特斯腐朽领域根须延迟上下文 {
   Y: number;
   技能实例ID?: number;
 }
-
-let 腐朽领域根须延迟上下文: 莫尔特斯腐朽领域根须延迟上下文 | undefined = undefined;
 
 function 创建腐朽领域沼泽地表(this: void, context: 莫尔特斯运行时上下文): void {
   const grid = context.根须宫格;
@@ -126,14 +127,14 @@ function 处理净化符文(this: void, context: 莫尔特斯运行时上下文,
   return false;
 }
 
-function 莫尔特斯腐朽沼泽根须(this: void): void {
-  const variable = 腐朽领域根须延迟上下文;
-  腐朽领域根须延迟上下文 = undefined;
-  if (variable == null) return;
-  const context = variable.context;
-  const target = variable.target;
+function 莫尔特斯腐朽沼泽根须(this: void, variable?: any): void {
+  const data = variable as 莫尔特斯腐朽领域根须延迟上下文 | undefined;
+  if (data == null) return;
+  const context = data.context;
+  const target = data.target;
   if (!单位有效(context.Boss单位) || !单位有效(target)) return;
-  AddSpecialEffect(莫尔特斯数值与表现配置.腐朽根须穿刺.穿刺特效路径, variable.X, variable.Y);
+  const 穿刺配置 = 莫尔特斯数值与表现配置.腐朽根须穿刺;
+  创建点特效({ 模型路径: 穿刺配置.穿刺特效路径, X: data.X, Y: data.Y, 持续秒: 穿刺配置.瞬时特效持续秒 });
   造成单体技能伤害({
     来源: context.Boss单位,
     目标: target,
@@ -144,14 +145,14 @@ function 莫尔特斯腐朽沼泽根须(this: void): void {
     伤害类型: DAMAGE_TYPE_PLANT,
     weaponType: WEAPON_TYPE_WHOKNOWS,
     来源类型: "Boss技能",
-    技能实例ID: variable.技能实例ID,
+    技能实例ID: data.技能实例ID,
     标签: "莫尔特斯腐朽领域根须",
   });
   增加玩家腐败值(context, target, 莫尔特斯数值与表现配置.腐朽根须穿刺.腐败值);
 }
 
-export function 尝试触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯运行时上下文): void {
-  if (context.腐朽领域已触发 || context.阶段 < 3 || !单位有效(context.Boss单位)) return;
+export function 触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯运行时上下文): void {
+  if (context.腐朽领域已触发 || !单位有效(context.Boss单位)) return;
   context.腐朽领域已触发 = true;
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
   播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
@@ -170,12 +171,9 @@ export function 尝试触发莫尔特斯腐朽领域(this: void, context: 莫尔
   });
 }
 
-export function 处理莫尔特斯腐朽领域周期(this: void, context: 莫尔特斯运行时上下文, nowMs: number): void {
-  if (!context.腐朽领域已触发 || !单位有效(context.Boss单位)) return;
+export function 处理莫尔特斯沼泽腐败(this: void, context: 莫尔特斯运行时上下文): boolean {
+  if (!context.腐朽领域已触发 || !单位有效(context.Boss单位)) return false;
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
-  if (context.下次沼泽腐败时间 <= 0) context.下次沼泽腐败时间 = nowMs;
-  if (nowMs < context.下次沼泽腐败时间) return;
-  context.下次沼泽腐败时间 = nowMs + cfg.沼泽腐败间隔秒 * 1000;
   const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
@@ -184,31 +182,32 @@ export function 处理莫尔特斯腐朽领域周期(this: void, context: 莫尔
     施加快速减速Buff(context.Boss单位, hero, cfg.减速比例, cfg.减速比例, 1.3);
     增加玩家腐败值(context, hero, cfg.沼泽每跳腐败值);
   }
-  if (context.下次沼泽根须时间 <= 0) context.下次沼泽根须时间 = nowMs + cfg.根须触发间隔秒 * 1000;
-  if (nowMs >= context.下次沼泽根须时间 && heroes.length > 0) {
-    context.下次沼泽根须时间 = nowMs + cfg.根须触发间隔秒 * 1000;
-    const target = heroes[GetRandomInt(0, heroes.length - 1)];
-    if (单位有效(target)) {
-      const x = GetUnitX(target);
-      const y = GetUnitY(target);
-      const 技能实例ID = 创建独立技能伤害实例({
-        来源类型: "Boss技能",
-        标签: "莫尔特斯腐朽领域根须",
-        持续时间秒: 3,
-      });
-      创建技能提示圈({
-        类型: "圆形",
-        X: x,
-        Y: y,
-        半径: 莫尔特斯数值与表现配置.根须领域.单格边长 * 0.5,
-        持续时间: 1,
-      });
-      腐朽领域根须延迟上下文 = { context, target, X: x, Y: y, 技能实例ID };
-      const id = addDelayedCallback(1000, 莫尔特斯腐朽沼泽根须);
-      context.清理.登记延迟回调("莫尔特斯-腐朽沼泽根须", id);
-    }
-  }
+  return true;
 }
 
-export function 注册莫尔特斯腐朽领域(this: void): void {
+export function 处理莫尔特斯沼泽根须(this: void, context: 莫尔特斯运行时上下文): boolean {
+  if (!context.腐朽领域已触发 || !单位有效(context.Boss单位)) return false;
+  const cfg = 莫尔特斯数值与表现配置.腐朽领域;
+  const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
+  if (heroes.length <= 0) return false;
+  const target = heroes[GetRandomInt(0, heroes.length - 1)];
+  if (!单位有效(target)) return true;
+  const x = GetUnitX(target);
+  const y = GetUnitY(target);
+  const 技能实例ID = 创建独立技能伤害实例({
+    来源类型: "Boss技能",
+    标签: "莫尔特斯腐朽领域根须",
+    持续时间秒: 3,
+  });
+  创建技能提示圈({
+    类型: "圆形",
+    X: x,
+    Y: y,
+    半径: 莫尔特斯数值与表现配置.根须领域.单格边长 * 0.5,
+    持续时间: 1,
+  });
+  const data: 莫尔特斯腐朽领域根须延迟上下文 = { context, target, X: x, Y: y, 技能实例ID };
+  const id = addDelayedCallback(cfg.根须结算延迟毫秒, 莫尔特斯腐朽沼泽根须, data);
+  context.清理.登记延迟回调("莫尔特斯-腐朽沼泽根须", id);
+  return true;
 }

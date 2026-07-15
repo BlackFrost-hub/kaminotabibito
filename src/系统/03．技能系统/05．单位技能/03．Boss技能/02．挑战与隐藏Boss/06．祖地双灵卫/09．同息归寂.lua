@@ -196,13 +196,13 @@ ____exports["执行祖地双灵卫净化收束"] = function(context)
         GetUnitY(azure)
     )
     if effectA ~= nil and effectA ~= 0 then
-        YDWETimerDestroyEffectSafe(3, effectA)
+        YDWETimerDestroyEffectSafe(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["最终净化特效持续秒"], effectA)
     end
     if effectB ~= nil and effectB ~= 0 then
-        YDWETimerDestroyEffectSafe(3, effectB)
+        YDWETimerDestroyEffectSafe(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["最终净化特效持续秒"], effectB)
     end
     local delayedId = addDelayedCallback(
-        2800,
+        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["最终净化结算延迟毫秒"],
         function()
             _____4E3B_52A8_7ED3_675FBoss_6218_8FD0_884C(red, {["跳过死亡音效"] = true, ["跳过死亡剧情"] = true})
             _____4E3B_52A8_7ED3_675FBoss_6218_8FD0_884C(azure, {["跳过死亡音效"] = true, ["跳过死亡剧情"] = true})

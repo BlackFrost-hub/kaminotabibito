@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
 import { 巴尔扎罗斯固定安全区配置表 } from "./01．场地配置";
@@ -8,9 +13,6 @@ import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 减少巴尔扎罗斯灼热层数 } from "./16．灼热层数工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -70,10 +72,6 @@ interface 末日熔爆点 {
   右?: number;
   下?: number;
   上?: number;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 取场地中心(this: void, context: 巴尔扎罗斯运行时上下文): 末日熔爆点 {
@@ -201,9 +199,11 @@ function 点在安全区(this: void, unit: any, safePoints: 末日熔爆点[]): 
 
 function 计算外圈伤害(this: void, boss: any, target: any): number {
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;
-  return (GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.外圈伤害目标最大生命比例
-    + 读取单位攻击力(boss) * config.外圈伤害Boss攻击力比例)
-    * config.外圈伤害总倍率;
+  return 计算组合技能伤害(boss, target, {
+    来源攻击力比例: config.外圈伤害Boss攻击力比例,
+    目标最大生命比例: config.外圈伤害目标最大生命比例,
+    总倍率: config.外圈伤害总倍率,
+  });
 }
 
 function 计算安全区余波伤害(this: void, target: any): number {
@@ -373,7 +373,7 @@ export function 初始化巴尔扎罗斯末日熔爆节点(this: void, context: 
       { ID: "末日熔爆-P3", 百分比: config.第三阶段触发生命比例, on触发: function 巴尔扎罗斯进入P3(this: void): void { 进入第三阶段(context); } },
     ],
   });
-  const tickId = addPeriodicCallback(1000, function 巴尔扎罗斯末日熔爆周期(this: void): void {
+  const tickId = addPeriodicCallback(config.运行检查间隔毫秒, function 巴尔扎罗斯末日熔爆周期(this: void): void {
     尝试低血量额外触发(context);
     尝试周期触发末日熔爆(context);
   });

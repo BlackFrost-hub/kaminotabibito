@@ -8,8 +8,13 @@ import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 播放莫尔特斯限时动作, 极坐标X, 极坐标Y, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
+import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const jass = require("jass.common") as any;
 
@@ -19,15 +24,13 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const IssuePointOrder = jass.IssuePointOrder as (unit: any, order: string, x: number, y: number) => boolean;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
@@ -53,12 +56,6 @@ function 莫尔特斯孢子云周期(this: void, variable?: any): void {
   const data = variable as 孢子云实例 | undefined;
   if (data == null) return;
   孢子云Tick(data);
-}
-
-function 莫尔特斯延迟创建孢子云(this: void, variable?: any): void {
-  const context = variable as 莫尔特斯运行时上下文 | undefined;
-  if (context == null) return;
-  创建单团孢子云(context);
 }
 
 function 孢子云Tick(this: void, data: 孢子云实例): void {
@@ -92,7 +89,7 @@ function 孢子云Tick(this: void, data: 孢子云实例): void {
       weaponType: WEAPON_TYPE_WHOKNOWS,
       来源类型: "Boss技能",
     });
-    AddSpecialEffect(cfg.命中特效路径, GetUnitX(hero), GetUnitY(hero));
+    创建点特效({ 模型路径: cfg.命中特效路径, X: GetUnitX(hero), Y: GetUnitY(hero), 持续秒: cfg.瞬时特效持续秒 });
     应用莫尔特斯腐败值(data.context, hero, cfg.每秒腐败值);
   }
 }
@@ -123,20 +120,44 @@ function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下�
     剩余跳数: cfg.持续秒,
     周期ID: 0,
   };
-  data.周期ID = addPeriodicCallback(1000, 莫尔特斯孢子云周期, data);
+  data.周期ID = addPeriodicCallback(cfg.Tick间隔毫秒, 莫尔特斯孢子云周期, data);
   context.清理.登记周期回调("莫尔特斯-腐败孢子云周期", data.周期ID);
+}
+
+function 追加孢子云创建时间轴(this: void, 事件列表: 固定时间轴事件[], context: 莫尔特斯运行时上下文, index: number): void {
+  事件列表.push({
+    时点毫秒: index * 1000,
+    名称: "腐败孢子云第" + String(index + 1) + "团",
+    执行: function 莫尔特斯创建孢子云(this: void): void {
+      创建单团孢子云(context);
+    },
+  });
 }
 
 export function 释放莫尔特斯腐败孢子云(this: void, context: 莫尔特斯运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.腐败孢子云;
+  if (cfg.数量 <= 0) return;
+  if (context.腐败孢子云组合执行器 == null) {
+    context.腐败孢子云组合执行器 = 创建固定组合技能执行器<莫尔特斯运行时上下文>({
+      名称: "莫尔特斯-腐败孢子云",
+      清理: context.清理,
+      互斥组: "莫尔特斯腐败孢子云",
+    });
+  }
+  if (context.腐败孢子云组合执行器.是否运行中()) return;
+  const 事件列表: 固定时间轴事件[] = [];
+  for (let i = 0; i < cfg.数量; i++) 追加孢子云创建时间轴(事件列表, context, i);
   播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(boss, "腐败孢子云");
-  for (let i = 0; i < cfg.数量; i++) {
-    const id = addDelayedCallback(i * 1000, 莫尔特斯延迟创建孢子云, context);
-    context.清理.登记延迟回调("莫尔特斯-创建腐败孢子云", id);
-  }
+  context.腐败孢子云组合执行器.开始({
+    key: "腐败孢子云",
+    单位: boss,
+    上下文: context,
+    最大持续毫秒: cfg.数量 * 1000,
+    阶段列表: 创建固定时间轴阶段列表(事件列表),
+  });
 }
 
 function on莫尔特斯腐败孢子云施法(this: void, castingUnit: any, spellAbilityId: number): void {

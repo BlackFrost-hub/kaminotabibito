@@ -137,9 +137,9 @@ export function 执行祖地双灵卫净化收束(this: void, context: 祖地双
   SetUnitVertexColor(azure, 255, 255, 255, 210);
   const effectA = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.最终净化归静特效路径, GetUnitX(red), GetUnitY(red));
   const effectB = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.最终净化归静特效路径, GetUnitX(azure), GetUnitY(azure));
-  if (effectA != null && effectA !== 0) YDWETimerDestroyEffectSafe(3, effectA);
-  if (effectB != null && effectB !== 0) YDWETimerDestroyEffectSafe(3, effectB);
-  const delayedId = addDelayedCallback(2800, function 双灵卫净化结算(this: void): void {
+  if (effectA != null && effectA !== 0) YDWETimerDestroyEffectSafe(祖地双灵卫数值与表现配置.P3.最终净化特效持续秒, effectA);
+  if (effectB != null && effectB !== 0) YDWETimerDestroyEffectSafe(祖地双灵卫数值与表现配置.P3.最终净化特效持续秒, effectB);
+  const delayedId = addDelayedCallback(祖地双灵卫数值与表现配置.P3.最终净化结算延迟毫秒, function 双灵卫净化结算(this: void): void {
     主动结束Boss战运行(red, { 跳过死亡音效: true, 跳过死亡剧情: true });
     主动结束Boss战运行(azure, { 跳过死亡音效: true, 跳过死亡剧情: true });
     打开Boss死亡首领奖励UI(双灵卫奖励池ID);

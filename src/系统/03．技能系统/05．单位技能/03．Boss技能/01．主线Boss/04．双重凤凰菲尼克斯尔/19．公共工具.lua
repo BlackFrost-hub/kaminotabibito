@@ -8,10 +8,15 @@ local _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
+local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["点到线段距离平方"]
 local _____516C_5171_6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
 local _____516C_5171_6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss技能伤害"]
+local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
+local _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF = _____6247_5F62_533A_57DF["单位是否在扇形区域"]
 ____exports["单位有效"] = function(unit)
     return unit ~= nil and unit ~= 0 and isValidUnit(unit)
 end
@@ -28,7 +33,6 @@ end
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_0["造成技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local Player = jass.Player
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -41,7 +45,6 @@ local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
-local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local Atan2 = jass.Atan2
 local SquareRoot = jass.SquareRoot
@@ -90,7 +93,7 @@ local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_9["施加快�
 local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.index")
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_10["创建可攻击机制单位"]
 local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_11.createTimedEffect
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
 local createTimedUnitEffect = ____require_result_11.createTimedUnitEffect
 local RAD_TO_DEG = 57.29577951308232
 local _____5FEB_901F_63A7_5236__51FB_6655 = 1
@@ -230,19 +233,7 @@ ____exports["播放点特效"] = function(model, x, y, lifeMs)
     if model == nil or model == "" then
         return nil
     end
-    local ____temp_13
-    if lifeMs > 0 then
-        ____temp_13 = createTimedEffect(
-            model,
-            x,
-            y,
-            0,
-            lifeMs / 1000
-        )
-    else
-        ____temp_13 = AddSpecialEffect(model, x, y)
-    end
-    return ____temp_13
+    return _____521B_5EFA_70B9_7279_6548({["模型路径"] = model, X = x, Y = y, ["持续秒"] = lifeMs > 0 and lifeMs / 1000 or nil})
 end
 ____exports["播放单位特效"] = function(model, unit, attach, lifeMs)
     if attach == nil then
@@ -254,13 +245,13 @@ ____exports["播放单位特效"] = function(model, unit, attach, lifeMs)
     if model == nil or model == "" or not ____exports["单位有效"](unit) then
         return nil
     end
-    local ____temp_14
+    local ____temp_13
     if lifeMs > 0 then
-        ____temp_14 = createTimedUnitEffect(unit, attach, model, lifeMs / 1000)
+        ____temp_13 = createTimedUnitEffect(unit, attach, model, lifeMs / 1000)
     else
-        ____temp_14 = AddSpecialEffectTarget(model, unit, attach)
+        ____temp_13 = AddSpecialEffectTarget(model, unit, attach)
     end
-    return ____temp_14
+    return ____temp_13
 end
 ____exports["显示常规读条"] = function(_____79D2, _____989C_8272ID, _____6807_9898_6587_672C, _____63D0_793A_6587_672C)
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = _____79D2, ["颜色ID"] = _____989C_8272ID, ["标题文本"] = _____6807_9898_6587_672C, ["提示文本"] = _____63D0_793A_6587_672C})
@@ -306,48 +297,31 @@ ____exports["单位在扇形内"] = function(source, target, radius, angleDeg)
     if not ____exports["单位存活"](source) or not ____exports["单位存活"](target) then
         return false
     end
-    local sx = GetUnitX(source)
-    local sy = GetUnitY(source)
-    local tx = GetUnitX(target)
-    local ty = GetUnitY(target)
-    local d = ____exports["两点距离"](sx, sy, tx, ty)
-    if d > radius then
-        return false
-    end
-    local facing = GetUnitFacing(source)
-    local diff = Atan2(ty - sy, tx - sx) * RAD_TO_DEG - facing
-    while diff > 180 do
-        diff = diff - 360
-    end
-    while diff < -180 do
-        diff = diff + 360
-    end
-    return diff <= angleDeg * 0.5 and diff >= -angleDeg * 0.5
+    return _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF(
+        target,
+        GetUnitX(source),
+        GetUnitY(source),
+        radius,
+        GetUnitFacing(source),
+        angleDeg
+    )
 end
 ____exports["线段到点距离"] = function(ax, ay, bx, by, px, py)
-    local abx = bx - ax
-    local aby = by - ay
-    local apx = px - ax
-    local apy = py - ay
-    local abLenSq = abx * abx + aby * aby
-    if abLenSq <= 0.01 then
-        return ____exports["两点距离"](ax, ay, px, py)
-    end
-    local t = (apx * abx + apy * aby) / abLenSq
-    if t < 0 then
-        t = 0
-    end
-    if t > 1 then
-        t = 1
-    end
-    return ____exports["两点距离"](ax + abx * t, ay + aby * t, px, py)
+    return SquareRoot(_____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9(
+        px,
+        py,
+        ax,
+        ay,
+        bx,
+        by
+    ))
 end
 ____exports["范围敌人"] = function(boss, x, y, radius)
     return getEnemyUnitsInRange(boss, x, y, radius)
 end
 local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, target, amount, attackType, damageType, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
     if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
-        _____9020_6210_6280_80FD_4F24_5BB3({
+        _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3({
             ["技能ID"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["技能ID"],
             ["技能实例ID"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["技能实例ID"],
             ["标签"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["标签"],
@@ -358,7 +332,6 @@ local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, tar
             attackType = attackType,
             ["伤害类型"] = damageType,
             weaponType = WEAPON_TYPE_WHOKNOWS,
-            ["来源类型"] = "Boss技能",
             ["伤害形态"] = _____4F24_5BB3_5F62_6001
         })
     end
@@ -524,20 +497,20 @@ ____exports["减少元素层数"] = function(unit, _____5143_7D20, count)
         return
     end
     local runtime = getBuffRuntime(unit, buffID)
-    local ____registerManualBuff_26 = registerManualBuff
-    local ____unit_25 = unit
-    local ____opt_result_23
+    local ____registerManualBuff_25 = registerManualBuff
+    local ____unit_24 = unit
+    local ____opt_result_22
     if runtime ~= nil then
-        ____opt_result_23 = runtime.remaining
+        ____opt_result_22 = runtime.remaining
     end
-    local ____opt_result_23_24 = ____opt_result_23
-    if ____opt_result_23_24 == nil then
-        ____opt_result_23_24 = 30
+    local ____opt_result_22_23 = ____opt_result_22
+    if ____opt_result_22_23 == nil then
+        ____opt_result_22_23 = 30
     end
-    ____registerManualBuff_26(
-        ____unit_25,
+    ____registerManualBuff_25(
+        ____unit_24,
         buffID,
-        ____opt_result_23_24,
+        ____opt_result_22_23,
         next,
         {stack = next, sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
     )
@@ -583,13 +556,11 @@ ____exports["创建菲尼克斯尔机制单位"] = function(context, id, name, m
     if inst == nil then
         return nil
     end
-    if type(DzSetUnitName) == "function" then
-        DzSetUnitName(inst["单位"], name)
-    end
+    DzSetUnitName(inst["单位"], name)
     return inst["单位"]
 end
 ____exports["设置单位模型"] = function(unit, model)
-    if type(DzSetUnitModel) == "function" and ____exports["单位有效"](unit) then
+    if ____exports["单位有效"](unit) then
         DzSetUnitModel(unit, model)
     end
 end

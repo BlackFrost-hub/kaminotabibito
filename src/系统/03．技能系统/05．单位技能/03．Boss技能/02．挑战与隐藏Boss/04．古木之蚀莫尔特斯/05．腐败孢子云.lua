@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____83AB_5C14_7279_65AF_5B62_5B50_4E91_5468_671F, _____5B62_5B50_4E91Tick, _____521B_5EFA_5355_56E2_5B62_5B50_4E91, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, IssuePointOrder, AddSpecialEffect, GetUnitState, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, UNIT_STATE_MAX_LIFE, addPeriodicCallback, removePeriodicCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____8150_8D25_5B62_5B50_4E91_6280_80FDID
+local _____5B62_5B50_4E91Tick, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____521B_5EFA_70B9_7279_6548, GetUnitX, GetUnitY, GetRandomReal, IssuePointOrder, GetUnitState, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, UNIT_STATE_MAX_LIFE, removePeriodicCallback, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____8150_8D25_5B62_5B50_4E91_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.00．配置")
 local _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["莫尔特斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.01．运行时上下文")
@@ -22,13 +22,10 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-function _____83AB_5C14_7279_65AF_5B62_5B50_4E91_5468_671F(variable)
-    local data = variable
-    if data == nil then
-        return
-    end
-    _____5B62_5B50_4E91Tick(data)
-end
+local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
+local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
+local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
+local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
 function _____5B62_5B50_4E91Tick(data)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]
     local boss = data.context["Boss单位"]
@@ -60,12 +57,12 @@ function _____5B62_5B50_4E91Tick(data)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue9
+                    goto __continue7
                 end
                 local dx = GetUnitX(hero) - GetUnitX(spore)
                 local dy = GetUnitY(hero) - GetUnitY(spore)
                 if dx * dx + dy * dy > cfg["半径"] * cfg["半径"] then
-                    goto __continue9
+                    goto __continue7
                 end
                 local damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["每秒目标最大生命比例"]
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -80,19 +77,53 @@ function _____5B62_5B50_4E91Tick(data)
                     weaponType = WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能"
                 })
-                AddSpecialEffect(
-                    cfg["命中特效路径"],
-                    GetUnitX(hero),
-                    GetUnitY(hero)
-                )
+                _____521B_5EFA_70B9_7279_6548({
+                    ["模型路径"] = cfg["命中特效路径"],
+                    X = GetUnitX(hero),
+                    Y = GetUnitY(hero),
+                    ["持续秒"] = cfg["瞬时特效持续秒"]
+                })
                 _____5E94_7528_83AB_5C14_7279_65AF_8150_8D25_503C(data.context, hero, cfg["每秒腐败值"])
             end
-            ::__continue9::
+            ::__continue7::
             i = i + 1
         end
     end
 end
-function _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
+local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
+local jass = require("jass.common")
+local GetUnitTypeId = jass.GetUnitTypeId
+GetUnitX = jass.GetUnitX
+GetUnitY = jass.GetUnitY
+local GetOwningPlayer = jass.GetOwningPlayer
+GetRandomReal = jass.GetRandomReal
+IssuePointOrder = jass.IssuePointOrder
+GetUnitState = jass.GetUnitState
+ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
+DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
+WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
+UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_2.addPeriodicCallback
+removePeriodicCallback = ____require_result_2.removePeriodicCallback
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_3["创建可攻击机制单位"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
+_____8150_8D25_5B62_5B50_4E91_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]["技能槽位"])
+local _____5DF2_6CE8_518C = false
+local function _____83AB_5C14_7279_65AF_5B62_5B50_4E91_5468_671F(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____5B62_5B50_4E91Tick(data)
+end
+local function _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
     local boss = context["Boss单位"]
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]
     local instance = _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
@@ -120,42 +151,18 @@ function _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
         _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
     )
     local data = {context = context, ["孢子单位"] = instance["单位"], ["剩余跳数"] = cfg["持续秒"], ["周期ID"] = 0}
-    data["周期ID"] = addPeriodicCallback(1000, _____83AB_5C14_7279_65AF_5B62_5B50_4E91_5468_671F, data)
-    local ____self_4 = context["清理"]
-    ____self_4["登记周期回调"](____self_4, "莫尔特斯-腐败孢子云周期", data["周期ID"])
+    data["周期ID"] = addPeriodicCallback(cfg["Tick间隔毫秒"], _____83AB_5C14_7279_65AF_5B62_5B50_4E91_5468_671F, data)
+    local ____self_5 = context["清理"]
+    ____self_5["登记周期回调"](____self_5, "莫尔特斯-腐败孢子云周期", data["周期ID"])
 end
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
-local jass = require("jass.common")
-local GetUnitTypeId = jass.GetUnitTypeId
-GetUnitX = jass.GetUnitX
-GetUnitY = jass.GetUnitY
-GetOwningPlayer = jass.GetOwningPlayer
-GetRandomReal = jass.GetRandomReal
-IssuePointOrder = jass.IssuePointOrder
-AddSpecialEffect = jass.AddSpecialEffect
-GetUnitState = jass.GetUnitState
-ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
-WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-addPeriodicCallback = ____require_result_1.addPeriodicCallback
-removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-_____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
-_____8150_8D25_5B62_5B50_4E91_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]["技能槽位"])
-local _____5DF2_6CE8_518C = false
-local function _____83AB_5C14_7279_65AF_5EF6_8FDF_521B_5EFA_5B62_5B50_4E91(variable)
-    local context = variable
-    if context == nil then
-        return
-    end
-    _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
+local function _____8FFD_52A0_5B62_5B50_4E91_521B_5EFA_65F6_95F4_8F74(_____4E8B_4EF6_5217_8868, context, index)
+    _____4E8B_4EF6_5217_8868[#_____4E8B_4EF6_5217_8868 + 1] = {
+        ["时点毫秒"] = index * 1000,
+        ["名称"] = ("腐败孢子云第" .. tostring(index + 1)) .. "团",
+        ["执行"] = function()
+            _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
+        end
+    }
 end
 ____exports["释放莫尔特斯腐败孢子云"] = function(context)
     local boss = context["Boss单位"]
@@ -163,17 +170,37 @@ ____exports["释放莫尔特斯腐败孢子云"] = function(context)
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]
-    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
-    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "腐败孢子云")
+    if cfg["数量"] <= 0 then
+        return
+    end
+    if context["腐败孢子云组合执行器"] == nil then
+        context["腐败孢子云组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "莫尔特斯-腐败孢子云", ["清理"] = context["清理"], ["互斥组"] = "莫尔特斯腐败孢子云"})
+    end
+    local ____self_6 = context["腐败孢子云组合执行器"]
+    if ____self_6["是否运行中"](____self_6) then
+        return
+    end
+    local _____4E8B_4EF6_5217_8868 = {}
     do
         local i = 0
         while i < cfg["数量"] do
-            local id = addDelayedCallback(i * 1000, _____83AB_5C14_7279_65AF_5EF6_8FDF_521B_5EFA_5B62_5B50_4E91, context)
-            local ____self_5 = context["清理"]
-            ____self_5["登记延迟回调"](____self_5, "莫尔特斯-创建腐败孢子云", id)
+            _____8FFD_52A0_5B62_5B50_4E91_521B_5EFA_65F6_95F4_8F74(_____4E8B_4EF6_5217_8868, context, i)
             i = i + 1
         end
     end
+    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
+    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "腐败孢子云")
+    local ____self_7 = context["腐败孢子云组合执行器"]
+    ____self_7["开始"](
+        ____self_7,
+        {
+            key = "腐败孢子云",
+            ["单位"] = boss,
+            ["上下文"] = context,
+            ["最大持续毫秒"] = cfg["数量"] * 1000,
+            ["阶段列表"] = _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868(_____4E8B_4EF6_5217_8868)
+        }
+    )
 end
 local function ____on_83AB_5C14_7279_65AF_8150_8D25_5B62_5B50_4E91_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____8150_8D25_5B62_5B50_4E91_6280_80FDID then

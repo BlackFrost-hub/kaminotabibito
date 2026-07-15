@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 距离XY, 两点角度 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
@@ -13,29 +14,18 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
-const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const jass = require('jass.common') as any;
-const japi = require('jass.japi') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const GetRandomReal = jass.GetRandomReal as (minimum: number, maximum: number) => number;
-const SquareRoot = jass.SquareRoot as (value: number) => number;
-const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
-const GetUnitState = japi.GetUnitState as (unit: any, state: any) => number;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, scale: number) => void) | undefined;
-const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, degrees: number) => void) | undefined;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const RAD_TO_DEG = 57.29577951308232;
 const 鲜血回收技能Key = '鲜血回收';
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 限制连线缩放(this: void, value: number): number {
   const cfg = 夏提雅数值与表现配置.鲜血印记;
@@ -47,13 +37,16 @@ function 限制连线缩放(this: void, value: number): number {
 function 创建鲜血回收连线(this: void, context: 夏提雅运行时上下文, mark: 夏提雅鲜血印记实例): void {
   const boss = context.Boss单位;
   const cfg = 夏提雅数值与表现配置.鲜血印记;
-  const dx = GetUnitX(boss) - mark.X;
-  const dy = GetUnitY(boss) - mark.Y;
-  const effect = AddSpecialEffect(夏提雅数值与表现配置.表现资源.鲜血回收连线特效路径, mark.X, mark.Y);
-  if (effect == null || effect === 0) return;
-  if (typeof EXSetEffectSize === 'function') EXSetEffectSize(effect, 限制连线缩放(SquareRoot(dx * dx + dy * dy) / cfg.回收连线基准长度));
-  if (typeof EXEffectMatRotateZ === 'function') EXEffectMatRotateZ(effect, Atan2(dy, dx) * RAD_TO_DEG);
-  YDWETimerDestroyEffectSafe(cfg.回收连线持续秒, effect);
+  const bossX = GetUnitX(boss);
+  const bossY = GetUnitY(boss);
+  创建点特效({
+    模型路径: 夏提雅数值与表现配置.表现资源.鲜血回收连线特效路径,
+    X: mark.X,
+    Y: mark.Y,
+    缩放: 限制连线缩放(距离XY(mark.X, mark.Y, bossX, bossY) / cfg.回收连线基准长度),
+    Z轴角度: 两点角度(mark.X, mark.Y, bossX, bossY),
+    持续秒: cfg.回收连线持续秒,
+  });
 }
 
 function 结束鲜血回收(this: void, context: 夏提雅运行时上下文): void {

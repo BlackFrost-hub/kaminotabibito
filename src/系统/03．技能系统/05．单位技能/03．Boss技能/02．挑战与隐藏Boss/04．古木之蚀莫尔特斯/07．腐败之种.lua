@@ -224,7 +224,7 @@ local function _____53D1_5C04_8150_8D25_4E4B_79CD(context, target)
         ["持续毫秒"] = cfg["飞行秒"] * 1000,
         ["周期ID"] = 0
     }
-    data["周期ID"] = addPeriodicCallback(50, _____83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD_5F39_9053, data)
+    data["周期ID"] = addPeriodicCallback(cfg["弹道刷新间隔毫秒"], _____83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD_5F39_9053, data)
     local ____self_9 = context["清理"]
     ____self_9["登记周期回调"](____self_9, "莫尔特斯-腐败之种弹道", data["周期ID"])
 end

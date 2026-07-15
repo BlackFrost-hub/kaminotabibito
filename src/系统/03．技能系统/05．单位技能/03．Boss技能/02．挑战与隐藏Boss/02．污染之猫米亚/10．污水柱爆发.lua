@@ -1,6 +1,9 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离平方XY"]
 local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.01．场地配置")
 local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心X"]
 local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心Y"]
@@ -19,6 +22,10 @@ local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.index")
 local _____5F00_59CB_539F_5730_51FB_98DE = ____index["开始原地击飞"]
+local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.05．点名预警执行器")
+local _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668 = ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668["创建点名预警执行器"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
@@ -27,53 +34,22 @@ local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
 local _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_3["创建持续危险区域"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
-local _____521B_5EFA_8584_5706_5F62_63D0_793A_5708 = ____require_result_4["创建薄圆形提示圈"]
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_6.YDWETimerDestroyEffectSafe
-local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成AOE技能伤害"]
-local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_7["创建独立技能伤害实例"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成AOE技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_5["创建独立技能伤害实例"]
 local jass = require("jass.common")
-local japi = require("jass.japi")
-local AddSpecialEffect = jass.AddSpecialEffect
 local GetRandomInt = jass.GetRandomInt
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
-local IsUnitType = jass.IsUnitType
-local ConvertUnitState = jass.ConvertUnitState
-local EXSetEffectSize = japi.EXSetEffectSize
-local GetUnitStateJapi = japi.GetUnitState
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
-local function _____53D6_5355_4F4D_653B_51FB_529B(unit)
-    if not _____5355_4F4D_6709_6548(unit) or type(GetUnitStateJapi) ~= "function" then
-        return 1000
-    end
-    local value = GetUnitStateJapi(
-        unit,
-        ConvertUnitState(21)
-    )
-    return value > 0 and value or 1000
-end
 local function _____8BA1_7B97_6C61_6C34_67F1_7206_53D1_4F24_5BB3(boss, target)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
-    return (_____53D6_5355_4F4D_653B_51FB_529B(boss) * config["爆发伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["爆发伤害目标最大生命比例"]) * config["爆发伤害总倍率"]
+    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["爆发伤害Boss攻击力比例"], ["目标最大生命比例"] = config["爆发伤害目标最大生命比例"], ["总倍率"] = config["爆发伤害总倍率"]})
 end
 local function _____8BA1_7B97_6C61_6C34_67F1_6C34_5751_4F24_5BB3(boss, target)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
-    return (_____53D6_5355_4F4D_653B_51FB_529B(boss) * config["水坑每秒伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["水坑每秒伤害目标最大生命比例"]) * config["水坑每秒伤害总倍率"]
-end
-local function _____8DDD_79BB_5E73_65B9(x1, y1, x2, y2)
-    local dx = x2 - x1
-    local dy = y2 - y1
-    return dx * dx + dy * dy
+    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["水坑每秒伤害Boss攻击力比例"], ["目标最大生命比例"] = config["水坑每秒伤害目标最大生命比例"], ["总倍率"] = config["水坑每秒伤害总倍率"]})
 end
 local function _____53D6_6C61_6C34_67F1_6570_91CF()
     local playerCount = _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570()
@@ -111,15 +87,8 @@ local function _____9009_62E9_6C61_6C34_67F1_843D_70B9(boss)
     end
     return result
 end
-local function _____64AD_653E_6C61_6C34_67F1_9884_8B66(point)
+local function _____64AD_653E_6C61_6C34_67F1_9501_5B9A_8868_73B0(point)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
-    _____521B_5EFA_8584_5706_5F62_63D0_793A_5708(
-        point.x,
-        point.y,
-        config["爆发半径"],
-        config["预警秒"],
-        1 / config["预警秒"]
-    )
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["特效"]["平台预警底圈"],
         X = point.x,
@@ -134,21 +103,18 @@ local function _____64AD_653E_6C61_6C34_67F1_9884_8B66(point)
     })
 end
 local function _____64AD_653E_6C61_6C34_67F1_7206_53D1_8868_73B0(point)
-    local effects = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]["爆发特效"]
+    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
+    local effects = config["爆发特效"]
     do
         local i = 0
         while i < #effects do
-            do
-                local effect = AddSpecialEffect(effects[i + 1], point.x, point.y)
-                if effect == nil or effect == 0 then
-                    goto __continue18
-                end
-                if type(EXSetEffectSize) == "function" then
-                    EXSetEffectSize(effect, 1)
-                end
-                YDWETimerDestroyEffectSafe(2, effect)
-            end
-            ::__continue18::
+            _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = effects[i + 1],
+                X = point.x,
+                Y = point.y,
+                ["缩放"] = config["爆发特效缩放"],
+                ["持续秒"] = config["爆发特效持续秒"]
+            })
             i = i + 1
         end
     end
@@ -173,7 +139,7 @@ local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point,
                     do
                         local target = _____533A_57DF_5185_5355_4F4D[i + 1]
                         if not _____5355_4F4D_6709_6548(target) then
-                            goto __continue24
+                            goto __continue18
                         end
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
                             ["来源"] = context["Boss单位"],
@@ -188,7 +154,7 @@ local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point,
                         })
                         _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["水坑每秒腐化层数"], "污水柱残留水坑")
                     end
-                    ::__continue24::
+                    ::__continue18::
                     i = i + 1
                 end
             end
@@ -212,7 +178,7 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point, _____6280
             do
                 local target = targets[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue29
+                    goto __continue23
                 end
                 if _____8DDD_79BB_5E73_65B9(
                     point.x,
@@ -220,7 +186,7 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point, _____6280
                     GetUnitX(target),
                     GetUnitY(target)
                 ) > radius2 then
-                    goto __continue29
+                    goto __continue23
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
@@ -244,40 +210,46 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point, _____6280
                     ["主单位"] = boss
                 })
             end
-            ::__continue29::
+            ::__continue23::
             i = i + 1
         end
     end
     _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point, _____6280_80FD_5B9E_4F8BID)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污水柱爆发", 3)
 end
-____exports["注册米亚污水柱爆发"] = function()
-end
-____exports["尝试触发米亚污水柱爆发"] = function(context, nowMs)
-    if context["阶段"] ~= 2 then
-        return
-    end
+____exports["释放米亚污水柱爆发"] = function(context)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
-    if context["上次污水柱爆发Ms"] > 0 and nowMs - context["上次污水柱爆发Ms"] < config["冷却Ms"] then
-        return
-    end
     local boss = context["Boss单位"]
-    if not _____5355_4F4D_6709_6548(boss) then
-        return
+    if not _____5355_4F4D_6709_6548(boss) or context["阶段"] ~= 2 then
+        return false
     end
-    context["上次污水柱爆发Ms"] = nowMs
     local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "米亚污水柱爆发", ["持续时间秒"] = config["预警秒"] + config["水坑持续秒"] + 2})
     local points = _____9009_62E9_6C61_6C34_67F1_843D_70B9(boss)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污水柱爆发", 0)
     do
         local i = 0
         while i < #points do
-            _____64AD_653E_6C61_6C34_67F1_9884_8B66(points[i + 1])
+            local point = points[i + 1]
+            _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668({
+                ["清理"] = context["清理"],
+                ["名称"] = "米亚-污水柱爆发-" .. tostring(i + 1),
+                ["锁定X"] = point.x,
+                ["锁定Y"] = point.y,
+                ["延迟秒"] = config["预警秒"],
+                ["锁定坐标"] = true,
+                ["提示圈"] = {["类型"] = "圆形", ["半径"] = config["爆发半径"], ["动画速度"] = 1 / config["预警秒"], ["来源单位"] = boss},
+                ["on锁定"] = function(result)
+                    _____64AD_653E_6C61_6C34_67F1_9501_5B9A_8868_73B0({x = result["锁定X"], y = result["锁定Y"]})
+                end,
+                ["on结算"] = function(result)
+                    _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, {x = result["锁定X"], y = result["锁定Y"]}, _____6280_80FD_5B9E_4F8BID)
+                end
+            })
             i = i + 1
         end
     end
-    addDelayedCallback(
-        1500,
+    local reminderId = addDelayedCallback(
+        config["前提醒延迟毫秒"],
         function()
             if not _____5355_4F4D_6709_6548(context["Boss单位"]) or context["阶段"] ~= 2 then
                 return
@@ -285,17 +257,8 @@ ____exports["尝试触发米亚污水柱爆发"] = function(context, nowMs)
             _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "污水柱爆发", 1)
         end
     )
-    addDelayedCallback(
-        config["预警秒"] * 1000,
-        function()
-            do
-                local i = 0
-                while i < #points do
-                    _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, points[i + 1], _____6280_80FD_5B9E_4F8BID)
-                    i = i + 1
-                end
-            end
-        end
-    )
+    local ____self_6 = context["清理"]
+    ____self_6["登记延迟回调"](____self_6, "米亚-污水柱爆发前提醒", reminderId)
+    return true
 end
 return ____exports

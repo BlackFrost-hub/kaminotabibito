@@ -188,16 +188,13 @@ function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文,
   if (instance == null || !单位有效(instance.单位)) return;
   临时调整攻击(instance.单位, cfg.甲虫攻击力);
   const data: 甲虫追击实例 = { context, 甲虫单位: instance.单位, 接触目标: null, 接触Ticks: 0, 周期ID: 0, 技能实例ID };
-  data.周期ID = addPeriodicCallback(1000, 莫尔特斯甲虫追击周期, data);
+  data.周期ID = addPeriodicCallback(cfg.追击刷新间隔毫秒, 莫尔特斯甲虫追击周期, data);
   context.清理.登记周期回调("莫尔特斯-甲虫追击", data.周期ID);
 }
 
-export function 尝试释放莫尔特斯共生腐朽虫群(this: void, context: 莫尔特斯运行时上下文, nowMs: number): void {
-  if (context.阶段 < 2 || !单位有效(context.Boss单位)) return;
+export function 释放莫尔特斯共生腐朽虫群(this: void, context: 莫尔特斯运行时上下文): boolean {
+  if (!单位有效(context.Boss单位)) return false;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
-  if (context.下次虫群时间 <= 0) context.下次虫群时间 = nowMs + cfg.触发间隔秒 * 1000;
-  if (nowMs < context.下次虫群时间) return;
-  context.下次虫群时间 = nowMs + cfg.触发间隔秒 * 1000;
   播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放Boss坐标音效(莫尔特斯音效配置.共生腐朽虫群.甲虫入场, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
   const 技能实例ID = 创建独立技能伤害实例({
@@ -208,7 +205,5 @@ export function 尝试释放莫尔特斯共生腐朽虫群(this: void, context: 
   for (let i = 0; i < cfg.甲虫数量; i++) {
     创建腐化甲虫(context, i * 90, 技能实例ID);
   }
-}
-
-export function 注册莫尔特斯共生腐朽虫群(this: void): void {
+  return true;
 }
