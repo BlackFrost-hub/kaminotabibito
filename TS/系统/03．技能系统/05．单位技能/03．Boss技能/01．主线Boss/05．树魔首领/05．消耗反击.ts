@@ -7,6 +7,7 @@ import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 两点方向角, 单位是否在来源正面扇区, 单位是否在来源背后扇区 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/08．方位判定工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -20,8 +21,6 @@ const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
-const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
-const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, value: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, target: any, attachPoint: string) => any;
 const AddLightning = jass.AddLightning as (codeName: string, checkVisibility: boolean, x1: number, y1: number, x2: number, y2: number) => any;
@@ -48,6 +47,9 @@ const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePe
 const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   开始硬直: (this: void, unit: any, durationSec: number) => void;
 };
+const { 播放限时单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
+  播放限时单位动画: (this: void, 参数: any) => any;
+};
 const { 创建线段危险区 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区") as {
   创建线段危险区: (this: void, 参数: any) => any;
 };
@@ -70,7 +72,6 @@ interface 消耗反击状态 {
   Boss: any;
   上下文: 树魔首领运行时上下文;
   到期Ms: number;
-  动画回调ID: number;
   结束回调ID: number;
   特效回调ID: number;
 }
@@ -79,10 +80,6 @@ const 树魔首领单位类型ID = stringToFourCC(树魔首领单位技能配置
 const 消耗反击技能ID = stringToFourCC(树魔首领数值与表现配置.消耗反击.技能槽位);
 const 消耗反击状态表: Record<number, 消耗反击状态 | undefined> = {};
 let 消耗反击已注册 = false;
-
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
-}
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
@@ -110,11 +107,18 @@ function 清除消耗反击状态(this: void, boss: any): void {
   const hid = GetHandleId(boss) || 0;
   const state = 消耗反击状态表[hid];
   if (state == null) return;
-  if (state.动画回调ID !== 0) removePeriodicCallback(state.动画回调ID);
   if (state.特效回调ID !== 0) removePeriodicCallback(state.特效回调ID);
   if (state.结束回调ID !== 0) removeDelayedCallback(state.结束回调ID);
   delete 消耗反击状态表[hid];
-  if (单位有效(boss)) SetUnitTimeScale(boss, 1);
+  if (单位有效(boss)) {
+    播放限时单位动画({
+      单位: boss,
+      动画编号: 树魔首领数值与表现配置.消耗反击.恢复动画编号,
+      动画速度: 1,
+      持续秒: 0,
+      恢复动画编号: 树魔首领数值与表现配置.消耗反击.恢复动画编号,
+    });
+  }
 }
 
 function 播放防御姿态特效(this: void, boss: any): void {
@@ -170,7 +174,13 @@ function 执行反击(this: void, state: 消耗反击状态, attacker: any, 触�
   const angle = 取方向角(boss, attacker);
   播放Boss坐标音效(树魔首领音效配置.消耗反击.正面反击, GetUnitX(boss), GetUnitY(boss), 树魔首领音效配置.默认裁断距离);
   SetUnitFacing(boss, angle);
-  SetUnitAnimationByIndex(boss, 4);
+  播放限时单位动画({
+    单位: boss,
+    动画编号: cfg.反击动画编号,
+    动画速度: cfg.动画速度,
+    持续秒: cfg.反击动画原始时长秒,
+    恢复动画编号: cfg.恢复动画编号,
+  });
   创建反击弹道表现(boss, angle);
   播放抽魔特效(attacker);
   播放反击连线(boss, attacker);
@@ -220,21 +230,32 @@ export function 释放树魔首领消耗反击(this: void, context: 树魔首领
   播放树魔首领台词(boss, "消耗反击");
   尝试播放树魔首领关键怪叫(boss);
   开始硬直(boss, cfg.持续秒);
-  SetUnitTimeScale(boss, cfg.动画速度);
-  SetUnitAnimationByIndex(boss, cfg.动画编号);
   播放防御姿态特效(boss);
 
   const state: 消耗反击状态 = {
     Boss: boss,
     上下文: context,
     到期Ms: getServerTime() + cfg.持续秒 * 1000,
-    动画回调ID: 0,
     结束回调ID: 0,
     特效回调ID: 0,
   };
-  state.动画回调ID = addPeriodicCallback(cfg.动画重播间隔毫秒, function 树魔首领消耗反击动作Tick(this: void): void {
-    if (!单位有效(boss) || getServerTime() >= state.到期Ms) return;
-    SetUnitAnimationByIndex(boss, cfg.动画编号);
+  消耗反击状态表[hid] = state;
+  播放限时单位动画({
+    单位: boss,
+    动画编号: cfg.起手动画编号,
+    动画速度: cfg.动画速度,
+    持续秒: cfg.起手动画原始时长秒,
+    恢复动画编号: cfg.维持动画编号,
+    完成回调: function 树魔首领消耗反击进入维持姿势(this: void): void {
+      if (消耗反击状态表[hid] !== state) return;
+      播放限时单位动画({
+        单位: boss,
+        动画编号: cfg.维持动画编号,
+        动画速度: cfg.动画速度,
+        持续秒: cfg.持续秒 - cfg.起手动画原始时长秒,
+        恢复动画编号: cfg.恢复动画编号,
+      });
+    },
   });
   state.特效回调ID = addPeriodicCallback(cfg.防御特效刷新毫秒, function 树魔首领消耗反击防御特效Tick(this: void): void {
     if (!单位有效(boss) || getServerTime() >= state.到期Ms) return;
@@ -243,7 +264,6 @@ export function 释放树魔首领消耗反击(this: void, context: 树魔首领
   state.结束回调ID = addDelayedCallback(cfg.持续秒 * 1000, function 树魔首领消耗反击自然结束(this: void): void {
     清除消耗反击状态(boss);
   });
-  消耗反击状态表[hid] = state;
 }
 
 function 树魔首领消耗反击伤害修正(this: void, damageContext: any): number {

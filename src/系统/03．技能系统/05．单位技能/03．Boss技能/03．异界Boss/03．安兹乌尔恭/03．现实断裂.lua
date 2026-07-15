@@ -2,6 +2,7 @@
 local ____exports = {}
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建安兹运行时上下文"]
+local _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["标记安兹普通机制忙碌"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.00．配置")
 local _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["安兹乌尔恭单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
@@ -128,7 +129,7 @@ local function _____521B_5EFA_73B0_5B9E_65AD_88C2_5224_5B9A(context, angle, orig
 end
 ____exports["释放安兹现实断裂"] = function(context)
     local boss = context["安兹单位"]
-    if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] then
+    if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] or context["当前大型技能"] ~= nil then
         return
     end
     local target = _____53D6_76EE_6807(boss)
@@ -136,6 +137,7 @@ ____exports["释放安兹现实断裂"] = function(context)
         return
     end
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
+    _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C(context, config["现实断裂预警秒"] + config["现实断裂危险持续秒"])
     local angle = _____53D6_65B9_5411_89D2(boss, target)
     local originX = GetUnitX(boss)
     local originY = GetUnitY(boss)

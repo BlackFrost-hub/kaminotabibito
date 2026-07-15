@@ -1,32 +1,26 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____64AD_653E_9650_65F6_70B9_7279_6548, GetUnitX, GetUnitY, IsUnitType, RemoveUnit, AddSpecialEffect, DestroyEffect, UNIT_TYPE_DEAD, addDelayedCallback, _____5206_8EAB_6B8B_5F71_8DEF_5F84
+local _____5355_4F4D_6709_6548, GetUnitX, GetUnitY, IsUnitType, RemoveUnit, UNIT_TYPE_DEAD, createTimedEffect, _____5206_8EAB_6B8B_5F71_8DEF_5F84
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
 local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
 function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
-function _____64AD_653E_9650_65F6_70B9_7279_6548(model, x, y, duration)
-    local effect = AddSpecialEffect(model, x, y)
-    addDelayedCallback(
-        duration * 1000,
-        function()
-            DestroyEffect(effect)
-        end
-    )
-end
 ____exports["清理英灵战乙女投影"] = function(context)
     local projection = context["英灵战乙女句柄"]
     context["英灵战乙女句柄"] = nil
     if _____5355_4F4D_6709_6548(projection) then
-        _____64AD_653E_9650_65F6_70B9_7279_6548(
+        createTimedEffect(
             _____5206_8EAB_6B8B_5F71_8DEF_5F84,
             GetUnitX(projection),
             GetUnitY(projection),
+            0,
             _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["英灵投影收束秒"]
         )
         RemoveUnit(projection)
     end
+    context["英灵战乙女已登场"] = false
 end
 local jass = require("jass.common")
 GetUnitX = jass.GetUnitX
@@ -34,32 +28,25 @@ GetUnitY = jass.GetUnitY
 IsUnitType = jass.IsUnitType
 RemoveUnit = jass.RemoveUnit
 local SetUnitAnimation = jass.SetUnitAnimation
+local SetUnitFacing = jass.SetUnitFacing
 local SetUnitAcquireRange = jass.SetUnitAcquireRange
 local SetUnitPathing = jass.SetUnitPathing
 local UnitAddAbility = jass.UnitAddAbility
-AddSpecialEffect = jass.AddSpecialEffect
-DestroyEffect = jass.DestroyEffect
+local Atan2 = jass.Atan2
+local CosBJ = jass.CosBJ
+local SinBJ = jass.SinBJ
+local GetRandomReal = jass.GetRandomReal
 UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
 local _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_1.addDelayedCallback
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedEffect = ____require_result_3.createTimedEffect
 local _____8757_866B_6280_80FDID = 1097625443
 _____5206_8EAB_6B8B_5F71_8DEF_5F84 = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx"
-local function _____79FB_9664_6307_5B9A_82F1_7075_6295_5F71(context, projection)
-    if context["英灵战乙女句柄"] == projection then
-        context["英灵战乙女句柄"] = nil
-    end
-    if _____5355_4F4D_6709_6548(projection) then
-        _____64AD_653E_9650_65F6_70B9_7279_6548(
-            _____5206_8EAB_6B8B_5F71_8DEF_5F84,
-            GetUnitX(projection),
-            GetUnitY(projection),
-            _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["英灵投影收束秒"]
-        )
-        RemoveUnit(projection)
-    end
-end
 --- 只创建表现投影；不创建 AI、普攻或任何伤害。
 ____exports["创建夏提雅英灵投影"] = function(context, x, y, face, duration)
     local boss = context["Boss单位"]
@@ -90,49 +77,109 @@ ____exports["创建夏提雅英灵投影"] = function(context, x, y, face, durat
     SetUnitAcquireRange(projection, 0)
     SetUnitPathing(projection, false)
     context["英灵战乙女句柄"] = projection
-    _____64AD_653E_9650_65F6_70B9_7279_6548(_____5206_8EAB_6B8B_5F71_8DEF_5F84, x, y, cfg["英灵投影出现残影秒"])
+    createTimedEffect(
+        _____5206_8EAB_6B8B_5F71_8DEF_5F84,
+        x,
+        y,
+        0,
+        cfg["英灵投影出现残影秒"]
+    )
     return projection
+end
+____exports["获取夏提雅英灵投影"] = function(context)
+    local _____5355_4F4D_6709_6548_result_4
+    if _____5355_4F4D_6709_6548(context["英灵战乙女句柄"]) then
+        _____5355_4F4D_6709_6548_result_4 = context["英灵战乙女句柄"]
+    else
+        _____5355_4F4D_6709_6548_result_4 = nil
+    end
+    return _____5355_4F4D_6709_6548_result_4
+end
+____exports["启动夏提雅英灵战乙女阶段"] = function(context, target)
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(target) or context["阶段"] ~= "P2英灵战乙女" then
+        return false
+    end
+    if _____5355_4F4D_6709_6548(context["英灵战乙女句柄"]) then
+        context["英灵战乙女已登场"] = true
+        return true
+    end
+    local facing = Atan2(
+        GetUnitY(target) - GetUnitY(boss),
+        GetUnitX(target) - GetUnitX(boss)
+    ) * 57.29577951308232
+    local distance = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["英灵常驻距离"]
+    local projection = ____exports["创建夏提雅英灵投影"](
+        context,
+        GetUnitX(target) + CosBJ(facing) * distance,
+        GetUnitY(target) + SinBJ(facing) * distance,
+        facing + 180,
+        3600
+    )
+    context["英灵战乙女已登场"] = _____5355_4F4D_6709_6548(projection)
+    return context["英灵战乙女已登场"]
 end
 --- 供公共调度器调用：投影只在延迟点执行传入的基础伤害结算，
 -- 不复制控制、血印、吸血、装备和其他二次触发。
 ____exports["触发英灵战乙女复刻"] = function(context, _____53C2_6570)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2
     local delay = _____53C2_6570["延迟秒"] or cfg["英灵复刻延迟最小秒"]
-    local duration = _____53C2_6570["投影持续秒"] or delay + 0.8
-    local projection = ____exports["创建夏提雅英灵投影"](
-        context,
-        _____53C2_6570.X,
-        _____53C2_6570.Y,
-        _____53C2_6570["朝向"],
-        duration
-    )
+    local ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_5 = ____exports["获取夏提雅英灵投影"](context)
+    if ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_5 == nil then
+        ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_5 = ____exports["创建夏提雅英灵投影"](
+            context,
+            _____53C2_6570.X,
+            _____53C2_6570.Y,
+            _____53C2_6570["朝向"],
+            3600
+        )
+    end
+    local projection = ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_5
     if not _____5355_4F4D_6709_6548(projection) then
         return projection
     end
-    SetUnitAnimation(projection, "attack")
-    addDelayedCallback(
+    SetUnitFacing(projection, _____53C2_6570["朝向"])
+    local delayedId = addDelayedCallback(
         delay * 1000,
         function()
             if context["英灵战乙女句柄"] ~= projection or not _____5355_4F4D_6709_6548(projection) then
                 return
             end
+            SetUnitAnimation(projection, "attack")
             if _____53C2_6570["复刻结算"] ~= nil then
                 _____53C2_6570["复刻结算"]()
             end
         end
     )
-    addDelayedCallback(
-        duration * 1000,
-        function()
-            _____79FB_9664_6307_5B9A_82F1_7075_6295_5F71(context, projection)
-        end
-    )
+    local ____self_6 = context["清理"]
+    ____self_6["登记延迟回调"](____self_6, "夏提雅-英灵战乙女复刻", delayedId)
     return projection
+end
+____exports["尝试触发英灵战乙女复刻"] = function(context, skillKey, _____53C2_6570)
+    if context["阶段"] ~= "P2英灵战乙女" or context["挑战已结束"] or not _____5355_4F4D_6709_6548(context["英灵战乙女句柄"]) then
+        return false
+    end
+    local now = getServerTime()
+    if now < context["英灵复刻冷却到Ms"] or context["上次英灵复刻技能"] == skillKey then
+        return false
+    end
+    local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2
+    context["英灵复刻冷却到Ms"] = now + cfg["英灵复刻内部冷却秒"] * 1000
+    context["上次英灵复刻技能"] = skillKey
+    ____exports["触发英灵战乙女复刻"](
+        context,
+        __TS__ObjectAssign(
+            {},
+            _____53C2_6570,
+            {["延迟秒"] = _____53C2_6570["延迟秒"] or GetRandomReal(cfg["英灵复刻延迟最小秒"], cfg["英灵复刻延迟最大秒"])}
+        )
+    )
+    return true
 end
 ____exports["英灵战乙女机制状态"] = {
     ["已完成设计"] = true,
     ["已完成实现"] = true,
-    ["已注册"] = false,
+    ["已注册"] = true,
     ["类型"] = "P2固定延迟镜像",
     ["语义"] = "英灵使用夏提雅女武神模型作为半透明投影；没有独立AI和普通攻击，只在公共调度指定时延迟复刻基础伤害。"
 }

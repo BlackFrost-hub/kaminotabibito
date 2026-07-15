@@ -9,3 +9,4 @@ export * from './07．亡者凝视';
 export * from './08．旧誓墓碑';
 export * from './09．不灭军魂';
 export * from './10．技能调度';
+export * from './11．台词播放';

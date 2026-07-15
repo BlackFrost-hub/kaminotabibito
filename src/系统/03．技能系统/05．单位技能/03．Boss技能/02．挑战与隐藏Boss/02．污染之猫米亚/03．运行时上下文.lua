@@ -14,6 +14,7 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____7C73_4E9A_8150_5316_611F_67D3_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚腐化感染配置"]
 local _____7C73_4E9A_9636_6BB5_9608_503C = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚阶段阈值"]
 local _____7C73_4E9A_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚音效配置"]
+local _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚运行时配置"]
 local ____07_FF0E_7075_732B_5206_8EAB = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.07．灵猫分身")
 local _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB = ____07_FF0E_7075_732B_5206_8EAB["尝试触发米亚灵猫分身"]
 local ____08_FF0E_6C61_67D3_6807_8BB0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.08．污染标记")
@@ -38,10 +39,11 @@ local _____5EF6_8FDF_64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_65
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
+local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
+local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local IsUnitType = jass.IsUnitType
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -164,42 +166,33 @@ local function _____5237_65B0_7C73_4E9A_9636_6BB5(context)
         _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "转阶段3", 0)
     end
 end
-local function _____63A8_8FDB_7C73_4E9A_8FD0_884C_65F6()
-    local nowMs = getServerTime()
-    local contexts = _____7C73_4E9A_4E0A_4E0B_6587_5DE5_5382["获取全部"]()
-    do
-        local i = 0
-        while i < #contexts do
-            do
-                local context = contexts[i + 1]
-                if context == nil then
-                    goto __continue19
-                end
-                if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                    ____exports["清理米亚上下文"](context["Boss单位"])
-                    goto __continue19
-                end
-                _____5237_65B0_7C73_4E9A_9636_6BB5(context)
-                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
-                _____5237_65B0_7C73_4E9A_6C61_67D3_6807_8BB0(context, nowMs)
-                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_67D3_8109_51B2(context, nowMs)
-                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_6C34_67F1_7206_53D1(context, nowMs)
-                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_8150_5316_8F6C_79FB(context, nowMs)
-                _____5237_65B0_7C73_4E9A_5E73_53F0_8D85_8F7D_60E9_7F5A(context, nowMs)
-                _____5237_65B0_7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42(context, nowMs)
-                _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3(context)
-            end
-            ::__continue19::
-            i = i + 1
-        end
+local function _____63A8_8FDB_7C73_4E9A_8FD0_884C_65F6(context, nowMs)
+    if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        ____exports["清理米亚上下文"](context["Boss单位"])
+        return
     end
+    _____5237_65B0_7C73_4E9A_9636_6BB5(context)
+    _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
+    _____5237_65B0_7C73_4E9A_6C61_67D3_6807_8BB0(context, nowMs)
+    _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_67D3_8109_51B2(context, nowMs)
+    _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_6C34_67F1_7206_53D1(context, nowMs)
+    _____5C1D_8BD5_89E6_53D1_7C73_4E9A_8150_5316_8F6C_79FB(context, nowMs)
+    _____5237_65B0_7C73_4E9A_5E73_53F0_8D85_8F7D_60E9_7F5A(context, nowMs)
+    _____5237_65B0_7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42(context, nowMs)
+    _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3(context)
 end
 ____exports["注册米亚运行时"] = function()
     if _____7C73_4E9A_8FD0_884C_65F6_5DF2_6CE8_518C then
         return
     end
     _____7C73_4E9A_8FD0_884C_65F6_5DF2_6CE8_518C = true
-    addPeriodicCallback(250, _____63A8_8FDB_7C73_4E9A_8FD0_884C_65F6)
+    _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({
+        ["名称"] = "米亚-运行时推进",
+        ["间隔毫秒"] = _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E["推进间隔毫秒"],
+        ["取当前时间"] = getServerTime,
+        ["取上下文列表"] = _____7C73_4E9A_4E0A_4E0B_6587_5DE5_5382["获取全部"],
+        ["执行"] = _____63A8_8FDB_7C73_4E9A_8FD0_884C_65F6
+    })
 end
 ____exports["给单位添加米亚腐化层数"] = function(context, _____5355_4F4D, _____5C42_6570, _____539F_56E0)
     local ____self_2 = context["腐化层数控制器"]

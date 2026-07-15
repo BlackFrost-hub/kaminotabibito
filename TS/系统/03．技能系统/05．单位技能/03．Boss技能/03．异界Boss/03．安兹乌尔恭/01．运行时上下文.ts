@@ -5,11 +5,12 @@ import { 创建雅儿贝德运行状态, type 雅儿贝德运行状态 } from '.
 import type { 机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
 import { 创建机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
 import { 创建单位运行时上下文工厂 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂';
+import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
+import type { 伤害生命下限保护控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 
 const jass = require('jass.common') as any;
-const { getServerTime, addPeriodicCallback } = require('系统.00．核心系统.05．中心计时器') as {
+const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
 };
 
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
@@ -28,11 +29,16 @@ export interface 安兹运行时上下文 {
   阶段: 安兹阶段;
   开战时间Ms: number;
   上次阶段变化Ms: number;
+  普通机制忙碌到Ms: number;
+  上次大型技能结束Ms: number;
   当前大型技能?: string;
   时间停止中: boolean;
+  高阶亡灵召唤物?: any;
+  亡灵箭削弱到Ms: number;
   天空坠落已释放: boolean;
   一切生命的终点已释放: boolean;
   挑战已结束: boolean;
+  挑战生命下限保护?: 伤害生命下限保护控制器;
   已初始化: boolean;
   清理: 机制清理篮子;
 }
@@ -56,7 +62,10 @@ function 创建安兹上下文(
     阶段: 'P1至尊的审视',
     开战时间Ms: nowMs,
     上次阶段变化Ms: nowMs,
+    普通机制忙碌到Ms: 0,
+    上次大型技能结束Ms: 0,
     时间停止中: false,
+    亡灵箭削弱到Ms: 0,
     天空坠落已释放: false,
     一切生命的终点已释放: false,
     挑战已结束: false,
@@ -93,6 +102,15 @@ export function 获取安兹运行时上下文(this: void, boss: any): 安兹运
   return 安兹上下文工厂.获取(boss);
 }
 
+export function 获取全部安兹运行时上下文(this: void): 安兹运行时上下文[] {
+  return 安兹上下文工厂.获取全部();
+}
+
+export function 标记安兹普通机制忙碌(this: void, context: 安兹运行时上下文, durationSeconds: number): void {
+  const untilMs = getServerTime() + durationSeconds * 1000;
+  if (untilMs > context.普通机制忙碌到Ms) context.普通机制忙碌到Ms = untilMs;
+}
+
 export function 获取或创建安兹运行时上下文(this: void, boss: any): 安兹运行时上下文 | undefined {
   return 安兹上下文工厂.获取或创建(boss);
 }
@@ -127,21 +145,21 @@ function 刷新安兹阶段(this: void, context: 安兹运行时上下文): void
   }
 }
 
-function 推进安兹运行时(this: void): void {
-  const contexts = 安兹上下文工厂.获取全部();
-  for (let i = 0; i < contexts.length; i++) {
-    const context = contexts[i];
-    if (context == null) continue;
-    if (!单位有效(context.安兹单位)) {
-      清理安兹运行时上下文(context.安兹单位);
-      continue;
-    }
-    刷新安兹阶段(context);
+function 推进安兹运行时(this: void, context: 安兹运行时上下文): void {
+  if (!单位有效(context.安兹单位)) {
+    清理安兹运行时上下文(context.安兹单位);
+    return;
   }
+  刷新安兹阶段(context);
 }
 
 export function 注册安兹运行时(this: void): void {
   if (安兹运行时已注册) return;
   安兹运行时已注册 = true;
-  addPeriodicCallback(250, 推进安兹运行时);
+  创建周期机制调度器({
+    名称: '安兹-运行时阶段刷新',
+    间隔毫秒: 250,
+    取上下文列表: 获取全部安兹运行时上下文,
+    执行: 推进安兹运行时,
+  });
 }

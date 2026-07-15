@@ -7,8 +7,9 @@ export const 巴尔扎罗斯单位技能配置 = {
   护卫: {
     格鲁姆: {
       名称: "熔岩破坏者·格鲁姆",
+      单位ID: "N03J",
       模型路径: "Boss\\Balzaroth\\Grum\\Grum.mdx",
-      图标路径: "Boss\\Balzaroth\\Grum\\Grum.blp",
+      图标路径: "Boss\\Balzaroth\\Icon\\GrumPortrait.blp",
       广播持续时间Ms: 3200,
       配音裁断距离: 4000,
       配音生成配置: {
@@ -42,8 +43,14 @@ export const 巴尔扎罗斯单位技能配置 = {
     },
     塞拉: {
       名称: "冰焰巫师·塞拉",
+      单位ID: "N03K",
       模型路径: "Boss\\Balzaroth\\Sera\\Sera.mdx",
-      图标路径: "Boss\\Balzaroth\\Sera\\Sera.blp",
+      图标路径: "Boss\\Balzaroth\\Icon\\SeraPortrait.blp",
+      默认普攻弹道模型: "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdl",
+      火焰普攻弹道模型: "Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdl",
+      普攻弹道弧度: 0.15,
+      普攻弹道速度: 900,
+      普攻弹道自导: true,
       广播持续时间Ms: 3200,
       配音裁断距离: 4000,
       配音生成配置: {

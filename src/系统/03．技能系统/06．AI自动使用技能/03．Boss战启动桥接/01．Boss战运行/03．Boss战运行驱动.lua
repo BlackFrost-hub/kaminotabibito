@@ -114,12 +114,14 @@ local function _____6E05_7406_5F53_524DBoss_5168_5C40(bossUnit)
         jglobals.udg_Boss = nil
     end
 end
-local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
+local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs, _____9009_9879)
     if context["是否已结束"] then
         return
     end
     context["是否已结束"] = true
-    _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_97F3_6548(context["Boss单位"])
+    if (_____9009_9879 and _____9009_9879["跳过死亡音效"]) ~= true then
+        _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_97F3_6548(context["Boss单位"])
+    end
     _____7ED3_675FBoss_8840_6761_5F31_70B9_97E7_6027(context)
     _____5904_7406Boss_6218_62A4_536B_7ED3_675F(context)
     _____505C_6B62_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
@@ -130,12 +132,14 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
     _____6E05_7406Boss_7BAD_5934_7279_6548(context["Boss单位"])
     _____767B_8BB0Boss_6B7B_4EA1_5EF6_8FDF_6E05_7406YD_6570_636E(context, nowMs)
     _____7ED3_675FBoss_6218_533A_57DF_97F3_9891(context, nowMs)
-    local ____require_result_8 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.07．异界Boss死亡奖励")
-    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_8["发放异界Boss死亡奖励"]
+    local ____require_result_10 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.07．异界Boss死亡奖励")
+    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_10["发放异界Boss死亡奖励"]
     _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1(context["Boss单位"])
-    local ____require_result_9 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
-    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_9["尝试播放Boss死亡主线剧情"]
-    _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5(context["Boss单位"])
+    local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
+    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_11["尝试播放Boss死亡主线剧情"]
+    if (_____9009_9879 and _____9009_9879["跳过死亡剧情"]) ~= true then
+        _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5(context["Boss单位"])
+    end
     QuestMessageBJ(
         GetPlayersAll(),
         _____83B7_53D6Quest_6D88_606F_5B8C_6210(),
@@ -178,6 +182,18 @@ local function _____63A8_8FDBBoss_6218_542F_52A8_72B6_6001(context, nowMs)
         _____5904_7406Boss_6218_62A4_536B_542F_52A8(context)
     end
 end
+____exports["主动结束Boss战运行"] = function(bossUnit, _____9009_9879)
+    local context = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(bossUnit)
+    if context == nil or context["是否已结束"] then
+        return false
+    end
+    _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(
+        context,
+        getServerTime(),
+        _____9009_9879
+    )
+    return true
+end
 local function _____5F53_524D_662F_5426_4ECD_9700_9A71_52A8Boss_6218_8FD0_884C()
     if _____5F53_524D_662F_5426_5B58_5728Boss_6218_8FD0_884C_4E0A_4E0B_6587() then
         return true
@@ -210,22 +226,22 @@ local function ____onBoss_6218_8FD0_884CTick()
             do
                 local context = activeContexts[i + 1]
                 if context == nil or context["是否已结束"] then
-                    goto __continue30
+                    goto __continue34
                 end
                 _____63A8_8FDBBoss_6218_542F_52A8_72B6_6001(context, nowMs)
                 if not context["是否已激活"] then
-                    goto __continue30
+                    goto __continue34
                 end
                 if _____5355_4F4D_662F_5426_6B7B_4EA1(context["Boss单位"]) then
                     _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
-                    goto __continue30
+                    goto __continue34
                 end
                 _____7EA0_504FBoss_4F4D_7F6E(context)
                 _____7EA0_504F_73A9_5BB6_82F1_96C4_4F4D_7F6E_5230Boss(context)
                 _____5904_7406Boss_6218_62A4_536BTick(context, nowMs)
                 _____5C1D_8BD5_515C_5E95_641C_654C_5E76_4E0B_4EE4(context, nowMs)
             end
-            ::__continue30::
+            ::__continue34::
             i = i + 1
         end
     end

@@ -62,6 +62,9 @@ _____53CD_51FB_7A97_53E3_6A21_677F_5B9E_73B0.prototype["处理伤害"] = functio
     if self["参数"]["仅技能伤害"] == true and context.isSkillDamage ~= true and context.isSkillAttack ~= true then
         return context.currentDamage
     end
+    if self["参数"]["触发条件"] ~= nil and not self["参数"]["触发条件"](context) then
+        return context.currentDamage
+    end
     local result = context.currentDamage
     if self["参数"]["背后破招角度"] ~= nil and _____5355_4F4D_662F_5426_5728_6765_6E90_80CC_540E_6247_533A(self["参数"]["单位"], context.attacker, self["参数"]["背后破招角度"]) then
         result = result * (self["参数"]["背后受伤倍率"] or 1)

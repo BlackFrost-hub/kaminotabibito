@@ -17,6 +17,10 @@ export const 米亚阶段阈值 = {
   第三阶段生命比例: 0.4,
 } as const;
 
+export const 米亚运行时配置 = {
+  推进间隔毫秒: 250,
+} as const;
+
 export const 米亚腐化感染配置 = {
   最大层数: 15,
   每层米亚相关伤害提高: 0.02,

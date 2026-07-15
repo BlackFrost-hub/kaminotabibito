@@ -3,7 +3,7 @@
 import { 创建可配置层数状态, 可配置层数状态控制器 } from "../../../../00．技能模板+函数/04．机制组件/01．层数状态";
 import { 米亚安全域运行时矩形组, 创建米亚安全域矩形组, 清理米亚安全域矩形组, 取米亚单位所在安全域, 取米亚平台中心X, 取米亚平台中心Y } from "./01．场地配置";
 import { 米亚单位技能配置 } from "./00．配置";
-import { 米亚腐化感染配置, 米亚阶段阈值, 米亚音效配置 } from "./02．数值与表现配置";
+import { 米亚腐化感染配置, 米亚阶段阈值, 米亚音效配置, 米亚运行时配置 } from "./02．数值与表现配置";
 import { 尝试触发米亚灵猫分身 } from "./07．灵猫分身";
 import { 刷新米亚污染标记 } from "./08．污染标记";
 import { 尝试触发米亚污染脉冲 } from "./09．污染脉冲";
@@ -16,11 +16,11 @@ import { 播放米亚台词 } from "./15．台词播放";
 import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import type { 机制清理篮子 } from "../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
 import { 创建单位运行时上下文工厂 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
+import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 
 const jass = require("jass.common") as any;
-const { getServerTime, addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
 };
 
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
@@ -181,32 +181,32 @@ function 刷新米亚阶段(this: void, context: 米亚运行时上下文): void
   }
 }
 
-function 推进米亚运行时(this: void): void {
-  const nowMs = getServerTime();
-  const contexts = 米亚上下文工厂.获取全部();
-  for (let i = 0; i < contexts.length; i++) {
-    const context = contexts[i];
-    if (context == null) continue;
-    if (!单位有效(context.Boss单位)) {
-      清理米亚上下文(context.Boss单位);
-      continue;
-    }
-    刷新米亚阶段(context);
-    尝试触发米亚灵猫分身(context);
-    刷新米亚污染标记(context, nowMs);
-    尝试触发米亚污染脉冲(context, nowMs);
-    尝试触发米亚污水柱爆发(context, nowMs);
-    尝试触发米亚腐化转移(context, nowMs);
-    刷新米亚平台超载惩罚(context, nowMs);
-    刷新米亚腐化黏液涂层(context, nowMs);
-    尝试触发米亚终极污染(context);
+function 推进米亚运行时(this: void, context: 米亚运行时上下文, nowMs: number): void {
+  if (!单位有效(context.Boss单位)) {
+    清理米亚上下文(context.Boss单位);
+    return;
   }
+  刷新米亚阶段(context);
+  尝试触发米亚灵猫分身(context);
+  刷新米亚污染标记(context, nowMs);
+  尝试触发米亚污染脉冲(context, nowMs);
+  尝试触发米亚污水柱爆发(context, nowMs);
+  尝试触发米亚腐化转移(context, nowMs);
+  刷新米亚平台超载惩罚(context, nowMs);
+  刷新米亚腐化黏液涂层(context, nowMs);
+  尝试触发米亚终极污染(context);
 }
 
 export function 注册米亚运行时(this: void): void {
   if (米亚运行时已注册) return;
   米亚运行时已注册 = true;
-  addPeriodicCallback(250, 推进米亚运行时);
+  创建周期机制调度器({
+    名称: '米亚-运行时推进',
+    间隔毫秒: 米亚运行时配置.推进间隔毫秒,
+    取当前时间: getServerTime,
+    取上下文列表: 米亚上下文工厂.获取全部,
+    执行: 推进米亚运行时,
+  });
 }
 
 export function 给单位添加米亚腐化层数(this: void, context: 米亚运行时上下文, 单位: any, 层数: number, 原因: string): number {

@@ -17,6 +17,7 @@ import {
   播放点特效,
   取单位X,
   取单位Y,
+  设置单位动画,
 } from "./19．公共工具";
 
 const jass = require("jass.common") as any;
@@ -57,6 +58,7 @@ function 菲尼克斯尔怨火核心承伤修正(this: void, damageContext: any)
 export function 触发菲尼克斯尔怨火核心暴露(this: void, context: 菲尼克斯尔运行时上下文): void {
   if (context.怨火核心暴露中 || context.当前形态 !== "第二形态" || !单位存活(context.Boss)) return;
   context.怨火核心暴露中 = true;
+  设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.施法.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.施法.倍速);
   播放菲尼克斯尔台词(context.Boss, "怨火核心暴露");
   const center = 菲尼克斯尔场地配置.中心点;
   context.怨火核心 = 创建菲尼克斯尔机制单位(

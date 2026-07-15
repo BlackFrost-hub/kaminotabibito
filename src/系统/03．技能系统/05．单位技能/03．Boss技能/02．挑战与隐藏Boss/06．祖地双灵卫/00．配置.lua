@@ -11,6 +11,8 @@ ____exports["祖地双灵卫单位技能配置"] = {
         ["变异单位ID"] = "U00B",
         ["正常模型路径"] = "Boss\\AncestralTwinSpiritGuards\\RedOathGuard.mdx",
         ["变异模型路径"] = "Boss\\AncestralTwinSpiritGuards\\RedOathMutant.mdx",
+        ["正常模型缩放"] = 1.78,
+        ["变异模型缩放"] = 2.22,
         ["正常头像路径"] = "Boss\\AncestralTwinSpiritGuards\\Icon\\BTNRedOathGuard.blp",
         ["变异头像路径"] = "Boss\\AncestralTwinSpiritGuards\\Icon\\BTNRedOathMutant.blp",
         ["广播持续时间Ms"] = 3800,
@@ -78,6 +80,8 @@ ____exports["祖地双灵卫单位技能配置"] = {
         ["变异单位ID"] = "U00D",
         ["正常模型路径"] = "Boss\\AncestralTwinSpiritGuards\\AzureShadeGuard.mdx",
         ["变异模型路径"] = "Boss\\AncestralTwinSpiritGuards\\AzureShadeMutant.mdx",
+        ["正常模型缩放"] = 1.5,
+        ["变异模型缩放"] = 3.5,
         ["正常头像路径"] = "Boss\\AncestralTwinSpiritGuards\\Icon\\BTNAzureShadeGuard.blp",
         ["变异头像路径"] = "Boss\\AncestralTwinSpiritGuards\\Icon\\BTNAzureShadeMutant.blp",
         ["广播持续时间Ms"] = 4000,
@@ -161,9 +165,9 @@ ____exports["祖地双灵卫单位技能配置"] = {
         ["单位数据已填写"] = true,
         ["正式模型已填写"] = true,
         ["正式头像已填写"] = true,
-        ["表现资源已填写"] = false,
-        ["技能已实现"] = false,
-        ["战斗已注册"] = false
+        ["表现资源已填写"] = true,
+        ["技能已实现"] = true,
+        ["战斗已注册"] = true
     }
 }
 return ____exports

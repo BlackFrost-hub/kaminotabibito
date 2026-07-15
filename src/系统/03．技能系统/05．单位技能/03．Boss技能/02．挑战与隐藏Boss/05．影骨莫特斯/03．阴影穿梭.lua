@@ -15,6 +15,7 @@ local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放影骨莫特斯台词"]
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
+local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C = ____11_FF0E_516C_5171_5DE5_5177["播放影骨莫特斯限时动作"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
@@ -156,6 +157,8 @@ ____exports["释放影骨阴影穿梭"] = function(context)
     if not _____5355_4F4D_6709_6548(boss) then
         return
     end
+    local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]
+    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(boss, "阴影穿梭")
     AddSpecialEffect(
         _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭残影"],
@@ -194,7 +197,7 @@ ____exports["释放影骨阴影穿梭"] = function(context)
     ____self_3["登记延迟回调"](
         ____self_3,
         "影骨-阴影穿梭",
-        addDelayedCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]["消失秒"] * 1000, _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210)
+        addDelayedCallback(cfg["消失秒"] * 1000, _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210)
     )
 end
 local function ____on_5F71_9AA8_9634_5F71_7A7F_68AD_65BD_6CD5(castingUnit, spellAbilityId)

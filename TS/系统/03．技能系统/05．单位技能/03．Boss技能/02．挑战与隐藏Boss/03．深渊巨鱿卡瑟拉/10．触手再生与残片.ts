@@ -13,6 +13,7 @@ import { 释放卡瑟拉深渊召唤 } from "./06．深渊召唤";
 import { 尝试触发卡瑟拉触手解放 } from "./08．触手解放";
 import { 尝试释放卡瑟拉共生电击 } from "./09．共生电击";
 import { 单位有效, 极坐标X, 极坐标Y, 距离XY, 取坐标角度 } from "./14．公共工具";
+import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
@@ -66,7 +67,6 @@ interface 再生触手实例 {
 }
 
 let 已注册 = false;
-let 周期ID = 0;
 
 function 治疗Boss固定值(this: void, boss: any, amount: number): void {
   if (!单位有效(boss) || !(amount > 0)) return;
@@ -292,26 +292,27 @@ function 处理深渊召唤(this: void, context: 卡瑟拉运行时上下文, no
   释放卡瑟拉深渊召唤(context);
 }
 
-function on卡瑟拉运行时周期(this: void): void {
-  const now = getServerTime();
-  const contexts = 获取全部卡瑟拉上下文();
-  for (let i = 0; i < contexts.length; i++) {
-    const context = contexts[i];
-    if (!单位有效(context.Boss单位)) {
-      清理卡瑟拉上下文(context.Boss单位);
-      continue;
-    }
-    刷新卡瑟拉阶段(context);
-    处理深渊召唤(context, now);
-    尝试触发卡瑟拉触手解放(context);
-    处理血量再生触手(context);
-    尝试释放卡瑟拉共生电击(context, now);
-    处理残片吸收(context, now);
+function on卡瑟拉运行时周期(this: void, context: 卡瑟拉运行时上下文, now: number): void {
+  if (!单位有效(context.Boss单位)) {
+    清理卡瑟拉上下文(context.Boss单位);
+    return;
   }
+  刷新卡瑟拉阶段(context);
+  处理深渊召唤(context, now);
+  尝试触发卡瑟拉触手解放(context);
+  处理血量再生触手(context);
+  尝试释放卡瑟拉共生电击(context, now);
+  处理残片吸收(context, now);
 }
 
 export function 注册卡瑟拉触手再生与残片(this: void): void {
   if (已注册) return;
   已注册 = true;
-  周期ID = addPeriodicCallback(1000, on卡瑟拉运行时周期);
+  创建周期机制调度器({
+    名称: '卡瑟拉-运行时推进',
+    间隔毫秒: 卡瑟拉数值与表现配置.运行时.推进间隔毫秒,
+    取当前时间: getServerTime,
+    取上下文列表: 获取全部卡瑟拉上下文,
+    执行: on卡瑟拉运行时周期,
+  });
 }

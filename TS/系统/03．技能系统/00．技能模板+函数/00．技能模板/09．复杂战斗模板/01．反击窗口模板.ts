@@ -33,6 +33,7 @@ export interface 反击窗口模板参数 {
   背后受伤倍率?: number;
   仅普攻?: boolean;
   仅技能伤害?: boolean;
+  触发条件?: (this: void, context: DamageModifierContext) => boolean;
   修正优先级?: number;
   on反击?: (this: void, context: DamageModifierContext, 修改后伤害: number) => void;
   on破招?: (this: void, context: DamageModifierContext, 修改后伤害: number) => void;
@@ -78,6 +79,7 @@ class 反击窗口模板实现 implements 反击窗口模板实例 {
     if (this.已结束 || context.target !== this.参数.单位) return context.currentDamage;
     if (this.参数.仅普攻 === true && context.isNormalAttack !== true) return context.currentDamage;
     if (this.参数.仅技能伤害 === true && context.isSkillDamage !== true && context.isSkillAttack !== true) return context.currentDamage;
+    if (this.参数.触发条件 != null && !this.参数.触发条件(context)) return context.currentDamage;
 
     let result = context.currentDamage;
     if (this.参数.背后破招角度 != null && 单位是否在来源背后扇区(this.参数.单位, context.attacker, this.参数.背后破招角度)) {

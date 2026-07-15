@@ -30,6 +30,8 @@ local _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868 = ____19_
 local _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击最大生命伤害"]
 local _____9020_6210_6697_706B_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成暗火伤害"]
 local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587 = ____19_FF0E_516C_5171_5DE5_5177["创建菲尼克斯尔独立伤害上下文"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.18．单位动画守护")
+local _____521B_5EFA_5355_4F4D_52A8_753B_5B88_62A4 = ____require_result_0["创建单位动画守护"]
 local jass = require("jass.common")
 local KillUnit = jass.KillUnit
 local RemoveUnit = jass.RemoveUnit
@@ -125,8 +127,16 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                 _____53D6_6700_5927_751F_547D(context.Boss) * config["凤凰蛋生命Boss最大生命比例"],
                 _____521B_5EFA_51E4_51F0_86CB_6B7B_4EA1_56DE_8C03(context)
             )
-            local ____context__51E4_51F0_86CB_5217_8868_0 = context["凤凰蛋列表"]
-            ____context__51E4_51F0_86CB_5217_8868_0[#____context__51E4_51F0_86CB_5217_8868_0 + 1] = {["单位"] = egg, ["已摧毁"] = false}
+            local eggAnimation = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第一形态"]["凤凰蛋"]
+            _____521B_5EFA_5355_4F4D_52A8_753B_5B88_62A4({
+                ["单位"] = egg,
+                ["动画编号"] = eggAnimation["编号"],
+                ["附加动画属性"] = eggAnimation["附加动画属性"],
+                ["间隔秒"] = eggAnimation["守护间隔秒"],
+                ["调试名"] = "菲尼克斯尔-凤凰蛋动画守护"
+            })
+            local ____context__51E4_51F0_86CB_5217_8868_1 = context["凤凰蛋列表"]
+            ____context__51E4_51F0_86CB_5217_8868_1[#____context__51E4_51F0_86CB_5217_8868_1 + 1] = {["单位"] = egg, ["已摧毁"] = false}
             _____64AD_653E_70B9_7279_6548(_____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回能量上升"], p.x, p.y, 2500)
             i = i + 1
         end
@@ -201,8 +211,8 @@ ____exports["初始化菲尼克斯尔永恒轮回节点"] = function(context)
             end
         end
     )
-    local ____self_1 = context["清理"]
-    ____self_1["登记周期回调"](____self_1, "菲尼克斯尔-永恒轮回检测", timerId)
+    local ____self_2 = context["清理"]
+    ____self_2["登记周期回调"](____self_2, "菲尼克斯尔-永恒轮回检测", timerId)
 end
 ____exports["注册菲尼克斯尔永恒轮回"] = function()
 end

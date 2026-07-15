@@ -4,6 +4,8 @@ import type { 菲尼克斯尔元素类型, 菲尼克斯尔运行时上下文 } f
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
 import type { 技能伤害形态 } from "../../../../../04．伤害系统/08．技能伤害系统";
+import { stringToFourCC, 距离XY, 极坐标X as 公共极坐标X, 极坐标Y as 公共极坐标Y } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -25,9 +27,6 @@ const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, whic
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
-const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
-const Cos = jass.Cos as (radians: number) => number;
-const Sin = jass.Sin as (radians: number) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (x: number) => number;
 const R2I = jass.R2I as (x: number) => number;
@@ -87,8 +86,11 @@ const { 开始硬直, 施加快速减速Buff, 施加快速控制Buff } = require
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.index") as {
   创建可攻击机制单位: (this: void, 参数: any) => any;
 };
+const { createTimedEffect, createTimedUnitEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+  createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
+};
 
-const DEG_TO_RAD = 0.017453292519943295;
 const RAD_TO_DEG = 57.29577951308232;
 const 快速控制_击晕 = 1;
 
@@ -109,9 +111,7 @@ export function 创建菲尼克斯尔独立伤害上下文(this: void, 标签: s
   };
 }
 
-export function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
-}
+export { stringToFourCC };
 
 export function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && isValidUnit(unit);
@@ -213,24 +213,12 @@ export function 停止周期(this: void, id: number): void {
 
 export function 播放点特效(this: void, model: string, x: number, y: number, lifeMs: number = 1200): any {
   if (model == null || model === "") return null;
-  const effect = AddSpecialEffect(model, x, y);
-  if (effect != null && effect !== 0 && lifeMs > 0) {
-    addDelayedCallback(lifeMs, function 菲尼克斯尔销毁点特效(this: void): void {
-      DestroyEffect(effect);
-    });
-  }
-  return effect;
+  return lifeMs > 0 ? createTimedEffect(model, x, y, 0, lifeMs / 1000) : AddSpecialEffect(model, x, y);
 }
 
 export function 播放单位特效(this: void, model: string, unit: any, attach: string = "origin", lifeMs: number = 1200): any {
   if (model == null || model === "" || !单位有效(unit)) return null;
-  const effect = AddSpecialEffectTarget(model, unit, attach);
-  if (effect != null && effect !== 0 && lifeMs > 0) {
-    addDelayedCallback(lifeMs, function 菲尼克斯尔销毁单位特效(this: void): void {
-      DestroyEffect(effect);
-    });
-  }
-  return effect;
+  return lifeMs > 0 ? createTimedUnitEffect(unit, attach, model, lifeMs / 1000) : AddSpecialEffectTarget(model, unit, attach);
 }
 
 export function 显示常规读条(this: void, 秒: number, 颜色ID: number, 标题文本: string, 提示文本: string): void {
@@ -261,18 +249,14 @@ export function 创建预警扇形(this: void, source: any, radius: number, dura
   创建技能提示圈({ 类型: "红色扇形", 锚点单位: source, 半径: radius, 持续时间: duration });
 }
 
-export function 两点距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  const dx = x1 - x2;
-  const dy = y1 - y2;
-  return SquareRoot(dx * dx + dy * dy);
-}
+export const 两点距离 = 距离XY;
 
 export function 极坐标X(this: void, x: number, distance: number, angleDeg: number): number {
-  return x + distance * Cos(angleDeg * DEG_TO_RAD);
+  return 公共极坐标X(x, angleDeg, distance);
 }
 
 export function 极坐标Y(this: void, y: number, distance: number, angleDeg: number): number {
-  return y + distance * Sin(angleDeg * DEG_TO_RAD);
+  return 公共极坐标Y(y, angleDeg, distance);
 }
 
 export function 单位在扇形内(this: void, source: any, target: any, radius: number, angleDeg: number): boolean {
@@ -347,12 +331,19 @@ export function 造成普通伤害(this: void, source: any, target: any, amount:
 }
 
 export function 计算攻击最大生命伤害(this: void, source: any, target: any, attackRate: number, maxLifeRate: number): number {
-  return (取攻击力(source) * attackRate + 取最大生命(target) * maxLifeRate) * 取菲尼克斯尔技能强度倍率(source);
+  return 计算组合技能伤害(source, target, {
+    来源攻击力比例: attackRate,
+    目标最大生命比例: maxLifeRate,
+    总倍率: 取菲尼克斯尔技能强度倍率(source),
+  });
 }
 
 export function 计算攻击已损失伤害(this: void, source: any, target: any, attackRate: number, lostLifeRate: number): number {
-  const lost = 取最大生命(target) - 取当前生命(target);
-  return (取攻击力(source) * attackRate + lost * lostLifeRate) * 取菲尼克斯尔技能强度倍率(source);
+  return 计算组合技能伤害(source, target, {
+    来源攻击力比例: attackRate,
+    目标已损生命比例: lostLifeRate,
+    总倍率: 取菲尼克斯尔技能强度倍率(source),
+  });
 }
 
 export function 取菲尼克斯尔技能强度倍率(this: void, source: any): number {

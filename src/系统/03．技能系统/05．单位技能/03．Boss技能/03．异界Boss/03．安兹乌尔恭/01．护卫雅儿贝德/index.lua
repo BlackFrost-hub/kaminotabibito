@@ -14,6 +14,10 @@ local ____06_FF0E_751F_547D_951A_70B9_5C01_9501 = require("系统.03．技能系
 local _____751F_547D_951A_70B9_5C01_9501_6280_80FD_72B6_6001 = ____06_FF0E_751F_547D_951A_70B9_5C01_9501["生命锚点封锁技能状态"]
 local ____07_FF0E_6280_80FD_9A71_52A8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.07．技能驱动")
 local _____96C5_513F_8D1D_5FB7_6280_80FD_9A71_52A8_72B6_6001 = ____07_FF0E_6280_80FD_9A71_52A8["雅儿贝德技能驱动状态"]
+local ____08_FF0E_5B88_62A4_56DE_5F52 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.08．守护回归")
+local _____5B88_62A4_56DE_5F52_6280_80FD_72B6_6001 = ____08_FF0E_5B88_62A4_56DE_5F52["守护回归技能状态"]
+local ____09_FF0E_62A4_536B_53CD_51FB = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.09．护卫反击")
+local _____62A4_536B_53CD_51FB_6280_80FD_72B6_6001 = ____09_FF0E_62A4_536B_53CD_51FB["护卫反击技能状态"]
 do
     local ____export = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.00．状态")
     for ____exportKey, ____exportValue in pairs(____export) do
@@ -78,9 +82,27 @@ do
         end
     end
 end
-____exports["雅儿贝德技能状态"] = {["已注册"] = false, ["技能"] = {
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.08．守护回归")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.09．护卫反击")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+____exports["雅儿贝德技能状态"] = {["已注册"] = true, ["技能"] = {
     _____81F3_5C0A_62E6_622A_6280_80FD_72B6_6001,
     _____9ED1_7FFC_6A2A_626B_6280_80FD_72B6_6001,
+    _____5B88_62A4_56DE_5F52_6280_80FD_72B6_6001,
+    _____62A4_536B_53CD_51FB_6280_80FD_72B6_6001,
     _____5B88_62A4_8005_4E4B_804C_8D23_6280_80FD_72B6_6001,
     _____81F3_5C0A_5171_62A4_6280_80FD_72B6_6001,
     _____9ED1_7FFC_62D8_675F_6280_80FD_72B6_6001,

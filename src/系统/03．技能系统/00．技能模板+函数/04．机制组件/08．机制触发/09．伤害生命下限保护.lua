@@ -89,6 +89,13 @@ _____4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4_5B9E_73B0.prototype["处理伤害"]
     if self["参数"]["过滤伤害"] ~= nil and not self["参数"]["过滤伤害"](context) then
         return current
     end
+    if self["参数"]["伤害预处理"] ~= nil then
+        local adjusted = self["参数"]["伤害预处理"](context, current)
+        current = type(adjusted) == "number" and adjusted == adjusted and adjusted or current
+        if not (current > 0) then
+            return 0
+        end
+    end
     local _____5F53_524D_751F_547D = GetUnitState(self["参数"]["单位"], UNIT_STATE_LIFE)
     local _____751F_547D_4E0B_9650 = self["计算生命下限"](self, context)
     if self["参数"]["离开下限后重置触底"] == true and _____5F53_524D_751F_547D > _____751F_547D_4E0B_9650 then
@@ -98,7 +105,7 @@ _____4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4_5B9E_73B0.prototype["处理伤害"]
     if _____5B9E_9645_5141_8BB8_4F24_5BB3 < 0 then
         _____5B9E_9645_5141_8BB8_4F24_5BB3 = 0
     end
-    if current <= _____5B9E_9645_5141_8BB8_4F24_5BB3 then
+    if current < _____5B9E_9645_5141_8BB8_4F24_5BB3 then
         return current
     end
     local event = {

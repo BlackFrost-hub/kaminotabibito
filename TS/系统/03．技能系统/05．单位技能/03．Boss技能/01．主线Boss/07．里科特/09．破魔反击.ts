@@ -4,7 +4,7 @@ import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 获取全部里科特上下文, type 里科特运行时上下文 } from "./01．运行时上下文";
 import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
-import { 单位有效, stringToFourCC, 距离平方XY } from "./13．公共工具";
+import { 单位有效, 播放里科特施法维持动作, 播放里科特限时动作, stringToFourCC, 距离平方XY } from "./13．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
@@ -13,14 +13,15 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetRandomReal = jass.GetRandomReal as (lowBound: number, highBound: number) => number;
-const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
-const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
+const { createTimedUnitEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -52,12 +53,10 @@ function 取反击上下文(this: void, boss: any): 里科特运行时上下文 
 }
 
 function 播放限时反击特效(this: void, target: any): void {
-  const model: string = 里科特数值与表现配置.破魔反击.反击特效路径;
+  const cfg = 里科特数值与表现配置.破魔反击;
+  const model: string = cfg.反击特效路径;
   if (!单位有效(target) || model === "") return;
-  const effect = AddSpecialEffectTarget(model, target, "origin");
-  addDelayedCallback(800, function 里科特破魔反击特效销毁(this: void): void {
-    DestroyEffect(effect);
-  });
+  createTimedUnitEffect(target, 'origin', model, cfg.反击特效持续秒);
 }
 
 function 结束破魔反击窗口(this: void, context: 里科特运行时上下文): void {
@@ -70,6 +69,7 @@ function 开始破魔反击窗口(this: void, context: 里科特运行时上下�
   if (!单位有效(boss)) return;
   const cfg = 里科特数值与表现配置.破魔反击;
   context.破魔反击中 = true;
+  播放里科特施法维持动作(boss, cfg.反击窗口秒, cfg.动画速度);
   registerManualBuff(boss, 里科特BuffID.破魔反击, cfg.反击窗口秒, 1, { sourceName: "里科特-破魔反击" });
   播放Boss坐标音效(里科特音效配置.破魔反击.窗口开启, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
   播放限时反击特效(boss);
@@ -118,6 +118,7 @@ function on里科特破魔反击伤害修正(this: void, damageContext: any): nu
   const distance2 = 距离平方XY(GetUnitX(boss), GetUnitY(boss), GetUnitX(attacker), GetUnitY(attacker));
   const near2 = cfg.近距离阈值 * cfg.近距离阈值;
   const ratio = distance2 <= near2 ? cfg.近距离当前生命移除比例 : cfg.远距离当前生命移除比例;
+  播放里科特限时动作(boss, cfg.触发动画编号, 1, cfg.触发动画原始时长秒);
   按比例移除当前生命(attacker, ratio, true);
   施加眩晕(boss, attacker, cfg.眩晕秒);
   播放Boss坐标音效(里科特音效配置.破魔反击.触发剥离, GetUnitX(attacker), GetUnitY(attacker), 里科特音效配置.默认裁断距离);

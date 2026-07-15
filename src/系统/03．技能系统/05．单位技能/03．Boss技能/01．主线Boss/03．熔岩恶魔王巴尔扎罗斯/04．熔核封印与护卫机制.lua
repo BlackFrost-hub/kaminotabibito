@@ -67,6 +67,7 @@ local function _____521B_5EFA_683C_9C81_59C6(context)
     local cfg = _____5DF4_5C14_624E_7F57_65AF_62A4_536B_914D_7F6E["格鲁姆"]
     return _____521B_5EFA_53EC_5524_7269({
         ["主人单位"] = context["Boss单位"],
+        ["单位类型"] = _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["格鲁姆"]["单位ID"],
         ["单位名称"] = _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["格鲁姆"]["名称"],
         X = cfg.X,
         Y = cfg.Y,
@@ -82,6 +83,7 @@ local function _____521B_5EFA_585E_62C9(context)
     local cfg = _____5DF4_5C14_624E_7F57_65AF_62A4_536B_914D_7F6E["塞拉"]
     return _____521B_5EFA_53EC_5524_7269({
         ["主人单位"] = context["Boss单位"],
+        ["单位类型"] = _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["塞拉"]["单位ID"],
         ["单位名称"] = _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["塞拉"]["名称"],
         X = cfg.X,
         Y = cfg.Y,
@@ -90,11 +92,7 @@ local function _____521B_5EFA_585E_62C9(context)
         ["生命值"] = cfg["生命值"],
         ["生命值受小怪倍率"] = false,
         ["护甲"] = cfg["防御力"],
-        ["攻击间隔"] = cfg["攻击间隔"],
-        ["攻击范围"] = 650,
-        ["普攻弹道模型"] = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl",
-        ["普攻弹道弧度"] = 0.15,
-        ["普攻弹道速度"] = 900
+        ["攻击间隔"] = cfg["攻击间隔"]
     })
 end
 local function _____6DFB_52A0_7194_6838_5C01_5370(context)

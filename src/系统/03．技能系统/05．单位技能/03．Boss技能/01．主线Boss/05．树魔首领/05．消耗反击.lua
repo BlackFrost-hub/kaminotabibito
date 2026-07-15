@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local stringToFourCC, _____5355_4F4D_6709_6548, _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001, _____64AD_653E_9632_5FA1_59FF_6001_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, IsUnitType, UNIT_TYPE_DEAD, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, _____5F00_59CB_786C_76F4, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6D88_8017_53CD_51FB_6280_80FDID, _____6D88_8017_53CD_51FB_72B6_6001_8868
+local _____5355_4F4D_6709_6548, _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001, _____64AD_653E_9632_5FA1_59FF_6001_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetHandleId, IsUnitType, UNIT_TYPE_DEAD, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, _____5F00_59CB_786C_76F4, _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6D88_8017_53CD_51FB_6280_80FDID, _____6D88_8017_53CD_51FB_72B6_6001_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -20,9 +20,8 @@ local _____5355_4F4D_662F_5426_5728_6765_6E90_6B63_9762_6247_533A = ____08_FF0E_
 local _____5355_4F4D_662F_5426_5728_6765_6E90_80CC_540E_6247_533A = ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177["单位是否在来源背后扇区"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
-function stringToFourCC(s)
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
@@ -32,9 +31,6 @@ function _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001(boss)
     if state == nil then
         return
     end
-    if state["动画回调ID"] ~= 0 then
-        removePeriodicCallback(state["动画回调ID"])
-    end
     if state["特效回调ID"] ~= 0 then
         removePeriodicCallback(state["特效回调ID"])
     end
@@ -43,7 +39,13 @@ function _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001(boss)
     end
     __TS__Delete(_____6D88_8017_53CD_51FB_72B6_6001_8868, hid)
     if _____5355_4F4D_6709_6548(boss) then
-        SetUnitTimeScale(boss, 1)
+        _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({
+            ["单位"] = boss,
+            ["动画编号"] = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]["恢复动画编号"],
+            ["动画速度"] = 1,
+            ["持续秒"] = 0,
+            ["恢复动画编号"] = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]["恢复动画编号"]
+        })
     end
 end
 function _____64AD_653E_9632_5FA1_59FF_6001_7279_6548(boss)
@@ -82,26 +84,34 @@ ____exports["释放树魔首领消耗反击"] = function(context)
     _____64AD_653E_6811_9B54_9996_9886_53F0_8BCD(boss, "消耗反击")
     _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB(boss)
     _____5F00_59CB_786C_76F4(boss, cfg["持续秒"])
-    SetUnitTimeScale(boss, cfg["动画速度"])
-    SetUnitAnimationByIndex(boss, cfg["动画编号"])
     _____64AD_653E_9632_5FA1_59FF_6001_7279_6548(boss)
     local state = {
         Boss = boss,
         ["上下文"] = context,
         ["到期Ms"] = getServerTime() + cfg["持续秒"] * 1000,
-        ["动画回调ID"] = 0,
         ["结束回调ID"] = 0,
         ["特效回调ID"] = 0
     }
-    state["动画回调ID"] = addPeriodicCallback(
-        cfg["动画重播间隔毫秒"],
-        function()
-            if not _____5355_4F4D_6709_6548(boss) or getServerTime() >= state["到期Ms"] then
+    _____6D88_8017_53CD_51FB_72B6_6001_8868[hid] = state
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({
+        ["单位"] = boss,
+        ["动画编号"] = cfg["起手动画编号"],
+        ["动画速度"] = cfg["动画速度"],
+        ["持续秒"] = cfg["起手动画原始时长秒"],
+        ["恢复动画编号"] = cfg["维持动画编号"],
+        ["完成回调"] = function()
+            if _____6D88_8017_53CD_51FB_72B6_6001_8868[hid] ~= state then
                 return
             end
-            SetUnitAnimationByIndex(boss, cfg["动画编号"])
+            _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({
+                ["单位"] = boss,
+                ["动画编号"] = cfg["维持动画编号"],
+                ["动画速度"] = cfg["动画速度"],
+                ["持续秒"] = cfg["持续秒"] - cfg["起手动画原始时长秒"],
+                ["恢复动画编号"] = cfg["恢复动画编号"]
+            })
         end
-    )
+    })
     state["特效回调ID"] = addPeriodicCallback(
         cfg["防御特效刷新毫秒"],
         function()
@@ -117,7 +127,6 @@ ____exports["释放树魔首领消耗反击"] = function(context)
             _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001(boss)
         end
     )
-    _____6D88_8017_53CD_51FB_72B6_6001_8868[hid] = state
 end
 function ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____6D88_8017_53CD_51FB_6280_80FDID then
@@ -142,8 +151,6 @@ GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local SetUnitFacing = jass.SetUnitFacing
-SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
-SetUnitTimeScale = jass.SetUnitTimeScale
 IsUnitType = jass.IsUnitType
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local AddLightning = jass.AddLightning
@@ -165,18 +172,20 @@ removePeriodicCallback = ____require_result_3.removePeriodicCallback
 getServerTime = ____require_result_3.getServerTime
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 _____5F00_59CB_786C_76F4 = ____require_result_4["开始硬直"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
-local _____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_5["创建线段危险区"]
-local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_6["获取Boss技能敌对英雄列表"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedEffect = ____require_result_7.createTimedEffect
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local ____require_result_8 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_8.YDWETimerDestroyEffectSafe
-local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_9.CosBJ
-local SinBJ = ____require_result_9.SinBJ
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+_____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____require_result_5["播放限时单位动画"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
+local _____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_6["创建线段危险区"]
+local ____require_result_7 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_7["获取Boss技能敌对英雄列表"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedEffect = ____require_result_8.createTimedEffect
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_9 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_9.YDWETimerDestroyEffectSafe
+local ____require_result_10 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_10.CosBJ
+local SinBJ = ____require_result_10.SinBJ
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____6D88_8017_53CD_51FB_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]["技能槽位"])
 _____6D88_8017_53CD_51FB_72B6_6001_8868 = {}
@@ -253,7 +262,13 @@ local function _____6267_884C_53CD_51FB(state, attacker, _____89E6_53D1_4F24_5BB
         _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["默认裁断距离"]
     )
     SetUnitFacing(boss, angle)
-    SetUnitAnimationByIndex(boss, 4)
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({
+        ["单位"] = boss,
+        ["动画编号"] = cfg["反击动画编号"],
+        ["动画速度"] = cfg["动画速度"],
+        ["持续秒"] = cfg["反击动画原始时长秒"],
+        ["恢复动画编号"] = cfg["恢复动画编号"]
+    })
     _____521B_5EFA_53CD_51FB_5F39_9053_8868_73B0(boss, angle)
     _____64AD_653E_62BD_9B54_7279_6548(attacker)
     _____64AD_653E_53CD_51FB_8FDE_7EBF(boss, attacker)

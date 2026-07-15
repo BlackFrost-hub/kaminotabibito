@@ -4,7 +4,7 @@ import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, 刷新影骨盗贼遗产Buff, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
 import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
-import { 单位有效, stringToFourCC } from "./11．公共工具";
+import { 单位有效, 播放影骨莫特斯限时动作, stringToFourCC } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 const jass = require("jass.common") as any;
@@ -132,6 +132,8 @@ function 注册影骨遗产宝箱延迟生成(this: void, context: 影骨莫特�
 export function 释放影骨盗贼遗产(this: void, context: 影骨莫特斯运行时上下文): void {
   if (context.遗产宝箱已生成) return;
   context.遗产宝箱已生成 = true;
+  const cfg = 影骨莫特斯数值与表现配置.盗贼的遗产;
+  播放影骨莫特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   播放影骨莫特斯台词(context.Boss单位, "盗贼的遗产");
   const count = 影骨莫特斯数值与表现配置.盗贼的遗产.宝箱数量;
   for (let i = 0; i < count; i++) {

@@ -5,6 +5,7 @@ import { 获取树魔首领上下文, 获取或创建树魔首领上下文, 获�
 import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
+import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
@@ -59,10 +60,6 @@ const 巫医单位类型ID = stringToFourCC(树魔首领单位技能配置.召�
 const 投掷者单位类型ID = stringToFourCC(树魔首领单位技能配置.召唤物ID.投掷者);
 
 let 树魔首领随从特性已注册 = false;
-
-function stringToFourCC(this: void, s: string): number {
-  return (string.byte(s, 1) << 24) + (string.byte(s, 2) << 16) + (string.byte(s, 3) << 8) + string.byte(s, 4);
-}
 
 function 单位存活(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;

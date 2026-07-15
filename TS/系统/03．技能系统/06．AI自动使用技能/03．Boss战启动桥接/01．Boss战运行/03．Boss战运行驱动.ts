@@ -122,11 +122,16 @@ function 清理当前Boss全局(this: void, bossUnit: any): void {
   if (jglobals.udg_Boss === bossUnit) jglobals.udg_Boss = null;
 }
 
-function 结束Boss战运行上下文(this: void, context: Boss战运行上下文, nowMs: number): void {
+export interface 主动结束Boss战选项 {
+  跳过死亡音效?: boolean;
+  跳过死亡剧情?: boolean;
+}
+
+function 结束Boss战运行上下文(this: void, context: Boss战运行上下文, nowMs: number, 选项?: 主动结束Boss战选项): void {
   if (context.是否已结束) return;
 
   context.是否已结束 = true;
-  尝试播放Boss死亡音效(context.Boss单位);
+  if (选项?.跳过死亡音效 !== true) 尝试播放Boss死亡音效(context.Boss单位);
   结束Boss血条弱点韧性(context);
   处理Boss战护卫结束(context);
   停止赫萝昼夜被动(context.Boss单位);
@@ -144,7 +149,7 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
   const { 尝试播放Boss死亡主线剧情 } = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引") as {
     尝试播放Boss死亡主线剧情: (this: void, bossUnit: any) => boolean;
   };
-  尝试播放Boss死亡主线剧情(context.Boss单位);
+  if (选项?.跳过死亡剧情 !== true) 尝试播放Boss死亡主线剧情(context.Boss单位);
 
   QuestMessageBJ(GetPlayersAll(), 获取Quest消息完成(), 获取Boss战胜利提示文本());
   debugLogForce(Boss战运行模块名, "Boss战结束", "boss=", context.Boss句柄ID, "generation=", context.运行代次);
@@ -172,6 +177,13 @@ QuestMessageBJ(GetPlayersAll(), 获取Quest消息秘密(), 获取Boss战转场�
     启动瑟兰迪尔Boss运行时(context.Boss单位);
     处理Boss战护卫启动(context);
   }
+}
+
+export function 主动结束Boss战运行(this: void, bossUnit: any, 选项?: 主动结束Boss战选项): boolean {
+  const context = 读取Boss战运行上下文(bossUnit);
+  if (context == null || context.是否已结束) return false;
+  结束Boss战运行上下文(context, getServerTime(), 选项);
+  return true;
 }
 
 function 当前是否仍需驱动Boss战运行(this: void): boolean {

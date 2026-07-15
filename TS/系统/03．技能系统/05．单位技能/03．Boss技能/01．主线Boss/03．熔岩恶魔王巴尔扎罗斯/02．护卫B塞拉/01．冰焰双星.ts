@@ -176,6 +176,7 @@ export function 释放冰焰双星(this: void, context: 巴尔扎罗斯运行时
     硬直秒: config.施法硬直秒,
     动画编号: config.动画编号,
     动画速度: config.动画速度,
+    恢复动画编号: config.恢复动画编号,
     吟唱条: {
       通道: "常规技能",
       总时长: config.施法硬直秒,

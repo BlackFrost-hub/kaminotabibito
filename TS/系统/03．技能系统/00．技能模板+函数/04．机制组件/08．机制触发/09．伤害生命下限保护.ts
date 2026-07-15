@@ -37,6 +37,7 @@ export interface 伤害生命下限保护参数 {
   离开下限后重置触底?: boolean;
   清理?: 机制清理篮子;
   过滤伤害?: (this: void, context: any) => boolean;
+  伤害预处理?: (this: void, context: any, 当前伤害: number) => number;
   取生命下限?: (this: void, 单位: any, context?: any) => number;
   on首次触底?: (this: void, event: 伤害生命下限事件) => void;
   on拦截?: (this: void, event: 伤害生命下限事件) => void;
@@ -116,9 +117,14 @@ class 伤害生命下限保护实现 implements 伤害生命下限保护控制�
   }
 
   private 处理伤害(context: any): number {
-    const current = context.currentDamage;
+    let current = context.currentDamage;
     if (!this.是否生效() || context.target !== this.参数.单位 || !(current > 0)) return current;
     if (this.参数.过滤伤害 != null && !this.参数.过滤伤害(context)) return current;
+    if (this.参数.伤害预处理 != null) {
+      const adjusted = this.参数.伤害预处理(context, current);
+      current = typeof adjusted === "number" && adjusted === adjusted ? adjusted : current;
+      if (!(current > 0)) return 0;
+    }
 
     const 当前生命 = GetUnitState(this.参数.单位, UNIT_STATE_LIFE);
     const 生命下限 = this.计算生命下限(context);
@@ -126,7 +132,7 @@ class 伤害生命下限保护实现 implements 伤害生命下限保护控制�
 
     let 实际允许伤害 = 当前生命 - 生命下限;
     if (实际允许伤害 < 0) 实际允许伤害 = 0;
-    if (current <= 实际允许伤害) return current;
+    if (current < 实际允许伤害) return current;
 
     const event: 伤害生命下限事件 = {
       单位: this.参数.单位,
@@ -181,4 +187,3 @@ export function 创建伤害生命下限保护(this: void, 参数: 伤害生命�
   }
   return 控制器;
 }
-

@@ -20,6 +20,8 @@ local _____6781_5750_6807X = ____14_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____14_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____8DDD_79BBXY = ____14_FF0E_516C_5171_5DE5_5177["距离XY"]
 local _____53D6_5750_6807_89D2_5EA6 = ____14_FF0E_516C_5171_5DE5_5177["取坐标角度"]
+local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
+local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
@@ -54,7 +56,6 @@ local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单�
 local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉")
 local _____5361_745F_62C9BuffID = ____require_result_7["卡瑟拉BuffID"]
 local _____5DF2_6CE8_518C = false
-local _____5468_671FID = 0
 local function _____6CBB_7597Boss_56FA_5B9A_503C(boss, amount)
     if not _____5355_4F4D_6709_6548(boss) or not (amount > 0) then
         return
@@ -362,35 +363,29 @@ local function _____5904_7406_6DF1_6E0A_53EC_5524(context, nowMs)
     context["下次深渊召唤时间"] = nowMs + cfg["触发间隔秒"] * 1000
     _____91CA_653E_5361_745F_62C9_6DF1_6E0A_53EC_5524(context)
 end
-local function ____on_5361_745F_62C9_8FD0_884C_65F6_5468_671F()
-    local now = getServerTime()
-    local contexts = _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587()
-    do
-        local i = 0
-        while i < #contexts do
-            do
-                local context = contexts[i + 1]
-                if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                    _____6E05_7406_5361_745F_62C9_4E0A_4E0B_6587(context["Boss单位"])
-                    goto __continue59
-                end
-                _____5237_65B0_5361_745F_62C9_9636_6BB5(context)
-                _____5904_7406_6DF1_6E0A_53EC_5524(context, now)
-                _____5C1D_8BD5_89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E(context)
-                _____5904_7406_8840_91CF_518D_751F_89E6_624B(context)
-                _____5C1D_8BD5_91CA_653E_5361_745F_62C9_5171_751F_7535_51FB(context, now)
-                _____5904_7406_6B8B_7247_5438_6536(context, now)
-            end
-            ::__continue59::
-            i = i + 1
-        end
+local function ____on_5361_745F_62C9_8FD0_884C_65F6_5468_671F(context, now)
+    if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        _____6E05_7406_5361_745F_62C9_4E0A_4E0B_6587(context["Boss单位"])
+        return
     end
+    _____5237_65B0_5361_745F_62C9_9636_6BB5(context)
+    _____5904_7406_6DF1_6E0A_53EC_5524(context, now)
+    _____5C1D_8BD5_89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E(context)
+    _____5904_7406_8840_91CF_518D_751F_89E6_624B(context)
+    _____5C1D_8BD5_91CA_653E_5361_745F_62C9_5171_751F_7535_51FB(context, now)
+    _____5904_7406_6B8B_7247_5438_6536(context, now)
 end
 ____exports["注册卡瑟拉触手再生与残片"] = function()
     if _____5DF2_6CE8_518C then
         return
     end
     _____5DF2_6CE8_518C = true
-    _____5468_671FID = addPeriodicCallback(1000, ____on_5361_745F_62C9_8FD0_884C_65F6_5468_671F)
+    _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({
+        ["名称"] = "卡瑟拉-运行时推进",
+        ["间隔毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"],
+        ["取当前时间"] = getServerTime,
+        ["取上下文列表"] = _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587,
+        ["执行"] = ____on_5361_745F_62C9_8FD0_884C_65F6_5468_671F
+    })
 end
 return ____exports

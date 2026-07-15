@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import { 瑟兰迪尔单位技能配置 } from "./00．配置";
-import { 瑟兰迪尔阶段阈值 } from "./02．数值与表现配置";
+import { 瑟兰迪尔阶段阈值, 瑟兰迪尔运行时配置 } from "./02．数值与表现配置";
 import { 尝试触发瑟兰迪尔执法印记 } from "./04．执法印记";
 import { 刷新瑟兰迪尔秩序领域, 清理瑟兰迪尔秩序领域 } from "./07．秩序领域";
 import { 尝试触发瑟兰迪尔审判之环 } from "./08．审判之环";
@@ -9,13 +9,13 @@ import { 尝试触发瑟兰迪尔月光灌注, 清理瑟兰迪尔月光灌注 } 
 import { 尝试触发瑟兰迪尔终末审判 } from "./12．终末审判";
 import type { 机制清理篮子 } from "../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
 import { 创建单位运行时上下文工厂 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
+import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 export { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 
 const jass = require("jass.common") as any;
-const { getServerTime, addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
 };
 
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
@@ -97,26 +97,26 @@ function 刷新瑟兰迪尔阶段(this: void, context: 瑟兰迪尔运行时上�
   }
 }
 
-function 推进瑟兰迪尔运行时(this: void): void {
-  const contexts = 瑟兰迪尔上下文工厂.获取全部();
-  for (let i = 0; i < contexts.length; i++) {
-    const context = contexts[i];
-    if (context == null) continue;
-    if (!单位有效(context.Boss单位)) {
-      清理瑟兰迪尔上下文(context.Boss单位);
-      continue;
-    }
-    刷新瑟兰迪尔阶段(context);
-    尝试触发瑟兰迪尔执法印记(context);
-    刷新瑟兰迪尔秩序领域(context);
-    尝试触发瑟兰迪尔月光灌注(context);
-    if (context.阶段 >= 2) 尝试触发瑟兰迪尔审判之环(context);
-    if (context.阶段 >= 3) 尝试触发瑟兰迪尔终末审判(context);
+function 推进瑟兰迪尔运行时(this: void, context: 瑟兰迪尔运行时上下文): void {
+  if (!单位有效(context.Boss单位)) {
+    清理瑟兰迪尔上下文(context.Boss单位);
+    return;
   }
+  刷新瑟兰迪尔阶段(context);
+  尝试触发瑟兰迪尔执法印记(context);
+  刷新瑟兰迪尔秩序领域(context);
+  尝试触发瑟兰迪尔月光灌注(context);
+  if (context.阶段 >= 2) 尝试触发瑟兰迪尔审判之环(context);
+  if (context.阶段 >= 3) 尝试触发瑟兰迪尔终末审判(context);
 }
 
 export function 注册瑟兰迪尔运行时(this: void): void {
   if (瑟兰迪尔运行时已注册) return;
   瑟兰迪尔运行时已注册 = true;
-  addPeriodicCallback(250, 推进瑟兰迪尔运行时);
+  创建周期机制调度器({
+    名称: '瑟兰迪尔-运行时推进',
+    间隔毫秒: 瑟兰迪尔运行时配置.推进间隔毫秒,
+    取上下文列表: 瑟兰迪尔上下文工厂.获取全部,
+    执行: 推进瑟兰迪尔运行时,
+  });
 }

@@ -1,17 +1,19 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local SquareRoot, isValidUnit, _____83B7_53D6_5355_4F4DBuff_5C42_6570
+local isValidUnit, _____83B7_53D6_5355_4F4DBuff_5C42_6570
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.00．配置")
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲尼克斯尔单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.02．数值与表现配置")
 local _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["菲尼克斯尔数值与表现配置"]
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
+local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
+local _____516C_5171_6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
+local _____516C_5171_6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
+local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 ____exports["单位有效"] = function(unit)
     return unit ~= nil and unit ~= 0 and isValidUnit(unit)
-end
-____exports["两点距离"] = function(x1, y1, x2, y2)
-    local dx = x1 - x2
-    local dy = y1 - y2
-    return SquareRoot(dx * dx + dy * dy)
 end
 ____exports["取菲尼克斯尔技能强度倍率"] = function(source)
     if not ____exports["单位有效"](source) then
@@ -41,11 +43,8 @@ local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
-local DestroyEffect = jass.DestroyEffect
-local Cos = jass.Cos
-local Sin = jass.Sin
 local Atan2 = jass.Atan2
-SquareRoot = jass.SquareRoot
+local SquareRoot = jass.SquareRoot
 local R2I = jass.R2I
 local GetRandomInt = jass.GetRandomInt
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
@@ -90,7 +89,9 @@ local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_9["施加快�
 local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_9["施加快速控制Buff"]
 local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.index")
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_10["创建可攻击机制单位"]
-local DEG_TO_RAD = 0.017453292519943295
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_11.createTimedEffect
+local createTimedUnitEffect = ____require_result_11.createTimedUnitEffect
 local RAD_TO_DEG = 57.29577951308232
 local _____5FEB_901F_63A7_5236__51FB_6655 = 1
 ____exports["创建菲尼克斯尔独立伤害上下文"] = function(_____6807_7B7E, _____6301_7EED_65F6_95F4_79D2)
@@ -99,9 +100,7 @@ ____exports["创建菲尼克斯尔独立伤害上下文"] = function(_____6807_7
         ["标签"] = _____6807_7B7E
     }
 end
-function ____exports.stringToFourCC(s)
-    return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
-end
+____exports.stringToFourCC = stringToFourCC
 ____exports["单位存活"] = function(unit)
     return ____exports["单位有效"](unit) and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
 end
@@ -175,13 +174,13 @@ ____exports["取目标或随机玩家"] = function(boss, target)
         GetUnitX(boss),
         GetUnitY(boss)
     )
-    local _____5355_4F4D_5B58_6D3B_result_11
+    local _____5355_4F4D_5B58_6D3B_result_12
     if ____exports["单位存活"](nearest) then
-        _____5355_4F4D_5B58_6D3B_result_11 = nearest
+        _____5355_4F4D_5B58_6D3B_result_12 = nearest
     else
-        _____5355_4F4D_5B58_6D3B_result_11 = ____exports["取随机玩家英雄"]()
+        _____5355_4F4D_5B58_6D3B_result_12 = ____exports["取随机玩家英雄"]()
     end
-    return _____5355_4F4D_5B58_6D3B_result_11
+    return _____5355_4F4D_5B58_6D3B_result_12
 end
 ____exports["面向单位"] = function(source, target)
     if not ____exports["单位有效"](source) or not ____exports["单位有效"](target) then
@@ -231,16 +230,19 @@ ____exports["播放点特效"] = function(model, x, y, lifeMs)
     if model == nil or model == "" then
         return nil
     end
-    local effect = AddSpecialEffect(model, x, y)
-    if effect ~= nil and effect ~= 0 and lifeMs > 0 then
-        addDelayedCallback(
-            lifeMs,
-            function()
-                DestroyEffect(effect)
-            end
+    local ____temp_13
+    if lifeMs > 0 then
+        ____temp_13 = createTimedEffect(
+            model,
+            x,
+            y,
+            0,
+            lifeMs / 1000
         )
+    else
+        ____temp_13 = AddSpecialEffect(model, x, y)
     end
-    return effect
+    return ____temp_13
 end
 ____exports["播放单位特效"] = function(model, unit, attach, lifeMs)
     if attach == nil then
@@ -252,16 +254,13 @@ ____exports["播放单位特效"] = function(model, unit, attach, lifeMs)
     if model == nil or model == "" or not ____exports["单位有效"](unit) then
         return nil
     end
-    local effect = AddSpecialEffectTarget(model, unit, attach)
-    if effect ~= nil and effect ~= 0 and lifeMs > 0 then
-        addDelayedCallback(
-            lifeMs,
-            function()
-                DestroyEffect(effect)
-            end
-        )
+    local ____temp_14
+    if lifeMs > 0 then
+        ____temp_14 = createTimedUnitEffect(unit, attach, model, lifeMs / 1000)
+    else
+        ____temp_14 = AddSpecialEffectTarget(model, unit, attach)
     end
-    return effect
+    return ____temp_14
 end
 ____exports["显示常规读条"] = function(_____79D2, _____989C_8272ID, _____6807_9898_6587_672C, _____63D0_793A_6587_672C)
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = _____79D2, ["颜色ID"] = _____989C_8272ID, ["标题文本"] = _____6807_9898_6587_672C, ["提示文本"] = _____63D0_793A_6587_672C})
@@ -296,11 +295,12 @@ end
 ____exports["创建预警扇形"] = function(source, radius, duration)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({["类型"] = "红色扇形", ["锚点单位"] = source, ["半径"] = radius, ["持续时间"] = duration})
 end
+____exports["两点距离"] = _____8DDD_79BBXY
 ____exports["极坐标X"] = function(x, distance, angleDeg)
-    return x + distance * Cos(angleDeg * DEG_TO_RAD)
+    return _____516C_5171_6781_5750_6807X(x, angleDeg, distance)
 end
 ____exports["极坐标Y"] = function(y, distance, angleDeg)
-    return y + distance * Sin(angleDeg * DEG_TO_RAD)
+    return _____516C_5171_6781_5750_6807Y(y, angleDeg, distance)
 end
 ____exports["单位在扇形内"] = function(source, target, radius, angleDeg)
     if not ____exports["单位存活"](source) or not ____exports["单位存活"](target) then
@@ -434,11 +434,26 @@ ____exports["造成普通伤害"] = function(source, target, amount, _____4F24_5
     )
 end
 ____exports["计算攻击最大生命伤害"] = function(source, target, attackRate, maxLifeRate)
-    return (____exports["取攻击力"](source) * attackRate + ____exports["取最大生命"](target) * maxLifeRate) * ____exports["取菲尼克斯尔技能强度倍率"](source)
+    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
+        source,
+        target,
+        {
+            ["来源攻击力比例"] = attackRate,
+            ["目标最大生命比例"] = maxLifeRate,
+            ["总倍率"] = ____exports["取菲尼克斯尔技能强度倍率"](source)
+        }
+    )
 end
 ____exports["计算攻击已损失伤害"] = function(source, target, attackRate, lostLifeRate)
-    local lost = ____exports["取最大生命"](target) - ____exports["取当前生命"](target)
-    return (____exports["取攻击力"](source) * attackRate + lost * lostLifeRate) * ____exports["取菲尼克斯尔技能强度倍率"](source)
+    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
+        source,
+        target,
+        {
+            ["来源攻击力比例"] = attackRate,
+            ["目标已损生命比例"] = lostLifeRate,
+            ["总倍率"] = ____exports["取菲尼克斯尔技能强度倍率"](source)
+        }
+    )
 end
 ____exports["开始施法硬直"] = function(unit, duration)
     _____5F00_59CB_786C_76F4(unit, duration)
@@ -509,20 +524,20 @@ ____exports["减少元素层数"] = function(unit, _____5143_7D20, count)
         return
     end
     local runtime = getBuffRuntime(unit, buffID)
-    local ____registerManualBuff_23 = registerManualBuff
-    local ____unit_22 = unit
-    local ____opt_result_20
+    local ____registerManualBuff_26 = registerManualBuff
+    local ____unit_25 = unit
+    local ____opt_result_23
     if runtime ~= nil then
-        ____opt_result_20 = runtime.remaining
+        ____opt_result_23 = runtime.remaining
     end
-    local ____opt_result_20_21 = ____opt_result_20
-    if ____opt_result_20_21 == nil then
-        ____opt_result_20_21 = 30
+    local ____opt_result_23_24 = ____opt_result_23
+    if ____opt_result_23_24 == nil then
+        ____opt_result_23_24 = 30
     end
-    ____registerManualBuff_23(
-        ____unit_22,
+    ____registerManualBuff_26(
+        ____unit_25,
         buffID,
-        ____opt_result_20_21,
+        ____opt_result_23_24,
         next,
         {stack = next, sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
     )

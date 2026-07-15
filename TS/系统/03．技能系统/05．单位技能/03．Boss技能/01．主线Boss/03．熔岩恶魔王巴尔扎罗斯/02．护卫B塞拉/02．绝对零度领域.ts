@@ -97,6 +97,7 @@ export function 释放绝对零度领域(this: void, context: 巴尔扎罗斯运
     硬直秒: config.施法硬直秒,
     动画编号: config.动画编号,
     动画速度: config.动画速度,
+    恢复动画编号: config.恢复动画编号,
     吟唱条: {
       通道: "场地常驻AOE",
       总时长: config.施法硬直秒,

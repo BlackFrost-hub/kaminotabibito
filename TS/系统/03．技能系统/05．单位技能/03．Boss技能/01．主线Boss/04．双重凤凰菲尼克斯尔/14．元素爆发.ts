@@ -21,6 +21,7 @@ import {
   计算攻击最大生命伤害,
   计算攻击已损失伤害,
   取最大生命,
+  设置单位动画,
 } from "./19．公共工具";
 
 function 取元素特效(this: void, 元素: 菲尼克斯尔元素类型): string {
@@ -34,6 +35,7 @@ export function 结算菲尼克斯尔元素爆发(this: void, context: 菲尼克
   if (context.当前形态 !== "第二形态" || !单位存活(context.Boss)) return;
   const config = 菲尼克斯尔数值与表现配置.元素爆发;
   const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔元素爆发", 3);
+  设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.施法.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.施法.倍速);
   播放菲尼克斯尔台词(context.Boss, "元素爆发");
   显示场地读条(3, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   const heroes = 取菲尼克斯尔玩家英雄列表();

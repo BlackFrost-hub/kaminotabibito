@@ -97,8 +97,8 @@ export const 亚伦柯斯单位技能配置 = {
   },
   当前状态: {
     结构已建立: true,
-    技能已迁移: false,
-    技能已注册: false,
+    技能已迁移: true,
+    技能已注册: true,
   },
 } as const;
 

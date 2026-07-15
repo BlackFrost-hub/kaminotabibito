@@ -11,7 +11,7 @@ import {
 } from "./01．运行时上下文";
 import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
-import { 单位有效, stringToFourCC } from "./13．公共工具";
+import { 单位有效, 播放里科特施法维持动作, 播放里科特限时动作, stringToFourCC } from "./13．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -24,9 +24,6 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -37,6 +34,10 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
+const { createTimedEffect, createTimedUnitEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+  createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
 };
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -68,18 +69,12 @@ function 取里科特上下文ByBoss(this: void, boss: any): 里科特运行时�
 
 function 播放限时目标特效(this: void, target: any, model: string, attach: string, duration: number): void {
   if (!单位有效(target) || model === "") return;
-  const effect = AddSpecialEffectTarget(model, target, attach);
-  addDelayedCallback(duration * 1000, function 里科特神风目标特效销毁(this: void): void {
-    DestroyEffect(effect);
-  });
+  createTimedUnitEffect(target, attach, model, duration);
 }
 
 function 播放限时点特效(this: void, model: string, x: number, y: number, duration: number): void {
   if (model === "") return;
-  const effect = AddSpecialEffect(model, x, y);
-  addDelayedCallback(duration * 1000, function 里科特神风点特效销毁(this: void): void {
-    DestroyEffect(effect);
-  });
+  createTimedEffect(model, x, y, 0, duration);
 }
 
 function 设置神风护体层数(this: void, context: 里科特运行时上下文): void {
@@ -142,6 +137,8 @@ function 结算单个神风粉碎(this: void, context: 里科特运行时上下�
 }
 
 function 结算神风粉碎(this: void, context: 里科特运行时上下文): void {
+  const cfg = 里科特数值与表现配置.神风护体;
+  播放里科特限时动作(context.Boss单位, cfg.粉碎动画编号, 1, cfg.粉碎动画原始时长秒);
   播放里科特台词(context.Boss单位, "粉碎");
   for (const key in context.神风印记表) {
     const stack = context.神风印记表[key];
@@ -178,6 +175,8 @@ function on里科特神风护体施法(this: void, castingUnit: any, spellAbilit
   if (!单位有效(castingUnit) || GetUnitTypeId(castingUnit) !== 里科特单位类型ID) return;
   const context = 获取或创建里科特上下文(castingUnit);
   if (context == null) return;
+  const cfg = 里科特数值与表现配置.神风护体;
+  播放里科特施法维持动作(castingUnit, cfg.持续秒, cfg.动画速度);
   播放里科特台词(castingUnit, "神风护体");
   播放Boss坐标音效(里科特音效配置.神风护体.展开, GetUnitX(castingUnit), GetUnitY(castingUnit), 里科特音效配置.默认裁断距离);
   设置神风护体层数(context);

@@ -29,7 +29,7 @@ export function 释放菲尼克斯尔骸骨弹幕(this: void, context: 菲尼克
   const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔骸骨弹幕", config.读条秒 + config.波次数 * config.波次间隔秒 + 2);
   播放菲尼克斯尔台词(context.Boss, "骸骨弹幕");
   开始施法硬直(context.Boss, config.读条秒);
-  设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.弹幕解体.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.弹幕解体.倍速);
+  设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.弹幕攻击.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.弹幕攻击.倍速);
   显示常规读条(config.读条秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   延迟(config.读条秒 * 1000, function 菲尼克斯尔骸骨弹幕开始(this: void): void {
     播放Boss坐标音效(菲尼克斯尔音效配置.骸骨弹幕.起手层, 取单位X(context.Boss), 取单位Y(context.Boss), 菲尼克斯尔音效配置.默认裁断距离);

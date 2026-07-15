@@ -1,11 +1,150 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local ____exports = {}
----
--- @noSelfInFile
+local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
+local _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["重置夏提雅猎血连击"]
+local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
+local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
+local ____04_FF0E_9C9C_8840_5370_8BB0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.04．鲜血印记")
+local _____5438_6536_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____04_FF0E_9C9C_8840_5370_8BB0["吸收夏提雅鲜血印记"]
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_0.doHeal
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_2.YDWETimerDestroyEffectSafe
+local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
+local IsUnitType = jass.IsUnitType
+local GetRandomReal = jass.GetRandomReal
+local SquareRoot = jass.SquareRoot
+local Atan2 = jass.Atan2
+local AddSpecialEffect = jass.AddSpecialEffect
+local GetUnitState = japi.GetUnitState
+local EXSetEffectSize = japi.EXSetEffectSize
+local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
+local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+local RAD_TO_DEG = 57.29577951308232
+local _____9C9C_8840_56DE_6536_6280_80FDKey = "鲜血回收"
+local function _____5355_4F4D_6709_6548(unit)
+    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
+end
+local function _____9650_5236_8FDE_7EBF_7F29_653E(value)
+    local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
+    if value < cfg["回收连线最小缩放"] then
+        return cfg["回收连线最小缩放"]
+    end
+    if value > cfg["回收连线最大缩放"] then
+        return cfg["回收连线最大缩放"]
+    end
+    return value
+end
+local function _____521B_5EFA_9C9C_8840_56DE_6536_8FDE_7EBF(context, mark)
+    local boss = context["Boss单位"]
+    local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
+    local dx = GetUnitX(boss) - mark.X
+    local dy = GetUnitY(boss) - mark.Y
+    local effect = AddSpecialEffect(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["鲜血回收连线特效路径"], mark.X, mark.Y)
+    if effect == nil or effect == 0 then
+        return
+    end
+    if type(EXSetEffectSize) == "function" then
+        EXSetEffectSize(
+            effect,
+            _____9650_5236_8FDE_7EBF_7F29_653E(SquareRoot(dx * dx + dy * dy) / cfg["回收连线基准长度"])
+        )
+    end
+    if type(EXEffectMatRotateZ) == "function" then
+        EXEffectMatRotateZ(
+            effect,
+            Atan2(dy, dx) * RAD_TO_DEG
+        )
+    end
+    YDWETimerDestroyEffectSafe(cfg["回收连线持续秒"], effect)
+end
+local function _____7ED3_675F_9C9C_8840_56DE_6536(context)
+    if context["当前大型技能"] == _____9C9C_8840_56DE_6536_6280_80FDKey then
+        context["当前大型技能"] = nil
+    end
+end
+local function _____7ED3_7B97_9C9C_8840_56DE_6536(context)
+    local boss = context["Boss单位"]
+    local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
+    local marks = __TS__ArraySlice(context["血印句柄列表"])
+    local absorbed = 0
+    do
+        local i = 0
+        while i < #marks do
+            if _____5438_6536_590F_63D0_96C5_9C9C_8840_5370_8BB0(context, marks[i + 1]) then
+                absorbed = absorbed + 1
+            end
+            i = i + 1
+        end
+    end
+    if absorbed > 0 then
+        local ratio = GetRandomReal(cfg["单枚回血比例最小"], cfg["单枚回血比例最大"]) * absorbed
+        doHeal({
+            HealSource = boss,
+            HealTarget = boss,
+            HealAmount = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio,
+            ItemHeal = false,
+            HealEffect = false
+        })
+        local ____self_3 = context["血之狂热控制器"]
+        ____self_3["增加"](____self_3, boss, absorbed, "鲜血回收")
+    end
+    _____7ED3_675F_9C9C_8840_56DE_6536(context)
+end
+____exports["释放夏提雅鲜血回收"] = function(context)
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] or context["当前大型技能"] ~= nil or #context["血印句柄列表"] <= 0 then
+        return false
+    end
+    if context["阶段"] ~= "P1鲜血女武神" and context["阶段"] ~= "P2英灵战乙女" then
+        return false
+    end
+    local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
+    context["当前大型技能"] = _____9C9C_8840_56DE_6536_6280_80FDKey
+    context["普通机制忙碌到Ms"] = getServerTime() + (cfg["回收前摇秒"] + 0.25) * 1000
+    _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(context)
+    local marks = __TS__ArraySlice(context["血印句柄列表"])
+    do
+        local i = 0
+        while i < #marks do
+            if not marks[i + 1]["已清理"] then
+                _____521B_5EFA_9C9C_8840_56DE_6536_8FDE_7EBF(context, marks[i + 1])
+            end
+            i = i + 1
+        end
+    end
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["回收动画编号"], ["持续秒"] = cfg["回收前摇秒"] + 0.2, ["恢复动画编号"] = 0})
+    local delayedId = addDelayedCallback(
+        cfg["回收前摇秒"] * 1000,
+        function()
+            if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] then
+                return
+            end
+            if context["当前大型技能"] ~= _____9C9C_8840_56DE_6536_6280_80FDKey or context["阶段"] == "P3真祖血宴" then
+                _____7ED3_675F_9C9C_8840_56DE_6536(context)
+                return
+            end
+            _____7ED3_7B97_9C9C_8840_56DE_6536(context)
+        end
+    )
+    local ____self_4 = context["清理"]
+    ____self_4["登记延迟回调"](____self_4, "夏提雅-鲜血回收", delayedId)
+    return true
+end
 ____exports["鲜血回收机制状态"] = {
     ["已完成设计"] = true,
-    ["已完成实现"] = false,
-    ["已注册"] = false,
+    ["已完成实现"] = true,
+    ["已注册"] = true,
     ["类型"] = "P1P2周期恢复机制",
     ["语义"] = "蓄势后吸收所有剩余血印，按数量恢复生命并获得短时血之狂热。",
     ["实现要求"] = "无血印时跳过；回收期间暂停其他主动技能；回血不得因事件重复触发。"

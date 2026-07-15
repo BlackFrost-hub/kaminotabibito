@@ -54,7 +54,7 @@ export function 释放菲尼克斯尔凤凰漩涡(this: void, context: 菲尼克
   面向单位(boss, realTarget);
   播放菲尼克斯尔台词(boss, "凤凰漩涡");
   开始施法硬直(boss, config.预警秒);
-  设置单位动画(boss, 菲尼克斯尔数值与表现配置.动画.第一形态.漩涡施法.编号, 菲尼克斯尔数值与表现配置.动画.第一形态.漩涡施法.倍速);
+  设置单位动画(boss, 菲尼克斯尔数值与表现配置.动画.第一形态.施法弯身.编号, 菲尼克斯尔数值与表现配置.动画.第一形态.施法弯身.倍速);
   显示常规读条(config.预警秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   创建预警圆(x, y, config.半径, config.预警秒);
   延迟(config.预警秒 * 1000, function 菲尼克斯尔凤凰漩涡开始(this: void): void {

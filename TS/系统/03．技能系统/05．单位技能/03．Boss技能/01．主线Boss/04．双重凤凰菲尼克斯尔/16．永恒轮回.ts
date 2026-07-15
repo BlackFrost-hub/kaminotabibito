@@ -6,6 +6,10 @@ import { 菲尼克斯尔场地配置 } from "./01．场地配置";
 import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+
+const { 创建单位动画守护 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.18．单位动画守护") as {
+  创建单位动画守护: (this: void, 参数: any) => any;
+};
 import {
   周期,
   延迟,
@@ -85,6 +89,14 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
       取最大生命(context.Boss) * config.凤凰蛋生命Boss最大生命比例,
       创建凤凰蛋死亡回调(context)
     );
+    const eggAnimation = 菲尼克斯尔数值与表现配置.动画.第一形态.凤凰蛋;
+    创建单位动画守护({
+      单位: egg,
+      动画编号: eggAnimation.编号,
+      附加动画属性: eggAnimation.附加动画属性,
+      间隔秒: eggAnimation.守护间隔秒,
+      调试名: "菲尼克斯尔-凤凰蛋动画守护",
+    });
     context.凤凰蛋列表.push({ 单位: egg, 已摧毁: false });
     播放点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回能量上升, p.x, p.y, 2500);
   }

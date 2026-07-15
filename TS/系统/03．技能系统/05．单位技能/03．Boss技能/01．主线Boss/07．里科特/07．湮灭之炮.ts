@@ -4,7 +4,7 @@ import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科特运行时上下文 } from "./01．运行时上下文";
 import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
-import { 单位有效, stringToFourCC, 取坐标角度, 极坐标X, 极坐标Y, 点到线段距离平方 } from "./13．公共工具";
+import { 单位有效, 播放里科特施法维持动作, stringToFourCC, 取坐标角度, 极坐标X, 极坐标Y, 点到线段距离平方 } from "./13．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -22,8 +22,6 @@ const SetUnitScale = jass.SetUnitScale as (whichUnit: any, scaleX: number, scale
 const SetUnitVertexColor = jass.SetUnitVertexColor as (whichUnit: any, red: number, green: number, blue: number, alpha: number) => void;
 const UnitAddAbility = jass.UnitAddAbility as (whichUnit: any, abilityId: number) => boolean;
 const SetUnitPathing = jass.SetUnitPathing as (whichUnit: any, flag: boolean) => void;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -35,6 +33,9 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = requ
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
+};
+const { createTimedEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -73,10 +74,7 @@ let 已注册 = false;
 
 function 播放限时点特效(this: void, model: string, x: number, y: number, duration: number): void {
   if (model === "") return;
-  const effect = AddSpecialEffect(model, x, y);
-  addDelayedCallback(duration * 1000, function 里科特湮灭之炮点特效销毁(this: void): void {
-    DestroyEffect(effect);
-  });
+  createTimedEffect(model, x, y, 0, duration);
 }
 
 function 创建湮灭投影单位(this: void, boss: any, x: number, y: number, face: number): any {
@@ -87,7 +85,7 @@ function 创建湮灭投影单位(this: void, boss: any, x: number, y: number, f
   SetUnitPathing(projection, false);
   SetUnitScale(projection, cfg.投影缩放, cfg.投影缩放, cfg.投影缩放);
   SetUnitVertexColor(projection, 160, 210, 255, cfg.投影透明度);
-  播放限时点特效(cfg.出现特效路径, x, y, 1);
+  播放限时点特效(cfg.出现特效路径, x, y, cfg.出现特效持续秒);
   return projection;
 }
 
@@ -159,6 +157,8 @@ function 调度单个湮灭投影(this: void, context: 里科特运行时上下�
   const py = 极坐标Y(GetUnitY(target), angle, cfg.投影距离);
   const face = 取坐标角度(px, py, GetUnitX(target), GetUnitY(target));
   const projection = 创建湮灭投影单位(boss, px, py, face);
+  const delay = 刷新里科特阶段(context) >= 2 ? cfg.P2锁定前延迟秒 : cfg.锁定前延迟秒;
+  if (单位有效(projection)) 播放里科特施法维持动作(projection, delay + cfg.锁定持续秒, cfg.动画速度);
   播放Boss坐标音效(里科特音效配置.湮灭之炮.投影锁定, px, py, 里科特音效配置.默认裁断距离);
   const data: 湮灭投影 = {
     context,
@@ -184,7 +184,6 @@ function 调度单个湮灭投影(this: void, context: 里科特运行时上下�
     持续时间: 刷新里科特阶段(context) >= 2 ? cfg.P2锁定前延迟秒 : cfg.锁定前延迟秒,
     来源单位: boss,
   });
-  const delay = 刷新里科特阶段(context) >= 2 ? cfg.P2锁定前延迟秒 : cfg.锁定前延迟秒;
   const id = addDelayedCallback(delay * 1000, function 里科特湮灭投影延迟开炮(this: void): void {
     开始湮灭投影炮击(data);
   });
@@ -225,6 +224,9 @@ function 调度P3眩晕炮(this: void, context: 里科特运行时上下文): vo
 export function 释放里科特湮灭之炮(this: void, context: 里科特运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
+  const cfg = 里科特数值与表现配置.湮灭之炮;
+  const castDuration = 刷新里科特阶段(context) >= 2 ? cfg.P2锁定前延迟秒 : cfg.锁定前延迟秒;
+  播放里科特施法维持动作(boss, castDuration, cfg.动画速度);
   播放里科特台词(boss, "湮灭之炮");
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) 调度单个湮灭投影(context, heroes[i]);

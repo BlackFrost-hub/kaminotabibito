@@ -1,81 +1,39 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
----
--- @noSelfInFile
-local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
-local GetUnitX = jass.GetUnitX
-local GetUnitY = jass.GetUnitY
-local GetUnitFacing = jass.GetUnitFacing
-local GetUnitState = jass.GetUnitState
-local IsUnitType = jass.IsUnitType
-local Atan2 = jass.Atan2
-local SquareRoot = jass.SquareRoot
-local Cos = jass.Cos
-local Sin = jass.Sin
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
-local _____8F6C_56DB_5B57_7801 = ____require_result_0.stringToFourCC
-local _____5F27_5EA6_8F6C_89D2_5EA6 = 57.29577951308232
-local _____89D2_5EA6_8F6C_5F27_5EA6 = 0.017453292519943295
-function ____exports.stringToFourCC(id)
-    return _____8F6C_56DB_5B57_7801(id)
-end
-____exports["取单位ID"] = function(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
-____exports["单位有效"] = function(unit)
-    if unit == nil or unit == 0 then
-        return false
-    end
-    if IsUnitType(unit, UNIT_TYPE_DEAD) == true then
-        return false
-    end
-    return GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
-end
-____exports["两点距离"] = function(x1, y1, x2, y2)
-    local dx = x2 - x1
-    local dy = y2 - y1
-    return SquareRoot(dx * dx + dy * dy)
-end
-____exports["两点角度"] = function(x1, y1, x2, y2)
-    local angle = Atan2(y2 - y1, x2 - x1) * _____5F27_5EA6_8F6C_89D2_5EA6
-    if angle < 0 then
-        angle = angle + 360
-    end
-    return angle
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.02．数值与表现配置")
+local _____5F71_9AA8_83AB_7279_65AF_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯模型动画配置"]
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位有效"]
+local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local _____516C_5171_6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
+local _____516C_5171_6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
+local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["角度差绝对值"]
+local _____76EE_6807_6B63_9762_671D_5411_6765_6E90 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["目标正面朝向来源"]
+____exports.stringToFourCC = stringToFourCC
+____exports["取单位ID"] = _____53D6_5355_4F4DID
+____exports["单位有效"] = _____5355_4F4D_6709_6548
+____exports["两点角度"] = _____4E24_70B9_89D2_5EA6
+____exports["角度差绝对值"] = _____89D2_5EA6_5DEE_7EDD_5BF9_503C
+____exports["目标正面朝向来源"] = _____76EE_6807_6B63_9762_671D_5411_6765_6E90
+____exports["两点距离"] = _____8DDD_79BBXY
+____exports["播放影骨莫特斯限时动作"] = function(unit, _____52A8_753B_7F16_53F7, _____52A8_753B_901F_5EA6, _____6301_7EED_79D2)
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({
+        ["单位"] = unit,
+        ["动画编号"] = _____52A8_753B_7F16_53F7,
+        ["动画速度"] = _____52A8_753B_901F_5EA6,
+        ["持续秒"] = _____6301_7EED_79D2,
+        ["恢复动画编号"] = _____5F71_9AA8_83AB_7279_65AF_6A21_578B_52A8_753B_914D_7F6E["战斗待机编号"]
+    })
 end
 ____exports["极坐标X"] = function(x, distance, angleDeg)
-    return x + distance * Cos(angleDeg * _____89D2_5EA6_8F6C_5F27_5EA6)
+    return _____516C_5171_6781_5750_6807X(x, angleDeg, distance)
 end
 ____exports["极坐标Y"] = function(y, distance, angleDeg)
-    return y + distance * Sin(angleDeg * _____89D2_5EA6_8F6C_5F27_5EA6)
-end
-____exports["角度差绝对值"] = function(a, b)
-    local diff = a - b
-    while diff > 180 do
-        diff = diff - 360
-    end
-    while diff < -180 do
-        diff = diff + 360
-    end
-    return diff >= 0 and diff or -diff
-end
-____exports["目标正面朝向来源"] = function(source, target, frontAngle)
-    if not ____exports["单位有效"](source) or not ____exports["单位有效"](target) then
-        return false
-    end
-    local targetFacing = GetUnitFacing(target)
-    local targetToSource = ____exports["两点角度"](
-        GetUnitX(target),
-        GetUnitY(target),
-        GetUnitX(source),
-        GetUnitY(source)
-    )
-    return ____exports["角度差绝对值"](targetFacing, targetToSource) <= frontAngle * 0.5
+    return _____516C_5171_6781_5750_6807Y(y, angleDeg, distance)
 end
 return ____exports

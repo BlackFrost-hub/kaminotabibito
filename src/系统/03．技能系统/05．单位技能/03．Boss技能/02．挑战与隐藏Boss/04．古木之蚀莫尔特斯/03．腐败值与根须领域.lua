@@ -23,8 +23,9 @@ local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
+local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.05．闪电宫格区域")
 local _____521B_5EFA_95EA_7535_4E5D_5BAB_683C_533A_57DF = ____require_result_1["创建闪电九宫格区域"]
@@ -121,36 +122,30 @@ ____exports["使用腐败虫尸净化"] = function(context, unit)
         {sourceName = "莫尔特斯-腐败虫尸"}
     )
 end
-local function ____on_83AB_5C14_7279_65AF_8FD0_884C_65F6_5468_671F()
-    local now = getServerTime()
-    local contexts = _____83B7_53D6_5168_90E8_83AB_5C14_7279_65AF_4E0A_4E0B_6587()
-    do
-        local i = 0
-        while i < #contexts do
-            do
-                local context = contexts[i + 1]
-                if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                    _____6E05_7406_83AB_5C14_7279_65AF_4E0A_4E0B_6587(context["Boss单位"])
-                    goto __continue14
-                end
-                _____786E_4FDD_6839_987B_5BAB_683C(context)
-                _____5237_65B0_83AB_5C14_7279_65AF_9636_6BB5(context)
-                _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_6839_7CFB_89C9_9192(context)
-                _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_8150_673D_9886_57DF(context)
-                _____5904_7406_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5468_671F(context, now)
-                _____5C1D_8BD5_91CA_653E_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4(context, now)
-                _____5904_7406_83AB_5C14_7279_65AF_8150_8D25_4F20_8F93(context, now)
-            end
-            ::__continue14::
-            i = i + 1
-        end
+local function ____on_83AB_5C14_7279_65AF_8FD0_884C_65F6_5468_671F(context, now)
+    if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        _____6E05_7406_83AB_5C14_7279_65AF_4E0A_4E0B_6587(context["Boss单位"])
+        return
     end
+    _____786E_4FDD_6839_987B_5BAB_683C(context)
+    _____5237_65B0_83AB_5C14_7279_65AF_9636_6BB5(context)
+    _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_6839_7CFB_89C9_9192(context)
+    _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_8150_673D_9886_57DF(context)
+    _____5904_7406_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5468_671F(context, now)
+    _____5C1D_8BD5_91CA_653E_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4(context, now)
+    _____5904_7406_83AB_5C14_7279_65AF_8150_8D25_4F20_8F93(context, now)
 end
 ____exports["注册莫尔特斯腐败值与根须领域"] = function()
     if _____5DF2_6CE8_518C then
         return
     end
     _____5DF2_6CE8_518C = true
-    addPeriodicCallback(1000, ____on_83AB_5C14_7279_65AF_8FD0_884C_65F6_5468_671F)
+    _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({
+        ["名称"] = "莫尔特斯-运行时推进",
+        ["间隔毫秒"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"],
+        ["取当前时间"] = getServerTime,
+        ["取上下文列表"] = _____83B7_53D6_5168_90E8_83AB_5C14_7279_65AF_4E0A_4E0B_6587,
+        ["执行"] = ____on_83AB_5C14_7279_65AF_8FD0_884C_65F6_5468_671F
+    })
 end
 return ____exports

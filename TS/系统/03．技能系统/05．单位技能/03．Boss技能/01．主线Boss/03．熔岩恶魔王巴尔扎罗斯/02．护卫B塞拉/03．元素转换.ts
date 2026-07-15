@@ -4,6 +4,7 @@ import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下�
 import { 塞拉公共 } from "./00．公共";
 import { 巴尔扎罗斯音效配置 } from "../02．数值与表现配置";
 import { 播放Boss坐标音效 } from "../../../00．公共/00．Boss音效播放";
+import { 播放限时单位动画 } from "../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 const {  巴尔扎罗斯单位技能配置,
   巴尔扎罗斯技能数值配置,
   播放塞拉台词,
@@ -13,15 +14,28 @@ const {  巴尔扎罗斯单位技能配置,
   getServerTime,
   GetUnitX,
   GetUnitY,
-  SetUnitAnimationByIndex,
-  SetUnitTimeScale,
   单位有效,
   取单位ID,
   塞拉形态表,
   零度领域减伤到期Ms表,
 } = 塞拉公共;
 
+const japi = require("jass.japi") as any;
+const DzSetUnitMissileModel = japi.DzSetUnitMissileModel as ((unit: any, model: string) => void) | undefined;
+const DzSetUnitMissileArc = japi.DzSetUnitMissileArc as ((unit: any, arc: number) => void) | undefined;
+const DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed as ((unit: any, speed: number) => void) | undefined;
+const DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming as ((unit: any, homing: boolean) => void) | undefined;
+
 let 塞拉伤害修正已注册 = false;
+
+function 应用塞拉形态弹道(this: void, sera: any, next: "火焰" | "冰霜"): void {
+  const config = 巴尔扎罗斯单位技能配置.护卫.塞拉;
+  const model = next === "火焰" ? config.火焰普攻弹道模型 : config.默认普攻弹道模型;
+  if (DzSetUnitMissileModel != null) DzSetUnitMissileModel(sera, model);
+  if (DzSetUnitMissileArc != null) DzSetUnitMissileArc(sera, config.普攻弹道弧度);
+  if (DzSetUnitMissileSpeed != null) DzSetUnitMissileSpeed(sera, config.普攻弹道速度);
+  if (DzSetUnitMissileHoming != null) DzSetUnitMissileHoming(sera, config.普攻弹道自导);
+}
 
 export function 切换塞拉形态(this: void, context: 巴尔扎罗斯运行时上下文, next: "火焰" | "冰霜", 播放台词: boolean): void {
   const sera = context.塞拉;
@@ -38,8 +52,14 @@ export function 切换塞拉形态(this: void, context: 巴尔扎罗斯运行时
     1,
     { sourceName: 巴尔扎罗斯单位技能配置.护卫.塞拉.名称 },
   );
-  SetUnitTimeScale(sera, config.动画速度);
-  SetUnitAnimationByIndex(sera, config.动画编号);
+  应用塞拉形态弹道(sera, next);
+  播放限时单位动画({
+    单位: sera,
+    动画编号: config.动画编号,
+    动画速度: config.动画速度,
+    持续秒: config.动画播放秒,
+    恢复动画编号: config.恢复动画编号,
+  });
   播放Boss坐标音效(next === "火焰" ? 巴尔扎罗斯音效配置.塞拉.冰转火 : 巴尔扎罗斯音效配置.塞拉.火转冰, GetUnitX(sera), GetUnitY(sera), 巴尔扎罗斯音效配置.默认裁断距离);
   if (播放台词) 播放塞拉台词(sera, next === "火焰" ? "元素转换火焰" : "元素转换冰霜");
 }

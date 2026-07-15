@@ -2,10 +2,13 @@
 local ____exports = {}
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建安兹运行时上下文"]
+local _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["标记安兹普通机制忙碌"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.00．配置")
 local _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["安兹乌尔恭单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
+local ____08_FF0E_9AD8_9636_4EA1_7075_53EC_5524 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.08．高阶亡灵召唤")
+local _____53D6_5B89_5179_4EA1_7075_7BAD_4F24_5BB3_500D_7387 = ____08_FF0E_9AD8_9636_4EA1_7075_53EC_5524["取安兹亡灵箭伤害倍率"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
@@ -58,9 +61,9 @@ local function _____53D6_4E3B_8981_76EE_6807(boss)
     end
     return _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss)
 end
-local function _____8BA1_7B97_9AD8_9636_9B54_6CD5_7BAD_4F24_5BB3(boss, target)
+local function _____8BA1_7B97_9AD8_9636_9B54_6CD5_7BAD_4F24_5BB3(context, boss, target)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
-    return _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["高阶魔法箭伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg["高阶魔法箭伤害目标最大生命比例"]
+    return (_____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["高阶魔法箭伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg["高阶魔法箭伤害目标最大生命比例"]) * _____53D6_5B89_5179_4EA1_7075_7BAD_4F24_5BB3_500D_7387(context)
 end
 local function _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, x, y)
     local boss = context["安兹单位"]
@@ -100,7 +103,7 @@ local function _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, x, y)
                     ["技能ID"] = _____9AD8_9636_9B54_6CD5_7BAD_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = target,
-                    ["伤害"] = _____8BA1_7B97_9AD8_9636_9B54_6CD5_7BAD_4F24_5BB3(boss, target),
+                    ["伤害"] = _____8BA1_7B97_9AD8_9636_9B54_6CD5_7BAD_4F24_5BB3(context, boss, target),
                     attack = false,
                     ranged = true,
                     attackType = ATTACK_TYPE_MAGIC,
@@ -152,7 +155,7 @@ local function _____5B89_6392_9AD8_9636_9B54_6CD5_7BAD_8F6E_6B21(context)
 end
 ____exports["释放安兹高阶魔法箭"] = function(context)
     local boss = context["安兹单位"]
-    if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] or context["时间停止中"] then
+    if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] or context["时间停止中"] or context["当前大型技能"] ~= nil then
         return
     end
     local target = _____53D6_4E3B_8981_76EE_6807(boss)
@@ -160,6 +163,7 @@ ____exports["释放安兹高阶魔法箭"] = function(context)
         return
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
+    _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C(context, cfg["高阶魔法箭施法前摇秒"] + (cfg["高阶魔法箭轮数"] - 1) * cfg["高阶魔法箭轮次间隔秒"] + cfg["高阶魔法箭落点预警秒"])
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
         ["施法者"] = boss,
         ["目标单位"] = target,

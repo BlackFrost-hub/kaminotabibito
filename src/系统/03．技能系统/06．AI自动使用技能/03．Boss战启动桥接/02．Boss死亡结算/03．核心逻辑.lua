@@ -197,7 +197,7 @@ local function ____on_6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI()
         GetOwningPlayer(_____82F1_96C4)
     )
 end
-local function _____6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI(_____5956_52B1_6C60ID)
+____exports["打开Boss死亡首领奖励UI"] = function(_____5956_52B1_6C60ID)
     if _____5956_52B1_6C60ID == nil or _____5956_52B1_6C60ID == "" then
         return
     end
@@ -452,7 +452,7 @@ ____exports["执行Boss死亡结算"] = function(_____914D_7F6E, ____Boss_5355_4
     if not _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_524D_7F6E(_____914D_7F6E, _____51FB_6740_8005) then
         return false
     end
-    _____6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI(_____914D_7F6E["首领奖励池ID"])
+    ____exports["打开Boss死亡首领奖励UI"](_____914D_7F6E["首领奖励池ID"])
     _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
     _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)
     _____6267_884CBoss_6B7B_4EA1_6E05_7406(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D)

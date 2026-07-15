@@ -56,6 +56,11 @@ export interface 基础施法时间线参数 {
   动画编号?: number;
   动画名?: string;
   动画速度?: number;
+  后续动画编号?: number;
+  后续动画名?: string;
+  后续动画速度?: number;
+  后续动画延迟毫秒?: number;
+  恢复动画编号?: number;
   重播动作延迟毫秒?: number;
   吟唱条?: 施法时间线吟唱条参数;
   播放台词?: (this: void) => void;
@@ -100,6 +105,17 @@ function 播放施法动作(this: void, 参数: 基础施法时间线参数): vo
   }
 }
 
+function 播放后续施法动作(this: void, 参数: 基础施法时间线参数): void {
+  const caster = 参数.施法者;
+  if (!单位有效(caster)) return;
+  SetUnitTimeScale(caster, 参数.后续动画速度 ?? 参数.动画速度 ?? 1);
+  if (参数.后续动画编号 != null) {
+    SetUnitAnimationByIndex(caster, 参数.后续动画编号);
+  } else if (参数.后续动画名 != null && 参数.后续动画名 !== "") {
+    SetUnitAnimation(caster, 参数.后续动画名);
+  }
+}
+
 function 显示施法吟唱条(this: void, 参数: 施法时间线吟唱条参数): void {
   if (参数.通道 === "大招") {
     显示大招吟唱条(参数);
@@ -123,6 +139,12 @@ export function 启动基础施法时间线(this: void, 参数: 基础施法时�
   if (参数.吟唱条 != null) 显示施法吟唱条(参数.吟唱条);
   播放施法动作(参数);
 
+  if (参数.后续动画延迟毫秒 != null && 参数.后续动画延迟毫秒 > 0) {
+    addDelayedCallback(参数.后续动画延迟毫秒, function 基础施法时间线后续动作(this: void): void {
+      播放后续施法动作(参数);
+    });
+  }
+
   if (参数.重播动作延迟毫秒 != null && 参数.重播动作延迟毫秒 > 0) {
     addDelayedCallback(参数.重播动作延迟毫秒, function 基础施法时间线重播动作(this: void): void {
       播放施法动作(参数);
@@ -137,7 +159,7 @@ export function 启动基础施法时间线(this: void, 参数: 基础施法时�
     on生效();
     if (参数.完成后恢复动作 !== false && 单位有效(caster)) {
       SetUnitTimeScale(caster, 1);
-      SetUnitAnimationByIndex(caster, 0);
+      SetUnitAnimationByIndex(caster, 参数.恢复动画编号 ?? 0);
     }
   });
 }

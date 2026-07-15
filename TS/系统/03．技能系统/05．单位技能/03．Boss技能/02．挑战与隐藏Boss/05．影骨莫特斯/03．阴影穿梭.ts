@@ -4,7 +4,7 @@ import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取影骨莫特斯上下文, 获取或创建影骨莫特斯上下文, 设置影骨背刺准备, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
 import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
-import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y, 目标正面朝向来源, 取单位ID } from "./11．公共工具";
+import { 单位有效, 播放影骨莫特斯限时动作, stringToFourCC, 极坐标X, 极坐标Y, 目标正面朝向来源, 取单位ID } from "./11．公共工具";
 import { 执行战斗自身位移到坐标 } from "../../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
@@ -98,6 +98,8 @@ function 影骨阴影穿梭完成(this: void): void {
 export function 释放影骨阴影穿梭(this: void, context: 影骨莫特斯运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
+  const cfg = 影骨莫特斯数值与表现配置.阴影穿梭;
+  播放影骨莫特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   播放影骨莫特斯台词(boss, "阴影穿梭");
   AddSpecialEffect(影骨莫特斯表现配置.阴影穿梭残影, GetUnitX(boss), GetUnitY(boss));
   播放Boss坐标音效(影骨莫特斯音效配置.阴影穿梭.消失残影, GetUnitX(boss), GetUnitY(boss), 影骨莫特斯音效配置.默认裁断距离);
@@ -115,7 +117,7 @@ export function 释放影骨阴影穿梭(this: void, context: 影骨莫特斯运
   const id = 取单位ID(boss);
   if (id === 0) return;
   待穿梭上下文[id] = context;
-  context.清理.登记延迟回调("影骨-阴影穿梭", addDelayedCallback(影骨莫特斯数值与表现配置.阴影穿梭.消失秒 * 1000, 影骨阴影穿梭完成));
+  context.清理.登记延迟回调("影骨-阴影穿梭", addDelayedCallback(cfg.消失秒 * 1000, 影骨阴影穿梭完成));
 }
 
 function on影骨阴影穿梭施法(this: void, castingUnit: any, spellAbilityId: number): void {

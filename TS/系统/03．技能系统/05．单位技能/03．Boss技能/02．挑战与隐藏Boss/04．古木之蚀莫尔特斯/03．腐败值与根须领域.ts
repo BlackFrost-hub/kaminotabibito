@@ -16,9 +16,9 @@ import { 尝试释放莫尔特斯共生腐朽虫群 } from "./10．共生腐朽�
 import { 处理莫尔特斯腐败传输 } from "./12．腐败传输";
 import { 单位有效 } from "./16．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 
-const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
 const { 创建闪电九宫格区域 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.05．闪电宫格区域") as {
@@ -102,27 +102,28 @@ export function 使用腐败虫尸净化(this: void, context: 莫尔特斯运行
   });
 }
 
-function on莫尔特斯运行时周期(this: void): void {
-  const now = getServerTime();
-  const contexts = 获取全部莫尔特斯上下文();
-  for (let i = 0; i < contexts.length; i++) {
-    const context = contexts[i];
-    if (!单位有效(context.Boss单位)) {
-      清理莫尔特斯上下文(context.Boss单位);
-      continue;
-    }
-    确保根须宫格(context);
-    刷新莫尔特斯阶段(context);
-    尝试触发莫尔特斯根系觉醒(context);
-    尝试触发莫尔特斯腐朽领域(context);
-    处理莫尔特斯腐朽领域周期(context, now);
-    尝试释放莫尔特斯共生腐朽虫群(context, now);
-    处理莫尔特斯腐败传输(context, now);
+function on莫尔特斯运行时周期(this: void, context: 莫尔特斯运行时上下文, now: number): void {
+  if (!单位有效(context.Boss单位)) {
+    清理莫尔特斯上下文(context.Boss单位);
+    return;
   }
+  确保根须宫格(context);
+  刷新莫尔特斯阶段(context);
+  尝试触发莫尔特斯根系觉醒(context);
+  尝试触发莫尔特斯腐朽领域(context);
+  处理莫尔特斯腐朽领域周期(context, now);
+  尝试释放莫尔特斯共生腐朽虫群(context, now);
+  处理莫尔特斯腐败传输(context, now);
 }
 
 export function 注册莫尔特斯腐败值与根须领域(this: void): void {
   if (已注册) return;
   已注册 = true;
-  addPeriodicCallback(1000, on莫尔特斯运行时周期);
+  创建周期机制调度器({
+    名称: '莫尔特斯-运行时推进',
+    间隔毫秒: 莫尔特斯数值与表现配置.运行时.推进间隔毫秒,
+    取当前时间: getServerTime,
+    取上下文列表: 获取全部莫尔特斯上下文,
+    执行: on莫尔特斯运行时周期,
+  });
 }

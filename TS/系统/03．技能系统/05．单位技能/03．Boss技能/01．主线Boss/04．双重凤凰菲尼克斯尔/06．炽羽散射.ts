@@ -65,7 +65,7 @@ export function 释放菲尼克斯尔炽羽散射(this: void, context: 菲尼克
   面向单位(boss, realTarget);
   播放菲尼克斯尔台词(boss, "炽羽散射");
   开始施法硬直(boss, config.读条秒);
-  设置单位动画(boss, 菲尼克斯尔数值与表现配置.动画.第一形态.振翅.编号, 菲尼克斯尔数值与表现配置.动画.第一形态.振翅.倍速);
+  设置单位动画(boss, 菲尼克斯尔数值与表现配置.动画.第一形态.炽羽攻击.编号, 菲尼克斯尔数值与表现配置.动画.第一形态.炽羽攻击.倍速);
   显示常规读条(config.读条秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   const centerX = 取单位X(realTarget);
   const centerY = 取单位Y(realTarget);

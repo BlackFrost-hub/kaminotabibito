@@ -64,6 +64,7 @@ function 创建格鲁姆(this: void, context: 巴尔扎罗斯运行时上下文)
   const cfg = 巴尔扎罗斯护卫配置.格鲁姆;
   return 创建召唤物({
     主人单位: context.Boss单位,
+    单位类型: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.单位ID,
     单位名称: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.名称,
     X: cfg.X,
     Y: cfg.Y,
@@ -80,6 +81,7 @@ function 创建塞拉(this: void, context: 巴尔扎罗斯运行时上下文): a
   const cfg = 巴尔扎罗斯护卫配置.塞拉;
   return 创建召唤物({
     主人单位: context.Boss单位,
+    单位类型: 巴尔扎罗斯单位技能配置.护卫.塞拉.单位ID,
     单位名称: 巴尔扎罗斯单位技能配置.护卫.塞拉.名称,
     X: cfg.X,
     Y: cfg.Y,
@@ -89,10 +91,6 @@ function 创建塞拉(this: void, context: 巴尔扎罗斯运行时上下文): a
     生命值受小怪倍率: false,
     护甲: cfg.防御力,
     攻击间隔: cfg.攻击间隔,
-    攻击范围: 650,
-    普攻弹道模型: "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl",
-    普攻弹道弧度: 0.15,
-    普攻弹道速度: 900,
   });
 }
 

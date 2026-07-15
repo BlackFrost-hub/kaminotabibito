@@ -157,7 +157,7 @@ function on打开Boss死亡首领奖励UI(this: void): void {
   打开首领奖励选择界面(当前Boss死亡首领奖励池ID, GetOwningPlayer(英雄));
 }
 
-function 打开Boss死亡首领奖励UI(this: void, 奖励池ID: string | undefined): void {
+export function 打开Boss死亡首领奖励UI(this: void, 奖励池ID: string | undefined): void {
   if (奖励池ID == null || 奖励池ID === "") return;
   const 玩家英雄组 = 读取玩家英雄组();
   if (玩家英雄组 == null || 玩家英雄组 === 0) return;

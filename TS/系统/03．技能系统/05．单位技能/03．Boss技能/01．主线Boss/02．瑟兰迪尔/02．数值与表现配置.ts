@@ -20,6 +20,10 @@ export const 瑟兰迪尔阶段阈值 = {
   第三阶段生命比例: 0.4,
 } as const;
 
+export const 瑟兰迪尔运行时配置 = {
+  推进间隔毫秒: 250,
+} as const;
+
 export const 瑟兰迪尔数值与表现配置 = {
   执法印记: {
     BuffID: "BTH3",

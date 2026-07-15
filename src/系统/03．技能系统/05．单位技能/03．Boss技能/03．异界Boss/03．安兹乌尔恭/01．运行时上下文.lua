@@ -8,10 +8,11 @@ local ____01_FF0E_673A_5236_6E05_7406_7BEE_5B50 = require("系统.03．技能系
 local _____521B_5EFA_673A_5236_6E05_7406_7BEE_5B50 = ____01_FF0E_673A_5236_6E05_7406_7BEE_5B50["创建机制清理篮子"]
 local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
+local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
+local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local IsUnitType = jass.IsUnitType
 local GetUnitState = jass.GetUnitState
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
@@ -29,7 +30,10 @@ local function _____521B_5EFA_5B89_5179_4E0A_4E0B_6587(boss, _____6E05_7406, ___
         ["阶段"] = "P1至尊的审视",
         ["开战时间Ms"] = nowMs,
         ["上次阶段变化Ms"] = nowMs,
+        ["普通机制忙碌到Ms"] = 0,
+        ["上次大型技能结束Ms"] = 0,
         ["时间停止中"] = false,
+        ["亡灵箭削弱到Ms"] = 0,
         ["天空坠落已释放"] = false,
         ["一切生命的终点已释放"] = false,
         ["挑战已结束"] = false,
@@ -61,6 +65,15 @@ local _____5B89_5179_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_88
 })
 ____exports["获取安兹运行时上下文"] = function(boss)
     return _____5B89_5179_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
+end
+____exports["获取全部安兹运行时上下文"] = function()
+    return _____5B89_5179_4E0A_4E0B_6587_5DE5_5382["获取全部"]()
+end
+____exports["标记安兹普通机制忙碌"] = function(context, durationSeconds)
+    local untilMs = getServerTime() + durationSeconds * 1000
+    if untilMs > context["普通机制忙碌到Ms"] then
+        context["普通机制忙碌到Ms"] = untilMs
+    end
 end
 ____exports["获取或创建安兹运行时上下文"] = function(boss)
     return _____5B89_5179_4E0A_4E0B_6587_5DE5_5382["获取或创建"](boss)
@@ -100,32 +113,18 @@ local function _____5237_65B0_5B89_5179_9636_6BB5(context)
         context["上次阶段变化Ms"] = getServerTime()
     end
 end
-local function _____63A8_8FDB_5B89_5179_8FD0_884C_65F6()
-    local contexts = _____5B89_5179_4E0A_4E0B_6587_5DE5_5382["获取全部"]()
-    do
-        local i = 0
-        while i < #contexts do
-            do
-                local context = contexts[i + 1]
-                if context == nil then
-                    goto __continue22
-                end
-                if not _____5355_4F4D_6709_6548(context["安兹单位"]) then
-                    ____exports["清理安兹运行时上下文"](context["安兹单位"])
-                    goto __continue22
-                end
-                _____5237_65B0_5B89_5179_9636_6BB5(context)
-            end
-            ::__continue22::
-            i = i + 1
-        end
+local function _____63A8_8FDB_5B89_5179_8FD0_884C_65F6(context)
+    if not _____5355_4F4D_6709_6548(context["安兹单位"]) then
+        ____exports["清理安兹运行时上下文"](context["安兹单位"])
+        return
     end
+    _____5237_65B0_5B89_5179_9636_6BB5(context)
 end
 ____exports["注册安兹运行时"] = function()
     if _____5B89_5179_8FD0_884C_65F6_5DF2_6CE8_518C then
         return
     end
     _____5B89_5179_8FD0_884C_65F6_5DF2_6CE8_518C = true
-    addPeriodicCallback(250, _____63A8_8FDB_5B89_5179_8FD0_884C_65F6)
+    _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({["名称"] = "安兹-运行时阶段刷新", ["间隔毫秒"] = 250, ["取上下文列表"] = ____exports["获取全部安兹运行时上下文"], ["执行"] = _____63A8_8FDB_5B89_5179_8FD0_884C_65F6})
 end
 return ____exports

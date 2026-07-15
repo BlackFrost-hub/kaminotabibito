@@ -6,6 +6,7 @@ import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./0
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { stringToFourCC, 距离平方XY } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -56,18 +57,8 @@ const 树魔首领单位类型ID = stringToFourCC(树魔首领单位技能配置
 const 扩散冲击波技能ID = stringToFourCC(树魔首领数值与表现配置.扩散冲击波.技能槽位);
 let 扩散冲击波已注册 = false;
 
-function stringToFourCC(this: void, s: string): number {
-  return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
-}
-
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 距离平方XY(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  const dx = x1 - x2;
-  const dy = y1 - y2;
-  return dx * dx + dy * dy;
 }
 
 function 播放扩散冲击波蓄力特效(this: void, boss: any): void {
@@ -186,6 +177,7 @@ export function 释放树魔首领扩散冲击波(this: void, context: 树魔首
     硬直秒: cfg.前摇秒,
     动画编号: cfg.动画编号,
     动画速度: cfg.动画速度,
+    恢复动画编号: cfg.恢复动画编号,
     吟唱条: {
       通道: "常规技能",
       总时长: cfg.前摇秒,

@@ -73,6 +73,18 @@ local function _____64AD_653E_65BD_6CD5_52A8_4F5C(_____53C2_6570)
         SetUnitAnimation(caster, _____53C2_6570["动画名"])
     end
 end
+local function _____64AD_653E_540E_7EED_65BD_6CD5_52A8_4F5C(_____53C2_6570)
+    local caster = _____53C2_6570["施法者"]
+    if not _____5355_4F4D_6709_6548(caster) then
+        return
+    end
+    SetUnitTimeScale(caster, _____53C2_6570["后续动画速度"] or _____53C2_6570["动画速度"] or 1)
+    if _____53C2_6570["后续动画编号"] ~= nil then
+        SetUnitAnimationByIndex(caster, _____53C2_6570["后续动画编号"])
+    elseif _____53C2_6570["后续动画名"] ~= nil and _____53C2_6570["后续动画名"] ~= "" then
+        SetUnitAnimation(caster, _____53C2_6570["后续动画名"])
+    end
+end
 local function _____663E_793A_65BD_6CD5_541F_5531_6761(_____53C2_6570)
     if _____53C2_6570["通道"] == "大招" then
         _____663E_793A_5927_62DB_541F_5531_6761(_____53C2_6570)
@@ -99,6 +111,14 @@ ____exports["启动基础施法时间线"] = function(_____53C2_6570)
         _____663E_793A_65BD_6CD5_541F_5531_6761(_____53C2_6570["吟唱条"])
     end
     _____64AD_653E_65BD_6CD5_52A8_4F5C(_____53C2_6570)
+    if _____53C2_6570["后续动画延迟毫秒"] ~= nil and _____53C2_6570["后续动画延迟毫秒"] > 0 then
+        addDelayedCallback(
+            _____53C2_6570["后续动画延迟毫秒"],
+            function()
+                _____64AD_653E_540E_7EED_65BD_6CD5_52A8_4F5C(_____53C2_6570)
+            end
+        )
+    end
     if _____53C2_6570["重播动作延迟毫秒"] ~= nil and _____53C2_6570["重播动作延迟毫秒"] > 0 then
         addDelayedCallback(
             _____53C2_6570["重播动作延迟毫秒"],
@@ -123,7 +143,7 @@ ____exports["启动基础施法时间线"] = function(_____53C2_6570)
             ____on_751F_6548()
             if _____53C2_6570["完成后恢复动作"] ~= false and _____5355_4F4D_6709_6548(caster) then
                 SetUnitTimeScale(caster, 1)
-                SetUnitAnimationByIndex(caster, 0)
+                SetUnitAnimationByIndex(caster, _____53C2_6570["恢复动画编号"] or 0)
             end
         end
     )

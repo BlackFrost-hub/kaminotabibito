@@ -42,7 +42,7 @@ export function 释放菲尼克斯尔凤凰挽歌(this: void, context: 菲尼克
   const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔凤凰挽歌", config.引导秒 + 2);
   播放菲尼克斯尔台词(context.Boss, "凤凰挽歌");
   开始施法硬直(context.Boss, config.引导秒);
-  设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.哀鸣引导.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.哀鸣引导.倍速);
+  设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.施法.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.施法.倍速);
   显示大招读条(config.引导秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
   播放点特效(菲尼克斯尔数值与表现配置.特效.凤凰挽歌主体, 取单位X(context.Boss), 取单位Y(context.Boss), config.引导秒 * 1000);
   播放Boss坐标音效(菲尼克斯尔音效配置.凤凰挽歌.引导开始, 取单位X(context.Boss), 取单位Y(context.Boss), 菲尼克斯尔音效配置.默认裁断距离);

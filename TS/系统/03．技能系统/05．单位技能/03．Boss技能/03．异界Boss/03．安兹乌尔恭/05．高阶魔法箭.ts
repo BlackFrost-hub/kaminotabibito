@@ -1,9 +1,10 @@
 /** @noSelfInFile */
 
 import type { 安兹运行时上下文 } from './01．运行时上下文';
-import { 获取或创建安兹运行时上下文 } from './01．运行时上下文';
+import { 获取或创建安兹运行时上下文, 标记安兹普通机制忙碌 } from './01．运行时上下文';
 import { 安兹乌尔恭单位技能配置 } from './00．配置';
 import { 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
+import { 取安兹亡灵箭伤害倍率 } from './08．高阶亡灵召唤';
 import { 注册单位技能壳监听 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器';
 import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 开始分批点名落点模板, type 分批点名落点结果 } from '../../../../00．技能模板+函数/00．技能模板/05．点名技能模板/02．分批点名落点模板';
@@ -62,10 +63,12 @@ function 取主要目标(this: void, boss: any): any {
   return 获取Boss技能随机敌对英雄(boss);
 }
 
-function 计算高阶魔法箭伤害(this: void, boss: any, target: any): number {
+function 计算高阶魔法箭伤害(this: void, context: 安兹运行时上下文, boss: any, target: any): number {
   const cfg = 安兹乌尔恭数值与表现配置.普通技能;
-  return 读取单位攻击力(boss) * cfg.高阶魔法箭伤害Boss攻击力比例
-    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg.高阶魔法箭伤害目标最大生命比例;
+  return (
+    读取单位攻击力(boss) * cfg.高阶魔法箭伤害Boss攻击力比例
+      + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg.高阶魔法箭伤害目标最大生命比例
+  ) * 取安兹亡灵箭伤害倍率(context);
 }
 
 function 高阶魔法箭结算(this: void, context: 安兹运行时上下文, x: number, y: number): void {
@@ -90,7 +93,7 @@ function 高阶魔法箭结算(this: void, context: 安兹运行时上下文, x:
       技能ID: 高阶魔法箭技能ID,
       来源: boss,
       目标: target,
-      伤害: 计算高阶魔法箭伤害(boss, target),
+      伤害: 计算高阶魔法箭伤害(context, boss, target),
       attack: false,
       ranged: true,
       attackType: ATTACK_TYPE_MAGIC,
@@ -136,10 +139,16 @@ function 安排高阶魔法箭轮次(this: void, context: 安兹运行时上下�
 
 export function 释放安兹高阶魔法箭(this: void, context: 安兹运行时上下文): void {
   const boss = context.安兹单位;
-  if (!单位有效(boss) || context.挑战已结束 || context.时间停止中) return;
+  if (!单位有效(boss) || context.挑战已结束 || context.时间停止中 || context.当前大型技能 != null) return;
   const target = 取主要目标(boss);
   if (!单位有效(target)) return;
   const cfg = 安兹乌尔恭数值与表现配置.普通技能;
+  标记安兹普通机制忙碌(
+    context,
+    cfg.高阶魔法箭施法前摇秒
+      + (cfg.高阶魔法箭轮数 - 1) * cfg.高阶魔法箭轮次间隔秒
+      + cfg.高阶魔法箭落点预警秒,
+  );
   启动基础施法时间线({
     施法者: boss,
     目标单位: target,

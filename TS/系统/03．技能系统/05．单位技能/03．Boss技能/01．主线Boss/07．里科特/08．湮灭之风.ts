@@ -4,7 +4,7 @@ import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科特运行时上下文 } from "./01．运行时上下文";
 import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
-import { 单位有效, stringToFourCC, 距离平方XY } from "./13．公共工具";
+import { 单位有效, 播放里科特施法维持动作, stringToFourCC, 距离平方XY } from "./13．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -16,8 +16,6 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const ShowUnit = jass.ShowUnit as (whichUnit: any, show: boolean) => void;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) => number;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -30,6 +28,9 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = requ
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
+};
+const { createTimedEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -58,11 +59,7 @@ let 已注册 = false;
 
 function 播放限时点特效(this: void, model: string, x: number, y: number, duration: number): void {
   if (model === "") return;
-  const effect = AddSpecialEffect(model, x, y);
-  const id = addDelayedCallback(duration * 1000, function 里科特湮灭之风特效销毁(this: void): void {
-    DestroyEffect(effect);
-  });
-  if (id === 0) DestroyEffect(effect);
+  createTimedEffect(model, x, y, 0, duration);
 }
 
 function 施加湮灭之风随机控制(this: void, boss: any, hero: any): void {
@@ -126,11 +123,13 @@ export function 释放里科特湮灭之风(this: void, context: 里科特运行
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 里科特数值与表现配置.湮灭之风;
+  const stage = 刷新里科特阶段(context);
+  if (stage >= 3) 播放里科特施法维持动作(boss, cfg.持续秒, cfg.动画速度);
   播放里科特台词(boss, "湮灭之风");
   播放Boss坐标音效(里科特音效配置.湮灭之风.风场展开, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
   播放限时点特效(cfg.扩散特效路径, GetUnitX(boss), GetUnitY(boss), cfg.扩散特效持续秒);
   播放限时点特效(cfg.风场特效路径, GetUnitX(boss), GetUnitY(boss), cfg.风场特效持续秒);
-  if (刷新里科特阶段(context) < 3) ShowUnit(boss, false);
+  if (stage < 3) ShowUnit(boss, false);
 
   const data: 湮灭风场 = {
     context,
