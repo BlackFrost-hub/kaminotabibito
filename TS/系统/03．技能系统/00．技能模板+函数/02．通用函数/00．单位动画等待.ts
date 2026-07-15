@@ -48,6 +48,9 @@ export interface 限时单位动画参数 {
   动画名?: string;
   动画速度?: number;
   持续秒: number;
+  重播时点秒列表?: number[];
+  /** false 时到期只恢复动画速度，不主动切换动画。 */
+  恢复动画?: boolean;
   恢复动画编号?: number;
   恢复动画名?: string;
   恢复动画速度?: number;
@@ -185,17 +188,36 @@ export function 播放限时单位动画(参数: 限时单位动画参数): any 
     SetUnitAnimation(单位, 参数.动画名 as string);
   }
 
+  const 重播时点秒列表 = 参数.重播时点秒列表 ?? [];
+  for (let i = 0; i < 重播时点秒列表.length; i++) {
+    const 重播时点秒 = 重播时点秒列表[i];
+    if (!(重播时点秒 > 0) || 重播时点秒 >= 持续秒) continue;
+    创建动画等待任务({
+      下一步: function 限时单位动画重播(this: void): void {
+        if (单位限时动画令牌表[单位ID] !== 令牌) return;
+        SetUnitTimeScale(单位, 参数.动画速度 ?? 1);
+        if (参数.动画编号 != null) {
+          SetUnitAnimationByIndex(单位, 参数.动画编号);
+        } else {
+          SetUnitAnimation(单位, 参数.动画名 as string);
+        }
+      },
+    }, 重播时点秒);
+  }
+
   return 创建动画等待任务({
     下一步: function 限时单位动画恢复(this: void): void {
       if (单位限时动画令牌表[单位ID] !== 令牌) return;
       单位限时动画令牌表[单位ID] = undefined;
       SetUnitTimeScale(单位, 参数.恢复动画速度 ?? 1);
-      if (参数.恢复动画编号 != null) {
-        SetUnitAnimationByIndex(单位, 参数.恢复动画编号);
-      } else if (参数.恢复动画名 != null && 参数.恢复动画名 !== "") {
-        SetUnitAnimation(单位, 参数.恢复动画名);
-      } else {
-        SetUnitAnimation(单位, "stand");
+      if (参数.恢复动画 !== false) {
+        if (参数.恢复动画编号 != null) {
+          SetUnitAnimationByIndex(单位, 参数.恢复动画编号);
+        } else if (参数.恢复动画名 != null && 参数.恢复动画名 !== "") {
+          SetUnitAnimation(单位, 参数.恢复动画名);
+        } else {
+          SetUnitAnimation(单位, "stand");
+        }
       }
       if (参数.完成回调 != null) 参数.完成回调();
     },

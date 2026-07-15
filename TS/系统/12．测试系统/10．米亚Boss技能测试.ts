@@ -38,29 +38,30 @@ const { 释放米亚腐化爪击 } = require("系统.03．技能系统.05．单�
 const { 释放米亚污水喷吐 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.06．污水喷吐") as {
   释放米亚污水喷吐: (this: void, context: any) => void;
 };
-const { 尝试触发米亚灵猫分身 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.07．灵猫分身") as {
-  尝试触发米亚灵猫分身: (this: void, context: any) => void;
+const { 触发米亚灵猫分身 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.07．灵猫分身") as {
+  触发米亚灵猫分身: (this: void, context: any) => boolean;
 };
 const { 刷新米亚污染标记 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.08．污染标记") as {
   刷新米亚污染标记: (this: void, context: any, nowMs: number) => void;
 };
-const { 尝试触发米亚污染脉冲 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.09．污染脉冲") as {
-  尝试触发米亚污染脉冲: (this: void, context: any, nowMs: number) => void;
+const { 释放米亚污染脉冲 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.09．污染脉冲") as {
+  释放米亚污染脉冲: (this: void, context: any) => boolean;
 };
-const { 尝试触发米亚污水柱爆发 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.10．污水柱爆发") as {
-  尝试触发米亚污水柱爆发: (this: void, context: any, nowMs: number) => void;
+const { 释放米亚污水柱爆发 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.10．污水柱爆发") as {
+  释放米亚污水柱爆发: (this: void, context: any) => boolean;
 };
-const { 尝试触发米亚腐化转移 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.11．腐化转移") as {
-  尝试触发米亚腐化转移: (this: void, context: any, nowMs: number) => void;
+const { 释放米亚腐化转移 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.11．腐化转移") as {
+  释放米亚腐化转移: (this: void, context: any, nowMs: number) => boolean;
 };
 const { 刷新米亚平台超载惩罚 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.12．平台超载惩罚") as {
   刷新米亚平台超载惩罚: (this: void, context: any, nowMs: number) => void;
 };
-const { 刷新米亚腐化黏液涂层 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.13．腐化黏液涂层") as {
-  刷新米亚腐化黏液涂层: (this: void, context: any, nowMs: number) => void;
+const { 刷新米亚腐化黏液涂层被动状态, 释放米亚全场腐化黏液 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.13．腐化黏液涂层") as {
+  刷新米亚腐化黏液涂层被动状态: (this: void, context: any) => void;
+  释放米亚全场腐化黏液: (this: void, context: any) => boolean;
 };
-const { 尝试触发米亚终极污染 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.14．终极污染") as {
-  尝试触发米亚终极污染: (this: void, context: any) => void;
+const { 触发米亚终极污染 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.14．终极污染") as {
+  触发米亚终极污染: (this: void, context: any, 阈值序号: 0 | 1) => boolean;
 };
 const {
   米亚默认平台中心配置,
@@ -310,7 +311,7 @@ function 执行米亚技能测试(this: void, player: any, 序号: number): void
     context.阶段 = 1;
     context.已触发分身80 = false;
     SetUnitState(context.Boss单位, UNIT_STATE_LIFE, 测试单位最大生命值 * 0.75);
-    尝试触发米亚灵猫分身(context);
+    触发米亚灵猫分身(context);
     提示(player, "已测试：灵猫分身。");
   } else if (序号 === 4) {
     context.阶段 = 1;
@@ -320,19 +321,16 @@ function 执行米亚技能测试(this: void, player: any, 序号: number): void
     提示(player, "已测试：污染标记。");
   } else if (序号 === 5) {
     context.阶段 = 2;
-    context.上次污染脉冲Ms = 0;
-    尝试触发米亚污染脉冲(context, nowMs);
+    释放米亚污染脉冲(context);
     提示(player, "已测试：污染脉冲。");
   } else if (序号 === 6) {
     context.阶段 = 2;
-    context.上次污水柱爆发Ms = 0;
-    尝试触发米亚污水柱爆发(context, nowMs);
+    释放米亚污水柱爆发(context);
     提示(player, "已测试：污水柱爆发。");
   } else if (序号 === 7) {
     context.阶段 = 2;
-    context.上次腐化转移Ms = 0;
     context.腐化转移污染平台ID = "";
-    尝试触发米亚腐化转移(context, nowMs);
+    释放米亚腐化转移(context, nowMs);
     提示(player, "已测试：腐化转移。");
   } else if (序号 === 8) {
     context.阶段 = 2;
@@ -346,15 +344,15 @@ function 执行米亚技能测试(this: void, player: any, 序号: number): void
     提示(player, "已测试：平台超载。");
   } else if (序号 === 9) {
     context.阶段 = 3;
-    context.上次全场甩黏液Ms = 0;
-    刷新米亚腐化黏液涂层(context, nowMs);
+    刷新米亚腐化黏液涂层被动状态(context);
+    释放米亚全场腐化黏液(context);
     提示(player, "已测试：腐化黏液涂层。");
   } else if (序号 === 10) {
     context.阶段 = 3;
     context.终极污染引导中 = false;
     context.已触发终极污染30 = false;
     SetUnitState(context.Boss单位, UNIT_STATE_LIFE, 测试单位最大生命值 * 0.25);
-    尝试触发米亚终极污染(context);
+    触发米亚终极污染(context, 0);
     提示(player, "已测试：终极污染。");
   }
 }

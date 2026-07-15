@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹模型动画配置"]
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
@@ -14,8 +16,8 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["点到线段距离平方"]
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
 local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -28,17 +30,15 @@ local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂
 local ____require_result_5 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
 local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_5["显示大招吟唱条"]
 local _____5173_95ED_541F_5531_6761 = ____require_result_5["关闭吟唱条"]
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_6.YDWETimerDestroyEffectSafe
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_7["设置特效XYZ轴旋转"]
-local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_8.getServerTime
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_6["设置特效XYZ轴旋转"]
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_7.getServerTime
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local GetRandomInt = jass.GetRandomInt
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -50,7 +50,6 @@ local Atan2 = jass.Atan2
 local Cos = jass.Cos
 local Sin = jass.Sin
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -58,9 +57,6 @@ local EXSetEffectSize = japi.EXSetEffectSize
 local RAD_TO_DEG = 57.29577951308232
 local _____65F6_95F4_505C_6B62_5927_578B_6280_80FDKey = "时间停止"
 local _____65F6_95F4_505C_6B62_6682_505C_6765_6E90 = "安兹-时间停止"
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____53D6_65F6_95F4_505C_6B62_603B_65F6_957F_79D2()
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]
     return cfg["时间停止预展示秒"] + cfg["时间停止冻结秒"] + cfg["时间停止结算间隔秒"] * 2 + cfg["时间停止收尾秒"]
@@ -136,27 +132,23 @@ local function _____521B_5EFA_65F6_95F4_505C_6B62_6301_7EED_8868_73B0(instance)
     local clock = AddSpecialEffectTarget(cfg["表现资源"]["时间停止钟面特效路径"], boss, "origin")
     local gear = AddSpecialEffectTarget(cfg["表现资源"]["时间停止齿轮特效路径"], boss, "origin")
     if clock ~= nil and clock ~= 0 then
-        if type(EXSetEffectSize) == "function" then
-            EXSetEffectSize(clock, cfg["阶段技能"]["时间停止钟面缩放"])
-        end
-        local ____instance__6301_7EED_7279_6548_5217_8868_9 = instance["持续特效列表"]
-        ____instance__6301_7EED_7279_6548_5217_8868_9[#____instance__6301_7EED_7279_6548_5217_8868_9 + 1] = clock
+        EXSetEffectSize(clock, cfg["阶段技能"]["时间停止钟面缩放"])
+        local ____instance__6301_7EED_7279_6548_5217_8868_8 = instance["持续特效列表"]
+        ____instance__6301_7EED_7279_6548_5217_8868_8[#____instance__6301_7EED_7279_6548_5217_8868_8 + 1] = clock
     end
     if gear ~= nil and gear ~= 0 then
-        if type(EXSetEffectSize) == "function" then
-            EXSetEffectSize(gear, cfg["阶段技能"]["时间停止齿轮缩放"])
-        end
-        local ____instance__6301_7EED_7279_6548_5217_8868_10 = instance["持续特效列表"]
-        ____instance__6301_7EED_7279_6548_5217_8868_10[#____instance__6301_7EED_7279_6548_5217_8868_10 + 1] = gear
+        EXSetEffectSize(gear, cfg["阶段技能"]["时间停止齿轮缩放"])
+        local ____instance__6301_7EED_7279_6548_5217_8868_9 = instance["持续特效列表"]
+        ____instance__6301_7EED_7279_6548_5217_8868_9[#____instance__6301_7EED_7279_6548_5217_8868_9 + 1] = gear
     end
 end
 local function _____51BB_7ED3_65F6_95F4_505C_6B62_73A9_5BB6(instance)
-    local ____instance_context__6311_6218_5DF2_7ED3_675F_12 = instance.context["挑战已结束"]
-    if not ____instance_context__6311_6218_5DF2_7ED3_675F_12 then
-        local ____self_11 = instance.context["清理"]
-        ____instance_context__6311_6218_5DF2_7ED3_675F_12 = ____self_11["已清理"](____self_11)
+    local ____instance_context__6311_6218_5DF2_7ED3_675F_11 = instance.context["挑战已结束"]
+    if not ____instance_context__6311_6218_5DF2_7ED3_675F_11 then
+        local ____self_10 = instance.context["清理"]
+        ____instance_context__6311_6218_5DF2_7ED3_675F_11 = ____self_10["已清理"](____self_10)
     end
-    if ____instance_context__6311_6218_5DF2_7ED3_675F_12 then
+    if ____instance_context__6311_6218_5DF2_7ED3_675F_11 then
         return
     end
     instance.context["时间停止中"] = true
@@ -167,14 +159,14 @@ local function _____51BB_7ED3_65F6_95F4_505C_6B62_73A9_5BB6(instance)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue16
+                    goto __continue13
                 end
                 if _____6DFB_52A0_5355_4F4D_6682_505C(hero, _____65F6_95F4_505C_6B62_6682_505C_6765_6E90) then
-                    local ____instance__6682_505C_5355_4F4D_5217_8868_13 = instance["暂停单位列表"]
-                    ____instance__6682_505C_5355_4F4D_5217_8868_13[#____instance__6682_505C_5355_4F4D_5217_8868_13 + 1] = hero
+                    local ____instance__6682_505C_5355_4F4D_5217_8868_12 = instance["暂停单位列表"]
+                    ____instance__6682_505C_5355_4F4D_5217_8868_12[#____instance__6682_505C_5355_4F4D_5217_8868_12 + 1] = hero
                 end
             end
-            ::__continue16::
+            ::__continue13::
             i = i + 1
         end
     end
@@ -226,14 +218,13 @@ local function _____6E05_7406_65F6_95F4_505C_6B62_5B9E_4F8B(instance)
     end
 end
 local function _____64AD_653E_65F6_95F4_505C_6B62_7ED3_7B97_7279_6548(model, x, y, scale)
-    local effect = AddSpecialEffect(model, x, y)
-    if effect ~= nil and effect ~= 0 then
-        if type(EXSetEffectSize) == "function" then
-            EXSetEffectSize(effect, scale)
-        end
-        YDWETimerDestroyEffectSafe(_____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["时间停止结算特效持续秒"], effect)
-    end
-    return effect
+    return _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = model,
+        X = x,
+        Y = y,
+        ["缩放"] = scale,
+        ["持续秒"] = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["时间停止结算特效持续秒"]
+    })
 end
 local function _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(boss, target, damage, tag)
     _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -266,21 +257,21 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_5730_9762_6CD5_9635(instance)
             do
                 local target = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue38
+                    goto __continue33
                 end
                 local dx = GetUnitX(target) - locked["地面法阵X"]
                 local dy = GetUnitY(target) - locked["地面法阵Y"]
                 if dx * dx + dy * dy > radius2 then
-                    goto __continue38
+                    goto __continue33
                 end
                 _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(
                     boss,
                     target,
-                    _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["阶段技能"]["时间停止地面法阵伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg["阶段技能"]["时间停止地面法阵伤害目标最大生命比例"],
+                    _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = cfg["阶段技能"]["时间停止地面法阵伤害Boss攻击力比例"], ["目标最大生命比例"] = cfg["阶段技能"]["时间停止地面法阵伤害目标最大生命比例"]}),
                     "安兹·时间停止·地面法阵"
                 )
             end
-            ::__continue38::
+            ::__continue33::
             i = i + 1
         end
     end
@@ -306,7 +297,7 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_73B0_5B9E_65AD_88C2(instance)
             do
                 local target = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue45
+                    goto __continue40
                 end
                 if _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9(
                     GetUnitX(target),
@@ -316,16 +307,16 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_73B0_5B9E_65AD_88C2(instance)
                     locked["裂缝终点X"],
                     locked["裂缝终点Y"]
                 ) > halfWidth2 then
-                    goto __continue45
+                    goto __continue40
                 end
                 _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(
                     boss,
                     target,
-                    _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * ordinary["现实断裂伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * ordinary["现实断裂伤害目标最大生命比例"],
+                    _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = ordinary["现实断裂伤害Boss攻击力比例"], ["目标最大生命比例"] = ordinary["现实断裂伤害目标最大生命比例"]}),
                     "安兹·时间停止·现实断裂"
                 )
             end
-            ::__continue45::
+            ::__continue40::
             i = i + 1
         end
     end
@@ -348,21 +339,29 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_9B54_6CD5_7BAD(instance)
             do
                 local target = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue51
+                    goto __continue46
                 end
                 local dx = GetUnitX(target) - locked["魔法箭X"]
                 local dy = GetUnitY(target) - locked["魔法箭Y"]
                 if dx * dx + dy * dy > radius2 then
-                    goto __continue51
+                    goto __continue46
                 end
                 _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(
                     boss,
                     target,
-                    (_____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * ordinary["高阶魔法箭伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * ordinary["高阶魔法箭伤害目标最大生命比例"]) * _____53D6_5B89_5179_4EA1_7075_7BAD_4F24_5BB3_500D_7387(context),
+                    _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
+                        boss,
+                        target,
+                        {
+                            ["来源攻击力比例"] = ordinary["高阶魔法箭伤害Boss攻击力比例"],
+                            ["目标最大生命比例"] = ordinary["高阶魔法箭伤害目标最大生命比例"],
+                            ["总倍率"] = _____53D6_5B89_5179_4EA1_7075_7BAD_4F24_5BB3_500D_7387(context)
+                        }
+                    ),
                     "安兹·时间停止·高阶魔法箭"
                 )
             end
-            ::__continue51::
+            ::__continue46::
             i = i + 1
         end
     end
@@ -386,9 +385,9 @@ ____exports["释放安兹时间停止"] = function(context)
         ["已清理"] = false
     }
     context["当前大型技能"] = _____65F6_95F4_505C_6B62_5927_578B_6280_80FDKey
-    local ____self_14 = context["清理"]
-    ____self_14["登记清理"](
-        ____self_14,
+    local ____self_13 = context["清理"]
+    ____self_13["登记清理"](
+        ____self_13,
         "安兹-时间停止实例",
         function()
             _____6E05_7406_65F6_95F4_505C_6B62_5B9E_4F8B(instance)

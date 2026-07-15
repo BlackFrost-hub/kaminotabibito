@@ -1,5 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
 local _____83B7_53D6_5168_90E8_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取全部安兹运行时上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
@@ -15,15 +18,11 @@ local _____91CA_653E_5B89_5179_4E00_5207_751F_547D_7684_7EC8_70B9 = ____10_FF0E_
 local ____01_FF0E_6218_6597_6280_80FD_8C03_5EA6_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.13．战斗技能调度模板.01．战斗技能调度模板")
 local _____521B_5EFA_6218_6597_6280_80FD_8C03_5EA6_5668 = ____01_FF0E_6218_6597_6280_80FD_8C03_5EA6_6A21_677F["创建战斗技能调度器"]
 local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____5B89_5179_6280_80FD_8C03_5EA6_5668
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____53D6_5B89_5179_4E0A_4E0B_6587_952E(context)
-    return _____5355_4F4D_6709_6548(context["安兹单位"]) and GetHandleId(context["安兹单位"]) or 0
+    return _____53D6_5355_4F4DID(context["安兹单位"])
 end
 local function _____53EF_8C03_5EA6_5B89_5179_6280_80FD(context)
     local ____temp_1 = _____5355_4F4D_6709_6548(context["安兹单位"]) and not context["挑战已结束"]

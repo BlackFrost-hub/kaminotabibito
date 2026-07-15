@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
@@ -41,10 +42,6 @@ const RAD_TO_DEG = 57.29577951308232;
 interface 月纹落点 {
   X: number;
   Y: number;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 构建月纹目标列表(this: void, boss: any, preferred: any): any[] {

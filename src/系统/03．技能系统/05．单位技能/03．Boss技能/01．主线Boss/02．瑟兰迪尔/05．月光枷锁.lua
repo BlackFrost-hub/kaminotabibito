@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWETimerDestroyEffectSafe, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, Sound3DII_CooPlayReuse, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, AddSpecialEffectTarget, UnitRemoveAbility, GetUnitState, _____6708_5149_67B7_9501_6280_80FDID, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, UNIT_STATE_MAX_LIFE, _____6708_5149_67B7_9501_7ED1_5B9A_8868
+local _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, createTimedUnitEffect, Sound3DII_CooPlayReuse, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, UnitRemoveAbility, _____6708_5149_67B7_9501_6280_80FDID, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, _____6708_5149_67B7_9501_7ED1_5B9A_8868
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
@@ -14,25 +14,25 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
-function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0
-end
+local _____5355_4F4D_53E5_67C4_5B58_5728 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位句柄存在"]
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 function _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C(caster)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
     _____5F00_59CB_786C_76F4(caster, config["施法硬直秒"])
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = config["施法硬直秒"], ["颜色ID"] = config["吟唱条颜色ID"], ["标题文本"] = config["吟唱条标题文本"], ["提示文本"] = config["吟唱条提示文本"]})
-    SetUnitTimeScale(caster, config["动画速度"])
-    SetUnitAnimationByIndex(caster, config["动画编号"])
-    addDelayedCallback(
-        config["动画重播延迟Ms"],
-        function()
-            if not _____5355_4F4D_6709_6548(caster) then
-                return
-            end
-            SetUnitTimeScale(caster, config["动画速度"])
-            SetUnitAnimationByIndex(caster, config["动画编号"])
-        end
-    )
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({
+        ["单位"] = caster,
+        ["动画编号"] = config["动画编号"],
+        ["动画速度"] = config["动画速度"],
+        ["持续秒"] = config["施法硬直秒"],
+        ["重播时点秒列表"] = {config["动画重播延迟Ms"] / 1000},
+        ["恢复动画编号"] = config["恢复动画编号"],
+        ["恢复动画速度"] = config["恢复动画速度"]
+    })
 end
 function _____8BA9_5355_4F4D_9762_5411_76EE_6807(caster, target)
     if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
@@ -44,7 +44,7 @@ function _____8BA9_5355_4F4D_9762_5411_76EE_6807(caster, target)
     ) * BJ_RADTODEG
     SetUnitFacing(caster, angle)
 end
-function _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55(caster, target)
+function _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55(caster, target, context)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
     local targetId = GetHandleId(target)
     local _____5DF2_547D_4E2D = false
@@ -56,14 +56,14 @@ function _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55(caster, target)
             return
         end
         _____5DF2_547D_4E2D = true
-        _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster, _____547D_4E2D_5355_4F4D)
+        _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster, _____547D_4E2D_5355_4F4D, context)
     end
     local function _____6708_5149_67B7_9501_5F39_5E55_5230_8FBE_76EE_6807_70B9()
         if _____5DF2_547D_4E2D or not _____5355_4F4D_6709_6548(target) then
             return
         end
         _____5DF2_547D_4E2D = true
-        _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster, target)
+        _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster, target, context)
     end
     _____521B_5EFA_539F_751F_5F39_5E55({
         ["所有者"] = caster,
@@ -91,12 +91,9 @@ function _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55(caster, target)
 end
 function _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548(target)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
-    local targetEffect = AddSpecialEffectTarget(config["命中特效"], target, "origin")
-    if targetEffect ~= nil and targetEffect ~= 0 then
-        YDWETimerDestroyEffectSafe(config["定身秒"], targetEffect)
-    end
+    createTimedUnitEffect(target, "origin", config["命中特效"], config["定身秒"])
 end
-function _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3(caster, target, tickIndex)
+function _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3(caster, target, tickIndex, _____8BB0_5F55)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
     local targetId = GetHandleId(target)
     addDelayedCallback(
@@ -105,10 +102,10 @@ function _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3(caster, target, tickIn
             if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
                 return
             end
-            if _____6708_5149_67B7_9501_7ED1_5B9A_8868[targetId] == nil then
+            if _____6708_5149_67B7_9501_7ED1_5B9A_8868[targetId] ~= _____8BB0_5F55 then
                 return
             end
-            local damage = (_____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * config["Tick伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["Tick伤害目标最大生命比例"]) * config["Tick伤害总倍率"]
+            local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(caster, target, {["来源攻击力比例"] = config["Tick伤害Boss攻击力比例"], ["目标最大生命比例"] = config["Tick伤害目标最大生命比例"], ["总倍率"] = config["Tick伤害总倍率"]})
             _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
                 ["技能ID"] = _____6708_5149_67B7_9501_6280_80FDID,
                 ["来源"] = caster,
@@ -124,14 +121,49 @@ function _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3(caster, target, tickIn
         end
     )
 end
-function _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(caster, target)
-    if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
-        return
+function _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(targetId, _____8BB0_5F55, _____6E05_7406_63A7_5236)
+    if _____6708_5149_67B7_9501_7ED1_5B9A_8868[targetId] ~= _____8BB0_5F55 then
+        return false
     end
-    _____6708_5149_67B7_9501_7ED1_5B9A_8868[GetHandleId(target)] = {["来源单位"] = caster, ["目标单位"] = target, ["已承受打断伤害"] = 0}
+    __TS__Delete(_____6708_5149_67B7_9501_7ED1_5B9A_8868, targetId)
+    if _____6E05_7406_63A7_5236 then
+        _____6E05_7406_6708_5149_67B7_9501_63A7_5236(_____8BB0_5F55["目标单位"])
+    end
+    return true
+end
+function _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(caster, target, context)
+    if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
+        return nil
+    end
+    local ____temp_13 = context ~= nil
+    if ____temp_13 then
+        local ____self_12 = context["清理"]
+        ____temp_13 = ____self_12["已清理"](____self_12)
+    end
+    if ____temp_13 then
+        return nil
+    end
+    local targetId = GetHandleId(target)
+    local _____65E7_8BB0_5F55 = _____6708_5149_67B7_9501_7ED1_5B9A_8868[targetId]
+    if _____65E7_8BB0_5F55 ~= nil then
+        _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(targetId, _____65E7_8BB0_5F55, true)
+    end
+    local _____8BB0_5F55 = {["来源单位"] = caster, ["目标单位"] = target, ["已承受打断伤害"] = 0}
+    _____6708_5149_67B7_9501_7ED1_5B9A_8868[targetId] = _____8BB0_5F55
+    if context ~= nil then
+        local ____self_14 = context["清理"]
+        ____self_14["登记清理"](
+            ____self_14,
+            "月光枷锁绑定",
+            function()
+                _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(targetId, _____8BB0_5F55, true)
+            end
+        )
+    end
+    return _____8BB0_5F55
 end
 function _____6E05_7406_6708_5149_67B7_9501_63A7_5236(target)
-    if not _____5355_4F4D_6709_6548(target) then
+    if not _____5355_4F4D_53E5_67C4_5B58_5728(target) then
         return
     end
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
@@ -139,7 +171,7 @@ function _____6E05_7406_6708_5149_67B7_9501_63A7_5236(target)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(target, _____6708_5149_67B7_9501_6839_987BBuffID)
     UnitRemoveAbility(target, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff)
 end
-____exports["释放瑟兰迪尔月光枷锁效果"] = function(caster, target)
+____exports["释放瑟兰迪尔月光枷锁效果"] = function(caster, target, context)
     if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
         return
     end
@@ -157,15 +189,20 @@ ____exports["释放瑟兰迪尔月光枷锁效果"] = function(caster, target)
             _____8BA9_5355_4F4D_9762_5411_76EE_6807(caster, target)
             SetUnitTimeScale(caster, config["恢复动画速度"])
             SetUnitAnimationByIndex(caster, config["恢复动画编号"])
-            _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55(caster, target)
+            _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55(caster, target, context)
         end
     )
 end
-function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster, target)
+function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster, target, context)
     if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
         return
     end
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
+    local _____8BB0_5F55 = _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(caster, target, context)
+    if _____8BB0_5F55 == nil then
+        return
+    end
+    local targetId = GetHandleId(target)
     Sound3DII_CooPlayReuse(
         config["命中音效"],
         GetUnitX(target),
@@ -175,7 +212,6 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster
     )
     _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548(target)
     _____65BD_52A0_6269_5C55_63A7_5236(caster, target, "roots", {["持续时间"] = config["定身秒"]})
-    _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(caster, target)
     registerManualBuff(
         target,
         config.BuffID,
@@ -190,10 +226,16 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster
     do
         local i = 1
         while i <= config["定身秒"] do
-            _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3(caster, target, i)
+            _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3(caster, target, i, _____8BB0_5F55)
             i = i + 1
         end
     end
+    addDelayedCallback(
+        R2I(config["定身秒"] * 1000) + 1,
+        function()
+            _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(targetId, _____8BB0_5F55, true)
+        end
+    )
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
@@ -218,12 +260,10 @@ local ____require_result_8 = require("系统.04．伤害系统.00．伤害计算
 local registerAppliedFinalDamageListener = ____require_result_8.registerAppliedFinalDamageListener
 local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.14．月光碎片")
 local _____521B_5EFA_745F_5170_8FEA_5C14_6708_5149_788E_7247 = ____require_result_9["创建瑟兰迪尔月光碎片"]
-local ____require_result_10 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDWETimerDestroyEffectSafe = ____require_result_10.YDWETimerDestroyEffectSafe
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_11["读取单位攻击力"]
-local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.index")
-Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
+local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedUnitEffect = ____require_result_10.createTimedUnitEffect
+local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效系统.index")
+Sound3DII_CooPlayReuse = ____require_result_11.Sound3DII_CooPlayReuse
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitName = jass.GetUnitName
@@ -236,16 +276,14 @@ Atan2 = jass.Atan2
 GetHandleId = jass.GetHandleId
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 SetUnitTimeScale = jass.SetUnitTimeScale
-AddSpecialEffectTarget = jass.AddSpecialEffectTarget
+local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 UnitRemoveAbility = jass.UnitRemoveAbility
-GetUnitState = jass.GetUnitState
 local _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____6708_5149_67B7_9501_6280_80FDID = stringToFourCC(_____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]["技能槽位"])
 local _____6708_5149_67B7_9501_5DF2_6CE8_518C = false
 BJ_RADTODEG = 57.29577951308232
 _____6708_5149_67B7_9501_6839_987BBuffID = "C017"
 _____6708_5149_67B7_9501_539F_751F_6839_987BBuff = 1111844210
-UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 _____6708_5149_67B7_9501_7ED1_5B9A_8868 = {}
 local function _____6253_65AD_6708_5149_67B7_9501_5E76_6389_843D_788E_7247(target)
     if not _____5355_4F4D_6709_6548(target) then
@@ -257,8 +295,7 @@ local function _____6253_65AD_6708_5149_67B7_9501_5E76_6389_843D_788E_7247(targe
         return false
     end
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["月光枷锁"]
-    __TS__Delete(_____6708_5149_67B7_9501_7ED1_5B9A_8868, targetId)
-    _____6E05_7406_6708_5149_67B7_9501_63A7_5236(target)
+    _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(targetId, _____8BB0_5F55, true)
     addDelayedCallback(
         0,
         function()
@@ -296,7 +333,7 @@ local function ____on_6708_5149_67B7_9501_627F_53D7_4F24_5BB3(target, attacker, 
     end
 end
 ____exports["释放瑟兰迪尔月光枷锁"] = function(_context, _target)
-    ____exports["释放瑟兰迪尔月光枷锁效果"](_context["Boss单位"], _target)
+    ____exports["释放瑟兰迪尔月光枷锁效果"](_context["Boss单位"], _target, _context)
 end
 ____exports["立即打断瑟兰迪尔月光枷锁"] = function(caster, target)
     if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
@@ -315,7 +352,11 @@ local function ____on_745F_5170_8FEA_5C14_6708_5149_67B7_9501_751F_6548(castingU
         return
     end
     local target = GetSpellTargetUnit()
-    ____exports["释放瑟兰迪尔月光枷锁效果"](castingUnit, target)
+    local context = _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587(castingUnit)
+    if context == nil then
+        return
+    end
+    ____exports["释放瑟兰迪尔月光枷锁效果"](castingUnit, target, context)
 end
 ____exports["注册瑟兰迪尔月光枷锁"] = function()
     if _____6708_5149_67B7_9501_5DF2_6CE8_518C then

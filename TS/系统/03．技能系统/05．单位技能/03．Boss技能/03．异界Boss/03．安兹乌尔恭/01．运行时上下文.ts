@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 安兹乌尔恭单位技能配置 } from './00．配置';
 import { 创建雅儿贝德运行状态, type 雅儿贝德运行状态 } from './01．护卫雅儿贝德/00．状态';
 import type { 机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
@@ -44,10 +45,6 @@ export interface 安兹运行时上下文 {
 }
 
 let 安兹运行时已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 创建安兹上下文(
   this: void,

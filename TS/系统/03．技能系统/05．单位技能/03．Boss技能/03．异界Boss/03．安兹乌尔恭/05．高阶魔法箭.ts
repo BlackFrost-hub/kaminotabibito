@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 获取或创建安兹运行时上下文, 标记安兹普通机制忙碌 } from './01．运行时上下文';
 import { 安兹乌尔恭单位技能配置 } from './00．配置';
@@ -9,9 +14,6 @@ import { 注册单位技能壳监听 } from '../../../../00．技能模板+函�
 import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 开始分批点名落点模板, type 分批点名落点结果 } from '../../../../00．技能模板+函数/00．技能模板/05．点名技能模板/02．分批点名落点模板';
 
-const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线') as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -31,15 +33,13 @@ const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const 安兹单位类型ID = stringToFourCC(安兹乌尔恭单位技能配置.正式单位ID);
 const 高阶魔法箭技能ID = stringToFourCC(安兹乌尔恭单位技能配置.技能壳.高阶魔法箭);
 let 高阶魔法箭已注册 = false;
@@ -53,10 +53,6 @@ export const 高阶魔法箭技能状态 = {
   语义: '三轮骸骨魔法箭雨按时间差锁定不同玩家当前位置，鼓励分散与连续移动。',
 } as const;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
 function 取主要目标(this: void, boss: any): any {
   const entry = 获取Boss技能最高仇恨目标(boss);
   if (entry != null && 单位有效(entry.targetRef)) return entry.targetRef;
@@ -65,10 +61,11 @@ function 取主要目标(this: void, boss: any): any {
 
 function 计算高阶魔法箭伤害(this: void, context: 安兹运行时上下文, boss: any, target: any): number {
   const cfg = 安兹乌尔恭数值与表现配置.普通技能;
-  return (
-    读取单位攻击力(boss) * cfg.高阶魔法箭伤害Boss攻击力比例
-      + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg.高阶魔法箭伤害目标最大生命比例
-  ) * 取安兹亡灵箭伤害倍率(context);
+  return 计算组合技能伤害(boss, target, {
+    来源攻击力比例: cfg.高阶魔法箭伤害Boss攻击力比例,
+    目标最大生命比例: cfg.高阶魔法箭伤害目标最大生命比例,
+    总倍率: 取安兹亡灵箭伤害倍率(context),
+  });
 }
 
 function 高阶魔法箭结算(this: void, context: 安兹运行时上下文, x: number, y: number): void {
@@ -77,7 +74,7 @@ function 高阶魔法箭结算(this: void, context: 安兹运行时上下文, x:
   const cfg = 安兹乌尔恭数值与表现配置;
   const effect = AddSpecialEffect(cfg.表现资源.高阶魔法箭特效路径, x, y);
   if (effect != null && effect !== 0) {
-    if (typeof EXSetEffectSize === 'function') EXSetEffectSize(effect, cfg.普通技能.高阶魔法箭特效缩放);
+    EXSetEffectSize(effect, cfg.普通技能.高阶魔法箭特效缩放);
     YDWETimerDestroyEffectSafe(cfg.普通技能.高阶魔法箭特效持续秒, effect);
   }
   const targets = 获取Boss技能敌对英雄列表(boss);

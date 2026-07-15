@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 亚伦柯斯单位技能配置 } from './00．配置';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
@@ -61,10 +62,6 @@ export interface 亚伦柯斯运行时上下文 {
 }
 
 let 亚伦柯斯运行时已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 亚伦柯斯运行时上下文 {
   const now = getServerTime();

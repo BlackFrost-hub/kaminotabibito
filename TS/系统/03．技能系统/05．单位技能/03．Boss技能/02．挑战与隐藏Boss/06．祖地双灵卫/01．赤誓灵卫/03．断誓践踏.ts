@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 执行战斗自身位移到坐标 } from '../../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
@@ -37,10 +38,6 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 点在圆内(this: void, x: number, y: number, centerX: number, centerY: number, radius: number): boolean {
   const dx = x - centerX;

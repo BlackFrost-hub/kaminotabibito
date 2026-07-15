@@ -25,7 +25,6 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
@@ -51,12 +50,6 @@ local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
 local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____795E_98CE_62A4_4F53_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["神风护体"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
-local function _____53D6_5355_4F4DID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local function _____53D6_91CC_79D1_7279_4E0A_4E0B_6587ByBoss(boss)
     local contexts = _____83B7_53D6_5168_90E8_91CC_79D1_7279_4E0A_4E0B_6587()
     do
@@ -70,24 +63,6 @@ local function _____53D6_91CC_79D1_7279_4E0A_4E0B_6587ByBoss(boss)
     end
     return nil
 end
-local function _____64AD_653E_9650_65F6_76EE_6807_7279_6548(target, model, attach, duration)
-    if not _____5355_4F4D_6709_6548(target) or model == "" then
-        return
-    end
-    createTimedUnitEffect(target, attach, model, duration)
-end
-local function _____64AD_653E_9650_65F6_70B9_7279_6548(model, x, y, duration)
-    if model == "" then
-        return
-    end
-    createTimedEffect(
-        model,
-        x,
-        y,
-        0,
-        duration
-    )
-end
 local function _____8BBE_7F6E_795E_98CE_62A4_4F53_5C42_6570(context)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["神风护体"]
     context["神风护体层数"] = cfg["基础层数"]
@@ -98,7 +73,7 @@ local function _____8BBE_7F6E_795E_98CE_62A4_4F53_5C42_6570(context)
         cfg["基础层数"],
         {stack = cfg["基础层数"], sourceName = "里科特-神风护体"}
     )
-    _____64AD_653E_9650_65F6_76EE_6807_7279_6548(context["Boss单位"], cfg["护体特效路径"], "origin", cfg["持续秒"])
+    createTimedUnitEffect(context["Boss单位"], "origin", cfg["护体特效路径"], cfg["持续秒"])
 end
 local function _____66F4_65B0_795E_98CE_62A4_4F53_5C42_6570Buff(context)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["神风护体"]
@@ -159,10 +134,11 @@ local function _____7ED3_7B97_5355_4E2A_795E_98CE_7C89_788E(context, target)
         GetUnitY(target),
         _____91CC_79D1_7279_97F3_6548_914D_7F6E["默认裁断距离"]
     )
-    _____64AD_653E_9650_65F6_70B9_7279_6548(
+    createTimedEffect(
         cfg["粉碎特效路径"],
         GetUnitX(target),
         GetUnitY(target),
+        0,
         1
     )
     _____6E05_9664_91CC_79D1_7279_795E_98CE_5370_8BB0(context, target)
@@ -176,14 +152,14 @@ local function _____7ED3_7B97_795E_98CE_7C89_788E(context)
         do
             local stack = context["神风印记表"][key]
             if stack == nil or stack <= 0 then
-                goto __continue21
+                goto __continue15
             end
             local target = context["神风印记单位表"][key]
             if target ~= nil then
                 _____7ED3_7B97_5355_4E2A_795E_98CE_7C89_788E(context, target)
             end
         end
-        ::__continue21::
+        ::__continue15::
     end
     context["神风印记表"] = {}
     context["神风印记单位表"] = {}

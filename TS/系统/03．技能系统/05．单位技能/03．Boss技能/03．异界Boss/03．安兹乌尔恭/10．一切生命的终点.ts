@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
@@ -62,9 +63,9 @@ const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
 const DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
-const EXSetEffectXY = japi.EXSetEffectXY as ((effect: any, x: number, y: number) => void) | undefined;
-const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, degrees: number) => void) | undefined;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
+const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) => void;
+const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, degrees: number) => void;
 const DEG_TO_RAD = 0.017453292519943295;
 const 一切生命的终点大型技能Key = '一切生命的终点';
 
@@ -84,10 +85,6 @@ interface 一切生命的终点实例 {
   倒计时特效: any;
   锚点封锁?: 生命锚点封锁控制器;
   已清理: boolean;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 销毁特效(this: void, effect: any): void {
@@ -179,8 +176,8 @@ function 创建生命锚点(this: void, instance: 一切生命的终点实例, x
   SetUnitPathing(unitInstance.单位, false);
   const ground = AddSpecialEffect(cfg.表现资源.生命锚点地面层特效路径, x, y);
   const holy = AddSpecialEffect(cfg.表现资源.生命锚点圣光层特效路径, x, y);
-  if (ground != null && ground !== 0 && typeof EXSetEffectSize === 'function') EXSetEffectSize(ground, stage.生命锚点地面层缩放);
-  if (holy != null && holy !== 0 && typeof EXSetEffectSize === 'function') EXSetEffectSize(holy, stage.生命锚点圣光层缩放);
+  if (ground != null && ground !== 0) EXSetEffectSize(ground, stage.生命锚点地面层缩放);
+  if (holy != null && holy !== 0) EXSetEffectSize(holy, stage.生命锚点圣光层缩放);
   const anchor: 生命锚点状态 = {
     单位实例: unitInstance,
     地面特效: ground,
@@ -248,9 +245,9 @@ function 播放女妖哭嚎表现(this: void, instance: 一切生命的终点实
   for (let i = 0; i < stage.女妖哭嚎死亡波数量; i++) {
     const effect = AddSpecialEffect(cfg.表现资源.女妖哭嚎死亡波特效路径, x, y);
     if (effect == null || effect === 0) continue;
-    if (typeof EXSetEffectXY === 'function') EXSetEffectXY(effect, x, y);
-    if (typeof EXEffectMatRotateZ === 'function') EXEffectMatRotateZ(effect, i * 360 / stage.女妖哭嚎死亡波数量);
-    if (typeof EXSetEffectSize === 'function') EXSetEffectSize(effect, stage.女妖哭嚎死亡波缩放);
+    EXSetEffectXY(effect, x, y);
+    EXEffectMatRotateZ(effect, i * 360 / stage.女妖哭嚎死亡波数量);
+    EXSetEffectSize(effect, stage.女妖哭嚎死亡波缩放);
     YDWETimerDestroyEffectSafe(stage.女妖哭嚎特效持续秒, effect);
   }
 }

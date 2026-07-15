@@ -1,29 +1,44 @@
-/.build
-/.def
-/.JASS
-/imports
+# generated build output
+/.build/
+/.def/
+/.JASS/
+/JASS/
+/build/
+/output/
 /src/**/*.js
+/backups/
+/logs/
+
+# map sources, unpacked data, and imported assets
+/imports/
 /.w3x/
+/map/
+/map01/
 *.w3x
-~$*
-/JASS
-/.codex_tmp_buff_sheet_fix
-/_tmp_xlsm
-/.codex_tmp_*/
-/_tmp_*/
-/output
-/tmp
-/.opencode
-/map
-/map01
-/audio_temp
-/build
-/%APPDATA%
-node_modules/
+
+# dependencies and package-manager logs
+/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# local tools, assistants, and working directories
+/%APPDATA%/
+/.agents/
+/.claude/
+/.opencode/
+/.vscode/jass-cache/
+/.codex_tmp_*/
+/_tmp_*/
+/tmp/
+/audio_temp/
+/image_temp/
+/voice_pack_manifest.json
+/voice_pack_manifest/
+
+# temporary and editor files
+~$*
 *.tmp
 *.temp
 *.log
@@ -38,18 +53,4 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 Desktop.ini
-.tmp
-
-# local editor / assistant cache
-.vscode/jass-cache/
-.claude/
-.claude/settings.local.json
-
-# build artifacts
-/backups/
-/logs/
-
-# generated legacy flat voice manifest
-/voice_pack_manifest.json
-/voice_pack_manifest
-/image_temp
+.tmp/

@@ -1,7 +1,6 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Number = ____lualib.__TS__Number
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____64AD_653E_51FA_751F_7279_6548, _____53D6_7CBE_7075_7BAD_9635_76EE_6807_6743_91CD, _____5355_4F4D_5B58_6D3B, _____8BFB_53D6_7CBE_7075_7BAD_9635Boss_653B_51FB_529B, _____9009_62E9_7CBE_7075_7BAD_9635_5C04_51FB_76EE_6807, _____521B_5EFA_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_53EC_5524_7269, ____on_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_751F_6548, _____521B_5EFA_53EC_5524_7269, YDWETimerDestroyEffectSafe, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____6CE8_518C_7AD9_6869_5F39_5E55_5C04_51FB_5355_4F4D, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, getBuffRuntime, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, GetUnitStateJapi, AddSpecialEffect, IsUnitType, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, _____57FA_7840_653B_51FB_529B_72B6_6001, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7CBE_7075_7BAD_9635_6280_80FDID
+local _____64AD_653E_51FA_751F_7279_6548, _____53D6_7CBE_7075_7BAD_9635_76EE_6807_6743_91CD, _____8BFB_53D6_7CBE_7075_7BAD_9635Boss_653B_51FB_529B, _____9009_62E9_7CBE_7075_7BAD_9635_5C04_51FB_76EE_6807, _____521B_5EFA_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_53EC_5524_7269, ____on_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_751F_6548, _____521B_5EFA_53EC_5524_7269, _____521B_5EFA_70B9_7279_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____6CE8_518C_7AD9_6869_5F39_5E55_5C04_51FB_5355_4F4D, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, getBuffRuntime, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_MAX_LIFE, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7CBE_7075_7BAD_9635_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
@@ -14,14 +13,9 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
-function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0
-end
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 function _____64AD_653E_51FA_751F_7279_6548(x, y)
-    local effect = AddSpecialEffect("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl", x, y)
-    if effect ~= nil and effect ~= 0 then
-        YDWETimerDestroyEffectSafe(1, effect)
-    end
+    _____521B_5EFA_70B9_7279_6548({["模型路径"] = "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl", X = x, Y = y, ["持续秒"] = 1})
 end
 function _____53D6_7CBE_7075_7BAD_9635_76EE_6807_6743_91CD(target)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["精灵箭阵"]
@@ -32,24 +26,17 @@ function _____53D6_7CBE_7075_7BAD_9635_76EE_6807_6743_91CD(target)
     end
     return weight
 end
-function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 function _____8BFB_53D6_7CBE_7075_7BAD_9635Boss_653B_51FB_529B(boss)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["精灵箭阵"]
     local attack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss)
     if attack > 0 then
         return attack
     end
-    local baseAttack = __TS__Number(GetUnitStateJapi(boss, _____57FA_7840_653B_51FB_529B_72B6_6001)) or 0
-    if baseAttack > 0 then
-        return baseAttack
-    end
     return config["Boss攻击力兜底"]
 end
 function _____9009_62E9_7CBE_7075_7BAD_9635_5C04_51FB_76EE_6807(shooter, _boss)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["精灵箭阵"]
-    if not _____5355_4F4D_5B58_6D3B(shooter) then
+    if not _____5355_4F4D_6709_6548(shooter) then
         return nil
     end
     local searchRadius = config["索敌半径"] > 0 and config["索敌半径"] or config["弹幕最大飞行距离"]
@@ -157,8 +144,8 @@ function ____on_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_751F_6548(castingUnit, s
 end
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
 _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDWETimerDestroyEffectSafe = ____require_result_1.YDWETimerDestroyEffectSafe
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local ____require_result_2 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_2["读取单位攻击力"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
@@ -170,18 +157,12 @@ _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex = ____require_resul
 local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
 getBuffRuntime = ____require_result_6.getBuffRuntime
 local jass = require("jass.common")
-local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
-GetUnitStateJapi = japi.GetUnitState
-local ConvertUnitState = jass.ConvertUnitState
-AddSpecialEffect = jass.AddSpecialEffect
-IsUnitType = jass.IsUnitType
+local AddSpecialEffect = jass.AddSpecialEffect
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-_____57FA_7840_653B_51FB_529B_72B6_6001 = ConvertUnitState(18)
 _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____7CBE_7075_7BAD_9635_6280_80FDID = stringToFourCC(_____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["精灵箭阵"]["技能槽位"])
 local _____7CBE_7075_7BAD_9635_5DF2_6CE8_518C = false

@@ -1,14 +1,19 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+const { 播放限时单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
+  播放限时单位动画: (this: void, 参数: any) => any;
+};
+
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
 import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 创建血量节点触发器 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.index") as {
   创建血量节点触发器: (this: void, 参数: any) => any;
 };
@@ -57,22 +62,15 @@ let 熔岩护盾伤害修正已注册 = false;
 const 近战反弹冷却表: Record<number, number> = {};
 const 冰霜命中护盾时间表: Record<number, number> = {};
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 播放护盾短动作(this: void, boss: any): void {
   const config = 巴尔扎罗斯技能数值配置.熔岩护盾;
-  SetUnitTimeScale(boss, config.动画速度);
-  SetUnitAnimationByIndex(boss, config.动画编号);
-  addDelayedCallback(700, function 巴尔扎罗斯熔岩护盾恢复动作(this: void): void {
-    if (!单位有效(boss)) return;
-    SetUnitTimeScale(boss, 1);
+  播放限时单位动画({
+    单位: boss,
+    动画编号: config.动画编号,
+    动画速度: config.动画速度,
+    持续秒: 0.7,
+    恢复动画: false,
+    恢复动画速度: 1,
   });
 }
 
@@ -127,8 +125,10 @@ function 创建熔岩护盾(this: void, context: 巴尔扎罗斯运行时上下�
 
 function 计算反弹伤害(this: void, boss: any, attacker: any): number {
   const config = 巴尔扎罗斯技能数值配置.熔岩护盾;
-  return GetUnitState(attacker, UNIT_STATE_MAX_LIFE) * config.近战反弹来源最大生命比例
-    + 读取单位攻击力(boss) * config.近战反弹Boss攻击力比例;
+  return 计算组合技能伤害(boss, attacker, {
+    来源攻击力比例: config.近战反弹Boss攻击力比例,
+    目标最大生命比例: config.近战反弹来源最大生命比例,
+  });
 }
 
 function 尝试安排近战反弹(this: void, boss: any, attacker: any): void {

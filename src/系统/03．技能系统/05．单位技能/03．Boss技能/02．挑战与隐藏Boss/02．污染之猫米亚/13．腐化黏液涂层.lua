@@ -1,6 +1,9 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间距离平方"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.00．配置")
 local _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["米亚单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.02．数值与表现配置")
@@ -27,18 +30,8 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local _____8150_5316_9ECF_6DB2_8FD1_6218_51B7_5374_8868 = {}
 local _____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868 = {}
 local _____7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42_5DF2_6CE8_518C = false
-local _____7C73_4E9A_8150_5316_9ECF_6DB2_53D7_4F24_63D0_793AMs = 0
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
-local function _____8DDD_79BB_5E73_65B9(a, b)
-    local dx = GetUnitX(a) - GetUnitX(b)
-    local dy = GetUnitY(a) - GetUnitY(b)
-    return dx * dx + dy * dy
-end
 local function _____53D6_8150_5316_9ECF_6DB2_4E0A_4E0B_6587(boss)
     local id = GetHandleId(boss) or 0
     if id == 0 then
@@ -52,10 +45,25 @@ local function _____767B_8BB0_8150_5316_9ECF_6DB2_4E0A_4E0B_6587(context)
         return
     end
     if context["阶段"] ~= 3 or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-        __TS__Delete(_____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868, id)
+        if _____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868[id] == context then
+            __TS__Delete(_____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868, id)
+        end
+        return
+    end
+    if _____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868[id] == context then
         return
     end
     _____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868[id] = context
+    local ____self_6 = context["清理"]
+    ____self_6["登记清理"](
+        ____self_6,
+        "腐化黏液上下文索引",
+        function()
+            if _____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868[id] == context then
+                __TS__Delete(_____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868, id)
+            end
+        end
+    )
 end
 local function _____5237_65B0_8150_5316_9ECF_6DB2Buff(context)
     registerManualBuff(
@@ -86,10 +94,11 @@ local function _____5904_7406_8150_5316_9ECF_6DB2_8FD1_6218_53CD_566C(target, _d
         return
     end
     local nowMs = getServerTime()
-    if _____8150_5316_9ECF_6DB2_8FD1_6218_51B7_5374_8868[sourceId] ~= nil and nowMs - (_____8150_5316_9ECF_6DB2_8FD1_6218_51B7_5374_8868[sourceId] or 0) < config["近战叠层冷却Ms"] then
+    local _____51B7_5374_8868 = context["腐化黏液近战冷却表"]
+    if _____51B7_5374_8868[sourceId] ~= nil and nowMs - (_____51B7_5374_8868[sourceId] or 0) < config["近战叠层冷却Ms"] then
         return
     end
-    _____8150_5316_9ECF_6DB2_8FD1_6218_51B7_5374_8868[sourceId] = nowMs
+    _____51B7_5374_8868[sourceId] = nowMs
     _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, source, 1, "腐化黏液涂层近战反噬")
     _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "腐化黏液涂层", 1)
 end
@@ -100,17 +109,16 @@ local function _____5904_7406_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8(damage
     end
     local bonus = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化黏液涂层"]["Boss受伤提高"]
     local nowMs = getServerTime()
-    if nowMs - _____7C73_4E9A_8150_5316_9ECF_6DB2_53D7_4F24_63D0_793AMs >= 12000 then
-        _____7C73_4E9A_8150_5316_9ECF_6DB2_53D7_4F24_63D0_793AMs = nowMs
+    if nowMs - context["腐化黏液上次受伤提示Ms"] >= 12000 then
+        context["腐化黏液上次受伤提示Ms"] = nowMs
         _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "腐化黏液涂层", 3)
     end
     return damageContext.currentDamage * (1 + bonus)
 end
-local function _____7529_51FA_8150_5316_9ECF_6DB2(context, nowMs)
-    context["上次全场甩黏液Ms"] = nowMs
+____exports["释放米亚全场腐化黏液"] = function(context)
     local boss = context["Boss单位"]
-    if not _____5355_4F4D_6709_6548(boss) then
-        return
+    if not _____5355_4F4D_6709_6548(boss) or context["阶段"] ~= 3 then
+        return false
     end
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "腐化黏液涂层", 2)
     _____521B_5EFA_70B9_7279_6548({
@@ -128,14 +136,15 @@ local function _____7529_51FA_8150_5316_9ECF_6DB2(context, nowMs)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue23
+                    goto __continue25
                 end
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, hero, 1, "腐化黏液涂层全场甩黏液")
             end
-            ::__continue23::
+            ::__continue25::
             i = i + 1
         end
     end
+    return true
 end
 ____exports["注册米亚腐化黏液涂层"] = function()
     if _____7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42_5DF2_6CE8_518C then
@@ -145,16 +154,11 @@ ____exports["注册米亚腐化黏液涂层"] = function()
     registerDamageCallback(_____5904_7406_8150_5316_9ECF_6DB2_8FD1_6218_53CD_566C, 0.03)
     registerDamageModifier(_____5904_7406_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8, 35)
 end
-____exports["刷新米亚腐化黏液涂层"] = function(context, nowMs)
+____exports["刷新米亚腐化黏液涂层被动状态"] = function(context)
     _____767B_8BB0_8150_5316_9ECF_6DB2_4E0A_4E0B_6587(context)
     if context["阶段"] ~= 3 then
         return
     end
     _____5237_65B0_8150_5316_9ECF_6DB2Buff(context)
-    local interval = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化黏液涂层"]["全场甩黏液间隔Ms"]
-    if context["上次全场甩黏液Ms"] > 0 and nowMs - context["上次全场甩黏液Ms"] < interval then
-        return
-    end
-    _____7529_51FA_8150_5316_9ECF_6DB2(context, nowMs)
 end
 return ____exports

@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.01．运行时上下文")
 local _____8FDB_5165_4E9A_4F26_67EF_65AFP3 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["进入亚伦柯斯P3"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.02．数值与表现配置")
@@ -50,9 +52,6 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
 local _____65E7_8A93_6B8B_5F71_6280_80FDKey = "旧誓墓碑残影"
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____9500_6BC1_5893_7891_7279_6548(state)
     if state["墓碑特效"] ~= nil and state["墓碑特效"] ~= 0 then
         DestroyEffect(state["墓碑特效"])
@@ -194,7 +193,7 @@ local function _____5C1D_8BD5_91CA_653E_5893_7891_6B8B_5F71(context, state, now)
                                 endY,
                                 cfg["残影斩击宽度"]
                             ) then
-                                goto __continue33
+                                goto __continue32
                             end
                             local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["残影斩击伤害攻击力比例"], ["目标最大生命比例"] = cfg["残影斩击伤害目标最大生命比例"]})
                             _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -210,7 +209,7 @@ local function _____5C1D_8BD5_91CA_653E_5893_7891_6B8B_5F71(context, state, now)
                                 ["标签"] = "亚伦柯斯·旧誓墓碑残影"
                             })
                         end
-                        ::__continue33::
+                        ::__continue32::
                         i = i + 1
                     end
                 end
@@ -291,7 +290,7 @@ ____exports["启动亚伦柯斯旧誓墓碑"] = function(context)
                     do
                         local state = context["墓碑状态列表"][i + 1]
                         if state["已安魂"] then
-                            goto __continue45
+                            goto __continue44
                         end
                         if _____8303_56F4_5185_5B58_5728_73A9_5BB6(context, state) then
                             state["安魂进度秒"] = state["安魂进度秒"] + cfg["检查间隔秒"]
@@ -303,13 +302,13 @@ ____exports["启动亚伦柯斯旧誓墓碑"] = function(context)
                         end
                         if state["安魂进度秒"] >= cfg["安魂持续秒"] then
                             _____5B8C_6210_5893_7891_5B89_9B42(context, state)
-                            goto __continue45
+                            goto __continue44
                         end
                         if current >= state["下次残影Ms"] and _____5C1D_8BD5_91CA_653E_5893_7891_6B8B_5F71(context, state, current) then
                             break
                         end
                     end
-                    ::__continue45::
+                    ::__continue44::
                     i = i + 1
                 end
             end

@@ -8,8 +8,13 @@ import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 播放莫尔特斯限时动作, 极坐标X, 极坐标Y, 点到线段距离平方, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
+import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const jass = require("jass.common") as any;
 
@@ -18,14 +23,10 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
-};
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
@@ -49,17 +50,6 @@ interface 鞭笞通道 {
   X: number;
   Y: number;
   朝向: number;
-}
-
-interface 鞭笞命中变量 {
-  context: 莫尔特斯运行时上下文;
-  channel: 鞭笞通道;
-  命中次数表: Record<number, number | undefined>;
-}
-
-interface 鞭笞波次变量 {
-  context: 莫尔特斯运行时上下文;
-  命中次数表: Record<number, number | undefined>;
 }
 
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
@@ -102,9 +92,14 @@ function 单通道鞭笞命中(this: void, context: 莫尔特斯运行时上下�
   const cfg = 莫尔特斯数值与表现配置.扭曲荆棘鞭笞;
   const endX = 极坐标X(channel.X, channel.朝向, cfg.矩形长度);
   const endY = 极坐标Y(channel.Y, channel.朝向, cfg.矩形长度);
-  AddSpecialEffect(cfg.藤蔓模型路径, channel.X, channel.Y);
+  创建点特效({ 模型路径: cfg.藤蔓模型路径, X: channel.X, Y: channel.Y, 持续秒: cfg.瞬时特效持续秒 });
   for (let i = 1; i <= 3; i++) {
-    AddSpecialEffect(cfg.路径爆点特效路径, 极坐标X(channel.X, channel.朝向, i * 512), 极坐标Y(channel.Y, channel.朝向, i * 512));
+    创建点特效({
+      模型路径: cfg.路径爆点特效路径,
+      X: 极坐标X(channel.X, channel.朝向, i * 512),
+      Y: 极坐标Y(channel.Y, channel.朝向, i * 512),
+      持续秒: cfg.瞬时特效持续秒,
+    });
   }
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
@@ -142,59 +137,77 @@ function 单通道鞭笞命中(this: void, context: 莫尔特斯运行时上下�
   }
 }
 
-function 莫尔特斯荆棘鞭笞命中(this: void, variable?: any): void {
-  const data = variable as 鞭笞命中变量 | undefined;
-  if (data == null) return;
-  单通道鞭笞命中(data.context, data.channel, data.命中次数表);
-}
-
-function 莫尔特斯荆棘鞭笞扫击音效(this: void, variable?: any): void {
-  const context = variable as 莫尔特斯运行时上下文 | undefined;
-  if (context == null || !单位有效(context.Boss单位)) return;
-  播放Boss坐标音效(莫尔特斯音效配置.扭曲荆棘鞭笞.扫击, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
-}
-
-function 执行一波鞭笞(this: void, context: 莫尔特斯运行时上下文, 命中次数表: Record<number, number | undefined>): void {
+function 追加鞭笞波次时间轴(
+  this: void,
+  事件列表: 固定时间轴事件[],
+  context: 莫尔特斯运行时上下文,
+  命中次数表: Record<number, number | undefined>,
+  波次索引: number,
+): void {
   const cfg = 莫尔特斯数值与表现配置.扭曲荆棘鞭笞;
-  const channels = 选择本波通道(context);
-  if (channels.length > 0) {
-    const sfxId = addDelayedCallback(cfg.预警秒 * 1000, 莫尔特斯荆棘鞭笞扫击音效, context);
-    context.清理.登记延迟回调("莫尔特斯-荆棘鞭笞扫击音效", sfxId);
-  }
-  for (let i = 0; i < channels.length; i++) {
-    const channel = channels[i];
-    创建技能提示圈({
-      类型: "矩形",
-      X: 极坐标X(channel.X, channel.朝向, cfg.矩形长度 / 2),
-      Y: 极坐标Y(channel.Y, channel.朝向, cfg.矩形长度 / 2),
-      宽度: cfg.矩形宽度,
-      长度: cfg.矩形长度,
-      朝向: channel.朝向,
-      持续时间: cfg.预警秒,
-    });
-    const id = addDelayedCallback(cfg.预警秒 * 1000, 莫尔特斯荆棘鞭笞命中, { context, channel, 命中次数表 } as 鞭笞命中变量);
-    context.清理.登记延迟回调("莫尔特斯-荆棘鞭笞命中", id);
-  }
-}
-
-function 莫尔特斯荆棘鞭笞波次(this: void, variable?: any): void {
-  const data = variable as 鞭笞波次变量 | undefined;
-  if (data == null) return;
-  执行一波鞭笞(data.context, data.命中次数表);
+  const 波次序号 = 波次索引 + 1;
+  const 预警时点毫秒 = (cfg.开始延迟秒 + 波次索引 * cfg.波次间隔秒) * 1000;
+  const 通道列表: 鞭笞通道[] = [];
+  事件列表.push({
+    时点毫秒: 预警时点毫秒,
+    名称: "扭曲荆棘鞭笞第" + String(波次序号) + "波预警",
+    执行: function 莫尔特斯荆棘鞭笞波次预警(this: void): void {
+      if (!单位有效(context.Boss单位)) return;
+      const selected = 选择本波通道(context);
+      for (let i = 0; i < selected.length; i++) {
+        const channel = selected[i];
+        通道列表.push(channel);
+        创建技能提示圈({
+          类型: "矩形",
+          X: 极坐标X(channel.X, channel.朝向, cfg.矩形长度 / 2),
+          Y: 极坐标Y(channel.Y, channel.朝向, cfg.矩形长度 / 2),
+          宽度: cfg.矩形宽度,
+          长度: cfg.矩形长度,
+          朝向: channel.朝向,
+          持续时间: cfg.预警秒,
+        });
+      }
+    },
+  });
+  事件列表.push({
+    时点毫秒: 预警时点毫秒 + cfg.预警秒 * 1000,
+    名称: "扭曲荆棘鞭笞第" + String(波次序号) + "波结算",
+    执行: function 莫尔特斯荆棘鞭笞波次结算(this: void): void {
+      const boss = context.Boss单位;
+      if (!单位有效(boss) || 通道列表.length <= 0) return;
+      播放Boss坐标音效(莫尔特斯音效配置.扭曲荆棘鞭笞.扫击, GetUnitX(boss), GetUnitY(boss), 莫尔特斯音效配置.默认裁断距离);
+      for (let i = 0; i < 通道列表.length; i++) 单通道鞭笞命中(context, 通道列表[i], 命中次数表);
+    },
+  });
 }
 
 export function 释放莫尔特斯扭曲荆棘鞭笞(this: void, context: 莫尔特斯运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.扭曲荆棘鞭笞;
+  if (cfg.扫击次数 <= 0) return;
+  if (context.扭曲荆棘鞭笞组合执行器 == null) {
+    context.扭曲荆棘鞭笞组合执行器 = 创建固定组合技能执行器<莫尔特斯运行时上下文>({
+      名称: "莫尔特斯-扭曲荆棘鞭笞",
+      清理: context.清理,
+      互斥组: "莫尔特斯扭曲荆棘鞭笞",
+    });
+  }
+  if (context.扭曲荆棘鞭笞组合执行器.是否运行中()) return;
+  const hitMap: Record<number, number | undefined> = {};
+  const 事件列表: 固定时间轴事件[] = [];
+  for (let wave = 0; wave < cfg.扫击次数; wave++) 追加鞭笞波次时间轴(事件列表, context, hitMap, wave);
+  const 最后结算秒 = cfg.开始延迟秒 + (cfg.扫击次数 - 1) * cfg.波次间隔秒 + cfg.预警秒;
+  const 执行ID = context.扭曲荆棘鞭笞组合执行器.开始({
+    key: "扭曲荆棘鞭笞",
+    单位: boss,
+    上下文: context,
+    最大持续毫秒: 最后结算秒 * 1000 + 1000,
+    阶段列表: 创建固定时间轴阶段列表(事件列表),
+  });
+  if (执行ID === 0) return;
   播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(boss, "扭曲荆棘鞭笞");
-  const hitMap: Record<number, number | undefined> = {};
-  for (let wave = 0; wave < cfg.扫击次数; wave++) {
-    const delay = (cfg.开始延迟秒 + wave * cfg.波次间隔秒) * 1000;
-    const id = addDelayedCallback(delay, 莫尔特斯荆棘鞭笞波次, { context, 命中次数表: hitMap } as 鞭笞波次变量);
-    context.清理.登记延迟回调("莫尔特斯-荆棘鞭笞波次", id);
-  }
 }
 
 function on莫尔特斯扭曲荆棘鞭笞施法(this: void, castingUnit: any, spellAbilityId: number): void {

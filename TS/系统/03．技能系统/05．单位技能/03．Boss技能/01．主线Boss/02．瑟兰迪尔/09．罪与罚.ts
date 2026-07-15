@@ -6,7 +6,9 @@ import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置"
 import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位存活 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
+import { 创建固定时间轴阶段列表 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -21,8 +23,12 @@ const { 显示常规技能吟唱条, 关闭吟唱条 } = require("系统.09．�
   显示常规技能吟唱条: (this: void, 参数: any) => void;
   关闭吟唱条: (this: void, 通道?: string) => void;
 };
-const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+const { 创建点特效, createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+  createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
+};
+const { 播放限时单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
+  播放限时单位动画: (this: void, 参数: any) => any;
 };
 const { 获取Boss技能应攻击目标, 获取Boss技能最近敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能应攻击目标: (this: void, boss: any) => { targetRef: any } | null;
@@ -60,10 +66,6 @@ const 瑟兰迪尔单位类型ID = stringToFourCC(瑟兰迪尔单位技能配置
 const 罪与罚技能ID = stringToFourCC(瑟兰迪尔数值与表现配置.罪与罚.技能槽位);
 let 罪与罚已注册 = false;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0;
-}
-
 function 造成伤害(this: void, boss: any, target: any, amount: number, damageType: any): void {
   if (!单位有效(boss) || !单位有效(target) || amount <= 0) return;
   造成单体技能伤害({
@@ -81,10 +83,7 @@ function 造成伤害(this: void, boss: any, target: any, amount: number, damage
 }
 
 function 播放点名特效(this: void, target: any, duration: number): void {
-  const effect = AddSpecialEffectTarget("Common\\Effect\\Element\\Light\\protectionaura.mdx", target, "origin");
-  if (effect != null && effect !== 0) {
-    YDWETimerDestroyEffectSafe(duration, effect);
-  }
+  createTimedUnitEffect(target, "origin", "Common\\Effect\\Element\\Light\\protectionaura.mdx", duration);
 }
 
 function 让单位面向目标(this: void, caster: any, target: any): void {
@@ -117,13 +116,14 @@ function 取象限法阵颜色(this: void, type: number, config: any): number {
 
 function 播放施法法阵(this: void, boss: any, type: number, config: any): void {
   if (!单位有效(boss)) return;
-  const effect = AddSpecialEffect(config.施法法阵特效, GetUnitX(boss), GetUnitY(boss));
-  if (effect == null || effect === 0) return;
-  EXSetEffectSize(effect, config.施法法阵缩放);
-  if (typeof DzSetEffectVertexColor === "function") {
-    DzSetEffectVertexColor(effect, 取象限法阵颜色(type, config));
-  }
-  YDWETimerDestroyEffectSafe(config.施法硬直秒 + 0.5, effect);
+  创建点特效({
+    模型路径: config.施法法阵特效,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    缩放: config.施法法阵缩放,
+    顶点颜色: 取象限法阵颜色(type, config),
+    持续秒: config.施法硬直秒 + 0.5,
+  });
 }
 
 function 结算周期伤害(this: void, boss: any, target: any, times: number, damage: number, damageType: any): void {
@@ -142,6 +142,61 @@ export function 释放瑟兰迪尔罪与罚(this: void, context: 瑟兰迪尔运
   if (!单位有效(boss) || !单位有效(actualTarget)) return;
   const type = GetRandomInt(1, 4);
   const 象限名称 = 取象限名称(type);
+  if (context.罪与罚组合执行器 == null) {
+    context.罪与罚组合执行器 = 创建固定组合技能执行器<瑟兰迪尔运行时上下文>({
+      名称: "瑟兰迪尔-罪与罚",
+      清理: context.清理,
+      互斥组: "瑟兰迪尔罪与罚",
+    });
+  }
+  const 执行ID = context.罪与罚组合执行器.开始({
+    key: "罪与罚",
+    单位: boss,
+    上下文: context,
+    最大持续毫秒: R2I((config.施法硬直秒 + config.延迟秒) * 1000) + 1000,
+    阶段列表: 创建固定时间轴阶段列表([{
+      时点毫秒: R2I(config.施法硬直秒 * 1000),
+      名称: "罪与罚点名开始",
+      执行: function 瑟兰迪尔罪与罚点名开始(this: void): void {
+        关闭吟唱条("常规技能");
+        if (!单位有效(boss) || !单位有效(actualTarget)) return;
+        让单位面向目标(boss, actualTarget);
+        Sound3DII_CooPlayReuse(config.点名音效, GetUnitX(actualTarget), GetUnitY(actualTarget), 0, config.点名音效裁断距离);
+        播放点名特效(actualTarget, config.延迟秒);
+      },
+    }, {
+      时点毫秒: R2I((config.施法硬直秒 + config.延迟秒) * 1000),
+      名称: "罪与罚结算",
+      执行: function 瑟兰迪尔罪与罚结算(this: void): void {
+        if (!单位有效(boss) || !单位有效(actualTarget)) return;
+        让单位面向目标(boss, actualTarget);
+        const maxLife = GetUnitState(actualTarget, UNIT_STATE_MAX_LIFE);
+        if (type === 1) {
+          挂Buff(boss, actualTarget, config.红惩罚BuffID, config.惩罚持续秒, 0, "BuffIcon\\Boss\\Thranduil\\lieyanzhuoshao.blp", config.红特效);
+          挂Buff(boss, actualTarget, config.红增益BuffID, config.增益持续秒, 0.35, "BuffIcon\\Boss\\Thranduil\\nuhuozhangkong.blp", config.红特效);
+          结算周期伤害(boss, actualTarget, config.惩罚持续秒, maxLife * 0.05, jass.DAMAGE_TYPE_FIRE);
+        } else if (type === 2) {
+          挂Buff(boss, actualTarget, config.蓝惩罚BuffID, config.惩罚持续秒, 0.7, "BuffIcon\\Boss\\Thranduil\\shendudongjie.blp", config.蓝惩罚特效);
+          挂Buff(boss, actualTarget, config.蓝增益BuffID, config.增益持续秒, 0.4, "BuffIcon\\Boss\\Thranduil\\bingshuangbihu.blp", config.蓝增益特效);
+        } else if (type === 3) {
+          挂Buff(boss, actualTarget, config.绿惩罚BuffID, config.惩罚持续秒, 0, "BuffIcon\\Boss\\Thranduil\\zhimingdusu.blp", config.绿惩罚特效);
+          挂Buff(boss, actualTarget, config.绿增益BuffID, config.增益持续秒, 0, "BuffIcon\\Boss\\Thranduil\\duyefanzhuan.blp", config.绿增益特效);
+          结算周期伤害(boss, actualTarget, config.惩罚持续秒, maxLife * 0.04, jass.DAMAGE_TYPE_POISON);
+        } else {
+          const mana = GetUnitState(actualTarget, UNIT_STATE_MANA);
+          const maxMana = GetUnitState(actualTarget, UNIT_STATE_MAX_MANA);
+          const damage = maxMana > 0 ? (maxMana - mana) * 2 : 200;
+          挂Buff(boss, actualTarget, config.黄惩罚BuffID, config.惩罚持续秒, 0, "BuffIcon\\Boss\\Thranduil\\molifanshi.blp");
+          挂Buff(boss, actualTarget, config.黄增益BuffID, config.增益持续秒, 0, "BuffIcon\\Boss\\Thranduil\\aoshuchaozai.blp", config.黄增益特效);
+          结算周期伤害(boss, actualTarget, config.惩罚持续秒, damage, jass.DAMAGE_TYPE_MIND);
+        }
+      },
+    }]),
+    结束回调: function 瑟兰迪尔罪与罚组合结束(this: void, event): void {
+      if (event.原因 !== "完成") 关闭吟唱条("常规技能");
+    },
+  });
+  if (执行ID === 0) return;
   播放瑟兰迪尔台词(boss, "罪与罚");
   让单位面向目标(boss, actualTarget);
   开始硬直(boss, config.施法硬直秒);
@@ -152,47 +207,14 @@ export function 释放瑟兰迪尔罪与罚(this: void, context: 瑟兰迪尔运
     标题文本: config.吟唱条标题文本 + "：" + 象限名称,
     提示文本: "常规技能：即将赐予" + 象限名称 + "象限",
   });
-  SetUnitTimeScale(boss, config.动画速度);
-  SetUnitAnimationByIndex(boss, config.动画编号);
-  addDelayedCallback(config.动画重播延迟Ms, function 重播瑟兰迪尔罪与罚施法动作(this: void): void {
-    if (!单位有效(boss)) return;
-    SetUnitTimeScale(boss, config.动画速度);
-    SetUnitAnimationByIndex(boss, config.动画编号);
-  });
-
-  addDelayedCallback(R2I(config.施法硬直秒 * 1000), function 瑟兰迪尔罪与罚点名开始(this: void): void {
-    关闭吟唱条("常规技能");
-    if (!单位有效(boss) || !单位有效(actualTarget)) return;
-    让单位面向目标(boss, actualTarget);
-    SetUnitTimeScale(boss, config.恢复动画速度);
-    SetUnitAnimationByIndex(boss, config.恢复动画编号);
-    Sound3DII_CooPlayReuse(config.点名音效, GetUnitX(actualTarget), GetUnitY(actualTarget), 0, config.点名音效裁断距离);
-    播放点名特效(actualTarget, config.延迟秒);
-  });
-
-  addDelayedCallback(R2I((config.施法硬直秒 + config.延迟秒) * 1000), function 瑟兰迪尔罪与罚结算(this: void): void {
-    if (!单位有效(boss) || !单位有效(actualTarget)) return;
-    让单位面向目标(boss, actualTarget);
-    const maxLife = GetUnitState(actualTarget, UNIT_STATE_MAX_LIFE);
-    if (type === 1) {
-      挂Buff(boss, actualTarget, config.红惩罚BuffID, config.惩罚持续秒, 0, "BuffIcon\\Boss\\Thranduil\\lieyanzhuoshao.blp", config.红特效);
-      挂Buff(boss, actualTarget, config.红增益BuffID, config.增益持续秒, 0.35, "BuffIcon\\Boss\\Thranduil\\nuhuozhangkong.blp", config.红特效);
-      结算周期伤害(boss, actualTarget, config.惩罚持续秒, maxLife * 0.05, jass.DAMAGE_TYPE_FIRE);
-    } else if (type === 2) {
-      挂Buff(boss, actualTarget, config.蓝惩罚BuffID, config.惩罚持续秒, 0.7, "BuffIcon\\Boss\\Thranduil\\shendudongjie.blp", config.蓝惩罚特效);
-      挂Buff(boss, actualTarget, config.蓝增益BuffID, config.增益持续秒, 0.4, "BuffIcon\\Boss\\Thranduil\\bingshuangbihu.blp", config.蓝增益特效);
-    } else if (type === 3) {
-      挂Buff(boss, actualTarget, config.绿惩罚BuffID, config.惩罚持续秒, 0, "BuffIcon\\Boss\\Thranduil\\zhimingdusu.blp", config.绿惩罚特效);
-      挂Buff(boss, actualTarget, config.绿增益BuffID, config.增益持续秒, 0, "BuffIcon\\Boss\\Thranduil\\duyefanzhuan.blp", config.绿增益特效);
-      结算周期伤害(boss, actualTarget, config.惩罚持续秒, maxLife * 0.04, jass.DAMAGE_TYPE_POISON);
-    } else {
-      const mana = GetUnitState(actualTarget, UNIT_STATE_MANA);
-      const maxMana = GetUnitState(actualTarget, UNIT_STATE_MAX_MANA);
-      const damage = maxMana > 0 ? (maxMana - mana) * 2 : 200;
-      挂Buff(boss, actualTarget, config.黄惩罚BuffID, config.惩罚持续秒, 0, "BuffIcon\\Boss\\Thranduil\\molifanshi.blp");
-      挂Buff(boss, actualTarget, config.黄增益BuffID, config.增益持续秒, 0, "BuffIcon\\Boss\\Thranduil\\aoshuchaozai.blp", config.黄增益特效);
-      结算周期伤害(boss, actualTarget, config.惩罚持续秒, damage, jass.DAMAGE_TYPE_MIND);
-    }
+  播放限时单位动画({
+    单位: boss,
+    动画编号: config.动画编号,
+    动画速度: config.动画速度,
+    持续秒: config.施法硬直秒,
+    重播时点秒列表: [config.动画重播延迟Ms / 1000],
+    恢复动画编号: config.恢复动画编号,
+    恢复动画速度: config.恢复动画速度,
   });
 }
 

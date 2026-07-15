@@ -23,20 +23,23 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
+local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
+local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
+local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
 local GetRandomInt = jass.GetRandomInt
-local AddSpecialEffect = jass.AddSpecialEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
 local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -108,15 +111,16 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["扭曲荆棘鞭笞"]
     local endX = _____6781_5750_6807X(channel.X, channel["朝向"], cfg["矩形长度"])
     local endY = _____6781_5750_6807Y(channel.Y, channel["朝向"], cfg["矩形长度"])
-    AddSpecialEffect(cfg["藤蔓模型路径"], channel.X, channel.Y)
+    _____521B_5EFA_70B9_7279_6548({["模型路径"] = cfg["藤蔓模型路径"], X = channel.X, Y = channel.Y, ["持续秒"] = cfg["瞬时特效持续秒"]})
     do
         local i = 1
         while i <= 3 do
-            AddSpecialEffect(
-                cfg["路径爆点特效路径"],
-                _____6781_5750_6807X(channel.X, channel["朝向"], i * 512),
-                _____6781_5750_6807Y(channel.Y, channel["朝向"], i * 512)
-            )
+            _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = cfg["路径爆点特效路径"],
+                X = _____6781_5750_6807X(channel.X, channel["朝向"], i * 512),
+                Y = _____6781_5750_6807Y(channel.Y, channel["朝向"], i * 512),
+                ["持续秒"] = cfg["瞬时特效持续秒"]
+            })
             i = i + 1
         end
     end
@@ -177,59 +181,61 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
         end
     end
 end
-local function _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_547D_4E2D(variable)
-    local data = variable
-    if data == nil then
-        return
-    end
-    _____5355_901A_9053_97AD_7B1E_547D_4E2D(data.context, data.channel, data["命中次数表"])
-end
-local function _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_626B_51FB_97F3_6548(variable)
-    local context = variable
-    if context == nil or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-        return
-    end
-    _____64AD_653EBoss_5750_6807_97F3_6548(
-        _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["扭曲荆棘鞭笞"]["扫击"],
-        GetUnitX(context["Boss单位"]),
-        GetUnitY(context["Boss单位"]),
-        _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
-    )
-end
-local function _____6267_884C_4E00_6CE2_97AD_7B1E(context, _____547D_4E2D_6B21_6570_8868)
+local function _____8FFD_52A0_97AD_7B1E_6CE2_6B21_65F6_95F4_8F74(_____4E8B_4EF6_5217_8868, context, _____547D_4E2D_6B21_6570_8868, _____6CE2_6B21_7D22_5F15)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["扭曲荆棘鞭笞"]
-    local channels = _____9009_62E9_672C_6CE2_901A_9053(context)
-    if #channels > 0 then
-        local sfxId = addDelayedCallback(cfg["预警秒"] * 1000, _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_626B_51FB_97F3_6548, context)
-        local ____self_8 = context["清理"]
-        ____self_8["登记延迟回调"](____self_8, "莫尔特斯-荆棘鞭笞扫击音效", sfxId)
-    end
-    do
-        local i = 0
-        while i < #channels do
-            local channel = channels[i + 1]
-            _____521B_5EFA_6280_80FD_63D0_793A_5708({
-                ["类型"] = "矩形",
-                X = _____6781_5750_6807X(channel.X, channel["朝向"], cfg["矩形长度"] / 2),
-                Y = _____6781_5750_6807Y(channel.Y, channel["朝向"], cfg["矩形长度"] / 2),
-                ["宽度"] = cfg["矩形宽度"],
-                ["长度"] = cfg["矩形长度"],
-                ["朝向"] = channel["朝向"],
-                ["持续时间"] = cfg["预警秒"]
-            })
-            local id = addDelayedCallback(cfg["预警秒"] * 1000, _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_547D_4E2D, {context = context, channel = channel, ["命中次数表"] = _____547D_4E2D_6B21_6570_8868})
-            local ____self_9 = context["清理"]
-            ____self_9["登记延迟回调"](____self_9, "莫尔特斯-荆棘鞭笞命中", id)
-            i = i + 1
+    local _____6CE2_6B21_5E8F_53F7 = _____6CE2_6B21_7D22_5F15 + 1
+    local _____9884_8B66_65F6_70B9_6BEB_79D2 = (cfg["开始延迟秒"] + _____6CE2_6B21_7D22_5F15 * cfg["波次间隔秒"]) * 1000
+    local _____901A_9053_5217_8868 = {}
+    _____4E8B_4EF6_5217_8868[#_____4E8B_4EF6_5217_8868 + 1] = {
+        ["时点毫秒"] = _____9884_8B66_65F6_70B9_6BEB_79D2,
+        ["名称"] = ("扭曲荆棘鞭笞第" .. tostring(_____6CE2_6B21_5E8F_53F7)) .. "波预警",
+        ["执行"] = function()
+            if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+                return
+            end
+            local selected = _____9009_62E9_672C_6CE2_901A_9053(context)
+            do
+                local i = 0
+                while i < #selected do
+                    local channel = selected[i + 1]
+                    _____901A_9053_5217_8868[#_____901A_9053_5217_8868 + 1] = channel
+                    _____521B_5EFA_6280_80FD_63D0_793A_5708({
+                        ["类型"] = "矩形",
+                        X = _____6781_5750_6807X(channel.X, channel["朝向"], cfg["矩形长度"] / 2),
+                        Y = _____6781_5750_6807Y(channel.Y, channel["朝向"], cfg["矩形长度"] / 2),
+                        ["宽度"] = cfg["矩形宽度"],
+                        ["长度"] = cfg["矩形长度"],
+                        ["朝向"] = channel["朝向"],
+                        ["持续时间"] = cfg["预警秒"]
+                    })
+                    i = i + 1
+                end
+            end
         end
-    end
-end
-local function _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_6CE2_6B21(variable)
-    local data = variable
-    if data == nil then
-        return
-    end
-    _____6267_884C_4E00_6CE2_97AD_7B1E(data.context, data["命中次数表"])
+    }
+    _____4E8B_4EF6_5217_8868[#_____4E8B_4EF6_5217_8868 + 1] = {
+        ["时点毫秒"] = _____9884_8B66_65F6_70B9_6BEB_79D2 + cfg["预警秒"] * 1000,
+        ["名称"] = ("扭曲荆棘鞭笞第" .. tostring(_____6CE2_6B21_5E8F_53F7)) .. "波结算",
+        ["执行"] = function()
+            local boss = context["Boss单位"]
+            if not _____5355_4F4D_6709_6548(boss) or #_____901A_9053_5217_8868 <= 0 then
+                return
+            end
+            _____64AD_653EBoss_5750_6807_97F3_6548(
+                _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["扭曲荆棘鞭笞"]["扫击"],
+                GetUnitX(boss),
+                GetUnitY(boss),
+                _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
+            )
+            do
+                local i = 0
+                while i < #_____901A_9053_5217_8868 do
+                    _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, _____901A_9053_5217_8868[i + 1], _____547D_4E2D_6B21_6570_8868)
+                    i = i + 1
+                end
+            end
+        end
+    }
 end
 ____exports["释放莫尔特斯扭曲荆棘鞭笞"] = function(context)
     local boss = context["Boss单位"]
@@ -237,19 +243,42 @@ ____exports["释放莫尔特斯扭曲荆棘鞭笞"] = function(context)
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["扭曲荆棘鞭笞"]
-    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
-    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "扭曲荆棘鞭笞")
+    if cfg["扫击次数"] <= 0 then
+        return
+    end
+    if context["扭曲荆棘鞭笞组合执行器"] == nil then
+        context["扭曲荆棘鞭笞组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "莫尔特斯-扭曲荆棘鞭笞", ["清理"] = context["清理"], ["互斥组"] = "莫尔特斯扭曲荆棘鞭笞"})
+    end
+    local ____self_8 = context["扭曲荆棘鞭笞组合执行器"]
+    if ____self_8["是否运行中"](____self_8) then
+        return
+    end
     local hitMap = {}
+    local _____4E8B_4EF6_5217_8868 = {}
     do
         local wave = 0
         while wave < cfg["扫击次数"] do
-            local delay = (cfg["开始延迟秒"] + wave * cfg["波次间隔秒"]) * 1000
-            local id = addDelayedCallback(delay, _____83AB_5C14_7279_65AF_8346_68D8_97AD_7B1E_6CE2_6B21, {context = context, ["命中次数表"] = hitMap})
-            local ____self_10 = context["清理"]
-            ____self_10["登记延迟回调"](____self_10, "莫尔特斯-荆棘鞭笞波次", id)
+            _____8FFD_52A0_97AD_7B1E_6CE2_6B21_65F6_95F4_8F74(_____4E8B_4EF6_5217_8868, context, hitMap, wave)
             wave = wave + 1
         end
     end
+    local _____6700_540E_7ED3_7B97_79D2 = cfg["开始延迟秒"] + (cfg["扫击次数"] - 1) * cfg["波次间隔秒"] + cfg["预警秒"]
+    local ____self_9 = context["扭曲荆棘鞭笞组合执行器"]
+    local _____6267_884CID = ____self_9["开始"](
+        ____self_9,
+        {
+            key = "扭曲荆棘鞭笞",
+            ["单位"] = boss,
+            ["上下文"] = context,
+            ["最大持续毫秒"] = _____6700_540E_7ED3_7B97_79D2 * 1000 + 1000,
+            ["阶段列表"] = _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868(_____4E8B_4EF6_5217_8868)
+        }
+    )
+    if _____6267_884CID == 0 then
+        return
+    end
+    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
+    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "扭曲荆棘鞭笞")
 end
 local function ____on_83AB_5C14_7279_65AF_626D_66F2_8346_68D8_97AD_7B1E_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____626D_66F2_8346_68D8_97AD_7B1E_6280_80FDID then

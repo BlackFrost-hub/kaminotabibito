@@ -1,5 +1,9 @@
 /** @noSelfInFile */
 
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import { 菲利斯单位技能配置 } from "./00．配置";
 import { 获取或创建菲利斯上下文, 菲利斯运行时上下文 } from "./01．运行时上下文";
 import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
@@ -26,9 +30,6 @@ const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -89,8 +90,10 @@ function 结算剑气初始命中(this: void, context: 菲利斯运行时上下�
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     if (单位到线段距离平方(hero, ax, ay, bx, by) > width2) continue;
-    const damage = 读取单位攻击力(boss) * cfg.Boss攻击力比例
-      + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.目标最大生命比例;
+    const damage = 计算组合技能伤害(boss, hero, {
+      来源攻击力比例: cfg.Boss攻击力比例,
+      目标最大生命比例: cfg.目标最大生命比例,
+    });
     造成AOE技能伤害({
       技能ID: 剑气灵斩技能ID,
       来源: boss,
@@ -140,8 +143,10 @@ function 创建侵蚀残留(this: void, context: 菲利斯运行时上下文, ax
       const hero = heroes[i];
       if (!单位有效(hero)) continue;
       if (单位到线段距离平方(hero, ax, ay, bx, by) > width2) continue;
-      const damage = 读取单位攻击力(boss) * cfg.侵蚀Boss攻击力比例
-        + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.侵蚀目标最大生命比例;
+      const damage = 计算组合技能伤害(boss, hero, {
+        来源攻击力比例: cfg.侵蚀Boss攻击力比例,
+        目标最大生命比例: cfg.侵蚀目标最大生命比例,
+      });
       造成AOE技能伤害({
         技能ID: 剑气灵斩技能ID,
         来源: boss,

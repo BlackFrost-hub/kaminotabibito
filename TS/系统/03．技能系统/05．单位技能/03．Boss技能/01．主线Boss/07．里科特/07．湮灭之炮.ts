@@ -72,11 +72,6 @@ const 湮灭之炮技能ID = stringToFourCC(里科特数值与表现配置.湮�
 const 蝗虫技能ID = stringToFourCC("Aloc");
 let 已注册 = false;
 
-function 播放限时点特效(this: void, model: string, x: number, y: number, duration: number): void {
-  if (model === "") return;
-  createTimedEffect(model, x, y, 0, duration);
-}
-
 function 创建湮灭投影单位(this: void, boss: any, x: number, y: number, face: number): any {
   const cfg = 里科特数值与表现配置.湮灭之炮;
   const projection = CreateUnit(GetOwningPlayer(boss), stringToFourCC(cfg.投影单位类型), x, y, face);
@@ -85,7 +80,7 @@ function 创建湮灭投影单位(this: void, boss: any, x: number, y: number, f
   SetUnitPathing(projection, false);
   SetUnitScale(projection, cfg.投影缩放, cfg.投影缩放, cfg.投影缩放);
   SetUnitVertexColor(projection, 160, 210, 255, cfg.投影透明度);
-  播放限时点特效(cfg.出现特效路径, x, y, cfg.出现特效持续秒);
+  createTimedEffect(cfg.出现特效路径, x, y, 0, cfg.出现特效持续秒);
   return projection;
 }
 
@@ -112,7 +107,7 @@ function 结算湮灭之炮一跳(this: void, data: 湮灭投影): void {
   }
   data.剩余跳数 = data.剩余跳数 - 1;
   创建湮灭之炮预警(data);
-  播放限时点特效(里科特数值与表现配置.湮灭之炮.射线特效路径, data.终点X, data.终点Y, 里科特数值与表现配置.湮灭之炮.射线持续秒);
+  createTimedEffect(里科特数值与表现配置.湮灭之炮.射线特效路径, data.终点X, data.终点Y, 0, 里科特数值与表现配置.湮灭之炮.射线持续秒);
 
   const heroes = 获取Boss技能敌对英雄列表(boss);
   const damage = 读取单位攻击力(boss) * 里科特数值与表现配置.湮灭之炮.每跳Boss攻击力比例;

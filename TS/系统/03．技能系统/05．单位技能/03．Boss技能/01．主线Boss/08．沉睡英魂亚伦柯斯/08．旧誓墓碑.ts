@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 进入亚伦柯斯P3 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
@@ -62,10 +63,6 @@ interface 旧誓墓碑状态 {
   墓碑特效?: any;
   范围特效?: any;
   下次残影Ms: number;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 销毁墓碑特效(this: void, state: 旧誓墓碑状态): void {

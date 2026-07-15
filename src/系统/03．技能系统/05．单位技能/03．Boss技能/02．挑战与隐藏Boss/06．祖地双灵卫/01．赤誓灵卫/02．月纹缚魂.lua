@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
 local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["祖地双灵卫数值与表现配置"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
@@ -33,9 +35,6 @@ local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local RAD_TO_DEG = 57.29577951308232
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____6784_5EFA_6708_7EB9_76EE_6807_5217_8868(boss, preferred)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     local playerCount = _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570()
@@ -138,12 +137,12 @@ ____exports["释放月纹缚魂"] = function(context, preferredTarget)
                                 local hit = heroes[j + 1]
                                 local hid = GetHandleId(hit) or 0
                                 if hid == 0 or damaged[hid] == true then
-                                    goto __continue25
+                                    goto __continue24
                                 end
                                 local dx = GetUnitX(hit) - point.X
                                 local dy = GetUnitY(hit) - point.Y
                                 if dx * dx + dy * dy > radius2 then
-                                    goto __continue25
+                                    goto __continue24
                                 end
                                 damaged[hid] = true
                                 local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
@@ -161,7 +160,7 @@ ____exports["释放月纹缚魂"] = function(context, preferredTarget)
                                 })
                                 _____5F00_59CB_786C_76F4(hit, cfg["硬直秒"])
                             end
-                            ::__continue25::
+                            ::__continue24::
                             j = j + 1
                         end
                     end

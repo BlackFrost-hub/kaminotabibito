@@ -22,9 +22,6 @@ const { 记录Boss自动技能启动 } = require("系统.03．技能系统.06．
 const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用") as {
   应用Boss战启动属性配置: (this: void, unit: any) => void;
 };
-const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  getServerTime: (this: void) => number;
-};
 const { 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
   标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
 };
@@ -91,11 +88,11 @@ const { 释放卡瑟拉墨汁喷吐 } = require("系统.03．技能系统.05．�
 const { 释放卡瑟拉高压水炮 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.07．高压水炮") as {
   释放卡瑟拉高压水炮: (this: void, context: any) => void;
 };
-const { 尝试触发卡瑟拉触手解放 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.08．触手解放") as {
-  尝试触发卡瑟拉触手解放: (this: void, context: any) => void;
+const { 触发卡瑟拉触手解放 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.08．触手解放") as {
+  触发卡瑟拉触手解放: (this: void, context: any) => void;
 };
-const { 尝试释放卡瑟拉共生电击 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.09．共生电击") as {
-  尝试释放卡瑟拉共生电击: (this: void, context: any, nowMs: number) => void;
+const { 释放卡瑟拉共生电击 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.09．共生电击") as {
+  释放卡瑟拉共生电击: (this: void, context: any) => boolean;
 };
 
 const { 获取或创建莫尔特斯上下文 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.01．运行时上下文") as {
@@ -116,14 +113,14 @@ const { 释放莫尔特斯扭曲荆棘鞭笞 } = require("系统.03．技能系�
 const { 释放莫尔特斯腐败之种 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.07．腐败之种") as {
   释放莫尔特斯腐败之种: (this: void, context: any) => void;
 };
-const { 尝试触发莫尔特斯根系觉醒 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.08．根系觉醒") as {
-  尝试触发莫尔特斯根系觉醒: (this: void, context: any) => void;
+const { 触发莫尔特斯根系觉醒 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.08．根系觉醒") as {
+  触发莫尔特斯根系觉醒: (this: void, context: any) => void;
 };
-const { 尝试触发莫尔特斯腐朽领域 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.09．腐朽领域") as {
-  尝试触发莫尔特斯腐朽领域: (this: void, context: any) => void;
+const { 触发莫尔特斯腐朽领域 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.09．腐朽领域") as {
+  触发莫尔特斯腐朽领域: (this: void, context: any) => void;
 };
-const { 尝试释放莫尔特斯共生腐朽虫群 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.10．共生腐朽虫群") as {
-  尝试释放莫尔特斯共生腐朽虫群: (this: void, context: any, nowMs: number) => void;
+const { 释放莫尔特斯共生腐朽虫群 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.10．共生腐朽虫群") as {
+  释放莫尔特斯共生腐朽虫群: (this: void, context: any) => boolean;
 };
 const { 释放莫尔特斯古木悲鸣 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.11．古木悲鸣") as {
   释放莫尔特斯古木悲鸣: (this: void, context: any) => void;
@@ -460,7 +457,7 @@ function on卡瑟拉技能5测试命令(this: void, player: any): void {
 function on卡瑟拉技能6测试命令(this: void, player: any): void {
   const context = 创建卡瑟拉测试(player);
   if (context != null) {
-    尝试触发卡瑟拉触手解放(context);
+    触发卡瑟拉触手解放(context);
     提示(player, "卡瑟拉", "已测试：触手解放。");
   }
 }
@@ -468,7 +465,7 @@ function on卡瑟拉技能6测试命令(this: void, player: any): void {
 function on卡瑟拉技能7测试命令(this: void, player: any): void {
   const context = 创建卡瑟拉测试(player);
   if (context != null) {
-    尝试释放卡瑟拉共生电击(context, getServerTime());
+    释放卡瑟拉共生电击(context);
     提示(player, "卡瑟拉", "已测试：共生电击。");
   }
 }
@@ -514,7 +511,7 @@ function on莫尔特斯技能4测试命令(this: void, player: any): void {
 function on莫尔特斯技能5测试命令(this: void, player: any): void {
   const context = 创建莫尔特斯测试(player);
   if (context != null) {
-    尝试触发莫尔特斯根系觉醒(context);
+    触发莫尔特斯根系觉醒(context);
     提示(player, "莫尔特斯", "已测试：根系觉醒。");
   }
 }
@@ -522,7 +519,7 @@ function on莫尔特斯技能5测试命令(this: void, player: any): void {
 function on莫尔特斯技能6测试命令(this: void, player: any): void {
   const context = 创建莫尔特斯测试(player);
   if (context != null) {
-    尝试触发莫尔特斯腐朽领域(context);
+    触发莫尔特斯腐朽领域(context);
     提示(player, "莫尔特斯", "已测试：腐朽领域。");
   }
 }
@@ -530,7 +527,7 @@ function on莫尔特斯技能6测试命令(this: void, player: any): void {
 function on莫尔特斯技能7测试命令(this: void, player: any): void {
   const context = 创建莫尔特斯测试(player);
   if (context != null) {
-    尝试释放莫尔特斯共生腐朽虫群(context, getServerTime());
+    释放莫尔特斯共生腐朽虫群(context);
     提示(player, "莫尔特斯", "已测试：共生腐朽虫群。");
   }
 }

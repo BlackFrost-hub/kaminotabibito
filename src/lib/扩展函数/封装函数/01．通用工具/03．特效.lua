@@ -6,7 +6,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84, _____9650_5236_5230_989C_8272_5B57_8282, _____53D6_7279_6548_9876_70B9_989C_8272, _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4, _____521B_5EFA_5FAA_73AF_70B9_7279_6548_4E00_6B21, _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick, _____786E_4FDD_5FAA_73AF_70B9_7279_6548Tick, _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55, ____on_5FAA_73AF_70B9_7279_6548Tick, destroyBoundEffect, _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5, _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5, _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548, _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1, _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1, ____on_7279_6548_9500_6BC1_68C0_67E5, jass, addPeriodicCallback, removePeriodicCallback, getServerTime, AddSpecialEffect, DestroyEffect, EXSetEffectXY, EXSetEffectZ, EXSetEffectSize, EXSetEffectSpeed, EXEffectMatScale, DzSetEffectScale, DzGetColor, DzSetEffectVertexColor, _____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868, _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868, _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID, _____5FAA_73AF_70B9_7279_6548_68C0_67E5_95F4_9694_6BEB_79D2, _____5FAA_73AF_70B9_7279_6548_8868, _____5FAA_73AF_70B9_7279_6548_6570_91CF, _____5FAA_73AF_70B9_7279_6548_56DE_8C03ID, _____4E0B_4E00_4E2A_5FAA_73AF_70B9_7279_6548ID, unitEffectMap
+local _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84, _____9650_5236_5230_989C_8272_5B57_8282, _____53D6_7279_6548_9876_70B9_989C_8272, _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4, _____521B_5EFA_5FAA_73AF_70B9_7279_6548_4E00_6B21, _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick, _____786E_4FDD_5FAA_73AF_70B9_7279_6548Tick, _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55, ____on_5FAA_73AF_70B9_7279_6548Tick, destroyBoundEffect, _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5, _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5, _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548, _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1, _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1, ____on_7279_6548_9500_6BC1_68C0_67E5, jass, addPeriodicCallback, removePeriodicCallback, getServerTime, AddSpecialEffect, DestroyEffect, EXSetEffectXY, EXSetEffectZ, EXSetEffectSize, EXSetEffectSpeed, EXEffectMatRotateX, EXEffectMatRotateY, EXEffectMatRotateZ, EXEffectMatScale, DzSetEffectScale, DzGetColor, DzSetEffectVertexColor, _____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868, _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868, _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID, _____5FAA_73AF_70B9_7279_6548_68C0_67E5_95F4_9694_6BEB_79D2, _____5FAA_73AF_70B9_7279_6548_8868, _____5FAA_73AF_70B9_7279_6548_6570_91CF, _____5FAA_73AF_70B9_7279_6548_56DE_8C03ID, _____4E0B_4E00_4E2A_5FAA_73AF_70B9_7279_6548ID, unitEffectMap
 function _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84(modelPath)
     if (string.find(modelPath, "imports\\", nil, true) or 0) - 1 == 0 then
         return __TS__StringSubstring(modelPath, 8)
@@ -15,6 +15,23 @@ function _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84(modelPath)
         return __TS__StringSubstring(modelPath, 8)
     end
     return modelPath
+end
+____exports["设置特效XYZ轴旋转"] = function(effect, _____53C2_6570)
+    if effect == nil or effect == 0 or _____53C2_6570 == nil then
+        return
+    end
+    local x = __TS__Number(_____53C2_6570["X轴角度"]) or 0
+    local y = __TS__Number(_____53C2_6570["Y轴角度"]) or 0
+    local z = __TS__Number(_____53C2_6570["Z轴角度"]) or 0
+    if x ~= 0 then
+        EXEffectMatRotateX(effect, x)
+    end
+    if y ~= 0 then
+        EXEffectMatRotateY(effect, y)
+    end
+    if z ~= 0 then
+        EXEffectMatRotateZ(effect, z)
+    end
 end
 function _____9650_5236_5230_989C_8272_5B57_8282(value)
     if value < 0 then
@@ -36,10 +53,7 @@ function _____53D6_7279_6548_9876_70B9_989C_8272(_____53C2_6570)
     local red = _____9650_5236_5230_989C_8272_5B57_8282(_____53C2_6570["红"])
     local green = _____9650_5236_5230_989C_8272_5B57_8282(_____53C2_6570["绿"])
     local blue = _____9650_5236_5230_989C_8272_5B57_8282(_____53C2_6570["蓝"])
-    if type(DzGetColor) == "function" then
-        return DzGetColor(alpha, red, green, blue)
-    end
-    return alpha * 16777216 + red * 65536 + green * 256 + blue
+    return DzGetColor(alpha, red, green, blue)
 end
 function _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4(effect)
     if effect == nil or effect == 0 then
@@ -62,12 +76,13 @@ function _____521B_5EFA_5FAA_73AF_70B9_7279_6548_4E00_6B21(_____8BB0_5F55)
     if _____53C2_6570.Z ~= nil and _____53C2_6570.Z ~= 0 then
         EXSetEffectZ(effect, _____53C2_6570.Z)
     end
+    ____exports["设置特效XYZ轴旋转"](effect, _____53C2_6570)
     ____exports["设置Dz绑定特效缩放"](effect, _____53C2_6570["缩放"] or 1)
     if _____53C2_6570["动画速度"] ~= nil then
         EXSetEffectSpeed(effect, _____53C2_6570["动画速度"])
     end
     local color = _____53D6_7279_6548_9876_70B9_989C_8272(_____53C2_6570)
-    if color ~= nil and type(DzSetEffectVertexColor) == "function" then
+    if color ~= nil then
         DzSetEffectVertexColor(effect, color)
     end
     return effect
@@ -99,13 +114,13 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
             local id = idText
             local _____8BB0_5F55 = _____5FAA_73AF_70B9_7279_6548_8868[id]
             if _____8BB0_5F55 == nil then
-                goto __continue47
+                goto __continue46
             end
             local _____53C2_6570 = _____8BB0_5F55["参数"]
             local alive = _____53C2_6570["存活条件"] == nil or _____53C2_6570["存活条件"]()
             if _____8BB0_5F55["已停止"] or not alive or _____8BB0_5F55["结束毫秒"] > 0 and now >= _____8BB0_5F55["结束毫秒"] then
                 _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55(id, _____8BB0_5F55)
-                goto __continue47
+                goto __continue46
             end
             if now >= _____8BB0_5F55["下次重建毫秒"] then
                 _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4(_____8BB0_5F55["当前特效"])
@@ -116,7 +131,7 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
                 _____8BB0_5F55["当前特效"] = nil
             end
         end
-        ::__continue47::
+        ::__continue46::
     end
     if _____5FAA_73AF_70B9_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick()
@@ -236,13 +251,9 @@ ____exports["设置Dz绑定特效缩放"] = function(effect, scale)
     if effect == nil or effect == 0 then
         return
     end
-    if type(DzSetEffectScale) == "function" then
-        DzSetEffectScale(effect, scale)
-    end
+    DzSetEffectScale(effect, scale)
     EXSetEffectSize(effect, scale)
-    if type(EXEffectMatScale) == "function" then
-        EXEffectMatScale(effect, scale, scale, scale)
-    end
+    EXEffectMatScale(effect, scale, scale, scale)
 end
 jass = require("jass.common")
 local japi = require("jass.japi")
@@ -264,9 +275,9 @@ EXSetEffectXY = japi.EXSetEffectXY
 EXSetEffectZ = japi.EXSetEffectZ
 EXSetEffectSize = japi.EXSetEffectSize
 EXSetEffectSpeed = japi.EXSetEffectSpeed
-local EXEffectMatRotateX = japi.EXEffectMatRotateX
-local EXEffectMatRotateY = japi.EXEffectMatRotateY
-local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
+EXEffectMatRotateX = japi.EXEffectMatRotateX
+EXEffectMatRotateY = japi.EXEffectMatRotateY
+EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 EXEffectMatScale = japi.EXEffectMatScale
 DzSetEffectScale = japi.DzSetEffectScale
 DzGetColor = japi.DzGetColor
@@ -325,23 +336,6 @@ function ____exports.createTimedUnitEffect(unit, attachPoint, modelPath, duratio
     _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548(effect, duration)
     return effect
 end
-____exports["设置特效XYZ轴旋转"] = function(effect, _____53C2_6570)
-    if effect == nil or effect == 0 or _____53C2_6570 == nil then
-        return
-    end
-    local x = __TS__Number(_____53C2_6570["X轴角度"]) or 0
-    local y = __TS__Number(_____53C2_6570["Y轴角度"]) or 0
-    local z = __TS__Number(_____53C2_6570["Z轴角度"]) or 0
-    if x ~= 0 and type(EXEffectMatRotateX) == "function" then
-        EXEffectMatRotateX(effect, x)
-    end
-    if y ~= 0 and type(EXEffectMatRotateY) == "function" then
-        EXEffectMatRotateY(effect, y)
-    end
-    if z ~= 0 and type(EXEffectMatRotateZ) == "function" then
-        EXEffectMatRotateZ(effect, z)
-    end
-end
 ____exports["创建点特效"] = function(_____53C2_6570)
     if _____53C2_6570["模型路径"] == nil or _____53C2_6570["模型路径"] == "" then
         return nil
@@ -357,12 +351,13 @@ ____exports["创建点特效"] = function(_____53C2_6570)
     if _____53C2_6570.Z ~= nil and _____53C2_6570.Z ~= 0 then
         EXSetEffectZ(effect, _____53C2_6570.Z)
     end
+    ____exports["设置特效XYZ轴旋转"](effect, _____53C2_6570)
     ____exports["设置Dz绑定特效缩放"](effect, _____53C2_6570["缩放"] or 1)
     if _____53C2_6570["动画速度"] ~= nil then
         EXSetEffectSpeed(effect, _____53C2_6570["动画速度"])
     end
     local color = _____53D6_7279_6548_9876_70B9_989C_8272(_____53C2_6570)
-    if color ~= nil and type(DzSetEffectVertexColor) == "function" then
+    if color ~= nil then
         DzSetEffectVertexColor(effect, color)
     end
     if _____53C2_6570["持续秒"] ~= nil and _____53C2_6570["持续秒"] > 0 then
@@ -560,11 +555,11 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
         do
             local record = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key]
             if record == nil then
-                goto __continue117
+                goto __continue114
             end
             if not _____5355_4F4D_53EF_5750_6807_8DDF_968F(record.unit) then
                 _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548_8BB0_5F55(key, record)
-                goto __continue117
+                goto __continue114
             end
             DzSetEffectPos(
                 record.effect,
@@ -573,7 +568,7 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
                 record.height
             )
         end
-        ::__continue117::
+        ::__continue114::
     end
     if _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()

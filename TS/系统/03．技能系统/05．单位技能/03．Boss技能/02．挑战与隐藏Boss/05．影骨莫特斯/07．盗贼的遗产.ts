@@ -7,17 +7,18 @@ import { 播放影骨莫特斯台词 } from "./08．台词播放";
 import { 单位有效, 播放影骨莫特斯限时动作, stringToFourCC } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
+import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-};
 const { 创建交互宝箱 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.12．交互宝箱桥接") as {
   创建交互宝箱: (this: void, 参数: any) => any;
 };
@@ -37,13 +38,6 @@ interface 影骨遗产宝箱变量 {
   Y: number;
 }
 
-interface 影骨遗产宝箱延迟上下文 {
-  context: 影骨莫特斯运行时上下文;
-  index: number;
-}
-
-const 影骨遗产宝箱延迟上下文表: Record<number, 影骨遗产宝箱延迟上下文 | undefined> = {};
-
 function 给Boss叠加盗贼遗产(this: void, context: 影骨莫特斯运行时上下文): void {
   context.已开启遗产宝箱数 += 1;
   const bonus = 读取单位攻击力(context.Boss单位) * 影骨莫特斯数值与表现配置.盗贼的遗产.每个宝箱Boss攻击提高;
@@ -53,7 +47,7 @@ function 给Boss叠加盗贼遗产(this: void, context: 影骨莫特斯运行时
 
 function 开启影骨宝箱(this: void, context: 影骨莫特斯运行时上下文, x: number, y: number): void {
   给Boss叠加盗贼遗产(context);
-  AddSpecialEffect(影骨莫特斯表现配置.宝箱出现, x, y);
+  创建点特效({ 模型路径: 影骨莫特斯表现配置.宝箱出现, X: x, Y: y, 持续秒: 影骨莫特斯数值与表现配置.盗贼的遗产.瞬时特效持续秒 });
   播放Boss坐标音效(影骨莫特斯音效配置.盗贼的遗产.增益回流, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 影骨莫特斯音效配置.默认裁断距离);
 }
 
@@ -75,7 +69,7 @@ function 影骨遗产宝箱开启完成(this: void, opener: any, _chest: any, _c
 function 创建影骨宝箱(this: void, context: 影骨莫特斯运行时上下文, index: number): void {
   const point = 影骨莫特斯数值与表现配置.盗贼的遗产.宝箱点[index];
   if (point == null) return;
-  AddSpecialEffect(影骨莫特斯表现配置.宝箱出现, point.X, point.Y);
+  创建点特效({ 模型路径: 影骨莫特斯表现配置.宝箱出现, X: point.X, Y: point.Y, 持续秒: 影骨莫特斯数值与表现配置.盗贼的遗产.瞬时特效持续秒 });
   播放Boss坐标音效(影骨莫特斯音效配置.盗贼的遗产.宝箱出现, point.X, point.Y, 影骨莫特斯音效配置.默认裁断距离);
   创建交互宝箱({
     清理: context.清理,
@@ -90,55 +84,42 @@ function 创建影骨宝箱(this: void, context: 影骨莫特斯运行时上下�
   });
 }
 
-function 执行影骨遗产宝箱延迟生成(this: void, index: number): void {
-  const variable = 影骨遗产宝箱延迟上下文表[index];
-  if (variable == null) return;
-  delete 影骨遗产宝箱延迟上下文表[index];
-  创建影骨宝箱(variable.context, variable.index);
-}
-
-function 影骨遗产宝箱延迟生成1(this: void): void {
-  执行影骨遗产宝箱延迟生成(0);
-}
-
-function 影骨遗产宝箱延迟生成2(this: void): void {
-  执行影骨遗产宝箱延迟生成(1);
-}
-
-function 影骨遗产宝箱延迟生成3(this: void): void {
-  执行影骨遗产宝箱延迟生成(2);
-}
-
-function 影骨遗产宝箱延迟生成4(this: void): void {
-  执行影骨遗产宝箱延迟生成(3);
-}
-
-function 取影骨遗产宝箱延迟回调(this: void, index: number): ((this: void) => void) | undefined {
-  if (index === 0) return 影骨遗产宝箱延迟生成1;
-  if (index === 1) return 影骨遗产宝箱延迟生成2;
-  if (index === 2) return 影骨遗产宝箱延迟生成3;
-  if (index === 3) return 影骨遗产宝箱延迟生成4;
-  return undefined;
-}
-
-function 注册影骨遗产宝箱延迟生成(this: void, context: 影骨莫特斯运行时上下文, index: number): void {
-  const callback = 取影骨遗产宝箱延迟回调(index);
-  if (callback == null) return;
-  影骨遗产宝箱延迟上下文表[index] = { context, index };
-  const id = addDelayedCallback(index * 500, callback);
-  context.清理.登记延迟回调("影骨-盗贼遗产宝箱", id);
+function 追加遗产宝箱生成时间轴(this: void, 事件列表: 固定时间轴事件[], context: 影骨莫特斯运行时上下文, index: number): void {
+  事件列表.push({
+    时点毫秒: index * 500,
+    名称: "盗贼遗产第" + String(index + 1) + "个宝箱",
+    执行: function 影骨遗产宝箱生成(this: void): void {
+      创建影骨宝箱(context, index);
+    },
+  });
 }
 
 export function 释放影骨盗贼遗产(this: void, context: 影骨莫特斯运行时上下文): void {
   if (context.遗产宝箱已生成) return;
-  context.遗产宝箱已生成 = true;
   const cfg = 影骨莫特斯数值与表现配置.盗贼的遗产;
+  const count = cfg.宝箱数量;
+  if (count <= 0) return;
+  if (context.盗贼遗产组合执行器 == null) {
+    context.盗贼遗产组合执行器 = 创建固定组合技能执行器<影骨莫特斯运行时上下文>({
+      名称: "影骨莫特斯-盗贼遗产",
+      清理: context.清理,
+      互斥组: "影骨莫特斯盗贼遗产",
+    });
+  }
+  if (context.盗贼遗产组合执行器.是否运行中()) return;
+  const 事件列表: 固定时间轴事件[] = [];
+  for (let i = 0; i < count; i++) 追加遗产宝箱生成时间轴(事件列表, context, i);
+  context.遗产宝箱已生成 = true;
   播放影骨莫特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   播放影骨莫特斯台词(context.Boss单位, "盗贼的遗产");
-  const count = 影骨莫特斯数值与表现配置.盗贼的遗产.宝箱数量;
-  for (let i = 0; i < count; i++) {
-    注册影骨遗产宝箱延迟生成(context, i);
-  }
+  const 执行ID = context.盗贼遗产组合执行器.开始({
+    key: "盗贼的遗产",
+    单位: context.Boss单位,
+    上下文: context,
+    最大持续毫秒: count * 500 + 500,
+    阶段列表: 创建固定时间轴阶段列表(事件列表),
+  });
+  if (执行ID === 0) context.遗产宝箱已生成 = false;
 }
 
 function on影骨盗贼遗产施法(this: void, castingUnit: any, spellAbilityId: number): void {

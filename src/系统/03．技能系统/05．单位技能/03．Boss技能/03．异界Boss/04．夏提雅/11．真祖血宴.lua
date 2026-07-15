@@ -1,6 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
 local _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["重置夏提雅猎血连击"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
@@ -32,9 +34,6 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____653B_901F_5C5E_6027ID = 10
 local _____771F_7956_8840_5BB4_6280_80FDKey = "真祖血宴"
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____9650_5236_8840_5BB4_5C42_6570(value)
     local max = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["血宴层数上限"]
     if value <= 0 then

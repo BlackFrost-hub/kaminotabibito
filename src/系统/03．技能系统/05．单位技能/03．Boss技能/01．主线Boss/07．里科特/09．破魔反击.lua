@@ -58,14 +58,6 @@ local function _____53D6_53CD_51FB_4E0A_4E0B_6587(boss)
     end
     return nil
 end
-local function _____64AD_653E_9650_65F6_53CD_51FB_7279_6548(target)
-    local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["破魔反击"]
-    local model = cfg["反击特效路径"]
-    if not _____5355_4F4D_6709_6548(target) or model == "" then
-        return
-    end
-    createTimedUnitEffect(target, "origin", model, cfg["反击特效持续秒"])
-end
 local function _____7ED3_675F_7834_9B54_53CD_51FB_7A97_53E3(context)
     context["破魔反击中"] = false
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["Boss单位"], _____91CC_79D1_7279BuffID["破魔反击"])
@@ -91,7 +83,7 @@ local function _____5F00_59CB_7834_9B54_53CD_51FB_7A97_53E3(context)
         GetUnitY(boss),
         _____91CC_79D1_7279_97F3_6548_914D_7F6E["默认裁断距离"]
     )
-    _____64AD_653E_9650_65F6_53CD_51FB_7279_6548(boss)
+    createTimedUnitEffect(boss, "origin", cfg["反击特效路径"], cfg["反击特效持续秒"])
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "圆形",
         X = GetUnitX(boss),
@@ -162,7 +154,7 @@ local function ____on_91CC_79D1_7279_7834_9B54_53CD_51FB_4F24_5BB3_4FEE_6B63(dam
         GetUnitY(attacker),
         _____91CC_79D1_7279_97F3_6548_914D_7F6E["默认裁断距离"]
     )
-    _____64AD_653E_9650_65F6_53CD_51FB_7279_6548(attacker)
+    createTimedUnitEffect(attacker, "origin", cfg["反击特效路径"], cfg["反击特效持续秒"])
     _____7ED3_675F_7834_9B54_53CD_51FB_7A97_53E3(context)
     return damageContext.currentDamage
 end

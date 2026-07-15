@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { type 卡瑟拉运行时上下文, 刷新卡瑟拉阶段 } from "./01．运行时上下文";
+import type { 卡瑟拉运行时上下文 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y, 播放卡瑟拉限时动作 } from "./14．公共工具";
@@ -138,11 +138,10 @@ function 执行卡瑟拉潜入与触手解放(this: void, context: 卡瑟拉运�
   context.清理.登记延迟回调("卡瑟拉-触手解放限时", id);
 }
 
-export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉运行时上下文): void {
+export function 触发卡瑟拉触手解放(this: void, context: 卡瑟拉运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   if (context.触手解放已触发 || context.Boss潜入中) return;
-  if (刷新卡瑟拉阶段(context) < 3) return;
   const cfg = 卡瑟拉数值与表现配置.触手解放;
   context.触手解放已触发 = true;
   context.Boss潜入中 = true;
@@ -162,7 +161,4 @@ export function 尝试触发卡瑟拉触手解放(this: void, context: 卡瑟拉
     执行卡瑟拉潜入与触手解放(context);
   });
   context.清理.登记延迟回调("卡瑟拉-触手解放潜入", 潜入ID);
-}
-
-export function 注册卡瑟拉触手解放(this: void): void {
 }

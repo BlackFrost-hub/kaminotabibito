@@ -1,5 +1,9 @@
 /** @noSelfInFile */
 
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
 import { 巴尔扎罗斯音效配置 } from "../02．数值与表现配置";
@@ -7,7 +11,6 @@ import { 播放Boss坐标音效 } from "../../../00．公共/00．Boss音效播�
 const {  巴尔扎罗斯技能数值配置,
   播放塞拉台词,
   施加巴尔扎罗斯灼热,
-  读取单位攻击力,
   启动基础施法时间线,
   创建技能提示圈,
   施加快速减速Buff,
@@ -18,10 +21,8 @@ const {  巴尔扎罗斯技能数值配置,
   SinBJ,
   GetUnitX,
   GetUnitY,
-  GetUnitState,
   GetUnitFlyHeight,
   SquareRoot,
-  UNIT_STATE_MAX_LIFE,
   DAMAGE_TYPE_FIRE,
   DAMAGE_TYPE_COLD,
   单位有效,
@@ -35,19 +36,21 @@ const {  巴尔扎罗斯技能数值配置,
 function 计算冰球伤害(this: void, context: 巴尔扎罗斯运行时上下文, target: any): number {
   const config = 巴尔扎罗斯技能数值配置.冰焰双星;
   const sera = context.塞拉;
-  return (读取单位攻击力(sera) * config.冰球伤害攻击力比例
-    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.冰球伤害目标最大生命比例)
-    * config.冰球伤害总倍率
-    * 取形态技能倍率(context, "冰霜");
+  return 计算组合技能伤害(sera, target, {
+    来源攻击力比例: config.冰球伤害攻击力比例,
+    目标最大生命比例: config.冰球伤害目标最大生命比例,
+    总倍率: config.冰球伤害总倍率 * 取形态技能倍率(context, "冰霜"),
+  });
 }
 
 function 计算火球伤害(this: void, context: 巴尔扎罗斯运行时上下文, target: any): number {
   const config = 巴尔扎罗斯技能数值配置.冰焰双星;
   const sera = context.塞拉;
-  return (读取单位攻击力(sera) * config.火球伤害攻击力比例
-    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.火球伤害目标最大生命比例)
-    * config.火球伤害总倍率
-    * 取形态技能倍率(context, "火焰");
+  return 计算组合技能伤害(sera, target, {
+    来源攻击力比例: config.火球伤害攻击力比例,
+    目标最大生命比例: config.火球伤害目标最大生命比例,
+    总倍率: config.火球伤害总倍率 * 取形态技能倍率(context, "火焰"),
+  });
 }
 
 function 结算冰焰AOE(this: void, context: 巴尔扎罗斯运行时上下文, hitUnit: any, 类型: "冰霜" | "火焰"): void {

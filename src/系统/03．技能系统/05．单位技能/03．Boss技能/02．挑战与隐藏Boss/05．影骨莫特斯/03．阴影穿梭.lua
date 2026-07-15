@@ -28,23 +28,24 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetRandomReal = jass.GetRandomReal
-local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local SetUnitVertexColor = jass.SetUnitVertexColor
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local IssueTargetOrder = jass.IssueTargetOrder
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_1["获取Boss技能随机敌对英雄"]
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_2.registerDamageModifier
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_3.registerDamageModifier
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____9634_5F71_7A7F_68AD_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["阴影穿梭"])
 local _____5DF2_6CE8_518C_9634_5F71_7A7F_68AD = false
@@ -136,7 +137,7 @@ local function _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210()
                 )
                 goto __continue12
             end
-            AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭落点"], x, y)
+            _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭落点"], X = x, Y = y, ["持续秒"] = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]["瞬时特效持续秒"]})
             _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["阴影穿梭"]["落点闪现"], x, y, _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
             SetUnitInvulnerable(boss, false)
             SetUnitVertexColor(
@@ -160,11 +161,12 @@ ____exports["释放影骨阴影穿梭"] = function(context)
     local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(boss, "阴影穿梭")
-    AddSpecialEffect(
-        _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭残影"],
-        GetUnitX(boss),
-        GetUnitY(boss)
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭残影"],
+        X = GetUnitX(boss),
+        Y = GetUnitY(boss),
+        ["持续秒"] = cfg["瞬时特效持续秒"]
+    })
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["阴影穿梭"]["消失残影"],
         GetUnitX(boss),
@@ -193,9 +195,9 @@ ____exports["释放影骨阴影穿梭"] = function(context)
         return
     end
     _____5F85_7A7F_68AD_4E0A_4E0B_6587[id] = context
-    local ____self_3 = context["清理"]
-    ____self_3["登记延迟回调"](
-        ____self_3,
+    local ____self_4 = context["清理"]
+    ____self_4["登记延迟回调"](
+        ____self_4,
         "影骨-阴影穿梭",
         addDelayedCallback(cfg["消失秒"] * 1000, _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210)
     )

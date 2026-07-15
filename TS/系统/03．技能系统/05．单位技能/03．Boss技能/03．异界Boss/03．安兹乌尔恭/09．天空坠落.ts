@@ -1,13 +1,15 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
 import { 创建圆形安全区组, type 圆形安全区组 } from '../../../../00．技能模板+函数/04．机制组件/02．战斗区域/04．圆形安全区组';
 import { 启动雅儿贝德天空坠落联动 } from './01．护卫雅儿贝德/05．黑翼拘束';
 
-const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线') as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -29,7 +31,6 @@ const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
@@ -37,12 +38,11 @@ const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
+const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const DEG_TO_RAD = 0.017453292519943295;
 const 天空坠落大型技能Key = '天空坠落';
 
@@ -51,10 +51,6 @@ interface 天空坠落实例 {
   法阵特效: any;
   墓碑特效列表: any[];
   表现已清理: boolean;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 销毁天空坠落预警表现(this: void, instance: 天空坠落实例): void {
@@ -90,7 +86,7 @@ function 创建天空坠落预警(this: void, context: 安兹运行时上下文,
     const safeY = originY + sin * stage.天空坠落安全区中心距离;
     const grave = AddSpecialEffect(cfg.表现资源.天空坠落墓碑特效路径, graveX, graveY);
     if (grave != null && grave !== 0) {
-      if (typeof EXSetEffectSize === 'function') EXSetEffectSize(grave, stage.天空坠落墓碑缩放);
+      EXSetEffectSize(grave, stage.天空坠落墓碑缩放);
       graves.push(grave);
     }
     safeZones.push({
@@ -110,8 +106,8 @@ function 创建天空坠落预警(this: void, context: 安兹运行时上下文,
   });
   const circle = AddSpecialEffect(cfg.表现资源.天空坠落天空法阵特效路径, originX, originY);
   if (circle != null && circle !== 0) {
-    if (typeof EXSetEffectZ === 'function') EXSetEffectZ(circle, stage.天空坠落法阵高度);
-    if (typeof EXSetEffectSize === 'function') EXSetEffectSize(circle, stage.天空坠落法阵缩放);
+    EXSetEffectZ(circle, stage.天空坠落法阵高度);
+    EXSetEffectSize(circle, stage.天空坠落法阵缩放);
   }
   const instance: 天空坠落实例 = {
     安全区组: safeZoneGroup,
@@ -142,8 +138,10 @@ function 结算天空坠落伤害(this: void, context: 安兹运行时上下文,
     造成AOE技能伤害({
       来源: boss,
       目标: target,
-      伤害: 读取单位攻击力(boss) * cfg.阶段技能.天空坠落伤害Boss攻击力比例
-        + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg.阶段技能.天空坠落伤害目标最大生命比例,
+      伤害: 计算组合技能伤害(boss, target, {
+        来源攻击力比例: cfg.阶段技能.天空坠落伤害Boss攻击力比例,
+        目标最大生命比例: cfg.阶段技能.天空坠落伤害目标最大生命比例,
+      }),
       attack: false,
       ranged: true,
       attackType: ATTACK_TYPE_MAGIC,

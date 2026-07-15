@@ -126,6 +126,4 @@ ____exports["释放卡瑟拉深渊召唤"] = function(context)
         end
     end
 end
-____exports["注册卡瑟拉深渊召唤"] = function()
-end
 return ____exports

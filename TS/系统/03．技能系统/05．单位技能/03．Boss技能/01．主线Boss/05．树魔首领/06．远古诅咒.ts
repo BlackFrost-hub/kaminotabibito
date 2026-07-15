@@ -1,12 +1,16 @@
 /** @noSelfInFile */
 
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import { 树魔首领单位技能配置 } from "./00．配置";
 import { 获取或创建树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
 import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 播放Boss坐标音效编排, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC, 距离平方XY } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 距离平方XY, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -27,9 +31,6 @@ const DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND as any;
 const DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -66,10 +67,6 @@ const { createTimedEffect, 创建点特效 } = require("lib.扩展函数.封装�
 const 树魔首领单位类型ID = stringToFourCC(树魔首领单位技能配置.单位ID);
 const 远古诅咒技能ID = stringToFourCC(树魔首领数值与表现配置.远古诅咒.技能槽位);
 let 远古诅咒已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取有效玩家人数(this: void): number {
   const count = 取当前有效玩家人数();
@@ -187,8 +184,10 @@ function 执行远古诅咒后续爆发(this: void, context: 树魔首领运行�
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     if (距离平方XY(centerX, centerY, GetUnitX(hero), GetUnitY(hero)) > radius2) continue;
-    const damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.后续爆发目标最大生命比例
-      + 读取单位攻击力(boss) * cfg.后续爆发Boss攻击力比例;
+    const damage = 计算组合技能伤害(boss, hero, {
+      来源攻击力比例: cfg.后续爆发Boss攻击力比例,
+      目标最大生命比例: cfg.后续爆发目标最大生命比例,
+    });
     造成AOE技能伤害({
       技能ID: 远古诅咒技能ID,
       来源: boss,

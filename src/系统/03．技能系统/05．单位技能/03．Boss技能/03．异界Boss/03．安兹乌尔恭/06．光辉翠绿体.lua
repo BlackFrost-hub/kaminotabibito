@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建安兹运行时上下文"]
 local _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["标记安兹普通机制忙碌"]
@@ -33,9 +35,6 @@ local DzSetEffectVertexColor = japi.DzSetEffectVertexColor
 local _____5B89_5179_5355_4F4D_7C7B_578BID = stringToFourCC(_____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["正式单位ID"])
 local _____5149_8F89_7FE0_7EFF_4F53_6280_80FDID = stringToFourCC(_____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["光辉翠绿体"])
 local _____5149_8F89_7FE0_7EFF_4F53_5DF2_6CE8_518C = false
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____91CA_653E_7FE0_7EFF_51B2_51FB(boss)
     if not _____5355_4F4D_6709_6548(boss) then
         return
@@ -51,12 +50,12 @@ local function _____91CA_653E_7FE0_7EFF_51B2_51FB(boss)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue6
+                    goto __continue5
                 end
                 local dx = GetUnitX(hero) - x
                 local dy = GetUnitY(hero) - y
                 if dx * dx + dy * dy > radius2 then
-                    goto __continue6
+                    goto __continue5
                 end
                 _____5F00_59CB_51FB_9000(hero, {
                     ["来源单位"] = boss,
@@ -68,7 +67,7 @@ local function _____91CA_653E_7FE0_7EFF_51B2_51FB(boss)
                     ["主单位死亡时中断"] = false
                 })
             end
-            ::__continue6::
+            ::__continue5::
             i = i + 1
         end
     end
@@ -80,7 +79,7 @@ local function _____521B_5EFA_7FE0_7EFF_9632_62A4(context)
     end
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local effect = AddSpecialEffectTarget(config["表现资源"]["光辉翠绿体特效路径"], boss, "origin")
-    if effect ~= nil and effect ~= 0 and type(DzSetEffectVertexColor) == "function" then
+    if effect ~= nil and effect ~= 0 then
         DzSetEffectVertexColor(effect, 80 * 65536 + 255 * 256 + 120)
     end
     local effectDestroyed = false

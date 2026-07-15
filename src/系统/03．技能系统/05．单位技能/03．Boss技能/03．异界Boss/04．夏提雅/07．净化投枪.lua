@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
 local _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["重置夏提雅猎血连击"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
@@ -13,6 +15,8 @@ local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_
 local ____09_FF0E_82F1_7075_6218_4E59_5973 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.09．英灵战乙女")
 local _____83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71 = ____09_FF0E_82F1_7075_6218_4E59_5973["获取夏提雅英灵投影"]
 local _____5C1D_8BD5_89E6_53D1_82F1_7075_6218_4E59_5973_590D_523B = ____09_FF0E_82F1_7075_6218_4E59_5973["尝试触发英灵战乙女复刻"]
+local ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.05．点名预警执行器")
+local _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668 = ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668["创建点名预警执行器"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -21,7 +25,6 @@ local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_r
 local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
 local getServerTime = ____require_result_3.getServerTime
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
@@ -38,9 +41,6 @@ local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local RAD_TO_DEG = 57.29577951308232
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____5C1D_8BD5_5B89_6392_51C0_5316_6295_67AA_82F1_7075_590D_523B(context, x, y)
     local projection = _____83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71(context)
     if not _____5355_4F4D_6709_6548(projection) then
@@ -75,7 +75,7 @@ local function _____5C1D_8BD5_5B89_6392_51C0_5316_6295_67AA_82F1_7075_590D_523B(
                             local dx = GetUnitX(heroes[i + 1]) - x
                             local dy = GetUnitY(heroes[i + 1]) - y
                             if dx * dx + dy * dy > cfg["伤害半径"] * cfg["伤害半径"] then
-                                goto __continue8
+                                goto __continue7
                             end
                             local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(context["Boss单位"], heroes[i + 1], {["来源攻击力比例"] = cfg["伤害攻击力比例"] * p2["英灵复刻伤害比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"] * p2["英灵复刻伤害比例"]})
                             _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -91,7 +91,7 @@ local function _____5C1D_8BD5_5B89_6392_51C0_5316_6295_67AA_82F1_7075_590D_523B(
                                 ["标签"] = "夏提雅·英灵复刻-净化投枪"
                             })
                         end
-                        ::__continue8::
+                        ::__continue7::
                         i = i + 1
                     end
                 end
@@ -125,7 +125,7 @@ local function _____7ED3_7B97_51C0_5316_6295_67AA_843D_70B9(context, x, y, tag)
                 local dx = GetUnitX(heroes[i + 1]) - x
                 local dy = GetUnitY(heroes[i + 1]) - y
                 if dx * dx + dy * dy > cfg["伤害半径"] * cfg["伤害半径"] then
-                    goto __continue14
+                    goto __continue13
                 end
                 local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, heroes[i + 1], {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -141,7 +141,7 @@ local function _____7ED3_7B97_51C0_5316_6295_67AA_843D_70B9(context, x, y, tag)
                     ["标签"] = tag
                 })
             end
-            ::__continue14::
+            ::__continue13::
             i = i + 1
         end
     end
@@ -168,51 +168,39 @@ ____exports["释放夏提雅净化投枪"] = function(context, target)
     context["上次净化投枪目标ID"] = GetHandleId(target)
     _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(context)
     context["普通机制忙碌到Ms"] = getServerTime() + (totalDuration + 0.4) * 1000
-    _____521B_5EFA_6280_80FD_63D0_793A_5708({
-        ["类型"] = "敌方圆形",
-        X = x,
-        Y = y,
-        ["半径"] = cfg["伤害半径"],
-        ["持续时间"] = cfg["预警秒"],
-        ["来源单位"] = boss
-    })
-    if isP3 then
-        _____521B_5EFA_6280_80FD_63D0_793A_5708({
-            ["类型"] = "敌方圆形",
-            X = secondX,
-            Y = secondY,
-            ["半径"] = cfg["伤害半径"],
-            ["持续时间"] = totalDuration,
-            ["来源单位"] = boss
-        })
-    end
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["动画编号"], ["持续秒"] = totalDuration, ["恢复动画编号"] = 0})
-    local delayedId = addDelayedCallback(
-        cfg["预警秒"] * 1000,
-        function()
+    _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668({
+        ["清理"] = context["清理"],
+        ["名称"] = "夏提雅-净化投枪",
+        ["锁定X"] = x,
+        ["锁定Y"] = y,
+        ["延迟秒"] = cfg["预警秒"],
+        ["提示圈"] = {["类型"] = "敌方圆形", ["半径"] = cfg["伤害半径"], ["持续时间"] = cfg["预警秒"], ["来源单位"] = boss},
+        ["on结算"] = function(result)
             if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] then
                 return
             end
-            _____7ED3_7B97_51C0_5316_6295_67AA_843D_70B9(context, x, y, "夏提雅·净化投枪")
+            _____7ED3_7B97_51C0_5316_6295_67AA_843D_70B9(context, result["锁定X"], result["锁定Y"], "夏提雅·净化投枪")
             if not isP3 then
-                _____5C1D_8BD5_5B89_6392_51C0_5316_6295_67AA_82F1_7075_590D_523B(context, x, y)
+                _____5C1D_8BD5_5B89_6392_51C0_5316_6295_67AA_82F1_7075_590D_523B(context, result["锁定X"], result["锁定Y"])
             end
         end
-    )
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "夏提雅-净化投枪", delayedId)
+    })
     if isP3 then
-        local secondId = addDelayedCallback(
-            totalDuration * 1000,
-            function()
+        _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668({
+            ["清理"] = context["清理"],
+            ["名称"] = "夏提雅-净化投枪-P3第二枚",
+            ["锁定X"] = secondX,
+            ["锁定Y"] = secondY,
+            ["延迟秒"] = totalDuration,
+            ["提示圈"] = {["类型"] = "敌方圆形", ["半径"] = cfg["伤害半径"], ["持续时间"] = totalDuration, ["来源单位"] = boss},
+            ["on结算"] = function(result)
                 if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] or context["阶段"] ~= "P3真祖血宴" then
                     return
                 end
-                _____7ED3_7B97_51C0_5316_6295_67AA_843D_70B9(context, secondX, secondY, "夏提雅·净化投枪-P3第二枚")
+                _____7ED3_7B97_51C0_5316_6295_67AA_843D_70B9(context, result["锁定X"], result["锁定Y"], "夏提雅·净化投枪-P3第二枚")
             end
-        )
-        local ____self_7 = context["清理"]
-        ____self_7["登记延迟回调"](____self_7, "夏提雅-净化投枪-P3第二枚", secondId)
+        })
     end
     return true
 end

@@ -1,5 +1,12 @@
 /** @noSelfInFile */
 
+import {
+  单位间距离平方 as 距离平方,
+  取单位ID,
+  单位句柄存在 as 单位存在,
+  单位未标记死亡 as 单位存活,
+  单位已标记死亡 as 单位已死亡,
+} from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚技能数值配置 } from "./02．数值与表现配置";
@@ -18,38 +25,17 @@ const { setThreat } = require("系统.01．单位系统.06．仇恨系统.00．�
 
 const jass = require("jass.common") as any;
 
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-
-function 单位存在(this: void, unit: any): boolean {
-  return unit != null && unit !== 0;
-}
-
-function 单位存活(this: void, unit: any): boolean {
-  return 单位存在(unit) && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 单位已死亡(this: void, unit: any): boolean {
-  return 单位存在(unit) && IsUnitType(unit, UNIT_TYPE_DEAD) === true;
-}
-
-function 距离平方(this: void, a: any, b: any): number {
-  const dx = GetUnitX(a) - GetUnitX(b);
-  const dy = GetUnitY(a) - GetUnitY(b);
-  return dx * dx + dy * dy;
-}
 
 function 取单位仇恨(this: void, entries: Array<{ targetHid: number; threat: number }>, unit: any): number {
-  const hid = GetHandleId(unit);
+  const hid = 取单位ID(unit);
   for (let i = 0; i < entries.length; i++) {
     if (entries[i].targetHid === hid) return entries[i].threat;
   }
@@ -125,8 +111,6 @@ function 强制攻击污染标记目标(this: void, context: 米亚运行时上�
   IssueTargetOrder(context.Boss单位, "attack", target);
 }
 
-export function 注册米亚污染标记(this: void): void {
-}
 
 export function 取米亚污染标记伤害倍率(this: void, context: 米亚运行时上下文, target: any): number {
   if (context.阶段 !== 1) return 1;

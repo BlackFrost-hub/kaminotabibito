@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建安兹运行时上下文"]
 local _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["标记安兹普通机制忙碌"]
@@ -36,9 +38,6 @@ local _____5B89_5179_5355_4F4D_7C7B_578BID = stringToFourCC(_____5B89_5179_4E4C_
 local _____5FC3_810F_638C_63E1_6280_80FDID = stringToFourCC(_____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["心脏掌握"])
 local _____5FC3_810F_638C_63E1_6297_6027_5230_671FMs_8868 = {}
 local _____5FC3_810F_638C_63E1_5DF2_6CE8_518C = false
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____9500_6BC1_5FC3_810F_638C_63E1_8868_73B0(instance)
     if instance["点名特效"] ~= nil and instance["点名特效"] ~= 0 then
         DestroyEffect(instance["点名特效"])
@@ -59,14 +58,14 @@ local function _____53D6_5FC3_810F_638C_63E1_76EE_6807(boss)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue8
+                    goto __continue7
                 end
                 local ____until = _____5FC3_810F_638C_63E1_6297_6027_5230_671FMs_8868[GetHandleId(hero)] or 0
                 if ____until <= now then
                     eligible[#eligible + 1] = hero
                 end
             end
-            ::__continue8::
+            ::__continue7::
             i = i + 1
         end
     end
@@ -87,7 +86,7 @@ local function _____7EDF_8BA1_6551_63F4_961F_53CB(boss, target, radius)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) or hero == target then
-                    goto __continue14
+                    goto __continue13
                 end
                 local dx = GetUnitX(hero) - x
                 local dy = GetUnitY(hero) - y
@@ -95,7 +94,7 @@ local function _____7EDF_8BA1_6551_63F4_961F_53CB(boss, target, radius)
                     count = count + 1
                 end
             end
-            ::__continue14::
+            ::__continue13::
             i = i + 1
         end
     end

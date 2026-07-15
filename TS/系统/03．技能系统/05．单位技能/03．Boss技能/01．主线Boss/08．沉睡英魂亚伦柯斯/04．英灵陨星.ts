@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
@@ -30,10 +31,6 @@ const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const 英灵陨星技能Key = '英灵陨星';
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取落点数量(this: void, context: 亚伦柯斯运行时上下文): number {
   const cfg = 亚伦柯斯正式设计配置.英灵陨星;

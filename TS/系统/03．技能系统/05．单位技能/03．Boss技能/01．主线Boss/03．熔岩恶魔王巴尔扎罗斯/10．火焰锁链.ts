@@ -1,5 +1,9 @@
 /** @noSelfInFile */
 
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取或创建巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
@@ -7,11 +11,8 @@ import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位未标记死亡 as 单位有效, 单位间距离平方 as 距离平方 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -73,16 +74,6 @@ interface 火焰锁链状态 {
   stopped: boolean;
 }
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 距离平方(this: void, a: any, b: any): number {
-  const dx = GetUnitX(a) - GetUnitX(b);
-  const dy = GetUnitY(a) - GetUnitY(b);
-  return dx * dx + dy * dy;
-}
-
 function 选择火焰锁链目标(this: void, boss: any): any {
   const config = 巴尔扎罗斯技能数值配置.火焰锁链;
   const heroes = 获取Boss技能敌对英雄列表(boss);
@@ -103,9 +94,11 @@ function 选择火焰锁链目标(this: void, boss: any): any {
 
 function 计算超距伤害(this: void, boss: any, target: any): number {
   const config = 巴尔扎罗斯技能数值配置.火焰锁链;
-  return (读取单位攻击力(boss) * config.超距伤害Boss攻击力比例
-    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.超距伤害目标最大生命比例)
-    * config.超距伤害总倍率;
+  return 计算组合技能伤害(boss, target, {
+    来源攻击力比例: config.超距伤害Boss攻击力比例,
+    目标最大生命比例: config.超距伤害目标最大生命比例,
+    总倍率: config.超距伤害总倍率,
+  });
 }
 
 function 更新锁链单位位置(this: void, state: 火焰锁链状态): void {

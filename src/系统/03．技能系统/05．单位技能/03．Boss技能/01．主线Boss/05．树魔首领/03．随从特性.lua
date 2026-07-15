@@ -17,6 +17,8 @@ local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_65
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
+local _____5355_4F4D_53E5_67C4_5B58_5728 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位句柄存在"]
+local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -27,10 +29,8 @@ local GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed
 local GetOwningPlayer = jass.GetOwningPlayer
 local CreateUnit = jass.CreateUnit
 local IssueTargetOrder = jass.IssueTargetOrder
-local IsUnitType = jass.IsUnitType
 local GetRandomReal = jass.GetRandomReal
 local GetRandomInt = jass.GetRandomInt
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
@@ -55,14 +55,11 @@ local _____730E_5934_8005_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_
 local _____5DEB_533B_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["召唤物ID"]["巫医"])
 local _____6295_63B7_8005_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["召唤物ID"]["投掷者"])
 local _____6811_9B54_9996_9886_968F_4ECE_7279_6027_5DF2_6CE8_518C = false
-local function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____662F_6811_9B54_9996_9886(unit)
     return _____5355_4F4D_5B58_6D3B(unit) and GetUnitTypeId(unit) == _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID
 end
 local function _____5355_4F4D_7C7B_578B_662F_6811_9B54_9996_9886(unit)
-    return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) == _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID
+    return _____5355_4F4D_53E5_67C4_5B58_5728(unit) and GetUnitTypeId(unit) == _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID
 end
 local function _____968F_673A_53EC_5524_70B9(boss)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
@@ -265,7 +262,7 @@ local function _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick()
             do
                 local context = list[i + 1]
                 if context == nil then
-                    goto __continue42
+                    goto __continue41
                 end
                 _____5237_65B0_968F_4ECE_72B6_6001(context)
                 if context["下一次召唤Ms"] > 0 and now >= context["下一次召唤Ms"] then
@@ -273,7 +270,7 @@ local function _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick()
                     context["下一次召唤Ms"] = now + _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["召唤间隔秒"] * 1000
                 end
             end
-            ::__continue42::
+            ::__continue41::
             i = i + 1
         end
     end

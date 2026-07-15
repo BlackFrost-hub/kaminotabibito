@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 播放巴尔扎罗斯台词, 播放格鲁姆台词, 播放塞拉台词 } from "./14．台词播放";
@@ -41,15 +42,6 @@ const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const 护卫归属Boss表: Record<number, any | undefined> = {};
 let 护卫死亡监听已注册 = false;
 let 熔核封印伤害修正已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
 
 function 登记护卫归属(this: void, context: 巴尔扎罗斯运行时上下文, guard: any): void {
   const id = 取单位ID(guard);

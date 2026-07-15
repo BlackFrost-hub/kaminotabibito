@@ -52,13 +52,6 @@ function 取反击上下文(this: void, boss: any): 里科特运行时上下文 
   return undefined;
 }
 
-function 播放限时反击特效(this: void, target: any): void {
-  const cfg = 里科特数值与表现配置.破魔反击;
-  const model: string = cfg.反击特效路径;
-  if (!单位有效(target) || model === "") return;
-  createTimedUnitEffect(target, 'origin', model, cfg.反击特效持续秒);
-}
-
 function 结束破魔反击窗口(this: void, context: 里科特运行时上下文): void {
   context.破魔反击中 = false;
   移除单位指定Buff(context.Boss单位, 里科特BuffID.破魔反击);
@@ -72,7 +65,7 @@ function 开始破魔反击窗口(this: void, context: 里科特运行时上下�
   播放里科特施法维持动作(boss, cfg.反击窗口秒, cfg.动画速度);
   registerManualBuff(boss, 里科特BuffID.破魔反击, cfg.反击窗口秒, 1, { sourceName: "里科特-破魔反击" });
   播放Boss坐标音效(里科特音效配置.破魔反击.窗口开启, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
-  播放限时反击特效(boss);
+  createTimedUnitEffect(boss, "origin", cfg.反击特效路径, cfg.反击特效持续秒);
   创建技能提示圈({
     类型: "圆形",
     X: GetUnitX(boss),
@@ -122,7 +115,7 @@ function on里科特破魔反击伤害修正(this: void, damageContext: any): nu
   按比例移除当前生命(attacker, ratio, true);
   施加眩晕(boss, attacker, cfg.眩晕秒);
   播放Boss坐标音效(里科特音效配置.破魔反击.触发剥离, GetUnitX(attacker), GetUnitY(attacker), 里科特音效配置.默认裁断距离);
-  播放限时反击特效(attacker);
+  createTimedUnitEffect(attacker, "origin", cfg.反击特效路径, cfg.反击特效持续秒);
   结束破魔反击窗口(context);
   return damageContext.currentDamage;
 }

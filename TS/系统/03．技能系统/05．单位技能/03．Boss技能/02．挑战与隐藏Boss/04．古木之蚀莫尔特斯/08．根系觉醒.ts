@@ -10,6 +10,9 @@ const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系�
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 const jass = require("jass.common") as any;
 
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
@@ -78,7 +81,7 @@ function 根系觉醒失败爆发(this: void, context: 莫尔特斯运行时上�
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
   治疗Boss最大生命比例(boss, cfg.失败回血比例);
-  AddSpecialEffect(cfg.全屏爆发特效路径, GetUnitX(boss), GetUnitY(boss));
+  创建点特效({ 模型路径: cfg.全屏爆发特效路径, X: GetUnitX(boss), Y: GetUnitY(boss), 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(莫尔特斯音效配置.根系觉醒.失败爆发, GetUnitX(boss), GetUnitY(boss), 莫尔特斯音效配置.默认裁断距离);
   const 技能实例ID = 创建独立技能伤害实例({
     来源类型: "Boss技能",
@@ -136,13 +139,13 @@ function 创建腐败之源目标列表(this: void, context: 莫尔特斯运行�
 
 function 莫尔特斯腐败之源死亡(this: void, unit: any): void {
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
-  AddSpecialEffect(cfg.腐败之源摧毁特效路径, GetUnitX(unit), GetUnitY(unit));
+  创建点特效({ 模型路径: cfg.腐败之源摧毁特效路径, X: GetUnitX(unit), Y: GetUnitY(unit), 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(莫尔特斯音效配置.根系觉醒.腐败之源摧毁, GetUnitX(unit), GetUnitY(unit), 莫尔特斯音效配置.默认裁断距离);
 }
 
 function 莫尔特斯腐败之源销毁(this: void, unit: any): void {
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
-  AddSpecialEffect(cfg.腐败之源摧毁特效路径, GetUnitX(unit), GetUnitY(unit));
+  创建点特效({ 模型路径: cfg.腐败之源摧毁特效路径, X: GetUnitX(unit), Y: GetUnitY(unit), 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(莫尔特斯音效配置.根系觉醒.腐败之源摧毁, GetUnitX(unit), GetUnitY(unit), 莫尔特斯音效配置.默认裁断距离);
 }
 
@@ -158,8 +161,8 @@ function 莫尔特斯根系觉醒结束(this: void, _是否成功: boolean, _剩
   context.腐败之源组 = undefined;
 }
 
-export function 尝试触发莫尔特斯根系觉醒(this: void, context: 莫尔特斯运行时上下文): void {
-  if (context.根系觉醒已触发 || context.阶段 < 2 || !单位有效(context.Boss单位)) return;
+export function 触发莫尔特斯根系觉醒(this: void, context: 莫尔特斯运行时上下文): void {
+  if (context.根系觉醒已触发 || !单位有效(context.Boss单位)) return;
   context.根系觉醒已触发 = true;
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
   播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
@@ -186,7 +189,4 @@ export function 尝试触发莫尔特斯根系觉醒(this: void, context: 莫尔
   });
   const hideId = addDelayedCallback(cfg.显形动作秒 * 1000, 延迟隐藏根系觉醒Boss, context);
   context.清理.登记延迟回调("莫尔特斯-根系觉醒显形动作", hideId);
-}
-
-export function 注册莫尔特斯根系觉醒(this: void): void {
 }

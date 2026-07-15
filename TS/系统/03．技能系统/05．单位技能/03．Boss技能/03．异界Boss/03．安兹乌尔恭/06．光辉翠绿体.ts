@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 获取或创建安兹运行时上下文, 标记安兹普通机制忙碌 } from './01．运行时上下文';
 import { 安兹乌尔恭单位技能配置 } from './00．配置';
@@ -25,15 +26,11 @@ const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, unit: any, point: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as ((effect: any, color: number) => void) | undefined;
+const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as (effect: any, color: number) => void;
 
 const 安兹单位类型ID = stringToFourCC(安兹乌尔恭单位技能配置.正式单位ID);
 const 光辉翠绿体技能ID = stringToFourCC(安兹乌尔恭单位技能配置.技能壳.光辉翠绿体);
 let 光辉翠绿体已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 释放翠绿冲击(this: void, boss: any): void {
   if (!单位有效(boss)) return;
@@ -65,7 +62,7 @@ function 创建翠绿防护(this: void, context: 安兹运行时上下文): void
   if (!单位有效(boss)) return;
   const config = 安兹乌尔恭数值与表现配置;
   const effect = AddSpecialEffectTarget(config.表现资源.光辉翠绿体特效路径, boss, 'origin');
-  if (effect != null && effect !== 0 && typeof DzSetEffectVertexColor === 'function') {
+  if (effect != null && effect !== 0) {
     DzSetEffectVertexColor(effect, 80 * 65536 + 255 * 256 + 120);
   }
   let effectDestroyed = false;

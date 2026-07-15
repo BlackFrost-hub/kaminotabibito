@@ -16,3 +16,4 @@ export * from "./14．终极污染";
 export * from "./15．台词播放";
 export * from "./16．技能入口";
 export * from "./17．被动效果";
+export * from "./18．技能调度";

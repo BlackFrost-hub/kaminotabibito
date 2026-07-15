@@ -22,7 +22,10 @@ export interface 点名预警执行结果 {
 export interface 点名预警执行器参数 {
   清理?: 机制清理篮子;
   名称: string;
-  目标: any;
+  目标?: any;
+  锁定X?: number;
+  锁定Y?: number;
+  取坐标?: (this: void, 目标: any) => { X: number; Y: number };
   延迟秒: number;
   /** 默认锁定点名瞬间坐标；false 表示结算时读取目标实时坐标。 */
   锁定坐标?: boolean;
@@ -44,10 +47,11 @@ class 点名预警执行器实现 implements 点名预警执行器 {
 
   constructor(参数: 点名预警执行器参数) {
     this.参数 = 参数;
+    const 初始坐标 = this.读取坐标();
     this.结果 = {
       目标: 参数.目标,
-      锁定X: 参数.目标 != null && 参数.目标 !== 0 ? GetUnitX(参数.目标) : 0,
-      锁定Y: 参数.目标 != null && 参数.目标 !== 0 ? GetUnitY(参数.目标) : 0,
+      锁定X: 初始坐标.X,
+      锁定Y: 初始坐标.Y,
     };
     if (参数.on锁定 != null) 参数.on锁定(this.结果);
     this.创建提示圈();
@@ -71,11 +75,23 @@ class 点名预警执行器实现 implements 点名预警执行器 {
     if (this.已取消) return;
     this.已取消 = true;
     this.延迟ID = 0;
-    if (this.参数.锁定坐标 === false && this.参数.目标 != null && this.参数.目标 !== 0) {
-      this.结果.锁定X = GetUnitX(this.参数.目标);
-      this.结果.锁定Y = GetUnitY(this.参数.目标);
+    if (this.参数.锁定坐标 === false) {
+      const 当前坐标 = this.读取坐标();
+      this.结果.锁定X = 当前坐标.X;
+      this.结果.锁定Y = 当前坐标.Y;
     }
     this.参数.on结算(this.结果);
+  }
+
+  private 读取坐标(): { X: number; Y: number } {
+    if (this.参数.取坐标 != null) return this.参数.取坐标(this.参数.目标);
+    if (this.参数.锁定X != null && this.参数.锁定Y != null) {
+      return { X: this.参数.锁定X, Y: this.参数.锁定Y };
+    }
+    if (this.参数.目标 != null && this.参数.目标 !== 0) {
+      return { X: GetUnitX(this.参数.目标), Y: GetUnitY(this.参数.目标) };
+    }
+    return { X: 0, Y: 0 };
   }
 
   private 创建提示圈(): void {

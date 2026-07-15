@@ -19,7 +19,6 @@ const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技�
 };
 const jass = require("jass.common") as any;
 
-const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -54,27 +53,12 @@ const 里科特单位类型ID = stringToFourCC(里科特单位技能配置.单�
 const 神风护体技能ID = stringToFourCC(里科特数值与表现配置.神风护体.技能槽位);
 let 已注册 = false;
 
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 取里科特上下文ByBoss(this: void, boss: any): 里科特运行时上下文 | undefined {
   const contexts = 获取全部里科特上下文();
   for (let i = 0; i < contexts.length; i++) {
     if (contexts[i].Boss单位 === boss) return contexts[i];
   }
   return undefined;
-}
-
-function 播放限时目标特效(this: void, target: any, model: string, attach: string, duration: number): void {
-  if (!单位有效(target) || model === "") return;
-  createTimedUnitEffect(target, attach, model, duration);
-}
-
-function 播放限时点特效(this: void, model: string, x: number, y: number, duration: number): void {
-  if (model === "") return;
-  createTimedEffect(model, x, y, 0, duration);
 }
 
 function 设置神风护体层数(this: void, context: 里科特运行时上下文): void {
@@ -84,7 +68,7 @@ function 设置神风护体层数(this: void, context: 里科特运行时上下�
     stack: cfg.基础层数,
     sourceName: "里科特-神风护体",
   });
-  播放限时目标特效(context.Boss单位, cfg.护体特效路径, "origin", cfg.持续秒);
+  createTimedUnitEffect(context.Boss单位, "origin", cfg.护体特效路径, cfg.持续秒);
 }
 
 function 更新神风护体层数Buff(this: void, context: 里科特运行时上下文): void {
@@ -131,7 +115,7 @@ function 结算单个神风粉碎(this: void, context: 里科特运行时上下�
   });
   施加眩晕(context.Boss单位, target, stun);
   播放Boss坐标音效(里科特音效配置.神风护体.粉碎清算, GetUnitX(target), GetUnitY(target), 里科特音效配置.默认裁断距离);
-  播放限时点特效(cfg.粉碎特效路径, GetUnitX(target), GetUnitY(target), 1);
+  createTimedEffect(cfg.粉碎特效路径, GetUnitX(target), GetUnitY(target), 0, 1);
   清除里科特神风印记(context, target);
   移除单位指定Buff(target, 里科特BuffID.神风印记);
 }

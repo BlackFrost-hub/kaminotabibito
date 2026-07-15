@@ -30,8 +30,6 @@ local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
-local AddSpecialEffect = jass.AddSpecialEffect
-local DestroyEffect = jass.DestroyEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -43,19 +41,21 @@ local addPeriodicCallback = ____require_result_2.addPeriodicCallback
 local removePeriodicCallback = ____require_result_2.removePeriodicCallback
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.13．属性抗性门槛")
-local _____6EE1_8DB3_5C5E_6027_6297_6027_95E8_69DB = ____require_result_5["满足属性抗性门槛"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.10．战斗视野压制")
-local _____65BD_52A0_6218_6597_89C6_91CE_538B_5236 = ____require_result_6["施加战斗视野压制"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_7["施加快速控制Buff"]
-local ____require_result_8 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_8.registerManualBuff
-local ____require_result_9 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉")
-local _____5361_745F_62C9BuffID = ____require_result_9["卡瑟拉BuffID"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_5["获取Boss技能随机敌对英雄"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.13．属性抗性门槛")
+local _____6EE1_8DB3_5C5E_6027_6297_6027_95E8_69DB = ____require_result_6["满足属性抗性门槛"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.10．战斗视野压制")
+local _____65BD_52A0_6218_6597_89C6_91CE_538B_5236 = ____require_result_7["施加战斗视野压制"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_8["施加快速控制Buff"]
+local ____require_result_9 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_9.registerManualBuff
+local ____require_result_10 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉")
+local _____5361_745F_62C9BuffID = ____require_result_10["卡瑟拉BuffID"]
 local _____5361_745F_62C9_5355_4F4D_7C7B_578BID = stringToFourCC(_____5361_745F_62C9_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____58A8_6C41_55B7_5410_6280_80FDID = stringToFourCC(_____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["墨汁喷吐"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -72,17 +72,9 @@ local function _____64AD_653E_58A8_6C41_5730_9762_7279_6548(context, x, y)
     if model == "" then
         return
     end
-    local effect = AddSpecialEffect(model, x, y)
-    local ____self_10 = context["清理"]
-    ____self_10["登记特效"](____self_10, "卡瑟拉-墨汁地面残留", effect)
-    local id = addDelayedCallback(
-        cfg["残留秒"] * 1000,
-        function()
-            DestroyEffect(effect)
-        end
-    )
+    local effect = _____521B_5EFA_70B9_7279_6548({["模型路径"] = model, X = x, Y = y})
     local ____self_11 = context["清理"]
-    ____self_11["登记延迟回调"](____self_11, "卡瑟拉-墨汁残留特效销毁", id)
+    ____self_11["登记限时特效"](____self_11, "卡瑟拉-墨汁地面残留", effect, cfg["残留秒"] * 1000)
 end
 local function _____5355_4F4D_5728_58A8_6C41_6247_5F62_5185(unit, area)
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["墨汁喷吐"]
@@ -111,7 +103,7 @@ local function _____7ED3_7B97_58A8_6C41_533A_57DF_4E00_8DF3(area)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) or not _____5355_4F4D_5728_58A8_6C41_6247_5F62_5185(hero, area) then
-                    goto __continue12
+                    goto __continue11
                 end
                 local resisted = _____6EE1_8DB3_5C5E_6027_6297_6027_95E8_69DB(hero, "水", cfg["水抗门槛"], true)
                 local factor = resisted and cfg["达标效果倍率"] or 1
@@ -137,7 +129,7 @@ local function _____7ED3_7B97_58A8_6C41_533A_57DF_4E00_8DF3(area)
                 )
                 affected[#affected + 1] = hero
             end
-            ::__continue12::
+            ::__continue11::
             i = i + 1
         end
     end

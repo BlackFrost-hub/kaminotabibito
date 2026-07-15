@@ -2,11 +2,8 @@
 
 import type { 瑟兰迪尔运行时上下文 } from "./03．运行时上下文";
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位存活 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
-const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  getServerTime: (this: void) => number;
-};
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   getBuffRuntime: (this: void, unit: any, buffID: string) => { effect: number; remaining: number } | null;
@@ -41,10 +38,6 @@ const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, tar
 const 瑟兰迪尔单位ID = stringToFourCC("N057");
 let 伤害修正已注册 = false;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0;
-}
-
 function 获取本次印记增伤(this: void): number {
   const config = 瑟兰迪尔数值与表现配置.执法印记;
   return 取当前有效玩家人数() <= 1 ? config.单人额外伤害加成 : config.Boss对标记目标伤害加成;
@@ -65,22 +58,14 @@ function 确保执法印记伤害修正(this: void): void {
   registerDamageModifier(on执法印记伤害修正, 35);
 }
 
-export function 尝试触发瑟兰迪尔执法印记(this: void, context: 瑟兰迪尔运行时上下文): void {
-  const config = 瑟兰迪尔数值与表现配置.执法印记;
-  const now = getServerTime();
-  if (context.上次执法印记Ms > 0 && now - context.上次执法印记Ms < config.周期秒 * 1000) return;
-  context.上次执法印记Ms = now;
-
+export function 选择瑟兰迪尔执法印记目标(this: void, context: 瑟兰迪尔运行时上下文): any {
   const threatTarget = 获取Boss技能应攻击目标(context.Boss单位);
-  const target = threatTarget?.targetRef ?? 获取Boss技能最近敌对英雄(context.Boss单位);
-  if (!单位有效(target)) return;
-
-  释放瑟兰迪尔执法印记(context, target);
+  return threatTarget?.targetRef ?? 获取Boss技能最近敌对英雄(context.Boss单位);
 }
 
-export function 释放瑟兰迪尔执法印记(this: void, context: 瑟兰迪尔运行时上下文, target: any): void {
+export function 释放瑟兰迪尔执法印记(this: void, context: 瑟兰迪尔运行时上下文, target: any): boolean {
   const config = 瑟兰迪尔数值与表现配置.执法印记;
-  if (!单位有效(context.Boss单位) || !单位有效(target)) return;
+  if (!单位有效(context.Boss单位) || !单位有效(target)) return false;
   const bonus = 获取本次印记增伤();
   const durationMs = config.持续秒 * 1000;
   setThreat(context.Boss单位, target, 1000);
@@ -92,6 +77,7 @@ export function 释放瑟兰迪尔执法印记(this: void, context: 瑟兰迪尔
     iconOverride: "BuffIcon\\Boss\\Thranduil\\zhifayinji.blp",
     effectModelOverride: config.特效,
   });
+  return true;
 }
 
 export function 注册瑟兰迪尔执法印记(this: void): void {

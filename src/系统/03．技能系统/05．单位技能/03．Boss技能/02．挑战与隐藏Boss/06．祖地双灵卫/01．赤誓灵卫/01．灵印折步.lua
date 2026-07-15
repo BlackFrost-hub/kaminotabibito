@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
 local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["祖地双灵卫数值与表现配置"]
 local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
@@ -39,9 +41,6 @@ local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local RAD_TO_DEG = 57.29577951308232
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____9650_5236_5728_573A_5730_5185(context, x, y)
     local margin = 64
     local minX = context["场地中心X"] - context["场地半宽"] + margin
@@ -107,7 +106,7 @@ ____exports["创建赤誓镇魂印"] = function(context, x, y)
                     do
                         local target = units[i + 1]
                         if not _____5355_4F4D_6709_6548(target) or not _____5355_4F4D_5728_5217_8868_4E2D(target, heroes) then
-                            goto __continue15
+                            goto __continue14
                         end
                         _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                             boss,
@@ -132,7 +131,7 @@ ____exports["创建赤誓镇魂印"] = function(context, x, y)
                             ["启用闪电效果"] = false
                         })
                     end
-                    ::__continue15::
+                    ::__continue14::
                     i = i + 1
                 end
             end
@@ -155,7 +154,7 @@ ____exports["创建赤誓镇魂印"] = function(context, x, y)
                 local dx = GetUnitX(hit) - x
                 local dy = GetUnitY(hit) - y
                 if dx * dx + dy * dy > radius2 then
-                    goto __continue20
+                    goto __continue19
                 end
                 local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -171,7 +170,7 @@ ____exports["创建赤誓镇魂印"] = function(context, x, y)
                     ["标签"] = "祖地双灵卫·灵印折步镇魂印"
                 })
             end
-            ::__continue20::
+            ::__continue19::
             i = i + 1
         end
     end

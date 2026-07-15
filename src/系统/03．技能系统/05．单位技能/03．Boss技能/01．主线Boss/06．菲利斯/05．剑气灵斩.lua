@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_76EE_6807, _____8865_5145Boss_9B54_6CD5, _____521B_5EFA_65B9_5411_7279_6548, _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D, _____521B_5EFA_4FB5_8680_6B8B_7559, ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, GetSpellTargetUnit, UNIT_STATE_MAX_LIFE, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_6C14_7075_65A9_6280_80FDID
+local _____53D6_76EE_6807, _____8865_5145Boss_9B54_6CD5, _____521B_5EFA_65B9_5411_7279_6548, _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D, _____521B_5EFA_4FB5_8680_6B8B_7559, ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, GetSpellTargetUnit, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_6C14_7075_65A9_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
@@ -72,7 +72,7 @@ function _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(context, ax, ay, bx, by, w
                 ) > width2 then
                     goto __continue10
                 end
-                local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["Boss攻击力比例"] + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["目标最大生命比例"]
+                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hero, {["来源攻击力比例"] = cfg["Boss攻击力比例"], ["目标最大生命比例"] = cfg["目标最大生命比例"]})
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____5251_6C14_7075_65A9_6280_80FDID,
                     ["来源"] = boss,
@@ -152,7 +152,7 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
                         ) > width2 then
                             goto __continue18
                         end
-                        local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["侵蚀Boss攻击力比例"] + GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["侵蚀目标最大生命比例"]
+                        local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hero, {["来源攻击力比例"] = cfg["侵蚀Boss攻击力比例"], ["目标最大生命比例"] = cfg["侵蚀目标最大生命比例"]})
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
                             ["技能ID"] = _____5251_6C14_7075_65A9_6280_80FDID,
                             ["来源"] = boss,
@@ -262,8 +262,10 @@ function ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548(castingUnit, spellA
     end
     ____exports["释放菲利斯剑气灵斩"](context)
 end
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+_____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
+local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_1["造成AOE技能伤害"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
@@ -271,15 +273,13 @@ GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
 SetUnitState = jass.SetUnitState
 GetSpellTargetUnit = jass.GetSpellTargetUnit
-UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")

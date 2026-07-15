@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
@@ -38,10 +39,6 @@ const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
 const 亡冥英斩技能Key = '亡冥英斩';
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 造成亡冥英斩伤害(this: void, source: any, target: any, attackRatio: number, lifeRatio: number, tag: string): void {
   const damage = 计算组合技能伤害(source, target, { 来源攻击力比例: attackRatio, 目标最大生命比例: lifeRatio });

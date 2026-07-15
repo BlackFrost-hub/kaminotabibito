@@ -33,9 +33,6 @@ local function _____521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587(boss, _____6E05_7406
     }
 end
 local _____83F2_5229_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "菲利斯", ["主动技能提示"] = _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587})
-local function _____53D6_5355_4F4DID(unit)
-    return _____83F2_5229_65AF_4E0A_4E0B_6587_5DE5_5382["取单位ID"](unit)
-end
 ____exports["获取菲利斯上下文"] = function(boss)
     return _____83F2_5229_65AF_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
 end
@@ -49,20 +46,20 @@ ____exports["获取全部菲利斯上下文"] = function()
     return _____83F2_5229_65AF_4E0A_4E0B_6587_5DE5_5382["获取全部"]()
 end
 ____exports["登记菲利斯剑魂狼"] = function(wolf, record)
-    local id = _____53D6_5355_4F4DID(wolf)
+    local id = _____83F2_5229_65AF_4E0A_4E0B_6587_5DE5_5382["取单位ID"](wolf)
     if id == 0 then
         return
     end
     _____83F2_5229_65AF_5251_9B42_72FC_8868[id] = record
 end
 ____exports["注销菲利斯剑魂狼"] = function(wolf)
-    local id = _____53D6_5355_4F4DID(wolf)
+    local id = _____83F2_5229_65AF_4E0A_4E0B_6587_5DE5_5382["取单位ID"](wolf)
     if id ~= 0 then
         __TS__Delete(_____83F2_5229_65AF_5251_9B42_72FC_8868, id)
     end
 end
 ____exports["获取菲利斯剑魂狼记录"] = function(wolf)
-    local id = _____53D6_5355_4F4DID(wolf)
+    local id = _____83F2_5229_65AF_4E0A_4E0B_6587_5DE5_5382["取单位ID"](wolf)
     local ____temp_2
     if id == 0 then
         ____temp_2 = nil
@@ -75,7 +72,7 @@ local function ____on_83F2_5229_65AF_5355_4F4D_6B7B_4EA1(dyingUnit)
     if GetUnitTypeId(dyingUnit) == _____83F2_5229_65AF_5355_4F4D_7C7B_578BID then
         _____64AD_653E_83F2_5229_65AF_53F0_8BCD(dyingUnit, "死亡", 0)
     end
-    local id = _____53D6_5355_4F4DID(dyingUnit)
+    local id = _____83F2_5229_65AF_4E0A_4E0B_6587_5DE5_5382["取单位ID"](dyingUnit)
     if id == 0 then
         return
     end

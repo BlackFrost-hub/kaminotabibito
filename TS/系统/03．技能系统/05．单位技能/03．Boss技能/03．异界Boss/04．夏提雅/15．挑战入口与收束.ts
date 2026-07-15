@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 清理夏提雅运行时上下文, 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅单位技能配置 } from './00．配置';
@@ -42,10 +43,6 @@ const ShowUnit = jass.ShowUnit as (unit: any, flag: boolean) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const 血之复生技能Key = '血之复生';
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 export function 启动夏提雅挑战收束(this: void, context: 夏提雅运行时上下文, 是否再次战败 = false): boolean {
   const boss = context.Boss单位;

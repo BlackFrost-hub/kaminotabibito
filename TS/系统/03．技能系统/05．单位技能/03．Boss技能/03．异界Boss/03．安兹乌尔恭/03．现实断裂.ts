@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 极坐标X, 极坐标Y } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 获取或创建安兹运行时上下文, 标记安兹普通机制忙碌 } from './01．运行时上下文';
 import { 安兹乌尔恭单位技能配置 } from './00．配置';
@@ -7,9 +12,6 @@ import { 安兹乌尔恭数值与表现配置 } from './02．数值与表现配�
 import { 注册单位技能壳监听 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器';
 import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
-const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线') as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -27,28 +29,17 @@ const { 获取Boss技能最高仇恨目标, 获取Boss技能随机敌对英雄, 
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
-};
-const { 设置特效XYZ轴旋转 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
-  设置特效XYZ轴旋转: (this: void, effect: any, 参数: { X轴角度?: number; Y轴角度?: number; Z轴角度?: number }) => void;
+const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 
 const jass = require('jass.common') as any;
-const japi = require('jass.japi') as any;
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const BJ_RADTODEG = 57.29577951308232;
 const 安兹单位类型ID = stringToFourCC(安兹乌尔恭单位技能配置.正式单位ID);
 const 现实断裂技能ID = stringToFourCC(安兹乌尔恭单位技能配置.技能壳.现实断裂);
@@ -63,10 +54,6 @@ export const 现实断裂技能状态 = {
   语义: '预告一条狭长空间切面，延迟后按固定方向爆发并保留可识别安全区。',
 } as const;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
 function 取目标(this: void, boss: any): any {
   const entry = 获取Boss技能最高仇恨目标(boss);
   if (entry != null && 单位有效(entry.targetRef)) return entry.targetRef;
@@ -79,27 +66,30 @@ function 取方向角(this: void, boss: any, target: any): number {
 
 function 计算伤害(this: void, boss: any, target: any): number {
   const config = 安兹乌尔恭数值与表现配置.普通技能;
-  return 读取单位攻击力(boss) * config.现实断裂伤害Boss攻击力比例
-    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.现实断裂伤害目标最大生命比例;
+  return 计算组合技能伤害(boss, target, {
+    来源攻击力比例: config.现实断裂伤害Boss攻击力比例,
+    目标最大生命比例: config.现实断裂伤害目标最大生命比例,
+  });
 }
 
 function 播放现实断裂特效(this: void, x: number, y: number, angle: number): void {
   const config = 安兹乌尔恭数值与表现配置;
-  const effect = AddSpecialEffect(config.表现资源.现实断裂特效路径, x, y);
-  if (effect == null || effect === 0) return;
-  if (typeof EXSetEffectSize === 'function') EXSetEffectSize(effect, config.普通技能.现实断裂特效缩放);
-  设置特效XYZ轴旋转(effect, { Z轴角度: angle });
-  YDWETimerDestroyEffectSafe(config.普通技能.现实断裂特效持续秒, effect);
+  创建点特效({
+    模型路径: config.表现资源.现实断裂特效路径,
+    X: x,
+    Y: y,
+    缩放: config.普通技能.现实断裂特效缩放,
+    Z轴角度: angle,
+    持续秒: config.普通技能.现实断裂特效持续秒,
+  });
 }
 
 function 创建现实断裂判定(this: void, context: 安兹运行时上下文, angle: number, originX: number, originY: number): void {
   const config = 安兹乌尔恭数值与表现配置.普通技能;
   const boss = context.安兹单位;
-  const forwardX = Math.cos(angle * Math.PI / 180);
-  const forwardY = Math.sin(angle * Math.PI / 180);
   播放现实断裂特效(
-    originX + forwardX * config.现实断裂路径长度 * 0.5,
-    originY + forwardY * config.现实断裂路径长度 * 0.5,
+    极坐标X(originX, angle, config.现实断裂路径长度 * 0.5),
+    极坐标Y(originY, angle, config.现实断裂路径长度 * 0.5),
     angle,
   );
   创建线段危险区({
@@ -146,8 +136,8 @@ export function 释放安兹现实断裂(this: void, context: 安兹运行时上
   const originY = GetUnitY(boss);
   创建技能提示圈({
     类型: '矩形',
-    X: originX + Math.cos(angle * Math.PI / 180) * config.现实断裂路径长度 * 0.5,
-    Y: originY + Math.sin(angle * Math.PI / 180) * config.现实断裂路径长度 * 0.5,
+    X: 极坐标X(originX, angle, config.现实断裂路径长度 * 0.5),
+    Y: 极坐标Y(originY, angle, config.现实断裂路径长度 * 0.5),
     宽度: config.现实断裂路径宽度,
     长度: config.现实断裂路径长度,
     朝向: angle,
@@ -156,8 +146,8 @@ export function 释放安兹现实断裂(this: void, context: 安兹运行时上
   });
   启动基础施法时间线({
     施法者: boss,
-    目标X: originX + Math.cos(angle * Math.PI / 180) * config.现实断裂路径长度,
-    目标Y: originY + Math.sin(angle * Math.PI / 180) * config.现实断裂路径长度,
+    目标X: 极坐标X(originX, angle, config.现实断裂路径长度),
+    目标Y: 极坐标Y(originY, angle, config.现实断裂路径长度),
     硬直秒: config.现实断裂预警秒,
     动画编号: 3,
     动画速度: 1,

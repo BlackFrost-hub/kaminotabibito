@@ -1,6 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, getServerTime, GetUnitState, SetUnitState, IsUnitType, UNIT_TYPE_DEAD, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
+local getServerTime, GetUnitState, SetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____4E24_5355_4F4D_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间距离平方"]
 local ____index = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.index")
 local _____96C5_513F_8D1D_5FB7_6280_80FD_72B6_6001 = ____index["雅儿贝德技能状态"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
@@ -22,9 +25,6 @@ local ____01_FF0E_81F3_5C0A_62E6_622A = require("系统.03．技能系统.05．�
 local _____6CE8_518C_96C5_513F_8D1D_5FB7_81F3_5C0A_62E6_622A = ____01_FF0E_81F3_5C0A_62E6_622A["注册雅儿贝德至尊拦截"]
 local ____03_FF0E_5B88_62A4_8005_4E4B_804C_8D23 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.03．守护者之职责")
 local _____6CE8_518C_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23 = ____03_FF0E_5B88_62A4_8005_4E4B_804C_8D23["注册雅儿贝德守护者之职责"]
-function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 ____exports["推进安兹守护者模式"] = function(context)
     local state = context["雅儿贝德"]
     local albedo = state and state["单位"]
@@ -79,20 +79,15 @@ local GetUnitFacing = jass.GetUnitFacing
 GetUnitState = jass.GetUnitState
 SetUnitState = jass.SetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
-IsUnitType = jass.IsUnitType
+local IsUnitType = jass.IsUnitType
 local Cos = jass.Cos
 local Sin = jass.Sin
-UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local DEG_TO_RAD = 0.017453292519943295
 local _____96C5_513F_8D1D_5FB7_4F24_5BB3_4FEE_6B63_5DF2_6CE8_518C = false
 local _____96C5_513F_8D1D_5FB7_8FD0_884C_65F6_9A71_52A8_5DF2_6CE8_518C = false
-local function _____4E24_5355_4F4D_8DDD_79BB_5E73_65B9(a, b)
-    local dx = GetUnitX(a) - GetUnitX(b)
-    local dy = GetUnitY(a) - GetUnitY(b)
-    return dx * dx + dy * dy
-end
 local function _____67E5_627E_8054_5408_4E0A_4E0B_6587(unit)
     local contexts = _____83B7_53D6_5168_90E8_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587()
     do

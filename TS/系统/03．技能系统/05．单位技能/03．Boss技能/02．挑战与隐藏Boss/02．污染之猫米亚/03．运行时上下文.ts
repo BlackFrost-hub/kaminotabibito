@@ -1,22 +1,22 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 创建可配置层数状态, 可配置层数状态控制器 } from "../../../../00．技能模板+函数/04．机制组件/01．层数状态";
 import { 米亚安全域运行时矩形组, 创建米亚安全域矩形组, 清理米亚安全域矩形组, 取米亚单位所在安全域, 取米亚平台中心X, 取米亚平台中心Y } from "./01．场地配置";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚腐化感染配置, 米亚阶段阈值, 米亚音效配置, 米亚运行时配置 } from "./02．数值与表现配置";
-import { 尝试触发米亚灵猫分身 } from "./07．灵猫分身";
 import { 刷新米亚污染标记 } from "./08．污染标记";
-import { 尝试触发米亚污染脉冲 } from "./09．污染脉冲";
-import { 尝试触发米亚污水柱爆发 } from "./10．污水柱爆发";
-import { 尝试触发米亚腐化转移 } from "./11．腐化转移";
+import { 刷新米亚腐化转移污染平台 } from "./11．腐化转移";
 import { 刷新米亚平台超载惩罚 } from "./12．平台超载惩罚";
-import { 刷新米亚腐化黏液涂层 } from "./13．腐化黏液涂层";
-import { 尝试触发米亚终极污染, 清理米亚终极污染 } from "./14．终极污染";
+import { 刷新米亚腐化黏液涂层被动状态 } from "./13．腐化黏液涂层";
+import { 清理米亚终极污染 } from "./14．终极污染";
 import { 播放米亚台词 } from "./15．台词播放";
 import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import type { 机制清理篮子 } from "../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
 import { 创建单位运行时上下文工厂 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
+import { 创建阶段上下文, type 阶段上下文 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/01．阶段上下文";
+import type { 固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 
 const jass = require("jass.common") as any;
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
@@ -26,10 +26,7 @@ const { getServerTime } = require("系统.00．核心系统.05．中心计时器
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
-const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 export type 米亚阶段 = 1 | 2 | 3;
 
@@ -38,6 +35,7 @@ export interface 米亚运行时上下文 {
   阶段: 米亚阶段;
   开战时间Ms: number;
   清理: 机制清理篮子;
+  阶段上下文: 阶段上下文;
   安全域区域组: 米亚安全域运行时矩形组;
   腐化层数控制器: 可配置层数状态控制器;
   已触发分身80: boolean;
@@ -46,32 +44,25 @@ export interface 米亚运行时上下文 {
   上次污染标记低频台词Ms: number;
   已触发终极污染30: boolean;
   已触发终极污染15: boolean;
-  上次腐化爪击Ms: number;
-  上次污水喷吐Ms: number;
   上次污染标记Ms: number;
-  上次污染脉冲Ms: number;
-  上次污水柱爆发Ms: number;
-  上次腐化转移Ms: number;
   上次平台超载检测Ms: number;
-  上次全场甩黏液Ms: number;
+  污染脉冲组合执行器?: 固定组合技能执行器<米亚运行时上下文>;
   腐化转移污染平台ID?: string;
   腐化转移污染结束Ms: number;
   腐化转移下次叠层Ms: number;
+  腐化转移组合执行器?: 固定组合技能执行器<米亚运行时上下文>;
   超载平台ID表: Record<string, boolean | undefined>;
   超载平台下次叠层Ms表: Record<string, number | undefined>;
   上次平台超载台词Ms: number;
+  腐化黏液近战冷却表: Record<number, number | undefined>;
+  腐化黏液上次受伤提示Ms: number;
   终极污染引导中: boolean;
-  终极污染开始Ms: number;
-  终极污染结束Ms: number;
+  终极污染组合执行器?: 固定组合技能执行器<米亚运行时上下文>;
   终极污染核心列表: any[];
   终极污染本次叠层表: Record<number, number | undefined>;
 }
 
 let 米亚运行时已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 创建米亚腐化层数控制器(this: void, context: 米亚运行时上下文): 可配置层数状态控制器 {
   return 创建可配置层数状态({
@@ -106,6 +97,7 @@ function 创建米亚上下文(this: void, boss: any, 清理: 机制清理篮子
     阶段: 1,
     开战时间Ms: getServerTime(),
     清理,
+    阶段上下文: undefined as any,
     安全域区域组: 创建米亚安全域矩形组(),
     腐化层数控制器: undefined as any,
     已触发分身80: false,
@@ -114,29 +106,54 @@ function 创建米亚上下文(this: void, boss: any, 清理: 机制清理篮子
     上次污染标记低频台词Ms: 0,
     已触发终极污染30: false,
     已触发终极污染15: false,
-    上次腐化爪击Ms: 0,
-    上次污水喷吐Ms: 0,
     上次污染标记Ms: 0,
-    上次污染脉冲Ms: 0,
-    上次污水柱爆发Ms: 0,
-    上次腐化转移Ms: 0,
     上次平台超载检测Ms: 0,
-    上次全场甩黏液Ms: 0,
     腐化转移污染平台ID: "",
     腐化转移污染结束Ms: 0,
     腐化转移下次叠层Ms: 0,
     超载平台ID表: {},
     超载平台下次叠层Ms表: {},
     上次平台超载台词Ms: 0,
+    腐化黏液近战冷却表: {},
+    腐化黏液上次受伤提示Ms: 0,
     终极污染引导中: false,
-    终极污染开始Ms: 0,
-    终极污染结束Ms: 0,
     终极污染核心列表: [],
     终极污染本次叠层表: {},
   };
   context.腐化层数控制器 = 创建米亚腐化层数控制器(context);
+  context.阶段上下文 = 创建米亚阶段上下文(context);
   播放米亚台词(boss, "开场", 0);
   return context;
+}
+
+function 创建米亚阶段上下文(this: void, context: 米亚运行时上下文): 阶段上下文 {
+  const boss = context.Boss单位;
+  return 创建阶段上下文({
+    清理: context.清理,
+    名称: "米亚",
+    单位: boss,
+    初始阶段ID: "P1",
+    Tick间隔毫秒: 米亚运行时配置.推进间隔毫秒,
+    阶段列表: [{
+      ID: "P1",
+    }, {
+      ID: "P2",
+      血量百分比: 米亚阶段阈值.第二阶段生命比例,
+      on进入: function 米亚进入P2(this: void): void {
+        context.阶段 = 2;
+        播放Boss坐标音效(米亚音效配置.转阶段2.跳入水池, GetUnitX(boss), GetUnitY(boss), 米亚音效配置.默认裁断距离);
+        延迟播放Boss坐标音效(米亚音效配置.转阶段2.毒水喷涌, 取米亚平台中心X(), 取米亚平台中心Y(), 米亚音效配置.转阶段2.毒水喷涌延迟Ms, 米亚音效配置.默认裁断距离);
+        播放米亚台词(boss, "转阶段2", 0);
+      },
+    }, {
+      ID: "P3",
+      血量百分比: 米亚阶段阈值.第三阶段生命比例,
+      on进入: function 米亚进入P3(this: void): void {
+        context.阶段 = 3;
+        播放米亚台词(boss, "转阶段3", 0);
+      },
+    }],
+  });
 }
 
 function 清理米亚上下文机制(this: void, context: 米亚运行时上下文): void {
@@ -160,25 +177,12 @@ export function 获取或创建米亚上下文(this: void, boss: any): 米亚运
   return 米亚上下文工厂.获取或创建(boss);
 }
 
-export function 清理米亚上下文(this: void, boss: any): void {
-  米亚上下文工厂.清理上下文(boss);
+export function 获取全部米亚上下文(this: void): 米亚运行时上下文[] {
+  return 米亚上下文工厂.获取全部();
 }
 
-function 刷新米亚阶段(this: void, context: 米亚运行时上下文): void {
-  const boss = context.Boss单位;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  if (maxLife <= 0) return;
-  const ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife;
-  if (context.阶段 === 1 && ratio <= 米亚阶段阈值.第二阶段生命比例) {
-    context.阶段 = 2;
-    播放Boss坐标音效(米亚音效配置.转阶段2.跳入水池, GetUnitX(boss), GetUnitY(boss), 米亚音效配置.默认裁断距离);
-    延迟播放Boss坐标音效(米亚音效配置.转阶段2.毒水喷涌, 取米亚平台中心X(), 取米亚平台中心Y(), 米亚音效配置.转阶段2.毒水喷涌延迟Ms, 米亚音效配置.默认裁断距离);
-    播放米亚台词(boss, "转阶段2", 0);
-  }
-  if (context.阶段 === 2 && ratio <= 米亚阶段阈值.第三阶段生命比例) {
-    context.阶段 = 3;
-    播放米亚台词(boss, "转阶段3", 0);
-  }
+export function 清理米亚上下文(this: void, boss: any): void {
+  米亚上下文工厂.清理上下文(boss);
 }
 
 function 推进米亚运行时(this: void, context: 米亚运行时上下文, nowMs: number): void {
@@ -186,15 +190,10 @@ function 推进米亚运行时(this: void, context: 米亚运行时上下文, no
     清理米亚上下文(context.Boss单位);
     return;
   }
-  刷新米亚阶段(context);
-  尝试触发米亚灵猫分身(context);
   刷新米亚污染标记(context, nowMs);
-  尝试触发米亚污染脉冲(context, nowMs);
-  尝试触发米亚污水柱爆发(context, nowMs);
-  尝试触发米亚腐化转移(context, nowMs);
+  刷新米亚腐化转移污染平台(context, nowMs);
   刷新米亚平台超载惩罚(context, nowMs);
-  刷新米亚腐化黏液涂层(context, nowMs);
-  尝试触发米亚终极污染(context);
+  刷新米亚腐化黏液涂层被动状态(context);
 }
 
 export function 注册米亚运行时(this: void): void {

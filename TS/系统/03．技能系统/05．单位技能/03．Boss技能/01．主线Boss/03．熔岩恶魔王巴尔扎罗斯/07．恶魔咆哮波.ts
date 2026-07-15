@@ -1,5 +1,9 @@
 /** @noSelfInFile */
 
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取或创建巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
@@ -7,11 +11,8 @@ import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -29,11 +30,8 @@ const { 获取Boss技能最高仇恨目标, 获取Boss技能随机敌对英雄, 
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
-const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
-};
-const { 设置特效XYZ轴旋转 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  设置特效XYZ轴旋转: (this: void, effect: any, 参数: { X轴角度?: number; Y轴角度?: number; Z轴角度?: number }) => void;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { 施加快速控制Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   施加快速控制Buff: (this: void, 来源单位: any, 目标单位: any, 控制ID: number, 持续时间: number) => void;
@@ -73,10 +71,6 @@ const 恶魔咆哮波技能ID = stringToFourCC(巴尔扎罗斯技能数值配置
 const 快速控制_击晕 = 0;
 let 恶魔咆哮波已注册 = false;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
 function 取目标单位(this: void, boss: any): any {
   const entry = 获取Boss技能最高仇恨目标(boss);
   if (entry != null && 单位有效(entry.targetRef)) return entry.targetRef;
@@ -114,9 +108,11 @@ function 治疗单位(this: void, unit: any, amount: number): void {
 
 function 计算咆哮波伤害(this: void, boss: any, target: any): number {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  return (读取单位攻击力(boss) * config.伤害Boss攻击力比例
-    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.伤害目标最大生命比例)
-    * config.伤害总倍率;
+  return 计算组合技能伤害(boss, target, {
+    来源攻击力比例: config.伤害Boss攻击力比例,
+    目标最大生命比例: config.伤害目标最大生命比例,
+    总倍率: config.伤害总倍率,
+  });
 }
 
 function 记录咆哮波玩家命中(this: void, context: 巴尔扎罗斯运行时上下文, target: any): void {
@@ -135,28 +131,32 @@ function 播放恶魔咆哮波蓄力特效(this: void, boss: any, angle: number)
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
   const x = GetUnitX(boss) + CosBJ(angle) * config.冲击特效前移;
   const y = GetUnitY(boss) + SinBJ(angle) * config.冲击特效前移;
-  const effect = AddSpecialEffect(config.聚火特效路径, x, y);
-  if (effect == null || effect === 0) return;
-  if (typeof EXSetEffectZ === "function") EXSetEffectZ(effect, config.聚火特效高度);
-  if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, config.聚火特效缩放);
-  设置特效XYZ轴旋转(effect, { Z轴角度: angle });
-  YDWETimerDestroyEffectSafe(config.聚火特效持续秒, effect);
+  创建点特效({
+    模型路径: config.聚火特效路径,
+    X: x,
+    Y: y,
+    Z: config.聚火特效高度,
+    缩放: config.聚火特效缩放,
+    Z轴角度: angle,
+    持续秒: config.聚火特效持续秒,
+  });
 }
 
 function 播放恶魔咆哮波冲击特效(this: void, boss: any, angle: number): void {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
   const x = GetUnitX(boss) + CosBJ(angle) * config.冲击特效前移;
   const y = GetUnitY(boss) + SinBJ(angle) * config.冲击特效前移;
-  const effect = AddSpecialEffect(config.冲击特效路径, x, y);
-  if (effect == null || effect === 0) return;
-  if (typeof EXSetEffectZ === "function") EXSetEffectZ(effect, config.冲击特效高度);
-  if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, config.冲击特效缩放);
-  设置特效XYZ轴旋转(effect, {
+  创建点特效({
+    模型路径: config.冲击特效路径,
+    X: x,
+    Y: y,
+    Z: config.冲击特效高度,
+    缩放: config.冲击特效缩放,
     X轴角度: config.冲击特效X轴旋转角度,
     Y轴角度: config.冲击特效Y轴旋转角度,
     Z轴角度: angle + config.冲击特效朝向修正角度,
+    持续秒: config.冲击特效持续秒,
   });
-  YDWETimerDestroyEffectSafe(config.冲击特效持续秒, effect);
 }
 
 function 创建咆哮波预警(this: void, boss: any, angle: number): void {

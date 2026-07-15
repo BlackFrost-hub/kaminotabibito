@@ -1,6 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹模型动画配置"]
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
@@ -19,8 +21,8 @@ local addDelayedCallback = ____require_result_4.addDelayedCallback
 local getServerTime = ____require_result_4.getServerTime
 local ____require_result_5 = require("系统.09．表现系统.06．广播提示消息.index")
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_5["广播单位提示"]
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_6.YDWETimerDestroyEffectSafe
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetHandleId = jass.GetHandleId
@@ -41,9 +43,6 @@ local DEG_TO_RAD = 0.017453292519943295
 local _____9AD8_9636_4EA1_7075_53EC_5524_5927_578B_6280_80FDKey = "高阶亡灵召唤"
 local _____9AD8_9636_4EA1_7075_5B9E_4F8B_8868 = {}
 local _____9AD8_9636_4EA1_7075_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____6E05_7406_9AD8_9636_4EA1_7075_5B9E_4F8B(instance)
     if instance["已移除"] then
         return
@@ -97,14 +96,13 @@ local function _____786E_4FDD_9AD8_9636_4EA1_7075_6B7B_4EA1_76D1_542C()
     registerDeathListener(____on_9AD8_9636_4EA1_7075_6B7B_4EA1)
 end
 local function _____64AD_653E_53EC_5524_7279_6548(model, x, y, scale)
-    local effect = AddSpecialEffect(model, x, y)
-    if effect == nil or effect == 0 then
-        return
-    end
-    if type(EXSetEffectSize) == "function" then
-        EXSetEffectSize(effect, scale)
-    end
-    YDWETimerDestroyEffectSafe(_____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["高阶亡灵召唤表现持续秒"], effect)
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = model,
+        X = x,
+        Y = y,
+        ["缩放"] = scale,
+        ["持续秒"] = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["高阶亡灵召唤表现持续秒"]
+    })
 end
 local function _____521B_5EFA_9AD8_9636_4EA1_7075(context, x, y, target)
     local boss = context["安兹单位"]

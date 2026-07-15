@@ -17,11 +17,8 @@ function _____70B9_540D_9884_8B66_6267_884C_5668_5B9E_73B0.prototype.____constru
     self["延迟ID"] = 0
     self["已取消"] = false
     self["参数"] = _____53C2_6570
-    self["结果"] = {
-        ["目标"] = _____53C2_6570["目标"],
-        ["锁定X"] = _____53C2_6570["目标"] ~= nil and _____53C2_6570["目标"] ~= 0 and GetUnitX(_____53C2_6570["目标"]) or 0,
-        ["锁定Y"] = _____53C2_6570["目标"] ~= nil and _____53C2_6570["目标"] ~= 0 and GetUnitY(_____53C2_6570["目标"]) or 0
-    }
+    local _____521D_59CB_5750_6807 = self["读取坐标"](self)
+    self["结果"] = {["目标"] = _____53C2_6570["目标"], ["锁定X"] = _____521D_59CB_5750_6807.X, ["锁定Y"] = _____521D_59CB_5750_6807.Y}
     if _____53C2_6570["on锁定"] ~= nil then
         _____53C2_6570["on锁定"](self["结果"])
     end
@@ -53,11 +50,27 @@ _____70B9_540D_9884_8B66_6267_884C_5668_5B9E_73B0.prototype["结算"] = function
     end
     self["已取消"] = true
     self["延迟ID"] = 0
-    if self["参数"]["锁定坐标"] == false and self["参数"]["目标"] ~= nil and self["参数"]["目标"] ~= 0 then
-        self["结果"]["锁定X"] = GetUnitX(self["参数"]["目标"])
-        self["结果"]["锁定Y"] = GetUnitY(self["参数"]["目标"])
+    if self["参数"]["锁定坐标"] == false then
+        local _____5F53_524D_5750_6807 = self["读取坐标"](self)
+        self["结果"]["锁定X"] = _____5F53_524D_5750_6807.X
+        self["结果"]["锁定Y"] = _____5F53_524D_5750_6807.Y
     end
     self["参数"]["on结算"](self["结果"])
+end
+_____70B9_540D_9884_8B66_6267_884C_5668_5B9E_73B0.prototype["读取坐标"] = function(self)
+    if self["参数"]["取坐标"] ~= nil then
+        return self["参数"]["取坐标"](self["参数"]["目标"])
+    end
+    if self["参数"]["锁定X"] ~= nil and self["参数"]["锁定Y"] ~= nil then
+        return {X = self["参数"]["锁定X"], Y = self["参数"]["锁定Y"]}
+    end
+    if self["参数"]["目标"] ~= nil and self["参数"]["目标"] ~= 0 then
+        return {
+            X = GetUnitX(self["参数"]["目标"]),
+            Y = GetUnitY(self["参数"]["目标"])
+        }
+    end
+    return {X = 0, Y = 0}
 end
 _____70B9_540D_9884_8B66_6267_884C_5668_5B9E_73B0.prototype["创建提示圈"] = function(self)
     local _____63D0_793A_5708 = self["参数"]["提示圈"]

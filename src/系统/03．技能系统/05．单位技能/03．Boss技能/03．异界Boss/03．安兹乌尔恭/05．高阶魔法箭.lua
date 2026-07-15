@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建安兹运行时上下文"]
 local _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["标记安兹普通机制忙碌"]
@@ -15,8 +17,8 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local ____02_FF0E_5206_6279_70B9_540D_843D_70B9_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.05．点名技能模板.02．分批点名落点模板")
 local _____5F00_59CB_5206_6279_70B9_540D_843D_70B9_6A21_677F = ____02_FF0E_5206_6279_70B9_540D_843D_70B9_6A21_677F["开始分批点名落点模板"]
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -31,11 +33,9 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -51,9 +51,6 @@ ____exports["高阶魔法箭技能状态"] = {
     ["包含战斗自身位移"] = false,
     ["语义"] = "三轮骸骨魔法箭雨按时间差锁定不同玩家当前位置，鼓励分散与连续移动。"
 }
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____53D6_4E3B_8981_76EE_6807(boss)
     local entry = _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807(boss)
     if entry ~= nil and _____5355_4F4D_6709_6548(entry.targetRef) then
@@ -63,7 +60,15 @@ local function _____53D6_4E3B_8981_76EE_6807(boss)
 end
 local function _____8BA1_7B97_9AD8_9636_9B54_6CD5_7BAD_4F24_5BB3(context, boss, target)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
-    return (_____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["高阶魔法箭伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg["高阶魔法箭伤害目标最大生命比例"]) * _____53D6_5B89_5179_4EA1_7075_7BAD_4F24_5BB3_500D_7387(context)
+    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
+        boss,
+        target,
+        {
+            ["来源攻击力比例"] = cfg["高阶魔法箭伤害Boss攻击力比例"],
+            ["目标最大生命比例"] = cfg["高阶魔法箭伤害目标最大生命比例"],
+            ["总倍率"] = _____53D6_5B89_5179_4EA1_7075_7BAD_4F24_5BB3_500D_7387(context)
+        }
+    )
 end
 local function _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, x, y)
     local boss = context["安兹单位"]
@@ -78,9 +83,7 @@ local function _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, x, y)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local effect = AddSpecialEffect(cfg["表现资源"]["高阶魔法箭特效路径"], x, y)
     if effect ~= nil and effect ~= 0 then
-        if type(EXSetEffectSize) == "function" then
-            EXSetEffectSize(effect, cfg["普通技能"]["高阶魔法箭特效缩放"])
-        end
+        EXSetEffectSize(effect, cfg["普通技能"]["高阶魔法箭特效缩放"])
         YDWETimerDestroyEffectSafe(cfg["普通技能"]["高阶魔法箭特效持续秒"], effect)
     end
     local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
@@ -92,12 +95,12 @@ local function _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, x, y)
             do
                 local target = targets[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue11
+                    goto __continue9
                 end
                 local dx = GetUnitX(target) - x
                 local dy = GetUnitY(target) - y
                 if dx * dx + dy * dy > radiusSquared then
-                    goto __continue11
+                    goto __continue9
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____9AD8_9636_9B54_6CD5_7BAD_6280_80FDID,
@@ -112,7 +115,7 @@ local function _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, x, y)
                     ["来源类型"] = "Boss技能"
                 })
             end
-            ::__continue11::
+            ::__continue9::
             i = i + 1
         end
     end

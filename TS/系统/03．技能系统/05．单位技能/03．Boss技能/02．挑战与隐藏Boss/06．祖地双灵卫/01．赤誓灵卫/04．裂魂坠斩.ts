@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 单位是否在扇形区域 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
@@ -7,6 +8,8 @@ import { 单位是否在条形区域 } from '../../../../../00．技能模板+�
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 创建固定组合技能执行器 } from '../../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
+import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from '../../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -16,9 +19,6 @@ const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统
 };
 const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
   造成AOE技能伤害: (this: void, params: any) => boolean;
-};
-const { addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -39,10 +39,6 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 造成裂魂坠斩伤害(this: void, boss: any, target: any, attackRatio: number, maxLifeRatio: number, label: string): void {
   const damage = 计算组合技能伤害(boss, target, { 来源攻击力比例: attackRatio, 目标最大生命比例: maxLifeRatio });
@@ -67,35 +63,47 @@ export function 释放裂魂坠斩(this: void, context: 祖地双灵卫运行时
     EXEffectMatRotateZ(slashTrail, facing);
     YDWETimerDestroyEffectSafe(cfg.前摇秒 + 0.4, slashTrail);
   }
-  const slashId = addDelayedCallback(cfg.前摇秒 * 1000, function 裂魂坠斩重斩结算(this: void): void {
-    if (!单位有效(boss) || context.战斗已结束) return;
-    const impact = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.裂魂坠斩.扇形落地特效路径, startX, startY);
-    if (impact != null && impact !== 0) YDWETimerDestroyEffectSafe(0.8, impact);
-    const heroes = 获取Boss技能敌对英雄列表(boss);
-    for (let i = 0; i < heroes.length; i++) {
-      const hit = heroes[i];
-      if (!单位是否在扇形区域(hit, startX, startY, cfg.扇形半径, facing, cfg.扇形角度)) continue;
-      造成裂魂坠斩伤害(boss, hit, cfg.重斩伤害攻击力比例, cfg.单段目标最大生命比例, '祖地双灵卫·裂魂坠斩');
-    }
-    创建技能提示圈({ 类型: '方向直线', X: startX, Y: startY, 长度: cfg.余震长度, 宽度: cfg.余震宽度, 朝向: facing, 持续时间: cfg.余震延迟秒, 来源单位: boss });
-    const aftershockId = addDelayedCallback(cfg.余震延迟秒 * 1000, function 裂魂坠斩余震结算(this: void): void {
+  const 事件列表: 固定时间轴事件[] = [{
+    时点毫秒: cfg.前摇秒 * 1000,
+    名称: '裂魂坠斩重斩结算',
+    执行: function 裂魂坠斩重斩结算(this: void): void {
+      if (!单位有效(boss) || context.战斗已结束) return;
+      const impact = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.裂魂坠斩.扇形落地特效路径, startX, startY);
+      if (impact != null && impact !== 0) YDWETimerDestroyEffectSafe(0.8, impact);
+      const heroes = 获取Boss技能敌对英雄列表(boss);
+      for (let i = 0; i < heroes.length; i++) {
+        const hit = heroes[i];
+        if (!单位是否在扇形区域(hit, startX, startY, cfg.扇形半径, facing, cfg.扇形角度)) continue;
+        造成裂魂坠斩伤害(boss, hit, cfg.重斩伤害攻击力比例, cfg.单段目标最大生命比例, '祖地双灵卫·裂魂坠斩');
+      }
+      创建技能提示圈({ 类型: '方向直线', X: startX, Y: startY, 长度: cfg.余震长度, 宽度: cfg.余震宽度, 朝向: facing, 持续时间: cfg.余震延迟秒, 来源单位: boss });
+    },
+  }, {
+    时点毫秒: (cfg.前摇秒 + cfg.余震延迟秒) * 1000,
+    名称: '裂魂坠斩余震结算',
+    执行: function 裂魂坠斩余震结算(this: void): void {
       if (!单位有效(boss) || context.战斗已结束) return;
       const wave = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.裂魂坠斩.直线余震特效路径, startX, startY);
       if (wave != null && wave !== 0) {
         EXEffectMatRotateZ(wave, facing);
         YDWETimerDestroyEffectSafe(0.8, wave);
       }
-      const currentHeroes = 获取Boss技能敌对英雄列表(boss);
-      for (let i = 0; i < currentHeroes.length; i++) {
-        const hit = currentHeroes[i];
+      const heroes = 获取Boss技能敌对英雄列表(boss);
+      for (let i = 0; i < heroes.length; i++) {
+        const hit = heroes[i];
         if (!单位是否在条形区域(hit, startX, startY, endX, endY, cfg.余震宽度)) continue;
         造成裂魂坠斩伤害(boss, hit, cfg.余震伤害攻击力比例, cfg.单段目标最大生命比例, '祖地双灵卫·裂魂坠斩余震');
       }
-    });
-    context.清理.登记延迟回调('祖地双灵卫-裂魂坠斩余震', aftershockId);
-  });
-  context.清理.登记延迟回调('祖地双灵卫-裂魂坠斩重斩', slashId);
-  return true;
+    },
+  }];
+  const executor = 创建固定组合技能执行器<祖地双灵卫运行时上下文>({ 名称: '祖地双灵卫-裂魂坠斩', 清理: context.清理, 互斥组: '祖地双灵卫主要技能' });
+  return executor.开始({
+    key: '裂魂坠斩',
+    单位: boss,
+    上下文: context,
+    最大持续毫秒: (cfg.前摇秒 + cfg.余震延迟秒 + 0.2) * 1000,
+    阶段列表: 创建固定时间轴阶段列表(事件列表),
+  }) !== 0;
 }
 
 export const 裂魂坠斩技能状态 = {

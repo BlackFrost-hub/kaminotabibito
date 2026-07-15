@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
 import { 执行非伤害生命移除 } from '../../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/09．非伤害生命移除';
@@ -24,10 +25,6 @@ const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number,
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 export function 启动雅儿贝德至尊共护(this: void, context: 安兹运行时上下文, largeSkillSeconds: number): boolean {
   const state = context.雅儿贝德;

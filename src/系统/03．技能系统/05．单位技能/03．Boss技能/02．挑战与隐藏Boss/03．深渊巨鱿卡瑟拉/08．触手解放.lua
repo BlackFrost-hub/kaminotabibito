@@ -1,7 +1,5 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.01．运行时上下文")
-local _____5237_65B0_5361_745F_62C9_9636_6BB5 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["刷新卡瑟拉阶段"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.02．数值与表现配置")
 local _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["卡瑟拉数值与表现配置"]
 local _____5361_745F_62C9_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["卡瑟拉音效配置"]
@@ -180,15 +178,12 @@ local function _____6267_884C_5361_745F_62C9_6F5C_5165_4E0E_89E6_624B_89E3_653E(
     local ____self_5 = context["清理"]
     ____self_5["登记延迟回调"](____self_5, "卡瑟拉-触手解放限时", id)
 end
-____exports["尝试触发卡瑟拉触手解放"] = function(context)
+____exports["触发卡瑟拉触手解放"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
         return
     end
     if context["触手解放已触发"] or context["Boss潜入中"] then
-        return
-    end
-    if _____5237_65B0_5361_745F_62C9_9636_6BB5(context) < 3 then
         return
     end
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手解放"]
@@ -219,7 +214,5 @@ ____exports["尝试触发卡瑟拉触手解放"] = function(context)
     )
     local ____self_6 = context["清理"]
     ____self_6["登记延迟回调"](____self_6, "卡瑟拉-触手解放潜入", _____6F5C_5165ID)
-end
-____exports["注册卡瑟拉触手解放"] = function()
 end
 return ____exports

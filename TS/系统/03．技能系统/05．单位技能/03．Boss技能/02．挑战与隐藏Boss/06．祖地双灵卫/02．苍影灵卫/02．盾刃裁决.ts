@@ -8,12 +8,13 @@ import { 两点角度, 极坐标X, 极坐标Y, 单位有效 } from '../../../../
 import { 单位是否在扇形区域 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
 import { 单位是否在条形区域 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/矩形区域';
 import { createTimedEffect, 设置特效XYZ轴旋转 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
+import { 创建固定组合技能执行器 } from '../../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
+import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from '../../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能敌对英雄列表: (this: void, boss: any) => any[] };
 const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as { 造成AOE技能伤害: (this: void, params: any) => boolean };
-const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
 };
 
@@ -44,32 +45,44 @@ export function 释放盾刃裁决(this: void, context: 祖地双灵卫运行时
   立即设置单位朝向(boss, facing);
   创建技能提示圈({ 类型: '扇形', X: x, Y: y, 半径: cfg.扇形半径, 扇形角度: cfg.扇形角度, 朝向: facing, 持续时间: firstWarning, 来源单位: boss });
   播放限时单位动画({ 单位: boss, 动画编号: cfg.盾击动画编号, 持续秒: firstWarning + 0.15, 恢复动画编号: cfg.恢复动画编号 });
-  const firstId = addDelayedCallback(firstWarning * 1000, function 盾刃裁决盾击(this: void): void {
-    if (!单位有效(boss) || context.战斗已结束) return;
-    const heroes = 获取Boss技能敌对英雄列表(boss);
-    for (let i = 0; i < heroes.length; i++) {
-      if (单位是否在扇形区域(heroes[i], x, y, cfg.扇形半径, facing, cfg.扇形角度)) {
-        造成裁决伤害(boss, heroes[i], cfg.盾击伤害攻击力比例, cfg.单段目标最大生命比例, '祖地双灵卫·盾刃裁决-盾击', WEAPON_TYPE_METAL_HEAVY_BASH);
+  const 事件列表: 固定时间轴事件[] = [{
+    时点毫秒: firstWarning * 1000,
+    名称: '盾刃裁决盾击',
+    执行: function 盾刃裁决盾击(this: void): void {
+      if (!单位有效(boss) || context.战斗已结束) return;
+      const heroes = 获取Boss技能敌对英雄列表(boss);
+      for (let i = 0; i < heroes.length; i++) {
+        if (单位是否在扇形区域(heroes[i], x, y, cfg.扇形半径, facing, cfg.扇形角度)) {
+          造成裁决伤害(boss, heroes[i], cfg.盾击伤害攻击力比例, cfg.单段目标最大生命比例, '祖地双灵卫·盾刃裁决-盾击', WEAPON_TYPE_METAL_HEAVY_BASH);
+        }
       }
-    }
-    createTimedEffect(祖地双灵卫数值与表现配置.表现资源.盾刃裁决.盾击命中特效路径, 极坐标X(x, facing, cfg.扇形半径 * 0.45), 极坐标Y(y, facing, cfg.扇形半径 * 0.45), 0, 0.8);
-    创建技能提示圈({ 类型: '方向直线', X: x, Y: y, 宽度: cfg.直线宽度, 长度: cfg.直线长度, 朝向: facing, 持续时间: cfg.两段间隔秒, 来源单位: boss });
-    播放限时单位动画({ 单位: boss, 动画编号: cfg.重斩动画编号, 持续秒: cfg.两段间隔秒 + 0.2, 恢复动画编号: cfg.恢复动画编号 });
-  });
-  const secondId = addDelayedCallback((firstWarning + cfg.两段间隔秒) * 1000, function 盾刃裁决重斩(this: void): void {
-    if (!单位有效(boss) || context.战斗已结束) return;
-    const heroes = 获取Boss技能敌对英雄列表(boss);
-    for (let i = 0; i < heroes.length; i++) {
-      if (单位是否在条形区域(heroes[i], x, y, endX, endY, cfg.直线宽度)) {
-        造成裁决伤害(boss, heroes[i], cfg.重斩伤害攻击力比例, cfg.单段目标最大生命比例, '祖地双灵卫·盾刃裁决-重斩', WEAPON_TYPE_METAL_HEAVY_SLICE);
+      createTimedEffect(祖地双灵卫数值与表现配置.表现资源.盾刃裁决.盾击命中特效路径, 极坐标X(x, facing, cfg.扇形半径 * 0.45), 极坐标Y(y, facing, cfg.扇形半径 * 0.45), 0, 0.8);
+      创建技能提示圈({ 类型: '方向直线', X: x, Y: y, 宽度: cfg.直线宽度, 长度: cfg.直线长度, 朝向: facing, 持续时间: cfg.两段间隔秒, 来源单位: boss });
+      播放限时单位动画({ 单位: boss, 动画编号: cfg.重斩动画编号, 持续秒: cfg.两段间隔秒 + 0.2, 恢复动画编号: cfg.恢复动画编号 });
+    },
+  }, {
+    时点毫秒: (firstWarning + cfg.两段间隔秒) * 1000,
+    名称: '盾刃裁决重斩',
+    执行: function 盾刃裁决重斩(this: void): void {
+      if (!单位有效(boss) || context.战斗已结束) return;
+      const heroes = 获取Boss技能敌对英雄列表(boss);
+      for (let i = 0; i < heroes.length; i++) {
+        if (单位是否在条形区域(heroes[i], x, y, endX, endY, cfg.直线宽度)) {
+          造成裁决伤害(boss, heroes[i], cfg.重斩伤害攻击力比例, cfg.单段目标最大生命比例, '祖地双灵卫·盾刃裁决-重斩', WEAPON_TYPE_METAL_HEAVY_SLICE);
+        }
       }
-    }
-    const effect = createTimedEffect(祖地双灵卫数值与表现配置.表现资源.盾刃裁决.剑刃重斩特效路径, x, y, 0, 0.9);
-    设置特效XYZ轴旋转(effect, { Z轴角度: facing });
-  });
-  context.清理.登记延迟回调('祖地双灵卫-盾刃裁决盾击', firstId);
-  context.清理.登记延迟回调('祖地双灵卫-盾刃裁决重斩', secondId);
-  return true;
+      const effect = createTimedEffect(祖地双灵卫数值与表现配置.表现资源.盾刃裁决.剑刃重斩特效路径, x, y, 0, 0.9);
+      设置特效XYZ轴旋转(effect, { Z轴角度: facing });
+    },
+  }];
+  const executor = 创建固定组合技能执行器<祖地双灵卫运行时上下文>({ 名称: '祖地双灵卫-盾刃裁决', 清理: context.清理, 互斥组: '祖地双灵卫主要技能' });
+  return executor.开始({
+    key: '盾刃裁决',
+    单位: boss,
+    上下文: context,
+    最大持续毫秒: (firstWarning + cfg.两段间隔秒 + 0.35) * 1000,
+    阶段列表: 创建固定时间轴阶段列表(事件列表),
+  }) !== 0;
 }
 
 export const 盾刃裁决技能状态 = {

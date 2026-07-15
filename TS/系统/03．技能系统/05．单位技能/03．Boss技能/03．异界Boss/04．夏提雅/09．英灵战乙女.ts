@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 
@@ -43,10 +44,6 @@ export interface 英灵复刻参数 {
   延迟秒?: number;
   投影持续秒?: number;
   复刻结算?: (this: void) => void;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 /** 只创建表现投影；不创建 AI、普攻或任何伤害。 */

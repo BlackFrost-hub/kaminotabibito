@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 取单位ID } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 获取全部亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
@@ -16,7 +17,6 @@ const { 获取Boss技能最近敌对英雄, 获取Boss技能随机敌对英雄 }
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const jass = require('jass.common') as any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -24,12 +24,8 @@ const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 let 亚伦柯斯调度器: 战斗技能调度器 | undefined;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
 function 取上下文键(this: void, context: 亚伦柯斯运行时上下文): number {
-  return 单位有效(context.Boss单位) ? GetHandleId(context.Boss单位) : 0;
+  return 取单位ID(context.Boss单位);
 }
 
 function 可调度(this: void, context: 亚伦柯斯运行时上下文, now: number): boolean {

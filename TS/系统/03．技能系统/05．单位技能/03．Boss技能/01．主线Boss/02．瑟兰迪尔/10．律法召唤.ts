@@ -6,7 +6,7 @@ import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置"
 import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
@@ -47,10 +47,6 @@ const 律法召唤技能ID = stringToFourCC(瑟兰迪尔数值与表现配置.�
 let 律法召唤已注册 = false;
 
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 启动律法链路(this: void, boss: any, summon: any, 已连接目标: any[]): void {
   const config = 瑟兰迪尔数值与表现配置.律法召唤;

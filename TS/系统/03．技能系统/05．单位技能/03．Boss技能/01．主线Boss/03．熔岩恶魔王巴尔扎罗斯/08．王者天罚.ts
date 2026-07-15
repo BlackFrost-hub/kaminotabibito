@@ -1,5 +1,9 @@
 /** @noSelfInFile */
 
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取或创建巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
@@ -8,7 +12,7 @@ import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 施加巴尔扎罗斯灼热 } from "./16．灼热层数工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位未标记死亡 as 单位有效, 单位到点距离平方 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -25,8 +29,8 @@ const { 施加单体攻击力提高Buff } = require("系统.03．技能系统.00
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -64,16 +68,6 @@ interface 天罚波次 {
   延迟秒: number;
 }
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 距离平方XY(this: void, unit: any, x: number, y: number): number {
-  const dx = GetUnitX(unit) - x;
-  const dy = GetUnitY(unit) - y;
-  return dx * dx + dy * dy;
-}
-
 function 限制生命值(this: void, value: number, maxLife: number): number {
   if (value < 1) return 1;
   if (value > maxLife) return maxLife;
@@ -95,18 +89,19 @@ function 计算天罚半径(this: void, context: 巴尔扎罗斯运行时上下�
 
 function 计算天罚伤害(this: void, boss: any, target: any): number {
   const config = 巴尔扎罗斯技能数值配置.王者天罚;
-  return (读取单位攻击力(boss) * config.伤害Boss攻击力比例
-    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.伤害目标最大生命比例)
-    * config.伤害总倍率;
+  return 计算组合技能伤害(boss, target, {
+    来源攻击力比例: config.伤害Boss攻击力比例,
+    目标最大生命比例: config.伤害目标最大生命比例,
+    总倍率: config.伤害总倍率,
+  });
 }
 
 function 播放天罚爆炸特效(this: void, x: number, y: number): void {
   const config = 巴尔扎罗斯技能数值配置.王者天罚;
-  const effect = AddSpecialEffect(config.爆炸特效路径, x, y);
-  if (effect == null || effect === 0) return;
-  if (typeof EXSetEffectZ === "function") EXSetEffectZ(effect, config.爆炸特效高度);
-  if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, config.爆炸特效缩放);
-  YDWETimerDestroyEffectSafe(config.爆炸特效持续秒, effect);
+  创建点特效({
+    模型路径: config.爆炸特效路径, X: x, Y: y, Z: config.爆炸特效高度,
+    缩放: config.爆炸特效缩放, 持续秒: config.爆炸特效持续秒,
+  });
 }
 
 function 记录天罚玩家命中(this: void, context: 巴尔扎罗斯运行时上下文, target: any): void {
@@ -140,7 +135,7 @@ function 触发天罚波次(this: void, context: 巴尔扎罗斯运行时上下�
   const candidates = 收集天罚命中候选(context);
   for (let i = 0; i < candidates.length; i++) {
     const unit = candidates[i];
-    if (!单位有效(unit) || 距离平方XY(unit, 波次.X, 波次.Y) > radius2) continue;
+    if (!单位有效(unit) || 单位到点距离平方(unit, 波次.X, 波次.Y) > radius2) continue;
     if (unit === boss) {
       治疗单位(boss, GetUnitState(boss, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.王者天罚.命中自身治疗最大生命比例);
     } else if (是护卫(context, unit)) {

@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import { 卡瑟拉单位技能配置 } from "./00．配置";
-import { 获取或创建卡瑟拉上下文, 取玩家触手残片, 刷新卡瑟拉阶段, type 卡瑟拉运行时上下文 } from "./01．运行时上下文";
+import { 获取或创建卡瑟拉上下文, 取玩家触手残片, type 卡瑟拉运行时上下文 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, stringToFourCC, 取坐标角度, 极坐标X, 极坐标Y, 点到线段距离平方, 距离平方XY, 播放卡瑟拉限时动作 } from "./14．公共工具";
@@ -126,7 +126,7 @@ function 结算高压水炮(this: void, context: 卡瑟拉运行时上下文, st
 export function 释放卡瑟拉高压水炮(this: void, context: 卡瑟拉运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.Boss潜入中) return;
-  if (刷新卡瑟拉阶段(context) < 2) return;
+  if (context.阶段 < 2) return;
   const target = 选择最远玩家(boss);
   if (!单位有效(target)) return;
   const cfg = 卡瑟拉数值与表现配置.高压水炮;

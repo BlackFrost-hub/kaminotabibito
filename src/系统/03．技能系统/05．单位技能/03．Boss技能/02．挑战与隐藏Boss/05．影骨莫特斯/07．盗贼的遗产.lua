@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.00．配置")
 local _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["影骨莫特斯单位技能配置"]
@@ -20,14 +19,17 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
+local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
+local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
+local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local AddSpecialEffect = jass.AddSpecialEffect
 local IssueTargetOrder = jass.IssueTargetOrder
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.12．交互宝箱桥接")
 local _____521B_5EFA_4EA4_4E92_5B9D_7BB1 = ____require_result_1["创建交互宝箱"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
@@ -37,7 +39,6 @@ local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单�
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____76D7_8D3C_9057_4EA7_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["盗贼的遗产"])
 local _____5DF2_6CE8_518C_76D7_8D3C_9057_4EA7 = false
-local _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_4E0A_4E0B_6587_8868 = {}
 local function _____7ED9Boss_53E0_52A0_76D7_8D3C_9057_4EA7(context)
     context["已开启遗产宝箱数"] = context["已开启遗产宝箱数"] + 1
     local bonus = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["Boss单位"]) * _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["盗贼的遗产"]["每个宝箱Boss攻击提高"]
@@ -46,7 +47,7 @@ local function _____7ED9Boss_53E0_52A0_76D7_8D3C_9057_4EA7(context)
 end
 local function _____5F00_542F_5F71_9AA8_5B9D_7BB1(context, x, y)
     _____7ED9Boss_53E0_52A0_76D7_8D3C_9057_4EA7(context)
-    AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["宝箱出现"], x, y)
+    _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["宝箱出现"], X = x, Y = y, ["持续秒"] = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["盗贼的遗产"]["瞬时特效持续秒"]})
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["盗贼的遗产"]["增益回流"],
         GetUnitX(context["Boss单位"]),
@@ -84,7 +85,7 @@ local function _____521B_5EFA_5F71_9AA8_5B9D_7BB1(context, index)
     if point == nil then
         return
     end
-    AddSpecialEffect(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["宝箱出现"], point.X, point.Y)
+    _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["宝箱出现"], X = point.X, Y = point.Y, ["持续秒"] = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["盗贼的遗产"]["瞬时特效持续秒"]})
     _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["盗贼的遗产"]["宝箱出现"], point.X, point.Y, _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
     _____521B_5EFA_4EA4_4E92_5B9D_7BB1({
         ["清理"] = context["清理"],
@@ -98,66 +99,55 @@ local function _____521B_5EFA_5F71_9AA8_5B9D_7BB1(context, index)
         ["on开启完成"] = _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5F00_542F_5B8C_6210
     })
 end
-local function _____6267_884C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(index)
-    local variable = _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_4E0A_4E0B_6587_8868[index]
-    if variable == nil then
-        return
-    end
-    __TS__Delete(_____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_4E0A_4E0B_6587_8868, index)
-    _____521B_5EFA_5F71_9AA8_5B9D_7BB1(variable.context, variable.index)
-end
-local function _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_62101()
-    _____6267_884C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(0)
-end
-local function _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_62102()
-    _____6267_884C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(1)
-end
-local function _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_62103()
-    _____6267_884C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(2)
-end
-local function _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_62104()
-    _____6267_884C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(3)
-end
-local function _____53D6_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_56DE_8C03(index)
-    if index == 0 then
-        return _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_62101
-    end
-    if index == 1 then
-        return _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_62102
-    end
-    if index == 2 then
-        return _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_62103
-    end
-    if index == 3 then
-        return _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_62104
-    end
-    return nil
-end
-local function _____6CE8_518C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(context, index)
-    local callback = _____53D6_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_56DE_8C03(index)
-    if callback == nil then
-        return
-    end
-    _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_4E0A_4E0B_6587_8868[index] = {context = context, index = index}
-    local id = addDelayedCallback(index * 500, callback)
-    local ____self_4 = context["清理"]
-    ____self_4["登记延迟回调"](____self_4, "影骨-盗贼遗产宝箱", id)
+local function _____8FFD_52A0_9057_4EA7_5B9D_7BB1_751F_6210_65F6_95F4_8F74(_____4E8B_4EF6_5217_8868, context, index)
+    _____4E8B_4EF6_5217_8868[#_____4E8B_4EF6_5217_8868 + 1] = {
+        ["时点毫秒"] = index * 500,
+        ["名称"] = ("盗贼遗产第" .. tostring(index + 1)) .. "个宝箱",
+        ["执行"] = function()
+            _____521B_5EFA_5F71_9AA8_5B9D_7BB1(context, index)
+        end
+    }
 end
 ____exports["释放影骨盗贼遗产"] = function(context)
     if context["遗产宝箱已生成"] then
         return
     end
-    context["遗产宝箱已生成"] = true
     local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["盗贼的遗产"]
-    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
-    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "盗贼的遗产")
-    local count = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["盗贼的遗产"]["宝箱数量"]
+    local count = cfg["宝箱数量"]
+    if count <= 0 then
+        return
+    end
+    if context["盗贼遗产组合执行器"] == nil then
+        context["盗贼遗产组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "影骨莫特斯-盗贼遗产", ["清理"] = context["清理"], ["互斥组"] = "影骨莫特斯盗贼遗产"})
+    end
+    local ____self_4 = context["盗贼遗产组合执行器"]
+    if ____self_4["是否运行中"](____self_4) then
+        return
+    end
+    local _____4E8B_4EF6_5217_8868 = {}
     do
         local i = 0
         while i < count do
-            _____6CE8_518C_5F71_9AA8_9057_4EA7_5B9D_7BB1_5EF6_8FDF_751F_6210(context, i)
+            _____8FFD_52A0_9057_4EA7_5B9D_7BB1_751F_6210_65F6_95F4_8F74(_____4E8B_4EF6_5217_8868, context, i)
             i = i + 1
         end
+    end
+    context["遗产宝箱已生成"] = true
+    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
+    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "盗贼的遗产")
+    local ____self_5 = context["盗贼遗产组合执行器"]
+    local _____6267_884CID = ____self_5["开始"](
+        ____self_5,
+        {
+            key = "盗贼的遗产",
+            ["单位"] = context["Boss单位"],
+            ["上下文"] = context,
+            ["最大持续毫秒"] = count * 500 + 500,
+            ["阶段列表"] = _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868(_____4E8B_4EF6_5217_8868)
+        }
+    )
+    if _____6267_884CID == 0 then
+        context["遗产宝箱已生成"] = false
     end
 end
 local function ____on_5F71_9AA8_76D7_8D3C_9057_4EA7_65BD_6CD5(castingUnit, spellAbilityId)

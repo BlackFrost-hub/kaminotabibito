@@ -26,8 +26,6 @@ local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
-local AddSpecialEffect = jass.AddSpecialEffect
-local DestroyEffect = jass.DestroyEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -35,12 +33,14 @@ local ____require_result_1 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.方向抵抗牵引")
-local _____5F00_59CB_65B9_5411_62B5_6297_7275_5F15 = ____require_result_4["开始方向抵抗牵引"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____65BD_52A0_7729_6655 = ____require_result_5["施加眩晕"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.方向抵抗牵引")
+local _____5F00_59CB_65B9_5411_62B5_6297_7275_5F15 = ____require_result_5["开始方向抵抗牵引"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
 local _____5361_745F_62C9_5355_4F4D_7C7B_578BID = stringToFourCC(_____5361_745F_62C9_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6DF1_6D77_6DA1_6D41_6280_80FDID = stringToFourCC(_____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["深海涡流"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -50,17 +50,9 @@ local function _____64AD_653E_9650_65F6_6DA1_6D41_7279_6548(context, x, y)
     if model == "" then
         return
     end
-    local effect = AddSpecialEffect(model, x, y)
-    local ____self_6 = context["清理"]
-    ____self_6["登记特效"](____self_6, "卡瑟拉-深海涡流特效", effect)
-    local id = addDelayedCallback(
-        cfg["涡流特效持续秒"] * 1000,
-        function()
-            DestroyEffect(effect)
-        end
-    )
+    local effect = _____521B_5EFA_70B9_7279_6548({["模型路径"] = model, X = x, Y = y})
     local ____self_7 = context["清理"]
-    ____self_7["登记延迟回调"](____self_7, "卡瑟拉-深海涡流特效销毁", id)
+    ____self_7["登记限时特效"](____self_7, "卡瑟拉-深海涡流特效", effect, cfg["涡流特效持续秒"] * 1000)
 end
 local function _____7ED3_7B97_6DF1_6D77_6DA1_6D41_7206_53D1(context, x, y)
     local boss = context["Boss单位"]
@@ -76,7 +68,7 @@ local function _____7ED3_7B97_6DF1_6D77_6DA1_6D41_7206_53D1(context, x, y)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue8
+                    goto __continue7
                 end
                 local dist = _____8DDD_79BBXY(
                     GetUnitX(hero),
@@ -85,7 +77,7 @@ local function _____7ED3_7B97_6DF1_6D77_6DA1_6D41_7206_53D1(context, x, y)
                     y
                 )
                 if dist > cfg["最大半径"] then
-                    goto __continue8
+                    goto __continue7
                 end
                 local t = _____9650_5236_6570_503C(dist / cfg["最大半径"], 0, 1)
                 local coeff = cfg["最近伤害系数"] - (cfg["最近伤害系数"] - cfg["最远伤害系数"]) * t
@@ -103,7 +95,7 @@ local function _____7ED3_7B97_6DF1_6D77_6DA1_6D41_7206_53D1(context, x, y)
                 })
                 _____65BD_52A0_7729_6655(boss, hero, cfg["眩晕秒"])
             end
-            ::__continue8::
+            ::__continue7::
             i = i + 1
         end
     end

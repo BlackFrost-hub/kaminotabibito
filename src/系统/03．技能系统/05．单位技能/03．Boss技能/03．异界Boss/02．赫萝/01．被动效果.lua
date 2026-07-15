@@ -12,29 +12,20 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____662F_5426_9ED1_5929 = ____require_result_1["是否黑天"]
 local ____require_result_2 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8F6C_56DB_4F4DID = ____require_result_2["转四位ID"]
-local ____require_result_3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.02．赫萝.00．配置")
-local _____8D6B_841D_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_3["赫萝单位技能配置"]
-local GetHandleId = jass.GetHandleId
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____53D6_5355_4F4DID = ____require_result_3["取单位ID"]
+local _____5355_4F4D_672A_6807_8BB0_6B7B_4EA1 = ____require_result_3["单位未标记死亡"]
+local ____require_result_4 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.02．赫萝.00．配置")
+local _____8D6B_841D_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_4["赫萝单位技能配置"]
 local GetUnitTypeId = jass.GetUnitTypeId
-local IsUnitType = jass.IsUnitType
 local SetUnitStateJapi = japi.SetUnitState
 local SetUnitMoveSpeed = jass.SetUnitMoveSpeed
 local ConvertUnitState = jass.ConvertUnitState
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____8D6B_841D_5355_4F4D_7C7B_578BID = _____8F6C_56DB_4F4DID(_____8D6B_841D_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____8D6B_841D_663C_591C_88AB_52A8_5355_4F4D_8868 = {}
 local _____8D6B_841D_663C_591C_88AB_52A8_5B9A_65F6_5668ID = 0
-local function _____83B7_53D6_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local function _____5E94_7528_8D6B_841D_663C_591C_72B6_6001(unit)
-    if unit == nil or unit == 0 then
-        return
-    end
-    if IsUnitType(unit, UNIT_TYPE_DEAD) then
+    if not _____5355_4F4D_672A_6807_8BB0_6B7B_4EA1(unit) then
         return
     end
     if GetUnitTypeId(unit) ~= _____8D6B_841D_5355_4F4D_7C7B_578BID then
@@ -64,16 +55,16 @@ local function _____5904_7406_8D6B_841D_663C_591C_88AB_52A8Tick()
             do
                 local handleId = __TS__Number(keys[i + 1]) or 0
                 if handleId <= 0 then
-                    goto __continue12
+                    goto __continue9
                 end
                 local unit = _____8D6B_841D_663C_591C_88AB_52A8_5355_4F4D_8868[handleId]
-                if unit == nil or unit == 0 or IsUnitType(unit, UNIT_TYPE_DEAD) then
+                if not _____5355_4F4D_672A_6807_8BB0_6B7B_4EA1(unit) then
                     __TS__Delete(_____8D6B_841D_663C_591C_88AB_52A8_5355_4F4D_8868, handleId)
-                    goto __continue12
+                    goto __continue9
                 end
                 _____5E94_7528_8D6B_841D_663C_591C_72B6_6001(unit)
             end
-            ::__continue12::
+            ::__continue9::
             i = i + 1
         end
     end
@@ -95,7 +86,7 @@ ____exports["启动赫萝昼夜被动"] = function(unit)
     if GetUnitTypeId(unit) ~= _____8D6B_841D_5355_4F4D_7C7B_578BID then
         return
     end
-    local handleId = _____83B7_53D6_53E5_67C4ID(unit)
+    local handleId = _____53D6_5355_4F4DID(unit)
     if handleId == 0 then
         return
     end
@@ -104,7 +95,7 @@ ____exports["启动赫萝昼夜被动"] = function(unit)
     _____5E94_7528_8D6B_841D_663C_591C_72B6_6001(unit)
 end
 ____exports["停止赫萝昼夜被动"] = function(unit)
-    local handleId = _____83B7_53D6_53E5_67C4ID(unit)
+    local handleId = _____53D6_5355_4F4DID(unit)
     if handleId == 0 then
         return
     end

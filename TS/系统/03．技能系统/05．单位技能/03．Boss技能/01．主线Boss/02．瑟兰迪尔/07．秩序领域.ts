@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位间距离平方 as 距离平方, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 瑟兰迪尔运行时上下文 } from "./03．运行时上下文";
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
 
@@ -32,12 +33,6 @@ const 秩序领域影响单位表: Record<number, any | undefined> = {};
 const 秩序领域来源名称表: Record<number, string | undefined> = {};
 const 秩序领域特效缩放表: Record<number, number | undefined> = {};
 
-function 距离平方(this: void, a: any, b: any): number {
-  const dx = GetUnitX(a) - GetUnitX(b);
-  const dy = GetUnitY(a) - GetUnitY(b);
-  return dx * dx + dy * dy;
-}
-
 function 确保Boss自身领域表现(this: void, boss: any): void {
   const config = 瑟兰迪尔数值与表现配置.秩序领域;
   const bossId = 取单位ID(boss);
@@ -52,11 +47,6 @@ function 确保Boss自身领域表现(this: void, boss: any): void {
   if (effect != null && effect !== 0) {
     秩序领域特效缩放表[bossId] = config.特效缩放;
   }
-}
-
-function 取单位ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
 }
 
 function 调整秩序领域影响层数(this: void, unit: any, delta: number): void {
@@ -120,7 +110,4 @@ export function 清理瑟兰迪尔秩序领域(this: void, boss: any): void {
   }
   const next: Record<number, number | undefined> = {};
   同步秩序领域影响(next);
-}
-
-export function 注册瑟兰迪尔秩序领域(this: void): void {
 }

@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import type { 米亚安全域运行时矩形 } from "./01．场地配置";
 import { 米亚平台配置, 米亚技能数值配置 } from "./02．数值与表现配置";
@@ -30,10 +31,6 @@ const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 const 平台超载效果表: Record<string, boolean | undefined> = {};
 const 平台超载持续台词间隔Ms = 3000;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取平台ID(this: void, 区域: 米亚安全域运行时矩形): string {
   return 区域.配置.ID ?? 区域.配置.名称 ?? "";
@@ -117,8 +114,6 @@ export function 取米亚平台超载伤害倍率(this: void, target: any): numb
   return getBuffRuntime(target, 米亚单位技能配置.BuffID.平台超载) != null ? 1.3 : 1;
 }
 
-export function 注册米亚平台超载惩罚(this: void): void {
-}
 
 export function 刷新米亚平台超载惩罚(this: void, context: 米亚运行时上下文, nowMs: number): void {
   if (context.阶段 < 2) return;

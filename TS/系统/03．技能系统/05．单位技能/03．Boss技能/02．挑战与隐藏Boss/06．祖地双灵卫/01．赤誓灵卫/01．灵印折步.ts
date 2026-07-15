@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 祖地双灵卫运行时上下文, 祖地双灵卫区域状态 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 执行战斗自身传送到坐标 } from '../../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
@@ -42,10 +43,6 @@ const RAD_TO_DEG = 57.29577951308232;
 
 interface 镇魂印运行状态 extends 祖地双灵卫区域状态 {
   区域实例?: 区域效果实例;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 限制在场地内(this: void, context: 祖地双灵卫运行时上下文, x: number, y: number): { X: number; Y: number } {

@@ -26,13 +26,13 @@ const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) 
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const EXSetEffectSpeed = japi.EXSetEffectSpeed as (effect: any, speed: number) => void;
-const EXEffectMatRotateX = japi.EXEffectMatRotateX as ((effect: any, angle: number) => void) | undefined;
-const EXEffectMatRotateY = japi.EXEffectMatRotateY as ((effect: any, angle: number) => void) | undefined;
-const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, angle: number) => void) | undefined;
-const EXEffectMatScale = japi.EXEffectMatScale as ((effect: any, x: number, y: number, z: number) => void) | undefined;
-const DzSetEffectScale = japi.DzSetEffectScale as ((effect: any, scale: number) => void) | undefined;
-const DzGetColor = japi.DzGetColor as ((alpha: number, red: number, green: number, blue: number) => number) | undefined;
-const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as ((effect: any, color: number) => void) | undefined;
+const EXEffectMatRotateX = japi.EXEffectMatRotateX as (effect: any, angle: number) => void;
+const EXEffectMatRotateY = japi.EXEffectMatRotateY as (effect: any, angle: number) => void;
+const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, angle: number) => void;
+const EXEffectMatScale = japi.EXEffectMatScale as (effect: any, x: number, y: number, z: number) => void;
+const DzSetEffectScale = japi.DzSetEffectScale as (effect: any, scale: number) => void;
+const DzGetColor = japi.DzGetColor as (alpha: number, red: number, green: number, blue: number) => number;
+const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as (effect: any, color: number) => void;
 
 function 规范化特效模型路径(modelPath: string): string {
   if (modelPath.indexOf("imports\\") === 0) return modelPath.substring(8);
@@ -88,7 +88,7 @@ export function createTimedUnitEffect(
   return effect;
 }
 
-export interface 点特效参数 {
+export interface 点特效参数 extends 特效XYZ轴旋转参数 {
   模型路径: string;
   X: number;
   Y: number;
@@ -116,9 +116,9 @@ export function 设置特效XYZ轴旋转(effect: any, 参数: 特效XYZ轴旋转
   const x = Number(参数.X轴角度) || 0;
   const y = Number(参数.Y轴角度) || 0;
   const z = Number(参数.Z轴角度) || 0;
-  if (x !== 0 && typeof EXEffectMatRotateX === "function") EXEffectMatRotateX(effect, x);
-  if (y !== 0 && typeof EXEffectMatRotateY === "function") EXEffectMatRotateY(effect, y);
-  if (z !== 0 && typeof EXEffectMatRotateZ === "function") EXEffectMatRotateZ(effect, z);
+  if (x !== 0) EXEffectMatRotateX(effect, x);
+  if (y !== 0) EXEffectMatRotateY(effect, y);
+  if (z !== 0) EXEffectMatRotateZ(effect, z);
 }
 
 export function 创建点特效(参数: 点特效参数): any {
@@ -126,12 +126,11 @@ export function 创建点特效(参数: 点特效参数): any {
   const effect = AddSpecialEffect(规范化特效模型路径(参数.模型路径), 参数.X, 参数.Y);
   if (effect == null || effect === 0) return null;
   if (参数.Z != null && 参数.Z !== 0) EXSetEffectZ(effect, 参数.Z);
+  设置特效XYZ轴旋转(effect, 参数);
   设置Dz绑定特效缩放(effect, 参数.缩放 ?? 1);
   if (参数.动画速度 != null) EXSetEffectSpeed(effect, 参数.动画速度);
   const color = 取特效顶点颜色(参数);
-  if (color != null && typeof DzSetEffectVertexColor === "function") {
-    DzSetEffectVertexColor(effect, color);
-  }
+  if (color != null) DzSetEffectVertexColor(effect, color);
   if (参数.持续秒 != null && 参数.持续秒 > 0) {
     安排定时销毁特效(effect, 参数.持续秒);
   }
@@ -151,7 +150,7 @@ export function 创建持续点法阵(参数: 循环点特效参数): 循环点�
   return 创建循环点特效(参数);
 }
 
-export interface 循环点特效参数 {
+export interface 循环点特效参数 extends 特效XYZ轴旋转参数 {
   模型路径: string;
   X: number;
   Y: number;
@@ -201,10 +200,7 @@ function 取特效顶点颜色(this: void, 参数: 循环点特效参数): numbe
   const red = 限制到颜色字节(参数.红);
   const green = 限制到颜色字节(参数.绿);
   const blue = 限制到颜色字节(参数.蓝);
-  if (typeof DzGetColor === "function") {
-    return DzGetColor(alpha, red, green, blue);
-  }
-  return alpha * 16777216 + red * 65536 + green * 256 + blue;
+  return DzGetColor(alpha, red, green, blue);
 }
 
 function 销毁循环点特效句柄(this: void, effect: any): void {
@@ -219,12 +215,11 @@ function 创建循环点特效一次(this: void, 记录: 循环点特效记录):
   const effect = AddSpecialEffect(规范化特效模型路径(参数.模型路径), 参数.X, 参数.Y);
   if (effect == null || effect === 0) return null;
   if (参数.Z != null && 参数.Z !== 0) EXSetEffectZ(effect, 参数.Z);
+  设置特效XYZ轴旋转(effect, 参数);
   设置Dz绑定特效缩放(effect, 参数.缩放 ?? 1);
   if (参数.动画速度 != null) EXSetEffectSpeed(effect, 参数.动画速度);
   const color = 取特效顶点颜色(参数);
-  if (color != null && typeof DzSetEffectVertexColor === "function") {
-    DzSetEffectVertexColor(effect, color);
-  }
+  if (color != null) DzSetEffectVertexColor(effect, color);
   return effect;
 }
 
@@ -478,13 +473,9 @@ export function 创建Dz绑定单位特效(unit: any, attachPoint: string, model
 
 export function 设置Dz绑定特效缩放(effect: any, scale: number): void {
   if (effect == null || effect === 0) return;
-  if (typeof DzSetEffectScale === "function") {
-    DzSetEffectScale(effect, scale);
-  }
+  DzSetEffectScale(effect, scale);
   EXSetEffectSize(effect, scale);
-  if (typeof EXEffectMatScale === "function") {
-    EXEffectMatScale(effect, scale, scale, scale);
-  }
+  EXEffectMatScale(effect, scale, scale, scale);
 }
 
 function 单位可坐标跟随(this: void, unit: any): boolean {

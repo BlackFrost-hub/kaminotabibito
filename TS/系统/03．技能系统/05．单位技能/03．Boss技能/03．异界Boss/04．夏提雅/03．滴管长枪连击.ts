@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 获取夏提雅运行时上下文, 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
@@ -61,10 +62,6 @@ const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
 let 滴管长枪连击已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取强化攻击阈值(this: void, context: 夏提雅运行时上下文): number {
   const cfg = 夏提雅数值与表现配置.滴管长枪连击;

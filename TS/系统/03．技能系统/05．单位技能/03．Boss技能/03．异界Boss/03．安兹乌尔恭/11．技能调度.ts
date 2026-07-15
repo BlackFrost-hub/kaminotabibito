@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 获取全部安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
@@ -10,18 +11,13 @@ import { 释放安兹一切生命的终点 } from './10．一切生命的终点'
 import { 创建战斗技能调度器, type 战斗技能调度器 } from '../../../../00．技能模板+函数/00．技能模板/13．战斗技能调度模板/01．战斗技能调度模板';
 
 const jass = require('jass.common') as any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 let 安兹技能调度器: 战斗技能调度器 | undefined;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
 function 取安兹上下文键(this: void, context: 安兹运行时上下文): number {
-  return 单位有效(context.安兹单位) ? GetHandleId(context.安兹单位) : 0;
+  return 取单位ID(context.安兹单位);
 }
 
 function 可调度安兹技能(this: void, context: 安兹运行时上下文): boolean {

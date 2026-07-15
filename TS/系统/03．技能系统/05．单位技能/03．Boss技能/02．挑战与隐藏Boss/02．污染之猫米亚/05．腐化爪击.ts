@@ -4,18 +4,15 @@ import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import { 获取或创建米亚上下文 } from "./03．运行时上下文";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 米亚单位技能配置 } from "./00．配置";
-import { 米亚技能数值配置 } from "./02．数值与表现配置";
+import { 米亚技能数值配置, 米亚运行时配置 } from "./02．数值与表现配置";
 import { 播放米亚台词 } from "./15．台词播放";
 import { 取米亚污染标记伤害倍率 } from "./08．污染标记";
 import { 取米亚平台超载伤害倍率 } from "./12．平台超载惩罚";
 import { stringToFourCC, 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
-const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  getServerTime: (this: void) => number;
-};
-const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { 创建持续危险区域 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域") as {
   创建持续危险区域: (this: void, 参数: any) => any;
@@ -23,9 +20,11 @@ const { 创建持续危险区域 } = require("系统.03．技能系统.00．技�
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
+const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
+  读取单位攻击力: (this: void, unit: any) => number;
+};
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
@@ -34,11 +33,7 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
-const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const GetUnitStateJapi = japi.GetUnitState as ((unit: any, state: any) => number) | undefined;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 
 const BJ_RADTODEG = 57.29577951308232;
 const 米亚单位类型ID = stringToFourCC(米亚单位技能配置.Boss单位ID);
@@ -51,20 +46,16 @@ function 让单位面向目标(this: void, caster: any, target: any): void {
   SetUnitFacing(caster, angle);
 }
 
-function 取单位攻击力(this: void, unit: any): number {
-  if (!单位有效(unit) || typeof GetUnitStateJapi !== "function") return 1000;
-  const value = GetUnitStateJapi(unit, ConvertUnitState(0x15));
-  return value > 0 ? value : 1000;
-}
-
 function 播放爪击表现(this: void, boss: any, target: any): void {
   if (!单位有效(target)) return;
   const config = 米亚技能数值配置.腐化爪击;
-  const effect = AddSpecialEffect("Common\\Effect\\Form\\ClawMark\\reapers_claws_green.mdx", GetUnitX(target), GetUnitY(target));
-  if (effect != null && effect !== 0) {
-    if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, 1.3);
-    YDWETimerDestroyEffectSafe(1.2, effect);
-  }
+  创建点特效({
+    模型路径: config.命中特效路径,
+    X: GetUnitX(target),
+    Y: GetUnitY(target),
+    缩放: config.命中特效缩放,
+    持续秒: config.命中特效持续秒,
+  });
   SetUnitTimeScale(boss, config.动画速度);
   SetUnitAnimationByIndex(boss, config.动画编号);
 }
@@ -96,7 +87,6 @@ export function 释放米亚腐化爪击(this: void, context: 米亚运行时上
   if (!单位有效(boss) || !单位有效(actualTarget)) return;
 
   const config = 米亚技能数值配置.腐化爪击;
-  context.上次腐化爪击Ms = getServerTime();
   播放米亚台词(boss, "腐化爪击");
   让单位面向目标(boss, actualTarget);
   播放爪击表现(boss, actualTarget);
@@ -104,7 +94,7 @@ export function 释放米亚腐化爪击(this: void, context: 米亚运行时上
     技能ID: 腐化爪击技能ID,
     来源: boss,
     目标: actualTarget,
-    伤害: 取单位攻击力(boss) * config.攻击力倍率 * 取米亚污染标记伤害倍率(context, actualTarget) * 取米亚平台超载伤害倍率(actualTarget),
+    伤害: (读取单位攻击力(boss) || 米亚运行时配置.Boss攻击力兜底) * config.攻击力倍率 * 取米亚污染标记伤害倍率(context, actualTarget) * 取米亚平台超载伤害倍率(actualTarget),
     attackType: jass.ATTACK_TYPE_CHAOS,
     伤害类型: jass.DAMAGE_TYPE_POISON,
     weaponType: jass.WEAPON_TYPE_WHOKNOWS,

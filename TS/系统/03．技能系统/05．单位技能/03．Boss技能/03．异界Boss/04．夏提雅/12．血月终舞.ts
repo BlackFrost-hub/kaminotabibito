@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
@@ -45,18 +46,14 @@ const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
-const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, scale: number) => void) | undefined;
+const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, scale: number) => void;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
 const 血月终舞技能Key = '血月终舞';
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取P3节奏倍率(this: void, context: 夏提雅运行时上下文): number {
   return 1 / (1 + context.血宴层数 * 夏提雅数值与表现配置.P3.血宴每层技能节奏提高);
@@ -73,13 +70,13 @@ function 创建空中血月(this: void, x: number, y: number, duration: number):
   const main = AddSpecialEffect(夏提雅数值与表现配置.表现资源.血月终舞特效路径, x, y);
   const aux = AddSpecialEffect(夏提雅数值与表现配置.表现资源.血月终舞辅助特效路径, x, y);
   if (main != null && main !== 0) {
-    if (typeof EXSetEffectZ === 'function') EXSetEffectZ(main, cfg.血月高度);
-    if (typeof EXSetEffectSize === 'function') EXSetEffectSize(main, cfg.血月缩放);
+    EXSetEffectZ(main, cfg.血月高度);
+    EXSetEffectSize(main, cfg.血月缩放);
     YDWETimerDestroyEffectSafe(duration, main);
   }
   if (aux != null && aux !== 0) {
-    if (typeof EXSetEffectZ === 'function') EXSetEffectZ(aux, cfg.血月高度);
-    if (typeof EXSetEffectSize === 'function') EXSetEffectSize(aux, cfg.血月缩放);
+    EXSetEffectZ(aux, cfg.血月高度);
+    EXSetEffectSize(aux, cfg.血月缩放);
     YDWETimerDestroyEffectSafe(duration, aux);
   }
 }

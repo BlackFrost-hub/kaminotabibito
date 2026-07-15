@@ -1,6 +1,9 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取巴尔扎罗斯上下文"]
 local ____14_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.14．台词播放")
@@ -39,15 +42,6 @@ local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____62A4_536B_5F52_5C5EBoss_8868 = {}
 local _____62A4_536B_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
 local _____7194_6838_5C01_5370_4F24_5BB3_4FEE_6B63_5DF2_6CE8_518C = false
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
-local function _____53D6_5355_4F4DID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local function _____767B_8BB0_62A4_536B_5F52_5C5E(context, guard)
     local id = _____53D6_5355_4F4DID(guard)
     if id == 0 then

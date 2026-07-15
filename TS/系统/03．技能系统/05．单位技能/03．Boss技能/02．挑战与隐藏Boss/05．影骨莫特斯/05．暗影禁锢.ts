@@ -14,7 +14,6 @@ const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -120,23 +119,6 @@ export function 释放影骨暗影禁锢(this: void, context: 影骨莫特斯运
   播放Boss坐标音效(影骨莫特斯音效配置.暗影禁锢.预警, x, y, 影骨莫特斯音效配置.默认裁断距离);
   const id = addDelayedCallback(cfg.预警秒 * 1000, 影骨暗影禁锢生效, { context, x, y } as 影骨暗影禁锢延迟变量);
   context.清理.登记延迟回调("影骨-暗影禁锢", id);
-}
-
-export function 尝试触发影骨暗影禁锢(this: void, context: 影骨莫特斯运行时上下文, nowMs: number): void {
-  const cfg = 影骨莫特斯数值与表现配置.暗影禁锢;
-  if (context.下次暗影禁锢间隔Ms <= 0) {
-    context.下次暗影禁锢间隔Ms = GetRandomReal(cfg.触发间隔最小秒, cfg.触发间隔最大秒) * 1000;
-  }
-  if (context.上次暗影禁锢Ms <= 0) {
-    context.上次暗影禁锢Ms = nowMs;
-    return;
-  }
-  if (context.上次暗影禁锢Ms > 0 && nowMs - context.上次暗影禁锢Ms < context.下次暗影禁锢间隔Ms) return;
-  const target = 获取Boss技能随机敌对英雄(context.Boss单位, context.Boss单位, cfg.目标搜索半径);
-  if (!单位有效(target)) return;
-  context.上次暗影禁锢Ms = nowMs;
-  context.下次暗影禁锢间隔Ms = GetRandomReal(cfg.触发间隔最小秒, cfg.触发间隔最大秒) * 1000;
-  释放影骨暗影禁锢(context, target);
 }
 
 function on影骨暗影禁锢施法(this: void, castingUnit: any, spellAbilityId: number): void {

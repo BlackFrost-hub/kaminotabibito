@@ -74,7 +74,6 @@ local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 GetOwningPlayer = jass.GetOwningPlayer
-local GetRandomReal = jass.GetRandomReal
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -121,26 +120,6 @@ ____exports["释放影骨暗影禁锢"] = function(context, target)
     local id = addDelayedCallback(cfg["预警秒"] * 1000, _____5F71_9AA8_6697_5F71_7981_9522_751F_6548, {context = context, x = x, y = y})
     local ____self_7 = context["清理"]
     ____self_7["登记延迟回调"](____self_7, "影骨-暗影禁锢", id)
-end
-____exports["尝试触发影骨暗影禁锢"] = function(context, nowMs)
-    local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["暗影禁锢"]
-    if context["下次暗影禁锢间隔Ms"] <= 0 then
-        context["下次暗影禁锢间隔Ms"] = GetRandomReal(cfg["触发间隔最小秒"], cfg["触发间隔最大秒"]) * 1000
-    end
-    if context["上次暗影禁锢Ms"] <= 0 then
-        context["上次暗影禁锢Ms"] = nowMs
-        return
-    end
-    if context["上次暗影禁锢Ms"] > 0 and nowMs - context["上次暗影禁锢Ms"] < context["下次暗影禁锢间隔Ms"] then
-        return
-    end
-    local target = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(context["Boss单位"], context["Boss单位"], cfg["目标搜索半径"])
-    if not _____5355_4F4D_6709_6548(target) then
-        return
-    end
-    context["上次暗影禁锢Ms"] = nowMs
-    context["下次暗影禁锢间隔Ms"] = GetRandomReal(cfg["触发间隔最小秒"], cfg["触发间隔最大秒"]) * 1000
-    ____exports["释放影骨暗影禁锢"](context, target)
 end
 local function ____on_5F71_9AA8_6697_5F71_7981_9522_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____6697_5F71_7981_9522_6280_80FDID then

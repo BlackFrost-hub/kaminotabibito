@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
 import { 取安兹亡灵箭伤害倍率 } from './08．高阶亡灵召唤';
@@ -11,9 +16,6 @@ import {
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 点到线段距离平方 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
-const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
@@ -31,11 +33,9 @@ const { 显示大招吟唱条, 关闭吟唱条 } = require('系统.09．表现�
   显示大招吟唱条: (this: void, 参数: any) => void;
   关闭吟唱条: (this: void, 通道?: string) => void;
 };
-const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
-};
-const { 设置特效XYZ轴旋转 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+const { 设置特效XYZ轴旋转, 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
   设置特效XYZ轴旋转: (this: void, effect: any, 参数: { X轴角度?: number; Y轴角度?: number; Z轴角度?: number }) => void;
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
@@ -45,7 +45,6 @@ const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
@@ -57,11 +56,10 @@ const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const RAD_TO_DEG = 57.29577951308232;
 const 时间停止大型技能Key = '时间停止';
 const 时间停止暂停来源 = '安兹-时间停止';
@@ -84,10 +82,6 @@ interface 时间停止实例 {
   暂停单位列表: any[];
   持续特效列表: any[];
   已清理: boolean;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 取时间停止总时长秒(this: void): number {
@@ -164,11 +158,11 @@ function 创建时间停止持续表现(this: void, instance: 时间停止实例
   const clock = AddSpecialEffectTarget(cfg.表现资源.时间停止钟面特效路径, boss, 'origin');
   const gear = AddSpecialEffectTarget(cfg.表现资源.时间停止齿轮特效路径, boss, 'origin');
   if (clock != null && clock !== 0) {
-    if (typeof EXSetEffectSize === 'function') EXSetEffectSize(clock, cfg.阶段技能.时间停止钟面缩放);
+    EXSetEffectSize(clock, cfg.阶段技能.时间停止钟面缩放);
     instance.持续特效列表.push(clock);
   }
   if (gear != null && gear !== 0) {
-    if (typeof EXSetEffectSize === 'function') EXSetEffectSize(gear, cfg.阶段技能.时间停止齿轮缩放);
+    EXSetEffectSize(gear, cfg.阶段技能.时间停止齿轮缩放);
     instance.持续特效列表.push(gear);
   }
 }
@@ -220,12 +214,13 @@ function 清理时间停止实例(this: void, instance: 时间停止实例): voi
 }
 
 function 播放时间停止结算特效(this: void, model: string, x: number, y: number, scale: number): any {
-  const effect = AddSpecialEffect(model, x, y);
-  if (effect != null && effect !== 0) {
-    if (typeof EXSetEffectSize === 'function') EXSetEffectSize(effect, scale);
-    YDWETimerDestroyEffectSafe(安兹乌尔恭数值与表现配置.阶段技能.时间停止结算特效持续秒, effect);
-  }
-  return effect;
+  return 创建点特效({
+    模型路径: model,
+    X: x,
+    Y: y,
+    缩放: scale,
+    持续秒: 安兹乌尔恭数值与表现配置.阶段技能.时间停止结算特效持续秒,
+  });
 }
 
 function 造成时间停止伤害(this: void, boss: any, target: any, damage: number, tag: string): void {
@@ -266,8 +261,10 @@ function 结算时间停止地面法阵(this: void, instance: 时间停止实例
     造成时间停止伤害(
       boss,
       target,
-      读取单位攻击力(boss) * cfg.阶段技能.时间停止地面法阵伤害Boss攻击力比例
-        + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg.阶段技能.时间停止地面法阵伤害目标最大生命比例,
+      计算组合技能伤害(boss, target, {
+        来源攻击力比例: cfg.阶段技能.时间停止地面法阵伤害Boss攻击力比例,
+        目标最大生命比例: cfg.阶段技能.时间停止地面法阵伤害目标最大生命比例,
+      }),
       '安兹·时间停止·地面法阵',
     );
   }
@@ -303,8 +300,10 @@ function 结算时间停止现实断裂(this: void, instance: 时间停止实例
     造成时间停止伤害(
       boss,
       target,
-      读取单位攻击力(boss) * ordinary.现实断裂伤害Boss攻击力比例
-        + GetUnitState(target, UNIT_STATE_MAX_LIFE) * ordinary.现实断裂伤害目标最大生命比例,
+      计算组合技能伤害(boss, target, {
+        来源攻击力比例: ordinary.现实断裂伤害Boss攻击力比例,
+        目标最大生命比例: ordinary.现实断裂伤害目标最大生命比例,
+      }),
       '安兹·时间停止·现实断裂',
     );
   }
@@ -334,10 +333,11 @@ function 结算时间停止魔法箭(this: void, instance: 时间停止实例): 
     造成时间停止伤害(
       boss,
       target,
-      (
-        读取单位攻击力(boss) * ordinary.高阶魔法箭伤害Boss攻击力比例
-          + GetUnitState(target, UNIT_STATE_MAX_LIFE) * ordinary.高阶魔法箭伤害目标最大生命比例
-      ) * 取安兹亡灵箭伤害倍率(context),
+      计算组合技能伤害(boss, target, {
+        来源攻击力比例: ordinary.高阶魔法箭伤害Boss攻击力比例,
+        目标最大生命比例: ordinary.高阶魔法箭伤害目标最大生命比例,
+        总倍率: 取安兹亡灵箭伤害倍率(context),
+      }),
       '安兹·时间停止·高阶魔法箭',
     );
   }

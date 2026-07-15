@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．运行时上下文")
 local _____83B7_53D6_5168_90E8_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取全部祖地双灵卫运行时上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
@@ -32,16 +34,12 @@ local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_r
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
 local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local GetRandomReal = jass.GetRandomReal
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____53CC_7075_536B_8C03_5EA6_5668
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____53D6_4E0A_4E0B_6587_952E(context)
-    return _____5355_4F4D_6709_6548(context["赤誓灵卫单位"]) and GetHandleId(context["赤誓灵卫单位"]) or 0
+    return _____53D6_5355_4F4DID(context["赤誓灵卫单位"])
 end
 local function _____53EF_8C03_5EA6(context, now)
     return not context["战斗已结束"] and context["阶段"] ~= "净化收束" and context["阶段"] ~= "已结束" and context["大型技能占用者"] == nil and now >= context["大型机制忙碌到Ms"]

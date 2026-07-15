@@ -1,8 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local GetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
 local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
+local ____01_FF0E_9636_6BB5_4E0A_4E0B_6587 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.01．阶段上下文")
+local _____521B_5EFA_9636_6BB5_4E0A_4E0B_6587 = ____01_FF0E_9636_6BB5_4E0A_4E0B_6587["创建阶段上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.00．配置")
 local _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["莫尔特斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.02．数值与表现配置")
@@ -13,29 +14,9 @@ local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____53D6_5355_4F4DID = ____16_FF0E_516C_5171_5DE5_5177["取单位ID"]
 local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
-____exports["取莫尔特斯当前阶段"] = function(boss)
-    if not _____5355_4F4D_6709_6548(boss) then
-        return 1
-    end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    if not (maxLife > 0) then
-        return 1
-    end
-    local ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife
-    if ratio <= 0.4 then
-        return 3
-    end
-    if ratio <= 0.7 then
-        return 2
-    end
-    return 1
-end
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
-GetUnitState = jass.GetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
-UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_0.registerDeathListener
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
@@ -49,21 +30,44 @@ local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
 local function _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587(boss, _____6E05_7406)
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "开场", 0)
-    return {
+    local context = {
         ["Boss单位"] = boss,
-        ["阶段"] = ____exports["取莫尔特斯当前阶段"](boss),
+        ["阶段"] = 1,
+        ["阶段上下文"] = nil,
         ["已初始化"] = false,
         ["清理"] = _____6E05_7406,
         ["玩家腐败值表"] = {},
         ["玩家腐败值单位表"] = {},
         ["根系觉醒已触发"] = false,
         ["腐朽领域已触发"] = false,
-        ["下次沼泽腐败时间"] = 0,
-        ["下次沼泽根须时间"] = 0,
-        ["下次虫群时间"] = 0,
-        ["下次腐败传输档位"] = 95,
+        ["腐败传输节点已注册"] = false,
         ["腐败护盾值"] = 0
     }
+    context["阶段上下文"] = _____521B_5EFA_9636_6BB5_4E0A_4E0B_6587({
+        ["清理"] = _____6E05_7406,
+        ["名称"] = "莫尔特斯",
+        ["单位"] = boss,
+        ["初始阶段ID"] = "P1",
+        ["Tick间隔毫秒"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"],
+        ["阶段列表"] = {
+            {ID = "P1"},
+            {
+                ID = "P2",
+                ["血量百分比"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段阈值"]["P2生命比例"],
+                ["on进入"] = function()
+                    context["阶段"] = 2
+                end
+            },
+            {
+                ID = "P3",
+                ["血量百分比"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段阈值"]["P3生命比例"],
+                ["on进入"] = function()
+                    context["阶段"] = 3
+                end
+            }
+        }
+    })
+    return context
 end
 local _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "莫尔特斯", ["主动技能提示"] = _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587})
 ____exports["获取莫尔特斯上下文"] = function(boss)
@@ -77,10 +81,6 @@ ____exports["获取全部莫尔特斯上下文"] = function()
 end
 ____exports["清理莫尔特斯上下文"] = function(boss)
     _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["清理上下文"](boss)
-end
-____exports["刷新莫尔特斯阶段"] = function(context)
-    context["阶段"] = ____exports["取莫尔特斯当前阶段"](context["Boss单位"])
-    return context["阶段"]
 end
 ____exports["刷新玩家腐败值Buff"] = function(_context, unit, stack)
     local current = stack or 0
@@ -148,14 +148,14 @@ ____exports["取腐败值最高玩家"] = function(context)
             local value = context["玩家腐败值表"][key] or 0
             local unit = context["玩家腐败值单位表"][key]
             if not _____5355_4F4D_6709_6548(unit) then
-                goto __continue24
+                goto __continue20
             end
             if value > bestValue then
                 bestValue = value
                 best = unit
             end
         end
-        ::__continue24::
+        ::__continue20::
     end
     return best
 end

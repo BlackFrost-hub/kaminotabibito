@@ -8,8 +8,12 @@ import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 播放莫尔特斯限时动作, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 创建点名预警执行器 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/05．点名预警执行器";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const jass = require("jass.common") as any;
 
@@ -24,17 +28,10 @@ const DestroyGroup = jass.DestroyGroup as (group: any) => void;
 const GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect as (group: any, rect: any, filter: any) => void;
 const FirstOfGroup = jass.FirstOfGroup as (group: any) => any;
 const GroupRemoveUnit = jass.GroupRemoveUnit as (group: any, unit: any) => void;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
-};
-const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
-  创建技能提示圈: (this: void, 配置: any) => any;
-};
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位") as {
   创建可攻击机制单位: (this: void, 参数: any) => any;
 };
@@ -45,11 +42,6 @@ const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位�
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
 const 腐朽根须穿刺技能ID = stringToFourCC(莫尔特斯数值与表现配置.腐朽根须穿刺.技能槽位);
 let 已注册 = false;
-
-interface 根须穿刺延迟变量 {
-  context: 莫尔特斯运行时上下文;
-  cell: any;
-}
 
 function 选择根须穿刺格子(this: void, context: 莫尔特斯运行时上下文): any[] {
   const grid = context.根须宫格;
@@ -70,7 +62,7 @@ function 结算单格根须穿刺(this: void, context: 莫尔特斯运行时上�
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.腐朽根须穿刺;
-  AddSpecialEffect(cfg.穿刺特效路径, cell.中心X, cell.中心Y);
+  创建点特效({ 模型路径: cfg.穿刺特效路径, X: cell.中心X, Y: cell.中心Y, 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(莫尔特斯音效配置.腐朽根须穿刺.结算, cell.中心X, cell.中心Y, 莫尔特斯音效配置.默认裁断距离);
   创建可攻击机制单位({
     清理: context.清理,
@@ -111,10 +103,25 @@ function 结算单格根须穿刺(this: void, context: 莫尔特斯运行时上�
   DestroyGroup(group);
 }
 
-function 莫尔特斯根须穿刺延迟结算(this: void, variable?: any): void {
-  const data = variable as 根须穿刺延迟变量 | undefined;
-  if (data == null) return;
-  结算单格根须穿刺(data.context, data.cell);
+function 创建根须穿刺格子预警(this: void, context: 莫尔特斯运行时上下文, cell: any, index: number): void {
+  const cfg = 莫尔特斯数值与表现配置.腐朽根须穿刺;
+  const cellSize = 莫尔特斯数值与表现配置.根须领域.单格边长;
+  创建点名预警执行器({
+    清理: context.清理,
+    名称: "莫尔特斯-腐朽根须穿刺-" + String(index + 1),
+    锁定X: cell.中心X,
+    锁定Y: cell.中心Y,
+    延迟秒: cfg.预警秒,
+    提示圈: {
+      类型: "矩形",
+      宽度: cellSize,
+      长度: cellSize,
+      朝向: 0,
+    },
+    on结算: function 莫尔特斯根须穿刺结算(this: void): void {
+      结算单格根须穿刺(context, cell);
+    },
+  });
 }
 
 export function 释放莫尔特斯腐朽根须穿刺(this: void, context: 莫尔特斯运行时上下文): void {
@@ -125,18 +132,7 @@ export function 释放莫尔特斯腐朽根须穿刺(this: void, context: 莫尔
   播放莫尔特斯台词(boss, "腐朽根须穿刺");
   const cells = 选择根须穿刺格子(context);
   for (let i = 0; i < cells.length; i++) {
-    const cell = cells[i];
-    创建技能提示圈({
-      类型: "矩形",
-      X: cell.中心X,
-      Y: cell.中心Y,
-      宽度: 莫尔特斯数值与表现配置.根须领域.单格边长,
-      长度: 莫尔特斯数值与表现配置.根须领域.单格边长,
-      朝向: 0,
-      持续时间: cfg.预警秒,
-    });
-    const id = addDelayedCallback(cfg.预警秒 * 1000, 莫尔特斯根须穿刺延迟结算, { context, cell } as 根须穿刺延迟变量);
-    context.清理.登记延迟回调("莫尔特斯-腐朽根须穿刺", id);
+    创建根须穿刺格子预警(context, cells[i], i);
   }
 }
 

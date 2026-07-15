@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001, _____64AD_653E_9632_5FA1_59FF_6001_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetHandleId, IsUnitType, UNIT_TYPE_DEAD, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, _____5F00_59CB_786C_76F4, _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6D88_8017_53CD_51FB_6280_80FDID, _____6D88_8017_53CD_51FB_72B6_6001_8868
+local _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001, _____64AD_653E_9632_5FA1_59FF_6001_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetHandleId, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, _____5F00_59CB_786C_76F4, _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6D88_8017_53CD_51FB_6280_80FDID, _____6D88_8017_53CD_51FB_72B6_6001_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -22,9 +22,7 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
-function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 function _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001(boss)
     local hid = GetHandleId(boss) or 0
     local state = _____6D88_8017_53CD_51FB_72B6_6001_8868[hid]
@@ -151,12 +149,12 @@ GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local SetUnitFacing = jass.SetUnitFacing
-IsUnitType = jass.IsUnitType
+local IsUnitType = jass.IsUnitType
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local AddLightning = jass.AddLightning
 local DestroyLightning = jass.DestroyLightning
 local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
-UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
@@ -180,12 +178,11 @@ local ____require_result_7 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_7["获取Boss技能敌对英雄列表"]
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 createTimedEffect = ____require_result_8.createTimedEffect
+local createTimedUnitEffect = ____require_result_8.createTimedUnitEffect
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
-local ____require_result_9 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_9.YDWETimerDestroyEffectSafe
-local ____require_result_10 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_10.CosBJ
-local SinBJ = ____require_result_10.SinBJ
+local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_9.CosBJ
+local SinBJ = ____require_result_9.SinBJ
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____6D88_8017_53CD_51FB_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]["技能槽位"])
 _____6D88_8017_53CD_51FB_72B6_6001_8868 = {}
@@ -211,10 +208,7 @@ local function _____8BBE_7F6E_9B54_6CD5_503C_4E0B_9650(unit, value)
 end
 local function _____64AD_653E_62BD_9B54_7279_6548(target)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]
-    local effect = AddSpecialEffectTarget(cfg["抽魔特效路径"], target, "origin")
-    if effect ~= nil and effect ~= 0 then
-        YDWETimerDestroyEffectSafe(1, effect)
-    end
+    createTimedUnitEffect(target, "origin", cfg["抽魔特效路径"], 1)
 end
 local function _____64AD_653E_53CD_51FB_8FDE_7EBF(boss, target)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]

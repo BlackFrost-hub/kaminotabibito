@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.00．配置")
 local _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["夏提雅单位技能配置"]
 local ____01_FF0E_673A_5236_6E05_7406_7BEE_5B50 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.06．机制清理.01．机制清理篮子")
@@ -31,9 +33,6 @@ local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
 local _____653B_901F_5C5E_6027ID = 10
 local _____590F_63D0_96C5_8FD0_884C_65F6_5DF2_6CE8_518C = false
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____521B_5EFA_4E0A_4E0B_6587(boss, _____6E05_7406)
     local now = getServerTime()
     local context = {

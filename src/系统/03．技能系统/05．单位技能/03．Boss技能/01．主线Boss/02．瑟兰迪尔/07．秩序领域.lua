@@ -1,15 +1,11 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_5355_4F4DID, GetHandleId
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间距离平方"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
 local _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["瑟兰迪尔数值与表现配置"]
-function _____53D6_5355_4F4DID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_0.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_0["移除单位指定Buff"]
@@ -25,18 +21,13 @@ local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitName = jass.GetUnitName
-GetHandleId = jass.GetHandleId
+local GetHandleId = jass.GetHandleId
 local _____9886_57DF_7279_6548_952E = "thranduil-order-aura"
 local _____653B_901F_5C5E_6027ID = 10
 local _____79E9_5E8F_9886_57DF_5F71_54CD_5C42_6570_8868 = {}
 local _____79E9_5E8F_9886_57DF_5F71_54CD_5355_4F4D_8868 = {}
 local _____79E9_5E8F_9886_57DF_6765_6E90_540D_79F0_8868 = {}
 local _____79E9_5E8F_9886_57DF_7279_6548_7F29_653E_8868 = {}
-local function _____8DDD_79BB_5E73_65B9(a, b)
-    local dx = GetUnitX(a) - GetUnitX(b)
-    local dy = GetUnitY(a) - GetUnitY(b)
-    return dx * dx + dy * dy
-end
 local function _____786E_4FDDBoss_81EA_8EAB_9886_57DF_8868_73B0(boss)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["秩序领域"]
     local bossId = _____53D6_5355_4F4DID(boss)
@@ -113,14 +104,14 @@ ____exports["刷新瑟兰迪尔秩序领域"] = function(context)
                 if _____8DDD_79BB_5E73_65B9(boss, target) <= radius2 then
                     local targetId = _____53D6_5355_4F4DID(target)
                     if targetId == 0 then
-                        goto __continue23
+                        goto __continue20
                     end
                     next[targetId] = 1
                     _____79E9_5E8F_9886_57DF_5F71_54CD_5355_4F4D_8868[targetId] = target
                     _____79E9_5E8F_9886_57DF_6765_6E90_540D_79F0_8868[targetId] = GetUnitName(boss)
                 end
             end
-            ::__continue23::
+            ::__continue20::
             i = i + 1
         end
     end
@@ -136,7 +127,5 @@ ____exports["清理瑟兰迪尔秩序领域"] = function(boss)
     end
     local next = {}
     _____540C_6B65_79E9_5E8F_9886_57DF_5F71_54CD(next)
-end
-____exports["注册瑟兰迪尔秩序领域"] = function()
 end
 return ____exports

@@ -12,6 +12,7 @@ local RemoveRect = jass.RemoveRect
 local RemoveRegion = jass.RemoveRegion
 local DestroyUbersplat = jass.DestroyUbersplat
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
 local removeDelayedCallback = ____require_result_0.removeDelayedCallback
 local _____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0 = __TS__Class()
@@ -63,6 +64,38 @@ _____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["登记特效"] = functio
         self,
         _____540D_79F0,
         function()
+            DestroyEffect(_____7279_6548)
+        end
+    )
+end
+_____673A_5236_6E05_7406_7BEE_5B50_5B9E_73B0.prototype["登记限时特效"] = function(self, _____540D_79F0, _____7279_6548, _____6301_7EED_6BEB_79D2)
+    if _____7279_6548 == nil or _____7279_6548 == 0 then
+        return
+    end
+    if not (_____6301_7EED_6BEB_79D2 > 0) then
+        self["登记特效"](self, _____540D_79F0, _____7279_6548)
+        return
+    end
+    local _____7B49_5F85_9500_6BC1 = true
+    local _____56DE_8C03ID = addDelayedCallback(
+        _____6301_7EED_6BEB_79D2,
+        function()
+            if not _____7B49_5F85_9500_6BC1 then
+                return
+            end
+            _____7B49_5F85_9500_6BC1 = false
+            DestroyEffect(_____7279_6548)
+        end
+    )
+    self["登记清理"](
+        self,
+        _____540D_79F0,
+        function()
+            if not _____7B49_5F85_9500_6BC1 then
+                return
+            end
+            _____7B49_5F85_9500_6BC1 = false
+            removeDelayedCallback(_____56DE_8C03ID)
             DestroyEffect(_____7279_6548)
         end
     )

@@ -2,7 +2,6 @@
 local ____exports = {}
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.01．运行时上下文")
 local _____6D88_8017_73A9_5BB6_89E6_624B_6B8B_7247 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["消耗玩家触手残片"]
-local _____5237_65B0_5361_745F_62C9_9636_6BB5 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["刷新卡瑟拉阶段"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.02．数值与表现配置")
 local _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["卡瑟拉数值与表现配置"]
 local _____5361_745F_62C9_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["卡瑟拉音效配置"]
@@ -13,6 +12,8 @@ local _____5355_4F4D_6709_6548 = ____14_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____6781_5750_6807X = ____14_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____14_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____8DDD_79BB_5E73_65B9XY = ____14_FF0E_516C_5171_5DE5_5177["距离平方XY"]
+local _____64AD_653E_70B9_7279_6548 = ____14_FF0E_516C_5171_5DE5_5177["播放点特效"]
+local _____64AD_653E_5355_4F4D_7279_6548 = ____14_FF0E_516C_5171_5DE5_5177["播放单位特效"]
 local _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C = ____14_FF0E_516C_5171_5DE5_5177["播放卡瑟拉限时动作"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
@@ -25,9 +26,6 @@ local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_resul
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local AddSpecialEffect = jass.AddSpecialEffect
-local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
-local DestroyEffect = jass.DestroyEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_LIGHTNING = jass.DAMAGE_TYPE_LIGHTNING
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -41,20 +39,6 @@ local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_4.registerManualBuff
 local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉")
 local _____5361_745F_62C9BuffID = ____require_result_5["卡瑟拉BuffID"]
-local function _____64AD_653E_70B9_7279_6548(model, x, y)
-    if model == "" then
-        return
-    end
-    local effect = AddSpecialEffect(model, x, y)
-    DestroyEffect(effect)
-end
-local function _____64AD_653E_5355_4F4D_7279_6548(model, unit)
-    if model == "" or not _____5355_4F4D_6709_6548(unit) then
-        return
-    end
-    local effect = AddSpecialEffectTarget(model, unit, "origin")
-    DestroyEffect(effect)
-end
 local function _____786E_4FDD_7EDD_7F18_73CA_745A(context)
     if context["绝缘珊瑚安全区组"] ~= nil and #context["绝缘珊瑚列表"] > 0 then
         return
@@ -155,7 +139,7 @@ local function _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context, _____6
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue23
+                    goto __continue19
                 end
                 if _____73A9_5BB6_5728_7EDD_7F18_73CA_745A_5185(context, hero) then
                     registerManualBuff(
@@ -165,10 +149,10 @@ local function _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context, _____6
                         1,
                         {sourceName = "卡瑟拉-绝缘庇护"}
                     )
-                    goto __continue23
+                    goto __continue19
                 end
                 if _____6D88_8017_73A9_5BB6_89E6_624B_6B8B_7247(context, hero, cfg["抵消残片数"]) then
-                    goto __continue23
+                    goto __continue19
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
@@ -193,29 +177,18 @@ local function _____7ED3_7B97_5361_745F_62C9_5171_751F_7535_51FB(context, _____6
                     {sourceName = "卡瑟拉-麻痹电流"}
                 )
             end
-            ::__continue23::
+            ::__continue19::
             i = i + 1
         end
     end
 end
-____exports["尝试释放卡瑟拉共生电击"] = function(context, nowMs)
+____exports["释放卡瑟拉共生电击"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or context["Boss潜入中"] then
-        return
-    end
-    if _____5237_65B0_5361_745F_62C9_9636_6BB5(context) < 3 then
-        return
+        return false
     end
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["共生电击"]
     _____786E_4FDD_7EDD_7F18_73CA_745A(context)
-    if context["下次共生电击时间"] <= 0 then
-        context["下次共生电击时间"] = nowMs + cfg["间隔秒"] * 1000
-        return
-    end
-    if nowMs < context["下次共生电击时间"] then
-        return
-    end
-    context["下次共生电击时间"] = nowMs + cfg["间隔秒"] * 1000
     _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["预警秒"])
     _____64AD_653E_5361_745F_62C9_53F0_8BCD(boss, "共生电击")
     _____64AD_653EBoss_5750_6807_97F3_6548(
@@ -248,7 +221,6 @@ ____exports["尝试释放卡瑟拉共生电击"] = function(context, nowMs)
     )
     local ____self_9 = context["清理"]
     ____self_9["登记延迟回调"](____self_9, "卡瑟拉-共生电击结算", id)
-end
-____exports["注册卡瑟拉共生电击"] = function()
+    return true
 end
 return ____exports

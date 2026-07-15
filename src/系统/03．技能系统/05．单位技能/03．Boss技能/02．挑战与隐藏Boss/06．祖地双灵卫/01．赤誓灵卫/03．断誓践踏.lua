@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
 local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["祖地双灵卫数值与表现配置"]
 local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
@@ -35,9 +37,6 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____70B9_5728_5706_5185(x, y, centerX, centerY, radius)
     local dx = x - centerX
     local dy = y - centerY
@@ -84,7 +83,7 @@ local function _____7ED3_7B97_8DF5_8E0F_4F24_5BB3(context, x, y, label)
                     y,
                     cfg["落点半径"]
                 ) then
-                    goto __continue11
+                    goto __continue10
                 end
                 local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -100,7 +99,7 @@ local function _____7ED3_7B97_8DF5_8E0F_4F24_5BB3(context, x, y, label)
                     ["标签"] = label
                 })
             end
-            ::__continue11::
+            ::__continue10::
             i = i + 1
         end
     end
@@ -117,7 +116,7 @@ ____exports["尝试以断誓践踏破壳当前净化节点"] = function(context,
             do
                 local node = nodes[i + 1]
                 if node["序号"] ~= context["当前净化节点序号"] or node["阶段"] ~= "破壳" then
-                    goto __continue16
+                    goto __continue15
                 end
                 local now = getServerTime()
                 if now < node["重试允许Ms"] then
@@ -137,7 +136,7 @@ ____exports["尝试以断誓践踏破壳当前净化节点"] = function(context,
                 node["重试允许Ms"] = 0
                 return true
             end
-            ::__continue16::
+            ::__continue15::
             i = i + 1
         end
     end

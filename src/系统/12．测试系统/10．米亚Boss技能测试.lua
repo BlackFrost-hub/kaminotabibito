@@ -33,21 +33,22 @@ local _____91CA_653E_7C73_4E9A_8150_5316_722A_51FB = ____require_result_9["释�
 local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.06．污水喷吐")
 local _____91CA_653E_7C73_4E9A_6C61_6C34_55B7_5410 = ____require_result_10["释放米亚污水喷吐"]
 local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.07．灵猫分身")
-local _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB = ____require_result_11["尝试触发米亚灵猫分身"]
+local _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB = ____require_result_11["触发米亚灵猫分身"]
 local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.08．污染标记")
 local _____5237_65B0_7C73_4E9A_6C61_67D3_6807_8BB0 = ____require_result_12["刷新米亚污染标记"]
 local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.09．污染脉冲")
-local _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_67D3_8109_51B2 = ____require_result_13["尝试触发米亚污染脉冲"]
+local _____91CA_653E_7C73_4E9A_6C61_67D3_8109_51B2 = ____require_result_13["释放米亚污染脉冲"]
 local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.10．污水柱爆发")
-local _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_6C34_67F1_7206_53D1 = ____require_result_14["尝试触发米亚污水柱爆发"]
+local _____91CA_653E_7C73_4E9A_6C61_6C34_67F1_7206_53D1 = ____require_result_14["释放米亚污水柱爆发"]
 local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.11．腐化转移")
-local _____5C1D_8BD5_89E6_53D1_7C73_4E9A_8150_5316_8F6C_79FB = ____require_result_15["尝试触发米亚腐化转移"]
+local _____91CA_653E_7C73_4E9A_8150_5316_8F6C_79FB = ____require_result_15["释放米亚腐化转移"]
 local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.12．平台超载惩罚")
 local _____5237_65B0_7C73_4E9A_5E73_53F0_8D85_8F7D_60E9_7F5A = ____require_result_16["刷新米亚平台超载惩罚"]
 local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.13．腐化黏液涂层")
-local _____5237_65B0_7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42 = ____require_result_17["刷新米亚腐化黏液涂层"]
+local _____5237_65B0_7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42_88AB_52A8_72B6_6001 = ____require_result_17["刷新米亚腐化黏液涂层被动状态"]
+local _____91CA_653E_7C73_4E9A_5168_573A_8150_5316_9ECF_6DB2 = ____require_result_17["释放米亚全场腐化黏液"]
 local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.14．终极污染")
-local _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3 = ____require_result_18["尝试触发米亚终极污染"]
+local _____89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3 = ____require_result_18["触发米亚终极污染"]
 local ____require_result_19 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.01．场地配置")
 local _____7C73_4E9A_9ED8_8BA4_5E73_53F0_4E2D_5FC3_914D_7F6E = ____require_result_19["米亚默认平台中心配置"]
 local _____7C73_4E9A_9ED8_8BA4_5B89_5168_57DF_914D_7F6E_8868 = ____require_result_19["米亚默认安全域配置表"]
@@ -290,7 +291,7 @@ local function _____6267_884C_7C73_4E9A_6280_80FD_6D4B_8BD5(player, _____5E8F_53
         context["阶段"] = 1
         context["已触发分身80"] = false
         SetUnitState(context["Boss单位"], UNIT_STATE_LIFE, _____6D4B_8BD5_5355_4F4D_6700_5927_751F_547D_503C * 0.75)
-        _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
+        _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
         _____63D0_793A(player, "已测试：灵猫分身。")
     elseif _____5E8F_53F7 == 4 then
         context["阶段"] = 1
@@ -300,19 +301,16 @@ local function _____6267_884C_7C73_4E9A_6280_80FD_6D4B_8BD5(player, _____5E8F_53
         _____63D0_793A(player, "已测试：污染标记。")
     elseif _____5E8F_53F7 == 5 then
         context["阶段"] = 2
-        context["上次污染脉冲Ms"] = 0
-        _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_67D3_8109_51B2(context, nowMs)
+        _____91CA_653E_7C73_4E9A_6C61_67D3_8109_51B2(context)
         _____63D0_793A(player, "已测试：污染脉冲。")
     elseif _____5E8F_53F7 == 6 then
         context["阶段"] = 2
-        context["上次污水柱爆发Ms"] = 0
-        _____5C1D_8BD5_89E6_53D1_7C73_4E9A_6C61_6C34_67F1_7206_53D1(context, nowMs)
+        _____91CA_653E_7C73_4E9A_6C61_6C34_67F1_7206_53D1(context)
         _____63D0_793A(player, "已测试：污水柱爆发。")
     elseif _____5E8F_53F7 == 7 then
         context["阶段"] = 2
-        context["上次腐化转移Ms"] = 0
         context["腐化转移污染平台ID"] = ""
-        _____5C1D_8BD5_89E6_53D1_7C73_4E9A_8150_5316_8F6C_79FB(context, nowMs)
+        _____91CA_653E_7C73_4E9A_8150_5316_8F6C_79FB(context, nowMs)
         _____63D0_793A(player, "已测试：腐化转移。")
     elseif _____5E8F_53F7 == 8 then
         context["阶段"] = 2
@@ -326,15 +324,15 @@ local function _____6267_884C_7C73_4E9A_6280_80FD_6D4B_8BD5(player, _____5E8F_53
         _____63D0_793A(player, "已测试：平台超载。")
     elseif _____5E8F_53F7 == 9 then
         context["阶段"] = 3
-        context["上次全场甩黏液Ms"] = 0
-        _____5237_65B0_7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42(context, nowMs)
+        _____5237_65B0_7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42_88AB_52A8_72B6_6001(context)
+        _____91CA_653E_7C73_4E9A_5168_573A_8150_5316_9ECF_6DB2(context)
         _____63D0_793A(player, "已测试：腐化黏液涂层。")
     elseif _____5E8F_53F7 == 10 then
         context["阶段"] = 3
         context["终极污染引导中"] = false
         context["已触发终极污染30"] = false
         SetUnitState(context["Boss单位"], UNIT_STATE_LIFE, _____6D4B_8BD5_5355_4F4D_6700_5927_751F_547D_503C * 0.25)
-        _____5C1D_8BD5_89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3(context)
+        _____89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3(context, 0)
         _____63D0_793A(player, "已测试：终极污染。")
     end
 end

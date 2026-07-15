@@ -1,9 +1,9 @@
 /** @noSelfInFile */
 
-import { type 卡瑟拉运行时上下文, 消耗玩家触手残片, 刷新卡瑟拉阶段 } from "./01．运行时上下文";
+import { type 卡瑟拉运行时上下文, 消耗玩家触手残片 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY, 播放卡瑟拉限时动作 } from "./14．公共工具";
+import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY, 播放点特效, 播放单位特效, 播放卡瑟拉限时动作 } from "./14．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 创建动态装饰物安全区组 } from "../../../../00．技能模板+函数/04．机制组件/02．战斗区域/06．动态装饰物安全区组";
 
@@ -15,9 +15,6 @@ const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
-const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_LIGHTNING = jass.DAMAGE_TYPE_LIGHTNING as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -37,18 +34,6 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
 const { 卡瑟拉BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉") as {
   卡瑟拉BuffID: { 麻痹电流: string; 绝缘庇护: string };
 };
-
-function 播放点特效(this: void, model: string, x: number, y: number): void {
-  if (model === "") return;
-  const effect = AddSpecialEffect(model, x, y);
-  DestroyEffect(effect);
-}
-
-function 播放单位特效(this: void, model: string, unit: any): void {
-  if (model === "" || !单位有效(unit)) return;
-  const effect = AddSpecialEffectTarget(model, unit, "origin");
-  DestroyEffect(effect);
-}
 
 function 确保绝缘珊瑚(this: void, context: 卡瑟拉运行时上下文): void {
   if (context.绝缘珊瑚安全区组 != null && context.绝缘珊瑚列表.length > 0) return;
@@ -132,18 +117,11 @@ function 结算卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上�
   }
 }
 
-export function 尝试释放卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上下文, nowMs: number): void {
+export function 释放卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上下文): boolean {
   const boss = context.Boss单位;
-  if (!单位有效(boss) || context.Boss潜入中) return;
-  if (刷新卡瑟拉阶段(context) < 3) return;
+  if (!单位有效(boss) || context.Boss潜入中) return false;
   const cfg = 卡瑟拉数值与表现配置.共生电击;
   确保绝缘珊瑚(context);
-  if (context.下次共生电击时间 <= 0) {
-    context.下次共生电击时间 = nowMs + cfg.间隔秒 * 1000;
-    return;
-  }
-  if (nowMs < context.下次共生电击时间) return;
-  context.下次共生电击时间 = nowMs + cfg.间隔秒 * 1000;
   播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.预警秒);
   播放卡瑟拉台词(boss, "共生电击");
   播放Boss坐标音效(卡瑟拉音效配置.共生电击.预警, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
@@ -167,7 +145,5 @@ export function 尝试释放卡瑟拉共生电击(this: void, context: 卡瑟拉
     结算卡瑟拉共生电击(context, 技能实例ID);
   });
   context.清理.登记延迟回调("卡瑟拉-共生电击结算", id);
-}
-
-export function 注册卡瑟拉共生电击(this: void): void {
+  return true;
 }

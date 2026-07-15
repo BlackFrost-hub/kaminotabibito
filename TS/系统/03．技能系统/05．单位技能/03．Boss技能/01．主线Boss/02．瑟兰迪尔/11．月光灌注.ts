@@ -1,8 +1,11 @@
 /** @noSelfInFile */
 
+import { 单位存活 as 单位有效, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 瑟兰迪尔运行时上下文 } from "./03．运行时上下文";
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
+import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
+import { 创建固定时间轴阶段列表 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -29,8 +32,9 @@ const { 显示常规技能吟唱条, 显示致命惩罚吟唱条, 关闭吟唱�
   显示致命惩罚吟唱条: (this: void, 参数: any) => void;
   关闭吟唱条: (this: void, 通道?: string) => void;
 };
-const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+const { 创建点特效, createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+  createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
 };
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
@@ -38,7 +42,6 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
 
 const jass = require("jass.common") as any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -62,13 +65,9 @@ interface 月光灌注运行状态 {
 const 月光灌注状态表: Record<string, 月光灌注运行状态 | undefined> = {};
 let 当前月光灌注Boss: any = null;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && GetUnitState(unit, UNIT_STATE_LIFE) > 0;
-}
-
 function 取月光灌注Key(this: void, unit: any): string {
   if (unit == null || unit === 0) return "";
-  return tostring(GetHandleId(unit));
+  return tostring(取单位ID(unit));
 }
 
 function 回滚月光灌注状态(this: void, unit: any): void {
@@ -91,26 +90,52 @@ function on月光灌注Buff移除(this: void, unit: any, _buffID: string, _row: 
 
 function 播放神罚特效(this: void, x: number, y: number): void {
   const config = 瑟兰迪尔数值与表现配置.月光灌注;
-  const effect1 = AddSpecialEffect(config.神罚特效1, x, y);
-  if (effect1 != null && effect1 !== 0) YDWETimerDestroyEffectSafe(2, effect1);
-  const effect2 = AddSpecialEffect(config.神罚特效2, x, y);
-  if (effect2 != null && effect2 !== 0) YDWETimerDestroyEffectSafe(2, effect2);
+  创建点特效({ 模型路径: config.神罚特效1, X: x, Y: y, 持续秒: 2 });
+  创建点特效({ 模型路径: config.神罚特效2, X: x, Y: y, 持续秒: 2 });
 }
 
-export function 尝试触发瑟兰迪尔月光灌注(this: void, context: 瑟兰迪尔运行时上下文): void {
+export function 释放瑟兰迪尔月光灌注(this: void, context: 瑟兰迪尔运行时上下文): boolean {
   const config = 瑟兰迪尔数值与表现配置.月光灌注;
   const boss = context.Boss单位;
-  if (!单位有效(boss) || context.已触发月光灌注) return;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  const life = GetUnitState(boss, UNIT_STATE_LIFE);
-  if (maxLife > 0 && life / maxLife > config.触发生命比例) return;
-  释放瑟兰迪尔月光灌注(context);
-}
-
-export function 释放瑟兰迪尔月光灌注(this: void, context: 瑟兰迪尔运行时上下文): void {
-  const config = 瑟兰迪尔数值与表现配置.月光灌注;
-  const boss = context.Boss单位;
-  if (!单位有效(boss)) return;
+  if (!单位有效(boss) || context.已触发月光灌注) return false;
+  if (context.月光灌注组合执行器 == null) {
+    context.月光灌注组合执行器 = 创建固定组合技能执行器<瑟兰迪尔运行时上下文>({
+      名称: "瑟兰迪尔-月光灌注",
+      清理: context.清理,
+      互斥组: "瑟兰迪尔月光灌注",
+    });
+  }
+  const 执行ID = context.月光灌注组合执行器.开始({
+    key: "月光灌注",
+    单位: boss,
+    上下文: context,
+    最大持续毫秒: R2I(config.施法硬直秒 * 1000) + 1000,
+    阶段列表: 创建固定时间轴阶段列表([{
+      时点毫秒: config.举剑冻结延迟Ms,
+      名称: "月光灌注举剑停顿",
+      执行: function 瑟兰迪尔月光灌注举剑停顿(this: void): void {
+        if (单位有效(boss)) SetUnitTimeScale(boss, config.冻结动画速度);
+      },
+    }, {
+      时点毫秒: R2I(config.施法硬直秒 * 1000),
+      名称: "月光灌注生效",
+      执行: function 瑟兰迪尔月光灌注生效(this: void): void {
+        关闭吟唱条("常规技能");
+        if (!单位有效(boss)) return;
+        SetUnitTimeScale(boss, config.恢复动画速度);
+        SetUnitAnimationByIndex(boss, config.恢复动画编号);
+        结算瑟兰迪尔月光灌注(boss);
+      },
+    }]),
+    结束回调: function 瑟兰迪尔月光灌注组合结束(this: void, event): void {
+      if (event.原因 === "完成") return;
+      关闭吟唱条("常规技能");
+      if (!单位有效(boss)) return;
+      SetUnitTimeScale(boss, config.恢复动画速度);
+      SetUnitAnimationByIndex(boss, config.恢复动画编号);
+    },
+  });
+  if (执行ID === 0) return false;
   context.已触发月光灌注 = true;
 
   播放瑟兰迪尔台词(boss, "月光灌注");
@@ -123,23 +148,8 @@ export function 释放瑟兰迪尔月光灌注(this: void, context: 瑟兰迪尔
   });
   SetUnitTimeScale(boss, config.施法动画速度);
   SetUnitAnimationByIndex(boss, config.动画编号);
-  const castEffect = AddSpecialEffectTarget(config.特效, boss, "origin");
-  if (castEffect != null && castEffect !== 0) {
-    YDWETimerDestroyEffectSafe(config.施法硬直秒, castEffect);
-  }
-
-  addDelayedCallback(config.举剑冻结延迟Ms, function 瑟兰迪尔月光灌注举剑停顿(this: void): void {
-    if (!单位有效(boss)) return;
-    SetUnitTimeScale(boss, config.冻结动画速度);
-  });
-
-  addDelayedCallback(R2I(config.施法硬直秒 * 1000), function 瑟兰迪尔月光灌注生效(this: void): void {
-    关闭吟唱条("常规技能");
-    if (!单位有效(boss)) return;
-    SetUnitTimeScale(boss, config.恢复动画速度);
-    SetUnitAnimationByIndex(boss, config.恢复动画编号);
-    结算瑟兰迪尔月光灌注(boss);
-  });
+  createTimedUnitEffect(boss, "origin", config.特效, config.施法硬直秒);
+  return true;
 }
 
 function 结算瑟兰迪尔月光灌注(this: void, boss: any): void {
@@ -194,8 +204,6 @@ function 结算瑟兰迪尔精灵神罚(this: void, boss: any): void {
   }
 }
 
-export function 注册瑟兰迪尔月光灌注(this: void): void {
-}
 
 export function 清理瑟兰迪尔月光灌注(this: void): void {
   关闭吟唱条("致命惩罚");

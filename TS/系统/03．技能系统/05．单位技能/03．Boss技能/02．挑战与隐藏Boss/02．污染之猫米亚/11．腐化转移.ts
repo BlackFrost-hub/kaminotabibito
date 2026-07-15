@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import type { 米亚安全域运行时矩形 } from "./01．场地配置";
 import { 米亚技能数值配置, 米亚音效配置 } from "./02．数值与表现配置";
@@ -8,10 +9,8 @@ import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 播放米亚台词 } from "./15．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 执行战斗自身传送到坐标 } from "../../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
-
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-};
+import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
+import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
@@ -40,13 +39,8 @@ const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, inde
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const R2I = jass.R2I as (value: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const BJ_RADTODEG = 57.29577951308232;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取平台ID(this: void, 区域: 米亚安全域运行时矩形): string {
   return 区域.配置.ID ?? 区域.配置.名称 ?? "";
@@ -132,7 +126,7 @@ function 开始污染平台(this: void, context: 米亚运行时上下文, 区�
   播放米亚台词(context.Boss单位, "腐化转移", 1);
 }
 
-function 刷新污染平台(this: void, context: 米亚运行时上下文, nowMs: number): void {
+export function 刷新米亚腐化转移污染平台(this: void, context: 米亚运行时上下文, nowMs: number): void {
   const id = context.腐化转移污染平台ID ?? "";
   if (id === "") return;
   if (nowMs >= context.腐化转移污染结束Ms) {
@@ -164,63 +158,95 @@ function 刷新污染平台(this: void, context: 米亚运行时上下文, nowMs
   }
 }
 
-function 启动腐化转移(this: void, context: 米亚运行时上下文, nowMs: number, 区域: 米亚安全域运行时矩形): void {
+function 创建腐化转移时间轴事件(this: void, context: 米亚运行时上下文, nowMs: number, 区域: 米亚安全域运行时矩形): 固定时间轴事件[] {
   const boss = context.Boss单位;
   const config = 米亚技能数值配置.腐化转移;
-  context.上次腐化转移Ms = nowMs;
-  面向平台(boss, 区域);
-  开始硬直(boss, config.预警秒);
-  SetUnitTimeScale(boss, config.预警动画速度);
-  SetUnitAnimationByIndex(boss, config.预警动画编号);
-  播放平台预警(区域);
-  播放米亚台词(boss, "腐化转移", 0);
-  显示常规技能吟唱条({
-    总时长: config.预警秒,
-    颜色ID: 3,
-    标题文本: "腐化转移",
-    提示文本: "米亚正在污染安全区！离开目标平台！",
-  });
-
-  addDelayedCallback(config.弓背冻结延迟Ms, function 米亚腐化转移弓背冻结(this: void): void {
-    if (!单位有效(context.Boss单位)) return;
-    SetUnitTimeScale(context.Boss单位, config.弓背冻结动画速度);
-  });
-
-  addDelayedCallback(R2I(config.预警秒 * 1000), function 米亚腐化转移落点生效(this: void): void {
-    const currentBoss = context.Boss单位;
-    if (!单位有效(currentBoss) || context.阶段 < 2) return;
-    关闭吟唱条("常规技能");
-    const 原X = GetUnitX(currentBoss);
-    const 原Y = GetUnitY(currentBoss);
-    if (!执行战斗自身传送到坐标(currentBoss, 区域.中心X, 区域.中心Y)) {
-      SetUnitTimeScale(currentBoss, config.恢复动画速度);
-      SetUnitAnimationByIndex(currentBoss, config.恢复动画编号);
-      return;
-    }
-    播放入出水表现(原X, 原Y);
-    SetUnitTimeScale(currentBoss, config.出水动画速度);
-    SetUnitAnimationByIndex(currentBoss, config.出水动画编号);
-    播放入出水表现(区域.中心X, 区域.中心Y);
-    开始污染平台(context, 区域, nowMs + R2I(config.预警秒 * 1000));
-    addDelayedCallback(config.恢复动作延迟Ms, function 米亚腐化转移恢复动作(this: void): void {
+  const 预警毫秒 = config.预警秒 * 1000;
+  return [{
+    时点毫秒: 0,
+    名称: "腐化转移开始",
+    执行: function 米亚腐化转移开始(this: void): void {
+      if (!单位有效(boss)) return;
+      面向平台(boss, 区域);
+      开始硬直(boss, config.预警秒);
+      SetUnitTimeScale(boss, config.预警动画速度);
+      SetUnitAnimationByIndex(boss, config.预警动画编号);
+      播放平台预警(区域);
+      播放米亚台词(boss, "腐化转移", 0);
+      显示常规技能吟唱条({
+        总时长: config.预警秒,
+        颜色ID: 3,
+        标题文本: "腐化转移",
+        提示文本: "米亚正在污染安全区！离开目标平台！",
+      });
+    },
+  }, {
+    时点毫秒: config.弓背冻结延迟Ms,
+    名称: "腐化转移弓背冻结",
+    执行: function 米亚腐化转移弓背冻结(this: void): void {
+      if (单位有效(context.Boss单位)) SetUnitTimeScale(context.Boss单位, config.弓背冻结动画速度);
+    },
+  }, {
+    时点毫秒: 预警毫秒,
+    名称: "腐化转移落点生效",
+    执行: function 米亚腐化转移落点生效(this: void): void {
+      const currentBoss = context.Boss单位;
+      关闭吟唱条("常规技能");
+      if (!单位有效(currentBoss) || context.阶段 < 2) return;
+      const 原X = GetUnitX(currentBoss);
+      const 原Y = GetUnitY(currentBoss);
+      if (!执行战斗自身传送到坐标(currentBoss, 区域.中心X, 区域.中心Y)) {
+        SetUnitTimeScale(currentBoss, config.恢复动画速度);
+        SetUnitAnimationByIndex(currentBoss, config.恢复动画编号);
+        return;
+      }
+      播放入出水表现(原X, 原Y);
+      SetUnitTimeScale(currentBoss, config.出水动画速度);
+      SetUnitAnimationByIndex(currentBoss, config.出水动画编号);
+      播放入出水表现(区域.中心X, 区域.中心Y);
+      开始污染平台(context, 区域, nowMs + 预警毫秒);
+    },
+  }, {
+    时点毫秒: 预警毫秒 + config.恢复动作延迟Ms,
+    名称: "腐化转移恢复动作",
+    执行: function 米亚腐化转移恢复动作(this: void): void {
       if (!单位有效(context.Boss单位)) return;
       SetUnitTimeScale(context.Boss单位, config.恢复动画速度);
       SetUnitAnimationByIndex(context.Boss单位, config.恢复动画编号);
-    });
-  });
+    },
+  }];
 }
 
-export function 注册米亚腐化转移(this: void): void {
-}
-
-export function 尝试触发米亚腐化转移(this: void, context: 米亚运行时上下文, nowMs: number): void {
-  if (context.阶段 < 2) return;
-  刷新污染平台(context, nowMs);
-  if ((context.腐化转移污染平台ID ?? "") !== "") return;
+function 启动腐化转移(this: void, context: 米亚运行时上下文, nowMs: number, 区域: 米亚安全域运行时矩形): boolean {
   const config = 米亚技能数值配置.腐化转移;
-  if (context.上次腐化转移Ms > 0 && nowMs - context.上次腐化转移Ms < config.冷却Ms) return;
-  if (!单位有效(context.Boss单位)) return;
+  if (context.腐化转移组合执行器 == null) {
+    context.腐化转移组合执行器 = 创建固定组合技能执行器<米亚运行时上下文>({
+      名称: "米亚-腐化转移",
+      清理: context.清理,
+      互斥组: "米亚普通技能",
+    });
+  }
+  const 执行ID = context.腐化转移组合执行器.开始({
+    key: "腐化转移",
+    单位: context.Boss单位,
+    上下文: context,
+    最大持续毫秒: config.预警秒 * 1000 + config.恢复动作延迟Ms + 500,
+    阶段列表: 创建固定时间轴阶段列表(创建腐化转移时间轴事件(context, nowMs, 区域)),
+    结束回调: function 米亚腐化转移结束(this: void, event): void {
+      if (event.原因 === "完成") return;
+      关闭吟唱条("常规技能");
+      if (!单位有效(context.Boss单位)) return;
+      SetUnitTimeScale(context.Boss单位, config.恢复动画速度);
+      SetUnitAnimationByIndex(context.Boss单位, config.恢复动画编号);
+    },
+  });
+  return 执行ID !== 0;
+}
+
+
+export function 释放米亚腐化转移(this: void, context: 米亚运行时上下文, nowMs: number): boolean {
+  if (context.阶段 < 2 || (context.腐化转移污染平台ID ?? "") !== "" || !单位有效(context.Boss单位)) return false;
   const 区域 = 选择污染平台(context);
-  if (区域 == null) return;
-  启动腐化转移(context, nowMs, 区域);
+  if (区域 == null) return false;
+  return 启动腐化转移(context, nowMs, 区域);
 }

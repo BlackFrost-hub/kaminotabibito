@@ -1,10 +1,13 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.00．配置")
 local _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["米亚单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.02．数值与表现配置")
 local _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚技能数值配置"]
 local _____7C73_4E9A_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚音效配置"]
+local _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["米亚运行时配置"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.15．台词播放")
 local _____64AD_653E_7C73_4E9A_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放米亚台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -19,8 +22,9 @@ local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
 local _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548 = ____require_result_2["创建单位脚下点特效"]
 local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
 local X_FixUnitStandingSafe = ____require_result_3.X_FixUnitStandingSafe
+local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -30,24 +34,9 @@ local RemoveUnit = jass.RemoveUnit
 local IsUnitType = jass.IsUnitType
 local CosBJ = jass.CosBJ
 local SinBJ = jass.SinBJ
-local ConvertUnitState = jass.ConvertUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local GetUnitStateJapi = japi.GetUnitState
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
-local function _____53D6_5355_4F4D_653B_51FB_529B(unit)
-    if not _____5355_4F4D_6709_6548(unit) or type(GetUnitStateJapi) ~= "function" then
-        return 1000
-    end
-    local value = GetUnitStateJapi(
-        unit,
-        ConvertUnitState(21)
-    )
-    return value > 0 and value or 1000
-end
 local function _____64AD_653E_5206_8EAB_51FA_751F_8868_73B0(x, y)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = "Common\\Effect\\Element\\magic\\WhiteElement.mdx",
@@ -98,13 +87,13 @@ local function _____5B89_6392_5206_8EAB_5230_671F_7ED3_7B97(context, summons)
                     do
                         local summon = summons[i + 1]
                         if not _____5355_4F4D_6709_6548(summon) then
-                            goto __continue16
+                            goto __continue13
                         end
                         aliveCount = aliveCount + 1
                         _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(summon, {["模型路径"] = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx", ["持续秒"] = 1.2, ["缩放"] = 1})
                         RemoveUnit(summon)
                     end
-                    ::__continue16::
+                    ::__continue13::
                     i = i + 1
                 end
             end
@@ -117,17 +106,18 @@ local function _____5B89_6392_5206_8EAB_5230_671F_7ED3_7B97(context, summons)
         end
     )
 end
-local function _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
+____exports["触发米亚灵猫分身"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
-        return
+        return false
     end
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["灵猫分身"]
     local bossX = GetUnitX(boss)
     local bossY = GetUnitY(boss)
     local facing = GetUnitFacing(boss)
     local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    local attack = _____53D6_5355_4F4D_653B_51FB_529B(boss)
+    local rawAttack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss)
+    local attack = rawAttack > 0 and rawAttack or _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E["Boss攻击力兜底"]
     local summons = {}
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "灵猫分身", 0)
     _____64AD_653EBoss_5750_6807_97F3_6548(_____7C73_4E9A_97F3_6548_914D_7F6E["灵猫分身"]["主辨识音"], bossX, bossY, _____7C73_4E9A_97F3_6548_914D_7F6E["默认裁断距离"])
@@ -175,31 +165,6 @@ local function _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
         _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "灵猫分身", 1)
         _____5B89_6392_5206_8EAB_5230_671F_7ED3_7B97(context, summons)
     end
-end
-____exports["注册米亚灵猫分身"] = function()
-end
-____exports["尝试触发米亚灵猫分身"] = function(context)
-    if context["阶段"] ~= 1 then
-        return
-    end
-    local boss = context["Boss单位"]
-    if not _____5355_4F4D_6709_6548(boss) then
-        return
-    end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    if maxLife <= 0 then
-        return
-    end
-    local ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife
-    local thresholds = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["灵猫分身"]["触发生命比例"]
-    if not context["已触发分身80"] and ratio <= thresholds[1] then
-        context["已触发分身80"] = true
-        _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
-        return
-    end
-    if not context["已触发分身50"] and ratio <= thresholds[2] then
-        context["已触发分身50"] = true
-        _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
-    end
+    return true
 end
 return ____exports

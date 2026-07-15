@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_5355_4F4D_653B_51FB_529B, _____8BA1_7B97_6C61_6C34_55B7_5410_76F4_63A5_4F24_5BB3, _____70B9_5728_524D_65B9_6247_5F62_5185, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____64AD_653E_55B7_5410_8868_73B0, _____521B_5EFA_6C61_6C34_55B7_5410_6B8B_7559_533A, ____on_7C73_4E9A_6C61_6C34_55B7_5410_751F_6548, getServerTime, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868Ex, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, YDWETimerDestroyEffectSafe, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____9020_6210AOE_6280_80FD_4F24_5BB3, jass, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitFacing, GetUnitState, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, ConvertUnitState, CosBJ, SinBJ, Atan2, AddSpecialEffect, GetUnitStateJapi, EXSetEffectSize, EXEffectMatRotateZ, UNIT_STATE_MAX_LIFE, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____6C61_6C34_55B7_5410_6280_80FDID
+local _____70B9_5728_524D_65B9_6247_5F62_5185, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____64AD_653E_55B7_5410_8868_73B0, _____521B_5EFA_6C61_6C34_55B7_5410_6B8B_7559_533A, ____on_7C73_4E9A_6C61_6C34_55B7_5410_751F_6548, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868Ex, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____521B_5EFA_70B9_7279_6548, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, jass, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, CosBJ, SinBJ, Atan2, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____6C61_6C34_55B7_5410_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_7C73_4E9A_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建米亚上下文"]
 local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.04．腐化感染")
@@ -22,22 +22,10 @@ local _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387 = ____12_FF0E_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位有效"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBoss_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行Boss技能伤害"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
-function _____53D6_5355_4F4D_653B_51FB_529B(unit)
-    if not _____5355_4F4D_6709_6548(unit) or type(GetUnitStateJapi) ~= "function" then
-        return 1000
-    end
-    local value = GetUnitStateJapi(
-        unit,
-        ConvertUnitState(21)
-    )
-    return value > 0 and value or 1000
-end
-function _____8BA1_7B97_6C61_6C34_55B7_5410_76F4_63A5_4F24_5BB3(boss, target)
-    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水喷吐"]
-    return (_____53D6_5355_4F4D_653B_51FB_529B(boss) * config["直接伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["直接伤害目标最大生命比例"]) * config["直接伤害总倍率"]
-end
 function _____70B9_5728_524D_65B9_6247_5F62_5185(boss, target, range, halfAngle)
     local dx = GetUnitX(target) - GetUnitX(boss)
     local dy = GetUnitY(target) - GetUnitY(boss)
@@ -70,16 +58,14 @@ function _____64AD_653E_55B7_5410_8868_73B0(boss)
     local facing = GetUnitFacing(boss)
     local x = GetUnitX(boss) + CosBJ(facing) * 120
     local y = GetUnitY(boss) + SinBJ(facing) * 120
-    local effect = AddSpecialEffect("Common\\Effect\\Element\\poison\\[AKE]war3AKE.com - 6158867876016216905550325.mdx", x, y)
-    if effect ~= nil and effect ~= 0 then
-        if type(EXSetEffectSize) == "function" then
-            EXSetEffectSize(effect, 1.2)
-        end
-        if type(EXEffectMatRotateZ) == "function" then
-            EXEffectMatRotateZ(effect, facing)
-        end
-        YDWETimerDestroyEffectSafe(1.5, effect)
-    end
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = config["喷吐特效路径"],
+        X = x,
+        Y = y,
+        ["Z轴角度"] = facing,
+        ["缩放"] = config["喷吐特效缩放"],
+        ["持续秒"] = config["喷吐特效持续秒"]
+    })
     SetUnitTimeScale(boss, config["动画速度"])
     SetUnitAnimationByIndex(boss, config["动画编号"])
 end
@@ -117,7 +103,6 @@ ____exports["释放米亚污水喷吐"] = function(context)
         return
     end
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水喷吐"]
-    context["上次污水喷吐Ms"] = getServerTime()
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污水喷吐")
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____7C73_4E9A_97F3_6548_914D_7F6E["污水喷吐"]["前摇蓄力"],
@@ -145,21 +130,25 @@ ____exports["释放米亚污水喷吐"] = function(context)
             do
                 local target = targets[i + 1]
                 if not _____5355_4F4D_6709_6548(target) or not _____70B9_5728_524D_65B9_6247_5F62_5185(boss, target, config["喷吐距离"], config["喷吐半角"]) then
-                    goto __continue22
+                    goto __continue16
                 end
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBoss_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____6C61_6C34_55B7_5410_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = target,
-                    ["伤害"] = _____8BA1_7B97_6C61_6C34_55B7_5410_76F4_63A5_4F24_5BB3(boss, target) * _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387(context, target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
+                    ["伤害公式"] = {
+                        ["来源攻击力比例"] = config["直接伤害Boss攻击力比例"],
+                        ["目标最大生命比例"] = config["直接伤害目标最大生命比例"],
+                        ["总倍率"] = config["直接伤害总倍率"] * _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387(context, target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target)
+                    },
                     attackType = jass.ATTACK_TYPE_CHAOS,
                     ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
                     weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能"
+                    ["伤害形态"] = "AOE"
                 })
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["直接腐化层数"], "污水喷吐")
             end
-            ::__continue22::
+            ::__continue16::
             i = i + 1
         end
     end
@@ -177,36 +166,24 @@ function ____on_7C73_4E9A_6C61_6C34_55B7_5410_751F_6548(castingUnit, spellAbilit
     end
     ____exports["释放米亚污水喷吐"](context)
 end
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-getServerTime = ____require_result_0.getServerTime
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868Ex = ____require_result_1["获取Boss技能敌对英雄列表Ex"]
-_____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807 = ____require_result_1["获取Boss技能应攻击目标"]
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDWETimerDestroyEffectSafe = ____require_result_2.YDWETimerDestroyEffectSafe
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
-_____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_3["创建持续危险区域"]
-local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技能伤害"]
+local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868Ex = ____require_result_0["获取Boss技能敌对英雄列表Ex"]
+_____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807 = ____require_result_0["获取Boss技能应攻击目标"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
+_____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_2["创建持续危险区域"]
 jass = require("jass.common")
-local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitFacing = jass.GetUnitFacing
-GetUnitState = jass.GetUnitState
 SetUnitFacing = jass.SetUnitFacing
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 SetUnitTimeScale = jass.SetUnitTimeScale
-ConvertUnitState = jass.ConvertUnitState
 CosBJ = jass.CosBJ
 SinBJ = jass.SinBJ
 Atan2 = jass.Atan2
-AddSpecialEffect = jass.AddSpecialEffect
-GetUnitStateJapi = japi.GetUnitState
-EXSetEffectSize = japi.EXSetEffectSize
-EXEffectMatRotateZ = japi.EXEffectMatRotateZ
-UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 BJ_RADTODEG = 57.29577951308232
 _____7C73_4E9A_5355_4F4D_7C7B_578BID = stringToFourCC(_____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["Boss单位ID"])
 _____6C61_6C34_55B7_5410_6280_80FDID = stringToFourCC(_____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["污水喷吐技能"])

@@ -157,6 +157,34 @@ ____exports["播放限时单位动画"] = function(_____53C2_6570)
     else
         SetUnitAnimation(_____5355_4F4D, _____53C2_6570["动画名"])
     end
+    local _____91CD_64AD_65F6_70B9_79D2_5217_8868 = _____53C2_6570["重播时点秒列表"] or ({})
+    do
+        local i = 0
+        while i < #_____91CD_64AD_65F6_70B9_79D2_5217_8868 do
+            do
+                local _____91CD_64AD_65F6_70B9_79D2 = _____91CD_64AD_65F6_70B9_79D2_5217_8868[i + 1]
+                if not (_____91CD_64AD_65F6_70B9_79D2 > 0) or _____91CD_64AD_65F6_70B9_79D2 >= _____6301_7EED_79D2 then
+                    goto __continue41
+                end
+                _____521B_5EFA_52A8_753B_7B49_5F85_4EFB_52A1(
+                    {["下一步"] = function()
+                        if _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_8868[_____5355_4F4DID] ~= _____4EE4_724C then
+                            return
+                        end
+                        SetUnitTimeScale(_____5355_4F4D, _____53C2_6570["动画速度"] or 1)
+                        if _____53C2_6570["动画编号"] ~= nil then
+                            SetUnitAnimationByIndex(_____5355_4F4D, _____53C2_6570["动画编号"])
+                        else
+                            SetUnitAnimation(_____5355_4F4D, _____53C2_6570["动画名"])
+                        end
+                    end},
+                    _____91CD_64AD_65F6_70B9_79D2
+                )
+            end
+            ::__continue41::
+            i = i + 1
+        end
+    end
     return _____521B_5EFA_52A8_753B_7B49_5F85_4EFB_52A1(
         {["下一步"] = function()
             if _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_8868[_____5355_4F4DID] ~= _____4EE4_724C then
@@ -164,12 +192,14 @@ ____exports["播放限时单位动画"] = function(_____53C2_6570)
             end
             _____5355_4F4D_9650_65F6_52A8_753B_4EE4_724C_8868[_____5355_4F4DID] = nil
             SetUnitTimeScale(_____5355_4F4D, _____53C2_6570["恢复动画速度"] or 1)
-            if _____53C2_6570["恢复动画编号"] ~= nil then
-                SetUnitAnimationByIndex(_____5355_4F4D, _____53C2_6570["恢复动画编号"])
-            elseif _____53C2_6570["恢复动画名"] ~= nil and _____53C2_6570["恢复动画名"] ~= "" then
-                SetUnitAnimation(_____5355_4F4D, _____53C2_6570["恢复动画名"])
-            else
-                SetUnitAnimation(_____5355_4F4D, "stand")
+            if _____53C2_6570["恢复动画"] ~= false then
+                if _____53C2_6570["恢复动画编号"] ~= nil then
+                    SetUnitAnimationByIndex(_____5355_4F4D, _____53C2_6570["恢复动画编号"])
+                elseif _____53C2_6570["恢复动画名"] ~= nil and _____53C2_6570["恢复动画名"] ~= "" then
+                    SetUnitAnimation(_____5355_4F4D, _____53C2_6570["恢复动画名"])
+                else
+                    SetUnitAnimation(_____5355_4F4D, "stand")
+                end
             end
             if _____53C2_6570["完成回调"] ~= nil then
                 _____53C2_6570["完成回调"]()

@@ -2,17 +2,16 @@
 
 import type { 机制清理篮子 } from "../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
 import { 创建单位运行时上下文工厂 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
+import { 创建阶段上下文, type 阶段上下文 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/01．阶段上下文";
 import { 莫尔特斯单位技能配置 } from "./00．配置";
 import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 取单位ID, stringToFourCC } from "./16．公共工具";
+import type { 固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
@@ -43,6 +42,7 @@ export type 莫尔特斯阶段 = 1 | 2 | 3;
 export interface 莫尔特斯运行时上下文 {
   Boss单位: any;
   阶段: 莫尔特斯阶段;
+  阶段上下文: 阶段上下文;
   已初始化: boolean;
   清理: 机制清理篮子;
   根须宫格?: any;
@@ -51,30 +51,50 @@ export interface 莫尔特斯运行时上下文 {
   根系觉醒已触发: boolean;
   腐朽领域已触发: boolean;
   腐败之源组?: any;
-  下次沼泽腐败时间: number;
-  下次沼泽根须时间: number;
-  下次虫群时间: number;
-  下次腐败传输档位: number;
+  腐败传输节点已注册: boolean;
   腐败护盾值: number;
+  腐败孢子云组合执行器?: 固定组合技能执行器<莫尔特斯运行时上下文>;
+  扭曲荆棘鞭笞组合执行器?: 固定组合技能执行器<莫尔特斯运行时上下文>;
 }
 
 function 创建莫尔特斯上下文(this: void, boss: any, 清理: 机制清理篮子): 莫尔特斯运行时上下文 {
   播放莫尔特斯台词(boss, "开场", 0);
-  return {
+  const context: 莫尔特斯运行时上下文 = {
     Boss单位: boss,
-    阶段: 取莫尔特斯当前阶段(boss),
+    阶段: 1,
+    阶段上下文: undefined as any,
     已初始化: false,
     清理,
     玩家腐败值表: {},
     玩家腐败值单位表: {},
     根系觉醒已触发: false,
     腐朽领域已触发: false,
-    下次沼泽腐败时间: 0,
-    下次沼泽根须时间: 0,
-    下次虫群时间: 0,
-    下次腐败传输档位: 95,
+    腐败传输节点已注册: false,
     腐败护盾值: 0,
   };
+  context.阶段上下文 = 创建阶段上下文({
+    清理,
+    名称: "莫尔特斯",
+    单位: boss,
+    初始阶段ID: "P1",
+    Tick间隔毫秒: 莫尔特斯数值与表现配置.运行时.推进间隔毫秒,
+    阶段列表: [{
+      ID: "P1",
+    }, {
+      ID: "P2",
+      血量百分比: 莫尔特斯数值与表现配置.阶段阈值.P2生命比例,
+      on进入: function 莫尔特斯进入P2(this: void): void {
+        context.阶段 = 2;
+      },
+    }, {
+      ID: "P3",
+      血量百分比: 莫尔特斯数值与表现配置.阶段阈值.P3生命比例,
+      on进入: function 莫尔特斯进入P3(this: void): void {
+        context.阶段 = 3;
+      },
+    }],
+  });
+  return context;
 }
 
 const 莫尔特斯上下文工厂 = 创建单位运行时上下文工厂<莫尔特斯运行时上下文>({
@@ -97,21 +117,6 @@ export function 获取全部莫尔特斯上下文(this: void): 莫尔特斯运�
 
 export function 清理莫尔特斯上下文(this: void, boss: any): void {
   莫尔特斯上下文工厂.清理上下文(boss);
-}
-
-export function 取莫尔特斯当前阶段(this: void, boss: any): 莫尔特斯阶段 {
-  if (!单位有效(boss)) return 1;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  if (!(maxLife > 0)) return 1;
-  const ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife;
-  if (ratio <= 0.4) return 3;
-  if (ratio <= 0.7) return 2;
-  return 1;
-}
-
-export function 刷新莫尔特斯阶段(this: void, context: 莫尔特斯运行时上下文): 莫尔特斯阶段 {
-  context.阶段 = 取莫尔特斯当前阶段(context.Boss单位);
-  return context.阶段;
 }
 
 export function 刷新玩家腐败值Buff(this: void, _context: 莫尔特斯运行时上下文, unit: any, stack?: number): void {

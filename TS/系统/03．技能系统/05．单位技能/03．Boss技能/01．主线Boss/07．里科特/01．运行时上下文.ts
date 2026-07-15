@@ -52,10 +52,6 @@ const 里科特上下文工厂 = 创建单位运行时上下文工厂<里科特�
   创建上下文: 创建里科特上下文,
 });
 
-function 取单位ID(this: void, unit: any): number {
-  return 里科特上下文工厂.取单位ID(unit);
-}
-
 export function 获取里科特上下文(this: void, boss: any): 里科特运行时上下文 | undefined {
   return 里科特上下文工厂.获取(boss);
 }
@@ -88,7 +84,7 @@ export function 刷新里科特阶段(this: void, context: 里科特运行时上
 }
 
 export function 增加里科特神风印记(this: void, context: 里科特运行时上下文, unit: any, amount: number = 1): number {
-  const id = 取单位ID(unit);
+  const id = 里科特上下文工厂.取单位ID(unit);
   if (id === 0) return 0;
   const next = (context.神风印记表[id] ?? 0) + amount;
   context.神风印记表[id] = next;
@@ -97,12 +93,12 @@ export function 增加里科特神风印记(this: void, context: 里科特运行
 }
 
 export function 取里科特神风印记(this: void, context: 里科特运行时上下文, unit: any): number {
-  const id = 取单位ID(unit);
+  const id = 里科特上下文工厂.取单位ID(unit);
   return id === 0 ? 0 : (context.神风印记表[id] ?? 0);
 }
 
 export function 清除里科特神风印记(this: void, context: 里科特运行时上下文, unit: any): void {
-  const id = 取单位ID(unit);
+  const id = 里科特上下文工厂.取单位ID(unit);
   if (id !== 0) {
     delete context.神风印记表[id];
     delete context.神风印记单位表[id];

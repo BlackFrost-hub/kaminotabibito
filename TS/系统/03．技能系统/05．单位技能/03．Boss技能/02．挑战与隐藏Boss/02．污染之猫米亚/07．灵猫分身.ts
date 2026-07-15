@@ -1,8 +1,9 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import { 米亚单位技能配置 } from "./00．配置";
-import { 米亚技能数值配置, 米亚音效配置 } from "./02．数值与表现配置";
+import { 米亚技能数值配置, 米亚音效配置, 米亚运行时配置 } from "./02．数值与表现配置";
 import { 播放米亚台词 } from "./15．台词播放";
 import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 
@@ -19,9 +20,11 @@ const { 创建点特效, 创建单位脚下点特效 } = require("lib.扩展函�
 const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
   X_FixUnitStandingSafe: (this: void, unit: any) => void;
 };
+const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
+  读取单位攻击力: (this: void, unit: any) => number;
+};
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -32,21 +35,9 @@ const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
-const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const GetUnitStateJapi = japi.GetUnitState as ((unit: any, state: any) => number) | undefined;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 取单位攻击力(this: void, unit: any): number {
-  if (!单位有效(unit) || typeof GetUnitStateJapi !== "function") return 1000;
-  const value = GetUnitStateJapi(unit, ConvertUnitState(0x15));
-  return value > 0 ? value : 1000;
-}
 
 function 播放分身出生表现(this: void, x: number, y: number): void {
   创建点特效({
@@ -101,16 +92,17 @@ function 安排分身到期结算(this: void, context: 米亚运行时上下文,
   });
 }
 
-function 触发米亚灵猫分身(this: void, context: 米亚运行时上下文): void {
+export function 触发米亚灵猫分身(this: void, context: 米亚运行时上下文): boolean {
   const boss = context.Boss单位;
-  if (!单位有效(boss)) return;
+  if (!单位有效(boss)) return false;
 
   const config = 米亚技能数值配置.灵猫分身;
   const bossX = GetUnitX(boss);
   const bossY = GetUnitY(boss);
   const facing = GetUnitFacing(boss);
   const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  const attack = 取单位攻击力(boss);
+  const rawAttack = 读取单位攻击力(boss);
+  const attack = rawAttack > 0 ? rawAttack : 米亚运行时配置.Boss攻击力兜底;
   const summons: any[] = [];
 
   播放米亚台词(boss, "灵猫分身", 0);
@@ -155,28 +147,5 @@ function 触发米亚灵猫分身(this: void, context: 米亚运行时上下文)
     播放米亚台词(boss, "灵猫分身", 1);
     安排分身到期结算(context, summons);
   }
-}
-
-export function 注册米亚灵猫分身(this: void): void {
-}
-
-export function 尝试触发米亚灵猫分身(this: void, context: 米亚运行时上下文): void {
-  if (context.阶段 !== 1) return;
-  const boss = context.Boss单位;
-  if (!单位有效(boss)) return;
-
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  if (maxLife <= 0) return;
-  const ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife;
-  const thresholds = 米亚技能数值配置.灵猫分身.触发生命比例;
-
-  if (!context.已触发分身80 && ratio <= thresholds[0]) {
-    context.已触发分身80 = true;
-    触发米亚灵猫分身(context);
-    return;
-  }
-  if (!context.已触发分身50 && ratio <= thresholds[1]) {
-    context.已触发分身50 = true;
-    触发米亚灵猫分身(context);
-  }
+  return true;
 }

@@ -7,7 +7,7 @@ import { 祖地双灵卫单位技能配置 } from './00．配置';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 创建机制清理篮子, type 机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
 import { 创建联合战斗成员生命周期, type 联合战斗成员生命周期 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/20．联合战斗成员生命周期';
-import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 取单位ID } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 伤害生命下限保护控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 
 const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文') as {
@@ -15,7 +15,6 @@ const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const jass = require('jass.common') as any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -106,10 +105,6 @@ export interface 祖地双灵卫运行时上下文 {
 
 const 上下文列表: 祖地双灵卫运行时上下文[] = [];
 const 单位上下文表: Record<number, 祖地双灵卫运行时上下文 | undefined> = {};
-
-function 取单位句柄(this: void, unit: any): number {
-  return unit != null && unit !== 0 ? GetHandleId(unit) || 0 : 0;
-}
 
 function 是赤誓单位(this: void, unit: any): boolean {
   const id = unit != null && unit !== 0 ? GetUnitTypeId(unit) : 0;
@@ -211,7 +206,7 @@ export function 创建祖地双灵卫运行时上下文(this: void, 赤誓灵卫
 }
 
 export function 获取祖地双灵卫运行时上下文(this: void, unit: any): 祖地双灵卫运行时上下文 | undefined {
-  return 单位上下文表[取单位句柄(unit)];
+  return 单位上下文表[取单位ID(unit)];
 }
 
 export function 获取全部祖地双灵卫运行时上下文(this: void): 祖地双灵卫运行时上下文[] {
@@ -229,8 +224,8 @@ export function 获取或创建祖地双灵卫运行时上下文(this: void, 启
   const battle = 读取Boss战运行上下文(启动单位) ?? 读取Boss战运行上下文(red) ?? 读取Boss战运行上下文(azure);
   const context = 创建祖地双灵卫运行时上下文(red, azure, battle?.地点矩形);
   上下文列表.push(context);
-  单位上下文表[取单位句柄(red)] = context;
-  单位上下文表[取单位句柄(azure)] = context;
+  单位上下文表[取单位ID(red)] = context;
+  单位上下文表[取单位ID(azure)] = context;
   return context;
 }
 
@@ -238,7 +233,7 @@ export function 清理祖地双灵卫运行时上下文(this: void, context: 祖
   if (context.战斗已结束) return;
   context.战斗已结束 = true;
   context.阶段 = '已结束';
-  单位上下文表[取单位句柄(context.赤誓灵卫单位)] = undefined;
-  单位上下文表[取单位句柄(context.苍影灵卫单位)] = undefined;
+  单位上下文表[取单位ID(context.赤誓灵卫单位)] = undefined;
+  单位上下文表[取单位ID(context.苍影灵卫单位)] = undefined;
   context.清理.清理全部();
 }

@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 夏提雅单位技能配置 } from './00．配置';
 import { 创建机制清理篮子, type 机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
 import { 创建单位运行时上下文工厂 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂';
@@ -9,6 +10,7 @@ import { 创建Buff层数状态, type Buff层数状态控制器 } from '../../..
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
 import type { 伤害生命下限保护控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
+import type { 固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
@@ -53,6 +55,7 @@ export interface 夏提雅运行时上下文 {
   已触发复生: boolean;
   血月终舞已释放: boolean;
   上次净化投枪目标ID: number;
+  血月轮舞组合执行器?: 固定组合技能执行器<夏提雅运行时上下文>;
   当前大型技能?: string;
   挑战已结束: boolean;
   挑战生命下限保护?: 伤害生命下限保护控制器;
@@ -61,10 +64,6 @@ export interface 夏提雅运行时上下文 {
 }
 
 let 夏提雅运行时已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 夏提雅运行时上下文 {
   const now = getServerTime();

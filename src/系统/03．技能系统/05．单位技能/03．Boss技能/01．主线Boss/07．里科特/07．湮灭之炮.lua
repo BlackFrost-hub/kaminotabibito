@@ -61,18 +61,6 @@ local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_
 local _____6E6E_706D_4E4B_70AE_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]["技能槽位"])
 local _____8757_866B_6280_80FDID = stringToFourCC("Aloc")
 local _____5DF2_6CE8_518C = false
-local function _____64AD_653E_9650_65F6_70B9_7279_6548(model, x, y, duration)
-    if model == "" then
-        return
-    end
-    createTimedEffect(
-        model,
-        x,
-        y,
-        0,
-        duration
-    )
-end
 local function _____521B_5EFA_6E6E_706D_6295_5F71_5355_4F4D(boss, x, y, face)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]
     local projection = CreateUnit(
@@ -95,7 +83,13 @@ local function _____521B_5EFA_6E6E_706D_6295_5F71_5355_4F4D(boss, x, y, face)
         255,
         cfg["投影透明度"]
     )
-    _____64AD_653E_9650_65F6_70B9_7279_6548(cfg["出现特效路径"], x, y, cfg["出现特效持续秒"])
+    createTimedEffect(
+        cfg["出现特效路径"],
+        x,
+        y,
+        0,
+        cfg["出现特效持续秒"]
+    )
     return projection
 end
 local function _____521B_5EFA_6E6E_706D_4E4B_70AE_9884_8B66(data)
@@ -122,7 +116,13 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_70AE_4E00_8DF3(data)
     end
     data["剩余跳数"] = data["剩余跳数"] - 1
     _____521B_5EFA_6E6E_706D_4E4B_70AE_9884_8B66(data)
-    _____64AD_653E_9650_65F6_70B9_7279_6548(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]["射线特效路径"], data["终点X"], data["终点Y"], _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]["射线持续秒"])
+    createTimedEffect(
+        _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]["射线特效路径"],
+        data["终点X"],
+        data["终点Y"],
+        0,
+        _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]["射线持续秒"]
+    )
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]["每跳Boss攻击力比例"]
     local radius2 = 90 * 90
@@ -132,7 +132,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_70AE_4E00_8DF3(data)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue11
+                    goto __continue9
                 end
                 local dist2 = _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9(
                     GetUnitX(hero),
@@ -157,7 +157,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_70AE_4E00_8DF3(data)
                     })
                 end
             end
-            ::__continue11::
+            ::__continue9::
             i = i + 1
         end
     end
@@ -285,7 +285,7 @@ local function _____8C03_5EA6P3_7729_6655_70AE(context)
                     do
                         local hero = heroes[i + 1]
                         if not _____5355_4F4D_6709_6548(hero) then
-                            goto __continue27
+                            goto __continue25
                         end
                         local dx = GetUnitX(hero) - cx
                         local dy = GetUnitY(hero) - cy
@@ -293,7 +293,7 @@ local function _____8C03_5EA6P3_7729_6655_70AE(context)
                             _____65BD_52A0_7729_6655(boss, hero, cfg["P3眩晕秒"])
                         end
                     end
-                    ::__continue27::
+                    ::__continue25::
                     i = i + 1
                 end
             end

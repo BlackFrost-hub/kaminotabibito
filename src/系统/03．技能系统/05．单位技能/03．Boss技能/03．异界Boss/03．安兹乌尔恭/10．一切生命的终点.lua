@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹模型动画配置"]
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
@@ -60,9 +62,6 @@ local EXSetEffectXY = japi.EXSetEffectXY
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local DEG_TO_RAD = 0.017453292519943295
 local _____4E00_5207_751F_547D_7684_7EC8_70B9_5927_578B_6280_80FDKey = "一切生命的终点"
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____9500_6BC1_7279_6548(effect)
     if effect ~= nil and effect ~= 0 then
         DestroyEffect(effect)
@@ -135,7 +134,7 @@ local function _____6388_4E88_5168_961F_751F_547D_5E87_62A4(instance)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue20
+                    goto __continue19
                 end
                 instance["庇护单位表"][GetHandleId(hero)] = true
                 registerManualBuff(
@@ -146,7 +145,7 @@ local function _____6388_4E88_5168_961F_751F_547D_5E87_62A4(instance)
                     {sourceName = "安兹-一切生命的终点"}
                 )
             end
-            ::__continue20::
+            ::__continue19::
             i = i + 1
         end
     end
@@ -196,10 +195,10 @@ local function _____521B_5EFA_751F_547D_951A_70B9(instance, x, y, index)
     SetUnitPathing(unitInstance["单位"], false)
     local ground = AddSpecialEffect(cfg["表现资源"]["生命锚点地面层特效路径"], x, y)
     local holy = AddSpecialEffect(cfg["表现资源"]["生命锚点圣光层特效路径"], x, y)
-    if ground ~= nil and ground ~= 0 and type(EXSetEffectSize) == "function" then
+    if ground ~= nil and ground ~= 0 then
         EXSetEffectSize(ground, stage["生命锚点地面层缩放"])
     end
-    if holy ~= nil and holy ~= 0 and type(EXSetEffectSize) == "function" then
+    if holy ~= nil and holy ~= 0 then
         EXSetEffectSize(holy, stage["生命锚点圣光层缩放"])
     end
     local anchor = {
@@ -285,20 +284,14 @@ local function _____64AD_653E_5973_5996_54ED_568E_8868_73B0(instance)
             do
                 local effect = AddSpecialEffect(cfg["表现资源"]["女妖哭嚎死亡波特效路径"], x, y)
                 if effect == nil or effect == 0 then
-                    goto __continue43
+                    goto __continue42
                 end
-                if type(EXSetEffectXY) == "function" then
-                    EXSetEffectXY(effect, x, y)
-                end
-                if type(EXEffectMatRotateZ) == "function" then
-                    EXEffectMatRotateZ(effect, i * 360 / stage["女妖哭嚎死亡波数量"])
-                end
-                if type(EXSetEffectSize) == "function" then
-                    EXSetEffectSize(effect, stage["女妖哭嚎死亡波缩放"])
-                end
+                EXSetEffectXY(effect, x, y)
+                EXEffectMatRotateZ(effect, i * 360 / stage["女妖哭嚎死亡波数量"])
+                EXSetEffectSize(effect, stage["女妖哭嚎死亡波缩放"])
                 YDWETimerDestroyEffectSafe(stage["女妖哭嚎特效持续秒"], effect)
             end
-            ::__continue43::
+            ::__continue42::
             i = i + 1
         end
     end
@@ -318,7 +311,7 @@ local function _____7ED3_7B97_5973_5996_54ED_568E(instance)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) or instance["庇护单位表"][GetHandleId(hero)] == true then
-                    goto __continue51
+                    goto __continue47
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
@@ -333,7 +326,7 @@ local function _____7ED3_7B97_5973_5996_54ED_568E(instance)
                     ["标签"] = "安兹·女妖哭嚎"
                 })
             end
-            ::__continue51::
+            ::__continue47::
             i = i + 1
         end
     end

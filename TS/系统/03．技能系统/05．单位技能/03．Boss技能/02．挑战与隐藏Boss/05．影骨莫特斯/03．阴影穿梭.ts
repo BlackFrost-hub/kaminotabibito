@@ -8,13 +8,15 @@ import { 单位有效, 播放影骨莫特斯限时动作, stringToFourCC, 极坐
 import { 执行战斗自身位移到坐标 } from "../../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, target: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
@@ -86,7 +88,12 @@ function 影骨阴影穿梭完成(this: void): void {
       SetUnitVertexColor(boss, 255, 255, 255, 255);
       continue;
     }
-    AddSpecialEffect(影骨莫特斯表现配置.阴影穿梭落点, x, y);
+    创建点特效({
+      模型路径: 影骨莫特斯表现配置.阴影穿梭落点,
+      X: x,
+      Y: y,
+      持续秒: 影骨莫特斯数值与表现配置.阴影穿梭.瞬时特效持续秒,
+    });
     播放Boss坐标音效(影骨莫特斯音效配置.阴影穿梭.落点闪现, x, y, 影骨莫特斯音效配置.默认裁断距离);
     SetUnitInvulnerable(boss, false);
     SetUnitVertexColor(boss, 255, 255, 255, 255);
@@ -101,7 +108,7 @@ export function 释放影骨阴影穿梭(this: void, context: 影骨莫特斯运
   const cfg = 影骨莫特斯数值与表现配置.阴影穿梭;
   播放影骨莫特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   播放影骨莫特斯台词(boss, "阴影穿梭");
-  AddSpecialEffect(影骨莫特斯表现配置.阴影穿梭残影, GetUnitX(boss), GetUnitY(boss));
+  创建点特效({ 模型路径: 影骨莫特斯表现配置.阴影穿梭残影, X: GetUnitX(boss), Y: GetUnitY(boss), 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(影骨莫特斯音效配置.阴影穿梭.消失残影, GetUnitX(boss), GetUnitY(boss), 影骨莫特斯音效配置.默认裁断距离);
   尝试播放Boss拟声池({
     标识: 影骨莫特斯音效配置.怪物拟声.标识,

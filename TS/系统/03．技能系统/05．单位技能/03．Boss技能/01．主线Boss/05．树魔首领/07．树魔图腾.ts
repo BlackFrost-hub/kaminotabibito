@@ -6,7 +6,7 @@ import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./0
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC, 距离平方XY } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 距离平方XY, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -83,10 +83,6 @@ const 巫医单位类型ID = stringToFourCC(树魔首领单位技能配置.召�
 const 投掷者单位类型ID = stringToFourCC(树魔首领单位技能配置.召唤物ID.投掷者);
 let 树魔图腾已注册 = false;
 let 树魔图腾治疗回调已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取难度(this: void): number {
   const n = getGameDifficulty();

@@ -51,18 +51,6 @@ local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
 local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6E6E_706D_4E4B_98CE_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之风"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
-local function _____64AD_653E_9650_65F6_70B9_7279_6548(model, x, y, duration)
-    if model == "" then
-        return
-    end
-    createTimedEffect(
-        model,
-        x,
-        y,
-        0,
-        duration
-    )
-end
 local function _____65BD_52A0_6E6E_706D_4E4B_98CE_968F_673A_63A7_5236(boss, hero)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之风"]
     local roll = GetRandomInt(0, 2)
@@ -109,7 +97,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue11
+                    goto __continue9
                 end
                 if _____8DDD_79BB_5E73_65B9XY(
                     GetUnitX(hero),
@@ -117,7 +105,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
                     bx,
                     by
                 ) > radius2 then
-                    goto __continue11
+                    goto __continue9
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____6E6E_706D_4E4B_98CE_6280_80FDID,
@@ -133,7 +121,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
                 })
                 _____65BD_52A0_5FEB_901F_63A7_5236Buff(boss, hero, 2, cfg["沉默秒"])
             end
-            ::__continue11::
+            ::__continue9::
             i = i + 1
         end
     end
@@ -159,16 +147,18 @@ ____exports["释放里科特湮灭之风"] = function(context)
         GetUnitY(boss),
         _____91CC_79D1_7279_97F3_6548_914D_7F6E["默认裁断距离"]
     )
-    _____64AD_653E_9650_65F6_70B9_7279_6548(
+    createTimedEffect(
         cfg["扩散特效路径"],
         GetUnitX(boss),
         GetUnitY(boss),
+        0,
         cfg["扩散特效持续秒"]
     )
-    _____64AD_653E_9650_65F6_70B9_7279_6548(
+    createTimedEffect(
         cfg["风场特效路径"],
         GetUnitX(boss),
         GetUnitY(boss),
+        0,
         cfg["风场特效持续秒"]
     )
     if stage < 3 then

@@ -35,14 +35,21 @@ ____exports["取单位ID"] = function(unit)
     end
     return GetHandleId(unit) or 0
 end
+____exports["单位句柄存在"] = function(unit)
+    return unit ~= nil and unit ~= 0
+end
+____exports["单位未标记死亡"] = function(unit)
+    return ____exports["单位句柄存在"](unit) and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
+end
+____exports["单位已标记死亡"] = function(unit)
+    return ____exports["单位句柄存在"](unit) and IsUnitType(unit, UNIT_TYPE_DEAD) == true
+end
+____exports["单位存活"] = function(unit)
+    return ____exports["单位未标记死亡"](unit) and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
+end
+--- 兼容旧调用；需要区分句柄、死亡标记时请使用语义明确的函数。
 ____exports["单位有效"] = function(unit)
-    if unit == nil or unit == 0 then
-        return false
-    end
-    if IsUnitType(unit, UNIT_TYPE_DEAD) == true then
-        return false
-    end
-    return GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
+    return ____exports["单位存活"](unit)
 end
 ____exports["读取单位攻击力"] = function(unit)
     if unit == nil or unit == 0 then
@@ -66,6 +73,22 @@ ____exports["距离平方XY"] = function(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
     return dx * dx + dy * dy
+end
+____exports["单位间距离平方"] = function(a, b)
+    return ____exports["距离平方XY"](
+        GetUnitX(a),
+        GetUnitY(a),
+        GetUnitX(b),
+        GetUnitY(b)
+    )
+end
+____exports["单位到点距离平方"] = function(unit, x, y)
+    return ____exports["距离平方XY"](
+        GetUnitX(unit),
+        GetUnitY(unit),
+        x,
+        y
+    )
 end
 ____exports["距离XY"] = function(x1, y1, x2, y2)
     return SquareRoot(____exports["距离平方XY"](x1, y1, x2, y2))

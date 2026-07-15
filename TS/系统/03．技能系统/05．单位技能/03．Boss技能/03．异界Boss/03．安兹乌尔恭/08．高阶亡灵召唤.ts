@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
 import { 创建召唤物 } from '../../../../00．技能模板+函数/01．技能函数/11．召唤物/04．对外接口';
@@ -23,8 +24,8 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
 const { 广播单位提示 } = require('系统.09．表现系统.06．广播提示消息.index') as {
   广播单位提示: (this: void, sourceUnit: any, text: string, durationMs: number) => void;
 };
-const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 
 const jass = require('jass.common') as any;
@@ -55,10 +56,6 @@ interface 高阶亡灵召唤实例 {
 
 const 高阶亡灵实例表: Record<number, 高阶亡灵召唤实例 | undefined> = {};
 let 高阶亡灵死亡监听已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 清理高阶亡灵实例(this: void, instance: 高阶亡灵召唤实例): void {
   if (instance.已移除) return;
@@ -97,10 +94,13 @@ function 确保高阶亡灵死亡监听(this: void): void {
 }
 
 function 播放召唤特效(this: void, model: string, x: number, y: number, scale: number): void {
-  const effect = AddSpecialEffect(model, x, y);
-  if (effect == null || effect === 0) return;
-  if (typeof EXSetEffectSize === 'function') EXSetEffectSize(effect, scale);
-  YDWETimerDestroyEffectSafe(安兹乌尔恭数值与表现配置.阶段技能.高阶亡灵召唤表现持续秒, effect);
+  创建点特效({
+    模型路径: model,
+    X: x,
+    Y: y,
+    缩放: scale,
+    持续秒: 安兹乌尔恭数值与表现配置.阶段技能.高阶亡灵召唤表现持续秒,
+  });
 }
 
 function 创建高阶亡灵(this: void, context: 安兹运行时上下文, x: number, y: number, target: any): void {

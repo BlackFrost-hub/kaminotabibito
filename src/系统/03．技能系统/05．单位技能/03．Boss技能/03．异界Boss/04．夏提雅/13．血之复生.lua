@@ -1,6 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
 local _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["重置夏提雅猎血连击"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.00．配置")
@@ -56,9 +58,6 @@ local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____8840_4E4B_590D_751F_6280_80FDKey = "血之复生"
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____53D6_590D_751F_7ED3_6676_53D7_51FB_6B21_6570()
     local _____73A9_5BB6_4EBA_6570 = __TS__Number(_____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570()) or 1
     if _____73A9_5BB6_4EBA_6570 < 1 then
@@ -263,13 +262,13 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
                     end
                 })
                 if crystal == nil then
-                    goto __continue32
+                    goto __continue31
                 end
                 PauseUnit(crystal["单位"], true)
                 SetUnitPathing(crystal["单位"], false)
                 crystals[#crystals + 1] = crystal
             end
-            ::__continue32::
+            ::__continue31::
             i = i + 1
         end
     end

@@ -9,7 +9,8 @@ const RemoveRect = jass.RemoveRect as (whichRect: any) => void;
 const RemoveRegion = jass.RemoveRegion as (whichRegion: any) => void;
 const DestroyUbersplat = jass.DestroyUbersplat as (whichUbersplat: any) => void;
 
-const { removePeriodicCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, removePeriodicCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   removeDelayedCallback: (this: void, id: number) => void;
 };
@@ -29,6 +30,7 @@ export interface 机制清理篮子 {
   登记周期回调(名称: string, 回调ID: number): void;
   登记延迟回调(名称: string, 回调ID: number): void;
   登记特效(名称: string, 特效: any): void;
+  登记限时特效(名称: string, 特效: any, 持续毫秒: number): void;
   登记单位(名称: string, 单位: any): void;
   登记闪电(名称: string, 闪电: any): void;
   登记矩形(名称: string, 矩形: any): void;
@@ -72,6 +74,26 @@ class 机制清理篮子实现 implements 机制清理篮子 {
   登记特效(名称: string, 特效: any): void {
     if (特效 == null || 特效 === 0) return;
     this.登记清理(名称, function 机制清理篮子销毁特效(this: void): void {
+      DestroyEffect(特效);
+    });
+  }
+
+  登记限时特效(名称: string, 特效: any, 持续毫秒: number): void {
+    if (特效 == null || 特效 === 0) return;
+    if (!(持续毫秒 > 0)) {
+      this.登记特效(名称, 特效);
+      return;
+    }
+    let 等待销毁 = true;
+    const 回调ID = addDelayedCallback(持续毫秒, function 机制清理篮子限时特效自然销毁(this: void): void {
+      if (!等待销毁) return;
+      等待销毁 = false;
+      DestroyEffect(特效);
+    });
+    this.登记清理(名称, function 机制清理篮子限时特效提前销毁(this: void): void {
+      if (!等待销毁) return;
+      等待销毁 = false;
+      removeDelayedCallback(回调ID);
       DestroyEffect(特效);
     });
   }

@@ -57,11 +57,6 @@ const 里科特单位类型ID = stringToFourCC(里科特单位技能配置.单�
 const 湮灭之风技能ID = stringToFourCC(里科特数值与表现配置.湮灭之风.技能槽位);
 let 已注册 = false;
 
-function 播放限时点特效(this: void, model: string, x: number, y: number, duration: number): void {
-  if (model === "") return;
-  createTimedEffect(model, x, y, 0, duration);
-}
-
 function 施加湮灭之风随机控制(this: void, boss: any, hero: any): void {
   const cfg = 里科特数值与表现配置.湮灭之风;
   const roll = GetRandomInt(0, 2);
@@ -127,8 +122,8 @@ export function 释放里科特湮灭之风(this: void, context: 里科特运行
   if (stage >= 3) 播放里科特施法维持动作(boss, cfg.持续秒, cfg.动画速度);
   播放里科特台词(boss, "湮灭之风");
   播放Boss坐标音效(里科特音效配置.湮灭之风.风场展开, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
-  播放限时点特效(cfg.扩散特效路径, GetUnitX(boss), GetUnitY(boss), cfg.扩散特效持续秒);
-  播放限时点特效(cfg.风场特效路径, GetUnitX(boss), GetUnitY(boss), cfg.风场特效持续秒);
+  createTimedEffect(cfg.扩散特效路径, GetUnitX(boss), GetUnitY(boss), 0, cfg.扩散特效持续秒);
+  createTimedEffect(cfg.风场特效路径, GetUnitX(boss), GetUnitY(boss), 0, cfg.风场特效持续秒);
   if (stage < 3) ShowUnit(boss, false);
 
   const data: 湮灭风场 = {

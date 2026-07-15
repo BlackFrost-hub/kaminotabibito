@@ -1,19 +1,20 @@
 /** @noSelfInFile */
 
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 格鲁姆公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
   播放格鲁姆台词,
   施加巴尔扎罗斯灼热,
-  读取单位攻击力,
   启动基础施法时间线,
   创建技能提示圈,
   获取Boss技能敌对英雄列表,
   施加快速控制Buff,
   GetUnitX,
   GetUnitY,
-  GetUnitState,
-  UNIT_STATE_MAX_LIFE,
   快速控制_击晕,
   单位有效,
   点到单位距离平方,
@@ -33,9 +34,11 @@ function 目标在重锤扇形内(this: void, grum: any, target: any, facing: nu
 
 function 计算重锤伤害(this: void, grum: any, target: any): number {
   const config = 巴尔扎罗斯技能数值配置.熔岩重锤;
-  return (读取单位攻击力(grum) * config.伤害攻击力比例
-    + GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.伤害目标最大生命比例)
-    * config.伤害总倍率;
+  return 计算组合技能伤害(grum, target, {
+    来源攻击力比例: config.伤害攻击力比例,
+    目标最大生命比例: config.伤害目标最大生命比例,
+    总倍率: config.伤害总倍率,
+  });
 }
 
 function 创建重锤提示(this: void, grum: any, angle: number): void {

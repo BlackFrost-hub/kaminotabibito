@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
 local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
@@ -8,14 +10,14 @@ local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能�
 local _____5F00_59CB_51FB_9000 = _____51FB_9000_7CFB_7EDF["开始击退"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
-local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
-local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
 local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技能伤害"]
 local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
@@ -26,21 +28,16 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local Atan2 = jass.Atan2
 local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local EXSetEffectSize = japi.EXSetEffectSize
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local RAD_TO_DEG = 57.29577951308232
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____64AD_653E_9ED1_7FFC_6A2A_626B_8868_73B0(albedo, facing)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local x = GetUnitX(albedo)
@@ -54,17 +51,13 @@ local function _____64AD_653E_9ED1_7FFC_6A2A_626B_8868_73B0(albedo, facing)
             do
                 local effect = effects[i + 1]
                 if effect == nil or effect == 0 then
-                    goto __continue5
+                    goto __continue4
                 end
-                if type(EXEffectMatRotateZ) == "function" then
-                    EXEffectMatRotateZ(effect, facing)
-                end
-                if type(EXSetEffectSize) == "function" then
-                    EXSetEffectSize(effect, cfg["守护者模式"]["黑翼横扫特效缩放"])
-                end
+                EXEffectMatRotateZ(effect, facing)
+                EXSetEffectSize(effect, cfg["守护者模式"]["黑翼横扫特效缩放"])
                 YDWETimerDestroyEffectSafe(cfg["守护者模式"]["黑翼横扫特效持续秒"], effect)
             end
-            ::__continue5::
+            ::__continue4::
             i = i + 1
         end
     end
@@ -93,12 +86,12 @@ local function _____7ED3_7B97_9ED1_7FFC_6A2A_626B(context, facing)
                     facing,
                     cfg["黑翼横扫角度"]
                 ) then
-                    goto __continue12
+                    goto __continue9
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = albedo,
                     ["目标"] = target,
-                    ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(albedo) * cfg["黑翼横扫伤害攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg["黑翼横扫伤害目标最大生命比例"],
+                    ["伤害"] = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(albedo, target, {["来源攻击力比例"] = cfg["黑翼横扫伤害攻击力比例"], ["目标最大生命比例"] = cfg["黑翼横扫伤害目标最大生命比例"]}),
                     attack = false,
                     ranged = false,
                     attackType = ATTACK_TYPE_NORMAL,
@@ -116,7 +109,7 @@ local function _____7ED3_7B97_9ED1_7FFC_6A2A_626B(context, facing)
                     ["只命中敌人"] = false
                 })
             end
-            ::__continue12::
+            ::__continue9::
             i = i + 1
         end
     end

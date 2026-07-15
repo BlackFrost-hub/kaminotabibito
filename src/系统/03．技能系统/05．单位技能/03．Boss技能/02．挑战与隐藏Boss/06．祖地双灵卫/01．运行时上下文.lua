@@ -10,12 +10,12 @@ local ____20_FF0E_8054_5408_6218_6597_6210_5458_751F_547D_5468_671F = require("�
 local _____521B_5EFA_8054_5408_6218_6597_6210_5458_751F_547D_5468_671F = ____20_FF0E_8054_5408_6218_6597_6210_5458_751F_547D_5468_671F["创建联合战斗成员生命周期"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
 local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_0["读取Boss战运行上下文"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
 local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -36,9 +36,6 @@ local _____82CD_5F71_6B63_5E38ID = stringToFourCC(_____7956_5730_53CC_7075_536B_
 local _____82CD_5F71_53D8_5F02ID = stringToFourCC(_____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["单位"]["苍影灵卫"]["变异单位ID"])
 local _____4E0A_4E0B_6587_5217_8868 = {}
 local _____5355_4F4D_4E0A_4E0B_6587_8868 = {}
-local function _____53D6_5355_4F4D_53E5_67C4(unit)
-    return unit ~= nil and unit ~= 0 and (GetHandleId(unit) or 0) or 0
-end
 local function _____662F_8D64_8A93_5355_4F4D(unit)
     local id = unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) or 0
     return id == _____8D64_8A93_6B63_5E38ID or id == _____8D64_8A93_53D8_5F02ID
@@ -176,7 +173,7 @@ ____exports["创建祖地双灵卫运行时上下文"] = function(_____8D64_8A93
     return context
 end
 ____exports["获取祖地双灵卫运行时上下文"] = function(unit)
-    return _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4(unit)]
+    return _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(unit)]
 end
 ____exports["获取全部祖地双灵卫运行时上下文"] = function()
     local result = {}
@@ -229,8 +226,8 @@ ____exports["获取或创建祖地双灵卫运行时上下文"] = function(_____
     end
     local context = ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_11(red, azure, ____opt_result_10)
     _____4E0A_4E0B_6587_5217_8868[#_____4E0A_4E0B_6587_5217_8868 + 1] = context
-    _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4(red)] = context
-    _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4(azure)] = context
+    _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(red)] = context
+    _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(azure)] = context
     return context
 end
 ____exports["清理祖地双灵卫运行时上下文"] = function(context)
@@ -239,8 +236,8 @@ ____exports["清理祖地双灵卫运行时上下文"] = function(context)
     end
     context["战斗已结束"] = true
     context["阶段"] = "已结束"
-    _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4(context["赤誓灵卫单位"])] = nil
-    _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4(context["苍影灵卫单位"])] = nil
+    _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(context["赤誓灵卫单位"])] = nil
+    _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(context["苍影灵卫单位"])] = nil
     local ____self_12 = context["清理"]
     ____self_12["清理全部"](____self_12)
 end

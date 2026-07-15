@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.00．配置")
 local _____4E9A_4F26_67EF_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["亚伦柯斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.02．数值与表现配置")
@@ -40,9 +42,6 @@ local _____653B_51FB_529B_5C5E_6027ID = 1
 local _____653B_901F_5C5E_6027ID = 10
 local _____4E9A_4F26_67EF_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____4E9A_4F26_67EF_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____4E9A_4F26_67EF_65AF_8FD0_884C_65F6_5DF2_6CE8_518C = false
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____521B_5EFA_4E0A_4E0B_6587(boss, _____6E05_7406)
     local now = getServerTime()
     local context = {

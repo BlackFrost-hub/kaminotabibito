@@ -17,88 +17,86 @@ local ____require_result_4 = require("系统.03．技能系统.06．AI自动使�
 local _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8 = ____require_result_4["记录Boss自动技能启动"]
 local ____require_result_5 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用")
 local _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E = ____require_result_5["应用Boss战启动属性配置"]
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_6.getServerTime
-local ____require_result_7 = require("系统.12．测试系统.00．测试系统辅助函数")
-local _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97 = ____require_result_7["标记测试Boss跳过死亡结算"]
-local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
-local _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587 = ____require_result_8["获取或创建菲利斯上下文"]
-local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.10．被动效果")
-local _____6CE8_518C_83F2_5229_65AF_88AB_52A8_6548_679C = ____require_result_9["注册菲利斯被动效果"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.04．剑魂杀")
-local _____91CA_653E_83F2_5229_65AF_5251_9B42_6740 = ____require_result_10["释放菲利斯剑魂杀"]
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.05．剑气灵斩")
-local _____91CA_653E_83F2_5229_65AF_5251_6C14_7075_65A9 = ____require_result_11["释放菲利斯剑气灵斩"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.06．全力封印斩")
-local _____91CA_653E_83F2_5229_65AF_5168_529B_5C01_5370_65A9 = ____require_result_12["释放菲利斯全力封印斩"]
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.07．异形化")
-local _____91CA_653E_83F2_5229_65AF_5F02_5F62_5316 = ____require_result_13["释放菲利斯异形化"]
-local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.01．运行时上下文")
-local _____83B7_53D6_6216_521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587 = ____require_result_14["获取或创建里科特上下文"]
-local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.12．被动效果")
-local _____6CE8_518C_91CC_79D1_7279_88AB_52A8_6548_679C = ____require_result_15["注册里科特被动效果"]
-local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.04．四重风刃")
-local _____91CA_653E_91CC_79D1_7279_56DB_91CD_98CE_5203 = ____require_result_16["释放里科特四重风刃"]
-local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.05．追击风刃")
-local _____91CA_653E_91CC_79D1_7279_8FFD_51FB_98CE_5203 = ____require_result_17["释放里科特追击风刃"]
-local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.07．湮灭之炮")
-local _____91CA_653E_91CC_79D1_7279_6E6E_706D_4E4B_70AE = ____require_result_18["释放里科特湮灭之炮"]
-local ____require_result_19 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.08．湮灭之风")
-local _____91CA_653E_91CC_79D1_7279_6E6E_706D_4E4B_98CE = ____require_result_19["释放里科特湮灭之风"]
-local ____require_result_20 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.09．破魔反击")
-local _____91CA_653E_91CC_79D1_7279_7834_9B54_53CD_51FB = ____require_result_20["释放里科特破魔反击"]
-local ____require_result_21 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.01．运行时上下文")
-local _____83B7_53D6_6216_521B_5EFA_5361_745F_62C9_4E0A_4E0B_6587 = ____require_result_21["获取或创建卡瑟拉上下文"]
-local ____require_result_22 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.13．被动效果")
-local _____6CE8_518C_5361_745F_62C9_88AB_52A8_6548_679C = ____require_result_22["注册卡瑟拉被动效果"]
-local ____require_result_23 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.06．深渊召唤")
-local _____91CA_653E_5361_745F_62C9_6DF1_6E0A_53EC_5524 = ____require_result_23["释放卡瑟拉深渊召唤"]
-local ____require_result_24 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.03．深海涡流")
-local _____91CA_653E_5361_745F_62C9_6DF1_6D77_6DA1_6D41 = ____require_result_24["释放卡瑟拉深海涡流"]
-local ____require_result_25 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.04．触手鞭笞")
-local _____91CA_653E_5361_745F_62C9_89E6_624B_97AD_7B1E = ____require_result_25["释放卡瑟拉触手鞭笞"]
-local ____require_result_26 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.05．墨汁喷吐")
-local _____91CA_653E_5361_745F_62C9_58A8_6C41_55B7_5410 = ____require_result_26["释放卡瑟拉墨汁喷吐"]
-local ____require_result_27 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.07．高压水炮")
-local _____91CA_653E_5361_745F_62C9_9AD8_538B_6C34_70AE = ____require_result_27["释放卡瑟拉高压水炮"]
-local ____require_result_28 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.08．触手解放")
-local _____5C1D_8BD5_89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E = ____require_result_28["尝试触发卡瑟拉触手解放"]
-local ____require_result_29 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.09．共生电击")
-local _____5C1D_8BD5_91CA_653E_5361_745F_62C9_5171_751F_7535_51FB = ____require_result_29["尝试释放卡瑟拉共生电击"]
-local ____require_result_30 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.01．运行时上下文")
-local _____83B7_53D6_6216_521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587 = ____require_result_30["获取或创建莫尔特斯上下文"]
-local ____require_result_31 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.15．被动效果")
-local _____6CE8_518C_83AB_5C14_7279_65AF_88AB_52A8_6548_679C = ____require_result_31["注册莫尔特斯被动效果"]
-local ____require_result_32 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.04．腐朽根须穿刺")
-local _____91CA_653E_83AB_5C14_7279_65AF_8150_673D_6839_987B_7A7F_523A = ____require_result_32["释放莫尔特斯腐朽根须穿刺"]
-local ____require_result_33 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.05．腐败孢子云")
-local _____91CA_653E_83AB_5C14_7279_65AF_8150_8D25_5B62_5B50_4E91 = ____require_result_33["释放莫尔特斯腐败孢子云"]
-local ____require_result_34 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.06．扭曲荆棘鞭笞")
-local _____91CA_653E_83AB_5C14_7279_65AF_626D_66F2_8346_68D8_97AD_7B1E = ____require_result_34["释放莫尔特斯扭曲荆棘鞭笞"]
-local ____require_result_35 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.07．腐败之种")
-local _____91CA_653E_83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD = ____require_result_35["释放莫尔特斯腐败之种"]
-local ____require_result_36 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.08．根系觉醒")
-local _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_6839_7CFB_89C9_9192 = ____require_result_36["尝试触发莫尔特斯根系觉醒"]
-local ____require_result_37 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.09．腐朽领域")
-local _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_8150_673D_9886_57DF = ____require_result_37["尝试触发莫尔特斯腐朽领域"]
-local ____require_result_38 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.10．共生腐朽虫群")
-local _____5C1D_8BD5_91CA_653E_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4 = ____require_result_38["尝试释放莫尔特斯共生腐朽虫群"]
-local ____require_result_39 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.11．古木悲鸣")
-local _____91CA_653E_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23 = ____require_result_39["释放莫尔特斯古木悲鸣"]
-local ____require_result_40 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.01．运行时上下文")
-local _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587 = ____require_result_40["获取或创建影骨莫特斯上下文"]
-local ____require_result_41 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.10．被动效果")
-local _____6CE8_518C_5F71_9AA8_83AB_7279_65AF_88AB_52A8_6548_679C = ____require_result_41["注册影骨莫特斯被动效果"]
-local ____require_result_42 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.05．暗影禁锢")
-local _____91CA_653E_5F71_9AA8_6697_5F71_7981_9522 = ____require_result_42["释放影骨暗影禁锢"]
-local ____require_result_43 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.03．阴影穿梭")
-local _____91CA_653E_5F71_9AA8_9634_5F71_7A7F_68AD = ____require_result_43["释放影骨阴影穿梭"]
-local ____require_result_44 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.04．骸骨召唤")
-local _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524 = ____require_result_44["释放影骨骸骨召唤"]
-local ____require_result_45 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.06．幽影爆发")
-local _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1 = ____require_result_45["释放影骨幽影爆发"]
-local ____require_result_46 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.07．盗贼的遗产")
-local _____91CA_653E_5F71_9AA8_76D7_8D3C_9057_4EA7 = ____require_result_46["释放影骨盗贼遗产"]
+local ____require_result_6 = require("系统.12．测试系统.00．测试系统辅助函数")
+local _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97 = ____require_result_6["标记测试Boss跳过死亡结算"]
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587 = ____require_result_7["获取或创建菲利斯上下文"]
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.10．被动效果")
+local _____6CE8_518C_83F2_5229_65AF_88AB_52A8_6548_679C = ____require_result_8["注册菲利斯被动效果"]
+local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.04．剑魂杀")
+local _____91CA_653E_83F2_5229_65AF_5251_9B42_6740 = ____require_result_9["释放菲利斯剑魂杀"]
+local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.05．剑气灵斩")
+local _____91CA_653E_83F2_5229_65AF_5251_6C14_7075_65A9 = ____require_result_10["释放菲利斯剑气灵斩"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.06．全力封印斩")
+local _____91CA_653E_83F2_5229_65AF_5168_529B_5C01_5370_65A9 = ____require_result_11["释放菲利斯全力封印斩"]
+local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.07．异形化")
+local _____91CA_653E_83F2_5229_65AF_5F02_5F62_5316 = ____require_result_12["释放菲利斯异形化"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.01．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587 = ____require_result_13["获取或创建里科特上下文"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.12．被动效果")
+local _____6CE8_518C_91CC_79D1_7279_88AB_52A8_6548_679C = ____require_result_14["注册里科特被动效果"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.04．四重风刃")
+local _____91CA_653E_91CC_79D1_7279_56DB_91CD_98CE_5203 = ____require_result_15["释放里科特四重风刃"]
+local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.05．追击风刃")
+local _____91CA_653E_91CC_79D1_7279_8FFD_51FB_98CE_5203 = ____require_result_16["释放里科特追击风刃"]
+local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.07．湮灭之炮")
+local _____91CA_653E_91CC_79D1_7279_6E6E_706D_4E4B_70AE = ____require_result_17["释放里科特湮灭之炮"]
+local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.08．湮灭之风")
+local _____91CA_653E_91CC_79D1_7279_6E6E_706D_4E4B_98CE = ____require_result_18["释放里科特湮灭之风"]
+local ____require_result_19 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.09．破魔反击")
+local _____91CA_653E_91CC_79D1_7279_7834_9B54_53CD_51FB = ____require_result_19["释放里科特破魔反击"]
+local ____require_result_20 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.01．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_5361_745F_62C9_4E0A_4E0B_6587 = ____require_result_20["获取或创建卡瑟拉上下文"]
+local ____require_result_21 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.13．被动效果")
+local _____6CE8_518C_5361_745F_62C9_88AB_52A8_6548_679C = ____require_result_21["注册卡瑟拉被动效果"]
+local ____require_result_22 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.06．深渊召唤")
+local _____91CA_653E_5361_745F_62C9_6DF1_6E0A_53EC_5524 = ____require_result_22["释放卡瑟拉深渊召唤"]
+local ____require_result_23 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.03．深海涡流")
+local _____91CA_653E_5361_745F_62C9_6DF1_6D77_6DA1_6D41 = ____require_result_23["释放卡瑟拉深海涡流"]
+local ____require_result_24 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.04．触手鞭笞")
+local _____91CA_653E_5361_745F_62C9_89E6_624B_97AD_7B1E = ____require_result_24["释放卡瑟拉触手鞭笞"]
+local ____require_result_25 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.05．墨汁喷吐")
+local _____91CA_653E_5361_745F_62C9_58A8_6C41_55B7_5410 = ____require_result_25["释放卡瑟拉墨汁喷吐"]
+local ____require_result_26 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.07．高压水炮")
+local _____91CA_653E_5361_745F_62C9_9AD8_538B_6C34_70AE = ____require_result_26["释放卡瑟拉高压水炮"]
+local ____require_result_27 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.08．触手解放")
+local _____89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E = ____require_result_27["触发卡瑟拉触手解放"]
+local ____require_result_28 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.09．共生电击")
+local _____91CA_653E_5361_745F_62C9_5171_751F_7535_51FB = ____require_result_28["释放卡瑟拉共生电击"]
+local ____require_result_29 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.01．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587 = ____require_result_29["获取或创建莫尔特斯上下文"]
+local ____require_result_30 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.15．被动效果")
+local _____6CE8_518C_83AB_5C14_7279_65AF_88AB_52A8_6548_679C = ____require_result_30["注册莫尔特斯被动效果"]
+local ____require_result_31 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.04．腐朽根须穿刺")
+local _____91CA_653E_83AB_5C14_7279_65AF_8150_673D_6839_987B_7A7F_523A = ____require_result_31["释放莫尔特斯腐朽根须穿刺"]
+local ____require_result_32 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.05．腐败孢子云")
+local _____91CA_653E_83AB_5C14_7279_65AF_8150_8D25_5B62_5B50_4E91 = ____require_result_32["释放莫尔特斯腐败孢子云"]
+local ____require_result_33 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.06．扭曲荆棘鞭笞")
+local _____91CA_653E_83AB_5C14_7279_65AF_626D_66F2_8346_68D8_97AD_7B1E = ____require_result_33["释放莫尔特斯扭曲荆棘鞭笞"]
+local ____require_result_34 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.07．腐败之种")
+local _____91CA_653E_83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD = ____require_result_34["释放莫尔特斯腐败之种"]
+local ____require_result_35 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.08．根系觉醒")
+local _____89E6_53D1_83AB_5C14_7279_65AF_6839_7CFB_89C9_9192 = ____require_result_35["触发莫尔特斯根系觉醒"]
+local ____require_result_36 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.09．腐朽领域")
+local _____89E6_53D1_83AB_5C14_7279_65AF_8150_673D_9886_57DF = ____require_result_36["触发莫尔特斯腐朽领域"]
+local ____require_result_37 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.10．共生腐朽虫群")
+local _____91CA_653E_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4 = ____require_result_37["释放莫尔特斯共生腐朽虫群"]
+local ____require_result_38 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.11．古木悲鸣")
+local _____91CA_653E_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23 = ____require_result_38["释放莫尔特斯古木悲鸣"]
+local ____require_result_39 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.01．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587 = ____require_result_39["获取或创建影骨莫特斯上下文"]
+local ____require_result_40 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.10．被动效果")
+local _____6CE8_518C_5F71_9AA8_83AB_7279_65AF_88AB_52A8_6548_679C = ____require_result_40["注册影骨莫特斯被动效果"]
+local ____require_result_41 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.05．暗影禁锢")
+local _____91CA_653E_5F71_9AA8_6697_5F71_7981_9522 = ____require_result_41["释放影骨暗影禁锢"]
+local ____require_result_42 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.03．阴影穿梭")
+local _____91CA_653E_5F71_9AA8_9634_5F71_7A7F_68AD = ____require_result_42["释放影骨阴影穿梭"]
+local ____require_result_43 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.04．骸骨召唤")
+local _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524 = ____require_result_43["释放影骨骸骨召唤"]
+local ____require_result_44 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.06．幽影爆发")
+local _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1 = ____require_result_44["释放影骨幽影爆发"]
+local ____require_result_45 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.07．盗贼的遗产")
+local _____91CA_653E_5F71_9AA8_76D7_8D3C_9057_4EA7 = ____require_result_45["释放影骨盗贼遗产"]
 local _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = 12
 local _____6D4B_8BD5_5355_4F4D_6700_5927_751F_547D_503C = 999999
 local _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X = -540.6
@@ -395,17 +393,14 @@ end
 local function ____on_5361_745F_62C9_6280_80FD6_6D4B_8BD5_547D_4EE4(player)
     local context = _____521B_5EFA_5361_745F_62C9_6D4B_8BD5(player)
     if context ~= nil then
-        _____5C1D_8BD5_89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E(context)
+        _____89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E(context)
         _____63D0_793A(player, "卡瑟拉", "已测试：触手解放。")
     end
 end
 local function ____on_5361_745F_62C9_6280_80FD7_6D4B_8BD5_547D_4EE4(player)
     local context = _____521B_5EFA_5361_745F_62C9_6D4B_8BD5(player)
     if context ~= nil then
-        _____5C1D_8BD5_91CA_653E_5361_745F_62C9_5171_751F_7535_51FB(
-            context,
-            getServerTime()
-        )
+        _____91CA_653E_5361_745F_62C9_5171_751F_7535_51FB(context)
         _____63D0_793A(player, "卡瑟拉", "已测试：共生电击。")
     end
 end
@@ -447,24 +442,21 @@ end
 local function ____on_83AB_5C14_7279_65AF_6280_80FD5_6D4B_8BD5_547D_4EE4(player)
     local context = _____521B_5EFA_83AB_5C14_7279_65AF_6D4B_8BD5(player)
     if context ~= nil then
-        _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_6839_7CFB_89C9_9192(context)
+        _____89E6_53D1_83AB_5C14_7279_65AF_6839_7CFB_89C9_9192(context)
         _____63D0_793A(player, "莫尔特斯", "已测试：根系觉醒。")
     end
 end
 local function ____on_83AB_5C14_7279_65AF_6280_80FD6_6D4B_8BD5_547D_4EE4(player)
     local context = _____521B_5EFA_83AB_5C14_7279_65AF_6D4B_8BD5(player)
     if context ~= nil then
-        _____5C1D_8BD5_89E6_53D1_83AB_5C14_7279_65AF_8150_673D_9886_57DF(context)
+        _____89E6_53D1_83AB_5C14_7279_65AF_8150_673D_9886_57DF(context)
         _____63D0_793A(player, "莫尔特斯", "已测试：腐朽领域。")
     end
 end
 local function ____on_83AB_5C14_7279_65AF_6280_80FD7_6D4B_8BD5_547D_4EE4(player)
     local context = _____521B_5EFA_83AB_5C14_7279_65AF_6D4B_8BD5(player)
     if context ~= nil then
-        _____5C1D_8BD5_91CA_653E_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4(
-            context,
-            getServerTime()
-        )
+        _____91CA_653E_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4(context)
         _____63D0_793A(player, "莫尔特斯", "已测试：共生腐朽虫群。")
     end
 end

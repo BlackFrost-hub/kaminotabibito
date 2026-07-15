@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, _____53D6_6709_6548_73A9_5BB6_4EBA_6570, _____53D6_8BC5_5492_76EE_6807, _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708, _____64AD_653E_70B9_540D_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____6536_96C6_5206_644A_76EE_6807, _____6CBB_7597_5168_90E8_73A9_5BB6, _____53D6_73A9_5BB6_4E2D_5FC3, _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____8C03_5EA6_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5, ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, GetUnitState, IsUnitType, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_TYPE_DEAD, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____6811_9B54_9996_9886BuffID, doHeal, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____8FDC_53E4_8BC5_5492_6280_80FDID
+local _____53D6_6709_6548_73A9_5BB6_4EBA_6570, _____53D6_8BC5_5492_76EE_6807, _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708, _____64AD_653E_70B9_540D_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____6536_96C6_5206_644A_76EE_6807, _____6CBB_7597_5168_90E8_73A9_5BB6, _____53D6_73A9_5BB6_4E2D_5FC3, _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____8C03_5EA6_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5, ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____6811_9B54_9996_9886BuffID, doHeal, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____8FDC_53E4_8BC5_5492_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -19,9 +19,7 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____8DDD_79BB_5E73_65B9XY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离平方XY"]
-function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 function _____53D6_6709_6548_73A9_5BB6_4EBA_6570()
     local count = _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570()
     return count > 0 and count or 1
@@ -98,7 +96,7 @@ function _____6536_96C6_5206_644A_76EE_6807(boss, target)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue14
+                    goto __continue13
                 end
                 if _____8DDD_79BB_5E73_65B9XY(
                     targetX,
@@ -109,7 +107,7 @@ function _____6536_96C6_5206_644A_76EE_6807(boss, target)
                     result[#result + 1] = hero
                 end
             end
-            ::__continue14::
+            ::__continue13::
             i = i + 1
         end
     end
@@ -126,7 +124,7 @@ function _____6CBB_7597_5168_90E8_73A9_5BB6(boss, amount)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue20
+                    goto __continue19
                 end
                 doHeal({
                     HealSource = boss,
@@ -136,7 +134,7 @@ function _____6CBB_7597_5168_90E8_73A9_5BB6(boss, amount)
                     HealEffect = true
                 })
             end
-            ::__continue20::
+            ::__continue19::
             i = i + 1
         end
     end
@@ -152,13 +150,13 @@ function _____53D6_73A9_5BB6_4E2D_5FC3(boss)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue24
+                    goto __continue23
                 end
                 sx = sx + GetUnitX(hero)
                 sy = sy + GetUnitY(hero)
                 count = count + 1
             end
-            ::__continue24::
+            ::__continue23::
             i = i + 1
         end
     end
@@ -193,7 +191,7 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, centerX
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue30
+                    goto __continue29
                 end
                 if _____8DDD_79BB_5E73_65B9XY(
                     centerX,
@@ -201,9 +199,9 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, centerX
                     GetUnitX(hero),
                     GetUnitY(hero)
                 ) > radius2 then
-                    goto __continue30
+                    goto __continue29
                 end
-                local damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["后续爆发目标最大生命比例"] + _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["后续爆发Boss攻击力比例"]
+                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hero, {["来源攻击力比例"] = cfg["后续爆发Boss攻击力比例"], ["目标最大生命比例"] = cfg["后续爆发目标最大生命比例"]})
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____8FDC_53E4_8BC5_5492_6280_80FDID,
                     ["来源"] = boss,
@@ -217,7 +215,7 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, centerX
                     ["来源类型"] = "Boss技能"
                 })
             end
-            ::__continue30::
+            ::__continue29::
             i = i + 1
         end
     end
@@ -371,24 +369,24 @@ function ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548(castingUnit, s
     end
     ____exports["释放树魔首领远古诅咒"](context)
 end
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+_____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
+local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_1["造成AOE技能伤害"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
-IsUnitType = jass.IsUnitType
+local IsUnitType = jass.IsUnitType
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND
 DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")

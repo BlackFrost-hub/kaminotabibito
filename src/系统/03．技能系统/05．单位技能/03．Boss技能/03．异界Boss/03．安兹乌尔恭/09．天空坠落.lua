@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹模型动画配置"]
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
@@ -7,8 +9,8 @@ local ____04_FF0E_5706_5F62_5B89_5168_533A_7EC4 = require("系统.03．技能系
 local _____521B_5EFA_5706_5F62_5B89_5168_533A_7EC4 = ____04_FF0E_5706_5F62_5B89_5168_533A_7EC4["创建圆形安全区组"]
 local ____05_FF0E_9ED1_7FFC_62D8_675F = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.05．黑翼拘束")
 local _____542F_52A8_96C5_513F_8D1D_5FB7_5929_7A7A_5760_843D_8054_52A8 = ____05_FF0E_9ED1_7FFC_62D8_675F["启动雅儿贝德天空坠落联动"]
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -24,7 +26,6 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local GetRandomReal = jass.GetRandomReal
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -32,7 +33,6 @@ local DestroyEffect = jass.DestroyEffect
 local Cos = jass.Cos
 local Sin = jass.Sin
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -40,9 +40,6 @@ local EXSetEffectZ = japi.EXSetEffectZ
 local EXSetEffectSize = japi.EXSetEffectSize
 local DEG_TO_RAD = 0.017453292519943295
 local _____5929_7A7A_5760_843D_5927_578B_6280_80FDKey = "天空坠落"
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____9500_6BC1_5929_7A7A_5760_843D_9884_8B66_8868_73B0(instance)
     if instance["表现已清理"] then
         return
@@ -86,9 +83,7 @@ local function _____521B_5EFA_5929_7A7A_5760_843D_9884_8B66(context, castSeconds
             local safeY = originY + sin * stage["天空坠落安全区中心距离"]
             local grave = AddSpecialEffect(cfg["表现资源"]["天空坠落墓碑特效路径"], graveX, graveY)
             if grave ~= nil and grave ~= 0 then
-                if type(EXSetEffectSize) == "function" then
-                    EXSetEffectSize(grave, stage["天空坠落墓碑缩放"])
-                end
+                EXSetEffectSize(grave, stage["天空坠落墓碑缩放"])
                 graves[#graves + 1] = grave
             end
             safeZones[#safeZones + 1] = {
@@ -110,12 +105,8 @@ local function _____521B_5EFA_5929_7A7A_5760_843D_9884_8B66(context, castSeconds
     })
     local circle = AddSpecialEffect(cfg["表现资源"]["天空坠落天空法阵特效路径"], originX, originY)
     if circle ~= nil and circle ~= 0 then
-        if type(EXSetEffectZ) == "function" then
-            EXSetEffectZ(circle, stage["天空坠落法阵高度"])
-        end
-        if type(EXSetEffectSize) == "function" then
-            EXSetEffectSize(circle, stage["天空坠落法阵缩放"])
-        end
+        EXSetEffectZ(circle, stage["天空坠落法阵高度"])
+        EXSetEffectSize(circle, stage["天空坠落法阵缩放"])
     end
     local instance = {["安全区组"] = safeZoneGroup, ["法阵特效"] = circle, ["墓碑特效列表"] = graves, ["表现已清理"] = false}
     local ____self_7 = context["清理"]
@@ -161,12 +152,12 @@ local function _____7ED3_7B97_5929_7A7A_5760_843D_4F24_5BB3(context, instance)
                     ____temp_11 = ____self_10["单位是否安全"](____self_10, target)
                 end
                 if ____temp_11 then
-                    goto __continue23
+                    goto __continue19
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = target,
-                    ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["阶段技能"]["天空坠落伤害Boss攻击力比例"] + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg["阶段技能"]["天空坠落伤害目标最大生命比例"],
+                    ["伤害"] = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = cfg["阶段技能"]["天空坠落伤害Boss攻击力比例"], ["目标最大生命比例"] = cfg["阶段技能"]["天空坠落伤害目标最大生命比例"]}),
                     attack = false,
                     ranged = true,
                     attackType = ATTACK_TYPE_MAGIC,
@@ -176,7 +167,7 @@ local function _____7ED3_7B97_5929_7A7A_5760_843D_4F24_5BB3(context, instance)
                     ["标签"] = "安兹·天空坠落"
                 })
             end
-            ::__continue23::
+            ::__continue19::
             i = i + 1
         end
     end

@@ -93,6 +93,3 @@ export function 释放卡瑟拉深渊召唤(this: void, context: 卡瑟拉运行
     创建深渊幼鱿(context, i * 120);
   }
 }
-
-export function 注册卡瑟拉深渊召唤(this: void): void {
-}

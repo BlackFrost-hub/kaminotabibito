@@ -4,16 +4,17 @@ import {
   获取全部卡瑟拉上下文,
   清理卡瑟拉上下文,
   设置玩家触手残片,
-  刷新卡瑟拉阶段,
   type 卡瑟拉运行时上下文,
   type 卡瑟拉地面触手残片,
 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 释放卡瑟拉深渊召唤 } from "./06．深渊召唤";
-import { 尝试触发卡瑟拉触手解放 } from "./08．触手解放";
-import { 尝试释放卡瑟拉共生电击 } from "./09．共生电击";
+import { 释放卡瑟拉共生电击 } from "./09．共生电击";
 import { 单位有效, 极坐标X, 极坐标Y, 距离XY, 取坐标角度 } from "./14．公共工具";
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
+import { 创建战斗技能调度器 } from '../../../../00．技能模板+函数/00．技能模板/13．战斗技能调度模板/01．战斗技能调度模板';
+import { 创建血量节点触发器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/01．血量节点触发器';
+import { 取单位ID } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
@@ -74,17 +75,6 @@ function 治疗Boss固定值(this: void, boss: any, amount: number): void {
   const life = GetUnitState(boss, UNIT_STATE_LIFE);
   const next = life + amount;
   SetUnitState(boss, UNIT_STATE_LIFE, next > maxLife ? maxLife : next);
-}
-
-function 取生命十档(this: void, boss: any): number {
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  if (!(maxLife > 0)) return 10;
-  const ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife;
-  let grade = 10;
-  while (grade > 0 && ratio <= (grade - 1) * 0.1) {
-    grade = grade - 1;
-  }
-  return grade;
 }
 
 function 选择最低生命玩家(this: void, boss: any): any {
@@ -175,18 +165,26 @@ function 生成再生触手(this: void, context: 卡瑟拉运行时上下文): v
   context.清理.登记周期回调("卡瑟拉-再生触手周期", data.周期ID);
 }
 
-function 处理血量再生触手(this: void, context: 卡瑟拉运行时上下文): void {
-  const boss = context.Boss单位;
-  if (!单位有效(boss)) return;
-  const current = 取生命十档(boss);
-  if (context.阶段 < 3) {
-    context.上次触手再生档位 = current;
-    return;
+function 确保触手再生血量节点(this: void, context: 卡瑟拉运行时上下文): void {
+  if (context.触手再生节点已注册) return;
+  context.触手再生节点已注册 = true;
+  const 节点列表: Array<{ ID: string; 百分比: number; on触发: (this: void, unit: any, 当前百分比: number) => void }> = [];
+  for (let 档位 = 5; 档位 >= 1; 档位--) {
+    节点列表.push({
+      ID: "触手再生-" + 档位 + "0%",
+      百分比: 档位 * 0.1,
+      on触发: function 卡瑟拉触手再生节点触发(this: void): void {
+        生成再生触手(context);
+      },
+    });
   }
-  while (context.上次触手再生档位 > current) {
-    context.上次触手再生档位 = context.上次触手再生档位 - 1;
-    生成再生触手(context);
-  }
+  创建血量节点触发器({
+    清理: context.清理,
+    名称: "卡瑟拉-触手再生节点",
+    单位: context.Boss单位,
+    节点列表,
+    Tick间隔毫秒: 卡瑟拉数值与表现配置.运行时.推进间隔毫秒,
+  });
 }
 
 function 移动单个地面残片(this: void, context: 卡瑟拉运行时上下文, fragment: 卡瑟拉地面触手残片): boolean {
@@ -209,11 +207,7 @@ function 移动单个地面残片(this: void, context: 卡瑟拉运行时上下�
   return false;
 }
 
-function 牵引地面触手残片(this: void, context: 卡瑟拉运行时上下文, nowMs: number): number {
-  const cfg = 卡瑟拉数值与表现配置.触手残片;
-  if (context.下次残片牵引时间 <= 0) context.下次残片牵引时间 = nowMs + cfg.吸引间隔秒 * 1000;
-  if (nowMs < context.下次残片牵引时间) return 0;
-  context.下次残片牵引时间 = nowMs + cfg.吸引间隔秒 * 1000;
+function 牵引地面触手残片(this: void, context: 卡瑟拉运行时上下文): number {
   let absorbed = 0;
   let index = 0;
   while (index < context.场上触手残片列表.length) {
@@ -273,46 +267,93 @@ function 应用触手精华(this: void, context: 卡瑟拉运行时上下文, co
   });
 }
 
-function 处理残片吸收(this: void, context: 卡瑟拉运行时上下文, nowMs: number): void {
-  const cfg = 卡瑟拉数值与表现配置.触手残片;
-  const groundAbsorbed = 牵引地面触手残片(context, nowMs);
+function 处理地面残片牵引(this: void, context: 卡瑟拉运行时上下文): void {
+  const groundAbsorbed = 牵引地面触手残片(context);
   if (groundAbsorbed > 0) 应用触手精华(context, groundAbsorbed);
-  if (context.下次残片吸收时间 <= 0) context.下次残片吸收时间 = nowMs + cfg.Boss吸收间隔秒 * 1000;
-  if (nowMs < context.下次残片吸收时间) return;
-  context.下次残片吸收时间 = nowMs + cfg.Boss吸收间隔秒 * 1000;
+}
+
+function 处理玩家残片吸收(this: void, context: 卡瑟拉运行时上下文): void {
   应用触手精华(context, 吸收玩家触手残片(context));
 }
 
-function 处理深渊召唤(this: void, context: 卡瑟拉运行时上下文, nowMs: number): void {
-  if (context.阶段 < 2 || context.Boss潜入中) return;
-  const cfg = 卡瑟拉数值与表现配置.深渊召唤;
-  if (context.下次深渊召唤时间 <= 0) context.下次深渊召唤时间 = nowMs;
-  if (nowMs < context.下次深渊召唤时间) return;
-  context.下次深渊召唤时间 = nowMs + cfg.触发间隔秒 * 1000;
-  释放卡瑟拉深渊召唤(context);
+function 取卡瑟拉上下文键(this: void, context: 卡瑟拉运行时上下文): number {
+  return 取单位ID(context.Boss单位);
 }
 
-function on卡瑟拉运行时周期(this: void, context: 卡瑟拉运行时上下文, now: number): void {
+function 可调度卡瑟拉深渊召唤(this: void, context: 卡瑟拉运行时上下文): boolean {
+  return 单位有效(context.Boss单位) && context.阶段 >= 2 && !context.Boss潜入中;
+}
+
+function 执行卡瑟拉深渊召唤(this: void, context: 卡瑟拉运行时上下文): boolean {
+  释放卡瑟拉深渊召唤(context);
+  return true;
+}
+
+function 可调度卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上下文): boolean {
+  return 单位有效(context.Boss单位) && context.阶段 >= 3 && !context.Boss潜入中;
+}
+
+function on卡瑟拉运行时维护(this: void, context: 卡瑟拉运行时上下文): void {
   if (!单位有效(context.Boss单位)) {
     清理卡瑟拉上下文(context.Boss单位);
     return;
   }
-  刷新卡瑟拉阶段(context);
-  处理深渊召唤(context, now);
-  尝试触发卡瑟拉触手解放(context);
-  处理血量再生触手(context);
-  尝试释放卡瑟拉共生电击(context, now);
-  处理残片吸收(context, now);
+  确保触手再生血量节点(context);
 }
 
 export function 注册卡瑟拉触手再生与残片(this: void): void {
   if (已注册) return;
   已注册 = true;
   创建周期机制调度器({
-    名称: '卡瑟拉-运行时推进',
+    名称: '卡瑟拉-运行时维护',
+    间隔毫秒: 卡瑟拉数值与表现配置.运行时.推进间隔毫秒,
+    取上下文列表: 获取全部卡瑟拉上下文,
+    执行: on卡瑟拉运行时维护,
+  });
+  创建周期机制调度器({
+    名称: '卡瑟拉-地面残片牵引',
+    间隔毫秒: 卡瑟拉数值与表现配置.触手残片.吸引间隔秒 * 1000,
+    取上下文列表: 获取全部卡瑟拉上下文,
+    可执行: function 卡瑟拉地面残片牵引可执行(this: void, context: 卡瑟拉运行时上下文): boolean {
+      return 单位有效(context.Boss单位) && context.场上触手残片列表.length > 0;
+    },
+    执行: 处理地面残片牵引,
+  });
+  创建周期机制调度器({
+    名称: '卡瑟拉-玩家残片吸收',
+    间隔毫秒: 卡瑟拉数值与表现配置.触手残片.Boss吸收间隔秒 * 1000,
+    取上下文列表: 获取全部卡瑟拉上下文,
+    可执行: function 卡瑟拉玩家残片吸收可执行(this: void, context: 卡瑟拉运行时上下文): boolean {
+      return 单位有效(context.Boss单位) && !context.Boss潜入中;
+    },
+    执行: 处理玩家残片吸收,
+  });
+  创建战斗技能调度器<卡瑟拉运行时上下文>({
+    名称: '卡瑟拉-深渊召唤调度',
     间隔毫秒: 卡瑟拉数值与表现配置.运行时.推进间隔毫秒,
     取当前时间: getServerTime,
     取上下文列表: 获取全部卡瑟拉上下文,
-    执行: on卡瑟拉运行时周期,
+    取上下文键: 取卡瑟拉上下文键,
+    可调度: 可调度卡瑟拉深渊召唤,
+    技能列表: [{
+      key: '深渊召唤',
+      冷却毫秒: 卡瑟拉数值与表现配置.深渊召唤.触发间隔秒 * 1000,
+      首次延迟毫秒: 0,
+      执行: 执行卡瑟拉深渊召唤,
+    }],
+  });
+  创建战斗技能调度器<卡瑟拉运行时上下文>({
+    名称: '卡瑟拉-共生电击调度',
+    间隔毫秒: 卡瑟拉数值与表现配置.运行时.推进间隔毫秒,
+    取当前时间: getServerTime,
+    取上下文列表: 获取全部卡瑟拉上下文,
+    取上下文键: 取卡瑟拉上下文键,
+    可调度: 可调度卡瑟拉共生电击,
+    技能列表: [{
+      key: '共生电击',
+      冷却毫秒: 卡瑟拉数值与表现配置.共生电击.间隔秒 * 1000,
+      首次延迟毫秒: 卡瑟拉数值与表现配置.共生电击.间隔秒 * 1000,
+      执行: 释放卡瑟拉共生电击,
+    }],
   });
 }

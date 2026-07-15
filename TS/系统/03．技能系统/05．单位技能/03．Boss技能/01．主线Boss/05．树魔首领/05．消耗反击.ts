@@ -7,7 +7,7 @@ import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 两点方向角, 单位是否在来源正面扇区, 单位是否在来源背后扇区 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/08．方位判定工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -56,12 +56,10 @@ const { 创建线段危险区 } = require("系统.03．技能系统.00．技能�
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { createTimedEffect, 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+const { createTimedEffect, createTimedUnitEffect, 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+  createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
   创建点特效: (this: void, 参数: any) => any;
-};
-const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
 const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   CosBJ: (this: void, degrees: number) => number;
@@ -80,10 +78,6 @@ const 树魔首领单位类型ID = stringToFourCC(树魔首领单位技能配置
 const 消耗反击技能ID = stringToFourCC(树魔首领数值与表现配置.消耗反击.技能槽位);
 const 消耗反击状态表: Record<number, 消耗反击状态 | undefined> = {};
 let 消耗反击已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取方向角(this: void, from: any, to: any): number {
   return 两点方向角(GetUnitX(from), GetUnitY(from), GetUnitX(to), GetUnitY(to));
@@ -128,8 +122,7 @@ function 播放防御姿态特效(this: void, boss: any): void {
 
 function 播放抽魔特效(this: void, target: any): void {
   const cfg = 树魔首领数值与表现配置.消耗反击;
-  const effect = AddSpecialEffectTarget(cfg.抽魔特效路径, target, "origin");
-  if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(1, effect);
+  createTimedUnitEffect(target, "origin", cfg.抽魔特效路径, 1);
 }
 
 function 播放反击连线(this: void, boss: any, target: any): void {

@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 单位间距离平方 as 两单位距离平方 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 雅儿贝德技能状态 } from './01．护卫雅儿贝德/index';
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 获取全部安兹运行时上下文, 绑定雅儿贝德到安兹上下文 } from './01．运行时上下文';
@@ -42,16 +43,6 @@ const DEG_TO_RAD = 0.017453292519943295;
 
 let 雅儿贝德伤害修正已注册 = false;
 let 雅儿贝德运行时驱动已注册 = false;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 两单位距离平方(this: void, a: any, b: any): number {
-  const dx = GetUnitX(a) - GetUnitX(b);
-  const dy = GetUnitY(a) - GetUnitY(b);
-  return dx * dx + dy * dy;
-}
 
 function 查找联合上下文(this: void, unit: any): 安兹运行时上下文 | undefined {
   const contexts = 获取全部安兹运行时上下文();

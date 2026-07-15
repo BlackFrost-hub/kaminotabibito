@@ -52,9 +52,6 @@ local function _____521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587(boss, _____6E05_7406
     }
 end
 local _____91CC_79D1_7279_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "里科特", ["主动技能提示"] = _____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_91CC_79D1_7279_4E0A_4E0B_6587})
-local function _____53D6_5355_4F4DID(unit)
-    return _____91CC_79D1_7279_4E0A_4E0B_6587_5DE5_5382["取单位ID"](unit)
-end
 ____exports["获取里科特上下文"] = function(boss)
     return _____91CC_79D1_7279_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
 end
@@ -75,7 +72,7 @@ ____exports["增加里科特神风印记"] = function(context, unit, amount)
     if amount == nil then
         amount = 1
     end
-    local id = _____53D6_5355_4F4DID(unit)
+    local id = _____91CC_79D1_7279_4E0A_4E0B_6587_5DE5_5382["取单位ID"](unit)
     if id == 0 then
         return 0
     end
@@ -85,11 +82,11 @@ ____exports["增加里科特神风印记"] = function(context, unit, amount)
     return next
 end
 ____exports["取里科特神风印记"] = function(context, unit)
-    local id = _____53D6_5355_4F4DID(unit)
+    local id = _____91CC_79D1_7279_4E0A_4E0B_6587_5DE5_5382["取单位ID"](unit)
     return id == 0 and 0 or (context["神风印记表"][id] or 0)
 end
 ____exports["清除里科特神风印记"] = function(context, unit)
-    local id = _____53D6_5355_4F4DID(unit)
+    local id = _____91CC_79D1_7279_4E0A_4E0B_6587_5DE5_5382["取单位ID"](unit)
     if id ~= 0 then
         __TS__Delete(context["神风印记表"], id)
         __TS__Delete(context["神风印记单位表"], id)

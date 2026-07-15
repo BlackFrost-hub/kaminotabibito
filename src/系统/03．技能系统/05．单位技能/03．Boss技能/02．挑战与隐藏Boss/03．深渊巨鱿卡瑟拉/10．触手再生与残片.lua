@@ -5,15 +5,12 @@ local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系
 local _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取全部卡瑟拉上下文"]
 local _____6E05_7406_5361_745F_62C9_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["清理卡瑟拉上下文"]
 local _____8BBE_7F6E_73A9_5BB6_89E6_624B_6B8B_7247 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["设置玩家触手残片"]
-local _____5237_65B0_5361_745F_62C9_9636_6BB5 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["刷新卡瑟拉阶段"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.02．数值与表现配置")
 local _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["卡瑟拉数值与表现配置"]
 local ____06_FF0E_6DF1_6E0A_53EC_5524 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.06．深渊召唤")
 local _____91CA_653E_5361_745F_62C9_6DF1_6E0A_53EC_5524 = ____06_FF0E_6DF1_6E0A_53EC_5524["释放卡瑟拉深渊召唤"]
-local ____08_FF0E_89E6_624B_89E3_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.08．触手解放")
-local _____5C1D_8BD5_89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E = ____08_FF0E_89E6_624B_89E3_653E["尝试触发卡瑟拉触手解放"]
 local ____09_FF0E_5171_751F_7535_51FB = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.09．共生电击")
-local _____5C1D_8BD5_91CA_653E_5361_745F_62C9_5171_751F_7535_51FB = ____09_FF0E_5171_751F_7535_51FB["尝试释放卡瑟拉共生电击"]
+local _____91CA_653E_5361_745F_62C9_5171_751F_7535_51FB = ____09_FF0E_5171_751F_7535_51FB["释放卡瑟拉共生电击"]
 local ____14_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.14．公共工具")
 local _____5355_4F4D_6709_6548 = ____14_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____6781_5750_6807X = ____14_FF0E_516C_5171_5DE5_5177["极坐标X"]
@@ -22,6 +19,12 @@ local _____8DDD_79BBXY = ____14_FF0E_516C_5171_5DE5_5177["距离XY"]
 local _____53D6_5750_6807_89D2_5EA6 = ____14_FF0E_516C_5171_5DE5_5177["取坐标角度"]
 local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
 local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
+local ____01_FF0E_6218_6597_6280_80FD_8C03_5EA6_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.13．战斗技能调度模板.01．战斗技能调度模板")
+local _____521B_5EFA_6218_6597_6280_80FD_8C03_5EA6_5668 = ____01_FF0E_6218_6597_6280_80FD_8C03_5EA6_6A21_677F["创建战斗技能调度器"]
+local ____01_FF0E_8840_91CF_8282_70B9_89E6_53D1_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.01．血量节点触发器")
+local _____521B_5EFA_8840_91CF_8282_70B9_89E6_53D1_5668 = ____01_FF0E_8840_91CF_8282_70B9_89E6_53D1_5668["创建血量节点触发器"]
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
@@ -65,18 +68,6 @@ local function _____6CBB_7597Boss_56FA_5B9A_503C(boss, amount)
     local next = life + amount
     SetUnitState(boss, UNIT_STATE_LIFE, next > maxLife and maxLife or next)
 end
-local function _____53D6_751F_547D_5341_6863(boss)
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    if not (maxLife > 0) then
-        return 10
-    end
-    local ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife
-    local grade = 10
-    while grade > 0 and ratio <= (grade - 1) * 0.1 do
-        grade = grade - 1
-    end
-    return grade
-end
 local function _____9009_62E9_6700_4F4E_751F_547D_73A9_5BB6(boss)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     local best = nil
@@ -87,11 +78,11 @@ local function _____9009_62E9_6700_4F4E_751F_547D_73A9_5BB6(boss)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue9
+                    goto __continue6
                 end
                 local maxLife = GetUnitState(hero, UNIT_STATE_MAX_LIFE)
                 if not (maxLife > 0) then
-                    goto __continue9
+                    goto __continue6
                 end
                 local ratio = GetUnitState(hero, UNIT_STATE_LIFE) / maxLife
                 if ratio < bestRatio then
@@ -99,7 +90,7 @@ local function _____9009_62E9_6700_4F4E_751F_547D_73A9_5BB6(boss)
                     best = hero
                 end
             end
-            ::__continue9::
+            ::__continue6::
             i = i + 1
         end
     end
@@ -202,20 +193,32 @@ local function _____751F_6210_518D_751F_89E6_624B(context)
     local ____self_9 = context["清理"]
     ____self_9["登记周期回调"](____self_9, "卡瑟拉-再生触手周期", data["周期ID"])
 end
-local function _____5904_7406_8840_91CF_518D_751F_89E6_624B(context)
-    local boss = context["Boss单位"]
-    if not _____5355_4F4D_6709_6548(boss) then
+local function _____786E_4FDD_89E6_624B_518D_751F_8840_91CF_8282_70B9(context)
+    if context["触手再生节点已注册"] then
         return
     end
-    local current = _____53D6_751F_547D_5341_6863(boss)
-    if context["阶段"] < 3 then
-        context["上次触手再生档位"] = current
-        return
+    context["触手再生节点已注册"] = true
+    local _____8282_70B9_5217_8868 = {}
+    do
+        local _____6863_4F4D = 5
+        while _____6863_4F4D >= 1 do
+            _____8282_70B9_5217_8868[#_____8282_70B9_5217_8868 + 1] = {
+                ID = ("触手再生-" .. tostring(_____6863_4F4D)) .. "0%",
+                ["百分比"] = _____6863_4F4D * 0.1,
+                ["on触发"] = function()
+                    _____751F_6210_518D_751F_89E6_624B(context)
+                end
+            }
+            _____6863_4F4D = _____6863_4F4D - 1
+        end
     end
-    while context["上次触手再生档位"] > current do
-        context["上次触手再生档位"] = context["上次触手再生档位"] - 1
-        _____751F_6210_518D_751F_89E6_624B(context)
-    end
+    _____521B_5EFA_8840_91CF_8282_70B9_89E6_53D1_5668({
+        ["清理"] = context["清理"],
+        ["名称"] = "卡瑟拉-触手再生节点",
+        ["单位"] = context["Boss单位"],
+        ["节点列表"] = _____8282_70B9_5217_8868,
+        ["Tick间隔毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"]
+    })
 end
 local function _____79FB_52A8_5355_4E2A_5730_9762_6B8B_7247(context, fragment)
     if fragment["已吸收"] then
@@ -242,15 +245,7 @@ local function _____79FB_52A8_5355_4E2A_5730_9762_6B8B_7247(context, fragment)
     fragment["特效"] = AddSpecialEffect(cfg["地面模型路径"], fragment.X, fragment.Y)
     return false
 end
-local function _____7275_5F15_5730_9762_89E6_624B_6B8B_7247(context, nowMs)
-    local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]
-    if context["下次残片牵引时间"] <= 0 then
-        context["下次残片牵引时间"] = nowMs + cfg["吸引间隔秒"] * 1000
-    end
-    if nowMs < context["下次残片牵引时间"] then
-        return 0
-    end
-    context["下次残片牵引时间"] = nowMs + cfg["吸引间隔秒"] * 1000
+local function _____7275_5F15_5730_9762_89E6_624B_6B8B_7247(context)
     local absorbed = 0
     local index = 0
     while index < #context["场上触手残片列表"] do
@@ -259,11 +254,11 @@ local function _____7275_5F15_5730_9762_89E6_624B_6B8B_7247(context, nowMs)
             if _____79FB_52A8_5355_4E2A_5730_9762_6B8B_7247(context, fragment) then
                 __TS__ArraySplice(context["场上触手残片列表"], index, 1)
                 absorbed = absorbed + 1
-                goto __continue35
+                goto __continue31
             end
             index = index + 1
         end
-        ::__continue35::
+        ::__continue31::
     end
     return absorbed
 end
@@ -273,16 +268,16 @@ local function _____5438_6536_73A9_5BB6_89E6_624B_6B8B_7247(context)
         do
             local current = context["玩家触手残片表"][key] or 0
             if current <= 0 or current >= 4 then
-                goto __continue38
+                goto __continue34
             end
             local unit = context["玩家触手残片单位表"][key]
             if unit == nil or unit == 0 then
-                goto __continue38
+                goto __continue34
             end
             count = count + current
             _____8BBE_7F6E_73A9_5BB6_89E6_624B_6B8B_7247(context, unit, 0)
         end
-        ::__continue38::
+        ::__continue34::
     end
     return count
 end
@@ -331,61 +326,79 @@ local function _____5E94_7528_89E6_624B_7CBE_534E(context, count)
         {stack = context["触手精华层数"], sourceName = "卡瑟拉-触手精华"}
     )
 end
-local function _____5904_7406_6B8B_7247_5438_6536(context, nowMs)
-    local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]
-    local groundAbsorbed = _____7275_5F15_5730_9762_89E6_624B_6B8B_7247(context, nowMs)
+local function _____5904_7406_5730_9762_6B8B_7247_7275_5F15(context)
+    local groundAbsorbed = _____7275_5F15_5730_9762_89E6_624B_6B8B_7247(context)
     if groundAbsorbed > 0 then
         _____5E94_7528_89E6_624B_7CBE_534E(context, groundAbsorbed)
     end
-    if context["下次残片吸收时间"] <= 0 then
-        context["下次残片吸收时间"] = nowMs + cfg["Boss吸收间隔秒"] * 1000
-    end
-    if nowMs < context["下次残片吸收时间"] then
-        return
-    end
-    context["下次残片吸收时间"] = nowMs + cfg["Boss吸收间隔秒"] * 1000
+end
+local function _____5904_7406_73A9_5BB6_6B8B_7247_5438_6536(context)
     _____5E94_7528_89E6_624B_7CBE_534E(
         context,
         _____5438_6536_73A9_5BB6_89E6_624B_6B8B_7247(context)
     )
 end
-local function _____5904_7406_6DF1_6E0A_53EC_5524(context, nowMs)
-    if context["阶段"] < 2 or context["Boss潜入中"] then
-        return
-    end
-    local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["深渊召唤"]
-    if context["下次深渊召唤时间"] <= 0 then
-        context["下次深渊召唤时间"] = nowMs
-    end
-    if nowMs < context["下次深渊召唤时间"] then
-        return
-    end
-    context["下次深渊召唤时间"] = nowMs + cfg["触发间隔秒"] * 1000
-    _____91CA_653E_5361_745F_62C9_6DF1_6E0A_53EC_5524(context)
+local function _____53D6_5361_745F_62C9_4E0A_4E0B_6587_952E(context)
+    return _____53D6_5355_4F4DID(context["Boss单位"])
 end
-local function ____on_5361_745F_62C9_8FD0_884C_65F6_5468_671F(context, now)
+local function _____53EF_8C03_5EA6_5361_745F_62C9_6DF1_6E0A_53EC_5524(context)
+    return _____5355_4F4D_6709_6548(context["Boss单位"]) and context["阶段"] >= 2 and not context["Boss潜入中"]
+end
+local function _____6267_884C_5361_745F_62C9_6DF1_6E0A_53EC_5524(context)
+    _____91CA_653E_5361_745F_62C9_6DF1_6E0A_53EC_5524(context)
+    return true
+end
+local function _____53EF_8C03_5EA6_5361_745F_62C9_5171_751F_7535_51FB(context)
+    return _____5355_4F4D_6709_6548(context["Boss单位"]) and context["阶段"] >= 3 and not context["Boss潜入中"]
+end
+local function ____on_5361_745F_62C9_8FD0_884C_65F6_7EF4_62A4(context)
     if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         _____6E05_7406_5361_745F_62C9_4E0A_4E0B_6587(context["Boss单位"])
         return
     end
-    _____5237_65B0_5361_745F_62C9_9636_6BB5(context)
-    _____5904_7406_6DF1_6E0A_53EC_5524(context, now)
-    _____5C1D_8BD5_89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E(context)
-    _____5904_7406_8840_91CF_518D_751F_89E6_624B(context)
-    _____5C1D_8BD5_91CA_653E_5361_745F_62C9_5171_751F_7535_51FB(context, now)
-    _____5904_7406_6B8B_7247_5438_6536(context, now)
+    _____786E_4FDD_89E6_624B_518D_751F_8840_91CF_8282_70B9(context)
 end
 ____exports["注册卡瑟拉触手再生与残片"] = function()
     if _____5DF2_6CE8_518C then
         return
     end
     _____5DF2_6CE8_518C = true
+    _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({["名称"] = "卡瑟拉-运行时维护", ["间隔毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"], ["取上下文列表"] = _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587, ["执行"] = ____on_5361_745F_62C9_8FD0_884C_65F6_7EF4_62A4})
     _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({
-        ["名称"] = "卡瑟拉-运行时推进",
+        ["名称"] = "卡瑟拉-地面残片牵引",
+        ["间隔毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]["吸引间隔秒"] * 1000,
+        ["取上下文列表"] = _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587,
+        ["可执行"] = function(context)
+            return _____5355_4F4D_6709_6548(context["Boss单位"]) and #context["场上触手残片列表"] > 0
+        end,
+        ["执行"] = _____5904_7406_5730_9762_6B8B_7247_7275_5F15
+    })
+    _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({
+        ["名称"] = "卡瑟拉-玩家残片吸收",
+        ["间隔毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]["Boss吸收间隔秒"] * 1000,
+        ["取上下文列表"] = _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587,
+        ["可执行"] = function(context)
+            return _____5355_4F4D_6709_6548(context["Boss单位"]) and not context["Boss潜入中"]
+        end,
+        ["执行"] = _____5904_7406_73A9_5BB6_6B8B_7247_5438_6536
+    })
+    _____521B_5EFA_6218_6597_6280_80FD_8C03_5EA6_5668({
+        ["名称"] = "卡瑟拉-深渊召唤调度",
         ["间隔毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"],
         ["取当前时间"] = getServerTime,
         ["取上下文列表"] = _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587,
-        ["执行"] = ____on_5361_745F_62C9_8FD0_884C_65F6_5468_671F
+        ["取上下文键"] = _____53D6_5361_745F_62C9_4E0A_4E0B_6587_952E,
+        ["可调度"] = _____53EF_8C03_5EA6_5361_745F_62C9_6DF1_6E0A_53EC_5524,
+        ["技能列表"] = {{key = "深渊召唤", ["冷却毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["深渊召唤"]["触发间隔秒"] * 1000, ["首次延迟毫秒"] = 0, ["执行"] = _____6267_884C_5361_745F_62C9_6DF1_6E0A_53EC_5524}}
+    })
+    _____521B_5EFA_6218_6597_6280_80FD_8C03_5EA6_5668({
+        ["名称"] = "卡瑟拉-共生电击调度",
+        ["间隔毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"],
+        ["取当前时间"] = getServerTime,
+        ["取上下文列表"] = _____83B7_53D6_5168_90E8_5361_745F_62C9_4E0A_4E0B_6587,
+        ["取上下文键"] = _____53D6_5361_745F_62C9_4E0A_4E0B_6587_952E,
+        ["可调度"] = _____53EF_8C03_5EA6_5361_745F_62C9_5171_751F_7535_51FB,
+        ["技能列表"] = {{key = "共生电击", ["冷却毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["共生电击"]["间隔秒"] * 1000, ["首次延迟毫秒"] = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["共生电击"]["间隔秒"] * 1000, ["执行"] = _____91CA_653E_5361_745F_62C9_5171_751F_7535_51FB}}
     })
 end
 return ____exports

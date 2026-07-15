@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
 local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["祖地双灵卫数值与表现配置"]
 local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
@@ -13,16 +15,18 @@ local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．�
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
+local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
+local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
+local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
 local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
@@ -38,9 +42,6 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____9020_6210_88C2_9B42_5760_65A9_4F24_5BB3(boss, target, attackRatio, maxLifeRatio, label)
     local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = attackRatio, ["目标最大生命比例"] = maxLifeRatio})
     _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -88,102 +89,112 @@ ____exports["释放裂魂坠斩"] = function(context, target)
         EXEffectMatRotateZ(slashTrail, facing)
         YDWETimerDestroyEffectSafe(cfg["前摇秒"] + 0.4, slashTrail)
     end
-    local slashId = addDelayedCallback(
-        cfg["前摇秒"] * 1000,
-        function()
-            if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
-                return
-            end
-            local impact = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["扇形落地特效路径"], startX, startY)
-            if impact ~= nil and impact ~= 0 then
-                YDWETimerDestroyEffectSafe(0.8, impact)
-            end
-            local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-            do
-                local i = 0
-                while i < #heroes do
-                    do
-                        local hit = heroes[i + 1]
-                        if not _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF(
-                            hit,
-                            startX,
-                            startY,
-                            cfg["扇形半径"],
-                            facing,
-                            cfg["扇形角度"]
-                        ) then
-                            goto __continue11
-                        end
-                        _____9020_6210_88C2_9B42_5760_65A9_4F24_5BB3(
-                            boss,
-                            hit,
-                            cfg["重斩伤害攻击力比例"],
-                            cfg["单段目标最大生命比例"],
-                            "祖地双灵卫·裂魂坠斩"
-                        )
-                    end
-                    ::__continue11::
-                    i = i + 1
+    local _____4E8B_4EF6_5217_8868 = {
+        {
+            ["时点毫秒"] = cfg["前摇秒"] * 1000,
+            ["名称"] = "裂魂坠斩重斩结算",
+            ["执行"] = function()
+                if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
+                    return
                 end
-            end
-            _____521B_5EFA_6280_80FD_63D0_793A_5708({
-                ["类型"] = "方向直线",
-                X = startX,
-                Y = startY,
-                ["长度"] = cfg["余震长度"],
-                ["宽度"] = cfg["余震宽度"],
-                ["朝向"] = facing,
-                ["持续时间"] = cfg["余震延迟秒"],
-                ["来源单位"] = boss
-            })
-            local aftershockId = addDelayedCallback(
-                cfg["余震延迟秒"] * 1000,
-                function()
-                    if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
-                        return
-                    end
-                    local wave = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["直线余震特效路径"], startX, startY)
-                    if wave ~= nil and wave ~= 0 then
-                        EXEffectMatRotateZ(wave, facing)
-                        YDWETimerDestroyEffectSafe(0.8, wave)
-                    end
-                    local currentHeroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-                    do
-                        local i = 0
-                        while i < #currentHeroes do
-                            do
-                                local hit = currentHeroes[i + 1]
-                                if not _____5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF(
-                                    hit,
-                                    startX,
-                                    startY,
-                                    endX,
-                                    endY,
-                                    cfg["余震宽度"]
-                                ) then
-                                    goto __continue17
-                                end
-                                _____9020_6210_88C2_9B42_5760_65A9_4F24_5BB3(
-                                    boss,
-                                    hit,
-                                    cfg["余震伤害攻击力比例"],
-                                    cfg["单段目标最大生命比例"],
-                                    "祖地双灵卫·裂魂坠斩余震"
-                                )
+                local impact = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["扇形落地特效路径"], startX, startY)
+                if impact ~= nil and impact ~= 0 then
+                    YDWETimerDestroyEffectSafe(0.8, impact)
+                end
+                local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+                do
+                    local i = 0
+                    while i < #heroes do
+                        do
+                            local hit = heroes[i + 1]
+                            if not _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF(
+                                hit,
+                                startX,
+                                startY,
+                                cfg["扇形半径"],
+                                facing,
+                                cfg["扇形角度"]
+                            ) then
+                                goto __continue10
                             end
-                            ::__continue17::
-                            i = i + 1
+                            _____9020_6210_88C2_9B42_5760_65A9_4F24_5BB3(
+                                boss,
+                                hit,
+                                cfg["重斩伤害攻击力比例"],
+                                cfg["单段目标最大生命比例"],
+                                "祖地双灵卫·裂魂坠斩"
+                            )
                         end
+                        ::__continue10::
+                        i = i + 1
                     end
                 end
-            )
-            local ____self_5 = context["清理"]
-            ____self_5["登记延迟回调"](____self_5, "祖地双灵卫-裂魂坠斩余震", aftershockId)
-        end
-    )
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "祖地双灵卫-裂魂坠斩重斩", slashId)
-    return true
+                _____521B_5EFA_6280_80FD_63D0_793A_5708({
+                    ["类型"] = "方向直线",
+                    X = startX,
+                    Y = startY,
+                    ["长度"] = cfg["余震长度"],
+                    ["宽度"] = cfg["余震宽度"],
+                    ["朝向"] = facing,
+                    ["持续时间"] = cfg["余震延迟秒"],
+                    ["来源单位"] = boss
+                })
+            end
+        },
+        {
+            ["时点毫秒"] = (cfg["前摇秒"] + cfg["余震延迟秒"]) * 1000,
+            ["名称"] = "裂魂坠斩余震结算",
+            ["执行"] = function()
+                if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
+                    return
+                end
+                local wave = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["直线余震特效路径"], startX, startY)
+                if wave ~= nil and wave ~= 0 then
+                    EXEffectMatRotateZ(wave, facing)
+                    YDWETimerDestroyEffectSafe(0.8, wave)
+                end
+                local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+                do
+                    local i = 0
+                    while i < #heroes do
+                        do
+                            local hit = heroes[i + 1]
+                            if not _____5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF(
+                                hit,
+                                startX,
+                                startY,
+                                endX,
+                                endY,
+                                cfg["余震宽度"]
+                            ) then
+                                goto __continue16
+                            end
+                            _____9020_6210_88C2_9B42_5760_65A9_4F24_5BB3(
+                                boss,
+                                hit,
+                                cfg["余震伤害攻击力比例"],
+                                cfg["单段目标最大生命比例"],
+                                "祖地双灵卫·裂魂坠斩余震"
+                            )
+                        end
+                        ::__continue16::
+                        i = i + 1
+                    end
+                end
+            end
+        }
+    }
+    local executor = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "祖地双灵卫-裂魂坠斩", ["清理"] = context["清理"], ["互斥组"] = "祖地双灵卫主要技能"})
+    return executor["开始"](
+        executor,
+        {
+            key = "裂魂坠斩",
+            ["单位"] = boss,
+            ["上下文"] = context,
+            ["最大持续毫秒"] = (cfg["前摇秒"] + cfg["余震延迟秒"] + 0.2) * 1000,
+            ["阶段列表"] = _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868(_____4E8B_4EF6_5217_8868)
+        }
+    ) ~= 0
 end
 ____exports["裂魂坠斩技能状态"] = {
     ["所属形态"] = "裂誓战躯",

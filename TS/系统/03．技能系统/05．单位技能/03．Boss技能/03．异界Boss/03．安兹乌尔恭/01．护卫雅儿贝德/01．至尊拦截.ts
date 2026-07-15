@@ -1,5 +1,10 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
+  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
+};
+
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 获取全部安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
@@ -11,9 +16,6 @@ const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能�
 };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
-  读取单位攻击力: (this: void, unit: any) => number;
 };
 const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -47,10 +49,6 @@ const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
 let 至尊拦截伤害监听已注册 = false;
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
 function 结算至尊拦截(this: void, context: 安兹运行时上下文, x: number, y: number): void {
   const albedo = context.雅儿贝德?.单位;
   if (!单位有效(albedo) || context.挑战已结束) return;
@@ -68,8 +66,10 @@ function 结算至尊拦截(this: void, context: 安兹运行时上下文, x: nu
     造成AOE技能伤害({
       来源: albedo,
       目标: target,
-      伤害: 读取单位攻击力(albedo) * cfg.守护者模式.至尊拦截伤害攻击力比例
-        + GetUnitState(target, UNIT_STATE_MAX_LIFE) * cfg.守护者模式.至尊拦截伤害目标最大生命比例,
+      伤害: 计算组合技能伤害(albedo, target, {
+        来源攻击力比例: cfg.守护者模式.至尊拦截伤害攻击力比例,
+        目标最大生命比例: cfg.守护者模式.至尊拦截伤害目标最大生命比例,
+      }),
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,

@@ -1,5 +1,10 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间距离平方"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____5355_4F4D_5DF2_6B7B_4EA1 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位已标记死亡"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.00．配置")
 local _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["米亚单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.02．数值与表现配置")
@@ -14,33 +19,16 @@ local _____83B7_53D6Boss_6280_80FD_4EC7_6068_76EE_6807_5217_8868 = ____require_r
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
 local setThreat = ____require_result_2.setThreat
 local jass = require("jass.common")
-local GetHandleId = jass.GetHandleId
 local GetUnitName = jass.GetUnitName
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local IssueTargetOrder = jass.IssueTargetOrder
-local IsUnitType = jass.IsUnitType
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local function _____5355_4F4D_5B58_5728(unit)
-    return unit ~= nil and unit ~= 0
-end
-local function _____5355_4F4D_5B58_6D3B(unit)
-    return _____5355_4F4D_5B58_5728(unit) and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
-local function _____5355_4F4D_5DF2_6B7B_4EA1(unit)
-    return _____5355_4F4D_5B58_5728(unit) and IsUnitType(unit, UNIT_TYPE_DEAD) == true
-end
-local function _____8DDD_79BB_5E73_65B9(a, b)
-    local dx = GetUnitX(a) - GetUnitX(b)
-    local dy = GetUnitY(a) - GetUnitY(b)
-    return dx * dx + dy * dy
-end
 local function _____53D6_5355_4F4D_4EC7_6068(entries, unit)
-    local hid = GetHandleId(unit)
+    local hid = _____53D6_5355_4F4DID(unit)
     do
         local i = 0
         while i < #entries do
@@ -84,14 +72,14 @@ local function _____9009_62E9_6C61_67D3_6807_8BB0_76EE_6807(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(hero) then
-                    goto __continue17
+                    goto __continue13
                 end
                 local stack = _____53D6_76EE_6807_8150_5316_5C42_6570(context, hero)
                 if stack > highestStack then
                     highestStack = stack
                 end
             end
-            ::__continue17::
+            ::__continue13::
             i = i + 1
         end
     end
@@ -112,7 +100,7 @@ local function _____9009_62E9_6C61_67D3_6807_8BB0_76EE_6807(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(hero) or _____53D6_76EE_6807_8150_5316_5C42_6570(context, hero) ~= highestStack then
-                    goto __continue23
+                    goto __continue19
                 end
                 local threat = _____53D6_5355_4F4D_4EC7_6068(threatEntries, hero)
                 local dist = _____8DDD_79BB_5E73_65B9(boss, hero)
@@ -122,7 +110,7 @@ local function _____9009_62E9_6C61_67D3_6807_8BB0_76EE_6807(context)
                     bestDistance = dist
                 end
             end
-            ::__continue23::
+            ::__continue19::
             i = i + 1
         end
     end
@@ -148,8 +136,6 @@ local function _____5F3A_5236_653B_51FB_6C61_67D3_6807_8BB0_76EE_6807(context, t
     end
     setThreat(context["Boss单位"], target, 1000)
     IssueTargetOrder(context["Boss单位"], "attack", target)
-end
-____exports["注册米亚污染标记"] = function()
 end
 ____exports["取米亚污染标记伤害倍率"] = function(context, target)
     if context["阶段"] ~= 1 then

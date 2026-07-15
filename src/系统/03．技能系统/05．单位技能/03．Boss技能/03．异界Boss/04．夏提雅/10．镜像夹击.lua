@@ -1,6 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_6709_6548, GetUnitX, GetUnitY, IsUnitType, RemoveUnit, UNIT_TYPE_DEAD, createTimedEffect, _____5206_8EAB_6B8B_5F71_8DEF_5F84
+local GetUnitX, GetUnitY, RemoveUnit, createTimedEffect, _____5206_8EAB_6B8B_5F71_8DEF_5F84
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
 local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
@@ -16,9 +18,6 @@ local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_
 local ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.01．多阶段技能编排.06．技能阶段链执行器")
 local _____521B_5EFA_7ACB_5373_6267_884C_9636_6BB5 = ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668["创建立即执行阶段"]
 local _____521B_5EFA_5EF6_8FDF_9636_6BB5 = ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668["创建延迟阶段"]
-function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 ____exports["清理镜像夹击投影"] = function(context)
     local projection = context["镜像夹击句柄"]
     context["镜像夹击句柄"] = nil
@@ -36,7 +35,7 @@ end
 local jass = require("jass.common")
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-IsUnitType = jass.IsUnitType
+local IsUnitType = jass.IsUnitType
 RemoveUnit = jass.RemoveUnit
 local SetUnitAnimation = jass.SetUnitAnimation
 local SetUnitAcquireRange = jass.SetUnitAcquireRange
@@ -49,14 +48,13 @@ local SinBJ = jass.SinBJ
 local Atan2 = jass.Atan2
 local SquareRoot = jass.SquareRoot
 local GetHandleId = jass.GetHandleId
-UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
 local _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
 local getServerTime = ____require_result_1.getServerTime
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 createTimedEffect = ____require_result_2.createTimedEffect
@@ -70,22 +68,6 @@ local _____8757_866B_6280_80FDID = 1097625443
 _____5206_8EAB_6B8B_5F71_8DEF_5F84 = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx"
 local RAD_TO_DEG = 57.29577951308232
 local _____955C_50CF_5939_51FB_6280_80FDKey = "镜像夹击"
-local function _____6E05_7406_6307_5B9A_955C_50CF_6295_5F71(context, projection)
-    if context["镜像夹击句柄"] == projection then
-        context["镜像夹击句柄"] = nil
-    end
-    if not _____5355_4F4D_6709_6548(projection) then
-        return
-    end
-    createTimedEffect(
-        _____5206_8EAB_6B8B_5F71_8DEF_5F84,
-        GetUnitX(projection),
-        GetUnitY(projection),
-        0,
-        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["英灵投影收束秒"]
-    )
-    RemoveUnit(projection)
-end
 local function _____521B_5EFA_955C_50CF_5939_51FB_6295_5F71(context, x, y, face)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
@@ -125,13 +107,9 @@ local function _____521B_5EFA_955C_50CF_5939_51FB_6295_5F71(context, x, y, face)
     )
     return projection
 end
---- 本体移动由公共调度器负责；这里负责对侧投影、攻击动画与第二段基础伤害窗口。
+--- 本体移动由公共调度器负责；这里创建对侧投影并启动本体结算。
 -- 调用者必须在两个结算回调中自行排除控制、血印、吸血和其他二次触发。
 ____exports["施放镜像夹击"] = function(context, _____53C2_6570)
-    local cleanUp, projection
-    function cleanUp()
-        _____6E05_7406_6307_5B9A_955C_50CF_6295_5F71(context, projection)
-    end
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
         return nil
@@ -141,65 +119,53 @@ ____exports["施放镜像夹击"] = function(context, _____53C2_6570)
     local directionY = SinBJ(_____53C2_6570["本体朝向"])
     local startX = _____53C2_6570["中心X"] + directionX * cfg["镜像夹击投影距离"]
     local startY = _____53C2_6570["中心Y"] + directionY * cfg["镜像夹击投影距离"]
-    local endX = _____53C2_6570["中心X"] - directionX * cfg["镜像夹击投影越过距离"]
-    local endY = _____53C2_6570["中心Y"] - directionY * cfg["镜像夹击投影越过距离"]
-    projection = _____521B_5EFA_955C_50CF_5939_51FB_6295_5F71(context, startX, startY, _____53C2_6570["本体朝向"] + 180)
+    local projection = _____521B_5EFA_955C_50CF_5939_51FB_6295_5F71(context, startX, startY, _____53C2_6570["本体朝向"] + 180)
     if not _____5355_4F4D_6709_6548(projection) then
         return projection
     end
     if _____53C2_6570["本体结算"] ~= nil then
         _____53C2_6570["本体结算"]()
     end
-    local chargeDistance = SquareRoot((endX - startX) * (endX - startX) + (endY - startY) * (endY - startY))
-    local startId = addDelayedCallback(
-        cfg["镜像夹击第二段延迟秒"] * 1000,
-        function()
-            if context["镜像夹击句柄"] ~= projection or not _____5355_4F4D_6709_6548(projection) then
-                return
-            end
-            _____5F00_59CB_51B2_950B(
-                projection,
-                {
-                    ["目标X"] = endX,
-                    ["目标Y"] = endY,
-                    ["距离"] = chargeDistance,
-                    ["持续时间"] = cfg["镜像夹击投影突进秒"],
-                    ["检查地形"] = true,
-                    ["暂停单位"] = false,
-                    ["禁用碰撞"] = true,
-                    ["位移特效"] = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["滴管长枪拖尾特效路径"],
-                    ["命中半径"] = cfg["镜像夹击路径宽度"] * 0.5,
-                    ["只命中敌人"] = true,
-                    ["允许重复命中"] = false,
-                    ["命中后结束"] = false,
-                    ["命中回调"] = function(_source, hit)
-                        if _____53C2_6570["投影命中"] ~= nil then
-                            _____53C2_6570["投影命中"](hit)
-                        end
-                    end,
-                    ["开始回调"] = function()
-                        SetUnitAnimationByIndex(projection, cfg["镜像夹击投影动画编号"])
-                    end,
-                    ["结束回调"] = function()
-                        if _____53C2_6570["投影结算"] ~= nil then
-                            _____53C2_6570["投影结算"]()
-                        end
-                    end
-                }
-            )
-        end
-    )
-    local cleanupId = addDelayedCallback(
-        (cfg["镜像夹击第二段延迟秒"] + cfg["镜像夹击投影突进秒"] + cfg["镜像夹击恢复窗口秒"]) * 1000,
-        function()
-            cleanUp()
-        end
-    )
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "夏提雅-镜像夹击投影突进", startId)
-    local ____self_7 = context["清理"]
-    ____self_7["登记延迟回调"](____self_7, "夏提雅-镜像夹击投影收束", cleanupId)
     return projection
+end
+local function _____542F_52A8_955C_50CF_5939_51FB_6295_5F71_51B2_950B(context, projection, endX, endY, _____53C2_6570)
+    if context["镜像夹击句柄"] ~= projection or not _____5355_4F4D_6709_6548(projection) then
+        return
+    end
+    local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2
+    local startX = GetUnitX(projection)
+    local startY = GetUnitY(projection)
+    local chargeDistance = SquareRoot((endX - startX) * (endX - startX) + (endY - startY) * (endY - startY))
+    _____5F00_59CB_51B2_950B(
+        projection,
+        {
+            ["目标X"] = endX,
+            ["目标Y"] = endY,
+            ["距离"] = chargeDistance,
+            ["持续时间"] = cfg["镜像夹击投影突进秒"],
+            ["检查地形"] = true,
+            ["暂停单位"] = false,
+            ["禁用碰撞"] = true,
+            ["位移特效"] = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["滴管长枪拖尾特效路径"],
+            ["命中半径"] = cfg["镜像夹击路径宽度"] * 0.5,
+            ["只命中敌人"] = true,
+            ["允许重复命中"] = false,
+            ["命中后结束"] = false,
+            ["命中回调"] = function(_source, hit)
+                if _____53C2_6570["投影命中"] ~= nil then
+                    _____53C2_6570["投影命中"](hit)
+                end
+            end,
+            ["开始回调"] = function()
+                SetUnitAnimationByIndex(projection, cfg["镜像夹击投影动画编号"])
+            end,
+            ["结束回调"] = function()
+                if _____53C2_6570["投影结算"] ~= nil then
+                    _____53C2_6570["投影结算"]()
+                end
+            end
+        }
+    )
 end
 local function _____9020_6210_955C_50CF_5939_51FB_4F24_5BB3(context, target, ratio, tag)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2
@@ -252,6 +218,7 @@ ____exports["释放夏提雅镜像夹击"] = function(context, target)
     local mirrorDistance = cfg["镜像夹击投影距离"] + cfg["镜像夹击投影越过距离"]
     local totalSeconds = cfg["镜像夹击预警秒"] + cfg["镜像夹击第二段延迟秒"] + cfg["镜像夹击投影突进秒"] + cfg["镜像夹击恢复窗口秒"]
     local mainTargetId = GetHandleId(target)
+    local projection = nil
     local executor = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "夏提雅-镜像夹击", ["清理"] = context["清理"], ["互斥组"] = "夏提雅大型技能"})
     context["当前大型技能"] = _____955C_50CF_5939_51FB_6280_80FDKey
     context["普通机制忙碌到Ms"] = getServerTime() + totalSeconds * 1000
@@ -296,7 +263,7 @@ ____exports["释放夏提雅镜像夹击"] = function(context, target)
                         if context["当前大型技能"] ~= _____955C_50CF_5939_51FB_6280_80FDKey or context["阶段"] ~= "P2英灵战乙女" then
                             return
                         end
-                        ____exports["施放镜像夹击"](
+                        projection = ____exports["施放镜像夹击"](
                             context,
                             {
                                 ["中心X"] = centerX,
@@ -331,7 +298,27 @@ ____exports["释放夏提雅镜像夹击"] = function(context, target)
                                             end
                                         }
                                     )
-                                end,
+                                end
+                            }
+                        )
+                    end,
+                    "本体冲锋与投影排队"
+                ),
+                _____521B_5EFA_5EF6_8FDF_9636_6BB5(cfg["镜像夹击第二段延迟秒"] * 1000, "英灵冲锋等待"),
+                _____521B_5EFA_7ACB_5373_6267_884C_9636_6BB5(
+                    function()
+                        if context["当前大型技能"] ~= _____955C_50CF_5939_51FB_6280_80FDKey or context["阶段"] ~= "P2英灵战乙女" then
+                            return
+                        end
+                        _____542F_52A8_955C_50CF_5939_51FB_6295_5F71_51B2_950B(
+                            context,
+                            projection,
+                            mirrorEndX,
+                            mirrorEndY,
+                            {
+                                ["中心X"] = centerX,
+                                ["中心Y"] = centerY,
+                                ["本体朝向"] = facing,
                                 ["投影命中"] = function(hit)
                                     _____9020_6210_955C_50CF_5939_51FB_4F24_5BB3(context, hit, cfg["镜像夹击投影伤害比例"], "夏提雅·镜像夹击-英灵")
                                     _____65BD_52A0_5FEB_901F_51CF_901FBuff(
@@ -345,9 +332,9 @@ ____exports["释放夏提雅镜像夹击"] = function(context, target)
                             }
                         )
                     end,
-                    "本体冲锋与投影排队"
+                    "英灵冲锋"
                 ),
-                _____521B_5EFA_5EF6_8FDF_9636_6BB5((cfg["镜像夹击第二段延迟秒"] + cfg["镜像夹击投影突进秒"] + cfg["镜像夹击恢复窗口秒"]) * 1000, "英灵冲锋与恢复窗口")
+                _____521B_5EFA_5EF6_8FDF_9636_6BB5((cfg["镜像夹击投影突进秒"] + cfg["镜像夹击恢复窗口秒"]) * 1000, "英灵冲锋与恢复窗口")
             },
             ["结束回调"] = function()
                 _____7ED3_675F_955C_50CF_5939_51FB(context)

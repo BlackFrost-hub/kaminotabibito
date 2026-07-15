@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效, 单位间距离平方 as 距离平方 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚技能数值配置 } from "./02．数值与表现配置";
@@ -33,20 +34,8 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
-const 腐化黏液近战冷却表: Record<number, number | undefined> = {};
 const 腐化黏液上下文表: Record<number, 米亚运行时上下文 | undefined> = {};
 let 米亚腐化黏液涂层已注册 = false;
-let 米亚腐化黏液受伤提示Ms = 0;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 距离平方(this: void, a: any, b: any): number {
-  const dx = GetUnitX(a) - GetUnitX(b);
-  const dy = GetUnitY(a) - GetUnitY(b);
-  return dx * dx + dy * dy;
-}
 
 function 取腐化黏液上下文(this: void, boss: any): 米亚运行时上下文 | undefined {
   const id = GetHandleId(boss) || 0;
@@ -58,10 +47,14 @@ function 登记腐化黏液上下文(this: void, context: 米亚运行时上下�
   const id = GetHandleId(context.Boss单位) || 0;
   if (id === 0) return;
   if (context.阶段 !== 3 || !单位有效(context.Boss单位)) {
-    delete 腐化黏液上下文表[id];
+    if (腐化黏液上下文表[id] === context) delete 腐化黏液上下文表[id];
     return;
   }
+  if (腐化黏液上下文表[id] === context) return;
   腐化黏液上下文表[id] = context;
+  context.清理.登记清理("腐化黏液上下文索引", function 清理腐化黏液上下文索引(this: void): void {
+    if (腐化黏液上下文表[id] === context) delete 腐化黏液上下文表[id];
+  });
 }
 
 function 刷新腐化黏液Buff(this: void, context: 米亚运行时上下文): void {
@@ -83,8 +76,9 @@ function 处理腐化黏液近战反噬(this: void, target: any, _damage: number
   const sourceId = GetHandleId(source) || 0;
   if (sourceId === 0) return;
   const nowMs = getServerTime();
-  if (腐化黏液近战冷却表[sourceId] != null && nowMs - (腐化黏液近战冷却表[sourceId] ?? 0) < config.近战叠层冷却Ms) return;
-  腐化黏液近战冷却表[sourceId] = nowMs;
+  const 冷却表 = context.腐化黏液近战冷却表;
+  if (冷却表[sourceId] != null && nowMs - (冷却表[sourceId] ?? 0) < config.近战叠层冷却Ms) return;
+  冷却表[sourceId] = nowMs;
   添加米亚腐化感染(context, source, 1, "腐化黏液涂层近战反噬");
   播放米亚台词(context.Boss单位, "腐化黏液涂层", 1);
 }
@@ -94,17 +88,16 @@ function 处理腐化黏液Boss受伤提高(this: void, damageContext: any): num
   if (context == null || context.阶段 !== 3) return damageContext.currentDamage;
   const bonus = 米亚技能数值配置.腐化黏液涂层.Boss受伤提高;
   const nowMs = getServerTime();
-  if (nowMs - 米亚腐化黏液受伤提示Ms >= 12000) {
-    米亚腐化黏液受伤提示Ms = nowMs;
+  if (nowMs - context.腐化黏液上次受伤提示Ms >= 12000) {
+    context.腐化黏液上次受伤提示Ms = nowMs;
     播放米亚台词(context.Boss单位, "腐化黏液涂层", 3);
   }
   return damageContext.currentDamage * (1 + bonus);
 }
 
-function 甩出腐化黏液(this: void, context: 米亚运行时上下文, nowMs: number): void {
-  context.上次全场甩黏液Ms = nowMs;
+export function 释放米亚全场腐化黏液(this: void, context: 米亚运行时上下文): boolean {
   const boss = context.Boss单位;
-  if (!单位有效(boss)) return;
+  if (!单位有效(boss) || context.阶段 !== 3) return false;
   播放米亚台词(boss, "腐化黏液涂层", 2);
   创建点特效({
     模型路径: "war3mapImported\\archimonde_portal_state.mdx",
@@ -121,6 +114,7 @@ function 甩出腐化黏液(this: void, context: 米亚运行时上下文, nowMs
     if (!单位有效(hero)) continue;
     添加米亚腐化感染(context, hero, 1, "腐化黏液涂层全场甩黏液");
   }
+  return true;
 }
 
 export function 注册米亚腐化黏液涂层(this: void): void {
@@ -130,11 +124,8 @@ export function 注册米亚腐化黏液涂层(this: void): void {
   registerDamageModifier(处理腐化黏液Boss受伤提高, 35);
 }
 
-export function 刷新米亚腐化黏液涂层(this: void, context: 米亚运行时上下文, nowMs: number): void {
+export function 刷新米亚腐化黏液涂层被动状态(this: void, context: 米亚运行时上下文): void {
   登记腐化黏液上下文(context);
   if (context.阶段 !== 3) return;
   刷新腐化黏液Buff(context);
-  const interval = 米亚技能数值配置.腐化黏液涂层.全场甩黏液间隔Ms;
-  if (context.上次全场甩黏液Ms > 0 && nowMs - context.上次全场甩黏液Ms < interval) return;
-  甩出腐化黏液(context, nowMs);
 }

@@ -11,6 +11,7 @@ local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
@@ -26,8 +27,8 @@ local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_r
 local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_6.addPeriodicCallback
 local removePeriodicCallback = ____require_result_6.removePeriodicCallback
-local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_7.YDWETimerDestroyEffectSafe
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
@@ -42,9 +43,6 @@ local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local EXSetEffectZ = japi.EXSetEffectZ
 local EXSetEffectSize = japi.EXSetEffectSize
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____53D6_573A_5730_4E2D_5FC3(context)
     local boss = context["Boss单位"]
     local points = _____521B_5EFABoss_6218_573A_5730_70B9_4F4D_96C6(
@@ -61,20 +59,14 @@ local function _____64AD_653E_5730_6838Tick_7279_6548(x, y)
     do
         local i = 0
         while i < #paths do
-            do
-                local effect = AddSpecialEffect(paths[i + 1], x, y)
-                if effect == nil or effect == 0 then
-                    goto __continue6
-                end
-                if type(EXSetEffectZ) == "function" then
-                    EXSetEffectZ(effect, config["Tick特效高度"])
-                end
-                if type(EXSetEffectSize) == "function" then
-                    EXSetEffectSize(effect, config["Tick特效缩放"])
-                end
-                YDWETimerDestroyEffectSafe(config["Tick特效持续秒"], effect)
-            end
-            ::__continue6::
+            _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = paths[i + 1],
+                X = x,
+                Y = y,
+                Z = config["Tick特效高度"],
+                ["缩放"] = config["Tick特效缩放"],
+                ["持续秒"] = config["Tick特效持续秒"]
+            })
             i = i + 1
         end
     end

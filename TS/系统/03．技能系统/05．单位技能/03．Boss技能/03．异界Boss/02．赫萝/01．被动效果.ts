@@ -12,6 +12,10 @@ const { 是否黑天 } = require("系统.03．技能系统.00．技能模板+函
 const { 转四位ID } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   转四位ID: (this: void, rawIdText: string) => number;
 };
+const { 取单位ID, 单位未标记死亡 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  取单位ID: (this: void, unit: any) => number;
+  单位未标记死亡: (this: void, unit: any) => boolean;
+};
 const { 赫萝单位技能配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.02．赫萝.00．配置") as {
   赫萝单位技能配置: {
     单位ID: string;
@@ -23,26 +27,17 @@ const { 赫萝单位技能配置 } = require("系统.03．技能系统.05．单�
   };
 };
 
-const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
-const IsUnitType = jass.IsUnitType as (whichUnit: any, whichType: number) => boolean;
 const SetUnitStateJapi = japi.SetUnitState as (whichUnit: any, whichUnitState: number, value: number) => void;
 const SetUnitMoveSpeed = jass.SetUnitMoveSpeed as (whichUnit: any, newSpeed: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (state: number) => number;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as number;
 
 const 赫萝单位类型ID = 转四位ID(赫萝单位技能配置.单位ID);
 const 赫萝昼夜被动单位表: Record<number, any | undefined> = {};
 let 赫萝昼夜被动定时器ID = 0;
 
-function 获取句柄ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 应用赫萝昼夜状态(this: void, unit: any): void {
-  if (unit == null || unit === 0) return;
-  if (IsUnitType(unit, UNIT_TYPE_DEAD)) return;
+  if (!单位未标记死亡(unit)) return;
   if (GetUnitTypeId(unit) !== 赫萝单位类型ID) return;
 
   if (是否黑天()) {
@@ -61,7 +56,7 @@ function 处理赫萝昼夜被动Tick(this: void): void {
     if (handleId <= 0) continue;
 
     const unit = 赫萝昼夜被动单位表[handleId];
-    if (unit == null || unit === 0 || IsUnitType(unit, UNIT_TYPE_DEAD)) {
+    if (!单位未标记死亡(unit)) {
       delete 赫萝昼夜被动单位表[handleId];
       continue;
     }
@@ -84,7 +79,7 @@ export function 启动赫萝昼夜被动(this: void, unit: any): void {
   if (unit == null || unit === 0) return;
   if (GetUnitTypeId(unit) !== 赫萝单位类型ID) return;
 
-  const handleId = 获取句柄ID(unit);
+  const handleId = 取单位ID(unit);
   if (handleId === 0) return;
 
   赫萝昼夜被动单位表[handleId] = unit;
@@ -93,7 +88,7 @@ export function 启动赫萝昼夜被动(this: void, unit: any): void {
 }
 
 export function 停止赫萝昼夜被动(this: void, unit: any): void {
-  const handleId = 获取句柄ID(unit);
+  const handleId = 取单位ID(unit);
   if (handleId === 0) return;
 
   delete 赫萝昼夜被动单位表[handleId];

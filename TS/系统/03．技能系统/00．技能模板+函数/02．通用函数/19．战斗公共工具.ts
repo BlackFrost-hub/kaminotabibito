@@ -38,10 +38,25 @@ export function 取单位ID(this: void, unit: any): number {
   return GetHandleId(unit) || 0;
 }
 
+export function 单位句柄存在(this: void, unit: any): boolean {
+  return unit != null && unit !== 0;
+}
+
+export function 单位未标记死亡(this: void, unit: any): boolean {
+  return 单位句柄存在(unit) && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
+}
+
+export function 单位已标记死亡(this: void, unit: any): boolean {
+  return 单位句柄存在(unit) && IsUnitType(unit, UNIT_TYPE_DEAD) === true;
+}
+
+export function 单位存活(this: void, unit: any): boolean {
+  return 单位未标记死亡(unit) && GetUnitState(unit, UNIT_STATE_LIFE) > 0.405;
+}
+
+/** 兼容旧调用；需要区分句柄、死亡标记时请使用语义明确的函数。 */
 export function 单位有效(this: void, unit: any): boolean {
-  if (unit == null || unit === 0) return false;
-  if (IsUnitType(unit, UNIT_TYPE_DEAD) === true) return false;
-  return GetUnitState(unit, UNIT_STATE_LIFE) > 0.405;
+  return 单位存活(unit);
 }
 
 export function 读取单位攻击力(this: void, unit: any): number {
@@ -56,6 +71,14 @@ export function 距离平方XY(this: void, x1: number, y1: number, x2: number, y
   const dx = x2 - x1;
   const dy = y2 - y1;
   return dx * dx + dy * dy;
+}
+
+export function 单位间距离平方(this: void, a: any, b: any): number {
+  return 距离平方XY(GetUnitX(a), GetUnitY(a), GetUnitX(b), GetUnitY(b));
+}
+
+export function 单位到点距离平方(this: void, unit: any, x: number, y: number): number {
+  return 距离平方XY(GetUnitX(unit), GetUnitY(unit), x, y);
 }
 
 export function 距离XY(this: void, x1: number, y1: number, x2: number, y2: number): number {

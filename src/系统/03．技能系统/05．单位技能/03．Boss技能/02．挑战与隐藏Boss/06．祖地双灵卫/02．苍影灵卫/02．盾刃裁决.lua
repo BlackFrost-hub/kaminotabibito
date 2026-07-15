@@ -19,6 +19,10 @@ local _____5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF = _____77E9_5F62_533A_57
 local ____03_FF0E_7279_6548 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____03_FF0E_7279_6548.createTimedEffect
 local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____03_FF0E_7279_6548["设置特效XYZ轴旋转"]
+local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
+local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
+local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
+local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -26,7 +30,6 @@ local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_r
 local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
 local getServerTime = ____require_result_3.getServerTime
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
@@ -80,101 +83,111 @@ ____exports["释放盾刃裁决"] = function(context, target)
         ["来源单位"] = boss
     })
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["盾击动画编号"], ["持续秒"] = firstWarning + 0.15, ["恢复动画编号"] = cfg["恢复动画编号"]})
-    local firstId = addDelayedCallback(
-        firstWarning * 1000,
-        function()
-            if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
-                return
-            end
-            local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-            do
-                local i = 0
-                while i < #heroes do
-                    if _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF(
-                        heroes[i + 1],
-                        x,
-                        y,
-                        cfg["扇形半径"],
-                        facing,
-                        cfg["扇形角度"]
-                    ) then
-                        _____9020_6210_88C1_51B3_4F24_5BB3(
-                            boss,
-                            heroes[i + 1],
-                            cfg["盾击伤害攻击力比例"],
-                            cfg["单段目标最大生命比例"],
-                            "祖地双灵卫·盾刃裁决-盾击",
-                            WEAPON_TYPE_METAL_HEAVY_BASH
-                        )
-                    end
-                    i = i + 1
+    local _____4E8B_4EF6_5217_8868 = {
+        {
+            ["时点毫秒"] = firstWarning * 1000,
+            ["名称"] = "盾刃裁决盾击",
+            ["执行"] = function()
+                if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
+                    return
                 end
-            end
-            createTimedEffect(
-                _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["盾刃裁决"]["盾击命中特效路径"],
-                _____6781_5750_6807X(x, facing, cfg["扇形半径"] * 0.45),
-                _____6781_5750_6807Y(y, facing, cfg["扇形半径"] * 0.45),
-                0,
-                0.8
-            )
-            _____521B_5EFA_6280_80FD_63D0_793A_5708({
-                ["类型"] = "方向直线",
-                X = x,
-                Y = y,
-                ["宽度"] = cfg["直线宽度"],
-                ["长度"] = cfg["直线长度"],
-                ["朝向"] = facing,
-                ["持续时间"] = cfg["两段间隔秒"],
-                ["来源单位"] = boss
-            })
-            _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["重斩动画编号"], ["持续秒"] = cfg["两段间隔秒"] + 0.2, ["恢复动画编号"] = cfg["恢复动画编号"]})
-        end
-    )
-    local secondId = addDelayedCallback(
-        (firstWarning + cfg["两段间隔秒"]) * 1000,
-        function()
-            if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
-                return
-            end
-            local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-            do
-                local i = 0
-                while i < #heroes do
-                    if _____5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF(
-                        heroes[i + 1],
-                        x,
-                        y,
-                        endX,
-                        endY,
-                        cfg["直线宽度"]
-                    ) then
-                        _____9020_6210_88C1_51B3_4F24_5BB3(
-                            boss,
+                local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+                do
+                    local i = 0
+                    while i < #heroes do
+                        if _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF(
                             heroes[i + 1],
-                            cfg["重斩伤害攻击力比例"],
-                            cfg["单段目标最大生命比例"],
-                            "祖地双灵卫·盾刃裁决-重斩",
-                            WEAPON_TYPE_METAL_HEAVY_SLICE
-                        )
+                            x,
+                            y,
+                            cfg["扇形半径"],
+                            facing,
+                            cfg["扇形角度"]
+                        ) then
+                            _____9020_6210_88C1_51B3_4F24_5BB3(
+                                boss,
+                                heroes[i + 1],
+                                cfg["盾击伤害攻击力比例"],
+                                cfg["单段目标最大生命比例"],
+                                "祖地双灵卫·盾刃裁决-盾击",
+                                WEAPON_TYPE_METAL_HEAVY_BASH
+                            )
+                        end
+                        i = i + 1
                     end
-                    i = i + 1
                 end
+                createTimedEffect(
+                    _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["盾刃裁决"]["盾击命中特效路径"],
+                    _____6781_5750_6807X(x, facing, cfg["扇形半径"] * 0.45),
+                    _____6781_5750_6807Y(y, facing, cfg["扇形半径"] * 0.45),
+                    0,
+                    0.8
+                )
+                _____521B_5EFA_6280_80FD_63D0_793A_5708({
+                    ["类型"] = "方向直线",
+                    X = x,
+                    Y = y,
+                    ["宽度"] = cfg["直线宽度"],
+                    ["长度"] = cfg["直线长度"],
+                    ["朝向"] = facing,
+                    ["持续时间"] = cfg["两段间隔秒"],
+                    ["来源单位"] = boss
+                })
+                _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["重斩动画编号"], ["持续秒"] = cfg["两段间隔秒"] + 0.2, ["恢复动画编号"] = cfg["恢复动画编号"]})
             end
-            local effect = createTimedEffect(
-                _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["盾刃裁决"]["剑刃重斩特效路径"],
-                x,
-                y,
-                0,
-                0.9
-            )
-            _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C(effect, {["Z轴角度"] = facing})
-        end
-    )
-    local ____self_4 = context["清理"]
-    ____self_4["登记延迟回调"](____self_4, "祖地双灵卫-盾刃裁决盾击", firstId)
-    local ____self_5 = context["清理"]
-    ____self_5["登记延迟回调"](____self_5, "祖地双灵卫-盾刃裁决重斩", secondId)
-    return true
+        },
+        {
+            ["时点毫秒"] = (firstWarning + cfg["两段间隔秒"]) * 1000,
+            ["名称"] = "盾刃裁决重斩",
+            ["执行"] = function()
+                if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
+                    return
+                end
+                local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+                do
+                    local i = 0
+                    while i < #heroes do
+                        if _____5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF(
+                            heroes[i + 1],
+                            x,
+                            y,
+                            endX,
+                            endY,
+                            cfg["直线宽度"]
+                        ) then
+                            _____9020_6210_88C1_51B3_4F24_5BB3(
+                                boss,
+                                heroes[i + 1],
+                                cfg["重斩伤害攻击力比例"],
+                                cfg["单段目标最大生命比例"],
+                                "祖地双灵卫·盾刃裁决-重斩",
+                                WEAPON_TYPE_METAL_HEAVY_SLICE
+                            )
+                        end
+                        i = i + 1
+                    end
+                end
+                local effect = createTimedEffect(
+                    _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["盾刃裁决"]["剑刃重斩特效路径"],
+                    x,
+                    y,
+                    0,
+                    0.9
+                )
+                _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C(effect, {["Z轴角度"] = facing})
+            end
+        }
+    }
+    local executor = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "祖地双灵卫-盾刃裁决", ["清理"] = context["清理"], ["互斥组"] = "祖地双灵卫主要技能"})
+    return executor["开始"](
+        executor,
+        {
+            key = "盾刃裁决",
+            ["单位"] = boss,
+            ["上下文"] = context,
+            ["最大持续毫秒"] = (firstWarning + cfg["两段间隔秒"] + 0.35) * 1000,
+            ["阶段列表"] = _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868(_____4E8B_4EF6_5217_8868)
+        }
+    ) ~= 0
 end
 ____exports["盾刃裁决技能状态"] = {
     ["所属守卫"] = "苍影灵卫",

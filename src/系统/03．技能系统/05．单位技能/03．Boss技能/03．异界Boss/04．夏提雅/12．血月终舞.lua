@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
 local _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["重置夏提雅猎血连击"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
@@ -53,9 +55,6 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
 local _____8840_6708_7EC8_821E_6280_80FDKey = "血月终舞"
-local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
-end
 local function _____53D6P3_8282_594F_500D_7387(context)
     return 1 / (1 + context["血宴层数"] * _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["血宴每层技能节奏提高"])
 end
@@ -79,21 +78,13 @@ local function _____521B_5EFA_7A7A_4E2D_8840_6708(x, y, duration)
     local main = AddSpecialEffect(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["血月终舞特效路径"], x, y)
     local aux = AddSpecialEffect(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["血月终舞辅助特效路径"], x, y)
     if main ~= nil and main ~= 0 then
-        if type(EXSetEffectZ) == "function" then
-            EXSetEffectZ(main, cfg["血月高度"])
-        end
-        if type(EXSetEffectSize) == "function" then
-            EXSetEffectSize(main, cfg["血月缩放"])
-        end
+        EXSetEffectZ(main, cfg["血月高度"])
+        EXSetEffectSize(main, cfg["血月缩放"])
         YDWETimerDestroyEffectSafe(duration, main)
     end
     if aux ~= nil and aux ~= 0 then
-        if type(EXSetEffectZ) == "function" then
-            EXSetEffectZ(aux, cfg["血月高度"])
-        end
-        if type(EXSetEffectSize) == "function" then
-            EXSetEffectSize(aux, cfg["血月缩放"])
-        end
+        EXSetEffectZ(aux, cfg["血月高度"])
+        EXSetEffectSize(aux, cfg["血月缩放"])
         YDWETimerDestroyEffectSafe(duration, aux)
     end
 end
@@ -113,7 +104,7 @@ local function _____7ED3_7B97_8840_6708_6247_533A(context, x, y, facing)
                     facing,
                     cfg["扇区角度"]
                 ) then
-                    goto __continue15
+                    goto __continue10
                 end
                 local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(context["Boss单位"], target, {["来源攻击力比例"] = cfg["扇区伤害攻击力比例"], ["目标最大生命比例"] = cfg["扇区伤害目标最大生命比例"]})
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -129,7 +120,7 @@ local function _____7ED3_7B97_8840_6708_6247_533A(context, x, y, facing)
                     ["标签"] = "夏提雅·血月终舞-扇区"
                 })
             end
-            ::__continue15::
+            ::__continue10::
             i = i + 1
         end
     end

@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
@@ -30,10 +31,6 @@ const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: 
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const 攻速属性ID = 10;
 const 真祖血宴技能Key = '真祖血宴';
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 限制血宴层数(this: void, value: number): number {
   const max = 夏提雅数值与表现配置.P3.血宴层数上限;

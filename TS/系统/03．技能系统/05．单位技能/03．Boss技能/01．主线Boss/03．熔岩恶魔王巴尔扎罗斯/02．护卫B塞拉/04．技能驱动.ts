@@ -5,9 +5,10 @@ import { 释放冰焰双星 } from "./01．冰焰双星";
 import { 释放绝对零度领域 } from "./02．绝对零度领域";
 import { 切换塞拉形态, 确保塞拉伤害修正 } from "./03．元素转换";
 import { 塞拉公共 } from "./00．公共";
-const {  巴尔扎罗斯技能数值配置,
-  addPeriodicCallback,
-  getServerTime,
+import { 创建战斗技能调度器 } from "../../../../../00．技能模板+函数/00．技能模板/13．战斗技能调度模板/01．战斗技能调度模板";
+
+const {
+  巴尔扎罗斯技能数值配置,
   GetUnitX,
   GetUnitY,
   单位有效,
@@ -15,43 +16,28 @@ const {  巴尔扎罗斯技能数值配置,
   点距离平方,
   取塞拉形态,
   取塞拉技能目标,
-  塞拉冰焰双星下次Ms表,
-  塞拉绝对零度下次Ms表,
-  塞拉元素转换下次Ms表,
-  塞拉忙碌到Ms表,
   塞拉形态表,
   绝对零度领域状态表,
 } = 塞拉公共;
 
-function 尝试释放塞拉技能(this: void, context: 巴尔扎罗斯运行时上下文): void {
-  const sera = context.塞拉;
-  if (!单位有效(context.Boss单位) || !单位有效(sera)) return;
-  const id = 取单位ID(sera);
-  const now = getServerTime();
-  if (now < (塞拉忙碌到Ms表[id] ?? 0)) return;
-  if (now >= (塞拉元素转换下次Ms表[id] ?? 0)) {
-    const next = 取塞拉形态(context) === "火焰" ? "冰霜" : "火焰";
-    塞拉元素转换下次Ms表[id] = now + 巴尔扎罗斯技能数值配置.元素转换.周期秒 * 1000;
-    切换塞拉形态(context, next, true);
-    return;
-  }
+function 塞拉可调度(this: void, context: 巴尔扎罗斯运行时上下文): boolean {
+  return 单位有效(context.Boss单位) && 单位有效(context.塞拉);
+}
 
-  const target = 取塞拉技能目标(context);
-  if (!单位有效(target)) return;
+function 取塞拉上下文键(this: void, context: 巴尔扎罗斯运行时上下文): number {
+  return 取单位ID(context.塞拉);
+}
+
+function 选择塞拉目标(this: void, context: 巴尔扎罗斯运行时上下文): any {
+  return 取塞拉技能目标(context);
+}
+
+function 塞拉冰焰双星目标有效(this: void, context: 巴尔扎罗斯运行时上下文, target: any): boolean {
+  const sera = context.塞拉;
+  if (!单位有效(sera) || !单位有效(target)) return false;
   const iceFire = 巴尔扎罗斯技能数值配置.冰焰双星;
-  const zero = 巴尔扎罗斯技能数值配置.绝对零度领域;
   const distanceSq = 点距离平方(GetUnitX(sera), GetUnitY(sera), GetUnitX(target), GetUnitY(target));
-  if (now >= (塞拉冰焰双星下次Ms表[id] ?? 0) && distanceSq <= iceFire.施法距离 * iceFire.施法距离) {
-    塞拉冰焰双星下次Ms表[id] = now + iceFire.冷却秒 * 1000;
-    塞拉忙碌到Ms表[id] = now + iceFire.施法硬直秒 * 1000;
-    释放冰焰双星(context, target);
-    return;
-  }
-  if (now >= (塞拉绝对零度下次Ms表[id] ?? 0)) {
-    塞拉绝对零度下次Ms表[id] = now + zero.冷却秒 * 1000;
-    塞拉忙碌到Ms表[id] = now + zero.施法硬直秒 * 1000;
-    释放绝对零度领域(context, target);
-  }
+  return distanceSq <= iceFire.施法距离 * iceFire.施法距离;
 }
 
 export function 初始化巴尔扎罗斯塞拉技能(this: void, context: 巴尔扎罗斯运行时上下文): void {
@@ -61,20 +47,57 @@ export function 初始化巴尔扎罗斯塞拉技能(this: void, context: 巴尔
   if (单位有效(context.塞拉)) {
     const id = 取单位ID(context.塞拉);
     切换塞拉形态(context, "火焰", false);
-    塞拉元素转换下次Ms表[id] = getServerTime() + 巴尔扎罗斯技能数值配置.元素转换.周期秒 * 1000;
     context.清理.登记清理("巴尔扎罗斯-塞拉技能状态", function 巴尔扎罗斯塞拉技能状态清理(this: void): void {
-      delete 塞拉冰焰双星下次Ms表[id];
-      delete 塞拉绝对零度下次Ms表[id];
-      delete 塞拉元素转换下次Ms表[id];
-      delete 塞拉忙碌到Ms表[id];
       delete 塞拉形态表[id];
       delete 绝对零度领域状态表[id];
     });
   }
-  const tickId = addPeriodicCallback(500, function 巴尔扎罗斯塞拉技能Tick(this: void): void {
-    尝试释放塞拉技能(context);
+  const conversion = 巴尔扎罗斯技能数值配置.元素转换;
+  const iceFire = 巴尔扎罗斯技能数值配置.冰焰双星;
+  const zero = 巴尔扎罗斯技能数值配置.绝对零度领域;
+  创建战斗技能调度器<巴尔扎罗斯运行时上下文>({
+    名称: "巴尔扎罗斯-塞拉技能调度",
+    清理: context.清理,
+    间隔毫秒: 500,
+    取上下文列表: function 取塞拉上下文列表(this: void): 巴尔扎罗斯运行时上下文[] { return [context]; },
+    取上下文键: 取塞拉上下文键,
+    可调度: 塞拉可调度,
+    技能列表: [{
+      key: "元素转换",
+      冷却毫秒: conversion.周期秒 * 1000,
+      首次延迟毫秒: conversion.周期秒 * 1000,
+      优先级: 30,
+      执行: function 执行塞拉元素转换(this: void, skillContext: 巴尔扎罗斯运行时上下文): boolean {
+        const next = 取塞拉形态(skillContext) === "火焰" ? "冰霜" : "火焰";
+        切换塞拉形态(skillContext, next, true);
+        return true;
+      },
+    }, {
+      key: "冰焰双星",
+      冷却毫秒: iceFire.冷却秒 * 1000,
+      首次延迟毫秒: 0,
+      忙碌毫秒: iceFire.施法硬直秒 * 1000,
+      优先级: 20,
+      选择目标: 选择塞拉目标,
+      目标有效: 塞拉冰焰双星目标有效,
+      执行: function 执行塞拉冰焰双星(this: void, skillContext: 巴尔扎罗斯运行时上下文, target: any): boolean {
+        释放冰焰双星(skillContext, target);
+        return true;
+      },
+    }, {
+      key: "绝对零度领域",
+      冷却毫秒: zero.冷却秒 * 1000,
+      首次延迟毫秒: 0,
+      忙碌毫秒: zero.施法硬直秒 * 1000,
+      优先级: 10,
+      选择目标: 选择塞拉目标,
+      目标有效: function 塞拉绝对零度目标有效(this: void, _context: 巴尔扎罗斯运行时上下文, target: any): boolean { return 单位有效(target); },
+      执行: function 执行塞拉绝对零度(this: void, skillContext: 巴尔扎罗斯运行时上下文, target: any): boolean {
+        释放绝对零度领域(skillContext, target);
+        return true;
+      },
+    }],
   });
-  context.清理.登记周期回调("巴尔扎罗斯-塞拉技能驱动", tickId);
 }
 
 export function 注册巴尔扎罗斯护卫塞拉(this: void): void {

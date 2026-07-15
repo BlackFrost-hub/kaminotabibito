@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 获取或创建安兹运行时上下文, 标记安兹普通机制忙碌 } from './01．运行时上下文';
 import { 安兹乌尔恭单位技能配置 } from './00．配置';
@@ -44,10 +45,6 @@ interface 心脏掌握实例 {
   点名特效: any;
   倒计时特效: any;
   已结算: boolean;
-}
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }
 
 function 销毁心脏掌握表现(this: void, instance: 心脏掌握实例): void {

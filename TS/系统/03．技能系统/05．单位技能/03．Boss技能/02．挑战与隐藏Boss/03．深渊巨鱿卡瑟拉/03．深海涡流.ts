@@ -16,8 +16,6 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -27,6 +25,9 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
@@ -46,12 +47,8 @@ function 播放限时涡流特效(this: void, context: 卡瑟拉运行时上下�
   const cfg = 卡瑟拉数值与表现配置.深海涡流;
   const model: string = cfg.涡流模型路径;
   if (model === "") return;
-  const effect = AddSpecialEffect(model, x, y);
-  context.清理.登记特效("卡瑟拉-深海涡流特效", effect);
-  const id = addDelayedCallback(cfg.涡流特效持续秒 * 1000, function 卡瑟拉深海涡流特效销毁(this: void): void {
-    DestroyEffect(effect);
-  });
-  context.清理.登记延迟回调("卡瑟拉-深海涡流特效销毁", id);
+  const effect = 创建点特效({ 模型路径: model, X: x, Y: y });
+  context.清理.登记限时特效("卡瑟拉-深海涡流特效", effect, cfg.涡流特效持续秒 * 1000);
 }
 
 function 结算深海涡流爆发(this: void, context: 卡瑟拉运行时上下文, x: number, y: number): void {

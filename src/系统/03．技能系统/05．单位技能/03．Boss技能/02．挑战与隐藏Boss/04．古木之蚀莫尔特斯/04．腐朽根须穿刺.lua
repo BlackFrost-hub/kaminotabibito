@@ -20,8 +20,12 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.05．点名预警执行器")
+local _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668 = ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668["创建点名预警执行器"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -34,18 +38,13 @@ local DestroyGroup = jass.DestroyGroup
 local GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
 local FirstOfGroup = jass.FirstOfGroup
 local GroupRemoveUnit = jass.GroupRemoveUnit
-local AddSpecialEffect = jass.AddSpecialEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_3["创建可攻击机制单位"]
-local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
+local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____8150_673D_6839_987B_7A7F_523A_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -81,7 +80,7 @@ local function _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(context, cell)
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]
-    AddSpecialEffect(cfg["穿刺特效路径"], cell["中心X"], cell["中心Y"])
+    _____521B_5EFA_70B9_7279_6548({["模型路径"] = cfg["穿刺特效路径"], X = cell["中心X"], Y = cell["中心Y"], ["持续秒"] = cfg["瞬时特效持续秒"]})
     _____64AD_653EBoss_5750_6807_97F3_6548(_____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["腐朽根须穿刺"]["结算"], cell["中心X"], cell["中心Y"], _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
     _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
         ["清理"] = context["清理"],
@@ -124,12 +123,20 @@ local function _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(context, cell)
     end
     DestroyGroup(group)
 end
-local function _____83AB_5C14_7279_65AF_6839_987B_7A7F_523A_5EF6_8FDF_7ED3_7B97(variable)
-    local data = variable
-    if data == nil then
-        return
-    end
-    _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(data.context, data.cell)
+local function _____521B_5EFA_6839_987B_7A7F_523A_683C_5B50_9884_8B66(context, cell, index)
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]
+    local cellSize = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"]
+    _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668({
+        ["清理"] = context["清理"],
+        ["名称"] = "莫尔特斯-腐朽根须穿刺-" .. tostring(index + 1),
+        ["锁定X"] = cell["中心X"],
+        ["锁定Y"] = cell["中心Y"],
+        ["延迟秒"] = cfg["预警秒"],
+        ["提示圈"] = {["类型"] = "矩形", ["宽度"] = cellSize, ["长度"] = cellSize, ["朝向"] = 0},
+        ["on结算"] = function()
+            _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(context, cell)
+        end
+    })
 end
 ____exports["释放莫尔特斯腐朽根须穿刺"] = function(context)
     local boss = context["Boss单位"]
@@ -143,19 +150,7 @@ ____exports["释放莫尔特斯腐朽根须穿刺"] = function(context)
     do
         local i = 0
         while i < #cells do
-            local cell = cells[i + 1]
-            _____521B_5EFA_6280_80FD_63D0_793A_5708({
-                ["类型"] = "矩形",
-                X = cell["中心X"],
-                Y = cell["中心Y"],
-                ["宽度"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"],
-                ["长度"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"],
-                ["朝向"] = 0,
-                ["持续时间"] = cfg["预警秒"]
-            })
-            local id = addDelayedCallback(cfg["预警秒"] * 1000, _____83AB_5C14_7279_65AF_6839_987B_7A7F_523A_5EF6_8FDF_7ED3_7B97, {context = context, cell = cell})
-            local ____self_5 = context["清理"]
-            ____self_5["登记延迟回调"](____self_5, "莫尔特斯-腐朽根须穿刺", id)
+            _____521B_5EFA_6839_987B_7A7F_523A_683C_5B50_9884_8B66(context, cells[i + 1], i)
             i = i + 1
         end
     end

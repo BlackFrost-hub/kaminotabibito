@@ -5,7 +5,7 @@ import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 施加巴尔扎罗斯灼热 } from "./16．灼热层数工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -29,8 +29,8 @@ const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
-const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 
 const jass = require("jass.common") as any;
@@ -56,10 +56,6 @@ interface 地核状态 {
   stopped: boolean;
 }
 
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
 function 取场地中心(this: void, context: 巴尔扎罗斯运行时上下文): { X: number; Y: number } {
   const boss = context.Boss单位;
   const points = 创建Boss战场地点位集(context.战斗区域组, GetUnitX(boss), GetUnitY(boss));
@@ -71,11 +67,10 @@ function 播放地核Tick特效(this: void, x: number, y: number): void {
   const config = 巴尔扎罗斯技能数值配置.地核召唤;
   const paths = [config.Tick冲击波路径, config.Tick叠加冲击波路径];
   for (let i = 0; i < paths.length; i++) {
-    const effect = AddSpecialEffect(paths[i], x, y);
-    if (effect == null || effect === 0) continue;
-    if (typeof EXSetEffectZ === "function") EXSetEffectZ(effect, config.Tick特效高度);
-    if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, config.Tick特效缩放);
-    YDWETimerDestroyEffectSafe(config.Tick特效持续秒, effect);
+    创建点特效({
+      模型路径: paths[i], X: x, Y: y, Z: config.Tick特效高度,
+      缩放: config.Tick特效缩放, 持续秒: config.Tick特效持续秒,
+    });
   }
 }
 

@@ -22,15 +22,17 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local AddSpecialEffect = jass.AddSpecialEffect
-local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
-local _____65BD_52A0_6050_60E7 = ____require_result_1["施加恐惧"]
+local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
+local _____65BD_52A0_6050_60E7 = ____require_result_2["施加恐惧"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____53E4_6728_60B2_9E23_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["古木悲鸣"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -108,8 +110,8 @@ local function _____786E_4FDD_60B2_9E23_8611_83C7_8868_73B0(context)
                     goto __continue13
                 end
                 local effect = AddSpecialEffect(cfg["巨型蘑菇模型列表"][i + 1], cell["中心X"], cell["中心Y"])
-                local ____self_2 = context["清理"]
-                ____self_2["登记特效"](____self_2, "莫尔特斯-古木悲鸣蘑菇", effect)
+                local ____self_3 = context["清理"]
+                ____self_3["登记特效"](____self_3, "莫尔特斯-古木悲鸣蘑菇", effect)
             end
             ::__continue13::
             i = i + 1
@@ -125,11 +127,12 @@ ____exports["释放莫尔特斯古木悲鸣"] = function(context)
     _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "古木悲鸣")
     _____786E_4FDD_60B2_9E23_8611_83C7_8868_73B0(context)
-    AddSpecialEffect(
-        cfg["悲鸣特效路径"],
-        GetUnitX(boss),
-        GetUnitY(boss)
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["悲鸣特效路径"],
+        X = GetUnitX(boss),
+        Y = GetUnitY(boss),
+        ["持续秒"] = cfg["瞬时特效持续秒"]
+    })
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["古木悲鸣"]["悲鸣波"],
         GetUnitX(boss),

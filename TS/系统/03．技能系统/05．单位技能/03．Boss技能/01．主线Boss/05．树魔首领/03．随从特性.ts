@@ -5,7 +5,7 @@ import { 获取树魔首领上下文, 获取或创建树魔首领上下文, 获�
 import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
-import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 单位句柄存在, 单位未标记死亡 as 单位存活 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
@@ -18,10 +18,8 @@ const GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed as (whichUnit: any)
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const CreateUnit = jass.CreateUnit as (id: any, unitid: number, x: number, y: number, face: number) => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, targetWidget: any) => boolean;
-const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 const {
   addPeriodicCallback,
@@ -61,16 +59,12 @@ const 投掷者单位类型ID = stringToFourCC(树魔首领单位技能配置.�
 
 let 树魔首领随从特性已注册 = false;
 
-function 单位存活(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
 function 是树魔首领(this: void, unit: any): boolean {
   return 单位存活(unit) && GetUnitTypeId(unit) === 树魔首领单位类型ID;
 }
 
 function 单位类型是树魔首领(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && GetUnitTypeId(unit) === 树魔首领单位类型ID;
+  return 单位句柄存在(unit) && GetUnitTypeId(unit) === 树魔首领单位类型ID;
 }
 
 function 随机召唤点(this: void, boss: any): { x: number; y: number } {

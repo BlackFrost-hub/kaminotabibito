@@ -1,5 +1,6 @@
 /** @noSelfInFile */
 
+import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅单位技能配置 } from './00．配置';
@@ -63,10 +64,6 @@ interface 复生结晶点 {
 }
 
 export type 夏提雅复生失败回调 = (this: void, context: 夏提雅运行时上下文) => void;
-
-function 单位有效(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
 
 function 取复生结晶受击次数(this: void): number {
   let 玩家人数 = Number(取当前有效玩家人数()) || 1;

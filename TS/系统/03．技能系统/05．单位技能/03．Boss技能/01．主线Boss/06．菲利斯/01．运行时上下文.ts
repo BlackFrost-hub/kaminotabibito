@@ -61,10 +61,6 @@ const 菲利斯上下文工厂 = 创建单位运行时上下文工厂<菲利斯�
   创建上下文: 创建菲利斯上下文,
 });
 
-function 取单位ID(this: void, unit: any): number {
-  return 菲利斯上下文工厂.取单位ID(unit);
-}
-
 export function 获取菲利斯上下文(this: void, boss: any): 菲利斯运行时上下文 | undefined {
   return 菲利斯上下文工厂.获取(boss);
 }
@@ -82,18 +78,18 @@ export function 获取全部菲利斯上下文(this: void): 菲利斯运行时�
 }
 
 export function 登记菲利斯剑魂狼(this: void, wolf: any, record: 菲利斯剑魂狼记录): void {
-  const id = 取单位ID(wolf);
+  const id = 菲利斯上下文工厂.取单位ID(wolf);
   if (id === 0) return;
   菲利斯剑魂狼表[id] = record;
 }
 
 export function 注销菲利斯剑魂狼(this: void, wolf: any): void {
-  const id = 取单位ID(wolf);
+  const id = 菲利斯上下文工厂.取单位ID(wolf);
   if (id !== 0) delete 菲利斯剑魂狼表[id];
 }
 
 export function 获取菲利斯剑魂狼记录(this: void, wolf: any): 菲利斯剑魂狼记录 | undefined {
-  const id = 取单位ID(wolf);
+  const id = 菲利斯上下文工厂.取单位ID(wolf);
   return id === 0 ? undefined : 菲利斯剑魂狼表[id];
 }
 
@@ -101,7 +97,7 @@ function on菲利斯单位死亡(this: void, dyingUnit: any): void {
   if (GetUnitTypeId(dyingUnit) === 菲利斯单位类型ID) {
     播放菲利斯台词(dyingUnit, "死亡", 0);
   }
-  const id = 取单位ID(dyingUnit);
+  const id = 菲利斯上下文工厂.取单位ID(dyingUnit);
   if (id === 0) return;
   if (菲利斯上下文工厂.获取(dyingUnit) != null) 清理菲利斯上下文(dyingUnit);
   if (菲利斯剑魂狼表[id] != null) delete 菲利斯剑魂狼表[id];
