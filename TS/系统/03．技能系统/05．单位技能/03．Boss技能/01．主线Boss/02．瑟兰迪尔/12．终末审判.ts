@@ -20,8 +20,8 @@ const { 显示大招吟唱条, 关闭吟唱条 } = require("系统.09．表现�
   显示大招吟唱条: (this: void, 参数: any) => void;
   关闭吟唱条: (this: void, 通道?: string) => void;
 };
-const { 创建白色圆形提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
-  创建白色圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => void;
+const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
+  创建技能提示圈: (this: void, 配置: any) => any;
 };
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
@@ -131,7 +131,13 @@ function 创建终末审判时间轴事件(this: void, context: 瑟兰迪尔运�
       播放点特效(config.蓄力完成特效, 结算X, 结算Y, 2, config.蓄力完成冲击缩放);
       播放点特效(config.警示特效, 结算X, 结算Y, config.爆炸延迟秒 + 0.5, config.场地法阵缩放);
       播放点特效(config.法阵叠加特效, 结算X, 结算Y, config.爆炸延迟秒 + 0.5, config.场地法阵缩放);
-      创建白色圆形提示圈(结算X, 结算Y, config.安全区半径, config.爆炸延迟秒 + 0.5);
+      创建技能提示圈({
+        类型: "白色安全圆",
+        X: 结算X,
+        Y: 结算Y,
+        半径: config.安全区半径,
+        持续时间: config.爆炸延迟秒 + 0.5,
+      });
       const heroes = 获取Boss技能敌对英雄列表(boss);
       for (let i = 0; i < heroes.length; i++) {
         const target = heroes[i];

@@ -11,6 +11,9 @@ import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放"
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
+const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
+  创建技能提示圈: (this: void, 配置: any) => any;
+};
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -206,6 +209,14 @@ function 发射腐败之种(this: void, context: 莫尔特斯运行时上下文,
   const sy = GetUnitY(boss);
   const tx = GetUnitX(target);
   const ty = GetUnitY(target);
+  创建技能提示圈({
+    类型: "敌方圆形",
+    X: tx,
+    Y: ty,
+    半径: cfg.波动半径,
+    持续时间: cfg.飞行秒 + cfg.生长延迟秒 + cfg.波动间隔秒,
+    来源单位: boss,
+  });
   const angle = 取坐标角度(sx, sy, tx, ty) + 90;
   const distance = 莫尔特斯数值与表现配置.根须领域.单格边长 * cfg.中点偏移比例;
   const midX = 极坐标X((sx + tx) / 2, angle, distance);

@@ -20,6 +20,9 @@ const { 显示场地常驻AOE吟唱条, 关闭吟唱条 } = require("系统.09�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
+const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
+  创建技能提示圈: (this: void, 配置: any) => any;
+};
 const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
@@ -39,13 +42,45 @@ const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, angle: numb
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
-function 单位在有效安全域内(this: void, context: 米亚运行时上下文, unit: any): boolean {
-  const 区域 = 取米亚单位所在安全域(unit, context.安全域区域组);
+function 米亚安全域当前有效(this: void, context: 米亚运行时上下文, 区域: any): boolean {
   if (区域 == null) return false;
   const id = 区域.配置.ID ?? 区域.配置.名称 ?? "";
   if (id !== "" && context.腐化转移污染平台ID === id) return false;
   if (id !== "" && context.超载平台ID表[id] === true) return false;
   return true;
+}
+
+function 单位在有效安全域内(this: void, context: 米亚运行时上下文, unit: any): boolean {
+  return 米亚安全域当前有效(context, 取米亚单位所在安全域(unit, context.安全域区域组));
+}
+
+function 显示污染脉冲波预警(this: void, context: 米亚运行时上下文, waveIndex: number, 持续秒: number): void {
+  const boss = context.Boss单位;
+  const config = 米亚技能数值配置.污染脉冲;
+  const radius = config.波次半径[waveIndex];
+  if (!单位有效(boss) || radius == null || radius <= 0 || 持续秒 <= 0) return;
+  创建技能提示圈({
+    类型: "敌方圆形",
+    X: 取米亚平台中心X(),
+    Y: 取米亚平台中心Y(),
+    半径: radius,
+    持续时间: 持续秒,
+    来源单位: boss,
+  });
+  const 区域列表 = context.安全域区域组.区域列表;
+  for (let i = 0; i < 区域列表.length; i++) {
+    const 区域 = 区域列表[i];
+    if (!米亚安全域当前有效(context, 区域)) continue;
+    const width = 区域.配置.右 - 区域.配置.左;
+    const height = 区域.配置.上 - 区域.配置.下;
+    创建技能提示圈({
+      类型: "白色安全圆",
+      X: 区域.中心X,
+      Y: 区域.中心Y,
+      半径: (width < height ? width : height) * 0.5,
+      持续时间: 持续秒,
+    });
+  }
 }
 
 function 创建朝向点特效(this: void, model: string, x: number, y: number, scale: number, duration: number, yawDeg: number, z?: number): void {
@@ -120,6 +155,7 @@ function 创建污染脉冲时间轴事件(this: void, context: 米亚运行时�
         持续时间秒: config.预警秒 + config.波次半径.length + 2,
       });
       播放脉冲中心预警();
+      显示污染脉冲波预警(context, 0, config.预警秒);
       播放米亚台词(boss, "污染脉冲", 0);
       显示场地常驻AOE吟唱条({
         总时长: config.预警秒,
@@ -137,6 +173,15 @@ function 创建污染脉冲时间轴事件(this: void, context: 米亚运行时�
   }];
   for (let i = 0; i < config.波次半径.length; i++) {
     const waveIndex = i;
+    if (waveIndex > 0) {
+      事件列表.push({
+        时点毫秒: (config.预警秒 + waveIndex - 1) * 1000,
+        名称: "污染脉冲第" + (waveIndex + 1) + "波预警",
+        执行: function 米亚污染脉冲后续波预警(this: void): void {
+          显示污染脉冲波预警(context, waveIndex, 1);
+        },
+      });
+    }
     事件列表.push({
       时点毫秒: (config.预警秒 + waveIndex) * 1000,
       名称: "污染脉冲第" + (waveIndex + 1) + "波",

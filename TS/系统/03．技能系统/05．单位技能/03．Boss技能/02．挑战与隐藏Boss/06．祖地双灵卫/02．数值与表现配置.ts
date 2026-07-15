@@ -171,12 +171,11 @@ export const 祖地双灵卫数值与表现配置 = {
     侵蚀主色: { R: 45, G: 66, B: 78 },
     路径规则: '填写游戏内模型路径，不带imports前缀；形状预警默认走提示圈工厂。',
     公共: {
-      双灵同誓连线特效路径: 'Common\\Effect\\Form\\Line\\AinzAlbedoGuardianLink.mdx',
       低血守卫保护特效路径: 'Common\\Effect\\Form\\Shield\\holyshield_state.mdx',
       赤誓变异转化特效路径: 'Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx',
       苍影变异转化特效路径: 'Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx',
       P3污染共鸣连线特效路径: 'Common\\Effect\\Form\\Line\\DeathWave.mdx',
-      灵魂崩解特效路径: 'Common\\Effect\\Form\\RiseFall\\AronkosDefeatDissolve.mdx',
+      魂力回灌特效路径: 'Common\\Effect\\Form\\RiseFall\\SpiritGuardSoulReflux.mdx',
       最终净化归静特效路径: 'Common\\Effect\\Form\\RiseFall\\AronkosSoulReleasePillar.mdx',
     },
     誓锋壁进: {

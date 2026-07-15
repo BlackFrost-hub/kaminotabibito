@@ -39,12 +39,12 @@ function _____83AB_5C14_7279_65AF_8150_8D25_79CD_5B50_6210_957F(variable)
     if data == nil then
         return
     end
-    local ____self_5 = data.seed
-    if not ____self_5["是否存活"](____self_5) then
+    local ____self_6 = data.seed
+    if not ____self_6["是否存活"](____self_6) then
         return
     end
-    local ____self_6 = data.seed
-    ____self_6["销毁"](____self_6)
+    local ____self_7 = data.seed
+    ____self_7["销毁"](____self_7)
     _____521B_5EFA_8150_8D25_5E7C_6811(data.context, data.x, data.y)
 end
 function _____521B_5EFA_8150_8D25_5E7C_6811(context, x, y)
@@ -68,8 +68,8 @@ function _____521B_5EFA_8150_8D25_5E7C_6811(context, x, y)
     end
     local data = {context = context, ["幼树单位"] = instance["单位"], ["剩余跳数"] = cfg["持续秒"] / cfg["波动间隔秒"], ["周期ID"] = 0}
     data["周期ID"] = addPeriodicCallback(cfg["波动间隔秒"] * 1000, _____83AB_5C14_7279_65AF_8150_8D25_5E7C_6811_6CE2_52A8, data)
-    local ____self_7 = context["清理"]
-    ____self_7["登记周期回调"](____self_7, "莫尔特斯-腐败幼树波动", data["周期ID"])
+    local ____self_8 = context["清理"]
+    ____self_8["登记周期回调"](____self_8, "莫尔特斯-腐败幼树波动", data["周期ID"])
 end
 function _____5E7C_6811_6CE2_52A8Tick(data)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败之种"]
@@ -135,8 +135,8 @@ function _____521B_5EFA_843D_5730_79CD_5B50(context, x, y)
     end
     _____64AD_653EBoss_5750_6807_97F3_6548(_____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["腐败之种"]["扎根成长"], x, y, _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
     local id = addDelayedCallback(cfg["生长延迟秒"] * 1000, _____83AB_5C14_7279_65AF_8150_8D25_79CD_5B50_6210_957F, {context = context, seed = seed, x = x, y = y})
-    local ____self_8 = context["清理"]
-    ____self_8["登记延迟回调"](____self_8, "莫尔特斯-腐败种子成长", id)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "莫尔特斯-腐败种子成长", id)
 end
 function _____5F39_9053Tick(data)
     local now = getServerTime()
@@ -163,6 +163,8 @@ function _____5F39_9053Tick(data)
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -177,18 +179,18 @@ DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 EXSetEffectXY = japi.EXSetEffectXY
 EXSetEffectZ = japi.EXSetEffectZ
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_1.addDelayedCallback
-addPeriodicCallback = ____require_result_1.addPeriodicCallback
-removePeriodicCallback = ____require_result_1.removePeriodicCallback
-getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-_____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_2.addDelayedCallback
+addPeriodicCallback = ____require_result_2.addPeriodicCallback
+removePeriodicCallback = ____require_result_2.removePeriodicCallback
+getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+_____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_3["创建可攻击机制单位"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____8150_8D25_4E4B_79CD_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败之种"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -206,6 +208,14 @@ local function _____53D1_5C04_8150_8D25_4E4B_79CD(context, target)
     local sy = GetUnitY(boss)
     local tx = GetUnitX(target)
     local ty = GetUnitY(target)
+    _____521B_5EFA_6280_80FD_63D0_793A_5708({
+        ["类型"] = "敌方圆形",
+        X = tx,
+        Y = ty,
+        ["半径"] = cfg["波动半径"],
+        ["持续时间"] = cfg["飞行秒"] + cfg["生长延迟秒"] + cfg["波动间隔秒"],
+        ["来源单位"] = boss
+    })
     local angle = _____53D6_5750_6807_89D2_5EA6(sx, sy, tx, ty) + 90
     local distance = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"] * cfg["中点偏移比例"]
     local midX = _____6781_5750_6807X((sx + tx) / 2, angle, distance)
@@ -225,8 +235,8 @@ local function _____53D1_5C04_8150_8D25_4E4B_79CD(context, target)
         ["周期ID"] = 0
     }
     data["周期ID"] = addPeriodicCallback(cfg["弹道刷新间隔毫秒"], _____83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD_5F39_9053, data)
-    local ____self_9 = context["清理"]
-    ____self_9["登记周期回调"](____self_9, "莫尔特斯-腐败之种弹道", data["周期ID"])
+    local ____self_10 = context["清理"]
+    ____self_10["登记周期回调"](____self_10, "莫尔特斯-腐败之种弹道", data["周期ID"])
 end
 ____exports["释放莫尔特斯腐败之种"] = function(context)
     local boss = context["Boss单位"]
@@ -235,13 +245,13 @@ ____exports["释放莫尔特斯腐败之种"] = function(context)
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败之种"]
     local spellTarget = GetSpellTargetUnit()
-    local _____5355_4F4D_6709_6548_result_10
+    local _____5355_4F4D_6709_6548_result_11
     if _____5355_4F4D_6709_6548(spellTarget) then
-        _____5355_4F4D_6709_6548_result_10 = spellTarget
+        _____5355_4F4D_6709_6548_result_11 = spellTarget
     else
-        _____5355_4F4D_6709_6548_result_10 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss)
+        _____5355_4F4D_6709_6548_result_11 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss)
     end
-    local target = _____5355_4F4D_6709_6548_result_10
+    local target = _____5355_4F4D_6709_6548_result_11
     if not _____5355_4F4D_6709_6548(target) then
         return
     end

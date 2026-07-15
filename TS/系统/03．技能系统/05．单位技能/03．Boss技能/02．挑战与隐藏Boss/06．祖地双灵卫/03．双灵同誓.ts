@@ -4,12 +4,11 @@ import type { 祖地双灵卫运行时上下文 } from './01．运行时上下�
 import { 获取祖地双灵卫运行时上下文 } from './01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
+import { 创建持续单位连线 } from '../../../../00．技能模板+函数/04．机制组件/07．机制连线/01．持续单位连线';
+import { 闪电效果代码 } from '../../../../00．技能模板+函数/02．通用函数/17．闪电效果代码';
 
 const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
   registerDamageModifier: (this: void, callback: (this: void, damage: any) => number, priority?: number) => number;
-};
-const { 创建单位绑定闪电 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电') as {
-  创建单位绑定闪电: (this: void, params: any) => any;
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff系统.00．Buff系统') as {
@@ -41,6 +40,10 @@ function 关闭同誓保护(this: void, context: 祖地双灵卫运行时上下�
   context.低血保护守卫 = undefined;
   if (context.同誓保护特效 != null && context.同誓保护特效 !== 0) DestroyEffect(context.同誓保护特效);
   context.同誓保护特效 = undefined;
+  if (context.同誓暗金连线 != null) context.同誓暗金连线.停止('同誓保护关闭');
+  if (context.同誓冷蓝连线 != null) context.同誓冷蓝连线.停止('同誓保护关闭');
+  context.同誓暗金连线 = undefined;
+  context.同誓冷蓝连线 = undefined;
   if (previousLow != null && previousLow !== 0) 移除单位指定Buff(previousLow, 祖地双灵卫BuffID.双灵同誓);
 }
 
@@ -49,14 +52,35 @@ function 开启同誓保护(this: void, context: 祖地双灵卫运行时上下�
   关闭同誓保护(context);
   context.同誓保护已启用 = true;
   context.低血保护守卫 = lowName;
-  context.下次同誓连线脉冲Ms = 0;
   if (low != null && low !== 0) {
     context.同誓保护特效 = AddSpecialEffectTarget(祖地双灵卫数值与表现配置.表现资源.公共.低血守卫保护特效路径, low, 'origin');
     registerManualBuff(low, 祖地双灵卫BuffID.双灵同誓, 3600, 祖地双灵卫数值与表现配置.公共.同誓低血减伤比例 * 100, { sourceName: '祖地双灵卫-双灵同誓' });
   }
+  context.同誓暗金连线 = 创建持续单位连线({
+    清理: context.清理,
+    名称: '祖地双灵卫-同誓暗金连线',
+    起点单位: context.赤誓灵卫单位,
+    终点单位: context.苍影灵卫单位,
+    闪电代码: 闪电效果代码.黄色细束,
+    起点高度: 72,
+    终点高度: 72,
+    Tick间隔毫秒: 40,
+    颜色: { r: 0.82, g: 0.56, b: 0.18, a: 0.78 },
+  });
+  context.同誓冷蓝连线 = 创建持续单位连线({
+    清理: context.清理,
+    名称: '祖地双灵卫-同誓冷蓝连线',
+    起点单位: context.赤誓灵卫单位,
+    终点单位: context.苍影灵卫单位,
+    闪电代码: 闪电效果代码.蓝色细束,
+    起点高度: 88,
+    终点高度: 88,
+    Tick间隔毫秒: 40,
+    颜色: { r: 0.36, g: 0.72, b: 1, a: 0.74 },
+  });
 }
 
-export function 更新祖地双灵同誓(this: void, context: 祖地双灵卫运行时上下文, now: number = getServerTime()): void {
+export function 更新祖地双灵同誓(this: void, context: 祖地双灵卫运行时上下文, _now: number = getServerTime()): void {
   if (context.战斗已结束 || context.阶段 === '净化收束' || context.阶段 === '已结束') {
     关闭同誓保护(context);
     return;
@@ -71,18 +95,8 @@ export function 更新祖地双灵同誓(this: void, context: 祖地双灵卫运
   } else if (context.同誓保护已启用 && diff <= cfg.双灵同誓解除生命差) {
     关闭同誓保护(context);
   } else if (context.同誓保护已启用) {
-    context.低血保护守卫 = redRatio <= azureRatio ? '赤誓灵卫' : '苍影灵卫';
-  }
-  if (context.同誓保护已启用 && now >= context.下次同誓连线脉冲Ms) {
-    context.下次同誓连线脉冲Ms = now + 700;
-    创建单位绑定闪电({
-      效果代码: 'SPLK',
-      起点单位: context.赤誓灵卫单位,
-      终点单位: context.苍影灵卫单位,
-      持续时间: 0.8,
-      任一死亡时销毁: true,
-      颜色: { r: 0.75, g: 0.82, b: 1, a: 0.72 },
-    });
+    const nextLow = redRatio <= azureRatio ? '赤誓灵卫' : '苍影灵卫';
+    if (context.低血保护守卫 !== nextLow) 开启同誓保护(context, nextLow);
   }
 }
 

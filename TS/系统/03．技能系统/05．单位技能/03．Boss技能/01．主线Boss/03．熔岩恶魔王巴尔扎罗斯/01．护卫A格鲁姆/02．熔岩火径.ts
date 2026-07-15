@@ -103,7 +103,7 @@ function 创建火径(this: void, context: 巴尔扎罗斯运行时上下文, ce
     单位列表: function 取火径目标(this: void): any[] {
       return 获取Boss技能敌对英雄列表(context.Boss单位);
     },
-    提示圈: false,
+    提示圈: { 类型: "方向直线", 来源单位: grum },
     on周期: function 格鲁姆火径周期(this: void, unit: any): void {
       if (!单位有效(grum) || !单位有效(unit)) return;
       造成格鲁姆Boss技能伤害(grum, unit, 计算火径持续伤害(grum), "AOE");

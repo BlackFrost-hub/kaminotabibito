@@ -21,8 +21,8 @@ const { 显示常规技能吟唱条, 关闭吟唱条 } = require("系统.09．�
 const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   开始硬直: (this: void, unit: any, durationSec: number) => void;
 };
-const { 创建薄圆形提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
-  创建薄圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number) => void;
+const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
+  创建技能提示圈: (this: void, 配置: any) => any;
 };
 const { 创建点特效, 创建循环点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
@@ -78,7 +78,14 @@ function 播放入出水表现(this: void, x: number, y: number): void {
 function 播放平台预警(this: void, 区域: 米亚安全域运行时矩形): void {
   const config = 米亚技能数值配置.腐化转移;
   const 半径 = 取平台提示半径(区域);
-  创建薄圆形提示圈(区域.中心X, 区域.中心Y, 半径, config.预警秒, 1 / config.预警秒);
+  创建技能提示圈({
+    类型: "敌方圆形",
+    X: 区域.中心X,
+    Y: 区域.中心Y,
+    半径,
+    持续时间: config.预警秒,
+    动画速度: 1 / config.预警秒,
+  });
   创建点特效({
     模型路径: 米亚单位技能配置.特效.平台预警底圈,
     X: 区域.中心X,

@@ -105,7 +105,7 @@ function 创建现实断裂判定(this: void, context: 安兹运行时上下文,
     单位列表: function 取现实断裂候选(this: void): any[] {
       return 获取Boss技能敌对英雄列表(boss);
     },
-    提示圈: false,
+    提示圈: { 类型: '方向直线', 来源单位: boss },
     on进入: function 现实断裂命中(this: void, unit: any): void {
       if (!单位有效(unit) || unit === boss) return;
       造成AOE技能伤害({

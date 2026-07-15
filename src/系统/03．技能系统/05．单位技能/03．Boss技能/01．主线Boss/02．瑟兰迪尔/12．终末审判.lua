@@ -23,8 +23,8 @@ local _____5F00_59CB_786C_76F4 = ____require_result_2["开始硬直"]
 local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
 local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_3["显示大招吟唱条"]
 local _____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
-local _____521B_5EFA_767D_8272_5706_5F62_63D0_793A_5708 = ____require_result_4["创建白色圆形提示圈"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_4["创建技能提示圈"]
 local ____require_result_5 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_CooPlayReuse = ____require_result_5.Sound3DII_CooPlayReuse
 local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -182,7 +182,13 @@ local function _____521B_5EFA_7EC8_672B_5BA1_5224_65F6_95F4_8F74_4E8B_4EF6(conte
                 config["爆炸延迟秒"] + 0.5,
                 config["场地法阵缩放"]
             )
-            _____521B_5EFA_767D_8272_5706_5F62_63D0_793A_5708(_____7ED3_7B97X, _____7ED3_7B97Y, config["安全区半径"], config["爆炸延迟秒"] + 0.5)
+            _____521B_5EFA_6280_80FD_63D0_793A_5708({
+                ["类型"] = "白色安全圆",
+                X = _____7ED3_7B97X,
+                Y = _____7ED3_7B97Y,
+                ["半径"] = config["安全区半径"],
+                ["持续时间"] = config["爆炸延迟秒"] + 0.5
+            })
             local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
             do
                 local i = 0

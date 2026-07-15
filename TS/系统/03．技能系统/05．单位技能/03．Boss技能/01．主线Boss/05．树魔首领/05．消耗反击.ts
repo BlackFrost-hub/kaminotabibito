@@ -192,7 +192,7 @@ function 执行反击(this: void, state: 消耗反击状态, attacker: any, 触�
     单位列表: function 取消耗反击候选单位(this: void): any[] {
       return 获取Boss技能敌对英雄列表(boss);
     },
-    提示圈: false,
+    提示圈: { 类型: "方向直线", 来源单位: boss },
     on进入: function 树魔首领消耗反击命中(this: void, unit: any): void {
       if (!单位有效(unit)) return;
       const damage = 读取单位攻击力(boss) * cfg.反击Boss攻击力比例;

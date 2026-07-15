@@ -109,7 +109,7 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
     所有者: context.Boss单位,
     模型路径: config.残留特效路径,
     特效高度: config.残留特效高度,
-    显示提示圈: false,
+    提示圈: { 类型: "敌方圆形" },
     on周期: function 巴尔扎罗斯熔岩残留周期(this: void, units: any[]): void {
       const boss = context.Boss单位;
       if (!单位有效(boss)) return;

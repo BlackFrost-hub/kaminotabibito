@@ -62,8 +62,6 @@ function 进入灵魂崩解(this: void, context: 祖地双灵卫运行时上下�
   registerManualBuff(unit, 祖地双灵卫BuffID.灵魂崩解, 3600, 1, { sourceName: '祖地双灵卫-灵魂崩解', tickWhilePaused: true });
   const animation = name === '赤誓灵卫' ? 祖地双灵卫数值与表现配置.动作.裂誓消散 : 祖地双灵卫数值与表现配置.动作.无面施法;
   播放限时单位动画({ 单位: unit, 动画编号: animation, 持续秒: 2, 恢复动画编号: animation });
-  const effect = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.灵魂崩解特效路径, GetUnitX(unit), GetUnitY(unit));
-  if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(2.2, effect);
   if (context.崩解中的守卫 == null) {
     context.崩解中的守卫 = name;
     const allPurified = context.已净化节点数量 >= 祖地双灵卫数值与表现配置.P3.净化节点数量;
@@ -107,6 +105,8 @@ function 恢复崩解守卫(this: void, context: 祖地双灵卫运行时上下�
   PauseUnit(unit, false);
   context.联合生命周期.设置状态(name, '活跃', '同步崩解超时回灌');
   移除单位指定Buff(unit, 祖地双灵卫BuffID.灵魂崩解);
+  const reflux = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.魂力回灌特效路径, GetUnitX(unit), GetUnitY(unit));
+  if (reflux != null && reflux !== 0) YDWETimerDestroyEffectSafe(1.2, reflux);
   context.崩解中的守卫 = undefined;
   context.崩解截止时间Ms = 0;
 }

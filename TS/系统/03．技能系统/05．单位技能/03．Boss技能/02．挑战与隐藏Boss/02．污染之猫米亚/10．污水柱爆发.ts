@@ -131,7 +131,7 @@ function 创建污水柱残留水坑(this: void, context: 米亚运行时上下�
     所有者: context.Boss单位,
     模型路径: 米亚单位技能配置.特效.腐化残留云,
     特效高度: 0,
-    显示提示圈: false,
+    提示圈: { 类型: "敌方圆形" },
     on周期: function 米亚污水柱残留水坑周期(this: void, 区域内单位: any[]): void {
       for (let i = 0; i < 区域内单位.length; i++) {
         const target = 区域内单位[i];

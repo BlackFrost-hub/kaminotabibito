@@ -14,9 +14,8 @@ const {
   取单位Y: (this: void, unit: any) => number;
   在坐标播放特效: (this: void, model: string, x: number, y: number, z: number, size: number, lifeSec: number) => void;
 };
-const { 创建薄圆形提示圈特效, 立即销毁提示圈特效 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
-  创建薄圆形提示圈特效: (this: void, x: number, y: number, r: number, speed?: number, 来源单位?: any) => any;
-  立即销毁提示圈特效: (this: void, effect: any) => void;
+const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
+  创建技能提示圈: (this: void, 配置: any) => any;
 };
 const {
   注册指定单位闪避后监听,
@@ -40,7 +39,6 @@ interface 灵力意识体爆点记录 {
   来源单位: any;
   X: number;
   Y: number;
-  预警特效: any;
 }
 
 const 灵力意识体单位类型ID = 转四位ID(灵力意识体单位技能配置.单位ID);
@@ -53,9 +51,6 @@ function 播放灵力意识体爆点特效(this: void, x: number, y: number): vo
 function 处理灵力意识体延迟爆点(this: void): void {
   const record = 灵力意识体爆点队列.shift();
   if (record == null) return;
-  if (record.预警特效 != null && record.预警特效 !== 0) {
-    立即销毁提示圈特效(record.预警特效);
-  }
   播放灵力意识体爆点特效(record.X, record.Y);
   以攻击力倍率造成范围暗影伤害(
     record.来源单位,
@@ -69,8 +64,15 @@ function 处理灵力意识体延迟爆点(this: void): void {
 function 灵力意识体闪避后处理(this: void, record: any, _applied: number, _snapshot: any): void {
   const x = 取单位X(record.attacker);
   const y = 取单位Y(record.attacker);
-  const 预警特效 = 创建薄圆形提示圈特效(x, y, 灵力意识体单位技能配置.伤害半径, 1, record.target);
-  灵力意识体爆点队列.push({ 来源单位: record.target, X: x, Y: y, 预警特效 });
+  创建技能提示圈({
+    类型: "敌方圆形",
+    X: x,
+    Y: y,
+    半径: 灵力意识体单位技能配置.伤害半径,
+    持续时间: 灵力意识体单位技能配置.延迟毫秒 / 1000,
+    来源单位: record.target,
+  });
+  灵力意识体爆点队列.push({ 来源单位: record.target, X: x, Y: y });
   addDelayedCallback(灵力意识体单位技能配置.延迟毫秒, 处理灵力意识体延迟爆点);
 }
 

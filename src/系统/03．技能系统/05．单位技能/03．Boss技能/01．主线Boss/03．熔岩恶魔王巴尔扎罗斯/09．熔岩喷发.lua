@@ -71,7 +71,7 @@ function _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, x, y)
         ["所有者"] = context["Boss单位"],
         ["模型路径"] = config["残留特效路径"],
         ["特效高度"] = config["残留特效高度"],
-        ["显示提示圈"] = false,
+        ["提示圈"] = {["类型"] = "敌方圆形"},
         ["on周期"] = function(units)
             local boss = context["Boss单位"]
             if not _____5355_4F4D_6709_6548(boss) then

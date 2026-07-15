@@ -11,7 +11,7 @@ export const 亚伦柯斯Buff表: Record<string, BuffData> = {
   [亚伦柯斯BuffID.旧誓加护]: {
     buffID: 亚伦柯斯BuffID.旧誓加护,
     buffName: '旧誓加护',
-    icon: 'ReplaceableTextures\\CommandButtons\\BTNReincarnation.blp',
+    icon: 'BuffIcon\\Boss\\Aronkos\\old_oath_protection.blp',
     effect: '',
     type: 'Buff:phase:protection',
     interval: 0,
@@ -26,7 +26,7 @@ export const 亚伦柯斯Buff表: Record<string, BuffData> = {
   [亚伦柯斯BuffID.不灭军魂]: {
     buffID: 亚伦柯斯BuffID.不灭军魂,
     buffName: '不灭军魂',
-    icon: 'ReplaceableTextures\\CommandButtons\\BTNAvatar.blp',
+    icon: 'BuffIcon\\Boss\\Aronkos\\undying_military_soul.blp',
     effect: '',
     type: 'Buff:phase:empower',
     interval: 0,

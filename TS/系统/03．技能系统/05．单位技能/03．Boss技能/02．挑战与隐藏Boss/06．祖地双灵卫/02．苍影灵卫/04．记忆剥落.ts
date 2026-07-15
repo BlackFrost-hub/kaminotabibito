@@ -56,7 +56,7 @@ function 创建空白灵域(this: void, context: 祖地双灵卫运行时上下�
     X: x, Y: y, 半径: cfg.半径, 持续时间: cfg.持续秒, 检测间隔: cfg.检查间隔秒,
     影响目标: '敌方', 所有者: boss,
     模型路径: 祖地双灵卫数值与表现配置.表现资源.记忆剥落.空白灵域地面特效路径,
-    提示圈: false,
+    提示圈: { 类型: '敌方圆形', 来源单位: boss },
     on周期: function 空白灵域周期伤害(this: void, units: any[]): void {
       for (let i = 0; i < units.length; i++) {
         const hit = units[i];

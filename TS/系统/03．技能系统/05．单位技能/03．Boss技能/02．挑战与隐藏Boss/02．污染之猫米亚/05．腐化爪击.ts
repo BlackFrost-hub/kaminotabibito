@@ -72,7 +72,7 @@ function 创建腐化爪击残留区(this: void, context: 米亚运行时上下�
     所有者: context.Boss单位,
     模型路径: 米亚单位技能配置.特效.腐化残留云,
     特效高度: 0,
-    显示提示圈: false,
+    提示圈: { 类型: "敌方圆形" },
     on周期: function 米亚腐化爪击残留区周期(this: void, 区域内单位: any[]): void {
       for (let i = 0; i < 区域内单位.length; i++) {
         添加米亚腐化感染(context, 区域内单位[i], config.残留每秒腐化层数, "腐化爪击残留");

@@ -214,7 +214,7 @@ function 创建咆哮波判定(this: void, context: 巴尔扎罗斯运行时上�
     单位列表: function 取恶魔咆哮波候选单位(this: void): any[] {
       return 收集咆哮波候选单位(context);
     },
-    提示圈: false,
+    提示圈: { 类型: "方向直线", 来源单位: boss },
     on进入: function 巴尔扎罗斯恶魔咆哮波进入(this: void, unit: any): void {
       执行咆哮波命中(context, unit);
     },

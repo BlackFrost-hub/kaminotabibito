@@ -283,7 +283,7 @@ local function _____6267_884C_53CD_51FB(state, attacker, _____89E6_53D1_4F24_5BB
         ["单位列表"] = function()
             return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
         end,
-        ["提示圈"] = false,
+        ["提示圈"] = {["类型"] = "方向直线", ["来源单位"] = boss},
         ["on进入"] = function(unit)
             if not _____5355_4F4D_6709_6548(unit) then
                 return

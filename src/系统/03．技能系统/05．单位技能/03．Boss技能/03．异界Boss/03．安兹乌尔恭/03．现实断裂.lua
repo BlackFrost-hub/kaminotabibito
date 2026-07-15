@@ -99,7 +99,7 @@ local function _____521B_5EFA_73B0_5B9E_65AD_88C2_5224_5B9A(context, angle, orig
         ["单位列表"] = function()
             return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
         end,
-        ["提示圈"] = false,
+        ["提示圈"] = {["类型"] = "方向直线", ["来源单位"] = boss},
         ["on进入"] = function(unit)
             if not _____5355_4F4D_6709_6548(unit) or unit == boss then
                 return

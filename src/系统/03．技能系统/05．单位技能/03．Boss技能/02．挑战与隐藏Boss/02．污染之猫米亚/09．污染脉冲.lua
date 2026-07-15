@@ -29,9 +29,11 @@ local _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761 = ____require_result_
 local _____5173_95ED_541F_5531_6761 = ____require_result_1["关闭吟唱条"]
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
-local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_3["造成AOE技能伤害"]
-local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_3["创建独立技能伤害实例"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技能伤害"]
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_4["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -44,12 +46,19 @@ local EXSetEffectZ = japi.EXSetEffectZ
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local function _____5355_4F4D_5728_6709_6548_5B89_5168_57DF_5185(context, unit)
-    local _____533A_57DF = _____53D6_7C73_4E9A_5355_4F4D_6240_5728_5B89_5168_57DF(unit, context["安全域区域组"])
+local function _____7C73_4E9A_5B89_5168_57DF_5F53_524D_6709_6548(context, _____533A_57DF)
     if _____533A_57DF == nil then
         return false
     end
-    local id = _____533A_57DF["配置"].ID or _____533A_57DF["配置"]["名称"] or ""
+    local ____533A_57DF__914D_7F6E_ID_5 = _____533A_57DF["配置"].ID
+    if ____533A_57DF__914D_7F6E_ID_5 == nil then
+        ____533A_57DF__914D_7F6E_ID_5 = _____533A_57DF["配置"]["名称"]
+    end
+    local ____533A_57DF__914D_7F6E_ID_5_6 = ____533A_57DF__914D_7F6E_ID_5
+    if ____533A_57DF__914D_7F6E_ID_5_6 == nil then
+        ____533A_57DF__914D_7F6E_ID_5_6 = ""
+    end
+    local id = ____533A_57DF__914D_7F6E_ID_5_6
     if id ~= "" and context["腐化转移污染平台ID"] == id then
         return false
     end
@@ -57,6 +66,51 @@ local function _____5355_4F4D_5728_6709_6548_5B89_5168_57DF_5185(context, unit)
         return false
     end
     return true
+end
+local function _____5355_4F4D_5728_6709_6548_5B89_5168_57DF_5185(context, unit)
+    return _____7C73_4E9A_5B89_5168_57DF_5F53_524D_6709_6548(
+        context,
+        _____53D6_7C73_4E9A_5355_4F4D_6240_5728_5B89_5168_57DF(unit, context["安全域区域组"])
+    )
+end
+local function _____663E_793A_6C61_67D3_8109_51B2_6CE2_9884_8B66(context, waveIndex, _____6301_7EED_79D2)
+    local boss = context["Boss单位"]
+    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
+    local radius = config["波次半径"][waveIndex + 1]
+    if not _____5355_4F4D_6709_6548(boss) or radius == nil or radius <= 0 or _____6301_7EED_79D2 <= 0 then
+        return
+    end
+    _____521B_5EFA_6280_80FD_63D0_793A_5708({
+        ["类型"] = "敌方圆形",
+        X = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
+        Y = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y(),
+        ["半径"] = radius,
+        ["持续时间"] = _____6301_7EED_79D2,
+        ["来源单位"] = boss
+    })
+    local _____533A_57DF_5217_8868 = context["安全域区域组"]["区域列表"]
+    do
+        local i = 0
+        while i < #_____533A_57DF_5217_8868 do
+            do
+                local _____533A_57DF = _____533A_57DF_5217_8868[i + 1]
+                if not _____7C73_4E9A_5B89_5168_57DF_5F53_524D_6709_6548(context, _____533A_57DF) then
+                    goto __continue10
+                end
+                local width = _____533A_57DF["配置"]["右"] - _____533A_57DF["配置"]["左"]
+                local height = _____533A_57DF["配置"]["上"] - _____533A_57DF["配置"]["下"]
+                _____521B_5EFA_6280_80FD_63D0_793A_5708({
+                    ["类型"] = "白色安全圆",
+                    X = _____533A_57DF["中心X"],
+                    Y = _____533A_57DF["中心Y"],
+                    ["半径"] = (width < height and width or height) * 0.5,
+                    ["持续时间"] = _____6301_7EED_79D2
+                })
+            end
+            ::__continue10::
+            i = i + 1
+        end
+    end
 end
 local function _____521B_5EFA_671D_5411_70B9_7279_6548(model, x, y, scale, duration, yawDeg, z)
     _____521B_5EFA_70B9_7279_6548({
@@ -134,10 +188,10 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
             do
                 local target = targets[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue15
+                    goto __continue21
                 end
                 if _____5355_4F4D_5728_6709_6548_5B89_5168_57DF_5185(context, target) then
-                    goto __continue15
+                    goto __continue21
                 end
                 if _____8DDD_79BB_5E73_65B9(
                     centerX,
@@ -145,7 +199,7 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
                     GetUnitX(target),
                     GetUnitY(target)
                 ) > radius2 then
-                    goto __continue15
+                    goto __continue21
                 end
                 local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -161,7 +215,7 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
                 })
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["每波腐化层数"], "污染脉冲")
             end
-            ::__continue15::
+            ::__continue21::
             i = i + 1
         end
     end
@@ -180,6 +234,7 @@ local function _____521B_5EFA_6C61_67D3_8109_51B2_65F6_95F4_8F74_4E8B_4EF6(conte
                 end
                 _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "米亚污染脉冲", ["持续时间秒"] = config["预警秒"] + #config["波次半径"] + 2})
                 _____64AD_653E_8109_51B2_4E2D_5FC3_9884_8B66()
+                _____663E_793A_6C61_67D3_8109_51B2_6CE2_9884_8B66(context, 0, config["预警秒"])
                 _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污染脉冲", 0)
                 _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761({["总时长"] = config["预警秒"], ["颜色ID"] = 3, ["标题文本"] = "污染脉冲", ["提示文本"] = "水池污染正在扩散，请进入安全域。"})
             end
@@ -198,6 +253,15 @@ local function _____521B_5EFA_6C61_67D3_8109_51B2_65F6_95F4_8F74_4E8B_4EF6(conte
         local i = 0
         while i < #config["波次半径"] do
             local waveIndex = i
+            if waveIndex > 0 then
+                _____4E8B_4EF6_5217_8868[#_____4E8B_4EF6_5217_8868 + 1] = {
+                    ["时点毫秒"] = (config["预警秒"] + waveIndex - 1) * 1000,
+                    ["名称"] = ("污染脉冲第" .. tostring(waveIndex + 1)) .. "波预警",
+                    ["执行"] = function()
+                        _____663E_793A_6C61_67D3_8109_51B2_6CE2_9884_8B66(context, waveIndex, 1)
+                    end
+                }
+            end
             _____4E8B_4EF6_5217_8868[#_____4E8B_4EF6_5217_8868 + 1] = {
                 ["时点毫秒"] = (config["预警秒"] + waveIndex) * 1000,
                 ["名称"] = ("污染脉冲第" .. tostring(waveIndex + 1)) .. "波",
@@ -219,9 +283,9 @@ ____exports["释放米亚污染脉冲"] = function(context)
     if context["污染脉冲组合执行器"] == nil then
         context["污染脉冲组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "米亚-污染脉冲", ["清理"] = context["清理"], ["互斥组"] = "米亚场地技能"})
     end
-    local ____self_4 = context["污染脉冲组合执行器"]
-    local _____6267_884CID = ____self_4["开始"](
-        ____self_4,
+    local ____self_7 = context["污染脉冲组合执行器"]
+    local _____6267_884CID = ____self_7["开始"](
+        ____self_7,
         {
             key = "污染脉冲",
             ["单位"] = boss,

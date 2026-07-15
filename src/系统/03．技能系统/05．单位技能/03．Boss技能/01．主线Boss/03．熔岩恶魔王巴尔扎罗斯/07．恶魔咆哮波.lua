@@ -177,7 +177,7 @@ function _____521B_5EFA_5486_54EE_6CE2_5224_5B9A(context, angle)
         ["单位列表"] = function()
             return _____6536_96C6_5486_54EE_6CE2_5019_9009_5355_4F4D(context)
         end,
-        ["提示圈"] = false,
+        ["提示圈"] = {["类型"] = "方向直线", ["来源单位"] = boss},
         ["on进入"] = function(unit)
             _____6267_884C_5486_54EE_6CE2_547D_4E2D(context, unit)
         end

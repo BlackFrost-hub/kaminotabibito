@@ -78,14 +78,6 @@ local function _____8FDB_5165_7075_9B42_5D29_89E3(context, name)
     )
     local animation = name == "赤誓灵卫" and _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["动作"]["裂誓消散"] or _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["动作"]["无面施法"]
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = unit, ["动画编号"] = animation, ["持续秒"] = 2, ["恢复动画编号"] = animation})
-    local effect = AddSpecialEffect(
-        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["公共"]["灵魂崩解特效路径"],
-        GetUnitX(unit),
-        GetUnitY(unit)
-    )
-    if effect ~= nil and effect ~= 0 then
-        YDWETimerDestroyEffectSafe(2.2, effect)
-    end
     if context["崩解中的守卫"] == nil then
         context["崩解中的守卫"] = name
         local allPurified = context["已净化节点数量"] >= _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["净化节点数量"]
@@ -140,6 +132,14 @@ local function _____6062_590D_5D29_89E3_5B88_536B(context, name)
     local ____self_10 = context["联合生命周期"]
     ____self_10["设置状态"](____self_10, name, "活跃", "同步崩解超时回灌")
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, _____7956_5730_53CC_7075_536BBuffID["灵魂崩解"])
+    local reflux = AddSpecialEffect(
+        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["公共"]["魂力回灌特效路径"],
+        GetUnitX(unit),
+        GetUnitY(unit)
+    )
+    if reflux ~= nil and reflux ~= 0 then
+        YDWETimerDestroyEffectSafe(1.2, reflux)
+    end
     context["崩解中的守卫"] = nil
     context["崩解截止时间Ms"] = 0
 end

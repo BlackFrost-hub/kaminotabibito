@@ -12,8 +12,11 @@ export const 夏提雅Buff表: Record<string, BuffData> = {
   [夏提雅BuffID.鲜血枯竭]: {
     buffID: 夏提雅BuffID.鲜血枯竭,
     buffName: '鲜血枯竭',
-    icon: 'ReplaceableTextures\\CommandButtons\\BTNVampiricAura.blp',
-    effect: '',
+    icon: 'BuffIcon\\Boss\\Shalltear\\blood_exhaustion.blp',
+    effect: 'Common\\Effect\\Form\\Debuff\\ShalltearBloodExhaustionMark.mdx',
+    effectMode: 'attach',
+    effectAttachPoint: 'overhead',
+    effectScale: 0.85,
     type: 'Buff:mechanic:protection',
     interval: 0,
     maxStack: 1,
@@ -27,7 +30,7 @@ export const 夏提雅Buff表: Record<string, BuffData> = {
   [夏提雅BuffID.血之狂热]: {
     buffID: 夏提雅BuffID.血之狂热,
     buffName: '血之狂热',
-    icon: 'ReplaceableTextures\\CommandButtons\\BTNBloodLust.blp',
+    icon: 'BuffIcon\\Boss\\Shalltear\\blood_frenzy.blp',
     effect: '',
     type: 'Buff:combat:haste',
     interval: 0,
@@ -42,7 +45,7 @@ export const 夏提雅Buff表: Record<string, BuffData> = {
   [夏提雅BuffID.真祖血宴]: {
     buffID: 夏提雅BuffID.真祖血宴,
     buffName: '真祖血宴',
-    icon: 'ReplaceableTextures\\CommandButtons\\BTNVampiricAura.blp',
+    icon: 'BuffIcon\\Boss\\Shalltear\\true_ancestor_blood_feast.blp',
     effect: '',
     type: 'Buff:phase:empower',
     interval: 0,

@@ -16,6 +16,9 @@ const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
+const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
+  创建技能提示圈: (this: void, 配置: any) => any;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -67,14 +70,14 @@ function 孢子云Tick(this: void, data: 孢子云实例): void {
     return;
   }
   data.剩余跳数 = data.剩余跳数 - 1;
-  const angle = GetRandomReal(0, 360);
-  IssuePointOrder(spore, "move", 极坐标X(GetUnitX(spore), angle, cfg.移动距离), 极坐标Y(GetUnitY(spore), angle, cfg.移动距离));
+  const currentX = GetUnitX(spore);
+  const currentY = GetUnitY(spore);
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
-    const dx = GetUnitX(hero) - GetUnitX(spore);
-    const dy = GetUnitY(hero) - GetUnitY(spore);
+    const dx = GetUnitX(hero) - currentX;
+    const dy = GetUnitY(hero) - currentY;
     if (dx * dx + dy * dy > cfg.半径 * cfg.半径) continue;
     const damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.每秒目标最大生命比例;
     造成AOE技能伤害({
@@ -92,6 +95,18 @@ function 孢子云Tick(this: void, data: 孢子云实例): void {
     创建点特效({ 模型路径: cfg.命中特效路径, X: GetUnitX(hero), Y: GetUnitY(hero), 持续秒: cfg.瞬时特效持续秒 });
     应用莫尔特斯腐败值(data.context, hero, cfg.每秒腐败值);
   }
+  const angle = GetRandomReal(0, 360);
+  const destinationX = 极坐标X(currentX, angle, cfg.移动距离);
+  const destinationY = 极坐标Y(currentY, angle, cfg.移动距离);
+  IssuePointOrder(spore, "move", destinationX, destinationY);
+  创建技能提示圈({
+    类型: "敌方圆形",
+    X: destinationX,
+    Y: destinationY,
+    半径: cfg.半径,
+    持续时间: cfg.Tick间隔毫秒 / 1000,
+    来源单位: boss,
+  });
 }
 
 function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下文): void {
@@ -113,6 +128,14 @@ function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下�
     持续时间: cfg.持续秒,
   });
   if (instance == null || !单位有效(instance.单位)) return;
+  创建技能提示圈({
+    类型: "敌方圆形",
+    X: GetUnitX(instance.单位),
+    Y: GetUnitY(instance.单位),
+    半径: cfg.半径,
+    持续时间: cfg.Tick间隔毫秒 / 1000,
+    来源单位: boss,
+  });
   播放Boss坐标音效(莫尔特斯音效配置.腐败孢子云.成形, GetUnitX(instance.单位), GetUnitY(instance.单位), 莫尔特斯音效配置.默认裁断距离);
   const data: 孢子云实例 = {
     context,

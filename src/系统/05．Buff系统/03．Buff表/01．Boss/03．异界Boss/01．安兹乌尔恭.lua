@@ -4,8 +4,11 @@ ____exports["安兹乌尔恭BuffID"] = {["生命庇护"] = "BAZ1"}
 ____exports["安兹乌尔恭Buff表"] = {[____exports["安兹乌尔恭BuffID"]["生命庇护"]] = {
     buffID = ____exports["安兹乌尔恭BuffID"]["生命庇护"],
     buffName = "生命庇护",
-    icon = "ReplaceableTextures\\CommandButtons\\BTNResurrection.blp",
-    effect = "",
+    icon = "BuffIcon\\Boss\\AinzOoalGown\\life_shelter.blp",
+    effect = "Common\\Effect\\Form\\Aura\\AinzLifeShelterStatus.mdx",
+    effectMode = "attach",
+    effectAttachPoint = "overhead",
+    effectScale = 0.28,
     type = "Buff:mechanic:protection",
     interval = 0,
     maxStack = 1,
@@ -14,7 +17,7 @@ ____exports["安兹乌尔恭Buff表"] = {[____exports["安兹乌尔恭BuffID"]["
     dispelLevel = 3,
     priority = 95,
     canPurge = false,
-    tooltip = "三座生命锚点已经响应英魂誓约，本次女妖哭嚎不会造成致命伤害。"
+    tooltip = "三座生命锚全部激活后获得，免受本轮“女妖哭嚎”的致命伤害。"
 }}
 ____exports.default = ____exports["安兹乌尔恭Buff表"]
 return ____exports

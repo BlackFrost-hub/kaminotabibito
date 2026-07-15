@@ -17,7 +17,7 @@ const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index"
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 const UnitRemoveAbility = jass["UnitRemoveAbility"] as (whichUnit: any, abilityId: number) => boolean;
 const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
-  buffs: Record<string, { effect: string; effectMode?: "attach" | "point"; effectAttachPoint?: string }>;
+  buffs: Record<string, { effect: string; effectMode?: "attach" | "point"; effectAttachPoint?: string; effectScale?: number }>;
 };
 const negativeEffectImmunity = require("系统.05．Buff系统.06．负面效果免疫状态") as {
   单位是否免疫负面效果BuffID: (this: void, unit: any, buffID: string) => boolean;
@@ -26,7 +26,7 @@ const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09�
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
 const buffEffectTools = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  创建Dz绑定单位特效: (this: void, unit: any, attachPoint: string, modelPath: string, effectKey?: string) => any;
+  创建Dz绑定单位特效: (this: void, unit: any, attachPoint: string, modelPath: string, effectKey?: string, scale?: number) => any;
   销毁Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => void;
   销毁Dz绑定特效句柄: (this: void, effect: any) => void;
 };
@@ -295,7 +295,7 @@ function playManualBuffEffect(target: any, buffID: string, row: BuffRuntime, dur
     }
   } else {
     const effectKey = "manual-buff:" + buffID;
-    effect = buffEffectTools.创建Dz绑定单位特效(target, meta?.effectAttachPoint ?? "overhead", modelPath, effectKey);
+    effect = buffEffectTools.创建Dz绑定单位特效(target, meta?.effectAttachPoint ?? "overhead", modelPath, effectKey, meta?.effectScale ?? 1);
     if (effect != null && effect !== 0) {
       row.visualEffect = effect;
       row.visualEffectKey = effectKey;

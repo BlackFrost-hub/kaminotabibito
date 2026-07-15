@@ -131,7 +131,7 @@ local function _____521B_5EFA_706B_5F84(context, center, lineAngle, normalAngle)
         ["单位列表"] = function()
             return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
         end,
-        ["提示圈"] = false,
+        ["提示圈"] = {["类型"] = "方向直线", ["来源单位"] = grum},
         ["on周期"] = function(unit)
             if not _____5355_4F4D_6709_6548(grum) or not _____5355_4F4D_6709_6548(unit) then
                 return

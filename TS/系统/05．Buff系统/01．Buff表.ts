@@ -16,6 +16,7 @@ export interface BuffData {
   effect: string;
   effectMode?: 'attach' | 'point';
   effectAttachPoint?: string;
+  effectScale?: number;
   type: string;
   interval: number;
   maxStack: number;
