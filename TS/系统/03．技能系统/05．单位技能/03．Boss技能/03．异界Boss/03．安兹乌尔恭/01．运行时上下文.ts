@@ -8,9 +8,11 @@ import { 创建机制清理篮子 } from '../../../../00．技能模板+函数/0
 import { 创建单位运行时上下文工厂 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂';
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 import type { 伤害生命下限保护控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
+import { 播放安兹台词 } from './12．台词播放';
 
 const jass = require('jass.common') as any;
-const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
 
@@ -38,6 +40,8 @@ export interface 安兹运行时上下文 {
   亡灵箭削弱到Ms: number;
   天空坠落已释放: boolean;
   一切生命的终点已释放: boolean;
+  终阶段预告已播放: boolean;
+  至尊宣言已播放: boolean;
   挑战已结束: boolean;
   挑战生命下限保护?: 伤害生命下限保护控制器;
   已初始化: boolean;
@@ -53,7 +57,7 @@ function 创建安兹上下文(
   模式: 安兹挑战模式,
 ): 安兹运行时上下文 {
   const nowMs = getServerTime();
-  return {
+  const context: 安兹运行时上下文 = {
     安兹单位: boss,
     模式,
     阶段: 'P1至尊的审视',
@@ -65,10 +69,26 @@ function 创建安兹上下文(
     亡灵箭削弱到Ms: 0,
     天空坠落已释放: false,
     一切生命的终点已释放: false,
+    终阶段预告已播放: false,
+    至尊宣言已播放: false,
     挑战已结束: false,
     已初始化: true,
     清理,
   };
+  if (单位有效(boss)) {
+    播放安兹台词(boss, '登场');
+    const battleStartId = addDelayedCallback(安兹乌尔恭单位技能配置.开场台词时间.战斗开始延迟Ms, function 安兹战斗开始台词(this: void): void {
+      if (单位有效(boss) && !context.挑战已结束) 播放安兹台词(boss, '战斗开始');
+    });
+    清理.登记延迟回调('安兹-战斗开始台词', battleStartId);
+    if (模式 === '守护者介入') {
+      const guardianId = addDelayedCallback(安兹乌尔恭单位技能配置.开场台词时间.守护者命令延迟Ms, function 安兹守护者命令台词(this: void): void {
+        if (单位有效(boss) && !context.挑战已结束) 播放安兹台词(boss, '守护者命令');
+      });
+      清理.登记延迟回调('安兹-守护者命令台词', guardianId);
+    }
+  }
+  return context;
 }
 
 export function 创建安兹运行时上下文(
@@ -130,6 +150,21 @@ function 刷新安兹阶段(this: void, context: 安兹运行时上下文): void
   const maxLife = GetUnitState(context.安兹单位, UNIT_STATE_MAX_LIFE);
   if (maxLife <= 0) return;
   const ratio = GetUnitState(context.安兹单位, UNIT_STATE_LIFE) / maxLife;
+  if (!context.终阶段预告已播放 && ratio <= 安兹乌尔恭单位技能配置.阶段阈值.P3预告生命比例) {
+    const 尚未进入P3 = ratio > 安兹乌尔恭单位技能配置.阶段阈值.P3生命比例;
+    const P3大招已经结束 = context.一切生命的终点已释放 && context.当前大型技能 == null;
+    if (尚未进入P3 || P3大招已经结束) {
+      context.终阶段预告已播放 = true;
+      播放安兹台词(context.安兹单位, '进入P3');
+    }
+  }
+  if (!context.至尊宣言已播放
+    && ratio <= 安兹乌尔恭单位技能配置.阶段阈值.至尊宣言生命比例
+    && context.一切生命的终点已释放
+    && context.当前大型技能 == null) {
+    context.至尊宣言已播放 = true;
+    播放安兹台词(context.安兹单位, '至尊宣言');
+  }
   let nextStage = context.阶段;
   if (ratio <= 安兹乌尔恭单位技能配置.阶段阈值.P3生命比例) {
     nextStage = 'P3死亡是众生的终点';
@@ -139,6 +174,7 @@ function 刷新安兹阶段(this: void, context: 安兹运行时上下文): void
   if (nextStage !== context.阶段) {
     context.阶段 = nextStage;
     context.上次阶段变化Ms = getServerTime();
+    if (nextStage === 'P2死亡支配者') 播放安兹台词(context.安兹单位, '进入P2');
   }
 }
 

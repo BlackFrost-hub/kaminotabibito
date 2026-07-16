@@ -20,6 +20,8 @@ export const 祖地双灵卫单位技能配置 = {
       变异头像路径: 'Boss\\AncestralTwinSpiritGuards\\Icon\\BTNRedOathMutant.blp',
       广播持续时间Ms: 3800,
       配音裁断距离: 4000,
+      配音组: 'AncestralTwinSpiritGuards',
+      配音允许重叠: true,
       配音生成配置: {
         显示台词字段: '台词',
         配音台词字段: '配音台词',
@@ -90,6 +92,8 @@ export const 祖地双灵卫单位技能配置 = {
       变异头像路径: 'Boss\\AncestralTwinSpiritGuards\\Icon\\BTNAzureShadeMutant.blp',
       广播持续时间Ms: 4000,
       配音裁断距离: 4000,
+      配音组: 'AncestralTwinSpiritGuards',
+      配音允许重叠: true,
       配音生成配置: {
         显示台词字段: '台词',
         配音台词字段: '配音台词',

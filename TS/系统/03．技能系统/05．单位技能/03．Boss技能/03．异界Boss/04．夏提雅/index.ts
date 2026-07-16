@@ -16,3 +16,4 @@ export * from './14．技能调度';
 export * from './15．挑战入口与收束';
 export * from './16．技能入口';
 export * from './17．被动效果';
+export * from './18．台词播放';

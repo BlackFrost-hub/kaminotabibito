@@ -16,6 +16,8 @@ local _____9650_5236_6570_503C = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["限�
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位有效"]
 local ____01_FF0E_6301_7EED_5371_9669_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
 local _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____01_FF0E_6301_7EED_5371_9669_533A_57DF["创建持续危险区域"]
+local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
+local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -152,6 +154,7 @@ ____exports["释放记忆剥落"] = function(context, target)
     if available <= 0 then
         return false
     end
+    _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD(boss, "记忆剥落")
     local baseX = _____5355_4F4D_6709_6548(target) and GetUnitX(target) or context["场地中心X"]
     local baseY = _____5355_4F4D_6709_6548(target) and GetUnitY(target) or context["场地中心Y"]
     local bossFacing = _____4E24_70B9_89D2_5EA6(

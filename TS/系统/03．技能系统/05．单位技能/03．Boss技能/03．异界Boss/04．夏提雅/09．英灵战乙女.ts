@@ -3,6 +3,7 @@
 import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
+import { 播放夏提雅台词 } from './18．台词播放';
 
 const jass = require('jass.common') as any;
 
@@ -95,6 +96,7 @@ export function 获取夏提雅英灵投影(this: void, context: 夏提雅运行
 export function 启动夏提雅英灵战乙女阶段(this: void, context: 夏提雅运行时上下文, target: any): boolean {
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(target) || context.阶段 !== 'P2英灵战乙女') return false;
+  播放夏提雅台词(boss, '英灵战乙女');
   if (单位有效(context.英灵战乙女句柄)) {
     context.英灵战乙女已登场 = true;
     return true;

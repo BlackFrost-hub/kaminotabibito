@@ -3,6 +3,7 @@
 import type { 祖地双灵卫运行时上下文 } from './01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 推进祖地双灵卫下一个净化节点 } from './07．双钥净化';
+import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 单位是否在胶囊区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/胶囊区域';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
@@ -47,6 +48,8 @@ export function 释放祖地双灵卫封门误判(this: void, context: 祖地双
   const red = context.赤誓灵卫单位;
   const azure = context.苍影灵卫单位;
   context.封门误判待触发 = false;
+  if (context.已净化节点数量 % 2 === 1) 播放赤誓灵卫台词(red, '封门误判');
+  else 播放苍影灵卫台词(azure, '封门误判');
   context.大型技能占用者 = '联合机制';
   context.大型机制忙碌到Ms = getServerTime() + (cfg.封门误判预警秒 + 0.8) * 1000;
   创建技能提示圈({ 类型: '敌方圆形', X: context.场地中心X, Y: context.场地中心Y, 半径: context.场地半宽 > context.场地半高 ? context.场地半宽 : context.场地半高, 持续时间: cfg.封门误判预警秒, 来源单位: azure });

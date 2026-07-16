@@ -59,7 +59,7 @@ export function 启动夏提雅挑战收束(this: void, context: 夏提雅运行
   const effect = AddSpecialEffect(cfg.表现资源.挑战结束离场特效路径, GetUnitX(boss), GetUnitY(boss));
   if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(cfg.挑战收束.离场特效持续秒, effect);
   播放限时单位动画({ 单位: boss, 动画编号: cfg.挑战收束.离场动画编号, 持续秒: cfg.挑战收束.离场延迟秒, 恢复动画编号: 0 });
-  if (是否再次战败) 广播单位提示(boss, 夏提雅单位技能配置.广播台词.再次战败, 3600);
+  if (是否再次战败) 广播单位提示(boss, 夏提雅单位技能配置.台词.再次战败[0], 3600);
 
   const delayedId = addDelayedCallback(cfg.挑战收束.离场延迟秒 * 1000, function 夏提雅挑战离场(this: void): void {
     ShowUnit(boss, false);

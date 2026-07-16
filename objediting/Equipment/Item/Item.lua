@@ -346,8 +346,8 @@ createEquipmentItem('I0FS', '安魂守墓灯', {
   classification = 'PowerUp',
   level = 6,
   score = 10100,
-  tooltipExtended = '|cffccffff[饰品/辅助]-治疗/延迟保护|r|n|cffffcc99等级：B++|n评分：10100|r|n|cffffffcc[基础属性]|r|n冷却缩减+14%|n技能治疗率+25%|n魔法恢复+32|n生命值+2200|n控制抗性+22%|n|cffffffcc[装备效果规划]|r|n安魂余光：治疗或施加护盾后，为低生命友方留下安魂状态；未再受伤则恢复，受伤则获得减伤。装备技能后续接入。|n|cFF808080灯里的魂火不为墓地照路，只替仍在战斗的人保留片刻安宁。|r',
-  description = '|cffccffff[饰品/辅助]-治疗/延迟保护|r|n|cffffcc99等级：B++|n评分：10100|r|n|cffffffcc[基础属性]|r|n冷却缩减+14%|n技能治疗率+25%|n魔法恢复+32|n生命值+2200|n控制抗性+22%|n|cffffffcc[装备效果规划]|r|n安魂余光：治疗或施加护盾后，为低生命友方留下安魂状态；未再受伤则恢复，受伤则获得减伤。装备技能后续接入。|n|cFF808080灯里的魂火不为墓地照路，只替仍在战斗的人保留片刻安宁。|r',
+  tooltipExtended = '|cffccffff[饰品/辅助]-治疗/延迟保护|r|n|cffffcc99等级：B++|n评分：10100|r|n|cffffffcc[基础属性]|r|n冷却缩减+14%|n技能治疗率+25%|n魔法恢复+32|n生命值+2200|n控制抗性+22%|n|cffffffcc[装备效果]|r|n安魂余光：治疗或施加护盾后，为低生命友方留下安魂状态；未再受伤则恢复，受伤则获得减伤。|n|cFF808080灯里的魂火不为墓地照路，只替仍在战斗的人保留片刻安宁。|r',
+  description = '|cffccffff[饰品/辅助]-治疗/延迟保护|r|n|cffffcc99等级：B++|n评分：10100|r|n|cffffffcc[基础属性]|r|n冷却缩减+14%|n技能治疗率+25%|n魔法恢复+32|n生命值+2200|n控制抗性+22%|n|cffffffcc[装备效果]|r|n安魂余光：治疗或施加护盾后，为低生命友方留下安魂状态；未再受伤则恢复，受伤则获得减伤。|n|cFF808080灯里的魂火不为墓地照路，只替仍在战斗的人保留片刻安宁。|r',
 })
 
 createEquipmentItem('I0FY', '双钥归一棱镜', {
@@ -358,8 +358,8 @@ createEquipmentItem('I0FY', '双钥归一棱镜', {
   classification = 'PowerUp',
   level = 6,
   score = 6950,
-  tooltipExtended = '|cffccffff[饰品/全能]-普攻/技能混合|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n全属性+28|n攻击力+90|n技能伤害+16%|n冷却缩减+8%|n|cffffffcc[装备效果规划]|r|n双钥共鸣：普攻与技能伤害分别生成武魂钥和灵识钥，两钥同时存在时触发额外伤害与护盾。装备技能后续接入。|n|cFF808080暗金与冷蓝两道灵印在棱镜中心归一，缺少任何一侧都无法点亮。|r',
-  description = '|cffccffff[饰品/全能]-普攻/技能混合|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n全属性+28|n攻击力+90|n技能伤害+16%|n冷却缩减+8%|n|cffffffcc[装备效果规划]|r|n双钥共鸣：普攻与技能伤害分别生成武魂钥和灵识钥，两钥同时存在时触发额外伤害与护盾。装备技能后续接入。|n|cFF808080暗金与冷蓝两道灵印在棱镜中心归一，缺少任何一侧都无法点亮。|r',
+  tooltipExtended = '|cffccffff[饰品/全能]-普攻/技能混合|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n全属性+28|n攻击力+90|n技能伤害+16%|n冷却缩减+8%|n|cffffffcc[装备效果]|r|n双钥共鸣：普攻与技能伤害分别生成武魂钥和灵识钥，两钥同时存在时触发额外伤害与护盾。|n|cFF808080暗金与冷蓝两道灵印在棱镜中心归一，缺少任何一侧都无法点亮。|r',
+  description = '|cffccffff[饰品/全能]-普攻/技能混合|r|n|cffffcc99等级：B|n评分：6950|r|n|cffffffcc[基础属性]|r|n全属性+28|n攻击力+90|n技能伤害+16%|n冷却缩减+8%|n|cffffffcc[装备效果]|r|n双钥共鸣：普攻与技能伤害分别生成武魂钥和灵识钥，两钥同时存在时触发额外伤害与护盾。|n|cFF808080暗金与冷蓝两道灵印在棱镜中心归一，缺少任何一侧都无法点亮。|r',
 })
 
 createEquipmentItem('I0FZ', '月白归静圣铃', {
@@ -370,8 +370,8 @@ createEquipmentItem('I0FZ', '月白归静圣铃', {
   classification = 'PowerUp',
   level = 6,
   score = 6900,
-  tooltipExtended = '|cffccffff[饰品/辅助]-保护/控制缓冲|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+22%|n魔法消耗减少+10%|n生命值+1500|n控制抗性+18%|n|cffffffcc[装备效果规划]|r|n净誓余辉：治疗或施加护盾给低生命友方时，使目标短时间获得减伤与控制抗性。装备技能后续接入。|n|cFF808080铃声落下时，躁动的灵识会像月光下的水面一样重新归静。|r',
-  description = '|cffccffff[饰品/辅助]-保护/控制缓冲|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+22%|n魔法消耗减少+10%|n生命值+1500|n控制抗性+18%|n|cffffffcc[装备效果规划]|r|n净誓余辉：治疗或施加护盾给低生命友方时，使目标短时间获得减伤与控制抗性。装备技能后续接入。|n|cFF808080铃声落下时，躁动的灵识会像月光下的水面一样重新归静。|r',
+  tooltipExtended = '|cffccffff[饰品/辅助]-保护/控制缓冲|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+22%|n魔法消耗减少+10%|n生命值+1500|n控制抗性+18%|n|cffffffcc[装备效果]|r|n净誓余辉：治疗或施加护盾给低生命友方时，使目标短时间获得减伤与控制抗性。|n|cFF808080铃声落下时，躁动的灵识会像月光下的水面一样重新归静。|r',
+  description = '|cffccffff[饰品/辅助]-保护/控制缓冲|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n冷却缩减+12%|n技能治疗率+22%|n魔法消耗减少+10%|n生命值+1500|n控制抗性+18%|n|cffffffcc[装备效果]|r|n净誓余辉：治疗或施加护盾给低生命友方时，使目标短时间获得减伤与控制抗性。|n|cFF808080铃声落下时，躁动的灵识会像月光下的水面一样重新归静。|r',
 })
 
 createEquipmentItem('I0G1', '光辉翠绿宝石', {
@@ -382,6 +382,6 @@ createEquipmentItem('I0G1', '光辉翠绿宝石', {
   classification = 'PowerUp',
   level = 6,
   score = 11500,
-  tooltipExtended = '|cffccffff[饰品/宝石]-通用生存|r|n|cffffcc99等级：A|n评分：11500|r|n|cffffffcc[基础属性]|r|n生命值+4500|n护甲+55|n魔法抗性+25%|n全属性+40|n|cffffffcc[装备效果规划]|r|n光辉翠绿体：周期性获得宝石防护，完全抵挡下一次达到门槛的直接物理伤害后破碎。装备技能后续接入。|n|cFF808080翠绿薄壳并不拒绝所有伤害，只等待真正值得它碎裂的一击。|r',
-  description = '|cffccffff[饰品/宝石]-通用生存|r|n|cffffcc99等级：A|n评分：11500|r|n|cffffffcc[基础属性]|r|n生命值+4500|n护甲+55|n魔法抗性+25%|n全属性+40|n|cffffffcc[装备效果规划]|r|n光辉翠绿体：周期性获得宝石防护，完全抵挡下一次达到门槛的直接物理伤害后破碎。装备技能后续接入。|n|cFF808080翠绿薄壳并不拒绝所有伤害，只等待真正值得它碎裂的一击。|r',
+  tooltipExtended = '|cffccffff[饰品/宝石]-通用生存|r|n|cffffcc99等级：A|n评分：11500|r|n|cffffffcc[基础属性]|r|n生命值+4500|n护甲+55|n魔法抗性+25%|n全属性+40|n|cffffffcc[装备效果]|r|n光辉翠绿体：周期性获得宝石防护，完全抵挡下一次达到门槛的直接物理伤害后破碎。|n|cFF808080翠绿薄壳并不拒绝所有伤害，只等待真正值得它碎裂的一击。|r',
+  description = '|cffccffff[饰品/宝石]-通用生存|r|n|cffffcc99等级：A|n评分：11500|r|n|cffffffcc[基础属性]|r|n生命值+4500|n护甲+55|n魔法抗性+25%|n全属性+40|n|cffffffcc[装备效果]|r|n光辉翠绿体：周期性获得宝石防护，完全抵挡下一次达到门槛的直接物理伤害后破碎。|n|cFF808080翠绿薄壳并不拒绝所有伤害，只等待真正值得它碎裂的一击。|r',
 })

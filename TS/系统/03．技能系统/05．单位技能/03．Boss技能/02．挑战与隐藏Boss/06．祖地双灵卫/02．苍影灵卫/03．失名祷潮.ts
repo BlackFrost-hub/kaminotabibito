@@ -8,6 +8,7 @@ import { 计算组合技能伤害 } from '../../../../../00．技能模板+函�
 import { 两点角度, 极坐标X, 极坐标Y, 点到线段距离平方, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 单位是否在条形区域 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/矩形区域';
 import { createTimedEffect, 设置特效XYZ轴旋转 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
+import { 播放苍影灵卫台词 } from '../12．台词播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能敌对英雄列表: (this: void, boss: any) => any[] };
@@ -77,6 +78,12 @@ export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时
   const targets = 取祷潮目标列表(boss, target);
   if (targets.length === 0) return false;
   const cfg = 祖地双灵卫数值与表现配置.P2.失名祷潮;
+  const nodeIndex = context.当前净化节点序号 - 1;
+  const isCalibratingNode = context.阶段 === 'P3双蚀共鸣'
+    && nodeIndex >= 0
+    && nodeIndex < context.净化节点列表.length
+    && context.净化节点列表[nodeIndex].阶段 === '校准';
+  播放苍影灵卫台词(boss, isCalibratingNode ? '双钥净化校准' : '失名祷潮');
   const primary = targets[0];
   const startX = GetUnitX(boss);
   const startY = GetUnitY(boss);

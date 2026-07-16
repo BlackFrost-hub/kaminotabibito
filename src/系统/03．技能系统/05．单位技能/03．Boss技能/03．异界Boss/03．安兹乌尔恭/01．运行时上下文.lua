@@ -12,8 +12,11 @@ local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("�
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
 local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
 local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
+local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．台词播放")
+local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
 local getServerTime = ____require_result_0.getServerTime
 local IsUnitType = jass.IsUnitType
 local GetUnitState = jass.GetUnitState
@@ -23,7 +26,7 @@ local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____5B89_5179_8FD0_884C_65F6_5DF2_6CE8_518C = false
 local function _____521B_5EFA_5B89_5179_4E0A_4E0B_6587(boss, _____6E05_7406, _____6A21_5F0F)
     local nowMs = getServerTime()
-    return {
+    local context = {
         ["安兹单位"] = boss,
         ["模式"] = _____6A21_5F0F,
         ["阶段"] = "P1至尊的审视",
@@ -35,10 +38,36 @@ local function _____521B_5EFA_5B89_5179_4E0A_4E0B_6587(boss, _____6E05_7406, ___
         ["亡灵箭削弱到Ms"] = 0,
         ["天空坠落已释放"] = false,
         ["一切生命的终点已释放"] = false,
+        ["终阶段预告已播放"] = false,
+        ["至尊宣言已播放"] = false,
         ["挑战已结束"] = false,
         ["已初始化"] = true,
         ["清理"] = _____6E05_7406
     }
+    if _____5355_4F4D_6709_6548(boss) then
+        _____64AD_653E_5B89_5179_53F0_8BCD(boss, "登场")
+        local battleStartId = addDelayedCallback(
+            _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["开场台词时间"]["战斗开始延迟Ms"],
+            function()
+                if _____5355_4F4D_6709_6548(boss) and not context["挑战已结束"] then
+                    _____64AD_653E_5B89_5179_53F0_8BCD(boss, "战斗开始")
+                end
+            end
+        )
+        _____6E05_7406["登记延迟回调"](_____6E05_7406, "安兹-战斗开始台词", battleStartId)
+        if _____6A21_5F0F == "守护者介入" then
+            local guardianId = addDelayedCallback(
+                _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["开场台词时间"]["守护者命令延迟Ms"],
+                function()
+                    if _____5355_4F4D_6709_6548(boss) and not context["挑战已结束"] then
+                        _____64AD_653E_5B89_5179_53F0_8BCD(boss, "守护者命令")
+                    end
+                end
+            )
+            _____6E05_7406["登记延迟回调"](_____6E05_7406, "安兹-守护者命令台词", guardianId)
+        end
+    end
+    return context
 end
 ____exports["创建安兹运行时上下文"] = function(_____6A21_5F0F, boss)
     return _____521B_5EFA_5B89_5179_4E0A_4E0B_6587(
@@ -101,6 +130,18 @@ local function _____5237_65B0_5B89_5179_9636_6BB5(context)
         return
     end
     local ratio = GetUnitState(context["安兹单位"], UNIT_STATE_LIFE) / maxLife
+    if not context["终阶段预告已播放"] and ratio <= _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3预告生命比例"] then
+        local _____5C1A_672A_8FDB_5165P3 = ratio > _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3生命比例"]
+        local ____P3_5927_62DB_5DF2_7ECF_7ED3_675F = context["一切生命的终点已释放"] and context["当前大型技能"] == nil
+        if _____5C1A_672A_8FDB_5165P3 or ____P3_5927_62DB_5DF2_7ECF_7ED3_675F then
+            context["终阶段预告已播放"] = true
+            _____64AD_653E_5B89_5179_53F0_8BCD(context["安兹单位"], "进入P3")
+        end
+    end
+    if not context["至尊宣言已播放"] and ratio <= _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["至尊宣言生命比例"] and context["一切生命的终点已释放"] and context["当前大型技能"] == nil then
+        context["至尊宣言已播放"] = true
+        _____64AD_653E_5B89_5179_53F0_8BCD(context["安兹单位"], "至尊宣言")
+    end
     local nextStage = context["阶段"]
     if ratio <= _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3生命比例"] then
         nextStage = "P3死亡是众生的终点"
@@ -110,6 +151,9 @@ local function _____5237_65B0_5B89_5179_9636_6BB5(context)
     if nextStage ~= context["阶段"] then
         context["阶段"] = nextStage
         context["上次阶段变化Ms"] = getServerTime()
+        if nextStage == "P2死亡支配者" then
+            _____64AD_653E_5B89_5179_53F0_8BCD(context["安兹单位"], "进入P2")
+        end
     end
 end
 local function _____63A8_8FDB_5B89_5179_8FD0_884C_65F6(context)

@@ -11,8 +11,10 @@ import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
 import type { 伤害生命下限保护控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 import type { 固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
+import { 播放夏提雅台词 } from './18．台词播放';
 
-const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
 const jass = require('jass.common') as any;
@@ -120,6 +122,13 @@ function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 夏
       };
     },
   });
+  if (单位有效(boss)) {
+    播放夏提雅台词(boss, '登场');
+    const battleStartId = addDelayedCallback(夏提雅单位技能配置.开场台词时间.战斗开始延迟Ms, function 夏提雅战斗开始台词(this: void): void {
+      if (单位有效(boss) && !context.挑战已结束) 播放夏提雅台词(boss, '战斗开始');
+    });
+    清理.登记延迟回调('夏提雅-战斗开始台词', battleStartId);
+  }
   return context;
 }
 
@@ -185,6 +194,7 @@ function 刷新阶段(this: void, context: 夏提雅运行时上下文): void {
   context.上次阶段变化Ms = getServerTime();
   context.当前大型技能 = undefined;
   重置夏提雅猎血连击(context);
+  if (next === 'P2英灵战乙女') 播放夏提雅台词(context.Boss单位, '进入P2');
 }
 
 function 推进夏提雅运行时(this: void, context: 夏提雅运行时上下文, now: number): void {

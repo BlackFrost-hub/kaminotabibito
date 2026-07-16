@@ -46,6 +46,7 @@ export function 启用亚伦柯斯不灭军魂(this: void, context: 亚伦柯斯
     if (aura != null && aura !== 0) DestroyEffect(aura);
     if (单位有效(boss)) 移除单位指定Buff(boss, 亚伦柯斯BuffID.不灭军魂);
   });
+  播放亚伦柯斯台词(boss, '不灭军魂');
   return true;
 }
 

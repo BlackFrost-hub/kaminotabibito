@@ -4,3 +4,4 @@ export * from "./02．主动陷阱模板";
 export * from "./03．最终伤害触发模板";
 export * from "./04．持有战斗周期模板";
 export * from "./05．命中派生触发模板";
+export * from "./06．不同技能伤害序列触发模板";

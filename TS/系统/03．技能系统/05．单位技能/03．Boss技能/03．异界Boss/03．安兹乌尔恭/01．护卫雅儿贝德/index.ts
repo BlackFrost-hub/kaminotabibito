@@ -8,6 +8,7 @@ export * from './06．生命锚点封锁';
 export * from './07．技能驱动';
 export * from './08．守护回归';
 export * from './09．护卫反击';
+export * from './10．台词播放';
 
 import { 至尊拦截技能状态 } from './01．至尊拦截';
 import { 黑翼横扫技能状态 } from './02．黑翼横扫';

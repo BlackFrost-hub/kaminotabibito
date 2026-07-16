@@ -6,6 +6,8 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
 local ____09_FF0E_975E_4F24_5BB3_751F_547D_79FB_9664 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除")
 local _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664 = ____09_FF0E_975E_4F24_5BB3_751F_547D_79FB_9664["执行非伤害生命移除"]
+local ____10_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.10．台词播放")
+local _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD = ____10_FF0E_53F0_8BCD_64AD_653E["播放雅儿贝德台词"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
 local _____5F00_59CB_62A4_76FE = ____require_result_0["开始护盾"]
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
@@ -30,6 +32,7 @@ ____exports["启动雅儿贝德至尊共护"] = function(context, largeSkillSeco
     if state == nil or not _____5355_4F4D_6709_6548(albedo) or not _____5355_4F4D_6709_6548(boss) or state["阶段状态"] == "失衡" then
         return false
     end
+    _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD(albedo, "至尊共护")
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local guardState = state
     local total = GetUnitState(albedo, UNIT_STATE_LIFE) * cfg["守护者模式"]["至尊共护护盾当前生命比例"]

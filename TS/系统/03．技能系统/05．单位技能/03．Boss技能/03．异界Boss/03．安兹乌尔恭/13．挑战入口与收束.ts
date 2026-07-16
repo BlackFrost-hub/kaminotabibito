@@ -6,6 +6,7 @@ import { 清理安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
+import { 播放安兹台词 } from './12．台词播放';
 const { 主动结束Boss战运行 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动') as {
   主动结束Boss战运行: (this: void, boss: any, options?: any) => boolean;
 };
@@ -14,9 +15,6 @@ const { 清理Boss自动技能启动上下文 } = require('系统.03．技能系
 };
 const { addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-};
-const { 广播单位提示 } = require('系统.09．表现系统.06．广播提示消息.index') as {
-  广播单位提示: (this: void, source: any, text: string, durationMs: number) => void;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -60,7 +58,7 @@ export function 启动安兹挑战收束(this: void, context: 安兹运行时上
   播放限时单位动画({ 单位: boss, 动画编号: cfg.守护者模式.挑战收束安兹姿势动画编号, 持续秒: cfg.守护者模式.挑战收束离场延迟秒, 恢复动画编号: 0 });
   if (单位有效(albedo)) 播放限时单位动画({ 单位: albedo, 动画编号: cfg.守护者模式.挑战收束雅儿贝德姿势动画编号, 持续秒: cfg.守护者模式.挑战收束离场延迟秒, 恢复动画编号: 1 });
   播放挑战结束门扉(GetUnitX(boss), GetUnitY(boss));
-  广播单位提示(boss, '|cffffff99试炼到此为止。雅儿贝德，收起武器。|r', 3600);
+  播放安兹台词(boss, '挑战结束');
   const delayedId = addDelayedCallback(cfg.守护者模式.挑战收束离场延迟秒 * 1000, function 安兹挑战离场(this: void): void {
     context.雅儿贝德?.成员生命周期?.设置状态('雅儿贝德', '离场', '服从至尊命令');
     context.雅儿贝德?.成员生命周期?.设置状态('安兹', '离场', '试炼结束');

@@ -10,6 +10,7 @@ local _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C = ____19_FF0E_4E34_65F6_5C5E_
 local ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_88C5_5907_6280_80FD_4F24_5BB3 = ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF["造成装备技能伤害"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getUnitsInRange = ____require_result_0.getUnitsInRange
 local getEnemyUnitsInRange = ____require_result_0.getEnemyUnitsInRange
@@ -34,6 +35,7 @@ local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
+local EXSetEffectSize = japi.EXSetEffectSize
 ____exports["扣除当前生命比例"] = function(unit, ratio)
     if not _____5355_4F4D_5B58_6D3B(unit) or not (ratio > 0) then
         return
@@ -92,14 +94,20 @@ ____exports["恢复生命魔法"] = function(source, target, hp, mp, _____9ED8_8
         ManaShowText = mp > 0
     })
 end
-____exports["播放点特效"] = function(model, x, y, _____6301_7EED_79D2)
+____exports["播放点特效"] = function(model, x, y, _____6301_7EED_79D2, _____7F29_653E)
     if _____6301_7EED_79D2 == nil then
         _____6301_7EED_79D2 = 1
+    end
+    if _____7F29_653E == nil then
+        _____7F29_653E = 1
     end
     if model == "" then
         return
     end
     local effect = AddSpecialEffect(model, x, y)
+    if effect ~= nil and effect ~= 0 and _____7F29_653E ~= 1 then
+        EXSetEffectSize(effect, _____7F29_653E)
+    end
     addDelayedCallback(
         _____6301_7EED_79D2 * 1000,
         function()
@@ -109,17 +117,23 @@ ____exports["播放点特效"] = function(model, x, y, _____6301_7EED_79D2)
         end
     )
 end
-____exports["播放单位特效"] = function(model, unit, attach, _____6301_7EED_79D2)
+____exports["播放单位特效"] = function(model, unit, attach, _____6301_7EED_79D2, _____7F29_653E)
     if attach == nil then
         attach = "origin"
     end
     if _____6301_7EED_79D2 == nil then
         _____6301_7EED_79D2 = 1
     end
+    if _____7F29_653E == nil then
+        _____7F29_653E = 1
+    end
     if unit == nil or unit == 0 or model == "" then
         return
     end
     local effect = AddSpecialEffectTarget(model, unit, attach)
+    if effect ~= nil and effect ~= 0 and _____7F29_653E ~= 1 then
+        EXSetEffectSize(effect, _____7F29_653E)
+    end
     addDelayedCallback(
         _____6301_7EED_79D2 * 1000,
         function()
@@ -162,6 +176,12 @@ ____exports["取范围敌人"] = function(source, target, radius)
         GetUnitY(target),
         radius
     )
+end
+____exports["取坐标范围敌人"] = function(source, x, y, radius)
+    if not _____5355_4F4D_5B58_6D3B(source) or not (radius > 0) then
+        return {}
+    end
+    return getEnemyUnitsInRange(source, x, y, radius)
 end
 ____exports["开始通用护盾"] = function(source, target, amount, duration, tag)
     if not _____5355_4F4D_5B58_6D3B(target) or not (amount > 0) then

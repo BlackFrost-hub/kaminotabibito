@@ -10,6 +10,7 @@ import { 单位是否在扇形区域 } from '../../../../00．技能模板+函�
 import { 单位是否在胶囊区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/胶囊区域';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂';
+import { 播放夏提雅台词 } from './18．台词播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能敌对英雄列表: (this: void, boss: any) => any[] };
@@ -43,6 +44,7 @@ function 造成轮舞伤害(this: void, source: any, target: any, attackRatio: n
 export function 释放夏提雅血月轮舞(this: void, context: 夏提雅运行时上下文, target: any): boolean {
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(target) || context.挑战已结束 || context.当前大型技能 != null) return false;
+  播放夏提雅台词(boss, '血月轮舞');
   const cfg = 夏提雅数值与表现配置.血月轮舞;
   const secondDelay = context.阶段 === 'P3真祖血宴' ? cfg.第二段延迟秒 * cfg.P3第二段延迟倍率 : cfg.第二段延迟秒;
   const x = GetUnitX(boss);

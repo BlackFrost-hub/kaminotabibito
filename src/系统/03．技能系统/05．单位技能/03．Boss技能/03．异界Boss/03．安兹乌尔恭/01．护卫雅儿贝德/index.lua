@@ -98,6 +98,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.10．台词播放")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 ____exports["雅儿贝德技能状态"] = {["已注册"] = true, ["技能"] = {
     _____81F3_5C0A_62E6_622A_6280_80FD_72B6_6001,
     _____9ED1_7FFC_6A2A_626B_6280_80FD_72B6_6001,

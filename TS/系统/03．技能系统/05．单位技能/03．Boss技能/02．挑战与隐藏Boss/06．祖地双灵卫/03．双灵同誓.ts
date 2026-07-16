@@ -5,6 +5,7 @@ import { 获取祖地双灵卫运行时上下文 } from './01．运行时上下�
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 import { 创建持续单位连线 } from '../../../../00．技能模板+函数/04．机制组件/07．机制连线/01．持续单位连线';
+import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 import { 闪电效果代码 } from '../../../../00．技能模板+函数/02．通用函数/17．闪电效果代码';
 
 const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
@@ -50,6 +51,8 @@ function 关闭同誓保护(this: void, context: 祖地双灵卫运行时上下�
 function 开启同誓保护(this: void, context: 祖地双灵卫运行时上下文, lowName: '赤誓灵卫' | '苍影灵卫'): void {
   const low = lowName === '赤誓灵卫' ? context.赤誓灵卫单位 : context.苍影灵卫单位;
   关闭同誓保护(context);
+  if (lowName === '赤誓灵卫') 播放苍影灵卫台词(context.苍影灵卫单位, '双灵同誓');
+  else 播放赤誓灵卫台词(context.赤誓灵卫单位, '双灵同誓');
   context.同誓保护已启用 = true;
   context.低血保护守卫 = lowName;
   if (low != null && low !== 0) {

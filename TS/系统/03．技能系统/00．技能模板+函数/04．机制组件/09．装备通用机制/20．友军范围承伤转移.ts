@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
+
 const { registerDamageModifier, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
   unregisterDamageModifier: (this: void, id: number) => boolean;
@@ -23,6 +25,7 @@ export interface 友军范围承伤转移事件 {
 
 export interface 友军范围承伤转移参数 {
   名称?: string;
+  清理?: 机制清理篮子;
   转移比例: number;
   转移半径: number;
   优先级?: number;
@@ -43,6 +46,7 @@ class 友军范围承伤转移实现 implements 友军范围承伤转移控制�
   private readonly 配置: 友军范围承伤转移参数;
   private readonly 修正ID: number;
   private 已停止 = false;
+  private 正在转移 = false;
 
   constructor(配置: 友军范围承伤转移参数) {
     this.名称 = 配置.名称 ?? "友军范围承伤转移";
@@ -51,6 +55,11 @@ class 友军范围承伤转移实现 implements 友军范围承伤转移控制�
     this.修正ID = registerDamageModifier(function 友军范围承伤转移回调(this: void, context: any): number {
       return self.修正(context);
     }, 配置.优先级 ?? 35);
+    if (配置.清理 != null) {
+      配置.清理.登记清理(this.名称 + "-承伤转移", function 友军范围承伤转移清理(this: void): void {
+        self.停止();
+      });
+    }
   }
 
   停止(): void {
@@ -61,7 +70,7 @@ class 友军范围承伤转移实现 implements 友军范围承伤转移控制�
 
   private 修正(context: any): number {
     const current = context.currentDamage;
-    if (this.已停止 || !(current > 0)) return current;
+    if (this.已停止 || this.正在转移 || !(current > 0)) return current;
     if ((this.配置.排除真实伤害 ?? true) && context.isTrueDamage === true) return current;
 
     const target = context.target;
@@ -78,6 +87,7 @@ class 友军范围承伤转移实现 implements 友军范围承伤转移控制�
     const transfer = current * this.配置.转移比例;
     if (!(transfer > 0)) return current;
 
+    this.正在转移 = true;
     this.配置.on转移({
       受击者: target,
       攻击者: attacker,
@@ -87,6 +97,7 @@ class 友军范围承伤转移实现 implements 友军范围承伤转移控制�
       上下文: context,
       配置: this.配置,
     });
+    this.正在转移 = false;
     return current - transfer;
   }
 

@@ -5,6 +5,7 @@ import type { 祖地双灵卫运行时上下文 } from './01．运行时上下�
 import { 祖地双灵卫单位技能配置 } from './00．配置';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
@@ -52,11 +53,15 @@ function 进入P2(this: void, context: 祖地双灵卫运行时上下文, first:
   context.大型机制忙碌到Ms = now + 1800;
   context.大型技能占用者 = first;
   变异守卫(context, first);
+  if (first === '赤誓灵卫') 播放赤誓灵卫台词(context.赤誓灵卫单位, '首次变异');
+  else 播放苍影灵卫台词(context.苍影灵卫单位, '首次变异');
 }
 
 function 进入P3(this: void, context: 祖地双灵卫运行时上下文, now: number): void {
   const second: 祖地双灵卫名称 = context.首次变异守卫 === '赤誓灵卫' ? '苍影灵卫' : '赤誓灵卫';
   变异守卫(context, second);
+  if (second === '赤誓灵卫') 播放赤誓灵卫台词(context.赤誓灵卫单位, 'P3双蚀共鸣');
+  else 播放苍影灵卫台词(context.苍影灵卫单位, 'P3双蚀共鸣');
   context.阶段 = 'P3双蚀共鸣';
   context.大型技能占用者 = '联合机制';
   context.大型机制忙碌到Ms = now + 2200;

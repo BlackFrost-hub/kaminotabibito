@@ -6,6 +6,7 @@ import { 施加临时属性效果 } from "./19．临时属性效果";
 import { 造成装备技能伤害, type 装备技能伤害类型, type 技能伤害形态 } from "../../../../04．伤害系统/08．技能伤害系统";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const { getUnitsInRange, getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
@@ -36,6 +37,7 @@ const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolea
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
 export function 扣除当前生命比例(this: void, unit: any, ratio: number): void {
   if (!单位存活(unit) || !(ratio > 0)) return;
@@ -90,17 +92,19 @@ export function 恢复生命魔法(this: void, source: any, target: any, hp: num
   });
 }
 
-export function 播放点特效(this: void, model: string, x: number, y: number, 持续秒: number = 1): void {
+export function 播放点特效(this: void, model: string, x: number, y: number, 持续秒: number = 1, 缩放: number = 1): void {
   if (model === "") return;
   const effect = AddSpecialEffect(model, x, y);
+  if (effect != null && effect !== 0 && 缩放 !== 1) EXSetEffectSize(effect, 缩放);
   addDelayedCallback(持续秒 * 1000, function 销毁点特效(this: void): void {
     if (effect != null && effect !== 0) DestroyEffect(effect);
   });
 }
 
-export function 播放单位特效(this: void, model: string, unit: any, attach: string = "origin", 持续秒: number = 1): void {
+export function 播放单位特效(this: void, model: string, unit: any, attach: string = "origin", 持续秒: number = 1, 缩放: number = 1): void {
   if (unit == null || unit === 0 || model === "") return;
   const effect = AddSpecialEffectTarget(model, unit, attach);
+  if (effect != null && effect !== 0 && 缩放 !== 1) EXSetEffectSize(effect, 缩放);
   addDelayedCallback(持续秒 * 1000, function 销毁单位特效(this: void): void {
     if (effect != null && effect !== 0) DestroyEffect(effect);
   });
@@ -121,6 +125,11 @@ export function 取范围友方(this: void, source: any, radius: number): any[] 
 export function 取范围敌人(this: void, source: any, target: any, radius: number): any[] {
   if (!单位存活(source) || target == null || target === 0) return [];
   return getEnemyUnitsInRange(source, GetUnitX(target), GetUnitY(target), radius);
+}
+
+export function 取坐标范围敌人(this: void, source: any, x: number, y: number, radius: number): any[] {
+  if (!单位存活(source) || !(radius > 0)) return [];
+  return getEnemyUnitsInRange(source, x, y, radius);
 }
 
 export function 开始通用护盾(this: void, source: any, target: any, amount: number, duration: number, tag: string): void {

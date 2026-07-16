@@ -14,6 +14,7 @@ local _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0 = __TS__Class()
 _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.name = "友军范围承伤转移实现"
 function _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype.____constructor(self, _____914D_7F6E)
     self["已停止"] = false
+    self["正在转移"] = false
     self["名称"] = _____914D_7F6E["名称"] or "友军范围承伤转移"
     self["配置"] = _____914D_7F6E
     local ____self = self
@@ -23,6 +24,16 @@ function _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype.____co
         end,
         _____914D_7F6E["优先级"] or 35
     )
+    if _____914D_7F6E["清理"] ~= nil then
+        local ____self_1 = _____914D_7F6E["清理"]
+        ____self_1["登记清理"](
+            ____self_1,
+            self["名称"] .. "-承伤转移",
+            function()
+                ____self["停止"](____self)
+            end
+        )
+    end
 end
 _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["停止"] = function(self)
     if self["已停止"] then
@@ -33,14 +44,14 @@ _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["停止"] = fun
 end
 _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["修正"] = function(self, context)
     local current = context.currentDamage
-    if self["已停止"] or not (current > 0) then
+    if self["已停止"] or self["正在转移"] or not (current > 0) then
         return current
     end
-    local ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_1 = self["配置"]["排除真实伤害"]
-    if ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_1 == nil then
-        ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_1 = true
+    local ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_2 = self["配置"]["排除真实伤害"]
+    if ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_2 == nil then
+        ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_2 = true
     end
-    if ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_1 and context.isTrueDamage == true then
+    if ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_2 and context.isTrueDamage == true then
         return current
     end
     local target = context.target
@@ -59,6 +70,7 @@ _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["修正"] = fun
     if not (transfer > 0) then
         return current
     end
+    self["正在转移"] = true
     self["配置"]["on转移"]({
         ["受击者"] = target,
         ["攻击者"] = attacker,
@@ -68,6 +80,7 @@ _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["修正"] = fun
         ["上下文"] = context,
         ["配置"] = self["配置"]
     })
+    self["正在转移"] = false
     return current - transfer
 end
 _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["寻找承受者"] = function(self, target, attacker, context)
@@ -83,13 +96,13 @@ _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["寻找承受�
             do
                 local holder = candidates[i + 1]
                 if holder == nil or holder == 0 or holder == target then
-                    goto __continue15
+                    goto __continue17
                 end
                 if not IsUnitAlly(holder, owner) then
-                    goto __continue15
+                    goto __continue17
                 end
                 if self["配置"]["可承受者"] ~= nil and not self["配置"]["可承受者"]({["受击者"] = target, ["攻击者"] = attacker, ["候选单位"] = holder, ["上下文"] = context}) then
-                    goto __continue15
+                    goto __continue17
                 end
                 local dx = GetUnitX(holder) - tx
                 local dy = GetUnitY(holder) - ty
@@ -97,7 +110,7 @@ _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["寻找承受�
                     return holder
                 end
             end
-            ::__continue15::
+            ::__continue17::
             i = i + 1
         end
     end

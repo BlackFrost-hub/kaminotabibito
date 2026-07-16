@@ -19,6 +19,8 @@ local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系
 local _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身传送到坐标"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
+local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
 local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
 local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_0["读取Boss战运行上下文"]
 local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
@@ -204,6 +206,7 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
     if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] or context["阶段"] ~= "复生仪式" or context["当前大型技能"] ~= _____8840_4E4B_590D_751F_6280_80FDKey then
         return false
     end
+    _____64AD_653E_590F_63D0_96C5_53F0_8BCD(boss, "血之复生")
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["血之复生"]
     local crystals = {}
     local points = _____53D6_590D_751F_7ED3_6676_70B9(boss)
@@ -295,7 +298,7 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
                 local remaining = _____7EDF_8BA1_5B58_6D3B_7ED3_6676(crystals)
                 _____6E05_7406_590D_751F_7ED3_6676(crystals)
                 if remaining <= 0 then
-                    _____5E7F_64AD_5355_4F4D_63D0_793A(boss, _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["广播台词"]["复生失败"], 3600)
+                    _____5E7F_64AD_5355_4F4D_63D0_793A(boss, _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["台词"]["复生失败"][1], 3600)
                     ____on_590D_751F_5931_8D25(context)
                     return
                 end
@@ -317,7 +320,7 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
         ["标题文本"] = "血之复生",
         ["提示文本"] = "在仪式结束前摧毁三枚复生结晶"
     })
-    _____5E7F_64AD_5355_4F4D_63D0_793A(boss, _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["广播台词"]["血之复生"], 3600)
+    _____5E7F_64AD_5355_4F4D_63D0_793A(boss, _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["台词"]["血之复生"][1], 3600)
     return true
 end
 ____exports["血之复生机制状态"] = {

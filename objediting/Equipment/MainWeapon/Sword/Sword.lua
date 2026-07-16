@@ -32,6 +32,6 @@ createEquipmentItem('I0FT', '赤誓断界剑', {
   classification = 'Campaign',
   level = 6,
   score = 7000,
-  tooltipExtended = '|cffccffff[主武器/长剑]-物理/位移爆发|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+180|n力量+35|n护甲穿透+22%|n生命值+1200|n|cffffffcc[装备效果规划]|r|n誓锋壁进：完成战斗自身位移后，下一次普通攻击转为扇形重斩并为自身生成短时护盾。装备技能后续接入。|n|cFF808080剑脊上的赤誓只承认向前的脚步，以及挡在同伴身前的锋刃。|r',
-  description = '|cffccffff[主武器/长剑]-物理/位移爆发|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+180|n力量+35|n护甲穿透+22%|n生命值+1200|n|cffffffcc[装备效果规划]|r|n誓锋壁进：完成战斗自身位移后，下一次普通攻击转为扇形重斩并为自身生成短时护盾。装备技能后续接入。|n|cFF808080剑脊上的赤誓只承认向前的脚步，以及挡在同伴身前的锋刃。|r',
+  tooltipExtended = '|cffccffff[主武器/长剑]-物理/位移爆发|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+180|n力量+35|n护甲穿透+22%|n生命值+1200|n|cffffffcc[装备效果]|r|n誓锋壁进：完成战斗自身位移后，下一次普通攻击转为扇形重斩并为自身生成短时护盾。|n|cFF808080剑脊上的赤誓只承认向前的脚步，以及挡在同伴身前的锋刃。|r',
+  description = '|cffccffff[主武器/长剑]-物理/位移爆发|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+180|n力量+35|n护甲穿透+22%|n生命值+1200|n|cffffffcc[装备效果]|r|n誓锋壁进：完成战斗自身位移后，下一次普通攻击转为扇形重斩并为自身生成短时护盾。|n|cFF808080剑脊上的赤誓只承认向前的脚步，以及挡在同伴身前的锋刃。|r',
 })

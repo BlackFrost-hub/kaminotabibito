@@ -56,6 +56,7 @@ ____exports["启用亚伦柯斯不灭军魂"] = function(context)
             end
         end
     )
+    _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD(boss, "不灭军魂")
     return true
 end
 ____exports["触发亚伦柯斯最终强化"] = function(context)

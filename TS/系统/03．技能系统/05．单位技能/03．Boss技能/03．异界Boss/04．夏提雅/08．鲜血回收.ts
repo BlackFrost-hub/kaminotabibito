@@ -6,6 +6,7 @@ import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 吸收夏提雅鲜血印记, type 夏提雅鲜血印记实例 } from './04．鲜血印记';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 播放夏提雅台词 } from './18．台词播放';
 
 const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
   doHeal: (this: void, params: any) => number;
@@ -77,6 +78,7 @@ export function 释放夏提雅鲜血回收(this: void, context: 夏提雅运行
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.挑战已结束 || context.当前大型技能 != null || context.血印句柄列表.length <= 0) return false;
   if (context.阶段 !== 'P1鲜血女武神' && context.阶段 !== 'P2英灵战乙女') return false;
+  播放夏提雅台词(boss, '鲜血回收');
   const cfg = 夏提雅数值与表现配置.鲜血印记;
   context.当前大型技能 = 鲜血回收技能Key;
   context.普通机制忙碌到Ms = getServerTime() + (cfg.回收前摇秒 + 0.25) * 1000;

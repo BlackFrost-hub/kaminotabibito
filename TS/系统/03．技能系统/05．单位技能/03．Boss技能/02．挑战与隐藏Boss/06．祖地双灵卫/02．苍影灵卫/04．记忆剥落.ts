@@ -6,6 +6,7 @@ import { 播放限时单位动画 } from '../../../../../00．技能模板+函�
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 两点角度, 极坐标X, 极坐标Y, 距离平方XY, 限制数值, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 创建持续危险区域, type 持续危险区域实例 } from '../../../../../00．技能模板+函数/04．机制组件/03．持续危险区/01．持续危险区域';
+import { 播放苍影灵卫台词 } from '../12．台词播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能敌对英雄列表: (this: void, boss: any) => any[] };
@@ -77,6 +78,7 @@ export function 释放记忆剥落(this: void, context: 祖地双灵卫运行时
   const cfg = 祖地双灵卫数值与表现配置.P2.记忆剥落;
   const available = cfg.同时存在上限 - context.空白灵域列表.length;
   if (available <= 0) return false;
+  播放苍影灵卫台词(boss, '记忆剥落');
   const baseX = 单位有效(target) ? GetUnitX(target) : context.场地中心X;
   const baseY = 单位有效(target) ? GetUnitY(target) : context.场地中心Y;
   const bossFacing = 两点角度(GetUnitX(boss), GetUnitY(boss), baseX, baseY);

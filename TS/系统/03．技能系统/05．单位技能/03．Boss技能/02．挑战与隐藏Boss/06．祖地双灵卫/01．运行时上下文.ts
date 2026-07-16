@@ -10,11 +10,15 @@ import { 创建联合战斗成员生命周期, type 联合战斗成员生命周�
 import { stringToFourCC, 取单位ID } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 伤害生命下限保护控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 import type { 持续单位连线实例 } from '../../../../00．技能模板+函数/04．机制组件/07．机制连线/01．持续单位连线';
+import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 
 const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文') as {
   读取Boss战运行上下文: (this: void, boss: any) => any;
 };
-const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
+const { getServerTime, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
+  getServerTime: (this: void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
 const jass = require('jass.common') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -227,6 +231,11 @@ export function 获取或创建祖地双灵卫运行时上下文(this: void, 启
   上下文列表.push(context);
   单位上下文表[取单位ID(red)] = context;
   单位上下文表[取单位ID(azure)] = context;
+  播放赤誓灵卫台词(red, '开场');
+  const azureOpeningId = addDelayedCallback(7200, function 苍影灵卫开场接话(this: void): void {
+    if (!context.战斗已结束) 播放苍影灵卫台词(azure, '开场');
+  });
+  context.清理.登记延迟回调('祖地双灵卫-苍影开场台词', azureOpeningId);
   return context;
 }
 

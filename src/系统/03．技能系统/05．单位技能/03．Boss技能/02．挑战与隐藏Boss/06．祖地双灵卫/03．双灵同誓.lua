@@ -8,6 +8,9 @@ local ____05_FF0E_7956_5730_53CC_7075_536B = require("系统.05．Buff系统.03�
 local _____7956_5730_53CC_7075_536BBuffID = ____05_FF0E_7956_5730_53CC_7075_536B["祖地双灵卫BuffID"]
 local ____01_FF0E_6301_7EED_5355_4F4D_8FDE_7EBF = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.07．机制连线.01．持续单位连线")
 local _____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF = ____01_FF0E_6301_7EED_5355_4F4D_8FDE_7EBF["创建持续单位连线"]
+local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
+local _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放赤誓灵卫台词"]
+local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
 local ____17_FF0E_95EA_7535_6548_679C_4EE3_7801 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.17．闪电效果代码")
 local _____95EA_7535_6548_679C_4EE3_7801 = ____17_FF0E_95EA_7535_6548_679C_4EE3_7801["闪电效果代码"]
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
@@ -77,6 +80,11 @@ local function _____5F00_542F_540C_8A93_4FDD_62A4(context, lowName)
     end
     local low = ____temp_5
     _____5173_95ED_540C_8A93_4FDD_62A4(context)
+    if lowName == "赤誓灵卫" then
+        _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD(context["苍影灵卫单位"], "双灵同誓")
+    else
+        _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD(context["赤誓灵卫单位"], "双灵同誓")
+    end
     context["同誓保护已启用"] = true
     context["低血保护守卫"] = lowName
     if low ~= nil and low ~= 0 then

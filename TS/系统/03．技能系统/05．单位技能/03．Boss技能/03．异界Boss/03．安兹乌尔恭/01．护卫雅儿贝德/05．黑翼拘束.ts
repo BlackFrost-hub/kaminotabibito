@@ -5,6 +5,7 @@ import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
 import { 创建可攻击机制单位 } from '../../../../../00．技能模板+函数/04．机制组件/05．机制单位/01．可攻击机制单位';
 import { 启动雅儿贝德至尊共护 } from './04．至尊共护';
+import { 播放雅儿贝德台词 } from './10．台词播放';
 
 const { 获取Boss技能随机敌对英雄 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
@@ -76,6 +77,7 @@ export function 启动雅儿贝德天空坠落联动(this: void, context: 安兹
   const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
   const target = 获取Boss技能随机敌对英雄(context.安兹单位);
   if (!单位有效(target)) return;
+  播放雅儿贝德台词(state.单位, '黑翼拘束');
   const remaining = castSeconds - cfg.黑翼拘束启动延迟秒;
   if (remaining <= 0.5) return;
   const delayedId = addDelayedCallback(cfg.黑翼拘束启动延迟秒 * 1000, function 黑翼拘束延迟启动(this: void): void {

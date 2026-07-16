@@ -9,6 +9,7 @@ import { 播放限时单位动画 } from '../../../../00．技能模板+函数/0
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 获取夏提雅英灵投影, 尝试触发英灵战乙女复刻 } from './09．英灵战乙女';
 import { 创建点名预警执行器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/05．点名预警执行器';
+import { 播放夏提雅台词 } from './18．台词播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
@@ -82,6 +83,7 @@ function 结算净化投枪落点(this: void, context: 夏提雅运行时上下�
 export function 释放夏提雅净化投枪(this: void, context: 夏提雅运行时上下文, target: any): boolean {
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(target) || context.挑战已结束 || context.当前大型技能 != null) return false;
+  播放夏提雅台词(boss, '净化投枪');
   const cfg = 夏提雅数值与表现配置.净化投枪;
   const x = GetUnitX(target);
   const y = GetUnitY(target);

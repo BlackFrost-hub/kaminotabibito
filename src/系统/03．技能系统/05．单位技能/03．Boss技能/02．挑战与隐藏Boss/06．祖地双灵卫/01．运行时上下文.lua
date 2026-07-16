@@ -11,10 +11,14 @@ local _____521B_5EFA_8054_5408_6218_6597_6210_5458_751F_547D_5468_671F = ____20_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
+local _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放赤誓灵卫台词"]
+local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
 local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
 local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_0["读取Boss战运行上下文"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
+local addDelayedCallback = ____require_result_1.addDelayedCallback
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -227,6 +231,17 @@ ____exports["获取或创建祖地双灵卫运行时上下文"] = function(_____
     _____4E0A_4E0B_6587_5217_8868[#_____4E0A_4E0B_6587_5217_8868 + 1] = context
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(red)] = context
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(azure)] = context
+    _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD(red, "开场")
+    local azureOpeningId = addDelayedCallback(
+        7200,
+        function()
+            if not context["战斗已结束"] then
+                _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD(azure, "开场")
+            end
+        end
+    )
+    local ____self_12 = context["清理"]
+    ____self_12["登记延迟回调"](____self_12, "祖地双灵卫-苍影开场台词", azureOpeningId)
     return context
 end
 ____exports["清理祖地双灵卫运行时上下文"] = function(context)
@@ -237,7 +252,7 @@ ____exports["清理祖地双灵卫运行时上下文"] = function(context)
     context["阶段"] = "已结束"
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(context["赤誓灵卫单位"])] = nil
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(context["苍影灵卫单位"])] = nil
-    local ____self_12 = context["清理"]
-    ____self_12["清理全部"](____self_12)
+    local ____self_13 = context["清理"]
+    ____self_13["清理全部"](____self_13)
 end
 return ____exports

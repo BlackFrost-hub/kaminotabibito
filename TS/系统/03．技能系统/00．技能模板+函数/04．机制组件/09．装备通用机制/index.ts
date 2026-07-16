@@ -21,3 +21,5 @@ export * from "./24．句柄上下文托管";
 export * from "./25．延迟批处理队列";
 export * from "./26．延迟去重批处理队列";
 export * from "./27．伤害派生批处理队列";
+export * from "./28．单位驻留进度";
+export * from "./29．重复伤害类型适应";

@@ -10,6 +10,7 @@ import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通�
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 创建固定组合技能执行器 } from '../../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from '../../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂';
+import { 播放赤誓灵卫台词 } from '../12．台词播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -49,6 +50,7 @@ export function 释放裂魂坠斩(this: void, context: 祖地双灵卫运行时
   const boss = context.赤誓灵卫单位;
   if (!单位有效(boss) || !单位有效(target) || context.战斗已结束 || context.赤誓灵卫形态 !== '裂誓战躯') return false;
   const cfg = 祖地双灵卫数值与表现配置.P2.裂魂坠斩;
+  播放赤誓灵卫台词(boss, '裂魂坠斩');
   const startX = GetUnitX(boss);
   const startY = GetUnitY(boss);
   const facing = Atan2(GetUnitY(target) - startY, GetUnitX(target) - startX) * RAD_TO_DEG;

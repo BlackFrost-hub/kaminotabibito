@@ -8,6 +8,7 @@ import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配�
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
+import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 const { 主动结束Boss战运行 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动') as {
   主动结束Boss战运行: (this: void, boss: any, options?: any) => boolean;
 };
@@ -62,6 +63,8 @@ function 进入灵魂崩解(this: void, context: 祖地双灵卫运行时上下�
   registerManualBuff(unit, 祖地双灵卫BuffID.灵魂崩解, 3600, 1, { sourceName: '祖地双灵卫-灵魂崩解', tickWhilePaused: true });
   const animation = name === '赤誓灵卫' ? 祖地双灵卫数值与表现配置.动作.裂誓消散 : 祖地双灵卫数值与表现配置.动作.无面施法;
   播放限时单位动画({ 单位: unit, 动画编号: animation, 持续秒: 2, 恢复动画编号: animation });
+  if (name === '赤誓灵卫') 播放赤誓灵卫台词(unit, '灵魂崩解');
+  else 播放苍影灵卫台词(unit, '灵魂崩解');
   if (context.崩解中的守卫 == null) {
     context.崩解中的守卫 = name;
     const allPurified = context.已净化节点数量 >= 祖地双灵卫数值与表现配置.P3.净化节点数量;
@@ -107,6 +110,8 @@ function 恢复崩解守卫(this: void, context: 祖地双灵卫运行时上下�
   移除单位指定Buff(unit, 祖地双灵卫BuffID.灵魂崩解);
   const reflux = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.魂力回灌特效路径, GetUnitX(unit), GetUnitY(unit));
   if (reflux != null && reflux !== 0) YDWETimerDestroyEffectSafe(1.2, reflux);
+  if (name === '赤誓灵卫') 播放苍影灵卫台词(context.苍影灵卫单位, '同息回灌');
+  else 播放赤誓灵卫台词(context.赤誓灵卫单位, '同息回灌');
   context.崩解中的守卫 = undefined;
   context.崩解截止时间Ms = 0;
 }
@@ -118,6 +123,8 @@ export function 执行祖地双灵卫净化收束(this: void, context: 祖地双
   context.大型技能占用者 = '联合机制';
   const red = context.赤誓灵卫单位;
   const azure = context.苍影灵卫单位;
+  if (context.首次变异守卫 === '赤誓灵卫') 播放赤誓灵卫台词(red, '净化收束');
+  else 播放苍影灵卫台词(azure, '净化收束');
   PauseUnit(red, true);
   PauseUnit(azure, true);
   SetUnitInvulnerable(red, true);

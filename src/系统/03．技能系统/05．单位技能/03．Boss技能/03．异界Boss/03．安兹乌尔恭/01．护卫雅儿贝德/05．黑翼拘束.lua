@@ -8,6 +8,8 @@ local ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D = require("系统.03．技�
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D["创建可攻击机制单位"]
 local ____04_FF0E_81F3_5C0A_5171_62A4 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.04．至尊共护")
 local _____542F_52A8_96C5_513F_8D1D_5FB7_81F3_5C0A_5171_62A4 = ____04_FF0E_81F3_5C0A_5171_62A4["启动雅儿贝德至尊共护"]
+local ____10_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.10．台词播放")
+local _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD = ____10_FF0E_53F0_8BCD_64AD_653E["播放雅儿贝德台词"]
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_0["获取Boss技能随机敌对英雄"]
 local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
@@ -88,6 +90,7 @@ ____exports["启动雅儿贝德天空坠落联动"] = function(context, castSeco
     if not _____5355_4F4D_6709_6548(target) then
         return
     end
+    _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD(state["单位"], "黑翼拘束")
     local remaining = castSeconds - cfg["黑翼拘束启动延迟秒"]
     if remaining <= 0.5 then
         return

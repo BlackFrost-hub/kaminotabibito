@@ -4,6 +4,7 @@ import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能�
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
 import { 创建召唤物 } from '../../../../00．技能模板+函数/01．技能函数/11．召唤物/04．对外接口';
+import { 播放安兹台词 } from './12．台词播放';
 
 const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -167,6 +168,7 @@ export function 释放安兹高阶亡灵召唤(this: void, context: 安兹运行
   const summonX = GetUnitX(boss) + Cos(angle) * stage.高阶亡灵召唤距离;
   const summonY = GetUnitY(boss) + Sin(angle) * stage.高阶亡灵召唤距离;
   context.当前大型技能 = 高阶亡灵召唤大型技能Key;
+  播放安兹台词(boss, '高阶亡灵召唤');
   确保高阶亡灵死亡监听();
   播放召唤特效(cfg.表现资源.高阶亡灵召唤门特效路径, summonX, summonY, stage.高阶亡灵召唤门缩放);
   播放召唤特效(cfg.表现资源.高阶亡灵召唤外圈特效路径, summonX, summonY, stage.高阶亡灵召唤外圈缩放);

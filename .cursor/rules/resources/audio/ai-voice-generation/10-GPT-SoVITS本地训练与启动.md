@@ -18,7 +18,11 @@ ProPlus 权重：D:\AI\GPT-SoVITS\GPT_SoVITS\pretrained_models\v2Pro
 
 - GPU：NVIDIA GeForce RTX 3050 Laptop GPU，4GB 显存。
 - Python：3.11，放在项目独立 `runtime` 中，不使用系统 Python。
-- PyTorch：CUDA 12.8 版本；已经验证 `torch.cuda.is_available() == true`。
+- PyTorch：`2.11.0+cu126`。
+- Torchaudio：`2.11.0+cu126`。
+- TorchCodec：`0.11.1+cpu`。
+- MarkupSafe：`2.1.5`，用于兼容当前 Gradio。
+- CUDA：已经验证 `torch.cuda.is_available() == true`，设备为 `NVIDIA GeForce RTX 3050 Laptop GPU`。
 - 主模型方向：GPT-SoVITS v2ProPlus，优先日语动漫角色声线相似度。
 - 用户接受较慢生成速度，优先音色相似度、稳定性和多候选筛选。
 
@@ -104,6 +108,8 @@ curl.exe -s -o NUL -w "%{http_code}" "http://127.0.0.1:9874/"
 - 数据质量优先于训练速度：严格去除 BGM、混响、战斗音效、串音和错误日文标注。
 - 平静、愤怒、低语、受伤、癫狂、死亡等参考音频分目录保存；推理时按目标情绪选择参考。
 - 普通批量台词走 TTS；要求极强演技的关键句可先演出，再走变声。
+
+完整的素材准备、标注、`1A/1B/1C`、低显存训练、权重筛选、推理质检与项目接入流程见 `11-GPT-SoVITS完整训练实战流程.md`。
 
 ## 常见提示
 

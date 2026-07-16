@@ -13,6 +13,8 @@ local ____04_FF0E_9C9C_8840_5370_8BB0 = require("系统.03．技能系统.05．�
 local _____5438_6536_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____04_FF0E_9C9C_8840_5370_8BB0["吸收夏提雅鲜血印记"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
+local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
 local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_0.doHeal
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
@@ -94,6 +96,7 @@ ____exports["释放夏提雅鲜血回收"] = function(context)
     if context["阶段"] ~= "P1鲜血女武神" and context["阶段"] ~= "P2英灵战乙女" then
         return false
     end
+    _____64AD_653E_590F_63D0_96C5_53F0_8BCD(boss, "鲜血回收")
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
     context["当前大型技能"] = _____9C9C_8840_56DE_6536_6280_80FDKey
     context["普通机制忙碌到Ms"] = getServerTime() + (cfg["回收前摇秒"] + 0.25) * 1000

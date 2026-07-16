@@ -47,6 +47,7 @@ const 位移封锁提示间隔Ms = 800;
 
 const 位移封锁提示冷却: Record<number, number | undefined> = {};
 let 原生位移封锁Buff缓存: number[] | undefined = undefined;
+const 战斗自身位移监听列表: Array<(this: void, unit: any, 起点X: number, 起点Y: number, 终点X: number, 终点Y: number) => void> = [];
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0;
@@ -114,17 +115,35 @@ export function 尝试阻止自身位移技能(unit: any): boolean {
   return true;
 }
 
+export function 注册战斗自身位移完成监听(
+  listener: (this: void, unit: any, 起点X: number, 起点Y: number, 终点X: number, 终点Y: number) => void,
+): void {
+  战斗自身位移监听列表.push(listener);
+}
+
+function 通知战斗自身位移完成(this: void, unit: any, 起点X: number, 起点Y: number, 终点X: number, 终点Y: number): void {
+  for (let i = 0; i < 战斗自身位移监听列表.length; i++) {
+    战斗自身位移监听列表[i](unit, 起点X, 起点Y, 终点X, 终点Y);
+  }
+}
+
 export function 执行战斗自身位移到坐标(unit: any, x: number, y: number): boolean {
   if (!单位有效(unit)) return false;
   if (尝试阻止自身位移技能(unit)) return false;
+  const 起点X = jass.GetUnitX(unit) as number;
+  const 起点Y = jass.GetUnitY(unit) as number;
   SetUnitX(unit, x);
   SetUnitY(unit, y);
+  通知战斗自身位移完成(unit, 起点X, 起点Y, x, y);
   return true;
 }
 
 export function 执行战斗自身传送到坐标(unit: any, x: number, y: number): boolean {
   if (!单位有效(unit)) return false;
   if (尝试阻止自身位移技能(unit)) return false;
+  const 起点X = jass.GetUnitX(unit) as number;
+  const 起点Y = jass.GetUnitY(unit) as number;
   SetUnitPosition(unit, x, y);
+  通知战斗自身位移完成(unit, 起点X, 起点Y, x, y);
   return true;
 }

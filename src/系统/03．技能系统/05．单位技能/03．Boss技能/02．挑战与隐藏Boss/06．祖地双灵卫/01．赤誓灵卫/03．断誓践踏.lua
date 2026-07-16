@@ -13,6 +13,8 @@ local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．�
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
+local _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放赤誓灵卫台词"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -173,6 +175,9 @@ ____exports["释放断誓践踏"] = function(context, target)
         return false
     end
     local cfg = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["断誓践踏"]
+    local nodeIndex = context["当前净化节点序号"] - 1
+    local isBreakingNode = context["阶段"] == "P3双蚀共鸣" and nodeIndex >= 0 and nodeIndex < #context["净化节点列表"] and context["净化节点列表"][nodeIndex + 1]["阶段"] == "破壳"
+    _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD(boss, isBreakingNode and "双钥净化破壳" or "断誓践踏")
     local targetX = GetUnitX(target)
     local targetY = GetUnitY(target)
     local ____temp_5

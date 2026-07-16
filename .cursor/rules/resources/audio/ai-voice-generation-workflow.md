@@ -19,6 +19,7 @@
    - `04-古树自然神谕.md`
    - `05-亡灵吸血鬼盗贼女巫.md`
    - `06-怪物异形诅咒.md`
+6. 本机启动与固定环境看 `ai-voice-generation/10-GPT-SoVITS本地训练与启动.md`；从素材到项目接入的完整训练流程看 `ai-voice-generation/11-GPT-SoVITS完整训练实战流程.md`。
 
 ## 核心规则
 

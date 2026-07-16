@@ -13,6 +13,7 @@ import { 取安兹亡灵箭伤害倍率 } from './08．高阶亡灵召唤';
 import { 注册单位技能壳监听 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器';
 import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 开始分批点名落点模板, type 分批点名落点结果 } from '../../../../00．技能模板+函数/00．技能模板/05．点名技能模板/02．分批点名落点模板';
+import { 播放安兹台词 } from './12．台词播放';
 
 const { 启动基础施法时间线 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线') as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -139,6 +140,7 @@ export function 释放安兹高阶魔法箭(this: void, context: 安兹运行时
   if (!单位有效(boss) || context.挑战已结束 || context.时间停止中 || context.当前大型技能 != null) return;
   const target = 取主要目标(boss);
   if (!单位有效(target)) return;
+  播放安兹台词(boss, '高阶魔法箭');
   const cfg = 安兹乌尔恭数值与表现配置.普通技能;
   标记安兹普通机制忙碌(
     context,

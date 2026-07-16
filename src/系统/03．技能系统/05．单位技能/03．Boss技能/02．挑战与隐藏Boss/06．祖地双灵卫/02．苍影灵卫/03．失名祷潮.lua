@@ -20,6 +20,8 @@ local _____5355_4F4D_662F_5426_5728_6761_5F62_533A_57DF = _____77E9_5F62_533A_57
 local ____03_FF0E_7279_6548 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____03_FF0E_7279_6548.createTimedEffect
 local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____03_FF0E_7279_6548["设置特效XYZ轴旋转"]
+local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
+local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -135,6 +137,9 @@ ____exports["释放失名祷潮"] = function(context, target)
         return false
     end
     local cfg = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["失名祷潮"]
+    local nodeIndex = context["当前净化节点序号"] - 1
+    local isCalibratingNode = context["阶段"] == "P3双蚀共鸣" and nodeIndex >= 0 and nodeIndex < #context["净化节点列表"] and context["净化节点列表"][nodeIndex + 1]["阶段"] == "校准"
+    _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD(boss, isCalibratingNode and "双钥净化校准" or "失名祷潮")
     local primary = targets[1]
     local startX = GetUnitX(boss)
     local startY = GetUnitY(boss)

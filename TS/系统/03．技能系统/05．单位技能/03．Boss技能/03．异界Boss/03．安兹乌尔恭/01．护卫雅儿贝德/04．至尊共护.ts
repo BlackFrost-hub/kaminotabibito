@@ -4,6 +4,7 @@ import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技�
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
 import { 执行非伤害生命移除 } from '../../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/09．非伤害生命移除';
+import { 播放雅儿贝德台词 } from './10．台词播放';
 
 const { 开始护盾 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统') as {
   开始护盾: (this: void, unit: any, 参数: any) => number;
@@ -31,6 +32,7 @@ export function 启动雅儿贝德至尊共护(this: void, context: 安兹运行
   const albedo = state?.单位;
   const boss = context.安兹单位;
   if (state == null || !单位有效(albedo) || !单位有效(boss) || state.阶段状态 === '失衡') return false;
+  播放雅儿贝德台词(albedo, '至尊共护');
   const cfg = 安兹乌尔恭数值与表现配置;
   const guardState = state;
   const total = GetUnitState(albedo, UNIT_STATE_LIFE) * cfg.守护者模式.至尊共护护盾当前生命比例;

@@ -28,6 +28,7 @@ local _____4F4D_79FB_5C01_9501_63D0_793A_6301_7EED_65F6_95F4 = 1.2
 local _____4F4D_79FB_5C01_9501_63D0_793A_95F4_9694Ms = 800
 local _____4F4D_79FB_5C01_9501_63D0_793A_51B7_5374 = {}
 local _____539F_751F_4F4D_79FB_5C01_9501Buff_7F13_5B58 = nil
+local _____6218_6597_81EA_8EAB_4F4D_79FB_76D1_542C_5217_8868 = {}
 local function _____5355_4F4D_6709_6548(unit)
     return unit ~= nil and unit ~= 0
 end
@@ -120,6 +121,24 @@ ____exports["尝试阻止自身位移技能"] = function(unit)
     ____exports["提示无法使用位移技能"](unit)
     return true
 end
+____exports["注册战斗自身位移完成监听"] = function(listener)
+    _____6218_6597_81EA_8EAB_4F4D_79FB_76D1_542C_5217_8868[#_____6218_6597_81EA_8EAB_4F4D_79FB_76D1_542C_5217_8868 + 1] = listener
+end
+local function _____901A_77E5_6218_6597_81EA_8EAB_4F4D_79FB_5B8C_6210(unit, _____8D77_70B9X, _____8D77_70B9Y, _____7EC8_70B9X, _____7EC8_70B9Y)
+    do
+        local i = 0
+        while i < #_____6218_6597_81EA_8EAB_4F4D_79FB_76D1_542C_5217_8868 do
+            _____6218_6597_81EA_8EAB_4F4D_79FB_76D1_542C_5217_8868[i + 1](
+                unit,
+                _____8D77_70B9X,
+                _____8D77_70B9Y,
+                _____7EC8_70B9X,
+                _____7EC8_70B9Y
+            )
+            i = i + 1
+        end
+    end
+end
 ____exports["执行战斗自身位移到坐标"] = function(unit, x, y)
     if not _____5355_4F4D_6709_6548(unit) then
         return false
@@ -127,8 +146,17 @@ ____exports["执行战斗自身位移到坐标"] = function(unit, x, y)
     if ____exports["尝试阻止自身位移技能"](unit) then
         return false
     end
+    local _____8D77_70B9X = jass.GetUnitX(unit)
+    local _____8D77_70B9Y = jass.GetUnitY(unit)
     SetUnitX(unit, x)
     SetUnitY(unit, y)
+    _____901A_77E5_6218_6597_81EA_8EAB_4F4D_79FB_5B8C_6210(
+        unit,
+        _____8D77_70B9X,
+        _____8D77_70B9Y,
+        x,
+        y
+    )
     return true
 end
 ____exports["执行战斗自身传送到坐标"] = function(unit, x, y)
@@ -138,7 +166,16 @@ ____exports["执行战斗自身传送到坐标"] = function(unit, x, y)
     if ____exports["尝试阻止自身位移技能"](unit) then
         return false
     end
+    local _____8D77_70B9X = jass.GetUnitX(unit)
+    local _____8D77_70B9Y = jass.GetUnitY(unit)
     SetUnitPosition(unit, x, y)
+    _____901A_77E5_6218_6597_81EA_8EAB_4F4D_79FB_5B8C_6210(
+        unit,
+        _____8D77_70B9X,
+        _____8D77_70B9Y,
+        x,
+        y
+    )
     return true
 end
 return ____exports

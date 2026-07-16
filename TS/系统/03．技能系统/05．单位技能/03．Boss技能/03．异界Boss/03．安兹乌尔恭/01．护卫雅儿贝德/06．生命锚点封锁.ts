@@ -3,6 +3,7 @@
 import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
+import { 播放雅儿贝德台词 } from './10．台词播放';
 
 const { 开始护盾, 移除护盾 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统') as {
   开始护盾: (this: void, unit: any, 参数: any) => number;
@@ -83,6 +84,7 @@ export function 启动雅儿贝德生命锚点封锁(
   if (state == null || !单位有效(albedo) || state.阶段状态 === '失衡' || context.挑战已结束) return undefined;
   const target = 选择未激活锚点(targets);
   if (target == null || !(durationSeconds > 0)) return undefined;
+  播放雅儿贝德台词(albedo, '生命锚点封锁');
   const guardState = state;
   const blockTarget = target;
   const cfg = 安兹乌尔恭数值与表现配置;

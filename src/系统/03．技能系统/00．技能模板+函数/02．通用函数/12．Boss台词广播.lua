@@ -9,7 +9,7 @@ local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效�
 local Sound3DII_UnitPlayReuse = ____require_result_1.Sound3DII_UnitPlayReuse
 local GetRandomInt = jass.GetRandomInt
 local StopSound = jass.StopSound
-local _____5F53_524DBoss_914D_97F3_53E5_67C4 = nil
+local ____Boss_914D_97F3_53E5_67C4_8868 = {}
 ____exports["取Boss台词下标"] = function(_____53F0_8BCD_8868, _____7C7B_578B, index)
     local lines = _____53F0_8BCD_8868[_____7C7B_578B]
     if lines == nil or #lines <= 0 then
@@ -31,7 +31,10 @@ ____exports["取Boss台词文本"] = function(_____53F0_8BCD_8868, _____7C7B_578
     end
     return lines[lineIndex + 1] or lines[1]
 end
-____exports["播放Boss台词配音"] = function(_____6765_6E90_5355_4F4D, _____914D_97F3_8D44_6E90_8868, _____7C7B_578B, index, _____88C1_65AD_8DDD_79BB, _____5141_8BB8_91CD_53E0)
+____exports["播放Boss台词配音"] = function(_____6765_6E90_5355_4F4D, _____914D_97F3_8D44_6E90_8868, _____7C7B_578B, index, _____88C1_65AD_8DDD_79BB, _____5141_8BB8_91CD_53E0, _____914D_97F3_7EC4)
+    if _____914D_97F3_7EC4 == nil then
+        _____914D_97F3_7EC4 = "BossVoice"
+    end
     if _____914D_97F3_8D44_6E90_8868 == nil then
         return
     end
@@ -43,10 +46,11 @@ ____exports["播放Boss台词配音"] = function(_____6765_6E90_5355_4F4D, _____
     if path == nil or path == "" then
         return
     end
-    if not _____5141_8BB8_91CD_53E0 and _____5F53_524DBoss_914D_97F3_53E5_67C4 ~= nil and _____5F53_524DBoss_914D_97F3_53E5_67C4 ~= 0 then
-        StopSound(_____5F53_524DBoss_914D_97F3_53E5_67C4, false, false)
+    local _____4E0A_4E00_6761_914D_97F3_53E5_67C4 = ____Boss_914D_97F3_53E5_67C4_8868[_____914D_97F3_7EC4]
+    if not _____5141_8BB8_91CD_53E0 and _____4E0A_4E00_6761_914D_97F3_53E5_67C4 ~= nil and _____4E0A_4E00_6761_914D_97F3_53E5_67C4 ~= 0 then
+        StopSound(_____4E0A_4E00_6761_914D_97F3_53E5_67C4, false, false)
     end
-    _____5F53_524DBoss_914D_97F3_53E5_67C4 = Sound3DII_UnitPlayReuse(path, _____6765_6E90_5355_4F4D, _____88C1_65AD_8DDD_79BB or 4000)
+    ____Boss_914D_97F3_53E5_67C4_8868[_____914D_97F3_7EC4] = Sound3DII_UnitPlayReuse(path, _____6765_6E90_5355_4F4D, _____88C1_65AD_8DDD_79BB or 4000)
 end
 ____exports["播放Boss台词广播"] = function(_____6765_6E90_5355_4F4D, _____53F0_8BCD_8868, _____7C7B_578B, _____6301_7EED_65F6_95F4Ms, index)
     local text = ____exports["取Boss台词文本"](_____53F0_8BCD_8868, _____7C7B_578B, index)
@@ -67,13 +71,19 @@ ____exports["播放Boss台词"] = function(_____6765_6E90_5355_4F4D, _____914D_7
         _____914D_7F6E["广播持续时间Ms"],
         actualIndex
     )
+    local ____temp_2 = _____914D_7F6E["配音组"] or _____914D_7F6E.BossKey
+    if ____temp_2 == nil then
+        ____temp_2 = "BossVoice"
+    end
+    local _____914D_97F3_7EC4 = ____temp_2
     ____exports["播放Boss台词配音"](
         _____6765_6E90_5355_4F4D,
         _____914D_7F6E["配音资源"],
         _____7C7B_578B,
         actualIndex,
         _____914D_7F6E["配音裁断距离"],
-        _____914D_7F6E["配音允许重叠"]
+        _____914D_7F6E["配音允许重叠"],
+        _____914D_97F3_7EC4
     )
 end
 return ____exports

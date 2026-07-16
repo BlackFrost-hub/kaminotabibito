@@ -7,6 +7,7 @@ const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技�
 
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
+import { 播放安兹台词 } from './12．台词播放';
 import { 创建圆形安全区组, type 圆形安全区组 } from '../../../../00．技能模板+函数/04．机制组件/02．战斗区域/04．圆形安全区组';
 import { 启动雅儿贝德天空坠落联动 } from './01．护卫雅儿贝德/05．黑翼拘束';
 
@@ -162,6 +163,7 @@ export function 释放安兹天空坠落(this: void, context: 安兹运行时上
   const recoverySeconds = GetRandomReal(cfg.天空坠落回落最小秒, cfg.天空坠落回落最大秒);
   context.天空坠落已释放 = true;
   context.当前大型技能 = 天空坠落大型技能Key;
+  播放安兹台词(boss, '天空坠落');
   const instance = 创建天空坠落预警(context, castSeconds);
   if (context.模式 === '守护者介入') 启动雅儿贝德天空坠落联动(context, castSeconds);
   启动基础施法时间线({

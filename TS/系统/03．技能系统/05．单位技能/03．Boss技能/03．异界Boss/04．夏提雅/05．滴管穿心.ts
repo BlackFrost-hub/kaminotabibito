@@ -7,6 +7,7 @@ import { 开始冲锋 } from '../../../../00．技能模板+函数/01．技能�
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 获取夏提雅英灵投影, 尝试触发英灵战乙女复刻 } from './09．英灵战乙女';
+import { 播放夏提雅台词 } from './18．台词播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -100,6 +101,7 @@ function 尝试安排滴管穿心英灵复刻(this: void, context: 夏提雅运�
 export function 释放夏提雅滴管穿心(this: void, context: 夏提雅运行时上下文, target: any): boolean {
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(target) || context.挑战已结束 || context.当前大型技能 != null) return false;
+  播放夏提雅台词(boss, '滴管穿心');
   const cfg = 夏提雅数值与表现配置.滴管穿心;
   const startX = GetUnitX(boss);
   const startY = GetUnitY(boss);

@@ -7,6 +7,7 @@ import { 执行战斗自身位移到坐标 } from '../../../../../00．技能模
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 播放赤誓灵卫台词 } from '../12．台词播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -114,6 +115,12 @@ export function 释放断誓践踏(this: void, context: 祖地双灵卫运行时
   const boss = context.赤誓灵卫单位;
   if (!单位有效(boss) || !单位有效(target) || context.战斗已结束 || context.赤誓灵卫形态 !== '裂誓战躯') return false;
   const cfg = 祖地双灵卫数值与表现配置.P2.断誓践踏;
+  const nodeIndex = context.当前净化节点序号 - 1;
+  const isBreakingNode = context.阶段 === 'P3双蚀共鸣'
+    && nodeIndex >= 0
+    && nodeIndex < context.净化节点列表.length
+    && context.净化节点列表[nodeIndex].阶段 === '破壳';
+  播放赤誓灵卫台词(boss, isBreakingNode ? '双钥净化破壳' : '断誓践踏');
   const targetX = GetUnitX(target);
   const targetY = GetUnitY(target);
   const activeShield = context.阶段 === 'P2侵蚀失衡' && context.首次变异守卫 === '赤誓灵卫' ? context.誓盾 : undefined;

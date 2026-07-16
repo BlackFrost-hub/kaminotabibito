@@ -18,7 +18,10 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
 local ____02_FF0E_590F_63D0_96C5 = require("系统.05．Buff系统.03．Buff表.01．Boss.03．异界Boss.02．夏提雅")
 local _____590F_63D0_96C5BuffID = ____02_FF0E_590F_63D0_96C5["夏提雅BuffID"]
+local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
+local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
 local getServerTime = ____require_result_0.getServerTime
 local jass = require("jass.common")
 local GetUnitState = jass.GetUnitState
@@ -82,6 +85,18 @@ local function _____521B_5EFA_4E0A_4E0B_6587(boss, _____6E05_7406)
             return {stack = layers, effect2 = layers * frenzy["血之狂热每层技能冷却恢复提高"] * 100, sourceName = "夏提雅-鲜血回收"}
         end
     })
+    if _____5355_4F4D_6709_6548(boss) then
+        _____64AD_653E_590F_63D0_96C5_53F0_8BCD(boss, "登场")
+        local battleStartId = addDelayedCallback(
+            _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["开场台词时间"]["战斗开始延迟Ms"],
+            function()
+                if _____5355_4F4D_6709_6548(boss) and not context["挑战已结束"] then
+                    _____64AD_653E_590F_63D0_96C5_53F0_8BCD(boss, "战斗开始")
+                end
+            end
+        )
+        _____6E05_7406["登记延迟回调"](_____6E05_7406, "夏提雅-战斗开始台词", battleStartId)
+    end
     return context
 end
 --- 独立测试可显式创建；正式战斗使用上下文工厂。
@@ -157,6 +172,9 @@ local function _____5237_65B0_9636_6BB5(context)
     context["上次阶段变化Ms"] = getServerTime()
     context["当前大型技能"] = nil
     ____exports["重置夏提雅猎血连击"](context)
+    if next == "P2英灵战乙女" then
+        _____64AD_653E_590F_63D0_96C5_53F0_8BCD(context["Boss单位"], "进入P2")
+    end
 end
 local function _____63A8_8FDB_590F_63D0_96C5_8FD0_884C_65F6(context, now)
     if not _____5355_4F4D_6709_6548(context["Boss单位"]) then

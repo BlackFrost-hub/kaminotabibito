@@ -17,6 +17,7 @@ import {
   type 生命锚点封锁控制器,
   type 生命锚点封锁目标,
 } from './01．护卫雅儿贝德/06．生命锚点封锁';
+import { 播放安兹台词 } from './12．台词播放';
 
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
@@ -299,6 +300,7 @@ export function 释放安兹一切生命的终点(this: void, context: 安兹运
   };
   context.一切生命的终点已释放 = true;
   context.当前大型技能 = 一切生命的终点大型技能Key;
+  播放安兹台词(boss, '一切生命的终点');
   context.清理.登记清理('安兹-一切生命的终点实例', function 一切生命的终点实例清理(this: void): void {
     清理一切生命的终点实例(instance);
   });

@@ -8,6 +8,8 @@ local _____5B89_5179_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
 local ____04_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
 local _____521B_5EFA_53EC_5524_7269 = ____04_FF0E_5BF9_5916_63A5_53E3["创建召唤物"]
+local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．台词播放")
+local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
@@ -183,6 +185,7 @@ ____exports["释放安兹高阶亡灵召唤"] = function(context)
     local summonX = GetUnitX(boss) + Cos(angle) * stage["高阶亡灵召唤距离"]
     local summonY = GetUnitY(boss) + Sin(angle) * stage["高阶亡灵召唤距离"]
     context["当前大型技能"] = _____9AD8_9636_4EA1_7075_53EC_5524_5927_578B_6280_80FDKey
+    _____64AD_653E_5B89_5179_53F0_8BCD(boss, "高阶亡灵召唤")
     _____786E_4FDD_9AD8_9636_4EA1_7075_6B7B_4EA1_76D1_542C()
     _____64AD_653E_53EC_5524_7279_6548(cfg["表现资源"]["高阶亡灵召唤门特效路径"], summonX, summonY, stage["高阶亡灵召唤门缩放"])
     _____64AD_653E_53EC_5524_7279_6548(cfg["表现资源"]["高阶亡灵召唤外圈特效路径"], summonX, summonY, stage["高阶亡灵召唤外圈缩放"])

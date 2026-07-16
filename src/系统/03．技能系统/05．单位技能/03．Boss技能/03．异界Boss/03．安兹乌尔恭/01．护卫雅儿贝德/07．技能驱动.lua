@@ -12,6 +12,8 @@ local ____08_FF0E_5B88_62A4_56DE_5F52 = require("系统.03．技能系统.05．�
 local _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_56DE_5F52 = ____08_FF0E_5B88_62A4_56DE_5F52["释放雅儿贝德守护回归"]
 local ____09_FF0E_62A4_536B_53CD_51FB = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.09．护卫反击")
 local _____91CA_653E_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB = ____09_FF0E_62A4_536B_53CD_51FB["释放雅儿贝德护卫反击"]
+local ____10_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.10．台词播放")
+local _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD = ____10_FF0E_53F0_8BCD_64AD_653E["播放雅儿贝德台词"]
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_0["获取Boss技能最近敌对英雄"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
@@ -40,14 +42,17 @@ ____exports["推进雅儿贝德技能驱动"] = function(context)
     local guardDy = GetUnitY(albedo) - GetUnitY(context["安兹单位"])
     if guardDx * guardDx + guardDy * guardDy > cfg["守护回归触发距离"] * cfg["守护回归触发距离"] then
         if _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_56DE_5F52(context) then
+            _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD(albedo, "守护回归")
             return
         end
     end
     local cooldown = cfg["黑翼横扫冷却秒"] * (state["阶段状态"] == "狂怒护卫" and cfg["黑翼横扫狂怒冷却倍率"] or 1) * 1000
     local now = getServerTime()
     if now < state["上次普通技能Ms"] + cooldown then
-        if active == nil and not _____91CA_653E_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB(context) then
-            _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23(context)
+        if active == nil and _____91CA_653E_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB(context) then
+            _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD(albedo, "护卫反击")
+        elseif active == nil and _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23(context) then
+            _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD(albedo, "守护者之职责")
         end
         return
     end
@@ -61,9 +66,13 @@ ____exports["推进雅儿贝德技能驱动"] = function(context)
     local dx = GetUnitX(target) - GetUnitX(albedo)
     local dy = GetUnitY(target) - GetUnitY(albedo)
     if dx * dx + dy * dy <= cfg["黑翼横扫半径"] * cfg["黑翼横扫半径"] then
-        _____91CA_653E_96C5_513F_8D1D_5FB7_9ED1_7FFC_6A2A_626B(context, target)
+        if _____91CA_653E_96C5_513F_8D1D_5FB7_9ED1_7FFC_6A2A_626B(context, target) then
+            _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD(albedo, "黑翼横扫")
+        end
     elseif active == nil then
-        _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23(context)
+        if _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23(context) then
+            _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD(albedo, "守护者之职责")
+        end
     end
 end
 ____exports["雅儿贝德技能驱动状态"] = {["已完成设计"] = true, ["已完成实现"] = true, ["已注册"] = true, ["语义"] = "根据安兹阶段、雅儿贝德生命、双方距离和共享大型技能锁选择护卫动作。"}

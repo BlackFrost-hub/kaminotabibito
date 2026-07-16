@@ -11,7 +11,7 @@ const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．
 const GetRandomInt = jass.GetRandomInt as (this: void, lowBound: number, highBound: number) => number;
 const StopSound = jass.StopSound as (soundHandle: any, killWhenDone: boolean, fadeOut: boolean) => void;
 
-let 当前Boss配音句柄: any = null;
+const Boss配音句柄表: Record<string, any> = {};
 
 export type Boss台词表 = Record<string, readonly string[]>;
 export type Boss配音资源表 = Record<string, readonly string[]>;
@@ -19,6 +19,7 @@ export type Boss配音资源表 = Record<string, readonly string[]>;
 export interface Boss台词播放配置 {
   台词: Boss台词表;
   广播持续时间Ms: number;
+  配音组?: string;
   配音资源?: Boss配音资源表;
   配音裁断距离?: number;
   配音允许重叠?: boolean;
@@ -46,17 +47,19 @@ export function 播放Boss台词配音(
   类型: string,
   index: number,
   裁断距离?: number,
-  允许重叠?: boolean
+  允许重叠?: boolean,
+  配音组 = 'BossVoice'
 ): void {
   if (配音资源表 == null) return;
   const paths = 配音资源表[类型];
   if (paths == null || paths.length <= 0) return;
   const path = paths[index] ?? paths[0];
   if (path == null || path === "") return;
-  if (!允许重叠 && 当前Boss配音句柄 != null && 当前Boss配音句柄 !== 0) {
-    StopSound(当前Boss配音句柄, false, false);
+  const 上一条配音句柄 = Boss配音句柄表[配音组];
+  if (!允许重叠 && 上一条配音句柄 != null && 上一条配音句柄 !== 0) {
+    StopSound(上一条配音句柄, false, false);
   }
-  当前Boss配音句柄 = Sound3DII_UnitPlayReuse(path, 来源单位, 裁断距离 ?? 4000);
+  Boss配音句柄表[配音组] = Sound3DII_UnitPlayReuse(path, 来源单位, 裁断距离 ?? 4000);
 }
 
 export function 播放Boss台词广播(
@@ -82,5 +85,6 @@ export function 播放Boss台词(
   const actualIndex = 取Boss台词下标(配置.台词, 类型, index);
   if (actualIndex == null) return;
   播放Boss台词广播(来源单位, 配置.台词, 类型, 配置.广播持续时间Ms, actualIndex);
-  播放Boss台词配音(来源单位, 配置.配音资源, 类型, actualIndex, 配置.配音裁断距离, 配置.配音允许重叠);
+  const 配音组 = 配置.配音组 ?? (配置 as any).BossKey ?? 'BossVoice';
+  播放Boss台词配音(来源单位, 配置.配音资源, 类型, actualIndex, 配置.配音裁断距离, 配置.配音允许重叠, 配音组);
 }
