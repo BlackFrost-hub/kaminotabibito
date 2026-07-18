@@ -10,6 +10,7 @@ import { 获取全部安兹运行时上下文 } from '../01．运行时上下文
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
 import { 开始冲锋, 开始击退 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { 播放限时单位动画 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -100,6 +101,7 @@ export function 释放雅儿贝德至尊拦截(this: void, context: 安兹运行
   const angleRadians = Atan2(GetUnitY(attacker) - GetUnitY(boss), GetUnitX(attacker) - GetUnitX(boss));
   const endX = GetUnitX(boss) + Cos(angleRadians) * cfg.至尊拦截落点距安兹;
   const endY = GetUnitY(boss) + Sin(angleRadians) * cfg.至尊拦截落点距安兹;
+  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.雅儿贝德护卫拦截, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   const startX = GetUnitX(albedo);
   const startY = GetUnitY(albedo);
   const dx = endX - startX;

@@ -18,6 +18,7 @@ import {
   type 生命锚点封锁目标,
 } from './01．护卫雅儿贝德/06．生命锚点封锁';
 import { 播放安兹台词 } from './12．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
@@ -257,6 +258,7 @@ function 结算女妖哭嚎(this: void, instance: 一切生命的终点实例): 
   if (instance.已清理 || instance.context.挑战已结束) return false;
   播放女妖哭嚎表现(instance);
   const boss = instance.context.安兹单位;
+  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.一切生命终点, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   const cfg = 安兹乌尔恭数值与表现配置.阶段技能;
   const heroes = 获取Boss技能敌对英雄列表(boss);
   const solved = instance.锚点列表.length === cfg.生命锚点数量
@@ -301,6 +303,7 @@ export function 释放安兹一切生命的终点(this: void, context: 安兹运
   context.一切生命的终点已释放 = true;
   context.当前大型技能 = 一切生命的终点大型技能Key;
   播放安兹台词(boss, '一切生命的终点');
+  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.死亡倒计时, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   context.清理.登记清理('安兹-一切生命的终点实例', function 一切生命的终点实例清理(this: void): void {
     清理一切生命的终点实例(instance);
   });

@@ -4,6 +4,7 @@ import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能�
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 开始冲锋 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
@@ -61,6 +62,7 @@ function 安排P3归魂回斩(this: void, context: 亚伦柯斯运行时上下�
       return;
     }
     播放限时单位动画({ 单位: boss, 动画编号: cfg.P3归魂动画编号, 持续秒: 1, 恢复动画编号: 1 });
+    播放Boss坐标音效(亚伦柯斯正式设计配置.音效.归魂剑痕, endX, endY, 亚伦柯斯正式设计配置.音效默认裁断距离);
     const effect = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.归魂剑痕特效路径, endX, endY);
     if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(0.8, effect);
     const heroes = 获取Boss技能敌对英雄列表(boss);
@@ -98,6 +100,7 @@ export function 释放亚伦柯斯亡冥英斩(this: void, context: 亚伦柯斯
   const charge = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.亡冥英斩蓄势特效路径, startX, startY);
   if (charge != null && charge !== 0) YDWETimerDestroyEffectSafe(cfg.前摇秒 + 0.2, charge);
   播放亚伦柯斯台词(boss, isP3 ? '亡冥英斩归魂' : '亡冥英斩');
+  播放Boss坐标音效(亚伦柯斯正式设计配置.音效.亡冥英斩蓄势, startX, startY, 亚伦柯斯正式设计配置.音效默认裁断距离);
 
   const delayedId = addDelayedCallback(cfg.前摇秒 * 1000, function 亚伦柯斯亡冥英斩开始(this: void): void {
     if (!单位有效(boss) || context.战斗已结束) {
@@ -118,6 +121,7 @@ export function 释放亚伦柯斯亡冥英斩(this: void, context: 亚伦柯斯
       允许重复命中: false,
       命中后结束: false,
       命中回调: function 亚伦柯斯亡冥英斩命中(this: void, source: any, hit: any): void {
+        播放Boss坐标音效(亚伦柯斯正式设计配置.音效.亡冥英斩突进命中, GetUnitX(hit), GetUnitY(hit), 亚伦柯斯正式设计配置.音效默认裁断距离);
         造成亡冥英斩伤害(source, hit, cfg.伤害攻击力比例, cfg.伤害目标最大生命比例, '亚伦柯斯·亡冥英斩');
         const effect = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.亡冥英斩命中特效路径, GetUnitX(hit), GetUnitY(hit));
         if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(0.6, effect);

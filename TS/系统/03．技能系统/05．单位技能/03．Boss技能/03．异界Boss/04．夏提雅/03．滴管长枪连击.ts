@@ -9,6 +9,7 @@ import { 播放限时单位动画 } from '../../../../00．技能模板+函数/0
 import { 单位是否处于硬控制效果合集 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -94,6 +95,7 @@ function 执行强化穿刺命中(this: void, context: 夏提雅运行时上下�
   const dx = GetUnitX(target) - GetUnitX(boss);
   const dy = GetUnitY(target) - GetUnitY(boss);
   if (dx * dx + dy * dy > cfg.强化穿刺命中距离 * cfg.强化穿刺命中距离) return;
+  播放Boss坐标音效(夏提雅数值与表现配置.音效.滴管穿心汲血, GetUnitX(target), GetUnitY(target), 夏提雅数值与表现配置.音效默认裁断距离);
   SetUnitFacing(boss, Atan2(dy, dx) * RAD_TO_DEG);
   const damage = 计算组合技能伤害(boss, target, {
     来源攻击力比例: cfg.强化穿刺伤害攻击力比例,

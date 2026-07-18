@@ -10,6 +10,7 @@ import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/0
 import { 获取夏提雅英灵投影, 尝试触发英灵战乙女复刻 } from './09．英灵战乙女';
 import { 创建点名预警执行器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/05．点名预警执行器';
 import { 播放夏提雅台词 } from './18．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
@@ -67,6 +68,7 @@ function 尝试安排净化投枪英灵复刻(this: void, context: 夏提雅运�
 function 结算净化投枪落点(this: void, context: 夏提雅运行时上下文, x: number, y: number, tag: string): void {
   const boss = context.Boss单位;
   const cfg = 夏提雅数值与表现配置.净化投枪;
+  播放Boss坐标音效(夏提雅数值与表现配置.音效.净化投枪, x, y, 夏提雅数值与表现配置.音效默认裁断距离);
   const effect = AddSpecialEffect(夏提雅数值与表现配置.表现资源.净化投枪特效路径, x, y);
   if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(cfg.特效持续秒, effect);
   净化落点内夏提雅鲜血印记(context, x, y, cfg.伤害半径);

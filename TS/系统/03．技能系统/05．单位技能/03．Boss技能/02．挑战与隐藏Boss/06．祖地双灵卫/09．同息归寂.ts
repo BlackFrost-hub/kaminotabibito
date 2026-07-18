@@ -9,6 +9,7 @@ import { 播放限时单位动画 } from '../../../../00．技能模板+函数/0
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 const { 主动结束Boss战运行 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动') as {
   主动结束Boss战运行: (this: void, boss: any, options?: any) => boolean;
 };
@@ -62,6 +63,7 @@ function 进入灵魂崩解(this: void, context: 祖地双灵卫运行时上下�
   SetUnitInvulnerable(unit, true);
   registerManualBuff(unit, 祖地双灵卫BuffID.灵魂崩解, 3600, 1, { sourceName: '祖地双灵卫-灵魂崩解', tickWhilePaused: true });
   const animation = name === '赤誓灵卫' ? 祖地双灵卫数值与表现配置.动作.裂誓消散 : 祖地双灵卫数值与表现配置.动作.无面施法;
+  if (context.崩解中的守卫 == null) 播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.同息归寂, GetUnitX(unit), GetUnitY(unit), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   播放限时单位动画({ 单位: unit, 动画编号: animation, 持续秒: 2, 恢复动画编号: animation });
   if (name === '赤誓灵卫') 播放赤誓灵卫台词(unit, '灵魂崩解');
   else 播放苍影灵卫台词(unit, '灵魂崩解');

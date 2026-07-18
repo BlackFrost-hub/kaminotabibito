@@ -4,6 +4,7 @@ import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能�
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 开始分批点名落点模板 } from '../../../../00．技能模板+函数/00．技能模板/05．点名技能模板/02．分批点名落点模板';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
@@ -49,6 +50,7 @@ function 结算英灵陨星(this: void, context: 亚伦柯斯运行时上下文,
   const cfg = 亚伦柯斯正式设计配置;
   const meteor = AddSpecialEffect(cfg.表现资源.英灵陨星正式特效路径, x, y);
   const impact = AddSpecialEffect(cfg.表现资源.英灵陨星落地特效路径, x, y);
+  播放Boss坐标音效(cfg.音效.英灵陨星命中, x, y, cfg.音效默认裁断距离);
   if (meteor != null && meteor !== 0) YDWETimerDestroyEffectSafe(0.8, meteor);
   if (impact != null && impact !== 0) YDWETimerDestroyEffectSafe(0.8, impact);
   const heroes = 获取Boss技能敌对英雄列表(boss);
@@ -80,6 +82,7 @@ export function 释放亚伦柯斯英灵陨星(this: void, context: 亚伦柯斯
   context.普通机制忙碌到Ms = getServerTime() + (totalDuration + 0.4) * 1000;
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: 1, 恢复动画编号: 1 });
   播放亚伦柯斯台词(boss, isP3 ? '英灵陨星送葬' : '英灵陨星');
+  播放Boss坐标音效(亚伦柯斯正式设计配置.音效.英灵陨星坠落, GetUnitX(boss), GetUnitY(boss), 亚伦柯斯正式设计配置.音效默认裁断距离);
 
   开始分批点名落点模板({
     名称: '亚伦柯斯-英灵陨星',

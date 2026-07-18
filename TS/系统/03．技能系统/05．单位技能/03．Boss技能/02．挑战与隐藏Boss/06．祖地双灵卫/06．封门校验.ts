@@ -11,6 +11,7 @@ import { 两点角度, 极坐标X, 极坐标Y, 点到线段距离平方 } from '
 import { 执行战斗自身传送到坐标 } from '../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 播放苍影灵卫台词 } from './12．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -108,6 +109,7 @@ export function 释放祖地双灵卫封门校验(this: void, context: 祖地双
     return false;
   }
   播放苍影灵卫台词(azure, '封门校验');
+  播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.封门校验, GetUnitX(azure), GetUnitY(azure), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   return true;
 }
 

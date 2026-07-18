@@ -8,6 +8,8 @@ local ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D = require("系统.03．技�
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D["创建可攻击机制单位"]
 local ____06_FF0E_5355_4F4D_505C_7559_89E6_53D1_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.06．单位停留触发器")
 local _____521B_5EFA_5355_4F4D_505C_7559_89E6_53D1_5668 = ____06_FF0E_5355_4F4D_505C_7559_89E6_53D1_5668["创建单位停留触发器"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
@@ -80,6 +82,7 @@ ____exports["创建夏提雅鲜血印记"] = function(context, x, y)
     if unitInstance == nil then
         return nil
     end
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["鲜血印记落地"], x, y, _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"])
     UnitAddAbility(unitInstance["单位"], _____8757_866B_6280_80FDID)
     SetUnitInvulnerable(unitInstance["单位"], true)
     PauseUnit(unitInstance["单位"], true)

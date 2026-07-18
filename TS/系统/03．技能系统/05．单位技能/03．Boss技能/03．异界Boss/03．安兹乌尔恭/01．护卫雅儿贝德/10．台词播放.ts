@@ -10,6 +10,7 @@ const { 播放Boss台词 } = require('系统.03．技能系统.00．技能模板
       台词: Record<string, readonly string[]>;
       广播持续时间Ms: number;
       配音资源?: Record<string, readonly string[]>;
+      配音组?: string;
       配音裁断距离?: number;
       配音允许重叠?: boolean;
     },
@@ -23,6 +24,8 @@ export type 雅儿贝德台词类型 = keyof typeof 安兹乌尔恭单位技能�
 const 雅儿贝德台词配置 = {
   台词: 安兹乌尔恭单位技能配置.雅儿贝德台词,
   广播持续时间Ms: 安兹乌尔恭单位技能配置.广播持续时间Ms,
+  配音资源: 安兹乌尔恭单位技能配置.配音资源,
+  配音组: 安兹乌尔恭单位技能配置.护卫.BossKey,
   配音裁断距离: 安兹乌尔恭单位技能配置.配音裁断距离,
 } as const;
 

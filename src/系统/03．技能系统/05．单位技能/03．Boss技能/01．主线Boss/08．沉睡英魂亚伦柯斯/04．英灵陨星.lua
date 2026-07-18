@@ -6,6 +6,8 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["亚伦柯斯正式设计配置"]
 local ____11_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.11．台词播放")
 local _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD = ____11_FF0E_53F0_8BCD_64AD_653E["播放亚伦柯斯台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____02_FF0E_5206_6279_70B9_540D_843D_70B9_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.05．点名技能模板.02．分批点名落点模板")
 local _____5F00_59CB_5206_6279_70B9_540D_843D_70B9_6A21_677F = ____02_FF0E_5206_6279_70B9_540D_843D_70B9_6A21_677F["开始分批点名落点模板"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
@@ -53,6 +55,7 @@ local function _____7ED3_7B97_82F1_7075_9668_661F(context, x, y, radius)
     local cfg = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E
     local meteor = AddSpecialEffect(cfg["表现资源"]["英灵陨星正式特效路径"], x, y)
     local impact = AddSpecialEffect(cfg["表现资源"]["英灵陨星落地特效路径"], x, y)
+    _____64AD_653EBoss_5750_6807_97F3_6548(cfg["音效"]["英灵陨星命中"], x, y, cfg["音效默认裁断距离"])
     if meteor ~= nil and meteor ~= 0 then
         YDWETimerDestroyEffectSafe(0.8, meteor)
     end
@@ -108,6 +111,12 @@ ____exports["释放亚伦柯斯英灵陨星"] = function(context)
     context["普通机制忙碌到Ms"] = getServerTime() + (totalDuration + 0.4) * 1000
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["动画编号"], ["持续秒"] = 1, ["恢复动画编号"] = 1})
     _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD(boss, isP3 and "英灵陨星送葬" or "英灵陨星")
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["音效"]["英灵陨星坠落"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["音效默认裁断距离"]
+    )
     _____5F00_59CB_5206_6279_70B9_540D_843D_70B9_6A21_677F({
         ["名称"] = "亚伦柯斯-英灵陨星",
         ["清理"] = context["清理"],

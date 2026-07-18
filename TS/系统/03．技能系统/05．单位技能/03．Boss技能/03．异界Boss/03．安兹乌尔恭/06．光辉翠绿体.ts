@@ -10,6 +10,7 @@ import { 创建次数型伤害免疫 } from '../../../../00．技能模板+函�
 import { 开始击退 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 播放安兹台词 } from './12．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 启动基础施法时间线 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线') as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -101,6 +102,7 @@ export function 释放安兹光辉翠绿体(this: void, context: 安兹运行时
   const boss = context.安兹单位;
   if (!单位有效(boss) || context.挑战已结束 || context.当前大型技能 != null) return;
   播放安兹台词(boss, '光辉翠绿体');
+  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.光辉翠绿体, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   const config = 安兹乌尔恭数值与表现配置.普通技能;
   标记安兹普通机制忙碌(context, config.光辉翠绿体施法硬直秒 + config.光辉翠绿体持续秒);
   启动基础施法时间线({

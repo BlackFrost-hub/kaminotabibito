@@ -21,6 +21,8 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
 local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_0["读取Boss战运行上下文"]
 local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
@@ -181,6 +183,12 @@ local function _____5B8C_6210_590D_751F_6210_529F(context, _____5269_4F59_7ED3_6
     local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
     SetUnitState(boss, UNIT_STATE_LIFE, maxLife * cfg["单枚恢复生命比例"] * _____5269_4F59_7ED3_6676)
     _____64AD_653E_590D_751F_6210_529F_8868_73B0(boss)
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["血之复生成功"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     context["阶段"] = "P3真祖血宴"
     context["上次阶段变化Ms"] = getServerTime()
     context["普通机制忙碌到Ms"] = context["上次阶段变化Ms"] + (cfg["复生成功恢复动作延迟秒"] + 1) * 1000
@@ -207,6 +215,12 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
         return false
     end
     _____64AD_653E_590F_63D0_96C5_53F0_8BCD(boss, "血之复生")
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["血之复生仪式"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["血之复生"]
     local crystals = {}
     local points = _____53D6_590D_751F_7ED3_6676_70B9(boss)
@@ -299,6 +313,12 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
                 _____6E05_7406_590D_751F_7ED3_6676(crystals)
                 if remaining <= 0 then
                     _____5E7F_64AD_5355_4F4D_63D0_793A(boss, _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["台词"]["复生失败"][1], 3600)
+                    _____64AD_653EBoss_5750_6807_97F3_6548(
+                        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["血之复生失败"],
+                        GetUnitX(boss),
+                        GetUnitY(boss),
+                        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+                    )
                     ____on_590D_751F_5931_8D25(context)
                     return
                 end

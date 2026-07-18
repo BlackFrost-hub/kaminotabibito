@@ -15,6 +15,8 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_0.doHeal
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
@@ -62,6 +64,12 @@ local function _____7ED3_675F_9C9C_8840_56DE_6536(context)
 end
 local function _____7ED3_7B97_9C9C_8840_56DE_6536(context)
     local boss = context["Boss单位"]
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["鲜血回收"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
     local marks = __TS__ArraySlice(context["血印句柄列表"])
     local absorbed = 0

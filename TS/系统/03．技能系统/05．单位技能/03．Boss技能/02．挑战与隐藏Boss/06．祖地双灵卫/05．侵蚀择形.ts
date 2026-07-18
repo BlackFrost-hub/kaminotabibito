@@ -6,6 +6,7 @@ import { 祖地双灵卫单位技能配置 } from './00．配置';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
@@ -33,6 +34,7 @@ function 生命比例(this: void, unit: any): number {
 function 变异守卫(this: void, context: 祖地双灵卫运行时上下文, name: 祖地双灵卫名称): void {
   const isRed = name === '赤誓灵卫';
   const unit = isRed ? context.赤誓灵卫单位 : context.苍影灵卫单位;
+  播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.侵蚀择形, GetUnitX(unit), GetUnitY(unit), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   const unitCfg = isRed ? 祖地双灵卫单位技能配置.单位.赤誓灵卫 : 祖地双灵卫单位技能配置.单位.苍影灵卫;
   const effectPath = isRed ? 祖地双灵卫数值与表现配置.表现资源.公共.赤誓变异转化特效路径 : 祖地双灵卫数值与表现配置.表现资源.公共.苍影变异转化特效路径;
   const effect = AddSpecialEffect(effectPath, GetUnitX(unit), GetUnitY(unit));

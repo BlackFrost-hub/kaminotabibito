@@ -8,6 +8,8 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
 local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 ____exports["清理英灵战乙女投影"] = function(context)
     local projection = context["英灵战乙女句柄"]
     context["英灵战乙女句柄"] = nil
@@ -144,6 +146,12 @@ ____exports["触发英灵战乙女复刻"] = function(context, _____53C2_6570)
     local delayedId = addDelayedCallback(
         delay * 1000,
         function()
+            _____64AD_653EBoss_5750_6807_97F3_6548(
+                _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["英灵战乙女"],
+                GetUnitX(context["Boss单位"]),
+                GetUnitY(context["Boss单位"]),
+                _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+            )
             if context["英灵战乙女句柄"] ~= projection or not _____5355_4F4D_6709_6548(projection) then
                 return
             end

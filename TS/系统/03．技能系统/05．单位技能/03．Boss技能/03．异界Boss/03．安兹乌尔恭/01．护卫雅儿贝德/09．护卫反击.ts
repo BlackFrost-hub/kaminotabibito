@@ -7,6 +7,7 @@ import { 创建反击窗口模板, type 反击窗口模板实例 } from '../../.
 import { 开始冲锋 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { 播放限时单位动画 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 
 const { 造成单体技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
   造成单体技能伤害: (this: void, 参数: any) => boolean;
@@ -87,7 +88,8 @@ function 启动护卫反击动作(this: void, context: 安兹运行时上下文,
       : cfg.护卫反击最大冲锋距离)
     : 0;
 
-  function 播放反击砸击并结算(this: void): void {
+function 播放反击砸击并结算(this: void): void {
+  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.雅儿贝德护卫拦截, GetUnitX(albedo), GetUnitY(albedo), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
     if (!单位有效(albedo) || !单位有效(attacker) || context.挑战已结束) {
       guardState.独占状态?.结束(token, '取消', '反击目标失效');
       return;

@@ -11,6 +11,7 @@ import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/0
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import { 创建立即执行阶段, 创建延迟阶段 } from '../../../../00．技能模板+函数/00．技能模板/01．多阶段技能编排/06．技能阶段链执行器';
 import { 播放夏提雅台词 } from './18．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -105,6 +106,7 @@ export function 释放夏提雅血月终舞(this: void, context: 夏提雅运行
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(target) || context.挑战已结束 || context.阶段 !== 'P3真祖血宴' || !context.P3转阶段已处理 || context.血月终舞已释放 || context.当前大型技能 != null) return false;
   播放夏提雅台词(boss, '血月终舞');
+  播放Boss坐标音效(夏提雅数值与表现配置.音效.血月终舞启动, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   const cfg = 夏提雅数值与表现配置.P3;
   移动到场地中心(boss);
   const centerX = GetUnitX(boss);
@@ -157,6 +159,7 @@ export function 释放夏提雅血月终舞(this: void, context: 夏提雅运行
       允许重复命中: false,
       命中后结束: false,
       命中回调: function 夏提雅血月终舞冲锋命中(this: void, _source: any, hit: any): void {
+        播放Boss坐标音效(夏提雅数值与表现配置.音效.血月终舞, GetUnitX(hit), GetUnitY(hit), 夏提雅数值与表现配置.音效默认裁断距离);
         const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.终舞冲锋伤害攻击力比例, 目标最大生命比例: cfg.终舞冲锋伤害目标最大生命比例 });
         造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: false, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '夏提雅·血月终舞-俯冲' });
       },

@@ -4,6 +4,7 @@ import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能�
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 亚伦柯斯BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/07．亚伦柯斯';
 
 const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
@@ -38,6 +39,7 @@ export function 启用亚伦柯斯不灭军魂(this: void, context: 亚伦柯斯
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.战斗已结束 || context.阶段 !== 'P3最后的誓约' || context.不灭军魂已启用) return false;
   context.不灭军魂已启用 = true;
+  播放Boss坐标音效(亚伦柯斯正式设计配置.音效.不灭军魂, GetUnitX(boss), GetUnitY(boss), 亚伦柯斯正式设计配置.音效默认裁断距离);
   registerManualBuff(boss, 亚伦柯斯BuffID.不灭军魂, 3600, 亚伦柯斯正式设计配置.不灭军魂.P3技能间隔缩短比例 * 100, {
     sourceName: '亚伦柯斯-不灭军魂',
   });

@@ -17,6 +17,8 @@ local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local ____02_FF0E_590F_63D0_96C5 = require("系统.05．Buff系统.03．Buff表.01．Boss.03．异界Boss.02．夏提雅")
 local _____590F_63D0_96C5BuffID = ____02_FF0E_590F_63D0_96C5["夏提雅BuffID"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_0.registerDamageModifier
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
@@ -89,6 +91,12 @@ local function _____6267_884C_5F3A_5316_7A7F_523A_547D_4E2D(context, target)
     if dx * dx + dy * dy > cfg["强化穿刺命中距离"] * cfg["强化穿刺命中距离"] then
         return
     end
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["滴管穿心汲血"],
+        GetUnitX(target),
+        GetUnitY(target),
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     SetUnitFacing(
         boss,
         Atan2(dy, dx) * RAD_TO_DEG

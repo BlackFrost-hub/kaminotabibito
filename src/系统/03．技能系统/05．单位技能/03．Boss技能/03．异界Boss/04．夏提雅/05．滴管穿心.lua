@@ -15,6 +15,8 @@ local _____83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71 = ____09_FF0E_82F1_7075_
 local _____5C1D_8BD5_89E6_53D1_82F1_7075_6218_4E59_5973_590D_523B = ____09_FF0E_82F1_7075_6218_4E59_5973["尝试触发英灵战乙女复刻"]
 local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -122,6 +124,12 @@ ____exports["释放夏提雅滴管穿心"] = function(context, target)
         return false
     end
     _____64AD_653E_590F_63D0_96C5_53F0_8BCD(boss, "滴管穿心")
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["滴管穿心突进"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["滴管穿心"]
     local startX = GetUnitX(boss)
     local startY = GetUnitY(boss)
@@ -175,6 +183,12 @@ ____exports["释放夏提雅滴管穿心"] = function(context, target)
                     ["允许重复命中"] = false,
                     ["命中后结束"] = false,
                     ["命中回调"] = function(source, hit)
+                        _____64AD_653EBoss_5750_6807_97F3_6548(
+                            _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["滴管穿心汲血"],
+                            GetUnitX(hit),
+                            GetUnitY(hit),
+                            _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+                        )
                         local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(source, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
                             ["来源"] = source,

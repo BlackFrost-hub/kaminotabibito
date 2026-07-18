@@ -6,6 +6,7 @@ import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配�
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 import { 创建持续单位连线 } from '../../../../00．技能模板+函数/04．机制组件/07．机制连线/01．持续单位连线';
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 闪电效果代码 } from '../../../../00．技能模板+函数/02．通用函数/17．闪电效果代码';
 
 const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
@@ -18,6 +19,8 @@ const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff
 };
 const jass = require('jass.common') as any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, unit: any, attachment: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
@@ -50,9 +53,12 @@ function 关闭同誓保护(this: void, context: 祖地双灵卫运行时上下�
 
 function 开启同誓保护(this: void, context: 祖地双灵卫运行时上下文, lowName: '赤誓灵卫' | '苍影灵卫'): void {
   const low = lowName === '赤誓灵卫' ? context.赤誓灵卫单位 : context.苍影灵卫单位;
+  const wasEnabled = context.同誓保护已启用;
   关闭同誓保护(context);
   if (lowName === '赤誓灵卫') 播放苍影灵卫台词(context.苍影灵卫单位, '双灵同誓');
   else 播放赤誓灵卫台词(context.赤誓灵卫单位, '双灵同誓');
+  const sound = wasEnabled ? 祖地双灵卫数值与表现配置.音效.双灵同誓保护 : 祖地双灵卫数值与表现配置.音效.双灵同誓建立;
+  播放Boss坐标音效(sound, GetUnitX(low), GetUnitY(low), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   context.同誓保护已启用 = true;
   context.低血保护守卫 = lowName;
   if (low != null && low !== 0) {

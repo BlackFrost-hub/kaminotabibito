@@ -3,6 +3,7 @@
 import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 亚伦柯斯单位技能配置 } from './00．配置';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
 import { 创建机制清理篮子, type 机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
 import { 创建单位运行时上下文工厂 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂';
@@ -181,6 +182,7 @@ function on亚伦柯斯死亡(this: void, dyingUnit: any): void {
   context.战斗已结束 = true;
   context.阶段 = '战败归静';
   context.当前大型技能 = undefined;
+  播放Boss坐标音效(亚伦柯斯正式设计配置.音效.战败归静, GetUnitX(dyingUnit), GetUnitY(dyingUnit), 亚伦柯斯正式设计配置.音效默认裁断距离);
   播放亚伦柯斯台词(dyingUnit, '战败');
   const effect = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.战败归静特效路径, GetUnitX(dyingUnit), GetUnitY(dyingUnit));
   if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(2.6, effect);

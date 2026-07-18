@@ -11,6 +11,8 @@ local _____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF = ____01_FF0E_6301_7EED_5355_
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
 local _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放赤誓灵卫台词"]
 local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____17_FF0E_95EA_7535_6548_679C_4EE3_7801 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.17．闪电效果代码")
 local _____95EA_7535_6548_679C_4EE3_7801 = ____17_FF0E_95EA_7535_6548_679C_4EE3_7801["闪电效果代码"]
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
@@ -22,6 +24,8 @@ local registerManualBuff = ____require_result_2.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
 local jass = require("jass.common")
 local GetUnitState = jass.GetUnitState
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local UnitDamageTarget = jass.UnitDamageTarget
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
@@ -79,12 +83,20 @@ local function _____5F00_542F_540C_8A93_4FDD_62A4(context, lowName)
         ____temp_5 = context["苍影灵卫单位"]
     end
     local low = ____temp_5
+    local wasEnabled = context["同誓保护已启用"]
     _____5173_95ED_540C_8A93_4FDD_62A4(context)
     if lowName == "赤誓灵卫" then
         _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD(context["苍影灵卫单位"], "双灵同誓")
     else
         _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD(context["赤誓灵卫单位"], "双灵同誓")
     end
+    local sound = wasEnabled and _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["双灵同誓保护"] or _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["双灵同誓建立"]
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        sound,
+        GetUnitX(low),
+        GetUnitY(low),
+        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     context["同誓保护已启用"] = true
     context["低血保护守卫"] = lowName
     if low ~= nil and low ~= 0 then

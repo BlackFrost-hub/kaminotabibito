@@ -164,6 +164,18 @@ export const 祖地双灵卫数值与表现配置 = {
     无面劈砍: 6,
     无面施法: 7,
   },
+  音效默认裁断距离: 3000,
+  音效: {
+    双灵同誓建立: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_oath_link_establish.mp3',
+    双灵同誓保护: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_oath_link_protect.mp3',
+    封门校验: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_gate_validation_impact.mp3',
+    同息归寂: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_shared_breath_collapse.mp3',
+    赤誓盾锋: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_red_oath_shield_charge.mp3',
+    苍影镇魂印: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_azure_spirit_seal.mp3',
+    双钥净化: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_dual_key_purify.mp3',
+    侵蚀择形: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_corruption_transform.mp3',
+    封门误判: 'Sound\\Boss\\AncestralTwinGuards\\SFX\\twin_guards_gate_misjudgment_break.mp3',
+  },
   表现资源: {
     誓约主色: { R: 220, G: 174, B: 78 },
     灵识主色: { R: 105, G: 185, B: 235 },

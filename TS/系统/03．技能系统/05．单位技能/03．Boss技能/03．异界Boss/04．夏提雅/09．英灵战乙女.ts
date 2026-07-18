@@ -4,6 +4,7 @@ import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能�
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 播放夏提雅台词 } from './18．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const jass = require('jass.common') as any;
 
@@ -126,6 +127,7 @@ export function 触发英灵战乙女复刻(this: void, context: 夏提雅运行
 
   SetUnitFacing(projection, 参数.朝向);
   const delayedId = addDelayedCallback(delay * 1000, function 夏提雅英灵复刻结算(this: void): void {
+    播放Boss坐标音效(夏提雅数值与表现配置.音效.英灵战乙女, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 夏提雅数值与表现配置.音效默认裁断距离);
     if (context.英灵战乙女句柄 !== projection || !单位有效(projection)) return;
     SetUnitAnimation(projection, 'attack');
     if (参数.复刻结算 != null) 参数.复刻结算();

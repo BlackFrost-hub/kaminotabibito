@@ -22,11 +22,13 @@ local createTimedEffect = ____03_FF0E_7279_6548.createTimedEffect
 local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____03_FF0E_7279_6548["设置特效XYZ轴旋转"]
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
 local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.牵引系统")
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.01．牵引系统.03．对外接口")
 local _____5F00_59CB_7275_5F15 = ____require_result_2["开始牵引"]
 local _____505C_6B62_7275_5F15 = ____require_result_2["停止牵引"]
 local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -129,6 +131,12 @@ local function _____68C0_67E5_7977_6F6E_7A7F_8FC7_6821_51C6_8282_70B9(context, s
 end
 ____exports["释放失名祷潮"] = function(context, target)
     local boss = context["苍影灵卫单位"]
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["苍影镇魂印"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
         return false
     end

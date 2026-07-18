@@ -9,10 +9,11 @@ import { 两点角度, 极坐标X, 极坐标Y, 点到线段距离平方, 单位�
 import { 单位是否在条形区域 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/矩形区域';
 import { createTimedEffect, 设置特效XYZ轴旋转 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
 import { 播放苍影灵卫台词 } from '../12．台词播放';
+import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能敌对英雄列表: (this: void, boss: any) => any[] };
-const { 开始牵引, 停止牵引 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.牵引系统') as {
+const { 开始牵引, 停止牵引 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.01．牵引系统.03．对外接口') as {
   开始牵引: (this: void, unit: any, params: any) => number;
   停止牵引: (this: void, id: number) => boolean;
 };
@@ -74,6 +75,7 @@ function 检查祷潮穿过校准节点(this: void, context: 祖地双灵卫运�
 
 export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时上下文, target?: any): boolean {
   const boss = context.苍影灵卫单位;
+  播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.苍影镇魂印, GetUnitX(boss), GetUnitY(boss), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   if (!单位有效(boss) || context.战斗已结束) return false;
   const targets = 取祷潮目标列表(boss, target);
   if (targets.length === 0) return false;

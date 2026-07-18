@@ -150,6 +150,21 @@ ____exports["夏提雅数值与表现配置"] = {
         ["复生成功特效持续秒"] = 1.2
     },
     ["挑战收束"] = {["离场动画编号"] = 10, ["离场延迟秒"] = 1.5, ["离场特效持续秒"] = 1.6},
+    ["音效默认裁断距离"] = 3000,
+    ["音效"] = {
+        ["滴管穿心汲血"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_spuit_lance_third_hit_drain.mp3",
+        ["净化投枪"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_purifying_lance_impact.mp3",
+        ["血月终舞"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_blood_moon_final_dive.mp3",
+        ["滴管穿心突进"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_lance_dash_thrust.mp3",
+        ["鲜血回收"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_blood_mark_reclaim.mp3",
+        ["英灵战乙女"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_valkyrie_echo_attack.mp3",
+        ["鲜血印记落地"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_blood_mark_create.mp3",
+        ["真祖血宴"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_true_blood_feast_phase.mp3",
+        ["血月终舞启动"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_blood_moon_start.mp3",
+        ["血之复生仪式"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_resurrection_ritual_pulse.mp3",
+        ["血之复生成功"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_resurrection_resolve_success.mp3",
+        ["血之复生失败"] = "Sound\\Boss\\Shalltear\\SFX\\shalltear_resurrection_resolve_failure.mp3"
+    },
     ["表现资源"] = {
         ["血红镜面裂隙特效路径"] = "",
         ["普攻二段鲜血标记特效路径"] = "Common\\Effect\\Form\\Debuff\\ShalltearBloodDropMark.mdx",

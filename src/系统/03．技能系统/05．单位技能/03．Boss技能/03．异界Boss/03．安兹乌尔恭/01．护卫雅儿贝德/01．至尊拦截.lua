@@ -11,6 +11,8 @@ local _____5F00_59CB_51B2_950B = _____51FB_9000_7CFB_7EDF["开始冲锋"]
 local _____5F00_59CB_51FB_9000 = _____51FB_9000_7CFB_7EDF["开始击退"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
@@ -115,6 +117,12 @@ ____exports["释放雅儿贝德至尊拦截"] = function(context, attacker)
     )
     local endX = GetUnitX(boss) + Cos(angleRadians) * cfg["至尊拦截落点距安兹"]
     local endY = GetUnitY(boss) + Sin(angleRadians) * cfg["至尊拦截落点距安兹"]
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["雅儿贝德护卫拦截"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local startX = GetUnitX(albedo)
     local startY = GetUnitY(albedo)
     local dx = endX - startX

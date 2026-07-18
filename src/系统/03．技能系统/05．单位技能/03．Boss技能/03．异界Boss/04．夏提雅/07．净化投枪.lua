@@ -19,6 +19,8 @@ local ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668 = require("系统.03．技�
 local _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668 = ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668["创建点名预警执行器"]
 local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -114,6 +116,7 @@ end
 local function _____7ED3_7B97_51C0_5316_6295_67AA_843D_70B9(context, x, y, tag)
     local boss = context["Boss单位"]
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["净化投枪"]
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["净化投枪"], x, y, _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"])
     local effect = AddSpecialEffect(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["净化投枪特效路径"], x, y)
     if effect ~= nil and effect ~= 0 then
         YDWETimerDestroyEffectSafe(cfg["特效持续秒"], effect)

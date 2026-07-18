@@ -7,6 +7,7 @@ import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 吸收夏提雅鲜血印记, type 夏提雅鲜血印记实例 } from './04．鲜血印记';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 播放夏提雅台词 } from './18．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
   doHeal: (this: void, params: any) => number;
@@ -56,6 +57,7 @@ function 结束鲜血回收(this: void, context: 夏提雅运行时上下文): v
 
 function 结算鲜血回收(this: void, context: 夏提雅运行时上下文): void {
   const boss = context.Boss单位;
+  播放Boss坐标音效(夏提雅数值与表现配置.音效.鲜血回收, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   const cfg = 夏提雅数值与表现配置.鲜血印记;
   const marks = context.血印句柄列表.slice() as 夏提雅鲜血印记实例[];
   let absorbed = 0;

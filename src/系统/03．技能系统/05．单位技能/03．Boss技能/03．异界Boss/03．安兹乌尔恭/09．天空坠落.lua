@@ -11,6 +11,8 @@ local ____04_FF0E_5706_5F62_5B89_5168_533A_7EC4 = require("系统.03．技能系
 local _____521B_5EFA_5706_5F62_5B89_5168_533A_7EC4 = ____04_FF0E_5706_5F62_5B89_5168_533A_7EC4["创建圆形安全区组"]
 local ____05_FF0E_9ED1_7FFC_62D8_675F = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.05．黑翼拘束")
 local _____542F_52A8_96C5_513F_8D1D_5FB7_5929_7A7A_5760_843D_8054_52A8 = ____05_FF0E_9ED1_7FFC_62D8_675F["启动雅儿贝德天空坠落联动"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
@@ -131,6 +133,12 @@ local function _____7ED3_7B97_5929_7A7A_5760_843D_4F24_5BB3(context, instance)
     if ____temp_9 then
         return
     end
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["天空坠落贯穿"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local x = GetUnitX(boss)
     local y = GetUnitY(boss)
@@ -186,6 +194,12 @@ ____exports["释放安兹天空坠落"] = function(context)
     context["天空坠落已释放"] = true
     context["当前大型技能"] = _____5929_7A7A_5760_843D_5927_578B_6280_80FDKey
     _____64AD_653E_5B89_5179_53F0_8BCD(boss, "天空坠落")
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["天空坠落聚能"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local instance = _____521B_5EFA_5929_7A7A_5760_843D_9884_8B66(context, castSeconds)
     if context["模式"] == "守护者介入" then
         _____542F_52A8_96C5_513F_8D1D_5FB7_5929_7A7A_5760_843D_8054_52A8(context, castSeconds)

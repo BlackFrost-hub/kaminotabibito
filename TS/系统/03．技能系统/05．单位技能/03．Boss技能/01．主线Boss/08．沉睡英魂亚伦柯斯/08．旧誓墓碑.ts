@@ -6,6 +6,7 @@ import { 进入亚伦柯斯P3 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 亚伦柯斯单位技能配置 } from './00．配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 单位是否在胶囊区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/胶囊区域';
 import { 亚伦柯斯BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/07．亚伦柯斯';
@@ -99,6 +100,7 @@ function 完成墓碑安魂(this: void, context: 亚伦柯斯运行时上下文,
   if (context.未安魂墓碑数量 < 0) context.未安魂墓碑数量 = 0;
   刷新旧誓加护Buff(context);
   const release = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.墓碑安魂完成特效路径, state.X, state.Y);
+  播放Boss坐标音效(亚伦柯斯正式设计配置.音效.墓碑安魂, state.X, state.Y, 亚伦柯斯正式设计配置.音效默认裁断距离);
   if (release != null && release !== 0) YDWETimerDestroyEffectSafe(1.4, release);
   播放亚伦柯斯台词(context.Boss单位, '墓碑安魂');
   if (context.未安魂墓碑数量 <= 0) 进入亚伦柯斯P3(context);

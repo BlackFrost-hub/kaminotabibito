@@ -2,6 +2,7 @@
 
 import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
+import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 两点角度, 极坐标X, 极坐标Y, 距离XY, 限制数值, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
@@ -84,6 +85,7 @@ function 创建终点誓盾(this: void, context: 祖地双灵卫运行时上下�
 
 export function 释放誓锋壁进(this: void, context: 祖地双灵卫运行时上下文, target: any): boolean {
   const boss = context.苍影灵卫单位;
+  播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.赤誓盾锋, GetUnitX(boss), GetUnitY(boss), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   if (!单位有效(boss) || !单位有效(target) || context.战斗已结束) return false;
   const cfg = 祖地双灵卫数值与表现配置.P1.誓锋壁进;
   const startX = GetUnitX(boss);

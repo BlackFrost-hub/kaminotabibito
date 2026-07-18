@@ -83,6 +83,18 @@ ____exports["亚伦柯斯正式设计配置"] = {
         ["残影斩击伤害目标最大生命比例"] = 0.015
     },
     ["不灭军魂"] = {["P3技能间隔缩短比例"] = 0.12, ["最终强化攻击力比例"] = 0.2, ["最终强化攻击速度提高"] = 0.15, ["最终强化控制免疫秒"] = 1.2},
+    ["音效默认裁断距离"] = 3000,
+    ["音效"] = {
+        ["亡冥英斩突进命中"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_soul_cleave_dash_hit.mp3",
+        ["亡冥英斩蓄势"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_soul_cleave_charge.mp3",
+        ["归魂剑痕"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_returning_soul_slash.mp3",
+        ["英灵陨星坠落"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_fallen_spirit_descent.mp3",
+        ["英灵陨星命中"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_fallen_spirit_impact.mp3",
+        ["亡者凝视"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_grave_gaze_release.mp3",
+        ["墓碑安魂"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_tombstone_rest_complete.mp3",
+        ["不灭军魂"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_undying_oath_awaken.mp3",
+        ["战败归静"] = "Sound\\Boss\\Aronkos\\SFX\\aronkos_duty_ends_defeat.mp3"
+    },
     ["表现资源"] = {
         ["开战苏醒特效路径"] = "Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx",
         ["常驻英魂特效路径"] = "Common\\Effect\\Form\\Aura\\AronkosGraveSoulField.mdx",

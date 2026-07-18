@@ -17,6 +17,8 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____02_FF0E_590F_63D0_96C5 = require("系统.05．Buff系统.03．Buff表.01．Boss.03．异界Boss.02．夏提雅")
 local _____590F_63D0_96C5BuffID = ____02_FF0E_590F_63D0_96C5["夏提雅BuffID"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_0.registerManualBuff
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.00．SGSS")
@@ -46,6 +48,12 @@ ____exports["释放夏提雅真祖血宴"] = function(context)
     if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] or context["阶段"] ~= "P3真祖血宴" or context["P3转阶段已处理"] or context["当前大型技能"] ~= nil then
         return false
     end
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["真祖血宴"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P3
     context["P3转阶段已处理"] = true
     context["当前大型技能"] = _____771F_7956_8840_5BB4_6280_80FDKey

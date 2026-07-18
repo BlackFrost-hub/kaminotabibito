@@ -4,6 +4,7 @@ import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 创建可攻击机制单位, type 可攻击机制单位实例 } from '../../../../00．技能模板+函数/04．机制组件/05．机制单位/01．可攻击机制单位';
 import { 创建单位停留触发器, type 单位停留触发控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/06．单位停留触发器';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能敌对英雄列表: (this: void, boss: any) => any[] };
 const { addDelayedCallback, removeDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
@@ -52,6 +53,7 @@ export function 创建夏提雅鲜血印记(this: void, context: 夏提雅运行
   if (context.血印句柄列表.length >= cfg.同时存在上限) return undefined;
   const unitInstance = 创建可攻击机制单位({ 清理: context.清理, 名称: '夏提雅-鲜血印记', 主人单位: context.Boss单位, 所属玩家: Player(15), 单位类型: cfg.机制单位ID, 模型路径: 夏提雅数值与表现配置.表现资源.血印地面特效路径, X: x, Y: y, 最大生命: 1, 生命值受小怪倍率: false, 缩放: cfg.机制单位缩放 });
   if (unitInstance == null) return undefined;
+  播放Boss坐标音效(夏提雅数值与表现配置.音效.鲜血印记落地, x, y, 夏提雅数值与表现配置.音效默认裁断距离);
   UnitAddAbility(unitInstance.单位, 蝗虫技能ID);
   SetUnitInvulnerable(unitInstance.单位, true);
   PauseUnit(unitInstance.单位, true);

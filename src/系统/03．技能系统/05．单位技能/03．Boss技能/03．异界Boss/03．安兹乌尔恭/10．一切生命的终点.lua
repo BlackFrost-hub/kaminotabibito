@@ -22,6 +22,8 @@ local ____06_FF0E_751F_547D_951A_70B9_5C01_9501 = require("系统.03．技能系
 local _____542F_52A8_96C5_513F_8D1D_5FB7_751F_547D_951A_70B9_5C01_9501 = ____06_FF0E_751F_547D_951A_70B9_5C01_9501["启动雅儿贝德生命锚点封锁"]
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．台词播放")
 local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
 local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -304,6 +306,12 @@ local function _____7ED3_7B97_5973_5996_54ED_568E(instance)
     end
     _____64AD_653E_5973_5996_54ED_568E_8868_73B0(instance)
     local boss = instance.context["安兹单位"]
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["一切生命终点"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     local solved = #instance["锚点列表"] == cfg["生命锚点数量"] and _____53D6_5DF2_6FC0_6D3B_951A_70B9_6570_91CF(instance) >= cfg["生命锚点数量"]
@@ -356,6 +364,12 @@ ____exports["释放安兹一切生命的终点"] = function(context)
     context["一切生命的终点已释放"] = true
     context["当前大型技能"] = _____4E00_5207_751F_547D_7684_7EC8_70B9_5927_578B_6280_80FDKey
     _____64AD_653E_5B89_5179_53F0_8BCD(boss, "一切生命的终点")
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["死亡倒计时"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
     local ____self_12 = context["清理"]
     ____self_12["登记清理"](
         ____self_12,

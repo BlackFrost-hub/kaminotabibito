@@ -16,6 +16,7 @@ import {
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 点到线段距离平方 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 播放安兹台词 } from './12．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
@@ -364,6 +365,7 @@ export function 释放安兹时间停止(this: void, context: 安兹运行时上
   };
   context.当前大型技能 = 时间停止大型技能Key;
   播放安兹台词(boss, '时间停止启动');
+  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.时间停止启动, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   context.清理.登记清理('安兹-时间停止实例', function 时间停止实例清理(this: void): void {
     清理时间停止实例(instance);
   });

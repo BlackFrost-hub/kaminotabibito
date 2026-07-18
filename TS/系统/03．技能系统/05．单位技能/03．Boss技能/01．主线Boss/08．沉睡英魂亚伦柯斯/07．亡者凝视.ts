@@ -4,6 +4,7 @@ import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能�
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 单位是否在扇形区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
@@ -59,6 +60,7 @@ export function 释放亚伦柯斯亡者凝视(this: void, context: 亚伦柯斯
       return;
     }
     const effect = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.亡者凝视特效路径, x, y);
+    播放Boss坐标音效(亚伦柯斯正式设计配置.音效.亡者凝视, x, y, 亚伦柯斯正式设计配置.音效默认裁断距离);
     if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(0.8, effect);
     const heroes = 获取Boss技能敌对英雄列表(boss);
     for (let i = 0; i < heroes.length; i++) {

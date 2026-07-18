@@ -6,6 +6,8 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["亚伦柯斯正式设计配置"]
 local ____11_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.11．台词播放")
 local _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD = ____11_FF0E_53F0_8BCD_64AD_653E["播放亚伦柯斯台词"]
+local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____07_FF0E_4E9A_4F26_67EF_65AF = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.07．亚伦柯斯")
 local _____4E9A_4F26_67EF_65AFBuffID = ____07_FF0E_4E9A_4F26_67EF_65AF["亚伦柯斯BuffID"]
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
@@ -35,6 +37,12 @@ ____exports["启用亚伦柯斯不灭军魂"] = function(context)
         return false
     end
     context["不灭军魂已启用"] = true
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["音效"]["不灭军魂"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["音效默认裁断距离"]
+    )
     registerManualBuff(
         boss,
         _____4E9A_4F26_67EF_65AFBuffID["不灭军魂"],

@@ -11,6 +11,7 @@ import { 创建固定受击次数机制单位, type 固定受击次数机制单�
 import { 执行战斗自身传送到坐标 } from '../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 播放夏提雅台词 } from './18．台词播放';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文') as {
   读取Boss战运行上下文: (this: void, boss: any) => any;
@@ -136,6 +137,7 @@ function 完成复生成功(this: void, context: 夏提雅运行时上下文, �
   const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
   SetUnitState(boss, UNIT_STATE_LIFE, maxLife * cfg.单枚恢复生命比例 * 剩余结晶);
   播放复生成功表现(boss);
+  播放Boss坐标音效(夏提雅数值与表现配置.音效.血之复生成功, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   context.阶段 = 'P3真祖血宴';
   context.上次阶段变化Ms = getServerTime();
   context.普通机制忙碌到Ms = context.上次阶段变化Ms + (cfg.复生成功恢复动作延迟秒 + 1) * 1000;
@@ -153,6 +155,7 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.挑战已结束 || context.阶段 !== '复生仪式' || context.当前大型技能 !== 血之复生技能Key) return false;
   播放夏提雅台词(boss, '血之复生');
+  播放Boss坐标音效(夏提雅数值与表现配置.音效.血之复生仪式, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   const cfg = 夏提雅数值与表现配置.血之复生;
   const crystals: 固定受击次数机制单位实例[] = [];
   const points = 取复生结晶点(boss);
@@ -224,6 +227,7 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
       清理复生结晶(crystals);
       if (remaining <= 0) {
         广播单位提示(boss, 夏提雅单位技能配置.台词.复生失败[0], 3600);
+        播放Boss坐标音效(夏提雅数值与表现配置.音效.血之复生失败, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
         on复生失败(context);
         return;
       }

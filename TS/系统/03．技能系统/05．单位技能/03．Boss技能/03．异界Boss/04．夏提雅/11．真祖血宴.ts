@@ -9,6 +9,7 @@ import { 清理英灵战乙女投影 } from './09．英灵战乙女';
 import { 清理镜像夹击投影 } from './10．镜像夹击';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { registerManualBuff } = require('系统.05．Buff系统.00．Buff系统') as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -41,6 +42,7 @@ function 限制血宴层数(this: void, value: number): number {
 export function 释放夏提雅真祖血宴(this: void, context: 夏提雅运行时上下文): boolean {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.挑战已结束 || context.阶段 !== 'P3真祖血宴' || context.P3转阶段已处理 || context.当前大型技能 != null) return false;
+  播放Boss坐标音效(夏提雅数值与表现配置.音效.真祖血宴, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   const cfg = 夏提雅数值与表现配置.P3;
   context.P3转阶段已处理 = true;
   context.当前大型技能 = 真祖血宴技能Key;

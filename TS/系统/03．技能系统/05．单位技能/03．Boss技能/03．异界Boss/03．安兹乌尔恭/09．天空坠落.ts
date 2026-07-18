@@ -10,6 +10,7 @@ import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from '
 import { 播放安兹台词 } from './12．台词播放';
 import { 创建圆形安全区组, type 圆形安全区组 } from '../../../../00．技能模板+函数/04．机制组件/02．战斗区域/04．圆形安全区组';
 import { 启动雅儿贝德天空坠落联动 } from './01．护卫雅儿贝德/05．黑翼拘束';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
 const { 启动基础施法时间线 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线') as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -125,6 +126,7 @@ function 创建天空坠落预警(this: void, context: 安兹运行时上下文,
 function 结算天空坠落伤害(this: void, context: 安兹运行时上下文, instance: 天空坠落实例): void {
   const boss = context.安兹单位;
   if (!单位有效(boss) || context.挑战已结束 || context.清理.已清理()) return;
+  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.天空坠落贯穿, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   const cfg = 安兹乌尔恭数值与表现配置;
   const x = GetUnitX(boss);
   const y = GetUnitY(boss);
@@ -164,6 +166,7 @@ export function 释放安兹天空坠落(this: void, context: 安兹运行时上
   context.天空坠落已释放 = true;
   context.当前大型技能 = 天空坠落大型技能Key;
   播放安兹台词(boss, '天空坠落');
+  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.天空坠落聚能, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   const instance = 创建天空坠落预警(context, castSeconds);
   if (context.模式 === '守护者介入') 启动雅儿贝德天空坠落联动(context, castSeconds);
   启动基础施法时间线({

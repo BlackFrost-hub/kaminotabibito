@@ -2,6 +2,7 @@
 
 import type { 祖地双灵卫净化节点状态, 祖地双灵卫运行时上下文 } from './01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
+import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
@@ -89,6 +90,7 @@ export function 更新祖地双灵卫双钥净化(this: void, context: 祖地双
       registerManualBuff(units[i], 祖地双灵卫BuffID.净化反冲, 祖地双灵卫数值与表现配置.P3.净化后易伤秒, 祖地双灵卫数值与表现配置.P3.净化后易伤比例 * 100, { sourceName: '祖地双灵卫-净化反冲' });
     }
     context.封门误判待触发 = true;
+    播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.双钥净化, node.X, node.Y, 祖地双灵卫数值与表现配置.音效默认裁断距离);
     context.大型机制忙碌到Ms = now + 800;
   }
   刷新节点表现(node);
