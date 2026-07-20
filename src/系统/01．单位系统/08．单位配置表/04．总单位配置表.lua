@@ -6178,10 +6178,16 @@ ____exports["总单位配置表"] = {
     },
     h00Y = {
         _parent = "hmtm",
-        Name = "穆戈尔投掷者",
-        file = "war3mapImported\\KetzualHero.mdl",
+        Name = "碎礁投石手",
+        file = "Unit\\Minion\\KetzualHero.mdx",
+        Art = "Unit\\Minion\\Icon\\KetzualHero.blp",
+        modelScale = 1,
         targs1 = "debris,ground,wall,ward,item",
         race = "naga",
+        Missileart_1 = "abilities\\weapons\\DemolisherMissile\\DemolisherMissile.mdl",
+        Missilespeed_1 = 900,
+        Missilearc_1 = 0.35,
+        upgrades = "R001,R002",
         unit = "h00Y"
     },
     h00Z = {
@@ -8890,37 +8896,42 @@ ____exports["总单位配置表"] = {
     n050 = {_parent = "nhym", Name = "血精灵术士", modelScale = 1.25, unit = "n050"},
     n052 = {
         _parent = "nnrg",
-        Name = "远古遗迹精灵（变异）",
-        file = "war3mapImported\\NagaDeepStalker.mdl",
+        Name = "金鳞执刑官",
+        file = "Unit\\Elite\\NagaDeepStalker.mdx",
+        Art = "Unit\\Elite\\Icon\\NagaDeepStalker.blp",
         modelScale = 1.75,
+        race = "naga",
+        upgrades = "R001,R002",
         unit = "n052"
-    },
-    n053 = {
-        _parent = "nnmg",
-        Name = "变异精灵",
-        file = "war3mapImported\\Murloc2_BC.mdl",
-        modelScale = 2,
-        unit = "n053"
     },
     n054 = {
         _parent = "nnmg",
-        Name = "穆戈尔钩手",
-        file = "war3mapImported\\DreamEater.mdl",
+        Name = "灵潮祭司",
+        file = "Unit\\Elite\\DreamEater.MDX",
+        Art = "Unit\\Elite\\Icon\\DreamEater.blp",
         modelScale = 1.8,
+        race = "naga",
+        upgrades = "R001,R002",
         unit = "n054"
     },
     n055 = {
         _parent = "nnrg",
-        Name = "远古遗迹精灵（巨化）",
-        file = "war3mapImported\\NagaRoyalGuard.mdl",
+        Name = "深渊鳞将",
+        file = "Unit\\Elite\\NagaRoyalGuard.mdx",
+        Art = "Unit\\Elite\\Icon\\NagaRoyalGuard.blp",
         modelScale = 1.75,
+        race = "naga",
+        upgrades = "R001,R002",
         unit = "n055"
     },
     n056 = {
         _parent = "nnmg",
-        Name = "穆戈尔精英",
-        file = "war3mapImported\\Murlocs_master.mdl",
+        Name = "潮蚀巡鳞者",
+        file = "Unit\\Minion\\Murlocs_master.MDX",
+        Art = "Unit\\Minion\\Icon\\Murlocs_master.blp",
         modelScale = 1.5,
+        race = "naga",
+        upgrades = "R001,R002",
         unit = "n056"
     },
     n058 = {

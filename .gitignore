@@ -36,6 +36,7 @@ pnpm-debug.log*
 /image_temp/
 /voice_pack_manifest.json
 /voice_pack_manifest/
+/模型制作/
 
 # temporary and editor files
 ~$*
