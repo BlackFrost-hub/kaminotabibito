@@ -45,7 +45,7 @@ ____exports["处理异雷法袍受伤"] = function(ctx)
                 _____4F24_5BB3_4E8B_4EF6_4F24_5BB3_7C7B_578B["闪电"],
                 {["伤害形态"] = "AOE"}
             )
-            _____65BD_52A0_6269_5C55_63A7_5236(ctx.target, _____76EE_6807, "stun", {["持续时间"] = 1})
+            _____65BD_52A0_6269_5C55_63A7_5236(ctx.target, _____76EE_6807, "stun", {["持续时间"] = 1, ["效果来源名称"] = "异雷法袍", ["效果来源类型"] = "装备"})
             _____64AD_653E_5355_4F4D_7279_6548(_____76EE_6807, "Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdl", "origin")
             i = i + 1
         end

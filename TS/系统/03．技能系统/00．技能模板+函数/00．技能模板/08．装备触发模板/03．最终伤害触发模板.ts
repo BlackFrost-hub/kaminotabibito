@@ -1,7 +1,8 @@
 /** @noSelfInFile */
 
-const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
+const { registerAppliedFinalDamageListener, registerAppliedFinalDamagePostListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
+  registerAppliedFinalDamagePostListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
 const jass = require("jass.common") as any;
 const {
@@ -17,10 +18,11 @@ const {
   进入装备冷却并显示: (this: void, key: string, 秒数: number, unit: any, 装备名: string) => void;
   装备概率通过: (this: void, unit: any, chance: number) => boolean;
 };
-const { 单位存活, 是技能伤害, 是纯普攻 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.09．装备战斗判断") as {
+const { 单位存活, 是技能伤害, 是纯普攻, 本次最终伤害后生命比例不高于 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.09．装备战斗判断") as {
   单位存活: (this: void, unit: any) => boolean;
   是技能伤害: (this: void, snapshot: any) => boolean;
   是纯普攻: (this: void, snapshot: any) => boolean;
+  本次最终伤害后生命比例不高于: (this: void, unit: any, 本次最终伤害: number, 生命比例上限: number) => boolean;
 };
 
 export type 最终伤害持有者 = "攻击者" | "受击者";
@@ -45,6 +47,8 @@ export interface 最终伤害触发参数 {
   冷却标签?: string;
   冷却前缀?: string;
   要求双方存活?: boolean;
+  /** 预判本次最终伤害实际扣血后，受击目标生命比例不高于该值。 */
+  受击后生命比例上限?: number;
   自定义过滤?: (this: void, event: 最终伤害触发事件) => boolean;
   on触发: (this: void, event: 最终伤害触发事件) => void;
   次数阈值?: number;
@@ -104,6 +108,11 @@ function 记录冷却(this: void, holder: any, record: 最终伤害触发记录)
   进入装备冷却并显示(取冷却键(holder, record), cd, holder, record.配置.装备名);
 }
 
+function 通过受击后生命阈值(this: void, target: any, applied: number, config: 最终伤害触发参数): boolean {
+  const ratio = config.受击后生命比例上限;
+  return ratio == null || 本次最终伤害后生命比例不高于(target, applied, ratio);
+}
+
 function 通过次数并记录(this: void, holder: any, record: 最终伤害触发记录): boolean {
   const threshold = record.配置.次数阈值 ?? 1;
   if (!(threshold > 1)) return true;
@@ -130,6 +139,7 @@ function 尝试执行最终伤害触发(this: void, target: any, attacker: any, 
   if (config.要求双方存活 !== false && (!单位存活(holder) || !单位存活((config.持有者 ?? "攻击者") === "受击者" ? attacker : target))) return;
   if (!单位持有装备(holder, config.装备名)) return;
   if (!通过伤害类型过滤(snapshot, config)) return;
+  if (!通过受击后生命阈值(target, applied, config)) return;
 
   const event: 最终伤害触发事件 = { 目标: target, 攻击者: attacker, 持有者: holder, 本次伤害: applied, 伤害快照: snapshot, 配置: config };
   if (config.自定义过滤 != null && !config.自定义过滤(event)) return;
@@ -141,14 +151,29 @@ function 尝试执行最终伤害触发(this: void, target: any, attacker: any, 
   config.on触发(event);
 }
 
-function on最终伤害触发模板(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
+function 分发最终伤害触发模板(this: void, target: any, attacker: any, applied: number, snapshot: any, 仅生命阈值: boolean): void {
   for (const key in 最终伤害触发记录表) {
     const record = 最终伤害触发记录表[Number(key) || 0];
-    if (record != null) 尝试执行最终伤害触发(target, attacker, applied, snapshot, record);
+    if (record == null) continue;
+    if (仅生命阈值) {
+      if (record.配置.受击后生命比例上限 == null) continue;
+    } else if (record.配置.受击后生命比例上限 != null) {
+      continue;
+    }
+    尝试执行最终伤害触发(target, attacker, applied, snapshot, record);
   }
 }
 
+function on最终伤害触发模板(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
+  分发最终伤害触发模板(target, attacker, applied, snapshot, false);
+}
+
+function on最终伤害后生命阈值触发模板(this: void, target: any, attacker: any, applied: number, snapshot: any): void {
+  分发最终伤害触发模板(target, attacker, applied, snapshot, true);
+}
+
 registerAppliedFinalDamageListener(on最终伤害触发模板);
+registerAppliedFinalDamagePostListener(on最终伤害后生命阈值触发模板);
 
 export function 注册最终伤害触发模板(this: void, 配置: 最终伤害触发参数): 最终伤害触发控制器 {
   const id = ++最终伤害触发计数;

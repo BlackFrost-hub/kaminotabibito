@@ -64,6 +64,14 @@ export function 取最大生命(this: void, unit: any): number {
   return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || GetUnitState(unit, UNIT_STATE_MAX_LIFE) || 0;
 }
 
+/** 最终伤害监听发生在实际扣血前，因此统一用“当前生命 - 本次最终伤害”预判。 */
+export function 本次最终伤害后生命比例不高于(this: void, unit: any, 本次最终伤害: number, 生命比例上限: number): boolean {
+  if (unit == null || unit === 0 || !(本次最终伤害 > 0) || 生命比例上限 < 0) return false;
+  const 最大生命 = 取最大生命(unit);
+  if (!(最大生命 > 0)) return false;
+  return 取当前生命(unit) - 本次最终伤害 <= 最大生命 * 生命比例上限;
+}
+
 export function 取攻击力(this: void, unit: any): number {
   return GetUnitStateJapi(unit, ConvertUnitState(0x15)) || 0;
 }

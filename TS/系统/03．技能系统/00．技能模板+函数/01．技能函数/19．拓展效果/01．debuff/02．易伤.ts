@@ -10,7 +10,10 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
     durationSec: number,
     effectValue: number,
     extras?: {
+      sourceUnit?: any;
       sourceName?: string;
+      effectSourceName?: string;
+      effectSourceType?: "装备" | "技能";
       iconOverride?: string;
       effectModelOverride?: string;
       effectValue2?: number;
@@ -18,7 +21,6 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
   ) => void;
 };
 
-const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 
@@ -52,6 +54,8 @@ export interface 易伤参数 {
   特效路径?: string;
   持续时间: number;
   伤害增加百分比: number;
+  效果来源名称?: string;
+  效果来源类型?: "装备" | "技能";
 }
 
 export interface 易伤范围筛选 {
@@ -89,7 +93,9 @@ export function 施加易伤(this: void, 来源单位: any, 目标单位: any, �
   const BuffID = 参数.BuffID ?? 默认易伤BuffID;
 
   registerManualBuff(目标单位, BuffID, 参数.持续时间, 参数.伤害增加百分比, {
-    sourceName: GetUnitName(来源单位),
+    sourceUnit: 来源单位,
+    effectSourceName: 参数.效果来源名称,
+    effectSourceType: 参数.效果来源类型,
     iconOverride: 参数.图标路径 ?? 读取Buff图标(BuffID),
     effectModelOverride: 参数.特效路径 ?? 读取Buff特效(BuffID),
   });

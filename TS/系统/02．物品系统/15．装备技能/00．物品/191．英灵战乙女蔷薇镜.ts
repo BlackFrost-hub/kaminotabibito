@@ -27,7 +27,7 @@ const jass = require('jass.common') as any;
             y = jass.GetUnitY(target),
             damage = e.本次伤害 * 0.45,
             aoe = 是AOE技能伤害(e.伤害快照);
-        播放点特效(四Boss装备特效.蔷薇镜缘, x, y, 1.2, 0.35);
+        播放点特效(四Boss装备特效.蔷薇镜像扩散, x, y, 0.8, 0.35);
         开始技能阶段链(
             attacker,
             创建固定时间轴阶段列表([
@@ -35,7 +35,6 @@ const jass = require('jass.common') as any;
                     时点毫秒: 650,
                     名称: '英灵镜像复刻',
                     执行: function on镜像复刻结算(this: void): void {
-                        播放点特效(四Boss装备特效.血色冲击, x, y, 1, 0.28);
                         if (aoe) {
                             const units = 取坐标范围敌人(attacker, x, y, 280);
                             for (let i = 0; i < units.length; i++)

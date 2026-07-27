@@ -7,6 +7,8 @@ const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: n
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetLocalPlayer = jass.GetLocalPlayer as () => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
@@ -121,7 +123,7 @@ export function 注册战斗自身位移完成监听(
   战斗自身位移监听列表.push(listener);
 }
 
-function 通知战斗自身位移完成(this: void, unit: any, 起点X: number, 起点Y: number, 终点X: number, 终点Y: number): void {
+export function 通知战斗自身位移完成(this: void, unit: any, 起点X: number, 起点Y: number, 终点X: number, 终点Y: number): void {
   for (let i = 0; i < 战斗自身位移监听列表.length; i++) {
     战斗自身位移监听列表[i](unit, 起点X, 起点Y, 终点X, 终点Y);
   }
@@ -130,20 +132,20 @@ function 通知战斗自身位移完成(this: void, unit: any, 起点X: number, 
 export function 执行战斗自身位移到坐标(unit: any, x: number, y: number): boolean {
   if (!单位有效(unit)) return false;
   if (尝试阻止自身位移技能(unit)) return false;
-  const 起点X = jass.GetUnitX(unit) as number;
-  const 起点Y = jass.GetUnitY(unit) as number;
+  const 起点X = GetUnitX(unit);
+  const 起点Y = GetUnitY(unit);
   SetUnitX(unit, x);
   SetUnitY(unit, y);
-  通知战斗自身位移完成(unit, 起点X, 起点Y, x, y);
+  通知战斗自身位移完成(unit, 起点X, 起点Y, GetUnitX(unit), GetUnitY(unit));
   return true;
 }
 
 export function 执行战斗自身传送到坐标(unit: any, x: number, y: number): boolean {
   if (!单位有效(unit)) return false;
   if (尝试阻止自身位移技能(unit)) return false;
-  const 起点X = jass.GetUnitX(unit) as number;
-  const 起点Y = jass.GetUnitY(unit) as number;
+  const 起点X = GetUnitX(unit);
+  const 起点Y = GetUnitY(unit);
   SetUnitPosition(unit, x, y);
-  通知战斗自身位移完成(unit, 起点X, 起点Y, x, y);
+  通知战斗自身位移完成(unit, 起点X, 起点Y, GetUnitX(unit), GetUnitY(unit));
   return true;
 }

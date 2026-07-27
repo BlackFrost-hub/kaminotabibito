@@ -388,11 +388,11 @@ ____exports["施加攻击效果减速"] = function(source, target, amount, durat
         duration
     )
 end
-____exports["施加攻击效果眩晕"] = function(source, target, duration)
+____exports["施加攻击效果眩晕"] = function(source, target, duration, _____6548_679C_6765_6E90_540D_79F0, _____6548_679C_6765_6E90_7C7B_578B)
     if not (duration > 0) then
         return
     end
-    _____65BD_52A0_6269_5C55_63A7_5236(source, target, "stun", {["持续时间"] = duration})
+    _____65BD_52A0_6269_5C55_63A7_5236(source, target, "stun", {["持续时间"] = duration, ["效果来源名称"] = _____6548_679C_6765_6E90_540D_79F0, ["效果来源类型"] = _____6548_679C_6765_6E90_7C7B_578B})
 end
 ____exports["施加攻击效果击飞"] = function(source, target, duration)
     if not (duration > 0) then

@@ -28,7 +28,7 @@ local function ____on_8150_8D25_6839_987B_6CD5_6756_89E6_53D1(event)
     local target = event["目标"]
     local attacker = event["攻击者"]
     _____64AD_653E_5355_4F4D_7279_6548(_____88C5_5907_5C0F_7279_6548["根须"], target, "origin", 2.5)
-    _____65BD_52A0_6269_5C55_63A7_5236(attacker, target, "roots", {["持续时间"] = 1.5})
+    _____65BD_52A0_6269_5C55_63A7_5236(attacker, target, "roots", {["持续时间"] = 1.5, ["效果来源名称"] = "腐败根须法杖", ["效果来源类型"] = "装备"})
     _____9020_6210_88C5_5907_4F24_5BB3(
         attacker,
         target,

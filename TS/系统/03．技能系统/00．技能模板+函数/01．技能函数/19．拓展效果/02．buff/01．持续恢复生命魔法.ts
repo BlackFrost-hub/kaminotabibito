@@ -1,7 +1,5 @@
 /** @noSelfInFile */
 
-const jass = require("jass.common") as any;
-
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (
     this: void,
@@ -11,6 +9,9 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
     effectValue: number,
     extras?: {
       sourceName?: string;
+      sourceUnit?: any;
+      effectSourceName?: string;
+      effectSourceType?: "装备" | "技能";
       iconOverride?: string;
       effectModelOverride?: string;
       effectValue2?: number;
@@ -31,8 +32,6 @@ const { startHot } = require("系统.04．伤害系统.02．治疗系统.04．�
   ) => void;
 };
 
-const GetUnitName = jass.GetUnitName as (unit: any) => string;
-
 export interface 持续恢复生命魔法参数 {
   BuffID: string;
   图标路径: string;
@@ -43,6 +42,8 @@ export interface 持续恢复生命魔法参数 {
   间隔: number;
   每跳生命恢复: number;
   每跳魔法恢复: number;
+  效果来源名称?: string;
+  效果来源类型?: "装备" | "技能";
 }
 
 function 持续恢复结束条件恒真(this: void, _目标单位: any): boolean {
@@ -55,7 +56,9 @@ export function 施加持续恢复生命魔法(this: void, 来源单位: any, �
 
   registerManualBuff(目标单位, 参数.BuffID, 参数.持续时间, 参数.每跳生命恢复, {
     effectValue2: 参数.每跳魔法恢复,
-    sourceName: GetUnitName(来源单位),
+    sourceUnit: 来源单位,
+    effectSourceName: 参数.效果来源名称,
+    effectSourceType: 参数.效果来源类型,
     iconOverride: 参数.图标路径,
     effectModelOverride: 参数.特效路径,
   });

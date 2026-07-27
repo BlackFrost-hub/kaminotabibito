@@ -23,7 +23,7 @@ export const 祖地双灵卫Buff表: Record<string, BuffData> = {
     tooltip: '暂时停止行动。必须在同步窗口内令另一名守卫也进入崩解，否则将被同伴回灌。',
   },
   [祖地双灵卫BuffID.净化反冲]: {
-    buffID: 祖地双灵卫BuffID.净化反冲, buffName: '净化反冲', icon: 'BuffIcon\\Boss\\AncestralTwinSpiritGuards\\purification_recoil.blp', effect: 'Common\\Effect\\Form\\Debuff\\SpiritGuardPurificationRecoil.mdx', effectMode: 'attach', effectAttachPoint: 'origin', effectScale: 0.22, type: 'Debuff:mechanic:vulnerable', interval: 0, maxStack: 1, stackRule: 'highest', stackRefresh: true, dispelLevel: 3, priority: 85, canPurge: false,
+    buffID: 祖地双灵卫BuffID.净化反冲, buffName: '净化反冲', icon: 'BuffIcon\\Boss\\AncestralTwinSpiritGuards\\purification_recoil.blp', effect: 'Common\\Effect\\Form\\Debuff\\SpiritGuardPurificationRecoil.mdx', effectMode: 'attach', effectAttachPoint: 'origin', effectScale: 0.22, effectHeight: 75, type: 'Debuff:mechanic:vulnerable', interval: 0, maxStack: 1, stackRule: 'highest', stackRefresh: true, dispelLevel: 3, priority: 85, canPurge: false,
     tooltip: '净化节点反冲使守卫短时间承受额外伤害。',
   },
 };

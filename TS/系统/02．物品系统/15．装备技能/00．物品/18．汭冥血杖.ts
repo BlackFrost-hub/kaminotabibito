@@ -28,6 +28,8 @@ const { 施加持续恢复生命魔法 } = require("系统.03．技能系统.00�
     间隔: number;
     每跳生命恢复: number;
     每跳魔法恢复: number;
+    效果来源名称?: string;
+    效果来源类型?: "装备" | "技能";
   }) => void;
 };
 
@@ -63,7 +65,7 @@ function 目标可献祭(this: void, 目标单位: any, 等级上限: number): b
   return GetUnitLevel(目标单位) <= 等级上限;
 }
 
-function 施加汭冥血杖恢复(this: void, 施法单位: any, 生命恢复值: number, 魔法恢复值: number): void {
+function 施加汭冥血杖恢复(this: void, 施法单位: any, 生命恢复值: number, 魔法恢复值: number, 是否强化: boolean): void {
   施加持续恢复生命魔法(施法单位, 施法单位, {
     BuffID: 汭冥血杖配置.BuffID,
     图标路径: 汭冥血杖配置.图标路径,
@@ -74,6 +76,8 @@ function 施加汭冥血杖恢复(this: void, 施法单位: any, 生命恢复值
     间隔: 汭冥血杖配置.恢复间隔,
     每跳生命恢复: 生命恢复值,
     每跳魔法恢复: 魔法恢复值,
+    效果来源名称: 是否强化 ? "汭冥血杖强化" : "汭冥血杖",
+    效果来源类型: "装备",
   });
 }
 
@@ -106,7 +110,7 @@ export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事�
   }
 
   KillUnit(目标单位);
-  施加汭冥血杖恢复(施法单位, 生命恢复值, 魔法恢复值);
+  施加汭冥血杖恢复(施法单位, 生命恢复值, 魔法恢复值, 是否强化);
 }
 
 export function 处理汭冥血杖使用(this: void, 上下文: 物品技能事件上下文): void {  主动物品调试日志("19．汭冥血杖", "进入", "处理汭冥血杖使用");

@@ -106,7 +106,7 @@ local function onSfbCurseRemoved(unitOrHid)
     writeTrackedAccuracy(state, state.previousAccuracy, unitOrHid)
     __TS__Delete(curseAccuracyStateByHid, hid)
 end
-____exports["SFB_施加自定义诅咒Buff"] = function(sourceUnit, u, time)
+____exports["SFB_施加自定义诅咒Buff"] = function(sourceUnit, u, time, effectSourceName, effectSourceType)
     if not SUC_IsValidUnit(u) or time <= 0 then
         return
     end
@@ -141,6 +141,8 @@ ____exports["SFB_施加自定义诅咒Buff"] = function(sourceUnit, u, time)
         0,
         {
             sourceName = getUnitSourceName(sourceUnit, u),
+            effectSourceName = effectSourceName,
+            effectSourceType = effectSourceType,
             onRemove = onSfbCurseRemoved
         }
     )

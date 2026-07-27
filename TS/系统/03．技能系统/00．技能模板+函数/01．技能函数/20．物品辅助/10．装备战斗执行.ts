@@ -54,6 +54,7 @@ export interface 造成装备伤害选项 {
   标签?: string;
   伤害形态?: 技能伤害形态;
   参与技能伤害加成?: boolean;
+  伤害转移?: boolean;
 }
 
 export function 造成装备伤害(this: void, source: any, target: any, amount: number, damageType: any, ranged: boolean = false, weaponType: any = WEAPON_TYPE_WHOKNOWS, 选项?: 造成装备伤害选项): void {
@@ -73,6 +74,7 @@ export function 造成装备伤害(this: void, source: any, target: any, amount:
     标签: 选项?.标签,
     伤害形态: 选项?.伤害形态,
     参与技能伤害加成: 选项?.参与技能伤害加成,
+    isDamageTransfer: 选项?.伤害转移 === true,
   });
 }
 

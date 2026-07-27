@@ -19,7 +19,9 @@ export function 处理狂暴树枝使用(this: void, ctx: 物品技能事件上�
   播放点特效("Abilities\\Spells\\Items\\AIda\\AIdaCaster.mdl", 取单位X(unit), 取单位Y(unit));
   施加临时属性效果(unit, cfg.持续毫秒, [{ 类型: "攻速", 数值: cfg.攻速 }]);
   registerManualBuff(unit, 常规BuffID.狂暴树枝_狂暴, cfg.持续毫秒 / 1000, cfg.攻速显示, {
-    sourceName: "狂暴树枝",
+    sourceUnit: unit,
+    effectSourceName: "狂暴树枝",
+    effectSourceType: "装备",
     effectValue2: cfg.自伤,
   });
   启动计数周期执行({

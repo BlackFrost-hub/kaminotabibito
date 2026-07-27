@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
-const { registerAppliedFinalHealListener } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+const { registerBeforeAppliedFinalHealListener, registerAppliedFinalHealListener } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  registerBeforeAppliedFinalHealListener: (this: void, cb: (this: void, source: any, target: any, amount: number, isItemHeal: boolean) => void) => void;
   registerAppliedFinalHealListener: (this: void, cb: (this: void, source: any, target: any, amount: number, isItemHeal: boolean) => void) => void;
 };
 
@@ -17,6 +18,7 @@ export interface 治疗护盾联动参数 {
   名称?: string;
   单位?: any;
   监听方向?: "自己获得" | "自己给予" | "双向";
+  治疗触发阶段?: "治疗开始" | "治疗完成";
   过滤事件?: (this: void, event: 治疗护盾联动事件) => boolean;
   on治疗?: (this: void, event: 治疗护盾联动事件) => void;
   on护盾?: (this: void, event: 治疗护盾联动事件) => void;
@@ -43,8 +45,9 @@ class 治疗护盾联动实现 implements 治疗护盾联动控制器 {
     治疗护盾联动表[this.控制器ID] = this;
   }
 
-  处理治疗(event: 治疗护盾联动事件): void {
+  处理治疗(event: 治疗护盾联动事件, 阶段: "治疗开始" | "治疗完成"): void {
     if (this.已停止 || this.参数.on治疗 == null || !this.匹配单位(event)) return;
+    if ((this.参数.治疗触发阶段 ?? "治疗完成") !== 阶段) return;
     if (this.参数.过滤事件 != null && !this.参数.过滤事件(event)) return;
     this.参数.on治疗(event);
   }
@@ -82,13 +85,22 @@ export function 通知获得护盾事件(this: void, 来源单位: any, 目标�
   }
 }
 
-function on最终治疗联动(this: void, source: any, target: any, amount: number, isItemHeal: boolean): void {
+function 分发治疗联动(this: void, source: any, target: any, amount: number, isItemHeal: boolean, 阶段: "治疗开始" | "治疗完成"): void {
   if (amount <= 0) return;
   const event: 治疗护盾联动事件 = { 来源单位: source, 目标单位: target, 数值: amount, 是否物品治疗: isItemHeal };
   for (const key in 治疗护盾联动表) {
     const 控制器 = 治疗护盾联动表[key];
-    if (控制器 != null) 控制器.处理治疗(event);
+    if (控制器 != null) 控制器.处理治疗(event, 阶段);
   }
 }
 
+function on治疗开始联动(this: void, source: any, target: any, amount: number, isItemHeal: boolean): void {
+  分发治疗联动(source, target, amount, isItemHeal, "治疗开始");
+}
+
+function on最终治疗联动(this: void, source: any, target: any, amount: number, isItemHeal: boolean): void {
+  分发治疗联动(source, target, amount, isItemHeal, "治疗完成");
+}
+
+registerBeforeAppliedFinalHealListener(on治疗开始联动);
 registerAppliedFinalHealListener(on最终治疗联动);

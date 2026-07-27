@@ -17,7 +17,9 @@ function on净化者手套触发(this: void, event: any): void {
     临时治疗率(attacker, 0.10, duration);
   }
   registerManualBuff(attacker, 常规BuffID.净化者手套_净化增幅, duration, value, {
-    sourceName: "净化者手套",
+    sourceUnit: attacker,
+    effectSourceName: "净化者手套",
+    effectSourceType: "装备",
     iconOverride: "Equipment\\Icon\\Gloves\\purifier_gloves.blp",
   });
   播放单位特效(装备小特效.护盾闪光, attacker, "origin", 0.8);

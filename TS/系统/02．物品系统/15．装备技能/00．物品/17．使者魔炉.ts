@@ -123,7 +123,9 @@ export function 处理使者魔炉使用(this: void, 上下文: 物品技能事�
     if (!单位是否有效且敌对(敌人, 施法单位)) continue;
     调整命中率(敌人, -使者魔炉配置.命中率削减);
     registerManualBuff(敌人, 使者魔炉致盲BuffID, 使者魔炉配置.恢复延迟, 使者魔炉配置.命中率削减 * 100, {
-      sourceName: "使者魔炉",
+      sourceUnit: 施法单位,
+      effectSourceName: "使者魔炉",
+      effectSourceType: "装备",
       iconOverride: "ReplaceableTextures\\CommandButtons\\BTN000230.blp",
     });
     命中目标列表.push(敌人);

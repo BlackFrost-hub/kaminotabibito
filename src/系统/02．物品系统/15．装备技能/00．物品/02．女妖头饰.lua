@@ -49,9 +49,11 @@ ____exports["处理女妖头饰累计"] = function(target, attacker, applied)
             {["是否在CD中"] = false, ["达到阈值后重置"] = true}
         )
         if _____5230_8FBE_9608_503C then
-            _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C(function()
-                _____521B_5EFA_6697_5F71_7A81_88AD_8FFD_8E2A(target, attacker, {["减益"] = {duration = 2, damagePerSecond = 500}})
-            end)
+            local _____6548_679C_6765_6E90_540D_79F0 = _____6709_5973_5996_5934_9970_5F3A_5316 and _____5973_5996_5934_9970_5F3A_5316_7D2F_8BA1_914D_7F6E["物品名"] or _____5973_5996_5934_9970_7D2F_8BA1_914D_7F6E["物品名"]
+            local function _____6267_884C_5973_5996_5934_9970_6697_5F71_7A81_88AD()
+                _____521B_5EFA_6697_5F71_7A81_88AD_8FFD_8E2A(target, attacker, {["减益"] = {duration = 2, damagePerSecond = 500, effectSourceName = _____6548_679C_6765_6E90_540D_79F0, effectSourceType = "装备"}})
+            end
+            _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C(_____6267_884C_5973_5996_5934_9970_6697_5F71_7A81_88AD)
             if _____6709_5973_5996_5934_9970_5F3A_5316 and _____5973_5996_5934_9970_5F3A_5316_7269_54C1 ~= nil then
                 local _____5F53_524D_6B21_6570 = GetItemCharges(_____5973_5996_5934_9970_5F3A_5316_7269_54C1)
                 local _____4E0B_6B21_6B21_6570 = _____5F53_524D_6B21_6570 + 1

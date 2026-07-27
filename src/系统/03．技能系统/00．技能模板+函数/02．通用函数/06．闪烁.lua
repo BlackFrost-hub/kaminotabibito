@@ -3,9 +3,10 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____64AD_653E_95EA_70C1_7279_6548, _____672C_5730_4E3A_5355_4F4D_62E5_6709_8005_91CD_65B0_9009_4E2D_5355_4F4D, _____7ED3_675F_95EA_70C1_5B9E_4F8B, ____on_95EA_70C1Tick, jass, offTick10ms, YDWETimerDestroyEffect, _____79FB_9664_5355_4F4D_6682_505C, AddSpecialEffect, GetOwningPlayer, GetLocalPlayer, ClearSelection, SelectUnit, ShowUnit, SetUnitFacing, SetUnitPosition, GetUnitState, TICK_INTERVAL, UNIT_ALIVE_LIFE, _____95EA_70C1_6682_505C_6765_6E90, _____6D3B_52A8_95EA_70C1_5217_8868, _____95EA_70C1_6620_5C04, _____5DF2_6CE8_518C_95EA_70C1Tick
+local _____5355_4F4D_5B58_6D3B, _____64AD_653E_95EA_70C1_7279_6548, _____672C_5730_4E3A_5355_4F4D_62E5_6709_8005_91CD_65B0_9009_4E2D_5355_4F4D, _____7ED3_675F_95EA_70C1_5B9E_4F8B, ____on_95EA_70C1Tick, jass, offTick10ms, YDWETimerDestroyEffect, _____79FB_9664_5355_4F4D_6682_505C, AddSpecialEffect, GetOwningPlayer, GetLocalPlayer, ClearSelection, SelectUnit, ShowUnit, SetUnitFacing, GetUnitState, TICK_INTERVAL, UNIT_ALIVE_LIFE, _____95EA_70C1_6682_505C_6765_6E90, _____6D3B_52A8_95EA_70C1_5217_8868, _____95EA_70C1_6620_5C04, _____5DF2_6CE8_518C_95EA_70C1Tick
 local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
 local _____5C1D_8BD5_963B_6B62_81EA_8EAB_4F4D_79FB_6280_80FD = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["尝试阻止自身位移技能"]
+local _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身传送到坐标"]
 function _____5355_4F4D_5B58_6D3B(unit)
     return unit ~= nil and unit ~= 0 and GetUnitState(unit, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE
 end
@@ -33,16 +34,18 @@ function _____7ED3_675F_95EA_70C1_5B9E_4F8B(_____5B9E_4F8B, _____662F_5426_5B8C_
         __TS__ArraySplice(_____6D3B_52A8_95EA_70C1_5217_8868, idx, 1)
     end
     if _____662F_5426_5B8C_6210 and _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) then
-        SetUnitPosition(_____5B9E_4F8B["单位"], _____5B9E_4F8B["目标X"], _____5B9E_4F8B["目标Y"])
-        if _____5B9E_4F8B["朝向"] ~= nil then
+        local _____5DF2_5B8C_6210_4F4D_79FB = _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(_____5B9E_4F8B["单位"], _____5B9E_4F8B["目标X"], _____5B9E_4F8B["目标Y"])
+        if _____5DF2_5B8C_6210_4F4D_79FB and _____5B9E_4F8B["朝向"] ~= nil then
             SetUnitFacing(_____5B9E_4F8B["单位"], _____5B9E_4F8B["朝向"])
         end
         ShowUnit(_____5B9E_4F8B["单位"], true)
         if _____5B9E_4F8B["闪烁期间暂停单位"] and not _____5B9E_4F8B["单位原本已暂停"] then
             _____79FB_9664_5355_4F4D_6682_505C(_____5B9E_4F8B["单位"], _____95EA_70C1_6682_505C_6765_6E90)
         end
-        _____64AD_653E_95EA_70C1_7279_6548(_____5B9E_4F8B["结束特效"], _____5B9E_4F8B["目标X"], _____5B9E_4F8B["目标Y"], _____5B9E_4F8B["特效生命周期"])
-        if _____5B9E_4F8B["结束后选中单位"] then
+        if _____5DF2_5B8C_6210_4F4D_79FB then
+            _____64AD_653E_95EA_70C1_7279_6548(_____5B9E_4F8B["结束特效"], _____5B9E_4F8B["目标X"], _____5B9E_4F8B["目标Y"], _____5B9E_4F8B["特效生命周期"])
+        end
+        if _____5DF2_5B8C_6210_4F4D_79FB and _____5B9E_4F8B["结束后选中单位"] then
             _____672C_5730_4E3A_5355_4F4D_62E5_6709_8005_91CD_65B0_9009_4E2D_5355_4F4D(_____5B9E_4F8B["单位"])
         end
     elseif _____5B9E_4F8B["闪烁期间暂停单位"] and _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) and not _____5B9E_4F8B["单位原本已暂停"] then
@@ -61,16 +64,16 @@ function ____on_95EA_70C1Tick()
             local _____5B9E_4F8B = _____6D3B_52A8_95EA_70C1_5217_8868[i + 1]
             if not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) then
                 _____7ED3_675F_95EA_70C1_5B9E_4F8B(_____5B9E_4F8B, false)
-                goto __continue17
+                goto __continue18
             end
             _____5B9E_4F8B["剩余时间"] = _____5B9E_4F8B["剩余时间"] - TICK_INTERVAL
             if _____5B9E_4F8B["剩余时间"] <= 0 then
                 _____7ED3_675F_95EA_70C1_5B9E_4F8B(_____5B9E_4F8B, true)
-                goto __continue17
+                goto __continue18
             end
             i = i + 1
         end
-        ::__continue17::
+        ::__continue18::
     end
 end
 jass = require("jass.common")
@@ -93,7 +96,6 @@ SelectUnit = jass.SelectUnit
 ShowUnit = jass.ShowUnit
 local IsUnitPaused = jass.IsUnitPaused
 SetUnitFacing = jass.SetUnitFacing
-SetUnitPosition = jass.SetUnitPosition
 GetUnitState = jass.GetUnitState
 TICK_INTERVAL = 0.01
 UNIT_ALIVE_LIFE = 0.405
@@ -129,10 +131,10 @@ ____exports["开始闪烁"] = function(_____5355_4F4D, _____53C2_6570)
     end
     ShowUnit(_____5355_4F4D, false)
     if _____6301_7EED_65F6_95F4 <= 0 then
-        SetUnitPosition(_____5355_4F4D, _____53C2_6570["目标X"], _____53C2_6570["目标Y"])
-        if _____53C2_6570["朝向"] ~= nil then
+        local _____5DF2_5B8C_6210_4F4D_79FB = _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(_____5355_4F4D, _____53C2_6570["目标X"], _____53C2_6570["目标Y"])
+        if _____5DF2_5B8C_6210_4F4D_79FB and _____53C2_6570["朝向"] ~= nil then
             SetUnitFacing(_____5355_4F4D, _____53C2_6570["朝向"])
-        else
+        elseif _____5DF2_5B8C_6210_4F4D_79FB then
             SetUnitFacing(
                 _____5355_4F4D,
                 GetUnitFacing(_____5355_4F4D)
@@ -142,8 +144,10 @@ ____exports["开始闪烁"] = function(_____5355_4F4D, _____53C2_6570)
         if _____95EA_70C1_671F_95F4_6682_505C_5355_4F4D and not _____539F_672C_5DF2_6682_505C then
             _____79FB_9664_5355_4F4D_6682_505C(_____5355_4F4D, _____95EA_70C1_6682_505C_6765_6E90)
         end
-        _____64AD_653E_95EA_70C1_7279_6548(_____53C2_6570["结束特效"], _____53C2_6570["目标X"], _____53C2_6570["目标Y"], _____7279_6548_751F_547D_5468_671F)
-        if _____7ED3_675F_540E_9009_4E2D_5355_4F4D then
+        if _____5DF2_5B8C_6210_4F4D_79FB then
+            _____64AD_653E_95EA_70C1_7279_6548(_____53C2_6570["结束特效"], _____53C2_6570["目标X"], _____53C2_6570["目标Y"], _____7279_6548_751F_547D_5468_671F)
+        end
+        if _____5DF2_5B8C_6210_4F4D_79FB and _____7ED3_675F_540E_9009_4E2D_5355_4F4D then
             _____672C_5730_4E3A_5355_4F4D_62E5_6709_8005_91CD_65B0_9009_4E2D_5355_4F4D(_____5355_4F4D)
         end
         return 0

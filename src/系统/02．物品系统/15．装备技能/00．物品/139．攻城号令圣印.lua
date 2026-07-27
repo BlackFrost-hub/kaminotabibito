@@ -26,7 +26,7 @@ local function ____on_653B_57CE_53F7_4EE4_5723_5370_89E6_53D1(event)
                 _____5E38_89C4BuffID["攻城号令圣印_攻城号令"],
                 6,
                 16,
-                {sourceName = "攻城号令圣印", iconOverride = "Equipment\\Icon\\Item\\siege_command_signet.blp"}
+                {sourceUnit = attacker, effectSourceName = "攻城号令圣印", effectSourceType = "装备", iconOverride = "Equipment\\Icon\\Item\\siege_command_signet.blp"}
             )
             if _____53D6_5F53_524D_751F_547D(unit) < _____53D6_6700_5927_751F_547D(unit) * 0.5 then
                 _____5F00_59CB_901A_7528_62A4_76FE(

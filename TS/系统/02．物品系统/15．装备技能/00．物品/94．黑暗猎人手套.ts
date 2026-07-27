@@ -9,7 +9,14 @@ import {
 import { 注册最终伤害触发模板 } from "../../../03．技能系统/00．技能模板+函数/00．技能模板/08．装备触发模板";
 
 const { SFB_setCurse } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
-  SFB_setCurse: (this: void, sourceUnit: any, u: any, time: number) => void;
+  SFB_setCurse: (
+    this: void,
+    sourceUnit: any,
+    u: any,
+    time: number,
+    effectSourceName?: string,
+    effectSourceType?: "装备" | "技能"
+  ) => void;
 };
 
 const 装备名 = "|cffcc99ff黑暗猎人手套|r";
@@ -33,7 +40,7 @@ const 诅咒持续秒 = 1.5;
     return 距离满足限制(event.攻击者, event.目标, undefined, 最大攻击距离);
   },
   on触发: function on黑暗猎人手套最终伤害(this: void, event): void {
-    SFB_setCurse(event.攻击者, event.目标, 诅咒持续秒);
+    SFB_setCurse(event.攻击者, event.目标, 诅咒持续秒, "黑暗猎人手套", "装备");
     攻击效果造成伤害(event.攻击者, event.目标, 取攻击力(event.攻击者) * 攻击力系数, "暗影");
   },
 });

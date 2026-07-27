@@ -54,6 +54,7 @@ ____exports["祖地双灵卫Buff表"] = {[____exports["祖地双灵卫BuffID"]["
     effectMode = "attach",
     effectAttachPoint = "origin",
     effectScale = 0.22,
+    effectHeight = 75,
     type = "Debuff:mechanic:vulnerable",
     interval = 0,
     maxStack = 1,

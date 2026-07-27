@@ -14,7 +14,8 @@ const { 施加移速提升Buff, 清除单位指定Buff } = require("系统.03．
     基础移速百分比?: number;
     当前移速百分比?: number;
     BuffID?: string;
-    sourceName?: string;
+    效果来源名称?: string;
+    效果来源类型?: "装备" | "技能";
   }) => boolean;
   清除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
 };
@@ -29,6 +30,8 @@ export interface 潜行状态参数 {
   单位: any;
   来源单位?: any;
   名称?: string;
+  效果来源名称?: string;
+  效果来源类型?: "装备" | "技能";
   持续秒数: number;
   固定移速?: number;
   基础移速百分比?: number;
@@ -120,7 +123,8 @@ export function 施加潜行状态(this: void, 参数: 潜行状态参数): 潜�
       基础移速百分比: 参数.基础移速百分比,
       当前移速百分比: 参数.当前移速百分比,
       BuffID: 参数.移速BuffID ?? 默认潜行移速BuffID,
-      sourceName: 参数.名称 ?? "潜行",
+      效果来源名称: 参数.效果来源名称 ?? 参数.名称 ?? "潜行",
+      效果来源类型: 参数.效果来源类型,
     });
   }
 

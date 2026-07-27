@@ -21,7 +21,9 @@ export function 处理嗜狱恶剑使用(this: void, ctx: 物品技能事件上�
     { 类型: "玩家属性", 属性名: "必定暴击", 数值: cfg.必定暴击 },
   ]);
   registerManualBuff(unit, 常规BuffID.嗜狱恶剑_嗜狱, cfg.持续毫秒 / 1000, cfg.攻击增加, {
-    sourceName: "嗜狱恶剑",
+    sourceUnit: unit,
+    effectSourceName: "嗜狱恶剑",
+    effectSourceType: "装备",
   });
 }
 

@@ -86,7 +86,7 @@ ____exports["处理女妖魔甲使用"] = function(ctx)
         _____5E38_89C4BuffID["女妖魔甲_完全免疫"],
         cfg["持续毫秒"] / 1000,
         cfg["魔法伤害提升"] * 100,
-        {sourceName = "女妖魔甲"}
+        {sourceUnit = unit, effectSourceName = "女妖魔甲", effectSourceType = "装备"}
     )
     local unitId = _____53D6_5355_4F4DID(unit)
     if unitId == 0 then

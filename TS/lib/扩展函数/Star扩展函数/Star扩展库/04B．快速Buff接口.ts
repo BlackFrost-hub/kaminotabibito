@@ -42,34 +42,48 @@ export { SFB_增益BUFF, SFB_负面BUFF, SFB_Unit, SFB_Init };
 
 initItemIllusionSummonBridge();
 
-export function SFB_setPositiveBuff(sourceUnit: any, u: any, id: number, time: number): void {
+export function SFB_setPositiveBuff(
+  sourceUnit: any,
+  u: any,
+  id: number,
+  time: number,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
   if (id === SFB_增益BUFF.心灵之火) {
-    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.INNER_FIRE, ORDER.INNER_FIRE);
+    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.INNER_FIRE, ORDER.INNER_FIRE, effectSourceName, effectSourceType);
   } else if (id === SFB_增益BUFF.嗜血术) {
-    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.BLOODLUST, ORDER.BLOODLUST);
+    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.BLOODLUST, ORDER.BLOODLUST, effectSourceName, effectSourceType);
   }
 }
 
-export function SFB_setNegativeBuff(sourceUnit: any, u: any, id: number, time: number): void {
+export function SFB_setNegativeBuff(
+  sourceUnit: any,
+  u: any,
+  id: number,
+  time: number,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
   if (shouldApplyControlReduction(id)) {
     time = calcReducedControlDuration(u, time);
     if (time <= 0) return;
   }
 
   if (id === SFB_负面BUFF.残废) {
-    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.CRIPPLE, ORDER.CRIPPLE);
+    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.CRIPPLE, ORDER.CRIPPLE, effectSourceName, effectSourceType);
   } else if (id === SFB_负面BUFF.精灵之火) {
-    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.FAERIE_FIRE, ORDER.FAERIE_FIRE);
+    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.FAERIE_FIRE, ORDER.FAERIE_FIRE, effectSourceName, effectSourceType);
   } else if (id === SFB_负面BUFF.诅咒) {
-    SFB_施加自定义诅咒Buff(sourceUnit, u, time);
+    SFB_施加自定义诅咒Buff(sourceUnit, u, time, effectSourceName, effectSourceType);
   } else if (id === SFB_负面BUFF.睡眠) {
     施加睡眠({ 来源单位: sourceUnit, 目标单位: u, 持续时间: time });
   } else if (id === SFB_负面BUFF.纠缠根须) {
-    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.ENTANGLING_ROOTS, ORDER.ENTANGLING_ROOTS);
+    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.ENTANGLING_ROOTS, ORDER.ENTANGLING_ROOTS, effectSourceName, effectSourceType);
   } else if (id === SFB_负面BUFF.飓风) {
-    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.CYCLONE, ORDER.CYCLONE);
+    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.CYCLONE, ORDER.CYCLONE, effectSourceName, effectSourceType);
   } else if (id === SFB_负面BUFF.寄生) {
-    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.PARASITE, ORDER.PARASITE);
+    SFB_施加原生目标Buff(sourceUnit, u, id, time, ABILITY.PARASITE, ORDER.PARASITE, effectSourceName, effectSourceType);
   }
 }
 
@@ -89,8 +103,14 @@ export function SFB_setFaerieFire(sourceUnit: any, u: any, time: number): void {
   SFB_setNegativeBuff(sourceUnit, u, SFB_负面BUFF.精灵之火, time);
 }
 
-export function SFB_setCurse(sourceUnit: any, u: any, time: number): void {
-  SFB_setNegativeBuff(sourceUnit, u, SFB_负面BUFF.诅咒, time);
+export function SFB_setCurse(
+  sourceUnit: any,
+  u: any,
+  time: number,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
+  SFB_setNegativeBuff(sourceUnit, u, SFB_负面BUFF.诅咒, time, effectSourceName, effectSourceType);
 }
 
 export function SFB_setSleep(sourceUnit: any, u: any, time: number): void {
@@ -132,14 +152,21 @@ export function SFB_施加通用Buff(来源单位: any, 目标单位: any, Buff�
   SFB_setBuff(来源单位, 目标单位, Buff类型, 持续时间);
 }
 
-export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): void {
+export function SFB_setBuff(
+  sourceUnit: any,
+  u: any,
+  id: number,
+  time: number,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
   if (!SUC_IsValidUnit(u) || time === 0) return;
   if (SUC_IsUnitStructure(u)) return;
   if (u === SFB_Unit) return;
   if (time <= 0) return;
 
   if (id === SFB_增益BUFF.心灵之火 || id === SFB_增益BUFF.嗜血术) {
-    SFB_setPositiveBuff(sourceUnit, u, id, time);
+    SFB_setPositiveBuff(sourceUnit, u, id, time, effectSourceName, effectSourceType);
     return;
   }
   if (
@@ -151,7 +178,7 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
     || id === SFB_负面BUFF.飓风
     || id === SFB_负面BUFF.寄生
   ) {
-    SFB_setNegativeBuff(sourceUnit, u, id, time);
+    SFB_setNegativeBuff(sourceUnit, u, id, time, effectSourceName, effectSourceType);
     return;
   }
 
@@ -161,7 +188,7 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
   }
 
   if (id >= 21) {
-    SFB_施加暂停类Buff(sourceUnit, u, id, time);
+    SFB_施加暂停类Buff(sourceUnit, u, id, time, effectSourceName, effectSourceType);
     return;
   }
 
@@ -208,7 +235,7 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
 
   YDWESetUnitAbilityDataReal(caster, abilityId, 1, 102, time);
   YDWESetUnitAbilityDataReal(caster, abilityId, 1, 103, time);
-  registerSfbManualBuff(sourceUnit, u, id, time, 0);
+  registerSfbManualBuff(sourceUnit, u, id, time, 0, effectSourceName, effectSourceType);
 
   if (typeof orderStr === "string") {
     IssueTargetOrder(caster, orderStr, u);
@@ -217,7 +244,15 @@ export function SFB_setBuff(sourceUnit: any, u: any, id: number, time: number): 
   }
 }
 
-export function SFB_setSlow(sourceUnit: any, u: any, as: number, ms: number, time: number): void {
+export function SFB_setSlow(
+  sourceUnit: any,
+  u: any,
+  as: number,
+  ms: number,
+  time: number,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
   if (!SUC_IsValidUnit(u) || time === 0) return;
   if (SUC_IsUnitStructure(u)) return;
   if (u === SFB_Unit) return;
@@ -235,6 +270,6 @@ export function SFB_setSlow(sourceUnit: any, u: any, as: number, ms: number, tim
   YDWESetUnitAbilityDataReal(caster, ABILITY.SLOW, 1, 102, time);
   YDWESetUnitAbilityDataReal(caster, ABILITY.SLOW, 1, 103, time);
 
-  registerSfbManualBuff(sourceUnit, u, 7, time, ms);
+  registerSfbManualBuff(sourceUnit, u, 7, time, ms, effectSourceName, effectSourceType);
   IssueTargetOrderById(caster, ORDER.SLOW, u);
 }

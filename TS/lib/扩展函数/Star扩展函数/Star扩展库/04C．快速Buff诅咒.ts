@@ -101,7 +101,14 @@ function onSfbCurseRemoved(this: void, unitOrHid: any): void {
   delete curseAccuracyStateByHid[hid];
 }
 
-export function SFB_施加自定义诅咒Buff(this: void, sourceUnit: any, u: any, time: number): void {
+export function SFB_施加自定义诅咒Buff(
+  this: void,
+  sourceUnit: any,
+  u: any,
+  time: number,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
   if (!SUC_IsValidUnit(u) || time <= 0) {
     return;
   }
@@ -134,6 +141,8 @@ export function SFB_施加自定义诅咒Buff(this: void, sourceUnit: any, u: an
 
   registerManualBuff(u, buffID, time, 0, {
     sourceName: getUnitSourceName(sourceUnit, u),
+    effectSourceName,
+    effectSourceType,
     onRemove: onSfbCurseRemoved,
   });
 }

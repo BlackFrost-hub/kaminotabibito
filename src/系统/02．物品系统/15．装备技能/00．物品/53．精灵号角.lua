@@ -41,8 +41,8 @@ end
 local function _____5E94_7528_7CBE_7075_53F7_89D2_62A4_7532_5DEE_503C(target, delta)
     _____8C03_6574_72B6_6001ID_5C5E_6027(target, _____62A4_7532_5C5E_6027ID, delta)
 end
-local function _____53D6_7CBE_7075_53F7_89D2_5149_73AFBuff_9644_52A0(_target, _____5C42_6570)
-    return {sourceName = "精灵号角", effectValue2 = _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["号角"]["精灵号角光环护甲"] * _____5C42_6570}
+local function _____53D6_7CBE_7075_53F7_89D2_5149_73AFBuff_9644_52A0(_target, _____5C42_6570, holder)
+    return {sourceUnit = holder, effectSourceName = "精灵号角", effectSourceType = "装备", effectValue2 = _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["号角"]["精灵号角光环护甲"] * _____5C42_6570}
 end
 ____exports["初始化精灵号角光环"] = function()
     if _____5DF2_521D_59CB_5316_7CBE_7075_53F7_89D2_5149_73AF then
@@ -98,7 +98,7 @@ ____exports["处理精灵号角使用"] = function(ctx)
                 _____5E38_89C4BuffID["精灵号角_王之号角"],
                 cfg["持续毫秒"] / 1000,
                 15,
-                {sourceName = "精灵号角", effectValue2 = extraAttack}
+                {sourceUnit = unit, effectSourceName = "精灵号角", effectSourceType = "装备", effectValue2 = extraAttack}
             )
             i = i + 1
         end

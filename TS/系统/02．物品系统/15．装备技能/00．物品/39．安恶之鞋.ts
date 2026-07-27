@@ -17,7 +17,7 @@ export function 处理安恶之鞋造成伤害(this: void, ctx: 伤害事件上�
   if (装备冷却中(冷却键)) return;
   if (!装备触发概率通过(0.5, ctx.attacker)) return;
   进入装备冷却并显示(冷却键, 10, ctx.attacker, "安恶之鞋");
-  施加恐惧(ctx.attacker, ctx.target, { 持续时间: 1, 模式: "逃离施法者" });
+  施加恐惧(ctx.attacker, ctx.target, { 持续时间: 1, 模式: "逃离施法者", 效果来源名称: "安恶之鞋", 效果来源类型: "装备" });
 }
 
 export {};

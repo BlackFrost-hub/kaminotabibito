@@ -109,6 +109,7 @@ const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害�
     isIndependentSkillDamage?: boolean;
     isSingleTargetSkillDamage?: boolean;
     isAoeSkillDamage?: boolean;
+    isDamageTransfer?: boolean;
   }) => number;
 };
 const { 获取当前技能伤害上下文 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -128,6 +129,7 @@ const { 获取当前技能伤害上下文 } = require("系统.04．伤害系统.
     isSingleTargetSkillDamage: boolean;
     isAoeSkillDamage: boolean;
     participatesInSkillDamageBonus: boolean;
+    isDamageTransfer: boolean;
   } | null;
 };
 const { 获取伤害归属单位 } = require("系统.04．伤害系统.04．伤害映射") as {
@@ -195,6 +197,7 @@ export interface DamageTypeSnapshot {
   isIndependentSkillDamage: boolean;
   isSingleTargetSkillDamage: boolean;
   isAoeSkillDamage: boolean;
+  isDamageTransfer: boolean;
   isMetalDamage: boolean;
   isWoodDamage: boolean;
   isWaterDamage: boolean;
@@ -204,25 +207,39 @@ export interface DamageTypeSnapshot {
   isDarkDamage: boolean;
 }
 
-export type AppliedFinalDamageListener = (target: any, attacker: any, applied: number, snapshot: DamageTypeSnapshot) => void;
+export type AppliedFinalDamageListener = (this: void, target: any, attacker: any, applied: number, snapshot: DamageTypeSnapshot) => void;
 
 const appliedFinalDamageListeners: AppliedFinalDamageListener[] = [];
+const appliedFinalDamagePostListeners: AppliedFinalDamageListener[] = [];
 
 export function 延后一帧执行伤害派生效果(this: void, callback: () => void): void {
   createDelayedCall(0.0, callback);
 }
 
 /** 在 `onDamageEvent` 完成 `YDWESetEventDamage`（或免疫置 0）后收到 `(target, attacker, applied)` */
-export function registerAppliedFinalDamageListener(cb: AppliedFinalDamageListener): void {
+export function registerAppliedFinalDamageListener(this: void, cb: AppliedFinalDamageListener): void {
   for (let i = 0; i < appliedFinalDamageListeners.length; i++) {
     if (appliedFinalDamageListeners[i] === cb) return;
   }
   appliedFinalDamageListeners.push(cb);
 }
 
+/** 在普通最终伤害监听全部完成后派发；此时引擎尚未实际扣除本次生命。 */
+export function registerAppliedFinalDamagePostListener(this: void, cb: AppliedFinalDamageListener): void {
+  for (let i = 0; i < appliedFinalDamagePostListeners.length; i++) {
+    if (appliedFinalDamagePostListeners[i] === cb) return;
+  }
+  appliedFinalDamagePostListeners.push(cb);
+}
+
 function notifyAppliedFinalDamageListeners(target: any, attacker: any, applied: number, snapshot: DamageTypeSnapshot): void {
   for (let i = 0; i < appliedFinalDamageListeners.length; i++) {
     const cb = appliedFinalDamageListeners[i];
+    if (cb == null) continue;
+    cb(target, attacker, applied, snapshot);
+  }
+  for (let i = 0; i < appliedFinalDamagePostListeners.length; i++) {
+    const cb = appliedFinalDamagePostListeners[i];
     if (cb == null) continue;
     cb(target, attacker, applied, snapshot);
   }
@@ -256,6 +273,7 @@ function captureDamageTypeSnapshot(this: void): DamageTypeSnapshot {
     isIndependentSkillDamage: skillContext?.isIndependentSkillDamage === true,
     isSingleTargetSkillDamage: skillContext?.isSingleTargetSkillDamage === true,
     isAoeSkillDamage: skillContext?.isAoeSkillDamage === true,
+    isDamageTransfer: skillContext?.isDamageTransfer === true,
     isMetalDamage: 伤害函数.isMetalDamage(),
     isWoodDamage: 伤害函数.isWoodDamage(),
     isWaterDamage: 伤害函数.isWaterDamage(),
@@ -667,6 +685,7 @@ export function onDamageEvent(
       isIndependentSkillDamage: snapshot.isIndependentSkillDamage,
       isSingleTargetSkillDamage: snapshot.isSingleTargetSkillDamage,
       isAoeSkillDamage: snapshot.isAoeSkillDamage,
+      isDamageTransfer: snapshot.isDamageTransfer,
     });
   }
 

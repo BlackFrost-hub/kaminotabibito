@@ -50,7 +50,7 @@ ____exports["处理恶斯胸甲使用"] = function(ctx)
         _____5E38_89C4BuffID["恶斯胸甲_祭血攻击"],
         _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["恶斯胸甲"]["持续毫秒"] / 1000,
         _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["恶斯胸甲"]["触发伤害阈值"],
-        {sourceName = "恶斯胸甲", effectValue2 = paidLife * _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["恶斯胸甲"]["后续伤害倍率"]}
+        {sourceUnit = unit, effectSourceName = "恶斯胸甲", effectSourceType = "装备", effectValue2 = paidLife * _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["恶斯胸甲"]["后续伤害倍率"]}
     )
 end
 ____exports["处理恶斯胸甲伤害修正"] = function(context)
@@ -71,7 +71,7 @@ ____exports["处理恶斯胸甲伤害修正"] = function(context)
         _____5E38_89C4BuffID["恶斯胸甲_祭血灼烧"],
         _____7269_54C1_4F7F_7528_6570_503C_914D_7F6E["恶斯胸甲"]["持续毫秒"] / 1000,
         damage,
-        {sourceName = "恶斯胸甲"}
+        {sourceUnit = attacker, effectSourceName = "恶斯胸甲", effectSourceType = "装备"}
     )
     _____5F00_59CB_6301_7EED_4F24_5BB3({
         ["来源"] = attacker,

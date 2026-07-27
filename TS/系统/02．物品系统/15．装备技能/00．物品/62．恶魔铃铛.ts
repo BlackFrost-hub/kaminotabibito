@@ -39,12 +39,14 @@ function 应用恶魔铃铛攻击差值(this: void, target: any, delta: number):
   调整状态ID属性(target, 攻击属性ID, delta);
 }
 
-function 刷新恶魔铃铛攻击降低Buff(this: void, target: any, 攻击降低: number, 持续秒: number, 来源名称: string): void {
+function 刷新恶魔铃铛攻击降低Buff(this: void, target: any, 攻击降低: number, 持续秒: number, 来源单位: any, 装备来源名称: string): void {
   if (!(攻击降低 > 0) || 持续秒 <= 0) return;
   const old = getBuffRuntime(target, 常规BuffID.攻击力降低);
-  if (old != null && old.sourceName !== 来源名称 && old.effect > 攻击降低) return;
+  if (old != null && old.effectSourceName !== 装备来源名称 && old.effect > 攻击降低) return;
   registerManualBuff(target, 常规BuffID.攻击力降低, 持续秒, 攻击降低, {
-    sourceName: 来源名称,
+    sourceUnit: 来源单位,
+    effectSourceName: 装备来源名称,
+    effectSourceType: "装备",
   });
 }
 
@@ -52,11 +54,11 @@ function 同步恶魔铃铛光环Buff(
   this: void,
   target: any,
   _层数: number,
-  _holder: any,
+  holder: any,
   已应用值表: Record<string, number | undefined>,
 ): void {
   const attackReduction = -(已应用值表.攻击降低 ?? 0);
-  刷新恶魔铃铛攻击降低Buff(target, attackReduction, 恶魔铃铛光环Buff持续秒, "恶魔铃铛光环");
+  刷新恶魔铃铛攻击降低Buff(target, attackReduction, 恶魔铃铛光环Buff持续秒, holder, "恶魔铃铛");
 }
 
 export function 初始化恶魔铃铛光环(this: void): void {
@@ -88,10 +90,10 @@ export function 处理恶魔铃铛使用(this: void, ctx: 物品技能事件上�
   const enemies = 获取范围敌人(unit, 取单位X(unit), 取单位Y(unit), cfg.半径);
   for (const enemy of enemies) {
     const fearTime = 单位是英雄(enemy) ? cfg.恐惧英雄 : cfg.恐惧普通;
-    施加恐惧(unit, enemy, { 持续时间: fearTime, 模式: "逃离施法者" });
+    施加恐惧(unit, enemy, { 持续时间: fearTime, 模式: "逃离施法者", 效果来源名称: "恶魔铃铛", 效果来源类型: "装备" });
     const attack = 取单位攻击(enemy) * cfg.攻击降低比例;
     施加临时属性效果(enemy, cfg.持续毫秒, [{ 类型: "攻击", 数值: -attack }]);
-    刷新恶魔铃铛攻击降低Buff(enemy, attack, cfg.持续毫秒 / 1000, "恶魔铃铛");
+    刷新恶魔铃铛攻击降低Buff(enemy, attack, cfg.持续毫秒 / 1000, unit, "恶魔铃铛");
   }
 }
 

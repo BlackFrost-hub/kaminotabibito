@@ -28,7 +28,7 @@ local function ____on_51C0_5316_8005_624B_5957_89E6_53D1(event)
         _____5E38_89C4BuffID["净化者手套_净化增幅"],
         duration,
         value,
-        {sourceName = "净化者手套", iconOverride = "Equipment\\Icon\\Gloves\\purifier_gloves.blp"}
+        {sourceUnit = attacker, effectSourceName = "净化者手套", effectSourceType = "装备", iconOverride = "Equipment\\Icon\\Gloves\\purifier_gloves.blp"}
     )
     _____64AD_653E_5355_4F4D_7279_6548(_____88C5_5907_5C0F_7279_6548["护盾闪光"], attacker, "origin", 0.8)
 end

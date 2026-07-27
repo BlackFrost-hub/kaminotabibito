@@ -28,6 +28,6 @@ ____exports["处理安恶之鞋造成伤害"] = function(ctx)
         return
     end
     _____8FDB_5165_88C5_5907_51B7_5374_5E76_663E_793A(_____51B7_5374_952E, 10, ctx.attacker, "安恶之鞋")
-    _____65BD_52A0_6050_60E7(ctx.attacker, ctx.target, {["持续时间"] = 1, ["模式"] = "逃离施法者"})
+    _____65BD_52A0_6050_60E7(ctx.attacker, ctx.target, {["持续时间"] = 1, ["模式"] = "逃离施法者", ["效果来源名称"] = "安恶之鞋", ["效果来源类型"] = "装备"})
 end
 return ____exports

@@ -27,7 +27,7 @@ export function 处理异雷法袍受伤(this: void, ctx: 伤害事件上下文)
   for (let i = 0; i < 敌人.length; i++) {
     const 目标 = 敌人[i];
     造成伤害事件伤害(ctx.target, 目标, 1000, 伤害事件伤害类型.闪电, { 伤害形态: "AOE" });
-    施加扩展控制(ctx.target, 目标, "stun", { 持续时间: 1 });
+    施加扩展控制(ctx.target, 目标, "stun", { 持续时间: 1, 效果来源名称: "异雷法袍", 效果来源类型: "装备" });
     播放单位特效(目标, "Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdl", "origin");
   }
 }

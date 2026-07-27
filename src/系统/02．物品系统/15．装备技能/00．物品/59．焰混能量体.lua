@@ -65,7 +65,7 @@ ____exports["处理焰混能量体使用"] = function(ctx)
         _____5E38_89C4BuffID["焰混能量体_混焰"],
         cfg["持续毫秒"] / 1000,
         cfg["攻速显示"],
-        {sourceName = "焰混能量体", effectValue2 = cfg["普攻次数"]}
+        {sourceUnit = unit, effectSourceName = "焰混能量体", effectSourceType = "装备", effectValue2 = cfg["普攻次数"]}
     )
 end
 ____exports["处理焰混能量体伤害"] = function(_target, attacker, _applied, snapshot)

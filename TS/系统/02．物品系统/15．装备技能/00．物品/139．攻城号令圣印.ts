@@ -12,7 +12,9 @@ function on攻城号令圣印触发(this: void, event: any): void {
     const unit = allies[i];
     临时受到治疗率(unit, 0.16, 6);
     registerManualBuff(unit, 常规BuffID.攻城号令圣印_攻城号令, 6, 16, {
-      sourceName: "攻城号令圣印",
+      sourceUnit: attacker,
+      effectSourceName: "攻城号令圣印",
+      effectSourceType: "装备",
       iconOverride: "Equipment\\Icon\\Item\\siege_command_signet.blp",
     });
     if (取当前生命(unit) < 取最大生命(unit) * 0.5) 开始通用护盾(attacker, unit, 850, 5, "攻城号令圣印");

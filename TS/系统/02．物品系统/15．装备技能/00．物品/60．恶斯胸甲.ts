@@ -28,7 +28,9 @@ export function 处理恶斯胸甲使用(this: void, ctx: 物品技能事件上�
   if (!(paidLife > 0)) return;
   恶斯胸甲窗口.写入(unit, paidLife, 物品使用数值配置.恶斯胸甲.持续毫秒 / 1000);
   registerManualBuff(unit, 常规BuffID.恶斯胸甲_祭血攻击, 物品使用数值配置.恶斯胸甲.持续毫秒 / 1000, 物品使用数值配置.恶斯胸甲.触发伤害阈值, {
-    sourceName: "恶斯胸甲",
+    sourceUnit: unit,
+    effectSourceName: "恶斯胸甲",
+    effectSourceType: "装备",
     effectValue2: paidLife * 物品使用数值配置.恶斯胸甲.后续伤害倍率,
   });
 }
@@ -43,7 +45,9 @@ export function 处理恶斯胸甲伤害修正(this: void, context: any): number
   const target = context.target;
   const damage = cost * 物品使用数值配置.恶斯胸甲.后续伤害倍率;
   registerManualBuff(target, 常规BuffID.恶斯胸甲_祭血灼烧, 物品使用数值配置.恶斯胸甲.持续毫秒 / 1000, damage, {
-    sourceName: "恶斯胸甲",
+    sourceUnit: attacker,
+    effectSourceName: "恶斯胸甲",
+    effectSourceType: "装备",
   });
   开始持续伤害({
     来源: attacker,

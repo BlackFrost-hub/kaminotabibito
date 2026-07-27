@@ -17,7 +17,7 @@ function 结算熔岩地狱之敲钟(this: void, 来源: any, 目标列表: any[
   const damage = GetHeroInt(来源, true) * 物品使用数值配置.地狱敲钟.智力伤害倍率;
   for (const target of 目标列表) {
     造成火焰伤害(来源, target, damage);
-    施加眩晕(来源, target, 物品使用数值配置.地狱敲钟.熔岩眩晕);
+    施加眩晕(来源, target, 物品使用数值配置.地狱敲钟.熔岩眩晕, "熔岩地狱之敲钟", "装备");
   }
 }
 
@@ -28,7 +28,7 @@ export function 处理熔岩地狱之敲钟使用(this: void, ctx: 物品技能�
   减少魔法值(unit, 取最大魔法(unit) * cfg.消耗最大魔法比例 + cfg.消耗固定魔法, true, false);
   const targets = 获取范围敌人(unit, 取单位X(unit), 取单位Y(unit), cfg.半径);
   for (const target of targets) {
-    施加减速(unit, target, cfg.熔岩减速, cfg.熔岩延迟毫秒 / 1000);
+    施加减速(unit, target, cfg.熔岩减速, cfg.熔岩延迟毫秒 / 1000, "熔岩地狱之敲钟", "装备");
   }
   延迟执行(cfg.熔岩延迟毫秒, function on熔岩地狱之敲钟延迟(this: void): void {
     结算熔岩地狱之敲钟(unit, targets);

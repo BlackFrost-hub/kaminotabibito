@@ -6,7 +6,10 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 const jass = require("jass.common") as any;
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: {
+    sourceUnit?: any;
     sourceName?: string;
+    effectSourceName?: string;
+    effectSourceType?: "装备" | "技能";
     iconOverride?: string;
     effectModelOverride?: string;
     nativeBuffAbilityIds?: number[];
@@ -17,7 +20,16 @@ const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as 
   getBuffRuntime: (this: void, unit: any, buffID: string) => any | null;
 };
 const { SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
-  SFB_setSlow: (this: void, sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
+  SFB_setSlow: (
+    this: void,
+    sourceUnit: any,
+    u: any,
+    as: number,
+    ms: number,
+    time: number,
+    effectSourceName?: string,
+    effectSourceType?: "装备" | "技能"
+  ) => void;
 };
 const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
   创建原生弹幕: (this: void, 参数: any) => any;
@@ -37,7 +49,6 @@ const GetUnitState = jass.GetUnitState as (u: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
-const GetUnitName = jass.GetUnitName as (u: any) => string;
 const R2I = jass.R2I as (value: number) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -71,6 +82,8 @@ export interface 暗影突袭减益参数 {
   iconOverride?: string;
   effectModelOverride?: string;
   sourceName?: string;
+  effectSourceName?: string;
+  effectSourceType?: "装备" | "技能";
   duration?: number;
   damagePerSecond?: number;
   slowAttack?: number;
@@ -220,12 +233,15 @@ export function 施加暗影突袭减益(this: void, source: any, target: any, �
   const buffID = 参数.buffID ?? 暗影突袭BuffID;
   debugLogForce("暗影突袭", "施加减益", "source:", source, "target:", target, "duration:", duration, "dps:", damagePerSecond);
   registerManualBuff(target, buffID, duration, 0, {
-    sourceName: 参数.sourceName ?? GetUnitName(source),
+    sourceUnit: source,
+    sourceName: 参数.sourceName,
+    effectSourceName: 参数.effectSourceName,
+    effectSourceType: 参数.effectSourceType,
     iconOverride: 参数.iconOverride ?? 读取Buff图标(buffID),
     effectModelOverride: 参数.effectModelOverride ?? 读取Buff特效(buffID),
     onRemove: on暗影突袭Buff移除,
   });
-  SFB_setSlow(source, target, slowAttack, slowMove, duration);
+  SFB_setSlow(source, target, slowAttack, slowMove, duration, 参数.effectSourceName, 参数.effectSourceType);
 
   const 毒素ID = ++下一个暗影突袭毒素ID;
   暗影突袭毒素计时表[毒素ID] = {

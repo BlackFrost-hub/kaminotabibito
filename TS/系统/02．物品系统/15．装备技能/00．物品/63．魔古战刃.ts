@@ -18,7 +18,7 @@ export function 处理魔古战刃使用(this: void, ctx: 物品技能事件上�
   for (const enemy of enemies) {
     造成普通伤害(unit, enemy, damage);
     命令攻击来源(enemy, unit);
-    施加减速(unit, enemy, 0.30, 2);
+    施加减速(unit, enemy, 0.30, 2, "魔古战刃", "装备");
     拉向来源(unit, enemy, cfg.拉拢距离, cfg.拉拢时间);
   }
 }

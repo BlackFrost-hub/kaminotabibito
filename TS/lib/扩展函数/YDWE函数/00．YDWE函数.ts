@@ -10,7 +10,7 @@
 
 const japi = require("jass.japi") as any;
 const jass = require("jass.common") as any;
-const { ceil } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
+const { ceil } = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算") as {
   ceil: (this: void, value: number) => number;
 };
 const jglobals = require("jass.globals") as any;

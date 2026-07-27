@@ -11,7 +11,9 @@ function on菲利斯的统御纹章触发(this: void, event: any): void {
   for (let i = 0; i < allies.length; i++) {
     临时玩家属性(allies[i], "魔法伤害", 0.10, 6);
     registerManualBuff(allies[i], 常规BuffID.菲利斯的统御纹章_统御号令, 6, 10, {
-      sourceName: "菲利斯的统御纹章",
+      sourceUnit: attacker,
+      effectSourceName: "菲利斯的统御纹章",
+      effectSourceType: "装备",
       iconOverride: "Equipment\\Icon\\Item\\phyllis_command_emblem.blp",
     });
     播放单位特效(装备小特效.护盾闪光, allies[i], "origin", 0.8);

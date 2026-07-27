@@ -84,6 +84,7 @@ import {
   isUnitInBuffPool,
   移除单位指定Buff,
 } from "../../../05．Buff系统/00．Buff系统";
+import { 常规BuffID } from "../../../05．Buff系统/03．Buff表/00．Buff登记";
 
 import {
   施加睡眠,
@@ -222,6 +223,25 @@ export const 二级驱散清除单位Buff = 二级驱散单位Buff;
 export const 获取单位Buff运行数据 = getBuffRuntime;
 export const 获取单位BuffID列表 = getBuffIdsOnUnit;
 export const 单位是否在Buff池中 = isUnitInBuffPool;
+
+export function 施加黑翼守护契约Buff(this: void, 守护者: any, 受护者: any, 持续时间: number, 转移比例: number): void {
+  if (守护者 == null || 守护者 === 0 || 受护者 == null || 受护者 === 0 || !(持续时间 > 0)) return;
+  registerManualBuff(守护者, 常规BuffID.黑翼守护重盾_守护者契约, 持续时间, 转移比例, {
+    sourceUnit: 守护者,
+    effectSourceName: "黑翼守护重盾",
+    effectSourceType: "装备",
+  });
+  registerManualBuff(受护者, 常规BuffID.黑翼守护重盾_受护者契约, 持续时间, 转移比例, {
+    sourceUnit: 守护者,
+    effectSourceName: "黑翼守护重盾",
+    effectSourceType: "装备",
+  });
+}
+
+export function 清除黑翼守护契约Buff(this: void, 守护者: any, 受护者: any): void {
+  if (守护者 != null && 守护者 !== 0) 移除单位指定Buff(守护者, 常规BuffID.黑翼守护重盾_守护者契约);
+  if (受护者 != null && 受护者 !== 0) 移除单位指定Buff(受护者, 常规BuffID.黑翼守护重盾_受护者契约);
+}
 
 /** 判断单位是否拥有指定 Buff 池条目。 */
 export function 单位是否拥有指定Buff(单位: any, BuffID: string): boolean {

@@ -37,7 +37,7 @@ ____exports["处理首领号角使用"] = function(ctx)
         _____5E38_89C4BuffID["首领号角_王之号角"],
         cfg["持续毫秒"] / 1000,
         attack,
-        {sourceName = "首领号角", effectValue2 = armor}
+        {sourceUnit = unit, effectSourceName = "首领号角", effectSourceType = "装备", effectValue2 = armor}
     )
 end
 return ____exports

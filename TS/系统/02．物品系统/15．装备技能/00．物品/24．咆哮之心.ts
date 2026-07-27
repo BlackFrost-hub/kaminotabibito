@@ -11,7 +11,7 @@ const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
-  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: { sourceName?: string }) => void;
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
 
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -58,7 +58,11 @@ export function 处理咆哮之心使用(this: void, 上下文: 物品技能事�
 
   const 持续毫秒 = 咆哮之心配置.次数 * 咆哮之心配置.周期 * 1000;
   const 附加攻击 = R2I(GetUnitStateJapi(目标单位, ConvertUnitState(0x15)) / 咆哮之心配置.力量转攻击除数);
-  registerManualBuff(目标单位, "C028", 持续毫秒 / 1000, 附加攻击, { sourceName: "咆哮之心" });
+  registerManualBuff(目标单位, "C028", 持续毫秒 / 1000, 附加攻击, {
+    sourceUnit: 施法单位,
+    effectSourceName: "咆哮之心",
+    effectSourceType: "装备",
+  });
   const 属性效果 = 施加临时属性效果(目标单位, 持续毫秒, [{ 类型: "攻击", 数值: 附加攻击 }]);
   const 周期上下文: 咆哮之心上下文 = { 施法单位, 目标单位, 属性效果 };
   启动计数周期执行({

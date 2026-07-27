@@ -23,6 +23,8 @@ function on灵猫步伐之靴最终伤害(this: void, event: any): void {
     持续时间: 灵猫跃步持续秒数,
     基础移速百分比: 灵猫跃步移速比例,
     图标路径: "Equipment\\Icon\\Shoes\\spirit_cat_steps_boots.blp",
+    效果来源名称: "灵猫步伐之靴",
+    效果来源类型: "装备",
   });
   播放单位特效(target, 灵猫跃步特效, "origin", 1);
 }

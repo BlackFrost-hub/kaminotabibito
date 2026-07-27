@@ -80,6 +80,12 @@ registerHealCallback((source, target, amount, isItemHeal) => {
 registerHealEvent((source, target, amount, isItemHeal) => {
   console.log(`治疗了 ${amount}`);
 });
+
+// 最终实际治疗量已确定、生命值尚未写入
+registerBeforeAppliedFinalHealListener(on治疗开始);
+
+// 实际加血完成后
+registerAppliedFinalHealListener(on治疗完成);
 ```
 
 ## 治疗率存储

@@ -21,7 +21,7 @@ function 结算阴暗之敲钟(this: void, 来源: any, 目标列表: any[]): vo
   for (const target of 目标列表) {
     调整单位属性(target, "伤害%", cfg.阴暗减伤);
     造成暗影伤害(来源, target, damage);
-    施加眩晕(来源, target, cfg.阴暗眩晕);
+    施加眩晕(来源, target, cfg.阴暗眩晕, "阴暗之敲钟", "装备");
   }
 }
 
@@ -34,7 +34,9 @@ export function 处理阴暗之敲钟使用(this: void, ctx: 物品技能事件�
   for (const target of targets) {
     调整单位属性(target, "伤害%", -cfg.阴暗减伤);
     registerManualBuff(target, 常规BuffID.伤害降低, cfg.阴暗持续毫秒 / 1000, cfg.阴暗减伤 * 100, {
-      sourceName: "阴暗之敲钟",
+      sourceUnit: unit,
+      effectSourceName: "阴暗之敲钟",
+      effectSourceType: "装备",
     });
   }
   延迟执行(cfg.阴暗持续毫秒, function on阴暗之敲钟延迟(this: void): void {

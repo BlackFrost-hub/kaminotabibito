@@ -7,6 +7,8 @@ const { 施加移速提升Buff } = require("系统.03．技能系统.00．技能
   施加移速提升Buff: (this: void, source: any, target: any, params: {
     持续时间: number;
     基础移速百分比?: number;
+    效果来源名称?: string;
+    效果来源类型?: "装备" | "技能";
   }) => boolean;
 };
 
@@ -14,6 +16,8 @@ function 触发血浴右腿移速提升(this: void, ctx: 攻击效果上下文):
   施加移速提升Buff(ctx.source, ctx.source, {
     持续时间: 3,
     基础移速百分比: 0.1,
+    效果来源名称: "血浴之母的第一条右腿",
+    效果来源类型: "装备",
   });
 }
 

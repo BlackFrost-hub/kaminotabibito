@@ -12,12 +12,13 @@
  */
 
 const jass = require("jass.common") as Record<string, unknown>;
+const GetUnitName = (jass as any).GetUnitName as (this: void, unit: any) => string;
 const unitBjExt = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as { IsUnitPausedBJ?: (unit: any) => boolean };
 const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 const UnitRemoveAbility = jass["UnitRemoveAbility"] as (whichUnit: any, abilityId: number) => boolean;
 const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
-  buffs: Record<string, { effect: string; effectMode?: "attach" | "point"; effectAttachPoint?: string; effectScale?: number }>;
+  buffs: Record<string, { effect: string; effectMode?: "attach" | "point"; effectAttachPoint?: string; effectScale?: number; effectHeight?: number }>;
 };
 const negativeEffectImmunity = require("系统.05．Buff系统.06．负面效果免疫状态") as {
   单位是否免疫负面效果BuffID: (this: void, unit: any, buffID: string) => boolean;
@@ -28,6 +29,8 @@ const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09�
 const buffEffectTools = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建Dz绑定单位特效: (this: void, unit: any, attachPoint: string, modelPath: string, effectKey?: string, scale?: number) => any;
   销毁Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => void;
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
+  销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
   销毁Dz绑定特效句柄: (this: void, effect: any) => void;
 };
 const AddSpecialEffect = jass["AddSpecialEffect"] as (modelName: string, x: number, y: number) => any;
@@ -73,11 +76,17 @@ export interface BuffRuntime {
   remaining: number;
   effect: number;
   effect2: number;
-  /** UI/机制层数。未设置时按 1 层处理。 */
+  /** UI/机制层数。未设置时按 1 层处理；可充能 Buff 可显式允许显示 0 层。 */
   stack: number;
+  /** 允许该 Buff 在等待补充层数期间显示 0 层。 */
+  allowZeroStack?: boolean;
   source: "dot" | "manual";
   /** 来源单位名称 */
   sourceName?: string;
+  /** 产生该 Buff 的装备或技能名称 */
+  effectSourceName?: string;
+  /** 效果来源分类；装备来源需显式标记，默认按技能来源显示 */
+  effectSourceType?: "装备" | "技能";
   _dotParsedDuration?: number;
   /** JASS 桥接：覆盖 01．Buff表 图标（非空则 Buff 条用此路径） */
   iconOverride?: string;
@@ -87,6 +96,8 @@ export interface BuffRuntime {
   visualEffect?: any;
   /** DzBindEffect 绑定特效的键，用于 Buff 到期/刷新时精确销毁。 */
   visualEffectKey?: string;
+  /** Buff 表现采用附着还是单位坐标跟随。 */
+  visualEffectMode?: "bind" | "follow";
   /** Buff 池到期时一并移除的原生魔法效果 rawId，用于清理单位状态栏图标/效果。 */
   nativeBuffAbilityIds?: number[];
   /** Buff 被移除或到期时触发的纯 TS 清理回调。 */
@@ -216,9 +227,10 @@ function toHid(u: any): number {
   return (jass as any).GetHandleId(u) as number;
 }
 
-function normalizeBuffStack(stack: number | undefined): number {
+function normalizeBuffStack(stack: number | undefined, allowZeroStack: boolean = false): number {
   if (stack == null || typeof stack !== "number" || !isFinite(stack)) return 1;
   const value = R2I(stack);
+  if (allowZeroStack && value <= 0) return 0;
   return value > 1 ? value : 1;
 }
 
@@ -240,7 +252,14 @@ function syncDotFromPoolTick(): void {
 export function syncDotBuff(
   typeId: string,
   target: any,
-  state: { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null
+  state: {
+    effect: number;
+    remaining: number;
+    sourceName?: string;
+    effectSourceName?: string;
+    effectSourceType?: "装备" | "技能";
+    _dotParsedDuration?: number;
+  } | null
 ): void {
   const buffID = DOT_TYPE_TO_BUFF_ID[typeId];
   if (!buffID) return;
@@ -262,6 +281,8 @@ export function syncDotBuff(
     stack: 1,
     source: "dot",
     sourceName: state.sourceName,
+    effectSourceName: state.effectSourceName,
+    effectSourceType: state.effectSourceType,
     _dotParsedDuration: state._dotParsedDuration,
   };
   setBuffToFlat(hid, buffID, row);
@@ -271,11 +292,16 @@ export function syncDotBuff(
 
 /** 手动 Buff 的可选展示字段（JASS 桥接、技能脚本） */
 export interface RegisterManualBuffExtras {
+  /** 施加单位句柄；登记时立即转换为名称，不在 Buff 运行时保存句柄 */
+  sourceUnit?: any;
   sourceName?: string;
+  effectSourceName?: string;
+  effectSourceType?: "装备" | "技能";
   iconOverride?: string;
   effectModelOverride?: string;
   effectValue2?: number;
   stack?: number;
+  allowZeroStack?: boolean;
   nativeBuffAbilityIds?: number[];
   onRemove?: (this: void, unit: any, buffID: string, row: BuffRuntime) => void;
   tickWhilePaused?: boolean;
@@ -295,7 +321,13 @@ function playManualBuffEffect(target: any, buffID: string, row: BuffRuntime, dur
     }
   } else {
     const effectKey = "manual-buff:" + buffID;
-    effect = buffEffectTools.创建Dz绑定单位特效(target, meta?.effectAttachPoint ?? "overhead", modelPath, effectKey, meta?.effectScale ?? 1);
+    if (meta?.effectHeight != null) {
+      effect = buffEffectTools.创建单位坐标跟随特效(target, modelPath, effectKey, meta?.effectScale ?? 1, meta.effectHeight);
+      row.visualEffectMode = "follow";
+    } else {
+      effect = buffEffectTools.创建Dz绑定单位特效(target, meta?.effectAttachPoint ?? "overhead", modelPath, effectKey, meta?.effectScale ?? 1);
+      row.visualEffectMode = "bind";
+    }
     if (effect != null && effect !== 0) {
       row.visualEffect = effect;
       row.visualEffectKey = effectKey;
@@ -324,16 +356,20 @@ export function registerManualBuff(
     remaining: durationSec,
     effect: effectValue,
     effect2: extras?.effectValue2 ?? 0,
-    stack: normalizeBuffStack(extras?.stack),
+    stack: normalizeBuffStack(extras?.stack, extras?.allowZeroStack === true),
     source: "manual",
   };
   if (extras != null) {
     if (extras.sourceName !== undefined && extras.sourceName !== "") row.sourceName = extras.sourceName;
+    else if (extras.sourceUnit != null && extras.sourceUnit !== 0) row.sourceName = GetUnitName(extras.sourceUnit);
+    if (extras.effectSourceName !== undefined && extras.effectSourceName !== "") row.effectSourceName = extras.effectSourceName;
+    if (extras.effectSourceType !== undefined) row.effectSourceType = extras.effectSourceType;
     if (extras.iconOverride !== undefined && extras.iconOverride !== "") row.iconOverride = extras.iconOverride;
     if (extras.effectModelOverride !== undefined && extras.effectModelOverride !== "")
       row.effectModelOverride = extras.effectModelOverride;
     if (extras.effectValue2 !== undefined) row.effect2 = extras.effectValue2;
-    if (extras.stack !== undefined) row.stack = normalizeBuffStack(extras.stack);
+    if (extras.allowZeroStack === true) row.allowZeroStack = true;
+    if (extras.stack !== undefined) row.stack = normalizeBuffStack(extras.stack, row.allowZeroStack === true);
     if (extras.nativeBuffAbilityIds !== undefined && extras.nativeBuffAbilityIds.length > 0)
       row.nativeBuffAbilityIds = extras.nativeBuffAbilityIds;
     if (extras.onRemove !== undefined) row.onRemove = extras.onRemove;
@@ -389,13 +425,13 @@ export function getBuffRuntimeByHid(hid: number, buffID: string): BuffRuntime | 
 
 export function 获取单位Buff层数(unit: any, buffID: string): number {
   const row = getBuffRuntime(unit, buffID);
-  return row != null ? normalizeBuffStack(row.stack) : 0;
+  return row != null ? normalizeBuffStack(row.stack, row.allowZeroStack === true) : 0;
 }
 
 export function 设置单位Buff层数(unit: any, buffID: string, stack: number): boolean {
   const row = getBuffRuntime(unit, buffID);
   if (row == null) return false;
-  row.stack = normalizeBuffStack(stack);
+  row.stack = normalizeBuffStack(stack, row.allowZeroStack === true);
   return true;
 }
 
@@ -477,12 +513,14 @@ function cleanupBuffOnRemove(unitRef: any, hid: number, buffID: string, row: Buf
 function cleanupBuffVisualEffect(unitRef: any, row: BuffRuntime): void {
   if (row.visualEffect == null || row.visualEffect === 0) return;
   if (unitRef != null && unitRef !== 0 && row.visualEffectKey != null && row.visualEffectKey !== "") {
-    buffEffectTools.销毁Dz绑定单位特效(unitRef, row.visualEffectKey);
+    if (row.visualEffectMode === "follow") buffEffectTools.销毁单位坐标跟随特效(unitRef, row.visualEffectKey);
+    else buffEffectTools.销毁Dz绑定单位特效(unitRef, row.visualEffectKey);
   } else {
     buffEffectTools.销毁Dz绑定特效句柄(row.visualEffect);
   }
   row.visualEffect = null;
   row.visualEffectKey = undefined;
+  row.visualEffectMode = undefined;
 }
 
 function removeBuffRuntimeByKey(hid: number, buffID: string, row: BuffRuntime, unitRef: any): void {

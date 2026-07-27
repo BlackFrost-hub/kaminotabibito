@@ -3,7 +3,7 @@ local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5904_7406_5F85_9500_6BC1_6CBB_7597_7279_6548, _____5B89_6392_6CBB_7597_7279_6548_9500_6BC1, cloneHealParams, _____6267_884C_5EF6_8FDF_6CBB_7597_961F_5217, calcHealAmount, getMissingLife, playHealEffect, addHealStats, shouldRecordPlayerHeal, addPlayerHealStats, jass, GetUnitStateJass, SetUnitStateJass, GetUnitStateJapi, GetOwningPlayer, YDUserDataGet, YDUserDataSet, STES_FireWithParams, _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57, addDelayedCallback, addPeriodicCallback, getServerTime, healCallbacks, healEventListeners, totalHealStats, delayedHealQueue, delayedHealScheduled, _____5F85_9500_6BC1_6CBB_7597_7279_6548_5217_8868, _____5DF2_6CE8_518C_6CBB_7597_7279_6548_9A71_52A8
+local _____5904_7406_5F85_9500_6BC1_6CBB_7597_7279_6548, _____5B89_6392_6CBB_7597_7279_6548_9500_6BC1, cloneHealParams, _____6267_884C_5EF6_8FDF_6CBB_7597_961F_5217, calcHealAmount, getMissingLife, playHealEffect, addHealStats, shouldRecordPlayerHeal, addPlayerHealStats, jass, GetUnitStateJass, SetUnitStateJass, GetUnitStateJapi, GetOwningPlayer, YDUserDataGet, YDUserDataSet, STES_FireWithParams, _____663E_793A_5355_4F4D_6570_503C_6F02_6D6E_6587_5B57, addDelayedCallback, addPeriodicCallback, getServerTime, healCallbacks, beforeAppliedFinalHealListeners, healEventListeners, totalHealStats, delayedHealQueue, delayedHealScheduled, _____5F85_9500_6BC1_6CBB_7597_7279_6548_5217_8868, _____5DF2_6CE8_518C_6CBB_7597_7279_6548_9A71_52A8
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.04．伤害系统.02．治疗系统.00．常量定义")
 local HEAL_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_SYSTEM_ENABLED
 local HEAL_EVENTS = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_EVENTS
@@ -321,6 +321,13 @@ function ____exports.doHeal(params)
             local missingLife = getMissingLife(HealTarget)
             actualHeal = amount < missingLife and amount or missingLife
             if actualHeal > 0 then
+                for ____, listener in ipairs(beforeAppliedFinalHealListeners) do
+                    do
+                        pcall(function()
+                            listener(HealSource, HealTarget, actualHeal, ItemHeal)
+                        end)
+                    end
+                end
                 local curLife = GetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE)
                 SetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal)
                 if HealEffect or UseDefaultHealEffect then
@@ -365,6 +372,7 @@ addDelayedCallback = ____require_result_3.addDelayedCallback
 addPeriodicCallback = ____require_result_3.addPeriodicCallback
 getServerTime = ____require_result_3.getServerTime
 healCallbacks = {}
+beforeAppliedFinalHealListeners = {}
 healEventListeners = {}
 totalHealStats = __TS__New(Map)
 delayedHealQueue = {}
@@ -409,6 +417,12 @@ end
 function ____exports.registerHealEvent(cb)
     if type(cb) == "function" then
         healEventListeners[#healEventListeners + 1] = cb
+    end
+end
+--- 注册治疗开始监听：最终实际治疗量确定后、生命值写入前触发，业务侧只读使用。
+function ____exports.registerBeforeAppliedFinalHealListener(cb)
+    if type(cb) == "function" then
+        beforeAppliedFinalHealListeners[#beforeAppliedFinalHealListeners + 1] = cb
     end
 end
 --- 注册最终治疗监听：实际加血完成后触发，业务侧只读使用。

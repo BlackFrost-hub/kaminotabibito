@@ -143,7 +143,7 @@ export function 处理狱妖魔盾使用(this: void, 上下文: 物品技能事�
   const enemies = 获取范围敌人(单位, x, y, 狱妖魔盾配置.爆发半径);
   for (const enemy of enemies) {
     造成强化伤害(单位, enemy, shieldValue * 狱妖魔盾配置.爆发倍率);
-    施加眩晕(单位, enemy, 狱妖魔盾配置.眩晕时间);
+    施加眩晕(单位, enemy, 狱妖魔盾配置.眩晕时间, "狱妖魔盾", "装备");
     击退远离来源(单位, enemy, 250, 0.5);
   }
   移除单位标签护盾(单位, 狱妖魔盾护盾标签);

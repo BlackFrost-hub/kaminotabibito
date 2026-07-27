@@ -242,7 +242,7 @@ end
 function ____exports.shouldApplyControlReduction(id)
     return id == 0 or id == 1 or id == 2 or id == 5 or id == ____exports["SFB_负面BUFF"]["睡眠"] or id == ____exports["SFB_负面BUFF"]["纠缠根须"] or id == ____exports["SFB_负面BUFF"]["飓风"]
 end
-function ____exports.registerSfbManualBuff(sourceUnit, u, id, time, effectValue)
+function ____exports.registerSfbManualBuff(sourceUnit, u, id, time, effectValue, effectSourceName, effectSourceType)
     local buffID = SFB_BUFF_ID[id]
     if buffID == nil or buffID == "" then
         return
@@ -254,6 +254,8 @@ function ____exports.registerSfbManualBuff(sourceUnit, u, id, time, effectValue)
         effectValue,
         {
             sourceName = ____exports.getUnitSourceName(sourceUnit, u),
+            effectSourceName = effectSourceName,
+            effectSourceType = effectSourceType,
             nativeBuffAbilityIds = SFB_NATIVE_BUFF_IDS[id]
         }
     )
@@ -336,7 +338,7 @@ local function ____SFB__786E_4FDD_9A6C_7532_6280_80FD(abilityId)
     ____SFB__5DF2_6DFB_52A0_6280_80FD[abilityId] = true
     return true
 end
-____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, abilityId, orderStr)
+____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, abilityId, orderStr, effectSourceName, effectSourceType)
     if not SUC_IsValidUnit(u) or time <= 0 then
         return
     end
@@ -403,7 +405,9 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
         u,
         id,
         time,
-        0
+        0,
+        effectSourceName,
+        effectSourceType
     )
     ____exports.IssueTargetOrder(caster, orderStr, u)
 end
@@ -460,13 +464,15 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
     end
     return ____temp_12
 end
-____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time)
+____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time, effectSourceName, effectSourceType)
     ____exports.registerSfbManualBuff(
         sourceUnit,
         u,
         id,
         time,
-        0
+        0,
+        effectSourceName,
+        effectSourceType
     )
     if id == 21 then
         _____8BBE_7F6E_5355_4F4D_6682_505C_65F6_95F4(u, "SFB_Stun", time)

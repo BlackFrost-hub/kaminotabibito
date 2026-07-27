@@ -160,4 +160,3 @@ export function 创建持续单位连线(this: void, 参数: 持续单位连线�
   }
   return 实例;
 }
-

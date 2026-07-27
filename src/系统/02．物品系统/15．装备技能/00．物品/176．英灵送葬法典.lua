@@ -14,60 +14,66 @@ local _____88C5_5907_4F24_5BB3_7C7B_578B = ____07_FF0E_88C5_5907_8F85_52A9["装�
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
+local function _____8FC7_6EE4_82F1_7075_9001_846C_4F24_5BB3(e)
+    return _____662FAOE_6280_80FD_4F24_5BB3(e["伤害快照"])
+end
+local function _____7ED3_7B97_82F1_7075_9001_846C(context)
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____56DBBoss_88C5_5907_7279_6548["英灵陨星"],
+        X = context.X,
+        Y = context.Y,
+        Z = 80,
+        ["持续秒"] = 0.8,
+        ["缩放"] = 0.02
+    })
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____56DBBoss_88C5_5907_7279_6548["英灵陨星落地"],
+        X = context.X,
+        Y = context.Y,
+        Z = 80,
+        ["持续秒"] = 0.4,
+        ["缩放"] = 0.01
+    })
+    local us = _____53D6_8303_56F4_654C_4EBA(context["来源"], context["目标"], 300)
+    local d = _____53D6_653B_51FB_529B(context["来源"]) * 0.65 + 350
+    do
+        local i = 0
+        while i < #us do
+            _____9020_6210_88C5_5907_4F24_5BB3(
+                context["来源"],
+                us[i + 1],
+                d,
+                _____88C5_5907_4F24_5BB3_7C7B_578B["魔法"],
+                true,
+                nil,
+                {["装备技能类型"] = "装备被动", ["标签"] = "英灵送葬", ["伤害形态"] = "AOE"}
+            )
+            i = i + 1
+        end
+    end
+end
+local function ____on_82F1_7075_9001_846C_89E6_53D1(e)
+    local s = e["持有者"]
+    local t = e["目标"]
+    local x = jass.GetUnitX(t)
+    local y = jass.GetUnitY(t)
+    _____64AD_653E_70B9_7279_6548(
+        _____56DBBoss_88C5_5907_7279_6548["英灵陨星预警"],
+        x,
+        y,
+        1,
+        0.55
+    )
+    addDelayedCallback(900, _____7ED3_7B97_82F1_7075_9001_846C, {["来源"] = s, ["目标"] = t, X = x, Y = y})
+end
 _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
     ["名称"] = "英灵送葬法典",
     ["装备名"] = _____56DBBoss_6218_5229_54C1_88C5_5907_540D["英灵送葬法典"],
     ["伤害过滤"] = "技能",
     ["冷却秒数"] = 10,
-    ["自定义过滤"] = function(e) return _____662FAOE_6280_80FD_4F24_5BB3(e["伤害快照"]) end,
-    ["on触发"] = function(e)
-        local s = e["持有者"]
-        local t = e["目标"]
-        local x = jass.GetUnitX(t)
-        local y = jass.GetUnitY(t)
-        _____64AD_653E_70B9_7279_6548(
-            _____56DBBoss_88C5_5907_7279_6548["英灵陨星预警"],
-            x,
-            y,
-            1,
-            0.55
-        )
-        addDelayedCallback(
-            900,
-            function()
-                _____64AD_653E_70B9_7279_6548(
-                    _____56DBBoss_88C5_5907_7279_6548["英灵陨星"],
-                    x,
-                    y,
-                    1,
-                    0.65
-                )
-                _____64AD_653E_70B9_7279_6548(
-                    _____56DBBoss_88C5_5907_7279_6548["英灵陨星落地"],
-                    x,
-                    y,
-                    1,
-                    0.5
-                )
-                local us = _____53D6_8303_56F4_654C_4EBA(s, t, 300)
-                local d = _____53D6_653B_51FB_529B(s) * 0.65 + 350
-                do
-                    local i = 0
-                    while i < #us do
-                        _____9020_6210_88C5_5907_4F24_5BB3(
-                            s,
-                            us[i + 1],
-                            d,
-                            _____88C5_5907_4F24_5BB3_7C7B_578B["魔法"],
-                            true,
-                            nil,
-                            {["装备技能类型"] = "装备被动", ["标签"] = "英灵送葬", ["伤害形态"] = "AOE"}
-                        )
-                        i = i + 1
-                    end
-                end
-            end
-        )
-    end
+    ["自定义过滤"] = _____8FC7_6EE4_82F1_7075_9001_846C_4F24_5BB3,
+    ["on触发"] = ____on_82F1_7075_9001_846C_89E6_53D1
 })
 return ____exports

@@ -17,6 +17,8 @@ export interface BuffData {
   effectMode?: 'attach' | 'point';
   effectAttachPoint?: string;
   effectScale?: number;
+  /** 非空时改用单位坐标跟随特效，并以该值作为绝对高度。 */
+  effectHeight?: number;
   type: string;
   interval: number;
   maxStack: number;
@@ -28,6 +30,10 @@ export interface BuffData {
   canPurge: boolean;
   /** 为 true 时，该 Buff 会阻止冲锋、跳跃、闪烁等自身位移技能。 */
   禁止位移?: boolean;
+  /** data/data1 对应的属性名；命中百分比属性表时，0.15 自动显示为 15。 */
+  data属性名?: string;
+  /** data2 对应的属性名；命中百分比属性表时，0.15 自动显示为 15。 */
+  data2属性名?: string;
   tooltip: string;
   [key: string]: string | number | boolean | undefined;
 }

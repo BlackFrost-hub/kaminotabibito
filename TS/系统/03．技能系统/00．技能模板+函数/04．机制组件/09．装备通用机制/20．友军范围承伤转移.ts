@@ -70,7 +70,7 @@ class 友军范围承伤转移实现 implements 友军范围承伤转移控制�
 
   private 修正(context: any): number {
     const current = context.currentDamage;
-    if (this.已停止 || this.正在转移 || !(current > 0)) return current;
+    if (this.已停止 || this.正在转移 || context.isDamageTransfer === true || !(current > 0)) return current;
     if ((this.配置.排除真实伤害 ?? true) && context.isTrueDamage === true) return current;
 
     const target = context.target;

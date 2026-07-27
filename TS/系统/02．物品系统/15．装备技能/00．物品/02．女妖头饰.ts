@@ -64,11 +64,18 @@ export function 处理女妖头饰累计(this: void, target: any, attacker: any,
       达到阈值后重置: true,
     });
     if (到达阈值) {
-      延后一帧执行伤害派生效果(() => {
+      const 效果来源名称 = 有女妖头饰强化 ? 女妖头饰强化累计配置.物品名 : 女妖头饰累计配置.物品名;
+      function 执行女妖头饰暗影突袭(this: void): void {
         创建暗影突袭追踪(target, attacker, {
-          减益: { duration: 2.0, damagePerSecond: 500 },
+          减益: {
+            duration: 2.0,
+            damagePerSecond: 500,
+            effectSourceName: 效果来源名称,
+            effectSourceType: "装备",
+          },
         });
-      });
+      }
+      延后一帧执行伤害派生效果(执行女妖头饰暗影突袭);
       if (有女妖头饰强化 && 女妖头饰强化物品 != null) {
         const 当前次数 = GetItemCharges(女妖头饰强化物品);
         const 下次次数 = 当前次数 + 1;

@@ -126,6 +126,7 @@ local ConvertAttackType = jass.ConvertAttackType
 local ConvertWeaponType = jass.ConvertWeaponType
 _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local appliedFinalDamageListeners = {}
+local appliedFinalDamagePostListeners = {}
 ____exports["延后一帧执行伤害派生效果"] = function(callback)
     createDelayedCall(0, callback)
 end
@@ -142,6 +143,19 @@ function ____exports.registerAppliedFinalDamageListener(cb)
     end
     appliedFinalDamageListeners[#appliedFinalDamageListeners + 1] = cb
 end
+--- 在普通最终伤害监听全部完成后派发；此时引擎尚未实际扣除本次生命。
+function ____exports.registerAppliedFinalDamagePostListener(cb)
+    do
+        local i = 0
+        while i < #appliedFinalDamagePostListeners do
+            if appliedFinalDamagePostListeners[i + 1] == cb then
+                return
+            end
+            i = i + 1
+        end
+    end
+    appliedFinalDamagePostListeners[#appliedFinalDamagePostListeners + 1] = cb
+end
 local function notifyAppliedFinalDamageListeners(target, attacker, applied, snapshot)
     do
         local i = 0
@@ -149,11 +163,25 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied, snap
             do
                 local cb = appliedFinalDamageListeners[i + 1]
                 if cb == nil then
-                    goto __continue9
+                    goto __continue13
                 end
                 cb(target, attacker, applied, snapshot)
             end
-            ::__continue9::
+            ::__continue13::
+            i = i + 1
+        end
+    end
+    do
+        local i = 0
+        while i < #appliedFinalDamagePostListeners do
+            do
+                local cb = appliedFinalDamagePostListeners[i + 1]
+                if cb == nil then
+                    goto __continue16
+                end
+                cb(target, attacker, applied, snapshot)
+            end
+            ::__continue16::
             i = i + 1
         end
     end
@@ -186,6 +214,7 @@ local function captureDamageTypeSnapshot()
         isIndependentSkillDamage = (skillContext and skillContext.isIndependentSkillDamage) == true,
         isSingleTargetSkillDamage = (skillContext and skillContext.isSingleTargetSkillDamage) == true,
         isAoeSkillDamage = (skillContext and skillContext.isAoeSkillDamage) == true,
+        isDamageTransfer = (skillContext and skillContext.isDamageTransfer) == true,
         isMetalDamage = _____4F24_5BB3_51FD_6570.isMetalDamage(),
         isWoodDamage = _____4F24_5BB3_51FD_6570.isWoodDamage(),
         isWaterDamage = _____4F24_5BB3_51FD_6570.isWaterDamage(),
@@ -213,13 +242,13 @@ end
 -- @returns 伤害计算结果
 function ____exports.calculateDamage(target, attacker, baseDamage, originalAttacker)
     local damage = baseDamage
-    local ____temp_35
+    local ____temp_37
     if originalAttacker ~= nil and originalAttacker ~= 0 then
-        ____temp_35 = originalAttacker
+        ____temp_37 = originalAttacker
     else
-        ____temp_35 = attacker
+        ____temp_37 = attacker
     end
-    local rawAttacker = ____temp_35
+    local rawAttacker = ____temp_37
     local isPlayer = isPlayerUnit(nil, target)
     local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()
     local isPhysDmg = _____4F24_5BB3_51FD_6570.isPhysicalDamage()
@@ -423,7 +452,8 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
             skillDamageShape = snapshot.skillDamageShape,
             isIndependentSkillDamage = snapshot.isIndependentSkillDamage,
             isSingleTargetSkillDamage = snapshot.isSingleTargetSkillDamage,
-            isAoeSkillDamage = snapshot.isAoeSkillDamage
+            isAoeSkillDamage = snapshot.isAoeSkillDamage,
+            isDamageTransfer = snapshot.isDamageTransfer
         })
     end
     if finalDamage ~= baseDamage then

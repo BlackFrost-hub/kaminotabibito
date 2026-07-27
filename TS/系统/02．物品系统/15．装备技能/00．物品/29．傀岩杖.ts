@@ -23,7 +23,7 @@ function 傀岩杖命中(this: void, event: { 上下文: 傀岩杖弹幕上下�
   const ctx = event.上下文;
   const 命中单位 = event.命中单位;
   造成伤害事件伤害(ctx.来源, 命中单位, 100, 伤害事件伤害类型.魔法);
-  施加扩展控制(ctx.来源, 命中单位, "stun", { 持续时间: 0.5 });
+  施加扩展控制(ctx.来源, 命中单位, "stun", { 持续时间: 0.5, 效果来源名称: "傀岩杖", 效果来源类型: "装备" });
 }
 
 export function 处理傀岩杖受伤(this: void, ctx: 伤害事件上下文): void {

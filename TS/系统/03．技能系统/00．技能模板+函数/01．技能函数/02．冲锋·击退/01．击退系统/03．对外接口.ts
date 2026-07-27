@@ -15,11 +15,13 @@ import {
   快照单位组,
 } from "./00．共享";
 import { 创建位移实例, 结束位移ID, 停止单位位移 } from "./02．驱动与实例";
-import { 尝试阻止自身位移技能 } from "../../../02．通用函数/20．位移技能限制";
+import { 尝试阻止自身位移技能, 通知战斗自身位移完成 } from "../../../02．通用函数/20．位移技能限制";
 
 const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
   按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
 };
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 
 function 计算冲锋行走动画倍率(持续时间?: number): number {
   if (持续时间 == null || 持续时间 <= 0) {
@@ -39,7 +41,7 @@ function 计算冲锋行走动画倍率(持续时间?: number): number {
 function 解析冲锋角度(单位: any, 参数: 冲锋参数): number | null {
   if (参数.角度 != null) return 参数.角度;
   if (参数.目标X != null && 参数.目标Y != null) {
-    return X_GAFC(jass.GetUnitX(单位) as number, jass.GetUnitY(单位) as number, 参数.目标X, 参数.目标Y);
+    return X_GAFC(GetUnitX(单位), GetUnitY(单位), 参数.目标X, 参数.目标Y);
   }
   return null;
 }
@@ -49,15 +51,15 @@ function 解析击退角度(单位: any, 参数: 击退参数): number | null {
 
   if (参数.来源单位 != null && 参数.来源单位 !== 0) {
     return X_GAFC(
-      jass.GetUnitX(参数.来源单位) as number,
-      jass.GetUnitY(参数.来源单位) as number,
-      jass.GetUnitX(单位) as number,
-      jass.GetUnitY(单位) as number
+      GetUnitX(参数.来源单位),
+      GetUnitY(参数.来源单位),
+      GetUnitX(单位),
+      GetUnitY(单位)
     );
   }
 
   if (参数.来源X != null && 参数.来源Y != null) {
-    return X_GAFC(参数.来源X, 参数.来源Y, jass.GetUnitX(单位) as number, jass.GetUnitY(单位) as number);
+    return X_GAFC(参数.来源X, 参数.来源Y, GetUnitX(单位), GetUnitY(单位));
   }
 
   return null;
@@ -69,34 +71,39 @@ export function 开始冲锋(单位: any, 参数: 冲锋参数): number {
   const 角度 = 解析冲锋角度(单位, 参数);
   if (角度 == null) return 0;
 
+  const 起点X = GetUnitX(单位);
+  const 起点Y = GetUnitY(单位);
   const 原开始回调 = 参数.开始回调;
   const 原结束回调 = 参数.结束回调;
   const 行走动画倍率 = 计算冲锋行走动画倍率(参数.持续时间);
   const 距离 = 按英雄技能距离修正上下文修正距离(参数.距离, 参数.英雄技能距离修正, "自身位移距离");
+
+  function on主动冲锋开始(this: void, 移动单位: any, 位移ID: number): void {
+    if (移动单位 != null && 移动单位 !== 0 && typeof SetUnitAnimation === "function") {
+      SetUnitAnimation(移动单位, "walk");
+    } else {
+      零秒后播放单位动作(移动单位, "walk");
+    }
+    if (typeof SetUnitTimeScale === "function") SetUnitTimeScale(移动单位, 行走动画倍率);
+    if (原开始回调 != null) 原开始回调(移动单位, 位移ID);
+  }
+
+  function on主动冲锋结束(this: void, 移动单位: any, 原因: 位移结束原因, 位移ID: number, 命中目标?: any): void {
+    const 单位有效 = 移动单位 != null && 移动单位 !== 0;
+    const 终点X = 单位有效 ? GetUnitX(移动单位) : 起点X;
+    const 终点Y = 单位有效 ? GetUnitY(移动单位) : 起点Y;
+    if (单位有效 && typeof SetUnitTimeScale === "function") SetUnitTimeScale(移动单位, 1.0);
+    if (原结束回调 != null) 原结束回调(移动单位, 原因, 位移ID, 命中目标);
+    if (单位有效 && 原因 !== "中断" && 原因 !== "死亡" && 原因 !== "主单位死亡") {
+      通知战斗自身位移完成(移动单位, 起点X, 起点Y, 终点X, 终点Y);
+    }
+  }
+
   const 合并参数: 冲锋参数 = {
     ...参数,
     距离,
-    开始回调: function (this: void, 移动单位: any, 位移ID: number): void {
-      if (移动单位 != null && 移动单位 !== 0 && typeof SetUnitAnimation === "function") {
-        SetUnitAnimation(移动单位, "walk");
-      } else {
-        零秒后播放单位动作(移动单位, "walk");
-      }
-      if (typeof SetUnitTimeScale === "function") {
-        SetUnitTimeScale(移动单位, 行走动画倍率);
-      }
-      if (原开始回调 != null) {
-        原开始回调(移动单位, 位移ID);
-      }
-    },
-    结束回调: function (this: void, 移动单位: any, 原因: 位移结束原因, 位移ID: number, 命中目标?: any): void {
-      if (移动单位 != null && 移动单位 !== 0 && typeof SetUnitTimeScale === "function") {
-        SetUnitTimeScale(移动单位, 1.0);
-      }
-      if (原结束回调 != null) {
-        原结束回调(移动单位, 原因, 位移ID, 命中目标);
-      }
-    },
+    开始回调: on主动冲锋开始,
+    结束回调: on主动冲锋结束,
   };
   return 创建位移实例(单位, 角度, 合并参数);
 }

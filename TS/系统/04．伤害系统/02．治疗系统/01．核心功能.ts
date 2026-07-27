@@ -59,7 +59,7 @@ const { addDelayedCallback, addPeriodicCallback, getServerTime } = require("系�
 type HealCallback = (source: any, target: any, amount: number, isItemHeal: boolean) => number;
 
 /** 治疗事件监听（只读） */
-type HealEventListener = (source: any, target: any, amount: number, isItemHeal: boolean) => void;
+type HealEventListener = (this: void, source: any, target: any, amount: number, isItemHeal: boolean) => void;
 
 /** 治疗参数（与JASS端参数名一致） */
 export interface HealParams {
@@ -83,6 +83,7 @@ export interface HealParams {
 // ==========================================================================================
 
 const healCallbacks: HealCallback[] = [];
+const beforeAppliedFinalHealListeners: HealEventListener[] = [];
 const healEventListeners: HealEventListener[] = [];
 const totalHealStats: Map<number, number> = new Map();
 const delayedHealQueue: HealParams[] = [];
@@ -199,6 +200,11 @@ export function registerHealCallback(cb: HealCallback): void {
  */
 export function registerHealEvent(cb: HealEventListener): void {
   if (typeof cb === "function") healEventListeners.push(cb);
+}
+
+/** 注册治疗开始监听：最终实际治疗量确定后、生命值写入前触发，业务侧只读使用。 */
+export function registerBeforeAppliedFinalHealListener(this: void, cb: HealEventListener): void {
+  if (typeof cb === "function") beforeAppliedFinalHealListeners.push(cb);
 }
 
 /** 注册最终治疗监听：实际加血完成后触发，业务侧只读使用。 */
@@ -443,6 +449,10 @@ export function doHeal(this: void, params: HealParams): number {
       actualHeal = amount < missingLife ? amount : missingLife;
 
       if (actualHeal > 0) {
+        for (const listener of beforeAppliedFinalHealListeners) {
+          try { listener(HealSource, HealTarget, actualHeal, ItemHeal); } catch (_e) {}
+        }
+
         const curLife = GetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE);
         SetUnitStateJass(HealTarget, jass.UNIT_STATE_LIFE, curLife + actualHeal);
 

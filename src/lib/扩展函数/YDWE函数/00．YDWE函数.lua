@@ -12,7 +12,7 @@ local ____exports = {}
 -- - EXSetUnitMoveType      : 设置单位移动类型
 local japi = require("jass.japi")
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算")
 local ceil = ____require_result_0.ceil
 local jglobals = require("jass.globals")
 ____exports.ABILITY_STATE_COOLDOWN = 1

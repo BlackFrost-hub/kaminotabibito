@@ -12,9 +12,11 @@ import {
   单位当前跳跃,
   取句柄ID,
   快照单位组,
+  GetUnitX,
+  GetUnitY,
 } from "./00．共享";
 import { 创建跳跃实例, 解析跳跃角度, 结束跳跃ID, 停止单位跳跃 } from "./02．驱动与实例";
-import { 尝试阻止自身位移技能 } from "../../../02．通用函数/20．位移技能限制";
+import { 尝试阻止自身位移技能, 通知战斗自身位移完成 } from "../../../02．通用函数/20．位移技能限制";
 
 const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
   按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
@@ -25,8 +27,22 @@ export function 开始跳跃(单位: any, 参数: 跳跃参数): number {
 
   const 角度 = 解析跳跃角度(单位, 参数);
   if (角度 == null) return 0;
+  const 起点X = GetUnitX(单位);
+  const 起点Y = GetUnitY(单位);
+  const 原结束回调 = 参数.结束回调;
   const 距离 = 按英雄技能距离修正上下文修正距离(参数.距离, 参数.英雄技能距离修正, "自身位移距离");
-  return 创建跳跃实例(单位, 角度, { ...参数, 距离 });
+
+  function on主动跳跃结束(this: void, 移动单位: any, 原因: 跳跃结束原因, 跳跃ID: number): void {
+    const 单位有效 = 移动单位 != null && 移动单位 !== 0;
+    const 终点X = 单位有效 ? GetUnitX(移动单位) : 起点X;
+    const 终点Y = 单位有效 ? GetUnitY(移动单位) : 起点Y;
+    if (原结束回调 != null) 原结束回调(移动单位, 原因, 跳跃ID);
+    if (单位有效 && 原因 !== "中断" && 原因 !== "死亡" && 原因 !== "主单位死亡") {
+      通知战斗自身位移完成(移动单位, 起点X, 起点Y, 终点X, 终点Y);
+    }
+  }
+
+  return 创建跳跃实例(单位, 角度, { ...参数, 距离, 结束回调: on主动跳跃结束 });
 }
 
 export function 开始定向跳跃(单位: any, 参数: 跳跃参数): number {

@@ -149,6 +149,8 @@ local function _____5E94_7528_5171_4EAB_71C3_70E7(source, target, _____53C2_6570
                 _____53C2_6570["来源名称"],
                 GetUnitName(source)
             ),
+            effectSourceName = _____53C2_6570["效果来源名称"],
+            effectSourceType = _____53C2_6570["效果来源类型"],
             _dotParsedDuration = remaining
         }
     )
@@ -179,6 +181,8 @@ local function _____5E94_7528_72EC_7ACB_71C3_70E7(source, target, _____53C2_6570
             _____53C2_6570["来源名称"],
             GetUnitName(source)
         ),
+        effectSourceName = _____53C2_6570["效果来源名称"],
+        effectSourceType = _____53C2_6570["效果来源类型"],
         iconPath = _____53D6_5B57_7B26_4E32(_____53C2_6570["图标路径"], _____71C3_70E7_9ED8_8BA4_56FE_6807),
         effectPath = _____53D6_5B57_7B26_4E32(_____53C2_6570["特效路径"], _____71C3_70E7_9ED8_8BA4_7279_6548),
         effectAttachPoint = _____53D6_5B57_7B26_4E32(_____53C2_6570["特效挂点"], "origin"),
@@ -189,7 +193,14 @@ local function _____5E94_7528_72EC_7ACB_71C3_70E7(source, target, _____53C2_6570
         buffID,
         duration,
         damage,
-        {sourceName = _____72EC_7ACB_71C3_70E7_8868[buffID].sourceName, iconOverride = _____72EC_7ACB_71C3_70E7_8868[buffID].iconPath, effectModelOverride = _____72EC_7ACB_71C3_70E7_8868[buffID].effectPath, onRemove = ____on_72EC_7ACB_71C3_70E7_79FB_9664}
+        {
+            sourceName = _____72EC_7ACB_71C3_70E7_8868[buffID].sourceName,
+            effectSourceName = _____72EC_7ACB_71C3_70E7_8868[buffID].effectSourceName,
+            effectSourceType = _____72EC_7ACB_71C3_70E7_8868[buffID].effectSourceType,
+            iconOverride = _____72EC_7ACB_71C3_70E7_8868[buffID].iconPath,
+            effectModelOverride = _____72EC_7ACB_71C3_70E7_8868[buffID].effectPath,
+            onRemove = ____on_72EC_7ACB_71C3_70E7_79FB_9664
+        }
     )
     _____64AD_653E_9644_7740_7279_6548(target, _____72EC_7ACB_71C3_70E7_8868[buffID].effectPath, _____72EC_7ACB_71C3_70E7_8868[buffID].effectAttachPoint, _____72EC_7ACB_71C3_70E7_8868[buffID].effectDuration)
     _____786E_4FDD_72EC_7ACB_71C3_70E7_9A71_52A8()

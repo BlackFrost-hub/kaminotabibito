@@ -14,7 +14,7 @@ local function _____6267_884C_6267_6CD5_8005_5FBD_8BB0_6C89_9ED8(ctx)
         return
     end
     _____8FDB_5165_88C5_5907_51B7_5374_5E76_663E_793A(key, 8, ctx.source, "执法者徽记")
-    _____65BD_52A0_6269_5C55_63A7_5236(ctx.source, ctx.target, "silence", {["持续时间"] = 2})
+    _____65BD_52A0_6269_5C55_63A7_5236(ctx.source, ctx.target, "silence", {["持续时间"] = 2, ["效果来源名称"] = "执法者徽记", ["效果来源类型"] = "装备"})
 end
 _____6CE8_518C_653B_51FB_6548_679C_914D_7F6E({
     ["装备名"] = "执法者徽记",

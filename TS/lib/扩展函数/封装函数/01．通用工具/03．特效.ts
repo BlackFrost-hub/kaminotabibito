@@ -11,10 +11,12 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
+const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
+  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+};
 
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
@@ -23,9 +25,7 @@ const DzBindEffect = japi.DzBindEffect as (widget: any, attachPoint: string, eff
 const DzUnbindEffect = japi.DzUnbindEffect as (effect: any) => void;
 const DzSetEffectPos = japi.DzSetEffectPos as (effect: any, x: number, y: number, z: number) => void;
 const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) => void;
-const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
-const EXSetEffectSpeed = japi.EXSetEffectSpeed as (effect: any, speed: number) => void;
 const EXEffectMatRotateX = japi.EXEffectMatRotateX as (effect: any, angle: number) => void;
 const EXEffectMatRotateY = japi.EXEffectMatRotateY as (effect: any, angle: number) => void;
 const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, angle: number) => void;
@@ -64,15 +64,7 @@ export function createTimedEffect(
   z: number = 0,
   duration: number = 2
 ): any {
-  const eff = jass.AddSpecialEffect(规范化特效模型路径(modelPath), x, y);
-  if (!eff) return null;
-
-  if (z !== 0) {
-    japi.EXSetEffectZ(eff, z);
-  }
-
-  安排定时销毁特效(eff, duration);
-  return eff;
+  return EC_CreateEffect(规范化特效模型路径(modelPath), x, y, z, 0, 1, 1, duration);
 }
 
 export function createTimedUnitEffect(
@@ -113,9 +105,9 @@ export interface 特效XYZ轴旋转参数 {
 
 export function 设置特效XYZ轴旋转(effect: any, 参数: 特效XYZ轴旋转参数): void {
   if (effect == null || effect === 0 || 参数 == null) return;
-  const x = Number(参数.X轴角度) || 0;
-  const y = Number(参数.Y轴角度) || 0;
-  const z = Number(参数.Z轴角度) || 0;
+  const x = 参数.X轴角度 ?? 0;
+  const y = 参数.Y轴角度 ?? 0;
+  const z = 参数.Z轴角度 ?? 0;
   if (x !== 0) EXEffectMatRotateX(effect, x);
   if (y !== 0) EXEffectMatRotateY(effect, y);
   if (z !== 0) EXEffectMatRotateZ(effect, z);
@@ -123,17 +115,21 @@ export function 设置特效XYZ轴旋转(effect: any, 参数: 特效XYZ轴旋转
 
 export function 创建点特效(参数: 点特效参数): any {
   if (参数.模型路径 == null || 参数.模型路径 === "") return null;
-  const effect = AddSpecialEffect(规范化特效模型路径(参数.模型路径), 参数.X, 参数.Y);
+  const duration = 参数.持续秒 != null && 参数.持续秒 > 0 ? 参数.持续秒 : -1;
+  const effect = EC_CreateEffect(
+    规范化特效模型路径(参数.模型路径),
+    参数.X,
+    参数.Y,
+    参数.Z ?? 0,
+    0,
+    参数.缩放 ?? 1,
+    参数.动画速度 ?? 1,
+    duration,
+  );
   if (effect == null || effect === 0) return null;
-  if (参数.Z != null && 参数.Z !== 0) EXSetEffectZ(effect, 参数.Z);
   设置特效XYZ轴旋转(effect, 参数);
-  设置Dz绑定特效缩放(effect, 参数.缩放 ?? 1);
-  if (参数.动画速度 != null) EXSetEffectSpeed(effect, 参数.动画速度);
   const color = 取特效顶点颜色(参数);
   if (color != null) DzSetEffectVertexColor(effect, color);
-  if (参数.持续秒 != null && 参数.持续秒 > 0) {
-    安排定时销毁特效(effect, 参数.持续秒);
-  }
   return effect;
 }
 
@@ -212,12 +208,18 @@ function 销毁循环点特效句柄(this: void, effect: any): void {
 
 function 创建循环点特效一次(this: void, 记录: 循环点特效记录): any {
   const 参数 = 记录.参数;
-  const effect = AddSpecialEffect(规范化特效模型路径(参数.模型路径), 参数.X, 参数.Y);
+  const effect = EC_CreateEffect(
+    规范化特效模型路径(参数.模型路径),
+    参数.X,
+    参数.Y,
+    参数.Z ?? 0,
+    0,
+    参数.缩放 ?? 1,
+    参数.动画速度 ?? 1,
+    -1,
+  );
   if (effect == null || effect === 0) return null;
-  if (参数.Z != null && 参数.Z !== 0) EXSetEffectZ(effect, 参数.Z);
   设置特效XYZ轴旋转(effect, 参数);
-  设置Dz绑定特效缩放(effect, 参数.缩放 ?? 1);
-  if (参数.动画速度 != null) EXSetEffectSpeed(effect, 参数.动画速度);
   const color = 取特效顶点颜色(参数);
   if (color != null) DzSetEffectVertexColor(effect, color);
   return effect;
@@ -463,10 +465,9 @@ export function 创建Dz绑定单位特效(unit: any, attachPoint: string, model
     解绑后归零尺寸并销毁Dz绑定特效(existingEffect);
   }
 
-  const effect = AddSpecialEffect(规范化特效模型路径(modelPath), GetUnitX(unit), GetUnitY(unit));
+  const effect = EC_CreateEffect(规范化特效模型路径(modelPath), GetUnitX(unit), GetUnitY(unit), 0, 0, scale, 1, -1);
   if (!effect) return null;
   DzBindEffect(unit, attachPoint, effect);
-  设置Dz绑定特效缩放(effect, scale);
   Dz绑定单位特效表.set(key, effect);
   return effect;
 }
@@ -533,13 +534,9 @@ export function 创建单位坐标跟随特效(unit: any, modelPath: string, eff
 
   const x = GetUnitX(unit);
   const y = GetUnitY(unit);
-  const effect = AddSpecialEffect(规范化特效模型路径(modelPath), x, y);
+  const effect = EC_CreateEffect(规范化特效模型路径(modelPath), x, y, height, 0, scale, animSpeed ?? 1, -1);
   if (!effect) return null;
   DzSetEffectPos(effect, x, y, height);
-  if (animSpeed != null) {
-    EXSetEffectSpeed(effect, animSpeed);
-  }
-  设置Dz绑定特效缩放(effect, scale);
   单位坐标跟随特效表[key] = { unit, effect, scale, height, animSpeed };
   单位坐标跟随特效数量 += 1;
   确保单位坐标跟随特效Tick();

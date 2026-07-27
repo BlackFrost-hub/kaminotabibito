@@ -105,6 +105,14 @@ do
     end
 end
 do
+    local ____export = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.23．装备属性定义")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
     ____exports["是否为使用物品"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["是否为使用物品"]
     ____exports["单位持有物品"] = ____17_FF0E_7269_54C1_6280_80FD_5DE5_5177_517C_5BB9["单位持有物品"]

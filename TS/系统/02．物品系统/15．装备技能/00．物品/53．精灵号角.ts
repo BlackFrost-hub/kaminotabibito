@@ -45,9 +45,11 @@ function 应用精灵号角护甲差值(this: void, target: any, delta: number):
   调整状态ID属性(target, 护甲属性ID, delta);
 }
 
-function 取精灵号角光环Buff附加(this: void, _target: any, 层数: number): any {
+function 取精灵号角光环Buff附加(this: void, _target: any, 层数: number, holder: any): any {
   return {
-    sourceName: "精灵号角",
+    sourceUnit: holder,
+    effectSourceName: "精灵号角",
+    effectSourceType: "装备",
     effectValue2: 物品使用数值配置.号角.精灵号角光环护甲 * 层数,
   };
 }
@@ -91,7 +93,9 @@ export function 处理精灵号角使用(this: void, ctx: 物品技能事件上�
     const extraAttack = 取句柄ID(target) === 取句柄ID(unit) ? selfExtraAttack : 0;
     施加临时属性效果(target, cfg.持续毫秒, [{ 类型: "攻击", 数值: activeAttack + extraAttack }]);
     registerManualBuff(target, 常规BuffID.精灵号角_王之号角, cfg.持续毫秒 / 1000, 15, {
-      sourceName: "精灵号角",
+      sourceUnit: unit,
+      effectSourceName: "精灵号角",
+      effectSourceType: "装备",
       effectValue2: extraAttack,
     });
   }

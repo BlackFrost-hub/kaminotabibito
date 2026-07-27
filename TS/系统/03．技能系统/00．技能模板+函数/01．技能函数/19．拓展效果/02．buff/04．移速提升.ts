@@ -11,6 +11,9 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
     effectValue: number,
     extras?: {
       sourceName?: string;
+      sourceUnit?: any;
+      effectSourceName?: string;
+      effectSourceType?: "装备" | "技能";
       iconOverride?: string;
       effectModelOverride?: string;
       onRemove?: (this: void, unit: any, buffID: string, row: { effect: number }) => void;
@@ -28,7 +31,6 @@ const { SOS_SetUnitSpeed, SOS_GetUnitSpeed, SOS_UnSetUnitSpeed } = require("lib.
 };
 
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
-const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed as (unit: any) => number;
 const GetUnitMoveSpeed = jass.GetUnitMoveSpeed as (unit: any) => number;
 
@@ -43,6 +45,8 @@ export interface 移速提升Buff参数 {
   当前移速百分比?: number;
   图标路径?: string;
   特效路径?: string;
+  效果来源名称?: string;
+  效果来源类型?: "装备" | "技能";
 }
 
 interface 移速提升记录 {
@@ -141,7 +145,9 @@ export function 施加移速提升Buff(this: void, 来源单位: any, 目标单�
   };
 
   registerManualBuff(目标单位, BuffID, 参数.持续时间, 提升移速, {
-    sourceName: 来源单位 != null && 来源单位 !== 0 ? GetUnitName(来源单位) : undefined,
+    sourceUnit: 来源单位,
+    effectSourceName: 参数.效果来源名称,
+    effectSourceType: 参数.效果来源类型,
     iconOverride: 参数.图标路径,
     effectModelOverride: 参数.特效路径,
     onRemove: on移速提升移除,

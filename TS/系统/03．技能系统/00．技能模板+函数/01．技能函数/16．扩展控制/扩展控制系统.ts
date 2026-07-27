@@ -20,7 +20,7 @@ const { calcReducedControlDuration, isExcludedFromControlResist } = require("系
   isExcludedFromControlResist: (this: void, unit: any) => boolean;
 };
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
-  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: { sourceName?: string }) => void;
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
 };
 const { 施加睡眠 } = require("系统.05．Buff系统.07．睡眠系统") as {
@@ -94,7 +94,6 @@ import type {
 } from "./控制效果定义";
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
-const GetUnitName = jass.GetUnitName as (u: any) => string;
 const GetUnitCurrentOrder = jass.GetUnitCurrentOrder as (u: any) => number;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => boolean;
@@ -524,7 +523,11 @@ export function 施加扩展控制(
   const 记录 = 构建扩展控制记录(类型 as 扩展控制类型, 来源单位, 目标单位, 实际持续时间, 规范参数);
   扩展控制映射表[目标ID] = 记录;
   加入目标ID(目标ID);
-  registerManualBuff(目标单位, 记录.BuffID, 实际持续时间, 0, { sourceName: GetUnitName(来源单位) });
+  registerManualBuff(目标单位, 记录.BuffID, 实际持续时间, 0, {
+    sourceUnit: 来源单位,
+    effectSourceName: (规范参数 as any).效果来源名称,
+    effectSourceType: (规范参数 as any).效果来源类型,
+  });
   生效扩展控制首帧(记录);
   通知控制Debuff事件({ 来源单位, 目标单位, 类型: 类型 as string, 持续时间: 实际持续时间, BuffID: 记录.BuffID, 是否控制: true, 原始参数: 规范参数 });
   debugLogForce(模块名, "施加扩展控制", "类型=", 类型, "来源=", 取单位ID(来源单位), "目标=", 目标ID, "持续=", 实际持续时间);

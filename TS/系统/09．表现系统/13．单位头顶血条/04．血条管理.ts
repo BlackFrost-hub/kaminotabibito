@@ -229,6 +229,27 @@ interface 护盾显示分段 {
   数值: number;
 }
 
+interface 有效生命显示参数 {
+  实际生命比例: number;
+  生命显示比例: number;
+  护盾值: number;
+  显示容量: number;
+}
+
+function 计算有效生命显示参数(this: void, life: number, maxLife: number, shield: number): 有效生命显示参数 {
+  const safeMaxLife = maxLife > 1 ? maxLife : 1;
+  const safeLife = life > 0 ? life : 0;
+  const safeShield = shield > 0 ? shield : 0;
+  const effectiveLife = safeLife + safeShield;
+  const displayCapacity = effectiveLife > safeMaxLife ? effectiveLife : safeMaxLife;
+  return {
+    实际生命比例: 限制01(safeLife / safeMaxLife),
+    生命显示比例: 限制01(safeLife / displayCapacity),
+    护盾值: safeShield,
+    显示容量: displayCapacity,
+  };
+}
+
 function 合并护盾显示分段(this: void, unit: any): 护盾显示分段[] {
   const list = 查询单位护盾列表(unit);
   const result: 护盾显示分段[] = [];
@@ -261,8 +282,7 @@ function 隐藏护盾分段(this: void, binding: 单位血条绑定, startIndex:
   }
 }
 
-function 刷新护盾分段(this: void, binding: 单位血条绑定, lifePct: number, maxLife: number): void {
-  const shield = 查询单位可显示护盾值(binding.单位);
+function 刷新护盾分段(this: void, binding: 单位血条绑定, lifeDisplayPct: number, displayCapacity: number, shield: number): void {
   if (!(shield > 0)) {
     隐藏护盾分段(binding, 0);
     return;
@@ -274,15 +294,13 @@ function 刷新护盾分段(this: void, binding: 单位血条绑定, lifePct: nu
     return;
   }
 
-  const shieldPct = 限制01(shield / maxLife);
-  const emptyPct = 限制01(1 - lifePct);
-  const totalVisiblePct = emptyPct > 0.001 ? (shieldPct > emptyPct ? emptyPct : shieldPct) : shieldPct;
-  const startPct = emptyPct > 0.001 ? lifePct : 1 - totalVisiblePct;
+  const totalVisiblePct = 限制01(shield / displayCapacity);
+  const startPct = lifeDisplayPct;
   let usedPct = 0;
   let frameIndex = 0;
 
   for (let i = 0; i < segments.length && frameIndex < binding.帧.shields.length; i++) {
-    let segmentPct = 限制01(segments[i].数值 / maxLife);
+    let segmentPct = 限制01(segments[i].数值 / displayCapacity);
     if (frameIndex === binding.帧.shields.length - 1) {
       segmentPct = totalVisiblePct - usedPct;
     } else if (usedPct + segmentPct > totalVisiblePct) {
@@ -327,16 +345,20 @@ function 调整根框尺寸(this: void, binding: 单位血条绑定): void {
 function 初始化帧内容(this: void, binding: 单位血条绑定): void {
   const 帧 = binding.帧;
   const unit = binding.单位;
-  const lifePct = 限制01(GetUnitState(unit, 生命状态) / binding.最大生命缓存);
-  binding.生命缓降比例 = lifePct;
-  更新生命贴图(binding, lifePct);
-  DzFrameSetSize(帧.life, 血条尺寸.内条宽 * lifePct, 血条尺寸.生命高);
+  const display = 计算有效生命显示参数(
+    GetUnitState(unit, 生命状态),
+    binding.最大生命缓存,
+    查询单位可显示护盾值(unit)
+  );
+  binding.生命缓降比例 = display.生命显示比例;
+  更新生命贴图(binding, display.实际生命比例);
+  DzFrameSetSize(帧.life, 血条尺寸.内条宽 * display.生命显示比例, 血条尺寸.生命高);
   DzFrameSetSize(帧.lifeLag, 0, 血条尺寸.生命高);
   DzFrameSetText(帧.name, 取血条名字文本(unit));
   调整根框尺寸(binding);
   DzFrameShow(帧.mana, binding.最大魔法缓存 > 0);
   DzFrameShow(帧.lifeLag, false);
-  隐藏护盾分段(binding, 0);
+  刷新护盾分段(binding, display.生命显示比例, display.显示容量, display.护盾值);
   绑定帧到单位(帧, unit, 取头顶高度(unit, binding.是否英雄));
   隐藏单位原生血条(unit);
 }
@@ -398,13 +420,13 @@ function 刷新生命魔法(this: void, binding: 单位血条绑定): void {
   const maxLifeNow = GetUnitState(unit, 最大生命状态);
   if (maxLifeNow > 1) binding.最大生命缓存 = maxLifeNow;
   const maxLife = binding.最大生命缓存 > 1 ? binding.最大生命缓存 : 1;
-  const lifePct = 限制01(life / maxLife);
-  const lifeWidth = 血条尺寸.内条宽 * lifePct;
-  更新生命贴图(binding, lifePct);
+  const display = 计算有效生命显示参数(life, maxLife, 查询单位可显示护盾值(unit));
+  const lifeWidth = 血条尺寸.内条宽 * display.生命显示比例;
+  更新生命贴图(binding, display.实际生命比例);
   DzFrameSetSize(binding.帧.life, lifeWidth, 血条尺寸.生命高);
-  更新生命缓降(binding, lifePct);
+  更新生命缓降(binding, display.生命显示比例);
 
-  刷新护盾分段(binding, lifePct, maxLife);
+  刷新护盾分段(binding, display.生命显示比例, display.显示容量, display.护盾值);
 
   const maxManaNow = GetUnitState(unit, 最大魔法状态);
   if (maxManaNow > 0) binding.最大魔法缓存 = maxManaNow;

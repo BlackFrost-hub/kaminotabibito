@@ -6,7 +6,7 @@ import { 施加攻击效果眩晕 } from "../08．攻击效果/00．公共/01．
 import { 取单位对单位冷却键, 装备冷却就绪, 进入装备冷却并显示 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/07．装备辅助";
 
 const { 施加单体护甲降低Buff } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.01．debuff.04．护甲降低") as {
-  施加单体护甲降低Buff: (this: void, source: any, target: any, params: { 持续时间: number; 护甲: number; 叠加键?: string }) => boolean;
+  施加单体护甲降低Buff: (this: void, source: any, target: any, params: { 持续时间: number; 护甲: number; 叠加键?: string; 效果来源名称?: string; 效果来源类型?: "装备" | "技能" }) => boolean;
 };
 
 function 执行沙之猎弓(this: void, 上下文: 攻击效果上下文): void {
@@ -18,8 +18,10 @@ function 执行沙之猎弓(this: void, 上下文: 攻击效果上下文): void 
     持续时间: 6,
     护甲: 15,
     叠加键: "沙之猎弓",
+    效果来源名称: "沙之猎弓",
+    效果来源类型: "装备",
   });
-  施加攻击效果眩晕(上下文.source, 上下文.target, 1);
+  施加攻击效果眩晕(上下文.source, 上下文.target, 1, "沙之猎弓", "装备");
 }
 
 注册攻击效果配置({

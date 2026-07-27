@@ -4,6 +4,7 @@ local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
+local registerAppliedFinalDamagePostListener = ____require_result_0.registerAppliedFinalDamagePostListener
 local jass = require("jass.common")
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.08．装备识别与冷却")
 local _____5355_4F4D_6301_6709_88C5_5907 = ____require_result_1["单位持有装备"]
@@ -15,6 +16,7 @@ local ____require_result_2 = require("系统.03．技能系统.00．技能模板
 local _____5355_4F4D_5B58_6D3B = ____require_result_2["单位存活"]
 local _____662F_6280_80FD_4F24_5BB3 = ____require_result_2["是技能伤害"]
 local _____662F_7EAF_666E_653B = ____require_result_2["是纯普攻"]
+local _____672C_6B21_6700_7EC8_4F24_5BB3_540E_751F_547D_6BD4_4F8B_4E0D_9AD8_4E8E = ____require_result_2["本次最终伤害后生命比例不高于"]
 local _____6700_7EC8_4F24_5BB3_89E6_53D1_8BB0_5F55_8868 = {}
 local _____6700_7EC8_4F24_5BB3_89E6_53D1_8BA1_6570 = 0
 local GetHandleId = jass.GetHandleId
@@ -70,6 +72,10 @@ local function _____8BB0_5F55_51B7_5374(holder, record)
         record["配置"]["装备名"]
     )
 end
+local function _____901A_8FC7_53D7_51FB_540E_751F_547D_9608_503C(target, applied, config)
+    local ratio = config["受击后生命比例上限"]
+    return ratio == nil or _____672C_6B21_6700_7EC8_4F24_5BB3_540E_751F_547D_6BD4_4F8B_4E0D_9AD8_4E8E(target, applied, ratio)
+end
 local function _____901A_8FC7_6B21_6570_5E76_8BB0_5F55(holder, record)
     local threshold = record["配置"]["次数阈值"] or 1
     if not (threshold > 1) then
@@ -124,6 +130,9 @@ local function _____5C1D_8BD5_6267_884C_6700_7EC8_4F24_5BB3_89E6_53D1(target, at
     if not _____901A_8FC7_4F24_5BB3_7C7B_578B_8FC7_6EE4(snapshot, config) then
         return
     end
+    if not _____901A_8FC7_53D7_51FB_540E_751F_547D_9608_503C(target, applied, config) then
+        return
+    end
     local event = {
         ["目标"] = target,
         ["攻击者"] = attacker,
@@ -148,10 +157,20 @@ local function _____5C1D_8BD5_6267_884C_6700_7EC8_4F24_5BB3_89E6_53D1(target, at
     _____8BB0_5F55_51B7_5374(holder, record)
     config["on触发"](event)
 end
-local function ____on_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F(target, attacker, applied, snapshot)
+local function _____5206_53D1_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F(target, attacker, applied, snapshot, _____4EC5_751F_547D_9608_503C)
     for key in pairs(_____6700_7EC8_4F24_5BB3_89E6_53D1_8BB0_5F55_8868) do
-        local record = _____6700_7EC8_4F24_5BB3_89E6_53D1_8BB0_5F55_8868[__TS__Number(key) or 0]
-        if record ~= nil then
+        do
+            local record = _____6700_7EC8_4F24_5BB3_89E6_53D1_8BB0_5F55_8868[__TS__Number(key) or 0]
+            if record == nil then
+                goto __continue33
+            end
+            if _____4EC5_751F_547D_9608_503C then
+                if record["配置"]["受击后生命比例上限"] == nil then
+                    goto __continue33
+                end
+            elseif record["配置"]["受击后生命比例上限"] ~= nil then
+                goto __continue33
+            end
             _____5C1D_8BD5_6267_884C_6700_7EC8_4F24_5BB3_89E6_53D1(
                 target,
                 attacker,
@@ -160,9 +179,29 @@ local function ____on_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F(target, attacker, 
                 record
             )
         end
+        ::__continue33::
     end
 end
+local function ____on_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F(target, attacker, applied, snapshot)
+    _____5206_53D1_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F(
+        target,
+        attacker,
+        applied,
+        snapshot,
+        false
+    )
+end
+local function ____on_6700_7EC8_4F24_5BB3_540E_751F_547D_9608_503C_89E6_53D1_6A21_677F(target, attacker, applied, snapshot)
+    _____5206_53D1_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F(
+        target,
+        attacker,
+        applied,
+        snapshot,
+        true
+    )
+end
 registerAppliedFinalDamageListener(____on_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F)
+registerAppliedFinalDamagePostListener(____on_6700_7EC8_4F24_5BB3_540E_751F_547D_9608_503C_89E6_53D1_6A21_677F)
 ____exports["注册最终伤害触发模板"] = function(_____914D_7F6E)
     _____6700_7EC8_4F24_5BB3_89E6_53D1_8BA1_6570 = _____6700_7EC8_4F24_5BB3_89E6_53D1_8BA1_6570 + 1
     local id = _____6700_7EC8_4F24_5BB3_89E6_53D1_8BA1_6570

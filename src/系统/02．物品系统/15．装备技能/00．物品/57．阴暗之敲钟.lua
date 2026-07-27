@@ -30,7 +30,13 @@ local function _____7ED3_7B97_9634_6697_4E4B_6572_949F(_____6765_6E90, _____76EE
     for ____, target in ipairs(_____76EE_6807_5217_8868) do
         _____8C03_6574_5355_4F4D_5C5E_6027(target, "伤害%", cfg["阴暗减伤"])
         _____9020_6210_6697_5F71_4F24_5BB3(_____6765_6E90, target, damage)
-        _____65BD_52A0_7729_6655(_____6765_6E90, target, cfg["阴暗眩晕"])
+        _____65BD_52A0_7729_6655(
+            _____6765_6E90,
+            target,
+            cfg["阴暗眩晕"],
+            "阴暗之敲钟",
+            "装备"
+        )
     end
 end
 ____exports["处理阴暗之敲钟使用"] = function(ctx)
@@ -58,7 +64,7 @@ ____exports["处理阴暗之敲钟使用"] = function(ctx)
             _____5E38_89C4BuffID["伤害降低"],
             cfg["阴暗持续毫秒"] / 1000,
             cfg["阴暗减伤"] * 100,
-            {sourceName = "阴暗之敲钟"}
+            {sourceUnit = unit, effectSourceName = "阴暗之敲钟", effectSourceType = "装备"}
         )
     end
     _____5EF6_8FDF_6267_884C(

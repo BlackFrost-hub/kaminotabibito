@@ -46,7 +46,7 @@ ____exports["处理斯尔能量之心使用"] = function(ctx)
         _____5E38_89C4BuffID["斯尔能量之心_能量爆发"],
         cfg["持续毫秒"] / 1000,
         cfg["伤害提升"] * 100,
-        {sourceName = "斯尔能量之心"}
+        {sourceUnit = unit, effectSourceName = "斯尔能量之心", effectSourceType = "装备"}
     )
 end
 ____exports["处理斯尔能量之心伤害修正"] = function(context)

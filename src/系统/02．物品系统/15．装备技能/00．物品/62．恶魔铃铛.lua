@@ -37,12 +37,12 @@ end
 local function _____5E94_7528_6076_9B54_94C3_94DB_653B_51FB_5DEE_503C(target, delta)
     _____8C03_6574_72B6_6001ID_5C5E_6027(target, _____653B_51FB_5C5E_6027ID, delta)
 end
-local function _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(target, _____653B_51FB_964D_4F4E, _____6301_7EED_79D2, _____6765_6E90_540D_79F0)
+local function _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(target, _____653B_51FB_964D_4F4E, _____6301_7EED_79D2, _____6765_6E90_5355_4F4D, _____88C5_5907_6765_6E90_540D_79F0)
     if not (_____653B_51FB_964D_4F4E > 0) or _____6301_7EED_79D2 <= 0 then
         return
     end
     local old = getBuffRuntime(target, _____5E38_89C4BuffID["攻击力降低"])
-    if old ~= nil and old.sourceName ~= _____6765_6E90_540D_79F0 and old.effect > _____653B_51FB_964D_4F4E then
+    if old ~= nil and old.effectSourceName ~= _____88C5_5907_6765_6E90_540D_79F0 and old.effect > _____653B_51FB_964D_4F4E then
         return
     end
     registerManualBuff(
@@ -50,12 +50,18 @@ local function _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(target
         _____5E38_89C4BuffID["攻击力降低"],
         _____6301_7EED_79D2,
         _____653B_51FB_964D_4F4E,
-        {sourceName = _____6765_6E90_540D_79F0}
+        {sourceUnit = _____6765_6E90_5355_4F4D, effectSourceName = _____88C5_5907_6765_6E90_540D_79F0, effectSourceType = "装备"}
     )
 end
-local function _____540C_6B65_6076_9B54_94C3_94DB_5149_73AFBuff(target, ______5C42_6570, _holder, _____5DF2_5E94_7528_503C_8868)
+local function _____540C_6B65_6076_9B54_94C3_94DB_5149_73AFBuff(target, ______5C42_6570, holder, _____5DF2_5E94_7528_503C_8868)
     local attackReduction = -(_____5DF2_5E94_7528_503C_8868["攻击降低"] or 0)
-    _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(target, attackReduction, _____6076_9B54_94C3_94DB_5149_73AFBuff_6301_7EED_79D2, "恶魔铃铛光环")
+    _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(
+        target,
+        attackReduction,
+        _____6076_9B54_94C3_94DB_5149_73AFBuff_6301_7EED_79D2,
+        holder,
+        "恶魔铃铛"
+    )
 end
 ____exports["初始化恶魔铃铛光环"] = function()
     if _____5DF2_521D_59CB_5316_6076_9B54_94C3_94DB_5149_73AF then
@@ -89,10 +95,16 @@ ____exports["处理恶魔铃铛使用"] = function(ctx)
     )
     for ____, enemy in ipairs(enemies) do
         local fearTime = _____5355_4F4D_662F_82F1_96C4(enemy) and cfg["恐惧英雄"] or cfg["恐惧普通"]
-        _____65BD_52A0_6050_60E7(unit, enemy, {["持续时间"] = fearTime, ["模式"] = "逃离施法者"})
+        _____65BD_52A0_6050_60E7(unit, enemy, {["持续时间"] = fearTime, ["模式"] = "逃离施法者", ["效果来源名称"] = "恶魔铃铛", ["效果来源类型"] = "装备"})
         local attack = _____53D6_5355_4F4D_653B_51FB(enemy) * cfg["攻击降低比例"]
         _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C(enemy, cfg["持续毫秒"], {{["类型"] = "攻击", ["数值"] = -attack}})
-        _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(enemy, attack, cfg["持续毫秒"] / 1000, "恶魔铃铛")
+        _____5237_65B0_6076_9B54_94C3_94DB_653B_51FB_964D_4F4EBuff(
+            enemy,
+            attack,
+            cfg["持续毫秒"] / 1000,
+            unit,
+            "恶魔铃铛"
+        )
     end
 end
 ____exports["初始化恶魔铃铛光环"]()

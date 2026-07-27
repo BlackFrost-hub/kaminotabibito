@@ -24,7 +24,7 @@ local function ____on_83F2_5229_65AF_7684_7EDF_5FA1_7EB9_7AE0_89E6_53D1(event)
                 _____5E38_89C4BuffID["菲利斯的统御纹章_统御号令"],
                 6,
                 10,
-                {sourceName = "菲利斯的统御纹章", iconOverride = "Equipment\\Icon\\Item\\phyllis_command_emblem.blp"}
+                {sourceUnit = attacker, effectSourceName = "菲利斯的统御纹章", effectSourceType = "装备", iconOverride = "Equipment\\Icon\\Item\\phyllis_command_emblem.blp"}
             )
             _____64AD_653E_5355_4F4D_7279_6548(_____88C5_5907_5C0F_7279_6548["护盾闪光"], allies[i + 1], "origin", 0.8)
             i = i + 1

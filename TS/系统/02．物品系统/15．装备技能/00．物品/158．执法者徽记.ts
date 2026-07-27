@@ -12,7 +12,7 @@ function 执行执法者徽记沉默(this: void, ctx: 攻击效果上下文): vo
   const key = 取单位对单位冷却键(ctx.source, ctx.target, "执法者徽记");
   if (!装备冷却就绪(key)) return;
   进入装备冷却并显示(key, 8, ctx.source, "执法者徽记");
-  施加扩展控制(ctx.source, ctx.target, "silence", { 持续时间: 2 });
+  施加扩展控制(ctx.source, ctx.target, "silence", { 持续时间: 2, 效果来源名称: "执法者徽记", 效果来源类型: "装备" });
 }
 
 注册攻击效果配置({

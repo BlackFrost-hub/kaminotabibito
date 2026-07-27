@@ -4,6 +4,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local registerBeforeAppliedFinalHealListener = ____require_result_0.registerBeforeAppliedFinalHealListener
 local registerAppliedFinalHealListener = ____require_result_0.registerAppliedFinalHealListener
 local _____6CBB_7597_62A4_76FE_8054_52A8_8868 = {}
 local _____6CBB_7597_62A4_76FE_8054_52A8_8BA1_6570 = 0
@@ -17,8 +18,11 @@ function _____6CBB_7597_62A4_76FE_8054_52A8_5B9E_73B0.prototype.____constructor(
     self["控制器ID"] = _____6CBB_7597_62A4_76FE_8054_52A8_8BA1_6570
     _____6CBB_7597_62A4_76FE_8054_52A8_8868[self["控制器ID"]] = self
 end
-_____6CBB_7597_62A4_76FE_8054_52A8_5B9E_73B0.prototype["处理治疗"] = function(self, event)
+_____6CBB_7597_62A4_76FE_8054_52A8_5B9E_73B0.prototype["处理治疗"] = function(self, event, _____9636_6BB5)
     if self["已停止"] or self["参数"]["on治疗"] == nil or not self["匹配单位"](self, event) then
+        return
+    end
+    if (self["参数"]["治疗触发阶段"] or "治疗完成") ~= _____9636_6BB5 then
         return
     end
     if self["参数"]["过滤事件"] ~= nil and not self["参数"]["过滤事件"](event) then
@@ -73,7 +77,7 @@ ____exports["通知获得护盾事件"] = function(_____6765_6E90_5355_4F4D, ___
         end
     end
 end
-local function ____on_6700_7EC8_6CBB_7597_8054_52A8(source, target, amount, isItemHeal)
+local function _____5206_53D1_6CBB_7597_8054_52A8(source, target, amount, isItemHeal, _____9636_6BB5)
     if amount <= 0 then
         return
     end
@@ -81,9 +85,28 @@ local function ____on_6700_7EC8_6CBB_7597_8054_52A8(source, target, amount, isIt
     for key in pairs(_____6CBB_7597_62A4_76FE_8054_52A8_8868) do
         local _____63A7_5236_5668 = _____6CBB_7597_62A4_76FE_8054_52A8_8868[key]
         if _____63A7_5236_5668 ~= nil then
-            _____63A7_5236_5668["处理治疗"](_____63A7_5236_5668, event)
+            _____63A7_5236_5668["处理治疗"](_____63A7_5236_5668, event, _____9636_6BB5)
         end
     end
 end
+local function ____on_6CBB_7597_5F00_59CB_8054_52A8(source, target, amount, isItemHeal)
+    _____5206_53D1_6CBB_7597_8054_52A8(
+        source,
+        target,
+        amount,
+        isItemHeal,
+        "治疗开始"
+    )
+end
+local function ____on_6700_7EC8_6CBB_7597_8054_52A8(source, target, amount, isItemHeal)
+    _____5206_53D1_6CBB_7597_8054_52A8(
+        source,
+        target,
+        amount,
+        isItemHeal,
+        "治疗完成"
+    )
+end
+registerBeforeAppliedFinalHealListener(____on_6CBB_7597_5F00_59CB_8054_52A8)
 registerAppliedFinalHealListener(____on_6700_7EC8_6CBB_7597_8054_52A8)
 return ____exports

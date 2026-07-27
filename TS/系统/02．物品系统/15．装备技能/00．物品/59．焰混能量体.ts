@@ -50,7 +50,9 @@ export function 处理焰混能量体使用(this: void, ctx: 物品技能事件�
     },
   });
   registerManualBuff(unit, 常规BuffID.焰混能量体_混焰, cfg.持续毫秒 / 1000, cfg.攻速显示, {
-    sourceName: "焰混能量体",
+    sourceUnit: unit,
+    effectSourceName: "焰混能量体",
+    effectSourceType: "装备",
     effectValue2: cfg.普攻次数,
   });
 }

@@ -54,7 +54,9 @@ export function 处理女妖魔甲使用(this: void, ctx: 物品技能事件上�
   const cfg = 物品使用数值配置.女妖魔甲;
   施加临时属性效果(unit, cfg.持续毫秒, [{ 类型: "玩家属性", 属性名: "魔法伤害", 数值: cfg.魔法伤害提升 }]);
   registerManualBuff(unit, 常规BuffID.女妖魔甲_完全免疫, cfg.持续毫秒 / 1000, cfg.魔法伤害提升 * 100, {
-    sourceName: "女妖魔甲",
+    sourceUnit: unit,
+    effectSourceName: "女妖魔甲",
+    effectSourceType: "装备",
   });
   const unitId = 取单位ID(unit);
   if (unitId === 0) return;

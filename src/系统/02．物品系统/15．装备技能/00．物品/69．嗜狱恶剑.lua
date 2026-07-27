@@ -34,7 +34,7 @@ ____exports["处理嗜狱恶剑使用"] = function(ctx)
         _____5E38_89C4BuffID["嗜狱恶剑_嗜狱"],
         cfg["持续毫秒"] / 1000,
         cfg["攻击增加"],
-        {sourceName = "嗜狱恶剑"}
+        {sourceUnit = unit, effectSourceName = "嗜狱恶剑", effectSourceType = "装备"}
     )
 end
 return ____exports

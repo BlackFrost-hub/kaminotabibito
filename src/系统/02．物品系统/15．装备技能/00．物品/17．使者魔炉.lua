@@ -122,7 +122,7 @@ ____exports["处理使者魔炉使用"] = function(_____4E0A_4E0B_6587)
                     _____4F7F_8005_9B54_7089_81F4_76F2BuffID,
                     _____4F7F_8005_9B54_7089_914D_7F6E["恢复延迟"],
                     _____4F7F_8005_9B54_7089_914D_7F6E["命中率削减"] * 100,
-                    {sourceName = "使者魔炉", iconOverride = "ReplaceableTextures\\CommandButtons\\BTN000230.blp"}
+                    {sourceUnit = _____65BD_6CD5_5355_4F4D, effectSourceName = "使者魔炉", effectSourceType = "装备", iconOverride = "ReplaceableTextures\\CommandButtons\\BTN000230.blp"}
                 )
                 _____547D_4E2D_76EE_6807_5217_8868[#_____547D_4E2D_76EE_6807_5217_8868 + 1] = _____654C_4EBA
             end

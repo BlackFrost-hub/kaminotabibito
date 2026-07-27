@@ -21,6 +21,8 @@ local getBuffRuntime = ____00_FF0EBuff_7CFB_7EDF.getBuffRuntime
 local getBuffIdsOnUnit = ____00_FF0EBuff_7CFB_7EDF.getBuffIdsOnUnit
 local isUnitInBuffPool = ____00_FF0EBuff_7CFB_7EDF.isUnitInBuffPool
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____00_FF0EBuff_7CFB_7EDF["移除单位指定Buff"]
+local ____00_FF0EBuff_767B_8BB0 = require("系统.05．Buff系统.03．Buff表.00．Buff登记")
+local _____5E38_89C4BuffID = ____00_FF0EBuff_767B_8BB0["常规BuffID"]
 local ____07_FF0E_7761_7720_7CFB_7EDF = require("系统.05．Buff系统.07．睡眠系统")
 local _____65BD_52A0_7761_7720 = ____07_FF0E_7761_7720_7CFB_7EDF["施加睡眠"]
 local _____6E05_9664_7761_7720 = ____07_FF0E_7761_7720_7CFB_7EDF["清除睡眠"]
@@ -254,6 +256,33 @@ ____exports["二级驱散清除单位Buff"] = _____4E8C_7EA7_9A71_6563_5355_4F4D
 ____exports["获取单位Buff运行数据"] = getBuffRuntime
 ____exports["获取单位BuffID列表"] = getBuffIdsOnUnit
 ____exports["单位是否在Buff池中"] = isUnitInBuffPool
+____exports["施加黑翼守护契约Buff"] = function(_____5B88_62A4_8005, _____53D7_62A4_8005, _____6301_7EED_65F6_95F4, _____8F6C_79FB_6BD4_4F8B)
+    if _____5B88_62A4_8005 == nil or _____5B88_62A4_8005 == 0 or _____53D7_62A4_8005 == nil or _____53D7_62A4_8005 == 0 or not (_____6301_7EED_65F6_95F4 > 0) then
+        return
+    end
+    registerManualBuff(
+        _____5B88_62A4_8005,
+        _____5E38_89C4BuffID["黑翼守护重盾_守护者契约"],
+        _____6301_7EED_65F6_95F4,
+        _____8F6C_79FB_6BD4_4F8B,
+        {sourceUnit = _____5B88_62A4_8005, effectSourceName = "黑翼守护重盾", effectSourceType = "装备"}
+    )
+    registerManualBuff(
+        _____53D7_62A4_8005,
+        _____5E38_89C4BuffID["黑翼守护重盾_受护者契约"],
+        _____6301_7EED_65F6_95F4,
+        _____8F6C_79FB_6BD4_4F8B,
+        {sourceUnit = _____5B88_62A4_8005, effectSourceName = "黑翼守护重盾", effectSourceType = "装备"}
+    )
+end
+____exports["清除黑翼守护契约Buff"] = function(_____5B88_62A4_8005, _____53D7_62A4_8005)
+    if _____5B88_62A4_8005 ~= nil and _____5B88_62A4_8005 ~= 0 then
+        _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____5B88_62A4_8005, _____5E38_89C4BuffID["黑翼守护重盾_守护者契约"])
+    end
+    if _____53D7_62A4_8005 ~= nil and _____53D7_62A4_8005 ~= 0 then
+        _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____53D7_62A4_8005, _____5E38_89C4BuffID["黑翼守护重盾_受护者契约"])
+    end
+end
 --- 判断单位是否拥有指定 Buff 池条目。
 ____exports["单位是否拥有指定Buff"] = function(_____5355_4F4D, BuffID)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 or BuffID == nil or BuffID == "" then
@@ -389,13 +418,13 @@ local function _____5355_4F4D_62E5_6709_5339_914DBuff_6C60_6761_76EE(_____5355_4
                 end
                 local typeName = ____temp_4
                 if type(typeName) ~= "string" then
-                    goto __continue45
+                    goto __continue50
                 end
                 if _____5339_914D_51FD_6570(typeName) then
                     return true
                 end
             end
-            ::__continue45::
+            ::__continue50::
             i = i + 1
         end
     end
@@ -424,16 +453,16 @@ local function _____6E05_9664_5355_4F4D_5339_914DBuff_6C60_6761_76EE(_____5355_4
                 end
                 local typeName = ____temp_5
                 if type(typeName) ~= "string" then
-                    goto __continue52
+                    goto __continue57
                 end
                 if not _____5339_914D_51FD_6570(typeName) then
-                    goto __continue52
+                    goto __continue57
                 end
                 if _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____5355_4F4D, buffID) then
                     removed = removed + 1
                 end
             end
-            ::__continue52::
+            ::__continue57::
             i = i + 1
         end
     end

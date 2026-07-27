@@ -52,7 +52,11 @@ local function _____5904_7406_83B7_5F97(_____914D_7F6E, unit, _item, currentCoun
         end
         return
     end
-    _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = 1}
+    _____914D_7F6E["单位状态"][unitId] = {
+        ["单位"] = unit,
+        ["数量"] = 1,
+        ["下次触发时间"] = getServerTime() + _____914D_7F6E["间隔毫秒"]
+    }
     if previousCount <= 0 then
         local ____opt_4 = _____914D_7F6E["获取回调"]
         if ____opt_4 ~= nil then
@@ -75,7 +79,12 @@ local function _____5904_7406_4E22_5F03(_____914D_7F6E, unit, _item, currentCoun
         end
         return
     end
-    _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = 1}
+    local _____539F_72B6_6001 = _____914D_7F6E["单位状态"][unitId]
+    _____914D_7F6E["单位状态"][unitId] = {
+        ["单位"] = unit,
+        ["数量"] = 1,
+        ["下次触发时间"] = _____539F_72B6_6001 and _____539F_72B6_6001["下次触发时间"] or getServerTime() + _____914D_7F6E["间隔毫秒"]
+    }
 end
 local function ____on_6301_6709_578B_5468_671F_6548_679CTick()
     local now = getServerTime()
@@ -84,10 +93,12 @@ local function ____on_6301_6709_578B_5468_671F_6548_679CTick()
         while i < #_____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868 do
             do
                 local _____914D_7F6E = _____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868[i + 1]
-                if now < _____914D_7F6E["下次触发时间"] then
-                    goto __continue20
+                if _____914D_7F6E["按单位独立计时"] ~= true then
+                    if now < _____914D_7F6E["下次触发时间"] then
+                        goto __continue20
+                    end
+                    _____914D_7F6E["下次触发时间"] = now + _____914D_7F6E["间隔毫秒"]
                 end
-                _____914D_7F6E["下次触发时间"] = now + _____914D_7F6E["间隔毫秒"]
                 local _____5F85_6E05_7406 = {}
                 local _____5355_4F4DID_5217_8868 = _____83B7_53D6_6709_5E8F_5355_4F4D_72B6_6001ID_5217_8868(_____914D_7F6E["单位状态"])
                 do
@@ -98,21 +109,27 @@ local function ____on_6301_6709_578B_5468_671F_6548_679CTick()
                             local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId]
                             if _____72B6_6001 == nil or _____72B6_6001["单位"] == nil or _____72B6_6001["单位"] == 0 then
                                 _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
-                                goto __continue23
+                                goto __continue24
                             end
                             local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(_____72B6_6001["单位"], _____914D_7F6E["物品类型ID"])
                             if currentCount <= 0 then
                                 _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
-                                local ____opt_8 = _____914D_7F6E["丢弃回调"]
-                                if ____opt_8 ~= nil then
-                                    ____opt_8(_____72B6_6001["单位"], _____72B6_6001["数量"])
+                                local ____opt_10 = _____914D_7F6E["丢弃回调"]
+                                if ____opt_10 ~= nil then
+                                    ____opt_10(_____72B6_6001["单位"], _____72B6_6001["数量"])
                                 end
-                                goto __continue23
+                                goto __continue24
                             end
                             _____72B6_6001["数量"] = 1
+                            if _____914D_7F6E["按单位独立计时"] == true then
+                                if now < _____72B6_6001["下次触发时间"] then
+                                    goto __continue24
+                                end
+                                _____72B6_6001["下次触发时间"] = now + _____914D_7F6E["间隔毫秒"]
+                            end
                             _____914D_7F6E["周期回调"](_____72B6_6001["单位"], 1)
                         end
-                        ::__continue23::
+                        ::__continue24::
                         unitIndex = unitIndex + 1
                     end
                 end
@@ -195,19 +212,23 @@ local function _____8865_767B_8BB0_521D_59CB_5355_4F4D(_____914D_7F6E)
                 local unit = _____5355_4F4D_5217_8868[i + 1]
                 local unitId = _____83B7_53D6_5355_4F4DID(unit)
                 if unitId == 0 then
-                    goto __continue44
+                    goto __continue47
                 end
                 local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(unit, _____914D_7F6E["物品类型ID"])
                 if currentCount <= 0 then
-                    goto __continue44
+                    goto __continue47
                 end
-                _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = 1}
-                local ____opt_10 = _____914D_7F6E["获取回调"]
-                if ____opt_10 ~= nil then
-                    ____opt_10(unit, 1)
+                _____914D_7F6E["单位状态"][unitId] = {
+                    ["单位"] = unit,
+                    ["数量"] = 1,
+                    ["下次触发时间"] = getServerTime() + _____914D_7F6E["间隔毫秒"]
+                }
+                local ____opt_12 = _____914D_7F6E["获取回调"]
+                if ____opt_12 ~= nil then
+                    ____opt_12(unit, 1)
                 end
             end
-            ::__continue44::
+            ::__continue47::
             i = i + 1
         end
     end
@@ -231,6 +252,16 @@ local function _____521B_5EFA_6301_6709_578B_5468_671F_6548_679C_63A7_5236_5668(
         end,
         ["获取单位数量"] = function()
             return #_____83B7_53D6_6709_5E8F_5355_4F4D_72B6_6001ID_5217_8868(_____914D_7F6E["单位状态"])
+        end,
+        ["读取单位下次触发剩余毫秒"] = function(unit)
+            local unitId = _____83B7_53D6_5355_4F4DID(unit)
+            local _____5355_4F4D_72B6_6001 = _____914D_7F6E["单位状态"][unitId]
+            if unitId == 0 or _____5355_4F4D_72B6_6001 == nil then
+                return 0
+            end
+            local _____89E6_53D1_65F6_95F4 = _____914D_7F6E["按单位独立计时"] == true and _____5355_4F4D_72B6_6001["下次触发时间"] or _____914D_7F6E["下次触发时间"]
+            local _____5269_4F59_6BEB_79D2 = _____89E6_53D1_65F6_95F4 - getServerTime()
+            return _____5269_4F59_6BEB_79D2 > 0 and _____5269_4F59_6BEB_79D2 or 0
         end
     }
 end
@@ -250,6 +281,7 @@ ____exports["注册持有型周期效果"] = function(_____53C2_6570)
     local _____63A7_5236_5668 = _____521B_5EFA_6301_6709_578B_5468_671F_6548_679C_63A7_5236_5668(_____914D_7F6E)
     _____914D_7F6E["获取单位列表"] = _____63A7_5236_5668["获取单位列表"]
     _____914D_7F6E["获取单位数量"] = _____63A7_5236_5668["获取单位数量"]
+    _____914D_7F6E["读取单位下次触发剩余毫秒"] = _____63A7_5236_5668["读取单位下次触发剩余毫秒"]
     _____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868[#_____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868 + 1] = _____914D_7F6E
     _____8865_767B_8BB0_521D_59CB_5355_4F4D(_____914D_7F6E)
     if _____5DF2_6CE8_518C_76D1_542C_7269_54C1_7C7B_578B[_____53C2_6570["物品类型ID"]] ~= true then

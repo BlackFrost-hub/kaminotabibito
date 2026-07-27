@@ -8,7 +8,7 @@
  * 3. 重新选中是本地玩家表现：默认让单位拥有者重新选中该单位。
  */
 
-import { 尝试阻止自身位移技能 } from "./20．位移技能限制";
+import { 尝试阻止自身位移技能, 执行战斗自身传送到坐标 } from "./20．位移技能限制";
 
 const jass = require("jass.common") as any;
 
@@ -36,7 +36,6 @@ const SelectUnit = jass["SelectUnit"] as (u: any, flag: boolean) => void;
 const ShowUnit = jass["ShowUnit"] as (u: any, flag: boolean) => void;
 const IsUnitPaused = jass["IsUnitPaused"] as (u: any) => boolean;
 const SetUnitFacing = jass["SetUnitFacing"] as (u: any, angle: number) => void;
-const SetUnitPosition = jass["SetUnitPosition"] as (u: any, x: number, y: number) => void;
 const GetUnitState = jass["GetUnitState"] as (u: any, state: any) => number;
 
 const TICK_INTERVAL = 0.01;
@@ -102,16 +101,14 @@ function 结束闪烁实例(实例: 闪烁实例, 是否完成: boolean): void {
   }
 
   if (是否完成 && 单位存活(实例.单位)) {
-    SetUnitPosition(实例.单位, 实例.目标X, 实例.目标Y);
-    if (实例.朝向 != null) {
-      SetUnitFacing(实例.单位, 实例.朝向);
-    }
+    const 已完成位移 = 执行战斗自身传送到坐标(实例.单位, 实例.目标X, 实例.目标Y);
+    if (已完成位移 && 实例.朝向 != null) SetUnitFacing(实例.单位, 实例.朝向);
     ShowUnit(实例.单位, true);
     if (实例.闪烁期间暂停单位 && !实例.单位原本已暂停) {
       移除单位暂停(实例.单位, 闪烁暂停来源);
     }
-    播放闪烁特效(实例.结束特效, 实例.目标X, 实例.目标Y, 实例.特效生命周期);
-    if (实例.结束后选中单位) {
+    if (已完成位移) 播放闪烁特效(实例.结束特效, 实例.目标X, 实例.目标Y, 实例.特效生命周期);
+    if (已完成位移 && 实例.结束后选中单位) {
       本地为单位拥有者重新选中单位(实例.单位);
     }
   } else if (实例.闪烁期间暂停单位 && 单位存活(实例.单位) && !实例.单位原本已暂停) {
@@ -174,18 +171,15 @@ export function 开始闪烁(单位: any, 参数: 闪烁参数): number {
   ShowUnit(单位, false);
 
   if (持续时间 <= 0) {
-    SetUnitPosition(单位, 参数.目标X, 参数.目标Y);
-    if (参数.朝向 != null) {
-      SetUnitFacing(单位, 参数.朝向);
-    } else {
-      SetUnitFacing(单位, GetUnitFacing(单位));
-    }
+    const 已完成位移 = 执行战斗自身传送到坐标(单位, 参数.目标X, 参数.目标Y);
+    if (已完成位移 && 参数.朝向 != null) SetUnitFacing(单位, 参数.朝向);
+    else if (已完成位移) SetUnitFacing(单位, GetUnitFacing(单位));
     ShowUnit(单位, true);
     if (闪烁期间暂停单位 && !原本已暂停) {
       移除单位暂停(单位, 闪烁暂停来源);
     }
-    播放闪烁特效(参数.结束特效, 参数.目标X, 参数.目标Y, 特效生命周期);
-    if (结束后选中单位) {
+    if (已完成位移) 播放闪烁特效(参数.结束特效, 参数.目标X, 参数.目标Y, 特效生命周期);
+    if (已完成位移 && 结束后选中单位) {
       本地为单位拥有者重新选中单位(单位);
     }
     return 0;

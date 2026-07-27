@@ -75,6 +75,7 @@ export interface 技能伤害参数 {
   标签?: string;
   伤害形态?: 技能伤害形态;
   参与技能伤害加成?: boolean;
+  isDamageTransfer?: boolean;
 }
 
 export interface 技能伤害上下文 {
@@ -93,6 +94,7 @@ export interface 技能伤害上下文 {
   isSingleTargetSkillDamage: boolean;
   isAoeSkillDamage: boolean;
   participatesInSkillDamageBonus: boolean;
+  isDamageTransfer: boolean;
 }
 
 const 技能伤害上下文栈: 技能伤害上下文[] = [];
@@ -247,6 +249,7 @@ function 创建技能伤害上下文(this: void, 参数: 技能伤害参数): �
     isSingleTargetSkillDamage: damageShape === "单体",
     isAoeSkillDamage: damageShape === "AOE",
     participatesInSkillDamageBonus: 参数.参与技能伤害加成 !== false,
+    isDamageTransfer: 参数.isDamageTransfer === true,
   };
 }
 

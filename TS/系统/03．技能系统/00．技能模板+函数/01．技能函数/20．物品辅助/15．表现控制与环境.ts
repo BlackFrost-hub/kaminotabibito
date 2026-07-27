@@ -22,8 +22,25 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
   doHeal: (this: void, params: any) => number;
 };
 const { SFB_setBuff, SFB_setSlow } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
-  SFB_setBuff: (this: void, source: any, target: any, id: number, time: number) => void;
-  SFB_setSlow: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, time: number) => void;
+  SFB_setBuff: (
+    this: void,
+    source: any,
+    target: any,
+    id: number,
+    time: number,
+    effectSourceName?: string,
+    effectSourceType?: "装备" | "技能"
+  ) => void;
+  SFB_setSlow: (
+    this: void,
+    source: any,
+    target: any,
+    attackSlow: number,
+    moveSlow: number,
+    time: number,
+    effectSourceName?: string,
+    effectSourceType?: "装备" | "技能"
+  ) => void;
 };
 const { 清除单位负面Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   清除单位负面Buff: (this: void, unit: any, onlyPurgable?: boolean) => number;
@@ -112,12 +129,27 @@ export function 播放单位特效(this: void, 模型: string, 单位: any, 挂�
   createTimedUnitEffect(单位, 挂点, 模型, 持续秒);
 }
 
-export function 施加眩晕(this: void, 来源: any, 目标: any, 持续时间: number): void {
-  SFB_setBuff(来源, 目标, 0, 持续时间);
+export function 施加眩晕(
+  this: void,
+  来源: any,
+  目标: any,
+  持续时间: number,
+  效果来源名称?: string,
+  效果来源类型?: "装备" | "技能"
+): void {
+  SFB_setBuff(来源, 目标, 0, 持续时间, 效果来源名称, 效果来源类型);
 }
 
-export function 施加减速(this: void, 来源: any, 目标: any, 降低比例: number, 持续时间: number): void {
-  SFB_setSlow(来源, 目标, 降低比例, 降低比例, 持续时间);
+export function 施加减速(
+  this: void,
+  来源: any,
+  目标: any,
+  降低比例: number,
+  持续时间: number,
+  效果来源名称?: string,
+  效果来源类型?: "装备" | "技能"
+): void {
+  SFB_setSlow(来源, 目标, 降低比例, 降低比例, 持续时间, 效果来源名称, 效果来源类型);
 }
 
 export function 清除负面Buff(this: void, 单位: any): number {

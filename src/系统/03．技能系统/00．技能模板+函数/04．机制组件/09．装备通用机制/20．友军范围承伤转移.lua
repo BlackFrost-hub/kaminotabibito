@@ -44,7 +44,7 @@ _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["停止"] = fun
 end
 _____53CB_519B_8303_56F4_627F_4F24_8F6C_79FB_5B9E_73B0.prototype["修正"] = function(self, context)
     local current = context.currentDamage
-    if self["已停止"] or self["正在转移"] or not (current > 0) then
+    if self["已停止"] or self["正在转移"] or context.isDamageTransfer == true or not (current > 0) then
         return current
     end
     local ____self__914D_7F6E__6392_9664_771F_5B9E_4F24_5BB3_2 = self["配置"]["排除真实伤害"]

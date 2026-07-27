@@ -60,6 +60,7 @@ export const 四Boss装备特效 = {
   灵魂崩解: "Common\\Effect\\Form\\Debuff\\SpiritGuardSoulCollapse.mdx",
   魂力回灌: "Common\\Effect\\Form\\RiseFall\\SpiritGuardSoulReflux.mdx",
   净化反冲: "Common\\Effect\\Form\\Debuff\\SpiritGuardPurificationRecoil.mdx",
+  灵识闪烁扩散: "Common\\Effect\\Form\\Spread\\BlueSoulFlashSpread.mdx",
   天空法阵: "Common\\Effect\\Form\\MagicCircle\\AinzFallingSkyWarmGoldCircle.mdx",
   天空光柱: "Common\\Effect\\Form\\RiseFall\\AinzFallingSkyLaser.mdx",
   天空冲击: "Common\\Effect\\Form\\Explosion\\AinzFallingSkyImpact.mdx",
@@ -71,6 +72,7 @@ export const 四Boss装备特效 = {
   血晶球壳: "Common\\Effect\\Form\\RiseFall\\ShalltearBloodRebirthShell.mdx",
   血晶重构: "Common\\Effect\\Form\\RiseFall\\ShalltearBloodRebirthWeave.mdx",
   蔷薇镜缘: "Common\\Effect\\Form\\Illusion\\ShalltearRoseMirrorRim.mdx",
+  蔷薇镜像扩散: "Common\\Effect\\Form\\Spread\\az_shanxian02.mdx",
 } as const;
 
 export const 装备小特效 = {

@@ -8,6 +8,8 @@ local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetHandleId = jass.GetHandleId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local SetUnitPosition = jass.SetUnitPosition
 local SetUnitX = jass.SetUnitX
 local SetUnitY = jass.SetUnitY
@@ -124,7 +126,7 @@ end
 ____exports["注册战斗自身位移完成监听"] = function(listener)
     _____6218_6597_81EA_8EAB_4F4D_79FB_76D1_542C_5217_8868[#_____6218_6597_81EA_8EAB_4F4D_79FB_76D1_542C_5217_8868 + 1] = listener
 end
-local function _____901A_77E5_6218_6597_81EA_8EAB_4F4D_79FB_5B8C_6210(unit, _____8D77_70B9X, _____8D77_70B9Y, _____7EC8_70B9X, _____7EC8_70B9Y)
+____exports["通知战斗自身位移完成"] = function(unit, _____8D77_70B9X, _____8D77_70B9Y, _____7EC8_70B9X, _____7EC8_70B9Y)
     do
         local i = 0
         while i < #_____6218_6597_81EA_8EAB_4F4D_79FB_76D1_542C_5217_8868 do
@@ -146,16 +148,16 @@ ____exports["执行战斗自身位移到坐标"] = function(unit, x, y)
     if ____exports["尝试阻止自身位移技能"](unit) then
         return false
     end
-    local _____8D77_70B9X = jass.GetUnitX(unit)
-    local _____8D77_70B9Y = jass.GetUnitY(unit)
+    local _____8D77_70B9X = GetUnitX(unit)
+    local _____8D77_70B9Y = GetUnitY(unit)
     SetUnitX(unit, x)
     SetUnitY(unit, y)
-    _____901A_77E5_6218_6597_81EA_8EAB_4F4D_79FB_5B8C_6210(
+    ____exports["通知战斗自身位移完成"](
         unit,
         _____8D77_70B9X,
         _____8D77_70B9Y,
-        x,
-        y
+        GetUnitX(unit),
+        GetUnitY(unit)
     )
     return true
 end
@@ -166,15 +168,15 @@ ____exports["执行战斗自身传送到坐标"] = function(unit, x, y)
     if ____exports["尝试阻止自身位移技能"](unit) then
         return false
     end
-    local _____8D77_70B9X = jass.GetUnitX(unit)
-    local _____8D77_70B9Y = jass.GetUnitY(unit)
+    local _____8D77_70B9X = GetUnitX(unit)
+    local _____8D77_70B9Y = GetUnitY(unit)
     SetUnitPosition(unit, x, y)
-    _____901A_77E5_6218_6597_81EA_8EAB_4F4D_79FB_5B8C_6210(
+    ____exports["通知战斗自身位移完成"](
         unit,
         _____8D77_70B9X,
         _____8D77_70B9Y,
-        x,
-        y
+        GetUnitX(unit),
+        GetUnitY(unit)
     )
     return true
 end

@@ -37,7 +37,7 @@ ____exports["处理狂暴树枝使用"] = function(ctx)
         _____5E38_89C4BuffID["狂暴树枝_狂暴"],
         cfg["持续毫秒"] / 1000,
         cfg["攻速显示"],
-        {sourceName = "狂暴树枝", effectValue2 = cfg["自伤"]}
+        {sourceUnit = unit, effectSourceName = "狂暴树枝", effectSourceType = "装备", effectValue2 = cfg["自伤"]}
     )
     _____542F_52A8_8BA1_6570_5468_671F_6267_884C({
         ["间隔毫秒"] = cfg["自伤间隔毫秒"],

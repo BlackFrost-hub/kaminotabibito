@@ -80,7 +80,12 @@ function 处理指挥易伤(this: void, ctx: any): void {
   if (B00H指挥BuffID === 0) return;
   if (ctx.attacker == null || ctx.attacker === 0 || ctx.target == null || ctx.target === 0) return;
   if (!单位拥有Buff(ctx.attacker, B00H指挥BuffID)) return;
-  施加易伤(ctx.attacker, ctx.target, { 持续时间: 5, 伤害增加百分比: 0.15 });
+  施加易伤(ctx.attacker, ctx.target, {
+    持续时间: 5,
+    伤害增加百分比: 0.15,
+    效果来源名称: "指挥之剑",
+    效果来源类型: "装备",
+  });
 }
 
 const 暗黑侵蚀复活队列 = 创建延迟批处理队列<暗黑侵蚀复活记录>("暗黑侵蚀复活", {

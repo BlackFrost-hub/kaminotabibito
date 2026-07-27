@@ -7,7 +7,6 @@ local ____exports = {}
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_0.registerManualBuff
-local GetUnitName = jass.GetUnitName
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local buffTableMod = require("系统.05．Buff系统.01．Buff表")
@@ -50,7 +49,9 @@ ____exports["施加易伤"] = function(_____6765_6E90_5355_4F4D, _____76EE_6807_
         _____53C2_6570["持续时间"],
         _____53C2_6570["伤害增加百分比"],
         {
-            sourceName = GetUnitName(_____6765_6E90_5355_4F4D),
+            sourceUnit = _____6765_6E90_5355_4F4D,
+            effectSourceName = _____53C2_6570["效果来源名称"],
+            effectSourceType = _____53C2_6570["效果来源类型"],
             iconOverride = _____53C2_6570["图标路径"] or _____8BFB_53D6Buff_56FE_6807(BuffID),
             effectModelOverride = _____53C2_6570["特效路径"] or _____8BFB_53D6Buff_7279_6548(BuffID)
         }

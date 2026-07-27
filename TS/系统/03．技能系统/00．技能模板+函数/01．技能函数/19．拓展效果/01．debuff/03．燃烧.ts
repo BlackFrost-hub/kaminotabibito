@@ -15,6 +15,8 @@ const { registerManualBuff, getBuffRuntime } = require("系统.05．Buff系统.0
     effectValue: number,
     extras?: {
       sourceName?: string;
+      effectSourceName?: string;
+      effectSourceType?: "装备" | "技能";
       iconOverride?: string;
       effectModelOverride?: string;
       effectValue2?: number;
@@ -28,7 +30,14 @@ const { syncDotBuff } = require("系统.05．Buff系统.00．Buff系统") as {
     this: void,
     typeId: string,
     target: any,
-    state: { effect: number; remaining: number; sourceName?: string; _dotParsedDuration?: number } | null
+    state: {
+      effect: number;
+      remaining: number;
+      sourceName?: string;
+      effectSourceName?: string;
+      effectSourceType?: "装备" | "技能";
+      _dotParsedDuration?: number;
+    } | null
   ) => void;
 };
 const { getUnitBurn, dealBurnDamage } = require("系统.04．伤害系统.02．dot伤害") as {
@@ -61,6 +70,8 @@ export interface 燃烧效果参数 {
   特效挂点?: string;
   特效持续时间?: number;
   来源名称?: string;
+  效果来源名称?: string;
+  效果来源类型?: "装备" | "技能";
   BuffID?: string;
   最大持续时间?: number;
   只刷新更强?: boolean;
@@ -72,6 +83,8 @@ interface 独立燃烧记录 {
   buffID: string;
   damagePerSecond: number;
   sourceName?: string;
+  effectSourceName?: string;
+  effectSourceType?: "装备" | "技能";
   iconPath: string;
   effectPath: string;
   effectAttachPoint: string;
@@ -182,6 +195,8 @@ function 应用共享燃烧(this: void, source: any, target: any, 参数: 燃烧
     effect,
     remaining,
     sourceName: 取字符串(参数.来源名称, GetUnitName(source)),
+    effectSourceName: 参数.效果来源名称,
+    effectSourceType: 参数.效果来源类型,
     _dotParsedDuration: remaining,
   });
   播放附着特效(target, 取字符串(参数.特效路径, 燃烧默认特效), 取字符串(参数.特效挂点, "origin"), 取数值(参数.特效持续时间, 0.75));
@@ -200,6 +215,8 @@ function 应用独立燃烧(this: void, source: any, target: any, 参数: 燃烧
     buffID,
     damagePerSecond: damage,
     sourceName: 取字符串(参数.来源名称, GetUnitName(source)),
+    effectSourceName: 参数.效果来源名称,
+    effectSourceType: 参数.效果来源类型,
     iconPath: 取字符串(参数.图标路径, 燃烧默认图标),
     effectPath: 取字符串(参数.特效路径, 燃烧默认特效),
     effectAttachPoint: 取字符串(参数.特效挂点, "origin"),
@@ -207,6 +224,8 @@ function 应用独立燃烧(this: void, source: any, target: any, 参数: 燃烧
   };
   registerManualBuff(target, buffID, duration, damage, {
     sourceName: 独立燃烧表[buffID]!.sourceName,
+    effectSourceName: 独立燃烧表[buffID]!.effectSourceName,
+    effectSourceType: 独立燃烧表[buffID]!.effectSourceType,
     iconOverride: 独立燃烧表[buffID]!.iconPath,
     effectModelOverride: 独立燃烧表[buffID]!.effectPath,
     onRemove: on独立燃烧移除,

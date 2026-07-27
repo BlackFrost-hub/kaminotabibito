@@ -33,7 +33,13 @@ _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
         return _____8DDD_79BB_6EE1_8DB3_9650_5236(event["攻击者"], event["目标"], nil, _____6700_5927_653B_51FB_8DDD_79BB)
     end,
     ["on触发"] = function(event)
-        SFB_setCurse(event["攻击者"], event["目标"], _____8BC5_5492_6301_7EED_79D2)
+        SFB_setCurse(
+            event["攻击者"],
+            event["目标"],
+            _____8BC5_5492_6301_7EED_79D2,
+            "黑暗猎人手套",
+            "装备"
+        )
         _____653B_51FB_6548_679C_9020_6210_4F24_5BB3(
             event["攻击者"],
             event["目标"],

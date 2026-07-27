@@ -41,17 +41,25 @@ const BUFF_BAR_Y = 0.1655;
 const ICON_W = 0.02;
 const ICON_H = 16 / 600;
 const ICON_GAP = 0.0005;
+const STACK_BADGE_TEX = "UI\\Buff\\buff_stack_badge.tga";
+const STACK_BADGE_W = 0.0072;
+const STACK_BADGE_H = 0.0105;
+const STACK_BADGE_FONT = "Fonts\\dfst-m3u.ttf";
+const STACK_BADGE_FONT_SIZE = 0.008;
+const STACK_BADGE_TEXT_ALIGN_CENTER = 18;
 const TIP_BOX_TEX = "UI\\wenbenkuang.blp";
 const TIP_W = 0.22;
-const TIP_H = 0.068;
+const TIP_H = 0.082;
 const TIP_PAD_X = 0.009;
 const TIP_PAD_TOP = 0.007;
 const TIP_PAD_BOTTOM = 0.006;
-const TIP_OFFSET_Y_FROM_ICON_TOP = 0.07;
+const TIP_OFFSET_Y_FROM_ICON_TOP = 0.084;
+const TIP_SOURCE_H = 0.028;
 
 interface SlotFrames {
   root: number;
   remainText: number;
+  stackBadge: number;
   stackText: number;
   hit: number;
   tipBox: number;
@@ -191,23 +199,47 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
     setFrameLevelSafe(remainText, 182);
   }
 
+  const stackBadge =
+    uiCreateFrame({
+      type: UI工具.FrameType.BACKDROP,
+      name: "BuffUIBarStackBadge" + index,
+      parent: bd,
+      template: "template",
+      visible: false,
+    }) || 0;
+  if (stackBadge && stackBadge !== 0) {
+    uiSetFramePointRelative(
+      stackBadge,
+      UI工具.FramePoint.TOPRIGHT,
+      bd,
+      UI工具.FramePoint.TOPRIGHT,
+      -0.0003,
+      -0.0003
+    );
+    uiSetFrameSize(stackBadge, { width: STACK_BADGE_W, height: STACK_BADGE_H });
+    uiSetFrameTexture(stackBadge, STACK_BADGE_TEX);
+    setFrameLevelSafe(stackBadge, 183);
+  }
+
   const stackText =
     uiCreateTextLabel(
       "BuffUIBarStack" + index,
-      bd,
+      stackBadge && stackBadge !== 0 ? stackBadge : bd,
       "",
       {
-        relativeTo: bd,
-        point: UI工具.FramePoint.BOTTOMRIGHT,
-        relativePoint: UI工具.FramePoint.BOTTOMRIGHT,
-        x: -0.001,
-        y: 0.002,
+        relativeTo: stackBadge && stackBadge !== 0 ? stackBadge : bd,
+        point: UI工具.FramePoint.CENTER,
+        relativePoint: stackBadge && stackBadge !== 0 ? UI工具.FramePoint.CENTER : UI工具.FramePoint.TOPRIGHT,
+        x: 0,
+        y: stackBadge && stackBadge !== 0 ? 0 : -0.006,
       },
-      { width: ICON_W * 0.62, height: 0.014 }
+      { width: STACK_BADGE_W * 0.72, height: STACK_BADGE_H * 0.72 }
     ) || 0;
   if (stackText && stackText !== 0) {
-    japi.DzFrameSetTextAlignment(stackText, UI工具.FramePoint.BOTTOMRIGHT);
-    setFrameLevelSafe(stackText, 183);
+    japi.DzFrameSetTextAlignment(stackText, -1);
+    japi.DzFrameSetTextAlignment(stackText, STACK_BADGE_TEXT_ALIGN_CENTER);
+    japi.DzFrameSetFont(stackText, STACK_BADGE_FONT, STACK_BADGE_FONT_SIZE, 0);
+    setFrameLevelSafe(stackText, 184);
   }
 
   const hit =
@@ -279,7 +311,7 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
       tipBox && tipBox !== 0
         ? { relativeTo: tipBox, point: UI工具.FramePoint.BOTTOMLEFT, relativePoint: UI工具.FramePoint.BOTTOMLEFT, x: TIP_PAD_X, y: TIP_PAD_BOTTOM }
         : { relativeTo: bd, point: UI工具.FramePoint.TOPLEFT, relativePoint: UI工具.FramePoint.TOPRIGHT, x: 0.002, y: TIP_OFFSET_Y_FROM_ICON_TOP - 0.016 },
-      { width: boxW - TIP_PAD_X * 2, height: 0.019 }
+      { width: boxW - TIP_PAD_X * 2, height: TIP_SOURCE_H }
     ) || 0;
   if (tipSourceText && tipSourceText !== 0) {
     japi.DzFrameSetTextAlignment(tipSourceText, -1);
@@ -292,6 +324,7 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
   return {
     root: bd,
     remainText: remainText || 0,
+    stackBadge: stackBadge || 0,
     stackText: stackText || 0,
     hit: hit || 0,
     tipBox: tipBox || 0,
@@ -307,6 +340,7 @@ function hideSlot(this: void, i: number): void {
   if (s.tipSourceText !== 0) uiHideFrame(s.tipSourceText);
   if (s.tipBox !== 0) uiHideFrame(s.tipBox);
   if (s.stackText !== 0) uiHideFrame(s.stackText);
+  if (s.stackBadge !== 0) uiHideFrame(s.stackBadge);
   if (s.hit !== 0) uiHideFrame(s.hit);
   if (s.root !== 0) uiHideFrame(s.root);
 }
@@ -330,8 +364,13 @@ function renderBuffBarLocal(this: void, vm: { slots: Array<{ visible: boolean; i
       }
       if (slot.stackText !== 0) {
         japi.DzFrameSetText(slot.stackText, slotVM.stackText);
-        if (slotVM.stackText !== "") uiShowFrame(slot.stackText);
-        else uiHideFrame(slot.stackText);
+        if (slotVM.stackText !== "") {
+          if (slot.stackBadge !== 0) uiShowFrame(slot.stackBadge);
+          uiShowFrame(slot.stackText);
+        } else {
+          uiHideFrame(slot.stackText);
+          if (slot.stackBadge !== 0) uiHideFrame(slot.stackBadge);
+        }
       }
       if (slot.tipBodyText !== 0) {
         japi.DzFrameSetText(slot.tipBodyText, slotVM.tooltipBodyText);

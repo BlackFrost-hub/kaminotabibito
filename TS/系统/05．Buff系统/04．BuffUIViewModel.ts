@@ -11,6 +11,9 @@ const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.i
   debugLog: (module: string, ...args: any[]) => void;
   setDebug: (module: string, on: boolean) => void;
 };
+const { 是否百分比装备属性名 } = require("lib.扩展函数.物品相关函数.装备数据查询") as {
+  是否百分比装备属性名: (this: void, 属性名: string) => boolean;
+};
 
 const MAX_SLOTS = 20;
 const jass = require("jass.common") as any;
@@ -45,13 +48,45 @@ function formatOneDecimal(n: number): string {
   return `${intPart}.${fracPart}`;
 }
 
+function 是否百分比Buff字段(this: void, template: string, placeholder: string, 属性名: string | undefined): boolean {
+  if (属性名 !== undefined && 属性名 !== "" && 是否百分比装备属性名(属性名)) return true;
+  return template.indexOf(placeholder + "%") >= 0;
+}
+
+function formatBuffValue(this: void, template: string, placeholder: string, value: number, 属性名: string | undefined): string {
+  const displayValue = 是否百分比Buff字段(template, placeholder, 属性名) && value > -1 && value < 1 ? value * 100 : value;
+  return formatOneDecimal(displayValue);
+}
+
+function formatBuffSourceText(
+  this: void,
+  sourceName: string | undefined,
+  effectSourceName: string | undefined,
+  effectSourceType: "装备" | "技能" | undefined
+): string {
+  let sourceText = TIP_COLOR_SOURCE;
+  if (sourceName !== undefined && sourceName !== "") {
+    sourceText += "单位来源：『" + sourceName + "』";
+  }
+  if (effectSourceName !== undefined && effectSourceName !== "") {
+    if (sourceText !== TIP_COLOR_SOURCE) sourceText += "|n";
+    sourceText += (effectSourceType === "装备" ? "装备来源：『" : "技能来源：『") + effectSourceName + "』";
+  }
+  return sourceText + "|r";
+}
+
 function formatDotTooltip(
   template: string,
   durationForDisplay: number,
   effectValue: number,
   effectValue2: number,
+  stack: number,
   sourceName: string | undefined,
-  intervalSec: number
+  effectSourceName: string | undefined,
+  effectSourceType: "装备" | "技能" | undefined,
+  intervalSec: number,
+  data属性名: string | undefined,
+  data2属性名: string | undefined
 ): { bodyText: string; sourceText: string } {
   const rem = typeof durationForDisplay === "number" && isFinite(durationForDisplay) ? clampMin(durationForDisplay, 0) : 0;
   const val = typeof effectValue === "number" && isFinite(effectValue) ? effectValue : 0;
@@ -59,9 +94,11 @@ function formatDotTooltip(
 
   const timeStr = formatOneDecimal(rem);
   const damageStr = formatOneDecimal(val);
-  const damageStr2 = formatOneDecimal(typeof effectValue2 === "number" && isFinite(effectValue2) ? effectValue2 : 0);
+  const val2 = typeof effectValue2 === "number" && isFinite(effectValue2) ? effectValue2 : 0;
   const intervalStr = formatOneDecimal(intv);
-  const dataStr = formatOneDecimal(val <= 1 ? val * 100 : val);
+  const dataStr = formatBuffValue(template, "data", val, data属性名);
+  const dataStr1 = formatBuffValue(template, "data1", val, data属性名);
+  const dataStr2 = formatBuffValue(template, "data2", val2, data2属性名);
   const direction = val >= 0 ? "增加" : "减少";
 
   let s = template;
@@ -69,17 +106,17 @@ function formatDotTooltip(
   s = s.split("持续时间").join(timeStr);
   s = s.split("interval").join(intervalStr);
   s = s.split("damage").join(damageStr);
+  s = s.split("stack").join(tostringCompat(stack));
   s = s.split("增加或减少").join(direction);
   s = s.split("增加/减少").join(direction);
   s = s.split("增减").join(direction);
-  s = s.split("data1").join(damageStr);
-  s = s.split("data2").join(damageStr2);
+  s = s.split("data1").join(dataStr1);
+  s = s.split("data2").join(dataStr2);
   s = s.split("data").join(dataStr);
 
-  const src = sourceName !== undefined && sourceName !== "" ? sourceName : "未记录";
   return {
     bodyText: TIP_COLOR_BODY + s + "|r",
-    sourceText: TIP_COLOR_SOURCE + "来源：" + src + "|r",
+    sourceText: formatBuffSourceText(sourceName, effectSourceName, effectSourceType),
   };
 }
 
@@ -136,6 +173,8 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
           remaining: rt.remaining,
           iconRemaining: buffPoolMod.getDotIconDisplayRemaining(unit, bid, rt.remaining),
           sourceName: rt.sourceName,
+          effectSourceName: rt.effectSourceName,
+          effectSourceType: rt.effectSourceType,
           _dotParsedDuration: (rt as any)._dotParsedDuration,
         },
         iconOverride: rt.iconOverride,
@@ -168,8 +207,13 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
         durationForTip,
         row.state.effect,
         row.state.effect2 ?? 0,
+        row.state.stack ?? 1,
         row.state.sourceName,
-        meta.interval
+        row.state.effectSourceName,
+        row.state.effectSourceType,
+        meta.interval,
+        typeof meta.data属性名 === "string" ? meta.data属性名 : undefined,
+        typeof meta.data2属性名 === "string" ? meta.data2属性名 : undefined
       );
       tooltipBodyText = tooltipParts.bodyText;
       tooltipSourceText = tooltipParts.sourceText;
@@ -184,17 +228,14 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
         "，效果2 " +
         formatOneDecimal(row.state.effect2 ?? 0) +
         "|r";
-      tooltipSourceText =
-        TIP_COLOR_SOURCE +
-        "来源：" +
-        (row.state.sourceName && row.state.sourceName !== "" ? row.state.sourceName : "未记录") +
-        "|r";
+      tooltipSourceText = formatBuffSourceText(row.state.sourceName, row.state.effectSourceName, row.state.effectSourceType);
     }
 
     const remainStr = formatBuffRemainOneDecimal(row.state.iconRemaining);
     const remainText = "|cffffffff" + remainStr + "|r";
-    const stack = typeof row.state.stack === "number" && row.state.stack > 1 ? row.state.stack : 0;
-    const stackText = stack > 0 ? "|cfffff2d9" + tostringCompat(stack) + "|r" : "";
+    const 显示层数角标 = meta !== undefined && meta.maxStack > 1;
+    const stack = typeof row.state.stack === "number" && row.state.stack >= 0 ? row.state.stack : 1;
+    const stackText = 显示层数角标 ? "|cfffff2d9" + tostringCompat(stack) + "|r" : "";
 
     slots[i] = {
       visible: true,

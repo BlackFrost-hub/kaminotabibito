@@ -237,11 +237,22 @@ export function shouldApplyControlReduction(id: number): boolean {
     || id === SFB_负面BUFF.飓风;
 }
 
-export function registerSfbManualBuff(this: void, sourceUnit: any, u: any, id: number, time: number, effectValue: number): void {
+export function registerSfbManualBuff(
+  this: void,
+  sourceUnit: any,
+  u: any,
+  id: number,
+  time: number,
+  effectValue: number,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
   const buffID = SFB_BUFF_ID[id];
   if (buffID == null || buffID === "") return;
   registerManualBuff(u, buffID, time, effectValue, {
     sourceName: getUnitSourceName(sourceUnit, u),
+    effectSourceName,
+    effectSourceType,
     nativeBuffAbilityIds: SFB_NATIVE_BUFF_IDS[id],
   });
 }
@@ -311,7 +322,17 @@ function SFB_确保马甲技能(this: void, abilityId: number): boolean {
   return true;
 }
 
-export function SFB_施加原生目标Buff(this: void, sourceUnit: any, u: any, id: number, time: number, abilityId: number, orderStr: string): void {
+export function SFB_施加原生目标Buff(
+  this: void,
+  sourceUnit: any,
+  u: any,
+  id: number,
+  time: number,
+  abilityId: number,
+  orderStr: string,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
   if (!SUC_IsValidUnit(u) || time <= 0) return;
   if (SUC_IsUnitStructure(u)) return;
   if (u === SFB_Unit) return;
@@ -333,7 +354,7 @@ export function SFB_施加原生目标Buff(this: void, sourceUnit: any, u: any, 
     YDWESetUnitAbilityDataReal(caster, abilityId, 1, 107, 999999);
   }
 
-  registerSfbManualBuff(sourceUnit, u, id, time, 0);
+  registerSfbManualBuff(sourceUnit, u, id, time, 0, effectSourceName, effectSourceType);
 
   IssueTargetOrder(caster, orderStr, u);
 }
@@ -361,8 +382,16 @@ export function SFB_施加原生目标技能(this: void, u: any, abilityId: numb
   return typeof orderStr === "string" ? IssueTargetOrder(caster, orderStr, u) === true : false;
 }
 
-export function SFB_施加暂停类Buff(this: void, sourceUnit: any, u: any, id: number, time: number): void {
-  registerSfbManualBuff(sourceUnit, u, id, time, 0);
+export function SFB_施加暂停类Buff(
+  this: void,
+  sourceUnit: any,
+  u: any,
+  id: number,
+  time: number,
+  effectSourceName?: string,
+  effectSourceType?: "装备" | "技能"
+): void {
+  registerSfbManualBuff(sourceUnit, u, id, time, 0, effectSourceName, effectSourceType);
   if (id === 21) {
     设置单位暂停时间(u, "SFB_Stun", time);
   } else if (id === 22) {

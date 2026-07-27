@@ -20,7 +20,9 @@ export function 处理首领号角使用(this: void, ctx: 物品技能事件上�
     { 类型: "护甲", 数值: armor },
   ]);
   registerManualBuff(unit, 常规BuffID.首领号角_王之号角, cfg.持续毫秒 / 1000, attack, {
-    sourceName: "首领号角",
+    sourceUnit: unit,
+    effectSourceName: "首领号角",
+    effectSourceType: "装备",
     effectValue2: armor,
   });
 }

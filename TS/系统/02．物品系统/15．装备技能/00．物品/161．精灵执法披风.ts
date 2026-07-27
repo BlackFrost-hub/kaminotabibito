@@ -24,8 +24,6 @@ const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS")
 const { 常规BuffID } = require("系统.05．Buff系统.03．Buff表.00．Buff登记") as {
   常规BuffID: { 精灵执法披风_秩序领域: string };
 };
-const jass = require("jass.common") as any;
-const GetUnitName = jass.GetUnitName as (unit: any) => string;
 
 const 精灵执法披风配置 = {
   物品名: "精灵执法披风",
@@ -50,10 +48,11 @@ function 应用精灵执法披风攻速差值(this: void, target: any, delta: nu
 }
 
 function 取精灵执法披风Buff附加(this: void, _target: any, _层数: number, holder: any): any {
-  const sourceName = holder == null || holder === 0
-    ? "精灵执法披风"
-    : "『精灵执法披风』「" + GetUnitName(holder) + "」";
-  return { sourceName };
+  return {
+    sourceUnit: holder,
+    effectSourceName: "精灵执法披风",
+    effectSourceType: "装备",
+  };
 }
 
 export function 初始化精灵执法披风效果(this: void): void {

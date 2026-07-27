@@ -11,6 +11,8 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
     effectValue: number,
     extras?: {
       sourceName?: string;
+      effectSourceName?: string;
+      effectSourceType?: "装备" | "技能";
       iconOverride?: string;
       effectModelOverride?: string;
       onRemove?: (this: void, unit: any, buffID: string, row: { effect: number }) => void;
@@ -55,6 +57,9 @@ interface 护甲降低聚合状态 {
   BuffID: string;
   总数值: number;
   栈表: Record<string, 护甲降低运行状态 | undefined>;
+  来源名称?: string;
+  效果来源名称?: string;
+  效果来源类型?: "装备" | "技能";
 }
 
 interface 护甲降低到期记录 {
@@ -85,6 +90,8 @@ export interface 护甲降低Buff参数 {
   叠加键?: string;
   图标路径?: string;
   特效路径?: string;
+  效果来源名称?: string;
+  效果来源类型?: "装备" | "技能";
 }
 
 export interface 范围护甲降低Buff参数 extends 护甲降低Buff参数 {
@@ -130,7 +137,7 @@ function on护甲降低移除(this: void, 单位: any, BuffID: string, _row: { e
   调整单位护甲(单位, 状态.总数值);
 }
 
-function 刷新护甲降低显示Buff(this: void, 状态: 护甲降低聚合状态, 来源名称?: string, 图标路径?: string, 特效路径?: string): void {
+function 刷新护甲降低显示Buff(this: void, 状态: 护甲降低聚合状态, 图标路径?: string, 特效路径?: string): void {
   const now = getServerTime();
   let 总数值 = 0;
   let 最晚到期 = 0;
@@ -149,7 +156,9 @@ function 刷新护甲降低显示Buff(this: void, 状态: 护甲降低聚合状�
   }
 
   registerManualBuff(状态.单位, 状态.BuffID, (最晚到期 - now) / 1000, 总数值, {
-    sourceName: 来源名称,
+    sourceName: 状态.来源名称,
+    effectSourceName: 状态.效果来源名称,
+    effectSourceType: 状态.效果来源类型,
     iconOverride: 图标路径,
     effectModelOverride: 特效路径,
     onRemove: on护甲降低移除,
@@ -210,7 +219,10 @@ export function 施加单体护甲降低Buff(this: void, 来源单位: any, 目�
   状态.栈表[叠加键] = { 数值: 生效护甲, 到期时间, 版本 };
   状态.总数值 = 状态.总数值 + 差值;
 
-  刷新护甲降低显示Buff(状态, GetUnitName(来源单位), 参数.图标路径, 参数.特效路径);
+  状态.来源名称 = GetUnitName(来源单位);
+  状态.效果来源名称 = 参数.效果来源名称;
+  状态.效果来源类型 = 参数.效果来源类型;
+  刷新护甲降低显示Buff(状态, 参数.图标路径, 参数.特效路径);
 
   护甲降低到期队列.push({ 单位: 目标单位, BuffID, 叠加键, 到期时间, 版本 });
   addDelayedCallback(参数.持续时间 * 1000, 处理护甲降低到期);

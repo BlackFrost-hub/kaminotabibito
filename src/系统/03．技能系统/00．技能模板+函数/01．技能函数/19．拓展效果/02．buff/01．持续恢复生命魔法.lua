@@ -1,13 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
----
--- @noSelfInFile
-local jass = require("jass.common")
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_0.registerManualBuff
 local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果")
 local startHot = ____require_result_1.startHot
-local GetUnitName = jass.GetUnitName
 local function _____6301_7EED_6062_590D_7ED3_675F_6761_4EF6_6052_771F(______76EE_6807_5355_4F4D)
     return true
 end
@@ -25,7 +21,9 @@ ____exports["施加持续恢复生命魔法"] = function(_____6765_6E90_5355_4F4
         _____53C2_6570["每跳生命恢复"],
         {
             effectValue2 = _____53C2_6570["每跳魔法恢复"],
-            sourceName = GetUnitName(_____6765_6E90_5355_4F4D),
+            sourceUnit = _____6765_6E90_5355_4F4D,
+            effectSourceName = _____53C2_6570["效果来源名称"],
+            effectSourceType = _____53C2_6570["效果来源类型"],
             iconOverride = _____53C2_6570["图标路径"],
             effectModelOverride = _____53C2_6570["特效路径"]
         }

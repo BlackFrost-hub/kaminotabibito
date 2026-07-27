@@ -43,6 +43,7 @@ export interface DamageModifierContext {
   skillDamageShape?: string;
   isSingleTargetSkillDamage?: boolean;
   isAoeSkillDamage?: boolean;
+  isDamageTransfer?: boolean;
 }
 
 export type DamageModifier = (this: void, context: DamageModifierContext) => number;

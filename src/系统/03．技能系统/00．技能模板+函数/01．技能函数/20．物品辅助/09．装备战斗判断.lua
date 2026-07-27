@@ -55,6 +55,17 @@ end
 ____exports["取最大生命"] = function(unit)
     return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) or GetUnitState(unit, UNIT_STATE_MAX_LIFE) or 0
 end
+--- 最终伤害监听发生在实际扣血前，因此统一用“当前生命 - 本次最终伤害”预判。
+____exports["本次最终伤害后生命比例不高于"] = function(unit, _____672C_6B21_6700_7EC8_4F24_5BB3, _____751F_547D_6BD4_4F8B_4E0A_9650)
+    if unit == nil or unit == 0 or not (_____672C_6B21_6700_7EC8_4F24_5BB3 > 0) or _____751F_547D_6BD4_4F8B_4E0A_9650 < 0 then
+        return false
+    end
+    local _____6700_5927_751F_547D = ____exports["取最大生命"](unit)
+    if not (_____6700_5927_751F_547D > 0) then
+        return false
+    end
+    return ____exports["取当前生命"](unit) - _____672C_6B21_6700_7EC8_4F24_5BB3 <= _____6700_5927_751F_547D * _____751F_547D_6BD4_4F8B_4E0A_9650
+end
 ____exports["取攻击力"] = function(unit)
     return GetUnitStateJapi(
         unit,

@@ -22,7 +22,6 @@ local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
-local GetUnitName = jass.GetUnitName
 local R2I = jass.R2I
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -232,7 +231,10 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
         duration,
         0,
         {
-            sourceName = _____53C2_6570.sourceName or GetUnitName(source),
+            sourceUnit = source,
+            sourceName = _____53C2_6570.sourceName,
+            effectSourceName = _____53C2_6570.effectSourceName,
+            effectSourceType = _____53C2_6570.effectSourceType,
             iconOverride = _____53C2_6570.iconOverride or _____8BFB_53D6Buff_56FE_6807(buffID),
             effectModelOverride = _____53C2_6570.effectModelOverride or _____8BFB_53D6Buff_7279_6548(buffID),
             onRemove = ____on_6697_5F71_7A81_88ADBuff_79FB_9664
@@ -243,7 +245,9 @@ ____exports["施加暗影突袭减益"] = function(source, target, _____53C2_657
         target,
         slowAttack,
         slowMove,
-        duration
+        duration,
+        _____53C2_6570.effectSourceName,
+        _____53C2_6570.effectSourceType
     )
     _____4E0B_4E00_4E2A_6697_5F71_7A81_88AD_6BD2_7D20ID = _____4E0B_4E00_4E2A_6697_5F71_7A81_88AD_6BD2_7D20ID + 1
     local _____6BD2_7D20ID = _____4E0B_4E00_4E2A_6697_5F71_7A81_88AD_6BD2_7D20ID

@@ -9,7 +9,7 @@ const { 创建战斗状态触发器 } = require("系统.03．技能系统.00．�
     主体类型?: "玩家英雄" | "Boss" | "普通单位";
     周期触发秒?: number;
     on周期触发?: (this: void, event: { 单位: any }) => void;
-  }) => { 停止: (this: void) => void };
+  }) => { 停止(): void };
 };
 
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -33,7 +33,7 @@ function 取单位ID(this: void, unit: any): number {
 }
 
 export function 创建单位战斗状态托管器(this: void, 参数: 单位战斗状态托管参数): 单位战斗状态托管器 {
-  const 控制器表: Record<number, { 停止: (this: void) => void } | undefined> = {};
+  const 控制器表: Record<number, { 停止(): void } | undefined> = {};
 
   function 已加入(this: void, unit: any): boolean {
     const unitId = 取单位ID(unit);
@@ -64,4 +64,3 @@ export function 创建单位战斗状态托管器(this: void, 参数: 单位战�
 
   return { 加入, 移除, 已加入 };
 }
-

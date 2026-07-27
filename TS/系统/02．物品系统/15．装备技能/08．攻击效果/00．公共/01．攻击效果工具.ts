@@ -300,9 +300,16 @@ export function 施加攻击效果减速(this: void, source: any, target: any, a
   快速减速Buff(source, target, amount, amount, duration);
 }
 
-export function 施加攻击效果眩晕(this: void, source: any, target: any, duration: number): void {
+export function 施加攻击效果眩晕(
+  this: void,
+  source: any,
+  target: any,
+  duration: number,
+  效果来源名称?: string,
+  效果来源类型?: "装备" | "技能"
+): void {
   if (!(duration > 0)) return;
-  施加扩展控制(source, target, "stun", { 持续时间: duration });
+  施加扩展控制(source, target, "stun", { 持续时间: duration, 效果来源名称, 效果来源类型 });
 }
 
 export function 施加攻击效果击飞(this: void, source: any, target: any, duration: number): void {

@@ -37,7 +37,14 @@ ____exports["处理魔古战刃使用"] = function(ctx)
     for ____, enemy in ipairs(enemies) do
         _____9020_6210_666E_901A_4F24_5BB3(unit, enemy, damage)
         _____547D_4EE4_653B_51FB_6765_6E90(enemy, unit)
-        _____65BD_52A0_51CF_901F(unit, enemy, 0.3, 2)
+        _____65BD_52A0_51CF_901F(
+            unit,
+            enemy,
+            0.3,
+            2,
+            "魔古战刃",
+            "装备"
+        )
         _____62C9_5411_6765_6E90(unit, enemy, cfg["拉拢距离"], cfg["拉拢时间"])
     end
 end

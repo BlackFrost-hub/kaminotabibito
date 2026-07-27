@@ -47,7 +47,6 @@ local _____9ED8_8BA4_6050_60E7_79FB_52A8_901F_5EA6 = ____require_result_12["默�
 local _____9ED8_8BA4_6050_60E7_968F_673A_534A_5F84 = ____require_result_12["默认恐惧随机半径"]
 local _____6269_5C55_63A7_5236_7279_6548_6302_70B9 = ____require_result_12["扩展控制特效挂点"]
 local GetHandleId = jass.GetHandleId
-local GetUnitName = jass.GetUnitName
 local GetUnitCurrentOrder = jass.GetUnitCurrentOrder
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
@@ -604,7 +603,7 @@ ____exports["施加扩展控制"] = function(_____6765_6E90_5355_4F4D_6216Self, 
         _____8BB0_5F55.BuffID,
         _____5B9E_9645_6301_7EED_65F6_95F4,
         0,
-        {sourceName = GetUnitName(_____6765_6E90_5355_4F4D)}
+        {sourceUnit = _____6765_6E90_5355_4F4D, effectSourceName = _____89C4_8303_53C2_6570["效果来源名称"], effectSourceType = _____89C4_8303_53C2_6570["效果来源类型"]}
     )
     _____751F_6548_6269_5C55_63A7_5236_9996_5E27(_____8BB0_5F55)
     _____901A_77E5_63A7_5236Debuff_4E8B_4EF6({

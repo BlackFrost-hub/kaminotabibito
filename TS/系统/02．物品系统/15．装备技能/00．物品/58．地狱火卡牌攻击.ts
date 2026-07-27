@@ -17,7 +17,9 @@ export function 处理地狱火卡牌攻击使用(this: void, ctx: 物品技能�
     { 类型: "攻速", 数值: cfg.攻速 },
   ]);
   registerManualBuff(unit, 常规BuffID.地狱火卡牌攻击_地狱火攻击, cfg.持续毫秒 / 1000, attack, {
-    sourceName: "地狱火卡牌",
+    sourceUnit: unit,
+    effectSourceName: "地狱火卡牌",
+    effectSourceType: "装备",
     effectValue2: cfg.攻速显示,
   });
 }

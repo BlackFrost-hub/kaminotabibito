@@ -18,7 +18,14 @@ local function ____on_7075_732B_6B65_4F10_4E4B_9774_6700_7EC8_4F24_5BB3(event)
     if not _____5355_4F4D_6709_6548_5B58_6D3B(target) then
         return
     end
-    _____65BD_52A0_79FB_901F_63D0_5347Buff(target, target, {BuffID = _____5E38_89C4BuffID["灵猫步伐之靴_灵猫跃步"], ["持续时间"] = _____7075_732B_8DC3_6B65_6301_7EED_79D2_6570, ["基础移速百分比"] = _____7075_732B_8DC3_6B65_79FB_901F_6BD4_4F8B, ["图标路径"] = "Equipment\\Icon\\Shoes\\spirit_cat_steps_boots.blp"})
+    _____65BD_52A0_79FB_901F_63D0_5347Buff(target, target, {
+        BuffID = _____5E38_89C4BuffID["灵猫步伐之靴_灵猫跃步"],
+        ["持续时间"] = _____7075_732B_8DC3_6B65_6301_7EED_79D2_6570,
+        ["基础移速百分比"] = _____7075_732B_8DC3_6B65_79FB_901F_6BD4_4F8B,
+        ["图标路径"] = "Equipment\\Icon\\Shoes\\spirit_cat_steps_boots.blp",
+        ["效果来源名称"] = "灵猫步伐之靴",
+        ["效果来源类型"] = "装备"
+    })
     _____64AD_653E_5355_4F4D_7279_6548(target, _____7075_732B_8DC3_6B65_7279_6548, "origin", 1)
 end
 _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({

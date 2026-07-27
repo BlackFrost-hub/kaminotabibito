@@ -25,7 +25,7 @@ ____exports["处理地狱火卡牌攻击使用"] = function(ctx)
         _____5E38_89C4BuffID["地狱火卡牌攻击_地狱火攻击"],
         cfg["持续毫秒"] / 1000,
         attack,
-        {sourceName = "地狱火卡牌", effectValue2 = cfg["攻速显示"]}
+        {sourceUnit = unit, effectSourceName = "地狱火卡牌", effectSourceType = "装备", effectValue2 = cfg["攻速显示"]}
     )
 end
 return ____exports

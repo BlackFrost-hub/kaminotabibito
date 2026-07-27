@@ -48,6 +48,9 @@ function hideSlot(i)
     if s.stackText ~= 0 then
         uiHideFrame(s.stackText)
     end
+    if s.stackBadge ~= 0 then
+        uiHideFrame(s.stackBadge)
+    end
     if s.hit ~= 0 then
         uiHideFrame(s.hit)
     end
@@ -72,7 +75,7 @@ function renderBuffBarLocal(vm)
                 local slotVM = vm.slots[i + 1]
                 local slot = slots[i + 1]
                 if not slot then
-                    goto __continue50
+                    goto __continue52
                 end
                 if slotVM.visible then
                     if slot.root ~= 0 then
@@ -85,9 +88,15 @@ function renderBuffBarLocal(vm)
                     if slot.stackText ~= 0 then
                         japi.DzFrameSetText(slot.stackText, slotVM.stackText)
                         if slotVM.stackText ~= "" then
+                            if slot.stackBadge ~= 0 then
+                                uiShowFrame(slot.stackBadge)
+                            end
                             uiShowFrame(slot.stackText)
                         else
                             uiHideFrame(slot.stackText)
+                            if slot.stackBadge ~= 0 then
+                                uiHideFrame(slot.stackBadge)
+                            end
                         end
                     end
                     if slot.tipBodyText ~= 0 then
@@ -103,7 +112,7 @@ function renderBuffBarLocal(vm)
                     hideSlot(i)
                 end
             end
-            ::__continue50::
+            ::__continue52::
             i = i + 1
         end
     end
@@ -164,13 +173,20 @@ local BUFF_BAR_Y = 0.1655
 local ICON_W = 0.02
 local ICON_H = 16 / 600
 local ICON_GAP = 0.0005
+local STACK_BADGE_TEX = "UI\\Buff\\buff_stack_badge.tga"
+local STACK_BADGE_W = 0.0072
+local STACK_BADGE_H = 0.0105
+local STACK_BADGE_FONT = "Fonts\\dfst-m3u.ttf"
+local STACK_BADGE_FONT_SIZE = 0.008
+local STACK_BADGE_TEXT_ALIGN_CENTER = 18
 local TIP_BOX_TEX = "UI\\wenbenkuang.blp"
 local TIP_W = 0.22
-local TIP_H = 0.068
+local TIP_H = 0.082
 local TIP_PAD_X = 0.009
 local TIP_PAD_TOP = 0.007
 local TIP_PAD_BOTTOM = 0.006
-local TIP_OFFSET_Y_FROM_ICON_TOP = 0.07
+local TIP_OFFSET_Y_FROM_ICON_TOP = 0.084
+local TIP_SOURCE_H = 0.028
 slots = {}
 local buffUiInitialized = false
 local refreshCallbackId = 0
@@ -309,22 +325,44 @@ local function createOneSlot(index, parent)
         japi.DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
         setFrameLevelSafe(remainText, 182)
     end
+    local stackBadge = uiCreateFrame({
+        type = ____UI_5DE5_5177.FrameType.BACKDROP,
+        name = "BuffUIBarStackBadge" .. tostring(index),
+        parent = bd,
+        template = "template",
+        visible = false
+    }) or 0
+    if stackBadge and stackBadge ~= 0 then
+        uiSetFramePointRelative(
+            stackBadge,
+            ____UI_5DE5_5177.FramePoint.TOPRIGHT,
+            bd,
+            ____UI_5DE5_5177.FramePoint.TOPRIGHT,
+            -0.0003,
+            -0.0003
+        )
+        uiSetFrameSize(stackBadge, {width = STACK_BADGE_W, height = STACK_BADGE_H})
+        uiSetFrameTexture(stackBadge, STACK_BADGE_TEX)
+        setFrameLevelSafe(stackBadge, 183)
+    end
     local stackText = uiCreateTextLabel(
         "BuffUIBarStack" .. tostring(index),
-        bd,
+        stackBadge and stackBadge ~= 0 and stackBadge or bd,
         "",
         {
-            relativeTo = bd,
-            point = ____UI_5DE5_5177.FramePoint.BOTTOMRIGHT,
-            relativePoint = ____UI_5DE5_5177.FramePoint.BOTTOMRIGHT,
-            x = -0.001,
-            y = 0.002
+            relativeTo = stackBadge and stackBadge ~= 0 and stackBadge or bd,
+            point = ____UI_5DE5_5177.FramePoint.CENTER,
+            relativePoint = stackBadge and stackBadge ~= 0 and ____UI_5DE5_5177.FramePoint.CENTER or ____UI_5DE5_5177.FramePoint.TOPRIGHT,
+            x = 0,
+            y = stackBadge and stackBadge ~= 0 and 0 or -0.006
         },
-        {width = ICON_W * 0.62, height = 0.014}
+        {width = STACK_BADGE_W * 0.72, height = STACK_BADGE_H * 0.72}
     ) or 0
     if stackText and stackText ~= 0 then
-        japi.DzFrameSetTextAlignment(stackText, ____UI_5DE5_5177.FramePoint.BOTTOMRIGHT)
-        setFrameLevelSafe(stackText, 183)
+        japi.DzFrameSetTextAlignment(stackText, -1)
+        japi.DzFrameSetTextAlignment(stackText, STACK_BADGE_TEXT_ALIGN_CENTER)
+        japi.DzFrameSetFont(stackText, STACK_BADGE_FONT, STACK_BADGE_FONT_SIZE, 0)
+        setFrameLevelSafe(stackText, 184)
     end
     local hit = uiCreateFrame({
         type = ____UI_5DE5_5177.FrameType.GLUETEXTBUTTON,
@@ -408,7 +446,7 @@ local function createOneSlot(index, parent)
             x = 0.002,
             y = TIP_OFFSET_Y_FROM_ICON_TOP - 0.016
         }),
-        {width = boxW - TIP_PAD_X * 2, height = 0.019}
+        {width = boxW - TIP_PAD_X * 2, height = TIP_SOURCE_H}
     ) or 0
     if tipSourceText and tipSourceText ~= 0 then
         japi.DzFrameSetTextAlignment(tipSourceText, -1)
@@ -420,6 +458,7 @@ local function createOneSlot(index, parent)
     return {
         root = bd,
         remainText = remainText or 0,
+        stackBadge = stackBadge or 0,
         stackText = stackText or 0,
         hit = hit or 0,
         tipBox = tipBox or 0,

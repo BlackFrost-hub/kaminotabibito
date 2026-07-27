@@ -11,7 +11,16 @@ import { 施加或刷新周期目标效果 } from "../../../03．技能系统/00
 import { 造成装备伤害 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/10．装备战斗执行";
 
 const { SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
-  SFB_setSlow: (this: void, sourceUnit: any, u: any, as: number, ms: number, time: number) => void;
+  SFB_setSlow: (
+    this: void,
+    sourceUnit: any,
+    u: any,
+    as: number,
+    ms: number,
+    time: number,
+    effectSourceName?: string,
+    effectSourceType?: "装备" | "技能"
+  ) => void;
 };
 
 const jass = require("jass.common") as any;
@@ -63,7 +72,7 @@ function 施加或刷新撕裂(this: void, source: any, target: any): void {
     return 攻击者类型满足(event.攻击者, "近战");
   },
   on触发: function on恶魔王爪最终伤害(this: void, event): void {
-    SFB_setSlow(event.攻击者, event.目标, 0, 减速比例, 减速持续秒);
+    SFB_setSlow(event.攻击者, event.目标, 0, 减速比例, 减速持续秒, "恶魔王爪", "装备");
     施加或刷新撕裂(event.攻击者, event.目标);
   },
 });

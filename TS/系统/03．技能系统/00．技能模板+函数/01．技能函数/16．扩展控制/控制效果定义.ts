@@ -8,17 +8,22 @@ export type 扩展控制类型 = "taunt" | "charm" | "fear";
 export type 扩展控制兼容类型 = 快速控制类型 | 扩展控制类型;
 export type 恐惧模式 = "逃离施法者" | "随机乱跑";
 
-export interface 嘲讽参数 {
+export interface 控制来源展示参数 {
+  效果来源名称?: string;
+  效果来源类型?: "装备" | "技能";
+}
+
+export interface 嘲讽参数 extends 控制来源展示参数 {
   持续时间: number;
   反伤倍率?: number;
 }
 
-export interface 魅惑参数 {
+export interface 魅惑参数 extends 控制来源展示参数 {
   持续时间: number;
   跟随半径?: number;
 }
 
-export interface 恐惧参数 {
+export interface 恐惧参数 extends 控制来源展示参数 {
   持续时间: number;
   模式?: 恐惧模式;
   逃离距离?: number;
@@ -26,7 +31,7 @@ export interface 恐惧参数 {
   移动速度?: number;
 }
 
-export interface 睡眠控制参数 {
+export interface 睡眠控制参数 extends 控制来源展示参数 {
   持续时间: number;
   伤害阈值?: number;
   保底时间?: number;

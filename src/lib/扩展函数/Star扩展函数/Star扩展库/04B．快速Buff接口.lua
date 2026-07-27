@@ -29,7 +29,7 @@ local ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1 = require("lib.扩展函数
 local initItemIllusionSummonBridge = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1.initItemIllusionSummonBridge
 local ____SFB__6E05_7A7A_5E7B_8C61_7269_54C1_4E0A_4E0B_6587 = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1["SFB_清空幻象物品上下文"]
 local ____SFB__8BB0_5F55_5E7B_8C61_7269_54C1_4E0A_4E0B_6587 = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1["SFB_记录幻象物品上下文"]
-function ____exports.SFB_setPositiveBuff(sourceUnit, u, id, time)
+function ____exports.SFB_setPositiveBuff(sourceUnit, u, id, time, effectSourceName, effectSourceType)
     if id == ____SFB__589E_76CABUFF["心灵之火"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
             sourceUnit,
@@ -37,7 +37,9 @@ function ____exports.SFB_setPositiveBuff(sourceUnit, u, id, time)
             id,
             time,
             ABILITY.INNER_FIRE,
-            ORDER.INNER_FIRE
+            ORDER.INNER_FIRE,
+            effectSourceName,
+            effectSourceType
         )
     elseif id == ____SFB__589E_76CABUFF["嗜血术"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
@@ -46,11 +48,13 @@ function ____exports.SFB_setPositiveBuff(sourceUnit, u, id, time)
             id,
             time,
             ABILITY.BLOODLUST,
-            ORDER.BLOODLUST
+            ORDER.BLOODLUST,
+            effectSourceName,
+            effectSourceType
         )
     end
 end
-function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
+function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time, effectSourceName, effectSourceType)
     if shouldApplyControlReduction(id) then
         time = calcReducedControlDuration(u, time)
         if time <= 0 then
@@ -64,7 +68,9 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
             id,
             time,
             ABILITY.CRIPPLE,
-            ORDER.CRIPPLE
+            ORDER.CRIPPLE,
+            effectSourceName,
+            effectSourceType
         )
     elseif id == ____SFB__8D1F_9762BUFF["精灵之火"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
@@ -73,10 +79,18 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
             id,
             time,
             ABILITY.FAERIE_FIRE,
-            ORDER.FAERIE_FIRE
+            ORDER.FAERIE_FIRE,
+            effectSourceName,
+            effectSourceType
         )
     elseif id == ____SFB__8D1F_9762BUFF["诅咒"] then
-        ____SFB__65BD_52A0_81EA_5B9A_4E49_8BC5_5492Buff(sourceUnit, u, time)
+        ____SFB__65BD_52A0_81EA_5B9A_4E49_8BC5_5492Buff(
+            sourceUnit,
+            u,
+            time,
+            effectSourceName,
+            effectSourceType
+        )
     elseif id == ____SFB__8D1F_9762BUFF["睡眠"] then
         _____65BD_52A0_7761_7720({["来源单位"] = sourceUnit, ["目标单位"] = u, ["持续时间"] = time})
     elseif id == ____SFB__8D1F_9762BUFF["纠缠根须"] then
@@ -86,7 +100,9 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
             id,
             time,
             ABILITY.ENTANGLING_ROOTS,
-            ORDER.ENTANGLING_ROOTS
+            ORDER.ENTANGLING_ROOTS,
+            effectSourceName,
+            effectSourceType
         )
     elseif id == ____SFB__8D1F_9762BUFF["飓风"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
@@ -95,7 +111,9 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
             id,
             time,
             ABILITY.CYCLONE,
-            ORDER.CYCLONE
+            ORDER.CYCLONE,
+            effectSourceName,
+            effectSourceType
         )
     elseif id == ____SFB__8D1F_9762BUFF["寄生"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
@@ -104,11 +122,13 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
             id,
             time,
             ABILITY.PARASITE,
-            ORDER.PARASITE
+            ORDER.PARASITE,
+            effectSourceName,
+            effectSourceType
         )
     end
 end
-function ____exports.SFB_setBuff(sourceUnit, u, id, time)
+function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effectSourceType)
     if not SUC_IsValidUnit(u) or time == 0 then
         return
     end
@@ -122,11 +142,25 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
         return
     end
     if id == ____SFB__589E_76CABUFF["心灵之火"] or id == ____SFB__589E_76CABUFF["嗜血术"] then
-        ____exports.SFB_setPositiveBuff(sourceUnit, u, id, time)
+        ____exports.SFB_setPositiveBuff(
+            sourceUnit,
+            u,
+            id,
+            time,
+            effectSourceName,
+            effectSourceType
+        )
         return
     end
     if id == ____SFB__8D1F_9762BUFF["残废"] or id == ____SFB__8D1F_9762BUFF["精灵之火"] or id == ____SFB__8D1F_9762BUFF["诅咒"] or id == ____SFB__8D1F_9762BUFF["睡眠"] or id == ____SFB__8D1F_9762BUFF["纠缠根须"] or id == ____SFB__8D1F_9762BUFF["飓风"] or id == ____SFB__8D1F_9762BUFF["寄生"] then
-        ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time)
+        ____exports.SFB_setNegativeBuff(
+            sourceUnit,
+            u,
+            id,
+            time,
+            effectSourceName,
+            effectSourceType
+        )
         return
     end
     if shouldApplyControlReduction(id) then
@@ -136,7 +170,14 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
         end
     end
     if id >= 21 then
-        ____SFB__65BD_52A0_6682_505C_7C7BBuff(sourceUnit, u, id, time)
+        ____SFB__65BD_52A0_6682_505C_7C7BBuff(
+            sourceUnit,
+            u,
+            id,
+            time,
+            effectSourceName,
+            effectSourceType
+        )
         return
     end
     local caster = SFB_Unit
@@ -227,7 +268,9 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time)
         u,
         id,
         time,
-        0
+        0,
+        effectSourceName,
+        effectSourceType
     )
     if type(orderStr) == "string" then
         IssueTargetOrder(caster, orderStr, u)
@@ -254,8 +297,15 @@ end
 function ____exports.SFB_setFaerieFire(sourceUnit, u, time)
     ____exports.SFB_setNegativeBuff(sourceUnit, u, ____SFB__8D1F_9762BUFF["精灵之火"], time)
 end
-function ____exports.SFB_setCurse(sourceUnit, u, time)
-    ____exports.SFB_setNegativeBuff(sourceUnit, u, ____SFB__8D1F_9762BUFF["诅咒"], time)
+function ____exports.SFB_setCurse(sourceUnit, u, time, effectSourceName, effectSourceType)
+    ____exports.SFB_setNegativeBuff(
+        sourceUnit,
+        u,
+        ____SFB__8D1F_9762BUFF["诅咒"],
+        time,
+        effectSourceName,
+        effectSourceType
+    )
 end
 function ____exports.SFB_setSleep(sourceUnit, u, time)
     ____exports.SFB_setNegativeBuff(sourceUnit, u, ____SFB__8D1F_9762BUFF["睡眠"], time)
@@ -291,7 +341,7 @@ end
 ____exports["SFB_施加通用Buff"] = function(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, ____Buff_7C7B_578B, _____6301_7EED_65F6_95F4)
     ____exports.SFB_setBuff(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, ____Buff_7C7B_578B, _____6301_7EED_65F6_95F4)
 end
-function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time)
+function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, effectSourceType)
     if not SUC_IsValidUnit(u) or time == 0 then
         return
     end
@@ -348,7 +398,9 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time)
         u,
         7,
         time,
-        ms
+        ms,
+        effectSourceName,
+        effectSourceType
     )
     IssueTargetOrderById(caster, ORDER.SLOW, u)
 end

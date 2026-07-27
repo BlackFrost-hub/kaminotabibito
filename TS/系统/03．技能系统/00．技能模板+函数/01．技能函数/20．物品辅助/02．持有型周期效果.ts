@@ -24,6 +24,7 @@ const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 export interface 持有型周期效果参数 {
   物品类型ID: number;
   间隔毫秒: number;
+  按单位独立计时?: boolean;
   周期回调: (this: void, unit: any, currentCount: number) => void;
   获取回调?: (this: void, unit: any, currentCount: number) => void;
   丢弃回调?: (this: void, unit: any, currentCount: number) => void;
@@ -33,11 +34,13 @@ export interface 持有型周期效果参数 {
 export interface 持有型周期效果控制器 {
   获取单位列表(this: void): any[];
   获取单位数量(this: void): number;
+  读取单位下次触发剩余毫秒(this: void, unit: any): number;
 }
 
 type 持有型周期效果状态 = {
   单位: any;
   数量: number;
+  下次触发时间: number;
 };
 
 type 持有型周期效果实例 = 持有型周期效果参数 & 持有型周期效果控制器 & {
@@ -79,7 +82,11 @@ function 处理获得(this: void, 配置: 持有型周期效果实例, unit: any
     return;
   }
 
-  配置.单位状态[unitId] = { 单位: unit, 数量: 1 };
+  配置.单位状态[unitId] = {
+    单位: unit,
+    数量: 1,
+    下次触发时间: getServerTime() + 配置.间隔毫秒,
+  };
   if (previousCount <= 0) {
     配置.获取回调?.(unit, 1);
   }
@@ -95,15 +102,22 @@ function 处理丢弃(this: void, 配置: 持有型周期效果实例, unit: any
     }
     return;
   }
-  配置.单位状态[unitId] = { 单位: unit, 数量: 1 };
+  const 原状态 = 配置.单位状态[unitId];
+  配置.单位状态[unitId] = {
+    单位: unit,
+    数量: 1,
+    下次触发时间: 原状态?.下次触发时间 ?? getServerTime() + 配置.间隔毫秒,
+  };
 }
 
 function on持有型周期效果Tick(this: void): void {
   const now = getServerTime();
   for (let i = 0; i < 持有型周期效果实例表.length; i++) {
     const 配置 = 持有型周期效果实例表[i];
-    if (now < 配置.下次触发时间) continue;
-    配置.下次触发时间 = now + 配置.间隔毫秒;
+    if (配置.按单位独立计时 !== true) {
+      if (now < 配置.下次触发时间) continue;
+      配置.下次触发时间 = now + 配置.间隔毫秒;
+    }
 
     const 待清理: number[] = [];
     const 单位ID列表 = 获取有序单位状态ID列表(配置.单位状态);
@@ -123,6 +137,10 @@ function on持有型周期效果Tick(this: void): void {
       }
 
       状态.数量 = 1;
+      if (配置.按单位独立计时 === true) {
+        if (now < 状态.下次触发时间) continue;
+        状态.下次触发时间 = now + 配置.间隔毫秒;
+      }
       配置.周期回调(状态.单位, 1);
     }
 
@@ -170,7 +188,11 @@ function 补登记初始单位(this: void, 配置: 持有型周期效果实例):
     if (unitId === 0) continue;
     const currentCount = 获取单位当前持有指定物品数量(unit, 配置.物品类型ID);
     if (currentCount <= 0) continue;
-    配置.单位状态[unitId] = { 单位: unit, 数量: 1 };
+    配置.单位状态[unitId] = {
+      单位: unit,
+      数量: 1,
+      下次触发时间: getServerTime() + 配置.间隔毫秒,
+    };
     配置.获取回调?.(unit, 1);
   }
 }
@@ -191,6 +213,16 @@ function 创建持有型周期效果控制器(this: void, 配置: 持有型周�
     获取单位数量: function 获取持有型周期效果单位数量(this: void): number {
       return 获取有序单位状态ID列表(配置.单位状态).length;
     },
+    读取单位下次触发剩余毫秒: function 读取持有型周期效果单位剩余毫秒(this: void, unit: any): number {
+      const unitId = 获取单位ID(unit);
+      const 单位状态 = 配置.单位状态[unitId];
+      if (unitId === 0 || 单位状态 == null) return 0;
+      const 触发时间 = 配置.按单位独立计时 === true
+        ? 单位状态.下次触发时间
+        : 配置.下次触发时间;
+      const 剩余毫秒 = 触发时间 - getServerTime();
+      return 剩余毫秒 > 0 ? 剩余毫秒 : 0;
+    },
   };
 }
 
@@ -206,6 +238,7 @@ export function 注册持有型周期效果(this: void, 参数: 持有型周期�
   const 控制器 = 创建持有型周期效果控制器(配置);
   配置.获取单位列表 = 控制器.获取单位列表;
   配置.获取单位数量 = 控制器.获取单位数量;
+  配置.读取单位下次触发剩余毫秒 = 控制器.读取单位下次触发剩余毫秒;
   持有型周期效果实例表.push(配置);
   补登记初始单位(配置);
 

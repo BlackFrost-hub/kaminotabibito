@@ -14,7 +14,6 @@ local SOS_SetUnitSpeed = ____require_result_2.SOS_SetUnitSpeed
 local SOS_GetUnitSpeed = ____require_result_2.SOS_GetUnitSpeed
 local SOS_UnSetUnitSpeed = ____require_result_2.SOS_UnSetUnitSpeed
 local GetHandleId = jass.GetHandleId
-local GetUnitName = jass.GetUnitName
 local GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed
 local GetUnitMoveSpeed = jass.GetUnitMoveSpeed
 local _____9ED8_8BA4_79FB_901F_63D0_5347BuffID = "C033"
@@ -121,7 +120,9 @@ ____exports["施加移速提升Buff"] = function(_____6765_6E90_5355_4F4D, _____
         _____53C2_6570["持续时间"],
         _____63D0_5347_79FB_901F,
         {
-            sourceName = _____6765_6E90_5355_4F4D ~= nil and _____6765_6E90_5355_4F4D ~= 0 and GetUnitName(_____6765_6E90_5355_4F4D) or nil,
+            sourceUnit = _____6765_6E90_5355_4F4D,
+            effectSourceName = _____53C2_6570["效果来源名称"],
+            effectSourceType = _____53C2_6570["效果来源类型"],
             iconOverride = _____53C2_6570["图标路径"],
             effectModelOverride = _____53C2_6570["特效路径"],
             onRemove = ____on_79FB_901F_63D0_5347_79FB_9664
