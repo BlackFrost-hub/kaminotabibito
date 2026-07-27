@@ -37,6 +37,7 @@ pnpm-debug.log*
 /voice_pack_manifest.json
 /voice_pack_manifest/
 /模型制作/
+/模型制作.zip
 
 # temporary and editor files
 ~$*
@@ -55,3 +56,7 @@ pnpm-debug.log*
 Thumbs.db
 Desktop.ini
 .tmp/
+/.codex_tmp
+/_codex_blender_preview
+/_mcp_scripts
+

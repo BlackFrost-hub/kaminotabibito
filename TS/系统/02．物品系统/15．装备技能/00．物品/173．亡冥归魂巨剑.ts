@@ -23,7 +23,7 @@ const { addDelayedCallback } = require('系统.00．核心系统.05．中心计�
         const x = jass.GetUnitX(event.目标);
         const y = jass.GetUnitY(event.目标);
         addDelayedCallback(600, function 归魂回斩(this: void): void {
-            播放点特效(四Boss装备特效.归魂剑痕, x, y, 1, 0.55);
+            播放点特效(四Boss装备特效.归魂剑痕, x, y, 1, 1.1);
             const units = 取坐标范围敌人(source, x, y, 280);
             const damage = 取攻击力(source) * 0.75;
             for (let i = 0; i < units.length; i++)

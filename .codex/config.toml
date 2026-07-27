@@ -1,0 +1,21 @@
+[mcp_servers.blender]
+type = "stdio"
+command = "python"
+args = ["-m", "blmcp"]
+enabled = true
+startup_timeout_sec = 30
+
+[mcp_servers.blender.env]
+BLENDER_MCP_HOST = "127.0.0.1"
+BLENDER_MCP_PORT = "9876"
+
+[mcp_servers.bc]
+type = "stdio"
+command = "python"
+args = ["-m", "blmcp"]
+enabled = true
+startup_timeout_sec = 30
+
+[mcp_servers.bc.env]
+BLENDER_MCP_HOST = "127.0.0.1"
+BLENDER_MCP_PORT = "9877"

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Syzl Project Rules"
-  short_description: "按项目规则路由 Syzl 的代码、玩法、资源与构建工作"
-  default_prompt: "Use $syzl-project-rules to route this repository task through the relevant core, engine, gameplay, resources, and tooling rules before making changes."
