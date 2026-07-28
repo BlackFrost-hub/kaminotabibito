@@ -16249,26 +16249,6 @@ ____exports["技能数据表"] = {
         UnButtonpos_2 = 1,
         UnButtonpos_1 = 2
     },
-    A0IS = {
-        ability = "A0IS",
-        _parent = "AOhw",
-        Name = "YL-医疗波（max）",
-        Rng = 999999,
-        race = "creeps",
-        DataA = 10,
-        DataB = 16,
-        DataC = 0,
-        hero = 0,
-        reqLevel = 2,
-        Cost = 0,
-        Cool = 12,
-        EditorSuffix = "巨魔巫医",
-        Animnames = "Spell",
-        Unart = "ReplaceableTextures\\CommandButtons\\BTNHealingWave.blp",
-        LightningEffect = "HWPB,HWSB",
-        Cast = 0.4,
-        levels = 1
-    },
     A0IT = {
         ability = "A0IT",
         _parent = "Aspb",

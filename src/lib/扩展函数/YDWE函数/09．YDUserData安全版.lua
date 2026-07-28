@@ -36,6 +36,7 @@ local YDWESetUnitAbilityStateUnsafe = ydweBase.YDWESetUnitAbilityState
 local YDWESetUnitAbilityDataRealUnsafe = ydweBase.YDWESetUnitAbilityDataReal
 local YDWETimerDestroyEffectUnsafe = ydweBase.YDWETimerDestroyEffect
 local YDWEAngleBetweenUnitsUnsafe = ydweBase.YDWEAngleBetweenUnits
+local YDWEDistanceBetweenUnitsUnsafe = ydweBase.YDWEDistanceBetweenUnits
 function ____exports.YDUserDataGetSafe(tableType, tableKey, attr, valueType)
     return YDUserDataGetUnsafe(
         nil,
@@ -137,6 +138,9 @@ end
 function ____exports.YDWEAngleBetweenUnitsSafe(fromUnit, toUnit)
     return YDWEAngleBetweenUnitsUnsafe(nil, fromUnit, toUnit)
 end
+function ____exports.YDWEDistanceBetweenUnitsSafe(a, b)
+    return YDWEDistanceBetweenUnitsUnsafe(nil, a, b)
+end
 ____exports["安全YDUserDataGet"] = ____exports.YDUserDataGetSafe
 ____exports["安全YDUserDataSet"] = ____exports.YDUserDataSetSafe
 ____exports["安全YDUserDataClear"] = ____exports.YDUserDataClearSafe
@@ -152,4 +156,5 @@ ____exports["安全设置单位技能状态"] = ____exports.YDWESetUnitAbilitySt
 ____exports["安全设置单位技能实数数据"] = ____exports.YDWESetUnitAbilityDataRealSafe
 ____exports["安全延时销毁特效"] = ____exports.YDWETimerDestroyEffectSafe
 ____exports["安全取两单位角度"] = ____exports.YDWEAngleBetweenUnitsSafe
+____exports["安全取两单位距离"] = ____exports.YDWEDistanceBetweenUnitsSafe
 return ____exports

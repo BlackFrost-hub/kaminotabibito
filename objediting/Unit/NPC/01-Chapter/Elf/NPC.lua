@@ -1,0 +1,1 @@
+-- Chapter 1 elf NPC object data.

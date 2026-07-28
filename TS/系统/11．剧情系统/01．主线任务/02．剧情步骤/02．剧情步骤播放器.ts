@@ -47,6 +47,10 @@ const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动�
 const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用") as {
   应用Boss战启动属性配置: (this: void, unit: any) => void;
 };
+const { 记录Boss自动技能启动, 是否已登记Boss自动技能 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表") as {
+  记录Boss自动技能启动: (this: void, unit: any, source: "Boss战.绑定单位") => any;
+  是否已登记Boss自动技能: (this: void, unit: any) => boolean;
+};
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
@@ -54,7 +58,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 import 主线剧情片段配置表 from "./01．剧情片段配置表";
 import type { 剧情动作参数表, 剧情动作执行上下文 } from "../00．剧情系统核心工具/00．剧情动作类型";
 import { 写入当前剧情动作上下文 } from "../00．剧情系统核心工具/01．剧情动作上下文";
-import { 按名字给触发单位物品, 执行通用剧情动作 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 按名字给触发单位物品, 执行通用剧情动作, 读取语义单位引用 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
 import type { 剧情片段配置, 剧情步骤 } from "./00．剧情步骤类型";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
@@ -248,12 +252,13 @@ function 安排片段绝对时间动作(this: void, 片段: 剧情片段配置):
 function 执行对白步骤(this: void, 步骤: 剧情步骤): void {
   if (步骤.type !== "dialog") return;
   const 持续时间 = 步骤.持续时间 ?? 3;
+  const 下一步延迟 = 步骤.原生电影阻塞 === false ? 0 : 持续时间;
   if (步骤.使用原生电影系统 === true) {
     const 说话者 = 步骤.说话者 ?? "系统";
     const 文本 = 步骤.文本;
     TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, 说话者, null, 文本, bj_TIMETYPE_SET, 计算步骤持续时间(持续时间), false);
     剧情播放器运行时状态.当前步骤索引++;
-    安排下一步(持续时间);
+    安排下一步(下一步延迟);
     return;
   }
   执行UIDialog步骤(步骤);
@@ -264,13 +269,15 @@ function 读取当前剧情触发单位(this: void): any {
 }
 
 function 读取说话者单位(this: void, 说话者: string | undefined, 说话者引用: string | undefined): any {
-  const 引用单位 = 读取YD单位引用(说话者引用);
+  const 引用单位 = 读取单位引用(说话者引用);
   if (引用单位 != null && 引用单位 !== 0) return 引用单位;
   if (说话者 === "玩家") {
     const 触发单位 = 读取当前剧情触发单位();
     if (触发单位 != null && 触发单位 !== 0) return 触发单位;
   }
   if (说话者 != null && 说话者 !== "") {
+    const 运行时单位 = 读取语义单位引用(`主线NPC.${说话者}`);
+    if (运行时单位 != null && 运行时单位 !== 0) return 运行时单位;
     const 主线NPC单位 = YDUserDataGetSafe("string", "主线NPC", 说话者, "unit");
     if (主线NPC单位 != null && 主线NPC单位 !== 0) return 主线NPC单位;
     const Boss单位 = YDUserDataGetSafe("string", "Boss", 说话者, "unit");
@@ -296,14 +303,14 @@ function 执行UIDialog步骤(this: void, 步骤: 剧情步骤): void {
     }
   }
   剧情播放器运行时状态.当前步骤索引++;
-  安排下一步(持续时间);
+  安排下一步(步骤.原生电影阻塞 === false ? 0 : 持续时间);
 }
 
 function 执行UI广播步骤(this: void, 步骤: 剧情步骤): void {
   if (步骤.type !== "broadcast") return;
   const 文本 = 步骤.文本;
   const 持续时间毫秒 = (步骤.持续时间 ?? 3) * 1000;
-  const 来源单位 = 读取YD单位引用(步骤.来源单位引用);
+  const 来源单位 = 读取单位引用(步骤.来源单位引用);
   if (来源单位 != null && 来源单位 !== 0) {
     广播单位提示(来源单位, 文本, 持续时间毫秒);
     return;
@@ -353,30 +360,31 @@ function 执行自定义动作步骤(this: void, 步骤: 剧情步骤): void {
   执行当前剧情步骤();
 }
 
-function 读取YD单位引用(this: void, 引用: string | undefined): any {
+function 读取单位引用(this: void, 引用: string | undefined): any {
   if (引用 == null || 引用 === "") return null;
-  const splitIndex = 引用.indexOf(".");
-  if (splitIndex < 0) return null;
-  const tableName = 引用.substring(0, splitIndex);
-  const keyName = 引用.substring(splitIndex + 1);
-  if (tableName === "" || keyName === "") return null;
-  return YDUserDataGetSafe("string", tableName, keyName, "unit");
+  return 读取语义单位引用(引用);
+}
+
+function 启动剧情Boss战(this: void, bossUnit: any): void {
+  if (bossUnit == null || bossUnit === 0) return;
+  if (!是否已登记Boss自动技能(bossUnit)) {
+    记录Boss自动技能启动(bossUnit, "Boss战.绑定单位");
+  }
+  应用Boss战启动属性配置(bossUnit);
+  YDUserDataSetSafe("string", Boss战表名, Boss战绑定单位字段, "unit", bossUnit);
+  const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
+  if (触发单位 != null && 触发单位 !== 0) {
+    YDUserDataSetSafe("string", Boss战表名, Boss战触发玩家字段, "unit", 触发单位);
+  }
+  移除单位暂停(bossUnit, 剧情Boss预置暂停来源);
+  SetUnitInvulnerable(bossUnit, false);
+  启动Boss战运行(bossUnit);
 }
 
 function 执行Boss战启动步骤(this: void, 步骤: 剧情步骤): void {
   if (步骤.type !== "startBossFight") return;
-  const bossUnit = 读取YD单位引用(步骤.Boss引用) ?? 读取YD单位引用((步骤 as any).Boss名 ? `Boss.${(步骤 as any).Boss名}` : undefined);
-  if (bossUnit != null && bossUnit !== 0) {
-    应用Boss战启动属性配置(bossUnit);
-    YDUserDataSetSafe("string", Boss战表名, Boss战绑定单位字段, "unit", bossUnit);
-    const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
-    if (触发单位 != null && 触发单位 !== 0) {
-      YDUserDataSetSafe("string", Boss战表名, Boss战触发玩家字段, "unit", 触发单位);
-    }
-    移除单位暂停(bossUnit, 剧情Boss预置暂停来源);
-    SetUnitInvulnerable(bossUnit, false);
-    启动Boss战运行(bossUnit);
-  }
+  const bossUnit = 读取单位引用(步骤.Boss引用) ?? 读取单位引用((步骤 as any).Boss名 ? `Boss.${(步骤 as any).Boss名}` : undefined);
+  启动剧情Boss战(bossUnit);
   剧情播放器运行时状态.当前步骤索引++;
   执行当前剧情步骤();
 }
@@ -399,18 +407,8 @@ function 执行跳过模式步骤逻辑(this: void, 步骤: 剧情步骤): void 
       获取执行主线剧情动作函数()(步骤.动作ID, 步骤.参数 ?? {});
       return;
     case "startBossFight": {
-      const bossUnit = 读取YD单位引用(步骤.Boss引用) ?? 读取YD单位引用((步骤 as any).Boss名 ? `Boss.${(步骤 as any).Boss名}` : undefined);
-      if (bossUnit != null && bossUnit !== 0) {
-        应用Boss战启动属性配置(bossUnit);
-        YDUserDataSetSafe("string", Boss战表名, Boss战绑定单位字段, "unit", bossUnit);
-        const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
-        if (触发单位 != null && 触发单位 !== 0) {
-          YDUserDataSetSafe("string", Boss战表名, Boss战触发玩家字段, "unit", 触发单位);
-        }
-        移除单位暂停(bossUnit, 剧情Boss预置暂停来源);
-        SetUnitInvulnerable(bossUnit, false);
-        启动Boss战运行(bossUnit);
-      }
+      const bossUnit = 读取单位引用(步骤.Boss引用) ?? 读取单位引用((步骤 as any).Boss名 ? `Boss.${(步骤 as any).Boss名}` : undefined);
+      启动剧情Boss战(bossUnit);
       return;
     }
     case "giveItem": {

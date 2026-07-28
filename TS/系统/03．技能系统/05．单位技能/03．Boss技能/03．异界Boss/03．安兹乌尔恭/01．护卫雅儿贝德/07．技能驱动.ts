@@ -15,6 +15,9 @@ const { 获取Boss技能最近敌对英雄 } = require('系统.01．单位系统
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
 };
+const { Boss自动施法是否开启 } = require('系统.03．技能系统.06．AI自动使用技能.04．Boss自动施法开关') as {
+  Boss自动施法是否开启: (this: void) => boolean;
+};
 const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -22,6 +25,7 @@ const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 export function 推进雅儿贝德技能驱动(this: void, context: 安兹运行时上下文): void {
+  if (!Boss自动施法是否开启()) return;
   const state = context.雅儿贝德;
   const albedo = state?.单位;
   if (state == null || !单位有效(albedo) || context.挑战已结束 || context.当前大型技能 != null) return;

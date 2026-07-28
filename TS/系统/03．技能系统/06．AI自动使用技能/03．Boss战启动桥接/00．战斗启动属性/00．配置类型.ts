@@ -53,12 +53,19 @@ export interface 战斗启动属性配置 {
   死亡后所有玩家英雄基础全属性?: number;
 }
 
-export interface Boss战斗启动护卫单位配置 {
-  单位ID: string;
-  单位名?: string;
-  X: number;
-  Y: number;
-  面向?: number;
+export interface Boss战斗启动护卫单位配置 {
+  单位ID: string;
+  单位名?: string;
+  X?: number;
+  Y?: number;
+  面向?: number;
+  每批生成数量?: number;
+  同类最大存活数量?: number;
+  随机生成位置?: {
+    中心: "Boss战矩形中心";
+    最小半径: number;
+    最大半径: number;
+  };
   额外最大生命?: number;
   出生特效模型?: string;
   出生特效持续秒?: number;
@@ -66,8 +73,10 @@ export interface Boss战斗启动护卫单位配置 {
   普攻伤害吸血?: number;
   主Boss死亡时立刻死亡?: boolean;
 
+  护卫血条优先级?: number;
+  /** @deprecated 使用护卫血条优先级；true 兼容为默认优先级。 */
   显示护卫血条?: boolean;
-}
+}
 
 export interface Boss战斗启动护卫对白配置 {
   延迟毫秒: number;

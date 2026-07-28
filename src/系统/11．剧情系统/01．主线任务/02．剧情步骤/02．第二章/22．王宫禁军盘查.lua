@@ -29,11 +29,15 @@ ____exports["王宫禁军盘查紧凑剧情片段"] = {
             ["触发范围"] = 999,
             ["触发单位发布命令"] = "stop",
             ["解锁视野"] = "gg_rct______________121, gg_rct______________122, gg_rct______________123",
-            ["任务更新提示"] = "|cffffff00『主线目标』：|r前往|cffff99cc『克林姆德王』|r。",
-            ["小地图X"] = 18924.9,
-            ["小地图Y"] = -24399.8,
-            ["旧JASS功能清单"] = "CreateFogModifierRectBJ / QuestSetDescription / QuestMessageBJ / PingMinimap"
+            ["旧JASS功能清单"] = "CreateFogModifierRectBJ"
         }
+    }, {
+        ["序号"] = 2,
+        ["挂点"] = "afterDialog",
+        ["对白序号"] = 5,
+        ["动作ID"] = "JLC精灵城_王宫目标刷新",
+        ["名称"] = "王宫盘查后刷新觐见目标",
+        ["参数"] = {["任务更新提示"] = "|cffffff00『主线目标』：|r前往|cffff99cc『克林姆德王』|r。", ["小地图X"] = 18924.9, ["小地图Y"] = -24399.8, ["旧JASS功能清单"] = "QuestSetDescription / QuestMessageBJ / PingMinimap"}
     }}
 }
 ____exports["王宫禁军盘查剧情片段"] = _____7F16_8BD1_7D27_51D1_5267_60C5_7247_6BB5(____exports["王宫禁军盘查紧凑剧情片段"])

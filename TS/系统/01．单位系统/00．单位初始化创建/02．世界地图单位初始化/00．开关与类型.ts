@@ -32,6 +32,6 @@ export interface 世界地图单位缓步创建状态 {
   运行中: boolean;
 }
 
-export const 启用世界地图单位TS初始化 = true;
+export const 启用世界地图单位TS初始化 = false;
 export const 世界地图单位默认每批创建数量 = 20;
 export const 世界地图单位默认批次间隔秒 = 0.03;

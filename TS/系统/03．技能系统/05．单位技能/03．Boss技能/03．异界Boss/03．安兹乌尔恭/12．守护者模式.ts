@@ -16,6 +16,10 @@ import { 注册雅儿贝德守护者之职责 } from './01．护卫雅儿贝德/
 const { 创建召唤物 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.index') as {
   创建召唤物: (this: void, 参数: any) => any;
 };
+const { 创建自定义护卫单位, 处理Boss结束全部护卫 } = require('系统.01．单位系统.10．护卫系统.index') as {
+  创建自定义护卫单位: (this: void, 参数: any, 创建器: (this: void) => any) => any;
+  处理Boss结束全部护卫: (this: void, boss: any) => void;
+};
 const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
@@ -99,22 +103,30 @@ function 创建雅儿贝德单位(this: void, context: 安兹运行时上下文)
   const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
   const facing = GetUnitFacing(boss);
   const angle = (facing + 90) * DEG_TO_RAD;
-  return 创建召唤物({
-    主人单位: boss,
-    所属玩家: GetOwningPlayer(boss),
-    单位类型: 安兹乌尔恭单位技能配置.护卫.正式单位ID,
-    单位名称: 安兹乌尔恭单位技能配置.护卫.单位名称,
-    模型路径: 安兹乌尔恭单位技能配置.护卫.模型路径,
-    X: GetUnitX(boss) + Cos(angle) * cfg.雅儿贝德出生距离,
-    Y: GetUnitY(boss) + Sin(angle) * cfg.雅儿贝德出生距离,
-    朝向: facing,
-    生命值: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg.雅儿贝德生命比例,
-    生命值受小怪倍率: false,
-    攻击力: 读取单位攻击力(boss) * cfg.雅儿贝德攻击比例,
-    攻击间隔: cfg.雅儿贝德攻击间隔,
-    攻击范围: cfg.雅儿贝德攻击范围,
-    索敌范围: cfg.雅儿贝德索敌范围,
-    护甲: cfg.雅儿贝德护甲,
+  return 创建自定义护卫单位({
+    主Boss单位: boss,
+    护卫类型: '安兹乌尔恭:雅儿贝德',
+    护卫血条优先级: 300,
+    标记为召唤单位: true,
+    Boss结束处理: '移除',
+  }, function 创建雅儿贝德召唤物(this: void): any {
+    return 创建召唤物({
+      主人单位: boss,
+      所属玩家: GetOwningPlayer(boss),
+      单位类型: 安兹乌尔恭单位技能配置.护卫.正式单位ID,
+      单位名称: 安兹乌尔恭单位技能配置.护卫.单位名称,
+      模型路径: 安兹乌尔恭单位技能配置.护卫.模型路径,
+      X: GetUnitX(boss) + Cos(angle) * cfg.雅儿贝德出生距离,
+      Y: GetUnitY(boss) + Sin(angle) * cfg.雅儿贝德出生距离,
+      朝向: facing,
+      生命值: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg.雅儿贝德生命比例,
+      生命值受小怪倍率: false,
+      攻击力: 读取单位攻击力(boss) * cfg.雅儿贝德攻击比例,
+      攻击间隔: cfg.雅儿贝德攻击间隔,
+      攻击范围: cfg.雅儿贝德攻击范围,
+      索敌范围: cfg.雅儿贝德索敌范围,
+      护甲: cfg.雅儿贝德护甲,
+    });
   });
 }
 
@@ -149,7 +161,10 @@ export function 启动安兹守护者模式(this: void, context: 安兹运行时
     名称: '安兹与雅儿贝德联合技能独占',
     清理: context.清理,
   });
-  context.清理.登记单位('雅儿贝德护卫单位', albedo);
+  const boss = context.安兹单位;
+  context.清理.登记清理('雅儿贝德护卫单位', function 清理雅儿贝德护卫单位(this: void): void {
+    处理Boss结束全部护卫(boss);
+  });
   确保雅儿贝德伤害修正();
   确保雅儿贝德运行时驱动();
   注册雅儿贝德至尊拦截();

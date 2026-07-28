@@ -49,6 +49,8 @@ local _____5904_7406Boss_6218_62A4_536B_7ED3_675F = ____06_FF0EBoss_6218_62A4_53
 local ____index = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.03．Boss血条弱点韧性.index")
 local _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027 = ____index["启动Boss血条弱点韧性"]
 local _____7ED3_675FBoss_8840_6761_5F31_70B9_97E7_6027 = ____index["结束Boss血条弱点韧性"]
+local ____09_FF0EBoss_62A4_536B_8840_6761_4F18_5148_7EA7_8C03_5EA6 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.09．Boss护卫血条优先级调度")
+local _____540C_6B65_5168_90E8Boss_62A4_536B_8840_6761_4F18_5148_7EA7 = ____09_FF0EBoss_62A4_536B_8840_6761_4F18_5148_7EA7_8C03_5EA6["同步全部Boss护卫血条优先级"]
 ____exports["停止Boss战运行驱动"] = function()
     if ____Boss_6218_8FD0_884C_5468_671F_56DE_8C03ID == 0 then
         return
@@ -245,6 +247,7 @@ local function ____onBoss_6218_8FD0_884CTick()
             i = i + 1
         end
     end
+    _____540C_6B65_5168_90E8Boss_62A4_536B_8840_6761_4F18_5148_7EA7(activeContexts)
     local rectContexts = _____83B7_53D6_5168_90E8_77E9_5F62_5F53_524DBoss_6218_4E0A_4E0B_6587()
     do
         local i = 0

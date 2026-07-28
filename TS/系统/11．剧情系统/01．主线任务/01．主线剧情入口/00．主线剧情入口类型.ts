@@ -16,9 +16,8 @@ export interface 主线NPC初始化配置 {
   说明?: string;
 }
 
-export interface 主线剧情入口配置基础 {
+export interface 主线剧情入口分支配置 {
   配置名: string;
-  触发方式: 主线剧情入口触发方式;
   剧情片段ID?: string;
   旧JASS触发器?: 旧主线剧情触发器名;
   需要剧情进度?: number;
@@ -26,6 +25,11 @@ export interface 主线剧情入口配置基础 {
   最高剧情进度?: number;
   需要物品名?: string;
   说明?: string;
+}
+
+export interface 主线剧情入口配置基础 extends 主线剧情入口分支配置 {
+  触发方式: 主线剧情入口触发方式;
+  剧情进度分支?: 主线剧情入口分支配置[];
 }
 
 export interface 主线剧情单位范围入口配置 extends 主线剧情入口配置基础 {

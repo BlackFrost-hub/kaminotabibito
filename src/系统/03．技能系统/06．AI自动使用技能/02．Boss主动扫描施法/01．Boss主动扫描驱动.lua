@@ -22,6 +22,8 @@ local _____5F02_754CBossAI_914D_7F6E_8868 = ____05_FF0E_5F02_754CBossAI_914D_7F6
 local ____01_FF0EBoss_81EA_52A8_6280_80FD_6CE8_518C_8868 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表")
 local _____83B7_53D6_6240_6709Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587 = ____01_FF0EBoss_81EA_52A8_6280_80FD_6CE8_518C_8868["获取所有Boss自动技能启动上下文"]
 local _____6E05_7406Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587 = ____01_FF0EBoss_81EA_52A8_6280_80FD_6CE8_518C_8868["清理Boss自动技能启动上下文"]
+local ____04_FF0EBoss_81EA_52A8_65BD_6CD5_5F00_5173 = require("系统.03．技能系统.06．AI自动使用技能.04．Boss自动施法开关")
+local ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F = ____04_FF0EBoss_81EA_52A8_65BD_6CD5_5F00_5173["Boss自动施法是否开启"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitName = jass.GetUnitName
@@ -44,15 +46,16 @@ local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩�
 local SUC_IsUnitAlive = ____require_result_3.SUC_IsUnitAlive
 local SUC_MatchBasicTarget = ____require_result_3.SUC_MatchBasicTarget
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local getObjectProperty = ____require_result_4.getObjectProperty
 local ObjectType = ____require_result_4.ObjectType
-local YDWEDistanceBetweenUnits = ____require_result_4.YDWEDistanceBetweenUnits
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
-local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.02．目标选择")
-local _____83B7_53D6_5E94_653B_51FB_76EE_6807 = ____require_result_6["获取应攻击目标"]
-local ____require_result_7 = require("系统.03．技能系统.08．技能数据表.00．技能数据表")
-local _____6280_80FD_6570_636E_8868 = ____require_result_7["技能数据表"]
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local getObjectPropertySafe = ____require_result_5.getObjectPropertySafe
+local YDWEDistanceBetweenUnitsSafe = ____require_result_5.YDWEDistanceBetweenUnitsSafe
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
+local ____require_result_7 = require("系统.01．单位系统.06．仇恨系统.02．目标选择")
+local _____83B7_53D6_5E94_653B_51FB_76EE_6807 = ____require_result_7["获取应攻击目标"]
+local ____require_result_8 = require("系统.03．技能系统.08．技能数据表.00．技能数据表")
+local _____6280_80FD_6570_636E_8868 = ____require_result_8["技能数据表"]
 local platformAbilityApi = require("平台扩展API取值")
 local _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4 = platformAbilityApi["技能_获取技能当前冷却时间"]
 local _____6280_80FD__83B7_53D6_6280_80FD_65BD_6CD5_8DDD_79BB = platformAbilityApi["技能_获取技能施法距离"]
@@ -66,16 +69,16 @@ local _____6280_80FD_80FD_529BID_7F13_5B58 = {}
 local _____6280_80FD_65BD_6CD5_8DDD_79BB_7F13_5B58 = {}
 local _____6280_80FD_65BD_6CD5_8303_56F4_7F13_5B58 = {}
 local ____Boss_4E3B_52A8_626B_63CF_56DE_8C03ID = 0
-local ____array_8 = __TS__SparseArrayNew(table.unpack(____BossAI_914D_7F6E_8868))
+local ____array_9 = __TS__SparseArrayNew(table.unpack(____BossAI_914D_7F6E_8868))
 __TS__SparseArrayPush(
-    ____array_8,
+    ____array_9,
     table.unpack(_____82F1_96C4BossAI_914D_7F6E_8868)
 )
 __TS__SparseArrayPush(
-    ____array_8,
+    ____array_9,
     table.unpack(_____5F02_754CBossAI_914D_7F6E_8868)
 )
-local ____Boss_4E3B_52A8_626B_63CF_914D_7F6E_8868 = {__TS__SparseArraySpread(____array_8)}
+local ____Boss_4E3B_52A8_626B_63CF_914D_7F6E_8868 = {__TS__SparseArraySpread(____array_9)}
 local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
     if unit == nil or unit == 0 then
         return 0
@@ -138,13 +141,13 @@ local function _____8BFB_53D6_6570_503C_5B57_6BB5(raw)
 end
 local function _____8BFB_53D6_6280_80FD_8868_6570_503C(skillId, field)
     local _____7F13_5B58_952E = (skillId .. ":") .. field
-    local ____temp_9
+    local ____temp_10
     if field == "Rng" then
-        ____temp_9 = _____6280_80FD_65BD_6CD5_8DDD_79BB_7F13_5B58[_____7F13_5B58_952E]
+        ____temp_10 = _____6280_80FD_65BD_6CD5_8DDD_79BB_7F13_5B58[_____7F13_5B58_952E]
     else
-        ____temp_9 = _____6280_80FD_65BD_6CD5_8303_56F4_7F13_5B58[_____7F13_5B58_952E]
+        ____temp_10 = _____6280_80FD_65BD_6CD5_8303_56F4_7F13_5B58[_____7F13_5B58_952E]
     end
-    local cached = ____temp_9
+    local cached = ____temp_10
     if cached ~= nil then
         return cached
     end
@@ -165,7 +168,7 @@ local function _____8BFB_53D6_6280_80FD_547D_4EE4_5B57_7B26_4E32(skillId)
     if cached ~= nil then
         return cached
     end
-    local value = getObjectProperty(ObjectType.ABILITY, skillId, "Order") or ""
+    local value = getObjectPropertySafe(ObjectType.ABILITY, skillId, "Order") or ""
     _____6280_80FD_547D_4EE4_7F13_5B58[skillId] = value
     return value
 end
@@ -245,12 +248,12 @@ local function _____9009_62E9_6700_8FD1_654C_4EBA(unit, candidates)
         return nil
     end
     local best = candidates[1]
-    local bestDistance = YDWEDistanceBetweenUnits(unit, best)
+    local bestDistance = YDWEDistanceBetweenUnitsSafe(unit, best)
     do
         local i = 1
         while i < #candidates do
             local candidate = candidates[i + 1]
-            local distance = YDWEDistanceBetweenUnits(unit, candidate)
+            local distance = YDWEDistanceBetweenUnitsSafe(unit, candidate)
             if distance < bestDistance then
                 best = candidate
                 bestDistance = distance
@@ -287,7 +290,7 @@ local function _____662F_5426_6EE1_8DB3_6280_80FD_91CA_653E_6761_4EF6(unit, ____
         return false
     end
     if target ~= nil and target ~= 0 and target ~= unit then
-        local distance = YDWEDistanceBetweenUnits(unit, target)
+        local distance = YDWEDistanceBetweenUnitsSafe(unit, target)
         if _____6280_80FD["最小施法距离"] ~= nil and distance < _____6280_80FD["最小施法距离"] then
             return false
         end
@@ -350,7 +353,7 @@ local function _____9009_62E9_4E3B_52A8_65BD_6CD5_76EE_6807(unit, _____914D_7F6E
             if not _____662F_5426_6709_6548Boss_4E3B_52A8_76EE_6807(target, unit) then
                 return false
             end
-            return YDWEDistanceBetweenUnits(unit, target) <= _____8303_56F4
+            return YDWEDistanceBetweenUnitsSafe(unit, target) <= _____8303_56F4
         end
     )
     if threat ~= nil and threat.targetRef ~= nil and threat.targetRef ~= 0 then
@@ -373,13 +376,13 @@ local function _____6267_884C_6280_80FD_4E0B_5355(unit, _____6280_80FD, _____547
         return IssueTargetOrder(unit, _____547D_4EE4_5B57_7B26_4E32, target) == true
     end
     if _____65BD_6CD5_76EE_6807_7C7B_578B == "点" then
-        local ____temp_10
+        local ____temp_11
         if target ~= nil and target ~= 0 then
-            ____temp_10 = target
+            ____temp_11 = target
         else
-            ____temp_10 = unit
+            ____temp_11 = unit
         end
-        local pointTarget = ____temp_10
+        local pointTarget = ____temp_11
         local x = jass.GetUnitX(pointTarget)
         local y = jass.GetUnitY(pointTarget)
         return IssuePointOrder(unit, _____547D_4EE4_5B57_7B26_4E32, x, y) == true
@@ -503,26 +506,26 @@ local function _____5C1D_8BD5_9A71_52A8_5355_4E2ABoss(context)
         return
     end
     state["下次可施法时间"] = now + (_____914D_7F6E["公共施法间隔Ms"] or _____9ED8_8BA4_516C_5171_65BD_6CD5_95F4_9694_6BEB_79D2)
-    local ____debugLogForce_14 = debugLogForce
-    local ____skill__6280_80FD_540D_12 = skill["技能名"]
-    local ____skill__6280_80FDID_13 = skill["技能ID"]
-    local ____temp_11
+    local ____debugLogForce_15 = debugLogForce
+    local ____skill__6280_80FD_540D_13 = skill["技能名"]
+    local ____skill__6280_80FDID_14 = skill["技能ID"]
+    local ____temp_12
     if target ~= nil and target ~= 0 then
-        ____temp_11 = jass.GetUnitName(target)
+        ____temp_12 = jass.GetUnitName(target)
     else
-        ____temp_11 = "无目标"
+        ____temp_12 = "无目标"
     end
-    ____debugLogForce_14(
+    ____debugLogForce_15(
         _____6A21_5757_540D,
         "Boss主动施法",
         "boss=",
         _____5355_4F4D_540D,
         "skill=",
-        ____skill__6280_80FD_540D_12,
+        ____skill__6280_80FD_540D_13,
         "id=",
-        ____skill__6280_80FDID_13,
+        ____skill__6280_80FDID_14,
         "target=",
-        ____temp_11,
+        ____temp_12,
         "cdMs=",
         coolMs,
         "range=",
@@ -534,6 +537,9 @@ local function _____5C1D_8BD5_9A71_52A8_5355_4E2ABoss(context)
     )
 end
 local function ____onBoss_4E3B_52A8_626B_63CFTick()
+    if not ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F() then
+        return
+    end
     local contexts = _____83B7_53D6_6240_6709Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587()
     do
         local i = 0

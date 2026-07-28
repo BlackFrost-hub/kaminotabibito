@@ -8,6 +8,7 @@ export * from "./00．AI配置";
 export * from "./03．Boss战启动桥接";
 export * from "./01．受击反应施法";
 export * from "./02．Boss主动扫描施法";
+export * from "./04．Boss自动施法开关";
 
 /**
  * 入口初始化：先接入受击反应与 Boss 战启动桥接，再接主动扫描驱动。

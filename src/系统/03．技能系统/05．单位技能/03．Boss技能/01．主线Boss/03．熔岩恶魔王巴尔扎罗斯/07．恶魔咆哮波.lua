@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_76EE_6807_5355_4F4D, _____53D6_65B9_5411_89D2, _____662F_5DF4_5C14_624E_7F57_65AF_62A4_536B, _____6536_96C6_5486_54EE_6CE2_5019_9009_5355_4F4D, _____9650_5236_751F_547D_503C, _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5486_54EE_6CE2_4F24_5BB3, _____8BB0_5F55_5486_54EE_6CE2_73A9_5BB6_547D_4E2D, _____64AD_653E_6076_9B54_5486_54EE_6CE2_84C4_529B_7279_6548, _____64AD_653E_6076_9B54_5486_54EE_6CE2_51B2_51FB_7279_6548, _____521B_5EFA_5486_54EE_6CE2_9884_8B66, _____6267_884C_5486_54EE_6CE2_547D_4E2D, _____521B_5EFA_5486_54EE_6CE2_5224_5B9A, ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_7EBF_6BB5_5371_9669_533A, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, getServerTime, _____521B_5EFA_70B9_7279_6548, _____65BD_52A0_5FEB_901F_63A7_5236Buff, CosBJ, SinBJ, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, Atan2, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, BJ_RADTODEG, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____6076_9B54_5486_54EE_6CE2_6280_80FDID, _____5FEB_901F_63A7_5236__51FB_6655
+local _____53D6_76EE_6807_5355_4F4D, _____53D6_65B9_5411_89D2, _____662F_5DF4_5C14_624E_7F57_65AF_62A4_536B, _____6536_96C6_5486_54EE_6CE2_5019_9009_5355_4F4D, _____9650_5236_751F_547D_503C, _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5486_54EE_6CE2_4F24_5BB3, _____8BB0_5F55_5486_54EE_6CE2_73A9_5BB6_547D_4E2D, _____64AD_653E_6076_9B54_5486_54EE_6CE2_84C4_529B_7279_6548, _____64AD_653E_6076_9B54_5486_54EE_6CE2_51B2_51FB_7279_6548, _____521B_5EFA_5486_54EE_6CE2_9884_8B66, _____6267_884C_5486_54EE_6CE2_547D_4E2D, _____521B_5EFA_5486_54EE_6CE2_5224_5B9A, ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_7EBF_6BB5_5371_9669_533A, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, getServerTime, _____521B_5EFA_70B9_7279_6548, _____65BD_52A0_5FEB_901F_63A7_5236Buff, CosBJ, SinBJ, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____83B7_53D6Boss_62A4_536B_5217_8868, _____662F_5426_6307_5B9ABoss_62A4_536B, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, Atan2, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, BJ_RADTODEG, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____6076_9B54_5486_54EE_6CE2_6280_80FDID, _____5FEB_901F_63A7_5236__51FB_6655
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -34,15 +34,17 @@ function _____53D6_65B9_5411_89D2(boss, target)
     ) * BJ_RADTODEG
 end
 function _____662F_5DF4_5C14_624E_7F57_65AF_62A4_536B(context, unit)
-    return unit ~= nil and unit ~= 0 and (unit == context["格鲁姆"] or unit == context["塞拉"])
+    return _____662F_5426_6307_5B9ABoss_62A4_536B(unit, context["Boss单位"])
 end
 function _____6536_96C6_5486_54EE_6CE2_5019_9009_5355_4F4D(context)
     local result = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
-    if _____5355_4F4D_6709_6548(context["格鲁姆"]) then
-        result[#result + 1] = context["格鲁姆"]
-    end
-    if _____5355_4F4D_6709_6548(context["塞拉"]) then
-        result[#result + 1] = context["塞拉"]
+    local guards = _____83B7_53D6Boss_62A4_536B_5217_8868(context["Boss单位"], true)
+    do
+        local i = 0
+        while i < #guards do
+            result[#result + 1] = guards[i + 1]
+            i = i + 1
+        end
     end
     return result
 end
@@ -256,6 +258,9 @@ CosBJ = ____require_result_8.CosBJ
 SinBJ = ____require_result_8.SinBJ
 local ____require_result_9 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_9["造成AOE技能伤害"]
+local ____require_result_10 = require("系统.01．单位系统.10．护卫系统.index")
+_____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_10["获取Boss护卫列表"]
+_____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_10["是否指定Boss护卫"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId

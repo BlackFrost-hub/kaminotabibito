@@ -18,12 +18,17 @@ local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_0["获取Boss技能最近敌对英雄"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("系统.03．技能系统.06．AI自动使用技能.04．Boss自动施法开关")
+local ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F = ____require_result_2["Boss自动施法是否开启"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 ____exports["推进雅儿贝德技能驱动"] = function(context)
+    if not ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F() then
+        return
+    end
     local state = context["雅儿贝德"]
     local albedo = state and state["单位"]
     if state == nil or not _____5355_4F4D_6709_6548(albedo) or context["挑战已结束"] or context["当前大型技能"] ~= nil then
@@ -32,8 +37,8 @@ ____exports["推进雅儿贝德技能驱动"] = function(context)
     if state["阶段状态"] == "失衡" or state["阶段状态"] == "已离场" then
         return
     end
-    local ____opt_4 = state["独占状态"]
-    local active = ____opt_4 and ____opt_4["取当前"](____opt_4)
+    local ____opt_5 = state["独占状态"]
+    local active = ____opt_5 and ____opt_5["取当前"](____opt_5)
     if active ~= nil and active.key ~= "雅儿贝德-守护者之职责" then
         return
     end

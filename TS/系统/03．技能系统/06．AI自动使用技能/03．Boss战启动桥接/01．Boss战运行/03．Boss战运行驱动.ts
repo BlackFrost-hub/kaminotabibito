@@ -52,6 +52,7 @@ import {
   启动Boss血条弱点韧性,
   结束Boss血条弱点韧性,
 } from "../03．Boss血条弱点韧性/index";
+import { 同步全部Boss护卫血条优先级 } from "./09．Boss护卫血条优先级调度";
 
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, forceHandle: any, messageType: number, message: string) => void;
@@ -220,6 +221,8 @@ function onBoss战运行Tick(this: void): void {
     处理Boss战护卫Tick(context, nowMs);
     尝试兜底搜敌并下令(context, nowMs);
   }
+
+  同步全部Boss护卫血条优先级(activeContexts);
 
   const rectContexts = 获取全部矩形当前Boss战上下文();
   for (let i = 0; i < rectContexts.length; i++) {

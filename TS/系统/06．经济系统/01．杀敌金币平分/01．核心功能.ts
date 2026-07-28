@@ -133,6 +133,7 @@ function getHeroGroup(this: void): any {
 
 /** 检查死亡单位是否触发金币平分（中立敌对或玩家8） */
 function isValidDyingUnit(this: void, dyingUnit: any): boolean {
+  if (jass.IsUnitType(dyingUnit, jass.UNIT_TYPE_SUMMONED) === true) return false;
   const playerId = getUnitOwnerId(dyingUnit);
   // 玩家12(中立敌对) 或 玩家8(粉色，实际索引为7)
   return playerId === 12 || playerId === 7;

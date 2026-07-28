@@ -159,12 +159,18 @@ function on里科特神风护体施法(this: void, castingUnit: any, spellAbilit
   if (!单位有效(castingUnit) || GetUnitTypeId(castingUnit) !== 里科特单位类型ID) return;
   const context = 获取或创建里科特上下文(castingUnit);
   if (context == null) return;
+  释放里科特神风护体(context);
+}
+
+export function 释放里科特神风护体(this: void, context: 里科特运行时上下文): boolean {
+  if (!单位有效(context.Boss单位)) return false;
   const cfg = 里科特数值与表现配置.神风护体;
-  播放里科特施法维持动作(castingUnit, cfg.持续秒, cfg.动画速度);
-  播放里科特台词(castingUnit, "神风护体");
-  播放Boss坐标音效(里科特音效配置.神风护体.展开, GetUnitX(castingUnit), GetUnitY(castingUnit), 里科特音效配置.默认裁断距离);
+  播放里科特施法维持动作(context.Boss单位, cfg.持续秒, cfg.动画速度);
+  播放里科特台词(context.Boss单位, "神风护体");
+  播放Boss坐标音效(里科特音效配置.神风护体.展开, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 里科特音效配置.默认裁断距离);
   设置神风护体层数(context);
   调度神风粉碎(context);
+  return true;
 }
 
 export function 注册里科特神风护体与粉碎(this: void): void {

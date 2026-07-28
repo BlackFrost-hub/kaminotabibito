@@ -36,6 +36,10 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
+const { 获取Boss护卫列表, 是否指定Boss护卫 } = require("系统.01．单位系统.10．护卫系统.index") as {
+  获取Boss护卫列表: (this: void, boss: any, 只返回存活?: boolean) => any[];
+  是否指定Boss护卫: (this: void, unit: any, boss: any) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -116,14 +120,14 @@ function 记录天罚玩家命中(this: void, context: 巴尔扎罗斯运行时�
 
 function 收集天罚命中候选(this: void, context: 巴尔扎罗斯运行时上下文): any[] {
   const result = 获取Boss技能敌对英雄列表(context.Boss单位);
-  if (单位有效(context.格鲁姆)) result.push(context.格鲁姆);
-  if (单位有效(context.塞拉)) result.push(context.塞拉);
+  const guards = 获取Boss护卫列表(context.Boss单位, true);
+  for (let i = 0; i < guards.length; i++) result.push(guards[i]);
   if (单位有效(context.Boss单位)) result.push(context.Boss单位);
   return result;
 }
 
 function 是护卫(this: void, context: 巴尔扎罗斯运行时上下文, unit: any): boolean {
-  return unit === context.格鲁姆 || unit === context.塞拉;
+  return 是否指定Boss护卫(unit, context.Boss单位);
 }
 
 function 触发天罚波次(this: void, context: 巴尔扎罗斯运行时上下文, 波次: 天罚波次): void {

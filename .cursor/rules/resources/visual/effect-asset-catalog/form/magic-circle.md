@@ -20,3 +20,4 @@
 | `Common\Effect\Form\MagicCircle\ShalltearBloodSwordRitualSigil.mdx` | 候选截图观察：深红竖向魔剑纹章具有血族和武器仪式感，但恶魔造型偏重，不够蔷薇贵族。 | 迁移后序列：`Stand / Death`；完成 10 项结构修复。 | 夏提雅·血枪仪式 / 血之复生辅助纹章；源候选 `YX_NPC_XUEMOJIAN.mdx`。 | 只作短时召枪或复生节点纹章，不作为常驻血印。 | 77668 | `616EF5E5D4BC1818` |
 | `Common\Effect\Form\MagicCircle\AinzFallingSkyWarmGoldCircle.mdx` | 候选截图观察：多层细金环围绕明亮核心，具有悬空、缓慢旋转的超位施法轮廓，正好补足当前尚缺的高空法阵层。它不是落地冲击，不能替换 `JNTX (159).mdx`。 | 迁移后序列：`Birth / Stand / Death`；完成 3 项结构修复。 | 安兹·天空坠落天空法阵；源候选 `5.mdx`。 | 高空大比例、低亮度使用；与其他白金符文层组合，实机确认朝向、中心亮度和遮挡。 | 4314 | `052584C587D41115` |
 | `Common\Effect\Form\MagicCircle\GrandUndeadAura.mdx` | 候选截图观察：大型多重法阵有高阶召令的层级，绿色亡灵气息也能成立；缺点是容易与自然系法术混淆。 | 迁移后序列：`Stand / Death`；保留源动画结构。 | 安兹·高阶亡灵召唤；源候选 `GrandUndeadAura.mdx`。 | 若采用，需与黑金或骨白召唤主体共同出现。 | 8136 | `F40EC0678F15DDE5` |
+| `Common\Effect\Form\MagicCircle\ElvenGateDefenseCircle.mdx` | 明亮的蓝色铭文法阵，轮廓清楚，适合作为必须守住的城门目标。 | 贴地持续显示。 | 克林姆德王城攻城战的城门防御核心。 | 作为可攻击单位模型使用；运行时必须锁定站位，死亡直接触发攻城失败。 | 9000 | `E1EB5FAEB5169010` |

@@ -35,6 +35,8 @@ export type 技能目标过滤器 = (entry: Boss技能仇恨目标) => boolean;
 export type Boss技能英雄过滤器 = (this: void, hero: any) => boolean;
 export type Boss技能英雄权重函数 = (this: void, hero: any) => number;
 
+const Boss技能测试目标列表: any[] = [];
+
 export function 获取Boss技能最高仇恨目标(
   this: void,
   boss: any,
@@ -79,6 +81,31 @@ function 单位在列表中(this: void, unit: any, list: any[] | undefined): boo
   return false;
 }
 
+export function 注册Boss技能测试目标(this: void, unit: any): void {
+  if (!单位有效(unit) || 单位在列表中(unit, Boss技能测试目标列表)) return;
+  Boss技能测试目标列表.push(unit);
+}
+
+export function 注销Boss技能测试目标(this: void, unit: any): void {
+  for (let i = Boss技能测试目标列表.length - 1; i >= 0; i--) {
+    if (Boss技能测试目标列表[i] === unit) Boss技能测试目标列表.splice(i, 1);
+  }
+}
+
+function 获取有效Boss技能测试目标列表(this: void, boss: any): any[] {
+  const result: any[] = [];
+  const bossOwner = GetOwningPlayer(boss);
+  for (let i = Boss技能测试目标列表.length - 1; i >= 0; i--) {
+    const unit = Boss技能测试目标列表[i];
+    if (!单位有效(unit)) {
+      Boss技能测试目标列表.splice(i, 1);
+    } else if (IsUnitEnemy(unit, bossOwner) === true) {
+      result.push(unit);
+    }
+  }
+  return result;
+}
+
 function 获取玩家首个存活英雄(this: void, whichPlayer: any): any {
   const registeredHero = getRegisteredPlayerHero(whichPlayer);
   if (单位有效(registeredHero) && IsUnitType(registeredHero, UNIT_TYPE_HERO) === true) return registeredHero;
@@ -102,6 +129,8 @@ function 获取玩家首个存活英雄(this: void, whichPlayer: any): any {
 export function 获取Boss技能敌对英雄列表(this: void, boss: any): any[] {
   const result: any[] = [];
   if (!单位有效(boss)) return result;
+  const testTargets = 获取有效Boss技能测试目标列表(boss);
+  if (testTargets.length > 0) return testTargets;
   const bossOwner = GetOwningPlayer(boss);
   for (let pid = 0; pid <= 5; pid++) {
     const hero = 获取玩家首个存活英雄(Player(pid));

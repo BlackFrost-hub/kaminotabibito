@@ -34,10 +34,10 @@ export function 执行树魔首领死亡奖励(this: void): void {
   pendingTreantDeathUnit = undefined;
 }
 
-function 执行树魔首领死亡后返城(this: void): void {}
+function 执行树魔首领死亡后查看掉落(this: void): void {}
 
 export const 树魔首领死亡承接剧情动作注册表: Record<string, 剧情动作处理器> = {
   "SW01死亡事件_树魔首领死亡前置": 执行树魔首领死亡前置,
   "SW01死亡事件_树魔首领死亡奖励": 执行树魔首领死亡奖励,
-  "JLC精灵城_树魔首领死亡后返城": 执行树魔首领死亡后返城,
+  "JLC精灵城_树魔首领死亡后查看掉落": 执行树魔首领死亡后查看掉落,
 };

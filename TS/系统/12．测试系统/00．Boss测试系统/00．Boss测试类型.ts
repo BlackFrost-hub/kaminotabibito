@@ -16,9 +16,10 @@ export interface Boss测试技能命令 {
 }
 
 export interface Boss测试注册配置 {
-  命令前缀: string;
+  命令单位名: string;
   Boss名称: string;
-  场地: Boss测试场地定义;
+  场地?: Boss测试场地定义;
   创建或获取上下文: (this: void, player: any) => any;
+  清理上下文: (this: void, player: any, context: any) => void;
   技能命令列表: Boss测试技能命令[];
 }

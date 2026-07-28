@@ -39,6 +39,7 @@ const ydweBase = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   YDWESetUnitAbilityDataReal: (this: void, unit: any, abilityId: number, level: number, dataType: number, value: number) => boolean;
   YDWETimerDestroyEffect: (this: void, duration: number, effect: any) => void;
   YDWEAngleBetweenUnits: (this: void, fromUnit: any, toUnit: any) => number;
+  YDWEDistanceBetweenUnits: (this: void, a: any, b: any) => number;
 };
 
 const YDUserDataGetUnsafe = ydweCompat.YDUserDataGet as any;
@@ -56,6 +57,7 @@ const YDWESetUnitAbilityStateUnsafe = ydweBase.YDWESetUnitAbilityState as any;
 const YDWESetUnitAbilityDataRealUnsafe = ydweBase.YDWESetUnitAbilityDataReal as any;
 const YDWETimerDestroyEffectUnsafe = ydweBase.YDWETimerDestroyEffect as any;
 const YDWEAngleBetweenUnitsUnsafe = ydweBase.YDWEAngleBetweenUnits as any;
+const YDWEDistanceBetweenUnitsUnsafe = ydweBase.YDWEDistanceBetweenUnits as any;
 
 export function YDUserDataGetSafe(this: void, tableType: string, tableKey: any, attr: string, valueType: string): any {
   return YDUserDataGetUnsafe(undefined, tableType, tableKey, attr, valueType);
@@ -117,6 +119,10 @@ export function YDWEAngleBetweenUnitsSafe(this: void, fromUnit: any, toUnit: any
   return YDWEAngleBetweenUnitsUnsafe(undefined, fromUnit, toUnit);
 }
 
+export function YDWEDistanceBetweenUnitsSafe(this: void, a: any, b: any): number {
+  return YDWEDistanceBetweenUnitsUnsafe(undefined, a, b);
+}
+
 export const 安全YDUserDataGet = YDUserDataGetSafe;
 export const 安全YDUserDataSet = YDUserDataSetSafe;
 export const 安全YDUserDataClear = YDUserDataClearSafe;
@@ -132,3 +138,4 @@ export const 安全设置单位技能状态 = YDWESetUnitAbilityStateSafe;
 export const 安全设置单位技能实数数据 = YDWESetUnitAbilityDataRealSafe;
 export const 安全延时销毁特效 = YDWETimerDestroyEffectSafe;
 export const 安全取两单位角度 = YDWEAngleBetweenUnitsSafe;
+export const 安全取两单位距离 = YDWEDistanceBetweenUnitsSafe;

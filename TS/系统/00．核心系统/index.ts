@@ -19,6 +19,7 @@ export * from "./01．事件中心/index";
 export * from "./03．脱战系统/index";
 export * from "./05．中心计时器";
 export * from "./06．特效绑定系统";
+export * from "./09．游戏结算开关";
 
 const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: () => number;

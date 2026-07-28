@@ -6,6 +6,7 @@ import { BossAI配置表 } from "../00．AI配置/01．BossAI配置表";
 import { 英雄BossAI配置表 } from "../00．AI配置/04．英雄BossAI配置表";
 import { 异界BossAI配置表 } from "../00．AI配置/05．异界BossAI配置表";
 import { 获取所有Boss自动技能启动上下文, 清理Boss自动技能启动上下文 } from "../03．Boss战启动桥接/01．Boss自动技能注册表";
+import { Boss自动施法是否开启 } from "../04．Boss自动施法开关";
 
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
@@ -32,10 +33,12 @@ const { SUC_IsUnitAlive, SUC_MatchBasicTarget } = require("lib.扩展函数.Star
   SUC_IsUnitAlive: (this: void, unit: any) => boolean;
   SUC_MatchBasicTarget: (this: void, target: any, source: any, wantEnemy: boolean) => boolean;
 };
-const { getObjectProperty, ObjectType, YDWEDistanceBetweenUnits } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
-  getObjectProperty: (this: void, objectType: number, objectId: number | string, property: string) => string;
+const { ObjectType } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   ObjectType: { ABILITY: number };
-  YDWEDistanceBetweenUnits: (this: void, a: any, b: any) => number;
+};
+const { getObjectPropertySafe, YDWEDistanceBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  getObjectPropertySafe: (this: void, objectType: number, objectId: number | string, property: string) => string;
+  YDWEDistanceBetweenUnitsSafe: (this: void, a: any, b: any) => number;
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
@@ -138,7 +141,7 @@ function 读取技能表数值(skillId: string, field: "Rng" | "Area"): number {
 function 读取技能命令字符串(skillId: string): string {
   const cached = 技能命令缓存[skillId];
   if (cached != null) return cached;
-  const value = getObjectProperty(ObjectType.ABILITY, skillId, "Order") || "";
+  const value = getObjectPropertySafe(ObjectType.ABILITY, skillId, "Order") || "";
   技能命令缓存[skillId] = value;
   return value;
 }
@@ -207,10 +210,10 @@ function 是否有效Boss主动目标(candidate: any, source: any): boolean {
 function 选择最近敌人(unit: any, candidates: any[]): any | null {
   if (candidates.length === 0) return null;
   let best = candidates[0];
-  let bestDistance = YDWEDistanceBetweenUnits(unit, best);
+  let bestDistance = YDWEDistanceBetweenUnitsSafe(unit, best);
   for (let i = 1; i < candidates.length; i++) {
     const candidate = candidates[i];
-    const distance = YDWEDistanceBetweenUnits(unit, candidate);
+    const distance = YDWEDistanceBetweenUnitsSafe(unit, candidate);
     if (distance < bestDistance) {
       best = candidate;
       bestDistance = distance;
@@ -248,7 +251,7 @@ function 是否满足技能释放条件(
   }
 
   if (target != null && target !== 0 && target !== unit) {
-    const distance = YDWEDistanceBetweenUnits(unit, target);
+    const distance = YDWEDistanceBetweenUnitsSafe(unit, target);
     if (技能.最小施法距离 != null && distance < 技能.最小施法距离) {
       return false;
     }
@@ -303,7 +306,7 @@ function 选择主动施法目标(
   const threat = 获取应攻击目标(unit, (entry) => {
     const target = entry.targetRef;
     if (!是否有效Boss主动目标(target, unit)) return false;
-    return YDWEDistanceBetweenUnits(unit, target) <= 范围;
+    return YDWEDistanceBetweenUnitsSafe(unit, target) <= 范围;
   });
   if (threat != null && threat.targetRef != null && threat.targetRef !== 0) {
     return threat.targetRef;
@@ -469,6 +472,7 @@ function 尝试驱动单个Boss(context: { Boss单位: any; 来源: string; 注�
 }
 
 function onBoss主动扫描Tick(this: void): void {
+  if (!Boss自动施法是否开启()) return;
   const contexts = 获取所有Boss自动技能启动上下文();
   for (let i = 0; i < contexts.length; i++) {
     尝试驱动单个Boss(contexts[i]);

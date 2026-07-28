@@ -34,7 +34,7 @@ ____exports["单位o000战斗启动护卫配置"] = {["Boss单位ID"] = "o000", 
     ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
     ["出生特效持续秒"] = 1.5,
     ["主Boss死亡时立刻死亡"] = true,
-    ["显示护卫血条"] = true
+    ["护卫血条优先级"] = 100
 }, {
     ["单位ID"] = "nbds",
     ["单位名"] = "蛇之看守者(精英)",
@@ -44,6 +44,6 @@ ____exports["单位o000战斗启动护卫配置"] = {["Boss单位ID"] = "o000", 
     ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
     ["出生特效持续秒"] = 1.5,
     ["主Boss死亡时立刻死亡"] = true,
-    ["显示护卫血条"] = true
+    ["护卫血条优先级"] = 100
 }}}}
 return ____exports

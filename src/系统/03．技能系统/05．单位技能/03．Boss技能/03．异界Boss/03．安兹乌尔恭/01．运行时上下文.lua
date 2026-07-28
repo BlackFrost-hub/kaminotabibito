@@ -18,6 +18,8 @@ local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("系统.01．单位系统.10．护卫系统.index")
+local _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B = ____require_result_1["处理Boss结束全部护卫"]
 local IsUnitType = jass.IsUnitType
 local GetUnitState = jass.GetUnitState
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
@@ -84,6 +86,7 @@ local _____5B89_5179_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_88
     ["on清理"] = function(context)
         context["挑战已结束"] = true
         context["阶段"] = "已结束"
+        _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B(context["安兹单位"])
         if context["雅儿贝德"] ~= nil then
             context["雅儿贝德"]["守护连接生效"] = false
             context["雅儿贝德"]["共同护盾生效"] = false

@@ -6,3 +6,4 @@ export * from "./04．Boss战运行工具";
 export * from "./05．Boss战地形纠偏";
 export * from "./06．Boss战护卫";
 export * from "./08．Boss死亡音效";
+export * from "./09．Boss护卫血条优先级调度";

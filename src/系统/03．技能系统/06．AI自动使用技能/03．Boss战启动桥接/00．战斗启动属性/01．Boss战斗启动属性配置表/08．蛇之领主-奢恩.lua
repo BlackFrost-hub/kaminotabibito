@@ -39,7 +39,7 @@ ____exports["单位nbdo战斗启动护卫配置"] = {
         ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
         ["出生特效持续秒"] = 1,
         ["主Boss死亡时立刻死亡"] = true,
-        ["显示护卫血条"] = true
+        ["护卫血条优先级"] = 100
     }, {
         ["单位ID"] = "nbdw",
         ["单位名"] = "蛇之护卫",
@@ -50,7 +50,7 @@ ____exports["单位nbdo战斗启动护卫配置"] = {
         ["出生特效模型"] = "Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl",
         ["出生特效持续秒"] = 1,
         ["主Boss死亡时立刻死亡"] = true,
-        ["显示护卫血条"] = true
+        ["护卫血条优先级"] = 100
     }}},
     ["周期护卫批次"] = {["间隔毫秒"] = 42500, ["广播说话者"] = "护卫", ["广播文案池"] = {"进攻！粉碎入侵者", "奢恩大人，我们来帮助你赶跑入侵者"}, ["单位列表"] = {{
         ["单位ID"] = "nbdw",

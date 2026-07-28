@@ -15,15 +15,17 @@ local ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5 = require("系统.11．剧情系
 local _____5207_6362_5267_60C5_5927_95E8 = ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5["切换剧情大门"]
 local _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F = ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5["发送剧情任务消息"]
 local _____53D1_9001_5267_60C5_5C0F_5730_56FE_4FE1_53F7 = ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5["发送剧情小地图信号"]
+local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
+local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["读取剧情运行时单位"]
 function _____8BFB_53D6_5168_5C40_53E5_67C4(_____53D8_91CF_540D)
     if _____53D8_91CF_540D == "" then
         return nil
     end
-    local ____jglobals______53D8_91CF_540D_19 = jglobals[_____53D8_91CF_540D]
-    if ____jglobals______53D8_91CF_540D_19 == nil then
-        ____jglobals______53D8_91CF_540D_19 = nil
+    local ____jglobals______53D8_91CF_540D_20 = jglobals[_____53D8_91CF_540D]
+    if ____jglobals______53D8_91CF_540D_20 == nil then
+        ____jglobals______53D8_91CF_540D_20 = nil
     end
-    return ____jglobals______53D8_91CF_540D_19
+    return ____jglobals______53D8_91CF_540D_20
 end
 function _____5207_6362_533A_57DF_97F3_4E50_8868_8FBE_5F0F(expr, add)
     local list = __TS__StringSplit(expr, ";")
@@ -33,22 +35,22 @@ function _____5207_6362_533A_57DF_97F3_4E50_8868_8FBE_5F0F(expr, add)
             do
                 local item = __TS__StringTrim(list[i + 1])
                 if #item == 0 then
-                    goto __continue146
+                    goto __continue150
                 end
                 local at = (string.find(item, "@", nil, true) or 0) - 1
                 if at < 0 then
-                    goto __continue146
+                    goto __continue150
                 end
                 local soundVarName = __TS__StringTrim(__TS__StringSubstring(item, 0, at))
                 local rectVarName = __TS__StringTrim(__TS__StringSubstring(item, at + 1))
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
                 local rectHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(rectVarName)
                 if soundHandle == nil or soundHandle == 0 or rectHandle == nil or rectHandle == 0 then
-                    goto __continue146
+                    goto __continue150
                 end
                 SetStackedSoundBJ(add, soundHandle, rectHandle)
             end
-            ::__continue146::
+            ::__continue150::
             i = i + 1
         end
     end
@@ -61,15 +63,15 @@ function _____64AD_653E_97F3_6548_8868_8FBE_5F0F(expr)
             do
                 local soundVarName = __TS__StringTrim(list[i + 1])
                 if #soundVarName == 0 then
-                    goto __continue152
+                    goto __continue156
                 end
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
                 if soundHandle == nil or soundHandle == 0 then
-                    goto __continue152
+                    goto __continue156
                 end
                 PlaySoundBJ(soundHandle)
             end
-            ::__continue152::
+            ::__continue156::
             i = i + 1
         end
     end
@@ -87,52 +89,56 @@ local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local AdjustPlayerStateBJ = ____require_result_2.AdjustPlayerStateBJ
-local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_3["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_3["移除单位暂停"]
-local ____require_result_4 = require("lib.扩展函数.BJ函数.07．杂项")
-local ModifyGateBJ = ____require_result_4.ModifyGateBJ
-local ForGroupBJ = ____require_result_4.ForGroupBJ
-local SetTimeOfDay = ____require_result_4.SetTimeOfDay
+local ____require_result_3 = require("系统.00．核心系统.07．联机安全工具")
+local safeForForce = ____require_result_3.safeForForce
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
 local ____require_result_5 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_5.GetPlayersAll
-local ____require_result_6 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-SetStackedSoundBJ = ____require_result_6.SetStackedSoundBJ
-local ____require_result_7 = require("lib.扩展函数.BJ函数.14．音效函数")
-PlaySoundBJ = ____require_result_7.PlaySoundBJ
-local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local ModifyHeroStat = ____require_result_8.ModifyHeroStat
-local ____require_result_9 = require("lib.扩展函数.BJ函数.03．物品与库存")
-local AddItemToStockBJ = ____require_result_9.AddItemToStockBJ
-local GetItemOfTypeFromUnitBJ = ____require_result_9.GetItemOfTypeFromUnitBJ
-local ____require_result_10 = require("lib.扩展函数.BJ函数.06．任务消息")
-local QuestMessageBJ = ____require_result_10.QuestMessageBJ
-local ____require_result_11 = require("lib.扩展函数.物品相关函数.物品判断函数")
-local UnitHasItemOfTypeBJ = ____require_result_11.UnitHasItemOfTypeBJ
-local ____require_result_12 = require("系统.02．物品系统.13．物品名反查")
-local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_12["按名字反查物品ID"]
-local ____require_result_13 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_13["按名字反查Boss单位ID"]
-local ____require_result_14 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_14.stringToFourCCSafe
-local ____require_result_15 = require("系统.08．任务系统.01．任务数据")
-local questDB = ____require_result_15.questDB
-local QuestType = ____require_result_15.QuestType
-local QuestStatus = ____require_result_15.QuestStatus
-local ____require_result_16 = require("系统.08．任务系统.02．任务管理器")
-local questManager = ____require_result_16.questManager
-local ____require_result_17 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
-local _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E = ____require_result_17["创建并冻结剧情Boss预置"]
-local ____require_result_18 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
-local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_18["启动Boss战运行"]
+local ModifyGateBJ = ____require_result_5.ModifyGateBJ
+local ForGroupBJ = ____require_result_5.ForGroupBJ
+local SetTimeOfDay = ____require_result_5.SetTimeOfDay
+local ____require_result_6 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_6.GetPlayersAll
+local ____require_result_7 = require("lib.扩展函数.BJ函数.04．矩形与区域")
+SetStackedSoundBJ = ____require_result_7.SetStackedSoundBJ
+local ____require_result_8 = require("lib.扩展函数.BJ函数.14．音效函数")
+PlaySoundBJ = ____require_result_8.PlaySoundBJ
+local ____require_result_9 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local ModifyHeroStat = ____require_result_9.ModifyHeroStat
+local ____require_result_10 = require("lib.扩展函数.BJ函数.03．物品与库存")
+local AddItemToStockBJ = ____require_result_10.AddItemToStockBJ
+local GetItemOfTypeFromUnitBJ = ____require_result_10.GetItemOfTypeFromUnitBJ
+local ____require_result_11 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_11.QuestMessageBJ
+local ____require_result_12 = require("lib.扩展函数.物品相关函数.物品判断函数")
+local UnitHasItemOfTypeBJ = ____require_result_12.UnitHasItemOfTypeBJ
+local ____require_result_13 = require("系统.02．物品系统.13．物品名反查")
+local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_13["按名字反查物品ID"]
+local ____require_result_14 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_14["按名字反查Boss单位ID"]
+local ____require_result_15 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_15.stringToFourCCSafe
+local ____require_result_16 = require("系统.08．任务系统.01．任务数据")
+local questDB = ____require_result_16.questDB
+local QuestType = ____require_result_16.QuestType
+local QuestStatus = ____require_result_16.QuestStatus
+local ____require_result_17 = require("系统.08．任务系统.02．任务管理器")
+local questManager = ____require_result_17.questManager
+local ____require_result_18 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
+local _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E = ____require_result_18["创建并冻结剧情Boss预置"]
+local ____require_result_19 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
+local _____542F_52A8Boss_6218_8FD0_884C = ____require_result_19["启动Boss战运行"]
 local AddSpecialEffect = jass.AddSpecialEffect
 local CreateFogModifierRect = jass.CreateFogModifierRect
 local CreateItem = jass.CreateItem
 local CreateUnit = jass.CreateUnit
 local DisplayCineFilter = jass.DisplayCineFilter
 local FogModifierStart = jass.FogModifierStart
+local GetEnumPlayer = jass.GetEnumPlayer
 local GetEnumUnit = jass.GetEnumUnit
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetUnitName = jass.GetUnitName
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -165,6 +171,8 @@ local _____5F53_524D_73A9_5BB6_82F1_96C4_65E0_654C = false
 local _____5267_60C5_73A9_5BB6_82F1_96C4_63A7_5236_6682_505C_6765_6E90 = "剧情系统:玩家英雄控制"
 local _____5267_60C5_89E6_53D1_5355_4F4D_63A7_5236_6682_505C_6765_6E90 = "剧情系统:触发单位控制"
 local _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668 = {}
+local _____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808 = {}
+local _____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808 = {}
 local _____5EF6_8FDF_6267_884C_4EFB_52A1 = {}
 local _____5EF6_8FDF_6267_884C_626B_63CFID = 0
 local function maxNum(a, b)
@@ -284,6 +292,10 @@ ____exports["读取语义单位引用"] = function(_____5F15_7528)
     if _____5F15_7528 == "" then
         return nil
     end
+    local _____8FD0_884C_65F6_5355_4F4D = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____5F15_7528)
+    if _____8FD0_884C_65F6_5355_4F4D ~= nil and _____8FD0_884C_65F6_5355_4F4D ~= 0 then
+        return _____8FD0_884C_65F6_5355_4F4D
+    end
     local splitIndex = (string.find(_____5F15_7528, ".", nil, true) or 0) - 1
     if splitIndex >= 0 then
         local tableName = __TS__StringSubstring(_____5F15_7528, 0, splitIndex)
@@ -292,13 +304,7 @@ ____exports["读取语义单位引用"] = function(_____5F15_7528)
             return YDUserDataGetSafe("string", tableName, keyName, "unit")
         end
     end
-    local _____5019_9009_8868_540D_5217_8868 = {
-        "主线NPC",
-        "ZX",
-        "Boss",
-        "Boss战",
-        "jq"
-    }
+    local _____5019_9009_8868_540D_5217_8868 = {"主线NPC", "ZX", "Boss", "Boss战"}
     do
         local i = 0
         while i < #_____5019_9009_8868_540D_5217_8868 do
@@ -361,27 +367,31 @@ local function _____5411_5546_5E97_6DFB_52A0_7269_54C1(unit, _____7269_54C1_540D
                 local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(items[i + 1])
                 local itemTypeId = stringToFourCCSafe(rawId)
                 if not (itemTypeId > 0) then
-                    goto __continue56
+                    goto __continue57
                 end
                 AddItemToStockBJ(itemTypeId, unit, 1, 1)
             end
-            ::__continue56::
+            ::__continue57::
             i = i + 1
         end
     end
 end
-local function _____8C03_6574_5168_90E8_73A9_5BB6_91D1_5E01(delta)
-    do
-        local playerId = 0
-        while playerId < 8 do
-            AdjustPlayerStateBJ(
-                delta,
-                Player(playerId),
-                PLAYER_STATE_RESOURCE_GOLD
-            )
-            playerId = playerId + 1
-        end
+local function ____on_8C03_6574_679A_4E3E_73A9_5BB6_91D1_5E01()
+    local delta = _____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808[#_____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808]
+    local whichPlayer = GetEnumPlayer()
+    if delta == nil or whichPlayer == nil or whichPlayer == 0 then
+        return
     end
+    AdjustPlayerStateBJ(delta, whichPlayer, PLAYER_STATE_RESOURCE_GOLD)
+end
+local function _____8C03_6574_73A9_5BB6_7EC4_91D1_5E01(delta)
+    local _____73A9_5BB6_7EC4 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
+    if _____73A9_5BB6_7EC4 == nil or _____73A9_5BB6_7EC4 == 0 then
+        return
+    end
+    _____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808[#_____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808 + 1] = delta
+    safeForForce(_____73A9_5BB6_7EC4, ____on_8C03_6574_679A_4E3E_73A9_5BB6_91D1_5E01)
+    table.remove(_____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808)
 end
 ____exports["设置玩家英雄组控制状态"] = function(_____6682_505C, _____65E0_654C)
     local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
@@ -411,43 +421,51 @@ ____exports["停止触发单位"] = function()
     end
     IssueImmediateOrder(unit, "stop")
 end
-____exports["给全部玩家添加区域视野"] = function(rectVarName)
+local function ____on_7ED9_679A_4E3E_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE()
+    local _____4E0A_4E0B_6587 = _____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808[#_____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808]
+    if _____4E0A_4E0B_6587 == nil then
+        return
+    end
+    local whichPlayer = GetEnumPlayer()
+    if whichPlayer == nil or whichPlayer == 0 then
+        return
+    end
+    local key = (_____4E0A_4E0B_6587["矩形变量名"] .. "#") .. tostring(GetPlayerId(whichPlayer))
+    if _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] then
+        return
+    end
+    local fogModifier = CreateFogModifierRect(
+        whichPlayer,
+        FOG_OF_WAR_VISIBLE,
+        _____4E0A_4E0B_6587["矩形句柄"],
+        true,
+        false
+    )
+    if fogModifier == nil or fogModifier == 0 then
+        return
+    end
+    FogModifierStart(fogModifier)
+    _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] = true
+end
+____exports["给玩家组添加区域视野"] = function(rectVarName)
     local rectHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(rectVarName)
     if rectHandle == nil or rectHandle == 0 then
         return
     end
-    do
-        local playerId = 0
-        while playerId < 8 do
-            do
-                local key = (rectVarName .. "#") .. tostring(playerId)
-                if _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] then
-                    goto __continue72
-                end
-                local fogModifier = CreateFogModifierRect(
-                    Player(playerId),
-                    FOG_OF_WAR_VISIBLE,
-                    rectHandle,
-                    true,
-                    false
-                )
-                if fogModifier == nil or fogModifier == 0 then
-                    goto __continue72
-                end
-                FogModifierStart(fogModifier)
-                _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] = true
-            end
-            ::__continue72::
-            playerId = playerId + 1
-        end
+    local _____73A9_5BB6_7EC4 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
+    if _____73A9_5BB6_7EC4 == nil or _____73A9_5BB6_7EC4 == 0 then
+        return
     end
+    _____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808[#_____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808 + 1] = {["矩形变量名"] = rectVarName, ["矩形句柄"] = rectHandle}
+    safeForForce(_____73A9_5BB6_7EC4, ____on_7ED9_679A_4E3E_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE)
+    table.remove(_____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808)
 end
-____exports["给全部玩家添加多个区域视野"] = function(rectVarNames)
+____exports["给玩家组添加多个区域视野"] = function(rectVarNames)
     local _____5217_8868 = _____5206_5272_540D_79F0_5217_8868(rectVarNames)
     do
         local i = 0
         while i < #_____5217_8868 do
-            ____exports["给全部玩家添加区域视野"](_____5217_8868[i + 1])
+            ____exports["给玩家组添加区域视野"](_____5217_8868[i + 1])
             i = i + 1
         end
     end
@@ -474,15 +492,15 @@ ____exports["更新主线任务UI"] = function(_____4EFB_52A1_63CF_8FF0, _____63
         })
         questDB:acceptQuest(0, _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     end
-    local ____opt_22 = questDB.globalData
-    if ____opt_22 ~= nil then
-        ____opt_22 = ____opt_22.quests
+    local ____opt_23 = questDB.globalData
+    if ____opt_23 ~= nil then
+        ____opt_23 = ____opt_23.quests
     end
-    local ____opt_result_24
-    if ____opt_22 ~= nil then
-        ____opt_result_24 = ____opt_22:get(_____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
+    local ____opt_result_25
+    if ____opt_23 ~= nil then
+        ____opt_result_25 = ____opt_23:get(_____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     end
-    local _____4EFB_52A1 = ____opt_result_24
+    local _____4EFB_52A1 = ____opt_result_25
     if _____4EFB_52A1 ~= nil and _____4EFB_52A1_63CF_8FF0 ~= "" then
         _____4EFB_52A1.description = _____4EFB_52A1_63CF_8FF0
         _____4EFB_52A1.updatedAt = os.time()
@@ -553,16 +571,16 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
         _____5199_5165_5267_60C5_8FDB_5EA6(_____8BBE_7F6E_8FDB_5EA6)
     end
     if _____53D6_53C2_6570_5E03_5C14(_____53C2_6570, "开启电影模式") then
-        local ____require_result_25 = require("lib.扩展函数.BJ函数.05A．电影函数")
-        local CinematicModeBJ = ____require_result_25.CinematicModeBJ
+        local ____require_result_26 = require("lib.扩展函数.BJ函数.05A．电影函数")
+        local CinematicModeBJ = ____require_result_26.CinematicModeBJ
         CinematicModeBJ(
             true,
             GetPlayersAll()
         )
     end
     if _____53D6_53C2_6570_5E03_5C14(_____53C2_6570, "关闭电影模式") then
-        local ____require_result_26 = require("lib.扩展函数.BJ函数.05A．电影函数")
-        local CinematicModeBJ = ____require_result_26.CinematicModeBJ
+        local ____require_result_27 = require("lib.扩展函数.BJ函数.05A．电影函数")
+        local CinematicModeBJ = ____require_result_27.CinematicModeBJ
         CinematicModeBJ(
             false,
             GetPlayersAll()
@@ -599,24 +617,24 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
     end
     local _____89C6_91CE_77E9_5F62 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "视野矩形") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "可见区域") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "解锁视野")
     if _____89C6_91CE_77E9_5F62 ~= "" then
-        ____exports["给全部玩家添加多个区域视野"](_____89C6_91CE_77E9_5F62)
+        ____exports["给玩家组添加多个区域视野"](_____89C6_91CE_77E9_5F62)
     end
     local _____53EF_89C1_533A_57DF1 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "可见区域1")
     local _____53EF_89C1_533A_57DF2 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "可见区域2")
     if _____53EF_89C1_533A_57DF1 ~= "" then
-        ____exports["给全部玩家添加区域视野"](_____53EF_89C1_533A_57DF1)
+        ____exports["给玩家组添加区域视野"](_____53EF_89C1_533A_57DF1)
     end
     if _____53EF_89C1_533A_57DF2 ~= "" then
-        ____exports["给全部玩家添加区域视野"](_____53EF_89C1_533A_57DF2)
+        ____exports["给玩家组添加区域视野"](_____53EF_89C1_533A_57DF2)
     end
     local ____NPC_5F15_7528 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "NPC") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "长老单位")
-    local ____temp_27
+    local ____temp_28
     if ____NPC_5F15_7528 ~= "" then
-        ____temp_27 = ____exports["读取语义单位引用"](____NPC_5F15_7528)
+        ____temp_28 = ____exports["读取语义单位引用"](____NPC_5F15_7528)
     else
-        ____temp_27 = nil
+        ____temp_28 = nil
     end
-    local npcUnit = ____temp_27
+    local npcUnit = ____temp_28
     local _____89E6_53D1_5355_4F4D = ____exports["读取触发单位"]()
     if npcUnit ~= nil and npcUnit ~= 0 then
         if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then
@@ -655,14 +673,15 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
         end
     end
     local _____5F00_95E8_5BF9_8C61 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "开门对象")
-    if _____5F00_95E8_5BF9_8C61 ~= "" then
+    local _____5F00_95E8_5EF6_8FDF_79D2_6570 = _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "开门延时秒数") or _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟开门秒")
+    if _____5F00_95E8_5BF9_8C61 ~= "" and _____5F00_95E8_5EF6_8FDF_79D2_6570 <= 0 then
         local destructable = _____8BFB_53D6_5168_5C40_53E5_67C4(_____5F00_95E8_5BF9_8C61)
         if destructable ~= nil and destructable ~= 0 then
             ModifyGateBJ(bj_GATEOPERATION_OPEN, destructable)
         end
     end
     local _____9690_85CF_963B_6321 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "隐藏阻挡")
-    if _____9690_85CF_963B_6321 ~= "" then
+    if _____9690_85CF_963B_6321 ~= "" and _____5F00_95E8_5EF6_8FDF_79D2_6570 <= 0 then
         local destructable = _____8BFB_53D6_5168_5C40_53E5_67C4(_____9690_85CF_963B_6321)
         if destructable ~= nil and destructable ~= 0 then
             ShowDestructable(destructable, false)
@@ -696,10 +715,10 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
     end
     local _____53D1_653E_91D1_5E01 = _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "发放金币")
     if _____53D1_653E_91D1_5E01 ~= 0 then
-        _____8C03_6574_5168_90E8_73A9_5BB6_91D1_5E01(_____53D1_653E_91D1_5E01)
+        _____8C03_6574_73A9_5BB6_7EC4_91D1_5E01(_____53D1_653E_91D1_5E01)
     end
     local _____9884_8B66_6587_672C = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "预警文本")
-    local _____5EF6_8FDF_79D2_6570 = _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟秒数") or _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟开门秒") or (_____9884_8B66_6587_672C ~= "" and 4 or 0)
+    local _____5EF6_8FDF_79D2_6570 = _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "延迟秒数") or _____5F00_95E8_5EF6_8FDF_79D2_6570 or (_____9884_8B66_6587_672C ~= "" and 4 or 0)
     local _____5EF6_8FDF_63D0_793A = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟提示") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟消息") or _____9884_8B66_6587_672C
     if _____5EF6_8FDF_63D0_793A ~= "" then
         local _____5EF6_8FDF_6D88_606F_7C7B_578B_6807_8BB0 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "延迟消息类型")

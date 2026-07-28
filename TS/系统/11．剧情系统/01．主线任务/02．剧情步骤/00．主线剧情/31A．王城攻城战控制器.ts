@@ -1,0 +1,461 @@
+/** @noSelfInFile */
+
+const jass = require("jass.common") as any;
+
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
+const { 按名字反查总单位ID } = require("系统.01．单位系统.08．单位配置表.04．总单位配置表") as {
+  按名字反查总单位ID: (this: void, name: string) => string | undefined;
+};
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
+  X_FixUnitStandingSafe: (this: void, unit: any) => void;
+};
+const { GS_LoadUintProperty, GS_UnitPry } = require("lib.扩展函数.Star扩展函数.02．GS单位属性") as {
+  GS_LoadUintProperty: (this: void, unit: any, propertyType: number) => number;
+  GS_UnitPry: (this: void, unit: any, change: number, propertyType: number, value: number) => void;
+};
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
+  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
+};
+const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => (this: void) => void;
+};
+const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
+  safeDestroyTrigger: (this: void, trigger: any) => void;
+};
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
+};
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+};
+const { 设置全体玩家游戏失败 } = require("系统.00．核心系统.09．游戏结算开关") as {
+  设置全体玩家游戏失败: (this: void) => boolean;
+};
+
+import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 创建并冻结剧情Boss预置 } from "../../00．剧情系统核心工具/03．剧情Boss预置桥接";
+import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
+
+const CreateTrigger = jass.CreateTrigger as (this: void) => any;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
+const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
+const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, unit: any, order: string) => boolean;
+const IssueTargetOrder = jass.IssueTargetOrder as (this: void, unit: any, order: string, target: any) => boolean;
+const Player = jass.Player as (this: void, playerId: number) => any;
+const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
+const SetUnitOwner = jass.SetUnitOwner as (this: void, unit: any, owner: any, changeColor: boolean) => void;
+const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
+
+const 敌军玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
+const 友军玩家ID = jass.PLAYER_NEUTRAL_PASSIVE as number;
+const 攻城开始延迟毫秒 = 5000;
+const 攻城目标重发间隔毫秒 = 1800;
+const 防御法阵X = -6992.3;
+const 防御法阵Y = -13170.9;
+const 菲利斯出现X = -6906.2;
+const 菲利斯出现Y = -16695.7;
+const 菲利斯对白触发范围 = 600;
+const 耶提尔靠近玩家偏移X = 160;
+const 进攻朝向 = 90;
+const 防守朝向 = 270;
+
+interface 攻城单位预置 {
+  单位名: string;
+  X: number;
+  Y: number;
+  朝向: number;
+}
+
+interface 友军单位预置 extends 攻城单位预置 {
+  生命比例: number;
+  攻击比例: number;
+  护甲比例: number;
+}
+
+interface 友军属性基准 {
+  最大生命: number;
+  攻击力: number;
+  护甲: number;
+}
+
+interface 王城攻城战状态 {
+  世代: number;
+  阶段: number;
+  剩余单位数: number;
+  触发单位: any;
+  防御法阵: any;
+  攻城单位: any[];
+  周期回调ID: number;
+  菲利斯: any;
+  菲利斯接近触发器: any;
+  取消菲利斯接近监听: ((this: void) => void) | undefined;
+  菲利斯出场对话已触发: boolean;
+}
+
+interface 菲利斯接近触发清理参数 {
+  触发器: any;
+}
+
+const 第一波单位预置: 攻城单位预置[] = [
+  { 单位名: "第二军团战士", X: -7124.8, Y: -15925.6, 朝向: 进攻朝向 },
+  { 单位名: "第二军团战士", X: -7244.8, Y: -16015.6, 朝向: 进攻朝向 },
+  { 单位名: "第二军团战士", X: -7004.8, Y: -16015.6, 朝向: 进攻朝向 },
+  { 单位名: "第二军团弓箭手", X: -6717.6, Y: -15921.9, 朝向: 进攻朝向 },
+  { 单位名: "第二军团弓箭手", X: -6837.6, Y: -16011.9, 朝向: 进攻朝向 },
+  { 单位名: "第二军团弓箭手", X: -6597.6, Y: -16011.9, 朝向: 进攻朝向 },
+];
+
+const 第二波单位预置: 攻城单位预置[] = [
+  { 单位名: "第二军团护卫", X: -7130.7, Y: -16299.6, 朝向: 进攻朝向 },
+  { 单位名: "第二军团护卫", X: -7250.7, Y: -16389.6, 朝向: 进攻朝向 },
+  { 单位名: "第二军团护卫", X: -7010.7, Y: -16389.6, 朝向: 进攻朝向 },
+  { 单位名: "第二军团术士", X: -6694.2, Y: -16285.9, 朝向: 进攻朝向 },
+  { 单位名: "第二军团术士", X: -6814.2, Y: -16375.9, 朝向: 进攻朝向 },
+  { 单位名: "第二军团术士", X: -6574.2, Y: -16375.9, 朝向: 进攻朝向 },
+];
+
+const 友军单位预置表: 友军单位预置[] = [
+  { 单位名: "精灵禁军", X: -7224.6, Y: -14381.4, 朝向: 防守朝向, 生命比例: 0.38, 攻击比例: 0.55, 护甲比例: 0.65 },
+  { 单位名: "精灵禁军", X: -6789.2, Y: -14367.6, 朝向: 防守朝向, 生命比例: 0.38, 攻击比例: 0.55, 护甲比例: 0.65 },
+  { 单位名: "精灵弓箭手", X: -7271.5, Y: -14101.1, 朝向: 防守朝向, 生命比例: 0.25, 攻击比例: 0.60, 护甲比例: 0.30 },
+  { 单位名: "精灵弓箭手", X: -6628.4, Y: -14092.0, 朝向: 防守朝向, 生命比例: 0.25, 攻击比例: 0.60, 护甲比例: 0.30 },
+  { 单位名: "虔诚的高等精灵骑士", X: -7520.3, Y: -14400.7, 朝向: 防守朝向, 生命比例: 0.50, 攻击比例: 0.70, 护甲比例: 0.75 },
+  { 单位名: "精灵精英骑射手", X: -6332.1, Y: -14384.2, 朝向: 防守朝向, 生命比例: 0.34, 攻击比例: 0.68, 护甲比例: 0.40 },
+];
+
+const 当前攻城单位世代表: Record<number, number | undefined> = {};
+let 当前王城攻城战状态: 王城攻城战状态 | undefined;
+let 王城攻城战世代 = 0;
+let 已注册攻城单位死亡监听 = false;
+
+function 单位存活(this: void, unit: any): boolean {
+  return unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0 && GetUnitState(unit, jass.UNIT_STATE_LIFE) > 0.405;
+}
+
+function 至少为(this: void, value: number, minimum: number): number {
+  return value < minimum ? minimum : value;
+}
+
+function 读取单位类型ID(this: void, 单位名: string): number {
+  return stringToFourCCSafe(按名字反查总单位ID(单位名));
+}
+
+function 停止攻城目标重发(this: void): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null || 状态.周期回调ID === 0) return;
+  removePeriodicCallback(状态.周期回调ID);
+  状态.周期回调ID = 0;
+}
+
+function on重发攻城目标(this: void): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null || !单位存活(状态.防御法阵)) return;
+  if (状态.阶段 >= 1 && 状态.阶段 <= 2) {
+    for (let i = 0; i < 状态.攻城单位.length; i++) {
+      const unit = 状态.攻城单位[i];
+      if (单位存活(unit)) IssueTargetOrder(unit, "attack", 状态.防御法阵);
+    }
+    return;
+  }
+  if (状态.阶段 === 3 && !状态.菲利斯出场对话已触发 && 单位存活(状态.菲利斯)) {
+    IssueTargetOrder(状态.菲利斯, "attack", 状态.防御法阵);
+  }
+}
+
+function 启动攻城目标重发(this: void): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null || 状态.周期回调ID !== 0) return;
+  状态.周期回调ID = addPeriodicCallback(攻城目标重发间隔毫秒, on重发攻城目标);
+}
+
+function 创建攻城单位(this: void, 预置: 攻城单位预置, 世代: number): boolean {
+  const unitTypeId = 读取单位类型ID(预置.单位名);
+  const 状态 = 当前王城攻城战状态;
+  if (!(unitTypeId > 0) || 状态 == null || !单位存活(状态.防御法阵)) return false;
+
+  const unit = 创建单位并登记排泄安全(Player(敌军玩家ID), unitTypeId, 预置.X, 预置.Y, 预置.朝向);
+  if (!单位存活(unit)) return false;
+
+  当前攻城单位世代表[GetHandleId(unit)] = 世代;
+  状态.攻城单位.push(unit);
+  IssueTargetOrder(unit, "attack", 状态.防御法阵);
+  return true;
+}
+
+function 创建当前阶段单位(this: void, 预置列表: 攻城单位预置[]): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null) return;
+
+  状态.剩余单位数 = 0;
+  for (let i = 0; i < 预置列表.length; i++) {
+    if (创建攻城单位(预置列表[i], 状态.世代)) 状态.剩余单位数++;
+  }
+  if (状态.剩余单位数 > 0) 启动攻城目标重发();
+}
+
+function 读取友军属性基准(this: void, 耶提尔: any): 友军属性基准 {
+  if (!单位存活(耶提尔)) return { 最大生命: 12000, 攻击力: 300, 护甲: 40 };
+  return {
+    最大生命: 至少为(GetUnitState(耶提尔, jass.UNIT_STATE_MAX_LIFE), 12000),
+    攻击力: 至少为(GS_LoadUintProperty(耶提尔, 2), 300),
+    护甲: 至少为(GS_LoadUintProperty(耶提尔, 3), 40),
+  };
+}
+
+function 应用友军动态属性(this: void, unit: any, 预置: 友军单位预置, 基准: 友军属性基准): void {
+  const 目标最大生命 = 至少为(基准.最大生命 * 预置.生命比例, 1800);
+  const 目标攻击力 = 至少为(基准.攻击力 * 预置.攻击比例, 100);
+  const 目标护甲 = 至少为(基准.护甲 * 预置.护甲比例, 8);
+  GS_UnitPry(unit, 0, 0, 目标最大生命 - GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE));
+  GS_UnitPry(unit, 0, 2, 目标攻击力 - GS_LoadUintProperty(unit, 2));
+  GS_UnitPry(unit, 0, 3, 目标护甲 - GS_LoadUintProperty(unit, 3));
+}
+
+function 创建友军单位(this: void, 预置: 友军单位预置, 基准: 友军属性基准): void {
+  const unitTypeId = 读取单位类型ID(预置.单位名);
+  if (!(unitTypeId > 0)) return;
+  const unit = 创建单位并登记排泄安全(Player(友军玩家ID), unitTypeId, 预置.X, 预置.Y, 预置.朝向);
+  if (!单位存活(unit)) return;
+  应用友军动态属性(unit, 预置, 基准);
+  IssueImmediateOrder(unit, "holdposition");
+}
+
+function 布置耶提尔与友军(this: void): void {
+  const 耶提尔 = 读取语义单位引用("主线NPC.耶提尔");
+  const 基准 = 读取友军属性基准(耶提尔);
+  if (单位存活(耶提尔)) {
+    SetUnitPosition(耶提尔, -6924.1, -13933.9);
+    SetUnitFacing(耶提尔, 防守朝向);
+    IssueImmediateOrder(耶提尔, "holdposition");
+  }
+  for (let i = 0; i < 友军单位预置表.length; i++) 创建友军单位(友军单位预置表[i], 基准);
+}
+
+function 创建城门防御法阵(this: void): any {
+  const unitTypeId = 读取单位类型ID("王城防御法阵");
+  if (!(unitTypeId > 0)) return null;
+  const unit = 创建单位并登记排泄安全(Player(友军玩家ID), unitTypeId, 防御法阵X, 防御法阵Y, 防守朝向);
+  if (!单位存活(unit)) return null;
+  X_FixUnitStandingSafe(unit);
+  return unit;
+}
+
+function on延迟销毁菲利斯接近触发器(this: void, variable?: any): void {
+  const 参数 = variable as 菲利斯接近触发清理参数 | undefined;
+  if (参数 == null || 参数.触发器 == null || 参数.触发器 === 0) return;
+  safeDestroyTrigger(参数.触发器);
+}
+
+function 注销菲利斯接近监听(this: void, 状态: 王城攻城战状态): void {
+  const 取消监听 = 状态.取消菲利斯接近监听;
+  状态.取消菲利斯接近监听 = undefined;
+  if (取消监听 != null) 取消监听();
+
+  const 触发器 = 状态.菲利斯接近触发器;
+  状态.菲利斯接近触发器 = null;
+  if (触发器 != null && 触发器 !== 0) {
+    addDelayedCallback(1, on延迟销毁菲利斯接近触发器, { 触发器 } as 菲利斯接近触发清理参数);
+  }
+}
+
+export function 结束菲利斯攻城等待(this: void): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null) return;
+  停止攻城目标重发();
+  for (let i = 0; i < 状态.攻城单位.length; i++) {
+    if (单位存活(状态.攻城单位[i])) IssueImmediateOrder(状态.攻城单位[i], "stop");
+  }
+  if (单位存活(状态.菲利斯)) IssueImmediateOrder(状态.菲利斯, "stop");
+  if (状态.菲利斯接近触发器 != null && 状态.菲利斯接近触发器 !== 0) {
+    注销菲利斯接近监听(状态);
+  }
+}
+
+export function 登记存活攻城单位为菲利斯护卫(this: void): number {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null || !单位存活(状态.菲利斯)) return 0;
+  const { 登记Boss战待带入护卫 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.06．Boss战护卫") as {
+    登记Boss战待带入护卫: (this: void, boss: any, guard: any, 护卫类型: string) => boolean;
+  };
+
+  let count = 0;
+  for (let i = 0; i < 状态.攻城单位.length; i++) {
+    const unit = 状态.攻城单位[i];
+    if (!单位存活(unit)) continue;
+    IssueImmediateOrder(unit, "stop");
+    if (登记Boss战待带入护卫(状态.菲利斯, unit, "菲利斯第二军团残部")) count++;
+    当前攻城单位世代表[GetHandleId(unit)] = undefined;
+  }
+  状态.攻城单位 = [];
+  状态.剩余单位数 = 0;
+  return count;
+}
+
+function on菲利斯接近触发(this: void): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null || 状态.阶段 !== 3 || 状态.菲利斯出场对话已触发) return;
+
+  const 进入单位 = GetTriggerUnit();
+  if (!单位存活(进入单位)) return;
+  const 耶提尔 = 读取语义单位引用("主线NPC.耶提尔");
+  const 由耶提尔触发 = 单位存活(耶提尔) && 进入单位 === 耶提尔;
+  const 由玩家英雄触发 = 是玩家英雄组单位(进入单位);
+  if (!由耶提尔触发 && !由玩家英雄触发) return;
+
+  状态.菲利斯出场对话已触发 = true;
+  结束菲利斯攻城等待();
+
+  let 剧情触发单位 = 状态.触发单位;
+  if (由玩家英雄触发) {
+    剧情触发单位 = 进入单位;
+    if (单位存活(耶提尔)) {
+      SetUnitPosition(耶提尔, GetUnitX(进入单位) + 耶提尔靠近玩家偏移X, GetUnitY(进入单位));
+      IssueImmediateOrder(耶提尔, "stop");
+    }
+  }
+
+  const { 播放主线剧情片段 } = require("../02．剧情步骤播放器") as {
+    播放主线剧情片段: (this: void, 片段ID: string, 上下文?: any) => boolean;
+  };
+  播放主线剧情片段("elven_city_felice_projection_arrival", {
+    片段ID: "elven_city_felice_projection_arrival",
+    触发配置名: "菲利斯接近范围",
+    触发单位: 剧情触发单位,
+  });
+}
+
+function 注册菲利斯接近对白触发(this: void, 状态: 王城攻城战状态, 菲利斯: any): void {
+  const 触发器 = CreateTrigger();
+  状态.菲利斯 = 菲利斯;
+  状态.菲利斯接近触发器 = 触发器;
+  状态.菲利斯出场对话已触发 = false;
+
+  if (safeTriggerAddAction(触发器, on菲利斯接近触发) == null) {
+    状态.菲利斯接近触发器 = null;
+    safeDestroyTrigger(触发器);
+    return;
+  }
+  状态.取消菲利斯接近监听 = registerUnitInRangeTrigger(
+    触发器,
+    菲利斯,
+    菲利斯对白触发范围,
+    null,
+    false
+  );
+}
+
+function on开始王城攻城第二波(this: void, 预期世代?: any): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null || 状态.世代 !== 预期世代 || 状态.阶段 !== 1) return;
+
+  状态.阶段 = 2;
+  创建当前阶段单位(第二波单位预置);
+  if (状态.剩余单位数 <= 0) addDelayedCallback(1800, on启动菲利斯出场, 状态.世代);
+}
+
+function on启动菲利斯出场(this: void, 预期世代?: any): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null || 状态.世代 !== 预期世代 || 状态.阶段 !== 2) return;
+
+  状态.阶段 = 3;
+  停止攻城目标重发();
+  const bossUnit = 创建并冻结剧情Boss预置({
+    Boss键: "Boss.菲利斯",
+    Boss名: "菲利斯",
+    X: 菲利斯出现X,
+    Y: 菲利斯出现Y,
+    朝向: 进攻朝向,
+    预创建后暂停: false,
+    预创建后无敌: true,
+  });
+  if (bossUnit == null || bossUnit === 0) return;
+  SetUnitOwner(bossUnit, Player(敌军玩家ID), true);
+  注册菲利斯接近对白触发(状态, bossUnit);
+  IssueTargetOrder(bossUnit, "attack", 状态.防御法阵);
+  启动攻城目标重发();
+}
+
+function on王城攻城单位死亡(this: void, dyingUnit: any): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null) return;
+  if (dyingUnit === 状态.菲利斯) {
+    结束菲利斯攻城等待();
+    return;
+  }
+  if (dyingUnit === 状态.防御法阵 && 状态.阶段 >= 1 && 状态.阶段 <= 3) {
+    状态.阶段 = -1;
+    结束菲利斯攻城等待();
+    设置全体玩家游戏失败();
+    return;
+  }
+  if (状态.阶段 < 1 || 状态.阶段 > 2) return;
+
+  const handleId = GetHandleId(dyingUnit);
+  if (当前攻城单位世代表[handleId] !== 状态.世代) return;
+  当前攻城单位世代表[handleId] = undefined;
+  delete 当前攻城单位世代表[handleId];
+  for (let i = 状态.攻城单位.length - 1; i >= 0; i--) {
+    if (状态.攻城单位[i] === dyingUnit) 状态.攻城单位.splice(i, 1);
+  }
+
+  状态.剩余单位数--;
+  if (状态.剩余单位数 > 0) return;
+  停止攻城目标重发();
+  if (状态.阶段 === 1) {
+    addDelayedCallback(1600, on开始王城攻城第二波, 状态.世代);
+    return;
+  }
+  addDelayedCallback(1800, on启动菲利斯出场, 状态.世代);
+}
+
+function 确保攻城单位死亡监听(this: void): void {
+  if (已注册攻城单位死亡监听) return;
+  已注册攻城单位死亡监听 = true;
+  registerDeathListener(on王城攻城单位死亡);
+}
+
+function on正式开始王城攻城战(this: void, 预期世代?: any): void {
+  const 状态 = 当前王城攻城战状态;
+  if (状态 == null || 状态.世代 !== 预期世代 || 状态.阶段 !== 0) return;
+  状态.防御法阵 = 创建城门防御法阵();
+  if (!单位存活(状态.防御法阵)) return;
+
+  布置耶提尔与友军();
+  状态.阶段 = 1;
+  创建当前阶段单位(第一波单位预置);
+  if (状态.剩余单位数 <= 0) addDelayedCallback(1600, on开始王城攻城第二波, 状态.世代);
+}
+
+export function 启动王城攻城战(this: void): void {
+  if (当前王城攻城战状态 != null && 当前王城攻城战状态.阶段 >= 0) return;
+  确保攻城单位死亡监听();
+  王城攻城战世代++;
+  当前王城攻城战状态 = {
+    世代: 王城攻城战世代,
+    阶段: 0,
+    剩余单位数: 0,
+    触发单位: 读取当前剧情动作上下文().触发单位,
+    防御法阵: null,
+    攻城单位: [],
+    周期回调ID: 0,
+    菲利斯: null,
+    菲利斯接近触发器: null,
+    取消菲利斯接近监听: undefined,
+    菲利斯出场对话已触发: false,
+  };
+  addDelayedCallback(攻城开始延迟毫秒, on正式开始王城攻城战, 王城攻城战世代);
+}
+
+export {};

@@ -1,7 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 --- 不同技能伤害序列装备测试
---
 -- 先通过 wp177 / wp181 / wp191 获取待测装备，再输入 1052。
 -- 地图预设大法师会对周围每个敌人依次造成 4 次技能伤害，
 -- 四次伤害分别携带不同的技能 ID，用于验证不同技能计数与下一次技能伤害触发。

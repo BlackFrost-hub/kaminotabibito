@@ -15,6 +15,7 @@ export * from "./06．仇恨系统/index";
 export * from "./07．异界Boss/index";
 export * from "./08．单位配置表/index";
 export * from "./09．科技配置表/index";
+export * from "./10．护卫系统/index";
 
 const 单位初始化创建系统 = require("系统.01．单位系统.00．单位初始化创建.index") as { init?: () => void };
 

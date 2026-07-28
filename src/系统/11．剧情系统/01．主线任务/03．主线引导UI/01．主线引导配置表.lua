@@ -22,11 +22,18 @@ local STRING_309 = "|cffffff00『主线引导』：|r回到|cffffffcc『西里�
 local STRING_310 = "|cffffff00『主线引导』：|r击败神秘蒙面人！！"
 local STRING_311 = "|cffffff00『主线目标』：|r跟随精灵族长！"
 local STRING_312 = "|cffffff00『主线引导』：|r使用|cffff99cc『森林传送阵』（在传送阵附近使用异界能力中的『环境交互』）|r前往|cffffcc99『克林山谷』|r寻找|cffff9900『克林姆德一脉』|r"
-local STRING_313 = "|cffffff00『主线引导』：|r拜访此地的|cffffffcc『看守者』（村口）|r验明身份。"
+local STRING_313 = "|cffffff00『主线引导』：|r前往拜访|cffff99cc『阿尔文』|r，验明帝国使者身份。"
 local STRING_314 = "|cffffff00『主线引导』：|r穿过|cffff9900『克林山谷』|r前往|cffff9900『克林姆德城』|r"
-local STRING_315 = "|cffffff00『主线引导』：|r前往|cffff9900『克林姆德王宫』|r觐见|cffff99cc『克林姆德王』|r|n。"
+local STRING_315 = "|cffffff00『主线引导』：|r前往|cffff9900『克林姆德王宫』|r觐见|cffff99cc『克林姆德国王』|r。"
 local STRING_316 = "|cffffff00『主线引导』：觐见|cffff99cc『克林姆德王』|r|n。"
-local STRING_317 = "|cffffff00『主线目标』：|r|cffffcc99前往东南方向的『巨魔一族』领地调查。|r"
+local STRING_317 = "|cffffff00『主线目标』：|r|cffffcc99前往东南方向的『巨魔一族』领地调查。|r（小地图信号处）"
+local _____8FDB_5EA626_4E3B_7EBF_5F15_5BFC = "|cffffff00『主线目标』：|r闯入巨魔腹地，击败巨魔王！"
+local _____8FDB_5EA627_4E3B_7EBF_5F15_5BFC = "|cffffff00『主线目标』：|r击败巨魔王！"
+local _____8FDB_5EA628_4E3B_7EBF_5F15_5BFC = "|cffffff00『主线目标』：|r查看树魔首领死亡处掉落的物品！"
+local _____8FDB_5EA629_4E3B_7EBF_5F15_5BFC = "|cffffff00『主线目标』：|r返回|cffff99cc『克林姆德王城』|r，向|cffff99cc『克林姆德王』|r汇报调查结果。"
+local _____8FDB_5EA630_4E3B_7EBF_5F15_5BFC = "|cffffff00『主线目标』：|r前往|cff99ffcc『术法协会』|r，找|cff99ffcc『赫克提尔』|r解读魔法信件。"
+local _____8FDB_5EA631_4E3B_7EBF_5F15_5BFC = "|cffffff00『主线目标』：|r前往会议室。"
+local _____8FDB_5EA632_4E3B_7EBF_5F15_5BFC = "|cffffff00『主线目标』：|r守住城门处的|cff66ccff『王城防御法阵』|r，击退第二军团并击败|cffff3333『菲利斯』|r。|cffff3333『法阵被摧毁将直接游戏失败！』|r"
 --- 进度 -> 配置映射表
 local _____8FDB_5EA6_914D_7F6E_8868 = {}
 _____8FDB_5EA6_914D_7F6E_8868[0] = {["提示文本"] = STRING_293, ["镜头X"] = -29104.8, ["镜头Y"] = -27527.1}
@@ -53,7 +60,15 @@ _____8FDB_5EA6_914D_7F6E_8868[20] = {["提示文本"] = STRING_313, ["镜头X"] 
 _____8FDB_5EA6_914D_7F6E_8868[21] = {["提示文本"] = STRING_314, ["镜头X"] = -6997.4, ["镜头Y"] = -13110.9}
 _____8FDB_5EA6_914D_7F6E_8868[22] = {["提示文本"] = STRING_315, ["镜头X"] = -10900.6, ["镜头Y"] = -10601.8}
 _____8FDB_5EA6_914D_7F6E_8868[23] = {["提示文本"] = STRING_316, ["镜头X"] = 18924.9, ["镜头Y"] = -24399.8}
+_____8FDB_5EA6_914D_7F6E_8868[24] = {["提示文本"] = STRING_316, ["镜头X"] = 18924.9, ["镜头Y"] = -24399.8}
 _____8FDB_5EA6_914D_7F6E_8868[25] = {["提示文本"] = STRING_317, ["镜头X"] = -2906.2, ["镜头Y"] = -14099.8}
+_____8FDB_5EA6_914D_7F6E_8868[26] = {["提示文本"] = _____8FDB_5EA626_4E3B_7EBF_5F15_5BFC}
+_____8FDB_5EA6_914D_7F6E_8868[27] = {["提示文本"] = _____8FDB_5EA627_4E3B_7EBF_5F15_5BFC, ["镜头跟随单位"] = "Boss.树魔首领"}
+_____8FDB_5EA6_914D_7F6E_8868[28] = {["提示文本"] = _____8FDB_5EA628_4E3B_7EBF_5F15_5BFC}
+_____8FDB_5EA6_914D_7F6E_8868[29] = {["提示文本"] = _____8FDB_5EA629_4E3B_7EBF_5F15_5BFC, ["镜头跟随单位"] = "ZX.克林姆德王"}
+_____8FDB_5EA6_914D_7F6E_8868[30] = {["提示文本"] = _____8FDB_5EA630_4E3B_7EBF_5F15_5BFC, ["镜头跟随单位"] = "ZX.赫克提尔"}
+_____8FDB_5EA6_914D_7F6E_8868[31] = {["提示文本"] = _____8FDB_5EA631_4E3B_7EBF_5F15_5BFC, ["镜头跟随单位"] = "ZX.克林姆德王"}
+_____8FDB_5EA6_914D_7F6E_8868[32] = {["提示文本"] = _____8FDB_5EA632_4E3B_7EBF_5F15_5BFC, ["镜头X"] = -6992.3, ["镜头Y"] = -13170.9}
 --- 根据剧情进度获取配置
 -- 进度 < 1 时使用 0；否则直接使用进度值
 ____exports["获取进度配置"] = function()

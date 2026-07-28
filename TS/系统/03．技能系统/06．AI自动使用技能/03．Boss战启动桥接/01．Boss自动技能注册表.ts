@@ -5,7 +5,7 @@ const { getServerTime } = require("系统.00．核心系统.05．中心计时器
   getServerTime: (this: void) => number;
 };
 
-export type Boss自动技能来源 = "STES.Boss" | "Boss战.单位" | "Boss战.绑定单位";
+export type Boss自动技能来源 = "STES.Boss" | "Boss战.单位" | "Boss战.绑定单位" | "Boss测试";
 
 export interface Boss自动技能启动上下文 {
   Boss单位: any;

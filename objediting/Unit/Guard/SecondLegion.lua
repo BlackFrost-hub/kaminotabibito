@@ -1,0 +1,27 @@
+-- Second Legion guard.
+
+createSecondLegionUnit('n063', 'hfoo', {
+  name = '第二军团护卫',
+  description = '持剑盾保护菲利斯与军团术士的精锐护卫。',
+  modelFile = 'Unit\\Guard\\SecondLegionGuard.mdx',
+  icon = 'Unit\\Guard\\Icon\\SecondLegionGuard.blp',
+  scale = 1.25,
+  hp = 8000,
+  hpRegen = 80.0,
+  defense = 35,
+  speed = 330,
+  collision = 32.0,
+  acquire = 700.0,
+  pointValue = 250,
+  bounty = 1000,
+  damage = 650,
+  attackCooldown = 1.60,
+  attackRange = 128,
+  rangeBuffer = 250.0,
+  attackTargets = 'ground,enemy,neutral,structure,debris,item,ward',
+  attackType = AttackType.Normal,
+  weaponType = WeaponType.Normal,
+  weaponSound = WeaponSound.MetalHeavySlice,
+  attackBackswing = 0.50,
+  attackDamagePoint = 0.40,
+})

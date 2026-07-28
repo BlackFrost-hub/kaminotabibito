@@ -25,6 +25,9 @@ const { 按名字反查物品ID } = require("系统.02．物品系统.13．物�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
+const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => () => void;
+};
 const { 查找主线剧情片段 } = require("../02．剧情步骤/02．剧情步骤播放器") as {
   查找主线剧情片段: (this: void, 片段ID: string) => any;
 };
@@ -40,8 +43,9 @@ import {
   主线剧情可破坏物初始化配置表,
   主线剧情矩形入口配置表,
 } from "./01．主线NPC初始化配置表";
-import type { 主线NPC初始化配置, 主线剧情入口配置 } from "./00．主线剧情入口类型";
+import type { 主线NPC初始化配置, 主线剧情入口分支配置, 主线剧情入口配置 } from "./00．主线剧情入口类型";
 import { 读取剧情进度 } from "../00．剧情系统核心工具/01．剧情动作上下文";
+import { 注册剧情运行时单位 } from "../00．剧情系统核心工具/08．剧情运行时单位";
 import { 初始化进度01_精灵村长老发布任务核心 } from "../02．剧情步骤/00．主线剧情/01．精灵村长老发布任务";
 import { 初始化进度02_地精洞窟进入演出核心 } from "../02．剧情步骤/00．主线剧情/02．地精洞窟进入演出";
 import { 初始化进度03_地精祭祀Boss前导核心 } from "../02．剧情步骤/00．主线剧情/03．地精祭祀Boss前导";
@@ -56,12 +60,11 @@ const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetDestructableInvulnerable = jass.SetDestructableInvulnerable as (this: void, destructable: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
-const TriggerRegisterUnitInRange = jass.TriggerRegisterUnitInRange as (this: void, trig: any, whichUnit: any, range: number, filter: any) => any;
 const 中立被动玩家ID = 15;
 let 已请求初始化主线剧情入口 = false;
 let 已执行初始化主线剧情入口 = false;
 const NPC运行时表: Record<string, any> = {};
-const 入口配置By触发器ID: Record<string, 主线剧情入口配置> = {};
+const 触发器ID对应入口配置列表: Record<string, 主线剧情入口分支配置[]> = {};
 
 
 function 获取全局句柄(this: void, 变量名: string): any {
@@ -82,6 +85,7 @@ function 写入NPC绑定(this: void, 配置: 主线NPC初始化配置, unit: any
 function 记录NPC运行时(this: void, 配置: 主线NPC初始化配置, unit: any): void {
   if (unit == null || unit === 0) return;
   NPC运行时表[配置.配置名] = unit;
+  注册剧情运行时单位(`主线NPC.${配置.配置名}`, unit);
 }
 
 function 初始化单个NPC(this: void, 配置: 主线NPC初始化配置): void {
@@ -93,12 +97,12 @@ function 初始化单个NPC(this: void, 配置: 主线NPC初始化配置): void 
   记录NPC运行时(配置, unit);
 }
 
-function 记录入口触发器配置(this: void, trigger: any, 配置: 主线剧情入口配置): void {
+function 记录入口触发器配置(this: void, trigger: any, 配置列表: 主线剧情入口分支配置[]): void {
   if (trigger == null) return;
-  入口配置By触发器ID[tostring(GetHandleId(trigger))] = 配置;
+  触发器ID对应入口配置列表[tostring(GetHandleId(trigger))] = 配置列表;
 }
 
-function 剧情进度满足入口配置(this: void, 配置: 主线剧情入口配置): boolean {
+function 剧情进度满足入口配置(this: void, 配置: 主线剧情入口分支配置): boolean {
   const 当前剧情进度 = 读取剧情进度();
   if (配置.需要剧情进度 != null && 当前剧情进度 !== 配置.需要剧情进度) return false;
   if (配置.最低剧情进度 != null && 当前剧情进度 < 配置.最低剧情进度) return false;
@@ -106,7 +110,7 @@ function 剧情进度满足入口配置(this: void, 配置: 主线剧情入口�
   return true;
 }
 
-function 触发单位满足入口物品配置(this: void, 配置: 主线剧情入口配置, 触发单位: any): boolean {
+function 触发单位满足入口物品配置(this: void, 配置: 主线剧情入口分支配置, 触发单位: any): boolean {
   if (配置.需要物品名 == null || 配置.需要物品名 === "") return true;
   if (触发单位 == null || 触发单位 === 0) return false;
   const 物品类型ID = stringToFourCCSafe(按名字反查物品ID(配置.需要物品名));
@@ -114,35 +118,49 @@ function 触发单位满足入口物品配置(this: void, 配置: 主线剧情�
   return UnitHasItemOfTypeBJ(触发单位, 物品类型ID);
 }
 
-function on主线剧情入口触发(this: void): void {
-  const trigger = GetTriggeringTrigger();
-  if (trigger == null) return;
-  const 配置 = 入口配置By触发器ID[tostring(GetHandleId(trigger))];
-  if (配置 == null || 配置.剧情片段ID == null) return;
-  if (!剧情进度满足入口配置(配置)) return;
-  const 触发单位 = GetTriggerUnit();
-  if (!触发单位满足入口物品配置(配置, 触发单位)) return;
+function 尝试播放入口配置(this: void, 配置: 主线剧情入口分支配置, 触发单位: any): boolean {
+  if (配置 == null || 配置.剧情片段ID == null) return false;
+  if (!剧情进度满足入口配置(配置)) return false;
+  if (!触发单位满足入口物品配置(配置, 触发单位)) return false;
 
   const 片段 = 查找主线剧情片段(配置.剧情片段ID);
-  if (片段 == null) return;
+  if (片段 == null) return false;
 
   YDUserDataSetSafe("string", "主线剧情入口", "触发配置", "string", 配置.配置名);
   YDUserDataSetSafe("string", "主线剧情入口", "剧情片段ID", "string", 配置.剧情片段ID);
   if (触发单位 != null) {
     YDUserDataSetSafe("string", "主线剧情入口", "触发单位", "unit", 触发单位);
   }
-  播放主线剧情片段(配置.剧情片段ID, {
+  return 播放主线剧情片段(配置.剧情片段ID, {
     片段ID: 配置.剧情片段ID,
     触发配置名: 配置.配置名,
     触发单位,
   });
 }
 
-function 创建入口触发器(this: void, 配置: 主线剧情入口配置): any {
+function on主线剧情入口触发(this: void): void {
+  const trigger = GetTriggeringTrigger();
+  if (trigger == null) return;
+  const 配置列表 = 触发器ID对应入口配置列表[tostring(GetHandleId(trigger))];
+  if (配置列表 == null) return;
+
+  const 触发单位 = GetTriggerUnit();
+  for (let i = 0; i < 配置列表.length; i++) {
+    if (尝试播放入口配置(配置列表[i], 触发单位)) return;
+  }
+}
+
+function 创建入口触发器(this: void, 配置列表: 主线剧情入口分支配置[]): any {
   const trigger = CreateTrigger();
-  记录入口触发器配置(trigger, 配置);
+  记录入口触发器配置(trigger, 配置列表);
   TriggerAddAction(trigger, on主线剧情入口触发);
   return trigger;
+}
+
+function 展开入口剧情分支(this: void, 配置: 主线剧情入口配置): 主线剧情入口分支配置[] {
+  const 分支列表 = 配置.剧情进度分支;
+  if (分支列表 != null && 分支列表.length > 0) return 分支列表;
+  return [配置];
 }
 
 function 初始化单位范围入口(this: void): void {
@@ -150,7 +168,7 @@ function 初始化单位范围入口(this: void): void {
     const 配置 = 主线剧情单位范围入口配置表[i];
     const unit = NPC运行时表[配置.NPC配置名];
     if (unit == null) continue;
-    TriggerRegisterUnitInRange(创建入口触发器(配置), unit, 配置.注册范围, null);
+    registerUnitInRangeTrigger(创建入口触发器(展开入口剧情分支(配置)), unit, 配置.注册范围, null, false);
   }
 }
 
@@ -159,7 +177,7 @@ function 初始化矩形入口(this: void): void {
     const 配置 = 主线剧情矩形入口配置表[i];
     const 矩形 = 获取全局句柄(配置.矩形变量名);
     if (矩形 == null) continue;
-    TriggerRegisterEnterRectSimple(创建入口触发器(配置), 矩形);
+    TriggerRegisterEnterRectSimple(创建入口触发器(展开入口剧情分支(配置)), 矩形);
   }
 }
 
@@ -168,7 +186,7 @@ function 初始化全局单位入口(this: void): void {
     const 配置 = 主线剧情全局单位入口配置表[i];
     const unit = 获取全局句柄(配置.单位变量名);
     if (unit == null) continue;
-    TriggerRegisterUnitInRange(创建入口触发器(配置), unit, 配置.注册范围, null);
+    registerUnitInRangeTrigger(创建入口触发器(展开入口剧情分支(配置)), unit, 配置.注册范围, null, false);
   }
 }
 

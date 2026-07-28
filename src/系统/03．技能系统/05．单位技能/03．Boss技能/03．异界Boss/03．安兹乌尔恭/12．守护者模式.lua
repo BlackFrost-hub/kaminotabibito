@@ -46,18 +46,18 @@ ____exports["推进安兹守护者模式"] = function(context)
     state["当前生命比例"] = life / maxLife
     if state["阶段状态"] == "失衡" and now >= state["失衡结束Ms"] then
         state["阶段状态"] = state["当前生命比例"] < cfg["雅儿贝德狂怒阈值"] and "狂怒护卫" or "正常护卫"
-        local ____opt_14 = state["成员生命周期"]
-        if ____opt_14 ~= nil then
-            ____opt_14["设置状态"](____opt_14, "雅儿贝德", "活跃", "失衡结束")
+        local ____opt_15 = state["成员生命周期"]
+        if ____opt_15 ~= nil then
+            ____opt_15["设置状态"](____opt_15, "雅儿贝德", "活跃", "失衡结束")
         end
     end
     if state["阶段状态"] ~= "失衡" and state["当前生命比例"] <= state["下一个失衡生命比例"] and state["下一个失衡生命比例"] > cfg["雅儿贝德锁血比例"] then
         state["阶段状态"] = "失衡"
         state["失衡结束Ms"] = now + cfg["雅儿贝德失衡持续秒"] * 1000
         state["下一个失衡生命比例"] = state["下一个失衡生命比例"] - cfg["雅儿贝德失衡生命步进"]
-        local ____opt_16 = state["成员生命周期"]
-        if ____opt_16 ~= nil then
-            ____opt_16["设置状态"](____opt_16, "雅儿贝德", "失衡", "累计损失20%最大生命")
+        local ____opt_17 = state["成员生命周期"]
+        if ____opt_17 ~= nil then
+            ____opt_17["设置状态"](____opt_17, "雅儿贝德", "失衡", "累计损失20%最大生命")
         end
     elseif state["阶段状态"] ~= "失衡" then
         state["阶段状态"] = state["当前生命比例"] < cfg["雅儿贝德狂怒阈值"] and "狂怒护卫" or "正常护卫"
@@ -66,12 +66,15 @@ ____exports["推进安兹守护者模式"] = function(context)
 end
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.index")
 local _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
-local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_2.registerDamageModifier
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-getServerTime = ____require_result_3.getServerTime
+local ____require_result_1 = require("系统.01．单位系统.10．护卫系统.index")
+local _____521B_5EFA_81EA_5B9A_4E49_62A4_536B_5355_4F4D = ____require_result_1["创建自定义护卫单位"]
+local _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B = ____require_result_1["处理Boss结束全部护卫"]
+local ____require_result_2 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_2["读取单位攻击力"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_3.registerDamageModifier
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+getServerTime = ____require_result_4.getServerTime
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -94,12 +97,12 @@ local function _____67E5_627E_8054_5408_4E0A_4E0B_6587(unit)
         local i = 0
         while i < #contexts do
             local context = contexts[i + 1]
-            local ____temp_6 = context["安兹单位"] == unit
-            if not ____temp_6 then
-                local ____opt_4 = context["雅儿贝德"]
-                ____temp_6 = (____opt_4 and ____opt_4["单位"]) == unit
+            local ____temp_7 = context["安兹单位"] == unit
+            if not ____temp_7 then
+                local ____opt_5 = context["雅儿贝德"]
+                ____temp_7 = (____opt_5 and ____opt_5["单位"]) == unit
             end
-            if ____temp_6 then
+            if ____temp_7 then
                 return context
             end
             i = i + 1
@@ -159,34 +162,45 @@ local function _____521B_5EFA_96C5_513F_8D1D_5FB7_5355_4F4D(context)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]
     local facing = GetUnitFacing(boss)
     local angle = (facing + 90) * DEG_TO_RAD
-    return _____521B_5EFA_53EC_5524_7269({
-        ["主人单位"] = boss,
-        ["所属玩家"] = GetOwningPlayer(boss),
-        ["单位类型"] = _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["正式单位ID"],
-        ["单位名称"] = _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["单位名称"],
-        ["模型路径"] = _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["模型路径"],
-        X = GetUnitX(boss) + Cos(angle) * cfg["雅儿贝德出生距离"],
-        Y = GetUnitY(boss) + Sin(angle) * cfg["雅儿贝德出生距离"],
-        ["朝向"] = facing,
-        ["生命值"] = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg["雅儿贝德生命比例"],
-        ["生命值受小怪倍率"] = false,
-        ["攻击力"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["雅儿贝德攻击比例"],
-        ["攻击间隔"] = cfg["雅儿贝德攻击间隔"],
-        ["攻击范围"] = cfg["雅儿贝德攻击范围"],
-        ["索敌范围"] = cfg["雅儿贝德索敌范围"],
-        ["护甲"] = cfg["雅儿贝德护甲"]
-    })
+    return _____521B_5EFA_81EA_5B9A_4E49_62A4_536B_5355_4F4D(
+        {
+            ["主Boss单位"] = boss,
+            ["护卫类型"] = "安兹乌尔恭:雅儿贝德",
+            ["护卫血条优先级"] = 300,
+            ["标记为召唤单位"] = true,
+            ["Boss结束处理"] = "移除"
+        },
+        function()
+            return _____521B_5EFA_53EC_5524_7269({
+                ["主人单位"] = boss,
+                ["所属玩家"] = GetOwningPlayer(boss),
+                ["单位类型"] = _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["正式单位ID"],
+                ["单位名称"] = _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["单位名称"],
+                ["模型路径"] = _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["模型路径"],
+                X = GetUnitX(boss) + Cos(angle) * cfg["雅儿贝德出生距离"],
+                Y = GetUnitY(boss) + Sin(angle) * cfg["雅儿贝德出生距离"],
+                ["朝向"] = facing,
+                ["生命值"] = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg["雅儿贝德生命比例"],
+                ["生命值受小怪倍率"] = false,
+                ["攻击力"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["雅儿贝德攻击比例"],
+                ["攻击间隔"] = cfg["雅儿贝德攻击间隔"],
+                ["攻击范围"] = cfg["雅儿贝德攻击范围"],
+                ["索敌范围"] = cfg["雅儿贝德索敌范围"],
+                ["护甲"] = cfg["雅儿贝德护甲"]
+            })
+        end
+    )
 end
 ____exports["启动安兹守护者模式"] = function(context)
     if not _____5355_4F4D_6709_6548(context["安兹单位"]) or context["挑战已结束"] then
         return false
     end
-    local ____opt_7 = context["雅儿贝德"]
-    if (____opt_7 and ____opt_7["已初始化"]) == true and context["雅儿贝德"]["成员生命周期"] ~= nil then
+    local ____opt_8 = context["雅儿贝德"]
+    if (____opt_8 and ____opt_8["已初始化"]) == true and context["雅儿贝德"]["成员生命周期"] ~= nil then
         return true
     end
-    local ____opt_9 = context["雅儿贝德"]
-    local albedo = ____opt_9 and ____opt_9["单位"]
+    local ____opt_10 = context["雅儿贝德"]
+    local albedo = ____opt_10 and ____opt_10["单位"]
     if not _____5355_4F4D_6709_6548(albedo) then
         albedo = _____521B_5EFA_96C5_513F_8D1D_5FB7_5355_4F4D(context)
     end
@@ -213,8 +227,15 @@ ____exports["启动安兹守护者模式"] = function(context)
         ["参与最终结算"] = false
     }}})
     state["独占状态"] = _____521B_5EFA_53EF_62A2_5360_72EC_5360_72B6_6001_7BA1_7406_5668({["名称"] = "安兹与雅儿贝德联合技能独占", ["清理"] = context["清理"]})
-    local ____self_11 = context["清理"]
-    ____self_11["登记单位"](____self_11, "雅儿贝德护卫单位", albedo)
+    local boss = context["安兹单位"]
+    local ____self_12 = context["清理"]
+    ____self_12["登记清理"](
+        ____self_12,
+        "雅儿贝德护卫单位",
+        function()
+            _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B(boss)
+        end
+    )
     _____786E_4FDD_96C5_513F_8D1D_5FB7_4F24_5BB3_4FEE_6B63()
     _____786E_4FDD_96C5_513F_8D1D_5FB7_8FD0_884C_65F6_9A71_52A8()
     _____6CE8_518C_96C5_513F_8D1D_5FB7_81F3_5C0A_62E6_622A()

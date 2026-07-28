@@ -87,6 +87,9 @@ local function getHeroGroup()
 end
 --- 检查死亡单位是否触发金币平分（中立敌对或玩家8）
 local function isValidDyingUnit(dyingUnit)
+    if jass.IsUnitType(dyingUnit, jass.UNIT_TYPE_SUMMONED) == true then
+        return false
+    end
     local playerId = getUnitOwnerId(nil, dyingUnit)
     return playerId == 12 or playerId == 7
 end

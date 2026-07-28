@@ -57,6 +57,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.00．核心系统.09．游戏结算开关")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 local centerTimer = require("系统.00．核心系统.05．中心计时器")
 local function expose(self, name, fn)
     if type(fn) ~= "function" then

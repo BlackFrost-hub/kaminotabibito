@@ -80,6 +80,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.01．单位系统.10．护卫系统.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 local _____5355_4F4D_521D_59CB_5316_521B_5EFA_7CFB_7EDF = require("系统.01．单位系统.00．单位初始化创建.index")
 --- 初始化单位系统
 -- 各子系统已在各自 index.ts 中自动初始化

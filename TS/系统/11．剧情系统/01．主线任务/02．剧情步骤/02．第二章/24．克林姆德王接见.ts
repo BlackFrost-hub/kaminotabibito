@@ -33,17 +33,26 @@ export const 克林姆德国王委托紧凑剧情片段: 紧凑剧情片段配�
         NPC: "ZX.克林姆德王",
         触发范围: 999,
         触发单位发布命令: "stop",
-        开始音乐: "gg_snd_JQBGM02 @ gg_rct______________121",
-        发放金币: 15000,
-        生成猎魂单位名: "猎魂",
-        猎魂位置X: -2823.1,
-        猎魂位置Y: -14119.8,
-        移除阻挡: "gg_dest_Dofw_5490",
-        旧JASS功能清单: "SetUnitInvulnerable / PauseUnit / SetUnitOwner / SetStackedSoundBJ / AdjustPlayerStateBJ / CreateUnit",
       },
     },
     {
-      序号: 2, 挂点: "beforeDialog", 对白序号: 13,
+      序号: 2, 挂点: "beforeDialog", 对白序号: 6,
+      动作ID: "JLC精灵城_接见开始BGM", 名称: "国王接见中段开启区域音乐",
+      参数: {
+        开始音乐: "gg_snd_JQBGM02 @ gg_rct______________121",
+        旧JASS功能清单: "SetStackedSoundBJ(true)",
+      },
+    },
+    {
+      序号: 3, 挂点: "beforeDialog", 对白序号: 13,
+      动作ID: "JLC精灵城_接见发放金币", 名称: "克林姆德王发放行动经费",
+      参数: {
+        发放金币: 15000,
+        旧JASS功能清单: "AdjustPlayerStateBJ",
+      },
+    },
+    {
+      序号: 4, 挂点: "beforeDialog", 对白序号: 13,
       动作ID: "JLC精灵城_接见金币提示", 名称: "克林姆德王赠金币提示",
       参数: {
         提示文本: "|cffffff00『系统提示』：|r所有英雄收到了|cffffff0015000金币！|r",
@@ -51,13 +60,39 @@ export const 克林姆德国王委托紧凑剧情片段: 紧凑剧情片段配�
       },
     },
     {
-      序号: 3, 挂点: "afterDialog", 对白序号: 13,
-      动作ID: "JLC精灵城_发布巨魔线任务", 名称: "发布巨魔线任务",
+      序号: 5, 挂点: "afterDialog", 对白序号: 13,
+      动作ID: "JLC精灵城_接见关闭BGM", 名称: "国王接见结束关闭区域音乐",
       参数: {
         停止区域音乐: "gg_snd_JQBGM02 @ gg_rct______________121",
+        旧JASS功能清单: "SetStackedSoundBJ(false)",
+      },
+    },
+    {
+      序号: 6, 挂点: "afterDialog", 对白序号: 13,
+      动作ID: "JLC精灵城_发布巨魔线任务", 名称: "发布巨魔线任务",
+      参数: {
         任务更新提示: "|cffffff00『主线目标』：|r|cffffcc99前往东南方向的『巨魔一族』领地调查。|r（小地图信号处）",
         小地图X: -2906.2,
         小地图Y: -14099.8,
+        旧JASS功能清单: "QuestSetDescription / QuestMessageBJ / PingMinimapLocForForce",
+      },
+    },
+    {
+      序号: 7, 挂点: "afterDialog", 对白序号: 13,
+      动作ID: "JLC精灵城_创建猎魂入口", 名称: "创建猎魂并注册范围入口",
+      参数: {
+        生成猎魂单位名: "猎魂",
+        猎魂位置X: -2823.1,
+        猎魂位置Y: -14119.8,
+        旧JASS功能清单: "CreateUnit / TriggerRegisterUnitInRange",
+      },
+    },
+    {
+      序号: 8, 挂点: "afterDialog", 对白序号: 13,
+      动作ID: "JLC精灵城_移除巨魔路线阻挡", 名称: "移除巨魔路线力量之墙",
+      参数: {
+        移除阻挡: "gg_dest_Dofw_5490",
+        旧JASS功能清单: "RemoveDestructable",
       },
     },
   ],

@@ -15,6 +15,9 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
 const { AdjustPlayerStateBJ } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   AdjustPlayerStateBJ: (this: void, delta: number, whichPlayer: any, whichPlayerState: any) => void;
 };
+const { safeForForce } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeForForce: (this: void, whichForce: any, callback: (this: void) => void) => void;
+};
 const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
@@ -70,6 +73,7 @@ const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动�
 import type { 剧情动作参数表 } from "./00．剧情动作类型";
 import { 读取当前剧情动作上下文, 写入剧情进度 } from "./01．剧情动作上下文";
 import { 切换剧情大门, 发送剧情任务消息, 发送剧情小地图信号 } from "./02．剧情动作桥接";
+import { 读取剧情运行时单位 } from "./08．剧情运行时单位";
 
 const AddSpecialEffect = jass.AddSpecialEffect as (this: void, modelName: string, x: number, y: number) => any;
 const CreateFogModifierRect = jass.CreateFogModifierRect as (
@@ -84,8 +88,10 @@ const CreateItem = jass.CreateItem as (this: void, itemId: number, x: number, y:
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const DisplayCineFilter = jass.DisplayCineFilter as (this: void, flag: boolean) => void;
 const FogModifierStart = jass.FogModifierStart as (this: void, whichFog: any) => void;
+const GetEnumPlayer = jass.GetEnumPlayer as (this: void) => any;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, whichPlayer: any) => number;
 const GetUnitName = jass.GetUnitName as (this: void, whichUnit: any) => string;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
@@ -120,6 +126,12 @@ let 当前玩家英雄无敌 = false;
 const 剧情玩家英雄控制暂停来源 = "剧情系统:玩家英雄控制";
 const 剧情触发单位控制暂停来源 = "剧情系统:触发单位控制";
 const 已创建视野修整器: Record<string, true | undefined> = {};
+interface 玩家组视野上下文 {
+  矩形变量名: string;
+  矩形句柄: any;
+}
+const 玩家组视野上下文栈: 玩家组视野上下文[] = [];
+const 玩家组金币调整栈: number[] = [];
 interface 延迟执行记录 {
   类型: "消息" | "开门";
   文本?: string;
@@ -223,6 +235,8 @@ function 读取全局句柄(this: void, 变量名: string): any {
 
 export function 读取语义单位引用(this: void, 引用: string): any {
   if (引用 === "") return null;
+  const 运行时单位 = 读取剧情运行时单位(引用);
+  if (运行时单位 != null && 运行时单位 !== 0) return 运行时单位;
   const splitIndex = 引用.indexOf(".");
   if (splitIndex >= 0) {
     const tableName = 引用.substring(0, splitIndex);
@@ -232,7 +246,7 @@ export function 读取语义单位引用(this: void, 引用: string): any {
     }
   }
 
-  const 候选表名列表 = ["主线NPC", "ZX", "Boss", "Boss战", "jq"];
+  const 候选表名列表 = ["主线NPC", "ZX", "Boss", "Boss战"];
   for (let i = 0; i < 候选表名列表.length; i++) {
     const unit = YDUserDataGetSafe("string", 候选表名列表[i], 引用, "unit");
     if (unit != null && unit !== 0) return unit;
@@ -281,10 +295,19 @@ function 向商店添加物品(this: void, unit: any, 物品名列表: string): 
   }
 }
 
-function 调整全部玩家金币(this: void, delta: number): void {
-  for (let playerId = 0; playerId < 8; playerId++) {
-    AdjustPlayerStateBJ(delta, Player(playerId), PLAYER_STATE_RESOURCE_GOLD);
-  }
+function on调整枚举玩家金币(this: void): void {
+  const delta = 玩家组金币调整栈[玩家组金币调整栈.length - 1];
+  const whichPlayer = GetEnumPlayer();
+  if (delta == null || whichPlayer == null || whichPlayer === 0) return;
+  AdjustPlayerStateBJ(delta, whichPlayer, PLAYER_STATE_RESOURCE_GOLD);
+}
+
+function 调整玩家组金币(this: void, delta: number): void {
+  const 玩家组 = YDUserDataGetSafe("string", "玩家", "玩家组", "force");
+  if (玩家组 == null || 玩家组 === 0) return;
+  玩家组金币调整栈.push(delta);
+  safeForForce(玩家组, on调整枚举玩家金币);
+  玩家组金币调整栈.pop();
 }
 
 export function 设置玩家英雄组控制状态(this: void, 暂停: boolean, 无敌: boolean): void {
@@ -312,24 +335,33 @@ export function 停止触发单位(this: void): void {
   IssueImmediateOrder(unit, "stop");
 }
 
-export function 给全部玩家添加区域视野(this: void, rectVarName: string): void {
-  const rectHandle = 读取全局句柄(rectVarName);
-  if (rectHandle == null || rectHandle === 0) return;
-
-  for (let playerId = 0; playerId < 8; playerId++) {
-    const key = `${rectVarName}#${playerId}`;
-    if (已创建视野修整器[key]) continue;
-    const fogModifier = CreateFogModifierRect(Player(playerId), FOG_OF_WAR_VISIBLE, rectHandle, true, false);
-    if (fogModifier == null || fogModifier === 0) continue;
-    FogModifierStart(fogModifier);
-    已创建视野修整器[key] = true;
-  }
+function on给枚举玩家添加区域视野(this: void): void {
+  const 上下文 = 玩家组视野上下文栈[玩家组视野上下文栈.length - 1];
+  if (上下文 == null) return;
+  const whichPlayer = GetEnumPlayer();
+  if (whichPlayer == null || whichPlayer === 0) return;
+  const key = `${上下文.矩形变量名}#${GetPlayerId(whichPlayer)}`;
+  if (已创建视野修整器[key]) return;
+  const fogModifier = CreateFogModifierRect(whichPlayer, FOG_OF_WAR_VISIBLE, 上下文.矩形句柄, true, false);
+  if (fogModifier == null || fogModifier === 0) return;
+  FogModifierStart(fogModifier);
+  已创建视野修整器[key] = true;
 }
 
-export function 给全部玩家添加多个区域视野(this: void, rectVarNames: string): void {
+export function 给玩家组添加区域视野(this: void, rectVarName: string): void {
+  const rectHandle = 读取全局句柄(rectVarName);
+  if (rectHandle == null || rectHandle === 0) return;
+  const 玩家组 = YDUserDataGetSafe("string", "玩家", "玩家组", "force");
+  if (玩家组 == null || 玩家组 === 0) return;
+  玩家组视野上下文栈.push({ 矩形变量名: rectVarName, 矩形句柄: rectHandle });
+  safeForForce(玩家组, on给枚举玩家添加区域视野);
+  玩家组视野上下文栈.pop();
+}
+
+export function 给玩家组添加多个区域视野(this: void, rectVarNames: string): void {
   const 列表 = 分割名称列表(rectVarNames);
   for (let i = 0; i < 列表.length; i++) {
-    给全部玩家添加区域视野(列表[i]);
+    给玩家组添加区域视野(列表[i]);
   }
 }
 
@@ -442,11 +474,11 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
   }
 
   const 视野矩形 = 取参数文本(参数, "视野矩形") || 取参数文本(参数, "可见区域") || 取参数文本(参数, "解锁视野");
-  if (视野矩形 !== "") 给全部玩家添加多个区域视野(视野矩形);
+  if (视野矩形 !== "") 给玩家组添加多个区域视野(视野矩形);
   const 可见区域1 = 取参数文本(参数, "可见区域1");
   const 可见区域2 = 取参数文本(参数, "可见区域2");
-  if (可见区域1 !== "") 给全部玩家添加区域视野(可见区域1);
-  if (可见区域2 !== "") 给全部玩家添加区域视野(可见区域2);
+  if (可见区域1 !== "") 给玩家组添加区域视野(可见区域1);
+  if (可见区域2 !== "") 给玩家组添加区域视野(可见区域2);
 
   const NPC引用 = 取参数文本(参数, "NPC") || 取参数文本(参数, "长老单位");
   const npcUnit = NPC引用 !== "" ? 读取语义单位引用(NPC引用) : null;
@@ -476,12 +508,13 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
   }
 
   const 开门对象 = 取参数文本(参数, "开门对象");
-  if (开门对象 !== "") {
+  const 开门延迟秒数 = 取参数数字(参数, "开门延时秒数") || 取参数数字(参数, "延迟开门秒");
+  if (开门对象 !== "" && 开门延迟秒数 <= 0) {
     const destructable = 读取全局句柄(开门对象);
     if (destructable != null && destructable !== 0) ModifyGateBJ(bj_GATEOPERATION_OPEN, destructable);
   }
   const 隐藏阻挡 = 取参数文本(参数, "隐藏阻挡");
-  if (隐藏阻挡 !== "") {
+  if (隐藏阻挡 !== "" && 开门延迟秒数 <= 0) {
     const destructable = 读取全局句柄(隐藏阻挡);
     if (destructable != null && destructable !== 0) ShowDestructable(destructable, false);
   }
@@ -507,12 +540,12 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
   }
   const 发放金币 = 取参数数字(参数, "发放金币");
   if (发放金币 !== 0) {
-    调整全部玩家金币(发放金币);
+    调整玩家组金币(发放金币);
   }
 
   const 预警文本 = 取参数文本(参数, "预警文本");
   const 延迟秒数 = 取参数数字(参数, "延迟秒数")
-    || 取参数数字(参数, "延迟开门秒")
+    || 开门延迟秒数
     || (预警文本 !== "" ? 4 : 0);
   const 延迟提示 = 取参数文本(参数, "延迟提示") || 取参数文本(参数, "延迟消息") || 预警文本;
   if (延迟提示 !== "") {

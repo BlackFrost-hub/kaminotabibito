@@ -14,6 +14,9 @@ const GetRandomReal = jass.GetRandomReal as (min: number, max: number) => number
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
+const { Boss自动施法是否开启 } = require("系统.03．技能系统.06．AI自动使用技能.04．Boss自动施法开关") as {
+  Boss自动施法是否开启: (this: void) => boolean;
+};
 
 export interface 战斗技能运行状态 {
   已初始化: boolean;
@@ -162,6 +165,7 @@ class 战斗技能调度器实现<TContext> implements 战斗技能调度器 {
   }
 
   private 执行上下文(context: TContext, nowMs: number): void {
+    if (!Boss自动施法是否开启()) return;
     if (this.参数.可调度 != null && !this.参数.可调度(context, nowMs)) return;
     const contextKey = this.参数.取上下文键(context);
     if (contextKey === 0) return;

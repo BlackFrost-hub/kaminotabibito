@@ -26,7 +26,7 @@ export const 王城门禁紧凑剧情片段: 紧凑剧情片段配置 = {
         开门延时秒数: 2.5,
         开门对象: "gg_dest_LTe1_11879",
         隐藏阻挡: "gg_dest_B00K_5466",
-        解锁视野: "gg_rct______________121, gg_rct______________122, gg_rct______________123",
+        解锁视野: "gg_rct__________u",
         旧JASS功能清单: "TimerStart / ModifyGateBJ / ShowDestructable(false) / CreateFogModifierRectBJ",
       },
     },

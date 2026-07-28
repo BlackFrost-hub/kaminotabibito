@@ -6,6 +6,8 @@ import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./0
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { stringToFourCC, 单位句柄存在, 单位未标记死亡 as 单位存活 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 启动基础施法时间线 } from '../../../../00．技能模板+函数/02．通用函数/13．施法时间线';
+import { 发起治疗波跳链 } from '../../../../00．技能模板+函数/01．技能函数/10．跳链/治疗波跳链';
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
@@ -16,10 +18,11 @@ const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (whichUnit: any) => number;
 const GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed as (whichUnit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
-const CreateUnit = jass.CreateUnit as (id: any, unitid: number, x: number, y: number, face: number) => any;
-const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, targetWidget: any) => boolean;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
+const GetUnitState = jass.GetUnitState as (whichUnit: any, state: any) => number;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const {
   addPeriodicCallback,
@@ -49,6 +52,21 @@ const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS")
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedEffect: (this: void, model: string, x: number, y: number, z: number, duration: number) => any;
 };
+const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
+  CosBJ: (this: void, degrees: number) => number;
+  SinBJ: (this: void, degrees: number) => number;
+};
+const {
+  创建护卫单位,
+  获取Boss护卫列表,
+  是否指定Boss护卫,
+  处理Boss结束全部护卫,
+} = require("系统.01．单位系统.10．护卫系统.index") as {
+  创建护卫单位: (this: void, 参数: any) => any;
+  获取Boss护卫列表: (this: void, boss: any, 只返回存活?: boolean) => any[];
+  是否指定Boss护卫: (this: void, unit: any, boss: any) => boolean;
+  处理Boss结束全部护卫: (this: void, boss: any) => void;
+};
 
 const 攻速属性ID = 10;
 const 叠加移动速度属性ID = 9;
@@ -67,22 +85,89 @@ function 单位类型是树魔首领(this: void, unit: any): boolean {
   return 单位句柄存在(unit) && GetUnitTypeId(unit) === 树魔首领单位类型ID;
 }
 
-function 随机召唤点(this: void, boss: any): { x: number; y: number } {
+interface 树魔随从存活统计 {
+  猎头者: number;
+  巫医: number;
+  投掷者: number;
+}
+
+interface 树魔随从编制项 {
+  数量: number;
+  召唤距离: number;
+  相对Boss朝向角度: number;
+  槽位间隔角度: number;
+}
+
+function 统计树魔随从(this: void, context: 树魔首领运行时上下文): 树魔随从存活统计 {
+  const result: 树魔随从存活统计 = { 猎头者: 0, 巫医: 0, 投掷者: 0 };
+  const list = context.随从组.取单位列表();
+  for (let i = 0; i < list.length; i++) {
+    const unit = list[i];
+    if (!单位存活(unit)) continue;
+    const typeId = GetUnitTypeId(unit);
+    if (typeId === 猎头者单位类型ID) result.猎头者++;
+    else if (typeId === 巫医单位类型ID) result.巫医++;
+    else if (typeId === 投掷者单位类型ID) result.投掷者++;
+  }
+  return result;
+}
+
+function 计算随从召唤点(
+  this: void,
+  boss: any,
+  编制: 树魔随从编制项,
+  槽位序号: number,
+): { x: number; y: number } {
   const cfg = 树魔首领数值与表现配置.随从特性;
+  const 居中槽位 = 槽位序号 - (编制.数量 - 1) * 0.5;
+  const angle = GetUnitFacing(boss)
+    + 编制.相对Boss朝向角度
+    + 居中槽位 * 编制.槽位间隔角度
+    + GetRandomReal(-cfg.召唤角度抖动, cfg.召唤角度抖动);
   return {
-    x: GetUnitX(boss) + GetRandomReal(-cfg.召唤范围, cfg.召唤范围),
-    y: GetUnitY(boss) + GetRandomReal(-cfg.召唤范围, cfg.召唤范围),
+    x: GetUnitX(boss) + CosBJ(angle) * 编制.召唤距离,
+    y: GetUnitY(boss) + SinBJ(angle) * 编制.召唤距离,
   };
 }
 
-function 召唤树魔随从(this: void, context: 树魔首领运行时上下文, unitTypeId: number): any {
+function 获取树魔随从护卫类型(this: void, unitTypeId: number): string {
+  if (unitTypeId === 猎头者单位类型ID) return "树魔首领:猎头者";
+  if (unitTypeId === 巫医单位类型ID) return "树魔首领:巫医";
+  if (unitTypeId === 投掷者单位类型ID) return "树魔首领:投掷者";
+  return "树魔首领:随从";
+}
+
+function 获取树魔随从血条优先级(this: void, unitTypeId: number): number {
+  const priorities = 树魔首领数值与表现配置.随从特性.血条优先级;
+  if (unitTypeId === 投掷者单位类型ID) return priorities.投掷者;
+  if (unitTypeId === 巫医单位类型ID) return priorities.巫医;
+  if (unitTypeId === 猎头者单位类型ID) return priorities.猎头者;
+  return 0;
+}
+
+function 召唤树魔随从(
+  this: void,
+  context: 树魔首领运行时上下文,
+  unitTypeId: number,
+  编制: 树魔随从编制项,
+  槽位序号: number,
+): any {
   const boss = context.Boss单位;
-  const 点 = 随机召唤点(boss);
-  const minion = CreateUnit(GetOwningPlayer(boss), unitTypeId, 点.x, 点.y, GetRandomReal(0, 360));
+  const 点 = 计算随从召唤点(boss, 编制, 槽位序号);
+  const minion = 创建护卫单位({
+    主Boss单位: boss,
+    护卫类型: 获取树魔随从护卫类型(unitTypeId),
+    护卫血条优先级: 获取树魔随从血条优先级(unitTypeId),
+    标记为召唤单位: true,
+    Boss结束处理: "移除",
+    单位类型: unitTypeId,
+    所属玩家: GetOwningPlayer(boss),
+    X: 点.x,
+    Y: 点.y,
+    面向: GetUnitFacing(boss),
+  });
   if (minion == null || minion === 0) return null;
   context.随从组.登记(minion);
-  context.清理.登记单位("树魔首领随从", minion);
-  IssueTargetOrder(minion, "patrol", boss);
   return minion;
 }
 
@@ -104,40 +189,156 @@ function 尝试播放树魔首领怪叫(this: void, boss: any, 触发概率百�
   });
 }
 
-function 召唤一波随从(this: void, context: 树魔首领运行时上下文): void {
-  const roll = GetRandomInt(1, 3);
-  let 已召唤随从 = false;
-  if (roll === 1) {
-    if (召唤树魔随从(context, 猎头者单位类型ID) != null) 已召唤随从 = true;
-    if (召唤树魔随从(context, 猎头者单位类型ID) != null) 已召唤随从 = true;
-  } else if (roll === 2) {
-    const witchDoctor = 召唤树魔随从(context, 巫医单位类型ID);
-    if (witchDoctor != null && witchDoctor !== 0) {
-      已召唤随从 = true;
-      let healId = 0;
-      healId = addPeriodicCallback(树魔首领数值与表现配置.随从特性.巫医治疗间隔秒 * 1000, function 树魔巫医治疗Tick(this: void): void {
-        if (!单位存活(witchDoctor) || !单位存活(context.Boss单位)) {
-          removePeriodicCallback(healId);
-          return;
-        }
-        IssueTargetOrder(witchDoctor, "healingwave", context.Boss单位);
-      });
-      context.清理.登记周期回调("树魔巫医治疗", healId);
+function 取单位缺血比例(this: void, unit: any): number {
+  if (!单位存活(unit)) return 0;
+  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  if (!(maxLife > 0)) return 0;
+  const currentLife = GetUnitState(unit, UNIT_STATE_LIFE);
+  const ratio = (maxLife - currentLife) / maxLife;
+  return ratio > 0 ? ratio : 0;
+}
+
+function 选择巫医治疗目标(this: void, context: 树魔首领运行时上下文): any {
+  const cfg = 树魔首领数值与表现配置.随从特性;
+  const boss = context.Boss单位;
+  const bossMissingRatio = 取单位缺血比例(boss);
+  if (bossMissingRatio >= cfg.巫医优先治疗Boss缺血比例) return boss;
+
+  const list = 获取Boss护卫列表(boss, true);
+  let target: any = null;
+  let highestMissingRatio = 0;
+  for (let i = 0; i < list.length; i++) {
+    const minion = list[i];
+    const missingRatio = 取单位缺血比例(minion);
+    if (missingRatio > highestMissingRatio) {
+      target = minion;
+      highestMissingRatio = missingRatio;
     }
-  } else {
-    if (召唤树魔随从(context, 投掷者单位类型ID) != null) 已召唤随从 = true;
   }
-  if (已召唤随从) {
-    const soundCfg = 树魔首领音效配置;
-    播放Boss坐标音效(
-      随机取音效路径(soundCfg.随从特性.召唤号令列表),
-      GetUnitX(context.Boss单位),
-      GetUnitY(context.Boss单位),
-      soundCfg.默认裁断距离,
-    );
-    尝试播放树魔首领怪叫(context.Boss单位, soundCfg.怪物拟声.召唤触发概率百分比);
+  if (target != null) return target;
+  return bossMissingRatio > 0 ? boss : null;
+}
+
+function 发起树魔巫医疗波(this: void, context: 树魔首领运行时上下文, witchDoctor: any): void {
+  const cfg = 树魔首领数值与表现配置.随从特性;
+  const boss = context.Boss单位;
+  const target = 选择巫医治疗目标(context);
+  if (target == null || target === 0) return;
+  const healAmount = GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE) * cfg.巫医疗波Boss最大生命比例;
+  function 树魔巫医疗波目标筛选(this: void, unit: any): boolean {
+    if (!单位存活(unit) || 取单位缺血比例(unit) <= 0) return false;
+    return unit === boss || 是否指定Boss护卫(unit, boss);
   }
+  发起治疗波跳链({
+    起始目标: target,
+    来源单位: witchDoctor,
+    最大跳数: cfg.巫医疗波最大目标数,
+    初始治疗量: healAmount,
+    影响目标: "友方",
+    每跳最大距离: cfg.巫医疗波每跳最大距离,
+    每跳衰减系数: cfg.巫医疗波每跳衰减系数,
+    允许重复治疗: false,
+    跳跃间隔: cfg.巫医疗波跳跃间隔秒,
+    闪电效果代码: "HWPB",
+    目标筛选: 树魔巫医疗波目标筛选,
+  });
+}
+
+function 启动巫医治疗驱动(this: void, context: 树魔首领运行时上下文, witchDoctor: any): void {
+  const cfg = 树魔首领数值与表现配置.随从特性;
+  let 下一次治疗Ms = getServerTime() + cfg.巫医疗波首次延迟秒 * 1000;
+  let healId = 0;
+  healId = addPeriodicCallback(cfg.巫医治疗检测间隔秒 * 1000, function 树魔巫医治疗Tick(this: void): void {
+    if (!单位存活(witchDoctor) || !单位存活(context.Boss单位)) {
+      removePeriodicCallback(healId);
+      return;
+    }
+    const now = getServerTime();
+    if (now < 下一次治疗Ms) return;
+    const target = 选择巫医治疗目标(context);
+    if (target == null || target === 0) return;
+    下一次治疗Ms = now + cfg.巫医疗波冷却秒 * 1000;
+    function 树魔巫医疗波生效(this: void): void {
+      if (单位存活(witchDoctor) && 单位存活(context.Boss单位)) {
+        发起树魔巫医疗波(context, witchDoctor);
+      }
+    }
+    启动基础施法时间线({
+      施法者: witchDoctor,
+      目标单位: target,
+      硬直秒: cfg.巫医疗波施法硬直秒,
+      动画名: "spell",
+      动画速度: 1,
+      恢复动画编号: 0,
+      on生效: 树魔巫医疗波生效,
+    });
+  });
+  context.清理.登记周期回调("树魔巫医治疗", healId);
+}
+
+function 补充指定类型随从(
+  this: void,
+  context: 树魔首领运行时上下文,
+  unitTypeId: number,
+  当前数量: number,
+  编制: 树魔随从编制项,
+): number {
+  let created = 0;
+  for (let i = 当前数量; i < 编制.数量; i++) {
+    const minion = 召唤树魔随从(context, unitTypeId, 编制, i);
+    if (minion == null || minion === 0) continue;
+    created++;
+    if (unitTypeId === 巫医单位类型ID) 启动巫医治疗驱动(context, minion);
+  }
+  return created;
+}
+
+function 补充树魔随从编制(this: void, context: 树魔首领运行时上下文): number {
+  const cfg = 树魔首领数值与表现配置.随从特性;
+  const counts = 统计树魔随从(context);
+  let created = 0;
+  created += 补充指定类型随从(context, 猎头者单位类型ID, counts.猎头者, cfg.编制.猎头者);
+  created += 补充指定类型随从(context, 巫医单位类型ID, counts.巫医, cfg.编制.巫医);
+  created += 补充指定类型随从(context, 投掷者单位类型ID, counts.投掷者, cfg.编制.投掷者);
+  if (created <= 0) return 0;
+
+  const soundCfg = 树魔首领音效配置;
+  播放Boss坐标音效(
+    随机取音效路径(soundCfg.随从特性.召唤号令列表),
+    GetUnitX(context.Boss单位),
+    GetUnitY(context.Boss单位),
+    soundCfg.默认裁断距离,
+  );
+  尝试播放树魔首领怪叫(context.Boss单位, soundCfg.怪物拟声.召唤触发概率百分比);
   播放树魔首领台词(context.Boss单位, "随从特性");
+  return created;
+}
+
+export function 初始化树魔首领随从特性(this: void, context: 树魔首领运行时上下文): void {
+  if (context.随从特性已初始化 || !单位存活(context.Boss单位)) return;
+  const cfg = 树魔首领数值与表现配置.随从特性;
+  context.随从特性已初始化 = true;
+  const boss = context.Boss单位;
+  context.清理.登记清理("树魔首领-护卫登记清理", function 清理树魔随从护卫登记(this: void): void {
+    处理Boss结束全部护卫(boss);
+  });
+  if (cfg.初始召唤延迟秒 <= 0) {
+    补充树魔随从编制(context);
+    context.下一次召唤Ms = getServerTime() + cfg.补员间隔秒 * 1000;
+  } else {
+    context.下一次召唤Ms = getServerTime() + cfg.初始召唤延迟秒 * 1000;
+  }
+  刷新随从状态(context);
+}
+
+export function 立即补充树魔首领随从(this: void, context: 树魔首领运行时上下文): number {
+  if (!单位存活(context.Boss单位)) return 0;
+  const cfg = 树魔首领数值与表现配置.随从特性;
+  context.随从特性已初始化 = true;
+  const created = 补充树魔随从编制(context);
+  context.下一次召唤Ms = getServerTime() + cfg.补员间隔秒 * 1000;
+  刷新随从状态(context);
+  return created;
 }
 
 function 进入无从暴怒(this: void, context: 树魔首领运行时上下文): void {
@@ -170,7 +371,7 @@ function 刷新随从状态(this: void, context: 树魔首领运行时上下文)
   const cfg = 树魔首领数值与表现配置.随从特性;
   const count = context.随从组.取存活数量();
   context.当前随从数量 = count;
-  context.当前兽群层数 = Math.min(4, count);
+  context.当前兽群层数 = count < cfg.兽群最高层数 ? count : cfg.兽群最高层数;
 
   if (count > 0) {
     退出无从暴怒(context);
@@ -208,10 +409,7 @@ function 树魔首领随从特性Tick(this: void): void {
   const currentBoss = jglobals.udg_Boss;
   if (是树魔首领(currentBoss)) {
     const context = 获取或创建树魔首领上下文(currentBoss);
-    if (context != null && !context.随从特性已初始化) {
-      context.随从特性已初始化 = true;
-      context.下一次召唤Ms = getServerTime() + 树魔首领数值与表现配置.随从特性.召唤间隔秒 * 1000;
-    }
+    if (context != null) 初始化树魔首领随从特性(context);
   }
 
   const now = getServerTime();
@@ -219,11 +417,11 @@ function 树魔首领随从特性Tick(this: void): void {
   for (let i = 0; i < list.length; i++) {
     const context = list[i];
     if (context == null) continue;
-    刷新随从状态(context);
-    if (context.下一次召唤Ms > 0 && now >= context.下一次召唤Ms) {
-      召唤一波随从(context);
-      context.下一次召唤Ms = now + 树魔首领数值与表现配置.随从特性.召唤间隔秒 * 1000;
+    if (context.随从特性已初始化 && context.下一次召唤Ms > 0 && now >= context.下一次召唤Ms) {
+      补充树魔随从编制(context);
+      context.下一次召唤Ms = now + 树魔首领数值与表现配置.随从特性.补员间隔秒 * 1000;
     }
+    刷新随从状态(context);
   }
 }
 

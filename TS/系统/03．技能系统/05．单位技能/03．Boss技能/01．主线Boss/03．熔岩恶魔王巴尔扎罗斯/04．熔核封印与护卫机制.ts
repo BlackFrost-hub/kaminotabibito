@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 单位未标记死亡 as 单位有效, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 播放巴尔扎罗斯台词, 播放格鲁姆台词, 播放塞拉台词 } from "./14．台词播放";
@@ -10,6 +10,11 @@ import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放"
 
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
+};
+const { 创建自定义护卫单位, 获取护卫所属Boss, 处理Boss结束全部护卫 } = require("系统.01．单位系统.10．护卫系统.index") as {
+  创建自定义护卫单位: (this: void, 参数: any, 创建器: (this: void) => any) => any;
+  获取护卫所属Boss: (this: void, guard: any) => any;
+  处理Boss结束全部护卫: (this: void, boss: any) => void;
 };
 const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -33,56 +38,61 @@ const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.
 
 const jass = require("jass.common") as any;
 
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
-const 护卫归属Boss表: Record<number, any | undefined> = {};
 let 护卫死亡监听已注册 = false;
 let 熔核封印伤害修正已注册 = false;
 
-function 登记护卫归属(this: void, context: 巴尔扎罗斯运行时上下文, guard: any): void {
-  const id = 取单位ID(guard);
-  if (id === 0) return;
-  护卫归属Boss表[id] = context.Boss单位;
-  context.清理.登记清理("巴尔扎罗斯-护卫归属清理", function 清理护卫归属(this: void): void {
-    delete 护卫归属Boss表[id];
-  });
-}
-
 function 创建格鲁姆(this: void, context: 巴尔扎罗斯运行时上下文): any {
   const cfg = 巴尔扎罗斯护卫配置.格鲁姆;
-  return 创建召唤物({
-    主人单位: context.Boss单位,
-    单位类型: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.单位ID,
-    单位名称: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.名称,
-    X: cfg.X,
-    Y: cfg.Y,
-    朝向: cfg.面向,
-    模型文件: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.模型路径,
-    生命值: cfg.生命值,
-    生命值受小怪倍率: false,
-    护甲: cfg.防御力,
-    攻击间隔: cfg.攻击间隔,
+  return 创建自定义护卫单位({
+    主Boss单位: context.Boss单位,
+    护卫类型: "巴尔扎罗斯:格鲁姆",
+    护卫血条优先级: 200,
+    标记为召唤单位: true,
+    Boss结束处理: "移除",
+  }, function 创建格鲁姆召唤物(this: void): any {
+    return 创建召唤物({
+      主人单位: context.Boss单位,
+      单位类型: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.单位ID,
+      单位名称: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.名称,
+      X: cfg.X,
+      Y: cfg.Y,
+      朝向: cfg.面向,
+      模型文件: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.模型路径,
+      生命值: cfg.生命值,
+      生命值受小怪倍率: false,
+      护甲: cfg.防御力,
+      攻击间隔: cfg.攻击间隔,
+    });
   });
 }
 
 function 创建塞拉(this: void, context: 巴尔扎罗斯运行时上下文): any {
   const cfg = 巴尔扎罗斯护卫配置.塞拉;
-  return 创建召唤物({
-    主人单位: context.Boss单位,
-    单位类型: 巴尔扎罗斯单位技能配置.护卫.塞拉.单位ID,
-    单位名称: 巴尔扎罗斯单位技能配置.护卫.塞拉.名称,
-    X: cfg.X,
-    Y: cfg.Y,
-    朝向: cfg.面向,
-    模型文件: 巴尔扎罗斯单位技能配置.护卫.塞拉.模型路径,
-    生命值: cfg.生命值,
-    生命值受小怪倍率: false,
-    护甲: cfg.防御力,
-    攻击间隔: cfg.攻击间隔,
+  return 创建自定义护卫单位({
+    主Boss单位: context.Boss单位,
+    护卫类型: "巴尔扎罗斯:塞拉",
+    护卫血条优先级: 200,
+    标记为召唤单位: true,
+    Boss结束处理: "移除",
+  }, function 创建塞拉召唤物(this: void): any {
+    return 创建召唤物({
+      主人单位: context.Boss单位,
+      单位类型: 巴尔扎罗斯单位技能配置.护卫.塞拉.单位ID,
+      单位名称: 巴尔扎罗斯单位技能配置.护卫.塞拉.名称,
+      X: cfg.X,
+      Y: cfg.Y,
+      朝向: cfg.面向,
+      模型文件: 巴尔扎罗斯单位技能配置.护卫.塞拉.模型路径,
+      生命值: cfg.生命值,
+      生命值受小怪倍率: false,
+      护甲: cfg.防御力,
+      攻击间隔: cfg.攻击间隔,
+    });
   });
 }
 
@@ -110,11 +120,8 @@ function 双护卫都已死亡(this: void, context: 巴尔扎罗斯运行时上�
 }
 
 function on巴尔扎罗斯护卫死亡(this: void, dyingUnit: any): void {
-  const guardId = 取单位ID(dyingUnit);
-  if (guardId === 0) return;
-  const boss = 护卫归属Boss表[guardId];
+  const boss = 获取护卫所属Boss(dyingUnit);
   if (boss == null || boss === 0) return;
-  delete 护卫归属Boss表[guardId];
   const context = 获取巴尔扎罗斯上下文(boss);
   if (context == null) return;
   if (dyingUnit === context.格鲁姆) {
@@ -161,10 +168,10 @@ export function 初始化巴尔扎罗斯熔核封印与护卫机制(this: void, 
 
   context.格鲁姆 = 创建格鲁姆(context);
   context.塞拉 = 创建塞拉(context);
-  context.清理.登记单位("巴尔扎罗斯-格鲁姆", context.格鲁姆);
-  context.清理.登记单位("巴尔扎罗斯-塞拉", context.塞拉);
-  登记护卫归属(context, context.格鲁姆);
-  登记护卫归属(context, context.塞拉);
+  const boss = context.Boss单位;
+  context.清理.登记清理("巴尔扎罗斯-护卫登记清理", function 清理巴尔扎罗斯护卫登记(this: void): void {
+    处理Boss结束全部护卫(boss);
+  });
 
   const grum = context.格鲁姆;
   const sera = context.塞拉;

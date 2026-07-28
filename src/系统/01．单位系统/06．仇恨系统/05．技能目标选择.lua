@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____00_FF0E_4EC7_6068_5B58_50A8 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
 local getEnemyThreats = ____00_FF0E_4EC7_6068_5B58_50A8.getEnemyThreats
@@ -22,6 +23,7 @@ local FirstOfGroup = jass.FirstOfGroup
 local GroupRemoveUnit = jass.GroupRemoveUnit
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
+local ____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868 = {}
 ____exports["获取Boss技能最高仇恨目标"] = function(boss, filter)
     return getHighestThreat(boss, filter)
 end
@@ -68,6 +70,40 @@ local function _____5355_4F4D_5728_5217_8868_4E2D(unit, list)
     end
     return false
 end
+____exports["注册Boss技能测试目标"] = function(unit)
+    if not _____5355_4F4D_6709_6548(unit) or _____5355_4F4D_5728_5217_8868_4E2D(unit, ____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868) then
+        return
+    end
+    ____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868[#____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868 + 1] = unit
+end
+____exports["注销Boss技能测试目标"] = function(unit)
+    do
+        local i = #____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868 - 1
+        while i >= 0 do
+            if ____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868[i + 1] == unit then
+                __TS__ArraySplice(____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868, i, 1)
+            end
+            i = i - 1
+        end
+    end
+end
+local function _____83B7_53D6_6709_6548Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868(boss)
+    local result = {}
+    local bossOwner = GetOwningPlayer(boss)
+    do
+        local i = #____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868 - 1
+        while i >= 0 do
+            local unit = ____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868[i + 1]
+            if not _____5355_4F4D_6709_6548(unit) then
+                __TS__ArraySplice(____Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868, i, 1)
+            elseif IsUnitEnemy(unit, bossOwner) == true then
+                result[#result + 1] = unit
+            end
+            i = i - 1
+        end
+    end
+    return result
+end
 local function _____83B7_53D6_73A9_5BB6_9996_4E2A_5B58_6D3B_82F1_96C4(whichPlayer)
     local registeredHero = getRegisteredPlayerHero(whichPlayer)
     if _____5355_4F4D_6709_6548(registeredHero) and IsUnitType(registeredHero, UNIT_TYPE_HERO) == true then
@@ -93,6 +129,10 @@ ____exports["获取Boss技能敌对英雄列表"] = function(boss)
     if not _____5355_4F4D_6709_6548(boss) then
         return result
     end
+    local testTargets = _____83B7_53D6_6709_6548Boss_6280_80FD_6D4B_8BD5_76EE_6807_5217_8868(boss)
+    if #testTargets > 0 then
+        return testTargets
+    end
     local bossOwner = GetOwningPlayer(boss)
     do
         local pid = 0
@@ -116,20 +156,20 @@ ____exports["获取Boss技能敌对英雄列表Ex"] = function(boss, centerUnit,
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue27
+                    goto __continue39
                 end
                 if _____5355_4F4D_5728_5217_8868_4E2D(hero, excludeList) then
-                    goto __continue27
+                    goto __continue39
                 end
                 if filter ~= nil and not filter(hero) then
-                    goto __continue27
+                    goto __continue39
                 end
                 if centerUnit ~= nil and centerUnit ~= 0 and radius2 > 0 and _____8DDD_79BB_5E73_65B9(centerUnit, hero) > radius2 then
-                    goto __continue27
+                    goto __continue39
                 end
                 result[#result + 1] = hero
             end
-            ::__continue27::
+            ::__continue39::
             i = i + 1
         end
     end

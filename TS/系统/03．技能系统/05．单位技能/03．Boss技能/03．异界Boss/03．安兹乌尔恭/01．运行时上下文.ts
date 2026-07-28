@@ -15,6 +15,9 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
+const { 处理Boss结束全部护卫 } = require('系统.01．单位系统.10．护卫系统.index') as {
+  处理Boss结束全部护卫: (this: void, boss: any) => void;
+};
 
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
@@ -107,6 +110,7 @@ const 安兹上下文工厂 = 创建单位运行时上下文工厂<安兹运行�
   on清理: function 清理安兹联合状态(this: void, context: 安兹运行时上下文): void {
     context.挑战已结束 = true;
     context.阶段 = '已结束';
+    处理Boss结束全部护卫(context.安兹单位);
     if (context.雅儿贝德 != null) {
       context.雅儿贝德.守护连接生效 = false;
       context.雅儿贝德.共同护盾生效 = false;

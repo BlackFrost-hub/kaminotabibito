@@ -1,0 +1,1 @@
+-- Chapter 3 other NPC object data.

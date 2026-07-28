@@ -11,6 +11,8 @@ local jass = require("jass.common")
 local GetRandomReal = jass.GetRandomReal
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("系统.03．技能系统.06．AI自动使用技能.04．Boss自动施法开关")
+local ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F = ____require_result_1["Boss自动施法是否开启"]
 local function _____53D6_914D_7F6E_6570_503C(value, context)
     if value == nil then
         return 0
@@ -41,16 +43,16 @@ function _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype.____constru
     })
 end
 _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["启动"] = function(self)
-    local ____self_1 = self["周期调度器"]
-    ____self_1["启动"](____self_1)
+    local ____self_2 = self["周期调度器"]
+    ____self_2["启动"](____self_2)
 end
 _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["停止"] = function(self)
-    local ____self_2 = self["周期调度器"]
-    ____self_2["停止"](____self_2)
+    local ____self_3 = self["周期调度器"]
+    ____self_3["停止"](____self_3)
 end
 _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["是否运行中"] = function(self)
-    local ____self_3 = self["周期调度器"]
-    return ____self_3["是否运行中"](____self_3)
+    local ____self_4 = self["周期调度器"]
+    return ____self_4["是否运行中"](____self_4)
 end
 _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["清空上下文"] = function(self, _____4E0A_4E0B_6587_952E)
     __TS__Delete(self["状态表"], _____4E0A_4E0B_6587_952E)
@@ -77,6 +79,9 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["取独占状态管�
     return self["独占状态管理器"]
 end
 _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["执行上下文"] = function(self, context, nowMs)
+    if not ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F() then
+        return
+    end
     if self["参数"]["可调度"] ~= nil and not self["参数"]["可调度"](context, nowMs) then
         return
     end
@@ -133,51 +138,51 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["收集候选"] = fu
             do
                 local _____5B9A_4E49 = self["参数"]["技能列表"][i + 1]
                 if nowMs < (_____72B6_6001["下次可用毫秒表"][_____5B9A_4E49.key] or 0) then
-                    goto __continue30
+                    goto __continue31
                 end
                 if _____5B9A_4E49["阶段允许"] ~= nil and not _____5B9A_4E49["阶段允许"](context, nowMs) then
-                    goto __continue30
+                    goto __continue31
                 end
                 if _____5B9A_4E49["可释放"] ~= nil and not _____5B9A_4E49["可释放"](context, nowMs, _____72B6_6001) then
-                    goto __continue30
+                    goto __continue31
                 end
-                local ____temp_5 = _____5B9A_4E49["互斥组"] ~= nil
-                if ____temp_5 then
-                    local ____self_4 = self["互斥锁"]
-                    ____temp_5 = ____self_4["是否被占用"](____self_4, _____5B9A_4E49["互斥组"], nowMs)
+                local ____temp_6 = _____5B9A_4E49["互斥组"] ~= nil
+                if ____temp_6 then
+                    local ____self_5 = self["互斥锁"]
+                    ____temp_6 = ____self_5["是否被占用"](____self_5, _____5B9A_4E49["互斥组"], nowMs)
                 end
-                if ____temp_5 then
-                    goto __continue30
+                if ____temp_6 then
+                    goto __continue31
                 end
-                local ____temp_7 = self["独占状态管理器"] ~= nil and _____5B9A_4E49["跳过独占状态"] ~= true
-                if ____temp_7 then
-                    local ____self_6 = self["独占状态管理器"]
-                    ____temp_7 = not ____self_6["可开始"](
-                        ____self_6,
+                local ____temp_8 = self["独占状态管理器"] ~= nil and _____5B9A_4E49["跳过独占状态"] ~= true
+                if ____temp_8 then
+                    local ____self_7 = self["独占状态管理器"]
+                    ____temp_8 = not ____self_7["可开始"](
+                        ____self_7,
                         self["取独占状态Key"](self, contextKey, _____5B9A_4E49.key),
                         _____5B9A_4E49["独占优先级"] or self["参数"]["默认独占优先级"] or 10,
                         nowMs
                     )
                 end
-                if ____temp_7 then
-                    goto __continue30
+                if ____temp_8 then
+                    goto __continue31
                 end
-                local ____temp_8
+                local ____temp_9
                 if _____5B9A_4E49["选择目标"] == nil then
-                    ____temp_8 = nil
+                    ____temp_9 = nil
                 else
-                    ____temp_8 = _____5B9A_4E49["选择目标"](context, nowMs)
+                    ____temp_9 = _____5B9A_4E49["选择目标"](context, nowMs)
                 end
-                local target = ____temp_8
+                local target = ____temp_9
                 if _____5B9A_4E49["选择目标"] ~= nil and target == nil then
-                    goto __continue30
+                    goto __continue31
                 end
                 if target ~= nil and _____5B9A_4E49["目标有效"] ~= nil and not _____5B9A_4E49["目标有效"](context, target, nowMs) then
-                    goto __continue30
+                    goto __continue31
                 end
                 _____7ED3_679C[#_____7ED3_679C + 1] = {["定义"] = _____5B9A_4E49, ["目标"] = target}
             end
-            ::__continue30::
+            ::__continue31::
             i = i + 1
         end
     end
@@ -204,14 +209,14 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["选择候选"] = fu
         while i < #_____5019_9009_5217_8868 do
             do
                 if (_____5019_9009_5217_8868[i + 1]["定义"]["优先级"] or 0) ~= _____6700_9AD8_4F18_5148_7EA7 then
-                    goto __continue44
+                    goto __continue45
                 end
                 local _____6743_91CD = _____5019_9009_5217_8868[i + 1]["定义"]["权重"] or 1
                 if _____6743_91CD > 0 then
                     _____603B_6743_91CD = _____603B_6743_91CD + _____6743_91CD
                 end
             end
-            ::__continue44::
+            ::__continue45::
             i = i + 1
         end
     end
@@ -226,11 +231,11 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["选择候选"] = fu
             do
                 local _____5019_9009 = _____5019_9009_5217_8868[i + 1]
                 if (_____5019_9009["定义"]["优先级"] or 0) ~= _____6700_9AD8_4F18_5148_7EA7 then
-                    goto __continue49
+                    goto __continue50
                 end
                 local _____6743_91CD = _____5019_9009["定义"]["权重"] or 1
                 if _____6743_91CD <= 0 then
-                    goto __continue49
+                    goto __continue50
                 end
                 _____6700_540E_5019_9009 = _____5019_9009
                 _____968F_673A_503C = _____968F_673A_503C - _____6743_91CD
@@ -238,7 +243,7 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["选择候选"] = fu
                     return _____5019_9009
                 end
             end
-            ::__continue49::
+            ::__continue50::
             i = i + 1
         end
     end
@@ -252,18 +257,18 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["执行候选"] = fu
         mutexMs = busyMs
     end
     local _____5360_7528_8005 = (tostring(contextKey) .. ":") .. _____5B9A_4E49.key
-    local ____temp_10 = _____5B9A_4E49["互斥组"] ~= nil
-    if ____temp_10 then
-        local ____self_9 = self["互斥锁"]
-        ____temp_10 = not ____self_9["尝试占用"](
-            ____self_9,
+    local ____temp_11 = _____5B9A_4E49["互斥组"] ~= nil
+    if ____temp_11 then
+        local ____self_10 = self["互斥锁"]
+        ____temp_11 = not ____self_10["尝试占用"](
+            ____self_10,
             _____5B9A_4E49["互斥组"],
             _____5360_7528_8005,
             mutexMs,
             nowMs
         )
     end
-    if ____temp_10 then
+    if ____temp_11 then
         return
     end
     local _____72EC_5360Token = 0
@@ -274,30 +279,30 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["执行候选"] = fu
         end
         local _____72EC_5360_72B6_6001Key = self["取独占状态Key"](self, contextKey, _____5B9A_4E49.key)
         local ____on_72EC_5360_72B6_6001_7ED3_675F = _____5B9A_4E49["独占状态结束"]
-        local ____self_15 = self["独占状态管理器"]
-        local ____self_15__5F00_59CB_16 = ____self_15["开始"]
-        local ____temp_12 = _____5B9A_4E49["独占优先级"] or self["参数"]["默认独占优先级"] or 10
-        local ____72EC_5360_6301_7EED_6BEB_79D2_13 = _____72EC_5360_6301_7EED_6BEB_79D2
-        local ____temp_14 = _____5B9A_4E49["独占状态可被抢占"] == true
-        local ____temp_11
+        local ____self_16 = self["独占状态管理器"]
+        local ____self_16__5F00_59CB_17 = ____self_16["开始"]
+        local ____temp_13 = _____5B9A_4E49["独占优先级"] or self["参数"]["默认独占优先级"] or 10
+        local ____72EC_5360_6301_7EED_6BEB_79D2_14 = _____72EC_5360_6301_7EED_6BEB_79D2
+        local ____temp_15 = _____5B9A_4E49["独占状态可被抢占"] == true
+        local ____temp_12
         if ____on_72EC_5360_72B6_6001_7ED3_675F == nil then
-            ____temp_11 = nil
+            ____temp_12 = nil
         else
-            ____temp_11 = function(event)
+            ____temp_12 = function(event)
                 ____on_72EC_5360_72B6_6001_7ED3_675F(context, _____5019_9009["目标"], event)
             end
         end
-        _____72EC_5360Token = ____self_15__5F00_59CB_16(____self_15, {
+        _____72EC_5360Token = ____self_16__5F00_59CB_17(____self_16, {
             key = _____72EC_5360_72B6_6001Key,
-            ["优先级"] = ____temp_12,
-            ["持续毫秒"] = ____72EC_5360_6301_7EED_6BEB_79D2_13,
-            ["可被抢占"] = ____temp_14,
-            ["on结束"] = ____temp_11
+            ["优先级"] = ____temp_13,
+            ["持续毫秒"] = ____72EC_5360_6301_7EED_6BEB_79D2_14,
+            ["可被抢占"] = ____temp_15,
+            ["on结束"] = ____temp_12
         }, nowMs)
         if _____72EC_5360Token == 0 then
             if _____5B9A_4E49["互斥组"] ~= nil then
-                local ____self_17 = self["互斥锁"]
-                ____self_17["释放"](____self_17, _____5B9A_4E49["互斥组"], _____5360_7528_8005)
+                local ____self_18 = self["互斥锁"]
+                ____self_18["释放"](____self_18, _____5B9A_4E49["互斥组"], _____5360_7528_8005)
             end
             return
         end
@@ -305,13 +310,13 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["执行候选"] = fu
     local _____6210_529F = _____5B9A_4E49["执行"](context, _____5019_9009["目标"], nowMs) ~= false
     if not _____6210_529F then
         if _____5B9A_4E49["互斥组"] ~= nil then
-            local ____self_18 = self["互斥锁"]
-            ____self_18["释放"](____self_18, _____5B9A_4E49["互斥组"], _____5360_7528_8005)
+            local ____self_19 = self["互斥锁"]
+            ____self_19["释放"](____self_19, _____5B9A_4E49["互斥组"], _____5360_7528_8005)
         end
         if _____72EC_5360Token ~= 0 then
-            local ____opt_19 = self["独占状态管理器"]
-            if ____opt_19 ~= nil then
-                ____opt_19["结束"](____opt_19, _____72EC_5360Token, "取消", _____5B9A_4E49.key)
+            local ____opt_20 = self["独占状态管理器"]
+            if ____opt_20 ~= nil then
+                ____opt_20["结束"](____opt_20, _____72EC_5360Token, "取消", _____5B9A_4E49.key)
             end
         end
         return

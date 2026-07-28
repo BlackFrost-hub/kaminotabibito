@@ -35,6 +35,7 @@ export interface 治疗波参数 {
   跳跃间隔?: number;
   治疗特效路径?: string;
   闪电效果代码?: string;
+  目标筛选?: (this: void, 单位: any, 当前目标: any, 已完成跳数: number) => boolean;
   每跳回调?: (this: void, 单位: any, 治疗量: number, 当前跳数: number) => void;
   结束回调?: (this: void, 已完成的跳数: number) => void;
 }
@@ -72,7 +73,7 @@ export function 发起治疗波跳链(参数: 治疗波参数): any {
     闪电效果代码: 参数.闪电效果代码 ?? 默认治疗波闪电代码,
     闪电持续时间: undefined,
     治疗特效路径: 治疗特效,
-    目标筛选: undefined,
+    目标筛选: 参数.目标筛选,
     每跳回调: 每跳回调Wrapper,
     结束回调: 结束回调Wrapper,
   };

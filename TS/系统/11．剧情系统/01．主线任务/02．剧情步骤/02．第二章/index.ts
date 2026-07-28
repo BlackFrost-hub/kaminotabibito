@@ -10,6 +10,7 @@ export * from "./27．树魔首领死亡承接";
 export * from "./29．魔法信件汇报";
 export * from "./30．赫克提尔解析";
 export * from "./31．王城紧急会议";
+export * from "./31A．菲利斯投影出场";
 export * from "./32．第二章王子Boss战过程";
 export * from "./33．第二章王子Boss战后承接";
 export * from "./34．第二章后续承接";
