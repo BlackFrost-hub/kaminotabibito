@@ -26,19 +26,20 @@ local ____require_result_0 = require("系统.03．技能系统.00．技能模板
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_2["创建单位坐标跟随特效"]
+local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_2["销毁单位坐标跟随特效"]
+local _____8BBE_7F6E_7279_6548_989C_8272 = ____require_result_2["设置特效颜色"]
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
-local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
-local DestroyEffect = jass.DestroyEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local DzSetEffectVertexColor = japi.DzSetEffectVertexColor
 local _____5B89_5179_5355_4F4D_7C7B_578BID = stringToFourCC(_____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["正式单位ID"])
 local _____5149_8F89_7FE0_7EFF_4F53_6280_80FDID = stringToFourCC(_____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["光辉翠绿体"])
 local _____5149_8F89_7FE0_7EFF_4F53_5DF2_6CE8_518C = false
+local _____5149_8F89_7FE0_7EFF_4F53_7279_6548_952E = "安兹·光辉翠绿体"
 local function _____91CA_653E_7FE0_7EFF_51B2_51FB(boss)
     if not _____5355_4F4D_6709_6548(boss) then
         return
@@ -82,17 +83,21 @@ local function _____521B_5EFA_7FE0_7EFF_9632_62A4(context)
         return
     end
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
-    local effect = AddSpecialEffectTarget(config["表现资源"]["光辉翠绿体特效路径"], boss, "origin")
-    if effect ~= nil and effect ~= 0 then
-        DzSetEffectVertexColor(effect, 80 * 65536 + 255 * 256 + 120)
-    end
+    local effect = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
+        boss,
+        config["表现资源"]["光辉翠绿体特效路径"],
+        _____5149_8F89_7FE0_7EFF_4F53_7279_6548_952E,
+        config["普通技能"]["光辉翠绿体特效缩放"],
+        config["普通技能"]["光辉翠绿体特效高度"]
+    )
+    _____8BBE_7F6E_7279_6548_989C_8272(effect, config["普通技能"]["光辉翠绿体特效红"], config["普通技能"]["光辉翠绿体特效绿"], config["普通技能"]["光辉翠绿体特效蓝"])
     local effectDestroyed = false
     local function _____9500_6BC1_7FE0_7EFF_9632_62A4_7279_6548()
-        if effectDestroyed or effect == nil or effect == 0 then
+        if effectDestroyed then
             return
         end
         effectDestroyed = true
-        DestroyEffect(effect)
+        _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(boss, _____5149_8F89_7FE0_7EFF_4F53_7279_6548_952E)
     end
     _____521B_5EFA_6B21_6570_578B_4F24_5BB3_514D_75AB({
         ["名称"] = "安兹·光辉翠绿体",

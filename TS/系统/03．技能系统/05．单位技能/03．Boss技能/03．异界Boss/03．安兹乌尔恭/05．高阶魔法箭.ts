@@ -30,6 +30,9 @@ const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能�
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
 
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
@@ -132,8 +135,24 @@ function 安排高阶魔法箭轮次(this: void, context: 安兹运行时上下�
     },
     on结算: function 结算本轮高阶魔法箭(this: void, 结果: 分批点名落点结果): void {
       高阶魔法箭结算(context, 结果.锁定X, 结果.锁定Y);
+      if (结果.序号 === 1) 安排安兹高阶魔法箭特效后音效(context);
     },
   });
+}
+
+export function 安排安兹高阶魔法箭特效后音效(this: void, context: 安兹运行时上下文): void {
+  const boss = context.安兹单位;
+  const cfg = 安兹乌尔恭数值与表现配置;
+  const callbackId = addDelayedCallback(cfg.普通技能.高阶魔法箭特效后音效延迟秒 * 1000, function 高阶魔法箭特效后音效(this: void): void {
+    if (context.挑战已结束 || context.清理.已清理() || !单位有效(boss)) return;
+    播放Boss坐标音效(
+      cfg.音效.高阶魔法箭,
+      GetUnitX(boss),
+      GetUnitY(boss),
+      cfg.音效默认裁断距离,
+    );
+  });
+  context.清理.登记延迟回调('安兹-高阶魔法箭音效', callbackId);
 }
 
 export function 释放安兹高阶魔法箭(this: void, context: 安兹运行时上下文): void {
@@ -141,7 +160,6 @@ export function 释放安兹高阶魔法箭(this: void, context: 安兹运行时
   if (!单位有效(boss) || context.挑战已结束 || context.时间停止中 || context.当前大型技能 != null) return;
   const target = 取主要目标(boss);
   if (!单位有效(target)) return;
-  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.高阶魔法箭, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   播放安兹台词(boss, '高阶魔法箭');
   const cfg = 安兹乌尔恭数值与表现配置.普通技能;
   标记安兹普通机制忙碌(

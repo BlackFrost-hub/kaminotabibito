@@ -2,7 +2,7 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
-| `Common\Effect\Form\RiseFall\AinzUndeadArrowVolley.mdx` | 七支完整骸骨箭，具有骨白箭头、骨节箭杆、钩状尾羽和黑紫长光轨。 | 多箭从高处错位、错峰坠落；`Birth / Stand / Death`。 | 高阶亡灵箭雨、高阶魔法箭。 | 不承担地面预警；高度、覆盖范围和节奏需进图校准；箭身贴图层必须保持 `Transparent`，贴图必须使用兼容 1.27 的 JPEG 8-bit Alpha BLP。 | 26219 | `8C4484DEDBED5BCE` |
+| `Common\Effect\Form\RiseFall\AinzUndeadArrowVolley.mdx` | 七支完整骸骨箭，具有骨白箭头、骨节箭杆、钩状尾羽和黑紫长光轨。 | 多箭从高处错位、错峰坠落；`Birth / Stand / Death`，`Death` 首帧完全隐藏并直接消失。 | 高阶亡灵箭雨、高阶魔法箭。 | 不承担地面预警；高度、覆盖范围和节奏需进图校准；箭身贴图层必须保持 `Transparent`，贴图必须使用兼容 1.27 的 JPEG 8-bit Alpha BLP。 | 26107 | `61C9AC7C22236D80` |
 | `Common\Effect\Form\RiseFall\ShalltearHolyLance.mdx` | 苍白金实体长枪，枪身细长，带交叉辉光和小型圣辉落点环。 | 从高处高速坠落；`Birth / Stand / Death`。 | 净化投枪、神圣坠枪。 | 落点环只作命中装饰，不代替范围预警。 | 16466 | `6FC59C46CBC966F3` |
 | `Common\Effect\Form\RiseFall\ShalltearBloodMoonDisc.mdx` | 写实深红血月主体，外有双层暗红月晕和尖刺血冠；月面有真实陨坑纹理。 | 空中正面展示；月晕与血冠缓慢旋转；`Birth / Stand / Death`。 | 血月主体、空中阶段物件。 | 月体是单层凸面，不使用透明背面；需叠加 Aux 才有竖向月光和坠落。 | 36695 | `2454CA0F3512CB1A` |
 | `Common\Effect\Form\RiseFall\ShalltearBloodMoonAux.mdx` | 多层竖向月光、血色能量和向下坠落的辅助光层。 | 竖向展开与坠落；`Birth / Stand / Death`。 | 血月月光、降临和坠落辅助层。 | 不能单独代替完整血月圆盘。 | 19468 | `6308F9BEA39FE3E5` |

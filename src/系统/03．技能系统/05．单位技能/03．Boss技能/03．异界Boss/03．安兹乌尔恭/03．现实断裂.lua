@@ -40,6 +40,7 @@ local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
+local GetRandomReal = jass.GetRandomReal
 local Atan2 = jass.Atan2
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
@@ -73,21 +74,21 @@ local function _____8BA1_7B97_4F24_5BB3(boss, target)
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
     return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["现实断裂伤害Boss攻击力比例"], ["目标最大生命比例"] = config["现实断裂伤害目标最大生命比例"]})
 end
-local function _____64AD_653E_73B0_5B9E_65AD_88C2_547D_4E2D_7279_6548(x, y, angle)
+local function _____64AD_653E_73B0_5B9E_65AD_88C2_547D_4E2D_7279_6548(x, y)
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = config["表现资源"]["现实断裂命中叠加特效路径"],
         X = x,
         Y = y,
         ["缩放"] = config["普通技能"]["现实断裂命中特效缩放"],
-        ["Z轴角度"] = angle,
+        ["Z轴角度"] = GetRandomReal(0, 360),
         ["持续秒"] = config["普通技能"]["现实断裂命中特效持续秒"],
         ["红"] = config["普通技能"]["现实断裂命中特效红"],
         ["绿"] = config["普通技能"]["现实断裂命中特效绿"],
         ["蓝"] = config["普通技能"]["现实断裂命中特效蓝"]
     })
 end
-local function _____521B_5EFA_73B0_5B9E_65AD_88C2_79FB_52A8(context, angle, originX, originY)
+____exports["创建安兹现实断裂移动"] = function(context, angle, originX, originY)
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
     local boss = context["安兹单位"]
     local endX = _____6781_5750_6807X(originX, angle, config["现实断裂路径长度"])
@@ -117,12 +118,14 @@ local function _____521B_5EFA_73B0_5B9E_65AD_88C2_79FB_52A8(context, angle, orig
         ["影响目标"] = "敌方",
         ["每单位最大命中次数"] = 1,
         ["碰撞消失"] = false,
-        ["不可阻挡"] = true,
+        ["弹幕生命值"] = 99,
+        ["可被攻击摧毁"] = true,
         ["禁用碰撞"] = true,
         ["附加特效1"] = {
             ["模型"] = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["现实断裂路径移动特效路径"],
             ["跟随主弹幕参数"] = true,
             ["缩放"] = config["现实断裂路径特效缩放"],
+            ["朝向角偏移"] = config["现实断裂路径特效朝向偏移"],
             ["红"] = config["现实断裂路径特效红"],
             ["绿"] = config["现实断裂路径特效绿"],
             ["蓝"] = config["现实断裂路径特效蓝"]
@@ -148,8 +151,7 @@ local function _____521B_5EFA_73B0_5B9E_65AD_88C2_79FB_52A8(context, angle, orig
             })
             _____64AD_653E_73B0_5B9E_65AD_88C2_547D_4E2D_7279_6548(
                 GetUnitX(unit),
-                GetUnitY(unit),
-                angle
+                GetUnitY(unit)
             )
         end
     })
@@ -163,12 +165,6 @@ ____exports["释放安兹现实断裂"] = function(context)
     if not _____5355_4F4D_6709_6548(target) then
         return
     end
-    _____64AD_653EBoss_5750_6807_97F3_6548(
-        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["现实断裂"],
-        GetUnitX(boss),
-        GetUnitY(boss),
-        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
-    )
     _____64AD_653E_5B89_5179_53F0_8BCD(boss, "现实断裂")
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
     _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C(context, config["现实断裂预警秒"] + config["现实断裂路径移动秒"])
@@ -177,8 +173,8 @@ ____exports["释放安兹现实断裂"] = function(context)
     local originY = GetUnitY(boss)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "矩形",
-        X = _____6781_5750_6807X(originX, angle, config["现实断裂路径长度"] * 0.5),
-        Y = _____6781_5750_6807Y(originY, angle, config["现实断裂路径长度"] * 0.5),
+        X = originX,
+        Y = originY,
         ["宽度"] = config["现实断裂路径宽度"],
         ["长度"] = config["现实断裂路径长度"],
         ["朝向"] = angle,
@@ -201,7 +197,8 @@ ____exports["释放安兹现实断裂"] = function(context)
             ["提示文本"] = "沿固定方向撕开空间切面"
         },
         ["on生效"] = function()
-            _____521B_5EFA_73B0_5B9E_65AD_88C2_79FB_52A8(context, angle, originX, originY)
+            _____64AD_653EBoss_5750_6807_97F3_6548(_____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["现实断裂"], originX, originY, _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"])
+            ____exports["创建安兹现实断裂移动"](context, angle, originX, originY)
         end
     })
 end

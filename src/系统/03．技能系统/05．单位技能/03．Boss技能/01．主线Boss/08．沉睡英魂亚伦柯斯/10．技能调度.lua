@@ -47,7 +47,7 @@ local function _____9009_62E9_968F_673A_76EE_6807(context)
     return _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(context["Boss单位"])
 end
 local function _____53D6_9636_6BB5_51B7_5374_6BEB_79D2(context, baseSeconds)
-    local multiplier = context["阶段"] == "P3最后的誓约" and 1 - _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["不灭军魂"]["P3技能间隔缩短比例"] or 1
+    local multiplier = context["阶段"] == "P3最后的誓约" and context["不灭军魂已启用"] and 1 - _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["不灭军魂"]["P3技能间隔缩短比例"] or 1
     return baseSeconds * multiplier * 1000
 end
 local function _____53D6_4EA1_51A5_82F1_65A9_51B7_5374(context)

@@ -18,21 +18,23 @@ const { 启动基础施法时间线 } = require('系统.03．技能系统.00．�
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
+const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效, 设置特效颜色 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number) => any;
+  销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
+  设置特效颜色: (this: void, effect: any, red: number, green: number, blue: number, alpha?: number) => void;
+};
 
 const jass = require('jass.common') as any;
-const japi = require('jass.japi') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, unit: any, point: string) => any;
-const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as (effect: any, color: number) => void;
 
 const 安兹单位类型ID = stringToFourCC(安兹乌尔恭单位技能配置.正式单位ID);
 const 光辉翠绿体技能ID = stringToFourCC(安兹乌尔恭单位技能配置.技能壳.光辉翠绿体);
 let 光辉翠绿体已注册 = false;
+const 光辉翠绿体特效键 = '安兹·光辉翠绿体';
 
 function 释放翠绿冲击(this: void, boss: any): void {
   if (!单位有效(boss)) return;
@@ -63,15 +65,24 @@ function 创建翠绿防护(this: void, context: 安兹运行时上下文): void
   const boss = context.安兹单位;
   if (!单位有效(boss)) return;
   const config = 安兹乌尔恭数值与表现配置;
-  const effect = AddSpecialEffectTarget(config.表现资源.光辉翠绿体特效路径, boss, 'origin');
-  if (effect != null && effect !== 0) {
-    DzSetEffectVertexColor(effect, 80 * 65536 + 255 * 256 + 120);
-  }
+  const effect = 创建单位坐标跟随特效(
+    boss,
+    config.表现资源.光辉翠绿体特效路径,
+    光辉翠绿体特效键,
+    config.普通技能.光辉翠绿体特效缩放,
+    config.普通技能.光辉翠绿体特效高度,
+  );
+  设置特效颜色(
+    effect,
+    config.普通技能.光辉翠绿体特效红,
+    config.普通技能.光辉翠绿体特效绿,
+    config.普通技能.光辉翠绿体特效蓝,
+  );
   let effectDestroyed = false;
   function 销毁翠绿防护特效(this: void): void {
-    if (effectDestroyed || effect == null || effect === 0) return;
+    if (effectDestroyed) return;
     effectDestroyed = true;
-    DestroyEffect(effect);
+    销毁单位坐标跟随特效(boss, 光辉翠绿体特效键);
   }
   创建次数型伤害免疫({
     名称: '安兹·光辉翠绿体',

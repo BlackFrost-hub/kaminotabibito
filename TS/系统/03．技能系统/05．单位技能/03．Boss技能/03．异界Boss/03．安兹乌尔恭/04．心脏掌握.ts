@@ -23,18 +23,31 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { 设置特效缩放 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  设置特效缩放: (this: void, effect: any, scale: number) => void;
+};
+const { QuestMessageBJ } = require('lib.扩展函数.BJ函数.06．任务消息') as {
+  QuestMessageBJ: (this: void, forceHandle: any, messageType: number, message: string) => void;
+};
+const { GetPlayersAll } = require('lib.扩展函数.BJ函数.07．杂项') as {
+  GetPlayersAll: (this: void) => any;
+};
 
 const jass = require('jass.common') as any;
+const jglobals = require('jass.globals') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const GetPlayerName = jass.GetPlayerName as (player: any) => string;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, unit: any, point: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const KillUnit = jass.KillUnit as (unit: any) => void;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
+const Quest消息警告 = jglobals.bj_QUESTMESSAGE_WARNING as number;
 
 const 安兹单位类型ID = stringToFourCC(安兹乌尔恭单位技能配置.正式单位ID);
 const 心脏掌握技能ID = stringToFourCC(安兹乌尔恭单位技能配置.技能壳.心脏掌握);
@@ -90,6 +103,16 @@ function 统计救援队友(this: void, boss: any, target: any, radius: number):
   return count;
 }
 
+function 广播心脏掌握点名警告(this: void, target: any): void {
+  const config = 安兹乌尔恭数值与表现配置.普通技能;
+  const playerName = GetPlayerName(GetOwningPlayer(target));
+  QuestMessageBJ(
+    GetPlayersAll(),
+    Quest消息警告,
+    `|cffff2020『任务警告』：|r|cffffcc00${playerName}|r 被安兹乌尔恭的|cffff2020『心脏掌握』|r点名！请在 ${config.心脏掌握倒计时秒} 秒内进入目标 ${config.心脏掌握救援半径} 范围协助破解，否则目标将被处决。`,
+  );
+}
+
 function 结算心脏掌握(this: void, instance: 心脏掌握实例): void {
   if (instance.已结算) return;
   instance.已结算 = true;
@@ -106,6 +129,7 @@ function 结算心脏掌握(this: void, instance: 心脏掌握实例): void {
   }
   const effect = AddSpecialEffectTarget(config.表现资源.心脏掌握处决特效路径, target, 'chest');
   if (effect != null && effect !== 0) {
+    设置特效缩放(effect, config.普通技能.心脏掌握处决特效缩放);
     YDWETimerDestroyEffectSafe(config.普通技能.心脏掌握处决特效持续秒, effect);
   }
   KillUnit(target);
@@ -113,13 +137,16 @@ function 结算心脏掌握(this: void, instance: 心脏掌握实例): void {
 
 function 创建心脏掌握倒计时(this: void, context: 安兹运行时上下文, target: any): void {
   const config = 安兹乌尔恭数值与表现配置;
+  const markEffect = AddSpecialEffectTarget(config.表现资源.心脏掌握点名特效路径, target, 'chest');
+  设置特效缩放(markEffect, config.普通技能.心脏掌握点名特效缩放);
   const instance: 心脏掌握实例 = {
     context,
     target,
-    点名特效: AddSpecialEffectTarget(config.表现资源.心脏掌握点名特效路径, target, 'chest'),
+    点名特效: markEffect,
     倒计时特效: AddSpecialEffectTarget(config.表现资源.心脏掌握倒计时特效路径, target, 'overhead'),
     已结算: false,
   };
+  广播心脏掌握点名警告(target);
   context.清理.登记清理('安兹-心脏掌握表现', function 心脏掌握表现清理(this: void): void {
     instance.已结算 = true;
     销毁心脏掌握表现(instance);

@@ -40,6 +40,7 @@ const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
+const GetRandomReal = jass.GetRandomReal as (minimum: number, maximum: number) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -76,14 +77,14 @@ function 计算伤害(this: void, boss: any, target: any): number {
   });
 }
 
-function 播放现实断裂命中特效(this: void, x: number, y: number, angle: number): void {
+function 播放现实断裂命中特效(this: void, x: number, y: number): void {
   const config = 安兹乌尔恭数值与表现配置;
   创建点特效({
     模型路径: config.表现资源.现实断裂命中叠加特效路径,
     X: x,
     Y: y,
     缩放: config.普通技能.现实断裂命中特效缩放,
-    Z轴角度: angle,
+    Z轴角度: GetRandomReal(0, 360),
     持续秒: config.普通技能.现实断裂命中特效持续秒,
     红: config.普通技能.现实断裂命中特效红,
     绿: config.普通技能.现实断裂命中特效绿,
@@ -91,7 +92,7 @@ function 播放现实断裂命中特效(this: void, x: number, y: number, angle:
   });
 }
 
-function 创建现实断裂移动(this: void, context: 安兹运行时上下文, angle: number, originX: number, originY: number): void {
+export function 创建安兹现实断裂移动(this: void, context: 安兹运行时上下文, angle: number, originX: number, originY: number): void {
   const config = 安兹乌尔恭数值与表现配置.普通技能;
   const boss = context.安兹单位;
   const endX = 极坐标X(originX, angle, config.现实断裂路径长度);
@@ -115,12 +116,14 @@ function 创建现实断裂移动(this: void, context: 安兹运行时上下文,
     影响目标: '敌方',
     每单位最大命中次数: 1,
     碰撞消失: false,
-    不可阻挡: true,
+    弹幕生命值: 99,
+    可被攻击摧毁: true,
     禁用碰撞: true,
     附加特效1: {
       模型: 安兹乌尔恭数值与表现配置.表现资源.现实断裂路径移动特效路径,
       跟随主弹幕参数: true,
       缩放: config.现实断裂路径特效缩放,
+      朝向角偏移: config.现实断裂路径特效朝向偏移,
       红: config.现实断裂路径特效红,
       绿: config.现实断裂路径特效绿,
       蓝: config.现实断裂路径特效蓝,
@@ -142,7 +145,7 @@ function 创建现实断裂移动(this: void, context: 安兹运行时上下文,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: 'Boss技能',
       });
-      播放现实断裂命中特效(GetUnitX(unit), GetUnitY(unit), angle);
+      播放现实断裂命中特效(GetUnitX(unit), GetUnitY(unit));
     },
   });
 }
@@ -152,7 +155,6 @@ export function 释放安兹现实断裂(this: void, context: 安兹运行时上
   if (!单位有效(boss) || context.挑战已结束 || context.当前大型技能 != null) return;
   const target = 取目标(boss);
   if (!单位有效(target)) return;
-  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.现实断裂, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   播放安兹台词(boss, '现实断裂');
   const config = 安兹乌尔恭数值与表现配置.普通技能;
   标记安兹普通机制忙碌(context, config.现实断裂预警秒 + config.现实断裂路径移动秒);
@@ -161,8 +163,8 @@ export function 释放安兹现实断裂(this: void, context: 安兹运行时上
   const originY = GetUnitY(boss);
   创建技能提示圈({
     类型: '矩形',
-    X: 极坐标X(originX, angle, config.现实断裂路径长度 * 0.5),
-    Y: 极坐标Y(originY, angle, config.现实断裂路径长度 * 0.5),
+    X: originX,
+    Y: originY,
     宽度: config.现实断裂路径宽度,
     长度: config.现实断裂路径长度,
     朝向: angle,
@@ -185,7 +187,13 @@ export function 释放安兹现实断裂(this: void, context: 安兹运行时上
       提示文本: '沿固定方向撕开空间切面',
     },
     on生效: function 现实断裂生效(this: void): void {
-      创建现实断裂移动(context, angle, originX, originY);
+      播放Boss坐标音效(
+        安兹乌尔恭数值与表现配置.音效.现实断裂,
+        originX,
+        originY,
+        安兹乌尔恭数值与表现配置.音效默认裁断距离,
+      );
+      创建安兹现实断裂移动(context, angle, originX, originY);
     },
   });
 }

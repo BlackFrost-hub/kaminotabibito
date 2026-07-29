@@ -2,7 +2,7 @@
 /**
  * TS 原生弹幕 - 类型定义
  *
- * 设计目标：单位作为弹幕物理载体，特效只做表现。
+ * 设计目标：同时支持单位物理载体与无单位壳的纯特效载体。
  *
  * 弹幕马甲分类约定：
  * - 古树：蝗虫弹幕单位。
@@ -17,6 +17,7 @@ import type { 英雄技能距离修正上下文 } from "../../../04．机制组�
 
 export type 原生弹幕影响目标 = "敌方" | "友方" | "全部";
 export type 原生弹幕轨迹类型 = "直线" | "追踪";
+export type 原生弹幕载体模式 = "单位" | "特效";
 export type 原生弹幕结束原因 = "完成" | "命中消失" | "距离结束" | "生命周期结束" | "单位死亡" | "被阻挡" | "手动销毁";
 
 export type 原生弹幕目标筛选 = (this: void, 目标单位: any, 弹幕ID: number) => boolean;
@@ -48,6 +49,8 @@ export interface 原生弹幕附加特效参数 {
   跟随主弹幕参数?: boolean;
   /** 根据每 Tick 的水平位移与 Z 高度差自动设置 Pitch；仅独立附加特效支持。 */
   跟随轨迹俯仰?: boolean;
+  /** 只修正模型视觉朝向，不改变弹幕的移动方向。 */
+  朝向角偏移?: number;
   缩放?: number;
   红?: number;
   绿?: number;
@@ -57,6 +60,8 @@ export interface 原生弹幕附加特效参数 {
 
 export interface 原生弹幕参数 {
   所有者: any;
+  /** 默认“单位”；“特效”模式不创建单位壳，仍支持轨迹、命中、伤害和回调。 */
+  载体模式?: 原生弹幕载体模式;
   所属玩家?: any;
   弹幕单位?: any;
   弹幕单位类型?: number;
@@ -135,7 +140,10 @@ export interface 原生弹幕参数 {
 
 export interface 原生弹幕实例 {
   readonly 弹幕ID: number;
+  /** 纯特效模式下为 null。 */
   readonly 弹幕单位: any;
+  readonly 弹幕特效1: any;
+  readonly 弹幕特效2: any;
   获取剩余生命(this: void): number;
   造成阻挡伤害(this: void, 伤害值: number, 来源单位?: any): boolean;
   销毁(this: void, 原因?: 原生弹幕结束原因): void;
@@ -147,6 +155,7 @@ export interface 原生弹幕内部实例 {
   弹幕单位: any;
   当前X: number;
   当前Y: number;
+  当前Z: number;
   当前方向角: number;
   当前速度: number;
   当前伤害值: number;

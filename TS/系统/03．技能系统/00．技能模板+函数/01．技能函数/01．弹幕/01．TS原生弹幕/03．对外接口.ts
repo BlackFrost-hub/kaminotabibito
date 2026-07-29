@@ -67,11 +67,13 @@ function 解析弹幕方向(this: void, 参数: 原生弹幕参数): number {
 }
 
 function 创建或取得弹幕单位(this: void, 参数: 原生弹幕参数, x: number, y: number, face: number): any {
+  if (参数.载体模式 === "特效") return null;
   if (参数.弹幕单位 != null && 参数.弹幕单位 !== 0) return 参数.弹幕单位;
   return CreateUnit(解析弹幕玩家(参数), 参数.弹幕单位类型 ?? 默认弹幕单位类型, x, y, face);
 }
 
 function 激活非牛头人弹幕可选取(this: void, 实例: 原生弹幕内部实例): void {
+  if (实例.弹幕单位 == null || 实例.弹幕单位 === 0) return;
   if (实例.参数.不可阻挡 === true) return;
   const face = 实例.当前方向角;
   const x = 实例.当前X + CosBJ(face);
@@ -123,20 +125,20 @@ function 初始化弹幕单位类别(this: void, 参数: 原生弹幕参数, 弹
 function 创建弹幕附加特效(
   this: void,
   参数: 原生弹幕参数,
-  弹幕单位: any,
+  x: number,
+  y: number,
+  z: number,
+  face: number,
   特效参数?: 原生弹幕附加特效参数,
 ): any {
   if (特效参数 == null || 特效参数.模型 === "") return null;
   const scale = 特效参数.缩放 ?? (特效参数.跟随主弹幕参数 === true ? (参数.缩放 ?? 1) : 1);
-  const x = GetUnitX(弹幕单位);
-  const y = GetUnitY(弹幕单位);
-  const z = 参数.飞行高度 ?? 0;
   const effect = EC_CreateEffect(
     特效参数.模型,
     x,
     y,
     z,
-    GetUnitFacing(弹幕单位),
+    face + (特效参数.朝向角偏移 ?? 0),
     scale,
     1,
     -1,
@@ -147,29 +149,31 @@ function 创建弹幕附加特效(
   return effect;
 }
 
-function 初始化弹幕单位表现(this: void, 参数: 原生弹幕参数, 弹幕单位: any): [any, any] {
-  初始化弹幕单位类别(参数, 弹幕单位);
+function 初始化弹幕表现(this: void, 参数: 原生弹幕参数, 弹幕单位: any, x: number, y: number, z: number, face: number): [any, any] {
+  if (弹幕单位 != null && 弹幕单位 !== 0) {
+    初始化弹幕单位类别(参数, 弹幕单位);
 
-  if (参数.模型 != null && 参数.模型 !== "" && DzSetUnitModel != null) {
-    DzSetUnitModel(弹幕单位, 参数.模型);
-  }
+    if (参数.模型 != null && 参数.模型 !== "" && DzSetUnitModel != null) {
+      DzSetUnitModel(弹幕单位, 参数.模型);
+    }
 
-  const 缩放 = 参数.缩放 ?? 1;
-  if (缩放 > 0) {
-    SetUnitScale(弹幕单位, 缩放, 缩放, 缩放);
-  }
-  if (参数.飞行高度 != null) {
-    SetUnitFlyHeight(弹幕单位, 参数.飞行高度, 0);
-  }
-  if (参数.禁用碰撞 !== false) {
-    SetUnitPathing(弹幕单位, false);
+    const 缩放 = 参数.缩放 ?? 1;
+    if (缩放 > 0) {
+      SetUnitScale(弹幕单位, 缩放, 缩放, 缩放);
+    }
+    if (参数.飞行高度 != null) {
+      SetUnitFlyHeight(弹幕单位, 参数.飞行高度, 0);
+    }
+    if (参数.禁用碰撞 !== false) {
+      SetUnitPathing(弹幕单位, false);
+    }
   }
   const legacyEffect = 参数.附着特效模型 != null && 参数.附着特效模型 !== ""
     ? { 模型: 参数.附着特效模型, 附着点: 参数.附着点 }
     : undefined;
   return [
-    创建弹幕附加特效(参数, 弹幕单位, 参数.附加特效1 ?? legacyEffect),
-    创建弹幕附加特效(参数, 弹幕单位, 参数.附加特效2),
+    创建弹幕附加特效(参数, x, y, z, face, 参数.附加特效1 ?? legacyEffect),
+    创建弹幕附加特效(参数, x, y, z, face, 参数.附加特效2),
   ];
 }
 
@@ -185,6 +189,8 @@ function 创建弹幕实例对象(this: void, 实例: 原生弹幕内部实例):
   return {
     弹幕ID: 实例.id,
     弹幕单位: 实例.弹幕单位,
+    弹幕特效1: 实例.附加特效1,
+    弹幕特效2: 实例.附加特效2,
     获取剩余生命: function 获取剩余生命(this: void): number {
       const 当前 = 获取原生弹幕实例(实例.id);
       return 当前 != null ? 当前.剩余生命 : 0;
@@ -203,6 +209,7 @@ export function 创建原生弹幕(this: void, 参数: 原生弹幕参数): 原�
   const x = 解析弹幕X(参数);
   const y = 解析弹幕Y(参数);
   const face = 解析弹幕方向(参数);
+  const z = 参数.飞行高度 ?? 0;
   const 弹幕单位 = 创建或取得弹幕单位(参数, x, y, face);
   const id = 分配原生弹幕ID();
 
@@ -212,6 +219,7 @@ export function 创建原生弹幕(this: void, 参数: 原生弹幕参数): 原�
     弹幕单位,
     当前X: x,
     当前Y: y,
+    当前Z: z,
     当前方向角: face,
     当前速度: 参数.速度,
     当前伤害值: 参数.伤害值 ?? 0,
@@ -225,13 +233,15 @@ export function 创建原生弹幕(this: void, 参数: 原生弹幕参数): 原�
     命中规则状态: null,
   };
 
-  const 附加特效 = 初始化弹幕单位表现(参数, 弹幕单位);
+  const 附加特效 = 初始化弹幕表现(参数, 弹幕单位, x, y, z, face);
   实例.附加特效1 = 附加特效[0];
   实例.附加特效2 = 附加特效[1];
   激活非牛头人弹幕可选取(实例);
   实例.命中规则状态 = 创建弹幕命中规则状态(实例);
   注册原生弹幕实例(实例, 取句柄ID(弹幕单位));
-  确保弹幕死亡事件监听();
+  if (弹幕单位 != null && 弹幕单位 !== 0) {
+    确保弹幕死亡事件监听();
+  }
   确保原生弹幕驱动();
   return 创建弹幕实例对象(实例);
 }
@@ -261,6 +271,7 @@ export function 重置原生弹幕命中记录(this: void, 弹幕ID: number): bo
 export function 造成原生弹幕阻挡伤害(this: void, 弹幕ID: number, 伤害值: number, 来源单位?: any): boolean {
   const 实例 = 获取原生弹幕实例(弹幕ID);
   if (实例 == null || 实例.已结束) return false;
+  if (实例.弹幕单位 == null || 实例.弹幕单位 === 0) return false;
   if (伤害值 <= 0) return false;
   if (实例.参数.不可阻挡 === true) return false;
 

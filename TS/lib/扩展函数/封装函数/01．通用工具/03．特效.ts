@@ -478,6 +478,18 @@ export function 设置Dz绑定特效缩放(effect: any, scale: number): void {
   EXEffectMatScale(effect, scale, scale, scale);
 }
 
+/** 安全设置普通特效实例缩放，不要求特效使用 Dz 绑定。 */
+export function 设置特效缩放(effect: any, scale: number): void {
+  if (effect == null || effect === 0 || scale <= 0) return;
+  EXSetEffectSize(effect, scale);
+}
+
+/** 使用 DzGetColor 组装完整 ARGB，避免手算颜色遗漏 Alpha 或通道错位。 */
+export function 设置特效颜色(effect: any, red: number, green: number, blue: number, alpha: number = 255): void {
+  if (effect == null || effect === 0) return;
+  DzSetEffectVertexColor(effect, DzGetColor(alpha, red, green, blue));
+}
+
 function 单位可坐标跟随(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
 }

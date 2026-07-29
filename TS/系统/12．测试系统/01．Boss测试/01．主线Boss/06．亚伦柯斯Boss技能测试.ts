@@ -103,6 +103,7 @@ interface 亚伦柯斯测试上下文 {
   运行时: any;
   目标单位: any;
   Boss单位: any;
+  玩家英雄: any;
 }
 
 const 最近测试Boss: Record<number, any> = {};
@@ -171,7 +172,8 @@ function 创建或获取亚伦柯斯测试上下文(this: void, player: any): �
 
   SelectUnitForPlayerSingle(boss, player);
   StarOther_PanCameraToTimedForPlayer(player, 测试中心X, 测试中心Y, 0.2);
-  return { 运行时: runtime, 目标单位: target, Boss单位: boss };
+  runtime.测试安魂英雄 = hero;
+  return { 运行时: runtime, 目标单位: target, Boss单位: boss, 玩家英雄: hero };
 }
 
 function 清理亚伦柯斯测试上下文(this: void, player: any, context: 亚伦柯斯测试上下文): void {
@@ -243,9 +245,27 @@ function 测试亚伦柯斯P3亡者凝视(this: void, _player: any, context: 亚
   释放亚伦柯斯亡者凝视(context.运行时, context.目标单位);
 }
 function 测试亚伦柯斯旧誓墓碑(this: void, _player: any, context: 亚伦柯斯测试上下文): void {
-  context.运行时.阶段 = 'P2旧誓回响';
-  context.运行时.当前大型技能 = undefined;
+  清理亚伦柯斯运行时上下文(context.Boss单位);
+  const runtime = 获取或创建亚伦柯斯运行时上下文(context.Boss单位);
+  if (runtime == null) return;
+  context.运行时 = runtime;
+  context.运行时.测试安魂英雄 = context.玩家英雄;
+  准备亚伦柯斯P2(context);
   启动亚伦柯斯旧誓墓碑(context.运行时);
+}
+function 测试亚伦柯斯大法师靠近墓碑(this: void, player: any, context: 亚伦柯斯测试上下文): void {
+  let states = context.运行时.墓碑状态列表 as any[];
+  if (!context.运行时.墓碑机制已启动 || states.length <= 0) {
+    测试亚伦柯斯旧誓墓碑(player, context);
+    states = context.运行时.墓碑状态列表 as any[];
+  }
+  context.运行时.测试安魂英雄 = context.玩家英雄;
+  for (let i = 0; i < states.length; i++) {
+    const state = states[i];
+    if (state.已安魂) continue;
+    SetUnitPosition(context.玩家英雄, state.X, state.Y);
+    return;
+  }
 }
 function 测试亚伦柯斯进入P3(this: void, _player: any, context: 亚伦柯斯测试上下文): void { 准备亚伦柯斯P3(context); }
 function 测试亚伦柯斯P3亡冥英斩(this: void, _player: any, context: 亚伦柯斯测试上下文): void {
@@ -277,6 +297,7 @@ const 亚伦柯斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 3, 命令: '3-2', 名称: 'P2亡者凝视', 执行: 测试亚伦柯斯P2亡者凝视 },
   { 序号: 3, 命令: '3-3', 名称: 'P3亡者凝视', 执行: 测试亚伦柯斯P3亡者凝视 },
   { 序号: 4, 名称: 'P2旧誓墓碑', 执行: 测试亚伦柯斯旧誓墓碑 },
+  { 序号: 4, 命令: '4-near', 名称: '预设大法师靠近下一座未安魂墓碑', 执行: 测试亚伦柯斯大法师靠近墓碑 },
   { 序号: 5, 名称: '进入P3最后誓约', 执行: 测试亚伦柯斯进入P3 },
   { 序号: 6, 名称: 'P3亡冥英斩归魂', 执行: 测试亚伦柯斯P3亡冥英斩 },
   { 序号: 7, 名称: 'P3英灵陨星送葬', 执行: 测试亚伦柯斯P3英灵陨星 },

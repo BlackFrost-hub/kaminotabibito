@@ -114,6 +114,7 @@ function 创建高阶亡灵(this: void, context: 安兹运行时上下文, x: nu
     主人单位: boss,
     单位类型: cfg.高阶亡灵召唤单位ID,
     单位名称: cfg.高阶亡灵召唤单位名称,
+    模型文件: cfg.高阶亡灵召唤模型路径,
     X: x,
     Y: y,
     朝向: GetUnitFacing(boss),

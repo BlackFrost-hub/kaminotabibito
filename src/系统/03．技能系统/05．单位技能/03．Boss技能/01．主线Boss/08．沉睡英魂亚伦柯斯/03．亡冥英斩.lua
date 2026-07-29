@@ -249,6 +249,7 @@ ____exports["释放亚伦柯斯亡冥英斩"] = function(context, target)
     })
     local charge = AddSpecialEffect(_____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["表现资源"]["亡冥英斩蓄势特效路径"], startX, startY)
     if charge ~= nil and charge ~= 0 then
+        EXEffectMatRotateZ(charge, facing)
         YDWETimerDestroyEffectSafe(cfg["前摇秒"] + 0.2, charge)
     end
     _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD(boss, isP3 and "亡冥英斩归魂" or "亡冥英斩")

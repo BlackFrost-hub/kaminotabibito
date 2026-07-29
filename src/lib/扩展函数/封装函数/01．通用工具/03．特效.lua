@@ -514,6 +514,26 @@ ____exports["设置Dz绑定特效缩放"] = function(effect, scale)
     EXSetEffectSize(effect, scale)
     EXEffectMatScale(effect, scale, scale, scale)
 end
+--- 安全设置普通特效实例缩放，不要求特效使用 Dz 绑定。
+____exports["设置特效缩放"] = function(effect, scale)
+    if effect == nil or effect == 0 or scale <= 0 then
+        return
+    end
+    EXSetEffectSize(effect, scale)
+end
+--- 使用 DzGetColor 组装完整 ARGB，避免手算颜色遗漏 Alpha 或通道错位。
+____exports["设置特效颜色"] = function(effect, red, green, blue, alpha)
+    if alpha == nil then
+        alpha = 255
+    end
+    if effect == nil or effect == 0 then
+        return
+    end
+    DzSetEffectVertexColor(
+        effect,
+        DzGetColor(alpha, red, green, blue)
+    )
+end
 local function _____5355_4F4D_53EF_5750_6807_8DDF_968F(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
@@ -547,11 +567,11 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
         do
             local record = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key]
             if record == nil then
-                goto __continue107
+                goto __continue111
             end
             if not _____5355_4F4D_53EF_5750_6807_8DDF_968F(record.unit) then
                 _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548_8BB0_5F55(key, record)
-                goto __continue107
+                goto __continue111
             end
             DzSetEffectPos(
                 record.effect,
@@ -560,7 +580,7 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
                 record.height
             )
         end
-        ::__continue107::
+        ::__continue111::
     end
     if _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()

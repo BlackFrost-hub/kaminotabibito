@@ -58,7 +58,7 @@ function 读取弹幕伤害形态(this: void, 实例: 原生弹幕内部实例):
 function 目标阵营允许(this: void, 实例: 原生弹幕内部实例, 目标单位: any): boolean {
   const 来源单位 = 实例.参数.所有者;
   if (目标单位 == null || 目标单位 === 0) return false;
-  if (isSameUnit(目标单位, 实例.弹幕单位)) return false;
+  if (实例.弹幕单位 != null && 实例.弹幕单位 !== 0 && isSameUnit(目标单位, 实例.弹幕单位)) return false;
   if (实例.参数.允许命中所有者 !== true && isSameUnit(目标单位, 来源单位)) return false;
 
   const 影响目标 = 实例.参数.影响目标 ?? "敌方";

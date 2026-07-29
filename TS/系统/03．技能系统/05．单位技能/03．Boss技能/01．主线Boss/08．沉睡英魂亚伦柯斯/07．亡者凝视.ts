@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 单位未标记死亡 as 单位有效, 极坐标X, 极坐标Y } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
@@ -23,8 +23,9 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
-const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+const { 创建原生弹幕, 创建直线定点轨迹 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index') as {
+  创建原生弹幕: (this: void, 参数: any) => any;
+  创建直线定点轨迹: (this: void, 起点X: number, 起点Y: number, 终点X: number, 终点Y: number) => any;
 };
 
 const jass = require('jass.common') as any;
@@ -33,7 +34,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -60,9 +60,27 @@ export function 释放亚伦柯斯亡者凝视(this: void, context: 亚伦柯斯
       if (context.当前大型技能 === 亡者凝视技能Key) context.当前大型技能 = undefined;
       return;
     }
-    const effect = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.亡者凝视特效路径, x, y);
+    const endX = 极坐标X(x, facing, cfg.半径);
+    const endY = 极坐标Y(y, facing, cfg.半径);
+    创建原生弹幕({
+      所有者: boss,
+      载体模式: '特效',
+      X: x,
+      Y: y,
+      方向角: facing,
+      速度: cfg.半径 / cfg.冲击持续秒,
+      生命周期: cfg.冲击持续秒,
+      最大距离: cfg.半径,
+      轨迹采样器: 创建直线定点轨迹(x, y, endX, endY),
+      命中半径: 0,
+      禁用碰撞: true,
+      附加特效1: {
+        模型: 亚伦柯斯正式设计配置.表现资源.亡者凝视特效路径,
+        跟随主弹幕参数: true,
+        缩放: 2,
+      },
+    });
     播放Boss坐标音效(亚伦柯斯正式设计配置.音效.亡者凝视, x, y, 亚伦柯斯正式设计配置.音效默认裁断距离);
-    if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(0.8, effect);
     const heroes = 获取Boss技能敌对英雄列表(boss);
     for (let i = 0; i < heroes.length; i++) {
       const hit = heroes[i];

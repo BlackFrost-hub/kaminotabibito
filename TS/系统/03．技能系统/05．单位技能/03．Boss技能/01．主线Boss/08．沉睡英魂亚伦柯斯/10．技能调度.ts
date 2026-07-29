@@ -43,7 +43,9 @@ function 选择随机目标(this: void, context: 亚伦柯斯运行时上下文)
 }
 
 function 取阶段冷却毫秒(this: void, context: 亚伦柯斯运行时上下文, baseSeconds: number): number {
-  const multiplier = context.阶段 === 'P3最后的誓约' ? 1 - 亚伦柯斯正式设计配置.不灭军魂.P3技能间隔缩短比例 : 1;
+  const multiplier = context.阶段 === 'P3最后的誓约' && context.不灭军魂已启用
+    ? 1 - 亚伦柯斯正式设计配置.不灭军魂.P3技能间隔缩短比例
+    : 1;
   return baseSeconds * multiplier * 1000;
 }
 

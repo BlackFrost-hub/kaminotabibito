@@ -157,16 +157,16 @@ ${vertices.map(() => '        0,').join('\n')}
 }`;
 }
 
-function alphaTrack(entries) {
+function alphaTrack(entries, interpolation = 'Linear') {
   return `Alpha ${entries.length} {
-        Linear,
+        ${interpolation},
 ${entries.map(([time, alpha]) => `        ${time}: ${formatNumber(alpha)},`).join('\n')}
     }`;
 }
 
-function geosetAnimationBlock(geosetId, color, alphaEntries) {
+function geosetAnimationBlock(geosetId, color, alphaEntries, interpolation = 'Linear') {
   return `GeosetAnim {
-    ${alphaTrack(alphaEntries)}
+    ${alphaTrack(alphaEntries, interpolation)}
     static Color ${vector(color)},
     GeosetId ${geosetId},
 }`;
@@ -199,7 +199,7 @@ for (let index = 0; index < 12; index += 1) {
     [offTime - 120, 1],
     [offTime, 0],
     [13400, 0],
-  ]));
+  ], 'DontInterp'));
 }
 
 function scalingKey(time, scale) {
@@ -319,6 +319,12 @@ if (verified.name !== 'AinzHeartCountdown' || verified.geosets.length !== 14 || 
 }
 if (verified.materials[1].layers[0].filterMode !== 1) {
   throw new Error('Heart texture layer must use Transparent filter mode');
+}
+for (let index = 2; index < 14; index += 1) {
+  const alphaAnimation = verified.geosetAnimations[index].animations[0];
+  if (alphaAnimation == null || alphaAnimation.interpolationType !== 0) {
+    throw new Error(`Countdown tick ${index - 1} alpha must use DontInterp`);
+  }
 }
 
 const tickSvg = Array.from({ length: 12 }, (_, index) => {

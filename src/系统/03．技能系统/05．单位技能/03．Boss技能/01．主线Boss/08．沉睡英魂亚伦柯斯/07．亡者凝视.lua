@@ -2,6 +2,8 @@
 local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local _____6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
+local _____6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.02．数值与表现配置")
 local _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["亚伦柯斯正式设计配置"]
 local ____11_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.11．台词播放")
@@ -25,15 +27,15 @@ local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_3.addDelayedCallback
 local getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
+local _____521B_5EFA_76F4_7EBF_5B9A_70B9_8F68_8FF9 = ____require_result_4["创建直线定点轨迹"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local SetUnitFacing = jass.SetUnitFacing
 local Atan2 = jass.Atan2
-local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
@@ -77,11 +79,23 @@ ____exports["释放亚伦柯斯亡者凝视"] = function(context, target)
                 end
                 return
             end
-            local effect = AddSpecialEffect(_____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["表现资源"]["亡者凝视特效路径"], x, y)
+            local endX = _____6781_5750_6807X(x, facing, cfg["半径"])
+            local endY = _____6781_5750_6807Y(y, facing, cfg["半径"])
+            _____521B_5EFA_539F_751F_5F39_5E55({
+                ["所有者"] = boss,
+                ["载体模式"] = "特效",
+                X = x,
+                Y = y,
+                ["方向角"] = facing,
+                ["速度"] = cfg["半径"] / cfg["冲击持续秒"],
+                ["生命周期"] = cfg["冲击持续秒"],
+                ["最大距离"] = cfg["半径"],
+                ["轨迹采样器"] = _____521B_5EFA_76F4_7EBF_5B9A_70B9_8F68_8FF9(x, y, endX, endY),
+                ["命中半径"] = 0,
+                ["禁用碰撞"] = true,
+                ["附加特效1"] = {["模型"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["表现资源"]["亡者凝视特效路径"], ["跟随主弹幕参数"] = true, ["缩放"] = 2}
+            })
             _____64AD_653EBoss_5750_6807_97F3_6548(_____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["音效"]["亡者凝视"], x, y, _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["音效默认裁断距离"])
-            if effect ~= nil and effect ~= 0 then
-                YDWETimerDestroyEffectSafe(0.8, effect)
-            end
             local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
             do
                 local i = 0
@@ -96,7 +110,7 @@ ____exports["释放亚伦柯斯亡者凝视"] = function(context, target)
                             facing,
                             cfg["扇形角度"]
                         ) then
-                            goto __continue9
+                            goto __continue8
                         end
                         local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -113,7 +127,7 @@ ____exports["释放亚伦柯斯亡者凝视"] = function(context, target)
                         })
                         _____5F00_59CB_786C_76F4(hit, cfg["硬直秒"])
                     end
-                    ::__continue9::
+                    ::__continue8::
                     i = i + 1
                 end
             end

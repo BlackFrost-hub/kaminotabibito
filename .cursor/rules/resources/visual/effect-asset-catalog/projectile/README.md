@@ -13,3 +13,4 @@
 | `Common\Effect\Projectile\Red Quick.mdx` | 候选截图观察：红白细长高速轨迹方向明确，厚度远小于普通光炮，适合长枪直刺和高速拖尾。 | 迁移后序列：`Birth / Birth - 2 / Birth - 3 / Stand / Death`；完成 3 项结构修复。 | 夏提雅·滴管长枪拖尾 / 直线反刺；源候选 `Red Quick.mdx`。 | 接入时压低白色亮度，并避免整屏染红。 | 9108 | `78F0D70BFC7BD058` |
 | `Common\Effect\Projectile\GhostlyBoneSpearPurple.mdx` | 用户指定的紫色幽魂骨矛，骨质主体与紫色灵光用于增强暗系弹体轮廓。 | `Birth / Stand / Death`；朝模型正前方飞行。 | 菲尼克斯尔骸骨弹幕的可见叠加层。 | 与原生 `SerpentWardMissile.mdl` 叠加，不单独替换原骨羽；只引用游戏内置贴图。 | 10519 | `F1082E4DE0A03619` |
 | `Common\Effect\Projectile\TrollChiefExpandingShockwave.mdx` | 用户截图确认：翠绿色扇形风波连续向前推出，前端明亮、尾部收束，方向辨识清晰。 | `Stand`；模型正前方应与弹幕朝向一致。 | 树魔首领扩散冲击波的径向飞行层、消耗反击的正面冲击波。 | 用于移动弹幕，不能替代 Boss 施法点的爆发特效；依赖 Projectile 共享 Texture 贴图。 | 8219 | `BC954A50C76C0E21` |
+| `Common\Effect\Projectile\AronkosTombstoneEchoSlash.mdx` | 高饱和红色月牙斩光，前缘清晰并带细长红蓝拖尾，能够表现墓碑残影沿预警线突进。 | `Birth / Stand / Death`；模型正前方随直线弹幕移动。 | 亚伦柯斯旧誓墓碑每 `5.2秒` 发射的残影斩击。 | 不代替方向直线预警；运行时以纯特效弹幕移动并按路径碰撞结算，复用已校验的 KnifeLight 私有贴图。 | 4818 | `E4CC810C342DF3BE` |

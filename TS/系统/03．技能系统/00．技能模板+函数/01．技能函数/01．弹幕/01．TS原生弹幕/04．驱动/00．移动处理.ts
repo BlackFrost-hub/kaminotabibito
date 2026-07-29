@@ -72,7 +72,8 @@ function 同步单个弹幕附加特效(
     EXEffectMatReset(effect);
     EXSetEffectSize(effect, 解析附加特效缩放(实例, 特效参数));
     if (轨迹俯仰角 !== 0) EXEffectMatRotateY(effect, -轨迹俯仰角);
-    if (新方向角 !== 0) EXEffectMatRotateZ(effect, 新方向角);
+    const 特效方向角 = 新方向角 + (特效参数.朝向角偏移 ?? 0);
+    if (特效方向角 !== 0) EXEffectMatRotateZ(effect, 特效方向角);
     DzSetEffectPos(effect, x, y, z);
     return;
   }
@@ -98,20 +99,39 @@ function 同步弹幕附加特效(
   同步单个弹幕附加特效(实例, 实例.附加特效2, 实例.参数.附加特效2, x, y, z, 新方向角, 旋转角度差, 轨迹俯仰角);
 }
 
-function 更新弹幕单位坐标(this: void, 实例: 原生弹幕内部实例, x: number, y: number, face: number, 旧方向角: number, z?: number): void {
+function 更新弹幕坐标(this: void, 实例: 原生弹幕内部实例, x: number, y: number, face: number, 旧方向角: number, z?: number): void {
   const 新方向角 = 标准化角度(face);
   const oldX = 实例.当前X;
   const oldY = 实例.当前Y;
-  const oldZ = GetUnitFlyHeight(实例.弹幕单位);
+  const oldZ = 实例.弹幕单位 != null && 实例.弹幕单位 !== 0
+    ? GetUnitFlyHeight(实例.弹幕单位)
+    : 实例.当前Z;
   const newZ = z ?? oldZ;
-  SetUnitX(实例.弹幕单位, x);
-  SetUnitY(实例.弹幕单位, y);
-  立即设置单位朝向(实例.弹幕单位, 新方向角);
-  if (z != null) SetUnitFlyHeight(实例.弹幕单位, z, 0);
+  if (实例.弹幕单位 != null && 实例.弹幕单位 !== 0) {
+    SetUnitX(实例.弹幕单位, x);
+    SetUnitY(实例.弹幕单位, y);
+    立即设置单位朝向(实例.弹幕单位, 新方向角);
+    if (z != null) SetUnitFlyHeight(实例.弹幕单位, z, 0);
+  }
   实例.当前X = x;
   实例.当前Y = y;
+  实例.当前Z = newZ;
   实例.当前方向角 = 新方向角;
   同步弹幕附加特效(实例, oldX, oldY, oldZ, x, y, newZ, 旧方向角, 新方向角);
+}
+
+export function 同步原生弹幕表现朝向(this: void, 实例: 原生弹幕内部实例, 旧方向角: number): void {
+  同步弹幕附加特效(
+    实例,
+    实例.当前X,
+    实例.当前Y,
+    实例.当前Z,
+    实例.当前X,
+    实例.当前Y,
+    实例.当前Z,
+    旧方向角,
+    实例.当前方向角,
+  );
 }
 
 function 更新追踪方向(this: void, 实例: 原生弹幕内部实例, delta: number): void {
@@ -141,9 +161,10 @@ function 尝试弹射(this: void, 实例: 原生弹幕内部实例, 同步前方
   } else {
     实例.当前方向角 = 标准化角度(实例.当前方向角 + (实例.参数.弹射角度 ?? 180));
   }
-  立即设置单位朝向(实例.弹幕单位, 实例.当前方向角);
-  const z = GetUnitFlyHeight(实例.弹幕单位);
-  同步弹幕附加特效(实例, 实例.当前X, 实例.当前Y, z, 实例.当前X, 实例.当前Y, z, 同步前方向角, 实例.当前方向角);
+  if (实例.弹幕单位 != null && 实例.弹幕单位 !== 0) {
+    立即设置单位朝向(实例.弹幕单位, 实例.当前方向角);
+  }
+  同步原生弹幕表现朝向(实例, 同步前方向角);
 
   const 衰减 = 实例.参数.弹射衰减 ?? 0;
   if (衰减 > 0) {
@@ -155,7 +176,7 @@ function 尝试弹射(this: void, 实例: 原生弹幕内部实例, 同步前方
 }
 
 export function 推进弹幕移动(this: void, 实例: 原生弹幕内部实例, delta: number): boolean {
-  if (IsUnitPaused(实例.弹幕单位)) return false;
+  if (实例.弹幕单位 != null && 实例.弹幕单位 !== 0 && IsUnitPaused(实例.弹幕单位)) return false;
 
   const 延迟 = 实例.参数.延迟发射 ?? 0;
   if (延迟 > 0 && 实例.已运行时间 < 延迟) return false;
@@ -167,14 +188,14 @@ export function 推进弹幕移动(this: void, 实例: 原生弹幕内部实例,
     const oldY = 实例.当前Y;
     const 结果 = 采样器(实例, delta);
     实例.已飞行距离 += 计算距离(oldX, oldY, 结果.X, 结果.Y);
-    更新弹幕单位坐标(实例, 结果.X, 结果.Y, 结果.方向角 ?? 实例.当前方向角, 移动前方向角, 结果.Z);
+    更新弹幕坐标(实例, 结果.X, 结果.Y, 结果.方向角 ?? 实例.当前方向角, 移动前方向角, 结果.Z);
     return 结果.完成 === true;
   }
 
   if (实例.参数.轨迹类型 === "追踪") {
     更新追踪方向(实例, delta);
   } else {
-    if (实例.参数.显式改向后锁定方向 !== true) {
+    if (实例.弹幕单位 != null && 实例.弹幕单位 !== 0 && 实例.参数.显式改向后锁定方向 !== true) {
       实例.当前方向角 = 标准化角度(GetUnitFacing(实例.弹幕单位));
     }
   }
@@ -187,6 +208,6 @@ export function 推进弹幕移动(this: void, 实例: 原生弹幕内部实例,
   }
 
   实例.已飞行距离 += 距离;
-  更新弹幕单位坐标(实例, nextX, nextY, 实例.当前方向角, 移动前方向角);
+  更新弹幕坐标(实例, nextX, nextY, 实例.当前方向角, 移动前方向角);
   return false;
 }

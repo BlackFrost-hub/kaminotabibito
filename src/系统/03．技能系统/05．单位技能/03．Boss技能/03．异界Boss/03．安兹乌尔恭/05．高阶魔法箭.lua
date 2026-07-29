@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local addDelayedCallback, GetUnitX, GetUnitY
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
@@ -21,6 +22,31 @@ local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+____exports["安排安兹高阶魔法箭特效后音效"] = function(context)
+    local boss = context["安兹单位"]
+    local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
+    local callbackId = addDelayedCallback(
+        cfg["普通技能"]["高阶魔法箭特效后音效延迟秒"] * 1000,
+        function()
+            local ____context__6311_6218_5DF2_7ED3_675F_11 = context["挑战已结束"]
+            if not ____context__6311_6218_5DF2_7ED3_675F_11 then
+                local ____self_10 = context["清理"]
+                ____context__6311_6218_5DF2_7ED3_675F_11 = ____self_10["已清理"](____self_10)
+            end
+            if ____context__6311_6218_5DF2_7ED3_675F_11 or not _____5355_4F4D_6709_6548(boss) then
+                return
+            end
+            _____64AD_653EBoss_5750_6807_97F3_6548(
+                cfg["音效"]["高阶魔法箭"],
+                GetUnitX(boss),
+                GetUnitY(boss),
+                cfg["音效默认裁断距离"]
+            )
+        end
+    )
+    local ____self_12 = context["清理"]
+    ____self_12["登记延迟回调"](____self_12, "安兹-高阶魔法箭音效", callbackId)
+end
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
@@ -33,10 +59,12 @@ local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_3["造成AOE技能伤害"]
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_5.addDelayedCallback
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local GetUnitX = jass.GetUnitX
-local GetUnitY = jass.GetUnitY
+GetUnitX = jass.GetUnitX
+GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
@@ -76,12 +104,12 @@ local function _____8BA1_7B97_9AD8_9636_9B54_6CD5_7BAD_4F24_5BB3(context, boss, 
 end
 local function _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, x, y)
     local boss = context["安兹单位"]
-    local ____context__6311_6218_5DF2_7ED3_675F_6 = context["挑战已结束"]
-    if not ____context__6311_6218_5DF2_7ED3_675F_6 then
-        local ____self_5 = context["清理"]
-        ____context__6311_6218_5DF2_7ED3_675F_6 = ____self_5["已清理"](____self_5)
+    local ____context__6311_6218_5DF2_7ED3_675F_7 = context["挑战已结束"]
+    if not ____context__6311_6218_5DF2_7ED3_675F_7 then
+        local ____self_6 = context["清理"]
+        ____context__6311_6218_5DF2_7ED3_675F_7 = ____self_6["已清理"](____self_6)
     end
-    if ____context__6311_6218_5DF2_7ED3_675F_6 or not _____5355_4F4D_6709_6548(boss) then
+    if ____context__6311_6218_5DF2_7ED3_675F_7 or not _____5355_4F4D_6709_6548(boss) then
         return
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
@@ -126,12 +154,12 @@ local function _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, x, y)
 end
 local function _____53D6_9AD8_9636_9B54_6CD5_7BAD_76EE_6807_5217_8868(context)
     local boss = context["安兹单位"]
-    local ____context__6311_6218_5DF2_7ED3_675F_8 = context["挑战已结束"]
-    if not ____context__6311_6218_5DF2_7ED3_675F_8 then
-        local ____self_7 = context["清理"]
-        ____context__6311_6218_5DF2_7ED3_675F_8 = ____self_7["已清理"](____self_7)
+    local ____context__6311_6218_5DF2_7ED3_675F_9 = context["挑战已结束"]
+    if not ____context__6311_6218_5DF2_7ED3_675F_9 then
+        local ____self_8 = context["清理"]
+        ____context__6311_6218_5DF2_7ED3_675F_9 = ____self_8["已清理"](____self_8)
     end
-    if ____context__6311_6218_5DF2_7ED3_675F_8 or not _____5355_4F4D_6709_6548(boss) then
+    if ____context__6311_6218_5DF2_7ED3_675F_9 or not _____5355_4F4D_6709_6548(boss) then
         return {}
     end
     local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
@@ -157,6 +185,9 @@ local function _____5B89_6392_9AD8_9636_9B54_6CD5_7BAD_8F6E_6B21(context)
         ["提示圈"] = {["类型"] = "敌方圆形", ["半径"] = cfg["高阶魔法箭伤害半径"], ["来源单位"] = boss},
         ["on结算"] = function(_____7ED3_679C)
             _____9AD8_9636_9B54_6CD5_7BAD_7ED3_7B97(context, _____7ED3_679C["锁定X"], _____7ED3_679C["锁定Y"])
+            if _____7ED3_679C["序号"] == 1 then
+                ____exports["安排安兹高阶魔法箭特效后音效"](context)
+            end
         end
     })
 end
@@ -169,12 +200,6 @@ ____exports["释放安兹高阶魔法箭"] = function(context)
     if not _____5355_4F4D_6709_6548(target) then
         return
     end
-    _____64AD_653EBoss_5750_6807_97F3_6548(
-        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["高阶魔法箭"],
-        GetUnitX(boss),
-        GetUnitY(boss),
-        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
-    )
     _____64AD_653E_5B89_5179_53F0_8BCD(boss, "高阶魔法箭")
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
     _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C(context, cfg["高阶魔法箭施法前摇秒"] + (cfg["高阶魔法箭轮数"] - 1) * cfg["高阶魔法箭轮次间隔秒"] + cfg["高阶魔法箭落点预警秒"])

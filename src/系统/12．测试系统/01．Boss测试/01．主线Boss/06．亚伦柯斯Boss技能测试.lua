@@ -145,7 +145,8 @@ local function _____521B_5EFA_6216_83B7_53D6_4E9A_4F26_67EF_65AF_6D4B_8BD5_4E0A_
     end
     SelectUnitForPlayerSingle(boss, player)
     StarOther_PanCameraToTimedForPlayer(player, _____6D4B_8BD5_4E2D_5FC3X, _____6D4B_8BD5_4E2D_5FC3Y, 0.2)
-    return {["运行时"] = runtime, ["目标单位"] = target, ["Boss单位"] = boss}
+    runtime["测试安魂英雄"] = hero
+    return {["运行时"] = runtime, ["目标单位"] = target, ["Boss单位"] = boss, ["玩家英雄"] = hero}
 end
 local function _____6E05_7406_4E9A_4F26_67EF_65AF_6D4B_8BD5_4E0A_4E0B_6587(player, context)
     local pid = GetPlayerId(player)
@@ -228,9 +229,38 @@ local function _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_4EA1_8005_51DD_89C6(_player,
     _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_8005_51DD_89C6(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_65E7_8A93_5893_7891(_player, context)
-    context["运行时"]["阶段"] = "P2旧誓回响"
-    context["运行时"]["当前大型技能"] = nil
+    _____6E05_7406_4E9A_4F26_67EF_65AF_8FD0_884C_65F6_4E0A_4E0B_6587(context["Boss单位"])
+    local runtime = _____83B7_53D6_6216_521B_5EFA_4E9A_4F26_67EF_65AF_8FD0_884C_65F6_4E0A_4E0B_6587(context["Boss单位"])
+    if runtime == nil then
+        return
+    end
+    context["运行时"] = runtime
+    context["运行时"]["测试安魂英雄"] = context["玩家英雄"]
+    _____51C6_5907_4E9A_4F26_67EF_65AFP2(context)
     _____542F_52A8_4E9A_4F26_67EF_65AF_65E7_8A93_5893_7891(context["运行时"])
+end
+local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_5927_6CD5_5E08_9760_8FD1_5893_7891(player, context)
+    local states = context["运行时"]["墓碑状态列表"]
+    if not context["运行时"]["墓碑机制已启动"] or #states <= 0 then
+        _____6D4B_8BD5_4E9A_4F26_67EF_65AF_65E7_8A93_5893_7891(player, context)
+        states = context["运行时"]["墓碑状态列表"]
+    end
+    context["运行时"]["测试安魂英雄"] = context["玩家英雄"]
+    do
+        local i = 0
+        while i < #states do
+            do
+                local state = states[i + 1]
+                if state["已安魂"] then
+                    goto __continue35
+                end
+                SetUnitPosition(context["玩家英雄"], state.X, state.Y)
+                return
+            end
+            ::__continue35::
+            i = i + 1
+        end
+    end
 end
 local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_8FDB_5165P3(_player, context)
     _____51C6_5907_4E9A_4F26_67EF_65AFP3(context)
@@ -267,6 +297,7 @@ local _____4E9A_4F26_67EF_65AF_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 3, ["命令"] = "3-2", ["名称"] = "P2亡者凝视", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP2_4EA1_8005_51DD_89C6},
     {["序号"] = 3, ["命令"] = "3-3", ["名称"] = "P3亡者凝视", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_4EA1_8005_51DD_89C6},
     {["序号"] = 4, ["名称"] = "P2旧誓墓碑", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AF_65E7_8A93_5893_7891},
+    {["序号"] = 4, ["命令"] = "4-near", ["名称"] = "预设大法师靠近下一座未安魂墓碑", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AF_5927_6CD5_5E08_9760_8FD1_5893_7891},
     {["序号"] = 5, ["名称"] = "进入P3最后誓约", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AF_8FDB_5165P3},
     {["序号"] = 6, ["名称"] = "P3亡冥英斩归魂", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_4EA1_51A5_82F1_65A9},
     {["序号"] = 7, ["名称"] = "P3英灵陨星送葬", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_82F1_7075_9668_661F},

@@ -58,8 +58,9 @@ local function _____540C_6B65_5355_4E2A_5F39_5E55_9644_52A0_7279_6548(_____5B9E_
         if _____8F68_8FF9_4FEF_4EF0_89D2 ~= 0 then
             EXEffectMatRotateY(effect, -_____8F68_8FF9_4FEF_4EF0_89D2)
         end
-        if _____65B0_65B9_5411_89D2 ~= 0 then
-            EXEffectMatRotateZ(effect, _____65B0_65B9_5411_89D2)
+        local _____7279_6548_65B9_5411_89D2 = _____65B0_65B9_5411_89D2 + (_____7279_6548_53C2_6570["朝向角偏移"] or 0)
+        if _____7279_6548_65B9_5411_89D2 ~= 0 then
+            EXEffectMatRotateZ(effect, _____7279_6548_65B9_5411_89D2)
         end
         DzSetEffectPos(effect, x, y, z)
         return
@@ -102,20 +103,23 @@ local function _____540C_6B65_5F39_5E55_9644_52A0_7279_6548(_____5B9E_4F8B, oldX
         _____8F68_8FF9_4FEF_4EF0_89D2
     )
 end
-local function _____66F4_65B0_5F39_5E55_5355_4F4D_5750_6807(_____5B9E_4F8B, x, y, face, _____65E7_65B9_5411_89D2, z)
+local function _____66F4_65B0_5F39_5E55_5750_6807(_____5B9E_4F8B, x, y, face, _____65E7_65B9_5411_89D2, z)
     local _____65B0_65B9_5411_89D2 = _____6807_51C6_5316_89D2_5EA6(face)
     local oldX = _____5B9E_4F8B["当前X"]
     local oldY = _____5B9E_4F8B["当前Y"]
-    local oldZ = GetUnitFlyHeight(_____5B9E_4F8B["弹幕单位"])
+    local oldZ = _____5B9E_4F8B["弹幕单位"] ~= nil and _____5B9E_4F8B["弹幕单位"] ~= 0 and GetUnitFlyHeight(_____5B9E_4F8B["弹幕单位"]) or _____5B9E_4F8B["当前Z"]
     local newZ = z or oldZ
-    SetUnitX(_____5B9E_4F8B["弹幕单位"], x)
-    SetUnitY(_____5B9E_4F8B["弹幕单位"], y)
-    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(_____5B9E_4F8B["弹幕单位"], _____65B0_65B9_5411_89D2)
-    if z ~= nil then
-        SetUnitFlyHeight(_____5B9E_4F8B["弹幕单位"], z, 0)
+    if _____5B9E_4F8B["弹幕单位"] ~= nil and _____5B9E_4F8B["弹幕单位"] ~= 0 then
+        SetUnitX(_____5B9E_4F8B["弹幕单位"], x)
+        SetUnitY(_____5B9E_4F8B["弹幕单位"], y)
+        _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(_____5B9E_4F8B["弹幕单位"], _____65B0_65B9_5411_89D2)
+        if z ~= nil then
+            SetUnitFlyHeight(_____5B9E_4F8B["弹幕单位"], z, 0)
+        end
     end
     _____5B9E_4F8B["当前X"] = x
     _____5B9E_4F8B["当前Y"] = y
+    _____5B9E_4F8B["当前Z"] = newZ
     _____5B9E_4F8B["当前方向角"] = _____65B0_65B9_5411_89D2
     _____540C_6B65_5F39_5E55_9644_52A0_7279_6548(
         _____5B9E_4F8B,
@@ -127,6 +131,19 @@ local function _____66F4_65B0_5F39_5E55_5355_4F4D_5750_6807(_____5B9E_4F8B, x, y
         newZ,
         _____65E7_65B9_5411_89D2,
         _____65B0_65B9_5411_89D2
+    )
+end
+____exports["同步原生弹幕表现朝向"] = function(_____5B9E_4F8B, _____65E7_65B9_5411_89D2)
+    _____540C_6B65_5F39_5E55_9644_52A0_7279_6548(
+        _____5B9E_4F8B,
+        _____5B9E_4F8B["当前X"],
+        _____5B9E_4F8B["当前Y"],
+        _____5B9E_4F8B["当前Z"],
+        _____5B9E_4F8B["当前X"],
+        _____5B9E_4F8B["当前Y"],
+        _____5B9E_4F8B["当前Z"],
+        _____65E7_65B9_5411_89D2,
+        _____5B9E_4F8B["当前方向角"]
     )
 end
 local function _____66F4_65B0_8FFD_8E2A_65B9_5411(_____5B9E_4F8B, delta)
@@ -163,19 +180,10 @@ local function _____5C1D_8BD5_5F39_5C04(_____5B9E_4F8B, _____540C_6B65_524D_65B9
     else
         _____5B9E_4F8B["当前方向角"] = _____6807_51C6_5316_89D2_5EA6(_____5B9E_4F8B["当前方向角"] + (_____5B9E_4F8B["参数"]["弹射角度"] or 180))
     end
-    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(_____5B9E_4F8B["弹幕单位"], _____5B9E_4F8B["当前方向角"])
-    local z = GetUnitFlyHeight(_____5B9E_4F8B["弹幕单位"])
-    _____540C_6B65_5F39_5E55_9644_52A0_7279_6548(
-        _____5B9E_4F8B,
-        _____5B9E_4F8B["当前X"],
-        _____5B9E_4F8B["当前Y"],
-        z,
-        _____5B9E_4F8B["当前X"],
-        _____5B9E_4F8B["当前Y"],
-        z,
-        _____540C_6B65_524D_65B9_5411_89D2,
-        _____5B9E_4F8B["当前方向角"]
-    )
+    if _____5B9E_4F8B["弹幕单位"] ~= nil and _____5B9E_4F8B["弹幕单位"] ~= 0 then
+        _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(_____5B9E_4F8B["弹幕单位"], _____5B9E_4F8B["当前方向角"])
+    end
+    ____exports["同步原生弹幕表现朝向"](_____5B9E_4F8B, _____540C_6B65_524D_65B9_5411_89D2)
     local _____8870_51CF = _____5B9E_4F8B["参数"]["弹射衰减"] or 0
     if _____8870_51CF > 0 then
         local _____7CFB_6570 = _____9650_5236_8303_56F4(1 - _____8870_51CF, 0, 1)
@@ -185,7 +193,7 @@ local function _____5C1D_8BD5_5F39_5C04(_____5B9E_4F8B, _____540C_6B65_524D_65B9
     return true
 end
 ____exports["推进弹幕移动"] = function(_____5B9E_4F8B, delta)
-    if IsUnitPaused(_____5B9E_4F8B["弹幕单位"]) then
+    if _____5B9E_4F8B["弹幕单位"] ~= nil and _____5B9E_4F8B["弹幕单位"] ~= 0 and IsUnitPaused(_____5B9E_4F8B["弹幕单位"]) then
         return false
     end
     local _____5EF6_8FDF = _____5B9E_4F8B["参数"]["延迟发射"] or 0
@@ -199,7 +207,7 @@ ____exports["推进弹幕移动"] = function(_____5B9E_4F8B, delta)
         local oldY = _____5B9E_4F8B["当前Y"]
         local _____7ED3_679C = _____91C7_6837_5668(_____5B9E_4F8B, delta)
         _____5B9E_4F8B["已飞行距离"] = _____5B9E_4F8B["已飞行距离"] + _____8BA1_7B97_8DDD_79BB(oldX, oldY, _____7ED3_679C.X, _____7ED3_679C.Y)
-        _____66F4_65B0_5F39_5E55_5355_4F4D_5750_6807(
+        _____66F4_65B0_5F39_5E55_5750_6807(
             _____5B9E_4F8B,
             _____7ED3_679C.X,
             _____7ED3_679C.Y,
@@ -212,7 +220,7 @@ ____exports["推进弹幕移动"] = function(_____5B9E_4F8B, delta)
     if _____5B9E_4F8B["参数"]["轨迹类型"] == "追踪" then
         _____66F4_65B0_8FFD_8E2A_65B9_5411(_____5B9E_4F8B, delta)
     else
-        if _____5B9E_4F8B["参数"]["显式改向后锁定方向"] ~= true then
+        if _____5B9E_4F8B["弹幕单位"] ~= nil and _____5B9E_4F8B["弹幕单位"] ~= 0 and _____5B9E_4F8B["参数"]["显式改向后锁定方向"] ~= true then
             _____5B9E_4F8B["当前方向角"] = _____6807_51C6_5316_89D2_5EA6(GetUnitFacing(_____5B9E_4F8B["弹幕单位"]))
         end
     end
@@ -223,7 +231,7 @@ ____exports["推进弹幕移动"] = function(_____5B9E_4F8B, delta)
         return not _____5C1D_8BD5_5F39_5C04(_____5B9E_4F8B, _____79FB_52A8_524D_65B9_5411_89D2)
     end
     _____5B9E_4F8B["已飞行距离"] = _____5B9E_4F8B["已飞行距离"] + _____8DDD_79BB
-    _____66F4_65B0_5F39_5E55_5355_4F4D_5750_6807(
+    _____66F4_65B0_5F39_5E55_5750_6807(
         _____5B9E_4F8B,
         nextX,
         nextY,

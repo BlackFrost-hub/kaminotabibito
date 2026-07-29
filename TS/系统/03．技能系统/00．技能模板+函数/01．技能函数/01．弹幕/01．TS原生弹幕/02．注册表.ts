@@ -22,7 +22,9 @@ export function 获取原生弹幕实例(this: void, 弹幕ID: number): 原生�
 
 export function 注册原生弹幕实例(this: void, 实例: 原生弹幕内部实例, 弹幕单位句柄ID: number): void {
   原生弹幕实例表[实例.id] = 实例;
-  单位到原生弹幕ID[弹幕单位句柄ID] = 实例.id;
+  if (弹幕单位句柄ID > 0) {
+    单位到原生弹幕ID[弹幕单位句柄ID] = 实例.id;
+  }
   原生弹幕ID列表.push(实例.id);
 }
 

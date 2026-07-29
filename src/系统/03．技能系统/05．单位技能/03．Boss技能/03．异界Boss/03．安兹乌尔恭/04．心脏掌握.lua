@@ -27,17 +27,27 @@ local addDelayedCallback = ____require_result_2.addDelayedCallback
 local getServerTime = ____require_result_2.getServerTime
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_4["设置特效缩放"]
+local ____require_result_5 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_5.QuestMessageBJ
+local ____require_result_6 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_6.GetPlayersAll
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerName = jass.GetPlayerName
 local GetRandomInt = jass.GetRandomInt
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local KillUnit = jass.KillUnit
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local ____Quest_6D88_606F_8B66_544A = jglobals.bj_QUESTMESSAGE_WARNING
 local _____5B89_5179_5355_4F4D_7C7B_578BID = stringToFourCC(_____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["正式单位ID"])
 local _____5FC3_810F_638C_63E1_6280_80FDID = stringToFourCC(_____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["心脏掌握"])
 local _____5FC3_810F_638C_63E1_6297_6027_5230_671FMs_8868 = {}
@@ -104,6 +114,15 @@ local function _____7EDF_8BA1_6551_63F4_961F_53CB(boss, target, radius)
     end
     return count
 end
+local function _____5E7F_64AD_5FC3_810F_638C_63E1_70B9_540D_8B66_544A(target)
+    local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
+    local playerName = GetPlayerName(GetOwningPlayer(target))
+    QuestMessageBJ(
+        GetPlayersAll(),
+        ____Quest_6D88_606F_8B66_544A,
+        ((((("|cffff2020『任务警告』：|r|cffffcc00" .. playerName) .. "|r 被安兹乌尔恭的|cffff2020『心脏掌握』|r点名！请在 ") .. tostring(config["心脏掌握倒计时秒"])) .. " 秒内进入目标 ") .. tostring(config["心脏掌握救援半径"])) .. " 范围协助破解，否则目标将被处决。"
+    )
+end
 local function _____7ED3_7B97_5FC3_810F_638C_63E1(instance)
     if instance["已结算"] then
         return
@@ -124,22 +143,26 @@ local function _____7ED3_7B97_5FC3_810F_638C_63E1(instance)
     end
     local effect = AddSpecialEffectTarget(config["表现资源"]["心脏掌握处决特效路径"], target, "chest")
     if effect ~= nil and effect ~= 0 then
+        _____8BBE_7F6E_7279_6548_7F29_653E(effect, config["普通技能"]["心脏掌握处决特效缩放"])
         YDWETimerDestroyEffectSafe(config["普通技能"]["心脏掌握处决特效持续秒"], effect)
     end
     KillUnit(target)
 end
 local function _____521B_5EFA_5FC3_810F_638C_63E1_5012_8BA1_65F6(context, target)
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
+    local markEffect = AddSpecialEffectTarget(config["表现资源"]["心脏掌握点名特效路径"], target, "chest")
+    _____8BBE_7F6E_7279_6548_7F29_653E(markEffect, config["普通技能"]["心脏掌握点名特效缩放"])
     local instance = {
         context = context,
         target = target,
-        ["点名特效"] = AddSpecialEffectTarget(config["表现资源"]["心脏掌握点名特效路径"], target, "chest"),
+        ["点名特效"] = markEffect,
         ["倒计时特效"] = AddSpecialEffectTarget(config["表现资源"]["心脏掌握倒计时特效路径"], target, "overhead"),
         ["已结算"] = false
     }
-    local ____self_4 = context["清理"]
-    ____self_4["登记清理"](
-        ____self_4,
+    _____5E7F_64AD_5FC3_810F_638C_63E1_70B9_540D_8B66_544A(target)
+    local ____self_7 = context["清理"]
+    ____self_7["登记清理"](
+        ____self_7,
         "安兹-心脏掌握表现",
         function()
             instance["已结算"] = true
@@ -152,8 +175,8 @@ local function _____521B_5EFA_5FC3_810F_638C_63E1_5012_8BA1_65F6(context, target
             _____7ED3_7B97_5FC3_810F_638C_63E1(instance)
         end
     )
-    local ____self_5 = context["清理"]
-    ____self_5["登记延迟回调"](____self_5, "安兹-心脏掌握倒计时", callbackId)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "安兹-心脏掌握倒计时", callbackId)
 end
 ____exports["释放安兹心脏掌握"] = function(context)
     local boss = context["安兹单位"]

@@ -195,7 +195,10 @@ export function 释放亚伦柯斯亡冥英斩(this: void, context: 亚伦柯斯
   播放限时单位动画({ 单位: boss, 动画编号: cfg.前摇动画编号, 持续秒: cfg.前摇秒, 恢复动画: false });
   创建技能提示圈({ 类型: '方向直线', X: startX, Y: startY, 宽度: cfg.路径宽度, 长度: distance, 朝向: facing, 持续时间: cfg.前摇秒, 来源单位: boss });
   const charge = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.亡冥英斩蓄势特效路径, startX, startY);
-  if (charge != null && charge !== 0) YDWETimerDestroyEffectSafe(cfg.前摇秒 + 0.2, charge);
+  if (charge != null && charge !== 0) {
+    EXEffectMatRotateZ(charge, facing);
+    YDWETimerDestroyEffectSafe(cfg.前摇秒 + 0.2, charge);
+  }
   播放亚伦柯斯台词(boss, isP3 ? '亡冥英斩归魂' : '亡冥英斩');
   播放Boss坐标音效(亚伦柯斯正式设计配置.音效.亡冥英斩蓄势, startX, startY, 亚伦柯斯正式设计配置.音效默认裁断距离);
 

@@ -19,6 +19,7 @@ import {
 } from "../01．共享";
 import { 获取原生弹幕实例, 单位到原生弹幕ID } from "../02．注册表";
 import { 取句柄ID } from "../01．共享";
+import { 同步原生弹幕表现朝向 } from "../04．驱动/00．移动处理";
 
 interface 原生弹幕改向参数 {
   朝向角度: number;
@@ -40,15 +41,21 @@ function 应用原生弹幕改向(this: void, 实例: 原生弹幕内部实例, 
   实例.参数.轨迹类型 = "直线";
   实例.参数.指定目标 = undefined;
   实例.参数.显式改向后锁定方向 = true;
-  实例.当前X = GetUnitX(实例.弹幕单位);
-  实例.当前Y = GetUnitY(实例.弹幕单位);
+  const 旧方向角 = 实例.当前方向角;
+  if (实例.弹幕单位 != null && 实例.弹幕单位 !== 0) {
+    实例.当前X = GetUnitX(实例.弹幕单位);
+    实例.当前Y = GetUnitY(实例.弹幕单位);
+  }
   实例.当前方向角 = 朝向角度;
   实例.当前速度 = 解析改向速度(实例, 参数.新速度);
 
-  SetUnitFacing(实例.弹幕单位, 朝向角度);
-  if (EXSetUnitFacing != null) {
-    EXSetUnitFacing(实例.弹幕单位, 朝向角度 * 0.017453292519943295);
+  if (实例.弹幕单位 != null && 实例.弹幕单位 !== 0) {
+    SetUnitFacing(实例.弹幕单位, 朝向角度);
+    if (EXSetUnitFacing != null) {
+      EXSetUnitFacing(实例.弹幕单位, 朝向角度 * 0.017453292519943295);
+    }
   }
+  同步原生弹幕表现朝向(实例, 旧方向角);
   return true;
 }
 

@@ -7,6 +7,8 @@ const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技�
 
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
+import { 创建安兹现实断裂移动 } from './03．现实断裂';
+import { 安排安兹高阶魔法箭特效后音效 } from './05．高阶魔法箭';
 import { 取安兹亡灵箭伤害倍率 } from './08．高阶亡灵召唤';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import {
@@ -14,7 +16,7 @@ import {
   创建延迟阶段,
 } from '../../../../00．技能模板+函数/00．技能模板/01．多阶段技能编排/06．技能阶段链执行器';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
-import { 点到线段距离平方 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 播放安兹台词 } from './12．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
@@ -35,8 +37,7 @@ const { 显示大招吟唱条, 关闭吟唱条 } = require('系统.09．表现�
   显示大招吟唱条: (this: void, 参数: any) => void;
   关闭吟唱条: (this: void, 通道?: string) => void;
 };
-const { 设置特效XYZ轴旋转, 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
-  设置特效XYZ轴旋转: (this: void, effect: any, 参数: { X轴角度?: number; Y轴角度?: number; Z轴角度?: number }) => void;
+const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
   创建点特效: (this: void, 参数: any) => any;
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
@@ -48,8 +49,6 @@ const japi = require('jass.japi') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, unit: any, point: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
@@ -57,7 +56,6 @@ const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => 
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -136,8 +134,8 @@ function 创建时间停止预警(this: void, instance: 时间停止实例): voi
   });
   创建技能提示圈({
     类型: '矩形',
-    X: (locked.裂缝起点X + locked.裂缝终点X) * 0.5,
-    Y: (locked.裂缝起点Y + locked.裂缝终点Y) * 0.5,
+    X: locked.裂缝起点X,
+    Y: locked.裂缝起点Y,
     宽度: ordinary.现实断裂路径宽度,
     长度: ordinary.现实断裂路径长度,
     朝向: locked.裂缝角度,
@@ -172,6 +170,14 @@ function 创建时间停止持续表现(this: void, instance: 时间停止实例
 function 冻结时间停止玩家(this: void, instance: 时间停止实例): void {
   if (instance.context.挑战已结束 || instance.context.清理.已清理()) return;
   instance.context.时间停止中 = true;
+  const cfg = 安兹乌尔恭数值与表现配置.阶段技能;
+  显示大招吟唱条({
+    通道: '大招',
+    总时长: cfg.时间停止冻结秒,
+    颜色ID: 4,
+    标题文本: '时间停止中',
+    提示文本: '冻结持续1.6秒；时间恢复后立即开始伤害结算',
+  });
   const heroes = 获取Boss技能敌对英雄列表(instance.context.安兹单位);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
@@ -276,39 +282,14 @@ function 结算时间停止现实断裂(this: void, instance: 时间停止实例
   const context = instance.context;
   const boss = context.安兹单位;
   if (!单位有效(boss) || context.挑战已结束) return;
-  const cfg = 安兹乌尔恭数值与表现配置;
-  const ordinary = cfg.普通技能;
   const locked = instance.锁定;
-  const effect = 播放时间停止结算特效(
-    cfg.表现资源.时间停止现实断裂结算特效路径,
-    (locked.裂缝起点X + locked.裂缝终点X) * 0.5,
-    (locked.裂缝起点Y + locked.裂缝终点Y) * 0.5,
-    cfg.阶段技能.时间停止现实断裂结算特效缩放,
+  播放Boss坐标音效(
+    安兹乌尔恭数值与表现配置.音效.现实断裂,
+    locked.裂缝起点X,
+    locked.裂缝起点Y,
+    安兹乌尔恭数值与表现配置.音效默认裁断距离,
   );
-  if (effect != null && effect !== 0) 设置特效XYZ轴旋转(effect, { Z轴角度: locked.裂缝角度 });
-  const halfWidth2 = ordinary.现实断裂路径宽度 * ordinary.现实断裂路径宽度 * 0.25;
-  const heroes = 获取Boss技能敌对英雄列表(boss);
-  for (let i = 0; i < heroes.length; i++) {
-    const target = heroes[i];
-    if (!单位有效(target)) continue;
-    if (点到线段距离平方(
-      GetUnitX(target),
-      GetUnitY(target),
-      locked.裂缝起点X,
-      locked.裂缝起点Y,
-      locked.裂缝终点X,
-      locked.裂缝终点Y,
-    ) > halfWidth2) continue;
-    造成时间停止伤害(
-      boss,
-      target,
-      计算组合技能伤害(boss, target, {
-        来源攻击力比例: ordinary.现实断裂伤害Boss攻击力比例,
-        目标最大生命比例: ordinary.现实断裂伤害目标最大生命比例,
-      }),
-      '安兹·时间停止·现实断裂',
-    );
-  }
+  创建安兹现实断裂移动(context, locked.裂缝角度, locked.裂缝起点X, locked.裂缝起点Y);
 }
 
 function 结算时间停止魔法箭(this: void, instance: 时间停止实例): void {
@@ -324,6 +305,7 @@ function 结算时间停止魔法箭(this: void, instance: 时间停止实例): 
     locked.魔法箭Y,
     ordinary.高阶魔法箭特效缩放,
   );
+  安排安兹高阶魔法箭特效后音效(context);
   const radius2 = ordinary.高阶魔法箭伤害半径 * ordinary.高阶魔法箭伤害半径;
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
@@ -370,6 +352,7 @@ export function 释放安兹时间停止(this: void, context: 安兹运行时上
     清理时间停止实例(instance);
   });
   const totalSeconds = 取时间停止总时长秒();
+  开始硬直(boss, totalSeconds);
   播放限时单位动画({
     单位: boss,
     动画编号: cfg.时间停止动画编号,
@@ -379,10 +362,10 @@ export function 释放安兹时间停止(this: void, context: 安兹运行时上
   });
   显示大招吟唱条({
     通道: '大招',
-    总时长: cfg.时间停止预展示秒 + cfg.时间停止冻结秒,
+    总时长: cfg.时间停止预展示秒,
     颜色ID: 4,
-    标题文本: '时间停止',
-    提示文本: '所有危险位置已经锁定，冻结前寻找安全方向',
+    标题文本: '2.8秒后时间停止',
+    提示文本: '现在寻找安全位置；随后冻结1.6秒，解冻时开始伤害结算',
   });
   const executionId = executor.开始({
     key: 时间停止大型技能Key,

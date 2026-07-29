@@ -38,7 +38,7 @@ local function _____76EE_6807_9635_8425_5141_8BB8(_____5B9E_4F8B, _____76EE_6807
     if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
         return false
     end
-    if isSameUnit(_____76EE_6807_5355_4F4D, _____5B9E_4F8B["弹幕单位"]) then
+    if _____5B9E_4F8B["弹幕单位"] ~= nil and _____5B9E_4F8B["弹幕单位"] ~= 0 and isSameUnit(_____76EE_6807_5355_4F4D, _____5B9E_4F8B["弹幕单位"]) then
         return false
     end
     if _____5B9E_4F8B["参数"]["允许命中所有者"] ~= true and isSameUnit(_____76EE_6807_5355_4F4D, _____6765_6E90_5355_4F4D) then

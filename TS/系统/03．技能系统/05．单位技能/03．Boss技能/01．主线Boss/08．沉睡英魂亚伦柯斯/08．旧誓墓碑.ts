@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 单位未标记死亡 as 单位有效, 极坐标X, 极坐标Y } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 亚伦柯斯运行时上下文 } from './01．运行时上下文';
 import { 进入亚伦柯斯P3 } from './01．运行时上下文';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
@@ -8,10 +8,17 @@ import { 亚伦柯斯单位技能配置 } from './00．配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
-import { 单位是否在胶囊区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/胶囊区域';
 import { 亚伦柯斯BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/07．亚伦柯斯';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
+import { 创建原生弹幕, 创建直线定点轨迹 } from '../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕';
+import {
+  创建世界坐标进度UI,
+  更新世界坐标进度UI,
+  设置世界坐标进度UI显示,
+  销毁世界坐标进度UI,
+  type 世界坐标进度UI,
+} from '../../../../../09．表现系统/15．世界坐标进度UI';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -47,8 +54,6 @@ const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const GetRectCenterX = jass.GetRectCenterX as (rect: any) => number;
 const GetRectCenterY = jass.GetRectCenterY as (rect: any) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const CosBJ = jass.CosBJ as (degrees: number) => number;
-const SinBJ = jass.SinBJ as (degrees: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
@@ -65,14 +70,17 @@ interface 旧誓墓碑状态 {
   已安魂: boolean;
   墓碑特效?: any;
   范围特效?: any;
+  安魂进度UI?: 世界坐标进度UI | null;
   下次残影Ms: number;
 }
 
 function 销毁墓碑特效(this: void, state: 旧誓墓碑状态): void {
   if (state.墓碑特效 != null && state.墓碑特效 !== 0) DestroyEffect(state.墓碑特效);
   if (state.范围特效 != null && state.范围特效 !== 0) DestroyEffect(state.范围特效);
+  销毁世界坐标进度UI(state.安魂进度UI);
   state.墓碑特效 = undefined;
   state.范围特效 = undefined;
+  state.安魂进度UI = undefined;
 }
 
 function 清理墓碑列表(this: void, context: 亚伦柯斯运行时上下文): void {
@@ -89,7 +97,7 @@ function 刷新旧誓加护Buff(this: void, context: 亚伦柯斯运行时上下
     移除单位指定Buff(boss, 亚伦柯斯BuffID.旧誓加护);
     return;
   }
-  const reduction = 亚伦柯斯正式设计配置.旧誓墓碑.未安魂减伤每层 * count * 100;
+  const reduction = 亚伦柯斯正式设计配置.旧誓墓碑.未安魂减伤每层 * 100;
   registerManualBuff(boss, 亚伦柯斯BuffID.旧誓加护, 3600, reduction, { stack: count, sourceName: '亚伦柯斯-旧誓墓碑' });
 }
 
@@ -109,8 +117,14 @@ function 完成墓碑安魂(this: void, context: 亚伦柯斯运行时上下文,
 }
 
 function 范围内存在玩家(this: void, context: 亚伦柯斯运行时上下文, state: 旧誓墓碑状态): boolean {
-  const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   const radius = 亚伦柯斯正式设计配置.旧誓墓碑.安魂范围;
+  const testHero = (context as any).测试安魂英雄;
+  if (单位有效(testHero)) {
+    const testDx = GetUnitX(testHero) - state.X;
+    const testDy = GetUnitY(testHero) - state.Y;
+    if (testDx * testDx + testDy * testDy <= radius * radius) return true;
+  }
+  const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   for (let i = 0; i < heroes.length; i++) {
     const dx = GetUnitX(heroes[i]) - state.X;
     const dy = GetUnitY(heroes[i]) - state.Y;
@@ -119,41 +133,58 @@ function 范围内存在玩家(this: void, context: 亚伦柯斯运行时上下�
   return false;
 }
 
-function 设置全部墓碑下次残影(this: void, context: 亚伦柯斯运行时上下文, nextMs: number): void {
-  for (let i = 0; i < context.墓碑状态列表.length; i++) {
-    const state = context.墓碑状态列表[i] as 旧誓墓碑状态;
-    if (!state.已安魂) state.下次残影Ms = nextMs;
-  }
-}
-
 function 尝试释放墓碑残影(this: void, context: 亚伦柯斯运行时上下文, state: 旧誓墓碑状态, now: number): boolean {
   const boss = context.Boss单位;
-  if (context.当前大型技能 != null || now < context.普通机制忙碌到Ms) return false;
+  if (context.当前大型技能 !== 旧誓残影技能Key && (context.当前大型技能 != null || now < context.普通机制忙碌到Ms)) return false;
   const target = 获取Boss技能随机敌对英雄(boss);
   if (!单位有效(target)) return false;
   const cfg = 亚伦柯斯正式设计配置.旧誓墓碑;
   const dx = GetUnitX(target) - state.X;
   const dy = GetUnitY(target) - state.Y;
   const facing = Atan2(dy, dx) * RAD_TO_DEG;
-  const endX = state.X + CosBJ(facing) * cfg.残影斩击长度;
-  const endY = state.Y + SinBJ(facing) * cfg.残影斩击长度;
+  const endX = 极坐标X(state.X, facing, cfg.残影斩击长度);
+  const endY = 极坐标Y(state.Y, facing, cfg.残影斩击长度);
   context.当前大型技能 = 旧誓残影技能Key;
-  context.普通机制忙碌到Ms = now + (cfg.残影斩击预警秒 + 0.4) * 1000;
-  设置全部墓碑下次残影(context, now + cfg.残影斩击间隔秒 * 1000);
+  context.普通机制忙碌到Ms = now + (cfg.残影斩击预警秒 + cfg.残影斩击飞行秒 + 0.4) * 1000;
+  state.下次残影Ms = now + cfg.残影斩击间隔秒 * 1000;
   创建技能提示圈({ 类型: '方向直线', X: state.X, Y: state.Y, 宽度: cfg.残影斩击宽度, 长度: cfg.残影斩击长度, 朝向: facing, 持续时间: cfg.残影斩击预警秒, 来源单位: boss });
   const delayedId = addDelayedCallback(cfg.残影斩击预警秒 * 1000, function 亚伦柯斯墓碑残影结算(this: void): void {
     if (!context.战斗已结束 && context.阶段 === 'P2旧誓回响' && !state.已安魂) {
-      const echo = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.墓碑残影模型路径, state.X, state.Y);
-      if (echo != null && echo !== 0) YDWETimerDestroyEffectSafe(0.9, echo);
       const heroes = 获取Boss技能敌对英雄列表(boss);
-      for (let i = 0; i < heroes.length; i++) {
-        const hit = heroes[i];
-        if (!单位是否在胶囊区域(hit, state.X, state.Y, endX, endY, cfg.残影斩击宽度)) continue;
-        const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.残影斩击伤害攻击力比例, 目标最大生命比例: cfg.残影斩击伤害目标最大生命比例 });
-        造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '亚伦柯斯·旧誓墓碑残影' });
-      }
+      创建原生弹幕({
+        所有者: boss,
+        载体模式: '特效',
+        X: state.X,
+        Y: state.Y,
+        方向角: facing,
+        速度: cfg.残影斩击长度 / cfg.残影斩击飞行秒,
+        生命周期: cfg.残影斩击飞行秒,
+        最大距离: cfg.残影斩击长度,
+        轨迹采样器: 创建直线定点轨迹(state.X, state.Y, endX, endY),
+        命中半径: cfg.残影斩击宽度 * 0.5,
+        影响目标: '敌方',
+        每单位最大命中次数: 1,
+        碰撞消失: false,
+        禁用碰撞: true,
+        附加特效1: {
+          模型: 亚伦柯斯正式设计配置.表现资源.墓碑残影模型路径,
+          跟随主弹幕参数: true,
+        },
+        目标筛选: function 亚伦柯斯墓碑残影目标筛选(this: void, unit: any): boolean {
+          for (let i = 0; i < heroes.length; i++) if (heroes[i] === unit) return true;
+          return false;
+        },
+        on命中: function 亚伦柯斯墓碑残影命中(this: void, hit: any): void {
+          if (!单位有效(hit)) return;
+          const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.残影斩击伤害攻击力比例, 目标最大生命比例: cfg.残影斩击伤害目标最大生命比例 });
+          造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '亚伦柯斯·旧誓墓碑残影' });
+        },
+      });
     }
-    if (context.当前大型技能 === 旧誓残影技能Key) context.当前大型技能 = undefined;
+    const clearId = addDelayedCallback(cfg.残影斩击飞行秒 * 1000, function 亚伦柯斯墓碑残影飞行结束(this: void): void {
+      if (context.当前大型技能 === 旧誓残影技能Key) context.当前大型技能 = undefined;
+    });
+    context.清理.登记延迟回调('亚伦柯斯-墓碑残影飞行结束', clearId);
   });
   context.清理.登记延迟回调('亚伦柯斯-墓碑残影', delayedId);
   return true;
@@ -177,8 +208,8 @@ export function 启动亚伦柯斯旧誓墓碑(this: void, context: 亚伦柯斯
   context.未安魂墓碑数量 = cfg.数量;
   context.墓碑状态列表 = [];
   for (let i = 0; i < cfg.数量 && i < facings.length; i++) {
-    const x = centerX + CosBJ(facings[i]) * cfg.场地中心偏移半径;
-    const y = centerY + SinBJ(facings[i]) * cfg.场地中心偏移半径;
+    const x = 极坐标X(centerX, facings[i], cfg.场地中心偏移半径);
+    const y = 极坐标Y(centerY, facings[i], cfg.场地中心偏移半径);
     const state: 旧誓墓碑状态 = {
       X: x,
       Y: y,
@@ -186,6 +217,19 @@ export function 启动亚伦柯斯旧誓墓碑(this: void, context: 亚伦柯斯
       已安魂: false,
       墓碑特效: AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.誓约墓碑模型路径, x, y),
       范围特效: AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.墓碑安魂范围特效路径, x, y),
+      安魂进度UI: 创建世界坐标进度UI({
+        X: x,
+        Y: y,
+        Z: 220,
+        最大值: cfg.安魂持续秒,
+        当前值: 0,
+        标题: '安魂',
+        数值后缀: '秒',
+        类型: '安魂',
+        平滑过渡秒: cfg.检查间隔秒,
+        初始显示: false,
+        雾中可见: false,
+      }),
       下次残影Ms: now + cfg.残影斩击间隔秒 * 1000,
     };
     context.墓碑状态列表.push(state);
@@ -207,16 +251,19 @@ export function 启动亚伦柯斯旧誓墓碑(this: void, context: 亚伦柯斯
     for (let i = 0; i < context.墓碑状态列表.length; i++) {
       const state = context.墓碑状态列表[i] as 旧誓墓碑状态;
       if (state.已安魂) continue;
-      if (范围内存在玩家(context, state)) state.安魂进度秒 += cfg.检查间隔秒;
+      const hasPlayer = 范围内存在玩家(context, state);
+      if (hasPlayer) state.安魂进度秒 += cfg.检查间隔秒;
       else {
         state.安魂进度秒 -= cfg.离开每次回退秒;
         if (state.安魂进度秒 < 0) state.安魂进度秒 = 0;
       }
+      更新世界坐标进度UI(state.安魂进度UI, state.安魂进度秒);
+      设置世界坐标进度UI显示(state.安魂进度UI, hasPlayer || state.安魂进度秒 > 0);
       if (state.安魂进度秒 >= cfg.安魂持续秒) {
         完成墓碑安魂(context, state);
         continue;
       }
-      if (current >= state.下次残影Ms && 尝试释放墓碑残影(context, state, current)) break;
+      if (current >= state.下次残影Ms) 尝试释放墓碑残影(context, state, current);
     }
   });
   context.清理.登记周期回调('亚伦柯斯-旧誓墓碑推进', periodicId);

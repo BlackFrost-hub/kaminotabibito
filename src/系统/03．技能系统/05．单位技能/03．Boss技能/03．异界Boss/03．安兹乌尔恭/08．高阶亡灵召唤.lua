@@ -119,6 +119,7 @@ local function _____521B_5EFA_9AD8_9636_4EA1_7075(context, x, y, target)
         ["主人单位"] = boss,
         ["单位类型"] = cfg["高阶亡灵召唤单位ID"],
         ["单位名称"] = cfg["高阶亡灵召唤单位名称"],
+        ["模型文件"] = cfg["高阶亡灵召唤模型路径"],
         X = x,
         Y = y,
         ["朝向"] = GetUnitFacing(boss),

@@ -282,7 +282,7 @@ function translationTrack(arrow) {
   const start = [targetX - directionX * 210, targetY - directionY * 210, 440 + arrow.delay * 0.1];
   const end = [targetX, targetY, -20];
   const arrival = arrow.delay + 430;
-  return `Translation 9 {
+  return `Translation 8 {
         Linear,
         0: ${vector(start)},
         ${arrow.delay}: ${vector(start)},
@@ -291,8 +291,7 @@ function translationTrack(arrow) {
         1900: ${vector(end)},
         2900: ${vector(end)},
         3000: ${vector(end)},
-        3250: ${vector([targetX, targetY, -12])},
-        3500: ${vector([targetX, targetY, 10])},
+        3001: ${vector(end)},
     }`;
 }
 
@@ -312,9 +311,9 @@ const arrowBones = arrows.map((arrow, index) => `Bone "AinzUndeadArrow_${index +
     }
 }`).join('\n');
 
-const sharedAlpha = [[0, 0], [80, 0.84], [1800, 0.84], [1900, 0.72], [2900, 0.72], [3000, 0.72], [3500, 0]];
-const headAlpha = [[0, 0], [80, 0.96], [1800, 0.96], [1900, 0.9], [2900, 0.9], [3000, 0.9], [3500, 0]];
-const spriteAlpha = [[0, 0], [80, 1], [1800, 1], [1900, 0.94], [2900, 0.94], [3000, 0.94], [3500, 0]];
+const sharedAlpha = [[0, 0], [80, 0.84], [1800, 0.84], [1900, 0.72], [2900, 0.72], [3000, 0], [3001, 0]];
+const headAlpha = [[0, 0], [80, 0.96], [1800, 0.96], [1900, 0.9], [2900, 0.9], [3000, 0], [3001, 0]];
+const spriteAlpha = [[0, 0], [80, 1], [1800, 1], [1900, 0.94], [2900, 0.94], [3000, 0], [3001, 0]];
 
 const mdl = `Version {
     FormatVersion 800,
@@ -340,7 +339,7 @@ Sequences 3 {
         BoundsRadius ${boundsRadius},
     }
     Anim "Death" {
-        Interval { 3000, 3500 },
+        Interval { 3000, 3001 },
         NonLooping,
         MinimumExtent ${vector(minimumExtent)},
         MaximumExtent ${vector(maximumExtent)},
@@ -452,6 +451,17 @@ if (verified.textures.length !== expectedTextures.length || verified.textures.so
 }
 if (verified.materials[2].layers[0].filterMode !== 1) {
   throw new Error('Arrow texture layer must use Transparent filter mode');
+}
+const deathSequence = verified.sequences.find((sequence) => sequence.name === 'Death');
+if (!deathSequence || deathSequence.interval[0] !== 3000 || deathSequence.interval[1] !== 3001) {
+  throw new Error('Death sequence must be the instant-hide interval 3000-3001');
+}
+for (const geosetAnimation of verified.geosetAnimations) {
+  const alphaAnimation = geosetAnimation.animations[0];
+  const deathFrameIndex = alphaAnimation.frames.indexOf(3000);
+  if (deathFrameIndex < 0 || alphaAnimation.values[deathFrameIndex][0] !== 0) {
+    throw new Error('Every geoset must be fully transparent on the first Death frame');
+  }
 }
 
 process.stdout.write(JSON.stringify({

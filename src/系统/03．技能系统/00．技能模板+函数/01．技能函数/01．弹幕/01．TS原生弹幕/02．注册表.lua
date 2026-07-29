@@ -15,7 +15,9 @@ ____exports["获取原生弹幕实例"] = function(_____5F39_5E55ID)
 end
 ____exports["注册原生弹幕实例"] = function(_____5B9E_4F8B, _____5F39_5E55_5355_4F4D_53E5_67C4ID)
     ____exports["原生弹幕实例表"][_____5B9E_4F8B.id] = _____5B9E_4F8B
-    ____exports["单位到原生弹幕ID"][_____5F39_5E55_5355_4F4D_53E5_67C4ID] = _____5B9E_4F8B.id
+    if _____5F39_5E55_5355_4F4D_53E5_67C4ID > 0 then
+        ____exports["单位到原生弹幕ID"][_____5F39_5E55_5355_4F4D_53E5_67C4ID] = _____5B9E_4F8B.id
+    end
     local ____exports__539F_751F_5F39_5E55ID_5217_8868_0 = ____exports["原生弹幕ID列表"]
     ____exports__539F_751F_5F39_5E55ID_5217_8868_0[#____exports__539F_751F_5F39_5E55ID_5217_8868_0 + 1] = _____5B9E_4F8B.id
 end
