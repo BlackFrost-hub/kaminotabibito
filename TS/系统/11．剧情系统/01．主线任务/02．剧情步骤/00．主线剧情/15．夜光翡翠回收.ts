@@ -21,9 +21,12 @@ const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC�
 const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
   TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
 };
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
+};
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
-import { 读取当前剧情动作上下文, 写入当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 export { 沙漠情报商人回收夜光翡翠剧情片段 } from "../01．第一章/15．夜光翡翠回收";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
@@ -31,7 +34,6 @@ const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: numbe
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
-const IsUnitInGroup = jass.IsUnitInGroup as (this: void, whichUnit: any, whichGroup: any) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveUnit = jass.RemoveUnit as (this: void, whichUnit: any) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, actionFunc: (this: void) => void) => any;
@@ -50,15 +52,13 @@ function 触发裂缝回村(this: void): void {
   if (当前进度 !== 16) return;
 
   const 触发单位 = GetTriggerUnit();
-  const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
-  if (玩家英雄组 != null && 玩家英雄组 !== 0 && !IsUnitInGroup(触发单位, 玩家英雄组)) return;
+  if (!是玩家英雄组单位(触发单位)) return;
 
   const 上下文 = {
     片段ID: 回村剧情片段ID,
     触发配置名: "裂缝回村入口",
     触发单位,
   };
-  写入当前剧情动作上下文(上下文);
   const { 播放主线剧情片段 } = require("../02．剧情步骤播放器") as {
     播放主线剧情片段: (this: void, id: string, 上下文?: any) => boolean;
   };
@@ -97,9 +97,6 @@ export function 执行情报商人回收夜光翡翠(this: void, 参数: 剧情�
   }
 }
 
-function 执行源石入手目标刷新(this: void): void {}
-
 export const 夜光翡翠回收剧情动作注册表: Record<string, 剧情动作处理器> = {
   "JLC沙漠_情报商人回收夜光翡翠": 执行情报商人回收夜光翡翠,
-  "JLC沙漠_源石入手目标刷新": 执行源石入手目标刷新,
 };

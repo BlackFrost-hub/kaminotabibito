@@ -37,6 +37,7 @@ export * from "./31．王城紧急会议";
 export * from "./32．第二章王子Boss战过程";
 export * from "./33．第二章王子Boss战后承接";
 export * from "./34．第二章后续承接";
+export * from "./35．第三章启程";
 
 export function 初始化前五个主线剧情核心(this: void): void {
   初始化进度01_精灵村长老发布任务核心();

@@ -27,4 +27,4 @@ alwaysApply: false
 ## 乱码与验收
 
 - 终端乱码先视为显示或代码页问题；任务不依赖时，不要顺手整份“清乱码”。
-- 涉及 TSTL 或 Lua 产物时：修改 TS → 运行 `npm run build` → 再检查本次相关的 `src/**/*.lua`。build 失败前，旧产物不能作为结论。
+- 涉及 TSTL 或 Lua 产物时：修改 TS → 优先对本次修改或新建的 TS 文件运行 `npm run build:files -- "<TS文件>"` → 再检查本次相关的 `src/**/*.lua`。修改 `TS/global.d.ts`、`tsconfig.json`、公共类型或导出签名，删除/重命名 TS 文件，局部构建失败或最终交付验证时，改为运行 `npm run build`。构建失败前，旧产物不能作为结论。

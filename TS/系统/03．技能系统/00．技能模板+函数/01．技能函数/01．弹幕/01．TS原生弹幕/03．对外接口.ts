@@ -3,12 +3,13 @@
  * TS 原生弹幕 - 对外接口
  */
 
-import type { 原生弹幕参数, 原生弹幕实例, 原生弹幕结束原因, 原生弹幕内部实例 } from "./00．类型";
+import type { 原生弹幕参数, 原生弹幕实例, 原生弹幕结束原因, 原生弹幕内部实例, 原生弹幕附加特效参数 } from "./00．类型";
 import {
-  AddSpecialEffectTarget,
   CreateUnit,
   默认弹幕单位类型,
+  DzSetEffectPos,
   DzSetUnitModel,
+  EC_CreateEffect,
   GetOwningPlayer,
   GetUnitFacing,
   GetUnitX,
@@ -32,14 +33,13 @@ import {
 } from "./01．共享";
 import { 分配原生弹幕ID, 获取原生弹幕实例, 注册原生弹幕实例, 单位到原生弹幕ID } from "./02．注册表";
 import { 触发原生弹幕STES事件 } from "./02．事件/index";
-import { 创建弹幕命中规则状态 } from "./03．命中/index";
+import { 创建弹幕命中规则状态, 重置弹幕命中规则状态 } from "./03．命中/index";
 import { 结束原生弹幕实例, 确保原生弹幕驱动 } from "./04．驱动/index";
 import { 确保弹幕死亡事件监听 } from "./05．死亡事件/index";
 
 const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
   按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
 };
-
 function 解析弹幕玩家(this: void, 参数: 原生弹幕参数): any {
   if (参数.所属玩家 != null && 参数.所属玩家 !== 0) return 参数.所属玩家;
   if (参数.所有者 != null && 参数.所有者 !== 0) return GetOwningPlayer(参数.所有者);
@@ -102,7 +102,33 @@ function 初始化弹幕单位类别(this: void, 参数: 原生弹幕参数, 弹
   }
 }
 
-function 初始化弹幕单位表现(this: void, 参数: 原生弹幕参数, 弹幕单位: any): any {
+function 创建弹幕附加特效(
+  this: void,
+  参数: 原生弹幕参数,
+  弹幕单位: any,
+  特效参数?: 原生弹幕附加特效参数,
+): any {
+  if (特效参数 == null || 特效参数.模型 === "") return null;
+  const scale = 特效参数.缩放 ?? (特效参数.跟随主弹幕参数 === true ? (参数.缩放 ?? 1) : 1);
+  const x = GetUnitX(弹幕单位);
+  const y = GetUnitY(弹幕单位);
+  const z = 参数.飞行高度 ?? 0;
+  const effect = EC_CreateEffect(
+    特效参数.模型,
+    x,
+    y,
+    z,
+    GetUnitFacing(弹幕单位),
+    scale,
+    1,
+    -1,
+  );
+  if (effect == null || effect === 0) return null;
+  DzSetEffectPos(effect, x, y, z);
+  return effect;
+}
+
+function 初始化弹幕单位表现(this: void, 参数: 原生弹幕参数, 弹幕单位: any): [any, any] {
   初始化弹幕单位类别(参数, 弹幕单位);
 
   if (参数.模型 != null && 参数.模型 !== "" && DzSetUnitModel != null) {
@@ -119,10 +145,13 @@ function 初始化弹幕单位表现(this: void, 参数: 原生弹幕参数, 弹
   if (参数.禁用碰撞 !== false) {
     SetUnitPathing(弹幕单位, false);
   }
-  if (参数.附着特效模型 != null && 参数.附着特效模型 !== "") {
-    return AddSpecialEffectTarget(参数.附着特效模型, 弹幕单位, 参数.附着点 ?? "origin");
-  }
-  return null;
+  const legacyEffect = 参数.附着特效模型 != null && 参数.附着特效模型 !== ""
+    ? { 模型: 参数.附着特效模型, 附着点: 参数.附着点 }
+    : undefined;
+  return [
+    创建弹幕附加特效(参数, 弹幕单位, 参数.附加特效1 ?? legacyEffect),
+    创建弹幕附加特效(参数, 弹幕单位, 参数.附加特效2),
+  ];
 }
 
 function 归一化弹幕距离参数(this: void, 参数: 原生弹幕参数): 原生弹幕参数 {
@@ -172,11 +201,14 @@ export function 创建原生弹幕(this: void, 参数: 原生弹幕参数): 原�
     剩余生命: 参数.弹幕生命值 ?? 0,
     弹射次数: 0,
     已结束: false,
-    附着特效: null,
+    附加特效1: null,
+    附加特效2: null,
     命中规则状态: null,
   };
 
-  实例.附着特效 = 初始化弹幕单位表现(参数, 弹幕单位);
+  const 附加特效 = 初始化弹幕单位表现(参数, 弹幕单位);
+  实例.附加特效1 = 附加特效[0];
+  实例.附加特效2 = 附加特效[1];
   激活非牛头人弹幕可选取(实例);
   实例.命中规则状态 = 创建弹幕命中规则状态(实例);
   注册原生弹幕实例(实例, 取句柄ID(弹幕单位));
@@ -198,6 +230,13 @@ export function 获取原生弹幕(this: void, 弹幕ID: number): 原生弹幕�
 export function 获取单位原生弹幕ID(this: void, 单位: any): number {
   const id = 单位到原生弹幕ID[取句柄ID(单位)];
   return id ?? 0;
+}
+
+export function 重置原生弹幕命中记录(this: void, 弹幕ID: number): boolean {
+  const 实例 = 获取原生弹幕实例(弹幕ID);
+  if (实例 == null || 实例.已结束) return false;
+  重置弹幕命中规则状态(实例);
+  return true;
 }
 
 export function 造成原生弹幕阻挡伤害(this: void, 弹幕ID: number, 伤害值: number, 来源单位?: any): boolean {

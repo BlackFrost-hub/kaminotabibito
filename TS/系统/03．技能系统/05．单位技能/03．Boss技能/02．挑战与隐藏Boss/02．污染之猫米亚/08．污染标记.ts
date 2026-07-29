@@ -22,6 +22,9 @@ const { 获取Boss技能敌对英雄列表, 获取Boss技能仇恨目标列表 }
 const { setThreat } = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储") as {
   setThreat: (this: void, enemy: any, target: any, value: number) => void;
 };
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
 
 const jass = require("jass.common") as any;
 
@@ -29,9 +32,7 @@ const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 function 取单位仇恨(this: void, entries: Array<{ targetHid: number; threat: number }>, unit: any): number {
@@ -48,10 +49,7 @@ function 取目标腐化层数(this: void, context: 米亚运行时上下文, ta
 
 function 恢复Boss生命(this: void, boss: any, ratio: number): void {
   if (!单位存活(boss) || ratio <= 0) return;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  const current = GetUnitState(boss, UNIT_STATE_LIFE);
-  const next = current + maxLife * ratio > maxLife ? maxLife : current + maxLife * ratio;
-  SetUnitState(boss, UNIT_STATE_LIFE, next);
+  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio, ItemHeal: false, HealEffect: false });
 }
 
 function 处理旧标记死亡(this: void, context: 米亚运行时上下文): void {

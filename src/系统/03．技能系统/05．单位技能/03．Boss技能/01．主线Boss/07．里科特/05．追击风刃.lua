@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_8FFD_51FB_76EE_6807, _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6, _____53D1_5C04_8FFD_51FB_98CE_5203, ____on_91CC_79D1_7279_8FFD_51FB_98CE_5203_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetSpellTargetUnit, GetOwningPlayer, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____91CC_79D1_7279_5355_4F4D_7C7B_578BID, _____8FFD_51FB_98CE_5203_6280_80FDID
+local _____53D6_8FFD_51FB_76EE_6807, _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6, _____53D1_5C04_8FFD_51FB_98CE_5203, ____on_91CC_79D1_7279_8FFD_51FB_98CE_5203_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetSpellTargetUnit, GetOwningPlayer, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____91CC_79D1_7279_5355_4F4D_7C7B_578BID, _____8FFD_51FB_98CE_5203_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.00．配置")
 local _____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["里科特单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.01．运行时上下文")
@@ -31,23 +31,22 @@ function _____53D6_8FFD_51FB_76EE_6807(boss)
     end
     return _____5355_4F4D_6709_6548_result_5
 end
-function _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6(context, _____4E0A_4E0B_6587)
+function _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6(context, _____9636_6BB5, _____4E0A_4E0B_6587)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["追击风刃"]
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(_____4E0A_4E0B_6587["弹幕单位"]) then
         return nil
     end
-    if _____5237_65B0_91CC_79D1_7279_9636_6BB5(context) >= 3 then
+    if _____9636_6BB5 >= 3 then
         local target = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
         return _____5355_4F4D_6709_6548(target) and _____53D6_5355_4F4D_95F4_89D2_5EA6(_____4E0A_4E0B_6587["弹幕单位"], target) or nil
     end
     return _____53D6_5355_4F4D_95F4_89D2_5EA6(_____4E0A_4E0B_6587["弹幕单位"], boss)
 end
-function _____53D1_5C04_8FFD_51FB_98CE_5203(context, angle)
+function _____53D1_5C04_8FFD_51FB_98CE_5203(context, _____9636_6BB5, angle)
     local boss = context["Boss单位"]
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["追击风刃"]
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["Boss攻击力比例"]
-    local stage = _____5237_65B0_91CC_79D1_7279_9636_6BB5(context)
     _____521B_5EFA_5EF6_8FDF_6539_5411_5F39_5E55({
         ["名称"] = "里科特-追击风刃改向",
         ["清理"] = context["清理"],
@@ -58,7 +57,7 @@ function _____53D1_5C04_8FFD_51FB_98CE_5203(context, angle)
             Y = GetUnitY(boss),
             ["方向角"] = angle,
             ["速度"] = cfg["速度"],
-            ["最大距离"] = cfg["射程"],
+            ["最大距离"] = _____9636_6BB5 == 1 and cfg["射程"] or cfg["射程"] * cfg["阶段改向最大距离倍率"],
             ["命中半径"] = cfg["命中半径"],
             ["影响目标"] = "敌方",
             ["碰撞消失"] = false,
@@ -77,18 +76,19 @@ function _____53D1_5C04_8FFD_51FB_98CE_5203(context, angle)
                     ["伤害"] = damage,
                     attack = false,
                     ranged = false,
-                    attackType = ATTACK_TYPE_MAGIC,
+                    attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能"
                 })
             end
         },
-        ["自动改向"] = stage ~= 1,
-        ["改向延迟秒"] = stage >= 3 and cfg["P3追踪延迟秒"] or cfg["P2回转延迟秒"],
+        ["自动改向"] = _____9636_6BB5 ~= 1,
+        ["改向时重置命中记录"] = _____9636_6BB5 ~= 1,
+        ["改向延迟秒"] = _____9636_6BB5 >= 3 and cfg["P3追踪延迟秒"] or cfg["P2回转延迟秒"],
         ["新速度"] = cfg["速度"],
         ["取改向角度"] = function(_____4E0A_4E0B_6587)
-            return _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6(context, _____4E0A_4E0B_6587)
+            return _____53D6_8FFD_51FB_98CE_5203_9636_6BB5_6539_5411_89D2_5EA6(context, _____9636_6BB5, _____4E0A_4E0B_6587)
         end
     })
 end
@@ -102,6 +102,7 @@ ____exports["释放里科特追击风刃"] = function(context)
         return
     end
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["追击风刃"]
+    local _____9636_6BB5 = _____5237_65B0_91CC_79D1_7279_9636_6BB5(context)
     local angle = _____53D6_5355_4F4D_95F4_89D2_5EA6(boss, target)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "矩形",
@@ -131,7 +132,7 @@ ____exports["释放里科特追击风刃"] = function(context)
                 GetUnitY(boss),
                 _____91CC_79D1_7279_97F3_6548_914D_7F6E["默认裁断距离"]
             )
-            _____53D1_5C04_8FFD_51FB_98CE_5203(context, angle)
+            _____53D1_5C04_8FFD_51FB_98CE_5203(context, _____9636_6BB5, angle)
         end
     })
 end
@@ -156,7 +157,7 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetOwningPlayer = jass.GetOwningPlayer
-ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")

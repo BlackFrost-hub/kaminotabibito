@@ -15,9 +15,10 @@ const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const ShowUnit = jass.ShowUnit as (whichUnit: any, show: boolean) => void;
 const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) => number;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
@@ -46,16 +47,40 @@ const { 施加快速控制Buff, 施加快速减速Buff } = require("系统.03．
 const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   施加眩晕: (this: void, source: any, target: any, duration: number) => void;
 };
+const { X_FixUnitStandingSafe, X_RestoreUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
+  X_FixUnitStandingSafe: (this: void, unit: any) => void;
+  X_RestoreUnitStandingSafe: (this: void, unit: any) => void;
+};
 
 interface 湮灭风场 {
   context: 里科特运行时上下文;
+  BossID: number;
+  已锁定移动: boolean;
   剩余跳数: number;
   周期ID: number;
+  已结束: boolean;
 }
 
 const 里科特单位类型ID = stringToFourCC(里科特单位技能配置.单位ID);
 const 湮灭之风技能ID = stringToFourCC(里科特数值与表现配置.湮灭之风.技能槽位);
+const 当前湮灭风场表: Record<number, 湮灭风场 | undefined> = {};
 let 已注册 = false;
+
+function 结束湮灭之风(this: void, data: 湮灭风场): void {
+  if (data.已结束) return;
+  data.已结束 = true;
+  if (当前湮灭风场表[data.BossID] === data) delete 当前湮灭风场表[data.BossID];
+  removePeriodicCallback(data.周期ID);
+  const boss = data.context.Boss单位;
+  if (boss == null || boss === 0) return;
+  ShowUnit(boss, true);
+  if (data.已锁定移动) X_RestoreUnitStandingSafe(boss);
+}
+
+function 清理湮灭之风(this: void, value?: any): void {
+  const data = value as 湮灭风场 | undefined;
+  if (data != null) 结束湮灭之风(data);
+}
 
 function 施加湮灭之风随机控制(this: void, boss: any, hero: any): void {
   const cfg = 里科特数值与表现配置.湮灭之风;
@@ -73,8 +98,7 @@ function 结算湮灭之风一跳(this: void, data: 湮灭风场): void {
   const context = data.context;
   const boss = context.Boss单位;
   if (!单位有效(boss) || data.剩余跳数 <= 0) {
-    removePeriodicCallback(data.周期ID);
-    ShowUnit(boss, true);
+    结束湮灭之风(data);
     return;
   }
   data.剩余跳数 = data.剩余跳数 - 1;
@@ -103,7 +127,7 @@ function 结算湮灭之风一跳(this: void, data: 湮灭风场): void {
       伤害: damage,
       attack: false,
       ranged: false,
-      attackType: ATTACK_TYPE_MAGIC,
+      attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_MAGIC,
       weaponType: WEAPON_TYPE_WHOKNOWS,
       来源类型: "Boss技能",
@@ -118,26 +142,37 @@ export function 释放里科特湮灭之风(this: void, context: 里科特运行
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 里科特数值与表现配置.湮灭之风;
+  const bossId = GetHandleId(boss);
+  const current = 当前湮灭风场表[bossId];
+  if (current != null) 结束湮灭之风(current);
   const stage = 刷新里科特阶段(context);
   if (stage >= 3) 播放里科特施法维持动作(boss, cfg.持续秒, cfg.动画速度);
   播放里科特台词(boss, "湮灭之风");
   播放Boss坐标音效(里科特音效配置.湮灭之风.风场展开, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
   createTimedEffect(cfg.扩散特效路径, GetUnitX(boss), GetUnitY(boss), 0, cfg.扩散特效持续秒);
   createTimedEffect(cfg.风场特效路径, GetUnitX(boss), GetUnitY(boss), 0, cfg.风场特效持续秒);
-  if (stage < 3) ShowUnit(boss, false);
+  const 应锁定移动 = stage < 3;
+  if (应锁定移动) {
+    X_FixUnitStandingSafe(boss);
+    ShowUnit(boss, false);
+  }
 
   const data: 湮灭风场 = {
     context,
+    BossID: bossId,
+    已锁定移动: 应锁定移动,
     剩余跳数: cfg.持续秒 / cfg.tick秒,
     周期ID: 0,
+    已结束: false,
   };
+  当前湮灭风场表[bossId] = data;
   data.周期ID = addPeriodicCallback(cfg.tick秒 * 1000, function 里科特湮灭之风周期(this: void): void {
     结算湮灭之风一跳(data);
   });
   context.清理.登记周期回调("里科特-湮灭之风周期", data.周期ID);
+  context.清理.登记清理("里科特-湮灭之风移动锁", 清理湮灭之风, data);
   const id = addDelayedCallback(cfg.持续秒 * 1000, function 里科特湮灭之风结束显形(this: void): void {
-    ShowUnit(boss, true);
-    removePeriodicCallback(data.周期ID);
+    结束湮灭之风(data);
   });
   context.清理.登记延迟回调("里科特-湮灭之风结束", id);
 }

@@ -11,10 +11,13 @@ const unitRelated = require("lib.扩展函数.自定义扩展函数.00．单位�
 const unitCleanup = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
   立即移除单位并取消排泄登记: (this: void, unit: any) => void;
 };
+const effectLibrary = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
+  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, scale: number, speed: number, duration: number) => any;
+};
 const 创建单位并登记排泄: any = unitRelated.创建单位并登记排泄;
 
-export const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 export const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
+export const EC_CreateEffect = effectLibrary.EC_CreateEffect;
 export const GetHandleId = jass.GetHandleId as (h: any) => number;
 export const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 export const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
@@ -50,6 +53,11 @@ export const SinBJ = (require("lib.扩展函数.BJ函数.12．数学函数") as 
 
 export const EXSetUnitFacing = japi.EXSetUnitFacing as ((unit: any, angle: number) => void) | undefined;
 export const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => void) | undefined;
+export const DzSetEffectPos = japi.DzSetEffectPos as (effect: any, x: number, y: number, z: number) => void;
+export const EXEffectMatReset = japi.EXEffectMatReset as (effect: any) => void;
+export const EXEffectMatRotateY = japi.EXEffectMatRotateY as (effect: any, angle: number) => void;
+export const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, angle: number) => void;
+export const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
 export const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 export const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;

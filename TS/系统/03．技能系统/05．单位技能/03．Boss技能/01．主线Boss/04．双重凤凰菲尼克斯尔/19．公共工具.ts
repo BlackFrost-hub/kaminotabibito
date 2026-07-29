@@ -15,13 +15,11 @@ const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08�
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
-const Player = jass.Player as (id: number) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, whichAnimation: number) => void;
@@ -30,12 +28,10 @@ const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (x: number) => number;
 const R2I = jass.R2I as (x: number) => number;
-const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD;
@@ -51,8 +47,10 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = requ
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
-const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
-  getRegisteredPlayerHero: (this: void, player: any) => any;
+const { 获取Boss技能敌对目标列表, 获取Boss技能随机敌对英雄, 获取Boss技能最近敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
+  获取Boss技能敌对目标列表: (this: void, boss: any) => any[];
+  获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
+  获取Boss技能最近敌对英雄: (this: void, boss: any) => any;
 };
 const { isValidUnit } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isValidUnit: (this: void, unit: any) => boolean;
@@ -137,48 +135,26 @@ export function 取当前生命(this: void, unit: any): number {
   return GetUnitState(unit, UNIT_STATE_LIFE);
 }
 
-export function 设置当前生命(this: void, unit: any, value: number): void {
-  SetUnitState(unit, UNIT_STATE_LIFE, value);
-}
-
 export function 取攻击力(this: void, unit: any): number {
   return 读取单位攻击力(unit);
 }
 
-export function 取菲尼克斯尔玩家英雄列表(this: void): any[] {
-  const result: any[] = [];
-  for (let i = 0; i < 12; i++) {
-    const hero = getRegisteredPlayerHero(Player(i));
-    if (单位存活(hero)) result.push(hero);
-  }
-  return result;
+export function 取菲尼克斯尔敌对目标列表(this: void, boss: any): any[] {
+  return 获取Boss技能敌对目标列表(boss);
 }
 
-export function 取随机玩家英雄(this: void): any {
-  const heroes = 取菲尼克斯尔玩家英雄列表();
-  if (heroes.length <= 0) return null;
-  return heroes[GetRandomInt(1, heroes.length) - 1];
-}
-
-export function 取最近玩家英雄(this: void, x: number, y: number): any {
-  const heroes = 取菲尼克斯尔玩家英雄列表();
-  let best: any = null;
-  let bestDist = 999999999;
-  for (let i = 0; i < heroes.length; i++) {
-    const hero = heroes[i];
-    const d = 两点距离(x, y, GetUnitX(hero), GetUnitY(hero));
-    if (d < bestDist) {
-      best = hero;
-      bestDist = d;
-    }
-  }
-  return best;
+export function 取随机玩家英雄(this: void, boss: any): any {
+  return 获取Boss技能随机敌对英雄(boss);
 }
 
 export function 取目标或随机玩家(this: void, boss: any, target?: any): any {
-  if (单位存活(target)) return target;
-  const nearest = 取最近玩家英雄(GetUnitX(boss), GetUnitY(boss));
-  return 单位存活(nearest) ? nearest : 取随机玩家英雄();
+  const targets = 取菲尼克斯尔敌对目标列表(boss);
+  if (单位存活(target)) {
+    for (let i = 0; i < targets.length; i++) {
+      if (targets[i] === target) return target;
+    }
+  }
+  return 获取Boss技能最近敌对英雄(boss);
 }
 
 export function 面向单位(this: void, source: any, target: any): void {
@@ -272,7 +248,7 @@ export function 范围敌人(this: void, boss: any, x: number, y: number, radius
   return getEnemyUnitsInRange(boss, x, y, radius);
 }
 
-function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, amount: number, attackType: any, damageType: any, 伤害形态: 技能伤害形态, 上下文?: 菲尼克斯尔伤害上下文参数): void {
+function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, amount: number, damageType: any, 伤害形态: 技能伤害形态, 上下文?: 菲尼克斯尔伤害上下文参数): void {
   if (amount > 0 && 单位存活(source) && 单位存活(target)) {
     提交预计算Boss技能伤害({
       技能ID: 上下文?.技能ID,
@@ -282,7 +258,7 @@ function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, a
       目标: target,
       伤害: amount,
       ranged: true,
-      attackType,
+      attackType: ATTACK_TYPE_NORMAL,
       伤害类型: damageType,
       weaponType: WEAPON_TYPE_WHOKNOWS,
       伤害形态,
@@ -291,23 +267,23 @@ function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, a
 }
 
 export function 造成火焰伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_FIRE, 伤害形态, 上下文);
+  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_FIRE, 伤害形态, 上下文);
 }
 
 export function 造成冰霜伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_COLD, 伤害形态, 上下文);
+  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_COLD, 伤害形态, 上下文);
 }
 
 export function 造成毒火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_POISON, 伤害形态, 上下文);
+  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_POISON, 伤害形态, 上下文);
 }
 
 export function 造成暗火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, 伤害形态, 上下文);
+  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_SHADOW_STRIKE, 伤害形态, 上下文);
 }
 
 export function 造成普通伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, 伤害形态, 上下文);
+  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_NORMAL, 伤害形态, 上下文);
 }
 
 export function 计算攻击最大生命伤害(this: void, source: any, target: any, attackRate: number, maxLifeRate: number): number {

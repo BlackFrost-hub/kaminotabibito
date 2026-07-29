@@ -18,23 +18,35 @@ local _____505C_6B62_5468_671F = ____19_FF0E_516C_5171_5DE5_5177["停止周期"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_516C_5171_5DE5_5177["单位存活"]
 local _____53D6_5F53_524D_751F_547D = ____19_FF0E_516C_5171_5DE5_5177["取当前生命"]
 local _____53D6_6700_5927_751F_547D = ____19_FF0E_516C_5171_5DE5_5177["取最大生命"]
-local _____8BBE_7F6E_5F53_524D_751F_547D = ____19_FF0E_516C_5171_5DE5_5177["设置当前生命"]
 local _____53D6_5355_4F4DX = ____19_FF0E_516C_5171_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____19_FF0E_516C_5171_5DE5_5177["取单位Y"]
 local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_673A_5236_5355_4F4D = ____19_FF0E_516C_5171_5DE5_5177["创建菲尼克斯尔机制单位"]
-local _____64AD_653E_70B9_7279_6548 = ____19_FF0E_516C_5171_5DE5_5177["播放点特效"]
 local _____663E_793A_81F4_547D_8BFB_6761 = ____19_FF0E_516C_5171_5DE5_5177["显示致命读条"]
 local _____5F00_59CB_65BD_6CD5_786C_76F4 = ____19_FF0E_516C_5171_5DE5_5177["开始施法硬直"]
 local _____8BBE_7F6E_5355_4F4D_52A8_753B = ____19_FF0E_516C_5171_5DE5_5177["设置单位动画"]
-local _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔玩家英雄列表"]
+local _____53D6_83F2_5C3C_514B_65AF_5C14_654C_5BF9_76EE_6807_5217_8868 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔敌对目标列表"]
 local _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击最大生命伤害"]
 local _____9020_6210_6697_706B_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成暗火伤害"]
 local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587 = ____19_FF0E_516C_5171_5DE5_5177["创建菲尼克斯尔独立伤害上下文"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.18．单位动画守护")
 local _____521B_5EFA_5355_4F4D_52A8_753B_5B88_62A4 = ____require_result_0["创建单位动画守护"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
+local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_2.doHeal
 local jass = require("jass.common")
 local KillUnit = jass.KillUnit
 local RemoveUnit = jass.RemoveUnit
+local SetUnitTimeScale = jass.SetUnitTimeScale
+local function _____64AD_653E_6C38_6052_8F6E_56DE_70B9_7279_6548(model, x, y, lifeMs, scale)
+    return _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = model,
+        X = x,
+        Y = y,
+        ["缩放"] = scale,
+        ["持续秒"] = lifeMs / 1000
+    })
+end
 local function _____6E05_7406_83F2_5C3C_514B_65AF_5C14_51E4_51F0_86CB(context)
     do
         local i = 0
@@ -43,11 +55,12 @@ local function _____6E05_7406_83F2_5C3C_514B_65AF_5C14_51E4_51F0_86CB(context)
             local egg = item["单位"]
             if egg ~= nil and egg ~= 0 then
                 if not item["已摧毁"] then
-                    _____64AD_653E_70B9_7279_6548(
+                    _____64AD_653E_6C38_6052_8F6E_56DE_70B9_7279_6548(
                         _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回星屑残留"],
                         _____53D6_5355_4F4DX(egg),
                         _____53D6_5355_4F4DY(egg),
-                        1200
+                        1200,
+                        _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["永恒轮回星屑残留特效缩放"]
                     )
                 end
                 RemoveUnit(egg)
@@ -64,17 +77,18 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_86CB_6B7B_4EA1(context,
             do
                 local item = context["凤凰蛋列表"][i + 1]
                 if item["单位"] ~= unit then
-                    goto __continue9
+                    goto __continue10
                 end
                 if item["已摧毁"] then
                     return
                 end
                 item["已摧毁"] = true
-                _____64AD_653E_70B9_7279_6548(
+                _____64AD_653E_6C38_6052_8F6E_56DE_70B9_7279_6548(
                     _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回星屑残留"],
                     _____53D6_5355_4F4DX(unit),
                     _____53D6_5355_4F4DY(unit),
-                    1200
+                    1200,
+                    _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["永恒轮回星屑残留特效缩放"]
                 )
                 _____64AD_653EBoss_5750_6807_97F3_6548(
                     _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["永恒轮回"]["凤凰蛋摧毁"],
@@ -84,7 +98,7 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_51E4_51F0_86CB_6B7B_4EA1(context,
                 )
                 return
             end
-            ::__continue9::
+            ::__continue10::
             i = i + 1
         end
     end
@@ -105,6 +119,14 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
     _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD(context.Boss, "永恒轮回")
     _____5F00_59CB_65BD_6CD5_786C_76F4(context.Boss, config["永恒轮回引导秒"])
     _____8BBE_7F6E_5355_4F4D_52A8_753B(context.Boss, _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第二形态"]["轮回死亡"]["编号"], _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第二形态"]["轮回死亡"]["倍速"])
+    _____5EF6_8FDF(
+        config["永恒轮回动画冻结秒"] * 1000,
+        function()
+            if _____5355_4F4D_5B58_6D3B(context.Boss) and context["当前形态"] == "永恒轮回" then
+                SetUnitTimeScale(context.Boss, 0)
+            end
+        end
+    )
     _____663E_793A_81F4_547D_8BFB_6761(config["永恒轮回引导秒"], 3, "永恒轮回倒计时", "摧毁凤凰之卵，否则菲尼克斯尔将恢复生命")
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["永恒轮回"]["开始"],
@@ -135,15 +157,43 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                 ["间隔秒"] = eggAnimation["守护间隔秒"],
                 ["调试名"] = "菲尼克斯尔-凤凰蛋动画守护"
             })
-            local ____context__51E4_51F0_86CB_5217_8868_1 = context["凤凰蛋列表"]
-            ____context__51E4_51F0_86CB_5217_8868_1[#____context__51E4_51F0_86CB_5217_8868_1 + 1] = {["单位"] = egg, ["已摧毁"] = false}
-            _____64AD_653E_70B9_7279_6548(_____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回能量上升"], p.x, p.y, 2500)
+            local ____context__51E4_51F0_86CB_5217_8868_3 = context["凤凰蛋列表"]
+            ____context__51E4_51F0_86CB_5217_8868_3[#____context__51E4_51F0_86CB_5217_8868_3 + 1] = {["单位"] = egg, ["已摧毁"] = false}
             i = i + 1
         end
     end
+    local _____80FD_91CF_4E0A_5347timerId = _____5468_671F(
+        500,
+        function()
+            do
+                local i = 0
+                while i < #context["凤凰蛋列表"] do
+                    do
+                        local egg = context["凤凰蛋列表"][i + 1]["单位"]
+                        if not _____5355_4F4D_5B58_6D3B(egg) then
+                            goto __continue23
+                        end
+                        _____64AD_653E_6C38_6052_8F6E_56DE_70B9_7279_6548(
+                            _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回能量上升"],
+                            _____53D6_5355_4F4DX(egg),
+                            _____53D6_5355_4F4DY(egg),
+                            600,
+                            config["永恒轮回能量上升特效缩放"]
+                        )
+                    end
+                    ::__continue23::
+                    i = i + 1
+                end
+            end
+        end
+    )
+    local ____self_4 = context["清理"]
+    ____self_4["登记周期回调"](____self_4, "菲尼克斯尔-永恒轮回能量上升", _____80FD_91CF_4E0A_5347timerId)
     _____5EF6_8FDF(
         config["永恒轮回引导秒"] * 1000,
         function()
+            _____505C_6B62_5468_671F(_____80FD_91CF_4E0A_5347timerId)
+            SetUnitTimeScale(context.Boss, 1)
             local aliveEggs = 0
             do
                 local i = 0
@@ -162,12 +212,14 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                     _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["默认裁断距离"]
                 )
                 local heal = _____53D6_6700_5927_751F_547D(context.Boss) * config["每枚存活凤凰蛋回血Boss最大生命比例"] * aliveEggs
-                local nextLife = _____53D6_5F53_524D_751F_547D(context.Boss) + heal
-                if nextLife > _____53D6_6700_5927_751F_547D(context.Boss) then
-                    nextLife = _____53D6_6700_5927_751F_547D(context.Boss)
-                end
-                _____8BBE_7F6E_5F53_524D_751F_547D(context.Boss, nextLife)
-                local heroes = _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868()
+                doHeal({
+                    HealSource = context.Boss,
+                    HealTarget = context.Boss,
+                    HealAmount = heal,
+                    ItemHeal = false,
+                    HealEffect = false
+                })
+                local heroes = _____53D6_83F2_5C3C_514B_65AF_5C14_654C_5BF9_76EE_6807_5217_8868(context.Boss)
                 do
                     local i = 0
                     while i < #heroes do
@@ -177,6 +229,13 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                             _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, heroes[i + 1], config["轮回失败全场伤害Boss攻击力比例"], config["轮回失败全场伤害目标最大生命比例"]),
                             "AOE",
                             _____4F24_5BB3_4E0A_4E0B_6587
+                        )
+                        _____64AD_653E_6C38_6052_8F6E_56DE_70B9_7279_6548(
+                            _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回失败伤害"],
+                            _____53D6_5355_4F4DX(heroes[i + 1]),
+                            _____53D6_5355_4F4DY(heroes[i + 1]),
+                            1500,
+                            config["永恒轮回失败伤害特效缩放"]
                         )
                         i = i + 1
                     end
@@ -188,11 +247,12 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                 _____6E05_7406_83F2_5C3C_514B_65AF_5C14_51E4_51F0_86CB(context)
                 KillUnit(context.Boss)
             end
-            _____64AD_653E_70B9_7279_6548(
+            _____64AD_653E_6C38_6052_8F6E_56DE_70B9_7279_6548(
                 _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回收拢"],
                 _____53D6_5355_4F4DX(context.Boss),
                 _____53D6_5355_4F4DY(context.Boss),
-                2000
+                2000,
+                config["永恒轮回收拢特效缩放"]
             )
         end
     )
@@ -211,8 +271,8 @@ ____exports["初始化菲尼克斯尔永恒轮回节点"] = function(context)
             end
         end
     )
-    local ____self_2 = context["清理"]
-    ____self_2["登记周期回调"](____self_2, "菲尼克斯尔-永恒轮回检测", timerId)
+    local ____self_5 = context["清理"]
+    ____self_5["登记周期回调"](____self_5, "菲尼克斯尔-永恒轮回检测", timerId)
 end
 ____exports["注册菲尼克斯尔永恒轮回"] = function()
 end

@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import { 里科特单位技能配置 } from "./00．配置";
-import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科特运行时上下文 } from "./01．运行时上下文";
+import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科特阶段, type 里科特运行时上下文 } from "./01．运行时上下文";
 import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度 } from "./13．公共工具";
@@ -18,7 +18,7 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
@@ -44,22 +44,21 @@ function 取追击目标(this: void, boss: any): any {
   return 单位有效(target) ? target : 获取Boss技能随机敌对英雄(boss, boss, 里科特数值与表现配置.追击风刃.施法距离 + 300);
 }
 
-function 取追击风刃阶段改向角度(this: void, context: 里科特运行时上下文, 上下文: 延迟改向弹幕上下文): number | undefined {
+function 取追击风刃阶段改向角度(this: void, context: 里科特运行时上下文, 阶段: 里科特阶段, 上下文: 延迟改向弹幕上下文): number | undefined {
   const cfg = 里科特数值与表现配置.追击风刃;
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(上下文.弹幕单位)) return undefined;
-  if (刷新里科特阶段(context) >= 3) {
+  if (阶段 >= 3) {
     const target = 获取Boss技能随机敌对英雄(boss, boss, 2000);
     return 单位有效(target) ? 取单位间角度(上下文.弹幕单位, target) : undefined;
   }
   return 取单位间角度(上下文.弹幕单位, boss);
 }
 
-function 发射追击风刃(this: void, context: 里科特运行时上下文, angle: number): void {
+function 发射追击风刃(this: void, context: 里科特运行时上下文, 阶段: 里科特阶段, angle: number): void {
   const boss = context.Boss单位;
   const cfg = 里科特数值与表现配置.追击风刃;
   const damage = 读取单位攻击力(boss) * cfg.Boss攻击力比例;
-  const stage = 刷新里科特阶段(context);
   创建延迟改向弹幕({
     名称: "里科特-追击风刃改向",
     清理: context.清理,
@@ -70,7 +69,7 @@ function 发射追击风刃(this: void, context: 里科特运行时上下文, an
       Y: GetUnitY(boss),
       方向角: angle,
       速度: cfg.速度,
-      最大距离: cfg.射程,
+      最大距离: 阶段 === 1 ? cfg.射程 : cfg.射程 * cfg.阶段改向最大距离倍率,
       命中半径: cfg.命中半径,
       影响目标: "敌方",
       碰撞消失: false,
@@ -87,18 +86,19 @@ function 发射追击风刃(this: void, context: 里科特运行时上下文, an
           伤害: damage,
           attack: false,
           ranged: false,
-          attackType: ATTACK_TYPE_MAGIC,
+          attackType: ATTACK_TYPE_NORMAL,
           伤害类型: DAMAGE_TYPE_MAGIC,
           weaponType: WEAPON_TYPE_WHOKNOWS,
           来源类型: "Boss技能",
         });
       },
     },
-    自动改向: stage !== 1,
-    改向延迟秒: stage >= 3 ? cfg.P3追踪延迟秒 : cfg.P2回转延迟秒,
+    自动改向: 阶段 !== 1,
+    改向时重置命中记录: 阶段 !== 1,
+    改向延迟秒: 阶段 >= 3 ? cfg.P3追踪延迟秒 : cfg.P2回转延迟秒,
     新速度: cfg.速度,
     取改向角度: function 里科特追击风刃取改向角度(this: void, 上下文: 延迟改向弹幕上下文): number | undefined {
-      return 取追击风刃阶段改向角度(context, 上下文);
+      return 取追击风刃阶段改向角度(context, 阶段, 上下文);
     },
   });
 }
@@ -109,6 +109,7 @@ export function 释放里科特追击风刃(this: void, context: 里科特运行
   const target = 取追击目标(boss);
   if (!单位有效(target)) return;
   const cfg = 里科特数值与表现配置.追击风刃;
+  const 阶段 = 刷新里科特阶段(context);
   const angle = 取单位间角度(boss, target);
   创建技能提示圈({
     类型: "矩形",
@@ -138,7 +139,7 @@ export function 释放里科特追击风刃(this: void, context: 里科特运行
     },
     on生效: function 里科特追击风刃生效(this: void): void {
       播放Boss坐标音效(里科特音效配置.追击风刃.发射, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
-      发射追击风刃(context, angle);
+      发射追击风刃(context, 阶段, angle);
     },
   });
 }

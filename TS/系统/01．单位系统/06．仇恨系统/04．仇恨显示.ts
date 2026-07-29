@@ -24,7 +24,8 @@ const 功能开关 = require("系统.00．核心系统.02．功能开关.01．QW
 };
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
-const GetUnitName = jass.GetUnitName as (u: any) => string;
+const GetUnitTypeId = jass.GetUnitTypeId as (u: any) => number;
+const GetUnitName = jass.GetUnitName as (u: any) => string | null;
 const SetTextTagText = (jass as any).SetTextTagText as (tt: any, text: string, height: number) => void;
 const SetTextTagPosUnit = (jass as any).SetTextTagPosUnit as (tt: any, unit: any, height: number) => void;
 const SetTextTagVisibility = (jass as any).SetTextTagVisibility as (tt: any, visible: boolean) => void;
@@ -49,6 +50,10 @@ function 取单位ID(u: any): number {
   return GetHandleId(u) || 0;
 }
 
+function 单位句柄仍有效(this: void, unit: any): boolean {
+  return unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0;
+}
+
 function 获取有序仇恨显示敌人ID列表(): number[] {
   const result: number[] = [];
   for (const key in 仇恨显示表) {
@@ -62,14 +67,17 @@ function 获取有序仇恨显示敌人ID列表(): number[] {
 }
 
 function 格式化仇恨值(仇恨值: number): string {
-  const 十倍整数 = R2I(仇恨值 * 10 + 0.5);
+  const 安全仇恨值 = typeof 仇恨值 === "number" && 仇恨值 === 仇恨值 ? 仇恨值 : 0;
+  const 十倍整数 = R2I(安全仇恨值 * 10 + 0.5);
   const 整数部分 = R2I(十倍整数 / 10);
   const 小数部分 = 十倍整数 - 整数部分 * 10;
   return `${整数部分}.${小数部分}`;
 }
 
 function 构建仇恨文本(目标单位: any, 仇恨值: number): string {
-  return `目标：${GetUnitName(目标单位)}|n仇恨值：${格式化仇恨值(仇恨值)}`;
+  const 单位名 = 单位句柄仍有效(目标单位) ? GetUnitName(目标单位) : null;
+  const 安全单位名 = 单位名 != null && 单位名 !== "" ? 单位名 : "未知目标";
+  return `目标：${安全单位名}|n仇恨值：${格式化仇恨值(仇恨值)}`;
 }
 
 function 本地玩家是否显示仇恨文字(): boolean {
@@ -124,7 +132,7 @@ function on仇恨显示Tick(): void {
       清除仇恨显示ById(敌人ID);
       continue;
     }
-    if (IsUnitType(数据.跟随单位, UNIT_TYPE_DEAD)) {
+    if (!单位句柄仍有效(数据.跟随单位) || IsUnitType(数据.跟随单位, UNIT_TYPE_DEAD)) {
       清除仇恨显示ById(敌人ID);
       continue;
     }
@@ -157,7 +165,10 @@ function 确保仇恨显示Tick已启动(): void {
 export function 更新仇恨显示(敌人: any, 目标单位: any, 仇恨值: number): void {
   const 敌人ID = 取单位ID(敌人);
   if (敌人ID === 0) return;
-  if (敌人 == null || 敌人 === 0 || 目标单位 == null || 目标单位 === 0) return;
+  if (!单位句柄仍有效(敌人) || !单位句柄仍有效(目标单位)) {
+    清除仇恨显示ById(敌人ID);
+    return;
+  }
   if (IsUnitType(敌人, UNIT_TYPE_DEAD) || IsUnitType(目标单位, UNIT_TYPE_DEAD)) {
     清除仇恨显示ById(敌人ID);
     return;

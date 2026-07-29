@@ -15,6 +15,24 @@ local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
 ____exports["创建单位AI配置"] = function(_____914D_7F6E)
     return _____914D_7F6E
 end
+____exports["创建AI状态白名单条件"] = function(_____8BFB_53D6_72B6_6001, _____5141_8BB8_72B6_6001_5217_8868)
+    return function(unit)
+        local _____5F53_524D_72B6_6001 = _____8BFB_53D6_72B6_6001(unit)
+        if _____5F53_524D_72B6_6001 == nil then
+            return false
+        end
+        do
+            local i = 0
+            while i < #_____5141_8BB8_72B6_6001_5217_8868 do
+                if _____5141_8BB8_72B6_6001_5217_8868[i + 1] == _____5F53_524D_72B6_6001 then
+                    return true
+                end
+                i = i + 1
+            end
+        end
+        return false
+    end
+end
 ____exports["按归类筛选单位AI配置"] = function(_____914D_7F6E_5217_8868, _____5F52_7C7B)
     local _____7ED3_679C = {}
     do
@@ -160,7 +178,7 @@ ____exports["构建单位IDAI配置索引"] = function(_____914D_7F6E_5217_8868)
                 local _____914D_7F6E = _____914D_7F6E_5217_8868[i + 1]
                 local _____5355_4F4DID = ____exports["解析单位AI配置单位ID"](_____914D_7F6E)
                 if _____5355_4F4DID == nil or _____5355_4F4DID == "" then
-                    goto __continue45
+                    goto __continue51
                 end
                 if not _____7D22_5F15[_____5355_4F4DID] then
                     _____7D22_5F15[_____5355_4F4DID] = {}
@@ -168,7 +186,7 @@ ____exports["构建单位IDAI配置索引"] = function(_____914D_7F6E_5217_8868)
                 local ____7D22_5F15______5355_4F4DID_7 = _____7D22_5F15[_____5355_4F4DID]
                 ____7D22_5F15______5355_4F4DID_7[#____7D22_5F15______5355_4F4DID_7 + 1] = _____914D_7F6E
             end
-            ::__continue45::
+            ::__continue51::
             i = i + 1
         end
     end

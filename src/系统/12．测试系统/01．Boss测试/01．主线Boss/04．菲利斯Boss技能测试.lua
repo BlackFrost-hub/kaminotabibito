@@ -15,6 +15,7 @@ local ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B = ____require_result_4["Boss测试�
 local _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840 = ____require_result_4["设置Boss测试单位满血"]
 local _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4 = ____require_result_4["获取Boss测试玩家基准英雄"]
 local _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175 = ____require_result_4["准备Boss测试固定步兵"]
+local _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_5C71_4E18_4E4B_738B = ____require_result_4["准备Boss测试固定山丘之王"]
 local _____79FB_9664Boss_6D4B_8BD5_5355_4F4D = ____require_result_4["移除Boss测试单位"]
 local _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4 = ____require_result_4["注册Boss测试命令组"]
 local ____require_result_5 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
@@ -37,10 +38,15 @@ local CreateUnit = jass.CreateUnit
 local SetHeroLevel = jass.SetHeroLevel
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
+local GetUnitState = jass.GetUnitState
+local SetUnitState = jass.SetUnitState
 local GetPlayerId = jass.GetPlayerId
+local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
+local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____83F2_5229_65AF_6D4B_8BD5Boss = {}
-local _____83F2_5229_65AF_6D4B_8BD5_6B65_51751 = {}
-local _____83F2_5229_65AF_6D4B_8BD5_6B65_51752 = {}
+local _____83F2_5229_65AF_6D4B_8BD5_6B65_5175 = {}
+local _____83F2_5229_65AF_6D4B_8BD5_5C71_4E18_4E4B_738B = {}
 local function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
@@ -75,12 +81,10 @@ local function _____51C6_5907_6D4B_8BD5_573A_666F(player, boss)
     local pid = GetPlayerId(player)
     local hero = _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4(player)
     if hero ~= nil and hero ~= 0 then
-        SetUnitPosition(hero, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y)
-        SetUnitFacing(hero, 90)
         _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840(hero)
     end
-    _____83F2_5229_65AF_6D4B_8BD5_6B65_51751[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____83F2_5229_65AF_6D4B_8BD5_6B65_51751[pid], _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X - 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
-    _____83F2_5229_65AF_6D4B_8BD5_6B65_51752[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____83F2_5229_65AF_6D4B_8BD5_6B65_51752[pid], _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X + 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
+    _____83F2_5229_65AF_6D4B_8BD5_6B65_5175[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____83F2_5229_65AF_6D4B_8BD5_6B65_5175[pid], _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X - 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
+    _____83F2_5229_65AF_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_5C71_4E18_4E4B_738B(_____83F2_5229_65AF_6D4B_8BD5_5C71_4E18_4E4B_738B[pid], _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X + 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
     SelectUnitForPlayerSingle(boss, player)
     StarOther_PanCameraToTimedForPlayer(player, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3Y, 0.2)
 end
@@ -103,11 +107,11 @@ local function _____6E05_7406_83F2_5229_65AF_6D4B_8BD5(player, _context)
     if boss ~= nil and boss ~= 0 then
         _____6E05_7406_83F2_5229_65AF_4E0A_4E0B_6587(boss)
     end
-    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____83F2_5229_65AF_6D4B_8BD5_6B65_51751[pid])
-    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____83F2_5229_65AF_6D4B_8BD5_6B65_51752[pid])
+    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____83F2_5229_65AF_6D4B_8BD5_6B65_5175[pid])
+    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____83F2_5229_65AF_6D4B_8BD5_5C71_4E18_4E4B_738B[pid])
     _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(boss)
-    _____83F2_5229_65AF_6D4B_8BD5_6B65_51751[pid] = nil
-    _____83F2_5229_65AF_6D4B_8BD5_6B65_51752[pid] = nil
+    _____83F2_5229_65AF_6D4B_8BD5_6B65_5175[pid] = nil
+    _____83F2_5229_65AF_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = nil
     _____83F2_5229_65AF_6D4B_8BD5Boss[pid] = nil
     if globals.udg_Boss == boss then
         globals.udg_Boss = nil
@@ -133,7 +137,48 @@ local function ____on_83F2_5229_65AF_6280_80FD4_6D4B_8BD5_547D_4EE4(_player, con
         _____91CA_653E_83F2_5229_65AF_5F02_5F62_5316(context)
     end
 end
-local _____83F2_5229_65AF_6D4B_8BD5_6280_80FD_5217_8868 = {{["序号"] = 1, ["名称"] = "剑魂杀", ["执行"] = ____on_83F2_5229_65AF_6280_80FD1_6D4B_8BD5_547D_4EE4}, {["序号"] = 2, ["名称"] = "剑气灵斩", ["执行"] = ____on_83F2_5229_65AF_6280_80FD2_6D4B_8BD5_547D_4EE4}, {["序号"] = 3, ["名称"] = "全力封印斩", ["执行"] = ____on_83F2_5229_65AF_6280_80FD3_6D4B_8BD5_547D_4EE4}, {["序号"] = 4, ["名称"] = "异形化", ["执行"] = ____on_83F2_5229_65AF_6280_80FD4_6D4B_8BD5_547D_4EE4}}
+local function ____on_83F2_5229_65AF_9886_8896_5149_73AF_6D4B_8BD5_547D_4EE4(player, context)
+    local ____temp_11
+    if context ~= nil then
+        ____temp_11 = context["Boss单位"]
+    else
+        ____temp_11 = nil
+    end
+    local boss = ____temp_11
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(boss) then
+        return
+    end
+    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    if not (maxLife > 0) then
+        return
+    end
+    if GetUnitState(boss, UNIT_STATE_LIFE) > maxLife * 0.5 then
+        SetUnitState(boss, UNIT_STATE_LIFE, maxLife * 0.3)
+        DisplayTimedTextToPlayer(
+            player,
+            0,
+            0,
+            6,
+            "[菲利斯-领袖光环] 已切换低血状态：友军攻击降低，剑气灵斩冷却缩短。"
+        )
+    else
+        SetUnitState(boss, UNIT_STATE_LIFE, maxLife)
+        DisplayTimedTextToPlayer(
+            player,
+            0,
+            0,
+            6,
+            "[菲利斯-领袖光环] 已切换高血状态：友军攻击提高。"
+        )
+    end
+end
+local _____83F2_5229_65AF_6D4B_8BD5_6280_80FD_5217_8868 = {
+    {["序号"] = 1, ["名称"] = "领袖光环（高血/低血切换）", ["执行"] = ____on_83F2_5229_65AF_9886_8896_5149_73AF_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 2, ["名称"] = "剑魂杀", ["执行"] = ____on_83F2_5229_65AF_6280_80FD1_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 3, ["名称"] = "剑气灵斩", ["执行"] = ____on_83F2_5229_65AF_6280_80FD2_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 4, ["名称"] = "全力封印斩", ["执行"] = ____on_83F2_5229_65AF_6280_80FD3_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 5, ["名称"] = "异形化", ["执行"] = ____on_83F2_5229_65AF_6280_80FD4_6D4B_8BD5_547D_4EE4}
+}
 _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4({
     ["命令单位名"] = "菲利斯",
     ["Boss名称"] = "菲利斯",

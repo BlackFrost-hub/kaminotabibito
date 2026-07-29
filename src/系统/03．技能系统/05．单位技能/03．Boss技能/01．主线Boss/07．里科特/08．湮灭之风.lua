@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.00．配置")
 local _____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["里科特单位技能配置"]
@@ -25,9 +26,10 @@ local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetHandleId = jass.GetHandleId
 local ShowUnit = jass.ShowUnit
 local GetRandomInt = jass.GetRandomInt
-local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
@@ -48,9 +50,37 @@ local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_6["施加快�
 local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_6["施加快速减速Buff"]
 local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
 local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
+local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
+local X_FixUnitStandingSafe = ____require_result_8.X_FixUnitStandingSafe
+local X_RestoreUnitStandingSafe = ____require_result_8.X_RestoreUnitStandingSafe
 local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6E6E_706D_4E4B_98CE_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之风"]["技能槽位"])
+local _____5F53_524D_6E6E_706D_98CE_573A_8868 = {}
 local _____5DF2_6CE8_518C = false
+local function _____7ED3_675F_6E6E_706D_4E4B_98CE(data)
+    if data["已结束"] then
+        return
+    end
+    data["已结束"] = true
+    if _____5F53_524D_6E6E_706D_98CE_573A_8868[data.BossID] == data then
+        __TS__Delete(_____5F53_524D_6E6E_706D_98CE_573A_8868, data.BossID)
+    end
+    removePeriodicCallback(data["周期ID"])
+    local boss = data.context["Boss单位"]
+    if boss == nil or boss == 0 then
+        return
+    end
+    ShowUnit(boss, true)
+    if data["已锁定移动"] then
+        X_RestoreUnitStandingSafe(boss)
+    end
+end
+local function _____6E05_7406_6E6E_706D_4E4B_98CE(value)
+    local data = value
+    if data ~= nil then
+        _____7ED3_675F_6E6E_706D_4E4B_98CE(data)
+    end
+end
 local function _____65BD_52A0_6E6E_706D_4E4B_98CE_968F_673A_63A7_5236(boss, hero)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之风"]
     local roll = GetRandomInt(0, 2)
@@ -72,8 +102,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
     local context = data.context
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or data["剩余跳数"] <= 0 then
-        removePeriodicCallback(data["周期ID"])
-        ShowUnit(boss, true)
+        _____7ED3_675F_6E6E_706D_4E4B_98CE(data)
         return
     end
     data["剩余跳数"] = data["剩余跳数"] - 1
@@ -97,7 +126,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue9
+                    goto __continue16
                 end
                 if _____8DDD_79BB_5E73_65B9XY(
                     GetUnitX(hero),
@@ -105,7 +134,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
                     bx,
                     by
                 ) > radius2 then
-                    goto __continue9
+                    goto __continue16
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____6E6E_706D_4E4B_98CE_6280_80FDID,
@@ -114,14 +143,14 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
                     ["伤害"] = damage,
                     attack = false,
                     ranged = false,
-                    attackType = ATTACK_TYPE_MAGIC,
+                    attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能"
                 })
                 _____65BD_52A0_5FEB_901F_63A7_5236Buff(boss, hero, 2, cfg["沉默秒"])
             end
-            ::__continue9::
+            ::__continue16::
             i = i + 1
         end
     end
@@ -136,6 +165,11 @@ ____exports["释放里科特湮灭之风"] = function(context)
         return
     end
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之风"]
+    local bossId = GetHandleId(boss)
+    local current = _____5F53_524D_6E6E_706D_98CE_573A_8868[bossId]
+    if current ~= nil then
+        _____7ED3_675F_6E6E_706D_4E4B_98CE(current)
+    end
     local stage = _____5237_65B0_91CC_79D1_7279_9636_6BB5(context)
     if stage >= 3 then
         _____64AD_653E_91CC_79D1_7279_65BD_6CD5_7EF4_6301_52A8_4F5C(boss, cfg["持续秒"], cfg["动画速度"])
@@ -161,27 +195,38 @@ ____exports["释放里科特湮灭之风"] = function(context)
         0,
         cfg["风场特效持续秒"]
     )
-    if stage < 3 then
+    local _____5E94_9501_5B9A_79FB_52A8 = stage < 3
+    if _____5E94_9501_5B9A_79FB_52A8 then
+        X_FixUnitStandingSafe(boss)
         ShowUnit(boss, false)
     end
-    local data = {context = context, ["剩余跳数"] = cfg["持续秒"] / cfg["tick秒"], ["周期ID"] = 0}
+    local data = {
+        context = context,
+        BossID = bossId,
+        ["已锁定移动"] = _____5E94_9501_5B9A_79FB_52A8,
+        ["剩余跳数"] = cfg["持续秒"] / cfg["tick秒"],
+        ["周期ID"] = 0,
+        ["已结束"] = false
+    }
+    _____5F53_524D_6E6E_706D_98CE_573A_8868[bossId] = data
     data["周期ID"] = addPeriodicCallback(
         cfg["tick秒"] * 1000,
         function()
             _____7ED3_7B97_6E6E_706D_4E4B_98CE_4E00_8DF3(data)
         end
     )
-    local ____self_8 = context["清理"]
-    ____self_8["登记周期回调"](____self_8, "里科特-湮灭之风周期", data["周期ID"])
+    local ____self_9 = context["清理"]
+    ____self_9["登记周期回调"](____self_9, "里科特-湮灭之风周期", data["周期ID"])
+    local ____self_10 = context["清理"]
+    ____self_10["登记清理"](____self_10, "里科特-湮灭之风移动锁", _____6E05_7406_6E6E_706D_4E4B_98CE, data)
     local id = addDelayedCallback(
         cfg["持续秒"] * 1000,
         function()
-            ShowUnit(boss, true)
-            removePeriodicCallback(data["周期ID"])
+            _____7ED3_675F_6E6E_706D_4E4B_98CE(data)
         end
     )
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "里科特-湮灭之风结束", id)
+    local ____self_11 = context["清理"]
+    ____self_11["登记延迟回调"](____self_11, "里科特-湮灭之风结束", id)
 end
 local function ____on_91CC_79D1_7279_6E6E_706D_4E4B_98CE_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____6E6E_706D_4E4B_98CE_6280_80FDID then

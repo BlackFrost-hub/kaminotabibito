@@ -48,6 +48,9 @@ const { 获取Boss护卫列表, 是否指定Boss护卫 } = require("系统.01．
   获取Boss护卫列表: (this: void, boss: any, 只返回存活?: boolean) => any[];
   是否指定Boss护卫: (this: void, unit: any, boss: any) => boolean;
 };
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -57,11 +60,9 @@ const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
@@ -97,17 +98,9 @@ function 收集咆哮波候选单位(this: void, context: 巴尔扎罗斯运行�
   return result;
 }
 
-function 限制生命值(this: void, value: number, maxLife: number): number {
-  if (value < 1) return 1;
-  if (value > maxLife) return maxLife;
-  return value;
-}
-
-function 治疗单位(this: void, unit: any, amount: number): void {
+function 治疗单位(this: void, source: any, unit: any, amount: number): void {
   if (!单位有效(unit) || amount <= 0) return;
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
-  const life = GetUnitState(unit, UNIT_STATE_LIFE);
-  SetUnitState(unit, UNIT_STATE_LIFE, 限制生命值(life + amount, maxLife));
+  doHeal({ HealSource: source, HealTarget: unit, HealAmount: amount, ItemHeal: false, HealEffect: false });
 }
 
 function 计算咆哮波伤害(this: void, boss: any, target: any): number {
@@ -182,7 +175,7 @@ function 执行咆哮波命中(this: void, context: 巴尔扎罗斯运行时上�
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(unit)) return;
   if (是巴尔扎罗斯护卫(context, unit)) {
-    治疗单位(unit, GetUnitState(unit, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.恶魔咆哮波.护卫命中治疗最大生命比例);
+    治疗单位(boss, unit, GetUnitState(unit, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.恶魔咆哮波.护卫命中治疗最大生命比例);
     return;
   }
   造成AOE技能伤害({

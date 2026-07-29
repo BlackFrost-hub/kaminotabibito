@@ -4,6 +4,7 @@ local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____03_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____03_FF0E_5BF9_5916_63A5_53E3["创建原生弹幕"]
+local _____91CD_7F6E_539F_751F_5F39_5E55_547D_4E2D_8BB0_5F55 = ____03_FF0E_5BF9_5916_63A5_53E3["重置原生弹幕命中记录"]
 local ____00_FF0E_5F39_5E55_6539_5411 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.06．改向与反弹.00．弹幕改向")
 local _____8BBE_7F6E_539F_751F_5F39_5E55_6307_5B9A_89D2_5EA6_98DE_884C = ____00_FF0E_5F39_5E55_6539_5411["设置原生弹幕指定角度飞行"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
@@ -67,6 +68,9 @@ _____5EF6_8FDF_6539_5411_5F39_5E55_5B9E_73B0.prototype["立即改向"] = functio
     local speed = self["参数"]["取新速度"] ~= nil and self["参数"]["取新速度"](_____4E0A_4E0B_6587) or self["参数"]["新速度"]
     local ok = _____8BBE_7F6E_539F_751F_5F39_5E55_6307_5B9A_89D2_5EA6_98DE_884C(self["弹幕ID"], angle, speed)
     if ok then
+        if self["参数"]["改向时重置命中记录"] == true then
+            _____91CD_7F6E_539F_751F_5F39_5E55_547D_4E2D_8BB0_5F55(self["弹幕ID"])
+        end
         self["已改向"] = true
         if self["参数"]["on改向"] ~= nil then
             self["参数"]["on改向"](_____4E0A_4E0B_6587)

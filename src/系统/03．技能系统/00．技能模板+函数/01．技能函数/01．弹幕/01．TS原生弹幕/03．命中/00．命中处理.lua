@@ -16,11 +16,15 @@ local isUnitAlly = ____require_result_2.isUnitAlly
 local isUnitEnemy = ____require_result_2.isUnitEnemy
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.10．命中规则")
 local _____521B_5EFA_547D_4E2D_89C4_5219_72B6_6001 = ____require_result_3["创建命中规则状态"]
+local _____91CD_7F6E_547D_4E2D_89C4_5219_72B6_6001 = ____require_result_3["重置命中规则状态"]
 local _____5355_4F4D_662F_5426_8FD8_80FD_547D_4E2D = ____require_result_3["单位是否还能命中"]
 local _____8BB0_5F55_5355_4F4D_547D_4E2D = ____require_result_3["记录单位命中"]
 local _____547D_4E2D_89C4_5219_662F_5426_5E94_505C_6B62 = ____require_result_3["命中规则是否应停止"]
 ____exports["创建弹幕命中规则状态"] = function(_____5B9E_4F8B)
     return _____521B_5EFA_547D_4E2D_89C4_5219_72B6_6001({["每单位最大命中次数"] = _____5B9E_4F8B["参数"]["每单位最大命中次数"], ["最大总命中次数"] = _____5B9E_4F8B["参数"]["最大总命中次数"], ["首个命中后停止"] = _____5B9E_4F8B["参数"]["碰撞消失"] == true})
+end
+____exports["重置弹幕命中规则状态"] = function(_____5B9E_4F8B)
+    _____91CD_7F6E_547D_4E2D_89C4_5219_72B6_6001(_____5B9E_4F8B["命中规则状态"])
 end
 local function _____8BFB_53D6_5F39_5E55_4F24_5BB3_5F62_6001(_____5B9E_4F8B)
     local _____663E_5F0F_5F62_6001 = _____5B9E_4F8B["参数"]["伤害形态"]

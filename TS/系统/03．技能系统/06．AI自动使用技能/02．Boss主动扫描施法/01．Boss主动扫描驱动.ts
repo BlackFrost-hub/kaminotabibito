@@ -263,6 +263,11 @@ function 是否满足技能释放条件(
   return true;
 }
 
+function 是否满足技能运行时可用条件(unit: any, 技能: AI技能覆盖配置): boolean {
+  const 条件 = 技能.运行时可用条件;
+  return 条件 == null || 条件(unit);
+}
+
 function 按单位获取Boss主动AI配置(unit: any): 单位AI配置 | undefined {
   const unitTypeId = GetUnitTypeId(unit);
   if (unitTypeId !== 0) {
@@ -378,6 +383,7 @@ function 选择可施法技能(
     const skill = 技能列表[i];
     const skillId = skill.技能ID as string;
     if (skillId == null || skillId === "") continue;
+    if (!是否满足技能运行时可用条件(unit, skill)) continue;
 
     const abilityId = 读取技能能力ID(skillId);
     if (abilityId === 0 || jass.GetUnitAbilityLevel(unit, abilityId) <= 0) continue;

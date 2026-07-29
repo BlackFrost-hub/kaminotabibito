@@ -27,10 +27,12 @@ const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff
   registerManualBuff: (this: void, unit: any, buffId: string, duration: number, value: number, extras?: any) => void;
   移除单位指定Buff: (this: void, unit: any, buffId: string) => boolean;
 };
+const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
+  doHeal: (this: void, params: any) => number;
+};
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
@@ -105,7 +107,10 @@ export function 绑定祖地双灵卫同息生命下限(this: void, context: 祖
 
 function 恢复崩解守卫(this: void, context: 祖地双灵卫运行时上下文, name: 祖地双灵卫名称): void {
   const unit = 取单位(context, name);
-  SetUnitState(unit, UNIT_STATE_LIFE, GetUnitState(unit, UNIT_STATE_MAX_LIFE) * 祖地双灵卫数值与表现配置.公共.同息回灌恢复比例);
+  const source = name === '赤誓灵卫' ? context.苍影灵卫单位 : context.赤誓灵卫单位;
+  const targetLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * 祖地双灵卫数值与表现配置.公共.同息回灌恢复比例;
+  const healAmount = targetLife - GetUnitState(unit, UNIT_STATE_LIFE);
+  if (healAmount > 0) doHeal({ HealSource: source, HealTarget: unit, HealAmount: healAmount, ItemHeal: false, HealEffect: false });
   SetUnitInvulnerable(unit, false);
   PauseUnit(unit, false);
   context.联合生命周期.设置状态(name, '活跃', '同步崩解超时回灌');

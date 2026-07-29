@@ -44,9 +44,7 @@ const 存活生命阈值 = 0.405;
 export type 范围光环目标类型 = "友军含自己" | "友军不含自己" | "敌人";
 export type 范围光环去重类型 = "单位" | "玩家";
 
-export interface 范围光环参数 {
-  物品类型ID: number;
-  间隔毫秒: number;
+export interface 范围光环基础参数 {
   半径: number;
   目标类型: 范围光环目标类型;
   去重类型?: 范围光环去重类型;
@@ -58,16 +56,26 @@ export interface 范围光环参数 {
   移除目标效果: (this: void, target: any, holder: any, currentCount: number) => void;
 }
 
+export interface 范围光环参数 extends 范围光环基础参数 {
+  物品类型ID: number;
+  间隔毫秒: number;
+}
+
+export interface 手动范围光环参数 extends 范围光环基础参数 {}
+
 type 持有者光环状态 = {
   目标键列表: number[];
   目标单位列表: any[];
 };
 
-type 范围光环实例 = 范围光环参数 & {
+type 范围光环实例 = 范围光环基础参数 & {
   持有者状态表: Record<number, 持有者光环状态 | undefined>;
 };
 
-const 范围光环实例表: 范围光环实例[] = [];
+type 持有型范围光环实例 = 范围光环实例 & Pick<范围光环参数, "物品类型ID" | "间隔毫秒">;
+
+const 范围光环实例表: 持有型范围光环实例[] = [];
+const 手动范围光环实例表: 范围光环实例[] = [];
 
 function 取单位ID(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
@@ -259,7 +267,7 @@ function on范围光环丢弃(this: void, unit: any): void {
 
 export function 注册持有型范围光环(this: void, 参数: 范围光环参数): void {
   if (参数 == null || 参数.物品类型ID === 0 || 参数.间隔毫秒 <= 0 || 参数.半径 <= 0) return;
-  const 配置: 范围光环实例 = {
+  const 配置: 持有型范围光环实例 = {
     ...参数,
     持有者状态表: {},
   };
@@ -270,6 +278,23 @@ export function 注册持有型范围光环(this: void, 参数: 范围光环参�
     周期回调: on范围光环周期,
     丢弃回调: on范围光环丢弃,
   });
+}
+
+export function 创建手动范围光环(this: void, 参数: 手动范围光环参数): number {
+  if (参数 == null || 参数.半径 <= 0) return 0;
+  const 配置: 范围光环实例 = {
+    ...参数,
+    持有者状态表: {},
+  };
+  手动范围光环实例表.push(配置);
+  return 手动范围光环实例表.length;
+}
+
+export function 同步手动范围光环(this: void, 光环ID: number, 持有者: any, 生效: boolean): void {
+  if (光环ID <= 0) return;
+  const 配置 = 手动范围光环实例表[光环ID - 1];
+  if (配置 == null) return;
+  同步单个持有者光环(配置, 持有者, 生效 ? 1 : 0);
 }
 
 export {};

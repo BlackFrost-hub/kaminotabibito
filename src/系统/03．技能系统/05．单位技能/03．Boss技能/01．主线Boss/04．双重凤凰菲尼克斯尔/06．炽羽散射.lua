@@ -29,11 +29,22 @@ local _____9020_6210_706B_7130_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造�
 local _____6DFB_52A0_5143_7D20_5C42_6570 = ____19_FF0E_516C_5171_5DE5_5177["添加元素层数"]
 local _____6781_5750_6807X = ____19_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____19_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
+local _____521B_5EFA_4E8C_9636_8D1D_585E_5C14XYZ_8F68_8FF9 = ____01_FF0ETS_539F_751F_5F39_5E55["创建二阶贝塞尔XYZ轨迹"]
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
+local GetUnitFlyHeight = jass.GetUnitFlyHeight
 local GetRandomReal = jass.GetRandomReal
+local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
+local Atan2 = jass.Atan2
+local ____jass_bj_RADTODEG_0 = jass.bj_RADTODEG
+if ____jass_bj_RADTODEG_0 == nil then
+    ____jass_bj_RADTODEG_0 = 57.29577951308232
+end
+local bj_RADTODEG = ____jass_bj_RADTODEG_0
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____70BD_7FBD_6563_5C04_6280_80FDID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["炽羽散射"])
 local _____70BD_7FBD_6563_5C04_5DF2_6CE8_518C = false
@@ -67,8 +78,35 @@ local function _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x
             end
         end
     )
-    local ____self_0 = context["清理"]
-    ____self_0["登记周期回调"](____self_0, "菲尼克斯尔燃烧区", tick)
+    local ____self_1 = context["清理"]
+    ____self_1["登记周期回调"](____self_1, "菲尼克斯尔燃烧区", tick)
+end
+local function _____53D6_5750_6807_671D_5411_89D2(fromX, fromY, toX, toY)
+    return Atan2(toY - fromY, toX - fromX) * bj_RADTODEG
+end
+local function _____7ED3_7B97_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_843D_70B9(context, boss, x, y, _____4F24_5BB3_4E0A_4E0B_6587)
+    if not _____5355_4F4D_5B58_6D3B(boss) then
+        return
+    end
+    local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["炽羽散射"]
+    _____64AD_653E_70B9_7279_6548(_____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["羽毛命中"], x, y, config["羽毛命中特效持续秒"] * 1000)
+    local enemies = _____8303_56F4_654C_4EBA(boss, x, y, config["落点半径"])
+    do
+        local i = 0
+        while i < #enemies do
+            local u = enemies[i + 1]
+            _____9020_6210_706B_7130_4F24_5BB3(
+                boss,
+                u,
+                _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(boss, u, config["羽毛伤害Boss攻击力比例"], config["羽毛伤害目标最大生命比例"]),
+                "AOE",
+                _____4F24_5BB3_4E0A_4E0B_6587
+            )
+            _____6DFB_52A0_5143_7D20_5C42_6570(u, "火", config["火印层数"])
+            i = i + 1
+        end
+    end
+    _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x, y, _____4F24_5BB3_4E0A_4E0B_6587)
 end
 ____exports["释放菲尼克斯尔炽羽散射"] = function(context, target, _____6280_80FD_5B9E_4F8BID)
     if context["当前形态"] ~= "第一形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
@@ -99,24 +137,51 @@ ____exports["释放菲尼克斯尔炽羽散射"] = function(context, target, ___
             _____5EF6_8FDF(
                 config["读条秒"] * 1000,
                 function()
-                    _____64AD_653E_70B9_7279_6548(_____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["羽毛弹体"], x, y, 900)
-                    local enemies = _____8303_56F4_654C_4EBA(boss, x, y, config["落点半径"])
-                    do
-                        local j = 0
-                        while j < #enemies do
-                            local u = enemies[j + 1]
-                            _____9020_6210_706B_7130_4F24_5BB3(
+                    if not _____5355_4F4D_5B58_6D3B(boss) then
+                        return
+                    end
+                    local startX = _____53D6_5355_4F4DX(boss)
+                    local startY = _____53D6_5355_4F4DY(boss)
+                    local startZ = GetUnitFlyHeight(boss)
+                    local face = _____53D6_5750_6807_671D_5411_89D2(startX, startY, x, y)
+                    local curveOffset = GetRandomReal(-config["贝塞尔侧弯最大距离"], config["贝塞尔侧弯最大距离"])
+                    local controlX = _____6781_5750_6807X((startX + x) * 0.5, curveOffset, face + 90)
+                    local controlY = _____6781_5750_6807Y((startY + y) * 0.5, curveOffset, face + 90)
+                    local projectile = _____521B_5EFA_539F_751F_5F39_5E55({
+                        ["所有者"] = boss,
+                        X = startX,
+                        Y = startY,
+                        ["方向角"] = face,
+                        ["速度"] = 0,
+                        ["生命周期"] = config["羽毛飞行秒"],
+                        ["命中半径"] = 0,
+                        ["碰撞消失"] = false,
+                        ["禁用碰撞"] = true,
+                        ["不可阻挡"] = true,
+                        ["模型"] = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["羽毛弹体"],
+                        ["飞行高度"] = startZ,
+                        ["轨迹采样器"] = _____521B_5EFA_4E8C_9636_8D1D_585E_5C14XYZ_8F68_8FF9(
+                            startX,
+                            startY,
+                            startZ,
+                            controlX,
+                            controlY,
+                            startZ * config["贝塞尔控制高度比例"],
+                            x,
+                            y,
+                            0
+                        ),
+                        ["on到达目标点"] = function(______5F39_5E55ID, ______539F_56E0)
+                            _____7ED3_7B97_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_843D_70B9(
+                                context,
                                 boss,
-                                u,
-                                _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(boss, u, config["羽毛伤害Boss攻击力比例"], config["羽毛伤害目标最大生命比例"]),
-                                "AOE",
+                                x,
+                                y,
                                 _____4F24_5BB3_4E0A_4E0B_6587
                             )
-                            _____6DFB_52A0_5143_7D20_5C42_6570(u, "火", config["火印层数"])
-                            j = j + 1
                         end
-                    end
-                    _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_71C3_70E7_533A(context, x, y, _____4F24_5BB3_4E0A_4E0B_6587)
+                    })
+                    SetUnitAnimationByIndex(projectile["弹幕单位"], 1)
                 end
             )
             i = i + 1

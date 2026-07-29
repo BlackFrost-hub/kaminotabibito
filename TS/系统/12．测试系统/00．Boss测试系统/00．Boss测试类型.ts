@@ -11,6 +11,7 @@ export interface Boss测试场地定义 {
 
 export interface Boss测试技能命令 {
   序号: number;
+  命令?: string;
   名称: string;
   执行: (this: void, player: any, context: any) => void;
 }

@@ -2,15 +2,13 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
-  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 const 沙漠食人魔待战暂停来源 = "剧情系统:沙漠食人魔待战";
 
-const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
 const { YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
@@ -21,12 +19,9 @@ const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") a
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
 };
-const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动") as {
-  启动Boss战运行: (this: void, bossUnit: any) => void;
-};
-
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 启动剧情Boss战 } from "../../00．剧情系统核心工具/11．剧情Boss战启动桥接";
 export { 沙漠食人魔Boss启动剧情片段 } from "../01．第一章/10．沙漠食人魔Boss启动";
 
 const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUnit: any) => boolean;
@@ -62,12 +57,6 @@ export function 执行沙漠食人魔Boss前置(this: void): void {
 export function 执行沙漠食人魔Boss开战(this: void, 参数: 剧情动作参数表): void {
   const bossUnit = YDUserDataGetSafe("string", "Boss", "沙漠食人魔", "unit");
   if (bossUnit == null || bossUnit === 0 || !IsUnitAliveBJ(bossUnit)) return;
-  const 上下文 = 读取当前剧情动作上下文();
-  YDUserDataSetSafe("string", "Boss战", "绑定单位", "unit", bossUnit);
-  if (上下文.触发单位 != null && 上下文.触发单位 !== 0) {
-    YDUserDataSetSafe("string", "Boss战", "触发玩家", "unit", 上下文.触发单位);
-  }
-
   const 音效变量名 = String(参数.播放音效 ?? "");
   if (音效变量名 !== "") {
     const soundHandle = jglobals[音效变量名];
@@ -76,9 +65,10 @@ export function 执行沙漠食人魔Boss开战(this: void, 参数: 剧情动作
     }
   }
 
-  SetUnitInvulnerable(bossUnit, false);
-  移除单位暂停(bossUnit, 沙漠食人魔待战暂停来源);
-  启动Boss战运行(bossUnit);
+  启动剧情Boss战(bossUnit, {
+    触发单位: 读取当前剧情动作上下文().触发单位,
+    暂停来源: 沙漠食人魔待战暂停来源,
+  });
 }
 
 export const 沙漠食人魔Boss启动剧情动作注册表: Record<string, 剧情动作处理器> = {

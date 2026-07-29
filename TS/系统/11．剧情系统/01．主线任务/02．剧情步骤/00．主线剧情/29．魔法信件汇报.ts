@@ -7,9 +7,6 @@ export function 执行魔法信件汇报(this: void): void {
   停止触发单位();
 }
 
-function 执行前往赫克提尔(this: void): void {}
-
 export const 魔法信件汇报剧情动作注册表: Record<string, 剧情动作处理器> = {
   "JLC精灵城_魔法信件汇报": 执行魔法信件汇报,
-  "JLC精灵城_前往赫克提尔": 执行前往赫克提尔,
 };

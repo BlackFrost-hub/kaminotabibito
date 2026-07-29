@@ -5888,6 +5888,19 @@ ____exports["总单位配置表"] = {
         turnRate = 2,
         unit = "e08R"
     },
+    e08T = {
+        _parent = "edot",
+        Name = "王宫卫队长-艾伦",
+        Art = "Unit\\NPC\\02-Chapter\\Elf\\Icon\\Allen.blp",
+        file = "Unit\\NPC\\02-Chapter\\Elf\\Allen.mdx",
+        abilList = "Asid,Aneu,Avul,Apit",
+        spd = 1,
+        race = "human",
+        moveHeight = 45,
+        modelScale = 1.2,
+        turnRate = 2,
+        unit = "e08T"
+    },
     e08S = {
         _parent = "hfoo",
         Name = "防卫部长-耶提尔",
@@ -10049,11 +10062,22 @@ ____exports["总单位配置表"] = {
         _parent = "osw2",
         Name = "剑魂之狼",
         dmgplus1 = 1,
-        HP = 6,
+        HP = 4,
         spd = 452,
         regenHP = 0,
         nsight = 1200,
         unit = "o00A"
+    },
+    o00B = {
+        _parent = "osw2",
+        Name = "大剑魂之狼",
+        dmgplus1 = 1,
+        HP = 8,
+        file = "Unit\\Summon\\FeliceSoulWolfLarge.mdx",
+        spd = 452,
+        regenHP = 0,
+        nsight = 1200,
+        unit = "o00B"
     },
     odoc = {
         _parent = "odoc",

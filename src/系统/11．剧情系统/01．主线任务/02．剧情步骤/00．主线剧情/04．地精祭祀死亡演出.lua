@@ -1,10 +1,7 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Number = ____lualib.__TS__Number
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
-local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
-local _____5199_5165_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入剧情进度"]
 local ____06_FF0EBoss_6B7B_4EA1_5267_60C5_7D22_5F15 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
 local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____06_FF0EBoss_6B7B_4EA1_5267_60C5_7D22_5F15["尝试播放Boss死亡主线剧情"]
 ---
@@ -28,8 +25,7 @@ local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_5["按�
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
 local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑")
-local _____6309_7ED3_7B97_952E_83B7_53D6Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E = ____require_result_7["按结算键获取Boss死亡结算配置"]
-local _____6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_7["执行Boss死亡结算"]
+local _____6309_7ED3_7B97_952E_6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_7["按结算键执行Boss死亡结算"]
 local CreateUnit = jass.CreateUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -124,8 +120,7 @@ local function _____521B_5EFA_5730_7CBE_6B7B_4EA1_795E_79D8_4EBA_6F14_51FA(_____
     )
     SetUnitFacing(_____795E_79D8_4EBA, 270)
 end
-____exports["执行地精祭祀死亡演出前置"] = function(_____53C2_6570)
-    _____5199_5165_5267_60C5_8FDB_5EA6(__TS__Number(_____53C2_6570["设置剧情进度"]) or 4)
+____exports["执行地精祭祀死亡演出前置"] = function()
     local gate = jglobals.gg_dest_DTg5_9811
     if gate ~= nil and gate ~= 0 then
         ModifyGateBJ(bj_GATEOPERATION_OPEN, gate)
@@ -138,10 +133,7 @@ ____exports["执行地精祭祀死亡演出前置"] = function(_____53C2_6570)
     end
     local _____6B8B_8840_5730_7CBE = _____521B_5EFA_6B8B_8840_5730_7CBE_5DEB_5E08()
     local bossUnit = YDUserDataGetSafe("string", "Boss", "地精巫师", "unit")
-    local _____7ED3_7B97_914D_7F6E = _____6309_7ED3_7B97_952E_83B7_53D6Boss_6B7B_4EA1_7ED3_7B97_914D_7F6E("主线_地精祭祀")
-    if _____7ED3_7B97_914D_7F6E ~= nil then
-        _____6267_884CBoss_6B7B_4EA1_7ED3_7B97(_____7ED3_7B97_914D_7F6E, bossUnit)
-    end
+    _____6309_7ED3_7B97_952E_6267_884CBoss_6B7B_4EA1_7ED3_7B97("主线_地精祭祀", bossUnit)
     _____521B_5EFA_5730_7CBE_6B7B_4EA1_795E_79D8_4EBA_6F14_51FA(_____6B8B_8840_5730_7CBE)
 end
 ____exports["地精祭祀死亡演出剧情动作注册表"] = {["JLC精灵村_地精祭祀死亡演出前置"] = ____exports["执行地精祭祀死亡演出前置"]}

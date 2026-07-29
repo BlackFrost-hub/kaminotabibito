@@ -41,7 +41,7 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local Atan2 = jass.Atan2
 local GetRandomReal = jass.GetRandomReal
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local RAD_TO_DEG = 57.29577951308232
@@ -88,7 +88,7 @@ local function _____5C1D_8BD5_5B89_6392_51C0_5316_6295_67AA_82F1_7075_590D_523B(
                                 ["伤害"] = damage,
                                 attack = false,
                                 ranged = true,
-                                attackType = ATTACK_TYPE_MAGIC,
+                                attackType = ATTACK_TYPE_NORMAL,
                                 ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                                 weaponType = WEAPON_TYPE_WHOKNOWS,
                                 ["来源类型"] = "Boss技能",
@@ -139,7 +139,7 @@ local function _____7ED3_7B97_51C0_5316_6295_67AA_843D_70B9(context, x, y, tag)
                     ["伤害"] = damage,
                     attack = false,
                     ranged = true,
-                    attackType = ATTACK_TYPE_MAGIC,
+                    attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能",

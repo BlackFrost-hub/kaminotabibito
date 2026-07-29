@@ -32,9 +32,32 @@ import { 王城紧急会议剧情动作注册表 } from "../02．剧情步骤/00
 import { 第二章王子Boss战过程剧情动作注册表 } from "../02．剧情步骤/00．主线剧情/32．第二章王子Boss战过程";
 import { 第二章王子Boss战后承接剧情动作注册表 } from "../02．剧情步骤/00．主线剧情/33．第二章王子Boss战后承接";
 import { 第二章后续承接剧情动作注册表 } from "../02．剧情步骤/00．主线剧情/34．第二章后续承接";
+import { 第三章启程剧情动作注册表 } from "../02．剧情步骤/00．主线剧情/35．第三章启程";
 import { 执行通用剧情动作 } from "./06．剧情通用执行工具";
+import { 查找标准剧情动作处理器 } from "./10．标准剧情动作";
+
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 主线剧情动作注册表: Record<string, 剧情动作处理器> = {};
+const 旧通用动作白名单: Record<string, true | undefined> = {
+  "JLC精灵城_接见发放金币": true,
+  "JLC精灵城_接见关闭BGM": true,
+  "JLC精灵城_接见开始BGM": true,
+  "JLC精灵城_移除巨魔路线阻挡": true,
+  "JLC精灵城_预置树魔首领": true,
+  "JLC精灵村_村口任务指引": true,
+  "JLC精灵村_地精洞窟演出一秒收尾": true,
+  "JLC精灵村_帝国勋章共鸣特效": true,
+  "JLC精灵村_关闭洞窟大门": true,
+  "JLC精灵村_解锁村内视野": true,
+  "JLC精灵村_赠送沙漠之靴": true,
+  "JLC沙漠_章节末Boss战预警": true,
+  "SRZ蛇人族_食人魔任务预警": true,
+  "第三章_恶魔城调查开始": true,
+  "第三章_前往恶魔城领主处": true,
+};
 
 Object.assign(
   主线剧情动作注册表,
@@ -71,6 +94,7 @@ Object.assign(
   第二章王子Boss战过程剧情动作注册表,
   第二章王子Boss战后承接剧情动作注册表,
   第二章后续承接剧情动作注册表,
+  第三章启程剧情动作注册表,
 );
 
 export function 查找主线剧情动作处理器(this: void, 动作ID: string): 剧情动作处理器 | undefined {
@@ -78,9 +102,19 @@ export function 查找主线剧情动作处理器(this: void, 动作ID: string):
 }
 
 export function 执行主线剧情动作(this: void, 动作ID: string, 参数: 剧情动作参数表): void {
+  const 标准处理器 = 查找标准剧情动作处理器(动作ID);
+  if (标准处理器 != null) {
+    标准处理器(参数);
+    return;
+  }
+
   const handler = 查找主线剧情动作处理器(动作ID);
   if (handler == null) {
-    执行通用剧情动作(参数);
+    if (旧通用动作白名单[动作ID]) {
+      执行通用剧情动作(参数);
+      return;
+    }
+    debugLogForce("11．剧情系统-动作注册表", "未知剧情动作ID", 动作ID);
     return;
   }
   handler(参数);

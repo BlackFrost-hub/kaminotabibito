@@ -30,7 +30,6 @@ local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomReal = jass.GetRandomReal
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -55,6 +54,8 @@ local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．B
 local _____5361_745F_62C9BuffID = ____require_result_7["卡瑟拉BuffID"]
 local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_8["施加快速减速Buff"]
+local ____require_result_9 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_9.doHeal
 local _____5361_745F_62C9_5355_4F4D_7C7B_578BID = stringToFourCC(_____5361_745F_62C9_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____89E6_624B_97AD_7B1E_6280_80FDID = stringToFourCC(_____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手鞭笞"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -81,13 +82,13 @@ local function _____9009_62E9_89E6_624B_97AD_7B1E_76EE_6807(context)
             i = i + 1
         end
     end
-    local _____5355_4F4D_6709_6548_result_9
+    local _____5355_4F4D_6709_6548_result_10
     if _____5355_4F4D_6709_6548(best) then
-        _____5355_4F4D_6709_6548_result_9 = best
+        _____5355_4F4D_6709_6548_result_10 = best
     else
-        _____5355_4F4D_6709_6548_result_9 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
+        _____5355_4F4D_6709_6548_result_10 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
     end
-    return _____5355_4F4D_6709_6548_result_9
+    return _____5355_4F4D_6709_6548_result_10
 end
 local function _____6389_843D_89E6_624B_6B8B_7247_7ED9_51FB_6740_8005(context, killer)
     if not _____5355_4F4D_6709_6548(killer) then
@@ -103,7 +104,13 @@ local function _____6389_843D_89E6_624B_6B8B_7247_7ED9_51FB_6740_8005(context, k
         local life = GetUnitState(killer, UNIT_STATE_LIFE)
         local heal = (maxLife - life) * _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]["已损生命恢复比例"]
         if heal > 0 then
-            SetUnitState(killer, UNIT_STATE_LIFE, life + heal > maxLife and maxLife or life + heal)
+            doHeal({
+                HealSource = killer,
+                HealTarget = killer,
+                HealAmount = heal,
+                ItemHeal = false,
+                HealEffect = false
+            })
         end
     end
 end
@@ -185,8 +192,8 @@ local function _____521B_5EFA_5355_6761_89E6_624B(context, target, x, y)
             _____89E6_624B_97AD_7B1E_4E00_8DF3(data)
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记周期回调"](____self_10, "卡瑟拉-触手鞭笞周期", data["周期ID"])
+    local ____self_11 = context["清理"]
+    ____self_11["登记周期回调"](____self_11, "卡瑟拉-触手鞭笞周期", data["周期ID"])
 end
 local function _____91CA_653E_89E6_624B_56F4_653B(context, target)
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手鞭笞"]
@@ -235,8 +242,8 @@ ____exports["释放卡瑟拉触手鞭笞"] = function(context)
             end
         end
     )
-    local ____self_11 = context["清理"]
-    ____self_11["登记延迟回调"](____self_11, "卡瑟拉-触手鞭笞围攻", id)
+    local ____self_12 = context["清理"]
+    ____self_12["登记延迟回调"](____self_12, "卡瑟拉-触手鞭笞围攻", id)
 end
 local function ____on_5361_745F_62C9_89E6_624B_97AD_7B1E_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____89E6_624B_97AD_7B1E_6280_80FDID then

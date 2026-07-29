@@ -300,6 +300,10 @@ local function _____662F_5426_6EE1_8DB3_6280_80FD_91CA_653E_6761_4EF6(unit, ____
     end
     return true
 end
+local function _____662F_5426_6EE1_8DB3_6280_80FD_8FD0_884C_65F6_53EF_7528_6761_4EF6(unit, _____6280_80FD)
+    local _____6761_4EF6 = _____6280_80FD["运行时可用条件"]
+    return _____6761_4EF6 == nil or _____6761_4EF6(unit)
+end
 local function _____6309_5355_4F4D_83B7_53D6Boss_4E3B_52A8AI_914D_7F6E(unit)
     local unitTypeId = GetUnitTypeId(unit)
     if unitTypeId ~= 0 then
@@ -424,30 +428,33 @@ local function _____9009_62E9_53EF_65BD_6CD5_6280_80FD(unit, _____914D_7F6E)
                 local skill = _____6280_80FD_5217_8868[i + 1]
                 local skillId = skill["技能ID"]
                 if skillId == nil or skillId == "" then
-                    goto __continue93
+                    goto __continue94
+                end
+                if not _____662F_5426_6EE1_8DB3_6280_80FD_8FD0_884C_65F6_53EF_7528_6761_4EF6(unit, skill) then
+                    goto __continue94
                 end
                 local abilityId = _____8BFB_53D6_6280_80FD_80FD_529BID(skillId)
                 if abilityId == 0 or jass.GetUnitAbilityLevel(unit, abilityId) <= 0 then
-                    goto __continue93
+                    goto __continue94
                 end
                 local coolMs = _____8BFB_53D6_6280_80FD_5F53_524D_51B7_5374_6BEB_79D2(unit, skillId)
                 if coolMs > 0 then
-                    goto __continue93
+                    goto __continue94
                 end
                 local range = skill["最大施法距离"] or _____8BFB_53D6_6280_80FD_5B9E_65F6_65BD_6CD5_8DDD_79BB(unit, skillId) or _____914D_7F6E["默认施法距离"] or 1200
                 local area = _____8BFB_53D6_6280_80FD_5B9E_65F6_65BD_6CD5_8303_56F4(unit, skillId)
                 local target = _____9009_62E9_4E3B_52A8_65BD_6CD5_76EE_6807(unit, _____914D_7F6E, skill, range)
                 if not _____662F_5426_6EE1_8DB3_6280_80FD_91CA_653E_6761_4EF6(unit, skill, target) then
-                    goto __continue93
+                    goto __continue94
                 end
                 if (skill["施法目标类型"] or "自动") ~= "无目标" and (skill["施法目标类型"] or "自动") ~= "自己" then
                     if target == nil or target == 0 then
-                        goto __continue93
+                        goto __continue94
                     end
                 end
                 local order = _____8BFB_53D6_6280_80FD_547D_4EE4_5B57_7B26_4E32(skillId)
                 if order == "" then
-                    goto __continue93
+                    goto __continue94
                 end
                 return {
                     skill = skill,
@@ -457,7 +464,7 @@ local function _____9009_62E9_53EF_65BD_6CD5_6280_80FD(unit, _____914D_7F6E)
                     area = area
                 }
             end
-            ::__continue93::
+            ::__continue94::
             i = i + 1
         end
     end

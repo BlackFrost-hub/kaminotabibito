@@ -460,6 +460,13 @@ ____exports["执行Boss死亡结算"] = function(_____914D_7F6E, ____Boss_5355_4
     _____6267_884CBoss_6B7B_4EA1_5956_52B1_4E0E_63D0_793A(_____914D_7F6E, _____51FB_6740_8005)
     return true
 end
+____exports["按结算键执行Boss死亡结算"] = function(_____7ED3_7B97_952E, ____Boss_5355_4F4D, _____51FB_6740_8005)
+    local _____914D_7F6E = ____exports["按结算键获取Boss死亡结算配置"](_____7ED3_7B97_952E)
+    if _____914D_7F6E == nil then
+        return false
+    end
+    return ____exports["执行Boss死亡结算"](_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
+end
 ____exports["尝试执行Boss死亡结算"] = function(____Boss_5355_4F4D, _____51FB_6740_8005)
     local _____914D_7F6E = ____exports["获取Boss死亡结算配置"](____Boss_5355_4F4D)
     if _____914D_7F6E == nil then

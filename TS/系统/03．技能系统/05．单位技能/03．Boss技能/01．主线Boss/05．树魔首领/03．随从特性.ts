@@ -5,7 +5,7 @@ import { 获取树魔首领上下文, 获取或创建树魔首领上下文, 获�
 import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
-import { stringToFourCC, 单位句柄存在, 单位未标记死亡 as 单位存活 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 读取单位攻击力, 单位句柄存在, 单位未标记死亡 as 单位存活 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 启动基础施法时间线 } from '../../../../00．技能模板+函数/02．通用函数/13．施法时间线';
 import { 发起治疗波跳链 } from '../../../../00．技能模板+函数/01．技能函数/10．跳链/治疗波跳链';
 
@@ -21,6 +21,8 @@ const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, state: any) => number;
+const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
+const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
@@ -32,9 +34,6 @@ const {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
-};
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -48,9 +47,6 @@ const { 树魔首领BuffID } = require("系统.05．Buff系统.03．Buff表.01�
 };
 const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS") as {
   SGSS_SetState: (this: void, unit: any, id: number, value: number) => void;
-};
-const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  createTimedEffect: (this: void, model: string, x: number, y: number, z: number, duration: number) => any;
 };
 const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   CosBJ: (this: void, degrees: number) => number;
@@ -68,6 +64,7 @@ const {
   处理Boss结束全部护卫: (this: void, boss: any) => void;
 };
 
+const 攻击力属性ID = 1;
 const 攻速属性ID = 10;
 const 叠加移动速度属性ID = 9;
 const 树魔首领单位类型ID = stringToFourCC(树魔首领单位技能配置.单位ID);
@@ -322,6 +319,12 @@ export function 初始化树魔首领随从特性(this: void, context: 树魔首
   context.清理.登记清理("树魔首领-护卫登记清理", function 清理树魔随从护卫登记(this: void): void {
     处理Boss结束全部护卫(boss);
   });
+  context.清理.登记清理("树魔首领-兽群攻击力回滚", function 清理树魔首领兽群攻击力(this: void): void {
+    清除兽群攻击力加成(context);
+  });
+  context.清理.登记清理("树魔首领-无从暴怒清理", function 清理树魔首领无从暴怒(this: void): void {
+    退出无从暴怒(context);
+  });
   if (cfg.初始召唤延迟秒 <= 0) {
     补充树魔随从编制(context);
     context.下一次召唤Ms = getServerTime() + cfg.补员间隔秒 * 1000;
@@ -349,6 +352,7 @@ function 进入无从暴怒(this: void, context: 树魔首领运行时上下文)
   context.暴怒移速增量 = GetUnitDefaultMoveSpeed(context.Boss单位) * cfg.无小弟移速提高;
   SGSS_SetState(context.Boss单位, 攻速属性ID, context.暴怒攻速增量);
   SGSS_SetState(context.Boss单位, 叠加移动速度属性ID, context.暴怒移速增量);
+  context.暴怒持续特效 = AddSpecialEffectTarget(cfg.暴怒持续特效路径, context.Boss单位, "origin");
   播放Boss坐标音效(树魔首领音效配置.随从特性.无从暴怒, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 树魔首领音效配置.默认裁断距离);
   尝试播放树魔首领怪叫(context.Boss单位, 树魔首领音效配置.怪物拟声.暴怒触发概率百分比);
 }
@@ -356,11 +360,36 @@ function 进入无从暴怒(this: void, context: 树魔首领运行时上下文)
 function 退出无从暴怒(this: void, context: 树魔首领运行时上下文): void {
   if (!context.无从暴怒中) return;
   context.无从暴怒中 = false;
+  if (context.暴怒持续特效 != null && context.暴怒持续特效 !== 0) DestroyEffect(context.暴怒持续特效);
+  context.暴怒持续特效 = null;
   if (context.暴怒攻速增量 !== 0) SGSS_SetState(context.Boss单位, 攻速属性ID, -context.暴怒攻速增量);
   if (context.暴怒移速增量 !== 0) SGSS_SetState(context.Boss单位, 叠加移动速度属性ID, -context.暴怒移速增量);
   context.暴怒攻速增量 = 0;
   context.暴怒移速增量 = 0;
   移除单位指定Buff(context.Boss单位, 树魔首领BuffID.无从暴怒);
+}
+
+function 清除兽群攻击力加成(this: void, context: 树魔首领运行时上下文): void {
+  const applied = context.兽群攻击力增量;
+  if (applied !== 0 && 单位句柄存在(context.Boss单位)) {
+    SGSS_SetState(context.Boss单位, 攻击力属性ID, -applied);
+  }
+  context.兽群攻击力增量 = 0;
+}
+
+function 刷新兽群攻击力加成(this: void, context: 树魔首领运行时上下文): void {
+  const cfg = 树魔首领数值与表现配置.随从特性;
+  const rawRatio = context.当前兽群层数 * cfg.每个小弟攻击提高;
+  const ratio = rawRatio < cfg.最高攻击提高 ? rawRatio : cfg.最高攻击提高;
+  const currentAttack = 读取单位攻击力(context.Boss单位);
+  const attackWithoutPack = currentAttack - context.兽群攻击力增量;
+  const baseAttack = attackWithoutPack > 0 ? attackWithoutPack : 0;
+  const nextBonus = baseAttack * ratio;
+  const delta = nextBonus - context.兽群攻击力增量;
+  if (delta > 0.001 || delta < -0.001) {
+    SGSS_SetState(context.Boss单位, 攻击力属性ID, delta);
+  }
+  context.兽群攻击力增量 = nextBonus;
 }
 
 function 刷新随从状态(this: void, context: 树魔首领运行时上下文): void {
@@ -372,11 +401,13 @@ function 刷新随从状态(this: void, context: 树魔首领运行时上下文)
   const count = context.随从组.取存活数量();
   context.当前随从数量 = count;
   context.当前兽群层数 = count < cfg.兽群最高层数 ? count : cfg.兽群最高层数;
+  刷新兽群攻击力加成(context);
 
   if (count > 0) {
     退出无从暴怒(context);
     registerManualBuff(context.Boss单位, 树魔首领BuffID.兽群号令, cfg.兽群Buff刷新秒, context.当前兽群层数, {
       sourceName: "树魔首领",
+      stack: context.当前兽群层数,
     });
   } else {
     移除单位指定Buff(context.Boss单位, 树魔首领BuffID.兽群号令);
@@ -384,18 +415,7 @@ function 刷新随从状态(this: void, context: 树魔首领运行时上下文)
     registerManualBuff(context.Boss单位, 树魔首领BuffID.无从暴怒, cfg.暴怒Buff刷新秒, 1, {
       sourceName: "树魔首领",
     });
-    createTimedEffect(cfg.暴怒持续特效路径, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 0, cfg.暴怒持续特效刷新毫秒 / 1000);
   }
-}
-
-function 树魔首领随从伤害修正(this: void, damageContext: any): number {
-  const attacker = damageContext.attacker;
-  if (!是树魔首领(attacker)) return damageContext.currentDamage;
-  const context = 获取或创建树魔首领上下文(attacker);
-  if (context == null || context.当前兽群层数 <= 0) return damageContext.currentDamage;
-  const cfg = 树魔首领数值与表现配置.随从特性;
-  const bonus = Math.min(cfg.最高攻击提高, context.当前兽群层数 * cfg.每个小弟攻击提高);
-  return damageContext.currentDamage * (1 + bonus);
 }
 
 function on树魔首领死亡(this: void, dyingUnit: any): void {
@@ -428,7 +448,6 @@ function 树魔首领随从特性Tick(this: void): void {
 export function 注册树魔首领随从特性(this: void): void {
   if (树魔首领随从特性已注册) return;
   树魔首领随从特性已注册 = true;
-  registerDamageModifier(树魔首领随从伤害修正, 45);
   registerDeathListener(on树魔首领死亡);
   addPeriodicCallback(树魔首领数值与表现配置.随从特性.追随刷新间隔毫秒, 树魔首领随从特性Tick);
 }

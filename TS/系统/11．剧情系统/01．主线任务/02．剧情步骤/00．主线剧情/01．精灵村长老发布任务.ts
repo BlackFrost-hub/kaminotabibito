@@ -34,6 +34,9 @@ const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
+};
 const {
   AddSpecialEffect,
   Condition,
@@ -55,7 +58,6 @@ const {
   GetUnitsInRectMatching,
   GroupRemoveUnit,
   IssueImmediateOrder,
-  IsUnitInGroup,
   Location,
   Player,
   PLAYER_NEUTRAL_PASSIVE,
@@ -89,7 +91,6 @@ const {
   GetUnitsInRectMatching: (this: void, whichRect: any, filter: any) => any;
   GroupRemoveUnit: (this: void, whichGroup: any, whichUnit: any) => void;
   IssueImmediateOrder: (this: void, whichUnit: any, order: string) => boolean;
-  IsUnitInGroup: (this: void, whichUnit: any, whichGroup: any) => boolean;
   Location: (this: void, x: number, y: number) => any;
   Player: (this: void, whichPlayer: number) => any;
   PLAYER_NEUTRAL_PASSIVE: number;
@@ -103,23 +104,18 @@ const {
   TriggerAddAction: (this: void, trig: any, action: (this: void) => void) => any;
   TriggerRegisterEnterRectSimple: (this: void, trig: any, r: any) => any;
 };
-const { 发送剧情任务消息, 发送剧情小地图信号 } = require("../../00．剧情系统核心工具/02．剧情动作桥接") as {
-  发送剧情任务消息: (this: void, 参数: any) => void;
-  发送剧情小地图信号: (this: void, 参数: any) => void;
-};
 const { 触发单位增加基础全属性 } = require("../../00．剧情系统核心工具/06．剧情通用执行工具") as {
   触发单位增加基础全属性: (this: void, value: number, template: string) => void;
 };
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 
-import { 读取剧情进度, 写入当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 播放主线剧情片段 } from "../02．剧情步骤播放器";
 
 const bj_HEROSTAT_STR = jglobals.bj_HEROSTAT_STR as number;
 const bj_HEROSTAT_AGI = jglobals.bj_HEROSTAT_AGI as number;
 const bj_HEROSTAT_INT = jglobals.bj_HEROSTAT_INT as number;
 const bj_MODIFYMETHOD_ADD = jglobals.bj_MODIFYMETHOD_ADD as number;
-const bj_QUESTMESSAGE_UPDATED = jglobals.bj_QUESTMESSAGE_UPDATED as number;
 
 let 已初始化进度01核心 = false;
 let 已触发村口放行 = false;
@@ -205,9 +201,6 @@ export function 执行长老对话前置(this: void, 参数: 剧情动作参数�
   创建随机金光戒指();
   StopMusic(false);
 
-  if (typeof 参数.设置剧情进度 === "number") {
-    YDUserDataSetSafe("string", "剧情进度", "整数", "integer", 参数.设置剧情进度);
-  }
   if (触发单位 != null && 触发单位 !== 0 && 参数.触发单位发布命令 != null) {
     IssueImmediateOrder(触发单位, String(参数.触发单位发布命令));
   }
@@ -228,11 +221,6 @@ export function 执行长老任务物品生成(this: void, 参数: 剧情动作�
     const itemTypeId = stringToFourCCSafe(按名字反查物品ID(物品名列表[i]));
     if (itemTypeId > 0) CreateItem(itemTypeId, GetUnitX(长老单位), GetUnitY(长老单位));
   }
-}
-
-export function 执行长老任务更新(this: void, 参数: 剧情动作参数表): void {
-  发送剧情小地图信号({ X: Number(参数.小地图X) || 0, Y: Number(参数.小地图Y) || 0, 持续时间: Number(参数.小地图持续时间) || 0 });
-  发送剧情任务消息({ 消息类型: bj_QUESTMESSAGE_UPDATED, 文本: String(参数.任务更新提示 ?? "") });
 }
 
 export function 执行地精区域显视野(this: void, 参数: 剧情动作参数表): void {
@@ -265,20 +253,12 @@ export const 精灵村长老发布任务剧情动作注册表: Record<string, �
   "JLC精灵村_村口放行前置": 执行村口放行前置,
   "JLC精灵村_长老对话前置": 执行长老对话前置,
   "JLC精灵村_长老任务物品生成": 执行长老任务物品生成,
-  "JLC精灵村_发布地精任务": 执行长老任务更新,
   "JLC精灵村_地精区域显视野": 执行地精区域显视野,
   "JLC精灵村_创建地精祭祀Boss预备": 执行地精祭祀Boss预备,
   "JLC精灵村_远古波动奖励": 执行远古波动奖励,
 };
 
-function 触发单位是玩家英雄(this: void, unit: any): boolean {
-  if (unit == null || unit === 0) return false;
-  const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
-  return 玩家英雄组 != null && 玩家英雄组 !== 0 && IsUnitInGroup(unit, 玩家英雄组);
-}
-
 function 写入并播放剧情(this: void, 片段ID: string, 触发配置名: string, 触发单位: any): boolean {
-  写入当前剧情动作上下文({ 片段ID, 触发配置名, 触发单位 });
   return 播放主线剧情片段(片段ID, { 片段ID, 触发配置名, 触发单位 });
 }
 
@@ -292,7 +272,7 @@ function 触发单位在村口放行矩形内(this: void, unit: any): boolean {
 function on精灵村村口放行触发(this: void): void {
   if (已触发村口放行) return;
   const 触发单位 = GetTriggerUnit();
-  if (!触发单位是玩家英雄(触发单位)) return;
+  if (!是玩家英雄组单位(触发单位)) return;
   if (读取剧情进度() > 0) return;
   if (!触发单位在村口放行矩形内(触发单位)) return;
   if (写入并播放剧情("jlc_elven_village_gate_release", "精灵村村口放行核心", 触发单位)) {
@@ -302,7 +282,7 @@ function on精灵村村口放行触发(this: void): void {
 
 function on精灵村长老发布任务触发(this: void): void {
   const 触发单位 = GetTriggerUnit();
-  if (!触发单位是玩家英雄(触发单位)) return;
+  if (!是玩家英雄组单位(触发单位)) return;
   if (读取剧情进度() >= 1) return;
   写入并播放剧情("jlc_elven_village_elder_quest", "精灵村长老发布任务核心", 触发单位);
 }

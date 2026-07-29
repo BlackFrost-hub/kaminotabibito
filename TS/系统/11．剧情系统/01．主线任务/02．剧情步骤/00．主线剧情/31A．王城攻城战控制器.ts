@@ -43,8 +43,11 @@ const { 设置全体玩家游戏失败 } = require("系统.00．核心系统.09�
 import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 创建并冻结剧情Boss预置 } from "../../00．剧情系统核心工具/03．剧情Boss预置桥接";
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 结算耶提尔菲利斯协战 } from "./31B．耶提尔协战控制器";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
+const AddSpecialEffect = jass.AddSpecialEffect as (this: void, modelName: string, x: number, y: number) => any;
+const DestroyEffect = jass.DestroyEffect as (this: void, effect: any) => void;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
@@ -66,6 +69,9 @@ const 防御法阵X = -6992.3;
 const 防御法阵Y = -13170.9;
 const 菲利斯出现X = -6906.2;
 const 菲利斯出现Y = -16695.7;
+const 菲利斯攻城传送门模型 = "Common\\Effect\\Form\\Portal\\FeliceSiegeBluePortal.mdx";
+const 菲利斯攻城传送门X = -7025.6;
+const 菲利斯攻城传送门Y = -16713.7;
 const 菲利斯对白触发范围 = 600;
 const 耶提尔靠近玩家偏移X = 160;
 const 进攻朝向 = 90;
@@ -99,6 +105,7 @@ interface 王城攻城战状态 {
   攻城单位: any[];
   周期回调ID: number;
   菲利斯: any;
+  菲利斯攻城传送门特效: any;
   菲利斯接近触发器: any;
   取消菲利斯接近监听: ((this: void) => void) | undefined;
   菲利斯出场对话已触发: boolean;
@@ -178,6 +185,21 @@ function 启动攻城目标重发(this: void): void {
   const 状态 = 当前王城攻城战状态;
   if (状态 == null || 状态.周期回调ID !== 0) return;
   状态.周期回调ID = addPeriodicCallback(攻城目标重发间隔毫秒, on重发攻城目标);
+}
+
+function 清理菲利斯攻城传送门(this: void, 状态: 王城攻城战状态): void {
+  const effect = 状态.菲利斯攻城传送门特效;
+  状态.菲利斯攻城传送门特效 = null;
+  if (effect != null && effect !== 0) DestroyEffect(effect);
+}
+
+function 创建菲利斯攻城传送门(this: void, 状态: 王城攻城战状态): void {
+  清理菲利斯攻城传送门(状态);
+  状态.菲利斯攻城传送门特效 = AddSpecialEffect(
+    菲利斯攻城传送门模型,
+    菲利斯攻城传送门X,
+    菲利斯攻城传送门Y
+  );
 }
 
 function 创建攻城单位(this: void, 预置: 攻城单位预置, 世代: number): boolean {
@@ -382,6 +404,7 @@ function on启动菲利斯出场(this: void, 预期世代?: any): void {
   });
   if (bossUnit == null || bossUnit === 0) return;
   SetUnitOwner(bossUnit, Player(敌军玩家ID), true);
+  创建菲利斯攻城传送门(状态);
   注册菲利斯接近对白触发(状态, bossUnit);
   IssueTargetOrder(bossUnit, "attack", 状态.防御法阵);
   启动攻城目标重发();
@@ -391,11 +414,14 @@ function on王城攻城单位死亡(this: void, dyingUnit: any): void {
   const 状态 = 当前王城攻城战状态;
   if (状态 == null) return;
   if (dyingUnit === 状态.菲利斯) {
+    清理菲利斯攻城传送门(状态);
     结束菲利斯攻城等待();
+    结算耶提尔菲利斯协战();
     return;
   }
   if (dyingUnit === 状态.防御法阵 && 状态.阶段 >= 1 && 状态.阶段 <= 3) {
     状态.阶段 = -1;
+    清理菲利斯攻城传送门(状态);
     结束菲利斯攻城等待();
     设置全体玩家游戏失败();
     return;
@@ -440,6 +466,7 @@ function on正式开始王城攻城战(this: void, 预期世代?: any): void {
 
 export function 启动王城攻城战(this: void): void {
   if (当前王城攻城战状态 != null && 当前王城攻城战状态.阶段 >= 0) return;
+  if (当前王城攻城战状态 != null) 清理菲利斯攻城传送门(当前王城攻城战状态);
   确保攻城单位死亡监听();
   王城攻城战世代++;
   当前王城攻城战状态 = {
@@ -451,6 +478,7 @@ export function 启动王城攻城战(this: void): void {
     攻城单位: [],
     周期回调ID: 0,
     菲利斯: null,
+    菲利斯攻城传送门特效: null,
     菲利斯接近触发器: null,
     取消菲利斯接近监听: undefined,
     菲利斯出场对话已触发: false,

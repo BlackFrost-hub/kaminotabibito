@@ -25,11 +25,13 @@ const { isSameUnit, isUnitAlly, isUnitEnemy } = require("lib.扩展函数.自定
 };
 const {
   创建命中规则状态,
+  重置命中规则状态,
   单位是否还能命中,
   记录单位命中,
   命中规则是否应停止,
 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.10．命中规则") as {
   创建命中规则状态: (this: void, 参数?: any) => any;
+  重置命中规则状态: (this: void, 状态: any) => void;
   单位是否还能命中: (this: void, 状态: any, 单位: any) => boolean;
   记录单位命中: (this: void, 状态: any, 单位: any) => boolean;
   命中规则是否应停止: (this: void, 状态: any) => boolean;
@@ -41,6 +43,10 @@ export function 创建弹幕命中规则状态(this: void, 实例: 原生弹幕�
     最大总命中次数: 实例.参数.最大总命中次数,
     首个命中后停止: 实例.参数.碰撞消失 === true,
   });
+}
+
+export function 重置弹幕命中规则状态(this: void, 实例: 原生弹幕内部实例): void {
+  重置命中规则状态(实例.命中规则状态);
 }
 
 function 读取弹幕伤害形态(this: void, 实例: 原生弹幕内部实例): "单体" | "AOE" | "未知" {

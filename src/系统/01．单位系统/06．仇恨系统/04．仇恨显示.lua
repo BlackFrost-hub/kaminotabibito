@@ -32,6 +32,7 @@ local ____require_result_1 = require("系统.00．核心系统.01．事件中心
 local registerDeathListener = ____require_result_1.registerDeathListener
 local _____529F_80FD_5F00_5173 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
 local GetHandleId = jass.GetHandleId
+local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitName = jass.GetUnitName
 local SetTextTagText = jass.SetTextTagText
 local SetTextTagPosUnit = jass.SetTextTagPosUnit
@@ -51,6 +52,9 @@ local function _____53D6_5355_4F4DID(u)
     end
     return GetHandleId(u) or 0
 end
+local function _____5355_4F4D_53E5_67C4_4ECD_6709_6548(unit)
+    return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0
+end
 local function _____83B7_53D6_6709_5E8F_4EC7_6068_663E_793A_654C_4EBAID_5217_8868()
     local result = {}
     for key in pairs(_____4EC7_6068_663E_793A_8868) do
@@ -63,13 +67,22 @@ local function _____83B7_53D6_6709_5E8F_4EC7_6068_663E_793A_654C_4EBAID_5217_886
     return result
 end
 local function _____683C_5F0F_5316_4EC7_6068_503C(_____4EC7_6068_503C)
-    local _____5341_500D_6574_6570 = R2I(_____4EC7_6068_503C * 10 + 0.5)
+    local _____5B89_5168_4EC7_6068_503C = type(_____4EC7_6068_503C) == "number" and _____4EC7_6068_503C == _____4EC7_6068_503C and _____4EC7_6068_503C or 0
+    local _____5341_500D_6574_6570 = R2I(_____5B89_5168_4EC7_6068_503C * 10 + 0.5)
     local _____6574_6570_90E8_5206 = R2I(_____5341_500D_6574_6570 / 10)
     local _____5C0F_6570_90E8_5206 = _____5341_500D_6574_6570 - _____6574_6570_90E8_5206 * 10
     return (tostring(_____6574_6570_90E8_5206) .. ".") .. tostring(_____5C0F_6570_90E8_5206)
 end
 local function _____6784_5EFA_4EC7_6068_6587_672C(_____76EE_6807_5355_4F4D, _____4EC7_6068_503C)
-    return (("目标：" .. GetUnitName(_____76EE_6807_5355_4F4D)) .. "|n仇恨值：") .. _____683C_5F0F_5316_4EC7_6068_503C(_____4EC7_6068_503C)
+    local _____5355_4F4D_53E5_67C4_4ECD_6709_6548_result_2
+    if _____5355_4F4D_53E5_67C4_4ECD_6709_6548(_____76EE_6807_5355_4F4D) then
+        _____5355_4F4D_53E5_67C4_4ECD_6709_6548_result_2 = GetUnitName(_____76EE_6807_5355_4F4D)
+    else
+        _____5355_4F4D_53E5_67C4_4ECD_6709_6548_result_2 = nil
+    end
+    local _____5355_4F4D_540D = _____5355_4F4D_53E5_67C4_4ECD_6709_6548_result_2
+    local _____5B89_5168_5355_4F4D_540D = _____5355_4F4D_540D ~= nil and _____5355_4F4D_540D ~= "" and _____5355_4F4D_540D or "未知目标"
+    return (("目标：" .. _____5B89_5168_5355_4F4D_540D) .. "|n仇恨值：") .. _____683C_5F0F_5316_4EC7_6068_503C(_____4EC7_6068_503C)
 end
 local function _____672C_5730_73A9_5BB6_662F_5426_663E_793A_4EC7_6068_6587_5B57()
     return _____529F_80FD_5F00_5173["本地玩家是否开启仇恨文字"]()
@@ -126,23 +139,23 @@ local function ____on_4EC7_6068_663E_793ATick()
                 local _____6570_636E = _____4EC7_6068_663E_793A_8868[_____654C_4EBAID]
                 if _____6570_636E == nil or _____6570_636E.textTag == nil or _____6570_636E["跟随单位"] == nil or _____6570_636E["跟随单位"] == 0 then
                     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-                    goto __continue20
+                    goto __continue21
                 end
-                if IsUnitType(_____6570_636E["跟随单位"], UNIT_TYPE_DEAD) then
+                if not _____5355_4F4D_53E5_67C4_4ECD_6709_6548(_____6570_636E["跟随单位"]) or IsUnitType(_____6570_636E["跟随单位"], UNIT_TYPE_DEAD) then
                     ____exports["清除仇恨显示ById"](_____654C_4EBAID)
-                    goto __continue20
+                    goto __continue21
                 end
                 SetTextTagPosUnit(_____6570_636E.textTag, _____6570_636E["跟随单位"], _____6587_5B57_9AD8_5EA6)
                 _____5E94_7528_672C_673A_4EC7_6068_6587_5B57_53EF_89C1_6027(_____6570_636E.textTag)
                 _____4ECD_6709_663E_793A = true
             end
-            ::__continue20::
+            ::__continue21::
             i = i + 1
         end
     end
     if not _____4ECD_6709_663E_793A and _____8DDF_968F_56DE_8C03ID ~= 0 then
-        local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-        local removePeriodicCallback = ____require_result_2.removePeriodicCallback
+        local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+        local removePeriodicCallback = ____require_result_3.removePeriodicCallback
         removePeriodicCallback(_____8DDF_968F_56DE_8C03ID)
         _____8DDF_968F_56DE_8C03ID = 0
     end
@@ -155,8 +168,8 @@ local function _____786E_4FDD_4EC7_6068_663E_793ATick_5DF2_542F_52A8()
     if _____8DDF_968F_56DE_8C03ID ~= 0 then
         return
     end
-    local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-    local addPeriodicCallback = ____require_result_3.addPeriodicCallback
+    local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+    local addPeriodicCallback = ____require_result_4.addPeriodicCallback
     _____8DDF_968F_56DE_8C03ID = addPeriodicCallback(_____8DDF_968F_5237_65B0_6BEB_79D2, ____on_4EC7_6068_663E_793ATick)
 end
 ____exports["更新仇恨显示"] = function(_____654C_4EBA, _____76EE_6807_5355_4F4D, _____4EC7_6068_503C)
@@ -164,7 +177,8 @@ ____exports["更新仇恨显示"] = function(_____654C_4EBA, _____76EE_6807_5355
     if _____654C_4EBAID == 0 then
         return
     end
-    if _____654C_4EBA == nil or _____654C_4EBA == 0 or _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
+    if not _____5355_4F4D_53E5_67C4_4ECD_6709_6548(_____654C_4EBA) or not _____5355_4F4D_53E5_67C4_4ECD_6709_6548(_____76EE_6807_5355_4F4D) then
+        ____exports["清除仇恨显示ById"](_____654C_4EBAID)
         return
     end
     if IsUnitType(_____654C_4EBA, UNIT_TYPE_DEAD) or IsUnitType(_____76EE_6807_5355_4F4D, UNIT_TYPE_DEAD) then
@@ -194,8 +208,8 @@ ____exports["清除所有仇恨显示"] = function()
         end
     end
     if _____8DDF_968F_56DE_8C03ID ~= 0 then
-        local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-        local removePeriodicCallback = ____require_result_4.removePeriodicCallback
+        local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+        local removePeriodicCallback = ____require_result_5.removePeriodicCallback
         removePeriodicCallback(_____8DDF_968F_56DE_8C03ID)
         _____8DDF_968F_56DE_8C03ID = 0
     end

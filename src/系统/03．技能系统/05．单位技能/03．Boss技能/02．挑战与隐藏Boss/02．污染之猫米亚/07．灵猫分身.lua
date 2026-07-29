@@ -24,17 +24,17 @@ local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩�
 local X_FixUnitStandingSafe = ____require_result_3.X_FixUnitStandingSafe
 local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
+local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_5.doHeal
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local RemoveUnit = jass.RemoveUnit
 local IsUnitType = jass.IsUnitType
 local CosBJ = jass.CosBJ
 local SinBJ = jass.SinBJ
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local function _____64AD_653E_5206_8EAB_51FA_751F_8868_73B0(x, y)
@@ -50,10 +50,13 @@ local function _____6062_590DBoss_751F_547D(boss, amount)
     if not _____5355_4F4D_6709_6548(boss) or amount <= 0 then
         return
     end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    local current = GetUnitState(boss, UNIT_STATE_LIFE)
-    local next = current + amount > maxLife and maxLife or current + amount
-    SetUnitState(boss, UNIT_STATE_LIFE, next)
+    doHeal({
+        HealSource = boss,
+        HealTarget = boss,
+        HealAmount = amount,
+        ItemHeal = false,
+        HealEffect = false
+    })
 end
 local function _____5B89_6392_5206_8EAB_5230_671F_7ED3_7B97(context, summons)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["灵猫分身"]

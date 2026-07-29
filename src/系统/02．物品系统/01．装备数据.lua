@@ -4342,6 +4342,28 @@ ____exports.items.I0G5 = {
     cdReduction = 0.12,
     atkSpeed = 0.25
 }
+____exports.items.I0G6 = {
+    type = "道具/戒指/饰品",
+    name = "菲利斯的战阵徽章",
+    goldPrice = 1260,
+    score = 6300,
+    level = "B",
+    str = 36,
+    dmg = 110,
+    hp = 1400,
+    armor = 22
+}
+____exports.items.I0G7 = {
+    type = "道具/戒指/饰品",
+    name = "第二军团攻城秘戒",
+    goldPrice = 1250,
+    score = 6250,
+    level = "B",
+    int = 42,
+    mp = 1000,
+    magicDmg = 0.18,
+    cdReduction = 0.1
+}
 ____exports.items.I0FJ = {type = "任务", name = "骸骨圣杯碎片", goldPrice = 0}
 ____exports.items.I0FM = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "IP01"}
 ____exports.items.ches = {

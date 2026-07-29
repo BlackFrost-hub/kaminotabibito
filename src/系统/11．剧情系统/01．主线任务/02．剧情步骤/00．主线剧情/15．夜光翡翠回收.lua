@@ -3,7 +3,6 @@ local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取当前剧情动作上下文"]
-local _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入当前剧情动作上下文"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -20,6 +19,8 @@ local ____require_result_4 = require("lib.扩展函数.Star扩展函数.04．EC�
 local EC_CreateEffect = ____require_result_4.EC_CreateEffect
 local ____require_result_5 = require("lib.扩展函数.BJ函数.01．触发与事件")
 local TriggerRegisterUnitInRangeSimple = ____require_result_5.TriggerRegisterUnitInRangeSimple
+local ____require_result_6 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_6["是玩家英雄组单位"]
 do
     local ____15_FF0E_591C_5149_7FE1_7FE0_56DE_6536 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.15．夜光翡翠回收")
     ____exports["沙漠情报商人回收夜光翡翠剧情片段"] = ____15_FF0E_591C_5149_7FE1_7FE0_56DE_6536["沙漠情报商人回收夜光翡翠剧情片段"]
@@ -29,7 +30,6 @@ local CreateUnit = jass.CreateUnit
 local GetTriggerUnit = jass.GetTriggerUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local IsUnitInGroup = jass.IsUnitInGroup
 local Player = jass.Player
 local RemoveUnit = jass.RemoveUnit
 local TriggerAddAction = jass.TriggerAddAction
@@ -48,14 +48,12 @@ local function _____89E6_53D1_88C2_7F1D_56DE_6751()
         return
     end
     local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
-    if _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 and not IsUnitInGroup(_____89E6_53D1_5355_4F4D, _____73A9_5BB6_82F1_96C4_7EC4) then
+    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
         return
     end
     local _____4E0A_4E0B_6587 = {["片段ID"] = _____56DE_6751_5267_60C5_7247_6BB5ID, ["触发配置名"] = "裂缝回村入口", ["触发单位"] = _____89E6_53D1_5355_4F4D}
-    _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587(_____4E0A_4E0B_6587)
-    local ____require_result_6 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_6["播放主线剧情片段"]
+    local ____require_result_7 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_7["播放主线剧情片段"]
     _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____56DE_6751_5267_60C5_7247_6BB5ID, _____4E0A_4E0B_6587)
 end
 local function _____6CE8_518C_88C2_7F1D_56DE_6751_5165_53E3(unit)
@@ -121,7 +119,5 @@ ____exports["执行情报商人回收夜光翡翠"] = function(_____53C2_6570)
         _____6CE8_518C_88C2_7F1D_56DE_6751_5165_53E3(_____88C2_7F1DB)
     end
 end
-local function _____6267_884C_6E90_77F3_5165_624B_76EE_6807_5237_65B0()
-end
-____exports["夜光翡翠回收剧情动作注册表"] = {["JLC沙漠_情报商人回收夜光翡翠"] = ____exports["执行情报商人回收夜光翡翠"], ["JLC沙漠_源石入手目标刷新"] = _____6267_884C_6E90_77F3_5165_624B_76EE_6807_5237_65B0}
+____exports["夜光翡翠回收剧情动作注册表"] = {["JLC沙漠_情报商人回收夜光翡翠"] = ____exports["执行情报商人回收夜光翡翠"]}
 return ____exports

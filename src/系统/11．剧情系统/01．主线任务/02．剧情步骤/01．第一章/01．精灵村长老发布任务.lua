@@ -89,12 +89,19 @@ ____exports["精灵村长老发布任务紧凑剧情片段"] = {
                 ["长老归属玩家"] = 6,
                 ["长老转向目标"] = "GetTriggerUnit()",
                 ["长老转向耗时"] = 1,
-                ["设置剧情进度"] = 1,
                 ["旧JASS功能清单"] = "ForForce reveal / SetUnitOwner(gg_unit_n025_0372) / RemoveLocation(udg_FHD) / Location(-26218.60,-28632.40) / Random item I09S / StopMusic / IssueImmediateOrder(stop) / SetUnitFacingToFaceUnitTimed / SetUnitOwner(长老, Player(6)) / SetUnitFacingTimed"
             }
         },
         {
             ["序号"] = 2,
+            ["挂点"] = "beforeDialog",
+            ["对白序号"] = 1,
+            ["动作ID"] = "主线.写入进度",
+            ["名称"] = "进入地精异变调查节点",
+            ["参数"] = {["节点进度"] = 1}
+        },
+        {
+            ["序号"] = 3,
             ["挂点"] = "beforeDialog",
             ["对白序号"] = 5,
             ["动作ID"] = "JLC精灵村_帝国勋章共鸣特效",
@@ -102,7 +109,7 @@ ____exports["精灵村长老发布任务紧凑剧情片段"] = {
             ["参数"] = {["模型路径"] = "Abilities\\Spells\\Other\\Awaken\\Awaken.mdl", ["目标"] = "GetTriggerUnit()", ["旧JASS功能清单"] = "EC_CreateEffect(Awaken.mdl)"}
         },
         {
-            ["序号"] = 3,
+            ["序号"] = 4,
             ["挂点"] = "afterDialog",
             ["对白序号"] = 5,
             ["动作ID"] = "JLC精灵村_远古波动奖励",
@@ -117,7 +124,7 @@ ____exports["精灵村长老发布任务紧凑剧情片段"] = {
             }
         },
         {
-            ["序号"] = 4,
+            ["序号"] = 5,
             ["挂点"] = "afterDialog",
             ["对白序号"] = 15,
             ["动作ID"] = "JLC精灵村_长老任务物品生成",
@@ -125,21 +132,15 @@ ____exports["精灵村长老发布任务紧凑剧情片段"] = {
             ["参数"] = {["物品名列表"] = "医疗剂（小）, 魔法药水（中）", ["生成位置"] = "精灵村长老当前位置", ["旧JASS功能清单"] = "CreateItem(医疗剂（小）) / CreateItem(魔法药水（中）) at elder"}
         },
         {
-            ["序号"] = 5,
+            ["序号"] = 6,
             ["挂点"] = "afterDialog",
             ["对白序号"] = 15,
-            ["动作ID"] = "JLC精灵村_发布地精任务",
-            ["名称"] = "长老交代完毕后刷新主线任务",
-            ["参数"] = {
-                ["任务更新提示"] = "|cffffff00『系统提示』：|r|cffff0000前往村子北方地精处！（小地图信号位置）|r",
-                ["小地图X"] = -29392.7,
-                ["小地图Y"] = -20049.2,
-                ["小地图持续时间"] = 20,
-                ["旧JASS功能清单"] = "QuestSetDescription(zx[1]) / PingMinimap / QuestMessageBJ(UPDATED)"
-            }
+            ["动作ID"] = "主线.发布节点目标",
+            ["名称"] = "长老交代完毕后发布地精调查目标",
+            ["参数"] = {["节点进度"] = 1}
         },
         {
-            ["序号"] = 6,
+            ["序号"] = 7,
             ["挂点"] = "afterDialog",
             ["对白序号"] = 15,
             ["动作ID"] = "JLC精灵村_地精区域显视野",
@@ -147,7 +148,7 @@ ____exports["精灵村长老发布任务紧凑剧情片段"] = {
             ["参数"] = {["可见区域1"] = "gg_rct______________085", ["可见区域2"] = "gg_rct______________032", ["旧JASS功能清单"] = "ForForce reveal rect 085 / reveal rect 032"}
         },
         {
-            ["序号"] = 7,
+            ["序号"] = 8,
             ["挂点"] = "afterDialog",
             ["对白序号"] = 15,
             ["动作ID"] = "JLC精灵村_创建地精祭祀Boss预备",

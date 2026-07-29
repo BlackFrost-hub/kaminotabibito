@@ -8,8 +8,9 @@ local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧�
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
 local _____5199_5165_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入剧情进度"]
 local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
-local _____66F4_65B0_4E3B_7EBF_4EFB_52A1UI = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["更新主线任务UI"]
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
+local ____10_FF0E_6807_51C6_5267_60C5_52A8_4F5C = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.10．标准剧情动作")
+local _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807 = ____10_FF0E_6807_51C6_5267_60C5_52A8_4F5C["发布主线节点目标"]
 local ____07_FF0E_5267_60C5_6280_80FD_4E8B_4EF6_8F85_52A9 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.07．剧情技能事件辅助")
 local _____5904_7406_6280_80FD_63A8_8FDB_4E3B_7EBF_5267_60C5 = ____07_FF0E_5267_60C5_6280_80FD_4E8B_4EF6_8F85_52A9["处理技能推进主线剧情"]
 ---
@@ -48,7 +49,6 @@ local GetUnitName = jass.GetUnitName
 local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local IsUnitInRangeXY = jass.IsUnitInRangeXY
-local PingMinimap = jass.PingMinimap
 local Player = jass.Player
 local RemoveUnit = jass.RemoveUnit
 local SetUnitFacing = jass.SetUnitFacing
@@ -265,8 +265,7 @@ local function _____6267_884C_6700_7EC8_4F24_5BB3_63A8_8FDB_5267_60C5(_____914D_
     if _____914D_7F6E["清理目标YD表"] == true then
         YDUserDataClearTableSafe("unit", target)
     end
-    PingMinimap(_____914D_7F6E["小地图X"], _____914D_7F6E["小地图Y"], _____914D_7F6E["小地图持续时间"])
-    _____66F4_65B0_4E3B_7EBF_4EFB_52A1UI(_____914D_7F6E["任务描述"] or "", _____914D_7F6E["任务提示"])
+    _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807(_____914D_7F6E["目标剧情进度"])
     if _____914D_7F6E["支线任务发现"] ~= nil then
         _____6267_884C_652F_7EBF_4EFB_52A1_53D1_73B0(_____914D_7F6E["支线任务发现"])
     end

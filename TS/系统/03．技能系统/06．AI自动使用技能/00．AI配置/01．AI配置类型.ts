@@ -4,6 +4,9 @@ export type 单位AI归类 = "杂鱼" | "精英" | "Boss" | "英雄Boss" | "异�
 export type 单位AI模式 = "自动扫描通魔" | "固定技能表";
 export type AI目标选择方式 = "最高仇恨" | "自己" | "当前攻击目标" | "最近敌人";
 export type AI施法目标类型 = "自动" | "无目标" | "自己" | "单位" | "点" | "单位或点";
+export type AI运行时状态 = string | number;
+export type AI运行时状态读取器 = (this: void, unit: any) => AI运行时状态 | undefined;
+export type AI技能运行时可用条件 = (this: void, unit: any) => boolean;
 
 export interface AI技能覆盖配置 {
   技能ID?: string;
@@ -18,6 +21,7 @@ export interface AI技能覆盖配置 {
   最高魔法百分比?: number;
   权重?: number;
   禁用?: boolean;
+  运行时可用条件?: AI技能运行时可用条件;
   说明?: string;
 }
 

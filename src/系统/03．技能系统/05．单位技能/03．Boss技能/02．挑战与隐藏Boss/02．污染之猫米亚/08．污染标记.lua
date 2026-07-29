@@ -18,14 +18,14 @@ local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_r
 local _____83B7_53D6Boss_6280_80FD_4EC7_6068_76EE_6807_5217_8868 = ____require_result_1["获取Boss技能仇恨目标列表"]
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
 local setThreat = ____require_result_2.setThreat
+local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_3.doHeal
 local jass = require("jass.common")
 local GetUnitName = jass.GetUnitName
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local IssueTargetOrder = jass.IssueTargetOrder
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local function _____53D6_5355_4F4D_4EC7_6068(entries, unit)
     local hid = _____53D6_5355_4F4DID(unit)
@@ -41,17 +41,20 @@ local function _____53D6_5355_4F4D_4EC7_6068(entries, unit)
     return 0
 end
 local function _____53D6_76EE_6807_8150_5316_5C42_6570(context, target)
-    local ____self_3 = context["腐化层数控制器"]
-    return ____self_3["取层数"](____self_3, target)
+    local ____self_4 = context["腐化层数控制器"]
+    return ____self_4["取层数"](____self_4, target)
 end
 local function _____6062_590DBoss_751F_547D(boss, ratio)
     if not _____5355_4F4D_5B58_6D3B(boss) or ratio <= 0 then
         return
     end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    local current = GetUnitState(boss, UNIT_STATE_LIFE)
-    local next = current + maxLife * ratio > maxLife and maxLife or current + maxLife * ratio
-    SetUnitState(boss, UNIT_STATE_LIFE, next)
+    doHeal({
+        HealSource = boss,
+        HealTarget = boss,
+        HealAmount = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio,
+        ItemHeal = false,
+        HealEffect = false
+    })
 end
 local function _____5904_7406_65E7_6807_8BB0_6B7B_4EA1(context)
     local target = context["污染标记目标"]

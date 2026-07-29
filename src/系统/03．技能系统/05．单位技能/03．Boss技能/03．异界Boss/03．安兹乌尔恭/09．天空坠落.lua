@@ -37,7 +37,7 @@ local DestroyEffect = jass.DestroyEffect
 local Cos = jass.Cos
 local Sin = jass.Sin
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local EXSetEffectZ = japi.EXSetEffectZ
@@ -170,7 +170,7 @@ local function _____7ED3_7B97_5929_7A7A_5760_843D_4F24_5BB3(context, instance)
                     ["伤害"] = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = cfg["阶段技能"]["天空坠落伤害Boss攻击力比例"], ["目标最大生命比例"] = cfg["阶段技能"]["天空坠落伤害目标最大生命比例"]}),
                     attack = false,
                     ranged = true,
-                    attackType = ATTACK_TYPE_MAGIC,
+                    attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能",

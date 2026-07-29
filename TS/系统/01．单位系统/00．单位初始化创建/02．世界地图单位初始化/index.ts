@@ -7,5 +7,6 @@ export * from "./05．中立生物配置表";
 export * from "./06．植物配置表";
 export * from "./07．异界描述石配置表";
 export * from "./08．Boss初始注册配置表";
+export * from "./09．世界地图单位缓存";
 export * from "./10．世界地图单位总调度";
 export * from "./20．世界地图单位缓步创建";

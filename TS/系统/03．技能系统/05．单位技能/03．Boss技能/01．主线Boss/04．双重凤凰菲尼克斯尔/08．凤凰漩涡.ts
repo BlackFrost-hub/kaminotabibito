@@ -66,10 +66,11 @@ export function 释放菲尼克斯尔凤凰漩涡(this: void, context: 菲尼克
       const enemies = 范围敌人(boss, x, y, config.半径);
       for (let i = 0; i < enemies.length; i++) {
         const u = enemies[i];
-        造成火焰伤害(boss, u, 计算攻击已损失伤害(boss, u, config.伤害Boss攻击力比例, config.伤害目标已损失生命比例), "AOE", 伤害上下文);
+        const damage = 计算攻击已损失伤害(boss, u, config.伤害Boss攻击力比例, config.伤害目标已损失生命比例);
+        const distance = 两点距离(取单位X(u), 取单位Y(u), x, y);
+        造成火焰伤害(boss, u, damage, "AOE", 伤害上下文);
         添加元素层数(u, "火", config.火印层数);
-        const d = 两点距离(取单位X(u), 取单位Y(u), x, y);
-        if (d > config.中心半径) {
+        if (distance > config.中心半径) {
           const angle = Atan2(y - 取单位Y(u), x - 取单位X(u)) * RAD_TO_DEG;
           移动单位到(u, 极坐标X(取单位X(u), config.牵引距离, angle), 极坐标Y(取单位Y(u), config.牵引距离, angle));
         }

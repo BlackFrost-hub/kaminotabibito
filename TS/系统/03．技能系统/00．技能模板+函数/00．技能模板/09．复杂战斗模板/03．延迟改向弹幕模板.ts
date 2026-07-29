@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import type { 原生弹幕参数, 原生弹幕实例 } from "../../01．技能函数/01．弹幕/01．TS原生弹幕/00．类型";
-import { 创建原生弹幕 } from "../../01．技能函数/01．弹幕/01．TS原生弹幕/03．对外接口";
+import { 创建原生弹幕, 重置原生弹幕命中记录 } from "../../01．技能函数/01．弹幕/01．TS原生弹幕/03．对外接口";
 import { 设置原生弹幕指定角度飞行 } from "../../01．技能函数/01．弹幕/01．TS原生弹幕/06．改向与反弹/00．弹幕改向";
 import type { 机制清理篮子 } from "../../04．机制组件/06．机制清理/01．机制清理篮子";
 
@@ -28,6 +28,8 @@ export interface 延迟改向弹幕参数 {
   新速度?: number;
   取新速度?: (this: void, 上下文: 延迟改向弹幕上下文) => number;
   自动改向?: boolean;
+  /** 改向成功后开启新一段命中判定，同一单位可在新路径上再次被命中。 */
+  改向时重置命中记录?: boolean;
   清理时销毁弹幕?: boolean;
   on创建?: (this: void, 上下文: 延迟改向弹幕上下文) => void;
   on改向?: (this: void, 上下文: 延迟改向弹幕上下文) => void;
@@ -94,6 +96,9 @@ class 延迟改向弹幕实现 implements 延迟改向弹幕实例 {
     const speed = this.参数.取新速度 != null ? this.参数.取新速度(上下文) : this.参数.新速度;
     const ok = 设置原生弹幕指定角度飞行(this.弹幕ID, angle, speed);
     if (ok) {
+      if (this.参数.改向时重置命中记录 === true) {
+        重置原生弹幕命中记录(this.弹幕ID);
+      }
       this.已改向 = true;
       if (this.参数.on改向 != null) this.参数.on改向(上下文);
     } else if (this.参数.on改向失败 != null) {

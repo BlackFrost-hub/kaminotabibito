@@ -61,6 +61,7 @@ local ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B = ____require_result_20["Boss测试
 local _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840 = ____require_result_20["设置Boss测试单位满血"]
 local _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4 = ____require_result_20["获取Boss测试玩家基准英雄"]
 local _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175 = ____require_result_20["准备Boss测试固定步兵"]
+local _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_5C71_4E18_4E4B_738B = ____require_result_20["准备Boss测试固定山丘之王"]
 local _____79FB_9664Boss_6D4B_8BD5_5355_4F4D = ____require_result_20["移除Boss测试单位"]
 local _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4 = ____require_result_20["注册Boss测试命令组"]
 local _____7C73_4E9A_5355_4F4DID = stringToFourCC("N00V")
@@ -78,8 +79,8 @@ local GetUnitState = jass.GetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____6700_8FD1_6D4B_8BD5Boss = {}
-local _____6700_8FD1_6D4B_8BD5_6B65_51751 = {}
-local _____6700_8FD1_6D4B_8BD5_6B65_51752 = {}
+local _____6700_8FD1_6D4B_8BD5_6B65_5175 = {}
+local _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B = {}
 local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player)
     local pid = GetPlayerId(player)
     local cached = _____6700_8FD1_6D4B_8BD5Boss[pid]
@@ -121,11 +122,9 @@ local function _____5E94_7528_7C73_4E9A_6D4B_8BD5_573A_5730_914D_7F6E(context)
 end
 local function _____51C6_5907_7C73_4E9A_6D4B_8BD5_573A_666F(player, hero, boss)
     local pid = GetPlayerId(player)
-    SetUnitPosition(hero, _____4E34_65F6_6D4B_8BD5_73A9_5BB6X, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y)
-    SetUnitFacing(hero, 90)
     _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840(hero)
-    _____6700_8FD1_6D4B_8BD5_6B65_51751[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_51751[pid], _____4E34_65F6_6D4B_8BD5_73A9_5BB6X - 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 220, 90)
-    _____6700_8FD1_6D4B_8BD5_6B65_51752[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_51752[pid], _____4E34_65F6_6D4B_8BD5_73A9_5BB6X + 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 220, 90)
+    _____6700_8FD1_6D4B_8BD5_6B65_5175[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_5175[pid], _____4E34_65F6_6D4B_8BD5_73A9_5BB6X - 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 220, 90)
+    _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_5C71_4E18_4E4B_738B(_____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid], _____4E34_65F6_6D4B_8BD5_73A9_5BB6X + 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 220, 90)
     SelectUnitForPlayerSingle(boss, player)
     StarOther_PanCameraToTimedForPlayer(player, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3Y, 0.2)
     _____5E94_7528_7C73_4E9A_6D4B_8BD5_573A_5730_914D_7F6E(nil)
@@ -161,18 +160,18 @@ local function _____6E05_7406_7C73_4E9A_6D4B_8BD5(player, _context)
         _____6E05_7406_7C73_4E9A_4E0A_4E0B_6587(boss)
     end
     _____91CD_7F6E_7C73_4E9A_573A_5730_914D_7F6E()
-    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_51751[pid])
-    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_51752[pid])
+    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_5175[pid])
+    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid])
     _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(boss)
-    _____6700_8FD1_6D4B_8BD5_6B65_51751[pid] = nil
-    _____6700_8FD1_6D4B_8BD5_6B65_51752[pid] = nil
+    _____6700_8FD1_6D4B_8BD5_6B65_5175[pid] = nil
+    _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = nil
     _____6700_8FD1_6D4B_8BD5Boss[pid] = nil
     if globals.udg_Boss == boss then
         globals.udg_Boss = nil
     end
 end
 local function ____on_7C73_4E9A_6280_80FD1_6D4B_8BD5_547D_4EE4(player, context)
-    local target = _____6700_8FD1_6D4B_8BD5_6B65_51751[GetPlayerId(player)]
+    local target = _____6700_8FD1_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
     if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
         _____91CA_653E_7C73_4E9A_8150_5316_722A_51FB(context, target)
     end
@@ -191,7 +190,7 @@ local function ____on_7C73_4E9A_6280_80FD3_6D4B_8BD5_547D_4EE4(_player, context)
     _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
 end
 local function ____on_7C73_4E9A_6280_80FD4_6D4B_8BD5_547D_4EE4(player, context)
-    local target = _____6700_8FD1_6D4B_8BD5_6B65_51751[GetPlayerId(player)]
+    local target = _____6700_8FD1_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
         return
     end
@@ -223,8 +222,8 @@ local function ____on_7C73_4E9A_6280_80FD8_6D4B_8BD5_547D_4EE4(player, context)
     context["上次平台超载检测Ms"] = 0
     local _____533A_57DF = context["安全域区域组"]["区域列表"][1]
     if _____533A_57DF ~= nil then
-        SetUnitPosition(_____6700_8FD1_6D4B_8BD5_6B65_51751[pid], _____533A_57DF["中心X"] - 45, _____533A_57DF["中心Y"])
-        SetUnitPosition(_____6700_8FD1_6D4B_8BD5_6B65_51752[pid], _____533A_57DF["中心X"] + 45, _____533A_57DF["中心Y"])
+        SetUnitPosition(_____6700_8FD1_6D4B_8BD5_6B65_5175[pid], _____533A_57DF["中心X"] - 45, _____533A_57DF["中心Y"])
+        SetUnitPosition(_____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid], _____533A_57DF["中心X"] + 45, _____533A_57DF["中心Y"])
     end
     _____5237_65B0_7C73_4E9A_5E73_53F0_8D85_8F7D_60E9_7F5A(
         context,

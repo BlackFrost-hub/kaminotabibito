@@ -11,7 +11,7 @@ import {
   延迟,
   停止周期,
   单位存活,
-  取菲尼克斯尔玩家英雄列表,
+  取菲尼克斯尔敌对目标列表,
   取单位X,
   取单位Y,
   两点距离,
@@ -38,10 +38,10 @@ const { 闪电效果代码 } = require("系统.03．技能系统.00．技能模�
 
 export function 释放菲尼克斯尔怨火链接(this: void, context: 菲尼克斯尔运行时上下文): void {
   if (context.当前形态 !== "第二形态" || !单位存活(context.Boss)) return;
-  const heroes = 取菲尼克斯尔玩家英雄列表();
-  if (heroes.length < 1) return;
-  const a = heroes[0];
-  let b = heroes.length >= 2 ? heroes[heroes.length - 1] : context.怨火锚点;
+  const targets = 取菲尼克斯尔敌对目标列表(context.Boss);
+  if (targets.length < 1) return;
+  const a = targets[0];
+  let b = targets.length >= 2 ? targets[1] : context.怨火锚点;
   if (!单位有效(b)) {
     const center = 菲尼克斯尔场地配置.中心点;
     b = 创建菲尼克斯尔机制单位(
@@ -86,7 +86,7 @@ export function 释放菲尼克斯尔怨火链接(this: void, context: 菲尼克
         停止周期(tick);
         return;
       }
-      const all = 取菲尼克斯尔玩家英雄列表();
+      const all = 取菲尼克斯尔敌对目标列表(context.Boss);
       for (let i = 0; i < all.length; i++) {
         const u = all[i];
         if (u === a || u === b) continue;

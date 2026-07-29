@@ -16,7 +16,7 @@ local _____5468_671F = ____19_FF0E_516C_5171_5DE5_5177["周期"]
 local _____5EF6_8FDF = ____19_FF0E_516C_5171_5DE5_5177["延迟"]
 local _____505C_6B62_5468_671F = ____19_FF0E_516C_5171_5DE5_5177["停止周期"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_516C_5171_5DE5_5177["单位存活"]
-local _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔玩家英雄列表"]
+local _____53D6_83F2_5C3C_514B_65AF_5C14_654C_5BF9_76EE_6807_5217_8868 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔敌对目标列表"]
 local _____53D6_5355_4F4DX = ____19_FF0E_516C_5171_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____19_FF0E_516C_5171_5DE5_5177["取单位Y"]
 local _____4E24_70B9_8DDD_79BB = ____19_FF0E_516C_5171_5DE5_5177["两点距离"]
@@ -40,14 +40,14 @@ ____exports["释放菲尼克斯尔怨火链接"] = function(context)
     if context["当前形态"] ~= "第二形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
         return
     end
-    local heroes = _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868()
-    if #heroes < 1 then
+    local targets = _____53D6_83F2_5C3C_514B_65AF_5C14_654C_5BF9_76EE_6807_5217_8868(context.Boss)
+    if #targets < 1 then
         return
     end
-    local a = heroes[1]
+    local a = targets[1]
     local ____temp_2
-    if #heroes >= 2 then
-        ____temp_2 = heroes[#heroes]
+    if #targets >= 2 then
+        ____temp_2 = targets[2]
     else
         ____temp_2 = context["怨火锚点"]
     end
@@ -149,7 +149,7 @@ ____exports["释放菲尼克斯尔怨火链接"] = function(context)
                         _____505C_6B62_5468_671F(tick)
                         return
                     end
-                    local all = _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868()
+                    local all = _____53D6_83F2_5C3C_514B_65AF_5C14_654C_5BF9_76EE_6807_5217_8868(context.Boss)
                     do
                         local i = 0
                         while i < #all do

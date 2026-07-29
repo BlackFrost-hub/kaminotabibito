@@ -7,7 +7,6 @@ local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
-local _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入当前剧情动作上下文"]
 local ____02_FF0E_5267_60C5_6B65_9AA4_64AD_653E_5668 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
 local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____02_FF0E_5267_60C5_6B65_9AA4_64AD_653E_5668["播放主线剧情片段"]
 ---
@@ -37,50 +36,47 @@ local ____require_result_7 = require("系统.01．单位系统.08．单位配置
 local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_7["按名字反查Boss单位ID"]
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_8.stringToFourCCSafe
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.12．JASS原生别名")
-local AddSpecialEffect = ____require_result_9.AddSpecialEffect
-local Condition = ____require_result_9.Condition
-local CreateFogModifierRect = ____require_result_9.CreateFogModifierRect
-local CreateItem = ____require_result_9.CreateItem
-local CreateTrigger = ____require_result_9.CreateTrigger
-local CreateUnit = ____require_result_9.CreateUnit
-local DestroyGroup = ____require_result_9.DestroyGroup
-local FirstOfGroup = ____require_result_9.FirstOfGroup
-local FogModifierStart = ____require_result_9.FogModifierStart
-local FOG_OF_WAR_VISIBLE = ____require_result_9.FOG_OF_WAR_VISIBLE
-local GetEnumUnit = ____require_result_9.GetEnumUnit
-local GetFilterUnit = ____require_result_9.GetFilterUnit
-local GetRandomReal = ____require_result_9.GetRandomReal
-local GetTriggerUnit = ____require_result_9.GetTriggerUnit
-local GetUnitTypeId = ____require_result_9.GetUnitTypeId
-local GetUnitX = ____require_result_9.GetUnitX
-local GetUnitY = ____require_result_9.GetUnitY
-local GetUnitsInRectMatching = ____require_result_9.GetUnitsInRectMatching
-local GroupRemoveUnit = ____require_result_9.GroupRemoveUnit
-local IssueImmediateOrder = ____require_result_9.IssueImmediateOrder
-local IsUnitInGroup = ____require_result_9.IsUnitInGroup
-local Location = ____require_result_9.Location
-local Player = ____require_result_9.Player
-local PLAYER_NEUTRAL_PASSIVE = ____require_result_9.PLAYER_NEUTRAL_PASSIVE
-local RemoveLocation = ____require_result_9.RemoveLocation
-local RemoveRect = ____require_result_9.RemoveRect
-local SetUnitFacing = ____require_result_9.SetUnitFacing
-local SetUnitFacingTimed = ____require_result_9.SetUnitFacingTimed
-local SetUnitInvulnerable = ____require_result_9.SetUnitInvulnerable
-local SetUnitOwner = ____require_result_9.SetUnitOwner
-local StopMusic = ____require_result_9.StopMusic
-local TriggerAddAction = ____require_result_9.TriggerAddAction
-local TriggerRegisterEnterRectSimple = ____require_result_9.TriggerRegisterEnterRectSimple
-local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.02．剧情动作桥接")
-local _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F = ____require_result_10["发送剧情任务消息"]
-local _____53D1_9001_5267_60C5_5C0F_5730_56FE_4FE1_53F7 = ____require_result_10["发送剧情小地图信号"]
+local ____require_result_9 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_9["是玩家英雄组单位"]
+local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.12．JASS原生别名")
+local AddSpecialEffect = ____require_result_10.AddSpecialEffect
+local Condition = ____require_result_10.Condition
+local CreateFogModifierRect = ____require_result_10.CreateFogModifierRect
+local CreateItem = ____require_result_10.CreateItem
+local CreateTrigger = ____require_result_10.CreateTrigger
+local CreateUnit = ____require_result_10.CreateUnit
+local DestroyGroup = ____require_result_10.DestroyGroup
+local FirstOfGroup = ____require_result_10.FirstOfGroup
+local FogModifierStart = ____require_result_10.FogModifierStart
+local FOG_OF_WAR_VISIBLE = ____require_result_10.FOG_OF_WAR_VISIBLE
+local GetEnumUnit = ____require_result_10.GetEnumUnit
+local GetFilterUnit = ____require_result_10.GetFilterUnit
+local GetRandomReal = ____require_result_10.GetRandomReal
+local GetTriggerUnit = ____require_result_10.GetTriggerUnit
+local GetUnitTypeId = ____require_result_10.GetUnitTypeId
+local GetUnitX = ____require_result_10.GetUnitX
+local GetUnitY = ____require_result_10.GetUnitY
+local GetUnitsInRectMatching = ____require_result_10.GetUnitsInRectMatching
+local GroupRemoveUnit = ____require_result_10.GroupRemoveUnit
+local IssueImmediateOrder = ____require_result_10.IssueImmediateOrder
+local Location = ____require_result_10.Location
+local Player = ____require_result_10.Player
+local PLAYER_NEUTRAL_PASSIVE = ____require_result_10.PLAYER_NEUTRAL_PASSIVE
+local RemoveLocation = ____require_result_10.RemoveLocation
+local RemoveRect = ____require_result_10.RemoveRect
+local SetUnitFacing = ____require_result_10.SetUnitFacing
+local SetUnitFacingTimed = ____require_result_10.SetUnitFacingTimed
+local SetUnitInvulnerable = ____require_result_10.SetUnitInvulnerable
+local SetUnitOwner = ____require_result_10.SetUnitOwner
+local StopMusic = ____require_result_10.StopMusic
+local TriggerAddAction = ____require_result_10.TriggerAddAction
+local TriggerRegisterEnterRectSimple = ____require_result_10.TriggerRegisterEnterRectSimple
 local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local _____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027 = ____require_result_11["触发单位增加基础全属性"]
 local bj_HEROSTAT_STR = jglobals.bj_HEROSTAT_STR
 local bj_HEROSTAT_AGI = jglobals.bj_HEROSTAT_AGI
 local bj_HEROSTAT_INT = jglobals.bj_HEROSTAT_INT
 local bj_MODIFYMETHOD_ADD = jglobals.bj_MODIFYMETHOD_ADD
-local bj_QUESTMESSAGE_UPDATED = jglobals.bj_QUESTMESSAGE_UPDATED
 local _____5DF2_521D_59CB_5316_8FDB_5EA601_6838_5FC3 = false
 local _____5DF2_89E6_53D1_6751_53E3_653E_884C = false
 local _____6751_53E3_653E_884C_73A9_5BB6_9762_5411_89D2_5EA6 = 0
@@ -205,15 +201,6 @@ ____exports["执行长老对话前置"] = function(_____53C2_6570)
     _____91CD_8BBE_5267_60C5FHD_70B9(-26218.6, -28632.4)
     _____521B_5EFA_968F_673A_91D1_5149_6212_6307()
     StopMusic(false)
-    if type(_____53C2_6570["设置剧情进度"]) == "number" then
-        YDUserDataSetSafe(
-            "string",
-            "剧情进度",
-            "整数",
-            "integer",
-            _____53C2_6570["设置剧情进度"]
-        )
-    end
     if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 and _____53C2_6570["触发单位发布命令"] ~= nil then
         IssueImmediateOrder(
             _____89E6_53D1_5355_4F4D,
@@ -266,44 +253,28 @@ ____exports["执行长老任务物品生成"] = function(_____53C2_6570)
         end
     end
 end
-____exports["执行长老任务更新"] = function(_____53C2_6570)
-    _____53D1_9001_5267_60C5_5C0F_5730_56FE_4FE1_53F7({
-        X = __TS__Number(_____53C2_6570["小地图X"]) or 0,
-        Y = __TS__Number(_____53C2_6570["小地图Y"]) or 0,
-        ["持续时间"] = __TS__Number(_____53C2_6570["小地图持续时间"]) or 0
-    })
-    local ____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F_16 = _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F
-    local ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_15 = _____53C2_6570["任务更新提示"]
-    if ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_15 == nil then
-        ____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_15 = ""
-    end
-    ____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F_16({
-        ["消息类型"] = bj_QUESTMESSAGE_UPDATED,
-        ["文本"] = tostring(____53C2_6570__4EFB_52A1_66F4_65B0_63D0_793A_15)
-    })
-end
 ____exports["执行地精区域显视野"] = function(_____53C2_6570)
+    local ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_16 = _____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE
+    local ____53C2_6570__53EF_89C1_533A_57DF1_15 = _____53C2_6570["可见区域1"]
+    if ____53C2_6570__53EF_89C1_533A_57DF1_15 == nil then
+        ____53C2_6570__53EF_89C1_533A_57DF1_15 = ""
+    end
+    ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_16(tostring(____53C2_6570__53EF_89C1_533A_57DF1_15))
     local ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_18 = _____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE
-    local ____53C2_6570__53EF_89C1_533A_57DF1_17 = _____53C2_6570["可见区域1"]
-    if ____53C2_6570__53EF_89C1_533A_57DF1_17 == nil then
-        ____53C2_6570__53EF_89C1_533A_57DF1_17 = ""
+    local ____53C2_6570__53EF_89C1_533A_57DF2_17 = _____53C2_6570["可见区域2"]
+    if ____53C2_6570__53EF_89C1_533A_57DF2_17 == nil then
+        ____53C2_6570__53EF_89C1_533A_57DF2_17 = ""
     end
-    ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_18(tostring(____53C2_6570__53EF_89C1_533A_57DF1_17))
-    local ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_20 = _____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE
-    local ____53C2_6570__53EF_89C1_533A_57DF2_19 = _____53C2_6570["可见区域2"]
-    if ____53C2_6570__53EF_89C1_533A_57DF2_19 == nil then
-        ____53C2_6570__53EF_89C1_533A_57DF2_19 = ""
-    end
-    ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_20(tostring(____53C2_6570__53EF_89C1_533A_57DF2_19))
+    ____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE_18(tostring(____53C2_6570__53EF_89C1_533A_57DF2_17))
 end
 ____exports["执行地精祭祀Boss预备"] = function(_____53C2_6570)
     StopMusic(false)
-    local ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_22 = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID
-    local ____53C2_6570_Boss_540D_21 = _____53C2_6570["Boss名"]
-    if ____53C2_6570_Boss_540D_21 == nil then
-        ____53C2_6570_Boss_540D_21 = "地精祭祀"
+    local ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_20 = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID
+    local ____53C2_6570_Boss_540D_19 = _____53C2_6570["Boss名"]
+    if ____53C2_6570_Boss_540D_19 == nil then
+        ____53C2_6570_Boss_540D_19 = "地精祭祀"
     end
-    local bossRawId = ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_22(tostring(____53C2_6570_Boss_540D_21)) or _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID("地精祭祀|cffff0000（BossLV12）|r")
+    local bossRawId = ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_20(tostring(____53C2_6570_Boss_540D_19)) or _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID("地精祭祀|cffff0000（BossLV12）|r")
     local bossTypeId = stringToFourCCSafe(bossRawId)
     if not (bossTypeId > 0) then
         return
@@ -334,34 +305,25 @@ ____exports["执行地精祭祀Boss预备"] = function(_____53C2_6570)
 end
 ____exports["执行远古波动奖励"] = function(_____53C2_6570)
     local _____5956_52B1_503C = __TS__Number(_____53C2_6570["力量"]) or __TS__Number(_____53C2_6570["全属性"]) or 3
-    local ____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027_24 = _____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027
-    local ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_23 = _____53C2_6570["任务消息模板"]
-    if ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_23 == nil then
-        ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_23 = "{英雄名}受到了远古波动！（|cffff99cc全属性+{value}|r）"
+    local ____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027_22 = _____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027
+    local ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_21 = _____53C2_6570["任务消息模板"]
+    if ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_21 == nil then
+        ____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_21 = "{英雄名}受到了远古波动！（|cffff99cc全属性+{value}|r）"
     end
-    ____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027_24(
+    ____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027_22(
         _____5956_52B1_503C,
-        tostring(____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_23)
+        tostring(____53C2_6570__4EFB_52A1_6D88_606F_6A21_677F_21)
     )
 end
 ____exports["精灵村长老发布任务剧情动作注册表"] = {
     ["JLC精灵村_村口放行前置"] = ____exports["执行村口放行前置"],
     ["JLC精灵村_长老对话前置"] = ____exports["执行长老对话前置"],
     ["JLC精灵村_长老任务物品生成"] = ____exports["执行长老任务物品生成"],
-    ["JLC精灵村_发布地精任务"] = ____exports["执行长老任务更新"],
     ["JLC精灵村_地精区域显视野"] = ____exports["执行地精区域显视野"],
     ["JLC精灵村_创建地精祭祀Boss预备"] = ____exports["执行地精祭祀Boss预备"],
     ["JLC精灵村_远古波动奖励"] = ____exports["执行远古波动奖励"]
 }
-local function _____89E6_53D1_5355_4F4D_662F_73A9_5BB6_82F1_96C4(unit)
-    if unit == nil or unit == 0 then
-        return false
-    end
-    local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
-    return _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 and IsUnitInGroup(unit, _____73A9_5BB6_82F1_96C4_7EC4)
-end
 local function _____5199_5165_5E76_64AD_653E_5267_60C5(_____7247_6BB5ID, _____89E6_53D1_914D_7F6E_540D, _____89E6_53D1_5355_4F4D)
-    _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587({["片段ID"] = _____7247_6BB5ID, ["触发配置名"] = _____89E6_53D1_914D_7F6E_540D, ["触发单位"] = _____89E6_53D1_5355_4F4D})
     return _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, {["片段ID"] = _____7247_6BB5ID, ["触发配置名"] = _____89E6_53D1_914D_7F6E_540D, ["触发单位"] = _____89E6_53D1_5355_4F4D})
 end
 local function _____89E6_53D1_5355_4F4D_5728_6751_53E3_653E_884C_77E9_5F62_5185(unit)
@@ -379,7 +341,7 @@ local function ____on_7CBE_7075_6751_6751_53E3_653E_884C_89E6_53D1()
         return
     end
     local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if not _____89E6_53D1_5355_4F4D_662F_73A9_5BB6_82F1_96C4(_____89E6_53D1_5355_4F4D) then
+    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
         return
     end
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() > 0 then
@@ -394,7 +356,7 @@ local function ____on_7CBE_7075_6751_6751_53E3_653E_884C_89E6_53D1()
 end
 local function ____on_7CBE_7075_6751_957F_8001_53D1_5E03_4EFB_52A1_89E6_53D1()
     local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if not _____89E6_53D1_5355_4F4D_662F_73A9_5BB6_82F1_96C4(_____89E6_53D1_5355_4F4D) then
+    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
         return
     end
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() >= 1 then

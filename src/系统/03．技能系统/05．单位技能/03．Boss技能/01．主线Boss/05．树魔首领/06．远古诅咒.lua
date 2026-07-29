@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_6709_6548_73A9_5BB6_4EBA_6570, _____53D6_8BC5_5492_76EE_6807, _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708, _____64AD_653E_70B9_540D_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____6536_96C6_5206_644A_76EE_6807, _____6CBB_7597_5168_90E8_73A9_5BB6, _____53D6_73A9_5BB6_4E2D_5FC3, _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____8C03_5EA6_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5, ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____6811_9B54_9996_9886BuffID, doHeal, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, createTimedEffect, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____8FDC_53E4_8BC5_5492_6280_80FDID
+local _____53D6_6709_6548_73A9_5BB6_4EBA_6570, _____53D6_8BC5_5492_76EE_6807, _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708, _____64AD_653E_70B9_540D_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____6536_96C6_5206_644A_76EE_6807, _____6CBB_7597_5168_90E8_73A9_5BB6, _____53D6_73A9_5BB6_4E2D_5FC3, _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____8C03_5EA6_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5, ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____6811_9B54_9996_9886BuffID, doHeal, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____521B_5EFA_70B9_7279_6548, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____8FDC_53E4_8BC5_5492_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -56,20 +56,22 @@ function _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708(context, target)
 end
 function _____64AD_653E_70B9_540D_7279_6548(target)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["远古诅咒"]
-    createTimedEffect(
-        cfg["点名特效路径"],
-        GetUnitX(target),
-        GetUnitY(target),
-        0,
-        cfg["点名特效持续秒"]
-    )
-    createTimedEffect(
-        cfg["点名叠加特效路径"],
-        GetUnitX(target),
-        GetUnitY(target),
-        0,
-        cfg["点名特效持续秒"]
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["点名特效路径"],
+        X = GetUnitX(target),
+        Y = GetUnitY(target),
+        Z = 0,
+        ["缩放"] = cfg["点名特效缩放"],
+        ["持续秒"] = cfg["点名特效持续秒"]
+    })
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["点名叠加特效路径"],
+        X = GetUnitX(target),
+        Y = GetUnitY(target),
+        Z = 0,
+        ["缩放"] = cfg["点名叠加特效缩放"],
+        ["持续秒"] = cfg["点名特效持续秒"]
+    })
 end
 function _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB(boss)
     local soundCfg = _____6811_9B54_9996_9886_97F3_6548_914D_7F6E
@@ -176,13 +178,14 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, centerX
     end
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["远古诅咒"]
     _____64AD_653EBoss_5750_6807_97F3_6548(_____6811_9B54_9996_9886_97F3_6548_914D_7F6E["远古诅咒"]["二段爆发"], centerX, centerY, _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["默认裁断距离"])
-    createTimedEffect(
-        cfg["后续爆发特效路径"],
-        centerX,
-        centerY,
-        0,
-        cfg["后续爆发特效持续秒"]
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["后续爆发特效路径"],
+        X = centerX,
+        Y = centerY,
+        Z = 0,
+        ["缩放"] = cfg["后续爆发特效缩放"],
+        ["持续秒"] = cfg["后续爆发特效持续秒"]
+    })
     local radius2 = cfg["后续爆发半径"] * cfg["后续爆发半径"]
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     do
@@ -408,8 +411,7 @@ doHeal = ____require_result_8.doHeal
 local ____require_result_9 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
 _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_9["取当前有效玩家人数"]
 local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedEffect = ____require_result_10.createTimedEffect
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
+_____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____8FDC_53E4_8BC5_5492_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["远古诅咒"]["技能槽位"])
 local _____8FDC_53E4_8BC5_5492_5DF2_6CE8_518C = false

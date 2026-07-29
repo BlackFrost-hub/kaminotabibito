@@ -8,6 +8,10 @@ local ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D = require("系统.03．技�
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D["创建可攻击机制单位"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
+local GetUnitState = jass.GetUnitState
+local SetUnitState = jass.SetUnitState
+local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_0.registerDamageModifier
 local _____56FA_5B9A_53D7_51FB_6B21_6570_5355_4F4D_8868 = {}
@@ -59,7 +63,7 @@ local function _____56FA_5B9A_53D7_51FB_6B21_6570_4F24_5BB3_4FEE_6B63(context)
         return context.currentDamage
     end
     if not _____672C_6B21_4F24_5BB3_662F_5426_8BA1_6570(_____8BB0_5F55["参数"], context) then
-        return context.currentDamage
+        return _____8BB0_5F55["参数"]["未计数伤害无效"] == true and 0 or context.currentDamage
     end
     local _____6263_9664_6B21_6570 = _____89C4_6574_6B21_6570(_____8BB0_5F55["参数"]["每次伤害扣除次数"] or 1)
     if _____6263_9664_6B21_6570 <= 0 then
@@ -74,6 +78,16 @@ local function _____56FA_5B9A_53D7_51FB_6B21_6570_4F24_5BB3_4FEE_6B63(context)
     )
     local ____self_4 = _____8BB0_5F55["实例"]
     local _____5269_4F59_6B21_6570 = ____self_4["读取剩余次数"](____self_4)
+    if _____8BB0_5F55["参数"]["同步生命条"] == true and _____5269_4F59_6B21_6570 > 0 then
+        local _____603B_6B21_6570 = _____89C4_6574_6B21_6570(_____8BB0_5F55["参数"]["受击次数"])
+        if _____603B_6B21_6570 > 0 then
+            SetUnitState(
+                _____8BB0_5F55["实例"]["单位"],
+                UNIT_STATE_LIFE,
+                GetUnitState(_____8BB0_5F55["实例"]["单位"], UNIT_STATE_MAX_LIFE) * _____5269_4F59_6B21_6570 / _____603B_6B21_6570
+            )
+        end
+    end
     if _____8BB0_5F55["参数"]["on受击"] ~= nil then
         _____8BB0_5F55["参数"]["on受击"](_____8BB0_5F55["实例"]["单位"], _____5269_4F59_6B21_6570, context)
     end

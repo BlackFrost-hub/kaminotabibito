@@ -14,11 +14,14 @@ end
 --- 条件判断函数
 -- 单位类型判断和敌对关系判断
 local jass = require("jass.common")
+local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
+local _____65E0_654C_6280_80FDAvul = 1098282348
+local _____65E0_654C_6280_80FDBvul = 1115059564
 local function isInvincibleUnit(unit)
-    if not unit then
+    if unit == nil or unit == 0 then
         return false
     end
-    return jass.IsUnitInvulnerable(unit)
+    return GetUnitAbilityLevel(unit, _____65E0_654C_6280_80FDAvul) > 0 or GetUnitAbilityLevel(unit, _____65E0_654C_6280_80FDBvul) > 0
 end
 local function isAncientUnit(unit)
     if not unit then

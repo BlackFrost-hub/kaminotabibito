@@ -21,10 +21,14 @@ export function 结束原生弹幕实例(this: void, 实例: 原生弹幕内部�
   if (实例.已结束) return;
   实例.已结束 = true;
 
-  if (实例.附着特效 != null && 实例.附着特效 !== 0) {
-    DestroyEffect(实例.附着特效);
-    实例.附着特效 = null;
+  if (实例.附加特效1 != null && 实例.附加特效1 !== 0) {
+    DestroyEffect(实例.附加特效1);
   }
+  if (实例.附加特效2 != null && 实例.附加特效2 !== 0) {
+    DestroyEffect(实例.附加特效2);
+  }
+  实例.附加特效1 = null;
+  实例.附加特效2 = null;
 
   const 回调 = 实例.参数.on结束;
   if (回调 != null) {

@@ -58,8 +58,10 @@ const { 触发菲尼克斯尔怨火核心暴露 } = require("系统.03．技能�
 const { 触发菲尼克斯尔永恒轮回 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.16．永恒轮回") as {
   触发菲尼克斯尔永恒轮回: (this: void, context: any) => void;
 };
-const { 添加元素层数 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.19．公共工具") as {
+const { 延迟, 添加元素层数, 减少元素层数 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.19．公共工具") as {
+  延迟: (this: void, delayMs: number, callback: (this: void) => void) => any;
   添加元素层数: (this: void, unit: any, 元素: "火" | "冰" | "毒" | "暗", count: number, duration?: number) => number;
+  减少元素层数: (this: void, unit: any, 元素: "火" | "冰" | "毒" | "暗", count: number) => void;
 };
 const { 菲尼克斯尔场地配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.01．场地配置") as {
   菲尼克斯尔场地配置: any;
@@ -70,11 +72,12 @@ const { 创建测试中心平移映射, 按测试映射平移坐标, 按测试�
   按测试映射平移矩形: (this: void, 矩形: any, 映射: any) => any;
   标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
 };
-const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
+const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 准备Boss测试固定山丘之王, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
   Boss测试单位存活: (this: void, unit: any) => boolean;
   设置Boss测试单位满血: (this: void, unit: any, 最大生命值?: number) => void;
   获取Boss测试玩家基准英雄: (this: void, player: any) => any;
   准备Boss测试固定步兵: (this: void, unit: any, x: number, y: number, facing?: number) => any;
+  准备Boss测试固定山丘之王: (this: void, unit: any, x: number, y: number, facing?: number) => any;
   移除Boss测试单位: (this: void, unit: any) => void;
   注册Boss测试命令组: (this: void, 配置: any) => void;
 };
@@ -118,10 +121,14 @@ const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCand
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facingAngle: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) => number;
+const KillUnit = jass.KillUnit as (whichUnit: any) => void;
+const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
+const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 
 const 最近测试Boss: Record<number, any> = {};
-const 最近测试步兵1: Record<number, any> = {};
-const 最近测试步兵2: Record<number, any> = {};
+const 最近测试步兵: Record<number, any> = {};
+const 最近测试山丘之王: Record<number, any> = {};
 
 function 复制映射菲尼克斯尔点位数组(this: void, 点位: any[], 映射: any): any[] {
   const result: any[] = [];
@@ -212,11 +219,9 @@ function 获取或创建测试Boss(this: void, player: any): any {
 
 function 准备菲尼克斯尔测试场景(this: void, player: any, hero: any, boss: any): any {
   const pid = GetPlayerId(player);
-  SetUnitPosition(hero, 临时测试玩家X, 临时测试玩家Y);
-  SetUnitFacing(hero, 90);
   设置Boss测试单位满血(hero);
-  最近测试步兵1[pid] = 准备Boss测试固定步兵(最近测试步兵1[pid], 临时测试玩家X - 260, 临时测试玩家Y + 180, 90);
-  最近测试步兵2[pid] = 准备Boss测试固定步兵(最近测试步兵2[pid], 临时测试玩家X + 260, 临时测试玩家Y + 180, 90);
+  最近测试步兵[pid] = 准备Boss测试固定步兵(最近测试步兵[pid], 临时测试玩家X - 260, 临时测试玩家Y + 180, 90);
+  最近测试山丘之王[pid] = 准备Boss测试固定山丘之王(最近测试山丘之王[pid], 临时测试玩家X + 260, 临时测试玩家Y + 180, 90);
   SelectUnitForPlayerSingle(boss, player);
   StarOther_PanCameraToTimedForPlayer(player, 临时测试场地中心X, 临时测试场地中心Y, 0.2);
   return 获取或创建菲尼克斯尔上下文(boss);
@@ -254,27 +259,27 @@ function 清理菲尼克斯尔测试(this: void, player: any, _context: any): vo
   const boss = 最近测试Boss[pid];
   if (boss != null && boss !== 0) 清理菲尼克斯尔上下文(boss);
   恢复菲尼克斯尔正式场地();
-  移除Boss测试单位(最近测试步兵1[pid]);
-  移除Boss测试单位(最近测试步兵2[pid]);
+  移除Boss测试单位(最近测试步兵[pid]);
+  移除Boss测试单位(最近测试山丘之王[pid]);
   移除Boss测试单位(boss);
-  最近测试步兵1[pid] = undefined;
-  最近测试步兵2[pid] = undefined;
+  最近测试步兵[pid] = undefined;
+  最近测试山丘之王[pid] = undefined;
   最近测试Boss[pid] = undefined;
   if (globals.udg_Boss === boss) globals.udg_Boss = null;
 }
 
 function on菲尼克斯尔技能1测试命令(this: void, player: any, context: any): void {
-  const target = 最近测试步兵1[GetPlayerId(player)];
+  const target = 最近测试步兵[GetPlayerId(player)];
   if (Boss测试单位存活(target)) 释放菲尼克斯尔炽羽散射(context, target);
 }
 
 function on菲尼克斯尔技能2测试命令(this: void, player: any, context: any): void {
-  const target = 最近测试步兵1[GetPlayerId(player)];
+  const target = 获取Boss测试玩家基准英雄(player);
   if (Boss测试单位存活(target)) 释放菲尼克斯尔熔岩吐息(context, target);
 }
 
 function on菲尼克斯尔技能3测试命令(this: void, player: any, context: any): void {
-  const target = 最近测试步兵1[GetPlayerId(player)];
+  const target = 最近测试步兵[GetPlayerId(player)];
   if (Boss测试单位存活(target)) 释放菲尼克斯尔凤凰漩涡(context, target);
 }
 
@@ -297,18 +302,55 @@ function on菲尼克斯尔技能7测试命令(this: void, _player: any, context:
   释放菲尼克斯尔凤凰挽歌(context);
 }
 
+function 清空菲尼克斯尔测试元素层数(this: void, target: any): void {
+  减少元素层数(target, "火", 999);
+  减少元素层数(target, "冰", 999);
+  减少元素层数(target, "毒", 999);
+  减少元素层数(target, "暗", 999);
+}
+
 function on菲尼克斯尔技能8测试命令(this: void, player: any, context: any): void {
-  const target = 最近测试步兵1[GetPlayerId(player)];
+  const target = 最近测试步兵[GetPlayerId(player)];
   if (!Boss测试单位存活(target)) return;
   确保菲尼克斯尔第二形态(context);
-  添加元素层数(target, "火", 3, 30);
-  添加元素层数(target, "暗", 5, 30);
+  清空菲尼克斯尔测试元素层数(target);
+  const 元素列表: ("火" | "冰" | "毒" | "暗")[] = ["火", "冰", "毒", "暗"];
+  const 随机元素 = 元素列表[GetRandomInt(0, 元素列表.length - 1)];
+  添加元素层数(target, 随机元素, 5, 30);
+  结算菲尼克斯尔元素爆发(context);
+}
+
+function on菲尼克斯尔技能8火测试命令(this: void, player: any, context: any): void {
+  const target = 最近测试步兵[GetPlayerId(player)];
+  if (!Boss测试单位存活(target)) return;
+  确保菲尼克斯尔第二形态(context);
+  清空菲尼克斯尔测试元素层数(target);
+  添加元素层数(target, "火", 5, 30);
   结算菲尼克斯尔元素爆发(context);
 }
 
 function on菲尼克斯尔技能9测试命令(this: void, _player: any, context: any): void {
   确保菲尼克斯尔第二形态(context);
   触发菲尼克斯尔怨火核心暴露(context);
+}
+
+function 创建菲尼克斯尔技能9击杀核心回调(this: void, context: any, source: any): (this: void) => void {
+  return function 菲尼克斯尔技能9延迟击杀核心(this: void): void {
+    if (!Boss测试单位存活(context.怨火核心)) return;
+    if (Boss测试单位存活(source)) {
+      const 剩余生命 = GetUnitState(context.怨火核心, jass.UNIT_STATE_LIFE);
+      UnitDamageTarget(source, context.怨火核心, 剩余生命 + 1, false, false, jass.ATTACK_TYPE_NORMAL, jass.DAMAGE_TYPE_MIND, jass.WEAPON_TYPE_WHOKNOWS);
+    } else {
+      KillUnit(context.怨火核心);
+    }
+  };
+}
+
+function on菲尼克斯尔技能9击杀测试命令(this: void, player: any, context: any): void {
+  确保菲尼克斯尔第二形态(context);
+  触发菲尼克斯尔怨火核心暴露(context);
+  const source = 最近测试步兵[GetPlayerId(player)];
+  延迟(1000, 创建菲尼克斯尔技能9击杀核心回调(context, source));
 }
 
 function on菲尼克斯尔技能10测试命令(this: void, _player: any, context: any): void {
@@ -324,8 +366,10 @@ const 菲尼克斯尔测试技能列表: Boss测试技能命令[] = [
   { 序号: 5, 名称: "骸骨弹幕", 执行: on菲尼克斯尔技能5测试命令 },
   { 序号: 6, 名称: "怨火链接", 执行: on菲尼克斯尔技能6测试命令 },
   { 序号: 7, 名称: "凤凰挽歌", 执行: on菲尼克斯尔技能7测试命令 },
-  { 序号: 8, 名称: "元素爆发", 执行: on菲尼克斯尔技能8测试命令 },
+  { 序号: 8, 名称: "元素爆发(随机)", 执行: on菲尼克斯尔技能8测试命令 },
+  { 序号: 82, 命令: "8-2", 名称: "元素爆发(火)", 执行: on菲尼克斯尔技能8火测试命令 },
   { 序号: 9, 名称: "怨火核心暴露", 执行: on菲尼克斯尔技能9测试命令 },
+  { 序号: 91, 命令: "9-1", 名称: "怨火核心暴露(1秒后击杀)", 执行: on菲尼克斯尔技能9击杀测试命令 },
   { 序号: 10, 名称: "永恒轮回", 执行: on菲尼克斯尔技能10测试命令 },
 ];
 

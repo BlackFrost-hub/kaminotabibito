@@ -444,11 +444,10 @@ const 单位坐标跟随特效间隔毫秒 = 30;
 const 单位坐标跟随特效默认高度 = 50;
 
 function 解绑后归零尺寸并销毁Dz绑定特效(effect: any): void {
-  if (!effect) return;
+  if (effect == null || effect === 0) return;
   DzUnbindEffect(effect);
-  EXSetEffectXY(effect, 0, 0);
-  EXSetEffectSize(effect, 0.00);
-  DestroyEffect(effect);
+  DzSetEffectScale(effect, 0);
+  安排定时销毁特效(effect, 0.01);
 }
 
 export function 销毁Dz绑定特效句柄(effect: any): void {

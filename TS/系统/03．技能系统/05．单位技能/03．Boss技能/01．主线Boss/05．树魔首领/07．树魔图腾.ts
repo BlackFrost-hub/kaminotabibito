@@ -65,8 +65,9 @@ const { 施加快速控制Buff } = require("系统.03．技能系统.00．技能
 const { registerHealCallback } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
   registerHealCallback: (this: void, cb: (this: void, source: any, target: any, amount: number, isItemHeal: boolean) => number) => void;
 };
-const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+const { createTimedEffect, createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+  createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
 };
 const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   CosBJ: (this: void, degrees: number) => number;
@@ -182,6 +183,7 @@ function 创建静止陷阱(this: void, context: 树魔首领运行时上下文)
   SetUnitMoveSpeed(trap.单位, cfg.静止陷阱移动速度);
 
   let 提示累计毫秒: number = cfg.静止陷阱范围提示间隔毫秒;
+  let 已开始触发 = false;
   const tickID = addPeriodicCallback(cfg.静止陷阱Tick毫秒, function 树魔首领静止陷阱Tick(this: void): void {
     if (!单位有效(boss) || !trap.是否存活()) {
       removePeriodicCallback(tickID);
@@ -213,11 +215,17 @@ function 创建静止陷阱(this: void, context: 树魔首领运行时上下文)
       const hero = heroes[i];
       if (!单位有效(hero)) continue;
       if (距离平方XY(GetUnitX(trap.单位), GetUnitY(trap.单位), GetUnitX(hero), GetUnitY(hero)) > radius2) continue;
-      播放Boss坐标音效(树魔首领音效配置.树魔图腾.陷阱触发, GetUnitX(trap.单位), GetUnitY(trap.单位), 树魔首领音效配置.默认裁断距离);
-      SetUnitAnimationByIndex(trap.单位, 3);
-      对所有玩家施加静止眩晕(boss);
-      trap.销毁();
+      if (已开始触发) return;
+      已开始触发 = true;
       removePeriodicCallback(tickID);
+      const 触发延迟ID = addDelayedCallback(cfg.静止陷阱触发延迟秒 * 1000, function 树魔首领静止陷阱延迟触发(this: void): void {
+        if (!单位有效(boss) || !trap.是否存活()) return;
+        播放Boss坐标音效(树魔首领音效配置.树魔图腾.陷阱触发, GetUnitX(trap.单位), GetUnitY(trap.单位), 树魔首领音效配置.默认裁断距离);
+        SetUnitAnimationByIndex(trap.单位, 3);
+        对所有玩家施加静止眩晕(boss);
+        trap.销毁();
+      });
+      context.清理.登记延迟回调("树魔首领-静止陷阱触发", 触发延迟ID);
       return;
     }
   });
@@ -252,7 +260,7 @@ function 创建生命陷阱(this: void, context: 树魔首领运行时上下文)
     for (let i = 0; i < heroes.length; i++) {
       const hero = heroes[i];
       if (!单位有效(hero)) continue;
-      造成AOE技能伤害({
+      const 是否成功造成伤害 = 造成AOE技能伤害({
         技能ID: 树魔图腾技能ID,
         来源: boss,
         目标: hero,
@@ -264,6 +272,14 @@ function 创建生命陷阱(this: void, context: 树魔首领运行时上下文)
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: "Boss技能",
       });
+      if (是否成功造成伤害) {
+        createTimedUnitEffect(
+          hero,
+          cfg.生命陷阱伤害特效挂点,
+          cfg.生命陷阱伤害特效路径,
+          cfg.生命陷阱伤害特效持续秒,
+        );
+      }
       registerManualBuff(hero, 树魔首领BuffID.治疗枯竭, cfg.生命陷阱Tick秒 + 0.4, healReduce, {
         sourceName: "树魔首领-生命陷阱",
       });
@@ -340,7 +356,8 @@ function 创建爆炸陷阱(this: void, context: 树魔首领运行时上下文)
   });
   context.清理.登记延迟回调("树魔首领-爆炸陷阱自然结束", naturalEndID);
 
-  const interval = Math.max(1.2, cfg.爆炸陷阱传送基础间隔秒 - cfg.爆炸陷阱传送每难度减少秒 * 取难度());
+  const 原始传送间隔 = cfg.爆炸陷阱传送基础间隔秒 - cfg.爆炸陷阱传送每难度减少秒 * 取难度();
+  const interval = 原始传送间隔 > 1.2 ? 原始传送间隔 : 1.2;
   const teleportID = addPeriodicCallback(interval * 1000, function 树魔首领爆炸陷阱传送Tick(this: void): void {
     if (!单位有效(boss) || !trap.是否存活() || naturalEnd) {
       removePeriodicCallback(teleportID);

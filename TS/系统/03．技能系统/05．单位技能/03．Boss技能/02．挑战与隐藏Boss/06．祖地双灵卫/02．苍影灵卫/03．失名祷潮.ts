@@ -27,7 +27,7 @@ const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
@@ -127,7 +127,7 @@ export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时
       const hit = heroes[i];
       if (!单位是否在条形区域(hit, startX, startY, endX, endY, cfg.宽度)) continue;
       const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-      造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_MAGIC, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·失名祷潮' });
+      造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·失名祷潮' });
     }
   });
   context.清理.登记延迟回调('祖地双灵卫-失名祷潮结算', resolveId);

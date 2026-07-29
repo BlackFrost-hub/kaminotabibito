@@ -40,6 +40,9 @@ const { 获取Boss护卫列表, 是否指定Boss护卫 } = require("系统.01．
   获取Boss护卫列表: (this: void, boss: any, 只返回存活?: boolean) => any[];
   是否指定Boss护卫: (this: void, unit: any, boss: any) => boolean;
 };
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -48,11 +51,9 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
@@ -72,17 +73,9 @@ interface 天罚波次 {
   延迟秒: number;
 }
 
-function 限制生命值(this: void, value: number, maxLife: number): number {
-  if (value < 1) return 1;
-  if (value > maxLife) return maxLife;
-  return value;
-}
-
-function 治疗单位(this: void, unit: any, amount: number): void {
+function 治疗单位(this: void, source: any, unit: any, amount: number): void {
   if (!单位有效(unit) || amount <= 0) return;
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
-  const life = GetUnitState(unit, UNIT_STATE_LIFE);
-  SetUnitState(unit, UNIT_STATE_LIFE, 限制生命值(life + amount, maxLife));
+  doHeal({ HealSource: source, HealTarget: unit, HealAmount: amount, ItemHeal: false, HealEffect: false });
 }
 
 function 计算天罚半径(this: void, context: 巴尔扎罗斯运行时上下文): number {
@@ -141,7 +134,7 @@ function 触发天罚波次(this: void, context: 巴尔扎罗斯运行时上下�
     const unit = candidates[i];
     if (!单位有效(unit) || 单位到点距离平方(unit, 波次.X, 波次.Y) > radius2) continue;
     if (unit === boss) {
-      治疗单位(boss, GetUnitState(boss, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.王者天罚.命中自身治疗最大生命比例);
+      治疗单位(boss, boss, GetUnitState(boss, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.王者天罚.命中自身治疗最大生命比例);
     } else if (是护卫(context, unit)) {
       施加单体攻击力提高Buff(boss, unit, {
         持续时间: 巴尔扎罗斯技能数值配置.王者天罚.护卫命中增攻持续秒,

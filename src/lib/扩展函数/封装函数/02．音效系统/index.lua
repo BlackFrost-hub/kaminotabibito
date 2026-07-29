@@ -47,6 +47,14 @@ do
         end
     end
 end
+do
+    local ____export = require("lib.扩展函数.封装函数.02．音效系统.07．原生任务音效")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 function ____exports.initSound3DII(self)
     setDefaultSoundModel(SoundModel:create())
     prewarmUiClickSound(DEFAULT_UI_CLICK_SOUND)

@@ -48,6 +48,13 @@ createElfCouncilNpc('e08R', '内务总管-语维', {
   height = 45.0,
 })
 
+createElfCouncilNpc('e08T', '王宫卫队长-艾伦', {
+  icon = 'Unit\\NPC\\02-Chapter\\Elf\\Icon\\Allen.blp',
+  modelFile = 'Unit\\NPC\\02-Chapter\\Elf\\Allen.mdx',
+  scale = 1.2,
+  height = 45.0,
+})
+
 local yethir = UnitDefinition:new('e08S', 'hfoo')
 yethir:setName('防卫部长-耶提尔')
 yethir:setNameEditorSuffix('')

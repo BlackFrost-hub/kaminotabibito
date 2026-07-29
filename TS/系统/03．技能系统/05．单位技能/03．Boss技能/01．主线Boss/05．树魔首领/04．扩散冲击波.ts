@@ -6,10 +6,12 @@ import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./0
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC, 距离平方XY, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+const { 造成AOE技能伤害, 创建技能伤害实例, 结束技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+  创建技能伤害实例: (this: void, 参数?: any) => number;
+  结束技能伤害实例: (this: void, 技能实例ID: number | undefined) => void;
 };
 const jass = require("jass.common") as any;
 
@@ -32,12 +34,9 @@ const { 启动基础施法时间线 } = require("系统.03．技能系统.00．�
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
-const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
-  获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
+const { 创建原生弹幕, 销毁原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
+  创建原生弹幕: (this: void, 参数: any) => any;
+  销毁原生弹幕: (this: void, 弹幕ID: number, 原因?: string) => void;
 };
 const { registerManualBuff, getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -56,6 +55,17 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const 树魔首领单位类型ID = stringToFourCC(树魔首领单位技能配置.单位ID);
 const 扩散冲击波技能ID = stringToFourCC(树魔首领数值与表现配置.扩散冲击波.技能槽位);
 let 扩散冲击波已注册 = false;
+
+interface 扩散冲击波飞行状态 {
+  上下文: 树魔首领运行时上下文;
+  技能实例ID: number;
+  已命中目标: Record<number, true | undefined>;
+  弹幕ID列表: number[];
+  剩余弹幕数: number;
+  已结束: boolean;
+}
+
+const 扩散冲击波弹幕状态表: Record<number, 扩散冲击波飞行状态 | undefined> = {};
 
 function 播放扩散冲击波蓄力特效(this: void, boss: any): void {
   const cfg = 树魔首领数值与表现配置.扩散冲击波;
@@ -79,6 +89,65 @@ function 播放扩散冲击波命中特效(this: void, boss: any): void {
     缩放: cfg.扩散命中特效缩放,
     持续秒: cfg.扩散命中特效持续秒,
   });
+  创建点特效({
+    模型路径: cfg.扩散命中冲击特效路径,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    Z: 0,
+    缩放: cfg.扩散命中冲击特效缩放,
+    持续秒: cfg.扩散命中冲击特效持续秒,
+  });
+}
+
+function 结束扩散冲击波飞行状态(this: void, state: 扩散冲击波飞行状态): void {
+  if (state.已结束) return;
+  state.已结束 = true;
+  结束技能伤害实例(state.技能实例ID);
+}
+
+function 清理扩散冲击波飞行状态(this: void, state?: 扩散冲击波飞行状态): void {
+  if (state == null || state.已结束) return;
+  state.已结束 = true;
+  for (let i = 0; i < state.弹幕ID列表.length; i++) {
+    const 弹幕ID = state.弹幕ID列表[i];
+    delete 扩散冲击波弹幕状态表[弹幕ID];
+    销毁原生弹幕(弹幕ID, "手动销毁");
+  }
+  结束技能伤害实例(state.技能实例ID);
+}
+
+function on树魔首领扩散冲击波弹幕命中(this: void, target: any, 弹幕ID: number): void {
+  const state = 扩散冲击波弹幕状态表[弹幕ID];
+  if (state == null || state.已结束 || !单位有效(target)) return;
+  const targetID = GetHandleId(target) || 0;
+  if (targetID === 0 || state.已命中目标[targetID] === true) return;
+  const boss = state.上下文.Boss单位;
+  if (!单位有效(boss)) return;
+
+  state.已命中目标[targetID] = true;
+  const cfg = 树魔首领数值与表现配置.扩散冲击波;
+  造成AOE技能伤害({
+    技能ID: 扩散冲击波技能ID,
+    技能实例ID: state.技能实例ID,
+    来源: boss,
+    目标: target,
+    伤害: 读取单位攻击力(boss) * cfg.Boss攻击力比例,
+    attack: false,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_PLANT,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
+  施加古树衰弱(target);
+}
+
+function on树魔首领扩散冲击波弹幕结束(this: void, _原因: string, 弹幕ID: number): void {
+  const state = 扩散冲击波弹幕状态表[弹幕ID];
+  delete 扩散冲击波弹幕状态表[弹幕ID];
+  if (state == null || state.已结束) return;
+  state.剩余弹幕数 -= 1;
+  if (state.剩余弹幕数 <= 0) 结束扩散冲击波飞行状态(state);
 }
 
 function 施加古树衰弱(this: void, target: any): void {
@@ -105,54 +174,59 @@ function 执行扩散冲击波(this: void, context: 树魔首领运行时上下�
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 树魔首领数值与表现配置.扩散冲击波;
-  const hit: Record<number, true | undefined> = {};
-  let step = 0;
+  const 飞行持续秒 = cfg.最大扩张跳数 * cfg.Tick间隔毫秒 / 1000;
+  const 最大飞行距离 = cfg.初始半径 + cfg.每跳扩张半径 * cfg.最大扩张跳数;
+  if (飞行持续秒 <= 0 || 最大飞行距离 <= 0 || cfg.扩散弹幕数量 <= 0) return;
+  const state: 扩散冲击波飞行状态 = {
+    上下文: context,
+    技能实例ID: 创建技能伤害实例({
+      技能ID: 扩散冲击波技能ID,
+      来源类型: "Boss技能",
+      标签: "树魔首领-扩散冲击波",
+      持续时间秒: 飞行持续秒 + 1,
+    }),
+    已命中目标: {},
+    弹幕ID列表: [],
+    剩余弹幕数: 0,
+    已结束: false,
+  };
 
   尝试播放树魔首领关键怪叫(boss);
   播放Boss坐标音效(树魔首领音效配置.扩散冲击波.生效, GetUnitX(boss), GetUnitY(boss), 树魔首领音效配置.默认裁断距离);
   播放扩散冲击波命中特效(boss);
-  let callbackID = 0;
-  callbackID = addPeriodicCallback(cfg.Tick间隔毫秒, function 树魔首领扩散冲击波Tick(this: void): void {
-    if (!单位有效(boss) || context.清理.已清理()) {
-      removePeriodicCallback(callbackID);
-      return;
-    }
-
-    step += 1;
-    const radius = cfg.初始半径 + cfg.每跳扩张半径 * step;
-    const radius2 = radius * radius;
-    const damage = 读取单位攻击力(boss) * cfg.Boss攻击力比例;
-    const bossX = GetUnitX(boss);
-    const bossY = GetUnitY(boss);
-    const targets = 获取Boss技能敌对英雄列表(boss);
-
-    for (let i = 0; i < targets.length; i++) {
-      const target = targets[i];
-      if (!单位有效(target)) continue;
-      const hid = GetHandleId(target) || 0;
-      if (hid === 0 || hit[hid] === true) continue;
-      if (距离平方XY(bossX, bossY, GetUnitX(target), GetUnitY(target)) > radius2) continue;
-      hit[hid] = true;
-      造成AOE技能伤害({
-        技能ID: 扩散冲击波技能ID,
-        来源: boss,
-        目标: target,
-        伤害: damage,
-        attack: false,
-        ranged: false,
-        attackType: ATTACK_TYPE_NORMAL,
-        伤害类型: DAMAGE_TYPE_PLANT,
-        weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
-      });
-      施加古树衰弱(target);
-    }
-
-    if (step >= cfg.最大扩张跳数) {
-      removePeriodicCallback(callbackID);
-    }
-  });
-  context.清理.登记周期回调("树魔首领-扩散冲击波", callbackID);
+  for (let i = 0; i < cfg.扩散弹幕数量; i++) {
+    const 弹幕 = 创建原生弹幕({
+      所有者: boss,
+      X: GetUnitX(boss),
+      Y: GetUnitY(boss),
+      方向角: i * 360 / cfg.扩散弹幕数量,
+      速度: 最大飞行距离 / 飞行持续秒,
+      最大距离: 最大飞行距离,
+      命中半径: cfg.扩散弹幕命中半径,
+      影响目标: "敌方",
+      碰撞消失: false,
+      每单位最大命中次数: 1,
+      不可阻挡: true,
+      禁用碰撞: true,
+      显式改向后锁定方向: true,
+      伤害值: 0,
+      伤害形态: "AOE",
+      模型: cfg.扩散弹幕模型路径,
+      缩放: cfg.扩散弹幕缩放,
+      飞行高度: cfg.扩散弹幕飞行高度,
+      on命中: on树魔首领扩散冲击波弹幕命中,
+      on结束: on树魔首领扩散冲击波弹幕结束,
+    });
+    if (弹幕 == null || 弹幕.弹幕ID == null || 弹幕.弹幕ID <= 0) continue;
+    state.弹幕ID列表.push(弹幕.弹幕ID);
+    state.剩余弹幕数 += 1;
+    扩散冲击波弹幕状态表[弹幕.弹幕ID] = state;
+  }
+  if (state.剩余弹幕数 <= 0) {
+    结束扩散冲击波飞行状态(state);
+    return;
+  }
+  context.清理.登记清理("树魔首领-扩散冲击波弹幕", 清理扩散冲击波飞行状态, state);
 }
 
 export function 释放树魔首领扩散冲击波(this: void, context: 树魔首领运行时上下文): void {

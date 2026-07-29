@@ -1,11 +1,13 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const ConvertUnitState = jass.ConvertUnitState as (stateId: number) => any;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
@@ -18,9 +20,7 @@ const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
-const UNIT_STATE_ATTACK1_BASE = 0x12;
-const UNIT_STATE_ATTACK1_BONUS = 0x10;
-const UNIT_STATE_ATTACK1_COUNT = 0x11;
+const UNIT_STATE_ATTACK = ConvertUnitState(0x15);
 
 const { stringToFourCC: 转四字码 } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string | undefined | null) => number;
@@ -61,10 +61,7 @@ export function 单位有效(this: void, unit: any): boolean {
 
 export function 读取单位攻击力(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
-  const base = GetUnitState(unit, ConvertUnitState(UNIT_STATE_ATTACK1_BASE)) || 0;
-  const bonus = GetUnitState(unit, ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)) || 0;
-  const diceCount = GetUnitState(unit, ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)) || 0;
-  return base + bonus * (diceCount + 1) / 2;
+  return Number(GetUnitStateJapi(unit, UNIT_STATE_ATTACK)) || 0;
 }
 
 export function 距离平方XY(this: void, x1: number, y1: number, x2: number, y2: number): number {

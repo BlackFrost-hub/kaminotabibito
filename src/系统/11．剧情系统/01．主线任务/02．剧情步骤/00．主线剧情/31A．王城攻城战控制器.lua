@@ -2,13 +2,15 @@ local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____505C_6B62_653B_57CE_76EE_6807_91CD_53D1, ____on_91CD_53D1_653B_57CE_76EE_6807, _____542F_52A8_653B_57CE_76EE_6807_91CD_53D1, ____on_5EF6_8FDF_9500_6BC1_83F2_5229_65AF_63A5_8FD1_89E6_53D1_5668, _____6CE8_9500_83F2_5229_65AF_63A5_8FD1_76D1_542C, ____on_83F2_5229_65AF_63A5_8FD1_89E6_53D1, _____6CE8_518C_83F2_5229_65AF_63A5_8FD1_5BF9_767D_89E6_53D1, ____on_542F_52A8_83F2_5229_65AF_51FA_573A, jass, registerUnitInRangeTrigger, safeTriggerAddAction, safeDestroyTrigger, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, CreateTrigger, GetTriggerUnit, GetUnitState, GetUnitTypeId, GetUnitX, GetUnitY, IssueImmediateOrder, IssueTargetOrder, Player, SetUnitOwner, SetUnitPosition, _____654C_519B_73A9_5BB6ID, _____653B_57CE_76EE_6807_91CD_53D1_95F4_9694_6BEB_79D2, _____83F2_5229_65AF_51FA_73B0X, _____83F2_5229_65AF_51FA_73B0Y, _____83F2_5229_65AF_5BF9_767D_89E6_53D1_8303_56F4, _____8036_63D0_5C14_9760_8FD1_73A9_5BB6_504F_79FBX, _____8FDB_653B_671D_5411, _____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001
+local _____5355_4F4D_5B58_6D3B, _____505C_6B62_653B_57CE_76EE_6807_91CD_53D1, ____on_91CD_53D1_653B_57CE_76EE_6807, _____542F_52A8_653B_57CE_76EE_6807_91CD_53D1, _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8, _____521B_5EFA_83F2_5229_65AF_653B_57CE_4F20_9001_95E8, ____on_5EF6_8FDF_9500_6BC1_83F2_5229_65AF_63A5_8FD1_89E6_53D1_5668, _____6CE8_9500_83F2_5229_65AF_63A5_8FD1_76D1_542C, ____on_83F2_5229_65AF_63A5_8FD1_89E6_53D1, _____6CE8_518C_83F2_5229_65AF_63A5_8FD1_5BF9_767D_89E6_53D1, ____on_542F_52A8_83F2_5229_65AF_51FA_573A, jass, registerUnitInRangeTrigger, safeTriggerAddAction, safeDestroyTrigger, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, CreateTrigger, AddSpecialEffect, DestroyEffect, GetTriggerUnit, GetUnitState, GetUnitTypeId, GetUnitX, GetUnitY, IssueImmediateOrder, IssueTargetOrder, Player, SetUnitOwner, SetUnitPosition, _____654C_519B_73A9_5BB6ID, _____653B_57CE_76EE_6807_91CD_53D1_95F4_9694_6BEB_79D2, _____83F2_5229_65AF_51FA_73B0X, _____83F2_5229_65AF_51FA_73B0Y, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8_6A21_578B, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8X, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8Y, _____83F2_5229_65AF_5BF9_767D_89E6_53D1_8303_56F4, _____8036_63D0_5C14_9760_8FD1_73A9_5BB6_504F_79FBX, _____8FDB_653B_671D_5411, _____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取当前剧情动作上下文"]
 local ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
 local _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E = ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5["创建并冻结剧情Boss预置"]
 local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
+local ____31B_FF0E_8036_63D0_5C14_534F_6218_63A7_5236_5668 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.31B．耶提尔协战控制器")
+local _____7ED3_7B97_8036_63D0_5C14_83F2_5229_65AF_534F_6218 = ____31B_FF0E_8036_63D0_5C14_534F_6218_63A7_5236_5668["结算耶提尔菲利斯协战"]
 function _____5355_4F4D_5B58_6D3B(unit)
     return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 and GetUnitState(unit, jass.UNIT_STATE_LIFE) > 0.405
 end
@@ -48,6 +50,17 @@ function _____542F_52A8_653B_57CE_76EE_6807_91CD_53D1()
         return
     end
     _____72B6_6001["周期回调ID"] = addPeriodicCallback(_____653B_57CE_76EE_6807_91CD_53D1_95F4_9694_6BEB_79D2, ____on_91CD_53D1_653B_57CE_76EE_6807)
+end
+function _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____72B6_6001)
+    local effect = _____72B6_6001["菲利斯攻城传送门特效"]
+    _____72B6_6001["菲利斯攻城传送门特效"] = nil
+    if effect ~= nil and effect ~= 0 then
+        DestroyEffect(effect)
+    end
+end
+function _____521B_5EFA_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____72B6_6001)
+    _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____72B6_6001)
+    _____72B6_6001["菲利斯攻城传送门特效"] = AddSpecialEffect(_____83F2_5229_65AF_653B_57CE_4F20_9001_95E8_6A21_578B, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8X, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8Y)
 end
 function ____on_5EF6_8FDF_9500_6BC1_83F2_5229_65AF_63A5_8FD1_89E6_53D1_5668(variable)
     local _____53C2_6570 = variable
@@ -165,6 +178,7 @@ function ____on_542F_52A8_83F2_5229_65AF_51FA_573A(_____9884_671F_4E16_4EE3)
         Player(_____654C_519B_73A9_5BB6ID),
         true
     )
+    _____521B_5EFA_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____72B6_6001)
     _____6CE8_518C_83F2_5229_65AF_63A5_8FD1_5BF9_767D_89E6_53D1(_____72B6_6001, bossUnit)
     IssueTargetOrder(bossUnit, "attack", _____72B6_6001["防御法阵"])
     _____542F_52A8_653B_57CE_76EE_6807_91CD_53D1()
@@ -197,6 +211,8 @@ removePeriodicCallback = ____require_result_9.removePeriodicCallback
 local ____require_result_10 = require("系统.00．核心系统.09．游戏结算开关")
 local _____8BBE_7F6E_5168_4F53_73A9_5BB6_6E38_620F_5931_8D25 = ____require_result_10["设置全体玩家游戏失败"]
 CreateTrigger = jass.CreateTrigger
+AddSpecialEffect = jass.AddSpecialEffect
+DestroyEffect = jass.DestroyEffect
 local GetHandleId = jass.GetHandleId
 GetTriggerUnit = jass.GetTriggerUnit
 GetUnitState = jass.GetUnitState
@@ -217,6 +233,9 @@ local _____9632_5FA1_6CD5_9635X = -6992.3
 local _____9632_5FA1_6CD5_9635Y = -13170.9
 _____83F2_5229_65AF_51FA_73B0X = -6906.2
 _____83F2_5229_65AF_51FA_73B0Y = -16695.7
+_____83F2_5229_65AF_653B_57CE_4F20_9001_95E8_6A21_578B = "Common\\Effect\\Form\\Portal\\FeliceSiegeBluePortal.mdx"
+_____83F2_5229_65AF_653B_57CE_4F20_9001_95E8X = -7025.6
+_____83F2_5229_65AF_653B_57CE_4F20_9001_95E8Y = -16713.7
 _____83F2_5229_65AF_5BF9_767D_89E6_53D1_8303_56F4 = 600
 _____8036_63D0_5C14_9760_8FD1_73A9_5BB6_504F_79FBX = 160
 _____8FDB_653B_671D_5411 = 90
@@ -451,7 +470,7 @@ ____exports["登记存活攻城单位为菲利斯护卫"] = function()
             do
                 local unit = _____72B6_6001["攻城单位"][i + 1]
                 if not _____5355_4F4D_5B58_6D3B(unit) then
-                    goto __continue53
+                    goto __continue56
                 end
                 IssueImmediateOrder(unit, "stop")
                 if _____767B_8BB0Boss_6218_5F85_5E26_5165_62A4_536B(_____72B6_6001["菲利斯"], unit, "菲利斯第二军团残部") then
@@ -459,7 +478,7 @@ ____exports["登记存活攻城单位为菲利斯护卫"] = function()
                 end
                 _____5F53_524D_653B_57CE_5355_4F4D_4E16_4EE3_8868[GetHandleId(unit)] = nil
             end
-            ::__continue53::
+            ::__continue56::
             i = i + 1
         end
     end
@@ -484,11 +503,14 @@ local function ____on_738B_57CE_653B_57CE_5355_4F4D_6B7B_4EA1(dyingUnit)
         return
     end
     if dyingUnit == _____72B6_6001["菲利斯"] then
+        _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____72B6_6001)
         ____exports["结束菲利斯攻城等待"]()
+        _____7ED3_7B97_8036_63D0_5C14_83F2_5229_65AF_534F_6218()
         return
     end
     if dyingUnit == _____72B6_6001["防御法阵"] and _____72B6_6001["阶段"] >= 1 and _____72B6_6001["阶段"] <= 3 then
         _____72B6_6001["阶段"] = -1
+        _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____72B6_6001)
         ____exports["结束菲利斯攻城等待"]()
         _____8BBE_7F6E_5168_4F53_73A9_5BB6_6E38_620F_5931_8D25()
         return
@@ -549,6 +571,9 @@ ____exports["启动王城攻城战"] = function()
     if _____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001 ~= nil and _____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001["阶段"] >= 0 then
         return
     end
+    if _____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001 ~= nil then
+        _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001)
+    end
     _____786E_4FDD_653B_57CE_5355_4F4D_6B7B_4EA1_76D1_542C()
     _____738B_57CE_653B_57CE_6218_4E16_4EE3 = _____738B_57CE_653B_57CE_6218_4E16_4EE3 + 1
     _____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001 = {
@@ -560,6 +585,7 @@ ____exports["启动王城攻城战"] = function()
         ["攻城单位"] = {},
         ["周期回调ID"] = 0,
         ["菲利斯"] = nil,
+        ["菲利斯攻城传送门特效"] = nil,
         ["菲利斯接近触发器"] = nil,
         ["取消菲利斯接近监听"] = nil,
         ["菲利斯出场对话已触发"] = false

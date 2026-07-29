@@ -1,28 +1,28 @@
 /** @noSelfInFile */
 
-import { 获取全部菲利斯上下文, type 菲利斯运行时上下文 } from "./01．运行时上下文";
+import { 获取全部菲利斯上下文, 获取菲利斯上下文, type 菲利斯运行时上下文 } from "./01．运行时上下文";
 import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
 import { 单位有效, stringToFourCC } from "./11．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 创建周期机制调度器 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器";
+import { 创建手动数值Buff范围光环, 同步手动数值Buff范围光环 } from "../../../../00．技能模板+函数/01．技能函数/23．光环/02．数值Buff范围光环";
+import { 调整状态ID属性 } from "../../../../00．技能模板+函数/01．技能函数/20．物品辅助/16．属性位移与指令";
 
 const jass = require("jass.common") as any;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const SetUnitAbilityLevel = jass.SetUnitAbilityLevel as (unit: any, abilityId: number, level: number) => number;
-const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const IsUnitAlly = jass.IsUnitAlly as (unit: any, whichPlayer: any) => boolean;
+const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+};
+const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
+  读取单位攻击力: (this: void, unit: any) => number;
 };
 const { 菲利斯BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.05．菲利斯") as {
   菲利斯BuffID: { 领袖光环: string };
@@ -32,9 +32,11 @@ const { 创建Dz绑定单位特效, 销毁Dz绑定单位特效 } = require("lib.
   销毁Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => void;
 };
 
-const 领袖光环技能ID = stringToFourCC(菲利斯数值与表现配置.领袖光环.技能槽位);
+const 原生领袖光环技能ID = stringToFourCC("A0LQ");
+const 攻击力属性ID = 1;
 let 领袖光环已注册 = false;
 const 领袖光环特效键 = "菲利斯-领袖光环";
+let 领袖光环范围ID = 0;
 
 function 生命比例(this: void, unit: any): number {
   const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
@@ -42,10 +44,53 @@ function 生命比例(this: void, unit: any): number {
   return GetUnitState(unit, UNIT_STATE_LIFE) / maxLife;
 }
 
+function 取领袖光环攻击力倍率(this: void, holder: any): number {
+  const context = 获取菲利斯上下文(holder);
+  if (context == null) return 0;
+  const cfg = 菲利斯数值与表现配置.领袖光环;
+  return context.当前领袖光环低血 ? -cfg.低血友军攻击降低 : cfg.高血友军攻击提高;
+}
+
+function 计算领袖光环攻击增量(this: void, target: any, 总层数: number, 已应用攻击力增量: number, holder: any): number {
+  if (总层数 <= 0) return 0;
+  const 当前攻击力 = 读取单位攻击力(target);
+  const 基础攻击力 = 当前攻击力 - 已应用攻击力增量;
+  const 攻击力倍率 = 取领袖光环攻击力倍率(holder);
+  return 基础攻击力 > 0 ? 基础攻击力 * 攻击力倍率 : 0;
+}
+
+function 应用领袖光环攻击力差值(this: void, target: any, 差值: number): void {
+  调整状态ID属性(target, 攻击力属性ID, 差值);
+}
+
+function 取领袖光环Buff显示值(this: void, _target: any, _总层数: number, holder: any): number {
+  return 取领袖光环攻击力倍率(holder);
+}
+
+function 取领袖光环Buff附加参数(this: void, _target: any, _总层数: number, _holder: any): any {
+  return {
+    sourceName: "菲利斯-领袖光环",
+  };
+}
+
+function 注册领袖光环清理(this: void, context: 菲利斯运行时上下文): void {
+  if (context.领袖光环清理已注册) return;
+  context.领袖光环清理已注册 = true;
+  const boss = context.Boss单位;
+  context.清理.登记清理("菲利斯-领袖光环", function 清理菲利斯领袖光环(this: void): void {
+    同步手动数值Buff范围光环(领袖光环范围ID, boss, false);
+  });
+}
+
 function 刷新单个领袖光环(this: void, context: 菲利斯运行时上下文): void {
   const boss = context.Boss单位;
+  注册领袖光环清理(context);
   if (!单位有效(boss)) return;
   const cfg = 菲利斯数值与表现配置.领袖光环;
+  if (!context.原生领袖光环已移除) {
+    UnitRemoveAbility(boss, 原生领袖光环技能ID);
+    context.原生领袖光环已移除 = true;
+  }
   const low = 生命比例(boss) < cfg.生命切换阈值;
   const wasLow = context.当前领袖光环低血;
   context.当前领袖光环低血 = low;
@@ -53,10 +98,10 @@ function 刷新单个领袖光环(this: void, context: 菲利斯运行时上下�
     播放Boss坐标音效(菲利斯音效配置.领袖光环.低血切换, GetUnitX(boss), GetUnitY(boss), 菲利斯音效配置.默认裁断距离);
     播放菲利斯台词(boss, "领袖光环", 0);
   }
-  SetUnitAbilityLevel(boss, 领袖光环技能ID, low ? cfg.低血物编等级 : cfg.高血物编等级);
   registerManualBuff(boss, 菲利斯BuffID.领袖光环, 1.4, low ? -cfg.低血友军攻击降低 : cfg.高血友军攻击提高, {
     sourceName: "菲利斯-领袖光环",
   });
+  同步手动数值Buff范围光环(领袖光环范围ID, boss, true);
 
   销毁Dz绑定单位特效(boss, 领袖光环特效键);
   创建Dz绑定单位特效(
@@ -68,30 +113,27 @@ function 刷新单个领袖光环(this: void, context: 菲利斯运行时上下�
   );
 }
 
-function 领袖光环伤害修正(this: void, damageContext: any): number {
-  if (damageContext == null || damageContext.isNormalAttack !== true) return damageContext.currentDamage;
-  const attacker = damageContext.attacker;
-  if (!单位有效(attacker)) return damageContext.currentDamage;
-  const cfg = 菲利斯数值与表现配置.领袖光环;
-  const list = 获取全部菲利斯上下文();
-  for (let i = 0; i < list.length; i++) {
-    const boss = list[i].Boss单位;
-    if (!单位有效(boss) || attacker === boss) continue;
-    if (IsUnitAlly(attacker, GetOwningPlayer(boss)) !== true) continue;
-    if (list[i].当前领袖光环低血) return damageContext.currentDamage * (1 - cfg.低血友军攻击降低);
-    return damageContext.currentDamage * (1 + cfg.高血友军攻击提高);
-  }
-  return damageContext.currentDamage;
-}
-
 export function 注册菲利斯领袖光环(this: void): void {
   if (领袖光环已注册) return;
   领袖光环已注册 = true;
+  领袖光环范围ID = 创建手动数值Buff范围光环({
+    状态ID: "菲利斯-领袖光环",
+    半径: 菲利斯数值与表现配置.领袖光环.范围,
+    目标类型: "友军不含自己",
+    排除无敌: true,
+    最大层数: 1,
+    数值效果列表: [{ key: "攻击力", 计算总值: 计算领袖光环攻击增量, 应用差值: 应用领袖光环攻击力差值 }],
+    Buff: {
+      BuffID: 菲利斯BuffID.领袖光环,
+      持续秒: 1.4,
+      取显示值: 取领袖光环Buff显示值,
+      取附加参数: 取领袖光环Buff附加参数,
+    },
+  });
   创建周期机制调度器({
     名称: "菲利斯-领袖光环",
     间隔毫秒: 菲利斯数值与表现配置.领袖光环.检查间隔毫秒,
     取上下文列表: 获取全部菲利斯上下文,
     执行: 刷新单个领袖光环,
   });
-  registerDamageModifier(领袖光环伤害修正, 34);
 }

@@ -28,11 +28,16 @@ import {
   极坐标Y,
 } from "./19．公共工具";
 import type { 菲尼克斯尔伤害上下文参数 } from "./19．公共工具";
+import { 创建二阶贝塞尔XYZ轨迹, 创建原生弹幕 } from "../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
+const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, animationIndex: number) => void;
+const Atan2 = jass.Atan2 as (y: number, x: number) => number;
+const bj_RADTODEG = (jass.bj_RADTODEG ?? 57.29577951308232) as number;
 
 const 菲尼克斯尔单位类型ID = stringToFourCC(菲尼克斯尔单位技能配置.单位ID);
 const 炽羽散射技能ID = stringToFourCC(菲尼克斯尔单位技能配置.技能壳.炽羽散射);
@@ -55,6 +60,23 @@ function 创建菲尼克斯尔燃烧区(this: void, context: 菲尼克斯尔运�
   context.清理.登记周期回调("菲尼克斯尔燃烧区", tick);
 }
 
+function 取坐标朝向角(this: void, fromX: number, fromY: number, toX: number, toY: number): number {
+  return (Atan2(toY - fromY, toX - fromX) as number) * bj_RADTODEG;
+}
+
+function 结算菲尼克斯尔炽羽落点(this: void, context: 菲尼克斯尔运行时上下文, boss: any, x: number, y: number, 伤害上下文: 菲尼克斯尔伤害上下文参数): void {
+  if (!单位存活(boss)) return;
+  const config = 菲尼克斯尔数值与表现配置.炽羽散射;
+  播放点特效(菲尼克斯尔数值与表现配置.特效.羽毛命中, x, y, config.羽毛命中特效持续秒 * 1000);
+  const enemies = 范围敌人(boss, x, y, config.落点半径);
+  for (let i = 0; i < enemies.length; i++) {
+    const u = enemies[i];
+    造成火焰伤害(boss, u, 计算攻击最大生命伤害(boss, u, config.羽毛伤害Boss攻击力比例, config.羽毛伤害目标最大生命比例), "AOE", 伤害上下文);
+    添加元素层数(u, "火", config.火印层数);
+  }
+  创建菲尼克斯尔燃烧区(context, x, y, 伤害上下文);
+}
+
 export function 释放菲尼克斯尔炽羽散射(this: void, context: 菲尼克斯尔运行时上下文, target?: any, 技能实例ID?: number): void {
   if (context.当前形态 !== "第一形态" || !单位存活(context.Boss)) return;
   const boss = context.Boss;
@@ -75,15 +97,38 @@ export function 释放菲尼克斯尔炽羽散射(this: void, context: 菲尼克
     const x = 极坐标X(centerX, dist, angle);
     const y = 极坐标Y(centerY, dist, angle);
     创建预警圆(x, y, config.落点半径, config.读条秒);
-    延迟(config.读条秒 * 1000, function 菲尼克斯尔炽羽落点(this: void): void {
-      播放点特效(菲尼克斯尔数值与表现配置.特效.羽毛弹体, x, y, 900);
-      const enemies = 范围敌人(boss, x, y, config.落点半径);
-      for (let j = 0; j < enemies.length; j++) {
-        const u = enemies[j];
-        造成火焰伤害(boss, u, 计算攻击最大生命伤害(boss, u, config.羽毛伤害Boss攻击力比例, config.羽毛伤害目标最大生命比例), "AOE", 伤害上下文);
-        添加元素层数(u, "火", config.火印层数);
-      }
-      创建菲尼克斯尔燃烧区(context, x, y, 伤害上下文);
+    延迟(config.读条秒 * 1000, function 菲尼克斯尔炽羽发射(this: void): void {
+      if (!单位存活(boss)) return;
+      const startX = 取单位X(boss);
+      const startY = 取单位Y(boss);
+      const startZ = GetUnitFlyHeight(boss);
+      const face = 取坐标朝向角(startX, startY, x, y);
+      const curveOffset = GetRandomReal(-config.贝塞尔侧弯最大距离, config.贝塞尔侧弯最大距离);
+      const controlX = 极坐标X((startX + x) * 0.5, curveOffset, face + 90);
+      const controlY = 极坐标Y((startY + y) * 0.5, curveOffset, face + 90);
+      const projectile = 创建原生弹幕({
+        所有者: boss,
+        X: startX,
+        Y: startY,
+        方向角: face,
+        速度: 0,
+        生命周期: config.羽毛飞行秒,
+        命中半径: 0,
+        碰撞消失: false,
+        禁用碰撞: true,
+        不可阻挡: true,
+        模型: 菲尼克斯尔数值与表现配置.特效.羽毛弹体,
+        飞行高度: startZ,
+        轨迹采样器: 创建二阶贝塞尔XYZ轨迹(
+          startX, startY, startZ,
+          controlX, controlY, startZ * config.贝塞尔控制高度比例,
+          x, y, 0,
+        ),
+        on到达目标点: function 菲尼克斯尔炽羽到达(this: void, _弹幕ID: number, _原因: "完成" | "距离结束"): void {
+          结算菲尼克斯尔炽羽落点(context, boss, x, y, 伤害上下文);
+        },
+      });
+      SetUnitAnimationByIndex(projectile.弹幕单位, 1);
     });
   }
 }

@@ -5,17 +5,17 @@ import { 菲尼克斯尔场地配置 } from "./01．场地配置";
 import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 创建点特效 } from "../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效";
 import {
   周期,
   延迟,
   停止周期,
   单位存活,
-  取菲尼克斯尔玩家英雄列表,
+  取菲尼克斯尔敌对目标列表,
   两点距离,
   取单位X,
   取单位Y,
   创建安全圆,
-  播放点特效,
   显示大招读条,
   设置单位动画,
   开始施法硬直,
@@ -44,21 +44,40 @@ export function 释放菲尼克斯尔凤凰挽歌(this: void, context: 菲尼克
   开始施法硬直(context.Boss, config.引导秒);
   设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.施法.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.施法.倍速);
   显示大招读条(config.引导秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
-  播放点特效(菲尼克斯尔数值与表现配置.特效.凤凰挽歌主体, 取单位X(context.Boss), 取单位Y(context.Boss), config.引导秒 * 1000);
+  创建点特效({
+    模型路径: 菲尼克斯尔数值与表现配置.特效.凤凰挽歌主体,
+    X: 取单位X(context.Boss),
+    Y: 取单位Y(context.Boss),
+    持续秒: config.引导秒,
+    缩放: config.主体特效缩放,
+  });
   播放Boss坐标音效(菲尼克斯尔音效配置.凤凰挽歌.引导开始, 取单位X(context.Boss), 取单位Y(context.Boss), 菲尼克斯尔音效配置.默认裁断距离);
   const points = 菲尼克斯尔场地配置.挽歌安全区点位;
   for (let i = 0; i < points.length; i++) {
     创建安全圆(points[i].x, points[i].y, config.安全区半径, config.引导秒);
-    播放点特效(菲尼克斯尔数值与表现配置.特效.凤凰挽歌安全区, points[i].x, points[i].y, config.引导秒 * 1000);
+    创建点特效({
+      模型路径: 菲尼克斯尔数值与表现配置.特效.凤凰挽歌安全区,
+      X: points[i].x,
+      Y: points[i].y,
+      持续秒: config.引导秒,
+      缩放: config.安全区特效缩放,
+    });
   }
   const tick = 周期(config.Tick秒 * 1000, function 菲尼克斯尔凤凰挽歌Tick(this: void): void {
-    const heroes = 取菲尼克斯尔玩家英雄列表();
+    const heroes = 取菲尼克斯尔敌对目标列表(context.Boss);
     for (let i = 0; i < heroes.length; i++) {
       const hero = heroes[i];
       if (玩家在安全区(hero)) continue;
       造成暗火伤害(context.Boss, hero, 取当前生命(hero) * config.当前生命损失比例, "AOE", 伤害上下文);
       添加元素层数(hero, "暗", config.规避叠层);
-      播放点特效(菲尼克斯尔数值与表现配置.特效.凤凰挽歌叠加, 取单位X(hero), 取单位Y(hero), 1200);
+      创建点特效({
+        模型路径: 菲尼克斯尔数值与表现配置.特效.凤凰挽歌叠加,
+        X: 取单位X(hero),
+        Y: 取单位Y(hero),
+        Z: config.圈外命中特效高度,
+        持续秒: config.Tick秒,
+        缩放: config.圈外命中特效缩放,
+      });
     }
   });
   context.清理.登记周期回调("菲尼克斯尔凤凰挽歌Tick", tick);

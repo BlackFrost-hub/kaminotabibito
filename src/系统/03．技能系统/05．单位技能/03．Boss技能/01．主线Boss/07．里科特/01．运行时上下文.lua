@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local GetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
+local GetUnitState, GetUnitStateJapi, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
 local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.00．配置")
@@ -16,7 +16,7 @@ ____exports["取里科特当前阶段"] = function(boss)
     if boss == nil or boss == 0 then
         return 1
     end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     if not (maxLife > 0) then
         return 1
     end
@@ -30,8 +30,10 @@ ____exports["取里科特当前阶段"] = function(boss)
     return 1
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
 GetUnitState = jass.GetUnitState
+GetUnitStateJapi = japi.GetUnitState
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")

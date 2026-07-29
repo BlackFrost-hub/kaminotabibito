@@ -345,6 +345,12 @@ export function 执行Boss死亡结算(this: void, 配置: Boss死亡结算配�
   return true;
 }
 
+export function 按结算键执行Boss死亡结算(this: void, 结算键: string, Boss单位?: any, 击杀者?: any): boolean {
+  const 配置 = 按结算键获取Boss死亡结算配置(结算键);
+  if (配置 == null) return false;
+  return 执行Boss死亡结算(配置, Boss单位, 击杀者);
+}
+
 export function 尝试执行Boss死亡结算(this: void, Boss单位: any, 击杀者?: any): boolean {
   const 配置 = 获取Boss死亡结算配置(Boss单位);
   if (配置 == null) return false;

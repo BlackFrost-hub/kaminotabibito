@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getServerTime, GetUnitState, SetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
+local getServerTime, doHeal, GetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local _____4E24_5355_4F4D_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间距离平方"]
@@ -39,25 +39,31 @@ ____exports["推进安兹守护者模式"] = function(context)
     local minimumLife = maxLife * cfg["雅儿贝德锁血比例"]
     local life = GetUnitState(albedo, UNIT_STATE_LIFE)
     if life < minimumLife then
-        SetUnitState(albedo, UNIT_STATE_LIFE, minimumLife)
-        life = minimumLife
+        doHeal({
+            HealSource = albedo,
+            HealTarget = albedo,
+            HealAmount = minimumLife - life,
+            ItemHeal = false,
+            HealEffect = false
+        })
+        life = GetUnitState(albedo, UNIT_STATE_LIFE)
     end
     local now = getServerTime()
     state["当前生命比例"] = life / maxLife
     if state["阶段状态"] == "失衡" and now >= state["失衡结束Ms"] then
         state["阶段状态"] = state["当前生命比例"] < cfg["雅儿贝德狂怒阈值"] and "狂怒护卫" or "正常护卫"
-        local ____opt_15 = state["成员生命周期"]
-        if ____opt_15 ~= nil then
-            ____opt_15["设置状态"](____opt_15, "雅儿贝德", "活跃", "失衡结束")
+        local ____opt_16 = state["成员生命周期"]
+        if ____opt_16 ~= nil then
+            ____opt_16["设置状态"](____opt_16, "雅儿贝德", "活跃", "失衡结束")
         end
     end
     if state["阶段状态"] ~= "失衡" and state["当前生命比例"] <= state["下一个失衡生命比例"] and state["下一个失衡生命比例"] > cfg["雅儿贝德锁血比例"] then
         state["阶段状态"] = "失衡"
         state["失衡结束Ms"] = now + cfg["雅儿贝德失衡持续秒"] * 1000
         state["下一个失衡生命比例"] = state["下一个失衡生命比例"] - cfg["雅儿贝德失衡生命步进"]
-        local ____opt_17 = state["成员生命周期"]
-        if ____opt_17 ~= nil then
-            ____opt_17["设置状态"](____opt_17, "雅儿贝德", "失衡", "累计损失20%最大生命")
+        local ____opt_18 = state["成员生命周期"]
+        if ____opt_18 ~= nil then
+            ____opt_18["设置状态"](____opt_18, "雅儿贝德", "失衡", "累计损失20%最大生命")
         end
     elseif state["阶段状态"] ~= "失衡" then
         state["阶段状态"] = state["当前生命比例"] < cfg["雅儿贝德狂怒阈值"] and "狂怒护卫" or "正常护卫"
@@ -75,12 +81,13 @@ local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算
 local registerDamageModifier = ____require_result_3.registerDamageModifier
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 getServerTime = ____require_result_4.getServerTime
+local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+doHeal = ____require_result_5.doHeal
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 GetUnitState = jass.GetUnitState
-SetUnitState = jass.SetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitType = jass.IsUnitType
 local Cos = jass.Cos
@@ -97,12 +104,12 @@ local function _____67E5_627E_8054_5408_4E0A_4E0B_6587(unit)
         local i = 0
         while i < #contexts do
             local context = contexts[i + 1]
-            local ____temp_7 = context["安兹单位"] == unit
-            if not ____temp_7 then
-                local ____opt_5 = context["雅儿贝德"]
-                ____temp_7 = (____opt_5 and ____opt_5["单位"]) == unit
+            local ____temp_8 = context["安兹单位"] == unit
+            if not ____temp_8 then
+                local ____opt_6 = context["雅儿贝德"]
+                ____temp_8 = (____opt_6 and ____opt_6["单位"]) == unit
             end
-            if ____temp_7 then
+            if ____temp_8 then
                 return context
             end
             i = i + 1
@@ -195,12 +202,12 @@ ____exports["启动安兹守护者模式"] = function(context)
     if not _____5355_4F4D_6709_6548(context["安兹单位"]) or context["挑战已结束"] then
         return false
     end
-    local ____opt_8 = context["雅儿贝德"]
-    if (____opt_8 and ____opt_8["已初始化"]) == true and context["雅儿贝德"]["成员生命周期"] ~= nil then
+    local ____opt_9 = context["雅儿贝德"]
+    if (____opt_9 and ____opt_9["已初始化"]) == true and context["雅儿贝德"]["成员生命周期"] ~= nil then
         return true
     end
-    local ____opt_10 = context["雅儿贝德"]
-    local albedo = ____opt_10 and ____opt_10["单位"]
+    local ____opt_11 = context["雅儿贝德"]
+    local albedo = ____opt_11 and ____opt_11["单位"]
     if not _____5355_4F4D_6709_6548(albedo) then
         albedo = _____521B_5EFA_96C5_513F_8D1D_5FB7_5355_4F4D(context)
     end
@@ -228,9 +235,9 @@ ____exports["启动安兹守护者模式"] = function(context)
     }}})
     state["独占状态"] = _____521B_5EFA_53EF_62A2_5360_72EC_5360_72B6_6001_7BA1_7406_5668({["名称"] = "安兹与雅儿贝德联合技能独占", ["清理"] = context["清理"]})
     local boss = context["安兹单位"]
-    local ____self_12 = context["清理"]
-    ____self_12["登记清理"](
-        ____self_12,
+    local ____self_13 = context["清理"]
+    ____self_13["登记清理"](
+        ____self_13,
         "雅儿贝德护卫单位",
         function()
             _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B(boss)

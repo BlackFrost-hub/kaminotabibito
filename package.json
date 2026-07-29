@@ -5,8 +5,11 @@
   "scripts": {
     "build": "tstl && node scripts/fix-lua-for-pack.js && node scripts/sync-lua-from-ts.js",
     "build:full": "tstl && node scripts/fix-lua-for-pack.js && node scripts/sync-lua-from-ts.js",
+    "build:files": "node scripts/build-files.js",
     "build:lua": "tstl",
-    "fix:pack": "node scripts/fix-lua-for-pack.js"
+    "fix:pack": "node scripts/fix-lua-for-pack.js",
+    "check:boss-sfx-mono": "node scripts/check-boss-sfx-mono.js",
+    "fix:boss-sfx-mono": "node scripts/check-boss-sfx-mono.js --fix"
   },
   "devDependencies": {
     "typescript": "^6.0.2",

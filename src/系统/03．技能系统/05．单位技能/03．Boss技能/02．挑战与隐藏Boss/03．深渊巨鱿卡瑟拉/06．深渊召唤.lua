@@ -15,29 +15,32 @@ local _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C = ____14_FF0E_516C_5171_
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
+local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_0.doHeal
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local GetRandomReal = jass.GetRandomReal
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_1["创建可攻击机制单位"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_2["临时调整攻击"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_3["临时调整攻击"]
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
         return
     end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    local life = GetUnitState(boss, UNIT_STATE_LIFE)
-    local next = life + maxLife * ratio
-    SetUnitState(boss, UNIT_STATE_LIFE, next > maxLife and maxLife or next)
+    doHeal({
+        HealSource = boss,
+        HealTarget = boss,
+        HealAmount = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio,
+        ItemHeal = false,
+        HealEffect = false
+    })
 end
 local function _____5E7C_9C7F_6B7B_4EA1_6389_843D_6B8B_7247(context, killer)
     if not _____5355_4F4D_6709_6548(killer) then
@@ -92,8 +95,8 @@ local function _____521B_5EFA_6DF1_6E0A_5E7C_9C7F(context, angle)
             _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, cfg["吞噬回血比例"])
         end
     )
-    local ____self_3 = context["清理"]
-    ____self_3["登记延迟回调"](____self_3, "卡瑟拉-深渊幼鱿吞噬", id)
+    local ____self_4 = context["清理"]
+    ____self_4["登记延迟回调"](____self_4, "卡瑟拉-深渊幼鱿吞噬", id)
 end
 ____exports["释放卡瑟拉深渊召唤"] = function(context)
     local boss = context["Boss单位"]

@@ -59,8 +59,7 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 const { 取当前有效玩家人数 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数") as {
   取当前有效玩家人数: (this: void) => number;
 };
-const { createTimedEffect, 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
 
@@ -108,8 +107,22 @@ function 启动跟随分摊提示圈(this: void, context: 树魔首领运行时�
 
 function 播放点名特效(this: void, target: any): void {
   const cfg = 树魔首领数值与表现配置.远古诅咒;
-  createTimedEffect(cfg.点名特效路径, GetUnitX(target), GetUnitY(target), 0, cfg.点名特效持续秒);
-  createTimedEffect(cfg.点名叠加特效路径, GetUnitX(target), GetUnitY(target), 0, cfg.点名特效持续秒);
+  创建点特效({
+    模型路径: cfg.点名特效路径,
+    X: GetUnitX(target),
+    Y: GetUnitY(target),
+    Z: 0,
+    缩放: cfg.点名特效缩放,
+    持续秒: cfg.点名特效持续秒,
+  });
+  创建点特效({
+    模型路径: cfg.点名叠加特效路径,
+    X: GetUnitX(target),
+    Y: GetUnitY(target),
+    Z: 0,
+    缩放: cfg.点名叠加特效缩放,
+    持续秒: cfg.点名特效持续秒,
+  });
 }
 
 function 尝试播放树魔首领关键怪叫(this: void, boss: any): void {
@@ -177,7 +190,14 @@ function 执行远古诅咒后续爆发(this: void, context: 树魔首领运行�
   if (!单位有效(boss)) return;
   const cfg = 树魔首领数值与表现配置.远古诅咒;
   播放Boss坐标音效(树魔首领音效配置.远古诅咒.二段爆发, centerX, centerY, 树魔首领音效配置.默认裁断距离);
-  createTimedEffect(cfg.后续爆发特效路径, centerX, centerY, 0, cfg.后续爆发特效持续秒);
+  创建点特效({
+    模型路径: cfg.后续爆发特效路径,
+    X: centerX,
+    Y: centerY,
+    Z: 0,
+    缩放: cfg.后续爆发特效缩放,
+    持续秒: cfg.后续爆发特效持续秒,
+  });
   const radius2 = cfg.后续爆发半径 * cfg.后续爆发半径;
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {

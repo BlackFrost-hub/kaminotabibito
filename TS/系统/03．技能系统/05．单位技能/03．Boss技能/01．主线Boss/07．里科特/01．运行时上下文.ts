@@ -8,8 +8,10 @@ import { 播放里科特台词 } from "./10．台词播放";
 import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
@@ -70,7 +72,7 @@ export function 清理里科特上下文(this: void, boss: any): void {
 
 export function 取里科特当前阶段(this: void, boss: any): 里科特阶段 {
   if (boss == null || boss === 0) return 1;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return 1;
   const ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife;
   if (ratio <= 里科特数值与表现配置.阶段阈值.P3生命比例) return 3;

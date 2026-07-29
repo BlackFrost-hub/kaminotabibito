@@ -5,6 +5,9 @@
  */
 
 const jass = require("jass.common") as any;
+const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: number) => number;
+const 无敌技能Avul = 0x4176756C;
+const 无敌技能Bvul = 0x4276756C;
 
 export interface UnitFilterOptions {
     仅敌人?: boolean;
@@ -20,8 +23,8 @@ export interface UnitFilterOptions {
 }
 
 function isInvincibleUnit(unit: any): boolean {
-    if (!unit) return false;
-    return jass.IsUnitInvulnerable(unit);
+    if (unit == null || unit === 0) return false;
+    return GetUnitAbilityLevel(unit, 无敌技能Avul) > 0 || GetUnitAbilityLevel(unit, 无敌技能Bvul) > 0;
 }
 
 function isAncientUnit(unit: any): boolean {

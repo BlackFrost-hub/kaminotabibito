@@ -8,13 +8,11 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
 };
-const { 按结算键获取Boss死亡结算配置, 执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑") as {
-  按结算键获取Boss死亡结算配置: (this: void, 结算键: string) => any;
-  执行Boss死亡结算: (this: void, 配置: any, Boss单位?: any, 击杀者?: any) => boolean;
+const { 按结算键执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑") as {
+  按结算键执行Boss死亡结算: (this: void, 结算键: string, Boss单位?: any, 击杀者?: any) => boolean;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
-import { 写入剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 export { 教派最终Boss死亡剧情片段 } from "../01．第一章/17．第一章最终Boss教派死亡";
 
 const GetDyingUnit = jass.GetDyingUnit as (this: void) => any;
@@ -29,12 +27,8 @@ export function 执行蒙面人死亡(this: void, 参数: 剧情动作参数表)
   const dyingTypeId = GetUnitTypeId(dyingUnit);
   if (dyingTypeId !== stringToFourCCSafe("N05N") && dyingTypeId !== stringToFourCCSafe("N05M")) return;
 
-  写入剧情进度(Number(参数.设置剧情进度) || Number(参数.目标进度) || 18);
   UnitSuspendDecay(dyingUnit, true);
-  const 结算配置 = 按结算键获取Boss死亡结算配置("蒙面人");
-  if (结算配置 != null) {
-    执行Boss死亡结算(结算配置, dyingUnit);
-  }
+  按结算键执行Boss死亡结算("蒙面人", dyingUnit);
 
   const 固定掉落物品名 = String(参数.固定掉落物品名 ?? "");
   const 固定掉落物品ID = stringToFourCCSafe(按名字反查物品ID(固定掉落物品名));
@@ -51,9 +45,6 @@ export function 执行蒙面人死亡(this: void, 参数: 剧情动作参数表)
   }
 }
 
-function 执行第一章完成任务刷新(this: void): void {}
-
 export const 第一章最终Boss教派死亡剧情动作注册表: Record<string, 剧情动作处理器> = {
   "SW01死亡事件_蒙面人死亡": 执行蒙面人死亡,
-  "JLC精灵村_第一章完成任务刷新": 执行第一章完成任务刷新,
 };

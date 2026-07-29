@@ -81,11 +81,12 @@ const { 创建测试中心平移映射, 按测试映射平移矩形, 复制平�
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
-const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
+const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 准备Boss测试固定山丘之王, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
   Boss测试单位存活: (this: void, unit: any) => boolean;
   设置Boss测试单位满血: (this: void, unit: any, 最大生命值?: number) => void;
   获取Boss测试玩家基准英雄: (this: void, player: any) => any;
   准备Boss测试固定步兵: (this: void, unit: any, x: number, y: number, facing?: number) => any;
+  准备Boss测试固定山丘之王: (this: void, unit: any, x: number, y: number, facing?: number) => any;
   移除Boss测试单位: (this: void, unit: any) => void;
   注册Boss测试命令组: (this: void, 配置: any) => void;
 };
@@ -107,8 +108,8 @@ const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const 最近测试Boss: Record<number, any> = {};
-const 最近测试步兵1: Record<number, any> = {};
-const 最近测试步兵2: Record<number, any> = {};
+const 最近测试步兵: Record<number, any> = {};
+const 最近测试山丘之王: Record<number, any> = {};
 
 function stringToFourCC(this: void, s: string): number {
   return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
@@ -153,11 +154,9 @@ function 应用米亚测试场地配置(this: void, context: any): void {
 
 function 准备米亚测试场景(this: void, player: any, hero: any, boss: any): any {
   const pid = GetPlayerId(player);
-  SetUnitPosition(hero, 临时测试玩家X, 临时测试玩家Y);
-  SetUnitFacing(hero, 90);
   设置Boss测试单位满血(hero);
-  最近测试步兵1[pid] = 准备Boss测试固定步兵(最近测试步兵1[pid], 临时测试玩家X - 220, 临时测试玩家Y + 220, 90);
-  最近测试步兵2[pid] = 准备Boss测试固定步兵(最近测试步兵2[pid], 临时测试玩家X + 220, 临时测试玩家Y + 220, 90);
+  最近测试步兵[pid] = 准备Boss测试固定步兵(最近测试步兵[pid], 临时测试玩家X - 220, 临时测试玩家Y + 220, 90);
+  最近测试山丘之王[pid] = 准备Boss测试固定山丘之王(最近测试山丘之王[pid], 临时测试玩家X + 220, 临时测试玩家Y + 220, 90);
   SelectUnitForPlayerSingle(boss, player);
   StarOther_PanCameraToTimedForPlayer(player, 临时测试场地中心X, 临时测试场地中心Y, 0.2);
   应用米亚测试场地配置(null);
@@ -190,17 +189,17 @@ function 清理米亚测试(this: void, player: any, _context: any): void {
   const boss = 最近测试Boss[pid];
   if (boss != null && boss !== 0) 清理米亚上下文(boss);
   重置米亚场地配置();
-  移除Boss测试单位(最近测试步兵1[pid]);
-  移除Boss测试单位(最近测试步兵2[pid]);
+  移除Boss测试单位(最近测试步兵[pid]);
+  移除Boss测试单位(最近测试山丘之王[pid]);
   移除Boss测试单位(boss);
-  最近测试步兵1[pid] = undefined;
-  最近测试步兵2[pid] = undefined;
+  最近测试步兵[pid] = undefined;
+  最近测试山丘之王[pid] = undefined;
   最近测试Boss[pid] = undefined;
   if (globals.udg_Boss === boss) globals.udg_Boss = null;
 }
 
 function on米亚技能1测试命令(this: void, player: any, context: any): void {
-  const target = 最近测试步兵1[GetPlayerId(player)];
+  const target = 最近测试步兵[GetPlayerId(player)];
   if (Boss测试单位存活(target)) 释放米亚腐化爪击(context, target);
 }
 
@@ -216,7 +215,7 @@ function on米亚技能3测试命令(this: void, _player: any, context: any): vo
 }
 
 function on米亚技能4测试命令(this: void, player: any, context: any): void {
-  const target = 最近测试步兵1[GetPlayerId(player)];
+  const target = 最近测试步兵[GetPlayerId(player)];
   if (!Boss测试单位存活(target)) return;
   const nowMs = getServerTime();
   context.阶段 = 1;
@@ -247,8 +246,8 @@ function on米亚技能8测试命令(this: void, player: any, context: any): voi
   context.上次平台超载检测Ms = 0;
   const 区域 = context.安全域区域组.区域列表[1];
   if (区域 != null) {
-    SetUnitPosition(最近测试步兵1[pid], 区域.中心X - 45, 区域.中心Y);
-    SetUnitPosition(最近测试步兵2[pid], 区域.中心X + 45, 区域.中心Y);
+    SetUnitPosition(最近测试步兵[pid], 区域.中心X - 45, 区域.中心Y);
+    SetUnitPosition(最近测试山丘之王[pid], 区域.中心X + 45, 区域.中心Y);
   }
   刷新米亚平台超载惩罚(context, getServerTime());
 }

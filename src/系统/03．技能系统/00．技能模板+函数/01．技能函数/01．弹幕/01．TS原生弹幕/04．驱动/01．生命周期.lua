@@ -25,10 +25,14 @@ ____exports["结束原生弹幕实例"] = function(_____5B9E_4F8B, _____539F_56E
         return
     end
     _____5B9E_4F8B["已结束"] = true
-    if _____5B9E_4F8B["附着特效"] ~= nil and _____5B9E_4F8B["附着特效"] ~= 0 then
-        DestroyEffect(_____5B9E_4F8B["附着特效"])
-        _____5B9E_4F8B["附着特效"] = nil
+    if _____5B9E_4F8B["附加特效1"] ~= nil and _____5B9E_4F8B["附加特效1"] ~= 0 then
+        DestroyEffect(_____5B9E_4F8B["附加特效1"])
     end
+    if _____5B9E_4F8B["附加特效2"] ~= nil and _____5B9E_4F8B["附加特效2"] ~= 0 then
+        DestroyEffect(_____5B9E_4F8B["附加特效2"])
+    end
+    _____5B9E_4F8B["附加特效1"] = nil
+    _____5B9E_4F8B["附加特效2"] = nil
     local _____56DE_8C03 = _____5B9E_4F8B["参数"]["on结束"]
     if _____56DE_8C03 ~= nil then
         _____56DE_8C03(_____539F_56E0, _____5B9E_4F8B.id)

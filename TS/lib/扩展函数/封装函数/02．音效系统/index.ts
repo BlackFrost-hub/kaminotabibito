@@ -8,6 +8,7 @@ export * from "./03．3D音效播放";
 export * from "./04．MP3音效播放";
 export * from "./05．UI音效";
 export * from "./06．参数设置";
+export * from "./07．原生任务音效";
 
 import { SoundModel } from "./01．声音模型";
 import { setDefaultSoundModel } from "./02．音效池";

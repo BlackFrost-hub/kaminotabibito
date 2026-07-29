@@ -18,9 +18,6 @@ export function 执行精灵森谷传送抵达(this: void, 参数: 剧情动作�
   PanCameraToTimed(Number(参数.相机X) || -22835.7, Number(参数.相机Y) || -14874.0, 0);
 }
 
-function 执行看守者目标刷新(this: void): void {}
-
 export const 精灵森谷传送抵达剧情动作注册表: Record<string, 剧情动作处理器> = {
   "JLC精灵城_传送阵抵达": 执行精灵森谷传送抵达,
-  "JLC精灵城_看守者目标刷新": 执行看守者目标刷新,
 };

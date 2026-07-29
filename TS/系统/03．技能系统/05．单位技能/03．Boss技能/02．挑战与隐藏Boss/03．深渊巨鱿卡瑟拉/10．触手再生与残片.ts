@@ -25,7 +25,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -59,6 +58,9 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
 const { 卡瑟拉BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉") as {
   卡瑟拉BuffID: { 触手精华: string };
 };
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
 
 interface 再生触手实例 {
   context: 卡瑟拉运行时上下文;
@@ -71,10 +73,7 @@ let 已注册 = false;
 
 function 治疗Boss固定值(this: void, boss: any, amount: number): void {
   if (!单位有效(boss) || !(amount > 0)) return;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  const life = GetUnitState(boss, UNIT_STATE_LIFE);
-  const next = life + amount;
-  SetUnitState(boss, UNIT_STATE_LIFE, next > maxLife ? maxLife : next);
+  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: amount, ItemHeal: false, HealEffect: false });
 }
 
 function 选择最低生命玩家(this: void, boss: any): any {

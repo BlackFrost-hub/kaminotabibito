@@ -33,13 +33,15 @@ const { 广播单位提示 } = require('系统.09．表现系统.06．广播提�
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
+  doHeal: (this: void, params: any) => number;
+};
 
 const jass = require('jass.common') as any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
@@ -56,7 +58,6 @@ const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const 血之复生技能Key = '血之复生';
 
@@ -135,7 +136,13 @@ function 完成复生成功(this: void, context: 夏提雅运行时上下文, �
   const boss = context.Boss单位;
   const cfg = 夏提雅数值与表现配置.血之复生;
   const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  SetUnitState(boss, UNIT_STATE_LIFE, maxLife * cfg.单枚恢复生命比例 * 剩余结晶);
+  doHeal({
+    HealSource: boss,
+    HealTarget: boss,
+    HealAmount: maxLife * cfg.单枚恢复生命比例 * 剩余结晶,
+    ItemHeal: false,
+    HealEffect: false,
+  });
   播放复生成功表现(boss);
   播放Boss坐标音效(夏提雅数值与表现配置.音效.血之复生成功, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   context.阶段 = 'P3真祖血宴';
@@ -186,11 +193,8 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
       受击次数: hitCount,
       计数模式: '纯普攻或最终伤害阈值',
       最终伤害计数阈值: cfg.技能伤害计数阈值,
+      同步生命条: true,
       缩放: cfg.结晶缩放,
-      on受击: function 夏提雅复生结晶受击(this: void, unit: any, remaining: number): void {
-        if (remaining <= 0) return;
-        SetUnitState(unit, UNIT_STATE_LIFE, GetUnitState(unit, UNIT_STATE_MAX_LIFE) * remaining / hitCount);
-      },
       on击破: function 夏提雅复生结晶击破(this: void, unit: any): void {
         播放结晶破裂(unit);
         const remaining = 统计存活结晶(crystals);

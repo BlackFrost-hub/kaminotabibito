@@ -15,7 +15,6 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
@@ -58,6 +57,9 @@ const { 开始牵引 } = require("系统.03．技能系统.00．技能模板+函
 const { 执行非伤害生命移除 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除") as {
   执行非伤害生命移除: (this: void, 参数: any) => number;
 };
+const { 魔法增减 } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
+  魔法增减: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean) => number;
+};
 const { 创建点特效, createUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
@@ -73,7 +75,7 @@ function 更新魔法显示(this: void, context: 菲利斯运行时上下文): v
   const maxMana = GetUnitState(boss, UNIT_STATE_MAX_MANA);
   if (maxMana > 0) {
     const shown = context.当前魔法充能 > maxMana ? maxMana : context.当前魔法充能;
-    SetUnitState(boss, UNIT_STATE_MANA, shown);
+    魔法增减(boss, shown - GetUnitState(boss, UNIT_STATE_MANA), false, false);
   }
   registerManualBuff(boss, 菲利斯BuffID.魔力汲取, 2.0, context.当前魔法充能, { sourceName: "菲利斯-魔力汲取" });
 }

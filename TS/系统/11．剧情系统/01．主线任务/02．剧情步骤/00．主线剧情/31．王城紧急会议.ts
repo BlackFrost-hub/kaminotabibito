@@ -1,5 +1,6 @@
 import type { 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 停止触发单位, 读取触发单位, 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 发布主线节点目标 } from "../../00．剧情系统核心工具/10．标准剧情动作";
 import { 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 启动王城攻城战, 结束菲利斯攻城等待, 登记存活攻城单位为菲利斯护卫 } from "./31A．王城攻城战控制器";
 import { 准备耶提尔菲利斯协战 } from "./31B．耶提尔协战控制器";
@@ -63,6 +64,11 @@ export function 布置王城会议席位(this: void): void {
   }
 }
 
+export function 执行前往会议室任务(this: void): void {
+  布置王城会议席位();
+  发布主线节点目标(31);
+}
+
 export function 执行紧急会议(this: void): void {
   停止触发单位();
   布置王城会议席位();
@@ -70,6 +76,7 @@ export function 执行紧急会议(this: void): void {
 
 export function 执行启动王城攻城战(this: void): void {
   启动王城攻城战();
+  发布主线节点目标(32);
 }
 
 export function 执行准备耶提尔菲利斯协战(this: void): void {
@@ -79,7 +86,7 @@ export function 执行准备耶提尔菲利斯协战(this: void): void {
 }
 
 export const 王城紧急会议剧情动作注册表: Record<string, 剧情动作处理器> = {
-  "JLC精灵城_前往会议室任务": 布置王城会议席位,
+  "JLC精灵城_前往会议室任务": 执行前往会议室任务,
   "JLC精灵城_紧急会议": 执行紧急会议,
   "JLC精灵城_启动王城攻城战": 执行启动王城攻城战,
   "JLC精灵城_准备耶提尔菲利斯协战": 执行准备耶提尔菲利斯协战,

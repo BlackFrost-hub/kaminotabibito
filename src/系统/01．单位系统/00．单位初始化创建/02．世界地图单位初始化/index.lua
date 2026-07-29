@@ -73,6 +73,14 @@ do
     end
 end
 do
+    local ____export = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.09．世界地图单位缓存")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.10．世界地图单位总调度")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then

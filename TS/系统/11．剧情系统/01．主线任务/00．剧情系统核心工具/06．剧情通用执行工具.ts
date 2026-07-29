@@ -74,6 +74,7 @@ import type { 剧情动作参数表 } from "./00．剧情动作类型";
 import { 读取当前剧情动作上下文, 写入剧情进度 } from "./01．剧情动作上下文";
 import { 切换剧情大门, 发送剧情任务消息, 发送剧情小地图信号 } from "./02．剧情动作桥接";
 import { 读取剧情运行时单位 } from "./08．剧情运行时单位";
+import { 进入剧情电影模式, 退出剧情电影模式并恢复镜头 } from "./12．剧情电影镜头";
 
 const AddSpecialEffect = jass.AddSpecialEffect as (this: void, modelName: string, x: number, y: number) => any;
 const CreateFogModifierRect = jass.CreateFogModifierRect as (
@@ -430,16 +431,10 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
   if (设置进度 > 0) 写入剧情进度(设置进度);
 
   if (取参数布尔(参数, "开启电影模式")) {
-    const { CinematicModeBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
-      CinematicModeBJ: (this: void, cineMode: boolean, forForce: any) => void;
-    };
-    CinematicModeBJ(true, GetPlayersAll());
+    进入剧情电影模式();
   }
   if (取参数布尔(参数, "关闭电影模式")) {
-    const { CinematicModeBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
-      CinematicModeBJ: (this: void, cineMode: boolean, forForce: any) => void;
-    };
-    CinematicModeBJ(false, GetPlayersAll());
+    退出剧情电影模式并恢复镜头();
   }
 
   if (取参数布尔(参数, "玩家英雄组暂停") || 取参数布尔(参数, "玩家英雄组无敌")) {

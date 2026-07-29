@@ -58,7 +58,7 @@ const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
@@ -232,7 +232,7 @@ function 造成时间停止伤害(this: void, boss: any, target: any, damage: nu
     伤害: damage,
     attack: false,
     ranged: true,
-    attackType: ATTACK_TYPE_MAGIC,
+    attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_MAGIC,
     weaponType: WEAPON_TYPE_WHOKNOWS,
     来源类型: 'Boss技能',

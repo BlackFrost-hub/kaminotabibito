@@ -40,7 +40,7 @@ local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local DestroyEffect = jass.DestroyEffect
-local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local function _____53D6_7977_6F6E_76EE_6807_5217_8868(boss, target)
@@ -290,7 +290,7 @@ ____exports["释放失名祷潮"] = function(context, target)
                             ["伤害"] = damage,
                             attack = false,
                             ranged = true,
-                            attackType = ATTACK_TYPE_MAGIC,
+                            attackType = ATTACK_TYPE_NORMAL,
                             ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                             weaponType = WEAPON_TYPE_WHOKNOWS,
                             ["来源类型"] = "Boss技能",

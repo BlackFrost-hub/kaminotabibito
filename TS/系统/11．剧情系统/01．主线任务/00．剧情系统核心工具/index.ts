@@ -7,3 +7,7 @@ export * from "./05．紧凑剧情片段编译";
 export * from "./06．剧情通用执行工具";
 export * from "./07．剧情技能事件辅助";
 export * from "./08．剧情运行时单位";
+export * from "./09．主线节点配置";
+export * from "./10．标准剧情动作";
+export * from "./11．剧情Boss战启动桥接";
+export * from "./12．剧情电影镜头";

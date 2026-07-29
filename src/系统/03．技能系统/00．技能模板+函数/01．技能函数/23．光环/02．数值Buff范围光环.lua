@@ -1,10 +1,13 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____24_FF0E_53E5_67C4_4E0A_4E0B_6587_6258_7BA1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.24．句柄上下文托管")
 local _____521B_5EFA_53E5_67C4_4E0A_4E0B_6587_6258_7BA1_5668 = ____24_FF0E_53E5_67C4_4E0A_4E0B_6587_6258_7BA1["创建句柄上下文托管器"]
 local ____01_FF0E_8303_56F4_5149_73AF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.23．光环.01．范围光环")
+local _____521B_5EFA_624B_52A8_8303_56F4_5149_73AF = ____01_FF0E_8303_56F4_5149_73AF["创建手动范围光环"]
 local _____6CE8_518C_6301_6709_578B_8303_56F4_5149_73AF = ____01_FF0E_8303_56F4_5149_73AF["注册持有型范围光环"]
+local _____540C_6B65_624B_52A8_8303_56F4_5149_73AF = ____01_FF0E_8303_56F4_5149_73AF["同步手动范围光环"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
@@ -16,7 +19,7 @@ local function _____53D6_53E5_67C4ID(handle)
     end
     return GetHandleId(handle) or 0
 end
-____exports["注册数值Buff范围光环"] = function(_____53C2_6570)
+local function _____521B_5EFA_6570_503CBuff_8303_56F4_5149_73AF(_____53C2_6570, _____6CE8_518C_8303_56F4_5149_73AF)
     local _____6258_7BA1_5668 = _____521B_5EFA_53E5_67C4_4E0A_4E0B_6587_6258_7BA1_5668(_____53C2_6570["状态ID"])
     local function _____53D6_6216_5EFA_72B6_6001(target)
         local old = _____6258_7BA1_5668["读取"](target)
@@ -92,12 +95,13 @@ ____exports["注册数值Buff范围光环"] = function(_____53C2_6570)
             return
         end
         _____72B6_6001["总层数"] = _____8BA1_7B97_603B_5C42_6570(_____72B6_6001)
+        local _____6765_6E90 = _____53D6_6765_6E90(_____72B6_6001, _____4F18_5148_6765_6E90)
         do
             local i = 0
             while i < #_____53C2_6570["数值效果列表"] do
                 local effect = _____53C2_6570["数值效果列表"][i + 1]
                 local oldValue = _____72B6_6001["已应用值表"][effect.key] or 0
-                local nextValue = _____72B6_6001["总层数"] > 0 and effect["计算总值"](target, _____72B6_6001["总层数"], oldValue) or 0
+                local nextValue = _____72B6_6001["总层数"] > 0 and effect["计算总值"](target, _____72B6_6001["总层数"], oldValue, _____6765_6E90) or 0
                 local delta = nextValue - oldValue
                 if delta ~= 0 then
                     effect["应用差值"](target, delta)
@@ -106,8 +110,7 @@ ____exports["注册数值Buff范围光环"] = function(_____53C2_6570)
                 i = i + 1
             end
         end
-        local source = _____53D6_6765_6E90(_____72B6_6001, _____4F18_5148_6765_6E90)
-        _____540C_6B65Buff(target, _____72B6_6001, source)
+        _____540C_6B65Buff(target, _____72B6_6001, _____6765_6E90)
         if _____72B6_6001["总层数"] <= 0 then
             _____6258_7BA1_5668["清空"](target)
         else
@@ -134,9 +137,7 @@ ____exports["注册数值Buff范围光环"] = function(_____53C2_6570)
         __TS__Delete(_____72B6_6001["持有者表"], holderId)
         _____540C_6B65_76EE_6807(target)
     end
-    _____6CE8_518C_6301_6709_578B_8303_56F4_5149_73AF({
-        ["物品类型ID"] = _____53C2_6570["物品类型ID"],
-        ["间隔毫秒"] = _____53C2_6570["间隔毫秒"],
+    return _____6CE8_518C_8303_56F4_5149_73AF({
         ["半径"] = _____53C2_6570["半径"],
         ["目标类型"] = _____53C2_6570["目标类型"],
         ["去重类型"] = _____53C2_6570["去重类型"],
@@ -147,5 +148,21 @@ ____exports["注册数值Buff范围光环"] = function(_____53C2_6570)
         ["同步目标效果"] = _____8BBE_7F6E_6301_6709_8005_8D21_732E,
         ["移除目标效果"] = _____79FB_9664_6301_6709_8005_8D21_732E
     })
+end
+local function _____6CE8_518C_624B_52A8_6570_503C_8303_56F4_5149_73AF(_____53C2_6570)
+    return _____521B_5EFA_624B_52A8_8303_56F4_5149_73AF(_____53C2_6570)
+end
+____exports["注册数值Buff范围光环"] = function(_____53C2_6570)
+    local function _____6CE8_518C_5F53_524D_6301_6709_578B_8303_56F4_5149_73AF(_____8303_56F4_53C2_6570)
+        _____6CE8_518C_6301_6709_578B_8303_56F4_5149_73AF(__TS__ObjectAssign({}, _____8303_56F4_53C2_6570, {["物品类型ID"] = _____53C2_6570["物品类型ID"], ["间隔毫秒"] = _____53C2_6570["间隔毫秒"]}))
+        return 0
+    end
+    _____521B_5EFA_6570_503CBuff_8303_56F4_5149_73AF(_____53C2_6570, _____6CE8_518C_5F53_524D_6301_6709_578B_8303_56F4_5149_73AF)
+end
+____exports["创建手动数值Buff范围光环"] = function(_____53C2_6570)
+    return _____521B_5EFA_6570_503CBuff_8303_56F4_5149_73AF(_____53C2_6570, _____6CE8_518C_624B_52A8_6570_503C_8303_56F4_5149_73AF)
+end
+____exports["同步手动数值Buff范围光环"] = function(_____5149_73AFID, _____6301_6709_8005, _____751F_6548)
+    _____540C_6B65_624B_52A8_8303_56F4_5149_73AF(_____5149_73AFID, _____6301_6709_8005, _____751F_6548)
 end
 return ____exports

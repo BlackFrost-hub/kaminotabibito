@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local _____8BA1_7B97_6B65_9AA4_6301_7EED_65F6_95F4, _____5B89_6392_4E0B_4E00_6B65, _____7ED3_675F_5F53_524D_5267_60C5_7247_6BB5, _____83B7_53D6_6267_884C_4E3B_7EBF_5267_60C5_52A8_4F5C_51FD_6570, _____6267_884C_5267_60C5_5EF6_8FDF_4EFB_52A1, _____5C1D_8BD5_505C_6B62_5267_60C5_5EF6_8FDF_4EFB_52A1_626B_63CF, _____6E05_7406_5267_60C5_5EF6_8FDF_4EFB_52A1, ____on_5267_60C5_5EF6_8FDF_4EFB_52A1_626B_63CF, _____6DFB_52A0_5267_60C5_5EF6_8FDF_4EFB_52A1, _____6267_884C_5BF9_767D_6B65_9AA4, _____8BFB_53D6_5F53_524D_5267_60C5_89E6_53D1_5355_4F4D, _____8BFB_53D6_8BF4_8BDD_8005_5355_4F4D, _____6267_884CUIDialog_6B65_9AA4, _____6267_884CUI_5E7F_64AD_6B65_9AA4, _____6267_884C_5E7F_64AD_6B65_9AA4, _____6267_884C_7B49_5F85_6B65_9AA4, _____6267_884C_81EA_5B9A_4E49_52A8_4F5C_6B65_9AA4, _____8BFB_53D6_5355_4F4D_5F15_7528, _____542F_52A8_5267_60C5Boss_6218, _____6267_884CBoss_6218_542F_52A8_6B65_9AA4, _____6267_884C_7ED9_7269_54C1_6B65_9AA4, _____6267_884C_5F53_524D_5267_60C5_6B65_9AA4, _____79FB_9664_5355_4F4D_6682_505C, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90, addPeriodicCallback, removePeriodicCallback, getServerTime, TransmissionFromUnitWithNameBJ, CinematicModeBJ, GetPlayersAll, _____53D1_9001_5934_50CF_63D0_793A_7ED9_73A9_5BB6, _____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6, _____5E7F_64AD_5355_4F4D_63D0_793A, YDUserDataGetSafe, YDUserDataSetSafe, _____542F_52A8Boss_6218_8FD0_884C, _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E, _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8, _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD, debugLogForce, Player, SetUnitInvulnerable, bj_TIMETYPE_SET, _____5267_60C5_64AD_653E_5668_6A21_5757_540D, ____Boss_6218_8868_540D, ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5, ____Boss_6218_89E6_53D1_73A9_5BB6_5B57_6BB5, _____9ED8_8BA4_5E7F_64AD_5934_50CF_8DEF_5F84, _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001, _____5F53_524D_7247_6BB5, _____5267_60C5_5EF6_8FDF_4EFB_52A1_5217_8868, _____5267_60C5_5EF6_8FDF_4EFB_52A1_626B_63CF_56DE_8C03ID, _____6267_884C_4E3B_7EBF_5267_60C5_52A8_4F5C_51FD_6570
+local _____8BA1_7B97_6B65_9AA4_6301_7EED_65F6_95F4, _____5B89_6392_4E0B_4E00_6B65, _____7ED3_675F_5F53_524D_5267_60C5_7247_6BB5, _____83B7_53D6_6267_884C_4E3B_7EBF_5267_60C5_52A8_4F5C_51FD_6570, _____6267_884C_5267_60C5_5EF6_8FDF_4EFB_52A1, _____5C1D_8BD5_505C_6B62_5267_60C5_5EF6_8FDF_4EFB_52A1_626B_63CF, _____6E05_7406_5267_60C5_5EF6_8FDF_4EFB_52A1, ____on_5267_60C5_5EF6_8FDF_4EFB_52A1_626B_63CF, _____6DFB_52A0_5267_60C5_5EF6_8FDF_4EFB_52A1, _____6267_884C_5BF9_767D_6B65_9AA4, _____8BFB_53D6_5F53_524D_5267_60C5_89E6_53D1_5355_4F4D, _____8BFB_53D6_8BF4_8BDD_8005_5355_4F4D, _____6267_884CUIDialog_6B65_9AA4, _____6267_884CUI_5E7F_64AD_6B65_9AA4, _____6267_884C_5E7F_64AD_6B65_9AA4, _____6267_884C_7B49_5F85_6B65_9AA4, _____6267_884C_81EA_5B9A_4E49_52A8_4F5C_6B65_9AA4, _____8BFB_53D6_5355_4F4D_5F15_7528, _____6267_884CBoss_6218_542F_52A8_6B65_9AA4, _____6267_884C_7ED9_7269_54C1_6B65_9AA4, _____6267_884C_5F53_524D_5267_60C5_6B65_9AA4, addPeriodicCallback, removePeriodicCallback, getServerTime, TransmissionFromUnitWithNameBJ, GetPlayersAll, _____53D1_9001_5934_50CF_63D0_793A_7ED9_73A9_5BB6, _____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6, _____5E7F_64AD_5355_4F4D_63D0_793A, YDUserDataGetSafe, debugLogForce, Player, bj_TIMETYPE_SET, _____5267_60C5_64AD_653E_5668_6A21_5757_540D, _____9ED8_8BA4_5E7F_64AD_5934_50CF_8DEF_5F84, _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001, _____5F53_524D_7247_6BB5, _____5267_60C5_5EF6_8FDF_4EFB_52A1_5217_8868, _____5267_60C5_5EF6_8FDF_4EFB_52A1_626B_63CF_56DE_8C03ID, _____6267_884C_4E3B_7EBF_5267_60C5_52A8_4F5C_51FD_6570
 local ____01_FF0E_5267_60C5_7247_6BB5_914D_7F6E_8868 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．剧情片段配置表")
 local _____4E3B_7EBF_5267_60C5_7247_6BB5_914D_7F6E_8868 = ____01_FF0E_5267_60C5_7247_6BB5_914D_7F6E_8868.default
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
@@ -11,6 +11,10 @@ local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11�
 local _____6309_540D_5B57_7ED9_89E6_53D1_5355_4F4D_7269_54C1 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["按名字给触发单位物品"]
 local _____6267_884C_901A_7528_5267_60C5_52A8_4F5C = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["执行通用剧情动作"]
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
+local ____11_FF0E_5267_60C5Boss_6218_542F_52A8_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.11．剧情Boss战启动桥接")
+local _____542F_52A8_5267_60C5Boss_6218 = ____11_FF0E_5267_60C5Boss_6218_542F_52A8_6865_63A5["启动剧情Boss战"]
+local ____12_FF0E_5267_60C5_7535_5F71_955C_5934 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情电影镜头")
+local _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934 = ____12_FF0E_5267_60C5_7535_5F71_955C_5934["退出剧情电影模式并恢复镜头"]
 function _____8BA1_7B97_6B65_9AA4_6301_7EED_65F6_95F4(seconds)
     local _____500D_901F = _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001["当前倍速"] > 0 and _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001["当前倍速"] or 1
     local result = seconds / _____500D_901F
@@ -38,10 +42,7 @@ function _____7ED3_675F_5F53_524D_5267_60C5_7247_6BB5()
     _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001["当前片段ID"] = nil
     _____5F53_524D_7247_6BB5 = nil
     _____6E05_7406_5267_60C5_5EF6_8FDF_4EFB_52A1(_____64AD_653E_4E16_4EE3)
-    CinematicModeBJ(
-        false,
-        GetPlayersAll()
-    )
+    _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934()
     if _____7247_6BB5ID ~= "" then
         debugLogForce(_____5267_60C5_64AD_653E_5668_6A21_5757_540D, "剧情片段结束", _____7247_6BB5ID)
     end
@@ -313,44 +314,15 @@ function _____8BFB_53D6_5355_4F4D_5F15_7528(_____5F15_7528)
     end
     return _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(_____5F15_7528)
 end
-function _____542F_52A8_5267_60C5Boss_6218(bossUnit)
-    if bossUnit == nil or bossUnit == 0 then
-        return
-    end
-    if not _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD(bossUnit) then
-        _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8(bossUnit, "Boss战.绑定单位")
-    end
-    _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E(bossUnit)
-    YDUserDataSetSafe(
-        "string",
-        ____Boss_6218_8868_540D,
-        ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5,
-        "unit",
-        bossUnit
-    )
-    local _____89E6_53D1_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
-    if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then
-        YDUserDataSetSafe(
-            "string",
-            ____Boss_6218_8868_540D,
-            ____Boss_6218_89E6_53D1_73A9_5BB6_5B57_6BB5,
-            "unit",
-            _____89E6_53D1_5355_4F4D
-        )
-    end
-    _____79FB_9664_5355_4F4D_6682_505C(bossUnit, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
-    SetUnitInvulnerable(bossUnit, false)
-    _____542F_52A8Boss_6218_8FD0_884C(bossUnit)
-end
 function _____6267_884CBoss_6218_542F_52A8_6B65_9AA4(_____6B65_9AA4)
     if _____6B65_9AA4.type ~= "startBossFight" then
         return
     end
-    local ____8BFB_53D6_5355_4F4D_5F15_7528_result_11 = _____8BFB_53D6_5355_4F4D_5F15_7528(_____6B65_9AA4["Boss引用"])
-    if ____8BFB_53D6_5355_4F4D_5F15_7528_result_11 == nil then
-        ____8BFB_53D6_5355_4F4D_5F15_7528_result_11 = _____8BFB_53D6_5355_4F4D_5F15_7528(_____6B65_9AA4["Boss名"] and "Boss." .. tostring(_____6B65_9AA4["Boss名"]) or nil)
+    local ____8BFB_53D6_5355_4F4D_5F15_7528_result_7 = _____8BFB_53D6_5355_4F4D_5F15_7528(_____6B65_9AA4["Boss引用"])
+    if ____8BFB_53D6_5355_4F4D_5F15_7528_result_7 == nil then
+        ____8BFB_53D6_5355_4F4D_5F15_7528_result_7 = _____8BFB_53D6_5355_4F4D_5F15_7528(_____6B65_9AA4["Boss名"] and "Boss." .. tostring(_____6B65_9AA4["Boss名"]) or nil)
     end
-    local bossUnit = ____8BFB_53D6_5355_4F4D_5F15_7528_result_11
+    local bossUnit = ____8BFB_53D6_5355_4F4D_5F15_7528_result_7
     _____542F_52A8_5267_60C5Boss_6218(bossUnit)
     _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001["当前步骤索引"] = _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001["当前步骤索引"] + 1
     _____6267_884C_5F53_524D_5267_60C5_6B65_9AA4()
@@ -380,44 +352,44 @@ function _____6267_884C_5F53_524D_5267_60C5_6B65_9AA4()
     end
     local _____6B65_9AA4 = _____5F53_524D_7247_6BB5["步骤列表"][_____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001["当前步骤索引"] + 1]
     repeat
-        local ____switch105 = _____6B65_9AA4.type
-        local ____cond105 = ____switch105 == "dialog"
-        if ____cond105 then
+        local ____switch101 = _____6B65_9AA4.type
+        local ____cond101 = ____switch101 == "dialog"
+        if ____cond101 then
             _____6267_884C_5BF9_767D_6B65_9AA4(_____6B65_9AA4)
             return
         end
-        ____cond105 = ____cond105 or ____switch105 == "broadcast"
-        if ____cond105 then
+        ____cond101 = ____cond101 or ____switch101 == "broadcast"
+        if ____cond101 then
             _____6267_884C_5E7F_64AD_6B65_9AA4(_____6B65_9AA4)
             return
         end
-        ____cond105 = ____cond105 or ____switch105 == "wait"
-        if ____cond105 then
+        ____cond101 = ____cond101 or ____switch101 == "wait"
+        if ____cond101 then
             _____6267_884C_7B49_5F85_6B65_9AA4(_____6B65_9AA4)
             return
         end
-        ____cond105 = ____cond105 or ____switch105 == "runAction"
-        if ____cond105 then
+        ____cond101 = ____cond101 or ____switch101 == "runAction"
+        if ____cond101 then
             _____6267_884C_81EA_5B9A_4E49_52A8_4F5C_6B65_9AA4(_____6B65_9AA4)
             return
         end
-        ____cond105 = ____cond105 or ____switch105 == "startBossFight"
-        if ____cond105 then
+        ____cond101 = ____cond101 or ____switch101 == "startBossFight"
+        if ____cond101 then
             _____6267_884CBoss_6218_542F_52A8_6B65_9AA4(_____6B65_9AA4)
             return
         end
-        ____cond105 = ____cond105 or ____switch105 == "giveItem"
-        if ____cond105 then
+        ____cond101 = ____cond101 or ____switch101 == "giveItem"
+        if ____cond101 then
             _____6267_884C_7ED9_7269_54C1_6B65_9AA4(_____6B65_9AA4)
             return
         end
         do
-            local ____6267_884C_901A_7528_5267_60C5_52A8_4F5C_16 = _____6267_884C_901A_7528_5267_60C5_52A8_4F5C
-            local ____6B65_9AA4__53C2_6570_15 = _____6B65_9AA4["参数"]
-            if ____6B65_9AA4__53C2_6570_15 == nil then
-                ____6B65_9AA4__53C2_6570_15 = {}
+            local ____6267_884C_901A_7528_5267_60C5_52A8_4F5C_12 = _____6267_884C_901A_7528_5267_60C5_52A8_4F5C
+            local ____6B65_9AA4__53C2_6570_11 = _____6B65_9AA4["参数"]
+            if ____6B65_9AA4__53C2_6570_11 == nil then
+                ____6B65_9AA4__53C2_6570_11 = {}
             end
-            ____6267_884C_901A_7528_5267_60C5_52A8_4F5C_16(____6B65_9AA4__53C2_6570_15)
+            ____6267_884C_901A_7528_5267_60C5_52A8_4F5C_12(____6B65_9AA4__53C2_6570_11)
             _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001["当前步骤索引"] = _____5267_60C5_64AD_653E_5668_8FD0_884C_65F6_72B6_6001["当前步骤索引"] + 1
             _____6267_884C_5F53_524D_5267_60C5_6B65_9AA4()
             return
@@ -428,40 +400,27 @@ end
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-_____79FB_9664_5355_4F4D_6682_505C = ____require_result_0["移除单位暂停"]
-_____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_1.addPeriodicCallback
-removePeriodicCallback = ____require_result_1.removePeriodicCallback
-getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("lib.扩展函数.BJ函数.05A．电影函数")
-TransmissionFromUnitWithNameBJ = ____require_result_2.TransmissionFromUnitWithNameBJ
-CinematicModeBJ = ____require_result_2.CinematicModeBJ
-local ____require_result_3 = require("lib.扩展函数.BJ函数.07．杂项")
-GetPlayersAll = ____require_result_3.GetPlayersAll
-local ____require_result_4 = require("lib.扩展函数.BJ函数.06．任务消息")
-local QuestMessageBJ = ____require_result_4.QuestMessageBJ
-local ____require_result_5 = require("系统.09．表现系统.06．广播提示消息.index")
-_____53D1_9001_5934_50CF_63D0_793A_7ED9_73A9_5BB6 = ____require_result_5["发送头像提示给玩家"]
-_____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6 = ____require_result_5["发送单位提示给玩家"]
-_____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_5["广播单位提示"]
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataGetSafe = ____require_result_6.YDUserDataGetSafe
-YDUserDataSetSafe = ____require_result_6.YDUserDataSetSafe
-local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
-_____542F_52A8Boss_6218_8FD0_884C = ____require_result_7["启动Boss战运行"]
-local ____require_result_8 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用")
-_____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E = ____require_result_8["应用Boss战启动属性配置"]
-local ____require_result_9 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表")
-_____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8 = ____require_result_9["记录Boss自动技能启动"]
-_____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD = ____require_result_9["是否已登记Boss自动技能"]
-local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_10.debugLogForce
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
+getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("lib.扩展函数.BJ函数.05A．电影函数")
+TransmissionFromUnitWithNameBJ = ____require_result_1.TransmissionFromUnitWithNameBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
+GetPlayersAll = ____require_result_2.GetPlayersAll
+local ____require_result_3 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_3.QuestMessageBJ
+local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
+_____53D1_9001_5934_50CF_63D0_793A_7ED9_73A9_5BB6 = ____require_result_4["发送头像提示给玩家"]
+_____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6 = ____require_result_4["发送单位提示给玩家"]
+_____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataGetSafe = ____require_result_5.YDUserDataGetSafe
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_6.debugLogForce
 local CreateTrigger = jass.CreateTrigger
 local GetTriggerPlayer = jass.GetTriggerPlayer
 Player = jass.Player
-SetUnitInvulnerable = jass.SetUnitInvulnerable
 local TriggerAddAction = jass.TriggerAddAction
 local TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent
 local TriggerRegisterPlayerEvent = jass.TriggerRegisterPlayerEvent
@@ -469,9 +428,6 @@ local EVENT_PLAYER_END_CINEMATIC = jass.EVENT_PLAYER_END_CINEMATIC
 bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET
 local bj_QUESTMESSAGE_HINT = jglobals.bj_QUESTMESSAGE_HINT
 _____5267_60C5_64AD_653E_5668_6A21_5757_540D = "11．剧情系统-剧情步骤播放器"
-____Boss_6218_8868_540D = "Boss战"
-____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5 = "绑定单位"
-____Boss_6218_89E6_53D1_73A9_5BB6_5B57_6BB5 = "触发玩家"
 _____9ED8_8BA4_5E7F_64AD_5934_50CF_8DEF_5F84 = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp"
 local _____9ED8_8BA4_5267_60C5_64AD_653E_5668_8FD0_884C_65F6 = {
     ["当前步骤索引"] = 0,
@@ -543,30 +499,30 @@ local function _____5E7F_64AD_5267_60C5_8DF3_8FC7_63D0_793A()
 end
 local function _____6267_884C_8DF3_8FC7_6A21_5F0F_6B65_9AA4_903B_8F91(_____6B65_9AA4)
     repeat
-        local ____switch93 = _____6B65_9AA4.type
-        local ____cond93 = ____switch93 == "dialog" or ____switch93 == "broadcast" or ____switch93 == "wait"
-        if ____cond93 then
+        local ____switch89 = _____6B65_9AA4.type
+        local ____cond89 = ____switch89 == "dialog" or ____switch89 == "broadcast" or ____switch89 == "wait"
+        if ____cond89 then
             return
         end
-        ____cond93 = ____cond93 or ____switch93 == "runAction"
-        if ____cond93 then
+        ____cond89 = ____cond89 or ____switch89 == "runAction"
+        if ____cond89 then
             _____83B7_53D6_6267_884C_4E3B_7EBF_5267_60C5_52A8_4F5C_51FD_6570()(_____6B65_9AA4["动作ID"], _____6B65_9AA4["参数"] or ({}))
             return
         end
-        ____cond93 = ____cond93 or ____switch93 == "startBossFight"
-        if ____cond93 then
+        ____cond89 = ____cond89 or ____switch89 == "startBossFight"
+        if ____cond89 then
             do
-                local ____8BFB_53D6_5355_4F4D_5F15_7528_result_12 = _____8BFB_53D6_5355_4F4D_5F15_7528(_____6B65_9AA4["Boss引用"])
-                if ____8BFB_53D6_5355_4F4D_5F15_7528_result_12 == nil then
-                    ____8BFB_53D6_5355_4F4D_5F15_7528_result_12 = _____8BFB_53D6_5355_4F4D_5F15_7528(_____6B65_9AA4["Boss名"] and "Boss." .. tostring(_____6B65_9AA4["Boss名"]) or nil)
+                local ____8BFB_53D6_5355_4F4D_5F15_7528_result_8 = _____8BFB_53D6_5355_4F4D_5F15_7528(_____6B65_9AA4["Boss引用"])
+                if ____8BFB_53D6_5355_4F4D_5F15_7528_result_8 == nil then
+                    ____8BFB_53D6_5355_4F4D_5F15_7528_result_8 = _____8BFB_53D6_5355_4F4D_5F15_7528(_____6B65_9AA4["Boss名"] and "Boss." .. tostring(_____6B65_9AA4["Boss名"]) or nil)
                 end
-                local bossUnit = ____8BFB_53D6_5355_4F4D_5F15_7528_result_12
+                local bossUnit = ____8BFB_53D6_5355_4F4D_5F15_7528_result_8
                 _____542F_52A8_5267_60C5Boss_6218(bossUnit)
                 return
             end
         end
-        ____cond93 = ____cond93 or ____switch93 == "giveItem"
-        if ____cond93 then
+        ____cond89 = ____cond89 or ____switch89 == "giveItem"
+        if ____cond89 then
             do
                 local itemName = _____6B65_9AA4["物品名"]
                 if itemName ~= nil and itemName ~= "" then
@@ -576,12 +532,12 @@ local function _____6267_884C_8DF3_8FC7_6A21_5F0F_6B65_9AA4_903B_8F91(_____6B65_
             end
         end
         do
-            local ____6267_884C_901A_7528_5267_60C5_52A8_4F5C_14 = _____6267_884C_901A_7528_5267_60C5_52A8_4F5C
-            local ____6B65_9AA4__53C2_6570_13 = _____6B65_9AA4["参数"]
-            if ____6B65_9AA4__53C2_6570_13 == nil then
-                ____6B65_9AA4__53C2_6570_13 = {}
+            local ____6267_884C_901A_7528_5267_60C5_52A8_4F5C_10 = _____6267_884C_901A_7528_5267_60C5_52A8_4F5C
+            local ____6B65_9AA4__53C2_6570_9 = _____6B65_9AA4["参数"]
+            if ____6B65_9AA4__53C2_6570_9 == nil then
+                ____6B65_9AA4__53C2_6570_9 = {}
             end
-            ____6267_884C_901A_7528_5267_60C5_52A8_4F5C_14(____6B65_9AA4__53C2_6570_13)
+            ____6267_884C_901A_7528_5267_60C5_52A8_4F5C_10(____6B65_9AA4__53C2_6570_9)
             return
         end
     until true

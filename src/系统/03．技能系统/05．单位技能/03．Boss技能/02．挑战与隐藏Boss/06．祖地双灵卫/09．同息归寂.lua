@@ -29,10 +29,11 @@ local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSa
 local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_4.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_4["移除单位指定Buff"]
+local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_5.doHeal
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local PauseUnit = jass.PauseUnit
 local SetUnitVertexColor = jass.SetUnitVertexColor
@@ -55,23 +56,23 @@ local function _____53D6_540D_79F0(context, unit)
     return nil
 end
 local function _____53D6_5355_4F4D(context, name)
-    local ____temp_5
+    local ____temp_6
     if name == "赤誓灵卫" then
-        ____temp_5 = context["赤誓灵卫单位"]
+        ____temp_6 = context["赤誓灵卫单位"]
     else
-        ____temp_5 = context["苍影灵卫单位"]
+        ____temp_6 = context["苍影灵卫单位"]
     end
-    return ____temp_5
+    return ____temp_6
 end
 local function _____8FDB_5165_7075_9B42_5D29_89E3(context, name)
     local unit = _____53D6_5355_4F4D(context, name)
-    local ____self_6 = context["联合生命周期"]
-    local member = ____self_6["取成员"](____self_6, name)
+    local ____self_7 = context["联合生命周期"]
+    local member = ____self_7["取成员"](____self_7, name)
     if member == nil or member["状态"] == "崩解" then
         return
     end
-    local ____self_7 = context["联合生命周期"]
-    ____self_7["设置状态"](____self_7, name, "崩解", "生命达到同步崩解阈值")
+    local ____self_8 = context["联合生命周期"]
+    ____self_8["设置状态"](____self_8, name, "崩解", "生命达到同步崩解阈值")
     PauseUnit(unit, true)
     SetUnitInvulnerable(unit, true)
     registerManualBuff(
@@ -124,31 +125,44 @@ ____exports["绑定祖地双灵卫同息生命下限"] = function(context)
                     return not context["战斗已结束"] and context["阶段"] == "P3双蚀共鸣"
                 end,
                 ["伤害预处理"] = function(_damage, current)
-                    local ____self_8 = context["联合生命周期"]
-                    local member = ____self_8["取成员"](____self_8, name)
+                    local ____self_9 = context["联合生命周期"]
+                    local member = ____self_9["取成员"](____self_9, name)
                     return member ~= nil and member["状态"] == "崩解" and 0 or current
                 end,
                 ["on首次触底"] = function()
                     _____8FDB_5165_7075_9B42_5D29_89E3(context, name)
                 end
             })
-            local ____context__540C_606F_751F_547D_4E0B_9650_4FDD_62A4_5217_8868_9 = context["同息生命下限保护列表"]
-            ____context__540C_606F_751F_547D_4E0B_9650_4FDD_62A4_5217_8868_9[#____context__540C_606F_751F_547D_4E0B_9650_4FDD_62A4_5217_8868_9 + 1] = controller
+            local ____context__540C_606F_751F_547D_4E0B_9650_4FDD_62A4_5217_8868_10 = context["同息生命下限保护列表"]
+            ____context__540C_606F_751F_547D_4E0B_9650_4FDD_62A4_5217_8868_10[#____context__540C_606F_751F_547D_4E0B_9650_4FDD_62A4_5217_8868_10 + 1] = controller
             i = i + 1
         end
     end
 end
 local function _____6062_590D_5D29_89E3_5B88_536B(context, name)
     local unit = _____53D6_5355_4F4D(context, name)
-    SetUnitState(
-        unit,
-        UNIT_STATE_LIFE,
-        GetUnitState(unit, UNIT_STATE_MAX_LIFE) * _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["公共"]["同息回灌恢复比例"]
-    )
+    local ____temp_11
+    if name == "赤誓灵卫" then
+        ____temp_11 = context["苍影灵卫单位"]
+    else
+        ____temp_11 = context["赤誓灵卫单位"]
+    end
+    local source = ____temp_11
+    local targetLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["公共"]["同息回灌恢复比例"]
+    local healAmount = targetLife - GetUnitState(unit, UNIT_STATE_LIFE)
+    if healAmount > 0 then
+        doHeal({
+            HealSource = source,
+            HealTarget = unit,
+            HealAmount = healAmount,
+            ItemHeal = false,
+            HealEffect = false
+        })
+    end
     SetUnitInvulnerable(unit, false)
     PauseUnit(unit, false)
-    local ____self_10 = context["联合生命周期"]
-    ____self_10["设置状态"](____self_10, name, "活跃", "同步崩解超时回灌")
+    local ____self_12 = context["联合生命周期"]
+    ____self_12["设置状态"](____self_12, name, "活跃", "同步崩解超时回灌")
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, _____7956_5730_53CC_7075_536BBuffID["灵魂崩解"])
     local reflux = AddSpecialEffect(
         _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["公共"]["魂力回灌特效路径"],
@@ -254,8 +268,8 @@ ____exports["执行祖地双灵卫净化收束"] = function(context)
             _____6E05_7406_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587(context)
         end
     )
-    local ____self_11 = context["清理"]
-    ____self_11["登记延迟回调"](____self_11, "祖地双灵卫-净化结算", delayedId)
+    local ____self_13 = context["清理"]
+    ____self_13["登记延迟回调"](____self_13, "祖地双灵卫-净化结算", delayedId)
     return true
 end
 ____exports["更新祖地双灵卫同息归寂"] = function(context, now)
@@ -270,8 +284,8 @@ ____exports["更新祖地双灵卫同息归寂"] = function(context, now)
         return
     end
     local name = context["崩解中的守卫"]
-    local ____self_12 = context["联合生命周期"]
-    local member = ____self_12["取成员"](____self_12, name)
+    local ____self_14 = context["联合生命周期"]
+    local member = ____self_14["取成员"](____self_14, name)
     if member ~= nil and member["状态"] == "崩解" then
         _____6062_590D_5D29_89E3_5B88_536B(context, name)
     end

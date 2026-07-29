@@ -31,7 +31,7 @@ createMeleeBossHeroUnit('N05T', '菲利斯', {
   scale = 2.65,
   soundSet = 'Arthas',
   classification = 'undead',
-  abilities = 'AInv,A0LP,A0LR,A0LS,A0LT,A0LQ',
+  abilities = 'AInv,A0LP,A0LR,A0LS,A0LT',
   upgrades = 'R001,R002',
   acquire = 1200.0,
   sightNight = 1400,

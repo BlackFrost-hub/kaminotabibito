@@ -138,11 +138,6 @@ export interface 主线剧情最终伤害事件配置 {
   清理Boss语义键?: string;
   清理目标YD表?: boolean;
   移除目标单位?: boolean;
-  任务描述?: string;
-  任务提示: string;
-  小地图X: number;
-  小地图Y: number;
-  小地图持续时间: number;
   支线任务发现?: 主线剧情支线任务发现配置;
   延迟显示?: 主线剧情延迟显隐配置;
   旧JASS来源?: string;

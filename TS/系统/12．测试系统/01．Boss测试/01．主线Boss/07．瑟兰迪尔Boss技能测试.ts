@@ -59,11 +59,12 @@ const { 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统
 const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用") as {
   应用Boss战启动属性配置: (this: void, unit: any) => void;
 };
-const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
+const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 准备Boss测试固定山丘之王, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
   Boss测试单位存活: (this: void, unit: any) => boolean;
   设置Boss测试单位满血: (this: void, unit: any, 最大生命值?: number) => void;
   获取Boss测试玩家基准英雄: (this: void, player: any) => any;
   准备Boss测试固定步兵: (this: void, unit: any, x: number, y: number, facing?: number) => any;
+  准备Boss测试固定山丘之王: (this: void, unit: any, x: number, y: number, facing?: number) => any;
   移除Boss测试单位: (this: void, unit: any) => void;
   注册Boss测试命令组: (this: void, 配置: any) => void;
 };
@@ -91,8 +92,8 @@ interface 瑟兰迪尔测试上下文 {
 }
 
 const 最近测试Boss: Record<number, any> = {};
-const 最近测试步兵1: Record<number, any> = {};
-const 最近测试步兵2: Record<number, any> = {};
+const 最近测试步兵: Record<number, any> = {};
+const 最近测试山丘之王: Record<number, any> = {};
 const 最近测试上下文: Record<number, 瑟兰迪尔测试上下文 | undefined> = {};
 
 function stringToFourCC(this: void, s: string): number {
@@ -128,12 +129,10 @@ function 创建或获取瑟兰迪尔测试(this: void, player: any): 瑟兰迪�
   const boss = 获取或创建测试Boss(player);
   if (!Boss测试单位存活(hero) || !Boss测试单位存活(boss)) return undefined;
 
-  SetUnitPosition(hero, 临时测试场地中心X, 临时测试玩家Y);
-  SetUnitFacing(hero, 90);
   设置Boss测试单位满血(hero);
-  const target = 准备Boss测试固定步兵(最近测试步兵1[pid], 临时测试场地中心X - 220, 临时测试玩家Y + 180, 90);
-  最近测试步兵1[pid] = target;
-  最近测试步兵2[pid] = 准备Boss测试固定步兵(最近测试步兵2[pid], 临时测试场地中心X + 220, 临时测试玩家Y + 180, 90);
+  const target = 准备Boss测试固定步兵(最近测试步兵[pid], 临时测试场地中心X - 220, 临时测试玩家Y + 180, 90);
+  最近测试步兵[pid] = target;
+  最近测试山丘之王[pid] = 准备Boss测试固定山丘之王(最近测试山丘之王[pid], 临时测试场地中心X + 220, 临时测试玩家Y + 180, 90);
   if (!Boss测试单位存活(target)) return undefined;
 
   应用Boss战启动属性配置(boss);
@@ -165,12 +164,12 @@ function 清理瑟兰迪尔测试(this: void, player: any, context: 瑟兰迪尔
   if (cached != null && cached.审判之环法阵句柄 != null) 停止循环点特效(cached.审判之环法阵句柄);
   if (cached != null && cached.基准英雄 != null) 销毁单位坐标跟随特效(cached.基准英雄, 秩序领域缩放测试特效键);
   if (boss != null && boss !== 0) 清理瑟兰迪尔上下文(boss);
-  移除Boss测试单位(最近测试步兵1[pid]);
-  移除Boss测试单位(最近测试步兵2[pid]);
+  移除Boss测试单位(最近测试步兵[pid]);
+  移除Boss测试单位(最近测试山丘之王[pid]);
   移除Boss测试单位(boss);
   最近测试上下文[pid] = undefined;
-  最近测试步兵1[pid] = undefined;
-  最近测试步兵2[pid] = undefined;
+  最近测试步兵[pid] = undefined;
+  最近测试山丘之王[pid] = undefined;
   最近测试Boss[pid] = undefined;
   if (globals.udg_Boss === boss) globals.udg_Boss = null;
 }

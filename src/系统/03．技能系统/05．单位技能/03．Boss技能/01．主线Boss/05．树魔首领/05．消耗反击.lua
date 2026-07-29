@@ -141,51 +141,48 @@ function ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548(castingUnit, s
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
+local _____521B_5EFA_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建技能伤害实例"]
+local _____7ED3_675F_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["结束技能伤害实例"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetHandleId = jass.GetHandleId
-local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local SetUnitFacing = jass.SetUnitFacing
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local AddLightning = jass.AddLightning
 local DestroyLightning = jass.DestroyLightning
-local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_2.registerDamageModifier
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_3.addDelayedCallback
-removeDelayedCallback = ____require_result_3.removeDelayedCallback
-addPeriodicCallback = ____require_result_3.addPeriodicCallback
-removePeriodicCallback = ____require_result_3.removePeriodicCallback
-getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____5F00_59CB_786C_76F4 = ____require_result_4["开始硬直"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
-_____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____require_result_5["播放限时单位动画"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
-local _____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_6["创建线段危险区"]
-local ____require_result_7 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_7["获取Boss技能敌对英雄列表"]
+local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
+local _____9B54_6CD5_589E_51CF = ____require_result_2["魔法增减"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_3.registerDamageModifier
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_4.addDelayedCallback
+removeDelayedCallback = ____require_result_4.removeDelayedCallback
+addPeriodicCallback = ____require_result_4.addPeriodicCallback
+removePeriodicCallback = ____require_result_4.removePeriodicCallback
+getServerTime = ____require_result_4.getServerTime
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____5F00_59CB_786C_76F4 = ____require_result_5["开始硬直"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+_____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____require_result_6["播放限时单位动画"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_7["创建原生弹幕"]
+local _____9500_6BC1_539F_751F_5F39_5E55 = ____require_result_7["销毁原生弹幕"]
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 createTimedEffect = ____require_result_8.createTimedEffect
 local createTimedUnitEffect = ____require_result_8.createTimedUnitEffect
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
-local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_9.CosBJ
-local SinBJ = ____require_result_9.SinBJ
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____6D88_8017_53CD_51FB_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]["技能槽位"])
 _____6D88_8017_53CD_51FB_72B6_6001_8868 = {}
+local _____53CD_51FB_51B2_51FB_6CE2_72B6_6001_8868 = {}
 local _____6D88_8017_53CD_51FB_5DF2_6CE8_518C = false
 local function _____53D6_65B9_5411_89D2(from, to)
     return _____4E24_70B9_65B9_5411_89D2(
@@ -202,9 +199,6 @@ end
 local function _____662F_6B63_9762_53CD_51FB_89D2_5EA6(boss, attacker)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]
     return _____5355_4F4D_662F_5426_5728_6765_6E90_6B63_9762_6247_533A(boss, attacker, cfg["正面判定角度"])
-end
-local function _____8BBE_7F6E_9B54_6CD5_503C_4E0B_9650(unit, value)
-    SetUnitState(unit, UNIT_STATE_MANA, value > 0 and value or 0)
 end
 local function _____64AD_653E_62BD_9B54_7279_6548(target)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]
@@ -230,17 +224,71 @@ local function _____64AD_653E_53CD_51FB_8FDE_7EBF(boss, target)
         end
     )
 end
-local function _____521B_5EFA_53CD_51FB_5F39_9053_8868_73B0(boss, angle)
-    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]
-    local x = GetUnitX(boss) + CosBJ(angle) * 160
-    local y = GetUnitY(boss) + SinBJ(angle) * 160
-    _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = cfg["反击弹道特效路径"],
-        X = x,
-        Y = y,
-        Z = 0,
-        ["持续秒"] = cfg["反击弹道特效持续秒"]
+local function ____on_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2_547D_4E2D(target, _____5F39_5E55ID)
+    local state = _____53CD_51FB_51B2_51FB_6CE2_72B6_6001_8868[_____5F39_5E55ID]
+    if state == nil or not _____5355_4F4D_6709_6548(state.Boss) or not _____5355_4F4D_6709_6548(target) then
+        return
+    end
+    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+        ["技能ID"] = _____6D88_8017_53CD_51FB_6280_80FDID,
+        ["技能实例ID"] = state["技能实例ID"],
+        ["来源"] = state.Boss,
+        ["目标"] = target,
+        ["伤害"] = state["伤害"],
+        attack = true,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
+        ["来源类型"] = "Boss技能"
     })
+end
+local function ____on_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2_7ED3_675F(______539F_56E0, _____5F39_5E55ID)
+    local state = _____53CD_51FB_51B2_51FB_6CE2_72B6_6001_8868[_____5F39_5E55ID]
+    __TS__Delete(_____53CD_51FB_51B2_51FB_6CE2_72B6_6001_8868, _____5F39_5E55ID)
+    if state ~= nil then
+        _____7ED3_675F_6280_80FD_4F24_5BB3_5B9E_4F8B(state["技能实例ID"])
+    end
+end
+local function _____6E05_7406_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2(_____5F39_5E55ID)
+    if _____5F39_5E55ID == nil or _____5F39_5E55ID <= 0 then
+        return
+    end
+    _____9500_6BC1_539F_751F_5F39_5E55(_____5F39_5E55ID, "手动销毁")
+end
+local function _____53D1_5C04_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2(context, boss, angle)
+    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["消耗反击"]
+    local _____4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["反击Boss攻击力比例"]
+    local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_6280_80FD_4F24_5BB3_5B9E_4F8B({["技能ID"] = _____6D88_8017_53CD_51FB_6280_80FDID, ["来源类型"] = "Boss技能", ["标签"] = "树魔首领-消耗反击冲击波", ["持续时间秒"] = cfg["反击射程"] / cfg["反击弹道速度"] + 1})
+    local _____5F39_5E55 = _____521B_5EFA_539F_751F_5F39_5E55({
+        ["所有者"] = boss,
+        X = GetUnitX(boss),
+        Y = GetUnitY(boss),
+        ["方向角"] = angle,
+        ["速度"] = cfg["反击弹道速度"],
+        ["最大距离"] = cfg["反击射程"],
+        ["命中半径"] = cfg["反击弹道命中半径"],
+        ["影响目标"] = "敌方",
+        ["碰撞消失"] = false,
+        ["每单位最大命中次数"] = 1,
+        ["不可阻挡"] = true,
+        ["禁用碰撞"] = true,
+        ["显式改向后锁定方向"] = true,
+        ["伤害值"] = 0,
+        ["伤害形态"] = "AOE",
+        ["模型"] = cfg["反击弹道特效路径"],
+        ["缩放"] = cfg["反击弹道特效缩放"],
+        ["飞行高度"] = cfg["反击弹道飞行高度"],
+        ["on命中"] = ____on_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2_547D_4E2D,
+        ["on结束"] = ____on_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2_7ED3_675F
+    })
+    if _____5F39_5E55 == nil or _____5F39_5E55["弹幕ID"] == nil or _____5F39_5E55["弹幕ID"] <= 0 then
+        _____7ED3_675F_6280_80FD_4F24_5BB3_5B9E_4F8B(_____6280_80FD_5B9E_4F8BID)
+        return
+    end
+    _____53CD_51FB_51B2_51FB_6CE2_72B6_6001_8868[_____5F39_5E55["弹幕ID"]] = {Boss = boss, ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID, ["伤害"] = _____4F24_5BB3}
+    local ____self_9 = context["清理"]
+    ____self_9["登记清理"](____self_9, "树魔首领-消耗反击冲击波", _____6E05_7406_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2, _____5F39_5E55["弹幕ID"])
 end
 local function _____6267_884C_53CD_51FB(state, attacker, _____89E6_53D1_4F24_5BB3)
     local boss = state.Boss
@@ -263,46 +311,10 @@ local function _____6267_884C_53CD_51FB(state, attacker, _____89E6_53D1_4F24_5BB
         ["持续秒"] = cfg["反击动画原始时长秒"],
         ["恢复动画编号"] = cfg["恢复动画编号"]
     })
-    _____521B_5EFA_53CD_51FB_5F39_9053_8868_73B0(boss, angle)
     _____64AD_653E_62BD_9B54_7279_6548(attacker)
     _____64AD_653E_53CD_51FB_8FDE_7EBF(boss, attacker)
-    _____8BBE_7F6E_9B54_6CD5_503C_4E0B_9650(
-        attacker,
-        GetUnitState(attacker, UNIT_STATE_MANA) - _____89E6_53D1_4F24_5BB3 * cfg["抽魔伤害比例"]
-    )
-    _____521B_5EFA_7EBF_6BB5_5371_9669_533A({
-        ["清理"] = state["上下文"]["清理"],
-        ["名称"] = "树魔首领-消耗反击冲击波",
-        ["起点X"] = GetUnitX(boss),
-        ["起点Y"] = GetUnitY(boss),
-        ["方向角"] = angle,
-        ["长度"] = cfg["反击射程"],
-        ["宽度"] = cfg["反击宽度"],
-        ["持续秒"] = cfg["反击持续秒"],
-        ["Tick间隔毫秒"] = cfg["反击Tick毫秒"],
-        ["单位列表"] = function()
-            return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-        end,
-        ["提示圈"] = {["类型"] = "方向直线", ["来源单位"] = boss},
-        ["on进入"] = function(unit)
-            if not _____5355_4F4D_6709_6548(unit) then
-                return
-            end
-            local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["反击Boss攻击力比例"]
-            _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                ["技能ID"] = _____6D88_8017_53CD_51FB_6280_80FDID,
-                ["来源"] = boss,
-                ["目标"] = unit,
-                ["伤害"] = damage,
-                attack = true,
-                ranged = false,
-                attackType = ATTACK_TYPE_NORMAL,
-                ["伤害类型"] = DAMAGE_TYPE_NORMAL,
-                weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                ["来源类型"] = "Boss技能"
-            })
-        end
-    })
+    _____9B54_6CD5_589E_51CF(attacker, -_____89E6_53D1_4F24_5BB3 * cfg["抽魔伤害比例"], false, false)
+    _____53D1_5C04_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2(state["上下文"], boss, angle)
 end
 local function _____6811_9B54_9996_9886_6D88_8017_53CD_51FB_4F24_5BB3_4FEE_6B63(damageContext)
     local target = damageContext.target

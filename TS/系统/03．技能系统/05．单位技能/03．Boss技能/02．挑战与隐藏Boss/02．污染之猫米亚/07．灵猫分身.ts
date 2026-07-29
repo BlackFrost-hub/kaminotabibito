@@ -23,6 +23,9 @@ const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Sta
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
 
 const jass = require("jass.common") as any;
 
@@ -30,12 +33,10 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
@@ -51,10 +52,7 @@ function 播放分身出生表现(this: void, x: number, y: number): void {
 
 function 恢复Boss生命(this: void, boss: any, amount: number): void {
   if (!单位有效(boss) || amount <= 0) return;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  const current = GetUnitState(boss, UNIT_STATE_LIFE);
-  const next = current + amount > maxLife ? maxLife : current + amount;
-  SetUnitState(boss, UNIT_STATE_LIFE, next);
+  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: amount, ItemHeal: false, HealEffect: false });
 }
 
 function 安排分身到期结算(this: void, context: 米亚运行时上下文, summons: any[]): void {

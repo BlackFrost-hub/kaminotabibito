@@ -13,6 +13,7 @@
 | `Line` | [`line.md`](line.md) | 直线波、切面、丝带、贯穿层。 |
 | `MagicCircle` | [`magic-circle.md`](magic-circle.md) | 地面或空中的法阵、符文。 |
 | `Marker` | [`marker.md`](marker.md) | 墓碑、锚点、机制实体标记。 |
+| `Portal` | [`portal.md`](portal.md) | 竖向传送门、空间门与跨界入口。 |
 | `RiseFall` | [`rise-fall.md`](rise-fall.md) | 升起、坠落、回填、空中主体。 |
 | `Rotate` | [`rotate.md`](rotate.md) | 旋转刃、环绕旋转主体。 |
 | `Shield` | [`shield.md`](shield.md) | 护盾、屏障、盾面。 |

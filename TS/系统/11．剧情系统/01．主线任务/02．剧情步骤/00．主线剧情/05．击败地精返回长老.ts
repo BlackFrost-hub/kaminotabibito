@@ -14,41 +14,32 @@ const { SetUnitFacingToFaceUnitTimed } = require("lib.扩展函数.BJ函数.02�
 const { YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
 };
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
+};
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
-import { 读取剧情进度, 写入当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
-import { 写入剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 播放主线剧情片段 } from "../02．剧情步骤播放器";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const IsUnitInGroup = jass.IsUnitInGroup as (this: void, whichUnit: any, whichGroup: any) => boolean;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const SetUnitFacingTimed = jass.SetUnitFacingTimed as (this: void, whichUnit: any, facing: number, duration: number) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 
 let 已初始化进度05核心 = false;
 
-function 触发单位是玩家英雄(this: void, unit: any): boolean {
-  if (unit == null || unit === 0) return false;
-  const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
-  return 玩家英雄组 != null && 玩家英雄组 !== 0 && IsUnitInGroup(unit, 玩家英雄组);
-}
-
 function on击败地精返回长老触发(this: void): void {
   const 触发单位 = GetTriggerUnit();
-  if (!触发单位是玩家英雄(触发单位)) return;
+  if (!是玩家英雄组单位(触发单位)) return;
   if (读取剧情进度() !== 4) return;
 
   const 片段ID = "jlc_goblin_defeated_return_elder";
-  写入当前剧情动作上下文({ 片段ID, 触发配置名: "击败地精返回长老核心", 触发单位 });
   播放主线剧情片段(片段ID, { 片段ID, 触发配置名: "击败地精返回长老核心", 触发单位 });
 }
 
 export function 执行击败地精回村前置(this: void, 参数: 剧情动作参数表): void {
-  if (typeof 参数.设置剧情进度 === "number") {
-    写入剧情进度(参数.设置剧情进度);
-  }
   const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
   const 长老单位 = YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit");
   if (触发单位 != null && 触发单位 !== 0) {

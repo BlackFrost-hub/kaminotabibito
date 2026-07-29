@@ -9,6 +9,10 @@ import {
 const jass = require("jass.common") as any;
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -21,6 +25,8 @@ export interface 固定受击次数机制单位参数 extends 可攻击机制单
   每次伤害扣除次数?: number;
   计数模式?: 固定受击次数计数模式;
   最终伤害计数阈值?: number;
+  未计数伤害无效?: boolean;
+  同步生命条?: boolean;
   过滤伤害?: (this: void, context: any) => boolean;
   on受击?: (this: void, 单位: any, 剩余次数: number, context: any) => void;
   on击破?: (this: void, 单位: any, context: any) => void;
@@ -71,13 +77,21 @@ function 固定受击次数伤害修正(this: void, context: any): number {
   if (记录 == null) return context.currentDamage;
   if (context.currentDamage <= 0) return context.currentDamage;
   if (记录.参数.过滤伤害 != null && !记录.参数.过滤伤害(context)) return context.currentDamage;
-  if (!本次伤害是否计数(记录.参数, context)) return context.currentDamage;
+  if (!本次伤害是否计数(记录.参数, context)) {
+    return 记录.参数.未计数伤害无效 === true ? 0 : context.currentDamage;
+  }
 
   const 扣除次数 = 规整次数(记录.参数.每次伤害扣除次数 ?? 1);
   if (扣除次数 <= 0) return 0;
 
   记录.实例.设置剩余次数(记录.实例.读取剩余次数() - 扣除次数);
   const 剩余次数 = 记录.实例.读取剩余次数();
+  if (记录.参数.同步生命条 === true && 剩余次数 > 0) {
+    const 总次数 = 规整次数(记录.参数.受击次数);
+    if (总次数 > 0) {
+      SetUnitState(记录.实例.单位, UNIT_STATE_LIFE, GetUnitState(记录.实例.单位, UNIT_STATE_MAX_LIFE) * 剩余次数 / 总次数);
+    }
+  }
   if (记录.参数.on受击 != null) 记录.参数.on受击(记录.实例.单位, 剩余次数, context);
 
   if (剩余次数 <= 0) {

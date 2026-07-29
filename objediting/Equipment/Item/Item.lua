@@ -385,3 +385,27 @@ createEquipmentItem('I0G1', '光辉翠绿宝石', {
   tooltipExtended = '|cffccffff[饰品/宝石]-通用生存|r|n|cffffcc99等级：A|n评分：11500|r|n|cffffffcc[基础属性]|r|n生命值+4500|n护甲+55|n魔法抗性+25%|n全属性+40|n|cffffffcc[装备效果]|r|n光辉翠绿体：获得1层宝石防护，此后每20秒再获得1层；每层独立持续22秒，最多同时存在2层。受到伤害达到800或最大生命值8%（取较高值）的非装备直接物理伤害时，消耗1层并完全抵挡该次伤害。|n|cFF808080翠绿薄壳并不拒绝所有伤害，只等待真正值得它碎裂的一击。|r',
   description = '|cffccffff[饰品/宝石]-通用生存|r|n|cffffcc99等级：A|n评分：11500|r|n|cffffffcc[基础属性]|r|n生命值+4500|n护甲+55|n魔法抗性+25%|n全属性+40|n|cffffffcc[装备效果]|r|n光辉翠绿体：获得1层宝石防护，此后每20秒再获得1层；每层独立持续22秒，最多同时存在2层。受到伤害达到800或最大生命值8%（取较高值）的非装备直接物理伤害时，消耗1层并完全抵挡该次伤害。|n|cFF808080翠绿薄壳并不拒绝所有伤害，只等待真正值得它碎裂的一击。|r',
 })
+
+createEquipmentItem('I0G6', '菲利斯的战阵徽章', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\felice_battleline_emblem.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 6300,
+  tooltipExtended = '|cffccffff[饰品]-战士/前排|r|n|cffffcc99等级：B|n评分：6300|r|n|cffffffcc[基础属性]|r|n力量+36|n攻击力+110|n生命值+1400|n护甲+22|n|cFF808080徽章由第二军团的战阵核心重铸，残存的军势仍在催促佩戴者向前推进。|r',
+  description = '|cffccffff[饰品]-战士/前排|r|n|cffffcc99等级：B|n评分：6300|r|n|cffffffcc[基础属性]|r|n力量+36|n攻击力+110|n生命值+1400|n护甲+22|n|cFF808080徽章由第二军团的战阵核心重铸，残存的军势仍在催促佩戴者向前推进。|r',
+})
+
+createEquipmentItem('I0G7', '第二军团攻城秘戒', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\second_legion_siege_arcane_ring.blp',
+  model = 'war3mapImported\\SpiderRingItem.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 6250,
+  tooltipExtended = '|cffccffff[饰品]-法术/循环|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+42|n魔法值+1000|n魔法伤害+18%|n冷却缩减+10%|n|cFF808080戒面上的攻城术式已经沉寂，但环绕其间的苍蓝魔力仍能加速施法循环。|r',
+  description = '|cffccffff[饰品]-法术/循环|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+42|n魔法值+1000|n魔法伤害+18%|n冷却缩减+10%|n|cFF808080戒面上的攻城术式已经沉寂，但环绕其间的苍蓝魔力仍能加速施法循环。|r',
+})

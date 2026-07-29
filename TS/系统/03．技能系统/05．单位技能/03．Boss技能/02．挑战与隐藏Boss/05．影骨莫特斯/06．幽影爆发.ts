@@ -11,6 +11,9 @@ import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
+const { 执行非伤害生命移除 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除") as {
+  执行非伤害生命移除: (this: void, params: any) => number;
+};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -21,7 +24,6 @@ const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -105,8 +107,13 @@ function 结束影骨幽影爆发(this: void, context: 影骨莫特斯运行时�
   for (let i = 0; i < context.幽影召唤物.length; i++) {
     const unit = context.幽影召唤物[i];
     if (!单位有效(unit)) continue;
-    const life = GetUnitState(unit, UNIT_STATE_LIFE);
-    SetUnitState(unit, UNIT_STATE_LIFE, life * (1 - lossRatio));
+    执行非伤害生命移除({
+      目标: unit,
+      数值: GetUnitState(unit, UNIT_STATE_LIFE) * lossRatio,
+      不致死: true,
+      显示文字: false,
+      显示特效: false,
+    });
   }
   context.幽影召唤物 = [];
 }

@@ -1,7 +1,14 @@
 /** @noSelfInFile */
 
 import { 创建句柄上下文托管器 } from "../../04．机制组件/09．装备通用机制/24．句柄上下文托管";
-import { 注册持有型范围光环, type 范围光环目标类型, type 范围光环去重类型 } from "./01．范围光环";
+import {
+  创建手动范围光环,
+  注册持有型范围光环,
+  同步手动范围光环,
+  type 范围光环基础参数,
+  type 范围光环目标类型,
+  type 范围光环去重类型,
+} from "./01．范围光环";
 
 const jass = require("jass.common") as any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -13,7 +20,7 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
 
 export interface 数值光环效果定义 {
   key: string;
-  计算总值: (this: void, target: any, 总层数: number, 已应用值: number) => number;
+  计算总值: (this: void, target: any, 总层数: number, 已应用值: number, 来源: any) => number;
   应用差值: (this: void, target: any, 差值: number) => void;
 }
 
@@ -27,20 +34,19 @@ export interface 数值光环Buff配置 {
   归零移除?: boolean;
 }
 
-export interface 数值Buff范围光环参数 {
+export interface 数值Buff范围光环基础参数 extends Omit<范围光环基础参数, "应用目标效果" | "同步目标效果" | "移除目标效果"> {
   状态ID: string;
-  物品类型ID: number;
-  间隔毫秒: number;
-  半径: number;
-  目标类型: 范围光环目标类型;
-  去重类型?: 范围光环去重类型;
-  排除无敌?: boolean;
-  最小生命值?: number;
   最大层数?: number;
-  额外筛选?: (this: void, target: any, holder: any) => boolean;
   数值效果列表: 数值光环效果定义[];
   Buff?: 数值光环Buff配置;
 }
+
+export interface 数值Buff范围光环参数 extends 数值Buff范围光环基础参数 {
+  物品类型ID: number;
+  间隔毫秒: number;
+}
+
+export interface 手动数值Buff范围光环参数 extends 数值Buff范围光环基础参数 {}
 
 interface 数值光环目标状态 {
   总层数: number;
@@ -54,7 +60,9 @@ function 取句柄ID(this: void, handle: any): number {
   return GetHandleId(handle) || 0;
 }
 
-export function 注册数值Buff范围光环(this: void, 参数: 数值Buff范围光环参数): void {
+type 注册范围光环函数 = (this: void, 参数: 范围光环基础参数) => number;
+
+function 创建数值Buff范围光环(this: void, 参数: 数值Buff范围光环基础参数, 注册范围光环: 注册范围光环函数): number {
   const 托管器 = 创建句柄上下文托管器<数值光环目标状态>(参数.状态ID);
 
   function 取或建状态(this: void, target: any): 数值光环目标状态 {
@@ -109,16 +117,16 @@ export function 注册数值Buff范围光环(this: void, 参数: 数值Buff范�
     const 状态 = 托管器.读取(target);
     if (状态 == null) return;
     状态.总层数 = 计算总层数(状态);
+    const 来源 = 取来源(状态, 优先来源);
     for (let i = 0; i < 参数.数值效果列表.length; i++) {
       const effect = 参数.数值效果列表[i];
       const oldValue = 状态.已应用值表[effect.key] ?? 0;
-      const nextValue = 状态.总层数 > 0 ? effect.计算总值(target, 状态.总层数, oldValue) : 0;
+      const nextValue = 状态.总层数 > 0 ? effect.计算总值(target, 状态.总层数, oldValue, 来源) : 0;
       const delta = nextValue - oldValue;
       if (delta !== 0) effect.应用差值(target, delta);
       状态.已应用值表[effect.key] = nextValue;
     }
-    const source = 取来源(状态, 优先来源);
-    同步Buff(target, 状态, source);
+    同步Buff(target, 状态, 来源);
     if (状态.总层数 <= 0) 托管器.清空(target);
     else 托管器.写入(target, 状态);
   }
@@ -141,9 +149,7 @@ export function 注册数值Buff范围光环(this: void, 参数: 数值Buff范�
     同步目标(target);
   }
 
-  注册持有型范围光环({
-    物品类型ID: 参数.物品类型ID,
-    间隔毫秒: 参数.间隔毫秒,
+  return 注册范围光环({
     半径: 参数.半径,
     目标类型: 参数.目标类型,
     去重类型: 参数.去重类型,
@@ -154,4 +160,28 @@ export function 注册数值Buff范围光环(this: void, 参数: 数值Buff范�
     同步目标效果: 设置持有者贡献,
     移除目标效果: 移除持有者贡献,
   });
+}
+
+function 注册手动数值范围光环(this: void, 参数: 范围光环基础参数): number {
+  return 创建手动范围光环(参数);
+}
+
+export function 注册数值Buff范围光环(this: void, 参数: 数值Buff范围光环参数): void {
+  function 注册当前持有型范围光环(this: void, 范围参数: 范围光环基础参数): number {
+    注册持有型范围光环({
+      ...范围参数,
+      物品类型ID: 参数.物品类型ID,
+      间隔毫秒: 参数.间隔毫秒,
+    });
+    return 0;
+  }
+  创建数值Buff范围光环(参数, 注册当前持有型范围光环);
+}
+
+export function 创建手动数值Buff范围光环(this: void, 参数: 手动数值Buff范围光环参数): number {
+  return 创建数值Buff范围光环(参数, 注册手动数值范围光环);
+}
+
+export function 同步手动数值Buff范围光环(this: void, 光环ID: number, 持有者: any, 生效: boolean): void {
+  同步手动范围光环(光环ID, 持有者, 生效);
 }

@@ -184,6 +184,7 @@ applyCommonDummyUnit(eaaa, {
   animationBlend = 0.0,
   animationRunSpeed = 0.0,
   animationWalkSpeed = 0.0,
+  movementType = MovementType.Fly,
   minHeight = 0.0,
   height = 75.0,
   classification = 'ancient,mechanical,ward',

@@ -54,7 +54,7 @@ local Atan2 = jass.Atan2
 local Cos = jass.Cos
 local Sin = jass.Sin
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local EXSetEffectSize = japi.EXSetEffectSize
@@ -237,7 +237,7 @@ local function _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(boss, target, damage
         ["伤害"] = damage,
         attack = false,
         ranged = true,
-        attackType = ATTACK_TYPE_MAGIC,
+        attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_MAGIC,
         weaponType = WEAPON_TYPE_WHOKNOWS,
         ["来源类型"] = "Boss技能",

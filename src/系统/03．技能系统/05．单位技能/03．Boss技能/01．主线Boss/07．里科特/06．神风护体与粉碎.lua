@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BBE_7F6E_795E_98CE_62A4_4F53_5C42_6570, _____7ED3_7B97_5355_4E2A_795E_98CE_7C89_788E, _____7ED3_7B97_795E_98CE_7C89_788E, _____8C03_5EA6_795E_98CE_7C89_788E, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitState, GetUnitX, GetUnitY, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_MAGIC, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, addDelayedCallback, createTimedEffect, createTimedUnitEffect, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____91CC_79D1_7279BuffID, _____65BD_52A0_7729_6655, _____795E_98CE_62A4_4F53_6280_80FDID
+local _____8BBE_7F6E_795E_98CE_62A4_4F53_5C42_6570, _____7ED3_7B97_5355_4E2A_795E_98CE_7C89_788E, _____7ED3_7B97_795E_98CE_7C89_788E, _____8C03_5EA6_795E_98CE_7C89_788E, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitStateJapi, GetUnitX, GetUnitY, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, addDelayedCallback, createTimedEffect, createTimedUnitEffect, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____91CC_79D1_7279BuffID, _____65BD_52A0_7729_6655, _____795E_98CE_62A4_4F53_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.00．配置")
 local _____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["里科特单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.01．运行时上下文")
@@ -44,7 +44,7 @@ function _____7ED3_7B97_5355_4E2A_795E_98CE_7C89_788E(context, target)
         return
     end
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["神风护体"]
-    local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     local damage = maxLife * cfg["粉碎每层最大生命比例"] * stack
     local stun = cfg["粉碎基础眩晕秒"] + cfg["粉碎每层眩晕秒"] * stack
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
@@ -54,7 +54,7 @@ function _____7ED3_7B97_5355_4E2A_795E_98CE_7C89_788E(context, target)
         ["伤害"] = damage,
         attack = false,
         ranged = false,
-        attackType = ATTACK_TYPE_MAGIC,
+        attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_MAGIC,
         weaponType = WEAPON_TYPE_WHOKNOWS,
         ["来源类型"] = "Boss技能"
@@ -132,12 +132,13 @@ end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
-GetUnitState = jass.GetUnitState
+GetUnitStateJapi = japi.GetUnitState
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")

@@ -20,11 +20,9 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
-const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED as any;
@@ -54,6 +52,12 @@ const { 创建点特效, 设置特效XYZ轴旋转 } = require("lib.扩展函数.
   创建点特效: (this: void, 参数: any) => any;
   设置特效XYZ轴旋转: (this: void, effect: any, 参数: any) => void;
 };
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
+const { 魔法增减 } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
+  魔法增减: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean) => number;
+};
 
 const 菲利斯单位类型ID = stringToFourCC(菲利斯单位技能配置.单位ID);
 const 剑气灵斩技能ID = stringToFourCC(菲利斯数值与表现配置.剑气灵斩.技能槽位);
@@ -67,9 +71,16 @@ function 取目标(this: void, boss: any): any {
 
 function 补充Boss魔法(this: void, context: 菲利斯运行时上下文, amount: number): void {
   const boss = context.Boss单位;
-  const maxMana = GetUnitState(boss, UNIT_STATE_MAX_MANA);
-  const current = GetUnitState(boss, UNIT_STATE_MANA);
-  if (maxMana > 0) SetUnitState(boss, UNIT_STATE_MANA, current + amount > maxMana ? maxMana : current + amount);
+  doHeal({
+    HealSource: boss,
+    HealTarget: boss,
+    HealAmount: 0,
+    HealManaAmount: amount,
+    ItemHeal: false,
+    HealEffect: false,
+    ManaEffect: false,
+    ManaShowText: false,
+  });
   context.当前魔法充能 += amount;
   if (context.当前魔法充能 > 菲利斯数值与表现配置.异形化.魔法阈值) {
     context.当前魔法充能 = 菲利斯数值与表现配置.异形化.魔法阈值;
@@ -109,16 +120,16 @@ function 结算剑气初始命中(this: void, context: 菲利斯运行时上下�
   }
 }
 
-function 创建侵蚀残留(this: void, context: 菲利斯运行时上下文, ax: number, ay: number, bx: number, by: number, angle: number, width: number): void {
+function 创建侵蚀残留(this: void, context: 菲利斯运行时上下文, ax: number, ay: number, bx: number, by: number, angle: number, width: number, effectScaleMultiplier: number): void {
   const boss = context.Boss单位;
   const cfg = 菲利斯数值与表现配置.剑气灵斩;
   const midX = (ax + bx) * 0.5;
   const midY = (ay + by) * 0.5;
-  创建方向特效(cfg.残留特效路径, midX, midY, angle, cfg.残留特效缩放, cfg.侵蚀持续秒);
+  创建方向特效(cfg.残留特效路径, midX, midY, angle + cfg.残留特效朝向偏移角度, cfg.残留特效缩放 * effectScaleMultiplier, cfg.侵蚀持续秒);
   创建技能提示圈({
     类型: "矩形",
-    X: midX,
-    Y: midY,
+    X: ax,
+    Y: ay,
     宽度: width,
     长度: cfg.距离,
     朝向: angle,
@@ -162,8 +173,8 @@ function 创建侵蚀残留(this: void, context: 菲利斯运行时上下文, ax
       const mana = GetUnitState(hero, UNIT_STATE_MANA);
       const lostMana = mana * cfg.侵蚀扣魔当前魔法比例;
       if (lostMana > 0) {
-        SetUnitState(hero, UNIT_STATE_MANA, mana - lostMana);
-        补充Boss魔法(context, lostMana * cfg.侵蚀补魔倍率);
+        const actualManaLoss = -魔法增减(hero, -lostMana, false, false);
+        if (actualManaLoss > 0) 补充Boss魔法(context, actualManaLoss * cfg.侵蚀补魔倍率);
       }
       registerManualBuff(hero, 菲利斯BuffID.侵蚀残留, cfg.侵蚀Buff残留秒, damage, { sourceName: "菲利斯-剑气灵斩" });
       创建点特效({ 模型路径: cfg.Tick命中特效路径, X: GetUnitX(hero), Y: GetUnitY(hero), 持续秒: cfg.Tick命中特效持续秒 });
@@ -184,6 +195,18 @@ export function 释放菲利斯剑气灵斩(this: void, context: 菲利斯运行
   const bx = 极坐标X(ax, angle, cfg.距离);
   const by = 极坐标Y(ay, angle, cfg.距离);
   const width = context.异形化中 ? cfg.宽度 * cfg.异形化宽度倍率 : cfg.宽度;
+  const effectScaleMultiplier = cfg.基础特效扩大倍率 * (context.异形化中 ? cfg.异形化宽度倍率 : 1);
+
+  创建技能提示圈({
+    类型: "矩形",
+    X: ax,
+    Y: ay,
+    宽度: width,
+    长度: cfg.距离,
+    朝向: angle,
+    持续时间: cfg.施法硬直秒,
+    来源单位: boss,
+  });
 
   启动基础施法时间线({
     施法者: boss,
@@ -196,9 +219,9 @@ export function 释放菲利斯剑气灵斩(this: void, context: 菲利斯运行
     },
     on生效: function 菲利斯剑气灵斩生效(this: void): void {
       播放Boss坐标音效(菲利斯音效配置.剑气灵斩.斩出侵蚀, ax, ay, 菲利斯音效配置.默认裁断距离);
-      创建方向特效(cfg.剑气特效路径, ax, ay, angle, cfg.剑气特效缩放, cfg.剑气特效持续秒);
+      创建方向特效(cfg.剑气特效路径, ax, ay, angle, cfg.剑气特效缩放 * effectScaleMultiplier, cfg.剑气特效持续秒);
       结算剑气初始命中(context, ax, ay, bx, by, width);
-      创建侵蚀残留(context, ax, ay, bx, by, angle, width);
+      创建侵蚀残留(context, ax, ay, bx, by, angle, width, effectScaleMultiplier);
     },
   });
 }

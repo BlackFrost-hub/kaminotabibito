@@ -17,14 +17,17 @@ export const 蛇人族接受食人魔任务紧凑剧情片段: 紧凑剧情片�
       动作ID: "SRZ蛇人族_接受食人魔任务", 名称: "拾取狩猎食人魔任务物品后创建沙漠食人魔预置",
       参数: {
         触发进度: 9,
-        目标进度: 10,
         注册范围: 850,
-        任务更新提示: "|cffffff00『主线目标』：|r击败|cffff6600『沙漠食人魔』|r。",
         旧JASS功能清单: "RemoveItem(I0D0) / CreateUnit(次元裂缝) / QuestSetDescription / QuestMessageBJ / CreateUnit(沙漠食人魔) / PauseUnit / SetUnitInvulnerable / TriggerRegisterUnitInRangeSimple / CreatePermanentCorpseLocBJ",
       },
     },
     {
       序号: 2, 挂点: "afterDialog", 对白序号: 1,
+      动作ID: "主线.发布节点目标", 名称: "发布寻找沙漠食人魔目标",
+      参数: { 节点进度: 10 },
+    },
+    {
+      序号: 3, 挂点: "afterDialog", 对白序号: 1,
       动作ID: "SRZ蛇人族_食人魔任务预警", 名称: "食人魔任务预警",
       参数: {
         延迟秒数: 0.5,

@@ -57,7 +57,7 @@ function 结束破魔反击窗口(this: void, context: 里科特运行时上下�
   移除单位指定Buff(context.Boss单位, 里科特BuffID.破魔反击);
 }
 
-function 开始破魔反击窗口(this: void, context: 里科特运行时上下文): void {
+export function 立即开启里科特破魔反击窗口(this: void, context: 里科特运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 里科特数值与表现配置.破魔反击;
@@ -95,7 +95,7 @@ export function 释放里科特破魔反击(this: void, context: 里科特运行
     来源单位: boss,
   });
   const id = addDelayedCallback(prepare * 1000, function 里科特破魔反击预备结束(this: void): void {
-    开始破魔反击窗口(context);
+    立即开启里科特破魔反击窗口(context);
   });
   context.清理.登记延迟回调("里科特-破魔反击预备", id);
 }

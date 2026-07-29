@@ -32,7 +32,6 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -58,15 +57,20 @@ local registerManualBuff = ____require_result_6.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
 local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉")
 local _____5361_745F_62C9BuffID = ____require_result_7["卡瑟拉BuffID"]
+local ____require_result_8 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_8.doHeal
 local _____5DF2_6CE8_518C = false
 local function _____6CBB_7597Boss_56FA_5B9A_503C(boss, amount)
     if not _____5355_4F4D_6709_6548(boss) or not (amount > 0) then
         return
     end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    local life = GetUnitState(boss, UNIT_STATE_LIFE)
-    local next = life + amount
-    SetUnitState(boss, UNIT_STATE_LIFE, next > maxLife and maxLife or next)
+    doHeal({
+        HealSource = boss,
+        HealTarget = boss,
+        HealAmount = amount,
+        ItemHeal = false,
+        HealEffect = false
+    })
 end
 local function _____9009_62E9_6700_4F4E_751F_547D_73A9_5BB6(boss)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
@@ -99,8 +103,8 @@ end
 local function _____521B_5EFA_5730_9762_89E6_624B_6B8B_7247(context, x, y)
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]
     local effect = AddSpecialEffect(cfg["地面模型路径"], x, y)
-    local ____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_8 = context["场上触手残片列表"]
-    ____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_8[#____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_8 + 1] = {X = x, Y = y, ["特效"] = effect, ["已吸收"] = false}
+    local ____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_9 = context["场上触手残片列表"]
+    ____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_9[#____context__573A_4E0A_89E6_624B_6B8B_7247_5217_8868_9 + 1] = {X = x, Y = y, ["特效"] = effect, ["已吸收"] = false}
 end
 local function _____7ED3_7B97_518D_751F_89E6_624B_4E00_8DF3(data)
     local context = data.context
@@ -190,8 +194,8 @@ local function _____751F_6210_518D_751F_89E6_624B(context)
             _____7ED3_7B97_518D_751F_89E6_624B_4E00_8DF3(data)
         end
     )
-    local ____self_9 = context["清理"]
-    ____self_9["登记周期回调"](____self_9, "卡瑟拉-再生触手周期", data["周期ID"])
+    local ____self_10 = context["清理"]
+    ____self_10["登记周期回调"](____self_10, "卡瑟拉-再生触手周期", data["周期ID"])
 end
 local function _____786E_4FDD_89E6_624B_518D_751F_8840_91CF_8282_70B9(context)
     if context["触手再生节点已注册"] then
@@ -315,8 +319,8 @@ local function _____5E94_7528_89E6_624B_7CBE_534E(context, count)
                 end
             end
         )
-        local ____self_10 = context["清理"]
-        ____self_10["登记延迟回调"](____self_10, "卡瑟拉-触手精华攻击回滚", id)
+        local ____self_11 = context["清理"]
+        ____self_11["登记延迟回调"](____self_11, "卡瑟拉-触手精华攻击回滚", id)
     end
     registerManualBuff(
         boss,

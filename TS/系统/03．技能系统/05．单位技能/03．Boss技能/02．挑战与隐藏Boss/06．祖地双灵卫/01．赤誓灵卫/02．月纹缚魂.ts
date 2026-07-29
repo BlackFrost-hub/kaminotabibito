@@ -34,7 +34,7 @@ const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const RAD_TO_DEG = 57.29577951308232;
@@ -95,7 +95,7 @@ export function 释放月纹缚魂(this: void, context: 祖地双灵卫运行时
         if (dx * dx + dy * dy > radius2) continue;
         damaged[hid] = true;
         const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-        造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_MAGIC, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·月纹缚魂' });
+        造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·月纹缚魂' });
         开始硬直(hit, cfg.硬直秒);
       }
     }

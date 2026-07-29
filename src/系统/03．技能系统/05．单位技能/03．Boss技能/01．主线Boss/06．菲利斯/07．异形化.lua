@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____66F4_65B0_9B54_6CD5_663E_793A, _____7ED3_675F_5F02_5F62_5316, _____5F02_5F62_5316Tick, _____542F_52A8_5F02_5F62_5316_72B6_6001, ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, DzSetUnitModel, _____8BBE_7F6EBoss_8840_6761_5934_50CF, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, getBuffRuntime, _____83F2_5229_65AFBuffID, _____5F00_59CB_7275_5F15, _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5F02_5F62_5316_6280_80FDID
+local _____66F4_65B0_9B54_6CD5_663E_793A, _____7ED3_675F_5F02_5F62_5316, _____5F02_5F62_5316Tick, _____542F_52A8_5F02_5F62_5316_72B6_6001, ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, DzSetUnitModel, _____8BBE_7F6EBoss_8840_6761_5934_50CF, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, getBuffRuntime, _____83F2_5229_65AFBuffID, _____5F00_59CB_7275_5F15, _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664, _____9B54_6CD5_589E_51CF, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5F02_5F62_5316_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
@@ -28,7 +28,12 @@ function _____66F4_65B0_9B54_6CD5_663E_793A(context)
     local maxMana = GetUnitState(boss, UNIT_STATE_MAX_MANA)
     if maxMana > 0 then
         local shown = context["当前魔法充能"] > maxMana and maxMana or context["当前魔法充能"]
-        SetUnitState(boss, UNIT_STATE_MANA, shown)
+        _____9B54_6CD5_589E_51CF(
+            boss,
+            shown - GetUnitState(boss, UNIT_STATE_MANA),
+            false,
+            false
+        )
     end
     registerManualBuff(
         boss,
@@ -53,12 +58,12 @@ end
 function _____5F02_5F62_5316Tick(context, callbackID)
     local boss = context["Boss单位"]
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]
-    local ____temp_13 = not _____5355_4F4D_6709_6548(boss)
-    if not ____temp_13 then
-        local ____self_12 = context["清理"]
-        ____temp_13 = ____self_12["已清理"](____self_12)
+    local ____temp_14 = not _____5355_4F4D_6709_6548(boss)
+    if not ____temp_14 then
+        local ____self_13 = context["清理"]
+        ____temp_14 = ____self_13["已清理"](____self_13)
     end
-    if ____temp_13 or getServerTime() >= context["异形化结束Ms"] or getBuffRuntime(boss, _____83F2_5229_65AFBuffID["异形化"]) == nil then
+    if ____temp_14 or getServerTime() >= context["异形化结束Ms"] or getBuffRuntime(boss, _____83F2_5229_65AFBuffID["异形化"]) == nil then
         removePeriodicCallback(callbackID)
         _____7ED3_675F_5F02_5F62_5316(context)
         return
@@ -174,8 +179,8 @@ function _____542F_52A8_5F02_5F62_5316_72B6_6001(context)
             _____5F02_5F62_5316Tick(context, tickID)
         end
     )
-    local ____self_14 = context["清理"]
-    ____self_14["登记周期回调"](____self_14, "菲利斯-异形化Tick", tickID)
+    local ____self_15 = context["清理"]
+    ____self_15["登记周期回调"](____self_15, "菲利斯-异形化Tick", tickID)
 end
 ____exports["释放菲利斯异形化"] = function(context)
     local boss = context["Boss单位"]
@@ -228,7 +233,6 @@ GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
-SetUnitState = jass.SetUnitState
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 UNIT_STATE_MANA = jass.UNIT_STATE_MANA
@@ -258,9 +262,11 @@ local ____require_result_9 = require("系统.03．技能系统.00．技能模板
 _____5F00_59CB_7275_5F15 = ____require_result_9["开始牵引"]
 local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.09．非伤害生命移除")
 _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664 = ____require_result_10["执行非伤害生命移除"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
-createUnitEffect = ____require_result_11.createUnitEffect
+local ____require_result_11 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
+_____9B54_6CD5_589E_51CF = ____require_result_11["魔法增减"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
+createUnitEffect = ____require_result_12.createUnitEffect
 _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____5F02_5F62_5316_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]["技能槽位"])
 local _____5F02_5F62_5316_5DF2_6CE8_518C = false

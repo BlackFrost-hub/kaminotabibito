@@ -34,13 +34,11 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
-local Player = jass.Player
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
@@ -49,11 +47,9 @@ local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local Atan2 = jass.Atan2
 local SquareRoot = jass.SquareRoot
 local R2I = jass.R2I
-local GetRandomInt = jass.GetRandomInt
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
@@ -66,8 +62,10 @@ local ____require_result_1 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local addPeriodicCallback = ____require_result_1.addPeriodicCallback
 local removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local ____require_result_2 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local getRegisteredPlayerHero = ____require_result_2.getRegisteredPlayerHero
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868 = ____require_result_2["获取Boss技能敌对目标列表"]
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
+local _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能最近敌对英雄"]
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 isValidUnit = ____require_result_3.isValidUnit
 local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
@@ -119,71 +117,29 @@ end
 ____exports["取当前生命"] = function(unit)
     return GetUnitState(unit, UNIT_STATE_LIFE)
 end
-____exports["设置当前生命"] = function(unit, value)
-    SetUnitState(unit, UNIT_STATE_LIFE, value)
-end
 ____exports["取攻击力"] = function(unit)
     return _____8BFB_53D6_5355_4F4D_653B_51FB_529B(unit)
 end
-____exports["取菲尼克斯尔玩家英雄列表"] = function()
-    local result = {}
-    do
-        local i = 0
-        while i < 12 do
-            local hero = getRegisteredPlayerHero(Player(i))
-            if ____exports["单位存活"](hero) then
-                result[#result + 1] = hero
-            end
-            i = i + 1
-        end
-    end
-    return result
+____exports["取菲尼克斯尔敌对目标列表"] = function(boss)
+    return _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868(boss)
 end
-____exports["取随机玩家英雄"] = function()
-    local heroes = ____exports["取菲尼克斯尔玩家英雄列表"]()
-    if #heroes <= 0 then
-        return nil
-    end
-    return heroes[GetRandomInt(1, #heroes)]
-end
-____exports["取最近玩家英雄"] = function(x, y)
-    local heroes = ____exports["取菲尼克斯尔玩家英雄列表"]()
-    local best = nil
-    local bestDist = 999999999
-    do
-        local i = 0
-        while i < #heroes do
-            local hero = heroes[i + 1]
-            local d = ____exports["两点距离"](
-                x,
-                y,
-                GetUnitX(hero),
-                GetUnitY(hero)
-            )
-            if d < bestDist then
-                best = hero
-                bestDist = d
-            end
-            i = i + 1
-        end
-    end
-    return best
+____exports["取随机玩家英雄"] = function(boss)
+    return _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss)
 end
 ____exports["取目标或随机玩家"] = function(boss, target)
+    local targets = ____exports["取菲尼克斯尔敌对目标列表"](boss)
     if ____exports["单位存活"](target) then
-        return target
+        do
+            local i = 0
+            while i < #targets do
+                if targets[i + 1] == target then
+                    return target
+                end
+                i = i + 1
+            end
+        end
     end
-    local nearest = ____exports["取最近玩家英雄"](
-        GetUnitX(boss),
-        GetUnitY(boss)
-    )
-    local _____5355_4F4D_5B58_6D3B_result_12
-    if ____exports["单位存活"](nearest) then
-        _____5355_4F4D_5B58_6D3B_result_12 = nearest
-    else
-        _____5355_4F4D_5B58_6D3B_result_12 = ____exports["取随机玩家英雄"]()
-    end
-    return _____5355_4F4D_5B58_6D3B_result_12
+    return _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
 end
 ____exports["面向单位"] = function(source, target)
     if not ____exports["单位有效"](source) or not ____exports["单位有效"](target) then
@@ -245,13 +201,13 @@ ____exports["播放单位特效"] = function(model, unit, attach, lifeMs)
     if model == nil or model == "" or not ____exports["单位有效"](unit) then
         return nil
     end
-    local ____temp_13
+    local ____temp_12
     if lifeMs > 0 then
-        ____temp_13 = createTimedUnitEffect(unit, attach, model, lifeMs / 1000)
+        ____temp_12 = createTimedUnitEffect(unit, attach, model, lifeMs / 1000)
     else
-        ____temp_13 = AddSpecialEffectTarget(model, unit, attach)
+        ____temp_12 = AddSpecialEffectTarget(model, unit, attach)
     end
-    return ____temp_13
+    return ____temp_12
 end
 ____exports["显示常规读条"] = function(_____79D2, _____989C_8272ID, _____6807_9898_6587_672C, _____63D0_793A_6587_672C)
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = _____79D2, ["颜色ID"] = _____989C_8272ID, ["标题文本"] = _____6807_9898_6587_672C, ["提示文本"] = _____63D0_793A_6587_672C})
@@ -319,7 +275,7 @@ end
 ____exports["范围敌人"] = function(boss, x, y, radius)
     return getEnemyUnitsInRange(boss, x, y, radius)
 end
-local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, target, amount, attackType, damageType, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
+local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, target, amount, damageType, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
     if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
         _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3({
             ["技能ID"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["技能ID"],
@@ -329,7 +285,7 @@ local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, tar
             ["目标"] = target,
             ["伤害"] = amount,
             ranged = true,
-            attackType = attackType,
+            attackType = ATTACK_TYPE_NORMAL,
             ["伤害类型"] = damageType,
             weaponType = WEAPON_TYPE_WHOKNOWS,
             ["伤害形态"] = _____4F24_5BB3_5F62_6001
@@ -344,7 +300,6 @@ ____exports["造成火焰伤害"] = function(source, target, amount, _____4F24_5
         source,
         target,
         amount,
-        ATTACK_TYPE_MAGIC,
         DAMAGE_TYPE_FIRE,
         _____4F24_5BB3_5F62_6001,
         _____4E0A_4E0B_6587
@@ -358,7 +313,6 @@ ____exports["造成冰霜伤害"] = function(source, target, amount, _____4F24_5
         source,
         target,
         amount,
-        ATTACK_TYPE_MAGIC,
         DAMAGE_TYPE_COLD,
         _____4F24_5BB3_5F62_6001,
         _____4E0A_4E0B_6587
@@ -372,7 +326,6 @@ ____exports["造成毒火伤害"] = function(source, target, amount, _____4F24_5
         source,
         target,
         amount,
-        ATTACK_TYPE_MAGIC,
         DAMAGE_TYPE_POISON,
         _____4F24_5BB3_5F62_6001,
         _____4E0A_4E0B_6587
@@ -386,7 +339,6 @@ ____exports["造成暗火伤害"] = function(source, target, amount, _____4F24_5
         source,
         target,
         amount,
-        ATTACK_TYPE_NORMAL,
         DAMAGE_TYPE_SHADOW_STRIKE,
         _____4F24_5BB3_5F62_6001,
         _____4E0A_4E0B_6587
@@ -400,7 +352,6 @@ ____exports["造成普通伤害"] = function(source, target, amount, _____4F24_5
         source,
         target,
         amount,
-        ATTACK_TYPE_NORMAL,
         DAMAGE_TYPE_NORMAL,
         _____4F24_5BB3_5F62_6001,
         _____4E0A_4E0B_6587
@@ -497,20 +448,20 @@ ____exports["减少元素层数"] = function(unit, _____5143_7D20, count)
         return
     end
     local runtime = getBuffRuntime(unit, buffID)
-    local ____registerManualBuff_25 = registerManualBuff
-    local ____unit_24 = unit
-    local ____opt_result_22
+    local ____registerManualBuff_24 = registerManualBuff
+    local ____unit_23 = unit
+    local ____opt_result_21
     if runtime ~= nil then
-        ____opt_result_22 = runtime.remaining
+        ____opt_result_21 = runtime.remaining
     end
-    local ____opt_result_22_23 = ____opt_result_22
-    if ____opt_result_22_23 == nil then
-        ____opt_result_22_23 = 30
+    local ____opt_result_21_22 = ____opt_result_21
+    if ____opt_result_21_22 == nil then
+        ____opt_result_21_22 = 30
     end
-    ____registerManualBuff_25(
-        ____unit_24,
+    ____registerManualBuff_24(
+        ____unit_23,
         buffID,
-        ____opt_result_22_23,
+        ____opt_result_21_22,
         next,
         {stack = next, sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
     )

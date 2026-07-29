@@ -461,13 +461,12 @@ local _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_56DE_8C03ID = 0
 local _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_95F4_9694_6BEB_79D2 = 30
 local _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_9ED8_8BA4_9AD8_5EA6 = 50
 local function _____89E3_7ED1_540E_5F52_96F6_5C3A_5BF8_5E76_9500_6BC1Dz_7ED1_5B9A_7279_6548(effect)
-    if not effect then
+    if effect == nil or effect == 0 then
         return
     end
     DzUnbindEffect(effect)
-    EXSetEffectXY(effect, 0, 0)
-    EXSetEffectSize(effect, 0)
-    DestroyEffect(effect)
+    DzSetEffectScale(effect, 0)
+    _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548(effect, 0.01)
 end
 ____exports["销毁Dz绑定特效句柄"] = function(effect)
     _____89E3_7ED1_540E_5F52_96F6_5C3A_5BF8_5E76_9500_6BC1Dz_7ED1_5B9A_7279_6548(effect)

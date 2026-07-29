@@ -2,10 +2,11 @@ local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____01_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．共享")
-local AddSpecialEffectTarget = ____01_FF0E_5171_4EAB.AddSpecialEffectTarget
 local CreateUnit = ____01_FF0E_5171_4EAB.CreateUnit
 local _____9ED8_8BA4_5F39_5E55_5355_4F4D_7C7B_578B = ____01_FF0E_5171_4EAB["默认弹幕单位类型"]
+local DzSetEffectPos = ____01_FF0E_5171_4EAB.DzSetEffectPos
 local DzSetUnitModel = ____01_FF0E_5171_4EAB.DzSetUnitModel
+local EC_CreateEffect = ____01_FF0E_5171_4EAB.EC_CreateEffect
 local GetOwningPlayer = ____01_FF0E_5171_4EAB.GetOwningPlayer
 local GetUnitFacing = ____01_FF0E_5171_4EAB.GetUnitFacing
 local GetUnitX = ____01_FF0E_5171_4EAB.GetUnitX
@@ -35,6 +36,7 @@ local ____index = require("系统.03．技能系统.00．技能模板+函数.01�
 local _____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6 = ____index["触发原生弹幕STES事件"]
 local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．命中.index")
 local _____521B_5EFA_5F39_5E55_547D_4E2D_89C4_5219_72B6_6001 = ____index["创建弹幕命中规则状态"]
+local _____91CD_7F6E_5F39_5E55_547D_4E2D_89C4_5219_72B6_6001 = ____index["重置弹幕命中规则状态"]
 local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.04．驱动.index")
 local _____7ED3_675F_539F_751F_5F39_5E55_5B9E_4F8B = ____index["结束原生弹幕实例"]
 local _____786E_4FDD_539F_751F_5F39_5E55_9A71_52A8 = ____index["确保原生弹幕驱动"]
@@ -157,6 +159,30 @@ local function _____521D_59CB_5316_5F39_5E55_5355_4F4D_7C7B_522B(_____53C2_6570,
         UnitAddAbility(_____5F39_5E55_5355_4F4D, _____8757_866B_6280_80FDID)
     end
 end
+local function _____521B_5EFA_5F39_5E55_9644_52A0_7279_6548(_____53C2_6570, _____5F39_5E55_5355_4F4D, _____7279_6548_53C2_6570)
+    if _____7279_6548_53C2_6570 == nil or _____7279_6548_53C2_6570["模型"] == "" then
+        return nil
+    end
+    local scale = _____7279_6548_53C2_6570["缩放"] or (_____7279_6548_53C2_6570["跟随主弹幕参数"] == true and (_____53C2_6570["缩放"] or 1) or 1)
+    local x = GetUnitX(_____5F39_5E55_5355_4F4D)
+    local y = GetUnitY(_____5F39_5E55_5355_4F4D)
+    local z = _____53C2_6570["飞行高度"] or 0
+    local effect = EC_CreateEffect(
+        _____7279_6548_53C2_6570["模型"],
+        x,
+        y,
+        z,
+        GetUnitFacing(_____5F39_5E55_5355_4F4D),
+        scale,
+        1,
+        -1
+    )
+    if effect == nil or effect == 0 then
+        return nil
+    end
+    DzSetEffectPos(effect, x, y, z)
+    return effect
+end
 local function _____521D_59CB_5316_5F39_5E55_5355_4F4D_8868_73B0(_____53C2_6570, _____5F39_5E55_5355_4F4D)
     _____521D_59CB_5316_5F39_5E55_5355_4F4D_7C7B_522B(_____53C2_6570, _____5F39_5E55_5355_4F4D)
     if _____53C2_6570["模型"] ~= nil and _____53C2_6570["模型"] ~= "" and DzSetUnitModel ~= nil then
@@ -172,10 +198,11 @@ local function _____521D_59CB_5316_5F39_5E55_5355_4F4D_8868_73B0(_____53C2_6570,
     if _____53C2_6570["禁用碰撞"] ~= false then
         SetUnitPathing(_____5F39_5E55_5355_4F4D, false)
     end
-    if _____53C2_6570["附着特效模型"] ~= nil and _____53C2_6570["附着特效模型"] ~= "" then
-        return AddSpecialEffectTarget(_____53C2_6570["附着特效模型"], _____5F39_5E55_5355_4F4D, _____53C2_6570["附着点"] or "origin")
-    end
-    return nil
+    local legacyEffect = _____53C2_6570["附着特效模型"] ~= nil and _____53C2_6570["附着特效模型"] ~= "" and ({["模型"] = _____53C2_6570["附着特效模型"], ["附着点"] = _____53C2_6570["附着点"]}) or nil
+    return {
+        _____521B_5EFA_5F39_5E55_9644_52A0_7279_6548(_____53C2_6570, _____5F39_5E55_5355_4F4D, _____53C2_6570["附加特效1"] or legacyEffect),
+        _____521B_5EFA_5F39_5E55_9644_52A0_7279_6548(_____53C2_6570, _____5F39_5E55_5355_4F4D, _____53C2_6570["附加特效2"])
+    }
 end
 local function _____5F52_4E00_5316_5F39_5E55_8DDD_79BB_53C2_6570(_____53C2_6570)
     if _____53C2_6570["最大距离"] == nil or _____53C2_6570["最大距离"] <= 0 then
@@ -224,10 +251,13 @@ ____exports["创建原生弹幕"] = function(_____53C2_6570)
         ["剩余生命"] = _____53C2_6570["弹幕生命值"] or 0,
         ["弹射次数"] = 0,
         ["已结束"] = false,
-        ["附着特效"] = nil,
+        ["附加特效1"] = nil,
+        ["附加特效2"] = nil,
         ["命中规则状态"] = nil
     }
-    _____5B9E_4F8B["附着特效"] = _____521D_59CB_5316_5F39_5E55_5355_4F4D_8868_73B0(_____53C2_6570, _____5F39_5E55_5355_4F4D)
+    local _____9644_52A0_7279_6548 = _____521D_59CB_5316_5F39_5E55_5355_4F4D_8868_73B0(_____53C2_6570, _____5F39_5E55_5355_4F4D)
+    _____5B9E_4F8B["附加特效1"] = _____9644_52A0_7279_6548[1]
+    _____5B9E_4F8B["附加特效2"] = _____9644_52A0_7279_6548[2]
     _____6FC0_6D3B_975E_725B_5934_4EBA_5F39_5E55_53EF_9009_53D6(_____5B9E_4F8B)
     _____5B9E_4F8B["命中规则状态"] = _____521B_5EFA_5F39_5E55_547D_4E2D_89C4_5219_72B6_6001(_____5B9E_4F8B)
     _____6CE8_518C_539F_751F_5F39_5E55_5B9E_4F8B(
@@ -244,6 +274,14 @@ end
 ____exports["获取单位原生弹幕ID"] = function(_____5355_4F4D)
     local id = _____5355_4F4D_5230_539F_751F_5F39_5E55ID[_____53D6_53E5_67C4ID(_____5355_4F4D)]
     return id or 0
+end
+____exports["重置原生弹幕命中记录"] = function(_____5F39_5E55ID)
+    local _____5B9E_4F8B = _____83B7_53D6_539F_751F_5F39_5E55_5B9E_4F8B(_____5F39_5E55ID)
+    if _____5B9E_4F8B == nil or _____5B9E_4F8B["已结束"] then
+        return false
+    end
+    _____91CD_7F6E_5F39_5E55_547D_4E2D_89C4_5219_72B6_6001(_____5B9E_4F8B)
+    return true
 end
 ____exports["按单位造成原生弹幕阻挡伤害"] = function(_____5F39_5E55_5355_4F4D, _____4F24_5BB3_503C, _____6765_6E90_5355_4F4D)
     local id = ____exports["获取单位原生弹幕ID"](_____5F39_5E55_5355_4F4D)

@@ -39,7 +39,7 @@ local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local Atan2 = jass.Atan2
-local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local BJ_RADTODEG = 57.29577951308232
@@ -115,7 +115,7 @@ local function _____521B_5EFA_73B0_5B9E_65AD_88C2_5224_5B9A(context, angle, orig
                 ["伤害"] = _____8BA1_7B97_4F24_5BB3(boss, unit),
                 attack = false,
                 ranged = true,
-                attackType = ATTACK_TYPE_MAGIC,
+                attackType = ATTACK_TYPE_NORMAL,
                 ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                 weaponType = WEAPON_TYPE_WHOKNOWS,
                 ["来源类型"] = "Boss技能"

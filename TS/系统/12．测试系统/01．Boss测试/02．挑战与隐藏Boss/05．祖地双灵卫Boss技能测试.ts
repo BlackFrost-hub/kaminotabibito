@@ -11,6 +11,7 @@ const {
   设置Boss测试单位满血,
   获取Boss测试玩家基准英雄,
   准备Boss测试固定步兵,
+  准备Boss测试固定山丘之王,
   移除Boss测试单位,
   注册Boss测试命令组,
 } = require('系统.12．测试系统.00．Boss测试系统.index') as {
@@ -18,6 +19,7 @@ const {
   设置Boss测试单位满血: (this: void, unit: any, 最大生命值?: number) => void;
   获取Boss测试玩家基准英雄: (this: void, player: any) => any;
   准备Boss测试固定步兵: (this: void, unit: any, x: number, y: number, facing?: number) => any;
+  准备Boss测试固定山丘之王: (this: void, unit: any, x: number, y: number, facing?: number) => any;
   移除Boss测试单位: (this: void, unit: any) => void;
   注册Boss测试命令组: (this: void, 配置: any) => void;
 };
@@ -118,8 +120,8 @@ interface 祖地双灵卫测试上下文 {
 
 const 最近赤誓灵卫: Record<number, any> = {};
 const 最近苍影灵卫: Record<number, any> = {};
-const 最近测试步兵1: Record<number, any> = {};
-const 最近测试步兵2: Record<number, any> = {};
+const 最近测试步兵: Record<number, any> = {};
+const 最近测试山丘之王: Record<number, any> = {};
 const 双灵测试矩形: Record<number, any> = {};
 
 function 获取或创建双灵测试矩形(this: void, player: any): any {
@@ -173,15 +175,14 @@ function 确保双灵测试战斗矩形(this: void, player: any, unit: any): voi
 }
 
 function 创建或获取祖地双灵卫测试上下文(this: void, player: any): 祖地双灵卫测试上下文 | undefined {
+  const pid = GetPlayerId(player);
   const hero = 获取Boss测试玩家基准英雄(player);
   const pair = 获取或创建双灵测试Boss(player);
   if (!Boss测试单位存活(hero) || pair == null) return undefined;
 
-  SetUnitPosition(hero, 玩家测试X, 玩家测试Y);
-  SetUnitFacing(hero, 90);
   设置Boss测试单位满血(hero);
-  const target = 获取或创建双灵测试步兵(最近测试步兵1, player, 玩家测试X - 220, 玩家测试Y + 180);
-  获取或创建双灵测试步兵(最近测试步兵2, player, 玩家测试X + 220, 玩家测试Y + 180);
+  const target = 获取或创建双灵测试步兵(最近测试步兵, player, 玩家测试X - 220, 玩家测试Y + 180);
+  最近测试山丘之王[pid] = 准备Boss测试固定山丘之王(最近测试山丘之王[pid], 玩家测试X + 220, 玩家测试Y + 180, 90);
   if (!Boss测试单位存活(target)) return undefined;
 
   注册祖地双灵卫被动效果();
@@ -208,13 +209,13 @@ function 清理祖地双灵卫测试上下文(this: void, player: any, context: 
   }
   const rect = 双灵测试矩形[pid];
   if (rect != null && rect !== 0) RemoveRect(rect);
-  移除Boss测试单位(最近测试步兵1[pid]);
-  移除Boss测试单位(最近测试步兵2[pid]);
+  移除Boss测试单位(最近测试步兵[pid]);
+  移除Boss测试单位(最近测试山丘之王[pid]);
   移除Boss测试单位(最近赤誓灵卫[pid]);
   移除Boss测试单位(最近苍影灵卫[pid]);
   双灵测试矩形[pid] = undefined;
-  最近测试步兵1[pid] = undefined;
-  最近测试步兵2[pid] = undefined;
+  最近测试步兵[pid] = undefined;
+  最近测试山丘之王[pid] = undefined;
   最近赤誓灵卫[pid] = undefined;
   最近苍影灵卫[pid] = undefined;
   if (globals.udg_Boss === context?.赤誓灵卫单位) globals.udg_Boss = null;

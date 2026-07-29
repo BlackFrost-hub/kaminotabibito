@@ -17,6 +17,9 @@ local _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F = ____02_FF0E_5267_60C5_52A8_
 local _____53D1_9001_5267_60C5_5C0F_5730_56FE_4FE1_53F7 = ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5["发送剧情小地图信号"]
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
 local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["读取剧情运行时单位"]
+local ____12_FF0E_5267_60C5_7535_5F71_955C_5934 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情电影镜头")
+local _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F = ____12_FF0E_5267_60C5_7535_5F71_955C_5934["进入剧情电影模式"]
+local _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934 = ____12_FF0E_5267_60C5_7535_5F71_955C_5934["退出剧情电影模式并恢复镜头"]
 function _____8BFB_53D6_5168_5C40_53E5_67C4(_____53D8_91CF_540D)
     if _____53D8_91CF_540D == "" then
         return nil
@@ -571,20 +574,10 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
         _____5199_5165_5267_60C5_8FDB_5EA6(_____8BBE_7F6E_8FDB_5EA6)
     end
     if _____53D6_53C2_6570_5E03_5C14(_____53C2_6570, "开启电影模式") then
-        local ____require_result_26 = require("lib.扩展函数.BJ函数.05A．电影函数")
-        local CinematicModeBJ = ____require_result_26.CinematicModeBJ
-        CinematicModeBJ(
-            true,
-            GetPlayersAll()
-        )
+        _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F()
     end
     if _____53D6_53C2_6570_5E03_5C14(_____53C2_6570, "关闭电影模式") then
-        local ____require_result_27 = require("lib.扩展函数.BJ函数.05A．电影函数")
-        local CinematicModeBJ = ____require_result_27.CinematicModeBJ
-        CinematicModeBJ(
-            false,
-            GetPlayersAll()
-        )
+        _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934()
     end
     if _____53D6_53C2_6570_5E03_5C14(_____53C2_6570, "玩家英雄组暂停") or _____53D6_53C2_6570_5E03_5C14(_____53C2_6570, "玩家英雄组无敌") then
         ____exports["设置玩家英雄组控制状态"](true, true)
@@ -628,13 +621,13 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
         ____exports["给玩家组添加区域视野"](_____53EF_89C1_533A_57DF2)
     end
     local ____NPC_5F15_7528 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "NPC") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "长老单位")
-    local ____temp_28
+    local ____temp_26
     if ____NPC_5F15_7528 ~= "" then
-        ____temp_28 = ____exports["读取语义单位引用"](____NPC_5F15_7528)
+        ____temp_26 = ____exports["读取语义单位引用"](____NPC_5F15_7528)
     else
-        ____temp_28 = nil
+        ____temp_26 = nil
     end
-    local npcUnit = ____temp_28
+    local npcUnit = ____temp_26
     local _____89E6_53D1_5355_4F4D = ____exports["读取触发单位"]()
     if npcUnit ~= nil and npcUnit ~= 0 then
         if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then

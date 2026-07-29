@@ -1,6 +1,12 @@
 /** @noSelfInFile */
 
-import type { 单位AI归类, 单位AI配置 } from "./01．AI配置类型";
+import type {
+  AI技能运行时可用条件,
+  AI运行时状态,
+  AI运行时状态读取器,
+  单位AI归类,
+  单位AI配置,
+} from "./01．AI配置类型";
 
 const { 按名字反查杂鱼单位ID } = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表") as {
   按名字反查杂鱼单位ID: (this: void, name: string) => string | undefined;
@@ -23,6 +29,21 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 
 export function 创建单位AI配置(this: void, 配置: 单位AI配置): 单位AI配置 {
   return 配置;
+}
+
+export function 创建AI状态白名单条件(
+  this: void,
+  读取状态: AI运行时状态读取器,
+  允许状态列表: AI运行时状态[]
+): AI技能运行时可用条件 {
+  return function AI状态白名单条件(this: void, unit: any): boolean {
+    const 当前状态 = 读取状态(unit);
+    if (当前状态 == null) return false;
+    for (let i = 0; i < 允许状态列表.length; i++) {
+      if (允许状态列表[i] === 当前状态) return true;
+    }
+    return false;
+  };
 }
 
 export function 按归类筛选单位AI配置(this: void, 配置列表: 单位AI配置[], 归类: 单位AI归类): 单位AI配置[] {

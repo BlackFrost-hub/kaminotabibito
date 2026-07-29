@@ -28,7 +28,7 @@ local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local _____82F1_7075_9668_661F_6280_80FDKey = "英灵陨星"
@@ -81,7 +81,7 @@ local function _____7ED3_7B97_82F1_7075_9668_661F(context, x, y, radius)
                     ["伤害"] = damage,
                     attack = false,
                     ranged = true,
-                    attackType = ATTACK_TYPE_MAGIC,
+                    attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能",

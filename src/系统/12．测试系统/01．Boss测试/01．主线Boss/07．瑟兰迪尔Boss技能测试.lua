@@ -49,6 +49,7 @@ local ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B = ____require_result_16["Boss测试
 local _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840 = ____require_result_16["设置Boss测试单位满血"]
 local _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4 = ____require_result_16["获取Boss测试玩家基准英雄"]
 local _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175 = ____require_result_16["准备Boss测试固定步兵"]
+local _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_5C71_4E18_4E4B_738B = ____require_result_16["准备Boss测试固定山丘之王"]
 local _____79FB_9664Boss_6D4B_8BD5_5355_4F4D = ____require_result_16["移除Boss测试单位"]
 local _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4 = ____require_result_16["注册Boss测试命令组"]
 local _____745F_5170_8FEA_5C14_5355_4F4DID = stringToFourCC("N057")
@@ -64,8 +65,8 @@ local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local GetPlayerId = jass.GetPlayerId
 local _____6700_8FD1_6D4B_8BD5Boss = {}
-local _____6700_8FD1_6D4B_8BD5_6B65_51751 = {}
-local _____6700_8FD1_6D4B_8BD5_6B65_51752 = {}
+local _____6700_8FD1_6D4B_8BD5_6B65_5175 = {}
+local _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B = {}
 local _____6700_8FD1_6D4B_8BD5_4E0A_4E0B_6587 = {}
 local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player)
     local pid = GetPlayerId(player)
@@ -101,12 +102,10 @@ local function _____521B_5EFA_6216_83B7_53D6_745F_5170_8FEA_5C14_6D4B_8BD5(playe
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(hero) or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(boss) then
         return nil
     end
-    SetUnitPosition(hero, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y)
-    SetUnitFacing(hero, 90)
     _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840(hero)
-    local target = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_51751[pid], _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X - 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
-    _____6700_8FD1_6D4B_8BD5_6B65_51751[pid] = target
-    _____6700_8FD1_6D4B_8BD5_6B65_51752[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_51752[pid], _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X + 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
+    local target = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_5175[pid], _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X - 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
+    _____6700_8FD1_6D4B_8BD5_6B65_5175[pid] = target
+    _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_5C71_4E18_4E4B_738B(_____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid], _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X + 220, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
         return nil
     end
@@ -144,12 +143,12 @@ local function _____6E05_7406_745F_5170_8FEA_5C14_6D4B_8BD5(player, context)
     if boss ~= nil and boss ~= 0 then
         _____6E05_7406_745F_5170_8FEA_5C14_4E0A_4E0B_6587(boss)
     end
-    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_51751[pid])
-    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_51752[pid])
+    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_5175[pid])
+    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid])
     _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(boss)
     _____6700_8FD1_6D4B_8BD5_4E0A_4E0B_6587[pid] = nil
-    _____6700_8FD1_6D4B_8BD5_6B65_51751[pid] = nil
-    _____6700_8FD1_6D4B_8BD5_6B65_51752[pid] = nil
+    _____6700_8FD1_6D4B_8BD5_6B65_5175[pid] = nil
+    _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = nil
     _____6700_8FD1_6D4B_8BD5Boss[pid] = nil
     if globals.udg_Boss == boss then
         globals.udg_Boss = nil

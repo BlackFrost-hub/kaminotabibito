@@ -2,17 +2,12 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  移除单位暂停: (this: void, unit: any, source: string) => boolean;
-};
-const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
-
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
-const { TransmissionFromUnitWithNameBJ, CinematicModeBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
+const { TransmissionFromUnitWithNameBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
   TransmissionFromUnitWithNameBJ: (
     this: void,
     toForce: any,
@@ -24,7 +19,6 @@ const { TransmissionFromUnitWithNameBJ, CinematicModeBJ } = require("lib.扩展�
     timeVal: number,
     wait: boolean,
   ) => void;
-  CinematicModeBJ: (this: void, cineMode: boolean, forForce: any) => void;
 };
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
@@ -37,19 +31,8 @@ const { 发送头像提示给玩家, 发送单位提示给玩家, 广播单位�
   发送单位提示给玩家: (this: void, targetPlayer: any, sourceUnit: any, text: string, duration?: number) => void;
   广播单位提示: (this: void, sourceUnit: any, text: string, duration?: number) => void;
 };
-const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
-};
-const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动") as {
-  启动Boss战运行: (this: void, bossUnit: any) => void;
-};
-const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用") as {
-  应用Boss战启动属性配置: (this: void, unit: any) => void;
-};
-const { 记录Boss自动技能启动, 是否已登记Boss自动技能 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表") as {
-  记录Boss自动技能启动: (this: void, unit: any, source: "Boss战.绑定单位") => any;
-  是否已登记Boss自动技能: (this: void, unit: any) => boolean;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -59,12 +42,13 @@ import 主线剧情片段配置表 from "./01．剧情片段配置表";
 import type { 剧情动作参数表, 剧情动作执行上下文 } from "../00．剧情系统核心工具/00．剧情动作类型";
 import { 写入当前剧情动作上下文 } from "../00．剧情系统核心工具/01．剧情动作上下文";
 import { 按名字给触发单位物品, 执行通用剧情动作, 读取语义单位引用 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 启动剧情Boss战 } from "../00．剧情系统核心工具/11．剧情Boss战启动桥接";
+import { 退出剧情电影模式并恢复镜头 } from "../00．剧情系统核心工具/12．剧情电影镜头";
 import type { 剧情片段配置, 剧情步骤 } from "./00．剧情步骤类型";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerPlayer = jass.GetTriggerPlayer as (this: void) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (
   this: void,
@@ -80,9 +64,6 @@ const bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET as number;
 const bj_QUESTMESSAGE_HINT = jglobals.bj_QUESTMESSAGE_HINT as number;
 
 const 剧情播放器模块名 = "11．剧情系统-剧情步骤播放器";
-const Boss战表名 = "Boss战";
-const Boss战绑定单位字段 = "绑定单位";
-const Boss战触发玩家字段 = "触发玩家";
 const 默认广播头像路径 = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
 
 export interface 剧情播放器运行时 {
@@ -154,7 +135,7 @@ function 结束当前剧情片段(this: void): void {
   剧情播放器运行时状态.当前片段ID = undefined;
   当前片段 = undefined;
   清理剧情延迟任务(播放世代);
-  CinematicModeBJ(false, GetPlayersAll());
+  退出剧情电影模式并恢复镜头();
   if (片段ID !== "") debugLogForce(剧情播放器模块名, "剧情片段结束", 片段ID);
 }
 
@@ -363,22 +344,6 @@ function 执行自定义动作步骤(this: void, 步骤: 剧情步骤): void {
 function 读取单位引用(this: void, 引用: string | undefined): any {
   if (引用 == null || 引用 === "") return null;
   return 读取语义单位引用(引用);
-}
-
-function 启动剧情Boss战(this: void, bossUnit: any): void {
-  if (bossUnit == null || bossUnit === 0) return;
-  if (!是否已登记Boss自动技能(bossUnit)) {
-    记录Boss自动技能启动(bossUnit, "Boss战.绑定单位");
-  }
-  应用Boss战启动属性配置(bossUnit);
-  YDUserDataSetSafe("string", Boss战表名, Boss战绑定单位字段, "unit", bossUnit);
-  const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
-  if (触发单位 != null && 触发单位 !== 0) {
-    YDUserDataSetSafe("string", Boss战表名, Boss战触发玩家字段, "unit", 触发单位);
-  }
-  移除单位暂停(bossUnit, 剧情Boss预置暂停来源);
-  SetUnitInvulnerable(bossUnit, false);
-  启动Boss战运行(bossUnit);
 }
 
 function 执行Boss战启动步骤(this: void, 步骤: 剧情步骤): void {

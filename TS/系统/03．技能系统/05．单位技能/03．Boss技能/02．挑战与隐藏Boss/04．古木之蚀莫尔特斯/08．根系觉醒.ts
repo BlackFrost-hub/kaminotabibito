@@ -13,20 +13,21 @@ const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
 const jass = require("jass.common") as any;
 
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const ShowUnit = jass.ShowUnit as (unit: any, show: boolean) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const { 创建限时摧毁目标组 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.02．限时摧毁目标组") as {
@@ -56,10 +57,7 @@ function 延迟隐藏根系觉醒Boss(this: void, context: 莫尔特斯运行时
 
 function 治疗Boss最大生命比例(this: void, boss: any, ratio: number): void {
   if (!单位有效(boss) || !(ratio > 0)) return;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  const life = GetUnitState(boss, UNIT_STATE_LIFE);
-  const next = life + maxLife * ratio;
-  SetUnitState(boss, UNIT_STATE_LIFE, next > maxLife ? maxLife : next);
+  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio, ItemHeal: false, HealEffect: false });
 }
 
 function 选择腐败之源格子(this: void, context: 莫尔特斯运行时上下文): any[] {

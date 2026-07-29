@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB, _____8FDB_5165_65E0_4ECE_66B4_6012, _____9000_51FA_65E0_4ECE_66B4_6012, _____5237_65B0_968F_4ECE_72B6_6001, GetUnitX, GetUnitY, GetUnitDefaultMoveSpeed, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____6811_9B54_9996_9886BuffID, SGSS_SetState, createTimedEffect, _____653B_901F_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID
+local _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB, _____8FDB_5165_65E0_4ECE_66B4_6012, _____9000_51FA_65E0_4ECE_66B4_6012, _____6E05_9664_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_968F_4ECE_72B6_6001, GetUnitX, GetUnitY, GetUnitDefaultMoveSpeed, AddSpecialEffectTarget, DestroyEffect, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____6811_9B54_9996_9886BuffID, SGSS_SetState, _____653B_51FB_529B_5C5E_6027ID, _____653B_901F_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -18,6 +18,7 @@ local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_65
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____5355_4F4D_53E5_67C4_5B58_5728 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位句柄存在"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____13_FF0E_65BD_6CD5_65F6_95F4_7EBF = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
@@ -46,6 +47,7 @@ function _____8FDB_5165_65E0_4ECE_66B4_6012(context)
     context["暴怒移速增量"] = GetUnitDefaultMoveSpeed(context["Boss单位"]) * cfg["无小弟移速提高"]
     SGSS_SetState(context["Boss单位"], _____653B_901F_5C5E_6027ID, context["暴怒攻速增量"])
     SGSS_SetState(context["Boss单位"], _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, context["暴怒移速增量"])
+    context["暴怒持续特效"] = AddSpecialEffectTarget(cfg["暴怒持续特效路径"], context["Boss单位"], "origin")
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____6811_9B54_9996_9886_97F3_6548_914D_7F6E["随从特性"]["无从暴怒"],
         GetUnitX(context["Boss单位"]),
@@ -59,6 +61,10 @@ function _____9000_51FA_65E0_4ECE_66B4_6012(context)
         return
     end
     context["无从暴怒中"] = false
+    if context["暴怒持续特效"] ~= nil and context["暴怒持续特效"] ~= 0 then
+        DestroyEffect(context["暴怒持续特效"])
+    end
+    context["暴怒持续特效"] = nil
     if context["暴怒攻速增量"] ~= 0 then
         SGSS_SetState(context["Boss单位"], _____653B_901F_5C5E_6027ID, -context["暴怒攻速增量"])
     end
@@ -68,6 +74,27 @@ function _____9000_51FA_65E0_4ECE_66B4_6012(context)
     context["暴怒攻速增量"] = 0
     context["暴怒移速增量"] = 0
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["Boss单位"], _____6811_9B54_9996_9886BuffID["无从暴怒"])
+end
+function _____6E05_9664_517D_7FA4_653B_51FB_529B_52A0_6210(context)
+    local applied = context["兽群攻击力增量"]
+    if applied ~= 0 and _____5355_4F4D_53E5_67C4_5B58_5728(context["Boss单位"]) then
+        SGSS_SetState(context["Boss单位"], _____653B_51FB_529B_5C5E_6027ID, -applied)
+    end
+    context["兽群攻击力增量"] = 0
+end
+function _____5237_65B0_517D_7FA4_653B_51FB_529B_52A0_6210(context)
+    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
+    local rawRatio = context["当前兽群层数"] * cfg["每个小弟攻击提高"]
+    local ratio = rawRatio < cfg["最高攻击提高"] and rawRatio or cfg["最高攻击提高"]
+    local currentAttack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["Boss单位"])
+    local attackWithoutPack = currentAttack - context["兽群攻击力增量"]
+    local baseAttack = attackWithoutPack > 0 and attackWithoutPack or 0
+    local nextBonus = baseAttack * ratio
+    local delta = nextBonus - context["兽群攻击力增量"]
+    if delta > 0.001 or delta < -0.001 then
+        SGSS_SetState(context["Boss单位"], _____653B_51FB_529B_5C5E_6027ID, delta)
+    end
+    context["兽群攻击力增量"] = nextBonus
 end
 function _____5237_65B0_968F_4ECE_72B6_6001(context)
     if not _____5355_4F4D_5B58_6D3B(context["Boss单位"]) then
@@ -79,6 +106,7 @@ function _____5237_65B0_968F_4ECE_72B6_6001(context)
     local count = ____self_14["取存活数量"](____self_14)
     context["当前随从数量"] = count
     context["当前兽群层数"] = count < cfg["兽群最高层数"] and count or cfg["兽群最高层数"]
+    _____5237_65B0_517D_7FA4_653B_51FB_529B_52A0_6210(context)
     if count > 0 then
         _____9000_51FA_65E0_4ECE_66B4_6012(context)
         registerManualBuff(
@@ -86,7 +114,7 @@ function _____5237_65B0_968F_4ECE_72B6_6001(context)
             _____6811_9B54_9996_9886BuffID["兽群号令"],
             cfg["兽群Buff刷新秒"],
             context["当前兽群层数"],
-            {sourceName = "树魔首领"}
+            {sourceName = "树魔首领", stack = context["当前兽群层数"]}
         )
     else
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["Boss单位"], _____6811_9B54_9996_9886BuffID["兽群号令"])
@@ -97,13 +125,6 @@ function _____5237_65B0_968F_4ECE_72B6_6001(context)
             cfg["暴怒Buff刷新秒"],
             1,
             {sourceName = "树魔首领"}
-        )
-        createTimedEffect(
-            cfg["暴怒持续特效路径"],
-            GetUnitX(context["Boss单位"]),
-            GetUnitY(context["Boss单位"]),
-            0,
-            cfg["暴怒持续特效刷新毫秒"] / 1000
         )
     end
 end
@@ -118,33 +139,32 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomReal = jass.GetRandomReal
 local GetRandomInt = jass.GetRandomInt
 local GetUnitState = jass.GetUnitState
+AddSpecialEffectTarget = jass.AddSpecialEffectTarget
+DestroyEffect = jass.DestroyEffect
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
 local getServerTime = ____require_result_0.getServerTime
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_1.registerDamageModifier
-local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_2.registerDeathListener
-local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_3.registerManualBuff
-_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
-local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领")
-_____6811_9B54_9996_9886BuffID = ____require_result_4["树魔首领BuffID"]
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.00．SGSS")
-SGSS_SetState = ____require_result_5.SGSS_SetState
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedEffect = ____require_result_6.createTimedEffect
-local ____require_result_7 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_7.CosBJ
-local SinBJ = ____require_result_7.SinBJ
-local ____require_result_8 = require("系统.01．单位系统.10．护卫系统.index")
-local _____521B_5EFA_62A4_536B_5355_4F4D = ____require_result_8["创建护卫单位"]
-local _____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_8["获取Boss护卫列表"]
-local _____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_8["是否指定Boss护卫"]
-local _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B = ____require_result_8["处理Boss结束全部护卫"]
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_1.registerDeathListener
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_2.registerManualBuff
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
+local ____require_result_3 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领")
+_____6811_9B54_9996_9886BuffID = ____require_result_3["树魔首领BuffID"]
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.00．SGSS")
+SGSS_SetState = ____require_result_4.SGSS_SetState
+local ____require_result_5 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_5.CosBJ
+local SinBJ = ____require_result_5.SinBJ
+local ____require_result_6 = require("系统.01．单位系统.10．护卫系统.index")
+local _____521B_5EFA_62A4_536B_5355_4F4D = ____require_result_6["创建护卫单位"]
+local _____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_6["获取Boss护卫列表"]
+local _____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_6["是否指定Boss护卫"]
+local _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B = ____require_result_6["处理Boss结束全部护卫"]
+_____653B_51FB_529B_5C5E_6027ID = 1
 _____653B_901F_5C5E_6027ID = 10
 _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID = 9
 local _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
@@ -160,8 +180,8 @@ local function _____5355_4F4D_7C7B_578B_662F_6811_9B54_9996_9886(unit)
 end
 local function _____7EDF_8BA1_6811_9B54_968F_4ECE(context)
     local result = {["猎头者"] = 0, ["巫医"] = 0, ["投掷者"] = 0}
-    local ____self_9 = context["随从组"]
-    local list = ____self_9["取单位列表"](____self_9)
+    local ____self_7 = context["随从组"]
+    local list = ____self_7["取单位列表"](____self_7)
     do
         local i = 0
         while i < #list do
@@ -237,8 +257,8 @@ local function _____53EC_5524_6811_9B54_968F_4ECE(context, unitTypeId, _____7F16
     if minion == nil or minion == 0 then
         return nil
     end
-    local ____self_10 = context["随从组"]
-    ____self_10["登记"](____self_10, minion)
+    local ____self_8 = context["随从组"]
+    ____self_8["登记"](____self_8, minion)
     return minion
 end
 local function _____968F_673A_53D6_97F3_6548_8DEF_5F84(list)
@@ -284,13 +304,13 @@ local function _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807(context)
     if target ~= nil then
         return target
     end
-    local ____temp_11
+    local ____temp_9
     if bossMissingRatio > 0 then
-        ____temp_11 = boss
+        ____temp_9 = boss
     else
-        ____temp_11 = nil
+        ____temp_9 = nil
     end
-    return ____temp_11
+    return ____temp_9
 end
 local function _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2(context, witchDoctor)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
@@ -356,8 +376,8 @@ local function _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8(context, witchDoctor
             })
         end
     )
-    local ____self_12 = context["清理"]
-    ____self_12["登记周期回调"](____self_12, "树魔巫医治疗", healId)
+    local ____self_10 = context["清理"]
+    ____self_10["登记周期回调"](____self_10, "树魔巫医治疗", healId)
 end
 local function _____8865_5145_6307_5B9A_7C7B_578B_968F_4ECE(context, unitTypeId, _____5F53_524D_6570_91CF, _____7F16_5236)
     local created = 0
@@ -408,12 +428,28 @@ ____exports["初始化树魔首领随从特性"] = function(context)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
     context["随从特性已初始化"] = true
     local boss = context["Boss单位"]
-    local ____self_13 = context["清理"]
-    ____self_13["登记清理"](
-        ____self_13,
+    local ____self_11 = context["清理"]
+    ____self_11["登记清理"](
+        ____self_11,
         "树魔首领-护卫登记清理",
         function()
             _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B(boss)
+        end
+    )
+    local ____self_12 = context["清理"]
+    ____self_12["登记清理"](
+        ____self_12,
+        "树魔首领-兽群攻击力回滚",
+        function()
+            _____6E05_9664_517D_7FA4_653B_51FB_529B_52A0_6210(context)
+        end
+    )
+    local ____self_13 = context["清理"]
+    ____self_13["登记清理"](
+        ____self_13,
+        "树魔首领-无从暴怒清理",
+        function()
+            _____9000_51FA_65E0_4ECE_66B4_6012(context)
         end
     )
     if cfg["初始召唤延迟秒"] <= 0 then
@@ -434,19 +470,6 @@ ____exports["立即补充树魔首领随从"] = function(context)
     context["下一次召唤Ms"] = getServerTime() + cfg["补员间隔秒"] * 1000
     _____5237_65B0_968F_4ECE_72B6_6001(context)
     return created
-end
-local function _____6811_9B54_9996_9886_968F_4ECE_4F24_5BB3_4FEE_6B63(damageContext)
-    local attacker = damageContext.attacker
-    if not _____662F_6811_9B54_9996_9886(attacker) then
-        return damageContext.currentDamage
-    end
-    local context = _____83B7_53D6_6216_521B_5EFA_6811_9B54_9996_9886_4E0A_4E0B_6587(attacker)
-    if context == nil or context["当前兽群层数"] <= 0 then
-        return damageContext.currentDamage
-    end
-    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
-    local bonus = math.min(cfg["最高攻击提高"], context["当前兽群层数"] * cfg["每个小弟攻击提高"])
-    return damageContext.currentDamage * (1 + bonus)
 end
 local function ____on_6811_9B54_9996_9886_6B7B_4EA1(dyingUnit)
     if not _____5355_4F4D_7C7B_578B_662F_6811_9B54_9996_9886(dyingUnit) then
@@ -474,7 +497,7 @@ local function _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick()
             do
                 local context = list[i + 1]
                 if context == nil then
-                    goto __continue79
+                    goto __continue83
                 end
                 if context["随从特性已初始化"] and context["下一次召唤Ms"] > 0 and now >= context["下一次召唤Ms"] then
                     _____8865_5145_6811_9B54_968F_4ECE_7F16_5236(context)
@@ -482,7 +505,7 @@ local function _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick()
                 end
                 _____5237_65B0_968F_4ECE_72B6_6001(context)
             end
-            ::__continue79::
+            ::__continue83::
             i = i + 1
         end
     end
@@ -492,7 +515,6 @@ ____exports["注册树魔首领随从特性"] = function()
         return
     end
     _____6811_9B54_9996_9886_968F_4ECE_7279_6027_5DF2_6CE8_518C = true
-    registerDamageModifier(_____6811_9B54_9996_9886_968F_4ECE_4F24_5BB3_4FEE_6B63, 45)
     registerDeathListener(____on_6811_9B54_9996_9886_6B7B_4EA1)
     addPeriodicCallback(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["追随刷新间隔毫秒"], _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick)
 end

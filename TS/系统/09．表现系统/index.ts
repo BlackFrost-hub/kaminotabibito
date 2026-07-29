@@ -27,6 +27,9 @@ const 物品提示模拟 = require("系统.09．表现系统.12．物品提示�
 const 单位头顶血条 = require("系统.09．表现系统.13．单位头顶血条.index") as {
   init: (this: void) => void;
 };
+const 镜头高度控制 = require("系统.09．表现系统.14．镜头高度控制.index") as {
+  init: (this: void) => void;
+};
 
 let 表现系统已初始化 = false;
 
@@ -44,6 +47,7 @@ export function init(this: void): void {
   require("系统.09．表现系统.08．吟唱条.index");
   require("系统.09．表现系统.11．背景框.index");
   单位头顶血条.init();
+  镜头高度控制.init();
   物品提示模拟.init();
   广播提示消息系统.初始化广播提示消息系统();
   游戏说明手册.init();

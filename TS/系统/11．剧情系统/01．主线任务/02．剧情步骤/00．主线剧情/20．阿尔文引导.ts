@@ -22,9 +22,6 @@ export function 执行阿尔文接引(this: void): void {
   EC_CreateEffect("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", GetUnitX(阿尔文), GetUnitY(阿尔文), 0, 270, 2, 1, 1.5);
 }
 
-function 执行阿尔文路线指引(this: void): void {}
-
 export const 阿尔文引导剧情动作注册表: Record<string, 剧情动作处理器> = {
   "JLC精灵城_阿尔文接引": 执行阿尔文接引,
-  "JLC精灵城_阿尔文路线指引": 执行阿尔文路线指引,
 };

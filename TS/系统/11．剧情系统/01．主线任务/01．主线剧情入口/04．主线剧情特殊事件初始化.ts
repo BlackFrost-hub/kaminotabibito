@@ -65,14 +65,14 @@ import type {
 import { 主线剧情技能通道事件配置表 } from "./05．主线剧情事件配置表";
 import { 蛇人族卫队长血线承接配置 } from "../02．剧情步骤/01．第一章/14．蛇人族卫队长试炼";
 import { 读取剧情进度, 写入剧情进度 } from "../00．剧情系统核心工具/01．剧情动作上下文";
-import { 更新主线任务UI, 读取语义单位引用 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 读取语义单位引用 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 发布主线节点目标 } from "../00．剧情系统核心工具/10．标准剧情动作";
 import { 处理技能推进主线剧情 } from "../00．剧情系统核心工具/07．剧情技能事件辅助";
 
 const GetUnitName = jass.GetUnitName as (this: void, whichUnit: any) => string;
 const GetUnitState = jass.GetUnitState as (this: void, whichUnit: any, whichState: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
 const IsUnitInRangeXY = jass.IsUnitInRangeXY as (this: void, whichUnit: any, x: number, y: number, distance: number) => boolean;
-const PingMinimap = jass.PingMinimap as (this: void, x: number, y: number, duration: number) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveUnit = jass.RemoveUnit as (this: void, whichUnit: any) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
@@ -243,8 +243,7 @@ function 执行最终伤害推进剧情(this: void, 配置: 主线剧情最终�
     YDUserDataClearTableSafe("unit", target);
   }
 
-  PingMinimap(配置.小地图X, 配置.小地图Y, 配置.小地图持续时间);
-  更新主线任务UI(配置.任务描述 ?? "", 配置.任务提示);
+  发布主线节点目标(配置.目标剧情进度);
 
   if (配置.支线任务发现 != null) {
     执行支线任务发现(配置.支线任务发现);

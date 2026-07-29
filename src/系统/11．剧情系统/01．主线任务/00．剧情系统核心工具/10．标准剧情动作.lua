@@ -1,0 +1,74 @@
+local ____lualib = require("lualib_bundle")
+local __TS__Number = ____lualib.__TS__Number
+local ____exports = {}
+local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
+local _____5199_5165_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入剧情进度"]
+local ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.02．剧情动作桥接")
+local _____53D1_9001_5267_60C5_5C0F_5730_56FE_4FE1_53F7 = ____02_FF0E_5267_60C5_52A8_4F5C_6865_63A5["发送剧情小地图信号"]
+local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
+local _____505C_6B62_89E6_53D1_5355_4F4D = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["停止触发单位"]
+local _____66F4_65B0_4E3B_7EBF_4EFB_52A1UI = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["更新主线任务UI"]
+local ____09_FF0E_4E3B_7EBF_8282_70B9_914D_7F6E = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.09．主线节点配置")
+local _____83B7_53D6_4E3B_7EBF_8282_70B9_914D_7F6E = ____09_FF0E_4E3B_7EBF_8282_70B9_914D_7F6E["获取主线节点配置"]
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
+local _____6807_51C6_5267_60C5_52A8_4F5C_6A21_5757_540D = "11．剧情系统-标准剧情动作"
+local function _____8BFB_53D6_8282_70B9_8FDB_5EA6(_____53C2_6570)
+    local _____8282_70B9_8FDB_5EA6 = _____53C2_6570["节点进度"]
+    if type(_____8282_70B9_8FDB_5EA6) == "number" then
+        return _____8282_70B9_8FDB_5EA6
+    end
+    if type(_____8282_70B9_8FDB_5EA6) == "string" then
+        return __TS__Number(_____8282_70B9_8FDB_5EA6) or 0
+    end
+    local _____76EE_6807_8FDB_5EA6 = _____53C2_6570["目标进度"]
+    if type(_____76EE_6807_8FDB_5EA6) == "number" then
+        return _____76EE_6807_8FDB_5EA6
+    end
+    if type(_____76EE_6807_8FDB_5EA6) == "string" then
+        return __TS__Number(_____76EE_6807_8FDB_5EA6) or 0
+    end
+    return 0
+end
+____exports["发布主线节点目标"] = function(_____8FDB_5EA6)
+    local _____8282_70B9 = _____83B7_53D6_4E3B_7EBF_8282_70B9_914D_7F6E(_____8FDB_5EA6)
+    if _____8282_70B9 == nil then
+        debugLogForce(_____6807_51C6_5267_60C5_52A8_4F5C_6A21_5757_540D, "找不到主线节点配置", _____8FDB_5EA6)
+        return false
+    end
+    _____66F4_65B0_4E3B_7EBF_4EFB_52A1UI(_____8282_70B9["任务描述"], _____8282_70B9["任务更新提示"] or _____8282_70B9["提示文本"])
+    if _____8282_70B9["小地图"] ~= nil then
+        _____53D1_9001_5267_60C5_5C0F_5730_56FE_4FE1_53F7({X = _____8282_70B9["小地图"].X, Y = _____8282_70B9["小地图"].Y, ["持续时间"] = _____8282_70B9["小地图"]["持续时间"] or 20})
+    end
+    return true
+end
+____exports["进入主线节点"] = function(_____8FDB_5EA6)
+    if _____83B7_53D6_4E3B_7EBF_8282_70B9_914D_7F6E(_____8FDB_5EA6) == nil then
+        debugLogForce(_____6807_51C6_5267_60C5_52A8_4F5C_6A21_5757_540D, "找不到主线节点配置", _____8FDB_5EA6)
+        return false
+    end
+    _____5199_5165_5267_60C5_8FDB_5EA6(_____8FDB_5EA6)
+    return ____exports["发布主线节点目标"](_____8FDB_5EA6)
+end
+local function _____6267_884C_5199_5165_4E3B_7EBF_8FDB_5EA6(_____53C2_6570)
+    local _____8FDB_5EA6 = _____8BFB_53D6_8282_70B9_8FDB_5EA6(_____53C2_6570)
+    if _____83B7_53D6_4E3B_7EBF_8282_70B9_914D_7F6E(_____8FDB_5EA6) == nil then
+        debugLogForce(_____6807_51C6_5267_60C5_52A8_4F5C_6A21_5757_540D, "无法写入未配置的主线节点", _____8FDB_5EA6)
+        return
+    end
+    _____5199_5165_5267_60C5_8FDB_5EA6(_____8FDB_5EA6)
+end
+local function _____6267_884C_53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807(_____53C2_6570)
+    ____exports["发布主线节点目标"](_____8BFB_53D6_8282_70B9_8FDB_5EA6(_____53C2_6570))
+end
+local function _____6267_884C_8FDB_5165_4E3B_7EBF_8282_70B9(_____53C2_6570)
+    ____exports["进入主线节点"](_____8BFB_53D6_8282_70B9_8FDB_5EA6(_____53C2_6570))
+end
+local function _____6267_884C_505C_6B62_5267_60C5_89E6_53D1_5355_4F4D()
+    _____505C_6B62_89E6_53D1_5355_4F4D()
+end
+local _____6807_51C6_5267_60C5_52A8_4F5C_6CE8_518C_8868 = {["主线.写入进度"] = _____6267_884C_5199_5165_4E3B_7EBF_8FDB_5EA6, ["主线.发布节点目标"] = _____6267_884C_53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807, ["主线.进入节点"] = _____6267_884C_8FDB_5165_4E3B_7EBF_8282_70B9, ["剧情.停止触发单位"] = _____6267_884C_505C_6B62_5267_60C5_89E6_53D1_5355_4F4D}
+____exports["查找标准剧情动作处理器"] = function(_____52A8_4F5CID)
+    return _____6807_51C6_5267_60C5_52A8_4F5C_6CE8_518C_8868[_____52A8_4F5CID]
+end
+return ____exports

@@ -68,6 +68,7 @@ import {
   世界地图Boss初始注册配置表,
   世界地图Boss初始额外单位配置表,
 } from "./08．Boss初始注册配置表";
+import { 尝试缓存世界地图单位 } from "./09．世界地图单位缓存";
 
 const Player = jass.Player as (this: void, playerId: number) => any;
 const GetRandomReal = jass.GetRandomReal as (this: void, lowBound: number, highBound: number) => number;
@@ -168,7 +169,9 @@ function 创建世界地图单位实例(this: void, 配置: 世界地图单位�
   const 单位类型ID = stringToFourCC(单位ID);
   const 面向角度 = 解析世界地图单位朝向(配置);
   const 玩家 = 解析世界地图单位玩家(配置);
-  return 创建单位并登记排泄安全(玩家, 单位类型ID, 配置.X, 配置.Y, 面向角度);
+  const unit = 创建单位并登记排泄安全(玩家, 单位类型ID, 配置.X, 配置.Y, 面向角度);
+  尝试缓存世界地图单位(配置, unit);
+  return unit;
 }
 
 function 执行单条世界地图单位创建(this: void, 配置: 世界地图单位出生配置): boolean {

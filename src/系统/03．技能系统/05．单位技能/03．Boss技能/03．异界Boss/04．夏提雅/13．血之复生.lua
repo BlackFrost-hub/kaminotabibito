@@ -37,12 +37,13 @@ local ____require_result_4 = require("系统.09．表现系统.06．广播提示
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
 local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
+local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_6.doHeal
 local jass = require("jass.common")
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local PauseUnit = jass.PauseUnit
 local SetUnitPathing = jass.SetUnitPathing
@@ -59,7 +60,6 @@ local CosBJ = jass.CosBJ
 local SinBJ = jass.SinBJ
 local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____8840_4E4B_590D_751F_6280_80FDKey = "血之复生"
 local function _____53D6_590D_751F_7ED3_6676_53D7_51FB_6B21_6570()
@@ -75,11 +75,11 @@ end
 local function _____53D6_590D_751F_7ED3_6676_70B9(boss)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["血之复生"]
     local battle = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(boss)
-    local ____opt_result_8
+    local ____opt_result_9
     if battle ~= nil then
-        ____opt_result_8 = battle["地点矩形"]
+        ____opt_result_9 = battle["地点矩形"]
     end
-    local rect = ____opt_result_8
+    local rect = ____opt_result_9
     if rect ~= nil and rect ~= 0 then
         local inset = cfg["场地边缘内缩"]
         return {
@@ -116,11 +116,11 @@ local function _____53D6_590D_751F_7ED3_6676_70B9(boss)
 end
 local function _____79FB_52A8_590F_63D0_96C5_5230_573A_5730_4E2D_5FC3(boss)
     local battle = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(boss)
-    local ____opt_result_11
+    local ____opt_result_12
     if battle ~= nil then
-        ____opt_result_11 = battle["地点矩形"]
+        ____opt_result_12 = battle["地点矩形"]
     end
-    local rect = ____opt_result_11
+    local rect = ____opt_result_12
     if rect ~= nil and rect ~= 0 then
         _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(
             boss,
@@ -181,7 +181,13 @@ local function _____5B8C_6210_590D_751F_6210_529F(context, _____5269_4F59_7ED3_6
     local boss = context["Boss单位"]
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["血之复生"]
     local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
-    SetUnitState(boss, UNIT_STATE_LIFE, maxLife * cfg["单枚恢复生命比例"] * _____5269_4F59_7ED3_6676)
+    doHeal({
+        HealSource = boss,
+        HealTarget = boss,
+        HealAmount = maxLife * cfg["单枚恢复生命比例"] * _____5269_4F59_7ED3_6676,
+        ItemHeal = false,
+        HealEffect = false
+    })
     _____64AD_653E_590D_751F_6210_529F_8868_73B0(boss)
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["血之复生成功"],
@@ -206,8 +212,8 @@ local function _____5B8C_6210_590D_751F_6210_529F(context, _____5269_4F59_7ED3_6
             end
         end
     )
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "夏提雅-复生成功恢复行动", delayedId)
+    local ____self_13 = context["清理"]
+    ____self_13["登记延迟回调"](____self_13, "夏提雅-复生成功恢复行动", delayedId)
 end
 ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_5931_8D25)
     local boss = context["Boss单位"]
@@ -252,17 +258,8 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
                     ["受击次数"] = hitCount,
                     ["计数模式"] = "纯普攻或最终伤害阈值",
                     ["最终伤害计数阈值"] = cfg["技能伤害计数阈值"],
+                    ["同步生命条"] = true,
                     ["缩放"] = cfg["结晶缩放"],
-                    ["on受击"] = function(unit, remaining)
-                        if remaining <= 0 then
-                            return
-                        end
-                        SetUnitState(
-                            unit,
-                            UNIT_STATE_LIFE,
-                            GetUnitState(unit, UNIT_STATE_MAX_LIFE) * remaining / hitCount
-                        )
-                    end,
                     ["on击破"] = function(unit)
                         _____64AD_653E_7ED3_6676_7834_88C2(unit)
                         local remaining = _____7EDF_8BA1_5B58_6D3B_7ED3_6676(crystals)

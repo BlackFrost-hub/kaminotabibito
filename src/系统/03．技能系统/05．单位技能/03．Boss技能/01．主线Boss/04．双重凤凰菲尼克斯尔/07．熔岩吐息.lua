@@ -24,23 +24,49 @@ local _____5EF6_8FDF = ____19_FF0E_516C_5171_5DE5_5177["延迟"]
 local _____5468_671F = ____19_FF0E_516C_5171_5DE5_5177["周期"]
 local _____505C_6B62_5468_671F = ____19_FF0E_516C_5171_5DE5_5177["停止周期"]
 local _____521B_5EFA_9884_8B66_6247_5F62 = ____19_FF0E_516C_5171_5DE5_5177["创建预警扇形"]
-local _____64AD_653E_70B9_7279_6548 = ____19_FF0E_516C_5171_5DE5_5177["播放点特效"]
 local _____5355_4F4D_5728_6247_5F62_5185 = ____19_FF0E_516C_5171_5DE5_5177["单位在扇形内"]
-local _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔玩家英雄列表"]
+local _____8303_56F4_654C_4EBA = ____19_FF0E_516C_5171_5DE5_5177["范围敌人"]
 local _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击最大生命伤害"]
 local _____9020_6210_706B_7130_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成火焰伤害"]
 local _____6DFB_52A0_5143_7D20_5C42_6570 = ____19_FF0E_516C_5171_5DE5_5177["添加元素层数"]
 local _____65BD_52A0_51CF_901F = ____19_FF0E_516C_5171_5DE5_5177["施加减速"]
 local _____53D6_5355_4F4DX = ____19_FF0E_516C_5171_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____19_FF0E_516C_5171_5DE5_5177["取单位Y"]
+local _____6781_5750_6807X = ____19_FF0E_516C_5171_5DE5_5177["极坐标X"]
+local _____6781_5750_6807Y = ____19_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetHandleId = jass.GetHandleId
+local GetUnitFacing = jass.GetUnitFacing
+local GetUnitFlyHeight = jass.GetUnitFlyHeight
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____7194_5CA9_5410_606F_6280_80FDID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["熔岩吐息"])
 local _____7194_5CA9_5410_606F_5DF2_6CE8_518C = false
+local function _____64AD_653E_83F2_5C3C_514B_65AF_5C14_7194_5CA9_5410_606F_7279_6548(boss)
+    local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["熔岩吐息"]
+    local facing = GetUnitFacing(boss)
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["吐息"],
+        X = _____6781_5750_6807X(
+            _____53D6_5355_4F4DX(boss),
+            config["吐息特效前移"],
+            facing
+        ),
+        Y = _____6781_5750_6807Y(
+            _____53D6_5355_4F4DY(boss),
+            config["吐息特效前移"],
+            facing
+        ),
+        Z = GetUnitFlyHeight(boss) + config["吐息特效高度偏移"],
+        ["缩放"] = config["吐息特效缩放"],
+        ["Z轴角度"] = facing + config["吐息特效朝向修正角度"],
+        ["持续秒"] = config["吐息特效持续秒"]
+    })
+end
 ____exports["释放菲尼克斯尔熔岩吐息"] = function(context, target, _____6280_80FD_5B9E_4F8BID)
     if context["当前形态"] ~= "第一形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
         return
@@ -53,6 +79,7 @@ ____exports["释放菲尼克斯尔熔岩吐息"] = function(context, target, ___
     local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["熔岩吐息"]
     local _____4F24_5BB3_4E0A_4E0B_6587 = {["技能ID"] = _____7194_5CA9_5410_606F_6280_80FDID, ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID, ["标签"] = "菲尼克斯尔熔岩吐息"}
     local hitCount = {}
+    local _____547D_4E2D_7D2F_8BA1_79D2 = {}
     _____9762_5411_5355_4F4D(boss, realTarget)
     _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD(boss, "熔岩吐息")
     _____5F00_59CB_65BD_6CD5_786C_76F4(boss, config["预警秒"] + config["持续秒"])
@@ -75,55 +102,72 @@ ____exports["释放菲尼克斯尔熔岩吐息"] = function(context, target, ___
     _____5EF6_8FDF(
         config["预警秒"] * 1000,
         function()
-            local elapsed = 0
+            local _____7ECF_8FC7_79D2 = 0
+            local function _____6267_884C_83F2_5C3C_514B_65AF_5C14_7194_5CA9_5410_606FTick()
+                if not _____5355_4F4D_5B58_6D3B(boss) or _____7ECF_8FC7_79D2 >= config["持续秒"] then
+                    return false
+                end
+                local _____5269_4F59_79D2 = config["持续秒"] - _____7ECF_8FC7_79D2
+                local _____672C_6B21_8986_76D6_79D2 = _____5269_4F59_79D2 < config["Tick秒"] and _____5269_4F59_79D2 or config["Tick秒"]
+                _____7ECF_8FC7_79D2 = _____7ECF_8FC7_79D2 + _____672C_6B21_8986_76D6_79D2
+                if _____5355_4F4D_5B58_6D3B(realTarget) then
+                    _____9762_5411_5355_4F4D(boss, realTarget)
+                end
+                _____64AD_653E_83F2_5C3C_514B_65AF_5C14_7194_5CA9_5410_606F_7279_6548(boss)
+                local _____4F24_5BB3_500D_7387 = _____672C_6B21_8986_76D6_79D2 / config["伤害基准Tick秒"]
+                local enemies = _____8303_56F4_654C_4EBA(
+                    boss,
+                    _____53D6_5355_4F4DX(boss),
+                    _____53D6_5355_4F4DY(boss),
+                    config["半径"]
+                )
+                do
+                    local i = 0
+                    while i < #enemies do
+                        do
+                            local enemy = enemies[i + 1]
+                            if not _____5355_4F4D_5728_6247_5F62_5185(boss, enemy, config["半径"], config["角度"]) then
+                                goto __continue11
+                            end
+                            _____9020_6210_706B_7130_4F24_5BB3(
+                                boss,
+                                enemy,
+                                _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(boss, enemy, config["伤害Boss攻击力比例"], config["伤害目标最大生命比例"]) * _____4F24_5BB3_500D_7387,
+                                "AOE",
+                                _____4F24_5BB3_4E0A_4E0B_6587
+                            )
+                            local id = GetHandleId(enemy) or 0
+                            local _____7D2F_8BA1_79D2 = (_____547D_4E2D_7D2F_8BA1_79D2[id] or 0) + _____672C_6B21_8986_76D6_79D2
+                            while _____7D2F_8BA1_79D2 + 0.0001 >= config["伤害基准Tick秒"] do
+                                _____7D2F_8BA1_79D2 = _____7D2F_8BA1_79D2 - config["伤害基准Tick秒"]
+                                _____6DFB_52A0_5143_7D20_5C42_6570(enemy, "火", config["火印层数"])
+                                hitCount[id] = (hitCount[id] or 0) + 1
+                                if hitCount[id] >= config["减速命中次数"] then
+                                    _____65BD_52A0_51CF_901F(boss, enemy, config["减速比例"], config["减速持续秒"])
+                                end
+                            end
+                            _____547D_4E2D_7D2F_8BA1_79D2[id] = _____7D2F_8BA1_79D2
+                        end
+                        ::__continue11::
+                        i = i + 1
+                    end
+                end
+                return _____7ECF_8FC7_79D2 + 0.0001 < config["持续秒"]
+            end
+            if not _____6267_884C_83F2_5C3C_514B_65AF_5C14_7194_5CA9_5410_606FTick() then
+                return
+            end
             local tick
             tick = _____5468_671F(
                 config["Tick秒"] * 1000,
                 function()
-                    elapsed = elapsed + config["Tick秒"]
-                    if _____5355_4F4D_5B58_6D3B(realTarget) then
-                        _____9762_5411_5355_4F4D(boss, realTarget)
-                    end
-                    _____64AD_653E_70B9_7279_6548(
-                        _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["吐息"],
-                        _____53D6_5355_4F4DX(boss),
-                        _____53D6_5355_4F4DY(boss),
-                        700
-                    )
-                    local heroes = _____53D6_83F2_5C3C_514B_65AF_5C14_73A9_5BB6_82F1_96C4_5217_8868()
-                    do
-                        local i = 0
-                        while i < #heroes do
-                            do
-                                local hero = heroes[i + 1]
-                                if not _____5355_4F4D_5728_6247_5F62_5185(boss, hero, config["半径"], config["角度"]) then
-                                    goto __continue9
-                                end
-                                _____9020_6210_706B_7130_4F24_5BB3(
-                                    boss,
-                                    hero,
-                                    _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(boss, hero, config["伤害Boss攻击力比例"], config["伤害目标最大生命比例"]),
-                                    "AOE",
-                                    _____4F24_5BB3_4E0A_4E0B_6587
-                                )
-                                _____6DFB_52A0_5143_7D20_5C42_6570(hero, "火", config["火印层数"])
-                                local id = GetHandleId(hero) or 0
-                                hitCount[id] = (hitCount[id] or 0) + 1
-                                if hitCount[id] >= config["减速命中次数"] then
-                                    _____65BD_52A0_51CF_901F(boss, hero, config["减速比例"], config["减速持续秒"])
-                                end
-                            end
-                            ::__continue9::
-                            i = i + 1
-                        end
-                    end
-                    if elapsed >= config["持续秒"] then
+                    if not _____6267_884C_83F2_5C3C_514B_65AF_5C14_7194_5CA9_5410_606FTick() then
                         _____505C_6B62_5468_671F(tick)
                     end
                 end
             )
-            local ____self_0 = context["清理"]
-            ____self_0["登记周期回调"](____self_0, "菲尼克斯尔熔岩吐息Tick", tick)
+            local ____self_1 = context["清理"]
+            ____self_1["登记周期回调"](____self_1, "菲尼克斯尔熔岩吐息Tick", tick)
         end
     )
 end

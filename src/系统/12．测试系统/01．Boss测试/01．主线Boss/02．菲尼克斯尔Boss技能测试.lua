@@ -43,7 +43,9 @@ local _____89E6_53D1_83F2_5C3C_514B_65AF_5C14_6028_706B_6838_5FC3_66B4_9732 = __
 local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.16．永恒轮回")
 local _____89E6_53D1_83F2_5C3C_514B_65AF_5C14_6C38_6052_8F6E_56DE = ____require_result_16["触发菲尼克斯尔永恒轮回"]
 local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.19．公共工具")
+local _____5EF6_8FDF = ____require_result_17["延迟"]
 local _____6DFB_52A0_5143_7D20_5C42_6570 = ____require_result_17["添加元素层数"]
+local _____51CF_5C11_5143_7D20_5C42_6570 = ____require_result_17["减少元素层数"]
 local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.01．场地配置")
 local _____83F2_5C3C_514B_65AF_5C14_573A_5730_914D_7F6E = ____require_result_18["菲尼克斯尔场地配置"]
 local ____require_result_19 = require("系统.12．测试系统.00．测试系统辅助函数")
@@ -56,6 +58,7 @@ local ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B = ____require_result_20["Boss测试
 local _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840 = ____require_result_20["设置Boss测试单位满血"]
 local _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4 = ____require_result_20["获取Boss测试玩家基准英雄"]
 local _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175 = ____require_result_20["准备Boss测试固定步兵"]
+local _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_5C71_4E18_4E4B_738B = ____require_result_20["准备Boss测试固定山丘之王"]
 local _____79FB_9664Boss_6D4B_8BD5_5355_4F4D = ____require_result_20["移除Boss测试单位"]
 local _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4 = ____require_result_20["注册Boss测试命令组"]
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4DID = stringToFourCC("N00U")
@@ -80,9 +83,13 @@ local SetHeroLevel = jass.SetHeroLevel
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local GetPlayerId = jass.GetPlayerId
+local GetRandomInt = jass.GetRandomInt
+local KillUnit = jass.KillUnit
+local GetUnitState = jass.GetUnitState
+local UnitDamageTarget = jass.UnitDamageTarget
 local _____6700_8FD1_6D4B_8BD5Boss = {}
-local _____6700_8FD1_6D4B_8BD5_6B65_51751 = {}
-local _____6700_8FD1_6D4B_8BD5_6B65_51752 = {}
+local _____6700_8FD1_6D4B_8BD5_6B65_5175 = {}
+local _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B = {}
 local function _____590D_5236_6620_5C04_83F2_5C3C_514B_65AF_5C14_70B9_4F4D_6570_7EC4(_____70B9_4F4D, _____6620_5C04)
     local result = {}
     do
@@ -166,11 +173,9 @@ local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player)
 end
 local function _____51C6_5907_83F2_5C3C_514B_65AF_5C14_6D4B_8BD5_573A_666F(player, hero, boss)
     local pid = GetPlayerId(player)
-    SetUnitPosition(hero, _____4E34_65F6_6D4B_8BD5_73A9_5BB6X, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y)
-    SetUnitFacing(hero, 90)
     _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840(hero)
-    _____6700_8FD1_6D4B_8BD5_6B65_51751[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_51751[pid], _____4E34_65F6_6D4B_8BD5_73A9_5BB6X - 260, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
-    _____6700_8FD1_6D4B_8BD5_6B65_51752[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_51752[pid], _____4E34_65F6_6D4B_8BD5_73A9_5BB6X + 260, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
+    _____6700_8FD1_6D4B_8BD5_6B65_5175[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_6B65_5175(_____6700_8FD1_6D4B_8BD5_6B65_5175[pid], _____4E34_65F6_6D4B_8BD5_73A9_5BB6X - 260, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
+    _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = _____51C6_5907Boss_6D4B_8BD5_56FA_5B9A_5C71_4E18_4E4B_738B(_____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid], _____4E34_65F6_6D4B_8BD5_73A9_5BB6X + 260, _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y + 180, 90)
     SelectUnitForPlayerSingle(boss, player)
     StarOther_PanCameraToTimedForPlayer(player, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X, _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3Y, 0.2)
     return _____83B7_53D6_6216_521B_5EFA_83F2_5C3C_514B_65AF_5C14_4E0A_4E0B_6587(boss)
@@ -210,30 +215,30 @@ local function _____6E05_7406_83F2_5C3C_514B_65AF_5C14_6D4B_8BD5(player, _contex
         _____6E05_7406_83F2_5C3C_514B_65AF_5C14_4E0A_4E0B_6587(boss)
     end
     _____6062_590D_83F2_5C3C_514B_65AF_5C14_6B63_5F0F_573A_5730()
-    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_51751[pid])
-    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_51752[pid])
+    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_6B65_5175[pid])
+    _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(_____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid])
     _____79FB_9664Boss_6D4B_8BD5_5355_4F4D(boss)
-    _____6700_8FD1_6D4B_8BD5_6B65_51751[pid] = nil
-    _____6700_8FD1_6D4B_8BD5_6B65_51752[pid] = nil
+    _____6700_8FD1_6D4B_8BD5_6B65_5175[pid] = nil
+    _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = nil
     _____6700_8FD1_6D4B_8BD5Boss[pid] = nil
     if globals.udg_Boss == boss then
         globals.udg_Boss = nil
     end
 end
 local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD1_6D4B_8BD5_547D_4EE4(player, context)
-    local target = _____6700_8FD1_6D4B_8BD5_6B65_51751[GetPlayerId(player)]
+    local target = _____6700_8FD1_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
     if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
         _____91CA_653E_83F2_5C3C_514B_65AF_5C14_70BD_7FBD_6563_5C04(context, target)
     end
 end
 local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD2_6D4B_8BD5_547D_4EE4(player, context)
-    local target = _____6700_8FD1_6D4B_8BD5_6B65_51751[GetPlayerId(player)]
+    local target = _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4(player)
     if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
         _____91CA_653E_83F2_5C3C_514B_65AF_5C14_7194_5CA9_5410_606F(context, target)
     end
 end
 local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD3_6D4B_8BD5_547D_4EE4(player, context)
-    local target = _____6700_8FD1_6D4B_8BD5_6B65_51751[GetPlayerId(player)]
+    local target = _____6700_8FD1_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
     if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
         _____91CA_653E_83F2_5C3C_514B_65AF_5C14_51E4_51F0_6F29_6DA1(context, target)
     end
@@ -253,19 +258,68 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD7_6D4B_8BD5_547D_4EE4(_p
     _____786E_4FDD_83F2_5C3C_514B_65AF_5C14_7B2C_4E8C_5F62_6001(context)
     _____91CA_653E_83F2_5C3C_514B_65AF_5C14_51E4_51F0_633D_6B4C(context)
 end
+local function _____6E05_7A7A_83F2_5C3C_514B_65AF_5C14_6D4B_8BD5_5143_7D20_5C42_6570(target)
+    _____51CF_5C11_5143_7D20_5C42_6570(target, "火", 999)
+    _____51CF_5C11_5143_7D20_5C42_6570(target, "冰", 999)
+    _____51CF_5C11_5143_7D20_5C42_6570(target, "毒", 999)
+    _____51CF_5C11_5143_7D20_5C42_6570(target, "暗", 999)
+end
 local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD8_6D4B_8BD5_547D_4EE4(player, context)
-    local target = _____6700_8FD1_6D4B_8BD5_6B65_51751[GetPlayerId(player)]
+    local target = _____6700_8FD1_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
         return
     end
     _____786E_4FDD_83F2_5C3C_514B_65AF_5C14_7B2C_4E8C_5F62_6001(context)
-    _____6DFB_52A0_5143_7D20_5C42_6570(target, "火", 3, 30)
-    _____6DFB_52A0_5143_7D20_5C42_6570(target, "暗", 5, 30)
+    _____6E05_7A7A_83F2_5C3C_514B_65AF_5C14_6D4B_8BD5_5143_7D20_5C42_6570(target)
+    local _____5143_7D20_5217_8868 = {"火", "冰", "毒", "暗"}
+    local _____968F_673A_5143_7D20 = _____5143_7D20_5217_8868[GetRandomInt(0, #_____5143_7D20_5217_8868 - 1) + 1]
+    _____6DFB_52A0_5143_7D20_5C42_6570(target, _____968F_673A_5143_7D20, 5, 30)
+    _____7ED3_7B97_83F2_5C3C_514B_65AF_5C14_5143_7D20_7206_53D1(context)
+end
+local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD8_706B_6D4B_8BD5_547D_4EE4(player, context)
+    local target = _____6700_8FD1_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
+        return
+    end
+    _____786E_4FDD_83F2_5C3C_514B_65AF_5C14_7B2C_4E8C_5F62_6001(context)
+    _____6E05_7A7A_83F2_5C3C_514B_65AF_5C14_6D4B_8BD5_5143_7D20_5C42_6570(target)
+    _____6DFB_52A0_5143_7D20_5C42_6570(target, "火", 5, 30)
     _____7ED3_7B97_83F2_5C3C_514B_65AF_5C14_5143_7D20_7206_53D1(context)
 end
 local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD9_6D4B_8BD5_547D_4EE4(_player, context)
     _____786E_4FDD_83F2_5C3C_514B_65AF_5C14_7B2C_4E8C_5F62_6001(context)
     _____89E6_53D1_83F2_5C3C_514B_65AF_5C14_6028_706B_6838_5FC3_66B4_9732(context)
+end
+local function _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_6280_80FD9_51FB_6740_6838_5FC3_56DE_8C03(context, source)
+    return function()
+        if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(context["怨火核心"]) then
+            return
+        end
+        if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(source) then
+            local _____5269_4F59_751F_547D = GetUnitState(context["怨火核心"], jass.UNIT_STATE_LIFE)
+            UnitDamageTarget(
+                source,
+                context["怨火核心"],
+                _____5269_4F59_751F_547D + 1,
+                false,
+                false,
+                jass.ATTACK_TYPE_NORMAL,
+                jass.DAMAGE_TYPE_MIND,
+                jass.WEAPON_TYPE_WHOKNOWS
+            )
+        else
+            KillUnit(context["怨火核心"])
+        end
+    end
+end
+local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD9_51FB_6740_6D4B_8BD5_547D_4EE4(player, context)
+    _____786E_4FDD_83F2_5C3C_514B_65AF_5C14_7B2C_4E8C_5F62_6001(context)
+    _____89E6_53D1_83F2_5C3C_514B_65AF_5C14_6028_706B_6838_5FC3_66B4_9732(context)
+    local source = _____6700_8FD1_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
+    _____5EF6_8FDF(
+        1000,
+        _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_6280_80FD9_51FB_6740_6838_5FC3_56DE_8C03(context, source)
+    )
 end
 local function ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD10_6D4B_8BD5_547D_4EE4(_player, context)
     _____786E_4FDD_83F2_5C3C_514B_65AF_5C14_7B2C_4E8C_5F62_6001(context)
@@ -279,8 +333,10 @@ local _____83F2_5C3C_514B_65AF_5C14_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 5, ["名称"] = "骸骨弹幕", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD5_6D4B_8BD5_547D_4EE4},
     {["序号"] = 6, ["名称"] = "怨火链接", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD6_6D4B_8BD5_547D_4EE4},
     {["序号"] = 7, ["名称"] = "凤凰挽歌", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD7_6D4B_8BD5_547D_4EE4},
-    {["序号"] = 8, ["名称"] = "元素爆发", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD8_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 8, ["名称"] = "元素爆发(随机)", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD8_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 82, ["命令"] = "8-2", ["名称"] = "元素爆发(火)", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD8_706B_6D4B_8BD5_547D_4EE4},
     {["序号"] = 9, ["名称"] = "怨火核心暴露", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD9_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 91, ["命令"] = "9-1", ["名称"] = "怨火核心暴露(1秒后击杀)", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD9_51FB_6740_6D4B_8BD5_547D_4EE4},
     {["序号"] = 10, ["名称"] = "永恒轮回", ["执行"] = ____on_83F2_5C3C_514B_65AF_5C14_6280_80FD10_6D4B_8BD5_547D_4EE4}
 }
 _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4({

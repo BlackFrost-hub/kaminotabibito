@@ -18,7 +18,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetRandomReal = jass.GetRandomReal as (lowBound: number, highBound: number) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -51,6 +50,9 @@ const { 卡瑟拉BuffID } = require("系统.05．Buff系统.03．Buff表.01．Bo
 };
 const { 施加快速减速Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number) => void;
+};
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
 };
 
 interface 触手鞭笞实例 {
@@ -91,7 +93,7 @@ function 掉落触手残片给击杀者(this: void, context: 卡瑟拉运行时�
     const maxLife = GetUnitState(killer, UNIT_STATE_MAX_LIFE);
     const life = GetUnitState(killer, UNIT_STATE_LIFE);
     const heal = (maxLife - life) * 卡瑟拉数值与表现配置.触手残片.已损生命恢复比例;
-    if (heal > 0) SetUnitState(killer, UNIT_STATE_LIFE, life + heal > maxLife ? maxLife : life + heal);
+    if (heal > 0) doHeal({ HealSource: killer, HealTarget: killer, HealAmount: heal, ItemHeal: false, HealEffect: false });
   }
 }
 

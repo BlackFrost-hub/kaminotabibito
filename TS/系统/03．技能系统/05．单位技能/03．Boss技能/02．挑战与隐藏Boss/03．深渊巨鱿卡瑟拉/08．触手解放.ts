@@ -5,6 +5,9 @@ import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．�
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 单位有效, 极坐标X, 极坐标Y, 播放卡瑟拉限时动作 } from "./14．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
 
 const jass = require("jass.common") as any;
 
@@ -12,11 +15,9 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const ShowUnit = jass.ShowUnit as (unit: any, show: boolean) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -47,10 +48,7 @@ interface 触手解放实例 {
 
 function 治疗Boss最大生命比例(this: void, boss: any, ratio: number): void {
   if (!单位有效(boss) || !(ratio > 0)) return;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
-  const life = GetUnitState(boss, UNIT_STATE_LIFE);
-  const next = life + maxLife * ratio;
-  SetUnitState(boss, UNIT_STATE_LIFE, next > maxLife ? maxLife : next);
+  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio, ItemHeal: false, HealEffect: false });
 }
 
 function 播放潜入特效(this: void, x: number, y: number): void {

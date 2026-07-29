@@ -41,6 +41,16 @@ export interface 原生弹幕STES配置 {
   阻挡事件名?: string;
 }
 
+export interface 原生弹幕附加特效参数 {
+  模型: string;
+  附着点?: string;
+  /** 始终跟随弹幕单位的坐标、高度和朝向；开启后，未单独设置的缩放继承主弹幕缩放。 */
+  跟随主弹幕参数?: boolean;
+  /** 根据每 Tick 的水平位移与 Z 高度差自动设置 Pitch；仅独立附加特效支持。 */
+  跟随轨迹俯仰?: boolean;
+  缩放?: number;
+}
+
 export interface 原生弹幕参数 {
   所有者: any;
   所属玩家?: any;
@@ -95,6 +105,10 @@ export interface 原生弹幕参数 {
   弹射衰减?: number;
 
   模型?: string;
+  /** 附加特效槽位最多两个；贝塞尔等自定义轨迹同样复用这组参数。 */
+  附加特效1?: 原生弹幕附加特效参数;
+  附加特效2?: 原生弹幕附加特效参数;
+  /** 兼容旧接口：等价于占用附加特效1。 */
   附着特效模型?: string;
   附着点?: string;
   缩放?: number;
@@ -137,6 +151,7 @@ export interface 原生弹幕内部实例 {
   剩余生命: number;
   弹射次数: number;
   已结束: boolean;
-  附着特效?: any;
+  附加特效1?: any;
+  附加特效2?: any;
   命中规则状态: any;
 }

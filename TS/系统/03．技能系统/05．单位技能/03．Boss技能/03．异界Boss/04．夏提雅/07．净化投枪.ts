@@ -29,7 +29,7 @@ const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: 
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const GetRandomReal = jass.GetRandomReal as (minimum: number, maximum: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const RAD_TO_DEG = 57.29577951308232;
@@ -58,7 +58,7 @@ function 尝试安排净化投枪英灵复刻(this: void, context: 夏提雅运�
           来源攻击力比例: cfg.伤害攻击力比例 * p2.英灵复刻伤害比例,
           目标最大生命比例: cfg.伤害目标最大生命比例 * p2.英灵复刻伤害比例,
         });
-        造成AOE技能伤害({ 来源: context.Boss单位, 目标: heroes[i], 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_MAGIC, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '夏提雅·英灵复刻-净化投枪' });
+        造成AOE技能伤害({ 来源: context.Boss单位, 目标: heroes[i], 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '夏提雅·英灵复刻-净化投枪' });
       }
     },
   });
@@ -78,7 +78,7 @@ function 结算净化投枪落点(this: void, context: 夏提雅运行时上下�
     const dy = GetUnitY(heroes[i]) - y;
     if (dx * dx + dy * dy > cfg.伤害半径 * cfg.伤害半径) continue;
     const damage = 计算组合技能伤害(boss, heroes[i], { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-    造成AOE技能伤害({ 来源: boss, 目标: heroes[i], 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_MAGIC, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: tag });
+    造成AOE技能伤害({ 来源: boss, 目标: heroes[i], 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: tag });
   }
 }
 

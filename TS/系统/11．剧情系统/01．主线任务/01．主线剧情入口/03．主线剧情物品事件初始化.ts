@@ -39,6 +39,7 @@ import type { 主线剧情物品事件配置, 主线剧情物品事件触发方�
 import { 主线剧情物品事件配置表 } from "./05．主线剧情事件配置表";
 import { 读取剧情进度, 写入剧情进度 } from "../00．剧情系统核心工具/01．剧情动作上下文";
 import { 更新主线任务UI } from "../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 发布主线节点目标 } from "../00．剧情系统核心工具/10．标准剧情动作";
 import { 播放主线剧情片段 } from "../02．剧情步骤/02．剧情步骤播放器";
 
 const GetItemTypeId = jass.GetItemTypeId as (this: void, whichItem: any) => number;
@@ -106,6 +107,7 @@ function 执行物品事件配置(this: void, 配置: 主线剧情物品事件�
   if (配置.对白文本 != null && 配置.对白文本 !== "") {
     TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, GetUnitName(unit), null, 配置.对白文本, bj_TIMETYPE_SET, 5.0, true);
   }
+  if (发布主线节点目标(配置.目标剧情进度)) return;
   if (配置.任务描述 != null && 配置.任务提示 != null) {
     更新主线任务UI(配置.任务描述, 配置.任务提示);
   }

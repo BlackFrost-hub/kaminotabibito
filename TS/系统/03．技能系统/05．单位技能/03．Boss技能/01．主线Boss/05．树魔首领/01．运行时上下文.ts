@@ -29,7 +29,9 @@ export interface 树魔首领运行时上下文 {
   随从特性已初始化: boolean;
   当前随从数量: number;
   当前兽群层数: number;
+  兽群攻击力增量: number;
   无从暴怒中: boolean;
+  暴怒持续特效: any;
   暴怒攻速增量: number;
   暴怒移速增量: number;
   下一次召唤Ms: number;
@@ -52,7 +54,9 @@ function 创建树魔首领上下文(this: void, boss: any, 清理: 机制清理
     随从特性已初始化: false,
     当前随从数量: 0,
     当前兽群层数: 0,
+    兽群攻击力增量: 0,
     无从暴怒中: false,
+    暴怒持续特效: null,
     暴怒攻速增量: 0,
     暴怒移速增量: 0,
     下一次召唤Ms: 0,

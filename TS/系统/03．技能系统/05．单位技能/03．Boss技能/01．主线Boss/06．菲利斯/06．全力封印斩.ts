@@ -17,7 +17,6 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
@@ -52,6 +51,9 @@ const { 施加快速控制Buff } = require("系统.03．技能系统.00．技能
 const { 创建点特效, createUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
+};
+const { 魔法增减 } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
+  魔法增减: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean) => number;
 };
 
 const 快速控制_击晕 = 0;
@@ -94,19 +96,21 @@ function 执行封印惩罚(this: void, boss: any, target: any): void {
   const mana = GetUnitState(target, UNIT_STATE_MANA);
   const manaLoss = mana * (cfg.魔法扣除基础比例 + cfg.魔法扣除每难度追加比例 * n);
   if (manaLoss > 0) {
-    SetUnitState(target, UNIT_STATE_MANA, mana - manaLoss);
-    造成单体技能伤害({
-      技能ID: 全力封印斩技能ID,
-      来源: boss,
-      目标: target,
-      伤害: manaLoss,
-      attack: false,
-      ranged: false,
-      attackType: ATTACK_TYPE_NORMAL,
-      伤害类型: DAMAGE_TYPE_MAGIC,
-      weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
-    });
+    const actualManaLoss = -魔法增减(target, -manaLoss, false, false);
+    if (actualManaLoss > 0) {
+      造成单体技能伤害({
+        技能ID: 全力封印斩技能ID,
+        来源: boss,
+        目标: target,
+        伤害: actualManaLoss,
+        attack: false,
+        ranged: false,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_MAGIC,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "Boss技能",
+      });
+    }
   }
   施加快速控制Buff(boss, target, 快速控制_击晕, cfg.基础眩晕秒 + cfg.每难度眩晕追加秒 * n);
   createUnitEffect(target, "origin", cfg.命中特效路径, cfg.特效持续秒, "菲利斯-封印命中");

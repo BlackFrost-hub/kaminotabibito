@@ -18,13 +18,14 @@ const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技�
   造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
@@ -98,7 +99,7 @@ function 结算单个神风粉碎(this: void, context: 里科特运行时上下�
   const stack = 取里科特神风印记(context, target);
   if (stack <= 0) return;
   const cfg = 里科特数值与表现配置.神风护体;
-  const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   const damage = maxLife * cfg.粉碎每层最大生命比例 * stack;
   const stun = cfg.粉碎基础眩晕秒 + cfg.粉碎每层眩晕秒 * stack;
   造成单体技能伤害({
@@ -108,7 +109,7 @@ function 结算单个神风粉碎(this: void, context: 里科特运行时上下�
     伤害: damage,
     attack: false,
     ranged: false,
-    attackType: ATTACK_TYPE_MAGIC,
+    attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_MAGIC,
     weaponType: WEAPON_TYPE_WHOKNOWS,
     来源类型: "Boss技能",

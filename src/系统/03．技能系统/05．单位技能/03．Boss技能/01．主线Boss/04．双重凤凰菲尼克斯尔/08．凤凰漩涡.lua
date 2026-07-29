@@ -78,21 +78,22 @@ ____exports["释放菲尼克斯尔凤凰漩涡"] = function(context, target, ___
                         local i = 0
                         while i < #enemies do
                             local u = enemies[i + 1]
-                            _____9020_6210_706B_7130_4F24_5BB3(
-                                boss,
-                                u,
-                                _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3(boss, u, config["伤害Boss攻击力比例"], config["伤害目标已损失生命比例"]),
-                                "AOE",
-                                _____4F24_5BB3_4E0A_4E0B_6587
-                            )
-                            _____6DFB_52A0_5143_7D20_5C42_6570(u, "火", config["火印层数"])
-                            local d = _____4E24_70B9_8DDD_79BB(
+                            local damage = _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3(boss, u, config["伤害Boss攻击力比例"], config["伤害目标已损失生命比例"])
+                            local distance = _____4E24_70B9_8DDD_79BB(
                                 _____53D6_5355_4F4DX(u),
                                 _____53D6_5355_4F4DY(u),
                                 x,
                                 y
                             )
-                            if d > config["中心半径"] then
+                            _____9020_6210_706B_7130_4F24_5BB3(
+                                boss,
+                                u,
+                                damage,
+                                "AOE",
+                                _____4F24_5BB3_4E0A_4E0B_6587
+                            )
+                            _____6DFB_52A0_5143_7D20_5C42_6570(u, "火", config["火印层数"])
+                            if distance > config["中心半径"] then
                                 local angle = Atan2(
                                     y - _____53D6_5355_4F4DY(u),
                                     x - _____53D6_5355_4F4DX(u)

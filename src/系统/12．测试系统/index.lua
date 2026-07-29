@@ -23,6 +23,8 @@ local ENABLE_LATER_BOSS_SKILL_TEST = true
 local ENABLE_PASSIVE_ITEM_COOLDOWN_UI_TEST = true
 local ENABLE_EXTERNAL_VOICE_PACK_TEST = true
 local ENABLE_BOSS_DUAL_HEALTH_BAR_TEST = true
+local ENABLE_BONE_SPEAR_EFFECT_TEST = true
+local ENABLE_BOSS_3D_SOUND_TEST = true
 local function loadTests(self)
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")
@@ -87,6 +89,12 @@ local function loadTests(self)
     end
     if ENABLE_BOSS_DUAL_HEALTH_BAR_TEST then
         require("系统.12．测试系统.01．Boss测试.15．Boss双血条测试")
+    end
+    if ENABLE_BONE_SPEAR_EFFECT_TEST then
+        require("系统.12．测试系统.16．骸骨弹幕附加特效测试")
+    end
+    if ENABLE_BOSS_3D_SOUND_TEST then
+        require("系统.12．测试系统.17．Boss音效3D播放测试")
     end
 end
 loadTests(nil)

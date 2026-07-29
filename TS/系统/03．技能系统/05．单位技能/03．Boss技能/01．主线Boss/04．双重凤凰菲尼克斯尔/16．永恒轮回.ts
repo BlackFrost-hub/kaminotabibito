@@ -10,6 +10,9 @@ import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放"
 const { 创建单位动画守护 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.18．单位动画守护") as {
   创建单位动画守护: (this: void, 参数: any) => any;
 };
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 import {
   周期,
   延迟,
@@ -17,30 +20,36 @@ import {
   单位存活,
   取当前生命,
   取最大生命,
-  设置当前生命,
   取单位X,
   取单位Y,
   创建菲尼克斯尔机制单位,
-  播放点特效,
   显示致命读条,
   开始施法硬直,
   设置单位动画,
-  取菲尼克斯尔玩家英雄列表,
+  取菲尼克斯尔敌对目标列表,
   计算攻击最大生命伤害,
   造成暗火伤害,
   创建菲尼克斯尔独立伤害上下文,
 } from "./19．公共工具";
+const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
+  doHeal: (this: void, params: any) => number;
+};
 
 const jass = require("jass.common") as any;
 const KillUnit = jass.KillUnit as (whichUnit: any) => void;
 const RemoveUnit = jass.RemoveUnit as (whichUnit: any) => void;
+const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
+
+function 播放永恒轮回点特效(this: void, model: string, x: number, y: number, lifeMs: number, scale: number): any {
+  return 创建点特效({ 模型路径: model, X: x, Y: y, 缩放: scale, 持续秒: lifeMs / 1000 });
+}
 
 function 清理菲尼克斯尔凤凰蛋(this: void, context: 菲尼克斯尔运行时上下文): void {
   for (let i = 0; i < context.凤凰蛋列表.length; i++) {
     const item = context.凤凰蛋列表[i];
     const egg = item.单位;
     if (egg != null && egg !== 0) {
-      if (!item.已摧毁) 播放点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回星屑残留, 取单位X(egg), 取单位Y(egg), 1200);
+      if (!item.已摧毁) 播放永恒轮回点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回星屑残留, 取单位X(egg), 取单位Y(egg), 1200, 菲尼克斯尔数值与表现配置.机制.永恒轮回星屑残留特效缩放);
       RemoveUnit(egg);
     }
   }
@@ -53,7 +62,7 @@ function on菲尼克斯尔凤凰蛋死亡(this: void, context: 菲尼克斯尔�
     if (item.单位 !== unit) continue;
     if (item.已摧毁) return;
     item.已摧毁 = true;
-    播放点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回星屑残留, 取单位X(unit), 取单位Y(unit), 1200);
+    播放永恒轮回点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回星屑残留, 取单位X(unit), 取单位Y(unit), 1200, 菲尼克斯尔数值与表现配置.机制.永恒轮回星屑残留特效缩放);
     播放Boss坐标音效(菲尼克斯尔音效配置.永恒轮回.凤凰蛋摧毁, 取单位X(unit), 取单位Y(unit), 菲尼克斯尔音效配置.默认裁断距离);
     return;
   }
@@ -74,6 +83,9 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
   播放菲尼克斯尔台词(context.Boss, "永恒轮回");
   开始施法硬直(context.Boss, config.永恒轮回引导秒);
   设置单位动画(context.Boss, 菲尼克斯尔数值与表现配置.动画.第二形态.轮回死亡.编号, 菲尼克斯尔数值与表现配置.动画.第二形态.轮回死亡.倍速);
+  延迟(config.永恒轮回动画冻结秒 * 1000, function 菲尼克斯尔永恒轮回冻结动画(this: void): void {
+    if (单位存活(context.Boss) && context.当前形态 === "永恒轮回") SetUnitTimeScale(context.Boss, 0);
+  });
   显示致命读条(config.永恒轮回引导秒, 3, "永恒轮回倒计时", "摧毁凤凰之卵，否则菲尼克斯尔将恢复生命");
   播放Boss坐标音效(菲尼克斯尔音效配置.永恒轮回.开始, 取单位X(context.Boss), 取单位Y(context.Boss), 菲尼克斯尔音效配置.默认裁断距离);
   const points = 菲尼克斯尔场地配置.导管点位;
@@ -98,9 +110,18 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
       调试名: "菲尼克斯尔-凤凰蛋动画守护",
     });
     context.凤凰蛋列表.push({ 单位: egg, 已摧毁: false });
-    播放点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回能量上升, p.x, p.y, 2500);
   }
+  const 能量上升timerId = 周期(500, function 菲尼克斯尔永恒轮回能量上升(this: void): void {
+    for (let i = 0; i < context.凤凰蛋列表.length; i++) {
+      const egg = context.凤凰蛋列表[i].单位;
+      if (!单位存活(egg)) continue;
+      播放永恒轮回点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回能量上升, 取单位X(egg), 取单位Y(egg), 600, config.永恒轮回能量上升特效缩放);
+    }
+  });
+  context.清理.登记周期回调("菲尼克斯尔-永恒轮回能量上升", 能量上升timerId);
   延迟(config.永恒轮回引导秒 * 1000, function 菲尼克斯尔永恒轮回结算(this: void): void {
+    停止周期(能量上升timerId);
+    SetUnitTimeScale(context.Boss, 1);
     let aliveEggs = 0;
     for (let i = 0; i < context.凤凰蛋列表.length; i++) {
       if (单位存活(context.凤凰蛋列表[i].单位)) aliveEggs += 1;
@@ -108,12 +129,11 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
     if (aliveEggs > 0) {
       播放Boss坐标音效(菲尼克斯尔音效配置.永恒轮回.失败结算, 取单位X(context.Boss), 取单位Y(context.Boss), 菲尼克斯尔音效配置.默认裁断距离);
       const heal = 取最大生命(context.Boss) * config.每枚存活凤凰蛋回血Boss最大生命比例 * aliveEggs;
-      let nextLife = 取当前生命(context.Boss) + heal;
-      if (nextLife > 取最大生命(context.Boss)) nextLife = 取最大生命(context.Boss);
-      设置当前生命(context.Boss, nextLife);
-      const heroes = 取菲尼克斯尔玩家英雄列表();
+      doHeal({ HealSource: context.Boss, HealTarget: context.Boss, HealAmount: heal, ItemHeal: false, HealEffect: false });
+      const heroes = 取菲尼克斯尔敌对目标列表(context.Boss);
       for (let i = 0; i < heroes.length; i++) {
         造成暗火伤害(context.Boss, heroes[i], 计算攻击最大生命伤害(context.Boss, heroes[i], config.轮回失败全场伤害Boss攻击力比例, config.轮回失败全场伤害目标最大生命比例), "AOE", 伤害上下文);
+        播放永恒轮回点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回失败伤害, 取单位X(heroes[i]), 取单位Y(heroes[i]), 1500, config.永恒轮回失败伤害特效缩放);
       }
       清理菲尼克斯尔凤凰蛋(context);
       context.当前形态 = "第二形态";
@@ -122,7 +142,7 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
       清理菲尼克斯尔凤凰蛋(context);
       KillUnit(context.Boss);
     }
-    播放点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回收拢, 取单位X(context.Boss), 取单位Y(context.Boss), 2000);
+    播放永恒轮回点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回收拢, 取单位X(context.Boss), 取单位Y(context.Boss), 2000, config.永恒轮回收拢特效缩放);
   });
 }
 

@@ -1,9 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
-  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 const 沙漠食人魔二阶段待战暂停来源 = "剧情系统:沙漠食人魔二阶段待战";
 
@@ -18,15 +17,11 @@ const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { 按结算键获取Boss死亡结算配置, 执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑") as {
-  按结算键获取Boss死亡结算配置: (this: void, 结算键: string) => any;
-  执行Boss死亡结算: (this: void, 配置: any, Boss单位?: any, 击杀者?: any) => boolean;
+const { 按结算键执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑") as {
+  按结算键执行Boss死亡结算: (this: void, 结算键: string, Boss单位?: any, 击杀者?: any) => boolean;
 };
-const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动") as {
-  启动Boss战运行: (this: void, bossUnit: any) => void;
-};
-
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
+import { 启动剧情Boss战 } from "../../00．剧情系统核心工具/11．剧情Boss战启动桥接";
 export { 沙漠食人魔一阶段死亡剧情片段 } from "../01．第一章/11．沙漠食人魔一阶段死亡";
 
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -52,10 +47,7 @@ export function 执行沙漠食人魔一阶段死亡前置(this: void, 参数: �
   if (dyingUnit == null || dyingUnit === 0) return;
   待处理一阶段死亡单位 = dyingUnit;
   UnitSuspendDecay(dyingUnit, true);
-  const 结算配置 = 按结算键获取Boss死亡结算配置("沙漠食人魔");
-  if (结算配置 != null) {
-    执行Boss死亡结算(结算配置, dyingUnit);
-  }
+  按结算键执行Boss死亡结算("沙漠食人魔", dyingUnit);
 
   const x = GetUnitX(dyingUnit);
   const y = GetUnitY(dyingUnit);
@@ -91,13 +83,13 @@ export function 执行沙漠食人魔一阶段死亡前置(this: void, 参数: �
 export function 执行沙漠食人魔二阶段开战(this: void): void {
   const bossUnit = 待开战杀戮食人魔 ?? YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit");
   if (bossUnit == null || bossUnit === 0) return;
-  YDUserDataSetSafe("string", "Boss战", "绑定单位", "unit", bossUnit);
   if (待开战目标单位 != null && 待开战目标单位 !== 0) {
     IssueTargetOrder(bossUnit, "attack", 待开战目标单位);
   }
-  SetUnitInvulnerable(bossUnit, false);
-  移除单位暂停(bossUnit, 沙漠食人魔二阶段待战暂停来源);
-  启动Boss战运行(bossUnit);
+  启动剧情Boss战(bossUnit, {
+    触发单位: 待开战目标单位,
+    暂停来源: 沙漠食人魔二阶段待战暂停来源,
+  });
   待处理一阶段死亡单位 = null;
   待开战杀戮食人魔 = null;
   待开战目标单位 = null;

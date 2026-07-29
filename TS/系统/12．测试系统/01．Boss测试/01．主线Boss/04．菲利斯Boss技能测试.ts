@@ -22,6 +22,7 @@ const {
   设置Boss测试单位满血,
   获取Boss测试玩家基准英雄,
   准备Boss测试固定步兵,
+  准备Boss测试固定山丘之王,
   移除Boss测试单位,
   注册Boss测试命令组,
 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
@@ -29,6 +30,7 @@ const {
   设置Boss测试单位满血: (this: void, unit: any, 最大生命值?: number) => void;
   获取Boss测试玩家基准英雄: (this: void, player: any) => any;
   准备Boss测试固定步兵: (this: void, unit: any, x: number, y: number, facing?: number) => any;
+  准备Boss测试固定山丘之王: (this: void, unit: any, x: number, y: number, facing?: number) => any;
   移除Boss测试单位: (this: void, unit: any) => void;
   注册Boss测试命令组: (this: void, 配置: any) => void;
 };
@@ -61,11 +63,16 @@ const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number
 const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCandy: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facingAngle: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (player: any, x: number, y: number, duration: number, text: string) => void;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const 菲利斯测试Boss: Record<number, any> = {};
-const 菲利斯测试步兵1: Record<number, any> = {};
-const 菲利斯测试步兵2: Record<number, any> = {};
+const 菲利斯测试步兵: Record<number, any> = {};
+const 菲利斯测试山丘之王: Record<number, any> = {};
 
 function stringToFourCC(this: void, s: string): number {
   return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
@@ -98,12 +105,10 @@ function 准备测试场景(this: void, player: any, boss: any): void {
   const pid = GetPlayerId(player);
   const hero = 获取Boss测试玩家基准英雄(player);
   if (hero != null && hero !== 0) {
-    SetUnitPosition(hero, 临时测试场地中心X, 临时测试玩家Y);
-    SetUnitFacing(hero, 90);
     设置Boss测试单位满血(hero);
   }
-  菲利斯测试步兵1[pid] = 准备Boss测试固定步兵(菲利斯测试步兵1[pid], 临时测试场地中心X - 220, 临时测试玩家Y + 180, 90);
-  菲利斯测试步兵2[pid] = 准备Boss测试固定步兵(菲利斯测试步兵2[pid], 临时测试场地中心X + 220, 临时测试玩家Y + 180, 90);
+  菲利斯测试步兵[pid] = 准备Boss测试固定步兵(菲利斯测试步兵[pid], 临时测试场地中心X - 220, 临时测试玩家Y + 180, 90);
+  菲利斯测试山丘之王[pid] = 准备Boss测试固定山丘之王(菲利斯测试山丘之王[pid], 临时测试场地中心X + 220, 临时测试玩家Y + 180, 90);
   SelectUnitForPlayerSingle(boss, player);
   StarOther_PanCameraToTimedForPlayer(player, 临时测试场地中心X, 临时测试场地中心Y, 0.2);
 }
@@ -125,11 +130,11 @@ function 清理菲利斯测试(this: void, player: any, _context: any): void {
   const pid = GetPlayerId(player);
   const boss = 菲利斯测试Boss[pid];
   if (boss != null && boss !== 0) 清理菲利斯上下文(boss);
-  移除Boss测试单位(菲利斯测试步兵1[pid]);
-  移除Boss测试单位(菲利斯测试步兵2[pid]);
+  移除Boss测试单位(菲利斯测试步兵[pid]);
+  移除Boss测试单位(菲利斯测试山丘之王[pid]);
   移除Boss测试单位(boss);
-  菲利斯测试步兵1[pid] = undefined;
-  菲利斯测试步兵2[pid] = undefined;
+  菲利斯测试步兵[pid] = undefined;
+  菲利斯测试山丘之王[pid] = undefined;
   菲利斯测试Boss[pid] = undefined;
   if (globals.udg_Boss === boss) globals.udg_Boss = null;
 }
@@ -150,11 +155,26 @@ function on菲利斯技能4测试命令(this: void, _player: any, context: any):
   if (context != null) 释放菲利斯异形化(context);
 }
 
+function on菲利斯领袖光环测试命令(this: void, player: any, context: any): void {
+  const boss = context != null ? context.Boss单位 : null;
+  if (!Boss测试单位存活(boss)) return;
+  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  if (!(maxLife > 0)) return;
+  if (GetUnitState(boss, UNIT_STATE_LIFE) > maxLife * 0.5) {
+    SetUnitState(boss, UNIT_STATE_LIFE, maxLife * 0.3);
+    DisplayTimedTextToPlayer(player, 0, 0, 6, "[菲利斯-领袖光环] 已切换低血状态：友军攻击降低，剑气灵斩冷却缩短。");
+  } else {
+    SetUnitState(boss, UNIT_STATE_LIFE, maxLife);
+    DisplayTimedTextToPlayer(player, 0, 0, 6, "[菲利斯-领袖光环] 已切换高血状态：友军攻击提高。");
+  }
+}
+
 const 菲利斯测试技能列表: Boss测试技能命令[] = [
-  { 序号: 1, 名称: "剑魂杀", 执行: on菲利斯技能1测试命令 },
-  { 序号: 2, 名称: "剑气灵斩", 执行: on菲利斯技能2测试命令 },
-  { 序号: 3, 名称: "全力封印斩", 执行: on菲利斯技能3测试命令 },
-  { 序号: 4, 名称: "异形化", 执行: on菲利斯技能4测试命令 },
+  { 序号: 1, 名称: "领袖光环（高血/低血切换）", 执行: on菲利斯领袖光环测试命令 },
+  { 序号: 2, 名称: "剑魂杀", 执行: on菲利斯技能1测试命令 },
+  { 序号: 3, 名称: "剑气灵斩", 执行: on菲利斯技能2测试命令 },
+  { 序号: 4, 名称: "全力封印斩", 执行: on菲利斯技能3测试命令 },
+  { 序号: 5, 名称: "异形化", 执行: on菲利斯技能4测试命令 },
 ];
 
 注册Boss测试命令组({

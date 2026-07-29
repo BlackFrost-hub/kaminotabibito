@@ -3,6 +3,7 @@
 import type { Boss测试技能命令 } from '../../00．Boss测试系统/00．Boss测试类型';
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const globals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 
 const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index") as {
@@ -17,21 +18,37 @@ const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06
 const { 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
   标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
 };
-const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 准备Boss测试固定山丘之王, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
   Boss测试单位存活: (this: void, unit: any) => boolean;
   设置Boss测试单位满血: (this: void, unit: any, 最大生命值?: number) => void;
   获取Boss测试玩家基准英雄: (this: void, player: any) => any;
   准备Boss测试固定步兵: (this: void, unit: any, x: number, y: number, facing?: number) => any;
+  准备Boss测试固定山丘之王: (this: void, unit: any, x: number, y: number, facing?: number) => any;
   移除Boss测试单位: (this: void, unit: any) => void;
   注册Boss测试命令组: (this: void, 配置: any) => void;
 };
 
-const { 获取或创建里科特上下文, 清理里科特上下文 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.01．运行时上下文") as {
+const { 获取或创建里科特上下文, 清理里科特上下文, 取里科特当前阶段 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.01．运行时上下文") as {
   获取或创建里科特上下文: (this: void, boss: any) => any;
   清理里科特上下文: (this: void, boss: any) => void;
+  取里科特当前阶段: (this: void, boss: any) => 1 | 2 | 3;
 };
 const { 注册里科特被动效果 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.12．被动效果") as {
   注册里科特被动效果: (this: void) => void;
+};
+const { 里科特数值与表现配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.02．数值与表现配置") as {
+  里科特数值与表现配置: any;
+};
+const { 施加快速减速Buff, 单位是否处于减速效果合集 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number, effectSourceName?: string, effectSourceType?: "装备" | "技能") => void;
+  单位是否处于减速效果合集: (this: void, unit: any) => boolean;
+};
+const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  removeDelayedCallback: (this: void, callbackId: number) => void;
 };
 const { 释放里科特四重风刃 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.04．四重风刃") as {
   释放里科特四重风刃: (this: void, context: any) => void;
@@ -48,8 +65,9 @@ const { 释放里科特湮灭之炮 } = require("系统.03．技能系统.05．�
 const { 释放里科特湮灭之风 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.08．湮灭之风") as {
   释放里科特湮灭之风: (this: void, context: any) => void;
 };
-const { 释放里科特破魔反击 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.09．破魔反击") as {
+const { 释放里科特破魔反击, 立即开启里科特破魔反击窗口 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.09．破魔反击") as {
   释放里科特破魔反击: (this: void, context: any) => void;
+  立即开启里科特破魔反击窗口: (this: void, context: any) => void;
 };
 
 const 临时测试场地中心X = -540.6;
@@ -61,10 +79,32 @@ const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCand
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facingAngle: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
+const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
+const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+const 里科特被动测试调试模块 = "里科特被动测试";
+type 里科特测试阶段 = 1 | 2 | 3;
+type 里科特测试技能释放函数 = (this: void, context: any) => void;
 
 const 里科特测试Boss: Record<number, any> = {};
-const 里科特测试步兵1: Record<number, any> = {};
-const 里科特测试步兵2: Record<number, any> = {};
+const 里科特测试步兵: Record<number, any> = {};
+const 里科特测试山丘之王: Record<number, any> = {};
+let 里科特减速测试待检查Boss: any = null;
+let 里科特减速测试初始已生效 = false;
+let 里科特减速测试回调ID = 0;
+let 里科特反击测试回调ID = 0;
+
+interface 里科特反击测试数据 {
+  Boss单位: any;
+  攻击单位: any;
+}
 
 function stringToFourCC(this: void, s: string): number {
   return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
@@ -97,12 +137,10 @@ function 准备测试场景(this: void, player: any, boss: any): void {
   const pid = GetPlayerId(player);
   const hero = 获取Boss测试玩家基准英雄(player);
   if (hero != null && hero !== 0) {
-    SetUnitPosition(hero, 临时测试场地中心X, 临时测试玩家Y);
-    SetUnitFacing(hero, 90);
     设置Boss测试单位满血(hero);
   }
-  里科特测试步兵1[pid] = 准备Boss测试固定步兵(里科特测试步兵1[pid], 临时测试场地中心X - 220, 临时测试玩家Y + 180, 90);
-  里科特测试步兵2[pid] = 准备Boss测试固定步兵(里科特测试步兵2[pid], 临时测试场地中心X + 220, 临时测试玩家Y + 180, 90);
+  里科特测试步兵[pid] = 准备Boss测试固定步兵(里科特测试步兵[pid], 临时测试场地中心X - 220, 临时测试玩家Y + 180, 90);
+  里科特测试山丘之王[pid] = 准备Boss测试固定山丘之王(里科特测试山丘之王[pid], 临时测试场地中心X + 220, 临时测试玩家Y + 180, 90);
   SelectUnitForPlayerSingle(boss, player);
   StarOther_PanCameraToTimedForPlayer(player, 临时测试场地中心X, 临时测试场地中心Y, 0.2);
 }
@@ -123,47 +161,197 @@ function 创建里科特测试(this: void, player: any): any {
 function 清理里科特测试(this: void, player: any, _context: any): void {
   const pid = GetPlayerId(player);
   const boss = 里科特测试Boss[pid];
+  if (里科特减速测试回调ID > 0) removeDelayedCallback(里科特减速测试回调ID);
+  if (里科特反击测试回调ID > 0) removeDelayedCallback(里科特反击测试回调ID);
+  里科特减速测试回调ID = 0;
+  里科特反击测试回调ID = 0;
+  里科特减速测试待检查Boss = null;
+  里科特减速测试初始已生效 = false;
   if (boss != null && boss !== 0) 清理里科特上下文(boss);
-  移除Boss测试单位(里科特测试步兵1[pid]);
-  移除Boss测试单位(里科特测试步兵2[pid]);
+  移除Boss测试单位(里科特测试步兵[pid]);
+  移除Boss测试单位(里科特测试山丘之王[pid]);
   移除Boss测试单位(boss);
-  里科特测试步兵1[pid] = undefined;
-  里科特测试步兵2[pid] = undefined;
+  里科特测试步兵[pid] = undefined;
+  里科特测试山丘之王[pid] = undefined;
   里科特测试Boss[pid] = undefined;
   if (globals.udg_Boss === boss) globals.udg_Boss = null;
 }
 
+function 设置里科特测试阶段(this: void, context: any, 阶段: 里科特测试阶段): boolean {
+  if (context == null || !Boss测试单位存活(context.Boss单位)) return false;
+  const boss = context.Boss单位;
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
+  if (!(maxLife > 0)) return false;
+  const thresholds = 里科特数值与表现配置.阶段阈值;
+  let ratio = 1;
+  if (阶段 === 2) ratio = (thresholds.P2生命比例 + thresholds.P3生命比例) * 0.5;
+  if (阶段 === 3) ratio = thresholds.P3生命比例 * 0.5;
+  const life = maxLife * ratio;
+  SetUnitState(boss, UNIT_STATE_LIFE, life);
+  const actualStage = 取里科特当前阶段(boss);
+  context.阶段 = actualStage;
+  if (actualStage !== 阶段) {
+    debugLogForce(里科特被动测试调试模块, "阶段命令准备失败", "目标阶段=", 阶段, "实际阶段=", actualStage, "最大生命=", maxLife, "当前生命=", GetUnitState(boss, UNIT_STATE_LIFE));
+    return false;
+  }
+  return true;
+}
+
+function 执行里科特阶段技能测试(this: void, context: any, 阶段: 里科特测试阶段, 释放技能: 里科特测试技能释放函数): void {
+  if (!设置里科特测试阶段(context, 阶段)) return;
+  释放技能(context);
+}
+
 function on里科特技能1测试命令(this: void, _player: any, context: any): void {
-  if (context != null) 释放里科特四重风刃(context);
+  执行里科特阶段技能测试(context, 1, 释放里科特四重风刃);
+}
+
+function on里科特技能1P2测试命令(this: void, _player: any, context: any): void {
+  执行里科特阶段技能测试(context, 2, 释放里科特四重风刃);
+}
+
+function on里科特技能1P3测试命令(this: void, _player: any, context: any): void {
+  执行里科特阶段技能测试(context, 3, 释放里科特四重风刃);
 }
 
 function on里科特技能2测试命令(this: void, _player: any, context: any): void {
-  if (context != null) 释放里科特追击风刃(context);
+  执行里科特阶段技能测试(context, 1, 释放里科特追击风刃);
+}
+
+function on里科特技能2P2测试命令(this: void, _player: any, context: any): void {
+  执行里科特阶段技能测试(context, 2, 释放里科特追击风刃);
+}
+
+function on里科特技能2P3测试命令(this: void, _player: any, context: any): void {
+  执行里科特阶段技能测试(context, 3, 释放里科特追击风刃);
 }
 
 function on里科特技能3测试命令(this: void, _player: any, context: any): void {
-  if (context != null) 释放里科特湮灭之炮(context);
+  执行里科特阶段技能测试(context, 1, 释放里科特湮灭之炮);
+}
+
+function on里科特技能3P2测试命令(this: void, _player: any, context: any): void {
+  执行里科特阶段技能测试(context, 2, 释放里科特湮灭之炮);
+}
+
+function on里科特技能3P3测试命令(this: void, _player: any, context: any): void {
+  执行里科特阶段技能测试(context, 3, 释放里科特湮灭之炮);
 }
 
 function on里科特技能4测试命令(this: void, _player: any, context: any): void {
-  if (context != null) 释放里科特湮灭之风(context);
+  执行里科特阶段技能测试(context, 2, 释放里科特湮灭之风);
+}
+
+function on里科特技能4P2测试命令(this: void, _player: any, context: any): void {
+  执行里科特阶段技能测试(context, 2, 释放里科特湮灭之风);
+}
+
+function on里科特技能4P3测试命令(this: void, _player: any, context: any): void {
+  执行里科特阶段技能测试(context, 3, 释放里科特湮灭之风);
 }
 
 function on里科特技能5测试命令(this: void, _player: any, context: any): void {
   if (context != null) 释放里科特破魔反击(context);
 }
 
+function on里科特破魔反击测试攻击(this: void, variable?: any): void {
+  里科特反击测试回调ID = 0;
+  const data = variable as 里科特反击测试数据 | undefined;
+  if (data == null || !Boss测试单位存活(data.Boss单位) || !Boss测试单位存活(data.攻击单位)) return;
+  const success = UnitDamageTarget(data.攻击单位, data.Boss单位, 100, true, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+  debugLogForce(里科特被动测试调试模块, "命令5-2 破魔反击", "0.5秒后普通攻击调用成功=", success);
+}
+
+function on里科特技能5P2反击测试命令(this: void, player: any, context: any): void {
+  if (!设置里科特测试阶段(context, 2)) return;
+  const source = 里科特测试步兵[GetPlayerId(player)];
+  if (!Boss测试单位存活(source)) {
+    debugLogForce(里科特被动测试调试模块, "命令5-2失败：找不到固定步兵攻击来源");
+    return;
+  }
+  if (里科特反击测试回调ID > 0) removeDelayedCallback(里科特反击测试回调ID);
+  立即开启里科特破魔反击窗口(context);
+  const data: 里科特反击测试数据 = { Boss单位: context.Boss单位, 攻击单位: source };
+  里科特反击测试回调ID = addDelayedCallback(500, on里科特破魔反击测试攻击, data);
+  context.清理.登记延迟回调("里科特-破魔反击自动测试", 里科特反击测试回调ID);
+}
+
 function on里科特技能6测试命令(this: void, _player: any, context: any): void {
   if (context != null) 释放里科特神风护体(context);
 }
 
+function on里科特技能7测试命令(this: void, player: any, context: any): void {
+  if (context == null || !Boss测试单位存活(context.Boss单位)) return;
+  const boss = context.Boss单位;
+  const source = 里科特测试步兵[GetPlayerId(player)];
+  if (!Boss测试单位存活(source)) {
+    debugLogForce(里科特被动测试调试模块, "命令7失败：找不到固定步兵伤害来源");
+    return;
+  }
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
+  SetUnitState(boss, UNIT_STATE_LIFE, maxLife);
+  const beforeLife = GetUnitState(boss, UNIT_STATE_LIFE);
+  const inputDamage = maxLife * 0.5;
+  const expectedCap = maxLife * 里科特数值与表现配置.被动.单次最大生命伤害比例;
+  const success = UnitDamageTarget(source, boss, inputDamage, false, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_UNIVERSAL, WEAPON_TYPE_WHOKNOWS);
+  const actualLoss = beforeLife - GetUnitState(boss, UNIT_STATE_LIFE);
+  debugLogForce(
+    里科特被动测试调试模块,
+    "命令7 单次伤害上限",
+    "调用成功=", success,
+    "输入伤害=", inputDamage,
+    "理论上限=", expectedCap,
+    "实际扣血=", actualLoss,
+    "通过=", success && actualLoss <= expectedCap + 1,
+  );
+}
+
+function on里科特减速免疫延迟检查(this: void): void {
+  const boss = 里科特减速测试待检查Boss;
+  const applied = 里科特减速测试初始已生效;
+  里科特减速测试待检查Boss = null;
+  里科特减速测试初始已生效 = false;
+  里科特减速测试回调ID = 0;
+  if (!Boss测试单位存活(boss)) return;
+  const remaining = 单位是否处于减速效果合集(boss);
+  debugLogForce(里科特被动测试调试模块, "命令8 减速免疫", "初始检测到减速=", applied, "1.2秒后仍有减速=", remaining, "通过=", applied && !remaining);
+}
+
+function on里科特技能8测试命令(this: void, player: any, context: any): void {
+  if (context == null || !Boss测试单位存活(context.Boss单位)) return;
+  const boss = context.Boss单位;
+  const source = 里科特测试步兵[GetPlayerId(player)];
+  if (!Boss测试单位存活(source)) {
+    debugLogForce(里科特被动测试调试模块, "命令8失败：找不到固定步兵减速来源");
+    return;
+  }
+  施加快速减速Buff(source, boss, 0, 0.5, 5, "里科特被动测试", "技能");
+  const applied = 单位是否处于减速效果合集(boss);
+  debugLogForce(里科特被动测试调试模块, "命令8 减速施加后", "检测到减速=", applied, "等待1.2秒检查被动清除");
+  if (里科特减速测试回调ID > 0) removeDelayedCallback(里科特减速测试回调ID);
+  里科特减速测试待检查Boss = boss;
+  里科特减速测试初始已生效 = applied;
+  里科特减速测试回调ID = addDelayedCallback(1200, on里科特减速免疫延迟检查);
+}
+
 const 里科特测试技能列表: Boss测试技能命令[] = [
-  { 序号: 1, 名称: "四重风刃", 执行: on里科特技能1测试命令 },
-  { 序号: 2, 名称: "追击风刃", 执行: on里科特技能2测试命令 },
-  { 序号: 3, 名称: "湮灭之炮", 执行: on里科特技能3测试命令 },
-  { 序号: 4, 名称: "湮灭之风", 执行: on里科特技能4测试命令 },
+  { 序号: 1, 名称: "四重风刃(P1基础)", 执行: on里科特技能1测试命令 },
+  { 序号: 1, 命令: "1-2", 名称: "四重风刃(P2强化)", 执行: on里科特技能1P2测试命令 },
+  { 序号: 1, 命令: "1-3", 名称: "四重风刃(P3强化)", 执行: on里科特技能1P3测试命令 },
+  { 序号: 2, 名称: "追击风刃(P1基础)", 执行: on里科特技能2测试命令 },
+  { 序号: 2, 命令: "2-2", 名称: "追击风刃(P2强化)", 执行: on里科特技能2P2测试命令 },
+  { 序号: 2, 命令: "2-3", 名称: "追击风刃(P3强化)", 执行: on里科特技能2P3测试命令 },
+  { 序号: 3, 名称: "湮灭之炮(P1基础)", 执行: on里科特技能3测试命令 },
+  { 序号: 3, 命令: "3-2", 名称: "湮灭之炮(P2强化)", 执行: on里科特技能3P2测试命令 },
+  { 序号: 3, 命令: "3-3", 名称: "湮灭之炮(P3强化)", 执行: on里科特技能3P3测试命令 },
+  { 序号: 4, 名称: "湮灭之风(P2基础)", 执行: on里科特技能4测试命令 },
+  { 序号: 4, 命令: "4-2", 名称: "湮灭之风(P2阶段)", 执行: on里科特技能4P2测试命令 },
+  { 序号: 4, 命令: "4-3", 名称: "湮灭之风(P3强化)", 执行: on里科特技能4P3测试命令 },
   { 序号: 5, 名称: "破魔反击", 执行: on里科特技能5测试命令 },
+  { 序号: 5, 命令: "5-2", 名称: "破魔反击(P2自动受击测试)", 执行: on里科特技能5P2反击测试命令 },
   { 序号: 6, 名称: "神风护体", 执行: on里科特技能6测试命令 },
+  { 序号: 7, 名称: "被动-单次伤害上限", 执行: on里科特技能7测试命令 },
+  { 序号: 8, 名称: "被动-减速免疫", 执行: on里科特技能8测试命令 },
 ];
 
 注册Boss测试命令组({

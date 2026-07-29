@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import type { 机制清理篮子 } from "../04．机制组件/06．机制清理/01．机制清理篮子";
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -29,26 +31,36 @@ const EXSetUnitFacing = japi.EXSetUnitFacing as ((this: void, unit: any, angle: 
 const RAD_TO_DEG = 57.29577951308232;
 const DEG_TO_RAD = 0.017453292519943295;
 
-export type 持续施法发射结束原因 = "完成" | "中断" | "施法者死亡";
+export type 持续施法发射结束原因 = "完成" | "中断" | "施法者死亡" | "目标失效";
 export type 持续施法发射面向模式 = "锁定初始方向" | "持续追踪目标" | "不处理";
 
 export interface 持续施法发射回调上下文 {
   ID: number;
   施法者: any;
+  目标单位: any;
+  起点X: number;
+  起点Y: number;
+  目标X: number;
+  目标Y: number;
   已进行秒: number;
   进度: number;
   当前朝向: number;
   发射次数: number;
+  数据?: any;
 }
 
 export interface 持续施法发射参数 {
+  清理?: 机制清理篮子;
+  名称?: string;
   施法者: any;
   总持续秒: number;
   Tick间隔毫秒?: number;
   目标单位?: any;
   目标X?: number;
   目标Y?: number;
+  目标失效时结束?: boolean;
   面向模式?: 持续施法发射面向模式;
+  处理动画?: boolean;
   动画序列?: number;
   动画名?: string;
   动画速度?: number;
@@ -58,6 +70,7 @@ export interface 持续施法发射参数 {
   发射开始秒: number;
   发射结束秒: number;
   发射间隔秒: number;
+  数据?: any;
   on开始?: (this: void, 上下文: 持续施法发射回调上下文) => void;
   onTick?: (this: void, 上下文: 持续施法发射回调上下文) => void;
   on发射?: (this: void, 上下文: 持续施法发射回调上下文) => void;
@@ -73,36 +86,24 @@ interface 持续施法发射实例 {
   发射结束毫秒: number;
   发射间隔毫秒: number;
   下次发射毫秒: number;
+  Tick间隔毫秒: number;
+  下次Tick毫秒: number;
   发射次数: number;
-  锁定朝向: number;
+  当前起点X: number;
+  当前起点Y: number;
+  当前目标X: number;
+  当前目标Y: number;
+  当前朝向: number;
   已结束: boolean;
 }
 
 const 持续施法发射实例表: Record<number, 持续施法发射实例 | undefined> = {};
 let 持续施法发射ID序号 = 0;
 let 持续施法发射驱动ID = 0;
+let 持续施法发射驱动间隔毫秒 = 0;
 
 function 单位有效(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
-}
-
-function 取目标X(this: void, 参数: 持续施法发射参数): number | undefined {
-  if (单位有效(参数.目标单位)) return GetUnitX(参数.目标单位);
-  return 参数.目标X;
-}
-
-function 取目标Y(this: void, 参数: 持续施法发射参数): number | undefined {
-  if (单位有效(参数.目标单位)) return GetUnitY(参数.目标单位);
-  return 参数.目标Y;
-}
-
-function 计算朝向(this: void, 参数: 持续施法发射参数, 默认朝向: number): number {
-  const caster = 参数.施法者;
-  if (!单位有效(caster)) return 默认朝向;
-  const targetX = 取目标X(参数);
-  const targetY = 取目标Y(参数);
-  if (targetX == null || targetY == null) return 默认朝向;
-  return Atan2(targetY - GetUnitY(caster), targetX - GetUnitX(caster)) * RAD_TO_DEG;
 }
 
 function 设置朝向(this: void, unit: any, facing: number): void {
@@ -112,6 +113,7 @@ function 设置朝向(this: void, unit: any, facing: number): void {
 }
 
 function 播放持续施法动画(this: void, 参数: 持续施法发射参数): void {
+  if (参数.处理动画 === false) return;
   const caster = 参数.施法者;
   if (!单位有效(caster)) return;
   SetUnitTimeScale(caster, 参数.动画速度 ?? 1);
@@ -134,18 +136,38 @@ function 取上下文(this: void, 实例: 持续施法发射实例, now: number)
   return {
     ID: 实例.ID,
     施法者: 实例.参数.施法者,
+    目标单位: 实例.参数.目标单位,
+    起点X: 实例.当前起点X,
+    起点Y: 实例.当前起点Y,
+    目标X: 实例.当前目标X,
+    目标Y: 实例.当前目标Y,
     已进行秒,
     进度,
-    当前朝向: 取当前朝向(实例),
+    当前朝向: 实例.当前朝向,
     发射次数: 实例.发射次数,
+    数据: 实例.参数.数据,
   };
 }
 
-function 取当前朝向(this: void, 实例: 持续施法发射实例): number {
+function 刷新路径快照(this: void, 实例: 持续施法发射实例): void {
   const 参数 = 实例.参数;
-  if (参数.面向模式 === "不处理") return GetUnitFacing(参数.施法者);
-  if (参数.面向模式 === "持续追踪目标") return 计算朝向(参数, 实例.锁定朝向);
-  return 实例.锁定朝向;
+  const caster = 参数.施法者;
+  实例.当前起点X = GetUnitX(caster);
+  实例.当前起点Y = GetUnitY(caster);
+
+  if (单位有效(参数.目标单位)) {
+    实例.当前目标X = GetUnitX(参数.目标单位);
+    实例.当前目标Y = GetUnitY(参数.目标单位);
+  } else if (参数.目标X != null && 参数.目标Y != null) {
+    实例.当前目标X = 参数.目标X;
+    实例.当前目标Y = 参数.目标Y;
+  }
+
+  if (参数.面向模式 === "不处理") {
+    实例.当前朝向 = GetUnitFacing(caster);
+  } else if (参数.面向模式 === "持续追踪目标") {
+    实例.当前朝向 = Atan2(实例.当前目标Y - 实例.当前起点Y, 实例.当前目标X - 实例.当前起点X) * RAD_TO_DEG;
+  }
 }
 
 function 结束持续施法发射实例(this: void, 实例: 持续施法发射实例, 原因: 持续施法发射结束原因): void {
@@ -157,7 +179,7 @@ function 结束持续施法发射实例(this: void, 实例: 持续施法发射�
   if (原因 !== "完成" && 实例.参数.中断时解除硬直 === true && 单位有效(caster)) {
     调整单位硬直时间(caster, 1, 9999);
   }
-  if (实例.参数.结束后恢复动画 !== false && 单位有效(caster)) {
+  if (实例.参数.处理动画 !== false && 实例.参数.结束后恢复动画 !== false && 单位有效(caster)) {
     SetUnitTimeScale(caster, 1);
     SetUnitAnimationByIndex(caster, 0);
   }
@@ -180,13 +202,22 @@ function 驱动持续施法发射(this: void): void {
       结束持续施法发射实例(实例, "施法者死亡");
       continue;
     }
+    if (实例.参数.目标失效时结束 === true && !单位有效(实例.参数.目标单位)) {
+      结束持续施法发射实例(实例, "目标失效");
+      continue;
+    }
 
-    const facing = 取当前朝向(实例);
-    if (实例.参数.面向模式 !== "不处理") 设置朝向(caster, facing);
+    刷新路径快照(实例);
+    if (实例.参数.面向模式 !== "不处理") 设置朝向(caster, 实例.当前朝向);
 
-    const ctx = 取上下文(实例, now);
     const onTick = 实例.参数.onTick;
-    if (onTick != null) onTick(ctx);
+    if (onTick != null && now >= 实例.下次Tick毫秒) {
+      onTick(取上下文(实例, now));
+      do {
+        实例.下次Tick毫秒 += 实例.Tick间隔毫秒;
+      } while (实例.下次Tick毫秒 <= now);
+      if (实例.已结束) continue;
+    }
 
     const on发射 = 实例.参数.on发射;
     while (
@@ -197,8 +228,9 @@ function 驱动持续施法发射(this: void): void {
       实例.发射次数 += 1;
       on发射(取上下文(实例, now));
       实例.下次发射毫秒 += 实例.发射间隔毫秒;
-      if (实例.发射间隔毫秒 <= 0) break;
+      if (实例.已结束 || 实例.发射间隔毫秒 <= 0) break;
     }
+    if (实例.已结束) continue;
 
     if (now >= 实例.结束毫秒) {
       结束持续施法发射实例(实例, "完成");
@@ -208,17 +240,27 @@ function 驱动持续施法发射(this: void): void {
   if (!hasActive && 持续施法发射驱动ID > 0) {
     removePeriodicCallback(持续施法发射驱动ID);
     持续施法发射驱动ID = 0;
+    持续施法发射驱动间隔毫秒 = 0;
   }
 }
 
 function 确保持续施法发射驱动(this: void, intervalMs: number): void {
-  if (持续施法发射驱动ID > 0) return;
+  if (持续施法发射驱动ID > 0 && 持续施法发射驱动间隔毫秒 <= intervalMs) return;
+  if (持续施法发射驱动ID > 0) removePeriodicCallback(持续施法发射驱动ID);
   持续施法发射驱动ID = addPeriodicCallback(intervalMs, 驱动持续施法发射);
+  持续施法发射驱动间隔毫秒 = intervalMs;
+}
+
+function 清理持续施法发射实例(this: void, ID?: any): void {
+  if (ID == null) return;
+  停止持续施法发射(ID as number, "中断");
 }
 
 export function 启动持续施法发射(this: void, 参数: 持续施法发射参数): number {
   const caster = 参数.施法者;
   if (!单位有效(caster)) return 0;
+  if (参数.清理 != null && 参数.清理.已清理()) return 0;
+  if (参数.目标失效时结束 === true && !单位有效(参数.目标单位)) return 0;
 
   const now = getServerTime();
   const totalMs = 参数.总持续秒 > 0 ? 参数.总持续秒 * 1000 : 0;
@@ -227,7 +269,14 @@ export function 启动持续施法发射(this: void, 参数: 持续施法发射�
   const fireStartMs = 参数.发射开始秒 > 0 ? 参数.发射开始秒 * 1000 : 0;
   const fireEndMs = 参数.发射结束秒 > 参数.发射开始秒 ? 参数.发射结束秒 * 1000 : fireStartMs;
   const fireIntervalMs = 参数.发射间隔秒 > 0 ? 参数.发射间隔秒 * 1000 : 100;
-  const lockedFacing = 计算朝向(参数, GetUnitFacing(caster));
+  const tickIntervalMs = 参数.Tick间隔毫秒 != null && 参数.Tick间隔毫秒 > 0 ? 参数.Tick间隔毫秒 : 30;
+  const startX = GetUnitX(caster);
+  const startY = GetUnitY(caster);
+  const targetX = 单位有效(参数.目标单位) ? GetUnitX(参数.目标单位) : (参数.目标X ?? startX);
+  const targetY = 单位有效(参数.目标单位) ? GetUnitY(参数.目标单位) : (参数.目标Y ?? startY);
+  const lockedFacing = targetX !== startX || targetY !== startY
+    ? Atan2(targetY - startY, targetX - startX) * RAD_TO_DEG
+    : GetUnitFacing(caster);
   const id = ++持续施法发射ID序号;
 
   const 实例: 持续施法发射实例 = {
@@ -239,8 +288,14 @@ export function 启动持续施法发射(this: void, 参数: 持续施法发射�
     发射结束毫秒: now + fireEndMs,
     发射间隔毫秒: fireIntervalMs,
     下次发射毫秒: now + fireStartMs,
+    Tick间隔毫秒: tickIntervalMs,
+    下次Tick毫秒: now + tickIntervalMs,
     发射次数: 0,
-    锁定朝向: lockedFacing,
+    当前起点X: startX,
+    当前起点Y: startY,
+    当前目标X: targetX,
+    当前目标Y: targetY,
+    当前朝向: lockedFacing,
     已结束: false,
   };
 
@@ -248,12 +303,14 @@ export function 启动持续施法发射(this: void, 参数: 持续施法发射�
   if (参数.面向模式 !== "不处理") 设置朝向(caster, lockedFacing);
   if (参数.硬直 !== false) 开始硬直(caster, 参数.总持续秒);
   播放持续施法动画(参数);
+  if (参数.清理 != null) {
+    参数.清理.登记清理(参数.名称 ?? "持续施法发射", 清理持续施法发射实例, id);
+  }
 
   const on开始 = 参数.on开始;
   if (on开始 != null) on开始(取上下文(实例, now));
 
-  const intervalMs = 参数.Tick间隔毫秒 != null && 参数.Tick间隔毫秒 > 0 ? 参数.Tick间隔毫秒 : 30;
-  确保持续施法发射驱动(intervalMs);
+  确保持续施法发射驱动(tickIntervalMs);
   return id;
 }
 

@@ -91,12 +91,16 @@ export const 精灵村长老发布任务紧凑剧情片段: 紧凑剧情片段�
         长老归属玩家: 6,
         长老转向目标: "GetTriggerUnit()",
         长老转向耗时: 1,
-        设置剧情进度: 1,
         旧JASS功能清单: "ForForce reveal / SetUnitOwner(gg_unit_n025_0372) / RemoveLocation(udg_FHD) / Location(-26218.60,-28632.40) / Random item I09S / StopMusic / IssueImmediateOrder(stop) / SetUnitFacingToFaceUnitTimed / SetUnitOwner(长老, Player(6)) / SetUnitFacingTimed",
       },
     },
     {
-      序号: 2, 挂点: "beforeDialog", 对白序号: 5,
+      序号: 2, 挂点: "beforeDialog", 对白序号: 1,
+      动作ID: "主线.写入进度", 名称: "进入地精异变调查节点",
+      参数: { 节点进度: 1 },
+    },
+    {
+      序号: 3, 挂点: "beforeDialog", 对白序号: 5,
       动作ID: "JLC精灵村_帝国勋章共鸣特效", 名称: "长老念出共鸣语前播放觉醒特效",
       参数: {
         模型路径: "Abilities\\Spells\\Other\\Awaken\\Awaken.mdl",
@@ -105,7 +109,7 @@ export const 精灵村长老发布任务紧凑剧情片段: 紧凑剧情片段�
       },
     },
     {
-      序号: 3, 挂点: "afterDialog", 对白序号: 5,
+      序号: 4, 挂点: "afterDialog", 对白序号: 5,
       动作ID: "JLC精灵村_远古波动奖励", 名称: "共鸣对白后发放全属性奖励",
       参数: {
         任务消息类型: "bj_QUESTMESSAGE_ITEMACQUIRED",
@@ -117,7 +121,7 @@ export const 精灵村长老发布任务紧凑剧情片段: 紧凑剧情片段�
       },
     },
     {
-      序号: 4, 挂点: "afterDialog", 对白序号: 15,
+      序号: 5, 挂点: "afterDialog", 对白序号: 15,
       动作ID: "JLC精灵村_长老任务物品生成", 名称: "长老交代完毕后生成补给物品",
       参数: {
         物品名列表: "医疗剂（小）, 魔法药水（中）",
@@ -126,18 +130,12 @@ export const 精灵村长老发布任务紧凑剧情片段: 紧凑剧情片段�
       },
     },
     {
-      序号: 5, 挂点: "afterDialog", 对白序号: 15,
-      动作ID: "JLC精灵村_发布地精任务", 名称: "长老交代完毕后刷新主线任务",
-      参数: {
-        任务更新提示: "|cffffff00『系统提示』：|r|cffff0000前往村子北方地精处！（小地图信号位置）|r",
-        小地图X: -29392.7,
-        小地图Y: -20049.2,
-        小地图持续时间: 20,
-        旧JASS功能清单: "QuestSetDescription(zx[1]) / PingMinimap / QuestMessageBJ(UPDATED)",
-      },
+      序号: 6, 挂点: "afterDialog", 对白序号: 15,
+      动作ID: "主线.发布节点目标", 名称: "长老交代完毕后发布地精调查目标",
+      参数: { 节点进度: 1 },
     },
     {
-      序号: 6, 挂点: "afterDialog", 对白序号: 15,
+      序号: 7, 挂点: "afterDialog", 对白序号: 15,
       动作ID: "JLC精灵村_地精区域显视野", 名称: "任务发布后给地精区域添加两块可见度修整器",
       参数: {
         可见区域1: "gg_rct______________085",
@@ -146,7 +144,7 @@ export const 精灵村长老发布任务紧凑剧情片段: 紧凑剧情片段�
       },
     },
     {
-      序号: 7, 挂点: "afterDialog", 对白序号: 15,
+      序号: 8, 挂点: "afterDialog", 对白序号: 15,
       动作ID: "JLC精灵村_创建地精祭祀Boss预备", 名称: "任务发布后创建并冻结地精祭祀",
       参数: {
         Boss键: "Boss.地精巫师",

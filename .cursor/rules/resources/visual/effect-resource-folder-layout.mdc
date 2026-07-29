@@ -30,15 +30,16 @@ imports\Common\Effect\Form\Aura\BloodAura\BloodAura.mdx
 ## 路径规则
 
 - 游戏内模型路径必须去掉 `imports\` 前缀，例如 `Common\Effect\Form\Aura\HolyAura.mdx`。
-- MDX / MDL 内部贴图路径也必须去掉 `imports\` 前缀。
-- 内部贴图路径应指向分类目录共享 `Texture`，例如 `Common\Effect\Form\Aura\Texture\Shockwave10.blp`。
+- MDX / MDL 内部的项目私有贴图路径必须去掉 `imports\` 前缀，并指向分类目录共享 `Texture`，例如 `Common\Effect\Form\Aura\Texture\Shockwave10.blp`。
+- Warcraft III 原生贴图必须保留源模型中的原生游戏路径，例如 `Textures\CloudSingle.blp`、`Textures\GenericGlow64.blp`；禁止改写到分类 `Texture`，也不要复制进 `imports`。
+- 导出工具可能把原生贴图一并导出到模型目录；源目录里存在同名 `.blp` 不能证明它是私有贴图。迁移前必须用 Warcraft MPQ/CASC 文件索引按完整游戏路径判定。
 - 只有模型名是 `file_000123`、`unnamed`、纯数字等无语义名字时，才按用途改成语义化名字；原本有明确语义的模型名不要无脑改名。
 
 ## 整理已有资源时
 
-1. 先把旧子目录里的贴图复制到父分类目录的共享 `Texture`。
+1. 先解析模型贴图表并区分原生贴图与私有贴图，只把私有贴图复制到父分类目录的共享 `Texture`。
 2. 把模型移动到父分类目录。
-3. 修改模型内部贴图路径，从 `...\模型子目录\Texture\...` 改为 `...\Texture\...`。
+3. 只修改模型内部的私有贴图路径，从 `...\模型子目录\Texture\...` 改为 `...\Texture\...`；原生贴图路径保持不变。
 4. 修改 TS / 文档里的模型引用路径。
 5. 确认旧子目录没有唯一资源后再删除。
 

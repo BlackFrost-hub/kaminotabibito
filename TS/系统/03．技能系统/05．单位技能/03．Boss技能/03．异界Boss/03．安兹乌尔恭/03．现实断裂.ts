@@ -39,7 +39,7 @@ const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const ATTACK_TYPE_MAGIC = jass.ATTACK_TYPE_MAGIC as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const BJ_RADTODEG = 57.29577951308232;
@@ -117,7 +117,7 @@ function 创建现实断裂判定(this: void, context: 安兹运行时上下文,
         伤害: 计算伤害(boss, unit),
         attack: false,
         ranged: true,
-        attackType: ATTACK_TYPE_MAGIC,
+        attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_MAGIC,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: 'Boss技能',

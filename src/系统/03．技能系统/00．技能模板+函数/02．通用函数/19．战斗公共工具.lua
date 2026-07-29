@@ -1,12 +1,15 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitFacing = jass.GetUnitFacing
 local ConvertUnitState = jass.ConvertUnitState
 local IsUnitType = jass.IsUnitType
@@ -19,9 +22,7 @@ local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-local UNIT_STATE_ATTACK1_BASE = 18
-local UNIT_STATE_ATTACK1_BONUS = 16
-local UNIT_STATE_ATTACK1_COUNT = 17
+local UNIT_STATE_ATTACK = ConvertUnitState(21)
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local _____8F6C_56DB_5B57_7801 = ____require_result_0.stringToFourCC
 local _____5F27_5EA6_8F6C_89D2_5EA6 = 57.29577951308232
@@ -55,19 +56,7 @@ ____exports["读取单位攻击力"] = function(unit)
     if unit == nil or unit == 0 then
         return 0
     end
-    local base = GetUnitState(
-        unit,
-        ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
-    ) or 0
-    local bonus = GetUnitState(
-        unit,
-        ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
-    ) or 0
-    local diceCount = GetUnitState(
-        unit,
-        ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)
-    ) or 0
-    return base + bonus * (diceCount + 1) / 2
+    return __TS__Number(GetUnitStateJapi(unit, UNIT_STATE_ATTACK)) or 0
 end
 ____exports["距离平方XY"] = function(x1, y1, x2, y2)
     local dx = x2 - x1

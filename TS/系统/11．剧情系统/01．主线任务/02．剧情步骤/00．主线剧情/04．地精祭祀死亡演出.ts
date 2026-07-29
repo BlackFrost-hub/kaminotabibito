@@ -25,14 +25,12 @@ const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { 按结算键获取Boss死亡结算配置, 执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑") as {
-  按结算键获取Boss死亡结算配置: (this: void, 结算键: string) => any;
-  执行Boss死亡结算: (this: void, 配置: any, Boss单位?: any, 击杀者?: any) => boolean;
+const { 按结算键执行Boss死亡结算 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑") as {
+  按结算键执行Boss死亡结算: (this: void, 结算键: string, Boss单位?: any, 击杀者?: any) => boolean;
 };
 
-import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
+import type { 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
-import { 写入剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 尝试播放Boss死亡主线剧情 } from "../06．Boss死亡剧情索引";
 
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -83,8 +81,7 @@ function 创建地精死亡神秘人演出(this: void, 残血地精: any): void 
   SetUnitFacing(神秘人, 270);
 }
 
-export function 执行地精祭祀死亡演出前置(this: void, 参数: 剧情动作参数表): void {
-  写入剧情进度(Number(参数.设置剧情进度) || 4);
+export function 执行地精祭祀死亡演出前置(this: void): void {
   const gate = jglobals.gg_dest_DTg5_9811;
   if (gate != null && gate !== 0) {
     ModifyGateBJ(bj_GATEOPERATION_OPEN, gate);
@@ -99,10 +96,7 @@ export function 执行地精祭祀死亡演出前置(this: void, 参数: 剧情�
 
   const 残血地精 = 创建残血地精巫师();
   const bossUnit = YDUserDataGetSafe("string", "Boss", "地精巫师", "unit");
-  const 结算配置 = 按结算键获取Boss死亡结算配置("主线_地精祭祀");
-  if (结算配置 != null) {
-    执行Boss死亡结算(结算配置, bossUnit);
-  }
+  按结算键执行Boss死亡结算("主线_地精祭祀", bossUnit);
   创建地精死亡神秘人演出(残血地精);
 }
 

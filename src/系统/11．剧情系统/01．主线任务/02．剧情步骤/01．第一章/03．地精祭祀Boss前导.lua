@@ -16,65 +16,84 @@ ____exports["地精祭祀Boss前导紧凑剧情片段"] = {
         {["序号"] = 4, ["说话者"] = "地精祭祀", ["文本"] = "嘶嘶……哈哈，那又如何？既然闯到了这里，你们自然也逃不过成为祭品的命运！", ["持续时间"] = 5.2},
         {["序号"] = 5, ["说话者"] = "玩家", ["文本"] = "那就先拿下你，再查清背后之人。", ["持续时间"] = 3.2}
     },
-    ["动作时间线"] = {{
-        ["序号"] = 1,
-        ["挂点"] = "beforeDialog",
-        ["对白序号"] = 1,
-        ["动作ID"] = "JLC精灵村_创建地精祭祀Boss预备",
-        ["名称"] = "地精祭祀现身前切入Boss预备",
-        ["参数"] = {
-            ["设置剧情进度"] = 3,
-            ["触发范围"] = 755,
-            ["Boss键"] = "Boss.地精巫师",
-            ["Boss名"] = "地精祭祀|cffff0000（BossLV12）|r",
-            ["地点矩形"] = "gg_rct______________111",
-            ["创建地点定时器"] = true,
-            ["血条Boss组登记"] = true,
-            ["Boss归属玩家"] = 12,
-            ["Boss暂停"] = true,
-            ["Boss无敌"] = true,
-            ["默认弱点数量"] = 3,
-            ["天生弱点数"] = 2,
-            ["短剑弱"] = true,
-            ["光弱"] = true,
-            ["护盾基础值"] = 5,
-            ["护盾成长值"] = 2,
-            ["旧JASS功能清单"] = "YDLocal1Set(rect, 地点) / CreateTimer / TimerStart / SDR_DebugTimer / GroupAddUnit(血条Boss组) / SetUnitOwner(地精巫师, 中立敌对) / PauseUnit(true) / SetUnitInvulnerable(true)"
+    ["动作时间线"] = {
+        {
+            ["序号"] = 1,
+            ["挂点"] = "beforeDialog",
+            ["对白序号"] = 1,
+            ["动作ID"] = "JLC精灵村_创建地精祭祀Boss预备",
+            ["名称"] = "地精祭祀现身前切入Boss预备",
+            ["参数"] = {
+                ["触发范围"] = 755,
+                ["Boss键"] = "Boss.地精巫师",
+                ["Boss名"] = "地精祭祀|cffff0000（BossLV12）|r",
+                ["地点矩形"] = "gg_rct______________111",
+                ["创建地点定时器"] = true,
+                ["血条Boss组登记"] = true,
+                ["Boss归属玩家"] = 12,
+                ["Boss暂停"] = true,
+                ["Boss无敌"] = true,
+                ["默认弱点数量"] = 3,
+                ["天生弱点数"] = 2,
+                ["短剑弱"] = true,
+                ["光弱"] = true,
+                ["护盾基础值"] = 5,
+                ["护盾成长值"] = 2,
+                ["旧JASS功能清单"] = "YDLocal1Set(rect, 地点) / CreateTimer / TimerStart / SDR_DebugTimer / GroupAddUnit(血条Boss组) / SetUnitOwner(地精巫师, 中立敌对) / PauseUnit(true) / SetUnitInvulnerable(true)"
+            }
+        },
+        {
+            ["序号"] = 2,
+            ["挂点"] = "beforeDialog",
+            ["对白序号"] = 1,
+            ["动作ID"] = "主线.写入进度",
+            ["名称"] = "进入地精祭祀Boss节点",
+            ["参数"] = {["节点进度"] = 3}
+        },
+        {
+            ["序号"] = 3,
+            ["挂点"] = "absoluteTime",
+            ["时间秒"] = 1,
+            ["动作ID"] = "JLC精灵村_关闭洞窟大门",
+            ["名称"] = "玩家被发现后关闭洞窟大门",
+            ["参数"] = {["可破坏物全局名"] = "gg_dest_DTg5_9811", ["开关"] = "关闭"}
+        },
+        {
+            ["序号"] = 4,
+            ["挂点"] = "absoluteTime",
+            ["时间秒"] = 5,
+            ["动作ID"] = "JLC精灵村_地精祭祀Boss战正式注册",
+            ["名称"] = "5 秒后正式注册地精祭祀 Boss 战数据并启动",
+            ["参数"] = {
+                ["Boss键"] = "Boss.地精巫师",
+                ["注册Boss技能事件"] = "gg_trg_______Boss001",
+                ["Boss战绑定单位字段"] = "Boss战.绑定单位",
+                ["Boss战触发玩家字段"] = "Boss战.触发玩家",
+                ["Boss战地点字段"] = "Boss战.地点",
+                ["Boss战战斗音乐"] = "gg_snd_Bossbattle001",
+                ["Boss战胜利音乐"] = "gg_snd_shengliBgm",
+                ["Boss战转场"] = true,
+                ["Boss战移动X"] = 25203,
+                ["Boss战移动Y"] = 13203.7,
+                ["玩家移动X"] = 23808.3,
+                ["玩家移动Y"] = 12449.7,
+                ["关闭电影模式"] = true,
+                ["触发单位恢复控制"] = true,
+                ["触发单位取消无敌"] = true,
+                ["玩家英雄组恢复控制"] = true,
+                ["玩家英雄组取消无敌"] = true,
+                ["旧JASS功能清单"] = "TriggerRegisterUnitEvent(gg_trg_______Boss001) / YDUserDataSet(魔抗/减少控制时间/弱点/护盾/Boss战字段) / ConditionalTriggerExecute(gg_trg_Boss____________u)"
+            }
+        },
+        {
+            ["序号"] = 5,
+            ["挂点"] = "afterDialog",
+            ["对白序号"] = 5,
+            ["动作ID"] = "主线.发布节点目标",
+            ["名称"] = "发布击败地精祭祀目标",
+            ["参数"] = {["节点进度"] = 3}
         }
-    }, {
-        ["序号"] = 2,
-        ["挂点"] = "absoluteTime",
-        ["时间秒"] = 1,
-        ["动作ID"] = "JLC精灵村_关闭洞窟大门",
-        ["名称"] = "玩家被发现后关闭洞窟大门",
-        ["参数"] = {["可破坏物全局名"] = "gg_dest_DTg5_9811", ["开关"] = "关闭"}
-    }, {
-        ["序号"] = 3,
-        ["挂点"] = "absoluteTime",
-        ["时间秒"] = 5,
-        ["动作ID"] = "JLC精灵村_地精祭祀Boss战正式注册",
-        ["名称"] = "5 秒后正式注册地精祭祀 Boss 战数据并启动",
-        ["参数"] = {
-            ["Boss键"] = "Boss.地精巫师",
-            ["注册Boss技能事件"] = "gg_trg_______Boss001",
-            ["Boss战绑定单位字段"] = "Boss战.绑定单位",
-            ["Boss战触发玩家字段"] = "Boss战.触发玩家",
-            ["Boss战地点字段"] = "Boss战.地点",
-            ["Boss战战斗音乐"] = "gg_snd_Bossbattle001",
-            ["Boss战胜利音乐"] = "gg_snd_shengliBgm",
-            ["Boss战转场"] = true,
-            ["Boss战移动X"] = 25203,
-            ["Boss战移动Y"] = 13203.7,
-            ["玩家移动X"] = 23808.3,
-            ["玩家移动Y"] = 12449.7,
-            ["关闭电影模式"] = true,
-            ["触发单位恢复控制"] = true,
-            ["触发单位取消无敌"] = true,
-            ["玩家英雄组恢复控制"] = true,
-            ["玩家英雄组取消无敌"] = true,
-            ["旧JASS功能清单"] = "TriggerRegisterUnitEvent(gg_trg_______Boss001) / YDUserDataSet(魔抗/减少控制时间/弱点/护盾/Boss战字段) / ConditionalTriggerExecute(gg_trg_Boss____________u)"
-        }
-    }}
+    }
 }
 ____exports["地精祭祀Boss前导剧情片段"] = _____7F16_8BD1_7D27_51D1_5267_60C5_7247_6BB5(____exports["地精祭祀Boss前导紧凑剧情片段"])
 return ____exports

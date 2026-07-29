@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_76EE_6807, _____8865_5145Boss_9B54_6CD5, _____521B_5EFA_65B9_5411_7279_6548, _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D, _____521B_5EFA_4FB5_8680_6B8B_7559, ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, GetSpellTargetUnit, UNIT_STATE_MANA, UNIT_STATE_MAX_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_6C14_7075_65A9_6280_80FDID
+local _____53D6_76EE_6807, _____8865_5145Boss_9B54_6CD5, _____521B_5EFA_65B9_5411_7279_6548, _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D, _____521B_5EFA_4FB5_8680_6B8B_7559, ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, GetSpellTargetUnit, UNIT_STATE_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, doHeal, _____9B54_6CD5_589E_51CF, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_6C14_7075_65A9_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
@@ -30,11 +30,16 @@ function _____53D6_76EE_6807(boss)
 end
 function _____8865_5145Boss_9B54_6CD5(context, amount)
     local boss = context["Boss单位"]
-    local maxMana = GetUnitState(boss, UNIT_STATE_MAX_MANA)
-    local current = GetUnitState(boss, UNIT_STATE_MANA)
-    if maxMana > 0 then
-        SetUnitState(boss, UNIT_STATE_MANA, current + amount > maxMana and maxMana or current + amount)
-    end
+    doHeal({
+        HealSource = boss,
+        HealTarget = boss,
+        HealAmount = 0,
+        HealManaAmount = amount,
+        ItemHeal = false,
+        HealEffect = false,
+        ManaEffect = false,
+        ManaShowText = false
+    })
     context["当前魔法充能"] = context["当前魔法充能"] + amount
     if context["当前魔法充能"] > _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]["魔法阈值"] then
         context["当前魔法充能"] = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]["魔法阈值"]
@@ -61,7 +66,7 @@ function _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(context, ax, ay, bx, by, w
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue10
+                    goto __continue9
                 end
                 if _____5355_4F4D_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9(
                     hero,
@@ -70,7 +75,7 @@ function _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(context, ax, ay, bx, by, w
                     bx,
                     by
                 ) > width2 then
-                    goto __continue10
+                    goto __continue9
                 end
                 local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hero, {["来源攻击力比例"] = cfg["Boss攻击力比例"], ["目标最大生命比例"] = cfg["目标最大生命比例"]})
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -86,12 +91,12 @@ function _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(context, ax, ay, bx, by, w
                     ["来源类型"] = "Boss技能"
                 })
             end
-            ::__continue10::
+            ::__continue9::
             i = i + 1
         end
     end
 end
-function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, width)
+function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, width, effectScaleMultiplier)
     local boss = context["Boss单位"]
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]
     local midX = (ax + bx) * 0.5
@@ -100,14 +105,14 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
         cfg["残留特效路径"],
         midX,
         midY,
-        angle,
-        cfg["残留特效缩放"],
+        angle + cfg["残留特效朝向偏移角度"],
+        cfg["残留特效缩放"] * effectScaleMultiplier,
         cfg["侵蚀持续秒"]
     )
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "矩形",
-        X = midX,
-        Y = midY,
+        X = ax,
+        Y = ay,
         ["宽度"] = width,
         ["长度"] = cfg["距离"],
         ["朝向"] = angle,
@@ -119,12 +124,12 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
     tickID = addPeriodicCallback(
         cfg["侵蚀Tick秒"] * 1000,
         function()
-            local ____temp_10 = not _____5355_4F4D_6709_6548(boss)
-            if not ____temp_10 then
-                local ____self_9 = context["清理"]
-                ____temp_10 = ____self_9["已清理"](____self_9)
+            local ____temp_12 = not _____5355_4F4D_6709_6548(boss)
+            if not ____temp_12 then
+                local ____self_11 = context["清理"]
+                ____temp_12 = ____self_11["已清理"](____self_11)
             end
-            if ____temp_10 then
+            if ____temp_12 then
                 removePeriodicCallback(tickID)
                 return
             end
@@ -141,7 +146,7 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
                     do
                         local hero = heroes[i + 1]
                         if not _____5355_4F4D_6709_6548(hero) then
-                            goto __continue18
+                            goto __continue17
                         end
                         if _____5355_4F4D_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9(
                             hero,
@@ -150,7 +155,7 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
                             bx,
                             by
                         ) > width2 then
-                            goto __continue18
+                            goto __continue17
                         end
                         local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hero, {["来源攻击力比例"] = cfg["侵蚀Boss攻击力比例"], ["目标最大生命比例"] = cfg["侵蚀目标最大生命比例"]})
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -168,8 +173,10 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
                         local mana = GetUnitState(hero, UNIT_STATE_MANA)
                         local lostMana = mana * cfg["侵蚀扣魔当前魔法比例"]
                         if lostMana > 0 then
-                            SetUnitState(hero, UNIT_STATE_MANA, mana - lostMana)
-                            _____8865_5145Boss_9B54_6CD5(context, lostMana * cfg["侵蚀补魔倍率"])
+                            local actualManaLoss = -_____9B54_6CD5_589E_51CF(hero, -lostMana, false, false)
+                            if actualManaLoss > 0 then
+                                _____8865_5145Boss_9B54_6CD5(context, actualManaLoss * cfg["侵蚀补魔倍率"])
+                            end
                         end
                         registerManualBuff(
                             hero,
@@ -185,14 +192,14 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
                             ["持续秒"] = cfg["Tick命中特效持续秒"]
                         })
                     end
-                    ::__continue18::
+                    ::__continue17::
                     i = i + 1
                 end
             end
         end
     )
-    local ____self_11 = context["清理"]
-    ____self_11["登记周期回调"](____self_11, "菲利斯-剑气灵斩侵蚀", tickID)
+    local ____self_13 = context["清理"]
+    ____self_13["登记周期回调"](____self_13, "菲利斯-剑气灵斩侵蚀", tickID)
 end
 ____exports["释放菲利斯剑气灵斩"] = function(context)
     local boss = context["Boss单位"]
@@ -210,6 +217,17 @@ ____exports["释放菲利斯剑气灵斩"] = function(context)
     local bx = _____6781_5750_6807X(ax, angle, cfg["距离"])
     local by = _____6781_5750_6807Y(ay, angle, cfg["距离"])
     local width = context["异形化中"] and cfg["宽度"] * cfg["异形化宽度倍率"] or cfg["宽度"]
+    local effectScaleMultiplier = cfg["基础特效扩大倍率"] * (context["异形化中"] and cfg["异形化宽度倍率"] or 1)
+    _____521B_5EFA_6280_80FD_63D0_793A_5708({
+        ["类型"] = "矩形",
+        X = ax,
+        Y = ay,
+        ["宽度"] = width,
+        ["长度"] = cfg["距离"],
+        ["朝向"] = angle,
+        ["持续时间"] = cfg["施法硬直秒"],
+        ["来源单位"] = boss
+    })
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
         ["施法者"] = boss,
         ["目标单位"] = target,
@@ -226,7 +244,7 @@ ____exports["释放菲利斯剑气灵斩"] = function(context)
                 ax,
                 ay,
                 angle,
-                cfg["剑气特效缩放"],
+                cfg["剑气特效缩放"] * effectScaleMultiplier,
                 cfg["剑气特效持续秒"]
             )
             _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(
@@ -244,7 +262,8 @@ ____exports["释放菲利斯剑气灵斩"] = function(context)
                 bx,
                 by,
                 angle,
-                width
+                width,
+                effectScaleMultiplier
             )
         end
     })
@@ -271,11 +290,9 @@ GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
-SetUnitState = jass.SetUnitState
 GetSpellTargetUnit = jass.GetSpellTargetUnit
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 UNIT_STATE_MANA = jass.UNIT_STATE_MANA
-UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
@@ -297,6 +314,10 @@ _____83F2_5229_65AFBuffID = ____require_result_7["菲利斯BuffID"]
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
 _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_8["设置特效XYZ轴旋转"]
+local ____require_result_9 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+doHeal = ____require_result_9.doHeal
+local ____require_result_10 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
+_____9B54_6CD5_589E_51CF = ____require_result_10["魔法增减"]
 _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____5251_6C14_7075_65A9_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]["技能槽位"])
 local _____5251_6C14_7075_65A9_5DF2_6CE8_518C = false

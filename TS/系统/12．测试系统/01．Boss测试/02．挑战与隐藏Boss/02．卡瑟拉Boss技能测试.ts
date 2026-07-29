@@ -17,11 +17,12 @@ const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06
 const { 标记测试Boss跳过死亡结算 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
   标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
 };
-const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
+const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试玩家基准英雄, 准备Boss测试固定步兵, 准备Boss测试固定山丘之王, 移除Boss测试单位, 注册Boss测试命令组 } = require("系统.12．测试系统.00．Boss测试系统.index") as {
   Boss测试单位存活: (this: void, unit: any) => boolean;
   设置Boss测试单位满血: (this: void, unit: any, 最大生命值?: number) => void;
   获取Boss测试玩家基准英雄: (this: void, player: any) => any;
   准备Boss测试固定步兵: (this: void, unit: any, x: number, y: number, facing?: number) => any;
+  准备Boss测试固定山丘之王: (this: void, unit: any, x: number, y: number, facing?: number) => any;
   移除Boss测试单位: (this: void, unit: any) => void;
   注册Boss测试命令组: (this: void, 配置: any) => void;
 };
@@ -66,8 +67,8 @@ const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 
 const 卡瑟拉测试Boss: Record<number, any> = {};
-const 卡瑟拉测试步兵1: Record<number, any> = {};
-const 卡瑟拉测试步兵2: Record<number, any> = {};
+const 卡瑟拉测试步兵: Record<number, any> = {};
+const 卡瑟拉测试山丘之王: Record<number, any> = {};
 
 function stringToFourCC(this: void, s: string): number {
   return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
@@ -100,12 +101,10 @@ function 准备测试场景(this: void, player: any, boss: any): void {
   const pid = GetPlayerId(player);
   const hero = 获取Boss测试玩家基准英雄(player);
   if (hero != null && hero !== 0) {
-    SetUnitPosition(hero, 临时测试场地中心X, 临时测试玩家Y);
-    SetUnitFacing(hero, 90);
     设置Boss测试单位满血(hero);
   }
-  卡瑟拉测试步兵1[pid] = 准备Boss测试固定步兵(卡瑟拉测试步兵1[pid], 临时测试场地中心X - 220, 临时测试玩家Y + 180, 90);
-  卡瑟拉测试步兵2[pid] = 准备Boss测试固定步兵(卡瑟拉测试步兵2[pid], 临时测试场地中心X + 220, 临时测试玩家Y + 180, 90);
+  卡瑟拉测试步兵[pid] = 准备Boss测试固定步兵(卡瑟拉测试步兵[pid], 临时测试场地中心X - 220, 临时测试玩家Y + 180, 90);
+  卡瑟拉测试山丘之王[pid] = 准备Boss测试固定山丘之王(卡瑟拉测试山丘之王[pid], 临时测试场地中心X + 220, 临时测试玩家Y + 180, 90);
   SelectUnitForPlayerSingle(boss, player);
   StarOther_PanCameraToTimedForPlayer(player, 临时测试场地中心X, 临时测试场地中心Y, 0.2);
 }
@@ -127,11 +126,11 @@ function 清理卡瑟拉测试(this: void, player: any, _context: any): void {
   const pid = GetPlayerId(player);
   const boss = 卡瑟拉测试Boss[pid];
   if (boss != null && boss !== 0) 清理卡瑟拉上下文(boss);
-  移除Boss测试单位(卡瑟拉测试步兵1[pid]);
-  移除Boss测试单位(卡瑟拉测试步兵2[pid]);
+  移除Boss测试单位(卡瑟拉测试步兵[pid]);
+  移除Boss测试单位(卡瑟拉测试山丘之王[pid]);
   移除Boss测试单位(boss);
-  卡瑟拉测试步兵1[pid] = undefined;
-  卡瑟拉测试步兵2[pid] = undefined;
+  卡瑟拉测试步兵[pid] = undefined;
+  卡瑟拉测试山丘之王[pid] = undefined;
   卡瑟拉测试Boss[pid] = undefined;
   if (globals.udg_Boss === boss) globals.udg_Boss = null;
 }

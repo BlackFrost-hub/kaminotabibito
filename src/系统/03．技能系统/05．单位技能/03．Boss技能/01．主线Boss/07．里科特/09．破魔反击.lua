@@ -62,7 +62,7 @@ local function _____7ED3_675F_7834_9B54_53CD_51FB_7A97_53E3(context)
     context["破魔反击中"] = false
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["Boss单位"], _____91CC_79D1_7279BuffID["破魔反击"])
 end
-local function _____5F00_59CB_7834_9B54_53CD_51FB_7A97_53E3(context)
+____exports["立即开启里科特破魔反击窗口"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
         return
@@ -120,7 +120,7 @@ ____exports["释放里科特破魔反击"] = function(context)
     local id = addDelayedCallback(
         prepare * 1000,
         function()
-            _____5F00_59CB_7834_9B54_53CD_51FB_7A97_53E3(context)
+            ____exports["立即开启里科特破魔反击窗口"](context)
         end
     )
     local ____self_9 = context["清理"]

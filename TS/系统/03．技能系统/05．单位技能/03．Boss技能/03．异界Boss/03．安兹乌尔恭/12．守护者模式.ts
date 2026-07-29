@@ -29,13 +29,15 @@ const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
 };
+const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
+  doHeal: (this: void, params: any) => number;
+};
 
 const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const Cos = jass.Cos as (radians: number) => number;
@@ -182,8 +184,8 @@ export function 推进安兹守护者模式(this: void, context: 安兹运行时
   const minimumLife = maxLife * cfg.雅儿贝德锁血比例;
   let life = GetUnitState(albedo, UNIT_STATE_LIFE);
   if (life < minimumLife) {
-    SetUnitState(albedo, UNIT_STATE_LIFE, minimumLife);
-    life = minimumLife;
+    doHeal({ HealSource: albedo, HealTarget: albedo, HealAmount: minimumLife - life, ItemHeal: false, HealEffect: false });
+    life = GetUnitState(albedo, UNIT_STATE_LIFE);
   }
   const now = getServerTime();
   state.当前生命比例 = life / maxLife;

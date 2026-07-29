@@ -20,7 +20,6 @@ export const 地精祭祀Boss前导紧凑剧情片段: 紧凑剧情片段配置 
       序号: 1, 挂点: "beforeDialog", 对白序号: 1,
       动作ID: "JLC精灵村_创建地精祭祀Boss预备", 名称: "地精祭祀现身前切入Boss预备",
       参数: {
-        设置剧情进度: 3,
         触发范围: 755,
         Boss键: "Boss.地精巫师",
         Boss名: "地精祭祀|cffff0000（BossLV12）|r",
@@ -40,7 +39,12 @@ export const 地精祭祀Boss前导紧凑剧情片段: 紧凑剧情片段配置 
       },
     },
     {
-      序号: 2, 挂点: "absoluteTime", 时间秒: 1,
+      序号: 2, 挂点: "beforeDialog", 对白序号: 1,
+      动作ID: "主线.写入进度", 名称: "进入地精祭祀Boss节点",
+      参数: { 节点进度: 3 },
+    },
+    {
+      序号: 3, 挂点: "absoluteTime", 时间秒: 1,
       动作ID: "JLC精灵村_关闭洞窟大门", 名称: "玩家被发现后关闭洞窟大门",
       参数: {
         可破坏物全局名: "gg_dest_DTg5_9811",
@@ -48,7 +52,7 @@ export const 地精祭祀Boss前导紧凑剧情片段: 紧凑剧情片段配置 
       },
     },
     {
-      序号: 3, 挂点: "absoluteTime", 时间秒: 5,
+      序号: 4, 挂点: "absoluteTime", 时间秒: 5,
       动作ID: "JLC精灵村_地精祭祀Boss战正式注册", 名称: "5 秒后正式注册地精祭祀 Boss 战数据并启动",
       参数: {
         Boss键: "Boss.地精巫师",
@@ -70,6 +74,11 @@ export const 地精祭祀Boss前导紧凑剧情片段: 紧凑剧情片段配置 
         玩家英雄组取消无敌: true,
         旧JASS功能清单: "TriggerRegisterUnitEvent(gg_trg_______Boss001) / YDUserDataSet(魔抗/减少控制时间/弱点/护盾/Boss战字段) / ConditionalTriggerExecute(gg_trg_Boss____________u)",
       },
+    },
+    {
+      序号: 5, 挂点: "afterDialog", 对白序号: 5,
+      动作ID: "主线.发布节点目标", 名称: "发布击败地精祭祀目标",
+      参数: { 节点进度: 3 },
     },
   ],
 };

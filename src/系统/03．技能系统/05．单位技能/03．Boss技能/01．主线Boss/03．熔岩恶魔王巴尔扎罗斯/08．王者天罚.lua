@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____9650_5236_751F_547D_503C, _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5929_7F5A_534A_5F84, _____8BA1_7B97_5929_7F5A_4F24_5BB3, _____64AD_653E_5929_7F5A_7206_70B8_7279_6548, _____8BB0_5F55_5929_7F5A_73A9_5BB6_547D_4E2D, _____6536_96C6_5929_7F5A_547D_4E2D_5019_9009, _____662F_62A4_536B, _____89E6_53D1_5929_7F5A_6CE2_6B21, _____521B_5EFA_5929_7F5A_6CE2_6B21_5217_8868, ____on_5DF4_5C14_624E_7F57_65AF_738B_8005_5929_7F5A_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_591A_6CE2_5EF6_8FDFAOE, _____65BD_52A0_5355_4F53_653B_51FB_529B_63D0_9AD8Buff, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____521B_5EFA_70B9_7279_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____83B7_53D6Boss_62A4_536B_5217_8868, _____662F_5426_6307_5B9ABoss_62A4_536B, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitState, GetHandleId, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____738B_8005_5929_7F5A_6280_80FDID
+local _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5929_7F5A_534A_5F84, _____8BA1_7B97_5929_7F5A_4F24_5BB3, _____64AD_653E_5929_7F5A_7206_70B8_7279_6548, _____8BB0_5F55_5929_7F5A_73A9_5BB6_547D_4E2D, _____6536_96C6_5929_7F5A_547D_4E2D_5019_9009, _____662F_62A4_536B, _____89E6_53D1_5929_7F5A_6CE2_6B21, _____521B_5EFA_5929_7F5A_6CE2_6B21_5217_8868, ____on_5DF4_5C14_624E_7F57_65AF_738B_8005_5929_7F5A_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_591A_6CE2_5EF6_8FDFAOE, _____65BD_52A0_5355_4F53_653B_51FB_529B_63D0_9AD8Buff, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____521B_5EFA_70B9_7279_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____83B7_53D6Boss_62A4_536B_5217_8868, _____662F_5426_6307_5B9ABoss_62A4_536B, doHeal, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, GetHandleId, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____738B_8005_5929_7F5A_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -20,26 +20,17 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local _____5355_4F4D_5230_70B9_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位到点距离平方"]
-function _____9650_5236_751F_547D_503C(value, maxLife)
-    if value < 1 then
-        return 1
-    end
-    if value > maxLife then
-        return maxLife
-    end
-    return value
-end
-function _____6CBB_7597_5355_4F4D(unit, amount)
+function _____6CBB_7597_5355_4F4D(source, unit, amount)
     if not _____5355_4F4D_6709_6548(unit) or amount <= 0 then
         return
     end
-    local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
-    local life = GetUnitState(unit, UNIT_STATE_LIFE)
-    SetUnitState(
-        unit,
-        UNIT_STATE_LIFE,
-        _____9650_5236_751F_547D_503C(life + amount, maxLife)
-    )
+    doHeal({
+        HealSource = source,
+        HealTarget = unit,
+        HealAmount = amount,
+        ItemHeal = false,
+        HealEffect = false
+    })
 end
 function _____8BA1_7B97_5929_7F5A_534A_5F84(context)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["王者天罚"]
@@ -107,10 +98,11 @@ function _____89E6_53D1_5929_7F5A_6CE2_6B21(context, _____6CE2_6B21)
             do
                 local unit = candidates[i + 1]
                 if not _____5355_4F4D_6709_6548(unit) or _____5355_4F4D_5230_70B9_8DDD_79BB_5E73_65B9(unit, _____6CE2_6B21.X, _____6CE2_6B21.Y) > radius2 then
-                    goto __continue22
+                    goto __continue19
                 end
                 if unit == boss then
                     _____6CBB_7597_5355_4F4D(
+                        boss,
                         boss,
                         GetUnitState(boss, UNIT_STATE_MAX_LIFE) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["王者天罚"]["命中自身治疗最大生命比例"]
                     )
@@ -139,7 +131,7 @@ function _____89E6_53D1_5929_7F5A_6CE2_6B21(context, _____6CE2_6B21)
                     _____8BB0_5F55_5929_7F5A_73A9_5BB6_547D_4E2D(context, unit)
                 end
             end
-            ::__continue22::
+            ::__continue19::
             i = i + 1
         end
     end
@@ -155,7 +147,7 @@ function _____521B_5EFA_5929_7F5A_6CE2_6B21_5217_8868(context)
             do
                 local hero = heroes[h + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue29
+                    goto __continue26
                 end
                 do
                     local i = 0
@@ -170,7 +162,7 @@ function _____521B_5EFA_5929_7F5A_6CE2_6B21_5217_8868(context)
                     end
                 end
             end
-            ::__continue29::
+            ::__continue26::
             h = h + 1
         end
     end
@@ -246,17 +238,17 @@ _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成AOE技能伤
 local ____require_result_8 = require("系统.01．单位系统.10．护卫系统.index")
 _____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_8["获取Boss护卫列表"]
 _____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_8["是否指定Boss护卫"]
+local ____require_result_9 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+doHeal = ____require_result_9.doHeal
 local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
-SetUnitState = jass.SetUnitState
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
 GetHandleId = jass.GetHandleId
-UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS

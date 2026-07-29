@@ -21,16 +21,18 @@ const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英�
 const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
   TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
 };
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
+};
 
 import type { 剧情动作参数表 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import type { 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
-import { 读取剧情进度, 写入当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 播放主线剧情片段 } from "../02．剧情步骤播放器";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const IsUnitInGroup = jass.IsUnitInGroup as (this: void, whichUnit: any, whichGroup: any) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 const TriggerRegisterUnitEvent = jass.TriggerRegisterUnitEvent as (this: void, trig: any, whichUnit: any, whichEvent: any) => any;
@@ -47,12 +49,6 @@ function 读取地精巫师Boss(this: void): any {
   return YDUserDataGetSafe("string", "Boss", "地精巫师", "unit");
 }
 
-function 触发单位是玩家英雄(this: void, unit: any): boolean {
-  if (unit == null || unit === 0) return false;
-  const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
-  return 玩家英雄组 != null && 玩家英雄组 !== 0 && IsUnitInGroup(unit, 玩家英雄组);
-}
-
 function Boss仍是前导状态(this: void, bossUnit: any): boolean {
   if (bossUnit == null || bossUnit === 0 || !IsUnitAliveBJ(bossUnit)) return false;
   return GetOwningPlayer(bossUnit) === Player(PLAYER_NEUTRAL_PASSIVE);
@@ -61,11 +57,7 @@ function Boss仍是前导状态(this: void, bossUnit: any): boolean {
 export function 执行地精祭祀Boss前导激活(this: void, 参数: 剧情动作参数表): void {
   const bossUnit = 读取地精巫师Boss();
   const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
-  if (读取剧情进度() !== 2 || !Boss仍是前导状态(bossUnit) || !触发单位是玩家英雄(触发单位)) return;
-  const { 写入剧情进度 } = require("../../00．剧情系统核心工具/01．剧情动作上下文") as {
-    写入剧情进度: (this: void, value: number) => void;
-  };
-  写入剧情进度(Number(参数.设置剧情进度) || 3);
+  if (读取剧情进度() !== 2 || !Boss仍是前导状态(bossUnit) || !是玩家英雄组单位(触发单位)) return;
   const 血条Boss组 = YDUserDataGetSafe("string", "血条Boss", "单位组", "group");
   if (血条Boss组 != null && 血条Boss组 !== 0) {
     const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUnit: any) => boolean;
@@ -98,10 +90,9 @@ function on地精祭祀Boss前导范围触发(this: void): void {
   const 触发单位 = GetTriggerUnit();
   if (读取剧情进度() !== 2) return;
   if (!Boss仍是前导状态(bossUnit)) return;
-  if (!触发单位是玩家英雄(触发单位)) return;
+  if (!是玩家英雄组单位(触发单位)) return;
 
   const 片段ID = "jlc_goblin_boss_intro";
-  写入当前剧情动作上下文({ 片段ID, 触发配置名: "地精祭祀Boss前导核心", 触发单位 });
   播放主线剧情片段(片段ID, { 片段ID, 触发配置名: "地精祭祀Boss前导核心", 触发单位 });
 }
 
