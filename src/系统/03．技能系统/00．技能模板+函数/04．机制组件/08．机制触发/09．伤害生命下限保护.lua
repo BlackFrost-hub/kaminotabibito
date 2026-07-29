@@ -8,6 +8,8 @@ local unregisterDamageModifier = ____require_result_0.unregisterDamageModifier
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -133,7 +135,7 @@ _____4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4_5B9E_73B0.prototype["处理伤害"]
     return _____5B9E_9645_5141_8BB8_4F24_5BB3
 end
 _____4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4_5B9E_73B0.prototype["计算生命下限"] = function(self, context)
-    local _____6700_5927_751F_547D = GetUnitState(self["参数"]["单位"], UNIT_STATE_MAX_LIFE)
+    local _____6700_5927_751F_547D = GetUnitStateJapi(self["参数"]["单位"], UNIT_STATE_MAX_LIFE)
     if self["参数"]["取生命下限"] ~= nil then
         return _____89C4_6574_4E0B_9650(
             self["参数"]["取生命下限"](self["参数"]["单位"], context),

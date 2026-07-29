@@ -12,6 +12,8 @@ const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能�
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -176,7 +178,7 @@ function 创建静止陷阱(this: void, context: 树魔首领运行时上下文)
     context,
     "树魔首领-静止陷阱",
     cfg.静止陷阱模型路径,
-    GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg.静止陷阱生命Boss最大生命比例,
+    GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg.静止陷阱生命Boss最大生命比例,
     duration,
   );
   if (trap == null) return;
@@ -239,7 +241,7 @@ function 创建生命陷阱(this: void, context: 树魔首领运行时上下文)
     context,
     "树魔首领-生命陷阱",
     cfg.生命陷阱模型路径,
-    GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg.生命陷阱生命Boss最大生命比例,
+    GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg.生命陷阱生命Boss最大生命比例,
     cfg.生命陷阱持续秒,
   );
   if (trap == null) return;
@@ -264,7 +266,7 @@ function 创建生命陷阱(this: void, context: 树魔首领运行时上下文)
         技能ID: 树魔图腾技能ID,
         来源: boss,
         目标: hero,
-        伤害: GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.生命陷阱伤害目标最大生命比例,
+        伤害: GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg.生命陷阱伤害目标最大生命比例,
         attack: false,
         ranged: false,
         attackType: ATTACK_TYPE_NORMAL,
@@ -340,7 +342,7 @@ function 创建爆炸陷阱(this: void, context: 树魔首领运行时上下文)
     context,
     "树魔首领-爆炸陷阱",
     cfg.爆炸陷阱模型路径,
-    GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg.爆炸陷阱生命Boss最大生命比例,
+    GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg.爆炸陷阱生命Boss最大生命比例,
     cfg.爆炸陷阱持续秒,
     function 树魔首领爆炸陷阱死亡(this: void, unit: any): void {
       if (naturalEnd || exploded) return;

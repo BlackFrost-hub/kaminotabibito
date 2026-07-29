@@ -35,6 +35,7 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -114,7 +115,7 @@ function 创建地核单位(this: void, context: 巴尔扎罗斯运行时上下�
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const config = 巴尔扎罗斯技能数值配置.地核召唤;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   const state: 地核状态 = { context, coreUnit: undefined, tickId: 0, stopped: false };
   const core = 创建可攻击机制单位({
     清理: context.清理,

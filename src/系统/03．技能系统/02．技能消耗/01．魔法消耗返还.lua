@@ -4,6 +4,8 @@ local ____exports = {}
 -- 
 -- 功能：读取物编原始消耗，并计算写入单个单位技能实例的最终魔法消耗
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local YDWEGetUnitAbilityDataInteger = ____require_result_0.YDWEGetUnitAbilityDataInteger
@@ -37,7 +39,7 @@ function ____exports.calcTotalManaCost(unit, abilityId, level)
     if percentCost >= PERCENT_COST_THRESHOLD then
         return -1
     end
-    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA)
     return fixedCost + maxMana * percentCost
 end
 --- 获取魔法消耗属性

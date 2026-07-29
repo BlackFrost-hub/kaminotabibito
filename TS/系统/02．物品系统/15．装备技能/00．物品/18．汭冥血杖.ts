@@ -6,6 +6,7 @@ import { 造成装备伤害 } from "../../../03．技能系统/00．技能模板
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { 获取坐标范围敌人, 单位是否有效且敌对 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围") as {
   获取坐标范围敌人: (this: void, centerUnit: any, x: number, y: number, radius: number) => any[];
@@ -91,9 +92,9 @@ export function 执行汭冥血杖献祭(this: void, 上下文: 物品技能事�
   const 等级上限 = 是否强化 ? 汭冥血杖配置.强化等级上限 : 汭冥血杖配置.普通等级上限;
   if (!目标可献祭(目标单位, 等级上限)) return;
 
-  const 目标最大生命 = GetUnitState(目标单位, UNIT_STATE_MAX_LIFE);
+  const 目标最大生命 = GetUnitStateJapi(目标单位, UNIT_STATE_MAX_LIFE);
   const 生命恢复值 = 目标最大生命 * (是否强化 ? 汭冥血杖配置.强化生命恢复比例 : 汭冥血杖配置.普通生命恢复比例);
-  const 魔法恢复值 = 是否强化 ? GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 汭冥血杖配置.强化魔法恢复比例 : 0;
+  const 魔法恢复值 = 是否强化 ? GetUnitStateJapi(施法单位, UNIT_STATE_MAX_MANA) * 汭冥血杖配置.强化魔法恢复比例 : 0;
   const 目标X = GetUnitX(目标单位);
   const 目标Y = GetUnitY(目标单位);
 

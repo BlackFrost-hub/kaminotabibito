@@ -3,6 +3,8 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetHandleId = jass.GetHandleId
 local GetUnitStateJass = jass.GetUnitState
@@ -66,9 +68,9 @@ local function _____83B7_53D6_5F53_524D_503C(target, resourceType)
 end
 local function _____83B7_53D6_6700_5927_503C(target, resourceType)
     if resourceType == "life" then
-        return GetUnitStateJass(target, UNIT_STATE_MAX_LIFE)
+        return GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     end
-    return GetUnitStateJass(target, UNIT_STATE_MAX_MANA)
+    return GetUnitStateJapi(target, UNIT_STATE_MAX_MANA)
 end
 local function _____8BBE_7F6E_5F53_524D_503C(target, resourceType, value)
     if resourceType == "life" then

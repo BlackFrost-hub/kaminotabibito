@@ -18,6 +18,7 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServ
 
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -64,7 +65,7 @@ function 守护职责伤害共享修正(this: void, damage: any): number {
     if (!单位有效(other)) continue;
     const share = damage.currentDamage * 安兹乌尔恭数值与表现配置.守护者模式.守护者之职责共享比例;
     const minimumLife = other === albedo
-      ? GetUnitState(albedo, UNIT_STATE_MAX_LIFE) * 安兹乌尔恭数值与表现配置.守护者模式.雅儿贝德锁血比例
+      ? GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE) * 安兹乌尔恭数值与表现配置.守护者模式.雅儿贝德锁血比例
       : 1;
     执行非伤害生命移除({
       目标: other,

@@ -24,6 +24,8 @@ local ____require_result_0 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local getServerTime = ____require_result_0.getServerTime
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local RemoveUnit = jass.RemoveUnit
@@ -154,7 +156,7 @@ local function _____5237_65B0_9636_6BB5(context)
     if context["挑战已结束"] or context["阶段"] == "复生仪式" or context["阶段"] == "挑战收束" or context["阶段"] == "已结束" then
         return
     end
-    local maxLife = GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE)
     if not (maxLife > 0) then
         return
     end

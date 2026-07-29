@@ -17,6 +17,8 @@ const { onAnyUnitItemStacked } = require("lib.扩展函数.物品相关函数.�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const SetItemCharges = jass.SetItemCharges as (item: any, charges: number) => void;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -47,7 +49,7 @@ function on触手残片叠加(this: void, 单位: any, 合并后物品: any, 被
   if (新增次数 !== 1) return;
   if (叠加前次数 < 触手残片配置.触发最低已有次数) return;
 
-  const 已损生命 = GetUnitState(单位, UNIT_STATE_MAX_LIFE) - GetUnitState(单位, UNIT_STATE_LIFE);
+  const 已损生命 = GetUnitStateJapi(单位, UNIT_STATE_MAX_LIFE) - GetUnitState(单位, UNIT_STATE_LIFE);
   if (已损生命 <= 0) return;
 
   恢复生命魔法(单位, 单位, 已损生命 * 触手残片配置.每次拾取治疗已损生命比例);

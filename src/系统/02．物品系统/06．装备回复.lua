@@ -118,6 +118,8 @@ function ____on_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5()
     end
 end
 jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetItemTypeId = jass.GetItemTypeId
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local onItemUse = ____require_result_0.onItemUse
@@ -168,13 +170,13 @@ local function applyHpMpToUnit(unit, hp, mp)
     end
     if hp > 0 and jass.UNIT_STATE_LIFE ~= nil and jass.UNIT_STATE_MAX_LIFE ~= nil then
         local cur = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE)
-        local maxL = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+        local maxL = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE)
         local nextLife = cur + hp
         jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, nextLife < maxL and nextLife or maxL)
     end
     if mp > 0 and jass.UNIT_STATE_MANA ~= nil and jass.UNIT_STATE_MAX_MANA ~= nil then
         local curM = jass.GetUnitState(unit, jass.UNIT_STATE_MANA)
-        local maxM = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+        local maxM = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA)
         local nextMana = curM + mp
         jass.SetUnitState(unit, jass.UNIT_STATE_MANA, nextMana < maxM and nextMana or maxM)
     end

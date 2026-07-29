@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
@@ -70,7 +72,7 @@ function 取战斗状态主体类型(this: void, 单位: any, 指定主体类型
 
 function 受伤达到进入战斗阈值(this: void, 单位: any, 主体类型: "玩家英雄" | "Boss" | "普通单位", applied: number): boolean {
   if (主体类型 !== "玩家英雄") return true;
-  const 最大生命 = GetUnitState(单位, UNIT_STATE_MAX_LIFE);
+  const 最大生命 = GetUnitStateJapi(单位, UNIT_STATE_MAX_LIFE);
   if (!(最大生命 > 0)) return applied > 0;
   return applied >= 最大生命 * 脱战伤害阈值比例;
 }

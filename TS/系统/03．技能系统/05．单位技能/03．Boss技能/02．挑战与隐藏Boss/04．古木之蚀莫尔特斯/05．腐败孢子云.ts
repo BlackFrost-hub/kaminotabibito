@@ -20,6 +20,8 @@ const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能�
   创建技能提示圈: (this: void, 配置: any) => any;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -79,7 +81,7 @@ function 孢子云Tick(this: void, data: 孢子云实例): void {
     const dx = GetUnitX(hero) - currentX;
     const dy = GetUnitY(hero) - currentY;
     if (dx * dx + dy * dy > cfg.半径 * cfg.半径) continue;
-    const damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.每秒目标最大生命比例;
+    const damage = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg.每秒目标最大生命比例;
     造成AOE技能伤害({
       技能ID: 腐败孢子云技能ID,
       来源: boss,

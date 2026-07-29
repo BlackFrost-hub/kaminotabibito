@@ -1,7 +1,21 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local jass = require("jass.common")
+local _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548, jass
+function _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(_____6A21_578B, _____5B9E_4F8B)
+    if _____6A21_578B == nil or _____6A21_578B == "" then
+        return
+    end
+    local _____7279_6548 = jass.AddSpecialEffect(
+        _____6A21_578B,
+        jass.GetUnitX(_____5B9E_4F8B["单位"]),
+        jass.GetUnitY(_____5B9E_4F8B["单位"])
+    )
+    if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
+        jass.DestroyEffect(_____7279_6548)
+    end
+end
+jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
 local X_GAFC = ____require_result_0.X_GAFC
@@ -116,18 +130,8 @@ ____exports["单位已被暂停"] = function(_____5355_4F4D)
     return jass.IsUnitPaused(_____5355_4F4D) == true
 end
 ____exports["播放位移特效"] = function(_____5B9E_4F8B)
-    local _____6A21_578B = _____5B9E_4F8B["位移特效"]
-    if _____6A21_578B == nil or _____6A21_578B == "" then
-        return
-    end
-    local _____7279_6548 = jass.AddSpecialEffect(
-        _____6A21_578B,
-        jass.GetUnitX(_____5B9E_4F8B["单位"]),
-        jass.GetUnitY(_____5B9E_4F8B["单位"])
-    )
-    if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
-        jass.DestroyEffect(_____7279_6548)
-    end
+    _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(_____5B9E_4F8B["位移特效"], _____5B9E_4F8B)
+    _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(_____5B9E_4F8B["附加位移特效"], _____5B9E_4F8B)
 end
 ____exports["获取枚举组"] = function()
     if _____679A_4E3E_7EC4 == nil or _____679A_4E3E_7EC4 == 0 then

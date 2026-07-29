@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
@@ -230,7 +232,7 @@ function 创建当前阶段单位(this: void, 预置列表: 攻城单位预置[]
 function 读取友军属性基准(this: void, 耶提尔: any): 友军属性基准 {
   if (!单位存活(耶提尔)) return { 最大生命: 12000, 攻击力: 300, 护甲: 40 };
   return {
-    最大生命: 至少为(GetUnitState(耶提尔, jass.UNIT_STATE_MAX_LIFE), 12000),
+    最大生命: 至少为(GetUnitStateJapi(耶提尔, jass.UNIT_STATE_MAX_LIFE), 12000),
     攻击力: 至少为(GS_LoadUintProperty(耶提尔, 2), 300),
     护甲: 至少为(GS_LoadUintProperty(耶提尔, 3), 40),
   };
@@ -240,7 +242,7 @@ function 应用友军动态属性(this: void, unit: any, 预置: 友军单位预
   const 目标最大生命 = 至少为(基准.最大生命 * 预置.生命比例, 1800);
   const 目标攻击力 = 至少为(基准.攻击力 * 预置.攻击比例, 100);
   const 目标护甲 = 至少为(基准.护甲 * 预置.护甲比例, 8);
-  GS_UnitPry(unit, 0, 0, 目标最大生命 - GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE));
+  GS_UnitPry(unit, 0, 0, 目标最大生命 - GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE));
   GS_UnitPry(unit, 0, 2, 目标攻击力 - GS_LoadUintProperty(unit, 2));
   GS_UnitPry(unit, 0, 3, 目标护甲 - GS_LoadUintProperty(unit, 3));
 }

@@ -19,6 +19,8 @@ local _____53D6_6700_5927_751F_547D = ____require_result_3["取最大生命"]
 local _____6267_884C_6CBB_7597 = ____require_result_3["执行治疗"]
 local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_3["调整玩家属性"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local _____9AD8_539F_9B54_529B_706F_7B3C_591C_665A_51CF_4F24 = _____521B_5EFA_5355_4F4D_52A8_6001_52A0_6210_540C_6B65_5668(function(unit, _key, delta)
@@ -32,7 +34,7 @@ local function _____6E05_7406_9AD8_539F_9B54_529B_706F_7B3C_72B6_6001(unit)
     _____9AD8_539F_9B54_529B_706F_7B3C_591C_665A_51CF_4F24["清理"](unit)
 end
 local function ____on_9AD8_539F_9B54_529B_706F_7B3C_5468_671F(unit, currentCount)
-    local manaCost = GetUnitState(unit, UNIT_STATE_MAX_MANA) * _____9AD8_539F_9B54_529B_706F_7B3C_914D_7F6E["最大魔法消耗比例"] * currentCount
+    local manaCost = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA) * _____9AD8_539F_9B54_529B_706F_7B3C_914D_7F6E["最大魔法消耗比例"] * currentCount
     _____51CF_5C11_9B54_6CD5_503C(unit, manaCost, true, false)
     _____540C_6B65_591C_665A_51CF_4F24(unit, currentCount)
     if not _____662F_5426_767D_5929() then

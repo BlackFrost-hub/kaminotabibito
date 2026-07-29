@@ -3,7 +3,7 @@
  * TS 原生弹幕 - 轨迹工具
  */
 
-import type { 原生弹幕内部实例 } from "../00．类型";
+import type { 原生弹幕内部实例, 原生弹幕轨迹采样器, 原生弹幕轨迹采样结果 } from "../00．类型";
 import { 计算距离, 取坐标朝向角, 限制范围 } from "../01．共享";
 
 export function 线性插值(this: void, from: number, to: number, progress: number): number {
@@ -24,4 +24,24 @@ export function 取弹幕轨迹进度(this: void, 实例: 原生弹幕内部实�
 export function 取采样方向(this: void, oldX: number, oldY: number, newX: number, newY: number, fallback: number): number {
   if (计算距离(oldX, oldY, newX, newY) <= 0.01) return fallback;
   return 取坐标朝向角(oldX, oldY, newX, newY);
+}
+
+export function 创建直线定点轨迹(
+  this: void,
+  起点X: number,
+  起点Y: number,
+  终点X: number,
+  终点Y: number,
+): 原生弹幕轨迹采样器 {
+  return function 直线定点轨迹采样(this: void, 实例): 原生弹幕轨迹采样结果 {
+    const progress = 取弹幕轨迹进度(实例);
+    const x = 线性插值(起点X, 终点X, progress);
+    const y = 线性插值(起点Y, 终点Y, progress);
+    return {
+      X: x,
+      Y: y,
+      方向角: 取采样方向(实例.当前X, 实例.当前Y, x, y, 实例.当前方向角),
+      完成: progress >= 1,
+    };
+  };
 }

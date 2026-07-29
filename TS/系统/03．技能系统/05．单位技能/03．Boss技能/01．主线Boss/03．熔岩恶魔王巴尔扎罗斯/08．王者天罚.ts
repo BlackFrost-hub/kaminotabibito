@@ -46,6 +46,7 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -134,7 +135,7 @@ function 触发天罚波次(this: void, context: 巴尔扎罗斯运行时上下�
     const unit = candidates[i];
     if (!单位有效(unit) || 单位到点距离平方(unit, 波次.X, 波次.Y) > radius2) continue;
     if (unit === boss) {
-      治疗单位(boss, boss, GetUnitState(boss, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.王者天罚.命中自身治疗最大生命比例);
+      治疗单位(boss, boss, GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.王者天罚.命中自身治疗最大生命比例);
     } else if (是护卫(context, unit)) {
       施加单体攻击力提高Buff(boss, unit, {
         持续时间: 巴尔扎罗斯技能数值配置.王者天罚.护卫命中增攻持续秒,

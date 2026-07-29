@@ -16,6 +16,8 @@ local _____5904_7406_6280_80FD_63A8_8FDB_4E3B_7EBF_5267_60C5 = ____07_FF0E_5267_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_0["添加单位暂停"]
@@ -226,7 +228,7 @@ local function _____547D_4E2D_6700_7EC8_4F24_5BB3_4E8B_4EF6_914D_7F6E(_____914D_
         return false
     end
     local currentLife = GetUnitState(target, UNIT_STATE_LIFE)
-    local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     if not (currentLife > 0) or not (maxLife > 0) then
         return false
     end
@@ -237,7 +239,7 @@ local function _____6267_884C_6280_80FD_63A8_8FDB_5267_60C5(_____914D_7F6E, cast
     _____5904_7406_6280_80FD_63A8_8FDB_4E3B_7EBF_5267_60C5({["片段ID"] = _____914D_7F6E["剧情片段ID"], ["触发配置名"] = _____914D_7F6E["配置名"], ["触发单位"] = castingUnit})
 end
 local function _____6267_884C_6700_7EC8_4F24_5BB3_63A8_8FDB_5267_60C5(_____914D_7F6E, target, attacker)
-    local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     YDWESetEventDamage(0)
     _____5199_5165_5267_60C5_8FDB_5EA6(_____914D_7F6E["目标剧情进度"])
     SetUnitState(target, UNIT_STATE_LIFE, maxLife * _____914D_7F6E["保底生命比例"])

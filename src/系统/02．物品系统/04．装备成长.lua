@@ -106,6 +106,8 @@ end
 -- 效果类型：Nstat / N%stat / Nexp / Nlevel / (level*N)stat / (level*N)exp
 -- 规则详见 `.cursor/rules/gameplay/equipment/heal-hot-format.md`
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetItemTypeId = jass.GetItemTypeId
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -319,25 +321,25 @@ local function getPctStatValue(unit, key)
         return jass.GetHeroAgi(unit, true)
     end
     if key == "hp" then
-        return jass.GetUnitState(
+        return GetUnitStateJapi(
             unit,
             jass.ConvertUnitState(1)
         )
     end
     if key == "mp" then
-        return jass.GetUnitState(
+        return GetUnitStateJapi(
             unit,
             jass.ConvertUnitState(3)
         )
     end
     if key == "dmg" then
-        return jass.GetUnitState(
+        return GetUnitStateJapi(
             unit,
             jass.ConvertUnitState(21)
         )
     end
     if key == "armor" then
-        return jass.GetUnitState(
+        return GetUnitStateJapi(
             unit,
             jass.ConvertUnitState(32)
         )

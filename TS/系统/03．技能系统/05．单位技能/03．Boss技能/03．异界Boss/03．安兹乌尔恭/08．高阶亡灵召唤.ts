@@ -32,6 +32,7 @@ const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用�
 
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -116,7 +117,7 @@ function 创建高阶亡灵(this: void, context: 安兹运行时上下文, x: nu
     X: x,
     Y: y,
     朝向: GetUnitFacing(boss),
-    生命值: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg.高阶亡灵召唤生命Boss最大生命比例,
+    生命值: GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg.高阶亡灵召唤生命Boss最大生命比例,
     生命值受小怪倍率: false,
     攻击力: 读取单位攻击力(boss) * cfg.高阶亡灵召唤攻击Boss攻击力比例,
     攻击间隔: cfg.高阶亡灵召唤攻击间隔,

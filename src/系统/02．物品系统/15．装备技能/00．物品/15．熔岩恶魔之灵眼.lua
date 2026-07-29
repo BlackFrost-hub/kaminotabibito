@@ -11,6 +11,8 @@ local _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E = ____00_FF0E_7269_54C1_
 local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
 local _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C = ____20_FF0E_7269_54C1_8F85_52A9["施加临时属性效果"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电")
 local _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535 = ____require_result_0["创建单位绑定闪电"]
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
@@ -42,7 +44,7 @@ ____exports["处理熔岩恶魔之灵眼使用"] = function(_____4E0A_4E0B_6587)
     _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535({["效果代码"] = _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["死亡之指闪电"], ["起点单位"] = _____65BD_6CD5_5355_4F4D, ["终点单位"] = _____76EE_6807_5355_4F4D, ["持续时间"] = _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["闪电持续时间"]})
     _____51CF_5C11_9B54_6CD5_503C(
         _____65BD_6CD5_5355_4F4D,
-        GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["魔法消耗比例"],
+        GetUnitStateJapi(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["魔法消耗比例"],
         true,
         false
     )
@@ -57,7 +59,7 @@ ____exports["处理熔岩恶魔之灵眼使用"] = function(_____4E0A_4E0B_6587)
     _____9020_6210_88C5_5907_4F24_5BB3(
         _____65BD_6CD5_5355_4F4D,
         _____76EE_6807_5355_4F4D,
-        GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["伤害魔法系数"],
+        GetUnitStateJapi(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____7194_5CA9_6076_9B54_4E4B_7075_773C_914D_7F6E["伤害魔法系数"],
         DAMAGE_TYPE_SHADOW_STRIKE,
         true,
         nil,

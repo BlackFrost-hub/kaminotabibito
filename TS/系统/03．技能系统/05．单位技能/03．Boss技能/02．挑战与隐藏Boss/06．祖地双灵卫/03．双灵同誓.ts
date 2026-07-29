@@ -18,6 +18,8 @@ const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff
   移除单位指定Buff: (this: void, unit: any, buffId: string) => boolean;
 };
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -34,7 +36,7 @@ let 正在结算同誓分担 = false;
 
 function 生命比例(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
   return maxLife > 0 ? GetUnitState(unit, UNIT_STATE_LIFE) / maxLife : 0;
 }
 

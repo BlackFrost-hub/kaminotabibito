@@ -1,12 +1,12 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BBE_7F6E_751F_547D_767E_5206_6BD4, _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4, _____82F1_96C4_8131_6218_5B8C_6210, ____Boss_8131_6218_5B8C_6210, jass, g, GetPlayersAll, QuestMessageBJ, getRegisteredPlayerHero, _____8131_6218_79FB_901F_6280_80FDID
+local _____8BBE_7F6E_751F_547D_767E_5206_6BD4, _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4, _____82F1_96C4_8131_6218_5B8C_6210, ____Boss_8131_6218_5B8C_6210, jass, GetUnitStateJapi, g, GetPlayersAll, QuestMessageBJ, getRegisteredPlayerHero, _____8131_6218_79FB_901F_6280_80FDID
 function _____8BBE_7F6E_751F_547D_767E_5206_6BD4(unit, pct)
-    local maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE)
     jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife * (pct > 0 and pct or 0) * 0.01)
 end
 function _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4(unit, pct)
-    local maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA)
     jass.SetUnitState(unit, jass.UNIT_STATE_MANA, maxMana * (pct > 0 and pct or 0) * 0.01)
 end
 function _____82F1_96C4_8131_6218_5B8C_6210(_____73A9_5BB6_7F16_53F7)
@@ -48,6 +48,8 @@ function ____Boss_8131_6218_5B8C_6210()
     )
 end
 jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.07．杂项")
 GetPlayersAll = ____require_result_0.GetPlayersAll
@@ -137,7 +139,7 @@ local function _____68C0_67E5_79FB_9664_8131_6218Buff(unit, damage)
     if not _____62E5_6709Buff(unit, _____8131_6218BuffID) then
         return
     end
-    local _____6700_5927_751F_547D = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+    local _____6700_5927_751F_547D = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE)
     local _____9608_503C = _____6700_5927_751F_547D * _____8131_6218_4F24_5BB3_9608_503C_6BD4_4F8B
     if damage >= _____9608_503C then
         jass.UnitRemoveAbility(unit, _____8131_6218_79FB_901F_6280_80FDID)

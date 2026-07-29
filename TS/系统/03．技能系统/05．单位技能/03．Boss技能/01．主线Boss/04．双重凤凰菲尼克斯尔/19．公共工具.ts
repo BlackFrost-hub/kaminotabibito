@@ -11,6 +11,7 @@ import { 单位是否在扇形区域 } from '../../../../00．技能模板+函�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
@@ -128,7 +129,7 @@ export function 取单位Y(this: void, unit: any): number {
 }
 
 export function 取最大生命(this: void, unit: any): number {
-  return GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
 }
 
 export function 取当前生命(this: void, unit: any): number {

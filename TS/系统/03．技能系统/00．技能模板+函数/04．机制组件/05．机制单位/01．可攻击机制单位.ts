@@ -41,8 +41,8 @@ export interface 可攻击机制单位参数 {
 export interface 可攻击机制单位实例 {
   readonly 单位: any;
   readonly ID: number;
-  是否存活(this: void): boolean;
-  销毁(this: void): void;
+  是否存活(): boolean;
+  销毁(): void;
 }
 
 const 机制单位表: Record<number, 可攻击机制单位实现 | undefined> = {};

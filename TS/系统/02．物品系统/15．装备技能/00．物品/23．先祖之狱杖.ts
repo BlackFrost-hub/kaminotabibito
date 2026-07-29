@@ -5,6 +5,8 @@ import { 主动物品调试日志 } from "../../../03．技能系统/00．技能
 import { 造成装备伤害 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/10．装备战斗执行";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
@@ -31,7 +33,7 @@ function 是否为先祖之狱杖(this: void, 物品: any): boolean {
 }
 
 function 执行先祖延迟伤害(this: void, 施法单位: any, 目标单位: any): void {
-  造成装备伤害(施法单位, 目标单位, GetUnitState(目标单位, UNIT_STATE_MAX_LIFE) * 先祖之狱杖配置.伤害生命比例, DAMAGE_TYPE_SHADOW_STRIKE, true, undefined, { 伤害形态: "单体" });
+  造成装备伤害(施法单位, 目标单位, GetUnitStateJapi(目标单位, UNIT_STATE_MAX_LIFE) * 先祖之狱杖配置.伤害生命比例, DAMAGE_TYPE_SHADOW_STRIKE, true, undefined, { 伤害形态: "单体" });
 }
 
 function 启动先祖延迟伤害(this: void, 施法单位: any, 目标单位: any): void {

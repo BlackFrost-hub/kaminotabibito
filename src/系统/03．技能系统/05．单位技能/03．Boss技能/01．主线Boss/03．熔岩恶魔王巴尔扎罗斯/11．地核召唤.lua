@@ -31,6 +31,7 @@ local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用�
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -126,7 +127,7 @@ local function _____521B_5EFA_5730_6838_5355_4F4D(context, x, y)
         return
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["地核召唤"]
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     local state = {context = context, coreUnit = nil, tickId = 0, stopped = false}
     local core = _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
         ["清理"] = context["清理"],

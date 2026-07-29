@@ -10,6 +10,7 @@ local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02�
 local _____6C6D_51A5_8840_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["汭冥血杖配置"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
 local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_0["获取坐标范围敌人"]
 local _____5355_4F4D_662F_5426_6709_6548_4E14_654C_5BF9 = ____require_result_0["单位是否有效且敌对"]
@@ -78,9 +79,9 @@ ____exports["执行汭冥血杖献祭"] = function(_____4E0A_4E0B_6587, _____662
     if not _____76EE_6807_53EF_732E_796D(_____76EE_6807_5355_4F4D, _____7B49_7EA7_4E0A_9650) then
         return
     end
-    local _____76EE_6807_6700_5927_751F_547D = GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_MAX_LIFE)
+    local _____76EE_6807_6700_5927_751F_547D = GetUnitStateJapi(_____76EE_6807_5355_4F4D, UNIT_STATE_MAX_LIFE)
     local _____751F_547D_6062_590D_503C = _____76EE_6807_6700_5927_751F_547D * (_____662F_5426_5F3A_5316 and _____6C6D_51A5_8840_6756_914D_7F6E["强化生命恢复比例"] or _____6C6D_51A5_8840_6756_914D_7F6E["普通生命恢复比例"])
-    local _____9B54_6CD5_6062_590D_503C = _____662F_5426_5F3A_5316 and GetUnitState(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____6C6D_51A5_8840_6756_914D_7F6E["强化魔法恢复比例"] or 0
+    local _____9B54_6CD5_6062_590D_503C = _____662F_5426_5F3A_5316 and GetUnitStateJapi(_____65BD_6CD5_5355_4F4D, UNIT_STATE_MAX_MANA) * _____6C6D_51A5_8840_6756_914D_7F6E["强化魔法恢复比例"] or 0
     local _____76EE_6807X = GetUnitX(_____76EE_6807_5355_4F4D)
     local _____76EE_6807Y = GetUnitY(_____76EE_6807_5355_4F4D)
     local _____7279_6548 = createUnitEffect(

@@ -22,6 +22,7 @@ local ____require_result_4 = require("系统.09．表现系统.06．广播提示
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -77,7 +78,7 @@ ____exports["启动雅儿贝德生命锚点封锁"] = function(context, targets,
     local blockTarget = target
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local byAlbedo = GetUnitState(albedo, UNIT_STATE_LIFE) * cfg["守护者模式"]["生命锚点封锁当前生命比例"]
-    local byBoss = GetUnitState(context["安兹单位"], UNIT_STATE_MAX_LIFE) * cfg["守护者模式"]["生命锚点封锁安兹最大生命上限比例"]
+    local byBoss = GetUnitStateJapi(context["安兹单位"], UNIT_STATE_MAX_LIFE) * cfg["守护者模式"]["生命锚点封锁安兹最大生命上限比例"]
     local shieldValue = byAlbedo < byBoss and byAlbedo or byBoss
     if not (shieldValue > 0) then
         return nil

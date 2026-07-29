@@ -21,6 +21,8 @@ const { addDelayedCallback } = require('系统.00．核心系统.05．中心计�
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -39,7 +41,7 @@ function 启动黑翼拘束核心(this: void, context: 安兹运行时上下文,
   if (state == null || !单位有效(albedo) || !单位有效(target) || context.挑战已结束) return;
   const cfg = 安兹乌尔恭数值与表现配置;
   const maxByAlbedo = GetUnitState(albedo, UNIT_STATE_LIFE) * cfg.守护者模式.黑翼拘束生命比例;
-  const maxByBoss = GetUnitState(context.安兹单位, UNIT_STATE_MAX_LIFE) * cfg.守护者模式.黑翼拘束安兹最大生命上限比例;
+  const maxByBoss = GetUnitStateJapi(context.安兹单位, UNIT_STATE_MAX_LIFE) * cfg.守护者模式.黑翼拘束安兹最大生命上限比例;
   const coreLife = maxByAlbedo < maxByBoss ? maxByAlbedo : maxByBoss;
   const wing = AddSpecialEffectTarget(cfg.表现资源.雅儿贝德黑翼拘束特效路径, target, 'origin');
   let paused = false;

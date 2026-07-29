@@ -11,6 +11,8 @@ const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技�
   造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -90,7 +92,7 @@ function 掉落触手残片给击杀者(this: void, context: 卡瑟拉运行时�
   if (GetRandomReal(0, 1) > cfg.触手残片掉落概率) return;
   const next = 增加玩家触手残片(context, killer, 1);
   if (next > 卡瑟拉数值与表现配置.触手残片.大于数量时恢复已损生命) {
-    const maxLife = GetUnitState(killer, UNIT_STATE_MAX_LIFE);
+    const maxLife = GetUnitStateJapi(killer, UNIT_STATE_MAX_LIFE);
     const life = GetUnitState(killer, UNIT_STATE_LIFE);
     const heal = (maxLife - life) * 卡瑟拉数值与表现配置.触手残片.已损生命恢复比例;
     if (heal > 0) doHeal({ HealSource: killer, HealTarget: killer, HealAmount: heal, ItemHeal: false, HealEffect: false });

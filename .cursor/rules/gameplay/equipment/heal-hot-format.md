@@ -69,8 +69,8 @@ abilList: "ID1,ID2,..."
 
 ## 注意事项
 
-- `jass.GetUnitState(unit, UNIT_STATE_MAX_LIFE)` 取最大生命值
+- `japi.GetUnitState(unit, UNIT_STATE_MAX_LIFE)` 取动态最大生命值
 - `jass.GetUnitState(unit, UNIT_STATE_LIFE)` 取当前生命值
-- `jass.GetUnitState(unit, UNIT_STATE_MAX_MANA)` 取最大魔法值
+- `japi.GetUnitState(unit, UNIT_STATE_MAX_MANA)` 取动态最大魔法值
 - `已损失 HP = maxHP - currentHP`
 - 防重 key 仍使用 `globalThis`，见同目录 `物品系统与装备技能规则.md`

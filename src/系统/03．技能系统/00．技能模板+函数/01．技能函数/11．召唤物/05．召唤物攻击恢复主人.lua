@@ -17,6 +17,8 @@ end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -72,12 +74,12 @@ local function ____on_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA(target, _atta
     local lifeAmount = lifeEnabled and _____8BA1_7B97_6062_590D_503C(
         _____53C2_6570["固定生命恢复"],
         _____53C2_6570["主人最大生命恢复比例"],
-        GetUnitState(owner, UNIT_STATE_MAX_LIFE)
+        GetUnitStateJapi(owner, UNIT_STATE_MAX_LIFE)
     ) or 0
     local manaAmount = manaEnabled and _____8BA1_7B97_6062_590D_503C(
         _____53C2_6570["固定魔法恢复"],
         _____53C2_6570["主人最大魔法恢复比例"],
-        GetUnitState(owner, UNIT_STATE_MAX_MANA)
+        GetUnitStateJapi(owner, UNIT_STATE_MAX_MANA)
     ) or 0
     if not (lifeAmount > 0) and not (manaAmount > 0) then
         return

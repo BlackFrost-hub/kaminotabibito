@@ -42,6 +42,7 @@ local ____require_result_6 = require("系统.00．核心系统.05．中心计时
 local getServerTime = ____require_result_6.getServerTime
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -81,7 +82,8 @@ local function _____6E05_7406_751F_547D_951A_70B9(anchor)
     _____9500_6BC1_7279_6548(anchor["圣光特效"])
     anchor["地面特效"] = 0
     anchor["圣光特效"] = 0
-    anchor["单位实例"]["销毁"]()
+    local ____self_8 = anchor["单位实例"]
+    ____self_8["销毁"](____self_8)
 end
 local function _____6E05_7406_4E00_5207_751F_547D_7684_7EC8_70B9_5B9E_4F8B(instance)
     if instance["已清理"] then
@@ -91,9 +93,9 @@ local function _____6E05_7406_4E00_5207_751F_547D_7684_7EC8_70B9_5B9E_4F8B(insta
     _____5173_95ED_541F_5531_6761("大招")
     _____9500_6BC1_7279_6548(instance["倒计时特效"])
     instance["倒计时特效"] = 0
-    local ____opt_8 = instance["锚点封锁"]
-    if ____opt_8 ~= nil then
-        ____opt_8["结束"]("一切生命的终点清理")
+    local ____opt_9 = instance["锚点封锁"]
+    if ____opt_9 ~= nil then
+        ____opt_9["结束"]("一切生命的终点清理")
     end
     instance["锚点封锁"] = nil
     do
@@ -161,8 +163,8 @@ local function _____6FC0_6D3B_751F_547D_951A_70B9(instance, anchor)
     end
     anchor["已激活"] = true
     if anchor["停留控制器"] ~= nil then
-        local ____self_10 = anchor["停留控制器"]
-        ____self_10["停止"](____self_10)
+        local ____self_11 = anchor["停留控制器"]
+        ____self_11["停止"](____self_11)
         anchor["停留控制器"] = nil
     end
     local count = _____53D6_5DF2_6FC0_6D3B_951A_70B9_6570_91CF(instance)
@@ -212,8 +214,8 @@ local function _____521B_5EFA_751F_547D_951A_70B9(instance, x, y, index)
         ["已激活"] = false,
         ["已封锁"] = false
     }
-    local ____instance__951A_70B9_5217_8868_11 = instance["锚点列表"]
-    ____instance__951A_70B9_5217_8868_11[#____instance__951A_70B9_5217_8868_11 + 1] = anchor
+    local ____instance__951A_70B9_5217_8868_12 = instance["锚点列表"]
+    ____instance__951A_70B9_5217_8868_12[#____instance__951A_70B9_5217_8868_12 + 1] = anchor
     anchor["停留控制器"] = _____521B_5EFA_5355_4F4D_505C_7559_89E6_53D1_5668({
         ["名称"] = "安兹-生命锚点停留-" .. tostring(index + 1),
         ["中心单位"] = unitInstance["单位"],
@@ -326,7 +328,7 @@ local function _____7ED3_7B97_5973_5996_54ED_568E(instance)
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = hero,
-                    ["伤害"] = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["女妖哭嚎致命伤害最大生命比例"],
+                    ["伤害"] = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg["女妖哭嚎致命伤害最大生命比例"],
                     attack = false,
                     ranged = true,
                     attackType = ATTACK_TYPE_CHAOS,
@@ -370,9 +372,9 @@ ____exports["释放安兹一切生命的终点"] = function(context)
         GetUnitY(boss),
         _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
     )
-    local ____self_12 = context["清理"]
-    ____self_12["登记清理"](
-        ____self_12,
+    local ____self_13 = context["清理"]
+    ____self_13["登记清理"](
+        ____self_13,
         "安兹-一切生命的终点实例",
         function()
             _____6E05_7406_4E00_5207_751F_547D_7684_7EC8_70B9_5B9E_4F8B(instance)

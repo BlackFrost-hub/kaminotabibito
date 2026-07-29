@@ -33,6 +33,7 @@ local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统
 local doHeal = ____require_result_5.doHeal
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local PauseUnit = jass.PauseUnit
@@ -148,7 +149,7 @@ local function _____6062_590D_5D29_89E3_5B88_536B(context, name)
         ____temp_11 = context["赤誓灵卫单位"]
     end
     local source = ____temp_11
-    local targetLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["公共"]["同息回灌恢复比例"]
+    local targetLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["公共"]["同息回灌恢复比例"]
     local healAmount = targetLife - GetUnitState(unit, UNIT_STATE_LIFE)
     if healAmount > 0 then
         doHeal({

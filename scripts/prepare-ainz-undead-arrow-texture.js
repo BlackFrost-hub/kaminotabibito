@@ -7,13 +7,13 @@ const extensionRoot = path.join(
   'extensions',
   'syh1906.war3-texture-preview-1.2.4-win32-x64',
 );
-const { decodeTextureBuffer, encodeTextureBuffer } = require(
+const { decodeTextureBuffer } = require(
   path.join(extensionRoot, 'out', 'conversion', 'textureConvert.js'),
 );
+const { writeWarcraftCompatibleTransparentBlp } = require('./war3-transparent-blp');
 
 const projectRoot = path.resolve(__dirname, '..');
 const sourcePath = path.join(projectRoot, 'image_temp', 'AinzUndeadArrowTexture-alpha.png');
-const previewPath = path.join(projectRoot, 'image_temp', 'AinzUndeadArrowTexture-256.png');
 const textureDirectory = path.join(projectRoot, 'imports', 'Common', 'Effect', 'Form', 'RiseFall', 'Texture');
 const outputPath = path.join(textureDirectory, 'AinzUndeadArrowVolley.blp');
 const outputWidth = 256;
@@ -97,8 +97,7 @@ for (let y = 0; y < drawHeight; y += 1) {
 
 const image = { width: outputWidth, height: outputHeight, rgba };
 fs.mkdirSync(textureDirectory, { recursive: true });
-fs.writeFileSync(previewPath, encodeTextureBuffer(image, 'png'));
-fs.writeFileSync(outputPath, encodeTextureBuffer(image, 'blp'));
+const blpVerification = writeWarcraftCompatibleTransparentBlp(image, outputPath);
 
 const decoded = decodeTextureBuffer(fs.readFileSync(outputPath), 'blp');
 let transparentPixels = 0;
@@ -113,11 +112,13 @@ if (decoded.width !== outputWidth || decoded.height !== outputHeight || transpar
 
 process.stdout.write(JSON.stringify({
   sourcePath,
-  previewPath,
   outputPath,
   width: decoded.width,
   height: decoded.height,
   bytes: fs.statSync(outputPath).size,
   transparentPixels,
   visiblePixels,
+  blpCompression: blpVerification.compression,
+  blpAlphaBits: blpVerification.alphaBits,
+  blpPictureType: blpVerification.pictureType,
 }, null, 2));

@@ -2,7 +2,7 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
-| `Common\Effect\Form\Debuff\AinzHeartCountdown.mdx` | 中央为深红解剖心脏浅浮雕，外围十二枚红色倒计时刻度；整体像悬浮的死亡状态图标。 | YZ 竖直朝向；心脏独立收缩回弹，刻度逐秒熄灭；`Birth / Stand / Death`。 | 十二秒处决倒计时、心脏诅咒。 | 刻度承担读秒，不能被外圈同步心跳抖动；处决需另叠捏心模型。 | 22009 | `D012D5F60CB9927F` |
+| `Common\Effect\Form\Debuff\AinzHeartCountdown.mdx` | 中央为深红解剖心脏浅浮雕，外围十二枚红色倒计时刻度；整体像悬浮的死亡状态图标。 | YZ 竖直朝向；心脏独立收缩回弹，刻度逐秒熄灭；`Birth / Stand / Death`。 | 十二秒处决倒计时、心脏诅咒。 | 刻度承担读秒，不能被外圈同步心跳抖动；处决需另叠捏心模型；心脏贴图层必须保持 `Transparent`，贴图必须使用兼容 1.27 的 JPEG 8-bit Alpha BLP。 | 22009 | `F652E3B93B97E347` |
 | `Common\Effect\Form\Debuff\AinzHeartGrasp.mdx` | 一只苍白骨感手掌伸出并捏住红色心脏，主体清楚、动作直接。 | 一次性伸手、抓握和清理；`Birth / Stand / Death`。 | 心脏倒计时归零处决。 | 不承担十二秒倒计时；应与 `AinzHeartCountdown.mdx` 分层播放。 | 43822 | `61C734541C093323` |
 | `Common\Effect\Form\Debuff\AinzDeathClock.mdx` | 暗红死亡钟盘，单根指针，外围十二枚独立刻度；没有爱心或心脏图案。 | 竖直广告牌；每秒停驻后快速跳到下一刻度；`Birth / Stand / Death`。 | 十二秒死亡钟、逐秒滴答倒计时。 | 音效由技能逻辑逐秒播放；模型本身不嵌入十二个声音。 | 32546 | `F1DADF0C29068B4D` |
 | `Common\Effect\Form\Debuff\AlbedoWingBind.mdx` | 成对黑色羽翼与黑白翼光向中央合拢，形成包围目标的翼铠外壳。 | 向中心收拢后维持，再淡出；`Birth / Stand / Death`。 | 黑翼拘束、翼铠封锁。 | 外壳中央辨识度不足，必须叠加暗金核心。 | 83355 | `DA5671E1CD1CC527` |

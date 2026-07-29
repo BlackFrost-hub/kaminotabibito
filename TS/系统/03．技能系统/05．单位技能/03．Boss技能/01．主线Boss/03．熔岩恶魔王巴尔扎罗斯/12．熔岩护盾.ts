@@ -44,6 +44,8 @@ const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -93,7 +95,7 @@ function 创建熔岩护盾(this: void, context: 巴尔扎罗斯运行时上下�
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩护盾;
-  const shieldValue = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config.护盾Boss最大生命比例;
+  const shieldValue = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config.护盾Boss最大生命比例;
   const bossId = 取单位ID(boss);
 
   播放护盾短动作(boss);

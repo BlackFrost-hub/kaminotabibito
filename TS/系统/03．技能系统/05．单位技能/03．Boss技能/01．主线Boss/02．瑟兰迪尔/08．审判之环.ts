@@ -39,6 +39,7 @@ const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系�
 };
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -188,7 +189,7 @@ function 结算瑟兰迪尔审判之环象限(this: void, boss: any, color: numb
     } else if (color === 3) {
       播放点特效(config.绿特效, x, y, 1);
       const life = GetUnitState(target, UNIT_STATE_LIFE);
-      const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+      const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
       if (maxLife > 0 && life / maxLife > 0.75) {
         造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿高血伤害Boss攻击力比例, config.绿高血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING, 技能实例ID);
       } else {
@@ -197,8 +198,8 @@ function 结算瑟兰迪尔审判之环象限(this: void, boss: any, color: numb
     } else {
       播放点特效(config.金特效, x, y, 1);
       const mana = GetUnitState(target, UNIT_STATE_MANA);
-      const maxMana = GetUnitState(target, UNIT_STATE_MAX_MANA);
-      const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+      const maxMana = GetUnitStateJapi(target, UNIT_STATE_MAX_MANA);
+      const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
       const lostRatio = maxMana > 0 ? (maxMana - mana) / maxMana : 0;
       造成伤害(boss, target, maxLife * lostRatio, jass.DAMAGE_TYPE_MIND, 技能实例ID);
     }

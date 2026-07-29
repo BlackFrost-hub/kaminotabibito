@@ -9,6 +9,8 @@ local ____exports = {}
 -- value: 恢复效果配置
 ____exports.ITEM_REGEN_EFFECTS = {["熊王腰带|I0BR"] = {type = "life_percent", value = 0.12}}
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local UnitItemInSlot = jass.UnitItemInSlot
 local GetItemTypeId = jass.GetItemTypeId
 local GetUnitState = jass.GetUnitState
@@ -44,7 +46,7 @@ end
 -- @returns 生命恢复加成值
 function ____exports.calcItemLifeRegenBonus(unit)
     local totalBonus = 0
-    local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     local entries = __TS__ArraySort(
         __TS__ObjectEntries(____exports.ITEM_REGEN_EFFECTS),
         function(____, ____bindingPattern0, ____bindingPattern1)
@@ -78,7 +80,7 @@ end
 -- @returns 魔法恢复加成值
 function ____exports.calcItemManaRegenBonus(unit)
     local totalBonus = 0
-    local maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA)
     local entries = __TS__ArraySort(
         __TS__ObjectEntries(____exports.ITEM_REGEN_EFFECTS),
         function(____, ____bindingPattern0, ____bindingPattern1)

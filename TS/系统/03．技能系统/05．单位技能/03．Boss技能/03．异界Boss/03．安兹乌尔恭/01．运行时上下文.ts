@@ -11,6 +11,8 @@ import type { 伤害生命下限保护控制器 } from '../../../../00．技能�
 import { 播放安兹台词 } from './12．台词播放';
 
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
@@ -151,7 +153,7 @@ export function 绑定雅儿贝德到安兹上下文(this: void, boss: any, albe
 
 function 刷新安兹阶段(this: void, context: 安兹运行时上下文): void {
   if (context.挑战已结束 || context.阶段 === '挑战收束' || context.阶段 === '已结束') return;
-  const maxLife = GetUnitState(context.安兹单位, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(context.安兹单位, UNIT_STATE_MAX_LIFE);
   if (maxLife <= 0) return;
   const ratio = GetUnitState(context.安兹单位, UNIT_STATE_LIFE) / maxLife;
   if (!context.终阶段预告已播放 && ratio <= 安兹乌尔恭单位技能配置.阶段阈值.P3预告生命比例) {

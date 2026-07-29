@@ -5,6 +5,8 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -20,7 +22,7 @@ end
 local function _____8BA1_7B97_4E0A_9650(_____53C2_6570)
     local _____4E0A_9650 = _____53C2_6570["固定上限"] or 0
     if _____53C2_6570["最大生命比例"] ~= nil and _____53C2_6570["最大生命比例"] > 0 then
-        local _____6700_5927_751F_547D = GetUnitState(_____53C2_6570["单位"], UNIT_STATE_MAX_LIFE)
+        local _____6700_5927_751F_547D = GetUnitStateJapi(_____53C2_6570["单位"], UNIT_STATE_MAX_LIFE)
         local _____767E_5206_6BD4_4E0A_9650 = _____6700_5927_751F_547D * _____53C2_6570["最大生命比例"]
         if _____4E0A_9650 <= 0 or _____767E_5206_6BD4_4E0A_9650 < _____4E0A_9650 then
             _____4E0A_9650 = _____767E_5206_6BD4_4E0A_9650

@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
@@ -39,7 +41,7 @@ function 取单位ID(this: void, 单位: any): number {
 function 计算上限(this: void, 参数: 单次承伤上限参数): number {
   let 上限 = 参数.固定上限 ?? 0;
   if (参数.最大生命比例 != null && 参数.最大生命比例 > 0) {
-    const 最大生命 = GetUnitState(参数.单位, UNIT_STATE_MAX_LIFE);
+    const 最大生命 = GetUnitStateJapi(参数.单位, UNIT_STATE_MAX_LIFE);
     const 百分比上限 = 最大生命 * 参数.最大生命比例;
     if (上限 <= 0 || 百分比上限 < 上限) 上限 = 百分比上限;
   }

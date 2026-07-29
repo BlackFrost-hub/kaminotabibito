@@ -8,6 +8,8 @@ import { 英雄Boss战斗启动属性配置表 } from "../00．战斗启动属�
 import { 异界Boss战斗启动属性配置表 } from "../00．战斗启动属性/03．异界Boss战斗启动属性配置表";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const jglobals = require("jass.globals") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
@@ -146,7 +148,7 @@ function 创建TS启动属性弱点配置(this: void, bossUnit: any, 配置: 战
 
   const n = 当前N值();
   const shieldValue = (配置.护盾基础值 ?? 0) + (配置.护盾每层N增量 ?? 0) * n;
-  const maxLife = GetUnitState(bossUnit, UNIT_STATE_MAX_LIFE) || 0;
+  const maxLife = GetUnitStateJapi(bossUnit, UNIT_STATE_MAX_LIFE) || 0;
   const demand = (配置.器弱伤害需求生命百分比 ?? 0) * maxLife;
 
   return 填充默认反馈配置({

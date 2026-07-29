@@ -32,6 +32,7 @@ ____exports["取菲尼克斯尔技能强度倍率"] = function(source)
 end
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -112,7 +113,7 @@ ____exports["取单位Y"] = function(unit)
     return GetUnitY(unit)
 end
 ____exports["取最大生命"] = function(unit)
-    return GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+    return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
 end
 ____exports["取当前生命"] = function(unit)
     return GetUnitState(unit, UNIT_STATE_LIFE)

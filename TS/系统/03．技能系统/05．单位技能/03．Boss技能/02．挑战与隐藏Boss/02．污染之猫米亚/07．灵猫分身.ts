@@ -28,6 +28,8 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -68,7 +70,7 @@ function 安排分身到期结算(this: void, context: 米亚运行时上下文,
   addDelayedCallback(config.持续秒 * 1000, function 米亚灵猫分身到期结算(this: void): void {
     const boss = context.Boss单位;
     if (!单位有效(boss)) return;
-    const healPerSummon = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config.未击杀每只恢复生命比例;
+    const healPerSummon = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config.未击杀每只恢复生命比例;
     let aliveCount = 0;
     for (let i = 0; i < summons.length; i++) {
       const summon = summons[i];
@@ -98,7 +100,7 @@ export function 触发米亚灵猫分身(this: void, context: 米亚运行时上
   const bossX = GetUnitX(boss);
   const bossY = GetUnitY(boss);
   const facing = GetUnitFacing(boss);
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   const rawAttack = 读取单位攻击力(boss);
   const attack = rawAttack > 0 ? rawAttack : 米亚运行时配置.Boss攻击力兜底;
   const summons: any[] = [];

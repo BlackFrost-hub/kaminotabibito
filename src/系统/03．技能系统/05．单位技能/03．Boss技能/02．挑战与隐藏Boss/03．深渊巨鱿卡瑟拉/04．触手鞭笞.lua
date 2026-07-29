@@ -24,6 +24,8 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -100,7 +102,7 @@ local function _____6389_843D_89E6_624B_6B8B_7247_7ED9_51FB_6740_8005(context, k
     end
     local next = _____589E_52A0_73A9_5BB6_89E6_624B_6B8B_7247(context, killer, 1)
     if next > _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]["大于数量时恢复已损生命"] then
-        local maxLife = GetUnitState(killer, UNIT_STATE_MAX_LIFE)
+        local maxLife = GetUnitStateJapi(killer, UNIT_STATE_MAX_LIFE)
         local life = GetUnitState(killer, UNIT_STATE_LIFE)
         local heal = (maxLife - life) * _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]["已损生命恢复比例"]
         if heal > 0 then

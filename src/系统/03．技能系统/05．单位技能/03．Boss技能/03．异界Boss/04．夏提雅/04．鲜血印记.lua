@@ -55,7 +55,8 @@ ____exports["清理夏提雅鲜血印记"] = function(context, mark, purified)
             YDWETimerDestroyEffectSafe(1.2, effect)
         end
     end
-    mark["单位实例"]["销毁"]()
+    local ____self_4 = mark["单位实例"]
+    ____self_4["销毁"](____self_4)
     _____4ECE_5217_8868_79FB_9664(context, mark)
 end
 ____exports["创建夏提雅鲜血印记"] = function(context, x, y)
@@ -117,10 +118,10 @@ ____exports["创建夏提雅鲜血印记"] = function(context, x, y)
             ____exports["清理夏提雅鲜血印记"](context, mark, false)
         end
     )
-    local ____self_4 = context["清理"]
-    ____self_4["登记延迟回调"](____self_4, "夏提雅-鲜血印记到期", mark["到期ID"])
-    local ____context__8840_5370_53E5_67C4_5217_8868_5 = context["血印句柄列表"]
-    ____context__8840_5370_53E5_67C4_5217_8868_5[#____context__8840_5370_53E5_67C4_5217_8868_5 + 1] = mark
+    local ____self_5 = context["清理"]
+    ____self_5["登记延迟回调"](____self_5, "夏提雅-鲜血印记到期", mark["到期ID"])
+    local ____context__8840_5370_53E5_67C4_5217_8868_6 = context["血印句柄列表"]
+    ____context__8840_5370_53E5_67C4_5217_8868_6[#____context__8840_5370_53E5_67C4_5217_8868_6 + 1] = mark
     return mark
 end
 ____exports["净化落点内夏提雅鲜血印记"] = function(context, x, y, radius)

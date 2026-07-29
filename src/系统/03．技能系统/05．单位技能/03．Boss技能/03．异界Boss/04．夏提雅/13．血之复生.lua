@@ -40,6 +40,8 @@ local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSa
 local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_6.doHeal
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -160,7 +162,8 @@ local function _____7EDF_8BA1_5B58_6D3B_7ED3_6676(crystals)
     do
         local i = 0
         while i < #crystals do
-            if crystals[i + 1]["是否存活"]() then
+            local ____self_13 = crystals[i + 1]
+            if ____self_13["是否存活"](____self_13) then
                 count = count + 1
             end
             i = i + 1
@@ -172,7 +175,8 @@ local function _____6E05_7406_590D_751F_7ED3_6676(crystals)
     do
         local i = 0
         while i < #crystals do
-            crystals[i + 1]["销毁"]()
+            local ____self_14 = crystals[i + 1]
+            ____self_14["销毁"](____self_14)
             i = i + 1
         end
     end
@@ -180,7 +184,7 @@ end
 local function _____5B8C_6210_590D_751F_6210_529F(context, _____5269_4F59_7ED3_6676)
     local boss = context["Boss单位"]
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["血之复生"]
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     doHeal({
         HealSource = boss,
         HealTarget = boss,
@@ -212,8 +216,8 @@ local function _____5B8C_6210_590D_751F_6210_529F(context, _____5269_4F59_7ED3_6
             end
         end
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记延迟回调"](____self_13, "夏提雅-复生成功恢复行动", delayedId)
+    local ____self_15 = context["清理"]
+    ____self_15["登记延迟回调"](____self_15, "夏提雅-复生成功恢复行动", delayedId)
 end
 ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_5931_8D25)
     local boss = context["Boss单位"]

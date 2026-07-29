@@ -10,6 +10,8 @@ import { 创建单位运行时上下文工厂 } from '../../../../00．技能模
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
+import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 
 const { getServerTime, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
@@ -26,6 +28,8 @@ const { SGSS_SetState } = require('lib.扩展函数.Star扩展函数.00．SGSS')
 };
 
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -71,7 +75,7 @@ function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 亚
     阶段: 'P1守墓者苏醒',
     开战时间Ms: now,
     上次阶段变化Ms: now,
-    普通机制忙碌到Ms: now + 1800,
+    普通机制忙碌到Ms: now + 亚伦柯斯正式设计配置.阶段表现.开战苏醒硬直秒 * 1000,
     已安魂墓碑数量: 0,
     未安魂墓碑数量: 0,
     墓碑机制已启动: false,
@@ -86,6 +90,8 @@ function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 亚
   };
   const effect = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.开战苏醒特效路径, GetUnitX(boss), GetUnitY(boss));
   if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(2, effect);
+  开始硬直(boss, 亚伦柯斯正式设计配置.阶段表现.开战苏醒硬直秒);
+  播放限时单位动画({ 单位: boss, 动画编号: 亚伦柯斯正式设计配置.阶段表现.开战苏醒动画编号, 持续秒: 亚伦柯斯正式设计配置.阶段表现.开战苏醒硬直秒, 恢复动画编号: 1 });
   创建伤害生命下限保护({
     名称: '亚伦柯斯-P2墓碑锁血',
     单位: boss,
@@ -147,10 +153,12 @@ export function 进入亚伦柯斯P3(this: void, context: 亚伦柯斯运行时�
   if (context.战斗已结束 || context.阶段 !== 'P2旧誓回响' || context.未安魂墓碑数量 > 0) return;
   context.阶段 = 'P3最后的誓约';
   context.上次阶段变化Ms = getServerTime();
-  context.普通机制忙碌到Ms = context.上次阶段变化Ms + 1800;
+  context.普通机制忙碌到Ms = context.上次阶段变化Ms + 亚伦柯斯正式设计配置.阶段表现.P3转换硬直秒 * 1000;
   context.当前大型技能 = undefined;
+  开始硬直(context.Boss单位, 亚伦柯斯正式设计配置.阶段表现.P3转换硬直秒);
+  播放限时单位动画({ 单位: context.Boss单位, 动画编号: 亚伦柯斯正式设计配置.阶段表现.P3转换动画编号, 持续秒: 亚伦柯斯正式设计配置.阶段表现.P3转换硬直秒, 恢复动画编号: 1 });
   播放亚伦柯斯台词(context.Boss单位, '记忆恢复');
-  const delayedId = addDelayedCallback(1800, function 亚伦柯斯P3宣言(this: void): void {
+  const delayedId = addDelayedCallback(亚伦柯斯正式设计配置.阶段表现.P3转换硬直秒 * 1000, function 亚伦柯斯P3宣言(this: void): void {
     if (!context.战斗已结束 && context.阶段 === 'P3最后的誓约') 播放亚伦柯斯台词(context.Boss单位, '转阶段3最后誓约');
   });
   context.清理.登记延迟回调('亚伦柯斯-P3宣言', delayedId);
@@ -158,17 +166,19 @@ export function 进入亚伦柯斯P3(this: void, context: 亚伦柯斯运行时�
 
 function 推进亚伦柯斯运行时(this: void, context: 亚伦柯斯运行时上下文, now: number): void {
   if (!单位有效(context.Boss单位) || context.战斗已结束) return;
-  const maxLife = GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return;
   const ratio = GetUnitState(context.Boss单位, UNIT_STATE_LIFE) / maxLife;
   if (context.阶段 === 'P1守墓者苏醒' && ratio <= 亚伦柯斯正式设计配置.阶段阈值.P2生命比例) {
     context.阶段 = 'P2旧誓回响';
     context.上次阶段变化Ms = now;
-    context.普通机制忙碌到Ms = now + 1500;
+    context.普通机制忙碌到Ms = now + 亚伦柯斯正式设计配置.阶段表现.P2转换硬直秒 * 1000;
     context.当前大型技能 = '旧誓回响转阶段';
     context.未安魂墓碑数量 = 亚伦柯斯正式设计配置.旧誓墓碑.数量;
+    开始硬直(context.Boss单位, 亚伦柯斯正式设计配置.阶段表现.P2转换硬直秒);
+    播放限时单位动画({ 单位: context.Boss单位, 动画编号: 亚伦柯斯正式设计配置.阶段表现.P2转换动画编号, 持续秒: 亚伦柯斯正式设计配置.阶段表现.P2转换硬直秒, 恢复动画编号: 1 });
     播放亚伦柯斯台词(context.Boss单位, '转阶段2旧誓回响');
-    const delayedId = addDelayedCallback(1500, function 亚伦柯斯P2转阶段结束(this: void): void {
+    const delayedId = addDelayedCallback(亚伦柯斯正式设计配置.阶段表现.P2转换硬直秒 * 1000, function 亚伦柯斯P2转阶段结束(this: void): void {
       if (context.当前大型技能 === '旧誓回响转阶段') context.当前大型技能 = undefined;
     });
     context.清理.登记延迟回调('亚伦柯斯-P2转阶段结束', delayedId);

@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -159,7 +161,7 @@ export function 执行闪避判定(this: void, context: 闪避判定上下文): 
     return { 结束链路: false, 伤害: currentDamage, 闪避概率: 0 };
   }
 
-  const 最大生命 = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+  const 最大生命 = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   if (最大生命 > 0 && currentDamage >= 最大生命 * 闪避系统配置.最大生命伤害比例门槛) {
     return { 结束链路: false, 伤害: currentDamage, 闪避概率: 0 };
   }

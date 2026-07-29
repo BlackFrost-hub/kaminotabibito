@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__NumberToFixed = ____lualib.__TS__NumberToFixed
 local ____exports = {}
-local multiboardSetItemValue, getPlayerAttr, getPlayerHero, formatPercent, formatNumber, formatReal, updateMultiboard, updatePlayerSpeed, onRefreshTick, onRefresh, registerToCenterTimer, jass, getGameTimeFormatted, getGameDifficulty, onTick10ms, YDUserDataGet, YDUserDataSet, forEachUnitInGroup, multiboards, _registered, _refreshCounter
+local multiboardSetItemValue, getPlayerAttr, getPlayerHero, formatPercent, formatNumber, formatReal, updateMultiboard, updatePlayerSpeed, onRefreshTick, onRefresh, registerToCenterTimer, jass, GetUnitStateJapi, getGameTimeFormatted, getGameDifficulty, onTick10ms, YDUserDataGet, YDUserDataSet, forEachUnitInGroup, multiboards, _registered, _refreshCounter
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.01．单位系统.01．多面板属性.00．常量定义")
 local MULTIBOARD_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTIBOARD_SYSTEM_ENABLED
 local MULTIBOARD_ROWS = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTIBOARD_ROWS
@@ -408,7 +408,7 @@ function updatePlayerSpeed(self, playerId)
     if foundUnit == nil then
         return
     end
-    local attackInterval = jass.GetUnitState(
+    local attackInterval = GetUnitStateJapi(
         foundUnit,
         jass.ConvertUnitState(37)
     )
@@ -466,6 +466,8 @@ function registerToCenterTimer(self)
     onTick10ms(onRefreshTick)
 end
 jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local createDelayedCall = ____require_result_0.createDelayedCall
 local ____G_1 = _G

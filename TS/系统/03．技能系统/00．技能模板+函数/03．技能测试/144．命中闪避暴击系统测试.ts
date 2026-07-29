@@ -7,6 +7,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const globals = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
 
 const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
@@ -115,7 +117,7 @@ function 创建敌人(this: void, target: any): any {
 }
 
 function 设置目标满血(this: void, target: any): void {
-  const 最大生命 = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+  const 最大生命 = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   SetUnitState(target, UNIT_STATE_LIFE, 最大生命);
   debugLogForce(模块名, "已设置满血", "life=", 最大生命);
 }

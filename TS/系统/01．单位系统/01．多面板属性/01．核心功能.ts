@@ -6,6 +6,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   createDelayedCall: (this: void, delaySec: number, callback: () => void) => { id: number };
 };
@@ -293,7 +295,7 @@ function updatePlayerSpeed(playerId: number): void {
   if (foundUnit == null) return;
 
   // 计算攻速
-  const attackInterval = jass.GetUnitState(foundUnit, jass.ConvertUnitState(0x25));
+  const attackInterval = GetUnitStateJapi(foundUnit, jass.ConvertUnitState(0x25));
   const attacksPerSec = attackInterval > 0 ? 1 / attackInterval : 0;
 
   // 获取移速

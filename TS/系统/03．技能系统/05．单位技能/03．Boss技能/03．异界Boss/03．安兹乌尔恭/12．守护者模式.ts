@@ -34,6 +34,8 @@ const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核�
 };
 
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
@@ -66,7 +68,7 @@ function 雅儿贝德联合伤害修正(this: void, damage: any): number {
   if (!单位有效(albedo)) return damage.currentDamage;
   const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
   if (damage.target === albedo) {
-    const maxLife = GetUnitState(albedo, UNIT_STATE_MAX_LIFE);
+    const maxLife = GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE);
     const minimumLife = maxLife * cfg.雅儿贝德锁血比例;
     const currentLife = GetUnitState(albedo, UNIT_STATE_LIFE);
     const allowed = currentLife - minimumLife;
@@ -121,7 +123,7 @@ function 创建雅儿贝德单位(this: void, context: 安兹运行时上下文)
       X: GetUnitX(boss) + Cos(angle) * cfg.雅儿贝德出生距离,
       Y: GetUnitY(boss) + Sin(angle) * cfg.雅儿贝德出生距离,
       朝向: facing,
-      生命值: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg.雅儿贝德生命比例,
+      生命值: GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg.雅儿贝德生命比例,
       生命值受小怪倍率: false,
       攻击力: 读取单位攻击力(boss) * cfg.雅儿贝德攻击比例,
       攻击间隔: cfg.雅儿贝德攻击间隔,
@@ -179,7 +181,7 @@ export function 推进安兹守护者模式(this: void, context: 安兹运行时
   const albedo = state?.单位;
   if (state == null || !单位有效(albedo) || context.挑战已结束) return;
   const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
-  const maxLife = GetUnitState(albedo, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE);
   if (maxLife <= 0) return;
   const minimumLife = maxLife * cfg.雅儿贝德锁血比例;
   let life = GetUnitState(albedo, UNIT_STATE_LIFE);

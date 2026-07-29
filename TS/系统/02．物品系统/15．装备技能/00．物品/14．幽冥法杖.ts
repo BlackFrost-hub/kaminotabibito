@@ -5,6 +5,7 @@ import { 主动物品调试日志 } from "../../../03．技能系统/00．技能
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
@@ -40,7 +41,7 @@ export function 处理幽冥法杖使用(this: void, 上下文: 物品技能事�
   const 目标单位 = 上下文.目标单位;
   if (目标单位 == null || 目标单位 === 0) return;
 
-  if (GetUnitState(目标单位, UNIT_STATE_MAX_LIFE) * 幽冥法杖配置.斩杀生命比例 < GetUnitState(目标单位, UNIT_STATE_LIFE)) return;
+  if (GetUnitStateJapi(目标单位, UNIT_STATE_MAX_LIFE) * 幽冥法杖配置.斩杀生命比例 < GetUnitState(目标单位, UNIT_STATE_LIFE)) return;
   const 特效 = createTimedEffect(幽冥法杖配置.特效路径, GetUnitX(目标单位), GetUnitY(目标单位), 0, 幽冥法杖配置.特效持续时间);
   if (特效 != null && 特效 !== 0) {
     EXSetEffectSize(特效, getObjectPropertyRealSafe(ObjectType.UNIT, GetUnitTypeId(目标单位), "modelScale"));

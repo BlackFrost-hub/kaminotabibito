@@ -10,6 +10,8 @@ import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放'
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 单位是否在胶囊区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/胶囊区域';
 import { 亚伦柯斯BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/07．亚伦柯斯';
+import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -168,6 +170,9 @@ export function 启动亚伦柯斯旧誓墓碑(this: void, context: 亚伦柯斯
   const facings = [90, 210, 330];
   const now = getServerTime();
   context.墓碑机制已启动 = true;
+  context.普通机制忙碌到Ms = now + cfg.启动硬直秒 * 1000;
+  开始硬直(boss, cfg.启动硬直秒);
+  播放限时单位动画({ 单位: boss, 动画编号: cfg.启动动画编号, 持续秒: cfg.启动硬直秒, 恢复动画编号: 1 });
   context.已安魂墓碑数量 = 0;
   context.未安魂墓碑数量 = cfg.数量;
   context.墓碑状态列表 = [];

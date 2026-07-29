@@ -13,6 +13,8 @@ function ____on_8840_91CF_8282_70B9_89E6_53D1_5668Tick()
     end
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -25,7 +27,7 @@ _____8840_91CF_8282_70B9_89E6_53D1_5668_8868 = {}
 local _____8840_91CF_8282_70B9_89E6_53D1_5668_9A71_52A8ID = 0
 local _____4E0B_4E00_4E2A_8840_91CF_8282_70B9_89E6_53D1_5668ID = 0
 local function _____53D6_751F_547D_767E_5206_6BD4(_____5355_4F4D)
-    local max = GetUnitState(_____5355_4F4D, UNIT_STATE_MAX_LIFE)
+    local max = GetUnitStateJapi(_____5355_4F4D, UNIT_STATE_MAX_LIFE)
     if not (max > 0) then
         return 0
     end

@@ -14,7 +14,7 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 export function 单位存活(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true && GetUnitState(unit, UNIT_STATE_LIFE) > 0.405;
@@ -61,7 +61,7 @@ export function 取当前生命(this: void, unit: any): number {
 }
 
 export function 取最大生命(this: void, unit: any): number {
-  return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || GetUnitState(unit, UNIT_STATE_MAX_LIFE) || 0;
+  return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || 0;
 }
 
 /** 最终伤害监听发生在实际扣血前，因此统一用“当前生命 - 本次最终伤害”预判。 */

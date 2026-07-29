@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____9009_62E9_706B_7130_9501_94FE_76EE_6807, _____8BA1_7B97_8D85_8DDD_4F24_5BB3, _____66F4_65B0_9501_94FE_5355_4F4D_4F4D_7F6E, _____505C_6B62_706B_7130_9501_94FE, ____on_706B_7130_9501_94FEBuff_79FB_9664, ____on_706B_7130_9501_94FETick, _____521B_5EFA_706B_7130_9501_94FE, ____on_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, SetUnitX, SetUnitY, Player, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, PLAYER_NEUTRAL_AGGRESSIVE, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____706B_7130_9501_94FE_6280_80FDID
+local _____9009_62E9_706B_7130_9501_94FE_76EE_6807, _____8BA1_7B97_8D85_8DDD_4F24_5BB3, _____66F4_65B0_9501_94FE_5355_4F4D_4F4D_7F6E, _____505C_6B62_706B_7130_9501_94FE, ____on_706B_7130_9501_94FEBuff_79FB_9664, ____on_706B_7130_9501_94FETick, _____521B_5EFA_706B_7130_9501_94FE, ____on_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, SetUnitX, SetUnitY, Player, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, PLAYER_NEUTRAL_AGGRESSIVE, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____706B_7130_9501_94FE_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -137,7 +137,7 @@ function _____521B_5EFA_706B_7130_9501_94FE(context, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["火焰锁链"]
     local centerX = (GetUnitX(boss) + GetUnitX(target)) * 0.5
     local centerY = (GetUnitY(boss) + GetUnitY(target)) * 0.5
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     local state = {
         context = context,
         target = target,
@@ -273,10 +273,12 @@ _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_7["移除单位指�
 local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_8["造成单体技能伤害"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-GetUnitState = jass.GetUnitState
+local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 SetUnitX = jass.SetUnitX
 SetUnitY = jass.SetUnitY

@@ -18,6 +18,8 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
   getServerTime: (this: void) => number;
 };
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
@@ -183,7 +185,7 @@ export function 重置夏提雅猎血连击(this: void, context: 夏提雅运行
 
 function 刷新阶段(this: void, context: 夏提雅运行时上下文): void {
   if (context.挑战已结束 || context.阶段 === '复生仪式' || context.阶段 === '挑战收束' || context.阶段 === '已结束') return;
-  const maxLife = GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return;
   const ratio = GetUnitState(context.Boss单位, UNIT_STATE_LIFE) / maxLife;
   let next = context.阶段;

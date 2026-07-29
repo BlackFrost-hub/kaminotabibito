@@ -36,6 +36,7 @@ local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_4["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local AddSpecialEffect = jass.AddSpecialEffect
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
@@ -201,7 +202,7 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
                 ) > radius2 then
                     goto __continue21
                 end
-                local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+                local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = target,

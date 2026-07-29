@@ -7,6 +7,8 @@ import {
 } from "./01．可攻击机制单位";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -33,8 +35,8 @@ export interface 固定受击次数机制单位参数 extends 可攻击机制单
 }
 
 export interface 固定受击次数机制单位实例 extends 可攻击机制单位实例 {
-  读取剩余次数(this: void): number;
-  设置剩余次数(this: void, 次数: number): void;
+  读取剩余次数(): number;
+  设置剩余次数(次数: number): void;
 }
 
 interface 固定受击次数记录 {
@@ -89,7 +91,7 @@ function 固定受击次数伤害修正(this: void, context: any): number {
   if (记录.参数.同步生命条 === true && 剩余次数 > 0) {
     const 总次数 = 规整次数(记录.参数.受击次数);
     if (总次数 > 0) {
-      SetUnitState(记录.实例.单位, UNIT_STATE_LIFE, GetUnitState(记录.实例.单位, UNIT_STATE_MAX_LIFE) * 剩余次数 / 总次数);
+      SetUnitState(记录.实例.单位, UNIT_STATE_LIFE, GetUnitStateJapi(记录.实例.单位, UNIT_STATE_MAX_LIFE) * 剩余次数 / 总次数);
     }
   }
   if (记录.参数.on受击 != null) 记录.参数.on受击(记录.实例.单位, 剩余次数, context);

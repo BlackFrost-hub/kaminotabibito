@@ -16,6 +16,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 const { onItemUse } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemUse: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
@@ -108,13 +110,13 @@ function applyHpMpToUnit(this: void, unit: any, hp: number, mp: number): void {
 
   if (hp > 0 && jass.UNIT_STATE_LIFE != null && jass.UNIT_STATE_MAX_LIFE != null) {
     const cur = jass.GetUnitState(unit, jass.UNIT_STATE_LIFE) as number;
-    const maxL = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE) as number;
+    const maxL = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE) as number;
     const nextLife = cur + hp;
     jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, nextLife < maxL ? nextLife : maxL);
   }
   if (mp > 0 && jass.UNIT_STATE_MANA != null && jass.UNIT_STATE_MAX_MANA != null) {
     const curM = jass.GetUnitState(unit, jass.UNIT_STATE_MANA) as number;
-    const maxM = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA) as number;
+    const maxM = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA) as number;
     const nextMana = curM + mp;
     jass.SetUnitState(unit, jass.UNIT_STATE_MANA, nextMana < maxM ? nextMana : maxM);
   }

@@ -20,6 +20,8 @@ local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_2["移除单位暂
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_3.addDelayedCallback
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -39,7 +41,7 @@ local function _____542F_52A8_9ED1_7FFC_62D8_675F_6838_5FC3(context, target, rem
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local maxByAlbedo = GetUnitState(albedo, UNIT_STATE_LIFE) * cfg["守护者模式"]["黑翼拘束生命比例"]
-    local maxByBoss = GetUnitState(context["安兹单位"], UNIT_STATE_MAX_LIFE) * cfg["守护者模式"]["黑翼拘束安兹最大生命上限比例"]
+    local maxByBoss = GetUnitStateJapi(context["安兹单位"], UNIT_STATE_MAX_LIFE) * cfg["守护者模式"]["黑翼拘束安兹最大生命上限比例"]
     local coreLife = maxByAlbedo < maxByBoss and maxByAlbedo or maxByBoss
     local wing = AddSpecialEffectTarget(cfg["表现资源"]["雅儿贝德黑翼拘束特效路径"], target, "origin")
     local paused = false

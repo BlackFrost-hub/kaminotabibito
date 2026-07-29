@@ -41,6 +41,8 @@ export const ITEM_REGEN_EFFECTS: Record<string, ItemRegenEffect> = {
 //=============================================================================
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const UnitItemInSlot = jass.UnitItemInSlot as (this: void, unit: any, slot: number) => any;
 const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
@@ -81,7 +83,7 @@ function hasItem(this: void, unit: any, 配置键名: string): boolean {
  */
 export function calcItemLifeRegenBonus(this: void, unit: any): number {
   let totalBonus = 0;
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
   const entries = Object.entries(ITEM_REGEN_EFFECTS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
   for (const [itemIdStr, effect] of entries) {
@@ -105,7 +107,7 @@ export function calcItemLifeRegenBonus(this: void, unit: any): number {
  */
 export function calcItemManaRegenBonus(this: void, unit: any): number {
   let totalBonus = 0;
-  const maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA);
   const entries = Object.entries(ITEM_REGEN_EFFECTS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 
   for (const [itemIdStr, effect] of entries) {

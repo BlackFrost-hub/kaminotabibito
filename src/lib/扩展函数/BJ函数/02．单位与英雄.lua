@@ -3,6 +3,8 @@ local ____exports = {}
 local ____12_FF0E_6570_5B66_51FD_6570 = require("lib.扩展函数.BJ函数.12．数学函数")
 local RMaxBJ = ____12_FF0E_6570_5B66_51FD_6570.RMaxBJ
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local jglobals = require("jass.globals")
 local UnitModifySkillPoints = jass.UnitModifySkillPoints
 local GetHeroSkillPoints = jass.GetHeroSkillPoints
@@ -126,7 +128,7 @@ function ____exports.SetUnitFacingToFaceUnitTimed(whichUnit, target, duration)
     jass.SetUnitFacingTimed(whichUnit, angle, duration)
 end
 function ____exports.GetUnitManaPercentBJ(whichUnit)
-    local maxMana = jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_MANA)
     if maxMana <= 0 then
         return 0
     end
@@ -136,11 +138,11 @@ function ____exports.SetUnitManaPercentBJ(whichUnit, percent)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_MANA,
-        jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA) * RMaxBJ(0, percent) * 0.01
+        GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_MANA) * RMaxBJ(0, percent) * 0.01
     )
 end
 function ____exports.GetUnitLifePercentBJ(whichUnit)
-    local maxLife = jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_LIFE)
     if maxLife <= 0 then
         return 0
     end
@@ -150,7 +152,7 @@ function ____exports.SetUnitLifePercentBJ(whichUnit, percent)
     jass.SetUnitState(
         whichUnit,
         jass.UNIT_STATE_LIFE,
-        jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_LIFE) * RMaxBJ(0, percent) * 0.01
+        GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_LIFE) * RMaxBJ(0, percent) * 0.01
     )
 end
 --- `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitLifePercentBJ` 语义一致（优先原生百分比 API）

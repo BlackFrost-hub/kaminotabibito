@@ -7,6 +7,8 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
@@ -151,7 +153,7 @@ end
 _____7D2F_8BA1_627F_4F24_89E6_53D1_5B9E_73B0.prototype["计算阈值"] = function(self, _____5355_4F4D)
     local _____9608_503C = self["参数"]["固定阈值"] or 0
     if self["参数"]["最大生命比例阈值"] ~= nil and self["参数"]["最大生命比例阈值"] > 0 then
-        local hpValue = GetUnitState(_____5355_4F4D, UNIT_STATE_MAX_LIFE) * self["参数"]["最大生命比例阈值"]
+        local hpValue = GetUnitStateJapi(_____5355_4F4D, UNIT_STATE_MAX_LIFE) * self["参数"]["最大生命比例阈值"]
         if _____9608_503C <= 0 or hpValue < _____9608_503C then
             _____9608_503C = hpValue
         end

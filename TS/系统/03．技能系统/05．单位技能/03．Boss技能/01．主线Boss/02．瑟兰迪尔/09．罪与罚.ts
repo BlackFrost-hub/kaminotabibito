@@ -42,6 +42,7 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
 };
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
@@ -170,7 +171,7 @@ export function 释放瑟兰迪尔罪与罚(this: void, context: 瑟兰迪尔运
       执行: function 瑟兰迪尔罪与罚结算(this: void): void {
         if (!单位有效(boss) || !单位有效(actualTarget)) return;
         让单位面向目标(boss, actualTarget);
-        const maxLife = GetUnitState(actualTarget, UNIT_STATE_MAX_LIFE);
+        const maxLife = GetUnitStateJapi(actualTarget, UNIT_STATE_MAX_LIFE);
         if (type === 1) {
           挂Buff(boss, actualTarget, config.红惩罚BuffID, config.惩罚持续秒, 0, "BuffIcon\\Boss\\Thranduil\\lieyanzhuoshao.blp", config.红特效);
           挂Buff(boss, actualTarget, config.红增益BuffID, config.增益持续秒, 0.35, "BuffIcon\\Boss\\Thranduil\\nuhuozhangkong.blp", config.红特效);
@@ -184,7 +185,7 @@ export function 释放瑟兰迪尔罪与罚(this: void, context: 瑟兰迪尔运
           结算周期伤害(boss, actualTarget, config.惩罚持续秒, maxLife * 0.04, jass.DAMAGE_TYPE_POISON);
         } else {
           const mana = GetUnitState(actualTarget, UNIT_STATE_MANA);
-          const maxMana = GetUnitState(actualTarget, UNIT_STATE_MAX_MANA);
+          const maxMana = GetUnitStateJapi(actualTarget, UNIT_STATE_MAX_MANA);
           const damage = maxMana > 0 ? (maxMana - mana) * 2 : 200;
           挂Buff(boss, actualTarget, config.黄惩罚BuffID, config.惩罚持续秒, 0, "BuffIcon\\Boss\\Thranduil\\molifanshi.blp");
           挂Buff(boss, actualTarget, config.黄增益BuffID, config.增益持续秒, 0, "BuffIcon\\Boss\\Thranduil\\aoshuchaozai.blp", config.黄增益特效);

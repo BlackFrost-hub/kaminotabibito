@@ -9,6 +9,8 @@ local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
 local ____require_result_3 = require("lib.扩展函数.物品相关函数.物品叠加函数")
 local onAnyUnitItemStacked = ____require_result_3.onAnyUnitItemStacked
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetItemTypeId = jass.GetItemTypeId
 local SetItemCharges = jass.SetItemCharges
 local GetUnitState = jass.GetUnitState
@@ -44,7 +46,7 @@ local function ____on_89E6_624B_6B8B_7247_53E0_52A0(_____5355_4F4D, _____5408_5E
     if _____53E0_52A0_524D_6B21_6570 < _____89E6_624B_6B8B_7247_914D_7F6E["触发最低已有次数"] then
         return
     end
-    local _____5DF2_635F_751F_547D = GetUnitState(_____5355_4F4D, UNIT_STATE_MAX_LIFE) - GetUnitState(_____5355_4F4D, UNIT_STATE_LIFE)
+    local _____5DF2_635F_751F_547D = GetUnitStateJapi(_____5355_4F4D, UNIT_STATE_MAX_LIFE) - GetUnitState(_____5355_4F4D, UNIT_STATE_LIFE)
     if _____5DF2_635F_751F_547D <= 0 then
         return
     end

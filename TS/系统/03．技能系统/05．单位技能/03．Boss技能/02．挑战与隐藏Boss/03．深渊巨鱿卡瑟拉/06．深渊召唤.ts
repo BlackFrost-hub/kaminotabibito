@@ -10,6 +10,8 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -30,7 +32,7 @@ const { 临时调整攻击 } = require("系统.03．技能系统.00．技能模�
 
 function 治疗Boss最大生命比例(this: void, boss: any, ratio: number): void {
   if (!单位有效(boss) || !(ratio > 0)) return;
-  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio, ItemHeal: false, HealEffect: false });
+  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * ratio, ItemHeal: false, HealEffect: false });
 }
 
 function 幼鱿死亡掉落残片(this: void, context: 卡瑟拉运行时上下文, killer: any): void {

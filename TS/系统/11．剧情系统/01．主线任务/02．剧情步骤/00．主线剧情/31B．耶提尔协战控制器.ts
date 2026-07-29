@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const {
   registerImmediateOrderListener,
@@ -208,7 +210,7 @@ function 停止耶提尔协战Tick(this: void, 状态: 耶提尔协战状态): v
 function 计算耶提尔存活奖励档位(this: void, 耶提尔: any): number {
   if (!单位有效(耶提尔)) return 0;
   const 当前生命 = GetUnitState(耶提尔, UNIT_STATE_LIFE);
-  const 最大生命 = GetUnitState(耶提尔, UNIT_STATE_MAX_LIFE);
+  const 最大生命 = GetUnitStateJapi(耶提尔, UNIT_STATE_MAX_LIFE);
   if (当前生命 <= 0.405 || 最大生命 <= 0) return 0;
   const 生命比例 = 当前生命 / 最大生命;
   if (生命比例 >= 0.75) return 3;

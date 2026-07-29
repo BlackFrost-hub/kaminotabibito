@@ -20,8 +20,9 @@ const { 启动基础施法时间线 } = require('系统.03．技能系统.00．�
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
-const { 创建线段危险区 } = require('系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区') as {
-  创建线段危险区: (this: void, 参数: any) => any;
+const { 创建原生弹幕, 创建直线定点轨迹 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index') as {
+  创建原生弹幕: (this: void, 参数: any) => any;
+  创建直线定点轨迹: (this: void, 起点X: number, 起点Y: number, 终点X: number, 终点Y: number) => any;
 };
 const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
@@ -38,6 +39,7 @@ const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用�
 const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -53,7 +55,7 @@ export const 现实断裂技能状态 = {
   已注册: true,
   伤害形态: 'AOE',
   包含战斗自身位移: false,
-  语义: '预告一条狭长空间切面，延迟后按固定方向爆发并保留可识别安全区。',
+  语义: '预告一条狭长空间切面，延迟后沿固定方向移动并保留可识别安全区。',
 } as const;
 
 function 取目标(this: void, boss: any): any {
@@ -74,42 +76,60 @@ function 计算伤害(this: void, boss: any, target: any): number {
   });
 }
 
-function 播放现实断裂特效(this: void, x: number, y: number, angle: number): void {
+function 播放现实断裂命中特效(this: void, x: number, y: number, angle: number): void {
   const config = 安兹乌尔恭数值与表现配置;
   创建点特效({
-    模型路径: config.表现资源.现实断裂特效路径,
+    模型路径: config.表现资源.现实断裂命中叠加特效路径,
     X: x,
     Y: y,
-    缩放: config.普通技能.现实断裂特效缩放,
+    缩放: config.普通技能.现实断裂命中特效缩放,
     Z轴角度: angle,
-    持续秒: config.普通技能.现实断裂特效持续秒,
+    持续秒: config.普通技能.现实断裂命中特效持续秒,
+    红: config.普通技能.现实断裂命中特效红,
+    绿: config.普通技能.现实断裂命中特效绿,
+    蓝: config.普通技能.现实断裂命中特效蓝,
   });
 }
 
-function 创建现实断裂判定(this: void, context: 安兹运行时上下文, angle: number, originX: number, originY: number): void {
+function 创建现实断裂移动(this: void, context: 安兹运行时上下文, angle: number, originX: number, originY: number): void {
   const config = 安兹乌尔恭数值与表现配置.普通技能;
   const boss = context.安兹单位;
-  播放现实断裂特效(
-    极坐标X(originX, angle, config.现实断裂路径长度 * 0.5),
-    极坐标Y(originY, angle, config.现实断裂路径长度 * 0.5),
-    angle,
-  );
-  创建线段危险区({
-    清理: context.清理,
-    名称: '安兹·现实断裂',
-    起点X: originX,
-    起点Y: originY,
+  const endX = 极坐标X(originX, angle, config.现实断裂路径长度);
+  const endY = 极坐标Y(originY, angle, config.现实断裂路径长度);
+  const 可命中目标表: Record<number, true | undefined> = {};
+  const targets = 获取Boss技能敌对英雄列表(boss);
+  for (let i = 0; i < targets.length; i++) {
+    const handleId = GetHandleId(targets[i]);
+    if (handleId !== 0) 可命中目标表[handleId] = true;
+  }
+  创建原生弹幕({
+    所有者: boss,
+    X: originX,
+    Y: originY,
     方向角: angle,
-    长度: config.现实断裂路径长度,
-    宽度: config.现实断裂路径宽度,
-    持续秒: config.现实断裂危险持续秒,
-    Tick间隔毫秒: config.现实断裂危险Tick毫秒,
-    单位列表: function 取现实断裂候选(this: void): any[] {
-      return 获取Boss技能敌对英雄列表(boss);
+    速度: config.现实断裂路径长度 / config.现实断裂路径移动秒,
+    生命周期: config.现实断裂路径移动秒,
+    最大距离: config.现实断裂路径长度,
+    轨迹采样器: 创建直线定点轨迹(originX, originY, endX, endY),
+    命中半径: config.现实断裂路径宽度 * 0.5,
+    影响目标: '敌方',
+    每单位最大命中次数: 1,
+    碰撞消失: false,
+    不可阻挡: true,
+    禁用碰撞: true,
+    附加特效1: {
+      模型: 安兹乌尔恭数值与表现配置.表现资源.现实断裂路径移动特效路径,
+      跟随主弹幕参数: true,
+      缩放: config.现实断裂路径特效缩放,
+      红: config.现实断裂路径特效红,
+      绿: config.现实断裂路径特效绿,
+      蓝: config.现实断裂路径特效蓝,
     },
-    提示圈: { 类型: '方向直线', 来源单位: boss },
-    on进入: function 现实断裂命中(this: void, unit: any): void {
-      if (!单位有效(unit) || unit === boss) return;
+    目标筛选: function 现实断裂目标筛选(this: void, unit: any): boolean {
+      return 单位有效(unit) && 可命中目标表[GetHandleId(unit)] === true;
+    },
+    on命中: function 现实断裂命中(this: void, unit: any): void {
+      if (!单位有效(unit)) return;
       造成AOE技能伤害({
         技能ID: 现实断裂技能ID,
         来源: boss,
@@ -122,6 +142,7 @@ function 创建现实断裂判定(this: void, context: 安兹运行时上下文,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: 'Boss技能',
       });
+      播放现实断裂命中特效(GetUnitX(unit), GetUnitY(unit), angle);
     },
   });
 }
@@ -134,7 +155,7 @@ export function 释放安兹现实断裂(this: void, context: 安兹运行时上
   播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.现实断裂, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   播放安兹台词(boss, '现实断裂');
   const config = 安兹乌尔恭数值与表现配置.普通技能;
-  标记安兹普通机制忙碌(context, config.现实断裂预警秒 + config.现实断裂危险持续秒);
+  标记安兹普通机制忙碌(context, config.现实断裂预警秒 + config.现实断裂路径移动秒);
   const angle = 取方向角(boss, target);
   const originX = GetUnitX(boss);
   const originY = GetUnitY(boss);
@@ -164,7 +185,7 @@ export function 释放安兹现实断裂(this: void, context: 安兹运行时上
       提示文本: '沿固定方向撕开空间切面',
     },
     on生效: function 现实断裂生效(this: void): void {
-      创建现实断裂判定(context, angle, originX, originY);
+      创建现实断裂移动(context, angle, originX, originY);
     },
   });
 }

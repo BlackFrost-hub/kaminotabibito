@@ -38,6 +38,8 @@ const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Sta
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
@@ -159,7 +161,7 @@ function 创建终极污染核心(this: void, context: 米亚运行时上下文,
 
 function 创建终极污染核心组(this: void, context: 米亚运行时上下文): void {
   const config = 米亚技能数值配置.终极污染;
-  const maxLife = GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
   const hp = maxLife * config.核心生命Boss最大生命比例;
   const points = 取核心出生点表();
   const count = config.核心数量 < points.length ? config.核心数量 : points.length;

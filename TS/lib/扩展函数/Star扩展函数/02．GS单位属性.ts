@@ -2,6 +2,7 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const jglobals = require("jass.globals") as any;
 const {
   SetUnitLifePercentBJ,
@@ -45,10 +46,10 @@ function saveReal(handle: any, parent: number, child: number, value: number): vo
 export function GS_LoadUintProperty(this: void, u: any, i: number): number {
   if (!u) return 0;
   if (i === 0) return GetUnitState(u, jass.UNIT_STATE_LIFE) || 0;
-  if (i === 1) return GetUnitState(u, jass.UNIT_STATE_MAX_MANA) || 0;
-  if (i === 2) return GetUnitState(u, ConvertUnitState(0x12)) || 0;
-  if (i === 3) return GetUnitState(u, ConvertUnitState(0x20)) || 0;
-  if (i === 4) return GetUnitState(u, ConvertUnitState(0x51)) || 0;
+  if (i === 1) return GetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA) || 0;
+  if (i === 2) return GetUnitStateJapi(u, ConvertUnitState(0x12)) || 0;
+  if (i === 3) return GetUnitStateJapi(u, ConvertUnitState(0x20)) || 0;
+  if (i === 4) return GetUnitStateJapi(u, ConvertUnitState(0x51)) || 0;
   if (i === 5) return (jass.GetUnitMoveSpeed(u) as number) || 0;
   return loadReal(HS, hid(u), i);
 }
@@ -66,26 +67,26 @@ export function GS_Unit_Pry_change(this: void, u: any, i: any, r: any): void {
 
   if (i === 0) {
     hp = GetUnitLifePercent(u) || 0;
-    SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) + (r * (1 + loadReal(HS, uid, 15))));
+    SetUnitState(u, jass.UNIT_STATE_MAX_LIFE, GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE) + (r * (1 + loadReal(HS, uid, 15))));
     SetUnitLifePercentBJ(u, hp);
     return;
   }
   if (i === 1) {
     hp = GetUnitManaPercent(u) || 0;
-    SetUnitState(u, jass.UNIT_STATE_MAX_MANA, GetUnitState(u, jass.UNIT_STATE_MAX_MANA) + r);
+    SetUnitState(u, jass.UNIT_STATE_MAX_MANA, GetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA) + r);
     SetUnitManaPercentBJ(u, hp);
     return;
   }
   if (i === 2) {
-    SetUnitState(u, ConvertUnitState(0x12), GetUnitState(u, ConvertUnitState(0x12)) + (r * (1 + loadReal(HS, uid, 16))));
+    SetUnitState(u, ConvertUnitState(0x12), GetUnitStateJapi(u, ConvertUnitState(0x12)) + (r * (1 + loadReal(HS, uid, 16))));
     return;
   }
   if (i === 3) {
-    SetUnitState(u, ConvertUnitState(0x20), GetUnitState(u, ConvertUnitState(0x20)) + (r * (1 + loadReal(HS, uid, 17))));
+    SetUnitState(u, ConvertUnitState(0x20), GetUnitStateJapi(u, ConvertUnitState(0x20)) + (r * (1 + loadReal(HS, uid, 17))));
     return;
   }
   if (i === 4) {
-    SetUnitState(u, ConvertUnitState(0x51), GetUnitState(u, ConvertUnitState(0x51)) + r);
+    SetUnitState(u, ConvertUnitState(0x51), GetUnitStateJapi(u, ConvertUnitState(0x51)) + r);
     return;
   }
   if (i === 5) {
@@ -97,7 +98,7 @@ export function GS_Unit_Pry_change(this: void, u: any, i: any, r: any): void {
   if (i === 13) {
     hp = GetUnitLifePercent(u) || 0;
     SetUnitState(u, jass.UNIT_STATE_MAX_LIFE,
-      (GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r)
+      (GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r)
     );
     SetUnitLifePercentBJ(u, hp);
     saveReal(HS, uid, i, loadReal(HS, uid, i) + r);
@@ -106,11 +107,11 @@ export function GS_Unit_Pry_change(this: void, u: any, i: any, r: any): void {
   if (i === 14) {
     if (r < 0) {
       SetUnitState(u, ConvertUnitState(0x12),
-        (GetUnitState(u, ConvertUnitState(0x12)) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r)
+        (GetUnitStateJapi(u, ConvertUnitState(0x12)) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r)
       );
     } else {
       SetUnitState(u, ConvertUnitState(0x12),
-        (GetUnitState(u, ConvertUnitState(0x12)) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r) + 1
+        (GetUnitStateJapi(u, ConvertUnitState(0x12)) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r) + 1
       );
     }
     saveReal(HS, uid, i, loadReal(HS, uid, i) + r);
@@ -118,7 +119,7 @@ export function GS_Unit_Pry_change(this: void, u: any, i: any, r: any): void {
   }
   if (i === 15) {
     SetUnitState(u, ConvertUnitState(0x20),
-      (GetUnitState(u, ConvertUnitState(0x20)) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r)
+      (GetUnitStateJapi(u, ConvertUnitState(0x20)) / (1 + loadReal(HS, uid, i))) * (1 + loadReal(HS, uid, i) + r)
     );
     saveReal(HS, uid, i, loadReal(HS, uid, i) + r);
     return;

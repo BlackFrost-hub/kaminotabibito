@@ -15,13 +15,15 @@ alwaysApply: false
   - 必要的材质过滤模式
   - 必要的模型缩放或面片尺寸
 4. PNG 转 BLP：
-  - 优先用 VSCode 插件 `war3-texture-preview`
-  - 转完立刻解码回 PNG 检查
-  - 对透明贴图核对 alpha，不只看肉眼预览
+  - 正式透明 BLP 必须使用 `scripts/war3-transparent-blp.js` 调用内置原生转换器
+  - 禁止用 `war3-texture-preview` 的 `encodeTextureBuffer(..., 'blp')` 生成正式透明 BLP
+  - 转完使用 `war3-texture-preview` 解码回临时 PNG 检查；检查完立即删除临时 PNG
+  - 对透明贴图同时核对 BLP 头、alpha 和画面，不只看肉眼预览
 5. 检查 MDX + BLP：
   - MDX 内部贴图路径和实际导入路径一致，并且不能带 `imports\` 前缀
   - BLP 尺寸正确
   - BLP 有 alpha，透明区 alpha 为 0
+  - 正式透明 BLP 为 `BLP1 compression=0 / alphaBits=8 / pictureType=3 或 pictureType=4`
   - 材质 `FilterMode` 对透明图标可用
 6. 接入 TS 时只引用模型路径，不直接引用 PNG；路径必须去掉 `imports\` 前缀。
 7. 打包/导入后必须重开地图进游戏看实物效果；模型查看器、插件预览、PNG 预览都不能替代游戏内验证。
@@ -54,19 +56,23 @@ alwaysApply: false
 
 ## BLP 透明
 
-- PNG 看起来透明不代表进游戏透明；必须转换成 BLP 后回读检查 alpha。
-- PNG 转 BLP 优先使用本机 VSCode 插件 `war3-texture-preview`，转换后再用同插件解码回 PNG，确认尺寸、方向、画面和 alpha。
+- PNG 看起来透明不代表进游戏透明；插件能回读透明也不代表 Warcraft 1.27 实机兼容。正式透明 BLP 必须同时通过头部、Alpha、MDX 材质和实机四项验收。
+- 正式透明 BLP 统一使用 `scripts/war3-transparent-blp.js` 调用内置原生转换器，输出 `BLP1 compression=0 / alphaBits=8 / pictureType=3 或 pictureType=4`。不得直接使用 `war3-texture-preview` 的 `encodeTextureBuffer(..., 'blp')` 作为正式透明 BLP。
+- `war3-texture-preview` 只用于把正式 BLP 回读为 PNG/TGA，检查尺寸、方向、颜色和 Alpha。回读文件属于临时预览，必须放在明确的临时目录，检查完立即删除；可编辑源 PNG 不属于临时预览，按资源源文件规则保留。
 - 贴图挂在 MDX 面片上时，如果进游戏出现完整黑色方块，优先检查 BLP 透明兼容，而不是继续修 PNG 黑边。
 - 本项目伤害数字贴图可作为透明 BLP 参考：`imports/UI/DamageNumbers/DmgNumTex_*.blp`。
+- 已确认的失败格式：`war3-texture-preview` 的 `encodeTextureBuffer(..., 'blp')` 当前输出 `BLP1 compression=1 / pictureType=5` 直通调色板格式。插件自身能正确回读其中的 Alpha，但 Warcraft 1.27 实机在透明面片上会显示黑底。
 - 透明图标 BLP 应重点核对：
+  - `compression = 0`
   - `alphaBits = 8`
+  - `pictureType = 3 或 pictureType = 4`
   - 尺寸正确
   - 解码后透明区 alpha 确实为 0
-  - 必要时让 header 的 alpha/type 形态贴近项目已有可用资源
+  - 半透明区和可见区都不为空
 
 ## MDX 材质
 
-- 透明图标模型必须检查材质过滤模式；如果 `Blend` 在游戏里表现为黑底，优先改成 `Transparent` 再测。
+- 透明图标模型必须检查材质过滤模式；如果 `Blend` 在游戏里表现为黑底，优先改成 `Transparent`。但 `Transparent` 不能弥补不兼容的 BLP 编码，材质和 BLP 头必须同时合格。
 - 不要只看模型查看器或 PNG 预览下结论；最终以游戏内特效显示为准。
 - 对同一批由同模板生成的模型，一个有黑底，通常三个都会有同类问题，先查模板材质和 BLP 编码，不要逐张贴图乱修。
 
@@ -74,5 +80,5 @@ alwaysApply: false
 
 1. 看游戏截图：黑边是局部边缘，黑底是整张面片。
 2. 黑边：处理 PNG 半透明边缘和透明像素 RGB，并重新转 BLP。
-3. 黑底：检查 BLP alpha/type/header 和 MDX `FilterMode`。
-4. 修完重新导入/打包并重开地图，避免 War3 使用旧资源缓存。
+3. 黑底：先确认正式 BLP 不是 `compression=1 / pictureType=5`，再检查 Alpha 与 MDX `FilterMode`；不能因为插件回读透明就跳过 BLP 头检查。
+4. 修完重新导入/打包并彻底重开游戏，避免 War3 使用旧资源缓存；最终以实机截图为准。

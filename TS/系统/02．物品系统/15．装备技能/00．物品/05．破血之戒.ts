@@ -8,6 +8,8 @@ const { 造成装备伤害 } = require("系统.03．技能系统.00．技能模�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { createTimedEffect, 创建Dz绑定单位特效, 销毁Dz绑定单位特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
@@ -53,7 +55,7 @@ function 结算破血之戒(this: void, 施法单位: any): void {
   const 上下文 = 破血之戒上下文托管器.读取(施法单位);
   if (上下文 == null) return;
 
-  const 伤害值 = 破血之戒配置.基础伤害 + GetUnitState(施法单位, ConvertUnitState(0x15)) * 3;
+  const 伤害值 = 破血之戒配置.基础伤害 + GetUnitStateJapi(施法单位, ConvertUnitState(0x15)) * 3;
   const 敌人列表 = 获取坐标范围敌人(施法单位, 上下文.目标X, 上下文.目标Y, 破血之戒配置.作用范围);
   createTimedEffect(破血之戒配置.选取特效路径, 上下文.目标X, 上下文.目标Y, 0, 1);
 

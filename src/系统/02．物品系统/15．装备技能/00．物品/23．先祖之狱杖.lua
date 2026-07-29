@@ -11,6 +11,8 @@ local _____5148_7956_4E4B_72F1_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_
 local ____20_FF0E_7269_54C1_8F85_52A9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.index")
 local _____5EF6_8FDF_6267_884C_53CC_5355_4F4D_52A8_4F5C = ____20_FF0E_7269_54C1_8F85_52A9["延迟执行双单位动作"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____require_result_0.createTimedEffect
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
@@ -31,7 +33,7 @@ local function _____6267_884C_5148_7956_5EF6_8FDF_4F24_5BB3(_____65BD_6CD5_5355_
     _____9020_6210_88C5_5907_4F24_5BB3(
         _____65BD_6CD5_5355_4F4D,
         _____76EE_6807_5355_4F4D,
-        GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_MAX_LIFE) * _____5148_7956_4E4B_72F1_6756_914D_7F6E["伤害生命比例"],
+        GetUnitStateJapi(_____76EE_6807_5355_4F4D, UNIT_STATE_MAX_LIFE) * _____5148_7956_4E4B_72F1_6756_914D_7F6E["伤害生命比例"],
         DAMAGE_TYPE_SHADOW_STRIKE,
         true,
         nil,

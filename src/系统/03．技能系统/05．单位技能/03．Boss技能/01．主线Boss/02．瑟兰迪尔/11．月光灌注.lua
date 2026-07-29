@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_6708_5149_704C_6CE8Key, _____56DE_6EDA_6708_5149_704C_6CE8_72B6_6001, ____on_6708_5149_704C_6CE8Buff_79FB_9664, _____64AD_653E_795E_7F5A_7279_6548, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_704C_6CE8, _____7ED3_7B97_745F_5170_8FEA_5C14_7CBE_7075_795E_7F5A, addDelayedCallback, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, SGSS_SetState, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5BF9_5355_4F4D_9020_6210_5F3A_5316_4F24_5BB3, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_70B9_7279_6548, Sound3DII_CooPlayReuse, GetUnitState, GetUnitName, GetUnitX, GetUnitY, SetUnitScale, GetUnitDefaultMoveSpeed, R2I, UNIT_STATE_MAX_LIFE, _____653B_51FB_529B_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, _____6708_5149_704C_6CE8_72B6_6001_8868, _____5F53_524D_6708_5149_704C_6CE8Boss
+local _____53D6_6708_5149_704C_6CE8Key, _____56DE_6EDA_6708_5149_704C_6CE8_72B6_6001, ____on_6708_5149_704C_6CE8Buff_79FB_9664, _____64AD_653E_795E_7F5A_7279_6548, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_704C_6CE8, _____7ED3_7B97_745F_5170_8FEA_5C14_7CBE_7075_795E_7F5A, addDelayedCallback, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, SGSS_SetState, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5BF9_5355_4F4D_9020_6210_5F3A_5316_4F24_5BB3, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_70B9_7279_6548, Sound3DII_CooPlayReuse, GetUnitStateJapi, GetUnitName, GetUnitX, GetUnitY, SetUnitScale, GetUnitDefaultMoveSpeed, R2I, UNIT_STATE_MAX_LIFE, _____653B_51FB_529B_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, _____6708_5149_704C_6CE8_72B6_6001_8868, _____5F53_524D_6708_5149_704C_6CE8Boss
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
@@ -120,7 +120,7 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_7CBE_7075_795E_7F5A(boss)
                 _____5BF9_5355_4F4D_9020_6210_5F3A_5316_4F24_5BB3(
                     boss,
                     target,
-                    GetUnitState(target, UNIT_STATE_MAX_LIFE) * config["神罚伤害最大生命比例"]
+                    GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * config["神罚伤害最大生命比例"]
                 )
             end
             ::__continue27::
@@ -152,7 +152,9 @@ local createTimedUnitEffect = ____require_result_7.createTimedUnitEffect
 local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.index")
 Sound3DII_CooPlayReuse = ____require_result_8.Sound3DII_CooPlayReuse
 local jass = require("jass.common")
-GetUnitState = jass.GetUnitState
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
+local GetUnitState = jass.GetUnitState
 GetUnitName = jass.GetUnitName
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY

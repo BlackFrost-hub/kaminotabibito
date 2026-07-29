@@ -29,6 +29,7 @@ local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用�
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -121,7 +122,7 @@ local function _____521B_5EFA_9AD8_9636_4EA1_7075(context, x, y, target)
         X = x,
         Y = y,
         ["朝向"] = GetUnitFacing(boss),
-        ["生命值"] = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg["高阶亡灵召唤生命Boss最大生命比例"],
+        ["生命值"] = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg["高阶亡灵召唤生命Boss最大生命比例"],
         ["生命值受小怪倍率"] = false,
         ["攻击力"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["高阶亡灵召唤攻击Boss攻击力比例"],
         ["攻击间隔"] = cfg["高阶亡灵召唤攻击间隔"],

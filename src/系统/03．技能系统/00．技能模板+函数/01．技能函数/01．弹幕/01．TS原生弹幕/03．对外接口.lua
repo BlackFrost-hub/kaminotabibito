@@ -4,6 +4,8 @@ local ____exports = {}
 local ____01_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．共享")
 local CreateUnit = ____01_FF0E_5171_4EAB.CreateUnit
 local _____9ED8_8BA4_5F39_5E55_5355_4F4D_7C7B_578B = ____01_FF0E_5171_4EAB["默认弹幕单位类型"]
+local DzGetColor = ____01_FF0E_5171_4EAB.DzGetColor
+local DzSetEffectVertexColor = ____01_FF0E_5171_4EAB.DzSetEffectVertexColor
 local DzSetEffectPos = ____01_FF0E_5171_4EAB.DzSetEffectPos
 local DzSetUnitModel = ____01_FF0E_5171_4EAB.DzSetUnitModel
 local EC_CreateEffect = ____01_FF0E_5171_4EAB.EC_CreateEffect
@@ -145,6 +147,29 @@ end
 local function _____5F39_5E55_53EF_88AB_653B_51FB_6467_6BC1(_____53C2_6570)
     return _____53C2_6570["可被攻击摧毁"] == true or _____53C2_6570["可被摧毁"] == true
 end
+local function _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(value)
+    if value < 0 then
+        return 0
+    end
+    if value > 255 then
+        return 255
+    end
+    return value
+end
+local function _____8BBE_7F6E_5F39_5E55_9644_52A0_7279_6548_989C_8272(effect, _____53C2_6570)
+    if _____53C2_6570["红"] == nil or _____53C2_6570["绿"] == nil or _____53C2_6570["蓝"] == nil then
+        return
+    end
+    DzSetEffectVertexColor(
+        effect,
+        DzGetColor(
+            _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570["透明度"] or 255),
+            _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570["红"]),
+            _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570["绿"]),
+            _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570["蓝"])
+        )
+    )
+end
 local function _____521D_59CB_5316_5F39_5E55_5355_4F4D_7C7B_522B(_____53C2_6570, _____5F39_5E55_5355_4F4D)
     UnitAddType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_ANCIENT)
     UnitAddType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_MECHANICAL)
@@ -181,6 +206,7 @@ local function _____521B_5EFA_5F39_5E55_9644_52A0_7279_6548(_____53C2_6570, ____
         return nil
     end
     DzSetEffectPos(effect, x, y, z)
+    _____8BBE_7F6E_5F39_5E55_9644_52A0_7279_6548_989C_8272(effect, _____7279_6548_53C2_6570)
     return effect
 end
 local function _____521D_59CB_5316_5F39_5E55_5355_4F4D_8868_73B0(_____53C2_6570, _____5F39_5E55_5355_4F4D)

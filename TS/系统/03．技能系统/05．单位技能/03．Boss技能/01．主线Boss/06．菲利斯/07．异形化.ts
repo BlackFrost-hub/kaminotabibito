@@ -10,6 +10,7 @@ import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00�
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -72,7 +73,7 @@ let 异形化伤害监听已注册 = false;
 
 function 更新魔法显示(this: void, context: 菲利斯运行时上下文): void {
   const boss = context.Boss单位;
-  const maxMana = GetUnitState(boss, UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitStateJapi(boss, UNIT_STATE_MAX_MANA);
   if (maxMana > 0) {
     const shown = context.当前魔法充能 > maxMana ? maxMana : context.当前魔法充能;
     魔法增减(boss, shown - GetUnitState(boss, UNIT_STATE_MANA), false, false);
@@ -161,7 +162,7 @@ function 异形化Tick(this: void, context: 菲利斯运行时上下文, callbac
     if (distance2 <= near2) {
       执行非伤害生命移除({
         目标: hero,
-        数值: GetUnitState(hero, UNIT_STATE_MAX_LIFE) * damageRatio,
+        数值: GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * damageRatio,
         不致死: true,
         显示特效: false,
       });

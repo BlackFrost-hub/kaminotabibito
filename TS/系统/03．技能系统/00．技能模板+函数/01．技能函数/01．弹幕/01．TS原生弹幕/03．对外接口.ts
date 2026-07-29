@@ -7,6 +7,8 @@ import type { 原生弹幕参数, 原生弹幕实例, 原生弹幕结束原因, 
 import {
   CreateUnit,
   默认弹幕单位类型,
+  DzGetColor,
+  DzSetEffectVertexColor,
   DzSetEffectPos,
   DzSetUnitModel,
   EC_CreateEffect,
@@ -84,6 +86,22 @@ function 弹幕可被攻击摧毁(this: void, 参数: 原生弹幕参数): boole
   return 参数.可被攻击摧毁 === true || 参数.可被摧毁 === true;
 }
 
+function 限制弹幕特效颜色字节(this: void, value: number): number {
+  if (value < 0) return 0;
+  if (value > 255) return 255;
+  return value;
+}
+
+function 设置弹幕附加特效颜色(this: void, effect: any, 参数: 原生弹幕附加特效参数): void {
+  if (参数.红 == null || 参数.绿 == null || 参数.蓝 == null) return;
+  DzSetEffectVertexColor(effect, DzGetColor(
+    限制弹幕特效颜色字节(参数.透明度 ?? 255),
+    限制弹幕特效颜色字节(参数.红),
+    限制弹幕特效颜色字节(参数.绿),
+    限制弹幕特效颜色字节(参数.蓝),
+  ));
+}
+
 function 初始化弹幕单位类别(this: void, 参数: 原生弹幕参数, 弹幕单位: any): void {
   // 物编默认已设置 ancient,mechanical,ward；这里为外部传入的弹幕单位补齐运行时分类。
   UnitAddType(弹幕单位, UNIT_TYPE_ANCIENT);
@@ -125,6 +143,7 @@ function 创建弹幕附加特效(
   );
   if (effect == null || effect === 0) return null;
   DzSetEffectPos(effect, x, y, z);
+  设置弹幕附加特效颜色(effect, 特效参数);
   return effect;
 }
 

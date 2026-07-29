@@ -2,7 +2,8 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
-| `Common\Effect\Form\Line\AinzRealityFracture.mdx` | 黑色空间切面只留下细白折线边缘，没有普通剑气的发光实体感。 | 单次切面爆发；运行时按固定方向旋转并覆盖在线段预警上。 | 现实断裂、空间切割。 | 不代替机制预警；来源物理特效库 `tx131.mdx`，结算错位由程序或辅助层补充。 | 8360 | `D48133EAE6FF15F7` |
+| `Common\Effect\Form\Line\AinzRealityFractureMovingSlash.mdx` | 高饱和洋红宽弧斩光，带多道细长拖尾。 | `Birth / Stand / Death`；运行时沿固定起终点路径移动。 | 安兹·现实断裂路径主体。 | 不代替机制预警；运行时 RGB `255 / 8 / 255`；表现顺序为图 1 路径主体后叠加图 2 命中层。 | 5932 | `CBC8FC760F568285` |
+| `Common\Effect\Form\Line\AinzRealityFracture.mdx` | 黑色空间切面只留下细白折线边缘，没有普通剑气的发光实体感。 | 单次切面爆发；运行时按固定方向旋转并覆盖在线段预警上。 | 时间停止解冻时的已锁定现实断裂瞬时结算。 | 不代替机制预警；普通现实断裂路径主体已改用移动模型，不得回退使用该静态模型。 | 8360 | `D48133EAE6FF15F7` |
 | `Common\Effect\Form\Line\BansheeGrayShockwave.mdx` | 黑灰色瞬间贯穿波，像死亡气息沿直线抽走生命，没有彩色法术感。 | 主表现集中在 `Birth`，`Stand / Death` 只负责安全清理。 | 女妖哭嚎结算、死亡直线冲击。 | 是瞬时主体，不是持续直线预警。 | 2788 | `82D0109A196DB7DA` |
 | `Common\Effect\Form\Line\ShalltearBloodReturnRibbon.mdx` | 多股纤细深血红丝带与微光向中心回卷，带有吸取后返回施法者的感觉。 | 具有明显回归动势；`Birth / Stand / Death`。 | 汲血回流、鲜血回收连线。 | 进图确认运动方向和长度；不合格时回退到普通双节点连线。 | 58821 | `B92CDC0817B44ED4` |
 | `Common\Effect\Form\Line\DeathWave.mdx` | 暗色粒子波沿单一方向推进，接近死亡吐息。 | 直线移动冲击。 | 安兹女妖哭嚎死亡波备选。 | 当前偏蓝紫且体量可能偏小，需实测运动方向与颗粒密度。 | 12691 | `C6EDF59B988B1D66` |

@@ -3,6 +3,8 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.04．伤害系统.06．暴击系统.01．暴击核心")
 local registerCritRateModifier = ____require_result_0.registerCritRateModifier
 local ____require_result_1 = require("系统.02．物品系统.13．物品名反查")
@@ -16,7 +18,7 @@ local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____68EE_9B54_8FDE_5F29_7269_54C1ID = stringToFourCCSafe(resolveItemIdByName("森魔连弩"))
 local function _____76EE_6807_751F_547D_6BD4_4F8B_9AD8_4E8E_516B_6210(target)
-    local _____6700_5927_751F_547D = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local _____6700_5927_751F_547D = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     if _____6700_5927_751F_547D <= 0 then
         return false
     end

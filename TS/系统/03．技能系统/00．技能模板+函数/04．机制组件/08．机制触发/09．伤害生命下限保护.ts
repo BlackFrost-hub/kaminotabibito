@@ -11,6 +11,8 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -157,7 +159,7 @@ class 伤害生命下限保护实现 implements 伤害生命下限保护控制�
   }
 
   private 计算生命下限(context?: any): number {
-    const 最大生命 = GetUnitState(this.参数.单位, UNIT_STATE_MAX_LIFE);
+    const 最大生命 = GetUnitStateJapi(this.参数.单位, UNIT_STATE_MAX_LIFE);
     if (this.参数.取生命下限 != null) {
       return 规整下限(this.参数.取生命下限(this.参数.单位, context), 最大生命);
     }

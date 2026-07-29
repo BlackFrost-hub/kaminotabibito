@@ -2,6 +2,8 @@
 import { RMaxBJ } from "./12．数学函数";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const jglobals = require("jass.globals") as any;
 const UnitModifySkillPoints = jass.UnitModifySkillPoints as (whichHero: any, delta: number) => boolean;
 const GetHeroSkillPoints = jass.GetHeroSkillPoints as (whichHero: any) => number;
@@ -120,23 +122,23 @@ export function SetUnitFacingToFaceUnitTimed(whichUnit: any, target: any, durati
 }
 
 export function GetUnitManaPercentBJ(whichUnit: any): number {
-    const maxMana = jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA);
+    const maxMana = GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_MANA);
     if (maxMana <= 0) return 0;
     return (jass.GetUnitState(whichUnit, jass.UNIT_STATE_MANA) / maxMana) * 100;
 }
 
 export function SetUnitManaPercentBJ(whichUnit: any, percent: number): void {
-    jass.SetUnitState(whichUnit, jass.UNIT_STATE_MANA, jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_MANA) * RMaxBJ(0, percent) * 0.01);
+    jass.SetUnitState(whichUnit, jass.UNIT_STATE_MANA, GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_MANA) * RMaxBJ(0, percent) * 0.01);
 }
 
 export function GetUnitLifePercentBJ(whichUnit: any): number {
-    const maxLife = jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_LIFE);
+    const maxLife = GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_LIFE);
     if (maxLife <= 0) return 0;
     return (jass.GetUnitState(whichUnit, jass.UNIT_STATE_LIFE) / maxLife) * 100;
 }
 
 export function SetUnitLifePercentBJ(whichUnit: any, percent: number): void {
-    jass.SetUnitState(whichUnit, jass.UNIT_STATE_LIFE, jass.GetUnitState(whichUnit, jass.UNIT_STATE_MAX_LIFE) * RMaxBJ(0, percent) * 0.01);
+    jass.SetUnitState(whichUnit, jass.UNIT_STATE_LIFE, GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_LIFE) * RMaxBJ(0, percent) * 0.01);
 }
 
 /** `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitLifePercentBJ` 语义一致（优先原生百分比 API） */

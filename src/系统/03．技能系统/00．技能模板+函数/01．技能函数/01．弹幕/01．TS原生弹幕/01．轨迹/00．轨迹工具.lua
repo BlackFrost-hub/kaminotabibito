@@ -23,4 +23,23 @@ ____exports["取采样方向"] = function(oldX, oldY, newX, newY, fallback)
     end
     return _____53D6_5750_6807_671D_5411_89D2(oldX, oldY, newX, newY)
 end
+____exports["创建直线定点轨迹"] = function(_____8D77_70B9X, _____8D77_70B9Y, _____7EC8_70B9X, _____7EC8_70B9Y)
+    return function(_____5B9E_4F8B)
+        local progress = ____exports["取弹幕轨迹进度"](_____5B9E_4F8B)
+        local x = ____exports["线性插值"](_____8D77_70B9X, _____7EC8_70B9X, progress)
+        local y = ____exports["线性插值"](_____8D77_70B9Y, _____7EC8_70B9Y, progress)
+        return {
+            X = x,
+            Y = y,
+            ["方向角"] = ____exports["取采样方向"](
+                _____5B9E_4F8B["当前X"],
+                _____5B9E_4F8B["当前Y"],
+                x,
+                y,
+                _____5B9E_4F8B["当前方向角"]
+            ),
+            ["完成"] = progress >= 1
+        }
+    end
+end
 return ____exports

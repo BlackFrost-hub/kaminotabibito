@@ -129,6 +129,8 @@ function _____5237_65B0_968F_4ECE_72B6_6001(context)
     end
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local jglobals = require("jass.globals")
 local GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
@@ -271,7 +273,7 @@ local function _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(unit)
     if not _____5355_4F4D_5B58_6D3B(unit) then
         return 0
     end
-    local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     if not (maxLife > 0) then
         return 0
     end
@@ -319,7 +321,7 @@ local function _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2(context, witchDoctor
     if target == nil or target == 0 then
         return
     end
-    local healAmount = GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * cfg["巫医疗波Boss最大生命比例"]
+    local healAmount = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE) * cfg["巫医疗波Boss最大生命比例"]
     local function _____6811_9B54_5DEB_533B_7597_6CE2_76EE_6807_7B5B_9009(unit)
         if not _____5355_4F4D_5B58_6D3B(unit) or _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(unit) <= 0 then
             return false

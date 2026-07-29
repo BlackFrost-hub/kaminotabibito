@@ -5,6 +5,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
@@ -61,7 +63,7 @@ function applyLifeRegen(this: void, unit: any, regen: number): void {
   if (regen <= 0) return;
 
   const currentLife = GetUnitState(unit, UNIT_STATE_LIFE);
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
 
   // 不超过最大生命
   const lifeGap = maxLife - currentLife;
@@ -78,7 +80,7 @@ function applyManaRegen(this: void, unit: any, regen: number): void {
   if (regen <= 0) return;
 
   const currentMana = GetUnitState(unit, UNIT_STATE_MANA);
-  const maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA);
 
   // 不超过最大魔法
   const manaGap = maxMana - currentMana;
@@ -125,7 +127,7 @@ export function processPlayerHeroRegen(this: void, unit: any): void {
   const lifeRegenAmplify = YDUserDataGet("player", player, "生命恢复属性增幅", "real") || 0;
 
   // 8. 计算总生命恢复 = (1 + 增幅) × (最大生命 × 百分比回复 + 生命恢复)
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
   const totalLifeRegen = (1 + lifeRegenAmplify) * (maxLife * percentLifeRegen + totalFixedLifeRegen);
 
   // 9. 存储总生命恢复到玩家属性（供多面板显示）
@@ -149,7 +151,7 @@ export function processPlayerHeroRegen(this: void, unit: any): void {
   const percentManaRegen = getPercentManaRegen(unit);
 
   // 5. 计算总魔法恢复 = 1 × (最大魔法 × 百分比回复 + 魔法恢复)
-  const maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA);
   const totalManaRegen = 1 * (maxMana * percentManaRegen + totalFixedManaRegen);
 
   // ========== 存储总恢复值（供多面板显示） ==========

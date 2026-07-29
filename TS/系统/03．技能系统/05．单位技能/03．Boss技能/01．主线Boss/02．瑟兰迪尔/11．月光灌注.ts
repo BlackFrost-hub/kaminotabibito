@@ -41,6 +41,8 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -200,7 +202,7 @@ function 结算瑟兰迪尔精灵神罚(this: void, boss: any): void {
     const target = heroes[i];
     if (!单位有效(target)) continue;
     播放神罚特效(GetUnitX(target), GetUnitY(target));
-    对单位造成强化伤害(boss, target, GetUnitState(target, UNIT_STATE_MAX_LIFE) * config.神罚伤害最大生命比例);
+    对单位造成强化伤害(boss, target, GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * config.神罚伤害最大生命比例);
   }
 }
 

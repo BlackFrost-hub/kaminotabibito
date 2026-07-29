@@ -35,7 +35,7 @@ const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
-const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 export interface 击杀回复触发事件 {
   击杀单位: any;
@@ -85,11 +85,11 @@ function 取单位ID(this: void, unit: any): number {
 }
 
 function 取最大生命(this: void, unit: any): number {
-  return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || GetUnitState(unit, UNIT_STATE_MAX_LIFE) || 0;
+  return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || 0;
 }
 
 function 取最大魔法(this: void, unit: any): number {
-  return GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA) || GetUnitState(unit, UNIT_STATE_MAX_MANA) || 0;
+  return GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA) || GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA) || 0;
 }
 
 function 取冷却键(this: void, unit: any, record: 击杀回复触发记录): string {

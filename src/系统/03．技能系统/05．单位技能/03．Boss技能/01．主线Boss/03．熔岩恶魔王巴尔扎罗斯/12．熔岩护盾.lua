@@ -37,6 +37,8 @@ local getServerTime = ____require_result_7.getServerTime
 local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_8["造成单体技能伤害"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
@@ -102,7 +104,7 @@ local function _____521B_5EFA_7194_5CA9_62A4_76FE(context)
         return
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩护盾"]
-    local shieldValue = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config["护盾Boss最大生命比例"]
+    local shieldValue = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config["护盾Boss最大生命比例"]
     local bossId = _____53D6_5355_4F4DID(boss)
     _____64AD_653E_62A4_76FE_77ED_52A8_4F5C(boss)
     _____64AD_653EBoss_5750_6807_97F3_6548(

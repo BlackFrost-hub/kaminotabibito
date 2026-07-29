@@ -3,6 +3,8 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
 local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_0["注册聊天命令监听"]
 local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
@@ -30,7 +32,7 @@ local function _____8BFB_53D6_5F53_524D_9B54_6CD5(unit)
     return GetUnitState(unit, UNIT_STATE_MANA)
 end
 local function _____8BFB_53D6_6700_5927_9B54_6CD5(unit)
-    return GetUnitState(unit, UNIT_STATE_MAX_MANA)
+    return GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA)
 end
 local function ____on_804A_5929146_9B54_6CD5_6D88_8017_51CF_5C11_6263_84DD_6D4B_8BD5(player, _command)
     local _____5927_6CD5_5E08 = getRegisteredPlayerHero(player)

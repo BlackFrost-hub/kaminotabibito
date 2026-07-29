@@ -77,6 +77,7 @@ export interface 通用位移参数 {
   暂停单位?: boolean;
   禁用碰撞?: boolean;
   位移特效?: string;
+  附加位移特效?: string;
 
   命中半径?: number;
   只命中敌人?: boolean;
@@ -127,6 +128,7 @@ export interface 位移实例 {
   暂停单位: boolean;
   禁用碰撞: boolean;
   位移特效: string;
+  附加位移特效: string;
   命中半径: number;
   只命中敌人: boolean;
   允许命中自己: boolean;
@@ -226,7 +228,11 @@ export function 单位已被暂停(单位: any): boolean {
 }
 
 export function 播放位移特效(实例: 位移实例): void {
-  const 模型 = 实例.位移特效;
+  播放单个位移特效(实例.位移特效, 实例);
+  播放单个位移特效(实例.附加位移特效, 实例);
+}
+
+function 播放单个位移特效(模型: string, 实例: 位移实例): void {
   if (模型 == null || 模型 === "") return;
   const 特效 = jass.AddSpecialEffect(模型, jass.GetUnitX(实例.单位) as number, jass.GetUnitY(实例.单位) as number);
   if (特效 != null && 特效 !== 0) {

@@ -42,6 +42,8 @@ local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_6["创建循�
 local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
 local X_FixUnitStandingSafe = ____require_result_7.X_FixUnitStandingSafe
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
@@ -152,7 +154,7 @@ local function _____521B_5EFA_7EC8_6781_6C61_67D3_6838_5FC3(context, point, hp)
 end
 local function _____521B_5EFA_7EC8_6781_6C61_67D3_6838_5FC3_7EC4(context)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["终极污染"]
-    local maxLife = GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE)
     local hp = maxLife * config["核心生命Boss最大生命比例"]
     local points = _____53D6_6838_5FC3_51FA_751F_70B9_8868()
     local count = config["核心数量"] < #points and config["核心数量"] or #points

@@ -46,6 +46,7 @@ const { getServerTime } = require('系统.00．核心系统.05．中心计时器
 
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -269,7 +270,7 @@ function 结算女妖哭嚎(this: void, instance: 一切生命的终点实例): 
     造成AOE技能伤害({
       来源: boss,
       目标: hero,
-      伤害: GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg.女妖哭嚎致命伤害最大生命比例,
+      伤害: GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg.女妖哭嚎致命伤害最大生命比例,
       attack: false,
       ranged: true,
       attackType: ATTACK_TYPE_CHAOS,

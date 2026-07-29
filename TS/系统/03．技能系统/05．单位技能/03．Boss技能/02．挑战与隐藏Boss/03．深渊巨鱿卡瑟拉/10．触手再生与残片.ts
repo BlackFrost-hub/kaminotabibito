@@ -20,6 +20,8 @@ const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技�
   造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -83,7 +85,7 @@ function 选择最低生命玩家(this: void, boss: any): any {
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
-    const maxLife = GetUnitState(hero, UNIT_STATE_MAX_LIFE);
+    const maxLife = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE);
     if (!(maxLife > 0)) continue;
     const ratio = GetUnitState(hero, UNIT_STATE_LIFE) / maxLife;
     if (ratio < bestRatio) {
@@ -238,7 +240,7 @@ function 应用触手精华(this: void, context: 卡瑟拉运行时上下文, co
   if (count <= 0) return;
   const boss = context.Boss单位;
   const cfg = 卡瑟拉数值与表现配置.触手残片;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   治疗Boss固定值(boss, maxLife * cfg.Boss每片回血比例 * count);
   context.触手精华层数 = context.触手精华层数 + count;
   const attackBonus = 读取单位攻击力(boss) * cfg.精华每层攻击加成 * count;

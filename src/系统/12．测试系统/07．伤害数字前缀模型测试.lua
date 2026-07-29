@@ -62,6 +62,8 @@ end
 -- - 数字闪避：临时步兵攻击大法师，强制闪避，观察大法师头顶闪避图标。
 -- - 数字未命中：大法师攻击临时步兵，强制未命中，观察大法师头顶未命中图标。
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local SetUnitStateJapi = japi.SetUnitState
 local globals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
 local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_0["注册聊天命令监听"]
@@ -118,7 +120,7 @@ local function _____521B_5EFA_4E34_65F6_5355_4F4D(nearUnit, offsetX)
     if not _____5355_4F4D_6709_6548(unit) then
         return nil
     end
-    SetUnitState(unit, UNIT_STATE_MAX_LIFE, _____4E34_65F6_5355_4F4D_751F_547D)
+    SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, _____4E34_65F6_5355_4F4D_751F_547D)
     SetUnitState(unit, UNIT_STATE_LIFE, _____4E34_65F6_5355_4F4D_751F_547D)
     _____5F85_6E05_7406_5355_4F4D = unit
     createDelayedCall(_____6E05_7406_5EF6_8FDF, _____6E05_7406_4E34_65F6_5355_4F4D)

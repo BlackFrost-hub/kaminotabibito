@@ -3,6 +3,8 @@
 import { 读取单位攻击力 } from "./19．战斗公共工具";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -29,7 +31,7 @@ function 取当前生命(this: void, unit: any): number {
 
 function 取最大生命(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
-  const value = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  const value = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
   return value > 0 ? value : 0;
 }
 
@@ -52,4 +54,3 @@ export function 计算组合技能伤害(this: void, 来源: any, 目标: any, �
   if (参数.最大值 != null && damage > 参数.最大值) damage = 参数.最大值;
   return damage > 0 ? damage : 0;
 }
-

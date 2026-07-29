@@ -18,6 +18,7 @@ const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09�
 };
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -27,7 +28,7 @@ const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => void) | undefined;
 function 生命比例(this: void, unit: any): number {
-  const maxLife = unit != null && unit !== 0 ? GetUnitState(unit, UNIT_STATE_MAX_LIFE) : 0;
+  const maxLife = unit != null && unit !== 0 ? GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) : 0;
   return maxLife > 0 ? GetUnitState(unit, UNIT_STATE_LIFE) / maxLife : 0;
 }
 
@@ -115,7 +116,7 @@ export function 绑定祖地双灵卫侵蚀生命下限(this: void, context: 祖
         return !context.战斗已结束 && (context.阶段 === 'P1双灵守门' || context.阶段 === 'P2侵蚀失衡');
       },
       取生命下限: function 取双灵卫侵蚀生命下限(this: void, target: any): number {
-        return GetUnitState(target, UNIT_STATE_MAX_LIFE) * 取侵蚀阶段生命下限比例(context, target);
+        return GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * 取侵蚀阶段生命下限比例(context, target);
       },
       on首次触底: function 双灵卫侵蚀首次触底(this: void): void {
         const now = getServerTime();

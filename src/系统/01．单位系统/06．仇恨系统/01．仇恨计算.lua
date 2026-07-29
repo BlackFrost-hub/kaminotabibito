@@ -8,6 +8,8 @@ local ____exports = {}
 -- 攻击者会经过 伤害映射 处理：玩家 0-4 的非英雄单位被映射为对应玩家英雄。
 -- 玩家判定范围 0-4（含未来扩展的玩家4）。
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_0.registerAppliedFinalDamageListener
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
@@ -73,7 +75,7 @@ local function onDamage(target, attacker, applied, _damageType)
     if not ____attacker_662F_73A9_5BB6_5355_4F4D then
         return
     end
-    local maxHp = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local maxHp = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     if maxHp <= 0 then
         return
     end

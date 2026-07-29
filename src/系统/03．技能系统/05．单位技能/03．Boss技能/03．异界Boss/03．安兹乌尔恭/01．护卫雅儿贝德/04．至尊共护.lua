@@ -16,6 +16,8 @@ local ____require_result_2 = require("系统.00．核心系统.05．中心计时
 local getServerTime = ____require_result_2.getServerTime
 local addDelayedCallback = ____require_result_2.addDelayedCallback
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -64,8 +66,8 @@ ____exports["启动雅儿贝德至尊共护"] = function(context, largeSkillSeco
         guardState["共同护盾生效"] = false
         _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664({
             ["目标"] = albedo,
-            ["数值"] = GetUnitState(albedo, UNIT_STATE_MAX_LIFE) * cfg["守护者模式"]["至尊共护破碎生命代价比例"],
-            ["最低生命"] = GetUnitState(albedo, UNIT_STATE_MAX_LIFE) * cfg["守护者模式"]["雅儿贝德锁血比例"],
+            ["数值"] = GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE) * cfg["守护者模式"]["至尊共护破碎生命代价比例"],
+            ["最低生命"] = GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE) * cfg["守护者模式"]["雅儿贝德锁血比例"],
             ["显示文字"] = true
         })
         guardState["阶段状态"] = "失衡"

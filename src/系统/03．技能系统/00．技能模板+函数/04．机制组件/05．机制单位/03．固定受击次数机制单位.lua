@@ -7,6 +7,8 @@ local ____exports = {}
 local ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D["创建可攻击机制单位"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
@@ -84,7 +86,7 @@ local function _____56FA_5B9A_53D7_51FB_6B21_6570_4F24_5BB3_4FEE_6B63(context)
             SetUnitState(
                 _____8BB0_5F55["实例"]["单位"],
                 UNIT_STATE_LIFE,
-                GetUnitState(_____8BB0_5F55["实例"]["单位"], UNIT_STATE_MAX_LIFE) * _____5269_4F59_6B21_6570 / _____603B_6B21_6570
+                GetUnitStateJapi(_____8BB0_5F55["实例"]["单位"], UNIT_STATE_MAX_LIFE) * _____5269_4F59_6B21_6570 / _____603B_6B21_6570
             )
         end
     end
@@ -118,7 +120,12 @@ function _____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_7
     self["剩余次数"] = _____5269_4F59_6B21_6570
 end
 _____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.prototype["是否存活"] = function(self)
-    return not self["已销毁"] and self["剩余次数"] > 0 and self["基础实例"]["是否存活"]()
+    local ____temp_7 = not self["已销毁"] and self["剩余次数"] > 0
+    if ____temp_7 then
+        local ____self_6 = self["基础实例"]
+        ____temp_7 = ____self_6["是否存活"](____self_6)
+    end
+    return ____temp_7
 end
 _____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.prototype["读取剩余次数"] = function(self)
     return self["剩余次数"]
@@ -132,7 +139,8 @@ _____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.proto
     end
     self["已销毁"] = true
     __TS__Delete(_____56FA_5B9A_53D7_51FB_6B21_6570_5355_4F4D_8868, self.ID)
-    self["基础实例"]["销毁"]()
+    local ____self_8 = self["基础实例"]
+    ____self_8["销毁"](____self_8)
 end
 ____exports["创建固定受击次数机制单位"] = function(_____53C2_6570)
     _____786E_4FDD_56FA_5B9A_53D7_51FB_6B21_6570_4F24_5BB3_4FEE_6B63()

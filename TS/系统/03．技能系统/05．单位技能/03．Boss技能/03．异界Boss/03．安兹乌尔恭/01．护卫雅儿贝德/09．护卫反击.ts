@@ -18,6 +18,8 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
 };
 
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -168,7 +170,7 @@ export function 释放雅儿贝德护卫反击(this: void, context: 安兹运行
     触发条件: function 护卫反击爆发过滤(this: void, damage: any): boolean {
       if (!单位有效(damage.attacker) || !IsUnitEnemy(damage.attacker, GetOwningPlayer(albedo))) return false;
       if (damage.isNormalAttack !== true && damage.isSkillDamage !== true && damage.isSkillAttack !== true) return false;
-      return damage.currentDamage >= GetUnitState(albedo, UNIT_STATE_MAX_LIFE) * cfg.护卫反击触发伤害最大生命比例;
+      return damage.currentDamage >= GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE) * cfg.护卫反击触发伤害最大生命比例;
     },
     on反击: function 护卫反击触发(this: void, damage: any): void {
       if (counterTriggered) return;

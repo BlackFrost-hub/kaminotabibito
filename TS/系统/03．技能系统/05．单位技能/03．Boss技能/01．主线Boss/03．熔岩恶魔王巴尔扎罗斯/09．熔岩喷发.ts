@@ -41,6 +41,7 @@ const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -116,7 +117,7 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
       for (let i = 0; i < units.length; i++) {
         const unit = units[i];
         if (!单位有效(unit)) continue;
-        const damage = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * config.残留伤害目标最大生命比例;
+        const damage = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * config.残留伤害目标最大生命比例;
         造成AOE技能伤害({
           技能ID: 熔岩喷发技能ID,
           来源: boss,

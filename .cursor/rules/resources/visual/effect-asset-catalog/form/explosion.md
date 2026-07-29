@@ -18,3 +18,4 @@
 | `Common\Effect\Form\Explosion\AronkosMeteorLandingBurst.mdx` | 候选截图观察：蓝白闪电与落点放射能量从中心扩散，补足英灵陨星接地瞬间的电光爆发。 | 迁移后序列：`Stand / Birth / Death`；完成 4 项结构修复。 | 亚伦柯斯·英灵陨星落地爆发；源候选 `JNTX (160).mdx`。 | 与坠落先导和余波按时序使用，不能三个主层同时满亮度叠放。 | 12633 | `7AE420E527D657D9` |
 | `Common\Effect\Form\Explosion\TrollChiefExpandingShockwaveImpact.mdx` | 明亮红橙圆环贴地展开，中心伴随垂直红色冲击柱和短促放射尖芒。 | 一次性 `Stand`，约 1.5 秒；迁移时补充安全 `Death`。 | 树魔首领扩散冲击波生效时的新增冲击层；源候选 `155.mdx`。 | 画面亮度较高，当前以 `2.0` 缩放叠加原有战争践踏效果；不要用作持续预警边界。 | 21499 | `3F86F8B64FB1DC0B` |
 | `Common\Effect\Form\Explosion\DevilSlam.mdx` | 蓝紫色贴地冲击波从黑暗核心向外爆发，中央伴随竖直光柱与尖锐能量芒。 | 瞬时落点爆发。 | 菲尼克斯尔永恒轮回失败时的全场暗火伤害命中。 | 当前以 `1.0` 缩放播放；8条贴图均保留为 Warcraft 原生路径。 | 13339 | `24B0801DC1CD42AB` |
+| `Common\Effect\Form\Explosion\WhiteSlashImpact.mdx` | 骨白圆形冲击环外叠一圈宽大的弧形剑光，中心留有清晰空洞。 | 一次性 `Birth`，从命中点瞬时展开。 | 亚伦柯斯亡冥英斩命中的附加白色斩击层。 | 与原有魂光命中特效叠加，不单独承担伤害范围提示。 | 4171 | `83BEE4B073C11085` |

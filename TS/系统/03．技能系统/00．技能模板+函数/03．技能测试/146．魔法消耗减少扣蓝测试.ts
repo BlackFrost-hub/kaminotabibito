@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
   注册聊天命令监听: (this: void, 命令: string, 回调: (this: void, player: any, command: string) => void) => void;
@@ -39,7 +41,7 @@ function 读取当前魔法(this: void, unit: any): number {
 }
 
 function 读取最大魔法(this: void, unit: any): number {
-  return GetUnitState(unit, UNIT_STATE_MAX_MANA);
+  return GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA);
 }
 
 function on聊天146魔法消耗减少扣蓝测试(this: void, player: any, _command: string): void {

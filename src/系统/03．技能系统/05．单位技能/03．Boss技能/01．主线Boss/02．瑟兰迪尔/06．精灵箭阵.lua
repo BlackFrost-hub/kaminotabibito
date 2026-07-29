@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____64AD_653E_51FA_751F_7279_6548, _____53D6_7CBE_7075_7BAD_9635_76EE_6807_6743_91CD, _____8BFB_53D6_7CBE_7075_7BAD_9635Boss_653B_51FB_529B, _____9009_62E9_7CBE_7075_7BAD_9635_5C04_51FB_76EE_6807, _____521B_5EFA_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_53EC_5524_7269, ____on_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_751F_6548, _____521B_5EFA_53EC_5524_7269, _____521B_5EFA_70B9_7279_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____6CE8_518C_7AD9_6869_5F39_5E55_5C04_51FB_5355_4F4D, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, getBuffRuntime, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_MAX_LIFE, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7CBE_7075_7BAD_9635_6280_80FDID
+local _____64AD_653E_51FA_751F_7279_6548, _____53D6_7CBE_7075_7BAD_9635_76EE_6807_6743_91CD, _____8BFB_53D6_7CBE_7075_7BAD_9635Boss_653B_51FB_529B, _____9009_62E9_7CBE_7075_7BAD_9635_5C04_51FB_76EE_6807, _____521B_5EFA_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_53EC_5524_7269, ____on_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_751F_6548, _____521B_5EFA_53EC_5524_7269, _____521B_5EFA_70B9_7279_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____6CE8_518C_7AD9_6869_5F39_5E55_5C04_51FB_5355_4F4D, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, getBuffRuntime, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, UNIT_STATE_MAX_LIFE, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7CBE_7075_7BAD_9635_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
@@ -56,7 +56,7 @@ function _____521B_5EFA_745F_5170_8FEA_5C14_7CBE_7075_7BAD_9635_53EC_5524_7269(b
     end
     local x = GetUnitX(boss)
     local y = GetUnitY(boss)
-    local hp = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config["生命倍率"]
+    local hp = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config["生命倍率"]
     local damage = _____8BFB_53D6_7CBE_7075_7BAD_9635Boss_653B_51FB_529B(boss) * config["伤害倍率"]
     local spawnDistance = config["出生距离"] > 360 and 360 or config["出生距离"]
     local offsets = {{spawnDistance, 0}, {-spawnDistance, 0}, {0, spawnDistance}, {0, -spawnDistance}}
@@ -157,10 +157,12 @@ _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex = ____require_resul
 local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
 getBuffRuntime = ____require_result_6.getBuffRuntime
 local jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-GetUnitState = jass.GetUnitState
+local GetUnitState = jass.GetUnitState
 local AddSpecialEffect = jass.AddSpecialEffect
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])

@@ -20,6 +20,8 @@ local ____require_result_1 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local getServerTime = ____require_result_1.getServerTime
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -200,7 +202,7 @@ ____exports["释放雅儿贝德护卫反击"] = function(context)
             if damage.isNormalAttack ~= true and damage.isSkillDamage ~= true and damage.isSkillAttack ~= true then
                 return false
             end
-            return damage.currentDamage >= GetUnitState(albedo, UNIT_STATE_MAX_LIFE) * cfg["护卫反击触发伤害最大生命比例"]
+            return damage.currentDamage >= GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE) * cfg["护卫反击触发伤害最大生命比例"]
         end,
         ["on反击"] = function(damage)
             if counterTriggered then

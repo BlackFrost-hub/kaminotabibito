@@ -7,6 +7,7 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 import { SUC_IsUnitAlive, SUC_IsUnitInvincible, SUC_IsValidUnit } from "./08．单位判定与筛选函数";
 
@@ -51,7 +52,7 @@ export function SU_GetHeroAllState(u: any, b: boolean): number {
 export function SU_GetUnitLostHPPercent(u: any): number {
   if (!SUC_IsValidUnit(u)) return 0;
 
-  const maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE);
   const life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE);
 
   if (maxLife <= 0) return 0;
@@ -62,7 +63,7 @@ export function SU_GetUnitLostHPPercent(u: any): number {
 export function SU_GetUnitLostHP(u: any): number {
   if (!SUC_IsValidUnit(u)) return 0;
 
-  const maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE);
   const life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE);
 
   return maxLife - life;
@@ -73,7 +74,7 @@ export function UnitAddHp(u: any, value: number, b: boolean): void {
   if (!SUC_IsValidUnit(u)) return;
 
   const life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE);
-  const maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE);
 
   const percent = maxLife > 0 ? life / maxLife : 1;
   const addValue = b ? maxLife * value : value;

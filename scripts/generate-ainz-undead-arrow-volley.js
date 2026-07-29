@@ -392,7 +392,7 @@ Materials 3 {
     }
     Material {
         Layer {
-            FilterMode Blend,
+            FilterMode Transparent,
             Unshaded,
             TwoSided,
             Unfogged,
@@ -449,6 +449,9 @@ if (verified.name !== 'AinzUndeadArrowVolley' || verified.geosets.length !== 3 |
 }
 if (verified.textures.length !== expectedTextures.length || verified.textures.some((texture, index) => texture.path !== expectedTextures[index])) {
   throw new Error('Generated MDX texture verification failed');
+}
+if (verified.materials[2].layers[0].filterMode !== 1) {
+  throw new Error('Arrow texture layer must use Transparent filter mode');
 }
 
 process.stdout.write(JSON.stringify({

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local getServerTime, doHeal, GetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
+local getServerTime, doHeal, GetUnitStateJapi, GetUnitState, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local _____4E24_5355_4F4D_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间距离平方"]
@@ -32,7 +32,7 @@ ____exports["推进安兹守护者模式"] = function(context)
         return
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]
-    local maxLife = GetUnitState(albedo, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE)
     if maxLife <= 0 then
         return
     end
@@ -84,6 +84,8 @@ getServerTime = ____require_result_4.getServerTime
 local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 doHeal = ____require_result_5.doHeal
 local jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -128,7 +130,7 @@ local function _____96C5_513F_8D1D_5FB7_8054_5408_4F24_5BB3_4FEE_6B63(damage)
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]
     if damage.target == albedo then
-        local maxLife = GetUnitState(albedo, UNIT_STATE_MAX_LIFE)
+        local maxLife = GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE)
         local minimumLife = maxLife * cfg["雅儿贝德锁血比例"]
         local currentLife = GetUnitState(albedo, UNIT_STATE_LIFE)
         local allowed = currentLife - minimumLife
@@ -187,7 +189,7 @@ local function _____521B_5EFA_96C5_513F_8D1D_5FB7_5355_4F4D(context)
                 X = GetUnitX(boss) + Cos(angle) * cfg["雅儿贝德出生距离"],
                 Y = GetUnitY(boss) + Sin(angle) * cfg["雅儿贝德出生距离"],
                 ["朝向"] = facing,
-                ["生命值"] = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg["雅儿贝德生命比例"],
+                ["生命值"] = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg["雅儿贝德生命比例"],
                 ["生命值受小怪倍率"] = false,
                 ["攻击力"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["雅儿贝德攻击比例"],
                 ["攻击间隔"] = cfg["雅儿贝德攻击间隔"],

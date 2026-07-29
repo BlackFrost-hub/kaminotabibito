@@ -23,6 +23,8 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位有效"]
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -34,7 +36,7 @@ local function _____7C73_4E9A_53EF_8C03_5EA6(context)
     return _____5355_4F4D_6709_6548(context["Boss单位"]) and not context["终极污染引导中"]
 end
 local function _____5230_8FBE_751F_547D_9608_503C(context, threshold)
-    local maxLife = GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE)
     return maxLife > 0 and GetUnitState(context["Boss单位"], UNIT_STATE_LIFE) / maxLife <= threshold
 end
 local function _____662FP1(context)

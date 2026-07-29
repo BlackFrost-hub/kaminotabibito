@@ -27,6 +27,8 @@ local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单�
 local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_5.doHeal
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -82,7 +84,7 @@ local function _____5B89_6392_5206_8EAB_5230_671F_7ED3_7B97(context, summons)
             if not _____5355_4F4D_6709_6548(boss) then
                 return
             end
-            local healPerSummon = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config["未击杀每只恢复生命比例"]
+            local healPerSummon = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config["未击杀每只恢复生命比例"]
             local aliveCount = 0
             do
                 local i = 0
@@ -118,7 +120,7 @@ ____exports["触发米亚灵猫分身"] = function(context)
     local bossX = GetUnitX(boss)
     local bossY = GetUnitY(boss)
     local facing = GetUnitFacing(boss)
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     local rawAttack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss)
     local attack = rawAttack > 0 and rawAttack or _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E["Boss攻击力兜底"]
     local summons = {}

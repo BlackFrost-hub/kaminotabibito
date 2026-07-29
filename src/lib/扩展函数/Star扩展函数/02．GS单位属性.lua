@@ -4,6 +4,7 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local SetUnitLifePercentBJ = ____require_result_0.SetUnitLifePercentBJ
@@ -44,22 +45,22 @@ function ____exports.GS_LoadUintProperty(u, i)
         return GetUnitState(u, jass.UNIT_STATE_LIFE) or 0
     end
     if i == 1 then
-        return GetUnitState(u, jass.UNIT_STATE_MAX_MANA) or 0
+        return GetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA) or 0
     end
     if i == 2 then
-        return GetUnitState(
+        return GetUnitStateJapi(
             u,
             ConvertUnitState(18)
         ) or 0
     end
     if i == 3 then
-        return GetUnitState(
+        return GetUnitStateJapi(
             u,
             ConvertUnitState(32)
         ) or 0
     end
     if i == 4 then
-        return GetUnitState(
+        return GetUnitStateJapi(
             u,
             ConvertUnitState(81)
         ) or 0
@@ -93,7 +94,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
         SetUnitState(
             u,
             jass.UNIT_STATE_MAX_LIFE,
-            GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) + r * (1 + loadReal(HS, uid, 15))
+            GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE) + r * (1 + loadReal(HS, uid, 15))
         )
         SetUnitLifePercentBJ(nil, u, hp)
         return
@@ -103,7 +104,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
         SetUnitState(
             u,
             jass.UNIT_STATE_MAX_MANA,
-            GetUnitState(u, jass.UNIT_STATE_MAX_MANA) + r
+            GetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA) + r
         )
         SetUnitManaPercentBJ(nil, u, hp)
         return
@@ -112,7 +113,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
         SetUnitState(
             u,
             ConvertUnitState(18),
-            GetUnitState(
+            GetUnitStateJapi(
                 u,
                 ConvertUnitState(18)
             ) + r * (1 + loadReal(HS, uid, 16))
@@ -123,7 +124,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
         SetUnitState(
             u,
             ConvertUnitState(32),
-            GetUnitState(
+            GetUnitStateJapi(
                 u,
                 ConvertUnitState(32)
             ) + r * (1 + loadReal(HS, uid, 17))
@@ -134,7 +135,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
         SetUnitState(
             u,
             ConvertUnitState(81),
-            GetUnitState(
+            GetUnitStateJapi(
                 u,
                 ConvertUnitState(81)
             ) + r
@@ -155,7 +156,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
         SetUnitState(
             u,
             jass.UNIT_STATE_MAX_LIFE,
-            GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) / (1 + loadReal(HS, uid, i)) * (1 + loadReal(HS, uid, i) + r)
+            GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE) / (1 + loadReal(HS, uid, i)) * (1 + loadReal(HS, uid, i) + r)
         )
         SetUnitLifePercentBJ(nil, u, hp)
         saveReal(
@@ -171,7 +172,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
             SetUnitState(
                 u,
                 ConvertUnitState(18),
-                GetUnitState(
+                GetUnitStateJapi(
                     u,
                     ConvertUnitState(18)
                 ) / (1 + loadReal(HS, uid, i)) * (1 + loadReal(HS, uid, i) + r)
@@ -180,7 +181,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
             SetUnitState(
                 u,
                 ConvertUnitState(18),
-                GetUnitState(
+                GetUnitStateJapi(
                     u,
                     ConvertUnitState(18)
                 ) / (1 + loadReal(HS, uid, i)) * (1 + loadReal(HS, uid, i) + r) + 1
@@ -198,7 +199,7 @@ function ____exports.GS_Unit_Pry_change(u, i, r)
         SetUnitState(
             u,
             ConvertUnitState(32),
-            GetUnitState(
+            GetUnitStateJapi(
                 u,
                 ConvertUnitState(32)
             ) / (1 + loadReal(HS, uid, i)) * (1 + loadReal(HS, uid, i) + r)

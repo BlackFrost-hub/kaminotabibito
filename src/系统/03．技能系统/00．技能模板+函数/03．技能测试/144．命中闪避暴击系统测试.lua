@@ -57,6 +57,8 @@ end
 -- 当前只保留一个场景：
 -- 敌人攻击大法师，2 秒内造成 20 次 10 点魔法伤害，测试 10% 闪避。
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local globals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
 local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_0["注册聊天命令监听"]
@@ -134,7 +136,7 @@ local function _____521B_5EFA_654C_4EBA(target)
     return enemy
 end
 local function _____8BBE_7F6E_76EE_6807_6EE1_8840(target)
-    local _____6700_5927_751F_547D = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local _____6700_5927_751F_547D = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     SetUnitState(target, UNIT_STATE_LIFE, _____6700_5927_751F_547D)
     debugLogForce(_____6A21_5757_540D, "已设置满血", "life=", _____6700_5927_751F_547D)
 end

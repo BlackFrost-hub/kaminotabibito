@@ -54,6 +54,7 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -175,7 +176,7 @@ function 执行咆哮波命中(this: void, context: 巴尔扎罗斯运行时上�
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(unit)) return;
   if (是巴尔扎罗斯护卫(context, unit)) {
-    治疗单位(boss, unit, GetUnitState(unit, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.恶魔咆哮波.护卫命中治疗最大生命比例);
+    治疗单位(boss, unit, GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.恶魔咆哮波.护卫命中治疗最大生命比例);
     return;
   }
   造成AOE技能伤害({

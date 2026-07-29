@@ -17,6 +17,8 @@ const { 获取Boss技能最近敌对英雄, 获取Boss技能随机敌对英雄 }
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -58,7 +60,7 @@ function 取亡者凝视冷却(this: void, context: 亚伦柯斯运行时上下�
 }
 
 function 到达最终强化阈值(this: void, context: 亚伦柯斯运行时上下文): boolean {
-  const maxLife = GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
   return maxLife > 0 && GetUnitState(context.Boss单位, UNIT_STATE_LIFE) / maxLife <= 亚伦柯斯正式设计配置.阶段阈值.最终强化生命比例;
 }
 
@@ -90,13 +92,13 @@ export function 注册亚伦柯斯技能调度(this: void): void {
       可释放: function 最终强化可释放(this: void, context: 亚伦柯斯运行时上下文): boolean { return !context.已触发最终强化 && 到达最终强化阈值(context); },
       执行: function 执行最终强化(this: void, context: 亚伦柯斯运行时上下文): boolean { return 触发亚伦柯斯最终强化(context); },
     }, {
-      key: '英灵陨星', 冷却毫秒: 取英灵陨星冷却, 首次延迟毫秒: 5200, 忙碌毫秒: (meteor.预警秒 + meteor.P2落点数量 * meteor.落点间隔秒 + 0.5) * 1000, 优先级: 25, 权重: 1, 互斥组: '亚伦柯斯主要机制',
+      key: '英灵陨星', 冷却毫秒: 取英灵陨星冷却, 首次延迟毫秒: 5200, 忙碌毫秒: (meteor.预警秒 + (meteor.P2批次数量 - 1) * meteor.批次间隔秒 + 0.5) * 1000, 优先级: 25, 权重: 1, 互斥组: '亚伦柯斯主要机制',
       执行: function 执行英灵陨星(this: void, context: 亚伦柯斯运行时上下文): boolean { return 释放亚伦柯斯英灵陨星(context); },
     }, {
       key: '亡者凝视', 冷却毫秒: 取亡者凝视冷却, 首次延迟毫秒: 4200, 忙碌毫秒: (gaze.前摇秒 + 0.5) * 1000, 优先级: 20, 权重: 1, 互斥组: '亚伦柯斯主要机制', 选择目标: 选择随机目标,
       执行: function 执行亡者凝视(this: void, context: 亚伦柯斯运行时上下文, target: any): boolean { return 释放亚伦柯斯亡者凝视(context, target); },
     }, {
-      key: '亡冥英斩', 冷却毫秒: 取亡冥英斩冷却, 首次延迟毫秒: 2600, 忙碌毫秒: (slash.前摇秒 + slash.推进秒 + slash.P3归魂延迟秒 + 0.4) * 1000, 优先级: 20, 权重: 1, 互斥组: '亚伦柯斯主要机制', 选择目标: 选择最近目标,
+      key: '亡冥英斩', 冷却毫秒: 取亡冥英斩冷却, 首次延迟毫秒: 2600, 忙碌毫秒: (slash.前摇秒 + slash.推进秒 + slash.P3归魂延迟秒 + slash.P3归魂推进秒 + 0.4) * 1000, 优先级: 20, 权重: 1, 互斥组: '亚伦柯斯主要机制', 选择目标: 选择最近目标,
       执行: function 执行亡冥英斩(this: void, context: 亚伦柯斯运行时上下文, target: any): boolean { return 释放亚伦柯斯亡冥英斩(context, target); },
     }],
     成功后: function 亚伦柯斯技能成功(this: void, context: 亚伦柯斯运行时上下文): void {

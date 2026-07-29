@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5B62_5B50_4E91Tick, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____521B_5EFA_70B9_7279_6548, _____521B_5EFA_6280_80FD_63D0_793A_5708, GetUnitX, GetUnitY, GetRandomReal, IssuePointOrder, GetUnitState, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, UNIT_STATE_MAX_LIFE, removePeriodicCallback, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____8150_8D25_5B62_5B50_4E91_6280_80FDID
+local _____5B62_5B50_4E91Tick, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____521B_5EFA_70B9_7279_6548, _____521B_5EFA_6280_80FD_63D0_793A_5708, GetUnitStateJapi, GetUnitX, GetUnitY, GetRandomReal, IssuePointOrder, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, UNIT_STATE_MAX_LIFE, removePeriodicCallback, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____8150_8D25_5B62_5B50_4E91_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.00．配置")
 local _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["莫尔特斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.01．运行时上下文")
@@ -51,7 +51,7 @@ function _____5B62_5B50_4E91Tick(data)
                 if dx * dx + dy * dy > cfg["半径"] * cfg["半径"] then
                     goto __continue7
                 end
-                local damage = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["每秒目标最大生命比例"]
+                local damage = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg["每秒目标最大生命比例"]
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____8150_8D25_5B62_5B50_4E91_6280_80FDID,
                     ["来源"] = boss,
@@ -96,13 +96,15 @@ _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 GetRandomReal = jass.GetRandomReal
 IssuePointOrder = jass.IssuePointOrder
-GetUnitState = jass.GetUnitState
+local GetUnitState = jass.GetUnitState
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS

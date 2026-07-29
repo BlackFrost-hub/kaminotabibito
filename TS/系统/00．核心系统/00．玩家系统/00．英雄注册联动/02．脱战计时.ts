@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const g = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
@@ -10,11 +12,11 @@ const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息"
 };
 
 function 设置生命百分比(this: void, unit: any, pct: number): void {
-  const maxLife = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE);
   jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife * (pct > 0 ? pct : 0) * 0.01);
 }
 function 设置魔法百分比(this: void, unit: any, pct: number): void {
-  const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA);
   jass.SetUnitState(unit, jass.UNIT_STATE_MANA, maxMana * (pct > 0 ? pct : 0) * 0.01);
 }
 function 拥有Buff(this: void, unit: any, buffId: number): boolean {
@@ -126,7 +128,7 @@ function Boss脱战完成(this: void): void {
 function 检查移除脱战Buff(this: void, unit: any, damage: number): void {
   if (!拥有Buff(unit, 脱战BuffID)) return;
 
-  const 最大生命 = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE);
+  const 最大生命 = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE);
   const 阈值 = 最大生命 * 脱战伤害阈值比例;
 
   if (damage >= 阈值) {

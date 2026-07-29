@@ -30,6 +30,8 @@ const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as 
   getBuffRuntime: (this: void, unit: any, buffID: string) => any;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -74,7 +76,7 @@ function 创建瑟兰迪尔精灵箭阵召唤物(this: void, boss: any): void {
 
   const x = GetUnitX(boss);
   const y = GetUnitY(boss);
-  const hp = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config.生命倍率;
+  const hp = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config.生命倍率;
   const damage = 读取精灵箭阵Boss攻击力(boss) * config.伤害倍率;
   const spawnDistance = config.出生距离 > 360 ? 360 : config.出生距离;
   const offsets = [

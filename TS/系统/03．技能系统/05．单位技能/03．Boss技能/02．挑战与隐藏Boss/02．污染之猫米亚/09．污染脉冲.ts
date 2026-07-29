@@ -30,6 +30,7 @@ const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -123,7 +124,7 @@ function 结算污染脉冲波(this: void, context: 米亚运行时上下文, wa
     if (!单位有效(target)) continue;
     if (单位在有效安全域内(context, target)) continue;
     if (距离平方(centerX, centerY, GetUnitX(target), GetUnitY(target)) > radius2) continue;
-    const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+    const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
     造成AOE技能伤害({
       来源: boss,
       目标: target,

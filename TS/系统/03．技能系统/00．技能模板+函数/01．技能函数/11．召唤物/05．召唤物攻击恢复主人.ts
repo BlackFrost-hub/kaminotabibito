@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetHandleId = jass.GetHandleId as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -70,10 +72,10 @@ function on召唤物攻击恢复主人(this: void, target: any, _attacker: any, 
   const lifeEnabled = 参数.生命恢复条件 == null || 参数.生命恢复条件(summon, owner, target, snapshot);
   const manaEnabled = 参数.魔法恢复条件 == null || 参数.魔法恢复条件(summon, owner, target, snapshot);
   const lifeAmount = lifeEnabled
-    ? 计算恢复值(参数.固定生命恢复, 参数.主人最大生命恢复比例, GetUnitState(owner, UNIT_STATE_MAX_LIFE))
+    ? 计算恢复值(参数.固定生命恢复, 参数.主人最大生命恢复比例, GetUnitStateJapi(owner, UNIT_STATE_MAX_LIFE))
     : 0;
   const manaAmount = manaEnabled
-    ? 计算恢复值(参数.固定魔法恢复, 参数.主人最大魔法恢复比例, GetUnitState(owner, UNIT_STATE_MAX_MANA))
+    ? 计算恢复值(参数.固定魔法恢复, 参数.主人最大魔法恢复比例, GetUnitStateJapi(owner, UNIT_STATE_MAX_MANA))
     : 0;
   if (!(lifeAmount > 0) && !(manaAmount > 0)) return;
 

@@ -7,8 +7,10 @@ if (!modelLibraryPath) {
 }
 
 const Model = require(modelLibraryPath).default;
+const { ensureWarcraftCompatibleTransparentBlp } = require('./war3-transparent-blp');
 const outputDirectory = path.resolve(__dirname, '..', 'imports', 'Common', 'Effect', 'Form', 'Debuff');
 const mdxPath = path.join(outputDirectory, 'AinzHeartCountdown.mdx');
+const heartTexturePath = path.join(outputDirectory, 'Texture', 'AinzHeartAnatomical.blp');
 const previewPath = path.join(process.env.TEMP || outputDirectory, 'AinzHeartCountdown-preview.svg');
 const previewPpmPath = path.join(process.env.TEMP || outputDirectory, 'AinzHeartCountdown-preview.ppm');
 
@@ -272,7 +274,7 @@ Materials 2 {
     }
     Material {
         Layer {
-            FilterMode Blend,
+            FilterMode Transparent,
             TwoSided,
             Unfogged,
             static TextureID 1,
@@ -304,6 +306,7 @@ PivotPoints 2 {
 `;
 
 fs.mkdirSync(outputDirectory, { recursive: true });
+const heartTextureVerification = ensureWarcraftCompatibleTransparentBlp(heartTexturePath);
 
 const model = new Model();
 model.loadMdl(mdl);
@@ -313,6 +316,9 @@ const verified = new Model();
 verified.loadMdx(fs.readFileSync(mdxPath));
 if (verified.name !== 'AinzHeartCountdown' || verified.geosets.length !== 14 || verified.sequences.length !== 3 || verified.bones.length !== 2) {
   throw new Error('Generated MDX did not pass structural verification');
+}
+if (verified.materials[1].layers[0].filterMode !== 1) {
+  throw new Error('Heart texture layer must use Transparent filter mode');
 }
 
 const tickSvg = Array.from({ length: 12 }, (_, index) => {
@@ -401,4 +407,7 @@ process.stdout.write(JSON.stringify({
   byteLength: fs.statSync(mdxPath).size,
   geosets: verified.geosets.length,
   sequences: verified.sequences.map((sequence) => sequence.name),
+  heartTextureCompression: heartTextureVerification.compression,
+  heartTextureAlphaBits: heartTextureVerification.alphaBits,
+  heartTexturePictureType: heartTextureVerification.pictureType,
 }, null, 2));

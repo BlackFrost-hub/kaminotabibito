@@ -16,6 +16,8 @@ local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64
 local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_0.doHeal
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -43,7 +45,7 @@ local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     doHeal({
         HealSource = boss,
         HealTarget = boss,
-        HealAmount = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio,
+        HealAmount = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * ratio,
         ItemHeal = false,
         HealEffect = false
     })

@@ -27,6 +27,8 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -49,7 +51,7 @@ function 取目标腐化层数(this: void, context: 米亚运行时上下文, ta
 
 function 恢复Boss生命(this: void, boss: any, ratio: number): void {
   if (!单位存活(boss) || ratio <= 0) return;
-  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio, ItemHeal: false, HealEffect: false });
+  doHeal({ HealSource: boss, HealTarget: boss, HealAmount: GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * ratio, ItemHeal: false, HealEffect: false });
 }
 
 function 处理旧标记死亡(this: void, context: 米亚运行时上下文): void {

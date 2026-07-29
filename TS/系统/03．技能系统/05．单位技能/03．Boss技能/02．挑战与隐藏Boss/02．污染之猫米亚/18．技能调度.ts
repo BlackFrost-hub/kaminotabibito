@@ -12,6 +12,8 @@ import { 创建战斗技能调度器, type 战斗技能调度器 } from "../../.
 import { 单位有效, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -27,7 +29,7 @@ function 米亚可调度(this: void, context: 米亚运行时上下文): boolean
 }
 
 function 到达生命阈值(this: void, context: 米亚运行时上下文, threshold: number): boolean {
-  const maxLife = GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
   return maxLife > 0 && GetUnitState(context.Boss单位, UNIT_STATE_LIFE) / maxLife <= threshold;
 }
 

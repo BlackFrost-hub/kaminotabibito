@@ -23,6 +23,7 @@ local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWETimerDestroyEffectSafe = ____require_result_2.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -32,7 +33,7 @@ local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local DzSetUnitModel = japi.DzSetUnitModel
 local function _____751F_547D_6BD4_4F8B(unit)
-    local maxLife = unit ~= nil and unit ~= 0 and GetUnitState(unit, UNIT_STATE_MAX_LIFE) or 0
+    local maxLife = unit ~= nil and unit ~= 0 and GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) or 0
     return maxLife > 0 and GetUnitState(unit, UNIT_STATE_LIFE) / maxLife or 0
 end
 local function _____53D8_5F02_5B88_536B(context, name)
@@ -179,7 +180,7 @@ ____exports["绑定祖地双灵卫侵蚀生命下限"] = function(context)
                     return not context["战斗已结束"] and (context["阶段"] == "P1双灵守门" or context["阶段"] == "P2侵蚀失衡")
                 end,
                 ["取生命下限"] = function(target)
-                    return GetUnitState(target, UNIT_STATE_MAX_LIFE) * _____53D6_4FB5_8680_9636_6BB5_751F_547D_4E0B_9650_6BD4_4F8B(context, target)
+                    return GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * _____53D6_4FB5_8680_9636_6BB5_751F_547D_4E0B_9650_6BD4_4F8B(context, target)
                 end,
                 ["on首次触底"] = function()
                     local now = getServerTime()

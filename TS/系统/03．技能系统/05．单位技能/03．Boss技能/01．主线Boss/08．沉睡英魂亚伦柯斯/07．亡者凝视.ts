@@ -51,6 +51,7 @@ export function 释放亚伦柯斯亡者凝视(this: void, context: 亚伦柯斯
   context.当前大型技能 = 亡者凝视技能Key;
   context.普通机制忙碌到Ms = getServerTime() + (cfg.前摇秒 + 0.5) * 1000;
   SetUnitFacing(boss, facing);
+  开始硬直(boss, cfg.前摇秒);
   创建技能提示圈({ 类型: '扇形', X: x, Y: y, 半径: cfg.半径, 扇形角度: cfg.扇形角度, 朝向: facing, 持续时间: cfg.前摇秒, 来源单位: boss });
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: cfg.前摇秒 + 0.2, 恢复动画编号: 1 });
   播放亚伦柯斯台词(boss, '亡者凝视');

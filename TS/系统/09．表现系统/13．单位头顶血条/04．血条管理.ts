@@ -6,6 +6,7 @@ import { 取单位血条帧组, 回收单位血条帧组 } from "./03．血条�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: (this: void) => void) => void;
@@ -384,8 +385,8 @@ export function 注册单位头顶血条(this: void, unit: any): void {
     return;
   }
 
-  const maxLife = GetUnitState(unit, 最大生命状态);
-  const maxMana = GetUnitState(unit, 最大魔法状态);
+  const maxLife = GetUnitStateJapi(unit, 最大生命状态);
+  const maxMana = GetUnitStateJapi(unit, 最大魔法状态);
   const isHero = IsUnitType(unit, jass.UNIT_TYPE_HERO);
   const binding: 单位血条绑定 = {
     单位: unit,
@@ -417,7 +418,7 @@ function 注销单位头顶血条(this: void, unitId: number): void {
 function 刷新生命魔法(this: void, binding: 单位血条绑定): void {
   const unit = binding.单位;
   const life = GetUnitState(unit, 生命状态);
-  const maxLifeNow = GetUnitState(unit, 最大生命状态);
+  const maxLifeNow = GetUnitStateJapi(unit, 最大生命状态);
   if (maxLifeNow > 1) binding.最大生命缓存 = maxLifeNow;
   const maxLife = binding.最大生命缓存 > 1 ? binding.最大生命缓存 : 1;
   const display = 计算有效生命显示参数(life, maxLife, 查询单位可显示护盾值(unit));
@@ -428,7 +429,7 @@ function 刷新生命魔法(this: void, binding: 单位血条绑定): void {
 
   刷新护盾分段(binding, display.生命显示比例, display.显示容量, display.护盾值);
 
-  const maxManaNow = GetUnitState(unit, 最大魔法状态);
+  const maxManaNow = GetUnitStateJapi(unit, 最大魔法状态);
   if (maxManaNow > 0) binding.最大魔法缓存 = maxManaNow;
   调整根框尺寸(binding);
   if (binding.最大魔法缓存 > 0) {

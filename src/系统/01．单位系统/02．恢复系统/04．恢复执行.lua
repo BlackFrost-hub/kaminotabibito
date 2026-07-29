@@ -4,6 +4,8 @@ local ____exports = {}
 -- 
 -- 功能：周期性执行单位恢复
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -37,7 +39,7 @@ local function applyLifeRegen(unit, regen)
         return
     end
     local currentLife = GetUnitState(unit, UNIT_STATE_LIFE)
-    local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     local lifeGap = maxLife - currentLife
     local actualRegen = regen < lifeGap and regen or lifeGap
     if actualRegen <= 0 then
@@ -51,7 +53,7 @@ local function applyManaRegen(unit, regen)
         return
     end
     local currentMana = GetUnitState(unit, UNIT_STATE_MANA)
-    local maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA)
     local manaGap = maxMana - currentMana
     local actualRegen = regen < manaGap and regen or manaGap
     if actualRegen <= 0 then
@@ -94,7 +96,7 @@ function ____exports.processPlayerHeroRegen(unit)
         "生命恢复属性增幅",
         "real"
     ) or 0
-    local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     local totalLifeRegen = (1 + lifeRegenAmplify) * (maxLife * percentLifeRegen + totalFixedLifeRegen)
     YDUserDataSet(
         nil,
@@ -123,7 +125,7 @@ function ____exports.processPlayerHeroRegen(unit)
     ) or 0
     local totalFixedManaRegen = equipManaBonus + baseManaRegen
     local percentManaRegen = getPercentManaRegen(unit)
-    local maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA)
     local totalManaRegen = 1 * (maxMana * percentManaRegen + totalFixedManaRegen)
     YDUserDataSet(
         nil,

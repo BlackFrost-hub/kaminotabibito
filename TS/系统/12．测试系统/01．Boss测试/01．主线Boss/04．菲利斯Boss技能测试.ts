@@ -3,6 +3,8 @@
 import type { Boss测试技能命令 } from '../../00．Boss测试系统/00．Boss测试类型';
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const globals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 
 const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index") as {
@@ -158,7 +160,7 @@ function on菲利斯技能4测试命令(this: void, _player: any, context: any):
 function on菲利斯领袖光环测试命令(this: void, player: any, context: any): void {
   const boss = context != null ? context.Boss单位 : null;
   if (!Boss测试单位存活(boss)) return;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return;
   if (GetUnitState(boss, UNIT_STATE_LIFE) > maxLife * 0.5) {
     SetUnitState(boss, UNIT_STATE_LIFE, maxLife * 0.3);

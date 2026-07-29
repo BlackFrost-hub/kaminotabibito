@@ -5,6 +5,8 @@ import { 主动物品调试日志 } from "../../../03．技能系统/00．技能
 import { 造成装备伤害 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助/10．装备战斗执行";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { 创建单位绑定闪电 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电") as {
   创建单位绑定闪电: (this: void, 参数: any) => any;
@@ -43,10 +45,10 @@ export function 处理熔岩恶魔之灵眼使用(this: void, 上下文: 物品�
 
   创建单位绑定闪电({ 效果代码: 熔岩恶魔之灵眼配置.魔力之焰闪电, 起点单位: 施法单位, 终点单位: 目标单位, 持续时间: 熔岩恶魔之灵眼配置.闪电持续时间 });
   创建单位绑定闪电({ 效果代码: 熔岩恶魔之灵眼配置.死亡之指闪电, 起点单位: 施法单位, 终点单位: 目标单位, 持续时间: 熔岩恶魔之灵眼配置.闪电持续时间 });
-  减少魔法值(施法单位, GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.魔法消耗比例, true, false);
+  减少魔法值(施法单位, GetUnitStateJapi(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.魔法消耗比例, true, false);
   createUnitEffect(目标单位, 熔岩恶魔之灵眼配置.特效挂点, 熔岩恶魔之灵眼配置.特效路径, 熔岩恶魔之灵眼配置.特效持续时间, "熔岩恶魔之灵眼");
   施加临时属性效果(目标单位, 熔岩恶魔之灵眼配置.命中率恢复延迟 * 1000, [{ 类型: "单位属性", 属性名: 命中率字段, 数值: -熔岩恶魔之灵眼配置.命中率削减 }]);
-  造成装备伤害(施法单位, 目标单位, GetUnitState(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.伤害魔法系数, DAMAGE_TYPE_SHADOW_STRIKE, true, undefined, { 伤害形态: "单体" });
+  造成装备伤害(施法单位, 目标单位, GetUnitStateJapi(施法单位, UNIT_STATE_MAX_MANA) * 熔岩恶魔之灵眼配置.伤害魔法系数, DAMAGE_TYPE_SHADOW_STRIKE, true, undefined, { 伤害形态: "单体" });
 }
 
 export {};

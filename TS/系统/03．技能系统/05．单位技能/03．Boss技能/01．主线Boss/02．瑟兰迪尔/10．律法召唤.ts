@@ -33,6 +33,8 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -93,7 +95,7 @@ function 执行瑟兰迪尔律法召唤(this: void, boss: any): void {
   const count = playerCount <= 1 ? config.数量单人 : config.数量多人;
   const bossX = GetUnitX(boss);
   const bossY = GetUnitY(boss);
-  const hp = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config.生命倍率;
+  const hp = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config.生命倍率;
   const 已连接目标: any[] = [];
   for (let i = 0; i < count; i++) {
     const angle = (360 / count) * i * bj_DEGTORAD;

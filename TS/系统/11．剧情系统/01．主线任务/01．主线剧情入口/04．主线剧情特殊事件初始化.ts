@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const jglobals = require("jass.globals") as any;
 const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
@@ -199,7 +201,7 @@ function 命中最终伤害事件配置(this: void, 配置: 主线剧情最终�
   if (GetUnitTypeId(target) !== stringToFourCCSafe(配置.单位ID)) return false;
 
   const currentLife = GetUnitState(target, UNIT_STATE_LIFE);
-  const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   if (!(currentLife > 0) || !(maxLife > 0)) return false;
 
   const afterHitLife = currentLife - applied;
@@ -215,7 +217,7 @@ function 执行技能推进剧情(this: void, 配置: 主线剧情技能通道�
 }
 
 function 执行最终伤害推进剧情(this: void, 配置: 主线剧情最终伤害事件配置, target: any, attacker: any): void {
-  const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   YDWESetEventDamage(0);
   写入剧情进度(配置.目标剧情进度);
   SetUnitState(target, UNIT_STATE_LIFE, maxLife * 配置.保底生命比例);

@@ -9,6 +9,8 @@ local __TS__StringEndsWith = ____lualib.__TS__StringEndsWith
 local ____exports = {}
 --- 装备 hot/abilList 解析与单段治疗量计算（供 `06．装备回复` 与 STES 推算共用）
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetItemTypeId = jass.GetItemTypeId
 function ____exports.parseEquipHealSegments(self, hotStr, abilList)
     local segments = __TS__StringSplit(hotStr, "+")
@@ -53,12 +55,12 @@ end
 function ____exports.calcEquipHealHpMp(self, tokens, unit)
     local hp = 0
     local mp = 0
-    local maxHp = jass.GetUnitState(
+    local maxHp = GetUnitStateJapi(
         unit,
         jass.ConvertUnitState(1)
     )
     local curHp = jass.GetWidgetLife(unit)
-    local maxMp = jass.GetUnitState(
+    local maxMp = GetUnitStateJapi(
         unit,
         jass.ConvertUnitState(3)
     )

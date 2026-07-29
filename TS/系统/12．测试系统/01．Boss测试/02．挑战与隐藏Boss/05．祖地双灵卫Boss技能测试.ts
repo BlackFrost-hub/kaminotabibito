@@ -4,6 +4,7 @@ import type { Boss测试技能命令 } from '../../00．Boss测试系统/00．Bo
 
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const globals = require('jass.globals') as { udg_Boss?: any; [key: string]: any };
 
 const {
@@ -243,14 +244,14 @@ function 重置祖地双灵卫P1(this: void, context: 祖地双灵卫测试上�
 
 function 准备祖地双灵卫P2(this: void, context: 祖地双灵卫测试上下文): void {
   重置祖地双灵卫P1(context);
-  const maxLife = GetUnitState(context.赤誓灵卫单位, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(context.赤誓灵卫单位, UNIT_STATE_MAX_LIFE);
   SetUnitState(context.赤誓灵卫单位, UNIT_STATE_LIFE, maxLife * 0.6);
   更新祖地双灵卫侵蚀阶段(context.运行时);
 }
 
 function 准备祖地双灵卫P3(this: void, context: 祖地双灵卫测试上下文): void {
   准备祖地双灵卫P2(context);
-  const maxLife = GetUnitState(context.赤誓灵卫单位, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(context.赤誓灵卫单位, UNIT_STATE_MAX_LIFE);
   SetUnitState(context.赤誓灵卫单位, UNIT_STATE_LIFE, maxLife * 0.3);
   更新祖地双灵卫侵蚀阶段(context.运行时);
 }

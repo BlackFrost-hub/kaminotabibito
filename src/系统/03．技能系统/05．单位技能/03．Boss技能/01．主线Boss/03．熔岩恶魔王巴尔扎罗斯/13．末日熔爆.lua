@@ -45,6 +45,8 @@ local ____require_result_10 = require("系统.04．伤害系统.08．技能伤�
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_10["造成AOE技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_10["创建独立技能伤害实例"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -223,7 +225,7 @@ local function _____8BA1_7B97_5916_5708_4F24_5BB3(boss, target)
     return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["外圈伤害Boss攻击力比例"], ["目标最大生命比例"] = config["外圈伤害目标最大生命比例"], ["总倍率"] = config["外圈伤害总倍率"]})
 end
 local function _____8BA1_7B97_5B89_5168_533A_4F59_6CE2_4F24_5BB3(target)
-    return GetUnitState(target, UNIT_STATE_MAX_LIFE) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]["安全区余波目标最大生命比例"]
+    return GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]["安全区余波目标最大生命比例"]
 end
 local function _____64AD_653E_7206_53D1_8868_73B0(center)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]
@@ -394,7 +396,7 @@ local function _____5C1D_8BD5_4F4E_8840_91CF_989D_5916_89E6_53D1(context)
     if not _____5355_4F4D_6709_6548(boss) then
         return
     end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     if maxLife <= 0 then
         return
     end

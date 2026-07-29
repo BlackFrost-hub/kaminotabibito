@@ -27,7 +27,12 @@ function _____673A_5236_5355_4F4D_751F_547D_5468_671F_5B9E_73B0.prototype.____co
     end
 end
 _____673A_5236_5355_4F4D_751F_547D_5468_671F_5B9E_73B0.prototype["是否存活"] = function(self)
-    return not self["已结束"] and self["基础实例"]["是否存活"]()
+    local ____temp_2 = not self["已结束"]
+    if ____temp_2 then
+        local ____self_1 = self["基础实例"]
+        ____temp_2 = ____self_1["是否存活"](____self_1)
+    end
+    return ____temp_2
 end
 _____673A_5236_5355_4F4D_751F_547D_5468_671F_5B9E_73B0.prototype["销毁"] = function(self, _____539F_56E0)
     if _____539F_56E0 == nil then
@@ -37,7 +42,8 @@ _____673A_5236_5355_4F4D_751F_547D_5468_671F_5B9E_73B0.prototype["销毁"] = fun
         return
     end
     self["结束"](self, _____539F_56E0)
-    self["基础实例"]["销毁"]()
+    local ____self_3 = self["基础实例"]
+    ____self_3["销毁"](____self_3)
 end
 _____673A_5236_5355_4F4D_751F_547D_5468_671F_5B9E_73B0.prototype["处理死亡"] = function(self, _____51FB_6740_8005)
     if self["已结束"] then
@@ -100,9 +106,9 @@ ____exports["创建机制单位生命周期"] = function(_____53C2_6570)
     end
     _____5B9E_4F8B = __TS__New(_____673A_5236_5355_4F4D_751F_547D_5468_671F_5B9E_73B0, _____57FA_7840_5B9E_4F8B, _____53C2_6570)
     if _____53C2_6570["清理"] ~= nil then
-        local ____self_1 = _____53C2_6570["清理"]
-        ____self_1["登记清理"](
-            ____self_1,
+        local ____self_4 = _____53C2_6570["清理"]
+        ____self_4["登记清理"](
+            ____self_4,
             _____53C2_6570["名称"],
             function()
                 if _____5B9E_4F8B ~= nil then

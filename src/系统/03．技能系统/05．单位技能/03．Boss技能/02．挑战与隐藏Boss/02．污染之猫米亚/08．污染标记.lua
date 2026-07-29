@@ -21,6 +21,8 @@ local setThreat = ____require_result_2.setThreat
 local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_3.doHeal
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitName = jass.GetUnitName
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -51,7 +53,7 @@ local function _____6062_590DBoss_751F_547D(boss, ratio)
     doHeal({
         HealSource = boss,
         HealTarget = boss,
-        HealAmount = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio,
+        HealAmount = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * ratio,
         ItemHeal = false,
         HealEffect = false
     })

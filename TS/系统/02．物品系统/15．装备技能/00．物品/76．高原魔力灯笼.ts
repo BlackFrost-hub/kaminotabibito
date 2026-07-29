@@ -27,6 +27,8 @@ const { 获取范围友军, 取单位X, 取单位Y, 取最大生命, 执行治�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 
@@ -46,7 +48,7 @@ function 清理高原魔力灯笼状态(this: void, unit: any): void {
 }
 
 function on高原魔力灯笼周期(this: void, unit: any, currentCount: number): void {
-  const manaCost = GetUnitState(unit, UNIT_STATE_MAX_MANA) * 高原魔力灯笼配置.最大魔法消耗比例 * currentCount;
+  const manaCost = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA) * 高原魔力灯笼配置.最大魔法消耗比例 * currentCount;
   减少魔法值(unit, manaCost, true, false);
   同步夜晚减伤(unit, currentCount);
   if (!是否白天()) return;

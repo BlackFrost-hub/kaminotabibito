@@ -4,6 +4,8 @@ local ____exports = {}
 -- 
 -- 功能：计算单位的基础恢复、百分比恢复、总恢复
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetHeroStr = jass.GetHeroStr
 local GetHeroInt = jass.GetHeroInt
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -81,7 +83,7 @@ end
 function ____exports.calcTotalLifeRegen(unit, baseRegen, itemBonus, unitMultiplier)
     local fixedRegen = getAttr(unit, "生命恢复")
     local percentRegen = ____exports.getPercentLifeRegen(unit)
-    local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     local percentRegenValue = maxLife * percentRegen
     local amplify = getPlayerAttr(unit, "生命恢复属性增幅")
     local totalBase = (baseRegen + itemBonus) * unitMultiplier + fixedRegen
@@ -94,7 +96,7 @@ end
 function ____exports.calcTotalManaRegen(unit, baseRegen)
     local fixedRegen = getAttr(unit, "魔法恢复")
     local percentRegen = ____exports.getPercentManaRegen(unit)
-    local maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA)
     local percentRegenValue = maxMana * percentRegen
     return baseRegen + fixedRegen + percentRegenValue
 end

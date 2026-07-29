@@ -98,8 +98,8 @@ Blender 本地桥：localhost:9876
 
 1. 透明源图必须保留真实 alpha；黑底预览不等于透明。
 2. TGA 必须保留 alpha。PNG、TGA、BLP 的大小写和相对路径都要实测。
-3. 优先使用 `war3-texture-preview` 插件完成 BLP 与 PNG/TGA 的转换。
-4. BLP 转换后必须再用插件回读成 PNG 或 TGA，核对尺寸、方向、颜色和 alpha；不能只看源 PNG。
+3. 正式透明 BLP 必须使用 `scripts/war3-transparent-blp.js` 调用内置原生转换器，验收头部为 `BLP1 compression=0 / alphaBits=8 / pictureType=3 或 pictureType=4`。禁止用 `war3-texture-preview` 的 `encodeTextureBuffer(..., 'blp')` 生成正式透明 BLP；该直通调色板格式已确认会在 Warcraft 1.27 透明面片上显示黑底。
+4. `war3-texture-preview` 只用于把正式 BLP 回读成临时 PNG 或 TGA，核对尺寸、方向、颜色和 Alpha；不能只看源 PNG。回读预览必须放在明确的临时目录，检查完立即删除，可编辑源 PNG 继续保留。
 5. 图案类贴图先按实际屏幕占比选择尺寸。小型花朵、心脏、箭头等通常先测试 128 或 256；没有可见收益时不要保留 512×512、数百 KB 的贴图。
 6. 压缩前保留可编辑 PNG 源；正式模型引用分类 `Texture` 目录中的 BLP/TGA，不引用 `image_temp`。
 7. 透明像素的 RGB、半透明边缘和抠图残色都要检查，避免黑边、白边、绿边和脏边。

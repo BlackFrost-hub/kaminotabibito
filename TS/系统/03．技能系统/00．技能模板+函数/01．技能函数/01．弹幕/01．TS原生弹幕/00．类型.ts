@@ -49,6 +49,10 @@ export interface 原生弹幕附加特效参数 {
   /** 根据每 Tick 的水平位移与 Z 高度差自动设置 Pitch；仅独立附加特效支持。 */
   跟随轨迹俯仰?: boolean;
   缩放?: number;
+  红?: number;
+  绿?: number;
+  蓝?: number;
+  透明度?: number;
 }
 
 export interface 原生弹幕参数 {

@@ -20,6 +20,8 @@ const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用�
   创建点特效: (this: void, 参数: any) => any;
 };
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
@@ -67,7 +69,7 @@ function 结算鲜血回收(this: void, context: 夏提雅运行时上下文): v
     doHeal({
       HealSource: boss,
       HealTarget: boss,
-      HealAmount: GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio,
+      HealAmount: GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * ratio,
       ItemHeal: false,
       HealEffect: false,
     });

@@ -3,6 +3,8 @@
 import { 主动物品调试日志 } from "../../../03．技能系统/00．技能模板+函数/01．技能函数/20．物品辅助";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -32,7 +34,7 @@ function 是否为地狱火卡牌(this: void, 物品: any): boolean {
 }
 
 function 计算每跳生命恢复(this: void, 单位: any): number {
-  return GetUnitState(单位, UNIT_STATE_MAX_LIFE) * 地狱火卡牌配置.生命恢复百分比 + 地狱火卡牌配置.固定生命恢复;
+  return GetUnitStateJapi(单位, UNIT_STATE_MAX_LIFE) * 地狱火卡牌配置.生命恢复百分比 + 地狱火卡牌配置.固定生命恢复;
 }
 
 function 计算每跳魔法恢复(this: void, 单位: any): number {

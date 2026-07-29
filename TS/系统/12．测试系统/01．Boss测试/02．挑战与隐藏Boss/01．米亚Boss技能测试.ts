@@ -3,6 +3,8 @@
 import type { Boss测试技能命令 } from '../../00．Boss测试系统/00．Boss测试类型';
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const globals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 
 const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index") as {
@@ -210,7 +212,7 @@ function on米亚技能2测试命令(this: void, _player: any, context: any): vo
 function on米亚技能3测试命令(this: void, _player: any, context: any): void {
   context.阶段 = 1;
   context.已触发分身80 = false;
-  SetUnitState(context.Boss单位, UNIT_STATE_LIFE, GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE) * 0.75);
+  SetUnitState(context.Boss单位, UNIT_STATE_LIFE, GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE) * 0.75);
   触发米亚灵猫分身(context);
 }
 
@@ -262,7 +264,7 @@ function on米亚技能10测试命令(this: void, _player: any, context: any): v
   context.阶段 = 3;
   context.终极污染引导中 = false;
   context.已触发终极污染30 = false;
-  SetUnitState(context.Boss单位, UNIT_STATE_LIFE, GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE) * 0.25);
+  SetUnitState(context.Boss单位, UNIT_STATE_LIFE, GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE) * 0.25);
   触发米亚终极污染(context, 0);
 }
 

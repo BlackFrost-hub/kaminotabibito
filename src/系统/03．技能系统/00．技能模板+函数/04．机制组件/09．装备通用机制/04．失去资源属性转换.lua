@@ -32,6 +32,8 @@ end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local R2I = jass.R2I
@@ -62,7 +64,7 @@ local function _____53D6_8D44_6E90_6BD4_4F8B(_____5355_4F4D, _____7C7B_578B)
     else
         ____temp_3 = UNIT_STATE_MAX_MANA
     end
-    local max = GetUnitState(____5355_4F4D_4, ____temp_3)
+    local max = GetUnitStateJapi(____5355_4F4D_4, ____temp_3)
     if max <= 0 then
         return 0
     end

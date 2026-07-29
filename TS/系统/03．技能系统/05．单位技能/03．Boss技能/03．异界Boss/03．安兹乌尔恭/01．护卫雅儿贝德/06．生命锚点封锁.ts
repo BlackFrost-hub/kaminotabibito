@@ -26,6 +26,7 @@ const { 广播单位提示 } = require('系统.09．表现系统.06．广播提�
 
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -89,7 +90,7 @@ export function 启动雅儿贝德生命锚点封锁(
   const blockTarget = target;
   const cfg = 安兹乌尔恭数值与表现配置;
   const byAlbedo = GetUnitState(albedo, UNIT_STATE_LIFE) * cfg.守护者模式.生命锚点封锁当前生命比例;
-  const byBoss = GetUnitState(context.安兹单位, UNIT_STATE_MAX_LIFE) * cfg.守护者模式.生命锚点封锁安兹最大生命上限比例;
+  const byBoss = GetUnitStateJapi(context.安兹单位, UNIT_STATE_MAX_LIFE) * cfg.守护者模式.生命锚点封锁安兹最大生命上限比例;
   const shieldValue = byAlbedo < byBoss ? byAlbedo : byBoss;
   if (!(shieldValue > 0)) return undefined;
 

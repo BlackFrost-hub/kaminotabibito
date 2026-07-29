@@ -3,6 +3,8 @@
 import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE;
@@ -40,7 +42,7 @@ let 血量节点触发器驱动ID = 0;
 let 下一个血量节点触发器ID = 0;
 
 function 取生命百分比(this: void, 单位: any): number {
-  const max = GetUnitState(单位, UNIT_STATE_MAX_LIFE);
+  const max = GetUnitStateJapi(单位, UNIT_STATE_MAX_LIFE);
   if (!(max > 0)) return 0;
   return GetUnitState(单位, UNIT_STATE_LIFE) / max;
 }

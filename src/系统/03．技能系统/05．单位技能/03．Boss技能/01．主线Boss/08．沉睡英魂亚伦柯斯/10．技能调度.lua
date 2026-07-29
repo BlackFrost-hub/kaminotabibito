@@ -26,6 +26,8 @@ local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_r
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
@@ -58,7 +60,7 @@ local function _____53D6_4EA1_8005_51DD_89C6_51B7_5374(context)
     return _____53D6_9636_6BB5_51B7_5374_6BEB_79D2(context, _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["亡者凝视"]["冷却秒"])
 end
 local function _____5230_8FBE_6700_7EC8_5F3A_5316_9608_503C(context)
-    local maxLife = GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE)
     return maxLife > 0 and GetUnitState(context["Boss单位"], UNIT_STATE_LIFE) / maxLife <= _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]["最终强化生命比例"]
 end
 ____exports["注册亚伦柯斯技能调度"] = function()
@@ -134,7 +136,7 @@ ____exports["注册亚伦柯斯技能调度"] = function()
                 key = "英灵陨星",
                 ["冷却毫秒"] = _____53D6_82F1_7075_9668_661F_51B7_5374,
                 ["首次延迟毫秒"] = 5200,
-                ["忙碌毫秒"] = (meteor["预警秒"] + meteor["P2落点数量"] * meteor["落点间隔秒"] + 0.5) * 1000,
+                ["忙碌毫秒"] = (meteor["预警秒"] + (meteor["P2批次数量"] - 1) * meteor["批次间隔秒"] + 0.5) * 1000,
                 ["优先级"] = 25,
                 ["权重"] = 1,
                 ["互斥组"] = "亚伦柯斯主要机制",
@@ -159,7 +161,7 @@ ____exports["注册亚伦柯斯技能调度"] = function()
                 key = "亡冥英斩",
                 ["冷却毫秒"] = _____53D6_4EA1_51A5_82F1_65A9_51B7_5374,
                 ["首次延迟毫秒"] = 2600,
-                ["忙碌毫秒"] = (slash["前摇秒"] + slash["推进秒"] + slash["P3归魂延迟秒"] + 0.4) * 1000,
+                ["忙碌毫秒"] = (slash["前摇秒"] + slash["推进秒"] + slash["P3归魂延迟秒"] + slash["P3归魂推进秒"] + 0.4) * 1000,
                 ["优先级"] = 20,
                 ["权重"] = 1,
                 ["互斥组"] = "亚伦柯斯主要机制",

@@ -25,6 +25,8 @@ local getServerTime = ____require_result_1.getServerTime
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
@@ -87,7 +89,7 @@ local function _____7ED3_7B97_9C9C_8840_56DE_6536(context)
         doHeal({
             HealSource = boss,
             HealTarget = boss,
-            HealAmount = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * ratio,
+            HealAmount = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * ratio,
             ItemHeal = false,
             HealEffect = false
         })

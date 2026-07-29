@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
@@ -49,7 +51,7 @@ function 单位有效(this: void, 单位: any): boolean {
 
 function 取资源比例(this: void, 单位: any, 类型: 失去资源类型): number {
   const current = GetUnitState(单位, 类型 === "生命" ? UNIT_STATE_LIFE : UNIT_STATE_MANA);
-  const max = GetUnitState(单位, 类型 === "生命" ? UNIT_STATE_MAX_LIFE : UNIT_STATE_MAX_MANA);
+  const max = GetUnitStateJapi(单位, 类型 === "生命" ? UNIT_STATE_MAX_LIFE : UNIT_STATE_MAX_MANA);
   if (max <= 0) return 0;
   const missing = max - current;
   if (missing <= 0) return 0;

@@ -5,8 +5,8 @@
 | 导入子目录 | 文字目录 | 主要语义 |
 | --- | --- | --- |
 | `Aura` | [`aura.md`](aura.md) | 环绕单位或地面的持续光环。 |
-| `Charge` | `charge.md`（有条目时创建） | 冲锋、突进、路径拖尾。 |
-| `ClawMark` | `claw-mark.md`（有条目时创建） | 爪痕、斩痕、抓击印记。 |
+| `Charge` | [`charge.md`](charge.md) | 冲锋、突进、路径拖尾。 |
+| `ClawMark` | [`claw-mark.md`](claw-mark.md) | 爪痕、斩痕、抓击印记。 |
 | `Debuff` | [`debuff.md`](debuff.md) | 点名、诅咒、拘束、倒计时。 |
 | `Explosion` | [`explosion.md`](explosion.md) | 瞬时爆发、破碎、炸裂。 |
 | `Illusion` | [`illusion.md`](illusion.md) | 镜像、残影、镜框、投影。 |

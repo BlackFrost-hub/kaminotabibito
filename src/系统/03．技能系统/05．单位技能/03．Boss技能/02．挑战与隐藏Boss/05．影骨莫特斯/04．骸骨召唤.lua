@@ -189,6 +189,8 @@ end
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -236,7 +238,7 @@ local function ____on_5F71_9AA8_9AB7_9AC5_5077_7A83_4FEE_6B63(damageContext)
     local stolen = cfg["偷金币固定值"] + gold * cfg["偷金币当前比例"]
     local nextGold = gold - stolen
     SetPlayerState(owner, PLAYER_STATE_RESOURCE_GOLD, nextGold > 0 and nextGold or 0)
-    if gold < GetUnitState(target, UNIT_STATE_MAX_LIFE) then
+    if gold < GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) then
         return damageContext.currentDamage + _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(context["Boss单位"], target, {["来源攻击力比例"] = cfg["贫血惩罚Boss攻击力比例"], ["目标最大生命比例"] = cfg["贫血惩罚目标最大生命比例"]})
     end
     return damageContext.currentDamage

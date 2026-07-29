@@ -9,6 +9,7 @@ local SUC_IsValidUnit = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570
 -- 提供单位基础操作、存活状态、生命读写，以及生命周期类型判断。
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local SetUnitStateJapi = japi.SetUnitState
 ____exports.TIMED_LIFE_NONE = 0
 ____exports.TIMED_LIFE_RAISE_DEAD = 1
@@ -43,7 +44,7 @@ function ____exports.SU_GetUnitLostHPPercent(u)
     if not SUC_IsValidUnit(u) then
         return 0
     end
-    local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE)
     local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
     if maxLife <= 0 then
         return 0
@@ -54,7 +55,7 @@ function ____exports.SU_GetUnitLostHP(u)
     if not SUC_IsValidUnit(u) then
         return 0
     end
-    local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE)
     local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
     return maxLife - life
 end
@@ -63,7 +64,7 @@ function ____exports.UnitAddHp(u, value, b)
         return
     end
     local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
-    local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE)
     local percent = maxLife > 0 and life / maxLife or 1
     local addValue = b and maxLife * value or value
     SetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue)

@@ -8,6 +8,7 @@ local ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E = require("系统.02�
 local _____5E7D_51A5_6CD5_6756_914D_7F6E = ____00_FF0E_7269_54C1_4F7F_7528_89E6_53D1_914D_7F6E["幽冥法杖配置"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____require_result_0.createTimedEffect
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
@@ -37,7 +38,7 @@ ____exports["处理幽冥法杖使用"] = function(_____4E0A_4E0B_6587)
     if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
         return
     end
-    if GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_MAX_LIFE) * _____5E7D_51A5_6CD5_6756_914D_7F6E["斩杀生命比例"] < GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_LIFE) then
+    if GetUnitStateJapi(_____76EE_6807_5355_4F4D, UNIT_STATE_MAX_LIFE) * _____5E7D_51A5_6CD5_6756_914D_7F6E["斩杀生命比例"] < GetUnitState(_____76EE_6807_5355_4F4D, UNIT_STATE_LIFE) then
         return
     end
     local _____7279_6548 = createTimedEffect(

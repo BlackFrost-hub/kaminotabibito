@@ -53,6 +53,8 @@ const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系�
 };
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -207,7 +209,7 @@ function 计算外圈伤害(this: void, boss: any, target: any): number {
 }
 
 function 计算安全区余波伤害(this: void, target: any): number {
-  return GetUnitState(target, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.末日熔爆.安全区余波目标最大生命比例;
+  return GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.末日熔爆.安全区余波目标最大生命比例;
 }
 
 function 播放爆发表现(this: void, center: 末日熔爆点): void {
@@ -351,7 +353,7 @@ function 尝试低血量额外触发(this: void, context: 巴尔扎罗斯运行�
   if (context.已触发低血量末日熔爆 || context.末日熔爆引导中) return;
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   if (maxLife <= 0) return;
   const ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife;
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;

@@ -14,6 +14,8 @@ local _____7834_8840_4E4B_6212_7ED1_5B9A_9644_7740_70B9 = ____01_FF0E_7269_54C1_
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
 local _____9020_6210_88C5_5907_4F24_5BB3 = ____require_result_0["造成装备伤害"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____require_result_1.createTimedEffect
 local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_1["创建Dz绑定单位特效"]
@@ -44,7 +46,7 @@ local function _____7ED3_7B97_7834_8840_4E4B_6212(_____65BD_6CD5_5355_4F4D)
     if _____4E0A_4E0B_6587 == nil then
         return
     end
-    local _____4F24_5BB3_503C = _____7834_8840_4E4B_6212_914D_7F6E["基础伤害"] + GetUnitState(
+    local _____4F24_5BB3_503C = _____7834_8840_4E4B_6212_914D_7F6E["基础伤害"] + GetUnitStateJapi(
         _____65BD_6CD5_5355_4F4D,
         ConvertUnitState(21)
     ) * 3

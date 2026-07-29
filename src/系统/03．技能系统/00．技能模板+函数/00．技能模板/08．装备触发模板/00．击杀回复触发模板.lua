@@ -35,10 +35,10 @@ local function _____53D6_5355_4F4DID(unit)
     return GetHandleId(unit) or 0
 end
 local function _____53D6_6700_5927_751F_547D(unit)
-    return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) or GetUnitState(unit, UNIT_STATE_MAX_LIFE) or 0
+    return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) or GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) or 0
 end
 local function _____53D6_6700_5927_9B54_6CD5(unit)
-    return GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA) or GetUnitState(unit, UNIT_STATE_MAX_MANA) or 0
+    return GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA) or GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA) or 0
 end
 local function _____53D6_51B7_5374_952E(unit, record)
     local id = _____53D6_5355_4F4DID(unit)

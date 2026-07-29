@@ -3,9 +3,12 @@ local ____exports = {}
 --- 单位工具函数
 -- 判断单位类型、查找单位等
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local g = require("jass.globals")
 local groupScratchPool = {}
+local GetUnitStateJass = jass.GetUnitState
+local SetUnitStateJass = jass.SetUnitState
+local ConvertUnitState = jass.ConvertUnitState
+local R2I = jass.R2I
 local function acquireScratchGroup(self)
     local scratch = table.remove(groupScratchPool)
     if scratch then
@@ -137,15 +140,15 @@ end
 --- 获取单位的攻击类型（Attack Type）
 -- 单位状态0x23对应攻击类型，使用ConvertUnitState转换
 function ____exports.Ir_GetUnitAttackType(u)
-    return jass.R2I(japi.GetUnitState(
+    return R2I(GetUnitStateJass(
         u,
-        jass.ConvertUnitState(35)
+        ConvertUnitState(35)
     ))
 end
 function ____exports.Ir_SetUnitAttackType(u, atp)
-    japi.SetUnitState(
+    SetUnitStateJass(
         u,
-        jass.ConvertUnitState(35),
+        ConvertUnitState(35),
         atp
     )
 end

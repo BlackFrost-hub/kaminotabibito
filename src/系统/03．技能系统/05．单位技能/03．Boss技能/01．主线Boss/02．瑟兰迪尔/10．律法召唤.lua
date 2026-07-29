@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____542F_52A8_5F8B_6CD5_94FE_8DEF, _____6267_884C_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524, ____on_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524_751F_6548, _____521B_5EFA_53EC_5524_7269, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____542F_52A8_72EC_5360_5355_4F4D_8FDE_63A5, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, Sound3DII_CooPlayReuse, jass, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, Cos, Sin, UNIT_STATE_MAX_LIFE, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____5F8B_6CD5_53EC_5524_6280_80FDID, bj_DEGTORAD
+local _____542F_52A8_5F8B_6CD5_94FE_8DEF, _____6267_884C_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524, ____on_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524_751F_6548, _____521B_5EFA_53EC_5524_7269, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____542F_52A8_72EC_5360_5355_4F4D_8FDE_63A5, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, Sound3DII_CooPlayReuse, jass, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, Cos, Sin, UNIT_STATE_MAX_LIFE, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____5F8B_6CD5_53EC_5524_6280_80FDID, bj_DEGTORAD
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
@@ -67,7 +67,7 @@ function _____6267_884C_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524(boss)
     local count = playerCount <= 1 and config["数量单人"] or config["数量多人"]
     local bossX = GetUnitX(boss)
     local bossY = GetUnitY(boss)
-    local hp = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * config["生命倍率"]
+    local hp = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config["生命倍率"]
     local _____5DF2_8FDE_63A5_76EE_6807 = {}
     do
         local i = 0
@@ -154,10 +154,12 @@ _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_6["造成单�
 local ____require_result_7 = require("lib.扩展函数.封装函数.02．音效系统.index")
 Sound3DII_CooPlayReuse = ____require_result_7.Sound3DII_CooPlayReuse
 jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-GetUnitState = jass.GetUnitState
+local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 Cos = jass.Cos
 Sin = jass.Sin

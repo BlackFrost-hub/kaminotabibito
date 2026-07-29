@@ -15,6 +15,8 @@ local _____82F1_96C4Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = ____02_F
 local ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.03．异界Boss战斗启动属性配置表.index")
 local _____5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["异界Boss战斗启动属性配置表"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local jglobals = require("jass.globals")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitState = jass.GetUnitState
@@ -151,7 +153,7 @@ local function _____521B_5EFATS_542F_52A8_5C5E_6027_5F31_70B9_914D_7F6E(bossUnit
     end
     local n = _____5F53_524DN_503C()
     local shieldValue = (_____914D_7F6E["护盾基础值"] or 0) + (_____914D_7F6E["护盾每层N增量"] or 0) * n
-    local maxLife = GetUnitState(bossUnit, UNIT_STATE_MAX_LIFE) or 0
+    local maxLife = GetUnitStateJapi(bossUnit, UNIT_STATE_MAX_LIFE) or 0
     local demand = (_____914D_7F6E["器弱伤害需求生命百分比"] or 0) * maxLife
     return _____586B_5145_9ED8_8BA4_53CD_9988_914D_7F6E({
         ["配置键"] = "TS战斗启动属性",

@@ -40,6 +40,8 @@ end
 -- 
 -- 特殊处理：马甲单位（UNIT_TYPE_ANCIENT）造成的伤害，吸血/吸魔给玩家英雄
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.01．属性读取")
@@ -226,7 +228,7 @@ function ____exports.applyLifeSteal(attacker, heal, showText)
         return
     end
     local currentLife = jass.GetUnitState(attacker, jass.UNIT_STATE_LIFE)
-    local maxLife = jass.GetUnitState(attacker, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(attacker, jass.UNIT_STATE_MAX_LIFE)
     local lifeGap = maxLife - currentLife
     local actualHeal = heal < lifeGap and heal or lifeGap
     if actualHeal <= 0 then
@@ -277,7 +279,7 @@ function ____exports.applyManaSteal(attacker, mana, showText)
         return
     end
     local currentMana = jass.GetUnitState(attacker, jass.UNIT_STATE_MANA)
-    local maxMana = jass.GetUnitState(attacker, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(attacker, jass.UNIT_STATE_MAX_MANA)
     local manaGap = maxMana - currentMana
     local actualMana = mana < manaGap and mana or manaGap
     if actualMana <= 0 then

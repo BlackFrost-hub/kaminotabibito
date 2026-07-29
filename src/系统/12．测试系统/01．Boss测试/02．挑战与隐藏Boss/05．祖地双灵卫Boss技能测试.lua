@@ -2,6 +2,7 @@
 local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local globals = require("jass.globals")
 local ____require_result_0 = require("系统.12．测试系统.00．Boss测试系统.index")
 local ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B = ____require_result_0["Boss测试单位存活"]
@@ -229,13 +230,13 @@ local function _____91CD_7F6E_7956_5730_53CC_7075_536BP1(context)
 end
 local function _____51C6_5907_7956_5730_53CC_7075_536BP2(context)
     _____91CD_7F6E_7956_5730_53CC_7075_536BP1(context)
-    local maxLife = GetUnitState(context["赤誓灵卫单位"], UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(context["赤誓灵卫单位"], UNIT_STATE_MAX_LIFE)
     SetUnitState(context["赤誓灵卫单位"], UNIT_STATE_LIFE, maxLife * 0.6)
     _____66F4_65B0_7956_5730_53CC_7075_536B_4FB5_8680_9636_6BB5(context["运行时"])
 end
 local function _____51C6_5907_7956_5730_53CC_7075_536BP3(context)
     _____51C6_5907_7956_5730_53CC_7075_536BP2(context)
-    local maxLife = GetUnitState(context["赤誓灵卫单位"], UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(context["赤誓灵卫单位"], UNIT_STATE_MAX_LIFE)
     SetUnitState(context["赤誓灵卫单位"], UNIT_STATE_LIFE, maxLife * 0.3)
     _____66F4_65B0_7956_5730_53CC_7075_536B_4FB5_8680_9636_6BB5(context["运行时"])
 end

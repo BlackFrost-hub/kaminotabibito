@@ -20,6 +20,10 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local ____09_FF0E_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.09．伤害生命下限保护")
 local _____521B_5EFA_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4 = ____09_FF0E_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4["创建伤害生命下限保护"]
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -30,6 +34,8 @@ local YDWETimerDestroyEffectSafe = ____require_result_2.YDWETimerDestroyEffectSa
 local ____require_result_3 = require("lib.扩展函数.Star扩展函数.00．SGSS")
 local SGSS_SetState = ____require_result_3.SGSS_SetState
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -51,7 +57,7 @@ local function _____521B_5EFA_4E0A_4E0B_6587(boss, _____6E05_7406)
         ["阶段"] = "P1守墓者苏醒",
         ["开战时间Ms"] = now,
         ["上次阶段变化Ms"] = now,
-        ["普通机制忙碌到Ms"] = now + 1800,
+        ["普通机制忙碌到Ms"] = now + _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["开战苏醒硬直秒"] * 1000,
         ["已安魂墓碑数量"] = 0,
         ["未安魂墓碑数量"] = 0,
         ["墓碑机制已启动"] = false,
@@ -72,6 +78,8 @@ local function _____521B_5EFA_4E0A_4E0B_6587(boss, _____6E05_7406)
     if effect ~= nil and effect ~= 0 then
         YDWETimerDestroyEffectSafe(2, effect)
     end
+    _____5F00_59CB_786C_76F4(boss, _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["开战苏醒硬直秒"])
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["开战苏醒动画编号"], ["持续秒"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["开战苏醒硬直秒"], ["恢复动画编号"] = 1})
     _____521B_5EFA_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4({
         ["名称"] = "亚伦柯斯-P2墓碑锁血",
         ["单位"] = boss,
@@ -135,11 +143,13 @@ ____exports["进入亚伦柯斯P3"] = function(context)
     end
     context["阶段"] = "P3最后的誓约"
     context["上次阶段变化Ms"] = getServerTime()
-    context["普通机制忙碌到Ms"] = context["上次阶段变化Ms"] + 1800
+    context["普通机制忙碌到Ms"] = context["上次阶段变化Ms"] + _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P3转换硬直秒"] * 1000
     context["当前大型技能"] = nil
+    _____5F00_59CB_786C_76F4(context["Boss单位"], _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P3转换硬直秒"])
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = context["Boss单位"], ["动画编号"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P3转换动画编号"], ["持续秒"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P3转换硬直秒"], ["恢复动画编号"] = 1})
     _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD(context["Boss单位"], "记忆恢复")
     local delayedId = addDelayedCallback(
-        1800,
+        _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P3转换硬直秒"] * 1000,
         function()
             if not context["战斗已结束"] and context["阶段"] == "P3最后的誓约" then
                 _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD(context["Boss单位"], "转阶段3最后誓约")
@@ -153,7 +163,7 @@ local function _____63A8_8FDB_4E9A_4F26_67EF_65AF_8FD0_884C_65F6(context, now)
     if not _____5355_4F4D_6709_6548(context["Boss单位"]) or context["战斗已结束"] then
         return
     end
-    local maxLife = GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE)
     if not (maxLife > 0) then
         return
     end
@@ -161,12 +171,14 @@ local function _____63A8_8FDB_4E9A_4F26_67EF_65AF_8FD0_884C_65F6(context, now)
     if context["阶段"] == "P1守墓者苏醒" and ratio <= _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]["P2生命比例"] then
         context["阶段"] = "P2旧誓回响"
         context["上次阶段变化Ms"] = now
-        context["普通机制忙碌到Ms"] = now + 1500
+        context["普通机制忙碌到Ms"] = now + _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P2转换硬直秒"] * 1000
         context["当前大型技能"] = "旧誓回响转阶段"
         context["未安魂墓碑数量"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["旧誓墓碑"]["数量"]
+        _____5F00_59CB_786C_76F4(context["Boss单位"], _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P2转换硬直秒"])
+        _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = context["Boss单位"], ["动画编号"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P2转换动画编号"], ["持续秒"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P2转换硬直秒"], ["恢复动画编号"] = 1})
         _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD(context["Boss单位"], "转阶段2旧誓回响")
         local delayedId = addDelayedCallback(
-            1500,
+            _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段表现"]["P2转换硬直秒"] * 1000,
             function()
                 if context["当前大型技能"] == "旧誓回响转阶段" then
                     context["当前大型技能"] = nil

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BA1_7B97_55B7_53D1_4F24_5BB3, _____521B_5EFA_968F_673A_843D_70B9, _____64AD_653E_55B7_53D1_7279_6548, _____521B_5EFA_7194_5CA9_6B8B_7559_533A, _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1, ____on_5DF4_5C14_624E_7F57_65AF_7194_5CA9_55B7_53D1_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____521B_5EFA_70B9_7279_6548, CosBJ, SinBJ, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, GetRandomReal, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____7194_5CA9_55B7_53D1_6280_80FDID
+local _____8BA1_7B97_55B7_53D1_4F24_5BB3, _____521B_5EFA_968F_673A_843D_70B9, _____64AD_653E_55B7_53D1_7279_6548, _____521B_5EFA_7194_5CA9_6B8B_7559_533A, _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1, ____on_5DF4_5C14_624E_7F57_65AF_7194_5CA9_55B7_53D1_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____521B_5EFA_70B9_7279_6548, CosBJ, SinBJ, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, GetRandomReal, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_CHAOS, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____7194_5CA9_55B7_53D1_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -85,7 +85,7 @@ function _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, x, y)
                         if not _____5355_4F4D_6709_6548(unit) then
                             goto __continue12
                         end
-                        local damage = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * config["残留伤害目标最大生命比例"]
+                        local damage = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * config["残留伤害目标最大生命比例"]
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
                             ["技能ID"] = _____7194_5CA9_55B7_53D1_6280_80FDID,
                             ["来源"] = boss,
@@ -261,10 +261,11 @@ local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害
 _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成AOE技能伤害"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-GetUnitState = jass.GetUnitState
+local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
 GetRandomReal = jass.GetRandomReal

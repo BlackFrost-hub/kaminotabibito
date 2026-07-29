@@ -5,6 +5,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetHeroStr = jass.GetHeroStr as (this: void, unit: any, includeBonuses: boolean) => number;
 const GetHeroInt = jass.GetHeroInt as (this: void, unit: any, includeBonuses: boolean) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
@@ -117,7 +119,7 @@ export function calcTotalLifeRegen(
 
   // 百分比生命恢复
   const percentRegen = getPercentLifeRegen(unit);
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
   const percentRegenValue = maxLife * percentRegen;
 
   // 生命恢复属性增幅
@@ -141,7 +143,7 @@ export function calcTotalManaRegen(this: void, unit: any, baseRegen: number): nu
 
   // 百分比魔法恢复
   const percentRegen = getPercentManaRegen(unit);
-  const maxMana = GetUnitState(unit, UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitStateJapi(unit, UNIT_STATE_MAX_MANA);
   const percentRegenValue = maxMana * percentRegen;
 
   return baseRegen + fixedRegen + percentRegenValue;

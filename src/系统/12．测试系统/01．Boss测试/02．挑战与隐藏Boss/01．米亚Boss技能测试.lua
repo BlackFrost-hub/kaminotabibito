@@ -5,6 +5,8 @@ function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local globals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local SelectUnitForPlayerSingle = ____require_result_0.SelectUnitForPlayerSingle
@@ -185,7 +187,7 @@ local function ____on_7C73_4E9A_6280_80FD3_6D4B_8BD5_547D_4EE4(_player, context)
     SetUnitState(
         context["Boss单位"],
         UNIT_STATE_LIFE,
-        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * 0.75
+        GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE) * 0.75
     )
     _____89E6_53D1_7C73_4E9A_7075_732B_5206_8EAB(context)
 end
@@ -242,7 +244,7 @@ local function ____on_7C73_4E9A_6280_80FD10_6D4B_8BD5_547D_4EE4(_player, context
     SetUnitState(
         context["Boss单位"],
         UNIT_STATE_LIFE,
-        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * 0.25
+        GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE) * 0.25
     )
     _____89E6_53D1_7C73_4E9A_7EC8_6781_6C61_67D3(context, 0)
 end

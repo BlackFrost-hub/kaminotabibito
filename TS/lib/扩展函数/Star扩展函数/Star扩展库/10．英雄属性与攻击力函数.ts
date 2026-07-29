@@ -5,6 +5,8 @@
  */
 
 const jass = require("jass.common") as any;
+const unitStateJapi = require("jass.japi") as any;
+const GetUnitStateJapi = unitStateJapi.GetUnitState as (this: void, unit: any, state: any) => number;
 const { CosBJ, BJ_DEGTORAD } = require("lib.扩展函数.BJ函数.00．BJ全局兜底") as {
   CosBJ: (this: void, degrees: number) => number;
   BJ_DEGTORAD: number;
@@ -168,9 +170,9 @@ export function SU_GetUnitWhiteAtk(this: any, uOrA: any, aMaybe: any): number {
   if (!SUC_IsValidUnit(u)) return 0;
 
   const primaryGreen = getHeroPrimaryGreenValue(u);
-  const baseDmg = jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE));
-  const bonusDmg = jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS));
-  const diceCount = jass.GetUnitState(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_COUNT));
+  const baseDmg = GetUnitStateJapi(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE));
+  const bonusDmg = GetUnitStateJapi(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS));
+  const diceCount = GetUnitStateJapi(u, jass.ConvertUnitState(UNIT_STATE_ATTACK1_COUNT));
 
   return baseDmg + bonusDmg * (diceCount + 1) / 2 - a * primaryGreen;
 }

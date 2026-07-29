@@ -289,7 +289,7 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_73B0_5B9E_65AD_88C2(instance)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local ordinary = cfg["普通技能"]
     local locked = instance["锁定"]
-    local effect = _____64AD_653E_65F6_95F4_505C_6B62_7ED3_7B97_7279_6548(cfg["表现资源"]["现实断裂特效路径"], (locked["裂缝起点X"] + locked["裂缝终点X"]) * 0.5, (locked["裂缝起点Y"] + locked["裂缝终点Y"]) * 0.5, ordinary["现实断裂特效缩放"])
+    local effect = _____64AD_653E_65F6_95F4_505C_6B62_7ED3_7B97_7279_6548(cfg["表现资源"]["时间停止现实断裂结算特效路径"], (locked["裂缝起点X"] + locked["裂缝终点X"]) * 0.5, (locked["裂缝起点Y"] + locked["裂缝终点Y"]) * 0.5, cfg["阶段技能"]["时间停止现实断裂结算特效缩放"])
     if effect ~= nil and effect ~= 0 then
         _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C(effect, {["Z轴角度"] = locked["裂缝角度"]})
     end

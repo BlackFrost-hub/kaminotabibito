@@ -3,7 +3,7 @@ local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
 local ____exports = {}
-local _____53D6_539F_751F_8840_6761_5E27, _____9690_85CF_5355_4F4D_539F_751F_8840_6761, _____9650_523601, _____5355_4F4D_5B58_6D3B, _____5355_4F4D_53EF_6CE8_518C_8840_6761, _____53D6_5934_9876_9AD8_5EA6, _____5E94_663E_793A_540D_5B57, _____53BB_9664_9B54_517D_989C_8272_7801, _____53D6_8840_6761_540D_5B57_6587_672C, _____53D6_751F_547D_8D34_56FE, _____66F4_65B0_751F_547D_8D34_56FE, _____53D6_62A4_76FE_8D34_56FE, _____8BA1_7B97_6709_6548_751F_547D_663E_793A_53C2_6570, _____5408_5E76_62A4_76FE_663E_793A_5206_6BB5, _____66F4_65B0_62A4_76FE_5206_6BB5_8D34_56FE, _____9690_85CF_62A4_76FE_5206_6BB5, _____5237_65B0_62A4_76FE_5206_6BB5, _____7ED1_5B9A_5E27_5230_5355_4F4D, _____6FC0_6D3B_7ED1_5B9A_663E_793A, _____8C03_6574_6839_6846_5C3A_5BF8, _____521D_59CB_5316_5E27_5185_5BB9, jass, _____67E5_8BE2_5355_4F4D_53EF_663E_793A_62A4_76FE_503C, _____67E5_8BE2_5355_4F4D_62A4_76FE_5217_8868, _____62A4_76FE_7C7B_578B, GetHandleId, IsUnitType, IsUnitEnemy, GetLocalPlayer, GetUnitAbilityLevel, GetUnitState, GetUnitLevel, GetUnitName, GetUnitTypeId, DzFrameShow, DzFrameSetSize, DzFrameSetPoint, DzFrameSetTexture, DzFrameSetText, DzFrameBindWidget, DzSetUnitPreselectUIVisible, DzFrameGetUnitHpBar, _____751F_547D_72B6_6001, _____6700_5927_751F_547D_72B6_6001, _____6700_5927_9B54_6CD5_72B6_6001, _____8757_866B_6280_80FDID, _____5355_4F4D_8840_6761_8868, _____5355_4F4DID_5217_8868
+local _____53D6_539F_751F_8840_6761_5E27, _____9690_85CF_5355_4F4D_539F_751F_8840_6761, _____9650_523601, _____5355_4F4D_5B58_6D3B, _____5355_4F4D_53EF_6CE8_518C_8840_6761, _____53D6_5934_9876_9AD8_5EA6, _____5E94_663E_793A_540D_5B57, _____53BB_9664_9B54_517D_989C_8272_7801, _____53D6_8840_6761_540D_5B57_6587_672C, _____53D6_751F_547D_8D34_56FE, _____66F4_65B0_751F_547D_8D34_56FE, _____53D6_62A4_76FE_8D34_56FE, _____8BA1_7B97_6709_6548_751F_547D_663E_793A_53C2_6570, _____5408_5E76_62A4_76FE_663E_793A_5206_6BB5, _____66F4_65B0_62A4_76FE_5206_6BB5_8D34_56FE, _____9690_85CF_62A4_76FE_5206_6BB5, _____5237_65B0_62A4_76FE_5206_6BB5, _____7ED1_5B9A_5E27_5230_5355_4F4D, _____6FC0_6D3B_7ED1_5B9A_663E_793A, _____8C03_6574_6839_6846_5C3A_5BF8, _____521D_59CB_5316_5E27_5185_5BB9, jass, GetUnitStateJapi, _____67E5_8BE2_5355_4F4D_53EF_663E_793A_62A4_76FE_503C, _____67E5_8BE2_5355_4F4D_62A4_76FE_5217_8868, _____62A4_76FE_7C7B_578B, GetHandleId, IsUnitType, IsUnitEnemy, GetLocalPlayer, GetUnitAbilityLevel, GetUnitState, GetUnitLevel, GetUnitName, GetUnitTypeId, DzFrameShow, DzFrameSetSize, DzFrameSetPoint, DzFrameSetTexture, DzFrameSetText, DzFrameBindWidget, DzSetUnitPreselectUIVisible, DzFrameGetUnitHpBar, _____751F_547D_72B6_6001, _____6700_5927_751F_547D_72B6_6001, _____6700_5927_9B54_6CD5_72B6_6001, _____8757_866B_6280_80FDID, _____5355_4F4D_8840_6761_8868, _____5355_4F4DID_5217_8868
 local ____00_FF0E_5E38_91CF = require("系统.09．表现系统.13．单位头顶血条.00．常量")
 local _____542F_7528_5355_4F4D_5934_9876_8840_6761 = ____00_FF0E_5E38_91CF["启用单位头顶血条"]
 local _____8840_6761_5237_65B0_95F4_9694Tick = ____00_FF0E_5E38_91CF["血条刷新间隔Tick"]
@@ -337,8 +337,8 @@ ____exports["注册单位头顶血条"] = function(unit)
     if _____5E27 == nil then
         return
     end
-    local maxLife = GetUnitState(unit, _____6700_5927_751F_547D_72B6_6001)
-    local maxMana = GetUnitState(unit, _____6700_5927_9B54_6CD5_72B6_6001)
+    local maxLife = GetUnitStateJapi(unit, _____6700_5927_751F_547D_72B6_6001)
+    local maxMana = GetUnitStateJapi(unit, _____6700_5927_9B54_6CD5_72B6_6001)
     local isHero = IsUnitType(unit, jass.UNIT_TYPE_HERO)
     local binding = {
         ["单位"] = unit,
@@ -359,6 +359,7 @@ ____exports["注册单位头顶血条"] = function(unit)
 end
 jass = require("jass.common")
 local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_0.onTick10ms
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
@@ -462,7 +463,7 @@ end
 local function _____5237_65B0_751F_547D_9B54_6CD5(binding)
     local unit = binding["单位"]
     local life = GetUnitState(unit, _____751F_547D_72B6_6001)
-    local maxLifeNow = GetUnitState(unit, _____6700_5927_751F_547D_72B6_6001)
+    local maxLifeNow = GetUnitStateJapi(unit, _____6700_5927_751F_547D_72B6_6001)
     if maxLifeNow > 1 then
         binding["最大生命缓存"] = maxLifeNow
     end
@@ -477,7 +478,7 @@ local function _____5237_65B0_751F_547D_9B54_6CD5(binding)
     DzFrameSetSize(binding["帧"].life, lifeWidth, _____8840_6761_5C3A_5BF8["生命高"])
     _____66F4_65B0_751F_547D_7F13_964D(binding, display["生命显示比例"])
     _____5237_65B0_62A4_76FE_5206_6BB5(binding, display["生命显示比例"], display["显示容量"], display["护盾值"])
-    local maxManaNow = GetUnitState(unit, _____6700_5927_9B54_6CD5_72B6_6001)
+    local maxManaNow = GetUnitStateJapi(unit, _____6700_5927_9B54_6CD5_72B6_6001)
     if maxManaNow > 0 then
         binding["最大魔法缓存"] = maxManaNow
     end

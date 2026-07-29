@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____66F4_65B0_9B54_6CD5_663E_793A, _____7ED3_675F_5F02_5F62_5316, _____5F02_5F62_5316Tick, _____542F_52A8_5F02_5F62_5316_72B6_6001, ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, DzSetUnitModel, _____8BBE_7F6EBoss_8840_6761_5934_50CF, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, getBuffRuntime, _____83F2_5229_65AFBuffID, _____5F00_59CB_7275_5F15, _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664, _____9B54_6CD5_589E_51CF, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5F02_5F62_5316_6280_80FDID
+local _____66F4_65B0_9B54_6CD5_663E_793A, _____7ED3_675F_5F02_5F62_5316, _____5F02_5F62_5316Tick, _____542F_52A8_5F02_5F62_5316_72B6_6001, ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, DzSetUnitModel, _____8BBE_7F6EBoss_8840_6761_5934_50CF, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, getBuffRuntime, _____83F2_5229_65AFBuffID, _____5F00_59CB_7275_5F15, _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664, _____9B54_6CD5_589E_51CF, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5F02_5F62_5316_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
@@ -25,7 +25,7 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 function _____66F4_65B0_9B54_6CD5_663E_793A(context)
     local boss = context["Boss单位"]
-    local maxMana = GetUnitState(boss, UNIT_STATE_MAX_MANA)
+    local maxMana = GetUnitStateJapi(boss, UNIT_STATE_MAX_MANA)
     if maxMana > 0 then
         local shown = context["当前魔法充能"] > maxMana and maxMana or context["当前魔法充能"]
         _____9B54_6CD5_589E_51CF(
@@ -98,7 +98,7 @@ function _____5F02_5F62_5316Tick(context, callbackID)
                 if distance2 <= near2 then
                     _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664({
                         ["目标"] = hero,
-                        ["数值"] = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * damageRatio,
+                        ["数值"] = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * damageRatio,
                         ["不致死"] = true,
                         ["显示特效"] = false
                     })
@@ -229,6 +229,7 @@ function ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548(castingUnit, spellAbilit
 end
 local jass = require("jass.common")
 local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY

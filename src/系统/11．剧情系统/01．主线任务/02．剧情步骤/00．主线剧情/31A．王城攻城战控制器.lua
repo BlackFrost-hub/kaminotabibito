@@ -184,6 +184,8 @@ function ____on_542F_52A8_83F2_5229_65AF_51FA_573A(_____9884_671F_4E16_4EE3)
     _____542F_52A8_653B_57CE_76EE_6807_91CD_53D1()
 end
 jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
@@ -368,7 +370,7 @@ local function _____8BFB_53D6_53CB_519B_5C5E_6027_57FA_51C6(_____8036_63D0_5C14)
     end
     return {
         ["最大生命"] = _____81F3_5C11_4E3A(
-            GetUnitState(_____8036_63D0_5C14, jass.UNIT_STATE_MAX_LIFE),
+            GetUnitStateJapi(_____8036_63D0_5C14, jass.UNIT_STATE_MAX_LIFE),
             12000
         ),
         ["攻击力"] = _____81F3_5C11_4E3A(
@@ -389,7 +391,7 @@ local function _____5E94_7528_53CB_519B_52A8_6001_5C5E_6027(unit, _____9884_7F6E
         unit,
         0,
         0,
-        _____76EE_6807_6700_5927_751F_547D - GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE)
+        _____76EE_6807_6700_5927_751F_547D - GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE)
     )
     GS_UnitPry(
         unit,

@@ -10,6 +10,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const SetUnitStateJapi = japi.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
 const globals = require("jass.globals") as { gg_unit_Hamg_0002?: any; [key: string]: any };
 
 const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
@@ -102,7 +104,7 @@ function 重置测试属性(this: void, archmage: any, target: any): void {
 function 创建临时单位(this: void, nearUnit: any, offsetX: number): any {
   const unit = CreateUnit(Player(PLAYER_NEUTRAL_AGGRESSIVE), 临时单位类型, GetUnitX(nearUnit) + offsetX, GetUnitY(nearUnit), 270);
   if (!单位有效(unit)) return null;
-  SetUnitState(unit, UNIT_STATE_MAX_LIFE, 临时单位生命);
+  SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, 临时单位生命);
   SetUnitState(unit, UNIT_STATE_LIFE, 临时单位生命);
   待清理单位 = unit;
   createDelayedCall(清理延迟, 清理临时单位);

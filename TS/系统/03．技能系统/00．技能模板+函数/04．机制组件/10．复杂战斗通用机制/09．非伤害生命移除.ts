@@ -28,7 +28,8 @@ export function 按比例移除当前生命(this: void, 目标: any, 比例: num
 
 export function 按比例移除最大生命(this: void, 目标: any, 比例: number, 不致死: boolean = true): number {
   const jass = require("jass.common") as any;
-  const maxLife = jass.GetUnitState(目标, jass.UNIT_STATE_MAX_LIFE) as number;
+  const maxLife = GetUnitStateJapi(目标, jass.UNIT_STATE_MAX_LIFE) as number;
   return 执行非伤害生命移除({ 目标, 数值: maxLife * 比例, 不致死 });
 }
-
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;

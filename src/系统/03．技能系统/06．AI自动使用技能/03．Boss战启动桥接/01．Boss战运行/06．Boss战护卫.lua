@@ -32,6 +32,7 @@ function _____83B7_53D6_62A4_536B_5BF9_767D_6765_6E90_5355_4F4D(context, _____8F
 end
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.09．表现系统.06．广播提示消息.index")
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_0["广播单位提示"]
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
@@ -152,12 +153,12 @@ local function _____83B7_53D6_540C_7C7B_5B58_6D3B_6570_91CF(_____8FD0_884C_4E0A_
 end
 local function _____5E94_7528_62A4_536B_989D_5916_5C5E_6027(unit, _____914D_7F6E)
     if _____914D_7F6E["额外最大生命"] ~= nil and _____914D_7F6E["额外最大生命"] ~= 0 then
-        local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+        local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
         SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, maxLife + _____914D_7F6E["额外最大生命"])
         SetUnitState(
             unit,
             UNIT_STATE_LIFE,
-            GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+            GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
         )
     end
     if _____914D_7F6E["暴击率"] ~= nil then

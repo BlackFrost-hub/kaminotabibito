@@ -6,6 +6,8 @@ local SUC_IsValidUnit = ____08_FF0E_5355_4F4D_5224_5B9A_4E0E_7B5B_9009_51FD_6570
 -- 
 -- 提供单位模型读取、英雄主属性操作与白字攻击力计算。
 local jass = require("jass.common")
+local unitStateJapi = require("jass.japi")
+local GetUnitStateJapi = unitStateJapi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.BJ函数.00．BJ全局兜底")
 local CosBJ = ____require_result_0.CosBJ
 local BJ_DEGTORAD = ____require_result_0.BJ_DEGTORAD
@@ -224,15 +226,15 @@ function ____exports.SU_GetUnitWhiteAtk(self, uOrA, aMaybe)
         return 0
     end
     local primaryGreen = getHeroPrimaryGreenValue(nil, u)
-    local baseDmg = jass.GetUnitState(
+    local baseDmg = GetUnitStateJapi(
         u,
         jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
     )
-    local bonusDmg = jass.GetUnitState(
+    local bonusDmg = GetUnitStateJapi(
         u,
         jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
     )
-    local diceCount = jass.GetUnitState(
+    local diceCount = GetUnitStateJapi(
         u,
         jass.ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)
     )

@@ -81,6 +81,8 @@ export interface 次数型伤害免疫控制器 {
 }
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
@@ -126,7 +128,7 @@ function 计算最低伤害(this: void, 参数: 次数型伤害免疫参数): nu
   let 门槛 = 参数.最低伤害 ?? 0;
   const 最大生命比例 = 参数.最低伤害占最大生命比例 ?? 0;
   if (最大生命比例 > 0 && 参数.单位 != null && 参数.单位 !== 0) {
-    const 比例门槛 = GetUnitState(参数.单位, UNIT_STATE_MAX_LIFE) * 最大生命比例;
+    const 比例门槛 = GetUnitStateJapi(参数.单位, UNIT_STATE_MAX_LIFE) * 最大生命比例;
     if (比例门槛 > 门槛) 门槛 = 比例门槛;
   }
   return 门槛;

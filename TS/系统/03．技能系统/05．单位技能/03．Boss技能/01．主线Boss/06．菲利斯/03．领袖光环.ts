@@ -10,6 +10,8 @@ import { 创建手动数值Buff范围光环, 同步手动数值Buff范围光环 
 import { 调整状态ID属性 } from "../../../../00．技能模板+函数/01．技能函数/20．物品辅助/16．属性位移与指令";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -39,7 +41,7 @@ const 领袖光环特效键 = "菲利斯-领袖光环";
 let 领袖光环范围ID = 0;
 
 function 生命比例(this: void, unit: any): number {
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return 0;
   return GetUnitState(unit, UNIT_STATE_LIFE) / maxLife;
 }

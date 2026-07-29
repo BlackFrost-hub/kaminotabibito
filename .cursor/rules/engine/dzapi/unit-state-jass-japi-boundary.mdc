@@ -1,35 +1,39 @@
 ---
-description: UnitState 写入时区分 JASS SetUnitState 与 JAPI SetUnitState，避免 ConvertUnitState/JAPI 状态误走 jass.SetUnitState
+description: UnitState 读写时区分 JASS 与 JAPI，避免动态最大值和扩展状态走错 API
 globs: TS/**/*.ts
 alwaysApply: false
 ---
 
 # UnitState 的 JASS / JAPI 边界
 
-`SetUnitState` 这个名字在 `jass.common` 和 `jass.japi` 里都存在，最容易混淆。写单位状态前先确认状态来源：
+`GetUnitState` / `SetUnitState` 在 `jass.common` 和 `jass.japi` 里都有同名入口，读写前必须按 GUI 的 `[JAPI]` 标记确认来源：
 
-- 普通 JASS 状态，例如当前生命、当前魔法：使用 `jass.SetUnitState`。
-- 文档或截图标记为 `[JAPI]` 的状态：使用 `japi.SetUnitState`。
-- `UNIT_STATE_MAX_LIFE`、`UNIT_STATE_MAX_MANA` 这类最大值写入按 `[JAPI]` 处理。
-- `ConvertUnitState(0x12)` 基础伤害、`0x16` 攻击范围、`0x20` 护甲、`0x25` 攻击间隔等 `[JAPI]` 状态写入，必须走 `japi.SetUnitState`。
+- 当前生命、当前魔法、攻击类型 `[1-6]`、护甲类型 `[0-7]` 没有 `[JAPI]` 标记，使用 JASS 读写。
+- 骰子数量、骰子面数、基础伤害、附加伤害、攻击范围、攻击间隔、攻击速度、护甲、最大生命、最大魔法标记为 `[JAPI]`，必须使用 JAPI 读写。
+- `UNIT_STATE_MAX_LIFE`、`UNIT_STATE_MAX_MANA` 的读取和写入都按 `[JAPI]` 处理。
+- `ConvertUnitState(0x10-0x16)` 伤害/攻击范围、`0x20` 护甲、`0x25` 攻击间隔、`0x51` 攻击速度等扩展状态读写必须走 JAPI。
 - `SetUnitAcquireRange` 是 JASS 主动索敌/主动攻击范围 API，不属于 `SetUnitState`。
 
-推荐写法：先绑定本地别名，避免 TSTL 生成 `japi:SetUnitState(...)` 这类错误调用形态。
+推荐写法：先绑定本地别名，避免 TSTL 生成 `japi:GetUnitState(...)` / `japi:SetUnitState(...)` 这类错误调用形态。
 
 ```ts
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-const SetUnitStateJass = jass.SetUnitState as (unit: any, state: number, value: number) => void;
-const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: number, value: number) => void;
+const GetUnitStateJass = jass.GetUnitState as (this: void, unit: any, state: number) => number;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: number) => number;
+const SetUnitStateJass = jass.SetUnitState as (this: void, unit: any, state: number, value: number) => void;
+const SetUnitStateJapi = japi.SetUnitState as (this: void, unit: any, state: number, value: number) => void;
 
+const maxLife = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE);
+const life = GetUnitStateJass(unit, jass.UNIT_STATE_LIFE);
 SetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE, maxLife + bonus);
 SetUnitStateJass(unit, jass.UNIT_STATE_LIFE, newLife);
 ```
 
 审计清单：
 
-1. 搜索 `SetUnitState(`、`jass.SetUnitState(`、`ConvertUnitState(`。
-2. 看到 `ConvertUnitState(0x12/0x16/0x20/0x25)` 或最大生命/最大魔法写入，优先检查是否使用了 `japi.SetUnitState`。
-3. 当前生命/当前魔法的写入保持 JASS，避免把普通状态也误改成 JAPI。
+1. 搜索 `GetUnitState(`、`SetUnitState(`、`jass.GetUnitState(`、`jass.SetUnitState(`、`ConvertUnitState(`。
+2. 看到 `ConvertUnitState(0x10-0x16/0x20/0x25/0x51)` 或最大生命/最大魔法读写，检查是否使用 JAPI。
+3. 当前生命/当前魔法以及攻击类型/护甲类型的读写保持 JASS，避免把无 `[JAPI]` 标记的状态误改成 JAPI。
 4. 改完必须构建，并抽查生成 Lua，确认是普通函数调用而不是冒号调用。

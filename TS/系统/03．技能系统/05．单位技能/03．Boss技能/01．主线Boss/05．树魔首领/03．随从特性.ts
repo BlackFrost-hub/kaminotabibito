@@ -10,6 +10,8 @@ import { 启动基础施法时间线 } from '../../../../00．技能模板+函�
 import { 发起治疗波跳链 } from '../../../../00．技能模板+函数/01．技能函数/10．跳链/治疗波跳链';
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
@@ -188,7 +190,7 @@ function 尝试播放树魔首领怪叫(this: void, boss: any, 触发概率百�
 
 function 取单位缺血比例(this: void, unit: any): number {
   if (!单位存活(unit)) return 0;
-  const maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return 0;
   const currentLife = GetUnitState(unit, UNIT_STATE_LIFE);
   const ratio = (maxLife - currentLife) / maxLife;
@@ -221,7 +223,7 @@ function 发起树魔巫医疗波(this: void, context: 树魔首领运行时上�
   const boss = context.Boss单位;
   const target = 选择巫医治疗目标(context);
   if (target == null || target === 0) return;
-  const healAmount = GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE) * cfg.巫医疗波Boss最大生命比例;
+  const healAmount = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE) * cfg.巫医疗波Boss最大生命比例;
   function 树魔巫医疗波目标筛选(this: void, unit: any): boolean {
     if (!单位存活(unit) || 取单位缺血比例(unit) <= 0) return false;
     return unit === boss || 是否指定Boss护卫(unit, boss);

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_96BE_5EA6, _____53D6_56FE_817E_4E2D_5FC3, _____9009_62E9_56FE_817E_5206_652F, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____521B_5EFA_56FE_817E_5355_4F4D, _____5BF9_6240_6709_73A9_5BB6_65BD_52A0_9759_6B62_7729_6655, _____521B_5EFA_9759_6B62_9677_9631, _____521B_5EFA_751F_547D_9677_9631, _____7206_70B8_9677_9631_9020_6210_4F24_5BB3, _____8C03_5EA6_7206_70B8_9677_9631_7206_70B8, _____521B_5EFA_7206_70B8_9677_9631, _____521B_5EFA_6811_9B54_56FE_817E_5206_652F, ____on_6811_9B54_9996_9886_6811_9B54_56FE_817E_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, GetOwningPlayer, IssuePointOrder, SetUnitMoveSpeed, SetUnitPosition, SetUnitAnimationByIndex, GetRandomInt, GetRandomReal, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getGameDifficulty, registerManualBuff, _____6811_9B54_9996_9886BuffID, _____65BD_52A0_5FEB_901F_63A7_5236Buff, createTimedEffect, createTimedUnitEffect, CosBJ, SinBJ, _____5FEB_901F_63A7_5236__51FB_6655, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6811_9B54_56FE_817E_6280_80FDID, _____730E_5934_8005_5355_4F4D_7C7B_578BID, _____5DEB_533B_5355_4F4D_7C7B_578BID, _____6295_63B7_8005_5355_4F4D_7C7B_578BID
+local _____53D6_96BE_5EA6, _____53D6_56FE_817E_4E2D_5FC3, _____9009_62E9_56FE_817E_5206_652F, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____521B_5EFA_56FE_817E_5355_4F4D, _____5BF9_6240_6709_73A9_5BB6_65BD_52A0_9759_6B62_7729_6655, _____521B_5EFA_9759_6B62_9677_9631, _____521B_5EFA_751F_547D_9677_9631, _____7206_70B8_9677_9631_9020_6210_4F24_5BB3, _____8C03_5EA6_7206_70B8_9677_9631_7206_70B8, _____521B_5EFA_7206_70B8_9677_9631, _____521B_5EFA_6811_9B54_56FE_817E_5206_652F, ____on_6811_9B54_9996_9886_6811_9B54_56FE_817E_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, GetOwningPlayer, IssuePointOrder, SetUnitMoveSpeed, SetUnitPosition, SetUnitAnimationByIndex, GetRandomInt, GetRandomReal, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_ENHANCED, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getGameDifficulty, registerManualBuff, _____6811_9B54_9996_9886BuffID, _____65BD_52A0_5FEB_901F_63A7_5236Buff, createTimedEffect, createTimedUnitEffect, CosBJ, SinBJ, _____5FEB_901F_63A7_5236__51FB_6655, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6811_9B54_56FE_817E_6280_80FDID, _____730E_5934_8005_5355_4F4D_7C7B_578BID, _____5DEB_533B_5355_4F4D_7C7B_578BID, _____6295_63B7_8005_5355_4F4D_7C7B_578BID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -136,7 +136,7 @@ function _____521B_5EFA_9759_6B62_9677_9631(context)
         context,
         "树魔首领-静止陷阱",
         cfg["静止陷阱模型路径"],
-        GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg["静止陷阱生命Boss最大生命比例"],
+        GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg["静止陷阱生命Boss最大生命比例"],
         duration
     )
     if trap == nil then
@@ -234,7 +234,7 @@ function _____521B_5EFA_751F_547D_9677_9631(context)
         context,
         "树魔首领-生命陷阱",
         cfg["生命陷阱模型路径"],
-        GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg["生命陷阱生命Boss最大生命比例"],
+        GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg["生命陷阱生命Boss最大生命比例"],
         cfg["生命陷阱持续秒"]
     )
     if trap == nil then
@@ -269,7 +269,7 @@ function _____521B_5EFA_751F_547D_9677_9631(context)
                             ["技能ID"] = _____6811_9B54_56FE_817E_6280_80FDID,
                             ["来源"] = boss,
                             ["目标"] = hero,
-                            ["伤害"] = GetUnitState(hero, UNIT_STATE_MAX_LIFE) * cfg["生命陷阱伤害目标最大生命比例"],
+                            ["伤害"] = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg["生命陷阱伤害目标最大生命比例"],
                             attack = false,
                             ranged = false,
                             attackType = ATTACK_TYPE_NORMAL,
@@ -367,7 +367,7 @@ function _____521B_5EFA_7206_70B8_9677_9631(context)
         context,
         "树魔首领-爆炸陷阱",
         cfg["爆炸陷阱模型路径"],
-        GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg["爆炸陷阱生命Boss最大生命比例"],
+        GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg["爆炸陷阱生命Boss最大生命比例"],
         cfg["爆炸陷阱持续秒"],
         function(unit)
             if naturalEnd or exploded then
@@ -479,6 +479,8 @@ end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY

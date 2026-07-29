@@ -55,6 +55,7 @@ ____exports["释放亚伦柯斯亡者凝视"] = function(context, target)
     context["当前大型技能"] = _____4EA1_8005_51DD_89C6_6280_80FDKey
     context["普通机制忙碌到Ms"] = getServerTime() + (cfg["前摇秒"] + 0.5) * 1000
     SetUnitFacing(boss, facing)
+    _____5F00_59CB_786C_76F4(boss, cfg["前摇秒"])
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "扇形",
         X = x,

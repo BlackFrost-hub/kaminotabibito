@@ -33,6 +33,8 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
 };
 
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -159,7 +161,7 @@ function on安兹承受爆发伤害(this: void, target: any, attacker: any, appl
   for (let i = 0; i < contexts.length; i++) {
     const context = contexts[i];
     if (context.安兹单位 !== target || context.模式 !== '守护者介入') continue;
-    const threshold = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    const threshold = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
       * 安兹乌尔恭数值与表现配置.守护者模式.至尊拦截触发伤害最大生命比例;
     if (applied >= threshold) 释放雅儿贝德至尊拦截(context, attacker);
     return;

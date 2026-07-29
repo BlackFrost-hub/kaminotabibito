@@ -9,6 +9,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const g = require("jass.globals") as any;
 
 //=============================================================================
@@ -52,7 +54,7 @@ export function YDWEGetUnitArmor(u: any): number {
   if (u == null) return 0;
 
   const armorState = jass.ConvertUnitState(UNIT_STATE_ARMOR);
-  return jass.GetUnitState(u, armorState);
+  return GetUnitStateJapi(u, armorState);
 }
 
 /**
@@ -76,7 +78,7 @@ export function YDWEGetUnitArmorByDamageTest(u: any): number {
   const trig = jass.GetTriggeringTrigger ? jass.GetTriggeringTrigger() : null;
 
   // 确保单位生命足够测试
-  const maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE);
   if (maxLife <= DAMAGE_LIFE) {
     jass.UnitAddAbility(u, ARMOR_TEST_ABILITY);
   }

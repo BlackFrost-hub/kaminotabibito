@@ -18,6 +18,10 @@ local _____80F6_56CA_533A_57DF = require("系统.03．技能系统.00．技能�
 local _____5355_4F4D_662F_5426_5728_80F6_56CA_533A_57DF = _____80F6_56CA_533A_57DF["单位是否在胶囊区域"]
 local ____07_FF0E_4E9A_4F26_67EF_65AF = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.07．亚伦柯斯")
 local _____4E9A_4F26_67EF_65AFBuffID = ____07_FF0E_4E9A_4F26_67EF_65AF["亚伦柯斯BuffID"]
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -243,6 +247,9 @@ ____exports["启动亚伦柯斯旧誓墓碑"] = function(context)
     local facings = {90, 210, 330}
     local now = getServerTime()
     context["墓碑机制已启动"] = true
+    context["普通机制忙碌到Ms"] = now + cfg["启动硬直秒"] * 1000
+    _____5F00_59CB_786C_76F4(boss, cfg["启动硬直秒"])
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["启动动画编号"], ["持续秒"] = cfg["启动硬直秒"], ["恢复动画编号"] = 1})
     context["已安魂墓碑数量"] = 0
     context["未安魂墓碑数量"] = cfg["数量"]
     context["墓碑状态列表"] = {}

@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: any) => number;
@@ -152,7 +154,7 @@ class 累计承伤触发实现 implements 累计承伤触发控制器 {
   private 计算阈值(单位: any): number {
     let 阈值 = this.参数.固定阈值 ?? 0;
     if (this.参数.最大生命比例阈值 != null && this.参数.最大生命比例阈值 > 0) {
-      const hpValue = GetUnitState(单位, UNIT_STATE_MAX_LIFE) * this.参数.最大生命比例阈值;
+      const hpValue = GetUnitStateJapi(单位, UNIT_STATE_MAX_LIFE) * this.参数.最大生命比例阈值;
       if (阈值 <= 0 || hpValue < 阈值) 阈值 = hpValue;
     }
     return 阈值;

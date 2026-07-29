@@ -10,6 +10,8 @@ local addDelayedCallback = ____require_result_1.addDelayedCallback
 local removeDelayedCallback = ____require_result_1.removeDelayedCallback
 local getServerTime = ____require_result_1.getServerTime
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local function _____89C4_6574_6B21_6570(_____6B21_6570)
@@ -103,7 +105,7 @@ local function _____8BA1_7B97_6700_4F4E_4F24_5BB3(_____53C2_6570)
     local _____95E8_69DB = _____53C2_6570["最低伤害"] or 0
     local _____6700_5927_751F_547D_6BD4_4F8B = _____53C2_6570["最低伤害占最大生命比例"] or 0
     if _____6700_5927_751F_547D_6BD4_4F8B > 0 and _____53C2_6570["单位"] ~= nil and _____53C2_6570["单位"] ~= 0 then
-        local _____6BD4_4F8B_95E8_69DB = GetUnitState(_____53C2_6570["单位"], UNIT_STATE_MAX_LIFE) * _____6700_5927_751F_547D_6BD4_4F8B
+        local _____6BD4_4F8B_95E8_69DB = GetUnitStateJapi(_____53C2_6570["单位"], UNIT_STATE_MAX_LIFE) * _____6700_5927_751F_547D_6BD4_4F8B
         if _____6BD4_4F8B_95E8_69DB > _____95E8_69DB then
             _____95E8_69DB = _____6BD4_4F8B_95E8_69DB
         end

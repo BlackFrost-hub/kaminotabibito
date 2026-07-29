@@ -6,6 +6,7 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local jglobals = require("jass.globals")
 local slk = require("jass.slk")
 local GetHandleId = jass.GetHandleId
@@ -211,7 +212,7 @@ end
 local function setHp(u, v)
     local key = sh("生命")
     local oldAdd = loadReal(u, key)
-    local oldMax = GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local oldMax = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE)
     local oldLife = GetUnitState(u, jass.UNIT_STATE_LIFE)
     local ratio = oldMax > 0.405 and oldLife / oldMax or 1
     local newAdd = oldAdd + v
@@ -225,7 +226,7 @@ end
 local function setMp(u, v)
     local key = sh("法力")
     local oldAdd = loadReal(u, key)
-    local oldMax = GetUnitState(u, jass.UNIT_STATE_MAX_MANA)
+    local oldMax = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA)
     local oldMana = GetUnitState(u, jass.UNIT_STATE_MANA)
     local ratio = oldMax > 0 and oldMana / oldMax or 1
     local newAdd = oldAdd + v
@@ -320,7 +321,7 @@ function ____exports.SGSS_SetStatePercentumEX2(u, id, v)
     if id == 7 then
         local pv = loadReal(u, hpPct)
         local av = loadReal(u, hpAdd)
-        local base = GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) - av
+        local base = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE) - av
         local npv = pv + v
         local nav = base * npv
         if av ~= nav then
@@ -332,7 +333,7 @@ function ____exports.SGSS_SetStatePercentumEX2(u, id, v)
     elseif id == 8 then
         local pv = loadReal(u, mpPct)
         local av = loadReal(u, mpAdd)
-        local base = GetUnitState(u, jass.UNIT_STATE_MAX_MANA) - av
+        local base = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA) - av
         local npv = pv + v
         local nav = base * npv
         if av ~= nav then

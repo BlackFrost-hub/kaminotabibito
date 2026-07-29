@@ -29,6 +29,8 @@ local ____require_result_6 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_6.addDelayedCallback
 local getServerTime = ____require_result_6.getServerTime
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -190,7 +192,7 @@ local function ____on_5B89_5179_627F_53D7_7206_53D1_4F24_5BB3(target, attacker, 
                 if context["安兹单位"] ~= target or context["模式"] ~= "守护者介入" then
                     goto __continue21
                 end
-                local threshold = GetUnitState(target, UNIT_STATE_MAX_LIFE) * _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["至尊拦截触发伤害最大生命比例"]
+                local threshold = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["至尊拦截触发伤害最大生命比例"]
                 if applied >= threshold then
                     ____exports["释放雅儿贝德至尊拦截"](context, attacker)
                 end

@@ -6,6 +6,8 @@ local _____53D6_7269_54C1_56DB_5B57_7801 = ____01_FF0E_6B7B_4EA1_4E8B_4EF6_914D_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local itemJudgeFns = require("lib.扩展函数.物品相关函数.index")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getUnitsInRange = ____require_result_0.getUnitsInRange
@@ -45,7 +47,7 @@ local function _____662F_5426_7B26_5408_6301_76FE_53EC_5524_6761_4EF6(_____5355_
     return itemJudgeFns.UnitHasItemOfTypeBJ(_____5355_4F4D, _____7269_54C1_56DB_5B57_7801)
 end
 local function _____8BA1_7B97_53EC_5524_751F_547D_503C(_____6301_6709_8005, _____57FA_7840_503C, _____7CFB_6570)
-    return _____57FA_7840_503C + jass.GetUnitState(_____6301_6709_8005, _____6700_5927_751F_547D_72B6_6001) * _____7CFB_6570
+    return _____57FA_7840_503C + GetUnitStateJapi(_____6301_6709_8005, _____6700_5927_751F_547D_72B6_6001) * _____7CFB_6570
 end
 local function _____8BA1_7B97_53EC_5524_653B_51FB_529B(_____6301_6709_8005, _____57FA_7840_503C, _____653B_51FB_72B6_6001, _____7CFB_6570)
     return _____57FA_7840_503C + jass.GetUnitState(
@@ -77,7 +79,7 @@ local function _____521B_5EFA_5C38_4F53_53EC_5524_7269(_____6301_6709_8005, ____
     jass.SetUnitState(
         _____53EC_5524_7269,
         _____5F53_524D_751F_547D_72B6_6001,
-        jass.GetUnitState(_____53EC_5524_7269, _____6700_5927_751F_547D_72B6_6001)
+        GetUnitStateJapi(_____53EC_5524_7269, _____6700_5927_751F_547D_72B6_6001)
     )
     createTimedEffect(
         nil,

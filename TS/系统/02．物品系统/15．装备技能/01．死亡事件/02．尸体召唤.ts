@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const itemJudgeFns = require("lib.扩展函数.物品相关函数.index") as {
   UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
@@ -45,7 +47,7 @@ function 是否符合持盾召唤条件(this: void, 单位: any, 上下文: 死�
 }
 
 function 计算召唤生命值(this: void, 持有者: any, 基础值: number, 系数: number): number {
-  return 基础值 + (jass.GetUnitState(持有者, 最大生命状态) as number) * 系数;
+  return 基础值 + (GetUnitStateJapi(持有者, 最大生命状态) as number) * 系数;
 }
 
 function 计算召唤攻击力(this: void, 持有者: any, 基础值: number, 攻击状态: number, 系数: number): number {
@@ -68,7 +70,7 @@ function 创建尸体召唤物(this: void, 持有者: any, 上下文: 死亡事�
   if (召唤物 == null || 召唤物 === 0) return;
 
   jass.UnitApplyTimedLife(召唤物, stringToFourCC(配置.限时生命Buff), 配置.持续时间);
-  jass.SetUnitState(召唤物, 当前生命状态, jass.GetUnitState(召唤物, 最大生命状态) as number);
+  jass.SetUnitState(召唤物, 当前生命状态, GetUnitStateJapi(召唤物, 最大生命状态) as number);
   createTimedEffect(配置.特效路径, 上下文.死亡坐标X, 上下文.死亡坐标Y, 0, 配置.特效持续时间);
 }
 

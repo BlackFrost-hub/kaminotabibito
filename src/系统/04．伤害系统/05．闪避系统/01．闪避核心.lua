@@ -50,6 +50,8 @@ end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.22．幸运值.00．幸运值系统")
@@ -161,7 +163,7 @@ ____exports["执行闪避判定"] = function(context)
     if currentDamage < _____95EA_907F_7CFB_7EDF_914D_7F6E["生效最低伤害"] then
         return {["结束链路"] = false, ["伤害"] = currentDamage, ["闪避概率"] = 0}
     end
-    local _____6700_5927_751F_547D = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local _____6700_5927_751F_547D = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     if _____6700_5927_751F_547D > 0 and currentDamage >= _____6700_5927_751F_547D * _____95EA_907F_7CFB_7EDF_914D_7F6E["最大生命伤害比例门槛"] then
         return {["结束链路"] = false, ["伤害"] = currentDamage, ["闪避概率"] = 0}
     end

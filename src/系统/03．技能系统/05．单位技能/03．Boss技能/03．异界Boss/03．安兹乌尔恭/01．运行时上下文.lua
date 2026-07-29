@@ -15,6 +15,8 @@ local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．台词播放")
 local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local getServerTime = ____require_result_0.getServerTime
@@ -128,7 +130,7 @@ local function _____5237_65B0_5B89_5179_9636_6BB5(context)
     if context["挑战已结束"] or context["阶段"] == "挑战收束" or context["阶段"] == "已结束" then
         return
     end
-    local maxLife = GetUnitState(context["安兹单位"], UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(context["安兹单位"], UNIT_STATE_MAX_LIFE)
     if maxLife <= 0 then
         return
     end

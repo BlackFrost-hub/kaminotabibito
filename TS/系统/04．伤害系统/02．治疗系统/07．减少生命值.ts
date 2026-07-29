@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -77,9 +79,9 @@ function 获取当前值(this: void, target: any, resourceType: 资源类型): n
 
 function 获取最大值(this: void, target: any, resourceType: 资源类型): number {
   if (resourceType === "life") {
-    return GetUnitStateJass(target, UNIT_STATE_MAX_LIFE);
+    return GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   }
-  return GetUnitStateJass(target, UNIT_STATE_MAX_MANA);
+  return GetUnitStateJapi(target, UNIT_STATE_MAX_MANA);
 }
 
 function 设置当前值(this: void, target: any, resourceType: 资源类型, value: number): void {

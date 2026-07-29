@@ -2,6 +2,7 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const jglobals = require("jass.globals") as any;
 const slk = require("jass.slk") as any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -144,7 +145,7 @@ function setState3(u: any, s: number, a: number, i: number): void {
 function setHp(u: any, v: number): void {
   const key = sh("生命");
   const oldAdd = loadReal(u, key);
-  const oldMax = GetUnitState(u, jass.UNIT_STATE_MAX_LIFE);
+  const oldMax = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE);
   const oldLife = GetUnitState(u, jass.UNIT_STATE_LIFE);
   const ratio = oldMax > 0.405 ? oldLife / oldMax : 1.0;
   const newAdd = oldAdd + v;
@@ -157,7 +158,7 @@ function setHp(u: any, v: number): void {
 function setMp(u: any, v: number): void {
   const key = sh("法力");
   const oldAdd = loadReal(u, key);
-  const oldMax = GetUnitState(u, jass.UNIT_STATE_MAX_MANA);
+  const oldMax = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA);
   const oldMana = GetUnitState(u, jass.UNIT_STATE_MANA);
   const ratio = oldMax > 0 ? oldMana / oldMax : 1.0;
   const newAdd = oldAdd + v;
@@ -233,7 +234,7 @@ export function SGSS_SetStatePercentumEX2(u: any, id: number, v: number): void {
   if (id === 7) {
     const pv = loadReal(u, hpPct);
     const av = loadReal(u, hpAdd);
-    const base = GetUnitState(u, jass.UNIT_STATE_MAX_LIFE) - av;
+    const base = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE) - av;
     const npv = pv + v;
     const nav = base * npv;
     if (av !== nav) {
@@ -245,7 +246,7 @@ export function SGSS_SetStatePercentumEX2(u: any, id: number, v: number): void {
   } else if (id === 8) {
     const pv = loadReal(u, mpPct);
     const av = loadReal(u, mpAdd);
-    const base = GetUnitState(u, jass.UNIT_STATE_MAX_MANA) - av;
+    const base = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_MANA) - av;
     const npv = pv + v;
     const nav = base * npv;
     if (av !== nav) {

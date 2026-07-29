@@ -38,6 +38,8 @@ const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核�
 };
 
 const jass = require('jass.common') as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -135,7 +137,7 @@ function 清理复生结晶(this: void, crystals: 固定受击次数机制单位
 function 完成复生成功(this: void, context: 夏提雅运行时上下文, 剩余结晶: number): void {
   const boss = context.Boss单位;
   const cfg = 夏提雅数值与表现配置.血之复生;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   doHeal({
     HealSource: boss,
     HealTarget: boss,

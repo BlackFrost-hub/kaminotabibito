@@ -27,30 +27,36 @@ local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_6["�
 local _____6E05_7406Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_6["清理Boss战运行上下文"]
 local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.00．配置")
 local _____4E9A_4F26_67EF_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_7["亚伦柯斯单位技能配置"]
-local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.06．被动效果")
-local _____6CE8_518C_4E9A_4F26_67EF_65AF_88AB_52A8_6548_679C = ____require_result_8["注册亚伦柯斯被动效果"]
-local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.01．运行时上下文")
-local _____83B7_53D6_6216_521B_5EFA_4E9A_4F26_67EF_65AF_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_9["获取或创建亚伦柯斯运行时上下文"]
-local _____6E05_7406_4E9A_4F26_67EF_65AF_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_9["清理亚伦柯斯运行时上下文"]
-local _____8FDB_5165_4E9A_4F26_67EF_65AFP3 = ____require_result_9["进入亚伦柯斯P3"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.03．亡冥英斩")
-local _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_51A5_82F1_65A9 = ____require_result_10["释放亚伦柯斯亡冥英斩"]
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.04．英灵陨星")
-local _____91CA_653E_4E9A_4F26_67EF_65AF_82F1_7075_9668_661F = ____require_result_11["释放亚伦柯斯英灵陨星"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.07．亡者凝视")
-local _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_8005_51DD_89C6 = ____require_result_12["释放亚伦柯斯亡者凝视"]
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.08．旧誓墓碑")
-local _____542F_52A8_4E9A_4F26_67EF_65AF_65E7_8A93_5893_7891 = ____require_result_13["启动亚伦柯斯旧誓墓碑"]
-local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.09．不灭军魂")
-local _____542F_7528_4E9A_4F26_67EF_65AF_4E0D_706D_519B_9B42 = ____require_result_14["启用亚伦柯斯不灭军魂"]
-local _____89E6_53D1_4E9A_4F26_67EF_65AF_6700_7EC8_5F3A_5316 = ____require_result_14["触发亚伦柯斯最终强化"]
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.02．数值与表现配置")
+local _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E = ____require_result_8["亚伦柯斯正式设计配置"]
+local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.06．被动效果")
+local _____6CE8_518C_4E9A_4F26_67EF_65AF_88AB_52A8_6548_679C = ____require_result_9["注册亚伦柯斯被动效果"]
+local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.01．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_4E9A_4F26_67EF_65AF_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_10["获取或创建亚伦柯斯运行时上下文"]
+local _____6E05_7406_4E9A_4F26_67EF_65AF_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_10["清理亚伦柯斯运行时上下文"]
+local _____8FDB_5165_4E9A_4F26_67EF_65AFP3 = ____require_result_10["进入亚伦柯斯P3"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.03．亡冥英斩")
+local _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_51A5_82F1_65A9 = ____require_result_11["释放亚伦柯斯亡冥英斩"]
+local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.04．英灵陨星")
+local _____91CA_653E_4E9A_4F26_67EF_65AF_82F1_7075_9668_661F = ____require_result_12["释放亚伦柯斯英灵陨星"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.07．亡者凝视")
+local _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_8005_51DD_89C6 = ____require_result_13["释放亚伦柯斯亡者凝视"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.08．旧誓墓碑")
+local _____542F_52A8_4E9A_4F26_67EF_65AF_65E7_8A93_5893_7891 = ____require_result_14["启动亚伦柯斯旧誓墓碑"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.09．不灭军魂")
+local _____542F_7528_4E9A_4F26_67EF_65AF_4E0D_706D_519B_9B42 = ____require_result_15["启用亚伦柯斯不灭军魂"]
+local _____89E6_53D1_4E9A_4F26_67EF_65AF_6700_7EC8_5F3A_5316 = ____require_result_15["触发亚伦柯斯最终强化"]
 local CreateUnit = jass.CreateUnit
 local GetPlayerId = jass.GetPlayerId
 local SetHeroLevel = jass.SetHeroLevel
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
+local GetUnitState = jass.GetUnitState
+local SetUnitState = jass.SetUnitState
 local Rect = jass.Rect
 local RemoveRect = jass.RemoveRect
+local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____4E9A_4F26_67EF_65AF_5355_4F4DID = stringToFourCCSafe(_____4E9A_4F26_67EF_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6D4B_8BD5_4E2D_5FC3X = -540.6
 local _____6D4B_8BD5_4E2D_5FC3Y = -2495.2
@@ -165,23 +171,60 @@ end
 local function _____51C6_5907_4E9A_4F26_67EF_65AFP1(context)
     context["运行时"]["阶段"] = "P1守墓者苏醒"
     context["运行时"]["当前大型技能"] = nil
+    SetUnitState(
+        context["Boss单位"],
+        UNIT_STATE_LIFE,
+        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE)
+    )
+end
+local function _____51C6_5907_4E9A_4F26_67EF_65AFP2(context)
+    local thresholds = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]
+    context["运行时"]["阶段"] = "P2旧誓回响"
+    context["运行时"]["当前大型技能"] = nil
+    SetUnitState(
+        context["Boss单位"],
+        UNIT_STATE_LIFE,
+        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * (thresholds["P2生命比例"] + thresholds["P3生命比例"]) * 0.5
+    )
 end
 local function _____51C6_5907_4E9A_4F26_67EF_65AFP3(context)
+    local thresholds = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]
     context["运行时"]["阶段"] = "P2旧誓回响"
     context["运行时"]["未安魂墓碑数量"] = 0
     context["运行时"]["当前大型技能"] = nil
+    SetUnitState(
+        context["Boss单位"],
+        UNIT_STATE_LIFE,
+        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * (thresholds["P3生命比例"] + thresholds["最终强化生命比例"]) * 0.5
+    )
     _____8FDB_5165_4E9A_4F26_67EF_65AFP3(context["运行时"])
 end
 local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_4EA1_51A5_82F1_65A9(_player, context)
     _____51C6_5907_4E9A_4F26_67EF_65AFP1(context)
     _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_51A5_82F1_65A9(context["运行时"], context["目标单位"])
 end
+local function _____6D4B_8BD5_4E9A_4F26_67EF_65AFP2_4EA1_51A5_82F1_65A9(_player, context)
+    _____51C6_5907_4E9A_4F26_67EF_65AFP2(context)
+    _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_51A5_82F1_65A9(context["运行时"], context["目标单位"])
+end
 local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_82F1_7075_9668_661F(_player, context)
     _____51C6_5907_4E9A_4F26_67EF_65AFP1(context)
     _____91CA_653E_4E9A_4F26_67EF_65AF_82F1_7075_9668_661F(context["运行时"])
 end
+local function _____6D4B_8BD5_4E9A_4F26_67EF_65AFP2_82F1_7075_9668_661F(_player, context)
+    _____51C6_5907_4E9A_4F26_67EF_65AFP2(context)
+    _____91CA_653E_4E9A_4F26_67EF_65AF_82F1_7075_9668_661F(context["运行时"])
+end
 local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_4EA1_8005_51DD_89C6(_player, context)
     _____51C6_5907_4E9A_4F26_67EF_65AFP1(context)
+    _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_8005_51DD_89C6(context["运行时"], context["目标单位"])
+end
+local function _____6D4B_8BD5_4E9A_4F26_67EF_65AFP2_4EA1_8005_51DD_89C6(_player, context)
+    _____51C6_5907_4E9A_4F26_67EF_65AFP2(context)
+    _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_8005_51DD_89C6(context["运行时"], context["目标单位"])
+end
+local function _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_4EA1_8005_51DD_89C6(_player, context)
+    _____51C6_5907_4E9A_4F26_67EF_65AFP3(context)
     _____91CA_653E_4E9A_4F26_67EF_65AF_4EA1_8005_51DD_89C6(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_65E7_8A93_5893_7891(_player, context)
@@ -206,12 +249,23 @@ local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_4E0D_706D_519B_9B42(_player, c
 end
 local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_6700_7EC8_5F3A_5316(_player, context)
     _____51C6_5907_4E9A_4F26_67EF_65AFP3(context)
+    SetUnitState(
+        context["Boss单位"],
+        UNIT_STATE_LIFE,
+        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]["最终强化生命比例"] * 0.5
+    )
     _____89E6_53D1_4E9A_4F26_67EF_65AF_6700_7EC8_5F3A_5316(context["运行时"])
 end
 local _____4E9A_4F26_67EF_65AF_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "P1亡冥英斩", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AF_4EA1_51A5_82F1_65A9},
+    {["序号"] = 1, ["命令"] = "1-2", ["名称"] = "P2亡冥英斩", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP2_4EA1_51A5_82F1_65A9},
+    {["序号"] = 1, ["命令"] = "1-3", ["名称"] = "P3亡冥英斩归魂", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_4EA1_51A5_82F1_65A9},
     {["序号"] = 2, ["名称"] = "P1英灵陨星", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AF_82F1_7075_9668_661F},
+    {["序号"] = 2, ["命令"] = "2-2", ["名称"] = "P2英灵陨星", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP2_82F1_7075_9668_661F},
+    {["序号"] = 2, ["命令"] = "2-3", ["名称"] = "P3英灵陨星送葬", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_82F1_7075_9668_661F},
     {["序号"] = 3, ["名称"] = "亡者凝视", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AF_4EA1_8005_51DD_89C6},
+    {["序号"] = 3, ["命令"] = "3-2", ["名称"] = "P2亡者凝视", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP2_4EA1_8005_51DD_89C6},
+    {["序号"] = 3, ["命令"] = "3-3", ["名称"] = "P3亡者凝视", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_4EA1_8005_51DD_89C6},
     {["序号"] = 4, ["名称"] = "P2旧誓墓碑", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AF_65E7_8A93_5893_7891},
     {["序号"] = 5, ["名称"] = "进入P3最后誓约", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AF_8FDB_5165P3},
     {["序号"] = 6, ["名称"] = "P3亡冥英斩归魂", ["执行"] = _____6D4B_8BD5_4E9A_4F26_67EF_65AFP3_4EA1_51A5_82F1_65A9},

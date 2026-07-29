@@ -14,6 +14,8 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
   创建点特效: (this: void, 参数: any) => any;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -101,7 +103,7 @@ function on影骨骷髅偷窃修正(this: void, damageContext: any): number {
   const stolen = cfg.偷金币固定值 + gold * cfg.偷金币当前比例;
   const nextGold = gold - stolen;
   SetPlayerState(owner, PLAYER_STATE_RESOURCE_GOLD, nextGold > 0 ? nextGold : 0);
-  if (gold < GetUnitState(target, UNIT_STATE_MAX_LIFE)) {
+  if (gold < GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)) {
     return damageContext.currentDamage + 计算组合技能伤害(context.Boss单位, target, {
       来源攻击力比例: cfg.贫血惩罚Boss攻击力比例,
       目标最大生命比例: cfg.贫血惩罚目标最大生命比例,

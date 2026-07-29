@@ -8,6 +8,8 @@ local ____exports = {}
 -- 1. 优先使用 GetUnitState + ConvertUnitState(0x20)
 -- 2. 兜底使用伤害测试法
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local g = require("jass.globals")
 --- 护甲状态常量
 local UNIT_STATE_ARMOR = 32
@@ -34,7 +36,7 @@ function ____exports.YDWEGetUnitArmor(self, u)
         return 0
     end
     local armorState = jass.ConvertUnitState(UNIT_STATE_ARMOR)
-    return jass.GetUnitState(u, armorState)
+    return GetUnitStateJapi(u, armorState)
 end
 --- 获取单位护甲值（伤害测试法）
 -- 通过造成测试伤害反算护甲值
@@ -59,7 +61,7 @@ function ____exports.YDWEGetUnitArmorByDamageTest(self, u)
         ____jass_GetTriggeringTrigger_0 = nil
     end
     local trig = ____jass_GetTriggeringTrigger_0
-    local maxLife = jass.GetUnitState(u, jass.UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE)
     if maxLife <= DAMAGE_LIFE then
         jass.UnitAddAbility(u, ARMOR_TEST_ABILITY)
     end

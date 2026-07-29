@@ -10,6 +10,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (target: any, attacker: any, applied: number, damageType: any) => void) => void;
@@ -75,7 +77,7 @@ function onDamage(this: void, target: any, attacker: any, applied: number, _dama
   if (target是玩家单位) return;
   if (!attacker是玩家单位) return;
 
-  const maxHp = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+  const maxHp = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   if (maxHp <= 0) return;
 
   const 当前目标ID = GetHandleId(target);

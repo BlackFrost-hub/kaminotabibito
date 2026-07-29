@@ -21,6 +21,8 @@ local _____540C_6B65_624B_52A8_6570_503CBuff_8303_56F4_5149_73AF = ____02_FF0E_6
 local ____16_FF0E_5C5E_6027_4F4D_79FB_4E0E_6307_4EE4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
 local _____8C03_6574_72B6_6001ID_5C5E_6027 = ____16_FF0E_5C5E_6027_4F4D_79FB_4E0E_6307_4EE4["调整状态ID属性"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -42,7 +44,7 @@ local _____9886_8896_5149_73AF_5DF2_6CE8_518C = false
 local _____9886_8896_5149_73AF_7279_6548_952E = "菲利斯-领袖光环"
 local _____9886_8896_5149_73AF_8303_56F4ID = 0
 local function _____751F_547D_6BD4_4F8B(unit)
-    local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     if not (maxLife > 0) then
         return 0
     end

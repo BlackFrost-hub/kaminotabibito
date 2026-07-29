@@ -8,6 +8,8 @@ local _____6267_884C_901A_7528_5267_60C5_52A8_4F5C = ____06_FF0E_5267_60C5_901A_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.11．单位指令事件中心")
 local registerImmediateOrderListener = ____require_result_0.registerImmediateOrderListener
 local registerPointOrderListener = ____require_result_0.registerPointOrderListener
@@ -170,7 +172,7 @@ local function _____8BA1_7B97_8036_63D0_5C14_5B58_6D3B_5956_52B1_6863_4F4D(_____
         return 0
     end
     local _____5F53_524D_751F_547D = GetUnitState(_____8036_63D0_5C14, UNIT_STATE_LIFE)
-    local _____6700_5927_751F_547D = GetUnitState(_____8036_63D0_5C14, UNIT_STATE_MAX_LIFE)
+    local _____6700_5927_751F_547D = GetUnitStateJapi(_____8036_63D0_5C14, UNIT_STATE_MAX_LIFE)
     if _____5F53_524D_751F_547D <= 0.405 or _____6700_5927_751F_547D <= 0 then
         return 0
     end

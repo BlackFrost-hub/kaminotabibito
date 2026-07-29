@@ -13,6 +13,7 @@ const { 造成AOE技能伤害, 造成单体技能伤害 } = require("系统.04�
 };
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -311,7 +312,7 @@ function on剑魂狼最终伤害(this: void, target: any, _attacker: any, _appli
     技能ID: 剑魂杀技能ID,
     来源: record.Boss单位,
     目标: target,
-    伤害: GetUnitState(target, UNIT_STATE_MAX_LIFE) * record.伤害比例,
+    伤害: GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * record.伤害比例,
     attack: false,
     ranged: false,
     attackType: ATTACK_TYPE_NORMAL,

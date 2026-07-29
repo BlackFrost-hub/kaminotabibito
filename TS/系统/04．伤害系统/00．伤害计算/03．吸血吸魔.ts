@@ -9,6 +9,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
@@ -251,7 +253,7 @@ export function applyLifeSteal(
 
   // 获取当前生命
   const currentLife = jass.GetUnitState(attacker, jass.UNIT_STATE_LIFE);
-  const maxLife = jass.GetUnitState(attacker, jass.UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(attacker, jass.UNIT_STATE_MAX_LIFE);
 
   // 不能超过最大生命
   const lifeGap = maxLife - currentLife;
@@ -315,7 +317,7 @@ export function applyManaSteal(
 
   // 获取当前魔法
   const currentMana = jass.GetUnitState(attacker, jass.UNIT_STATE_MANA);
-  const maxMana = jass.GetUnitState(attacker, jass.UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitStateJapi(attacker, jass.UNIT_STATE_MAX_MANA);
 
   // 不能超过最大魔法
   const manaGap = maxMana - currentMana;

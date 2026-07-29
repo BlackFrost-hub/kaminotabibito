@@ -280,10 +280,10 @@ function 结算时间停止现实断裂(this: void, instance: 时间停止实例
   const ordinary = cfg.普通技能;
   const locked = instance.锁定;
   const effect = 播放时间停止结算特效(
-    cfg.表现资源.现实断裂特效路径,
+    cfg.表现资源.时间停止现实断裂结算特效路径,
     (locked.裂缝起点X + locked.裂缝终点X) * 0.5,
     (locked.裂缝起点Y + locked.裂缝终点Y) * 0.5,
-    ordinary.现实断裂特效缩放,
+    cfg.阶段技能.时间停止现实断裂结算特效缩放,
   );
   if (effect != null && effect !== 0) 设置特效XYZ轴旋转(effect, { Z轴角度: locked.裂缝角度 });
   const halfWidth2 = ordinary.现实断裂路径宽度 * ordinary.现实断裂路径宽度 * 0.25;

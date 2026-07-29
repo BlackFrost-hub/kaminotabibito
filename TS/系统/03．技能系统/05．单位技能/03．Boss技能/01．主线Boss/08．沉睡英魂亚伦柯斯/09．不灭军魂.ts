@@ -6,6 +6,8 @@ import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 亚伦柯斯BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/07．亚伦柯斯';
+import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 
 const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -38,7 +40,10 @@ const 攻速属性ID = 10;
 export function 启用亚伦柯斯不灭军魂(this: void, context: 亚伦柯斯运行时上下文): boolean {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.战斗已结束 || context.阶段 !== 'P3最后的誓约' || context.不灭军魂已启用) return false;
+  const cfg = 亚伦柯斯正式设计配置.不灭军魂;
   context.不灭军魂已启用 = true;
+  开始硬直(boss, cfg.启动硬直秒);
+  播放限时单位动画({ 单位: boss, 动画编号: cfg.启动动画编号, 持续秒: cfg.启动硬直秒, 恢复动画编号: 1 });
   播放Boss坐标音效(亚伦柯斯正式设计配置.音效.不灭军魂, GetUnitX(boss), GetUnitY(boss), 亚伦柯斯正式设计配置.音效默认裁断距离);
   registerManualBuff(boss, 亚伦柯斯BuffID.不灭军魂, 3600, 亚伦柯斯正式设计配置.不灭军魂.P3技能间隔缩短比例 * 100, {
     sourceName: '亚伦柯斯-不灭军魂',
@@ -57,6 +62,8 @@ export function 触发亚伦柯斯最终强化(this: void, context: 亚伦柯斯
   if (!单位有效(boss) || context.战斗已结束 || context.阶段 !== 'P3最后的誓约' || context.已触发最终强化) return false;
   const cfg = 亚伦柯斯正式设计配置.不灭军魂;
   context.已触发最终强化 = true;
+  开始硬直(boss, cfg.最终强化硬直秒);
+  播放限时单位动画({ 单位: boss, 动画编号: cfg.最终强化动画编号, 持续秒: cfg.最终强化硬直秒, 恢复动画编号: 1 });
   context.最终强化攻击力增量 = 读取单位攻击力(boss) * cfg.最终强化攻击力比例;
   context.最终强化攻速增量 = cfg.最终强化攻击速度提高;
   if (context.最终强化攻击力增量 !== 0) SGSS_SetState(boss, 攻击力属性ID, context.最终强化攻击力增量);

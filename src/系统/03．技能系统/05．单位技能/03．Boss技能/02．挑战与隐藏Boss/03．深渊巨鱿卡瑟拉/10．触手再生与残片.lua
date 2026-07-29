@@ -28,6 +28,8 @@ local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单�
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -84,7 +86,7 @@ local function _____9009_62E9_6700_4F4E_751F_547D_73A9_5BB6(boss)
                 if not _____5355_4F4D_6709_6548(hero) then
                     goto __continue6
                 end
-                local maxLife = GetUnitState(hero, UNIT_STATE_MAX_LIFE)
+                local maxLife = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE)
                 if not (maxLife > 0) then
                     goto __continue6
                 end
@@ -291,7 +293,7 @@ local function _____5E94_7528_89E6_624B_7CBE_534E(context, count)
     end
     local boss = context["Boss单位"]
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手残片"]
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     _____6CBB_7597Boss_56FA_5B9A_503C(boss, maxLife * cfg["Boss每片回血比例"] * count)
     context["触手精华层数"] = context["触手精华层数"] + count
     local attackBonus = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["精华每层攻击加成"] * count

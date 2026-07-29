@@ -15,6 +15,8 @@ end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
@@ -49,7 +51,7 @@ local function _____53D7_4F24_8FBE_5230_8FDB_5165_6218_6597_9608_503C(_____5355_
     if _____4E3B_4F53_7C7B_578B ~= "玩家英雄" then
         return true
     end
-    local _____6700_5927_751F_547D = GetUnitState(_____5355_4F4D, UNIT_STATE_MAX_LIFE)
+    local _____6700_5927_751F_547D = GetUnitStateJapi(_____5355_4F4D, UNIT_STATE_MAX_LIFE)
     if not (_____6700_5927_751F_547D > 0) then
         return applied > 0
     end

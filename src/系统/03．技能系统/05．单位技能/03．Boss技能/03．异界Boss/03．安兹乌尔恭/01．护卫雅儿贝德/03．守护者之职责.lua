@@ -17,6 +17,7 @@ local removePeriodicCallback = ____require_result_1.removePeriodicCallback
 local getServerTime = ____require_result_1.getServerTime
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -70,7 +71,7 @@ local function _____5B88_62A4_804C_8D23_4F24_5BB3_5171_4EAB_4FEE_6B63(damage)
                     goto __continue9
                 end
                 local share = damage.currentDamage * _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["守护者之职责共享比例"]
-                local minimumLife = other == albedo and GetUnitState(albedo, UNIT_STATE_MAX_LIFE) * _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["雅儿贝德锁血比例"] or 1
+                local minimumLife = other == albedo and GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE) * _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["雅儿贝德锁血比例"] or 1
                 _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664({
                     ["目标"] = other,
                     ["数值"] = share,

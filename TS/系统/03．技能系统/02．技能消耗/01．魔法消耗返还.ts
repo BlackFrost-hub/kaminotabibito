@@ -6,6 +6,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const { YDUserDataGet, YDWEGetUnitAbilityDataInteger, YDWEGetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDWEGetUnitAbilityDataInteger: (u: any, abilcode: number, level: number, data_type: number) => number;
@@ -50,7 +52,7 @@ export function calcTotalManaCost(
     return -1;
   }
 
-  const maxMana = jass.GetUnitState(unit, jass.UNIT_STATE_MAX_MANA);
+  const maxMana = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA);
   return fixedCost + maxMana * percentCost;
 }
 

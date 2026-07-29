@@ -322,6 +322,7 @@ _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -382,7 +383,7 @@ local function ____on_5251_9B42_72FC_6700_7EC8_4F24_5BB3(target, _attacker, _app
         ["技能ID"] = _____5251_9B42_6740_6280_80FDID,
         ["来源"] = record["Boss单位"],
         ["目标"] = target,
-        ["伤害"] = GetUnitState(target, UNIT_STATE_MAX_LIFE) * record["伤害比例"],
+        ["伤害"] = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * record["伤害比例"],
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,

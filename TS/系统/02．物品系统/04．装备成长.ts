@@ -6,6 +6,8 @@
  * 规则详见 `.cursor/rules/gameplay/equipment/heal-hot-format.md`
  */
 const jass = require("jass.common") as JassCommon;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetItemTypeId = (jass as any).GetItemTypeId as (this: void, item: any) => number;
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -186,10 +188,10 @@ function getPctStatValue(unit: any, key: string): number {
   if (key === "int") return (jass as any).GetHeroInt(unit, true);
   if (key === "str") return (jass as any).GetHeroStr(unit, true);
   if (key === "agi") return (jass as any).GetHeroAgi(unit, true);
-  if (key === "hp")  return (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(1));
-  if (key === "mp")  return (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(3));
-  if (key === "dmg") return (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(0x15));
-  if (key === "armor") return (jass as any).GetUnitState(unit, (jass as any).ConvertUnitState(0x20));
+  if (key === "hp")  return GetUnitStateJapi(unit, (jass as any).ConvertUnitState(1));
+  if (key === "mp")  return GetUnitStateJapi(unit, (jass as any).ConvertUnitState(3));
+  if (key === "dmg") return GetUnitStateJapi(unit, (jass as any).ConvertUnitState(0x15));
+  if (key === "armor") return GetUnitStateJapi(unit, (jass as any).ConvertUnitState(0x20));
   return 0;
 }
 

@@ -23,6 +23,8 @@ local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_2.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -40,7 +42,7 @@ local function _____751F_547D_6BD4_4F8B(unit)
     if unit == nil or unit == 0 then
         return 0
     end
-    local maxLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     return maxLife > 0 and GetUnitState(unit, UNIT_STATE_LIFE) / maxLife or 0
 end
 local function _____5173_95ED_540C_8A93_4FDD_62A4(context)

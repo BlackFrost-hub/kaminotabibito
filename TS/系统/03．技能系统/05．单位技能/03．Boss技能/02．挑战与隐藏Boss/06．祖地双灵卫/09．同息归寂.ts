@@ -32,6 +32,7 @@ const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核�
 };
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
@@ -108,7 +109,7 @@ export function 绑定祖地双灵卫同息生命下限(this: void, context: 祖
 function 恢复崩解守卫(this: void, context: 祖地双灵卫运行时上下文, name: 祖地双灵卫名称): void {
   const unit = 取单位(context, name);
   const source = name === '赤誓灵卫' ? context.苍影灵卫单位 : context.赤誓灵卫单位;
-  const targetLife = GetUnitState(unit, UNIT_STATE_MAX_LIFE) * 祖地双灵卫数值与表现配置.公共.同息回灌恢复比例;
+  const targetLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * 祖地双灵卫数值与表现配置.公共.同息回灌恢复比例;
   const healAmount = targetLife - GetUnitState(unit, UNIT_STATE_LIFE);
   if (healAmount > 0) doHeal({ HealSource: source, HealTarget: unit, HealAmount: healAmount, ItemHeal: false, HealEffect: false });
   SetUnitInvulnerable(unit, false);

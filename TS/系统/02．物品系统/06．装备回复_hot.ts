@@ -3,6 +3,8 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 
 export interface EquipHealSegmentInfo {
@@ -35,9 +37,9 @@ export function parseEquipHealSegments(hotStr: string, abilList: string): EquipH
 export function calcEquipHealHpMp(tokens: string[], unit: any): { hp: number; mp: number } {
   let hp = 0;
   let mp = 0;
-  const maxHp: number = jass.GetUnitState(unit, jass.ConvertUnitState(1)) as number;
+  const maxHp: number = GetUnitStateJapi(unit, jass.ConvertUnitState(1)) as number;
   const curHp: number = jass.GetWidgetLife(unit) as number;
-  const maxMp: number = jass.GetUnitState(unit, jass.ConvertUnitState(3)) as number;
+  const maxMp: number = GetUnitStateJapi(unit, jass.ConvertUnitState(3)) as number;
   const lostHp = maxHp - curHp;
 
   for (const rawToken of tokens) {
