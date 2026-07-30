@@ -24,12 +24,16 @@ local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
 local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_6.getServerTime
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____8BBE_7F6E_7279_6548_989C_8272 = ____require_result_7["设置特效颜色"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local Atan2 = jass.Atan2
+local Cos = jass.Cos
+local Sin = jass.Sin
 local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -38,40 +42,38 @@ local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local EXSetEffectSize = japi.EXSetEffectSize
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local RAD_TO_DEG = 57.29577951308232
-local function _____64AD_653E_9ED1_7FFC_6A2A_626B_8868_73B0(albedo, facing)
+local function _____8BBE_7F6E_9ED1_7FFC_6A2A_626B_7279_6548_8868_73B0(effect, facing, scale, duration)
+    if effect == nil or effect == 0 then
+        return
+    end
+    EXEffectMatRotateZ(effect, facing)
+    EXSetEffectSize(effect, scale)
+    YDWETimerDestroyEffectSafe(duration, effect)
+end
+local function _____64AD_653E_9ED1_7FFC_6A2A_626B_8868_73B0(albedo, facing, _____91CD_51FBX, _____91CD_51FBY)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local x = GetUnitX(albedo)
     local y = GetUnitY(albedo)
     local pressure = AddSpecialEffect(cfg["表现资源"]["雅儿贝德黑翼横扫特效路径"], x, y)
-    local impact = AddSpecialEffect(cfg["表现资源"]["雅儿贝德重击特效路径"], x, y)
-    local effects = {pressure, impact}
-    do
-        local i = 0
-        while i < #effects do
-            do
-                local effect = effects[i + 1]
-                if effect == nil or effect == 0 then
-                    goto __continue4
-                end
-                EXEffectMatRotateZ(effect, facing)
-                EXSetEffectSize(effect, cfg["守护者模式"]["黑翼横扫特效缩放"])
-                YDWETimerDestroyEffectSafe(cfg["守护者模式"]["黑翼横扫特效持续秒"], effect)
-            end
-            ::__continue4::
-            i = i + 1
-        end
-    end
+    local impact = AddSpecialEffect(cfg["表现资源"]["雅儿贝德重击特效路径"], _____91CD_51FBX, _____91CD_51FBY)
+    local visual = cfg["守护者模式"]
+    _____8BBE_7F6E_7279_6548_989C_8272(pressure, visual["黑翼横扫风压特效红"], visual["黑翼横扫风压特效绿"], visual["黑翼横扫风压特效蓝"])
+    _____8BBE_7F6E_9ED1_7FFC_6A2A_626B_7279_6548_8868_73B0(pressure, facing, visual["黑翼横扫风压特效缩放"], visual["黑翼横扫特效持续秒"])
+    _____8BBE_7F6E_9ED1_7FFC_6A2A_626B_7279_6548_8868_73B0(impact, facing, visual["雅儿贝德重击特效缩放"], visual["雅儿贝德重击特效持续秒"])
 end
 local function _____7ED3_7B97_9ED1_7FFC_6A2A_626B(context, facing)
-    local ____opt_7 = context["雅儿贝德"]
-    local albedo = ____opt_7 and ____opt_7["单位"]
+    local ____opt_8 = context["雅儿贝德"]
+    local albedo = ____opt_8 and ____opt_8["单位"]
     if not _____5355_4F4D_6709_6548(albedo) or context["挑战已结束"] then
         return
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]
     local x = GetUnitX(albedo)
     local y = GetUnitY(albedo)
-    _____64AD_653E_9ED1_7FFC_6A2A_626B_8868_73B0(albedo, facing)
+    local radians = facing / RAD_TO_DEG
+    local impactX = x + Cos(radians) * cfg["黑翼横扫半径"]
+    local impactY = y + Sin(radians) * cfg["黑翼横扫半径"]
+    _____64AD_653E_9ED1_7FFC_6A2A_626B_8868_73B0(albedo, facing, impactX, impactY)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["安兹单位"])
     do
         local i = 0
@@ -86,7 +88,7 @@ local function _____7ED3_7B97_9ED1_7FFC_6A2A_626B(context, facing)
                     facing,
                     cfg["黑翼横扫角度"]
                 ) then
-                    goto __continue9
+                    goto __continue8
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = albedo,
@@ -109,7 +111,7 @@ local function _____7ED3_7B97_9ED1_7FFC_6A2A_626B(context, facing)
                     ["只命中敌人"] = false
                 })
             end
-            ::__continue9::
+            ::__continue8::
             i = i + 1
         end
     end
@@ -128,8 +130,8 @@ ____exports["释放雅儿贝德黑翼横扫"] = function(context, target)
         GetUnitY(target) - GetUnitY(albedo),
         GetUnitX(target) - GetUnitX(albedo)
     ) * RAD_TO_DEG
-    local ____opt_11 = state["独占状态"]
-    local token = ____opt_11 and ____opt_11["开始"](____opt_11, {key = "雅儿贝德-黑翼横扫", ["优先级"] = 30, ["持续毫秒"] = (cfg["黑翼横扫预警秒"] + 1) * 1000, ["可被抢占"] = false}) or 0
+    local ____opt_12 = state["独占状态"]
+    local token = ____opt_12 and ____opt_12["开始"](____opt_12, {key = "雅儿贝德-黑翼横扫", ["优先级"] = 30, ["持续毫秒"] = (cfg["黑翼横扫预警秒"] + 1) * 1000, ["可被抢占"] = false}) or 0
     if token == 0 then
         return false
     end

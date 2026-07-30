@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 /**
  * KK扩展API - 装饰物相关函数
  *
@@ -114,6 +116,13 @@ export function DzDoodadSetOrientMatrixResize(doodad: number): void {
  */
 export function DzDoodadSetVisible(doodad: number, enable: boolean): void {
   japi.DzDoodadSetVisible(doodad, enable);
+}
+
+/**
+ * 删除装饰物
+ */
+export function DzDoodadRemove(doodad: number): void {
+  japi.DzDoodadRemove(doodad);
 }
 
 /**

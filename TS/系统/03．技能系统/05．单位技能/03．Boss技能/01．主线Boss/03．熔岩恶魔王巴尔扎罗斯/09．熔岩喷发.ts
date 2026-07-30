@@ -52,7 +52,7 @@ const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number,
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
@@ -125,7 +125,7 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
           伤害: damage,
           attack: false,
           ranged: true,
-          attackType: ATTACK_TYPE_CHAOS,
+          attackType: ATTACK_TYPE_NORMAL,
           伤害类型: DAMAGE_TYPE_FIRE,
           weaponType: WEAPON_TYPE_WHOKNOWS,
           来源类型: "Boss技能",
@@ -165,7 +165,7 @@ function 执行熔岩喷发爆发(this: void, context: 巴尔扎罗斯运行时�
         伤害: 计算喷发伤害(boss, unit),
         attack: false,
         ranged: true,
-        attackType: ATTACK_TYPE_CHAOS,
+        attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_FIRE,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: "Boss技能",

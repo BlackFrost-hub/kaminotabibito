@@ -4,7 +4,7 @@ import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, type 影骨莫特斯运行时上下文, type 影骨召唤组 } from "./01．运行时上下文";
 import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
-import { 单位有效, 播放影骨莫特斯限时动作, stringToFourCC, 极坐标X, 极坐标Y, 取单位ID } from "./11．公共工具";
+import { 单位有效, 播放影骨莫特斯限时动作, 开始影骨莫特斯常规施法, stringToFourCC, 极坐标X, 极坐标Y, 取单位ID } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 计算组合技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害";
@@ -39,8 +39,8 @@ const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．�
 const { 创建战斗内拾取物 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物") as {
   创建战斗内拾取物: (this: void, 参数: any) => any;
 };
-const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
-  获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
+const { 获取Boss技能敌对目标列表, 获取Boss技能随机敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
+  获取Boss技能敌对目标列表: (this: void, boss: any) => any[];
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
 };
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
@@ -120,7 +120,7 @@ function 确保骷髅偷窃修正(this: void): void {
 
 function 影骨符咒可拾取单位(this: void, variable: 影骨符咒变量): any[] {
   if (variable == null || !单位有效(variable.context.Boss单位)) return [];
-  return 获取Boss技能敌对英雄列表(variable.context.Boss单位);
+  return 获取Boss技能敌对目标列表(variable.context.Boss单位);
 }
 
 function 影骨符咒拾取(this: void, hero: any, _实例: any, _variable: 影骨符咒变量): void {
@@ -260,6 +260,7 @@ export function 释放影骨骸骨召唤(this: void, context: 影骨莫特斯运
     }]),
   });
   if (执行ID === 0) return;
+  开始影骨莫特斯常规施法(boss, 3, "骸骨召唤", "莫特斯正在分批唤醒骸骨盗贼");
   播放影骨莫特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   播放影骨莫特斯台词(boss, "骸骨召唤");
   context.当前召唤组 = group;

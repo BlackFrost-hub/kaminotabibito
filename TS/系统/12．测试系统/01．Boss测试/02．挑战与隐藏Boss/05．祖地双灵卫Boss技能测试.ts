@@ -58,8 +58,12 @@ const { 获取或创建祖地双灵卫运行时上下文, 清理祖地双灵卫�
 const { 更新祖地双灵卫侵蚀阶段 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.05．侵蚀择形') as {
   更新祖地双灵卫侵蚀阶段: (this: void, context: any, now?: number) => void;
 };
-const { 释放灵印折步 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.01．灵印折步') as {
+const { 更新祖地双灵同誓 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.03．双灵同誓') as {
+  更新祖地双灵同誓: (this: void, context: any, now?: number) => void;
+};
+const { 释放灵印折步, 创建赤誓镇魂印 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.01．灵印折步') as {
   释放灵印折步: (this: void, context: any, target: any) => boolean;
+  创建赤誓镇魂印: (this: void, context: any, x: number, y: number) => void;
 };
 const { 释放月纹缚魂 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.02．月纹缚魂') as {
   释放月纹缚魂: (this: void, context: any, target?: any) => boolean;
@@ -92,15 +96,21 @@ const { 释放祖地双灵卫封门误判 } = require('系统.03．技能系统.
 const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCandy: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const SetUnitScale = jass.SetUnitScale as (unit: any, x: number, y: number, z: number) => void;
+const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const Rect = jass.Rect as (minX: number, minY: number, maxX: number, maxY: number) => any;
 const RemoveRect = jass.RemoveRect as (rect: any) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const DzSetUnitModel = japi.DzSetUnitModel as (unit: any, model: string) => void;
 
 const 赤誓灵卫单位ID = stringToFourCCSafe(祖地双灵卫单位技能配置.单位.赤誓灵卫.单位ID);
@@ -249,6 +259,13 @@ function 准备祖地双灵卫P2(this: void, context: 祖地双灵卫测试上�
   更新祖地双灵卫侵蚀阶段(context.运行时);
 }
 
+function 准备祖地双灵卫P2苍影先变异(this: void, context: 祖地双灵卫测试上下文): void {
+  重置祖地双灵卫P1(context);
+  const maxLife = GetUnitStateJapi(context.苍影灵卫单位, UNIT_STATE_MAX_LIFE);
+  SetUnitState(context.苍影灵卫单位, UNIT_STATE_LIFE, maxLife * 0.6);
+  更新祖地双灵卫侵蚀阶段(context.运行时);
+}
+
 function 准备祖地双灵卫P3(this: void, context: 祖地双灵卫测试上下文): void {
   准备祖地双灵卫P2(context);
   const maxLife = GetUnitStateJapi(context.赤誓灵卫单位, UNIT_STATE_MAX_LIFE);
@@ -281,17 +298,26 @@ function 测试双灵卫断誓践踏(this: void, _player: any, context: 祖地�
   准备祖地双灵卫P2(context);
   释放断誓践踏(context.运行时, context.目标单位);
 }
+function 测试双灵卫断誓践踏P3(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
+  准备祖地双灵卫P3(context);
+  释放断誓践踏(context.运行时, context.目标单位);
+}
 function 测试双灵卫裂魂坠斩(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
   准备祖地双灵卫P2(context);
   释放裂魂坠斩(context.运行时, context.目标单位);
 }
 function 测试双灵卫双蚀共鸣(this: void, _player: any, context: 祖地双灵卫测试上下文): void { 准备祖地双灵卫P3(context); }
 function 测试双灵卫失名祷潮(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
+  准备祖地双灵卫P2苍影先变异(context);
+  创建赤誓镇魂印(context.运行时, GetUnitX(context.目标单位), GetUnitY(context.目标单位));
+  释放失名祷潮(context.运行时, context.目标单位);
+}
+function 测试双灵卫失名祷潮P3(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
   准备祖地双灵卫P3(context);
   释放失名祷潮(context.运行时, context.目标单位);
 }
 function 测试双灵卫记忆剥落(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
-  准备祖地双灵卫P3(context);
+  准备祖地双灵卫P2苍影先变异(context);
   释放记忆剥落(context.运行时, context.目标单位);
 }
 function 测试双灵卫封门误判(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
@@ -302,6 +328,27 @@ function 测试双灵卫封门误判(this: void, _player: any, context: 祖地�
   释放祖地双灵卫封门误判(context.运行时);
 }
 
+function 测试双灵卫同誓被动(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
+  重置祖地双灵卫P1(context);
+  const redMax = GetUnitStateJapi(context.赤誓灵卫单位, UNIT_STATE_MAX_LIFE);
+  const azureMax = GetUnitStateJapi(context.苍影灵卫单位, UNIT_STATE_MAX_LIFE);
+  SetUnitState(context.赤誓灵卫单位, UNIT_STATE_LIFE, redMax * 0.5);
+  SetUnitState(context.苍影灵卫单位, UNIT_STATE_LIFE, azureMax);
+  更新祖地双灵同誓(context.运行时);
+}
+
+function 测试双灵卫侵蚀锁血被动(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
+  重置祖地双灵卫P1(context);
+  const redMax = GetUnitStateJapi(context.赤誓灵卫单位, UNIT_STATE_MAX_LIFE);
+  UnitDamageTarget(context.目标单位, context.赤誓灵卫单位, redMax * 0.9, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+}
+
+function 测试双灵卫同息锁血被动(this: void, _player: any, context: 祖地双灵卫测试上下文): void {
+  准备祖地双灵卫P3(context);
+  const redMax = GetUnitStateJapi(context.赤誓灵卫单位, UNIT_STATE_MAX_LIFE);
+  UnitDamageTarget(context.目标单位, context.赤誓灵卫单位, redMax * 0.8, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+}
+
 const 祖地双灵卫测试技能列表: Boss测试技能命令[] = [
   { 序号: 1, 名称: '赤誓灵印折步', 执行: 测试双灵卫灵印折步 },
   { 序号: 2, 名称: '赤誓月纹缚魂', 执行: 测试双灵卫月纹缚魂 },
@@ -309,12 +356,17 @@ const 祖地双灵卫测试技能列表: Boss测试技能命令[] = [
   { 序号: 4, 名称: '苍影盾刃裁决', 执行: 测试双灵卫盾刃裁决 },
   { 序号: 5, 名称: 'P1联合封门校验', 执行: 测试双灵卫封门校验 },
   { 序号: 6, 名称: 'P2赤誓侵蚀变异', 执行: 测试双灵卫赤誓变异 },
-  { 序号: 7, 名称: '赤誓断誓践踏', 执行: 测试双灵卫断誓践踏 },
+  { 序号: 7, 名称: '赤誓断誓践踏（P2盾压制）', 执行: 测试双灵卫断誓践踏 },
+  { 序号: 7, 命令: '7-3', 名称: '赤誓断誓践踏（P3破壳净化）', 执行: 测试双灵卫断誓践踏P3 },
   { 序号: 8, 名称: '赤誓裂魂坠斩', 执行: 测试双灵卫裂魂坠斩 },
   { 序号: 9, 名称: 'P3双蚀共鸣', 执行: 测试双灵卫双蚀共鸣 },
-  { 序号: 10, 名称: '苍影失名祷潮', 执行: 测试双灵卫失名祷潮 },
+  { 序号: 10, 名称: '苍影失名祷潮（P2吸收镇魂印）', 执行: 测试双灵卫失名祷潮 },
+  { 序号: 10, 命令: '10-3', 名称: '苍影失名祷潮（P3校准净化）', 执行: 测试双灵卫失名祷潮P3 },
   { 序号: 11, 名称: '苍影记忆剥落', 执行: 测试双灵卫记忆剥落 },
   { 序号: 12, 名称: 'P3封门误判', 执行: 测试双灵卫封门误判 },
+  { 序号: 13, 名称: '被动：双灵同誓减伤与分担', 执行: 测试双灵卫同誓被动 },
+  { 序号: 14, 名称: '被动：侵蚀阶段生命下限', 执行: 测试双灵卫侵蚀锁血被动 },
+  { 序号: 15, 名称: '被动：同息归寂生命下限', 执行: 测试双灵卫同息锁血被动 },
 ];
 
 注册Boss测试命令组({

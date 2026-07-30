@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下文';
+import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
@@ -95,6 +96,7 @@ export function 释放誓锋壁进(this: void, context: 祖地双灵卫运行时
   if (distance <= 32) return false;
   context.大型机制忙碌到Ms = getServerTime() + (cfg.前摇秒 + cfg.推进秒 + cfg.誓盾持续秒) * 1000;
   立即设置单位朝向(boss, facing);
+  开始祖地双灵卫常规施法(boss, cfg.前摇秒, '誓锋壁进', '苍影灵卫将沿锁定方向冲锋并展开誓盾');
   创建技能提示圈({ 类型: '方向直线', X: startX, Y: startY, 宽度: cfg.路径宽度, 长度: distance, 朝向: facing, 持续时间: cfg.前摇秒, 来源单位: boss });
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: cfg.前摇秒 + cfg.推进秒, 恢复动画编号: cfg.举盾动画编号 });
   const startId = addDelayedCallback(cfg.前摇秒 * 1000, function 誓锋壁进开始推进(this: void): void {

@@ -3,8 +3,9 @@
 import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
-import { 开始冲锋, 开始击退 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
-import { 播放限时单位动画 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始击退 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
+import { 开始雅儿贝德冲锋 } from './00．冲锋表现';
+import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
@@ -67,10 +68,11 @@ export function 释放雅儿贝德守护回归(this: void, context: 安兹运行
   state.守护连接生效 = false;
   state.上次守护回归Ms = now;
   const facing = Atan2(dy, dx) * RAD_TO_DEG;
+  立即设置单位朝向(albedo, facing);
   创建技能提示圈({
     类型: '方向直线',
-    X: (startX + endX) * 0.5,
-    Y: (startY + endY) * 0.5,
+    X: startX,
+    Y: startY,
     宽度: cfg.守护回归路径宽度,
     长度: distance,
     朝向: facing,
@@ -83,7 +85,7 @@ export function 释放雅儿贝德守护回归(this: void, context: 安兹运行
       exclusive?.结束(token, '取消', '阶段状态变化');
       return;
     }
-    const chargeId = 开始冲锋(albedo, {
+    const chargeId = 开始雅儿贝德冲锋(albedo, {
       目标X: endX,
       目标Y: endY,
       距离: distance,
@@ -123,6 +125,7 @@ export function 释放雅儿贝德守护回归(this: void, context: 安兹运行
         });
       },
       开始回调: function 守护回归动作(this: void): void {
+        立即设置单位朝向(albedo, facing);
         播放限时单位动画({
           单位: albedo,
           动画编号: cfg.守护回归动画编号,

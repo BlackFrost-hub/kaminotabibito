@@ -36,38 +36,47 @@ local _____83B7_53D6_6216_521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A
 local _____6E05_7406_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_9["清理祖地双灵卫运行时上下文"]
 local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.05．侵蚀择形")
 local _____66F4_65B0_7956_5730_53CC_7075_536B_4FB5_8680_9636_6BB5 = ____require_result_10["更新祖地双灵卫侵蚀阶段"]
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.01．灵印折步")
-local _____91CA_653E_7075_5370_6298_6B65 = ____require_result_11["释放灵印折步"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.02．月纹缚魂")
-local _____91CA_653E_6708_7EB9_7F1A_9B42 = ____require_result_12["释放月纹缚魂"]
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.03．断誓践踏")
-local _____91CA_653E_65AD_8A93_8DF5_8E0F = ____require_result_13["释放断誓践踏"]
-local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.04．裂魂坠斩")
-local _____91CA_653E_88C2_9B42_5760_65A9 = ____require_result_14["释放裂魂坠斩"]
-local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．苍影灵卫.01．誓锋壁进")
-local _____91CA_653E_8A93_950B_58C1_8FDB = ____require_result_15["释放誓锋壁进"]
-local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．苍影灵卫.02．盾刃裁决")
-local _____91CA_653E_76FE_5203_88C1_51B3 = ____require_result_16["释放盾刃裁决"]
-local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．苍影灵卫.03．失名祷潮")
-local _____91CA_653E_5931_540D_7977_6F6E = ____require_result_17["释放失名祷潮"]
-local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．苍影灵卫.04．记忆剥落")
-local _____91CA_653E_8BB0_5FC6_5265_843D = ____require_result_18["释放记忆剥落"]
-local ____require_result_19 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.06．封门校验")
-local _____91CA_653E_7956_5730_53CC_7075_536B_5C01_95E8_6821_9A8C = ____require_result_19["释放祖地双灵卫封门校验"]
-local ____require_result_20 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.08．封门误判")
-local _____91CA_653E_7956_5730_53CC_7075_536B_5C01_95E8_8BEF_5224 = ____require_result_20["释放祖地双灵卫封门误判"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.03．双灵同誓")
+local _____66F4_65B0_7956_5730_53CC_7075_540C_8A93 = ____require_result_11["更新祖地双灵同誓"]
+local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.01．灵印折步")
+local _____91CA_653E_7075_5370_6298_6B65 = ____require_result_12["释放灵印折步"]
+local _____521B_5EFA_8D64_8A93_9547_9B42_5370 = ____require_result_12["创建赤誓镇魂印"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.02．月纹缚魂")
+local _____91CA_653E_6708_7EB9_7F1A_9B42 = ____require_result_13["释放月纹缚魂"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.03．断誓践踏")
+local _____91CA_653E_65AD_8A93_8DF5_8E0F = ____require_result_14["释放断誓践踏"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．赤誓灵卫.04．裂魂坠斩")
+local _____91CA_653E_88C2_9B42_5760_65A9 = ____require_result_15["释放裂魂坠斩"]
+local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．苍影灵卫.01．誓锋壁进")
+local _____91CA_653E_8A93_950B_58C1_8FDB = ____require_result_16["释放誓锋壁进"]
+local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．苍影灵卫.02．盾刃裁决")
+local _____91CA_653E_76FE_5203_88C1_51B3 = ____require_result_17["释放盾刃裁决"]
+local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．苍影灵卫.03．失名祷潮")
+local _____91CA_653E_5931_540D_7977_6F6E = ____require_result_18["释放失名祷潮"]
+local ____require_result_19 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．苍影灵卫.04．记忆剥落")
+local _____91CA_653E_8BB0_5FC6_5265_843D = ____require_result_19["释放记忆剥落"]
+local ____require_result_20 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.06．封门校验")
+local _____91CA_653E_7956_5730_53CC_7075_536B_5C01_95E8_6821_9A8C = ____require_result_20["释放祖地双灵卫封门校验"]
+local ____require_result_21 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.08．封门误判")
+local _____91CA_653E_7956_5730_53CC_7075_536B_5C01_95E8_8BEF_5224 = ____require_result_21["释放祖地双灵卫封门误判"]
 local CreateUnit = jass.CreateUnit
 local GetPlayerId = jass.GetPlayerId
 local GetUnitState = jass.GetUnitState
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local SetUnitState = jass.SetUnitState
 local SetHeroLevel = jass.SetHeroLevel
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local SetUnitScale = jass.SetUnitScale
+local UnitDamageTarget = jass.UnitDamageTarget
 local Rect = jass.Rect
 local RemoveRect = jass.RemoveRect
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
+local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local DzSetUnitModel = japi.DzSetUnitModel
 local _____8D64_8A93_7075_536B_5355_4F4DID = stringToFourCCSafe(_____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["单位"]["赤誓灵卫"]["单位ID"])
 local _____82CD_5F71_7075_536B_5355_4F4DID = stringToFourCCSafe(_____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["单位"]["苍影灵卫"]["单位ID"])
@@ -234,6 +243,12 @@ local function _____51C6_5907_7956_5730_53CC_7075_536BP2(context)
     SetUnitState(context["赤誓灵卫单位"], UNIT_STATE_LIFE, maxLife * 0.6)
     _____66F4_65B0_7956_5730_53CC_7075_536B_4FB5_8680_9636_6BB5(context["运行时"])
 end
+local function _____51C6_5907_7956_5730_53CC_7075_536BP2_82CD_5F71_5148_53D8_5F02(context)
+    _____91CD_7F6E_7956_5730_53CC_7075_536BP1(context)
+    local maxLife = GetUnitStateJapi(context["苍影灵卫单位"], UNIT_STATE_MAX_LIFE)
+    SetUnitState(context["苍影灵卫单位"], UNIT_STATE_LIFE, maxLife * 0.6)
+    _____66F4_65B0_7956_5730_53CC_7075_536B_4FB5_8680_9636_6BB5(context["运行时"])
+end
 local function _____51C6_5907_7956_5730_53CC_7075_536BP3(context)
     _____51C6_5907_7956_5730_53CC_7075_536BP2(context)
     local maxLife = GetUnitStateJapi(context["赤誓灵卫单位"], UNIT_STATE_MAX_LIFE)
@@ -267,6 +282,10 @@ local function _____6D4B_8BD5_53CC_7075_536B_65AD_8A93_8DF5_8E0F(_player, contex
     _____51C6_5907_7956_5730_53CC_7075_536BP2(context)
     _____91CA_653E_65AD_8A93_8DF5_8E0F(context["运行时"], context["目标单位"])
 end
+local function _____6D4B_8BD5_53CC_7075_536B_65AD_8A93_8DF5_8E0FP3(_player, context)
+    _____51C6_5907_7956_5730_53CC_7075_536BP3(context)
+    _____91CA_653E_65AD_8A93_8DF5_8E0F(context["运行时"], context["目标单位"])
+end
 local function _____6D4B_8BD5_53CC_7075_536B_88C2_9B42_5760_65A9(_player, context)
     _____51C6_5907_7956_5730_53CC_7075_536BP2(context)
     _____91CA_653E_88C2_9B42_5760_65A9(context["运行时"], context["目标单位"])
@@ -275,11 +294,20 @@ local function _____6D4B_8BD5_53CC_7075_536B_53CC_8680_5171_9E23(_player, contex
     _____51C6_5907_7956_5730_53CC_7075_536BP3(context)
 end
 local function _____6D4B_8BD5_53CC_7075_536B_5931_540D_7977_6F6E(_player, context)
+    _____51C6_5907_7956_5730_53CC_7075_536BP2_82CD_5F71_5148_53D8_5F02(context)
+    _____521B_5EFA_8D64_8A93_9547_9B42_5370(
+        context["运行时"],
+        GetUnitX(context["目标单位"]),
+        GetUnitY(context["目标单位"])
+    )
+    _____91CA_653E_5931_540D_7977_6F6E(context["运行时"], context["目标单位"])
+end
+local function _____6D4B_8BD5_53CC_7075_536B_5931_540D_7977_6F6EP3(_player, context)
     _____51C6_5907_7956_5730_53CC_7075_536BP3(context)
     _____91CA_653E_5931_540D_7977_6F6E(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_53CC_7075_536B_8BB0_5FC6_5265_843D(_player, context)
-    _____51C6_5907_7956_5730_53CC_7075_536BP3(context)
+    _____51C6_5907_7956_5730_53CC_7075_536BP2_82CD_5F71_5148_53D8_5F02(context)
     _____91CA_653E_8BB0_5FC6_5265_843D(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_53CC_7075_536B_5C01_95E8_8BEF_5224(_player, context)
@@ -291,6 +319,42 @@ local function _____6D4B_8BD5_53CC_7075_536B_5C01_95E8_8BEF_5224(_player, contex
     end
     _____91CA_653E_7956_5730_53CC_7075_536B_5C01_95E8_8BEF_5224(context["运行时"])
 end
+local function _____6D4B_8BD5_53CC_7075_536B_540C_8A93_88AB_52A8(_player, context)
+    _____91CD_7F6E_7956_5730_53CC_7075_536BP1(context)
+    local redMax = GetUnitStateJapi(context["赤誓灵卫单位"], UNIT_STATE_MAX_LIFE)
+    local azureMax = GetUnitStateJapi(context["苍影灵卫单位"], UNIT_STATE_MAX_LIFE)
+    SetUnitState(context["赤誓灵卫单位"], UNIT_STATE_LIFE, redMax * 0.5)
+    SetUnitState(context["苍影灵卫单位"], UNIT_STATE_LIFE, azureMax)
+    _____66F4_65B0_7956_5730_53CC_7075_540C_8A93(context["运行时"])
+end
+local function _____6D4B_8BD5_53CC_7075_536B_4FB5_8680_9501_8840_88AB_52A8(_player, context)
+    _____91CD_7F6E_7956_5730_53CC_7075_536BP1(context)
+    local redMax = GetUnitStateJapi(context["赤誓灵卫单位"], UNIT_STATE_MAX_LIFE)
+    UnitDamageTarget(
+        context["目标单位"],
+        context["赤誓灵卫单位"],
+        redMax * 0.9,
+        false,
+        true,
+        ATTACK_TYPE_NORMAL,
+        DAMAGE_TYPE_NORMAL,
+        WEAPON_TYPE_WHOKNOWS
+    )
+end
+local function _____6D4B_8BD5_53CC_7075_536B_540C_606F_9501_8840_88AB_52A8(_player, context)
+    _____51C6_5907_7956_5730_53CC_7075_536BP3(context)
+    local redMax = GetUnitStateJapi(context["赤誓灵卫单位"], UNIT_STATE_MAX_LIFE)
+    UnitDamageTarget(
+        context["目标单位"],
+        context["赤誓灵卫单位"],
+        redMax * 0.8,
+        false,
+        true,
+        ATTACK_TYPE_NORMAL,
+        DAMAGE_TYPE_NORMAL,
+        WEAPON_TYPE_WHOKNOWS
+    )
+end
 local _____7956_5730_53CC_7075_536B_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "赤誓灵印折步", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_7075_5370_6298_6B65},
     {["序号"] = 2, ["名称"] = "赤誓月纹缚魂", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_6708_7EB9_7F1A_9B42},
@@ -298,12 +362,17 @@ local _____7956_5730_53CC_7075_536B_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 4, ["名称"] = "苍影盾刃裁决", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_76FE_5203_88C1_51B3},
     {["序号"] = 5, ["名称"] = "P1联合封门校验", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_5C01_95E8_6821_9A8C},
     {["序号"] = 6, ["名称"] = "P2赤誓侵蚀变异", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_8D64_8A93_53D8_5F02},
-    {["序号"] = 7, ["名称"] = "赤誓断誓践踏", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_65AD_8A93_8DF5_8E0F},
+    {["序号"] = 7, ["名称"] = "赤誓断誓践踏（P2盾压制）", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_65AD_8A93_8DF5_8E0F},
+    {["序号"] = 7, ["命令"] = "7-3", ["名称"] = "赤誓断誓践踏（P3破壳净化）", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_65AD_8A93_8DF5_8E0FP3},
     {["序号"] = 8, ["名称"] = "赤誓裂魂坠斩", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_88C2_9B42_5760_65A9},
     {["序号"] = 9, ["名称"] = "P3双蚀共鸣", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_53CC_8680_5171_9E23},
-    {["序号"] = 10, ["名称"] = "苍影失名祷潮", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_5931_540D_7977_6F6E},
+    {["序号"] = 10, ["名称"] = "苍影失名祷潮（P2吸收镇魂印）", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_5931_540D_7977_6F6E},
+    {["序号"] = 10, ["命令"] = "10-3", ["名称"] = "苍影失名祷潮（P3校准净化）", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_5931_540D_7977_6F6EP3},
     {["序号"] = 11, ["名称"] = "苍影记忆剥落", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_8BB0_5FC6_5265_843D},
-    {["序号"] = 12, ["名称"] = "P3封门误判", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_5C01_95E8_8BEF_5224}
+    {["序号"] = 12, ["名称"] = "P3封门误判", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_5C01_95E8_8BEF_5224},
+    {["序号"] = 13, ["名称"] = "被动：双灵同誓减伤与分担", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_540C_8A93_88AB_52A8},
+    {["序号"] = 14, ["名称"] = "被动：侵蚀阶段生命下限", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_4FB5_8680_9501_8840_88AB_52A8},
+    {["序号"] = 15, ["名称"] = "被动：同息归寂生命下限", ["执行"] = _____6D4B_8BD5_53CC_7075_536B_540C_606F_9501_8840_88AB_52A8}
 }
 _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4({
     ["命令单位名"] = "祖地双灵卫",

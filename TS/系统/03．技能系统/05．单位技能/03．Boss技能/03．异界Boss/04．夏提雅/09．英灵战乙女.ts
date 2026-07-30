@@ -3,8 +3,11 @@
 import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
+import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 播放夏提雅台词 } from './18．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const jass = require('jass.common') as any;
 
@@ -103,6 +106,12 @@ export function 启动夏提雅英灵战乙女阶段(this: void, context: 夏提
     return true;
   }
   const facing = Atan2(GetUnitY(target) - GetUnitY(boss), GetUnitX(target) - GetUnitX(boss)) * 57.29577951308232;
+  const cfg = 夏提雅数值与表现配置.P2;
+  SetUnitFacing(boss, facing);
+  开始硬直(boss, cfg.英灵登场演出秒);
+  显示夏提雅常规吟唱条(cfg.英灵登场演出秒, cfg.英灵登场吟唱条颜色ID, cfg.英灵登场吟唱条标题文本, cfg.英灵登场吟唱条提示文本);
+  播放限时单位动画({ 单位: boss, 动画编号: cfg.英灵登场动画编号, 持续秒: cfg.英灵登场演出秒, 恢复动画编号: 0 });
+  context.普通机制忙碌到Ms = getServerTime() + cfg.英灵登场演出秒 * 1000;
   const distance = 夏提雅数值与表现配置.P2.英灵常驻距离;
   const projection = 创建夏提雅英灵投影(
     context,

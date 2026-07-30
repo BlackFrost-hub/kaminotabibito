@@ -10,10 +10,12 @@ local _____8DDD_79BB_5E73_65B9XY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["�
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetRandomInt = jass.GetRandomInt
 local ____require_result_0 = require("lib.扩展函数.KK扩展API.00．装饰物函数")
 local DzDoodadCreate = ____require_result_0.DzDoodadCreate
 local DzDoodadSetModel = ____require_result_0.DzDoodadSetModel
 local DzDoodadSetVisible = ____require_result_0.DzDoodadSetVisible
+local DzDoodadRemove = ____require_result_0.DzDoodadRemove
 local function _____8F6C_88C5_9970_7269ID(id)
     return type(id) == "number" and id or stringToFourCC(id)
 end
@@ -98,18 +100,32 @@ _____52A8_6001_88C5_9970_7269_5B89_5168_533A_7EC4_5B9E_73B0.prototype["销毁"] 
         return
     end
     self["已销毁"] = true
-    self["隐藏"](self)
+    do
+        local i = 0
+        while i < #self["列表"] do
+            local _____533A = self["列表"][i + 1]
+            if _____533A["装饰物"] ~= nil and _____533A["装饰物"] ~= 0 then
+                DzDoodadRemove(_____533A["装饰物"])
+            end
+            i = i + 1
+        end
+    end
     self["列表"] = {}
 end
 _____52A8_6001_88C5_9970_7269_5B89_5168_533A_7EC4_5B9E_73B0.prototype["创建全部"] = function(self)
     local doodadId = _____8F6C_88C5_9970_7269ID(self["参数"]["装饰物ID"])
-    local varId = self["参数"]["变量ID"] or 1
     local z = self["参数"].Z or 0
     local scale = self["参数"]["缩放"] or 1
     do
         local i = 0
         while i < #self["参数"]["点位列表"] do
             local _____70B9 = self["参数"]["点位列表"][i + 1]
+            local varId = self["参数"]["变量ID"] or 0
+            local minVarId = self["参数"]["随机样式最小ID"]
+            local maxVarId = self["参数"]["随机样式最大ID"]
+            if minVarId ~= nil and maxVarId ~= nil and maxVarId >= minVarId then
+                varId = GetRandomInt(minVarId, maxVarId)
+            end
             local doodad = DzDoodadCreate(
                 doodadId,
                 varId,

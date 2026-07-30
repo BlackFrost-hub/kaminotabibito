@@ -5,7 +5,7 @@ import { 获取或创建莫尔特斯上下文, type 莫尔特斯运行时上下�
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 播放莫尔特斯限时动作, stringToFourCC } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯常规施法, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 创建点名预警执行器 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/05．点名预警执行器";
@@ -114,6 +114,8 @@ function 创建根须穿刺格子预警(this: void, context: 莫尔特斯运行�
     延迟秒: cfg.预警秒,
     提示圈: {
       类型: "矩形",
+      X: cell.中心X - cellSize / 2,
+      Y: cell.中心Y,
       宽度: cellSize,
       长度: cellSize,
       朝向: 0,
@@ -128,6 +130,7 @@ export function 释放莫尔特斯腐朽根须穿刺(this: void, context: 莫尔
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.腐朽根须穿刺;
   if (!单位有效(boss)) return;
+  开始莫尔特斯常规施法(boss, cfg.预警秒, "腐朽根须穿刺", "随机地块即将钻出腐败根须");
   播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(boss, "腐朽根须穿刺");
   const cells = 选择根须穿刺格子(context);

@@ -39,6 +39,7 @@ ____exports.SinBJ = require("lib.扩展函数.BJ函数.12．数学函数").SinBJ
 ____exports.EXSetUnitFacing = japi.EXSetUnitFacing
 ____exports.DzSetUnitModel = japi.DzSetUnitModel
 ____exports.DzSetEffectPos = japi.DzSetEffectPos
+____exports.DzSetEffectAnimation = japi.DzSetEffectAnimation
 ____exports.DzGetColor = japi.DzGetColor
 ____exports.DzSetEffectVertexColor = japi.DzSetEffectVertexColor
 ____exports.EXEffectMatReset = japi.EXEffectMatReset

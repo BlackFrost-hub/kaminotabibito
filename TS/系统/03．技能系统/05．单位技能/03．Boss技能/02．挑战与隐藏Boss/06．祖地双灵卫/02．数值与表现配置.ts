@@ -193,10 +193,10 @@ export const 祖地双灵卫数值与表现配置 = {
     誓锋壁进: {
       推进拖尾特效路径: 'Common\\Effect\\Form\\Aura\\long.MDX',
       定向誓盾特效路径: 'Common\\Effect\\Form\\Shield\\AlbedoDarkGoldBarrier.mdx',
-      冲锋命中特效路径: 'Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldHeavyImpact.mdx',
+      冲锋命中特效路径: 'Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx',
     },
     盾刃裁决: {
-      盾击命中特效路径: 'Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldHeavyImpact.mdx',
+      盾击命中特效路径: 'Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx',
       剑刃重斩特效路径: 'Common\\Effect\\Form\\Line\\AronkosSoulSlashImpact.mdx',
     },
     灵印折步: {

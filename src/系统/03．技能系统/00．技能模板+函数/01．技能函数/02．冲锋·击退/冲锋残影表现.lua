@@ -3,7 +3,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____9650_5236_5230_5B57_8282, _____7EC4_88C5_989C_8272_503C, _____6062_590D_5355_4F4D_8868_73B0, _____9500_6BC1_51B2_950B_6B8B_5F71_8868_73B0_5B9E_4F8B, _____521B_5EFA_4E00_6B21_6B8B_5F71, ____on_51B2_950B_6B8B_5F71_8868_73B0Tick, jass, _____83B7_53D6_5355_4F4D_5F53_524D_4F4D_79FBID, YDWETimerDestroyEffect, offTick10ms, AddSpecialEffect, GetUnitX, GetUnitY, GetUnitState, SetUnitTimeScale, GetUnitFlyHeight, SetUnitFlyHeight, R2I, DzSetEffectAnimation, DzPlayEffectAnimation, DzSetEffectVertexColor, DzSetEffectVertexAlpha, DzSetEffectScale, EXSetEffectXY, EXSetEffectZ, EXSetEffectSize, EXSetEffectSpeed, TICK_INTERVAL, UNIT_ALIVE_LIFE, _____6D3B_52A8_51B2_950B_6B8B_5F71_8868_73B0_5217_8868, _____51B2_950B_6B8B_5F71_8868_73B0_6620_5C04, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668
+local _____5355_4F4D_5B58_6D3B, _____9650_5236_5230_5B57_8282, _____7EC4_88C5_989C_8272_503C, _____6062_590D_5355_4F4D_8868_73B0, _____9500_6BC1_51B2_950B_6B8B_5F71_8868_73B0_5B9E_4F8B, _____521B_5EFA_4E00_6B21_6B8B_5F71, ____on_51B2_950B_6B8B_5F71_8868_73B0Tick, jass, _____83B7_53D6_5355_4F4D_5F53_524D_4F4D_79FBID, YDWETimerDestroyEffect, offTick10ms, AddSpecialEffect, GetUnitX, GetUnitY, GetUnitState, SetUnitTimeScale, GetUnitFlyHeight, SetUnitFlyHeight, R2I, DzSetEffectAnimation, DzPlayEffectAnimation, DzSetEffectVertexColor, DzSetEffectVertexAlpha, DzSetEffectScale, EXSetEffectXY, EXSetEffectZ, EXSetEffectSize, EXSetEffectSpeed, EXEffectMatRotateZ, TICK_INTERVAL, UNIT_ALIVE_LIFE, _____6D3B_52A8_51B2_950B_6B8B_5F71_8868_73B0_5217_8868, _____51B2_950B_6B8B_5F71_8868_73B0_6620_5C04, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668
 function _____5355_4F4D_5B58_6D3B(u)
     return u ~= nil and u ~= 0 and GetUnitState(u, jass.UNIT_STATE_LIFE) > UNIT_ALIVE_LIFE
 end
@@ -69,6 +69,9 @@ function _____521B_5EFA_4E00_6B21_6B8B_5F71(_____5B9E_4F8B)
     if type(EXSetEffectSpeed) == "function" then
         EXSetEffectSpeed(effect, _____5B9E_4F8B["动画速度"])
     end
+    if type(EXEffectMatRotateZ) == "function" and _____5B9E_4F8B["残影朝向"] ~= nil then
+        EXEffectMatRotateZ(effect, _____5B9E_4F8B["残影朝向"])
+    end
     if type(DzSetEffectAnimation) == "function" and _____5B9E_4F8B["动画序号"] ~= nil then
         DzSetEffectAnimation(effect, _____5B9E_4F8B["动画序号"], 0)
     end
@@ -91,9 +94,9 @@ function ____on_51B2_950B_6B8B_5F71_8868_73B0Tick()
     while i < #_____6D3B_52A8_51B2_950B_6B8B_5F71_8868_73B0_5217_8868 do
         do
             local _____5B9E_4F8B = _____6D3B_52A8_51B2_950B_6B8B_5F71_8868_73B0_5217_8868[i + 1]
-            if not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) or _____83B7_53D6_5355_4F4D_5F53_524D_4F4D_79FBID(nil, _____5B9E_4F8B["单位"]) ~= _____5B9E_4F8B["冲锋ID"] then
+            if not _____5355_4F4D_5B58_6D3B(_____5B9E_4F8B["单位"]) or _____83B7_53D6_5355_4F4D_5F53_524D_4F4D_79FBID(_____5B9E_4F8B["单位"]) ~= _____5B9E_4F8B["冲锋ID"] then
                 _____9500_6BC1_51B2_950B_6B8B_5F71_8868_73B0_5B9E_4F8B(_____5B9E_4F8B)
-                goto __continue35
+                goto __continue36
             end
             _____5B9E_4F8B["下次生成剩余时间"] = _____5B9E_4F8B["下次生成剩余时间"] - TICK_INTERVAL
             if _____5B9E_4F8B["下次生成剩余时间"] <= 0 then
@@ -102,7 +105,7 @@ function ____on_51B2_950B_6B8B_5F71_8868_73B0Tick()
             end
             i = i + 1
         end
-        ::__continue35::
+        ::__continue36::
     end
 end
 jass = require("jass.common")
@@ -186,6 +189,11 @@ if japi ~= nil then
     ____opt_result_29 = japi.EXSetEffectSpeed
 end
 EXSetEffectSpeed = ____opt_result_29
+local ____opt_result_32
+if japi ~= nil then
+    ____opt_result_32 = japi.EXEffectMatRotateZ
+end
+EXEffectMatRotateZ = ____opt_result_32
 TICK_INTERVAL = 0.01
 UNIT_ALIVE_LIFE = 0.405
 local DEFAULT_AFTERIMAGE_INTERVAL = 0.05
@@ -229,7 +237,7 @@ local function _____6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668()
     onTick10ms(____on_51B2_950B_6B8B_5F71_8868_73B0Tick)
 end
 ____exports["开始冲锋并附带残影表现"] = function(_____5355_4F4D, _____4F4D_79FB_53C2_6570, _____8868_73B0_53C2_6570)
-    local _____51B2_950BID = _____5F00_59CB_51B2_950B(nil, _____5355_4F4D, _____4F4D_79FB_53C2_6570)
+    local _____51B2_950BID = _____5F00_59CB_51B2_950B(_____5355_4F4D, _____4F4D_79FB_53C2_6570)
     if _____51B2_950BID <= 0 then
         return 0
     end
@@ -263,7 +271,8 @@ ____exports["开始冲锋并附带残影表现"] = function(_____5355_4F4D, ____
         ["下次生成剩余时间"] = 0,
         ["飞行高度变化"] = _____98DE_884C_9AD8_5EA6_53D8_5316,
         ["已应用飞行高度变化"] = _____98DE_884C_9AD8_5EA6_53D8_5316 ~= 0,
-        ["残影缩放"] = _____8868_73B0_53C2_6570["残影缩放"] ~= nil and _____8868_73B0_53C2_6570["残影缩放"] > 0 and _____8868_73B0_53C2_6570["残影缩放"] or DEFAULT_AFTERIMAGE_SCALE
+        ["残影缩放"] = _____8868_73B0_53C2_6570["残影缩放"] ~= nil and _____8868_73B0_53C2_6570["残影缩放"] > 0 and _____8868_73B0_53C2_6570["残影缩放"] or DEFAULT_AFTERIMAGE_SCALE,
+        ["残影朝向"] = _____8868_73B0_53C2_6570["残影朝向"]
     }
     _____51B2_950B_6B8B_5F71_8868_73B0_6620_5C04[_____51B2_950BID] = _____5B9E_4F8B
     _____6D3B_52A8_51B2_950B_6B8B_5F71_8868_73B0_5217_8868[#_____6D3B_52A8_51B2_950B_6B8B_5F71_8868_73B0_5217_8868 + 1] = _____5B9E_4F8B

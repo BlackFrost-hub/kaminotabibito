@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____505C_6B62_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5, _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272, removePeriodicCallback, CosBJ, SinBJ, AddSpecialEffect, DestroyEffect, GetOwningPlayer, GetPlayerId, EXSetEffectSpeed, EXSetEffectSize, EXEffectMatRotateZ, EXEffectMatScale, DzSetEffectVertexColor, DzSetEffectVertexAlpha, MODEL_SQUARE1X, MODEL_SQUARE1_5X, MODEL_SQUARE2X, MODEL_SQUARE2_5X, MODEL_SQUARE3X, MODEL_SQUARE3_5X, MODEL_SQUARE4X, MODEL_SQUARE5X, MODEL_SQUARE6X, MODEL_LINE1X, MODEL_LINE1_5X, MODEL_LINE2X, MODEL_LINE2_5X, MODEL_LINE3X, MODEL_LINE3_5X, MODEL_LINE4X, MODEL_LINE5X, MODEL_LINE6X, MODEL_RING, _____63D0_793A_5708_53CB_65B9_8272, _____63D0_793A_5708_654C_65B9_8272, _____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868, _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID
+local _____505C_6B62_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5, _____8BBE_7F6E_63D0_793A_7279_6548_9876_70B9_989C_8272, removePeriodicCallback, CosBJ, SinBJ, AddSpecialEffect, DestroyEffect, GetOwningPlayer, GetPlayerId, EXSetEffectSpeed, EXSetEffectSize, EXEffectMatRotateZ, EXEffectMatScale, DzSetEffectVertexColor, DzSetEffectVertexAlpha, MODEL_SQUARE1X, MODEL_SQUARE1_5X, MODEL_SQUARE2X, MODEL_SQUARE2_5X, MODEL_SQUARE3X, MODEL_SQUARE3_5X, MODEL_SQUARE4X, MODEL_SQUARE5X, MODEL_SQUARE6X, MODEL_SQUARE12X, MODEL_LINE1X, MODEL_LINE1_5X, MODEL_LINE2X, MODEL_LINE2_5X, MODEL_LINE3X, MODEL_LINE3_5X, MODEL_LINE4X, MODEL_LINE5X, MODEL_LINE6X, MODEL_RING, _____63D0_793A_5708_53CB_65B9_8272, _____63D0_793A_5708_654C_65B9_8272, _____7279_6548_6B65_8FDB_7F29_653E_4E0A_4E0B_6587_5217_8868, _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID
 function _____505C_6B62_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
     if _____7279_6548_6B65_8FDB_7F29_653E_68C0_67E5_56DE_8C03ID <= 0 then
         return
@@ -57,8 +57,9 @@ ____exports["移除特效步进缩放"] = function(_____7279_6548)
         _____505C_6B62_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
     end
 end
---- 创建一个需要手动销毁的矩形提示圈特效句柄
-____exports["创建矩形提示圈特效"] = function(x, y, width, long, fac, speed)
+--- 创建一个需要手动销毁的矩形提示圈特效句柄。
+-- 【重要】坐标必须传矩形路径起点，严禁传矩形中点；函数内部会沿朝向自动前移半个长度到模型中点。
+____exports["创建矩形提示圈特效"] = function(_____8DEF_5F84_8D77_70B9X, _____8DEF_5F84_8D77_70B9Y, width, long, fac, speed)
     if width > 1500 then
         width = 1500
     end
@@ -67,8 +68,8 @@ ____exports["创建矩形提示圈特效"] = function(x, y, width, long, fac, sp
     end
     local sw = width / 1000
     local dis = long / 2
-    x = x + CosBJ(fac) * dis
-    y = y + SinBJ(fac) * dis
+    local _____6A21_578B_4E2D_70B9X = _____8DEF_5F84_8D77_70B9X + CosBJ(fac) * dis
+    local _____6A21_578B_4E2D_70B9Y = _____8DEF_5F84_8D77_70B9Y + SinBJ(fac) * dis
     local model
     local sl
     local ratio = long / width
@@ -96,11 +97,14 @@ ____exports["创建矩形提示圈特效"] = function(x, y, width, long, fac, sp
     elseif ratio <= 5.5 then
         model = MODEL_SQUARE5X
         sl = long / 5000
-    else
+    elseif ratio <= 9 then
         model = MODEL_SQUARE6X
         sl = long / 6000
+    else
+        model = MODEL_SQUARE12X
+        sl = long / 12000
     end
-    local e = AddSpecialEffect(model, x, y)
+    local e = AddSpecialEffect(model, _____6A21_578B_4E2D_70B9X, _____6A21_578B_4E2D_70B9Y)
     if not e then
         return
     end
@@ -110,7 +114,9 @@ ____exports["创建矩形提示圈特效"] = function(x, y, width, long, fac, sp
     EXSetEffectSpeed(e, s)
     return e
 end
-____exports["创建方向直线提示圈特效"] = function(x, y, width, long, fac, speed)
+--- 创建一个需要手动销毁的方向直线提示圈特效句柄。
+-- 【重要】坐标必须传直线路径起点，严禁传模型中点；函数内部会沿朝向自动前移半个长度到模型中点。
+____exports["创建方向直线提示圈特效"] = function(_____8DEF_5F84_8D77_70B9X, _____8DEF_5F84_8D77_70B9Y, width, long, fac, speed)
     if width <= 0 or long <= 0 then
         return nil
     end
@@ -152,9 +158,9 @@ ____exports["创建方向直线提示圈特效"] = function(x, y, width, long, f
         modelLong = 6000
     end
     local dis = long / 2
-    x = x + CosBJ(fac) * dis
-    y = y + SinBJ(fac) * dis
-    local e = AddSpecialEffect(model, x, y)
+    local _____6A21_578B_4E2D_70B9X = _____8DEF_5F84_8D77_70B9X + CosBJ(fac) * dis
+    local _____6A21_578B_4E2D_70B9Y = _____8DEF_5F84_8D77_70B9Y + SinBJ(fac) * dis
+    local e = AddSpecialEffect(model, _____6A21_578B_4E2D_70B9X, _____6A21_578B_4E2D_70B9Y)
     if not e then
         return nil
     end
@@ -245,6 +251,7 @@ MODEL_SQUARE3_5X = MODEL_DIR .. "UnifiedTip_Rect3_5x.mdx"
 MODEL_SQUARE4X = MODEL_DIR .. "UnifiedTip_Rect4x.mdx"
 MODEL_SQUARE5X = MODEL_DIR .. "UnifiedTip_Rect5x.mdx"
 MODEL_SQUARE6X = MODEL_DIR .. "UnifiedTip_Rect6x.mdx"
+MODEL_SQUARE12X = MODEL_DIR .. "UnifiedTip_Rect12x.mdx"
 MODEL_LINE1X = MODEL_DIR .. "UnifiedTip_Line1x.mdx"
 MODEL_LINE1_5X = MODEL_DIR .. "UnifiedTip_Line1_5x.mdx"
 MODEL_LINE2X = MODEL_DIR .. "UnifiedTip_Line2x.mdx"
@@ -381,22 +388,23 @@ ____exports["启动特效步进缩放"] = function(_____7279_6548, _____57FA_784
     }
     _____786E_4FDD_7279_6548_6B65_8FDB_7F29_653E_68C0_67E5()
 end
---- 精确无变形比例：1:1、1:1.5、1:2、1:2.5、1:3、1:3.5、1:4、1:5、1:6。
+--- 精确无变形比例：1:1、1:1.5、1:2、1:2.5、1:3、1:3.5、1:4、1:5、1:6、1:12。
 -- 其他比例会选用最接近的预制模型，仍可能出现轻微的非等比拉伸。
 -- 如宽度为 300、比例为 1:1.5，则长度应为 450。
+-- 【重要】坐标必须传矩形路径起点，严禁传矩形中点；函数内部会沿朝向自动前移半个长度到模型中点。
 -- 
--- @param x X坐标
--- @param y Y坐标
+-- @param 路径起点X 矩形路径起点 X 坐标
+-- @param 路径起点Y 矩形路径起点 Y 坐标
 -- @param width 宽度（最大1500）
 -- @param long 长度（最大7500）
 -- @param fac 朝向角度
 -- @param time 持续时间（<=0 表示1秒）
 -- @param speed 动画速率（可选，默认 1/time）
--- 超过 1:6 时固定使用 6X 模型，比例越大视觉变形越明显。
-____exports["创建矩形提示圈"] = function(x, y, width, long, fac, time, speed, _____6765_6E90_5355_4F4D)
+-- 1:6 与 1:12 之间按更接近的预制模型缩放；超过 1:12 时固定使用 12X 模型。
+____exports["创建矩形提示圈"] = function(_____8DEF_5F84_8D77_70B9X, _____8DEF_5F84_8D77_70B9Y, width, long, fac, time, speed, _____6765_6E90_5355_4F4D)
     local e = ____exports["创建矩形提示圈特效"](
-        x,
-        y,
+        _____8DEF_5F84_8D77_70B9X,
+        _____8DEF_5F84_8D77_70B9Y,
         width,
         long,
         fac,
@@ -411,10 +419,11 @@ ____exports["创建矩形提示圈"] = function(x, y, width, long, fac, time, sp
 end
 --- 创建带中轴延伸箭头的方向直线提示。
 -- 预制比例与矩形一致，精确命中时只进行等比缩放。
-____exports["创建方向直线提示圈"] = function(x, y, width, long, fac, time, speed, _____6765_6E90_5355_4F4D)
+-- 【重要】坐标必须传直线路径起点，严禁传模型中点；函数内部会沿朝向自动前移半个长度到模型中点。
+____exports["创建方向直线提示圈"] = function(_____8DEF_5F84_8D77_70B9X, _____8DEF_5F84_8D77_70B9Y, width, long, fac, time, speed, _____6765_6E90_5355_4F4D)
     local e = ____exports["创建方向直线提示圈特效"](
-        x,
-        y,
+        _____8DEF_5F84_8D77_70B9X,
+        _____8DEF_5F84_8D77_70B9Y,
         width,
         long,
         fac,

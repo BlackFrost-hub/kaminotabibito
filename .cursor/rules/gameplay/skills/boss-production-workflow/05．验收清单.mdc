@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## 验收清单
 
-- `npm run build` 通过。
+- 按 [TS 构建验证分流](../../../tooling/build/map-packaging-after-ts-build.mdc#ts-构建验证分流) 完成构建；普通中间改动使用 `build:files`，只有本清单用于用户明确要求的最终整体验收时才运行完整 `npm run build`。
 - 若改 TS 回调/事件/计时器/主动技能核心，build 后检查生成 Lua 的 `self/nil`、回调参数和调用形态。
 - 新增 Boss 私有公共工具前已按行为搜索现有模板、通用函数和机制组件；重复骨架已复用或公共化，专属冷门机制没有被强行抽象。
 - 自定义模型的已确认动作集中在配置表，包含原始时长和语义；技能文件没有散写未经确认的动作编号。

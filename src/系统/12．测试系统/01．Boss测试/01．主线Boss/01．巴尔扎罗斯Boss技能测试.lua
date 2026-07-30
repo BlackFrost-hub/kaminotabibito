@@ -5,6 +5,7 @@ function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local globals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local SelectUnitForPlayerSingle = ____require_result_0.SelectUnitForPlayerSingle
@@ -34,6 +35,7 @@ local _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_672B_65E5_7194_7206_8282_70B9
 local _____91CA_653E_5DF4_5C14_624E_7F57_65AF_672B_65E5_7194_7206 = ____require_result_10["释放巴尔扎罗斯末日熔爆"]
 local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.07．恶魔咆哮波")
 local _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2 = ____require_result_11["释放巴尔扎罗斯恶魔咆哮波"]
+local _____91CA_653E_5DF4_5C14_624E_7F57_65AF_62A4_536B_6A21_4EFF_6076_9B54_5486_54EE_6CE2 = ____require_result_11["释放巴尔扎罗斯护卫模仿恶魔咆哮波"]
 local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.08．王者天罚")
 local _____91CA_653E_5DF4_5C14_624E_7F57_65AF_738B_8005_5929_7F5A = ____require_result_12["释放巴尔扎罗斯王者天罚"]
 local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.09．熔岩喷发")
@@ -52,6 +54,7 @@ local _____5DF4_5C14_624E_7F57_65AF_6218_6597_533A_57DF_914D_7F6E = ____require_
 local _____5DF4_5C14_624E_7F57_65AF_56FA_5B9A_5B89_5168_533A_914D_7F6E_8868 = ____require_result_17["巴尔扎罗斯固定安全区配置表"]
 local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
 local _____5DF4_5C14_624E_7F57_65AF_62A4_536B_914D_7F6E = ____require_result_18["巴尔扎罗斯护卫配置"]
+local _____5DF4_5C14_624E_7F57_65AF_9636_6BB5_9608_503C = ____require_result_18["巴尔扎罗斯阶段阈值"]
 local ____require_result_19 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.index")
 local _____521B_5EFA_52A8_6001_77E9_5F62_533A_57DF_7EC4 = ____require_result_19["创建动态矩形区域组"]
 local _____9500_6BC1_52A8_6001_77E9_5F62_533A_57DF_7EC4 = ____require_result_19["销毁动态矩形区域组"]
@@ -73,11 +76,26 @@ local _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X = -540.6
 local _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3Y = -2495.2
 local _____4E34_65F6_6D4B_8BD5_73A9_5BB6X = -540.6
 local _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y = -3055.2
+local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_62A4_536B = false
+local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_62A4_536B_4E3B_52A8_6280_80FD = false
+local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_683C_9C81_59C6_4E3B_52A8_6280_80FD = false
+local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_585E_62C9_4E3B_52A8_6280_80FD = false
+local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_683C_9C81_59C6_666E_653B = false
+local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_585E_62C9_666E_653B = false
 local CreateUnit = jass.CreateUnit
 local SetHeroLevel = jass.SetHeroLevel
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
+local SetUnitState = jass.SetUnitState
+local GetUnitState = jass.GetUnitState
+local SetUnitAcquireRange = jass.SetUnitAcquireRange
+local IssueImmediateOrder = jass.IssueImmediateOrder
 local GetPlayerId = jass.GetPlayerId
+local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+local DzUnitDisableAttack = japi.DzUnitDisableAttack
 local _____6700_8FD1_6D4B_8BD5Boss = {}
 local _____6700_8FD1_6D4B_8BD5_6B65_5175 = {}
 local _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B = {}
@@ -107,6 +125,16 @@ local function _____653E_7F6E_5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_62A4_536B(conte
         SetUnitFacing(context["塞拉"], _____5DF4_5C14_624E_7F57_65AF_62A4_536B_914D_7F6E["塞拉"]["面向"])
         _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840(context["塞拉"])
     end
+end
+local function _____7981_7528_5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_62A4_536B_666E_653B(guard)
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(guard) then
+        return
+    end
+    SetUnitAcquireRange(guard, 0)
+    if DzUnitDisableAttack ~= nil then
+        DzUnitDisableAttack(guard, true)
+    end
+    IssueImmediateOrder(guard, "stop")
 end
 local function _____83B7_53D6_6216_521B_5EFA_6D4B_8BD5Boss(player)
     local pid = GetPlayerId(player)
@@ -151,14 +179,26 @@ end
 local function _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_4E0A_4E0B_6587(context)
     _____6CE8_518C_5DF4_5C14_624E_7F57_65AF_8FD0_884C_65F6()
     _____6CE8_518C_5DF4_5C14_624E_7F57_65AF_6280_80FD_7ED3_6784()
-    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_7194_6838_5C01_5370_4E0E_62A4_536B_673A_5236(context)
-    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_683C_9C81_59C6_6280_80FD(context)
-    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_585E_62C9_6280_80FD(context)
+    _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_7194_6838_5C01_5370_4E0E_62A4_536B_673A_5236(context, _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_62A4_536B)
+    if not _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_62A4_536B then
+        if not _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_62A4_536B_4E3B_52A8_6280_80FD and not _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_683C_9C81_59C6_4E3B_52A8_6280_80FD then
+            _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_683C_9C81_59C6_6280_80FD(context)
+        end
+        if not _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_62A4_536B_4E3B_52A8_6280_80FD and not _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_585E_62C9_4E3B_52A8_6280_80FD then
+            _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_585E_62C9_6280_80FD(context)
+        end
+        _____653E_7F6E_5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_62A4_536B(context)
+        if _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_683C_9C81_59C6_666E_653B then
+            _____7981_7528_5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_62A4_536B_666E_653B(context["格鲁姆"])
+        end
+        if _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_7981_7528_585E_62C9_666E_653B then
+            _____7981_7528_5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_62A4_536B_666E_653B(context["塞拉"])
+        end
+    end
     _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_5730_6838_53EC_5524_8282_70B9(context)
     _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_7194_5CA9_62A4_76FE_8282_70B9(context)
     _____521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_672B_65E5_7194_7206_8282_70B9(context)
     _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E(context["Boss单位"])
-    _____653E_7F6E_5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_62A4_536B(context)
 end
 local function _____521B_5EFA_5E76_521D_59CB_5316_5DF4_5C14_624E_7F57_65AF_6D4B_8BD5(player)
     local hero = _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4(player)
@@ -195,13 +235,45 @@ end
 local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD1_6D4B_8BD5_547D_4EE4(_player, context)
     _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2(context)
 end
+local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD1_62A4_536B_6A21_4EFF_6D4B_8BD5_547D_4EE4(_player, context)
+    _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2(context)
+    _____91CA_653E_5DF4_5C14_624E_7F57_65AF_62A4_536B_6A21_4EFF_6076_9B54_5486_54EE_6CE2(context)
+end
 local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD2_6D4B_8BD5_547D_4EE4(_player, context)
+    _____91CA_653E_5DF4_5C14_624E_7F57_65AF_738B_8005_5929_7F5A(context)
+end
+local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD2P3_6D4B_8BD5_547D_4EE4(_player, context)
+    local boss = context["Boss单位"]
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(boss) then
+        return
+    end
+    SetUnitState(
+        boss,
+        UNIT_STATE_LIFE,
+        GetUnitState(boss, UNIT_STATE_MAX_LIFE) * _____5DF4_5C14_624E_7F57_65AF_9636_6BB5_9608_503C["第三阶段生命比例"] * 0.5
+    )
+    context["阶段"] = 3
     _____91CA_653E_5DF4_5C14_624E_7F57_65AF_738B_8005_5929_7F5A(context)
 end
 local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD3_6D4B_8BD5_547D_4EE4(_player, context)
     _____91CA_653E_5DF4_5C14_624E_7F57_65AF_7194_5CA9_55B7_53D1(context)
 end
 local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD4_6D4B_8BD5_547D_4EE4(_player, context)
+    _____91CA_653E_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE(context)
+end
+local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD4_8D85_8DDD_6D4B_8BD5_547D_4EE4(player, context)
+    local boss = context["Boss单位"]
+    local target = _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B[GetPlayerId(player)]
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(boss) or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
+        return
+    end
+    SetUnitPosition(
+        target,
+        GetUnitX(boss) + 700,
+        GetUnitY(boss)
+    )
+    SetUnitFacing(target, 180)
+    _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840(target)
     _____91CA_653E_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE(context)
 end
 local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD5_6D4B_8BD5_547D_4EE4(_player, context)
@@ -229,7 +301,7 @@ local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD9_6D4B_8BD5_547D_4EE4(pl
     end
 end
 local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD10_6D4B_8BD5_547D_4EE4(player, context)
-    local target = _____6700_8FD1_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
+    local target = _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4(player)
     if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(context["塞拉"]) and ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(target) then
         _____91CA_653E_7EDD_5BF9_96F6_5EA6_9886_57DF(context, target)
     end
@@ -246,9 +318,12 @@ local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD12_6D4B_8BD5_547D_4EE4(_
 end
 local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "恶魔咆哮波", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD1_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 1, ["命令"] = "1-2", ["名称"] = "恶魔咆哮波(P2护卫模仿)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD1_62A4_536B_6A21_4EFF_6D4B_8BD5_547D_4EE4},
     {["序号"] = 2, ["名称"] = "王者天罚", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD2_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 2, ["命令"] = "2-3", ["名称"] = "王者天罚(P3随机天罚)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD2P3_6D4B_8BD5_547D_4EE4},
     {["序号"] = 3, ["名称"] = "熔岩喷发", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD3_6D4B_8BD5_547D_4EE4},
     {["序号"] = 4, ["名称"] = "火焰锁链", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD4_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 4, ["命令"] = "4-2", ["名称"] = "火焰锁链(山丘之王700码超距)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD4_8D85_8DDD_6D4B_8BD5_547D_4EE4},
     {["序号"] = 5, ["名称"] = "地核召唤", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD5_6D4B_8BD5_547D_4EE4},
     {["序号"] = 6, ["名称"] = "末日熔爆", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD6_6D4B_8BD5_547D_4EE4},
     {["序号"] = 7, ["名称"] = "格鲁姆熔岩重锤", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD7_6D4B_8BD5_547D_4EE4},

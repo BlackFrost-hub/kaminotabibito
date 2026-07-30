@@ -40,6 +40,7 @@ export interface 单位停留触发参数 {
   on进入?: (this: void, 单位: any) => void;
   on离开?: (this: void, 单位: any, 已持续毫秒: number) => void;
   on触发?: (this: void, 状态: 单位停留状态) => void;
+  on刷新完成?: (this: void, 范围内状态列表: 单位停留状态[]) => void;
 }
 
 export interface 单位停留触发控制器 {
@@ -101,6 +102,7 @@ class 单位停留触发控制器实现 implements 单位停留触发控制器 {
     const centerY = GetUnitY(中心单位);
     const 半径平方 = this.参数.半径 * this.参数.半径;
     const 已访问表: Record<number, true> = {};
+    const 范围内状态列表: 单位停留状态[] = [];
     const 列表 = 读取单位列表(this.参数);
 
     for (let i = 0; i < 列表.length; i++) {
@@ -116,14 +118,20 @@ class 单位停留触发控制器实现 implements 单位停留触发控制器 {
         continue;
       }
       if (状态 == null) {
-        this.状态表[单位ID] = {
+        const 新状态: 内部停留状态 = {
           目标单位: 单位,
           进入毫秒: now,
           已持续毫秒: 0,
           是否已触发: false,
           当前在范围内: true,
         };
+        this.状态表[单位ID] = 新状态;
         if (this.参数.on进入 != null) this.参数.on进入(单位);
+        范围内状态列表.push({
+          目标单位: 单位,
+          已持续毫秒: 新状态.已持续毫秒,
+          是否已触发: false,
+        });
         continue;
       }
       状态.当前在范围内 = true;
@@ -141,6 +149,11 @@ class 单位停留触发控制器实现 implements 单位停留触发控制器 {
           delete this.状态表[单位ID];
         }
       }
+      范围内状态列表.push({
+        目标单位: 单位,
+        已持续毫秒: 状态.已持续毫秒,
+        是否已触发: 状态.是否已触发,
+      });
     }
 
     for (const key in this.状态表) {
@@ -148,6 +161,7 @@ class 单位停留触发控制器实现 implements 单位停留触发控制器 {
       const 状态 = this.状态表[key];
       if (状态 != null) this.处理离开(Number(key), 状态);
     }
+    if (this.参数.on刷新完成 != null) this.参数.on刷新完成(范围内状态列表);
   }
 
   读取状态(单位: any): 单位停留状态 | undefined {

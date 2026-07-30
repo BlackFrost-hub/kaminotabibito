@@ -29,6 +29,7 @@ local SquareRoot = jass.SquareRoot
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local EXSetEffectXY = japi.EXSetEffectXY
+local EXSetEffectZ = japi.EXSetEffectZ
 local EXSetEffectSize = japi.EXSetEffectSize
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local RAD_TO_DEG = 57.29577951308232
@@ -110,17 +111,19 @@ local function _____5237_65B0_5B88_62A4_804C_8D23_8FDE_63A5_8868_73B0(visual)
     local by = GetUnitY(albedo)
     local dx = bx - ax
     local dy = by - ay
+    local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]
     if visual["特效"] == nil or visual["特效"] == 0 then
         return
     end
     EXSetEffectXY(visual["特效"], (ax + bx) * 0.5, (ay + by) * 0.5)
+    EXSetEffectZ(visual["特效"], cfg["守护者之职责连接高度"])
     EXEffectMatRotateZ(
         visual["特效"],
         Atan2(dy, dx) * RAD_TO_DEG
     )
     EXSetEffectSize(
         visual["特效"],
-        SquareRoot(dx * dx + dy * dy) / _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["守护者之职责连接基础长度"]
+        SquareRoot(dx * dx + dy * dy) / cfg["守护者之职责连接基础长度"] * cfg["守护者之职责连接缩放倍率"]
     )
 end
 local function _____6E05_7406_5B88_62A4_804C_8D23_8868_73B0(visual)

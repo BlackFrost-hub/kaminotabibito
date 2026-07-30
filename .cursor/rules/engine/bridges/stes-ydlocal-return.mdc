@@ -19,7 +19,7 @@ alwaysApply: false
 - STES 事件表必须与 JASS 的 `STES___HT` / `STES_GetTable()` 是同一张 hashtable。不要用新 `InitHashtable` 覆盖 JASS 全局表，否则 JASS 注册与 Lua 读写不同表，`LoadInteger(..., skey_index)` 会一直是 0。
 - 事件名必须与 JASS `StringHash("事件名")` 完全一致，包括中文。
 - STES / YDLocal 桥接先按 JASS 原始写法对齐，不要猜测字段名；父触发 `YDLocal5Set(type, "key", value)`，Lua 子触发就必须用同一个 `type` 和 `"key"` 读。
-- 改 STES/YDLocal/TSTL self 相关代码后，必须 `npm run build`，再检查生成 Lua 的关键调用形态。
+- 改 STES/YDLocal/TSTL self 相关代码后，先按 [TS 构建验证分流](../../tooling/build/map-packaging-after-ts-build.mdc#ts-构建验证分流) 构建，再检查本次相关生成 Lua 的关键调用形态。桥接风险本身不自动升级为全量构建；普通修改仍优先 `build:files`。
 
 ## STES 注册
 - 推荐注册流程：`CreateTrigger()` -> `TriggerAddAction(trig, namedCallback)` -> `STES_GetTable()` -> `STES_Register(trig, eventName)`。

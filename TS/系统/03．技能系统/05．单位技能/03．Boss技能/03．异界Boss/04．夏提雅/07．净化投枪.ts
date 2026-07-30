@@ -6,11 +6,13 @@ import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 净化落点内夏提雅鲜血印记 } from './04．鲜血印记';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 获取夏提雅英灵投影, 尝试触发英灵战乙女复刻 } from './09．英灵战乙女';
 import { 创建点名预警执行器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/05．点名预警执行器';
 import { 播放夏提雅台词 } from './18．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
@@ -24,6 +26,7 @@ const jass = require('jass.common') as any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
@@ -94,6 +97,9 @@ export function 释放夏提雅净化投枪(this: void, context: 夏提雅运行
   const secondX = 单位有效(secondTarget) ? GetUnitX(secondTarget) : x;
   const secondY = 单位有效(secondTarget) ? GetUnitY(secondTarget) : y;
   const totalDuration = cfg.预警秒 + (isP3 ? cfg.P3第二枚投枪延迟秒 : 0);
+  SetUnitFacing(boss, Atan2(y - GetUnitY(boss), x - GetUnitX(boss)) * RAD_TO_DEG);
+  开始硬直(boss, totalDuration);
+  显示夏提雅常规吟唱条(totalDuration, cfg.吟唱条颜色ID, cfg.吟唱条标题文本, cfg.吟唱条提示文本);
   context.上次净化投枪目标ID = GetHandleId(target);
   重置夏提雅猎血连击(context);
   context.普通机制忙碌到Ms = getServerTime() + (totalDuration + 0.4) * 1000;

@@ -5,9 +5,10 @@ import { 获取或创建莫尔特斯上下文, type 莫尔特斯运行时上下�
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 播放莫尔特斯限时动作, 取坐标角度, 极坐标X, 极坐标Y, stringToFourCC } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯常规施法, 取坐标角度, 极坐标X, 极坐标Y, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 立即设置单位朝向 } from "../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
@@ -71,6 +72,12 @@ interface 幼树实例 {
 interface 种子成长变量 {
   context: 莫尔特斯运行时上下文;
   seed: any;
+  x: number;
+  y: number;
+}
+
+interface 腐败之种发射变量 {
+  context: 莫尔特斯运行时上下文;
   x: number;
   y: number;
 }
@@ -202,21 +209,12 @@ function 弹道Tick(this: void, data: 种子弹道): void {
   }
 }
 
-function 发射腐败之种(this: void, context: 莫尔特斯运行时上下文, target: any): void {
+function 发射腐败之种(this: void, context: 莫尔特斯运行时上下文, tx: number, ty: number): void {
   const boss = context.Boss单位;
+  if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.腐败之种;
   const sx = GetUnitX(boss);
   const sy = GetUnitY(boss);
-  const tx = GetUnitX(target);
-  const ty = GetUnitY(target);
-  创建技能提示圈({
-    类型: "敌方圆形",
-    X: tx,
-    Y: ty,
-    半径: cfg.波动半径,
-    持续时间: cfg.飞行秒 + cfg.生长延迟秒 + cfg.波动间隔秒,
-    来源单位: boss,
-  });
   const angle = 取坐标角度(sx, sy, tx, ty) + 90;
   const distance = 莫尔特斯数值与表现配置.根须领域.单格边长 * cfg.中点偏移比例;
   const midX = 极坐标X((sx + tx) / 2, angle, distance);
@@ -239,6 +237,12 @@ function 发射腐败之种(this: void, context: 莫尔特斯运行时上下文,
   context.清理.登记周期回调("莫尔特斯-腐败之种弹道", data.周期ID);
 }
 
+function 延迟发射莫尔特斯腐败之种(this: void, variable?: any): void {
+  const data = variable as 腐败之种发射变量 | undefined;
+  if (data == null) return;
+  发射腐败之种(data.context, data.x, data.y);
+}
+
 export function 释放莫尔特斯腐败之种(this: void, context: 莫尔特斯运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
@@ -246,9 +250,26 @@ export function 释放莫尔特斯腐败之种(this: void, context: 莫尔特斯
   const spellTarget = GetSpellTargetUnit();
   const target = 单位有效(spellTarget) ? spellTarget : 获取Boss技能随机敌对英雄(boss);
   if (!单位有效(target)) return;
+  const targetX = GetUnitX(target);
+  const targetY = GetUnitY(target);
+  立即设置单位朝向(boss, 取坐标角度(GetUnitX(boss), GetUnitY(boss), targetX, targetY));
+  开始莫尔特斯常规施法(boss, cfg.动作播放秒, "腐败之种", "腐败之种将飞向锁定落点");
   播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(boss, "腐败之种");
-  发射腐败之种(context, target);
+  创建技能提示圈({
+    类型: "敌方圆形",
+    X: targetX,
+    Y: targetY,
+    半径: cfg.波动半径,
+    持续时间: cfg.动作播放秒 + cfg.飞行秒 + cfg.生长延迟秒 + cfg.波动间隔秒,
+    来源单位: boss,
+  });
+  const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 延迟发射莫尔特斯腐败之种, {
+    context,
+    x: targetX,
+    y: targetY,
+  } as 腐败之种发射变量);
+  context.清理.登记延迟回调("莫尔特斯-腐败之种发射", delayedId);
 }
 
 function on莫尔特斯腐败之种施法(this: void, castingUnit: any, spellAbilityId: number): void {

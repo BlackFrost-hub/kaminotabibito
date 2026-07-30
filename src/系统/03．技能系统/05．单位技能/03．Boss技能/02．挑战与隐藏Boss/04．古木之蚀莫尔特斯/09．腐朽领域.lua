@@ -11,6 +11,7 @@ local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
+local _____5F00_59CB_83AB_5C14_7279_65AF_5927_62DB_65BD_6CD5 = ____16_FF0E_516C_5171_5DE5_5177["开始莫尔特斯大招施法"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
@@ -188,14 +189,12 @@ local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B(variable)
     })
     _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, target, _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["腐败值"])
 end
-____exports["触发莫尔特斯腐朽领域"] = function(context)
-    if context["腐朽领域已触发"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+local function _____7ED3_7B97_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5C55_5F00(variable)
+    local context = variable
+    if context == nil or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return
     end
-    context["腐朽领域已触发"] = true
-    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
-    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
-    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(context["Boss单位"], "低血量")
+    context["腐朽领域已生效"] = true
     _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
     _____521B_5EFA_51C0_5316_7B26_6587(context)
     _____64AD_653EBoss_5750_6807_97F3_6548(
@@ -214,8 +213,21 @@ ____exports["触发莫尔特斯腐朽领域"] = function(context)
         ["触发概率百分比"] = _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["转阶段触发概率百分比"]
     })
 end
+____exports["触发莫尔特斯腐朽领域"] = function(context)
+    if context["腐朽领域已触发"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        return
+    end
+    context["腐朽领域已触发"] = true
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
+    _____5F00_59CB_83AB_5C14_7279_65AF_5927_62DB_65BD_6CD5(context["Boss单位"], cfg["动作播放秒"], "腐朽领域", "腐败沼泽将在读条结束后覆盖场地")
+    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
+    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(context["Boss单位"], "低血量")
+    local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____7ED3_7B97_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5C55_5F00, context)
+    local ____self_12 = context["清理"]
+    ____self_12["登记延迟回调"](____self_12, "莫尔特斯-腐朽领域展开", delayedId)
+end
 ____exports["处理莫尔特斯沼泽腐败"] = function(context)
-    if not context["腐朽领域已触发"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+    if not context["腐朽领域已生效"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return false
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
@@ -226,10 +238,10 @@ ____exports["处理莫尔特斯沼泽腐败"] = function(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue27
+                    goto __continue29
                 end
                 if _____5904_7406_51C0_5316_7B26_6587(context, hero) then
-                    goto __continue27
+                    goto __continue29
                 end
                 _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                     context["Boss单位"],
@@ -240,14 +252,14 @@ ____exports["处理莫尔特斯沼泽腐败"] = function(context)
                 )
                 _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, hero, cfg["沼泽每跳腐败值"])
             end
-            ::__continue27::
+            ::__continue29::
             i = i + 1
         end
     end
     return true
 end
 ____exports["处理莫尔特斯沼泽根须"] = function(context)
-    if not context["腐朽领域已触发"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+    if not context["腐朽领域已生效"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return false
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
@@ -277,8 +289,8 @@ ____exports["处理莫尔特斯沼泽根须"] = function(context)
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
     }
     local id = addDelayedCallback(cfg["根须结算延迟毫秒"], _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B, data)
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "莫尔特斯-腐朽沼泽根须", id)
+    local ____self_13 = context["清理"]
+    ____self_13["登记延迟回调"](____self_13, "莫尔特斯-腐朽沼泽根须", id)
     return true
 end
 return ____exports

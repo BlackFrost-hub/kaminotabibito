@@ -1,6 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local globals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local SelectUnitForPlayerSingle = ____require_result_0.SelectUnitForPlayerSingle
@@ -29,10 +31,18 @@ local ____require_result_8 = require("系统.03．技能系统.05．单位技能
 local _____91CA_653E_5F71_9AA8_9634_5F71_7A7F_68AD = ____require_result_8["释放影骨阴影穿梭"]
 local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.04．骸骨召唤")
 local _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524 = ____require_result_9["释放影骨骸骨召唤"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.06．幽影爆发")
-local _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1 = ____require_result_10["释放影骨幽影爆发"]
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.07．盗贼的遗产")
-local _____91CA_653E_5F71_9AA8_76D7_8D3C_9057_4EA7 = ____require_result_11["释放影骨盗贼遗产"]
+local _____521B_5EFA_5F71_9AA8_53EC_5524_7269 = ____require_result_9["创建影骨召唤物"]
+local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.02．数值与表现配置")
+local _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____require_result_10["影骨莫特斯数值与表现配置"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.11．公共工具")
+local _____6781_5750_6807X = ____require_result_11["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_11["极坐标Y"]
+local ____require_result_12 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_12.addDelayedCallback
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.06．幽影爆发")
+local _____91CA_653E_5F71_9AA8_5E7D_5F71_7206_53D1 = ____require_result_13["释放影骨幽影爆发"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.07．盗贼的遗产")
+local _____91CA_653E_5F71_9AA8_76D7_8D3C_9057_4EA7 = ____require_result_14["释放影骨盗贼遗产"]
 local _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X = -540.6
 local _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3Y = -2495.2
 local _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y = -3055.2
@@ -40,10 +50,18 @@ local CreateUnit = jass.CreateUnit
 local SetHeroLevel = jass.SetHeroLevel
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
+local SetUnitState = jass.SetUnitState
 local GetPlayerId = jass.GetPlayerId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
+local GetRandomReal = jass.GetRandomReal
+local KillUnit = jass.KillUnit
+local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____5F71_9AA8_6D4B_8BD5Boss = {}
 local _____5F71_9AA8_6D4B_8BD5_6B65_5175 = {}
 local _____5F71_9AA8_6D4B_8BD5_5C71_4E18_4E4B_738B = {}
+local _____5F71_9AA82Kill_6D4B_8BD5_8868 = {}
 local function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
@@ -110,9 +128,16 @@ local function _____6E05_7406_5F71_9AA8_6D4B_8BD5(player, _context)
     _____5F71_9AA8_6D4B_8BD5_6B65_5175[pid] = nil
     _____5F71_9AA8_6D4B_8BD5_5C71_4E18_4E4B_738B[pid] = nil
     _____5F71_9AA8_6D4B_8BD5Boss[pid] = nil
+    _____5F71_9AA82Kill_6D4B_8BD5_8868[pid] = nil
     if globals.udg_Boss == boss then
         globals.udg_Boss = nil
     end
+end
+local function _____51C6_5907_5F71_9AA8_6D4B_8BD5_9636_6BB5(context, phase)
+    local maxLife = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE)
+    local ratio = phase == 1 and 1 or (phase == 2 and 0.6 or 0.3)
+    SetUnitState(context["Boss单位"], UNIT_STATE_LIFE, maxLife * ratio)
+    context["阶段"] = phase
 end
 local function ____on_5F71_9AA8_6280_80FD1_6D4B_8BD5_547D_4EE4(_player, context)
     if context ~= nil then
@@ -121,8 +146,109 @@ local function ____on_5F71_9AA8_6280_80FD1_6D4B_8BD5_547D_4EE4(_player, context)
 end
 local function ____on_5F71_9AA8_6280_80FD2_6D4B_8BD5_547D_4EE4(_player, context)
     if context ~= nil then
+        _____51C6_5907_5F71_9AA8_6D4B_8BD5_9636_6BB5(context, 1)
         _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
     end
+end
+local function ____on_5F71_9AA8_6280_80FD2P2_6D4B_8BD5_547D_4EE4(_player, context)
+    if context ~= nil then
+        _____51C6_5907_5F71_9AA8_6D4B_8BD5_9636_6BB5(context, 2)
+        _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
+    end
+end
+local function ____on_5F71_9AA8_6280_80FD2P3_6D4B_8BD5_547D_4EE4(_player, context)
+    if context ~= nil then
+        _____51C6_5907_5F71_9AA8_6D4B_8BD5_9636_6BB5(context, 3)
+        _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
+    end
+end
+local function ____on_5F71_9AA8_6280_80FD2Kill_5EF6_8FDF_51FB_6740(variable)
+    if variable == nil then
+        return
+    end
+    do
+        local i = 0
+        while i < #variable["骷髅列表"] do
+            local skeleton = variable["骷髅列表"][i + 1]
+            if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(skeleton) then
+                KillUnit(skeleton)
+            end
+            i = i + 1
+        end
+    end
+    if _____5F71_9AA82Kill_6D4B_8BD5_8868[variable["玩家ID"]] == variable then
+        _____5F71_9AA82Kill_6D4B_8BD5_8868[variable["玩家ID"]] = nil
+    end
+end
+local function ____on_5F71_9AA8_6280_80FD2Kill_6D4B_8BD5_547D_4EE4(player, context)
+    if context == nil or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(context["Boss单位"]) then
+        return
+    end
+    local pid = GetPlayerId(player)
+    local previous = _____5F71_9AA82Kill_6D4B_8BD5_8868[pid]
+    if previous ~= nil then
+        previous["召唤组"]["已重组"] = true
+        do
+            local i = 0
+            while i < #previous["骷髅列表"] do
+                local skeleton = previous["骷髅列表"][i + 1]
+                if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(skeleton) then
+                    KillUnit(skeleton)
+                end
+                i = i + 1
+            end
+        end
+    end
+    local group = {
+        ID = (context["下一个召唤组ID"] or 0) + 1,
+        ["阶段"] = context["阶段"],
+        ["总数"] = 4,
+        ["死亡数"] = 0,
+        ["已重组"] = false
+    }
+    context["下一个召唤组ID"] = group.ID
+    context["当前召唤组"] = group
+    local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]
+    local skeletons = {}
+    local skeletonTypeId = stringToFourCC(cfg["骷髅盗贼单位类型"])
+    do
+        local i = 0
+        while i < group["总数"] do
+            local angle = GetRandomReal(0, 360)
+            local distance = GetRandomReal(80, cfg["召唤偏移半径"])
+            local x = _____6781_5750_6807X(
+                GetUnitX(context["Boss单位"]),
+                distance,
+                angle
+            )
+            local y = _____6781_5750_6807Y(
+                GetUnitY(context["Boss单位"]),
+                distance,
+                angle
+            )
+            local instance = _____521B_5EFA_5F71_9AA8_53EC_5524_7269(
+                context,
+                skeletonTypeId,
+                x,
+                y,
+                group,
+                true
+            )
+            if instance ~= nil and ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(instance["单位"]) then
+                skeletons[#skeletons + 1] = instance["单位"]
+            end
+            i = i + 1
+        end
+    end
+    group["总数"] = #skeletons
+    if group["总数"] <= 0 then
+        return
+    end
+    local variable = {["玩家ID"] = pid, ["骷髅列表"] = skeletons, ["召唤组"] = group}
+    _____5F71_9AA82Kill_6D4B_8BD5_8868[pid] = variable
+    local delayedId = addDelayedCallback(2000, ____on_5F71_9AA8_6280_80FD2Kill_5EF6_8FDF_51FB_6740, variable)
+    local ____self_15 = context["清理"]
+    ____self_15["登记延迟回调"](____self_15, "影骨测试-2-kill", delayedId)
 end
 local function ____on_5F71_9AA8_6280_80FD3_6D4B_8BD5_547D_4EE4(player, context)
     local target = _____5F71_9AA8_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
@@ -142,13 +268,16 @@ local function ____on_5F71_9AA8_6280_80FD5_6D4B_8BD5_547D_4EE4(_player, context)
 end
 local _____5F71_9AA8_83AB_7279_65AF_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "阴影穿梭", ["执行"] = ____on_5F71_9AA8_6280_80FD1_6D4B_8BD5_547D_4EE4},
-    {["序号"] = 2, ["名称"] = "骸骨召唤", ["执行"] = ____on_5F71_9AA8_6280_80FD2_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 2, ["名称"] = "骸骨召唤（P1基础，死亡后重组）", ["执行"] = ____on_5F71_9AA8_6280_80FD2_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 2, ["命令"] = "2-2", ["名称"] = "骸骨召唤（P2，死亡后重组）", ["执行"] = ____on_5F71_9AA8_6280_80FD2P2_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 2, ["命令"] = "2-3", ["名称"] = "骸骨召唤（P3强化，死亡后不重组）", ["执行"] = ____on_5F71_9AA8_6280_80FD2P3_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 2, ["命令"] = "2-kill", ["名称"] = "骸骨召唤快速击杀", ["执行"] = ____on_5F71_9AA8_6280_80FD2Kill_6D4B_8BD5_547D_4EE4},
     {["序号"] = 3, ["名称"] = "暗影禁锢", ["执行"] = ____on_5F71_9AA8_6280_80FD3_6D4B_8BD5_547D_4EE4},
     {["序号"] = 4, ["名称"] = "幽影爆发", ["执行"] = ____on_5F71_9AA8_6280_80FD4_6D4B_8BD5_547D_4EE4},
     {["序号"] = 5, ["名称"] = "盗贼的遗产", ["执行"] = ____on_5F71_9AA8_6280_80FD5_6D4B_8BD5_547D_4EE4}
 }
 _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4({
-    ["命令单位名"] = "影骨莫特斯",
+    ["命令单位名"] = "莫特斯",
     ["Boss名称"] = "影骨莫特斯",
     ["创建或获取上下文"] = _____521B_5EFA_5F71_9AA8_6D4B_8BD5,
     ["清理上下文"] = _____6E05_7406_5F71_9AA8_6D4B_8BD5,

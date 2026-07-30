@@ -5,9 +5,13 @@ import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下�
 import { 获取巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 播放巴尔扎罗斯台词, 播放格鲁姆台词, 播放塞拉台词 } from "./14．台词播放";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
-import { 巴尔扎罗斯护卫配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
+import { 巴尔扎罗斯护卫配置, 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 
+const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number) => any;
+  销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
+};
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
 };
@@ -62,7 +66,6 @@ function 创建格鲁姆(this: void, context: 巴尔扎罗斯运行时上下文)
       X: cfg.X,
       Y: cfg.Y,
       朝向: cfg.面向,
-      模型文件: 巴尔扎罗斯单位技能配置.护卫.格鲁姆.模型路径,
       生命值: cfg.生命值,
       生命值受小怪倍率: false,
       护甲: cfg.防御力,
@@ -87,7 +90,6 @@ function 创建塞拉(this: void, context: 巴尔扎罗斯运行时上下文): a
       X: cfg.X,
       Y: cfg.Y,
       朝向: cfg.面向,
-      模型文件: 巴尔扎罗斯单位技能配置.护卫.塞拉.模型路径,
       生命值: cfg.生命值,
       生命值受小怪倍率: false,
       护甲: cfg.防御力,
@@ -99,10 +101,15 @@ function 创建塞拉(this: void, context: 巴尔扎罗斯运行时上下文): a
 function 添加熔核封印(this: void, context: 巴尔扎罗斯运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
+  const config = 巴尔扎罗斯技能数值配置.熔核封印;
   registerManualBuff(boss, 巴尔扎罗斯单位技能配置.BuffID.熔核封印, 999999, 0.8, {
     sourceName: "巴尔扎罗斯",
   });
   X_FixUnitStandingSafe(boss);
+  创建单位坐标跟随特效(boss, config.特效路径, config.特效键, config.特效缩放, config.特效高度, undefined, config.动画索引);
+  context.清理.登记清理("巴尔扎罗斯-熔核封印特效", function 巴尔扎罗斯熔核封印特效清理(this: void): void {
+    销毁单位坐标跟随特效(boss, config.特效键);
+  });
   context.熔核封印已解除 = false;
 }
 
@@ -110,6 +117,7 @@ function 解除熔核封印(this: void, context: 巴尔扎罗斯运行时上下�
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.熔核封印已解除) return;
   context.熔核封印已解除 = true;
+  销毁单位坐标跟随特效(boss, 巴尔扎罗斯技能数值配置.熔核封印.特效键);
   移除单位指定Buff(boss, 巴尔扎罗斯单位技能配置.BuffID.熔核封印);
   X_RestoreUnitStandingSafe(boss);
   播放Boss坐标音效(巴尔扎罗斯音效配置.转阶段2.封印破碎, GetUnitX(boss), GetUnitY(boss), 巴尔扎罗斯音效配置.默认裁断距离);
@@ -160,11 +168,12 @@ function 确保全局监听(this: void): void {
   }
 }
 
-export function 初始化巴尔扎罗斯熔核封印与护卫机制(this: void, context: 巴尔扎罗斯运行时上下文): void {
+export function 初始化巴尔扎罗斯熔核封印与护卫机制(this: void, context: 巴尔扎罗斯运行时上下文, 跳过护卫创建: boolean = false): void {
   if (context.护卫机制已初始化) return;
   context.护卫机制已初始化 = true;
   确保全局监听();
   添加熔核封印(context);
+  if (跳过护卫创建) return;
 
   context.格鲁姆 = 创建格鲁姆(context);
   context.塞拉 = 创建塞拉(context);

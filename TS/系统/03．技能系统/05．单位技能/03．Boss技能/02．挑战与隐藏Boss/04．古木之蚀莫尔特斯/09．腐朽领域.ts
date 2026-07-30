@@ -3,7 +3,7 @@
 import { 增加玩家腐败值, 清除玩家腐败值, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 播放莫尔特斯限时动作 } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯大招施法 } from "./16．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 
 const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -151,12 +151,10 @@ function 莫尔特斯腐朽沼泽根须(this: void, variable?: any): void {
   增加玩家腐败值(context, target, 莫尔特斯数值与表现配置.腐朽根须穿刺.腐败值);
 }
 
-export function 触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯运行时上下文): void {
-  if (context.腐朽领域已触发 || !单位有效(context.Boss单位)) return;
-  context.腐朽领域已触发 = true;
-  const cfg = 莫尔特斯数值与表现配置.腐朽领域;
-  播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
-  播放莫尔特斯台词(context.Boss单位, "低血量");
+function 结算莫尔特斯腐朽领域展开(this: void, variable?: any): void {
+  const context = variable as 莫尔特斯运行时上下文 | undefined;
+  if (context == null || !单位有效(context.Boss单位)) return;
+  context.腐朽领域已生效 = true;
   创建腐朽领域沼泽地表(context);
   创建净化符文(context);
   播放Boss坐标音效(莫尔特斯音效配置.腐朽领域.展开, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
@@ -171,8 +169,19 @@ export function 触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯
   });
 }
 
+export function 触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯运行时上下文): void {
+  if (context.腐朽领域已触发 || !单位有效(context.Boss单位)) return;
+  context.腐朽领域已触发 = true;
+  const cfg = 莫尔特斯数值与表现配置.腐朽领域;
+  开始莫尔特斯大招施法(context.Boss单位, cfg.动作播放秒, "腐朽领域", "腐败沼泽将在读条结束后覆盖场地");
+  播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
+  播放莫尔特斯台词(context.Boss单位, "低血量");
+  const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 结算莫尔特斯腐朽领域展开, context);
+  context.清理.登记延迟回调("莫尔特斯-腐朽领域展开", delayedId);
+}
+
 export function 处理莫尔特斯沼泽腐败(this: void, context: 莫尔特斯运行时上下文): boolean {
-  if (!context.腐朽领域已触发 || !单位有效(context.Boss单位)) return false;
+  if (!context.腐朽领域已生效 || !单位有效(context.Boss单位)) return false;
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
   const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   for (let i = 0; i < heroes.length; i++) {
@@ -186,7 +195,7 @@ export function 处理莫尔特斯沼泽腐败(this: void, context: 莫尔特斯
 }
 
 export function 处理莫尔特斯沼泽根须(this: void, context: 莫尔特斯运行时上下文): boolean {
-  if (!context.腐朽领域已触发 || !单位有效(context.Boss单位)) return false;
+  if (!context.腐朽领域已生效 || !单位有效(context.Boss单位)) return false;
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
   const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   if (heroes.length <= 0) return false;

@@ -8,6 +8,8 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
 local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
 local _____5F00_59CB_51B2_950B = _____51FB_9000_7CFB_7EDF["开始冲锋"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
 local _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身传送到坐标"]
 local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
@@ -50,6 +52,7 @@ local Atan2 = jass.Atan2
 local CosBJ = jass.CosBJ
 local SinBJ = jass.SinBJ
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
+local SetUnitFacing = jass.SetUnitFacing
 local AddSpecialEffect = jass.AddSpecialEffect
 local EXSetEffectZ = japi.EXSetEffectZ
 local EXSetEffectSize = japi.EXSetEffectSize
@@ -164,6 +167,7 @@ ____exports["释放夏提雅血月终舞"] = function(context, target)
     local recovery = GetRandomReal(cfg["血月终舞回落最小秒"], cfg["血月终舞回落最大秒"])
     local activeDuration = sectorTotal + chargeDuration
     local totalDuration = activeDuration + recovery
+    SetUnitFacing(boss, finalFacing)
     local executor = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "夏提雅-血月终舞", ["清理"] = context["清理"], ["互斥组"] = "夏提雅大型技能"})
     context["血月终舞已释放"] = true
     context["当前大型技能"] = _____8840_6708_7EC8_821E_6280_80FDKey
@@ -171,6 +175,7 @@ ____exports["释放夏提雅血月终舞"] = function(context, target)
     _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(context)
     local stages = {_____521B_5EFA_7ACB_5373_6267_884C_9636_6BB5(
         function()
+            _____5F00_59CB_786C_76F4(boss, sectorTotal)
             _____521B_5EFA_7A7A_4E2D_8840_6708(centerX, centerY, activeDuration + 0.5)
             _____521B_5EFA_6280_80FD_63D0_793A_5708({
                 ["类型"] = "方向直线",

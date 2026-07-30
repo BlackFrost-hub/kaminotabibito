@@ -56,12 +56,21 @@ local function _____521B_5EFA_6700_7EC8_5F3A_5316_7279_6548(context)
         GetUnitX(boss),
         GetUnitY(boss)
     )
-    if effect == nil or effect == 0 then
-        return
+    if effect ~= nil and effect ~= 0 then
+        EXSetEffectSize(effect, cfg["最终强化特效缩放"])
+        local ____self_7 = context["清理"]
+        ____self_7["登记限时特效"](____self_7, "亚伦柯斯-最终强化脉冲特效", effect, cfg["最终强化特效持续秒"] * 1000)
     end
-    EXSetEffectSize(effect, cfg["最终强化特效缩放"])
-    local ____self_7 = context["清理"]
-    ____self_7["登记限时特效"](____self_7, "亚伦柯斯-最终强化脉冲特效", effect, cfg["最终强化特效持续秒"] * 1000)
+    local stomp = AddSpecialEffect(
+        _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["表现资源"]["最终强化叠加特效路径"],
+        GetUnitX(boss),
+        GetUnitY(boss)
+    )
+    if stomp ~= nil and stomp ~= 0 then
+        EXSetEffectSize(stomp, cfg["最终强化叠加特效缩放"])
+        local ____self_8 = context["清理"]
+        ____self_8["登记限时特效"](____self_8, "亚伦柯斯-最终强化战争践踏特效", stomp, cfg["最终强化特效持续秒"] * 1000)
+    end
 end
 ____exports["启用亚伦柯斯不灭军魂"] = function(context)
     local boss = context["Boss单位"]
@@ -86,9 +95,9 @@ ____exports["启用亚伦柯斯不灭军魂"] = function(context)
         {sourceName = "亚伦柯斯-不灭军魂"}
     )
     local aura = AddSpecialEffectTarget(_____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["表现资源"]["常驻英魂特效路径"], boss, "origin")
-    local ____self_8 = context["清理"]
-    ____self_8["登记清理"](
-        ____self_8,
+    local ____self_9 = context["清理"]
+    ____self_9["登记清理"](
+        ____self_9,
         "亚伦柯斯-不灭军魂常驻层",
         function()
             if aura ~= nil and aura ~= 0 then
@@ -111,9 +120,9 @@ ____exports["触发亚伦柯斯最终强化"] = function(context)
     context["已触发最终强化"] = true
     _____5F00_59CB_786C_76F4(boss, cfg["最终强化硬直秒"])
     local invulnerableId = _____5F00_59CB_65E0_654C_5E27(boss, cfg["最终强化施法无敌秒"])
-    local ____self_9 = context["清理"]
-    ____self_9["登记清理"](
-        ____self_9,
+    local ____self_10 = context["清理"]
+    ____self_10["登记清理"](
+        ____self_10,
         "亚伦柯斯-最终强化施法无敌",
         function()
             if invulnerableId ~= 0 then
@@ -148,8 +157,8 @@ ____exports["触发亚伦柯斯最终强化"] = function(context)
                     _____521B_5EFA_6700_7EC8_5F3A_5316_7279_6548(context)
                 end
             )
-            local ____self_10 = context["清理"]
-            ____self_10["登记延迟回调"](____self_10, "亚伦柯斯-最终强化后续脉冲", delayedId)
+            local ____self_11 = context["清理"]
+            ____self_11["登记延迟回调"](____self_11, "亚伦柯斯-最终强化后续脉冲", delayedId)
             pulseIndex = pulseIndex + 1
         end
     end

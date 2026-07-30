@@ -27,7 +27,8 @@ const { 获取Boss技能最高仇恨目标, 获取Boss技能随机敌对英雄, 
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -66,7 +67,7 @@ const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number,
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
@@ -104,12 +105,12 @@ function 治疗单位(this: void, source: any, unit: any, amount: number): void 
   doHeal({ HealSource: source, HealTarget: unit, HealAmount: amount, ItemHeal: false, HealEffect: false });
 }
 
-function 计算咆哮波伤害(this: void, boss: any, target: any): number {
+function 计算咆哮波伤害(this: void, boss: any, target: any, 伤害倍率: number): number {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
   return 计算组合技能伤害(boss, target, {
     来源攻击力比例: config.伤害Boss攻击力比例,
     目标最大生命比例: config.伤害目标最大生命比例,
-    总倍率: config.伤害总倍率,
+    总倍率: config.伤害总倍率 * 伤害倍率,
   });
 }
 
@@ -125,54 +126,76 @@ function 记录咆哮波玩家命中(this: void, context: 巴尔扎罗斯运行�
   }
 }
 
-function 播放恶魔咆哮波蓄力特效(this: void, boss: any, angle: number): void {
+function 播放恶魔咆哮波蓄力特效(this: void, 施法者: any, angle: number, 高度: number): void {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  const x = GetUnitX(boss) + CosBJ(angle) * config.冲击特效前移;
-  const y = GetUnitY(boss) + SinBJ(angle) * config.冲击特效前移;
+  const x = GetUnitX(施法者) + CosBJ(angle) * config.冲击特效嘴部前移;
+  const y = GetUnitY(施法者) + SinBJ(angle) * config.冲击特效嘴部前移;
   创建点特效({
     模型路径: config.聚火特效路径,
     X: x,
     Y: y,
-    Z: config.聚火特效高度,
+    Z: 高度,
     缩放: config.聚火特效缩放,
     Z轴角度: angle,
     持续秒: config.聚火特效持续秒,
   });
 }
 
-function 播放恶魔咆哮波冲击特效(this: void, boss: any, angle: number): void {
+function 播放恶魔咆哮波冲击特效(this: void, 施法者: any, angle: number): void {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  const x = GetUnitX(boss) + CosBJ(angle) * config.冲击特效前移;
-  const y = GetUnitY(boss) + SinBJ(angle) * config.冲击特效前移;
+  const x = GetUnitX(施法者) + CosBJ(angle) * config.冲击特效嘴部前移;
+  const y = GetUnitY(施法者) + SinBJ(angle) * config.冲击特效嘴部前移;
   创建点特效({
     模型路径: config.冲击特效路径,
     X: x,
     Y: y,
-    Z: config.冲击特效高度,
+    Z: config.冲击特效嘴部高度,
     缩放: config.冲击特效缩放,
-    X轴角度: config.冲击特效X轴旋转角度,
-    Y轴角度: config.冲击特效Y轴旋转角度,
-    Z轴角度: angle + config.冲击特效朝向修正角度,
+    X轴角度: config.冲击特效横滚角度,
+    Y轴角度: config.冲击特效俯仰角度,
+    Z轴角度: angle + config.冲击特效Z轴朝向修正角度,
     持续秒: config.冲击特效持续秒,
   });
 }
 
-function 创建咆哮波预警(this: void, boss: any, angle: number): void {
+function 播放恶魔咆哮波火焰路径特效(this: void, 施法者: any, angle: number): void {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  const centerX = GetUnitX(boss) + CosBJ(angle) * (config.路径长度 * 0.5);
-  const centerY = GetUnitY(boss) + SinBJ(angle) * (config.路径长度 * 0.5);
+  const 起点X = GetUnitX(施法者) + CosBJ(angle) * config.冲击特效嘴部前移;
+  const 起点Y = GetUnitY(施法者) + SinBJ(angle) * config.冲击特效嘴部前移;
+  const 分段数 = config.火焰路径分段数;
+
+  // 起点加五个等距节点，共六个节点、五段地面火焰路径。
+  for (let index = 0; index <= 分段数; index++) {
+    const 进度 = index / 分段数;
+    addDelayedCallback(进度 * config.路径持续秒 * 1000, function 恶魔咆哮波火焰路径节点(this: void): void {
+      if (!单位有效(施法者)) return;
+      创建点特效({
+        模型路径: config.火焰路径特效路径,
+        X: 起点X + CosBJ(angle) * config.路径长度 * 进度,
+        Y: 起点Y + SinBJ(angle) * config.路径长度 * 进度,
+        Z: config.火焰路径高度,
+        缩放: config.火焰路径特效缩放,
+        持续秒: config.火焰路径特效持续秒,
+      });
+    });
+  }
+}
+
+function 创建咆哮波预警(this: void, 施法者: any, angle: number, 宽度倍率: number): void {
+  const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
   创建技能提示圈({
     类型: "矩形",
-    X: centerX,
-    Y: centerY,
-    宽度: config.路径宽度,
+    // 矩形提示圈以路径起点为输入，底层统一计算模型中点。
+    X: GetUnitX(施法者),
+    Y: GetUnitY(施法者),
+    宽度: config.路径宽度 * 宽度倍率,
     长度: config.路径长度,
     朝向: angle,
     持续时间: config.施法硬直秒,
   });
 }
 
-function 执行咆哮波命中(this: void, context: 巴尔扎罗斯运行时上下文, unit: any): void {
+function 执行咆哮波命中(this: void, context: 巴尔扎罗斯运行时上下文, unit: any, 伤害倍率: number): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(unit)) return;
   if (是巴尔扎罗斯护卫(context, unit)) {
@@ -183,10 +206,10 @@ function 执行咆哮波命中(this: void, context: 巴尔扎罗斯运行时上�
     技能ID: 恶魔咆哮波技能ID,
     来源: boss,
     目标: unit,
-    伤害: 计算咆哮波伤害(boss, unit),
+    伤害: 计算咆哮波伤害(boss, unit, 伤害倍率),
     attack: false,
     ranged: true,
-    attackType: ATTACK_TYPE_CHAOS,
+    attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_FIRE,
     weaponType: WEAPON_TYPE_WHOKNOWS,
     来源类型: "Boss技能",
@@ -194,45 +217,64 @@ function 执行咆哮波命中(this: void, context: 巴尔扎罗斯运行时上�
   记录咆哮波玩家命中(context, unit);
 }
 
-function 创建咆哮波判定(this: void, context: 巴尔扎罗斯运行时上下文, angle: number): void {
+function 创建咆哮波判定(
+  this: void,
+  context: 巴尔扎罗斯运行时上下文,
+  施法者: any,
+  angle: number,
+  宽度倍率: number,
+  伤害倍率: number,
+  嘴部高度: number,
+  播放发射音效: boolean,
+): void {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  const boss = context.Boss单位;
-  播放恶魔咆哮波冲击特效(boss, angle);
-  播放Boss坐标音效(巴尔扎罗斯音效配置.恶魔咆哮波.发射, GetUnitX(boss), GetUnitY(boss), 巴尔扎罗斯音效配置.默认裁断距离);
+  播放恶魔咆哮波冲击特效(施法者, angle);
+  播放恶魔咆哮波火焰路径特效(施法者, angle);
+  if (播放发射音效) {
+    播放Boss坐标音效(巴尔扎罗斯音效配置.恶魔咆哮波.发射, GetUnitX(施法者), GetUnitY(施法者), 巴尔扎罗斯音效配置.默认裁断距离);
+  }
   创建线段危险区({
     清理: context.清理,
     名称: "巴尔扎罗斯-恶魔咆哮波",
-    起点X: GetUnitX(boss),
-    起点Y: GetUnitY(boss),
+    起点X: GetUnitX(施法者),
+    起点Y: GetUnitY(施法者),
     方向角: angle,
     长度: config.路径长度,
-    宽度: config.路径宽度,
+    宽度: config.路径宽度 * 宽度倍率,
     持续秒: config.路径持续秒,
     Tick间隔毫秒: config.路径Tick毫秒,
     单位列表: function 取恶魔咆哮波候选单位(this: void): any[] {
       return 收集咆哮波候选单位(context);
     },
-    提示圈: { 类型: "方向直线", 来源单位: boss },
+    提示圈: { 类型: "方向直线", 来源单位: 施法者 },
     on进入: function 巴尔扎罗斯恶魔咆哮波进入(this: void, unit: any): void {
-      执行咆哮波命中(context, unit);
+      执行咆哮波命中(context, unit, 伤害倍率);
     },
   });
 }
 
-export function 释放巴尔扎罗斯恶魔咆哮波(this: void, context: 巴尔扎罗斯运行时上下文): void {
+function 释放巴尔扎罗斯恶魔咆哮波实例(
+  this: void,
+  context: 巴尔扎罗斯运行时上下文,
+  施法者: any,
+  宽度倍率: number,
+  伤害倍率: number,
+  嘴部高度: number,
+  播放本体台词: boolean,
+): void {
   const boss = context.Boss单位;
-  if (!单位有效(boss)) return;
+  if (!单位有效(boss) || !单位有效(施法者)) return;
   const target = 取目标单位(boss);
   if (!单位有效(target)) return;
 
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  const angle = 取方向角(boss, target);
-  创建咆哮波预警(boss, angle);
-  播放恶魔咆哮波蓄力特效(boss, angle);
+  const angle = 取方向角(施法者, target);
+  创建咆哮波预警(施法者, angle, 宽度倍率);
+  播放恶魔咆哮波蓄力特效(施法者, angle, 嘴部高度);
   启动基础施法时间线({
-    施法者: boss,
-    目标X: GetUnitX(boss) + CosBJ(angle) * config.路径长度,
-    目标Y: GetUnitY(boss) + SinBJ(angle) * config.路径长度,
+    施法者,
+    目标X: GetUnitX(施法者) + CosBJ(angle) * config.路径长度,
+    目标Y: GetUnitY(施法者) + SinBJ(angle) * config.路径长度,
     硬直秒: config.施法硬直秒,
     动画编号: config.动画编号,
     动画速度: config.动画速度,
@@ -246,12 +288,34 @@ export function 释放巴尔扎罗斯恶魔咆哮波(this: void, context: 巴尔
       提示文本: config.吟唱条提示文本,
     },
     播放台词: function 播放恶魔咆哮波台词(this: void): void {
-      播放巴尔扎罗斯台词(boss, "恶魔咆哮波");
+      if (播放本体台词) 播放巴尔扎罗斯台词(boss, "恶魔咆哮波");
     },
     on生效: function 巴尔扎罗斯恶魔咆哮波生效(this: void): void {
-      创建咆哮波判定(context, angle);
+      创建咆哮波判定(context, 施法者, angle, 宽度倍率, 伤害倍率, 嘴部高度, 播放本体台词);
     },
   });
+}
+
+export function 释放巴尔扎罗斯恶魔咆哮波(this: void, context: 巴尔扎罗斯运行时上下文): void {
+  const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
+  释放巴尔扎罗斯恶魔咆哮波实例(context, context.Boss单位, 1, 1, config.冲击特效嘴部高度, true);
+}
+
+export function 释放巴尔扎罗斯护卫模仿恶魔咆哮波(this: void, context: 巴尔扎罗斯运行时上下文): void {
+  const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
+  const 护卫列表 = [context.格鲁姆, context.塞拉];
+  for (let i = 0; i < 护卫列表.length; i++) {
+    const 护卫 = 护卫列表[i];
+    if (!单位有效(护卫)) continue;
+    释放巴尔扎罗斯恶魔咆哮波实例(
+      context,
+      护卫,
+      config.护卫模仿宽度倍率,
+      config.护卫模仿伤害倍率,
+      config.护卫模仿嘴部高度,
+      false,
+    );
+  }
 }
 
 export function 注册巴尔扎罗斯恶魔咆哮波(this: void): void {

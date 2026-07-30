@@ -25,13 +25,25 @@ local GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitState = jass.GetUnitState
 local GetRandomReal = jass.GetRandomReal
+local IssueTargetOrder = jass.IssueTargetOrder
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_3["临时调整攻击"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_4["临时调整攻击"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_5["开始硬直"]
+local ____require_result_6 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_6["显示常规技能吟唱条"]
+local ____require_result_7 = require("系统.01．单位系统.10．护卫系统.index")
+local _____767B_8BB0_62A4_536B_5355_4F4D = ____require_result_7["登记护卫单位"]
+local _____6CE8_9500_62A4_536B_5355_4F4D = ____require_result_7["注销护卫单位"]
+local ____require_result_8 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_8["获取Boss技能最近敌对英雄"]
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
         return
@@ -52,6 +64,9 @@ local function _____5E7C_9C7F_6B7B_4EA1_6389_843D_6B8B_7247(context, killer)
     if GetRandomReal(0, 1) <= chance then
         _____589E_52A0_73A9_5BB6_89E6_624B_6B8B_7247(context, killer, 1)
     end
+end
+local function _____6CE8_9500_5361_745F_62C9_6DF1_6E0A_5E7C_9C7F_62A4_536B(unit)
+    _____6CE8_9500_62A4_536B_5355_4F4D(unit)
 end
 local function _____521B_5EFA_6DF1_6E0A_5E7C_9C7F(context, angle)
     local boss = context["Boss单位"]
@@ -79,14 +94,28 @@ local function _____521B_5EFA_6DF1_6E0A_5E7C_9C7F(context, angle)
         ["最大生命"] = cfg["幼鱿生命值"],
         ["缩放"] = cfg["幼鱿缩放"],
         ["持续时间"] = cfg["吞噬等待秒"] + 2,
-        ["on死亡"] = function(_unit, killer)
+        ["on死亡"] = function(unit, killer)
+            _____6CE8_9500_5361_745F_62C9_6DF1_6E0A_5E7C_9C7F_62A4_536B(unit)
             _____5E7C_9C7F_6B7B_4EA1_6389_843D_6B8B_7247(context, killer)
-        end
+        end,
+        ["on销毁"] = _____6CE8_9500_5361_745F_62C9_6DF1_6E0A_5E7C_9C7F_62A4_536B
     })
     if instance == nil or not _____5355_4F4D_6709_6548(instance["单位"]) then
         return
     end
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["幼鱿出现特效模型路径"],
+        X = x,
+        Y = y,
+        ["缩放"] = cfg["幼鱿出现特效缩放"],
+        ["持续秒"] = cfg["幼鱿出现特效持续秒"]
+    })
     _____4E34_65F6_8C03_6574_653B_51FB(instance["单位"], cfg["幼鱿攻击力"])
+    _____767B_8BB0_62A4_536B_5355_4F4D(instance["单位"], {["主Boss单位"] = boss, ["护卫类型"] = "卡瑟拉-深渊幼鱿", ["标记为召唤单位"] = true, ["Boss结束处理"] = "注销"})
+    local target = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
+    if _____5355_4F4D_6709_6548(target) then
+        IssueTargetOrder(instance["单位"], "attack", target)
+    end
     local id = addDelayedCallback(
         cfg["吞噬等待秒"] * 1000,
         function()
@@ -97,8 +126,22 @@ local function _____521B_5EFA_6DF1_6E0A_5E7C_9C7F(context, angle)
             _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, cfg["吞噬回血比例"])
         end
     )
-    local ____self_4 = context["清理"]
-    ____self_4["登记延迟回调"](____self_4, "卡瑟拉-深渊幼鱿吞噬", id)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "卡瑟拉-深渊幼鱿吞噬", id)
+end
+local function _____53EC_5524_6DF1_6E0A_5E7C_9C7F(context)
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) or context["Boss潜入中"] then
+        return
+    end
+    local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["深渊召唤"]
+    do
+        local i = 0
+        while i < cfg["幼鱿数量"] do
+            _____521B_5EFA_6DF1_6E0A_5E7C_9C7F(context, i * 120)
+            i = i + 1
+        end
+    end
 end
 ____exports["释放卡瑟拉深渊召唤"] = function(context)
     local boss = context["Boss单位"]
@@ -106,7 +149,9 @@ ____exports["释放卡瑟拉深渊召唤"] = function(context)
         return
     end
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["深渊召唤"]
-    _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作原始时长秒"])
+    _____5F00_59CB_786C_76F4(boss, cfg["施法硬直秒"])
+    _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = cfg["施法硬直秒"], ["颜色ID"] = cfg["吟唱条颜色ID"], ["标题文本"] = cfg["吟唱条标题文本"], ["提示文本"] = cfg["吟唱条提示文本"]})
+    _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["施法硬直秒"])
     _____64AD_653E_5361_745F_62C9_53F0_8BCD(boss, "深渊召唤")
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____5361_745F_62C9_97F3_6548_914D_7F6E["深渊召唤"]["幼鱿入场"],
@@ -123,12 +168,13 @@ ____exports["释放卡瑟拉深渊召唤"] = function(context)
         ["冷却Ms"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["冷却Ms"],
         ["触发概率百分比"] = _____5361_745F_62C9_97F3_6548_914D_7F6E["怪物拟声"]["关键机制触发概率百分比"]
     })
-    do
-        local i = 0
-        while i < cfg["幼鱿数量"] do
-            _____521B_5EFA_6DF1_6E0A_5E7C_9C7F(context, i * 120)
-            i = i + 1
+    local id = addDelayedCallback(
+        cfg["施法硬直秒"] * 1000,
+        function()
+            _____53EC_5524_6DF1_6E0A_5E7C_9C7F(context)
         end
-    end
+    )
+    local ____self_10 = context["清理"]
+    ____self_10["登记延迟回调"](____self_10, "卡瑟拉-深渊召唤生成幼鱿", id)
 end
 return ____exports

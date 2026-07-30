@@ -30,12 +30,18 @@ const { getServerTime } = require('系统.00．核心系统.05．中心计时器
   getServerTime: (this: void) => number;
 };
 
+const { 设置特效颜色 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  设置特效颜色: (this: void, effect: any, red: number, green: number, blue: number, alpha?: number) => void;
+};
+
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
+const Cos = jass.Cos as (radians: number) => number;
+const Sin = jass.Sin as (radians: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -45,20 +51,28 @@ const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => v
 const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, degrees: number) => void;
 const RAD_TO_DEG = 57.29577951308232;
 
-function 播放黑翼横扫表现(this: void, albedo: any, facing: number): void {
+function 设置黑翼横扫特效表现(this: void, effect: any, facing: number, scale: number, duration: number): void {
+  if (effect == null || effect === 0) return;
+  EXEffectMatRotateZ(effect, facing);
+  EXSetEffectSize(effect, scale);
+  YDWETimerDestroyEffectSafe(duration, effect);
+}
+
+function 播放黑翼横扫表现(this: void, albedo: any, facing: number, 重击X: number, 重击Y: number): void {
   const cfg = 安兹乌尔恭数值与表现配置;
   const x = GetUnitX(albedo);
   const y = GetUnitY(albedo);
   const pressure = AddSpecialEffect(cfg.表现资源.雅儿贝德黑翼横扫特效路径, x, y);
-  const impact = AddSpecialEffect(cfg.表现资源.雅儿贝德重击特效路径, x, y);
-  const effects = [pressure, impact];
-  for (let i = 0; i < effects.length; i++) {
-    const effect = effects[i];
-    if (effect == null || effect === 0) continue;
-    EXEffectMatRotateZ(effect, facing);
-    EXSetEffectSize(effect, cfg.守护者模式.黑翼横扫特效缩放);
-    YDWETimerDestroyEffectSafe(cfg.守护者模式.黑翼横扫特效持续秒, effect);
-  }
+  const impact = AddSpecialEffect(cfg.表现资源.雅儿贝德重击特效路径, 重击X, 重击Y);
+  const visual = cfg.守护者模式;
+  设置特效颜色(
+    pressure,
+    visual.黑翼横扫风压特效红,
+    visual.黑翼横扫风压特效绿,
+    visual.黑翼横扫风压特效蓝,
+  );
+  设置黑翼横扫特效表现(pressure, facing, visual.黑翼横扫风压特效缩放, visual.黑翼横扫特效持续秒);
+  设置黑翼横扫特效表现(impact, facing, visual.雅儿贝德重击特效缩放, visual.雅儿贝德重击特效持续秒);
 }
 
 function 结算黑翼横扫(this: void, context: 安兹运行时上下文, facing: number): void {
@@ -67,7 +81,10 @@ function 结算黑翼横扫(this: void, context: 安兹运行时上下文, facin
   const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
   const x = GetUnitX(albedo);
   const y = GetUnitY(albedo);
-  播放黑翼横扫表现(albedo, facing);
+  const radians = facing / RAD_TO_DEG;
+  const impactX = x + Cos(radians) * cfg.黑翼横扫半径;
+  const impactY = y + Sin(radians) * cfg.黑翼横扫半径;
+  播放黑翼横扫表现(albedo, facing, impactX, impactY);
   const heroes = 获取Boss技能敌对英雄列表(context.安兹单位);
   for (let i = 0; i < heroes.length; i++) {
     const target = heroes[i];

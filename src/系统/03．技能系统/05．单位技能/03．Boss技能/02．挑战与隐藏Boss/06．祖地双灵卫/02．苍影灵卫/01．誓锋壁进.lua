@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．运行时上下文")
+local _____5F00_59CB_7956_5730_53CC_7075_536B_5E38_89C4_65BD_6CD5 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["开始祖地双灵卫常规施法"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
 local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["祖地双灵卫数值与表现配置"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -164,6 +166,7 @@ ____exports["释放誓锋壁进"] = function(context, target)
     end
     context["大型机制忙碌到Ms"] = getServerTime() + (cfg["前摇秒"] + cfg["推进秒"] + cfg["誓盾持续秒"]) * 1000
     _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(boss, facing)
+    _____5F00_59CB_7956_5730_53CC_7075_536B_5E38_89C4_65BD_6CD5(boss, cfg["前摇秒"], "誓锋壁进", "苍影灵卫将沿锁定方向冲锋并展开誓盾")
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "方向直线",
         X = startX,

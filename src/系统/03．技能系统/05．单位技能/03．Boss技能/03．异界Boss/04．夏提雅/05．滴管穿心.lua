@@ -1,13 +1,14 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
 local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
-local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
-local _____5F00_59CB_51B2_950B = _____51FB_9000_7CFB_7EDF["开始冲锋"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local ____09_FF0E_82F1_7075_6218_4E59_5973 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.09．英灵战乙女")
@@ -17,6 +18,8 @@ local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____19_FF0E_541F_5531_6761 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.19．吟唱条")
+local _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761 = ____19_FF0E_541F_5531_6761["显示夏提雅常规吟唱条"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -26,10 +29,13 @@ local addDelayedCallback = ____require_result_2.addDelayedCallback
 local getServerTime = ____require_result_2.getServerTime
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.冲锋残影表现")
+local _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0 = ____require_result_4["开始冲锋并附带残影表现"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local SetUnitFacing = jass.SetUnitFacing
 local IsUnitType = jass.IsUnitType
 local Atan2 = jass.Atan2
 local SquareRoot = jass.SquareRoot
@@ -40,6 +46,20 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
+local function _____5F00_59CB_6EF4_7BA1_7A7F_5FC3_51B2_950B(unit, moveConfig, facing)
+    local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["滴管穿心"]
+    return _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0(
+        unit,
+        __TS__ObjectAssign({}, moveConfig, {["位移特效"] = ""}),
+        {
+            ["残影模型"] = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["滴管长枪拖尾特效路径"],
+            ["残影生成间隔"] = cfg["拖尾特效生成间隔秒"],
+            ["残影生命周期"] = cfg["拖尾特效生命周期秒"],
+            ["残影透明度"] = 255,
+            ["残影朝向"] = facing
+        }
+    )
+end
 local function _____5C1D_8BD5_5B89_6392_6EF4_7BA1_7A7F_5FC3_82F1_7075_590D_523B(context, lockedX, lockedY)
     local projection = _____83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71(context)
     if not _____5355_4F4D_6709_6548(projection) then
@@ -70,7 +90,7 @@ local function _____5C1D_8BD5_5B89_6392_6EF4_7BA1_7A7F_5FC3_82F1_7075_590D_523B(
             ["朝向"] = facing,
             ["延迟秒"] = delay,
             ["复刻结算"] = function()
-                _____5F00_59CB_51B2_950B(
+                _____5F00_59CB_6EF4_7BA1_7A7F_5FC3_51B2_950B(
                     projection,
                     {
                         ["目标X"] = endX,
@@ -80,7 +100,6 @@ local function _____5C1D_8BD5_5B89_6392_6EF4_7BA1_7A7F_5FC3_82F1_7075_590D_523B(
                         ["检查地形"] = true,
                         ["暂停单位"] = false,
                         ["禁用碰撞"] = true,
-                        ["位移特效"] = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["滴管长枪拖尾特效路径"],
                         ["命中半径"] = cfg["命中半径"],
                         ["只命中敌人"] = true,
                         ["允许重复命中"] = false,
@@ -100,7 +119,8 @@ local function _____5C1D_8BD5_5B89_6392_6EF4_7BA1_7A7F_5FC3_82F1_7075_590D_523B(
                                 ["标签"] = "夏提雅·英灵复刻-滴管穿心"
                             })
                         end
-                    }
+                    },
+                    facing
                 )
             end
         }
@@ -146,6 +166,9 @@ ____exports["释放夏提雅滴管穿心"] = function(context, target)
     local endX = startX + dx * ratio
     local endY = startY + dy * ratio
     local facing = Atan2(dy, dx) * RAD_TO_DEG
+    SetUnitFacing(boss, facing)
+    _____5F00_59CB_786C_76F4(boss, cfg["预警秒"])
+    _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761(cfg["预警秒"], cfg["吟唱条颜色ID"], cfg["吟唱条标题文本"], cfg["吟唱条提示文本"])
     context["普通机制忙碌到Ms"] = getServerTime() + (cfg["预警秒"] + cfg["冲锋秒"]) * 1000
     context["当前猎血目标"] = nil
     context["当前猎血段数"] = 0
@@ -167,7 +190,7 @@ ____exports["释放夏提雅滴管穿心"] = function(context, target)
             if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] then
                 return
             end
-            local chargeId = _____5F00_59CB_51B2_950B(
+            local chargeId = _____5F00_59CB_6EF4_7BA1_7A7F_5FC3_51B2_950B(
                 boss,
                 {
                     ["目标X"] = endX,
@@ -177,7 +200,6 @@ ____exports["释放夏提雅滴管穿心"] = function(context, target)
                     ["检查地形"] = true,
                     ["暂停单位"] = true,
                     ["禁用碰撞"] = true,
-                    ["位移特效"] = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["滴管长枪拖尾特效路径"],
                     ["命中半径"] = cfg["命中半径"],
                     ["只命中敌人"] = true,
                     ["允许重复命中"] = false,
@@ -224,15 +246,16 @@ ____exports["释放夏提雅滴管穿心"] = function(context, target)
                             _____5C1D_8BD5_5B89_6392_6EF4_7BA1_7A7F_5FC3_82F1_7075_590D_523B(context, targetX, targetY)
                         end
                     end
-                }
+                },
+                facing
             )
             if chargeId == 0 then
                 context["普通机制忙碌到Ms"] = getServerTime()
             end
         end
     )
-    local ____self_4 = context["清理"]
-    ____self_4["登记延迟回调"](____self_4, "夏提雅-滴管穿心预警", delayedId)
+    local ____self_5 = context["清理"]
+    ____self_5["登记延迟回调"](____self_5, "夏提雅-滴管穿心预警", delayedId)
     return true
 end
 ____exports["滴管穿心技能状态"] = {

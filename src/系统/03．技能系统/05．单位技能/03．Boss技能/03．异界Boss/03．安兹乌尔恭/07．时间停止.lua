@@ -24,6 +24,9 @@ local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____07_FF0E_6280_80FD_9A71_52A8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.07．技能驱动")
+local _____521B_5EFA_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B_9884_8B66 = ____07_FF0E_6280_80FD_9A71_52A8["创建雅儿贝德时间停止冲锋预警"]
+local _____542F_52A8_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B = ____07_FF0E_6280_80FD_9A71_52A8["启动雅儿贝德时间停止冲锋"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -94,7 +97,9 @@ local function _____521B_5EFA_65F6_95F4_505C_6B62_9501_5B9A(context)
         ["裂缝起点Y"] = originY,
         ["裂缝终点X"] = originX + Cos(angleRadians) * ordinary["现实断裂路径长度"],
         ["裂缝终点Y"] = originY + Sin(angleRadians) * ordinary["现实断裂路径长度"],
-        ["裂缝角度"] = angleRadians * RAD_TO_DEG
+        ["裂缝角度"] = angleRadians * RAD_TO_DEG,
+        ["雅儿贝德冲锋终点X"] = GetUnitX(lineTarget),
+        ["雅儿贝德冲锋终点Y"] = GetUnitY(lineTarget)
     }
 end
 local function _____521B_5EFA_65F6_95F4_505C_6B62_9884_8B66(instance)
@@ -111,6 +116,9 @@ local function _____521B_5EFA_65F6_95F4_505C_6B62_9884_8B66(instance)
         ["持续时间"] = groundDuration,
         ["来源单位"] = instance.context["安兹单位"]
     })
+    if instance.context["模式"] == "守护者介入" then
+        _____521B_5EFA_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B_9884_8B66(instance.context, locked["雅儿贝德冲锋终点X"], locked["雅儿贝德冲锋终点Y"], groundDuration)
+    end
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "矩形",
         X = locked["裂缝起点X"],
@@ -171,14 +179,14 @@ local function _____51BB_7ED3_65F6_95F4_505C_6B62_73A9_5BB6(instance)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue13
+                    goto __continue14
                 end
                 if _____6DFB_52A0_5355_4F4D_6682_505C(hero, _____65F6_95F4_505C_6B62_6682_505C_6765_6E90) then
                     local ____instance__6682_505C_5355_4F4D_5217_8868_12 = instance["暂停单位列表"]
                     ____instance__6682_505C_5355_4F4D_5217_8868_12[#____instance__6682_505C_5355_4F4D_5217_8868_12 + 1] = hero
                 end
             end
-            ::__continue13::
+            ::__continue14::
             i = i + 1
         end
     end
@@ -269,12 +277,12 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_5730_9762_6CD5_9635(instance)
             do
                 local target = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue33
+                    goto __continue34
                 end
                 local dx = GetUnitX(target) - locked["地面法阵X"]
                 local dy = GetUnitY(target) - locked["地面法阵Y"]
                 if dx * dx + dy * dy > radius2 then
-                    goto __continue33
+                    goto __continue34
                 end
                 _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(
                     boss,
@@ -283,7 +291,7 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_5730_9762_6CD5_9635(instance)
                     "安兹·时间停止·地面法阵"
                 )
             end
-            ::__continue33::
+            ::__continue34::
             i = i + 1
         end
     end
@@ -317,12 +325,12 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_9B54_6CD5_7BAD(instance)
             do
                 local target = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue41
+                    goto __continue42
                 end
                 local dx = GetUnitX(target) - locked["魔法箭X"]
                 local dy = GetUnitY(target) - locked["魔法箭Y"]
                 if dx * dx + dy * dy > radius2 then
-                    goto __continue41
+                    goto __continue42
                 end
                 _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(
                     boss,
@@ -339,7 +347,7 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_9B54_6CD5_7BAD(instance)
                     "安兹·时间停止·高阶魔法箭"
                 )
             end
-            ::__continue41::
+            ::__continue42::
             i = i + 1
         end
     end
@@ -420,6 +428,7 @@ ____exports["释放安兹时间停止"] = function(context)
                 _____521B_5EFA_7ACB_5373_6267_884C_9636_6BB5(
                     function()
                         _____6062_590D_65F6_95F4_505C_6B62_73A9_5BB6(instance)
+                        _____542F_52A8_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B(context, locked["雅儿贝德冲锋终点X"], locked["雅儿贝德冲锋终点Y"])
                         _____64AD_653E_5B89_5179_53F0_8BCD(boss, "时间停止结算")
                         _____7ED3_7B97_65F6_95F4_505C_6B62_5730_9762_6CD5_9635(instance)
                     end,

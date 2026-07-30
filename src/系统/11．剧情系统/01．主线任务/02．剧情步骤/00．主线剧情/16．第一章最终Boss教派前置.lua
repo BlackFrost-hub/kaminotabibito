@@ -135,7 +135,6 @@ ____exports["执行教派袭击预置"] = function()
         while i < #_____6811_6728_5750_6807 do
             local point = _____6811_6728_5750_6807[i + 1]
             DzDoodadCreate(
-                nil,
                 stringToFourCCSafe("YOtf"),
                 1,
                 point[1],

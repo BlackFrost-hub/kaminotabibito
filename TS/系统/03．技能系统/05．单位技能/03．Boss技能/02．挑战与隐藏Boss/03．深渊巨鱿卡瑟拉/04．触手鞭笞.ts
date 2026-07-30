@@ -37,6 +37,12 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = requ
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, 单位: any, 持续时间: number) => void;
+};
 const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
   获取Boss技能随机敌对英雄: (this: void, boss: any, centerUnit?: any, radius?: number) => any;
@@ -144,6 +150,8 @@ function 创建单条触手(this: void, context: 卡瑟拉运行时上下文, ta
     Y: y,
     朝向: 0,
     最大生命: cfg.触手生命值,
+    攻击范围: cfg.触手攻击半径,
+    固定站桩: true,
     缩放: cfg.触手缩放,
     持续时间: cfg.触手持续秒,
     on死亡: function 卡瑟拉鞭笞触手死亡(this: void, _unit: any, killer: any): void {
@@ -164,11 +172,23 @@ function 创建单条触手(this: void, context: 卡瑟拉运行时上下文, ta
   context.清理.登记周期回调("卡瑟拉-触手鞭笞周期", data.周期ID);
 }
 
+function 播放触手出现特效(this: void, context: 卡瑟拉运行时上下文, x: number, y: number): void {
+  const cfg = 卡瑟拉数值与表现配置.触手鞭笞;
+  const effect = 创建点特效({
+    模型路径: cfg.触手出现特效模型路径,
+    X: x,
+    Y: y,
+    缩放: cfg.触手出现特效缩放,
+  });
+  context.清理.登记限时特效("卡瑟拉-触手鞭笞出现特效", effect, cfg.触手出现特效持续秒 * 1000);
+}
+
 function 释放触手围攻(this: void, context: 卡瑟拉运行时上下文, target: any): void {
   const cfg = 卡瑟拉数值与表现配置.触手鞭笞;
   const cx = GetUnitX(target);
   const cy = GetUnitY(target);
   播放Boss坐标音效(卡瑟拉音效配置.触手鞭笞.小触手出现, cx, cy, 卡瑟拉音效配置.默认裁断距离);
+  播放触手出现特效(context, cx, cy);
   for (let i = 0; i < cfg.触手数量; i++) {
     const angle = i * 120;
     创建单条触手(context, target, 极坐标X(cx, angle, cfg.触手半径), 极坐标Y(cy, angle, cfg.触手半径));
@@ -181,6 +201,7 @@ export function 释放卡瑟拉触手鞭笞(this: void, context: 卡瑟拉运行
   const target = 选择触手鞭笞目标(context);
   if (!单位有效(target)) return;
   const cfg = 卡瑟拉数值与表现配置.触手鞭笞;
+  开始硬直(boss, cfg.硬直秒);
   播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.延迟秒);
   播放卡瑟拉台词(boss, "触手鞭笞");
   创建技能提示圈({

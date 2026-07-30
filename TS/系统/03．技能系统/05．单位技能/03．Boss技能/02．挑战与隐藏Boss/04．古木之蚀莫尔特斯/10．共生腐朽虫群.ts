@@ -2,7 +2,7 @@
 
 import { 增加玩家腐败值, 清除玩家腐败值, 取腐败值最高玩家, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
-import { 单位有效, 播放莫尔特斯限时动作, 极坐标X, 极坐标Y } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯常规施法, 极坐标X, 极坐标Y } from "./16．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 
 const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -20,7 +20,8 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
@@ -192,18 +193,25 @@ function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文,
   context.清理.登记周期回调("莫尔特斯-甲虫追击", data.周期ID);
 }
 
-export function 释放莫尔特斯共生腐朽虫群(this: void, context: 莫尔特斯运行时上下文): boolean {
-  if (!单位有效(context.Boss单位)) return false;
+function 结算莫尔特斯共生腐朽虫群(this: void, variable?: any): void {
+  const context = variable as 莫尔特斯运行时上下文 | undefined;
+  if (context == null || !单位有效(context.Boss单位)) return;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
-  播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放Boss坐标音效(莫尔特斯音效配置.共生腐朽虫群.甲虫入场, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
   const 技能实例ID = 创建独立技能伤害实例({
     来源类型: "Boss技能",
     标签: "莫尔特斯共生腐朽虫群",
     持续时间秒: cfg.接触爆炸秒 + 12,
   });
-  for (let i = 0; i < cfg.甲虫数量; i++) {
-    创建腐化甲虫(context, i * 90, 技能实例ID);
-  }
+  for (let i = 0; i < cfg.甲虫数量; i++) 创建腐化甲虫(context, i * 90, 技能实例ID);
+}
+
+export function 释放莫尔特斯共生腐朽虫群(this: void, context: 莫尔特斯运行时上下文): boolean {
+  if (!单位有效(context.Boss单位)) return false;
+  const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
+  开始莫尔特斯常规施法(context.Boss单位, cfg.动作播放秒, "共生腐朽虫群", "腐化甲虫将在读条结束后涌出");
+  播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
+  const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 结算莫尔特斯共生腐朽虫群, context);
+  context.清理.登记延迟回调("莫尔特斯-共生腐朽虫群召唤", delayedId);
   return true;
 }

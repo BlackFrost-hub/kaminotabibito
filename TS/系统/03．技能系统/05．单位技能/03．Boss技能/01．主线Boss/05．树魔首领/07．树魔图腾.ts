@@ -21,8 +21,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const IssuePointOrder = jass.IssuePointOrder as (unit: any, order: string, x: number, y: number) => boolean;
-const SetUnitMoveSpeed = jass.SetUnitMoveSpeed as (unit: any, speed: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
@@ -44,9 +42,8 @@ const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能�
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位") as {
   创建可攻击机制单位: (this: void, 参数: any) => any;
 };
-const { 获取Boss技能敌对英雄列表, 获取Boss技能最近敌对英雄Ex } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
+const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-  获取Boss技能最近敌对英雄Ex: (this: void, boss: any, centerUnit?: any, radius?: number) => any;
 };
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getGameDifficulty } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -124,7 +121,7 @@ function 尝试播放树魔首领关键怪叫(this: void, boss: any): void {
   });
 }
 
-function 创建图腾单位(this: void, context: 树魔首领运行时上下文, 名称: string, 模型路径: string, 最大生命: number, 持续秒: number, on死亡?: (this: void, unit: any, killer: any) => void): any {
+function 创建图腾单位(this: void, context: 树魔首领运行时上下文, 名称: string, 模型路径: string, 最大生命: number, 持续秒: number, 固定站桩: boolean = false, on死亡?: (this: void, unit: any, killer: any) => void): any {
   const boss = context.Boss单位;
   const cfg = 树魔首领数值与表现配置.树魔图腾;
   const center = 取图腾中心(boss);
@@ -145,6 +142,7 @@ function 创建图腾单位(this: void, context: 树魔首领运行时上下文,
     X: center.x,
     Y: center.y,
     最大生命,
+    固定站桩,
     生命值受小怪倍率: false,
     飞行高度: cfg.图腾飞行高度,
     缩放: cfg.图腾缩放,
@@ -180,9 +178,9 @@ function 创建静止陷阱(this: void, context: 树魔首领运行时上下文)
     cfg.静止陷阱模型路径,
     GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg.静止陷阱生命Boss最大生命比例,
     duration,
+    true,
   );
   if (trap == null) return;
-  SetUnitMoveSpeed(trap.单位, cfg.静止陷阱移动速度);
 
   let 提示累计毫秒: number = cfg.静止陷阱范围提示间隔毫秒;
   let 已开始触发 = false;
@@ -200,15 +198,6 @@ function 创建静止陷阱(this: void, context: 树魔首领运行时上下文)
         半径: cfg.静止陷阱触发半径,
         持续时间: cfg.静止陷阱范围提示间隔毫秒 / 1000 + 0.1,
       });
-    }
-
-    const nearest = 获取Boss技能最近敌对英雄Ex(boss, trap.单位);
-    if (单位有效(nearest)) {
-      const distance2 = 距离平方XY(GetUnitX(trap.单位), GetUnitY(trap.单位), GetUnitX(nearest), GetUnitY(nearest));
-      SetUnitMoveSpeed(trap.单位, distance2 >= cfg.静止陷阱远距加速阈值 * cfg.静止陷阱远距加速阈值
-        ? cfg.静止陷阱远距移动速度
-        : cfg.静止陷阱移动速度);
-      IssuePointOrder(trap.单位, "move", GetUnitX(nearest), GetUnitY(nearest));
     }
 
     const heroes = 获取Boss技能敌对英雄列表(boss);
@@ -344,6 +333,7 @@ function 创建爆炸陷阱(this: void, context: 树魔首领运行时上下文)
     cfg.爆炸陷阱模型路径,
     GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg.爆炸陷阱生命Boss最大生命比例,
     cfg.爆炸陷阱持续秒,
+    true,
     function 树魔首领爆炸陷阱死亡(this: void, unit: any): void {
       if (naturalEnd || exploded) return;
       exploded = true;

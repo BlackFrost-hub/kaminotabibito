@@ -5,6 +5,7 @@ local ____01_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模�
 local CreateUnit = ____01_FF0E_5171_4EAB.CreateUnit
 local _____9ED8_8BA4_5F39_5E55_5355_4F4D_7C7B_578B = ____01_FF0E_5171_4EAB["默认弹幕单位类型"]
 local DzGetColor = ____01_FF0E_5171_4EAB.DzGetColor
+local DzSetEffectAnimation = ____01_FF0E_5171_4EAB.DzSetEffectAnimation
 local DzSetEffectVertexColor = ____01_FF0E_5171_4EAB.DzSetEffectVertexColor
 local DzSetEffectPos = ____01_FF0E_5171_4EAB.DzSetEffectPos
 local DzSetUnitModel = ____01_FF0E_5171_4EAB.DzSetUnitModel
@@ -71,15 +72,15 @@ ____exports["造成原生弹幕阻挡伤害"] = function(_____5F39_5E55ID, _____
     _____5B9E_4F8B["剩余生命"] = _____5B9E_4F8B["剩余生命"] - _____4F24_5BB3_503C
     local _____56DE_8C03 = _____5B9E_4F8B["参数"]["on阻挡"]
     if _____56DE_8C03 ~= nil then
-        local ____6765_6E90_5355_4F4D_1 = _____6765_6E90_5355_4F4D
-        if ____6765_6E90_5355_4F4D_1 == nil then
-            ____6765_6E90_5355_4F4D_1 = nil
+        local ____6765_6E90_5355_4F4D_3 = _____6765_6E90_5355_4F4D
+        if ____6765_6E90_5355_4F4D_3 == nil then
+            ____6765_6E90_5355_4F4D_3 = nil
         end
-        _____56DE_8C03(____6765_6E90_5355_4F4D_1, _____4F24_5BB3_503C, _____5F39_5E55ID)
+        _____56DE_8C03(____6765_6E90_5355_4F4D_3, _____4F24_5BB3_503C, _____5F39_5E55ID)
     end
-    local ____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6_4 = _____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6
-    local ____opt_2 = _____5B9E_4F8B["参数"].STES
-    ____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6_4(____opt_2 and ____opt_2["阻挡事件名"], _____5B9E_4F8B, {["来源单位"] = _____6765_6E90_5355_4F4D, ["伤害值"] = _____4F24_5BB3_503C})
+    local ____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6_6 = _____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6
+    local ____opt_4 = _____5B9E_4F8B["参数"].STES
+    ____89E6_53D1_539F_751F_5F39_5E55STES_4E8B_4EF6_6(____opt_4 and ____opt_4["阻挡事件名"], _____5B9E_4F8B, {["来源单位"] = _____6765_6E90_5355_4F4D, ["伤害值"] = _____4F24_5BB3_503C})
     if _____5B9E_4F8B["参数"]["被阻挡时销毁"] == true or _____5B9E_4F8B["参数"]["弹幕生命值"] ~= nil and _____5B9E_4F8B["剩余生命"] <= 0 then
         _____7ED3_675F_539F_751F_5F39_5E55_5B9E_4F8B(_____5B9E_4F8B, "被阻挡")
         return true
@@ -212,6 +213,11 @@ local function _____521B_5EFA_5F39_5E55_9644_52A0_7279_6548(_____53C2_6570, x, y
         return nil
     end
     DzSetEffectPos(effect, x, y, z)
+    if _____7279_6548_53C2_6570["动画索引"] ~= nil then
+        if DzSetEffectAnimation ~= nil then
+            DzSetEffectAnimation(effect, _____7279_6548_53C2_6570["动画索引"], 0)
+        end
+    end
     _____8BBE_7F6E_5F39_5E55_9644_52A0_7279_6548_989C_8272(effect, _____7279_6548_53C2_6570)
     return effect
 end

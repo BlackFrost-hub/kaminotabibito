@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下文';
+import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
@@ -43,6 +44,7 @@ export function 释放盾刃裁决(this: void, context: 祖地双灵卫运行时
   const firstWarning = cfg.两段间隔秒;
   context.大型机制忙碌到Ms = getServerTime() + (firstWarning + cfg.两段间隔秒 + 0.35) * 1000;
   立即设置单位朝向(boss, facing);
+  开始祖地双灵卫常规施法(boss, firstWarning, '盾刃裁决', '先结算正面盾击，再沿锁定方向释放重斩');
   创建技能提示圈({ 类型: '扇形', X: x, Y: y, 半径: cfg.扇形半径, 扇形角度: cfg.扇形角度, 朝向: facing, 持续时间: firstWarning, 来源单位: boss });
   播放限时单位动画({ 单位: boss, 动画编号: cfg.盾击动画编号, 持续秒: firstWarning + 0.15, 恢复动画编号: cfg.恢复动画编号 });
   const 事件列表: 固定时间轴事件[] = [{
@@ -57,6 +59,7 @@ export function 释放盾刃裁决(this: void, context: 祖地双灵卫运行时
         }
       }
       createTimedEffect(祖地双灵卫数值与表现配置.表现资源.盾刃裁决.盾击命中特效路径, 极坐标X(x, facing, cfg.扇形半径 * 0.45), 极坐标Y(y, facing, cfg.扇形半径 * 0.45), 0, 0.8);
+      开始祖地双灵卫常规施法(boss, cfg.两段间隔秒, '盾刃裁决·重斩', '重斩将沿刚才的方向结算');
       创建技能提示圈({ 类型: '方向直线', X: x, Y: y, 宽度: cfg.直线宽度, 长度: cfg.直线长度, 朝向: facing, 持续时间: cfg.两段间隔秒, 来源单位: boss });
       播放限时单位动画({ 单位: boss, 动画编号: cfg.重斩动画编号, 持续秒: cfg.两段间隔秒 + 0.2, 恢复动画编号: cfg.恢复动画编号 });
     },

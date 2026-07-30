@@ -3,6 +3,9 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____03_FF0E_7279_6548 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____03_FF0E_7279_6548["创建单位坐标跟随特效"]
+local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____03_FF0E_7279_6548["销毁单位坐标跟随特效"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
 local ____10_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.10．台词播放")
@@ -29,13 +32,11 @@ local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local AddSpecialEffect = jass.AddSpecialEffect
-local DestroyEffect = jass.DestroyEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local EXSetEffectSize = japi.EXSetEffectSize
+local _____751F_547D_951A_70B9_5C01_9501_9501_94FE_8DDF_968F_952E = "雅儿贝德-生命锚点封锁锁链"
 local _____951A_70B9_6EA2_51FA_4F24_5BB3_4FDD_62A4_8868 = {}
 local _____951A_70B9_6EA2_51FA_4F24_5BB3_4FDD_62A4_5DF2_6CE8_518C = false
 local function _____951A_70B9_6EA2_51FA_4F24_5BB3_4FDD_62A4(damage)
@@ -87,7 +88,6 @@ ____exports["启动雅儿贝德生命锚点封锁"] = function(context, targets,
     local unitId = GetHandleId(unit)
     local shieldId = 0
     local periodicId = 0
-    local barrierEffect = 0
     local cleaned = false
     local function _____6E05_9664_6EA2_51FA_4FDD_62A4()
         if _____951A_70B9_6EA2_51FA_4F24_5BB3_4FDD_62A4_8868[unitId] == true then
@@ -113,10 +113,7 @@ ____exports["启动雅儿贝德生命锚点封锁"] = function(context, targets,
         if currentShieldId ~= 0 and _____539F_56E0 ~= "护盾结束" then
             _____79FB_9664_62A4_76FE(currentShieldId)
         end
-        if barrierEffect ~= nil and barrierEffect ~= 0 then
-            DestroyEffect(barrierEffect)
-            barrierEffect = 0
-        end
+        _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(unit, _____751F_547D_951A_70B9_5C01_9501_9501_94FE_8DDF_968F_952E)
         if _____539F_56E0 == "破碎" then
             local breakEffect = AddSpecialEffect(
                 cfg["表现资源"]["雅儿贝德共同护盾破碎特效路径"],
@@ -170,10 +167,13 @@ ____exports["启动雅儿贝德生命锚点封锁"] = function(context, targets,
         return nil
     end
     SetUnitInvulnerable(unit, false)
-    barrierEffect = AddSpecialEffectTarget(cfg["表现资源"]["雅儿贝德共同护盾特效路径"], unit, "origin")
-    if barrierEffect ~= nil and barrierEffect ~= 0 then
-        EXSetEffectSize(barrierEffect, cfg["守护者模式"]["生命锚点封锁屏障缩放"])
-    end
+    _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
+        unit,
+        cfg["表现资源"]["雅儿贝德黑翼拘束锁链特效路径"],
+        _____751F_547D_951A_70B9_5C01_9501_9501_94FE_8DDF_968F_952E,
+        cfg["守护者模式"]["生命锚点封锁锁链缩放"],
+        cfg["守护者模式"]["生命锚点封锁锁链高度"]
+    )
     periodicId = addPeriodicCallback(cfg["守护者模式"]["生命锚点封锁状态检查间隔毫秒"], ____on_5C01_9501_72B6_6001_68C0_67E5)
     local ____self_7 = context["清理"]
     ____self_7["登记清理"](

@@ -15,6 +15,7 @@ local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
+local _____5F00_59CB_83AB_5C14_7279_65AF_5E38_89C4_65BD_6CD5 = ____16_FF0E_516C_5171_5DE5_5177["开始莫尔特斯常规施法"]
 local _____53D6_5750_6807_89D2_5EA6 = ____16_FF0E_516C_5171_5DE5_5177["取坐标角度"]
 local _____6781_5750_6807X = ____16_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____16_FF0E_516C_5171_5DE5_5177["极坐标Y"]
@@ -23,6 +24,8 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 function _____8D1D_585E_5C14_4F4D_7F6E(a, b, c, t)
     local u = 1 - t
     return u * u * a + 2 * u * t * b + t * t * c
@@ -201,21 +204,14 @@ local function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD_5F39_9053(variable)
     end
     _____5F39_9053Tick(data)
 end
-local function _____53D1_5C04_8150_8D25_4E4B_79CD(context, target)
+local function _____53D1_5C04_8150_8D25_4E4B_79CD(context, tx, ty)
     local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) then
+        return
+    end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败之种"]
     local sx = GetUnitX(boss)
     local sy = GetUnitY(boss)
-    local tx = GetUnitX(target)
-    local ty = GetUnitY(target)
-    _____521B_5EFA_6280_80FD_63D0_793A_5708({
-        ["类型"] = "敌方圆形",
-        X = tx,
-        Y = ty,
-        ["半径"] = cfg["波动半径"],
-        ["持续时间"] = cfg["飞行秒"] + cfg["生长延迟秒"] + cfg["波动间隔秒"],
-        ["来源单位"] = boss
-    })
     local angle = _____53D6_5750_6807_89D2_5EA6(sx, sy, tx, ty) + 90
     local distance = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]["单格边长"] * cfg["中点偏移比例"]
     local midX = _____6781_5750_6807X((sx + tx) / 2, angle, distance)
@@ -238,6 +234,13 @@ local function _____53D1_5C04_8150_8D25_4E4B_79CD(context, target)
     local ____self_10 = context["清理"]
     ____self_10["登记周期回调"](____self_10, "莫尔特斯-腐败之种弹道", data["周期ID"])
 end
+local function _____5EF6_8FDF_53D1_5C04_83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____53D1_5C04_8150_8D25_4E4B_79CD(data.context, data.x, data.y)
+end
 ____exports["释放莫尔特斯腐败之种"] = function(context)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
@@ -255,9 +258,31 @@ ____exports["释放莫尔特斯腐败之种"] = function(context)
     if not _____5355_4F4D_6709_6548(target) then
         return
     end
+    local targetX = GetUnitX(target)
+    local targetY = GetUnitY(target)
+    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(
+        boss,
+        _____53D6_5750_6807_89D2_5EA6(
+            GetUnitX(boss),
+            GetUnitY(boss),
+            targetX,
+            targetY
+        )
+    )
+    _____5F00_59CB_83AB_5C14_7279_65AF_5E38_89C4_65BD_6CD5(boss, cfg["动作播放秒"], "腐败之种", "腐败之种将飞向锁定落点")
     _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "腐败之种")
-    _____53D1_5C04_8150_8D25_4E4B_79CD(context, target)
+    _____521B_5EFA_6280_80FD_63D0_793A_5708({
+        ["类型"] = "敌方圆形",
+        X = targetX,
+        Y = targetY,
+        ["半径"] = cfg["波动半径"],
+        ["持续时间"] = cfg["动作播放秒"] + cfg["飞行秒"] + cfg["生长延迟秒"] + cfg["波动间隔秒"],
+        ["来源单位"] = boss
+    })
+    local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____5EF6_8FDF_53D1_5C04_83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD, {context = context, x = targetX, y = targetY})
+    local ____self_12 = context["清理"]
+    ____self_12["登记延迟回调"](____self_12, "莫尔特斯-腐败之种发射", delayedId)
 end
 local function ____on_83AB_5C14_7279_65AF_8150_8D25_4E4B_79CD_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____8150_8D25_4E4B_79CD_6280_80FDID then

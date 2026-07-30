@@ -66,11 +66,15 @@ function 取场地中心(this: void, context: 巴尔扎罗斯运行时上下文)
 
 function 播放地核Tick特效(this: void, x: number, y: number): void {
   const config = 巴尔扎罗斯技能数值配置.地核召唤;
-  const paths = [config.Tick冲击波路径, config.Tick叠加冲击波路径];
-  for (let i = 0; i < paths.length; i++) {
+  const effects = [
+    { 路径: config.Tick冲击波路径, 缩放: config.Tick冲击波特效缩放 },
+    { 路径: config.Tick叠加冲击波路径, 缩放: config.Tick叠加冲击波特效缩放 },
+  ];
+  for (let i = 0; i < effects.length; i++) {
+    const effect = effects[i];
     创建点特效({
-      模型路径: paths[i], X: x, Y: y, Z: config.Tick特效高度,
-      缩放: config.Tick特效缩放, 持续秒: config.Tick特效持续秒,
+      模型路径: effect.路径, X: x, Y: y, Z: config.Tick特效高度,
+      缩放: effect.缩放, 持续秒: config.Tick特效持续秒,
     });
   }
 }

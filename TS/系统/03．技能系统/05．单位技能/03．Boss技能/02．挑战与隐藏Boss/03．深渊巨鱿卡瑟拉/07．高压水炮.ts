@@ -31,6 +31,12 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, unit: any, 持续时间: number) => void;
+};
+const { 显示常规技能吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
+  显示常规技能吟唱条: (this: void, 参数: any) => void;
+};
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
@@ -130,18 +136,23 @@ export function 释放卡瑟拉高压水炮(this: void, context: 卡瑟拉运行
   const target = 选择最远玩家(boss);
   if (!单位有效(target)) return;
   const cfg = 卡瑟拉数值与表现配置.高压水炮;
+  开始硬直(boss, cfg.前摇秒);
+  显示常规技能吟唱条({
+    总时长: cfg.前摇秒,
+    颜色ID: cfg.吟唱条颜色ID,
+    标题文本: cfg.吟唱条标题文本,
+    提示文本: cfg.吟唱条提示文本,
+  });
   播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.前摇秒);
   const startX = GetUnitX(boss);
   const startY = GetUnitY(boss);
   const angle = 取坐标角度(startX, startY, GetUnitX(target), GetUnitY(target));
-  const centerX = 极坐标X(startX, angle, cfg.距离 * 0.5);
-  const centerY = 极坐标Y(startY, angle, cfg.距离 * 0.5);
   SetUnitFacing(boss, angle);
   播放卡瑟拉台词(boss, "高压水炮");
   创建技能提示圈({
     类型: "矩形",
-    X: centerX,
-    Y: centerY,
+    X: startX,
+    Y: startY,
     宽度: cfg.宽度,
     长度: cfg.距离,
     朝向: angle,

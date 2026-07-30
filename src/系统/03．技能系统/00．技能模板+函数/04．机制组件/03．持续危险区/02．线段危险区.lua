@@ -149,17 +149,13 @@ _____7EBF_6BB5_5371_9669_533A_5B9E_73B0.prototype["创建提示圈"] = function(
     if self["参数"]["提示圈"] == false then
         return
     end
-    local _____4E2D_5FC3X = self["参数"]["起点X"] + self["前向X"] * (self["参数"]["长度"] * 0.5)
-    local _____4E2D_5FC3Y = self["参数"]["起点Y"] + self["前向Y"] * (self["参数"]["长度"] * 0.5)
     _____521B_5EFA_6280_80FD_63D0_793A_5708(__TS__ObjectAssign({
         ["类型"] = "矩形",
-        X = _____4E2D_5FC3X,
-        Y = _____4E2D_5FC3Y,
         ["宽度"] = self["参数"]["宽度"],
         ["长度"] = self["参数"]["长度"],
         ["朝向"] = self["参数"]["方向角"],
         ["持续时间"] = self["参数"]["持续秒"]
-    }, self["参数"]["提示圈"] or ({})))
+    }, self["参数"]["提示圈"] or ({}), {X = self["参数"]["起点X"], Y = self["参数"]["起点Y"]}))
 end
 ____exports["创建线段危险区"] = function(_____53C2_6570)
     local _____5B9E_4F8B = __TS__New(_____7EBF_6BB5_5371_9669_533A_5B9E_73B0, _____53C2_6570)

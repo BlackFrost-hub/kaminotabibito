@@ -361,7 +361,7 @@ local function ____flush_53CD_4F24_961F_5217()
                 ["来源"] = _____8BB0_5F55["攻击者"],
                 ["目标"] = _____8BB0_5F55["攻击者"],
                 ["伤害"] = _____8BB0_5F55["伤害"],
-                attackType = jass.ATTACK_TYPE_CHAOS,
+                attackType = jass.ATTACK_TYPE_NORMAL,
                 ["伤害类型"] = jass.DAMAGE_TYPE_UNIVERSAL,
                 weaponType = nil,
                 ["来源类型"] = "其他",

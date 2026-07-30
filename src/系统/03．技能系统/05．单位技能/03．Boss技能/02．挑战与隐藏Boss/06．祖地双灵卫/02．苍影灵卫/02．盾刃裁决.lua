@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．运行时上下文")
+local _____5F00_59CB_7956_5730_53CC_7075_536B_5E38_89C4_65BD_6CD5 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["开始祖地双灵卫常规施法"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
 local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["祖地双灵卫数值与表现配置"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
@@ -72,6 +74,7 @@ ____exports["释放盾刃裁决"] = function(context, target)
     local firstWarning = cfg["两段间隔秒"]
     context["大型机制忙碌到Ms"] = getServerTime() + (firstWarning + cfg["两段间隔秒"] + 0.35) * 1000
     _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(boss, facing)
+    _____5F00_59CB_7956_5730_53CC_7075_536B_5E38_89C4_65BD_6CD5(boss, firstWarning, "盾刃裁决", "先结算正面盾击，再沿锁定方向释放重斩")
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "扇形",
         X = x,
@@ -122,6 +125,7 @@ ____exports["释放盾刃裁决"] = function(context, target)
                     0,
                     0.8
                 )
+                _____5F00_59CB_7956_5730_53CC_7075_536B_5E38_89C4_65BD_6CD5(boss, cfg["两段间隔秒"], "盾刃裁决·重斩", "重斩将沿刚才的方向结算")
                 _____521B_5EFA_6280_80FD_63D0_793A_5708({
                     ["类型"] = "方向直线",
                     X = x,

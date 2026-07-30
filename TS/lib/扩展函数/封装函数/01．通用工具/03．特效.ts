@@ -11,26 +11,30 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
+const { EC_CreateEffect, EC_GetPointZ } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
   EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+  EC_GetPointZ: (this: void, x: number, y: number) => number;
 };
 
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
+const Cos = jass.Cos as (radians: number) => number;
+const Sin = jass.Sin as (radians: number) => number;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const DzBindEffect = japi.DzBindEffect as (widget: any, attachPoint: string, effect: any) => void;
 const DzUnbindEffect = japi.DzUnbindEffect as (effect: any) => void;
-const DzSetEffectPos = japi.DzSetEffectPos as (effect: any, x: number, y: number, z: number) => void;
 const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) => void;
+const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const EXEffectMatRotateX = japi.EXEffectMatRotateX as (effect: any, angle: number) => void;
 const EXEffectMatRotateY = japi.EXEffectMatRotateY as (effect: any, angle: number) => void;
 const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, angle: number) => void;
 const EXEffectMatScale = japi.EXEffectMatScale as (effect: any, x: number, y: number, z: number) => void;
 const DzSetEffectScale = japi.DzSetEffectScale as (effect: any, scale: number) => void;
+const DzSetEffectAnimation = (japi as any)["DzSetEffectAnimation"] as ((effect: any, animationIndex: number, flag: number) => void) | undefined;
 const DzGetColor = japi.DzGetColor as (alpha: number, red: number, green: number, blue: number) => number;
 const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as (effect: any, color: number) => void;
 
@@ -88,6 +92,7 @@ export interface 点特效参数 extends 特效XYZ轴旋转参数 {
   持续秒?: number;
   缩放?: number;
   动画速度?: number;
+  动画索引?: number;
   顶点颜色?: number;
   红?: number;
   绿?: number;
@@ -128,9 +133,127 @@ export function 创建点特效(参数: 点特效参数): any {
   );
   if (effect == null || effect === 0) return null;
   设置特效XYZ轴旋转(effect, 参数);
+  if (参数.动画索引 != null && DzSetEffectAnimation != null) {
+    DzSetEffectAnimation(effect, 参数.动画索引, 0);
+  }
   const color = 取特效顶点颜色(参数);
   if (color != null) DzSetEffectVertexColor(effect, color);
   return effect;
+}
+
+export interface 逐段直线路径点特效参数 extends Omit<点特效参数, 'X' | 'Y'> {
+  起点X: number;
+  起点Y: number;
+  方向弧度: number;
+  路径长度: number;
+  段间距: number;
+  铺设间隔秒?: number;
+  存活条件?: (this: void) => boolean;
+}
+
+export interface 逐段直线路径点特效句柄 {
+  readonly ID: number;
+  停止(): void;
+}
+
+class 逐段直线路径点特效实现 implements 逐段直线路径点特效句柄 {
+  readonly ID: number;
+  private readonly 参数: 逐段直线路径点特效参数;
+  private 下一个距离 = 0;
+  private 下次铺设毫秒 = 0;
+  private 已停止 = false;
+
+  constructor(ID: number, 参数: 逐段直线路径点特效参数) {
+    this.ID = ID;
+    this.参数 = 参数;
+  }
+
+  启动(): void {
+    this.创建下一段();
+    if (!this.已停止) this.下次铺设毫秒 = getServerTime() + this.取铺设间隔毫秒();
+  }
+
+  推进(当前毫秒: number): void {
+    if (this.已停止) return;
+    if (this.参数.存活条件 != null && !this.参数.存活条件()) {
+      this.停止();
+      return;
+    }
+    if (当前毫秒 < this.下次铺设毫秒) return;
+    this.创建下一段();
+    if (!this.已停止) this.下次铺设毫秒 = 当前毫秒 + this.取铺设间隔毫秒();
+  }
+
+  停止(): void {
+    if (this.已停止) return;
+    this.已停止 = true;
+    移除逐段直线路径点特效(this);
+  }
+
+  是否已停止(): boolean {
+    return this.已停止;
+  }
+
+  private 创建下一段(): void {
+    const 路径长度 = this.参数.路径长度 > 0 ? this.参数.路径长度 : 0;
+    const 当前距离 = this.下一个距离 > 路径长度 ? 路径长度 : this.下一个距离;
+    创建点特效({
+      ...this.参数,
+      X: this.参数.起点X + Cos(this.参数.方向弧度) * 当前距离,
+      Y: this.参数.起点Y + Sin(this.参数.方向弧度) * 当前距离,
+    });
+    if (当前距离 >= 路径长度) {
+      this.停止();
+      return;
+    }
+    const 段间距 = this.参数.段间距 > 0 ? this.参数.段间距 : 128;
+    this.下一个距离 = 当前距离 + 段间距;
+    if (this.下一个距离 > 路径长度) this.下一个距离 = 路径长度;
+  }
+
+  private 取铺设间隔毫秒(): number {
+    const 秒 = this.参数.铺设间隔秒 != null && this.参数.铺设间隔秒 > 0 ? this.参数.铺设间隔秒 : 0.06;
+    return 秒 * 1000;
+  }
+}
+
+const 活跃逐段直线路径点特效列表: 逐段直线路径点特效实现[] = [];
+let 下一个逐段直线路径点特效ID = 0;
+let 逐段直线路径点特效回调ID = 0;
+
+function 确保逐段直线路径点特效Tick(): void {
+  if (逐段直线路径点特效回调ID !== 0) return;
+  逐段直线路径点特效回调ID = addPeriodicCallback(10, 逐段直线路径点特效Tick);
+}
+
+function 停止逐段直线路径点特效Tick(): void {
+  if (逐段直线路径点特效回调ID === 0) return;
+  removePeriodicCallback(逐段直线路径点特效回调ID);
+  逐段直线路径点特效回调ID = 0;
+}
+
+function 移除逐段直线路径点特效(实例: 逐段直线路径点特效实现): void {
+  const 索引 = 活跃逐段直线路径点特效列表.indexOf(实例);
+  if (索引 >= 0) 活跃逐段直线路径点特效列表.splice(索引, 1);
+  if (活跃逐段直线路径点特效列表.length === 0) 停止逐段直线路径点特效Tick();
+}
+
+function 逐段直线路径点特效Tick(this: void): void {
+  const 当前毫秒 = getServerTime();
+  let 索引 = 0;
+  while (索引 < 活跃逐段直线路径点特效列表.length) {
+    const 实例 = 活跃逐段直线路径点特效列表[索引];
+    实例.推进(当前毫秒);
+    if (活跃逐段直线路径点特效列表[索引] === 实例) 索引 += 1;
+  }
+}
+
+export function 创建逐段直线路径点特效(参数: 逐段直线路径点特效参数): 逐段直线路径点特效句柄 {
+  const 实例 = new 逐段直线路径点特效实现(++下一个逐段直线路径点特效ID, 参数);
+  活跃逐段直线路径点特效列表.push(实例);
+  实例.启动();
+  if (!实例.是否已停止()) 确保逐段直线路径点特效Tick();
+  return 实例;
 }
 
 export function 创建单位脚下点特效(unit: any, 参数: 单位脚下点特效参数): any {
@@ -521,7 +644,10 @@ function on单位坐标跟随特效Tick(this: void): void {
       销毁单位坐标跟随特效记录(key, record);
       continue;
     }
-    DzSetEffectPos(record.effect, GetUnitX(record.unit), GetUnitY(record.unit), record.height);
+    const x = GetUnitX(record.unit);
+    const y = GetUnitY(record.unit);
+    EXSetEffectXY(record.effect, x, y);
+    EXSetEffectZ(record.effect, EC_GetPointZ(x, y) + record.height);
   }
   if (单位坐标跟随特效数量 <= 0) {
     停止单位坐标跟随特效Tick();
@@ -533,7 +659,7 @@ function 确保单位坐标跟随特效Tick(this: void): void {
   单位坐标跟随特效回调ID = addPeriodicCallback(单位坐标跟随特效间隔毫秒, on单位坐标跟随特效Tick);
 }
 
-export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number): any {
+export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number): any {
   if (!单位可坐标跟随(unit) || modelPath === "") return null;
   const key = getUnitEffectKey(unit, effectKey);
   if (key === "") return null;
@@ -547,7 +673,11 @@ export function 创建单位坐标跟随特效(unit: any, modelPath: string, eff
   const y = GetUnitY(unit);
   const effect = EC_CreateEffect(规范化特效模型路径(modelPath), x, y, height, 0, scale, animSpeed ?? 1, -1);
   if (!effect) return null;
-  DzSetEffectPos(effect, x, y, height);
+  EXSetEffectXY(effect, x, y);
+  EXSetEffectZ(effect, EC_GetPointZ(x, y) + height);
+  if (动画索引 != null && DzSetEffectAnimation != null) {
+    DzSetEffectAnimation(effect, 动画索引, 0);
+  }
   单位坐标跟随特效表[key] = { unit, effect, scale, height, animSpeed };
   单位坐标跟随特效数量 += 1;
   确保单位坐标跟随特效Tick();

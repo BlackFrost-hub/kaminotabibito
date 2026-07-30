@@ -45,19 +45,23 @@ local addPeriodicCallback = ____require_result_2.addPeriodicCallback
 local removePeriodicCallback = ____require_result_2.removePeriodicCallback
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_5["创建可攻击机制单位"]
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_6.registerManualBuff
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉")
-local _____5361_745F_62C9BuffID = ____require_result_7["卡瑟拉BuffID"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_8["施加快速减速Buff"]
-local ____require_result_9 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_9.doHeal
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_5["开始硬直"]
+local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_6["获取Boss技能敌对英雄列表"]
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_6["获取Boss技能随机敌对英雄"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_7["创建可攻击机制单位"]
+local ____require_result_8 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_8.registerManualBuff
+local ____require_result_9 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.02．卡瑟拉")
+local _____5361_745F_62C9BuffID = ____require_result_9["卡瑟拉BuffID"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_10["施加快速减速Buff"]
+local ____require_result_11 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_11.doHeal
 local _____5361_745F_62C9_5355_4F4D_7C7B_578BID = stringToFourCC(_____5361_745F_62C9_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____89E6_624B_97AD_7B1E_6280_80FDID = stringToFourCC(_____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手鞭笞"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -84,13 +88,13 @@ local function _____9009_62E9_89E6_624B_97AD_7B1E_76EE_6807(context)
             i = i + 1
         end
     end
-    local _____5355_4F4D_6709_6548_result_10
+    local _____5355_4F4D_6709_6548_result_12
     if _____5355_4F4D_6709_6548(best) then
-        _____5355_4F4D_6709_6548_result_10 = best
+        _____5355_4F4D_6709_6548_result_12 = best
     else
-        _____5355_4F4D_6709_6548_result_10 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
+        _____5355_4F4D_6709_6548_result_12 = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss, boss, 2000)
     end
-    return _____5355_4F4D_6709_6548_result_10
+    return _____5355_4F4D_6709_6548_result_12
 end
 local function _____6389_843D_89E6_624B_6B8B_7247_7ED9_51FB_6740_8005(context, killer)
     if not _____5355_4F4D_6709_6548(killer) then
@@ -172,6 +176,8 @@ local function _____521B_5EFA_5355_6761_89E6_624B(context, target, x, y)
         Y = y,
         ["朝向"] = 0,
         ["最大生命"] = cfg["触手生命值"],
+        ["攻击范围"] = cfg["触手攻击半径"],
+        ["固定站桩"] = true,
         ["缩放"] = cfg["触手缩放"],
         ["持续时间"] = cfg["触手持续秒"],
         ["on死亡"] = function(_unit, killer)
@@ -194,14 +200,21 @@ local function _____521B_5EFA_5355_6761_89E6_624B(context, target, x, y)
             _____89E6_624B_97AD_7B1E_4E00_8DF3(data)
         end
     )
-    local ____self_11 = context["清理"]
-    ____self_11["登记周期回调"](____self_11, "卡瑟拉-触手鞭笞周期", data["周期ID"])
+    local ____self_13 = context["清理"]
+    ____self_13["登记周期回调"](____self_13, "卡瑟拉-触手鞭笞周期", data["周期ID"])
+end
+local function _____64AD_653E_89E6_624B_51FA_73B0_7279_6548(context, x, y)
+    local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手鞭笞"]
+    local effect = _____521B_5EFA_70B9_7279_6548({["模型路径"] = cfg["触手出现特效模型路径"], X = x, Y = y, ["缩放"] = cfg["触手出现特效缩放"]})
+    local ____self_14 = context["清理"]
+    ____self_14["登记限时特效"](____self_14, "卡瑟拉-触手鞭笞出现特效", effect, cfg["触手出现特效持续秒"] * 1000)
 end
 local function _____91CA_653E_89E6_624B_56F4_653B(context, target)
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手鞭笞"]
     local cx = GetUnitX(target)
     local cy = GetUnitY(target)
     _____64AD_653EBoss_5750_6807_97F3_6548(_____5361_745F_62C9_97F3_6548_914D_7F6E["触手鞭笞"]["小触手出现"], cx, cy, _____5361_745F_62C9_97F3_6548_914D_7F6E["默认裁断距离"])
+    _____64AD_653E_89E6_624B_51FA_73B0_7279_6548(context, cx, cy)
     do
         local i = 0
         while i < cfg["触手数量"] do
@@ -226,6 +239,7 @@ ____exports["释放卡瑟拉触手鞭笞"] = function(context)
         return
     end
     local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手鞭笞"]
+    _____5F00_59CB_786C_76F4(boss, cfg["硬直秒"])
     _____64AD_653E_5361_745F_62C9_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["延迟秒"])
     _____64AD_653E_5361_745F_62C9_53F0_8BCD(boss, "触手鞭笞")
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
@@ -244,8 +258,8 @@ ____exports["释放卡瑟拉触手鞭笞"] = function(context)
             end
         end
     )
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "卡瑟拉-触手鞭笞围攻", id)
+    local ____self_15 = context["清理"]
+    ____self_15["登记延迟回调"](____self_15, "卡瑟拉-触手鞭笞围攻", id)
 end
 local function ____on_5361_745F_62C9_89E6_624B_97AD_7B1E_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____89E6_624B_97AD_7B1E_6280_80FDID then

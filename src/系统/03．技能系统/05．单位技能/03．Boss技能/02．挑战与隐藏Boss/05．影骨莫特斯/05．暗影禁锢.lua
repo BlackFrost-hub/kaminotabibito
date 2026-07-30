@@ -14,7 +14,11 @@ local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C = ____11_FF0E_516C_5171_5DE5_5177["播放影骨莫特斯限时动作"]
+local _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5 = ____11_FF0E_516C_5171_5DE5_5177["开始影骨莫特斯常规施法"]
+local _____4E24_70B9_89D2_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["两点角度"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -105,6 +109,16 @@ ____exports["释放影骨暗影禁锢"] = function(context, target)
     end
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "暗影禁锢")
     local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["暗影禁锢"]
+    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(
+        context["Boss单位"],
+        _____4E24_70B9_89D2_5EA6(
+            GetUnitX(context["Boss单位"]),
+            GetUnitY(context["Boss单位"]),
+            GetUnitX(target),
+            GetUnitY(target)
+        )
+    )
+    _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5(context["Boss单位"], cfg["预警秒"], "暗影禁锢", "离开锁定的暗影法阵")
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
     local x = GetUnitX(target)
     local y = GetUnitY(target)

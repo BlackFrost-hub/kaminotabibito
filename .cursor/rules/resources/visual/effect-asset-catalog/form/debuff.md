@@ -4,9 +4,12 @@
 | --- | --- | --- | --- | --- | ---: | --- |
 | `Common\Effect\Form\Debuff\AinzHeartCountdown.mdx` | 中央为深红解剖心脏浅浮雕，外围十二枚红色倒计时刻度；整体像悬浮的死亡状态图标。 | YZ 竖直朝向；心脏独立收缩回弹，刻度使用 `DontInterp` 逐秒离散熄灭；`Birth / Stand / Death`。 | 十二秒处决倒计时、心脏诅咒。 | 刻度承担读秒，熄灭后不得出现半透明恢复，且不能被外圈同步心跳抖动；处决需另叠捏心模型；心脏贴图层必须保持 `Transparent`，贴图必须使用兼容 1.27 的 JPEG 8-bit Alpha BLP。 | 22009 | `8641751488BD6A81` |
 | `Common\Effect\Form\Debuff\AinzHeartGrasp.mdx` | 一只苍白骨感手掌伸出并捏住红色心脏，主体清楚、动作直接。 | 一次性伸手、抓握和清理；`Birth / Stand / Death`。 | 心脏倒计时归零处决。 | 不承担十二秒倒计时；应与 `AinzHeartCountdown.mdx` 分层播放。 | 43822 | `61C734541C093323` |
+| `Common\Effect\Form\Debuff\AinzHeartGraspCountdownRing.mdx` | 鲜红多层能量环围绕单位原点持续旋转，强调被点名者正处于危险倒计时。 | 源 `birth / death`；迁移补齐安全 `Stand`，保留原有颜色流动轨道。 | 安兹乌尔恭·心脏掌握十二秒倒计时层；源 `导出特效\ddcyz1\ddcyz1.mdx`。 | 绑定被点名目标 `origin`，只承担持续点名状态；处决时由 `AinzHeartGraspExecutionBurst.mdx` 在目标坐标结算。私有 Flow 贴图已迁入本分类 `Texture`。 | 75064 | `264B5511595F5B40` |
 | `Common\Effect\Form\Debuff\AinzDeathClock.mdx` | 暗红死亡钟盘，单根指针，外围十二枚独立刻度；没有爱心或心脏图案。 | 竖直广告牌；每秒停驻后快速跳到下一刻度；`Birth / Stand / Death`。 | 十二秒死亡钟、逐秒滴答倒计时。 | 音效由技能逻辑逐秒播放；模型本身不嵌入十二个声音。 | 32546 | `F1DADF0C29068B4D` |
 | `Common\Effect\Form\Debuff\AlbedoWingBind.mdx` | 成对黑色羽翼与黑白翼光向中央合拢，形成包围目标的翼铠外壳。 | 向中心收拢后维持，再淡出；`Birth / Stand / Death`。 | 黑翼拘束、翼铠封锁。 | 外壳中央辨识度不足，必须叠加暗金核心。 | 83355 | `DA5671E1CD1CC527` |
 | `Common\Effect\Form\Debuff\AlbedoWingBindCore.mdx` | 暗金亮点、贴地圆环与上方收束符号组成清楚的拘束焦点。 | 低位核心循环维持；`Birth / Stand / Death`。 | 可选中的拘束核心、黑翼中心焦点。 | 只承担核心，不单独代替黑翼外壳。 | 19709 | `64C3B26EA3B9753B` |
+| `Common\Effect\Form\Debuff\AlbedoWingBindChains.mdx` | 多组亮红锁链从竖直与交叉方向缠住单位，形成明显的禁锢轮廓。 | 挂载于单位 `origin`；原模型含 `Birth / Stand / Death`。 | 雅儿贝德“黑翼拘束”的目标状态层，以及生命锚点封锁的可击破锁链外观。 | 黑翼拘束时与黑翼外壳、暗金核心叠加；封锁时仅替换视觉外观，不取代护盾数值或核心可攻击性。私有 `Chains.blp` 已迁入同分类 `Texture`，其余三张贴图保留原生游戏路径。 | 9207 | `8D66E09BD10F8A5B` |
+| `Common\Effect\Form\Debuff\GoldenLock.mdx` | 明亮金色挂锁主体，轮廓直接，能清楚表达封印和锁闭状态。 | 适合在单位原点持续跟随显示；动画表现沿用源裸模型。 | Boss 开局封印、金色锁闭状态、不可移动机制。 | 裸模型，不带私有贴图；全部材质继续使用原生游戏贴图路径。 | 14628 | `E38940F1EBAED7C6` |
 | `Common\Effect\Form\Debuff\dds2136-01.mdx` | 灰白圆环具有死亡时钟底盘感，画面克制。 | 圆环状态表现。 | 安兹死亡倒计时底层备选。 | 截图不能证明十二分段和逐格动画，不能替代正式死亡钟。 | 3308 | `DC0471807A787D15` |
 | `Common\Effect\Form\Debuff\SpiritGuardMoonBind.mdx` | 冷蓝弧线与魂点从外向内缓慢聚集，束缚方向明确。 | 原动画约三秒向内收拢；迁移版补齐安全 `Death`。 | 苍影灵卫月纹缚魂、冷蓝收束禁锢。 | 技能结算需加速到约 1.2 秒；不与镇魂印同点堆放。 | 9862 | `41383F0D0D2B16E0` |
 | `Common\Effect\Form\Debuff\byakuganaura.mdx` | 候选截图观察：灰白圆盘外沿具有刻度感，比普通法阵更接近时钟；中心图案仍偏眼瞳，且无法确认刻度数量。 | 迁移后序列：`Stand / Death`；完成 2 项结构修复。 | 安兹·死亡倒计时；源候选 `byakuganaura.mdx`。 | 与 `dds2136-01.mdx` 比较十二段可读性。 | 6172 | `489DD5A16A1BD868` |

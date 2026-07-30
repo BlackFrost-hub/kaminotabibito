@@ -17,8 +17,18 @@ local _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_1["
 local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_2["添加单位暂停"]
 local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_2["移除单位暂停"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_3["施加快速减速Buff"]
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_4.registerManualBuff
+local getBuffRuntime = ____require_result_4.getBuffRuntime
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_4["移除单位指定Buff"]
+local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.00．Buff登记")
+local _____5E38_89C4BuffID = ____require_result_5["常规BuffID"]
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.03．异界Boss.01．安兹乌尔恭")
+local _____5B89_5179_4E4C_5C14_606DBuffID = ____require_result_6["安兹乌尔恭BuffID"]
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_7.addDelayedCallback
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -33,6 +43,7 @@ local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____9ED1_7FFC_62D8_675F_6682_505C_6765_6E90 = "雅儿贝德-黑翼拘束"
+local _____9ED1_7FFC_62D8_675F_51CF_901F_6765_6E90 = "雅儿贝德-黑翼拘束减速"
 local function _____542F_52A8_9ED1_7FFC_62D8_675F_6838_5FC3(context, target, remainingSeconds)
     local state = context["雅儿贝德"]
     local albedo = state and state["单位"]
@@ -45,8 +56,32 @@ local function _____542F_52A8_9ED1_7FFC_62D8_675F_6838_5FC3(context, target, rem
     local coreLife = maxByAlbedo < maxByBoss and maxByAlbedo or maxByBoss
     local wing = AddSpecialEffectTarget(cfg["表现资源"]["雅儿贝德黑翼拘束特效路径"], target, "origin")
     local paused = false
+    local slowRuntime = nil
+    registerManualBuff(
+        target,
+        _____5B89_5179_4E4C_5C14_606DBuffID["黑翼拘束"],
+        remainingSeconds,
+        0,
+        {sourceName = _____9ED1_7FFC_62D8_675F_6682_505C_6765_6E90}
+    )
+    local restraintRuntime = getBuffRuntime(target, _____5B89_5179_4E4C_5C14_606DBuffID["黑翼拘束"])
     if _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570() > 1 then
         paused = _____6DFB_52A0_5355_4F4D_6682_505C(target, _____9ED1_7FFC_62D8_675F_6682_505C_6765_6E90)
+    else
+        local slowRatio = cfg["守护者模式"]["黑翼拘束单人减速比例"]
+        _____65BD_52A0_5FEB_901F_51CF_901FBuff(
+            albedo,
+            target,
+            slowRatio,
+            slowRatio,
+            remainingSeconds,
+            _____9ED1_7FFC_62D8_675F_51CF_901F_6765_6E90,
+            "技能"
+        )
+        local currentSlowRuntime = getBuffRuntime(target, _____5E38_89C4BuffID["减速"])
+        if currentSlowRuntime ~= nil and currentSlowRuntime.effectSourceName == _____9ED1_7FFC_62D8_675F_51CF_901F_6765_6E90 then
+            slowRuntime = currentSlowRuntime
+        end
     end
     local cleaned = false
     local function cleanup()
@@ -56,6 +91,12 @@ local function _____542F_52A8_9ED1_7FFC_62D8_675F_6838_5FC3(context, target, rem
         cleaned = true
         if paused then
             _____79FB_9664_5355_4F4D_6682_505C(target, _____9ED1_7FFC_62D8_675F_6682_505C_6765_6E90)
+        end
+        if restraintRuntime ~= nil and getBuffRuntime(target, _____5B89_5179_4E4C_5C14_606DBuffID["黑翼拘束"]) == restraintRuntime then
+            _____79FB_9664_5355_4F4D_6307_5B9ABuff(target, _____5B89_5179_4E4C_5C14_606DBuffID["黑翼拘束"])
+        end
+        if slowRuntime ~= nil and getBuffRuntime(target, _____5E38_89C4BuffID["减速"]) == slowRuntime then
+            _____79FB_9664_5355_4F4D_6307_5B9ABuff(target, _____5E38_89C4BuffID["减速"])
         end
         if wing ~= nil and wing ~= 0 then
             DestroyEffect(wing)
@@ -103,8 +144,8 @@ ____exports["启动雅儿贝德天空坠落联动"] = function(context, castSeco
             _____542F_52A8_9ED1_7FFC_62D8_675F_6838_5FC3(context, target, remaining)
         end
     )
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "雅儿贝德-天空坠落黑翼拘束", delayedId)
+    local ____self_10 = context["清理"]
+    ____self_10["登记延迟回调"](____self_10, "雅儿贝德-天空坠落黑翼拘束", delayedId)
 end
 ____exports["黑翼拘束技能状态"] = {
     ["已完成设计"] = true,

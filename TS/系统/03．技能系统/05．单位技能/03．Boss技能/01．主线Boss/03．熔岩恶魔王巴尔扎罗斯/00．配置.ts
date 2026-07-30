@@ -122,6 +122,7 @@ export const 巴尔扎罗斯单位技能配置 = {
     塞拉火焰形态: "BBZ6",
     塞拉冰霜形态: "BBZ7",
     熔岩暴走: "BBZ8",
+    绝对零度领域: "BBZ9",
   },
   模型: {
     Boss: "Boss\\Balzaroth\\Balzaroth.mdx",

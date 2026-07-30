@@ -36,8 +36,6 @@ local getServerTime = ____require_result_7.getServerTime
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
 local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_8["创建循环点特效"]
-local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_8["创建单位坐标跟随特效"]
-local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_8["销毁单位坐标跟随特效"]
 local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
 local CosBJ = ____require_result_9.CosBJ
 local SinBJ = ____require_result_9.SinBJ
@@ -54,7 +52,7 @@ local IsUnitType = jass.IsUnitType
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local function _____53D6_573A_5730_4E2D_5FC3(context)
@@ -108,10 +106,12 @@ end
 local function _____521B_5EFA_5B89_5168_70B9_63D0_793A(point, _____6301_7EED_79D2)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]
     if point["左"] ~= nil and point["右"] ~= nil and point["下"] ~= nil and point["上"] ~= nil then
+        local _____77E9_5F62_8DEF_5F84_8D77_70B9X = (point["左"] + point["右"]) / 2
+        local _____77E9_5F62_8DEF_5F84_8D77_70B9Y = point["下"]
         _____521B_5EFA_6280_80FD_63D0_793A_5708({
             ["类型"] = "矩形",
-            X = point.X,
-            Y = point.Y,
+            X = _____77E9_5F62_8DEF_5F84_8D77_70B9X,
+            Y = _____77E9_5F62_8DEF_5F84_8D77_70B9Y,
             ["宽度"] = point["右"] - point["左"],
             ["长度"] = point["上"] - point["下"],
             ["朝向"] = 90,
@@ -157,13 +157,19 @@ end
 local function _____521B_5EFA_672B_65E5_7194_7206_5F15_5BFC_8868_73B0(context, center, safePoints)
     local boss = context["Boss单位"]
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]
-    _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
-        boss,
-        config["Boss蓄力特效路径"],
-        config["Boss蓄力特效键"],
-        config["Boss蓄力特效缩放"],
-        config["Boss蓄力特效高度"]
-    )
+    _____521B_5EFA_5FAA_73AF_70B9_7279_6548({
+        ["模型路径"] = config["Boss蓄力特效路径"],
+        X = GetUnitX(boss),
+        Y = GetUnitY(boss),
+        Z = config["Boss蓄力特效高度"],
+        ["缩放"] = config["Boss蓄力特效缩放"],
+        ["重建间隔秒"] = config["Boss蓄力特效Tick秒"],
+        ["单次持续秒"] = config["Boss蓄力特效Tick秒"],
+        ["总持续秒"] = config["引导秒"],
+        ["存活条件"] = function()
+            return context["末日熔爆引导中"] and _____5355_4F4D_6709_6548(boss)
+        end
+    })
     _____521B_5EFA_5FAA_73AF_70B9_7279_6548({
         ["模型路径"] = config["场地中心法阵路径"],
         X = center.X,
@@ -206,7 +212,7 @@ local function _____70B9_5728_5B89_5168_533A(unit, safePoints)
                     if x >= point["左"] and x <= point["右"] and y >= point["下"] and y <= point["上"] then
                         return true
                     end
-                    goto __continue23
+                    goto __continue24
                 end
                 local dx = x - safePoints[i + 1].X
                 local dy = y - safePoints[i + 1].Y
@@ -214,7 +220,7 @@ local function _____70B9_5728_5B89_5168_533A(unit, safePoints)
                     return true
                 end
             end
-            ::__continue23::
+            ::__continue24::
             i = i + 1
         end
     end
@@ -269,7 +275,7 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue35
+                    goto __continue36
                 end
                 if _____70B9_5728_5B89_5168_533A(hero, safePoints) then
                     _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -278,7 +284,7 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _
                         ["伤害"] = _____8BA1_7B97_5B89_5168_533A_4F59_6CE2_4F24_5BB3(hero),
                         attack = false,
                         ranged = true,
-                        attackType = ATTACK_TYPE_CHAOS,
+                        attackType = ATTACK_TYPE_NORMAL,
                         ["伤害类型"] = DAMAGE_TYPE_FIRE,
                         weaponType = WEAPON_TYPE_WHOKNOWS,
                         ["来源类型"] = "Boss技能",
@@ -293,7 +299,7 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _
                         ["伤害"] = _____8BA1_7B97_5916_5708_4F24_5BB3(boss, hero),
                         attack = false,
                         ranged = true,
-                        attackType = ATTACK_TYPE_CHAOS,
+                        attackType = ATTACK_TYPE_NORMAL,
                         ["伤害类型"] = DAMAGE_TYPE_FIRE,
                         weaponType = WEAPON_TYPE_WHOKNOWS,
                         ["来源类型"] = "Boss技能",
@@ -302,7 +308,7 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _
                     })
                 end
             end
-            ::__continue35::
+            ::__continue36::
             i = i + 1
         end
     end
@@ -339,7 +345,6 @@ ____exports["释放巴尔扎罗斯末日熔爆"] = function(context)
         end,
         ["on生效"] = function()
             context["末日熔爆引导中"] = false
-            _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(boss, config["Boss蓄力特效键"])
             _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _____6280_80FD_5B9E_4F8BID)
         end
     })

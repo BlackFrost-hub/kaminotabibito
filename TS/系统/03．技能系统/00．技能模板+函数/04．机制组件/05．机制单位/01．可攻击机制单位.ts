@@ -29,6 +29,8 @@ export interface 可攻击机制单位参数 {
   Y: number;
   朝向?: number;
   最大生命?: number;
+  攻击范围?: number;
+  固定站桩?: boolean;
   生命值受小怪倍率?: boolean;
   飞行高度?: number;
   缩放?: number;
@@ -118,6 +120,8 @@ export function 创建可攻击机制单位(this: void, 参数: 可攻击机制�
     Y: 参数.Y,
     朝向: 参数.朝向,
     生命值: 参数.最大生命,
+    攻击范围: 参数.攻击范围,
+    固定站桩: 参数.固定站桩,
     生命值受小怪倍率: 参数.生命值受小怪倍率 === false ? false : true,
     飞行高度: 参数.飞行高度,
     缩放: 参数.缩放,

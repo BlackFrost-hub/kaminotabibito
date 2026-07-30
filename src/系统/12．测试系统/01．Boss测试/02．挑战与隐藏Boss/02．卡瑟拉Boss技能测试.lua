@@ -33,10 +33,10 @@ local ____require_result_10 = require("系统.03．技能系统.05．单位技�
 local _____91CA_653E_5361_745F_62C9_58A8_6C41_55B7_5410 = ____require_result_10["释放卡瑟拉墨汁喷吐"]
 local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.07．高压水炮")
 local _____91CA_653E_5361_745F_62C9_9AD8_538B_6C34_70AE = ____require_result_11["释放卡瑟拉高压水炮"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.08．触手解放")
-local _____89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E = ____require_result_12["触发卡瑟拉触手解放"]
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.09．共生电击")
-local _____91CA_653E_5361_745F_62C9_5171_751F_7535_51FB = ____require_result_13["释放卡瑟拉共生电击"]
+local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.09．共生电击")
+local _____91CA_653E_5361_745F_62C9_5171_751F_7535_51FB = ____require_result_12["释放卡瑟拉共生电击"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.02．数值与表现配置")
+local _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E = ____require_result_13["卡瑟拉数值与表现配置"]
 local _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3X = -540.6
 local _____4E34_65F6_6D4B_8BD5_573A_5730_4E2D_5FC3Y = -2495.2
 local _____4E34_65F6_6D4B_8BD5_73A9_5BB6Y = -3055.2
@@ -44,7 +44,11 @@ local CreateUnit = jass.CreateUnit
 local SetHeroLevel = jass.SetHeroLevel
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
+local GetUnitState = jass.GetUnitState
+local SetUnitState = jass.SetUnitState
 local GetPlayerId = jass.GetPlayerId
+local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____5361_745F_62C9_6D4B_8BD5Boss = {}
 local _____5361_745F_62C9_6D4B_8BD5_6B65_5175 = {}
 local _____5361_745F_62C9_6D4B_8BD5_5C71_4E18_4E4B_738B = {}
@@ -102,6 +106,58 @@ local function _____521B_5EFA_5361_745F_62C9_6D4B_8BD5(player)
     _____542F_52A8Boss_6D4B_8BD5_94FE_8DEF(boss)
     return _____83B7_53D6_6216_521B_5EFA_5361_745F_62C9_4E0A_4E0B_6587(boss)
 end
+local function _____8BBE_7F6E_5361_745F_62C9_6D4B_8BD5_9636_6BB5_751F_547D(context, _____751F_547D_6BD4_4F8B)
+    local ____opt_result_16
+    if context ~= nil then
+        ____opt_result_16 = context["Boss单位"]
+    end
+    local boss = ____opt_result_16
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(boss) then
+        return false
+    end
+    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    if not (maxLife > 0) then
+        return false
+    end
+    SetUnitState(boss, UNIT_STATE_LIFE, maxLife * _____751F_547D_6BD4_4F8B)
+    return true
+end
+local function _____51C6_5907_5361_745F_62C9P2(context)
+    local _____9636_6BB5_9608_503C = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段阈值"]
+    local _____751F_547D_6BD4_4F8B = (_____9636_6BB5_9608_503C["P2生命比例"] + _____9636_6BB5_9608_503C["P3生命比例"]) * 0.5
+    if not _____8BBE_7F6E_5361_745F_62C9_6D4B_8BD5_9636_6BB5_751F_547D(context, _____751F_547D_6BD4_4F8B) then
+        return false
+    end
+    local ____self_17 = context["阶段上下文"]
+    ____self_17["手动进入阶段"](____self_17, "P2", _____751F_547D_6BD4_4F8B)
+    context["阶段"] = 2
+    return true
+end
+local function _____51C6_5907_5361_745F_62C9P3_975E_6F5C_5165(context)
+    local _____751F_547D_6BD4_4F8B = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段阈值"]["P3生命比例"] * 0.5
+    if not _____8BBE_7F6E_5361_745F_62C9_6D4B_8BD5_9636_6BB5_751F_547D(context, _____751F_547D_6BD4_4F8B) then
+        return false
+    end
+    context["触手解放已触发"] = true
+    context["Boss潜入中"] = false
+    local ____self_18 = context["阶段上下文"]
+    ____self_18["手动进入阶段"](____self_18, "P3", _____751F_547D_6BD4_4F8B)
+    context["阶段"] = 3
+    return true
+end
+local function _____6D4B_8BD5_5361_745F_62C9_89E6_624B_89E3_653E(context)
+    if not _____51C6_5907_5361_745F_62C9P2(context) then
+        return
+    end
+    local _____751F_547D_6BD4_4F8B = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段阈值"]["P3生命比例"]
+    if not _____8BBE_7F6E_5361_745F_62C9_6D4B_8BD5_9636_6BB5_751F_547D(context, _____751F_547D_6BD4_4F8B) then
+        return
+    end
+    context["触手解放已触发"] = false
+    local ____self_19 = context["阶段上下文"]
+    ____self_19["手动进入阶段"](____self_19, "P3", _____751F_547D_6BD4_4F8B)
+    context["阶段"] = 3
+end
 local function _____6E05_7406_5361_745F_62C9_6D4B_8BD5(player, _context)
     local pid = GetPlayerId(player)
     local boss = _____5361_745F_62C9_6D4B_8BD5Boss[pid]
@@ -134,22 +190,22 @@ local function ____on_5361_745F_62C9_6280_80FD3_6D4B_8BD5_547D_4EE4(_player, con
     end
 end
 local function ____on_5361_745F_62C9_6280_80FD4_6D4B_8BD5_547D_4EE4(_player, context)
-    if context ~= nil then
+    if context ~= nil and _____51C6_5907_5361_745F_62C9P2(context) then
         _____91CA_653E_5361_745F_62C9_6DF1_6E0A_53EC_5524(context)
     end
 end
 local function ____on_5361_745F_62C9_6280_80FD5_6D4B_8BD5_547D_4EE4(_player, context)
-    if context ~= nil then
+    if context ~= nil and _____51C6_5907_5361_745F_62C9P2(context) then
         _____91CA_653E_5361_745F_62C9_9AD8_538B_6C34_70AE(context)
     end
 end
 local function ____on_5361_745F_62C9_6280_80FD6_6D4B_8BD5_547D_4EE4(_player, context)
     if context ~= nil then
-        _____89E6_53D1_5361_745F_62C9_89E6_624B_89E3_653E(context)
+        _____6D4B_8BD5_5361_745F_62C9_89E6_624B_89E3_653E(context)
     end
 end
 local function ____on_5361_745F_62C9_6280_80FD7_6D4B_8BD5_547D_4EE4(_player, context)
-    if context ~= nil then
+    if context ~= nil and _____51C6_5907_5361_745F_62C9P3_975E_6F5C_5165(context) then
         _____91CA_653E_5361_745F_62C9_5171_751F_7535_51FB(context)
     end
 end
@@ -157,10 +213,10 @@ local _____5361_745F_62C9_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "深海涡流", ["执行"] = ____on_5361_745F_62C9_6280_80FD1_6D4B_8BD5_547D_4EE4},
     {["序号"] = 2, ["名称"] = "触手鞭笞", ["执行"] = ____on_5361_745F_62C9_6280_80FD2_6D4B_8BD5_547D_4EE4},
     {["序号"] = 3, ["名称"] = "墨汁喷吐", ["执行"] = ____on_5361_745F_62C9_6280_80FD3_6D4B_8BD5_547D_4EE4},
-    {["序号"] = 4, ["名称"] = "深渊召唤", ["执行"] = ____on_5361_745F_62C9_6280_80FD4_6D4B_8BD5_547D_4EE4},
-    {["序号"] = 5, ["名称"] = "高压水炮", ["执行"] = ____on_5361_745F_62C9_6280_80FD5_6D4B_8BD5_547D_4EE4},
-    {["序号"] = 6, ["名称"] = "触手解放", ["执行"] = ____on_5361_745F_62C9_6280_80FD6_6D4B_8BD5_547D_4EE4},
-    {["序号"] = 7, ["名称"] = "共生电击", ["执行"] = ____on_5361_745F_62C9_6280_80FD7_6D4B_8BD5_547D_4EE4}
+    {["序号"] = 4, ["名称"] = "P2深渊召唤", ["执行"] = ____on_5361_745F_62C9_6280_80FD4_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 5, ["名称"] = "P2高压水炮", ["执行"] = ____on_5361_745F_62C9_6280_80FD5_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 6, ["名称"] = "P3触手解放", ["执行"] = ____on_5361_745F_62C9_6280_80FD6_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 7, ["名称"] = "P3共生电击", ["执行"] = ____on_5361_745F_62C9_6280_80FD7_6D4B_8BD5_547D_4EE4}
 }
 _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4({
     ["命令单位名"] = "卡瑟拉",

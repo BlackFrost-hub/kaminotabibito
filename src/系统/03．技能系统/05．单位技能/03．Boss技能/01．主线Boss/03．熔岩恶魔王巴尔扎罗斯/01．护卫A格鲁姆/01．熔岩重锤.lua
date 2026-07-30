@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 local ____00_FF0E_516C_5171 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．护卫A格鲁姆.00．公共")
 local _____683C_9C81_59C6_516C_5171 = ____00_FF0E_516C_5171["格鲁姆公共"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
@@ -14,6 +16,8 @@ local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____683C_9C81
 local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____683C_9C81_59C6_516C_5171_1["施加快速控制Buff"]
 local GetUnitX = ____683C_9C81_59C6_516C_5171_1.GetUnitX
 local GetUnitY = ____683C_9C81_59C6_516C_5171_1.GetUnitY
+local CosBJ = ____683C_9C81_59C6_516C_5171_1.CosBJ
+local SinBJ = ____683C_9C81_59C6_516C_5171_1.SinBJ
 local _____5FEB_901F_63A7_5236__51FB_6655 = ____683C_9C81_59C6_516C_5171_1["快速控制_击晕"]
 local _____5355_4F4D_6709_6548 = ____683C_9C81_59C6_516C_5171_1["单位有效"]
 local _____70B9_5230_5355_4F4D_8DDD_79BB_5E73_65B9 = ____683C_9C81_59C6_516C_5171_1["点到单位距离平方"]
@@ -57,6 +61,8 @@ local function _____7ED3_7B97_91CD_9524(context, angle)
         return
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩重锤"]
+    local _____7206_70B8X = GetUnitX(grum) + CosBJ(angle) * config["扇形半径"] * 0.5
+    local _____7206_70B8Y = GetUnitY(grum) + SinBJ(angle) * config["扇形半径"] * 0.5
     _____64AD_653E_70B9_7279_6548(
         config["冲击波特效路径"],
         GetUnitX(grum),
@@ -68,10 +74,19 @@ local function _____7ED3_7B97_91CD_9524(context, angle)
     )
     _____64AD_653E_70B9_7279_6548(
         config["爆炸特效路径"],
-        GetUnitX(grum),
-        GetUnitY(grum),
+        _____7206_70B8X,
+        _____7206_70B8Y,
         config["爆炸特效高度"],
         config["爆炸特效缩放"],
+        config["特效持续秒"],
+        angle
+    )
+    _____64AD_653E_70B9_7279_6548(
+        config["爆炸叠加特效路径"],
+        _____7206_70B8X,
+        _____7206_70B8Y,
+        config["爆炸特效高度"],
+        config["爆炸叠加特效缩放"],
         config["特效持续秒"],
         angle
     )
@@ -105,6 +120,7 @@ ____exports["释放格鲁姆重锤"] = function(context, target)
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩重锤"]
     local angle = _____53D6_65B9_5411_89D2(grum, target)
+    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(grum, angle)
     _____521B_5EFA_91CD_9524_63D0_793A(grum, angle)
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
         ["施法者"] = grum,

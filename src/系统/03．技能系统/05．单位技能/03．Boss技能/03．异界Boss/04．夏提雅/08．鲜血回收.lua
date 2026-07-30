@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__ArraySlice = ____lualib.__TS__ArraySlice
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
@@ -13,10 +12,14 @@ local ____04_FF0E_9C9C_8840_5370_8BB0 = require("系统.03．技能系统.05．�
 local _____5438_6536_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____04_FF0E_9C9C_8840_5370_8BB0["吸收夏提雅鲜血印记"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____19_FF0E_541F_5531_6761 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.19．吟唱条")
+local _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761 = ____19_FF0E_541F_5531_6761["显示夏提雅常规吟唱条"]
 local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_0.doHeal
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
@@ -64,6 +67,17 @@ local function _____7ED3_675F_9C9C_8840_56DE_6536(context)
         context["当前大型技能"] = nil
     end
 end
+local function _____590D_5236_9C9C_8840_56DE_6536_5370_8BB0_5217_8868(context)
+    local marks = {}
+    do
+        local i = 0
+        while i < #context["血印句柄列表"] do
+            marks[#marks + 1] = context["血印句柄列表"][i + 1]
+            i = i + 1
+        end
+    end
+    return marks
+end
 local function _____7ED3_7B97_9C9C_8840_56DE_6536(context)
     local boss = context["Boss单位"]
     _____64AD_653EBoss_5750_6807_97F3_6548(
@@ -73,7 +87,7 @@ local function _____7ED3_7B97_9C9C_8840_56DE_6536(context)
         _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
     )
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
-    local marks = __TS__ArraySlice(context["血印句柄列表"])
+    local marks = _____590D_5236_9C9C_8840_56DE_6536_5370_8BB0_5217_8868(context)
     local absorbed = 0
     do
         local i = 0
@@ -110,8 +124,10 @@ ____exports["释放夏提雅鲜血回收"] = function(context)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["鲜血印记"]
     context["当前大型技能"] = _____9C9C_8840_56DE_6536_6280_80FDKey
     context["普通机制忙碌到Ms"] = getServerTime() + (cfg["回收前摇秒"] + 0.25) * 1000
+    _____5F00_59CB_786C_76F4(boss, cfg["回收前摇秒"])
+    _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761(cfg["回收前摇秒"], cfg["吟唱条颜色ID"], cfg["吟唱条标题文本"], cfg["吟唱条提示文本"])
     _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(context)
-    local marks = __TS__ArraySlice(context["血印句柄列表"])
+    local marks = _____590D_5236_9C9C_8840_56DE_6536_5370_8BB0_5217_8868(context)
     do
         local i = 0
         while i < #marks do

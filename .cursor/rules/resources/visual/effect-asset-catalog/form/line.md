@@ -2,15 +2,17 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
+| `Common\Effect\Form\Line\DemonicRoarWave.mdx` | 金白色细长锥形冲击波，前缘尖锐，后方分出多道高速拖影。 | 单一 `stand` 序列；运行时以 Z 轴对准目标方向，可叠加俯仰和横滚，适合从高处嘴部斜向喷出。 | 巴尔扎罗斯恶魔咆哮波，也可作为火焰、圣光或能量类的短促直线吐息主体。 | 不是自动移动弹幕；需由弹幕系统驱动位移，或在发射点短时播放。高亮度较强，不与白色直线预警重叠。 | 2328 | `B82DCD3F00D10250` |
 | `Common\Effect\Form\Line\AinzRealityFractureMovingSlash.mdx` | 高饱和洋红宽弧斩光，带多道细长拖尾。 | `Birth / Stand / Death`；运行时沿固定起终点路径移动，模型视觉朝向相对移动方向偏移 `180°`。 | 安兹·现实断裂路径主体。 | 不代替机制预警；运行时 RGB `255 / 8 / 255`；表现顺序为图 1 路径主体后叠加图 2 命中层。 | 5932 | `CBC8FC760F568285` |
 | `Common\Effect\Form\Line\AinzRealityFracture.mdx` | 黑色空间切面只留下细白折线边缘，没有普通剑气的发光实体感。 | 单次切面爆发；运行时按固定方向旋转并覆盖在线段预警上。 | 时间停止解冻时的已锁定现实断裂瞬时结算。 | 不代替机制预警；普通现实断裂路径主体已改用移动模型，不得回退使用该静态模型。 | 8360 | `D48133EAE6FF15F7` |
 | `Common\Effect\Form\Line\BansheeGrayShockwave.mdx` | 黑灰色瞬间贯穿波，像死亡气息沿直线抽走生命，没有彩色法术感。 | 主表现集中在 `Birth`，`Stand / Death` 只负责安全清理。 | 女妖哭嚎结算、死亡直线冲击。 | 是瞬时主体，不是持续直线预警。 | 2788 | `82D0109A196DB7DA` |
+| `Common\Effect\Form\Line\AinzBansheeWailDesecrate.mdx` | 紫黑色骷髅与向下拖出的腐蚀灵焰柱。 | 主动画含 `Birth`；作为短时单点路径片段播放。 | 安兹女妖哭嚎八向死亡波的路径叠加层。 | 不替代 `BansheeGrayShockwave.mdx` 主死亡波；运行时每 `160` 距离、每 `0.1` 秒沿八方向逐段创建，路径长度 `1600`。 | 16146 | `8A12014D6BF28999` |
 | `Common\Effect\Form\Line\ShalltearBloodReturnRibbon.mdx` | 多股纤细深血红丝带与微光向中心回卷，带有吸取后返回施法者的感觉。 | 具有明显回归动势；`Birth / Stand / Death`。 | 汲血回流、鲜血回收连线。 | 进图确认运动方向和长度；不合格时回退到普通双节点连线。 | 58821 | `B92CDC0817B44ED4` |
 | `Common\Effect\Form\Line\DeathWave.mdx` | 暗色粒子波沿单一方向推进，接近死亡吐息。 | 直线移动冲击。 | 安兹女妖哭嚎死亡波备选。 | 当前偏蓝紫且体量可能偏小，需实测运动方向与颗粒密度。 | 12691 | `C6EDF59B988B1D66` |
 | `Common\Effect\Form\Line\ShalltearBloodReturnArc.mdx` | 深红弯曲能量带，比直线闪电更像血流或枪势回旋。 | 弧形回旋；迁移时补齐 Stand 起始关键帧。 | 夏提雅鲜血回收、血月轮舞回旋辅助。 | 动态方向和长度待实机确认，不能替换血印与血月法阵主体。 | 9900 | `E3B537000B7236B0` |
 | `Common\Effect\Form\Line\AronkosSoulSlashVolley.mdx` | 候选截图观察：多道冷青弯曲剑光交错，颜色与英魂剑士设定相符，也比纯白爆光更克制；但它不是路径预警。 | 迁移后序列：`Stand / Death`；完成 4 项结构修复。 | 亚伦柯斯·亡冥英斩命中 / P3 回斩刀光；源候选 `JNTX (432).mdx`。 | 作为命中或回斩主刀光，与 `JNTX (528).mdx`、`JNTX (527).mdx` 的短促斩痕备选组合。 | 13120 | `0DADB33DB89F04E2` |
 | `Common\Effect\Form\Line\AronkosSoulSlashImpact.mdx` | 候选截图观察：两者都是灰白短促剑痕，颜色与英魂剑士相符；前者轮廓较克制，后者冲击更强，但都不能表现完整的狭长路径和突进过程。 | 迁移后序列：`Death / Birth / Stand`；完成 8 项结构修复。 | 亚伦柯斯·亡冥英斩斩痕 / 命中辅助；源候选 `JNTX (527).mdx`。 | 分别保留为挥斩与命中补层；当前技能主体仍为暂无。 | 10599 | `FCDAA6495526DE88` |
 | `Common\Effect\Form\Line\AronkosSoulSlashTrail.mdx` | 候选截图观察：两者都是灰白短促剑痕，颜色与英魂剑士相符；前者轮廓较克制，后者冲击更强，但都不能表现完整的狭长路径和突进过程。 | 迁移后序列：`Death / Birth / Stand`；完成 8 项结构修复。 | 亚伦柯斯·亡冥英斩斩痕 / 命中辅助；源候选 `JNTX (528).mdx`。 | 分别保留为挥斩与命中补层；当前技能主体仍为暂无。 | 10375 | `71E96053083B2CC9` |
-| `Common\Effect\Form\Line\AinzAlbedoGuardianLink.mdx` | 候选截图观察：两个金色符文节点由细金线相连，能够直接表达至尊与守护者之间的职责连接，比持续闪电更稳重。 | 迁移后序列：`Birth / Stand / Death`；完成 5 项结构修复。 | 安兹、雅儿贝德·护卫连接 / 守护者之职责预连接；源候选 `JNTX (564).mdx`。 | 以双方位置动态取中点、旋转和缩放；预连接阶段降低亮度并渐显，正式连接时恢复完整亮度。 | 25956 | `9ACDF92FE467DDD6` |
+| `Common\Effect\Form\Line\AinzAlbedoGuardianLink.mdx` | 候选截图观察：两个金色符文节点由细金线相连，能够直接表达至尊与守护者之间的职责连接，比持续闪电更稳重。 | 迁移后序列：`Birth / Stand / Death`；完成 5 项结构修复。 | 安兹、雅儿贝德·护卫连接 / 守护者之职责预连接；源候选 `JNTX (564).mdx`。 | 以双方位置动态取中点、旋转和按距离缩放；缩放倍率 `1.2`，高度 `200`。 | 25956 | `9ACDF92FE467DDD6` |
 | `Common\Effect\Form\Line\ShalltearBloodReturnLink.mdx` | 候选截图观察：红色双节点连线能表达血能回收，但端点法阵偏规整、连线也略粗，不够像多股液态细血线。 | 迁移后序列：`Birth / Stand / Death`；完成 6 项结构修复。 | 夏提雅·鲜血回收连线；源候选 `JNTX (565).mdx`。 | 可缩小后作为单个血印回流备选；不直接定为最终首选。 | 25744 | `D41656804C8A41CC` |
 | `Common\Effect\Form\Line\ShalltearWideBloodSweep.mdx` | 候选截图观察：多道深红弧线沿同一方向划出，具备长枪横扫后的血术残痕和清楚的攻击方向；比普通红色爆点更适合表现轮舞的宽扫段。 | 迁移后序列：`Birth / Stand / Death`；完成 3 项结构修复。 | 夏提雅·血月轮舞的宽横扫枪势；源候选 `SwipeCaster.mdx`。 | 作为 `JNTX (418).mdx` 横扫主刀光的替代备选，小尺寸、短时播放；不能替代窄直线反刺的 `Red Quick.mdx`。 | 9295 | `9EB513A48CD60B8C` |

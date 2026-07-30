@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
+import { 立即设置单位朝向 } from "../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 import { 格鲁姆公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
   播放格鲁姆台词,
@@ -31,15 +32,28 @@ interface 火径点 {
   y: number;
 }
 
-function 取火径参数(this: void, grum: any, target: any): { center: 火径点; lineAngle: number; normalAngle: number } {
+interface 火径参数 {
+  center: 火径点;
+  start: 火径点;
+  lineAngle: number;
+  normalAngle: number;
+}
+
+function 取火径参数(this: void, grum: any, target: any): 火径参数 {
   const config = 巴尔扎罗斯技能数值配置.熔岩火径;
   const normalAngle = 取方向角(grum, target);
+  const lineAngle = normalAngle + 90;
+  const center = {
+    x: GetUnitX(grum) + CosBJ(normalAngle) * config.火线中心前移,
+    y: GetUnitY(grum) + SinBJ(normalAngle) * config.火线中心前移,
+  };
   return {
-    center: {
-      x: GetUnitX(grum) + CosBJ(normalAngle) * config.火线中心前移,
-      y: GetUnitY(grum) + SinBJ(normalAngle) * config.火线中心前移,
+    center,
+    start: {
+      x: center.x - CosBJ(lineAngle) * config.长度 * 0.5,
+      y: center.y - SinBJ(lineAngle) * config.长度 * 0.5,
     },
-    lineAngle: normalAngle + 90,
+    lineAngle,
     normalAngle,
   };
 }
@@ -87,7 +101,8 @@ function 创建火径(this: void, context: 巴尔扎罗斯运行时上下文, ce
   const grum = context.格鲁姆;
   if (!单位有效(grum)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩火径;
-  const effect = 播放点特效(config.火线模型路径, center.x, center.y, config.火线特效高度, config.火线特效缩放, config.持续秒, lineAngle);
+  // FireWall 的模型轴与几何火线垂直，表现额外转 90 度；预警和命中区域仍使用 lineAngle。
+  const effect = 播放点特效(config.火线模型路径, center.x, center.y, config.火线特效高度, config.火线特效缩放, config.持续秒, lineAngle + 90);
   context.清理.登记特效("格鲁姆-熔岩火径主特效", effect);
   创建线段危险区({
     清理: context.清理,
@@ -117,11 +132,12 @@ export function 释放格鲁姆火径(this: void, context: 巴尔扎罗斯运行
   const grum = context.格鲁姆;
   if (!单位有效(grum) || !单位有效(target)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩火径;
+  立即设置单位朝向(grum, 取方向角(grum, target));
   const fire = 取火径参数(grum, target);
   创建技能提示圈({
     类型: "矩形",
-    X: fire.center.x,
-    Y: fire.center.y,
+    X: fire.start.x,
+    Y: fire.start.y,
     宽度: config.宽度,
     长度: config.长度,
     朝向: fire.lineAngle,

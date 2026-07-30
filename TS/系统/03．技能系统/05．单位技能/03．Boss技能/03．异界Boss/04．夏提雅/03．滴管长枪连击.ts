@@ -6,10 +6,11 @@ import { 获取夏提雅运行时上下文, 重置夏提雅猎血连击 } from '
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 创建夏提雅鲜血印记 } from './04．鲜血印记';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
-import { 单位是否处于硬控制效果合集 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
+import { 开始硬直, 单位是否处于硬控制效果合集 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -141,6 +142,8 @@ function 启动强化穿刺(this: void, context: 夏提雅运行时上下文, ta
   重置夏提雅猎血连击(context);
   context.普通机制忙碌到Ms = getServerTime() + (windup + 0.25) * 1000;
   SetUnitFacing(boss, Atan2(GetUnitY(target) - GetUnitY(boss), GetUnitX(target) - GetUnitX(boss)) * RAD_TO_DEG);
+  开始硬直(boss, windup);
+  显示夏提雅常规吟唱条(windup, cfg.吟唱条颜色ID, cfg.吟唱条标题文本, cfg.吟唱条提示文本);
   播放限时单位动画({ 单位: boss, 动画编号: cfg.强化穿刺动画编号, 持续秒: windup + 0.2, 恢复动画编号: 0 });
   const delayedId = addDelayedCallback(windup * 1000, function 夏提雅强化穿刺结算(this: void): void {
     if (!单位有效(boss) || !单位有效(target) || context.挑战已结束 || context.当前大型技能 != null) return;

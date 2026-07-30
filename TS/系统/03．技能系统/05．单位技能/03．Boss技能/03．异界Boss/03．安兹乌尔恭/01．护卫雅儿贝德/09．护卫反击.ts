@@ -4,8 +4,9 @@ import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技�
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
 import { 创建反击窗口模板, type 反击窗口模板实例 } from '../../../../../00．技能模板+函数/00．技能模板/09．复杂战斗模板/01．反击窗口模板';
-import { 开始冲锋 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
+import { 开始雅儿贝德冲锋 } from './00．冲锋表现';
 import { 播放限时单位动画 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直, 获取单位硬直剩余时间, 调整单位硬直时间 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 
@@ -15,6 +16,9 @@ const { 造成单体技能伤害 } = require('系统.04．伤害系统.08．技�
 const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
+};
+const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 
 const jass = require('jass.common') as any;
@@ -38,6 +42,22 @@ const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
 
+function 播放护卫反击命中特效(this: void, target: any): void {
+  const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
+  创建点特效({
+    模型路径: 安兹乌尔恭数值与表现配置.表现资源.雅儿贝德护卫反击命中特效路径,
+    X: GetUnitX(target),
+    Y: GetUnitY(target),
+    缩放: cfg.护卫反击命中特效缩放,
+    持续秒: cfg.护卫反击命中特效持续秒,
+  });
+}
+
+function 结束护卫反击守势硬直(this: void, albedo: any): void {
+  const remaining = 获取单位硬直剩余时间(albedo);
+  if (remaining > 0) 调整单位硬直时间(albedo, 1, remaining);
+}
+
 function 结算护卫反击(this: void, context: 安兹运行时上下文, attacker: any, token: number): void {
   const state = context.雅儿贝德;
   const albedo = state?.单位;
@@ -53,7 +73,7 @@ function 结算护卫反击(this: void, context: 安兹运行时上下文, attac
       来源攻击力比例: cfg.护卫反击伤害攻击力比例,
       目标最大生命比例: cfg.护卫反击伤害目标最大生命比例,
     });
-    造成单体技能伤害({
+    const 已命中 = 造成单体技能伤害({
       来源: albedo,
       目标: attacker,
       伤害: damage,
@@ -65,6 +85,7 @@ function 结算护卫反击(this: void, context: 安兹运行时上下文, attac
       来源类型: 'Boss技能',
       标签: '雅儿贝德·护卫反击',
     });
+    if (已命中) 播放护卫反击命中特效(attacker);
   }
   state.独占状态?.结束(token, '完成');
 }
@@ -89,6 +110,7 @@ function 启动护卫反击动作(this: void, context: 安兹运行时上下文,
       ? distance - cfg.护卫反击攻击距离
       : cfg.护卫反击最大冲锋距离)
     : 0;
+  结束护卫反击守势硬直(albedo);
 
 function 播放反击砸击并结算(this: void): void {
   播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.雅儿贝德护卫拦截, GetUnitX(albedo), GetUnitY(albedo), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
@@ -97,6 +119,7 @@ function 播放反击砸击并结算(this: void): void {
       return;
     }
     SetUnitFacing(albedo, Atan2(GetUnitY(attacker) - GetUnitY(albedo), GetUnitX(attacker) - GetUnitX(albedo)) * RAD_TO_DEG);
+    开始硬直(albedo, cfg.护卫反击结算延迟秒 + 0.35);
     播放限时单位动画({
       单位: albedo,
       动画编号: cfg.护卫反击攻击动画编号,
@@ -115,7 +138,7 @@ function 播放反击砸击并结算(this: void): void {
   }
   const endX = GetUnitX(albedo) + Cos(angle) * moveDistance;
   const endY = GetUnitY(albedo) + Sin(angle) * moveDistance;
-  const chargeId = 开始冲锋(albedo, {
+  const chargeId = 开始雅儿贝德冲锋(albedo, {
     目标X: endX,
     目标Y: endY,
     距离: moveDistance,
@@ -153,6 +176,7 @@ export function 释放雅儿贝德护卫反击(this: void, context: 安兹运行
   if (token === 0) return false;
   state.守护连接生效 = false;
   state.上次护卫反击Ms = now;
+  开始硬直(albedo, cfg.护卫反击窗口秒);
   播放限时单位动画({
     单位: albedo,
     动画编号: cfg.护卫反击守势动画编号,

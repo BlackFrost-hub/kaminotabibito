@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．运行时上下文")
+local _____5F00_59CB_7956_5730_53CC_7075_536B_5E38_89C4_65BD_6CD5 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["开始祖地双灵卫常规施法"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
 local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["祖地双灵卫数值与表现配置"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
@@ -131,12 +133,6 @@ local function _____68C0_67E5_7977_6F6E_7A7F_8FC7_6821_51C6_8282_70B9(context, s
 end
 ____exports["释放失名祷潮"] = function(context, target)
     local boss = context["苍影灵卫单位"]
-    _____64AD_653EBoss_5750_6807_97F3_6548(
-        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["苍影镇魂印"],
-        GetUnitX(boss),
-        GetUnitY(boss),
-        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
-    )
     if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
         return false
     end
@@ -161,6 +157,8 @@ ____exports["释放失名祷潮"] = function(context, target)
     local endY = _____6781_5750_6807Y(startY, facing, cfg["长度"])
     context["大型机制忙碌到Ms"] = getServerTime() + (cfg["预警秒"] + 0.5) * 1000
     _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(boss, facing)
+    _____5F00_59CB_7956_5730_53CC_7075_536B_5E38_89C4_65BD_6CD5(boss, cfg["预警秒"], "失名祷潮", "沿锁定方向释放灵魂潮，镇魂印可将其吸收")
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["苍影镇魂印"], startX, startY, _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"])
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "方向直线",
         X = startX,

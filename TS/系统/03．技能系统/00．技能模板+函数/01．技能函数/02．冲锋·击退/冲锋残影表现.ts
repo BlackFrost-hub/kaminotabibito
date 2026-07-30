@@ -21,8 +21,8 @@ const {
   开始冲锋,
   获取单位当前位移ID,
 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统") as {
-  开始冲锋: (单位: any, 参数: any) => number;
-  获取单位当前位移ID: (单位: any) => number;
+  开始冲锋: (this: void, 单位: any, 参数: any) => number;
+  获取单位当前位移ID: (this: void, 单位: any) => number;
 };
 
 const {
@@ -63,6 +63,7 @@ const EXSetEffectXY = japi?.EXSetEffectXY as ((effect: any, x: number, y: number
 const EXSetEffectZ = japi?.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
 const EXSetEffectSize = japi?.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const EXSetEffectSpeed = japi?.EXSetEffectSpeed as ((effect: any, speed: number) => void) | undefined;
+const EXEffectMatRotateZ = japi?.EXEffectMatRotateZ as ((effect: any, angle: number) => void) | undefined;
 
 const TICK_INTERVAL = 0.01;
 const UNIT_ALIVE_LIFE = 0.405;
@@ -87,6 +88,7 @@ export interface 冲锋残影表现参数 {
   残影生成间隔?: number;
   飞行高度变化?: number;
   残影缩放?: number;
+  残影朝向?: number;
 }
 
 interface 冲锋残影表现实例 {
@@ -106,6 +108,7 @@ interface 冲锋残影表现实例 {
   飞行高度变化: number;
   已应用飞行高度变化: boolean;
   残影缩放: number;
+  残影朝向?: number;
 }
 
 const 活动冲锋残影表现列表: 冲锋残影表现实例[] = [];
@@ -201,6 +204,9 @@ function 创建一次残影(实例: 冲锋残影表现实例): void {
   if (typeof EXSetEffectSpeed === "function") {
     EXSetEffectSpeed(effect, 实例.动画速度);
   }
+  if (typeof EXEffectMatRotateZ === "function" && 实例.残影朝向 != null) {
+    EXEffectMatRotateZ(effect, 实例.残影朝向);
+  }
   if (typeof DzSetEffectAnimation === "function" && 实例.动画序号 != null) {
     DzSetEffectAnimation(effect, 实例.动画序号, 0);
   }
@@ -275,6 +281,7 @@ export function 开始冲锋并附带残影表现(单位: any, 位移参数: any
     飞行高度变化,
     已应用飞行高度变化: 飞行高度变化 !== 0,
     残影缩放: 表现参数.残影缩放 != null && 表现参数.残影缩放 > 0 ? 表现参数.残影缩放 : DEFAULT_AFTERIMAGE_SCALE,
+    残影朝向: 表现参数.残影朝向,
   };
 
   冲锋残影表现映射[冲锋ID] = 实例;

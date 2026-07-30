@@ -49,11 +49,11 @@ const { 释放卡瑟拉墨汁喷吐 } = require("系统.03．技能系统.05．�
 const { 释放卡瑟拉高压水炮 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.07．高压水炮") as {
   释放卡瑟拉高压水炮: (this: void, context: any) => void;
 };
-const { 触发卡瑟拉触手解放 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.08．触手解放") as {
-  触发卡瑟拉触手解放: (this: void, context: any) => void;
-};
 const { 释放卡瑟拉共生电击 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.09．共生电击") as {
   释放卡瑟拉共生电击: (this: void, context: any) => boolean;
+};
+const { 卡瑟拉数值与表现配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.02．数值与表现配置") as {
+  卡瑟拉数值与表现配置: any;
 };
 
 const 临时测试场地中心X = -540.6;
@@ -64,7 +64,11 @@ const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number
 const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCandy: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facingAngle: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
+const GetUnitState = jass.GetUnitState as (unit: any, whichUnitState: any) => number;
+const SetUnitState = jass.SetUnitState as (unit: any, whichUnitState: any, newValue: number) => void;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const 卡瑟拉测试Boss: Record<number, any> = {};
 const 卡瑟拉测试步兵: Record<number, any> = {};
@@ -122,6 +126,43 @@ function 创建卡瑟拉测试(this: void, player: any): any {
   return 获取或创建卡瑟拉上下文(boss);
 }
 
+function 设置卡瑟拉测试阶段生命(this: void, context: any, 生命比例: number): boolean {
+  const boss = context?.Boss单位;
+  if (!Boss测试单位存活(boss)) return false;
+  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  if (!(maxLife > 0)) return false;
+  SetUnitState(boss, UNIT_STATE_LIFE, maxLife * 生命比例);
+  return true;
+}
+
+function 准备卡瑟拉P2(this: void, context: any): boolean {
+  const 阶段阈值 = 卡瑟拉数值与表现配置.阶段阈值;
+  const 生命比例 = (阶段阈值.P2生命比例 + 阶段阈值.P3生命比例) * 0.5;
+  if (!设置卡瑟拉测试阶段生命(context, 生命比例)) return false;
+  context.阶段上下文.手动进入阶段("P2", 生命比例);
+  context.阶段 = 2;
+  return true;
+}
+
+function 准备卡瑟拉P3非潜入(this: void, context: any): boolean {
+  const 生命比例 = 卡瑟拉数值与表现配置.阶段阈值.P3生命比例 * 0.5;
+  if (!设置卡瑟拉测试阶段生命(context, 生命比例)) return false;
+  context.触手解放已触发 = true;
+  context.Boss潜入中 = false;
+  context.阶段上下文.手动进入阶段("P3", 生命比例);
+  context.阶段 = 3;
+  return true;
+}
+
+function 测试卡瑟拉触手解放(this: void, context: any): void {
+  if (!准备卡瑟拉P2(context)) return;
+  const 生命比例 = 卡瑟拉数值与表现配置.阶段阈值.P3生命比例;
+  if (!设置卡瑟拉测试阶段生命(context, 生命比例)) return;
+  context.触手解放已触发 = false;
+  context.阶段上下文.手动进入阶段("P3", 生命比例);
+  context.阶段 = 3;
+}
+
 function 清理卡瑟拉测试(this: void, player: any, _context: any): void {
   const pid = GetPlayerId(player);
   const boss = 卡瑟拉测试Boss[pid];
@@ -148,29 +189,29 @@ function on卡瑟拉技能3测试命令(this: void, _player: any, context: any):
 }
 
 function on卡瑟拉技能4测试命令(this: void, _player: any, context: any): void {
-  if (context != null) 释放卡瑟拉深渊召唤(context);
+  if (context != null && 准备卡瑟拉P2(context)) 释放卡瑟拉深渊召唤(context);
 }
 
 function on卡瑟拉技能5测试命令(this: void, _player: any, context: any): void {
-  if (context != null) 释放卡瑟拉高压水炮(context);
+  if (context != null && 准备卡瑟拉P2(context)) 释放卡瑟拉高压水炮(context);
 }
 
 function on卡瑟拉技能6测试命令(this: void, _player: any, context: any): void {
-  if (context != null) 触发卡瑟拉触手解放(context);
+  if (context != null) 测试卡瑟拉触手解放(context);
 }
 
 function on卡瑟拉技能7测试命令(this: void, _player: any, context: any): void {
-  if (context != null) 释放卡瑟拉共生电击(context);
+  if (context != null && 准备卡瑟拉P3非潜入(context)) 释放卡瑟拉共生电击(context);
 }
 
 const 卡瑟拉测试技能列表: Boss测试技能命令[] = [
   { 序号: 1, 名称: "深海涡流", 执行: on卡瑟拉技能1测试命令 },
   { 序号: 2, 名称: "触手鞭笞", 执行: on卡瑟拉技能2测试命令 },
   { 序号: 3, 名称: "墨汁喷吐", 执行: on卡瑟拉技能3测试命令 },
-  { 序号: 4, 名称: "深渊召唤", 执行: on卡瑟拉技能4测试命令 },
-  { 序号: 5, 名称: "高压水炮", 执行: on卡瑟拉技能5测试命令 },
-  { 序号: 6, 名称: "触手解放", 执行: on卡瑟拉技能6测试命令 },
-  { 序号: 7, 名称: "共生电击", 执行: on卡瑟拉技能7测试命令 },
+  { 序号: 4, 名称: "P2深渊召唤", 执行: on卡瑟拉技能4测试命令 },
+  { 序号: 5, 名称: "P2高压水炮", 执行: on卡瑟拉技能5测试命令 },
+  { 序号: 6, 名称: "P3触手解放", 执行: on卡瑟拉技能6测试命令 },
+  { 序号: 7, 名称: "P3共生电击", 执行: on卡瑟拉技能7测试命令 },
 ];
 
 注册Boss测试命令组({

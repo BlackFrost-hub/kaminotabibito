@@ -6,10 +6,12 @@ import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 清理英灵战乙女投影 } from './09．英灵战乙女';
 import { 开始冲锋 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import { 创建立即执行阶段, 创建延迟阶段 } from '../../../../00．技能模板+函数/00．技能模板/01．多阶段技能编排/06．技能阶段链执行器';
 import { 播放夏提雅台词 } from './18．台词播放';
+import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const jass = require('jass.common') as any;
 
@@ -196,6 +198,7 @@ export function 释放夏提雅镜像夹击(this: void, context: 夏提雅运行
   const rawDistance = SquareRoot(dx * dx + dy * dy);
   if (!(rawDistance > 1) || rawDistance > cfg.镜像夹击本体最大距离) return false;
   const facing = Atan2(dy, dx) * RAD_TO_DEG;
+  SetUnitFacing(boss, facing);
   const directionX = CosBJ(facing);
   const directionY = SinBJ(facing);
   const bodyEndX = centerX + directionX * cfg.镜像夹击投影越过距离;
@@ -220,6 +223,8 @@ export function 释放夏提雅镜像夹击(this: void, context: 夏提雅运行
     最大持续毫秒: (totalSeconds + 1) * 1000,
     阶段列表: [
       创建立即执行阶段(function 夏提雅镜像夹击双路径预警(this: void): void {
+        开始硬直(boss, cfg.镜像夹击预警秒);
+        显示夏提雅常规吟唱条(cfg.镜像夹击预警秒, cfg.镜像夹击吟唱条颜色ID, cfg.镜像夹击吟唱条标题文本, cfg.镜像夹击吟唱条提示文本);
         清理英灵战乙女投影(context);
         创建技能提示圈({ 类型: '方向直线', X: bossX, Y: bossY, 宽度: cfg.镜像夹击路径宽度, 长度: bodyDistance, 朝向: facing, 持续时间: cfg.镜像夹击预警秒, 来源单位: boss });
         创建技能提示圈({ 类型: '方向直线', X: mirrorStartX, Y: mirrorStartY, 宽度: cfg.镜像夹击路径宽度, 长度: mirrorDistance, 朝向: facing + 180, 持续时间: cfg.镜像夹击预警秒 + cfg.镜像夹击第二段延迟秒, 来源单位: boss });

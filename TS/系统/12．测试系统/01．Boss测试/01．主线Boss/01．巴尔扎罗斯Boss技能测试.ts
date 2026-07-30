@@ -3,6 +3,7 @@
 import type { Boss测试技能命令 } from '../../00．Boss测试系统/00．Boss测试类型';
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const globals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 
 const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index") as {
@@ -23,7 +24,7 @@ const { 注册巴尔扎罗斯技能结构 } = require("系统.03．技能系统.
   注册巴尔扎罗斯技能结构: (this: void) => void;
 };
 const { 初始化巴尔扎罗斯熔核封印与护卫机制 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.04．熔核封印与护卫机制") as {
-  初始化巴尔扎罗斯熔核封印与护卫机制: (this: void, context: any) => void;
+  初始化巴尔扎罗斯熔核封印与护卫机制: (this: void, context: any, skipGuardCreation?: boolean) => void;
 };
 const { 初始化巴尔扎罗斯格鲁姆技能 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．护卫A格鲁姆.index") as {
   初始化巴尔扎罗斯格鲁姆技能: (this: void, context: any) => void;
@@ -42,8 +43,9 @@ const { 初始化巴尔扎罗斯末日熔爆节点, 释放巴尔扎罗斯末日�
   初始化巴尔扎罗斯末日熔爆节点: (this: void, context: any) => void;
   释放巴尔扎罗斯末日熔爆: (this: void, context: any) => void;
 };
-const { 释放巴尔扎罗斯恶魔咆哮波 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.07．恶魔咆哮波") as {
+const { 释放巴尔扎罗斯恶魔咆哮波, 释放巴尔扎罗斯护卫模仿恶魔咆哮波 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.07．恶魔咆哮波") as {
   释放巴尔扎罗斯恶魔咆哮波: (this: void, context: any) => void;
+  释放巴尔扎罗斯护卫模仿恶魔咆哮波: (this: void, context: any) => void;
 };
 const { 释放巴尔扎罗斯王者天罚 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.08．王者天罚") as {
   释放巴尔扎罗斯王者天罚: (this: void, context: any) => void;
@@ -59,7 +61,7 @@ const { 释放格鲁姆重锤, 释放格鲁姆火径 } = require("系统.03．�
   释放格鲁姆火径: (this: void, context: any, target: any) => void;
 };
 const { 释放冰焰双星, 释放绝对零度领域, 切换塞拉形态 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．护卫B塞拉.index") as {
-  释放冰焰双星: (this: void, context: any, target: any) => void;
+  释放冰焰双星: (this: void, context: any, target: any, 测试类型?: "双星" | "火焰" | "冰霜") => void;
   释放绝对零度领域: (this: void, context: any, target: any) => void;
   切换塞拉形态: (this: void, context: any, next: "火焰" | "冰霜", 播放台词: boolean) => void;
 };
@@ -67,8 +69,9 @@ const { 巴尔扎罗斯战斗区域配置, 巴尔扎罗斯固定安全区配置�
   巴尔扎罗斯战斗区域配置: any;
   巴尔扎罗斯固定安全区配置表: any[];
 };
-const { 巴尔扎罗斯护卫配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置") as {
+const { 巴尔扎罗斯护卫配置, 巴尔扎罗斯阶段阈值 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置") as {
   巴尔扎罗斯护卫配置: any;
+  巴尔扎罗斯阶段阈值: { 第三阶段生命比例: number };
 };
 const { 创建动态矩形区域组, 销毁动态矩形区域组 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.index") as {
   创建动态矩形区域组: (this: void, 名称: string, 配置列表: any[]) => any;
@@ -95,12 +98,27 @@ const 临时测试场地中心X = -540.6;
 const 临时测试场地中心Y = -2495.2;
 const 临时测试玩家X = -540.6;
 const 临时测试玩家Y = -3055.2;
+const 巴尔扎罗斯测试禁用护卫 = false;
+const 巴尔扎罗斯测试禁用护卫主动技能 = false;
+const 巴尔扎罗斯测试禁用格鲁姆主动技能 = false;
+const 巴尔扎罗斯测试禁用塞拉主动技能 = false;
+const 巴尔扎罗斯测试禁用格鲁姆普攻 = false;
+const 巴尔扎罗斯测试禁用塞拉普攻 = false;
 
 const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCandy: boolean) => void;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facingAngle: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
+const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
+const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const SetUnitAcquireRange = jass.SetUnitAcquireRange as (unit: any, range: number) => void;
+const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: string) => boolean;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const DzUnitDisableAttack = japi.DzUnitDisableAttack as ((unit: any, disabled: boolean) => void) | undefined;
 
 const 最近测试Boss: Record<number, any> = {};
 const 最近测试步兵: Record<number, any> = {};
@@ -134,6 +152,13 @@ function 放置巴尔扎罗斯测试护卫(this: void, context: any): void {
     SetUnitFacing(context.塞拉, 巴尔扎罗斯护卫配置.塞拉.面向);
     设置Boss测试单位满血(context.塞拉);
   }
+}
+
+function 禁用巴尔扎罗斯测试护卫普攻(this: void, guard: any): void {
+  if (!Boss测试单位存活(guard)) return;
+  SetUnitAcquireRange(guard, 0);
+  if (DzUnitDisableAttack != null) DzUnitDisableAttack(guard, true);
+  IssueImmediateOrder(guard, "stop");
 }
 
 function stringToFourCC(this: void, s: string): number {
@@ -178,14 +203,18 @@ function 准备巴尔扎罗斯测试场景(this: void, player: any, hero: any, b
 function 初始化巴尔扎罗斯测试上下文(this: void, context: any): void {
   注册巴尔扎罗斯运行时();
   注册巴尔扎罗斯技能结构();
-  初始化巴尔扎罗斯熔核封印与护卫机制(context);
-  初始化巴尔扎罗斯格鲁姆技能(context);
-  初始化巴尔扎罗斯塞拉技能(context);
+  初始化巴尔扎罗斯熔核封印与护卫机制(context, 巴尔扎罗斯测试禁用护卫);
+  if (!巴尔扎罗斯测试禁用护卫) {
+    if (!巴尔扎罗斯测试禁用护卫主动技能 && !巴尔扎罗斯测试禁用格鲁姆主动技能) 初始化巴尔扎罗斯格鲁姆技能(context);
+    if (!巴尔扎罗斯测试禁用护卫主动技能 && !巴尔扎罗斯测试禁用塞拉主动技能) 初始化巴尔扎罗斯塞拉技能(context);
+    放置巴尔扎罗斯测试护卫(context);
+    if (巴尔扎罗斯测试禁用格鲁姆普攻) 禁用巴尔扎罗斯测试护卫普攻(context.格鲁姆);
+    if (巴尔扎罗斯测试禁用塞拉普攻) 禁用巴尔扎罗斯测试护卫普攻(context.塞拉);
+  }
   初始化巴尔扎罗斯地核召唤节点(context);
   初始化巴尔扎罗斯熔岩护盾节点(context);
   初始化巴尔扎罗斯末日熔爆节点(context);
   应用Boss战启动属性配置(context.Boss单位);
-  放置巴尔扎罗斯测试护卫(context);
 }
 
 function 创建并初始化巴尔扎罗斯测试(this: void, player: any): any {
@@ -218,7 +247,20 @@ function on巴尔扎罗斯技能1测试命令(this: void, _player: any, context:
   释放巴尔扎罗斯恶魔咆哮波(context);
 }
 
+function on巴尔扎罗斯技能1护卫模仿测试命令(this: void, _player: any, context: any): void {
+  释放巴尔扎罗斯恶魔咆哮波(context);
+  释放巴尔扎罗斯护卫模仿恶魔咆哮波(context);
+}
+
 function on巴尔扎罗斯技能2测试命令(this: void, _player: any, context: any): void {
+  释放巴尔扎罗斯王者天罚(context);
+}
+
+function on巴尔扎罗斯技能2P3测试命令(this: void, _player: any, context: any): void {
+  const boss = context.Boss单位;
+  if (!Boss测试单位存活(boss)) return;
+  SetUnitState(boss, UNIT_STATE_LIFE, GetUnitState(boss, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯阶段阈值.第三阶段生命比例 * 0.5);
+  context.阶段 = 3;
   释放巴尔扎罗斯王者天罚(context);
 }
 
@@ -227,6 +269,16 @@ function on巴尔扎罗斯技能3测试命令(this: void, _player: any, context:
 }
 
 function on巴尔扎罗斯技能4测试命令(this: void, _player: any, context: any): void {
+  释放巴尔扎罗斯火焰锁链(context);
+}
+
+function on巴尔扎罗斯技能4超距测试命令(this: void, player: any, context: any): void {
+  const boss = context.Boss单位;
+  const target = 最近测试山丘之王[GetPlayerId(player)];
+  if (!Boss测试单位存活(boss) || !Boss测试单位存活(target)) return;
+  SetUnitPosition(target, GetUnitX(boss) + 700, GetUnitY(boss));
+  SetUnitFacing(target, 180);
+  设置Boss测试单位满血(target);
   释放巴尔扎罗斯火焰锁链(context);
 }
 
@@ -254,7 +306,7 @@ function on巴尔扎罗斯技能9测试命令(this: void, player: any, context: 
 }
 
 function on巴尔扎罗斯技能10测试命令(this: void, player: any, context: any): void {
-  const target = 最近测试步兵[GetPlayerId(player)];
+  const target = 获取Boss测试玩家基准英雄(player);
   if (Boss测试单位存活(context.塞拉) && Boss测试单位存活(target)) 释放绝对零度领域(context, target);
 }
 
@@ -268,9 +320,12 @@ function on巴尔扎罗斯技能12测试命令(this: void, _player: any, context
 
 const 巴尔扎罗斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 1, 名称: "恶魔咆哮波", 执行: on巴尔扎罗斯技能1测试命令 },
+  { 序号: 1, 命令: "1-2", 名称: "恶魔咆哮波(P2护卫模仿)", 执行: on巴尔扎罗斯技能1护卫模仿测试命令 },
   { 序号: 2, 名称: "王者天罚", 执行: on巴尔扎罗斯技能2测试命令 },
+  { 序号: 2, 命令: "2-3", 名称: "王者天罚(P3随机天罚)", 执行: on巴尔扎罗斯技能2P3测试命令 },
   { 序号: 3, 名称: "熔岩喷发", 执行: on巴尔扎罗斯技能3测试命令 },
   { 序号: 4, 名称: "火焰锁链", 执行: on巴尔扎罗斯技能4测试命令 },
+  { 序号: 4, 命令: "4-2", 名称: "火焰锁链(山丘之王700码超距)", 执行: on巴尔扎罗斯技能4超距测试命令 },
   { 序号: 5, 名称: "地核召唤", 执行: on巴尔扎罗斯技能5测试命令 },
   { 序号: 6, 名称: "末日熔爆", 执行: on巴尔扎罗斯技能6测试命令 },
   { 序号: 7, 名称: "格鲁姆熔岩重锤", 执行: on巴尔扎罗斯技能7测试命令 },

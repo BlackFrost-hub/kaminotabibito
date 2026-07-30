@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 祖地双灵卫运行时上下文, 祖地双灵卫净化节点状态 } from '../01．运行时上下文';
+import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
@@ -75,7 +76,6 @@ function 检查祷潮穿过校准节点(this: void, context: 祖地双灵卫运�
 
 export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时上下文, target?: any): boolean {
   const boss = context.苍影灵卫单位;
-  播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.苍影镇魂印, GetUnitX(boss), GetUnitY(boss), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   if (!单位有效(boss) || context.战斗已结束) return false;
   const targets = 取祷潮目标列表(boss, target);
   if (targets.length === 0) return false;
@@ -94,6 +94,8 @@ export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时
   const endY = 极坐标Y(startY, facing, cfg.长度);
   context.大型机制忙碌到Ms = getServerTime() + (cfg.预警秒 + 0.5) * 1000;
   立即设置单位朝向(boss, facing);
+  开始祖地双灵卫常规施法(boss, cfg.预警秒, '失名祷潮', '沿锁定方向释放灵魂潮，镇魂印可将其吸收');
+  播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.苍影镇魂印, startX, startY, 祖地双灵卫数值与表现配置.音效默认裁断距离);
   创建技能提示圈({ 类型: '方向直线', X: startX, Y: startY, 宽度: cfg.宽度, 长度: cfg.长度, 朝向: facing, 持续时间: cfg.预警秒, 来源单位: boss });
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: cfg.预警秒 + 0.35, 恢复动画编号: cfg.恢复动画编号 });
   createTimedEffect(祖地双灵卫数值与表现配置.表现资源.失名祷潮.祷潮蓄势特效路径, startX, startY, 0, cfg.预警秒);

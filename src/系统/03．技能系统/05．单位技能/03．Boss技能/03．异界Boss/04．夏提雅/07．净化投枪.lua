@@ -10,6 +10,8 @@ local ____04_FF0E_9C9C_8840_5370_8BB0 = require("系统.03．技能系统.05．�
 local _____51C0_5316_843D_70B9_5185_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____04_FF0E_9C9C_8840_5370_8BB0["净化落点内夏提雅鲜血印记"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local ____09_FF0E_82F1_7075_6218_4E59_5973 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.09．英灵战乙女")
@@ -21,6 +23,8 @@ local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____19_FF0E_541F_5531_6761 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.19．吟唱条")
+local _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761 = ____19_FF0E_541F_5531_6761["显示夏提雅常规吟唱条"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -36,6 +40,7 @@ local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local SetUnitFacing = jass.SetUnitFacing
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
 local Atan2 = jass.Atan2
@@ -171,6 +176,15 @@ ____exports["释放夏提雅净化投枪"] = function(context, target)
     local secondX = _____5355_4F4D_6709_6548(secondTarget) and GetUnitX(secondTarget) or x
     local secondY = _____5355_4F4D_6709_6548(secondTarget) and GetUnitY(secondTarget) or y
     local totalDuration = cfg["预警秒"] + (isP3 and cfg["P3第二枚投枪延迟秒"] or 0)
+    SetUnitFacing(
+        boss,
+        Atan2(
+            y - GetUnitY(boss),
+            x - GetUnitX(boss)
+        ) * RAD_TO_DEG
+    )
+    _____5F00_59CB_786C_76F4(boss, totalDuration)
+    _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761(totalDuration, cfg["吟唱条颜色ID"], cfg["吟唱条标题文本"], cfg["吟唱条提示文本"])
     context["上次净化投枪目标ID"] = GetHandleId(target)
     _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(context)
     context["普通机制忙碌到Ms"] = getServerTime() + (totalDuration + 0.4) * 1000

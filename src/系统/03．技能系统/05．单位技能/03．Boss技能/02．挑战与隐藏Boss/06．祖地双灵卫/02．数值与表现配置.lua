@@ -185,8 +185,8 @@ ____exports["祖地双灵卫数值与表现配置"] = {
             ["魂力回灌特效路径"] = "Common\\Effect\\Form\\RiseFall\\SpiritGuardSoulReflux.mdx",
             ["最终净化归静特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulReleasePillar.mdx"
         },
-        ["誓锋壁进"] = {["推进拖尾特效路径"] = "Common\\Effect\\Form\\Aura\\long.MDX", ["定向誓盾特效路径"] = "Common\\Effect\\Form\\Shield\\AlbedoDarkGoldBarrier.mdx", ["冲锋命中特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldHeavyImpact.mdx"},
-        ["盾刃裁决"] = {["盾击命中特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldHeavyImpact.mdx", ["剑刃重斩特效路径"] = "Common\\Effect\\Form\\Line\\AronkosSoulSlashImpact.mdx"},
+        ["誓锋壁进"] = {["推进拖尾特效路径"] = "Common\\Effect\\Form\\Aura\\long.MDX", ["定向誓盾特效路径"] = "Common\\Effect\\Form\\Shield\\AlbedoDarkGoldBarrier.mdx", ["冲锋命中特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx"},
+        ["盾刃裁决"] = {["盾击命中特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx", ["剑刃重斩特效路径"] = "Common\\Effect\\Form\\Line\\AronkosSoulSlashImpact.mdx"},
         ["灵印折步"] = {["消失特效路径"] = "Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx", ["出现特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulRiseRing.mdx", ["镇魂印地面特效路径"] = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx"},
         ["月纹缚魂"] = {["月纹地面特效路径"] = "Common\\Effect\\Form\\Debuff\\SpiritGuardMoonBind.mdx", ["禁锢生效特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulLightPillar.mdx"},
         ["封门校验"] = {["半场灵魂潮特效路径"] = "Common\\Effect\\Form\\Line\\DeathWave.mdx", ["誓盾阻挡特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx"},

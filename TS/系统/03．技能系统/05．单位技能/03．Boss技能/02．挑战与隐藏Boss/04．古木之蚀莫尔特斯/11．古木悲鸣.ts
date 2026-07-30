@@ -5,7 +5,7 @@ import { 获取或创建莫尔特斯上下文, 取玩家腐败值, type 莫尔�
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 播放莫尔特斯限时动作, 点到线段距离平方, stringToFourCC } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯大招施法, 点到线段距离平方, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -23,6 +23,9 @@ const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统
 };
 const { 施加恐惧 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统") as {
   施加恐惧: (this: void, source: any, target: any, params: any) => number;
+};
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
@@ -77,13 +80,12 @@ function 确保悲鸣蘑菇表现(this: void, context: 莫尔特斯运行时上�
   }
 }
 
-export function 释放莫尔特斯古木悲鸣(this: void, context: 莫尔特斯运行时上下文): void {
+function 结算莫尔特斯古木悲鸣(this: void, variable?: any): void {
+  const context = variable as 莫尔特斯运行时上下文 | undefined;
+  if (context == null) return;
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.古木悲鸣;
-  播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
-  播放莫尔特斯台词(boss, "古木悲鸣");
-  确保悲鸣蘑菇表现(context);
   创建点特效({ 模型路径: cfg.悲鸣特效路径, X: GetUnitX(boss), Y: GetUnitY(boss), 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(莫尔特斯音效配置.古木悲鸣.悲鸣波, GetUnitX(boss), GetUnitY(boss), 莫尔特斯音效配置.默认裁断距离);
   尝试播放Boss拟声池({
@@ -111,6 +113,18 @@ export function 释放莫尔特斯古木悲鸣(this: void, context: 莫尔特斯
       });
     }
   }
+}
+
+export function 释放莫尔特斯古木悲鸣(this: void, context: 莫尔特斯运行时上下文): void {
+  const boss = context.Boss单位;
+  if (!单位有效(boss)) return;
+  const cfg = 莫尔特斯数值与表现配置.古木悲鸣;
+  开始莫尔特斯大招施法(boss, cfg.动作播放秒, "古木悲鸣", "躲到巨型蘑菇后规避悲鸣冲击");
+  播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
+  播放莫尔特斯台词(boss, "古木悲鸣");
+  确保悲鸣蘑菇表现(context);
+  const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 结算莫尔特斯古木悲鸣, context);
+  context.清理.登记延迟回调("莫尔特斯-古木悲鸣结算", delayedId);
 }
 
 function on莫尔特斯古木悲鸣施法(this: void, castingUnit: any, spellAbilityId: number): void {

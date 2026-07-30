@@ -19,8 +19,10 @@ local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
 local ____require_result_4 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local IsUnitPausedBJ = ____require_result_4.IsUnitPausedBJ
-local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.02．目标选择")
-local _____83B7_53D6_5E94_653B_51FB_76EE_6807 = ____require_result_5["获取应攻击目标"]
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+local isValidCombatEnemyUnit = ____require_result_5.isValidCombatEnemyUnit
+local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.02．目标选择")
+local _____83B7_53D6_5E94_653B_51FB_76EE_6807 = ____require_result_6["获取应攻击目标"]
 local CreateUnit = jass.CreateUnit
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -74,7 +76,7 @@ end
 local function _____521B_5EFA_7A7A_9A71_52A8_72B6_6001()
     return {
         ["模式"] = "无",
-        ["兜底目标ID"] = 0,
+        ["攻击目标ID"] = 0,
         ["返回角度"] = 0,
         ["返回目标X"] = 0,
         ["返回目标Y"] = 0,
@@ -92,13 +94,21 @@ end
 local function _____5355_4F4D_53EF_4F5C_4E3A_4EC7_6068_76EE_6807(entry)
     return _____5355_4F4D_5B58_6D3B(entry.targetRef)
 end
-local function _____4EC7_6068_7CFB_7EDF_6B63_5728_63A5_7BA1(guard)
-    return _____83B7_53D6_5E94_653B_51FB_76EE_6807(guard, _____5355_4F4D_53EF_4F5C_4E3A_4EC7_6068_76EE_6807) ~= nil
-end
-local function _____9009_62E9Boss_9644_8FD1YD_73A9_5BB6_5355_4F4D(boss, _____73A9_5BB6_7EC4)
-    if _____73A9_5BB6_7EC4 == nil or _____73A9_5BB6_7EC4 == 0 then
-        return nil
+local function _____83B7_53D6_62A4_536B_4EC7_6068_76EE_6807(guard)
+    local entry = _____83B7_53D6_5E94_653B_51FB_76EE_6807(guard, _____5355_4F4D_53EF_4F5C_4E3A_4EC7_6068_76EE_6807)
+    local ____temp_7
+    if entry == nil then
+        ____temp_7 = nil
+    else
+        ____temp_7 = entry.targetRef
     end
+    return ____temp_7
+end
+local function _____5F53_524D_6B63_5728_6267_884C_653B_51FB_547D_4EE4(guard)
+    local orderId = GetUnitCurrentOrder(guard) or 0
+    return orderId == _____653B_51FB_547D_4EE4ID or orderId == _____653B_51FB_4E00_6B21_547D_4EE4ID
+end
+local function _____9009_62E9Boss_9644_8FD1_6218_6597_76EE_6807(boss, _____73A9_5BB6_7EC4)
     local group = CreateGroup()
     if group == nil or group == 0 then
         return nil
@@ -106,6 +116,7 @@ local function _____9009_62E9Boss_9644_8FD1YD_73A9_5BB6_5355_4F4D(boss, _____73A
     local bossX = GetUnitX(boss)
     local bossY = GetUnitY(boss)
     local result = nil
+    local resultIsYDPlayer = false
     local resultIsHero = false
     local bestDistanceSq = 0
     local bestHandleId = 0
@@ -123,20 +134,19 @@ local function _____9009_62E9Boss_9644_8FD1YD_73A9_5BB6_5355_4F4D(boss, _____73A
                 break
             end
             GroupRemoveUnit(group, candidate)
-            if not _____5355_4F4D_5B58_6D3B(candidate) then
+            if not isValidCombatEnemyUnit(candidate, boss) then
                 goto __continue13
             end
             local owner = GetOwningPlayer(candidate)
-            if owner == nil or owner == 0 or not IsPlayerInForce(owner, _____73A9_5BB6_7EC4) then
-                goto __continue13
-            end
+            local candidateIsYDPlayer = _____73A9_5BB6_7EC4 ~= nil and _____73A9_5BB6_7EC4 ~= 0 and owner ~= nil and owner ~= 0 and IsPlayerInForce(owner, _____73A9_5BB6_7EC4)
             local candidateIsHero = IsUnitType(candidate, UNIT_TYPE_HERO) == true
             local dx = GetUnitX(candidate) - bossX
             local dy = GetUnitY(candidate) - bossY
             local distanceSq = dx * dx + dy * dy
             local handleId = _____83B7_53D6_53E5_67C4ID(candidate)
-            if result == nil or candidateIsHero and not resultIsHero or candidateIsHero == resultIsHero and (distanceSq < bestDistanceSq or distanceSq == bestDistanceSq and handleId < bestHandleId) then
+            if result == nil or candidateIsYDPlayer and not resultIsYDPlayer or candidateIsYDPlayer == resultIsYDPlayer and candidateIsHero and not resultIsHero or candidateIsYDPlayer == resultIsYDPlayer and candidateIsHero == resultIsHero and (distanceSq < bestDistanceSq or distanceSq == bestDistanceSq and handleId < bestHandleId) then
                 result = candidate
+                resultIsYDPlayer = candidateIsYDPlayer
                 resultIsHero = candidateIsHero
                 bestDistanceSq = distanceSq
                 bestHandleId = handleId
@@ -150,13 +160,13 @@ end
 local function _____9A71_52A8_62A4_536B_653B_51FB(guard, target, state)
     local targetId = _____83B7_53D6_53E5_67C4ID(target)
     local currentOrderId = GetUnitCurrentOrder(guard) or 0
-    local _____5DF2_5728_653B_51FB_76F8_540C_76EE_6807 = state["模式"] == "攻击" and state["兜底目标ID"] == targetId and (currentOrderId == _____653B_51FB_547D_4EE4ID or currentOrderId == _____653B_51FB_4E00_6B21_547D_4EE4ID)
+    local _____5DF2_5728_653B_51FB_76F8_540C_76EE_6807 = state["模式"] == "攻击" and state["攻击目标ID"] == targetId and (currentOrderId == _____653B_51FB_547D_4EE4ID or currentOrderId == _____653B_51FB_4E00_6B21_547D_4EE4ID)
     if _____5DF2_5728_653B_51FB_76F8_540C_76EE_6807 or not _____5F53_524D_547D_4EE4_5141_8BB8_62A4_536B_9A71_52A8(guard) then
         return
     end
     if IssueTargetOrder(guard, "attack", target) then
         state["模式"] = "攻击"
-        state["兜底目标ID"] = targetId
+        state["攻击目标ID"] = targetId
     end
 end
 local function _____5237_65B0_62A4_536B_8FD4_56DE_70B9(boss, state)
@@ -179,7 +189,7 @@ local function _____9A71_52A8_62A4_536B_56DE_4F4D(guard, boss, state)
     local dy = GetUnitY(guard) - state["返回目标Y"]
     if dx * dx + dy * dy <= _____62A4_536B_8FD4_56DE_70B9_5230_8FBE_8DDD_79BB_5E73_65B9 then
         state["模式"] = "回位"
-        state["兜底目标ID"] = 0
+        state["攻击目标ID"] = 0
         return
     end
     if not _____5F53_524D_547D_4EE4_5141_8BB8_62A4_536B_9A71_52A8(guard) then
@@ -191,7 +201,7 @@ local function _____9A71_52A8_62A4_536B_56DE_4F4D(guard, boss, state)
     end
     if IssuePointOrder(guard, "move", state["返回目标X"], state["返回目标Y"]) then
         state["模式"] = "回位"
-        state["兜底目标ID"] = 0
+        state["攻击目标ID"] = 0
     end
 end
 local function ____on_62A4_536B_9A71_52A8Tick()
@@ -200,11 +210,11 @@ local function ____on_62A4_536B_9A71_52A8Tick()
         do
             local bossHandleId = __TS__ParseInt(bossKey, 10)
             if __TS__NumberIsNaN(__TS__Number(bossHandleId)) then
-                goto __continue29
+                goto __continue28
             end
             local list = _____6309Boss_53E5_67C4_7D22_5F15_7684_62A4_536B_53E5_67C4_8868[bossHandleId]
             if list == nil or #list == 0 then
-                goto __continue29
+                goto __continue28
             end
             local boss = nil
             do
@@ -219,9 +229,9 @@ local function ____on_62A4_536B_9A71_52A8Tick()
                 end
             end
             if not _____5355_4F4D_5B58_6D3B(boss) then
-                goto __continue29
+                goto __continue28
             end
-            local fallbackTarget = _____9009_62E9Boss_9644_8FD1YD_73A9_5BB6_5355_4F4D(boss, _____73A9_5BB6_7EC4)
+            local fallbackTarget = _____9009_62E9Boss_9644_8FD1_6218_6597_76EE_6807(boss, _____73A9_5BB6_7EC4)
             do
                 local i = 0
                 while i < #list do
@@ -229,30 +239,33 @@ local function ____on_62A4_536B_9A71_52A8Tick()
                         local guardHandleId = list[i + 1]
                         local record = _____6309_62A4_536B_53E5_67C4_7D22_5F15_7684_8BB0_5F55_8868[guardHandleId]
                         if record == nil or record["主Boss单位"] ~= boss or not _____5355_4F4D_5B58_6D3B(record["护卫单位"]) then
-                            goto __continue37
+                            goto __continue36
                         end
                         local state = _____6309_62A4_536B_53E5_67C4_7D22_5F15_7684_9A71_52A8_72B6_6001_8868[guardHandleId]
                         if state == nil then
                             state = _____521B_5EFA_7A7A_9A71_52A8_72B6_6001()
                             _____6309_62A4_536B_53E5_67C4_7D22_5F15_7684_9A71_52A8_72B6_6001_8868[guardHandleId] = state
                         end
-                        if _____4EC7_6068_7CFB_7EDF_6B63_5728_63A5_7BA1(record["护卫单位"]) then
-                            state["模式"] = "无"
-                            state["兜底目标ID"] = 0
-                            goto __continue37
+                        local threatTarget = _____83B7_53D6_62A4_536B_4EC7_6068_76EE_6807(record["护卫单位"])
+                        if threatTarget ~= nil and threatTarget ~= 0 then
+                            _____9A71_52A8_62A4_536B_653B_51FB(record["护卫单位"], threatTarget, state)
+                            goto __continue36
                         end
                         if fallbackTarget ~= nil and fallbackTarget ~= 0 then
                             _____9A71_52A8_62A4_536B_653B_51FB(record["护卫单位"], fallbackTarget, state)
-                        else
-                            _____9A71_52A8_62A4_536B_56DE_4F4D(record["护卫单位"], boss, state)
+                            goto __continue36
                         end
+                        if _____5F53_524D_6B63_5728_6267_884C_653B_51FB_547D_4EE4(record["护卫单位"]) then
+                            goto __continue36
+                        end
+                        _____9A71_52A8_62A4_536B_56DE_4F4D(record["护卫单位"], boss, state)
                     end
-                    ::__continue37::
+                    ::__continue36::
                     i = i + 1
                 end
             end
         end
-        ::__continue29::
+        ::__continue28::
     end
 end
 local function _____786E_4FDD_62A4_536B_9A71_52A8_5DF2_542F_52A8()
@@ -349,11 +362,11 @@ ____exports["创建护卫单位"] = function(_____53C2_6570)
     if unitTypeId == 0 then
         return nil
     end
-    local ____53C2_6570__6240_5C5E_73A9_5BB6_8 = _____53C2_6570["所属玩家"]
-    if ____53C2_6570__6240_5C5E_73A9_5BB6_8 == nil then
-        ____53C2_6570__6240_5C5E_73A9_5BB6_8 = GetOwningPlayer(_____53C2_6570["主Boss单位"])
+    local ____53C2_6570__6240_5C5E_73A9_5BB6_10 = _____53C2_6570["所属玩家"]
+    if ____53C2_6570__6240_5C5E_73A9_5BB6_10 == nil then
+        ____53C2_6570__6240_5C5E_73A9_5BB6_10 = GetOwningPlayer(_____53C2_6570["主Boss单位"])
     end
-    local owner = ____53C2_6570__6240_5C5E_73A9_5BB6_8
+    local owner = ____53C2_6570__6240_5C5E_73A9_5BB6_10
     if owner == nil or owner == 0 then
         return nil
     end
@@ -413,12 +426,12 @@ ____exports["获取护卫记录"] = function(unit)
     return record ~= nil and record["护卫单位"] == unit and record or nil
 end
 ____exports["获取护卫所属Boss"] = function(unit)
-    local ____opt_9 = ____exports["获取护卫记录"](unit)
-    return ____opt_9 and ____opt_9["主Boss单位"]
+    local ____opt_11 = ____exports["获取护卫记录"](unit)
+    return ____opt_11 and ____opt_11["主Boss单位"]
 end
 ____exports["获取护卫类型"] = function(unit)
-    local ____opt_11 = ____exports["获取护卫记录"](unit)
-    return ____opt_11 and ____opt_11["护卫类型"]
+    local ____opt_13 = ____exports["获取护卫记录"](unit)
+    return ____opt_13 and ____opt_13["护卫类型"]
 end
 ____exports["是否指定Boss护卫"] = function(unit, boss)
     local record = ____exports["获取护卫记录"](unit)
@@ -443,14 +456,14 @@ ____exports["获取Boss护卫列表"] = function(boss, _____53EA_8FD4_56DE_5B58_
             do
                 local record = _____6309_62A4_536B_53E5_67C4_7D22_5F15_7684_8BB0_5F55_8868[list[i + 1]]
                 if record == nil or record["主Boss单位"] ~= boss then
-                    goto __continue88
+                    goto __continue87
                 end
                 if _____53EA_8FD4_56DE_5B58_6D3B and not _____5355_4F4D_5B58_6D3B(record["护卫单位"]) then
-                    goto __continue88
+                    goto __continue87
                 end
                 result[#result + 1] = record["护卫单位"]
             end
-            ::__continue88::
+            ::__continue87::
             i = i + 1
         end
     end
@@ -475,7 +488,7 @@ ____exports["处理Boss结束全部护卫"] = function(boss)
                 local guard = list[i + 1]
                 local record = ____exports["获取护卫记录"](guard)
                 if record == nil or record["主Boss单位"] ~= boss then
-                    goto __continue96
+                    goto __continue95
                 end
                 local _____7ED3_675F_5904_7406 = record["Boss结束处理"]
                 ____exports["注销护卫单位"](guard)
@@ -485,7 +498,7 @@ ____exports["处理Boss结束全部护卫"] = function(boss)
                     KillUnit(guard)
                 end
             end
-            ::__continue96::
+            ::__continue95::
             i = i + 1
         end
     end

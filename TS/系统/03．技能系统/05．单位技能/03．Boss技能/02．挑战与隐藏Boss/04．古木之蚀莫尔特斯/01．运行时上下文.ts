@@ -50,6 +50,7 @@ export interface 莫尔特斯运行时上下文 {
   玩家腐败值单位表: Record<number, any>;
   根系觉醒已触发: boolean;
   腐朽领域已触发: boolean;
+  腐朽领域已生效: boolean;
   腐败之源组?: any;
   腐败传输节点已注册: boolean;
   腐败护盾值: number;
@@ -69,6 +70,7 @@ function 创建莫尔特斯上下文(this: void, boss: any, 清理: 机制清理
     玩家腐败值单位表: {},
     根系觉醒已触发: false,
     腐朽领域已触发: false,
+    腐朽领域已生效: false,
     腐败传输节点已注册: false,
     腐败护盾值: 0,
   };

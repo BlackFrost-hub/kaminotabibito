@@ -57,7 +57,7 @@ const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 const Player = jass.Player as (id: number) => any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
@@ -69,6 +69,7 @@ let 火焰锁链已注册 = false;
 interface 火焰锁链状态 {
   context: 巴尔扎罗斯运行时上下文;
   target: any;
+  chainInstance: any;
   chainUnit: any;
   line: any;
   tickId: number;
@@ -120,6 +121,11 @@ function 停止火焰锁链(this: void, state: 火焰锁链状态, removeBuff: b
     state.tickId = 0;
   }
   if (state.line != null) state.line.停止("火焰锁链结束");
+  if (state.chainInstance != null) {
+    state.chainInstance.销毁();
+    state.chainInstance = undefined;
+    state.chainUnit = undefined;
+  }
   if (removeBuff) 移除单位指定Buff(state.target, 巴尔扎罗斯单位技能配置.BuffID.火焰锁链);
 }
 
@@ -150,7 +156,7 @@ function on火焰锁链Tick(this: void, state: 火焰锁链状态): void {
     伤害: 计算超距伤害(boss, target),
     attack: false,
     ranged: true,
-    attackType: ATTACK_TYPE_CHAOS,
+    attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_FIRE,
     weaponType: WEAPON_TYPE_WHOKNOWS,
     来源类型: "Boss技能",
@@ -167,6 +173,7 @@ function 创建火焰锁链(this: void, context: 巴尔扎罗斯运行时上下�
   const state: 火焰锁链状态 = {
     context,
     target,
+    chainInstance: undefined,
     chainUnit: undefined,
     line: undefined,
     tickId: 0,
@@ -190,6 +197,7 @@ function 创建火焰锁链(this: void, context: 巴尔扎罗斯运行时上下�
     },
   });
   if (chain == null || !单位有效(chain.单位)) return;
+  state.chainInstance = chain;
   state.chainUnit = chain.单位;
   播放Boss坐标音效(巴尔扎罗斯音效配置.火焰锁链.锁定生成, centerX, centerY, 巴尔扎罗斯音效配置.默认裁断距离);
   state.line = 创建持续单位连线({

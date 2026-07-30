@@ -5,6 +5,7 @@ import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 开始冲锋 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 执行战斗自身传送到坐标 } from '../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 单位是否在扇形区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
@@ -47,6 +48,7 @@ const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const CosBJ = jass.CosBJ as (degrees: number) => number;
 const SinBJ = jass.SinBJ as (degrees: number) => number;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
+const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, scale: number) => void;
@@ -121,6 +123,7 @@ export function 释放夏提雅血月终舞(this: void, context: 夏提雅运行
   const recovery = GetRandomReal(cfg.血月终舞回落最小秒, cfg.血月终舞回落最大秒);
   const activeDuration = sectorTotal + chargeDuration;
   const totalDuration = activeDuration + recovery;
+  SetUnitFacing(boss, finalFacing);
   const executor = 创建固定组合技能执行器<夏提雅运行时上下文>({ 名称: '夏提雅-血月终舞', 清理: context.清理, 互斥组: '夏提雅大型技能' });
   context.血月终舞已释放 = true;
   context.当前大型技能 = 血月终舞技能Key;
@@ -128,6 +131,7 @@ export function 释放夏提雅血月终舞(this: void, context: 夏提雅运行
   重置夏提雅猎血连击(context);
   const stages: any[] = [
     创建立即执行阶段(function 夏提雅血月终舞启动(this: void): void {
+      开始硬直(boss, sectorTotal);
       创建空中血月(centerX, centerY, activeDuration + 0.5);
       创建技能提示圈({ 类型: '方向直线', X: centerX, Y: centerY, 宽度: cfg.终舞冲锋宽度, 长度: cfg.终舞冲锋长度, 朝向: finalFacing, 持续时间: sectorTotal, 来源单位: boss });
       SetUnitAnimationByIndex(boss, cfg.终舞引导动画编号);

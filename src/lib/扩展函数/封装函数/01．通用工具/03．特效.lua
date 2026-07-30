@@ -1,11 +1,14 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__Class = ____lualib.__TS__Class
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
+local __TS__New = ____lualib.__TS__New
 local __TS__Delete = ____lualib.__TS__Delete
 local Map = ____lualib.Map
-local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84, _____9650_5236_5230_989C_8272_5B57_8282, _____53D6_7279_6548_9876_70B9_989C_8272, _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4, _____521B_5EFA_5FAA_73AF_70B9_7279_6548_4E00_6B21, _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick, _____786E_4FDD_5FAA_73AF_70B9_7279_6548Tick, _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55, ____on_5FAA_73AF_70B9_7279_6548Tick, destroyBoundEffect, _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5, _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5, _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548, _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1, _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1, ____on_7279_6548_9500_6BC1_68C0_67E5, jass, addPeriodicCallback, removePeriodicCallback, getServerTime, EC_CreateEffect, DestroyEffect, EXSetEffectXY, EXSetEffectSize, EXEffectMatRotateX, EXEffectMatRotateY, EXEffectMatRotateZ, DzGetColor, DzSetEffectVertexColor, _____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868, _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868, _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID, _____5FAA_73AF_70B9_7279_6548_68C0_67E5_95F4_9694_6BEB_79D2, _____5FAA_73AF_70B9_7279_6548_8868, _____5FAA_73AF_70B9_7279_6548_6570_91CF, _____5FAA_73AF_70B9_7279_6548_56DE_8C03ID, _____4E0B_4E00_4E2A_5FAA_73AF_70B9_7279_6548ID, unitEffectMap
+local _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84, _____505C_6B62_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick, _____79FB_9664_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548, _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick, _____9650_5236_5230_989C_8272_5B57_8282, _____53D6_7279_6548_9876_70B9_989C_8272, _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4, _____521B_5EFA_5FAA_73AF_70B9_7279_6548_4E00_6B21, _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick, _____786E_4FDD_5FAA_73AF_70B9_7279_6548Tick, _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55, ____on_5FAA_73AF_70B9_7279_6548Tick, destroyBoundEffect, _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5, _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5, _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548, _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1, _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1, ____on_7279_6548_9500_6BC1_68C0_67E5, jass, addPeriodicCallback, removePeriodicCallback, getServerTime, EC_CreateEffect, DestroyEffect, EXSetEffectXY, EXSetEffectSize, EXEffectMatRotateX, EXEffectMatRotateY, EXEffectMatRotateZ, DzGetColor, DzSetEffectVertexColor, _____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868, _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868, _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID, _____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868, _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID, _____5FAA_73AF_70B9_7279_6548_68C0_67E5_95F4_9694_6BEB_79D2, _____5FAA_73AF_70B9_7279_6548_8868, _____5FAA_73AF_70B9_7279_6548_6570_91CF, _____5FAA_73AF_70B9_7279_6548_56DE_8C03ID, _____4E0B_4E00_4E2A_5FAA_73AF_70B9_7279_6548ID, unitEffectMap
 function _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84(modelPath)
     if (string.find(modelPath, "imports\\", nil, true) or 0) - 1 == 0 then
         return __TS__StringSubstring(modelPath, 8)
@@ -30,6 +33,33 @@ ____exports["设置特效XYZ轴旋转"] = function(effect, _____53C2_6570)
     end
     if z ~= 0 then
         EXEffectMatRotateZ(effect, z)
+    end
+end
+function _____505C_6B62_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick()
+    if _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID == 0 then
+        return
+    end
+    removePeriodicCallback(_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID)
+    _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID = 0
+end
+function _____79FB_9664_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548(_____5B9E_4F8B)
+    local _____7D22_5F15 = __TS__ArrayIndexOf(_____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868, _____5B9E_4F8B)
+    if _____7D22_5F15 >= 0 then
+        __TS__ArraySplice(_____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868, _____7D22_5F15, 1)
+    end
+    if #_____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868 == 0 then
+        _____505C_6B62_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick()
+    end
+end
+function _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick()
+    local _____5F53_524D_6BEB_79D2 = getServerTime()
+    local _____7D22_5F15 = 0
+    while _____7D22_5F15 < #_____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868 do
+        local _____5B9E_4F8B = _____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868[_____7D22_5F15 + 1]
+        _____5B9E_4F8B["推进"](_____5B9E_4F8B, _____5F53_524D_6BEB_79D2)
+        if _____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868[_____7D22_5F15 + 1] == _____5B9E_4F8B then
+            _____7D22_5F15 = _____7D22_5F15 + 1
+        end
     end
 end
 function _____9650_5236_5230_989C_8272_5B57_8282(value)
@@ -111,13 +141,13 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
             local id = idText
             local _____8BB0_5F55 = _____5FAA_73AF_70B9_7279_6548_8868[id]
             if _____8BB0_5F55 == nil then
-                goto __continue39
+                goto __continue67
             end
             local _____53C2_6570 = _____8BB0_5F55["参数"]
             local alive = _____53C2_6570["存活条件"] == nil or _____53C2_6570["存活条件"]()
             if _____8BB0_5F55["已停止"] or not alive or _____8BB0_5F55["结束毫秒"] > 0 and now >= _____8BB0_5F55["结束毫秒"] then
                 _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55(id, _____8BB0_5F55)
-                goto __continue39
+                goto __continue67
             end
             if now >= _____8BB0_5F55["下次重建毫秒"] then
                 _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4(_____8BB0_5F55["当前特效"])
@@ -128,7 +158,7 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
                 _____8BB0_5F55["当前特效"] = nil
             end
         end
-        ::__continue39::
+        ::__continue67::
     end
     if _____5FAA_73AF_70B9_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick()
@@ -252,22 +282,26 @@ removePeriodicCallback = ____require_result_0.removePeriodicCallback
 getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
 EC_CreateEffect = ____require_result_1.EC_CreateEffect
+local EC_GetPointZ = ____require_result_1.EC_GetPointZ
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local Cos = jass.Cos
+local Sin = jass.Sin
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 DestroyEffect = jass.DestroyEffect
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local DzBindEffect = japi.DzBindEffect
 local DzUnbindEffect = japi.DzUnbindEffect
-local DzSetEffectPos = japi.DzSetEffectPos
 EXSetEffectXY = japi.EXSetEffectXY
+local EXSetEffectZ = japi.EXSetEffectZ
 EXSetEffectSize = japi.EXSetEffectSize
 EXEffectMatRotateX = japi.EXEffectMatRotateX
 EXEffectMatRotateY = japi.EXEffectMatRotateY
 EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local EXEffectMatScale = japi.EXEffectMatScale
 local DzSetEffectScale = japi.DzSetEffectScale
+local DzSetEffectAnimation = japi.DzSetEffectAnimation
 DzGetColor = japi.DzGetColor
 DzSetEffectVertexColor = japi.DzSetEffectVertexColor
 _____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2 = 10
@@ -340,11 +374,100 @@ ____exports["创建点特效"] = function(_____53C2_6570)
         return nil
     end
     ____exports["设置特效XYZ轴旋转"](effect, _____53C2_6570)
+    if _____53C2_6570["动画索引"] ~= nil and DzSetEffectAnimation ~= nil then
+        DzSetEffectAnimation(effect, _____53C2_6570["动画索引"], 0)
+    end
     local color = _____53D6_7279_6548_9876_70B9_989C_8272(_____53C2_6570)
     if color ~= nil then
         DzSetEffectVertexColor(effect, color)
     end
     return effect
+end
+local _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0 = __TS__Class()
+_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.name = "逐段直线路径点特效实现"
+function _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.prototype.____constructor(self, ID, _____53C2_6570)
+    self["下一个距离"] = 0
+    self["下次铺设毫秒"] = 0
+    self["已停止"] = false
+    self.ID = ID
+    self["参数"] = _____53C2_6570
+end
+_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.prototype["启动"] = function(self)
+    self["创建下一段"](self)
+    if not self["已停止"] then
+        self["下次铺设毫秒"] = getServerTime() + self["取铺设间隔毫秒"](self)
+    end
+end
+_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.prototype["推进"] = function(self, _____5F53_524D_6BEB_79D2)
+    if self["已停止"] then
+        return
+    end
+    if self["参数"]["存活条件"] ~= nil and not self["参数"]["存活条件"]() then
+        self["停止"](self)
+        return
+    end
+    if _____5F53_524D_6BEB_79D2 < self["下次铺设毫秒"] then
+        return
+    end
+    self["创建下一段"](self)
+    if not self["已停止"] then
+        self["下次铺设毫秒"] = _____5F53_524D_6BEB_79D2 + self["取铺设间隔毫秒"](self)
+    end
+end
+_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.prototype["停止"] = function(self)
+    if self["已停止"] then
+        return
+    end
+    self["已停止"] = true
+    _____79FB_9664_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548(self)
+end
+_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.prototype["是否已停止"] = function(self)
+    return self["已停止"]
+end
+_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.prototype["创建下一段"] = function(self)
+    local _____8DEF_5F84_957F_5EA6 = self["参数"]["路径长度"] > 0 and self["参数"]["路径长度"] or 0
+    local _____5F53_524D_8DDD_79BB = self["下一个距离"] > _____8DEF_5F84_957F_5EA6 and _____8DEF_5F84_957F_5EA6 or self["下一个距离"]
+    ____exports["创建点特效"](__TS__ObjectAssign(
+        {},
+        self["参数"],
+        {
+            X = self["参数"]["起点X"] + Cos(self["参数"]["方向弧度"]) * _____5F53_524D_8DDD_79BB,
+            Y = self["参数"]["起点Y"] + Sin(self["参数"]["方向弧度"]) * _____5F53_524D_8DDD_79BB
+        }
+    ))
+    if _____5F53_524D_8DDD_79BB >= _____8DEF_5F84_957F_5EA6 then
+        self["停止"](self)
+        return
+    end
+    local _____6BB5_95F4_8DDD = self["参数"]["段间距"] > 0 and self["参数"]["段间距"] or 128
+    self["下一个距离"] = _____5F53_524D_8DDD_79BB + _____6BB5_95F4_8DDD
+    if self["下一个距离"] > _____8DEF_5F84_957F_5EA6 then
+        self["下一个距离"] = _____8DEF_5F84_957F_5EA6
+    end
+end
+_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.prototype["取铺设间隔毫秒"] = function(self)
+    local _____79D2 = self["参数"]["铺设间隔秒"] ~= nil and self["参数"]["铺设间隔秒"] > 0 and self["参数"]["铺设间隔秒"] or 0.06
+    return _____79D2 * 1000
+end
+_____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868 = {}
+local _____4E0B_4E00_4E2A_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548ID = 0
+_____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID = 0
+local function _____786E_4FDD_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick()
+    if _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID ~= 0 then
+        return
+    end
+    _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID = addPeriodicCallback(10, _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick)
+end
+____exports["创建逐段直线路径点特效"] = function(_____53C2_6570)
+    local ____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0_2 = _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0
+    _____4E0B_4E00_4E2A_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548ID = _____4E0B_4E00_4E2A_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548ID + 1
+    local _____5B9E_4F8B = __TS__New(____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0_2, _____4E0B_4E00_4E2A_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548ID, _____53C2_6570)
+    _____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868[#_____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868 + 1] = _____5B9E_4F8B
+    _____5B9E_4F8B["启动"](_____5B9E_4F8B)
+    if not _____5B9E_4F8B["是否已停止"](_____5B9E_4F8B) then
+        _____786E_4FDD_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick()
+    end
+    return _____5B9E_4F8B
 end
 ____exports["创建单位脚下点特效"] = function(unit, _____53C2_6570)
     if unit == nil or unit == 0 then
@@ -538,13 +661,13 @@ local function _____5355_4F4D_53EF_5750_6807_8DDF_968F(unit)
     return unit ~= nil and unit ~= 0 and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
 end
 local function _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548_8BB0_5F55(key, record)
-    local ____temp_2
+    local ____temp_3
     if record == nil then
-        ____temp_2 = nil
+        ____temp_3 = nil
     else
-        ____temp_2 = record.effect
+        ____temp_3 = record.effect
     end
-    local effect = ____temp_2
+    local effect = ____temp_3
     if effect ~= nil and effect ~= 0 then
         EXSetEffectXY(effect, 0, 0)
         EXSetEffectSize(effect, 0)
@@ -567,20 +690,21 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
         do
             local record = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key]
             if record == nil then
-                goto __continue111
+                goto __continue139
             end
             if not _____5355_4F4D_53EF_5750_6807_8DDF_968F(record.unit) then
                 _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548_8BB0_5F55(key, record)
-                goto __continue111
+                goto __continue139
             end
-            DzSetEffectPos(
+            local x = GetUnitX(record.unit)
+            local y = GetUnitY(record.unit)
+            EXSetEffectXY(record.effect, x, y)
+            EXSetEffectZ(
                 record.effect,
-                GetUnitX(record.unit),
-                GetUnitY(record.unit),
-                record.height
+                EC_GetPointZ(x, y) + record.height
             )
         end
-        ::__continue111::
+        ::__continue139::
     end
     if _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
@@ -592,7 +716,7 @@ local function _____786E_4FDD_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
     end
     _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_56DE_8C03ID = addPeriodicCallback(_____5355_4F4D_5750_6807_8DDF_968F_7279_6548_95F4_9694_6BEB_79D2, ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick)
 end
-____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effectKey, scale, height, animSpeed)
+____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effectKey, scale, height, animSpeed, _____52A8_753B_7D22_5F15)
     if effectKey == nil then
         effectKey = "default"
     end
@@ -628,7 +752,14 @@ ____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effect
     if not effect then
         return nil
     end
-    DzSetEffectPos(effect, x, y, height)
+    EXSetEffectXY(effect, x, y)
+    EXSetEffectZ(
+        effect,
+        EC_GetPointZ(x, y) + height
+    )
+    if _____52A8_753B_7D22_5F15 ~= nil and DzSetEffectAnimation ~= nil then
+        DzSetEffectAnimation(effect, _____52A8_753B_7D22_5F15, 0)
+    end
     _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key] = {
         unit = unit,
         effect = effect,
@@ -652,13 +783,13 @@ ____exports["获取单位坐标跟随特效"] = function(unit, effectKey)
         return nil
     end
     local record = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key]
-    local ____temp_3
+    local ____temp_4
     if record == nil then
-        ____temp_3 = nil
+        ____temp_4 = nil
     else
-        ____temp_3 = record.effect
+        ____temp_4 = record.effect
     end
-    return ____temp_3
+    return ____temp_4
 end
 ____exports["销毁单位坐标跟随特效"] = function(unit, effectKey)
     if effectKey == nil then
@@ -704,11 +835,11 @@ ____exports["获取Dz绑定单位特效"] = function(unit, effectKey)
     if key == "" then
         return nil
     end
-    local ____temp_4 = ____Dz_7ED1_5B9A_5355_4F4D_7279_6548_8868:get(key)
-    if ____temp_4 == nil then
-        ____temp_4 = nil
+    local ____temp_5 = ____Dz_7ED1_5B9A_5355_4F4D_7279_6548_8868:get(key)
+    if ____temp_5 == nil then
+        ____temp_5 = nil
     end
-    return ____temp_4
+    return ____temp_5
 end
 ____exports["销毁Dz绑定单位特效"] = function(unit, effectKey)
     if effectKey == nil then

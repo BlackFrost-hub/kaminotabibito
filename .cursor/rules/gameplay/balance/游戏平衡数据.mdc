@@ -48,4 +48,4 @@ alwaysApply: false
 2. 对应分类单位配置表。
 3. `04．总单位配置表.ts`。
 4. 涉及设计语义或例外时，同步 Boss/单位规划文档。
-5. 运行 ObjEditing、TypeScript build，并检查生成对象数据。
+5. 运行 ObjEditing，并按 [TS 构建验证分流](../../tooling/build/map-packaging-after-ts-build.mdc#ts-构建验证分流) 对本次 TS 改动执行局部或完整构建，再检查生成对象数据。

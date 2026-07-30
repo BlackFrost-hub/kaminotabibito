@@ -17,6 +17,20 @@ const { 添加单位暂停, 移除单位暂停 } = require('lib.扩展函数.Sta
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
+const { 施加快速减速Buff } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff') as {
+  施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number, effectSourceName?: string, effectSourceType?: '装备' | '技能') => void;
+};
+const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require('系统.05．Buff系统.00．Buff系统') as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSeconds: number, effectValue: number, extras?: any) => void;
+  getBuffRuntime: (this: void, unit: any, buffID: string) => any;
+  移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
+};
+const { 常规BuffID } = require('系统.05．Buff系统.03．Buff表.00．Buff登记') as {
+  常规BuffID: { 减速: string };
+};
+const { 安兹乌尔恭BuffID } = require('系统.05．Buff系统.03．Buff表.01．Boss.03．异界Boss.01．安兹乌尔恭') as {
+  安兹乌尔恭BuffID: { 黑翼拘束: string };
+};
 const { addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
@@ -34,6 +48,7 @@ const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const 黑翼拘束暂停来源 = '雅儿贝德-黑翼拘束';
+const 黑翼拘束减速来源 = '雅儿贝德-黑翼拘束减速';
 
 function 启动黑翼拘束核心(this: void, context: 安兹运行时上下文, target: any, remainingSeconds: number): void {
   const state = context.雅儿贝德;
@@ -45,12 +60,27 @@ function 启动黑翼拘束核心(this: void, context: 安兹运行时上下文,
   const coreLife = maxByAlbedo < maxByBoss ? maxByAlbedo : maxByBoss;
   const wing = AddSpecialEffectTarget(cfg.表现资源.雅儿贝德黑翼拘束特效路径, target, 'origin');
   let paused = false;
+  let slowRuntime: any = null;
+  registerManualBuff(target, 安兹乌尔恭BuffID.黑翼拘束, remainingSeconds, 0, { sourceName: 黑翼拘束暂停来源 });
+  const restraintRuntime = getBuffRuntime(target, 安兹乌尔恭BuffID.黑翼拘束);
   if (取当前有效玩家人数() > 1) paused = 添加单位暂停(target, 黑翼拘束暂停来源);
+  else {
+    const slowRatio = cfg.守护者模式.黑翼拘束单人减速比例;
+    施加快速减速Buff(albedo, target, slowRatio, slowRatio, remainingSeconds, 黑翼拘束减速来源, '技能');
+    const currentSlowRuntime = getBuffRuntime(target, 常规BuffID.减速);
+    if (currentSlowRuntime != null && currentSlowRuntime.effectSourceName === 黑翼拘束减速来源) slowRuntime = currentSlowRuntime;
+  }
   let cleaned = false;
   function cleanup(this: void): void {
     if (cleaned) return;
     cleaned = true;
     if (paused) 移除单位暂停(target, 黑翼拘束暂停来源);
+    if (restraintRuntime != null && getBuffRuntime(target, 安兹乌尔恭BuffID.黑翼拘束) === restraintRuntime) {
+      移除单位指定Buff(target, 安兹乌尔恭BuffID.黑翼拘束);
+    }
+    if (slowRuntime != null && getBuffRuntime(target, 常规BuffID.减速) === slowRuntime) {
+      移除单位指定Buff(target, 常规BuffID.减速);
+    }
     if (wing != null && wing !== 0) DestroyEffect(wing);
   }
   const core = 创建可攻击机制单位({

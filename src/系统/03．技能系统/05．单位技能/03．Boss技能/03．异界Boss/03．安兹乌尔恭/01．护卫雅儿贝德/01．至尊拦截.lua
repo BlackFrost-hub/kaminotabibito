@@ -7,10 +7,14 @@ local _____83B7_53D6_5168_90E8_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
 local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
-local _____5F00_59CB_51B2_950B = _____51FB_9000_7CFB_7EDF["开始冲锋"]
 local _____5F00_59CB_51FB_9000 = _____51FB_9000_7CFB_7EDF["开始击退"]
+local ____00_FF0E_51B2_950B_8868_73B0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.00．冲锋表现")
+local _____5F00_59CB_96C5_513F_8D1D_5FB7_51B2_950B = ____00_FF0E_51B2_950B_8868_73B0["开始雅儿贝德冲锋"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
@@ -31,6 +35,7 @@ local getServerTime = ____require_result_6.getServerTime
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
+local EXSetEffectSize = japi.EXSetEffectSize
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
@@ -56,7 +61,8 @@ local function _____7ED3_7B97_81F3_5C0A_62E6_622A(context, x, y)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local effect = AddSpecialEffect(cfg["表现资源"]["雅儿贝德重击特效路径"], x, y)
     if effect ~= nil and effect ~= 0 then
-        YDWETimerDestroyEffectSafe(cfg["守护者模式"]["黑翼横扫特效持续秒"], effect)
+        EXSetEffectSize(effect, cfg["守护者模式"]["雅儿贝德重击特效缩放"])
+        YDWETimerDestroyEffectSafe(cfg["守护者模式"]["雅儿贝德重击特效持续秒"], effect)
     end
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["安兹单位"])
     local radius = cfg["守护者模式"]["至尊拦截结算半径"]
@@ -140,25 +146,26 @@ ____exports["释放雅儿贝德至尊拦截"] = function(context, attacker)
     end
     state["守护连接生效"] = false
     state["上次至尊拦截Ms"] = now
+    _____5F00_59CB_786C_76F4(albedo, cfg["至尊拦截预警秒"])
     local facing = Atan2(dy, dx) * RAD_TO_DEG
+    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(albedo, facing)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "方向直线",
-        X = (startX + endX) * 0.5,
-        Y = (startY + endY) * 0.5,
+        X = startX,
+        Y = startY,
         ["宽度"] = cfg["至尊拦截路径宽度"],
         ["长度"] = distance,
         ["朝向"] = facing,
         ["持续时间"] = cfg["至尊拦截预警秒"],
         ["来源单位"] = albedo
     })
-    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = albedo, ["动画编号"] = cfg["至尊拦截动画编号"], ["持续秒"] = cfg["至尊拦截预警秒"] + cfg["至尊拦截冲锋秒"], ["恢复动画编号"] = 1})
     local delayedId = addDelayedCallback(
         cfg["至尊拦截预警秒"] * 1000,
         function()
             if not _____5355_4F4D_6709_6548(albedo) or context["挑战已结束"] then
                 return
             end
-            _____5F00_59CB_51B2_950B(
+            _____5F00_59CB_96C5_513F_8D1D_5FB7_51B2_950B(
                 albedo,
                 {
                     ["目标X"] = endX,
@@ -168,6 +175,10 @@ ____exports["释放雅儿贝德至尊拦截"] = function(context, attacker)
                     ["检查地形"] = true,
                     ["暂停单位"] = true,
                     ["禁用碰撞"] = true,
+                    ["开始回调"] = function()
+                        _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(albedo, facing)
+                        _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = albedo, ["动画编号"] = cfg["至尊拦截动画编号"], ["持续秒"] = cfg["至尊拦截冲锋秒"], ["恢复动画编号"] = 1})
+                    end,
                     ["结束回调"] = function()
                         _____7ED3_7B97_81F3_5C0A_62E6_622A(context, endX, endY)
                     end
@@ -190,7 +201,7 @@ local function ____on_5B89_5179_627F_53D7_7206_53D1_4F24_5BB3(target, attacker, 
             do
                 local context = contexts[i + 1]
                 if context["安兹单位"] ~= target or context["模式"] ~= "守护者介入" then
-                    goto __continue21
+                    goto __continue22
                 end
                 local threshold = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["至尊拦截触发伤害最大生命比例"]
                 if applied >= threshold then
@@ -198,7 +209,7 @@ local function ____on_5B89_5179_627F_53D7_7206_53D1_4F24_5BB3(target, attacker, 
                 end
                 return
             end
-            ::__continue21::
+            ::__continue22::
             i = i + 1
         end
     end

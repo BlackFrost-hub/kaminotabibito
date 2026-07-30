@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 祖地双灵卫运行时上下文 } from './01．运行时上下文';
+import { 开始祖地双灵卫联合施法 } from './01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 释放誓锋壁进 } from './02．苍影灵卫/01．誓锋壁进';
 import { 创建赤誓镇魂印 } from './01．赤誓灵卫/01．灵印折步';
@@ -9,7 +10,7 @@ import { 创建立即执行阶段, 创建延迟阶段 } from '../../../../00．�
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 两点角度, 极坐标X, 极坐标Y, 点到线段距离平方 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 执行战斗自身传送到坐标 } from '../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
-import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 播放苍影灵卫台词 } from './12．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
@@ -82,8 +83,11 @@ export function 释放祖地双灵卫封门校验(this: void, context: 祖地双
         waveEndY = 极坐标Y(shield.Y, facing, context.场地半宽 + 500);
         waveReady = true;
         执行战斗自身传送到坐标(red, waveStartX, waveStartY);
-        播放限时单位动画({ 单位: red, 动画编号: 祖地双灵卫数值与表现配置.动作.赤誓正常待机, 持续秒: waveWarning + 0.4, 恢复动画编号: 祖地双灵卫数值与表现配置.动作.赤誓正常待机 });
-        创建技能提示圈({ 类型: '方向直线', X: waveStartX, Y: waveStartY, 宽度: context.场地半高 * 2, 长度: context.场地半宽 * 2 + 900, 朝向: 两点角度(waveStartX, waveStartY, waveEndX, waveEndY), 持续时间: waveWarning, 来源单位: red });
+        const waveFacing = 两点角度(waveStartX, waveStartY, waveEndX, waveEndY);
+        立即设置单位朝向(red, waveFacing);
+        开始祖地双灵卫联合施法(context, waveWarning, '封门校验·灵魂潮', '誓盾成形后，灵魂潮将在读条结束时沿直线结算');
+        播放限时单位动画({ 单位: red, 动画编号: 祖地双灵卫数值与表现配置.P1.灵印折步.动画编号, 持续秒: waveWarning + 0.4, 恢复动画编号: 祖地双灵卫数值与表现配置.动作.赤誓正常待机 });
+        创建技能提示圈({ 类型: '方向直线', X: waveStartX, Y: waveStartY, 宽度: context.场地半高 * 2, 长度: context.场地半宽 * 2 + 900, 朝向: waveFacing, 持续时间: waveWarning, 来源单位: red });
       }, '灵魂潮预警'),
       创建延迟阶段(waveWarning * 1000, '等待灵魂潮'),
       创建立即执行阶段(function 封门校验魂潮结算(this: void): void {

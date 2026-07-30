@@ -45,9 +45,15 @@ function 创建最终强化特效(this: void, context: 亚伦柯斯运行时上�
   if (!单位有效(boss) || context.战斗已结束 || context.清理.已清理()) return;
   const cfg = 亚伦柯斯正式设计配置.不灭军魂;
   const effect = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.不灭军魂特效路径, GetUnitX(boss), GetUnitY(boss));
-  if (effect == null || effect === 0) return;
-  EXSetEffectSize(effect, cfg.最终强化特效缩放);
-  context.清理.登记限时特效('亚伦柯斯-最终强化脉冲特效', effect, cfg.最终强化特效持续秒 * 1000);
+  if (effect != null && effect !== 0) {
+    EXSetEffectSize(effect, cfg.最终强化特效缩放);
+    context.清理.登记限时特效('亚伦柯斯-最终强化脉冲特效', effect, cfg.最终强化特效持续秒 * 1000);
+  }
+  const stomp = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.最终强化叠加特效路径, GetUnitX(boss), GetUnitY(boss));
+  if (stomp != null && stomp !== 0) {
+    EXSetEffectSize(stomp, cfg.最终强化叠加特效缩放);
+    context.清理.登记限时特效('亚伦柯斯-最终强化战争践踏特效', stomp, cfg.最终强化特效持续秒 * 1000);
+  }
 }
 
 export function 启用亚伦柯斯不灭军魂(this: void, context: 亚伦柯斯运行时上下文): boolean {

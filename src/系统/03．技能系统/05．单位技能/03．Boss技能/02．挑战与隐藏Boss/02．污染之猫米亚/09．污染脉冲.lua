@@ -207,7 +207,7 @@ local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____
                     ["来源"] = boss,
                     ["目标"] = target,
                     ["伤害"] = maxLife * config["每波最大生命伤害比例"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
-                    attackType = jass.ATTACK_TYPE_CHAOS,
+                    attackType = jass.ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
                     weaponType = jass.WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能",

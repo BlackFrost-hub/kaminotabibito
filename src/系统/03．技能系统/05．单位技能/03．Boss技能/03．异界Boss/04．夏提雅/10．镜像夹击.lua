@@ -11,6 +11,8 @@ local ____09_FF0E_82F1_7075_6218_4E59_5973 = require("系统.03．技能系统.0
 local _____6E05_7406_82F1_7075_6218_4E59_5973_6295_5F71 = ____09_FF0E_82F1_7075_6218_4E59_5973["清理英灵战乙女投影"]
 local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
 local _____5F00_59CB_51B2_950B = _____51FB_9000_7CFB_7EDF["开始冲锋"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
@@ -20,6 +22,8 @@ local _____521B_5EFA_7ACB_5373_6267_884C_9636_6BB5 = ____06_FF0E_6280_80FD_9636_
 local _____521B_5EFA_5EF6_8FDF_9636_6BB5 = ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668["创建延迟阶段"]
 local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
+local ____19_FF0E_541F_5531_6761 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.19．吟唱条")
+local _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761 = ____19_FF0E_541F_5531_6761["显示夏提雅常规吟唱条"]
 ____exports["清理镜像夹击投影"] = function(context)
     local projection = context["镜像夹击句柄"]
     context["镜像夹击句柄"] = nil
@@ -209,6 +213,7 @@ ____exports["释放夏提雅镜像夹击"] = function(context, target)
         return false
     end
     local facing = Atan2(dy, dx) * RAD_TO_DEG
+    SetUnitFacing(boss, facing)
     local directionX = CosBJ(facing)
     local directionY = SinBJ(facing)
     local bodyEndX = centerX + directionX * cfg["镜像夹击投影越过距离"]
@@ -236,6 +241,8 @@ ____exports["释放夏提雅镜像夹击"] = function(context, target)
             ["阶段列表"] = {
                 _____521B_5EFA_7ACB_5373_6267_884C_9636_6BB5(
                     function()
+                        _____5F00_59CB_786C_76F4(boss, cfg["镜像夹击预警秒"])
+                        _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761(cfg["镜像夹击预警秒"], cfg["镜像夹击吟唱条颜色ID"], cfg["镜像夹击吟唱条标题文本"], cfg["镜像夹击吟唱条提示文本"])
                         _____6E05_7406_82F1_7075_6218_4E59_5973_6295_5F71(context)
                         _____521B_5EFA_6280_80FD_63D0_793A_5708({
                             ["类型"] = "方向直线",

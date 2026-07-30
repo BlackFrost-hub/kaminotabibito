@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 local ____00_FF0E_516C_5171 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．护卫A格鲁姆.00．公共")
 local _____683C_9C81_59C6_516C_5171 = ____00_FF0E_516C_5171["格鲁姆公共"]
 local ____683C_9C81_59C6_516C_5171_0 = _____683C_9C81_59C6_516C_5171
@@ -28,12 +30,18 @@ local _____64AD_653E_70B9_7279_6548 = ____683C_9C81_59C6_516C_5171_0["播放点�
 local function _____53D6_706B_5F84_53C2_6570(grum, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
     local normalAngle = _____53D6_65B9_5411_89D2(grum, target)
+    local lineAngle = normalAngle + 90
+    local center = {
+        x = GetUnitX(grum) + CosBJ(normalAngle) * config["火线中心前移"],
+        y = GetUnitY(grum) + SinBJ(normalAngle) * config["火线中心前移"]
+    }
     return {
-        center = {
-            x = GetUnitX(grum) + CosBJ(normalAngle) * config["火线中心前移"],
-            y = GetUnitY(grum) + SinBJ(normalAngle) * config["火线中心前移"]
+        center = center,
+        start = {
+            x = center.x - CosBJ(lineAngle) * config["长度"] * 0.5,
+            y = center.y - SinBJ(lineAngle) * config["长度"] * 0.5
         },
-        lineAngle = normalAngle + 90,
+        lineAngle = lineAngle,
         normalAngle = normalAngle
     }
 end
@@ -113,7 +121,7 @@ local function _____521B_5EFA_706B_5F84(context, center, lineAngle, normalAngle)
         config["火线特效高度"],
         config["火线特效缩放"],
         config["持续秒"],
-        lineAngle
+        lineAngle + 90
     )
     local ____self_2 = context["清理"]
     ____self_2["登记特效"](____self_2, "格鲁姆-熔岩火径主特效", effect)
@@ -159,11 +167,15 @@ ____exports["释放格鲁姆火径"] = function(context, target)
         return
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
+    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(
+        grum,
+        _____53D6_65B9_5411_89D2(grum, target)
+    )
     local fire = _____53D6_706B_5F84_53C2_6570(grum, target)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "矩形",
-        X = fire.center.x,
-        Y = fire.center.y,
+        X = fire.start.x,
+        Y = fire.start.y,
         ["宽度"] = config["宽度"],
         ["长度"] = config["长度"],
         ["朝向"] = fire.lineAngle,

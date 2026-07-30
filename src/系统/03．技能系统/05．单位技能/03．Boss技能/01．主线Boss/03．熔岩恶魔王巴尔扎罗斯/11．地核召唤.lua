@@ -56,16 +56,17 @@ local function _____53D6_573A_5730_4E2D_5FC3(context)
 end
 local function _____64AD_653E_5730_6838Tick_7279_6548(x, y)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["地核召唤"]
-    local paths = {config["Tick冲击波路径"], config["Tick叠加冲击波路径"]}
+    local effects = {{["路径"] = config["Tick冲击波路径"], ["缩放"] = config["Tick冲击波特效缩放"]}, {["路径"] = config["Tick叠加冲击波路径"], ["缩放"] = config["Tick叠加冲击波特效缩放"]}}
     do
         local i = 0
-        while i < #paths do
+        while i < #effects do
+            local effect = effects[i + 1]
             _____521B_5EFA_70B9_7279_6548({
-                ["模型路径"] = paths[i + 1],
+                ["模型路径"] = effect["路径"],
                 X = x,
                 Y = y,
                 Z = config["Tick特效高度"],
-                ["缩放"] = config["Tick特效缩放"],
+                ["缩放"] = effect["缩放"],
                 ["持续秒"] = config["Tick特效持续秒"]
             })
             i = i + 1

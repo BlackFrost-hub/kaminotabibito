@@ -30,6 +30,7 @@ const SquareRoot = jass.SquareRoot as (value: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) => void;
+const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, degrees: number) => void;
 const RAD_TO_DEG = 57.29577951308232;
@@ -96,11 +97,14 @@ function 刷新守护职责连接表现(this: void, visual: 守护职责表现�
   const by = GetUnitY(albedo);
   const dx = bx - ax;
   const dy = by - ay;
+  const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
   if (visual.特效 == null || visual.特效 === 0) return;
   EXSetEffectXY(visual.特效, (ax + bx) * 0.5, (ay + by) * 0.5);
+  EXSetEffectZ(visual.特效, cfg.守护者之职责连接高度);
   EXEffectMatRotateZ(visual.特效, Atan2(dy, dx) * RAD_TO_DEG);
   EXSetEffectSize(visual.特效, SquareRoot(dx * dx + dy * dy)
-    / 安兹乌尔恭数值与表现配置.守护者模式.守护者之职责连接基础长度);
+    / cfg.守护者之职责连接基础长度
+    * cfg.守护者之职责连接缩放倍率);
 }
 
 function 清理守护职责表现(this: void, visual: 守护职责表现状态): void {

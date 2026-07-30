@@ -129,7 +129,7 @@ function 结算污染脉冲波(this: void, context: 米亚运行时上下文, wa
       来源: boss,
       目标: target,
       伤害: maxLife * config.每波最大生命伤害比例 * 取米亚平台超载伤害倍率(target),
-      attackType: jass.ATTACK_TYPE_CHAOS,
+      attackType: jass.ATTACK_TYPE_NORMAL,
       伤害类型: jass.DAMAGE_TYPE_POISON,
       weaponType: jass.WEAPON_TYPE_WHOKNOWS,
       来源类型: "Boss技能",

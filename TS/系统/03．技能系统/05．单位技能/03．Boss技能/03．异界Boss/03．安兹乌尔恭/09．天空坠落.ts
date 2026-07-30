@@ -55,6 +55,11 @@ interface 天空坠落实例 {
   表现已清理: boolean;
 }
 
+interface 天空坠落伤害上下文 {
+  运行时: 安兹运行时上下文;
+  目标列表: any[];
+}
+
 function 销毁天空坠落预警表现(this: void, instance: 天空坠落实例): void {
   if (instance.表现已清理) return;
   instance.表现已清理 = true;
@@ -123,27 +128,25 @@ function 创建天空坠落预警(this: void, context: 安兹运行时上下文,
   return instance;
 }
 
-function 结算天空坠落伤害(this: void, context: 安兹运行时上下文, instance: 天空坠落实例): void {
+function 结算天空坠落单次伤害(
+  this: void,
+  damageContext: 天空坠落伤害上下文,
+  attackRatio: number,
+  maxLifeRatio: number,
+  tag: string,
+): void {
+  const context = damageContext.运行时;
   const boss = context.安兹单位;
   if (!单位有效(boss) || context.挑战已结束 || context.清理.已清理()) return;
-  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.天空坠落贯穿, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
-  const cfg = 安兹乌尔恭数值与表现配置;
-  const x = GetUnitX(boss);
-  const y = GetUnitY(boss);
-  const laser = AddSpecialEffect(cfg.表现资源.天空坠落光柱特效路径, x, y);
-  const impact = AddSpecialEffect(cfg.表现资源.天空坠落冲击特效路径, x, y);
-  if (laser != null && laser !== 0) YDWETimerDestroyEffectSafe(cfg.阶段技能.天空坠落冲击特效持续秒, laser);
-  if (impact != null && impact !== 0) YDWETimerDestroyEffectSafe(cfg.阶段技能.天空坠落冲击特效持续秒, impact);
-  const heroes = 获取Boss技能敌对英雄列表(boss);
-  for (let i = 0; i < heroes.length; i++) {
-    const target = heroes[i];
-    if (!单位有效(target) || instance.安全区组.单位是否安全(target)) continue;
+  for (let i = 0; i < damageContext.目标列表.length; i++) {
+    const target = damageContext.目标列表[i];
+    if (!单位有效(target)) continue;
     造成AOE技能伤害({
       来源: boss,
       目标: target,
       伤害: 计算组合技能伤害(boss, target, {
-        来源攻击力比例: cfg.阶段技能.天空坠落伤害Boss攻击力比例,
-        目标最大生命比例: cfg.阶段技能.天空坠落伤害目标最大生命比例,
+        来源攻击力比例: attackRatio,
+        目标最大生命比例: maxLifeRatio,
       }),
       attack: false,
       ranged: true,
@@ -151,10 +154,63 @@ function 结算天空坠落伤害(this: void, context: 安兹运行时上下文,
       伤害类型: DAMAGE_TYPE_MAGIC,
       weaponType: WEAPON_TYPE_WHOKNOWS,
       来源类型: 'Boss技能',
-      标签: '安兹·天空坠落',
+      标签: tag,
     });
   }
+}
+
+function 启动天空坠落结算(this: void, context: 安兹运行时上下文, instance: 天空坠落实例): void {
+  const boss = context.安兹单位;
+  if (!单位有效(boss) || context.挑战已结束 || context.清理.已清理()) return;
+  const cfg = 安兹乌尔恭数值与表现配置;
+  const stage = cfg.阶段技能;
+  const x = GetUnitX(boss);
+  const y = GetUnitY(boss);
+  const targets: any[] = [];
+  const heroes = 获取Boss技能敌对英雄列表(boss);
+  for (let i = 0; i < heroes.length; i++) {
+    const target = heroes[i];
+    if (单位有效(target) && !instance.安全区组.单位是否安全(target)) targets.push(target);
+  }
+  const damageContext: 天空坠落伤害上下文 = { 运行时: context, 目标列表: targets };
+  const laser = AddSpecialEffect(cfg.表现资源.天空坠落光柱特效路径, x, y);
+  const impact = AddSpecialEffect(cfg.表现资源.天空坠落冲击特效路径, x, y);
+  if (laser != null && laser !== 0) {
+    EXSetEffectSize(laser, stage.天空坠落光柱特效缩放);
+    YDWETimerDestroyEffectSafe(stage.天空坠落冲击特效持续秒, laser);
+  }
+  if (impact != null && impact !== 0) {
+    EXSetEffectSize(impact, stage.天空坠落冲击特效缩放);
+    EXSetEffectZ(impact, stage.天空坠落冲击特效高度);
+    YDWETimerDestroyEffectSafe(stage.天空坠落冲击特效持续秒, impact);
+  }
   销毁天空坠落预警表现(instance);
+
+  const landingId = addDelayedCallback((stage.天空坠落落地延迟秒 + stage.天空坠落主冲击额外延迟秒) * 1000, function 天空坠落主冲击(this: void): void {
+    if (!单位有效(boss) || context.挑战已结束 || context.清理.已清理()) return;
+    播放Boss坐标音效(cfg.音效.天空坠落贯穿, x, y, cfg.音效默认裁断距离);
+    结算天空坠落单次伤害(
+      damageContext,
+      stage.天空坠落主伤害Boss攻击力比例,
+      stage.天空坠落主伤害目标最大生命比例,
+      '安兹·天空坠落主冲击',
+    );
+  });
+  context.清理.登记延迟回调('安兹-天空坠落主冲击', landingId);
+
+  for (let waveIndex = 1; waveIndex <= stage.天空坠落余波次数; waveIndex++) {
+    const currentWave = waveIndex;
+    const delayMs = (stage.天空坠落落地延迟秒 + currentWave * stage.天空坠落余波间隔秒) * 1000;
+    const waveId = addDelayedCallback(delayMs, function 天空坠落余波(this: void): void {
+      结算天空坠落单次伤害(
+        damageContext,
+        stage.天空坠落余波伤害Boss攻击力比例,
+        stage.天空坠落余波伤害目标最大生命比例,
+        '安兹·天空坠落余波' + String(currentWave),
+      );
+    });
+    context.清理.登记延迟回调('安兹-天空坠落余波' + String(currentWave), waveId);
+  }
 }
 
 export function 释放安兹天空坠落(this: void, context: 安兹运行时上下文): boolean {
@@ -183,7 +239,7 @@ export function 释放安兹天空坠落(this: void, context: 安兹运行时上
       提示文本: '进入墓碑背后的白色安全区',
     },
     on生效: function 天空坠落生效(this: void): void {
-      结算天空坠落伤害(context, instance);
+      启动天空坠落结算(context, instance);
       const recoveryId = addDelayedCallback(recoverySeconds * 1000, function 天空坠落输出窗口结束(this: void): void {
         if (context.当前大型技能 === 天空坠落大型技能Key) {
           context.当前大型技能 = undefined;

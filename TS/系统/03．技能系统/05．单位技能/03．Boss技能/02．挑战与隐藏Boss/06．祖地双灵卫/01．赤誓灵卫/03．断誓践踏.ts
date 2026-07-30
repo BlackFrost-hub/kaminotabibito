@@ -2,6 +2,7 @@
 
 import { 单位未标记死亡 as 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下文';
+import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 执行战斗自身位移到坐标 } from '../../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
@@ -136,6 +137,7 @@ export function 释放断誓践踏(this: void, context: 祖地双灵卫运行时
   const second = 计算踏步落点(context, first.X, first.Y, secondTargetX, secondTargetY);
   立即设置单位朝向(boss, Atan2(second.Y - first.Y, second.X - first.X) * RAD_TO_DEG);
   const warningSeconds = cfg.第二步预警秒 > cfg.两步间隔秒 ? cfg.第二步预警秒 : cfg.两步间隔秒;
+  开始祖地双灵卫常规施法(boss, warningSeconds, '断誓践踏', '第二次踏步将落在新的锁定落点');
   创建技能提示圈({ 类型: '渐变圆形', X: second.X, Y: second.Y, 半径: cfg.落点半径, 持续时间: warningSeconds, 来源单位: boss });
   const delayedId = addDelayedCallback(warningSeconds * 1000, function 断誓践踏第二步(this: void): void {
     if (!单位有效(boss) || context.战斗已结束) return;

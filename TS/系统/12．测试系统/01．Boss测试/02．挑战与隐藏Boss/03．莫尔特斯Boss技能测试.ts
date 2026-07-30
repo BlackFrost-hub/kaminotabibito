@@ -27,9 +27,10 @@ const { Boss测试单位存活, 设置Boss测试单位满血, 获取Boss测试�
   注册Boss测试命令组: (this: void, 配置: any) => void;
 };
 
-const { 获取或创建莫尔特斯上下文, 清理莫尔特斯上下文 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.01．运行时上下文") as {
+const { 获取或创建莫尔特斯上下文, 清理莫尔特斯上下文, 应用莫尔特斯腐败值 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.01．运行时上下文") as {
   获取或创建莫尔特斯上下文: (this: void, boss: any) => any;
   清理莫尔特斯上下文: (this: void, boss: any) => void;
+  应用莫尔特斯腐败值: (this: void, context: any, unit: any, amount: number) => number;
 };
 const { 注册莫尔特斯被动效果 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.15．被动效果") as {
   注册莫尔特斯被动效果: (this: void) => void;
@@ -57,6 +58,9 @@ const { 释放莫尔特斯共生腐朽虫群 } = require("系统.03．技能系�
 };
 const { 释放莫尔特斯古木悲鸣 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.11．古木悲鸣") as {
   释放莫尔特斯古木悲鸣: (this: void, context: any) => void;
+};
+const { 测试触发莫尔特斯腐败传输 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.12．腐败传输") as {
+  测试触发莫尔特斯腐败传输: (this: void, context: any) => void;
 };
 
 const 临时测试场地中心X = -540.6;
@@ -170,6 +174,15 @@ function on莫尔特斯技能8测试命令(this: void, _player: any, context: an
   if (context != null) 释放莫尔特斯古木悲鸣(context);
 }
 
+function on莫尔特斯被动腐败满层测试命令(this: void, player: any, context: any): void {
+  const target = 莫尔特斯测试步兵[GetPlayerId(player)];
+  if (context != null && Boss测试单位存活(target)) 应用莫尔特斯腐败值(context, target, 100);
+}
+
+function on莫尔特斯被动腐败传输测试命令(this: void, _player: any, context: any): void {
+  if (context != null) 测试触发莫尔特斯腐败传输(context);
+}
+
 const 莫尔特斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 1, 名称: "腐朽根须穿刺", 执行: on莫尔特斯技能1测试命令 },
   { 序号: 2, 名称: "腐败孢子云", 执行: on莫尔特斯技能2测试命令 },
@@ -179,6 +192,8 @@ const 莫尔特斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 6, 名称: "腐朽领域", 执行: on莫尔特斯技能6测试命令 },
   { 序号: 7, 名称: "共生腐朽虫群", 执行: on莫尔特斯技能7测试命令 },
   { 序号: 8, 名称: "古木悲鸣", 执行: on莫尔特斯技能8测试命令 },
+  { 序号: 9, 名称: "被动：腐败值满层缠绕", 执行: on莫尔特斯被动腐败满层测试命令 },
+  { 序号: 10, 名称: "被动：腐败传输与护盾", 执行: on莫尔特斯被动腐败传输测试命令 },
 ];
 
 注册Boss测试命令组({

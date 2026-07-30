@@ -53,4 +53,5 @@ export * from "./146．魔法消耗减少扣蓝测试";
 export * from "./147．Boss血条弱点韧性测试";
 export * from "./148．异界背景框测试";
 export * from "./149．不同技能伤害序列装备测试";
+export * from "./150．金锁模型测试";
 export * from "./1050．反击测试";

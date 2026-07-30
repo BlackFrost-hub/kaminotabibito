@@ -1,6 +1,5 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
-local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local ____exports = {}
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.02．数值与表现配置")
 local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
@@ -35,6 +34,17 @@ local function _____4ECE_5217_8868_79FB_9664(context, mark)
             i = i - 1
         end
     end
+end
+local function _____590D_5236_9C9C_8840_5370_8BB0_5217_8868(context)
+    local list = {}
+    do
+        local i = 0
+        while i < #context["血印句柄列表"] do
+            list[#list + 1] = context["血印句柄列表"][i + 1]
+            i = i + 1
+        end
+    end
+    return list
 end
 ____exports["清理夏提雅鲜血印记"] = function(context, mark, purified)
     if purified == nil then
@@ -126,7 +136,7 @@ ____exports["创建夏提雅鲜血印记"] = function(context, x, y)
 end
 ____exports["净化落点内夏提雅鲜血印记"] = function(context, x, y, radius)
     local count = 0
-    local list = __TS__ArraySlice(context["血印句柄列表"])
+    local list = _____590D_5236_9C9C_8840_5370_8BB0_5217_8868(context)
     do
         local i = 0
         while i < #list do

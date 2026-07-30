@@ -1,6 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local globals = require("jass.globals")
 local ____require_result_0 = require("系统.12．测试系统.00．Boss测试系统.index")
 local ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B = ____require_result_0["Boss测试单位存活"]
@@ -22,27 +23,34 @@ local ____require_result_5 = require("系统.03．技能系统.06．AI自动使�
 local _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E = ____require_result_5["应用Boss战启动属性配置"]
 local ____require_result_6 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.17．被动效果")
 local _____6CE8_518C_590F_63D0_96C5_88AB_52A8_6548_679C = ____require_result_6["注册夏提雅被动效果"]
-local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
-local _____83B7_53D6_6216_521B_5EFA_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_7["获取或创建夏提雅运行时上下文"]
-local _____6E05_7406_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_7["清理夏提雅运行时上下文"]
-local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.04．鲜血印记")
-local _____521B_5EFA_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____require_result_8["创建夏提雅鲜血印记"]
-local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.05．滴管穿心")
-local _____91CA_653E_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3 = ____require_result_9["释放夏提雅滴管穿心"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.06．血月轮舞")
-local _____91CA_653E_590F_63D0_96C5_8840_6708_8F6E_821E = ____require_result_10["释放夏提雅血月轮舞"]
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.07．净化投枪")
-local _____91CA_653E_590F_63D0_96C5_51C0_5316_6295_67AA = ____require_result_11["释放夏提雅净化投枪"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.08．鲜血回收")
-local _____91CA_653E_590F_63D0_96C5_9C9C_8840_56DE_6536 = ____require_result_12["释放夏提雅鲜血回收"]
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.09．英灵战乙女")
-local _____542F_52A8_590F_63D0_96C5_82F1_7075_6218_4E59_5973_9636_6BB5 = ____require_result_13["启动夏提雅英灵战乙女阶段"]
-local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.10．镜像夹击")
-local _____91CA_653E_590F_63D0_96C5_955C_50CF_5939_51FB = ____require_result_14["释放夏提雅镜像夹击"]
-local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.11．真祖血宴")
-local _____91CA_653E_590F_63D0_96C5_771F_7956_8840_5BB4 = ____require_result_15["释放夏提雅真祖血宴"]
-local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.12．血月终舞")
-local _____91CA_653E_590F_63D0_96C5_8840_6708_7EC8_821E = ____require_result_16["释放夏提雅血月终舞"]
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.00．配置")
+local _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_7["夏提雅单位技能配置"]
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_8["获取或创建夏提雅运行时上下文"]
+local _____6E05_7406_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_8["清理夏提雅运行时上下文"]
+local _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB = ____require_result_8["重置夏提雅猎血连击"]
+local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.04．鲜血印记")
+local _____521B_5EFA_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____require_result_9["创建夏提雅鲜血印记"]
+local _____6E05_7406_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____require_result_9["清理夏提雅鲜血印记"]
+local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.05．滴管穿心")
+local _____91CA_653E_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3 = ____require_result_10["释放夏提雅滴管穿心"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.06．血月轮舞")
+local _____91CA_653E_590F_63D0_96C5_8840_6708_8F6E_821E = ____require_result_11["释放夏提雅血月轮舞"]
+local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.07．净化投枪")
+local _____91CA_653E_590F_63D0_96C5_51C0_5316_6295_67AA = ____require_result_12["释放夏提雅净化投枪"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.08．鲜血回收")
+local _____91CA_653E_590F_63D0_96C5_9C9C_8840_56DE_6536 = ____require_result_13["释放夏提雅鲜血回收"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.09．英灵战乙女")
+local _____542F_52A8_590F_63D0_96C5_82F1_7075_6218_4E59_5973_9636_6BB5 = ____require_result_14["启动夏提雅英灵战乙女阶段"]
+local _____6E05_7406_82F1_7075_6218_4E59_5973_6295_5F71 = ____require_result_14["清理英灵战乙女投影"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.10．镜像夹击")
+local _____91CA_653E_590F_63D0_96C5_955C_50CF_5939_51FB = ____require_result_15["释放夏提雅镜像夹击"]
+local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.11．真祖血宴")
+local _____91CA_653E_590F_63D0_96C5_771F_7956_8840_5BB4 = ____require_result_16["释放夏提雅真祖血宴"]
+local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.12．血月终舞")
+local _____91CA_653E_590F_63D0_96C5_8840_6708_7EC8_821E = ____require_result_17["释放夏提雅血月终舞"]
+local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.15．挑战入口与收束")
+local _____7ED1_5B9A_590F_63D0_96C5_6311_6218_751F_547D_4E0B_9650 = ____require_result_18["绑定夏提雅挑战生命下限"]
 local CreateUnit = jass.CreateUnit
 local GetPlayerId = jass.GetPlayerId
 local GetUnitX = jass.GetUnitX
@@ -51,7 +59,9 @@ local SetHeroLevel = jass.SetHeroLevel
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local SetUnitState = jass.SetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____590F_63D0_96C5_5355_4F4DID = stringToFourCCSafe("U009")
 local _____6D4B_8BD5_4E2D_5FC3X = -540.6
 local _____6D4B_8BD5_4E2D_5FC3Y = -2495.2
@@ -111,6 +121,7 @@ local function _____521B_5EFA_6216_83B7_53D6_590F_63D0_96C5_6D4B_8BD5_4E0A_4E0B_
     if runtime == nil then
         return nil
     end
+    _____7ED1_5B9A_590F_63D0_96C5_6311_6218_751F_547D_4E0B_9650(runtime)
     SelectUnitForPlayerSingle(boss, player)
     StarOther_PanCameraToTimedForPlayer(player, _____6D4B_8BD5_4E2D_5FC3X, _____6D4B_8BD5_4E2D_5FC3Y, 0.2)
     return {["运行时"] = runtime, ["目标单位"] = target, ["Boss单位"] = boss}
@@ -137,56 +148,141 @@ local function _____521B_5EFA_590F_63D0_96C5_6D4B_8BD5_8840_5370(context)
     _____521B_5EFA_590F_63D0_96C5_9C9C_8840_5370_8BB0(context["运行时"], x + 260, y - 120)
     _____521B_5EFA_590F_63D0_96C5_9C9C_8840_5370_8BB0(context["运行时"], x, y + 260)
 end
+local function _____6E05_7A7A_590F_63D0_96C5_6D4B_8BD5_8840_5370(context)
+    local source = context["运行时"]["血印句柄列表"]
+    local marks = {}
+    do
+        local i = 0
+        while i < #source do
+            marks[#marks + 1] = source[i + 1]
+            i = i + 1
+        end
+    end
+    do
+        local i = 0
+        while i < #marks do
+            _____6E05_7406_590F_63D0_96C5_9C9C_8840_5370_8BB0(context["运行时"], marks[i + 1], false)
+            i = i + 1
+        end
+    end
+end
+local function _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, _____9636_6BB5, _____4FDD_7559_8840_5370)
+    if _____4FDD_7559_8840_5370 == nil then
+        _____4FDD_7559_8840_5370 = false
+    end
+    local runtime = context["运行时"]
+    local boss = context["Boss单位"]
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
+    if not (maxLife > 0) then
+        return
+    end
+    if not _____4FDD_7559_8840_5370 then
+        _____6E05_7A7A_590F_63D0_96C5_6D4B_8BD5_8840_5370(context)
+    end
+    if _____9636_6BB5 ~= 2 then
+        _____6E05_7406_82F1_7075_6218_4E59_5973_6295_5F71(runtime)
+    end
+    local lifeRatio = 1
+    local phase = "P1鲜血女武神"
+    if _____9636_6BB5 == 2 then
+        lifeRatio = (_____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P2生命比例"] + _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3生命比例"]) * 0.5
+        phase = "P2英灵战乙女"
+    elseif _____9636_6BB5 == 3 then
+        lifeRatio = _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3生命比例"] * 0.5
+        phase = "P3真祖血宴"
+    end
+    SetUnitState(boss, UNIT_STATE_LIFE, maxLife * lifeRatio)
+    runtime["阶段"] = phase
+    runtime["当前大型技能"] = nil
+    runtime["普通机制忙碌到Ms"] = 0
+    runtime["P3转阶段已处理"] = _____9636_6BB5 == 3
+    runtime["血月终舞已释放"] = false
+    runtime["英灵复刻冷却到Ms"] = 0
+    runtime["上次英灵复刻技能"] = ""
+    _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(runtime)
+end
+local function _____51C6_5907_590F_63D0_96C5P2_82F1_7075(context)
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 2)
+    _____542F_52A8_590F_63D0_96C5_82F1_7075_6218_4E59_5973_9636_6BB5(context["运行时"], context["目标单位"])
+end
 local function _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3(_player, context)
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 1)
+    _____91CA_653E_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3(context["运行时"], context["目标单位"])
+end
+local function _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3P2(_player, context)
+    _____51C6_5907_590F_63D0_96C5P2_82F1_7075(context)
+    _____91CA_653E_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3(context["运行时"], context["目标单位"])
+end
+local function _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3P3(_player, context)
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 3)
     _____91CA_653E_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_8840_6708_8F6E_821E(_player, context)
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 1)
+    _____91CA_653E_590F_63D0_96C5_8840_6708_8F6E_821E(context["运行时"], context["目标单位"])
+end
+local function _____6D4B_8BD5_590F_63D0_96C5_8840_6708_8F6E_821EP3(_player, context)
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 3)
     _____91CA_653E_590F_63D0_96C5_8840_6708_8F6E_821E(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_51C0_5316_6295_67AA(_player, context)
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 1)
+    _____91CA_653E_590F_63D0_96C5_51C0_5316_6295_67AA(context["运行时"], context["目标单位"])
+end
+local function _____6D4B_8BD5_590F_63D0_96C5_51C0_5316_6295_67AAP2(_player, context)
+    _____51C6_5907_590F_63D0_96C5P2_82F1_7075(context)
+    _____91CA_653E_590F_63D0_96C5_51C0_5316_6295_67AA(context["运行时"], context["目标单位"])
+end
+local function _____6D4B_8BD5_590F_63D0_96C5_51C0_5316_6295_67AAP3(_player, context)
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 3)
     _____91CA_653E_590F_63D0_96C5_51C0_5316_6295_67AA(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_9C9C_8840_56DE_6536(_player, context)
-    context["运行时"]["阶段"] = "P1鲜血女武神"
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 1)
     _____521B_5EFA_590F_63D0_96C5_6D4B_8BD5_8840_5370(context)
     _____91CA_653E_590F_63D0_96C5_9C9C_8840_56DE_6536(context["运行时"])
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_82F1_7075_6218_4E59_5973(_player, context)
-    context["运行时"]["阶段"] = "P2英灵战乙女"
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 2)
     _____542F_52A8_590F_63D0_96C5_82F1_7075_6218_4E59_5973_9636_6BB5(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_955C_50CF_5939_51FB(_player, context)
-    context["运行时"]["阶段"] = "P2英灵战乙女"
-    _____542F_52A8_590F_63D0_96C5_82F1_7075_6218_4E59_5973_9636_6BB5(context["运行时"], context["目标单位"])
+    _____51C6_5907_590F_63D0_96C5P2_82F1_7075(context)
     _____91CA_653E_590F_63D0_96C5_955C_50CF_5939_51FB(context["运行时"], context["目标单位"])
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_771F_7956_8840_5BB4(_player, context)
-    context["运行时"]["阶段"] = "P3真祖血宴"
-    context["运行时"]["P3转阶段已处理"] = false
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 1)
     _____521B_5EFA_590F_63D0_96C5_6D4B_8BD5_8840_5370(context)
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 3, true)
+    context["运行时"]["P3转阶段已处理"] = false
     _____91CA_653E_590F_63D0_96C5_771F_7956_8840_5BB4(context["运行时"])
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_8840_6708_7EC8_821E(_player, context)
-    context["运行时"]["阶段"] = "P3真祖血宴"
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 3)
     context["运行时"]["P3转阶段已处理"] = true
-    context["运行时"]["血月终舞已释放"] = false
     _____91CA_653E_590F_63D0_96C5_8840_6708_7EC8_821E(context["运行时"], context["目标单位"])
 end
 local function _____51C6_5907_590F_63D0_96C5_8840_4E4B_590D_751F(_player, context)
-    context["运行时"]["阶段"] = "P3真祖血宴"
+    _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 3)
+    _____7ED1_5B9A_590F_63D0_96C5_6311_6218_751F_547D_4E0B_9650(context["运行时"])
     context["运行时"]["已触发复生"] = false
     SetUnitState(context["Boss单位"], UNIT_STATE_LIFE, 1)
 end
 local _____590F_63D0_96C5_6D4B_8BD5_6280_80FD_5217_8868 = {
-    {["序号"] = 1, ["名称"] = "滴管穿心", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3},
-    {["序号"] = 2, ["名称"] = "血月轮舞", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_8840_6708_8F6E_821E},
-    {["序号"] = 3, ["名称"] = "净化投枪", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_51C0_5316_6295_67AA},
-    {["序号"] = 4, ["名称"] = "鲜血回收", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_9C9C_8840_56DE_6536},
-    {["序号"] = 5, ["名称"] = "P2英灵战乙女", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_82F1_7075_6218_4E59_5973},
-    {["序号"] = 6, ["名称"] = "P2镜像夹击", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_955C_50CF_5939_51FB},
-    {["序号"] = 7, ["名称"] = "P3真祖血宴", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_771F_7956_8840_5BB4},
-    {["序号"] = 8, ["名称"] = "P3血月终舞", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_8840_6708_7EC8_821E},
-    {["序号"] = 9, ["名称"] = "血之复生触发准备（攻击致死）", ["执行"] = _____51C6_5907_590F_63D0_96C5_8840_4E4B_590D_751F}
+    {["序号"] = 1, ["名称"] = "滴管穿心（P1基础）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3},
+    {["序号"] = 1, ["命令"] = "1-2", ["名称"] = "滴管穿心（P2英灵复刻）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3P2},
+    {["序号"] = 1, ["命令"] = "1-3", ["名称"] = "滴管穿心（P3两段猎血起手）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3P3},
+    {["序号"] = 2, ["名称"] = "血月轮舞（P1基础）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_8840_6708_8F6E_821E},
+    {["序号"] = 2, ["命令"] = "2-3", ["名称"] = "血月轮舞（P3第二段加速）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_8840_6708_8F6E_821EP3},
+    {["序号"] = 3, ["名称"] = "净化投枪（P1基础）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_51C0_5316_6295_67AA},
+    {["序号"] = 3, ["命令"] = "3-2", ["名称"] = "净化投枪（P2英灵复刻）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_51C0_5316_6295_67AAP2},
+    {["序号"] = 3, ["命令"] = "3-3", ["名称"] = "净化投枪（P3双投枪）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_51C0_5316_6295_67AAP3},
+    {["序号"] = 4, ["名称"] = "鲜血回收（P1/P2同形态）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_9C9C_8840_56DE_6536},
+    {["序号"] = 5, ["名称"] = "英灵战乙女（P2基础）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_82F1_7075_6218_4E59_5973},
+    {["序号"] = 6, ["名称"] = "镜像夹击（P2基础）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_955C_50CF_5939_51FB},
+    {["序号"] = 7, ["名称"] = "真祖血宴（P3转阶段）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_771F_7956_8840_5BB4},
+    {["序号"] = 8, ["名称"] = "血月终舞（P3基础）", ["执行"] = _____6D4B_8BD5_590F_63D0_96C5_8840_6708_7EC8_821E},
+    {["序号"] = 9, ["名称"] = "血之复生被动准备（再输入55触底）", ["执行"] = _____51C6_5907_590F_63D0_96C5_8840_4E4B_590D_751F}
 }
 _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4({
     ["命令单位名"] = "夏提雅",

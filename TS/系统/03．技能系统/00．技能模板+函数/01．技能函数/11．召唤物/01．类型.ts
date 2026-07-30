@@ -57,6 +57,7 @@ export interface 召唤物输入参数 {
   射程?: number;
   range?: number;
   Rng?: number;
+  固定站桩?: boolean;
   普攻弹道模型?: string;
   弹道模型?: string;
   missileModel?: string;
@@ -113,6 +114,7 @@ export interface 规范化召唤物参数 {
   攻击力?: number;
   攻击间隔?: number;
   攻击范围?: number;
+  固定站桩?: boolean;
   普攻弹道模型?: string;
   普攻弹道弧度?: number;
   普攻弹道速度?: number;

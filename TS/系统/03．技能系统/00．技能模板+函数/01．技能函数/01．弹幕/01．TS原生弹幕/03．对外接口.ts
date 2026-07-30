@@ -8,6 +8,7 @@ import {
   CreateUnit,
   默认弹幕单位类型,
   DzGetColor,
+  DzSetEffectAnimation,
   DzSetEffectVertexColor,
   DzSetEffectPos,
   DzSetUnitModel,
@@ -145,6 +146,9 @@ function 创建弹幕附加特效(
   );
   if (effect == null || effect === 0) return null;
   DzSetEffectPos(effect, x, y, z);
+  if (特效参数.动画索引 != null) {
+    DzSetEffectAnimation?.(effect, 特效参数.动画索引, 0);
+  }
   设置弹幕附加特效颜色(effect, 特效参数);
   return effect;
 }

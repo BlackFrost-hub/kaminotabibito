@@ -11,6 +11,7 @@ local _____521B_5EFA_8054_5408_6218_6597_6210_5458_751F_547D_5468_671F = ____20_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
 local _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放赤誓灵卫台词"]
 local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
@@ -19,6 +20,11 @@ local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_0["�
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
 local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_2["开始硬直"]
+local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_3["显示常规技能吟唱条"]
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_3["显示大招吟唱条"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -38,6 +44,29 @@ local _____8D64_8A93_6B63_5E38ID = stringToFourCC(_____7956_5730_53CC_7075_536B_
 local _____8D64_8A93_53D8_5F02ID = stringToFourCC(_____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["单位"]["赤誓灵卫"]["变异单位ID"])
 local _____82CD_5F71_6B63_5E38ID = stringToFourCC(_____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["单位"]["苍影灵卫"]["单位ID"])
 local _____82CD_5F71_53D8_5F02ID = stringToFourCC(_____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["单位"]["苍影灵卫"]["变异单位ID"])
+____exports["开始祖地双灵卫常规施法"] = function(unit, _____541F_5531_79D2, _____6807_9898_6587_672C, _____63D0_793A_6587_672C, _____786C_76F4_79D2)
+    if not _____5355_4F4D_6709_6548(unit) then
+        return
+    end
+    _____5F00_59CB_786C_76F4(unit, _____786C_76F4_79D2 or _____541F_5531_79D2)
+    _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = _____541F_5531_79D2, ["颜色ID"] = 5, ["标题文本"] = _____6807_9898_6587_672C, ["提示文本"] = _____63D0_793A_6587_672C})
+end
+____exports["开始祖地双灵卫联合施法"] = function(context, _____541F_5531_79D2, _____6807_9898_6587_672C, _____63D0_793A_6587_672C, _____786C_76F4_79D2)
+    local duration = _____786C_76F4_79D2 or _____541F_5531_79D2
+    if _____5355_4F4D_6709_6548(context["赤誓灵卫单位"]) then
+        _____5F00_59CB_786C_76F4(context["赤誓灵卫单位"], duration)
+    end
+    if _____5355_4F4D_6709_6548(context["苍影灵卫单位"]) then
+        _____5F00_59CB_786C_76F4(context["苍影灵卫单位"], duration)
+    end
+    _____663E_793A_5927_62DB_541F_5531_6761({
+        ["通道"] = "大招",
+        ["总时长"] = _____541F_5531_79D2,
+        ["颜色ID"] = 5,
+        ["标题文本"] = _____6807_9898_6587_672C,
+        ["提示文本"] = _____63D0_793A_6587_672C
+    })
+end
 local _____4E0A_4E0B_6587_5217_8868 = {}
 local _____5355_4F4D_4E0A_4E0B_6587_8868 = {}
 local function _____662F_8D64_8A93_5355_4F4D(unit)
@@ -64,17 +93,17 @@ local function _____67E5_627E_9644_8FD1_642D_6863(unit, _____5BFB_627E_8D64_8A93
             break
         end
         GroupRemoveUnit(group, candidate)
-        local ____temp_3 = candidate ~= unit
-        if ____temp_3 then
-            local _____5BFB_627E_8D64_8A93_2
+        local ____temp_5 = candidate ~= unit
+        if ____temp_5 then
+            local _____5BFB_627E_8D64_8A93_4
             if _____5BFB_627E_8D64_8A93 then
-                _____5BFB_627E_8D64_8A93_2 = _____662F_8D64_8A93_5355_4F4D(candidate)
+                _____5BFB_627E_8D64_8A93_4 = _____662F_8D64_8A93_5355_4F4D(candidate)
             else
-                _____5BFB_627E_8D64_8A93_2 = _____662F_82CD_5F71_5355_4F4D(candidate)
+                _____5BFB_627E_8D64_8A93_4 = _____662F_82CD_5F71_5355_4F4D(candidate)
             end
-            ____temp_3 = _____5BFB_627E_8D64_8A93_2
+            ____temp_5 = _____5BFB_627E_8D64_8A93_4
         end
-        if ____temp_3 then
+        if ____temp_5 then
             result = candidate
             break
         end
@@ -196,38 +225,38 @@ ____exports["获取或创建祖地双灵卫运行时上下文"] = function(_____
     if existing ~= nil then
         return existing
     end
-    local _____662F_8D64_8A93_5355_4F4D_result_4
+    local _____662F_8D64_8A93_5355_4F4D_result_6
     if _____662F_8D64_8A93_5355_4F4D(_____542F_52A8_5355_4F4D) then
-        _____662F_8D64_8A93_5355_4F4D_result_4 = _____542F_52A8_5355_4F4D
+        _____662F_8D64_8A93_5355_4F4D_result_6 = _____542F_52A8_5355_4F4D
     else
-        _____662F_8D64_8A93_5355_4F4D_result_4 = _____67E5_627E_9644_8FD1_642D_6863(_____542F_52A8_5355_4F4D, true)
+        _____662F_8D64_8A93_5355_4F4D_result_6 = _____67E5_627E_9644_8FD1_642D_6863(_____542F_52A8_5355_4F4D, true)
     end
-    local red = _____662F_8D64_8A93_5355_4F4D_result_4
-    local _____662F_82CD_5F71_5355_4F4D_result_5
+    local red = _____662F_8D64_8A93_5355_4F4D_result_6
+    local _____662F_82CD_5F71_5355_4F4D_result_7
     if _____662F_82CD_5F71_5355_4F4D(_____542F_52A8_5355_4F4D) then
-        _____662F_82CD_5F71_5355_4F4D_result_5 = _____542F_52A8_5355_4F4D
+        _____662F_82CD_5F71_5355_4F4D_result_7 = _____542F_52A8_5355_4F4D
     else
-        _____662F_82CD_5F71_5355_4F4D_result_5 = _____67E5_627E_9644_8FD1_642D_6863(_____542F_52A8_5355_4F4D, false)
+        _____662F_82CD_5F71_5355_4F4D_result_7 = _____67E5_627E_9644_8FD1_642D_6863(_____542F_52A8_5355_4F4D, false)
     end
-    local azure = _____662F_82CD_5F71_5355_4F4D_result_5
+    local azure = _____662F_82CD_5F71_5355_4F4D_result_7
     if red == nil or red == 0 or azure == nil or azure == 0 then
         return nil
     end
-    local ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_6 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(_____542F_52A8_5355_4F4D)
-    if ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_6 == nil then
-        ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_6 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(red)
+    local ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(_____542F_52A8_5355_4F4D)
+    if ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8 == nil then
+        ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(red)
     end
-    local ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_6_7 = ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_6
-    if ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_6_7 == nil then
-        ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_6_7 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(azure)
+    local ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8_9 = ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8
+    if ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8_9 == nil then
+        ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8_9 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(azure)
     end
-    local battle = ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_6_7
-    local ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_11 = ____exports["创建祖地双灵卫运行时上下文"]
-    local ____opt_result_10
+    local battle = ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8_9
+    local ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_13 = ____exports["创建祖地双灵卫运行时上下文"]
+    local ____opt_result_12
     if battle ~= nil then
-        ____opt_result_10 = battle["地点矩形"]
+        ____opt_result_12 = battle["地点矩形"]
     end
-    local context = ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_11(red, azure, ____opt_result_10)
+    local context = ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_13(red, azure, ____opt_result_12)
     _____4E0A_4E0B_6587_5217_8868[#_____4E0A_4E0B_6587_5217_8868 + 1] = context
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(red)] = context
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(azure)] = context
@@ -240,8 +269,8 @@ ____exports["获取或创建祖地双灵卫运行时上下文"] = function(_____
             end
         end
     )
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "祖地双灵卫-苍影开场台词", azureOpeningId)
+    local ____self_14 = context["清理"]
+    ____self_14["登记延迟回调"](____self_14, "祖地双灵卫-苍影开场台词", azureOpeningId)
     return context
 end
 ____exports["清理祖地双灵卫运行时上下文"] = function(context)
@@ -252,7 +281,7 @@ ____exports["清理祖地双灵卫运行时上下文"] = function(context)
     context["阶段"] = "已结束"
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(context["赤誓灵卫单位"])] = nil
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(context["苍影灵卫单位"])] = nil
-    local ____self_13 = context["清理"]
-    ____self_13["清理全部"](____self_13)
+    local ____self_15 = context["清理"]
+    ____self_15["清理全部"](____self_15)
 end
 return ____exports

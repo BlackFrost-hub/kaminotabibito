@@ -18,6 +18,7 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetRandomReal = jass.GetRandomReal as (lowBound: number, highBound: number) => number;
+const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, targetWidget: any) => boolean;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -26,8 +27,24 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位") as {
   创建可攻击机制单位: (this: void, 参数: any) => any;
 };
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 const { 临时调整攻击 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   临时调整攻击: (this: void, unit: any, value: number) => void;
+};
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, unit: any, 持续时间: number) => void;
+};
+const { 显示常规技能吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
+  显示常规技能吟唱条: (this: void, 参数: any) => void;
+};
+const { 登记护卫单位, 注销护卫单位 } = require("系统.01．单位系统.10．护卫系统.index") as {
+  登记护卫单位: (this: void, unit: any, 参数: any) => any;
+  注销护卫单位: (this: void, unit: any) => boolean;
+};
+const { 获取Boss技能最近敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
+  获取Boss技能最近敌对英雄: (this: void, boss: any) => any;
 };
 
 function 治疗Boss最大生命比例(this: void, boss: any, ratio: number): void {
@@ -39,6 +56,10 @@ function 幼鱿死亡掉落残片(this: void, context: 卡瑟拉运行时上下�
   if (!单位有效(killer)) return;
   const chance = 卡瑟拉数值与表现配置.触手鞭笞.触手残片掉落概率;
   if (GetRandomReal(0, 1) <= chance) 增加玩家触手残片(context, killer, 1);
+}
+
+function 注销卡瑟拉深渊幼鱿护卫(this: void, unit: any): void {
+  注销护卫单位(unit);
 }
 
 function 创建深渊幼鱿(this: void, context: 卡瑟拉运行时上下文, angle: number): void {
@@ -59,12 +80,29 @@ function 创建深渊幼鱿(this: void, context: 卡瑟拉运行时上下文, an
     最大生命: cfg.幼鱿生命值,
     缩放: cfg.幼鱿缩放,
     持续时间: cfg.吞噬等待秒 + 2,
-    on死亡: function 卡瑟拉深渊幼鱿死亡(this: void, _unit: any, killer: any): void {
+    on死亡: function 卡瑟拉深渊幼鱿死亡(this: void, unit: any, killer: any): void {
+      注销卡瑟拉深渊幼鱿护卫(unit);
       幼鱿死亡掉落残片(context, killer);
     },
+    on销毁: 注销卡瑟拉深渊幼鱿护卫,
   });
   if (instance == null || !单位有效(instance.单位)) return;
+  创建点特效({
+    模型路径: cfg.幼鱿出现特效模型路径,
+    X: x,
+    Y: y,
+    缩放: cfg.幼鱿出现特效缩放,
+    持续秒: cfg.幼鱿出现特效持续秒,
+  });
   临时调整攻击(instance.单位, cfg.幼鱿攻击力);
+  登记护卫单位(instance.单位, {
+    主Boss单位: boss,
+    护卫类型: "卡瑟拉-深渊幼鱿",
+    标记为召唤单位: true,
+    Boss结束处理: "注销",
+  });
+  const target = 获取Boss技能最近敌对英雄(boss);
+  if (单位有效(target)) IssueTargetOrder(instance.单位, "attack", target);
   const id = addDelayedCallback(cfg.吞噬等待秒 * 1000, function 卡瑟拉深渊幼鱿吞噬(this: void): void {
     if (!单位有效(boss) || !instance.是否存活()) return;
     instance.销毁();
@@ -73,11 +111,27 @@ function 创建深渊幼鱿(this: void, context: 卡瑟拉运行时上下文, an
   context.清理.登记延迟回调("卡瑟拉-深渊幼鱿吞噬", id);
 }
 
+function 召唤深渊幼鱿(this: void, context: 卡瑟拉运行时上下文): void {
+  const boss = context.Boss单位;
+  if (!单位有效(boss) || context.Boss潜入中) return;
+  const cfg = 卡瑟拉数值与表现配置.深渊召唤;
+  for (let i = 0; i < cfg.幼鱿数量; i++) {
+    创建深渊幼鱿(context, i * 120);
+  }
+}
+
 export function 释放卡瑟拉深渊召唤(this: void, context: 卡瑟拉运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.Boss潜入中) return;
   const cfg = 卡瑟拉数值与表现配置.深渊召唤;
-  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作原始时长秒);
+  开始硬直(boss, cfg.施法硬直秒);
+  显示常规技能吟唱条({
+    总时长: cfg.施法硬直秒,
+    颜色ID: cfg.吟唱条颜色ID,
+    标题文本: cfg.吟唱条标题文本,
+    提示文本: cfg.吟唱条提示文本,
+  });
+  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.施法硬直秒);
   播放卡瑟拉台词(boss, "深渊召唤");
   播放Boss坐标音效(卡瑟拉音效配置.深渊召唤.幼鱿入场, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
   尝试播放Boss拟声池({
@@ -89,7 +143,8 @@ export function 释放卡瑟拉深渊召唤(this: void, context: 卡瑟拉运行
     冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
     触发概率百分比: 卡瑟拉音效配置.怪物拟声.关键机制触发概率百分比,
   });
-  for (let i = 0; i < cfg.幼鱿数量; i++) {
-    创建深渊幼鱿(context, i * 120);
-  }
+  const id = addDelayedCallback(cfg.施法硬直秒 * 1000, function 卡瑟拉深渊召唤生成幼鱿(this: void): void {
+    召唤深渊幼鱿(context);
+  });
+  context.清理.登记延迟回调("卡瑟拉-深渊召唤生成幼鱿", id);
 }

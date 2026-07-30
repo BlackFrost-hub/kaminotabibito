@@ -36,11 +36,9 @@ const { addDelayedCallback, addPeriodicCallback, getServerTime } = require("系�
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
-const { 创建点特效, 创建循环点特效, 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+const { 创建点特效, 创建循环点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
   创建循环点特效: (this: void, 参数: any) => any;
-  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
-  销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
 };
 const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   CosBJ: (this: void, degrees: number) => number;
@@ -63,7 +61,7 @@ const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
@@ -115,10 +113,12 @@ function 取安全点列表(this: void, context: 巴尔扎罗斯运行时上下�
 function 创建安全点提示(this: void, point: 末日熔爆点, 持续秒: number): void {
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;
   if (point.左 != null && point.右 != null && point.下 != null && point.上 != null) {
+    const 矩形路径起点X = (point.左 + point.右) / 2;
+    const 矩形路径起点Y = point.下;
     创建技能提示圈({
       类型: "矩形",
-      X: point.X,
-      Y: point.Y,
+      X: 矩形路径起点X,
+      Y: 矩形路径起点Y,
       宽度: point.右 - point.左,
       长度: point.上 - point.下,
       朝向: 90,
@@ -162,7 +162,19 @@ function 创建安全点高亮(this: void, points: 末日熔爆点[]): void {
 function 创建末日熔爆引导表现(this: void, context: 巴尔扎罗斯运行时上下文, center: 末日熔爆点, safePoints: 末日熔爆点[]): void {
   const boss = context.Boss单位;
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;
-  创建单位坐标跟随特效(boss, config.Boss蓄力特效路径, config.Boss蓄力特效键, config.Boss蓄力特效缩放, config.Boss蓄力特效高度);
+  创建循环点特效({
+    模型路径: config.Boss蓄力特效路径,
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    Z: config.Boss蓄力特效高度,
+    缩放: config.Boss蓄力特效缩放,
+    重建间隔秒: config.Boss蓄力特效Tick秒,
+    单次持续秒: config.Boss蓄力特效Tick秒,
+    总持续秒: config.引导秒,
+    存活条件: function 巴尔扎罗斯末日熔爆蓄力存活(this: void): boolean {
+      return context.末日熔爆引导中 && 单位有效(boss);
+    },
+  });
   创建循环点特效({
     模型路径: config.场地中心法阵路径,
     X: center.X,
@@ -253,7 +265,7 @@ function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下�
         伤害: 计算安全区余波伤害(hero),
         attack: false,
         ranged: true,
-        attackType: ATTACK_TYPE_CHAOS,
+        attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_FIRE,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: "Boss技能",
@@ -268,7 +280,7 @@ function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下�
         伤害: 计算外圈伤害(boss, hero),
         attack: false,
         ranged: true,
-        attackType: ATTACK_TYPE_CHAOS,
+        attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_FIRE,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: "Boss技能",
@@ -313,7 +325,6 @@ export function 释放巴尔扎罗斯末日熔爆(this: void, context: 巴尔扎
     },
     on生效: function 巴尔扎罗斯末日熔爆生效(this: void): void {
       context.末日熔爆引导中 = false;
-      销毁单位坐标跟随特效(boss, config.Boss蓄力特效键);
       结算末日熔爆(context, center, safePoints, 技能实例ID);
     },
   });

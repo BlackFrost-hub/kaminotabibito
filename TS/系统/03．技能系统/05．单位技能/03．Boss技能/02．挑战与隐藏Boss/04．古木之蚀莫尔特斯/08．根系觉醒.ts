@@ -3,7 +3,7 @@
 import { 增加玩家腐败值, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 播放莫尔特斯限时动作 } from "./16．公共工具";
+import { 单位有效, 播放莫尔特斯限时动作, 显示莫尔特斯大招吟唱条, 关闭莫尔特斯大招吟唱条 } from "./16．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 
 const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -154,6 +154,7 @@ function 莫尔特斯根系觉醒超时(this: void, _剩余数量: number, conte
 }
 
 function 莫尔特斯根系觉醒结束(this: void, _是否成功: boolean, _剩余数量: number, context: 莫尔特斯运行时上下文): void {
+  关闭莫尔特斯大招吟唱条();
   if (单位有效(context.Boss单位)) {
     ShowUnit(context.Boss单位, true);
     移除单位暂停(context.Boss单位, 莫尔特斯根系觉醒暂停来源);
@@ -165,6 +166,7 @@ export function 触发莫尔特斯根系觉醒(this: void, context: 莫尔特斯
   if (context.根系觉醒已触发 || !单位有效(context.Boss单位)) return;
   context.根系觉醒已触发 = true;
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
+  显示莫尔特斯大招吟唱条(cfg.限时秒, "根系觉醒", "在时间结束前摧毁全部腐败之源");
   播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(context.Boss单位, "根系觉醒");
   播放Boss坐标音效(莫尔特斯音效配置.根系觉醒.机制开始, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);

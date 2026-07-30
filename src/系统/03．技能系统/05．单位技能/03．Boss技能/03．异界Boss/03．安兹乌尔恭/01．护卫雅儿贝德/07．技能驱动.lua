@@ -14,17 +14,89 @@ local ____09_FF0E_62A4_536B_53CD_51FB = require("系统.03．技能系统.05．�
 local _____91CA_653E_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB = ____09_FF0E_62A4_536B_53CD_51FB["释放雅儿贝德护卫反击"]
 local ____10_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.10．台词播放")
 local _____64AD_653E_96C5_513F_8D1D_5FB7_53F0_8BCD = ____10_FF0E_53F0_8BCD_64AD_653E["播放雅儿贝德台词"]
+local ____00_FF0E_51B2_950B_8868_73B0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.00．冲锋表现")
+local _____5F00_59CB_96C5_513F_8D1D_5FB7_51B2_950B = ____00_FF0E_51B2_950B_8868_73B0["开始雅儿贝德冲锋"]
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_0["获取Boss技能最近敌对英雄"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
 local ____require_result_2 = require("系统.03．技能系统.06．AI自动使用技能.04．Boss自动施法开关")
 local ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F = ____require_result_2["Boss自动施法是否开启"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local Atan2 = jass.Atan2
+local SquareRoot = jass.SquareRoot
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local RAD_TO_DEG = 57.29577951308232
+local function _____53D6_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B_8DEF_5F84(albedo, targetX, targetY)
+    local startX = GetUnitX(albedo)
+    local startY = GetUnitY(albedo)
+    local dx = targetX - startX
+    local dy = targetY - startY
+    local distance = SquareRoot(dx * dx + dy * dy)
+    if distance <= 1 then
+        return nil
+    end
+    return {
+        X = startX,
+        Y = startY,
+        ["距离"] = distance,
+        ["朝向"] = Atan2(dy, dx) * RAD_TO_DEG
+    }
+end
+____exports["创建雅儿贝德时间停止冲锋预警"] = function(context, targetX, targetY, durationSeconds)
+    local state = context["雅儿贝德"]
+    local albedo = state and state["单位"]
+    if state == nil or not _____5355_4F4D_6709_6548(albedo) or state["阶段状态"] == "失衡" or state["阶段状态"] == "已离场" then
+        return
+    end
+    local path = _____53D6_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B_8DEF_5F84(albedo, targetX, targetY)
+    if path == nil then
+        return
+    end
+    _____521B_5EFA_6280_80FD_63D0_793A_5708({
+        ["类型"] = "方向直线",
+        X = path.X,
+        Y = path.Y,
+        ["宽度"] = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["时间停止雅儿贝德冲锋路径宽度"],
+        ["长度"] = path["距离"],
+        ["朝向"] = path["朝向"],
+        ["持续时间"] = durationSeconds,
+        ["来源单位"] = albedo
+    })
+end
+____exports["启动雅儿贝德时间停止冲锋"] = function(context, targetX, targetY)
+    local state = context["雅儿贝德"]
+    local albedo = state and state["单位"]
+    if state == nil or not _____5355_4F4D_6709_6548(albedo) or context["挑战已结束"] or context["当前大型技能"] ~= "时间停止" then
+        return false
+    end
+    if state["阶段状态"] == "失衡" or state["阶段状态"] == "已离场" then
+        return false
+    end
+    local path = _____53D6_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B_8DEF_5F84(albedo, targetX, targetY)
+    if path == nil then
+        return false
+    end
+    local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]
+    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = albedo, ["动画编号"] = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["守护回归动画编号"], ["持续秒"] = cfg["时间停止雅儿贝德冲锋秒"], ["恢复动画编号"] = 1})
+    local chargeId = _____5F00_59CB_96C5_513F_8D1D_5FB7_51B2_950B(albedo, {
+        ["目标X"] = targetX,
+        ["目标Y"] = targetY,
+        ["距离"] = path["距离"],
+        ["持续时间"] = cfg["时间停止雅儿贝德冲锋秒"],
+        ["检查地形"] = true,
+        ["暂停单位"] = true,
+        ["禁用碰撞"] = true
+    })
+    return chargeId ~= 0
+end
 ____exports["推进雅儿贝德技能驱动"] = function(context)
     if not ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F() then
         return
@@ -37,8 +109,8 @@ ____exports["推进雅儿贝德技能驱动"] = function(context)
     if state["阶段状态"] == "失衡" or state["阶段状态"] == "已离场" then
         return
     end
-    local ____opt_5 = state["独占状态"]
-    local active = ____opt_5 and ____opt_5["取当前"](____opt_5)
+    local ____opt_10 = state["独占状态"]
+    local active = ____opt_10 and ____opt_10["取当前"](____opt_10)
     if active ~= nil and active.key ~= "雅儿贝德-守护者之职责" then
         return
     end

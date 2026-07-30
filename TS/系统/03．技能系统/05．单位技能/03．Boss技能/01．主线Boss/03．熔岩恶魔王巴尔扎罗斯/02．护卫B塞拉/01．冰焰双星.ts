@@ -102,8 +102,16 @@ function 创建冰焰弱追踪曲线轨迹(
       const y01 = startY + (controlY - startY) * t;
       const x12 = controlX + (endX - controlX) * t;
       const y12 = controlY + (endY - controlY) * t;
-      const x = x01 + (x12 - x01) * t;
-      const y = y01 + (y12 - y01) * t;
+      const desiredX = x01 + (x12 - x01) * t;
+      const desiredY = y01 + (y12 - y01) * t;
+      // 贝塞尔采样点按时间推进会绕过弹体速度；限制单 Tick 位移，确保弱追踪阶段也遵守配置速度。
+      const dx = desiredX - 实例.当前X;
+      const dy = desiredY - 实例.当前Y;
+      const distance = SquareRoot(dx * dx + dy * dy);
+      const maxStep = 实例.当前速度 * delta;
+      const stepScale = distance > 0 && maxStep > 0 && distance > maxStep ? maxStep / distance : 1;
+      const x = 实例.当前X + dx * stepScale;
+      const y = 实例.当前Y + dy * stepScale;
       return { X: x, Y: y, Z: startZ, 方向角: 取方向角(实例.当前X, 实例.当前Y, x, y), 完成: false };
     }
     if (!状态.锁定) {
@@ -133,8 +141,9 @@ function 发射冰焰弹体(this: void, context: 巴尔扎罗斯运行时上下�
   const controlX = startX + CosBJ(angle) * config.曲线控制前移 + CosBJ(sideAngle) * config.曲线控制侧移;
   const controlY = startY + SinBJ(angle) * config.曲线控制前移 + SinBJ(sideAngle) * config.曲线控制侧移;
   const startZ = GetUnitFlyHeight(sera) + config.飞行高度;
-  创建原生弹幕({
+  const 弹幕 = 创建原生弹幕({
     所有者: sera,
+    载体模式: 类型 === "火焰" ? "特效" : "单位",
     X: startX,
     Y: startY,
     方向角: angle,
@@ -144,8 +153,13 @@ function 发射冰焰弹体(this: void, context: 巴尔扎罗斯运行时上下�
     生命周期: config.生命周期秒,
     碰撞消失: true,
     最大距离: config.最大飞行距离,
-    模型: 类型 === "冰霜" ? config.冰球模型路径 : config.火球模型路径,
-    附着特效模型: 类型 === "冰霜" ? config.冰球模型路径 : config.火球模型路径,
+    模型: 类型 === "冰霜" ? config.冰球模型路径 : "",
+    附加特效1: 类型 === "火焰" ? {
+      模型: config.火球模型路径,
+      动画索引: 0,
+      跟随主弹幕参数: true,
+      跟随轨迹俯仰: true,
+    } : undefined,
     缩放: 类型 === "冰霜" ? config.冰球缩放 : config.火球缩放,
     飞行高度: startZ,
     影响目标: "敌方",
@@ -162,7 +176,7 @@ function 发射冰焰弹体(this: void, context: 巴尔扎罗斯运行时上下�
   });
 }
 
-export function 释放冰焰双星(this: void, context: 巴尔扎罗斯运行时上下文, target: any): void {
+export function 释放冰焰双星(this: void, context: 巴尔扎罗斯运行时上下文, target: any, 测试类型: "双星" | "火焰" | "冰霜" = "双星"): void {
   const sera = context.塞拉;
   if (!单位有效(sera) || !单位有效(target)) return;
   const config = 巴尔扎罗斯技能数值配置.冰焰双星;
@@ -192,8 +206,8 @@ export function 释放冰焰双星(this: void, context: 巴尔扎罗斯运行时
     },
     on生效: function 塞拉冰焰双星生效(this: void): void {
       播放Boss坐标音效(巴尔扎罗斯音效配置.塞拉.冰焰双星发射, GetUnitX(sera), GetUnitY(sera), 巴尔扎罗斯音效配置.默认裁断距离);
-      发射冰焰弹体(context, target, "冰霜", 1);
-      发射冰焰弹体(context, target, "火焰", -1);
+      if (测试类型 !== "火焰") 发射冰焰弹体(context, target, "冰霜", 1);
+      if (测试类型 !== "冰霜") 发射冰焰弹体(context, target, "火焰", -1);
     },
   });
 }

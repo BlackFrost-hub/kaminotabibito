@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
 import { 播放雅儿贝德台词 } from './10．台词播放';
@@ -33,13 +34,11 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
-const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, unit: any, point: string) => any;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
+const 生命锚点封锁锁链跟随键 = '雅儿贝德-生命锚点封锁锁链';
 
 export interface 生命锚点封锁目标 {
   单位: any;
@@ -98,7 +97,6 @@ export function 启动雅儿贝德生命锚点封锁(
   const unitId = GetHandleId(unit);
   let shieldId = 0;
   let periodicId = 0;
-  let barrierEffect: any = 0;
   let cleaned = false;
 
   function 清除溢出保护(this: void): void {
@@ -117,10 +115,7 @@ export function 启动雅儿贝德生命锚点封锁(
     const currentShieldId = shieldId;
     shieldId = 0;
     if (currentShieldId !== 0 && 原因 !== '护盾结束') 移除护盾(currentShieldId);
-    if (barrierEffect != null && barrierEffect !== 0) {
-      DestroyEffect(barrierEffect);
-      barrierEffect = 0;
-    }
+    销毁单位坐标跟随特效(unit, 生命锚点封锁锁链跟随键);
     if (原因 === '破碎') {
       const breakEffect = AddSpecialEffect(cfg.表现资源.雅儿贝德共同护盾破碎特效路径, GetUnitX(unit), GetUnitY(unit));
       if (breakEffect != null && breakEffect !== 0) YDWETimerDestroyEffectSafe(1.2, breakEffect);
@@ -172,10 +167,13 @@ export function 启动雅儿贝德生命锚点封锁(
     return undefined;
   }
   SetUnitInvulnerable(unit, false);
-  barrierEffect = AddSpecialEffectTarget(cfg.表现资源.雅儿贝德共同护盾特效路径, unit, 'origin');
-  if (barrierEffect != null && barrierEffect !== 0) {
-    EXSetEffectSize(barrierEffect, cfg.守护者模式.生命锚点封锁屏障缩放);
-  }
+  创建单位坐标跟随特效(
+    unit,
+    cfg.表现资源.雅儿贝德黑翼拘束锁链特效路径,
+    生命锚点封锁锁链跟随键,
+    cfg.守护者模式.生命锚点封锁锁链缩放,
+    cfg.守护者模式.生命锚点封锁锁链高度,
+  );
   periodicId = addPeriodicCallback(cfg.守护者模式.生命锚点封锁状态检查间隔毫秒, on封锁状态检查);
   context.清理.登记清理('雅儿贝德-生命锚点封锁', function 生命锚点封锁清理(this: void): void {
     结束封锁('挑战清理');

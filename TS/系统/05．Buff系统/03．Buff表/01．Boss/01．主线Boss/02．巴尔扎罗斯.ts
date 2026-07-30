@@ -11,6 +11,7 @@ export const 巴尔扎罗斯BuffID = {
   塞拉火焰形态: "BBZ6",
   塞拉冰霜形态: "BBZ7",
   熔岩暴走: "BBZ8",
+  绝对零度领域: "BBZ9",
 } as const;
 
 export type 巴尔扎罗斯BuffID类型 = typeof 巴尔扎罗斯BuffID[keyof typeof 巴尔扎罗斯BuffID];
@@ -151,6 +152,22 @@ export const 巴尔扎罗斯Buff表: Record<string, BuffData> = {
     priority: 94,
     canPurge: false,
     tooltip: "巴尔扎罗斯进入地核暴走阶段，场地压力加速，技能强度提高，并周期触发末日熔爆威胁。",
+  },
+  [巴尔扎罗斯BuffID.绝对零度领域]: {
+    buffID: 巴尔扎罗斯BuffID.绝对零度领域,
+    buffName: "绝对零度领域",
+    icon: "BuffIcon\\Boss\\Balzaroth\\absolute_zero_domain.blp",
+    effect: "",
+    type: "Debuff:field:frost:damage-down",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 87,
+    canPurge: false,
+    data属性名: "造成伤害降低",
+    tooltip: "身处绝对零度领域时，每秒清除灼热层数，但造成的伤害降低data%，离开领域后仍持续time秒。",
   },
 };
 

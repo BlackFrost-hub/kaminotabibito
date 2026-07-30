@@ -15,6 +15,7 @@ local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
+local _____5F00_59CB_83AB_5C14_7279_65AF_5927_62DB_65BD_6CD5 = ____16_FF0E_516C_5171_5DE5_5177["开始莫尔特斯大招施法"]
 local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____16_FF0E_516C_5171_5DE5_5177["点到线段距离平方"]
 local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
@@ -33,6 +34,8 @@ local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
 local _____65BD_52A0_6050_60E7 = ____require_result_2["施加恐惧"]
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____53E4_6728_60B2_9E23_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["古木悲鸣"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -110,23 +113,24 @@ local function _____786E_4FDD_60B2_9E23_8611_83C7_8868_73B0(context)
                     goto __continue13
                 end
                 local effect = AddSpecialEffect(cfg["巨型蘑菇模型列表"][i + 1], cell["中心X"], cell["中心Y"])
-                local ____self_3 = context["清理"]
-                ____self_3["登记特效"](____self_3, "莫尔特斯-古木悲鸣蘑菇", effect)
+                local ____self_4 = context["清理"]
+                ____self_4["登记特效"](____self_4, "莫尔特斯-古木悲鸣蘑菇", effect)
             end
             ::__continue13::
             i = i + 1
         end
     end
 end
-____exports["释放莫尔特斯古木悲鸣"] = function(context)
+local function _____7ED3_7B97_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23(variable)
+    local context = variable
+    if context == nil then
+        return
+    end
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["古木悲鸣"]
-    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
-    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "古木悲鸣")
-    _____786E_4FDD_60B2_9E23_8611_83C7_8868_73B0(context)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = cfg["悲鸣特效路径"],
         X = GetUnitX(boss),
@@ -155,10 +159,10 @@ ____exports["释放莫尔特斯古木悲鸣"] = function(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue18
+                    goto __continue19
                 end
                 if _____73A9_5BB6_88AB_8611_83C7_906E_6321(context, hero) then
-                    goto __continue18
+                    goto __continue19
                 end
                 local before = _____53D6_73A9_5BB6_8150_8D25_503C(context, hero)
                 _____5E94_7528_83AB_5C14_7279_65AF_8150_8D25_503C(context, hero, cfg["腐败值"])
@@ -166,10 +170,24 @@ ____exports["释放莫尔特斯古木悲鸣"] = function(context)
                     _____65BD_52A0_6050_60E7(boss, hero, {["持续时间"] = cfg["恐惧秒"], ["模式"] = "随机乱跑", ["随机半径"] = 450, ["移动速度"] = 50})
                 end
             end
-            ::__continue18::
+            ::__continue19::
             i = i + 1
         end
     end
+end
+____exports["释放莫尔特斯古木悲鸣"] = function(context)
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) then
+        return
+    end
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["古木悲鸣"]
+    _____5F00_59CB_83AB_5C14_7279_65AF_5927_62DB_65BD_6CD5(boss, cfg["动作播放秒"], "古木悲鸣", "躲到巨型蘑菇后规避悲鸣冲击")
+    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
+    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "古木悲鸣")
+    _____786E_4FDD_60B2_9E23_8611_83C7_8868_73B0(context)
+    local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____7ED3_7B97_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23, context)
+    local ____self_5 = context["清理"]
+    ____self_5["登记延迟回调"](____self_5, "莫尔特斯-古木悲鸣结算", delayedId)
 end
 local function ____on_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____53E4_6728_60B2_9E23_6280_80FDID then

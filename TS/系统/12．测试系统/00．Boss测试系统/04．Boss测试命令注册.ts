@@ -19,9 +19,13 @@ const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事�
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 抬高Boss测试镜头 } = require("系统.09．表现系统.14．镜头高度控制.index") as {
+  抬高Boss测试镜头: (this: void) => void;
+};
 
 const jass = require("jass.common") as any;
 const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (player: any, x: number, y: number, duration: number, text: string) => void;
+const GetLocalPlayer = jass.GetLocalPlayer as () => any;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 const GetPlayerName = jass.GetPlayerName as (player: any) => string;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -66,6 +70,7 @@ const Boss测试配置列表: Boss测试注册配置[] = [];
 const 已注册技能命令表: Record<string, boolean | undefined> = {};
 const Boss测试玩家ID = 0;
 const Boss测试玩家名称 = "WorldEdit";
+const Boss测试备用玩家名称 = "九条艾莉莎";
 const Boss测试列表命令 = "Boss列表";
 const Boss测试重置命令 = "Boss重置";
 const Boss测试清理命令 = "Boss清理";
@@ -102,7 +107,10 @@ function 是允许Boss测试玩家(this: void, player: any): boolean {
   if (player == null || player === 0) return false;
   if (GetPlayerId(player) !== Boss测试玩家ID) return false;
   const playerName = GetPlayerName(player) ?? "";
-  return playerName === Boss测试玩家名称 || playerName === Boss测试玩家名称 + ":";
+  return playerName === Boss测试玩家名称
+    || playerName === Boss测试玩家名称 + ":"
+    || playerName === Boss测试备用玩家名称
+    || playerName === Boss测试备用玩家名称 + ":";
 }
 
 function 从Boss测试上下文取Boss单位(this: void, context: any): any {
@@ -181,6 +189,7 @@ function onBoss测试选择命令(this: void, player: any, command: string): voi
   if (!是允许Boss测试玩家(player)) return;
   const 配置 = Boss测试选择命令表[command];
   if (配置 == null) return;
+  if (player === GetLocalPlayer()) 抬高Boss测试镜头();
   激活Boss测试配置(player, 配置);
 }
 

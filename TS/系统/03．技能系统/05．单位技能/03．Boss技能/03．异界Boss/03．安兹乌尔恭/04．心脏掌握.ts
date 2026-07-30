@@ -16,14 +16,17 @@ const { 启动基础施法时间线 } = require('系统.03．技能系统.00．�
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
-const { 设置特效缩放 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+const { 创建点特效, 设置特效缩放 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  创建点特效: (this: void, 参数: any) => any;
   设置特效缩放: (this: void, effect: any, scale: number) => void;
 };
 const { QuestMessageBJ } = require('lib.扩展函数.BJ函数.06．任务消息') as {
@@ -44,6 +47,7 @@ const GetPlayerName = jass.GetPlayerName as (player: any) => string;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, unit: any, point: string) => any;
+const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const KillUnit = jass.KillUnit as (unit: any) => void;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
@@ -59,10 +63,20 @@ interface 心脏掌握实例 {
   target: any;
   点名特效: any;
   倒计时特效: any;
+  倒计时叠加特效循环ID: number;
+  音效循环ID: number;
   已结算: boolean;
 }
 
 function 销毁心脏掌握表现(this: void, instance: 心脏掌握实例): void {
+  if (instance.倒计时叠加特效循环ID !== 0) {
+    removePeriodicCallback(instance.倒计时叠加特效循环ID);
+    instance.倒计时叠加特效循环ID = 0;
+  }
+  if (instance.音效循环ID !== 0) {
+    removePeriodicCallback(instance.音效循环ID);
+    instance.音效循环ID = 0;
+  }
   if (instance.点名特效 != null && instance.点名特效 !== 0) {
     DestroyEffect(instance.点名特效);
     instance.点名特效 = 0;
@@ -71,6 +85,30 @@ function 销毁心脏掌握表现(this: void, instance: 心脏掌握实例): voi
     DestroyEffect(instance.倒计时特效);
     instance.倒计时特效 = 0;
   }
+}
+
+function 创建心脏掌握倒计时叠加特效(this: void, target: any): void {
+  if (!单位有效(target)) return;
+  const config = 安兹乌尔恭数值与表现配置;
+  创建点特效({
+    模型路径: config.表现资源.心脏掌握倒计时叠加特效路径,
+    X: GetUnitX(target),
+    Y: GetUnitY(target),
+    Z: 0,
+    缩放: config.普通技能.心脏掌握倒计时叠加特效缩放,
+    持续秒: config.普通技能.心脏掌握倒计时叠加特效持续秒,
+    动画索引: config.普通技能.心脏掌握倒计时叠加特效动画索引,
+  });
+}
+
+function 播放心脏掌握目标音效(this: void, target: any): void {
+  if (!单位有效(target)) return;
+  播放Boss坐标音效(
+    安兹乌尔恭数值与表现配置.音效.心脏掌握,
+    GetUnitX(target),
+    GetUnitY(target),
+    安兹乌尔恭数值与表现配置.音效默认裁断距离,
+  );
 }
 
 function 取心脏掌握目标(this: void, boss: any): any {
@@ -127,7 +165,7 @@ function 结算心脏掌握(this: void, instance: 心脏掌握实例): void {
     心脏掌握抗性到期Ms表[GetHandleId(target)] = getServerTime() + config.普通技能.心脏掌握破解抗性秒 * 1000;
     return;
   }
-  const effect = AddSpecialEffectTarget(config.表现资源.心脏掌握处决特效路径, target, 'chest');
+  const effect = AddSpecialEffect(config.表现资源.心脏掌握处决特效路径, GetUnitX(target), GetUnitY(target));
   if (effect != null && effect !== 0) {
     设置特效缩放(effect, config.普通技能.心脏掌握处决特效缩放);
     YDWETimerDestroyEffectSafe(config.普通技能.心脏掌握处决特效持续秒, effect);
@@ -144,8 +182,29 @@ function 创建心脏掌握倒计时(this: void, context: 安兹运行时上下�
     target,
     点名特效: markEffect,
     倒计时特效: AddSpecialEffectTarget(config.表现资源.心脏掌握倒计时特效路径, target, 'overhead'),
+    倒计时叠加特效循环ID: 0,
+    音效循环ID: 0,
     已结算: false,
   };
+  创建心脏掌握倒计时叠加特效(target);
+  instance.倒计时叠加特效循环ID = addPeriodicCallback(
+    config.普通技能.心脏掌握倒计时叠加特效刷新间隔毫秒,
+    function 心脏掌握倒计时叠加特效循环(this: void): void {
+      if (instance.已结算 || context.挑战已结束 || !单位有效(target)) {
+        销毁心脏掌握表现(instance);
+        return;
+      }
+      创建心脏掌握倒计时叠加特效(target);
+    },
+  );
+  播放心脏掌握目标音效(target);
+  instance.音效循环ID = addPeriodicCallback(config.普通技能.心脏掌握音效间隔秒 * 1000, function 心脏掌握目标音效循环(this: void): void {
+    if (instance.已结算 || context.挑战已结束 || !单位有效(target)) {
+      销毁心脏掌握表现(instance);
+      return;
+    }
+    播放心脏掌握目标音效(target);
+  });
   广播心脏掌握点名警告(target);
   context.清理.登记清理('安兹-心脏掌握表现', function 心脏掌握表现清理(this: void): void {
     instance.已结算 = true;
@@ -162,7 +221,6 @@ export function 释放安兹心脏掌握(this: void, context: 安兹运行时上
   if (!单位有效(boss) || context.挑战已结束 || context.当前大型技能 != null) return;
   const target = 取心脏掌握目标(boss);
   if (!单位有效(target)) return;
-  播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.心脏掌握, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
   播放安兹台词(boss, '心脏掌握');
   const config = 安兹乌尔恭数值与表现配置.普通技能;
   标记安兹普通机制忙碌(context, config.心脏掌握施法硬直秒 + config.心脏掌握倒计时秒);

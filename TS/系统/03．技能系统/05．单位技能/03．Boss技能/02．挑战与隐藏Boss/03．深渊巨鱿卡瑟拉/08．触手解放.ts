@@ -31,12 +31,19 @@ const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能�
 const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位") as {
   创建可攻击机制单位: (this: void, 参数: any) => any;
 };
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 const { 临时调整护甲 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   临时调整护甲: (this: void, unit: any, value: number) => void;
 };
 const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const { 显示大招吟唱条, 关闭吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
+  显示大招吟唱条: (this: void, 参数: any) => void;
+  关闭吟唱条: (this: void, 通道?: string) => void;
 };
 
 const 卡瑟拉触手解放暂停来源 = "Boss:Kasela:触手解放";
@@ -54,15 +61,32 @@ function 治疗Boss最大生命比例(this: void, boss: any, ratio: number): voi
 }
 
 function 播放潜入特效(this: void, x: number, y: number): void {
-  const model: string = 卡瑟拉数值与表现配置.触手解放.潜入特效路径;
-  if (model === "") return;
-  const effect = AddSpecialEffect(model, x, y);
-  DestroyEffect(effect);
+  const cfg = 卡瑟拉数值与表现配置.触手解放;
+  const model: string = cfg.潜入特效路径;
+  if (model !== "") {
+    const effect = AddSpecialEffect(model, x, y);
+    DestroyEffect(effect);
+  }
+  创建点特效({
+    模型路径: cfg.潜入回归能量爆闪特效模型路径,
+    X: x,
+    Y: y,
+    缩放: cfg.潜入回归叠加特效缩放,
+    持续秒: cfg.潜入回归叠加特效持续秒,
+  });
+  创建点特效({
+    模型路径: cfg.潜入回归水柱特效模型路径,
+    X: x,
+    Y: y,
+    缩放: cfg.潜入回归叠加特效缩放,
+    持续秒: cfg.潜入回归叠加特效持续秒,
+  });
 }
 
 function 回归卡瑟拉(this: void, data: 触手解放实例, success: boolean): void {
   if (data.已结束) return;
   data.已结束 = true;
+  关闭吟唱条("大招");
   const context = data.context;
   const boss = context.Boss单位;
   context.Boss潜入中 = false;
@@ -93,7 +117,7 @@ function 创建巨型触手(this: void, data: 触手解放实例, angle: number)
   const cfg = 卡瑟拉数值与表现配置.触手解放;
   const x = 极坐标X(GetUnitX(boss), angle, 650);
   const y = 极坐标Y(GetUnitY(boss), angle, 650);
-  创建可攻击机制单位({
+  const instance = 创建可攻击机制单位({
     清理: context.清理,
     名称: "卡瑟拉-解放巨型触手",
     主人单位: boss,
@@ -105,10 +129,19 @@ function 创建巨型触手(this: void, data: 触手解放实例, angle: number)
     朝向: angle + 180,
     最大生命: cfg.巨型触手生命值,
     缩放: cfg.巨型触手缩放,
+    固定站桩: true,
     持续时间: cfg.限时秒 + 2,
     on死亡: function 卡瑟拉解放巨型触手死亡(this: void): void {
       on巨型触手死亡(data);
     },
+  });
+  if (instance == null || !单位有效(instance.单位)) return;
+  创建点特效({
+    模型路径: cfg.巨型触手出现特效模型路径,
+    X: x,
+    Y: y,
+    缩放: cfg.巨型触手出现特效缩放,
+    持续秒: cfg.巨型触手出现特效持续秒,
   });
 }
 
@@ -126,6 +159,12 @@ function 执行卡瑟拉潜入与触手解放(this: void, context: 卡瑟拉运�
     半径: 720,
     持续时间: cfg.限时秒,
     来源单位: boss,
+  });
+  显示大招吟唱条({
+    总时长: cfg.限时秒,
+    颜色ID: cfg.吟唱条颜色ID,
+    标题文本: cfg.吟唱条标题文本,
+    提示文本: cfg.吟唱条提示文本,
   });
   const data: 触手解放实例 = { context, 已结束: false, 击破数量: 0, 总数量: cfg.触手数量 };
   播放Boss坐标音效(卡瑟拉音效配置.触手解放.巨型触手出水, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);

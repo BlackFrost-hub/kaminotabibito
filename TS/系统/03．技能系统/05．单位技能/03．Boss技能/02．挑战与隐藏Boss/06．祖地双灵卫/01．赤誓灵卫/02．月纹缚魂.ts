@@ -2,6 +2,7 @@
 
 import { 单位未标记死亡 as 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下文';
+import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
@@ -69,6 +70,7 @@ export function 释放月纹缚魂(this: void, context: 祖地双灵卫运行时
   const cfg = 祖地双灵卫数值与表现配置.P1.月纹缚魂;
   const points: 月纹落点[] = [];
   立即设置单位朝向(boss, Atan2(GetUnitY(targets[0]) - GetUnitY(boss), GetUnitX(targets[0]) - GetUnitX(boss)) * RAD_TO_DEG);
+  开始祖地双灵卫常规施法(boss, cfg.预警秒, '月纹缚魂', '锁定位置将生成月纹并禁锢范围内玩家');
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: cfg.预警秒 + 0.2, 恢复动画编号: cfg.恢复动画编号 });
   for (let i = 0; i < targets.length; i++) {
     const point = { X: GetUnitX(targets[i]), Y: GetUnitY(targets[i]) };

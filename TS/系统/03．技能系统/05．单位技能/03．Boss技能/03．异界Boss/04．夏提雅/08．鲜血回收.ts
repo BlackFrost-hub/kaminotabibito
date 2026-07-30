@@ -6,8 +6,10 @@ import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 吸收夏提雅鲜血印记, type 夏提雅鲜血印记实例 } from './04．鲜血印记';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 播放夏提雅台词 } from './18．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
   doHeal: (this: void, params: any) => number;
@@ -57,11 +59,17 @@ function 结束鲜血回收(this: void, context: 夏提雅运行时上下文): v
   if (context.当前大型技能 === 鲜血回收技能Key) context.当前大型技能 = undefined;
 }
 
+function 复制鲜血回收印记列表(this: void, context: 夏提雅运行时上下文): 夏提雅鲜血印记实例[] {
+  const marks: 夏提雅鲜血印记实例[] = [];
+  for (let i = 0; i < context.血印句柄列表.length; i++) marks.push(context.血印句柄列表[i] as 夏提雅鲜血印记实例);
+  return marks;
+}
+
 function 结算鲜血回收(this: void, context: 夏提雅运行时上下文): void {
   const boss = context.Boss单位;
   播放Boss坐标音效(夏提雅数值与表现配置.音效.鲜血回收, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   const cfg = 夏提雅数值与表现配置.鲜血印记;
-  const marks = context.血印句柄列表.slice() as 夏提雅鲜血印记实例[];
+  const marks = 复制鲜血回收印记列表(context);
   let absorbed = 0;
   for (let i = 0; i < marks.length; i++) if (吸收夏提雅鲜血印记(context, marks[i])) absorbed++;
   if (absorbed > 0) {
@@ -86,8 +94,10 @@ export function 释放夏提雅鲜血回收(this: void, context: 夏提雅运行
   const cfg = 夏提雅数值与表现配置.鲜血印记;
   context.当前大型技能 = 鲜血回收技能Key;
   context.普通机制忙碌到Ms = getServerTime() + (cfg.回收前摇秒 + 0.25) * 1000;
+  开始硬直(boss, cfg.回收前摇秒);
+  显示夏提雅常规吟唱条(cfg.回收前摇秒, cfg.吟唱条颜色ID, cfg.吟唱条标题文本, cfg.吟唱条提示文本);
   重置夏提雅猎血连击(context);
-  const marks = context.血印句柄列表.slice() as 夏提雅鲜血印记实例[];
+  const marks = 复制鲜血回收印记列表(context);
   for (let i = 0; i < marks.length; i++) if (!marks[i].已清理) 创建鲜血回收连线(context, marks[i]);
   播放限时单位动画({ 单位: boss, 动画编号: cfg.回收动画编号, 持续秒: cfg.回收前摇秒 + 0.2, 恢复动画编号: 0 });
   const delayedId = addDelayedCallback(cfg.回收前摇秒 * 1000, function 夏提雅鲜血回收结算(this: void): void {

@@ -52,12 +52,13 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
@@ -149,7 +150,7 @@ function 触发天罚波次(this: void, context: 巴尔扎罗斯运行时上下�
         伤害: 计算天罚伤害(boss, unit),
         attack: false,
         ranged: true,
-        attackType: ATTACK_TYPE_CHAOS,
+        attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_FIRE,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         来源类型: "Boss技能",
@@ -174,6 +175,20 @@ function 创建天罚波次列表(this: void, context: 巴尔扎罗斯运行时�
         半径: radius,
         延迟秒: config.波次延迟秒[i],
       });
+    }
+  }
+  if (context.阶段 >= 3) {
+    const 区域列表 = context.战斗区域组.区域列表;
+    for (let i = 0; i < config.波次延迟秒.length; i++) {
+      for (let j = 0; j < config.第三阶段额外随机落点数; j++) {
+        const 区域 = 区域列表.length > 0 ? 区域列表[j % 区域列表.length].配置 : undefined;
+        waves.push({
+          X: 区域 == null ? GetUnitX(context.Boss单位) : GetRandomReal(区域.左, 区域.右),
+          Y: 区域 == null ? GetUnitY(context.Boss单位) : GetRandomReal(区域.下, 区域.上),
+          半径: config.额外随机落点半径,
+          延迟秒: config.波次延迟秒[i],
+        });
+      }
     }
   }
   return waves;

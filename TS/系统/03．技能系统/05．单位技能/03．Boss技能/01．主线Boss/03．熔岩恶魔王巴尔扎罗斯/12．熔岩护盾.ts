@@ -56,7 +56,7 @@ const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, inde
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, timeScale: number) => void;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
@@ -150,7 +150,7 @@ function 尝试安排近战反弹(this: void, boss: any, attacker: any): void {
       伤害: 计算反弹伤害(boss, attacker),
       attack: false,
       ranged: true,
-      attackType: ATTACK_TYPE_CHAOS,
+      attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_FIRE,
       weaponType: WEAPON_TYPE_WHOKNOWS,
       来源类型: "Boss技能",

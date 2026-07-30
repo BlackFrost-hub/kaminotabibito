@@ -4,9 +4,11 @@ local ____exports = {}
 local ____00_FF0E_516C_5171 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．护卫B塞拉.00．公共")
 local _____585E_62C9_516C_5171 = ____00_FF0E_516C_5171["塞拉公共"]
 local ____585E_62C9_516C_5171_0 = _____585E_62C9_516C_5171
+local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯单位技能配置"]
 local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯技能数值配置"]
 local _____64AD_653E_585E_62C9_53F0_8BCD = ____585E_62C9_516C_5171_0["播放塞拉台词"]
 local _____51CF_5C11_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570 = ____585E_62C9_516C_5171_0["减少巴尔扎罗斯灼热层数"]
+local registerManualBuff = ____585E_62C9_516C_5171_0.registerManualBuff
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____585E_62C9_516C_5171_0["启动基础施法时间线"]
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____585E_62C9_516C_5171_0["创建技能提示圈"]
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____585E_62C9_516C_5171_0["获取Boss技能敌对英雄列表"]
@@ -23,6 +25,40 @@ local _____70B9_5728_5706_5185 = ____585E_62C9_516C_5171_0["点在圆内"]
 local _____8BA1_7B97_51B0_7130_76EE_6807_4F4D_7F6E = ____585E_62C9_516C_5171_0["计算冰焰目标位置"]
 local _____96F6_5EA6_9886_57DF_51CF_4F24_5230_671FMs_8868 = ____585E_62C9_516C_5171_0["零度领域减伤到期Ms表"]
 local _____7EDD_5BF9_96F6_5EA6_9886_57DF_72B6_6001_8868 = ____585E_62C9_516C_5171_0["绝对零度领域状态表"]
+local function _____53D6_7EDD_5BF9_96F6_5EA6_6700_8FD1_654C_5BF9_82F1_96C4(context, _____515C_5E95_76EE_6807)
+    local sera = context["塞拉"]
+    if not _____5355_4F4D_6709_6548(sera) then
+        return _____515C_5E95_76EE_6807
+    end
+    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
+    local target = nil
+    local minDistanceSquared = 0
+    do
+        local i = 0
+        while i < #heroes do
+            do
+                local hero = heroes[i + 1]
+                if not _____5355_4F4D_6709_6548(hero) then
+                    goto __continue5
+                end
+                local dx = GetUnitX(hero) - GetUnitX(sera)
+                local dy = GetUnitY(hero) - GetUnitY(sera)
+                local distanceSquared = dx * dx + dy * dy
+                if target == nil or distanceSquared < minDistanceSquared then
+                    target = hero
+                    minDistanceSquared = distanceSquared
+                end
+            end
+            ::__continue5::
+            i = i + 1
+        end
+    end
+    local ____target_1 = target
+    if ____target_1 == nil then
+        ____target_1 = _____515C_5E95_76EE_6807
+    end
+    return ____target_1
+end
 local function _____521B_5EFA_7EDD_5BF9_96F6_5EA6_9886_57DF(context, x, y)
     local sera = context["塞拉"]
     if not _____5355_4F4D_6709_6548(sera) then
@@ -44,9 +80,9 @@ local function _____521B_5EFA_7EDD_5BF9_96F6_5EA6_9886_57DF(context, x, y)
             return _____5355_4F4D_6709_6548(sera)
         end
     })
-    local ____self_1 = context["清理"]
-    ____self_1["登记清理"](
-        ____self_1,
+    local ____self_2 = context["清理"]
+    ____self_2["登记清理"](
+        ____self_2,
         "塞拉-绝对零度领域特效",
         function()
             _____505C_6B62_5FAA_73AF_70B9_7279_6548(effectHandle)
@@ -87,7 +123,7 @@ local function _____521B_5EFA_7EDD_5BF9_96F6_5EA6_9886_57DF(context, x, y)
                     do
                         local hero = list[i + 1]
                         if not _____5355_4F4D_6709_6548(hero) then
-                            goto __continue12
+                            goto __continue18
                         end
                         if not _____70B9_5728_5706_5185(
                             GetUnitX(hero),
@@ -96,23 +132,30 @@ local function _____521B_5EFA_7EDD_5BF9_96F6_5EA6_9886_57DF(context, x, y)
                             y,
                             config["半径"]
                         ) then
-                            goto __continue12
+                            goto __continue18
                         end
                         local heroId = _____53D6_5355_4F4DID(hero)
                         _____96F6_5EA6_9886_57DF_51CF_4F24_5230_671FMs_8868[heroId] = now + config["离开后减伤持续秒"] * 1000
+                        registerManualBuff(
+                            hero,
+                            _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E.BuffID["绝对零度领域"],
+                            config["离开后减伤持续秒"],
+                            config["造成伤害降低比例"],
+                            {sourceName = "塞拉-绝对零度领域"}
+                        )
                         if now >= (nextClear[heroId] or 0) then
                             _____51CF_5C11_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570(hero, config["周期清除灼热层数"])
                             nextClear[heroId] = now + config["清层周期秒"] * 1000
                         end
                     end
-                    ::__continue12::
+                    ::__continue18::
                     i = i + 1
                 end
             end
         end
     )
-    local ____self_2 = context["清理"]
-    ____self_2["登记周期回调"](____self_2, "塞拉-绝对零度领域Tick", tickId)
+    local ____self_3 = context["清理"]
+    ____self_3["登记周期回调"](____self_3, "塞拉-绝对零度领域Tick", tickId)
 end
 ____exports["释放绝对零度领域"] = function(context, target)
     local sera = context["塞拉"]
@@ -120,7 +163,10 @@ ____exports["释放绝对零度领域"] = function(context, target)
         return
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["绝对零度领域"]
-    local center = _____8BA1_7B97_51B0_7130_76EE_6807_4F4D_7F6E(context, target)
+    local center = _____8BA1_7B97_51B0_7130_76EE_6807_4F4D_7F6E(
+        context,
+        _____53D6_7EDD_5BF9_96F6_5EA6_6700_8FD1_654C_5BF9_82F1_96C4(context, target)
+    )
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "白色安全圆",
         X = center.X,

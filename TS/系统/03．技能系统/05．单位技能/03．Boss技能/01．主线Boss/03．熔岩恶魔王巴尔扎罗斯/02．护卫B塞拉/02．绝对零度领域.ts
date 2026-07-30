@@ -2,9 +2,11 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
-const {  巴尔扎罗斯技能数值配置,
+const {  巴尔扎罗斯单位技能配置,
+  巴尔扎罗斯技能数值配置,
   播放塞拉台词,
   减少巴尔扎罗斯灼热层数,
+  registerManualBuff,
   启动基础施法时间线,
   创建技能提示圈,
   获取Boss技能敌对英雄列表,
@@ -22,6 +24,26 @@ const {  巴尔扎罗斯技能数值配置,
   零度领域减伤到期Ms表,
   绝对零度领域状态表,
 } = 塞拉公共;
+
+function 取绝对零度最近敌对英雄(this: void, context: 巴尔扎罗斯运行时上下文, 兜底目标: any): any {
+  const sera = context.塞拉;
+  if (!单位有效(sera)) return 兜底目标;
+  const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
+  let target: any = null;
+  let minDistanceSquared = 0;
+  for (let i = 0; i < heroes.length; i++) {
+    const hero = heroes[i];
+    if (!单位有效(hero)) continue;
+    const dx = GetUnitX(hero) - GetUnitX(sera);
+    const dy = GetUnitY(hero) - GetUnitY(sera);
+    const distanceSquared = dx * dx + dy * dy;
+    if (target == null || distanceSquared < minDistanceSquared) {
+      target = hero;
+      minDistanceSquared = distanceSquared;
+    }
+  }
+  return target ?? 兜底目标;
+}
 
 function 创建绝对零度领域(this: void, context: 巴尔扎罗斯运行时上下文, x: number, y: number): void {
   const sera = context.塞拉;
@@ -69,6 +91,13 @@ function 创建绝对零度领域(this: void, context: 巴尔扎罗斯运行时�
       if (!点在圆内(GetUnitX(hero), GetUnitY(hero), x, y, config.半径)) continue;
       const heroId = 取单位ID(hero);
       零度领域减伤到期Ms表[heroId] = now + config.离开后减伤持续秒 * 1000;
+      registerManualBuff(
+        hero,
+        巴尔扎罗斯单位技能配置.BuffID.绝对零度领域,
+        config.离开后减伤持续秒,
+        config.造成伤害降低比例,
+        { sourceName: "塞拉-绝对零度领域" },
+      );
       if (now >= (nextClear[heroId] ?? 0)) {
         减少巴尔扎罗斯灼热层数(hero, config.周期清除灼热层数);
         nextClear[heroId] = now + config.清层周期秒 * 1000;
@@ -82,7 +111,7 @@ export function 释放绝对零度领域(this: void, context: 巴尔扎罗斯运
   const sera = context.塞拉;
   if (!单位有效(sera)) return;
   const config = 巴尔扎罗斯技能数值配置.绝对零度领域;
-  const center = 计算冰焰目标位置(context, target);
+  const center = 计算冰焰目标位置(context, 取绝对零度最近敌对英雄(context, target));
   创建技能提示圈({
     类型: "白色安全圆",
     X: center.X,

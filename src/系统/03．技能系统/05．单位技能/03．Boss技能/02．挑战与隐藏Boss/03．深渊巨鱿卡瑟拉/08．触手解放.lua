@@ -32,11 +32,16 @@ local ____require_result_2 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_3["创建可攻击机制单位"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____4E34_65F6_8C03_6574_62A4_7532 = ____require_result_4["临时调整护甲"]
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_5["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_5["移除单位暂停"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____4E34_65F6_8C03_6574_62A4_7532 = ____require_result_5["临时调整护甲"]
+local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_6["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_6["移除单位暂停"]
+local ____require_result_7 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_7["显示大招吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_7["关闭吟唱条"]
 local _____5361_745F_62C9_89E6_624B_89E3_653E_6682_505C_6765_6E90 = "Boss:Kasela:触手解放"
 local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     if not _____5355_4F4D_6709_6548(boss) or not (ratio > 0) then
@@ -51,18 +56,33 @@ local function _____6CBB_7597Boss_6700_5927_751F_547D_6BD4_4F8B(boss, ratio)
     })
 end
 local function _____64AD_653E_6F5C_5165_7279_6548(x, y)
-    local model = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手解放"]["潜入特效路径"]
-    if model == "" then
-        return
+    local cfg = _____5361_745F_62C9_6570_503C_4E0E_8868_73B0_914D_7F6E["触手解放"]
+    local model = cfg["潜入特效路径"]
+    if model ~= "" then
+        local effect = AddSpecialEffect(model, x, y)
+        DestroyEffect(effect)
     end
-    local effect = AddSpecialEffect(model, x, y)
-    DestroyEffect(effect)
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["潜入回归能量爆闪特效模型路径"],
+        X = x,
+        Y = y,
+        ["缩放"] = cfg["潜入回归叠加特效缩放"],
+        ["持续秒"] = cfg["潜入回归叠加特效持续秒"]
+    })
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["潜入回归水柱特效模型路径"],
+        X = x,
+        Y = y,
+        ["缩放"] = cfg["潜入回归叠加特效缩放"],
+        ["持续秒"] = cfg["潜入回归叠加特效持续秒"]
+    })
 end
 local function _____56DE_5F52_5361_745F_62C9(data, success)
     if data["已结束"] then
         return
     end
     data["已结束"] = true
+    _____5173_95ED_541F_5531_6761("大招")
     local context = data.context
     local boss = context["Boss单位"]
     context["Boss潜入中"] = false
@@ -120,7 +140,7 @@ local function _____521B_5EFA_5DE8_578B_89E6_624B(data, angle)
         angle,
         650
     )
-    _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
+    local instance = _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
         ["清理"] = context["清理"],
         ["名称"] = "卡瑟拉-解放巨型触手",
         ["主人单位"] = boss,
@@ -132,10 +152,21 @@ local function _____521B_5EFA_5DE8_578B_89E6_624B(data, angle)
         ["朝向"] = angle + 180,
         ["最大生命"] = cfg["巨型触手生命值"],
         ["缩放"] = cfg["巨型触手缩放"],
+        ["固定站桩"] = true,
         ["持续时间"] = cfg["限时秒"] + 2,
         ["on死亡"] = function()
             ____on_5DE8_578B_89E6_624B_6B7B_4EA1(data)
         end
+    })
+    if instance == nil or not _____5355_4F4D_6709_6548(instance["单位"]) then
+        return
+    end
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["巨型触手出现特效模型路径"],
+        X = x,
+        Y = y,
+        ["缩放"] = cfg["巨型触手出现特效缩放"],
+        ["持续秒"] = cfg["巨型触手出现特效持续秒"]
     })
 end
 local function _____6267_884C_5361_745F_62C9_6F5C_5165_4E0E_89E6_624B_89E3_653E(context)
@@ -158,6 +189,7 @@ local function _____6267_884C_5361_745F_62C9_6F5C_5165_4E0E_89E6_624B_89E3_653E(
         ["持续时间"] = cfg["限时秒"],
         ["来源单位"] = boss
     })
+    _____663E_793A_5927_62DB_541F_5531_6761({["总时长"] = cfg["限时秒"], ["颜色ID"] = cfg["吟唱条颜色ID"], ["标题文本"] = cfg["吟唱条标题文本"], ["提示文本"] = cfg["吟唱条提示文本"]})
     local data = {context = context, ["已结束"] = false, ["击破数量"] = 0, ["总数量"] = cfg["触手数量"]}
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____5361_745F_62C9_97F3_6548_914D_7F6E["触手解放"]["巨型触手出水"],
@@ -180,8 +212,8 @@ local function _____6267_884C_5361_745F_62C9_6F5C_5165_4E0E_89E6_624B_89E3_653E(
             end
         end
     )
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "卡瑟拉-触手解放限时", id)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "卡瑟拉-触手解放限时", id)
 end
 ____exports["触发卡瑟拉触手解放"] = function(context)
     local boss = context["Boss单位"]
@@ -217,7 +249,7 @@ ____exports["触发卡瑟拉触手解放"] = function(context)
             _____6267_884C_5361_745F_62C9_6F5C_5165_4E0E_89E6_624B_89E3_653E(context)
         end
     )
-    local ____self_7 = context["清理"]
-    ____self_7["登记延迟回调"](____self_7, "卡瑟拉-触手解放潜入", _____6F5C_5165ID)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "卡瑟拉-触手解放潜入", _____6F5C_5165ID)
 end
 return ____exports

@@ -2,6 +2,7 @@
 
 import { 单位未标记死亡 as 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 祖地双灵卫运行时上下文, 祖地双灵卫区域状态 } from '../01．运行时上下文';
+import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 执行战斗自身传送到坐标 } from '../../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
@@ -144,6 +145,7 @@ export function 释放灵印折步(this: void, context: 祖地双灵卫运行时
   const facing = Atan2(GetUnitY(target) - startY, GetUnitX(target) - startX) * RAD_TO_DEG;
   const landing = 限制在场地内(context, startX + CosBJ(facing) * cfg.位移距离, startY + SinBJ(facing) * cfg.位移距离);
   立即设置单位朝向(boss, facing);
+  开始祖地双灵卫常规施法(boss, cfg.前摇秒, '灵印折步', '赤誓灵卫将折步到锁定位置');
   创建技能提示圈({ 类型: '渐变圆形', X: landing.X, Y: landing.Y, 半径: cfg.镇魂印半径, 持续时间: cfg.前摇秒, 来源单位: boss });
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: cfg.前摇秒 + 0.2, 恢复动画编号: cfg.恢复动画编号 });
   const vanish = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.灵印折步.消失特效路径, startX, startY);

@@ -142,8 +142,15 @@ local function _____521B_5EFA_51B0_7130_5F31_8FFD_8E2A_66F2_7EBF_8F68_8FF9(start
             local y01 = startY + (controlY - startY) * t
             local x12 = controlX + (endX - controlX) * t
             local y12 = controlY + (endY - controlY) * t
-            local x = x01 + (x12 - x01) * t
-            local y = y01 + (y12 - y01) * t
+            local desiredX = x01 + (x12 - x01) * t
+            local desiredY = y01 + (y12 - y01) * t
+            local dx = desiredX - _____5B9E_4F8B["当前X"]
+            local dy = desiredY - _____5B9E_4F8B["当前Y"]
+            local distance = SquareRoot(dx * dx + dy * dy)
+            local maxStep = _____5B9E_4F8B["当前速度"] * delta
+            local stepScale = distance > 0 and maxStep > 0 and distance > maxStep and maxStep / distance or 1
+            local x = _____5B9E_4F8B["当前X"] + dx * stepScale
+            local y = _____5B9E_4F8B["当前Y"] + dy * stepScale
             return {
                 X = x,
                 Y = y,
@@ -190,8 +197,9 @@ local function _____53D1_5C04_51B0_7130_5F39_4F53(context, target, _____7C7B_578
     local controlX = startX + CosBJ(angle) * config["曲线控制前移"] + CosBJ(sideAngle) * config["曲线控制侧移"]
     local controlY = startY + SinBJ(angle) * config["曲线控制前移"] + SinBJ(sideAngle) * config["曲线控制侧移"]
     local startZ = GetUnitFlyHeight(sera) + config["飞行高度"]
-    _____521B_5EFA_539F_751F_5F39_5E55({
+    local _____5F39_5E55 = _____521B_5EFA_539F_751F_5F39_5E55({
         ["所有者"] = sera,
+        ["载体模式"] = _____7C7B_578B == "火焰" and "特效" or "单位",
         X = startX,
         Y = startY,
         ["方向角"] = angle,
@@ -208,8 +216,8 @@ local function _____53D1_5C04_51B0_7130_5F39_4F53(context, target, _____7C7B_578
         ["生命周期"] = config["生命周期秒"],
         ["碰撞消失"] = true,
         ["最大距离"] = config["最大飞行距离"],
-        ["模型"] = _____7C7B_578B == "冰霜" and config["冰球模型路径"] or config["火球模型路径"],
-        ["附着特效模型"] = _____7C7B_578B == "冰霜" and config["冰球模型路径"] or config["火球模型路径"],
+        ["模型"] = _____7C7B_578B == "冰霜" and config["冰球模型路径"] or "",
+        ["附加特效1"] = _____7C7B_578B == "火焰" and ({["模型"] = config["火球模型路径"], ["动画索引"] = 0, ["跟随主弹幕参数"] = true, ["跟随轨迹俯仰"] = true}) or nil,
         ["缩放"] = _____7C7B_578B == "冰霜" and config["冰球缩放"] or config["火球缩放"],
         ["飞行高度"] = startZ,
         ["影响目标"] = "敌方",
@@ -225,7 +233,10 @@ local function _____53D1_5C04_51B0_7130_5F39_4F53(context, target, _____7C7B_578
         end
     })
 end
-____exports["释放冰焰双星"] = function(context, target)
+____exports["释放冰焰双星"] = function(context, target, _____6D4B_8BD5_7C7B_578B)
+    if _____6D4B_8BD5_7C7B_578B == nil then
+        _____6D4B_8BD5_7C7B_578B = "双星"
+    end
     local sera = context["塞拉"]
     if not _____5355_4F4D_6709_6548(sera) or not _____5355_4F4D_6709_6548(target) then
         return
@@ -262,8 +273,12 @@ ____exports["释放冰焰双星"] = function(context, target)
                 GetUnitY(sera),
                 _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
             )
-            _____53D1_5C04_51B0_7130_5F39_4F53(context, target, "冰霜", 1)
-            _____53D1_5C04_51B0_7130_5F39_4F53(context, target, "火焰", -1)
+            if _____6D4B_8BD5_7C7B_578B ~= "火焰" then
+                _____53D1_5C04_51B0_7130_5F39_4F53(context, target, "冰霜", 1)
+            end
+            if _____6D4B_8BD5_7C7B_578B ~= "冰霜" then
+                _____53D1_5C04_51B0_7130_5F39_4F53(context, target, "火焰", -1)
+            end
         end
     })
 end

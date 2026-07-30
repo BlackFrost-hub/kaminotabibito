@@ -1,13 +1,15 @@
 /** @noSelfInFile */
 
 import type { 祖地双灵卫运行时上下文 } from './01．运行时上下文';
+import { 开始祖地双灵卫联合施法 } from './01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 推进祖地双灵卫下一个净化节点 } from './07．双钥净化';
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 单位是否在胶囊区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/胶囊区域';
-import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 两点角度, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -27,6 +29,8 @@ const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09�
 };
 const jass = require('jass.common') as any;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
@@ -49,6 +53,9 @@ export function 释放祖地双灵卫封门误判(this: void, context: 祖地双
   const red = context.赤誓灵卫单位;
   const azure = context.苍影灵卫单位;
   context.封门误判待触发 = false;
+  if (单位有效(red)) 立即设置单位朝向(red, 两点角度(GetUnitX(red), GetUnitY(red), context.场地中心X, context.场地中心Y));
+  if (单位有效(azure)) 立即设置单位朝向(azure, 两点角度(GetUnitX(azure), GetUnitY(azure), context.场地中心X, context.场地中心Y));
+  开始祖地双灵卫联合施法(context, cfg.封门误判预警秒, '封门误判', '沿月白安全通道躲避中心冲击，读条结束后结算伤害');
   播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.封门误判, context.场地中心X, context.场地中心Y, 祖地双灵卫数值与表现配置.音效默认裁断距离);
   if (context.已净化节点数量 % 2 === 1) 播放赤誓灵卫台词(red, '封门误判');
   else 播放苍影灵卫台词(azure, '封门误判');

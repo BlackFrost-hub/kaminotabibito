@@ -24,10 +24,13 @@ local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_2.addDelayedCallback
+local addPeriodicCallback = ____require_result_2.addPeriodicCallback
+local removePeriodicCallback = ____require_result_2.removePeriodicCallback
 local getServerTime = ____require_result_2.getServerTime
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
 local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_4["设置特效缩放"]
 local ____require_result_5 = require("lib.扩展函数.BJ函数.06．任务消息")
 local QuestMessageBJ = ____require_result_5.QuestMessageBJ
@@ -44,6 +47,7 @@ local GetPlayerName = jass.GetPlayerName
 local GetRandomInt = jass.GetRandomInt
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
+local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
 local KillUnit = jass.KillUnit
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
@@ -53,6 +57,14 @@ local _____5FC3_810F_638C_63E1_6280_80FDID = stringToFourCC(_____5B89_5179_4E4C_
 local _____5FC3_810F_638C_63E1_6297_6027_5230_671FMs_8868 = {}
 local _____5FC3_810F_638C_63E1_5DF2_6CE8_518C = false
 local function _____9500_6BC1_5FC3_810F_638C_63E1_8868_73B0(instance)
+    if instance["倒计时叠加特效循环ID"] ~= 0 then
+        removePeriodicCallback(instance["倒计时叠加特效循环ID"])
+        instance["倒计时叠加特效循环ID"] = 0
+    end
+    if instance["音效循环ID"] ~= 0 then
+        removePeriodicCallback(instance["音效循环ID"])
+        instance["音效循环ID"] = 0
+    end
     if instance["点名特效"] ~= nil and instance["点名特效"] ~= 0 then
         DestroyEffect(instance["点名特效"])
         instance["点名特效"] = 0
@@ -61,6 +73,32 @@ local function _____9500_6BC1_5FC3_810F_638C_63E1_8868_73B0(instance)
         DestroyEffect(instance["倒计时特效"])
         instance["倒计时特效"] = 0
     end
+end
+local function _____521B_5EFA_5FC3_810F_638C_63E1_5012_8BA1_65F6_53E0_52A0_7279_6548(target)
+    if not _____5355_4F4D_6709_6548(target) then
+        return
+    end
+    local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = config["表现资源"]["心脏掌握倒计时叠加特效路径"],
+        X = GetUnitX(target),
+        Y = GetUnitY(target),
+        Z = 0,
+        ["缩放"] = config["普通技能"]["心脏掌握倒计时叠加特效缩放"],
+        ["持续秒"] = config["普通技能"]["心脏掌握倒计时叠加特效持续秒"],
+        ["动画索引"] = config["普通技能"]["心脏掌握倒计时叠加特效动画索引"]
+    })
+end
+local function _____64AD_653E_5FC3_810F_638C_63E1_76EE_6807_97F3_6548(target)
+    if not _____5355_4F4D_6709_6548(target) then
+        return
+    end
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["心脏掌握"],
+        GetUnitX(target),
+        GetUnitY(target),
+        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
+    )
 end
 local function _____53D6_5FC3_810F_638C_63E1_76EE_6807(boss)
     local now = getServerTime()
@@ -72,14 +110,14 @@ local function _____53D6_5FC3_810F_638C_63E1_76EE_6807(boss)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue7
+                    goto __continue13
                 end
                 local ____until = _____5FC3_810F_638C_63E1_6297_6027_5230_671FMs_8868[GetHandleId(hero)] or 0
                 if ____until <= now then
                     eligible[#eligible + 1] = hero
                 end
             end
-            ::__continue7::
+            ::__continue13::
             i = i + 1
         end
     end
@@ -100,7 +138,7 @@ local function _____7EDF_8BA1_6551_63F4_961F_53CB(boss, target, radius)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) or hero == target then
-                    goto __continue13
+                    goto __continue19
                 end
                 local dx = GetUnitX(hero) - x
                 local dy = GetUnitY(hero) - y
@@ -108,7 +146,7 @@ local function _____7EDF_8BA1_6551_63F4_961F_53CB(boss, target, radius)
                     count = count + 1
                 end
             end
-            ::__continue13::
+            ::__continue19::
             i = i + 1
         end
     end
@@ -141,7 +179,11 @@ local function _____7ED3_7B97_5FC3_810F_638C_63E1(instance)
         _____5FC3_810F_638C_63E1_6297_6027_5230_671FMs_8868[GetHandleId(target)] = getServerTime() + config["普通技能"]["心脏掌握破解抗性秒"] * 1000
         return
     end
-    local effect = AddSpecialEffectTarget(config["表现资源"]["心脏掌握处决特效路径"], target, "chest")
+    local effect = AddSpecialEffect(
+        config["表现资源"]["心脏掌握处决特效路径"],
+        GetUnitX(target),
+        GetUnitY(target)
+    )
     if effect ~= nil and effect ~= 0 then
         _____8BBE_7F6E_7279_6548_7F29_653E(effect, config["普通技能"]["心脏掌握处决特效缩放"])
         YDWETimerDestroyEffectSafe(config["普通技能"]["心脏掌握处决特效持续秒"], effect)
@@ -157,8 +199,32 @@ local function _____521B_5EFA_5FC3_810F_638C_63E1_5012_8BA1_65F6(context, target
         target = target,
         ["点名特效"] = markEffect,
         ["倒计时特效"] = AddSpecialEffectTarget(config["表现资源"]["心脏掌握倒计时特效路径"], target, "overhead"),
+        ["倒计时叠加特效循环ID"] = 0,
+        ["音效循环ID"] = 0,
         ["已结算"] = false
     }
+    _____521B_5EFA_5FC3_810F_638C_63E1_5012_8BA1_65F6_53E0_52A0_7279_6548(target)
+    instance["倒计时叠加特效循环ID"] = addPeriodicCallback(
+        config["普通技能"]["心脏掌握倒计时叠加特效刷新间隔毫秒"],
+        function()
+            if instance["已结算"] or context["挑战已结束"] or not _____5355_4F4D_6709_6548(target) then
+                _____9500_6BC1_5FC3_810F_638C_63E1_8868_73B0(instance)
+                return
+            end
+            _____521B_5EFA_5FC3_810F_638C_63E1_5012_8BA1_65F6_53E0_52A0_7279_6548(target)
+        end
+    )
+    _____64AD_653E_5FC3_810F_638C_63E1_76EE_6807_97F3_6548(target)
+    instance["音效循环ID"] = addPeriodicCallback(
+        config["普通技能"]["心脏掌握音效间隔秒"] * 1000,
+        function()
+            if instance["已结算"] or context["挑战已结束"] or not _____5355_4F4D_6709_6548(target) then
+                _____9500_6BC1_5FC3_810F_638C_63E1_8868_73B0(instance)
+                return
+            end
+            _____64AD_653E_5FC3_810F_638C_63E1_76EE_6807_97F3_6548(target)
+        end
+    )
     _____5E7F_64AD_5FC3_810F_638C_63E1_70B9_540D_8B66_544A(target)
     local ____self_7 = context["清理"]
     ____self_7["登记清理"](
@@ -187,12 +253,6 @@ ____exports["释放安兹心脏掌握"] = function(context)
     if not _____5355_4F4D_6709_6548(target) then
         return
     end
-    _____64AD_653EBoss_5750_6807_97F3_6548(
-        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["心脏掌握"],
-        GetUnitX(boss),
-        GetUnitY(boss),
-        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
-    )
     _____64AD_653E_5B89_5179_53F0_8BCD(boss, "心脏掌握")
     local config = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["普通技能"]
     _____6807_8BB0_5B89_5179_666E_901A_673A_5236_5FD9_788C(context, config["心脏掌握施法硬直秒"] + config["心脏掌握倒计时秒"])

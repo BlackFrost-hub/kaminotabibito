@@ -18,6 +18,9 @@ const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 const { IsUnitPausedBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitPausedBJ: (this: void, unit: any) => boolean;
 };
+const { isValidCombatEnemyUnit } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
+  isValidCombatEnemyUnit: (this: void, targetUnit: any, sourceUnit: any) => boolean;
+};
 const { 获取应攻击目标 } = require("系统.01．单位系统.06．仇恨系统.02．目标选择") as {
   获取应攻击目标: (this: void, enemy: any, filter?: (entry: { targetHid: number; targetRef: any; threat: number }) => boolean) => { targetHid: number; targetRef: any; threat: number } | null;
 };
@@ -97,7 +100,7 @@ let 护卫驱动回调ID = 0;
 
 interface 护卫驱动状态 {
   模式: "无" | "攻击" | "回位";
-  兜底目标ID: number;
+  攻击目标ID: number;
   返回角度: number;
   返回目标X: number;
   返回目标Y: number;
@@ -119,7 +122,7 @@ function 单位存活(this: void, unit: any): boolean {
 function 创建空驱动状态(this: void): 护卫驱动状态 {
   return {
     模式: "无",
-    兜底目标ID: 0,
+    攻击目标ID: 0,
     返回角度: 0,
     返回目标X: 0,
     返回目标Y: 0,
@@ -143,18 +146,24 @@ function 单位可作为仇恨目标(this: void, entry: { targetRef: any }): boo
   return 单位存活(entry.targetRef);
 }
 
-function 仇恨系统正在接管(this: void, guard: any): boolean {
-  return 获取应攻击目标(guard, 单位可作为仇恨目标) != null;
+function 获取护卫仇恨目标(this: void, guard: any): any {
+  const entry = 获取应攻击目标(guard, 单位可作为仇恨目标);
+  return entry == null ? null : entry.targetRef;
 }
 
-function 选择Boss附近YD玩家单位(this: void, boss: any, 玩家组: any): any {
-  if (玩家组 == null || 玩家组 === 0) return null;
+function 当前正在执行攻击命令(this: void, guard: any): boolean {
+  const orderId = GetUnitCurrentOrder(guard) || 0;
+  return orderId === 攻击命令ID || orderId === 攻击一次命令ID;
+}
+
+function 选择Boss附近战斗目标(this: void, boss: any, 玩家组: any): any {
   const group = CreateGroup();
   if (group == null || group === 0) return null;
 
   const bossX = GetUnitX(boss);
   const bossY = GetUnitY(boss);
   let result: any = null;
+  let resultIsYDPlayer = false;
   let resultIsHero = false;
   let bestDistanceSq = 0;
   let bestHandleId = 0;
@@ -164,11 +173,14 @@ function 选择Boss附近YD玩家单位(this: void, boss: any, 玩家组: any): 
     const candidate = FirstOfGroup(group);
     if (candidate == null || candidate === 0) break;
     GroupRemoveUnit(group, candidate);
-    if (!单位存活(candidate)) continue;
+    if (!isValidCombatEnemyUnit(candidate, boss)) continue;
 
     const owner = GetOwningPlayer(candidate);
-    if (owner == null || owner === 0 || !IsPlayerInForce(owner, 玩家组)) continue;
-
+    const candidateIsYDPlayer = 玩家组 != null
+      && 玩家组 !== 0
+      && owner != null
+      && owner !== 0
+      && IsPlayerInForce(owner, 玩家组);
     const candidateIsHero = IsUnitType(candidate, UNIT_TYPE_HERO) === true;
     const dx = GetUnitX(candidate) - bossX;
     const dy = GetUnitY(candidate) - bossY;
@@ -176,10 +188,16 @@ function 选择Boss附近YD玩家单位(this: void, boss: any, 玩家组: any): 
     const handleId = 获取句柄ID(candidate);
     if (
       result == null
-      || (candidateIsHero && !resultIsHero)
-      || (candidateIsHero === resultIsHero && (distanceSq < bestDistanceSq || (distanceSq === bestDistanceSq && handleId < bestHandleId)))
+      || (candidateIsYDPlayer && !resultIsYDPlayer)
+      || (candidateIsYDPlayer === resultIsYDPlayer && candidateIsHero && !resultIsHero)
+      || (
+        candidateIsYDPlayer === resultIsYDPlayer
+        && candidateIsHero === resultIsHero
+        && (distanceSq < bestDistanceSq || (distanceSq === bestDistanceSq && handleId < bestHandleId))
+      )
     ) {
       result = candidate;
+      resultIsYDPlayer = candidateIsYDPlayer;
       resultIsHero = candidateIsHero;
       bestDistanceSq = distanceSq;
       bestHandleId = handleId;
@@ -194,13 +212,13 @@ function 驱动护卫攻击(this: void, guard: any, target: any, state: 护卫�
   const targetId = 获取句柄ID(target);
   const currentOrderId = GetUnitCurrentOrder(guard) || 0;
   const 已在攻击相同目标 = state.模式 === "攻击"
-    && state.兜底目标ID === targetId
+    && state.攻击目标ID === targetId
     && (currentOrderId === 攻击命令ID || currentOrderId === 攻击一次命令ID);
   if (已在攻击相同目标 || !当前命令允许护卫驱动(guard)) return;
 
   if (IssueTargetOrder(guard, "attack", target)) {
     state.模式 = "攻击";
-    state.兜底目标ID = targetId;
+    state.攻击目标ID = targetId;
   }
 }
 
@@ -224,7 +242,7 @@ function 驱动护卫回位(this: void, guard: any, boss: any, state: 护卫驱�
   const dy = GetUnitY(guard) - state.返回目标Y;
   if (dx * dx + dy * dy <= 护卫返回点到达距离平方) {
     state.模式 = "回位";
-    state.兜底目标ID = 0;
+    state.攻击目标ID = 0;
     return;
   }
   if (!当前命令允许护卫驱动(guard)) return;
@@ -233,7 +251,7 @@ function 驱动护卫回位(this: void, guard: any, boss: any, state: 护卫驱�
   if (state.模式 === "回位" && currentOrderId === 移动命令ID && !boss已明显移动) return;
   if (IssuePointOrder(guard, "move", state.返回目标X, state.返回目标Y)) {
     state.模式 = "回位";
-    state.兜底目标ID = 0;
+    state.攻击目标ID = 0;
   }
 }
 
@@ -255,7 +273,7 @@ function on护卫驱动Tick(this: void): void {
     }
     if (!单位存活(boss)) continue;
 
-    const fallbackTarget = 选择Boss附近YD玩家单位(boss, 玩家组);
+    const fallbackTarget = 选择Boss附近战斗目标(boss, 玩家组);
     for (let i = 0; i < list.length; i++) {
       const guardHandleId = list[i];
       const record = 按护卫句柄索引的记录表[guardHandleId];
@@ -266,16 +284,17 @@ function on护卫驱动Tick(this: void): void {
         state = 创建空驱动状态();
         按护卫句柄索引的驱动状态表[guardHandleId] = state;
       }
-      if (仇恨系统正在接管(record.护卫单位)) {
-        state.模式 = "无";
-        state.兜底目标ID = 0;
+      const threatTarget = 获取护卫仇恨目标(record.护卫单位);
+      if (threatTarget != null && threatTarget !== 0) {
+        驱动护卫攻击(record.护卫单位, threatTarget, state);
         continue;
       }
       if (fallbackTarget != null && fallbackTarget !== 0) {
         驱动护卫攻击(record.护卫单位, fallbackTarget, state);
-      } else {
-        驱动护卫回位(record.护卫单位, boss, state);
+        continue;
       }
+      if (当前正在执行攻击命令(record.护卫单位)) continue;
+      驱动护卫回位(record.护卫单位, boss, state);
     }
   }
 }

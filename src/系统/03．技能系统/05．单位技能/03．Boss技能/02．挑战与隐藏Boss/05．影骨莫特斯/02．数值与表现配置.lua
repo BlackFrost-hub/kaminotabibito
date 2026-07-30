@@ -198,6 +198,7 @@ ____exports["影骨莫特斯表现配置"] = {
     ["阴影穿梭残影"] = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx",
     ["阴影穿梭落点"] = "Common\\Effect\\Element\\Dark\\dark001.mdx",
     ["背刺命中"] = "Common\\Effect\\Form\\ClawMark\\reapers_claws_purple.mdx",
+    ["背刺命中血月"] = "Common\\Effect\\Element\\Blood\\moon_shin_blood_big1.mdx",
     ["骸骨召唤预警"] = "Common\\Effect\\Form\\MagicCircle\\HellRune2.mdx",
     ["骷髅出生"] = "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdl",
     ["骸骨战士重组"] = "Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdl",

@@ -9,7 +9,7 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
 const { DzDoodadCreate } = require("lib.扩展函数.KK扩展API.00．装饰物函数") as {
-  DzDoodadCreate: (id: number, varId: number, x: number, y: number, z: number, rotate: number, scale: number) => number;
+  DzDoodadCreate: (this: void, id: number, varId: number, x: number, y: number, z: number, rotate: number, scale: number) => number;
 };
 const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetRandomDirectionDeg: (this: void) => number;

@@ -48,7 +48,7 @@ local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local _____7194_5CA9_62A4_76FE_4F24_5BB3_4FEE_6B63_5DF2_6CE8_518C = false
@@ -180,7 +180,7 @@ local function _____5C1D_8BD5_5B89_6392_8FD1_6218_53CD_5F39(boss, attacker)
                 ["伤害"] = _____8BA1_7B97_53CD_5F39_4F24_5BB3(boss, attacker),
                 attack = false,
                 ranged = true,
-                attackType = ATTACK_TYPE_CHAOS,
+                attackType = ATTACK_TYPE_NORMAL,
                 ["伤害类型"] = DAMAGE_TYPE_FIRE,
                 weaponType = WEAPON_TYPE_WHOKNOWS,
                 ["来源类型"] = "Boss技能"

@@ -11,6 +11,20 @@ import {
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 创建可攻击机制单位, type 可攻击机制单位实例 } from '../../../../00．技能模板+函数/04．机制组件/05．机制单位/01．可攻击机制单位';
 import { 创建单位停留触发器, type 单位停留触发控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/06．单位停留触发器';
+import {
+  创建循环点特效,
+  停止循环点特效,
+  创建逐段直线路径点特效,
+  type 循环点特效句柄,
+  type 逐段直线路径点特效句柄,
+} from '../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
+import {
+  创建世界坐标进度UI,
+  更新世界坐标进度UI,
+  设置世界坐标进度UI显示,
+  销毁世界坐标进度UI,
+  type 世界坐标进度UI,
+} from '../../../../../09．表现系统/15．世界坐标进度UI';
 import { 安兹乌尔恭BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/01．安兹乌尔恭';
 import {
   启动雅儿贝德生命锚点封锁,
@@ -63,7 +77,7 @@ const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
@@ -74,8 +88,9 @@ const 一切生命的终点大型技能Key = '一切生命的终点';
 
 interface 生命锚点状态 {
   单位实例: 可攻击机制单位实例;
-  地面特效: any;
+  地面环循环特效: 循环点特效句柄;
   圣光特效: any;
+  激活进度UI: 世界坐标进度UI | null;
   停留控制器?: 单位停留触发控制器;
   已激活: boolean;
   已封锁: boolean;
@@ -86,6 +101,7 @@ interface 一切生命的终点实例 {
   锚点列表: 生命锚点状态[];
   庇护单位表: Record<number, true | undefined>;
   倒计时特效: any;
+  女妖哭嚎路径特效列表: 逐段直线路径点特效句柄[];
   锚点封锁?: 生命锚点封锁控制器;
   已清理: boolean;
 }
@@ -99,10 +115,11 @@ function 清理生命锚点(this: void, anchor: 生命锚点状态): void {
     anchor.停留控制器.停止();
     anchor.停留控制器 = undefined;
   }
-  销毁特效(anchor.地面特效);
+  停止循环点特效(anchor.地面环循环特效);
   销毁特效(anchor.圣光特效);
-  anchor.地面特效 = 0;
+  销毁世界坐标进度UI(anchor.激活进度UI);
   anchor.圣光特效 = 0;
+  anchor.激活进度UI = null;
   anchor.单位实例.销毁();
 }
 
@@ -112,6 +129,7 @@ function 清理一切生命的终点实例(this: void, instance: 一切生命的
   关闭吟唱条('大招');
   销毁特效(instance.倒计时特效);
   instance.倒计时特效 = 0;
+  停止女妖哭嚎路径特效(instance);
   instance.锚点封锁?.结束('一切生命的终点清理');
   instance.锚点封锁 = undefined;
   for (let i = 0; i < instance.锚点列表.length; i++) 清理生命锚点(instance.锚点列表[i]);
@@ -152,6 +170,8 @@ function 激活生命锚点(this: void, instance: 一切生命的终点实例, a
     anchor.停留控制器.停止();
     anchor.停留控制器 = undefined;
   }
+  销毁世界坐标进度UI(anchor.激活进度UI);
+  anchor.激活进度UI = null;
   const count = 取已激活锚点数量(instance);
   const required = 安兹乌尔恭数值与表现配置.阶段技能.生命锚点数量;
   广播单位提示(instance.context.安兹单位, `|cffffff99生命锚点已激活（${count}/${required}）|r`, 2200);
@@ -177,14 +197,37 @@ function 创建生命锚点(this: void, instance: 一切生命的终点实例, x
   SetUnitInvulnerable(unitInstance.单位, true);
   PauseUnit(unitInstance.单位, true);
   SetUnitPathing(unitInstance.单位, false);
-  const ground = AddSpecialEffect(cfg.表现资源.生命锚点地面层特效路径, x, y);
+  function 生命锚点地面环存活(this: void): boolean {
+    return !instance.已清理 && !instance.context.挑战已结束;
+  }
+  const ground = 创建循环点特效({
+    模型路径: cfg.表现资源.生命锚点地面层特效路径,
+    X: x,
+    Y: y,
+    缩放: stage.生命锚点地面层缩放,
+    重建间隔秒: stage.生命锚点地面层播放间隔秒,
+    总持续秒: stage.生命锚点地面层播放次数 * stage.生命锚点地面层播放间隔秒,
+    存活条件: 生命锚点地面环存活,
+  });
   const holy = AddSpecialEffect(cfg.表现资源.生命锚点圣光层特效路径, x, y);
-  if (ground != null && ground !== 0) EXSetEffectSize(ground, stage.生命锚点地面层缩放);
   if (holy != null && holy !== 0) EXSetEffectSize(holy, stage.生命锚点圣光层缩放);
   const anchor: 生命锚点状态 = {
     单位实例: unitInstance,
-    地面特效: ground,
+    地面环循环特效: ground,
     圣光特效: holy,
+    激活进度UI: 创建世界坐标进度UI({
+      X: x,
+      Y: y,
+      Z: 220,
+      最大值: stage.生命锚点激活停留秒,
+      当前值: 0,
+      标题: '激活锚点',
+      数值后缀: '秒',
+      类型: '自然',
+      平滑过渡秒: 0.1,
+      初始显示: false,
+      雾中可见: false,
+    }),
     已激活: false,
     已封锁: false,
   };
@@ -205,6 +248,15 @@ function 创建生命锚点(this: void, instance: 一切生命的终点实例, x
     },
     on触发: function 生命锚点停留完成(this: void): void {
       激活生命锚点(instance, anchor);
+    },
+    on刷新完成: function 刷新生命锚点激活进度(this: void, 范围内状态列表): void {
+      let 最大停留毫秒 = 0;
+      for (let i = 0; i < 范围内状态列表.length; i++) {
+        const 状态 = 范围内状态列表[i];
+        if (状态.已持续毫秒 > 最大停留毫秒) 最大停留毫秒 = 状态.已持续毫秒;
+      }
+      更新世界坐标进度UI(anchor.激活进度UI, 最大停留毫秒 / 1000);
+      设置世界坐标进度UI显示(anchor.激活进度UI, 范围内状态列表.length > 0 && !anchor.已封锁 && !anchor.已激活);
     },
   });
 }
@@ -245,14 +297,34 @@ function 播放女妖哭嚎表现(this: void, instance: 一切生命的终点实
   const stage = cfg.阶段技能;
   const x = GetUnitX(boss);
   const y = GetUnitY(boss);
+  停止女妖哭嚎路径特效(instance);
   for (let i = 0; i < stage.女妖哭嚎死亡波数量; i++) {
     const effect = AddSpecialEffect(cfg.表现资源.女妖哭嚎死亡波特效路径, x, y);
-    if (effect == null || effect === 0) continue;
-    EXSetEffectXY(effect, x, y);
-    EXEffectMatRotateZ(effect, i * 360 / stage.女妖哭嚎死亡波数量);
-    EXSetEffectSize(effect, stage.女妖哭嚎死亡波缩放);
-    YDWETimerDestroyEffectSafe(stage.女妖哭嚎特效持续秒, effect);
+    if (effect != null && effect !== 0) {
+      EXSetEffectXY(effect, x, y);
+      EXEffectMatRotateZ(effect, i * 360 / stage.女妖哭嚎死亡波数量);
+      EXSetEffectSize(effect, stage.女妖哭嚎死亡波缩放);
+      YDWETimerDestroyEffectSafe(stage.女妖哭嚎特效持续秒, effect);
+    }
+    instance.女妖哭嚎路径特效列表.push(创建逐段直线路径点特效({
+      模型路径: cfg.表现资源.女妖哭嚎路径叠加特效路径,
+      起点X: x,
+      起点Y: y,
+      方向弧度: i * 360 / stage.女妖哭嚎死亡波数量 * DEG_TO_RAD,
+      路径长度: stage.女妖哭嚎路径长度,
+      段间距: stage.女妖哭嚎路径段间距,
+      铺设间隔秒: stage.女妖哭嚎路径铺设间隔秒,
+      缩放: stage.女妖哭嚎路径叠加特效缩放,
+      持续秒: stage.女妖哭嚎路径叠加特效持续秒,
+    }));
   }
+}
+
+function 停止女妖哭嚎路径特效(this: void, instance: 一切生命的终点实例): void {
+  for (let i = 0; i < instance.女妖哭嚎路径特效列表.length; i++) {
+    instance.女妖哭嚎路径特效列表[i].停止();
+  }
+  instance.女妖哭嚎路径特效列表 = [];
 }
 
 function 结算女妖哭嚎(this: void, instance: 一切生命的终点实例): boolean {
@@ -273,7 +345,7 @@ function 结算女妖哭嚎(this: void, instance: 一切生命的终点实例): 
       伤害: GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg.女妖哭嚎致命伤害最大生命比例,
       attack: false,
       ranged: true,
-      attackType: ATTACK_TYPE_CHAOS,
+      attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_UNIVERSAL,
       weaponType: WEAPON_TYPE_WHOKNOWS,
       来源类型: 'Boss技能',
@@ -299,6 +371,7 @@ export function 释放安兹一切生命的终点(this: void, context: 安兹运
     锚点列表: [],
     庇护单位表: {},
     倒计时特效: 0,
+    女妖哭嚎路径特效列表: [],
     已清理: false,
   };
   context.一切生命的终点已释放 = true;

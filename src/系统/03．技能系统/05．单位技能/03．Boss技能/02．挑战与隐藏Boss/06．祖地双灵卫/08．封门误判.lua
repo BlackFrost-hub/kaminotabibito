@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.01．运行时上下文")
+local _____5F00_59CB_7956_5730_53CC_7075_536B_8054_5408_65BD_6CD5 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["开始祖地双灵卫联合施法"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
 local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["祖地双灵卫数值与表现配置"]
 local ____07_FF0E_53CC_94A5_51C0_5316 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.07．双钥净化")
@@ -15,6 +17,10 @@ local _____80F6_56CA_533A_57DF = require("系统.03．技能系统.00．技能�
 local _____5355_4F4D_662F_5426_5728_80F6_56CA_533A_57DF = _____80F6_56CA_533A_57DF["单位是否在胶囊区域"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -28,6 +34,8 @@ local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local AddSpecialEffect = jass.AddSpecialEffect
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
@@ -58,6 +66,29 @@ ____exports["释放祖地双灵卫封门误判"] = function(context)
     local red = context["赤誓灵卫单位"]
     local azure = context["苍影灵卫单位"]
     context["封门误判待触发"] = false
+    if _____5355_4F4D_6709_6548(red) then
+        _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(
+            red,
+            _____4E24_70B9_89D2_5EA6(
+                GetUnitX(red),
+                GetUnitY(red),
+                context["场地中心X"],
+                context["场地中心Y"]
+            )
+        )
+    end
+    if _____5355_4F4D_6709_6548(azure) then
+        _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(
+            azure,
+            _____4E24_70B9_89D2_5EA6(
+                GetUnitX(azure),
+                GetUnitY(azure),
+                context["场地中心X"],
+                context["场地中心Y"]
+            )
+        )
+    end
+    _____5F00_59CB_7956_5730_53CC_7075_536B_8054_5408_65BD_6CD5(context, cfg["封门误判预警秒"], "封门误判", "沿月白安全通道躲避中心冲击，读条结束后结算伤害")
     _____64AD_653EBoss_5750_6807_97F3_6548(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["封门误判"], context["场地中心X"], context["场地中心Y"], _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"])
     if context["已净化节点数量"] % 2 == 1 then
         _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD(red, "封门误判")
@@ -105,7 +136,7 @@ ____exports["释放祖地双灵卫封门误判"] = function(context)
                                 context["场地中心Y"],
                                 cfg["封门误判安全通道半宽"]
                             ) then
-                                goto __continue15
+                                goto __continue17
                             end
                             local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(red, target, {["来源攻击力比例"] = cfg["封门误判伤害攻击力比例"], ["目标最大生命比例"] = cfg["封门误判目标最大生命比例"]})
                             _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -121,7 +152,7 @@ ____exports["释放祖地双灵卫封门误判"] = function(context)
                                 ["标签"] = "祖地双灵卫·封门误判"
                             })
                         end
-                        ::__continue15::
+                        ::__continue17::
                         i = i + 1
                     end
                 end

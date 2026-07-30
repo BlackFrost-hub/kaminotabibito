@@ -24,17 +24,18 @@ const japi = require("jass.japi") as any;
 const DzSetUnitMissileModel = japi.DzSetUnitMissileModel as ((unit: any, model: string) => void) | undefined;
 const DzSetUnitMissileArc = japi.DzSetUnitMissileArc as ((unit: any, arc: number) => void) | undefined;
 const DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed as ((unit: any, speed: number) => void) | undefined;
-const DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming as ((unit: any, homing: boolean) => void) | undefined;
 
 let 塞拉伤害修正已注册 = false;
+const 塞拉形态弹道模型JAPI临时禁用 = false;
+const 塞拉形态弹道弧度JAPI临时禁用 = false;
+const 塞拉形态弹道速度JAPI临时禁用 = false;
 
 function 应用塞拉形态弹道(this: void, sera: any, next: "火焰" | "冰霜"): void {
   const config = 巴尔扎罗斯单位技能配置.护卫.塞拉;
   const model = next === "火焰" ? config.火焰普攻弹道模型 : config.默认普攻弹道模型;
-  if (DzSetUnitMissileModel != null) DzSetUnitMissileModel(sera, model);
-  if (DzSetUnitMissileArc != null) DzSetUnitMissileArc(sera, config.普攻弹道弧度);
-  if (DzSetUnitMissileSpeed != null) DzSetUnitMissileSpeed(sera, config.普攻弹道速度);
-  if (DzSetUnitMissileHoming != null) DzSetUnitMissileHoming(sera, config.普攻弹道自导);
+  if (!塞拉形态弹道模型JAPI临时禁用 && DzSetUnitMissileModel != null) DzSetUnitMissileModel(sera, model);
+  if (!塞拉形态弹道弧度JAPI临时禁用 && DzSetUnitMissileArc != null) DzSetUnitMissileArc(sera, config.普攻弹道弧度);
+  if (!塞拉形态弹道速度JAPI临时禁用 && DzSetUnitMissileSpeed != null) DzSetUnitMissileSpeed(sera, config.普攻弹道速度);
 }
 
 export function 切换塞拉形态(this: void, context: 巴尔扎罗斯运行时上下文, next: "火焰" | "冰霜", 播放台词: boolean): void {

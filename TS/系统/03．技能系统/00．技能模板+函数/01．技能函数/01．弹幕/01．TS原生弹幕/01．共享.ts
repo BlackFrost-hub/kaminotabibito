@@ -54,6 +54,7 @@ export const SinBJ = (require("lib.扩展函数.BJ函数.12．数学函数") as 
 export const EXSetUnitFacing = japi.EXSetUnitFacing as ((unit: any, angle: number) => void) | undefined;
 export const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => void) | undefined;
 export const DzSetEffectPos = japi.DzSetEffectPos as (effect: any, x: number, y: number, z: number) => void;
+export const DzSetEffectAnimation = japi.DzSetEffectAnimation as ((effect: any, animationIndex: number, flag: number) => void) | undefined;
 export const DzGetColor = japi.DzGetColor as (alpha: number, red: number, green: number, blue: number) => number;
 export const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as (effect: any, color: number) => void;
 export const EXEffectMatReset = japi.EXEffectMatReset as (effect: any) => void;

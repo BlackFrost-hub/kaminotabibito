@@ -8,8 +8,10 @@ const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技�
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 获取全部安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
-import { 开始冲锋, 开始击退 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
-import { 播放限时单位动画 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始击退 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
+import { 开始雅儿贝德冲锋 } from './00．冲锋表现';
+import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
@@ -35,6 +37,7 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
 const jass = require('jass.common') as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -57,7 +60,10 @@ function 结算至尊拦截(this: void, context: 安兹运行时上下文, x: nu
   if (!单位有效(albedo) || context.挑战已结束) return;
   const cfg = 安兹乌尔恭数值与表现配置;
   const effect = AddSpecialEffect(cfg.表现资源.雅儿贝德重击特效路径, x, y);
-  if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(cfg.守护者模式.黑翼横扫特效持续秒, effect);
+  if (effect != null && effect !== 0) {
+    EXSetEffectSize(effect, cfg.守护者模式.雅儿贝德重击特效缩放);
+    YDWETimerDestroyEffectSafe(cfg.守护者模式.雅儿贝德重击特效持续秒, effect);
+  }
   const heroes = 获取Boss技能敌对英雄列表(context.安兹单位);
   const radius = cfg.守护者模式.至尊拦截结算半径;
   for (let i = 0; i < heroes.length; i++) {
@@ -119,26 +125,22 @@ export function 释放雅儿贝德至尊拦截(this: void, context: 安兹运行
   if (token === 0) return false;
   state.守护连接生效 = false;
   state.上次至尊拦截Ms = now;
+  开始硬直(albedo, cfg.至尊拦截预警秒);
   const facing = Atan2(dy, dx) * RAD_TO_DEG;
+  立即设置单位朝向(albedo, facing);
   创建技能提示圈({
     类型: '方向直线',
-    X: (startX + endX) * 0.5,
-    Y: (startY + endY) * 0.5,
+    X: startX,
+    Y: startY,
     宽度: cfg.至尊拦截路径宽度,
     长度: distance,
     朝向: facing,
     持续时间: cfg.至尊拦截预警秒,
     来源单位: albedo,
   });
-  播放限时单位动画({
-    单位: albedo,
-    动画编号: cfg.至尊拦截动画编号,
-    持续秒: cfg.至尊拦截预警秒 + cfg.至尊拦截冲锋秒,
-    恢复动画编号: 1,
-  });
   const delayedId = addDelayedCallback(cfg.至尊拦截预警秒 * 1000, function 至尊拦截开始冲锋(this: void): void {
     if (!单位有效(albedo) || context.挑战已结束) return;
-    开始冲锋(albedo, {
+    开始雅儿贝德冲锋(albedo, {
       目标X: endX,
       目标Y: endY,
       距离: distance,
@@ -146,6 +148,15 @@ export function 释放雅儿贝德至尊拦截(this: void, context: 安兹运行
       检查地形: true,
       暂停单位: true,
       禁用碰撞: true,
+      开始回调: function 至尊拦截冲锋动作(this: void): void {
+        立即设置单位朝向(albedo, facing);
+        播放限时单位动画({
+          单位: albedo,
+          动画编号: cfg.至尊拦截动画编号,
+          持续秒: cfg.至尊拦截冲锋秒,
+          恢复动画编号: 1,
+        });
+      },
       结束回调: function 至尊拦截冲锋结束(this: void): void {
         结算至尊拦截(context, endX, endY);
       },

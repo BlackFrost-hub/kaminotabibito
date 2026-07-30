@@ -7,7 +7,7 @@ import { 祖地双灵卫单位技能配置 } from './00．配置';
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 创建机制清理篮子, type 机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
 import { 创建联合战斗成员生命周期, type 联合战斗成员生命周期 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/20．联合战斗成员生命周期';
-import { stringToFourCC, 取单位ID } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { stringToFourCC, 取单位ID, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 伤害生命下限保护控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 import type { 持续单位连线实例 } from '../../../../00．技能模板+函数/04．机制组件/07．机制连线/01．持续单位连线';
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
@@ -18,6 +18,13 @@ const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．
 const { getServerTime, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
+const { 开始硬直 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff') as {
+  开始硬直: (this: void, unit: any, durationSec: number) => void;
+};
+const { 显示常规技能吟唱条, 显示大招吟唱条 } = require('系统.09．表现系统.08．吟唱条.06．对外接口') as {
+  显示常规技能吟唱条: (this: void, 参数: any) => void;
+  显示大招吟唱条: (this: void, 参数: any) => void;
 };
 const jass = require('jass.common') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -107,6 +114,19 @@ export interface 祖地双灵卫运行时上下文 {
   联合生命周期: 联合战斗成员生命周期;
   清理: 机制清理篮子;
   已初始化: boolean;
+}
+
+export function 开始祖地双灵卫常规施法(this: void, unit: any, 吟唱秒: number, 标题文本: string, 提示文本: string, 硬直秒?: number): void {
+  if (!单位有效(unit)) return;
+  开始硬直(unit, 硬直秒 ?? 吟唱秒);
+  显示常规技能吟唱条({ 总时长: 吟唱秒, 颜色ID: 5, 标题文本, 提示文本 });
+}
+
+export function 开始祖地双灵卫联合施法(this: void, context: 祖地双灵卫运行时上下文, 吟唱秒: number, 标题文本: string, 提示文本: string, 硬直秒?: number): void {
+  const duration = 硬直秒 ?? 吟唱秒;
+  if (单位有效(context.赤誓灵卫单位)) 开始硬直(context.赤誓灵卫单位, duration);
+  if (单位有效(context.苍影灵卫单位)) 开始硬直(context.苍影灵卫单位, duration);
+  显示大招吟唱条({ 通道: '大招', 总时长: 吟唱秒, 颜色ID: 5, 标题文本, 提示文本 });
 }
 
 const 上下文列表: 祖地双灵卫运行时上下文[] = [];

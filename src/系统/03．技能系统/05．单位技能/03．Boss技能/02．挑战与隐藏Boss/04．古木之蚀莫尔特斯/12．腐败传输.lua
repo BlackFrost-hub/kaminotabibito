@@ -68,6 +68,13 @@ local function _____6267_884C_4E00_6B21_8150_8D25_4F20_8F93(context)
         ["触发概率百分比"] = _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["怪物拟声"]["关键机制触发概率百分比"]
     })
 end
+--- 测试入口：直接执行一次血量节点对应的腐败传输，便于验证连线、腐败值和 Boss 护盾。
+____exports["测试触发莫尔特斯腐败传输"] = function(context)
+    if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        return
+    end
+    _____6267_884C_4E00_6B21_8150_8D25_4F20_8F93(context)
+end
 ____exports["注册莫尔特斯腐败传输节点"] = function(context)
     if context["腐败传输节点已注册"] then
         return

@@ -6,10 +6,14 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
 local ____01_FF0E_53CD_51FB_7A97_53E3_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.01．反击窗口模板")
 local _____521B_5EFA_53CD_51FB_7A97_53E3_6A21_677F = ____01_FF0E_53CD_51FB_7A97_53E3_6A21_677F["创建反击窗口模板"]
-local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
-local _____5F00_59CB_51B2_950B = _____51FB_9000_7CFB_7EDF["开始冲锋"]
+local ____00_FF0E_51B2_950B_8868_73B0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.00．冲锋表现")
+local _____5F00_59CB_96C5_513F_8D1D_5FB7_51B2_950B = ____00_FF0E_51B2_950B_8868_73B0["开始雅儿贝德冲锋"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
+local _____83B7_53D6_5355_4F4D_786C_76F4_5269_4F59_65F6_95F4 = ____01_FF0E_63A7_5236_4E0EBuff["获取单位硬直剩余时间"]
+local _____8C03_6574_5355_4F4D_786C_76F4_65F6_95F4 = ____01_FF0E_63A7_5236_4E0EBuff["调整单位硬直时间"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -19,6 +23,8 @@ local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造�
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -39,13 +45,29 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
+local function _____64AD_653E_62A4_536B_53CD_51FB_547D_4E2D_7279_6548(target)
+    local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["雅儿贝德护卫反击命中特效路径"],
+        X = GetUnitX(target),
+        Y = GetUnitY(target),
+        ["缩放"] = cfg["护卫反击命中特效缩放"],
+        ["持续秒"] = cfg["护卫反击命中特效持续秒"]
+    })
+end
+local function _____7ED3_675F_62A4_536B_53CD_51FB_5B88_52BF_786C_76F4(albedo)
+    local remaining = _____83B7_53D6_5355_4F4D_786C_76F4_5269_4F59_65F6_95F4(albedo)
+    if remaining > 0 then
+        _____8C03_6574_5355_4F4D_786C_76F4_65F6_95F4(albedo, 1, remaining)
+    end
+end
 local function _____7ED3_7B97_62A4_536B_53CD_51FB(context, attacker, token)
     local state = context["雅儿贝德"]
     local albedo = state and state["单位"]
     if state == nil or not _____5355_4F4D_6709_6548(albedo) or not _____5355_4F4D_6709_6548(attacker) or context["挑战已结束"] then
-        local ____opt_4 = state and state["独占状态"]
-        if ____opt_4 ~= nil then
-            ____opt_4["结束"](____opt_4, token, "取消", "反击目标失效")
+        local ____opt_5 = state and state["独占状态"]
+        if ____opt_5 ~= nil then
+            ____opt_5["结束"](____opt_5, token, "取消", "反击目标失效")
         end
         return
     end
@@ -54,7 +76,7 @@ local function _____7ED3_7B97_62A4_536B_53CD_51FB(context, attacker, token)
     local dy = GetUnitY(attacker) - GetUnitY(albedo)
     if dx * dx + dy * dy <= cfg["护卫反击攻击距离"] * cfg["护卫反击攻击距离"] then
         local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(albedo, attacker, {["来源攻击力比例"] = cfg["护卫反击伤害攻击力比例"], ["目标最大生命比例"] = cfg["护卫反击伤害目标最大生命比例"]})
-        _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        local _____5DF2_547D_4E2D = _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
             ["来源"] = albedo,
             ["目标"] = attacker,
             ["伤害"] = damage,
@@ -66,19 +88,22 @@ local function _____7ED3_7B97_62A4_536B_53CD_51FB(context, attacker, token)
             ["来源类型"] = "Boss技能",
             ["标签"] = "雅儿贝德·护卫反击"
         })
+        if _____5DF2_547D_4E2D then
+            _____64AD_653E_62A4_536B_53CD_51FB_547D_4E2D_7279_6548(attacker)
+        end
     end
-    local ____opt_8 = state["独占状态"]
-    if ____opt_8 ~= nil then
-        ____opt_8["结束"](____opt_8, token, "完成")
+    local ____opt_9 = state["独占状态"]
+    if ____opt_9 ~= nil then
+        ____opt_9["结束"](____opt_9, token, "完成")
     end
 end
 local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, token)
     local state = context["雅儿贝德"]
     local albedo = state and state["单位"]
     if state == nil or not _____5355_4F4D_6709_6548(albedo) or not _____5355_4F4D_6709_6548(attacker) or context["挑战已结束"] then
-        local ____opt_12 = state and state["独占状态"]
-        if ____opt_12 ~= nil then
-            ____opt_12["结束"](____opt_12, token, "取消", "反击目标失效")
+        local ____opt_13 = state and state["独占状态"]
+        if ____opt_13 ~= nil then
+            ____opt_13["结束"](____opt_13, token, "取消", "反击目标失效")
         end
         return
     end
@@ -91,6 +116,7 @@ local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, t
     SetUnitFacing(albedo, angle * RAD_TO_DEG)
     local needMove = distance > cfg["护卫反击攻击距离"]
     local moveDistance = needMove and (distance - cfg["护卫反击攻击距离"] < cfg["护卫反击最大冲锋距离"] and distance - cfg["护卫反击攻击距离"] or cfg["护卫反击最大冲锋距离"]) or 0
+    _____7ED3_675F_62A4_536B_53CD_51FB_5B88_52BF_786C_76F4(albedo)
     local function _____64AD_653E_53CD_51FB_7838_51FB_5E76_7ED3_7B97()
         _____64AD_653EBoss_5750_6807_97F3_6548(
             _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["雅儿贝德护卫拦截"],
@@ -99,9 +125,9 @@ local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, t
             _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
         )
         if not _____5355_4F4D_6709_6548(albedo) or not _____5355_4F4D_6709_6548(attacker) or context["挑战已结束"] then
-            local ____opt_16 = guardState["独占状态"]
-            if ____opt_16 ~= nil then
-                ____opt_16["结束"](____opt_16, token, "取消", "反击目标失效")
+            local ____opt_17 = guardState["独占状态"]
+            if ____opt_17 ~= nil then
+                ____opt_17["结束"](____opt_17, token, "取消", "反击目标失效")
             end
             return
         end
@@ -112,6 +138,7 @@ local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, t
                 GetUnitX(attacker) - GetUnitX(albedo)
             ) * RAD_TO_DEG
         )
+        _____5F00_59CB_786C_76F4(albedo, cfg["护卫反击结算延迟秒"] + 0.35)
         _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = albedo, ["动画编号"] = cfg["护卫反击攻击动画编号"], ["持续秒"] = cfg["护卫反击结算延迟秒"] + 0.35, ["恢复动画编号"] = 1})
         local damageId = addDelayedCallback(
             cfg["护卫反击结算延迟秒"] * 1000,
@@ -119,8 +146,8 @@ local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, t
                 _____7ED3_7B97_62A4_536B_53CD_51FB(context, attacker, token)
             end
         )
-        local ____self_18 = context["清理"]
-        ____self_18["登记延迟回调"](____self_18, "雅儿贝德-护卫反击结算", damageId)
+        local ____self_19 = context["清理"]
+        ____self_19["登记延迟回调"](____self_19, "雅儿贝德-护卫反击结算", damageId)
     end
     if moveDistance <= 1 then
         _____64AD_653E_53CD_51FB_7838_51FB_5E76_7ED3_7B97()
@@ -128,7 +155,7 @@ local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, t
     end
     local endX = GetUnitX(albedo) + Cos(angle) * moveDistance
     local endY = GetUnitY(albedo) + Sin(angle) * moveDistance
-    local chargeId = _____5F00_59CB_51B2_950B(
+    local chargeId = _____5F00_59CB_96C5_513F_8D1D_5FB7_51B2_950B(
         albedo,
         {
             ["目标X"] = endX,
@@ -183,6 +210,7 @@ ____exports["释放雅儿贝德护卫反击"] = function(context)
     end
     state["守护连接生效"] = false
     state["上次护卫反击Ms"] = now
+    _____5F00_59CB_786C_76F4(albedo, cfg["护卫反击窗口秒"])
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = albedo, ["动画编号"] = cfg["护卫反击守势动画编号"], ["持续秒"] = cfg["护卫反击窗口秒"], ["恢复动画编号"] = 1})
     window = _____521B_5EFA_53CD_51FB_7A97_53E3_6A21_677F({
         ["清理"] = context["清理"],
@@ -219,8 +247,8 @@ ____exports["释放雅儿贝德护卫反击"] = function(context)
                     _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, token)
                 end
             )
-            local ____self_27 = context["清理"]
-            ____self_27["登记延迟回调"](____self_27, "雅儿贝德-护卫反击启动", triggerId)
+            local ____self_28 = context["清理"]
+            ____self_28["登记延迟回调"](____self_28, "雅儿贝德-护卫反击启动", triggerId)
         end,
         ["on结束"] = function()
             if not counterTriggered then

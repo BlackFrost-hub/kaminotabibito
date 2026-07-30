@@ -8,6 +8,7 @@ local registerKeyEventByCode = ____index.registerKeyEventByCode
 -- 主键盘和数字小键盘的 +/- 每次调整本地玩家镜头高度 200。
 local jass = require("jass.common")
 local _____955C_5934_9AD8_5EA6_6B65_957F = 200
+local ____Boss_6D4B_8BD5_955C_5934_9AD8_5EA6_504F_79FB = _____955C_5934_9AD8_5EA6_6B65_957F * 2
 local _____4E3B_952E_76D8_52A0_53F7_952E = 187
 local _____4E3B_952E_76D8_51CF_53F7_952E = 189
 local _____6570_5B57_5C0F_952E_76D8_52A0_53F7_952E = 107
@@ -20,6 +21,10 @@ local function _____62AC_9AD8_955C_5934(self)
 end
 local function _____964D_4F4E_955C_5934(self)
     AdjustCameraField(CAMERA_FIELD_ZOFFSET, -_____955C_5934_9AD8_5EA6_6B65_957F, 0)
+end
+--- Boss 测试场景使用，等同于连续按两次 +。
+____exports["抬高Boss测试镜头"] = function()
+    AdjustCameraField(CAMERA_FIELD_ZOFFSET, ____Boss_6D4B_8BD5_955C_5934_9AD8_5EA6_504F_79FB, 0)
 end
 function ____exports.init()
     if _____5DF2_521D_59CB_5316 then

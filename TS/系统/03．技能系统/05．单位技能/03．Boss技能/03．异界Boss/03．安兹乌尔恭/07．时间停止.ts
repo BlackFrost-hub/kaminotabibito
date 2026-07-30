@@ -19,6 +19,7 @@ import { 播放限时单位动画 } from '../../../../00．技能模板+函数/0
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 播放安兹台词 } from './12．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+import { 创建雅儿贝德时间停止冲锋预警, 启动雅儿贝德时间停止冲锋 } from './01．护卫雅儿贝德/07．技能驱动';
 
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
@@ -74,6 +75,8 @@ interface 时间停止锁定数据 {
   裂缝终点X: number;
   裂缝终点Y: number;
   裂缝角度: number;
+  雅儿贝德冲锋终点X: number;
+  雅儿贝德冲锋终点Y: number;
 }
 
 interface 时间停止实例 {
@@ -115,6 +118,8 @@ function 创建时间停止锁定(this: void, context: 安兹运行时上下文)
     裂缝终点X: originX + Cos(angleRadians) * ordinary.现实断裂路径长度,
     裂缝终点Y: originY + Sin(angleRadians) * ordinary.现实断裂路径长度,
     裂缝角度: angleRadians * RAD_TO_DEG,
+    雅儿贝德冲锋终点X: GetUnitX(lineTarget),
+    雅儿贝德冲锋终点Y: GetUnitY(lineTarget),
   };
 }
 
@@ -132,6 +137,14 @@ function 创建时间停止预警(this: void, instance: 时间停止实例): voi
     持续时间: groundDuration,
     来源单位: instance.context.安兹单位,
   });
+  if (instance.context.模式 === '守护者介入') {
+    创建雅儿贝德时间停止冲锋预警(
+      instance.context,
+      locked.雅儿贝德冲锋终点X,
+      locked.雅儿贝德冲锋终点Y,
+      groundDuration,
+    );
+  }
   创建技能提示圈({
     类型: '矩形',
     X: locked.裂缝起点X,
@@ -384,6 +397,11 @@ export function 释放安兹时间停止(this: void, context: 安兹运行时上
       创建延迟阶段(cfg.时间停止冻结秒 * 1000, '冻结布置'),
       创建立即执行阶段(function 时间停止恢复并结算法阵(this: void): void {
         恢复时间停止玩家(instance);
+        启动雅儿贝德时间停止冲锋(
+          context,
+          locked.雅儿贝德冲锋终点X,
+          locked.雅儿贝德冲锋终点Y,
+        );
         播放安兹台词(boss, '时间停止结算');
         结算时间停止地面法阵(instance);
       }, '地面法阵结算'),

@@ -8,8 +8,10 @@ import { 吸收夏提雅鲜血印记, type 夏提雅鲜血印记实例 } from '.
 import { 清理英灵战乙女投影 } from './09．英灵战乙女';
 import { 清理镜像夹击投影 } from './10．镜像夹击';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const { registerManualBuff } = require('系统.05．Buff系统.00．Buff系统') as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -39,6 +41,12 @@ function 限制血宴层数(this: void, value: number): number {
   return value >= max ? max : value;
 }
 
+function 复制血宴印记列表(this: void, context: 夏提雅运行时上下文): 夏提雅鲜血印记实例[] {
+  const marks: 夏提雅鲜血印记实例[] = [];
+  for (let i = 0; i < context.血印句柄列表.length; i++) marks.push(context.血印句柄列表[i] as 夏提雅鲜血印记实例);
+  return marks;
+}
+
 export function 释放夏提雅真祖血宴(this: void, context: 夏提雅运行时上下文): boolean {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.挑战已结束 || context.阶段 !== 'P3真祖血宴' || context.P3转阶段已处理 || context.当前大型技能 != null) return false;
@@ -47,11 +55,13 @@ export function 释放夏提雅真祖血宴(this: void, context: 夏提雅运行
   context.P3转阶段已处理 = true;
   context.当前大型技能 = 真祖血宴技能Key;
   context.普通机制忙碌到Ms = getServerTime() + (cfg.转阶段演出秒 + 0.25) * 1000;
+  开始硬直(boss, cfg.转阶段演出秒);
+  显示夏提雅常规吟唱条(cfg.转阶段演出秒, cfg.吟唱条颜色ID, cfg.吟唱条标题文本, cfg.吟唱条提示文本);
   重置夏提雅猎血连击(context);
   context.血之狂热控制器.清空(boss, 'P3转阶段');
   清理英灵战乙女投影(context);
   清理镜像夹击投影(context);
-  const marks = context.血印句柄列表.slice() as 夏提雅鲜血印记实例[];
+  const marks = 复制血宴印记列表(context);
   let absorbed = 0;
   for (let i = 0; i < marks.length; i++) if (吸收夏提雅鲜血印记(context, marks[i])) absorbed++;
   context.血宴层数 = 限制血宴层数(absorbed);

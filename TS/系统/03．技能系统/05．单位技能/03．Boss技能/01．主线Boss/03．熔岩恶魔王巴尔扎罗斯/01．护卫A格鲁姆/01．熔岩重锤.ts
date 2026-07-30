@@ -5,6 +5,7 @@ const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技�
 };
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
+import { 立即设置单位朝向 } from "../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 import { 格鲁姆公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
   播放格鲁姆台词,
@@ -15,6 +16,8 @@ const {  巴尔扎罗斯技能数值配置,
   施加快速控制Buff,
   GetUnitX,
   GetUnitY,
+  CosBJ,
+  SinBJ,
   快速控制_击晕,
   单位有效,
   点到单位距离平方,
@@ -57,8 +60,11 @@ function 结算重锤(this: void, context: 巴尔扎罗斯运行时上下文, an
   const grum = context.格鲁姆;
   if (!单位有效(grum)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩重锤;
+  const 爆炸X = GetUnitX(grum) + CosBJ(angle) * config.扇形半径 * 0.5;
+  const 爆炸Y = GetUnitY(grum) + SinBJ(angle) * config.扇形半径 * 0.5;
   播放点特效(config.冲击波特效路径, GetUnitX(grum), GetUnitY(grum), config.冲击波特效高度, config.冲击波特效缩放, config.特效持续秒, angle);
-  播放点特效(config.爆炸特效路径, GetUnitX(grum), GetUnitY(grum), config.爆炸特效高度, config.爆炸特效缩放, config.特效持续秒, angle);
+  播放点特效(config.爆炸特效路径, 爆炸X, 爆炸Y, config.爆炸特效高度, config.爆炸特效缩放, config.特效持续秒, angle);
+  播放点特效(config.爆炸叠加特效路径, 爆炸X, 爆炸Y, config.爆炸特效高度, config.爆炸叠加特效缩放, config.特效持续秒, angle);
   const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
@@ -74,6 +80,8 @@ export function 释放格鲁姆重锤(this: void, context: 巴尔扎罗斯运行
   if (!单位有效(grum) || !单位有效(target)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩重锤;
   const angle = 取方向角(grum, target);
+  // 预警、命中扇形和格鲁姆本体必须共享同一帧的朝向快照。
+  立即设置单位朝向(grum, angle);
   创建重锤提示(grum, angle);
   启动基础施法时间线({
     施法者: grum,

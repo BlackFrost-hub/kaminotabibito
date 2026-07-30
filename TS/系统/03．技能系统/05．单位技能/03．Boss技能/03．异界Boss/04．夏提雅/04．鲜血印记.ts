@@ -34,6 +34,12 @@ function 从列表移除(this: void, context: 夏提雅运行时上下文, mark:
   for (let i = context.血印句柄列表.length - 1; i >= 0; i--) if (context.血印句柄列表[i] === mark) context.血印句柄列表.splice(i, 1);
 }
 
+function 复制鲜血印记列表(this: void, context: 夏提雅运行时上下文): 夏提雅鲜血印记实例[] {
+  const list: 夏提雅鲜血印记实例[] = [];
+  for (let i = 0; i < context.血印句柄列表.length; i++) list.push(context.血印句柄列表[i] as 夏提雅鲜血印记实例);
+  return list;
+}
+
 export function 清理夏提雅鲜血印记(this: void, context: 夏提雅运行时上下文, mark: 夏提雅鲜血印记实例, purified: boolean = false): void {
   if (mark.已清理) return;
   mark.已清理 = true;
@@ -72,7 +78,7 @@ export function 创建夏提雅鲜血印记(this: void, context: 夏提雅运行
 
 export function 净化落点内夏提雅鲜血印记(this: void, context: 夏提雅运行时上下文, x: number, y: number, radius: number): number {
   let count = 0;
-  const list = context.血印句柄列表.slice();
+  const list = 复制鲜血印记列表(context);
   for (let i = 0; i < list.length; i++) {
     const mark = list[i] as 夏提雅鲜血印记实例;
     const dx = mark.X - x;

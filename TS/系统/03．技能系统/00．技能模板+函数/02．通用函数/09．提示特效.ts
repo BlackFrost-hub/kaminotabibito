@@ -67,6 +67,7 @@ const MODEL_SQUARE3_5X = MODEL_DIR + "UnifiedTip_Rect3_5x.mdx";
 const MODEL_SQUARE4X = MODEL_DIR + "UnifiedTip_Rect4x.mdx";
 const MODEL_SQUARE5X = MODEL_DIR + "UnifiedTip_Rect5x.mdx";
 const MODEL_SQUARE6X = MODEL_DIR + "UnifiedTip_Rect6x.mdx";
+const MODEL_SQUARE12X = MODEL_DIR + "UnifiedTip_Rect12x.mdx";
 const MODEL_LINE1X = MODEL_DIR + "UnifiedTip_Line1x.mdx";
 const MODEL_LINE1_5X = MODEL_DIR + "UnifiedTip_Line1_5x.mdx";
 const MODEL_LINE2X = MODEL_DIR + "UnifiedTip_Line2x.mdx";
@@ -268,23 +269,23 @@ export function 移除特效步进缩放(特效: any): void {
 // ==========================================================================================
 
 /**
- * 精确无变形比例：1:1、1:1.5、1:2、1:2.5、1:3、1:3.5、1:4、1:5、1:6。
+ * 精确无变形比例：1:1、1:1.5、1:2、1:2.5、1:3、1:3.5、1:4、1:5、1:6、1:12。
  * 其他比例会选用最接近的预制模型，仍可能出现轻微的非等比拉伸。
  * 如宽度为 300、比例为 1:1.5，则长度应为 450。
- *
- * @param x X坐标
- * @param y Y坐标
+ * 【重要】坐标必须传矩形路径起点，严禁传矩形中点；函数内部会沿朝向自动前移半个长度到模型中点。
+ * @param 路径起点X 矩形路径起点 X 坐标
+ * @param 路径起点Y 矩形路径起点 Y 坐标
  * @param width 宽度（最大1500）
  * @param long 长度（最大7500）
  * @param fac 朝向角度
  * @param time 持续时间（<=0 表示1秒）
  * @param speed 动画速率（可选，默认 1/time）
- * 超过 1:6 时固定使用 6X 模型，比例越大视觉变形越明显。
+ * 1:6 与 1:12 之间按更接近的预制模型缩放；超过 1:12 时固定使用 12X 模型。
  */
 export function 创建矩形提示圈(
-  x: number, y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any
+  路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any
 ): void {
-  const e = 创建矩形提示圈特效(x, y, width, long, fac, speed);
+  const e = 创建矩形提示圈特效(路径起点X, 路径起点Y, width, long, fac, speed);
   if (!e) return;
 
   按所属单位设置提示圈颜色(e, 来源单位);
@@ -293,18 +294,19 @@ export function 创建矩形提示圈(
 }
 
 /**
- * 创建一个需要手动销毁的矩形提示圈特效句柄
+ * 创建一个需要手动销毁的矩形提示圈特效句柄。
+ * 【重要】坐标必须传矩形路径起点，严禁传矩形中点；函数内部会沿朝向自动前移半个长度到模型中点。
  */
 export function 创建矩形提示圈特效(
-  x: number, y: number, width: number, long: number, fac: number, speed?: number
+  路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, speed?: number
 ): any {
   if (width > 1500) width = 1500;
   if (long > 7500) long = 7500;
 
   const sw = width / 1000;
   const dis = long / 2;
-  x += CosBJ(fac) * dis;
-  y += SinBJ(fac) * dis;
+  const 模型中点X = 路径起点X + CosBJ(fac) * dis;
+  const 模型中点Y = 路径起点Y + SinBJ(fac) * dis;
 
   let model: string;
   let sl: number;
@@ -334,12 +336,15 @@ export function 创建矩形提示圈特效(
   } else if (ratio <= 5.5) {
     model = MODEL_SQUARE5X;
     sl = long / 5000;
-  } else {
+  } else if (ratio <= 9) {
     model = MODEL_SQUARE6X;
     sl = long / 6000;
+  } else {
+    model = MODEL_SQUARE12X;
+    sl = long / 12000;
   }
 
-  const e = AddSpecialEffect(model, x, y);
+  const e = AddSpecialEffect(model, 模型中点X, 模型中点Y);
   if (!e) return;
 
   const s = speed ?? 1.0;
@@ -353,18 +358,23 @@ export function 创建矩形提示圈特效(
 /**
  * 创建带中轴延伸箭头的方向直线提示。
  * 预制比例与矩形一致，精确命中时只进行等比缩放。
+ * 【重要】坐标必须传直线路径起点，严禁传模型中点；函数内部会沿朝向自动前移半个长度到模型中点。
  */
 export function 创建方向直线提示圈(
-  x: number, y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any
+  路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any
 ): void {
-  const e = 创建方向直线提示圈特效(x, y, width, long, fac, speed);
+  const e = 创建方向直线提示圈特效(路径起点X, 路径起点Y, width, long, fac, speed);
   if (!e) return;
   按所属单位设置提示圈颜色(e, 来源单位);
   安全销毁特效(time <= 0 ? 1 : time + 0.05, e);
 }
 
+/**
+ * 创建一个需要手动销毁的方向直线提示圈特效句柄。
+ * 【重要】坐标必须传直线路径起点，严禁传模型中点；函数内部会沿朝向自动前移半个长度到模型中点。
+ */
 export function 创建方向直线提示圈特效(
-  x: number, y: number, width: number, long: number, fac: number, speed?: number
+  路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, speed?: number
 ): any {
   if (width <= 0 || long <= 0) return null;
   if (width > 1500) width = 1500;
@@ -403,9 +413,9 @@ export function 创建方向直线提示圈特效(
   }
 
   const dis = long / 2;
-  x += CosBJ(fac) * dis;
-  y += SinBJ(fac) * dis;
-  const e = AddSpecialEffect(model, x, y);
+  const 模型中点X = 路径起点X + CosBJ(fac) * dis;
+  const 模型中点Y = 路径起点Y + SinBJ(fac) * dis;
+  const e = AddSpecialEffect(model, 模型中点X, 模型中点Y);
   if (!e) return null;
 
   EXEffectMatRotateZ(e, fac + 270);

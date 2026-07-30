@@ -24,8 +24,8 @@ const {
   创建渐变圆形提示圈,
   创建双环提示圈,
 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
-  创建矩形提示圈: (this: void, x: number, y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any) => void;
-  创建方向直线提示圈: (this: void, x: number, y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any) => void;
+  创建矩形提示圈: (this: void, 路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any) => void;
+  创建方向直线提示圈: (this: void, 路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any) => void;
   创建红色扇形提示圈: (this: void, x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any) => void;
   创建薄圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any) => void;
   创建白色圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any) => void;
@@ -52,7 +52,9 @@ export type 技能提示圈类型 =
 
 export interface 技能提示圈配置 {
   类型?: 技能提示圈类型;
+  /** 矩形、直线类提示圈必须传路径起点，不能传模型中点；圆形、扇形则为中心点。 */
   X?: number;
+  /** 矩形、直线类提示圈必须传路径起点，不能传模型中点；圆形、扇形则为中心点。 */
   Y?: number;
   x?: number;
   y?: number;
@@ -147,6 +149,10 @@ export function 推断技能提示圈类型(this: void, 配置: 技能提示圈�
   return "渐变圆形";
 }
 
+/**
+ * 创建技能提示圈。
+ * 【重要】当类型为“矩形”“直线”“方向直线”时，X/Y 必须传路径起点；底层会自动前移半个长度到模型中点。
+ */
 export function 创建技能提示圈(this: void, 配置: 技能提示圈配置): any {
   const 类型 = 推断技能提示圈类型(配置);
   if (类型 === "无") return null;

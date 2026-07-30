@@ -34,6 +34,7 @@ export interface 线段危险区参数 {
   Tick间隔毫秒?: number;
   周期秒?: number;
   单位列表: (this: void) => any[];
+  /** 仅配置提示表现；坐标始终强制使用线段危险区的真实起点，不能覆盖为模型中点。 */
   提示圈?: 技能提示圈配置 | false;
   on进入?: (this: void, 单位: any) => void;
   on离开?: (this: void, 单位: any) => void;
@@ -162,17 +163,15 @@ class 线段危险区实现 implements 线段危险区实例 {
 
   private 创建提示圈(): void {
     if (this.参数.提示圈 === false) return;
-    const 中心X = this.参数.起点X + this.前向X * (this.参数.长度 * 0.5);
-    const 中心Y = this.参数.起点Y + this.前向Y * (this.参数.长度 * 0.5);
     创建技能提示圈({
       类型: "矩形",
-      X: 中心X,
-      Y: 中心Y,
       宽度: this.参数.宽度,
       长度: this.参数.长度,
       朝向: this.参数.方向角,
       持续时间: this.参数.持续秒,
       ...(this.参数.提示圈 ?? {}),
+      X: this.参数.起点X,
+      Y: this.参数.起点Y,
     });
   }
 }

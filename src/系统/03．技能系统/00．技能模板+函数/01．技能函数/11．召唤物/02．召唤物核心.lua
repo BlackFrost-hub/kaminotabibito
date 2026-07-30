@@ -15,6 +15,8 @@ local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCC = ____require_result_3.stringToFourCC
 local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_4.debugLogForce
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
+local X_FixUnitStandingSafe = ____require_result_5.X_FixUnitStandingSafe
 local SetUnitState = jass.SetUnitState
 local SetUnitStateJapi = japi.SetUnitState
 local SetUnitVertexColor = jass.SetUnitVertexColor
@@ -187,6 +189,9 @@ local function _____5E94_7528_53EC_5524_7269_5C5E_6027(unit, _____53C2_6570)
             _____53C2_6570["攻击范围"]
         )
     end
+    if _____53C2_6570["固定站桩"] == true then
+        X_FixUnitStandingSafe(unit)
+    end
     if _____53C2_6570["普攻弹道模型"] ~= nil and _____53C2_6570["普攻弹道模型"] ~= "" and DzSetUnitMissileModel ~= nil then
         DzSetUnitMissileModel(unit, _____53C2_6570["普攻弹道模型"])
     end
@@ -235,17 +240,17 @@ ____exports["创建召唤物核心"] = function(_____53C2_6570)
         _____53C2_6570["朝向"]
     )
     if summon == nil or summon == 0 then
-        local ____53C2_6570__6240_5C5E_73A9_5BB6_6 = _____53C2_6570["所属玩家"]
-        if ____53C2_6570__6240_5C5E_73A9_5BB6_6 == nil then
-            local ____temp_5
+        local ____53C2_6570__6240_5C5E_73A9_5BB6_7 = _____53C2_6570["所属玩家"]
+        if ____53C2_6570__6240_5C5E_73A9_5BB6_7 == nil then
+            local ____temp_6
             if _____53C2_6570["主人单位"] ~= nil and _____53C2_6570["主人单位"] ~= 0 then
-                ____temp_5 = GetOwningPlayer(_____53C2_6570["主人单位"])
+                ____temp_6 = GetOwningPlayer(_____53C2_6570["主人单位"])
             else
-                ____temp_5 = nil
+                ____temp_6 = nil
             end
-            ____53C2_6570__6240_5C5E_73A9_5BB6_6 = ____temp_5
+            ____53C2_6570__6240_5C5E_73A9_5BB6_7 = ____temp_6
         end
-        local owner = ____53C2_6570__6240_5C5E_73A9_5BB6_6
+        local owner = ____53C2_6570__6240_5C5E_73A9_5BB6_7
         if owner == nil or owner == 0 then
             debugLogForce(_____6A21_5757_540D, "创建失败：owner 无效", owner)
             return nil

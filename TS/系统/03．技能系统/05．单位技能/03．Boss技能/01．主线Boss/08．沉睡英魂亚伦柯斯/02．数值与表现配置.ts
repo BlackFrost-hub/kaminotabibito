@@ -127,6 +127,7 @@ export const 亚伦柯斯正式设计配置 = {
     最终强化控制免疫秒: 2,
     最终强化施法无敌秒: 1.2,
     最终强化特效缩放: 1.5,
+    最终强化叠加特效缩放: 2.2,
     最终强化特效次数: 3,
     最终强化特效间隔秒: 0.2,
     最终强化特效持续秒: 1.8,
@@ -163,6 +164,7 @@ export const 亚伦柯斯正式设计配置 = {
     墓碑安魂完成特效路径: 'Common\\Effect\\Form\\RiseFall\\AronkosSoulReleasePillar.mdx',
     墓碑残影模型路径: 'Common\\Effect\\Projectile\\AronkosTombstoneEchoSlash.mdx',
     不灭军魂特效路径: 'Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx',
+    最终强化叠加特效路径: 'Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl',
     战败归静特效路径: 'Common\\Effect\\Form\\RiseFall\\AronkosDefeatDissolve.mdx',
   },
 } as const;

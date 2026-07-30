@@ -27,22 +27,21 @@ local japi = require("jass.japi")
 local DzSetUnitMissileModel = japi.DzSetUnitMissileModel
 local DzSetUnitMissileArc = japi.DzSetUnitMissileArc
 local DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed
-local DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming
 local _____585E_62C9_4F24_5BB3_4FEE_6B63_5DF2_6CE8_518C = false
+local _____585E_62C9_5F62_6001_5F39_9053_6A21_578BJAPI_4E34_65F6_7981_7528 = false
+local _____585E_62C9_5F62_6001_5F39_9053_5F27_5EA6JAPI_4E34_65F6_7981_7528 = false
+local _____585E_62C9_5F62_6001_5F39_9053_901F_5EA6JAPI_4E34_65F6_7981_7528 = false
 local function _____5E94_7528_585E_62C9_5F62_6001_5F39_9053(sera, next)
     local config = _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E["护卫"]["塞拉"]
     local model = next == "火焰" and config["火焰普攻弹道模型"] or config["默认普攻弹道模型"]
-    if DzSetUnitMissileModel ~= nil then
+    if not _____585E_62C9_5F62_6001_5F39_9053_6A21_578BJAPI_4E34_65F6_7981_7528 and DzSetUnitMissileModel ~= nil then
         DzSetUnitMissileModel(sera, model)
     end
-    if DzSetUnitMissileArc ~= nil then
+    if not _____585E_62C9_5F62_6001_5F39_9053_5F27_5EA6JAPI_4E34_65F6_7981_7528 and DzSetUnitMissileArc ~= nil then
         DzSetUnitMissileArc(sera, config["普攻弹道弧度"])
     end
-    if DzSetUnitMissileSpeed ~= nil then
+    if not _____585E_62C9_5F62_6001_5F39_9053_901F_5EA6JAPI_4E34_65F6_7981_7528 and DzSetUnitMissileSpeed ~= nil then
         DzSetUnitMissileSpeed(sera, config["普攻弹道速度"])
-    end
-    if DzSetUnitMissileHoming ~= nil then
-        DzSetUnitMissileHoming(sera, config["普攻弹道自导"])
     end
 end
 ____exports["切换塞拉形态"] = function(context, next, _____64AD_653E_53F0_8BCD)

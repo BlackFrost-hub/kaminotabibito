@@ -51,6 +51,8 @@ export interface 原生弹幕附加特效参数 {
   跟随轨迹俯仰?: boolean;
   /** 只修正模型视觉朝向，不改变弹幕的移动方向。 */
   朝向角偏移?: number;
+  /** 创建后立即设置一次特效动画序号；不在移动 Tick 中重复播放。 */
+  动画索引?: number;
   缩放?: number;
   红?: number;
   绿?: number;

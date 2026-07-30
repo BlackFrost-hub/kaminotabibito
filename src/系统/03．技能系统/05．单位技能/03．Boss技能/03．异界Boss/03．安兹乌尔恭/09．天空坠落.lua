@@ -123,7 +123,8 @@ local function _____521B_5EFA_5929_7A7A_5760_843D_9884_8B66(context, castSeconds
     )
     return instance
 end
-local function _____7ED3_7B97_5929_7A7A_5760_843D_4F24_5BB3(context, instance)
+local function _____7ED3_7B97_5929_7A7A_5760_843D_5355_6B21_4F24_5BB3(damageContext, attackRatio, maxLifeRatio, tag)
+    local context = damageContext["运行时"]
     local boss = context["安兹单位"]
     local ____temp_9 = not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"]
     if not ____temp_9 then
@@ -133,55 +134,118 @@ local function _____7ED3_7B97_5929_7A7A_5760_843D_4F24_5BB3(context, instance)
     if ____temp_9 then
         return
     end
-    _____64AD_653EBoss_5750_6807_97F3_6548(
-        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["天空坠落贯穿"],
-        GetUnitX(boss),
-        GetUnitY(boss),
-        _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
-    )
-    local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
-    local x = GetUnitX(boss)
-    local y = GetUnitY(boss)
-    local laser = AddSpecialEffect(cfg["表现资源"]["天空坠落光柱特效路径"], x, y)
-    local impact = AddSpecialEffect(cfg["表现资源"]["天空坠落冲击特效路径"], x, y)
-    if laser ~= nil and laser ~= 0 then
-        YDWETimerDestroyEffectSafe(cfg["阶段技能"]["天空坠落冲击特效持续秒"], laser)
-    end
-    if impact ~= nil and impact ~= 0 then
-        YDWETimerDestroyEffectSafe(cfg["阶段技能"]["天空坠落冲击特效持续秒"], impact)
-    end
-    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     do
         local i = 0
-        while i < #heroes do
+        while i < #damageContext["目标列表"] do
             do
-                local target = heroes[i + 1]
-                local ____temp_11 = not _____5355_4F4D_6709_6548(target)
-                if not ____temp_11 then
-                    local ____self_10 = instance["安全区组"]
-                    ____temp_11 = ____self_10["单位是否安全"](____self_10, target)
-                end
-                if ____temp_11 then
-                    goto __continue19
+                local target = damageContext["目标列表"][i + 1]
+                if not _____5355_4F4D_6709_6548(target) then
+                    goto __continue17
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = target,
-                    ["伤害"] = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = cfg["阶段技能"]["天空坠落伤害Boss攻击力比例"], ["目标最大生命比例"] = cfg["阶段技能"]["天空坠落伤害目标最大生命比例"]}),
+                    ["伤害"] = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = attackRatio, ["目标最大生命比例"] = maxLifeRatio}),
                     attack = false,
                     ranged = true,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能",
-                    ["标签"] = "安兹·天空坠落"
+                    ["标签"] = tag
                 })
             end
-            ::__continue19::
+            ::__continue17::
             i = i + 1
         end
     end
+end
+local function _____542F_52A8_5929_7A7A_5760_843D_7ED3_7B97(context, instance)
+    local boss = context["安兹单位"]
+    local ____temp_11 = not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"]
+    if not ____temp_11 then
+        local ____self_10 = context["清理"]
+        ____temp_11 = ____self_10["已清理"](____self_10)
+    end
+    if ____temp_11 then
+        return
+    end
+    local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
+    local stage = cfg["阶段技能"]
+    local x = GetUnitX(boss)
+    local y = GetUnitY(boss)
+    local targets = {}
+    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+    do
+        local i = 0
+        while i < #heroes do
+            local target = heroes[i + 1]
+            local ____5355_4F4D_6709_6548_result_13 = _____5355_4F4D_6709_6548(target)
+            if ____5355_4F4D_6709_6548_result_13 then
+                local ____self_12 = instance["安全区组"]
+                ____5355_4F4D_6709_6548_result_13 = not ____self_12["单位是否安全"](____self_12, target)
+            end
+            if ____5355_4F4D_6709_6548_result_13 then
+                targets[#targets + 1] = target
+            end
+            i = i + 1
+        end
+    end
+    local damageContext = {["运行时"] = context, ["目标列表"] = targets}
+    local laser = AddSpecialEffect(cfg["表现资源"]["天空坠落光柱特效路径"], x, y)
+    local impact = AddSpecialEffect(cfg["表现资源"]["天空坠落冲击特效路径"], x, y)
+    if laser ~= nil and laser ~= 0 then
+        EXSetEffectSize(laser, stage["天空坠落光柱特效缩放"])
+        YDWETimerDestroyEffectSafe(stage["天空坠落冲击特效持续秒"], laser)
+    end
+    if impact ~= nil and impact ~= 0 then
+        EXSetEffectSize(impact, stage["天空坠落冲击特效缩放"])
+        EXSetEffectZ(impact, stage["天空坠落冲击特效高度"])
+        YDWETimerDestroyEffectSafe(stage["天空坠落冲击特效持续秒"], impact)
+    end
     _____9500_6BC1_5929_7A7A_5760_843D_9884_8B66_8868_73B0(instance)
+    local landingId = addDelayedCallback(
+        (stage["天空坠落落地延迟秒"] + stage["天空坠落主冲击额外延迟秒"]) * 1000,
+        function()
+            local ____temp_15 = not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"]
+            if not ____temp_15 then
+                local ____self_14 = context["清理"]
+                ____temp_15 = ____self_14["已清理"](____self_14)
+            end
+            if ____temp_15 then
+                return
+            end
+            _____64AD_653EBoss_5750_6807_97F3_6548(cfg["音效"]["天空坠落贯穿"], x, y, cfg["音效默认裁断距离"])
+            _____7ED3_7B97_5929_7A7A_5760_843D_5355_6B21_4F24_5BB3(damageContext, stage["天空坠落主伤害Boss攻击力比例"], stage["天空坠落主伤害目标最大生命比例"], "安兹·天空坠落主冲击")
+        end
+    )
+    local ____self_16 = context["清理"]
+    ____self_16["登记延迟回调"](____self_16, "安兹-天空坠落主冲击", landingId)
+    do
+        local waveIndex = 1
+        while waveIndex <= stage["天空坠落余波次数"] do
+            local currentWave = waveIndex
+            local delayMs = (stage["天空坠落落地延迟秒"] + currentWave * stage["天空坠落余波间隔秒"]) * 1000
+            local waveId = addDelayedCallback(
+                delayMs,
+                function()
+                    _____7ED3_7B97_5929_7A7A_5760_843D_5355_6B21_4F24_5BB3(
+                        damageContext,
+                        stage["天空坠落余波伤害Boss攻击力比例"],
+                        stage["天空坠落余波伤害目标最大生命比例"],
+                        "安兹·天空坠落余波" .. tostring(currentWave)
+                    )
+                end
+            )
+            local ____self_17 = context["清理"]
+            ____self_17["登记延迟回调"](
+                ____self_17,
+                "安兹-天空坠落余波" .. tostring(currentWave),
+                waveId
+            )
+            waveIndex = waveIndex + 1
+        end
+    end
 end
 ____exports["释放安兹天空坠落"] = function(context)
     local boss = context["安兹单位"]
@@ -218,7 +282,7 @@ ____exports["释放安兹天空坠落"] = function(context)
             ["提示文本"] = "进入墓碑背后的白色安全区"
         },
         ["on生效"] = function()
-            _____7ED3_7B97_5929_7A7A_5760_843D_4F24_5BB3(context, instance)
+            _____542F_52A8_5929_7A7A_5760_843D_7ED3_7B97(context, instance)
             local recoveryId = addDelayedCallback(
                 recoverySeconds * 1000,
                 function()
@@ -228,8 +292,8 @@ ____exports["释放安兹天空坠落"] = function(context)
                     end
                 end
             )
-            local ____self_12 = context["清理"]
-            ____self_12["登记延迟回调"](____self_12, "安兹-天空坠落输出窗口", recoveryId)
+            local ____self_18 = context["清理"]
+            ____self_18["登记延迟回调"](____self_18, "安兹-天空坠落输出窗口", recoveryId)
         end
     })
     return true

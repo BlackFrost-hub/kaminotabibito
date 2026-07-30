@@ -34,8 +34,14 @@ const { StarOther_PanCameraToTimedForPlayer } = require('lib.扩展函数.Star�
 const { 标记测试Boss跳过死亡结算 } = require('系统.12．测试系统.00．测试系统辅助函数') as {
   标记测试Boss跳过死亡结算: (this: void, boss: any) => void;
 };
+const { addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+};
 const { 应用Boss战启动属性配置 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用') as {
   应用Boss战启动属性配置: (this: void, unit: any) => void;
+};
+const { 安兹乌尔恭数值与表现配置 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置') as {
+  安兹乌尔恭数值与表现配置: any;
 };
 const { 注册安兹被动效果 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.15．被动效果') as {
   注册安兹被动效果: (this: void) => void;
@@ -88,23 +94,46 @@ const { 释放雅儿贝德护卫反击 } = require('系统.03．技能系统.05�
 };
 
 const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+const japi = require('jass.japi') as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCandy: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
+const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
+const Cos = jass.Cos as (radians: number) => number;
+const Sin = jass.Sin as (radians: number) => number;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const 安兹单位ID = stringToFourCCSafe('U007');
 const 测试中心X = -540.6;
 const 测试中心Y = -2495.2;
 const 玩家测试X = -540.6;
 const 玩家测试Y = -3055.2;
+const 角度转弧度 = 0.017453292519943295;
 
 interface 安兹测试上下文 {
   运行时: any;
   目标单位: any;
   Boss单位: any;
+}
+
+interface 守护职责受击测试参数 {
+  来源单位: any;
+  Boss单位: any;
+  雅儿贝德状态: any;
+}
+
+interface 护卫反击受击测试参数 {
+  来源单位: any;
+  雅儿贝德单位: any;
 }
 
 const 最近测试Boss: Record<number, any> = {};
@@ -192,11 +221,42 @@ function 测试雅儿贝德至尊拦截(this: void, _player: any, context: 安�
   释放雅儿贝德至尊拦截(context.运行时, context.目标单位);
 }
 function 测试雅儿贝德黑翼横扫(this: void, _player: any, context: 安兹测试上下文): void {
+  if (context.运行时.雅儿贝德 != null) context.运行时.雅儿贝德.上次普通技能Ms = 0;
   释放雅儿贝德黑翼横扫(context.运行时, context.目标单位);
 }
 function 测试雅儿贝德守护者之职责(this: void, _player: any, context: 安兹测试上下文): void {
   if (context.运行时.雅儿贝德 != null) context.运行时.雅儿贝德.上次守护职责Ms = 0;
   释放雅儿贝德守护者之职责(context.运行时);
+}
+function 结算守护职责20百分比最大生命受击(this: void, 参数?: 守护职责受击测试参数): void {
+  if (参数 == null || 参数.雅儿贝德状态?.守护连接生效 !== true) return;
+  if (!Boss测试单位存活(参数.来源单位) || !Boss测试单位存活(参数.Boss单位)) return;
+  const maxLife = GetUnitStateJapi(参数.Boss单位, UNIT_STATE_MAX_LIFE);
+  if (maxLife <= 0) return;
+  UnitDamageTarget(
+    参数.来源单位,
+    参数.Boss单位,
+    maxLife * 0.2,
+    true,
+    false,
+    ATTACK_TYPE_NORMAL,
+    DAMAGE_TYPE_NORMAL,
+    WEAPON_TYPE_WHOKNOWS,
+  );
+}
+function 测试雅儿贝德守护者之职责20百分比受击(this: void, _player: any, context: 安兹测试上下文): void {
+  if (!启动安兹守护者模式(context.运行时)) return;
+  const state = context.运行时.雅儿贝德;
+  if (state == null) return;
+  state.上次守护职责Ms = 0;
+  if (!释放雅儿贝德守护者之职责(context.运行时)) return;
+  const delayMs = 安兹乌尔恭数值与表现配置.守护者模式.守护者之职责预连接秒 * 1000 + 50;
+  const delayedId = addDelayedCallback(delayMs, 结算守护职责20百分比最大生命受击, {
+    来源单位: context.目标单位,
+    Boss单位: context.Boss单位,
+    雅儿贝德状态: state,
+  });
+  context.运行时.清理.登记延迟回调('安兹测试-守护职责-20%最大生命受击', delayedId);
 }
 function 测试雅儿贝德守护回归(this: void, _player: any, context: 安兹测试上下文): void {
   const state = context.运行时.雅儿贝德;
@@ -209,6 +269,41 @@ function 测试雅儿贝德守护回归(this: void, _player: any, context: 安�
 function 测试雅儿贝德护卫反击(this: void, _player: any, context: 安兹测试上下文): void {
   if (context.运行时.雅儿贝德 != null) context.运行时.雅儿贝德.上次护卫反击Ms = 0;
   释放雅儿贝德护卫反击(context.运行时);
+}
+function 结算雅儿贝德护卫反击受击(this: void, 参数?: 护卫反击受击测试参数): void {
+  if (参数 == null || !Boss测试单位存活(参数.来源单位) || !Boss测试单位存活(参数.雅儿贝德单位)) return;
+  const maxLife = GetUnitStateJapi(参数.雅儿贝德单位, UNIT_STATE_MAX_LIFE);
+  if (maxLife <= 0) return;
+  const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
+  if (!(cfg.护卫反击承伤倍率 > 0)) return;
+  const damage = maxLife * cfg.护卫反击触发伤害最大生命比例 / cfg.护卫反击承伤倍率 + 1;
+  UnitDamageTarget(
+    参数.来源单位,
+    参数.雅儿贝德单位,
+    damage,
+    true,
+    false,
+    ATTACK_TYPE_NORMAL,
+    DAMAGE_TYPE_UNIVERSAL,
+    WEAPON_TYPE_WHOKNOWS,
+  );
+}
+function 测试雅儿贝德护卫反击自动受击(this: void, _player: any, context: 安兹测试上下文): void {
+  const state = context.运行时.雅儿贝德;
+  const albedo = state?.单位;
+  const source = context.目标单位;
+  if (state == null || !Boss测试单位存活(albedo) || !Boss测试单位存活(source)) return;
+  const facing = GetUnitFacing(albedo);
+  const radians = facing * 角度转弧度;
+  SetUnitPosition(source, GetUnitX(albedo) + Cos(radians) * 270, GetUnitY(albedo) + Sin(radians) * 270);
+  SetUnitFacing(source, facing + 180);
+  state.上次护卫反击Ms = 0;
+  if (!释放雅儿贝德护卫反击(context.运行时)) return;
+  const delayedId = addDelayedCallback(50, 结算雅儿贝德护卫反击受击, {
+    来源单位: source,
+    雅儿贝德单位: albedo,
+  });
+  context.运行时.清理.登记延迟回调('安兹测试-护卫反击自动受击', delayedId);
 }
 
 const 安兹测试技能列表: Boss测试技能命令[] = [
@@ -224,8 +319,10 @@ const 安兹测试技能列表: Boss测试技能命令[] = [
   { 序号: 10, 名称: '雅儿贝德至尊拦截', 执行: 测试雅儿贝德至尊拦截 },
   { 序号: 11, 名称: '雅儿贝德黑翼横扫', 执行: 测试雅儿贝德黑翼横扫 },
   { 序号: 12, 名称: '雅儿贝德守护者之职责', 执行: 测试雅儿贝德守护者之职责 },
+  { 序号: 121, 命令: '12-1', 名称: '守护者之职责（护卫开启后承受20%最大生命伤害）', 执行: 测试雅儿贝德守护者之职责20百分比受击 },
   { 序号: 13, 名称: '雅儿贝德守护回归', 执行: 测试雅儿贝德守护回归 },
   { 序号: 14, 名称: '雅儿贝德护卫反击窗口', 执行: 测试雅儿贝德护卫反击 },
+  { 序号: 142, 命令: '14-2', 名称: '护卫反击（正面270距离以无视护甲普攻触发4%最终伤害阈值）', 执行: 测试雅儿贝德护卫反击自动受击 },
 ];
 
 注册Boss测试命令组({

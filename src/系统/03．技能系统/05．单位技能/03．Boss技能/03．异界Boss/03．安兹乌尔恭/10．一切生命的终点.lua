@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local _____505C_6B62_5973_5996_54ED_568E_8DEF_5F84_7279_6548
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
@@ -16,6 +17,15 @@ local ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D = require("系统.03．技�
 local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D["创建可攻击机制单位"]
 local ____06_FF0E_5355_4F4D_505C_7559_89E6_53D1_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.06．单位停留触发器")
 local _____521B_5EFA_5355_4F4D_505C_7559_89E6_53D1_5668 = ____06_FF0E_5355_4F4D_505C_7559_89E6_53D1_5668["创建单位停留触发器"]
+local ____03_FF0E_7279_6548 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____03_FF0E_7279_6548["创建循环点特效"]
+local _____505C_6B62_5FAA_73AF_70B9_7279_6548 = ____03_FF0E_7279_6548["停止循环点特效"]
+local _____521B_5EFA_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548 = ____03_FF0E_7279_6548["创建逐段直线路径点特效"]
+local ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI = require("系统.09．表现系统.15．世界坐标进度UI.index")
+local _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI = ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI["创建世界坐标进度UI"]
+local _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI = ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI["更新世界坐标进度UI"]
+local _____8BBE_7F6E_4E16_754C_5750_6807_8FDB_5EA6UI_663E_793A = ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI["设置世界坐标进度UI显示"]
+local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI["销毁世界坐标进度UI"]
 local ____01_FF0E_5B89_5179_4E4C_5C14_606D = require("系统.05．Buff系统.03．Buff表.01．Boss.03．异界Boss.01．安兹乌尔恭")
 local _____5B89_5179_4E4C_5C14_606DBuffID = ____01_FF0E_5B89_5179_4E4C_5C14_606D["安兹乌尔恭BuffID"]
 local ____06_FF0E_751F_547D_951A_70B9_5C01_9501 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.06．生命锚点封锁")
@@ -24,6 +34,17 @@ local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+function _____505C_6B62_5973_5996_54ED_568E_8DEF_5F84_7279_6548(instance)
+    do
+        local i = 0
+        while i < #instance["女妖哭嚎路径特效列表"] do
+            local ____self_14 = instance["女妖哭嚎路径特效列表"][i + 1]
+            ____self_14["停止"](____self_14)
+            i = i + 1
+        end
+    end
+    instance["女妖哭嚎路径特效列表"] = {}
+end
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
 local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -59,7 +80,7 @@ local Cos = jass.Cos
 local Sin = jass.Sin
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local EXSetEffectSize = japi.EXSetEffectSize
@@ -78,10 +99,11 @@ local function _____6E05_7406_751F_547D_951A_70B9(anchor)
         ____self_7["停止"](____self_7)
         anchor["停留控制器"] = nil
     end
-    _____9500_6BC1_7279_6548(anchor["地面特效"])
+    _____505C_6B62_5FAA_73AF_70B9_7279_6548(anchor["地面环循环特效"])
     _____9500_6BC1_7279_6548(anchor["圣光特效"])
-    anchor["地面特效"] = 0
+    _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI(anchor["激活进度UI"])
     anchor["圣光特效"] = 0
+    anchor["激活进度UI"] = nil
     local ____self_8 = anchor["单位实例"]
     ____self_8["销毁"](____self_8)
 end
@@ -93,6 +115,7 @@ local function _____6E05_7406_4E00_5207_751F_547D_7684_7EC8_70B9_5B9E_4F8B(insta
     _____5173_95ED_541F_5531_6761("大招")
     _____9500_6BC1_7279_6548(instance["倒计时特效"])
     instance["倒计时特效"] = 0
+    _____505C_6B62_5973_5996_54ED_568E_8DEF_5F84_7279_6548(instance)
     local ____opt_9 = instance["锚点封锁"]
     if ____opt_9 ~= nil then
         ____opt_9["结束"]("一切生命的终点清理")
@@ -167,6 +190,8 @@ local function _____6FC0_6D3B_751F_547D_951A_70B9(instance, anchor)
         ____self_11["停止"](____self_11)
         anchor["停留控制器"] = nil
     end
+    _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI(anchor["激活进度UI"])
+    anchor["激活进度UI"] = nil
     local count = _____53D6_5DF2_6FC0_6D3B_951A_70B9_6570_91CF(instance)
     local required = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["生命锚点数量"]
     _____5E7F_64AD_5355_4F4D_63D0_793A(
@@ -199,18 +224,39 @@ local function _____521B_5EFA_751F_547D_951A_70B9(instance, x, y, index)
     SetUnitInvulnerable(unitInstance["单位"], true)
     PauseUnit(unitInstance["单位"], true)
     SetUnitPathing(unitInstance["单位"], false)
-    local ground = AddSpecialEffect(cfg["表现资源"]["生命锚点地面层特效路径"], x, y)
-    local holy = AddSpecialEffect(cfg["表现资源"]["生命锚点圣光层特效路径"], x, y)
-    if ground ~= nil and ground ~= 0 then
-        EXSetEffectSize(ground, stage["生命锚点地面层缩放"])
+    local function _____751F_547D_951A_70B9_5730_9762_73AF_5B58_6D3B()
+        return not instance["已清理"] and not instance.context["挑战已结束"]
     end
+    local ground = _____521B_5EFA_5FAA_73AF_70B9_7279_6548({
+        ["模型路径"] = cfg["表现资源"]["生命锚点地面层特效路径"],
+        X = x,
+        Y = y,
+        ["缩放"] = stage["生命锚点地面层缩放"],
+        ["重建间隔秒"] = stage["生命锚点地面层播放间隔秒"],
+        ["总持续秒"] = stage["生命锚点地面层播放次数"] * stage["生命锚点地面层播放间隔秒"],
+        ["存活条件"] = _____751F_547D_951A_70B9_5730_9762_73AF_5B58_6D3B
+    })
+    local holy = AddSpecialEffect(cfg["表现资源"]["生命锚点圣光层特效路径"], x, y)
     if holy ~= nil and holy ~= 0 then
         EXSetEffectSize(holy, stage["生命锚点圣光层缩放"])
     end
     local anchor = {
         ["单位实例"] = unitInstance,
-        ["地面特效"] = ground,
+        ["地面环循环特效"] = ground,
         ["圣光特效"] = holy,
+        ["激活进度UI"] = _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI({
+            X = x,
+            Y = y,
+            Z = 220,
+            ["最大值"] = stage["生命锚点激活停留秒"],
+            ["当前值"] = 0,
+            ["标题"] = "激活锚点",
+            ["数值后缀"] = "秒",
+            ["类型"] = "自然",
+            ["平滑过渡秒"] = 0.1,
+            ["初始显示"] = false,
+            ["雾中可见"] = false
+        }),
         ["已激活"] = false,
         ["已封锁"] = false
     }
@@ -232,6 +278,21 @@ local function _____521B_5EFA_751F_547D_951A_70B9(instance, x, y, index)
         end,
         ["on触发"] = function()
             _____6FC0_6D3B_751F_547D_951A_70B9(instance, anchor)
+        end,
+        ["on刷新完成"] = function(_____8303_56F4_5185_72B6_6001_5217_8868)
+            local _____6700_5927_505C_7559_6BEB_79D2 = 0
+            do
+                local i = 0
+                while i < #_____8303_56F4_5185_72B6_6001_5217_8868 do
+                    local _____72B6_6001 = _____8303_56F4_5185_72B6_6001_5217_8868[i + 1]
+                    if _____72B6_6001["已持续毫秒"] > _____6700_5927_505C_7559_6BEB_79D2 then
+                        _____6700_5927_505C_7559_6BEB_79D2 = _____72B6_6001["已持续毫秒"]
+                    end
+                    i = i + 1
+                end
+            end
+            _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI(anchor["激活进度UI"], _____6700_5927_505C_7559_6BEB_79D2 / 1000)
+            _____8BBE_7F6E_4E16_754C_5750_6807_8FDB_5EA6UI_663E_793A(anchor["激活进度UI"], #_____8303_56F4_5185_72B6_6001_5217_8868 > 0 and not anchor["已封锁"] and not anchor["已激活"])
         end
     })
 end
@@ -284,20 +345,29 @@ local function _____64AD_653E_5973_5996_54ED_568E_8868_73B0(instance)
     local stage = cfg["阶段技能"]
     local x = GetUnitX(boss)
     local y = GetUnitY(boss)
+    _____505C_6B62_5973_5996_54ED_568E_8DEF_5F84_7279_6548(instance)
     do
         local i = 0
         while i < stage["女妖哭嚎死亡波数量"] do
-            do
-                local effect = AddSpecialEffect(cfg["表现资源"]["女妖哭嚎死亡波特效路径"], x, y)
-                if effect == nil or effect == 0 then
-                    goto __continue42
-                end
+            local effect = AddSpecialEffect(cfg["表现资源"]["女妖哭嚎死亡波特效路径"], x, y)
+            if effect ~= nil and effect ~= 0 then
                 EXSetEffectXY(effect, x, y)
                 EXEffectMatRotateZ(effect, i * 360 / stage["女妖哭嚎死亡波数量"])
                 EXSetEffectSize(effect, stage["女妖哭嚎死亡波缩放"])
                 YDWETimerDestroyEffectSafe(stage["女妖哭嚎特效持续秒"], effect)
             end
-            ::__continue42::
+            local ____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_13 = instance["女妖哭嚎路径特效列表"]
+            ____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_13[#____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_13 + 1] = _____521B_5EFA_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548({
+                ["模型路径"] = cfg["表现资源"]["女妖哭嚎路径叠加特效路径"],
+                ["起点X"] = x,
+                ["起点Y"] = y,
+                ["方向弧度"] = i * 360 / stage["女妖哭嚎死亡波数量"] * DEG_TO_RAD,
+                ["路径长度"] = stage["女妖哭嚎路径长度"],
+                ["段间距"] = stage["女妖哭嚎路径段间距"],
+                ["铺设间隔秒"] = stage["女妖哭嚎路径铺设间隔秒"],
+                ["缩放"] = stage["女妖哭嚎路径叠加特效缩放"],
+                ["持续秒"] = stage["女妖哭嚎路径叠加特效持续秒"]
+            })
             i = i + 1
         end
     end
@@ -323,7 +393,7 @@ local function _____7ED3_7B97_5973_5996_54ED_568E(instance)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) or instance["庇护单位表"][GetHandleId(hero)] == true then
-                    goto __continue47
+                    goto __continue54
                 end
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
@@ -331,14 +401,14 @@ local function _____7ED3_7B97_5973_5996_54ED_568E(instance)
                     ["伤害"] = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg["女妖哭嚎致命伤害最大生命比例"],
                     attack = false,
                     ranged = true,
-                    attackType = ATTACK_TYPE_CHAOS,
+                    attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_UNIVERSAL,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
                     ["来源类型"] = "Boss技能",
                     ["标签"] = "安兹·女妖哭嚎"
                 })
             end
-            ::__continue47::
+            ::__continue54::
             i = i + 1
         end
     end
@@ -361,6 +431,7 @@ ____exports["释放安兹一切生命的终点"] = function(context)
         ["锚点列表"] = {},
         ["庇护单位表"] = {},
         ["倒计时特效"] = 0,
+        ["女妖哭嚎路径特效列表"] = {},
         ["已清理"] = false
     }
     context["一切生命的终点已释放"] = true
@@ -372,9 +443,9 @@ ____exports["释放安兹一切生命的终点"] = function(context)
         GetUnitY(boss),
         _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记清理"](
-        ____self_13,
+    local ____self_15 = context["清理"]
+    ____self_15["登记清理"](
+        ____self_15,
         "安兹-一切生命的终点实例",
         function()
             _____6E05_7406_4E00_5207_751F_547D_7684_7EC8_70B9_5B9E_4F8B(instance)

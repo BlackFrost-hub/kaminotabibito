@@ -10,6 +10,7 @@ local _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
+local _____5F00_59CB_83AB_5C14_7279_65AF_5E38_89C4_65BD_6CD5 = ____16_FF0E_516C_5171_5DE5_5177["开始莫尔特斯常规施法"]
 local _____6781_5750_6807X = ____16_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____16_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -27,6 +28,7 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
 local addPeriodicCallback = ____require_result_1.addPeriodicCallback
 local removePeriodicCallback = ____require_result_1.removePeriodicCallback
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
@@ -204,12 +206,12 @@ local function _____521B_5EFA_8150_5316_7532_866B(context, angle, _____6280_80FD
     local ____self_9 = context["清理"]
     ____self_9["登记周期回调"](____self_9, "莫尔特斯-甲虫追击", data["周期ID"])
 end
-____exports["释放莫尔特斯共生腐朽虫群"] = function(context)
-    if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-        return false
+local function _____7ED3_7B97_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4(variable)
+    local context = variable
+    if context == nil or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
-    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["共生腐朽虫群"]["甲虫入场"],
         GetUnitX(context["Boss单位"]),
@@ -224,6 +226,17 @@ ____exports["释放莫尔特斯共生腐朽虫群"] = function(context)
             i = i + 1
         end
     end
+end
+____exports["释放莫尔特斯共生腐朽虫群"] = function(context)
+    if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        return false
+    end
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
+    _____5F00_59CB_83AB_5C14_7279_65AF_5E38_89C4_65BD_6CD5(context["Boss单位"], cfg["动作播放秒"], "共生腐朽虫群", "腐化甲虫将在读条结束后涌出")
+    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
+    local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____7ED3_7B97_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4, context)
+    local ____self_10 = context["清理"]
+    ____self_10["登记延迟回调"](____self_10, "莫尔特斯-共生腐朽虫群召唤", delayedId)
     return true
 end
 return ____exports

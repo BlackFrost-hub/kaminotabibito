@@ -386,5 +386,5 @@ manifest 示例：
 - [ ] 用户选择已记录，废稿状态清楚。
 - [ ] 正式文件位于 Voice 根目录，代码不引用 `_alternates`。
 - [ ] TS 配置、触发、manifest 与 MIX target 一致。
-- [ ] `npm run build` 通过并检查生成 Lua。
+- [ ] TS 有改动时，已按 [TS 构建验证分流](../../../tooling/build/map-packaging-after-ts-build.mdc#ts-构建验证分流) 完成构建并检查相关生成 Lua；只有用户明确要求最终整体验收时才运行完整 `npm run build`。
 - [ ] 需要部署时才重建并复制外置 MIX。

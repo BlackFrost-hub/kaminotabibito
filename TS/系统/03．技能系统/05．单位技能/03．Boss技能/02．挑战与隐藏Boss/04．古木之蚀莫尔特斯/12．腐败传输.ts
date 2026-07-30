@@ -52,6 +52,12 @@ function 执行一次腐败传输(this: void, context: 莫尔特斯运行时上�
   });
 }
 
+/** 测试入口：直接执行一次血量节点对应的腐败传输，便于验证连线、腐败值和 Boss 护盾。 */
+export function 测试触发莫尔特斯腐败传输(this: void, context: 莫尔特斯运行时上下文): void {
+  if (!单位有效(context.Boss单位)) return;
+  执行一次腐败传输(context);
+}
+
 export function 注册莫尔特斯腐败传输节点(this: void, context: 莫尔特斯运行时上下文): void {
   if (context.腐败传输节点已注册) return;
   context.腐败传输节点已注册 = true;

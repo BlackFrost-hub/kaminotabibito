@@ -95,7 +95,7 @@ export function 注册夏提雅技能调度(this: void): void {
       可释放: function 血月终舞可释放(this: void, context: 夏提雅运行时上下文): boolean { return !context.血月终舞已释放; },
       执行: function 执行血月终舞(this: void, context: 夏提雅运行时上下文, target: any): boolean { return 释放夏提雅血月终舞(context, target); },
     }, {
-      key: '英灵战乙女登场', 冷却毫秒: 1000, 首次延迟毫秒: 0, 忙碌毫秒: 1500, 优先级: 100, 权重: 1, 互斥组: '夏提雅普通技能', 选择目标: 选择最近目标,
+      key: '英灵战乙女登场', 冷却毫秒: 1000, 首次延迟毫秒: 0, 忙碌毫秒: 夏提雅数值与表现配置.P2.英灵登场演出秒 * 1000, 优先级: 100, 权重: 1, 互斥组: '夏提雅普通技能', 选择目标: 选择最近目标,
       阶段允许: function 英灵登场阶段允许(this: void, context: 夏提雅运行时上下文): boolean { return context.阶段 === 'P2英灵战乙女'; },
       可释放: function 英灵登场可释放(this: void, context: 夏提雅运行时上下文): boolean { return 获取夏提雅英灵投影(context) == null; },
       执行: function 执行英灵登场(this: void, context: 夏提雅运行时上下文, target: any): boolean { return 启动夏提雅英灵战乙女阶段(context, target); },

@@ -16,6 +16,7 @@ ____exports.DzDoodadSetOrientMatrixRotate = doodadApi.DzDoodadSetOrientMatrixRot
 ____exports.DzDoodadSetOrientMatrixScale = doodadApi.DzDoodadSetOrientMatrixScale
 ____exports.DzDoodadSetOrientMatrixResize = doodadApi.DzDoodadSetOrientMatrixResize
 ____exports.DzDoodadSetVisible = doodadApi.DzDoodadSetVisible
+____exports.DzDoodadRemove = doodadApi.DzDoodadRemove
 ____exports.DzDoodadSetAnimation = doodadApi.DzDoodadSetAnimation
 ____exports.DzDoodadSetTimeScale = doodadApi.DzDoodadSetTimeScale
 ____exports.DzDoodadGetTimeScale = doodadApi.DzDoodadGetTimeScale
@@ -72,6 +73,7 @@ function ____exports.registerBridge(self)
     expose(nil, "DzDoodadSetOrientMatrixScale", doodadApi.DzDoodadSetOrientMatrixScale)
     expose(nil, "DzDoodadSetOrientMatrixResize", doodadApi.DzDoodadSetOrientMatrixResize)
     expose(nil, "DzDoodadSetVisible", doodadApi.DzDoodadSetVisible)
+    expose(nil, "DzDoodadRemove", doodadApi.DzDoodadRemove)
     expose(nil, "DzDoodadSetAnimation", doodadApi.DzDoodadSetAnimation)
     expose(nil, "DzDoodadSetTimeScale", doodadApi.DzDoodadSetTimeScale)
     expose(nil, "DzDoodadGetTimeScale", doodadApi.DzDoodadGetTimeScale)

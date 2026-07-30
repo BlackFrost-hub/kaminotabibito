@@ -4,7 +4,8 @@ import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
 import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
-import { 单位有效, 播放影骨莫特斯限时动作, stringToFourCC } from "./11．公共工具";
+import { 单位有效, 播放影骨莫特斯限时动作, 开始影骨莫特斯常规施法, 两点角度, stringToFourCC } from "./11．公共工具";
+import { 立即设置单位朝向 } from "../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 const jass = require("jass.common") as any;
@@ -105,6 +106,8 @@ export function 释放影骨暗影禁锢(this: void, context: 影骨莫特斯运
   if (!单位有效(target)) return;
   播放影骨莫特斯台词(context.Boss单位, "暗影禁锢");
   const cfg = 影骨莫特斯数值与表现配置.暗影禁锢;
+  立即设置单位朝向(context.Boss单位, 两点角度(GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), GetUnitX(target), GetUnitY(target)));
+  开始影骨莫特斯常规施法(context.Boss单位, cfg.预警秒, "暗影禁锢", "离开锁定的暗影法阵");
   播放影骨莫特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   const x = GetUnitX(target);
   const y = GetUnitY(target);

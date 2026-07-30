@@ -3,6 +3,7 @@
 import type { Boss测试技能命令 } from '../../00．Boss测试系统/00．Boss测试类型';
 
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
 const globals = require('jass.globals') as { udg_Boss?: any; [key: string]: any };
 
 const {
@@ -40,12 +41,17 @@ const { 应用Boss战启动属性配置 } = require('系统.03．技能系统.06
 const { 注册夏提雅被动效果 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.17．被动效果') as {
   注册夏提雅被动效果: (this: void) => void;
 };
-const { 获取或创建夏提雅运行时上下文, 清理夏提雅运行时上下文 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文') as {
+const { 夏提雅单位技能配置 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.00．配置') as {
+  夏提雅单位技能配置: { 阶段阈值: { P2生命比例: number; P3生命比例: number } };
+};
+const { 获取或创建夏提雅运行时上下文, 清理夏提雅运行时上下文, 重置夏提雅猎血连击 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文') as {
   获取或创建夏提雅运行时上下文: (this: void, boss: any) => any;
   清理夏提雅运行时上下文: (this: void, boss: any) => void;
+  重置夏提雅猎血连击: (this: void, context: any) => void;
 };
-const { 创建夏提雅鲜血印记 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.04．鲜血印记') as {
+const { 创建夏提雅鲜血印记, 清理夏提雅鲜血印记 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.04．鲜血印记') as {
   创建夏提雅鲜血印记: (this: void, context: any, x: number, y: number) => any;
+  清理夏提雅鲜血印记: (this: void, context: any, mark: any, purified?: boolean) => void;
 };
 const { 释放夏提雅滴管穿心 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.05．滴管穿心') as {
   释放夏提雅滴管穿心: (this: void, context: any, target: any) => boolean;
@@ -59,8 +65,9 @@ const { 释放夏提雅净化投枪 } = require('系统.03．技能系统.05．�
 const { 释放夏提雅鲜血回收 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.08．鲜血回收') as {
   释放夏提雅鲜血回收: (this: void, context: any) => boolean;
 };
-const { 启动夏提雅英灵战乙女阶段 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.09．英灵战乙女') as {
+const { 启动夏提雅英灵战乙女阶段, 清理英灵战乙女投影 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.09．英灵战乙女') as {
   启动夏提雅英灵战乙女阶段: (this: void, context: any, target: any) => boolean;
+  清理英灵战乙女投影: (this: void, context: any) => void;
 };
 const { 释放夏提雅镜像夹击 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.10．镜像夹击') as {
   释放夏提雅镜像夹击: (this: void, context: any, target: any) => boolean;
@@ -71,6 +78,9 @@ const { 释放夏提雅真祖血宴 } = require('系统.03．技能系统.05．�
 const { 释放夏提雅血月终舞 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.12．血月终舞') as {
   释放夏提雅血月终舞: (this: void, context: any, target: any) => boolean;
 };
+const { 绑定夏提雅挑战生命下限 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.15．挑战入口与收束') as {
+  绑定夏提雅挑战生命下限: (this: void, context: any) => void;
+};
 
 const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
@@ -80,7 +90,9 @@ const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCand
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const 夏提雅单位ID = stringToFourCCSafe('U009');
 const 测试中心X = -540.6;
@@ -139,6 +151,7 @@ function 创建或获取夏提雅测试上下文(this: void, player: any): 夏�
   设置Boss测试单位满血(boss);
   const runtime = 获取或创建夏提雅运行时上下文(boss);
   if (runtime == null) return undefined;
+  绑定夏提雅挑战生命下限(runtime);
 
   SelectUnitForPlayerSingle(boss, player);
   StarOther_PanCameraToTimedForPlayer(player, 测试中心X, 测试中心Y, 0.2);
@@ -165,57 +178,130 @@ function 创建夏提雅测试血印(this: void, context: 夏提雅测试上下�
   创建夏提雅鲜血印记(context.运行时, x, y + 260);
 }
 
+type 夏提雅测试阶段 = 1 | 2 | 3;
+
+function 清空夏提雅测试血印(this: void, context: 夏提雅测试上下文): void {
+  const source = context.运行时.血印句柄列表 as any[];
+  const marks: any[] = [];
+  for (let i = 0; i < source.length; i++) marks.push(source[i]);
+  for (let i = 0; i < marks.length; i++) {
+    清理夏提雅鲜血印记(context.运行时, marks[i], false);
+  }
+}
+
+function 准备夏提雅测试阶段(this: void, context: 夏提雅测试上下文, 阶段: 夏提雅测试阶段, 保留血印: boolean = false): void {
+  const runtime = context.运行时;
+  const boss = context.Boss单位;
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
+  if (!(maxLife > 0)) return;
+  if (!保留血印) 清空夏提雅测试血印(context);
+  if (阶段 !== 2) 清理英灵战乙女投影(runtime);
+
+  let lifeRatio = 1;
+  let phase = 'P1鲜血女武神';
+  if (阶段 === 2) {
+    lifeRatio = (夏提雅单位技能配置.阶段阈值.P2生命比例 + 夏提雅单位技能配置.阶段阈值.P3生命比例) * 0.5;
+    phase = 'P2英灵战乙女';
+  } else if (阶段 === 3) {
+    lifeRatio = 夏提雅单位技能配置.阶段阈值.P3生命比例 * 0.5;
+    phase = 'P3真祖血宴';
+  }
+
+  SetUnitState(boss, UNIT_STATE_LIFE, maxLife * lifeRatio);
+  runtime.阶段 = phase;
+  runtime.当前大型技能 = undefined;
+  runtime.普通机制忙碌到Ms = 0;
+  runtime.P3转阶段已处理 = 阶段 === 3;
+  runtime.血月终舞已释放 = false;
+  runtime.英灵复刻冷却到Ms = 0;
+  runtime.上次英灵复刻技能 = '';
+  重置夏提雅猎血连击(runtime);
+}
+
+function 准备夏提雅P2英灵(this: void, context: 夏提雅测试上下文): void {
+  准备夏提雅测试阶段(context, 2);
+  启动夏提雅英灵战乙女阶段(context.运行时, context.目标单位);
+}
+
 function 测试夏提雅滴管穿心(this: void, _player: any, context: 夏提雅测试上下文): void {
+  准备夏提雅测试阶段(context, 1);
+  释放夏提雅滴管穿心(context.运行时, context.目标单位);
+}
+function 测试夏提雅滴管穿心P2(this: void, _player: any, context: 夏提雅测试上下文): void {
+  准备夏提雅P2英灵(context);
+  释放夏提雅滴管穿心(context.运行时, context.目标单位);
+}
+function 测试夏提雅滴管穿心P3(this: void, _player: any, context: 夏提雅测试上下文): void {
+  准备夏提雅测试阶段(context, 3);
   释放夏提雅滴管穿心(context.运行时, context.目标单位);
 }
 function 测试夏提雅血月轮舞(this: void, _player: any, context: 夏提雅测试上下文): void {
+  准备夏提雅测试阶段(context, 1);
+  释放夏提雅血月轮舞(context.运行时, context.目标单位);
+}
+function 测试夏提雅血月轮舞P3(this: void, _player: any, context: 夏提雅测试上下文): void {
+  准备夏提雅测试阶段(context, 3);
   释放夏提雅血月轮舞(context.运行时, context.目标单位);
 }
 function 测试夏提雅净化投枪(this: void, _player: any, context: 夏提雅测试上下文): void {
+  准备夏提雅测试阶段(context, 1);
+  释放夏提雅净化投枪(context.运行时, context.目标单位);
+}
+function 测试夏提雅净化投枪P2(this: void, _player: any, context: 夏提雅测试上下文): void {
+  准备夏提雅P2英灵(context);
+  释放夏提雅净化投枪(context.运行时, context.目标单位);
+}
+function 测试夏提雅净化投枪P3(this: void, _player: any, context: 夏提雅测试上下文): void {
+  准备夏提雅测试阶段(context, 3);
   释放夏提雅净化投枪(context.运行时, context.目标单位);
 }
 function 测试夏提雅鲜血回收(this: void, _player: any, context: 夏提雅测试上下文): void {
-  context.运行时.阶段 = 'P1鲜血女武神';
+  准备夏提雅测试阶段(context, 1);
   创建夏提雅测试血印(context);
   释放夏提雅鲜血回收(context.运行时);
 }
 function 测试夏提雅英灵战乙女(this: void, _player: any, context: 夏提雅测试上下文): void {
-  context.运行时.阶段 = 'P2英灵战乙女';
+  准备夏提雅测试阶段(context, 2);
   启动夏提雅英灵战乙女阶段(context.运行时, context.目标单位);
 }
 function 测试夏提雅镜像夹击(this: void, _player: any, context: 夏提雅测试上下文): void {
-  context.运行时.阶段 = 'P2英灵战乙女';
-  启动夏提雅英灵战乙女阶段(context.运行时, context.目标单位);
+  准备夏提雅P2英灵(context);
   释放夏提雅镜像夹击(context.运行时, context.目标单位);
 }
 function 测试夏提雅真祖血宴(this: void, _player: any, context: 夏提雅测试上下文): void {
-  context.运行时.阶段 = 'P3真祖血宴';
-  context.运行时.P3转阶段已处理 = false;
+  准备夏提雅测试阶段(context, 1);
   创建夏提雅测试血印(context);
+  准备夏提雅测试阶段(context, 3, true);
+  context.运行时.P3转阶段已处理 = false;
   释放夏提雅真祖血宴(context.运行时);
 }
 function 测试夏提雅血月终舞(this: void, _player: any, context: 夏提雅测试上下文): void {
-  context.运行时.阶段 = 'P3真祖血宴';
+  准备夏提雅测试阶段(context, 3);
   context.运行时.P3转阶段已处理 = true;
-  context.运行时.血月终舞已释放 = false;
   释放夏提雅血月终舞(context.运行时, context.目标单位);
 }
 function 准备夏提雅血之复生(this: void, _player: any, context: 夏提雅测试上下文): void {
-  context.运行时.阶段 = 'P3真祖血宴';
+  准备夏提雅测试阶段(context, 3);
+  绑定夏提雅挑战生命下限(context.运行时);
   context.运行时.已触发复生 = false;
   SetUnitState(context.Boss单位, UNIT_STATE_LIFE, 1);
 }
 
 const 夏提雅测试技能列表: Boss测试技能命令[] = [
-  { 序号: 1, 名称: '滴管穿心', 执行: 测试夏提雅滴管穿心 },
-  { 序号: 2, 名称: '血月轮舞', 执行: 测试夏提雅血月轮舞 },
-  { 序号: 3, 名称: '净化投枪', 执行: 测试夏提雅净化投枪 },
-  { 序号: 4, 名称: '鲜血回收', 执行: 测试夏提雅鲜血回收 },
-  { 序号: 5, 名称: 'P2英灵战乙女', 执行: 测试夏提雅英灵战乙女 },
-  { 序号: 6, 名称: 'P2镜像夹击', 执行: 测试夏提雅镜像夹击 },
-  { 序号: 7, 名称: 'P3真祖血宴', 执行: 测试夏提雅真祖血宴 },
-  { 序号: 8, 名称: 'P3血月终舞', 执行: 测试夏提雅血月终舞 },
-  { 序号: 9, 名称: '血之复生触发准备（攻击致死）', 执行: 准备夏提雅血之复生 },
+  { 序号: 1, 名称: '滴管穿心（P1基础）', 执行: 测试夏提雅滴管穿心 },
+  { 序号: 1, 命令: '1-2', 名称: '滴管穿心（P2英灵复刻）', 执行: 测试夏提雅滴管穿心P2 },
+  { 序号: 1, 命令: '1-3', 名称: '滴管穿心（P3两段猎血起手）', 执行: 测试夏提雅滴管穿心P3 },
+  { 序号: 2, 名称: '血月轮舞（P1基础）', 执行: 测试夏提雅血月轮舞 },
+  { 序号: 2, 命令: '2-3', 名称: '血月轮舞（P3第二段加速）', 执行: 测试夏提雅血月轮舞P3 },
+  { 序号: 3, 名称: '净化投枪（P1基础）', 执行: 测试夏提雅净化投枪 },
+  { 序号: 3, 命令: '3-2', 名称: '净化投枪（P2英灵复刻）', 执行: 测试夏提雅净化投枪P2 },
+  { 序号: 3, 命令: '3-3', 名称: '净化投枪（P3双投枪）', 执行: 测试夏提雅净化投枪P3 },
+  { 序号: 4, 名称: '鲜血回收（P1/P2同形态）', 执行: 测试夏提雅鲜血回收 },
+  { 序号: 5, 名称: '英灵战乙女（P2基础）', 执行: 测试夏提雅英灵战乙女 },
+  { 序号: 6, 名称: '镜像夹击（P2基础）', 执行: 测试夏提雅镜像夹击 },
+  { 序号: 7, 名称: '真祖血宴（P3转阶段）', 执行: 测试夏提雅真祖血宴 },
+  { 序号: 8, 名称: '血月终舞（P3基础）', 执行: 测试夏提雅血月终舞 },
+  { 序号: 9, 名称: '血之复生被动准备（再输入55触底）', 执行: 准备夏提雅血之复生 },
 ];
 
 注册Boss测试命令组({

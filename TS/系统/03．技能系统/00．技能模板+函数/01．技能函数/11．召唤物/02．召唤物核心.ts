@@ -35,6 +35,9 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
+  X_FixUnitStandingSafe: (this: void, unit: any) => void;
+};
 
 import type { 规范化召唤物参数 } from "./01．类型";
 
@@ -181,6 +184,10 @@ function 应用召唤物属性(this: void, unit: any, 参数: 规范化召唤物
 
   if (参数.攻击范围 != null && 参数.攻击范围 > 0) {
     SetUnitStateJapi(unit, ConvertUnitState(ATTACK_RANGE_STATE), 参数.攻击范围);
+  }
+
+  if (参数.固定站桩 === true) {
+    X_FixUnitStandingSafe(unit);
   }
 
   if (参数.普攻弹道模型 != null && 参数.普攻弹道模型 !== "" && DzSetUnitMissileModel != null) {

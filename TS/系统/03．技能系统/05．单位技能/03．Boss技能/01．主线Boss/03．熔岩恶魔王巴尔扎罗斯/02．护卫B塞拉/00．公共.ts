@@ -70,7 +70,7 @@ const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const ATTACK_TYPE_CHAOS = jass.ATTACK_TYPE_CHAOS as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -172,7 +172,7 @@ function 造成塞拉Boss技能伤害(this: void, source: any, target: any, amou
     目标: target,
     伤害: amount,
     ranged: true,
-    attackType: ATTACK_TYPE_CHAOS,
+    attackType: ATTACK_TYPE_NORMAL,
     伤害类型: damageType,
     weaponType: WEAPON_TYPE_WHOKNOWS,
     伤害形态,
@@ -219,7 +219,7 @@ export const 塞拉公共 = {
   SquareRoot,
   UNIT_STATE_MAX_LIFE,
   UNIT_TYPE_DEAD,
-  ATTACK_TYPE_CHAOS,
+  ATTACK_TYPE_NORMAL,
   DAMAGE_TYPE_FIRE,
   DAMAGE_TYPE_COLD,
   WEAPON_TYPE_WHOKNOWS,

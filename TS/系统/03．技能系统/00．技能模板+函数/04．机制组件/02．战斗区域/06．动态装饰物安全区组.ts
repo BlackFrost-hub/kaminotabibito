@@ -8,11 +8,13 @@ const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const GetRandomInt = jass.GetRandomInt as (min: number, max: number) => number;
 
-const { DzDoodadCreate, DzDoodadSetModel, DzDoodadSetVisible } = require("lib.扩展函数.KK扩展API.00．装饰物函数") as {
+const { DzDoodadCreate, DzDoodadSetModel, DzDoodadSetVisible, DzDoodadRemove } = require("lib.扩展函数.KK扩展API.00．装饰物函数") as {
   DzDoodadCreate: (this: void, id: number, varId: number, x: number, y: number, z: number, rotate: number, scale: number) => number;
   DzDoodadSetModel: (this: void, doodad: number, modelFile: string) => void;
   DzDoodadSetVisible: (this: void, doodad: number, enable: boolean) => void;
+  DzDoodadRemove: (this: void, doodad: number) => void;
 };
 
 export interface 动态装饰物安全区点位 {
@@ -39,6 +41,8 @@ export interface 动态装饰物安全区组参数 {
   点位列表: 动态装饰物安全区点位[];
   默认模型路径?: string;
   变量ID?: number;
+  随机样式最小ID?: number;
+  随机样式最大ID?: number;
   Z?: number;
   缩放?: number;
   默认显示提示?: boolean;
@@ -117,17 +121,23 @@ class 动态装饰物安全区组实现 implements 动态装饰物安全区组 {
   销毁(): void {
     if (this.已销毁) return;
     this.已销毁 = true;
-    this.隐藏();
+    for (let i = 0; i < this.列表.length; i++) {
+      const 区 = this.列表[i];
+      if (区.装饰物 != null && 区.装饰物 !== 0) DzDoodadRemove(区.装饰物);
+    }
     this.列表 = [];
   }
 
   private 创建全部(): void {
     const doodadId = 转装饰物ID(this.参数.装饰物ID);
-    const varId = this.参数.变量ID ?? 1;
     const z = this.参数.Z ?? 0;
     const scale = this.参数.缩放 ?? 1;
     for (let i = 0; i < this.参数.点位列表.length; i++) {
       const 点 = this.参数.点位列表[i];
+      let varId = this.参数.变量ID ?? 0;
+      const minVarId = this.参数.随机样式最小ID;
+      const maxVarId = this.参数.随机样式最大ID;
+      if (minVarId != null && maxVarId != null && maxVarId >= minVarId) varId = GetRandomInt(minVarId, maxVarId);
       const doodad = DzDoodadCreate(doodadId, varId, 点.X, 点.Y, z, 点.朝向 ?? 0, scale);
       const model = 点.模型路径 ?? this.参数.默认模型路径;
       if (model != null && model !== "") DzDoodadSetModel(doodad, model);

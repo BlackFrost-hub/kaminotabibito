@@ -1,8 +1,9 @@
 /** @noSelfInFile */
 
 import type { 祖地双灵卫运行时上下文, 祖地双灵卫区域状态 } from '../01．运行时上下文';
+import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
-import { 播放限时单位动画 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 两点角度, 极坐标X, 极坐标Y, 距离平方XY, 限制数值, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 创建持续危险区域, type 持续危险区域实例 } from '../../../../../00．技能模板+函数/04．机制组件/03．持续危险区/01．持续危险区域';
@@ -90,6 +91,8 @@ export function 释放记忆剥落(this: void, context: 祖地双灵卫运行时
     points.push(调整到场内且避开镇魂印(context, 极坐标X(baseX, sideFacing, signedOffset), 极坐标Y(baseY, sideFacing, signedOffset)));
   }
   context.大型机制忙碌到Ms = getServerTime() + (cfg.预警秒 + cfg.持续秒) * 1000;
+  立即设置单位朝向(boss, bossFacing);
+  开始祖地双灵卫常规施法(boss, cfg.预警秒, '记忆剥落', '两块空白灵域将在锁定位置生成并持续侵蚀');
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: cfg.预警秒 + 0.25, 恢复动画编号: cfg.恢复动画编号 });
   for (let i = 0; i < points.length; i++) 创建技能提示圈({ 类型: '敌方圆形', X: points[i].X, Y: points[i].Y, 半径: cfg.半径, 持续时间: cfg.预警秒, 来源单位: boss });
   const createId = addDelayedCallback(cfg.预警秒 * 1000, function 记忆剥落生成灵域(this: void): void {

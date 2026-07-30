@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____968F_673A_53D6_5F71_9AA8_97F3_6548_8DEF_5F84, _____767B_8BB0_5F71_9AA8_53EC_5524_7269, _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0, _____5F71_9AA8_7B26_5492_53EF_62FE_53D6_5355_4F4D, _____5F71_9AA8_7B26_5492_62FE_53D6, _____521B_5EFA_9AB8_9AA8_7B26_5492, _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4, _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB, _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1, _____5F71_9AA8_53EC_5524_7269_9500_6BC1, _____521B_5EFA_70B9_7279_6548, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, GetRandomInt, IssueTargetOrder, addDelayedCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6218_6597_5185_62FE_53D6_7269, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, registerManualBuff, _____5F71_9AA8_83AB_7279_65AFBuffID, _____9AB8_9AA8_6218_58EBID, _____5F71_9AA8_53EC_5524_7269_4E0A_4E0B_6587_8868
+local _____968F_673A_53D6_5F71_9AA8_97F3_6548_8DEF_5F84, _____767B_8BB0_5F71_9AA8_53EC_5524_7269, _____6E05_9664_5F71_9AA8_53EC_5524_7269_767B_8BB0, _____5F71_9AA8_7B26_5492_53EF_62FE_53D6_5355_4F4D, _____5F71_9AA8_7B26_5492_62FE_53D6, _____521B_5EFA_9AB8_9AA8_7B26_5492, _____5F71_9AA8_9AB8_9AA8_6218_58EB_91CD_7EC4, _____5C1D_8BD5_91CD_7EC4_9AB8_9AA8_6218_58EB, _____5F71_9AA8_53EC_5524_7269_6B7B_4EA1, _____5F71_9AA8_53EC_5524_7269_9500_6BC1, _____521B_5EFA_70B9_7279_6548, GetUnitX, GetUnitY, GetOwningPlayer, GetRandomReal, GetRandomInt, IssueTargetOrder, addDelayedCallback, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6218_6597_5185_62FE_53D6_7269, _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, registerManualBuff, _____5F71_9AA8_83AB_7279_65AFBuffID, _____9AB8_9AA8_6218_58EBID, _____5F71_9AA8_53EC_5524_7269_4E0A_4E0B_6587_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.00．配置")
 local _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["影骨莫特斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.01．运行时上下文")
@@ -15,6 +15,7 @@ local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C = ____11_FF0E_516C_5171_5DE5_5177["播放影骨莫特斯限时动作"]
+local _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5 = ____11_FF0E_516C_5171_5DE5_5177["开始影骨莫特斯常规施法"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
@@ -55,7 +56,7 @@ function _____5F71_9AA8_7B26_5492_53EF_62FE_53D6_5355_4F4D(variable)
     if variable == nil or not _____5355_4F4D_6709_6548(variable.context["Boss单位"]) then
         return {}
     end
-    return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(variable.context["Boss单位"])
+    return _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868(variable.context["Boss单位"])
 end
 function _____5F71_9AA8_7B26_5492_62FE_53D6(hero, ______5B9E_4F8B, _variable)
     _____521B_5EFA_70B9_7279_6548({
@@ -210,7 +211,7 @@ _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物")
 _____521B_5EFA_6218_6597_5185_62FE_53D6_7269 = ____require_result_3["创建战斗内拾取物"]
 local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868 = ____require_result_4["获取Boss技能敌对目标列表"]
 _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
 local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_5.registerDamageModifier
@@ -338,6 +339,7 @@ ____exports["释放影骨骸骨召唤"] = function(context)
     if _____6267_884CID == 0 then
         return
     end
+    _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5(boss, 3, "骸骨召唤", "莫特斯正在分批唤醒骸骨盗贼")
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(boss, "骸骨召唤")
     context["当前召唤组"] = group

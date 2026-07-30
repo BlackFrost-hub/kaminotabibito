@@ -1,5 +1,4 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.00．配置")
 local _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["影骨莫特斯单位技能配置"]
@@ -16,13 +15,16 @@ local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C = ____11_FF0E_516C_5171_5DE5_5177["播放影骨莫特斯限时动作"]
+local _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5 = ____11_FF0E_516C_5171_5DE5_5177["开始影骨莫特斯常规施法"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local _____4E24_70B9_89D2_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["两点角度"]
 local _____76EE_6807_6B63_9762_671D_5411_6765_6E90 = ____11_FF0E_516C_5171_5DE5_5177["目标正面朝向来源"]
-local _____53D6_5355_4F4DID = ____11_FF0E_516C_5171_5DE5_5177["取单位ID"]
 local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
 local _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身位移到坐标"]
+local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -50,7 +52,6 @@ local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_
 local _____9634_5F71_7A7F_68AD_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["阴影穿梭"])
 local _____5DF2_6CE8_518C_9634_5F71_7A7F_68AD = false
 local _____5DF2_6CE8_518C_80CC_523A_4FEE_6B63 = false
-local _____5F85_7A7F_68AD_4E0A_4E0B_6587 = {}
 local function ____on_5F71_9AA8_80CC_523A_4F24_5BB3_4FEE_6B63(damageContext)
     local boss = damageContext.attacker
     if not _____5355_4F4D_6709_6548(boss) or damageContext.isNormalAttack ~= true or damageContext.isSkillAttack == true or damageContext.isSkillDamage == true then
@@ -66,7 +67,8 @@ local function ____on_5F71_9AA8_80CC_523A_4F24_5BB3_4FEE_6B63(damageContext)
     _____8BBE_7F6E_5F71_9AA8_80CC_523A_51C6_5907(context, false)
     local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]
     local damage = damageContext.currentDamage * cfg["背刺伤害倍率"]
-    if _____76EE_6807_6B63_9762_671D_5411_6765_6E90(boss, damageContext.target, cfg["背刺角度"]) then
+    local _____6B63_9762_547D_4E2D = _____76EE_6807_6B63_9762_671D_5411_6765_6E90(boss, damageContext.target, cfg["背刺角度"])
+    if _____6B63_9762_547D_4E2D then
         damage = damage * cfg["正面减伤比例"]
     end
     if _____5355_4F4D_6709_6548(damageContext.target) then
@@ -80,6 +82,14 @@ local function ____on_5F71_9AA8_80CC_523A_4F24_5BB3_4FEE_6B63(damageContext)
             GetUnitY(damageContext.target),
             _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
         )
+        if not _____6B63_9762_547D_4E2D then
+            _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["背刺命中血月"],
+                X = GetUnitX(damageContext.target),
+                Y = GetUnitY(damageContext.target),
+                ["持续秒"] = 0.8
+            })
+        end
     end
     return damage
 end
@@ -90,68 +100,82 @@ local function _____786E_4FDD_5F71_9AA8_80CC_523A_4FEE_6B63()
     _____5DF2_6CE8_518C_80CC_523A_4FEE_6B63 = true
     registerDamageModifier(____on_5F71_9AA8_80CC_523A_4F24_5BB3_4FEE_6B63, 48)
 end
-local function _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210()
-    for key in pairs(_____5F85_7A7F_68AD_4E0A_4E0B_6587) do
-        do
-            local context = _____5F85_7A7F_68AD_4E0A_4E0B_6587[key]
-            if context == nil then
-                goto __continue12
-            end
-            __TS__Delete(_____5F85_7A7F_68AD_4E0A_4E0B_6587, key)
-            local boss = context["Boss单位"]
-            if not _____5355_4F4D_6709_6548(boss) then
-                goto __continue12
-            end
-            local target = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss)
-            if not _____5355_4F4D_6709_6548(target) then
-                SetUnitInvulnerable(boss, false)
-                SetUnitVertexColor(
-                    boss,
-                    255,
-                    255,
-                    255,
-                    255
-                )
-                goto __continue12
-            end
-            local angle = GetRandomReal(0, 360)
-            local distance = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]["出现距离"]
-            local x = _____6781_5750_6807X(
-                GetUnitX(target),
-                distance,
-                angle
-            )
-            local y = _____6781_5750_6807Y(
-                GetUnitY(target),
-                distance,
-                angle
-            )
-            if not _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807(boss, x, y) then
-                SetUnitInvulnerable(boss, false)
-                SetUnitVertexColor(
-                    boss,
-                    255,
-                    255,
-                    255,
-                    255
-                )
-                goto __continue12
-            end
-            _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭落点"], X = x, Y = y, ["持续秒"] = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]["瞬时特效持续秒"]})
-            _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["阴影穿梭"]["落点闪现"], x, y, _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
-            SetUnitInvulnerable(boss, false)
-            SetUnitVertexColor(
-                boss,
-                255,
-                255,
-                255,
-                255
-            )
-            _____8BBE_7F6E_5F71_9AA8_80CC_523A_51C6_5907(context, true)
-            IssueTargetOrder(boss, "attackonce", target)
-        end
-        ::__continue12::
+local function _____5F71_9AA8_9634_5F71_7A7F_68AD_8FDB_5165_65E0_654C(variable)
+    local data = variable
+    if data == nil then
+        return
     end
+    local boss = data.context["Boss单位"]
+    if _____5355_4F4D_6709_6548(boss) then
+        SetUnitInvulnerable(boss, true)
+    end
+end
+local function _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    local context = data.context
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) then
+        return
+    end
+    local target = data.target
+    if not _____5355_4F4D_6709_6548(target) then
+        SetUnitInvulnerable(boss, false)
+        SetUnitVertexColor(
+            boss,
+            255,
+            255,
+            255,
+            255
+        )
+        return
+    end
+    local angle = GetRandomReal(0, 360)
+    local distance = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]["出现距离"]
+    local x = _____6781_5750_6807X(
+        GetUnitX(target),
+        distance,
+        angle
+    )
+    local y = _____6781_5750_6807Y(
+        GetUnitY(target),
+        distance,
+        angle
+    )
+    if not _____6267_884C_6218_6597_81EA_8EAB_4F4D_79FB_5230_5750_6807(boss, x, y) then
+        SetUnitInvulnerable(boss, false)
+        SetUnitVertexColor(
+            boss,
+            255,
+            255,
+            255,
+            255
+        )
+        return
+    end
+    _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["阴影穿梭落点"], X = x, Y = y, ["持续秒"] = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]["瞬时特效持续秒"]})
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["阴影穿梭"]["落点闪现"], x, y, _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
+    SetUnitInvulnerable(boss, false)
+    SetUnitVertexColor(
+        boss,
+        255,
+        255,
+        255,
+        255
+    )
+    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(
+        boss,
+        _____4E24_70B9_89D2_5EA6(
+            x,
+            y,
+            GetUnitX(target),
+            GetUnitY(target)
+        )
+    )
+    _____8BBE_7F6E_5F71_9AA8_80CC_523A_51C6_5907(context, true)
+    IssueTargetOrder(boss, "attackonce", target)
 end
 ____exports["释放影骨阴影穿梭"] = function(context)
     local boss = context["Boss单位"]
@@ -159,6 +183,20 @@ ____exports["释放影骨阴影穿梭"] = function(context)
         return
     end
     local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["阴影穿梭"]
+    local target = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss)
+    if not _____5355_4F4D_6709_6548(target) then
+        return
+    end
+    _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(
+        boss,
+        _____4E24_70B9_89D2_5EA6(
+            GetUnitX(boss),
+            GetUnitY(boss),
+            GetUnitX(target),
+            GetUnitY(target)
+        )
+    )
+    _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5(boss, cfg["消失秒"], "阴影穿梭", "莫特斯即将从锁定目标附近现身")
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(boss, "阴影穿梭")
     _____521B_5EFA_70B9_7279_6548({
@@ -189,17 +227,31 @@ ____exports["释放影骨阴影穿梭"] = function(context)
         255,
         80
     )
-    SetUnitInvulnerable(boss, true)
-    local id = _____53D6_5355_4F4DID(boss)
-    if id == 0 then
-        return
-    end
-    _____5F85_7A7F_68AD_4E0A_4E0B_6587[id] = context
+    local data = {context = context, target = target}
+    local invulnerableDelay = cfg["消失秒"] > cfg["无敌秒"] and cfg["消失秒"] - cfg["无敌秒"] or 0
+    local invulnerableId = addDelayedCallback(invulnerableDelay * 1000, _____5F71_9AA8_9634_5F71_7A7F_68AD_8FDB_5165_65E0_654C, data)
     local ____self_4 = context["清理"]
-    ____self_4["登记延迟回调"](
-        ____self_4,
-        "影骨-阴影穿梭",
-        addDelayedCallback(cfg["消失秒"] * 1000, _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210)
+    ____self_4["登记延迟回调"](____self_4, "影骨-阴影穿梭进入无敌", invulnerableId)
+    local completeId = addDelayedCallback(cfg["消失秒"] * 1000, _____5F71_9AA8_9634_5F71_7A7F_68AD_5B8C_6210, data)
+    local ____self_5 = context["清理"]
+    ____self_5["登记延迟回调"](____self_5, "影骨-阴影穿梭", completeId)
+    local ____self_6 = context["清理"]
+    ____self_6["登记清理"](
+        ____self_6,
+        "影骨-阴影穿梭恢复可见",
+        function()
+            if not _____5355_4F4D_6709_6548(boss) then
+                return
+            end
+            SetUnitInvulnerable(boss, false)
+            SetUnitVertexColor(
+                boss,
+                255,
+                255,
+                255,
+                255
+            )
+        end
     )
 end
 local function ____on_5F71_9AA8_9634_5F71_7A7F_68AD_65BD_6CD5(castingUnit, spellAbilityId)

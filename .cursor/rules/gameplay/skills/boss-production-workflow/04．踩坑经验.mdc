@@ -171,17 +171,17 @@ alwaysApply: false
 
 ### 13. 构建、生成 Lua 和测试图
 
-- `npm run build` 通过不等于测试地图已经更新；它会更新 `src/**/*.lua`，但不一定刷新 `.build/war3map.lua` 和测试 `.w3x`。
+- 局部或完整 TS 构建通过都不等于测试地图已经更新；它们会更新相应的 `src/**/*.lua`，但不一定刷新 `.build/war3map.lua` 和测试 `.w3x`。
 - 修改 TS 后必须：
-  - `npm run build`
+  - 按 [TS 构建验证分流](../../../tooling/build/map-packaging-after-ts-build.mdc#ts-构建验证分流) 构建；普通业务 TS 只对本次修改文件运行 `build:files`
   - 对敏感回调/导出函数/JASS/JAPI 调用检查生成 Lua
-  - 需要进图测试时确认 `.build/war3map.lua` 已是最新，并重新打包 `.build/_warcraft_vscode_test.w3x`
+  - 普通进图测试交给用户执行 Warcraft VSCode `Run Map`；只有用户明确要求手动打包或正在排查地图未更新时，才确认 `.build/war3map.lua` 并重新打包测试图
 - 如果运行时报 `module 'xxx' not found`，不要只看 `src`，还要搜：
   - `src/**/*.lua`
   - `.build/war3map.lua`
   - `.build/_warcraft_vscode_test.w3x`
 - 对目录入口文件，Lua require 必须写到 `.index`；`warcraft.json` 的 package path 当前只包含 `./?.lua` 和 `./?/init.lua`，不包含 `./?/index.lua`。
-- 如果插件没有自动刷新测试图，可用 `MopaqPack-rs.exe generate -i .build/packlist.json -o .build/_warcraft_vscode_test.w3x` 重新生成测试地图；执行前要确认 `.build/war3map.lua` 已经是最新内容。
+- 仅在用户明确要求手动打包或正在排查打包问题时，如果插件没有自动刷新测试图，可用 `MopaqPack-rs.exe generate -i .build/packlist.json -o .build/_warcraft_vscode_test.w3x` 重新生成测试地图；执行前要确认 `.build/war3map.lua` 已经是最新内容。
 - 如果打包报 `ErrorCode(32)`，优先检查 `War3` / `WorldEditKKWE` 是否正在占用测试图。
 - 生成 Lua 检查重点：
   - 不能出现多余 `nil/self`

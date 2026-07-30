@@ -358,7 +358,7 @@ function flush反伤队列(this: void): void {
       来源: 记录.攻击者,
       目标: 记录.攻击者,
       伤害: 记录.伤害,
-      attackType: jass.ATTACK_TYPE_CHAOS,
+      attackType: jass.ATTACK_TYPE_NORMAL,
       伤害类型: jass.DAMAGE_TYPE_UNIVERSAL,
       weaponType: null,
       来源类型: "其他",
