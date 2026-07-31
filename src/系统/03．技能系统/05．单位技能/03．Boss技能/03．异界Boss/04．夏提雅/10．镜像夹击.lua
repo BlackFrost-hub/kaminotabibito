@@ -11,6 +11,7 @@ local ____09_FF0E_82F1_7075_6218_4E59_5973 = require("系统.03．技能系统.0
 local _____6E05_7406_82F1_7075_6218_4E59_5973_6295_5F71 = ____09_FF0E_82F1_7075_6218_4E59_5973["清理英灵战乙女投影"]
 local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
 local _____5F00_59CB_51B2_950B = _____51FB_9000_7CFB_7EDF["开始冲锋"]
+local _____505C_6B62_5355_4F4D_4F4D_79FB = _____51FB_9000_7CFB_7EDF["停止单位位移"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
@@ -39,6 +40,10 @@ ____exports["清理镜像夹击投影"] = function(context)
     end
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_0.CosBJ
+local SinBJ = ____require_result_0.SinBJ
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
@@ -49,27 +54,33 @@ local SetUnitFacing = jass.SetUnitFacing
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitPathing = jass.SetUnitPathing
 local UnitAddAbility = jass.UnitAddAbility
-local CosBJ = jass.CosBJ
-local SinBJ = jass.SinBJ
+local UnitAddType = jass.UnitAddType
+local ConvertUnitState = jass.ConvertUnitState
+local IssueImmediateOrder = jass.IssueImmediateOrder
 local Atan2 = jass.Atan2
 local SquareRoot = jass.SquareRoot
 local GetHandleId = jass.GetHandleId
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
-local _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedEffect = ____require_result_2.createTimedEffect
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技能伤害"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.03．快速Buff")
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_5["施加快速减速Buff"]
+local UNIT_TYPE_TAUREN = jass.UNIT_TYPE_TAUREN
+local SetUnitStateJapi = japi.SetUnitState
+local DzUnitDisableAttack = japi.DzUnitDisableAttack
+local _____653B_51FB_8303_56F4_72B6_6001 = 22
+local _____653B_51FB_95F4_9694_72B6_6001 = 37
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
+local _____521B_5EFA_53EC_5524_7269 = ____require_result_1["创建召唤物"]
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedEffect = ____require_result_3.createTimedEffect
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_4["创建技能提示圈"]
+local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成AOE技能伤害"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_6["施加快速减速Buff"]
 local _____8757_866B_6280_80FDID = 1097625443
 _____5206_8EAB_6B8B_5F71_8DEF_5F84 = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx"
 local RAD_TO_DEG = 57.29577951308232
@@ -100,7 +111,22 @@ local function _____521B_5EFA_955C_50CF_5939_51FB_6295_5F71(context, x, y, face)
         return projection
     end
     UnitAddAbility(projection, _____8757_866B_6280_80FDID)
+    UnitAddType(projection, UNIT_TYPE_TAUREN)
     SetUnitAcquireRange(projection, 0)
+    SetUnitStateJapi(
+        projection,
+        ConvertUnitState(_____653B_51FB_8303_56F4_72B6_6001),
+        0
+    )
+    SetUnitStateJapi(
+        projection,
+        ConvertUnitState(_____653B_51FB_95F4_9694_72B6_6001),
+        99
+    )
+    if DzUnitDisableAttack ~= nil then
+        DzUnitDisableAttack(projection, true)
+    end
+    IssueImmediateOrder(projection, "stop")
     SetUnitPathing(projection, false)
     SetUnitFacing(projection, face)
     context["镜像夹击句柄"] = projection
@@ -163,7 +189,8 @@ local function _____542F_52A8_955C_50CF_5939_51FB_6295_5F71_51B2_950B(context, p
                 end
             end,
             ["开始回调"] = function()
-                SetUnitAnimationByIndex(projection, cfg["镜像夹击投影动画编号"])
+                _____5F00_59CB_786C_76F4(projection, cfg["镜像夹击投影突进秒"])
+                SetUnitAnimationByIndex(projection, cfg["英灵复刻冲锋动画编号"])
             end,
             ["结束回调"] = function()
                 if _____53C2_6570["投影结算"] ~= nil then
@@ -183,17 +210,24 @@ local function _____9020_6210_955C_50CF_5939_51FB_4F24_5BB3(context, target, rat
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
-        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
         weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
         ["来源类型"] = "Boss技能",
         ["标签"] = tag
     })
 end
-local function _____7ED3_675F_955C_50CF_5939_51FB(context)
+local function _____7ED3_675F_955C_50CF_5939_51FB(context, _____6267_884CID)
+    if _____6267_884CID ~= nil and _____6267_884CID ~= 0 and context["镜像夹击执行ID"] ~= _____6267_884CID then
+        return
+    end
+    _____505C_6B62_5355_4F4D_4F4D_79FB(context["Boss单位"], "中断")
+    _____505C_6B62_5355_4F4D_4F4D_79FB(context["镜像夹击句柄"], "中断")
     ____exports["清理镜像夹击投影"](context)
     if context["当前大型技能"] == _____955C_50CF_5939_51FB_6280_80FDKey then
         context["当前大型技能"] = nil
     end
+    context["镜像夹击执行器"] = nil
+    context["镜像夹击执行ID"] = 0
 end
 ____exports["释放夏提雅镜像夹击"] = function(context, target)
     local boss = context["Boss单位"]
@@ -226,12 +260,20 @@ ____exports["释放夏提雅镜像夹击"] = function(context, target)
     local mirrorDistance = cfg["镜像夹击投影距离"] + cfg["镜像夹击投影越过距离"]
     local totalSeconds = cfg["镜像夹击预警秒"] + cfg["镜像夹击第二段延迟秒"] + cfg["镜像夹击投影突进秒"] + cfg["镜像夹击恢复窗口秒"]
     local mainTargetId = GetHandleId(target)
+    local previousExecutor = context["镜像夹击执行器"]
+    if previousExecutor ~= nil and previousExecutor["是否运行中"](previousExecutor) then
+        previousExecutor["停止"](previousExecutor, nil, "中断")
+    end
+    context["镜像夹击执行器"] = nil
+    context["镜像夹击执行ID"] = 0
     local projection = nil
     local executor = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "夏提雅-镜像夹击", ["清理"] = context["清理"], ["互斥组"] = "夏提雅大型技能"})
     context["当前大型技能"] = _____955C_50CF_5939_51FB_6280_80FDKey
     context["普通机制忙碌到Ms"] = getServerTime() + totalSeconds * 1000
     _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(context)
-    local executionId = executor["开始"](
+    context["镜像夹击执行器"] = executor
+    local executionId = 0
+    executionId = executor["开始"](
         executor,
         {
             key = _____955C_50CF_5939_51FB_6280_80FDKey,
@@ -347,10 +389,11 @@ ____exports["释放夏提雅镜像夹击"] = function(context, target)
                 _____521B_5EFA_5EF6_8FDF_9636_6BB5((cfg["镜像夹击投影突进秒"] + cfg["镜像夹击恢复窗口秒"]) * 1000, "英灵冲锋与恢复窗口")
             },
             ["结束回调"] = function()
-                _____7ED3_675F_955C_50CF_5939_51FB(context)
+                _____7ED3_675F_955C_50CF_5939_51FB(context, executionId)
             end
         }
     )
+    context["镜像夹击执行ID"] = executionId
     if executionId == 0 then
         _____7ED3_675F_955C_50CF_5939_51FB(context)
         return false

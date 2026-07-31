@@ -178,7 +178,7 @@ export function 启动雅儿贝德生命锚点封锁(
   context.清理.登记清理('雅儿贝德-生命锚点封锁', function 生命锚点封锁清理(this: void): void {
     结束封锁('挑战清理');
   });
-  广播单位提示(context.安兹单位, '|cffffcc66雅儿贝德封锁了一座生命锚点：击破暗金屏障后才能激活。|r', 3600);
+  广播单位提示(context.安兹单位, `|cffffcc66雅儿贝德封锁了1座未激活生命锚点，并生成持续${durationSeconds}秒的暗金屏障：击破屏障后才能激活。（多人模式集火破盾，单人模式持续攻击屏障。）|r`, 3600);
   return controller;
 }
 

@@ -40,6 +40,10 @@ const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统
 const { 施加战斗视野压制 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.10．战斗视野压制") as {
   施加战斗视野压制: (this: void, 参数: any) => void;
 };
+const { 显示大招吟唱条, 关闭吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
+  显示大招吟唱条: (this: void, 参数: any) => void;
+  关闭吟唱条: (this: void, 通道?: string) => void;
+};
 
 const 影骨单位类型ID = stringToFourCC(影骨莫特斯单位技能配置.单位ID);
 const 幽影爆发技能ID = stringToFourCC(影骨莫特斯单位技能配置.技能壳.幽影爆发);
@@ -55,6 +59,10 @@ interface 影骨幽影爆发结束变量 {
   context: 影骨莫特斯运行时上下文;
   aura: any;
   已销毁: boolean;
+}
+
+function 关闭影骨幽影爆发状态吟唱条(this: void): void {
+  关闭吟唱条("大招");
 }
 
 function on影骨幽影承伤修正(this: void, damageContext: any): number {
@@ -101,6 +109,7 @@ function 幽影爆发召唤Tick(this: void): void {
 function 结束影骨幽影爆发(this: void, context: 影骨莫特斯运行时上下文): void {
   if (!context.幽影爆发中) return;
   context.幽影爆发中 = false;
+  关闭影骨幽影爆发状态吟唱条();
   刷新影骨幽灵形态Buff(context);
   if (单位有效(context.Boss单位)) SetUnitVertexColor(context.Boss单位, 255, 255, 255, 255);
   const lossRatio = 影骨莫特斯数值与表现配置.幽影爆发.结束召唤物损血比例;
@@ -134,6 +143,14 @@ export function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运
   if (!单位有效(context.Boss单位)) return;
   const cfg = 影骨莫特斯数值与表现配置.幽影爆发;
   开始影骨莫特斯常规施法(context.Boss单位, cfg.动画播放秒, "幽影爆发", "幽影领域正在展开");
+  显示大招吟唱条({
+    通道: "大招",
+    总时长: cfg.持续秒,
+    颜色ID: 4,
+    标题文本: "幽影爆发",
+    提示文本: "幽影领域持续中",
+  });
+  context.清理.登记清理("影骨-幽影爆发状态吟唱条", 关闭影骨幽影爆发状态吟唱条);
   播放影骨莫特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   播放影骨莫特斯台词(context.Boss单位, "幽影爆发");
   创建点特效({

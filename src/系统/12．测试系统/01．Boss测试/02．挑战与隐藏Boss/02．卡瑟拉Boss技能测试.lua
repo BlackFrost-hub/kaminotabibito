@@ -1,6 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local globals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local SelectUnitForPlayerSingle = ____require_result_0.SelectUnitForPlayerSingle
@@ -115,7 +117,7 @@ local function _____8BBE_7F6E_5361_745F_62C9_6D4B_8BD5_9636_6BB5_751F_547D(conte
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(boss) then
         return false
     end
-    local maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) or 0
     if not (maxLife > 0) then
         return false
     end

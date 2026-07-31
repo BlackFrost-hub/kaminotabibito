@@ -9,6 +9,8 @@ export const 菲利斯BuffID = {
   封印标记: "BFE4",
   异形化: "BFE5",
   魔力汲取: "BFE6",
+  护主盾阵: "BFE7",
+  腐蚀迟滞: "BFE8",
 } as const;
 
 export type 菲利斯BuffID类型 = typeof 菲利斯BuffID[keyof typeof 菲利斯BuffID];
@@ -27,7 +29,7 @@ export const 菲利斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 72,
     canPurge: false,
-    tooltip: "菲利斯统御军团。生命值50%以上时提高其他友方攻击力；50%以下时削弱其他友方攻击力，并加快剑气灵斩循环。",
+    tooltip: "每1秒刷新，单次持续1.4秒，作用范围1000码且不作用于菲利斯本人。菲利斯生命值≥50%时，友军按原本攻击力获得+30%攻击力；生命值<50%时，友军按原本攻击力获得-50%攻击力。最多1层，不可驱散。",
   },
   [菲利斯BuffID.剑魂狼印]: {
     buffID: 菲利斯BuffID.剑魂狼印,
@@ -42,7 +44,7 @@ export const 菲利斯Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 64,
     canPurge: true,
-    tooltip: "被剑魂杀路径命中，短时间记录命中层数；命中数量用于判断剑魂狼是否合并为大狼。",
+    tooltip: "每次剑魂路径命中获得1层，持续4秒，最多2层，可驱散。本次剑魂杀的路径总命中次数≥2时，终点合并为1只大狼；否则生成2只小狼。",
   },
   [菲利斯BuffID.侵蚀残留]: {
     buffID: 菲利斯BuffID.侵蚀残留,
@@ -57,7 +59,7 @@ export const 菲利斯Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 68,
     canPurge: true,
-    tooltip: "站在剑气灵斩侵蚀路径内或刚离开路径，持续受到风属性魔法伤害并损失魔法值。",
+    tooltip: "剑气灵斩残留路径长1500码、宽260码（异形化时宽390码），区域持续240秒。站在路径内每1秒受到菲利斯当前攻击力×50%+目标最大生命值×5%的伤害，并损失当前魔法值10%；离开后Buff最多保留1.4秒，重新进入会刷新时间。菲利斯按实际扣除魔法值×200%恢复魔法，可驱散。",
   },
   [菲利斯BuffID.封印标记]: {
     buffID: 菲利斯BuffID.封印标记,
@@ -74,7 +76,7 @@ export const 菲利斯Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 78,
     canPurge: true,
-    tooltip: "全力封印斩锁定QWER全部冷却的玩家。结算时扣除魔法、造成暗魔法伤害、眩晕，并使菲利斯瞬移到目标身边。",
+    tooltip: "持续1.5秒。仅标记Q、W、E、R全部在冷却中的玩家；结算时扣除目标当前魔法值的35%+难度×5%，按实际扣除值造成等量伤害，并眩晕0.3+难度×0.2秒。菲利斯随后瞬移到随机标记目标身边96码，可驱散。",
   },
   [菲利斯BuffID.异形化]: {
     buffID: 菲利斯BuffID.异形化,
@@ -91,7 +93,7 @@ export const 菲利斯Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 92,
     canPurge: true,
-    tooltip: "菲利斯异形化5秒，造成和受到的伤害提高50%，刷新剑气灵斩，并持续牵引附近玩家；受到光属性伤害会缩短持续时间。",
+    tooltip: "持续5秒，可驱散。期间造成和受到的伤害均提高50%；每1秒对250码内目标直接扣除其最大生命值7%+难度×1%（不致死），250～1000码目标被牵引，每次持续0.7秒、速度150码/秒；每次受到光属性伤害，剩余时间缩短1.5秒。",
   },
   [菲利斯BuffID.魔力汲取]: {
     buffID: 菲利斯BuffID.魔力汲取,
@@ -106,7 +108,37 @@ export const 菲利斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 70,
     canPurge: false,
-    tooltip: "菲利斯造成伤害会积累魔法值。魔法达到10000时允许启用异形化；该状态可用于测试资源循环。",
+    tooltip: "充能上限10000。菲利斯每次实际造成伤害按伤害值×（70%+难度×5%）增加充能；侵蚀每次实际扣除的魔法值×200%转为菲利斯魔法，剑魂狼每次攻击恢复菲利斯最大魔法值5%。达到10000后可释放异形化，释放时充能清零。不可驱散。",
+  },
+  [菲利斯BuffID.护主盾阵]: {
+    buffID: 菲利斯BuffID.护主盾阵,
+    buffName: "护主盾阵",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNSteelMelee.blp",
+    effect: "",
+    type: "Buff:boss:defense",
+    interval: 0,
+    maxStack: 2,
+    stackRule: "stack",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 84,
+    canPurge: false,
+    tooltip: "每层使菲利斯受到的直接伤害降低10%，最多2层，最高降低20%。仅600码内存活的第二军团护卫生效；护卫死亡或离开600码范围后下一次刷新立即失效。不可驱散。",
+  },
+  [菲利斯BuffID.腐蚀迟滞]: {
+    buffID: 菲利斯BuffID.腐蚀迟滞,
+    buffName: "腐蚀迟滞",
+    icon: "ReplaceableTextures\\CommandButtons\\BTNSlow.blp",
+    effect: "",
+    type: "Debuff:control:soft:slow",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 1,
+    priority: 72,
+    canPurge: true,
+    tooltip: "移动速度降低30%，持续2秒，可驱散。该效果由第二军团术士的腐蚀法阵爆炸命中时施加。",
   },
 };
 

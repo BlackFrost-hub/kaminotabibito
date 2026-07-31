@@ -31,7 +31,7 @@ createMeleeBossHeroUnit('N00V', '污染之猫·腐化者米亚', {
   goldBountyBase = 550,
   pointValue = 110,
 
-  scale = 1.0,
+  scale = 3.0,
   collision = 64.0,
   soundSet = 'DruidOfTheClaw',
   classification = 'undead',

@@ -249,6 +249,14 @@ export function 充能单位指定标签护盾(单位ID: number, 标签: string,
   return nextValue - oldValue;
 }
 
+export function 刷新单位指定标签护盾持续时间(单位ID: number, 标签: string, 持续时间: number): boolean {
+  const 实例 = 获取单位指定标签护盾实例(单位ID, 标签);
+  if (实例 == null || !(持续时间 > 0)) return false;
+  实例.总持续时间 = 持续时间;
+  实例.剩余时间 = 持续时间;
+  return true;
+}
+
 export function 删除单位指定标签护盾(单位ID: number, 标签: string): 护盾实例[] {
   const ids = 获取单位护盾列表(单位ID);
   const deleted: 护盾实例[] = [];

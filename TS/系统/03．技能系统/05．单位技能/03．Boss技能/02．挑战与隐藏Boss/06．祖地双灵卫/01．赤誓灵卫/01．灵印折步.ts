@@ -27,6 +27,13 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { 设置特效缩放 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  设置特效缩放: (this: void, effect: any, scale: number) => void;
+};
+const { CosBJ, SinBJ } = require('lib.扩展函数.BJ函数.12．数学函数') as {
+  CosBJ: (this: void, degrees: number) => number;
+  SinBJ: (this: void, degrees: number) => number;
+};
 
 const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -34,8 +41,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const CosBJ = jass.CosBJ as (degrees: number) => number;
-const SinBJ = jass.SinBJ as (degrees: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -87,7 +92,8 @@ export function 创建赤誓镇魂印(this: void, context: 祖地双灵卫运行
     影响目标: '敌方',
     所有者: boss,
     模型路径: 祖地双灵卫数值与表现配置.表现资源.灵印折步.镇魂印地面特效路径,
-    提示圈: { 类型: '渐变圆形', 半径: cfg.镇魂印半径, 持续时间: cfg.镇魂印持续秒, 来源单位: boss },
+    特效缩放: 祖地双灵卫数值与表现配置.表现资源.灵印折步.镇魂印特效缩放,
+    提示圈: false,
     on周期: function 赤誓镇魂印周期(this: void, units: any[]): void {
       if (context.战斗已结束 || context.镇魂印 !== seal) {
         area.销毁();
@@ -155,7 +161,10 @@ export function 释放灵印折步(this: void, context: 祖地双灵卫运行时
     if (!执行战斗自身传送到坐标(boss, landing.X, landing.Y)) return;
     创建赤誓镇魂印(context, startX, startY);
     const arrival = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.灵印折步.出现特效路径, landing.X, landing.Y);
-    if (arrival != null && arrival !== 0) YDWETimerDestroyEffectSafe(0.8, arrival);
+    if (arrival != null && arrival !== 0) {
+      设置特效缩放(arrival, 祖地双灵卫数值与表现配置.表现资源.灵印折步.出现特效缩放);
+      YDWETimerDestroyEffectSafe(0.8, arrival);
+    }
   });
   context.清理.登记延迟回调('祖地双灵卫-灵印折步落地', delayedId);
   return true;

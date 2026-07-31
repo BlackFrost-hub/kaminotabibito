@@ -199,9 +199,6 @@ local function _____6D88_8017_666E_901A_6570_5B57_8DF3_8FC7_6807_8BB0(target, at
     return false
 end
 local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
-    if damageType.isNormalAttack then
-        return {r = 160, g = 82, b = 45}
-    end
     if damageType.isTrueDamage then
         return {r = 255, g = 255, b = 255}
     end
@@ -228,6 +225,9 @@ local function _____9009_53D6_4F24_5BB3_989C_8272(damageType)
     end
     if damageType.isDarkDamage then
         return {r = 180, g = 130, b = 255}
+    end
+    if damageType.isNormalAttack and damageType.isPhysicalDamage then
+        return {r = 160, g = 82, b = 45}
     end
     if damageType.isPhysicalDamage then
         return {r = 160, g = 82, b = 45}

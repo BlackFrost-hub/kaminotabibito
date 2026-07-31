@@ -17,6 +17,8 @@ local _____6781_5750_6807X = ____14_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____14_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____8DDD_79BBXY = ____14_FF0E_516C_5171_5DE5_5177["距离XY"]
 local _____53D6_5750_6807_89D2_5EA6 = ____14_FF0E_516C_5171_5DE5_5177["取坐标角度"]
+local ____11_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.03．深渊巨鱿卡瑟拉.11．台词播放")
+local _____64AD_653E_5361_745F_62C9_53F0_8BCD = ____11_FF0E_53F0_8BCD_64AD_653E["播放卡瑟拉台词"]
 local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
 local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local ____01_FF0E_6218_6597_6280_80FD_8C03_5EA6_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.13．战斗技能调度模板.01．战斗技能调度模板")
@@ -189,6 +191,7 @@ local function _____751F_6210_518D_751F_89E6_624B(context)
     if instance == nil or not _____5355_4F4D_6709_6548(instance["单位"]) then
         return
     end
+    _____64AD_653E_5361_745F_62C9_53F0_8BCD(boss, "触手再生")
     local data = {context = context, ["触手单位"] = instance["单位"], ["剩余跳数"] = cfg["再生触手持续秒"] / cfg["再生触手攻击间隔秒"], ["周期ID"] = 0}
     data["周期ID"] = addPeriodicCallback(
         cfg["再生触手攻击间隔秒"] * 1000,
@@ -336,13 +339,16 @@ local function _____5904_7406_5730_9762_6B8B_7247_7275_5F15(context)
     local groundAbsorbed = _____7275_5F15_5730_9762_89E6_624B_6B8B_7247(context)
     if groundAbsorbed > 0 then
         _____5E94_7528_89E6_624B_7CBE_534E(context, groundAbsorbed)
+        _____64AD_653E_5361_745F_62C9_53F0_8BCD(context["Boss单位"], "触手残片回收")
     end
 end
 local function _____5904_7406_73A9_5BB6_6B8B_7247_5438_6536(context)
-    _____5E94_7528_89E6_624B_7CBE_534E(
-        context,
-        _____5438_6536_73A9_5BB6_89E6_624B_6B8B_7247(context)
-    )
+    local absorbed = _____5438_6536_73A9_5BB6_89E6_624B_6B8B_7247(context)
+    if absorbed <= 0 then
+        return
+    end
+    _____5E94_7528_89E6_624B_7CBE_534E(context, absorbed)
+    _____64AD_653E_5361_745F_62C9_53F0_8BCD(context["Boss单位"], "触手残片吸收")
 end
 local function _____53D6_5361_745F_62C9_4E0A_4E0B_6587_952E(context)
     return _____53D6_5355_4F4DID(context["Boss单位"])

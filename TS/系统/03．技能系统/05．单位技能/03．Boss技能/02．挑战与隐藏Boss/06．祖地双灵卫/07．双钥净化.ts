@@ -4,6 +4,7 @@ import type { 祖地双灵卫净化节点状态, 祖地双灵卫运行时上下�
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
+const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as { debugLogForce: (this: void, module: string, ...args: any[]) => void };
 
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff系统.00．Buff系统') as {
@@ -13,6 +14,8 @@ const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff
 const jass = require('jass.common') as any;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
+const japi = require('jass.japi') as any;
+const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 
 function 销毁节点特效(this: void, node: 祖地双灵卫净化节点状态): void {
   if (node.特效 != null && node.特效 !== 0) DestroyEffect(node.特效);
@@ -32,7 +35,12 @@ function 刷新节点表现(this: void, node: 祖地双灵卫净化节点状态)
   销毁节点特效(node);
   node.表现阶段 = node.阶段;
   const path = 取节点表现路径(node);
-  if (path !== '') node.特效 = AddSpecialEffect(path, node.X, node.Y);
+  const resources = 祖地双灵卫数值与表现配置.表现资源.双钥净化;
+  if (path !== '') {
+    node.特效 = AddSpecialEffect(path, node.X, node.Y);
+    if (node.特效 != null && node.特效 !== 0 && path === resources.节点污染外壳特效路径 && EXSetEffectSize != null) EXSetEffectSize(node.特效, 2.0);
+    debugLogForce('祖地双灵卫-净化节点表现', '节点', node.序号, '阶段', node.阶段, '坐标', node.X, node.Y, '路径', path);
+  }
 }
 
 function 登记节点统一清理(this: void, context: 祖地双灵卫运行时上下文): void {

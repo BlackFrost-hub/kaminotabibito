@@ -3,7 +3,7 @@
 import { 莫尔特斯单位技能配置 } from "./00．配置";
 import { 获取或创建莫尔特斯上下文, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
-import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
+import { 应用莫尔特斯腐败值, 确保莫尔特斯根须宫格 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯常规施法, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
@@ -32,9 +32,6 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { 创建可攻击机制单位 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位") as {
-  创建可攻击机制单位: (this: void, 参数: any) => any;
-};
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
@@ -47,8 +44,16 @@ function 选择根须穿刺格子(this: void, context: 莫尔特斯运行时上�
   const grid = context.根须宫格;
   const result: any[] = [];
   if (grid == null) return result;
+  if (context.根须穿刺测试格子索引 != null) {
+    for (let i = 0; i < context.根须穿刺测试格子索引.length; i++) {
+      const cell = grid.获取格子By索引(context.根须穿刺测试格子索引[i]);
+      if (cell != null) result.push(cell);
+    }
+    return result;
+  }
   const pool: any[] = [];
-  for (let i = 0; i < grid.格子列表.length; i++) pool.push(grid.格子列表[i]);
+  const 格子列表 = grid.格子列表 as any[];
+  for (let i = 0; i < 格子列表.length; i++) pool.push(格子列表[i]);
   const count = 莫尔特斯数值与表现配置.腐朽根须穿刺.区域数量;
   for (let i = 0; i < count && pool.length > 0; i++) {
     const index = GetRandomInt(0, pool.length - 1);
@@ -62,20 +67,21 @@ function 结算单格根须穿刺(this: void, context: 莫尔特斯运行时上�
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.腐朽根须穿刺;
-  创建点特效({ 模型路径: cfg.穿刺特效路径, X: cell.中心X, Y: cell.中心Y, 持续秒: cfg.瞬时特效持续秒 });
-  播放Boss坐标音效(莫尔特斯音效配置.腐朽根须穿刺.结算, cell.中心X, cell.中心Y, 莫尔特斯音效配置.默认裁断距离);
-  创建可攻击机制单位({
-    清理: context.清理,
-    名称: "莫尔特斯-残留根须",
-    主人单位: boss,
-    所属玩家: GetOwningPlayer(boss),
-    单位类型: cfg.障碍单位类型,
-    模型路径: cfg.根须模型路径,
+  创建点特效({
+    模型路径: cfg.穿刺特效路径,
     X: cell.中心X,
     Y: cell.中心Y,
-    最大生命: cfg.障碍生命值,
-    缩放: cfg.障碍缩放,
-    持续时间: cfg.根须停留秒,
+    持续秒: cfg.瞬时特效持续秒,
+    缩放: cfg.穿刺命中特效缩放,
+  });
+  播放Boss坐标音效(莫尔特斯音效配置.腐朽根须穿刺.结算, cell.中心X, cell.中心Y, 莫尔特斯音效配置.默认裁断距离);
+  创建点特效({
+    模型路径: cfg.根须特效路径,
+    X: cell.中心X,
+    Y: cell.中心Y,
+    持续秒: cfg.根须停留秒,
+    缩放: cfg.根须特效缩放,
+    动画索引: cfg.根须模型动画索引,
   });
   const group = CreateGroup();
   GroupEnumUnitsInRect(group, cell.矩形, null);
@@ -130,6 +136,7 @@ export function 释放莫尔特斯腐朽根须穿刺(this: void, context: 莫尔
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.腐朽根须穿刺;
   if (!单位有效(boss)) return;
+  确保莫尔特斯根须宫格(context);
   开始莫尔特斯常规施法(boss, cfg.预警秒, "腐朽根须穿刺", "随机地块即将钻出腐败根须");
   播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
   播放莫尔特斯台词(boss, "腐朽根须穿刺");

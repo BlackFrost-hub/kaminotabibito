@@ -10,28 +10,32 @@ const jass = require("jass.common") as any;
 import { KEY_STATE, registerKeyEventByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 
 const 镜头高度步长 = 200;
-const Boss测试镜头高度偏移 = 镜头高度步长 * 2;
+const 默认镜头高度偏移 = 0;
+const Boss测试镜头高度偏移 = 默认镜头高度偏移 + 400;
 const 主键盘加号键 = 187;
 const 主键盘减号键 = 189;
 const 数字小键盘加号键 = 107;
 const 数字小键盘减号键 = 109;
 
 const CAMERA_FIELD_ZOFFSET = jass.CAMERA_FIELD_ZOFFSET;
-const AdjustCameraField = jass.AdjustCameraField as (field: any, offset: number, duration: number) => void;
+const GetCameraField = jass.GetCameraField as (field: any) => number;
+const SetCameraField = jass.SetCameraField as (field: any, value: number, duration: number) => void;
 
 let 已初始化 = false;
 
 function 抬高镜头(this: any): void {
-  AdjustCameraField(CAMERA_FIELD_ZOFFSET, 镜头高度步长, 0);
+  const 当前镜头高度 = GetCameraField(CAMERA_FIELD_ZOFFSET);
+  SetCameraField(CAMERA_FIELD_ZOFFSET, 当前镜头高度 + 镜头高度步长, 0);
 }
 
 function 降低镜头(this: any): void {
-  AdjustCameraField(CAMERA_FIELD_ZOFFSET, -镜头高度步长, 0);
+  const 当前镜头高度 = GetCameraField(CAMERA_FIELD_ZOFFSET);
+  SetCameraField(CAMERA_FIELD_ZOFFSET, 当前镜头高度 - 镜头高度步长, 0);
 }
 
-/** Boss 测试场景使用，等同于连续按两次 +。 */
+/** Boss 测试场景使用，每次都固定设置为默认镜头高度以上 400。 */
 export function 抬高Boss测试镜头(this: void): void {
-  AdjustCameraField(CAMERA_FIELD_ZOFFSET, Boss测试镜头高度偏移, 0);
+  SetCameraField(CAMERA_FIELD_ZOFFSET, Boss测试镜头高度偏移, 0);
 }
 
 export function init(this: void): void {

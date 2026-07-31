@@ -370,6 +370,19 @@ export function 创建方向直线提示圈(
 }
 
 /**
+ * 创建白色方向直线提示圈，用于明确标识安全通道。
+ * 坐标仍传直线路径起点，长度和朝向必须与实际路径一致。
+ */
+export function 创建白色方向直线提示圈(
+  路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, time: number, speed?: number
+): void {
+  const e = 创建方向直线提示圈特效(路径起点X, 路径起点Y, width, long, fac, speed);
+  if (!e) return;
+  按所属单位设置提示圈颜色(e, null, 提示圈友方色);
+  安全销毁特效(time <= 0 ? 1 : time + 0.05, e);
+}
+
+/**
  * 创建一个需要手动销毁的方向直线提示圈特效句柄。
  * 【重要】坐标必须传直线路径起点，严禁传模型中点；函数内部会沿朝向自动前移半个长度到模型中点。
  */

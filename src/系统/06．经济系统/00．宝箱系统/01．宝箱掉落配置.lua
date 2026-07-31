@@ -32,13 +32,17 @@ local ____require_result_5 = require("系统.09．表现系统.06．广播提示
 local _____53D1_9001_5934_50CF_63D0_793A_7ED9_73A9_5BB6 = ____require_result_5["发送头像提示给玩家"]
 local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统")
 local SFB_setBuff = ____require_result_6.SFB_setBuff
-local ____require_result_7 = require("系统.00．核心系统.01．颜色常量")
-local _____88C5_5907_7B49_7EA7_663E_793A_6587_672C = ____require_result_7["装备等级显示文本"]
-local _____88C5_5907_540D_5B57_989C_8272_6587_672C = ____require_result_7["装备名字颜色文本"]
-local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_8.debugLogForce
-local ____require_result_9 = require("系统.02．物品系统.09．装备排泄")
-local setLastCreatedItem = ____require_result_9.setLastCreatedItem
+local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_7.registerManualBuff
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_9 = require("系统.00．核心系统.01．颜色常量")
+local _____88C5_5907_7B49_7EA7_663E_793A_6587_672C = ____require_result_9["装备等级显示文本"]
+local _____88C5_5907_540D_5B57_989C_8272_6587_672C = ____require_result_9["装备名字颜色文本"]
+local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_10.debugLogForce
+local ____require_result_11 = require("系统.02．物品系统.09．装备排泄")
+local setLastCreatedItem = ____require_result_11.setLastCreatedItem
 local GetRandomInt = jass.GetRandomInt
 local GetRandomReal = jass.GetRandomReal
 local CreateItem = jass.CreateItem
@@ -311,8 +315,8 @@ local function _____6309_6389_843D_6A21_5F0F_6267_884C(dropMode, picks)
                     pool = __TS__ArrayFilter(
                         pool,
                         function(____, entry)
-                            local ____opt_16 = items[entry.id]
-                            local score = ____opt_16 and ____opt_16.score
+                            local ____opt_18 = items[entry.id]
+                            local score = ____opt_18 and ____opt_18.score
                             return score ~= nil and score >= dropMode.range.min and score <= dropMode.range.max
                         end
                     )
@@ -364,8 +368,8 @@ local function _____6309_6743_91CD_62BD_53D6_7B49_7EA7_6C60(_____5019_9009_7B49_
     return _____5019_9009_7B49_7EA7_6C60[#_____5019_9009_7B49_7EA7_6C60]
 end
 local function _____5E7F_64AD_5B9D_7BB1_88C5_5907_6D88_606F(_____52A8_4F5C, _____4E0A_4E0B_6587)
-    local ____debugLogForce_21 = debugLogForce
-    local ____array_20 = __TS__SparseArrayNew(
+    local ____debugLogForce_23 = debugLogForce
+    local ____array_22 = __TS__SparseArrayNew(
         "宝箱掉落配置",
         "广播检查",
         "ownerUnit=",
@@ -376,15 +380,15 @@ local function _____5E7F_64AD_5B9D_7BB1_88C5_5907_6D88_606F(_____52A8_4F5C, ____
         _____4E0A_4E0B_6587["最近装备等级文本"] or "",
         "chestType="
     )
-    local ____opt_18 = _____4E0A_4E0B_6587["宝箱配置"]
-    __TS__SparseArrayPush(____array_20, ____opt_18 and ____opt_18.destructableType or "")
-    ____debugLogForce_21(__TS__SparseArraySpread(____array_20))
+    local ____opt_20 = _____4E0A_4E0B_6587["宝箱配置"]
+    __TS__SparseArrayPush(____array_22, ____opt_20 and ____opt_20.destructableType or "")
+    ____debugLogForce_23(__TS__SparseArraySpread(____array_22))
     if not _____4E0A_4E0B_6587["开启者"] or not _____4E0A_4E0B_6587["最近装备物品ID"] or not _____4E0A_4E0B_6587["最近装备等级文本"] then
         debugLogForce("宝箱掉落配置", "跳过装备系统消息", "reason=", "missing_context")
         return
     end
-    local ____opt_22 = items[_____4E0A_4E0B_6587["最近装备物品ID"]]
-    local _____88C5_5907_540D = ____opt_22 and ____opt_22.name or _____4E0A_4E0B_6587["最近装备物品ID"]
+    local ____opt_24 = items[_____4E0A_4E0B_6587["最近装备物品ID"]]
+    local _____88C5_5907_540D = ____opt_24 and ____opt_24.name or _____4E0A_4E0B_6587["最近装备物品ID"]
     local _____73A9_5BB6_540D = GetPlayerName(GetOwningPlayer(_____4E0A_4E0B_6587["开启者"]))
     local _____7B49_7EA7Key = __TS__StringTrim(tostring(_____4E0A_4E0B_6587["最近装备等级文本"] or ""))
     local _____7B49_7EA7_6587_672C = _____88C5_5907_7B49_7EA7_663E_793A_6587_672C(nil, _____7B49_7EA7Key, _____7B49_7EA7Key)
@@ -473,15 +477,35 @@ local function _____6267_884C_9AD8_7EA7_6389_843D_52A8_4F5C(_____52A8_4F5C, ____
                     _____52A8_4F5C["保留当前生命比例"] or "nil",
                     "buffId=",
                     _____52A8_4F5C.BuffID or "nil",
+                    "customBuffId=",
+                    _____52A8_4F5C["自定义BuffID"] or "nil",
                     "buffTime=",
                     _____52A8_4F5C["Buff持续时间"] or "nil"
                 )
+                if _____52A8_4F5C["命中特效模型路径"] ~= nil then
+                    _____521B_5EFA_70B9_7279_6548({
+                        ["模型路径"] = _____52A8_4F5C["命中特效模型路径"],
+                        X = _____4E0A_4E0B_6587.x,
+                        Y = _____4E0A_4E0B_6587.y,
+                        ["持续秒"] = _____52A8_4F5C["命中特效持续秒"],
+                        ["缩放"] = _____52A8_4F5C["命中特效缩放"]
+                    })
+                end
                 if _____52A8_4F5C["保留当前生命比例"] ~= nil then
                     local _____5F53_524D_751F_547D = GetWidgetLife(_____4E0A_4E0B_6587["开启者"])
                     SetWidgetLife(_____4E0A_4E0B_6587["开启者"], _____5F53_524D_751F_547D * _____52A8_4F5C["保留当前生命比例"])
                 end
                 if _____52A8_4F5C.BuffID ~= nil and _____52A8_4F5C["Buff持续时间"] ~= nil then
                     SFB_setBuff(_____4E0A_4E0B_6587["开启者"], _____4E0A_4E0B_6587["开启者"], _____52A8_4F5C.BuffID, _____52A8_4F5C["Buff持续时间"])
+                end
+                if _____52A8_4F5C["自定义BuffID"] ~= nil and _____52A8_4F5C["Buff持续时间"] ~= nil then
+                    registerManualBuff(
+                        _____4E0A_4E0B_6587["开启者"],
+                        _____52A8_4F5C["自定义BuffID"],
+                        _____52A8_4F5C["Buff持续时间"],
+                        1,
+                        {sourceName = _____52A8_4F5C["自定义Buff来源名称"]}
+                    )
                 end
                 return
             end
@@ -514,7 +538,7 @@ local function _____6267_884C_9AD8_7EA7_6389_843D(config, _____4E0A_4E0B_6587)
     for ____, _____6389_843D_6BB5 in ipairs(_____9AD8_7EA7_6389_843D["随机段"]) do
         do
             if roll < _____6389_843D_6BB5["最小值"] or roll > _____6389_843D_6BB5["最大值"] then
-                goto __continue94
+                goto __continue96
             end
             debugLogForce(
                 "宝箱掉落配置",
@@ -532,24 +556,30 @@ local function _____6267_884C_9AD8_7EA7_6389_843D(config, _____4E0A_4E0B_6587)
             end
             return result
         end
-        ::__continue94::
+        ::__continue96::
     end
     return {}
 end
-____exports["执行宝箱掉落"] = function(config, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
-    local ____debugLogForce_28 = debugLogForce
-    local ____config_destructableType_26 = config.destructableType
-    local ____config_name_27 = config.name
-    local ____opt_24 = config.dropMode
-    ____debugLogForce_28(
+____exports["执行宝箱掉落"] = function(config, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A, x, y)
+    if x == nil then
+        x = 0
+    end
+    if y == nil then
+        y = 0
+    end
+    local ____debugLogForce_30 = debugLogForce
+    local ____config_destructableType_28 = config.destructableType
+    local ____config_name_29 = config.name
+    local ____opt_26 = config.dropMode
+    ____debugLogForce_30(
         "宝箱掉落配置",
         "executeChestDrop",
         "type=",
-        ____config_destructableType_26,
+        ____config_destructableType_28,
         "name=",
-        ____config_name_27,
+        ____config_name_29,
         "mode=",
-        ____opt_24 and ____opt_24.type or "none",
+        ____opt_26 and ____opt_26.type or "none",
         "picks=",
         config.picks or 0
     )
@@ -558,8 +588,8 @@ ____exports["执行宝箱掉落"] = function(config, opener, ownerUnit, _____630
             ["开启者"] = opener,
             ["宝箱主人"] = ownerUnit,
             ["宝箱配置"] = config,
-            x = 0,
-            y = 0,
+            x = x,
+            y = y,
             ["指定主随机"] = _____6307_5B9A_4E3B_968F_673A
         })
     end
@@ -568,7 +598,13 @@ ____exports["执行宝箱掉落"] = function(config, opener, ownerUnit, _____630
     end
     return _____6309_6389_843D_6A21_5F0F_6267_884C(config.dropMode, config.picks or 0)
 end
-____exports["按可破坏物掉落"] = function(destructableType, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
+____exports["按可破坏物掉落"] = function(destructableType, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A, x, y)
+    if x == nil then
+        x = 0
+    end
+    if y == nil then
+        y = 0
+    end
     local config = getChestConfigByString(destructableType)
     if not config then
         debugLogForce("宝箱掉落配置", "未找到宝箱配置", "type=", destructableType)
@@ -582,9 +618,22 @@ ____exports["按可破坏物掉落"] = function(destructableType, opener, ownerU
         "name=",
         config.name
     )
-    return ____exports["执行宝箱掉落"](config, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
+    return ____exports["执行宝箱掉落"](
+        config,
+        opener,
+        ownerUnit,
+        _____6307_5B9A_4E3B_968F_673A,
+        x,
+        y
+    )
 end
-____exports["按宝箱配置掉落"] = function(config, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
+____exports["按宝箱配置掉落"] = function(config, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A, x, y)
+    if x == nil then
+        x = 0
+    end
+    if y == nil then
+        y = 0
+    end
     debugLogForce(
         "宝箱掉落配置",
         "直接使用宝箱配置",
@@ -593,7 +642,14 @@ ____exports["按宝箱配置掉落"] = function(config, opener, ownerUnit, _____
         "name=",
         config.name
     )
-    return ____exports["执行宝箱掉落"](config, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
+    return ____exports["执行宝箱掉落"](
+        config,
+        opener,
+        ownerUnit,
+        _____6307_5B9A_4E3B_968F_673A,
+        x,
+        y
+    )
 end
 ____exports["创建掉落物品"] = function(itemId, x, y)
     if not items[itemId] then
@@ -633,7 +689,14 @@ local function _____83B7_53D6_6389_843D_504F_79FB(index)
     return DROP_OFFSETS[index % #DROP_OFFSETS + 1] or DROP_OFFSETS[1]
 end
 ____exports["宝箱位置掉落"] = function(destructableType, x, y, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
-    local itemIds = ____exports["按可破坏物掉落"](destructableType, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
+    local itemIds = ____exports["按可破坏物掉落"](
+        destructableType,
+        opener,
+        ownerUnit,
+        _____6307_5B9A_4E3B_968F_673A,
+        x,
+        y
+    )
     debugLogForce(
         "宝箱掉落配置",
         "宝箱掉落结果",
@@ -669,7 +732,14 @@ ____exports["宝箱位置掉落"] = function(destructableType, x, y, opener, own
     return createdItems
 end
 ____exports["宝箱配置掉落"] = function(config, x, y, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
-    local itemIds = ____exports["按宝箱配置掉落"](config, opener, ownerUnit, _____6307_5B9A_4E3B_968F_673A)
+    local itemIds = ____exports["按宝箱配置掉落"](
+        config,
+        opener,
+        ownerUnit,
+        _____6307_5B9A_4E3B_968F_673A,
+        x,
+        y
+    )
     debugLogForce(
         "宝箱掉落配置",
         "宝箱掉落结果",

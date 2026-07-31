@@ -23,6 +23,8 @@ local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
+local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
 local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local ____01_FF0E_6218_6597_6280_80FD_8C03_5EA6_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.13．战斗技能调度模板.01．战斗技能调度模板")
@@ -42,16 +44,18 @@ local _____83AB_5C14_7279_65AFBuffID = ____require_result_4["莫尔特斯BuffID"
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
+local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local _____5DF2_6CE8_518C = false
-local function _____786E_4FDD_6839_987B_5BAB_683C(context)
+____exports["确保莫尔特斯根须宫格"] = function(context)
     if context["根须宫格"] ~= nil then
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]
     context["根须宫格"] = _____521B_5EFA_95EA_7535_4E5D_5BAB_683C_533A_57DF({
         ["名称"] = "莫尔特斯-根须领域",
-        ["中心X"] = cfg["中心X"],
-        ["中心Y"] = cfg["中心Y"],
+        ["中心X"] = context["根须领域中心X"] or cfg["中心X"],
+        ["中心Y"] = context["根须领域中心Y"] or cfg["中心Y"],
         ["行数"] = cfg["行数"],
         ["列数"] = cfg["列数"],
         ["单格边长"] = cfg["单格边长"],
@@ -61,8 +65,30 @@ local function _____786E_4FDD_6839_987B_5BAB_683C(context)
         ["清理篮子"] = context["清理"]
     })
 end
+local function _____8BA1_7B97_83AB_5C14_7279_65AF_6EE1_5C42_7F20_7ED5_4F24_5BB3(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D)
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败值"]
+    local _____81EA_7136_4F24_5BB3 = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, {["目标已损生命比例"] = cfg["满层缠绕目标已损生命比例"]})
+    local _____7269_7406_4F24_5BB3 = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, {["来源攻击力比例"] = cfg["满层缠绕Boss攻击力比例"]})
+    return {{["伤害"] = _____81EA_7136_4F24_5BB3, ["伤害类型"] = DAMAGE_TYPE_PLANT}, {["伤害"] = _____7269_7406_4F24_5BB3, ["伤害类型"] = DAMAGE_TYPE_NORMAL}}
+end
+local function _____6C47_603B_83AB_5C14_7279_65AF_6BCF_8DF3_4F24_5BB3(_____4F24_5BB3_7EC4_4EF6_5217_8868)
+    local total = 0
+    do
+        local index = 0
+        while index < #_____4F24_5BB3_7EC4_4EF6_5217_8868 do
+            local _____4F24_5BB3_7EC4_4EF6 = _____4F24_5BB3_7EC4_4EF6_5217_8868[index + 1]
+            if _____4F24_5BB3_7EC4_4EF6 ~= nil and _____4F24_5BB3_7EC4_4EF6["伤害"] > 0 then
+                total = total + _____4F24_5BB3_7EC4_4EF6["伤害"]
+            end
+            index = index + 1
+        end
+    end
+    return total
+end
 local function _____89E6_53D1_8150_8D25_6EE1_5C42_7F20_7ED5(context, unit)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败值"]
+    local _____521D_59CB_4F24_5BB3_7EC4_4EF6 = _____8BA1_7B97_83AB_5C14_7279_65AF_6EE1_5C42_7F20_7ED5_4F24_5BB3(context["Boss单位"], unit)
+    local _____521D_59CB_4F24_5BB3 = _____6C47_603B_83AB_5C14_7279_65AF_6BCF_8DF3_4F24_5BB3(_____521D_59CB_4F24_5BB3_7EC4_4EF6)
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["腐败值"]["满层缠绕"],
         GetUnitX(unit),
@@ -73,25 +99,29 @@ local function _____89E6_53D1_8150_8D25_6EE1_5C42_7F20_7ED5(context, unit)
         ["来源单位"] = context["Boss单位"],
         ["目标单位"] = unit,
         ["持续时间"] = cfg["满层缠绕秒"],
-        ["伤害"] = cfg["满层缠绕每秒伤害"],
-        ["伤害间隔"] = 1
+        ["伤害"] = _____521D_59CB_4F24_5BB3,
+        ["伤害间隔"] = 1,
+        ["每跳伤害计算器"] = _____8BA1_7B97_83AB_5C14_7279_65AF_6EE1_5C42_7F20_7ED5_4F24_5BB3
     })
     registerManualBuff(
         unit,
         _____83AB_5C14_7279_65AFBuffID["根须缠绕"],
         cfg["满层缠绕秒"],
-        cfg["满层缠绕每秒伤害"],
+        _____521D_59CB_4F24_5BB3,
         {sourceName = "莫尔特斯-腐败满层"}
     )
 end
 ____exports["应用莫尔特斯腐败值"] = function(context, unit, amount)
-    if not _____5355_4F4D_6709_6548(unit) or amount == 0 then
-        return _____53D6_73A9_5BB6_8150_8D25_503C(context, unit)
+    local _____5F53_524D_503C = _____53D6_73A9_5BB6_8150_8D25_503C(context, unit)
+    local _____76EE_6807_6709_6548 = _____5355_4F4D_6709_6548(unit)
+    if not _____76EE_6807_6709_6548 or amount == 0 then
+        return _____5F53_524D_503C
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败值"]
-    local oldValue = _____53D6_73A9_5BB6_8150_8D25_503C(context, unit)
+    local oldValue = _____5F53_524D_503C
     local next = _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, unit, amount)
-    if oldValue < cfg["缠绕阈值"] and next >= cfg["缠绕阈值"] then
+    local crossedThreshold = oldValue < cfg["缠绕阈值"] and next >= cfg["缠绕阈值"]
+    if crossedThreshold then
         _____89E6_53D1_8150_8D25_6EE1_5C42_7F20_7ED5(context, unit)
     end
     return next
@@ -140,7 +170,7 @@ local function ____on_83AB_5C14_7279_65AF_8FD0_884C_65F6_7EF4_62A4(context)
         _____6E05_7406_83AB_5C14_7279_65AF_4E0A_4E0B_6587(context["Boss单位"])
         return
     end
-    _____786E_4FDD_6839_987B_5BAB_683C(context)
+    ____exports["确保莫尔特斯根须宫格"](context)
     if context["阶段"] >= 2 then
         _____89E6_53D1_83AB_5C14_7279_65AF_6839_7CFB_89C9_9192(context)
     end
@@ -167,6 +197,7 @@ ____exports["注册莫尔特斯腐败值与根须领域"] = function()
     _____521B_5EFA_6218_6597_6280_80FD_8C03_5EA6_5668({
         ["名称"] = "莫尔特斯-沼泽腐败调度",
         ["间隔毫秒"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"],
+        ["忽略自动施法开关"] = true,
         ["取当前时间"] = getServerTime,
         ["取上下文列表"] = _____83B7_53D6_5168_90E8_83AB_5C14_7279_65AF_4E0A_4E0B_6587,
         ["取上下文键"] = _____53D6_83AB_5C14_7279_65AF_4E0A_4E0B_6587_952E,
@@ -176,6 +207,7 @@ ____exports["注册莫尔特斯腐败值与根须领域"] = function()
     _____521B_5EFA_6218_6597_6280_80FD_8C03_5EA6_5668({
         ["名称"] = "莫尔特斯-沼泽根须调度",
         ["间隔毫秒"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"],
+        ["忽略自动施法开关"] = true,
         ["取当前时间"] = getServerTime,
         ["取上下文列表"] = _____83B7_53D6_5168_90E8_83AB_5C14_7279_65AF_4E0A_4E0B_6587,
         ["取上下文键"] = _____53D6_83AB_5C14_7279_65AF_4E0A_4E0B_6587_952E,

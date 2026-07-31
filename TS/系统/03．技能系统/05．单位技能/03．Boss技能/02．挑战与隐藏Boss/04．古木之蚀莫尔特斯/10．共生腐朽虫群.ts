@@ -11,8 +11,15 @@ const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("�
 };
 const jass = require("jass.common") as any;
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const 虫尸拾取调试模块 = "莫尔特斯-虫尸拾取";
+
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const SquareRoot = jass.SquareRoot as (value: number) => number;
+const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const KillUnit = jass.KillUnit as (unit: any) => void;
@@ -34,6 +41,12 @@ const { 获取Boss技能随机敌对英雄, 获取Boss技能敌对英雄列表 }
 };
 const { 创建战斗内拾取物 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物") as {
   创建战斗内拾取物: (this: void, 参数: any) => any;
+};
+const { 扩展_设特效速度 } = require("平台扩展API动作") as {
+  扩展_设特效速度: (this: void, effect: any, speed: number) => void;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -59,10 +72,47 @@ interface 甲虫追击实例 {
 
 interface 莫尔特斯虫尸变量 {
   context: 莫尔特斯运行时上下文;
+  已销毁?: boolean;
+  X?: number;
+  Y?: number;
+  已输出拾取候选日志?: boolean;
 }
 
 interface 莫尔特斯甲虫死亡变量 {
   context: 莫尔特斯运行时上下文;
+}
+
+interface 莫尔特斯虫尸生成变量 {
+  context: 莫尔特斯运行时上下文;
+  X: number;
+  Y: number;
+}
+
+interface 莫尔特斯虫尸冻结变量 {
+  特效: any;
+  拾取物变量: 莫尔特斯虫尸变量;
+}
+
+interface 共生腐朽虫群释放选项 {
+  召唤后延迟击杀全部甲虫?: boolean;
+}
+
+interface 共生腐朽虫群结算变量 {
+  context: 莫尔特斯运行时上下文;
+  释放选项?: 共生腐朽虫群释放选项;
+}
+
+interface 共生腐朽虫群测试击杀变量 {
+  context: 莫尔特斯运行时上下文;
+  甲虫单位列表: any[];
+  下一个索引: number;
+  周期ID: number;
+}
+
+function 计算距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  return SquareRoot(dx * dx + dy * dy);
 }
 
 function 取甲虫目标(this: void, context: 莫尔特斯运行时上下文): any {
@@ -74,12 +124,115 @@ function 取甲虫目标(this: void, context: 莫尔特斯运行时上下文): a
 function 莫尔特斯虫尸可拾取单位(this: void, variable?: any): any[] {
   const data = variable as 莫尔特斯虫尸变量 | undefined;
   if (data == null) return [];
-  return 获取Boss技能敌对英雄列表(data.context.Boss单位);
+  const result = 获取Boss技能敌对英雄列表(data.context.Boss单位);
+  const extraUnits = data.context.测试额外虫尸拾取单位;
+  const shouldLog = data.已输出拾取候选日志 !== true;
+  if (shouldLog) {
+    debugLogForce(
+      虫尸拾取调试模块,
+      "候选列表扫描",
+      "尸体坐标=",
+      data.X,
+      data.Y,
+      "正式候选数=",
+      result.length,
+      "额外候选数=",
+      extraUnits == null ? "nil" : extraUnits.length,
+      "拾取半径=",
+      莫尔特斯数值与表现配置.共生腐朽虫群.虫尸拾取半径,
+    );
+    if (extraUnits != null) {
+      for (let i = 0; i < extraUnits.length; i++) {
+        const unit = extraUnits[i];
+        const valid = 单位有效(unit);
+        if (valid && data.X != null && data.Y != null) {
+          const unitX = GetUnitX(unit);
+          const unitY = GetUnitY(unit);
+          debugLogForce(
+            虫尸拾取调试模块,
+            "额外候选",
+            "索引=",
+            i,
+            "单位=",
+            unit,
+            "有效=",
+            true,
+            "单位坐标=",
+            unitX,
+            unitY,
+            "距离=",
+            计算距离(data.X, data.Y, unitX, unitY),
+          );
+        } else {
+          debugLogForce(虫尸拾取调试模块, "额外候选", "索引=", i, "单位=", unit, "有效=", valid);
+        }
+      }
+    }
+  }
+  if (extraUnits == null) {
+    if (shouldLog) {
+      debugLogForce(虫尸拾取调试模块, "候选列表完成", "总候选数=", result.length);
+      data.已输出拾取候选日志 = true;
+    }
+    return result;
+  }
+  for (let i = 0; i < extraUnits.length; i++) {
+    const unit = extraUnits[i];
+    if (!单位有效(unit)) continue;
+    let exists = false;
+    for (let j = 0; j < result.length; j++) {
+      if (result[j] === unit) {
+        exists = true;
+        break;
+      }
+    }
+    if (!exists) result.push(unit);
+  }
+  if (shouldLog) {
+    debugLogForce(虫尸拾取调试模块, "候选列表完成", "总候选数=", result.length);
+    data.已输出拾取候选日志 = true;
+  }
+  return result;
 }
 
-function 莫尔特斯虫尸拾取(this: void, picker: any, _实例: any, variable?: any): void {
+function 播放莫尔特斯虫尸拾取驱散特效(this: void, picker: any): void {
+  if (!单位有效(picker)) return;
+  const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
+  创建点特效({
+    模型路径: cfg.虫尸拾取驱散特效路径,
+    X: GetUnitX(picker),
+    Y: GetUnitY(picker),
+    缩放: cfg.虫尸拾取驱散特效缩放,
+    持续秒: cfg.虫尸拾取驱散特效持续秒,
+  });
+}
+
+function 莫尔特斯虫尸拾取(this: void, picker: any, 实例: any, variable?: any): void {
   const data = variable as 莫尔特斯虫尸变量 | undefined;
   if (data == null) return;
+  const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
+  const pickerX = 单位有效(picker) ? GetUnitX(picker) : undefined;
+  const pickerY = 单位有效(picker) ? GetUnitY(picker) : undefined;
+  debugLogForce(
+    虫尸拾取调试模块,
+    "拾取命中",
+    "拾取单位=",
+    picker,
+    "尸体坐标=",
+    data.X,
+    data.Y,
+    "拾取单位坐标=",
+    pickerX,
+    pickerY,
+    "距离=",
+    data.X != null && data.Y != null && pickerX != null && pickerY != null
+      ? 计算距离(data.X, data.Y, pickerX, pickerY)
+      : "nil",
+  );
+  if (实例 != null && 实例.特效 != null && 实例.特效 !== 0) {
+    扩展_设特效速度(实例.特效, cfg.虫尸特效正常播放速度);
+  }
+  播放莫尔特斯虫尸拾取驱散特效(picker);
   const amount = 莫尔特斯数值与表现配置.腐败值.虫尸清除值;
   清除玩家腐败值(data.context, picker, amount);
   registerManualBuff(picker, 莫尔特斯BuffID.腐败虫尸净化, 3, amount, {
@@ -87,9 +240,24 @@ function 莫尔特斯虫尸拾取(this: void, picker: any, _实例: any, variabl
   });
 }
 
+function 莫尔特斯虫尸销毁(this: void, 实例: any, 原因: any, variable?: any): void {
+  const data = variable as 莫尔特斯虫尸变量 | undefined;
+  if (data == null) return;
+  data.已销毁 = true;
+  debugLogForce(虫尸拾取调试模块, "尸体销毁", "实例=", 实例 == null ? "nil" : 实例.ID, "原因=", 原因, "尸体坐标=", data.X, data.Y);
+}
+
+function 冻结莫尔特斯虫尸特效(this: void, variable?: any): void {
+  const data = variable as 莫尔特斯虫尸冻结变量 | undefined;
+  if (data == null || data.拾取物变量.已销毁 === true) return;
+  if (data.特效 == null || data.特效 === 0) return;
+  扩展_设特效速度(data.特效, 0);
+}
+
 function 创建虫尸拾取物(this: void, context: 莫尔特斯运行时上下文, x: number, y: number): void {
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
-  创建战斗内拾取物({
+  const 拾取物变量: 莫尔特斯虫尸变量 = { context, 已销毁: false, X: x, Y: y };
+  const 实例 = 创建战斗内拾取物({
     清理: context.清理,
     名称: "莫尔特斯-腐败虫尸",
     X: x,
@@ -98,9 +266,50 @@ function 创建虫尸拾取物(this: void, context: 莫尔特斯运行时上下�
     缩放: 0.55,
     持续秒: cfg.虫尸持续秒,
     拾取半径: cfg.虫尸拾取半径,
-    变量: { context } as 莫尔特斯虫尸变量,
+    变量: 拾取物变量,
     可拾取单位列表: 莫尔特斯虫尸可拾取单位,
     on拾取: 莫尔特斯虫尸拾取,
+    on销毁: 莫尔特斯虫尸销毁,
+  });
+  if (实例 == null || 实例.特效 == null || 实例.特效 === 0) {
+    debugLogForce(虫尸拾取调试模块, "尸体创建失败", "尸体坐标=", x, y);
+    return;
+  }
+  debugLogForce(
+    虫尸拾取调试模块,
+    "尸体创建成功",
+    "实例=",
+    实例.ID,
+    "尸体坐标=",
+    x,
+    y,
+    "拾取半径=",
+    cfg.虫尸拾取半径,
+    "测试额外候选数=",
+    context.测试额外虫尸拾取单位 == null ? "nil" : context.测试额外虫尸拾取单位.length,
+  );
+  扩展_设特效速度(实例.特效, cfg.虫尸特效播放速度);
+  const 冻结ID = addDelayedCallback(cfg.虫尸特效冻结延迟秒 * 1000, 冻结莫尔特斯虫尸特效, {
+    特效: 实例.特效,
+    拾取物变量,
+  } as 莫尔特斯虫尸冻结变量);
+  context.清理.登记延迟回调("莫尔特斯-腐败虫尸动画冻结", 冻结ID);
+}
+
+function 延迟创建莫尔特斯虫尸(this: void, variable?: any): void {
+  const data = variable as 莫尔特斯虫尸生成变量 | undefined;
+  if (data == null) return;
+  创建虫尸拾取物(data.context, data.X, data.Y);
+}
+
+function 创建甲虫爆炸特效(this: void, context: 莫尔特斯运行时上下文, x: number, y: number): any {
+  const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
+  return 创建点特效({
+    模型路径: cfg.爆炸特效路径,
+    X: x,
+    Y: y,
+    缩放: cfg.爆炸特效缩放,
+    持续秒: cfg.爆炸特效持续秒,
   });
 }
 
@@ -109,6 +318,7 @@ function 爆炸甲虫(this: void, data: 甲虫追击实例): void {
   const target = data.接触目标;
   if (!单位有效(boss) || !单位有效(target)) return;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
+  创建甲虫爆炸特效(data.context, GetUnitX(target), GetUnitY(target));
   造成单体技能伤害({
     来源: boss,
     目标: target,
@@ -123,6 +333,33 @@ function 爆炸甲虫(this: void, data: 甲虫追击实例): void {
     标签: "莫尔特斯共生腐朽虫群",
   });
   增加玩家腐败值(data.context, target, cfg.爆炸腐败值);
+}
+
+function 排队击杀共生腐朽虫群甲虫(this: void, variable?: any): void {
+  const data = variable as 共生腐朽虫群测试击杀变量 | undefined;
+  if (data == null || data.甲虫单位列表 == null) return;
+  if (data.下一个索引 >= data.甲虫单位列表.length) {
+    removePeriodicCallback(data.周期ID);
+    return;
+  }
+  const beetle = data.甲虫单位列表[data.下一个索引];
+  data.下一个索引 += 1;
+  if (单位有效(beetle)) {
+    创建甲虫爆炸特效(data.context, GetUnitX(beetle), GetUnitY(beetle));
+    KillUnit(beetle);
+  }
+  if (data.下一个索引 >= data.甲虫单位列表.length) {
+    removePeriodicCallback(data.周期ID);
+  }
+}
+
+function 延迟击杀共生腐朽虫群甲虫(this: void, variable?: any): void {
+  const data = variable as 共生腐朽虫群测试击杀变量 | undefined;
+  if (data == null || data.context == null || data.甲虫单位列表 == null || data.甲虫单位列表.length === 0) return;
+  const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
+  data.下一个索引 = 0;
+  data.周期ID = addPeriodicCallback(cfg.测试击杀间隔毫秒, 排队击杀共生腐朽虫群甲虫, data);
+  data.context.清理.登记周期回调("莫尔特斯测试-7-2-排队击杀甲虫", data.周期ID);
 }
 
 function 甲虫追击Tick(this: void, data: 甲虫追击实例): void {
@@ -163,10 +400,20 @@ function 莫尔特斯甲虫追击周期(this: void, variable?: any): void {
 function 莫尔特斯甲虫死亡(this: void, unit: any, _击杀者: any, variable?: any): void {
   const data = variable as 莫尔特斯甲虫死亡变量 | undefined;
   if (data == null) return;
-  创建虫尸拾取物(data.context, GetUnitX(unit), GetUnitY(unit));
+  const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
+  const x = GetUnitX(unit);
+  const y = GetUnitY(unit);
+  RemoveUnit(unit);
+  debugLogForce(虫尸拾取调试模块, "原始甲虫单位已移除", "单位=", unit, "尸体坐标=", x, y);
+  const delayedId = addDelayedCallback(cfg.虫尸死亡后延迟秒 * 1000, 延迟创建莫尔特斯虫尸, {
+    context: data.context,
+    X: x,
+    Y: y,
+  } as 莫尔特斯虫尸生成变量);
+  data.context.清理.登记延迟回调("莫尔特斯-腐败虫尸生成", delayedId);
 }
 
-function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文, angle: number, 技能实例ID?: number): void {
+function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文, angle: number, 技能实例ID?: number): any {
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
   const x = 极坐标X(GetUnitX(boss), angle, 360);
@@ -186,16 +433,18 @@ function 创建腐化甲虫(this: void, context: 莫尔特斯运行时上下文,
     变量: { context } as 莫尔特斯甲虫死亡变量,
     on死亡: 莫尔特斯甲虫死亡,
   });
-  if (instance == null || !单位有效(instance.单位)) return;
+  if (instance == null || !单位有效(instance.单位)) return undefined;
   临时调整攻击(instance.单位, cfg.甲虫攻击力);
   const data: 甲虫追击实例 = { context, 甲虫单位: instance.单位, 接触目标: null, 接触Ticks: 0, 周期ID: 0, 技能实例ID };
   data.周期ID = addPeriodicCallback(cfg.追击刷新间隔毫秒, 莫尔特斯甲虫追击周期, data);
   context.清理.登记周期回调("莫尔特斯-甲虫追击", data.周期ID);
+  return instance.单位;
 }
 
 function 结算莫尔特斯共生腐朽虫群(this: void, variable?: any): void {
-  const context = variable as 莫尔特斯运行时上下文 | undefined;
-  if (context == null || !单位有效(context.Boss单位)) return;
+  const data = variable as 共生腐朽虫群结算变量 | undefined;
+  if (data == null || !单位有效(data.context.Boss单位)) return;
+  const context = data.context;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
   播放Boss坐标音效(莫尔特斯音效配置.共生腐朽虫群.甲虫入场, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 莫尔特斯音效配置.默认裁断距离);
   const 技能实例ID = 创建独立技能伤害实例({
@@ -203,15 +452,32 @@ function 结算莫尔特斯共生腐朽虫群(this: void, variable?: any): void 
     标签: "莫尔特斯共生腐朽虫群",
     持续时间秒: cfg.接触爆炸秒 + 12,
   });
-  for (let i = 0; i < cfg.甲虫数量; i++) 创建腐化甲虫(context, i * 90, 技能实例ID);
+  const 甲虫单位列表: any[] = [];
+  for (let i = 0; i < cfg.甲虫数量; i++) {
+    const beetle = 创建腐化甲虫(context, i * 90, 技能实例ID);
+    if (单位有效(beetle)) 甲虫单位列表.push(beetle);
+  }
+  if (data.释放选项 != null && data.释放选项.召唤后延迟击杀全部甲虫 === true && 甲虫单位列表.length > 0) {
+    const delayedId = addDelayedCallback(2000, 延迟击杀共生腐朽虫群甲虫, {
+      context,
+      甲虫单位列表,
+      下一个索引: 0,
+      周期ID: 0,
+    });
+    context.清理.登记延迟回调("莫尔特斯测试-7-2-击杀甲虫", delayedId);
+  }
 }
 
-export function 释放莫尔特斯共生腐朽虫群(this: void, context: 莫尔特斯运行时上下文): boolean {
+export function 释放莫尔特斯共生腐朽虫群(this: void, context: 莫尔特斯运行时上下文, 释放选项?: 共生腐朽虫群释放选项): boolean {
   if (!单位有效(context.Boss单位)) return false;
   const cfg = 莫尔特斯数值与表现配置.共生腐朽虫群;
   开始莫尔特斯常规施法(context.Boss单位, cfg.动作播放秒, "共生腐朽虫群", "腐化甲虫将在读条结束后涌出");
   播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
-  const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 结算莫尔特斯共生腐朽虫群, context);
+  const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 结算莫尔特斯共生腐朽虫群, { context, 释放选项 } as 共生腐朽虫群结算变量);
   context.清理.登记延迟回调("莫尔特斯-共生腐朽虫群召唤", delayedId);
   return true;
+}
+
+export function 测试释放莫尔特斯共生腐朽虫群并延迟击杀(this: void, context: 莫尔特斯运行时上下文): boolean {
+  return 释放莫尔特斯共生腐朽虫群(context, { 召唤后延迟击杀全部甲虫: true });
 }

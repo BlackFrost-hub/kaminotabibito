@@ -46,10 +46,16 @@ const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位�
 const { 莫尔特斯BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯") as {
   莫尔特斯BuffID: { 净化庇护: string };
 };
-const { CreateUbersplatBJ, ShowUbersplatBJ } = require("lib.扩展函数.BJ函数.11．贴图函数") as {
-  CreateUbersplatBJ: (this: void, file: string, where: any, red: number, green: number, blue: number, alpha: number, forcePaused: boolean, noBirthTime: boolean) => any;
-  ShowUbersplatBJ: (this: void, flag: boolean, whichUbersplat: any) => void;
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { CreateUbersplatBJ, ShowUbersplatBJ, SetUbersplatRenderAlways } = require("lib.扩展函数.BJ函数.11．贴图函数") as {
+  CreateUbersplatBJ: (this: void, where: any, file: string, red: number, green: number, blue: number, alpha: number, forcePaused: boolean, noBirthTime: boolean) => any;
+  ShowUbersplatBJ: (this: void, flag: boolean, whichUbersplat: any) => void;
+  SetUbersplatRenderAlways: (this: void, whichUbersplat: any, flag: boolean) => void;
+};
+
+const 腐朽领域调试模块 = "莫尔特斯-腐朽领域";
 
 interface 莫尔特斯腐朽领域根须延迟上下文 {
   context: 莫尔特斯运行时上下文;
@@ -61,19 +67,60 @@ interface 莫尔特斯腐朽领域根须延迟上下文 {
 
 function 创建腐朽领域沼泽地表(this: void, context: 莫尔特斯运行时上下文): void {
   const grid = context.根须宫格;
-  if (grid == null) return;
+  if (grid == null) {
+    debugLogForce(腐朽领域调试模块, "地表创建跳过", "原因=根须宫格为空");
+    return;
+  }
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
   const color = cfg.沼泽贴图颜色;
-  for (let i = 0; i < grid.格子列表.length; i++) {
-    const cell = grid.格子列表[i];
-    if (cell == null) continue;
-    const loc = Location(cell.中心X, cell.中心Y);
-    const ubersplat = CreateUbersplatBJ(cfg.沼泽贴图类型, loc, color.r, color.g, color.b, color.a, cfg.沼泽贴图强制暂停, cfg.沼泽贴图无出生时间);
-    RemoveLocation(loc);
-    if (ubersplat == null || ubersplat === 0) continue;
-    ShowUbersplatBJ(true, ubersplat);
-    context.清理.登记贴图("莫尔特斯-腐朽领域沼泽", ubersplat);
+  const 格子列表 = grid.格子列表 as any[];
+  if (格子列表.length === 0) {
+    debugLogForce(腐朽领域调试模块, "地表创建跳过", "原因=九宫格没有格子");
+    return;
   }
+  const 覆盖行数 = cfg.沼泽贴图覆盖行数;
+  const 覆盖列数 = cfg.沼泽贴图覆盖列数;
+  const 总宽度 = grid.宽度 as number;
+  const 总高度 = grid.高度 as number;
+  const 首格 = 格子列表[0];
+  const 末格 = 格子列表[格子列表.length - 1];
+  const 宫格中心X = (首格.左 + 末格.右) / 2;
+  const 宫格中心Y = (首格.下 + 末格.上) / 2;
+  const 中心X = context.根须领域中心X ?? 宫格中心X;
+  const 中心Y = context.根须领域中心Y ?? 宫格中心Y;
+  const 起点X = 中心X - 总宽度 / 2;
+  const 起点Y = 中心Y - 总高度 / 2;
+  const 采样宽度 = 总宽度 / 覆盖列数;
+  const 采样高度 = 总高度 / 覆盖行数;
+  debugLogForce(
+    腐朽领域调试模块,
+    "地表创建开始",
+    "覆盖网格=", 覆盖行数, "x", 覆盖列数,
+    "类型=", cfg.沼泽贴图类型,
+    "颜色=", color.r, color.g, color.b, color.a,
+    "强制暂停=", cfg.沼泽贴图强制暂停,
+    "无出生时间=", cfg.沼泽贴图无出生时间,
+    "中心=", 中心X, 中心Y,
+  );
+  let 成功数量 = 0;
+  for (let row = 0; row < 覆盖行数; row++) {
+    for (let col = 0; col < 覆盖列数; col++) {
+      const x = 起点X + 采样宽度 * (col + 0.5);
+      const y = 起点Y + 采样高度 * (row + 0.5);
+      const loc = Location(x, y);
+      const ubersplat = CreateUbersplatBJ(loc, cfg.沼泽贴图类型, color.r, color.g, color.b, color.a, cfg.沼泽贴图强制暂停, cfg.沼泽贴图无出生时间);
+      RemoveLocation(loc);
+      const index = row * 覆盖列数 + col;
+      debugLogForce(腐朽领域调试模块, "地表贴图返回", "索引=", index, "x=", x, "y=", y, "句柄=", ubersplat);
+      if (ubersplat == null || ubersplat === 0) continue;
+      SetUbersplatRenderAlways(ubersplat, true);
+      ShowUbersplatBJ(true, ubersplat);
+      debugLogForce(腐朽领域调试模块, "地表贴图已显示", "索引=", index, "句柄=", ubersplat);
+      context.清理.登记贴图("莫尔特斯-腐朽领域沼泽", ubersplat);
+      成功数量 += 1;
+    }
+  }
+  debugLogForce(腐朽领域调试模块, "地表创建结束", "成功数量=", 成功数量);
 }
 
 function 创建净化符文(this: void, context: 莫尔特斯运行时上下文): void {
@@ -99,6 +146,24 @@ function 创建净化符文(this: void, context: 莫尔特斯运行时上下文)
       持续时间: cfg.净化持续秒,
     });
   }
+}
+
+function 创建腐朽领域中心Tick特效(this: void, context: 莫尔特斯运行时上下文): void {
+  const cfg = 莫尔特斯数值与表现配置.腐朽领域;
+  const 根须领域配置 = 莫尔特斯数值与表现配置.根须领域;
+  const grid = context.根须宫格;
+  const 格子列表 = grid == null ? undefined : grid.格子列表 as any[];
+  const 首格 = 格子列表 != null && 格子列表.length > 0 ? 格子列表[0] : undefined;
+  const 末格 = 格子列表 != null && 格子列表.length > 0 ? 格子列表[格子列表.length - 1] : undefined;
+  const 中心X = context.根须领域中心X ?? (首格 != null && 末格 != null ? (首格.左 + 末格.右) / 2 : 根须领域配置.中心X);
+  const 中心Y = context.根须领域中心Y ?? (首格 != null && 末格 != null ? (首格.下 + 末格.上) / 2 : 根须领域配置.中心Y);
+  创建点特效({
+    模型路径: cfg.沼泽Tick特效路径,
+    X: 中心X,
+    Y: 中心Y,
+    持续秒: cfg.沼泽Tick特效持续秒,
+    缩放: cfg.沼泽Tick特效缩放,
+  });
 }
 
 function 处理净化符文(this: void, context: 莫尔特斯运行时上下文, hero: any): boolean {
@@ -134,7 +199,13 @@ function 莫尔特斯腐朽沼泽根须(this: void, variable?: any): void {
   const target = data.target;
   if (!单位有效(context.Boss单位) || !单位有效(target)) return;
   const 穿刺配置 = 莫尔特斯数值与表现配置.腐朽根须穿刺;
-  创建点特效({ 模型路径: 穿刺配置.穿刺特效路径, X: data.X, Y: data.Y, 持续秒: 穿刺配置.瞬时特效持续秒 });
+  创建点特效({
+    模型路径: 穿刺配置.穿刺特效路径,
+    X: data.X,
+    Y: data.Y,
+    持续秒: 穿刺配置.瞬时特效持续秒,
+    缩放: 穿刺配置.穿刺命中特效缩放,
+  });
   造成单体技能伤害({
     来源: context.Boss单位,
     目标: target,
@@ -154,6 +225,7 @@ function 莫尔特斯腐朽沼泽根须(this: void, variable?: any): void {
 function 结算莫尔特斯腐朽领域展开(this: void, variable?: any): void {
   const context = variable as 莫尔特斯运行时上下文 | undefined;
   if (context == null || !单位有效(context.Boss单位)) return;
+  debugLogForce(腐朽领域调试模块, "展开结算", "根须宫格=", context.根须宫格 == null ? "nil" : "ready", "中心=", context.根须领域中心X, context.根须领域中心Y);
   context.腐朽领域已生效 = true;
   创建腐朽领域沼泽地表(context);
   创建净化符文(context);
@@ -170,7 +242,10 @@ function 结算莫尔特斯腐朽领域展开(this: void, variable?: any): void 
 }
 
 export function 触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯运行时上下文): void {
-  if (context.腐朽领域已触发 || !单位有效(context.Boss单位)) return;
+  if (context.腐朽领域已触发 || !单位有效(context.Boss单位)) {
+    debugLogForce(腐朽领域调试模块, "触发跳过", "已触发=", context.腐朽领域已触发, "Boss有效=", 单位有效(context.Boss单位));
+    return;
+  }
   context.腐朽领域已触发 = true;
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
   开始莫尔特斯大招施法(context.Boss单位, cfg.动作播放秒, "腐朽领域", "腐败沼泽将在读条结束后覆盖场地");
@@ -178,11 +253,13 @@ export function 触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯
   播放莫尔特斯台词(context.Boss单位, "低血量");
   const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 结算莫尔特斯腐朽领域展开, context);
   context.清理.登记延迟回调("莫尔特斯-腐朽领域展开", delayedId);
+  debugLogForce(腐朽领域调试模块, "触发成功", "延迟毫秒=", cfg.动作播放秒 * 1000, "延迟ID=", delayedId, "根须宫格=", context.根须宫格 == null ? "nil" : "ready");
 }
 
 export function 处理莫尔特斯沼泽腐败(this: void, context: 莫尔特斯运行时上下文): boolean {
   if (!context.腐朽领域已生效 || !单位有效(context.Boss单位)) return false;
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
+  创建腐朽领域中心Tick特效(context);
   const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];

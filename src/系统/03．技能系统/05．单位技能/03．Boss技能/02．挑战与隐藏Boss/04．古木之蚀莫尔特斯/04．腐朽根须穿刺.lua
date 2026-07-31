@@ -10,6 +10,7 @@ local _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_
 local _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["莫尔特斯音效配置"]
 local ____03_FF0E_8150_8D25_503C_4E0E_6839_987B_9886_57DF = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.03．腐败值与根须领域")
 local _____5E94_7528_83AB_5C14_7279_65AF_8150_8D25_503C = ____03_FF0E_8150_8D25_503C_4E0E_6839_987B_9886_57DF["应用莫尔特斯腐败值"]
+local _____786E_4FDD_83AB_5C14_7279_65AF_6839_987B_5BAB_683C = ____03_FF0E_8150_8D25_503C_4E0E_6839_987B_9886_57DF["确保莫尔特斯根须宫格"]
 local ____13_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.13．台词播放")
 local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_653E["播放莫尔特斯台词"]
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
@@ -42,10 +43,8 @@ local GroupRemoveUnit = jass.GroupRemoveUnit
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
-local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
+local ____require_result_2 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_2["读取单位攻击力"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____8150_673D_6839_987B_7A7F_523A_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -55,11 +54,25 @@ local function _____9009_62E9_6839_987B_7A7F_523A_683C_5B50(context)
     if grid == nil then
         return result
     end
+    if context["根须穿刺测试格子索引"] ~= nil then
+        do
+            local i = 0
+            while i < #context["根须穿刺测试格子索引"] do
+                local cell = grid["获取格子By索引"](grid, context["根须穿刺测试格子索引"][i + 1])
+                if cell ~= nil then
+                    result[#result + 1] = cell
+                end
+                i = i + 1
+            end
+        end
+        return result
+    end
     local pool = {}
+    local _____683C_5B50_5217_8868 = grid["格子列表"]
     do
         local i = 0
-        while i < grid["格子列表"].length do
-            pool[#pool + 1] = grid["格子列表"][i]
+        while i < #_____683C_5B50_5217_8868 do
+            pool[#pool + 1] = _____683C_5B50_5217_8868[i + 1]
             i = i + 1
         end
     end
@@ -81,20 +94,21 @@ local function _____7ED3_7B97_5355_683C_6839_987B_7A7F_523A(context, cell)
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]
-    _____521B_5EFA_70B9_7279_6548({["模型路径"] = cfg["穿刺特效路径"], X = cell["中心X"], Y = cell["中心Y"], ["持续秒"] = cfg["瞬时特效持续秒"]})
-    _____64AD_653EBoss_5750_6807_97F3_6548(_____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["腐朽根须穿刺"]["结算"], cell["中心X"], cell["中心Y"], _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
-    _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
-        ["清理"] = context["清理"],
-        ["名称"] = "莫尔特斯-残留根须",
-        ["主人单位"] = boss,
-        ["所属玩家"] = GetOwningPlayer(boss),
-        ["单位类型"] = cfg["障碍单位类型"],
-        ["模型路径"] = cfg["根须模型路径"],
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["穿刺特效路径"],
         X = cell["中心X"],
         Y = cell["中心Y"],
-        ["最大生命"] = cfg["障碍生命值"],
-        ["缩放"] = cfg["障碍缩放"],
-        ["持续时间"] = cfg["根须停留秒"]
+        ["持续秒"] = cfg["瞬时特效持续秒"],
+        ["缩放"] = cfg["穿刺命中特效缩放"]
+    })
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["腐朽根须穿刺"]["结算"], cell["中心X"], cell["中心Y"], _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["根须特效路径"],
+        X = cell["中心X"],
+        Y = cell["中心Y"],
+        ["持续秒"] = cfg["根须停留秒"],
+        ["缩放"] = cfg["根须特效缩放"],
+        ["动画索引"] = cfg["根须模型动画索引"]
     })
     local group = CreateGroup()
     GroupEnumUnitsInRect(group, cell["矩形"], nil)
@@ -152,6 +166,7 @@ ____exports["释放莫尔特斯腐朽根须穿刺"] = function(context)
     if not _____5355_4F4D_6709_6548(boss) then
         return
     end
+    _____786E_4FDD_83AB_5C14_7279_65AF_6839_987B_5BAB_683C(context)
     _____5F00_59CB_83AB_5C14_7279_65AF_5E38_89C4_65BD_6CD5(boss, cfg["预警秒"], "腐朽根须穿刺", "随机地块即将钻出腐败根须")
     _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "腐朽根须穿刺")

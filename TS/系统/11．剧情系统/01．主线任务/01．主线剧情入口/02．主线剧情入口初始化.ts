@@ -60,6 +60,10 @@ const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetDestructableInvulnerable = jass.SetDestructableInvulnerable as (this: void, destructable: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
+const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
+const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
+  X_FixUnitStandingSafe: (this: void, unit: any) => void;
+};
 const 中立被动玩家ID = 15;
 let 已请求初始化主线剧情入口 = false;
 let 已执行初始化主线剧情入口 = false;
@@ -94,6 +98,8 @@ function 初始化单个NPC(this: void, 配置: 主线NPC初始化配置): void 
     unit = CreateUnit(Player(配置.玩家ID ?? 中立被动玩家ID), stringToFourCC(配置.单位ID), 配置.X, 配置.Y, 配置.朝向);
     写入NPC绑定(配置, unit);
   }
+  if (配置.初始化无敌 === true) SetUnitInvulnerable(unit, true);
+  if (配置.初始化固定站立 === true) X_FixUnitStandingSafe(unit);
   记录NPC运行时(配置, unit);
 }
 

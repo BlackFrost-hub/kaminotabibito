@@ -79,7 +79,7 @@ _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["取独占状态管�
     return self["独占状态管理器"]
 end
 _____6218_6597_6280_80FD_8C03_5EA6_5668_5B9E_73B0.prototype["执行上下文"] = function(self, context, nowMs)
-    if not ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F() then
+    if self["参数"]["忽略自动施法开关"] ~= true and not ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F() then
         return
     end
     if self["参数"]["可调度"] ~= nil and not self["参数"]["可调度"](context, nowMs) then

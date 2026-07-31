@@ -66,6 +66,8 @@ export interface 战斗技能调度参数<TContext> {
   可调度?: (this: void, context: TContext, nowMs: number) => boolean;
   成功后?: (this: void, context: TContext, skillKey: string, target: any, nowMs: number) => void;
   自动启动?: boolean;
+  /** 持续场地效果在手动测试或自动施法关闭时仍需继续处理。 */
+  忽略自动施法开关?: boolean;
 }
 
 export interface 战斗技能调度器 {
@@ -165,7 +167,7 @@ class 战斗技能调度器实现<TContext> implements 战斗技能调度器 {
   }
 
   private 执行上下文(context: TContext, nowMs: number): void {
-    if (!Boss自动施法是否开启()) return;
+    if (this.参数.忽略自动施法开关 !== true && !Boss自动施法是否开启()) return;
     if (this.参数.可调度 != null && !this.参数.可调度(context, nowMs)) return;
     const contextKey = this.参数.取上下文键(context);
     if (contextKey === 0) return;

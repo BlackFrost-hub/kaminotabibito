@@ -1,8 +1,8 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
-local _____8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离平方XY"]
 local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.01．场地配置")
 local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心X"]
 local _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y = ____01_FF0E_573A_5730_914D_7F6E["取米亚平台中心Y"]
@@ -22,6 +22,8 @@ local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
 local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
+local ____03_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____03_FF0E_5BF9_5916_63A5_53E3["创建原生弹幕"]
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
 local ____require_result_1 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
@@ -38,15 +40,21 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
 local AddSpecialEffect = jass.AddSpecialEffect
-local GetUnitState = jass.GetUnitState
-local GetUnitX = jass.GetUnitX
-local GetUnitY = jass.GetUnitY
-local IsUnitType = jass.IsUnitType
+local GetHandleId = jass.GetHandleId
+local DestroyEffect = jass.DestroyEffect
 local EXSetEffectSize = japi.EXSetEffectSize
 local EXSetEffectZ = japi.EXSetEffectZ
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local _____6C61_67D3_8109_51B2_5F39_5E55_98DE_884C_79D2 = 0.5
+local _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_4E0A_4E0B_6587_8868 = {}
+local function _____9500_6BC1_7C73_4E9A_6C61_67D3_8109_51B2_6269_6563_7279_6548(effect)
+    if effect == nil or effect == 0 then
+        return
+    end
+    DestroyEffect(effect)
+end
 local function _____7C73_4E9A_5B89_5168_57DF_5F53_524D_6709_6548(context, _____533A_57DF)
     if _____533A_57DF == nil then
         return false
@@ -74,6 +82,73 @@ local function _____5355_4F4D_5728_6709_6548_5B89_5168_57DF_5185(context, unit)
         _____53D6_7C73_4E9A_5355_4F4D_6240_5728_5B89_5168_57DF(unit, context["安全域区域组"])
     )
 end
+local function _____521B_5EFA_7C73_4E9A_6C61_67D3_8109_51B2_53EF_547D_4E2D_76EE_6807ID_8868(boss)
+    local _____76EE_6807ID_8868 = {}
+    local _____76EE_6807_5217_8868 = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+    do
+        local i = 0
+        while i < #_____76EE_6807_5217_8868 do
+            do
+                local target = _____76EE_6807_5217_8868[i + 1]
+                if not _____5355_4F4D_6709_6548(target) then
+                    goto __continue11
+                end
+                local targetId = GetHandleId(target)
+                if targetId ~= 0 then
+                    _____76EE_6807ID_8868[targetId] = true
+                end
+            end
+            ::__continue11::
+            i = i + 1
+        end
+    end
+    return _____76EE_6807ID_8868
+end
+local function _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_76EE_6807_7B5B_9009(target, _____5F39_5E55ID)
+    local _____5F39_5E55_4E0A_4E0B_6587 = _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_4E0A_4E0B_6587_8868[_____5F39_5E55ID]
+    if _____5F39_5E55_4E0A_4E0B_6587 == nil or not _____5355_4F4D_6709_6548(target) then
+        return false
+    end
+    local targetId = GetHandleId(target)
+    return _____5F39_5E55_4E0A_4E0B_6587["可命中目标ID表"][targetId] == true
+end
+local function _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_547D_4E2D(target, _____5F39_5E55ID)
+    local _____5F39_5E55_4E0A_4E0B_6587 = _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_4E0A_4E0B_6587_8868[_____5F39_5E55ID]
+    if _____5F39_5E55_4E0A_4E0B_6587 == nil or not _____5355_4F4D_6709_6548(target) then
+        return
+    end
+    local targetId = GetHandleId(target)
+    if targetId == 0 or _____5F39_5E55_4E0A_4E0B_6587["本波已命中目标ID表"][targetId] == true then
+        return
+    end
+    _____5F39_5E55_4E0A_4E0B_6587["本波已命中目标ID表"][targetId] = true
+    local context = _____5F39_5E55_4E0A_4E0B_6587["上下文"]
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) or context["阶段"] ~= 2 then
+        return
+    end
+    if _____5355_4F4D_5728_6709_6548_5B89_5168_57DF_5185(context, target) then
+        return
+    end
+    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
+    local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
+    local damage = maxLife * config["每波最大生命伤害比例"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target)
+    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+        ["来源"] = boss,
+        ["目标"] = target,
+        ["伤害"] = damage,
+        attackType = jass.ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
+        weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能",
+        ["技能实例ID"] = _____5F39_5E55_4E0A_4E0B_6587["技能实例ID"],
+        ["标签"] = "米亚污染脉冲"
+    })
+    _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["每波腐化层数"], "污染脉冲")
+end
+local function _____6E05_7406_7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_4E0A_4E0B_6587(______539F_56E0, _____5F39_5E55ID)
+    __TS__Delete(_____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_4E0A_4E0B_6587_8868, _____5F39_5E55ID)
+end
 local function _____663E_793A_6C61_67D3_8109_51B2_6CE2_9884_8B66(context, waveIndex, _____6301_7EED_79D2)
     local boss = context["Boss单位"]
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
@@ -96,7 +171,7 @@ local function _____663E_793A_6C61_67D3_8109_51B2_6CE2_9884_8B66(context, waveIn
             do
                 local _____533A_57DF = _____533A_57DF_5217_8868[i + 1]
                 if not _____7C73_4E9A_5B89_5168_57DF_5F53_524D_6709_6548(context, _____533A_57DF) then
-                    goto __continue10
+                    goto __continue25
                 end
                 local width = _____533A_57DF["配置"]["右"] - _____533A_57DF["配置"]["左"]
                 local height = _____533A_57DF["配置"]["上"] - _____533A_57DF["配置"]["下"]
@@ -108,13 +183,13 @@ local function _____663E_793A_6C61_67D3_8109_51B2_6CE2_9884_8B66(context, waveIn
                     ["持续时间"] = _____6301_7EED_79D2
                 })
             end
-            ::__continue10::
+            ::__continue25::
             i = i + 1
         end
     end
 end
 local function _____521B_5EFA_671D_5411_70B9_7279_6548(model, x, y, scale, duration, yawDeg, z)
-    _____521B_5EFA_70B9_7279_6548({
+    return _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = model,
         X = x,
         Y = y,
@@ -126,38 +201,71 @@ local function _____521B_5EFA_671D_5411_70B9_7279_6548(model, x, y, scale, durat
 end
 local function _____64AD_653E_8109_51B2_4E2D_5FC3_9884_8B66()
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
-    _____521B_5EFA_671D_5411_70B9_7279_6548(
-        config["中心预警特效"],
-        _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
-        _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y(),
-        1.4,
-        config["预警秒"] + 0.2,
-        0,
-        30
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = config["中心预警特效"],
+        X = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
+        Y = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y(),
+        Z = 30,
+        ["缩放"] = 3,
+        ["持续秒"] = config["预警秒"] + 0.2,
+        ["红"] = 255,
+        ["绿"] = 20,
+        ["蓝"] = 20,
+        ["透明度"] = 255
+    })
 end
-local function _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
+local function _____64AD_653E_8109_51B2_6CE2_8868_73B0(context, waveIndex, _____6280_80FD_5B9E_4F8BID, _____4E0A_4E00_6CE2_6269_6563_7279_6548)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
+    local boss = context["Boss单位"]
     local centerX = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X()
     local centerY = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y()
+    local _____6CE2_6B21_534A_5F84 = config["波次半径"][waveIndex + 1]
+    local _____547D_4E2D_534A_5F84 = config["波次命中半径"][waveIndex + 1]
     local waveNo = waveIndex + 1
     local angles = {0, 90, 180, 270}
+    _____9500_6BC1_7C73_4E9A_6C61_67D3_8109_51B2_6269_6563_7279_6548(_____4E0A_4E00_6CE2_6269_6563_7279_6548)
+    if not _____5355_4F4D_6709_6548(boss) or _____6CE2_6B21_534A_5F84 == nil or _____6CE2_6B21_534A_5F84 <= 0 or _____547D_4E2D_534A_5F84 == nil or _____547D_4E2D_534A_5F84 <= 0 then
+        return nil
+    end
+    local _____53EF_547D_4E2D_76EE_6807ID_8868 = _____521B_5EFA_7C73_4E9A_6C61_67D3_8109_51B2_53EF_547D_4E2D_76EE_6807ID_8868(boss)
+    local _____672C_6CE2_5DF2_547D_4E2D_76EE_6807ID_8868 = {}
     do
         local i = 0
         while i < #angles do
-            _____521B_5EFA_671D_5411_70B9_7279_6548(
-                config["脉冲中心特效"],
-                centerX,
-                centerY,
-                1,
-                1.2,
-                angles[i + 1],
-                0
-            )
+            local _____5F39_5E55 = _____521B_5EFA_539F_751F_5F39_5E55({
+                ["所有者"] = boss,
+                ["载体模式"] = "单位",
+                X = centerX,
+                Y = centerY,
+                ["方向角"] = angles[i + 1],
+                ["速度"] = _____6CE2_6B21_534A_5F84 / _____6C61_67D3_8109_51B2_5F39_5E55_98DE_884C_79D2,
+                ["最大距离"] = _____6CE2_6B21_534A_5F84,
+                ["生命周期"] = _____6C61_67D3_8109_51B2_5F39_5E55_98DE_884C_79D2,
+                ["命中半径"] = _____547D_4E2D_534A_5F84,
+                ["影响目标"] = "敌方",
+                ["碰撞消失"] = false,
+                ["每单位最大命中次数"] = 1,
+                ["不可阻挡"] = true,
+                ["禁用碰撞"] = true,
+                ["显式改向后锁定方向"] = true,
+                ["模型"] = config["脉冲中心特效"],
+                ["缩放"] = 1,
+                ["攻击类型"] = jass.ATTACK_TYPE_NORMAL,
+                ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
+                ["武器类型"] = jass.WEAPON_TYPE_WHOKNOWS,
+                ["来源类型"] = "Boss技能",
+                ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
+                ["技能标签"] = "米亚污染脉冲",
+                ["伤害形态"] = "AOE",
+                ["目标筛选"] = _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_76EE_6807_7B5B_9009,
+                ["on命中"] = _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_547D_4E2D,
+                ["on结束"] = _____6E05_7406_7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_4E0A_4E0B_6587
+            })
+            _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_4E0A_4E0B_6587_8868[_____5F39_5E55["弹幕ID"]] = {["上下文"] = context, ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID, ["可命中目标ID表"] = _____53EF_547D_4E2D_76EE_6807ID_8868, ["本波已命中目标ID表"] = _____672C_6CE2_5DF2_547D_4E2D_76EE_6807ID_8868}
             i = i + 1
         end
     end
-    _____521B_5EFA_671D_5411_70B9_7279_6548(
+    local effect = _____521B_5EFA_671D_5411_70B9_7279_6548(
         config["扩散波特效"],
         centerX,
         centerY,
@@ -166,65 +274,27 @@ local function _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
         270,
         0
     )
+    return effect
 end
-local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____6280_80FD_5B9E_4F8BID)
+local function _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____6280_80FD_5B9E_4F8BID, _____4E0A_4E00_6CE2_6269_6563_7279_6548)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or context["阶段"] ~= 2 then
-        return
+        _____9500_6BC1_7C73_4E9A_6C61_67D3_8109_51B2_6269_6563_7279_6548(_____4E0A_4E00_6CE2_6269_6563_7279_6548)
+        return nil
     end
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
-    local radius = config["波次半径"][waveIndex + 1]
-    local radius2 = radius * radius
     local centerX = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X()
     local centerY = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y()
-    if waveIndex == 0 then
-        _____64AD_653EBoss_5750_6807_97F3_6548(_____7C73_4E9A_97F3_6548_914D_7F6E["污染脉冲"]["扩散波"], centerX, centerY, _____7C73_4E9A_97F3_6548_914D_7F6E["默认裁断距离"])
-    end
-    _____64AD_653E_8109_51B2_6CE2_8868_73B0(waveIndex)
+    local effect = _____64AD_653E_8109_51B2_6CE2_8868_73B0(context, waveIndex, _____6280_80FD_5B9E_4F8BID, _____4E0A_4E00_6CE2_6269_6563_7279_6548)
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____7C73_4E9A_97F3_6548_914D_7F6E["污染脉冲"]["扩散波"], centerX, centerY, _____7C73_4E9A_97F3_6548_914D_7F6E["默认裁断距离"])
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污染脉冲", waveIndex + 2)
-    local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-    do
-        local i = 0
-        while i < #targets do
-            do
-                local target = targets[i + 1]
-                if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue21
-                end
-                if _____5355_4F4D_5728_6709_6548_5B89_5168_57DF_5185(context, target) then
-                    goto __continue21
-                end
-                if _____8DDD_79BB_5E73_65B9(
-                    centerX,
-                    centerY,
-                    GetUnitX(target),
-                    GetUnitY(target)
-                ) > radius2 then
-                    goto __continue21
-                end
-                local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                    ["来源"] = boss,
-                    ["目标"] = target,
-                    ["伤害"] = maxLife * config["每波最大生命伤害比例"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
-                    attackType = jass.ATTACK_TYPE_NORMAL,
-                    ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
-                    weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能",
-                    ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
-                    ["标签"] = "米亚污染脉冲"
-                })
-                _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["每波腐化层数"], "污染脉冲")
-            end
-            ::__continue21::
-            i = i + 1
-        end
-    end
+    return effect
 end
 local function _____521B_5EFA_6C61_67D3_8109_51B2_65F6_95F4_8F74_4E8B_4EF6(context)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
     local boss = context["Boss单位"]
     local _____6280_80FD_5B9E_4F8BID = 0
+    local _____4E0A_4E00_6CE2_6269_6563_7279_6548 = nil
     local _____4E8B_4EF6_5217_8868 = {
         {
             ["时点毫秒"] = 0,
@@ -237,7 +307,12 @@ local function _____521B_5EFA_6C61_67D3_8109_51B2_65F6_95F4_8F74_4E8B_4EF6(conte
                 _____64AD_653E_8109_51B2_4E2D_5FC3_9884_8B66()
                 _____663E_793A_6C61_67D3_8109_51B2_6CE2_9884_8B66(context, 0, config["预警秒"])
                 _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "污染脉冲", 0)
-                _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761({["总时长"] = config["预警秒"], ["颜色ID"] = 3, ["标题文本"] = "污染脉冲", ["提示文本"] = "水池污染正在扩散，请进入安全域。"})
+                _____663E_793A_573A_5730_5E38_9A7BAOE_541F_5531_6761({
+                    ["总时长"] = config["预警秒"],
+                    ["颜色ID"] = 3,
+                    ["标题文本"] = "污染脉冲",
+                    ["提示文本"] = ((("预警" .. tostring(config["预警秒"])) .. "秒后扩散") .. tostring(#config["波次半径"])) .. "波，进入白色安全平台可规避（避开红色扩散区）。"
+                })
             end
         },
         {
@@ -267,7 +342,7 @@ local function _____521B_5EFA_6C61_67D3_8109_51B2_65F6_95F4_8F74_4E8B_4EF6(conte
                 ["时点毫秒"] = (config["预警秒"] + waveIndex) * 1000,
                 ["名称"] = ("污染脉冲第" .. tostring(waveIndex + 1)) .. "波",
                 ["执行"] = function()
-                    _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____6280_80FD_5B9E_4F8BID)
+                    _____4E0A_4E00_6CE2_6269_6563_7279_6548 = _____7ED3_7B97_6C61_67D3_8109_51B2_6CE2(context, waveIndex, _____6280_80FD_5B9E_4F8BID, _____4E0A_4E00_6CE2_6269_6563_7279_6548)
                 end
             }
             i = i + 1

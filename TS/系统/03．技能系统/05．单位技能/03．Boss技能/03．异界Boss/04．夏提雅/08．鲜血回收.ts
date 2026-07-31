@@ -10,6 +10,7 @@ import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用�
 import { 播放夏提雅台词 } from './18．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
+import { 播放夏提雅吸血恢复特效 } from './20．吸血表现';
 
 const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
   doHeal: (this: void, params: any) => number;
@@ -49,7 +50,7 @@ function 创建鲜血回收连线(this: void, context: 夏提雅运行时上下�
     模型路径: 夏提雅数值与表现配置.表现资源.鲜血回收连线特效路径,
     X: mark.X,
     Y: mark.Y,
-    缩放: 限制连线缩放(距离XY(mark.X, mark.Y, bossX, bossY) / cfg.回收连线基准长度),
+    缩放: 限制连线缩放(距离XY(mark.X, mark.Y, bossX, bossY) / cfg.回收连线基准长度) * cfg.回收连线缩放倍率,
     Z轴角度: 两点角度(mark.X, mark.Y, bossX, bossY),
     持续秒: cfg.回收连线持续秒,
   });
@@ -81,6 +82,7 @@ function 结算鲜血回收(this: void, context: 夏提雅运行时上下文): v
       ItemHeal: false,
       HealEffect: false,
     });
+    播放夏提雅吸血恢复特效(boss);
     context.血之狂热控制器.增加(boss, absorbed, '鲜血回收');
   }
   结束鲜血回收(context);

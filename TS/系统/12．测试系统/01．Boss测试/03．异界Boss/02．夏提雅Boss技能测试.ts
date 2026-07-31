@@ -44,10 +44,11 @@ const { 注册夏提雅被动效果 } = require('系统.03．技能系统.05．�
 const { 夏提雅单位技能配置 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.00．配置') as {
   夏提雅单位技能配置: { 阶段阈值: { P2生命比例: number; P3生命比例: number } };
 };
-const { 获取或创建夏提雅运行时上下文, 清理夏提雅运行时上下文, 重置夏提雅猎血连击 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文') as {
+const { 获取或创建夏提雅运行时上下文, 清理夏提雅运行时上下文, 重置夏提雅猎血连击, 设置夏提雅阶段模型 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.01．运行时上下文') as {
   获取或创建夏提雅运行时上下文: (this: void, boss: any) => any;
   清理夏提雅运行时上下文: (this: void, boss: any) => void;
   重置夏提雅猎血连击: (this: void, context: any) => void;
+  设置夏提雅阶段模型: (this: void, context: any) => void;
 };
 const { 创建夏提雅鲜血印记, 清理夏提雅鲜血印记 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.04．鲜血印记') as {
   创建夏提雅鲜血印记: (this: void, context: any, x: number, y: number) => any;
@@ -80,6 +81,12 @@ const { 释放夏提雅血月终舞 } = require('系统.03．技能系统.05．�
 };
 const { 绑定夏提雅挑战生命下限 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.15．挑战入口与收束') as {
   绑定夏提雅挑战生命下限: (this: void, context: any) => void;
+};
+const { 停止单位位移 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统') as {
+  停止单位位移: (this: void, unit: any, reason?: any) => boolean;
+};
+const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
 const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -194,6 +201,18 @@ function 准备夏提雅测试阶段(this: void, context: 夏提雅测试上下�
   const boss = context.Boss单位;
   const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return;
+  停止单位位移(boss, '中断');
+  停止单位位移(context.目标单位, '中断');
+  const mirrorExecutor = runtime.镜像夹击执行器;
+  if (mirrorExecutor != null && mirrorExecutor.是否运行中()) {
+    mirrorExecutor.停止(undefined, '中断');
+  }
+  runtime.镜像夹击执行器 = undefined;
+  runtime.镜像夹击执行ID = 0;
+  SetUnitPosition(boss, 测试中心X, 测试中心Y);
+  SetUnitFacing(boss, 270);
+  SetUnitPosition(context.目标单位, 玩家测试X - 220, 玩家测试Y + 180);
+  SetUnitFacing(context.目标单位, 90);
   if (!保留血印) 清空夏提雅测试血印(context);
   if (阶段 !== 2) 清理英灵战乙女投影(runtime);
 
@@ -209,6 +228,7 @@ function 准备夏提雅测试阶段(this: void, context: 夏提雅测试上下�
 
   SetUnitState(boss, UNIT_STATE_LIFE, maxLife * lifeRatio);
   runtime.阶段 = phase;
+  设置夏提雅阶段模型(runtime);
   runtime.当前大型技能 = undefined;
   runtime.普通机制忙碌到Ms = 0;
   runtime.P3转阶段已处理 = 阶段 === 3;
@@ -219,6 +239,8 @@ function 准备夏提雅测试阶段(this: void, context: 夏提雅测试上下�
 }
 
 function 准备夏提雅P2英灵(this: void, context: 夏提雅测试上下文): void {
+  // 测试命令可重复执行；先清理上一次复刻后已移动到终点的投影。
+  清理英灵战乙女投影(context.运行时);
   准备夏提雅测试阶段(context, 2);
   启动夏提雅英灵战乙女阶段(context.运行时, context.目标单位);
 }
@@ -229,7 +251,8 @@ function 测试夏提雅滴管穿心(this: void, _player: any, context: 夏提�
 }
 function 测试夏提雅滴管穿心P2(this: void, _player: any, context: 夏提雅测试上下文): void {
   准备夏提雅P2英灵(context);
-  释放夏提雅滴管穿心(context.运行时, context.目标单位);
+  const started = 释放夏提雅滴管穿心(context.运行时, context.目标单位);
+  debugLogForce('夏提雅-测试命令', '命令1-2执行', 'started=', started, 'phase=', context.运行时.阶段, 'projection=', context.运行时.英灵战乙女句柄);
 }
 function 测试夏提雅滴管穿心P3(this: void, _player: any, context: 夏提雅测试上下文): void {
   准备夏提雅测试阶段(context, 3);

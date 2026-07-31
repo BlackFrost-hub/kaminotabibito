@@ -3,6 +3,7 @@
 import type { Boss测试技能命令 } from '../../00．Boss测试系统/00．Boss测试类型';
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const globals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 
 const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index") as {
@@ -27,9 +28,10 @@ const { 获取或创建树魔首领上下文, 清理树魔首领上下文 } = re
 const { 注册树魔首领被动效果 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.10．被动效果") as {
   注册树魔首领被动效果: (this: void) => void;
 };
-const { 初始化树魔首领随从特性, 立即补充树魔首领随从 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.03．随从特性") as {
+const { 初始化树魔首领随从特性, 立即补充树魔首领随从, 测试触发树魔巫医疗波 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.03．随从特性") as {
   初始化树魔首领随从特性: (this: void, context: any) => void;
   立即补充树魔首领随从: (this: void, context: any) => number;
+  测试触发树魔巫医疗波: (this: void, context: any) => boolean;
 };
 const { 释放树魔首领扩散冲击波 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.04．扩散冲击波") as {
   释放树魔首领扩散冲击波: (this: void, context: any) => void;
@@ -68,9 +70,12 @@ const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const KillUnit = jass.KillUnit as (unit: any) => void;
+const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const 最近测试Boss: Record<number, any> = {};
 const 最近测试步兵: Record<number, any> = {};
@@ -223,6 +228,49 @@ function on树魔首领技能6测试命令(this: void, _player: any, context: an
   addDelayedCallback(100, on树魔首领技能6延迟检查);
 }
 
+function 设置树魔治疗波测试随从缺血(this: void, context: any, 缺血比例: number): number {
+  const list: any[] | undefined = context?.随从组?.取单位列表();
+  if (list == null) return 0;
+
+  let 设置数量 = 0;
+  for (let i = 0; i < list.length; i++) {
+    const minion = list[i];
+    if (!Boss测试单位存活(minion)) continue;
+    const maxLife = GetUnitStateJapi(minion, UNIT_STATE_MAX_LIFE);
+    if (!(maxLife > 0)) continue;
+    SetUnitState(minion, UNIT_STATE_LIFE, maxLife * (1 - 缺血比例));
+    设置数量++;
+  }
+  return 设置数量;
+}
+
+function on树魔首领技能7测试命令(this: void, _player: any, context: any): void {
+  if (context == null || !Boss测试单位存活(context.Boss单位)) return;
+  const created = 立即补充树魔首领随从(context);
+  const boss = context.Boss单位;
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
+  if (!(maxLife > 0)) return;
+  const testLife = maxLife * 0.7;
+  SetUnitState(boss, UNIT_STATE_LIFE, testLife);
+  const 设置随从数量 = 设置树魔治疗波测试随从缺血(context, 0.5);
+  const started = 测试触发树魔巫医疗波(context);
+  debugLogForce(
+    树魔首领测试调试模块,
+    "命令7",
+    "巫医治疗波测试",
+    "补充随从=",
+    created,
+    "Boss生命=",
+    testLife,
+    "随从缺血比例=",
+    0.5,
+    "设置随从数量=",
+    设置随从数量,
+    "施法启动=",
+    started,
+  );
+}
+
 const 树魔首领测试技能列表: Boss测试技能命令[] = [
   { 序号: 1, 名称: "扩散冲击波", 执行: on树魔首领技能1测试命令 },
   { 序号: 2, 名称: "消耗反击", 执行: on树魔首领技能2测试命令 },
@@ -230,6 +278,7 @@ const 树魔首领测试技能列表: Boss测试技能命令[] = [
   { 序号: 4, 名称: "树魔图腾", 执行: on树魔首领技能4测试命令 },
   { 序号: 5, 名称: "立即补齐随从编制", 执行: on树魔首领技能5测试命令 },
   { 序号: 6, 名称: "杀死所有随从并暂停补员（测试无从暴怒）", 执行: on树魔首领技能6测试命令 },
+  { 序号: 7, 名称: "巫医治疗波测试（Boss70%生命、随从50%缺血、观察每跳80%衰减）", 执行: on树魔首领技能7测试命令 },
 ];
 
 注册Boss测试命令组({

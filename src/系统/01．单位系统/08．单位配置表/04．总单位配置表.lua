@@ -10431,6 +10431,23 @@ ____exports["总单位配置表"] = {
         collision = 32,
         unit = "n063"
     },
+    MYC0 = {
+        _parent = "ewsp",
+        Name = "米亚腐化核心",
+        HP = 99999,
+        def = 10,
+        Art = "ReplaceableTextures\\CommandButtons\\BTNOrbOfCorruption.blp",
+        file = ".mdl",
+        abilList = "",
+        spd = 1,
+        race = "demon",
+        upgrades = "R001,R002",
+        regenHP = 0,
+        collision = 24,
+        nsight = 0,
+        sight = 0,
+        unit = "MYC0"
+    },
     n064 = {
         _parent = "ewsp",
         Name = "王城防御法阵",

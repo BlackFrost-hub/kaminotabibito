@@ -17,28 +17,35 @@ local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
 local _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放赤誓灵卫台词"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
-local getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_3["造成AOE技能伤害"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local addPeriodicCallback = ____require_result_4.addPeriodicCallback
+local removePeriodicCallback = ____require_result_4.removePeriodicCallback
+local getServerTime = ____require_result_4.getServerTime
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
+local EXSetEffectSize = japi.EXSetEffectSize
 local Atan2 = jass.Atan2
 local SquareRoot = jass.SquareRoot
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
 local function _____70B9_5728_5706_5185(x, y, centerX, centerY, radius)
@@ -71,8 +78,18 @@ local function _____7ED3_7B97_8DF5_8E0F_4F24_5BB3(context, x, y, label)
     end
     local cfg = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["断誓践踏"]
     local impact = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["断誓践踏"]["践踏落地特效路径"], x, y)
+    if impact ~= nil and impact ~= 0 and EXSetEffectSize ~= nil then
+        EXSetEffectSize(impact, 1.5)
+    end
     if impact ~= nil and impact ~= 0 then
         YDWETimerDestroyEffectSafe(0.8, impact)
+    end
+    local thunder = AddSpecialEffect("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl", x, y)
+    if thunder ~= nil and thunder ~= 0 and EXSetEffectSize ~= nil then
+        EXSetEffectSize(thunder, 2)
+    end
+    if thunder ~= nil and thunder ~= 0 then
+        YDWETimerDestroyEffectSafe(0.8, thunder)
     end
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     do
@@ -87,7 +104,7 @@ local function _____7ED3_7B97_8DF5_8E0F_4F24_5BB3(context, x, y, label)
                     y,
                     cfg["落点半径"]
                 ) then
-                    goto __continue10
+                    goto __continue13
                 end
                 local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
                 _____9020_6210AOE_6280_80FD_4F24_5BB3({
@@ -103,7 +120,7 @@ local function _____7ED3_7B97_8DF5_8E0F_4F24_5BB3(context, x, y, label)
                     ["标签"] = label
                 })
             end
-            ::__continue10::
+            ::__continue13::
             i = i + 1
         end
     end
@@ -120,27 +137,45 @@ ____exports["尝试以断誓践踏破壳当前净化节点"] = function(context,
             do
                 local node = nodes[i + 1]
                 if node["序号"] ~= context["当前净化节点序号"] or node["阶段"] ~= "破壳" then
-                    goto __continue15
+                    goto __continue18
                 end
                 local now = getServerTime()
                 if now < node["重试允许Ms"] then
                     return false
                 end
-                if not _____70B9_5728_5706_5185(
+                local dx = landingX - node.X
+                local dy = landingY - node.Y
+                local distance2 = dx * dx + dy * dy
+                local radius = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["节点判定半径"]
+                local hit = distance2 <= radius * radius
+                debugLogForce(
+                    "祖地双灵卫-7-3节点判定",
+                    "落点",
                     landingX,
                     landingY,
+                    "节点",
                     node.X,
                     node.Y,
-                    _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["节点判定半径"]
-                ) then
+                    "距离平方",
+                    distance2,
+                    "半径平方",
+                    radius * radius,
+                    "命中",
+                    hit
+                )
+                if not hit then
                     return false
+                end
+                local breakEffect = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["双钥净化"]["节点破壳特效路径"], node.X, node.Y)
+                if breakEffect ~= nil and breakEffect ~= 0 then
+                    YDWETimerDestroyEffectSafe(0.8, breakEffect)
                 end
                 node["阶段"] = "校准"
                 node["校准截止Ms"] = now + _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["校准阶段窗口秒"] * 1000
                 node["重试允许Ms"] = 0
                 return true
             end
-            ::__continue15::
+            ::__continue18::
             i = i + 1
         end
     end
@@ -162,6 +197,9 @@ local function _____5C1D_8BD5_7531_8A93_76FE_538B_5236_88C2_8A93_6218_8EAF(conte
     local cfg = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["断誓践踏"]
     _____5F00_59CB_786C_76F4(boss, cfg["压制硬直秒"])
     local suppress = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["断誓践踏"]["镇魂压制特效路径"], landingX, landingY)
+    if suppress ~= nil and suppress ~= 0 and EXSetEffectSize ~= nil then
+        EXSetEffectSize(suppress, 2)
+    end
     if suppress ~= nil and suppress ~= 0 then
         YDWETimerDestroyEffectSafe(cfg["压制硬直秒"], suppress)
     end
@@ -182,13 +220,13 @@ ____exports["释放断誓践踏"] = function(context, target)
     _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD(boss, isBreakingNode and "双钥净化破壳" or "断誓践踏")
     local targetX = GetUnitX(target)
     local targetY = GetUnitY(target)
-    local ____temp_5
+    local ____temp_6
     if context["阶段"] == "P2侵蚀失衡" and context["首次变异守卫"] == "赤誓灵卫" then
-        ____temp_5 = context["誓盾"]
+        ____temp_6 = context["誓盾"]
     else
-        ____temp_5 = nil
+        ____temp_6 = nil
     end
-    local activeShield = ____temp_5
+    local activeShield = ____temp_6
     local firstTargetX = activeShield ~= nil and getServerTime() < activeShield["到期Ms"] and activeShield.X or targetX
     local firstTargetY = activeShield ~= nil and getServerTime() < activeShield["到期Ms"] and activeShield.Y or targetY
     local first = _____8BA1_7B97_8E0F_6B65_843D_70B9(
@@ -249,13 +287,60 @@ ____exports["释放断誓践踏"] = function(context, target)
             end
             _____7ED3_7B97_8DF5_8E0F_4F24_5BB3(context, second.X, second.Y, "祖地双灵卫·断誓践踏二踏")
             local soulCrack = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["断誓践踏"]["短时魂裂特效路径"], second.X, second.Y)
+            if soulCrack ~= nil and soulCrack ~= 0 and EXSetEffectSize ~= nil then
+                EXSetEffectSize(soulCrack, 1.5)
+            end
             if soulCrack ~= nil and soulCrack ~= 0 then
                 YDWETimerDestroyEffectSafe(cfg["魂裂持续秒"], soulCrack)
             end
+            local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+            local ticks = 0
+            local crackTimer
+            crackTimer = addPeriodicCallback(
+                500,
+                function()
+                    ticks = ticks + 1
+                    do
+                        local i = 0
+                        while i < #heroes do
+                            do
+                                local hit = heroes[i + 1]
+                                if not _____5355_4F4D_6709_6548(hit) or not _____70B9_5728_5706_5185(
+                                    GetUnitX(hit),
+                                    GetUnitY(hit),
+                                    second.X,
+                                    second.Y,
+                                    cfg["落点半径"]
+                                ) then
+                                    goto __continue39
+                                end
+                                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = 0.08})
+                                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                                    ["来源"] = boss,
+                                    ["目标"] = hit,
+                                    ["伤害"] = damage,
+                                    attack = false,
+                                    ranged = true,
+                                    attackType = ATTACK_TYPE_NORMAL,
+                                    ["伤害类型"] = DAMAGE_TYPE_PLANT,
+                                    weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
+                                    ["来源类型"] = "Boss技能",
+                                    ["标签"] = "祖地双灵卫·断誓践踏魂裂"
+                                })
+                            end
+                            ::__continue39::
+                            i = i + 1
+                        end
+                    end
+                    if ticks >= 4 then
+                        removePeriodicCallback(crackTimer)
+                    end
+                end
+            )
         end
     )
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "祖地双灵卫-断誓践踏第二步", delayedId)
+    local ____self_7 = context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "祖地双灵卫-断誓践踏第二步", delayedId)
     return true
 end
 ____exports["断誓践踏技能状态"] = {

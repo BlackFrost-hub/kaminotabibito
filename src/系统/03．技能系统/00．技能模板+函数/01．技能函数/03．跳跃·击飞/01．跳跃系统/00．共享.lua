@@ -1,6 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
 local X_GAFC = ____require_result_0.X_GAFC
@@ -24,6 +25,7 @@ local UnitAddAbility = jass.UnitAddAbility
 local UnitRemoveAbility = jass.UnitRemoveAbility
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
+local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 local GetRandomReal = jass.GetRandomReal
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -156,6 +158,7 @@ ____exports["播放跳跃特效"] = function(_____5B9E_4F8B)
         GetUnitY(_____5B9E_4F8B["单位"])
     )
     if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
+        EXEffectMatRotateZ(_____7279_6548, _____5B9E_4F8B["角度"])
         DestroyEffect(_____7279_6548)
     end
 end

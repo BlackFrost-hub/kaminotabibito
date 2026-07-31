@@ -174,7 +174,7 @@ local ICON_W = 0.02
 local ICON_H = 16 / 600
 local ICON_GAP = 0.0005
 local STACK_BADGE_TEX = "UI\\Buff\\buff_stack_badge.tga"
-local STACK_BADGE_W = 0.0072
+local STACK_BADGE_W = 0.012
 local STACK_BADGE_H = 0.0105
 local STACK_BADGE_FONT = "Fonts\\dfst-m3u.ttf"
 local STACK_BADGE_FONT_SIZE = 0.008
@@ -356,7 +356,7 @@ local function createOneSlot(index, parent)
             x = 0,
             y = stackBadge and stackBadge ~= 0 and 0 or -0.006
         },
-        {width = STACK_BADGE_W * 0.72, height = STACK_BADGE_H * 0.72}
+        {width = STACK_BADGE_W * 0.86, height = STACK_BADGE_H * 0.72}
     ) or 0
     if stackText and stackText ~= 0 then
         japi.DzFrameSetTextAlignment(stackText, -1)

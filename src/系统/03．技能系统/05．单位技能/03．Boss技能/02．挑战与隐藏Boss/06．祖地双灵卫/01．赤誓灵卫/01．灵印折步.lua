@@ -30,14 +30,17 @@ local addDelayedCallback = ____require_result_3.addDelayedCallback
 local getServerTime = ____require_result_3.getServerTime
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_5["设置特效缩放"]
+local ____require_result_6 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_6.CosBJ
+local SinBJ = ____require_result_6.SinBJ
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
 local Atan2 = jass.Atan2
-local CosBJ = jass.CosBJ
-local SinBJ = jass.SinBJ
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
@@ -54,8 +57,8 @@ end
 local function _____6E05_9664_65E7_9547_9B42_5370(context)
     local oldSeal = context["镇魂印"]
     if (oldSeal and oldSeal["区域实例"]) ~= nil then
-        local ____self_7 = oldSeal["区域实例"]
-        ____self_7["销毁"](____self_7)
+        local ____self_9 = oldSeal["区域实例"]
+        ____self_9["销毁"](____self_9)
     end
     context["镇魂印"] = nil
 end
@@ -95,7 +98,8 @@ ____exports["创建赤誓镇魂印"] = function(context, x, y)
         ["影响目标"] = "敌方",
         ["所有者"] = boss,
         ["模型路径"] = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["灵印折步"]["镇魂印地面特效路径"],
-        ["提示圈"] = {["类型"] = "渐变圆形", ["半径"] = cfg["镇魂印半径"], ["持续时间"] = cfg["镇魂印持续秒"], ["来源单位"] = boss},
+        ["特效缩放"] = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["灵印折步"]["镇魂印特效缩放"],
+        ["提示圈"] = false,
         ["on周期"] = function(units)
             if context["战斗已结束"] or context["镇魂印"] ~= seal then
                 area["销毁"](area)
@@ -176,9 +180,9 @@ ____exports["创建赤誓镇魂印"] = function(context, x, y)
             i = i + 1
         end
     end
-    local ____self_8 = context["清理"]
-    ____self_8["登记清理"](
-        ____self_8,
+    local ____self_10 = context["清理"]
+    ____self_10["登记清理"](
+        ____self_10,
         "祖地双灵卫-镇魂印区域",
         function()
             area["销毁"](area)
@@ -229,12 +233,13 @@ ____exports["释放灵印折步"] = function(context, target)
             ____exports["创建赤誓镇魂印"](context, startX, startY)
             local arrival = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["灵印折步"]["出现特效路径"], landing.X, landing.Y)
             if arrival ~= nil and arrival ~= 0 then
+                _____8BBE_7F6E_7279_6548_7F29_653E(arrival, _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["灵印折步"]["出现特效缩放"])
                 YDWETimerDestroyEffectSafe(0.8, arrival)
             end
         end
     )
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "祖地双灵卫-灵印折步落地", delayedId)
+    local ____self_11 = context["清理"]
+    ____self_11["登记延迟回调"](____self_11, "祖地双灵卫-灵印折步落地", delayedId)
     return true
 end
 ____exports["灵印折步技能状态"] = {

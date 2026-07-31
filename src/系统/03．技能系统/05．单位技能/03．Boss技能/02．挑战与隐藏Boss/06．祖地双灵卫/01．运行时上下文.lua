@@ -25,6 +25,9 @@ local _____5F00_59CB_786C_76F4 = ____require_result_2["开始硬直"]
 local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
 local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_3["显示常规技能吟唱条"]
 local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_3["显示大招吟唱条"]
+local ____require_result_4 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_4.CosBJ
+local SinBJ = ____require_result_4.SinBJ
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -93,17 +96,17 @@ local function _____67E5_627E_9644_8FD1_642D_6863(unit, _____5BFB_627E_8D64_8A93
             break
         end
         GroupRemoveUnit(group, candidate)
-        local ____temp_5 = candidate ~= unit
-        if ____temp_5 then
-            local _____5BFB_627E_8D64_8A93_4
+        local ____temp_6 = candidate ~= unit
+        if ____temp_6 then
+            local _____5BFB_627E_8D64_8A93_5
             if _____5BFB_627E_8D64_8A93 then
-                _____5BFB_627E_8D64_8A93_4 = _____662F_8D64_8A93_5355_4F4D(candidate)
+                _____5BFB_627E_8D64_8A93_5 = _____662F_8D64_8A93_5355_4F4D(candidate)
             else
-                _____5BFB_627E_8D64_8A93_4 = _____662F_82CD_5F71_5355_4F4D(candidate)
+                _____5BFB_627E_8D64_8A93_5 = _____662F_82CD_5F71_5355_4F4D(candidate)
             end
-            ____temp_5 = _____5BFB_627E_8D64_8A93_4
+            ____temp_6 = _____5BFB_627E_8D64_8A93_5
         end
-        if ____temp_5 then
+        if ____temp_6 then
             result = candidate
             break
         end
@@ -115,8 +118,6 @@ local function _____521B_5EFA_8282_70B9_5217_8868(centerX, centerY)
     local radius = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P3["节点中心偏移半径"]
     local angles = {30, 150, 270}
     local result = {}
-    local CosBJ = jass.CosBJ
-    local SinBJ = jass.SinBJ
     do
         local i = 0
         while i < #angles do
@@ -225,38 +226,38 @@ ____exports["获取或创建祖地双灵卫运行时上下文"] = function(_____
     if existing ~= nil then
         return existing
     end
-    local _____662F_8D64_8A93_5355_4F4D_result_6
+    local _____662F_8D64_8A93_5355_4F4D_result_7
     if _____662F_8D64_8A93_5355_4F4D(_____542F_52A8_5355_4F4D) then
-        _____662F_8D64_8A93_5355_4F4D_result_6 = _____542F_52A8_5355_4F4D
+        _____662F_8D64_8A93_5355_4F4D_result_7 = _____542F_52A8_5355_4F4D
     else
-        _____662F_8D64_8A93_5355_4F4D_result_6 = _____67E5_627E_9644_8FD1_642D_6863(_____542F_52A8_5355_4F4D, true)
+        _____662F_8D64_8A93_5355_4F4D_result_7 = _____67E5_627E_9644_8FD1_642D_6863(_____542F_52A8_5355_4F4D, true)
     end
-    local red = _____662F_8D64_8A93_5355_4F4D_result_6
-    local _____662F_82CD_5F71_5355_4F4D_result_7
+    local red = _____662F_8D64_8A93_5355_4F4D_result_7
+    local _____662F_82CD_5F71_5355_4F4D_result_8
     if _____662F_82CD_5F71_5355_4F4D(_____542F_52A8_5355_4F4D) then
-        _____662F_82CD_5F71_5355_4F4D_result_7 = _____542F_52A8_5355_4F4D
+        _____662F_82CD_5F71_5355_4F4D_result_8 = _____542F_52A8_5355_4F4D
     else
-        _____662F_82CD_5F71_5355_4F4D_result_7 = _____67E5_627E_9644_8FD1_642D_6863(_____542F_52A8_5355_4F4D, false)
+        _____662F_82CD_5F71_5355_4F4D_result_8 = _____67E5_627E_9644_8FD1_642D_6863(_____542F_52A8_5355_4F4D, false)
     end
-    local azure = _____662F_82CD_5F71_5355_4F4D_result_7
+    local azure = _____662F_82CD_5F71_5355_4F4D_result_8
     if red == nil or red == 0 or azure == nil or azure == 0 then
         return nil
     end
-    local ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(_____542F_52A8_5355_4F4D)
-    if ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8 == nil then
-        ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(red)
+    local ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_9 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(_____542F_52A8_5355_4F4D)
+    if ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_9 == nil then
+        ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_9 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(red)
     end
-    local ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8_9 = ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8
-    if ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8_9 == nil then
-        ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8_9 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(azure)
+    local ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_9_10 = ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_9
+    if ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_9_10 == nil then
+        ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_9_10 = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(azure)
     end
-    local battle = ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_8_9
-    local ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_13 = ____exports["创建祖地双灵卫运行时上下文"]
-    local ____opt_result_12
+    local battle = ____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587_result_9_10
+    local ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_14 = ____exports["创建祖地双灵卫运行时上下文"]
+    local ____opt_result_13
     if battle ~= nil then
-        ____opt_result_12 = battle["地点矩形"]
+        ____opt_result_13 = battle["地点矩形"]
     end
-    local context = ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_13(red, azure, ____opt_result_12)
+    local context = ____exports__521B_5EFA_7956_5730_53CC_7075_536B_8FD0_884C_65F6_4E0A_4E0B_6587_14(red, azure, ____opt_result_13)
     _____4E0A_4E0B_6587_5217_8868[#_____4E0A_4E0B_6587_5217_8868 + 1] = context
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(red)] = context
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(azure)] = context
@@ -269,8 +270,8 @@ ____exports["获取或创建祖地双灵卫运行时上下文"] = function(_____
             end
         end
     )
-    local ____self_14 = context["清理"]
-    ____self_14["登记延迟回调"](____self_14, "祖地双灵卫-苍影开场台词", azureOpeningId)
+    local ____self_15 = context["清理"]
+    ____self_15["登记延迟回调"](____self_15, "祖地双灵卫-苍影开场台词", azureOpeningId)
     return context
 end
 ____exports["清理祖地双灵卫运行时上下文"] = function(context)
@@ -281,7 +282,7 @@ ____exports["清理祖地双灵卫运行时上下文"] = function(context)
     context["阶段"] = "已结束"
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(context["赤誓灵卫单位"])] = nil
     _____5355_4F4D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(context["苍影灵卫单位"])] = nil
-    local ____self_15 = context["清理"]
-    ____self_15["清理全部"](____self_15)
+    local ____self_16 = context["清理"]
+    ____self_16["清理全部"](____self_16)
 end
 return ____exports

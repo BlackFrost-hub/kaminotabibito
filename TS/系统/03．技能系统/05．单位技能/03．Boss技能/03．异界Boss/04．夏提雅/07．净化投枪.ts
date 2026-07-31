@@ -13,6 +13,7 @@ import { 创建点名预警执行器 } from '../../../../00．技能模板+函�
 import { 播放夏提雅台词 } from './18．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
+import { 创建二阶贝塞尔XYZ轨迹, 创建原生弹幕 } from '../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
@@ -22,6 +23,7 @@ const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 }
 const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as { 造成AOE技能伤害: (this: void, 参数: any) => boolean };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as { YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void };
+const { 设置特效缩放 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as { 设置特效缩放: (this: void, effect: any, scale: number) => void };
 const jass = require('jass.common') as any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -36,6 +38,75 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const RAD_TO_DEG = 57.29577951308232;
+const { CosBJ, SinBJ, TanBJ } = require('lib.扩展函数.BJ函数.12．数学函数') as {
+  CosBJ: (this: void, degrees: number) => number;
+  SinBJ: (this: void, degrees: number) => number;
+  TanBJ: (this: void, degrees: number) => number;
+};
+
+function 销毁夏提雅净化投枪弹幕(this: void, 弹幕?: any): void {
+  if (弹幕 == null || 弹幕 === 0 || 弹幕.销毁 == null) return;
+  弹幕.销毁('手动销毁');
+}
+
+function 发射夏提雅P3净化投枪(this: void, context: 夏提雅运行时上下文, x: number, y: number, 落下秒: number, tag: string): void {
+  const boss = context.Boss单位;
+  const cfg = 夏提雅数值与表现配置.净化投枪;
+  const 生成角度 = GetRandomReal(0, 360);
+  const 曲线偏移 = GetRandomReal(-cfg.P3投枪曲线偏移最大, cfg.P3投枪曲线偏移最大);
+  const 生成距离 = cfg.P3投枪生成距离;
+  const startX = x + CosBJ(生成角度) * 生成距离;
+  const startY = y + SinBJ(生成角度) * 生成距离;
+  const 控制角度 = 生成角度 + 90;
+  const controlX = (startX + x) * 0.5 + CosBJ(控制角度) * 曲线偏移;
+  const controlY = (startY + y) * 0.5 + SinBJ(控制角度) * 曲线偏移;
+  const controlDX = controlX - startX;
+  const controlDY = controlY - startY;
+  const 控制水平距离 = jass.SquareRoot(controlDX * controlDX + controlDY * controlDY) as number;
+  const 下俯角 = GetRandomReal(cfg.P3投枪下俯角最小, cfg.P3投枪下俯角最大);
+  const startZ = TanBJ(下俯角) * 控制水平距离 * 2;
+  const controlZ = startZ * 0.5;
+  const 初始朝向 = Atan2(controlY - startY, controlX - startX) * RAD_TO_DEG;
+  const 弹幕 = 创建原生弹幕({
+    所有者: boss,
+    载体模式: '单位',
+    X: startX,
+    Y: startY,
+    方向角: 初始朝向,
+    速度: 1,
+    生命周期: 落下秒,
+    影响目标: '敌方',
+    命中半径: 0,
+    不可阻挡: true,
+    禁用碰撞: true,
+    显式改向后锁定方向: true,
+    飞行高度: startZ,
+    附加特效1: {
+      模型: 夏提雅数值与表现配置.表现资源.净化投枪特效路径,
+      跟随主弹幕参数: true,
+      跟随轨迹俯仰: true,
+      动画索引: 0,
+      缩放: cfg.特效缩放,
+    },
+    轨迹采样器: 创建二阶贝塞尔XYZ轨迹(
+      startX,
+      startY,
+      startZ,
+      controlX,
+      controlY,
+      controlZ,
+      x,
+      y,
+      0,
+    ),
+    on到达目标点: function 夏提雅P3净化投枪到达目标点(this: void): void {
+      if (!单位有效(boss) || context.挑战已结束 || context.阶段 !== 'P3真祖血宴') return;
+      结算净化投枪落点(context, x, y, tag);
+    },
+  });
+  context.清理.登记清理('夏提雅-' + tag + '-弹幕', 销毁夏提雅净化投枪弹幕, 弹幕);
+}
+
 function 尝试安排净化投枪英灵复刻(this: void, context: 夏提雅运行时上下文, x: number, y: number): void {
   const projection = 获取夏提雅英灵投影(context);
   if (!单位有效(projection)) return;
@@ -48,9 +119,13 @@ function 尝试安排净化投枪英灵复刻(this: void, context: 夏提雅运�
     Y: GetUnitY(projection),
     朝向: facing,
     延迟秒: delay,
+    复刻动画编号: cfg.动画编号,
     复刻结算: function 夏提雅净化投枪英灵复刻(this: void): void {
       const effect = AddSpecialEffect(夏提雅数值与表现配置.表现资源.净化投枪特效路径, x, y);
-      if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(cfg.特效持续秒, effect);
+      if (effect != null && effect !== 0) {
+        设置特效缩放(effect, cfg.特效缩放);
+        YDWETimerDestroyEffectSafe(cfg.特效持续秒, effect);
+      }
       净化落点内夏提雅鲜血印记(context, x, y, cfg.伤害半径);
       const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
       for (let i = 0; i < heroes.length; i++) {
@@ -73,7 +148,10 @@ function 结算净化投枪落点(this: void, context: 夏提雅运行时上下�
   const cfg = 夏提雅数值与表现配置.净化投枪;
   播放Boss坐标音效(夏提雅数值与表现配置.音效.净化投枪, x, y, 夏提雅数值与表现配置.音效默认裁断距离);
   const effect = AddSpecialEffect(夏提雅数值与表现配置.表现资源.净化投枪特效路径, x, y);
-  if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(cfg.特效持续秒, effect);
+  if (effect != null && effect !== 0) {
+    设置特效缩放(effect, cfg.特效缩放);
+    YDWETimerDestroyEffectSafe(cfg.特效持续秒, effect);
+  }
   净化落点内夏提雅鲜血印记(context, x, y, cfg.伤害半径);
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
@@ -104,32 +182,25 @@ export function 释放夏提雅净化投枪(this: void, context: 夏提雅运行
   重置夏提雅猎血连击(context);
   context.普通机制忙碌到Ms = getServerTime() + (totalDuration + 0.4) * 1000;
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: totalDuration, 恢复动画编号: 0 });
-  创建点名预警执行器({
-    清理: context.清理,
-    名称: '夏提雅-净化投枪',
-    锁定X: x,
-    锁定Y: y,
-    延迟秒: cfg.预警秒,
-    提示圈: { 类型: '敌方圆形', 半径: cfg.伤害半径, 持续时间: cfg.预警秒, 来源单位: boss },
-    on结算: function 夏提雅净化投枪落下(this: void, result): void {
-      if (!单位有效(boss) || context.挑战已结束) return;
-      结算净化投枪落点(context, result.锁定X, result.锁定Y, '夏提雅·净化投枪');
-      if (!isP3) 尝试安排净化投枪英灵复刻(context, result.锁定X, result.锁定Y);
-    },
-  });
-  if (isP3) {
+  if (!isP3) {
     创建点名预警执行器({
       清理: context.清理,
-      名称: '夏提雅-净化投枪-P3第二枚',
-      锁定X: secondX,
-      锁定Y: secondY,
-      延迟秒: totalDuration,
-      提示圈: { 类型: '敌方圆形', 半径: cfg.伤害半径, 持续时间: totalDuration, 来源单位: boss },
-      on结算: function 夏提雅净化投枪第二枚落下(this: void, result): void {
-        if (!单位有效(boss) || context.挑战已结束 || context.阶段 !== 'P3真祖血宴') return;
-        结算净化投枪落点(context, result.锁定X, result.锁定Y, '夏提雅·净化投枪-P3第二枚');
+      名称: '夏提雅-净化投枪',
+      锁定X: x,
+      锁定Y: y,
+      延迟秒: cfg.预警秒,
+      提示圈: { 类型: '敌方圆形', 半径: cfg.伤害半径, 持续时间: cfg.预警秒, 来源单位: boss },
+      on结算: function 夏提雅净化投枪落下(this: void, result): void {
+        if (!单位有效(boss) || context.挑战已结束) return;
+        结算净化投枪落点(context, result.锁定X, result.锁定Y, '夏提雅·净化投枪');
+        尝试安排净化投枪英灵复刻(context, result.锁定X, result.锁定Y);
       },
     });
+  } else {
+    创建技能提示圈({ 类型: '敌方圆形', X: x, Y: y, 半径: cfg.伤害半径, 持续时间: cfg.预警秒, 来源单位: boss });
+    创建技能提示圈({ 类型: '敌方圆形', X: secondX, Y: secondY, 半径: cfg.伤害半径, 持续时间: totalDuration, 来源单位: boss });
+    发射夏提雅P3净化投枪(context, x, y, cfg.预警秒, '净化投枪-P3第一枚');
+    发射夏提雅P3净化投枪(context, secondX, secondY, totalDuration, '净化投枪-P3第二枚');
   }
   return true;
 }

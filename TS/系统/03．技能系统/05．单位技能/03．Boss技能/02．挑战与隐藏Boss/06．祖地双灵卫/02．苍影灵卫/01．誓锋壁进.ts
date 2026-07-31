@@ -8,7 +8,7 @@ import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 两点角度, 极坐标X, 极坐标Y, 距离XY, 限制数值, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 获取条形区域单位 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/矩形区域';
-import { 设置特效XYZ轴旋转 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
+import { 创建点特效, 设置特效XYZ轴旋转 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 开始冲锋 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统') as { 开始冲锋: (this: void, unit: any, params: any) => number };
@@ -19,6 +19,8 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
 };
 
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
+const DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha as (effect: any, alpha: number) => void;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
@@ -70,6 +72,9 @@ function 创建终点誓盾(this: void, context: 祖地双灵卫运行时上下�
   if (effect != null && effect !== 0) 设置特效XYZ轴旋转(effect, { Z轴角度: facing });
   const shield = { X: x, Y: y, 朝向: facing, 到期Ms: getServerTime() + cfg.誓盾持续秒 * 1000, 特效: effect };
   context.誓盾 = shield;
+  addDelayedCallback(500, function 誓盾表现延迟隐藏(this: void): void {
+    if (shield.特效 != null && shield.特效 !== 0) DzSetEffectVertexAlpha(shield.特效, 0);
+  });
   context.清理.登记清理('祖地双灵卫-誓盾特效', function 清理誓盾特效(this: void): void {
     if (shield.特效 != null && shield.特效 !== 0) {
       DestroyEffect(shield.特效);
@@ -115,8 +120,14 @@ export function 释放誓锋壁进(this: void, context: 祖地双灵卫运行时
         const endX = GetUnitX(boss);
         const endY = GetUnitY(boss);
         结算壁进路径(context, boss, startX, startY, endX, endY);
-        const impact = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.誓锋壁进.冲锋命中特效路径, endX, endY);
-        if (impact != null && impact !== 0) DestroyEffect(impact);
+        创建点特效({
+          模型路径: 祖地双灵卫数值与表现配置.表现资源.誓锋壁进.冲锋命中特效路径,
+          X: endX,
+          Y: endY,
+          缩放: 5.0,
+          动画索引: 0,
+          持续秒: 0.8,
+        });
         创建终点誓盾(context, boss, facing);
       },
     });

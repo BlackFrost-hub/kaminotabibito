@@ -26,7 +26,8 @@ const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => bo
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const DzBindEffect = japi.DzBindEffect as (widget: any, attachPoint: string, effect: any) => void;
 const DzUnbindEffect = japi.DzUnbindEffect as (effect: any) => void;
-const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) => void;
+const EXSetEffectX = (japi as any).EXSetEffectX as ((effect: any, x: number) => void) | undefined;
+const EXSetEffectY = (japi as any).EXSetEffectY as ((effect: any, y: number) => void) | undefined;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const EXEffectMatRotateX = japi.EXEffectMatRotateX as (effect: any, angle: number) => void;
@@ -42,6 +43,12 @@ function 规范化特效模型路径(modelPath: string): string {
   if (modelPath.indexOf("imports\\") === 0) return modelPath.substring(8);
   if (modelPath.indexOf("imports/") === 0) return modelPath.substring(8);
   return modelPath;
+}
+
+function 安全设置特效坐标(this: void, effect: any, x: number, y: number): void {
+  if (effect == null || effect === 0) return;
+  if (EXSetEffectX != null) EXSetEffectX(effect, x);
+  if (EXSetEffectY != null) EXSetEffectY(effect, y);
 }
 
 const 特效销毁检查间隔毫秒 = 10;
@@ -324,7 +331,7 @@ function 取特效顶点颜色(this: void, 参数: 循环点特效参数): numbe
 
 function 销毁循环点特效句柄(this: void, effect: any): void {
   if (effect == null || effect === 0) return;
-  EXSetEffectXY(effect, 0, 0);
+  安全设置特效坐标(effect, 0, 0);
   EXSetEffectSize(effect, 0.00);
   DestroyEffect(effect);
 }
@@ -620,7 +627,7 @@ function 单位可坐标跟随(this: void, unit: any): boolean {
 function 销毁单位坐标跟随特效记录(this: void, key: string, record: any): void {
   const effect = record == null ? null : record.effect;
   if (effect != null && effect !== 0) {
-    EXSetEffectXY(effect, 0, 0);
+    安全设置特效坐标(effect, 0, 0);
     EXSetEffectSize(effect, 0.00);
     DestroyEffect(effect);
   }
@@ -646,7 +653,7 @@ function on单位坐标跟随特效Tick(this: void): void {
     }
     const x = GetUnitX(record.unit);
     const y = GetUnitY(record.unit);
-    EXSetEffectXY(record.effect, x, y);
+    安全设置特效坐标(record.effect, x, y);
     EXSetEffectZ(record.effect, EC_GetPointZ(x, y) + record.height);
   }
   if (单位坐标跟随特效数量 <= 0) {
@@ -673,7 +680,7 @@ export function 创建单位坐标跟随特效(unit: any, modelPath: string, eff
   const y = GetUnitY(unit);
   const effect = EC_CreateEffect(规范化特效模型路径(modelPath), x, y, height, 0, scale, animSpeed ?? 1, -1);
   if (!effect) return null;
-  EXSetEffectXY(effect, x, y);
+  安全设置特效坐标(effect, x, y);
   EXSetEffectZ(effect, EC_GetPointZ(x, y) + height);
   if (动画索引 != null && DzSetEffectAnimation != null) {
     DzSetEffectAnimation(effect, 动画索引, 0);

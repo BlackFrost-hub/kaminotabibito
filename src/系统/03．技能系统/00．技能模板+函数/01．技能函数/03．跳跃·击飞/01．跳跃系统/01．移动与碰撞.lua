@@ -11,7 +11,6 @@ local _____8DF3_8DC3_6620_5C04 = ____00_FF0E_5171_4EAB["跳跃映射"]
 local _____5728_53EF_73A9_533A_57DF_5185 = ____00_FF0E_5171_4EAB["在可玩区域内"]
 local _____8BA1_7B97_5750_6807_8DDD_79BB = ____00_FF0E_5171_4EAB["计算坐标距离"]
 local _____8BA1_7B97_629B_7269_7EBF_9AD8_5EA6 = ____00_FF0E_5171_4EAB["计算抛物线高度"]
-local _____64AD_653E_8DF3_8DC3_7279_6548 = ____00_FF0E_5171_4EAB["播放跳跃特效"]
 local GetUnitX = ____00_FF0E_5171_4EAB.GetUnitX
 local GetUnitY = ____00_FF0E_5171_4EAB.GetUnitY
 local GetUnitFlyHeight = ____00_FF0E_5171_4EAB.GetUnitFlyHeight
@@ -60,7 +59,6 @@ local function _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____4F4D_79FB
     return {["停止"] = false}
 end
 ____exports["推进一步"] = function(_____5B9E_4F8B)
-    local _____8D77_59CB_5DF2_79FB_52A8 = _____5B9E_4F8B["已移动"]
     local _____5269_4F59_8DDD_79BB = _____5B9E_4F8B["总距离"] - _____5B9E_4F8B["已移动"]
     if _____5269_4F59_8DDD_79BB <= 0 then
         return {["停止"] = true, ["原因"] = "完成"}
@@ -77,18 +75,12 @@ ____exports["推进一步"] = function(_____5B9E_4F8B)
         local _____5B50_6B65_957F = _____5269_4F59_6B65_957F > MAX_SUB_STEP and MAX_SUB_STEP or _____5269_4F59_6B65_957F
         local _____7ED3_679C = _____5C1D_8BD5_79FB_52A8_4E00_6B65(_____5B9E_4F8B, _____5B50_6B65_957F)
         if _____7ED3_679C["停止"] then
-            if _____5B9E_4F8B["已移动"] > _____8D77_59CB_5DF2_79FB_52A8 then
-                _____64AD_653E_8DF3_8DC3_7279_6548(_____5B9E_4F8B)
-            end
             return _____7ED3_679C
         end
         if _____8DF3_8DC3_6620_5C04[_____5B9E_4F8B.id] ~= _____5B9E_4F8B then
             return {["停止"] = true, ["原因"] = "中断"}
         end
         _____5269_4F59_6B65_957F = _____5269_4F59_6B65_957F - _____5B50_6B65_957F
-    end
-    if _____5B9E_4F8B["已移动"] > _____8D77_59CB_5DF2_79FB_52A8 then
-        _____64AD_653E_8DF3_8DC3_7279_6548(_____5B9E_4F8B)
     end
     return {["停止"] = false}
 end

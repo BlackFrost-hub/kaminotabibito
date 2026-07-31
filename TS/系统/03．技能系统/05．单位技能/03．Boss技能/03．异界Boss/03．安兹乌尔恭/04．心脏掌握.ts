@@ -147,7 +147,7 @@ function 广播心脏掌握点名警告(this: void, target: any): void {
   QuestMessageBJ(
     GetPlayersAll(),
     Quest消息警告,
-    `|cffff2020『任务警告』：|r|cffffcc00${playerName}|r 被安兹乌尔恭的|cffff2020『心脏掌握』|r点名！请在 ${config.心脏掌握倒计时秒} 秒内进入目标 ${config.心脏掌握救援半径} 范围协助破解，否则目标将被处决。`,
+    `|cffff2020『任务警告』：|r|cffffcc00${playerName}|r 被安兹乌尔恭的|cffff2020『心脏掌握』|r点名！请在 ${config.心脏掌握倒计时秒} 秒内让至少1名队友进入目标 ${config.心脏掌握救援半径} 码范围协助破解，否则目标将被处决。（被点名者停留原地等待队友靠近。）`,
   );
 }
 
@@ -236,7 +236,7 @@ export function 释放安兹心脏掌握(this: void, context: 安兹运行时上
       总时长: config.心脏掌握施法硬直秒,
       颜色ID: 4,
       标题文本: '心脏掌握',
-      提示文本: '靠近被点名队友，共同破解死亡处决',
+      提示文本: '12秒内让至少1名队友进入320码范围，破解死亡处决',
     },
     on生效: function 心脏掌握生效(this: void): void {
       创建心脏掌握倒计时(context, target);

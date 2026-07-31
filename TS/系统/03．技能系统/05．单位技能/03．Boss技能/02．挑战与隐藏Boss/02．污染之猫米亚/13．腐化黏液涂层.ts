@@ -31,11 +31,45 @@ const jass = require("jass.common") as any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (player: any, x: number, y: number, duration: number, message: string) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 const 腐化黏液上下文表: Record<number, 米亚运行时上下文 | undefined> = {};
 let 米亚腐化黏液涂层已注册 = false;
+
+function 提示腐化黏液近战反噬(this: void, source: any, currentStack: number): void {
+  const owner = GetOwningPlayer(source);
+  if (owner == null || owner === 0) return;
+  DisplayTimedTextToPlayer(
+    owner,
+    0,
+    0,
+    4,
+    "|cffff4040腐化黏液反噬：|r你近战攻击米亚时被其黏液涂层污染，腐化感染+1（当前" + currentStack + "层）。",
+  );
+}
+
+function 播放腐化黏液全场爆发表现(this: void, x: number, y: number): void {
+  const config = 米亚单位技能配置.特效;
+  创建点特效({
+    模型路径: config.腐化黏液爆发地面,
+    X: x,
+    Y: y,
+    Z: 0,
+    缩放: 4.0,
+    持续秒: 1,
+  });
+  创建点特效({
+    模型路径: config.腐化黏液爆发放射,
+    X: x,
+    Y: y,
+    Z: 0,
+    缩放: 4.0,
+    持续秒: 1,
+  });
+}
 
 function 取腐化黏液上下文(this: void, boss: any): 米亚运行时上下文 | undefined {
   const id = GetHandleId(boss) || 0;
@@ -71,15 +105,18 @@ function 处理腐化黏液近战反噬(this: void, target: any, _damage: number
   if (context == null || context.阶段 !== 3) return;
 
   const config = 米亚技能数值配置.腐化黏液涂层;
-  if (距离平方(target, source) > 250 * 250) return;
-
   const sourceId = GetHandleId(source) || 0;
+  const distanceSquared = 距离平方(target, source);
+  if (distanceSquared > 250 * 250) return;
+
   if (sourceId === 0) return;
   const nowMs = getServerTime();
   const 冷却表 = context.腐化黏液近战冷却表;
-  if (冷却表[sourceId] != null && nowMs - (冷却表[sourceId] ?? 0) < config.近战叠层冷却Ms) return;
+  const lastApplyMs = 冷却表[sourceId];
+  if (lastApplyMs != null && nowMs - lastApplyMs < config.近战叠层冷却Ms) return;
   冷却表[sourceId] = nowMs;
-  添加米亚腐化感染(context, source, 1, "腐化黏液涂层近战反噬");
+  const newStack = 添加米亚腐化感染(context, source, 1, "腐化黏液涂层近战反噬");
+  提示腐化黏液近战反噬(source, newStack);
   播放米亚台词(context.Boss单位, "腐化黏液涂层", 1);
 }
 
@@ -87,31 +124,39 @@ function 处理腐化黏液Boss受伤提高(this: void, damageContext: any): num
   const context = 取腐化黏液上下文(damageContext.target);
   if (context == null || context.阶段 !== 3) return damageContext.currentDamage;
   const bonus = 米亚技能数值配置.腐化黏液涂层.Boss受伤提高;
+  const originalDamage = damageContext.currentDamage;
+  const modifiedDamage = originalDamage * (1 + bonus);
   const nowMs = getServerTime();
   if (nowMs - context.腐化黏液上次受伤提示Ms >= 12000) {
     context.腐化黏液上次受伤提示Ms = nowMs;
     播放米亚台词(context.Boss单位, "腐化黏液涂层", 3);
   }
-  return damageContext.currentDamage * (1 + bonus);
+  return modifiedDamage;
 }
 
 export function 释放米亚全场腐化黏液(this: void, context: 米亚运行时上下文): boolean {
   const boss = context.Boss单位;
-  if (!单位有效(boss) || context.阶段 !== 3) return false;
+  const bossValid = 单位有效(boss);
+  if (!bossValid || context.阶段 !== 3) return false;
   播放米亚台词(boss, "腐化黏液涂层", 2);
+  const effectPath = "war3mapImported\\archimonde_portal_state.mdx";
+  const effectX = GetUnitX(boss);
+  const effectY = GetUnitY(boss);
   创建点特效({
-    模型路径: "war3mapImported\\archimonde_portal_state.mdx",
-    X: GetUnitX(boss),
-    Y: GetUnitY(boss),
+    模型路径: effectPath,
+    X: effectX,
+    Y: effectY,
     Z: 80,
     缩放: 1.2,
     持续秒: 1,
   });
+  播放腐化黏液全场爆发表现(effectX, effectY);
 
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
-    if (!单位有效(hero)) continue;
+    const heroValid = 单位有效(hero);
+    if (!heroValid) continue;
     添加米亚腐化感染(context, hero, 1, "腐化黏液涂层全场甩黏液");
   }
   return true;
@@ -125,6 +170,7 @@ export function 注册米亚腐化黏液涂层(this: void): void {
 }
 
 export function 刷新米亚腐化黏液涂层被动状态(this: void, context: 米亚运行时上下文): void {
+  if (context == null) return;
   登记腐化黏液上下文(context);
   if (context.阶段 !== 3) return;
   刷新腐化黏液Buff(context);

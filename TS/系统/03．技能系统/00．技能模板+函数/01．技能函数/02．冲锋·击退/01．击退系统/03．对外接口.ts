@@ -76,15 +76,18 @@ export function 开始冲锋(单位: any, 参数: 冲锋参数): number {
   const 原开始回调 = 参数.开始回调;
   const 原结束回调 = 参数.结束回调;
   const 行走动画倍率 = 计算冲锋行走动画倍率(参数.持续时间);
+  const 有显式动作 = 参数.动画序号 != null || (参数.动画名 != null && 参数.动画名 !== "");
   const 距离 = 按英雄技能距离修正上下文修正距离(参数.距离, 参数.英雄技能距离修正, "自身位移距离");
 
   function on主动冲锋开始(this: void, 移动单位: any, 位移ID: number): void {
-    if (移动单位 != null && 移动单位 !== 0 && typeof SetUnitAnimation === "function") {
-      SetUnitAnimation(移动单位, "walk");
-    } else {
-      零秒后播放单位动作(移动单位, "walk");
+    if (!有显式动作) {
+      if (移动单位 != null && 移动单位 !== 0 && typeof SetUnitAnimation === "function") {
+        SetUnitAnimation(移动单位, "walk");
+      } else {
+        零秒后播放单位动作(移动单位, "walk");
+      }
+      if (typeof SetUnitTimeScale === "function") SetUnitTimeScale(移动单位, 行走动画倍率);
     }
-    if (typeof SetUnitTimeScale === "function") SetUnitTimeScale(移动单位, 行走动画倍率);
     if (原开始回调 != null) 原开始回调(移动单位, 位移ID);
   }
 

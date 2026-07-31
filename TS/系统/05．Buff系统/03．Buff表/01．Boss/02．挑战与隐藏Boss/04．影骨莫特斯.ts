@@ -11,6 +11,7 @@ export const 影骨莫特斯BuffID = {
   骸骨符咒: "BSB6",
   盗贼遗产: "BSB7",
   阴影陷阱眩晕: "BSB8",
+  P3强化: "BSB9",
 } as const;
 
 export type 影骨莫特斯BuffID类型 = typeof 影骨莫特斯BuffID[keyof typeof 影骨莫特斯BuffID];
@@ -29,7 +30,7 @@ export const 影骨莫特斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 82,
     canPurge: false,
-    tooltip: "影骨·莫特斯完成阴影穿梭后获得背刺准备。下一次纯普通攻击强化为背刺；玩家正面朝向莫特斯时最终伤害减半。",
+    tooltip: "持续12秒或触发1次后消失。下一次纯普通攻击造成原伤害2.5倍；玩家正面朝向莫特斯时，背刺最终伤害降低50%。",
   },
   [影骨莫特斯BuffID.暗影禁锢]: {
     buffID: 影骨莫特斯BuffID.暗影禁锢,
@@ -45,7 +46,7 @@ export const 影骨莫特斯Buff表: Record<string, BuffData> = {
     priority: 84,
     canPurge: false,
     禁止位移: true,
-    tooltip: "被暗影法阵禁锢，无法移动或施法。队友攻击并摧毁法阵后，剩余禁锢时间缩短到1秒。",
+    tooltip: "暗影法阵0.9秒预警后生效，半径320码；命中后禁锢4秒，无法移动或施法。队友摧毁法阵后，剩余禁锢时间缩短为1秒。",
   },
   [影骨莫特斯BuffID.幽灵形态]: {
     buffID: 影骨莫特斯BuffID.幽灵形态,
@@ -60,7 +61,7 @@ export const 影骨莫特斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 88,
     canPurge: false,
-    tooltip: "幽影爆发期间，莫特斯进入幽灵形态：受到的物理伤害降低40%，受到的魔法伤害提高40%。",
+    tooltip: "持续20秒。莫特斯受到物理伤害时只承受60%（降低40%），受到魔法伤害时承受140%（提高40%）。",
   },
   [影骨莫特斯BuffID.幽影视野压制]: {
     buffID: 影骨莫特斯BuffID.幽影视野压制,
@@ -75,7 +76,7 @@ export const 影骨莫特斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 80,
     canPurge: false,
-    tooltip: "幽影爆发期间视野大幅降低。Boss死亡、战斗重置或幽影爆发结束时必须恢复旧视野。",
+    tooltip: "持续20秒，所有玩家视野减少1600；幽影爆发结束、莫特斯死亡或战斗重置时恢复。",
   },
   [影骨莫特斯BuffID.暗影强化]: {
     buffID: 影骨莫特斯BuffID.暗影强化,
@@ -90,7 +91,7 @@ export const 影骨莫特斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 72,
     canPurge: false,
-    tooltip: "幽影爆发期间，莫特斯召唤物攻击转为暗属性魔法伤害，并参与召唤物重组计数。",
+    tooltip: "幽影爆发期间持续20秒；新召唤的骷髅普通攻击转为暗属性伤害，幽影爆发结束后不再转换。",
   },
   [影骨莫特斯BuffID.骸骨符咒]: {
     buffID: 影骨莫特斯BuffID.骸骨符咒,
@@ -105,7 +106,7 @@ export const 影骨莫特斯Buff表: Record<string, BuffData> = {
     dispelLevel: 1,
     priority: 62,
     canPurge: true,
-    tooltip: "拾取莫特斯召唤物掉落的符咒后，短时间提高护甲和魔法抗性。",
+    tooltip: "拾取莫特斯召唤物掉落的符咒后，获得+15护甲和+20%魔法抗性，持续12秒。",
   },
   [影骨莫特斯BuffID.盗贼遗产]: {
     buffID: 影骨莫特斯BuffID.盗贼遗产,
@@ -120,7 +121,7 @@ export const 影骨莫特斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 78,
     canPurge: false,
-    tooltip: "玩家每开启1个盗贼遗产宝箱，莫特斯永久提高3%基础攻击力，最多按场上4个宝箱叠加。",
+    tooltip: "每层对应1个已开启宝箱；每开1个宝箱，按开启前莫特斯当前攻击力的3%追加为固定攻击力，永久保留，最多4层。无其他攻击力变化时，连续开启4个相对初始当前攻击力累计提高12.550881%。",
   },
   [影骨莫特斯BuffID.阴影陷阱眩晕]: {
     buffID: 影骨莫特斯BuffID.阴影陷阱眩晕,
@@ -135,7 +136,22 @@ export const 影骨莫特斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 74,
     canPurge: false,
-    tooltip: "盗贼遗产宝箱触发陷阱后受到不致死生命损失，并被眩晕1.5秒。",
+    tooltip: "触发盗贼宝箱10%陷阱时，开启者当前生命保留30%（损失当前生命70%，不致死），并眩晕1.5秒。",
+  },
+  [影骨莫特斯BuffID.P3强化]: {
+    buffID: 影骨莫特斯BuffID.P3强化,
+    buffName: "阴影主宰",
+    icon: "BuffIcon\\Boss\\ShadowboneMortes\\shadow_summon_empower.blp",
+    effect: "",
+    type: "Buff:boss:phase",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 90,
+    canPurge: false,
+    tooltip: "P3期间持续生效：进入P3时按当时莫特斯当前攻击力的30%追加固定攻击力（只应用1次）；幽影爆发最大冷却改为原始冷却的65%，基础40秒时为26秒。",
   },
 };
 

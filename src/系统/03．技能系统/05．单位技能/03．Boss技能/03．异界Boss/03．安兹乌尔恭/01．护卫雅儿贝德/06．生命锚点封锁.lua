@@ -183,7 +183,11 @@ ____exports["启动雅儿贝德生命锚点封锁"] = function(context, targets,
             _____7ED3_675F_5C01_9501("挑战清理")
         end
     )
-    _____5E7F_64AD_5355_4F4D_63D0_793A(context["安兹单位"], "|cffffcc66雅儿贝德封锁了一座生命锚点：击破暗金屏障后才能激活。|r", 3600)
+    _____5E7F_64AD_5355_4F4D_63D0_793A(
+        context["安兹单位"],
+        ("|cffffcc66雅儿贝德封锁了1座未激活生命锚点，并生成持续" .. tostring(durationSeconds)) .. "秒的暗金屏障：击破屏障后才能激活。（多人模式集火破盾，单人模式持续攻击屏障。）|r",
+        3600
+    )
     return controller
 end
 ____exports["生命锚点封锁技能状态"] = {

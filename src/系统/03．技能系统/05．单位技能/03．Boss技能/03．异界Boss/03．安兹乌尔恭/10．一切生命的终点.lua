@@ -178,7 +178,11 @@ local function _____6388_4E88_5168_961F_751F_547D_5E87_62A4(instance)
             i = i + 1
         end
     end
-    _____5E7F_64AD_5355_4F4D_63D0_793A(instance.context["安兹单位"], "|cffffff99三座生命锚点已经响应：英魂庇护将抵挡女妖哭嚎。|r", 3600)
+    _____5E7F_64AD_5355_4F4D_63D0_793A(
+        instance.context["安兹单位"],
+        ((((("|cffffff99" .. tostring(cfg["生命锚点数量"])) .. "座生命锚点已全部激活：获得持续") .. tostring(cfg["一切生命的终点倒计时秒"] + 2)) .. "秒的生命庇护，可抵挡本轮女妖哭嚎1次。（女妖哭嚎后有") .. tostring(cfg["一切生命的终点破解输出窗口秒"])) .. "秒输出窗口，立即集中攻击安兹。）|r",
+        3600
+    )
 end
 local function _____6FC0_6D3B_751F_547D_951A_70B9(instance, anchor)
     if instance["已清理"] or anchor["已激活"] or anchor["已封锁"] then
@@ -194,9 +198,10 @@ local function _____6FC0_6D3B_751F_547D_951A_70B9(instance, anchor)
     anchor["激活进度UI"] = nil
     local count = _____53D6_5DF2_6FC0_6D3B_951A_70B9_6570_91CF(instance)
     local required = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["生命锚点数量"]
+    local stage = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]
     _____5E7F_64AD_5355_4F4D_63D0_793A(
         instance.context["安兹单位"],
-        ((("|cffffff99生命锚点已激活（" .. tostring(count)) .. "/") .. tostring(required)) .. "）|r",
+        ((((((("|cffffff99生命锚点已激活（" .. tostring(count)) .. "/") .. tostring(required)) .. "）；本锚点要求在") .. tostring(stage["生命锚点激活半径"])) .. "码内停留") .. tostring(stage["生命锚点激活停留秒"])) .. "秒。（继续前往下一个未激活锚点。）|r",
         2200
     )
     if #instance["锚点列表"] == required and count >= required then
@@ -337,7 +342,11 @@ local function _____521B_5EFA_4E00_5207_751F_547D_7684_7EC8_70B9_9884_8B66(insta
         end
     end
     instance["锚点封锁"] = _____542F_52A8_96C5_513F_8D1D_5FB7_751F_547D_951A_70B9_5C01_9501(context, blockTargets, stage["一切生命的终点倒计时秒"])
-    _____5E7F_64AD_5355_4F4D_63D0_793A(boss, "|cffff6666一切生命的终点：在十二秒内依次激活三座生命锚点！|r", 4200)
+    _____5E7F_64AD_5355_4F4D_63D0_793A(
+        boss,
+        ((((((("|cffff6666一切生命的终点开始" .. tostring(stage["一切生命的终点倒计时秒"])) .. "秒倒计时：需激活") .. tostring(stage["生命锚点数量"])) .. "座生命锚点，每座在") .. tostring(stage["生命锚点激活半径"])) .. "码内停留") .. tostring(stage["生命锚点激活停留秒"])) .. "秒。（分工踩点，优先处理被暗金屏障封锁的锚点。）|r",
+        4200
+    )
 end
 local function _____64AD_653E_5973_5996_54ED_568E_8868_73B0(instance)
     local boss = instance.context["安兹单位"]
@@ -413,9 +422,17 @@ local function _____7ED3_7B97_5973_5996_54ED_568E(instance)
         end
     end
     if solved then
-        _____5E7F_64AD_5355_4F4D_63D0_793A(boss, "|cffffff99死亡法则已经被英魂誓约撕开，集中攻击安兹！|r", 3600)
+        _____5E7F_64AD_5355_4F4D_63D0_793A(
+            boss,
+            ((("|cffffff99" .. tostring(cfg["生命锚点数量"])) .. "座生命锚点已全部激活，生命庇护抵挡本次女妖哭嚎；随后开放") .. tostring(cfg["一切生命的终点破解输出窗口秒"])) .. "秒输出窗口。（立即集中攻击安兹。）|r",
+            3600
+        )
     else
-        _____5E7F_64AD_5355_4F4D_63D0_793A(boss, "|cffff4444生命锚点未能全部响应，女妖哭嚎完成致命裁定。|r", 3200)
+        _____5E7F_64AD_5355_4F4D_63D0_793A(
+            boss,
+            ("|cffff4444生命锚点未能在" .. tostring(cfg["一切生命的终点倒计时秒"])) .. "秒内全部激活，女妖哭嚎已完成致命裁定。（下一轮分工提前踩点，优先处理封锁屏障。）|r",
+            3200
+        )
     end
     return solved
 end
@@ -463,7 +480,7 @@ ____exports["释放安兹一切生命的终点"] = function(context)
         ["总时长"] = cfg["一切生命的终点倒计时秒"],
         ["颜色ID"] = 2,
         ["标题文本"] = "一切生命的终点",
-        ["提示文本"] = "依次激活三座生命锚点，取得英魂庇护"
+        ["提示文本"] = "12秒内激活3座生命锚；每座需在230码内停留0.8秒"
     })
     local solved = false
     local executionId = executor["开始"](

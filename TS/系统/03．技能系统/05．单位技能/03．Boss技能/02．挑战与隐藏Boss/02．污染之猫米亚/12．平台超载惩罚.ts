@@ -21,7 +21,6 @@ const { registerManualBuff, getBuffRuntime } = require("系统.05．Buff系统.0
 const { 创建循环点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建循环点特效: (this: void, 参数: any) => any;
 };
-
 const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -42,8 +41,13 @@ function 单位在平台内(this: void, unit: any, 区域: 米亚安全域运行
   return x >= 区域.配置.左 && x <= 区域.配置.右 && y >= 区域.配置.下 && y <= 区域.配置.上;
 }
 
-function 取平台容量(this: void): number {
-  return 取当前有效玩家人数() <= 2 ? 米亚平台配置.单双人平台容量 : 米亚平台配置.三四人平台容量;
+function 取平台容量(this: void, 当前有效玩家人数: number): number {
+  return 当前有效玩家人数 <= 2 ? 米亚平台配置.单双人平台容量 : 米亚平台配置.三四人平台容量;
+}
+
+function 取平台超载测试容量覆盖(this: void, context: 米亚运行时上下文): number {
+  const 覆盖值 = Number((context as any).平台超载测试容量覆盖) || 0;
+  return 覆盖值 > 0 ? 覆盖值 : 0;
 }
 
 function 取平台内英雄(this: void, 区域: 米亚安全域运行时矩形, heroes: any[]): any[] {
@@ -111,7 +115,8 @@ function 处理超载平台(this: void, context: 米亚运行时上下文, 区�
 
 export function 取米亚平台超载伤害倍率(this: void, target: any): number {
   if (target == null || target === 0) return 1;
-  return getBuffRuntime(target, 米亚单位技能配置.BuffID.平台超载) != null ? 1.3 : 1;
+  const 有平台超载 = getBuffRuntime(target, 米亚单位技能配置.BuffID.平台超载) != null;
+  return 有平台超载 ? 1.3 : 1;
 }
 
 
@@ -121,8 +126,10 @@ export function 刷新米亚平台超载惩罚(this: void, context: 米亚运行
   context.上次平台超载检测Ms = nowMs;
   if (!单位有效(context.Boss单位)) return;
 
-  const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
-  const capacity = 取平台容量();
+  const heroes = 获取Boss技能敌对英雄列表(context.Boss单位) ?? [];
+  const 当前玩家人数 = 取当前有效玩家人数();
+  const 测试容量覆盖 = 取平台超载测试容量覆盖(context);
+  const capacity = 测试容量覆盖 > 0 ? 测试容量覆盖 : 取平台容量(当前玩家人数);
   const 本轮超载表: Record<string, boolean | undefined> = {};
   const 区域列表 = context.安全域区域组.区域列表;
   for (let i = 0; i < 区域列表.length; i++) {

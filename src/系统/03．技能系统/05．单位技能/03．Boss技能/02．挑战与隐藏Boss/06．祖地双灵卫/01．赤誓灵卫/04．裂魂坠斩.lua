@@ -15,6 +15,8 @@ local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_
 local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
@@ -29,16 +31,23 @@ local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_5 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_5.CosBJ
+local SinBJ = ____require_result_5.SinBJ
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
+local DestroyEffect = jass.DestroyEffect
+local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local Atan2 = jass.Atan2
-local CosBJ = jass.CosBJ
-local SinBJ = jass.SinBJ
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
+local EXSetEffectSize = japi.EXSetEffectSize
+local DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
@@ -83,6 +92,7 @@ ____exports["释放裂魂坠斩"] = function(context, target)
         cfg["前摇秒"] + cfg["余震延迟秒"]
     )
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["动画编号"], ["持续秒"] = cfg["前摇秒"] + cfg["余震延迟秒"] + 0.2, ["恢复动画编号"] = cfg["恢复动画编号"]})
+    _____5F00_59CB_786C_76F4(boss, cfg["前摇秒"] + cfg["余震延迟秒"])
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "红色扇形",
         X = startX,
@@ -96,7 +106,20 @@ ____exports["释放裂魂坠斩"] = function(context, target)
     local slashTrail = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["重斩拖尾特效路径"], startX, startY)
     if slashTrail ~= nil and slashTrail ~= 0 then
         EXEffectMatRotateZ(slashTrail, facing)
+        if EXSetEffectSize ~= nil then
+            EXSetEffectSize(slashTrail, 2)
+        end
         YDWETimerDestroyEffectSafe(cfg["前摇秒"] + 0.4, slashTrail)
+    end
+    local overlayX = startX + CosBJ(facing) * 180
+    local overlayY = startY + SinBJ(facing) * 180
+    local sectorOverlay = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["扇形方向叠加特效路径"], overlayX, overlayY)
+    if sectorOverlay ~= nil and sectorOverlay ~= 0 then
+        EXEffectMatRotateZ(sectorOverlay, facing)
+        if EXSetEffectSize ~= nil then
+            EXSetEffectSize(sectorOverlay, 2)
+        end
+        YDWETimerDestroyEffectSafe(cfg["前摇秒"], sectorOverlay)
     end
     local _____4E8B_4EF6_5217_8868 = {
         {
@@ -106,7 +129,11 @@ ____exports["释放裂魂坠斩"] = function(context, target)
                 if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
                     return
                 end
+                SetUnitAnimationByIndex(boss, 5)
                 local impact = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["扇形落地特效路径"], startX, startY)
+                if impact ~= nil and impact ~= 0 and EXSetEffectSize ~= nil then
+                    EXSetEffectSize(impact, 2)
+                end
                 if impact ~= nil and impact ~= 0 then
                     YDWETimerDestroyEffectSafe(0.8, impact)
                 end
@@ -124,7 +151,7 @@ ____exports["释放裂魂坠斩"] = function(context, target)
                                 facing,
                                 cfg["扇形角度"]
                             ) then
-                                goto __continue10
+                                goto __continue14
                             end
                             _____9020_6210_88C2_9B42_5760_65A9_4F24_5BB3(
                                 boss,
@@ -134,7 +161,7 @@ ____exports["释放裂魂坠斩"] = function(context, target)
                                 "祖地双灵卫·裂魂坠斩"
                             )
                         end
-                        ::__continue10::
+                        ::__continue14::
                         i = i + 1
                     end
                 end
@@ -157,10 +184,20 @@ ____exports["释放裂魂坠斩"] = function(context, target)
                 if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] then
                     return
                 end
-                local wave = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["直线余震特效路径"], startX, startY)
+                local waveX = startX + CosBJ(facing) * 300
+                local waveY = startY + SinBJ(facing) * 300
+                local wave = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["裂魂坠斩"]["直线余震特效路径"], waveX, waveY)
                 if wave ~= nil and wave ~= 0 then
                     EXEffectMatRotateZ(wave, facing)
-                    YDWETimerDestroyEffectSafe(0.8, wave)
+                    addDelayedCallback(
+                        500,
+                        function()
+                            if DzSetEffectVertexAlpha ~= nil then
+                                DzSetEffectVertexAlpha(wave, 0)
+                            end
+                            DestroyEffect(wave)
+                        end
+                    )
                 end
                 local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
                 do
@@ -176,7 +213,7 @@ ____exports["释放裂魂坠斩"] = function(context, target)
                                 endY,
                                 cfg["余震宽度"]
                             ) then
-                                goto __continue16
+                                goto __continue22
                             end
                             _____9020_6210_88C2_9B42_5760_65A9_4F24_5BB3(
                                 boss,
@@ -186,7 +223,7 @@ ____exports["释放裂魂坠斩"] = function(context, target)
                                 "祖地双灵卫·裂魂坠斩余震"
                             )
                         end
-                        ::__continue16::
+                        ::__continue22::
                         i = i + 1
                     end
                 end

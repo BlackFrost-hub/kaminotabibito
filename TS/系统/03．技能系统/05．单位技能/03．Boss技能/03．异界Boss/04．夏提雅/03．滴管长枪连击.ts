@@ -11,6 +11,8 @@ import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/0
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
+import { 播放夏提雅台词 } from './18．台词播放';
+import { 播放夏提雅吸血恢复特效 } from './20．吸血表现';
 
 const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -60,7 +62,7 @@ const GetUnitState = japi.GetUnitState as (unit: any, state: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
 let 滴管长枪连击已注册 = false;
@@ -84,10 +86,26 @@ function 可推进猎血连击(this: void, context: 夏提雅运行时上下文)
     && !单位是否处于硬控制效果合集(context.Boss单位);
 }
 
+export function 刷新夏提雅猎血连击Buff(this: void, context: 夏提雅运行时上下文): void {
+  if (!单位有效(context.Boss单位) || context.当前猎血段数 <= 0) return;
+  registerManualBuff(context.Boss单位, 夏提雅BuffID.猎血连击, 夏提雅数值与表现配置.滴管长枪连击.连击过期秒, 0, {
+    stack: context.当前猎血段数,
+    sourceName: '夏提雅-滴管长枪连击',
+  });
+}
+
 function 播放二段鲜血标记(this: void, target: any): void {
   const cfg = 夏提雅数值与表现配置.滴管长枪连击;
   const effect = createUnitEffect(target, 'overhead', 夏提雅数值与表现配置.表现资源.普攻二段鲜血标记特效路径, cfg.二段标记持续秒, '夏提雅-猎血二段');
   if (effect != null && effect !== 0) 设置Dz绑定特效缩放(effect, cfg.二段标记缩放);
+}
+
+function 尝试播放汲血穿刺台词(this: void, context: 夏提雅运行时上下文): void {
+  const now = getServerTime();
+  const cfg = 夏提雅数值与表现配置.滴管长枪连击;
+  if (now < context.汲血穿刺台词冷却到Ms) return;
+  context.汲血穿刺台词冷却到Ms = now + cfg.广播语音内置冷却秒 * 1000;
+  播放夏提雅台词(context.Boss单位, '汲血穿刺');
 }
 
 function 执行强化穿刺命中(this: void, context: 夏提雅运行时上下文, target: any): void {
@@ -95,7 +113,10 @@ function 执行强化穿刺命中(this: void, context: 夏提雅运行时上下�
   const cfg = 夏提雅数值与表现配置.滴管长枪连击;
   const dx = GetUnitX(target) - GetUnitX(boss);
   const dy = GetUnitY(target) - GetUnitY(boss);
-  if (dx * dx + dy * dy > cfg.强化穿刺命中距离 * cfg.强化穿刺命中距离) return;
+  const distanceSquared = dx * dx + dy * dy;
+  if (distanceSquared > cfg.强化穿刺命中距离 * cfg.强化穿刺命中距离) {
+    return;
+  }
   播放Boss坐标音效(夏提雅数值与表现配置.音效.滴管穿心汲血, GetUnitX(target), GetUnitY(target), 夏提雅数值与表现配置.音效默认裁断距离);
   SetUnitFacing(boss, Atan2(dy, dx) * RAD_TO_DEG);
   const damage = 计算组合技能伤害(boss, target, {
@@ -109,7 +130,7 @@ function 执行强化穿刺命中(this: void, context: 夏提雅运行时上下�
     attack: false,
     ranged: false,
     attackType: ATTACK_TYPE_NORMAL,
-    伤害类型: DAMAGE_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_ENHANCED,
     weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
     来源类型: 'Boss技能',
     标签: '夏提雅·滴管长枪强化穿刺',
@@ -129,6 +150,7 @@ function 执行强化穿刺命中(this: void, context: 夏提雅运行时上下�
     ItemHeal: false,
     HealEffect: false,
   });
+  播放夏提雅吸血恢复特效(boss);
   if (context.阶段 !== 'P3真祖血宴') 创建夏提雅鲜血印记(context, GetUnitX(target), GetUnitY(target));
   registerManualBuff(target, 夏提雅BuffID.鲜血枯竭, cfg.鲜血枯竭持续秒, 1, {
     sourceName: '夏提雅-滴管长枪强化穿刺',
@@ -142,12 +164,17 @@ function 启动强化穿刺(this: void, context: 夏提雅运行时上下文, ta
   重置夏提雅猎血连击(context);
   context.普通机制忙碌到Ms = getServerTime() + (windup + 0.25) * 1000;
   SetUnitFacing(boss, Atan2(GetUnitY(target) - GetUnitY(boss), GetUnitX(target) - GetUnitX(boss)) * RAD_TO_DEG);
+  尝试播放汲血穿刺台词(context);
   开始硬直(boss, windup);
   显示夏提雅常规吟唱条(windup, cfg.吟唱条颜色ID, cfg.吟唱条标题文本, cfg.吟唱条提示文本);
   播放限时单位动画({ 单位: boss, 动画编号: cfg.强化穿刺动画编号, 持续秒: windup + 0.2, 恢复动画编号: 0 });
   const delayedId = addDelayedCallback(windup * 1000, function 夏提雅强化穿刺结算(this: void): void {
-    if (!单位有效(boss) || !单位有效(target) || context.挑战已结束 || context.当前大型技能 != null) return;
-    if (单位是否处于硬控制效果合集(boss)) return;
+    if (!单位有效(boss) || !单位有效(target) || context.挑战已结束 || context.当前大型技能 != null) {
+      return;
+    }
+    if (单位是否处于硬控制效果合集(boss)) {
+      return;
+    }
     执行强化穿刺命中(context, target);
   });
   context.清理.登记延迟回调('夏提雅-滴管长枪强化穿刺', delayedId);
@@ -186,6 +213,7 @@ function on夏提雅普通攻击最终伤害(this: void, target: any, attacker: 
     context.当前猎血段数 += 1;
   }
   context.猎血段数过期时间Ms = getServerTime() + 夏提雅数值与表现配置.滴管长枪连击.连击过期秒 * 1000;
+  刷新夏提雅猎血连击Buff(context);
   if (context.当前猎血段数 === 取强化攻击阈值(context) - 1) 播放二段鲜血标记(target);
 }
 

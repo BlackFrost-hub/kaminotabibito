@@ -9,8 +9,12 @@ import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯常规�
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 立即设置单位朝向 } from "../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
+import { 创建世界坐标进度UI, 更新世界坐标进度UI, 销毁世界坐标进度UI, type 世界坐标进度UI } from "../../../../../09．表现系统/15．世界坐标进度UI";
 const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -30,6 +34,7 @@ const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectXY = japi.EXSetEffectXY as ((effect: any, x: number, y: number) => void) | undefined;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
+const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -74,6 +79,14 @@ interface 种子成长变量 {
   seed: any;
   x: number;
   y: number;
+  强化倒计时: 种子强化倒计时变量;
+}
+
+interface 种子强化倒计时变量 {
+  seed: any;
+  UI: 世界坐标进度UI | null;
+  周期ID: number;
+  到期时间毫秒: number;
 }
 
 interface 腐败之种发射变量 {
@@ -106,9 +119,41 @@ function 莫尔特斯腐败之种弹道(this: void, variable?: any): void {
 function 莫尔特斯腐败种子成长(this: void, variable?: any): void {
   const data = variable as 种子成长变量 | undefined;
   if (data == null) return;
+  清理莫尔特斯腐败种子强化倒计时(data.强化倒计时);
   if (!data.seed.是否存活()) return;
   data.seed.销毁();
   创建腐败幼树(data.context, data.x, data.y);
+}
+
+function 清理莫尔特斯腐败种子强化倒计时(this: void, data: 种子强化倒计时变量 | undefined): void {
+  if (data == null) return;
+  if (data.周期ID !== 0) {
+    removePeriodicCallback(data.周期ID);
+    data.周期ID = 0;
+  }
+  销毁世界坐标进度UI(data.UI);
+  data.UI = null;
+}
+
+function on莫尔特斯腐败种子死亡(this: void, _unit: any, _killer: any, variable?: any): void {
+  清理莫尔特斯腐败种子强化倒计时(variable as 种子强化倒计时变量 | undefined);
+}
+
+function on莫尔特斯腐败种子销毁(this: void, _unit: any, variable?: any): void {
+  清理莫尔特斯腐败种子强化倒计时(variable as 种子强化倒计时变量 | undefined);
+}
+
+function 莫尔特斯腐败种子强化倒计时(this: void, variable?: any): void {
+  const data = variable as 种子强化倒计时变量 | undefined;
+  if (data == null) return;
+  if (data.seed == null || !data.seed.是否存活()) {
+    清理莫尔特斯腐败种子强化倒计时(data);
+    return;
+  }
+  const now = getServerTime();
+  let remaining = (data.到期时间毫秒 - now) / 1000;
+  if (remaining < 0) remaining = 0;
+  更新世界坐标进度UI(data.UI, remaining);
 }
 
 function 创建腐败幼树(this: void, context: 莫尔特斯运行时上下文, x: number, y: number): void {
@@ -125,6 +170,8 @@ function 创建腐败幼树(this: void, context: 莫尔特斯运行时上下文,
     Y: y,
     最大生命: cfg.幼树生命值,
     缩放: cfg.幼树缩放,
+    固定站桩: true,
+    禁止普攻: true,
     持续时间: cfg.持续秒,
   });
   if (instance == null || !单位有效(instance.单位)) return;
@@ -147,6 +194,12 @@ function 幼树波动Tick(this: void, data: 幼树实例): void {
     return;
   }
   data.剩余跳数 = data.剩余跳数 - 1;
+  创建点特效({
+    模型路径: cfg.幼树Tick特效路径,
+    X: GetUnitX(tree),
+    Y: GetUnitY(tree),
+    持续秒: cfg.幼树Tick特效持续秒,
+  });
   const heroes = 获取Boss技能敌对英雄列表(boss);
   const damage = 读取单位攻击力(boss) * cfg.每跳Boss攻击力比例;
   for (let i = 0; i < heroes.length; i++) {
@@ -174,6 +227,12 @@ function 幼树波动Tick(this: void, data: 幼树实例): void {
 function 创建落地种子(this: void, context: 莫尔特斯运行时上下文, x: number, y: number): void {
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.腐败之种;
+  const 强化倒计时: 种子强化倒计时变量 = {
+    seed: null,
+    UI: null,
+    周期ID: 0,
+    到期时间毫秒: getServerTime() + cfg.生长延迟秒 * 1000,
+  };
   const seed = 创建可攻击机制单位({
     清理: context.清理,
     名称: "莫尔特斯-腐败种子",
@@ -184,12 +243,33 @@ function 创建落地种子(this: void, context: 莫尔特斯运行时上下文,
     X: x,
     Y: y,
     最大生命: cfg.种子生命值,
-    缩放: 0.85,
+    缩放: cfg.落地种子缩放,
+    固定站桩: true,
+    禁止普攻: true,
     持续时间: cfg.生长延迟秒 + 1,
+    变量: 强化倒计时,
+    on死亡: on莫尔特斯腐败种子死亡,
+    on销毁: on莫尔特斯腐败种子销毁,
   });
   if (seed == null) return;
+  强化倒计时.seed = seed;
+  强化倒计时.UI = 创建世界坐标进度UI({
+    X: x,
+    Y: y,
+    Z: cfg.强化进度UI高度,
+    最大值: cfg.生长延迟秒,
+    当前值: cfg.生长延迟秒,
+    标题: "强化",
+    数值后缀: "秒",
+    类型: "自然",
+    平滑过渡秒: cfg.强化进度刷新间隔毫秒 / 1000,
+    初始显示: true,
+    雾中可见: false,
+  });
+  强化倒计时.周期ID = addPeriodicCallback(cfg.强化进度刷新间隔毫秒, 莫尔特斯腐败种子强化倒计时, 强化倒计时);
+  context.清理.登记周期回调("莫尔特斯-腐败种子强化倒计时", 强化倒计时.周期ID);
   播放Boss坐标音效(莫尔特斯音效配置.腐败之种.扎根成长, x, y, 莫尔特斯音效配置.默认裁断距离);
-  const id = addDelayedCallback(cfg.生长延迟秒 * 1000, 莫尔特斯腐败种子成长, { context, seed, x, y } as 种子成长变量);
+  const id = addDelayedCallback(cfg.生长延迟秒 * 1000, 莫尔特斯腐败种子成长, { context, seed, x, y, 强化倒计时 } as 种子成长变量);
   context.清理.登记延迟回调("莫尔特斯-腐败种子成长", id);
 }
 
@@ -220,6 +300,7 @@ function 发射腐败之种(this: void, context: 莫尔特斯运行时上下文,
   const midX = 极坐标X((sx + tx) / 2, angle, distance);
   const midY = 极坐标Y((sy + ty) / 2, angle, distance);
   const effect = AddSpecialEffect(cfg.投射物模型路径, sx, sy);
+  if (effect != null && effect !== 0 && EXSetEffectSize != null) EXSetEffectSize(effect, cfg.投射物缩放);
   const data: 种子弹道 = {
     context,
     特效: effect,

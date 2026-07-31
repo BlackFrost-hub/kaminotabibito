@@ -51,6 +51,9 @@ local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
 local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.10．战斗视野压制")
 local _____65BD_52A0_6218_6597_89C6_91CE_538B_5236 = ____require_result_5["施加战斗视野压制"]
+local ____require_result_6 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_6["显示大招吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_6["关闭吟唱条"]
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____5E7D_5F71_7206_53D1_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["幽影爆发"])
 local _____9AB7_9AC5_76D7_8D3CID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]["骷髅盗贼单位类型"])
@@ -59,6 +62,9 @@ local _____5DF2_6CE8_518C_5E7D_5F71_7206_53D1 = false
 local _____5DF2_6CE8_518C_5E7D_5F71_627F_4F24 = false
 local _____5E7D_5F71_7206_53D1_5468_671F_8868 = {}
 local _____4E0B_4E00_4E2A_5E7D_5F71_5468_671FID = 0
+local function _____5173_95ED_5F71_9AA8_5E7D_5F71_7206_53D1_72B6_6001_541F_5531_6761()
+    _____5173_95ED_541F_5531_6761("大招")
+end
 local function ____on_5F71_9AA8_5E7D_5F71_627F_4F24_4FEE_6B63(damageContext)
     if not _____5355_4F4D_6709_6548(damageContext.target) or GetUnitTypeId(damageContext.target) ~= _____5F71_9AA8_5355_4F4D_7C7B_578BID then
         return damageContext.currentDamage
@@ -88,13 +94,13 @@ local function _____5E7D_5F71_7206_53D1_53EC_5524Tick()
         do
             local data = _____5E7D_5F71_7206_53D1_5468_671F_8868[key]
             if data == nil then
-                goto __continue10
+                goto __continue11
             end
             local context = data.context
             if not _____5355_4F4D_6709_6548(context["Boss单位"]) or not context["幽影爆发中"] then
                 removePeriodicCallback(data.id)
                 __TS__Delete(_____5E7D_5F71_7206_53D1_5468_671F_8868, key)
-                goto __continue10
+                goto __continue11
             end
             data.count = data.count + 1
             local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]
@@ -111,15 +117,15 @@ local function _____5E7D_5F71_7206_53D1_53EC_5524Tick()
                 true
             )
             if instance ~= nil and instance["单位"] ~= nil then
-                local ____context__5E7D_5F71_53EC_5524_7269_6 = context["幽影召唤物"]
-                ____context__5E7D_5F71_53EC_5524_7269_6[#____context__5E7D_5F71_53EC_5524_7269_6 + 1] = instance["单位"]
+                local ____context__5E7D_5F71_53EC_5524_7269_7 = context["幽影召唤物"]
+                ____context__5E7D_5F71_53EC_5524_7269_7[#____context__5E7D_5F71_53EC_5524_7269_7 + 1] = instance["单位"]
             end
             if data.count * cfg["召唤间隔秒"] >= cfg["召唤持续秒"] then
                 removePeriodicCallback(data.id)
                 __TS__Delete(_____5E7D_5F71_7206_53D1_5468_671F_8868, key)
             end
         end
-        ::__continue10::
+        ::__continue11::
     end
 end
 local function _____7ED3_675F_5F71_9AA8_5E7D_5F71_7206_53D1(context)
@@ -127,6 +133,7 @@ local function _____7ED3_675F_5F71_9AA8_5E7D_5F71_7206_53D1(context)
         return
     end
     context["幽影爆发中"] = false
+    _____5173_95ED_5F71_9AA8_5E7D_5F71_7206_53D1_72B6_6001_541F_5531_6761()
     _____5237_65B0_5F71_9AA8_5E7D_7075_5F62_6001Buff(context)
     if _____5355_4F4D_6709_6548(context["Boss单位"]) then
         SetUnitVertexColor(
@@ -144,7 +151,7 @@ local function _____7ED3_675F_5F71_9AA8_5E7D_5F71_7206_53D1(context)
             do
                 local unit = context["幽影召唤物"][i + 1]
                 if not _____5355_4F4D_6709_6548(unit) then
-                    goto __continue20
+                    goto __continue21
                 end
                 _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664({
                     ["目标"] = unit,
@@ -154,7 +161,7 @@ local function _____7ED3_675F_5F71_9AA8_5E7D_5F71_7206_53D1(context)
                     ["显示特效"] = false
                 })
             end
-            ::__continue20::
+            ::__continue21::
             i = i + 1
         end
     end
@@ -180,6 +187,15 @@ ____exports["释放影骨幽影爆发"] = function(context)
     end
     local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]
     _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5(context["Boss单位"], cfg["动画播放秒"], "幽影爆发", "幽影领域正在展开")
+    _____663E_793A_5927_62DB_541F_5531_6761({
+        ["通道"] = "大招",
+        ["总时长"] = cfg["持续秒"],
+        ["颜色ID"] = 4,
+        ["标题文本"] = "幽影爆发",
+        ["提示文本"] = "幽影领域持续中"
+    })
+    local ____self_8 = context["清理"]
+    ____self_8["登记清理"](____self_8, "影骨-幽影爆发状态吟唱条", _____5173_95ED_5F71_9AA8_5E7D_5F71_7206_53D1_72B6_6001_541F_5531_6761)
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "幽影爆发")
     _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["幽影爆发开场"], X = cfg["召唤中心X"], Y = cfg["召唤中心Y"], ["持续秒"] = cfg["瞬时特效持续秒"]})
@@ -197,8 +213,8 @@ ____exports["释放影骨幽影爆发"] = function(context)
     local aura = AddSpecialEffectTarget(_____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E["幽灵形态持续"], context["Boss单位"], "origin")
     local endVariable = {context = context, aura = aura, ["已销毁"] = false}
     if aura ~= nil and aura ~= 0 then
-        local ____self_7 = context["清理"]
-        ____self_7["登记清理"](____self_7, "影骨-幽灵形态", _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548, endVariable)
+        local ____self_9 = context["清理"]
+        ____self_9["登记清理"](____self_9, "影骨-幽灵形态", _____9500_6BC1_5F71_9AA8_5E7D_7075_5F62_6001_7279_6548, endVariable)
     end
     context["幽影爆发中"] = true
     context["幽影召唤物"] = {}
@@ -224,11 +240,11 @@ ____exports["释放影骨幽影爆发"] = function(context)
     local key = _____4E0B_4E00_4E2A_5E7D_5F71_5468_671FID
     local id = addPeriodicCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["召唤间隔秒"] * 1000, _____5E7D_5F71_7206_53D1_53EC_5524Tick)
     _____5E7D_5F71_7206_53D1_5468_671F_8868[key] = {context = context, count = 0, id = id}
-    local ____self_8 = context["清理"]
-    ____self_8["登记周期回调"](____self_8, "影骨-幽影爆发召唤", id)
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](
-        ____self_9,
+    local ____self_10 = context["清理"]
+    ____self_10["登记周期回调"](____self_10, "影骨-幽影爆发召唤", id)
+    local ____self_11 = context["清理"]
+    ____self_11["登记延迟回调"](
+        ____self_11,
         "影骨-幽影爆发结束",
         addDelayedCallback(_____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["幽影爆发"]["持续秒"] * 1000, _____5F71_9AA8_5E7D_5F71_7206_53D1_7ED3_675F, endVariable)
     )

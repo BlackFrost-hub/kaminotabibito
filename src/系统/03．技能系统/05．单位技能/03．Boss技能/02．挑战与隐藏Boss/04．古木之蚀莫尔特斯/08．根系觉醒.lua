@@ -23,6 +23,7 @@ function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_6B7B_4EA1(unit)
         ["模型路径"] = cfg["腐败之源摧毁特效路径"],
         X = GetUnitX(unit),
         Y = GetUnitY(unit),
+        ["缩放"] = cfg["腐败之源摧毁特效缩放"],
         ["持续秒"] = cfg["瞬时特效持续秒"]
     })
     _____64AD_653EBoss_5750_6807_97F3_6548(
@@ -38,6 +39,7 @@ function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1(unit)
         ["模型路径"] = cfg["腐败之源摧毁特效路径"],
         X = GetUnitX(unit),
         Y = GetUnitY(unit),
+        ["缩放"] = cfg["腐败之源摧毁特效缩放"],
         ["持续秒"] = cfg["瞬时特效持续秒"]
     })
     _____64AD_653EBoss_5750_6807_97F3_6548(
@@ -104,10 +106,11 @@ local function _____9009_62E9_8150_8D25_4E4B_6E90_683C_5B50(context)
         return result
     end
     local pool = {}
+    local _____683C_5B50_5217_8868 = grid["格子列表"]
     do
         local i = 0
-        while i < grid["格子列表"].length do
-            pool[#pool + 1] = grid["格子列表"][i]
+        while i < #_____683C_5B50_5217_8868 do
+            pool[#pool + 1] = _____683C_5B50_5217_8868[i + 1]
             i = i + 1
         end
     end
@@ -131,6 +134,7 @@ local function _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
         ["模型路径"] = cfg["全屏爆发特效路径"],
         X = GetUnitX(boss),
         Y = GetUnitY(boss),
+        ["缩放"] = cfg["全屏爆发特效缩放"],
         ["持续秒"] = cfg["瞬时特效持续秒"]
     })
     _____64AD_653EBoss_5750_6807_97F3_6548(
@@ -190,6 +194,7 @@ local function _____521B_5EFA_8150_8D25_4E4B_6E90_76EE_6807_5217_8868(context)
                 Y = cell["中心Y"],
                 ["最大生命"] = cfg["腐败之源生命值"],
                 ["缩放"] = cfg["腐败之源缩放"],
+                ["固定站桩"] = true,
                 ["on死亡"] = _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_6B7B_4EA1,
                 ["on销毁"] = _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1
             }

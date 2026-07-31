@@ -67,7 +67,8 @@ function 选择腐败之源格子(this: void, context: 莫尔特斯运行时上�
   const grid = context.根须宫格;
   if (grid == null) return result;
   const pool: any[] = [];
-  for (let i = 0; i < grid.格子列表.length; i++) pool.push(grid.格子列表[i]);
+  const 格子列表 = grid.格子列表 as any[];
+  for (let i = 0; i < 格子列表.length; i++) pool.push(格子列表[i]);
   const count = 莫尔特斯数值与表现配置.根系觉醒.腐败之源数量;
   for (let i = 0; i < count && pool.length > 0; i++) {
     const index = GetRandomInt(0, pool.length - 1);
@@ -81,7 +82,7 @@ function 根系觉醒失败爆发(this: void, context: 莫尔特斯运行时上�
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
   治疗Boss最大生命比例(boss, cfg.失败回血比例);
-  创建点特效({ 模型路径: cfg.全屏爆发特效路径, X: GetUnitX(boss), Y: GetUnitY(boss), 持续秒: cfg.瞬时特效持续秒 });
+  创建点特效({ 模型路径: cfg.全屏爆发特效路径, X: GetUnitX(boss), Y: GetUnitY(boss), 缩放: cfg.全屏爆发特效缩放, 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(莫尔特斯音效配置.根系觉醒.失败爆发, GetUnitX(boss), GetUnitY(boss), 莫尔特斯音效配置.默认裁断距离);
   const 技能实例ID = 创建独立技能伤害实例({
     来源类型: "Boss技能",
@@ -128,6 +129,7 @@ function 创建腐败之源目标列表(this: void, context: 莫尔特斯运行�
       Y: cell.中心Y,
       最大生命: cfg.腐败之源生命值,
       缩放: cfg.腐败之源缩放,
+      固定站桩: true,
       on死亡: 莫尔特斯腐败之源死亡,
       on销毁: 莫尔特斯腐败之源销毁,
     });
@@ -139,13 +141,13 @@ function 创建腐败之源目标列表(this: void, context: 莫尔特斯运行�
 
 function 莫尔特斯腐败之源死亡(this: void, unit: any): void {
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
-  创建点特效({ 模型路径: cfg.腐败之源摧毁特效路径, X: GetUnitX(unit), Y: GetUnitY(unit), 持续秒: cfg.瞬时特效持续秒 });
+  创建点特效({ 模型路径: cfg.腐败之源摧毁特效路径, X: GetUnitX(unit), Y: GetUnitY(unit), 缩放: cfg.腐败之源摧毁特效缩放, 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(莫尔特斯音效配置.根系觉醒.腐败之源摧毁, GetUnitX(unit), GetUnitY(unit), 莫尔特斯音效配置.默认裁断距离);
 }
 
 function 莫尔特斯腐败之源销毁(this: void, unit: any): void {
   const cfg = 莫尔特斯数值与表现配置.根系觉醒;
-  创建点特效({ 模型路径: cfg.腐败之源摧毁特效路径, X: GetUnitX(unit), Y: GetUnitY(unit), 持续秒: cfg.瞬时特效持续秒 });
+  创建点特效({ 模型路径: cfg.腐败之源摧毁特效路径, X: GetUnitX(unit), Y: GetUnitY(unit), 缩放: cfg.腐败之源摧毁特效缩放, 持续秒: cfg.瞬时特效持续秒 });
   播放Boss坐标音效(莫尔特斯音效配置.根系觉醒.腐败之源摧毁, GetUnitX(unit), GetUnitY(unit), 莫尔特斯音效配置.默认裁断距离);
 }
 

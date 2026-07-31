@@ -5,6 +5,7 @@
  * 包含中心计时器注册、实例创建与销毁、Tick 驱动逻辑。
  */
 import {
+  播放跳跃特效,
   CENTER_TIMER_TICKS,
   DEFAULT_JUMP_EFFECT_MODEL,
   X_GAFC,
@@ -211,6 +212,7 @@ export function 创建跳跃实例(单位: any, 角度: number, 参数: 通用�
   跳跃映射[跳跃ID] = 实例;
   单位当前跳跃[单位ID] = 跳跃ID;
   活动跳跃列表.push(实例);
+  播放跳跃特效(实例);
   if (实例.暂停单位) {
     添加单位暂停(单位, 实例.暂停来源);
   }

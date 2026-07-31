@@ -54,6 +54,9 @@ local GetTriggeringTrigger = jass.GetTriggeringTrigger
 local Player = jass.Player
 local SetDestructableInvulnerable = jass.SetDestructableInvulnerable
 local TriggerAddAction = jass.TriggerAddAction
+local SetUnitInvulnerable = jass.SetUnitInvulnerable
+local ____require_result_10 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
+local X_FixUnitStandingSafe = ____require_result_10.X_FixUnitStandingSafe
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
 local _____5DF2_8BF7_6C42_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = false
 local _____5DF2_6267_884C_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = false
@@ -67,13 +70,13 @@ local function _____8BFB_53D6_5DF2_7ED1_5B9ANPC(_____914D_7F6E)
         return nil
     end
     local unit = YDUserDataGetSafe("string", _____914D_7F6E["YD表"], _____914D_7F6E["YD键"], _____914D_7F6E["YD类型"] or "unit")
-    local ____temp_10
+    local ____temp_11
     if unit == nil or unit == 0 then
-        ____temp_10 = nil
+        ____temp_11 = nil
     else
-        ____temp_10 = unit
+        ____temp_11 = unit
     end
-    return ____temp_10
+    return ____temp_11
 end
 local function _____5199_5165NPC_7ED1_5B9A(_____914D_7F6E, unit)
     if _____914D_7F6E["YD表"] == nil or _____914D_7F6E["YD键"] == nil or _____914D_7F6E["YD字段"] == nil then
@@ -105,6 +108,12 @@ local function _____521D_59CB_5316_5355_4E2ANPC(_____914D_7F6E)
             _____914D_7F6E["朝向"]
         )
         _____5199_5165NPC_7ED1_5B9A(_____914D_7F6E, unit)
+    end
+    if _____914D_7F6E["初始化无敌"] == true then
+        SetUnitInvulnerable(unit, true)
+    end
+    if _____914D_7F6E["初始化固定站立"] == true then
+        X_FixUnitStandingSafe(unit)
     end
     _____8BB0_5F55NPC_8FD0_884C_65F6(_____914D_7F6E, unit)
 end
@@ -222,7 +231,7 @@ local function _____521D_59CB_5316_5355_4F4D_8303_56F4_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_5355_4F4D_8303_56F4_5165_53E3_914D_7F6E_8868[i + 1]
                 local unit = ____NPC_8FD0_884C_65F6_8868[_____914D_7F6E["NPC配置名"]]
                 if unit == nil then
-                    goto __continue38
+                    goto __continue40
                 end
                 registerUnitInRangeTrigger(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
@@ -232,7 +241,7 @@ local function _____521D_59CB_5316_5355_4F4D_8303_56F4_5165_53E3()
                     false
                 )
             end
-            ::__continue38::
+            ::__continue40::
             i = i + 1
         end
     end
@@ -245,14 +254,14 @@ local function _____521D_59CB_5316_77E9_5F62_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_77E9_5F62_5165_53E3_914D_7F6E_8868[i + 1]
                 local _____77E9_5F62 = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["矩形变量名"])
                 if _____77E9_5F62 == nil then
-                    goto __continue42
+                    goto __continue44
                 end
                 TriggerRegisterEnterRectSimple(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
                     _____77E9_5F62
                 )
             end
-            ::__continue42::
+            ::__continue44::
             i = i + 1
         end
     end
@@ -265,7 +274,7 @@ local function _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_5168_5C40_5355_4F4D_5165_53E3_914D_7F6E_8868[i + 1]
                 local unit = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["单位变量名"])
                 if unit == nil then
-                    goto __continue46
+                    goto __continue48
                 end
                 registerUnitInRangeTrigger(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
@@ -275,7 +284,7 @@ local function _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()
                     false
                 )
             end
-            ::__continue46::
+            ::__continue48::
             i = i + 1
         end
     end
@@ -288,11 +297,11 @@ local function _____521D_59CB_5316_53EF_7834_574F_7269()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_53EF_7834_574F_7269_521D_59CB_5316_914D_7F6E_8868[i + 1]
                 local destructable = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["变量名"])
                 if destructable == nil then
-                    goto __continue50
+                    goto __continue52
                 end
                 SetDestructableInvulnerable(destructable, _____914D_7F6E["无敌"])
             end
-            ::__continue50::
+            ::__continue52::
             i = i + 1
         end
     end

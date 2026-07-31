@@ -34,10 +34,15 @@ local DestroyEffect = jass.DestroyEffect
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local _____53CC_7075_540C_8A93_5DF2_6CE8_518C = false
 local _____6B63_5728_7ED3_7B97_540C_8A93_5206_62C5 = false
+local function _____505C_6B62_540C_8A93_8FDE_7EBF(_____8FDE_7EBF)
+    if _____8FDE_7EBF ~= nil then
+        _____8FDE_7EBF["停止"](_____8FDE_7EBF, "同誓保护关闭")
+    end
+end
 local function _____751F_547D_6BD4_4F8B(unit)
     if unit == nil or unit == 0 then
         return 0
@@ -65,12 +70,8 @@ local function _____5173_95ED_540C_8A93_4FDD_62A4(context)
         DestroyEffect(context["同誓保护特效"])
     end
     context["同誓保护特效"] = nil
-    if context["同誓暗金连线"] ~= nil then
-        context["同誓暗金连线"]["停止"]("同誓保护关闭")
-    end
-    if context["同誓冷蓝连线"] ~= nil then
-        context["同誓冷蓝连线"]["停止"]("同誓保护关闭")
-    end
+    _____505C_6B62_540C_8A93_8FDE_7EBF(context["同誓暗金连线"])
+    _____505C_6B62_540C_8A93_8FDE_7EBF(context["同誓冷蓝连线"])
     context["同誓暗金连线"] = nil
     context["同誓冷蓝连线"] = nil
     if previousLow ~= nil and previousLow ~= 0 then
@@ -216,7 +217,7 @@ local function ____on_53CC_7075_540C_8A93_4F24_5BB3_4FEE_6B63(damage)
             false,
             true,
             ATTACK_TYPE_NORMAL,
-            DAMAGE_TYPE_NORMAL,
+            DAMAGE_TYPE_MAGIC,
             WEAPON_TYPE_WHOKNOWS
         )
         _____6B63_5728_7ED3_7B97_540C_8A93_5206_62C5 = false

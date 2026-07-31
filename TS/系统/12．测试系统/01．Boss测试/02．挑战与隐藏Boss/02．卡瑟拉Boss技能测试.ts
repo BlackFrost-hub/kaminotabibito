@@ -3,6 +3,8 @@
 import type { Boss测试技能命令 } from '../../00．Boss测试系统/00．Boss测试类型';
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const globals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 
 const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index") as {
@@ -129,7 +131,7 @@ function 创建卡瑟拉测试(this: void, player: any): any {
 function 设置卡瑟拉测试阶段生命(this: void, context: any, 生命比例: number): boolean {
   const boss = context?.Boss单位;
   if (!Boss测试单位存活(boss)) return false;
-  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) ?? 0;
   if (!(maxLife > 0)) return false;
   SetUnitState(boss, UNIT_STATE_LIFE, maxLife * 生命比例);
   return true;

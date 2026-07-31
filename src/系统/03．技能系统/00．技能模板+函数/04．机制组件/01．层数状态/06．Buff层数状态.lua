@@ -1,6 +1,6 @@
 local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____01_FF0E_53EF_914D_7F6E_5C42_6570_72B6_6001 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.01．层数状态.01．可配置层数状态")
@@ -33,12 +33,13 @@ local function _____540C_6B65Buff(_____53C2_6570, _____5355_4F4D, _____5C42_6570
         ____temp_1 = _____53C2_6570["取Buff附加参数"](_____5355_4F4D, _____5C42_6570)
     end
     local extras = ____temp_1
+    local buffExtras = extras == nil and ({stack = _____5C42_6570}) or __TS__ObjectAssign({}, extras, {stack = _____5C42_6570})
     registerManualBuff(
         _____5355_4F4D,
         _____53C2_6570.BuffID,
         duration,
         effectValue,
-        extras
+        buffExtras
     )
 end
 local ____Buff_5C42_6570_72B6_6001_5B9E_73B0 = __TS__Class()

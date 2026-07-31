@@ -19,6 +19,7 @@ const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.
 };
 const jass = require('jass.common') as any;
 const japi = require("jass.japi") as any;
+const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => void) | undefined;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
@@ -45,6 +46,7 @@ export interface 夏提雅运行时上下文 {
   当前猎血目标?: any;
   当前猎血段数: number;
   猎血段数过期时间Ms: number;
+  汲血穿刺台词冷却到Ms: number;
   待结算强化穿刺目标?: any;
   血印句柄列表: any[];
   血之狂热控制器: Buff层数状态控制器;
@@ -56,6 +58,8 @@ export interface 夏提雅运行时上下文 {
   英灵复刻冷却到Ms: number;
   上次英灵复刻技能: string;
   镜像夹击句柄?: any;
+  镜像夹击执行器?: 固定组合技能执行器<夏提雅运行时上下文>;
+  镜像夹击执行ID?: number;
   已触发复生: boolean;
   血月终舞已释放: boolean;
   上次净化投枪目标ID: number;
@@ -79,6 +83,7 @@ function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 夏
     普通机制忙碌到Ms: 0,
     当前猎血段数: 0,
     猎血段数过期时间Ms: 0,
+    汲血穿刺台词冷却到Ms: 0,
     血印句柄列表: [],
     血之狂热控制器: undefined as unknown as Buff层数状态控制器,
     血宴层数: 0,
@@ -87,6 +92,7 @@ function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 夏
     英灵战乙女已登场: false,
     英灵复刻冷却到Ms: 0,
     上次英灵复刻技能: '',
+    镜像夹击执行ID: 0,
     已触发复生: false,
     血月终舞已释放: false,
     上次净化投枪目标ID: 0,
@@ -119,7 +125,7 @@ function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 夏
     取Buff附加参数: function 取血之狂热附加显示(this: void, _unit: any, layers: number): any {
       return {
         stack: layers,
-        effect2: layers * frenzy.血之狂热每层技能冷却恢复提高 * 100,
+        effectValue2: layers * frenzy.血之狂热每层技能冷却恢复提高 * 100,
         sourceName: '夏提雅-鲜血回收',
       };
     },
@@ -145,6 +151,7 @@ const 夏提雅上下文工厂 = 创建单位运行时上下文工厂<夏提雅�
   on清理: function 夏提雅上下文清理(this: void, context: 夏提雅运行时上下文): void {
     context.挑战已结束 = true;
     context.阶段 = '已结束';
+    重置夏提雅猎血连击(context);
     context.当前大型技能 = undefined;
     context.待结算强化穿刺目标 = undefined;
     if (context.血宴攻速增量 !== 0 && 单位有效(context.Boss单位)) {
@@ -177,10 +184,21 @@ export function 清理夏提雅运行时上下文(this: void, boss: any): void {
 }
 
 export function 重置夏提雅猎血连击(this: void, context: 夏提雅运行时上下文): void {
+  if (单位有效(context.Boss单位)) 移除单位指定Buff(context.Boss单位, 夏提雅BuffID.猎血连击);
   context.当前猎血目标 = undefined;
   context.当前猎血段数 = 0;
   context.猎血段数过期时间Ms = 0;
   context.待结算强化穿刺目标 = undefined;
+}
+
+/** 阶段模型由运行时统一维护，测试命令与正式血量转阶段共用这一入口。 */
+export function 设置夏提雅阶段模型(this: void, context: 夏提雅运行时上下文): void {
+  if (!单位有效(context.Boss单位) || DzSetUnitModel == null) return;
+  const 使用女武神模型 = context.阶段 === 'P2英灵战乙女' || context.阶段 === 'P3真祖血宴' || context.阶段 === '复生仪式';
+  DzSetUnitModel(
+    context.Boss单位,
+    使用女武神模型 ? 夏提雅单位技能配置.女武神形态.模型路径 : 夏提雅单位技能配置.模型路径,
+  );
 }
 
 function 刷新阶段(this: void, context: 夏提雅运行时上下文): void {
@@ -193,10 +211,12 @@ function 刷新阶段(this: void, context: 夏提雅运行时上下文): void {
   else if (ratio <= 夏提雅单位技能配置.阶段阈值.P2生命比例) next = 'P2英灵战乙女';
   if (next === context.阶段) return;
   context.阶段 = next;
+  设置夏提雅阶段模型(context);
   context.上次阶段变化Ms = getServerTime();
   context.当前大型技能 = undefined;
   重置夏提雅猎血连击(context);
   if (next === 'P2英灵战乙女') 播放夏提雅台词(context.Boss单位, '进入P2');
+  if (next === 'P3真祖血宴') 播放夏提雅台词(context.Boss单位, '进入P3');
 }
 
 function 推进夏提雅运行时(this: void, context: 夏提雅运行时上下文, now: number): void {

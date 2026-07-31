@@ -5,9 +5,10 @@ import { 获取树魔首领上下文, 获取或创建树魔首领上下文, 获�
 import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
-import { stringToFourCC, 读取单位攻击力, 单位句柄存在, 单位未标记死亡 as 单位存活 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
-import { 启动基础施法时间线 } from '../../../../00．技能模板+函数/02．通用函数/13．施法时间线';
+import { stringToFourCC, 读取单位攻击力, 单位句柄存在, 单位未标记死亡 as 单位存活, 两点角度 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 发起治疗波跳链 } from '../../../../00．技能模板+函数/01．技能函数/10．跳链/治疗波跳链';
+import { 开始充能 } from '../../../../00．技能模板+函数/01．技能函数/06．施法·蓄力·充能/充能系统';
+import type { 充能结束原因 } from '../../../../00．技能模板+函数/01．技能函数/06．施法·蓄力·充能/充能系统';
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -17,6 +18,10 @@ const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
+const SetUnitFacing = jass.SetUnitFacing as (whichUnit: any, facing: number) => void;
+const SetUnitAnimation = jass.SetUnitAnimation as (whichUnit: any, animation: string) => void;
+const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (whichUnit: any, index: number) => void;
+const SetUnitTimeScale = jass.SetUnitTimeScale as (whichUnit: any, timeScale: number) => void;
 const GetUnitFacing = jass.GetUnitFacing as (whichUnit: any) => number;
 const GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed as (whichUnit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
@@ -243,6 +248,73 @@ function 发起树魔巫医疗波(this: void, context: 树魔首领运行时上�
   });
 }
 
+interface 树魔巫医治疗充能记录 {
+  context: 树魔首领运行时上下文;
+  target: any;
+}
+
+const 树魔巫医治疗充能记录表: Record<number, 树魔巫医治疗充能记录 | undefined> = {};
+
+function 面向树魔巫医治疗目标(this: void, witchDoctor: any, target: any): void {
+  if (!单位存活(witchDoctor) || !单位存活(target)) return;
+  SetUnitFacing(witchDoctor, 两点角度(GetUnitX(witchDoctor), GetUnitY(witchDoctor), GetUnitX(target), GetUnitY(target)));
+}
+
+function 树魔巫医治疗充能开始(this: void, witchDoctor: any, _充能ID: number): void {
+  if (!单位存活(witchDoctor)) return;
+  SetUnitTimeScale(witchDoctor, 1);
+  SetUnitAnimation(witchDoctor, "spell");
+}
+
+function 树魔巫医治疗充能完成(this: void, witchDoctor: any, 充能ID: number): void {
+  const 记录 = 树魔巫医治疗充能记录表[充能ID];
+  delete 树魔巫医治疗充能记录表[充能ID];
+  if (记录 == null) return;
+
+  面向树魔巫医治疗目标(witchDoctor, 记录.target);
+  if (单位存活(witchDoctor) && 单位存活(记录.context.Boss单位)) {
+    发起树魔巫医疗波(记录.context, witchDoctor);
+  }
+}
+
+function 树魔巫医治疗充能结束(
+  this: void,
+  witchDoctor: any,
+  _原因: 充能结束原因,
+  充能ID: number,
+): void {
+  delete 树魔巫医治疗充能记录表[充能ID];
+  if (!单位存活(witchDoctor)) return;
+  SetUnitTimeScale(witchDoctor, 1);
+  SetUnitAnimationByIndex(witchDoctor, 0);
+}
+
+function 启动巫医治疗波施法(
+  this: void,
+  context: 树魔首领运行时上下文,
+  witchDoctor: any,
+  target: any,
+): void {
+  const cfg = 树魔首领数值与表现配置.随从特性;
+  const 施法硬直秒 = cfg.巫医疗波施法硬直秒;
+  面向树魔巫医治疗目标(witchDoctor, target);
+  const 充能ID = 开始充能(witchDoctor, {
+    持续时间: 施法硬直秒,
+    主单位: context.Boss单位,
+    主单位死亡时中断: true,
+    强制硬直: true,
+    显示进度条特效: true,
+    进度条特效动画序号: 0,
+    进度条特效动画速度: 施法硬直秒 > 0 ? 1 / 施法硬直秒 : 1,
+    开始回调: 树魔巫医治疗充能开始,
+    充能完成回调: 树魔巫医治疗充能完成,
+    结束回调: 树魔巫医治疗充能结束,
+  });
+  if (充能ID > 0) {
+    树魔巫医治疗充能记录表[充能ID] = { context, target };
+  }
+}
+
 function 启动巫医治疗驱动(this: void, context: 树魔首领运行时上下文, witchDoctor: any): void {
   const cfg = 树魔首领数值与表现配置.随从特性;
   let 下一次治疗Ms = getServerTime() + cfg.巫医疗波首次延迟秒 * 1000;
@@ -257,22 +329,23 @@ function 启动巫医治疗驱动(this: void, context: 树魔首领运行时上�
     const target = 选择巫医治疗目标(context);
     if (target == null || target === 0) return;
     下一次治疗Ms = now + cfg.巫医疗波冷却秒 * 1000;
-    function 树魔巫医疗波生效(this: void): void {
-      if (单位存活(witchDoctor) && 单位存活(context.Boss单位)) {
-        发起树魔巫医疗波(context, witchDoctor);
-      }
-    }
-    启动基础施法时间线({
-      施法者: witchDoctor,
-      目标单位: target,
-      硬直秒: cfg.巫医疗波施法硬直秒,
-      动画名: "spell",
-      动画速度: 1,
-      恢复动画编号: 0,
-      on生效: 树魔巫医疗波生效,
-    });
+    启动巫医治疗波施法(context, witchDoctor, target);
   });
   context.清理.登记周期回调("树魔巫医治疗", healId);
+}
+
+export function 测试触发树魔巫医疗波(this: void, context: 树魔首领运行时上下文): boolean {
+  if (!单位存活(context.Boss单位)) return false;
+  const target = 选择巫医治疗目标(context);
+  if (target == null || target === 0) return false;
+  const list = context.随从组.取单位列表();
+  for (let i = 0; i < list.length; i++) {
+    const witchDoctor = list[i];
+    if (!单位存活(witchDoctor) || GetUnitTypeId(witchDoctor) !== 巫医单位类型ID) continue;
+    启动巫医治疗波施法(context, witchDoctor, target);
+    return true;
+  }
+  return false;
 }
 
 function 补充指定类型随从(

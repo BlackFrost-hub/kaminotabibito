@@ -23,6 +23,7 @@ import {
   获取单位指定标签护盾实例,
   获取单位指定标签护盾值,
   充能单位指定标签护盾,
+  刷新单位指定标签护盾持续时间,
   删除单位指定标签护盾,
   取句柄ID,
 } from "./02．护盾实例";
@@ -222,6 +223,12 @@ export function 充能单位标签护盾(单位: any, 标签: string, 数值: nu
   const 实际增加 = 充能单位指定标签护盾(单位ID, 标签, 数值, 最大值);
   if (实际增加 > 0) 通知获得护盾事件(已有护盾.来源单位 ?? 单位, 单位, 实际增加, 标签, 参数);
   return 实际增加;
+}
+
+export function 刷新单位标签护盾持续时间(单位: any, 标签: string, 持续时间: number): boolean {
+  const 单位ID = 取句柄ID(单位);
+  if (单位ID === 0 || 标签 === "") return false;
+  return 刷新单位指定标签护盾持续时间(单位ID, 标签, 持续时间);
 }
 
 export function 移除单位标签护盾(单位: any, 标签: string): void {

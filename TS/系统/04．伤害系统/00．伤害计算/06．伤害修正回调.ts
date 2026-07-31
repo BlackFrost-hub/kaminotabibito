@@ -14,6 +14,12 @@ export interface DamageModifierContext {
   originalAttacker?: any;
   baseDamage: number;
   currentDamage: number;
+  rawAttackType?: any;
+  rawDamageType?: any;
+  rawWeaponType?: any;
+  effectiveAttackType?: any;
+  effectiveDamageType?: any;
+  effectiveWeaponType?: any;
   isPhysicalDamage: boolean;
   isMagicDamage: boolean;
   isEnhancedDamage: boolean;
@@ -25,7 +31,6 @@ export interface DamageModifierContext {
   isThunderDamage?: boolean;
   isLightDamage?: boolean;
   isDarkDamage?: boolean;
-  rawDamageType?: any;
   isNormalAttack: boolean;
   isRangedAttack?: boolean;
   isSkillAttack: boolean;
@@ -41,12 +46,21 @@ export interface DamageModifierContext {
   skillInstanceId?: number;
   skillDamageTag?: string;
   skillDamageShape?: string;
+  isIndependentSkillDamage?: boolean;
   isSingleTargetSkillDamage?: boolean;
   isAoeSkillDamage?: boolean;
   isDamageTransfer?: boolean;
 }
 
 export type DamageModifier = (this: void, context: DamageModifierContext) => number;
+
+/**
+ * 基础伤害修正发生在免疫判定之后、护甲/魔抗计算之前。
+ * 适合会改变伤害类型计算基数的附加伤害，不应在这里修改最终乘区。
+ */
+export interface DamageBaseModifierContext extends DamageModifierContext {}
+
+export type DamageBaseModifier = (this: void, context: DamageBaseModifierContext) => number;
 
 const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
   getBuffRuntime: (this: void, unit: any, buffID: string) => { effect: number; effect2?: number; remaining: number } | null;
@@ -61,6 +75,15 @@ interface DamageModifierEntry {
 const damageModifiers: DamageModifierEntry[] = [];
 let nextModifierId = 1;
 let vulnerableModifierRegistered = false;
+
+interface DamageBaseModifierEntry {
+  id: number;
+  priority: number;
+  callback: DamageBaseModifier;
+}
+
+const damageBaseModifiers: DamageBaseModifierEntry[] = [];
+let nextBaseModifierId = 1;
 
 const VULNERABLE_BUFF_ID = "C026";
 
@@ -105,6 +128,47 @@ export function applyDamageModifiers(context: DamageModifierContext): number {
     }
   }
   return currentDamage;
+}
+
+function sortDamageBaseModifiers(): void {
+  damageBaseModifiers.sort(function sortDamageBaseModifierEntries(a: DamageBaseModifierEntry, b: DamageBaseModifierEntry): number {
+    if (a.priority !== b.priority) return b.priority - a.priority;
+    return a.id - b.id;
+  });
+}
+
+export function registerDamageBaseModifier(callback: DamageBaseModifier, priority: number = 0): number {
+  if (callback == null) return 0;
+  const id = nextBaseModifierId;
+  nextBaseModifierId = nextBaseModifierId + 1;
+  damageBaseModifiers.push({ id, priority, callback });
+  sortDamageBaseModifiers();
+  return id;
+}
+
+export function unregisterDamageBaseModifier(id: number): boolean {
+  for (let i = 0; i < damageBaseModifiers.length; i++) {
+    if (damageBaseModifiers[i].id !== id) continue;
+    damageBaseModifiers.splice(i, 1);
+    return true;
+  }
+  return false;
+}
+
+export function applyDamageBaseModifiers(context: DamageBaseModifierContext): number {
+  let currentDamage = context.currentDamage;
+  for (let i = 0; i < damageBaseModifiers.length; i++) {
+    const entry = damageBaseModifiers[i];
+    if (entry == null || entry.callback == null) continue;
+    context.currentDamage = currentDamage;
+    const nextDamage = entry.callback(context);
+    if (typeof nextDamage === "number") currentDamage = nextDamage;
+  }
+  return currentDamage;
+}
+
+export function getDamageBaseModifierCount(): number {
+  return damageBaseModifiers.length;
 }
 
 export function getDamageModifierCount(): number {

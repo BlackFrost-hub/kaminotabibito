@@ -10,21 +10,33 @@ import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放'
 import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
+const { CosBJ, SinBJ } = require('lib.扩展函数.BJ函数.12．数学函数') as {
+  CosBJ: (this: void, degrees: number) => number;
+  SinBJ: (this: void, degrees: number) => number;
+};
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (unit: any, animationName: string) => void;
+const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, animationIndex: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAcquireRange = jass.SetUnitAcquireRange as (unit: any, range: number) => void;
 const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
+const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: string) => boolean;
+const ConvertUnitState = jass.ConvertUnitState as (state: number) => any;
 const UnitAddAbility = jass.UnitAddAbility as (unit: any, abilityId: number) => boolean;
+const UnitAddType = jass.UnitAddType as (unit: any, unitType: any) => boolean;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const CosBJ = jass.CosBJ as (degrees: number) => number;
-const SinBJ = jass.SinBJ as (degrees: number) => number;
 const GetRandomReal = jass.GetRandomReal as (minimum: number, maximum: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
+const UNIT_TYPE_TAUREN = jass.UNIT_TYPE_TAUREN as any;
+const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: any, value: number) => void;
+const DzUnitDisableAttack = japi.DzUnitDisableAttack as ((unit: any, disabled: boolean) => void) | undefined;
+const 攻击范围状态 = 0x16;
+const 攻击间隔状态 = 0x25;
 
 const { 创建召唤物 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口') as {
   创建召唤物: (this: void, 参数: any) => any;
@@ -38,9 +50,21 @@ const { getServerTime } = require('系统.00．核心系统.05．中心计时器
 const { createTimedEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
+const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 蝗虫技能ID = 0x416c6f63;
 const 分身残影路径 = 'Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx';
+
+function 禁用夏提雅投影原生攻击(this: void, unit: any): void {
+  if (!单位有效(unit)) return;
+  SetUnitAcquireRange(unit, 0);
+  SetUnitStateJapi(unit, ConvertUnitState(攻击范围状态), 0);
+  SetUnitStateJapi(unit, ConvertUnitState(攻击间隔状态), 99);
+  if (DzUnitDisableAttack != null) DzUnitDisableAttack(unit, true);
+  IssueImmediateOrder(unit, 'stop');
+}
 
 export interface 英灵复刻参数 {
   X: number;
@@ -48,6 +72,7 @@ export interface 英灵复刻参数 {
   朝向: number;
   延迟秒?: number;
   投影持续秒?: number;
+  复刻动画编号?: number;
   复刻结算?: (this: void) => void;
 }
 
@@ -76,7 +101,8 @@ export function 创建夏提雅英灵投影(this: void, context: 夏提雅运行
   if (!单位有效(projection)) return projection;
 
   UnitAddAbility(projection, 蝗虫技能ID);
-  SetUnitAcquireRange(projection, 0);
+  UnitAddType(projection, UNIT_TYPE_TAUREN);
+  禁用夏提雅投影原生攻击(projection);
   SetUnitPathing(projection, false);
   context.英灵战乙女句柄 = projection;
   createTimedEffect(分身残影路径, x, y, 0, cfg.英灵投影出现残影秒);
@@ -132,23 +158,34 @@ export function 触发英灵战乙女复刻(this: void, context: 夏提雅运行
   const cfg = 夏提雅数值与表现配置.P2;
   const delay = 参数.延迟秒 ?? cfg.英灵复刻延迟最小秒;
   const projection = 获取夏提雅英灵投影(context) ?? 创建夏提雅英灵投影(context, 参数.X, 参数.Y, 参数.朝向, 3600);
-  if (!单位有效(projection)) return projection;
+  if (!单位有效(projection)) {
+    debugLogForce('夏提雅-英灵战乙女', '复刻安排失败：投影无效');
+    return projection;
+  }
 
   SetUnitFacing(projection, 参数.朝向);
   const delayedId = addDelayedCallback(delay * 1000, function 夏提雅英灵复刻结算(this: void): void {
     播放Boss坐标音效(夏提雅数值与表现配置.音效.英灵战乙女, GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), 夏提雅数值与表现配置.音效默认裁断距离);
     if (context.英灵战乙女句柄 !== projection || !单位有效(projection)) return;
-    SetUnitAnimation(projection, 'attack');
+    if (参数.复刻动画编号 != null) SetUnitAnimationByIndex(projection, 参数.复刻动画编号);
+    else SetUnitAnimation(projection, 'attack');
     if (参数.复刻结算 != null) 参数.复刻结算();
   });
   context.清理.登记延迟回调('夏提雅-英灵战乙女复刻', delayedId);
+  debugLogForce('夏提雅-英灵战乙女', '复刻延迟已登记', 'delay=', delay, 'timer=', delayedId);
   return projection;
 }
 
 export function 尝试触发英灵战乙女复刻(this: void, context: 夏提雅运行时上下文, skillKey: string, 参数: 英灵复刻参数): boolean {
-  if (context.阶段 !== 'P2英灵战乙女' || context.挑战已结束 || !单位有效(context.英灵战乙女句柄)) return false;
+  if (context.阶段 !== 'P2英灵战乙女' || context.挑战已结束 || !单位有效(context.英灵战乙女句柄)) {
+    debugLogForce('夏提雅-英灵战乙女', '复刻拒绝：状态不满足', 'phase=', context.阶段, 'ended=', context.挑战已结束, 'projection=', 单位有效(context.英灵战乙女句柄));
+    return false;
+  }
   const now = getServerTime();
-  if (now < context.英灵复刻冷却到Ms || context.上次英灵复刻技能 === skillKey) return false;
+  if (now < context.英灵复刻冷却到Ms || context.上次英灵复刻技能 === skillKey) {
+    debugLogForce('夏提雅-英灵战乙女', '复刻拒绝：冷却或重复技能', 'now=', now, 'cooldownTo=', context.英灵复刻冷却到Ms, 'lastSkill=', context.上次英灵复刻技能, 'skill=', skillKey);
+    return false;
+  }
   const cfg = 夏提雅数值与表现配置.P2;
   context.英灵复刻冷却到Ms = now + cfg.英灵复刻内部冷却秒 * 1000;
   context.上次英灵复刻技能 = skillKey;

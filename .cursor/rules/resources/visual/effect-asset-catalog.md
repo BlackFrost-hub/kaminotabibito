@@ -25,6 +25,7 @@
 | 形态特效 | [`effect-asset-catalog/form/README.md`](effect-asset-catalog/form/README.md) | `imports\Common\Effect\Form` |
 | 元素特效 | [`effect-asset-catalog/element/README.md`](effect-asset-catalog/element/README.md) | `imports\Common\Effect\Element` |
 | 弹道特效 | [`effect-asset-catalog/projectile/README.md`](effect-asset-catalog/projectile/README.md) | `imports\Common\Effect\Projectile` |
+| 闪电定义与贴图 | [`effect-asset-catalog/lightning/README.md`](effect-asset-catalog/lightning/README.md) | `imports\Splats` + `imports\Common\Effect\Lightning` |
 | 去重与维护 | [`effect-asset-catalog/maintenance.md`](effect-asset-catalog/maintenance.md) | 跨分类维护规则 |
 
 新增详细条目时必须写入对应分类文件；禁止再把条目表追加到本入口文件。

@@ -6,6 +6,7 @@ export const 夏提雅BuffID = {
   鲜血枯竭: 'BSH1',
   血之狂热: 'BSH2',
   真祖血宴: 'BSH3',
+  猎血连击: 'BSH4',
 } as const;
 
 export const 夏提雅Buff表: Record<string, BuffData> = {
@@ -25,7 +26,7 @@ export const 夏提雅Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 90,
     canPurge: false,
-    tooltip: '短时间内再次承受汲血穿刺时仍会受到伤害，但不会为夏提雅恢复生命或留下鲜血印记。',
+    tooltip: '持续6秒。期间再次承受汲血强化穿刺仍会受到本次伤害，但夏提雅不会恢复3%最大生命，也不会生成新的鲜血印记。',
   },
   [夏提雅BuffID.血之狂热]: {
     buffID: 夏提雅BuffID.血之狂热,
@@ -40,7 +41,7 @@ export const 夏提雅Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 75,
     canPurge: false,
-    tooltip: '每层使攻击速度提高data%，技能冷却恢复提高data2%，最多3层。',
+    tooltip: '持续8秒。每层加8%攻击速度、加5%技能冷却恢复速度；1层为加8%攻击速度、加5%技能冷却恢复速度，2层为加16%攻击速度、加10%技能冷却恢复速度，3层为加24%攻击速度、加15%技能冷却恢复速度。',
   },
   [夏提雅BuffID.真祖血宴]: {
     buffID: 夏提雅BuffID.真祖血宴,
@@ -55,7 +56,22 @@ export const 夏提雅Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 95,
     canPurge: false,
-    tooltip: 'P3开始时每枚未净化鲜血印记转化一层，每层使攻击速度提高data%，并加快真祖技能节奏。',
+    tooltip: 'P3阶段持续到战斗结束。每枚未净化鲜血印记转化1层，最多3层；每层加8%攻击速度、加5%技能循环速度；1层为加8%攻击速度、加5%技能循环速度，2层为加16%攻击速度、加10%技能循环速度，3层为加24%攻击速度、加15%技能循环速度。',
+  },
+  [夏提雅BuffID.猎血连击]: {
+    buffID: 夏提雅BuffID.猎血连击,
+    buffName: '猎血连击',
+    icon: 'BuffIcon\\Boss\\Shalltear\\hunt_blood_combo.blp',
+    effect: '',
+    type: 'Buff:combat:mechanic',
+    interval: 0,
+    maxStack: 3,
+    stackRule: 'stack',
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 80,
+    canPurge: false,
+    tooltip: '普通攻击连续命中同一目标时叠层；P1/P2已有2层时下一次普通攻击改为汲血强化穿刺，P3已有1层时下一次普通攻击改为汲血强化穿刺。3秒未继续命中、夏提雅被硬控制或施放大型技能时清空；改打其他目标时从该目标的第1层重新计数。',
   },
 };
 

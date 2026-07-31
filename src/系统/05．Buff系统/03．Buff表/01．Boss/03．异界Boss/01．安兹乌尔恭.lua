@@ -17,7 +17,7 @@ ____exports["安兹乌尔恭Buff表"] = {[____exports["安兹乌尔恭BuffID"]["
     dispelLevel = 3,
     priority = 95,
     canPurge = false,
-    tooltip = "三座生命锚全部激活后获得，免受本轮“女妖哭嚎”的致命伤害。"
+    tooltip = "持续14秒；激活3座生命锚后获得，抵挡本轮“女妖哭嚎”的致命伤害1次。"
 }, [____exports["安兹乌尔恭BuffID"]["黑翼拘束"]] = {
     buffID = ____exports["安兹乌尔恭BuffID"]["黑翼拘束"],
     buffName = "黑翼拘束",
@@ -34,7 +34,7 @@ ____exports["安兹乌尔恭Buff表"] = {[____exports["安兹乌尔恭BuffID"]["
     dispelLevel = 3,
     priority = 96,
     canPurge = false,
-    tooltip = "被雅儿贝德的黑翼与锁链压制；击破拘束核心或等待天空坠落施法结束即可解除。"
+    tooltip = "持续3.2~4.0秒；多人模式暂停目标，单人模式使攻击速度和移动速度降低70%；击破拘束核心可提前解除。"
 }}
 ____exports.default = ____exports["安兹乌尔恭Buff表"]
 return ____exports

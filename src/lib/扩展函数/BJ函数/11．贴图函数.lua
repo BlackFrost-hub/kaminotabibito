@@ -4,16 +4,19 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
+local PercentTo255 = ____require_result_0.PercentTo255
 local GetLocationX = jass.GetLocationX
 local GetLocationY = jass.GetLocationY
 local CreateUbersplat = jass.CreateUbersplat
 local ShowUbersplat = jass.ShowUbersplat
-local ____jglobals_bj_lastCreatedUbersplat_0 = jglobals.bj_lastCreatedUbersplat
-if ____jglobals_bj_lastCreatedUbersplat_0 == nil then
-    ____jglobals_bj_lastCreatedUbersplat_0 = nil
+local SetUbersplatRenderAlwaysNative = jass.SetUbersplatRenderAlways
+local ____jglobals_bj_lastCreatedUbersplat_1 = jglobals.bj_lastCreatedUbersplat
+if ____jglobals_bj_lastCreatedUbersplat_1 == nil then
+    ____jglobals_bj_lastCreatedUbersplat_1 = nil
 end
-____exports.bj_lastCreatedUbersplat = ____jglobals_bj_lastCreatedUbersplat_0
-function ____exports.CreateUbersplatBJ(file, where, red, green, blue, alpha, forcePaused, noBirthTime)
+____exports.bj_lastCreatedUbersplat = ____jglobals_bj_lastCreatedUbersplat_1
+function ____exports.CreateUbersplatBJ(where, file, red, green, blue, alpha, forcePaused, noBirthTime)
     if where == nil or where == 0 then
         return nil
     end
@@ -23,10 +26,10 @@ function ____exports.CreateUbersplatBJ(file, where, red, green, blue, alpha, for
         x,
         y,
         file,
-        red,
-        green,
-        blue,
-        alpha,
+        PercentTo255(red),
+        PercentTo255(green),
+        PercentTo255(blue),
+        PercentTo255(100 - alpha),
         forcePaused,
         noBirthTime
     )
@@ -37,6 +40,12 @@ function ____exports.ShowUbersplatBJ(flag, whichUbersplat)
         return
     end
     ShowUbersplat(whichUbersplat, flag)
+end
+function ____exports.SetUbersplatRenderAlways(whichUbersplat, flag)
+    if whichUbersplat == nil or whichUbersplat == 0 then
+        return
+    end
+    SetUbersplatRenderAlwaysNative(whichUbersplat, flag)
 end
 function ____exports.GetLastCreatedUbersplat()
     return ____exports.bj_lastCreatedUbersplat

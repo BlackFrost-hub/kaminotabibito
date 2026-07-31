@@ -9,6 +9,7 @@ import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../
 import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 播放赤誓灵卫台词 } from '../12．台词播放';
+const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as { debugLogForce: (this: void, module: string, ...args: any[]) => void };
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -19,8 +20,10 @@ const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统
 const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
   造成AOE技能伤害: (this: void, params: any) => boolean;
 };
-const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
@@ -28,16 +31,19 @@ const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09�
 };
 
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
+const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const RAD_TO_DEG = 57.29577951308232;
 
@@ -70,7 +76,11 @@ function 结算践踏伤害(this: void, context: 祖地双灵卫运行时上下�
   if (!单位有效(boss) || context.战斗已结束) return;
   const cfg = 祖地双灵卫数值与表现配置.P2.断誓践踏;
   const impact = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.断誓践踏.践踏落地特效路径, x, y);
+  if (impact != null && impact !== 0 && EXSetEffectSize != null) EXSetEffectSize(impact, 1.5);
   if (impact != null && impact !== 0) YDWETimerDestroyEffectSafe(0.8, impact);
+  const thunder = AddSpecialEffect('Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl', x, y);
+  if (thunder != null && thunder !== 0 && EXSetEffectSize != null) EXSetEffectSize(thunder, 2.0);
+  if (thunder != null && thunder !== 0) YDWETimerDestroyEffectSafe(0.8, thunder);
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
     const hit = heroes[i];
@@ -89,7 +99,15 @@ export function 尝试以断誓践踏破壳当前净化节点(this: void, contex
     if (node.序号 !== context.当前净化节点序号 || node.阶段 !== '破壳') continue;
     const now = getServerTime();
     if (now < node.重试允许Ms) return false;
-    if (!点在圆内(landingX, landingY, node.X, node.Y, 祖地双灵卫数值与表现配置.P3.节点判定半径)) return false;
+    const dx = landingX - node.X;
+    const dy = landingY - node.Y;
+    const distance2 = dx * dx + dy * dy;
+    const radius = 祖地双灵卫数值与表现配置.P3.节点判定半径;
+    const hit = distance2 <= radius * radius;
+    debugLogForce('祖地双灵卫-7-3节点判定', '落点', landingX, landingY, '节点', node.X, node.Y, '距离平方', distance2, '半径平方', radius * radius, '命中', hit);
+    if (!hit) return false;
+    const breakEffect = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.双钥净化.节点破壳特效路径, node.X, node.Y);
+    if (breakEffect != null && breakEffect !== 0) YDWETimerDestroyEffectSafe(0.8, breakEffect);
     node.阶段 = '校准';
     node.校准截止Ms = now + 祖地双灵卫数值与表现配置.P3.校准阶段窗口秒 * 1000;
     node.重试允许Ms = 0;
@@ -106,6 +124,7 @@ function 尝试由誓盾压制裂誓战躯(this: void, context: 祖地双灵卫�
   const cfg = 祖地双灵卫数值与表现配置.P2.断誓践踏;
   开始硬直(boss, cfg.压制硬直秒);
   const suppress = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.断誓践踏.镇魂压制特效路径, landingX, landingY);
+  if (suppress != null && suppress !== 0 && EXSetEffectSize != null) EXSetEffectSize(suppress, 2.0);
   if (suppress != null && suppress !== 0) YDWETimerDestroyEffectSafe(cfg.压制硬直秒, suppress);
   if (shield.特效 != null && shield.特效 !== 0) DestroyEffect(shield.特效);
   context.誓盾 = undefined;
@@ -147,7 +166,20 @@ export function 释放断誓践踏(this: void, context: 祖地双灵卫运行时
     if (hitNode || suppressed) return;
     结算践踏伤害(context, second.X, second.Y, '祖地双灵卫·断誓践踏二踏');
     const soulCrack = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.断誓践踏.短时魂裂特效路径, second.X, second.Y);
+    if (soulCrack != null && soulCrack !== 0 && EXSetEffectSize != null) EXSetEffectSize(soulCrack, 1.5);
     if (soulCrack != null && soulCrack !== 0) YDWETimerDestroyEffectSafe(cfg.魂裂持续秒, soulCrack);
+    const heroes = 获取Boss技能敌对英雄列表(boss);
+    let ticks = 0;
+    const crackTimer = addPeriodicCallback(500, function 断誓践踏魂裂Tick(this: void): void {
+      ticks += 1;
+      for (let i = 0; i < heroes.length; i++) {
+        const hit = heroes[i];
+        if (!单位有效(hit) || !点在圆内(GetUnitX(hit), GetUnitY(hit), second.X, second.Y, cfg.落点半径)) continue;
+        const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: 0.08 });
+        造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_PLANT, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '祖地双灵卫·断誓践踏魂裂' });
+      }
+      if (ticks >= 4) removePeriodicCallback(crackTimer);
+    });
   });
   context.清理.登记延迟回调('祖地双灵卫-断誓践踏第二步', delayedId);
   return true;

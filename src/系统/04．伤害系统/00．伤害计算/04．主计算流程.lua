@@ -1,10 +1,14 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local applyElementalDamage, getRealAttrWithLimit, calcElementalDamageBonus, _____4F24_5BB3_51FD_6570
-function applyElementalDamage(attacker, target, isPlayer)
+local applyElementalDamage, getRealAttrWithLimit, calcElementalDamageBonus
+function applyElementalDamage(attacker, target, isPlayer, snapshot)
     local addDamage = 0
     local multiplier = 1
-    if _____4F24_5BB3_51FD_6570.isMetalDamage() then
+    if snapshot.isMetalDamage then
         local dmg = calcElementalDamageBonus(nil, attacker, "金属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "金属性抗性", isPlayer)
         if dmg >= 0 then
@@ -14,7 +18,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isWoodDamage() then
+    if snapshot.isWoodDamage then
         local dmg = calcElementalDamageBonus(nil, attacker, "木属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "木属性抗性", isPlayer)
         if dmg >= 0 then
@@ -24,7 +28,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isWaterDamage() then
+    if snapshot.isWaterDamage then
         local dmg = calcElementalDamageBonus(nil, attacker, "水属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "水属性抗性", isPlayer)
         if dmg >= 0 then
@@ -34,7 +38,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isFireDamage() then
+    if snapshot.isFireDamage then
         local dmg = calcElementalDamageBonus(nil, attacker, "火属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "火属性抗性", isPlayer)
         if dmg >= 0 then
@@ -44,7 +48,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isThunderDamage() then
+    if snapshot.isThunderDamage then
         local dmg = calcElementalDamageBonus(nil, attacker, "雷属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "雷属性抗性", isPlayer)
         if dmg >= 0 then
@@ -54,7 +58,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isLightDamage() then
+    if snapshot.isLightDamage then
         local dmg = calcElementalDamageBonus(nil, attacker, "光属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "光属性抗性", isPlayer)
         if dmg >= 0 then
@@ -64,7 +68,7 @@ function applyElementalDamage(attacker, target, isPlayer)
         end
         multiplier = multiplier * (1 - resist)
     end
-    if _____4F24_5BB3_51FD_6570.isDarkDamage() then
+    if snapshot.isDarkDamage then
         local dmg = calcElementalDamageBonus(nil, attacker, "暗属性伤害")
         local resist = getRealAttrWithLimit(nil, target, "暗属性抗性", isPlayer)
         if dmg >= 0 then
@@ -115,16 +119,20 @@ local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算
 local applyLifeAndManaSteal = ____require_result_2.applyLifeAndManaSteal
 local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local applyDamageModifiers = ____require_result_3.applyDamageModifiers
-local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587 = ____require_result_4["获取当前技能伤害上下文"]
-local ____require_result_5 = require("系统.04．伤害系统.04．伤害映射")
-local _____83B7_53D6_4F24_5BB3_5F52_5C5E_5355_4F4D = ____require_result_5["获取伤害归属单位"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
-local createDelayedCall = ____require_result_6.createDelayedCall
+local applyDamageBaseModifiers = ____require_result_3.applyDamageBaseModifiers
+local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.07．伤害类型转换")
+local applyDamageTypeConversions = ____require_result_4.applyDamageTypeConversions
+local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587 = ____require_result_5["获取当前技能伤害上下文"]
+local ____require_result_6 = require("系统.04．伤害系统.04．伤害映射")
+local _____83B7_53D6_4F24_5BB3_5F52_5C5E_5355_4F4D = ____require_result_6["获取伤害归属单位"]
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.02．计时器")
+local createDelayedCall = ____require_result_7.createDelayedCall
 local ConvertDamageType = jass.ConvertDamageType
 local ConvertAttackType = jass.ConvertAttackType
 local ConvertWeaponType = jass.ConvertWeaponType
-_____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
+local UnitDamageTarget = jass.UnitDamageTarget
+local _____4F24_5BB3_51FD_6570 = require("lib.扩展函数.封装函数.06．伤害函数.index")
 local appliedFinalDamageListeners = {}
 local appliedFinalDamagePostListeners = {}
 ____exports["延后一帧执行伤害派生效果"] = function(callback)
@@ -188,10 +196,16 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied, snap
 end
 local function captureDamageTypeSnapshot()
     local skillContext = _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587()
+    local rawAttackType = ConvertAttackType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_ATTACK_TYPE))
+    local rawDamageType = ConvertDamageType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_DAMAGE_TYPE))
+    local rawWeaponType = ConvertWeaponType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_WEAPON_TYPE))
     return {
-        rawAttackType = ConvertAttackType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_ATTACK_TYPE)),
-        rawDamageType = ConvertDamageType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_DAMAGE_TYPE)),
-        rawWeaponType = ConvertWeaponType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_WEAPON_TYPE)),
+        rawAttackType = rawAttackType,
+        rawDamageType = rawDamageType,
+        rawWeaponType = rawWeaponType,
+        effectiveAttackType = rawAttackType,
+        effectiveDamageType = rawDamageType,
+        effectiveWeaponType = rawWeaponType,
         isPhysicalDamage = _____4F24_5BB3_51FD_6570.isPhysicalDamage(),
         isMagicDamage = _____4F24_5BB3_51FD_6570.isMagicDamage(),
         isEnhancedDamage = _____4F24_5BB3_51FD_6570.isEnhancedDamage(),
@@ -224,6 +238,41 @@ local function captureDamageTypeSnapshot()
         isDarkDamage = _____4F24_5BB3_51FD_6570.isDarkDamage()
     }
 end
+local function _____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3(source, target, amount, request, defaultAttack, defaultRanged, defaultAttackType, defaultWeaponType)
+    if source == nil or source == 0 or target == nil or target == 0 or request == nil or request.damageType == nil or not (amount > 0) then
+        return
+    end
+    local ____array_42 = __TS__SparseArrayNew(source, target, amount)
+    local ____temp_38
+    if request.attack ~= nil then
+        ____temp_38 = request.attack
+    else
+        ____temp_38 = defaultAttack
+    end
+    __TS__SparseArrayPush(____array_42, ____temp_38)
+    local ____temp_39
+    if request.ranged ~= nil then
+        ____temp_39 = request.ranged
+    else
+        ____temp_39 = defaultRanged
+    end
+    __TS__SparseArrayPush(____array_42, ____temp_39)
+    local ____temp_40
+    if request.attackType ~= nil then
+        ____temp_40 = request.attackType
+    else
+        ____temp_40 = defaultAttackType
+    end
+    __TS__SparseArrayPush(____array_42, ____temp_40, request.damageType)
+    local ____temp_41
+    if request.weaponType ~= nil then
+        ____temp_41 = request.weaponType
+    else
+        ____temp_41 = defaultWeaponType
+    end
+    __TS__SparseArrayPush(____array_42, ____temp_41)
+    UnitDamageTarget(__TS__SparseArraySpread(____array_42))
+end
 --- 检查是否免疫伤害
 local function checkImmune(target, isNormalAtk)
     if isImmuneDamage(nil, target) and not isDamageReduceDisabled(nil, target) then
@@ -240,26 +289,85 @@ end
 -- @param attacker 攻击者
 -- @param baseDamage 基础伤害
 -- @returns 伤害计算结果
-function ____exports.calculateDamage(target, attacker, baseDamage, originalAttacker)
+function ____exports.calculateDamage(target, attacker, baseDamage, originalAttacker, damageSnapshot)
     local damage = baseDamage
-    local ____temp_37
+    local ____temp_43
     if originalAttacker ~= nil and originalAttacker ~= 0 then
-        ____temp_37 = originalAttacker
+        ____temp_43 = originalAttacker
     else
-        ____temp_37 = attacker
+        ____temp_43 = attacker
     end
-    local rawAttacker = ____temp_37
+    local rawAttacker = ____temp_43
+    local snapshot = damageSnapshot or captureDamageTypeSnapshot()
     local isPlayer = isPlayerUnit(nil, target)
-    local isNormalAtk = _____4F24_5BB3_51FD_6570.isNormalAttack()
-    local isPhysDmg = _____4F24_5BB3_51FD_6570.isPhysicalDamage()
-    local isMagicDmg = _____4F24_5BB3_51FD_6570.isMagicDamage()
-    local isEnhanceDmg = _____4F24_5BB3_51FD_6570.isEnhancedDamage()
-    local isTrueDmg = _____4F24_5BB3_51FD_6570.isTrueDamage()
+    local isNormalAtk = snapshot.isNormalAttack
+    local isPhysDmg = snapshot.isPhysicalDamage
+    local isMagicDmg = snapshot.isMagicDamage
+    local isEnhanceDmg = snapshot.isEnhancedDamage
+    local isTrueDmg = snapshot.isTrueDamage
     local skillContext = _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587()
-    local isWrappedSkillDmg = (skillContext and skillContext.isWrappedSkillDamage) == true and skillContext.participatesInSkillDamageBonus ~= false
-    local isAnySkillDmg = _____4F24_5BB3_51FD_6570.isSkillAttack() or _____4F24_5BB3_51FD_6570.isSkillDamage() or isWrappedSkillDmg
+    local isWrappedSkillDmg = snapshot.isWrappedSkillDamage == true and (skillContext and skillContext.participatesInSkillDamageBonus) ~= false
+    local isAnySkillDmg = snapshot.isSkillAttack or snapshot.isSkillDamage or isWrappedSkillDmg
     if isTrueDmg then
-        return {finalDamage = damage, immune = false, showDodge = false}
+        return {finalDamage = damage, immune = false, showDodge = false, calculatedBaseDamage = damage}
+    end
+    local immuneCheck = checkImmune(target, isNormalAtk)
+    if immuneCheck.immune then
+        return {
+            finalDamage = 0,
+            immune = true,
+            immuneReason = immuneCheck.reason,
+            showDodge = immuneCheck.showDodge,
+            calculatedBaseDamage = baseDamage
+        }
+    end
+    local baseContext = {
+        target = target,
+        attacker = attacker,
+        originalAttacker = rawAttacker,
+        baseDamage = baseDamage,
+        currentDamage = damage,
+        rawAttackType = snapshot.rawAttackType,
+        rawDamageType = snapshot.rawDamageType,
+        rawWeaponType = snapshot.rawWeaponType,
+        effectiveAttackType = snapshot.effectiveAttackType,
+        effectiveDamageType = snapshot.effectiveDamageType,
+        effectiveWeaponType = snapshot.effectiveWeaponType,
+        isPhysicalDamage = snapshot.isPhysicalDamage,
+        isMagicDamage = snapshot.isMagicDamage,
+        isEnhancedDamage = snapshot.isEnhancedDamage,
+        isTrueDamage = snapshot.isTrueDamage,
+        isMetalDamage = snapshot.isMetalDamage,
+        isWoodDamage = snapshot.isWoodDamage,
+        isWaterDamage = snapshot.isWaterDamage,
+        isFireDamage = snapshot.isFireDamage,
+        isThunderDamage = snapshot.isThunderDamage,
+        isLightDamage = snapshot.isLightDamage,
+        isDarkDamage = snapshot.isDarkDamage,
+        isNormalAttack = snapshot.isNormalAttack,
+        isRangedAttack = snapshot.isRangedAttack,
+        isSkillAttack = snapshot.isSkillAttack,
+        isSkillDamage = snapshot.isSkillDamage,
+        isWrappedSkillDamage = snapshot.isWrappedSkillDamage,
+        isEquipmentSkillDamage = snapshot.isEquipmentSkillDamage,
+        isNonEquipmentSkillDamage = snapshot.isNonEquipmentSkillDamage,
+        skillDamageSourceKind = snapshot.skillDamageSourceKind,
+        equipmentSkillDamageKind = snapshot.equipmentSkillDamageKind,
+        itemTypeId = snapshot.itemTypeId,
+        itemHandle = snapshot.itemHandle,
+        abilityId = snapshot.abilityId,
+        skillInstanceId = snapshot.skillInstanceId,
+        skillDamageTag = snapshot.skillDamageTag,
+        skillDamageShape = snapshot.skillDamageShape,
+        isIndependentSkillDamage = snapshot.isIndependentSkillDamage,
+        isSingleTargetSkillDamage = snapshot.isSingleTargetSkillDamage,
+        isAoeSkillDamage = snapshot.isAoeSkillDamage,
+        isDamageTransfer = snapshot.isDamageTransfer
+    }
+    damage = applyDamageBaseModifiers(baseContext)
+    baseContext.currentDamage = damage
+    if damage < 0.1 then
+        return {finalDamage = 0, immune = false, showDodge = false, calculatedBaseDamage = damage}
     end
     local dmgReduction = getRealAttr(nil, target, "伤害减少", 0)
     if isPhysDmg then
@@ -275,11 +383,7 @@ function ____exports.calculateDamage(target, attacker, baseDamage, originalAttac
     local dmgIncrease = getRealAttr(nil, attacker, "伤害增加", 0)
     damage = damage + dmgIncrease
     if damage < 0.1 then
-        return {finalDamage = 0, immune = false, showDodge = false}
-    end
-    local immuneCheck = checkImmune(target, isNormalAtk)
-    if immuneCheck.immune then
-        return {finalDamage = 0, immune = true, immuneReason = immuneCheck.reason, showDodge = immuneCheck.showDodge}
+        return {finalDamage = 0, immune = false, showDodge = false, calculatedBaseDamage = baseContext.currentDamage}
     end
     local addDamage = 0
     local finalMultiplier = 1
@@ -342,7 +446,7 @@ function ____exports.calculateDamage(target, attacker, baseDamage, originalAttac
         local magicAtkDmg = getRealAttr(nil, attacker, "魔法普攻伤害", 0)
         addDamage = addDamage + magicAtkDmg
     end
-    local elementalResult = applyElementalDamage(attacker, target, isPlayer)
+    local elementalResult = applyElementalDamage(attacker, target, isPlayer, snapshot)
     addDamage = addDamage + elementalResult.addDamage
     finalMultiplier = finalMultiplier * elementalResult.multiplier
     local summonMod = getSummonDamageModifier(
@@ -393,7 +497,7 @@ function ____exports.calculateDamage(target, attacker, baseDamage, originalAttac
     local finalDmgBonus = getFinalDamageBonus(nil, attacker)
     finalMultiplier = finalMultiplier * (1 + finalDmgBonus)
     local finalDamage = damage * (1 + addDamage) * finalMultiplier
-    return {finalDamage = finalDamage, immune = false, showDodge = false}
+    return {finalDamage = finalDamage, immune = false, showDodge = false, calculatedBaseDamage = baseContext.currentDamage}
 end
 --- 处理伤害事件
 -- 在伤害回调中调用
@@ -407,7 +511,61 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
     snapshot.originalAttacker = originalAttacker
     snapshot.mappedAttacker = mappedAttacker
     attacker = mappedAttacker
-    local result = ____exports.calculateDamage(target, attacker, baseDamage, originalAttacker)
+    local conversionContext = __TS__ObjectAssign({target = target, attacker = attacker, originalAttacker = originalAttacker, baseDamage = baseDamage}, snapshot)
+    applyDamageTypeConversions(conversionContext)
+    if conversionContext.reapplyDamage ~= nil then
+        _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
+        local ____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3_51 = _____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3
+        local ____temp_50
+        if originalAttacker ~= nil and originalAttacker ~= 0 then
+            ____temp_50 = originalAttacker
+        else
+            ____temp_50 = attacker
+        end
+        ____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3_51(
+            ____temp_50,
+            target,
+            baseDamage,
+            conversionContext.reapplyDamage,
+            snapshot.isNormalAttack,
+            snapshot.isRangedAttack,
+            snapshot.rawAttackType,
+            snapshot.rawWeaponType
+        )
+        return
+    end
+    snapshot.effectiveAttackType = conversionContext.effectiveAttackType
+    snapshot.effectiveDamageType = conversionContext.effectiveDamageType
+    snapshot.effectiveWeaponType = conversionContext.effectiveWeaponType
+    snapshot.isPhysicalDamage = conversionContext.isPhysicalDamage
+    snapshot.isMagicDamage = conversionContext.isMagicDamage
+    snapshot.isEnhancedDamage = conversionContext.isEnhancedDamage
+    snapshot.isTrueDamage = conversionContext.isTrueDamage
+    snapshot.isNormalAttack = conversionContext.isNormalAttack
+    snapshot.isRangedAttack = conversionContext.isRangedAttack
+    snapshot.isSkillAttack = conversionContext.isSkillAttack
+    snapshot.isSkillDamage = conversionContext.isSkillDamage
+    snapshot.isWrappedSkillDamage = conversionContext.isWrappedSkillDamage
+    snapshot.isEquipmentSkillDamage = conversionContext.isEquipmentSkillDamage
+    snapshot.isNonEquipmentSkillDamage = conversionContext.isNonEquipmentSkillDamage
+    snapshot.isIndependentSkillDamage = conversionContext.isIndependentSkillDamage
+    snapshot.isSingleTargetSkillDamage = conversionContext.isSingleTargetSkillDamage
+    snapshot.isAoeSkillDamage = conversionContext.isAoeSkillDamage
+    snapshot.isDamageTransfer = conversionContext.isDamageTransfer
+    snapshot.isMetalDamage = conversionContext.isMetalDamage
+    snapshot.isWoodDamage = conversionContext.isWoodDamage
+    snapshot.isWaterDamage = conversionContext.isWaterDamage
+    snapshot.isFireDamage = conversionContext.isFireDamage
+    snapshot.isThunderDamage = conversionContext.isThunderDamage
+    snapshot.isLightDamage = conversionContext.isLightDamage
+    snapshot.isDarkDamage = conversionContext.isDarkDamage
+    local result = ____exports.calculateDamage(
+        target,
+        attacker,
+        baseDamage,
+        originalAttacker,
+        snapshot
+    )
     if result.immune then
         _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
         notifyAppliedFinalDamageListeners(target, attacker, 0, snapshot)
@@ -421,8 +579,13 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
             target = target,
             attacker = attacker,
             originalAttacker = originalAttacker,
-            baseDamage = baseDamage,
+            baseDamage = result.calculatedBaseDamage,
             currentDamage = finalDamage,
+            rawAttackType = snapshot.rawAttackType,
+            rawWeaponType = snapshot.rawWeaponType,
+            effectiveAttackType = snapshot.effectiveAttackType,
+            effectiveDamageType = snapshot.effectiveDamageType,
+            effectiveWeaponType = snapshot.effectiveWeaponType,
             isPhysicalDamage = snapshot.isPhysicalDamage,
             isMagicDamage = snapshot.isMagicDamage,
             isEnhancedDamage = snapshot.isEnhancedDamage,

@@ -22,7 +22,7 @@ ____exports["祖地双灵卫数值与表现配置"] = {
             ["冷却秒"] = 9,
             ["前摇秒"] = 0.55,
             ["位移距离"] = 420,
-            ["镇魂印半径"] = 250,
+            ["镇魂印半径"] = 300,
             ["镇魂印持续秒"] = 4,
             ["动画编号"] = 4,
             ["恢复动画编号"] = 7,
@@ -120,7 +120,9 @@ ____exports["祖地双灵卫数值与表现配置"] = {
             ["动画编号"] = 7,
             ["恢复动画编号"] = 1,
             ["每跳攻击力比例"] = 0.18,
-            ["每跳目标最大生命比例"] = 0.006
+            ["每跳目标最大生命比例"] = 0.006,
+            ["减速比例"] = 0.3,
+            ["减速持续秒"] = 0.5
         },
         ["压制组合最小周期秒"] = 16,
         ["压制组合最大周期秒"] = 20
@@ -181,21 +183,50 @@ ____exports["祖地双灵卫数值与表现配置"] = {
             ["低血守卫保护特效路径"] = "Common\\Effect\\Form\\Shield\\holyshield_state.mdx",
             ["赤誓变异转化特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx",
             ["苍影变异转化特效路径"] = "Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx",
+            ["异变共通特效路径"] = "Common\\Effect\\Form\\RiseFall\\SpiritGuardMutationPillar.mdx",
+            ["异变共通特效缩放"] = 0.4,
             ["P3污染共鸣连线特效路径"] = "Common\\Effect\\Form\\Line\\DeathWave.mdx",
             ["魂力回灌特效路径"] = "Common\\Effect\\Form\\RiseFall\\SpiritGuardSoulReflux.mdx",
             ["最终净化归静特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulReleasePillar.mdx"
         },
         ["誓锋壁进"] = {["推进拖尾特效路径"] = "Common\\Effect\\Form\\Aura\\long.MDX", ["定向誓盾特效路径"] = "Common\\Effect\\Form\\Shield\\AlbedoDarkGoldBarrier.mdx", ["冲锋命中特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx"},
         ["盾刃裁决"] = {["盾击命中特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx", ["剑刃重斩特效路径"] = "Common\\Effect\\Form\\Line\\AronkosSoulSlashImpact.mdx"},
-        ["灵印折步"] = {["消失特效路径"] = "Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx", ["出现特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulRiseRing.mdx", ["镇魂印地面特效路径"] = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx"},
-        ["月纹缚魂"] = {["月纹地面特效路径"] = "Common\\Effect\\Form\\Debuff\\SpiritGuardMoonBind.mdx", ["禁锢生效特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulLightPillar.mdx"},
+        ["灵印折步"] = {
+            ["消失特效路径"] = "Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx",
+            ["出现特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulRiseRing.mdx",
+            ["出现特效缩放"] = 2,
+            ["镇魂印地面特效路径"] = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx",
+            ["镇魂印特效缩放"] = 2
+        },
+        ["月纹缚魂"] = {["月纹地面特效路径"] = "Common\\Effect\\Form\\Debuff\\SpiritGuardMoonBind.mdx", ["月纹地面特效缩放"] = 0.5, ["禁锢生效特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulLightPillar.mdx"},
         ["封门校验"] = {["半场灵魂潮特效路径"] = "Common\\Effect\\Form\\Line\\DeathWave.mdx", ["誓盾阻挡特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx"},
         ["断誓践踏"] = {["践踏落地特效路径"] = "Common\\Effect\\Form\\Explosion\\dustwave.mdx", ["短时魂裂特效路径"] = "Common\\Effect\\Form\\Explosion\\AronkosGraveDustWhirl.mdx", ["镇魂压制特效路径"] = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx"},
-        ["裂魂坠斩"] = {["重斩拖尾特效路径"] = "Common\\Effect\\Form\\Line\\AronkosSoulSlashVolley.mdx", ["扇形落地特效路径"] = "Common\\Effect\\Form\\Explosion\\dustwave.mdx", ["直线余震特效路径"] = "Common\\Effect\\Form\\Line\\BansheeGrayShockwave.mdx"},
-        ["失名祷潮"] = {["牵魂连线特效路径"] = "Common\\Effect\\Form\\Line\\AinzAlbedoGuardianLink.mdx", ["祷潮蓄势特效路径"] = "Common\\Effect\\Form\\Aura\\AronkosGraveSoulField.mdx", ["定向灵魂潮特效路径"] = "Common\\Effect\\Form\\Line\\DeathWave.mdx", ["断线与挡潮特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx"},
-        ["记忆剥落"] = {["褪色预警特效路径"] = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx", ["空白灵域地面特效路径"] = "Common\\Effect\\Form\\Aura\\AronkosGraveSoulField.mdx", ["空白灵域动态层特效路径"] = "Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx"},
+        ["裂魂坠斩"] = {["重斩拖尾特效路径"] = "Common\\Effect\\Form\\Line\\AronkosSoulSlashVolley.mdx", ["扇形落地特效路径"] = "Common\\Effect\\Form\\Explosion\\dustwave.mdx", ["直线余震特效路径"] = "Common\\Effect\\Form\\Line\\BansheeGrayShockwave.mdx", ["扇形方向叠加特效路径"] = "Common\\Effect\\Form\\Line\\file_001295.mdx"},
+        ["失名祷潮"] = {
+            ["牵魂连线特效路径"] = "Common\\Effect\\Form\\Line\\AinzAlbedoGuardianLink.mdx",
+            ["祷潮蓄势特效路径"] = "Common\\Effect\\Form\\Aura\\AronkosGraveSoulField.mdx",
+            ["祷潮蓄势特效缩放"] = 4,
+            ["定向灵魂潮特效路径"] = "Common\\Effect\\Form\\Line\\DeathWave.mdx",
+            ["断线与挡潮特效路径"] = "Common\\Effect\\Form\\Explosion\\AlbedoDarkGoldBarrierBreak.mdx"
+        },
+        ["记忆剥落"] = {
+            ["褪色预警特效路径"] = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx",
+            ["褪色预警特效缩放"] = 1.5,
+            ["空白灵域地面特效路径"] = "Common\\Effect\\Form\\Aura\\AronkosGraveSoulField.mdx",
+            ["空白灵域地面特效缩放"] = 4,
+            ["空白灵域动态层特效路径"] = "Common\\Effect\\Form\\Spread\\AronkosAwakeningSoulWave.mdx",
+            ["动态层特效生命周期秒"] = 0.3
+        },
         ["双钥净化"] = {["节点污染外壳特效路径"] = "Common\\Effect\\Form\\Shield\\YellowOrbShield.mdx", ["节点破壳特效路径"] = "Common\\Effect\\Form\\Explosion\\CorruptionShieldBreak.mdx", ["节点校准特效路径"] = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx", ["节点净化完成特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulReleasePillar.mdx"},
-        ["封门误判"] = {["入侵区域覆盖特效路径"] = "Common\\Effect\\Form\\Aura\\AronkosGraveSoulField.mdx", ["月白安全通道特效路径"] = "Common\\Effect\\Form\\Line\\AronkosSoulSlashTrail.mdx", ["封门中心砸击特效路径"] = "Common\\Effect\\Form\\Explosion\\dustwave.mdx", ["净化反射特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulReleaseAux.mdx"},
+        ["封门误判"] = {
+            ["入侵区域覆盖特效路径"] = "Common\\Effect\\Form\\Aura\\AronkosGraveSoulField.mdx",
+            ["入侵区域覆盖特效缩放"] = 4,
+            ["月白安全通道特效路径"] = "Common\\Effect\\Form\\Line\\AronkosSoulSlashTrail.mdx",
+            ["封门中心砸击特效路径"] = "Common\\Effect\\Form\\Explosion\\SpiritGuardGateSlamCrimson.mdx",
+            ["封门中心砸击叠加特效路径"] = "Common\\Effect\\Form\\Explosion\\SpiritGuardGateSlamAzure.mdx",
+            ["封门中心砸击特效缩放"] = 7,
+            ["净化反射特效路径"] = "Common\\Effect\\Form\\RiseFall\\AronkosSoulReleaseAux.mdx"
+        },
         ["特效资源已填完整"] = true,
         ["音效路径待填"] = true
     }

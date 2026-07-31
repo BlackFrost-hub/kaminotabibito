@@ -11,7 +11,7 @@
 | `Ice` | `ice.md`（有条目时创建） | 冰霜、冻结、寒气。 |
 | `Light` | `light.md`（有条目时创建） | 圣光、白金光、净化。 |
 | `magic` | `magic.md`（有条目时创建） | 通用奥术和复合魔法。 |
-| `Nature` | `nature.md`（有条目时创建） | 自然、植物、生命。 |
+| `Nature` | [`nature.md`](nature.md) | 自然、植物、生命。 |
 | `poison` | `poison.md`（有条目时创建） | 毒素、腐蚀、污染。 |
 | `Thunder` | `thunder.md`（有条目时创建） | 雷电、电弧、落雷。 |
 | `Water` | [water.md](water.md) | 水流、浪潮、泡沫。 |

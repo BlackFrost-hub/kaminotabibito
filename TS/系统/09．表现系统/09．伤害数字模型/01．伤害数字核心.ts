@@ -151,8 +151,6 @@ function 单位存活(this: void, unit: any): boolean {
 }
 
 function 选取伤害颜色(this: void, damageType: 伤害类型快照): { r: number; g: number; b: number } {
-  // 与 JASS 逻辑对齐：普通攻击优先按普攻色，不被魔法标记抢色。
-  if (damageType.isNormalAttack) return { r: 160, g: 82, b: 45 };//普攻伤害
   if (damageType.isTrueDamage) return { r: 255, g: 255, b: 255 };//真实/精神伤害
   if (damageType.isEnhancedDamage) return { r: 255, g: 140, b: 0 };//强化伤害
   if (damageType.isFireDamage) return { r: 255, g: 66, b: 66 };//火属性伤害
@@ -162,6 +160,7 @@ function 选取伤害颜色(this: void, damageType: 伤害类型快照): { r: nu
   if (damageType.isWoodDamage) return 风木属性伤害颜色;//风/木属性伤害
   if (damageType.isLightDamage) return { r: 255, g: 255, b: 170 };//光属性伤害
   if (damageType.isDarkDamage) return { r: 180, g: 130, b: 255 };//暗属性伤害
+  if (damageType.isNormalAttack && damageType.isPhysicalDamage) return { r: 160, g: 82, b: 45 };//普通物理攻击
   if (damageType.isPhysicalDamage) return { r: 160, g: 82, b: 45 };//物理伤害（棕色）
   if (damageType.isMagicDamage) return { r: 120, g: 140, b: 255 };//魔法伤害
   //兜底颜色代码，先普攻色/精神/强化色，避免被物理/魔法伤害抢色。

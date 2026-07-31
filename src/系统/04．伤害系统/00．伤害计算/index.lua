@@ -57,6 +57,14 @@ do
     end
 end
 do
+    local ____export = require("系统.04．伤害系统.00．伤害计算.07．伤害类型转换")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.04．伤害系统.00．伤害计算.07．Boss战伤害统计")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then

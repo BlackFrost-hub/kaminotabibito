@@ -13,6 +13,8 @@ export interface 主线NPC初始化配置 {
   YD键?: string;
   YD字段?: string;
   YD类型?: "unit";
+  初始化无敌?: boolean;
+  初始化固定站立?: boolean;
   说明?: string;
 }
 

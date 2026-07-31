@@ -294,7 +294,7 @@ Textures 1 {
 Materials 4 {
     Material {
         Layer {
-            FilterMode Blend,
+            FilterMode Additive,
             Unshaded,
             TwoSided,
             Unfogged,

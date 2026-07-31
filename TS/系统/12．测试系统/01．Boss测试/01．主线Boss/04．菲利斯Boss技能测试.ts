@@ -41,8 +41,15 @@ const { 获取或创建菲利斯上下文, 清理菲利斯上下文 } = require(
   获取或创建菲利斯上下文: (this: void, boss: any) => any;
   清理菲利斯上下文: (this: void, boss: any) => void;
 };
+const { 创建护卫单位, 注销护卫单位 } = require("系统.01．单位系统.10．护卫系统.index") as {
+  创建护卫单位: (this: void, 参数: any) => any;
+  注销护卫单位: (this: void, guard: any) => boolean;
+};
 const { 注册菲利斯被动效果 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.10．被动效果") as {
   注册菲利斯被动效果: (this: void) => void;
+};
+const { 立即触发菲利斯第二军团随从测试 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.12．第二军团随从") as {
+  立即触发菲利斯第二军团随从测试: (this: void, boss: any) => boolean;
 };
 const { 释放菲利斯剑魂杀 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.04．剑魂杀") as {
   释放菲利斯剑魂杀: (this: void, context: any) => void;
@@ -65,6 +72,8 @@ const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number
 const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCandy: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facingAngle: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
@@ -75,6 +84,8 @@ const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const 菲利斯测试Boss: Record<number, any> = {};
 const 菲利斯测试步兵: Record<number, any> = {};
 const 菲利斯测试山丘之王: Record<number, any> = {};
+const 菲利斯测试护卫: Record<number, any> = {};
+const 菲利斯测试术士: Record<number, any> = {};
 
 function stringToFourCC(this: void, s: string): number {
   return s.charCodeAt(0) * 0x1000000 + s.charCodeAt(1) * 0x10000 + s.charCodeAt(2) * 0x100 + s.charCodeAt(3);
@@ -128,15 +139,80 @@ function 创建菲利斯测试(this: void, player: any): any {
   return 获取或创建菲利斯上下文(boss);
 }
 
+function 创建或获取菲利斯测试随从(
+  this: void,
+  cache: Record<number, any>,
+  player: any,
+  boss: any,
+  unitType: string,
+  guardType: string,
+  x: number,
+  y: number,
+): any {
+  const pid = GetPlayerId(player);
+  let unit = cache[pid];
+  if (!Boss测试单位存活(unit)) {
+    unit = 创建护卫单位({
+      主Boss单位: boss,
+      单位类型: unitType,
+      护卫类型: guardType,
+      标记为召唤单位: true,
+      Boss结束处理: "移除",
+      X: x,
+      Y: y,
+      面向: 270,
+    });
+  } else {
+    SetUnitPosition(unit, x, y);
+    SetUnitFacing(unit, 270);
+  }
+  cache[pid] = unit;
+  return unit;
+}
+
+function 创建菲利斯测试第二军团(this: void, player: any, boss: any): { 护卫: any; 术士: any } {
+  const bossX = GetUnitX(boss);
+  const bossY = GetUnitY(boss);
+  const guard = 创建或获取菲利斯测试随从(
+    菲利斯测试护卫,
+    player,
+    boss,
+    "n063",
+    "菲利斯第二军团护卫",
+    bossX - 220,
+    bossY,
+  );
+  const warlock = 创建或获取菲利斯测试随从(
+    菲利斯测试术士,
+    player,
+    boss,
+    "n062",
+    "菲利斯第二军团术士",
+    bossX + 220,
+    bossY,
+  );
+  return { 护卫: guard, 术士: warlock };
+}
+
 function 清理菲利斯测试(this: void, player: any, _context: any): void {
   const pid = GetPlayerId(player);
   const boss = 菲利斯测试Boss[pid];
   if (boss != null && boss !== 0) 清理菲利斯上下文(boss);
+  if (菲利斯测试护卫[pid] != null && 菲利斯测试护卫[pid] !== 0) {
+    注销护卫单位(菲利斯测试护卫[pid]);
+    移除Boss测试单位(菲利斯测试护卫[pid]);
+  }
+  if (菲利斯测试术士[pid] != null && 菲利斯测试术士[pid] !== 0) {
+    注销护卫单位(菲利斯测试术士[pid]);
+    移除Boss测试单位(菲利斯测试术士[pid]);
+  }
   移除Boss测试单位(菲利斯测试步兵[pid]);
   移除Boss测试单位(菲利斯测试山丘之王[pid]);
   移除Boss测试单位(boss);
   菲利斯测试步兵[pid] = undefined;
   菲利斯测试山丘之王[pid] = undefined;
+  菲利斯测试护卫[pid] = undefined;
+  菲利斯测试术士[pid] = undefined;
   菲利斯测试Boss[pid] = undefined;
   if (globals.udg_Boss === boss) globals.udg_Boss = null;
 }
@@ -155,6 +231,28 @@ function on菲利斯技能3测试命令(this: void, _player: any, context: any):
 
 function on菲利斯技能4测试命令(this: void, _player: any, context: any): void {
   if (context != null) 释放菲利斯异形化(context);
+}
+
+function on菲利斯第二军团随从测试命令(this: void, player: any, context: any): void {
+  const boss = context != null ? context.Boss单位 : null;
+  if (!Boss测试单位存活(boss)) return;
+
+  const minions = 创建菲利斯测试第二军团(player, boss);
+  const guardCreated = Boss测试单位存活(minions.护卫);
+  const warlockCreated = Boss测试单位存活(minions.术士);
+  const spellStarted = 立即触发菲利斯第二军团随从测试(boss);
+  DisplayTimedTextToPlayer(
+    player,
+    0,
+    0,
+    8,
+    "[菲利斯测试] 已创建第二军团护卫与术士；护卫应在600码内提供每层10%减伤，术士已立即尝试开始1秒充能并施放腐蚀法阵。",
+  );
+  if (!guardCreated || !warlockCreated) {
+    DisplayTimedTextToPlayer(player, 0, 0, 8, "[菲利斯测试] 随从创建失败，请检查n063/n062物编单位是否可创建。");
+  } else if (!spellStarted) {
+    DisplayTimedTextToPlayer(player, 0, 0, 8, "[菲利斯测试] 随从已创建，但未找到可命中的敌对英雄，术士暂未开始充能。");
+  }
 }
 
 function on菲利斯领袖光环测试命令(this: void, player: any, context: any): void {
@@ -177,6 +275,7 @@ const 菲利斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 3, 名称: "剑气灵斩", 执行: on菲利斯技能2测试命令 },
   { 序号: 4, 名称: "全力封印斩", 执行: on菲利斯技能3测试命令 },
   { 序号: 5, 名称: "异形化", 执行: on菲利斯技能4测试命令 },
+  { 序号: 6, 名称: "召唤第二军团护卫与术士并完整测试", 执行: on菲利斯第二军团随从测试命令 },
 ];
 
 注册Boss测试命令组({

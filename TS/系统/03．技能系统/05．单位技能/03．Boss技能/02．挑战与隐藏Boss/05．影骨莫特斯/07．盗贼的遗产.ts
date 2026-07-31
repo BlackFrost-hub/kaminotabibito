@@ -67,7 +67,8 @@ function 影骨遗产宝箱开启完成(this: void, opener: any, _chest: any, _c
 }
 
 function 创建影骨宝箱(this: void, context: 影骨莫特斯运行时上下文, index: number): void {
-  const point = 影骨莫特斯数值与表现配置.盗贼的遗产.宝箱点[index];
+  const 点位列表 = context.遗产宝箱点 != null ? context.遗产宝箱点 : 影骨莫特斯数值与表现配置.盗贼的遗产.宝箱点;
+  const point = 点位列表[index];
   if (point == null) return;
   创建点特效({ 模型路径: 影骨莫特斯表现配置.宝箱出现, X: point.X, Y: point.Y, 持续秒: 影骨莫特斯数值与表现配置.盗贼的遗产.瞬时特效持续秒 });
   播放Boss坐标音效(影骨莫特斯音效配置.盗贼的遗产.宝箱出现, point.X, point.Y, 影骨莫特斯音效配置.默认裁断距离);

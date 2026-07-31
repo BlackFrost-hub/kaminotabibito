@@ -11,6 +11,7 @@ import { 卡瑟拉数值与表现配置 } from "./02．数值与表现配置";
 import { 释放卡瑟拉深渊召唤 } from "./06．深渊召唤";
 import { 释放卡瑟拉共生电击 } from "./09．共生电击";
 import { 单位有效, 极坐标X, 极坐标Y, 距离XY, 取坐标角度 } from "./14．公共工具";
+import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 import { 创建战斗技能调度器 } from '../../../../00．技能模板+函数/00．技能模板/13．战斗技能调度模板/01．战斗技能调度模板';
 import { 创建血量节点触发器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/01．血量节点触发器';
@@ -154,6 +155,7 @@ function 生成再生触手(this: void, context: 卡瑟拉运行时上下文): v
     },
   });
   if (instance == null || !单位有效(instance.单位)) return;
+  播放卡瑟拉台词(boss, "触手再生");
   const data: 再生触手实例 = {
     context,
     触手单位: instance.单位,
@@ -270,11 +272,17 @@ function 应用触手精华(this: void, context: 卡瑟拉运行时上下文, co
 
 function 处理地面残片牵引(this: void, context: 卡瑟拉运行时上下文): void {
   const groundAbsorbed = 牵引地面触手残片(context);
-  if (groundAbsorbed > 0) 应用触手精华(context, groundAbsorbed);
+  if (groundAbsorbed > 0) {
+    应用触手精华(context, groundAbsorbed);
+    播放卡瑟拉台词(context.Boss单位, "触手残片回收");
+  }
 }
 
 function 处理玩家残片吸收(this: void, context: 卡瑟拉运行时上下文): void {
-  应用触手精华(context, 吸收玩家触手残片(context));
+  const absorbed = 吸收玩家触手残片(context);
+  if (absorbed <= 0) return;
+  应用触手精华(context, absorbed);
+  播放卡瑟拉台词(context.Boss单位, "触手残片吸收");
 }
 
 function 取卡瑟拉上下文键(this: void, context: 卡瑟拉运行时上下文): number {

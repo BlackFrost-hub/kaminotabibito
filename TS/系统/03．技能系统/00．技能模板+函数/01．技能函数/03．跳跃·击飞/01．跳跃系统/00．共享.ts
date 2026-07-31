@@ -7,6 +7,7 @@
 import type { 英雄技能距离修正上下文 } from "../../../04．机制组件/11．技能属性修正";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const jglobals = require("jass.globals") as any;
 const { X_GAFC, X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
   X_GAFC: (x1: number, y1: number, x2: number, y2: number) => number;
@@ -38,6 +39,7 @@ const UnitAddAbility = jass["UnitAddAbility"] as (u: any, abilityId: number) => 
 const UnitRemoveAbility = jass["UnitRemoveAbility"] as (u: any, abilityId: number) => void;
 const AddSpecialEffect = jass["AddSpecialEffect"] as (model: string, x: number, y: number) => any;
 const DestroyEffect = jass["DestroyEffect"] as (effect: any) => void;
+const EXEffectMatRotateZ = japi["EXEffectMatRotateZ"] as (effect: any, angle: number) => void;
 const GetRandomReal = jass["GetRandomReal"] as (low: number, high: number) => number;
 const GetUnitX = jass["GetUnitX"] as (u: any) => number;
 const GetUnitY = jass["GetUnitY"] as (u: any) => number;
@@ -200,6 +202,7 @@ export function 播放跳跃特效(实例: 跳跃实例): void {
     GetUnitY(实例.单位)
   );
   if (特效 != null && 特效 !== 0) {
+    EXEffectMatRotateZ(特效, 实例.角度);
     DestroyEffect(特效);
   }
 }

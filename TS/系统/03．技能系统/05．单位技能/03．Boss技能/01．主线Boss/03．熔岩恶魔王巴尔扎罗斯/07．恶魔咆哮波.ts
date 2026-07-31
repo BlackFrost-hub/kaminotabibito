@@ -261,14 +261,15 @@ function 释放巴尔扎罗斯恶魔咆哮波实例(
   伤害倍率: number,
   嘴部高度: number,
   播放本体台词: boolean,
+  目标?: any,
 ): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || !单位有效(施法者)) return;
-  const target = 取目标单位(boss);
-  if (!单位有效(target)) return;
+  const targetUnit = 单位有效(目标) ? 目标 : 取目标单位(boss);
+  if (!单位有效(targetUnit)) return;
 
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  const angle = 取方向角(施法者, target);
+  const angle = 取方向角(施法者, targetUnit);
   创建咆哮波预警(施法者, angle, 宽度倍率);
   播放恶魔咆哮波蓄力特效(施法者, angle, 嘴部高度);
   启动基础施法时间线({
@@ -298,10 +299,13 @@ function 释放巴尔扎罗斯恶魔咆哮波实例(
 
 export function 释放巴尔扎罗斯恶魔咆哮波(this: void, context: 巴尔扎罗斯运行时上下文): void {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  释放巴尔扎罗斯恶魔咆哮波实例(context, context.Boss单位, 1, 1, config.冲击特效嘴部高度, true);
+  const target = 取目标单位(context.Boss单位);
+  if (!单位有效(target)) return;
+  释放巴尔扎罗斯恶魔咆哮波实例(context, context.Boss单位, 1, 1, config.冲击特效嘴部高度, true, target);
+  释放巴尔扎罗斯护卫模仿恶魔咆哮波(context, target);
 }
 
-export function 释放巴尔扎罗斯护卫模仿恶魔咆哮波(this: void, context: 巴尔扎罗斯运行时上下文): void {
+export function 释放巴尔扎罗斯护卫模仿恶魔咆哮波(this: void, context: 巴尔扎罗斯运行时上下文, target?: any): void {
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
   const 护卫列表 = [context.格鲁姆, context.塞拉];
   for (let i = 0; i < 护卫列表.length; i++) {
@@ -314,6 +318,7 @@ export function 释放巴尔扎罗斯护卫模仿恶魔咆哮波(this: void, con
       config.护卫模仿伤害倍率,
       config.护卫模仿嘴部高度,
       false,
+      target,
     );
   }
 }

@@ -29,6 +29,8 @@ local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
+local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -37,14 +39,11 @@ local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local AddSpecialEffect = jass.AddSpecialEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local function _____8A93_76FE_662F_5426_963B_6321(context, sourceX, sourceY, target)
     local shield = context["誓盾"]
@@ -139,38 +138,56 @@ ____exports["释放祖地双灵卫封门校验"] = function(context, target)
                         if not waveReady then
                             return
                         end
-                        local effect = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["封门校验"]["半场灵魂潮特效路径"], waveStartX, waveStartY)
-                        if effect ~= nil and effect ~= 0 then
-                            YDWETimerDestroyEffectSafe(1.2, effect)
-                        end
                         local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(red)
-                        do
-                            local i = 0
-                            while i < #heroes do
+                        _____521B_5EFA_539F_751F_5F39_5E55({
+                            ["所有者"] = red,
+                            ["载体模式"] = "单位",
+                            ["模型"] = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["封门校验"]["半场灵魂潮特效路径"],
+                            ["缩放"] = 1.7,
+                            X = waveStartX,
+                            Y = waveStartY,
+                            ["方向角"] = _____4E24_70B9_89D2_5EA6(waveStartX, waveStartY, waveEndX, waveEndY),
+                            ["速度"] = 1400,
+                            ["生命周期"] = 1.2,
+                            ["最大距离"] = context["场地半宽"] + 500,
+                            ["命中半径"] = context["场地半高"],
+                            ["影响目标"] = "敌方",
+                            ["每单位最大命中次数"] = 1,
+                            ["碰撞消失"] = false,
+                            ["目标筛选"] = function(unit)
                                 do
-                                    local hit = heroes[i + 1]
-                                    if _____8A93_76FE_662F_5426_963B_6321(context, waveStartX, waveStartY, hit) then
-                                        goto __continue15
+                                    local i = 0
+                                    while i < #heroes do
+                                        if heroes[i + 1] == unit then
+                                            return true
+                                        end
+                                        i = i + 1
                                     end
-                                    local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(red, hit, {["来源攻击力比例"] = 0.95, ["目标最大生命比例"] = 0.045})
-                                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                                        ["来源"] = red,
-                                        ["目标"] = hit,
-                                        ["伤害"] = damage,
-                                        attack = false,
-                                        ranged = true,
-                                        attackType = ATTACK_TYPE_NORMAL,
-                                        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
-                                        weaponType = WEAPON_TYPE_WHOKNOWS,
-                                        ["来源类型"] = "Boss技能",
-                                        ["标签"] = "祖地双灵卫·封门校验"
-                                    })
                                 end
-                                ::__continue15::
-                                i = i + 1
+                                return false
+                            end,
+                            ["on命中"] = function(hit)
+                                if _____8A93_76FE_662F_5426_963B_6321(context, waveStartX, waveStartY, hit) then
+                                    return
+                                end
+                                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(red, hit, {["来源攻击力比例"] = 0.95, ["目标最大生命比例"] = 0.045})
+                                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                                    ["来源"] = red,
+                                    ["目标"] = hit,
+                                    ["伤害"] = damage,
+                                    attack = false,
+                                    ranged = true,
+                                    attackType = ATTACK_TYPE_NORMAL,
+                                    ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
+                                    weaponType = WEAPON_TYPE_WHOKNOWS,
+                                    ["来源类型"] = "Boss技能",
+                                    ["标签"] = "祖地双灵卫·封门校验"
+                                })
+                            end,
+                            ["on到达目标点"] = function()
+                                _____521B_5EFA_8D64_8A93_9547_9B42_5370(context, waveStartX, waveStartY)
                             end
-                        end
-                        _____521B_5EFA_8D64_8A93_9547_9B42_5370(context, waveStartX, waveStartY)
+                        })
                     end,
                     "灵魂潮结算与留印"
                 )

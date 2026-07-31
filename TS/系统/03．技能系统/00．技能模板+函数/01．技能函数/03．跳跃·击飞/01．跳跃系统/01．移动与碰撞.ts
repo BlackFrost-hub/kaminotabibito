@@ -17,7 +17,6 @@ import {
   在可玩区域内,
   计算坐标距离,
   计算抛物线高度,
-  播放跳跃特效,
   GetUnitX,
   GetUnitY,
   GetUnitFlyHeight,
@@ -80,7 +79,6 @@ function 尝试移动一步(
 }
 
 export function 推进一步(实例: 跳跃实例): { 停止: boolean; 原因?: 跳跃结束原因 } {
-  const 起始已移动 = 实例.已移动;
   const 剩余距离 = 实例.总距离 - 实例.已移动;
   if (剩余距离 <= 0) {
     return { 停止: true, 原因: "完成" };
@@ -99,9 +97,6 @@ export function 推进一步(实例: 跳跃实例): { 停止: boolean; 原因?: 
     const 子步长 = 剩余步长 > MAX_SUB_STEP ? MAX_SUB_STEP : 剩余步长;
     const 结果 = 尝试移动一步(实例, 子步长);
     if (结果.停止) {
-      if (实例.已移动 > 起始已移动) {
-        播放跳跃特效(实例);
-      }
       return 结果;
     }
     if (跳跃映射[实例.id] !== 实例) {
@@ -110,8 +105,5 @@ export function 推进一步(实例: 跳跃实例): { 停止: boolean; 原因?: 
     剩余步长 -= 子步长;
   }
 
-  if (实例.已移动 > 起始已移动) {
-    播放跳跃特效(实例);
-  }
   return { 停止: false };
 }

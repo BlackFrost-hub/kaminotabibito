@@ -39,8 +39,6 @@ local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_5["广播单位提
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_6["创建循环点特效"]
-local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
-local X_FixUnitStandingSafe = ____require_result_7.X_FixUnitStandingSafe
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -73,7 +71,7 @@ local function _____64AD_653E_7EC8_6781_6C61_67D3_5F15_5BFC_8868_73B0(context)
         X = GetUnitX(boss),
         Y = GetUnitY(boss),
         Z = 20,
-        ["缩放"] = 1.6,
+        ["缩放"] = 3.2,
         ["总持续秒"] = seconds,
         ["重建间隔秒"] = 3,
         ["单次持续秒"] = 2.9,
@@ -86,7 +84,7 @@ local function _____64AD_653E_7EC8_6781_6C61_67D3_5F15_5BFC_8868_73B0(context)
         X = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3X(),
         Y = _____53D6_7C73_4E9A_5E73_53F0_4E2D_5FC3Y(),
         Z = 0,
-        ["缩放"] = 1.2,
+        ["缩放"] = 2.4,
         ["总持续秒"] = seconds,
         ["重建间隔秒"] = 3,
         ["单次持续秒"] = 2.9,
@@ -110,11 +108,12 @@ local function _____64AD_653E_7EC8_6781_6C61_67D3_5F15_5BFC_8868_73B0(context)
 end
 local function _____521B_5EFA_7EC8_6781_6C61_67D3_6838_5FC3(context, point, hp)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["终极污染"]
+    local boss = context["Boss单位"]
     local core = _____521B_5EFA_53EC_5524_7269({
-        ["主人单位"] = context["Boss单位"],
-        ["所属玩家"] = GetOwningPlayer(context["Boss单位"]),
+        ["主人单位"] = boss,
+        ["所属玩家"] = GetOwningPlayer(boss),
         ["单位类型"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["腐化核心单位ID"],
-        ["单位名称"] = "终极污染核心",
+        ["单位名称"] = "米亚腐化核心",
         ["模型文件"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["特效"]["终极污染核心模型"],
         X = point.x,
         Y = point.y,
@@ -122,21 +121,22 @@ local function _____521B_5EFA_7EC8_6781_6C61_67D3_6838_5FC3(context, point, hp)
         ["飞行高度"] = config["核心浮空高度"],
         ["生命值"] = hp,
         ["生命值受小怪倍率"] = false,
+        ["固定站桩"] = true,
         ["攻击力"] = 0,
         ["攻击范围"] = 0,
         ["索敌范围"] = 0,
         ["缩放"] = config["核心缩放"]
     })
-    if not _____5355_4F4D_6709_6548(core) then
+    local coreValid = _____5355_4F4D_6709_6548(core)
+    if not coreValid then
         return core
     end
-    X_FixUnitStandingSafe(core)
     local id = _____53D6_5355_4F4DID(core)
     if id ~= 0 then
         _____7EC8_6781_6C61_67D3_6838_5FC3_4E0A_4E0B_6587_8868[id] = context
     end
-    local ____context__7EC8_6781_6C61_67D3_6838_5FC3_5217_8868_8 = context["终极污染核心列表"]
-    ____context__7EC8_6781_6C61_67D3_6838_5FC3_5217_8868_8[#____context__7EC8_6781_6C61_67D3_6838_5FC3_5217_8868_8 + 1] = core
+    local ____context__7EC8_6781_6C61_67D3_6838_5FC3_5217_8868_7 = context["终极污染核心列表"]
+    ____context__7EC8_6781_6C61_67D3_6838_5FC3_5217_8868_7[#____context__7EC8_6781_6C61_67D3_6838_5FC3_5217_8868_7 + 1] = core
     _____521B_5EFA_5FAA_73AF_70B9_7279_6548({
         ["模型路径"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["特效"]["终极污染核心附着"],
         X = point.x,
@@ -166,7 +166,11 @@ local function _____521B_5EFA_7EC8_6781_6C61_67D3_6838_5FC3_7EC4(context)
             i = i + 1
         end
     end
-    _____5E7F_64AD_5355_4F4D_63D0_793A(context["Boss单位"], "打碎所有腐化核心，打断终极污染！", 4200)
+    _____5E7F_64AD_5355_4F4D_63D0_793A(
+        context["Boss单位"],
+        ((((((("终极污染开始，引导" .. tostring(config["引导秒"])) .. "秒，每秒全场增加") .. tostring(config["每秒全场腐化层数"])) .. "层腐化感染（") .. tostring(config["引导秒"])) .. "秒内击破全部") .. tostring(config["核心数量"])) .. "个腐化核心即可打断！）",
+        4200
+    )
     _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "终极污染", 2)
 end
 local function _____8BB0_5F55_7EC8_6781_6C61_67D3_53E0_5C42(context, target, count)
@@ -185,8 +189,8 @@ local function _____6E05_9000_7EC8_6781_6C61_67D3_672C_6B21_53E0_5C42(context)
             local id = _____53D6_5355_4F4DID(hero)
             local count = context["终极污染本次叠层表"][id] or 0
             if count > 0 then
-                local ____self_9 = context["腐化层数控制器"]
-                ____self_9["减少"](____self_9, hero, count, "终极污染打断清退")
+                local ____self_8 = context["腐化层数控制器"]
+                ____self_8["减少"](____self_8, hero, count, "终极污染打断清退")
             end
             i = i + 1
         end
@@ -213,9 +217,9 @@ local function _____6E05_7406_7EC8_6781_6C61_67D3_6838_5FC3(context)
 end
 ____exports["清理米亚终极污染"] = function(context)
     context["终极污染引导中"] = false
-    local ____opt_10 = context["终极污染组合执行器"]
-    if ____opt_10 ~= nil then
-        ____opt_10["停止"](____opt_10, nil, "中断")
+    local ____opt_9 = context["终极污染组合执行器"]
+    if ____opt_9 ~= nil then
+        ____opt_9["停止"](____opt_9, nil, "中断")
     end
     _____6E05_7406_7EC8_6781_6C61_67D3_6838_5FC3(context)
     context["终极污染本次叠层表"] = {}
@@ -255,8 +259,8 @@ local function _____6253_65AD_7EC8_6781_6C61_67D3(context)
     if not context["终极污染引导中"] then
         return
     end
-    local ____opt_12 = context["终极污染组合执行器"]
-    if (____opt_12 and ____opt_12["停止"](____opt_12, nil, "中断")) == true then
+    local ____opt_11 = context["终极污染组合执行器"]
+    if (____opt_11 and ____opt_11["停止"](____opt_11, nil, "中断")) == true then
         return
     end
     _____6267_884C_7EC8_6781_6C61_67D3_6253_65AD(context)
@@ -355,8 +359,8 @@ local function _____5B8C_6210_7EC8_6781_6C61_67D3(context)
                 if not _____5355_4F4D_6709_6548(hero) then
                     goto __continue54
                 end
-                local ____self_14 = context["腐化层数控制器"]
-                ____self_14["设置"](____self_14, hero, _____7C73_4E9A_8150_5316_611F_67D3_914D_7F6E["最大层数"], "终极污染完成")
+                local ____self_13 = context["腐化层数控制器"]
+                ____self_13["设置"](____self_13, hero, _____7C73_4E9A_8150_5316_611F_67D3_914D_7F6E["最大层数"], "终极污染完成")
                 if GetUnitState(hero, UNIT_STATE_LIFE) > 0 then
                     KillUnit(hero)
                 end
@@ -430,9 +434,9 @@ local function _____542F_52A8_7EC8_6781_6C61_67D3_65F6_95F4_8F74(context)
     if context["终极污染组合执行器"] == nil then
         context["终极污染组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "米亚-终极污染", ["清理"] = context["清理"], ["互斥组"] = "米亚大型技能"})
     end
-    local ____self_15 = context["终极污染组合执行器"]
-    local _____6267_884CID = ____self_15["开始"](
-        ____self_15,
+    local ____self_14 = context["终极污染组合执行器"]
+    local _____6267_884CID = ____self_14["开始"](
+        ____self_14,
         {
             key = "终极污染",
             ["单位"] = context["Boss单位"],
@@ -461,7 +465,12 @@ local function _____542F_52A8_7EC8_6781_6C61_67D3(context)
     SetUnitTimeScale(context["Boss单位"], config["引导动画速度"])
     SetUnitAnimationByIndex(context["Boss单位"], config["引导动画编号"])
     _____5F00_59CB_786C_76F4(context["Boss单位"], config["引导秒"])
-    _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761({["总时长"] = config["引导秒"], ["颜色ID"] = 4, ["标题文本"] = "终极污染", ["提示文本"] = "击碎全部腐化核心，否则全场腐化满层并死亡"})
+    _____663E_793A_81F4_547D_60E9_7F5A_541F_5531_6761({
+        ["总时长"] = config["引导秒"],
+        ["颜色ID"] = 4,
+        ["标题文本"] = "终极污染",
+        ["提示文本"] = ((((("引导" .. tostring(config["引导秒"])) .. "秒，每秒全场增加") .. tostring(config["每秒全场腐化层数"])) .. "层腐化感染；击破全部") .. tostring(config["核心数量"])) .. "个核心即可打断（优先击破核心）。"
+    })
     _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "终极污染", 0)
     _____64AD_653E_7EC8_6781_6C61_67D3_5F15_5BFC_8868_73B0(context)
     _____521B_5EFA_7EC8_6781_6C61_67D3_6838_5FC3_7EC4(context)

@@ -61,6 +61,7 @@ local FirstOfGroup = jass.FirstOfGroup
 local GroupRemoveUnit = jass.GroupRemoveUnit
 local DestroyGroup = jass.DestroyGroup
 local EXSetEffectZ = japi.EXSetEffectZ
+local EXSetEffectSize = japi.EXSetEffectSize
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
@@ -141,6 +142,9 @@ function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, ____
         if self["特效句柄"] and _____53C2_6570["特效高度"] then
             EXSetEffectZ(self["特效句柄"], _____53C2_6570["特效高度"])
         end
+        if self["特效句柄"] and _____53C2_6570["特效缩放"] ~= nil then
+            EXSetEffectSize(self["特效句柄"], _____53C2_6570["特效缩放"])
+        end
     end
     if _____53C2_6570["提示圈"] ~= false and _____53C2_6570["显示提示圈"] ~= false and _____53C2_6570["持续时间"] > 0 then
         local _____63D0_793A_5708_914D_7F6E = _____53C2_6570["提示圈"] or ({})
@@ -203,7 +207,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
         do
             local hid = GetHandleId(_____5355_4F4D)
             if not self["是否影响目标"](self, _____5355_4F4D) then
-                goto __continue27
+                goto __continue28
             end
             _____65B0_96C6_5408[hid] = _____5355_4F4D
             if not _____662F_9996_6B21 and not self["当前单位集合"][hid] then
@@ -217,7 +221,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                 self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
             end
         end
-        ::__continue27::
+        ::__continue28::
     end
     local _____5F53_524D_5355_4F4DID_5217_8868 = _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4DID_6570_7EC4(self["当前单位集合"])
     do
@@ -250,7 +254,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     local _____53BB_91CDKey = ____make_533A_57DF_6548_679C_53BB_91CDKey(_____53BB_91CD_7EC4, _____5355_4F4DID)
                     local _____4E0A_6B21_4F24_5BB3_65F6_95F4 = _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey]
                     if _____4E0A_6B21_4F24_5BB3_65F6_95F4 ~= nil and _____5F53_524D_65F6_95F4 - _____4E0A_6B21_4F24_5BB3_65F6_95F4 < _____53BB_91CD_95F4_9694_6BEB_79D2 then
-                        goto __continue37
+                        goto __continue38
                     end
                     _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey] = _____5F53_524D_65F6_95F4
                 end
@@ -275,7 +279,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     {["伤害形态"] = "AOE"}
                 )
             end
-            ::__continue37::
+            ::__continue38::
         end
     end
     local ____opt_20 = self["参数"]["on周期"]
@@ -333,6 +337,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
         self["特效句柄"] = AddSpecialEffect(self["参数"]["模型路径"], X, Y)
         if self["特效句柄"] and self["参数"]["特效高度"] then
             EXSetEffectZ(self["特效句柄"], self["参数"]["特效高度"])
+        end
+        if self["特效句柄"] and self["参数"]["特效缩放"] ~= nil then
+            EXSetEffectSize(self["特效句柄"], self["参数"]["特效缩放"])
         end
     end
     local _____5F53_524D_65F6_95F4 = getServerTime()

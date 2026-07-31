@@ -36,8 +36,9 @@ const { 初始化巴尔扎罗斯地核召唤节点, 释放巴尔扎罗斯地核�
   初始化巴尔扎罗斯地核召唤节点: (this: void, context: any) => void;
   释放巴尔扎罗斯地核召唤: (this: void, context: any) => void;
 };
-const { 初始化巴尔扎罗斯熔岩护盾节点 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.12．熔岩护盾") as {
+const { 初始化巴尔扎罗斯熔岩护盾节点, 释放巴尔扎罗斯熔岩护盾 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.12．熔岩护盾") as {
   初始化巴尔扎罗斯熔岩护盾节点: (this: void, context: any) => void;
+  释放巴尔扎罗斯熔岩护盾: (this: void, context: any) => void;
 };
 const { 初始化巴尔扎罗斯末日熔爆节点, 释放巴尔扎罗斯末日熔爆 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.13．末日熔爆") as {
   初始化巴尔扎罗斯末日熔爆节点: (this: void, context: any) => void;
@@ -69,9 +70,23 @@ const { 巴尔扎罗斯战斗区域配置, 巴尔扎罗斯固定安全区配置�
   巴尔扎罗斯战斗区域配置: any;
   巴尔扎罗斯固定安全区配置表: any[];
 };
-const { 巴尔扎罗斯护卫配置, 巴尔扎罗斯阶段阈值 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置") as {
+const { 巴尔扎罗斯护卫配置, 巴尔扎罗斯阶段阈值, 巴尔扎罗斯技能数值配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置") as {
   巴尔扎罗斯护卫配置: any;
   巴尔扎罗斯阶段阈值: { 第三阶段生命比例: number };
+  巴尔扎罗斯技能数值配置: any;
+};
+const { 巴尔扎罗斯单位技能配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置") as {
+  巴尔扎罗斯单位技能配置: any;
+};
+const { 移除单位标签护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾") as {
+  移除单位标签护盾: (this: void, unit: any, 标签: string) => void;
+};
+const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+};
+const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  removeDelayedCallback: (this: void, id: number) => void;
 };
 const { 创建动态矩形区域组, 销毁动态矩形区域组 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.index") as {
   创建动态矩形区域组: (this: void, 名称: string, 配置列表: any[]) => any;
@@ -116,13 +131,28 @@ const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitAcquireRange = jass.SetUnitAcquireRange as (unit: any, range: number) => void;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: string) => boolean;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const DzUnitDisableAttack = japi.DzUnitDisableAttack as ((unit: any, disabled: boolean) => void) | undefined;
 
 const 最近测试Boss: Record<number, any> = {};
 const 最近测试步兵: Record<number, any> = {};
 const 最近测试山丘之王: Record<number, any> = {};
+let 熔岩护盾近战测试回调ID = 0;
+let 熔岩护盾冰霜测试回调ID = 0;
+
+interface 巴尔扎罗斯熔岩护盾伤害测试参数 {
+  命令: "13-2" | "13-3";
+  Context: any;
+  Boss单位: any;
+  攻击单位: any;
+  伤害: number;
+}
 
 function 应用巴尔扎罗斯测试场地(this: void, context: any): void {
   const 正式中心X = (巴尔扎罗斯战斗区域配置.左 + 巴尔扎罗斯战斗区域配置.右) / 2;
@@ -318,6 +348,77 @@ function on巴尔扎罗斯技能12测试命令(this: void, _player: any, context
   if (Boss测试单位存活(context.塞拉)) 切换塞拉形态(context, "冰霜", true);
 }
 
+function 取消巴尔扎罗斯熔岩护盾测试回调(this: void): void {
+  if (熔岩护盾近战测试回调ID > 0) removeDelayedCallback(熔岩护盾近战测试回调ID);
+  if (熔岩护盾冰霜测试回调ID > 0) removeDelayedCallback(熔岩护盾冰霜测试回调ID);
+  熔岩护盾近战测试回调ID = 0;
+  熔岩护盾冰霜测试回调ID = 0;
+}
+
+function 重置巴尔扎罗斯熔岩护盾测试(this: void, boss: any): void {
+  取消巴尔扎罗斯熔岩护盾测试回调();
+  if (!Boss测试单位存活(boss)) return;
+  移除单位标签护盾(boss, 巴尔扎罗斯技能数值配置.熔岩护盾.护盾标签);
+  设置Boss测试单位满血(boss);
+}
+
+function on巴尔扎罗斯熔岩护盾近战测试伤害(this: void, variable?: any): void {
+  熔岩护盾近战测试回调ID = 0;
+  const 参数 = variable as 巴尔扎罗斯熔岩护盾伤害测试参数 | undefined;
+  if (参数 == null || !Boss测试单位存活(参数.Boss单位) || !Boss测试单位存活(参数.攻击单位)) return;
+  UnitDamageTarget(参数.攻击单位, 参数.Boss单位, 参数.伤害, true, false, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+}
+
+function on巴尔扎罗斯熔岩护盾冰霜测试伤害(this: void, variable?: any): void {
+  熔岩护盾冰霜测试回调ID = 0;
+  const 参数 = variable as 巴尔扎罗斯熔岩护盾伤害测试参数 | undefined;
+  if (参数 == null || !Boss测试单位存活(参数.Boss单位) || !Boss测试单位存活(参数.攻击单位)) return;
+  UnitDamageTarget(参数.攻击单位, 参数.Boss单位, 参数.伤害, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_COLD, WEAPON_TYPE_WHOKNOWS);
+}
+
+function on巴尔扎罗斯技能13测试命令(this: void, _player: any, context: any): void {
+  const boss = context.Boss单位;
+  if (!Boss测试单位存活(boss)) return;
+  重置巴尔扎罗斯熔岩护盾测试(boss);
+  释放巴尔扎罗斯熔岩护盾(context);
+}
+
+function on巴尔扎罗斯技能13近战反弹测试命令(this: void, player: any, context: any): void {
+  const boss = context.Boss单位;
+  const attacker = 最近测试山丘之王[GetPlayerId(player)];
+  if (!Boss测试单位存活(boss) || !Boss测试单位存活(attacker)) return;
+  重置巴尔扎罗斯熔岩护盾测试(boss);
+  设置Boss测试单位满血(attacker);
+  SetUnitPosition(attacker, GetUnitX(boss) + 140, GetUnitY(boss));
+  SetUnitFacing(attacker, 180);
+  释放巴尔扎罗斯熔岩护盾(context);
+  const 参数: 巴尔扎罗斯熔岩护盾伤害测试参数 = {
+    命令: "13-2", Context: context, Boss单位: boss, 攻击单位: attacker, 伤害: 1000,
+  };
+  熔岩护盾近战测试回调ID = addDelayedCallback(1000, on巴尔扎罗斯熔岩护盾近战测试伤害, 参数);
+  context.清理.登记延迟回调("巴尔扎罗斯测试-熔岩护盾近战反弹", 熔岩护盾近战测试回调ID);
+}
+
+function on巴尔扎罗斯技能13冰霜破盾测试命令(this: void, player: any, context: any): void {
+  const boss = context.Boss单位;
+  const attacker = 最近测试山丘之王[GetPlayerId(player)];
+  if (!Boss测试单位存活(boss) || !Boss测试单位存活(attacker)) return;
+  重置巴尔扎罗斯熔岩护盾测试(boss);
+  设置Boss测试单位满血(attacker);
+  registerManualBuff(boss, 巴尔扎罗斯单位技能配置.BuffID.熔岩暴走, 3600, 1, {
+    stack: 1,
+    sourceName: "巴尔扎罗斯测试",
+  });
+  释放巴尔扎罗斯熔岩护盾(context);
+  const maxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  const 伤害 = maxLife * 巴尔扎罗斯技能数值配置.熔岩护盾.护盾Boss最大生命比例 * 2;
+  const 参数: 巴尔扎罗斯熔岩护盾伤害测试参数 = {
+    命令: "13-3", Context: context, Boss单位: boss, 攻击单位: attacker, 伤害,
+  };
+  熔岩护盾冰霜测试回调ID = addDelayedCallback(2000, on巴尔扎罗斯熔岩护盾冰霜测试伤害, 参数);
+  context.清理.登记延迟回调("巴尔扎罗斯测试-熔岩护盾冰霜破盾", 熔岩护盾冰霜测试回调ID);
+}
+
 const 巴尔扎罗斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 1, 名称: "恶魔咆哮波", 执行: on巴尔扎罗斯技能1测试命令 },
   { 序号: 1, 命令: "1-2", 名称: "恶魔咆哮波(P2护卫模仿)", 执行: on巴尔扎罗斯技能1护卫模仿测试命令 },
@@ -334,6 +435,9 @@ const 巴尔扎罗斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 10, 名称: "塞拉绝对零度领域", 执行: on巴尔扎罗斯技能10测试命令 },
   { 序号: 11, 名称: "塞拉切换火焰形态", 执行: on巴尔扎罗斯技能11测试命令 },
   { 序号: 12, 名称: "塞拉切换冰霜形态", 执行: on巴尔扎罗斯技能12测试命令 },
+  { 序号: 13, 名称: "熔岩护盾(直接生成)", 执行: on巴尔扎罗斯技能13测试命令 },
+  { 序号: 13, 命令: "13-2", 名称: "熔岩护盾(1秒后近战反弹)", 执行: on巴尔扎罗斯技能13近战反弹测试命令 },
+  { 序号: 13, 命令: "13-3", 名称: "熔岩护盾(2秒后冰霜破盾)", 执行: on巴尔扎罗斯技能13冰霜破盾测试命令 },
 ];
 
 注册Boss测试命令组({

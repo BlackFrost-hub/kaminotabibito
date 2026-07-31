@@ -153,6 +153,28 @@ ____exports["点到线段距离平方"] = function(px, py, ax, ay, bx, by)
     local cy = ay + dy * t
     return ____exports["距离平方XY"](px, py, cx, cy)
 end
+--- 判断目标是否位于指定方向障碍物的下游遮挡带内。
+____exports["点是否处于方向障碍物后方"] = function(_____5F39_5E55X, _____5F39_5E55Y, _____65B9_5411_89D2, _____969C_788D_7269X, _____969C_788D_7269Y, _____76EE_6807X, _____76EE_6807Y, _____969C_788D_7269_534A_5F84)
+    if _____969C_788D_7269_534A_5F84 < 0 then
+        return false
+    end
+    local directionX = Cos(_____65B9_5411_89D2 * _____89D2_5EA6_8F6C_5F27_5EA6)
+    local directionY = Sin(_____65B9_5411_89D2 * _____89D2_5EA6_8F6C_5F27_5EA6)
+    local obstacleDX = _____969C_788D_7269X - _____5F39_5E55X
+    local obstacleDY = _____969C_788D_7269Y - _____5F39_5E55Y
+    local targetDX = _____76EE_6807X - _____5F39_5E55X
+    local targetDY = _____76EE_6807Y - _____5F39_5E55Y
+    local obstacleProjection = obstacleDX * directionX + obstacleDY * directionY
+    local targetProjection = targetDX * directionX + targetDY * directionY
+    if obstacleProjection <= 0 or targetProjection <= obstacleProjection then
+        return false
+    end
+    local targetRelativeX = _____76EE_6807X - _____969C_788D_7269X
+    local targetRelativeY = _____76EE_6807Y - _____969C_788D_7269Y
+    local lateralDistance = targetRelativeX * directionY - targetRelativeY * directionX
+    local absoluteLateralDistance = lateralDistance < 0 and -lateralDistance or lateralDistance
+    return absoluteLateralDistance <= _____969C_788D_7269_534A_5F84
+end
 ____exports["播放点特效"] = function(model, x, y)
     if model == nil or model == "" then
         return

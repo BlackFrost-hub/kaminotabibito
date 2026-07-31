@@ -10,3 +10,4 @@ export * from "./08．台词播放";
 export * from "./09．技能入口";
 export * from "./10．被动效果";
 export * from "./11．公共工具";
+export * from "./12．第二军团随从";

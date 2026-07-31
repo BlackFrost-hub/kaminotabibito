@@ -20,6 +20,7 @@ const FirstOfGroup = jass.FirstOfGroup as (whichGroup: any) => any;
 const GroupRemoveUnit = jass.GroupRemoveUnit as (whichGroup: any, whichUnit: any) => void;
 const DestroyGroup = jass.DestroyGroup as (whichGroup: any) => void;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
+const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
 
@@ -63,6 +64,7 @@ export interface 区域效果参数 {
   所有者?: any;
   模型路径?: string;
   特效高度?: number;
+  特效缩放?: number;
   显示提示圈?: boolean;
   提示圈?: 技能提示圈配置 | false;
   周期伤害?: number;
@@ -165,6 +167,9 @@ class 区域效果实现 implements 区域效果实例 {
       this.特效句柄 = AddSpecialEffect(参数.模型路径, this.当前X, this.当前Y);
       if (this.特效句柄 && 参数.特效高度) {
         EXSetEffectZ(this.特效句柄, 参数.特效高度);
+      }
+      if (this.特效句柄 && 参数.特效缩放 != null) {
+        EXSetEffectSize(this.特效句柄, 参数.特效缩放);
       }
     }
 
@@ -335,10 +340,13 @@ class 区域效果实现 implements 区域效果实例 {
     this.当前Y = Y;
     if (this.特效句柄 && this.参数.模型路径) {
       DestroyEffect(this.特效句柄);
-      this.特效句柄 = AddSpecialEffect(this.参数.模型路径, X, Y);
-      if (this.特效句柄 && this.参数.特效高度) {
-        EXSetEffectZ(this.特效句柄, this.参数.特效高度);
-      }
+        this.特效句柄 = AddSpecialEffect(this.参数.模型路径, X, Y);
+        if (this.特效句柄 && this.参数.特效高度) {
+          EXSetEffectZ(this.特效句柄, this.参数.特效高度);
+        }
+        if (this.特效句柄 && this.参数.特效缩放 != null) {
+          EXSetEffectSize(this.特效句柄, this.参数.特效缩放);
+        }
     }
     const 当前时间 = getServerTime();
     const 防抖毫秒 = this.防抖间隔毫秒值;

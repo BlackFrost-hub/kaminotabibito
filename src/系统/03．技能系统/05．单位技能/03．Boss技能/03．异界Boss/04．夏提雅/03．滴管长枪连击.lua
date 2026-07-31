@@ -22,6 +22,10 @@ local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____19_FF0E_541F_5531_6761 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.19．吟唱条")
 local _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761 = ____19_FF0E_541F_5531_6761["显示夏提雅常规吟唱条"]
+local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.18．台词播放")
+local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
+local ____20_FF0E_5438_8840_8868_73B0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.20．吸血表现")
+local _____64AD_653E_590F_63D0_96C5_5438_8840_6062_590D_7279_6548 = ____20_FF0E_5438_8840_8868_73B0["播放夏提雅吸血恢复特效"]
 local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_0.registerDamageModifier
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
@@ -59,7 +63,7 @@ local GetUnitState = japi.GetUnitState
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
 local _____6EF4_7BA1_957F_67AA_8FDE_51FB_5DF2_6CE8_518C = false
@@ -72,6 +76,18 @@ local function _____662F_590F_63D0_96C5_76F4_63A5_666E_901A_653B_51FB(damageCont
 end
 local function _____53EF_63A8_8FDB_730E_8840_8FDE_51FB(context)
     return not context["挑战已结束"] and context["当前大型技能"] == nil and getServerTime() >= context["普通机制忙碌到Ms"] and not _____5355_4F4D_662F_5426_5904_4E8E_786C_63A7_5236_6548_679C_5408_96C6(context["Boss单位"])
+end
+____exports["刷新夏提雅猎血连击Buff"] = function(context)
+    if not _____5355_4F4D_6709_6548(context["Boss单位"]) or context["当前猎血段数"] <= 0 then
+        return
+    end
+    registerManualBuff(
+        context["Boss单位"],
+        _____590F_63D0_96C5BuffID["猎血连击"],
+        _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["滴管长枪连击"]["连击过期秒"],
+        0,
+        {stack = context["当前猎血段数"], sourceName = "夏提雅-滴管长枪连击"}
+    )
 end
 local function _____64AD_653E_4E8C_6BB5_9C9C_8840_6807_8BB0(target)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["滴管长枪连击"]
@@ -86,12 +102,22 @@ local function _____64AD_653E_4E8C_6BB5_9C9C_8840_6807_8BB0(target)
         _____8BBE_7F6EDz_7ED1_5B9A_7279_6548_7F29_653E(effect, cfg["二段标记缩放"])
     end
 end
+local function _____5C1D_8BD5_64AD_653E_6C72_8840_7A7F_523A_53F0_8BCD(context)
+    local now = getServerTime()
+    local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["滴管长枪连击"]
+    if now < context["汲血穿刺台词冷却到Ms"] then
+        return
+    end
+    context["汲血穿刺台词冷却到Ms"] = now + cfg["广播语音内置冷却秒"] * 1000
+    _____64AD_653E_590F_63D0_96C5_53F0_8BCD(context["Boss单位"], "汲血穿刺")
+end
 local function _____6267_884C_5F3A_5316_7A7F_523A_547D_4E2D(context, target)
     local boss = context["Boss单位"]
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["滴管长枪连击"]
     local dx = GetUnitX(target) - GetUnitX(boss)
     local dy = GetUnitY(target) - GetUnitY(boss)
-    if dx * dx + dy * dy > cfg["强化穿刺命中距离"] * cfg["强化穿刺命中距离"] then
+    local distanceSquared = dx * dx + dy * dy
+    if distanceSquared > cfg["强化穿刺命中距离"] * cfg["强化穿刺命中距离"] then
         return
     end
     _____64AD_653EBoss_5750_6807_97F3_6548(
@@ -112,7 +138,7 @@ local function _____6267_884C_5F3A_5316_7A7F_523A_547D_4E2D(context, target)
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
-        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_ENHANCED,
         weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
         ["来源类型"] = "Boss技能",
         ["标签"] = "夏提雅·滴管长枪强化穿刺"
@@ -144,6 +170,7 @@ local function _____6267_884C_5F3A_5316_7A7F_523A_547D_4E2D(context, target)
         ItemHeal = false,
         HealEffect = false
     })
+    _____64AD_653E_590F_63D0_96C5_5438_8840_6062_590D_7279_6548(boss)
     if context["阶段"] ~= "P3真祖血宴" then
         _____521B_5EFA_590F_63D0_96C5_9C9C_8840_5370_8BB0(
             context,
@@ -172,6 +199,7 @@ local function _____542F_52A8_5F3A_5316_7A7F_523A(context, target)
             GetUnitX(target) - GetUnitX(boss)
         ) * RAD_TO_DEG
     )
+    _____5C1D_8BD5_64AD_653E_6C72_8840_7A7F_523A_53F0_8BCD(context)
     _____5F00_59CB_786C_76F4(boss, windup)
     _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761(windup, cfg["吟唱条颜色ID"], cfg["吟唱条标题文本"], cfg["吟唱条提示文本"])
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["强化穿刺动画编号"], ["持续秒"] = windup + 0.2, ["恢复动画编号"] = 0})
@@ -253,6 +281,7 @@ local function ____on_590F_63D0_96C5_666E_901A_653B_51FB_6700_7EC8_4F24_5BB3(tar
         context["当前猎血段数"] = context["当前猎血段数"] + 1
     end
     context["猎血段数过期时间Ms"] = getServerTime() + _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["滴管长枪连击"]["连击过期秒"] * 1000
+    ____exports["刷新夏提雅猎血连击Buff"](context)
     if context["当前猎血段数"] == _____53D6_5F3A_5316_653B_51FB_9608_503C(context) - 1 then
         _____64AD_653E_4E8C_6BB5_9C9C_8840_6807_8BB0(target)
     end

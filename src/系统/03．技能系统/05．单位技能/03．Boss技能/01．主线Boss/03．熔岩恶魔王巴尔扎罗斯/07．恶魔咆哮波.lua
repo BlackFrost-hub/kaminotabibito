@@ -206,17 +206,23 @@ function _____521B_5EFA_5486_54EE_6CE2_5224_5B9A(context, _____65BD_6CD5_8005, a
         end
     })
 end
-function _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4F8B(context, _____65BD_6CD5_8005, _____5BBD_5EA6_500D_7387, _____4F24_5BB3_500D_7387, _____5634_90E8_9AD8_5EA6, _____64AD_653E_672C_4F53_53F0_8BCD)
+function _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4F8B(context, _____65BD_6CD5_8005, _____5BBD_5EA6_500D_7387, _____4F24_5BB3_500D_7387, _____5634_90E8_9AD8_5EA6, _____64AD_653E_672C_4F53_53F0_8BCD, _____76EE_6807)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(_____65BD_6CD5_8005) then
         return
     end
-    local target = _____53D6_76EE_6807_5355_4F4D(boss)
-    if not _____5355_4F4D_6709_6548(target) then
+    local _____5355_4F4D_6709_6548_result_12
+    if _____5355_4F4D_6709_6548(_____76EE_6807) then
+        _____5355_4F4D_6709_6548_result_12 = _____76EE_6807
+    else
+        _____5355_4F4D_6709_6548_result_12 = _____53D6_76EE_6807_5355_4F4D(boss)
+    end
+    local targetUnit = _____5355_4F4D_6709_6548_result_12
+    if not _____5355_4F4D_6709_6548(targetUnit) then
         return
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]
-    local angle = _____53D6_65B9_5411_89D2(_____65BD_6CD5_8005, target)
+    local angle = _____53D6_65B9_5411_89D2(_____65BD_6CD5_8005, targetUnit)
     _____521B_5EFA_5486_54EE_6CE2_9884_8B66(_____65BD_6CD5_8005, angle, _____5BBD_5EA6_500D_7387)
     _____64AD_653E_6076_9B54_5486_54EE_6CE2_84C4_529B_7279_6548(_____65BD_6CD5_8005, angle, _____5634_90E8_9AD8_5EA6)
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
@@ -255,14 +261,46 @@ function _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4
 end
 ____exports["释放巴尔扎罗斯恶魔咆哮波"] = function(context)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]
+    local target = _____53D6_76EE_6807_5355_4F4D(context["Boss单位"])
+    if not _____5355_4F4D_6709_6548(target) then
+        return
+    end
     _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4F8B(
         context,
         context["Boss单位"],
         1,
         1,
         config["冲击特效嘴部高度"],
-        true
+        true,
+        target
     )
+    ____exports["释放巴尔扎罗斯护卫模仿恶魔咆哮波"](context, target)
+end
+____exports["释放巴尔扎罗斯护卫模仿恶魔咆哮波"] = function(context, target)
+    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]
+    local _____62A4_536B_5217_8868 = {context["格鲁姆"], context["塞拉"]}
+    do
+        local i = 0
+        while i < #_____62A4_536B_5217_8868 do
+            do
+                local _____62A4_536B = _____62A4_536B_5217_8868[i + 1]
+                if not _____5355_4F4D_6709_6548(_____62A4_536B) then
+                    goto __continue41
+                end
+                _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4F8B(
+                    context,
+                    _____62A4_536B,
+                    config["护卫模仿宽度倍率"],
+                    config["护卫模仿伤害倍率"],
+                    config["护卫模仿嘴部高度"],
+                    false,
+                    target
+                )
+            end
+            ::__continue41::
+            i = i + 1
+        end
+    end
 end
 function ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____6076_9B54_5486_54EE_6CE2_6280_80FDID then
@@ -329,31 +367,6 @@ _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____5DF4_5
 _____6076_9B54_5486_54EE_6CE2_6280_80FDID = stringToFourCC(_____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]["技能槽位"])
 _____5FEB_901F_63A7_5236__51FB_6655 = 0
 local _____6076_9B54_5486_54EE_6CE2_5DF2_6CE8_518C = false
-____exports["释放巴尔扎罗斯护卫模仿恶魔咆哮波"] = function(context)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]
-    local _____62A4_536B_5217_8868 = {context["格鲁姆"], context["塞拉"]}
-    do
-        local i = 0
-        while i < #_____62A4_536B_5217_8868 do
-            do
-                local _____62A4_536B = _____62A4_536B_5217_8868[i + 1]
-                if not _____5355_4F4D_6709_6548(_____62A4_536B) then
-                    goto __continue40
-                end
-                _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4F8B(
-                    context,
-                    _____62A4_536B,
-                    config["护卫模仿宽度倍率"],
-                    config["护卫模仿伤害倍率"],
-                    config["护卫模仿嘴部高度"],
-                    false
-                )
-            end
-            ::__continue40::
-            i = i + 1
-        end
-    end
-end
 ____exports["注册巴尔扎罗斯恶魔咆哮波"] = function()
     if _____6076_9B54_5486_54EE_6CE2_5DF2_6CE8_518C then
         return

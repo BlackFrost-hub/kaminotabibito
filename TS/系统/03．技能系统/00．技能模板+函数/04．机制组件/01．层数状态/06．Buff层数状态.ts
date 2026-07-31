@@ -42,7 +42,8 @@ function 同步Buff(this: void, 参数: Buff层数状态参数, 单位: any, 层
   if (duration <= 0) return;
   const effectValue = 参数.取Buff显示值 == null ? 层数 : 参数.取Buff显示值(单位, 层数);
   const extras = 参数.取Buff附加参数 == null ? undefined : 参数.取Buff附加参数(单位, 层数);
-  registerManualBuff(单位, 参数.BuffID, duration, effectValue, extras);
+  const buffExtras = extras == null ? { stack: 层数 } : { ...extras, stack: 层数 };
+  registerManualBuff(单位, 参数.BuffID, duration, effectValue, buffExtras);
 }
 
 class Buff层数状态实现 implements Buff层数状态控制器 {
@@ -104,4 +105,3 @@ export function 创建Buff层数状态(this: void, 参数: Buff层数状态参�
   }
   return 实例;
 }
-

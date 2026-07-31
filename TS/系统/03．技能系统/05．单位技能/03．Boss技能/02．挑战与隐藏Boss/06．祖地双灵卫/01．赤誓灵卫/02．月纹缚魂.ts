@@ -26,8 +26,13 @@ const { addDelayedCallback } = require('系统.00．核心系统.05．中心计�
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
+const DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha as (effect: any, alpha: number) => void;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -76,7 +81,14 @@ export function 释放月纹缚魂(this: void, context: 祖地双灵卫运行时
     const point = { X: GetUnitX(targets[i]), Y: GetUnitY(targets[i]) };
     points.push(point);
     创建技能提示圈({ 类型: '渐变圆形', X: point.X, Y: point.Y, 半径: cfg.半径, 持续时间: cfg.预警秒, 来源单位: boss });
-    const moon = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.月纹缚魂.月纹地面特效路径, point.X, point.Y);
+    const moon = 创建点特效({
+      模型路径: 祖地双灵卫数值与表现配置.表现资源.月纹缚魂.月纹地面特效路径,
+      X: point.X,
+      Y: point.Y,
+      缩放: 祖地双灵卫数值与表现配置.表现资源.月纹缚魂.月纹地面特效缩放,
+      动画索引: 0,
+      持续秒: cfg.预警秒 + 0.2,
+    });
     if (moon != null && moon !== 0) YDWETimerDestroyEffectSafe(cfg.预警秒 + 0.2, moon);
   }
   const delayedId = addDelayedCallback(cfg.预警秒 * 1000, function 月纹缚魂结算(this: void): void {
@@ -87,7 +99,12 @@ export function 释放月纹缚魂(this: void, context: 祖地双灵卫运行时
     for (let i = 0; i < points.length; i++) {
       const point = points[i];
       const impact = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.月纹缚魂.禁锢生效特效路径, point.X, point.Y);
-      if (impact != null && impact !== 0) YDWETimerDestroyEffectSafe(0.8, impact);
+      if (impact != null && impact !== 0) {
+        addDelayedCallback(1000, function 月纹禁锢生效特效隐藏(this: void): void {
+          DzSetEffectVertexAlpha(impact, 0);
+          YDWETimerDestroyEffectSafe(0, impact);
+        });
+      }
       for (let j = 0; j < heroes.length; j++) {
         const hit = heroes[j];
         const hid = GetHandleId(hit) || 0;

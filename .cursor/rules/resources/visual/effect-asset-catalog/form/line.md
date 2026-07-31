@@ -1,7 +1,10 @@
 # Form / Line
 
+<!-- ShalltearBloodMoonArcSlash was re-imported from file_001310 on 2026-07-31. The authoritative replacement record is the source model hash 678F9AFD3B52D0F0CF2B5B66FF91C82BD4E9EDB2217A03C77A0D51B09F3004EC; project output hash is 7BCD621DC8BF94D17DABF538F24298D5E99E53DACAAF71DD11D545BB333EEDCF, 11478 bytes, Death-only, with 8 private textures under Form\\Line\\Texture. -->
+
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
+| `Common\Effect\Form\Line\ShalltearBloodMoonArcSlash.mdx` | 红色弯月形斩光，外沿散落细小红色粒子，作为横扫枪势的短促弧形补层。 | 保留源模型默认 `Birth` 动作；在横扫结算点与主枪势同坐标叠加。 | 夏提雅·血月轮舞正面横扫弧光补层。 | 只作 `ShalltearWideBloodSweep.mdx` 的叠加层；正面横扫与反向反刺各创建一次，不承担伤害或预警判定。模型及两张私有贴图均重新导入自 `导出特效\\file_001307`，不补 `Stand / Death`。 | 6557 | `24E1638F55EB50C0` |
 | `Common\Effect\Form\Line\DemonicRoarWave.mdx` | 金白色细长锥形冲击波，前缘尖锐，后方分出多道高速拖影。 | 单一 `stand` 序列；运行时以 Z 轴对准目标方向，可叠加俯仰和横滚，适合从高处嘴部斜向喷出。 | 巴尔扎罗斯恶魔咆哮波，也可作为火焰、圣光或能量类的短促直线吐息主体。 | 不是自动移动弹幕；需由弹幕系统驱动位移，或在发射点短时播放。高亮度较强，不与白色直线预警重叠。 | 2328 | `B82DCD3F00D10250` |
 | `Common\Effect\Form\Line\AinzRealityFractureMovingSlash.mdx` | 高饱和洋红宽弧斩光，带多道细长拖尾。 | `Birth / Stand / Death`；运行时沿固定起终点路径移动，模型视觉朝向相对移动方向偏移 `180°`。 | 安兹·现实断裂路径主体。 | 不代替机制预警；运行时 RGB `255 / 8 / 255`；表现顺序为图 1 路径主体后叠加图 2 命中层。 | 5932 | `CBC8FC760F568285` |
 | `Common\Effect\Form\Line\AinzRealityFracture.mdx` | 黑色空间切面只留下细白折线边缘，没有普通剑气的发光实体感。 | 单次切面爆发；运行时按固定方向旋转并覆盖在线段预警上。 | 时间停止解冻时的已锁定现实断裂瞬时结算。 | 不代替机制预警；普通现实断裂路径主体已改用移动模型，不得回退使用该静态模型。 | 8360 | `D48133EAE6FF15F7` |
@@ -16,3 +19,4 @@
 | `Common\Effect\Form\Line\AinzAlbedoGuardianLink.mdx` | 候选截图观察：两个金色符文节点由细金线相连，能够直接表达至尊与守护者之间的职责连接，比持续闪电更稳重。 | 迁移后序列：`Birth / Stand / Death`；完成 5 项结构修复。 | 安兹、雅儿贝德·护卫连接 / 守护者之职责预连接；源候选 `JNTX (564).mdx`。 | 以双方位置动态取中点、旋转和按距离缩放；缩放倍率 `1.2`，高度 `200`。 | 25956 | `9ACDF92FE467DDD6` |
 | `Common\Effect\Form\Line\ShalltearBloodReturnLink.mdx` | 候选截图观察：红色双节点连线能表达血能回收，但端点法阵偏规整、连线也略粗，不够像多股液态细血线。 | 迁移后序列：`Birth / Stand / Death`；完成 6 项结构修复。 | 夏提雅·鲜血回收连线；源候选 `JNTX (565).mdx`。 | 可缩小后作为单个血印回流备选；不直接定为最终首选。 | 25744 | `D41656804C8A41CC` |
 | `Common\Effect\Form\Line\ShalltearWideBloodSweep.mdx` | 候选截图观察：多道深红弧线沿同一方向划出，具备长枪横扫后的血术残痕和清楚的攻击方向；比普通红色爆点更适合表现轮舞的宽扫段。 | 迁移后序列：`Birth / Stand / Death`；完成 3 项结构修复。 | 夏提雅·血月轮舞的宽横扫枪势；源候选 `SwipeCaster.mdx`。 | 作为 `JNTX (418).mdx` 横扫主刀光的替代备选，小尺寸、短时播放；不能替代窄直线反刺的 `Red Quick.mdx`。 | 9295 | `9EB513A48CD60B8C` |
+| `Common\Effect\Form\Line\ShalltearBloodMoonFinalStrike.mdx` | 紫白细长枪光，带蓝紫边缘和短促尾迹，沿直线飞行时可作为血月终舞的并列枪弹。 | 保留源模型 `Stand AZ / Death AZ`；单位载体创建后播放 0 号动作，方向锁定为当前扇区或俯冲面向。 | 夏提雅·血月终舞每个扇区的 4 枚图 2 弹幕。 | 使用原生单位弹幕移动和命中，不承担结算点一次性补层；复用原生 `Textures\\RibbonNE1_White.blp`、`RibbonNE1_blue.blp`、`Flare.blp`，仅复用项目已有的 `AinzRealityFractureMovingSlash_KnifeLight.blp`，不复制原生贴图。 | 4630 | `76289626731764BE` |

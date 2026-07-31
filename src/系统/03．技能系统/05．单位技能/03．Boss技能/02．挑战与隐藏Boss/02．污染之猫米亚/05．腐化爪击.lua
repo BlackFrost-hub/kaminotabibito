@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____64AD_653E_722A_51FB_8868_73B0, _____64AD_653E_722A_51FB_52A8_4F5C, _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A, _____7ED3_7B97_7C73_4E9A_8150_5316_722A_51FB, _____7ED3_7B97_7C73_4E9A_8150_5316_722A_51FB_8DF3_8DC3, _____5F00_59CB_7C73_4E9A_8150_5316_722A_51FB_8DF3_8DC3, ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548, _____521B_5EFA_70B9_7279_6548, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, addDelayedCallback, jass, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, Atan2, SquareRoot, GetRandomReal, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____8150_5316_722A_51FB_6280_80FDID, _____7C73_4E9A_8150_5316_722A_51FB_8DF3_8DC3_6570_636E_8868
+local _____64AD_653E_722A_51FB_8868_73B0, _____64AD_653E_722A_51FB_52A8_4F5C, _____521B_5EFA_8150_5316_722A_51FB_6B8B_7559_533A, _____7ED3_7B97_7C73_4E9A_8150_5316_722A_51FB, _____7ED3_7B97_7C73_4E9A_8150_5316_722A_51FB_8DF3_8DC3, _____5F00_59CB_7C73_4E9A_8150_5316_722A_51FB_8DF3_8DC3, ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, addDelayedCallback, YDWETimerDestroyEffectSafe, jass, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, AddSpecialEffect, EXEffectMatRotateY, EXEffectMatRotateZ, EXEffectMatScale, SetUnitFacing, SetUnitAnimationByIndex, SetUnitTimeScale, Atan2, SquareRoot, GetRandomReal, BJ_RADTODEG, _____7C73_4E9A_5355_4F4D_7C7B_578BID, _____8150_5316_722A_51FB_6280_80FDID, _____7C73_4E9A_8150_5316_722A_51FB_8DF3_8DC3_6570_636E_8868
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_7C73_4E9A_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建米亚上下文"]
 local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.04．腐化感染")
@@ -25,15 +25,28 @@ local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位有效"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
-function _____64AD_653E_722A_51FB_8868_73B0(boss, x, y)
+function _____64AD_653E_722A_51FB_8868_73B0(boss, x, y, facing)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化爪击"]
-    _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = config["命中特效路径"],
-        X = x,
-        Y = y,
-        ["缩放"] = config["命中特效缩放"],
-        ["持续秒"] = config["命中特效持续秒"]
-    })
+    local slashFacingA = facing - 45
+    local slashFacingB = facing + 45
+    local angles = {slashFacingA, slashFacingB}
+    do
+        local i = 0
+        while i < #angles do
+            do
+                local effect = AddSpecialEffect(config["命中特效路径"], x, y)
+                if effect == nil or effect == 0 then
+                    goto __continue4
+                end
+                EXEffectMatRotateY(effect, config["命中特效Y轴旋转角度"])
+                EXEffectMatRotateZ(effect, angles[i + 1])
+                EXEffectMatScale(effect, config["命中特效缩放"], config["命中特效缩放"], config["命中特效缩放"])
+                YDWETimerDestroyEffectSafe(config["命中特效持续秒"], effect)
+            end
+            ::__continue4::
+            i = i + 1
+        end
+    end
     _____64AD_653E_722A_51FB_52A8_4F5C(boss)
 end
 function _____64AD_653E_722A_51FB_52A8_4F5C(boss)
@@ -73,20 +86,26 @@ function _____7ED3_7B97_7C73_4E9A_8150_5316_722A_51FB(variable)
     local context = data.context
     local boss = context["Boss单位"]
     local actualTarget = data.target
-    if not _____5355_4F4D_6709_6548(boss) then
+    local ____boss_6709_6548 = _____5355_4F4D_6709_6548(boss)
+    local _____76EE_6807_6709_6548 = _____5355_4F4D_6709_6548(actualTarget)
+    if not ____boss_6709_6548 then
         return
     end
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化爪击"]
     SetUnitFacing(boss, data["朝向"])
     local landingX = GetUnitX(boss)
     local landingY = GetUnitY(boss)
-    _____64AD_653E_722A_51FB_8868_73B0(boss, landingX, landingY)
-    if _____5355_4F4D_6709_6548(actualTarget) then
-        _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+    _____64AD_653E_722A_51FB_8868_73B0(boss, landingX, landingY, data["朝向"])
+    if _____76EE_6807_6709_6548 then
+        local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) or _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E["Boss攻击力兜底"]
+        local _____6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387 = _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387(context, actualTarget)
+        local _____5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387 = _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(actualTarget)
+        local _____4F24_5BB3 = _____653B_51FB_529B * config["攻击力倍率"] * _____6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387 * _____5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387
+        local _____4F24_5BB3_5DF2_63D0_4EA4 = _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
             ["技能ID"] = _____8150_5316_722A_51FB_6280_80FDID,
             ["来源"] = boss,
             ["目标"] = actualTarget,
-            ["伤害"] = (_____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) or _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E["Boss攻击力兜底"]) * config["攻击力倍率"] * _____53D6_7C73_4E9A_6C61_67D3_6807_8BB0_4F24_5BB3_500D_7387(context, actualTarget) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(actualTarget),
+            ["伤害"] = _____4F24_5BB3,
             attackType = jass.ATTACK_TYPE_NORMAL,
             ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
             weaponType = jass.WEAPON_TYPE_WHOKNOWS,
@@ -132,7 +151,13 @@ function _____5F00_59CB_7C73_4E9A_8150_5316_722A_51FB_8DF3_8DC3(variable)
     end
 end
 ____exports["释放米亚腐化爪击"] = function(context, target)
-    local boss = context["Boss单位"]
+    local ____temp_6
+    if context ~= nil then
+        ____temp_6 = context["Boss单位"]
+    else
+        ____temp_6 = nil
+    end
+    local boss = ____temp_6
     local actualTarget = target
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(actualTarget) then
         return
@@ -156,7 +181,12 @@ ____exports["释放米亚腐化爪击"] = function(context, target)
     local facing = Atan2(dy, dx) * BJ_RADTODEG
     local jumpDuration = GetRandomReal(config["跳跃最短秒"], config["跳跃最长秒"])
     SetUnitFacing(boss, facing)
-    _____5F00_59CB_7C73_4E9A_5E38_89C4_65BD_6CD5(boss, config["前摇秒"], "腐化爪击", "米亚锁定目标准备扑击")
+    _____5F00_59CB_7C73_4E9A_5E38_89C4_65BD_6CD5(
+        boss,
+        config["前摇秒"],
+        "腐化爪击",
+        ((("锁定目标，" .. tostring(config["前摇秒"])) .. "秒后跃击并留下半径") .. tostring(config["残留半径"])) .. "码爪痕（离开红色路径、落点和爪痕）"
+    )
     SetUnitTimeScale(boss, 1)
     SetUnitAnimationByIndex(boss, config["前摇动画编号"])
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
@@ -178,8 +208,8 @@ ____exports["释放米亚腐化爪击"] = function(context, target)
         ["距离"] = distance,
         ["跳跃持续秒"] = jumpDuration
     })
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "米亚-腐化爪击结算", delayedId)
+    local ____self_7 = context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "米亚-腐化爪击结算", delayedId)
 end
 function ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____8150_5316_722A_51FB_6280_80FDID then
@@ -197,23 +227,28 @@ function ____on_7C73_4E9A_8150_5316_722A_51FB_751F_6548(castingUnit, spellAbilit
         GetSpellTargetUnit()
     )
 end
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
-_____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_1["创建持续危险区域"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_3["造成单体技能伤害"]
-local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_5.addDelayedCallback
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
+_____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_0["创建持续危险区域"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_2["造成单体技能伤害"]
+local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
 jass = require("jass.common")
+local japi = require("jass.japi")
 GetUnitTypeId = jass.GetUnitTypeId
 GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
+AddSpecialEffect = jass.AddSpecialEffect
+EXEffectMatRotateY = japi.EXEffectMatRotateY
+EXEffectMatRotateZ = japi.EXEffectMatRotateZ
+EXEffectMatScale = japi.EXEffectMatScale
 SetUnitFacing = jass.SetUnitFacing
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 SetUnitTimeScale = jass.SetUnitTimeScale

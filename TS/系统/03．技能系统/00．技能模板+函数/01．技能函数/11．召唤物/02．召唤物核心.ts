@@ -52,6 +52,7 @@ const DzSetUnitMissileArc = japi.DzSetUnitMissileArc as ((unit: any, arc: number
 const DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed as ((unit: any, speed: number) => void) | undefined;
 const DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming as ((unit: any, homing: boolean) => void) | undefined;
 const DzSetUnitName = japi.DzSetUnitName as ((unit: any, name: string) => void) | undefined;
+const DzUnitDisableAttack = japi.DzUnitDisableAttack as ((unit: any, disabled: boolean) => void) | undefined;
 
 const CreateUnit = 共享.CreateUnit;
 const GetHandleId = 共享.GetHandleId;
@@ -188,6 +189,10 @@ function 应用召唤物属性(this: void, unit: any, 参数: 规范化召唤物
 
   if (参数.固定站桩 === true) {
     X_FixUnitStandingSafe(unit);
+  }
+
+  if (参数.禁止普攻 === true && DzUnitDisableAttack != null) {
+    DzUnitDisableAttack(unit, true);
   }
 
   if (参数.普攻弹道模型 != null && 参数.普攻弹道模型 !== "" && DzSetUnitMissileModel != null) {

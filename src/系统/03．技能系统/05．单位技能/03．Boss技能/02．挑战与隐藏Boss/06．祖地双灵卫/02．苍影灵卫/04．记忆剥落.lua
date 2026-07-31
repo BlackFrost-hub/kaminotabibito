@@ -8,6 +8,8 @@ local _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
+local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____01_FF0E_63A7_5236_4E0EBuff["施加快速减速Buff"]
 local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
@@ -27,15 +29,43 @@ local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
 local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
-local getServerTime = ____require_result_3.getServerTime
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
+local ____require_result_4 = require("平台扩展API动作")
+local _____7279_6548_663E_793A__9690_85CF = ____require_result_4["特效显示_隐藏"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_5.addDelayedCallback
+local removeDelayedCallback = ____require_result_5.removeDelayedCallback
+local getServerTime = ____require_result_5.getServerTime
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local DestroyEffect = jass.DestroyEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
+local function _____9690_85CF_5E76_9500_6BC1_8BB0_5FC6_5265_843D_7279_6548(value)
+    local record = value
+    if record == nil or record["特效"] == nil or record["特效"] == 0 then
+        return
+    end
+    if record["延迟回调ID"] > 0 then
+        removeDelayedCallback(record["延迟回调ID"])
+    end
+    _____7279_6548_663E_793A__9690_85CF(record["特效"], false)
+    DestroyEffect(record["特效"])
+    record["特效"] = nil
+    record["延迟回调ID"] = 0
+end
+local function _____767B_8BB0_8BB0_5FC6_5265_843D_9650_65F6_7279_6548(context, effect, durationMs, cleanupName)
+    if effect == nil or effect == 0 then
+        return
+    end
+    local record = {["特效"] = effect, ["延迟回调ID"] = 0}
+    record["延迟回调ID"] = addDelayedCallback(durationMs, _____9690_85CF_5E76_9500_6BC1_8BB0_5FC6_5265_843D_7279_6548, record)
+    local ____self_6 = context["清理"]
+    ____self_6["登记清理"](____self_6, cleanupName, _____9690_85CF_5E76_9500_6BC1_8BB0_5FC6_5265_843D_7279_6548, record)
+end
 local function _____79FB_9664_7A7A_767D_7075_57DF_72B6_6001(context, state)
     do
         local i = #context["空白灵域列表"] - 1
@@ -84,14 +114,15 @@ local function _____8C03_6574_5230_573A_5185_4E14_907F_5F00_9547_9B42_5370(conte
 end
 local function _____521B_5EFA_7A7A_767D_7075_57DF(context, boss, x, y)
     local cfg = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E.P2["记忆剥落"]
+    local resources = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["记忆剥落"]
     local state = {
         X = x,
         Y = y,
         ["半径"] = cfg["半径"],
         ["到期Ms"] = getServerTime() + cfg["持续秒"] * 1000
     }
-    local ____context__7A7A_767D_7075_57DF_5217_8868_4 = context["空白灵域列表"]
-    ____context__7A7A_767D_7075_57DF_5217_8868_4[#____context__7A7A_767D_7075_57DF_5217_8868_4 + 1] = state
+    local ____context__7A7A_767D_7075_57DF_5217_8868_7 = context["空白灵域列表"]
+    ____context__7A7A_767D_7075_57DF_5217_8868_7[#____context__7A7A_767D_7075_57DF_5217_8868_7 + 1] = state
     local instance
     instance = _____521B_5EFA_6301_7EED_5371_9669_533A_57DF({
         X = x,
@@ -102,16 +133,28 @@ local function _____521B_5EFA_7A7A_767D_7075_57DF(context, boss, x, y)
         ["影响目标"] = "敌方",
         ["所有者"] = boss,
         ["模型路径"] = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["记忆剥落"]["空白灵域地面特效路径"],
+        ["特效缩放"] = resources["空白灵域地面特效缩放"],
         ["提示圈"] = {["类型"] = "敌方圆形", ["来源单位"] = boss},
         ["on周期"] = function(units)
+            local dynamicEffect = _____521B_5EFA_70B9_7279_6548({["模型路径"] = resources["空白灵域动态层特效路径"], X = state.X, Y = state.Y})
+            _____767B_8BB0_8BB0_5FC6_5265_843D_9650_65F6_7279_6548(context, dynamicEffect, resources["动态层特效生命周期秒"] * 1000, "祖地双灵卫-空白灵域动态层")
             do
                 local i = 0
                 while i < #units do
                     do
                         local hit = units[i + 1]
                         if not _____5355_4F4D_6709_6548(hit) then
-                            goto __continue16
+                            goto __continue21
                         end
+                        _____65BD_52A0_5FEB_901F_51CF_901FBuff(
+                            boss,
+                            hit,
+                            cfg["减速比例"],
+                            cfg["减速比例"],
+                            cfg["减速持续秒"],
+                            "祖地双灵卫·记忆剥落",
+                            "技能"
+                        )
                         local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["每跳攻击力比例"], ["目标最大生命比例"] = cfg["每跳目标最大生命比例"]})
                         _____9020_6210AOE_6280_80FD_4F24_5BB3({
                             ["来源"] = boss,
@@ -126,7 +169,7 @@ local function _____521B_5EFA_7A7A_767D_7075_57DF(context, boss, x, y)
                             ["标签"] = "祖地双灵卫·记忆剥落"
                         })
                     end
-                    ::__continue16::
+                    ::__continue21::
                     i = i + 1
                 end
             end
@@ -135,9 +178,9 @@ local function _____521B_5EFA_7A7A_767D_7075_57DF(context, boss, x, y)
             _____79FB_9664_7A7A_767D_7075_57DF_72B6_6001(context, state)
         end
     })
-    local ____self_7 = context["清理"]
-    ____self_7["登记清理"](
-        ____self_7,
+    local ____self_10 = context["清理"]
+    ____self_10["登记清理"](
+        ____self_10,
         "祖地双灵卫-空白灵域",
         function()
             if instance ~= nil then
@@ -185,17 +228,21 @@ ____exports["释放记忆剥落"] = function(context, target)
     _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(boss, bossFacing)
     _____5F00_59CB_7956_5730_53CC_7075_536B_5E38_89C4_65BD_6CD5(boss, cfg["预警秒"], "记忆剥落", "两块空白灵域将在锁定位置生成并持续侵蚀")
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["动画编号"], ["持续秒"] = cfg["预警秒"] + 0.25, ["恢复动画编号"] = cfg["恢复动画编号"]})
+    local resources = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["记忆剥落"]
     do
         local i = 0
         while i < #points do
+            local point = points[i + 1]
             _____521B_5EFA_6280_80FD_63D0_793A_5708({
                 ["类型"] = "敌方圆形",
-                X = points[i + 1].X,
-                Y = points[i + 1].Y,
+                X = point.X,
+                Y = point.Y,
                 ["半径"] = cfg["半径"],
                 ["持续时间"] = cfg["预警秒"],
                 ["来源单位"] = boss
             })
+            local warningEffect = _____521B_5EFA_70B9_7279_6548({["模型路径"] = resources["褪色预警特效路径"], X = point.X, Y = point.Y, ["缩放"] = resources["褪色预警特效缩放"]})
+            _____767B_8BB0_8BB0_5FC6_5265_843D_9650_65F6_7279_6548(context, warningEffect, cfg["预警秒"] * 1000, "祖地双灵卫-记忆剥落褪色预警")
             i = i + 1
         end
     end
@@ -214,8 +261,8 @@ ____exports["释放记忆剥落"] = function(context, target)
             end
         end
     )
-    local ____self_8 = context["清理"]
-    ____self_8["登记延迟回调"](____self_8, "祖地双灵卫-记忆剥落生成", createId)
+    local ____self_11 = context["清理"]
+    ____self_11["登记延迟回调"](____self_11, "祖地双灵卫-记忆剥落生成", createId)
     return true
 end
 ____exports["记忆剥落技能状态"] = {
@@ -226,6 +273,6 @@ ____exports["记忆剥落技能状态"] = {
     ["伤害形态"] = "AOE",
     ["需要独立技能实例ID"] = false,
     ["包含战斗自身位移"] = false,
-    ["实现要求"] = "复用持续危险区域生成最多两块空白灵域，并在选点时避开当前镇魂印处理区。"
+    ["实现要求"] = "复用持续危险区域生成最多两块空白灵域；每次区域检查创建一份动态灵魂波纹并在0.3秒后隐藏销毁，同时刷新30%减速，单次减速持续0.5秒，并在选点时避开当前镇魂印处理区。"
 }
 return ____exports

@@ -42,7 +42,7 @@ const ICON_W = 0.02;
 const ICON_H = 16 / 600;
 const ICON_GAP = 0.0005;
 const STACK_BADGE_TEX = "UI\\Buff\\buff_stack_badge.tga";
-const STACK_BADGE_W = 0.0072;
+const STACK_BADGE_W = 0.012;
 const STACK_BADGE_H = 0.0105;
 const STACK_BADGE_FONT = "Fonts\\dfst-m3u.ttf";
 const STACK_BADGE_FONT_SIZE = 0.008;
@@ -233,7 +233,7 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
         x: 0,
         y: stackBadge && stackBadge !== 0 ? 0 : -0.006,
       },
-      { width: STACK_BADGE_W * 0.72, height: STACK_BADGE_H * 0.72 }
+      { width: STACK_BADGE_W * 0.86, height: STACK_BADGE_H * 0.72 }
     ) || 0;
   if (stackText && stackText !== 0) {
     japi.DzFrameSetTextAlignment(stackText, -1);

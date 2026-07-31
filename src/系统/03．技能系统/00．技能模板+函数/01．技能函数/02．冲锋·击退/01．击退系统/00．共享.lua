@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548, jass
+local _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548, _____51B2_950B_4F4D_79FB_7279_6548_5230_671F, jass, DzSetEffectVertexAlpha, DestroyEffect, addDelayedCallback
 function _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(_____6A21_578B, _____5B9E_4F8B)
     if _____6A21_578B == nil or _____6A21_578B == "" then
         return
@@ -12,24 +12,38 @@ function _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(_____6A21_578B, _____5B9E_
         jass.GetUnitY(_____5B9E_4F8B["单位"])
     )
     if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
-        jass.DestroyEffect(_____7279_6548)
+        addDelayedCallback(300, _____51B2_950B_4F4D_79FB_7279_6548_5230_671F, _____7279_6548)
     end
 end
+function _____51B2_950B_4F4D_79FB_7279_6548_5230_671F(_____7279_6548)
+    if _____7279_6548 == nil or _____7279_6548 == 0 then
+        return
+    end
+    if type(DzSetEffectVertexAlpha) == "function" then
+        DzSetEffectVertexAlpha(_____7279_6548, 0)
+    end
+    DestroyEffect(_____7279_6548)
+end
 jass = require("jass.common")
+local japi = require("jass.japi")
+DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha
+DestroyEffect = jass.DestroyEffect
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_0.addDelayedCallback
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
-local X_GAFC = ____require_result_0.X_GAFC
-local X_IsTerrainWalkable = ____require_result_0.X_IsTerrainWalkable
-local X_IsUnitTerrainWalkable = ____require_result_0.X_IsUnitTerrainWalkable
-local X_GetAbleX = ____require_result_0.X_GetAbleX
-local X_GetAbleY = ____require_result_0.X_GetAbleY
-local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_1["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_1["移除单位暂停"]
-local _____5355_4F4D_662F_5426_5B58_5728_5176_4ED6_6682_505C_5360_7528 = ____require_result_1["单位是否存在其他暂停占用"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
-local _____96F6_79D2_540E_64AD_653E_5355_4F4D_52A8_4F5C = ____require_result_2["零秒后播放单位动作"]
-local _____96F6_79D2_540E_91CD_7F6E_5355_4F4D_52A8_753B = ____require_result_2["零秒后重置单位动画"]
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数")
+local X_GAFC = ____require_result_1.X_GAFC
+local X_IsTerrainWalkable = ____require_result_1.X_IsTerrainWalkable
+local X_IsUnitTerrainWalkable = ____require_result_1.X_IsUnitTerrainWalkable
+local X_GetAbleX = ____require_result_1.X_GetAbleX
+local X_GetAbleY = ____require_result_1.X_GetAbleY
+local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_2["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_2["移除单位暂停"]
+local _____5355_4F4D_662F_5426_5B58_5728_5176_4ED6_6682_505C_5360_7528 = ____require_result_2["单位是否存在其他暂停占用"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____96F6_79D2_540E_64AD_653E_5355_4F4D_52A8_4F5C = ____require_result_3["零秒后播放单位动作"]
+local _____96F6_79D2_540E_91CD_7F6E_5355_4F4D_52A8_753B = ____require_result_3["零秒后重置单位动画"]
 local ForGroup = jass.ForGroup
 local GetEnumUnit = jass.GetEnumUnit
 local SetUnitAnimation = jass.SetUnitAnimation
@@ -48,11 +62,11 @@ ____exports["零秒后播放单位动作"] = _____96F6_79D2_540E_64AD_653E_5355_
 ____exports["零秒后重置单位动画"] = _____96F6_79D2_540E_91CD_7F6E_5355_4F4D_52A8_753B
 ____exports.SetUnitAnimation = SetUnitAnimation
 ____exports.SetUnitTimeScale = SetUnitTimeScale
-local ____jglobals_bj_DEGTORAD_3 = jglobals.bj_DEGTORAD
-if ____jglobals_bj_DEGTORAD_3 == nil then
-    ____jglobals_bj_DEGTORAD_3 = 0.017453292519943295
+local ____jglobals_bj_DEGTORAD_4 = jglobals.bj_DEGTORAD
+if ____jglobals_bj_DEGTORAD_4 == nil then
+    ____jglobals_bj_DEGTORAD_4 = 0.017453292519943295
 end
-____exports.BJ_DEGTORAD = ____jglobals_bj_DEGTORAD_3
+____exports.BJ_DEGTORAD = ____jglobals_bj_DEGTORAD_4
 ____exports.TICK_INTERVAL = 0.02
 ____exports.CENTER_TIMER_TICKS = 2
 ____exports.MAX_SUB_STEP = 31

@@ -18,7 +18,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 70,
     canPurge: true,
-    tooltip: "被月光锁链定身，并周期承受自然伤害。",
+    tooltip: "持续3秒；被定身期间每1秒结算1次，单次伤害=瑟兰迪尔当前攻击力×8%+目标最大生命值×0.4%，共3次；累计受到其他单位≥1500点伤害可打断。",
   },
   BTH2: {
     buffID: "BTH2",
@@ -35,7 +35,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 1,
     priority: 60,
     canPurge: true,
-    tooltip: "月光碎片环绕自身：6秒内基础移动速度+25%。",
+    tooltip: "拾取后持续6秒；基础移动速度提高25%。",
   },
   BTH3: {
     buffID: "BTH3",
@@ -52,7 +52,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 75,
     canPurge: true,
-    tooltip: "被瑟兰迪尔标记，期间瑟兰迪尔会优先攻击你，并对你造成的伤害提高30%（单人模式为15%）。",
+    tooltip: "持续30秒；瑟兰迪尔优先攻击你；多人模式下瑟兰迪尔对你造成的伤害提高30%，单人模式提高15%。",
   },
   BTH4: {
     buffID: "BTH4",
@@ -67,7 +67,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 1,
     priority: 55,
     canPurge: false,
-    tooltip: "处于瑟兰迪尔近身领域内，攻击速度降低data%。",
+    tooltip: "瑟兰迪尔周围300码内，攻击速度降低30%；离开范围后约0.55秒失效。",
   },
   BTH5: {
     buffID: "BTH5",
@@ -82,7 +82,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 65,
     canPurge: false,
-    tooltip: "受到审判之环压制，攻击力降低55%。",
+    tooltip: "持续10秒；攻击力降低55%；不可驱散。",
   },
   BTH6: {
     buffID: "BTH6",
@@ -99,7 +99,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 60,
     canPurge: true,
-    tooltip: "持续受到烈焰伤害。",
+    tooltip: "持续8秒；每1秒结算1次，每次扣除目标最大生命值5%，共8次。",
   },
   BTH7: {
     buffID: "BTH7",
@@ -116,7 +116,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 1,
     priority: 50,
     canPurge: true,
-    tooltip: "以生命风险换取攻击增幅。",
+    tooltip: "持续18秒；攻击力提高35%。",
   },
   BTH8: {
     buffID: "BTH8",
@@ -133,7 +133,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 60,
     canPurge: true,
-    tooltip: "移动速度与攻击速度大幅降低。",
+    tooltip: "持续8秒；移动速度降低70%，攻击速度降低50%。",
   },
   BTH9: {
     buffID: "BTH9",
@@ -150,7 +150,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 1,
     priority: 50,
     canPurge: true,
-    tooltip: "获得冰霜庇护。",
+    tooltip: "持续18秒；护甲提高40%，魔抗提高30%。",
   },
   BTHA: {
     buffID: "BTHA",
@@ -167,7 +167,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 60,
     canPurge: false,
-    tooltip: "持续受到毒素侵蚀。",
+    tooltip: "持续8秒；每1秒结算1次，每次扣除目标最大生命值4%，共8次；治疗效果降低60%。",
   },
   BTHB: {
     buffID: "BTHB",
@@ -184,7 +184,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 1,
     priority: 50,
     canPurge: true,
-    tooltip: "获得毒液反转增益。",
+    tooltip: "持续18秒；每秒恢复300点法力，技能消耗降低50%。",
   },
   BTHC: {
     buffID: "BTHC",
@@ -199,7 +199,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 60,
     canPurge: true,
-    tooltip: "魔力亏空会转化为反噬伤害。",
+    tooltip: "持续8秒；每1秒结算1次，按结算时已损失法力值×200%造成伤害，共8次；无最大法力值时每次固定200。",
   },
   BTHD: {
     buffID: "BTHD",
@@ -216,7 +216,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 1,
     priority: 50,
     canPurge: true,
-    tooltip: "获得奥术超载增益。",
+    tooltip: "持续18秒；技能伤害提高45%，技能消耗提高60%，技能冷却缩短30%。",
   },
   BTHE: {
     buffID: "BTHE",
@@ -233,7 +233,7 @@ export const 瑟兰迪尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 90,
     canPurge: false,
-    tooltip: "月光灌注瑟兰迪尔，攻击力提高50%、体型提高30%、移动速度降低20%，并触发精灵神罚。",
+    tooltip: "持续180秒；瑟兰迪尔攻击力提高50%、体型提高30%、移动速度降低20%；倒计时结束后对所有玩家造成其最大生命值100%的强化伤害。",
   },
 };
 

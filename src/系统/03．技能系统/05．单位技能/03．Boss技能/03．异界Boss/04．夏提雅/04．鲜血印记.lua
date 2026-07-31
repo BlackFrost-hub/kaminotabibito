@@ -22,6 +22,7 @@ local UnitAddAbility = jass.UnitAddAbility
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local PauseUnit = jass.PauseUnit
 local SetUnitPathing = jass.SetUnitPathing
+local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local AddSpecialEffect = jass.AddSpecialEffect
 local _____8757_866B_6280_80FDID = 1097625443
 local function _____4ECE_5217_8868_79FB_9664(context, mark)
@@ -98,6 +99,7 @@ ____exports["创建夏提雅鲜血印记"] = function(context, x, y)
     SetUnitInvulnerable(unitInstance["单位"], true)
     PauseUnit(unitInstance["单位"], true)
     SetUnitPathing(unitInstance["单位"], false)
+    SetUnitAnimationByIndex(unitInstance["单位"], cfg["机制单位动画编号"])
     local mark = {
         X = x,
         Y = y,

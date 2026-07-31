@@ -13,9 +13,6 @@ import { 开始跳跃 } from "../../../../00．技能模板+函数/01．技能�
 import { stringToFourCC, 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
-const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  创建点特效: (this: void, 参数: any) => any;
-};
 const { 创建持续危险区域 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域") as {
   创建持续危险区域: (this: void, 参数: any) => any;
 };
@@ -31,13 +28,21 @@ const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
+const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
+};
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
+const EXEffectMatRotateY = japi.EXEffectMatRotateY as (effect: any, angle: number) => void;
+const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, angle: number) => void;
+const EXEffectMatScale = japi.EXEffectMatScale as (effect: any, x: number, y: number, z: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
@@ -62,15 +67,19 @@ interface 米亚腐化爪击结算变量 {
 
 const 米亚腐化爪击跳跃数据表: Record<number, 米亚腐化爪击结算变量 | undefined> = {};
 
-function 播放爪击表现(this: void, boss: any, x: number, y: number): void {
+function 播放爪击表现(this: void, boss: any, x: number, y: number, facing: number): void {
   const config = 米亚技能数值配置.腐化爪击;
-  创建点特效({
-    模型路径: config.命中特效路径,
-    X: x,
-    Y: y,
-    缩放: config.命中特效缩放,
-    持续秒: config.命中特效持续秒,
-  });
+  const slashFacingA = facing - 45;
+  const slashFacingB = facing + 45;
+  const angles = [slashFacingA, slashFacingB];
+  for (let i = 0; i < angles.length; i++) {
+    const effect = AddSpecialEffect(config.命中特效路径, x, y);
+    if (effect == null || effect === 0) continue;
+    EXEffectMatRotateY(effect, config.命中特效Y轴旋转角度);
+    EXEffectMatRotateZ(effect, angles[i]);
+    EXEffectMatScale(effect, config.命中特效缩放, config.命中特效缩放, config.命中特效缩放);
+    YDWETimerDestroyEffectSafe(config.命中特效持续秒, effect);
+  }
   播放爪击动作(boss);
 }
 
@@ -107,19 +116,25 @@ function 结算米亚腐化爪击(this: void, variable?: any): void {
   const context = data.context;
   const boss = context.Boss单位;
   const actualTarget = data.target;
-  if (!单位有效(boss)) return;
+  const boss有效 = 单位有效(boss);
+  const 目标有效 = 单位有效(actualTarget);
+  if (!boss有效) return;
 
   const config = 米亚技能数值配置.腐化爪击;
   SetUnitFacing(boss, data.朝向);
   const landingX = GetUnitX(boss);
   const landingY = GetUnitY(boss);
-  播放爪击表现(boss, landingX, landingY);
-  if (单位有效(actualTarget)) {
-    造成单体技能伤害({
+  播放爪击表现(boss, landingX, landingY, data.朝向);
+  if (目标有效) {
+    const 攻击力 = 读取单位攻击力(boss) || 米亚运行时配置.Boss攻击力兜底;
+    const 污染标记伤害倍率 = 取米亚污染标记伤害倍率(context, actualTarget);
+    const 平台超载伤害倍率 = 取米亚平台超载伤害倍率(actualTarget);
+    const 伤害 = 攻击力 * config.攻击力倍率 * 污染标记伤害倍率 * 平台超载伤害倍率;
+    const 伤害已提交 = 造成单体技能伤害({
       技能ID: 腐化爪击技能ID,
       来源: boss,
       目标: actualTarget,
-      伤害: (读取单位攻击力(boss) || 米亚运行时配置.Boss攻击力兜底) * config.攻击力倍率 * 取米亚污染标记伤害倍率(context, actualTarget) * 取米亚平台超载伤害倍率(actualTarget),
+      伤害,
       attackType: jass.ATTACK_TYPE_NORMAL,
       伤害类型: jass.DAMAGE_TYPE_POISON,
       weaponType: jass.WEAPON_TYPE_WHOKNOWS,
@@ -133,7 +148,9 @@ function 结算米亚腐化爪击(this: void, variable?: any): void {
 function 结算米亚腐化爪击跳跃(this: void, _unit: any, reason: any, jumpId: number): void {
   const data = 米亚腐化爪击跳跃数据表[jumpId];
   米亚腐化爪击跳跃数据表[jumpId] = undefined;
-  if (data == null || reason !== "完成") return;
+  if (data == null || reason !== "完成") {
+    return;
+  }
   结算米亚腐化爪击(data);
 }
 
@@ -156,13 +173,17 @@ function 开始米亚腐化爪击跳跃(this: void, variable?: any): void {
     主单位死亡时中断: true,
     结束回调: 结算米亚腐化爪击跳跃,
   });
-  if (jumpId > 0) 米亚腐化爪击跳跃数据表[jumpId] = data;
+  if (jumpId > 0) {
+    米亚腐化爪击跳跃数据表[jumpId] = data;
+  }
 }
 
 export function 释放米亚腐化爪击(this: void, context: 米亚运行时上下文, target?: any): void {
-  const boss = context.Boss单位;
+  const boss = context != null ? context.Boss单位 : null;
   const actualTarget = target;
-  if (!单位有效(boss) || !单位有效(actualTarget)) return;
+  if (!单位有效(boss) || !单位有效(actualTarget)) {
+    return;
+  }
   const config = 米亚技能数值配置.腐化爪击;
   播放米亚台词(boss, "腐化爪击");
   const startX = GetUnitX(boss);
@@ -172,7 +193,9 @@ export function 释放米亚腐化爪击(this: void, context: 米亚运行时上
   const dx = targetX - startX;
   const dy = targetY - startY;
   const rawDistance = SquareRoot(dx * dx + dy * dy);
-  if (!(rawDistance > 1)) return;
+  if (!(rawDistance > 1)) {
+    return;
+  }
   const distance = rawDistance > config.跳跃最大距离 ? config.跳跃最大距离 : rawDistance;
   const ratio = distance / rawDistance;
   const landingX = startX + dx * ratio;
@@ -180,7 +203,7 @@ export function 释放米亚腐化爪击(this: void, context: 米亚运行时上
   const facing = Atan2(dy, dx) * BJ_RADTODEG;
   const jumpDuration = GetRandomReal(config.跳跃最短秒, config.跳跃最长秒);
   SetUnitFacing(boss, facing);
-  开始米亚常规施法(boss, config.前摇秒, "腐化爪击", "米亚锁定目标准备扑击");
+  开始米亚常规施法(boss, config.前摇秒, "腐化爪击", `锁定目标，${config.前摇秒}秒后跃击并留下半径${config.残留半径}码爪痕（离开红色路径、落点和爪痕）`);
   SetUnitTimeScale(boss, 1);
   SetUnitAnimationByIndex(boss, config.前摇动画编号);
   创建技能提示圈({

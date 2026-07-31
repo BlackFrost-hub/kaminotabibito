@@ -74,17 +74,12 @@ local function _____9009_62E9_6C61_67D3_6807_8BB0_76EE_6807(context)
     do
         local i = 0
         while i < #heroes do
-            do
-                local hero = heroes[i + 1]
-                if not _____5355_4F4D_5B58_6D3B(hero) then
-                    goto __continue13
-                end
-                local stack = _____53D6_76EE_6807_8150_5316_5C42_6570(context, hero)
-                if stack > highestStack then
-                    highestStack = stack
-                end
+            local hero = heroes[i + 1]
+            local alive = _____5355_4F4D_5B58_6D3B(hero)
+            local stack = alive and _____53D6_76EE_6807_8150_5316_5C42_6570(context, hero) or 0
+            if stack > highestStack then
+                highestStack = stack
             end
-            ::__continue13::
             i = i + 1
         end
     end
@@ -105,7 +100,7 @@ local function _____9009_62E9_6C61_67D3_6807_8BB0_76EE_6807(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(hero) or _____53D6_76EE_6807_8150_5316_5C42_6570(context, hero) ~= highestStack then
-                    goto __continue19
+                    goto __continue18
                 end
                 local threat = _____53D6_5355_4F4D_4EC7_6068(threatEntries, hero)
                 local dist = _____8DDD_79BB_5E73_65B9(boss, hero)
@@ -115,7 +110,7 @@ local function _____9009_62E9_6C61_67D3_6807_8BB0_76EE_6807(context)
                     bestDistance = dist
                 end
             end
-            ::__continue19::
+            ::__continue18::
             i = i + 1
         end
     end
@@ -136,7 +131,9 @@ local function _____5237_65B0_6807_8BB0Buff(context, target)
     )
 end
 local function _____5F3A_5236_653B_51FB_6C61_67D3_6807_8BB0_76EE_6807(context, target)
-    if not _____5355_4F4D_5B58_6D3B(context["Boss单位"]) or not _____5355_4F4D_5B58_6D3B(target) then
+    local bossAlive = _____5355_4F4D_5B58_6D3B(context["Boss单位"])
+    local targetAlive = _____5355_4F4D_5B58_6D3B(target)
+    if not bossAlive or not targetAlive then
         return
     end
     setThreat(context["Boss单位"], target, 1000)

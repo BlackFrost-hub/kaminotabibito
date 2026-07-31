@@ -145,7 +145,7 @@ export const 控制Buff表: Record<string, BuffData> = {
       buffName: "施法硬直",
       icon: "ReplaceableTextures\\CommandButtons\\BTNReplay-Pause.blp",
       effect: "",
-      type: "Debuff:control:cast",
+      type: "Debuff:cast",
       interval: 0,
       maxStack: 1,
       stackRule: 'highest',

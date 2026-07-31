@@ -32,30 +32,63 @@ ____exports["清理英灵战乙女投影"] = function(context)
     context["英灵战乙女已登场"] = false
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_0.CosBJ
+local SinBJ = ____require_result_0.SinBJ
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 RemoveUnit = jass.RemoveUnit
 local SetUnitAnimation = jass.SetUnitAnimation
+local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitAcquireRange = jass.SetUnitAcquireRange
 local SetUnitPathing = jass.SetUnitPathing
+local IssueImmediateOrder = jass.IssueImmediateOrder
+local ConvertUnitState = jass.ConvertUnitState
 local UnitAddAbility = jass.UnitAddAbility
+local UnitAddType = jass.UnitAddType
 local Atan2 = jass.Atan2
-local CosBJ = jass.CosBJ
-local SinBJ = jass.SinBJ
 local GetRandomReal = jass.GetRandomReal
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
-local _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
+local UNIT_TYPE_TAUREN = jass.UNIT_TYPE_TAUREN
+local SetUnitStateJapi = japi.SetUnitState
+local DzUnitDisableAttack = japi.DzUnitDisableAttack
+local _____653B_51FB_8303_56F4_72B6_6001 = 22
+local _____653B_51FB_95F4_9694_72B6_6001 = 37
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
+local _____521B_5EFA_53EC_5524_7269 = ____require_result_1["创建召唤物"]
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_2.getServerTime
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedEffect = ____require_result_3.createTimedEffect
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_3.getServerTime
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedEffect = ____require_result_4.createTimedEffect
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_5.debugLogForce
 local _____8757_866B_6280_80FDID = 1097625443
 _____5206_8EAB_6B8B_5F71_8DEF_5F84 = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx"
+local function _____7981_7528_590F_63D0_96C5_6295_5F71_539F_751F_653B_51FB(unit)
+    if not _____5355_4F4D_6709_6548(unit) then
+        return
+    end
+    SetUnitAcquireRange(unit, 0)
+    SetUnitStateJapi(
+        unit,
+        ConvertUnitState(_____653B_51FB_8303_56F4_72B6_6001),
+        0
+    )
+    SetUnitStateJapi(
+        unit,
+        ConvertUnitState(_____653B_51FB_95F4_9694_72B6_6001),
+        99
+    )
+    if DzUnitDisableAttack ~= nil then
+        DzUnitDisableAttack(unit, true)
+    end
+    IssueImmediateOrder(unit, "stop")
+end
 --- 只创建表现投影；不创建 AI、普攻或任何伤害。
 ____exports["创建夏提雅英灵投影"] = function(context, x, y, face, duration)
     local boss = context["Boss单位"]
@@ -83,7 +116,8 @@ ____exports["创建夏提雅英灵投影"] = function(context, x, y, face, durat
         return projection
     end
     UnitAddAbility(projection, _____8757_866B_6280_80FDID)
-    SetUnitAcquireRange(projection, 0)
+    UnitAddType(projection, UNIT_TYPE_TAUREN)
+    _____7981_7528_590F_63D0_96C5_6295_5F71_539F_751F_653B_51FB(projection)
     SetUnitPathing(projection, false)
     context["英灵战乙女句柄"] = projection
     createTimedEffect(
@@ -96,13 +130,13 @@ ____exports["创建夏提雅英灵投影"] = function(context, x, y, face, durat
     return projection
 end
 ____exports["获取夏提雅英灵投影"] = function(context)
-    local _____5355_4F4D_6709_6548_result_4
+    local _____5355_4F4D_6709_6548_result_6
     if _____5355_4F4D_6709_6548(context["英灵战乙女句柄"]) then
-        _____5355_4F4D_6709_6548_result_4 = context["英灵战乙女句柄"]
+        _____5355_4F4D_6709_6548_result_6 = context["英灵战乙女句柄"]
     else
-        _____5355_4F4D_6709_6548_result_4 = nil
+        _____5355_4F4D_6709_6548_result_6 = nil
     end
-    return _____5355_4F4D_6709_6548_result_4
+    return _____5355_4F4D_6709_6548_result_6
 end
 ____exports["启动夏提雅英灵战乙女阶段"] = function(context, target)
     local boss = context["Boss单位"]
@@ -140,9 +174,9 @@ end
 ____exports["触发英灵战乙女复刻"] = function(context, _____53C2_6570)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2
     local delay = _____53C2_6570["延迟秒"] or cfg["英灵复刻延迟最小秒"]
-    local ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_5 = ____exports["获取夏提雅英灵投影"](context)
-    if ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_5 == nil then
-        ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_5 = ____exports["创建夏提雅英灵投影"](
+    local ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_7 = ____exports["获取夏提雅英灵投影"](context)
+    if ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_7 == nil then
+        ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_7 = ____exports["创建夏提雅英灵投影"](
             context,
             _____53C2_6570.X,
             _____53C2_6570.Y,
@@ -150,8 +184,9 @@ ____exports["触发英灵战乙女复刻"] = function(context, _____53C2_6570)
             3600
         )
     end
-    local projection = ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_5
+    local projection = ____exports__83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71_result_7
     if not _____5355_4F4D_6709_6548(projection) then
+        debugLogForce("夏提雅-英灵战乙女", "复刻安排失败：投影无效")
         return projection
     end
     SetUnitFacing(projection, _____53C2_6570["朝向"])
@@ -167,22 +202,56 @@ ____exports["触发英灵战乙女复刻"] = function(context, _____53C2_6570)
             if context["英灵战乙女句柄"] ~= projection or not _____5355_4F4D_6709_6548(projection) then
                 return
             end
-            SetUnitAnimation(projection, "attack")
+            if _____53C2_6570["复刻动画编号"] ~= nil then
+                SetUnitAnimationByIndex(projection, _____53C2_6570["复刻动画编号"])
+            else
+                SetUnitAnimation(projection, "attack")
+            end
             if _____53C2_6570["复刻结算"] ~= nil then
                 _____53C2_6570["复刻结算"]()
             end
         end
     )
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "夏提雅-英灵战乙女复刻", delayedId)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "夏提雅-英灵战乙女复刻", delayedId)
+    debugLogForce(
+        "夏提雅-英灵战乙女",
+        "复刻延迟已登记",
+        "delay=",
+        delay,
+        "timer=",
+        delayedId
+    )
     return projection
 end
 ____exports["尝试触发英灵战乙女复刻"] = function(context, skillKey, _____53C2_6570)
     if context["阶段"] ~= "P2英灵战乙女" or context["挑战已结束"] or not _____5355_4F4D_6709_6548(context["英灵战乙女句柄"]) then
+        debugLogForce(
+            "夏提雅-英灵战乙女",
+            "复刻拒绝：状态不满足",
+            "phase=",
+            context["阶段"],
+            "ended=",
+            context["挑战已结束"],
+            "projection=",
+            _____5355_4F4D_6709_6548(context["英灵战乙女句柄"])
+        )
         return false
     end
     local now = getServerTime()
     if now < context["英灵复刻冷却到Ms"] or context["上次英灵复刻技能"] == skillKey then
+        debugLogForce(
+            "夏提雅-英灵战乙女",
+            "复刻拒绝：冷却或重复技能",
+            "now=",
+            now,
+            "cooldownTo=",
+            context["英灵复刻冷却到Ms"],
+            "lastSkill=",
+            context["上次英灵复刻技能"],
+            "skill=",
+            skillKey
+        )
         return false
     end
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2

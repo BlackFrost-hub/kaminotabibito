@@ -18,6 +18,7 @@ const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09�
 };
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
+const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -35,10 +36,22 @@ function 生命比例(this: void, unit: any): number {
 function 变异守卫(this: void, context: 祖地双灵卫运行时上下文, name: 祖地双灵卫名称): void {
   const isRed = name === '赤誓灵卫';
   const unit = isRed ? context.赤誓灵卫单位 : context.苍影灵卫单位;
+  const mutationEffect = AddSpecialEffect(
+    祖地双灵卫数值与表现配置.表现资源.公共.异变共通特效路径,
+    GetUnitX(unit),
+    GetUnitY(unit),
+  );
+  if (mutationEffect != null && mutationEffect !== 0) {
+    if (EXSetEffectSize != null) {
+      EXSetEffectSize(mutationEffect, 祖地双灵卫数值与表现配置.表现资源.公共.异变共通特效缩放);
+    }
+    YDWETimerDestroyEffectSafe(1.8, mutationEffect);
+  }
   播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.侵蚀择形, GetUnitX(unit), GetUnitY(unit), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   const unitCfg = isRed ? 祖地双灵卫单位技能配置.单位.赤誓灵卫 : 祖地双灵卫单位技能配置.单位.苍影灵卫;
   const effectPath = isRed ? 祖地双灵卫数值与表现配置.表现资源.公共.赤誓变异转化特效路径 : 祖地双灵卫数值与表现配置.表现资源.公共.苍影变异转化特效路径;
   const effect = AddSpecialEffect(effectPath, GetUnitX(unit), GetUnitY(unit));
+  if (effect != null && effect !== 0 && EXSetEffectSize != null) EXSetEffectSize(effect, 5.0);
   if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(1.8, effect);
   if (DzSetUnitModel != null) DzSetUnitModel(unit, unitCfg.变异模型路径);
   SetUnitScale(unit, unitCfg.变异模型缩放, unitCfg.变异模型缩放, unitCfg.变异模型缩放);

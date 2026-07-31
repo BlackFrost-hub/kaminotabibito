@@ -14,8 +14,6 @@ local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系
 local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
 local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
 local _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF = _____6247_5F62_533A_57DF["单位是否在扇形区域"]
-local _____80F6_56CA_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.胶囊区域")
-local _____5355_4F4D_662F_5426_5728_80F6_56CA_533A_57DF = _____80F6_56CA_533A_57DF["单位是否在胶囊区域"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
@@ -24,6 +22,8 @@ local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
 local ____19_FF0E_541F_5531_6761 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.19．吟唱条")
 local _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761 = ____19_FF0E_541F_5531_6761["显示夏提雅常规吟唱条"]
+local ____03_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____03_FF0E_5BF9_5916_63A5_53E3["创建原生弹幕"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
@@ -34,15 +34,20 @@ local ____require_result_3 = require("系统.00．核心系统.05．中心计时
 local getServerTime = ____require_result_3.getServerTime
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
+local ____require_result_5 = require("平台扩展API动作")
+local _____8BBE_7279_6548_64AD_653E_52A8_753B_2 = ____require_result_5["设特效播放动画_2"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local Atan2 = jass.Atan2
-local Cos = jass.Cos
-local Sin = jass.Sin
 local SetUnitFacing = jass.SetUnitFacing
 local AddSpecialEffect = jass.AddSpecialEffect
+local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
+local EXSetEffectSize = japi.EXSetEffectSize
+local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
@@ -64,6 +69,54 @@ local function _____9020_6210_8F6E_821E_4F24_5BB3(source, target, attackRatio, l
         ["标签"] = tag
     })
 end
+local function _____8BBE_7F6E_8F6E_821E_5F27_5F62_671D_5411(effect, facing)
+    if effect ~= nil and effect ~= 0 and EXEffectMatRotateZ ~= nil then
+        EXEffectMatRotateZ(effect, facing)
+    end
+end
+local function _____53D1_5C04_8F6E_821E_53CD_523A_5F39_5E55(boss, x, y, facing, cfg)
+    local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+    local targetIds = {}
+    do
+        local i = 0
+        while i < #targets do
+            local id = GetHandleId(targets[i + 1])
+            if id ~= 0 then
+                targetIds[id] = true
+            end
+            i = i + 1
+        end
+    end
+    local barrage = _____521B_5EFA_539F_751F_5F39_5E55({
+        ["所有者"] = boss,
+        X = x,
+        Y = y,
+        ["方向角"] = facing,
+        ["速度"] = cfg["反刺弹幕速度"],
+        ["最大距离"] = cfg["反刺长度"],
+        ["生命周期"] = cfg["特效持续秒"],
+        ["命中半径"] = cfg["反刺宽度"] * 0.5,
+        ["影响目标"] = "敌方",
+        ["碰撞消失"] = false,
+        ["每单位最大命中次数"] = 1,
+        ["模型"] = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["血月轮舞弧形叠加特效路径"],
+        ["目标筛选"] = function(target)
+            return targetIds[GetHandleId(target)] == true
+        end,
+        ["on命中"] = function(target)
+            _____9020_6210_8F6E_821E_4F24_5BB3(
+                boss,
+                target,
+                cfg["反刺伤害攻击力比例"],
+                cfg["反刺伤害目标最大生命比例"],
+                "夏提雅·血月轮舞-反刺"
+            )
+        end
+    })
+    if barrage["弹幕单位"] ~= nil and barrage["弹幕单位"] ~= 0 then
+        SetUnitAnimationByIndex(barrage["弹幕单位"], 0)
+    end
+end
 ____exports["释放夏提雅血月轮舞"] = function(context, target)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(target) or context["挑战已结束"] or context["当前大型技能"] ~= nil then
@@ -79,9 +132,6 @@ ____exports["释放夏提雅血月轮舞"] = function(context, target)
         GetUnitX(target) - x
     ) * RAD_TO_DEG
     local reverseFacing = facing + 180
-    local reverseRad = reverseFacing * DEG_TO_RAD
-    local reverseEndX = x + Cos(reverseRad) * cfg["反刺长度"]
-    local reverseEndY = y + Sin(reverseRad) * cfg["反刺长度"]
     local _____4E8B_4EF6_5217_8868 = {
         {
             ["时点毫秒"] = 0,
@@ -140,7 +190,19 @@ ____exports["释放夏提雅血月轮舞"] = function(context, target)
                 end
                 local effect = AddSpecialEffect(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["血月轮舞特效路径"], x, y)
                 if effect ~= nil and effect ~= 0 then
+                    if EXSetEffectSize ~= nil then
+                        EXSetEffectSize(effect, cfg["横扫特效缩放"])
+                    end
                     YDWETimerDestroyEffectSafe(cfg["特效持续秒"], effect)
+                end
+                local arcEffect = AddSpecialEffect(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["血月轮舞弧形叠加特效路径"], x, y)
+                if arcEffect ~= nil and arcEffect ~= 0 then
+                    if EXSetEffectSize ~= nil then
+                        EXSetEffectSize(arcEffect, cfg["横扫特效缩放"])
+                    end
+                    _____8BBE_7F6E_8F6E_821E_5F27_5F62_671D_5411(arcEffect, facing)
+                    _____8BBE_7279_6548_64AD_653E_52A8_753B_2(arcEffect, 0, 0)
+                    YDWETimerDestroyEffectSafe(cfg["特效持续秒"], arcEffect)
                 end
                 _____521B_5EFA_6280_80FD_63D0_793A_5708({
                     ["类型"] = "方向直线",
@@ -163,38 +225,28 @@ ____exports["释放夏提雅血月轮舞"] = function(context, target)
                 if not _____5355_4F4D_6709_6548(boss) or context["挑战已结束"] then
                     return
                 end
-                local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-                do
-                    local i = 0
-                    while i < #heroes do
-                        if _____5355_4F4D_662F_5426_5728_80F6_56CA_533A_57DF(
-                            heroes[i + 1],
-                            x,
-                            y,
-                            reverseEndX,
-                            reverseEndY,
-                            cfg["反刺宽度"]
-                        ) then
-                            _____9020_6210_8F6E_821E_4F24_5BB3(
-                                boss,
-                                heroes[i + 1],
-                                cfg["反刺伤害攻击力比例"],
-                                cfg["反刺伤害目标最大生命比例"],
-                                "夏提雅·血月轮舞-反刺"
-                            )
-                        end
-                        i = i + 1
-                    end
+                local arcEffect = AddSpecialEffect(_____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["血月轮舞弧形叠加特效路径"], x, y)
+                if arcEffect ~= nil and arcEffect ~= 0 then
+                    _____8BBE_7F6E_8F6E_821E_5F27_5F62_671D_5411(arcEffect, reverseFacing)
+                    _____8BBE_7279_6548_64AD_653E_52A8_753B_2(arcEffect, 0, 0)
+                    YDWETimerDestroyEffectSafe(cfg["特效持续秒"], arcEffect)
                 end
+                _____53D1_5C04_8F6E_821E_53CD_523A_5F39_5E55(
+                    boss,
+                    x,
+                    y,
+                    reverseFacing,
+                    cfg
+                )
             end
         }
     }
     if context["血月轮舞组合执行器"] == nil then
         context["血月轮舞组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "夏提雅-血月轮舞", ["清理"] = context["清理"], ["互斥组"] = "夏提雅普通技能"})
     end
-    local ____self_5 = context["血月轮舞组合执行器"]
-    local _____6267_884CID = ____self_5["开始"](
-        ____self_5,
+    local ____self_6 = context["血月轮舞组合执行器"]
+    local _____6267_884CID = ____self_6["开始"](
+        ____self_6,
         {
             key = "血月轮舞",
             ["单位"] = boss,

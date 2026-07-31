@@ -1,5 +1,8 @@
 ﻿/** @noSelfInFile */
 
+import type { DamageBaseModifierContext, DamageModifierContext } from "./06．伤害修正回调";
+import type { DamageTypeConversionContext, DamageTypeReapplyRequest } from "./07．伤害类型转换";
+
 /**
  * 伤害计算主流程
  *
@@ -72,45 +75,12 @@ const {
 const { applyLifeAndManaSteal } = require("系统.04．伤害系统.00．伤害计算.03．吸血吸魔") as {
   applyLifeAndManaSteal: (attacker: any, damage: number, isMagic: boolean, isNormalAttack: boolean, showText: boolean) => void;
 };
-const { applyDamageModifiers } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  applyDamageModifiers: (this: void, context: {
-    target: any;
-    attacker: any;
-    originalAttacker?: any;
-    baseDamage: number;
-    currentDamage: number;
-    isPhysicalDamage: boolean;
-    isMagicDamage: boolean;
-    isEnhancedDamage: boolean;
-    isTrueDamage: boolean;
-    isMetalDamage?: boolean;
-    isWoodDamage?: boolean;
-    isWaterDamage?: boolean;
-    isFireDamage?: boolean;
-    isThunderDamage?: boolean;
-    isLightDamage?: boolean;
-    isDarkDamage?: boolean;
-    rawDamageType?: any;
-    isNormalAttack: boolean;
-    isRangedAttack?: boolean;
-    isSkillAttack: boolean;
-    isSkillDamage: boolean;
-    isWrappedSkillDamage?: boolean;
-    isEquipmentSkillDamage?: boolean;
-    isNonEquipmentSkillDamage?: boolean;
-    skillDamageSourceKind?: string;
-    equipmentSkillDamageKind?: string;
-    itemTypeId?: number;
-    itemHandle?: any;
-    abilityId?: number;
-    skillInstanceId?: number;
-    skillDamageTag?: string;
-    skillDamageShape?: string;
-    isIndependentSkillDamage?: boolean;
-    isSingleTargetSkillDamage?: boolean;
-    isAoeSkillDamage?: boolean;
-    isDamageTransfer?: boolean;
-  }) => number;
+const { applyDamageModifiers, applyDamageBaseModifiers } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  applyDamageModifiers: (this: void, context: DamageModifierContext) => number;
+  applyDamageBaseModifiers: (this: void, context: DamageBaseModifierContext) => number;
+};
+const { applyDamageTypeConversions } = require("系统.04．伤害系统.00．伤害计算.07．伤害类型转换") as {
+  applyDamageTypeConversions: (this: void, context: DamageTypeConversionContext) => DamageTypeConversionContext;
 };
 const { 获取当前技能伤害上下文 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   获取当前技能伤害上下文: (this: void) => {
@@ -141,6 +111,16 @@ const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用
 const ConvertDamageType = jass.ConvertDamageType as (value: number) => any;
 const ConvertAttackType = jass.ConvertAttackType as (value: number) => any;
 const ConvertWeaponType = jass.ConvertWeaponType as (value: number) => any;
+const UnitDamageTarget = jass.UnitDamageTarget as (
+  source: any,
+  target: any,
+  amount: number,
+  attack: boolean,
+  ranged: boolean,
+  attackType: any,
+  damageType: any,
+  weaponType: any
+) => boolean;
 const 伤害函数 = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   EXGetEventDamageData: (edd_type: number) => number;
   EVENT_DAMAGE_DATA_IS_PHYSICAL: number;
@@ -175,6 +155,9 @@ export interface DamageTypeSnapshot {
   rawAttackType: any;
   rawDamageType: any;
   rawWeaponType: any;
+  effectiveAttackType: any;
+  effectiveDamageType: any;
+  effectiveWeaponType: any;
   isPhysicalDamage: boolean;
   isMagicDamage: boolean;
   isEnhancedDamage: boolean;
@@ -247,10 +230,16 @@ function notifyAppliedFinalDamageListeners(target: any, attacker: any, applied: 
 
 function captureDamageTypeSnapshot(this: void): DamageTypeSnapshot {
   const skillContext = 获取当前技能伤害上下文();
+  const rawAttackType = ConvertAttackType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_ATTACK_TYPE));
+  const rawDamageType = ConvertDamageType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_DAMAGE_TYPE));
+  const rawWeaponType = ConvertWeaponType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_WEAPON_TYPE));
   return {
-    rawAttackType: ConvertAttackType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_ATTACK_TYPE)),
-    rawDamageType: ConvertDamageType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_DAMAGE_TYPE)),
-    rawWeaponType: ConvertWeaponType(伤害函数.EXGetEventDamageData(伤害函数.EVENT_DAMAGE_DATA_WEAPON_TYPE)),
+    rawAttackType,
+    rawDamageType,
+    rawWeaponType,
+    effectiveAttackType: rawAttackType,
+    effectiveDamageType: rawDamageType,
+    effectiveWeaponType: rawWeaponType,
     isPhysicalDamage: 伤害函数.isPhysicalDamage(),
     isMagicDamage: 伤害函数.isMagicDamage(),
     isEnhancedDamage: 伤害函数.isEnhancedDamage(),
@@ -297,6 +286,32 @@ export interface DamageResult {
   immuneReason?: string;
   /** 是否显示闪避 */
   showDodge: boolean;
+  /** 进入护甲/魔抗计算前的基础伤害。 */
+  calculatedBaseDamage: number;
+}
+
+function 重新提交转换伤害(
+  this: void,
+  source: any,
+  target: any,
+  amount: number,
+  request: DamageTypeReapplyRequest,
+  defaultAttack: boolean,
+  defaultRanged: boolean,
+  defaultAttackType: any,
+  defaultWeaponType: any,
+): void {
+  if (source == null || source === 0 || target == null || target === 0 || request == null || request.damageType == null || !(amount > 0)) return;
+  UnitDamageTarget(
+    source,
+    target,
+    amount,
+    request.attack !== undefined ? request.attack : defaultAttack,
+    request.ranged !== undefined ? request.ranged : defaultRanged,
+    request.attackType !== undefined ? request.attackType : defaultAttackType,
+    request.damageType,
+    request.weaponType !== undefined ? request.weaponType : defaultWeaponType,
+  );
 }
 
 //=============================================================================
@@ -339,24 +354,87 @@ export function calculateDamage(
   target: any,
   attacker: any,
   baseDamage: number,
-  originalAttacker?: any
+  originalAttacker?: any,
+  damageSnapshot?: DamageTypeSnapshot
 ): DamageResult {
   // 初始化
   let damage = baseDamage;
   const rawAttacker = originalAttacker != null && originalAttacker !== 0 ? originalAttacker : attacker;
+  const snapshot = damageSnapshot ?? captureDamageTypeSnapshot();
   const isPlayer = isPlayerUnit(target);
-  const isNormalAtk = 伤害函数.isNormalAttack();
-  const isPhysDmg = 伤害函数.isPhysicalDamage();
-  const isMagicDmg = 伤害函数.isMagicDamage();
-  const isEnhanceDmg = 伤害函数.isEnhancedDamage();
-  const isTrueDmg = 伤害函数.isTrueDamage();
+  const isNormalAtk = snapshot.isNormalAttack;
+  const isPhysDmg = snapshot.isPhysicalDamage;
+  const isMagicDmg = snapshot.isMagicDamage;
+  const isEnhanceDmg = snapshot.isEnhancedDamage;
+  const isTrueDmg = snapshot.isTrueDamage;
   const skillContext = 获取当前技能伤害上下文();
-  const isWrappedSkillDmg = skillContext?.isWrappedSkillDamage === true && skillContext.participatesInSkillDamageBonus !== false;
-  const isAnySkillDmg = 伤害函数.isSkillAttack() || 伤害函数.isSkillDamage() || isWrappedSkillDmg;
+  const isWrappedSkillDmg = snapshot.isWrappedSkillDamage === true && skillContext?.participatesInSkillDamageBonus !== false;
+  const isAnySkillDmg = snapshot.isSkillAttack || snapshot.isSkillDamage || isWrappedSkillDmg;
 
   // 真实伤害：跳过所有计算
   if (isTrueDmg) {
-    return { finalDamage: damage, immune: false, showDodge: false };
+    return { finalDamage: damage, immune: false, showDodge: false, calculatedBaseDamage: damage };
+  }
+
+  // 先判定免疫，避免基础伤害修正器在闪避/免疫事件上产生副作用。
+  const immuneCheck = checkImmune(target, isNormalAtk);
+  if (immuneCheck.immune) {
+    return {
+      finalDamage: 0,
+      immune: true,
+      immuneReason: immuneCheck.reason,
+      showDodge: immuneCheck.showDodge,
+      calculatedBaseDamage: baseDamage,
+    };
+  }
+
+  const baseContext: DamageBaseModifierContext = {
+    target,
+    attacker,
+    originalAttacker: rawAttacker,
+    baseDamage,
+    currentDamage: damage,
+    rawAttackType: snapshot.rawAttackType,
+    rawDamageType: snapshot.rawDamageType,
+    rawWeaponType: snapshot.rawWeaponType,
+    effectiveAttackType: snapshot.effectiveAttackType,
+    effectiveDamageType: snapshot.effectiveDamageType,
+    effectiveWeaponType: snapshot.effectiveWeaponType,
+    isPhysicalDamage: snapshot.isPhysicalDamage,
+    isMagicDamage: snapshot.isMagicDamage,
+    isEnhancedDamage: snapshot.isEnhancedDamage,
+    isTrueDamage: snapshot.isTrueDamage,
+    isMetalDamage: snapshot.isMetalDamage,
+    isWoodDamage: snapshot.isWoodDamage,
+    isWaterDamage: snapshot.isWaterDamage,
+    isFireDamage: snapshot.isFireDamage,
+    isThunderDamage: snapshot.isThunderDamage,
+    isLightDamage: snapshot.isLightDamage,
+    isDarkDamage: snapshot.isDarkDamage,
+    isNormalAttack: snapshot.isNormalAttack,
+    isRangedAttack: snapshot.isRangedAttack,
+    isSkillAttack: snapshot.isSkillAttack,
+    isSkillDamage: snapshot.isSkillDamage,
+    isWrappedSkillDamage: snapshot.isWrappedSkillDamage,
+    isEquipmentSkillDamage: snapshot.isEquipmentSkillDamage,
+    isNonEquipmentSkillDamage: snapshot.isNonEquipmentSkillDamage,
+    skillDamageSourceKind: snapshot.skillDamageSourceKind,
+    equipmentSkillDamageKind: snapshot.equipmentSkillDamageKind,
+    itemTypeId: snapshot.itemTypeId,
+    itemHandle: snapshot.itemHandle,
+    abilityId: snapshot.abilityId,
+    skillInstanceId: snapshot.skillInstanceId,
+    skillDamageTag: snapshot.skillDamageTag,
+    skillDamageShape: snapshot.skillDamageShape,
+    isIndependentSkillDamage: snapshot.isIndependentSkillDamage,
+    isSingleTargetSkillDamage: snapshot.isSingleTargetSkillDamage,
+    isAoeSkillDamage: snapshot.isAoeSkillDamage,
+    isDamageTransfer: snapshot.isDamageTransfer,
+  };
+  damage = applyDamageBaseModifiers(baseContext);
+  baseContext.currentDamage = damage;
+  if (damage < 0.1) {
+    return { finalDamage: 0, immune: false, showDodge: false, calculatedBaseDamage: damage };
   }
 
   // Step 1: 固定伤害减少/增加
@@ -370,18 +448,7 @@ export function calculateDamage(
 
   // 伤害过低
   if (damage < 0.1) {
-    return { finalDamage: 0, immune: false, showDodge: false };
-  }
-
-  // Step 2: 免疫判定
-  const immuneCheck = checkImmune(target, isNormalAtk);
-  if (immuneCheck.immune) {
-    return {
-      finalDamage: 0,
-      immune: true,
-      immuneReason: immuneCheck.reason,
-      showDodge: immuneCheck.showDodge,
-    };
+    return { finalDamage: 0, immune: false, showDodge: false, calculatedBaseDamage: baseContext.currentDamage };
   }
 
   // 加法叠加的伤害加成
@@ -475,7 +542,7 @@ export function calculateDamage(
   }
 
   // Step 13: 属性伤害修正
-  const elementalResult = applyElementalDamage(attacker, target, isPlayer);
+  const elementalResult = applyElementalDamage(attacker, target, isPlayer, snapshot);
   addDamage += elementalResult.addDamage;
   finalMultiplier *= elementalResult.multiplier;
 
@@ -528,7 +595,7 @@ export function calculateDamage(
   // Step 17: 结算伤害
   const finalDamage = damage * (1 + addDamage) * finalMultiplier;
 
-  return { finalDamage, immune: false, showDodge: false };
+  return { finalDamage, immune: false, showDodge: false, calculatedBaseDamage: baseContext.currentDamage };
 }
 
 //=============================================================================
@@ -541,13 +608,14 @@ export function calculateDamage(
 function applyElementalDamage(
   attacker: any,
   target: any,
-  isPlayer: boolean
+  isPlayer: boolean,
+  snapshot: DamageTypeSnapshot
 ): { addDamage: number; multiplier: number } {
   let addDamage = 0;
   let multiplier = 1;
 
   // 金属性
-  if (伤害函数.isMetalDamage()) {
+  if (snapshot.isMetalDamage) {
     const dmg = calcElementalDamageBonus(attacker, "金属性伤害");
     const resist = getRealAttrWithLimit(target, "金属性抗性", isPlayer);
     if (dmg >= 0) addDamage += dmg;
@@ -556,7 +624,7 @@ function applyElementalDamage(
   }
 
   // 木属性
-  if (伤害函数.isWoodDamage()) {
+  if (snapshot.isWoodDamage) {
     const dmg = calcElementalDamageBonus(attacker, "木属性伤害");
     const resist = getRealAttrWithLimit(target, "木属性抗性", isPlayer);
     if (dmg >= 0) addDamage += dmg;
@@ -565,7 +633,7 @@ function applyElementalDamage(
   }
 
   // 水属性
-  if (伤害函数.isWaterDamage()) {
+  if (snapshot.isWaterDamage) {
     const dmg = calcElementalDamageBonus(attacker, "水属性伤害");
     const resist = getRealAttrWithLimit(target, "水属性抗性", isPlayer);
     if (dmg >= 0) addDamage += dmg;
@@ -574,7 +642,7 @@ function applyElementalDamage(
   }
 
   // 火属性
-  if (伤害函数.isFireDamage()) {
+  if (snapshot.isFireDamage) {
     const dmg = calcElementalDamageBonus(attacker, "火属性伤害");
     const resist = getRealAttrWithLimit(target, "火属性抗性", isPlayer);
     if (dmg >= 0) addDamage += dmg;
@@ -583,7 +651,7 @@ function applyElementalDamage(
   }
 
   // 雷属性
-  if (伤害函数.isThunderDamage()) {
+  if (snapshot.isThunderDamage) {
     const dmg = calcElementalDamageBonus(attacker, "雷属性伤害");
     const resist = getRealAttrWithLimit(target, "雷属性抗性", isPlayer);
     if (dmg >= 0) addDamage += dmg;
@@ -592,7 +660,7 @@ function applyElementalDamage(
   }
 
   // 光属性
-  if (伤害函数.isLightDamage()) {
+  if (snapshot.isLightDamage) {
     const dmg = calcElementalDamageBonus(attacker, "光属性伤害");
     const resist = getRealAttrWithLimit(target, "光属性抗性", isPlayer);
     if (dmg >= 0) addDamage += dmg;
@@ -601,7 +669,7 @@ function applyElementalDamage(
   }
 
   // 暗属性
-  if (伤害函数.isDarkDamage()) {
+  if (snapshot.isDarkDamage) {
     const dmg = calcElementalDamageBonus(attacker, "暗属性伤害");
     const resist = getRealAttrWithLimit(target, "暗属性抗性", isPlayer);
     if (dmg >= 0) addDamage += dmg;
@@ -633,8 +701,56 @@ export function onDamageEvent(
   snapshot.mappedAttacker = mappedAttacker;
   attacker = mappedAttacker;
 
+  const conversionContext: DamageTypeConversionContext = {
+    target,
+    attacker,
+    originalAttacker,
+    baseDamage,
+    ...snapshot,
+  };
+  applyDamageTypeConversions(conversionContext);
+  if (conversionContext.reapplyDamage != null) {
+    伤害函数.YDWESetEventDamage(0);
+    重新提交转换伤害(
+      originalAttacker != null && originalAttacker !== 0 ? originalAttacker : attacker,
+      target,
+      baseDamage,
+      conversionContext.reapplyDamage,
+      snapshot.isNormalAttack,
+      snapshot.isRangedAttack,
+      snapshot.rawAttackType,
+      snapshot.rawWeaponType,
+    );
+    return;
+  }
+  snapshot.effectiveAttackType = conversionContext.effectiveAttackType;
+  snapshot.effectiveDamageType = conversionContext.effectiveDamageType;
+  snapshot.effectiveWeaponType = conversionContext.effectiveWeaponType;
+  snapshot.isPhysicalDamage = conversionContext.isPhysicalDamage;
+  snapshot.isMagicDamage = conversionContext.isMagicDamage;
+  snapshot.isEnhancedDamage = conversionContext.isEnhancedDamage;
+  snapshot.isTrueDamage = conversionContext.isTrueDamage;
+  snapshot.isNormalAttack = conversionContext.isNormalAttack;
+  snapshot.isRangedAttack = conversionContext.isRangedAttack;
+  snapshot.isSkillAttack = conversionContext.isSkillAttack;
+  snapshot.isSkillDamage = conversionContext.isSkillDamage;
+  snapshot.isWrappedSkillDamage = conversionContext.isWrappedSkillDamage;
+  snapshot.isEquipmentSkillDamage = conversionContext.isEquipmentSkillDamage;
+  snapshot.isNonEquipmentSkillDamage = conversionContext.isNonEquipmentSkillDamage;
+  snapshot.isIndependentSkillDamage = conversionContext.isIndependentSkillDamage;
+  snapshot.isSingleTargetSkillDamage = conversionContext.isSingleTargetSkillDamage;
+  snapshot.isAoeSkillDamage = conversionContext.isAoeSkillDamage;
+  snapshot.isDamageTransfer = conversionContext.isDamageTransfer;
+  snapshot.isMetalDamage = conversionContext.isMetalDamage;
+  snapshot.isWoodDamage = conversionContext.isWoodDamage;
+  snapshot.isWaterDamage = conversionContext.isWaterDamage;
+  snapshot.isFireDamage = conversionContext.isFireDamage;
+  snapshot.isThunderDamage = conversionContext.isThunderDamage;
+  snapshot.isLightDamage = conversionContext.isLightDamage;
+  snapshot.isDarkDamage = conversionContext.isDarkDamage;
+
   // 计算最终伤害
-  const result = calculateDamage(target, attacker, baseDamage, originalAttacker);
+  const result = calculateDamage(target, attacker, baseDamage, originalAttacker, snapshot);
 
   // 免疫
   if (result.immune) {
@@ -653,8 +769,13 @@ export function onDamageEvent(
       target,
       attacker,
       originalAttacker,
-      baseDamage,
+      baseDamage: result.calculatedBaseDamage,
       currentDamage: finalDamage,
+      rawAttackType: snapshot.rawAttackType,
+      rawWeaponType: snapshot.rawWeaponType,
+      effectiveAttackType: snapshot.effectiveAttackType,
+      effectiveDamageType: snapshot.effectiveDamageType,
+      effectiveWeaponType: snapshot.effectiveWeaponType,
       isPhysicalDamage: snapshot.isPhysicalDamage,
       isMagicDamage: snapshot.isMagicDamage,
       isEnhancedDamage: snapshot.isEnhancedDamage,

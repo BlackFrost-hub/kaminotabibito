@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import type { 持续原生效果参数 } from "./01．类型";
+import type { 每跳伤害计算器, 持续伤害组件, 持续原生效果参数 } from "./01．类型";
 
 const jass = require("jass.common") as any;
 
@@ -22,6 +22,9 @@ const { SFB_setEntanglingRoots, SFB_setParasite } = require("lib.扩展函数.St
 const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤害系统") as {
   造成持续伤害: (this: void, source: any, target: any, amount: number, damageType: any, ranged?: boolean, attackType?: any, weaponType?: any, 选项?: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const BUFF_纠缠根须 = 0x42456572;
 const BUFF_寄生 = 0x424E7061;
@@ -34,9 +37,13 @@ interface 持续伤害实例 {
   目标单位: any;
   伤害: number;
   伤害类型: any;
+  每跳伤害计算器?: 每跳伤害计算器;
   伤害间隔毫秒: number;
   下次伤害时间: number;
   BuffID: number;
+  调试标签?: string;
+  调试跳数: number;
+  调试上次暂停日志时间: number;
 }
 
 const 持续伤害实例表: Record<number, 持续伤害实例 | undefined> = {};
@@ -72,9 +79,9 @@ function 读取伤害类型(this: void, 参数: 持续原生效果参数): any {
   return 参数.伤害类型 ?? 参数.DamageType ?? DAMAGE_TYPE_PLANT;
 }
 
-function 注册持续伤害(this: void, 来源单位: any, 目标单位: any, 伤害: number, 伤害类型: any, 伤害间隔: number, BuffID: number): number {
+function 注册持续伤害(this: void, 来源单位: any, 目标单位: any, 伤害: number, 伤害类型: any, 伤害间隔: number, BuffID: number, 每跳伤害计算器?: 每跳伤害计算器, 调试标签?: string): number {
   if (目标单位 == null || 目标单位 === 0) return 0;
-  if (伤害 <= 0) return 0;
+  if (!(伤害 > 0) && 每跳伤害计算器 == null) return 0;
 
   const id = ++下一个持续伤害ID;
   const now = getServerTime();
@@ -84,9 +91,13 @@ function 注册持续伤害(this: void, 来源单位: any, 目标单位: any, �
     目标单位,
     伤害,
     伤害类型,
+    每跳伤害计算器,
     伤害间隔毫秒: 伤害间隔 * 1000,
     下次伤害时间: now + 伤害间隔 * 1000,
     BuffID,
+    调试标签,
+    调试跳数: 0,
+    调试上次暂停日志时间: 0,
   };
   持续伤害ID列表.push(id);
   确保持续伤害系统启动();
@@ -94,7 +105,9 @@ function 注册持续伤害(this: void, 来源单位: any, 目标单位: any, �
 }
 
 function 移除持续伤害(this: void, id: number): void {
-  if (持续伤害实例表[id] == null) return;
+  const 实例 = 持续伤害实例表[id];
+  if (实例 == null) return;
+  if (实例.调试标签 != null) debugLogForce(实例.调试标签, "持续伤害实例移除", "实例ID=", id, "目标=", 实例.目标单位, "已执行跳数=", 实例.调试跳数);
   delete 持续伤害实例表[id];
   const index = 持续伤害ID列表.indexOf(id);
   if (index >= 0) 持续伤害ID列表.splice(index, 1);
@@ -116,18 +129,46 @@ function 持续伤害系统Tick(this: void): void {
     const id = 持续伤害ID列表[index];
     const 实例 = 持续伤害实例表[id];
     if (实例 == null || 实例.目标单位 == null || 实例.目标单位 === 0) {
+      if (实例 != null && 实例.调试标签 != null) debugLogForce(实例.调试标签, "持续伤害跳过并移除：目标句柄无效", "实例ID=", id);
       移除持续伤害(id);
       continue;
     }
 
     if (GetUnitAbilityLevel(实例.目标单位, 实例.BuffID) <= 0) {
+      if (实例.调试标签 != null) debugLogForce(实例.调试标签, "持续伤害跳过并移除：原生Buff不存在", "实例ID=", id, "BuffID=", 实例.BuffID);
       移除持续伤害(id);
       continue;
     }
 
-    if (!IsUnitPaused(实例.目标单位) && now >= 实例.下次伤害时间) {
-      造成持续伤害(实例.来源单位, 实例.目标单位, 实例.伤害, 实例.伤害类型, false, ATTACK_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
-      实例.下次伤害时间 = now + 实例.伤害间隔毫秒;
+    if (now >= 实例.下次伤害时间) {
+      if (IsUnitPaused(实例.目标单位)) {
+        if (实例.调试标签 != null && now - 实例.调试上次暂停日志时间 >= 1000) {
+          实例.调试上次暂停日志时间 = now;
+          debugLogForce(实例.调试标签, "持续伤害跳过：目标当前被暂停", "实例ID=", id, "目标=", 实例.目标单位, "时间Ms=", now, "下次伤害时间=", 实例.下次伤害时间);
+        }
+      } else {
+        实例.调试跳数 += 1;
+        if (实例.调试标签 != null) debugLogForce(实例.调试标签, "持续伤害Tick开始", "实例ID=", id, "跳数=", 实例.调试跳数, "时间Ms=", now, "目标=", 实例.目标单位);
+        const 每跳伤害计算器 = 实例.每跳伤害计算器;
+        if (每跳伤害计算器 != null) {
+          const 伤害组件列表: 持续伤害组件[] = 每跳伤害计算器(实例.来源单位, 实例.目标单位);
+          if (实例.调试标签 != null) debugLogForce(实例.调试标签, "动态伤害计算器返回", "实例ID=", id, "组件数=", 伤害组件列表.length);
+          for (let componentIndex = 0; componentIndex < 伤害组件列表.length; componentIndex++) {
+            const 伤害组件 = 伤害组件列表[componentIndex];
+            if (伤害组件 == null || !(伤害组件.伤害 > 0)) {
+              if (实例.调试标签 != null) debugLogForce(实例.调试标签, "伤害组件跳过", "实例ID=", id, "组件索引=", componentIndex, "组件有效=", 伤害组件 != null, "伤害=", 伤害组件 != null ? 伤害组件.伤害 : 0);
+              continue;
+            }
+            const applied = 造成持续伤害(实例.来源单位, 实例.目标单位, 伤害组件.伤害, 伤害组件.伤害类型, false, ATTACK_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+            if (实例.调试标签 != null) debugLogForce(实例.调试标签, "伤害组件已结算", "实例ID=", id, "组件索引=", componentIndex, "伤害=", 伤害组件.伤害, "伤害类型句柄=", 伤害组件.伤害类型, "结算返回=", applied);
+          }
+        } else {
+          const applied = 造成持续伤害(实例.来源单位, 实例.目标单位, 实例.伤害, 实例.伤害类型, false, ATTACK_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+          if (实例.调试标签 != null) debugLogForce(实例.调试标签, "固定伤害已结算", "实例ID=", id, "伤害=", 实例.伤害, "伤害类型句柄=", 实例.伤害类型, "结算返回=", applied);
+        }
+        实例.下次伤害时间 = now + 实例.伤害间隔毫秒;
+        if (实例.调试标签 != null) debugLogForce(实例.调试标签, "持续伤害Tick结束", "实例ID=", id, "下一次伤害时间=", 实例.下次伤害时间);
+      }
     }
 
     if (index < 持续伤害ID列表.length && 持续伤害ID列表[index] === id) index++;
@@ -138,10 +179,17 @@ export function 施加禁锢(this: void, 参数: 持续原生效果参数): void
   const 来源单位 = 读取来源单位(参数);
   const 目标单位 = 读取目标单位(参数);
   const 持续时间 = 读取持续时间(参数);
-  if (目标单位 == null || 目标单位 === 0 || 持续时间 <= 0) return;
+  const 调试标签 = (参数 as any).调试标签 as string | undefined;
+  if (调试标签 != null) debugLogForce(调试标签, "施加禁锢入口", "来源=", 来源单位, "目标=", 目标单位, "持续秒=", 持续时间, "伤害=", 转数字(参数.伤害 ?? 参数.HitDamage), "伤害间隔秒=", 读取伤害间隔(参数), "有动态计算器=", 参数.每跳伤害计算器 != null);
+  if (目标单位 == null || 目标单位 === 0 || 持续时间 <= 0) {
+    if (调试标签 != null) debugLogForce(调试标签, "施加禁锢拒绝", "目标句柄有效=", 目标单位 != null && 目标单位 !== 0, "持续时间有效=", 持续时间 > 0);
+    return;
+  }
 
   SFB_setEntanglingRoots(来源单位, 目标单位, 持续时间);
-  注册持续伤害(来源单位, 目标单位, 转数字(参数.伤害 ?? 参数.HitDamage), 读取伤害类型(参数), 读取伤害间隔(参数), BUFF_纠缠根须);
+  if (调试标签 != null) debugLogForce(调试标签, "原生纠缠根须已调用", "来源=", 来源单位, "目标=", 目标单位, "持续秒=", 持续时间);
+  const 实例ID = 注册持续伤害(来源单位, 目标单位, 转数字(参数.伤害 ?? 参数.HitDamage), 读取伤害类型(参数), 读取伤害间隔(参数), BUFF_纠缠根须, 参数.每跳伤害计算器, 调试标签);
+  if (调试标签 != null) debugLogForce(调试标签, "持续伤害实例已注册", "实例ID=", 实例ID, "来源=", 来源单位, "目标=", 目标单位);
 }
 
 export function 施加寄生(this: void, 参数: 持续原生效果参数): void {
@@ -151,7 +199,7 @@ export function 施加寄生(this: void, 参数: 持续原生效果参数): void
   if (目标单位 == null || 目标单位 === 0 || 持续时间 <= 0) return;
 
   SFB_setParasite(来源单位, 目标单位, 持续时间);
-  注册持续伤害(来源单位, 目标单位, 转数字(参数.伤害 ?? 参数.HitDamage), 读取伤害类型(参数), 读取伤害间隔(参数), BUFF_寄生);
+  注册持续伤害(来源单位, 目标单位, 转数字(参数.伤害 ?? 参数.HitDamage), 读取伤害类型(参数), 读取伤害间隔(参数), BUFF_寄生, 参数.每跳伤害计算器);
 }
 
 export {};

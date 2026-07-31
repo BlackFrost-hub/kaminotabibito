@@ -3,7 +3,7 @@
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
 | `Common\Effect\Form\RiseFall\AinzUndeadArrowVolley.mdx` | 七支完整骸骨箭，具有骨白箭头、骨节箭杆、钩状尾羽和黑紫长光轨。 | 多箭从高处错位、错峰坠落；`Birth / Stand / Death`，`Death` 首帧完全隐藏并直接消失。 | 高阶亡灵箭雨、高阶魔法箭。 | 不承担地面预警；高度、覆盖范围和节奏需进图校准；箭身贴图层必须保持 `Transparent`，贴图必须使用兼容 1.27 的 JPEG 8-bit Alpha BLP。 | 26107 | `61C9AC7C22236D80` |
-| `Common\Effect\Form\RiseFall\ShalltearHolyLance.mdx` | 苍白金实体长枪，枪身细长，带交叉辉光和小型圣辉落点环。 | 从高处高速坠落；`Birth / Stand / Death`。 | 净化投枪、神圣坠枪。 | 落点环只作命中装饰，不代替范围预警。 | 16466 | `6FC59C46CBC966F3` |
+| `Common\Effect\Form\RiseFall\ShalltearHolyLance.mdx` | 苍白金实体长枪，枪身细长，带交叉辉光和小型圣辉落点环。 | 从高处高速坠落；`Birth / Stand / Death`。 | 净化投枪、神圣坠枪。 | 落点环只作命中装饰，不代替范围预警；四层材质统一使用 `Additive`，避免核心枪身出现黑边。 | 16466 | `D6FA8721DC5F174E` |
 | `Common\Effect\Form\RiseFall\ShalltearBloodMoonDisc.mdx` | 写实深红血月主体，外有双层暗红月晕和尖刺血冠；月面有真实陨坑纹理。 | 空中正面展示；月晕与血冠缓慢旋转；`Birth / Stand / Death`。 | 血月主体、空中阶段物件。 | 月体是单层凸面，不使用透明背面；需叠加 Aux 才有竖向月光和坠落。 | 36695 | `2454CA0F3512CB1A` |
 | `Common\Effect\Form\RiseFall\ShalltearBloodMoonAux.mdx` | 多层竖向月光、血色能量和向下坠落的辅助光层。 | 竖向展开与坠落；`Birth / Stand / Death`。 | 血月月光、降临和坠落辅助层。 | 不能单独代替完整血月圆盘。 | 19468 | `6308F9BEA39FE3E5` |
 | `Common\Effect\Form\RiseFall\ShalltearBloodRebirthWeave.mdx` | 深红细丝从下向上交织，像血液沿身体轮廓重新编织铠甲与肉身。 | 向上回填和交织；`Birth / Stand / Death`。 | 血晶破裂后的身体重构过程。 | 只是过程层，不能单独代替球壳或人物身体。 | 19644 | `9233E3EFFB10A995` |
@@ -18,3 +18,4 @@
 | `Common\Effect\Form\RiseFall\AinzFallingSkyLaser.mdx` | 候选截图观察：自带从高处直达地面的竖向光线与贴地环形结算，能够把天空法阵、坠落过程和落点读成同一招式；适合作为现有金白冲击层的方向性补足。 | 迁移后序列：`birth / Stand / Death`；完成 6 项结构修复。 | 安兹·天空坠落的竖向落线 / 落点环；源候选 `LaserCannon.mdx`。 | 与 `JNTX (159).mdx` 按时序叠加：先短暂显示 `LaserCannon.mdx` 的落线和落点环，再结算金白冲击；不可同帧满亮度重叠，实机检查冷蓝与暖金的协调度。 | 6240 | `6FC1FF925AB2716F` |
 | `Common\Effect\Form\RiseFall\AronkosSoulLightPillar.mdx` | 候选截图观察：蓝白小环可表现灵魂升起，灰烟可补墓土氛围，蓝色小型落柱可作为较克制的落地替代；三者均不足以单独承担核心技能。 | 迁移后序列：`Birth / Stand / Death`；完成 5 项结构修复。 | 亚伦柯斯·墓碑安魂 / 陨星落地辅助；源候选 `tx27.mdx`。 | 分别保留为安魂、烟尘和小范围落地辅助层。 | 14748 | `835F00AF3F62B0D9` |
 | `Common\Effect\Form\RiseFall\SpiritGuardSoulReflux.mdx` | 冷蓝魂光与少量暗金光点向单位内部收束，形成由外向内回灌的双色魂力。 | 短促内收、维持后清理；改造后含 `Birth / Stand / Death`。 | 双灵卫同步崩解失败后的“魂力回灌”；源候选 `MapTest\file_001190\file_001190.mdx`。 | 作为约 `1.2` 秒的一次性恢复层，不承担持续同誓连线，也不与灵魂崩解效果同时长期叠放。 | 2174 | `D807565BDF835752` |
+| `Common\Effect\Form\RiseFall\SpiritGuardMutationPillar.mdx` | 紫白竖向魂力柱与底部法阵在单位脚下升起，表现双灵卫进入异变形态时的转化爆发。 | 原始 `Birth / Death`，迁移补齐安全 `Stand`；按异变发生时坐标创建，不绑定单位。 | 双灵卫赤誓灵卫首次异变、苍影灵卫首次异变，以及 P3 第二名守卫异变的共通转化层；源 `MapTest\file_000796\file_000796.mdx`。 | 缩放 `0.75`，生命周期约 `1.8` 秒；16 张私有贴图统一降采样为 `128x128` 并迁入本分类共享 `Texture`，不改写原生贴图。 | 25921 | `DE9438908E6F0E17` |

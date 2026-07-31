@@ -13,8 +13,8 @@ local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_7C73_4E9A_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放米亚台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
-local _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身传送到坐标"]
+local ____03_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.03．对外接口")
+local _____5F00_59CB_8DF3_8DC3 = ____03_FF0E_5BF9_5916_63A5_53E3["开始跳跃"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
@@ -40,8 +40,10 @@ local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitTimeScale = jass.SetUnitTimeScale
 local Atan2 = jass.Atan2
+local SquareRoot = jass.SquareRoot
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local BJ_RADTODEG = 57.29577951308232
+local _____7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3_6570_636E_8868 = {}
 local function _____53D6_5E73_53F0ID(_____533A_57DF)
     return _____533A_57DF["配置"].ID or _____533A_57DF["配置"]["名称"] or ""
 end
@@ -57,9 +59,23 @@ local function _____9762_5411_5E73_53F0(boss, _____533A_57DF)
     ) * BJ_RADTODEG
     SetUnitFacing(boss, angle)
 end
-local function _____9009_62E9_6C61_67D3_5E73_53F0(context)
+local function _____9009_62E9_6C61_67D3_5E73_53F0(context, _____6307_5B9A_533A_57DF)
     local _____533A_57DF_7EC4 = context["安全域区域组"]
     if _____533A_57DF_7EC4 == nil or #_____533A_57DF_7EC4["区域列表"] <= 0 then
+        return nil
+    end
+    if _____6307_5B9A_533A_57DF ~= nil then
+        local _____6307_5B9A_5E73_53F0ID = _____53D6_5E73_53F0ID(_____6307_5B9A_533A_57DF)
+        do
+            local i = 0
+            while i < #_____533A_57DF_7EC4["区域列表"] do
+                local _____533A_57DF = _____533A_57DF_7EC4["区域列表"][i + 1]
+                if _____533A_57DF == _____6307_5B9A_533A_57DF or _____6307_5B9A_5E73_53F0ID ~= "" and _____53D6_5E73_53F0ID(_____533A_57DF) == _____6307_5B9A_5E73_53F0ID then
+                    return _____533A_57DF
+                end
+                i = i + 1
+            end
+        end
         return nil
     end
     local _____5019_9009 = {}
@@ -73,10 +89,8 @@ local function _____9009_62E9_6C61_67D3_5E73_53F0(context)
             i = i + 1
         end
     end
-    if #_____5019_9009 <= 0 then
-        return _____533A_57DF_7EC4["区域列表"][1]
-    end
-    return _____5019_9009[GetRandomInt(0, #_____5019_9009 - 1) + 1]
+    local _____9009_62E9_5217_8868 = #_____5019_9009 > 0 and _____5019_9009 or _____533A_57DF_7EC4["区域列表"]
+    return _____9009_62E9_5217_8868[GetRandomInt(0, #_____9009_62E9_5217_8868 - 1) + 1]
 end
 local function _____64AD_653E_5165_51FA_6C34_8868_73B0(x, y)
     _____521B_5EFA_70B9_7279_6548({
@@ -105,6 +119,57 @@ local function _____64AD_653E_5165_51FA_6C34_8868_73B0(x, y)
         ["动画速度"] = 0,
         ["持续秒"] = 1.4
     })
+end
+local function _____7ED3_675F_7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3(_unit, _____539F_56E0, _____8DF3_8DC3ID)
+    local data = _____7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3_6570_636E_8868[_____8DF3_8DC3ID]
+    _____7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3_6570_636E_8868[_____8DF3_8DC3ID] = nil
+    if data == nil or _____539F_56E0 ~= "完成" then
+        return
+    end
+    local boss = data.context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) then
+        return
+    end
+    _____9762_5411_5E73_53F0(boss, data["区域"])
+    _____64AD_653E_5165_51FA_6C34_8868_73B0(
+        GetUnitX(boss),
+        GetUnitY(boss)
+    )
+end
+local function _____5F00_59CB_7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3(context, _____533A_57DF)
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) then
+        return false
+    end
+    local _____8D77_70B9X = GetUnitX(boss)
+    local _____8D77_70B9Y = GetUnitY(boss)
+    local dx = _____533A_57DF["中心X"] - _____8D77_70B9X
+    local dy = _____533A_57DF["中心Y"] - _____8D77_70B9Y
+    local _____8DDD_79BB = SquareRoot(dx * dx + dy * dy)
+    if not (_____8DDD_79BB > 1) then
+        return false
+    end
+    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化转移"]
+    local _____8DF3_8DC3ID = _____5F00_59CB_8DF3_8DC3(boss, {
+        ["目标X"] = _____533A_57DF["中心X"],
+        ["目标Y"] = _____533A_57DF["中心Y"],
+        ["距离"] = _____8DDD_79BB,
+        ["持续时间"] = config["跳跃持续秒"],
+        ["跳跃高度"] = config["跳跃高度"],
+        ["暂停单位"] = true,
+        ["朝向跟随跳跃"] = true,
+        ["主单位"] = boss,
+        ["主单位死亡时中断"] = true,
+        ["结束回调"] = _____7ED3_675F_7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3
+    })
+    if _____8DF3_8DC3ID <= 0 then
+        return false
+    end
+    _____7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3_6570_636E_8868[_____8DF3_8DC3ID] = {context = context, ["区域"] = _____533A_57DF}
+    _____64AD_653E_5165_51FA_6C34_8868_73B0(_____8D77_70B9X, _____8D77_70B9Y)
+    SetUnitTimeScale(boss, config["出水动画速度"])
+    SetUnitAnimationByIndex(boss, config["出水动画编号"])
+    return true
 end
 local function _____64AD_653E_5E73_53F0_9884_8B66(_____533A_57DF)
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化转移"]
@@ -193,23 +258,23 @@ ____exports["刷新米亚腐化转移污染平台"] = function(context, nowMs)
     if _____533A_57DF == nil then
         return
     end
-    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
+    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"]) or ({})
     do
         local i = 0
         while i < #heroes do
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue25
+                    goto __continue35
                 end
                 local x = GetUnitX(hero)
                 local y = GetUnitY(hero)
                 if x < _____533A_57DF["配置"]["左"] or x > _____533A_57DF["配置"]["右"] or y < _____533A_57DF["配置"]["下"] or y > _____533A_57DF["配置"]["上"] then
-                    goto __continue25
+                    goto __continue35
                 end
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, hero, _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化转移"]["每秒腐化层数"], "腐化转移污染平台")
             end
-            ::__continue25::
+            ::__continue35::
             i = i + 1
         end
     end
@@ -232,15 +297,21 @@ local function _____521B_5EFA_8150_5316_8F6C_79FB_65F6_95F4_8F74_4E8B_4EF6(conte
                 SetUnitAnimationByIndex(boss, config["预警动画编号"])
                 _____64AD_653E_5E73_53F0_9884_8B66(_____533A_57DF)
                 _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "腐化转移", 0)
-                _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({["总时长"] = config["预警秒"], ["颜色ID"] = 3, ["标题文本"] = "腐化转移", ["提示文本"] = "米亚正在污染安全区！离开目标平台！"})
+                _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({
+                    ["总时长"] = config["预警秒"],
+                    ["颜色ID"] = 3,
+                    ["标题文本"] = "腐化转移",
+                    ["提示文本"] = ((("预警" .. tostring(config["预警秒"])) .. "秒后跳向目标平台并污染") .. tostring(config["平台污染持续秒"])) .. "秒（离开红色预警平台）。"
+                })
             end
         },
         {
             ["时点毫秒"] = config["弓背冻结延迟Ms"],
             ["名称"] = "腐化转移弓背冻结",
             ["执行"] = function()
-                if _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                    SetUnitTimeScale(context["Boss单位"], config["弓背冻结动画速度"])
+                local currentBoss = context["Boss单位"]
+                if _____5355_4F4D_6709_6548(currentBoss) then
+                    SetUnitTimeScale(currentBoss, config["弓背冻结动画速度"])
                 end
             end
         },
@@ -253,17 +324,11 @@ local function _____521B_5EFA_8150_5316_8F6C_79FB_65F6_95F4_8F74_4E8B_4EF6(conte
                 if not _____5355_4F4D_6709_6548(currentBoss) or context["阶段"] < 2 then
                     return
                 end
-                local _____539FX = GetUnitX(currentBoss)
-                local _____539FY = GetUnitY(currentBoss)
-                if not _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(currentBoss, _____533A_57DF["中心X"], _____533A_57DF["中心Y"]) then
+                if not _____5F00_59CB_7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3(context, _____533A_57DF) then
                     SetUnitTimeScale(currentBoss, config["恢复动画速度"])
                     SetUnitAnimationByIndex(currentBoss, config["恢复动画编号"])
                     return
                 end
-                _____64AD_653E_5165_51FA_6C34_8868_73B0(_____539FX, _____539FY)
-                SetUnitTimeScale(currentBoss, config["出水动画速度"])
-                SetUnitAnimationByIndex(currentBoss, config["出水动画编号"])
-                _____64AD_653E_5165_51FA_6C34_8868_73B0(_____533A_57DF["中心X"], _____533A_57DF["中心Y"])
                 _____5F00_59CB_6C61_67D3_5E73_53F0(context, _____533A_57DF, nowMs + _____9884_8B66_6BEB_79D2)
             end
         },
@@ -271,11 +336,12 @@ local function _____521B_5EFA_8150_5316_8F6C_79FB_65F6_95F4_8F74_4E8B_4EF6(conte
             ["时点毫秒"] = _____9884_8B66_6BEB_79D2 + config["恢复动作延迟Ms"],
             ["名称"] = "腐化转移恢复动作",
             ["执行"] = function()
-                if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+                local currentBoss = context["Boss单位"]
+                if not _____5355_4F4D_6709_6548(currentBoss) then
                     return
                 end
-                SetUnitTimeScale(context["Boss单位"], config["恢复动画速度"])
-                SetUnitAnimationByIndex(context["Boss单位"], config["恢复动画编号"])
+                SetUnitTimeScale(currentBoss, config["恢复动画速度"])
+                SetUnitAnimationByIndex(currentBoss, config["恢复动画编号"])
             end
         }
     }
@@ -309,11 +375,22 @@ local function _____542F_52A8_8150_5316_8F6C_79FB(context, nowMs, _____533A_57DF
     )
     return _____6267_884CID ~= 0
 end
-____exports["释放米亚腐化转移"] = function(context, nowMs)
-    if context["阶段"] < 2 or (context["腐化转移污染平台ID"] or "") ~= "" or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+____exports["释放米亚腐化转移"] = function(context, nowMs, _____6307_5B9A_533A_57DF)
+    if context == nil then
         return false
     end
-    local _____533A_57DF = _____9009_62E9_6C61_67D3_5E73_53F0(context)
+    local boss = context["Boss单位"]
+    local _____5F53_524D_6C61_67D3_5E73_53F0ID = context["腐化转移污染平台ID"] or ""
+    if context["阶段"] < 2 then
+        return false
+    end
+    if _____5F53_524D_6C61_67D3_5E73_53F0ID ~= "" then
+        return false
+    end
+    if not _____5355_4F4D_6709_6548(boss) then
+        return false
+    end
+    local _____533A_57DF = _____9009_62E9_6C61_67D3_5E73_53F0(context, _____6307_5B9A_533A_57DF)
     if _____533A_57DF == nil then
         return false
     end

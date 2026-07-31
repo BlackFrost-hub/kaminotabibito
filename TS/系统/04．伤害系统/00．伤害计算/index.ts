@@ -31,6 +31,9 @@ export * from "./05．事件注册";
 // 伤害修正回调层
 export * from "./06．伤害修正回调";
 
+// 伤害类型转换层
+export * from "./07．伤害类型转换";
+
 // Boss战伤害统计
 export * from "./07．Boss战伤害统计";
 

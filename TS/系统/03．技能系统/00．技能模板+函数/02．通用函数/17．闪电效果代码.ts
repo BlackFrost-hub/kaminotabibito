@@ -2,9 +2,15 @@
 /**
  * 闪电效果代码常量。
  *
- * 这些 code 来自 `map/map/Splats/LightningData.slk`，可直接传给
+ * 这些 code 来自正式导入的 `Splats\LightningData.slk`，可直接传给
  * `AddLightning` / `AddLightningEx` / `创建单位绑定闪电`。
+ * 私有闪电贴图统一位于 `Common\Effect\Lightning\Texture`。
  */
+
+export const 闪电效果资源路径 = {
+  定义: "Splats\\LightningData.slk",
+  贴图目录: "Common\\Effect\\Lightning\\Texture",
+} as const;
 
 export const 闪电效果代码 = {
   闪电链主闪电: "CLPB",
@@ -107,4 +113,3 @@ export const 闪电效果分类 = {
     闪电效果代码.死亡之指,
   ],
 } as const;
-

@@ -6,14 +6,18 @@ local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____05_FF0E_7956_5730_53CC_7075_536B = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.05．祖地双灵卫")
 local _____7956_5730_53CC_7075_536BBuffID = ____05_FF0E_7956_5730_53CC_7075_536B["祖地双灵卫BuffID"]
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_0.getServerTime
-local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_1.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_2.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
 local jass = require("jass.common")
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
+local japi = require("jass.japi")
+local EXSetEffectSize = japi.EXSetEffectSize
 local function _____9500_6BC1_8282_70B9_7279_6548(node)
     if node["特效"] ~= nil and node["特效"] ~= 0 then
         DestroyEffect(node["特效"])
@@ -40,8 +44,24 @@ local function _____5237_65B0_8282_70B9_8868_73B0(node)
     _____9500_6BC1_8282_70B9_7279_6548(node)
     node["表现阶段"] = node["阶段"]
     local path = _____53D6_8282_70B9_8868_73B0_8DEF_5F84(node)
+    local resources = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["双钥净化"]
     if path ~= "" then
         node["特效"] = AddSpecialEffect(path, node.X, node.Y)
+        if node["特效"] ~= nil and node["特效"] ~= 0 and path == resources["节点污染外壳特效路径"] and EXSetEffectSize ~= nil then
+            EXSetEffectSize(node["特效"], 2)
+        end
+        debugLogForce(
+            "祖地双灵卫-净化节点表现",
+            "节点",
+            node["序号"],
+            "阶段",
+            node["阶段"],
+            "坐标",
+            node.X,
+            node.Y,
+            "路径",
+            path
+        )
     end
 end
 local function _____767B_8BB0_8282_70B9_7EDF_4E00_6E05_7406(context)
@@ -49,9 +69,9 @@ local function _____767B_8BB0_8282_70B9_7EDF_4E00_6E05_7406(context)
         return
     end
     context["净化节点清理已登记"] = true
-    local ____self_2 = context["清理"]
-    ____self_2["登记清理"](
-        ____self_2,
+    local ____self_3 = context["清理"]
+    ____self_3["登记清理"](
+        ____self_3,
         "祖地双灵卫-P3净化节点",
         function()
             do

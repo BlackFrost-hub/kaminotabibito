@@ -4,6 +4,7 @@
 | --- | --- | --- | --- | --- | ---: | --- |
 | `Common\Effect\Form\Shield\EquipmentShieldFlash.mdx` | 多块明亮蜂巢盾片展开，结构干净，没有旗帜、刀剑或阵营装饰。 | 盾片展开、维持和回收。 | 通用装备护盾、蜂巢屏障原型。 | 雅儿贝德暗金版已派生为 `AlbedoDarkGoldBarrier.mdx`，不要再次复制改名。 | 16145 | `9370DFC5DC365629` |
 | `Common\Effect\Form\Shield\AlbedoDarkGoldBarrier.mdx` | 暗金蜂巢盾片组成防御屏障，亮度克制，具有重甲守护感。 | `Birth` 展开、`Stand` 维持、`Death` 回收。 | 雅儿贝德共同护盾、生命锚点封锁。 | 破碎时叠加独立碎裂层；来源是 `EquipmentShieldFlash.mdx` 的暗金派生版。 | 16229 | `559ADF50666566BD` |
+| `Common\Effect\Form\Shield\AinzUndeadSummonFatalShield.mdx` | 蓝白死亡能量构成的多层护盾，中心有清晰的致命保护语义，不遮挡死亡骑士主体。 | `Birth / Stand / Death`；致命伤害触发时绑定 `origin`，运行时播放 `Stand`，持续 `1` 秒后解绑并销毁。 | 安兹高阶亡灵召唤物的致命保护状态。 | 只承担视觉提示，实际致命伤害免疫由 TS 最终伤害修正器处理；触发时显示缩放 `2` 倍，不常驻。 | 80956 | `65181865829D7A60` |
 | `Common\Effect\Form\Shield\BigYellowOrbShield.mdx` | 暖金透明球罩，读取简单、覆盖完整。 | 球形盾面维持。 | 雅儿贝德半球护盾填充层备选。 | 视觉较通用，缺少重甲和黑翼身份，不能单独承担技能。 | 5112 | `4C79371BC965980A` |
 | `Common\Effect\Form\Shield\holyshield_state.mdx` | 四枚金色盾牌环绕，直接表达守护职责。 | 环绕状态维持；迁移版补齐安全 `Death`。 | 守护者之职责、至尊共护状态标记。 | 更适合状态标记而非完整阻挡盾面。 | 28940 | `143DEDB3E16EDB01` |
 | `Common\Effect\Form\Shield\YellowOrbShield.mdx` | 暖金透明球罩，轮廓比大型版更克制。 | 球形盾面维持。 | 雅儿贝德半球护盾辅助层。 | 仍是通用盾面，需与暗金重甲结构叠加。 | 5112 | `20845C6CC19ADDCC` |

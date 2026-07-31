@@ -114,6 +114,8 @@ function 孢子云Tick(this: void, data: 孢子云实例): void {
 function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下文): void {
   const boss = context.Boss单位;
   const cfg = 莫尔特斯数值与表现配置.腐败孢子云;
+  const bossMaxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
+  const sporeCloudMaxLife = cfg.基础生命值 + bossMaxLife * cfg.Boss最大生命比例;
   const instance = 创建可攻击机制单位({
     清理: context.清理,
     名称: "莫尔特斯-腐败孢子云",
@@ -124,7 +126,7 @@ function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下�
     X: GetUnitX(boss),
     Y: GetUnitY(boss),
     朝向: GetRandomReal(0, 360),
-    最大生命: cfg.驱散所需伤害,
+    最大生命: sporeCloudMaxLife,
     生命值受小怪倍率: cfg.受小怪倍率生命,
     缩放: cfg.缩放,
     持续时间: cfg.持续秒,

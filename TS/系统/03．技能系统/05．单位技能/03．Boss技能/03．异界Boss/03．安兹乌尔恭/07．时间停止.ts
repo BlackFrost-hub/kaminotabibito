@@ -189,7 +189,7 @@ function 冻结时间停止玩家(this: void, instance: 时间停止实例): voi
     总时长: cfg.时间停止冻结秒,
     颜色ID: 4,
     标题文本: '时间停止中',
-    提示文本: '冻结持续1.6秒；时间恢复后立即开始伤害结算',
+    提示文本: '冻结持续1.6秒；解冻后依次结算法阵、现实断裂和魔法箭',
   });
   const heroes = 获取Boss技能敌对英雄列表(instance.context.安兹单位);
   for (let i = 0; i < heroes.length; i++) {
@@ -378,7 +378,7 @@ export function 释放安兹时间停止(this: void, context: 安兹运行时上
     总时长: cfg.时间停止预展示秒,
     颜色ID: 4,
     标题文本: '2.8秒后时间停止',
-    提示文本: '现在寻找安全位置；随后冻结1.6秒，解冻时开始伤害结算',
+    提示文本: '2.8秒后冻结1.6秒；预展示期间离开预警并分散',
   });
   const executionId = executor.开始({
     key: 时间停止大型技能Key,

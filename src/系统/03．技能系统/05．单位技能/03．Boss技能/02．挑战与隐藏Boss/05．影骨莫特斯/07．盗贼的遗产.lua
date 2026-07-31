@@ -82,7 +82,8 @@ local function _____5F71_9AA8_9057_4EA7_5B9D_7BB1_5F00_542F_5B8C_6210(opener, _c
     _____5F00_542F_5F71_9AA8_5B9D_7BB1(variable.context, variable.X, variable.Y)
 end
 local function _____521B_5EFA_5F71_9AA8_5B9D_7BB1(context, index)
-    local point = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["盗贼的遗产"]["宝箱点"][index + 1]
+    local _____70B9_4F4D_5217_8868 = context["遗产宝箱点"] ~= nil and context["遗产宝箱点"] or _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["盗贼的遗产"]["宝箱点"]
+    local point = _____70B9_4F4D_5217_8868[index + 1]
     if point == nil then
         return
     end

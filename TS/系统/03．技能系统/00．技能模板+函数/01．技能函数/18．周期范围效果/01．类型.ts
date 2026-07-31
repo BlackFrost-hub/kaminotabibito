@@ -27,6 +27,13 @@ export interface 腐败层数参数 {
   腐败值?: boolean;
 }
 
+export interface 持续伤害组件 {
+  伤害: number;
+  伤害类型: any;
+}
+
+export type 每跳伤害计算器 = (this: void, 来源单位: any, 目标单位: any) => 持续伤害组件[];
+
 export interface 持续原生效果参数 {
   BuffSource?: any;
   来源单位?: any;
@@ -38,6 +45,7 @@ export interface 持续原生效果参数 {
   伤害类型?: any;
   DamageInterval?: number;
   伤害间隔?: number;
+  每跳伤害计算器?: 每跳伤害计算器;
   time?: number;
   持续时间?: number;
 }

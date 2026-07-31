@@ -26,6 +26,10 @@ const { 显示常规技能吟唱条, 显示大招吟唱条 } = require('系统.0
   显示常规技能吟唱条: (this: void, 参数: any) => void;
   显示大招吟唱条: (this: void, 参数: any) => void;
 };
+const { CosBJ, SinBJ } = require('lib.扩展函数.BJ函数.12．数学函数') as {
+  CosBJ: (this: void, degrees: number) => number;
+  SinBJ: (this: void, degrees: number) => number;
+};
 const jass = require('jass.common') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -163,8 +167,6 @@ function 创建节点列表(this: void, centerX: number, centerY: number): 祖�
   const radius = 祖地双灵卫数值与表现配置.P3.节点中心偏移半径;
   const angles = [30, 150, 270];
   const result: 祖地双灵卫净化节点状态[] = [];
-  const CosBJ = jass.CosBJ as (degrees: number) => number;
-  const SinBJ = jass.SinBJ as (degrees: number) => number;
   for (let i = 0; i < angles.length; i++) {
     result.push({ 序号: i + 1, X: centerX + CosBJ(angles[i]) * radius, Y: centerY + SinBJ(angles[i]) * radius, 阶段: '未激活', 校准截止Ms: 0, 重试允许Ms: 0 });
   }

@@ -88,15 +88,18 @@ ____exports["开始冲锋"] = function(_____5355_4F4D, _____53C2_6570)
     local _____539F_5F00_59CB_56DE_8C03 = _____53C2_6570["开始回调"]
     local _____539F_7ED3_675F_56DE_8C03 = _____53C2_6570["结束回调"]
     local _____884C_8D70_52A8_753B_500D_7387 = _____8BA1_7B97_51B2_950B_884C_8D70_52A8_753B_500D_7387(_____53C2_6570["持续时间"])
+    local _____6709_663E_5F0F_52A8_4F5C = _____53C2_6570["动画序号"] ~= nil or _____53C2_6570["动画名"] ~= nil and _____53C2_6570["动画名"] ~= ""
     local _____8DDD_79BB = _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB(_____53C2_6570["距离"], _____53C2_6570["英雄技能距离修正"], "自身位移距离")
     local function ____on_4E3B_52A8_51B2_950B_5F00_59CB(_____79FB_52A8_5355_4F4D, _____4F4D_79FBID)
-        if _____79FB_52A8_5355_4F4D ~= nil and _____79FB_52A8_5355_4F4D ~= 0 and type(SetUnitAnimation) == "function" then
-            SetUnitAnimation(_____79FB_52A8_5355_4F4D, "walk")
-        else
-            _____96F6_79D2_540E_64AD_653E_5355_4F4D_52A8_4F5C(_____79FB_52A8_5355_4F4D, "walk")
-        end
-        if type(SetUnitTimeScale) == "function" then
-            SetUnitTimeScale(_____79FB_52A8_5355_4F4D, _____884C_8D70_52A8_753B_500D_7387)
+        if not _____6709_663E_5F0F_52A8_4F5C then
+            if _____79FB_52A8_5355_4F4D ~= nil and _____79FB_52A8_5355_4F4D ~= 0 and type(SetUnitAnimation) == "function" then
+                SetUnitAnimation(_____79FB_52A8_5355_4F4D, "walk")
+            else
+                _____96F6_79D2_540E_64AD_653E_5355_4F4D_52A8_4F5C(_____79FB_52A8_5355_4F4D, "walk")
+            end
+            if type(SetUnitTimeScale) == "function" then
+                SetUnitTimeScale(_____79FB_52A8_5355_4F4D, _____884C_8D70_52A8_753B_500D_7387)
+            end
         end
         if _____539F_5F00_59CB_56DE_8C03 ~= nil then
             _____539F_5F00_59CB_56DE_8C03(_____79FB_52A8_5355_4F4D, _____4F4D_79FBID)

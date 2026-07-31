@@ -55,8 +55,6 @@ const 旧通用动作白名单: Record<string, true | undefined> = {
   "JLC精灵村_赠送沙漠之靴": true,
   "JLC沙漠_章节末Boss战预警": true,
   "SRZ蛇人族_食人魔任务预警": true,
-  "第三章_恶魔城调查开始": true,
-  "第三章_前往恶魔城领主处": true,
 };
 
 Object.assign(

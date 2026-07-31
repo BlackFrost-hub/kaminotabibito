@@ -18,6 +18,7 @@ const UnitAddAbility = jass.UnitAddAbility as (unit: any, abilityId: number) => 
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
+const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, animationIndex: number) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const 蝗虫技能ID = 0x416c6f63;
 
@@ -64,6 +65,7 @@ export function 创建夏提雅鲜血印记(this: void, context: 夏提雅运行
   SetUnitInvulnerable(unitInstance.单位, true);
   PauseUnit(unitInstance.单位, true);
   SetUnitPathing(unitInstance.单位, false);
+  SetUnitAnimationByIndex(unitInstance.单位, cfg.机制单位动画编号);
   const mark = { X: x, Y: y, 单位实例: unitInstance, 停留控制器: undefined as any, 到期ID: 0, 已清理: false } as 夏提雅鲜血印记实例;
   mark.停留控制器 = 创建单位停留触发器({
     名称: '夏提雅-鲜血印记主动净化', 中心单位: unitInstance.单位, 半径: cfg.净化半径, 需求持续毫秒: cfg.主动净化秒 * 1000, 检查间隔毫秒: 100, 离开后重置: true, 只触发一次: true, 清理篮子: context.清理,

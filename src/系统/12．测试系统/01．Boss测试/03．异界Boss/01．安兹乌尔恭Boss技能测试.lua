@@ -180,6 +180,42 @@ end
 local function _____6D4B_8BD5_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524(_player, context)
     _____91CA_653E_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524(context["运行时"])
 end
+local function _____7ED3_7B97_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_4F24_5BB3(_____53C2_6570)
+    if _____53C2_6570 == nil then
+        return
+    end
+    local ____opt_28 = _____53C2_6570["运行时"]
+    if ____opt_28 ~= nil then
+        ____opt_28 = ____opt_28["高阶亡灵召唤物"]
+    end
+    local summon = ____opt_28
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(_____53C2_6570["来源单位"]) or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(summon) then
+        return
+    end
+    local maxLife = GetUnitStateJapi(summon, UNIT_STATE_MAX_LIFE)
+    if not (maxLife > 0) then
+        return
+    end
+    UnitDamageTarget(
+        _____53C2_6570["来源单位"],
+        summon,
+        maxLife * 2,
+        false,
+        false,
+        ATTACK_TYPE_NORMAL,
+        DAMAGE_TYPE_UNIVERSAL,
+        WEAPON_TYPE_WHOKNOWS
+    )
+end
+local function _____6D4B_8BD5_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_4FDD_62A4(_player, context)
+    if not _____91CA_653E_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524(context["运行时"]) then
+        return
+    end
+    local delayMs = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["高阶亡灵召唤施法秒"] * 1000 + 2000
+    local delayedId = addDelayedCallback(delayMs, _____7ED3_7B97_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_4F24_5BB3, {["来源单位"] = context["目标单位"], ["运行时"] = context["运行时"]})
+    local ____self_30 = context["运行时"]["清理"]
+    ____self_30["登记延迟回调"](____self_30, "安兹测试-高阶亡灵致命保护", delayedId)
+end
 local function _____6D4B_8BD5_5B89_5179_5929_7A7A_5760_843D(_player, context)
     context["运行时"]["天空坠落已释放"] = false
     _____91CA_653E_5B89_5179_5929_7A7A_5760_843D(context["运行时"])
@@ -210,15 +246,15 @@ local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23(
     _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23(context["运行时"])
 end
 local function _____7ED3_7B97_5B88_62A4_804C_8D2320_767E_5206_6BD4_6700_5927_751F_547D_53D7_51FB(_____53C2_6570)
-    local ____temp_30 = _____53C2_6570 == nil
-    if not ____temp_30 then
-        local ____opt_28 = _____53C2_6570["雅儿贝德状态"]
-        if ____opt_28 ~= nil then
-            ____opt_28 = ____opt_28["守护连接生效"]
+    local ____temp_33 = _____53C2_6570 == nil
+    if not ____temp_33 then
+        local ____opt_31 = _____53C2_6570["雅儿贝德状态"]
+        if ____opt_31 ~= nil then
+            ____opt_31 = ____opt_31["守护连接生效"]
         end
-        ____temp_30 = ____opt_28 ~= true
+        ____temp_33 = ____opt_31 ~= true
     end
-    if ____temp_30 then
+    if ____temp_33 then
         return
     end
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(_____53C2_6570["来源单位"]) or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(_____53C2_6570["Boss单位"]) then
@@ -253,16 +289,16 @@ local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D232
     end
     local delayMs = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["守护者之职责预连接秒"] * 1000 + 50
     local delayedId = addDelayedCallback(delayMs, _____7ED3_7B97_5B88_62A4_804C_8D2320_767E_5206_6BD4_6700_5927_751F_547D_53D7_51FB, {["来源单位"] = context["目标单位"], ["Boss单位"] = context["Boss单位"], ["雅儿贝德状态"] = state})
-    local ____self_31 = context["运行时"]["清理"]
-    ____self_31["登记延迟回调"](____self_31, "安兹测试-守护职责-20%最大生命受击", delayedId)
+    local ____self_34 = context["运行时"]["清理"]
+    ____self_34["登记延迟回调"](____self_34, "安兹测试-守护职责-20%最大生命受击", delayedId)
 end
 local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_5B88_62A4_56DE_5F52(_player, context)
     local state = context["运行时"]["雅儿贝德"]
-    local ____opt_result_34
+    local ____opt_result_37
     if state ~= nil then
-        ____opt_result_34 = state["单位"]
+        ____opt_result_37 = state["单位"]
     end
-    local albedo = ____opt_result_34
+    local albedo = ____opt_result_37
     if state == nil or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(albedo) then
         return
     end
@@ -306,11 +342,11 @@ local function _____7ED3_7B97_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB_53D7_51FB(
 end
 local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB_81EA_52A8_53D7_51FB(_player, context)
     local state = context["运行时"]["雅儿贝德"]
-    local ____opt_result_37
+    local ____opt_result_40
     if state ~= nil then
-        ____opt_result_37 = state["单位"]
+        ____opt_result_40 = state["单位"]
     end
-    local albedo = ____opt_result_37
+    local albedo = ____opt_result_40
     local source = context["目标单位"]
     if state == nil or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(albedo) or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(source) then
         return
@@ -328,8 +364,8 @@ local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB_81EA_52A8_
         return
     end
     local delayedId = addDelayedCallback(50, _____7ED3_7B97_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB_53D7_51FB, {["来源单位"] = source, ["雅儿贝德单位"] = albedo})
-    local ____self_38 = context["运行时"]["清理"]
-    ____self_38["登记延迟回调"](____self_38, "安兹测试-护卫反击自动受击", delayedId)
+    local ____self_41 = context["运行时"]["清理"]
+    ____self_41["登记延迟回调"](____self_41, "安兹测试-护卫反击自动受击", delayedId)
 end
 local _____5B89_5179_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "现实断裂", ["执行"] = _____6D4B_8BD5_5B89_5179_73B0_5B9E_65AD_88C2},
@@ -338,6 +374,7 @@ local _____5B89_5179_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 4, ["名称"] = "光辉翠绿体", ["执行"] = _____6D4B_8BD5_5B89_5179_5149_8F89_7FE0_7EFF_4F53},
     {["序号"] = 5, ["名称"] = "时间停止", ["执行"] = _____6D4B_8BD5_5B89_5179_65F6_95F4_505C_6B62},
     {["序号"] = 6, ["名称"] = "高阶亡灵召唤", ["执行"] = _____6D4B_8BD5_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524},
+    {["序号"] = 61, ["命令"] = "6-1", ["名称"] = "高阶亡灵召唤（2秒后测试致命保护）", ["执行"] = _____6D4B_8BD5_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_4FDD_62A4},
     {["序号"] = 7, ["名称"] = "天空坠落+护卫联动", ["执行"] = _____6D4B_8BD5_5B89_5179_5929_7A7A_5760_843D},
     {["序号"] = 8, ["名称"] = "一切生命的终点+锚点封锁", ["执行"] = _____6D4B_8BD5_5B89_5179_4E00_5207_751F_547D_7684_7EC8_70B9},
     {["序号"] = 9, ["名称"] = "启动护卫模式", ["执行"] = _____6D4B_8BD5_5B89_5179_62A4_536B_6A21_5F0F},

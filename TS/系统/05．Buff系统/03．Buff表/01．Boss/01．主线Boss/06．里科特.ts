@@ -29,7 +29,7 @@ export const 里科特Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 70,
     canPurge: false,
-    tooltip: "里科特受到精灵之风庇护，免疫或快速清除大部分减速效果。",
+    tooltip: "每1秒清除里科特身上的减速、残废、诅咒等软控制；该Buff每次刷新持续2秒。",
   },
   [里科特BuffID.神明祝福]: {
     buffID: 里科特BuffID.神明祝福,
@@ -46,7 +46,7 @@ export const 里科特Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 86,
     canPurge: false,
-    tooltip: "里科特每秒恢复1%生命值，受到的控制持续时间不会超过1秒，受到单次最大生命伤害存在上限。",
+    tooltip: "每秒恢复最大生命值的1%；单次受到的伤害最多按最大生命值的19%结算；该Buff每次刷新持续2秒。",
   },
   [里科特BuffID.神风印记]: {
     buffID: 里科特BuffID.神风印记,
@@ -63,7 +63,7 @@ export const 里科特Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 78,
     canPurge: true,
-    tooltip: "攻击神风护体期间被反馈神风印记。粉碎会清除所有印记，并按层数造成精神伤害和眩晕。",
+    tooltip: "持续4.5秒；攻击神风护体期间的里科特会使攻击者获得1层。粉碎时清除全部层数，每层按目标最大生命值的20%结算伤害，并眩晕0.4+0.2×层数秒；Buff显示最多20层。",
   },
   [里科特BuffID.神风护体]: {
     buffID: 里科特BuffID.神风护体,
@@ -80,7 +80,7 @@ export const 里科特Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 90,
     canPurge: false,
-    tooltip: "里科特获得神风护体层数。每次被攻击减少1层，令本次伤害降低50%，并反馈攻击者1层神风印记。",
+    tooltip: "持续4秒，初始7层。每次受到攻击消耗1层，使本次伤害降低50%，并让攻击者获得1层神风印记；持续时间结束后按印记层数结算粉碎。",
   },
   [里科特BuffID.湮灭锁定]: {
     buffID: 里科特BuffID.湮灭锁定,
@@ -95,7 +95,7 @@ export const 里科特Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 82,
     canPurge: false,
-    tooltip: "湮灭之炮投影正在锁定你的方向。持续期间投影会按锁定方向发射湮灭炮击。",
+    tooltip: "湮灭之炮锁定你：P1延迟3秒、P2/P3延迟2秒，随后持续3秒，每0.1秒沿1200码直线炮击。该Buff实际持续P1为6秒、P2/P3为5秒；P3每个投影另有0~2秒随机落点预警，预警1秒后结算半径250码眩晕1秒。",
   },
   [里科特BuffID.破魔反击]: {
     buffID: 里科特BuffID.破魔反击,
@@ -112,7 +112,7 @@ export const 里科特Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 94,
     canPurge: false,
-    tooltip: "里科特进入2秒破魔反击窗口。窗口内受到伤害会强制反击伤害来源，按距离移除当前生命并眩晕。",
+    tooltip: "预备1~5秒后进入2秒反击窗口。窗口内受击时：攻击者距里科特≤300码，移除其当前生命70%；超过300码，移除99%；随后眩晕0.8秒，触发后窗口立即结束。",
   },
 };
 

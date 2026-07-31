@@ -21,6 +21,7 @@ local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单�
 local _____77E9_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.矩形区域")
 local _____83B7_53D6_6761_5F62_533A_57DF_5355_4F4D = _____77E9_5F62_533A_57DF["获取条形区域单位"]
 local ____03_FF0E_7279_6548 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____03_FF0E_7279_6548["创建点特效"]
 local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____03_FF0E_7279_6548["设置特效XYZ轴旋转"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
@@ -32,6 +33,8 @@ local ____require_result_3 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_3.addDelayedCallback
 local getServerTime = ____require_result_3.getServerTime
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local AddSpecialEffect = jass.AddSpecialEffect
@@ -116,6 +119,14 @@ local function _____521B_5EFA_7EC8_70B9_8A93_76FE(context, boss, facing)
         ["特效"] = effect
     }
     context["誓盾"] = shield
+    addDelayedCallback(
+        500,
+        function()
+            if shield["特效"] ~= nil and shield["特效"] ~= 0 then
+                DzSetEffectVertexAlpha(shield["特效"], 0)
+            end
+        end
+    )
     local ____self_6 = context["清理"]
     ____self_6["登记清理"](
         ____self_6,
@@ -209,10 +220,14 @@ ____exports["释放誓锋壁进"] = function(context, target)
                             endX,
                             endY
                         )
-                        local impact = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["誓锋壁进"]["冲锋命中特效路径"], endX, endY)
-                        if impact ~= nil and impact ~= 0 then
-                            DestroyEffect(impact)
-                        end
+                        _____521B_5EFA_70B9_7279_6548({
+                            ["模型路径"] = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["誓锋壁进"]["冲锋命中特效路径"],
+                            X = endX,
+                            Y = endY,
+                            ["缩放"] = 5,
+                            ["动画索引"] = 0,
+                            ["持续秒"] = 0.8
+                        })
                         _____521B_5EFA_7EC8_70B9_8A93_76FE(context, boss, facing)
                     end
                 }

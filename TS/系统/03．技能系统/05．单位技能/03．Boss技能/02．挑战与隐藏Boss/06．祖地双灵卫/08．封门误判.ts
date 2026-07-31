@@ -9,7 +9,8 @@ import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放'
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 单位是否在胶囊区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/胶囊区域';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
-import { 两点角度, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 两点角度, 距离XY, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 创建点特效 } from '../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -28,7 +29,9 @@ const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09�
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
+const EXSetEffectSize = (japi as any).EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -62,19 +65,48 @@ export function 释放祖地双灵卫封门误判(this: void, context: 祖地双
   context.大型技能占用者 = '联合机制';
   context.大型机制忙碌到Ms = getServerTime() + (cfg.封门误判预警秒 + 0.8) * 1000;
   创建技能提示圈({ 类型: '敌方圆形', X: context.场地中心X, Y: context.场地中心Y, 半径: context.场地半宽 > context.场地半高 ? context.场地半宽 : context.场地半高, 持续时间: cfg.封门误判预警秒, 来源单位: azure });
+  创建技能提示圈({
+    类型: '白色方向直线',
+    X: node.X,
+    Y: node.Y,
+    宽度: cfg.封门误判安全通道半宽 * 2,
+    长度: 距离XY(node.X, node.Y, context.场地中心X, context.场地中心Y),
+    朝向: 两点角度(node.X, node.Y, context.场地中心X, context.场地中心Y),
+    持续时间: cfg.封门误判预警秒,
+  });
+  创建点特效({
+    模型路径: 祖地双灵卫数值与表现配置.表现资源.封门误判.入侵区域覆盖特效路径,
+    X: context.场地中心X,
+    Y: context.场地中心Y,
+    缩放: 祖地双灵卫数值与表现配置.表现资源.封门误判.入侵区域覆盖特效缩放,
+    持续秒: cfg.封门误判预警秒 + 0.8,
+  });
   铺设月白通道(node.X, node.Y, context.场地中心X, context.场地中心Y, cfg.封门误判预警秒 + 0.6);
   播放限时单位动画({ 单位: red, 动画编号: 祖地双灵卫数值与表现配置.动作.裂誓下劈, 持续秒: cfg.封门误判预警秒 + 0.3, 恢复动画编号: 祖地双灵卫数值与表现配置.动作.裂誓待机 });
   播放限时单位动画({ 单位: azure, 动画编号: 祖地双灵卫数值与表现配置.动作.无面施法, 持续秒: cfg.封门误判预警秒 + 0.3, 恢复动画编号: 祖地双灵卫数值与表现配置.动作.无面待机 });
   const delayedId = addDelayedCallback(cfg.封门误判预警秒 * 1000, function 双灵卫封门误判结算(this: void): void {
     if (!context.战斗已结束 && context.阶段 === 'P3双蚀共鸣') {
       const impact = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.封门误判.封门中心砸击特效路径, context.场地中心X, context.场地中心Y);
+      const impactOverlay = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.封门误判.封门中心砸击叠加特效路径, context.场地中心X, context.场地中心Y);
+      const impactScale = 祖地双灵卫数值与表现配置.表现资源.封门误判.封门中心砸击特效缩放;
+      if (impact != null && impact !== 0 && EXSetEffectSize != null) EXSetEffectSize(impact, impactScale);
+      if (impactOverlay != null && impactOverlay !== 0 && EXSetEffectSize != null) EXSetEffectSize(impactOverlay, impactScale);
       if (impact != null && impact !== 0) YDWETimerDestroyEffectSafe(1.2, impact);
+      if (impactOverlay != null && impactOverlay !== 0) YDWETimerDestroyEffectSafe(1.2, impactOverlay);
       const heroes = 获取Boss技能敌对英雄列表(red);
+      let 通道成功 = false;
       for (let i = 0; i < heroes.length; i++) {
         const target = heroes[i];
-        if (单位是否在胶囊区域(target, node.X, node.Y, context.场地中心X, context.场地中心Y, cfg.封门误判安全通道半宽)) continue;
+        if (单位是否在胶囊区域(target, node.X, node.Y, context.场地中心X, context.场地中心Y, cfg.封门误判安全通道半宽)) {
+          通道成功 = true;
+          continue;
+        }
         const damage = 计算组合技能伤害(red, target, { 来源攻击力比例: cfg.封门误判伤害攻击力比例, 目标最大生命比例: cfg.封门误判目标最大生命比例 });
         造成AOE技能伤害({ 来源: red, 目标: target, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '祖地双灵卫·封门误判' });
+      }
+      if (通道成功) {
+        const reflection = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.封门误判.净化反射特效路径, node.X, node.Y);
+        if (reflection != null && reflection !== 0) YDWETimerDestroyEffectSafe(2.0, reflection);
       }
       context.大型技能占用者 = undefined;
       推进祖地双灵卫下一个净化节点(context);

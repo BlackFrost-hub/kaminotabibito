@@ -25,6 +25,7 @@ local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWETimerDestroyEffectSafe = ____require_result_2.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local EXSetEffectSize = japi.EXSetEffectSize
 local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
 local GetUnitX = jass.GetUnitX
@@ -47,6 +48,17 @@ local function _____53D8_5F02_5B88_536B(context, name)
         ____isRed_3 = context["苍影灵卫单位"]
     end
     local unit = ____isRed_3
+    local mutationEffect = AddSpecialEffect(
+        _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["公共"]["异变共通特效路径"],
+        GetUnitX(unit),
+        GetUnitY(unit)
+    )
+    if mutationEffect ~= nil and mutationEffect ~= 0 then
+        if EXSetEffectSize ~= nil then
+            EXSetEffectSize(mutationEffect, _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["公共"]["异变共通特效缩放"])
+        end
+        YDWETimerDestroyEffectSafe(1.8, mutationEffect)
+    end
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["侵蚀择形"],
         GetUnitX(unit),
@@ -60,6 +72,9 @@ local function _____53D8_5F02_5B88_536B(context, name)
         GetUnitX(unit),
         GetUnitY(unit)
     )
+    if effect ~= nil and effect ~= 0 and EXSetEffectSize ~= nil then
+        EXSetEffectSize(effect, 5)
+    end
     if effect ~= nil and effect ~= 0 then
         YDWETimerDestroyEffectSafe(1.8, effect)
     end

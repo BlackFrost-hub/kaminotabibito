@@ -33,10 +33,6 @@ const { 创建点特效, 创建循环点特效 } = require("lib.扩展函数.封
   创建点特效: (this: void, 参数: any) => any;
   创建循环点特效: (this: void, 参数: any) => any;
 };
-const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
-  X_FixUnitStandingSafe: (this: void, unit: any) => void;
-};
-
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
@@ -83,7 +79,7 @@ function 播放终极污染引导表现(this: void, context: 米亚运行时上�
     X: GetUnitX(boss),
     Y: GetUnitY(boss),
     Z: 20,
-    缩放: 1.6,
+    缩放: 3.2,
     总持续秒: seconds,
     重建间隔秒: 3,
     单次持续秒: 2.9,
@@ -96,7 +92,7 @@ function 播放终极污染引导表现(this: void, context: 米亚运行时上�
     X: 取米亚平台中心X(),
     Y: 取米亚平台中心Y(),
     Z: 0,
-    缩放: 1.2,
+    缩放: 2.4,
     总持续秒: seconds,
     重建间隔秒: 3,
     单次持续秒: 2.9,
@@ -121,11 +117,12 @@ function 播放终极污染引导表现(this: void, context: 米亚运行时上�
 
 function 创建终极污染核心(this: void, context: 米亚运行时上下文, point: 终极污染核心点, hp: number): any {
   const config = 米亚技能数值配置.终极污染;
+  const boss = context.Boss单位;
   const core = 创建召唤物({
-    主人单位: context.Boss单位,
-    所属玩家: GetOwningPlayer(context.Boss单位),
+    主人单位: boss,
+    所属玩家: GetOwningPlayer(boss),
     单位类型: 米亚单位技能配置.腐化核心单位ID,
-    单位名称: "终极污染核心",
+    单位名称: "米亚腐化核心",
     模型文件: 米亚单位技能配置.特效.终极污染核心模型,
     X: point.x,
     Y: point.y,
@@ -133,13 +130,14 @@ function 创建终极污染核心(this: void, context: 米亚运行时上下文,
     飞行高度: config.核心浮空高度,
     生命值: hp,
     生命值受小怪倍率: false,
+    固定站桩: true,
     攻击力: 0,
     攻击范围: 0,
     索敌范围: 0,
     缩放: config.核心缩放,
   });
-  if (!单位有效(core)) return core;
-  X_FixUnitStandingSafe(core);
+  const coreValid = 单位有效(core);
+  if (!coreValid) return core;
   const id = 取单位ID(core);
   if (id !== 0) 终极污染核心上下文表[id] = context;
   context.终极污染核心列表.push(core);
@@ -169,7 +167,7 @@ function 创建终极污染核心组(this: void, context: 米亚运行时上下�
   for (let i = 0; i < count; i++) {
     创建终极污染核心(context, points[i], hp);
   }
-  广播单位提示(context.Boss单位, "打碎所有腐化核心，打断终极污染！", 4200);
+  广播单位提示(context.Boss单位, `终极污染开始，引导${config.引导秒}秒，每秒全场增加${config.每秒全场腐化层数}层腐化感染（${config.引导秒}秒内击破全部${config.核心数量}个腐化核心即可打断！）`, 4200);
   播放米亚台词(context.Boss单位, "终极污染", 2);
 }
 
@@ -368,7 +366,7 @@ function 启动终极污染(this: void, context: 米亚运行时上下文): bool
     总时长: config.引导秒,
     颜色ID: 4,
     标题文本: "终极污染",
-    提示文本: "击碎全部腐化核心，否则全场腐化满层并死亡",
+    提示文本: `引导${config.引导秒}秒，每秒全场增加${config.每秒全场腐化层数}层腐化感染；击破全部${config.核心数量}个核心即可打断（优先击破核心）。`,
   });
   播放米亚台词(context.Boss单位, "终极污染", 0);
   播放终极污染引导表现(context);

@@ -46,7 +46,7 @@ imports\Common\Effect\Form\Aura\BloodAura\BloodAura.mdx
 ## 文字资产目录
 
 - `.cursor\rules\resources\visual\effect-asset-catalog.md` 只保留总入口、检索方法和数量概览。
-- 详细视觉条目必须写入 `.cursor\rules\resources\visual\effect-asset-catalog\`，并与 `imports\Common\Effect` 的 `Form / Element / Projectile` 分类对齐。
+- 详细视觉条目必须写入 `.cursor\rules\resources\visual\effect-asset-catalog\`，并与 `imports\Common\Effect` 的 `Form / Element / Projectile / Lightning` 分类对齐；`Lightning` 还要记录对应的 `imports\Splats` 定义文件。
 - `Form` 和 `Element` 继续按实际子目录拆分 Markdown；不得把所有模型追加回一个大表。
 - 每个模型只在一个主分类文件中建立正式条目，跨用途通过文字标签检索，不复制相同条目。
 - 新建资源分类目录时，必须同时更新对应文字目录的 `README.md`；新建文字分类时，也必须确认存在对应的导入目录或明确标注为待创建。

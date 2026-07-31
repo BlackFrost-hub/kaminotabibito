@@ -28,7 +28,7 @@ export const 卡瑟拉Buff表: Record<string, BuffData> = {
     priority: 72,
     canPurge: true,
     禁止位移: true,
-    tooltip: "被触手鞭笞命中后缠绕，移动速度降低40%，必要时附加短暂无法移动。",
+    tooltip: "持续3秒。攻击速度降低40%、移动速度降低40%，并禁止使用冲锋、跳跃、闪烁等位移技能。",
   },
   [卡瑟拉BuffID.墨汁遮蔽]: {
     buffID: 卡瑟拉BuffID.墨汁遮蔽,
@@ -43,7 +43,7 @@ export const 卡瑟拉Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 76,
     canPurge: true,
-    tooltip: "站在墨汁区域中，视野降低并被沉默，每秒受到水属性魔法伤害；水属性抗性达标时效果大幅减弱。",
+    tooltip: "每次命中刷新0.3秒：视野减少1200并沉默0.1秒；在墨汁区域内每秒受到Boss当前攻击力×55%的伤害。拥有35%或以上水属性抗性时，伤害降为Boss当前攻击力×19.25%/秒，沉默降为每次0.035秒。",
   },
   [卡瑟拉BuffID.触手残片]: {
     buffID: 卡瑟拉BuffID.触手残片,
@@ -58,7 +58,7 @@ export const 卡瑟拉Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 82,
     canPurge: false,
-    tooltip: "持有触手残片。每片提高水属性抗性并可在特定条件下恢复生命；共生电击无法躲避时会自动消耗3片抵消。",
+    tooltip: "持有1~5层；每层增加7%水属性抗性。拾取后若总层数达到3层及以上，立即恢复20%已损失生命；共生电击结算时若不在安全区，消耗3层可完全抵消本次命中。",
   },
   [卡瑟拉BuffID.触手精华]: {
     buffID: 卡瑟拉BuffID.触手精华,
@@ -73,7 +73,7 @@ export const 卡瑟拉Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 88,
     canPurge: false,
-    tooltip: "卡瑟拉吸收触手残片后获得触手精华。每层提升攻击力3%，持续20秒，可叠加。",
+    tooltip: "持续20秒；每层按卡瑟拉吸收瞬间的当前攻击力×3%换算为固定攻击力值并加入（不是基础攻击力或总攻击力百分比），每吸收1片额外恢复最大生命值2%；可叠加，最多显示99层。",
   },
   [卡瑟拉BuffID.麻痹电流]: {
     buffID: 卡瑟拉BuffID.麻痹电流,
@@ -90,7 +90,7 @@ export const 卡瑟拉Buff表: Record<string, BuffData> = {
     dispelLevel: 2,
     priority: 86,
     canPurge: true,
-    tooltip: "被共生电击命中后进入麻痹状态3秒；站在绝缘珊瑚安全半径内或消耗触手残片可抵消。",
+    tooltip: "持续3秒，无法移动、攻击或施法。仅在未进入绝缘珊瑚300码安全半径且未消耗3层触手残片抵消时施加。",
   },
   [卡瑟拉BuffID.绝缘庇护]: {
     buffID: 卡瑟拉BuffID.绝缘庇护,
@@ -105,7 +105,7 @@ export const 卡瑟拉Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 80,
     canPurge: false,
-    tooltip: "处于绝缘珊瑚安全半径内，免疫共生电击；离开安全区后立即失效。",
+    tooltip: "持续3秒。共生电击结算瞬间位于绝缘珊瑚300码安全半径内时获得，完全免疫本次6500点电击伤害与3秒眩晕；离开安全区不会提前移除。",
   },
 };
 

@@ -15,6 +15,8 @@ import { 释放莫尔特斯共生腐朽虫群 } from "./10．共生腐朽虫群"
 import { 注册莫尔特斯腐败传输节点 } from "./12．腐败传输";
 import { 单位有效 } from "./16．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import type { 持续伤害组件 } from "../../../../00．技能模板+函数/01．技能函数/18．周期范围效果/01．类型";
+import { 计算组合技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害";
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 import { 创建战斗技能调度器 } from '../../../../00．技能模板+函数/00．技能模板/13．战斗技能调度模板/01．战斗技能调度模板';
 import { 取单位ID } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
@@ -38,16 +40,18 @@ const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
+const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 
 let 已注册 = false;
 
-function 确保根须宫格(this: void, context: 莫尔特斯运行时上下文): void {
+export function 确保莫尔特斯根须宫格(this: void, context: 莫尔特斯运行时上下文): void {
   if (context.根须宫格 != null) return;
   const cfg = 莫尔特斯数值与表现配置.根须领域;
   context.根须宫格 = 创建闪电九宫格区域({
     名称: "莫尔特斯-根须领域",
-    中心X: cfg.中心X,
-    中心Y: cfg.中心Y,
+    中心X: context.根须领域中心X ?? cfg.中心X,
+    中心Y: context.根须领域中心Y ?? cfg.中心Y,
     行数: cfg.行数,
     列数: cfg.列数,
     单格边长: cfg.单格边长,
@@ -58,29 +62,53 @@ function 确保根须宫格(this: void, context: 莫尔特斯运行时上下文)
   });
 }
 
+function 计算莫尔特斯满层缠绕伤害(this: void, 来源单位: any, 目标单位: any): 持续伤害组件[] {
+  const cfg = 莫尔特斯数值与表现配置.腐败值;
+  const 自然伤害 = 计算组合技能伤害(来源单位, 目标单位, { 目标已损生命比例: cfg.满层缠绕目标已损生命比例 });
+  const 物理伤害 = 计算组合技能伤害(来源单位, 目标单位, { 来源攻击力比例: cfg.满层缠绕Boss攻击力比例 });
+
+  return [
+    { 伤害: 自然伤害, 伤害类型: DAMAGE_TYPE_PLANT },
+    { 伤害: 物理伤害, 伤害类型: DAMAGE_TYPE_NORMAL },
+  ];
+}
+
+function 汇总莫尔特斯每跳伤害(this: void, 伤害组件列表: 持续伤害组件[]): number {
+  let total = 0;
+  for (let index = 0; index < 伤害组件列表.length; index++) {
+    const 伤害组件 = 伤害组件列表[index];
+    if (伤害组件 != null && 伤害组件.伤害 > 0) total += 伤害组件.伤害;
+  }
+  return total;
+}
+
 function 触发腐败满层缠绕(this: void, context: 莫尔特斯运行时上下文, unit: any): void {
   const cfg = 莫尔特斯数值与表现配置.腐败值;
+  const 初始伤害组件 = 计算莫尔特斯满层缠绕伤害(context.Boss单位, unit);
+  const 初始伤害 = 汇总莫尔特斯每跳伤害(初始伤害组件);
   播放Boss坐标音效(莫尔特斯音效配置.腐败值.满层缠绕, GetUnitX(unit), GetUnitY(unit), 莫尔特斯音效配置.默认裁断距离);
   施加禁锢({
     来源单位: context.Boss单位,
     目标单位: unit,
     持续时间: cfg.满层缠绕秒,
-    伤害: cfg.满层缠绕每秒伤害,
+    伤害: 初始伤害,
     伤害间隔: 1,
+    每跳伤害计算器: 计算莫尔特斯满层缠绕伤害,
   });
-  registerManualBuff(unit, 莫尔特斯BuffID.根须缠绕, cfg.满层缠绕秒, cfg.满层缠绕每秒伤害, {
+  registerManualBuff(unit, 莫尔特斯BuffID.根须缠绕, cfg.满层缠绕秒, 初始伤害, {
     sourceName: "莫尔特斯-腐败满层",
   });
 }
 
 export function 应用莫尔特斯腐败值(this: void, context: 莫尔特斯运行时上下文, unit: any, amount: number): number {
-  if (!单位有效(unit) || amount === 0) return 取玩家腐败值(context, unit);
+  const 当前值 = 取玩家腐败值(context, unit);
+  const 目标有效 = 单位有效(unit);
+  if (!目标有效 || amount === 0) return 当前值;
   const cfg = 莫尔特斯数值与表现配置.腐败值;
-  const oldValue = 取玩家腐败值(context, unit);
+  const oldValue = 当前值;
   const next = 增加玩家腐败值(context, unit, amount);
-  if (oldValue < cfg.缠绕阈值 && next >= cfg.缠绕阈值) {
-    触发腐败满层缠绕(context, unit);
-  }
+  const crossedThreshold = oldValue < cfg.缠绕阈值 && next >= cfg.缠绕阈值;
+  if (crossedThreshold) 触发腐败满层缠绕(context, unit);
   return next;
 }
 
@@ -120,7 +148,7 @@ function on莫尔特斯运行时维护(this: void, context: 莫尔特斯运行�
     清理莫尔特斯上下文(context.Boss单位);
     return;
   }
-  确保根须宫格(context);
+  确保莫尔特斯根须宫格(context);
   if (context.阶段 >= 2) 触发莫尔特斯根系觉醒(context);
   if (context.阶段 >= 3) 触发莫尔特斯腐朽领域(context);
   注册莫尔特斯腐败传输节点(context);
@@ -152,6 +180,7 @@ export function 注册莫尔特斯腐败值与根须领域(this: void): void {
   创建战斗技能调度器<莫尔特斯运行时上下文>({
     名称: '莫尔特斯-沼泽腐败调度',
     间隔毫秒: 莫尔特斯数值与表现配置.运行时.推进间隔毫秒,
+    忽略自动施法开关: true,
     取当前时间: getServerTime,
     取上下文列表: 获取全部莫尔特斯上下文,
     取上下文键: 取莫尔特斯上下文键,
@@ -166,6 +195,7 @@ export function 注册莫尔特斯腐败值与根须领域(this: void): void {
   创建战斗技能调度器<莫尔特斯运行时上下文>({
     名称: '莫尔特斯-沼泽根须调度',
     间隔毫秒: 莫尔特斯数值与表现配置.运行时.推进间隔毫秒,
+    忽略自动施法开关: true,
     取当前时间: getServerTime,
     取上下文列表: 获取全部莫尔特斯上下文,
     取上下文键: 取莫尔特斯上下文键,

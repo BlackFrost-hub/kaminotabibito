@@ -22,7 +22,7 @@ ____exports["莫尔特斯Buff表"] = {
         dispelLevel = 3,
         priority = 90,
         canPurge = false,
-        tooltip = "腐败值持续累积。达到100时触发根须缠绕；可通过净化光斑、净化药剂或腐败虫尸清除。"
+        tooltip = "最多100层；达到100层后触发根须缠绕。站在净化光斑内每秒清除10层，拾取腐败虫尸立即清除30层。"
     },
     [____exports["莫尔特斯BuffID"]["根须缠绕"]] = {
         buffID = ____exports["莫尔特斯BuffID"]["根须缠绕"],
@@ -40,7 +40,7 @@ ____exports["莫尔特斯Buff表"] = {
         priority = 84,
         canPurge = true,
         ["禁止位移"] = true,
-        tooltip = "腐败值满或特定技能命中后被根须缠绕，无法移动并持续受到伤害。"
+        tooltip = "持续4秒并禁止移动；每1秒结算1次，共4次，每次造成目标已损失生命值的10%加上莫尔特斯当前攻击力的50%伤害。"
     },
     [____exports["莫尔特斯BuffID"]["荆棘寄生"]] = {
         buffID = ____exports["莫尔特斯BuffID"]["荆棘寄生"],
@@ -57,7 +57,7 @@ ____exports["莫尔特斯Buff表"] = {
         dispelLevel = 2,
         priority = 76,
         canPurge = true,
-        tooltip = "被扭曲荆棘寄生，每3秒受到伤害，持续12秒；可被驱散或站在净化光斑上移除。"
+        tooltip = "持续12秒，每3秒结算1次，共4次；每次造成莫尔特斯施加时攻击力的20%伤害。可被驱散或站在净化光斑内移除。"
     },
     [____exports["莫尔特斯BuffID"]["腐败护盾"]] = {
         buffID = ____exports["莫尔特斯BuffID"]["腐败护盾"],
@@ -74,7 +74,7 @@ ____exports["莫尔特斯Buff表"] = {
         dispelLevel = 3,
         priority = 88,
         canPurge = false,
-        tooltip = "莫尔特斯通过腐败传输获得护盾，护盾值基于转移的腐败值。"
+        tooltip = "莫尔特斯每损失5%生命值触发一次腐败传输：随机目标增加10点腐败值，莫尔特斯获得按被传输目标已损失生命值50%计算的真实护盾，最低1000点，持续10秒；再次触发时按新目标损失生命值追加并刷新10秒持续时间。"
     },
     [____exports["莫尔特斯BuffID"]["净化庇护"]] = {
         buffID = ____exports["莫尔特斯BuffID"]["净化庇护"],
@@ -91,7 +91,7 @@ ____exports["莫尔特斯Buff表"] = {
         dispelLevel = 3,
         priority = 70,
         canPurge = false,
-        tooltip = "站在净化光斑内获得净化庇护，每秒清除腐败值，可作为安全/净化状态提示。"
+        tooltip = "站在净化光斑内时获得此状态，每秒清除10点腐败值。"
     },
     [____exports["莫尔特斯BuffID"]["腐败虫尸净化"]] = {
         buffID = ____exports["莫尔特斯BuffID"]["腐败虫尸净化"],
@@ -106,7 +106,7 @@ ____exports["莫尔特斯Buff表"] = {
         dispelLevel = 1,
         priority = 72,
         canPurge = true,
-        tooltip = "使用腐败虫尸后获得短暂净化或一次性清除固定腐败值。"
+        tooltip = "拾取腐败虫尸后立即清除30点腐败值，并获得3秒净化状态。"
     }
 }
 ____exports.default = ____exports["莫尔特斯Buff表"]

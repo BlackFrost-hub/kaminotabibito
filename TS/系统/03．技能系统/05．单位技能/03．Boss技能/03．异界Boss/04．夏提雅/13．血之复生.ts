@@ -3,13 +3,13 @@
 import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 重置夏提雅猎血连击 } from './01．运行时上下文';
-import { 夏提雅单位技能配置 } from './00．配置';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 创建固定组合技能执行器, type 固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import { 创建延迟阶段 } from '../../../../00．技能模板+函数/00．技能模板/01．多阶段技能编排/06．技能阶段链执行器';
 import { 创建固定受击次数机制单位, type 固定受击次数机制单位实例 } from '../../../../00．技能模板+函数/04．机制组件/05．机制单位/03．固定受击次数机制单位';
 import { 执行战斗自身传送到坐标 } from '../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
+import { 确保单位可设置飞行高度, GetUnitFlyHeight, SetUnitFlyHeight } from '../../../../00．技能模板+函数/01．技能函数/03．跳跃·击飞/01．跳跃系统/00．共享';
 import { 播放夏提雅台词 } from './18．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
@@ -33,12 +33,19 @@ const { 广播单位提示 } = require('系统.09．表现系统.06．广播提�
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
 };
+const { 设置特效缩放 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
+  设置特效缩放: (this: void, effect: any, scale: number) => void;
+};
 const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
   doHeal: (this: void, params: any) => number;
 };
 
 const jass = require('jass.common') as any;
 const japi = require("jass.japi") as any;
+const { CosBJ, SinBJ } = require('lib.扩展函数.BJ函数.12．数学函数') as {
+  CosBJ: (this: void, degrees: number) => number;
+  SinBJ: (this: void, degrees: number) => number;
+};
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -49,6 +56,7 @@ const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: string) => boolean;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
+const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, timeScale: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const GetRectCenterX = jass.GetRectCenterX as (rect: any) => number;
 const GetRectCenterY = jass.GetRectCenterY as (rect: any) => number;
@@ -56,8 +64,6 @@ const GetRectMinX = jass.GetRectMinX as (rect: any) => number;
 const GetRectMinY = jass.GetRectMinY as (rect: any) => number;
 const GetRectMaxX = jass.GetRectMaxX as (rect: any) => number;
 const GetRectMaxY = jass.GetRectMaxY as (rect: any) => number;
-const CosBJ = jass.CosBJ as (degrees: number) => number;
-const SinBJ = jass.SinBJ as (degrees: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -109,17 +115,88 @@ function 移动夏提雅到场地中心(this: void, boss: any): void {
 function 播放结晶破裂(this: void, unit: any): void {
   if (unit == null || unit === 0) return;
   const effect = AddSpecialEffect(夏提雅数值与表现配置.表现资源.血之复生结晶模型路径, GetUnitX(unit), GetUnitY(unit));
-  if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(0.05, effect);
+  if (effect != null && effect !== 0) {
+    设置特效缩放(effect, 夏提雅数值与表现配置.血之复生.结晶缩放);
+    YDWETimerDestroyEffectSafe(0.05, effect);
+  }
 }
 
-function 播放复生成功表现(this: void, boss: any): void {
+function 播放复生成功特效批次(this: void, boss: any, 持续秒: number): void {
   const cfg = 夏提雅数值与表现配置;
+  if (!单位有效(boss) || !(持续秒 > 0)) return;
   const x = GetUnitX(boss);
   const y = GetUnitY(boss);
   const weave = AddSpecialEffect(cfg.表现资源.血之复生重构丝流路径, x, y);
   const burst = AddSpecialEffect(cfg.表现资源.血之复生成功爆发路径, x, y);
-  if (weave != null && weave !== 0) YDWETimerDestroyEffectSafe(cfg.血之复生.复生成功特效持续秒, weave);
-  if (burst != null && burst !== 0) YDWETimerDestroyEffectSafe(cfg.血之复生.复生成功特效持续秒, burst);
+  if (weave != null && weave !== 0) {
+    设置特效缩放(weave, cfg.血之复生.复生成功重构丝流缩放);
+    YDWETimerDestroyEffectSafe(持续秒, weave);
+  }
+  if (burst != null && burst !== 0) {
+    设置特效缩放(burst, cfg.血之复生.复生成功爆发缩放);
+    YDWETimerDestroyEffectSafe(持续秒, burst);
+  }
+}
+
+function 登记复生成功特效批次(this: void, context: 夏提雅运行时上下文, boss: any, 延迟秒: number, 持续秒: number, 序号: number): void {
+  const delayedId = addDelayedCallback(延迟秒 * 1000, function 夏提雅复生成功特效脉冲(this: void): void {
+    if (!单位有效(boss) || context.挑战已结束) return;
+    播放复生成功特效批次(boss, 持续秒);
+  });
+  context.清理.登记延迟回调('夏提雅-复生成功特效-' + String(序号), delayedId);
+}
+
+function 播放复生成功表现(this: void, context: 夏提雅运行时上下文): void {
+  const boss = context.Boss单位;
+  const cfg = 夏提雅数值与表现配置.血之复生;
+  const 总时长 = cfg.复生成功特效持续秒;
+  const 间隔 = cfg.复生成功特效间隔秒 > 0 ? cfg.复生成功特效间隔秒 : 总时长;
+  if (!(总时长 > 0) || !(间隔 > 0)) return;
+  let 已经过秒 = 0;
+  let 序号 = 1;
+  while (已经过秒 < 总时长) {
+    const 剩余秒 = 总时长 - 已经过秒;
+    if (已经过秒 === 0) 播放复生成功特效批次(boss, 剩余秒);
+    else 登记复生成功特效批次(context, boss, 已经过秒, 剩余秒, 序号);
+    已经过秒 += 间隔;
+    序号++;
+  }
+}
+
+function 执行复生成功回血(this: void, context: 夏提雅运行时上下文, boss: any, 恢复量: number): void {
+  if (!单位有效(boss) || context.挑战已结束 || !(恢复量 > 0)) return;
+  doHeal({
+    HealSource: boss,
+    HealTarget: boss,
+    HealAmount: 恢复量,
+    ItemHeal: false,
+    HealEffect: false,
+  });
+}
+
+function 登记复生成功回血(this: void, context: 夏提雅运行时上下文, boss: any, 延迟秒: number, 恢复量: number, 序号: number): void {
+  const delayedId = addDelayedCallback(延迟秒 * 1000, function 夏提雅复生成功回血脉冲(this: void): void {
+    执行复生成功回血(context, boss, 恢复量);
+  });
+  context.清理.登记延迟回调('夏提雅-复生成功回血-' + String(序号), delayedId);
+}
+
+function 安排复生成功回血(this: void, context: 夏提雅运行时上下文, boss: any, 总恢复量: number): void {
+  const 总时长 = 夏提雅数值与表现配置.血之复生.复生成功特效持续秒;
+  const 次数 = 4;
+  if (!(总恢复量 > 0) || !(总时长 > 0)) return;
+  const 单次恢复量 = 总恢复量 / 次数;
+  const 间隔秒 = 总时长 / 次数;
+  for (let i = 0; i < 次数; i++) {
+    const 延迟秒 = i * 间隔秒;
+    if (i === 0) 执行复生成功回血(context, boss, 单次恢复量);
+    else 登记复生成功回血(context, boss, 延迟秒, 单次恢复量, i + 1);
+  }
+}
+
+function 恢复夏提雅复生动画速度(this: void, boss: any): void {
+  if (boss == null || boss === 0) return;
+  SetUnitTimeScale(boss, 1);
 }
 
 function 统计存活结晶(this: void, crystals: 固定受击次数机制单位实例[]): number {
@@ -134,18 +211,15 @@ function 清理复生结晶(this: void, crystals: 固定受击次数机制单位
   for (let i = 0; i < crystals.length; i++) crystals[i].销毁();
 }
 
-function 完成复生成功(this: void, context: 夏提雅运行时上下文, 剩余结晶: number): void {
+function 完成复生成功(this: void, context: 夏提雅运行时上下文, 剩余结晶: number, 恢复复生表现: (this: void) => void): void {
   const boss = context.Boss单位;
   const cfg = 夏提雅数值与表现配置.血之复生;
   const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
-  doHeal({
-    HealSource: boss,
-    HealTarget: boss,
-    HealAmount: maxLife * cfg.单枚恢复生命比例 * 剩余结晶,
-    ItemHeal: false,
-    HealEffect: false,
-  });
-  播放复生成功表现(boss);
+  const 总恢复量 = maxLife * cfg.单枚恢复生命比例 * 剩余结晶;
+  播放夏提雅台词(boss, '复生成功');
+  安排复生成功回血(context, boss, 总恢复量);
+  恢复复生表现();
+  播放复生成功表现(context);
   播放Boss坐标音效(夏提雅数值与表现配置.音效.血之复生成功, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   context.阶段 = 'P3真祖血宴';
   context.上次阶段变化Ms = getServerTime();
@@ -166,6 +240,22 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
   播放夏提雅台词(boss, '血之复生');
   播放Boss坐标音效(夏提雅数值与表现配置.音效.血之复生仪式, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   const cfg = 夏提雅数值与表现配置.血之复生;
+  let 冻结前飞行高度 = 0;
+  let 已应用冻结高度 = false;
+  const 恢复复生表现 = function 夏提雅复生恢复表现(this: void): void {
+    恢复夏提雅复生动画速度(boss);
+    if (!已应用冻结高度 || !单位有效(boss)) return;
+    确保单位可设置飞行高度(boss);
+    SetUnitFlyHeight(boss, 冻结前飞行高度, 0);
+    已应用冻结高度 = false;
+  };
+  const 应用复生冻结高度 = function 夏提雅复生应用冻结高度(this: void): void {
+    if (!单位有效(boss) || context.挑战已结束 || context.当前大型技能 !== 血之复生技能Key || 已应用冻结高度) return;
+    确保单位可设置飞行高度(boss);
+    冻结前飞行高度 = GetUnitFlyHeight(boss);
+    SetUnitFlyHeight(boss, 冻结前飞行高度 + cfg.仪式动画冻结高度增加, 0);
+    已应用冻结高度 = true;
+  };
   const crystals: 固定受击次数机制单位实例[] = [];
   const points = 取复生结晶点(boss);
   const hitCount = 取复生结晶受击次数();
@@ -200,7 +290,15 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
       on击破: function 夏提雅复生结晶击破(this: void, unit: any): void {
         播放结晶破裂(unit);
         const remaining = 统计存活结晶(crystals);
-        广播单位提示(boss, '|cffff99aa复生结晶破碎，剩余 ' + String(remaining) + ' 枚。|r', 2200);
+        if (remaining > 0) {
+          广播单位提示(
+            boss,
+            '|cffff99aa复生结晶破碎，剩余' + String(remaining) + '枚；仪式结束时每枚存活结晶使夏提雅恢复' + String(cfg.单枚恢复生命比例 * 100) + '%最大生命。（继续击破剩余结晶，全部摧毁即可阻止复生。）|r',
+            3600,
+          );
+        } else {
+          广播单位提示(boss, '|cffff99aa复生结晶已全部摧毁。（' + String(cfg.仪式秒) + '秒仪式将失败，保持输出。）|r', 2400);
+        }
         if (remaining === 0 && executionId !== 0) executor?.停止(executionId, '完成');
       },
     });
@@ -211,6 +309,7 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
   }
 
   if (crystals.length <= 0) {
+    恢复复生表现();
     PauseUnit(boss, false);
     SetUnitInvulnerable(boss, false);
     return false;
@@ -226,21 +325,24 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
     结束回调: function 夏提雅血之复生结束(this: void, event): void {
       关闭吟唱条('大招');
       if (event.原因 !== '完成' || context.挑战已结束) {
+        恢复复生表现();
         清理复生结晶(crystals);
         return;
       }
       const remaining = 统计存活结晶(crystals);
       清理复生结晶(crystals);
       if (remaining <= 0) {
-        广播单位提示(boss, 夏提雅单位技能配置.台词.复生失败[0], 3600);
+        恢复复生表现();
+        播放夏提雅台词(boss, '复生失败');
         播放Boss坐标音效(夏提雅数值与表现配置.音效.血之复生失败, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
         on复生失败(context);
         return;
       }
-      完成复生成功(context, remaining);
+      完成复生成功(context, remaining, 恢复复生表现);
     },
   });
   if (executionId === 0) {
+    恢复复生表现();
     清理复生结晶(crystals);
     PauseUnit(boss, false);
     SetUnitInvulnerable(boss, false);
@@ -248,8 +350,18 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
   }
 
   播放限时单位动画({ 单位: boss, 动画编号: cfg.仪式动画编号, 持续秒: cfg.仪式秒, 恢复动画编号: 0 });
-  显示大招吟唱条({ 通道: '大招', 总时长: cfg.仪式秒, 颜色ID: 2, 标题文本: '血之复生', 提示文本: '在仪式结束前摧毁三枚复生结晶' });
-  广播单位提示(boss, 夏提雅单位技能配置.台词.血之复生[0], 3600);
+  const 抬高延迟秒 = cfg.仪式动画冻结秒 - cfg.仪式动画冻结高度提前秒;
+  const 抬高动画ID = addDelayedCallback((抬高延迟秒 > 0 ? 抬高延迟秒 : 0) * 1000, function 夏提雅血之复生提前抬高(this: void): void {
+    应用复生冻结高度();
+  });
+  context.清理.登记延迟回调('夏提雅-血之复生提前抬高', 抬高动画ID);
+  const 冻结动画ID = addDelayedCallback(cfg.仪式动画冻结秒 * 1000, function 夏提雅血之复生冻结施法动画(this: void): void {
+    if (!单位有效(boss) || context.挑战已结束 || context.当前大型技能 !== 血之复生技能Key) return;
+    应用复生冻结高度();
+    SetUnitTimeScale(boss, 0);
+  });
+  context.清理.登记延迟回调('夏提雅-血之复生冻结施法动画', 冻结动画ID);
+  显示大招吟唱条({ 通道: '大招', 总时长: cfg.仪式秒, 颜色ID: 2, 标题文本: '血之复生', 提示文本: String(cfg.仪式秒) + '秒内摧毁' + String(cfg.结晶数量) + '枚复生结晶；每枚存活结晶恢复' + String(cfg.单枚恢复生命比例 * 100) + '%最大生命（全部击破即可阻止复生）' });
   return true;
 }
 

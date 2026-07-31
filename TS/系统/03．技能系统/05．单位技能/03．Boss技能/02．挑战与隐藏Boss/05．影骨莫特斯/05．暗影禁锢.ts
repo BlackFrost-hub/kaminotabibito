@@ -67,7 +67,10 @@ function 影骨暗影禁锢施加控制(this: void, target: any, duration: numbe
   const data = variable as 影骨暗影禁锢法阵变量 | undefined;
   if (data == null) return;
   施加禁锢({ 来源单位: data.context.Boss单位, 目标单位: target, 持续时间: duration });
-  registerManualBuff(target, 影骨莫特斯BuffID.暗影禁锢, duration, 1, { sourceName: "影骨-暗影禁锢" });
+  registerManualBuff(target, 影骨莫特斯BuffID.暗影禁锢, duration, 1, {
+    sourceName: "影骨-暗影禁锢",
+    iconOverride: "BuffIcon\\Boss\\ShadowboneMortes\\shadow_prison.blp",
+  });
 }
 
 function 影骨暗影禁锢生效(this: void, variable?: any): void {
@@ -97,7 +100,8 @@ function 创建影骨暗影法阵(this: void, context: 影骨莫特斯运行时�
     取目标列表: 影骨暗影禁锢取目标列表,
     目标有效: 影骨暗影禁锢目标有效,
     施加控制: 影骨暗影禁锢施加控制,
-    创建特效路径: 影骨莫特斯表现配置.暗影禁锢法阵,
+    旋涡特效路径: 影骨莫特斯表现配置.暗影禁锢旋涡,
+    旋涡特效缩放: 0.8,
     摧毁特效路径: 影骨莫特斯表现配置.暗影禁锢摧毁,
   });
 }

@@ -13,6 +13,7 @@ import { 执行战斗自身传送到坐标 } from '../../../../00．技能模板
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 播放苍影灵卫台词 } from './12．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+import { 创建原生弹幕 } from '../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -24,15 +25,11 @@ const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能�
   造成AOE技能伤害: (this: void, params: any) => boolean;
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
-const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
-};
 const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 function 誓盾是否阻挡(this: void, context: 祖地双灵卫运行时上下文, sourceX: number, sourceY: number, target: any): boolean {
@@ -92,16 +89,35 @@ export function 释放祖地双灵卫封门校验(this: void, context: 祖地双
       创建延迟阶段(waveWarning * 1000, '等待灵魂潮'),
       创建立即执行阶段(function 封门校验魂潮结算(this: void): void {
         if (!waveReady) return;
-        const effect = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.封门校验.半场灵魂潮特效路径, waveStartX, waveStartY);
-        if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(1.2, effect);
         const heroes = 获取Boss技能敌对英雄列表(red);
-        for (let i = 0; i < heroes.length; i++) {
-          const hit = heroes[i];
-          if (誓盾是否阻挡(context, waveStartX, waveStartY, hit)) continue;
-          const damage = 计算组合技能伤害(red, hit, { 来源攻击力比例: 0.95, 目标最大生命比例: 0.045 });
-          造成AOE技能伤害({ 来源: red, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·封门校验' });
-        }
-        创建赤誓镇魂印(context, waveStartX, waveStartY);
+        创建原生弹幕({
+          所有者: red,
+          载体模式: '单位',
+          模型: 祖地双灵卫数值与表现配置.表现资源.封门校验.半场灵魂潮特效路径,
+          缩放: 1.7,
+          X: waveStartX,
+          Y: waveStartY,
+          方向角: 两点角度(waveStartX, waveStartY, waveEndX, waveEndY),
+          速度: 1400,
+          生命周期: 1.2,
+          最大距离: context.场地半宽 + 500,
+          命中半径: context.场地半高,
+          影响目标: '敌方',
+          每单位最大命中次数: 1,
+          碰撞消失: false,
+          目标筛选: function 封门校验灵魂潮目标筛选(this: void, unit: any): boolean {
+            for (let i = 0; i < heroes.length; i++) if (heroes[i] === unit) return true;
+            return false;
+          },
+          on命中: function 封门校验灵魂潮命中(this: void, hit: any): void {
+            if (誓盾是否阻挡(context, waveStartX, waveStartY, hit)) return;
+            const damage = 计算组合技能伤害(red, hit, { 来源攻击力比例: 0.95, 目标最大生命比例: 0.045 });
+            造成AOE技能伤害({ 来源: red, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_SHADOW_STRIKE, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·封门校验' });
+          },
+          on到达目标点: function 封门校验灵魂潮结束(this: void): void {
+            创建赤誓镇魂印(context, waveStartX, waveStartY);
+          },
+        });
       }, '灵魂潮结算与留印'),
     ],
     结束回调: function 封门校验结束(this: void): void {

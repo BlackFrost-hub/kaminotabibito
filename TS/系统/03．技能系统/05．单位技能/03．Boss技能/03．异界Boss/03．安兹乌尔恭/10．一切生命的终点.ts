@@ -160,7 +160,11 @@ function 授予全队生命庇护(this: void, instance: 一切生命的终点实
       sourceName: '安兹-一切生命的终点',
     });
   }
-  广播单位提示(instance.context.安兹单位, '|cffffff99三座生命锚点已经响应：英魂庇护将抵挡女妖哭嚎。|r', 3600);
+  广播单位提示(
+    instance.context.安兹单位,
+    `|cffffff99${cfg.生命锚点数量}座生命锚点已全部激活：获得持续${cfg.一切生命的终点倒计时秒 + 2}秒的生命庇护，可抵挡本轮女妖哭嚎1次。（女妖哭嚎后有${cfg.一切生命的终点破解输出窗口秒}秒输出窗口，立即集中攻击安兹。）|r`,
+    3600,
+  );
 }
 
 function 激活生命锚点(this: void, instance: 一切生命的终点实例, anchor: 生命锚点状态): void {
@@ -174,7 +178,8 @@ function 激活生命锚点(this: void, instance: 一切生命的终点实例, a
   anchor.激活进度UI = null;
   const count = 取已激活锚点数量(instance);
   const required = 安兹乌尔恭数值与表现配置.阶段技能.生命锚点数量;
-  广播单位提示(instance.context.安兹单位, `|cffffff99生命锚点已激活（${count}/${required}）|r`, 2200);
+  const stage = 安兹乌尔恭数值与表现配置.阶段技能;
+  广播单位提示(instance.context.安兹单位, `|cffffff99生命锚点已激活（${count}/${required}）；本锚点要求在${stage.生命锚点激活半径}码内停留${stage.生命锚点激活停留秒}秒。（继续前往下一个未激活锚点。）|r`, 2200);
   if (instance.锚点列表.length === required && count >= required) 授予全队生命庇护(instance);
 }
 
@@ -288,7 +293,7 @@ function 创建一切生命的终点预警(this: void, instance: 一切生命的
   const blockTargets: 生命锚点封锁目标[] = [];
   for (let i = 0; i < instance.锚点列表.length; i++) blockTargets.push(创建生命锚点封锁目标(instance.锚点列表[i]));
   instance.锚点封锁 = 启动雅儿贝德生命锚点封锁(context, blockTargets, stage.一切生命的终点倒计时秒);
-  广播单位提示(boss, '|cffff6666一切生命的终点：在十二秒内依次激活三座生命锚点！|r', 4200);
+  广播单位提示(boss, `|cffff6666一切生命的终点开始${stage.一切生命的终点倒计时秒}秒倒计时：需激活${stage.生命锚点数量}座生命锚点，每座在${stage.生命锚点激活半径}码内停留${stage.生命锚点激活停留秒}秒。（分工踩点，优先处理被暗金屏障封锁的锚点。）|r`, 4200);
 }
 
 function 播放女妖哭嚎表现(this: void, instance: 一切生命的终点实例): void {
@@ -352,8 +357,11 @@ function 结算女妖哭嚎(this: void, instance: 一切生命的终点实例): 
       标签: '安兹·女妖哭嚎',
     });
   }
-  if (solved) 广播单位提示(boss, '|cffffff99死亡法则已经被英魂誓约撕开，集中攻击安兹！|r', 3600);
-  else 广播单位提示(boss, '|cffff4444生命锚点未能全部响应，女妖哭嚎完成致命裁定。|r', 3200);
+  if (solved) {
+    广播单位提示(boss, `|cffffff99${cfg.生命锚点数量}座生命锚点已全部激活，生命庇护抵挡本次女妖哭嚎；随后开放${cfg.一切生命的终点破解输出窗口秒}秒输出窗口。（立即集中攻击安兹。）|r`, 3600);
+  } else {
+    广播单位提示(boss, `|cffff4444生命锚点未能在${cfg.一切生命的终点倒计时秒}秒内全部激活，女妖哭嚎已完成致命裁定。（下一轮分工提前踩点，优先处理封锁屏障。）|r`, 3200);
+  }
   return solved;
 }
 
@@ -393,7 +401,7 @@ export function 释放安兹一切生命的终点(this: void, context: 安兹运
     总时长: cfg.一切生命的终点倒计时秒,
     颜色ID: 2,
     标题文本: '一切生命的终点',
-    提示文本: '依次激活三座生命锚点，取得英魂庇护',
+    提示文本: '12秒内激活3座生命锚；每座需在230码内停留0.8秒',
   });
   let solved = false;
   const executionId = executor.开始({

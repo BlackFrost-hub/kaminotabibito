@@ -28,10 +28,44 @@ local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetOwningPlayer = jass.GetOwningPlayer
+local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868 = {}
 local _____7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42_5DF2_6CE8_518C = false
+local function _____63D0_793A_8150_5316_9ECF_6DB2_8FD1_6218_53CD_566C(source, currentStack)
+    local owner = GetOwningPlayer(source)
+    if owner == nil or owner == 0 then
+        return
+    end
+    DisplayTimedTextToPlayer(
+        owner,
+        0,
+        0,
+        4,
+        ("|cffff4040腐化黏液反噬：|r你近战攻击米亚时被其黏液涂层污染，腐化感染+1（当前" .. tostring(currentStack)) .. "层）。"
+    )
+end
+local function _____64AD_653E_8150_5316_9ECF_6DB2_5168_573A_7206_53D1_8868_73B0(x, y)
+    local config = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["特效"]
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = config["腐化黏液爆发地面"],
+        X = x,
+        Y = y,
+        Z = 0,
+        ["缩放"] = 4,
+        ["持续秒"] = 1
+    })
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = config["腐化黏液爆发放射"],
+        X = x,
+        Y = y,
+        Z = 0,
+        ["缩放"] = 4,
+        ["持续秒"] = 1
+    })
+end
 local function _____53D6_8150_5316_9ECF_6DB2_4E0A_4E0B_6587(boss)
     local id = GetHandleId(boss) or 0
     if id == 0 then
@@ -86,20 +120,23 @@ local function _____5904_7406_8150_5316_9ECF_6DB2_8FD1_6218_53CD_566C(target, _d
         return
     end
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化黏液涂层"]
-    if _____8DDD_79BB_5E73_65B9(target, source) > 250 * 250 then
+    local sourceId = GetHandleId(source) or 0
+    local distanceSquared = _____8DDD_79BB_5E73_65B9(target, source)
+    if distanceSquared > 250 * 250 then
         return
     end
-    local sourceId = GetHandleId(source) or 0
     if sourceId == 0 then
         return
     end
     local nowMs = getServerTime()
     local _____51B7_5374_8868 = context["腐化黏液近战冷却表"]
-    if _____51B7_5374_8868[sourceId] ~= nil and nowMs - (_____51B7_5374_8868[sourceId] or 0) < config["近战叠层冷却Ms"] then
+    local lastApplyMs = _____51B7_5374_8868[sourceId]
+    if lastApplyMs ~= nil and nowMs - lastApplyMs < config["近战叠层冷却Ms"] then
         return
     end
     _____51B7_5374_8868[sourceId] = nowMs
-    _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, source, 1, "腐化黏液涂层近战反噬")
+    local newStack = _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, source, 1, "腐化黏液涂层近战反噬")
+    _____63D0_793A_8150_5316_9ECF_6DB2_8FD1_6218_53CD_566C(source, newStack)
     _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "腐化黏液涂层", 1)
 end
 local function _____5904_7406_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8(damageContext)
@@ -108,39 +145,47 @@ local function _____5904_7406_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8(damage
         return damageContext.currentDamage
     end
     local bonus = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化黏液涂层"]["Boss受伤提高"]
+    local originalDamage = damageContext.currentDamage
+    local modifiedDamage = originalDamage * (1 + bonus)
     local nowMs = getServerTime()
     if nowMs - context["腐化黏液上次受伤提示Ms"] >= 12000 then
         context["腐化黏液上次受伤提示Ms"] = nowMs
         _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "腐化黏液涂层", 3)
     end
-    return damageContext.currentDamage * (1 + bonus)
+    return modifiedDamage
 end
 ____exports["释放米亚全场腐化黏液"] = function(context)
     local boss = context["Boss单位"]
-    if not _____5355_4F4D_6709_6548(boss) or context["阶段"] ~= 3 then
+    local bossValid = _____5355_4F4D_6709_6548(boss)
+    if not bossValid or context["阶段"] ~= 3 then
         return false
     end
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "腐化黏液涂层", 2)
+    local effectPath = "war3mapImported\\archimonde_portal_state.mdx"
+    local effectX = GetUnitX(boss)
+    local effectY = GetUnitY(boss)
     _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = "war3mapImported\\archimonde_portal_state.mdx",
-        X = GetUnitX(boss),
-        Y = GetUnitY(boss),
+        ["模型路径"] = effectPath,
+        X = effectX,
+        Y = effectY,
         Z = 80,
         ["缩放"] = 1.2,
         ["持续秒"] = 1
     })
+    _____64AD_653E_8150_5316_9ECF_6DB2_5168_573A_7206_53D1_8868_73B0(effectX, effectY)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     do
         local i = 0
         while i < #heroes do
             do
                 local hero = heroes[i + 1]
-                if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue25
+                local heroValid = _____5355_4F4D_6709_6548(hero)
+                if not heroValid then
+                    goto __continue28
                 end
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, hero, 1, "腐化黏液涂层全场甩黏液")
             end
-            ::__continue25::
+            ::__continue28::
             i = i + 1
         end
     end
@@ -155,6 +200,9 @@ ____exports["注册米亚腐化黏液涂层"] = function()
     registerDamageModifier(_____5904_7406_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8, 35)
 end
 ____exports["刷新米亚腐化黏液涂层被动状态"] = function(context)
+    if context == nil then
+        return
+    end
     _____767B_8BB0_8150_5316_9ECF_6DB2_4E0A_4E0B_6587(context)
     if context["阶段"] ~= 3 then
         return

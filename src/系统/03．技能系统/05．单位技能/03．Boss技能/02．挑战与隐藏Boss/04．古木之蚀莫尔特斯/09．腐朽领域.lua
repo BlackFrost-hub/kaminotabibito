@@ -44,47 +44,122 @@ local ____require_result_7 = require("系统.03．技能系统.05．单位技能
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
 local ____require_result_8 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
 local _____83AB_5C14_7279_65AFBuffID = ____require_result_8["莫尔特斯BuffID"]
-local ____require_result_9 = require("lib.扩展函数.BJ函数.11．贴图函数")
-local CreateUbersplatBJ = ____require_result_9.CreateUbersplatBJ
-local ShowUbersplatBJ = ____require_result_9.ShowUbersplatBJ
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_9.debugLogForce
+local ____require_result_10 = require("lib.扩展函数.BJ函数.11．贴图函数")
+local CreateUbersplatBJ = ____require_result_10.CreateUbersplatBJ
+local ShowUbersplatBJ = ____require_result_10.ShowUbersplatBJ
+local SetUbersplatRenderAlways = ____require_result_10.SetUbersplatRenderAlways
+local _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757 = "莫尔特斯-腐朽领域"
 local function _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
     local grid = context["根须宫格"]
     if grid == nil then
+        debugLogForce(_____8150_673D_9886_57DF_8C03_8BD5_6A21_5757, "地表创建跳过", "原因=根须宫格为空")
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
     local color = cfg["沼泽贴图颜色"]
+    local _____683C_5B50_5217_8868 = grid["格子列表"]
+    if #_____683C_5B50_5217_8868 == 0 then
+        debugLogForce(_____8150_673D_9886_57DF_8C03_8BD5_6A21_5757, "地表创建跳过", "原因=九宫格没有格子")
+        return
+    end
+    local _____8986_76D6_884C_6570 = cfg["沼泽贴图覆盖行数"]
+    local _____8986_76D6_5217_6570 = cfg["沼泽贴图覆盖列数"]
+    local _____603B_5BBD_5EA6 = grid["宽度"]
+    local _____603B_9AD8_5EA6 = grid["高度"]
+    local _____9996_683C = _____683C_5B50_5217_8868[1]
+    local _____672B_683C = _____683C_5B50_5217_8868[#_____683C_5B50_5217_8868]
+    local _____5BAB_683C_4E2D_5FC3X = (_____9996_683C["左"] + _____672B_683C["右"]) / 2
+    local _____5BAB_683C_4E2D_5FC3Y = (_____9996_683C["下"] + _____672B_683C["上"]) / 2
+    local _____4E2D_5FC3X = context["根须领域中心X"] or _____5BAB_683C_4E2D_5FC3X
+    local _____4E2D_5FC3Y = context["根须领域中心Y"] or _____5BAB_683C_4E2D_5FC3Y
+    local _____8D77_70B9X = _____4E2D_5FC3X - _____603B_5BBD_5EA6 / 2
+    local _____8D77_70B9Y = _____4E2D_5FC3Y - _____603B_9AD8_5EA6 / 2
+    local _____91C7_6837_5BBD_5EA6 = _____603B_5BBD_5EA6 / _____8986_76D6_5217_6570
+    local _____91C7_6837_9AD8_5EA6 = _____603B_9AD8_5EA6 / _____8986_76D6_884C_6570
+    debugLogForce(
+        _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757,
+        "地表创建开始",
+        "覆盖网格=",
+        _____8986_76D6_884C_6570,
+        "x",
+        _____8986_76D6_5217_6570,
+        "类型=",
+        cfg["沼泽贴图类型"],
+        "颜色=",
+        color.r,
+        color.g,
+        color.b,
+        color.a,
+        "强制暂停=",
+        cfg["沼泽贴图强制暂停"],
+        "无出生时间=",
+        cfg["沼泽贴图无出生时间"],
+        "中心=",
+        _____4E2D_5FC3X,
+        _____4E2D_5FC3Y
+    )
+    local _____6210_529F_6570_91CF = 0
     do
-        local i = 0
-        while i < grid["格子列表"].length do
+        local row = 0
+        while row < _____8986_76D6_884C_6570 do
             do
-                local cell = grid["格子列表"][i]
-                if cell == nil then
-                    goto __continue5
+                local col = 0
+                while col < _____8986_76D6_5217_6570 do
+                    do
+                        local x = _____8D77_70B9X + _____91C7_6837_5BBD_5EA6 * (col + 0.5)
+                        local y = _____8D77_70B9Y + _____91C7_6837_9AD8_5EA6 * (row + 0.5)
+                        local loc = Location(x, y)
+                        local ubersplat = CreateUbersplatBJ(
+                            loc,
+                            cfg["沼泽贴图类型"],
+                            color.r,
+                            color.g,
+                            color.b,
+                            color.a,
+                            cfg["沼泽贴图强制暂停"],
+                            cfg["沼泽贴图无出生时间"]
+                        )
+                        RemoveLocation(loc)
+                        local index = row * _____8986_76D6_5217_6570 + col
+                        debugLogForce(
+                            _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757,
+                            "地表贴图返回",
+                            "索引=",
+                            index,
+                            "x=",
+                            x,
+                            "y=",
+                            y,
+                            "句柄=",
+                            ubersplat
+                        )
+                        if ubersplat == nil or ubersplat == 0 then
+                            goto __continue8
+                        end
+                        SetUbersplatRenderAlways(ubersplat, true)
+                        ShowUbersplatBJ(true, ubersplat)
+                        debugLogForce(
+                            _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757,
+                            "地表贴图已显示",
+                            "索引=",
+                            index,
+                            "句柄=",
+                            ubersplat
+                        )
+                        local ____self_11 = context["清理"]
+                        ____self_11["登记贴图"](____self_11, "莫尔特斯-腐朽领域沼泽", ubersplat)
+                        _____6210_529F_6570_91CF = _____6210_529F_6570_91CF + 1
+                    end
+                    ::__continue8::
+                    col = col + 1
                 end
-                local loc = Location(cell["中心X"], cell["中心Y"])
-                local ubersplat = CreateUbersplatBJ(
-                    cfg["沼泽贴图类型"],
-                    loc,
-                    color.r,
-                    color.g,
-                    color.b,
-                    color.a,
-                    cfg["沼泽贴图强制暂停"],
-                    cfg["沼泽贴图无出生时间"]
-                )
-                RemoveLocation(loc)
-                if ubersplat == nil or ubersplat == 0 then
-                    goto __continue5
-                end
-                ShowUbersplatBJ(true, ubersplat)
-                local ____self_10 = context["清理"]
-                ____self_10["登记贴图"](____self_10, "莫尔特斯-腐朽领域沼泽", ubersplat)
             end
-            ::__continue5::
-            i = i + 1
+            row = row + 1
         end
     end
+    debugLogForce(_____8150_673D_9886_57DF_8C03_8BD5_6A21_5757, "地表创建结束", "成功数量=", _____6210_529F_6570_91CF)
 end
 local function _____521B_5EFA_51C0_5316_7B26_6587(context)
     local grid = context["根须宫格"]
@@ -104,11 +179,11 @@ local function _____521B_5EFA_51C0_5316_7B26_6587(context)
             do
                 local cell = cells[i + 1]
                 if cell == nil then
-                    goto __continue11
+                    goto __continue13
                 end
                 local effect = AddSpecialEffect(cfg["净化符文模型路径"], cell["中心X"], cell["中心Y"])
-                local ____self_11 = context["清理"]
-                ____self_11["登记特效"](____self_11, "莫尔特斯-净化符文", effect)
+                local ____self_12 = context["清理"]
+                ____self_12["登记特效"](____self_12, "莫尔特斯-净化符文", effect)
                 _____521B_5EFA_6280_80FD_63D0_793A_5708({
                     ["类型"] = "白色安全圆",
                     X = cell["中心X"],
@@ -117,10 +192,45 @@ local function _____521B_5EFA_51C0_5316_7B26_6587(context)
                     ["持续时间"] = cfg["净化持续秒"]
                 })
             end
-            ::__continue11::
+            ::__continue13::
             i = i + 1
         end
     end
+end
+local function _____521B_5EFA_8150_673D_9886_57DF_4E2D_5FC3Tick_7279_6548(context)
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
+    local _____6839_987B_9886_57DF_914D_7F6E = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]
+    local grid = context["根须宫格"]
+    local ____temp_13
+    if grid == nil then
+        ____temp_13 = nil
+    else
+        ____temp_13 = grid["格子列表"]
+    end
+    local _____683C_5B50_5217_8868 = ____temp_13
+    local ____temp_14
+    if _____683C_5B50_5217_8868 ~= nil and #_____683C_5B50_5217_8868 > 0 then
+        ____temp_14 = _____683C_5B50_5217_8868[1]
+    else
+        ____temp_14 = nil
+    end
+    local _____9996_683C = ____temp_14
+    local ____temp_15
+    if _____683C_5B50_5217_8868 ~= nil and #_____683C_5B50_5217_8868 > 0 then
+        ____temp_15 = _____683C_5B50_5217_8868[#_____683C_5B50_5217_8868]
+    else
+        ____temp_15 = nil
+    end
+    local _____672B_683C = ____temp_15
+    local _____4E2D_5FC3X = context["根须领域中心X"] or (_____9996_683C ~= nil and _____672B_683C ~= nil and (_____9996_683C["左"] + _____672B_683C["右"]) / 2 or _____6839_987B_9886_57DF_914D_7F6E["中心X"])
+    local _____4E2D_5FC3Y = context["根须领域中心Y"] or (_____9996_683C ~= nil and _____672B_683C ~= nil and (_____9996_683C["下"] + _____672B_683C["上"]) / 2 or _____6839_987B_9886_57DF_914D_7F6E["中心Y"])
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["沼泽Tick特效路径"],
+        X = _____4E2D_5FC3X,
+        Y = _____4E2D_5FC3Y,
+        ["持续秒"] = cfg["沼泽Tick特效持续秒"],
+        ["缩放"] = cfg["沼泽Tick特效缩放"]
+    })
 end
 local function _____5904_7406_51C0_5316_7B26_6587(context, hero)
     local grid = context["根须宫格"]
@@ -140,7 +250,7 @@ local function _____5904_7406_51C0_5316_7B26_6587(context, hero)
             do
                 local cell = cells[i + 1]
                 if cell == nil then
-                    goto __continue16
+                    goto __continue19
                 end
                 local dx = GetUnitX(hero) - cell["中心X"]
                 local dy = GetUnitY(hero) - cell["中心Y"]
@@ -156,7 +266,7 @@ local function _____5904_7406_51C0_5316_7B26_6587(context, hero)
                     return true
                 end
             end
-            ::__continue16::
+            ::__continue19::
             i = i + 1
         end
     end
@@ -173,7 +283,13 @@ local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B(variable)
         return
     end
     local _____7A7F_523A_914D_7F6E = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽根须穿刺"]
-    _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____7A7F_523A_914D_7F6E["穿刺特效路径"], X = data.X, Y = data.Y, ["持续秒"] = _____7A7F_523A_914D_7F6E["瞬时特效持续秒"]})
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____7A7F_523A_914D_7F6E["穿刺特效路径"],
+        X = data.X,
+        Y = data.Y,
+        ["持续秒"] = _____7A7F_523A_914D_7F6E["瞬时特效持续秒"],
+        ["缩放"] = _____7A7F_523A_914D_7F6E["穿刺命中特效缩放"]
+    })
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = context["Boss单位"],
         ["目标"] = target,
@@ -194,6 +310,15 @@ local function _____7ED3_7B97_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5C55_5F00(
     if context == nil or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return
     end
+    debugLogForce(
+        _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757,
+        "展开结算",
+        "根须宫格=",
+        context["根须宫格"] == nil and "nil" or "ready",
+        "中心=",
+        context["根须领域中心X"],
+        context["根须领域中心Y"]
+    )
     context["腐朽领域已生效"] = true
     _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
     _____521B_5EFA_51C0_5316_7B26_6587(context)
@@ -215,6 +340,14 @@ local function _____7ED3_7B97_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5C55_5F00(
 end
 ____exports["触发莫尔特斯腐朽领域"] = function(context)
     if context["腐朽领域已触发"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+        debugLogForce(
+            _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757,
+            "触发跳过",
+            "已触发=",
+            context["腐朽领域已触发"],
+            "Boss有效=",
+            _____5355_4F4D_6709_6548(context["Boss单位"])
+        )
         return
     end
     context["腐朽领域已触发"] = true
@@ -223,14 +356,25 @@ ____exports["触发莫尔特斯腐朽领域"] = function(context)
     _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(context["Boss单位"], "低血量")
     local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____7ED3_7B97_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5C55_5F00, context)
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "莫尔特斯-腐朽领域展开", delayedId)
+    local ____self_16 = context["清理"]
+    ____self_16["登记延迟回调"](____self_16, "莫尔特斯-腐朽领域展开", delayedId)
+    debugLogForce(
+        _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757,
+        "触发成功",
+        "延迟毫秒=",
+        cfg["动作播放秒"] * 1000,
+        "延迟ID=",
+        delayedId,
+        "根须宫格=",
+        context["根须宫格"] == nil and "nil" or "ready"
+    )
 end
 ____exports["处理莫尔特斯沼泽腐败"] = function(context)
     if not context["腐朽领域已生效"] or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return false
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
+    _____521B_5EFA_8150_673D_9886_57DF_4E2D_5FC3Tick_7279_6548(context)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
     do
         local i = 0
@@ -238,10 +382,10 @@ ____exports["处理莫尔特斯沼泽腐败"] = function(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue29
+                    goto __continue32
                 end
                 if _____5904_7406_51C0_5316_7B26_6587(context, hero) then
-                    goto __continue29
+                    goto __continue32
                 end
                 _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                     context["Boss单位"],
@@ -252,7 +396,7 @@ ____exports["处理莫尔特斯沼泽腐败"] = function(context)
                 )
                 _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, hero, cfg["沼泽每跳腐败值"])
             end
-            ::__continue29::
+            ::__continue32::
             i = i + 1
         end
     end
@@ -289,8 +433,8 @@ ____exports["处理莫尔特斯沼泽根须"] = function(context)
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
     }
     local id = addDelayedCallback(cfg["根须结算延迟毫秒"], _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B, data)
-    local ____self_13 = context["清理"]
-    ____self_13["登记延迟回调"](____self_13, "莫尔特斯-腐朽沼泽根须", id)
+    local ____self_17 = context["清理"]
+    ____self_17["登记延迟回调"](____self_17, "莫尔特斯-腐朽沼泽根须", id)
     return true
 end
 return ____exports

@@ -12,6 +12,7 @@ import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用�
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
+import { 播放夏提雅台词 } from './18．台词播放';
 
 const { registerManualBuff } = require('系统.05．Buff系统.00．Buff系统') as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -50,6 +51,7 @@ function 复制血宴印记列表(this: void, context: 夏提雅运行时上下�
 export function 释放夏提雅真祖血宴(this: void, context: 夏提雅运行时上下文): boolean {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.挑战已结束 || context.阶段 !== 'P3真祖血宴' || context.P3转阶段已处理 || context.当前大型技能 != null) return false;
+  播放夏提雅台词(boss, '真祖血宴');
   播放Boss坐标音效(夏提雅数值与表现配置.音效.真祖血宴, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
   const cfg = 夏提雅数值与表现配置.P3;
   context.P3转阶段已处理 = true;

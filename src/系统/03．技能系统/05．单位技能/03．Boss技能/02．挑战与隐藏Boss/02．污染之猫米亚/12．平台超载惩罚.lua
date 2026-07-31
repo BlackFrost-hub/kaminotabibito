@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
@@ -34,8 +35,12 @@ local function _____5355_4F4D_5728_5E73_53F0_5185(unit, _____533A_57DF)
     local y = GetUnitY(unit)
     return x >= _____533A_57DF["配置"]["左"] and x <= _____533A_57DF["配置"]["右"] and y >= _____533A_57DF["配置"]["下"] and y <= _____533A_57DF["配置"]["上"]
 end
-local function _____53D6_5E73_53F0_5BB9_91CF()
-    return _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570() <= 2 and _____7C73_4E9A_5E73_53F0_914D_7F6E["单双人平台容量"] or _____7C73_4E9A_5E73_53F0_914D_7F6E["三四人平台容量"]
+local function _____53D6_5E73_53F0_5BB9_91CF(_____5F53_524D_6709_6548_73A9_5BB6_4EBA_6570)
+    return _____5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 <= 2 and _____7C73_4E9A_5E73_53F0_914D_7F6E["单双人平台容量"] or _____7C73_4E9A_5E73_53F0_914D_7F6E["三四人平台容量"]
+end
+local function _____53D6_5E73_53F0_8D85_8F7D_6D4B_8BD5_5BB9_91CF_8986_76D6(context)
+    local _____8986_76D6_503C = __TS__Number(context["平台超载测试容量覆盖"]) or 0
+    return _____8986_76D6_503C > 0 and _____8986_76D6_503C or 0
 end
 local function _____53D6_5E73_53F0_5185_82F1_96C4(_____533A_57DF, heroes)
     local result = {}
@@ -45,13 +50,13 @@ local function _____53D6_5E73_53F0_5185_82F1_96C4(_____533A_57DF, heroes)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue7
+                    goto __continue8
                 end
                 if _____5355_4F4D_5728_5E73_53F0_5185(hero, _____533A_57DF) then
                     result[#result + 1] = hero
                 end
             end
-            ::__continue7::
+            ::__continue8::
             i = i + 1
         end
     end
@@ -125,7 +130,8 @@ ____exports["取米亚平台超载伤害倍率"] = function(target)
     if target == nil or target == 0 then
         return 1
     end
-    return getBuffRuntime(target, _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E.BuffID["平台超载"]) ~= nil and 1.3 or 1
+    local _____6709_5E73_53F0_8D85_8F7D = getBuffRuntime(target, _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E.BuffID["平台超载"]) ~= nil
+    return _____6709_5E73_53F0_8D85_8F7D and 1.3 or 1
 end
 ____exports["刷新米亚平台超载惩罚"] = function(context, nowMs)
     if context["阶段"] < 2 then
@@ -138,8 +144,10 @@ ____exports["刷新米亚平台超载惩罚"] = function(context, nowMs)
     if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return
     end
-    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
-    local capacity = _____53D6_5E73_53F0_5BB9_91CF()
+    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"]) or ({})
+    local _____5F53_524D_73A9_5BB6_4EBA_6570 = _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570()
+    local _____6D4B_8BD5_5BB9_91CF_8986_76D6 = _____53D6_5E73_53F0_8D85_8F7D_6D4B_8BD5_5BB9_91CF_8986_76D6(context)
+    local capacity = _____6D4B_8BD5_5BB9_91CF_8986_76D6 > 0 and _____6D4B_8BD5_5BB9_91CF_8986_76D6 or _____53D6_5E73_53F0_5BB9_91CF(_____5F53_524D_73A9_5BB6_4EBA_6570)
     local _____672C_8F6E_8D85_8F7D_8868 = {}
     local _____533A_57DF_5217_8868 = context["安全域区域组"]["区域列表"]
     do
@@ -149,7 +157,7 @@ ____exports["刷新米亚平台超载惩罚"] = function(context, nowMs)
                 local _____533A_57DF = _____533A_57DF_5217_8868[i + 1]
                 local id = _____53D6_5E73_53F0ID(_____533A_57DF)
                 if id == "" or context["腐化转移污染平台ID"] == id then
-                    goto __continue31
+                    goto __continue32
                 end
                 local units = _____53D6_5E73_53F0_5185_82F1_96C4(_____533A_57DF, heroes)
                 if #units > capacity then
@@ -157,7 +165,7 @@ ____exports["刷新米亚平台超载惩罚"] = function(context, nowMs)
                     _____5904_7406_8D85_8F7D_5E73_53F0(context, _____533A_57DF, units, nowMs)
                 end
             end
-            ::__continue31::
+            ::__continue32::
             i = i + 1
         end
     end
@@ -168,7 +176,7 @@ ____exports["刷新米亚平台超载惩罚"] = function(context, nowMs)
             do
                 local id = _____53D6_5E73_53F0ID(_____533A_57DF_5217_8868[i + 1])
                 if id == "" then
-                    goto __continue35
+                    goto __continue36
                 end
                 if _____672C_8F6E_8D85_8F7D_8868[id] == true then
                     _____4ECD_6709_8D85_8F7D = true
@@ -177,7 +185,7 @@ ____exports["刷新米亚平台超载惩罚"] = function(context, nowMs)
                     context["超载平台下次叠层Ms表"][id] = nil
                 end
             end
-            ::__continue35::
+            ::__continue36::
             i = i + 1
         end
     end

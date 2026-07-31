@@ -40,7 +40,7 @@ export interface 持续单位连线参数 {
 
 export interface 持续单位连线实例 {
   readonly 闪电: any;
-  停止(this: void, 原因?: string): void;
+  停止(原因?: string): void;
 }
 
 const 持续单位连线表: Record<number, 持续单位连线实现 | undefined> = {};

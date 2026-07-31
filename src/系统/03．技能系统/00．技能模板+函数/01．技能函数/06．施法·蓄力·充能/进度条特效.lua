@@ -53,7 +53,7 @@ _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____requ
 local _____8C03_8BD5_6A21_5757_540D = "进度条特效"
 local PROGRESSBAR_UNIT_ID = 1697657167
 local PROGRESSBAR_OWNER_PLAYER_ID = 4
-local DEFAULT_HEIGHT_OFFSET = 233
+____exports["默认进度条高度偏移"] = 275
 local DEFAULT_SCALE = 1
 local DEFAULT_ANIM_INDEX = 0
 local DEFAULT_COLOR_RGBA = {r = 255, g = 255, b = 0, a = 255}
@@ -171,7 +171,7 @@ ____exports["创建进度条特效"] = function(_____5355_4F4D, _____9009_9879)
     if _____5DF2_6709_8FDB_5EA6_6761 ~= nil then
         _____79FB_9664_8FDB_5EA6_6761_7279_6548(_____5DF2_6709_8FDB_5EA6_6761)
     end
-    local _____9AD8_5EA6_504F_79FB = _____9009_9879 and _____9009_9879["高度偏移"] or DEFAULT_HEIGHT_OFFSET
+    local _____9AD8_5EA6_504F_79FB = _____9009_9879 and _____9009_9879["高度偏移"] or ____exports["默认进度条高度偏移"]
     local _____7F29_653E = _____9009_9879 and _____9009_9879["缩放"] or DEFAULT_SCALE
     local _____52A8_753B_5E8F_53F7 = _____9009_9879 and _____9009_9879["动画序号"] or DEFAULT_ANIM_INDEX
     local _____52A8_753B_901F_5EA6 = _____9009_9879 and _____9009_9879["动画速度"]

@@ -7,10 +7,10 @@ import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../
 import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 两点角度, 极坐标X, 极坐标Y, 点到线段距离平方, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
-import { 单位是否在条形区域 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/矩形区域';
-import { createTimedEffect, 设置特效XYZ轴旋转 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
+import { createTimedEffect, 创建点特效 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
 import { 播放苍影灵卫台词 } from '../12．台词播放';
 import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
+import { 创建原生弹幕, 销毁原生弹幕 } from '../../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能敌对英雄列表: (this: void, boss: any) => any[] };
@@ -19,17 +19,20 @@ const { 开始牵引, 停止牵引 } = require('系统.03．技能系统.00．�
   停止牵引: (this: void, id: number) => boolean;
 };
 const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as { 造成AOE技能伤害: (this: void, params: any) => boolean };
-const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
 
 const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
+const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 function 取祷潮目标列表(this: void, boss: any, target?: any): any[] {
@@ -69,7 +72,9 @@ function 检查祷潮穿过校准节点(this: void, context: 祖地双灵卫运�
   for (let i = 0; i < context.净化节点列表.length; i++) {
     const node = context.净化节点列表[i];
     if (node.序号 !== context.当前净化节点序号 || node.阶段 !== '校准') continue;
-    if (点到线段距离平方(node.X, node.Y, startX, startY, endX, endY) <= radius * radius) 净化校准节点(context, node);
+    const distance2 = 点到线段距离平方(node.X, node.Y, startX, startY, endX, endY);
+    const hit = distance2 <= radius * radius;
+    if (hit) 净化校准节点(context, node);
     return;
   }
 }
@@ -98,7 +103,13 @@ export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时
   播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.苍影镇魂印, startX, startY, 祖地双灵卫数值与表现配置.音效默认裁断距离);
   创建技能提示圈({ 类型: '方向直线', X: startX, Y: startY, 宽度: cfg.宽度, 长度: cfg.长度, 朝向: facing, 持续时间: cfg.预警秒, 来源单位: boss });
   播放限时单位动画({ 单位: boss, 动画编号: cfg.动画编号, 持续秒: cfg.预警秒 + 0.35, 恢复动画编号: cfg.恢复动画编号 });
-  createTimedEffect(祖地双灵卫数值与表现配置.表现资源.失名祷潮.祷潮蓄势特效路径, startX, startY, 0, cfg.预警秒);
+  创建点特效({
+    模型路径: 祖地双灵卫数值与表现配置.表现资源.失名祷潮.祷潮蓄势特效路径,
+    X: startX,
+    Y: startY,
+    缩放: 祖地双灵卫数值与表现配置.表现资源.失名祷潮.祷潮蓄势特效缩放,
+    持续秒: cfg.预警秒,
+  });
   const pullIds: number[] = [];
   for (let i = 0; i < targets.length; i++) {
     if (!单位有效(targets[i])) continue;
@@ -111,26 +122,49 @@ export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时
   const resolveId = addDelayedCallback(cfg.预警秒 * 1000, function 失名祷潮结算(this: void): void {
     for (let i = 0; i < pullIds.length; i++) 停止牵引(pullIds[i]);
     if (!单位有效(boss) || context.战斗已结束) return;
-    let absorbed = false;
-    const seal = context.镇魂印;
-    if (seal != null && seal.到期Ms > getServerTime()) {
-      const hitRadius = seal.半径 + cfg.宽度 * 0.5;
-      absorbed = 点到线段距离平方(seal.X, seal.Y, startX, startY, endX, endY) <= hitRadius * hitRadius;
-    }
-    const effect = createTimedEffect(祖地双灵卫数值与表现配置.表现资源.失名祷潮.定向灵魂潮特效路径, startX, startY, 0, 1);
-    设置特效XYZ轴旋转(effect, { Z轴角度: facing });
-    if (absorbed) {
-      消耗镇魂印并压制(context, boss);
-      return;
-    }
-    检查祷潮穿过校准节点(context, startX, startY, endX, endY);
     const heroes = 获取Boss技能敌对英雄列表(boss);
-    for (let i = 0; i < heroes.length; i++) {
-      const hit = heroes[i];
-      if (!单位是否在条形区域(hit, startX, startY, endX, endY, cfg.宽度)) continue;
-      const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-      造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·失名祷潮' });
-    }
+    let barrage: any = undefined;
+    let monitorId = 0;
+    monitorId = addPeriodicCallback(10, function 失名祷潮镇魂印拦截Tick(this: void): void {
+      if (barrage == null || barrage.弹幕单位 == null || barrage.弹幕单位 === 0) return;
+      const seal = context.镇魂印;
+      if (seal == null || seal.到期Ms <= getServerTime()) return;
+      const hitRadius = seal.半径 + cfg.宽度 * 0.5;
+      const dx = GetUnitX(barrage.弹幕单位) - seal.X;
+      const dy = GetUnitY(barrage.弹幕单位) - seal.Y;
+      if (dx * dx + dy * dy > hitRadius * hitRadius) return;
+      SetUnitVertexColor(barrage.弹幕单位, 255, 255, 255, 0);
+      销毁原生弹幕(barrage.弹幕ID);
+      if (monitorId > 0) removePeriodicCallback(monitorId);
+      消耗镇魂印并压制(context, boss);
+    });
+    barrage = 创建原生弹幕({
+      所有者: boss,
+      载体模式: '单位',
+      模型: 祖地双灵卫数值与表现配置.表现资源.失名祷潮.定向灵魂潮特效路径,
+      X: startX,
+      Y: startY,
+      方向角: facing,
+      速度: cfg.长度 / 0.8,
+      生命周期: 1.2,
+      最大距离: cfg.长度,
+      命中半径: cfg.宽度 * 0.5,
+      影响目标: '敌方',
+      每单位最大命中次数: 1,
+      碰撞消失: false,
+      目标筛选: function 失名祷潮目标筛选(this: void, unit: any): boolean {
+        for (let i = 0; i < heroes.length; i++) if (heroes[i] === unit) return true;
+        return false;
+      },
+      on命中: function 失名祷潮命中(this: void, hit: any): void {
+        const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
+        造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_SHADOW_STRIKE, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·失名祷潮' });
+      },
+      on到达目标点: function 失名祷潮到达终点(this: void): void {
+        if (monitorId > 0) removePeriodicCallback(monitorId);
+        检查祷潮穿过校准节点(context, startX, startY, endX, endY);
+      },
+    });
   });
   context.清理.登记延迟回调('祖地双灵卫-失名祷潮结算', resolveId);
   return true;

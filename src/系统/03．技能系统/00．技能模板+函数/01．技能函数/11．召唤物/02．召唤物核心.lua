@@ -28,6 +28,7 @@ local DzSetUnitMissileArc = japi.DzSetUnitMissileArc
 local DzSetUnitMissileSpeed = japi.DzSetUnitMissileSpeed
 local DzSetUnitMissileHoming = japi.DzSetUnitMissileHoming
 local DzSetUnitName = japi.DzSetUnitName
+local DzUnitDisableAttack = japi.DzUnitDisableAttack
 local CreateUnit = _____5171_4EAB.CreateUnit
 local GetHandleId = _____5171_4EAB.GetHandleId
 local GetOwningPlayer = _____5171_4EAB.GetOwningPlayer
@@ -191,6 +192,9 @@ local function _____5E94_7528_53EC_5524_7269_5C5E_6027(unit, _____53C2_6570)
     end
     if _____53C2_6570["固定站桩"] == true then
         X_FixUnitStandingSafe(unit)
+    end
+    if _____53C2_6570["禁止普攻"] == true and DzUnitDisableAttack ~= nil then
+        DzUnitDisableAttack(unit, true)
     end
     if _____53C2_6570["普攻弹道模型"] ~= nil and _____53C2_6570["普攻弹道模型"] ~= "" and DzSetUnitMissileModel ~= nil then
         DzSetUnitMissileModel(unit, _____53C2_6570["普攻弹道模型"])

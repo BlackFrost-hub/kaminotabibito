@@ -30,7 +30,7 @@ export const 菲尼克斯尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 84,
     canPurge: false,
-    tooltip: "凤凰火焰留下的元素烙印。元素爆发会读取最高层元素，火印最高时触发火焰惩罚；脱离对应危险区后逐步衰减。",
+    tooltip: "最多6层；每次获得或刷新持续30秒。炽羽散射落点、燃烧区、熔岩吐息和凤凰漩涡会增加1层。元素爆发读取最高层时，凤凰火印成为最高层则按当前攻击力×120%+目标最大生命值×5%结算，结算后该最高层减少2层。",
   },
   [菲尼克斯尔BuffID.冷焰印记]: {
     buffID: 菲尼克斯尔BuffID.冷焰印记,
@@ -47,7 +47,7 @@ export const 菲尼克斯尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 84,
     canPurge: false,
-    tooltip: "冷焰侵入体内形成的元素烙印。元素爆发会读取最高层元素，冷焰最高时触发冷焰伤害和短暂硬直；脱离对应危险区后逐步衰减。",
+    tooltip: "最多6层；每次获得或刷新持续30秒。元素爆发读取最高层时，冷焰印记成为最高层则按当前攻击力×80%+目标最大生命值×3%结算，结算后该最高层减少2层。",
   },
   [菲尼克斯尔BuffID.毒火蚀痕]: {
     buffID: 菲尼克斯尔BuffID.毒火蚀痕,
@@ -64,7 +64,7 @@ export const 菲尼克斯尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 84,
     canPurge: false,
-    tooltip: "毒火腐蚀留下的元素烙印。元素爆发会读取最高层元素，毒火最高时触发已损失生命伤害并降低治疗效果；脱离对应危险区后逐步衰减。",
+    tooltip: "最多6层；每次获得或刷新持续30秒。元素爆发读取最高层时，毒火蚀痕成为最高层则按目标已损失生命值×20%结算，结算后该最高层减少2层。",
   },
   [菲尼克斯尔BuffID.怨火烙印]: {
     buffID: 菲尼克斯尔BuffID.怨火烙印,
@@ -81,7 +81,7 @@ export const 菲尼克斯尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 84,
     canPurge: false,
-    tooltip: "怨火与骸骨烈焰留下的元素烙印。元素爆发会读取最高层元素，怨火最高时触发暗火伤害并提高下一次大招威胁；脱离对应危险区后逐步衰减。",
+    tooltip: "最多6层；每次获得或刷新持续30秒。骸骨弹幕、怨火链接和凤凰挽歌圈外命中会增加1层。元素爆发读取最高层时，怨火烙印成为最高层则按当前攻击力×150%+目标最大生命值×4%结算，结算后该最高层减少2层。",
   },
   [菲尼克斯尔BuffID.导管破封]: {
     buffID: 菲尼克斯尔BuffID.导管破封,
@@ -96,7 +96,7 @@ export const 菲尼克斯尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 90,
     canPurge: false,
-    tooltip: "能量导管被摧毁后，菲尼克斯尔受到的伤害提高，同时技能强度提高。每摧毁1根导管叠加1层，最多4层。",
+    tooltip: "持续3600秒。每摧毁1根能量导管获得1层，最多4层；每层使菲尼克斯尔受到的最终伤害提高8%、技能强度提高6%。1/2/3/4层分别为承伤+8%/+16%/+24%/+32%，技能强度+6%/+12%/+18%/+24%。",
   },
   [菲尼克斯尔BuffID.怨火链接]: {
     buffID: 菲尼克斯尔BuffID.怨火链接,
@@ -113,7 +113,7 @@ export const 菲尼克斯尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 92,
     canPurge: false,
-    tooltip: "被怨火链接锁定。链接穿过单位会造成暗火伤害并叠加怨火烙印；主动拉断链接会触发爆炸惩罚。",
+    tooltip: "链接持续8秒，连线宽90码。两端距离超过850码时断链，双方各承受目标已损失生命值×18%+当前攻击力×120%，并各获得1层怨火烙印；其他单位进入连线宽度内时，每0.5秒承受当前攻击力×40%+目标最大生命值×1.5%，并获得1层怨火烙印。",
   },
   [菲尼克斯尔BuffID.永恒轮回]: {
     buffID: 菲尼克斯尔BuffID.永恒轮回,
@@ -130,7 +130,7 @@ export const 菲尼克斯尔Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 96,
     canPurge: false,
-    tooltip: "菲尼克斯尔进入永恒轮回，引导重生并召唤凤凰之卵。摧毁全部凤凰之卵可打断轮回，否则按存活凤凰蛋数量恢复生命并造成全场惩罚。",
+    tooltip: "菲尼克斯尔生命值≤5%时触发，持续15秒并生成4枚凤凰之卵；每枚凤凰蛋最大生命值为Boss最大生命值的8%。15秒后若仍有蛋存活，每枚恢复Boss最大生命值12%，并对全场每名玩家结算目标最大生命值20%+Boss当前攻击力×150%；4枚全部摧毁则Boss死亡。",
   },
 };
 

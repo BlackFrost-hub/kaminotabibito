@@ -30,7 +30,7 @@ const { 立即移除单位并取消排泄登记 } = require("系统.00．核心�
 const 调试模块名 = "进度条特效";
 const PROGRESSBAR_UNIT_ID = 1697657167; // 'e01O'
 const PROGRESSBAR_OWNER_PLAYER_ID = 4;
-const DEFAULT_HEIGHT_OFFSET = 233.0;
+export const 默认进度条高度偏移 = 275.0;
 const DEFAULT_SCALE = 1.0;
 const DEFAULT_ANIM_INDEX = 0;
 const DEFAULT_COLOR_RGBA = { r: 255, g: 255, b: 0, a: 255 };
@@ -160,7 +160,7 @@ export function 创建进度条特效(单位: any, 选项?: 进度条特效选�
     移除进度条特效(已有进度条);
   }
 
-  const 高度偏移 = 选项?.高度偏移 ?? DEFAULT_HEIGHT_OFFSET;
+  const 高度偏移 = 选项?.高度偏移 ?? 默认进度条高度偏移;
   const 缩放 = 选项?.缩放 ?? DEFAULT_SCALE;
   const 动画序号 = 选项?.动画序号 ?? DEFAULT_ANIM_INDEX;
   const 动画速度 = 选项?.动画速度;

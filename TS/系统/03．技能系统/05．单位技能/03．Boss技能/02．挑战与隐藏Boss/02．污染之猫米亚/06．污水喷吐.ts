@@ -27,8 +27,17 @@ const { 创建持续危险区域 } = require("系统.03．技能系统.00．技�
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+};
+const { ceil } = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算") as {
+  ceil: (this: void, value: number) => number;
+};
+const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
+  CosBJ: (this: void, degrees: number) => number;
+  SinBJ: (this: void, degrees: number) => number;
 };
 const jass = require("jass.common") as any;
 
@@ -39,8 +48,6 @@ const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
-const CosBJ = jass.CosBJ as (degrees: number) => number;
-const SinBJ = jass.SinBJ as (degrees: number) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 
 const BJ_RADTODEG = 57.29577951308232;
@@ -50,48 +57,183 @@ let 米亚污水喷吐已注册 = false;
 
 interface 米亚污水喷吐结算变量 {
   context: 米亚运行时上下文;
-  target: any;
   朝向: number;
+  中心X: number;
+  中心Y: number;
 }
 
-function 点在前方扇形内(this: void, boss: any, target: any, range: number, halfAngle: number, facing: number): boolean {
-  const dx = GetUnitX(target) - GetUnitX(boss);
-  const dy = GetUnitY(target) - GetUnitY(boss);
+interface 米亚单位坐标 {
+  x: number;
+  y: number;
+}
+
+interface 米亚污水喷吐表现周期变量 {
+  context: 米亚运行时上下文;
+  boss: any;
+  中心X: number;
+  中心Y: number;
+  朝向: number;
+  当前Tick数: number;
+  每Tick伤害倍率: number;
+  剩余Tick数: number;
+  周期ID: number;
+}
+
+function 读取米亚单位坐标(this: void, unit: any): 米亚单位坐标 | undefined {
+  if (unit == null || unit === 0) return undefined;
+  const x = GetUnitX(unit);
+  const y = GetUnitY(unit);
+  if (x == null || y == null) return undefined;
+  return { x, y };
+}
+
+function 点在前方扇形内(this: void, 中心X: number, 中心Y: number, target: any, range: number, halfAngle: number, facing: number): boolean {
+  if (target == null || target === 0 || !单位有效(target)) return false;
+  const target坐标 = 读取米亚单位坐标(target);
+  if (target坐标 == null) return false;
+  const dx = target坐标.x - 中心X;
+  const dy = target坐标.y - 中心Y;
   const distance2 = dx * dx + dy * dy;
   if (distance2 > range * range) return false;
-  const forwardX = CosBJ(facing);
-  const forwardY = SinBJ(facing);
+  const 安全朝向 = facing == null ? 0 : facing;
+  const forwardX = CosBJ(安全朝向);
+  const forwardY = SinBJ(安全朝向);
+  if (forwardX == null || forwardY == null) return false;
   const dot = dx * forwardX + dy * forwardY;
   if (dot <= 0) return false;
   const cosLimit = CosBJ(halfAngle);
+  if (cosLimit == null) return false;
   return dot * dot >= distance2 * cosLimit * cosLimit;
 }
 
-function 让单位面向目标(this: void, caster: any, target: any): void {
+function 让单位面向目标(this: void, caster: any, target: any, caster坐标?: 米亚单位坐标): void {
   if (!单位有效(caster) || !单位有效(target)) return;
-  const angle = Atan2(GetUnitY(target) - GetUnitY(caster), GetUnitX(target) - GetUnitX(caster)) * BJ_RADTODEG;
+  const 来源坐标 = caster坐标 != null ? caster坐标 : 读取米亚单位坐标(caster);
+  const 目标坐标 = 读取米亚单位坐标(target);
+  if (来源坐标 == null || 目标坐标 == null) return;
+  const angle = Atan2(目标坐标.y - 来源坐标.y, 目标坐标.x - 来源坐标.x) * BJ_RADTODEG;
+  if (angle == null) return;
   SetUnitFacing(caster, angle);
 }
 
-function 播放喷吐表现(this: void, boss: any, facing: number): void {
+function 执行米亚污水喷吐伤害Tick(this: void, data: 米亚污水喷吐表现周期变量): void {
+  const context = data.context;
+  const boss = data.boss;
   const config = 米亚技能数值配置.污水喷吐;
-  const x = GetUnitX(boss) + CosBJ(facing) * 120;
-  const y = GetUnitY(boss) + SinBJ(facing) * 120;
+  const targets = 获取Boss技能敌对英雄列表Ex(boss);
+  for (let i = 0; i < targets.length; i++) {
+    const target = targets[i];
+    if (!单位有效(target) || !点在前方扇形内(data.中心X, data.中心Y, target, config.喷吐距离, config.喷吐半角, data.朝向)) continue;
+    执行Boss技能伤害({
+      技能ID: 污水喷吐技能ID,
+      来源: boss,
+      目标: target,
+      伤害公式: {
+        来源攻击力比例: config.直接伤害Boss攻击力比例,
+        目标最大生命比例: config.直接伤害目标最大生命比例,
+        总倍率: config.直接伤害总倍率 * data.每Tick伤害倍率 * 取米亚污染标记伤害倍率(context, target) * 取米亚平台超载伤害倍率(target),
+      },
+      attackType: jass.ATTACK_TYPE_NORMAL,
+      伤害类型: jass.DAMAGE_TYPE_POISON,
+      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+      伤害形态: "AOE",
+      标签: "米亚污水喷吐Tick",
+    });
+    if (data.当前Tick数 === 1) {
+      添加米亚腐化感染(context, target, config.直接腐化层数, "污水喷吐");
+    }
+  }
+}
+
+function 播放米亚污水喷吐表现Tick(this: void, variable?: any): void {
+  const data = variable as 米亚污水喷吐表现周期变量 | undefined;
+  if (data == null) return;
+  if (data.剩余Tick数 <= 0) {
+    if (data.周期ID > 0) {
+      removePeriodicCallback(data.周期ID);
+      data.周期ID = 0;
+    }
+    return;
+  }
+  const context = data.context;
+  const boss = data.boss;
+  if (context == null || context.清理 == null || context.清理.已清理() || !单位有效(boss)) {
+    if (data.周期ID > 0) {
+      removePeriodicCallback(data.周期ID);
+      data.周期ID = 0;
+    }
+    return;
+  }
+  const config = 米亚技能数值配置.污水喷吐;
+  const 安全朝向 = data.朝向 == null ? 0 : data.朝向;
+  const forwardX = CosBJ(安全朝向);
+  const forwardY = SinBJ(安全朝向);
+  if (data.中心X == null || data.中心Y == null || forwardX == null || forwardY == null) {
+    if (data.周期ID > 0) {
+      removePeriodicCallback(data.周期ID);
+      data.周期ID = 0;
+    }
+    return;
+  }
+  const x = data.中心X + forwardX * config.喷吐特效前移距离;
+  const y = data.中心Y + forwardY * config.喷吐特效前移距离;
   创建点特效({
     模型路径: config.喷吐特效路径,
     X: x,
     Y: y,
-    Z轴角度: facing,
+    Z轴角度: 安全朝向,
     缩放: config.喷吐特效缩放,
-    持续秒: config.喷吐特效持续秒,
+    持续秒: config.喷吐特效单次生命周期秒,
+    红: config.喷吐特效红,
+    绿: config.喷吐特效绿,
+    蓝: config.喷吐特效蓝,
+    透明度: config.喷吐特效透明度,
   });
+  执行米亚污水喷吐伤害Tick(data);
+  data.当前Tick数 = data.当前Tick数 + 1;
+  data.剩余Tick数 = data.剩余Tick数 - 1;
+  if (data.剩余Tick数 <= 0 && data.周期ID > 0) {
+    removePeriodicCallback(data.周期ID);
+    data.周期ID = 0;
+  }
 }
 
-function 创建污水喷吐残留区(this: void, context: 米亚运行时上下文, facing: number): void {
-  const boss = context.Boss单位;
+function 播放喷吐表现(this: void, context: 米亚运行时上下文, boss: any, 中心X: number, 中心Y: number, facing: number): void {
+  if (context == null || context.清理 == null || context.清理.已清理() || boss == null || boss === 0 || !单位有效(boss)) {
+    return;
+  }
   const config = 米亚技能数值配置.污水喷吐;
-  const x = GetUnitX(boss) + CosBJ(facing) * (config.喷吐距离 * 0.55);
-  const y = GetUnitY(boss) + SinBJ(facing) * (config.喷吐距离 * 0.55);
+  const tick秒 = config.喷吐特效Tick秒;
+  const 总Tick数 = tick秒 > 0 ? ceil(config.喷吐特效持续秒 / tick秒) : 0;
+  if (总Tick数 <= 0) return;
+  const data: 米亚污水喷吐表现周期变量 = {
+    context,
+    boss,
+    中心X,
+    中心Y,
+    朝向: facing,
+    当前Tick数: 1,
+    每Tick伤害倍率: 1 / 总Tick数,
+    剩余Tick数: 总Tick数,
+    周期ID: 0,
+  };
+  播放米亚污水喷吐表现Tick(data);
+  if (data.剩余Tick数 <= 0) return;
+  data.周期ID = addPeriodicCallback(tick秒 * 1000, 播放米亚污水喷吐表现Tick, data);
+  context.清理.登记周期回调("米亚-污水喷吐表现Tick", data.周期ID);
+}
+
+function 创建污水喷吐残留区(this: void, context: 米亚运行时上下文, 中心X: number, 中心Y: number, facing: number): void {
+  if (context == null || context.清理 == null || context.清理.已清理()) return;
+  const boss = context.Boss单位;
+  if (boss == null || boss === 0 || !单位有效(boss)) return;
+  const config = 米亚技能数值配置.污水喷吐;
+  const 安全朝向 = facing == null ? 0 : facing;
+  const forwardX = CosBJ(安全朝向);
+  const forwardY = SinBJ(安全朝向);
+  if (中心X == null || 中心Y == null || forwardX == null || forwardY == null) return;
+  const x = 中心X + forwardX * (config.喷吐距离 * 0.55);
+  const y = 中心Y + forwardY * (config.喷吐距离 * 0.55);
   创建持续危险区域({
     X: x,
     Y: y,
@@ -104,6 +246,7 @@ function 创建污水喷吐残留区(this: void, context: 米亚运行时上下�
     特效高度: 0,
     提示圈: { 类型: "敌方圆形" },
     on周期: function 米亚污水喷吐残留区周期(this: void, 区域内单位: any[]): void {
+      if (context == null || context.清理 == null || context.清理.已清理()) return;
       for (let i = 0; i < 区域内单位.length; i++) {
         添加米亚腐化感染(context, 区域内单位[i], config.残留每秒腐化层数, "污水喷吐残留");
       }
@@ -115,60 +258,57 @@ function 结算米亚污水喷吐(this: void, variable?: any): void {
   const data = variable as 米亚污水喷吐结算变量 | undefined;
   if (data == null) return;
   const context = data.context;
+  if (context == null || context.清理 == null || context.清理.已清理()) return;
   const boss = context.Boss单位;
-  if (!单位有效(boss)) return;
+  const boss有效 = boss != null && boss !== 0 && 单位有效(boss);
+  if (!boss有效) return;
+  const 中心X = data.中心X;
+  const 中心Y = data.中心Y;
+  if (中心X == null || 中心Y == null) return;
 
   const config = 米亚技能数值配置.污水喷吐;
-  SetUnitFacing(boss, data.朝向);
-  播放喷吐表现(boss, data.朝向);
-  创建污水喷吐残留区(context, data.朝向);
+  const 安全朝向 = data.朝向 == null ? GetUnitFacing(boss) : data.朝向;
+  const 最终朝向 = 安全朝向 == null ? 0 : 安全朝向;
+  SetUnitFacing(boss, 最终朝向);
+  播放喷吐表现(context, boss, 中心X, 中心Y, 最终朝向);
+  创建污水喷吐残留区(context, 中心X, 中心Y, 最终朝向);
 
-  const targets = 获取Boss技能敌对英雄列表Ex(boss, boss, config.喷吐距离);
-  for (let i = 0; i < targets.length; i++) {
-    const target = targets[i];
-    if (!单位有效(target) || !点在前方扇形内(boss, target, config.喷吐距离, config.喷吐半角, data.朝向)) continue;
-    执行Boss技能伤害({
-      技能ID: 污水喷吐技能ID,
-      来源: boss,
-      目标: target,
-      伤害公式: {
-        来源攻击力比例: config.直接伤害Boss攻击力比例,
-        目标最大生命比例: config.直接伤害目标最大生命比例,
-        总倍率: config.直接伤害总倍率 * 取米亚污染标记伤害倍率(context, target) * 取米亚平台超载伤害倍率(target),
-      },
-      attackType: jass.ATTACK_TYPE_NORMAL,
-      伤害类型: jass.DAMAGE_TYPE_POISON,
-      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-      伤害形态: "AOE",
-    });
-    添加米亚腐化感染(context, target, config.直接腐化层数, "污水喷吐");
-  }
 }
 
 export function 释放米亚污水喷吐(this: void, context: 米亚运行时上下文): void {
+  if (context == null || context.清理 == null || context.清理.已清理()) return;
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const config = 米亚技能数值配置.污水喷吐;
   const threatTarget = 获取Boss技能应攻击目标(boss)?.targetRef;
-  if (单位有效(threatTarget)) 让单位面向目标(boss, threatTarget);
-  const facing = GetUnitFacing(boss);
+  const boss坐标 = 读取米亚单位坐标(boss);
+  if (boss坐标 == null) return;
+  if (单位有效(threatTarget)) 让单位面向目标(boss, threatTarget, boss坐标);
+  const 当前朝向 = GetUnitFacing(boss);
+  const facing = 当前朝向 == null ? 0 : 当前朝向;
+  SetUnitFacing(boss, facing);
   播放米亚台词(boss, "污水喷吐");
-  播放Boss坐标音效(米亚音效配置.污水喷吐.前摇蓄力, GetUnitX(boss), GetUnitY(boss), 米亚音效配置.默认裁断距离);
-  延迟播放Boss坐标音效(米亚音效配置.污水喷吐.持续喷射, GetUnitX(boss), GetUnitY(boss), 米亚音效配置.污水喷吐.持续喷射延迟Ms, 米亚音效配置.默认裁断距离);
-  开始米亚常规施法(boss, config.前摇秒, "污水喷吐", "离开米亚正面的喷吐扇形", config.总硬直秒);
+  播放Boss坐标音效(米亚音效配置.污水喷吐.前摇蓄力, boss坐标.x, boss坐标.y, 米亚音效配置.默认裁断距离);
+  延迟播放Boss坐标音效(米亚音效配置.污水喷吐.持续喷射, boss坐标.x, boss坐标.y, 米亚音效配置.污水喷吐.持续喷射延迟Ms, 米亚音效配置.默认裁断距离);
+  开始米亚常规施法(boss, config.总硬直秒, "污水喷吐", `1秒后向正面喷吐${config.喷吐特效持续秒}秒，范围${config.喷吐距离}码、${config.喷吐半角 * 2}°扇形（离开米亚正面）`, config.总硬直秒);
   SetUnitTimeScale(boss, config.动画速度);
   SetUnitAnimationByIndex(boss, config.动画编号);
   创建技能提示圈({
     类型: "红色扇形",
-    X: GetUnitX(boss),
-    Y: GetUnitY(boss),
+    X: boss坐标.x,
+    Y: boss坐标.y,
     半径: config.喷吐距离,
     扇形角度: config.喷吐半角 * 2,
     朝向: facing,
     持续时间: config.前摇秒,
     来源单位: boss,
   });
-  const delayedId = addDelayedCallback(config.前摇秒 * 1000, 结算米亚污水喷吐, { context, target: threatTarget, 朝向: facing } as 米亚污水喷吐结算变量);
+  const delayedId = addDelayedCallback(config.前摇秒 * 1000, 结算米亚污水喷吐, {
+    context,
+    朝向: facing,
+    中心X: boss坐标.x,
+    中心Y: boss坐标.y,
+  } as 米亚污水喷吐结算变量);
   context.清理.登记延迟回调("米亚-污水喷吐结算", delayedId);
 }
 

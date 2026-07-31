@@ -206,6 +206,15 @@ ____exports["充能单位指定标签护盾"] = function(_____5355_4F4DID, _____
     end
     return nextValue - oldValue
 end
+____exports["刷新单位指定标签护盾持续时间"] = function(_____5355_4F4DID, _____6807_7B7E, _____6301_7EED_65F6_95F4)
+    local _____5B9E_4F8B = ____exports["获取单位指定标签护盾实例"](_____5355_4F4DID, _____6807_7B7E)
+    if _____5B9E_4F8B == nil or not (_____6301_7EED_65F6_95F4 > 0) then
+        return false
+    end
+    _____5B9E_4F8B["总持续时间"] = _____6301_7EED_65F6_95F4
+    _____5B9E_4F8B["剩余时间"] = _____6301_7EED_65F6_95F4
+    return true
+end
 ____exports["删除单位指定标签护盾"] = function(_____5355_4F4DID, _____6807_7B7E)
     local ids = ____exports["获取单位护盾列表"](_____5355_4F4DID)
     local deleted = {}

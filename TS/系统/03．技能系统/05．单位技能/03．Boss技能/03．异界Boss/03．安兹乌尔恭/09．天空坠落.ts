@@ -236,7 +236,7 @@ export function 释放安兹天空坠落(this: void, context: 安兹运行时上
       总时长: castSeconds,
       颜色ID: 3,
       标题文本: '超位魔法·天空坠落',
-      提示文本: '进入墓碑背后的白色安全区',
+      提示文本: '引导4.0~4.8秒；进入半径210码墓碑阴影安全区',
     },
     on生效: function 天空坠落生效(this: void): void {
       启动天空坠落结算(context, instance);

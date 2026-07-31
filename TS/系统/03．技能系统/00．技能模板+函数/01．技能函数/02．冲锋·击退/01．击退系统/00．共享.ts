@@ -3,6 +3,12 @@ import type { 技能伤害来源类型, 技能伤害形态, 装备技能伤害�
 import type { 英雄技能距离修正上下文 } from "../../../04．机制组件/11．技能属性修正";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha as ((effect: any, alpha: number) => void) | undefined;
+const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+};
 const jglobals = require("jass.globals") as any;
 const { X_GAFC, X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
   X_GAFC: (x1: number, y1: number, x2: number, y2: number) => number;
@@ -100,6 +106,9 @@ export interface 通用位移参数 {
 }
 
 export interface 冲锋参数 extends 通用位移参数 {
+  /** 传入后由冲锋表现层播放指定动作，不再自动切换到 walk。 */
+  动画序号?: number;
+  动画名?: string;
   角度?: number;
   目标X?: number;
   目标Y?: number;
@@ -236,8 +245,14 @@ function 播放单个位移特效(模型: string, 实例: 位移实例): void {
   if (模型 == null || 模型 === "") return;
   const 特效 = jass.AddSpecialEffect(模型, jass.GetUnitX(实例.单位) as number, jass.GetUnitY(实例.单位) as number);
   if (特效 != null && 特效 !== 0) {
-    jass.DestroyEffect(特效);
+    addDelayedCallback(300, 冲锋位移特效到期, 特效);
   }
+}
+
+function 冲锋位移特效到期(this: void, 特效?: any): void {
+  if (特效 == null || 特效 === 0) return;
+  if (typeof DzSetEffectVertexAlpha === "function") DzSetEffectVertexAlpha(特效, 0);
+  DestroyEffect(特效);
 }
 
 export function 获取枚举组(): any {

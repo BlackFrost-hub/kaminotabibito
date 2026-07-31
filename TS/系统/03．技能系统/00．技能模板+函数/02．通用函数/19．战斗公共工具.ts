@@ -133,6 +133,40 @@ export function 点到线段距离平方(this: void, px: number, py: number, ax:
   return 距离平方XY(px, py, cx, cy);
 }
 
+/** 判断目标是否位于指定方向障碍物的下游遮挡带内。 */
+export function 点是否处于方向障碍物后方(
+  this: void,
+  弹幕X: number,
+  弹幕Y: number,
+  方向角: number,
+  障碍物X: number,
+  障碍物Y: number,
+  目标X: number,
+  目标Y: number,
+  障碍物半径: number,
+): boolean {
+  if (障碍物半径 < 0) return false;
+
+  const directionX = Cos(方向角 * 角度转弧度);
+  const directionY = Sin(方向角 * 角度转弧度);
+  const obstacleDX = 障碍物X - 弹幕X;
+  const obstacleDY = 障碍物Y - 弹幕Y;
+  const targetDX = 目标X - 弹幕X;
+  const targetDY = 目标Y - 弹幕Y;
+  const obstacleProjection = obstacleDX * directionX + obstacleDY * directionY;
+  const targetProjection = targetDX * directionX + targetDY * directionY;
+
+  // 障碍物必须在弹幕前方，目标必须位于同一方向且在障碍物之后。
+  if (obstacleProjection <= 0 || targetProjection <= obstacleProjection) return false;
+
+  // 目标可以偏离中心线，但必须落在障碍物沿弹幕方向投影出的安全带内。
+  const targetRelativeX = 目标X - 障碍物X;
+  const targetRelativeY = 目标Y - 障碍物Y;
+  const lateralDistance = targetRelativeX * directionY - targetRelativeY * directionX;
+  const absoluteLateralDistance = lateralDistance < 0 ? -lateralDistance : lateralDistance;
+  return absoluteLateralDistance <= 障碍物半径;
+}
+
 export function 播放点特效(this: void, model: string | undefined | null, x: number, y: number): void {
   if (model == null || model === "") return;
   const effect = AddSpecialEffect(model, x, y);

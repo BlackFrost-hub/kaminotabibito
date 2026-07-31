@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BA1_7B97_55B7_53D1_4F24_5BB3, _____521B_5EFA_968F_673A_843D_70B9, _____64AD_653E_55B7_53D1_7279_6548, _____521B_5EFA_7194_5CA9_6B8B_7559_533A, _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1, ____on_5DF4_5C14_624E_7F57_65AF_7194_5CA9_55B7_53D1_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____521B_5EFA_70B9_7279_6548, CosBJ, SinBJ, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, GetRandomReal, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____7194_5CA9_55B7_53D1_6280_80FDID
+local _____8BA1_7B97_55B7_53D1_4F24_5BB3, _____521B_5EFA_968F_673A_843D_70B9, _____64AD_653E_55B7_53D1_7279_6548, _____521B_5EFA_7194_5CA9_6B8B_7559_533A, _____5904_7406_7194_5CA9_55B7_53D1_7206_53D1_547D_4E2D, _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1, ____on_5DF4_5C14_624E_7F57_65AF_7194_5CA9_55B7_53D1_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_6301_7EED_5371_9669_533A_57DF, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____521B_5EFA_70B9_7279_6548, CosBJ, SinBJ, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitStateJapi, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, GetRandomReal, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____7194_5CA9_55B7_53D1_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -115,6 +115,34 @@ function _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, x, y)
         end
     )
 end
+function _____5904_7406_7194_5CA9_55B7_53D1_7206_53D1_547D_4E2D(boss, unit, config)
+    if not _____5355_4F4D_6709_6548(unit) then
+        return
+    end
+    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+        ["技能ID"] = _____7194_5CA9_55B7_53D1_6280_80FDID,
+        ["来源"] = boss,
+        ["目标"] = unit,
+        ["伤害"] = _____8BA1_7B97_55B7_53D1_4F24_5BB3(boss, unit),
+        attack = false,
+        ranged = true,
+        attackType = ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "Boss技能"
+    })
+    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["爆发灼热层数"])
+    _____5F00_59CB_539F_5730_51FB_98DE(unit, {
+        ["持续时间"] = config["爆发持续顶飞秒"],
+        ["最小高度"] = 180,
+        ["最大高度"] = 260,
+        ["暂停单位"] = false,
+        ["主单位"] = boss,
+        ["主单位死亡时中断"] = true,
+        ["中断已有跳跃"] = true,
+        ["冲击波模型"] = ""
+    })
+end
 function _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1(context, _____843D_70B9)
     local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(boss) then
@@ -137,6 +165,7 @@ function _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1(context, _____843D_70B9)
         _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["熔岩喷发"]["最后爆裂延迟Ms"],
         _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
     )
+    local _____7206_53D1_547D_4E2D_8BB0_5F55 = {}
     local instance = _____521B_5EFA_6301_7EED_5371_9669_533A_57DF({
         X = _____843D_70B9.X,
         Y = _____843D_70B9.Y,
@@ -146,33 +175,26 @@ function _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1(context, _____843D_70B9)
         ["影响目标"] = "敌方",
         ["所有者"] = boss,
         ["显示提示圈"] = false,
-        ["on进入"] = function(unit)
-            if not _____5355_4F4D_6709_6548(unit) then
-                return
+        ["on周期"] = function(units)
+            do
+                local i = 0
+                while i < #units do
+                    do
+                        local unit = units[i + 1]
+                        if not _____5355_4F4D_6709_6548(unit) then
+                            goto __continue21
+                        end
+                        local handleId = GetHandleId(unit)
+                        if _____7206_53D1_547D_4E2D_8BB0_5F55[handleId] then
+                            goto __continue21
+                        end
+                        _____7206_53D1_547D_4E2D_8BB0_5F55[handleId] = true
+                        _____5904_7406_7194_5CA9_55B7_53D1_7206_53D1_547D_4E2D(boss, unit, config)
+                    end
+                    ::__continue21::
+                    i = i + 1
+                end
             end
-            _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                ["技能ID"] = _____7194_5CA9_55B7_53D1_6280_80FDID,
-                ["来源"] = boss,
-                ["目标"] = unit,
-                ["伤害"] = _____8BA1_7B97_55B7_53D1_4F24_5BB3(boss, unit),
-                attack = false,
-                ranged = true,
-                attackType = ATTACK_TYPE_NORMAL,
-                ["伤害类型"] = DAMAGE_TYPE_FIRE,
-                weaponType = WEAPON_TYPE_WHOKNOWS,
-                ["来源类型"] = "Boss技能"
-            })
-            _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["爆发灼热层数"])
-            _____5F00_59CB_539F_5730_51FB_98DE(unit, {
-                ["持续时间"] = config["爆发持续顶飞秒"],
-                ["最小高度"] = 180,
-                ["最大高度"] = 260,
-                ["暂停单位"] = false,
-                ["主单位"] = boss,
-                ["主单位死亡时中断"] = true,
-                ["中断已有跳跃"] = true,
-                ["冲击波模型"] = ""
-            })
         end,
         ["on销毁"] = function()
             local ____self_9 = context["清理"]
@@ -263,6 +285,7 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
+GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState

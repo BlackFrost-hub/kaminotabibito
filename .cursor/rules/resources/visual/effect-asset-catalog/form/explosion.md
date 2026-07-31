@@ -2,8 +2,11 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
+| `Common\Effect\Form\Explosion\MoltesCorruptionBeetleBurst.mdx` | 绿色自然能量法阵、尖刺光柱与中心爆发光环，适合腐朽甲虫贴身爆炸。 | 仅有 `Stand` 序列；运行时在目标坐标创建并于 `2` 秒后销毁。 | 莫尔特斯·共生腐朽虫群的甲虫爆炸结算。 | 源模型 `JNTX (430).mdx`；`FelGlow.blp` 已迁入本分类 `Texture`，`Tornado2b.blp` 与 `RingOFire.blp` 复用 `Element\Water\Texture`；只作爆炸表现，不承担伤害判定。 | 32157 | `1188414FA646E6B5` |
 | `Common\Effect\Form\Explosion\AlbedoDarkGoldBarrierBreak.mdx` | 暗金盾片向外裂开，配短促放射光线和碎裂辉光。 | 瞬时向外破碎；`Birth / Stand / Death`。 | 暗金屏障破碎、护盾失效。 | 只作破碎层，不能代替屏障展开和维持。 | 15916 | `E9E3F02BFAC37E71` |
 | `Common\Effect\Form\Explosion\dustwave.mdx` | 灰白尘浪贴地扩散，具有古战场重击的厚重感。 | 从落点向外形成短促冲击环；迁移版补齐包围盒。 | 亚伦柯斯重斩落地、英灵陨星尘土层。 | 轮廓偏亮，需实机压透明度；不作坠落主体。 | 6993 | `321854534E4162EB` |
+| `Common\Effect\Form\Explosion\SpiritGuardGateSlamCrimson.mdx` | 红橙熔灼圆盘与贴地冲击环，来自 `249.mdx`，作为封门中心砸地的赤誓主层。 | `stand` 单序列，由运行时在 `1.2` 秒后销毁。 | 祖地双灵卫·封门误判中心砸地。 | 缺少 `Death` 序列；只作短时点特效，不承担持续区域。 | 2717 | `3DA88F256B59FF45` |
+| `Common\Effect\Form\Explosion\SpiritGuardGateSlamAzure.mdx` | 蓝色法阵、碎石与竖直灵光叠层，来自 `JNTX (431).mdx`，作为苍影同步砸地层。 | `Stand` 单序列，由运行时在 `1.2` 秒后销毁。 | 祖地双灵卫·封门误判中心砸地叠加层。 | 含 3 条私有贴图引用已改为项目共享 `Common\Effect\Element\Water\Texture` 路径；缺少 `Death` 序列。 | 32157 | `A9FDA21E601C4CC1` |
 | `Common\Effect\Form\Explosion\ShalltearRebirthBurst.mdx` | 红色能量柱、方形碎光和放射线组成强烈阶段爆发。 | 从中心瞬时向上、向外爆发；迁移版补齐 `Stand / Death`。 | 夏提雅复生成功的短促结算层。 | 缺少血晶和蔷薇语义，必须控制持续时间与遮挡。 | 4819 | `D72BC69924027450` |
 | `Common\Effect\Form\Explosion\zdgq.mdx` | 蓝白环形冲击配放射魂光，强化和魂压语义明显。 | 从中心向外爆发。 | 亚伦柯斯 P3 转阶段、魂压结算。 | 亮度和爆发性较强，不宜普通阶段反复播放。 | 7829 | `D77E19B72F0603C0` |
 | `Common\Effect\Form\Explosion\BloodSlam.mdx` | 候选截图观察：本批夏提雅候选中冲击层次最完整，深红法阵与血色爆发符合高阶血族；中央造型偏重、遮挡风险较高。 | 迁移后序列：`Birth / Stand / Death`；完成 3 项结构修复。 | 夏提雅·血月轮舞 / 真祖血宴命中；源候选 `BloodSlam.mdx`。 | 接入时检查俯视边界和缩放表现。 | 9228 | `05D1AF778E0C295C` |
@@ -23,3 +26,4 @@
 | `Common\Effect\Form\Explosion\AinzHeartGraspExecutionBurst.mdx` | 深红碎晶、竖向暗光与低位血红冲击在中心短促爆发。 | 源 `Birth`；迁移补齐安全 `Stand / Death` 和各段起始轨道。 | 安兹乌尔恭·心脏掌握倒计时失败时，在被点名目标当前坐标的处决爆发层；源 `MapTest\file_000853\file_000853.mdx`。 | 只在失败处决时创建一次；不绑定胸口、不替代倒计时或救援范围判定。4 张原生贴图保留 `Textures\...` 路径，11 张私有贴图迁入本分类 `Texture`。 | 26394 | `7150E70805C17B2A` |
 | `Common\Effect\Form\Explosion\ShalltearLanceImpact.mdx` | 红黑弧刃围绕红白核心交错爆发，地面同时展开一圈血红冲击环。 | 一次性 `Birth`；迁移补齐安全 `Stand / Death`。 | 夏提雅·滴管穿心命中爆发；源 `MapTest\file_001312\file_001312.mdx`。 | 中心亮度高，只作约 1 秒命中层；3 张私有贴图迁入本分类，KnifeLight 复用项目已有同 SHA 贴图，无原生贴图改写。 | 31952 | `C7C409A137806370` |
 | `Common\Effect\Form\Explosion\moon_shin_blood_big1.mdx` | 候选截图观察：深红血月或大面积血块爆发，带有暗红辉光和血浆质感 (预览图：aa374078-ff46-4383-97b9-07dcda9daf24.png) | 迁移后序列：Birth / Stand / Death | 技能2血月或血池爆发 | [注明：贴图需改成非原生路径] | [字节数待查] | [SHA-256待查] |
+| `Common\Effect\Form\Explosion\[TX] (272).mdx` | 蓝色光束、星点和中心爆裂光层组成的短促爆发。 | 源序列为小写 `stand` 且非循环；运行时按 `1.2` 秒播放后销毁，不补造 `Death`。 | 菲利斯第二军团术士命中爆炸。 | 4 张贴图均为 Warcraft 原生路径；只承担命中表现，不承担伤害判定。 | 13017 | `0B3442C56EAC3105` |

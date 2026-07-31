@@ -25,7 +25,11 @@ local ____require_result_4 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_4.addDelayedCallback
 local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
@@ -109,7 +113,14 @@ ____exports["释放月纹缚魂"] = function(context, preferredTarget)
                 ["持续时间"] = cfg["预警秒"],
                 ["来源单位"] = boss
             })
-            local moon = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["月纹缚魂"]["月纹地面特效路径"], point.X, point.Y)
+            local moon = _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["月纹缚魂"]["月纹地面特效路径"],
+                X = point.X,
+                Y = point.Y,
+                ["缩放"] = _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["月纹缚魂"]["月纹地面特效缩放"],
+                ["动画索引"] = 0,
+                ["持续秒"] = cfg["预警秒"] + 0.2
+            })
             if moon ~= nil and moon ~= 0 then
                 YDWETimerDestroyEffectSafe(cfg["预警秒"] + 0.2, moon)
             end
@@ -131,7 +142,13 @@ ____exports["释放月纹缚魂"] = function(context, preferredTarget)
                     local point = points[i + 1]
                     local impact = AddSpecialEffect(_____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["表现资源"]["月纹缚魂"]["禁锢生效特效路径"], point.X, point.Y)
                     if impact ~= nil and impact ~= 0 then
-                        YDWETimerDestroyEffectSafe(0.8, impact)
+                        addDelayedCallback(
+                            1000,
+                            function()
+                                DzSetEffectVertexAlpha(impact, 0)
+                                YDWETimerDestroyEffectSafe(0, impact)
+                            end
+                        )
                     end
                     do
                         local j = 0
@@ -140,12 +157,12 @@ ____exports["释放月纹缚魂"] = function(context, preferredTarget)
                                 local hit = heroes[j + 1]
                                 local hid = GetHandleId(hit) or 0
                                 if hid == 0 or damaged[hid] == true then
-                                    goto __continue24
+                                    goto __continue25
                                 end
                                 local dx = GetUnitX(hit) - point.X
                                 local dy = GetUnitY(hit) - point.Y
                                 if dx * dx + dy * dy > radius2 then
-                                    goto __continue24
+                                    goto __continue25
                                 end
                                 damaged[hid] = true
                                 local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
@@ -163,7 +180,7 @@ ____exports["释放月纹缚魂"] = function(context, preferredTarget)
                                 })
                                 _____5F00_59CB_786C_76F4(hit, cfg["硬直秒"])
                             end
-                            ::__continue24::
+                            ::__continue25::
                             j = j + 1
                         end
                     end
@@ -172,8 +189,8 @@ ____exports["释放月纹缚魂"] = function(context, preferredTarget)
             end
         end
     )
-    local ____self_6 = context["清理"]
-    ____self_6["登记延迟回调"](____self_6, "祖地双灵卫-月纹缚魂结算", delayedId)
+    local ____self_7 = context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "祖地双灵卫-月纹缚魂结算", delayedId)
     return true
 end
 ____exports["月纹缚魂技能状态"] = {

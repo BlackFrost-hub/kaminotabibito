@@ -136,6 +136,11 @@ interface 护卫反击受击测试参数 {
   雅儿贝德单位: any;
 }
 
+interface 高阶亡灵致命保护测试参数 {
+  来源单位: any;
+  运行时: any;
+}
+
 const 最近测试Boss: Record<number, any> = {};
 const 最近测试步兵: Record<number, any> = {};
 const 最近测试山丘之王: Record<number, any> = {};
@@ -207,6 +212,32 @@ function 测试安兹高阶魔法箭(this: void, _player: any, context: 安兹�
 function 测试安兹光辉翠绿体(this: void, _player: any, context: 安兹测试上下文): void { 释放安兹光辉翠绿体(context.运行时); }
 function 测试安兹时间停止(this: void, _player: any, context: 安兹测试上下文): void { 释放安兹时间停止(context.运行时); }
 function 测试安兹高阶亡灵召唤(this: void, _player: any, context: 安兹测试上下文): void { 释放安兹高阶亡灵召唤(context.运行时); }
+function 结算安兹高阶亡灵召唤致命伤害(this: void, 参数?: 高阶亡灵致命保护测试参数): void {
+  if (参数 == null) return;
+  const summon = 参数.运行时?.高阶亡灵召唤物;
+  if (!Boss测试单位存活(参数.来源单位) || !Boss测试单位存活(summon)) return;
+  const maxLife = GetUnitStateJapi(summon, UNIT_STATE_MAX_LIFE);
+  if (!(maxLife > 0)) return;
+  UnitDamageTarget(
+    参数.来源单位,
+    summon,
+    maxLife * 2,
+    false,
+    false,
+    ATTACK_TYPE_NORMAL,
+    DAMAGE_TYPE_UNIVERSAL,
+    WEAPON_TYPE_WHOKNOWS,
+  );
+}
+function 测试安兹高阶亡灵召唤致命保护(this: void, _player: any, context: 安兹测试上下文): void {
+  if (!释放安兹高阶亡灵召唤(context.运行时)) return;
+  const delayMs = 安兹乌尔恭数值与表现配置.阶段技能.高阶亡灵召唤施法秒 * 1000 + 2000;
+  const delayedId = addDelayedCallback(delayMs, 结算安兹高阶亡灵召唤致命伤害, {
+    来源单位: context.目标单位,
+    运行时: context.运行时,
+  });
+  context.运行时.清理.登记延迟回调('安兹测试-高阶亡灵致命保护', delayedId);
+}
 function 测试安兹天空坠落(this: void, _player: any, context: 安兹测试上下文): void {
   context.运行时.天空坠落已释放 = false;
   释放安兹天空坠落(context.运行时);
@@ -313,6 +344,7 @@ const 安兹测试技能列表: Boss测试技能命令[] = [
   { 序号: 4, 名称: '光辉翠绿体', 执行: 测试安兹光辉翠绿体 },
   { 序号: 5, 名称: '时间停止', 执行: 测试安兹时间停止 },
   { 序号: 6, 名称: '高阶亡灵召唤', 执行: 测试安兹高阶亡灵召唤 },
+  { 序号: 61, 命令: '6-1', 名称: '高阶亡灵召唤（2秒后测试致命保护）', 执行: 测试安兹高阶亡灵召唤致命保护 },
   { 序号: 7, 名称: '天空坠落+护卫联动', 执行: 测试安兹天空坠落 },
   { 序号: 8, 名称: '一切生命的终点+锚点封锁', 执行: 测试安兹一切生命的终点 },
   { 序号: 9, 名称: '启动护卫模式', 执行: 测试安兹护卫模式 },

@@ -29,6 +29,7 @@ local ____require_result_8 = require("系统.03．技能系统.05．单位技能
 local _____83B7_53D6_6216_521B_5EFA_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_8["获取或创建夏提雅运行时上下文"]
 local _____6E05_7406_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_8["清理夏提雅运行时上下文"]
 local _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB = ____require_result_8["重置夏提雅猎血连击"]
+local _____8BBE_7F6E_590F_63D0_96C5_9636_6BB5_6A21_578B = ____require_result_8["设置夏提雅阶段模型"]
 local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.04．鲜血印记")
 local _____521B_5EFA_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____require_result_9["创建夏提雅鲜血印记"]
 local _____6E05_7406_590F_63D0_96C5_9C9C_8840_5370_8BB0 = ____require_result_9["清理夏提雅鲜血印记"]
@@ -51,6 +52,10 @@ local ____require_result_17 = require("系统.03．技能系统.05．单位技�
 local _____91CA_653E_590F_63D0_96C5_8840_6708_7EC8_821E = ____require_result_17["释放夏提雅血月终舞"]
 local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.15．挑战入口与收束")
 local _____7ED1_5B9A_590F_63D0_96C5_6311_6218_751F_547D_4E0B_9650 = ____require_result_18["绑定夏提雅挑战生命下限"]
+local ____require_result_19 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
+local _____505C_6B62_5355_4F4D_4F4D_79FB = ____require_result_19["停止单位位移"]
+local ____require_result_20 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_20.debugLogForce
 local CreateUnit = jass.CreateUnit
 local GetPlayerId = jass.GetPlayerId
 local GetUnitX = jass.GetUnitX
@@ -176,6 +181,18 @@ local function _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, _____9
     if not (maxLife > 0) then
         return
     end
+    _____505C_6B62_5355_4F4D_4F4D_79FB(boss, "中断")
+    _____505C_6B62_5355_4F4D_4F4D_79FB(context["目标单位"], "中断")
+    local mirrorExecutor = runtime["镜像夹击执行器"]
+    if mirrorExecutor ~= nil and mirrorExecutor["是否运行中"](mirrorExecutor) then
+        mirrorExecutor["停止"](mirrorExecutor, nil, "中断")
+    end
+    runtime["镜像夹击执行器"] = nil
+    runtime["镜像夹击执行ID"] = 0
+    SetUnitPosition(boss, _____6D4B_8BD5_4E2D_5FC3X, _____6D4B_8BD5_4E2D_5FC3Y)
+    SetUnitFacing(boss, 270)
+    SetUnitPosition(context["目标单位"], _____73A9_5BB6_6D4B_8BD5X - 220, _____73A9_5BB6_6D4B_8BD5Y + 180)
+    SetUnitFacing(context["目标单位"], 90)
     if not _____4FDD_7559_8840_5370 then
         _____6E05_7A7A_590F_63D0_96C5_6D4B_8BD5_8840_5370(context)
     end
@@ -193,6 +210,7 @@ local function _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, _____9
     end
     SetUnitState(boss, UNIT_STATE_LIFE, maxLife * lifeRatio)
     runtime["阶段"] = phase
+    _____8BBE_7F6E_590F_63D0_96C5_9636_6BB5_6A21_578B(runtime)
     runtime["当前大型技能"] = nil
     runtime["普通机制忙碌到Ms"] = 0
     runtime["P3转阶段已处理"] = _____9636_6BB5 == 3
@@ -202,6 +220,7 @@ local function _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, _____9
     _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(runtime)
 end
 local function _____51C6_5907_590F_63D0_96C5P2_82F1_7075(context)
+    _____6E05_7406_82F1_7075_6218_4E59_5973_6295_5F71(context["运行时"])
     _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 2)
     _____542F_52A8_590F_63D0_96C5_82F1_7075_6218_4E59_5973_9636_6BB5(context["运行时"], context["目标单位"])
 end
@@ -211,7 +230,17 @@ local function _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3(_player, contex
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3P2(_player, context)
     _____51C6_5907_590F_63D0_96C5P2_82F1_7075(context)
-    _____91CA_653E_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3(context["运行时"], context["目标单位"])
+    local started = _____91CA_653E_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3(context["运行时"], context["目标单位"])
+    debugLogForce(
+        "夏提雅-测试命令",
+        "命令1-2执行",
+        "started=",
+        started,
+        "phase=",
+        context["运行时"]["阶段"],
+        "projection=",
+        context["运行时"]["英灵战乙女句柄"]
+    )
 end
 local function _____6D4B_8BD5_590F_63D0_96C5_6EF4_7BA1_7A7F_5FC3P3(_player, context)
     _____51C6_5907_590F_63D0_96C5_6D4B_8BD5_9636_6BB5(context, 3)

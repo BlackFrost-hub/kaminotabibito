@@ -3,6 +3,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local _____4ECE_4E2D_5FC3_8BA1_65F6_5668_6CE8_9500, _____5C1D_8BD5_6536_5C3E_4E2D_5FC3_8BA1_65F6_5668, _____5185_90E8_79FB_9664_8DF3_8DC3, offTick10ms, _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668, ____tick_8BA1_6570
 local ____00_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享")
+local _____64AD_653E_8DF3_8DC3_7279_6548 = ____00_FF0E_5171_4EAB["播放跳跃特效"]
 local CENTER_TIMER_TICKS = ____00_FF0E_5171_4EAB.CENTER_TIMER_TICKS
 local DEFAULT_JUMP_EFFECT_MODEL = ____00_FF0E_5171_4EAB.DEFAULT_JUMP_EFFECT_MODEL
 local X_GAFC = ____00_FF0E_5171_4EAB.X_GAFC
@@ -207,6 +208,7 @@ ____exports["创建跳跃实例"] = function(_____5355_4F4D, _____89D2_5EA6, ___
     _____8DF3_8DC3_6620_5C04[_____8DF3_8DC3ID] = _____5B9E_4F8B
     _____5355_4F4D_5F53_524D_8DF3_8DC3[_____5355_4F4DID] = _____8DF3_8DC3ID
     _____6D3B_52A8_8DF3_8DC3_5217_8868[#_____6D3B_52A8_8DF3_8DC3_5217_8868 + 1] = _____5B9E_4F8B
+    _____64AD_653E_8DF3_8DC3_7279_6548(_____5B9E_4F8B)
     if _____5B9E_4F8B["暂停单位"] then
         _____6DFB_52A0_5355_4F4D_6682_505C(_____5355_4F4D, _____5B9E_4F8B["暂停来源"])
     end

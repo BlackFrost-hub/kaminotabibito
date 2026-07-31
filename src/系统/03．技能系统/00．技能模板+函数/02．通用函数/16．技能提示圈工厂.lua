@@ -14,6 +14,8 @@ local GetUnitFacing = jass.GetUnitFacing
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
 local _____521B_5EFA_77E9_5F62_63D0_793A_5708 = ____require_result_0["创建矩形提示圈"]
 local _____521B_5EFA_65B9_5411_76F4_7EBF_63D0_793A_5708 = ____require_result_0["创建方向直线提示圈"]
+local _____521B_5EFA_767D_8272_65B9_5411_76F4_7EBF_63D0_793A_5708 = ____require_result_0["创建白色方向直线提示圈"]
+local _____521B_5EFA_767D_8272_6247_5F62_63D0_793A_5708 = ____require_result_0["创建白色扇形提示圈"]
 local _____521B_5EFA_7EA2_8272_6247_5F62_63D0_793A_5708 = ____require_result_0["创建红色扇形提示圈"]
 local _____521B_5EFA_8584_5706_5F62_63D0_793A_5708 = ____require_result_0["创建薄圆形提示圈"]
 local _____521B_5EFA_767D_8272_5706_5F62_63D0_793A_5708 = ____require_result_0["创建白色圆形提示圈"]
@@ -167,7 +169,7 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
         )
         return nil
     end
-    if _____7C7B_578B == "直线" or _____7C7B_578B == "方向直线" then
+    if _____7C7B_578B == "直线" or _____7C7B_578B == "方向直线" or _____7C7B_578B == "白色方向直线" then
         local _____5BBD_5EA6 = _____8F6C_6570_5B57(_____914D_7F6E["宽度"], 0)
         local _____957F_5EA6 = _____4FEE_6B63_63D0_793A_8DDD_79BB(
             _____914D_7F6E,
@@ -175,6 +177,18 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
             "矩形长度"
         )
         if _____5BBD_5EA6 <= 0 or _____957F_5EA6 <= 0 then
+            return nil
+        end
+        if _____7C7B_578B == "白色方向直线" then
+            _____521B_5EFA_767D_8272_65B9_5411_76F4_7EBF_63D0_793A_5708(
+                x,
+                y,
+                _____5BBD_5EA6,
+                _____957F_5EA6,
+                _____53D6_671D_5411(_____914D_7F6E),
+                _____6301_7EED_65F6_95F4,
+                _____52A8_753B_901F_5EA6
+            )
             return nil
         end
         _____521B_5EFA_65B9_5411_76F4_7EBF_63D0_793A_5708(
@@ -186,6 +200,17 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
             _____6301_7EED_65F6_95F4,
             _____52A8_753B_901F_5EA6,
             _____6765_6E90_5355_4F4D
+        )
+        return nil
+    end
+    if _____7C7B_578B == "白色扇形" then
+        _____521B_5EFA_767D_8272_6247_5F62_63D0_793A_5708(
+            x,
+            y,
+            _____53D6_671D_5411(_____914D_7F6E),
+            _____53D6_6247_5F62_5C3A_5BF8(_____914D_7F6E),
+            _____6301_7EED_65F6_95F4,
+            _____52A8_753B_901F_5EA6
         )
         return nil
     end

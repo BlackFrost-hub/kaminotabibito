@@ -5,6 +5,7 @@ function stringToFourCC(s)
     return (string.byte(s, 1) or 0 / 0) * 16777216 + (string.byte(s, 2) or 0 / 0) * 65536 + (string.byte(s, 3) or 0 / 0) * 256 + (string.byte(s, 4) or 0 / 0)
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local globals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.BJ函数.index")
 local SelectUnitForPlayerSingle = ____require_result_0.SelectUnitForPlayerSingle
@@ -24,6 +25,7 @@ local _____6CE8_518C_6811_9B54_9996_9886_88AB_52A8_6548_679C = ____require_resul
 local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.03．随从特性")
 local _____521D_59CB_5316_6811_9B54_9996_9886_968F_4ECE_7279_6027 = ____require_result_7["初始化树魔首领随从特性"]
 local _____7ACB_5373_8865_5145_6811_9B54_9996_9886_968F_4ECE = ____require_result_7["立即补充树魔首领随从"]
+local _____6D4B_8BD5_89E6_53D1_6811_9B54_5DEB_533B_7597_6CE2 = ____require_result_7["测试触发树魔巫医疗波"]
 local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.04．扩散冲击波")
 local _____91CA_653E_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2 = ____require_result_8["释放树魔首领扩散冲击波"]
 local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.05．消耗反击")
@@ -53,9 +55,12 @@ local SetUnitPosition = jass.SetUnitPosition
 local GetPlayerId = jass.GetPlayerId
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local KillUnit = jass.KillUnit
+local SetUnitState = jass.SetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____6700_8FD1_6D4B_8BD5Boss = {}
 local _____6700_8FD1_6D4B_8BD5_6B65_5175 = {}
 local _____6700_8FD1_6D4B_8BD5_5C71_4E18_4E4B_738B = {}
@@ -252,13 +257,79 @@ local function ____on_6811_9B54_9996_9886_6280_80FD6_6D4B_8BD5_547D_4EE4(_player
     _____6280_80FD6_5F85_68C0_67E5_4E0A_4E0B_6587 = context
     addDelayedCallback(100, ____on_6811_9B54_9996_9886_6280_80FD6_5EF6_8FDF_68C0_67E5)
 end
+local function _____8BBE_7F6E_6811_9B54_6CBB_7597_6CE2_6D4B_8BD5_968F_4ECE_7F3A_8840(context, _____7F3A_8840_6BD4_4F8B)
+    local ____opt_result_25
+    if context ~= nil then
+        ____opt_result_25 = context["随从组"]
+    end
+    local ____opt_result_26
+    if ____opt_result_25 ~= nil then
+        ____opt_result_26 = ____opt_result_25["取单位列表"](____opt_result_25)
+    end
+    local list = ____opt_result_26
+    if list == nil then
+        return 0
+    end
+    local _____8BBE_7F6E_6570_91CF = 0
+    do
+        local i = 0
+        while i < #list do
+            do
+                local minion = list[i + 1]
+                if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(minion) then
+                    goto __continue39
+                end
+                local maxLife = GetUnitStateJapi(minion, UNIT_STATE_MAX_LIFE)
+                if not (maxLife > 0) then
+                    goto __continue39
+                end
+                SetUnitState(minion, UNIT_STATE_LIFE, maxLife * (1 - _____7F3A_8840_6BD4_4F8B))
+                _____8BBE_7F6E_6570_91CF = _____8BBE_7F6E_6570_91CF + 1
+            end
+            ::__continue39::
+            i = i + 1
+        end
+    end
+    return _____8BBE_7F6E_6570_91CF
+end
+local function ____on_6811_9B54_9996_9886_6280_80FD7_6D4B_8BD5_547D_4EE4(_player, context)
+    if context == nil or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(context["Boss单位"]) then
+        return
+    end
+    local created = _____7ACB_5373_8865_5145_6811_9B54_9996_9886_968F_4ECE(context)
+    local boss = context["Boss单位"]
+    local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
+    if not (maxLife > 0) then
+        return
+    end
+    local testLife = maxLife * 0.7
+    SetUnitState(boss, UNIT_STATE_LIFE, testLife)
+    local _____8BBE_7F6E_968F_4ECE_6570_91CF = _____8BBE_7F6E_6811_9B54_6CBB_7597_6CE2_6D4B_8BD5_968F_4ECE_7F3A_8840(context, 0.5)
+    local started = _____6D4B_8BD5_89E6_53D1_6811_9B54_5DEB_533B_7597_6CE2(context)
+    debugLogForce(
+        _____6811_9B54_9996_9886_6D4B_8BD5_8C03_8BD5_6A21_5757,
+        "命令7",
+        "巫医治疗波测试",
+        "补充随从=",
+        created,
+        "Boss生命=",
+        testLife,
+        "随从缺血比例=",
+        0.5,
+        "设置随从数量=",
+        _____8BBE_7F6E_968F_4ECE_6570_91CF,
+        "施法启动=",
+        started
+    )
+end
 local _____6811_9B54_9996_9886_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "扩散冲击波", ["执行"] = ____on_6811_9B54_9996_9886_6280_80FD1_6D4B_8BD5_547D_4EE4},
     {["序号"] = 2, ["名称"] = "消耗反击", ["执行"] = ____on_6811_9B54_9996_9886_6280_80FD2_6D4B_8BD5_547D_4EE4},
     {["序号"] = 3, ["名称"] = "远古诅咒", ["执行"] = ____on_6811_9B54_9996_9886_6280_80FD3_6D4B_8BD5_547D_4EE4},
     {["序号"] = 4, ["名称"] = "树魔图腾", ["执行"] = ____on_6811_9B54_9996_9886_6280_80FD4_6D4B_8BD5_547D_4EE4},
     {["序号"] = 5, ["名称"] = "立即补齐随从编制", ["执行"] = ____on_6811_9B54_9996_9886_6280_80FD5_6D4B_8BD5_547D_4EE4},
-    {["序号"] = 6, ["名称"] = "杀死所有随从并暂停补员（测试无从暴怒）", ["执行"] = ____on_6811_9B54_9996_9886_6280_80FD6_6D4B_8BD5_547D_4EE4}
+    {["序号"] = 6, ["名称"] = "杀死所有随从并暂停补员（测试无从暴怒）", ["执行"] = ____on_6811_9B54_9996_9886_6280_80FD6_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 7, ["名称"] = "巫医治疗波测试（Boss70%生命、随从50%缺血、观察每跳80%衰减）", ["执行"] = ____on_6811_9B54_9996_9886_6280_80FD7_6D4B_8BD5_547D_4EE4}
 }
 _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4({
     ["命令单位名"] = "树魔首领",

@@ -69,8 +69,8 @@ function 选择污染标记目标(this: void, context: 米亚运行时上下文)
 
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
-    if (!单位存活(hero)) continue;
-    const stack = 取目标腐化层数(context, hero);
+    const alive = 单位存活(hero);
+    const stack = alive ? 取目标腐化层数(context, hero) : 0;
     if (stack > highestStack) highestStack = stack;
   }
   if (highestStack <= 0) return null;
@@ -106,7 +106,9 @@ function 刷新标记Buff(this: void, context: 米亚运行时上下文, target:
 }
 
 function 强制攻击污染标记目标(this: void, context: 米亚运行时上下文, target: any): void {
-  if (!单位存活(context.Boss单位) || !单位存活(target)) return;
+  const bossAlive = 单位存活(context.Boss单位);
+  const targetAlive = 单位存活(target);
+  if (!bossAlive || !targetAlive) return;
   setThreat(context.Boss单位, target, 1000);
   IssueTargetOrder(context.Boss单位, "attack", target);
 }

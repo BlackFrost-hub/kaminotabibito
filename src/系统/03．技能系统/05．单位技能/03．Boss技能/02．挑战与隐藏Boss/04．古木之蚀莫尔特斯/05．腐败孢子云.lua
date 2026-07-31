@@ -130,6 +130,8 @@ end
 local function _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
     local boss = context["Boss单位"]
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]
+    local bossMaxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
+    local sporeCloudMaxLife = cfg["基础生命值"] + bossMaxLife * cfg["Boss最大生命比例"]
     local instance = _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
         ["清理"] = context["清理"],
         ["名称"] = "莫尔特斯-腐败孢子云",
@@ -140,7 +142,7 @@ local function _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
         X = GetUnitX(boss),
         Y = GetUnitY(boss),
         ["朝向"] = GetRandomReal(0, 360),
-        ["最大生命"] = cfg["驱散所需伤害"],
+        ["最大生命"] = sporeCloudMaxLife,
         ["生命值受小怪倍率"] = cfg["受小怪倍率生命"],
         ["缩放"] = cfg["缩放"],
         ["持续时间"] = cfg["持续秒"]

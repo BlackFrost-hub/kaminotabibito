@@ -5,7 +5,7 @@ import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import type { 夏提雅运行时上下文 } from './01．运行时上下文';
 import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 清理英灵战乙女投影 } from './09．英灵战乙女';
-import { 开始冲锋 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
+import { 开始冲锋, 停止单位位移 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
@@ -14,6 +14,11 @@ import { 播放夏提雅台词 } from './18．台词播放';
 import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
+const { CosBJ, SinBJ } = require('lib.扩展函数.BJ函数.12．数学函数') as {
+  CosBJ: (this: void, degrees: number) => number;
+  SinBJ: (this: void, degrees: number) => number;
+};
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -25,15 +30,21 @@ const SetUnitFacing = jass.SetUnitFacing as (unit: any, face: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
 const UnitAddAbility = jass.UnitAddAbility as (unit: any, abilityId: number) => boolean;
-const CosBJ = jass.CosBJ as (degrees: number) => number;
-const SinBJ = jass.SinBJ as (degrees: number) => number;
+const UnitAddType = jass.UnitAddType as (unit: any, unitType: any) => boolean;
+const ConvertUnitState = jass.ConvertUnitState as (state: number) => any;
+const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: string) => boolean;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
+const UNIT_TYPE_TAUREN = jass.UNIT_TYPE_TAUREN as any;
+const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: any, value: number) => void;
+const DzUnitDisableAttack = japi.DzUnitDisableAttack as ((unit: any, disabled: boolean) => void) | undefined;
+const 攻击范围状态 = 0x16;
+const 攻击间隔状态 = 0x25;
 
 const { 创建召唤物 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口') as {
   创建召唤物: (this: void, 参数: any) => any;
@@ -50,7 +61,7 @@ const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能�
 const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
   造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
-const { 施加快速减速Buff } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.03．快速Buff') as {
+const { 施加快速减速Buff } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff') as {
   施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number) => void;
 };
 
@@ -92,7 +103,12 @@ function 创建镜像夹击投影(this: void, context: 夏提雅运行时上下�
   if (!单位有效(projection)) return projection;
 
   UnitAddAbility(projection, 蝗虫技能ID);
+  UnitAddType(projection, UNIT_TYPE_TAUREN);
   SetUnitAcquireRange(projection, 0);
+  SetUnitStateJapi(projection, ConvertUnitState(攻击范围状态), 0);
+  SetUnitStateJapi(projection, ConvertUnitState(攻击间隔状态), 99);
+  if (DzUnitDisableAttack != null) DzUnitDisableAttack(projection, true);
+  IssueImmediateOrder(projection, 'stop');
   SetUnitPathing(projection, false);
   SetUnitFacing(projection, face);
   context.镜像夹击句柄 = projection;
@@ -151,7 +167,8 @@ function 启动镜像夹击投影冲锋(this: void, context: 夏提雅运行时�
       if (参数.投影命中 != null) 参数.投影命中(hit);
     },
     开始回调: function 夏提雅镜像夹击投影动作(this: void): void {
-      SetUnitAnimationByIndex(projection, cfg.镜像夹击投影动画编号);
+      开始硬直(projection, cfg.镜像夹击投影突进秒);
+      SetUnitAnimationByIndex(projection, cfg.英灵复刻冲锋动画编号);
     },
     结束回调: function 夏提雅镜像夹击投影结束(this: void): void {
       if (参数.投影结算 != null) 参数.投影结算();
@@ -172,16 +189,21 @@ function 造成镜像夹击伤害(this: void, context: 夏提雅运行时上下�
     attack: false,
     ranged: false,
     attackType: ATTACK_TYPE_NORMAL,
-    伤害类型: DAMAGE_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
     weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
     来源类型: 'Boss技能',
     标签: tag,
   });
 }
 
-function 结束镜像夹击(this: void, context: 夏提雅运行时上下文): void {
+function 结束镜像夹击(this: void, context: 夏提雅运行时上下文, 执行ID?: number): void {
+  if (执行ID != null && 执行ID !== 0 && context.镜像夹击执行ID !== 执行ID) return;
+  停止单位位移(context.Boss单位, '中断');
+  停止单位位移(context.镜像夹击句柄, '中断');
   清理镜像夹击投影(context);
   if (context.当前大型技能 === 镜像夹击技能Key) context.当前大型技能 = undefined;
+  context.镜像夹击执行器 = undefined;
+  context.镜像夹击执行ID = 0;
 }
 
 export function 释放夏提雅镜像夹击(this: void, context: 夏提雅运行时上下文, target: any): boolean {
@@ -211,12 +233,20 @@ export function 释放夏提雅镜像夹击(this: void, context: 夏提雅运行
   const mirrorDistance = cfg.镜像夹击投影距离 + cfg.镜像夹击投影越过距离;
   const totalSeconds = cfg.镜像夹击预警秒 + cfg.镜像夹击第二段延迟秒 + cfg.镜像夹击投影突进秒 + cfg.镜像夹击恢复窗口秒;
   const mainTargetId = GetHandleId(target);
+  const previousExecutor = context.镜像夹击执行器;
+  if (previousExecutor != null && previousExecutor.是否运行中()) {
+    previousExecutor.停止(undefined, '中断');
+  }
+  context.镜像夹击执行器 = undefined;
+  context.镜像夹击执行ID = 0;
   let projection: any = undefined;
   const executor = 创建固定组合技能执行器<夏提雅运行时上下文>({ 名称: '夏提雅-镜像夹击', 清理: context.清理, 互斥组: '夏提雅大型技能' });
   context.当前大型技能 = 镜像夹击技能Key;
   context.普通机制忙碌到Ms = getServerTime() + totalSeconds * 1000;
   重置夏提雅猎血连击(context);
-  const executionId = executor.开始({
+  context.镜像夹击执行器 = executor;
+  let executionId = 0;
+  executionId = executor.开始({
     key: 镜像夹击技能Key,
     单位: boss,
     上下文: context,
@@ -278,8 +308,9 @@ export function 释放夏提雅镜像夹击(this: void, context: 夏提雅运行
       }, '英灵冲锋'),
       创建延迟阶段((cfg.镜像夹击投影突进秒 + cfg.镜像夹击恢复窗口秒) * 1000, '英灵冲锋与恢复窗口'),
     ],
-    结束回调: function 夏提雅镜像夹击结束(this: void): void { 结束镜像夹击(context); },
+    结束回调: function 夏提雅镜像夹击结束(this: void): void { 结束镜像夹击(context, executionId); },
   });
+  context.镜像夹击执行ID = executionId;
   if (executionId === 0) {
     结束镜像夹击(context);
     return false;

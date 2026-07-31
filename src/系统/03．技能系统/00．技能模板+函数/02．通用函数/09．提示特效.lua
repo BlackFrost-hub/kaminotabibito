@@ -435,6 +435,23 @@ ____exports["创建方向直线提示圈"] = function(_____8DEF_5F84_8D77_70B9X,
     ____exports["按所属单位设置提示圈颜色"](e, _____6765_6E90_5355_4F4D)
     _____5B89_5168_9500_6BC1_7279_6548(time <= 0 and 1 or time + 0.05, e)
 end
+--- 创建白色方向直线提示圈，用于明确标识安全通道。
+-- 坐标仍传直线路径起点，长度和朝向必须与实际路径一致。
+____exports["创建白色方向直线提示圈"] = function(_____8DEF_5F84_8D77_70B9X, _____8DEF_5F84_8D77_70B9Y, width, long, fac, time, speed)
+    local e = ____exports["创建方向直线提示圈特效"](
+        _____8DEF_5F84_8D77_70B9X,
+        _____8DEF_5F84_8D77_70B9Y,
+        width,
+        long,
+        fac,
+        speed
+    )
+    if not e then
+        return
+    end
+    ____exports["按所属单位设置提示圈颜色"](e, nil, _____63D0_793A_5708_53CB_65B9_8272)
+    _____5B89_5168_9500_6BC1_7279_6548(time <= 0 and 1 or time + 0.05, e)
+end
 --- 白色扇形提示圈
 -- `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
 ____exports["创建白色扇形提示圈"] = function(x, y, fac, size, time, speed, _____6765_6E90_5355_4F4D)

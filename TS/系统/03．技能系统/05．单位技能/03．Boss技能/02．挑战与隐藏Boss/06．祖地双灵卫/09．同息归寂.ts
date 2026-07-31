@@ -99,7 +99,12 @@ export function 绑定祖地双灵卫同息生命下限(this: void, context: 祖
         return member != null && member.状态 === '崩解' ? 0 : current;
       },
       on首次触底: function 双灵卫进入崩解(this: void): void {
-        进入灵魂崩解(context, name);
+        addDelayedCallback(0, function 双灵卫触底后进入崩解(this: void): void {
+          if (context.战斗已结束) return;
+          const member = context.联合生命周期.取成员(name);
+          if (member == null || member.状态 !== '活跃') return;
+          进入灵魂崩解(context, name);
+        });
       },
     });
     context.同息生命下限保护列表.push(controller);

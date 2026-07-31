@@ -44,6 +44,7 @@ const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -139,6 +140,33 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
   });
 }
 
+function 处理熔岩喷发爆发命中(this: void, boss: any, unit: any, config: typeof 巴尔扎罗斯技能数值配置.熔岩喷发): void {
+  if (!单位有效(unit)) return;
+  造成AOE技能伤害({
+    技能ID: 熔岩喷发技能ID,
+    来源: boss,
+    目标: unit,
+    伤害: 计算喷发伤害(boss, unit),
+    attack: false,
+    ranged: true,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_FIRE,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "Boss技能",
+  });
+  施加巴尔扎罗斯灼热(unit, config.爆发灼热层数);
+  开始原地击飞(unit, {
+    持续时间: config.爆发持续顶飞秒,
+    最小高度: 180,
+    最大高度: 260,
+    暂停单位: false,
+    主单位: boss,
+    主单位死亡时中断: true,
+    中断已有跳跃: true,
+    冲击波模型: "",
+  });
+}
+
 function 执行熔岩喷发爆发(this: void, context: 巴尔扎罗斯运行时上下文, 落点: 熔岩喷发落点): void {
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
@@ -147,6 +175,7 @@ function 执行熔岩喷发爆发(this: void, context: 巴尔扎罗斯运行时�
   播放Boss坐标音效(巴尔扎罗斯音效配置.熔岩喷发.地面开裂, 落点.X, 落点.Y, 巴尔扎罗斯音效配置.默认裁断距离);
   延迟播放Boss坐标音效(巴尔扎罗斯音效配置.熔岩喷发.熔岩上冲, 落点.X, 落点.Y, 巴尔扎罗斯音效配置.熔岩喷发.熔岩上冲延迟Ms, 巴尔扎罗斯音效配置.默认裁断距离);
   延迟播放Boss坐标音效(巴尔扎罗斯音效配置.熔岩喷发.最后爆裂, 落点.X, 落点.Y, 巴尔扎罗斯音效配置.熔岩喷发.最后爆裂延迟Ms, 巴尔扎罗斯音效配置.默认裁断距离);
+  const 爆发命中记录: Record<number, boolean> = {};
   const instance = 创建持续危险区域({
     X: 落点.X,
     Y: 落点.Y,
@@ -156,31 +185,15 @@ function 执行熔岩喷发爆发(this: void, context: 巴尔扎罗斯运行时�
     影响目标: "敌方",
     所有者: boss,
     显示提示圈: false,
-    on进入: function 巴尔扎罗斯熔岩喷发爆发命中(this: void, unit: any): void {
-      if (!单位有效(unit)) return;
-      造成AOE技能伤害({
-        技能ID: 熔岩喷发技能ID,
-        来源: boss,
-        目标: unit,
-        伤害: 计算喷发伤害(boss, unit),
-        attack: false,
-        ranged: true,
-        attackType: ATTACK_TYPE_NORMAL,
-        伤害类型: DAMAGE_TYPE_FIRE,
-        weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
-      });
-      施加巴尔扎罗斯灼热(unit, config.爆发灼热层数);
-      开始原地击飞(unit, {
-        持续时间: config.爆发持续顶飞秒,
-        最小高度: 180,
-        最大高度: 260,
-        暂停单位: false,
-        主单位: boss,
-        主单位死亡时中断: true,
-        中断已有跳跃: true,
-        冲击波模型: "",
-      });
+    on周期: function 巴尔扎罗斯熔岩喷发爆发周期(this: void, units: any[]): void {
+      for (let i = 0; i < units.length; i++) {
+        const unit = units[i];
+        if (!单位有效(unit)) continue;
+        const handleId = GetHandleId(unit);
+        if (爆发命中记录[handleId]) continue;
+        爆发命中记录[handleId] = true;
+        处理熔岩喷发爆发命中(boss, unit, config);
+      }
     },
     on销毁: function 巴尔扎罗斯熔岩喷发爆发结束(this: void): void {
       if (context.清理.已清理()) return;

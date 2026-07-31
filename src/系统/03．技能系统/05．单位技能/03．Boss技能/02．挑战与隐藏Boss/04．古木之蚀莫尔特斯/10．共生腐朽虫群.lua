@@ -19,33 +19,47 @@ local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local jass = require("jass.common")
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_1.debugLogForce
+local _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757 = "莫尔特斯-虫尸拾取"
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local SquareRoot = jass.SquareRoot
+local RemoveUnit = jass.RemoveUnit
 local GetOwningPlayer = jass.GetOwningPlayer
 local IssueTargetOrder = jass.IssueTargetOrder
 local KillUnit = jass.KillUnit
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
-local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物")
-local _____521B_5EFA_6218_6597_5185_62FE_53D6_7269 = ____require_result_4["创建战斗内拾取物"]
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_5.registerManualBuff
-local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
-local _____83AB_5C14_7279_65AFBuffID = ____require_result_6["莫尔特斯BuffID"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_7["临时调整攻击"]
-local ____require_result_8 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local addPeriodicCallback = ____require_result_2.addPeriodicCallback
+local removePeriodicCallback = ____require_result_2.removePeriodicCallback
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_3["创建可攻击机制单位"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.06．战斗内拾取物")
+local _____521B_5EFA_6218_6597_5185_62FE_53D6_7269 = ____require_result_5["创建战斗内拾取物"]
+local ____require_result_6 = require("平台扩展API动作")
+local _____6269_5C55__8BBE_7279_6548_901F_5EA6 = ____require_result_6["扩展_设特效速度"]
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
+local ____require_result_8 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_8.registerManualBuff
+local ____require_result_9 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
+local _____83AB_5C14_7279_65AFBuffID = ____require_result_9["莫尔特斯BuffID"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_10["临时调整攻击"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_11["读取单位攻击力"]
+local function _____8BA1_7B97_8DDD_79BB(x1, y1, x2, y2)
+    local dx = x2 - x1
+    local dy = y2 - y1
+    return SquareRoot(dx * dx + dy * dy)
+end
 local function _____53D6_7532_866B_76EE_6807(context)
     local target = _____53D6_8150_8D25_503C_6700_9AD8_73A9_5BB6(context)
     if _____5355_4F4D_6709_6548(target) then
@@ -58,13 +72,143 @@ local function _____83AB_5C14_7279_65AF_866B_5C38_53EF_62FE_53D6_5355_4F4D(varia
     if data == nil then
         return {}
     end
-    return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(data.context["Boss单位"])
+    local result = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(data.context["Boss单位"])
+    local extraUnits = data.context["测试额外虫尸拾取单位"]
+    local shouldLog = data["已输出拾取候选日志"] ~= true
+    if shouldLog then
+        debugLogForce(
+            _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757,
+            "候选列表扫描",
+            "尸体坐标=",
+            data.X,
+            data.Y,
+            "正式候选数=",
+            #result,
+            "额外候选数=",
+            extraUnits == nil and "nil" or #extraUnits,
+            "拾取半径=",
+            _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]["虫尸拾取半径"]
+        )
+        if extraUnits ~= nil then
+            do
+                local i = 0
+                while i < #extraUnits do
+                    local unit = extraUnits[i + 1]
+                    local valid = _____5355_4F4D_6709_6548(unit)
+                    if valid and data.X ~= nil and data.Y ~= nil then
+                        local unitX = GetUnitX(unit)
+                        local unitY = GetUnitY(unit)
+                        debugLogForce(
+                            _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757,
+                            "额外候选",
+                            "索引=",
+                            i,
+                            "单位=",
+                            unit,
+                            "有效=",
+                            true,
+                            "单位坐标=",
+                            unitX,
+                            unitY,
+                            "距离=",
+                            _____8BA1_7B97_8DDD_79BB(data.X, data.Y, unitX, unitY)
+                        )
+                    else
+                        debugLogForce(
+                            _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757,
+                            "额外候选",
+                            "索引=",
+                            i,
+                            "单位=",
+                            unit,
+                            "有效=",
+                            valid
+                        )
+                    end
+                    i = i + 1
+                end
+            end
+        end
+    end
+    if extraUnits == nil then
+        if shouldLog then
+            debugLogForce(_____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757, "候选列表完成", "总候选数=", #result)
+            data["已输出拾取候选日志"] = true
+        end
+        return result
+    end
+    do
+        local i = 0
+        while i < #extraUnits do
+            do
+                local unit = extraUnits[i + 1]
+                if not _____5355_4F4D_6709_6548(unit) then
+                    goto __continue16
+                end
+                local exists = false
+                do
+                    local j = 0
+                    while j < #result do
+                        if result[j + 1] == unit then
+                            exists = true
+                            break
+                        end
+                        j = j + 1
+                    end
+                end
+                if not exists then
+                    result[#result + 1] = unit
+                end
+            end
+            ::__continue16::
+            i = i + 1
+        end
+    end
+    if shouldLog then
+        debugLogForce(_____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757, "候选列表完成", "总候选数=", #result)
+        data["已输出拾取候选日志"] = true
+    end
+    return result
 end
-local function _____83AB_5C14_7279_65AF_866B_5C38_62FE_53D6(picker, ______5B9E_4F8B, variable)
+local function _____64AD_653E_83AB_5C14_7279_65AF_866B_5C38_62FE_53D6_9A71_6563_7279_6548(picker)
+    if not _____5355_4F4D_6709_6548(picker) then
+        return
+    end
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["虫尸拾取驱散特效路径"],
+        X = GetUnitX(picker),
+        Y = GetUnitY(picker),
+        ["缩放"] = cfg["虫尸拾取驱散特效缩放"],
+        ["持续秒"] = cfg["虫尸拾取驱散特效持续秒"]
+    })
+end
+local function _____83AB_5C14_7279_65AF_866B_5C38_62FE_53D6(picker, _____5B9E_4F8B, variable)
     local data = variable
     if data == nil then
         return
     end
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
+    local pickerX = _____5355_4F4D_6709_6548(picker) and GetUnitX(picker) or nil
+    local pickerY = _____5355_4F4D_6709_6548(picker) and GetUnitY(picker) or nil
+    debugLogForce(
+        _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757,
+        "拾取命中",
+        "拾取单位=",
+        picker,
+        "尸体坐标=",
+        data.X,
+        data.Y,
+        "拾取单位坐标=",
+        pickerX,
+        pickerY,
+        "距离=",
+        data.X ~= nil and data.Y ~= nil and pickerX ~= nil and pickerY ~= nil and _____8BA1_7B97_8DDD_79BB(data.X, data.Y, pickerX, pickerY) or "nil"
+    )
+    if _____5B9E_4F8B ~= nil and _____5B9E_4F8B["特效"] ~= nil and _____5B9E_4F8B["特效"] ~= 0 then
+        _____6269_5C55__8BBE_7279_6548_901F_5EA6(_____5B9E_4F8B["特效"], cfg["虫尸特效正常播放速度"])
+    end
+    _____64AD_653E_83AB_5C14_7279_65AF_866B_5C38_62FE_53D6_9A71_6563_7279_6548(picker)
     local amount = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败值"]["虫尸清除值"]
     _____6E05_9664_73A9_5BB6_8150_8D25_503C(data.context, picker, amount)
     registerManualBuff(
@@ -75,9 +219,38 @@ local function _____83AB_5C14_7279_65AF_866B_5C38_62FE_53D6(picker, ______5B9E_4
         {sourceName = "莫尔特斯-腐败虫尸"}
     )
 end
+local function _____83AB_5C14_7279_65AF_866B_5C38_9500_6BC1(_____5B9E_4F8B, _____539F_56E0, variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    data["已销毁"] = true
+    debugLogForce(
+        _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757,
+        "尸体销毁",
+        "实例=",
+        _____5B9E_4F8B == nil and "nil" or _____5B9E_4F8B.ID,
+        "原因=",
+        _____539F_56E0,
+        "尸体坐标=",
+        data.X,
+        data.Y
+    )
+end
+local function _____51BB_7ED3_83AB_5C14_7279_65AF_866B_5C38_7279_6548(variable)
+    local data = variable
+    if data == nil or data["拾取物变量"]["已销毁"] == true then
+        return
+    end
+    if data["特效"] == nil or data["特效"] == 0 then
+        return
+    end
+    _____6269_5C55__8BBE_7279_6548_901F_5EA6(data["特效"], 0)
+end
 local function _____521B_5EFA_866B_5C38_62FE_53D6_7269(context, x, y)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
-    _____521B_5EFA_6218_6597_5185_62FE_53D6_7269({
+    local _____62FE_53D6_7269_53D8_91CF = {context = context, ["已销毁"] = false, X = x, Y = y}
+    local _____5B9E_4F8B = _____521B_5EFA_6218_6597_5185_62FE_53D6_7269({
         ["清理"] = context["清理"],
         ["名称"] = "莫尔特斯-腐败虫尸",
         X = x,
@@ -86,9 +259,54 @@ local function _____521B_5EFA_866B_5C38_62FE_53D6_7269(context, x, y)
         ["缩放"] = 0.55,
         ["持续秒"] = cfg["虫尸持续秒"],
         ["拾取半径"] = cfg["虫尸拾取半径"],
-        ["变量"] = {context = context},
+        ["变量"] = _____62FE_53D6_7269_53D8_91CF,
         ["可拾取单位列表"] = _____83AB_5C14_7279_65AF_866B_5C38_53EF_62FE_53D6_5355_4F4D,
-        ["on拾取"] = _____83AB_5C14_7279_65AF_866B_5C38_62FE_53D6
+        ["on拾取"] = _____83AB_5C14_7279_65AF_866B_5C38_62FE_53D6,
+        ["on销毁"] = _____83AB_5C14_7279_65AF_866B_5C38_9500_6BC1
+    })
+    if _____5B9E_4F8B == nil or _____5B9E_4F8B["特效"] == nil or _____5B9E_4F8B["特效"] == 0 then
+        debugLogForce(
+            _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757,
+            "尸体创建失败",
+            "尸体坐标=",
+            x,
+            y
+        )
+        return
+    end
+    debugLogForce(
+        _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757,
+        "尸体创建成功",
+        "实例=",
+        _____5B9E_4F8B.ID,
+        "尸体坐标=",
+        x,
+        y,
+        "拾取半径=",
+        cfg["虫尸拾取半径"],
+        "测试额外候选数=",
+        context["测试额外虫尸拾取单位"] == nil and "nil" or #context["测试额外虫尸拾取单位"]
+    )
+    _____6269_5C55__8BBE_7279_6548_901F_5EA6(_____5B9E_4F8B["特效"], cfg["虫尸特效播放速度"])
+    local _____51BB_7ED3ID = addDelayedCallback(cfg["虫尸特效冻结延迟秒"] * 1000, _____51BB_7ED3_83AB_5C14_7279_65AF_866B_5C38_7279_6548, {["特效"] = _____5B9E_4F8B["特效"], ["拾取物变量"] = _____62FE_53D6_7269_53D8_91CF})
+    local ____self_12 = context["清理"]
+    ____self_12["登记延迟回调"](____self_12, "莫尔特斯-腐败虫尸动画冻结", _____51BB_7ED3ID)
+end
+local function _____5EF6_8FDF_521B_5EFA_83AB_5C14_7279_65AF_866B_5C38(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____521B_5EFA_866B_5C38_62FE_53D6_7269(data.context, data.X, data.Y)
+end
+local function _____521B_5EFA_7532_866B_7206_70B8_7279_6548(context, x, y)
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
+    return _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = cfg["爆炸特效路径"],
+        X = x,
+        Y = y,
+        ["缩放"] = cfg["爆炸特效缩放"],
+        ["持续秒"] = cfg["爆炸特效持续秒"]
     })
 end
 local function _____7206_70B8_7532_866B(data)
@@ -98,6 +316,11 @@ local function _____7206_70B8_7532_866B(data)
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
+    _____521B_5EFA_7532_866B_7206_70B8_7279_6548(
+        data.context,
+        GetUnitX(target),
+        GetUnitY(target)
+    )
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = boss,
         ["目标"] = target,
@@ -112,6 +335,40 @@ local function _____7206_70B8_7532_866B(data)
         ["标签"] = "莫尔特斯共生腐朽虫群"
     })
     _____589E_52A0_73A9_5BB6_8150_8D25_503C(data.context, target, cfg["爆炸腐败值"])
+end
+local function _____6392_961F_51FB_6740_5171_751F_8150_673D_866B_7FA4_7532_866B(variable)
+    local data = variable
+    if data == nil or data["甲虫单位列表"] == nil then
+        return
+    end
+    if data["下一个索引"] >= #data["甲虫单位列表"] then
+        removePeriodicCallback(data["周期ID"])
+        return
+    end
+    local beetle = data["甲虫单位列表"][data["下一个索引"] + 1]
+    data["下一个索引"] = data["下一个索引"] + 1
+    if _____5355_4F4D_6709_6548(beetle) then
+        _____521B_5EFA_7532_866B_7206_70B8_7279_6548(
+            data.context,
+            GetUnitX(beetle),
+            GetUnitY(beetle)
+        )
+        KillUnit(beetle)
+    end
+    if data["下一个索引"] >= #data["甲虫单位列表"] then
+        removePeriodicCallback(data["周期ID"])
+    end
+end
+local function _____5EF6_8FDF_51FB_6740_5171_751F_8150_673D_866B_7FA4_7532_866B(variable)
+    local data = variable
+    if data == nil or data.context == nil or data["甲虫单位列表"] == nil or #data["甲虫单位列表"] == 0 then
+        return
+    end
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
+    data["下一个索引"] = 0
+    data["周期ID"] = addPeriodicCallback(cfg["测试击杀间隔毫秒"], _____6392_961F_51FB_6740_5171_751F_8150_673D_866B_7FA4_7532_866B, data)
+    local ____self_13 = data.context["清理"]
+    ____self_13["登记周期回调"](____self_13, "莫尔特斯测试-7-2-排队击杀甲虫", data["周期ID"])
 end
 local function _____7532_866B_8FFD_51FBTick(data)
     local beetle = data["甲虫单位"]
@@ -156,11 +413,22 @@ local function _____83AB_5C14_7279_65AF_7532_866B_6B7B_4EA1(unit, ______51FB_674
     if data == nil then
         return
     end
-    _____521B_5EFA_866B_5C38_62FE_53D6_7269(
-        data.context,
-        GetUnitX(unit),
-        GetUnitY(unit)
+    local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
+    local x = GetUnitX(unit)
+    local y = GetUnitY(unit)
+    RemoveUnit(unit)
+    debugLogForce(
+        _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757,
+        "原始甲虫单位已移除",
+        "单位=",
+        unit,
+        "尸体坐标=",
+        x,
+        y
     )
+    local delayedId = addDelayedCallback(cfg["虫尸死亡后延迟秒"] * 1000, _____5EF6_8FDF_521B_5EFA_83AB_5C14_7279_65AF_866B_5C38, {context = data.context, X = x, Y = y})
+    local ____self_14 = data.context["清理"]
+    ____self_14["登记延迟回调"](____self_14, "莫尔特斯-腐败虫尸生成", delayedId)
 end
 local function _____521B_5EFA_8150_5316_7532_866B(context, angle, _____6280_80FD_5B9E_4F8BID)
     local boss = context["Boss单位"]
@@ -191,7 +459,7 @@ local function _____521B_5EFA_8150_5316_7532_866B(context, angle, _____6280_80FD
         ["on死亡"] = _____83AB_5C14_7279_65AF_7532_866B_6B7B_4EA1
     })
     if instance == nil or not _____5355_4F4D_6709_6548(instance["单位"]) then
-        return
+        return nil
     end
     _____4E34_65F6_8C03_6574_653B_51FB(instance["单位"], cfg["甲虫攻击力"])
     local data = {
@@ -203,14 +471,16 @@ local function _____521B_5EFA_8150_5316_7532_866B(context, angle, _____6280_80FD
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
     }
     data["周期ID"] = addPeriodicCallback(cfg["追击刷新间隔毫秒"], _____83AB_5C14_7279_65AF_7532_866B_8FFD_51FB_5468_671F, data)
-    local ____self_9 = context["清理"]
-    ____self_9["登记周期回调"](____self_9, "莫尔特斯-甲虫追击", data["周期ID"])
+    local ____self_15 = context["清理"]
+    ____self_15["登记周期回调"](____self_15, "莫尔特斯-甲虫追击", data["周期ID"])
+    return instance["单位"]
 end
 local function _____7ED3_7B97_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4(variable)
-    local context = variable
-    if context == nil or not _____5355_4F4D_6709_6548(context["Boss单位"]) then
+    local data = variable
+    if data == nil or not _____5355_4F4D_6709_6548(data.context["Boss单位"]) then
         return
     end
+    local context = data.context
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["共生腐朽虫群"]["甲虫入场"],
@@ -219,24 +489,36 @@ local function _____7ED3_7B97_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4(
         _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
     )
     local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "莫尔特斯共生腐朽虫群", ["持续时间秒"] = cfg["接触爆炸秒"] + 12})
+    local _____7532_866B_5355_4F4D_5217_8868 = {}
     do
         local i = 0
         while i < cfg["甲虫数量"] do
-            _____521B_5EFA_8150_5316_7532_866B(context, i * 90, _____6280_80FD_5B9E_4F8BID)
+            local beetle = _____521B_5EFA_8150_5316_7532_866B(context, i * 90, _____6280_80FD_5B9E_4F8BID)
+            if _____5355_4F4D_6709_6548(beetle) then
+                _____7532_866B_5355_4F4D_5217_8868[#_____7532_866B_5355_4F4D_5217_8868 + 1] = beetle
+            end
             i = i + 1
         end
     end
+    if data["释放选项"] ~= nil and data["释放选项"]["召唤后延迟击杀全部甲虫"] == true and #_____7532_866B_5355_4F4D_5217_8868 > 0 then
+        local delayedId = addDelayedCallback(2000, _____5EF6_8FDF_51FB_6740_5171_751F_8150_673D_866B_7FA4_7532_866B, {context = context, ["甲虫单位列表"] = _____7532_866B_5355_4F4D_5217_8868, ["下一个索引"] = 0, ["周期ID"] = 0})
+        local ____self_16 = context["清理"]
+        ____self_16["登记延迟回调"](____self_16, "莫尔特斯测试-7-2-击杀甲虫", delayedId)
+    end
 end
-____exports["释放莫尔特斯共生腐朽虫群"] = function(context)
+____exports["释放莫尔特斯共生腐朽虫群"] = function(context, _____91CA_653E_9009_9879)
     if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
         return false
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["共生腐朽虫群"]
     _____5F00_59CB_83AB_5C14_7279_65AF_5E38_89C4_65BD_6CD5(context["Boss单位"], cfg["动作播放秒"], "共生腐朽虫群", "腐化甲虫将在读条结束后涌出")
     _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
-    local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____7ED3_7B97_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4, context)
-    local ____self_10 = context["清理"]
-    ____self_10["登记延迟回调"](____self_10, "莫尔特斯-共生腐朽虫群召唤", delayedId)
+    local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____7ED3_7B97_83AB_5C14_7279_65AF_5171_751F_8150_673D_866B_7FA4, {context = context, ["释放选项"] = _____91CA_653E_9009_9879})
+    local ____self_17 = context["清理"]
+    ____self_17["登记延迟回调"](____self_17, "莫尔特斯-共生腐朽虫群召唤", delayedId)
     return true
+end
+____exports["测试释放莫尔特斯共生腐朽虫群并延迟击杀"] = function(context)
+    return ____exports["释放莫尔特斯共生腐朽虫群"](context, {["召唤后延迟击杀全部甲虫"] = true})
 end
 return ____exports

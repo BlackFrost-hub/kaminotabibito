@@ -12,6 +12,8 @@ import type { 固定组合技能执行器 } from "../../../../00．技能模板+
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
@@ -22,6 +24,17 @@ let 莫尔特斯死亡监听已注册 = false;
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
+};
+const { 开始护盾, 护盾类型, 查询单位标签护盾值, 充能单位标签护盾, 刷新单位标签护盾持续时间, 移除单位标签护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾") as {
+  开始护盾: (this: void, unit: any, params: any) => number;
+  护盾类型: { 通用: number };
+  查询单位标签护盾值: (this: void, unit: any, 标签: string) => number;
+  充能单位标签护盾: (this: void, unit: any, 标签: string, 数值: number, 最大值: number, 参数?: any) => number;
+  刷新单位标签护盾持续时间: (this: void, unit: any, 标签: string, 持续时间: number) => boolean;
+  移除单位标签护盾: (this: void, unit: any, 标签: string) => void;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { 莫尔特斯BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯") as {
   莫尔特斯BuffID: {
@@ -37,6 +50,8 @@ const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
 
+const 莫尔特斯腐败护盾标签 = "莫尔特斯-腐败护盾";
+
 export type 莫尔特斯阶段 = 1 | 2 | 3;
 
 export interface 莫尔特斯运行时上下文 {
@@ -46,6 +61,10 @@ export interface 莫尔特斯运行时上下文 {
   已初始化: boolean;
   清理: 机制清理篮子;
   根须宫格?: any;
+  根须领域中心X?: number;
+  根须领域中心Y?: number;
+  根须穿刺测试格子索引?: number[];
+  测试额外虫尸拾取单位?: any[];
   玩家腐败值表: Record<number, number | undefined>;
   玩家腐败值单位表: Record<number, any>;
   根系觉醒已触发: boolean;
@@ -118,6 +137,8 @@ export function 获取全部莫尔特斯上下文(this: void): 莫尔特斯运�
 }
 
 export function 清理莫尔特斯上下文(this: void, boss: any): void {
+  const context = 莫尔特斯上下文工厂.获取(boss);
+  if (context != null) 清理莫尔特斯腐败护盾(context);
   莫尔特斯上下文工厂.清理上下文(boss);
 }
 
@@ -178,10 +199,74 @@ export function 取腐败值最高玩家(this: void, context: 莫尔特斯运行
   return best;
 }
 
+function 播放莫尔特斯腐败护盾破裂特效(this: void, unit: any): void {
+  if (!单位有效(unit)) return;
+  const cfg = 莫尔特斯数值与表现配置.腐败传输;
+  创建点特效({
+    模型路径: cfg.护盾破裂特效路径,
+    X: GetUnitX(unit),
+    Y: GetUnitY(unit),
+    持续秒: cfg.护盾破裂特效持续秒,
+  });
+}
+
+function 清理莫尔特斯腐败护盾(this: void, context: 莫尔特斯运行时上下文): void {
+  const boss = context.Boss单位;
+  if (boss != null && boss !== 0) 移除单位标签护盾(boss, 莫尔特斯腐败护盾标签);
+  移除单位指定Buff(boss, 莫尔特斯BuffID.腐败护盾);
+  context.腐败护盾值 = 0;
+}
+
+function 创建莫尔特斯腐败护盾参数(this: void, context: 莫尔特斯运行时上下文, boss: any, value: number): any {
+  return {
+    类型: 护盾类型.通用,
+    数值: value,
+    持续时间: 莫尔特斯数值与表现配置.腐败传输.护盾持续秒,
+    来源单位: boss,
+    标签: 莫尔特斯腐败护盾标签,
+    结束回调: function 莫尔特斯腐败护盾结束(this: void, unit: any, _shieldID: number, _reason: string): void {
+      context.腐败护盾值 = 查询单位标签护盾值(unit, 莫尔特斯腐败护盾标签);
+      移除单位指定Buff(unit, 莫尔特斯BuffID.腐败护盾);
+    },
+    破碎回调: function 莫尔特斯腐败护盾破碎(this: void, unit: any, _shieldID: number, _absorbed: number): void {
+      context.腐败护盾值 = 0;
+      移除单位指定Buff(unit, 莫尔特斯BuffID.腐败护盾);
+      播放莫尔特斯腐败护盾破裂特效(unit);
+    },
+  };
+}
+
+export function 同步Boss腐败护盾值(this: void, context: 莫尔特斯运行时上下文): number {
+  const boss = context.Boss单位;
+  if (!单位有效(boss)) {
+    context.腐败护盾值 = 0;
+    return 0;
+  }
+  const current = 查询单位标签护盾值(boss, 莫尔特斯腐败护盾标签);
+  context.腐败护盾值 = current > 0 ? current : 0;
+  return context.腐败护盾值;
+}
+
 export function 刷新Boss腐败护盾Buff(this: void, context: 莫尔特斯运行时上下文): void {
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.腐败护盾值 <= 0) {
-    if (单位有效(boss)) 移除单位指定Buff(boss, 莫尔特斯BuffID.腐败护盾);
+    清理莫尔特斯腐败护盾(context);
+    return;
+  }
+
+  const desired = context.腐败护盾值;
+  const current = 查询单位标签护盾值(boss, 莫尔特斯腐败护盾标签);
+  if (current <= 0) {
+    开始护盾(boss, 创建莫尔特斯腐败护盾参数(context, boss, desired));
+  } else if (desired > current) {
+    充能单位标签护盾(boss, 莫尔特斯腐败护盾标签, desired - current, desired);
+  }
+  刷新单位标签护盾持续时间(boss, 莫尔特斯腐败护盾标签, 莫尔特斯数值与表现配置.腐败传输.护盾持续秒);
+
+  const actual = 查询单位标签护盾值(boss, 莫尔特斯腐败护盾标签);
+  context.腐败护盾值 = actual > 0 ? actual : 0;
+  if (context.腐败护盾值 <= 0) {
+    移除单位指定Buff(boss, 莫尔特斯BuffID.腐败护盾);
     return;
   }
   registerManualBuff(boss, 莫尔特斯BuffID.腐败护盾, 莫尔特斯数值与表现配置.腐败传输.护盾持续秒, context.腐败护盾值, {

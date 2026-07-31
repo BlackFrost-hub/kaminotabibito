@@ -5,6 +5,7 @@ import { 获取祖地双灵卫运行时上下文 } from './01．运行时上下�
 import { 祖地双灵卫数值与表现配置 } from './02．数值与表现配置';
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 import { 创建持续单位连线 } from '../../../../00．技能模板+函数/04．机制组件/07．机制连线/01．持续单位连线';
+import type { 持续单位连线实例 } from '../../../../00．技能模板+函数/04．机制组件/07．机制连线/01．持续单位连线';
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 闪电效果代码 } from '../../../../00．技能模板+函数/02．通用函数/17．闪电效果代码';
@@ -29,10 +30,14 @@ const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 let 双灵同誓已注册 = false;
 let 正在结算同誓分担 = false;
+
+function 停止同誓连线(this: void, 连线: 持续单位连线实例 | undefined): void {
+  if (连线 != null) 连线.停止('同誓保护关闭');
+}
 
 function 生命比例(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
@@ -46,8 +51,8 @@ function 关闭同誓保护(this: void, context: 祖地双灵卫运行时上下�
   context.低血保护守卫 = undefined;
   if (context.同誓保护特效 != null && context.同誓保护特效 !== 0) DestroyEffect(context.同誓保护特效);
   context.同誓保护特效 = undefined;
-  if (context.同誓暗金连线 != null) context.同誓暗金连线.停止('同誓保护关闭');
-  if (context.同誓冷蓝连线 != null) context.同誓冷蓝连线.停止('同誓保护关闭');
+  停止同誓连线(context.同誓暗金连线);
+  停止同誓连线(context.同誓冷蓝连线);
   context.同誓暗金连线 = undefined;
   context.同誓冷蓝连线 = undefined;
   if (previousLow != null && previousLow !== 0) 移除单位指定Buff(previousLow, 祖地双灵卫BuffID.双灵同誓);
@@ -131,7 +136,7 @@ function on双灵同誓伤害修正(this: void, damage: any): number {
   result -= shared;
   if (shared > 0 && high != null && high !== 0) {
     正在结算同誓分担 = true;
-    UnitDamageTarget(damage.attacker ?? damage.target, high, shared, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS);
+    UnitDamageTarget(damage.attacker ?? damage.target, high, shared, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
     正在结算同誓分担 = false;
   }
   return result;

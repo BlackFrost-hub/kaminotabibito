@@ -24,7 +24,7 @@ ____exports["树魔首领Buff表"] = {
         dispelLevel = 3,
         priority = 84,
         canPurge = false,
-        tooltip = "场上每存在1个树魔首领随从，Boss攻击力提高20%，最多叠加4层；随从死亡后动态扣层。"
+        tooltip = "每1个存活的树魔首领随从使Boss按基准攻击力（当前攻击力减去本Buff已有增量）额外增加20%攻击力；最多4层=80%，每1.5秒按存活数量重算，随从死亡或入场会同步增减层数。"
     },
     [____exports["树魔首领BuffID"]["无从暴怒"]] = {
         buffID = ____exports["树魔首领BuffID"]["无从暴怒"],
@@ -39,7 +39,7 @@ ____exports["树魔首领Buff表"] = {
         dispelLevel = 3,
         priority = 88,
         canPurge = false,
-        tooltip = "场上没有任何自身随从时，树魔首领进入暴怒：攻击速度提高100%，移动速度提高50%，直到新随从入场后移除。"
+        tooltip = "场上没有任何自身随从时，树魔首领获得额外攻速+100%，并获得等于默认移动速度×50%的额外移速；新随从入场后立即移除，Buff每1.5秒刷新。"
     },
     [____exports["树魔首领BuffID"]["古树衰弱"]] = {
         buffID = ____exports["树魔首领BuffID"]["古树衰弱"],
@@ -54,7 +54,7 @@ ____exports["树魔首领Buff表"] = {
         dispelLevel = 2,
         priority = 62,
         canPurge = true,
-        tooltip = "被扩散冲击波削弱，攻击力降低40%，持续7秒。"
+        tooltip = "被扩散冲击波命中后，普通攻击造成的最终伤害降低40%，持续7秒；技能伤害不受此效果影响。"
     },
     [____exports["树魔首领BuffID"]["远古诅咒"]] = {
         buffID = ____exports["树魔首领BuffID"]["远古诅咒"],
@@ -72,7 +72,7 @@ ____exports["树魔首领Buff表"] = {
         dispelLevel = 2,
         priority = 78,
         canPurge = true,
-        tooltip = "被远古诅咒点名。3秒后承受当前生命百分比精神伤害，400范围内其他玩家可分摊。"
+        tooltip = "点名后持续3秒；结算时第一段总伤害=点名目标当前生命值×（60%+20%×N），N为当前有效玩家人数且至少按1人计算。点名目标与其400码内有效玩家均分总伤害，无其他玩家时由点名目标独自承受；第一段后每名有效玩家恢复等于该总伤害的生命值。N≥2时，1.8秒后在玩家中心650码内受到Boss当前攻击力×300%+目标最大生命值×10%的第二段伤害。"
     },
     [____exports["树魔首领BuffID"]["治疗枯竭"]] = {
         buffID = ____exports["树魔首领BuffID"]["治疗枯竭"],
@@ -87,7 +87,7 @@ ____exports["树魔首领Buff表"] = {
         dispelLevel = 2,
         priority = 66,
         canPurge = true,
-        tooltip = "受到生命陷阱影响，受到的治疗效果降低，难度越高降低幅度越高。"
+        tooltip = "生命陷阱每1秒刷新一次；每次获得1.4秒治疗修正，受到的治疗量降低50%+难度等级×5%（难度1/2/3分别为55%/60%/65%，更高难度继续按公式增加）。"
     },
     [____exports["树魔首领BuffID"]["静止陷阱眩晕"]] = {
         buffID = ____exports["树魔首领BuffID"]["静止陷阱眩晕"],
@@ -104,7 +104,7 @@ ____exports["树魔首领Buff表"] = {
         dispelLevel = 3,
         priority = 82,
         canPurge = false,
-        tooltip = "触发静止陷阱后被无视韧性眩晕8秒。"
+        tooltip = "进入静止陷阱600码范围后等待0.75秒触发；触发后所有有效玩家获得无视韧性的眩晕8秒。"
     }
 }
 ____exports.default = ____exports["树魔首领Buff表"]
