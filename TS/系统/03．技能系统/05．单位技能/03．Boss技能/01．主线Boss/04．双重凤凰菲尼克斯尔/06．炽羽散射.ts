@@ -21,14 +21,14 @@ import {
   创建预警圆,
   播放点特效,
   范围敌人,
-  计算攻击最大生命伤害,
-  造成火焰伤害,
+  取菲尼克斯尔技能强度倍率,
   添加元素层数,
   极坐标X,
   极坐标Y,
 } from "./19．公共工具";
 import type { 菲尼克斯尔伤害上下文参数 } from "./19．公共工具";
 import { 创建二阶贝塞尔XYZ轨迹, 创建原生弹幕 } from "../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
@@ -38,12 +38,15 @@ const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => numbe
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, animationIndex: number) => void;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const bj_RADTODEG = (jass.bj_RADTODEG ?? 57.29577951308232) as number;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const 菲尼克斯尔单位类型ID = stringToFourCC(菲尼克斯尔单位技能配置.单位ID);
 const 炽羽散射技能ID = stringToFourCC(菲尼克斯尔单位技能配置.技能壳.炽羽散射);
 let 炽羽散射已注册 = false;
 
-function 创建菲尼克斯尔燃烧区(this: void, context: 菲尼克斯尔运行时上下文, x: number, y: number, 伤害上下文: 菲尼克斯尔伤害上下文参数): void {
+export function 创建菲尼克斯尔燃烧区(this: void, context: 菲尼克斯尔运行时上下文, x: number, y: number, 伤害上下文: 菲尼克斯尔伤害上下文参数): void {
   const config = 菲尼克斯尔数值与表现配置.炽羽散射;
   播放点特效(菲尼克斯尔数值与表现配置.特效.燃烧区, x, y, config.燃烧区持续秒 * 1000);
   let elapsed = 0;
@@ -52,7 +55,23 @@ function 创建菲尼克斯尔燃烧区(this: void, context: 菲尼克斯尔运�
     const enemies = 范围敌人(context.Boss, x, y, config.燃烧区半径);
     for (let i = 0; i < enemies.length; i++) {
       const u = enemies[i];
-      造成火焰伤害(context.Boss, u, 计算攻击最大生命伤害(context.Boss, u, 0, config.燃烧Tick目标最大生命比例), "AOE", 伤害上下文);
+      if (单位存活(context.Boss) && 单位存活(u)) {
+        执行BossAOE技能伤害({
+          技能ID: 伤害上下文?.技能ID,
+          技能实例ID: 伤害上下文?.技能实例ID,
+          标签: 伤害上下文?.标签,
+          来源: context.Boss,
+          目标: u,
+          伤害公式: {
+            目标最大生命比例: config.燃烧Tick目标最大生命比例,
+            总倍率: 取菲尼克斯尔技能强度倍率(context.Boss),
+          },
+          ranged: true,
+          attackType: ATTACK_TYPE_NORMAL,
+          伤害类型: DAMAGE_TYPE_FIRE,
+          weaponType: WEAPON_TYPE_WHOKNOWS,
+        });
+      }
       添加元素层数(u, "火", config.火印层数);
     }
     if (elapsed >= config.燃烧区持续秒) 停止周期(tick);
@@ -71,7 +90,24 @@ function 结算菲尼克斯尔炽羽落点(this: void, context: 菲尼克斯尔�
   const enemies = 范围敌人(boss, x, y, config.落点半径);
   for (let i = 0; i < enemies.length; i++) {
     const u = enemies[i];
-    造成火焰伤害(boss, u, 计算攻击最大生命伤害(boss, u, config.羽毛伤害Boss攻击力比例, config.羽毛伤害目标最大生命比例), "AOE", 伤害上下文);
+    if (单位存活(boss) && 单位存活(u)) {
+      执行BossAOE技能伤害({
+        技能ID: 伤害上下文?.技能ID,
+        技能实例ID: 伤害上下文?.技能实例ID,
+        标签: 伤害上下文?.标签,
+        来源: boss,
+        目标: u,
+        伤害公式: {
+          来源攻击力比例: config.羽毛伤害Boss攻击力比例,
+          目标最大生命比例: config.羽毛伤害目标最大生命比例,
+          总倍率: 取菲尼克斯尔技能强度倍率(boss),
+        },
+        ranged: true,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_FIRE,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+      });
+    }
     添加元素层数(u, "火", config.火印层数);
   }
   创建菲尼克斯尔燃烧区(context, x, y, 伤害上下文);

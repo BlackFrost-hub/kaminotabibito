@@ -15,22 +15,15 @@ local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____03_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.03．对外接口")
 local _____5F00_59CB_8DF3_8DC3 = ____03_FF0E_5BF9_5916_63A5_53E3["开始跳跃"]
-local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
-local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
-local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
-local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
-local ____require_result_1 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_1["显示常规技能吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_1["关闭吟唱条"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____5F00_59CB_786C_76F4 = ____require_result_2["开始硬直"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
-local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_4["创建循环点特效"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
+local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_3["创建循环点特效"]
 local jass = require("jass.common")
 local GetRandomInt = jass.GetRandomInt
 local GetUnitX = jass.GetUnitX
@@ -279,101 +272,61 @@ ____exports["刷新米亚腐化转移污染平台"] = function(context, nowMs)
         end
     end
 end
-local function _____521B_5EFA_8150_5316_8F6C_79FB_65F6_95F4_8F74_4E8B_4EF6(context, nowMs, _____533A_57DF)
-    local boss = context["Boss单位"]
-    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化转移"]
-    local _____9884_8B66_6BEB_79D2 = config["预警秒"] * 1000
-    return {
-        {
-            ["时点毫秒"] = 0,
-            ["名称"] = "腐化转移开始",
-            ["执行"] = function()
-                if not _____5355_4F4D_6709_6548(boss) then
-                    return
-                end
-                _____9762_5411_5E73_53F0(boss, _____533A_57DF)
-                _____5F00_59CB_786C_76F4(boss, config["预警秒"])
-                SetUnitTimeScale(boss, config["预警动画速度"])
-                SetUnitAnimationByIndex(boss, config["预警动画编号"])
-                _____64AD_653E_5E73_53F0_9884_8B66(_____533A_57DF)
-                _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "腐化转移", 0)
-                _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({
-                    ["总时长"] = config["预警秒"],
-                    ["颜色ID"] = 3,
-                    ["标题文本"] = "腐化转移",
-                    ["提示文本"] = ((("预警" .. tostring(config["预警秒"])) .. "秒后跳向目标平台并污染") .. tostring(config["平台污染持续秒"])) .. "秒（离开红色预警平台）。"
-                })
-            end
-        },
-        {
-            ["时点毫秒"] = config["弓背冻结延迟Ms"],
-            ["名称"] = "腐化转移弓背冻结",
-            ["执行"] = function()
-                local currentBoss = context["Boss单位"]
-                if _____5355_4F4D_6709_6548(currentBoss) then
-                    SetUnitTimeScale(currentBoss, config["弓背冻结动画速度"])
-                end
-            end
-        },
-        {
-            ["时点毫秒"] = _____9884_8B66_6BEB_79D2,
-            ["名称"] = "腐化转移落点生效",
-            ["执行"] = function()
-                local currentBoss = context["Boss单位"]
-                _____5173_95ED_541F_5531_6761("常规技能")
-                if not _____5355_4F4D_6709_6548(currentBoss) or context["阶段"] < 2 then
-                    return
-                end
-                if not _____5F00_59CB_7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3(context, _____533A_57DF) then
-                    SetUnitTimeScale(currentBoss, config["恢复动画速度"])
-                    SetUnitAnimationByIndex(currentBoss, config["恢复动画编号"])
-                    return
-                end
-                _____5F00_59CB_6C61_67D3_5E73_53F0(context, _____533A_57DF, nowMs + _____9884_8B66_6BEB_79D2)
-            end
-        },
-        {
-            ["时点毫秒"] = _____9884_8B66_6BEB_79D2 + config["恢复动作延迟Ms"],
-            ["名称"] = "腐化转移恢复动作",
-            ["执行"] = function()
-                local currentBoss = context["Boss单位"]
-                if not _____5355_4F4D_6709_6548(currentBoss) then
-                    return
-                end
-                SetUnitTimeScale(currentBoss, config["恢复动画速度"])
-                SetUnitAnimationByIndex(currentBoss, config["恢复动画编号"])
-            end
-        }
-    }
+local function _____6062_590D_7C73_4E9A_8150_5316_8F6C_79FB_52A8_4F5C(boss, config)
+    if not _____5355_4F4D_6709_6548(boss) then
+        return
+    end
+    SetUnitTimeScale(boss, config["恢复动画速度"])
+    SetUnitAnimationByIndex(boss, config["恢复动画编号"])
 end
 local function _____542F_52A8_8150_5316_8F6C_79FB(context, nowMs, _____533A_57DF)
+    local boss = context["Boss单位"]
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["腐化转移"]
-    if context["腐化转移组合执行器"] == nil then
-        context["腐化转移组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "米亚-腐化转移", ["清理"] = context["清理"], ["互斥组"] = "米亚普通技能"})
-    end
-    local ____self_5 = context["腐化转移组合执行器"]
-    local _____6267_884CID = ____self_5["开始"](
-        ____self_5,
-        {
-            key = "腐化转移",
-            ["单位"] = context["Boss单位"],
-            ["上下文"] = context,
-            ["最大持续毫秒"] = config["预警秒"] * 1000 + config["恢复动作延迟Ms"] + 500,
-            ["阶段列表"] = _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868(_____521B_5EFA_8150_5316_8F6C_79FB_65F6_95F4_8F74_4E8B_4EF6(context, nowMs, _____533A_57DF)),
-            ["结束回调"] = function(event)
-                if event["原因"] == "完成" then
-                    return
-                end
-                _____5173_95ED_541F_5531_6761("常规技能")
-                if not _____5355_4F4D_6709_6548(context["Boss单位"]) then
-                    return
-                end
-                SetUnitTimeScale(context["Boss单位"], config["恢复动画速度"])
-                SetUnitAnimationByIndex(context["Boss单位"], config["恢复动画编号"])
+    context["腐化转移施法中"] = true
+    local _____6D41_7A0B = _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
+        ["名称"] = "米亚-腐化转移",
+        ["施法者"] = boss,
+        ["目标X"] = _____533A_57DF["中心X"],
+        ["目标Y"] = _____533A_57DF["中心Y"],
+        ["硬直秒"] = config["预警秒"],
+        ["生效延迟秒"] = config["预警秒"],
+        ["完成延迟毫秒"] = config["恢复动作延迟Ms"],
+        ["动画编号"] = config["预警动画编号"],
+        ["动画速度"] = config["预警动画速度"],
+        ["后续动画速度"] = config["弓背冻结动画速度"],
+        ["后续动画延迟毫秒"] = config["弓背冻结延迟Ms"],
+        ["完成后恢复动作"] = false,
+        ["清理"] = context["清理"],
+        ["吟唱条"] = {
+            ["通道"] = "常规技能",
+            ["总时长"] = config["预警秒"],
+            ["颜色ID"] = 3,
+            ["标题文本"] = "腐化转移",
+            ["提示文本"] = ((("预警" .. tostring(config["预警秒"])) .. "秒后跳向目标平台并污染") .. tostring(config["平台污染持续秒"])) .. "秒（离开红色预警平台）。"
+        },
+        ["播放台词"] = function()
+            _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "腐化转移", 0)
+        end,
+        ["on生效"] = function()
+            local currentBoss = context["Boss单位"]
+            if not _____5355_4F4D_6709_6548(currentBoss) or context["阶段"] < 2 then
+                _____6062_590D_7C73_4E9A_8150_5316_8F6C_79FB_52A8_4F5C(currentBoss, config)
+                return
             end
-        }
-    )
-    return _____6267_884CID ~= 0
+            if not _____5F00_59CB_7C73_4E9A_8150_5316_8F6C_79FB_8DF3_8DC3(context, _____533A_57DF) then
+                _____6062_590D_7C73_4E9A_8150_5316_8F6C_79FB_52A8_4F5C(currentBoss, config)
+                return
+            end
+            _____5F00_59CB_6C61_67D3_5E73_53F0(context, _____533A_57DF, nowMs + config["预警秒"] * 1000)
+        end,
+        ["on结束"] = function(_____539F_56E0)
+            context["腐化转移施法中"] = false
+            if _____539F_56E0 == "完成" then
+                _____6062_590D_7C73_4E9A_8150_5316_8F6C_79FB_52A8_4F5C(context["Boss单位"], config)
+            end
+        end
+    })
+    return _____6D41_7A0B ~= nil and not _____6D41_7A0B["是否结束"](_____6D41_7A0B)
 end
 ____exports["释放米亚腐化转移"] = function(context, nowMs, _____6307_5B9A_533A_57DF)
     if context == nil then
@@ -382,6 +335,9 @@ ____exports["释放米亚腐化转移"] = function(context, nowMs, _____6307_5B9
     local boss = context["Boss单位"]
     local _____5F53_524D_6C61_67D3_5E73_53F0ID = context["腐化转移污染平台ID"] or ""
     if context["阶段"] < 2 then
+        return false
+    end
+    if context["腐化转移施法中"] then
         return false
     end
     if _____5F53_524D_6C61_67D3_5E73_53F0ID ~= "" then

@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 
 import { 树魔首领单位技能配置 } from "./00．配置";
-import { 获取树魔首领上下文, 获取或创建树魔首领上下文, 获取全部树魔首领上下文, 清理树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
+import { 获取或创建树魔首领上下文, 获取全部树魔首领上下文, 清理树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
 import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
 import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
@@ -9,6 +9,8 @@ import { stringToFourCC, 读取单位攻击力, 单位句柄存在, 单位未标
 import { 发起治疗波跳链 } from '../../../../00．技能模板+函数/01．技能函数/10．跳链/治疗波跳链';
 import { 开始充能 } from '../../../../00．技能模板+函数/01．技能函数/06．施法·蓄力·充能/充能系统';
 import type { 充能结束原因 } from '../../../../00．技能模板+函数/01．技能函数/06．施法·蓄力·充能/充能系统';
+import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
+import { 创建周期行为 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器';
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -34,16 +36,9 @@ const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 const {
-  addPeriodicCallback,
-  removePeriodicCallback,
   getServerTime,
 } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
-};
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, unit: any, buffID: string, duration: number, effect: number, extra?: any) => void;
@@ -70,6 +65,9 @@ const {
   是否指定Boss护卫: (this: void, unit: any, boss: any) => boolean;
   处理Boss结束全部护卫: (this: void, boss: any) => void;
 };
+const { 消费剧情Boss战带入随从 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接") as {
+  消费剧情Boss战带入随从: (this: void, boss: any) => any[];
+};
 
 const 攻击力属性ID = 1;
 const 攻速属性ID = 10;
@@ -85,10 +83,6 @@ function 是树魔首领(this: void, unit: any): boolean {
   return 单位存活(unit) && GetUnitTypeId(unit) === 树魔首领单位类型ID;
 }
 
-function 单位类型是树魔首领(this: void, unit: any): boolean {
-  return 单位句柄存在(unit) && GetUnitTypeId(unit) === 树魔首领单位类型ID;
-}
-
 interface 树魔随从存活统计 {
   猎头者: number;
   巫医: number;
@@ -100,6 +94,12 @@ interface 树魔随从编制项 {
   召唤距离: number;
   相对Boss朝向角度: number;
   槽位间隔角度: number;
+}
+
+interface 树魔巫医治疗驱动变量 {
+  context: 树魔首领运行时上下文;
+  巫医单位: any;
+  下一次治疗Ms: number;
 }
 
 function 统计树魔随从(this: void, context: 树魔首领运行时上下文): 树魔随从存活统计 {
@@ -114,6 +114,16 @@ function 统计树魔随从(this: void, context: 树魔首领运行时上下文)
     else if (typeId === 投掷者单位类型ID) result.投掷者++;
   }
   return result;
+}
+
+function 登记剧情带入树魔随从(this: void, context: 树魔首领运行时上下文): void {
+  const list = 消费剧情Boss战带入随从(context.Boss单位);
+  for (let i = 0; i < list.length; i++) {
+    const minion = list[i];
+    if (!单位存活(minion)) continue;
+    context.随从组.登记(minion);
+    if (GetUnitTypeId(minion) === 巫医单位类型ID) 启动巫医治疗驱动(context, minion);
+  }
 }
 
 function 计算随从召唤点(
@@ -317,21 +327,30 @@ function 启动巫医治疗波施法(
 
 function 启动巫医治疗驱动(this: void, context: 树魔首领运行时上下文, witchDoctor: any): void {
   const cfg = 树魔首领数值与表现配置.随从特性;
-  let 下一次治疗Ms = getServerTime() + cfg.巫医疗波首次延迟秒 * 1000;
-  let healId = 0;
-  healId = addPeriodicCallback(cfg.巫医治疗检测间隔秒 * 1000, function 树魔巫医治疗Tick(this: void): void {
-    if (!单位存活(witchDoctor) || !单位存活(context.Boss单位)) {
-      removePeriodicCallback(healId);
-      return;
-    }
-    const now = getServerTime();
-    if (now < 下一次治疗Ms) return;
-    const target = 选择巫医治疗目标(context);
-    if (target == null || target === 0) return;
-    下一次治疗Ms = now + cfg.巫医疗波冷却秒 * 1000;
-    启动巫医治疗波施法(context, witchDoctor, target);
+  const 变量: 树魔巫医治疗驱动变量 = {
+    context,
+    巫医单位: witchDoctor,
+    下一次治疗Ms: getServerTime() + cfg.巫医疗波首次延迟秒 * 1000,
+  };
+  创建周期行为({
+    名称: "树魔-巫医治疗驱动",
+    间隔毫秒: cfg.巫医治疗检测间隔秒 * 1000,
+    变量,
+    清理: context.清理,
+    onTick: 树魔巫医治疗Tick,
   });
-  context.清理.登记周期回调("树魔巫医治疗", healId);
+}
+
+function 树魔巫医治疗Tick(this: void, _执行次数: number, variable?: any): boolean {
+  const data = variable as 树魔巫医治疗驱动变量 | undefined;
+  if (data == null || !单位存活(data.巫医单位) || !单位存活(data.context.Boss单位)) return false;
+  const now = getServerTime();
+  if (now < data.下一次治疗Ms) return true;
+  const target = 选择巫医治疗目标(data.context);
+  if (target == null || target === 0) return true;
+  data.下一次治疗Ms = now + 树魔首领数值与表现配置.随从特性.巫医疗波冷却秒 * 1000;
+  启动巫医治疗波施法(data.context, data.巫医单位, target);
+  return true;
 }
 
 export function 测试触发树魔巫医疗波(this: void, context: 树魔首领运行时上下文): boolean {
@@ -400,6 +419,7 @@ export function 初始化树魔首领随从特性(this: void, context: 树魔首
   context.清理.登记清理("树魔首领-无从暴怒清理", function 清理树魔首领无从暴怒(this: void): void {
     退出无从暴怒(context);
   });
+  登记剧情带入树魔随从(context);
   if (cfg.初始召唤延迟秒 <= 0) {
     补充树魔随从编制(context);
     context.下一次召唤Ms = getServerTime() + cfg.补员间隔秒 * 1000;
@@ -493,36 +513,33 @@ function 刷新随从状态(this: void, context: 树魔首领运行时上下文)
   }
 }
 
-function on树魔首领死亡(this: void, dyingUnit: any): void {
-  if (!单位类型是树魔首领(dyingUnit)) return;
-  const context = 获取树魔首领上下文(dyingUnit);
-  if (context != null) 退出无从暴怒(context);
-  清理树魔首领上下文(dyingUnit);
-}
-
-function 树魔首领随从特性Tick(this: void): void {
+function 获取树魔首领随从特性上下文列表(this: void): 树魔首领运行时上下文[] {
   const currentBoss = jglobals.udg_Boss;
   if (是树魔首领(currentBoss)) {
     const context = 获取或创建树魔首领上下文(currentBoss);
     if (context != null) 初始化树魔首领随从特性(context);
   }
+  return 获取全部树魔首领上下文();
+}
 
-  const now = getServerTime();
-  const list = 获取全部树魔首领上下文();
-  for (let i = 0; i < list.length; i++) {
-    const context = list[i];
-    if (context == null) continue;
-    if (context.随从特性已初始化 && context.下一次召唤Ms > 0 && now >= context.下一次召唤Ms) {
-      补充树魔随从编制(context);
-      context.下一次召唤Ms = now + 树魔首领数值与表现配置.随从特性.补员间隔秒 * 1000;
-    }
-    刷新随从状态(context);
+function 执行树魔首领随从特性Tick(this: void, context: 树魔首领运行时上下文, now: number): void {
+  if (context == null) return;
+  if (context.随从特性已初始化) 登记剧情带入树魔随从(context);
+  if (context.随从特性已初始化 && context.下一次召唤Ms > 0 && now >= context.下一次召唤Ms) {
+    补充树魔随从编制(context);
+    context.下一次召唤Ms = now + 树魔首领数值与表现配置.随从特性.补员间隔秒 * 1000;
   }
+  刷新随从状态(context);
 }
 
 export function 注册树魔首领随从特性(this: void): void {
   if (树魔首领随从特性已注册) return;
   树魔首领随从特性已注册 = true;
-  registerDeathListener(on树魔首领死亡);
-  addPeriodicCallback(树魔首领数值与表现配置.随从特性.追随刷新间隔毫秒, 树魔首领随从特性Tick);
+  创建周期机制调度器({
+    名称: "树魔首领-随从特性驱动",
+    间隔毫秒: 树魔首领数值与表现配置.随从特性.追随刷新间隔毫秒,
+    取上下文列表: 获取树魔首领随从特性上下文列表,
+    取当前时间: getServerTime,
+    执行: 执行树魔首领随从特性Tick,
+  });
 }

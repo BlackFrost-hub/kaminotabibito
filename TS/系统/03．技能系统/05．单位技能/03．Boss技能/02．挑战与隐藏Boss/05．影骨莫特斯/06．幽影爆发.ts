@@ -2,12 +2,16 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取影骨莫特斯上下文, 获取或创建影骨莫特斯上下文, 刷新影骨幽灵形态Buff, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯模型动画配置, 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 创建影骨召唤物 } from "./04．骸骨召唤";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
-import { 单位有效, 播放影骨莫特斯限时动作, 开始影骨莫特斯常规施法, stringToFourCC, 极坐标X, 极坐标Y } from "./11．公共工具";
+import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y } from "./11．公共工具";
+import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
+};
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
@@ -28,11 +32,8 @@ const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
-};
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
@@ -52,13 +53,17 @@ const 骷髅射手ID = stringToFourCC(影骨莫特斯数值与表现配置.骸�
 
 let 已注册幽影爆发 = false;
 let 已注册幽影承伤 = false;
-const 幽影爆发周期表: Record<number, { context: 影骨莫特斯运行时上下文; count: number; id: number } | undefined> = {};
-let 下一个幽影周期ID = 0;
 
 interface 影骨幽影爆发结束变量 {
   context: 影骨莫特斯运行时上下文;
   aura: any;
   已销毁: boolean;
+}
+
+interface 影骨幽影爆发召唤变量 {
+  context: 影骨莫特斯运行时上下文;
+  count: number;
+  id: number;
 }
 
 function 关闭影骨幽影爆发状态吟唱条(this: void): void {
@@ -75,34 +80,42 @@ function on影骨幽影承伤修正(this: void, damageContext: any): number {
   return damageContext.currentDamage;
 }
 
+function 满足影骨幽影承伤条件(this: void, damageContext: any): boolean {
+  if (damageContext == null || !单位有效(damageContext.target)) return false;
+  if (GetUnitTypeId(damageContext.target) !== 影骨单位类型ID) return false;
+  const context = 获取影骨莫特斯上下文(damageContext.target);
+  return context != null && context.幽影爆发中 && damageContext.target === context.Boss单位;
+}
+
 function 确保幽影承伤修正(this: void): void {
   if (已注册幽影承伤) return;
   已注册幽影承伤 = true;
-  registerDamageModifier(on影骨幽影承伤修正, 52);
+  创建条件伤害修正({
+    名称: "影骨幽影爆发承伤修正",
+    优先级: 52,
+    条件: 满足影骨幽影承伤条件,
+    修正: on影骨幽影承伤修正,
+  });
 }
 
-function 幽影爆发召唤Tick(this: void): void {
-  for (const key in 幽影爆发周期表) {
-    const data = 幽影爆发周期表[key];
-    if (data == null) continue;
-    const context = data.context;
-    if (!单位有效(context.Boss单位) || !context.幽影爆发中) {
-      removePeriodicCallback(data.id);
-      delete 幽影爆发周期表[key];
-      continue;
-    }
-    data.count += 1;
-    const cfg = 影骨莫特斯数值与表现配置.幽影爆发;
-    const angle = GetRandomReal(0, 360);
-    const x = 极坐标X(cfg.召唤中心X, cfg.召唤半径, angle);
-    const y = 极坐标Y(cfg.召唤中心Y, cfg.召唤半径, angle);
-    const unitType = data.count % 2 === 0 ? 骷髅射手ID : 骷髅盗贼ID;
-    const instance = 创建影骨召唤物(context, unitType, x, y, undefined, true);
-    if (instance != null && instance.单位 != null) context.幽影召唤物.push(instance.单位);
-    if (data.count * cfg.召唤间隔秒 >= cfg.召唤持续秒) {
-      removePeriodicCallback(data.id);
-      delete 幽影爆发周期表[key];
-    }
+function 幽影爆发召唤Tick(this: void, variable?: any): void {
+  const data = variable as 影骨幽影爆发召唤变量 | undefined;
+  if (data == null) return;
+  const context = data.context;
+  if (!单位有效(context.Boss单位) || !context.幽影爆发中) {
+    removePeriodicCallback(data.id);
+    return;
+  }
+  data.count += 1;
+  const cfg = 影骨莫特斯数值与表现配置.幽影爆发;
+  const angle = GetRandomReal(0, 360);
+  const x = 极坐标X(cfg.召唤中心X, cfg.召唤半径, angle);
+  const y = 极坐标Y(cfg.召唤中心Y, cfg.召唤半径, angle);
+  const unitType = data.count % 2 === 0 ? 骷髅射手ID : 骷髅盗贼ID;
+  const instance = 创建影骨召唤物(context, unitType, x, y);
+  if (instance != null && instance.单位 != null) context.幽影召唤物.push(instance.单位);
+  if (data.count * cfg.召唤间隔秒 >= cfg.召唤持续秒) {
+    removePeriodicCallback(data.id);
   }
 }
 
@@ -140,9 +153,25 @@ function 影骨幽影爆发结束(this: void, variable: 影骨幽影爆发结束
 }
 
 export function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运行时上下文): void {
-  if (!单位有效(context.Boss单位)) return;
+  if (!单位有效(context.Boss单位) || context.幽影爆发中) return;
   const cfg = 影骨莫特斯数值与表现配置.幽影爆发;
-  开始影骨莫特斯常规施法(context.Boss单位, cfg.动画播放秒, "幽影爆发", "幽影领域正在展开");
+  启动基础施法时间线({
+    名称: "影骨-幽影爆发起手",
+    施法者: context.Boss单位,
+    硬直秒: cfg.动画播放秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    恢复动画编号: 影骨莫特斯模型动画配置.战斗待机编号,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.动画播放秒,
+      颜色ID: 4,
+      标题文本: "幽影爆发",
+      提示文本: "幽影领域正在展开",
+    },
+    清理: context.清理,
+    on生效: function 影骨幽影爆发起手时间线生效(this: void): void {},
+  });
   显示大招吟唱条({
     通道: "大招",
     总时长: cfg.持续秒,
@@ -151,7 +180,6 @@ export function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运
     提示文本: "幽影领域持续中",
   });
   context.清理.登记清理("影骨-幽影爆发状态吟唱条", 关闭影骨幽影爆发状态吟唱条);
-  播放影骨莫特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   播放影骨莫特斯台词(context.Boss单位, "幽影爆发");
   创建点特效({
     模型路径: 影骨莫特斯表现配置.幽影爆发开场,
@@ -188,10 +216,13 @@ export function 释放影骨幽影爆发(this: void, context: 影骨莫特斯运
     叠加键: "影骨-幽影视野压制",
   });
 
-  const key = ++下一个幽影周期ID;
-  const id = addPeriodicCallback(影骨莫特斯数值与表现配置.幽影爆发.召唤间隔秒 * 1000, 幽影爆发召唤Tick);
-  幽影爆发周期表[key] = { context, count: 0, id };
-  context.清理.登记周期回调("影骨-幽影爆发召唤", id);
+  const summonVariable: 影骨幽影爆发召唤变量 = { context, count: 0, id: 0 };
+  summonVariable.id = addPeriodicCallback(
+    影骨莫特斯数值与表现配置.幽影爆发.召唤间隔秒 * 1000,
+    幽影爆发召唤Tick,
+    summonVariable,
+  );
+  context.清理.登记周期回调("影骨-幽影爆发召唤", summonVariable.id);
   context.清理.登记延迟回调("影骨-幽影爆发结束", addDelayedCallback(影骨莫特斯数值与表现配置.幽影爆发.持续秒 * 1000, 影骨幽影爆发结束, endVariable));
 }
 

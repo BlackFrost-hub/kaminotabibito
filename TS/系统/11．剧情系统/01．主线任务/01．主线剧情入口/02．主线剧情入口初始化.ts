@@ -174,7 +174,11 @@ function 初始化单位范围入口(this: void): void {
     const 配置 = 主线剧情单位范围入口配置表[i];
     const unit = NPC运行时表[配置.NPC配置名];
     if (unit == null) continue;
-    registerUnitInRangeTrigger(创建入口触发器(展开入口剧情分支(配置)), unit, 配置.注册范围, null, false);
+    const 分支列表 = 展开入口剧情分支(配置);
+    for (let j = 0; j < 分支列表.length; j++) {
+      const 分支 = 分支列表[j];
+      registerUnitInRangeTrigger(创建入口触发器([分支]), unit, 分支.注册范围 ?? 配置.注册范围, null, false);
+    }
   }
 }
 

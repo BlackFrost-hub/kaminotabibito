@@ -6,6 +6,7 @@ local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系
 local _____83B7_53D6_6216_521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建影骨莫特斯上下文"]
 local _____5237_65B0_5F71_9AA8_76D7_8D3C_9057_4EA7Buff = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["刷新影骨盗贼遗产Buff"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.02．数值与表现配置")
+local _____5F71_9AA8_83AB_7279_65AF_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯模型动画配置"]
 local _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯数值与表现配置"]
 local _____5F71_9AA8_83AB_7279_65AF_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯表现配置"]
 local _____5F71_9AA8_83AB_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["影骨莫特斯音效配置"]
@@ -13,8 +14,6 @@ local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放影骨莫特斯台词"]
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
-local _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C = ____11_FF0E_516C_5171_5DE5_5177["播放影骨莫特斯限时动作"]
-local _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5 = ____11_FF0E_516C_5171_5DE5_5177["开始影骨莫特斯常规施法"]
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
@@ -24,19 +23,21 @@ local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
 local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IssueTargetOrder = jass.IssueTargetOrder
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.12．交互宝箱桥接")
-local _____521B_5EFA_4EA4_4E92_5B9D_7BB1 = ____require_result_1["创建交互宝箱"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_2["临时调整攻击"]
-local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.12．交互宝箱桥接")
+local _____521B_5EFA_4EA4_4E92_5B9D_7BB1 = ____require_result_2["创建交互宝箱"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_3["临时调整攻击"]
+local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
 local _____5F71_9AA8_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____76D7_8D3C_9057_4EA7_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["盗贼的遗产"])
 local _____5DF2_6CE8_518C_76D7_8D3C_9057_4EA7 = false
@@ -122,8 +123,8 @@ ____exports["释放影骨盗贼遗产"] = function(context)
     if context["盗贼遗产组合执行器"] == nil then
         context["盗贼遗产组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "影骨莫特斯-盗贼遗产", ["清理"] = context["清理"], ["互斥组"] = "影骨莫特斯盗贼遗产"})
     end
-    local ____self_4 = context["盗贼遗产组合执行器"]
-    if ____self_4["是否运行中"](____self_4) then
+    local ____self_5 = context["盗贼遗产组合执行器"]
+    if ____self_5["是否运行中"](____self_5) then
         return
     end
     local _____4E8B_4EF6_5217_8868 = {}
@@ -135,12 +136,9 @@ ____exports["释放影骨盗贼遗产"] = function(context)
         end
     end
     context["遗产宝箱已生成"] = true
-    _____5F00_59CB_5F71_9AA8_83AB_7279_65AF_5E38_89C4_65BD_6CD5(context["Boss单位"], cfg["动画播放秒"], "盗贼的遗产", "遗产宝箱正在依次出现")
-    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动画播放秒"])
-    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "盗贼的遗产")
-    local ____self_5 = context["盗贼遗产组合执行器"]
-    local _____6267_884CID = ____self_5["开始"](
-        ____self_5,
+    local ____self_6 = context["盗贼遗产组合执行器"]
+    local _____6267_884CID = ____self_6["开始"](
+        ____self_6,
         {
             key = "盗贼的遗产",
             ["单位"] = context["Boss单位"],
@@ -151,7 +149,29 @@ ____exports["释放影骨盗贼遗产"] = function(context)
     )
     if _____6267_884CID == 0 then
         context["遗产宝箱已生成"] = false
+        return
     end
+    _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
+        ["名称"] = "影骨-盗贼遗产",
+        ["施法者"] = context["Boss单位"],
+        ["硬直秒"] = cfg["动画播放秒"],
+        ["动画编号"] = cfg["动画编号"],
+        ["动画速度"] = cfg["动画速度"],
+        ["恢复动画编号"] = _____5F71_9AA8_83AB_7279_65AF_6A21_578B_52A8_753B_914D_7F6E["战斗待机编号"],
+        ["吟唱条"] = {
+            ["通道"] = "常规技能",
+            ["总时长"] = cfg["动画播放秒"],
+            ["颜色ID"] = 4,
+            ["标题文本"] = "盗贼的遗产",
+            ["提示文本"] = "遗产宝箱正在依次出现"
+        },
+        ["清理"] = context["清理"],
+        ["播放台词"] = function()
+            _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(context["Boss单位"], "盗贼的遗产")
+        end,
+        ["on生效"] = function()
+        end
+    })
 end
 local function ____on_5F71_9AA8_76D7_8D3C_9057_4EA7_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____76D7_8D3C_9057_4EA7_6280_80FDID then

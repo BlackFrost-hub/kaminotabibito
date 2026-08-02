@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5F71_9AA8_83AB_7279_65AF_9636_6BB5_8FDB_5165P2, _____5E94_7528_5F71_9AA8_83AB_7279_65AFP3_5F3A_5316, _____5F71_9AA8_83AB_7279_65AF_9636_6BB5_8FDB_5165P3, ____on_5F71_9AA8_83AB_7279_65AF_6B7B_4EA1, GetUnitTypeId, GetUnitAbilityLevel, SGSS_SetState, _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4, _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4, _____6280_80FD__83B7_53D6_6280_80FD_6700_5927_51B7_5374_65F6_95F4, _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_7C7B_578BID, _____5E7D_5F71_7206_53D1_6280_80FDID, _____653B_51FB_529B_5C5E_6027ID, registerManualBuff, _____5F71_9AA8_83AB_7279_65AFBuffID, _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382
+local _____5F71_9AA8_83AB_7279_65AF_9636_6BB5_8FDB_5165P2, _____5E94_7528_5F71_9AA8_83AB_7279_65AFP3_5F3A_5316, _____5F71_9AA8_83AB_7279_65AF_9636_6BB5_8FDB_5165P3, GetUnitAbilityLevel, SGSS_SetState, _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4, _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4, _____6280_80FD__83B7_53D6_6280_80FD_6700_5927_51B7_5374_65F6_95F4, _____5E7D_5F71_7206_53D1_6280_80FDID, _____653B_51FB_529B_5C5E_6027ID, registerManualBuff, _____5F71_9AA8_83AB_7279_65AFBuffID, _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382
 local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
 local ____01_FF0E_9636_6BB5_4E0A_4E0B_6587 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.01．阶段上下文")
@@ -63,37 +63,22 @@ end
 ____exports["获取影骨莫特斯上下文"] = function(boss)
     return _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
 end
-____exports["清理影骨莫特斯上下文"] = function(boss)
-    _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382["清理上下文"](boss)
-end
-function ____on_5F71_9AA8_83AB_7279_65AF_6B7B_4EA1(dyingUnit)
-    if GetUnitTypeId(dyingUnit) ~= _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_7C7B_578BID then
-        return
-    end
-    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(dyingUnit, "死亡", 0)
-    ____exports["清理影骨莫特斯上下文"](dyingUnit)
-end
 local jass = require("jass.common")
-GetUnitTypeId = jass.GetUnitTypeId
 GetUnitAbilityLevel = jass.GetUnitAbilityLevel
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_0.registerDeathListener
-local ____require_result_1 = require("lib.扩展函数.Star扩展函数.00．SGSS")
-SGSS_SetState = ____require_result_1.SGSS_SetState
-local ____require_result_2 = require("平台扩展API动作")
-_____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_2["技能_设置技能冷却时间"]
-local ____require_result_3 = require("平台扩展API取值")
-_____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4 = ____require_result_3["技能_获取技能当前冷却时间"]
-_____6280_80FD__83B7_53D6_6280_80FD_6700_5927_51B7_5374_65F6_95F4 = ____require_result_3["技能_获取技能最大冷却时间"]
-_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.00．SGSS")
+SGSS_SetState = ____require_result_0.SGSS_SetState
+local ____require_result_1 = require("平台扩展API动作")
+_____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_1["技能_设置技能冷却时间"]
+local ____require_result_2 = require("平台扩展API取值")
+_____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4 = ____require_result_2["技能_获取技能当前冷却时间"]
+_____6280_80FD__83B7_53D6_6280_80FD_6700_5927_51B7_5374_65F6_95F4 = ____require_result_2["技能_获取技能最大冷却时间"]
 _____5E7D_5F71_7206_53D1_6280_80FDID = stringToFourCC(_____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["幽影爆发"])
 _____653B_51FB_529B_5C5E_6027ID = 1
-local _____5F71_9AA8_83AB_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
-local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_4.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_4["移除单位指定Buff"]
-local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.04．影骨莫特斯")
-_____5F71_9AA8_83AB_7279_65AFBuffID = ____require_result_5["影骨莫特斯BuffID"]
+local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_3.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
+local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.04．影骨莫特斯")
+_____5F71_9AA8_83AB_7279_65AFBuffID = ____require_result_4["影骨莫特斯BuffID"]
 local function _____521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587(boss, _____6E05_7406)
     _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(boss, "开场", 0)
     local context = {
@@ -109,7 +94,6 @@ local function _____521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587(boss, ____
         ["P3强化已应用"] = false,
         ["P3攻击力增量"] = 0,
         ["P3幽影爆发原始最大冷却"] = 0,
-        ["下一个召唤组ID"] = 0,
         ["遗产宝箱已生成"] = false,
         ["遗产宝箱点"] = nil
     }
@@ -142,9 +126,22 @@ local function _____6E05_7406_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_673A_5236(
     context["幽影召唤物"] = {}
     context["当前召唤组"] = nil
 end
-_____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "影骨莫特斯", ["主动技能提示"] = _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587, ["on清理"] = _____6E05_7406_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_673A_5236})
+local function ____on_5F71_9AA8_83AB_7279_65AF_5355_4F4D_6B7B_4EA1(_context, dyingUnit, _killingUnit)
+    _____64AD_653E_5F71_9AA8_83AB_7279_65AF_53F0_8BCD(dyingUnit, "死亡", 0)
+end
+_____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({
+    ["名称"] = "影骨莫特斯",
+    ["主动技能提示"] = _____5F71_9AA8_83AB_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"],
+    ["创建上下文"] = _____521B_5EFA_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587,
+    ["on清理"] = _____6E05_7406_5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_673A_5236,
+    ["死亡时自动清理"] = true,
+    ["on单位死亡"] = ____on_5F71_9AA8_83AB_7279_65AF_5355_4F4D_6B7B_4EA1
+})
 ____exports["获取或创建影骨莫特斯上下文"] = function(boss)
     return _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取或创建"](boss)
+end
+____exports["清理影骨莫特斯上下文"] = function(boss)
+    _____5F71_9AA8_83AB_7279_65AF_4E0A_4E0B_6587_5DE5_5382["清理上下文"](boss)
 end
 ____exports["设置影骨莫特斯测试阶段"] = function(context, _____9636_6BB5)
     if _____9636_6BB5 ~= 3 and context["P3强化已应用"] then
@@ -204,10 +201,5 @@ ____exports["刷新影骨盗贼遗产Buff"] = function(context)
     )
 end
 ____exports["注册影骨莫特斯运行时"] = function()
-    if _____5F71_9AA8_83AB_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C then
-        return
-    end
-    _____5F71_9AA8_83AB_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = true
-    registerDeathListener(____on_5F71_9AA8_83AB_7279_65AF_6B7B_4EA1)
 end
 return ____exports

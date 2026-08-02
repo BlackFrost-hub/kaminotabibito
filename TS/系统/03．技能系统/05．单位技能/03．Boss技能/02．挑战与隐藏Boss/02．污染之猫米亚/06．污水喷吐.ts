@@ -6,12 +6,11 @@ import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚技能数值配置, 米亚音效配置 } from "./02．数值与表现配置";
 import { 播放米亚台词 } from "./15．台词播放";
-import { 开始米亚常规施法 } from "./19．施法提示";
 import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 取米亚污染标记伤害倍率 } from "./08．污染标记";
 import { 取米亚平台超载伤害倍率 } from "./12．平台超载惩罚";
 import { stringToFourCC, 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
-import { 执行Boss技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const { 获取Boss技能敌对英雄列表Ex, 获取Boss技能应攻击目标 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
@@ -27,8 +26,10 @@ const { 创建持续危险区域 } = require("系统.03．技能系统.00．技�
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
+};
+const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
@@ -124,7 +125,7 @@ function 执行米亚污水喷吐伤害Tick(this: void, data: 米亚污水喷吐
   for (let i = 0; i < targets.length; i++) {
     const target = targets[i];
     if (!单位有效(target) || !点在前方扇形内(data.中心X, data.中心Y, target, config.喷吐距离, config.喷吐半角, data.朝向)) continue;
-    执行Boss技能伤害({
+    执行BossAOE技能伤害({
       技能ID: 污水喷吐技能ID,
       来源: boss,
       目标: target,
@@ -136,7 +137,6 @@ function 执行米亚污水喷吐伤害Tick(this: void, data: 米亚污水喷吐
       attackType: jass.ATTACK_TYPE_NORMAL,
       伤害类型: jass.DAMAGE_TYPE_POISON,
       weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-      伤害形态: "AOE",
       标签: "米亚污水喷吐Tick",
     });
     if (data.当前Tick数 === 1) {
@@ -286,13 +286,8 @@ export function 释放米亚污水喷吐(this: void, context: 米亚运行时上
   if (单位有效(threatTarget)) 让单位面向目标(boss, threatTarget, boss坐标);
   const 当前朝向 = GetUnitFacing(boss);
   const facing = 当前朝向 == null ? 0 : 当前朝向;
-  SetUnitFacing(boss, facing);
-  播放米亚台词(boss, "污水喷吐");
   播放Boss坐标音效(米亚音效配置.污水喷吐.前摇蓄力, boss坐标.x, boss坐标.y, 米亚音效配置.默认裁断距离);
   延迟播放Boss坐标音效(米亚音效配置.污水喷吐.持续喷射, boss坐标.x, boss坐标.y, 米亚音效配置.污水喷吐.持续喷射延迟Ms, 米亚音效配置.默认裁断距离);
-  开始米亚常规施法(boss, config.总硬直秒, "污水喷吐", `1秒后向正面喷吐${config.喷吐特效持续秒}秒，范围${config.喷吐距离}码、${config.喷吐半角 * 2}°扇形（离开米亚正面）`, config.总硬直秒);
-  SetUnitTimeScale(boss, config.动画速度);
-  SetUnitAnimationByIndex(boss, config.动画编号);
   创建技能提示圈({
     类型: "红色扇形",
     X: boss坐标.x,
@@ -303,13 +298,35 @@ export function 释放米亚污水喷吐(this: void, context: 米亚运行时上
     持续时间: config.前摇秒,
     来源单位: boss,
   });
-  const delayedId = addDelayedCallback(config.前摇秒 * 1000, 结算米亚污水喷吐, {
+  const 结算数据: 米亚污水喷吐结算变量 = {
     context,
     朝向: facing,
     中心X: boss坐标.x,
     中心Y: boss坐标.y,
-  } as 米亚污水喷吐结算变量);
-  context.清理.登记延迟回调("米亚-污水喷吐结算", delayedId);
+  };
+  启动基础施法时间线({
+    名称: "米亚-污水喷吐",
+    施法者: boss,
+    硬直秒: config.总硬直秒,
+    生效延迟秒: config.前摇秒,
+    动画编号: config.动画编号,
+    动画速度: config.动画速度,
+    完成后恢复动作: false,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: config.前摇秒,
+      颜色ID: 3,
+      标题文本: "污水喷吐",
+      提示文本: `1秒后向正面喷吐${config.喷吐特效持续秒}秒，范围${config.喷吐距离}码、${config.喷吐半角 * 2}°扇形（离开米亚正面）`,
+    },
+    清理: context.清理,
+    播放台词: function 米亚污水喷吐台词(this: void): void {
+      播放米亚台词(boss, "污水喷吐");
+    },
+    on生效: function 米亚污水喷吐时间线生效(this: void): void {
+      结算米亚污水喷吐(结算数据);
+    },
+  });
 }
 
 export function 注册米亚污水喷吐(this: void): void {

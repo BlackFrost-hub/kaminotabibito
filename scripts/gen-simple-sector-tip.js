@@ -6,19 +6,43 @@
  * - Birth 动画严格为 0~1000ms，因此特效速度 1.0 对应 1 秒。
  */
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 
 const SIZE = 256;
 const root = path.join(__dirname, "..");
 const outputDir = path.join(root, "imports", "resource", "models", "Tip", "skillTip");
 const templateModel = path.join(__dirname, "assets", "telegraph-templates", "AbilTipSX.mdx");
-const outputModel = path.join(outputDir, "SimpleSectorTip.mdx");
-const outputTexture = path.join(outputDir, "SimpleSectorTip.blp");
-const fillTexture = path.join(outputDir, "SimpleSectorTipFill.blp");
-const glowTexture = path.join(outputDir, "SimpleSectorTipGlow.blp");
-const gameTexturePath = "resource\\models\\Tip\\skillTip\\SimpleSectorTipFill.blp";
-const gameOutlinePath = "resource\\models\\Tip\\skillTip\\SimpleSectorTip.blp";
-const gameGlowPath = "resource\\models\\Tip\\skillTip\\SimpleSectorTipGlow.blp";
+const { writeWarcraftCompatibleTransparentBlp } = require(path.join(root, "scripts", "war3-transparent-blp.js"));
+const aiSectorPath = path.join(root, "image_temp", "telegraph-style", "telegraph-sector-white.png");
+const baseFillTexturePath = path.join(outputDir, "SimpleSectorTipFill.blp");
+const baseOutlineTexturePath = path.join(outputDir, "SimpleSectorTip.blp");
+const sectorAngle = Number(process.env.SECTOR_ANGLE || 80);
+if (!Number.isFinite(sectorAngle) || sectorAngle <= 0 || sectorAngle > 360) {
+  throw new Error(`SECTOR_ANGLE must be within (0, 360], got ${process.env.SECTOR_ANGLE}`);
+}
+// 角度变体默认使用 256×256，保留原无后缀 80°资源的 512×512贴图。
+const sectorOutlineTextureSize = Number(process.env.SECTOR_TEXTURE_SIZE || 256);
+if (!Number.isInteger(sectorOutlineTextureSize) || sectorOutlineTextureSize < 64 || sectorOutlineTextureSize > 1024) {
+  throw new Error(`SECTOR_TEXTURE_SIZE must be an integer within [64, 1024], got ${process.env.SECTOR_TEXTURE_SIZE}`);
+}
+const sectorSuffix = process.env.SECTOR_SUFFIX !== undefined
+  ? process.env.SECTOR_SUFFIX
+  : (sectorAngle === 80 ? "" : `_${sectorAngle}`);
+const 是角度变体 = sectorAngle !== 80 || sectorSuffix !== "";
+const 使用共享原始贴图 = 是角度变体 && process.env.SECTOR_USE_SHARED_TEXTURES !== "0";
+const 原始扇形总角度 = 80;
+const 扇形底板横向比例 = Math.tan(sectorAngle * Math.PI / 360)
+  / Math.tan(原始扇形总角度 * Math.PI / 360);
+const modelStem = `SimpleSectorTip${sectorSuffix}`;
+const outputModel = path.join(outputDir, `${modelStem}.mdx`);
+const outputTexture = path.join(outputDir, `${modelStem}.blp`);
+const fillTexture = path.join(outputDir, `${modelStem}Fill.blp`);
+const glowTexture = path.join(outputDir, `${modelStem}Glow.blp`);
+const 贴图前缀 = 使用共享原始贴图 ? "SimpleSectorTip" : modelStem;
+const gameTexturePath = `resource\\models\\Tip\\skillTip\\${贴图前缀}Fill.blp`;
+const gameOutlinePath = `resource\\models\\Tip\\skillTip\\${贴图前缀}.blp`;
+const gameGlowPath = `resource\\models\\Tip\\skillTip\\${贴图前缀}Glow.blp`;
 
 function getTextureTools() {
   const extensionRoot = path.join(
@@ -28,6 +52,133 @@ function getTextureTools() {
     "syh1906.war3-texture-preview-1.2.4-win32-x64"
   );
   return require(path.join(extensionRoot, "out", "conversion", "textureConvert.js"));
+}
+
+function getNativeBlpTools() {
+  const nativeConverterPath = process.env.WAR3_NATIVE_BLP_CONVERT_LIB || path.join(
+    process.env.USERPROFILE || "",
+    ".vscode",
+    "extensions",
+    "shiyueqq1023261581.war3icon-0.0.2",
+    "out",
+    "command",
+    "helper",
+    "blp2img.js"
+  );
+  return require(nativeConverterPath);
+}
+
+function 读取PNG贴图(filePath) {
+  return getTextureTools().decodeTextureBuffer(fs.readFileSync(filePath), "png");
+}
+
+function 读取BLP贴图(filePath) {
+  const temporaryPngPath = path.join(os.tmpdir(), `syzl-sector-source-${process.pid}-${Date.now()}.png`);
+  try {
+    getNativeBlpTools().blp2Image(filePath, temporaryPngPath, "png");
+    return 读取PNG贴图(temporaryPngPath);
+  } finally {
+    if (fs.existsSync(temporaryPngPath)) fs.unlinkSync(temporaryPngPath);
+  }
+}
+
+function 按角度变换贴图(image, sourceTotalAngle, targetTotalAngle) {
+  if (!image || sourceTotalAngle <= 0 || targetTotalAngle <= 0) return image;
+
+  const sourceHalfAngle = sourceTotalAngle * Math.PI / 360;
+  const targetHalfAngle = targetTotalAngle * Math.PI / 360;
+  const xScale = Math.tan(sourceHalfAngle) / Math.tan(targetHalfAngle);
+  const centerX = image.width / 2;
+  const rgba = new Uint8ClampedArray(image.width * image.height * 4);
+
+  for (let y = 0; y < image.height; y++) {
+    for (let x = 0; x < image.width; x++) {
+      const sourceX = centerX + (x - centerX) * xScale;
+      if (sourceX < 0 || sourceX >= image.width - 1) continue;
+
+      const left = Math.floor(sourceX);
+      const right = left + 1;
+      const ratio = sourceX - left;
+      const outputIndex = (y * image.width + x) * 4;
+      const leftIndex = (y * image.width + left) * 4;
+      const rightIndex = (y * image.width + right) * 4;
+      for (let channel = 0; channel < 4; channel++) {
+        rgba[outputIndex + channel] = Math.round(
+          image.rgba[leftIndex + channel] * (1 - ratio) + image.rgba[rightIndex + channel] * ratio
+        );
+      }
+    }
+  }
+
+  return { width: image.width, height: image.height, rgba };
+}
+
+function 重采样贴图(image, targetSize) {
+  if (!image || targetSize <= 0 || (image.width === targetSize && image.height === targetSize)) return image;
+
+  const rgba = new Uint8ClampedArray(targetSize * targetSize * 4);
+  for (let y = 0; y < targetSize; y++) {
+    const sourceY = (y + 0.5) * image.height / targetSize - 0.5;
+    const top = Math.max(0, Math.min(image.height - 1, Math.floor(sourceY)));
+    const bottom = Math.max(0, Math.min(image.height - 1, top + 1));
+    const yRatio = Math.max(0, Math.min(1, sourceY - top));
+
+    for (let x = 0; x < targetSize; x++) {
+      const sourceX = (x + 0.5) * image.width / targetSize - 0.5;
+      const left = Math.max(0, Math.min(image.width - 1, Math.floor(sourceX)));
+      const right = Math.max(0, Math.min(image.width - 1, left + 1));
+      const xRatio = Math.max(0, Math.min(1, sourceX - left));
+      const outputIndex = (y * targetSize + x) * 4;
+      const topLeft = (top * image.width + left) * 4;
+      const topRight = (top * image.width + right) * 4;
+      const bottomLeft = (bottom * image.width + left) * 4;
+      const bottomRight = (bottom * image.width + right) * 4;
+
+      for (let channel = 0; channel < 4; channel++) {
+        const topValue = image.rgba[topLeft + channel] * (1 - xRatio) + image.rgba[topRight + channel] * xRatio;
+        const bottomValue = image.rgba[bottomLeft + channel] * (1 - xRatio) + image.rgba[bottomRight + channel] * xRatio;
+        rgba[outputIndex + channel] = Math.round(topValue * (1 - yRatio) + bottomValue * yRatio);
+      }
+    }
+  }
+
+  return { width: targetSize, height: targetSize, rgba };
+}
+
+function 缩放范围Y(extent, scale) {
+  if (!extent || !extent.min || !extent.max) return;
+  extent.min[1] *= scale;
+  extent.max[1] *= scale;
+  extent.boundsRadius = Math.max(extent.boundsRadius, Math.abs(extent.min[1]), Math.abs(extent.max[1]));
+}
+
+function 缩放扇形底板横向比例(geoset, scale) {
+  if (!geoset || scale <= 0 || scale === 1) return;
+
+  for (let i = 1; i < geoset.vertices.length; i += 3) {
+    geoset.vertices[i] *= scale;
+  }
+
+  缩放范围Y(geoset.extent, scale);
+  if (geoset.sequenceExtents) {
+    for (const extent of geoset.sequenceExtents) 缩放范围Y(extent, scale);
+  }
+}
+
+function 尝试读取原始风格贴图() {
+  if (使用共享原始贴图) return null;
+  if (sectorAngle === 80 && sectorSuffix === "") return null;
+  if (!fs.existsSync(baseFillTexturePath)) return null;
+
+  const 原始轮廓 = fs.existsSync(aiSectorPath)
+    ? 读取PNG贴图(aiSectorPath)
+    : (fs.existsSync(baseOutlineTexturePath) ? 读取BLP贴图(baseOutlineTexturePath) : null);
+  if (!原始轮廓) return null;
+
+  return {
+    轮廓: 重采样贴图(按角度变换贴图(原始轮廓, 80, sectorAngle), sectorOutlineTextureSize),
+    填充: 重采样贴图(按角度变换贴图(读取BLP贴图(baseFillTexturePath), 80, sectorAngle), Math.min(sectorOutlineTextureSize, 256)),
+  };
 }
 
 function getMdlxTools() {
@@ -52,7 +203,7 @@ const apexY = SIZE - 8;
 const modelForwardLength = 450;
 const modelLateralWidth = 900;
 const outerRadius = 420;
-const halfAngle = 40 * Math.PI / 180;
+const halfAngle = sectorAngle * Math.PI / 360;
 
 function smoothstep(a, b, value) {
   const t = Math.max(0, Math.min(1, (value - a) / (b - a)));
@@ -139,8 +290,8 @@ for (const side of [-1, 1]) {
   drawLine(apexX + side * 24, apexY - 135, apexX + side * 46, apexY - 210, 0.7, 45);
 }
 
-function encodeBlp(image) {
-  return getTextureTools().encodeTextureBuffer(image, "blp");
+function writeTransparentBlp(image, outputPath) {
+  writeWarcraftCompatibleTransparentBlp(image, outputPath);
 }
 
 function addQuad(vertices, faces, x1, x2, y1, y2, z) {
@@ -222,7 +373,7 @@ function createAnimatedModel() {
   const { Model, Texture, Material, Layer, Geoset, Bone, Vector3Animation } = getMdlxTools();
   const model = new Model();
   model.load(fs.readFileSync(templateModel));
-  model.name = "SimpleSectorTipAnimated";
+  model.name = `${modelStem}Animated`;
   model.blendTime = 100;
   model.textures[0].path = gameTexturePath;
   model.materials[0].layers[0].filterMode = 3; // Additive：黑色透明区不产生矩形压暗。
@@ -275,33 +426,50 @@ function createAnimatedModel() {
   model.pivotPoints.push(new Float32Array([0, 0, 0]));
 
   const templateGeoset = model.geosets[0];
+  if (使用共享原始贴图) {
+    缩放扇形底板横向比例(templateGeoset, 扇形底板横向比例);
+  }
   model.geosets.push(makeOutlineGeoset(Geoset, templateGeoset, 1));
   model.geosets.push(makeArrowGeoset(Geoset, templateGeoset, 2, true));
   model.geosets.push(makeArrowGeoset(Geoset, templateGeoset, 3, false));
-  model.extent.min = new Float32Array([-25, -450, 0]);
-  model.extent.max = new Float32Array([425, 450, 6]);
-  model.extent.boundsRadius = 620;
+  const lateralExtent = 450 * (使用共享原始贴图 ? 扇形底板横向比例 : 1);
+  model.extent.min = new Float32Array([-25, -lateralExtent, 0]);
+  model.extent.max = new Float32Array([425, lateralExtent, 6]);
+  model.extent.boundsRadius = Math.max(620, Math.sqrt(450 * 450 + lateralExtent * lateralExtent));
   return Buffer.from(model.saveMdx());
 }
 
-fs.writeFileSync(fillTexture, encodeBlp({ width: SIZE, height: SIZE, rgba: fillPixels }));
-const aiSectorPath = path.join(root, "image_temp", "telegraph-style", "telegraph-sector-white.png");
-if (fs.existsSync(aiSectorPath)) {
-  const aiSector = getTextureTools().decodeTextureBuffer(fs.readFileSync(aiSectorPath), "png");
-  fs.writeFileSync(outputTexture, encodeBlp(aiSector));
+const 原始风格贴图 = 尝试读取原始风格贴图();
+if (使用共享原始贴图) {
+  // 角度变体复用原始贴图，角度由 MDX 底板横向比例表达，避免重复导入大贴图。
+} else if (原始风格贴图) {
+  writeTransparentBlp(原始风格贴图.轮廓, outputTexture);
+  writeTransparentBlp(原始风格贴图.填充, fillTexture);
+} else if (sectorAngle === 80 && sectorSuffix === "" && fs.existsSync(aiSectorPath)) {
+  writeTransparentBlp(读取PNG贴图(aiSectorPath), outputTexture);
+  writeTransparentBlp({ width: SIZE, height: SIZE, rgba: fillPixels }, fillTexture);
 } else {
-  fs.writeFileSync(outputTexture, encodeBlp({ width: SIZE, height: SIZE, rgba: outlinePixels }));
+  writeTransparentBlp({ width: SIZE, height: SIZE, rgba: outlinePixels }, outputTexture);
+  writeTransparentBlp({ width: SIZE, height: SIZE, rgba: fillPixels }, fillTexture);
 }
-const glowPixels = new Uint8ClampedArray(8 * 8 * 4);
-for (let i = 0; i < glowPixels.length; i += 4) {
-  glowPixels[i] = 255;
-  glowPixels[i + 1] = 255;
-  glowPixels[i + 2] = 255;
-  glowPixels[i + 3] = 255;
+if (!使用共享原始贴图) {
+  const glowPixels = new Uint8ClampedArray(8 * 8 * 4);
+  for (let i = 0; i < glowPixels.length; i += 4) {
+    glowPixels[i] = 255;
+    glowPixels[i + 1] = 255;
+    glowPixels[i + 2] = 255;
+    glowPixels[i + 3] = 255;
+  }
+  // Glow 贴图是全不透明白色，由材质 alpha 控制亮度，不属于透明面片贴图。
+  fs.writeFileSync(glowTexture, getTextureTools().encodeTextureBuffer({ width: 8, height: 8, rgba: glowPixels }, "blp"));
 }
-fs.writeFileSync(glowTexture, encodeBlp({ width: 8, height: 8, rgba: glowPixels }));
 fs.writeFileSync(outputModel, createAnimatedModel());
+console.log(`sector angle ${sectorAngle} degrees`);
 console.log(`created ${path.relative(root, outputModel)}`);
-console.log(`created ${path.relative(root, outputTexture)}`);
-console.log(`created ${path.relative(root, fillTexture)}`);
-console.log(`created ${path.relative(root, glowTexture)}`);
+if (!使用共享原始贴图) {
+  console.log(`created ${path.relative(root, outputTexture)}`);
+  console.log(`created ${path.relative(root, fillTexture)}`);
+  console.log(`created ${path.relative(root, glowTexture)}`);
+} else {
+  console.log(`reused ${贴图前缀}*.blp`);
+}

@@ -1,11 +1,10 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB, _____8FDB_5165_65E0_4ECE_66B4_6012, _____9000_51FA_65E0_4ECE_66B4_6012, _____6E05_9664_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_968F_4ECE_72B6_6001, GetUnitX, GetUnitY, GetUnitDefaultMoveSpeed, AddSpecialEffectTarget, DestroyEffect, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____6811_9B54_9996_9886BuffID, SGSS_SetState, _____653B_51FB_529B_5C5E_6027ID, _____653B_901F_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID
+local _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB, _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B, _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807, _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2, _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5F00_59CB, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5B8C_6210, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_7ED3_675F, _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5, _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8, _____6811_9B54_5DEB_533B_6CBB_7597Tick, _____8FDB_5165_65E0_4ECE_66B4_6012, _____9000_51FA_65E0_4ECE_66B4_6012, _____6E05_9664_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_968F_4ECE_72B6_6001, GetUnitStateJapi, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimation, SetUnitAnimationByIndex, SetUnitTimeScale, GetUnitDefaultMoveSpeed, GetUnitState, AddSpecialEffectTarget, DestroyEffect, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____6811_9B54_9996_9886BuffID, SGSS_SetState, _____83B7_53D6Boss_62A4_536B_5217_8868, _____662F_5426_6307_5B9ABoss_62A4_536B, _____653B_51FB_529B_5C5E_6027ID, _____653B_901F_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
-local _____83B7_53D6_6811_9B54_9996_9886_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取树魔首领上下文"]
 local _____83B7_53D6_6216_521B_5EFA_6811_9B54_9996_9886_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建树魔首领上下文"]
 local _____83B7_53D6_5168_90E8_6811_9B54_9996_9886_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取全部树魔首领上下文"]
 local _____6E05_7406_6811_9B54_9996_9886_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["清理树魔首领上下文"]
@@ -27,6 +26,10 @@ local _____6CBB_7597_6CE2_8DF3_94FE = require("系统.03．技能系统.00．技
 local _____53D1_8D77_6CBB_7597_6CE2_8DF3_94FE = _____6CBB_7597_6CE2_8DF3_94FE["发起治疗波跳链"]
 local _____5145_80FD_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
 local _____5F00_59CB_5145_80FD = _____5145_80FD_7CFB_7EDF["开始充能"]
+local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
+local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
+local ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.22．限次周期执行器")
+local _____521B_5EFA_5468_671F_884C_4E3A = ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668["创建周期行为"]
 function _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB(boss, _____89E6_53D1_6982_7387_767E_5206_6BD4)
     local soundCfg = _____6811_9B54_9996_9886_97F3_6548_914D_7F6E
     _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60({
@@ -38,6 +41,171 @@ function _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB(boss, _____89E6_
         ["冷却Ms"] = soundCfg["怪物拟声"]["冷却Ms"],
         ["触发概率百分比"] = _____89E6_53D1_6982_7387_767E_5206_6BD4
     })
+end
+function _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(unit)
+    if not _____5355_4F4D_5B58_6D3B(unit) then
+        return 0
+    end
+    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
+    if not (maxLife > 0) then
+        return 0
+    end
+    local currentLife = GetUnitState(unit, UNIT_STATE_LIFE)
+    local ratio = (maxLife - currentLife) / maxLife
+    return ratio > 0 and ratio or 0
+end
+function _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807(context)
+    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
+    local boss = context["Boss单位"]
+    local bossMissingRatio = _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(boss)
+    if bossMissingRatio >= cfg["巫医优先治疗Boss缺血比例"] then
+        return boss
+    end
+    local list = _____83B7_53D6Boss_62A4_536B_5217_8868(boss, true)
+    local target = nil
+    local highestMissingRatio = 0
+    do
+        local i = 0
+        while i < #list do
+            local minion = list[i + 1]
+            local missingRatio = _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(minion)
+            if missingRatio > highestMissingRatio then
+                target = minion
+                highestMissingRatio = missingRatio
+            end
+            i = i + 1
+        end
+    end
+    if target ~= nil then
+        return target
+    end
+    local ____temp_10
+    if bossMissingRatio > 0 then
+        ____temp_10 = boss
+    else
+        ____temp_10 = nil
+    end
+    return ____temp_10
+end
+function _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2(context, witchDoctor)
+    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
+    local boss = context["Boss单位"]
+    local target = _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807(context)
+    if target == nil or target == 0 then
+        return
+    end
+    local healAmount = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE) * cfg["巫医疗波Boss最大生命比例"]
+    local function _____6811_9B54_5DEB_533B_7597_6CE2_76EE_6807_7B5B_9009(unit)
+        if not _____5355_4F4D_5B58_6D3B(unit) or _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(unit) <= 0 then
+            return false
+        end
+        return unit == boss or _____662F_5426_6307_5B9ABoss_62A4_536B(unit, boss)
+    end
+    _____53D1_8D77_6CBB_7597_6CE2_8DF3_94FE({
+        ["起始目标"] = target,
+        ["来源单位"] = witchDoctor,
+        ["最大跳数"] = cfg["巫医疗波最大目标数"],
+        ["初始治疗量"] = healAmount,
+        ["影响目标"] = "友方",
+        ["每跳最大距离"] = cfg["巫医疗波每跳最大距离"],
+        ["每跳衰减系数"] = cfg["巫医疗波每跳衰减系数"],
+        ["允许重复治疗"] = false,
+        ["跳跃间隔"] = cfg["巫医疗波跳跃间隔秒"],
+        ["闪电效果代码"] = "HWPB",
+        ["目标筛选"] = _____6811_9B54_5DEB_533B_7597_6CE2_76EE_6807_7B5B_9009
+    })
+end
+function _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807(witchDoctor, target)
+    if not _____5355_4F4D_5B58_6D3B(witchDoctor) or not _____5355_4F4D_5B58_6D3B(target) then
+        return
+    end
+    SetUnitFacing(
+        witchDoctor,
+        _____4E24_70B9_89D2_5EA6(
+            GetUnitX(witchDoctor),
+            GetUnitY(witchDoctor),
+            GetUnitX(target),
+            GetUnitY(target)
+        )
+    )
+end
+function _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5F00_59CB(witchDoctor, ______5145_80FDID)
+    if not _____5355_4F4D_5B58_6D3B(witchDoctor) then
+        return
+    end
+    SetUnitTimeScale(witchDoctor, 1)
+    SetUnitAnimation(witchDoctor, "spell")
+end
+function _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5B8C_6210(witchDoctor, _____5145_80FDID)
+    local _____8BB0_5F55 = _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868[_____5145_80FDID]
+    __TS__Delete(_____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868, _____5145_80FDID)
+    if _____8BB0_5F55 == nil then
+        return
+    end
+    _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807(witchDoctor, _____8BB0_5F55.target)
+    if _____5355_4F4D_5B58_6D3B(witchDoctor) and _____5355_4F4D_5B58_6D3B(_____8BB0_5F55.context["Boss单位"]) then
+        _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2(_____8BB0_5F55.context, witchDoctor)
+    end
+end
+function _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_7ED3_675F(witchDoctor, ______539F_56E0, _____5145_80FDID)
+    __TS__Delete(_____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868, _____5145_80FDID)
+    if not _____5355_4F4D_5B58_6D3B(witchDoctor) then
+        return
+    end
+    SetUnitTimeScale(witchDoctor, 1)
+    SetUnitAnimationByIndex(witchDoctor, 0)
+end
+function _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5(context, witchDoctor, target)
+    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
+    local _____65BD_6CD5_786C_76F4_79D2 = cfg["巫医疗波施法硬直秒"]
+    _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807(witchDoctor, target)
+    local _____5145_80FDID = _____5F00_59CB_5145_80FD(witchDoctor, {
+        ["持续时间"] = _____65BD_6CD5_786C_76F4_79D2,
+        ["主单位"] = context["Boss单位"],
+        ["主单位死亡时中断"] = true,
+        ["强制硬直"] = true,
+        ["显示进度条特效"] = true,
+        ["进度条特效动画序号"] = 0,
+        ["进度条特效动画速度"] = _____65BD_6CD5_786C_76F4_79D2 > 0 and 1 / _____65BD_6CD5_786C_76F4_79D2 or 1,
+        ["开始回调"] = _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5F00_59CB,
+        ["充能完成回调"] = _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5B8C_6210,
+        ["结束回调"] = _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_7ED3_675F
+    })
+    if _____5145_80FDID > 0 then
+        _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868[_____5145_80FDID] = {context = context, target = target}
+    end
+end
+function _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8(context, witchDoctor)
+    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
+    local _____53D8_91CF = {
+        context = context,
+        ["巫医单位"] = witchDoctor,
+        ["下一次治疗Ms"] = getServerTime() + cfg["巫医疗波首次延迟秒"] * 1000
+    }
+    _____521B_5EFA_5468_671F_884C_4E3A({
+        ["名称"] = "树魔-巫医治疗驱动",
+        ["间隔毫秒"] = cfg["巫医治疗检测间隔秒"] * 1000,
+        ["变量"] = _____53D8_91CF,
+        ["清理"] = context["清理"],
+        onTick = _____6811_9B54_5DEB_533B_6CBB_7597Tick
+    })
+end
+function _____6811_9B54_5DEB_533B_6CBB_7597Tick(______6267_884C_6B21_6570, variable)
+    local data = variable
+    if data == nil or not _____5355_4F4D_5B58_6D3B(data["巫医单位"]) or not _____5355_4F4D_5B58_6D3B(data.context["Boss单位"]) then
+        return false
+    end
+    local now = getServerTime()
+    if now < data["下一次治疗Ms"] then
+        return true
+    end
+    local target = _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807(data.context)
+    if target == nil or target == 0 then
+        return true
+    end
+    data["下一次治疗Ms"] = now + _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["巫医疗波冷却秒"] * 1000
+    _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5(data.context, data["巫医单位"], target)
+    return true
 end
 function _____8FDB_5165_65E0_4ECE_66B4_6012(context)
     if context["无从暴怒中"] then
@@ -132,46 +300,44 @@ function _____5237_65B0_968F_4ECE_72B6_6001(context)
 end
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local GetUnitStateJapi = japi.GetUnitState
+GetUnitStateJapi = japi.GetUnitState
 local jglobals = require("jass.globals")
 local GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-local SetUnitFacing = jass.SetUnitFacing
-local SetUnitAnimation = jass.SetUnitAnimation
-local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
-local SetUnitTimeScale = jass.SetUnitTimeScale
+SetUnitFacing = jass.SetUnitFacing
+SetUnitAnimation = jass.SetUnitAnimation
+SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
+SetUnitTimeScale = jass.SetUnitTimeScale
 local GetUnitFacing = jass.GetUnitFacing
 GetUnitDefaultMoveSpeed = jass.GetUnitDefaultMoveSpeed
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomReal = jass.GetRandomReal
 local GetRandomInt = jass.GetRandomInt
-local GetUnitState = jass.GetUnitState
+GetUnitState = jass.GetUnitState
 AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 DestroyEffect = jass.DestroyEffect
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local removePeriodicCallback = ____require_result_0.removePeriodicCallback
-local getServerTime = ____require_result_0.getServerTime
-local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_1.registerDeathListener
-local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_2.registerManualBuff
-_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
-local ____require_result_3 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领")
-_____6811_9B54_9996_9886BuffID = ____require_result_3["树魔首领BuffID"]
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.00．SGSS")
-SGSS_SetState = ____require_result_4.SGSS_SetState
-local ____require_result_5 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_5.CosBJ
-local SinBJ = ____require_result_5.SinBJ
-local ____require_result_6 = require("系统.01．单位系统.10．护卫系统.index")
-local _____521B_5EFA_62A4_536B_5355_4F4D = ____require_result_6["创建护卫单位"]
-local _____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_6["获取Boss护卫列表"]
-local _____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_6["是否指定Boss护卫"]
-local _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B = ____require_result_6["处理Boss结束全部护卫"]
+getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_1.registerManualBuff
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
+local ____require_result_2 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领")
+_____6811_9B54_9996_9886BuffID = ____require_result_2["树魔首领BuffID"]
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.00．SGSS")
+SGSS_SetState = ____require_result_3.SGSS_SetState
+local ____require_result_4 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_4.CosBJ
+local SinBJ = ____require_result_4.SinBJ
+local ____require_result_5 = require("系统.01．单位系统.10．护卫系统.index")
+local _____521B_5EFA_62A4_536B_5355_4F4D = ____require_result_5["创建护卫单位"]
+_____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_5["获取Boss护卫列表"]
+_____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_5["是否指定Boss护卫"]
+local _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B = ____require_result_5["处理Boss结束全部护卫"]
+local ____require_result_6 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
+local _____6D88_8D39_5267_60C5Boss_6218_5E26_5165_968F_4ECE = ____require_result_6["消费剧情Boss战带入随从"]
 _____653B_51FB_529B_5C5E_6027ID = 1
 _____653B_901F_5C5E_6027ID = 10
 _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID = 9
@@ -183,9 +349,6 @@ local _____6811_9B54_9996_9886_968F_4ECE_7279_6027_5DF2_6CE8_518C = false
 local function _____662F_6811_9B54_9996_9886(unit)
     return _____5355_4F4D_5B58_6D3B(unit) and GetUnitTypeId(unit) == _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID
 end
-local function _____5355_4F4D_7C7B_578B_662F_6811_9B54_9996_9886(unit)
-    return _____5355_4F4D_53E5_67C4_5B58_5728(unit) and GetUnitTypeId(unit) == _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID
-end
 local function _____7EDF_8BA1_6811_9B54_968F_4ECE(context)
     local result = {["猎头者"] = 0, ["巫医"] = 0, ["投掷者"] = 0}
     local ____self_7 = context["随从组"]
@@ -196,7 +359,7 @@ local function _____7EDF_8BA1_6811_9B54_968F_4ECE(context)
             do
                 local unit = list[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(unit) then
-                    goto __continue6
+                    goto __continue5
                 end
                 local typeId = GetUnitTypeId(unit)
                 if typeId == _____730E_5934_8005_5355_4F4D_7C7B_578BID then
@@ -207,11 +370,32 @@ local function _____7EDF_8BA1_6811_9B54_968F_4ECE(context)
                     result["投掷者"] = result["投掷者"] + 1
                 end
             end
-            ::__continue6::
+            ::__continue5::
             i = i + 1
         end
     end
     return result
+end
+local function _____767B_8BB0_5267_60C5_5E26_5165_6811_9B54_968F_4ECE(context)
+    local list = _____6D88_8D39_5267_60C5Boss_6218_5E26_5165_968F_4ECE(context["Boss单位"])
+    do
+        local i = 0
+        while i < #list do
+            do
+                local minion = list[i + 1]
+                if not _____5355_4F4D_5B58_6D3B(minion) then
+                    goto __continue12
+                end
+                local ____self_8 = context["随从组"]
+                ____self_8["登记"](____self_8, minion)
+                if GetUnitTypeId(minion) == _____5DEB_533B_5355_4F4D_7C7B_578BID then
+                    _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8(context, minion)
+                end
+            end
+            ::__continue12::
+            i = i + 1
+        end
+    end
 end
 local function _____8BA1_7B97_968F_4ECE_53EC_5524_70B9(boss, _____7F16_5236, _____69FD_4F4D_5E8F_53F7)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
@@ -265,8 +449,8 @@ local function _____53EC_5524_6811_9B54_968F_4ECE(context, unitTypeId, _____7F16
     if minion == nil or minion == 0 then
         return nil
     end
-    local ____self_8 = context["随从组"]
-    ____self_8["登记"](____self_8, minion)
+    local ____self_9 = context["随从组"]
+    ____self_9["登记"](____self_9, minion)
     return minion
 end
 local function _____968F_673A_53D6_97F3_6548_8DEF_5F84(list)
@@ -275,166 +459,7 @@ local function _____968F_673A_53D6_97F3_6548_8DEF_5F84(list)
     end
     return list[GetRandomInt(0, #list - 1) + 1]
 end
-local function _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(unit)
-    if not _____5355_4F4D_5B58_6D3B(unit) then
-        return 0
-    end
-    local maxLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
-    if not (maxLife > 0) then
-        return 0
-    end
-    local currentLife = GetUnitState(unit, UNIT_STATE_LIFE)
-    local ratio = (maxLife - currentLife) / maxLife
-    return ratio > 0 and ratio or 0
-end
-local function _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807(context)
-    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
-    local boss = context["Boss单位"]
-    local bossMissingRatio = _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(boss)
-    if bossMissingRatio >= cfg["巫医优先治疗Boss缺血比例"] then
-        return boss
-    end
-    local list = _____83B7_53D6Boss_62A4_536B_5217_8868(boss, true)
-    local target = nil
-    local highestMissingRatio = 0
-    do
-        local i = 0
-        while i < #list do
-            local minion = list[i + 1]
-            local missingRatio = _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(minion)
-            if missingRatio > highestMissingRatio then
-                target = minion
-                highestMissingRatio = missingRatio
-            end
-            i = i + 1
-        end
-    end
-    if target ~= nil then
-        return target
-    end
-    local ____temp_9
-    if bossMissingRatio > 0 then
-        ____temp_9 = boss
-    else
-        ____temp_9 = nil
-    end
-    return ____temp_9
-end
-local function _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2(context, witchDoctor)
-    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
-    local boss = context["Boss单位"]
-    local target = _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807(context)
-    if target == nil or target == 0 then
-        return
-    end
-    local healAmount = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE) * cfg["巫医疗波Boss最大生命比例"]
-    local function _____6811_9B54_5DEB_533B_7597_6CE2_76EE_6807_7B5B_9009(unit)
-        if not _____5355_4F4D_5B58_6D3B(unit) or _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B(unit) <= 0 then
-            return false
-        end
-        return unit == boss or _____662F_5426_6307_5B9ABoss_62A4_536B(unit, boss)
-    end
-    _____53D1_8D77_6CBB_7597_6CE2_8DF3_94FE({
-        ["起始目标"] = target,
-        ["来源单位"] = witchDoctor,
-        ["最大跳数"] = cfg["巫医疗波最大目标数"],
-        ["初始治疗量"] = healAmount,
-        ["影响目标"] = "友方",
-        ["每跳最大距离"] = cfg["巫医疗波每跳最大距离"],
-        ["每跳衰减系数"] = cfg["巫医疗波每跳衰减系数"],
-        ["允许重复治疗"] = false,
-        ["跳跃间隔"] = cfg["巫医疗波跳跃间隔秒"],
-        ["闪电效果代码"] = "HWPB",
-        ["目标筛选"] = _____6811_9B54_5DEB_533B_7597_6CE2_76EE_6807_7B5B_9009
-    })
-end
-local _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868 = {}
-local function _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807(witchDoctor, target)
-    if not _____5355_4F4D_5B58_6D3B(witchDoctor) or not _____5355_4F4D_5B58_6D3B(target) then
-        return
-    end
-    SetUnitFacing(
-        witchDoctor,
-        _____4E24_70B9_89D2_5EA6(
-            GetUnitX(witchDoctor),
-            GetUnitY(witchDoctor),
-            GetUnitX(target),
-            GetUnitY(target)
-        )
-    )
-end
-local function _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5F00_59CB(witchDoctor, ______5145_80FDID)
-    if not _____5355_4F4D_5B58_6D3B(witchDoctor) then
-        return
-    end
-    SetUnitTimeScale(witchDoctor, 1)
-    SetUnitAnimation(witchDoctor, "spell")
-end
-local function _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5B8C_6210(witchDoctor, _____5145_80FDID)
-    local _____8BB0_5F55 = _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868[_____5145_80FDID]
-    __TS__Delete(_____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868, _____5145_80FDID)
-    if _____8BB0_5F55 == nil then
-        return
-    end
-    _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807(witchDoctor, _____8BB0_5F55.target)
-    if _____5355_4F4D_5B58_6D3B(witchDoctor) and _____5355_4F4D_5B58_6D3B(_____8BB0_5F55.context["Boss单位"]) then
-        _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2(_____8BB0_5F55.context, witchDoctor)
-    end
-end
-local function _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_7ED3_675F(witchDoctor, ______539F_56E0, _____5145_80FDID)
-    __TS__Delete(_____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868, _____5145_80FDID)
-    if not _____5355_4F4D_5B58_6D3B(witchDoctor) then
-        return
-    end
-    SetUnitTimeScale(witchDoctor, 1)
-    SetUnitAnimationByIndex(witchDoctor, 0)
-end
-local function _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5(context, witchDoctor, target)
-    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
-    local _____65BD_6CD5_786C_76F4_79D2 = cfg["巫医疗波施法硬直秒"]
-    _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807(witchDoctor, target)
-    local _____5145_80FDID = _____5F00_59CB_5145_80FD(witchDoctor, {
-        ["持续时间"] = _____65BD_6CD5_786C_76F4_79D2,
-        ["主单位"] = context["Boss单位"],
-        ["主单位死亡时中断"] = true,
-        ["强制硬直"] = true,
-        ["显示进度条特效"] = true,
-        ["进度条特效动画序号"] = 0,
-        ["进度条特效动画速度"] = _____65BD_6CD5_786C_76F4_79D2 > 0 and 1 / _____65BD_6CD5_786C_76F4_79D2 or 1,
-        ["开始回调"] = _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5F00_59CB,
-        ["充能完成回调"] = _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5B8C_6210,
-        ["结束回调"] = _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_7ED3_675F
-    })
-    if _____5145_80FDID > 0 then
-        _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868[_____5145_80FDID] = {context = context, target = target}
-    end
-end
-local function _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8(context, witchDoctor)
-    local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
-    local _____4E0B_4E00_6B21_6CBB_7597Ms = getServerTime() + cfg["巫医疗波首次延迟秒"] * 1000
-    local healId = 0
-    healId = addPeriodicCallback(
-        cfg["巫医治疗检测间隔秒"] * 1000,
-        function()
-            if not _____5355_4F4D_5B58_6D3B(witchDoctor) or not _____5355_4F4D_5B58_6D3B(context["Boss单位"]) then
-                removePeriodicCallback(healId)
-                return
-            end
-            local now = getServerTime()
-            if now < _____4E0B_4E00_6B21_6CBB_7597Ms then
-                return
-            end
-            local target = _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807(context)
-            if target == nil or target == 0 then
-                return
-            end
-            _____4E0B_4E00_6B21_6CBB_7597Ms = now + cfg["巫医疗波冷却秒"] * 1000
-            _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5(context, witchDoctor, target)
-        end
-    )
-    local ____self_10 = context["清理"]
-    ____self_10["登记周期回调"](____self_10, "树魔巫医治疗", healId)
-end
+_____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868 = {}
 ____exports["测试触发树魔巫医疗波"] = function(context)
     if not _____5355_4F4D_5B58_6D3B(context["Boss单位"]) then
         return false
@@ -451,12 +476,12 @@ ____exports["测试触发树魔巫医疗波"] = function(context)
             do
                 local witchDoctor = list[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(witchDoctor) or GetUnitTypeId(witchDoctor) ~= _____5DEB_533B_5355_4F4D_7C7B_578BID then
-                    goto __continue58
+                    goto __continue62
                 end
                 _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5(context, witchDoctor, target)
                 return true
             end
-            ::__continue58::
+            ::__continue62::
             i = i + 1
         end
     end
@@ -470,14 +495,14 @@ local function _____8865_5145_6307_5B9A_7C7B_578B_968F_4ECE(context, unitTypeId,
             do
                 local minion = _____53EC_5524_6811_9B54_968F_4ECE(context, unitTypeId, _____7F16_5236, i)
                 if minion == nil or minion == 0 then
-                    goto __continue62
+                    goto __continue66
                 end
                 created = created + 1
                 if unitTypeId == _____5DEB_533B_5355_4F4D_7C7B_578BID then
                     _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8(context, minion)
                 end
             end
-            ::__continue62::
+            ::__continue66::
             i = i + 1
         end
     end
@@ -535,6 +560,7 @@ ____exports["初始化树魔首领随从特性"] = function(context)
             _____9000_51FA_65E0_4ECE_66B4_6012(context)
         end
     )
+    _____767B_8BB0_5267_60C5_5E26_5165_6811_9B54_968F_4ECE(context)
     if cfg["初始召唤延迟秒"] <= 0 then
         _____8865_5145_6811_9B54_968F_4ECE_7F16_5236(context)
         context["下一次召唤Ms"] = getServerTime() + cfg["补员间隔秒"] * 1000
@@ -554,17 +580,7 @@ ____exports["立即补充树魔首领随从"] = function(context)
     _____5237_65B0_968F_4ECE_72B6_6001(context)
     return created
 end
-local function ____on_6811_9B54_9996_9886_6B7B_4EA1(dyingUnit)
-    if not _____5355_4F4D_7C7B_578B_662F_6811_9B54_9996_9886(dyingUnit) then
-        return
-    end
-    local context = _____83B7_53D6_6811_9B54_9996_9886_4E0A_4E0B_6587(dyingUnit)
-    if context ~= nil then
-        _____9000_51FA_65E0_4ECE_66B4_6012(context)
-    end
-    _____6E05_7406_6811_9B54_9996_9886_4E0A_4E0B_6587(dyingUnit)
-end
-local function _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick()
+local function _____83B7_53D6_6811_9B54_9996_9886_968F_4ECE_7279_6027_4E0A_4E0B_6587_5217_8868()
     local currentBoss = jglobals.udg_Boss
     if _____662F_6811_9B54_9996_9886(currentBoss) then
         local context = _____83B7_53D6_6216_521B_5EFA_6811_9B54_9996_9886_4E0A_4E0B_6587(currentBoss)
@@ -572,33 +588,32 @@ local function _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick()
             ____exports["初始化树魔首领随从特性"](context)
         end
     end
-    local now = getServerTime()
-    local list = _____83B7_53D6_5168_90E8_6811_9B54_9996_9886_4E0A_4E0B_6587()
-    do
-        local i = 0
-        while i < #list do
-            do
-                local context = list[i + 1]
-                if context == nil then
-                    goto __continue98
-                end
-                if context["随从特性已初始化"] and context["下一次召唤Ms"] > 0 and now >= context["下一次召唤Ms"] then
-                    _____8865_5145_6811_9B54_968F_4ECE_7F16_5236(context)
-                    context["下一次召唤Ms"] = now + _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["补员间隔秒"] * 1000
-                end
-                _____5237_65B0_968F_4ECE_72B6_6001(context)
-            end
-            ::__continue98::
-            i = i + 1
-        end
+    return _____83B7_53D6_5168_90E8_6811_9B54_9996_9886_4E0A_4E0B_6587()
+end
+local function _____6267_884C_6811_9B54_9996_9886_968F_4ECE_7279_6027Tick(context, now)
+    if context == nil then
+        return
     end
+    if context["随从特性已初始化"] then
+        _____767B_8BB0_5267_60C5_5E26_5165_6811_9B54_968F_4ECE(context)
+    end
+    if context["随从特性已初始化"] and context["下一次召唤Ms"] > 0 and now >= context["下一次召唤Ms"] then
+        _____8865_5145_6811_9B54_968F_4ECE_7F16_5236(context)
+        context["下一次召唤Ms"] = now + _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["补员间隔秒"] * 1000
+    end
+    _____5237_65B0_968F_4ECE_72B6_6001(context)
 end
 ____exports["注册树魔首领随从特性"] = function()
     if _____6811_9B54_9996_9886_968F_4ECE_7279_6027_5DF2_6CE8_518C then
         return
     end
     _____6811_9B54_9996_9886_968F_4ECE_7279_6027_5DF2_6CE8_518C = true
-    registerDeathListener(____on_6811_9B54_9996_9886_6B7B_4EA1)
-    addPeriodicCallback(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["追随刷新间隔毫秒"], _____6811_9B54_9996_9886_968F_4ECE_7279_6027Tick)
+    _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({
+        ["名称"] = "树魔首领-随从特性驱动",
+        ["间隔毫秒"] = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]["追随刷新间隔毫秒"],
+        ["取上下文列表"] = _____83B7_53D6_6811_9B54_9996_9886_968F_4ECE_7279_6027_4E0A_4E0B_6587_5217_8868,
+        ["取当前时间"] = getServerTime,
+        ["执行"] = _____6267_884C_6811_9B54_9996_9886_968F_4ECE_7279_6027Tick
+    })
 end
 return ____exports

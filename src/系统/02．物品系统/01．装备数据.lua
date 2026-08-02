@@ -1900,6 +1900,7 @@ ____exports.items.I0CA = {
     weaponType = "剑"
 }
 ____exports.items.I0ES = {type = "任务", name = "残缺的魔法信件", goldPrice = 0}
+____exports.items.I0G9 = {type = "任务", name = "火灵核心", goldPrice = 0}
 ____exports.items.I000 = {type = "主武器", name = "精灵藤杖", goldPrice = 0}
 ____exports.items.I001 = {type = "主武器", name = "精灵魔杖", goldPrice = 0}
 ____exports.items.I003 = {type = "鞋子", name = "精灵鞋", goldPrice = 0}
@@ -3630,6 +3631,7 @@ ____exports.items.I0E4 = {
     level = "B-",
     all = 15
 }
+____exports.items.I0E5 = {type = "战斗道具", name = "月光碎片", goldPrice = 0}
 ____exports.items.I0EA = {
     type = "道具/戒指/饰品",
     name = "腐化猫爪手套",

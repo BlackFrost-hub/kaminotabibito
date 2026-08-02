@@ -3,12 +3,13 @@
 import { type 卡瑟拉运行时上下文, 消耗玩家触手残片 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY, 播放卡瑟拉限时动作 } from "./14．公共工具";
+import { 单位有效, 极坐标X, 极坐标Y, 距离平方XY } from "./14．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 创建动态装饰物安全区组 } from "../../../../00．技能模板+函数/04．机制组件/02．战斗区域/06．动态装饰物安全区组";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 启动基础施法时间线 } from "../../../../00．技能模板+函数/02．通用函数/13．施法时间线";
 
-const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const jass = require("jass.common") as any;
@@ -27,9 +28,6 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = requ
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
-};
-const { 显示常规技能吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
-  显示常规技能吟唱条: (this: void, 参数: any) => void;
 };
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
@@ -170,16 +168,15 @@ function 结算卡瑟拉共生电击(this: void, context: 卡瑟拉运行时上�
       continue;
     }
     if (消耗玩家触手残片(context, hero, cfg.抵消残片数)) continue;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       来源: boss,
       目标: hero,
-      伤害: cfg.雷伤害,
+      伤害公式: { 固定值: cfg.雷伤害 },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_LIGHTNING,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
       技能实例ID,
       标签: "卡瑟拉共生电击",
     });
@@ -193,25 +190,7 @@ export function 释放卡瑟拉共生电击(this: void, context: 卡瑟拉运行
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.Boss潜入中) return false;
   const cfg = 卡瑟拉数值与表现配置.共生电击;
-  显示常规技能吟唱条({
-    总时长: cfg.预警秒,
-    颜色ID: cfg.吟唱条颜色ID,
-    标题文本: cfg.吟唱条标题文本,
-    提示文本: cfg.吟唱条提示文本,
-  });
   确保绝缘珊瑚(context);
-  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.预警秒);
-  播放卡瑟拉台词(boss, "共生电击");
-  播放Boss坐标音效(卡瑟拉音效配置.共生电击.预警, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
-  尝试播放Boss拟声池({
-    标识: 卡瑟拉音效配置.怪物拟声.标识,
-    音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
-    X: GetUnitX(boss),
-    Y: GetUnitY(boss),
-    裁断距离: 卡瑟拉音效配置.默认裁断距离,
-    冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
-    触发概率百分比: 卡瑟拉音效配置.怪物拟声.关键机制触发概率百分比,
-  });
   播放共生电击蓄力特效(boss);
   const 预警特效: 共生电击预警特效实例 = {
     context,
@@ -228,9 +207,36 @@ export function 释放卡瑟拉共生电击(this: void, context: 卡瑟拉运行
     标签: "卡瑟拉共生电击",
     持续时间秒: cfg.预警秒 + 2,
   });
-  const id = addDelayedCallback(cfg.预警秒 * 1000, function 卡瑟拉共生电击结算(this: void): void {
-    结算卡瑟拉共生电击(context, 技能实例ID);
+  启动基础施法时间线({
+    名称: "卡瑟拉-共生电击",
+    施法者: boss,
+    硬直秒: cfg.预警秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.预警秒,
+      颜色ID: cfg.吟唱条颜色ID,
+      标题文本: cfg.吟唱条标题文本,
+      提示文本: cfg.吟唱条提示文本,
+    },
+    播放台词: function 卡瑟拉共生电击台词(this: void): void {
+      播放卡瑟拉台词(boss, "共生电击");
+      播放Boss坐标音效(卡瑟拉音效配置.共生电击.预警, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
+      尝试播放Boss拟声池({
+        标识: 卡瑟拉音效配置.怪物拟声.标识,
+        音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
+        X: GetUnitX(boss),
+        Y: GetUnitY(boss),
+        裁断距离: 卡瑟拉音效配置.默认裁断距离,
+        冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
+        触发概率百分比: 卡瑟拉音效配置.怪物拟声.关键机制触发概率百分比,
+      });
+    },
+    清理: context.清理,
+    on生效: function 卡瑟拉共生电击时间线生效(this: void): void {
+      结算卡瑟拉共生电击(context, 技能实例ID);
+    },
   });
-  context.清理.登记延迟回调("卡瑟拉-共生电击结算", id);
   return true;
 }

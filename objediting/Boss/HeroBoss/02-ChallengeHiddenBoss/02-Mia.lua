@@ -9,9 +9,9 @@ createMeleeBossHeroUnit('N00V', '污染之猫·腐化者米亚', {
   tooltipExtended = '污染之猫·腐化者米亚',
   description = '污染之猫·腐化者米亚',
 
-  -- Compared with Thranduil's Boss baseline, Mia is about 10% stronger.
+  -- Second-chapter hidden Boss baseline.
   level = 11,
-  hp = 22000,
+  hp = 60000,
   mana = 1100,
   initialMana = 1100,
   manaRegen = 11.0,
@@ -21,13 +21,14 @@ createMeleeBossHeroUnit('N00V', '污染之猫·腐化者米亚', {
   strength = 20,
   agility = 21,
   intelligence = 17,
-  strengthPerLevel = 2.10,
-  agilityPerLevel = 1.65,
-  intelligencePerLevel = 2.85,
-  damageBase = 1000,
-  attackCooldown = 1.82,
+  strengthPerLevel = 1,
+  agilityPerLevel = 1,
+  intelligencePerLevel = 1,
+  damageBase = 1950,
+  attackCooldown = 1.0,
   attackType = AttackType.Chaos,
   defense = 35,
+  hpRegen = 450.0,
   goldBountyBase = 550,
   pointValue = 110,
 

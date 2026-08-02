@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
@@ -37,9 +38,6 @@ import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放'
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
 const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff系统.00．Buff系统') as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
@@ -60,10 +58,8 @@ const { getServerTime } = require('系统.00．核心系统.05．中心计时器
 
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
-const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const Player = jass.Player as (id: number) => any;
@@ -76,7 +72,6 @@ const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -344,16 +339,17 @@ function 结算女妖哭嚎(this: void, instance: 一切生命的终点实例): 
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero) || instance.庇护单位表[GetHandleId(hero)] === true) continue;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       来源: boss,
       目标: hero,
-      伤害: GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg.女妖哭嚎致命伤害最大生命比例,
+      伤害公式: {
+        目标最大生命比例: cfg.女妖哭嚎致命伤害最大生命比例,
+      },
       attack: false,
       ranged: true,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_UNIVERSAL,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: 'Boss技能',
       标签: '安兹·女妖哭嚎',
     });
   }

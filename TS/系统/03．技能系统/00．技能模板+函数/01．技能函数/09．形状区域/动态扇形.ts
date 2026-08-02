@@ -1,7 +1,6 @@
 /** @noSelfInFile */
 /**
  * 形状区域 - 动态扇形
- *
  * 支持扇形波前按时间推进。
  * 默认模式为“每 0.02 秒只命中新扫到的那一圈”，也就是由近到远扫过去。
  */
@@ -15,6 +14,7 @@ const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
+const SquareRoot = jass.SquareRoot as (value: number) => number;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
@@ -34,7 +34,7 @@ const {
   removePeriodicCallback,
   getServerTime,
 } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
@@ -57,7 +57,7 @@ const { 获取扇形区域单位 } = require("系统.03．技能系统.00．技�
 };
 
 const { 创建红色扇形提示圈特效, 设置扇形提示圈朝向与尺寸, 重播提示圈动画, 立即销毁提示圈特效 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
-  创建红色扇形提示圈特效: (this: void, x: number, y: number, fac: number, size: number, speed?: number) => any;
+  创建红色扇形提示圈特效: (this: void, x: number, y: number, fac: number, size: number, speed?: number, 来源单位?: any, 扇形角度?: number) => any;
   设置扇形提示圈朝向与尺寸: (this: void, e: any, fac: number, size: number) => void;
   重播提示圈动画: (this: void, e: any, 动画序号?: number, 动画名?: string) => void;
   立即销毁提示圈特效: (this: void, e: any) => void;
@@ -154,7 +154,9 @@ class 动态扇形实现 implements 动态扇形实例 {
         this.当前Y,
         参数.方向角,
         取扇形提示圈尺寸(this.当前半径值),
-        1 / 参数.变化时间
+        1 / 参数.变化时间,
+        undefined,
+        参数.扇形角度
       );
     }
 
@@ -310,6 +312,7 @@ class 动态扇形实现 implements 动态扇形实例 {
 
 let 动态扇形实例ID计数器 = 0;
 let 动态扇形系统回调ID = 0;
+const 动态扇形系统检查间隔毫秒 = 20;
 const 活跃动态扇形实例: 动态扇形实现[] = [];
 
 function 取句柄ID(h: any): number {
@@ -319,7 +322,7 @@ function 取句柄ID(h: any): number {
 function 计算坐标距离(x1: number, y1: number, x2: number, y2: number): number {
   const dx = x2 - x1;
   const dy = y2 - y1;
-  return jass.SquareRoot(dx * dx + dy * dy) as number;
+  return SquareRoot(dx * dx + dy * dy);
 }
 
 function 取较小值(a: number, b: number): number {
@@ -341,7 +344,7 @@ function 确保动态扇形系统已启动(): void {
   if (动态扇形系统回调ID !== 0) {
     return;
   }
-  动态扇形系统回调ID = addPeriodicCallback(100, 动态扇形系统Tick);
+  动态扇形系统回调ID = addPeriodicCallback(动态扇形系统检查间隔毫秒, 动态扇形系统Tick);
 }
 
 function 注册动态扇形实例(实例: 动态扇形实现): void {

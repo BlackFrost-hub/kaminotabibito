@@ -1,9 +1,5 @@
 /** @noSelfInFile */
 
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
-
 import { 树魔首领单位技能配置 } from "./00．配置";
 import { 获取或创建树魔首领上下文, 树魔首领运行时上下文 } from "./01．运行时上下文";
 import { 树魔首领数值与表现配置, 树魔首领音效配置 } from "./02．数值与表现配置";
@@ -11,10 +7,9 @@ import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 播放Boss坐标音效编排, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 距离平方XY, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 执行BossAOE技能伤害, 提交预计算BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 创建周期行为 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -42,10 +37,8 @@ const { 获取Boss技能最高仇恨目标, 获取Boss技能随机敌对英雄, 
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
 };
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -80,29 +73,48 @@ function 取诅咒目标(this: void, boss: any): any {
   return 获取Boss技能随机敌对英雄(boss);
 }
 
+interface 远古诅咒跟随提示状态 {
+  目标: any;
+  已刷新毫秒: number;
+  刷新间隔毫秒: number;
+  延迟毫秒: number;
+  半径: number;
+}
+
+function 树魔首领远古诅咒分摊圈Tick(this: void, _执行次数: number, variable?: 远古诅咒跟随提示状态): boolean {
+  if (variable == null) return false;
+  variable.已刷新毫秒 += variable.刷新间隔毫秒;
+  if (!单位有效(variable.目标) || variable.已刷新毫秒 > variable.延迟毫秒) return false;
+  创建技能提示圈({
+    类型: "圆形",
+    锚点单位: variable.目标,
+    半径: variable.半径,
+    持续时间: variable.刷新间隔毫秒 / 1000 + 0.05,
+  });
+  return true;
+}
+
 function 启动跟随分摊提示圈(this: void, context: 树魔首领运行时上下文, target: any): void {
   const cfg = 树魔首领数值与表现配置.远古诅咒;
-  let elapsed = 0;
   创建技能提示圈({
     类型: "圆形",
     锚点单位: target,
     半径: cfg.分摊半径,
     持续时间: cfg.跟随提示圈刷新毫秒 / 1000 + 0.05,
   });
-  const id = addPeriodicCallback(cfg.跟随提示圈刷新毫秒, function 树魔首领远古诅咒分摊圈Tick(this: void): void {
-    elapsed += cfg.跟随提示圈刷新毫秒;
-    if (!单位有效(target) || elapsed > cfg.延迟秒 * 1000) {
-      removePeriodicCallback(id);
-      return;
-    }
-    创建技能提示圈({
-      类型: "圆形",
-      锚点单位: target,
+  创建周期行为({
+    名称: "树魔首领-远古诅咒分摊提示",
+    间隔毫秒: cfg.跟随提示圈刷新毫秒,
+    清理: context.清理,
+    变量: {
+      目标: target,
+      已刷新毫秒: 0,
+      刷新间隔毫秒: cfg.跟随提示圈刷新毫秒,
+      延迟毫秒: cfg.延迟秒 * 1000,
       半径: cfg.分摊半径,
-      持续时间: cfg.跟随提示圈刷新毫秒 / 1000 + 0.05,
-    });
+    },
+    onTick: 树魔首领远古诅咒分摊圈Tick,
   });
-  context.清理.登记周期回调("树魔首领-远古诅咒分摊提示", id);
 }
 
 function 播放点名特效(this: void, target: any): void {
@@ -204,21 +216,19 @@ function 执行远古诅咒后续爆发(this: void, context: 树魔首领运行�
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     if (距离平方XY(centerX, centerY, GetUnitX(hero), GetUnitY(hero)) > radius2) continue;
-    const damage = 计算组合技能伤害(boss, hero, {
-      来源攻击力比例: cfg.后续爆发Boss攻击力比例,
-      目标最大生命比例: cfg.后续爆发目标最大生命比例,
-    });
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       技能ID: 远古诅咒技能ID,
       来源: boss,
       目标: hero,
-      伤害: damage,
+      伤害公式: {
+        来源攻击力比例: cfg.后续爆发Boss攻击力比例,
+        目标最大生命比例: cfg.后续爆发目标最大生命比例,
+      },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_ENHANCED,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
     });
   }
 }
@@ -255,7 +265,7 @@ function 执行远古诅咒第一段(this: void, context: 树魔首领运行时�
   const damagePerTarget = baseDamage / count;
   if (splitTargets.length >= 2) {
     for (let i = 0; i < splitTargets.length; i++) {
-      造成AOE技能伤害({
+      提交预计算BossAOE技能伤害({
         技能ID: 远古诅咒技能ID,
         来源: boss,
         目标: splitTargets[i],
@@ -265,11 +275,10 @@ function 执行远古诅咒第一段(this: void, context: 树魔首领运行时�
         attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_MIND,
         weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
       });
     }
   } else {
-    造成AOE技能伤害({
+    提交预计算BossAOE技能伤害({
       技能ID: 远古诅咒技能ID,
       来源: boss,
       目标: target,
@@ -279,7 +288,6 @@ function 执行远古诅咒第一段(this: void, context: 树魔首领运行时�
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_MIND,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
     });
   }
   治疗全部玩家(boss, baseDamage);

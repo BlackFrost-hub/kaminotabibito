@@ -255,20 +255,6 @@ ____exports["区域传送配置"] = {
         condition = "always",
         rule = "40%KillUnit:|cffffff00『系统提示』|r：触发单位跳入熔浆不知所踪;20%传送:14783,-14913;20%传送:19009,-11590;20%传送:21077,-16342",
         enabled = true
-    },
-    ["19"] = {
-        id = "19",
-        name = "熔岩迷宫-王之墓冢",
-        left = 28448,
-        bottom = -3360,
-        right = 28864,
-        top = -3136,
-        teleportX = 10941,
-        teleportY = -15743,
-        cameraTime = 0.1,
-        text = "|cffffff00『系统提示』|r：现在的场景为：|cff993366『王之墓冢』|r",
-        condition = "zhuxian≥99",
-        enabled = true
     }
 }
 ____exports.default = ____exports["区域传送配置"]

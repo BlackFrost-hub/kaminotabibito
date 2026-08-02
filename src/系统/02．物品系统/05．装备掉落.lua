@@ -7,6 +7,7 @@ local __TS__ArraySome = ____lualib.__TS__ArraySome
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__Number = ____lualib.__TS__Number
+local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__ArraySort = ____lualib.__TS__ArraySort
@@ -17,18 +18,18 @@ function getItemsByScoreRange(minScore, maxScore)
     for id in pairs(itemsData) do
         do
             if type(id) ~= "string" or #id ~= 4 then
-                goto __continue78
+                goto __continue91
             end
             local entry = itemsData[id]
             local score = entry and entry.score
             if type(score) ~= "number" then
-                goto __continue78
+                goto __continue91
             end
             if score >= minScore and score <= maxScore then
                 result[#result + 1] = id
             end
         end
-        ::__continue78::
+        ::__continue91::
     end
     __TS__ArraySort(result)
     return result
@@ -164,6 +165,15 @@ local function pickFromWeightedPool(pool, picks)
         return {}
     end
     if picks == 1 then
+        do
+            local i = 0
+            while i < #pool do
+                if pool[i + 1].always then
+                    return {pool[i + 1].id}
+                end
+                i = i + 1
+            end
+        end
         local one = weightedPickOne(pool)
         return one and ({one}) or ({})
     end
@@ -198,18 +208,55 @@ local function pickFromWeightedPool(pool, picks)
         end
     end
     if #out > picks then
+        local protectedOut = {}
+        local removableOut = {}
         do
-            local i = #out - 1
+            local i = 0
+            while i < #out do
+                local isAlways = false
+                do
+                    local j = 0
+                    while j < #pool do
+                        if pool[j + 1].always and pool[j + 1].id == out[i + 1] then
+                            isAlways = true
+                            break
+                        end
+                        j = j + 1
+                    end
+                end
+                if isAlways then
+                    protectedOut[#protectedOut + 1] = out[i + 1]
+                else
+                    removableOut[#removableOut + 1] = out[i + 1]
+                end
+                i = i + 1
+            end
+        end
+        do
+            local i = #removableOut - 1
             while i >= 1 do
                 local j = jass.GetRandomInt(1, i + 1)
-                local t = out[i + 1]
-                out[i + 1] = out[j]
-                out[j] = t
+                local t = removableOut[i + 1]
+                removableOut[i + 1] = removableOut[j]
+                removableOut[j] = t
                 i = i - 1
             end
         end
-        while #out > picks do
-            table.remove(out)
+        __TS__ArraySetLength(out, 0)
+        do
+            local i = 0
+            while i < #protectedOut do
+                out[#out + 1] = protectedOut[i + 1]
+                i = i + 1
+            end
+        end
+        local removableToKeep = picks - #protectedOut
+        do
+            local i = 0
+            while i < removableToKeep and i < #removableOut do
+                out[#out + 1] = removableOut[i + 1]
+                i = i + 1
+            end
         end
     end
     local needMore = picks - #out
@@ -326,15 +373,15 @@ local function onUnitDeath(unit, _killer)
     for ____, rule in ipairs(DROP_RULES) do
         do
             if typeId ~= stringToFourCC(rule.unitId) then
-                goto __continue71
+                goto __continue84
             end
             local r = jass.GetRandomInt(1, 10000)
             if r > rule.proc * 10000 then
-                goto __continue71
+                goto __continue84
             end
             local list = getItemsByScoreRange(rule.minScore, rule.maxScore)
             if #list == 0 then
-                goto __continue71
+                goto __continue84
             end
             local idx = jass.GetRandomInt(1, #list)
             local itemId = list[idx]
@@ -343,7 +390,7 @@ local function onUnitDeath(unit, _killer)
             end
             break
         end
-        ::__continue71::
+        ::__continue84::
     end
 end
 registerDeathListener(onUnitDeath)

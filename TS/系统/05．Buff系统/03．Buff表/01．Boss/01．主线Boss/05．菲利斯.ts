@@ -113,7 +113,7 @@ export const 菲利斯Buff表: Record<string, BuffData> = {
   [菲利斯BuffID.护主盾阵]: {
     buffID: 菲利斯BuffID.护主盾阵,
     buffName: "护主盾阵",
-    icon: "ReplaceableTextures\\CommandButtons\\BTNSteelMelee.blp",
+    icon: "BuffIcon\\Boss\\Felice\\guard_shield_formation.blp",
     effect: "",
     type: "Buff:boss:defense",
     interval: 0,

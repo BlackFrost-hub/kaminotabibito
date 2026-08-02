@@ -27,7 +27,7 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string) => number;
@@ -44,6 +44,7 @@ import type { 规范化召唤物参数 } from "./01．类型";
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
+const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
 const SetUnitAcquireRange = jass.SetUnitAcquireRange as (unit: any, acquireRange: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (i: number) => any;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (unit: any, buffId: number, duration: number) => void;
@@ -77,7 +78,6 @@ const 死亡删除延迟秒数 = 3.0;
 const 模块名 = "召唤物核心";
 const DEFAULT_TIMED_LIFE_BUFF = stringToFourCC("BHwe");
 const 限时召唤物删除表: Record<number, true | undefined> = {};
-const 待延迟删除召唤物表: Record<number, any | undefined> = {};
 let 已注册限时召唤物删除监听 = false;
 
 function 设置最后创建单位(this: void, unit: any): void {
@@ -101,9 +101,8 @@ function 设置单位飞行高度(this: void, unit: any, height: number): void {
   SetUnitFlyHeight(unit, height, 0.0);
 }
 
-function 执行召唤物延迟删除(this: void, callbackId: number): void {
-  const unit = 待延迟删除召唤物表[callbackId];
-  待延迟删除召唤物表[callbackId] = undefined;
+function 执行召唤物延迟删除(this: void, variable?: any): void {
+  const unit = variable;
   if (unit == null || unit === 0) return;
   RemoveUnit(unit);
 }
@@ -113,9 +112,7 @@ function on限时召唤物死亡删除(this: void, 死亡单位: any, _击杀者
   const hid = GetHandleId(死亡单位);
   if (限时召唤物删除表[hid] == null) return;
   限时召唤物删除表[hid] = undefined;
-  let callbackId = 0;
-  callbackId = addDelayedCallback(死亡删除延迟秒数 * 1000, () => 执行召唤物延迟删除(callbackId));
-  待延迟删除召唤物表[callbackId] = 死亡单位;
+  addDelayedCallback(死亡删除延迟秒数 * 1000, 执行召唤物延迟删除, 死亡单位);
 }
 
 function 确保限时召唤物删除监听(this: void): void {
@@ -193,6 +190,17 @@ function 应用召唤物属性(this: void, unit: any, 参数: 规范化召唤物
 
   if (参数.禁止普攻 === true && DzUnitDisableAttack != null) {
     DzUnitDisableAttack(unit, true);
+  }
+
+  if (参数.添加技能 != null) {
+    for (let i = 0; i < 参数.添加技能.length; i++) {
+      const 技能ID = 参数.添加技能[i];
+      if (技能ID > 0) UnitAddAbility(unit, 技能ID);
+    }
+  }
+
+  if (参数.禁用路径 === true) {
+    SetUnitPathing(unit, false);
   }
 
   if (参数.普攻弹道模型 != null && 参数.普攻弹道模型 !== "" && DzSetUnitMissileModel != null) {

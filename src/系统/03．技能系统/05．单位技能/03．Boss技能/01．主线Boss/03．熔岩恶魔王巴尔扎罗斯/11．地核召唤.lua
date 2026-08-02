@@ -12,6 +12,8 @@ local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_65
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.22．限次周期执行器")
+local _____521B_5EFA_5468_671F_884C_4E3A = ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668["创建周期行为"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
@@ -24,11 +26,8 @@ local ____require_result_4 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFABoss_6218_573A_5730_70B9_4F4D_96C6 = ____require_result_4["创建Boss战场地点位集"]
 local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_6.addPeriodicCallback
-local removePeriodicCallback = ____require_result_6.removePeriodicCallback
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -102,25 +101,28 @@ local function _____505C_6B62_5730_6838(state)
         return
     end
     state.stopped = true
-    if state.tickId ~= 0 then
-        removePeriodicCallback(state.tickId)
-        state.tickId = 0
+    if state.tick ~= nil then
+        local ____self_7 = state.tick
+        ____self_7["停止"](____self_7)
+        state.tick = nil
     end
 end
-local function ____on_5730_6838Tick(state)
-    if state.stopped then
-        return
+local function ____on_5730_6838Tick(______6267_884C_6B21_6570, variable)
+    local state = variable
+    if state == nil or state.stopped then
+        return false
     end
     local core = state.coreUnit
     if not _____5355_4F4D_6709_6548(core) then
         _____505C_6B62_5730_6838(state)
-        return
+        return false
     end
     _____64AD_653E_5730_6838Tick_7279_6548(
         GetUnitX(core),
         GetUnitY(core)
     )
     _____5730_6838_53E0_52A0_5168_573A_707C_70ED(state.context)
+    return true
 end
 local function _____521B_5EFA_5730_6838_5355_4F4D(context, x, y)
     local boss = context["Boss单位"]
@@ -129,7 +131,7 @@ local function _____521B_5EFA_5730_6838_5355_4F4D(context, x, y)
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["地核召唤"]
     local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
-    local state = {context = context, coreUnit = nil, tickId = 0, stopped = false}
+    local state = {context = context, coreUnit = nil, tick = nil, stopped = false}
     local core = _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
         ["清理"] = context["清理"],
         ["名称"] = "巴尔扎罗斯-不稳定地核",
@@ -157,14 +159,13 @@ local function _____521B_5EFA_5730_6838_5355_4F4D(context, x, y)
     end
     state.coreUnit = core["单位"]
     _____64AD_653EBoss_5750_6807_97F3_6548(_____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["地核召唤"]["地核出现"], x, y, _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
-    state.tickId = addPeriodicCallback(
-        config["Tick秒"] * 1000,
-        function()
-            ____on_5730_6838Tick(state)
-        end
-    )
-    local ____self_8 = context["清理"]
-    ____self_8["登记周期回调"](____self_8, "巴尔扎罗斯-地核Tick", state.tickId)
+    state.tick = _____521B_5EFA_5468_671F_884C_4E3A({
+        ["名称"] = "巴尔扎罗斯-地核Tick",
+        ["间隔毫秒"] = config["Tick秒"] * 1000,
+        ["清理"] = context["清理"],
+        ["变量"] = state,
+        onTick = ____on_5730_6838Tick
+    })
 end
 ____exports["释放巴尔扎罗斯地核召唤"] = function(context)
     local boss = context["Boss单位"]

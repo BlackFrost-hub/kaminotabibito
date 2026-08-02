@@ -3,11 +3,32 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
+local CreateDestructable = jass.CreateDestructable
+local GetLocationX = jass.GetLocationX
+local GetLocationY = jass.GetLocationY
 --- 获取整个地图区域
 -- 对应JASS: GetEntireMapRect
 -- 实现: return GetWorldBounds()
 function ____exports.GetEntireMapRect()
     return jass.GetWorldBounds()
+end
+--- 对应 Blizzard.j 的 CreateDestructableLoc。
+-- 位置句柄由调用方管理；本函数只读取坐标并创建可破坏物。
+function ____exports.CreateDestructableLoc(objectid, loc, facing, scale, variation)
+    if loc == nil or loc == 0 then
+        return nil
+    end
+    local destructable = CreateDestructable(
+        objectid,
+        GetLocationX(loc),
+        GetLocationY(loc),
+        facing,
+        scale,
+        variation
+    )
+    jglobals.bj_lastCreatedDestructable = destructable
+    return destructable
 end
 function ____exports.RectContainsCoords(r, x, y)
     if not r then

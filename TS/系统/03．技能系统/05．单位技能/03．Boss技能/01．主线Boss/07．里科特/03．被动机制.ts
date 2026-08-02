@@ -14,9 +14,6 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
   doHeal: (this: void, params: any) => number;
 };
 
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
@@ -46,20 +43,6 @@ function 推进单个里科特被动(this: void, context: 里科特运行时上�
   if (maxLife > 0 && heal > 0) doHeal({ HealSource: boss, HealTarget: boss, HealAmount: heal, ItemHeal: false, HealEffect: false });
 }
 
-function on里科特神明祝福伤害上限(this: void, damageContext: any): number {
-  const contexts = 获取全部里科特上下文();
-  for (let i = 0; i < contexts.length; i++) {
-    const context = contexts[i];
-    if (damageContext.target !== context.Boss单位 || !单位有效(context.Boss单位)) continue;
-    const maxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
-    if (!(maxLife > 0)) return damageContext.currentDamage;
-    const capRatio = 里科特数值与表现配置.被动.单次最大生命伤害比例;
-    const cap = maxLife * capRatio;
-    return damageContext.currentDamage > cap ? cap : damageContext.currentDamage;
-  }
-  return damageContext.currentDamage;
-}
-
 export function 注册里科特被动机制(this: void): void {
   if (已注册) return;
   已注册 = true;
@@ -69,5 +52,4 @@ export function 注册里科特被动机制(this: void): void {
     取上下文列表: 获取全部里科特上下文,
     执行: 推进单个里科特被动,
   });
-  registerDamageModifier(on里科特神明祝福伤害上限, 80);
 }

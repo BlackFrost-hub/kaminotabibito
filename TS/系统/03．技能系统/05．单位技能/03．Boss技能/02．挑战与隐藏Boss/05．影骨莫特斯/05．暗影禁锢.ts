@@ -2,10 +2,9 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯模型动画配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
-import { 单位有效, 播放影骨莫特斯限时动作, 开始影骨莫特斯常规施法, 两点角度, stringToFourCC } from "./11．公共工具";
-import { 立即设置单位朝向 } from "../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
+import { 单位有效, 两点角度, stringToFourCC } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 const jass = require("jass.common") as any;
@@ -16,8 +15,8 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { 获取Boss技能随机敌对英雄, 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能随机敌对英雄: (this: void, boss: any, centerUnit?: any, radius?: number) => any;
@@ -47,12 +46,6 @@ interface 影骨暗影禁锢法阵变量 {
   context: 影骨莫特斯运行时上下文;
 }
 
-interface 影骨暗影禁锢延迟变量 {
-  context: 影骨莫特斯运行时上下文;
-  x: number;
-  y: number;
-}
-
 function 影骨暗影禁锢取目标列表(this: void, variable?: any): any[] {
   const data = variable as 影骨暗影禁锢法阵变量 | undefined;
   if (data == null) return [];
@@ -71,12 +64,6 @@ function 影骨暗影禁锢施加控制(this: void, target: any, duration: numbe
     sourceName: "影骨-暗影禁锢",
     iconOverride: "BuffIcon\\Boss\\ShadowboneMortes\\shadow_prison.blp",
   });
-}
-
-function 影骨暗影禁锢生效(this: void, variable?: any): void {
-  const data = variable as 影骨暗影禁锢延迟变量 | undefined;
-  if (data == null) return;
-  创建影骨暗影法阵(data.context, data.x, data.y);
 }
 
 function 创建影骨暗影法阵(this: void, context: 影骨莫特斯运行时上下文, x: number, y: number): void {
@@ -108,11 +95,7 @@ function 创建影骨暗影法阵(this: void, context: 影骨莫特斯运行时�
 
 export function 释放影骨暗影禁锢(this: void, context: 影骨莫特斯运行时上下文, target: any): void {
   if (!单位有效(target)) return;
-  播放影骨莫特斯台词(context.Boss单位, "暗影禁锢");
   const cfg = 影骨莫特斯数值与表现配置.暗影禁锢;
-  立即设置单位朝向(context.Boss单位, 两点角度(GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), GetUnitX(target), GetUnitY(target)));
-  开始影骨莫特斯常规施法(context.Boss单位, cfg.预警秒, "暗影禁锢", "离开锁定的暗影法阵");
-  播放影骨莫特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
   const x = GetUnitX(target);
   const y = GetUnitY(target);
   创建技能提示圈({
@@ -124,8 +107,30 @@ export function 释放影骨暗影禁锢(this: void, context: 影骨莫特斯运
     来源单位: context.Boss单位,
   });
   播放Boss坐标音效(影骨莫特斯音效配置.暗影禁锢.预警, x, y, 影骨莫特斯音效配置.默认裁断距离);
-  const id = addDelayedCallback(cfg.预警秒 * 1000, 影骨暗影禁锢生效, { context, x, y } as 影骨暗影禁锢延迟变量);
-  context.清理.登记延迟回调("影骨-暗影禁锢", id);
+  启动基础施法时间线({
+    名称: "影骨-暗影禁锢",
+    施法者: context.Boss单位,
+    目标X: x,
+    目标Y: y,
+    硬直秒: cfg.预警秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    恢复动画编号: 影骨莫特斯模型动画配置.战斗待机编号,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.预警秒,
+      颜色ID: 4,
+      标题文本: "暗影禁锢",
+      提示文本: "离开锁定的暗影法阵",
+    },
+    播放台词: function 影骨暗影禁锢台词(this: void): void {
+      播放影骨莫特斯台词(context.Boss单位, "暗影禁锢");
+    },
+    清理: context.清理,
+    on生效: function 影骨暗影禁锢时间线生效(this: void): void {
+      创建影骨暗影法阵(context, x, y);
+    },
+  });
 }
 
 function on影骨暗影禁锢施法(this: void, castingUnit: any, spellAbilityId: number): void {

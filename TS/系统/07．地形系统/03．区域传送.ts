@@ -19,14 +19,38 @@ const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.01．YDUserData�
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
 const regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
-  registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => () => void;
+  registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => (this: void) => void;
 };
+
+export interface 剧情玩家组传送配置 {
+  入口中心X: number;
+  入口中心Y: number;
+  入口半径: number;
+  目标X: number;
+  目标Y: number;
+  目标面向?: number;
+  条件: (this: void) => boolean;
+  读取玩家英雄组: (this: void) => any;
+  允许进入单位?: (this: void, unit: any) => boolean;
+  完成?: (this: void, 触发单位?: any) => void;
+}
+
+interface 剧情玩家组传送状态 {
+  配置: 剧情玩家组传送配置;
+  区域: any;
+  矩形: any;
+  触发器: any;
+  取消监听: (this: void) => void;
+  已触发: boolean;
+}
 
 // 运行时：Region -> 配置行 的映射，用于在回调里从 Region 反查到表格配置
 const regionMap = new Map<number, RegionConfig>();
 let 区域传送已初始化 = false;
 const 单位区域传送冷却: Record<number, number> = {};
 const 区域传送连触发保护Ms = 500;
+const 剧情玩家组传送状态表: Record<number, 剧情玩家组传送状态 | undefined> = {};
+let 当前剧情玩家组传送状态: 剧情玩家组传送状态 | undefined;
 
 // 简易调试输出：把关键信息打到玩家 0 屏幕上，便于排查区域是否创建/触发
 // function dbg(msg: string): void {
@@ -271,6 +295,103 @@ function initRegionTeleport(): void {
 
 function onInitRegionTeleportDelayed(this: void): void {
   initRegionTeleport();
+}
+
+function 剧情传送句柄有效(this: void, handle: any): boolean {
+  return handle != null && handle !== 0;
+}
+
+function 剧情传送单位可进入(this: void, unit: any): boolean {
+  if (!剧情传送句柄有效(unit)) return false;
+  if ((jass as any).IsUnitType(unit, (jass as any).UNIT_TYPE_HERO) !== true) return false;
+  if ((jass as any).IsUnitType(unit, (jass as any).UNIT_TYPE_DEAD) === true) return false;
+  const owner = (jass as any).GetOwningPlayer(unit);
+  const neutralAggressive = (jass as any).Player((jass as any).PLAYER_NEUTRAL_AGGRESSIVE);
+  return owner == null || owner !== neutralAggressive;
+}
+
+function 空剧情传送清理(this: void): void {}
+
+function on移动剧情玩家组(this: void): void {
+  const 状态 = 当前剧情玩家组传送状态;
+  if (状态 == null) return;
+  const unit = (jass as any).GetEnumUnit();
+  if (!剧情传送单位可进入(unit)) return;
+  (jass as any).SetUnitPosition(unit, 状态.配置.目标X, 状态.配置.目标Y);
+  if (状态.配置.目标面向 != null) {
+    (jass as any).SetUnitFacing(unit, 状态.配置.目标面向);
+  }
+  (jass as any).IssueImmediateOrder(unit, "stop");
+}
+
+function 清理剧情玩家组传送状态(this: void, 状态: 剧情玩家组传送状态): void {
+  const triggerId = Number((jass as any).GetHandleId(状态.触发器));
+  if (状态.取消监听 != null) 状态.取消监听();
+  if (剧情传送句柄有效(状态.触发器)) (jass as any).DestroyTrigger(状态.触发器);
+  if (剧情传送句柄有效(状态.矩形)) (jass as any).RemoveRect(状态.矩形);
+  if (剧情传送句柄有效(状态.区域)) (jass as any).RemoveRegion(状态.区域);
+  if (triggerId > 0) 剧情玩家组传送状态表[triggerId] = undefined;
+}
+
+function on剧情玩家组传送进入(this: void): void {
+  const trigger = (jass as any).GetTriggeringTrigger();
+  const triggerId = Number((jass as any).GetHandleId(trigger));
+  const 状态 = 剧情玩家组传送状态表[triggerId];
+  if (状态 == null || 状态.已触发) return;
+  if (!状态.配置.条件()) return;
+
+  const enteringUnit = (jass as any).GetTriggerUnit();
+  if (!剧情传送单位可进入(enteringUnit)) return;
+  if (状态.配置.允许进入单位 != null && !状态.配置.允许进入单位(enteringUnit)) return;
+  const 玩家英雄组 = 状态.配置.读取玩家英雄组();
+  if (!剧情传送句柄有效(玩家英雄组)) return;
+
+  状态.已触发 = true;
+  清理剧情玩家组传送状态(状态);
+  当前剧情玩家组传送状态 = 状态;
+  (jass as any).ForGroup(玩家英雄组, on移动剧情玩家组);
+  当前剧情玩家组传送状态 = undefined;
+  if (状态.配置.完成 != null) 状态.配置.完成(enteringUnit);
+}
+
+/**
+ * 按剧情动作动态注册一次性玩家英雄组传送。
+ * 区域、触发器和监听都由地形系统统一创建与销毁；条件不满足时不会传送。
+ */
+export function 注册剧情玩家组传送(this: void, 配置: 剧情玩家组传送配置): (this: void) => void {
+  if (配置 == null || 配置.入口半径 <= 0 || !配置.条件 || !配置.读取玩家英雄组) return 空剧情传送清理;
+
+  const region = (jass as any).CreateRegion();
+  const rect = (jass as any).Rect(
+    配置.入口中心X - 配置.入口半径,
+    配置.入口中心Y - 配置.入口半径,
+    配置.入口中心X + 配置.入口半径,
+    配置.入口中心Y + 配置.入口半径,
+  );
+  const trigger = (jass as any).CreateTrigger();
+  if (!剧情传送句柄有效(region) || !剧情传送句柄有效(rect) || !剧情传送句柄有效(trigger)) {
+    if (剧情传送句柄有效(rect)) (jass as any).RemoveRect(rect);
+    if (剧情传送句柄有效(region)) (jass as any).RemoveRegion(region);
+    if (剧情传送句柄有效(trigger)) (jass as any).DestroyTrigger(trigger);
+    return 空剧情传送清理;
+  }
+
+  (jass as any).RegionAddRect(region, rect);
+  (jass as any).TriggerAddAction(trigger, on剧情玩家组传送进入);
+  const 状态: 剧情玩家组传送状态 = {
+    配置,
+    区域: region,
+    矩形: rect,
+    触发器: trigger,
+    取消监听: regionEventCenter.registerEnterRegionTrigger(trigger, region, null),
+    已触发: false,
+  };
+  const triggerId = Number((jass as any).GetHandleId(trigger));
+  剧情玩家组传送状态表[triggerId] = 状态;
+
+  return function 清理已注册剧情玩家组传送(this: void): void {
+    if (!状态.已触发) 清理剧情玩家组传送状态(状态);
+  };
 }
 
 /** 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件） */

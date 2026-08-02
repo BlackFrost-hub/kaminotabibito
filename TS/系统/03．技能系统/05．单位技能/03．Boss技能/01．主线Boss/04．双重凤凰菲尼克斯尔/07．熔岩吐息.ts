@@ -20,8 +20,7 @@ import {
   创建预警扇形,
   单位在扇形内,
   范围敌人,
-  计算攻击最大生命伤害,
-  造成火焰伤害,
+  取菲尼克斯尔技能强度倍率,
   添加元素层数,
   施加减速,
   取单位X,
@@ -30,6 +29,7 @@ import {
   极坐标Y,
 } from "./19．公共工具";
 import type { 菲尼克斯尔伤害上下文参数 } from "./19．公共工具";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
@@ -37,6 +37,9 @@ const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
@@ -73,7 +76,7 @@ export function 释放菲尼克斯尔熔岩吐息(this: void, context: 菲尼克
   开始施法硬直(boss, config.预警秒 + config.持续秒);
   设置单位动画(boss, 菲尼克斯尔数值与表现配置.动画.第一形态.施法弯身.编号, 菲尼克斯尔数值与表现配置.动画.第一形态.施法弯身.倍速);
   显示常规读条(config.预警秒, config.吟唱条颜色ID, config.吟唱条标题文本, config.吟唱条提示文本);
-  创建预警扇形(boss, config.半径, config.预警秒);
+  创建预警扇形(boss, config.半径, config.预警秒, config.角度);
   播放Boss坐标音效(菲尼克斯尔音效配置.熔岩吐息.张口蓄力, 取单位X(boss), 取单位Y(boss), 菲尼克斯尔音效配置.默认裁断距离);
   延迟播放Boss坐标音效(菲尼克斯尔音效配置.熔岩吐息.持续喷吐, 取单位X(boss), 取单位Y(boss), 菲尼克斯尔音效配置.熔岩吐息.持续喷吐延迟Ms, 菲尼克斯尔音效配置.默认裁断距离);
   延迟(config.预警秒 * 1000, function 菲尼克斯尔熔岩吐息开始(this: void): void {
@@ -90,7 +93,24 @@ export function 释放菲尼克斯尔熔岩吐息(this: void, context: 菲尼克
       for (let i = 0; i < enemies.length; i++) {
         const enemy = enemies[i];
         if (!单位在扇形内(boss, enemy, config.半径, config.角度)) continue;
-        造成火焰伤害(boss, enemy, 计算攻击最大生命伤害(boss, enemy, config.伤害Boss攻击力比例, config.伤害目标最大生命比例) * 伤害倍率, "AOE", 伤害上下文);
+        if (单位存活(enemy)) {
+          执行BossAOE技能伤害({
+            技能ID: 伤害上下文?.技能ID,
+            技能实例ID: 伤害上下文?.技能实例ID,
+            标签: 伤害上下文?.标签,
+            来源: boss,
+            目标: enemy,
+            伤害公式: {
+              来源攻击力比例: config.伤害Boss攻击力比例,
+              目标最大生命比例: config.伤害目标最大生命比例,
+              总倍率: 取菲尼克斯尔技能强度倍率(boss) * 伤害倍率,
+            },
+            ranged: true,
+            attackType: ATTACK_TYPE_NORMAL,
+            伤害类型: DAMAGE_TYPE_FIRE,
+            weaponType: WEAPON_TYPE_WHOKNOWS,
+          });
+        }
         const id = GetHandleId(enemy) || 0;
         let 累计秒 = (命中累计秒[id] ?? 0) + 本次覆盖秒;
         while (累计秒 + 0.0001 >= config.伤害基准Tick秒) {

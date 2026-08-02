@@ -7,6 +7,7 @@ export * from "./02．区域传送配置";
 export * from "./03．区域传送";
 export * from "./04．激活传送点配置";
 export * from "./05．激活传送点";
+export * from "./06．可破坏物数据";
 export * from "./07．区域背景音乐";
 
 // 加载所有子模块

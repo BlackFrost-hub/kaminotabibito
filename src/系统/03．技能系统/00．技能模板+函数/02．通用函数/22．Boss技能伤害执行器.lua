@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_6280_80FD_4F24_5BB3 = ____08_FF0E_6280_80FD_4F24_5BB3_7CFB_7EDF["造成技能伤害"]
@@ -17,20 +18,33 @@ local function _____63D0_4EA4Boss_6280_80FD_4F24_5BB3_7ED3_679C(_____53C2_6570, 
         ranged = _____53C2_6570.ranged,
         attackType = _____53C2_6570.attackType,
         weaponType = _____53C2_6570.weaponType,
-        ["来源类型"] = "Boss技能",
+        ["来源类型"] = _____53C2_6570["来源类型"] or "Boss技能",
         ["技能ID"] = _____53C2_6570["技能ID"],
         ["技能实例ID"] = _____53C2_6570["技能实例ID"],
         ["标签"] = _____53C2_6570["标签"],
         ["伤害形态"] = _____53C2_6570["伤害形态"],
-        ["参与技能伤害加成"] = _____53C2_6570["参与技能伤害加成"]
+        ["参与技能伤害加成"] = _____53C2_6570["参与技能伤害加成"],
+        isDamageTransfer = _____53C2_6570.isDamageTransfer
     })
     return {["是否造成伤害"] = _____662F_5426_9020_6210_4F24_5BB3, ["伤害"] = _____4F24_5BB3}
 end
 ____exports["提交预计算Boss技能伤害"] = function(_____53C2_6570)
     return _____63D0_4EA4Boss_6280_80FD_4F24_5BB3_7ED3_679C(_____53C2_6570, _____53C2_6570["伤害"])
 end
+____exports["提交预计算Boss单体技能伤害"] = function(_____53C2_6570)
+    return ____exports["提交预计算Boss技能伤害"](__TS__ObjectAssign({}, _____53C2_6570, {["伤害形态"] = "单体"}))
+end
+____exports["提交预计算BossAOE技能伤害"] = function(_____53C2_6570)
+    return ____exports["提交预计算Boss技能伤害"](__TS__ObjectAssign({}, _____53C2_6570, {["伤害形态"] = "AOE"}))
+end
 ____exports["执行Boss技能伤害"] = function(_____53C2_6570)
     local _____4F24_5BB3 = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(_____53C2_6570["来源"], _____53C2_6570["目标"], _____53C2_6570["伤害公式"])
     return _____63D0_4EA4Boss_6280_80FD_4F24_5BB3_7ED3_679C(_____53C2_6570, _____4F24_5BB3)
+end
+____exports["执行Boss单体技能伤害"] = function(_____53C2_6570)
+    return ____exports["执行Boss技能伤害"](__TS__ObjectAssign({}, _____53C2_6570, {["伤害形态"] = "单体"}))
+end
+____exports["执行BossAOE技能伤害"] = function(_____53C2_6570)
+    return ____exports["执行Boss技能伤害"](__TS__ObjectAssign({}, _____53C2_6570, {["伤害形态"] = "AOE"}))
 end
 return ____exports

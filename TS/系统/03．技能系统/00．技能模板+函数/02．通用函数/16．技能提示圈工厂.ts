@@ -17,24 +17,34 @@ const GetUnitFacing = jass.GetUnitFacing as (u: any) => number;
 
 const {
   创建矩形提示圈,
+  创建矩形提示圈特效,
   创建方向直线提示圈,
   创建白色方向直线提示圈,
   创建白色扇形提示圈,
   创建红色扇形提示圈,
-  创建薄圆形提示圈,
+  创建薄圆形提示圈特效,
   创建白色圆形提示圈,
   创建渐变圆形提示圈,
+  创建渐变圆形提示圈特效,
   创建双环提示圈,
+  创建双环提示圈特效,
+  按所属单位设置提示圈颜色,
+  安全销毁特效,
 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
   创建矩形提示圈: (this: void, 路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any) => void;
+  创建矩形提示圈特效: (this: void, 路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, speed?: number) => any;
   创建方向直线提示圈: (this: void, 路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, time: number, speed?: number, 来源单位?: any) => void;
   创建白色方向直线提示圈: (this: void, 路径起点X: number, 路径起点Y: number, width: number, long: number, fac: number, time: number, speed?: number) => void;
-  创建白色扇形提示圈: (this: void, x: number, y: number, fac: number, size: number, time: number, speed?: number) => void;
-  创建红色扇形提示圈: (this: void, x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any) => void;
-  创建薄圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any) => void;
+  创建白色扇形提示圈: (this: void, x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any, 扇形角度?: number) => void;
+  创建红色扇形提示圈: (this: void, x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any, 扇形角度?: number) => void;
+  创建薄圆形提示圈特效: (this: void, x: number, y: number, r: number, speed?: number, 来源单位?: any) => any;
   创建白色圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any) => void;
   创建渐变圆形提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any) => any;
+  创建渐变圆形提示圈特效: (this: void, x: number, y: number, r: number, speed?: number, 来源单位?: any) => any;
   创建双环提示圈: (this: void, x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any) => any;
+  创建双环提示圈特效: (this: void, x: number, y: number, r: number, speed?: number, 来源单位?: any) => any;
+  按所属单位设置提示圈颜色: (this: void, effect: any, 来源单位?: any) => void;
+  安全销毁特效: (this: void, duration: number, effect: any) => void;
 };
 const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
   按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
@@ -82,6 +92,8 @@ export interface 技能提示圈配置 {
   预警秒?: number;
   延迟时间?: number;
   动画速度?: number;
+  /** 由持续区域持有并移动/销毁提示句柄时使用。 */
+  可手动销毁?: boolean;
 }
 
 function 转数字(this: void, value: any, 默认值: number): number {
@@ -173,6 +185,12 @@ export function 创建技能提示圈(this: void, 配置: 技能提示圈配置)
     const 宽度 = 转数字(配置.宽度, 0);
     const 长度 = 修正提示距离(配置, 转数字(配置.长度, 0), "矩形长度");
     if (宽度 <= 0 || 长度 <= 0) return null;
+    if (配置.可手动销毁) {
+      const effect = 创建矩形提示圈特效(x, y, 宽度, 长度, 取朝向(配置), 动画速度);
+      if (effect == null || effect === 0) return null;
+      按所属单位设置提示圈颜色(effect, 来源单位);
+      return effect;
+    }
     创建矩形提示圈(x, y, 宽度, 长度, 取朝向(配置), 持续时间, 动画速度, 来源单位);
     return null;
   }
@@ -190,12 +208,12 @@ export function 创建技能提示圈(this: void, 配置: 技能提示圈配置)
   }
 
   if (类型 === "白色扇形") {
-    创建白色扇形提示圈(x, y, 取朝向(配置), 取扇形尺寸(配置), 持续时间, 动画速度);
+    创建白色扇形提示圈(x, y, 取朝向(配置), 取扇形尺寸(配置), 持续时间, 动画速度, 来源单位, 配置.扇形角度);
     return null;
   }
 
   if (类型 === "扇形" || 类型 === "红色扇形") {
-    创建红色扇形提示圈(x, y, 取朝向(配置), 取扇形尺寸(配置), 持续时间, 动画速度, 来源单位);
+    创建红色扇形提示圈(x, y, 取朝向(配置), 取扇形尺寸(配置), 持续时间, 动画速度, 来源单位, 配置.扇形角度);
     return null;
   }
 
@@ -203,17 +221,23 @@ export function 创建技能提示圈(this: void, 配置: 技能提示圈配置)
   if (半径 <= 0) return null;
 
   if (类型 === "圆形" || 类型 === "敌方圆形") {
-    创建薄圆形提示圈(x, y, 半径, 持续时间, 动画速度, 来源单位);
-    return null;
+    const effect = 创建薄圆形提示圈特效(x, y, 半径, 动画速度, 来源单位);
+    if (!配置.可手动销毁) {
+      安全销毁特效(持续时间 <= 0 ? 0.5 : 持续时间 + 0.05, effect);
+      return null;
+    }
+    return effect;
   }
   if (类型 === "白色安全圆") {
     创建白色圆形提示圈(x, y, 半径, 持续时间, 动画速度, 来源单位);
     return null;
   }
   if (类型 === "双环") {
+    if (配置.可手动销毁) return 创建双环提示圈特效(x, y, 半径, 动画速度, 来源单位);
     return 创建双环提示圈(x, y, 半径, 持续时间, 动画速度, 来源单位);
   }
 
+  if (配置.可手动销毁) return 创建渐变圆形提示圈特效(x, y, 半径, 动画速度, 来源单位);
   return 创建渐变圆形提示圈(x, y, 半径, 持续时间, 动画速度, 来源单位);
 }
 

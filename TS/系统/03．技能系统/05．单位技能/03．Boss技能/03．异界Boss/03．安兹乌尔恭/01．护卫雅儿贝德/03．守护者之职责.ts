@@ -2,13 +2,9 @@
 
 import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
-import { 获取全部安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
-import { 执行非伤害生命移除 } from '../../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/09．非伤害生命移除';
-
-const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
+import { 创建友军范围承伤转移 } from '../../../../../00．技能模板+函数/04．机制组件/09．装备通用机制/20．友军范围承伤转移';
+import type { 友军范围承伤转移控制器 } from '../../../../../00．技能模板+函数/04．机制组件/09．装备通用机制/20．友军范围承伤转移';
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -21,26 +17,23 @@ const japi = require('jass.japi') as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) => void;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, degrees: number) => void;
 const RAD_TO_DEG = 57.29577951308232;
-let 守护职责伤害修正已注册 = false;
 
 interface 守护职责表现状态 {
   context: 安兹运行时上下文;
   token: number;
   特效: any;
   刷新ID: number;
+  承伤转移: 友军范围承伤转移控制器;
   已结束: boolean;
 }
 
@@ -52,38 +45,41 @@ function 是否直接伤害(this: void, damage: any): boolean {
   return true;
 }
 
-function 守护职责伤害共享修正(this: void, damage: any): number {
-  if (!(damage.currentDamage > 0) || !是否直接伤害(damage)) return damage.currentDamage;
-  const contexts = 获取全部安兹运行时上下文();
-  for (let i = 0; i < contexts.length; i++) {
-    const context = contexts[i];
-    const state = context.雅儿贝德;
-    const albedo = state?.单位;
-    if (state == null || !state.守护连接生效 || !单位有效(albedo)) continue;
-    let other: any = null;
-    if (damage.target === context.安兹单位) other = albedo;
-    else if (damage.target === albedo) other = context.安兹单位;
-    if (!单位有效(other)) continue;
-    const share = damage.currentDamage * 安兹乌尔恭数值与表现配置.守护者模式.守护者之职责共享比例;
-    const minimumLife = other === albedo
-      ? GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE) * 安兹乌尔恭数值与表现配置.守护者模式.雅儿贝德锁血比例
-      : 1;
-    执行非伤害生命移除({
-      目标: other,
-      数值: share,
-      最低生命: minimumLife,
-      显示文字: true,
-      显示特效: false,
-    });
-    return damage.currentDamage - share;
-  }
-  return damage.currentDamage;
-}
-
-function 确保守护职责伤害修正(this: void): void {
-  if (守护职责伤害修正已注册) return;
-  守护职责伤害修正已注册 = true;
-  registerDamageModifier(守护职责伤害共享修正, 45);
+function 创建守护职责承伤转移(
+  this: void,
+  context: 安兹运行时上下文,
+  boss: any,
+  albedo: any,
+): 友军范围承伤转移控制器 {
+  const state = context.雅儿贝德!;
+  const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
+  return 创建友军范围承伤转移({
+    名称: '安兹-守护者之职责',
+    清理: context.清理,
+    转移半径: cfg.守护者之职责断裂距离,
+    优先级: 45,
+    初始启用: false,
+    获取转移比例: function 读取守护职责共享比例(this: void): number {
+      return cfg.守护者之职责共享比例;
+    },
+    获取候选单位列表: function 获取守护职责承受者(this: void, event): any[] {
+      if (event.受击者 === boss) return [albedo];
+      if (event.受击者 === albedo) return [boss];
+      return [];
+    },
+    可承受者: function 守护职责承受者有效(this: void, event): boolean {
+      return 单位有效(event.候选单位);
+    },
+    过滤伤害: function 过滤守护职责伤害(this: void, event): boolean {
+      return !context.挑战已结束 && state.守护连接生效 && 是否直接伤害(event.上下文);
+    },
+    获取最低生命: function 读取守护职责最低生命(this: void, event): number {
+      if (event.承受者 !== albedo) return 1;
+      return GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE) * cfg.雅儿贝德锁血比例;
+    },
+    显示文字: true,
+    显示特效: false,
+  });
 }
 
 function 刷新守护职责连接表现(this: void, visual: 守护职责表现状态): void {
@@ -111,6 +107,7 @@ function 清理守护职责表现(this: void, visual: 守护职责表现状态):
   if (visual.已结束) return;
   visual.已结束 = true;
   visual.context.雅儿贝德!.守护连接生效 = false;
+  visual.承伤转移.停止();
   if (visual.刷新ID !== 0) removePeriodicCallback(visual.刷新ID);
   if (visual.特效 != null && visual.特效 !== 0) DestroyEffect(visual.特效);
 }
@@ -143,9 +140,14 @@ export function 释放雅儿贝德守护者之职责(this: void, context: 安兹
   const effect = AddSpecialEffect(安兹乌尔恭数值与表现配置.表现资源.雅儿贝德守护连接特效路径,
     (GetUnitX(boss) + GetUnitX(albedo)) * 0.5,
     (GetUnitY(boss) + GetUnitY(albedo)) * 0.5);
-  visual = { context, token, 特效: effect, 刷新ID: 0, 已结束: false };
+  const transfer = 创建守护职责承伤转移(context, boss, albedo);
+  visual = { context, token, 特效: effect, 刷新ID: 0, 承伤转移: transfer, 已结束: false };
   刷新守护职责连接表现(visual);
   visual.刷新ID = addPeriodicCallback(cfg.守护者之职责连接刷新间隔毫秒, function 守护职责连接刷新(this: void): void {
+    if (context.挑战已结束 || !单位有效(boss) || !单位有效(albedo)) {
+      state.独占状态?.结束(token, '取消', '守护连接单位失效');
+      return;
+    }
     if (context.当前大型技能 != null || state.阶段状态 === '失衡') {
       state.独占状态?.结束(token, '抢占', context.当前大型技能 ?? '雅儿贝德失衡');
       return;
@@ -159,7 +161,10 @@ export function 释放雅儿贝德守护者之职责(this: void, context: 安兹
     刷新守护职责连接表现(visual);
   });
   const activeId = addDelayedCallback(cfg.守护者之职责预连接秒 * 1000, function 守护职责正式连接(this: void): void {
-    if (state.独占状态?.取当前()?.token === token) state.守护连接生效 = true;
+    if (state.独占状态?.取当前()?.token === token) {
+      state.守护连接生效 = true;
+      visual.承伤转移.设置启用(true);
+    }
   });
   context.清理.登记延迟回调('雅儿贝德-守护职责预连接', activeId);
   context.清理.登记清理('雅儿贝德-守护职责表现', function 守护职责挑战清理(this: void): void {
@@ -169,7 +174,7 @@ export function 释放雅儿贝德守护者之职责(this: void, context: 安兹
 }
 
 export function 注册雅儿贝德守护者之职责(this: void): void {
-  确保守护职责伤害修正();
+  // 承伤转移控制器随每次职责连接创建，并由对应安兹上下文独立清理。
 }
 
 export const 守护者之职责技能状态 = {

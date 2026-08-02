@@ -14,8 +14,8 @@ local _____5F00_59CB_51B2_950B = _____51FB_9000_7CFB_7EDF["开始冲锋"]
 local _____505C_6B62_5355_4F4D_4F4D_79FB = _____51FB_9000_7CFB_7EDF["停止单位位移"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.01．多阶段技能编排.06．技能阶段链执行器")
@@ -77,10 +77,8 @@ local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用�
 createTimedEffect = ____require_result_3.createTimedEffect
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_4["创建技能提示圈"]
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成AOE技能伤害"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_6["施加快速减速Buff"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_5["施加快速减速Buff"]
 local _____8757_866B_6280_80FDID = 1097625443
 _____5206_8EAB_6B8B_5F71_8DEF_5F84 = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx"
 local RAD_TO_DEG = 57.29577951308232
@@ -202,17 +200,15 @@ local function _____542F_52A8_955C_50CF_5939_51FB_6295_5F71_51B2_950B(context, p
 end
 local function _____9020_6210_955C_50CF_5939_51FB_4F24_5BB3(context, target, ratio, tag)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E.P2
-    local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(context["Boss单位"], target, {["来源攻击力比例"] = cfg["镜像夹击本体伤害攻击力比例"] * ratio, ["目标最大生命比例"] = cfg["镜像夹击本体伤害目标最大生命比例"] * ratio})
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
         ["来源"] = context["Boss单位"],
         ["目标"] = target,
-        ["伤害"] = damage,
+        ["伤害公式"] = {["来源攻击力比例"] = cfg["镜像夹击本体伤害攻击力比例"] * ratio, ["目标最大生命比例"] = cfg["镜像夹击本体伤害目标最大生命比例"] * ratio},
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
         weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-        ["来源类型"] = "Boss技能",
         ["标签"] = tag
     })
 end

@@ -1,13 +1,14 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹模型动画配置"]
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
-local ____04_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
-local _____521B_5EFA_53EC_5524_7269 = ____04_FF0E_5BF9_5916_63A5_53E3["创建召唤物"]
+local ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
+local _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D["创建可攻击机制单位"]
+local ____10_FF0E_81F4_547D_4F24_5BB3_4FDD_547D_4E0E_9650_65F6_514D_75AB = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.10．致命伤害保命与限时免疫")
+local _____521B_5EFA_81F4_547D_4F24_5BB3_4FDD_547D_4E0E_9650_65F6_514D_75AB = ____10_FF0E_81F4_547D_4F24_5BB3_4FDD_547D_4E0E_9650_65F6_514D_75AB["创建致命伤害保命与限时免疫"]
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．台词播放")
 local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -18,47 +19,32 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
-local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_3.registerDeathListener
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_4.addDelayedCallback
-local removeDelayedCallback = ____require_result_4.removeDelayedCallback
-local getServerTime = ____require_result_4.getServerTime
-local ____require_result_5 = require("系统.09．表现系统.06．广播提示消息.index")
-local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_5["广播单位提示"]
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
+local removeDelayedCallback = ____require_result_3.removeDelayedCallback
+local getServerTime = ____require_result_3.getServerTime
+local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_7["创建Dz绑定单位特效"]
-local _____83B7_53D6Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_7["获取Dz绑定单位特效"]
-local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_7["销毁Dz绑定单位特效"]
-local ____require_result_8 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_8.registerDamageModifier
-local unregisterDamageModifier = ____require_result_8.unregisterDamageModifier
+local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_6["创建Dz绑定单位特效"]
+local _____83B7_53D6Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_6["获取Dz绑定单位特效"]
+local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_6["销毁Dz绑定单位特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
 local DzSetEffectAnimation = japi.DzSetEffectAnimation
-local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
-local GetUnitState = jass.GetUnitState
-local SetUnitState = jass.SetUnitState
-local IsUnitType = jass.IsUnitType
-local AddSpecialEffect = jass.AddSpecialEffect
-local RemoveUnit = jass.RemoveUnit
 local IssueTargetOrder = jass.IssueTargetOrder
 local Cos = jass.Cos
 local Sin = jass.Sin
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local DEG_TO_RAD = 0.017453292519943295
 local _____9AD8_9636_4EA1_7075_53EC_5524_5927_578B_6280_80FDKey = "高阶亡灵召唤"
 local _____9AD8_9636_4EA1_7075_81F4_547D_62A4_76FE_7279_6548Key = "安兹-高阶亡灵致命护盾"
-local _____9AD8_9636_4EA1_7075_5B9E_4F8B_8868 = {}
-local _____9AD8_9636_4EA1_7075_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
 local function ____on_9AD8_9636_4EA1_7075_81F4_547D_62A4_76FE_5230_671F(variable)
     local _____53C2_6570 = variable
     if _____53C2_6570 == nil or _____53C2_6570.instance == nil or _____53C2_6570.instance["已移除"] then
@@ -98,108 +84,103 @@ local function _____521B_5EFA_9AD8_9636_4EA1_7075_81F4_547D_62A4_76FE_7279_6548(
         DzSetEffectAnimation(effect, 1, 0)
     end
     local _____5230_671F_53C2_6570 = {instance = instance, effect = effect, callbackId = 0}
-    local callbackId = addDelayedCallback(1000, ____on_9AD8_9636_4EA1_7075_81F4_547D_62A4_76FE_5230_671F, _____5230_671F_53C2_6570)
+    local callbackId = addDelayedCallback(cfg["高阶亡灵召唤致命保护免疫秒"] * 1000, ____on_9AD8_9636_4EA1_7075_81F4_547D_62A4_76FE_5230_671F, _____5230_671F_53C2_6570)
     _____5230_671F_53C2_6570.callbackId = callbackId
     instance["致命护盾特效回调ID"] = callbackId
-    local ____self_9 = instance.context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "安兹-高阶亡灵致命护盾到期", callbackId)
-end
-local function _____5904_7406_9AD8_9636_4EA1_7075_81F4_547D_4FDD_62A4(instance, damageContext)
-    local currentDamage = damageContext.currentDamage
-    if instance["已移除"] or damageContext.target ~= instance.unit or not (currentDamage > 0) then
-        return currentDamage
-    end
-    local now = getServerTime()
-    local immunityMs = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["高阶亡灵召唤致命保护免疫秒"] * 1000
-    if now < instance["免伤截止Ms"] then
-        return 0
-    end
-    local currentLife = GetUnitState(instance.unit, UNIT_STATE_LIFE)
-    if not (currentLife > 0) or currentDamage < currentLife then
-        return currentDamage
-    end
-    instance["免伤截止Ms"] = now + immunityMs
-    SetUnitState(instance.unit, UNIT_STATE_LIFE, 1)
-    _____521B_5EFA_9AD8_9636_4EA1_7075_81F4_547D_62A4_76FE_7279_6548(instance)
-    return 0
+    local ____self_7 = instance.context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "安兹-高阶亡灵致命护盾到期", callbackId)
 end
 local function _____505C_7528_9AD8_9636_4EA1_7075_81F4_547D_4FDD_62A4(instance)
-    if instance["致命保护修正器ID"] > 0 then
-        unregisterDamageModifier(instance["致命保护修正器ID"])
-        instance["致命保护修正器ID"] = 0
+    local ____opt_8 = instance["致命保护"]
+    if ____opt_8 ~= nil then
+        ____opt_8["停止"](____opt_8)
     end
+    instance["致命保护"] = nil
     if instance["致命护盾特效回调ID"] > 0 then
         removeDelayedCallback(instance["致命护盾特效回调ID"])
         instance["致命护盾特效回调ID"] = 0
     end
-    instance["免伤截止Ms"] = 0
     if instance.unit ~= nil and instance.unit ~= 0 then
         _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548(instance.unit, _____9AD8_9636_4EA1_7075_81F4_547D_62A4_76FE_7279_6548Key)
     end
     instance["致命护盾特效"] = nil
 end
 local function _____521B_5EFA_9AD8_9636_4EA1_7075_81F4_547D_4FDD_62A4(instance)
-    local modifierId = registerDamageModifier(
-        function(damageContext)
-            return _____5904_7406_9AD8_9636_4EA1_7075_81F4_547D_4FDD_62A4(instance, damageContext)
+    local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]
+    instance["致命保护"] = _____521B_5EFA_81F4_547D_4F24_5BB3_4FDD_547D_4E0E_9650_65F6_514D_75AB({
+        ["名称"] = "安兹-高阶亡灵致命保护",
+        ["单位"] = instance.unit,
+        ["固定生命下限"] = 1,
+        ["免疫持续秒"] = cfg["高阶亡灵召唤致命保护免疫秒"],
+        ["生命下限修正优先级"] = -100001,
+        ["免疫修正优先级"] = -100000,
+        ["清理"] = instance.context["清理"],
+        ["过滤致命伤害"] = function()
+            return not instance["已移除"] and not instance["致命保护已触发"]
         end,
-        -100001
-    )
-    instance["致命保护修正器ID"] = modifierId
+        ["过滤免疫伤害"] = function()
+            return not instance["已移除"]
+        end,
+        ["on触发"] = function()
+            instance["致命保护已触发"] = true
+            _____521B_5EFA_9AD8_9636_4EA1_7075_81F4_547D_62A4_76FE_7279_6548(instance)
+        end
+    })
 end
-local function _____6E05_7406_9AD8_9636_4EA1_7075_5B9E_4F8B(instance)
+local function _____6E05_7406_9AD8_9636_4EA1_7075_72B6_6001(instance)
     if instance["已移除"] then
         return
     end
     instance["已移除"] = true
     _____505C_7528_9AD8_9636_4EA1_7075_81F4_547D_4FDD_62A4(instance)
-    __TS__Delete(_____9AD8_9636_4EA1_7075_5B9E_4F8B_8868, instance.handleId)
     if instance.context["高阶亡灵召唤物"] == instance.unit then
         instance.context["高阶亡灵召唤物"] = nil
     end
-    if instance.unit ~= nil and instance.unit ~= 0 then
-        RemoveUnit(instance.unit)
-    end
     instance.unit = 0
 end
-local function ____on_9AD8_9636_4EA1_7075_6B7B_4EA1(dyingUnit, _killingUnit)
-    if dyingUnit == nil or dyingUnit == 0 then
-        return
-    end
-    local instance = _____9AD8_9636_4EA1_7075_5B9E_4F8B_8868[GetHandleId(dyingUnit)]
+local function _____6E05_7406_9AD8_9636_4EA1_7075_5B9E_4F8B(instance)
     if instance == nil or instance["已移除"] then
         return
     end
-    __TS__Delete(_____9AD8_9636_4EA1_7075_5B9E_4F8B_8868, instance.handleId)
+    local ____self_10 = instance["机制单位"]
+    ____self_10["销毁"](____self_10)
+end
+local function ____on_9AD8_9636_4EA1_7075_673A_5236_5355_4F4D_9500_6BC1(_unit, variable)
+    local instance = variable and variable.instance
+    if instance == nil then
+        return
+    end
+    _____6E05_7406_9AD8_9636_4EA1_7075_72B6_6001(instance)
+end
+local function ____on_9AD8_9636_4EA1_7075_5C38_4F53_79FB_9664(variable)
+    local instance = variable
+    if instance == nil or instance["已移除"] then
+        return
+    end
+    _____6E05_7406_9AD8_9636_4EA1_7075_5B9E_4F8B(instance)
+end
+local function ____on_9AD8_9636_4EA1_7075_673A_5236_5355_4F4D_6B7B_4EA1(_dyingUnit, _killingUnit, variable)
+    local instance = variable and variable.instance
+    if instance == nil or instance["已移除"] then
+        return
+    end
     local context = instance.context
-    if context["高阶亡灵召唤物"] == dyingUnit then
+    if context["高阶亡灵召唤物"] == instance.unit then
         context["高阶亡灵召唤物"] = nil
     end
     _____505C_7528_9AD8_9636_4EA1_7075_81F4_547D_4FDD_62A4(instance)
-    local ____temp_11 = not context["挑战已结束"]
-    if ____temp_11 then
-        local ____self_10 = context["清理"]
-        ____temp_11 = not ____self_10["已清理"](____self_10)
+    local ____temp_16 = not context["挑战已结束"]
+    if ____temp_16 then
+        local ____self_15 = context["清理"]
+        ____temp_16 = not ____self_15["已清理"](____self_15)
     end
-    if ____temp_11 then
+    if ____temp_16 then
         context["亡灵箭削弱到Ms"] = getServerTime() + _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["高阶亡灵击败削弱秒"] * 1000
         _____5E7F_64AD_5355_4F4D_63D0_793A(context["安兹单位"], "|cff80d8ff[机制]|r 高阶亡灵已消灭：亡灵箭伤害降低25%，持续12秒。（优先击败死亡骑士，可降低后续亡灵箭压力。）", 3500)
     end
-    local removeId = addDelayedCallback(
-        3000,
-        function()
-            _____6E05_7406_9AD8_9636_4EA1_7075_5B9E_4F8B(instance)
-        end
-    )
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "安兹-高阶亡灵尸体移除", removeId)
-end
-local function _____786E_4FDD_9AD8_9636_4EA1_7075_6B7B_4EA1_76D1_542C()
-    if _____9AD8_9636_4EA1_7075_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C then
-        return
-    end
-    _____9AD8_9636_4EA1_7075_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = true
-    registerDeathListener(____on_9AD8_9636_4EA1_7075_6B7B_4EA1)
+    local removeId = addDelayedCallback(3000, ____on_9AD8_9636_4EA1_7075_5C38_4F53_79FB_9664, instance)
+    local ____self_17 = context["清理"]
+    ____self_17["登记延迟回调"](____self_17, "安兹-高阶亡灵尸体移除", removeId)
 end
 local function _____64AD_653E_53EC_5524_7279_6548(model, x, y, scale)
     _____521B_5EFA_70B9_7279_6548({
@@ -216,7 +197,10 @@ local function _____521B_5EFA_9AD8_9636_4EA1_7075(context, x, y, target)
         return
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]
-    local summon = _____521B_5EFA_53EC_5524_7269({
+    local _____56DE_8C03_53D8_91CF = {}
+    local _____673A_5236_5355_4F4D = _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
+        ["清理"] = context["清理"],
+        ["名称"] = "安兹-高阶亡灵召唤物",
         ["主人单位"] = boss,
         ["单位类型"] = cfg["高阶亡灵召唤单位ID"],
         ["单位名称"] = cfg["高阶亡灵召唤单位名称"],
@@ -235,36 +219,31 @@ local function _____521B_5EFA_9AD8_9636_4EA1_7075(context, x, y, target)
         ["透明度"] = cfg["高阶亡灵召唤透明度"],
         ["红"] = 150,
         ["绿"] = 205,
-        ["蓝"] = 255
+        ["蓝"] = 255,
+        ["变量"] = _____56DE_8C03_53D8_91CF,
+        ["on死亡"] = ____on_9AD8_9636_4EA1_7075_673A_5236_5355_4F4D_6B7B_4EA1,
+        ["on销毁"] = ____on_9AD8_9636_4EA1_7075_673A_5236_5355_4F4D_9500_6BC1
     })
-    if not _____5355_4F4D_6709_6548(summon) then
+    if _____673A_5236_5355_4F4D == nil or not _____5355_4F4D_6709_6548(_____673A_5236_5355_4F4D["单位"]) then
         return
     end
+    local summon = _____673A_5236_5355_4F4D["单位"]
     local instance = {
         context = context,
         unit = summon,
-        handleId = GetHandleId(summon),
+        ["机制单位"] = _____673A_5236_5355_4F4D,
         ["已移除"] = false,
-        ["致命保护修正器ID"] = 0,
-        ["免伤截止Ms"] = 0,
+        ["致命保护已触发"] = false,
         ["致命护盾特效"] = nil,
         ["致命护盾特效回调ID"] = 0
     }
+    _____56DE_8C03_53D8_91CF.instance = instance
     context["高阶亡灵召唤物"] = summon
-    _____9AD8_9636_4EA1_7075_5B9E_4F8B_8868[instance.handleId] = instance
     _____521B_5EFA_9AD8_9636_4EA1_7075_81F4_547D_4FDD_62A4(instance)
-    local ____self_13 = context["清理"]
-    ____self_13["登记清理"](
-        ____self_13,
-        "安兹-高阶亡灵召唤物",
-        function()
-            _____6E05_7406_9AD8_9636_4EA1_7075_5B9E_4F8B(instance)
-        end
-    )
     if _____5355_4F4D_6709_6548(target) then
         IssueTargetOrder(summon, "attack", target)
     end
-    _____5E7F_64AD_5355_4F4D_63D0_793A(boss, "|cffff6060[机制]|r 死亡骑士存活期间，安兹的亡灵箭伤害提高35%；死亡骑士受到致命伤害时保留1点生命并免伤1秒。（优先击败死亡骑士，可让后续亡灵箭降至基础值的75%。）", 3500)
+    _____5E7F_64AD_5355_4F4D_63D0_793A(boss, "|cffff6060[机制]|r 死亡骑士存活期间，安兹的亡灵箭伤害提高35%；首次受到致命伤害时保留1点生命并免伤1秒，之后可正常击败。（护盾消失后再次集火，可让亡灵箭降至基础值的75%。）", 3500)
 end
 ____exports["取安兹亡灵箭伤害倍率"] = function(context)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]
@@ -302,7 +281,6 @@ ____exports["释放安兹高阶亡灵召唤"] = function(context)
         GetUnitY(boss),
         _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
     )
-    _____786E_4FDD_9AD8_9636_4EA1_7075_6B7B_4EA1_76D1_542C()
     _____64AD_653E_53EC_5524_7279_6548(cfg["表现资源"]["高阶亡灵召唤门特效路径"], summonX, summonY, stage["高阶亡灵召唤门缩放"])
     _____64AD_653E_53EC_5524_7279_6548(cfg["表现资源"]["高阶亡灵召唤外圈特效路径"], summonX, summonY, stage["高阶亡灵召唤外圈缩放"])
     _____64AD_653E_53EC_5524_7279_6548(cfg["表现资源"]["高阶亡灵召唤内圈特效路径"], summonX, summonY, stage["高阶亡灵召唤内圈缩放"])
@@ -332,8 +310,8 @@ ____exports["释放安兹高阶亡灵召唤"] = function(context)
                     end
                 end
             )
-            local ____self_14 = context["清理"]
-            ____self_14["登记延迟回调"](____self_14, "安兹-高阶亡灵召唤收尾", finishId)
+            local ____self_18 = context["清理"]
+            ____self_18["登记延迟回调"](____self_18, "安兹-高阶亡灵召唤收尾", finishId)
         end
     })
     return true

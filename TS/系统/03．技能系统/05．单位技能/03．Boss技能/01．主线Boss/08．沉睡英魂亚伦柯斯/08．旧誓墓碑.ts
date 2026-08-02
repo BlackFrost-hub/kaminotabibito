@@ -7,11 +7,12 @@ import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
 import { 亚伦柯斯单位技能配置 } from './00．配置';
 import { 播放亚伦柯斯台词 } from './11．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 亚伦柯斯BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/07．亚伦柯斯';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 创建原生弹幕, 创建直线定点轨迹 } from '../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕';
+import { 创建周期行为 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器';
 import {
   创建世界坐标进度UI,
   更新世界坐标进度UI,
@@ -27,9 +28,6 @@ const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 }
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
 };
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, params: any) => boolean;
-};
 const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff系统.00．Buff系统') as {
   registerManualBuff: (this: void, unit: any, buffId: string, duration: number, value: number, extras?: any) => void;
   移除单位指定Buff: (this: void, unit: any, buffId: string) => boolean;
@@ -37,10 +35,8 @@ const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff
 const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文') as {
   读取Boss战运行上下文: (this: void, boss: any) => any;
 };
-const { getServerTime, addPeriodicCallback, removePeriodicCallback, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
+const { getServerTime, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
@@ -176,8 +172,17 @@ function 尝试释放墓碑残影(this: void, context: 亚伦柯斯运行时上�
         },
         on命中: function 亚伦柯斯墓碑残影命中(this: void, hit: any): void {
           if (!单位有效(hit)) return;
-          const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.残影斩击伤害攻击力比例, 目标最大生命比例: cfg.残影斩击伤害目标最大生命比例 });
-          造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '亚伦柯斯·旧誓墓碑残影' });
+          执行BossAOE技能伤害({
+            来源: boss,
+            目标: hit,
+            伤害公式: { 来源攻击力比例: cfg.残影斩击伤害攻击力比例, 目标最大生命比例: cfg.残影斩击伤害目标最大生命比例 },
+            attack: false,
+            ranged: true,
+            attackType: ATTACK_TYPE_NORMAL,
+            伤害类型: DAMAGE_TYPE_NORMAL,
+            weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+            标签: '亚伦柯斯·旧誓墓碑残影',
+          });
         },
       });
     }
@@ -187,6 +192,34 @@ function 尝试释放墓碑残影(this: void, context: 亚伦柯斯运行时上�
     context.清理.登记延迟回调('亚伦柯斯-墓碑残影飞行结束', clearId);
   });
   context.清理.登记延迟回调('亚伦柯斯-墓碑残影', delayedId);
+  return true;
+}
+
+function 亚伦柯斯墓碑推进周期(this: void, _执行次数: number, variable?: any): boolean {
+  const data = variable as { context?: 亚伦柯斯运行时上下文; cfg?: any } | undefined;
+  const context = data?.context;
+  const cfg = data?.cfg;
+  if (context == null || cfg == null) return false;
+  if (context.战斗已结束 || context.阶段 !== 'P2旧誓回响') return false;
+
+  const current = getServerTime();
+  for (let i = 0; i < context.墓碑状态列表.length; i++) {
+    const state = context.墓碑状态列表[i] as 旧誓墓碑状态;
+    if (state.已安魂) continue;
+    const hasPlayer = 范围内存在玩家(context, state);
+    if (hasPlayer) state.安魂进度秒 += cfg.检查间隔秒;
+    else {
+      state.安魂进度秒 -= cfg.离开每次回退秒;
+      if (state.安魂进度秒 < 0) state.安魂进度秒 = 0;
+    }
+    更新世界坐标进度UI(state.安魂进度UI, state.安魂进度秒);
+    设置世界坐标进度UI显示(state.安魂进度UI, hasPlayer || state.安魂进度秒 > 0);
+    if (state.安魂进度秒 >= cfg.安魂持续秒) {
+      完成墓碑安魂(context, state);
+      continue;
+    }
+    if (current >= state.下次残影Ms) 尝试释放墓碑残影(context, state, current);
+  }
   return true;
 }
 
@@ -240,33 +273,13 @@ export function 启动亚伦柯斯旧誓墓碑(this: void, context: 亚伦柯斯
   刷新旧誓加护Buff(context);
   播放亚伦柯斯台词(boss, '旧誓墓碑');
 
-  let periodicId = 0;
-  periodicId = addPeriodicCallback(cfg.检查间隔秒 * 1000, function 亚伦柯斯墓碑推进(this: void): void {
-    if (context.战斗已结束 || context.阶段 !== 'P2旧誓回响') {
-      if (periodicId !== 0) removePeriodicCallback(periodicId);
-      periodicId = 0;
-      return;
-    }
-    const current = getServerTime();
-    for (let i = 0; i < context.墓碑状态列表.length; i++) {
-      const state = context.墓碑状态列表[i] as 旧誓墓碑状态;
-      if (state.已安魂) continue;
-      const hasPlayer = 范围内存在玩家(context, state);
-      if (hasPlayer) state.安魂进度秒 += cfg.检查间隔秒;
-      else {
-        state.安魂进度秒 -= cfg.离开每次回退秒;
-        if (state.安魂进度秒 < 0) state.安魂进度秒 = 0;
-      }
-      更新世界坐标进度UI(state.安魂进度UI, state.安魂进度秒);
-      设置世界坐标进度UI显示(state.安魂进度UI, hasPlayer || state.安魂进度秒 > 0);
-      if (state.安魂进度秒 >= cfg.安魂持续秒) {
-        完成墓碑安魂(context, state);
-        continue;
-      }
-      if (current >= state.下次残影Ms) 尝试释放墓碑残影(context, state, current);
-    }
+  创建周期行为({
+    名称: '亚伦柯斯-旧誓墓碑推进',
+    间隔毫秒: cfg.检查间隔秒 * 1000,
+    清理: context.清理,
+    变量: { context, cfg },
+    onTick: 亚伦柯斯墓碑推进周期,
   });
-  context.清理.登记周期回调('亚伦柯斯-旧誓墓碑推进', periodicId);
   return true;
 }
 

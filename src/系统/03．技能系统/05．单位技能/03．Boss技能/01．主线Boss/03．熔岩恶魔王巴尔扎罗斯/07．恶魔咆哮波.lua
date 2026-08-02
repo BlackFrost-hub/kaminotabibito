@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_76EE_6807_5355_4F4D, _____53D6_65B9_5411_89D2, _____662F_5DF4_5C14_624E_7F57_65AF_62A4_536B, _____6536_96C6_5486_54EE_6CE2_5019_9009_5355_4F4D, _____6CBB_7597_5355_4F4D, _____8BA1_7B97_5486_54EE_6CE2_4F24_5BB3, _____8BB0_5F55_5486_54EE_6CE2_73A9_5BB6_547D_4E2D, _____64AD_653E_6076_9B54_5486_54EE_6CE2_84C4_529B_7279_6548, _____64AD_653E_6076_9B54_5486_54EE_6CE2_51B2_51FB_7279_6548, _____64AD_653E_6076_9B54_5486_54EE_6CE2_706B_7130_8DEF_5F84_7279_6548, _____521B_5EFA_5486_54EE_6CE2_9884_8B66, _____6267_884C_5486_54EE_6CE2_547D_4E2D, _____521B_5EFA_5486_54EE_6CE2_5224_5B9A, _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4F8B, ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_7EBF_6BB5_5371_9669_533A, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, getServerTime, _____521B_5EFA_70B9_7279_6548, _____65BD_52A0_5FEB_901F_63A7_5236Buff, CosBJ, SinBJ, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____83B7_53D6Boss_62A4_536B_5217_8868, _____662F_5426_6307_5B9ABoss_62A4_536B, doHeal, GetUnitStateJapi, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, Atan2, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, BJ_RADTODEG, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____6076_9B54_5486_54EE_6CE2_6280_80FDID, _____5FEB_901F_63A7_5236__51FB_6655
+local _____53D6_76EE_6807_5355_4F4D, _____53D6_65B9_5411_89D2, _____662F_5DF4_5C14_624E_7F57_65AF_62A4_536B, _____6536_96C6_5486_54EE_6CE2_5019_9009_5355_4F4D, _____6CBB_7597_5355_4F4D, _____8BB0_5F55_5486_54EE_6CE2_73A9_5BB6_547D_4E2D, _____64AD_653E_6076_9B54_5486_54EE_6CE2_84C4_529B_7279_6548, _____64AD_653E_6076_9B54_5486_54EE_6CE2_51B2_51FB_7279_6548, _____64AD_653E_6076_9B54_5486_54EE_6CE2_706B_7130_8DEF_5F84_7279_6548, _____521B_5EFA_5486_54EE_6CE2_9884_8B66, _____6267_884C_5486_54EE_6CE2_547D_4E2D, _____521B_5EFA_5486_54EE_6CE2_5224_5B9A, _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4F8B, ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_7EBF_6BB5_5371_9669_533A, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, getServerTime, _____521B_5EFA_70B9_7279_6548, _____65BD_52A0_5FEB_901F_63A7_5236Buff, CosBJ, SinBJ, _____83B7_53D6Boss_62A4_536B_5217_8868, _____662F_5426_6307_5B9ABoss_62A4_536B, doHeal, GetUnitStateJapi, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, Atan2, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, BJ_RADTODEG, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____6076_9B54_5486_54EE_6CE2_6280_80FDID, _____5FEB_901F_63A7_5236__51FB_6655
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -17,6 +17,8 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 function _____53D6_76EE_6807_5355_4F4D(boss)
     local entry = _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807(boss)
     if entry ~= nil and _____5355_4F4D_6709_6548(entry.targetRef) then
@@ -59,10 +61,6 @@ function _____6CBB_7597_5355_4F4D(source, unit, amount)
         ItemHeal = false,
         HealEffect = false
     })
-end
-function _____8BA1_7B97_5486_54EE_6CE2_4F24_5BB3(boss, target, _____4F24_5BB3_500D_7387)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["伤害Boss攻击力比例"], ["目标最大生命比例"] = config["伤害目标最大生命比例"], ["总倍率"] = config["伤害总倍率"] * _____4F24_5BB3_500D_7387})
 end
 function _____8BB0_5F55_5486_54EE_6CE2_73A9_5BB6_547D_4E2D(context, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]
@@ -161,17 +159,16 @@ function _____6267_884C_5486_54EE_6CE2_547D_4E2D(context, unit, _____4F24_5BB3_5
         )
         return
     end
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
         ["技能ID"] = _____6076_9B54_5486_54EE_6CE2_6280_80FDID,
         ["来源"] = boss,
         ["目标"] = unit,
-        ["伤害"] = _____8BA1_7B97_5486_54EE_6CE2_4F24_5BB3(boss, unit, _____4F24_5BB3_500D_7387),
+        ["伤害公式"] = {["来源攻击力比例"] = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]["伤害Boss攻击力比例"], ["目标最大生命比例"] = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]["伤害目标最大生命比例"], ["总倍率"] = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["恶魔咆哮波"]["伤害总倍率"] * _____4F24_5BB3_500D_7387},
         attack = false,
         ranged = true,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_FIRE,
-        weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能"
+        weaponType = WEAPON_TYPE_WHOKNOWS
     })
     _____8BB0_5F55_5486_54EE_6CE2_73A9_5BB6_547D_4E2D(context, unit)
 end
@@ -211,13 +208,13 @@ function _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(_____65BD_6CD5_8005) then
         return
     end
-    local _____5355_4F4D_6709_6548_result_12
+    local _____5355_4F4D_6709_6548_result_10
     if _____5355_4F4D_6709_6548(_____76EE_6807) then
-        _____5355_4F4D_6709_6548_result_12 = _____76EE_6807
+        _____5355_4F4D_6709_6548_result_10 = _____76EE_6807
     else
-        _____5355_4F4D_6709_6548_result_12 = _____53D6_76EE_6807_5355_4F4D(boss)
+        _____5355_4F4D_6709_6548_result_10 = _____53D6_76EE_6807_5355_4F4D(boss)
     end
-    local targetUnit = _____5355_4F4D_6709_6548_result_12
+    local targetUnit = _____5355_4F4D_6709_6548_result_10
     if not _____5355_4F4D_6709_6548(targetUnit) then
         return
     end
@@ -285,7 +282,7 @@ ____exports["释放巴尔扎罗斯护卫模仿恶魔咆哮波"] = function(conte
             do
                 local _____62A4_536B = _____62A4_536B_5217_8868[i + 1]
                 if not _____5355_4F4D_6709_6548(_____62A4_536B) then
-                    goto __continue41
+                    goto __continue40
                 end
                 _____91CA_653E_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_5B9E_4F8B(
                     context,
@@ -297,7 +294,7 @@ ____exports["释放巴尔扎罗斯护卫模仿恶魔咆哮波"] = function(conte
                     target
                 )
             end
-            ::__continue41::
+            ::__continue40::
             i = i + 1
         end
     end
@@ -315,35 +312,31 @@ function ____on_5DF4_5C14_624E_7F57_65AF_6076_9B54_5486_54EE_6CE2_751F_6548(cast
     end
     ____exports["释放巴尔扎罗斯恶魔咆哮波"](context)
 end
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-_____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
-_____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_3["创建线段危险区"]
-local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807 = ____require_result_4["获取Boss技能最高仇恨目标"]
-_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_5.addDelayedCallback
-getServerTime = ____require_result_5.getServerTime
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_7["施加快速控制Buff"]
-local ____require_result_8 = require("lib.扩展函数.BJ函数.12．数学函数")
-CosBJ = ____require_result_8.CosBJ
-SinBJ = ____require_result_8.SinBJ
-local ____require_result_9 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_9["造成AOE技能伤害"]
-local ____require_result_10 = require("系统.01．单位系统.10．护卫系统.index")
-_____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_10["获取Boss护卫列表"]
-_____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_10["是否指定Boss护卫"]
-local ____require_result_11 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-doHeal = ____require_result_11.doHeal
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
+_____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_2["创建线段危险区"]
+local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807 = ____require_result_3["获取Boss技能最高仇恨目标"]
+_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_3["获取Boss技能随机敌对英雄"]
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_4.addDelayedCallback
+getServerTime = ____require_result_4.getServerTime
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_6["施加快速控制Buff"]
+local ____require_result_7 = require("lib.扩展函数.BJ函数.12．数学函数")
+CosBJ = ____require_result_7.CosBJ
+SinBJ = ____require_result_7.SinBJ
+local ____require_result_8 = require("系统.01．单位系统.10．护卫系统.index")
+_____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_8["获取Boss护卫列表"]
+_____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_8["是否指定Boss护卫"]
+local ____require_result_9 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+doHeal = ____require_result_9.doHeal
 local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitStateJapi = japi.GetUnitState

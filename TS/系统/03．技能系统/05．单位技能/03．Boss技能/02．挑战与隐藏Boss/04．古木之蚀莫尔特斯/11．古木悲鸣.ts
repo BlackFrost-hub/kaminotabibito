@@ -8,8 +8,6 @@ import { 播放莫尔特斯台词 } from "./13．台词播放";
 import {
   单位有效,
   取单位ID,
-  播放莫尔特斯限时动作,
-  开始莫尔特斯大招施法,
   stringToFourCC,
   点是否处于方向障碍物后方,
   取坐标角度,
@@ -17,6 +15,7 @@ import {
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 创建原生弹幕, 销毁原生弹幕 } from "../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const { 设置特效缩放, 创建Dz绑定单位特效, 获取Dz绑定单位特效, 销毁Dz绑定单位特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   设置特效缩放: (this: void, 特效: any, 缩放: number) => void;
   创建Dz绑定单位特效: (this: void, 单位: any, 挂接点: string, 模型路径: string, 特效键?: string, 缩放?: number) => any;
@@ -49,8 +48,8 @@ const { 施加恐惧 } = require("系统.03．技能系统.00．技能模板+函
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
@@ -280,19 +279,17 @@ function 古木悲鸣弹幕命中(this: void, target: any, projectileId: number)
   const cfg = 莫尔特斯数值与表现配置.古木悲鸣;
   const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return;
-  造成AOE技能伤害({
+  执行BossAOE技能伤害({
     技能ID: 古木悲鸣技能ID,
     来源: state.context.Boss单位,
     目标: target,
-    伤害: maxLife * cfg.目标最大生命比例,
+    伤害公式: { 目标最大生命比例: cfg.目标最大生命比例 },
     attack: false,
     ranged: true,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_PLANT,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
     标签: "莫尔特斯·古木悲鸣",
-    伤害形态: "AOE",
   });
   const after = 应用莫尔特斯腐败值(state.context, target, cfg.腐败值);
   if (after >= cfg.恐惧阈值) {
@@ -430,13 +427,29 @@ export function 释放莫尔特斯古木悲鸣(this: void, context: 莫尔特斯
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 莫尔特斯数值与表现配置.古木悲鸣;
-  开始莫尔特斯大招施法(boss, cfg.动作播放秒, "古木悲鸣", "站到巨型蘑菇背向莫尔特斯的一侧，让蘑菇挡在你与Boss之间");
-  播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
-  播放莫尔特斯台词(boss, "古木悲鸣");
   确保莫尔特斯根须宫格(context);
   确保悲鸣蘑菇表现(context);
-  const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 结算莫尔特斯古木悲鸣, context);
-  context.清理.登记延迟回调("莫尔特斯-古木悲鸣结算", delayedId);
+  启动基础施法时间线({
+    名称: "莫尔特斯-古木悲鸣",
+    施法者: boss,
+    硬直秒: cfg.动作播放秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    吟唱条: {
+      通道: "大招",
+      总时长: cfg.动作播放秒,
+      颜色ID: 3,
+      标题文本: "古木悲鸣",
+      提示文本: "站到巨型蘑菇背向莫尔特斯的一侧，让蘑菇挡在你与Boss之间",
+    },
+    清理: context.清理,
+    播放台词: function 莫尔特斯古木悲鸣台词(this: void): void {
+      播放莫尔特斯台词(boss, "古木悲鸣");
+    },
+    on生效: function 莫尔特斯古木悲鸣时间线生效(this: void): void {
+      结算莫尔特斯古木悲鸣(context);
+    },
+  });
 }
 
 function on莫尔特斯古木悲鸣施法(this: void, castingUnit: any, spellAbilityId: number): void {

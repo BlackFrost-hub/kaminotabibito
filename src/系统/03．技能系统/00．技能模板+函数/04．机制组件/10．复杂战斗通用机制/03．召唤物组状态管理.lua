@@ -53,6 +53,8 @@ function _____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype.____constructor(
     self["单位列表"] = {}
     self["死亡表"] = {}
     self["全灭延迟ID"] = 0
+    self["批次开放"] = false
+    self["当前批次预期登记数量"] = 0
     self["已销毁"] = false
     self.ID = ID
     self["参数"] = _____53C2_6570
@@ -67,6 +69,28 @@ _____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["登记"] = function(self
     ____self__5355_4F4D_5217_8868_2[#____self__5355_4F4D_5217_8868_2 + 1] = _____5355_4F4D
     self["死亡表"][GetHandleId(_____5355_4F4D)] = nil
     self["广播数量变化"](self)
+end
+_____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["开始批次"] = function(self, _____9884_671F_767B_8BB0_6570_91CF)
+    if _____9884_671F_767B_8BB0_6570_91CF == nil then
+        _____9884_671F_767B_8BB0_6570_91CF = 0
+    end
+    if self["已销毁"] then
+        return
+    end
+    if self["全灭延迟ID"] ~= 0 then
+        removeDelayedCallback(self["全灭延迟ID"])
+        self["全灭延迟ID"] = 0
+    end
+    self["批次开放"] = true
+    self["当前批次预期登记数量"] = _____9884_671F_767B_8BB0_6570_91CF > 0 and _____9884_671F_767B_8BB0_6570_91CF or 0
+end
+_____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["结束批次"] = function(self)
+    if self["已销毁"] then
+        return
+    end
+    self["批次开放"] = false
+    self["当前批次预期登记数量"] = 0
+    self["尝试调度全灭"](self)
 end
 _____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["移除"] = function(self, _____5355_4F4D, _____662F_5426_5220_9664_5355_4F4D)
     if _____662F_5426_5220_9664_5355_4F4D == nil then
@@ -98,6 +122,19 @@ _____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["取存活数量"] = func
         while i < #self["单位列表"] do
             local unit = self["单位列表"][i + 1]
             if unit ~= nil and unit ~= 0 and self["死亡表"][GetHandleId(unit)] == nil then
+                count = count + 1
+            end
+            i = i + 1
+        end
+    end
+    return count
+end
+_____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["取死亡数量"] = function(self)
+    local count = 0
+    do
+        local i = 0
+        while i < #self["单位列表"] do
+            if self["死亡表"][GetHandleId(self["单位列表"][i + 1])] == true then
                 count = count + 1
             end
             i = i + 1
@@ -141,6 +178,8 @@ _____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["清空"] = function(self
     end
     self["单位列表"] = {}
     self["死亡表"] = {}
+    self["批次开放"] = false
+    self["当前批次预期登记数量"] = 0
     self["广播数量变化"](self)
 end
 _____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["销毁"] = function(self)
@@ -171,14 +210,18 @@ _____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["处理死亡"] = functio
     end
     self["死亡表"][id] = true
     if self["参数"]["on单位死亡"] ~= nil then
-        self["参数"]["on单位死亡"](_____5355_4F4D, _____51FB_6740_8005, self)
+        self["参数"]["on单位死亡"](_____5355_4F4D, _____51FB_6740_8005, self, self["参数"]["变量"])
+    end
+    if self["已销毁"] then
+        return
     end
     self["广播数量变化"](self)
-    if self["取存活数量"](self) <= 0 then
-        self["调度全灭"](self)
-    end
+    self["尝试调度全灭"](self)
 end
-_____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["调度全灭"] = function(self)
+_____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["尝试调度全灭"] = function(self)
+    if self["批次开放"] or #self["单位列表"] <= 0 or self["取存活数量"](self) > 0 then
+        return
+    end
     if self["全灭延迟ID"] ~= 0 then
         return
     end
@@ -192,7 +235,7 @@ _____53EC_5524_7269_7EC4_72B6_6001_5B9E_73B0.prototype["调度全灭"] = functio
                 return
             end
             if ____self["参数"]["on全部死亡"] ~= nil then
-                ____self["参数"]["on全部死亡"](____self)
+                ____self["参数"]["on全部死亡"](____self, ____self["参数"]["变量"])
             end
             if ____self["参数"]["全灭后保留死亡记录"] ~= true then
                 ____self["清空"](____self, false)

@@ -1,9 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 护甲减伤系数（游戏常数，默认0.06）
+--- 护甲减伤系数（项目游戏常数，固定0.02）
 -- 公式：减伤比例 = 护甲 * 系数 / (护甲 * 系数 + 1)
 -- 等价于：减伤比例 = 护甲 / (护甲 + 1/系数) = 护甲 / (护甲 + 50)
-local ARMOR_FACTOR = 0.06
+local ARMOR_FACTOR = 0.02
 --- 计算护甲减伤比例
 -- 公式：减伤比例 = 护甲 / (护甲 + 50)
 -- 

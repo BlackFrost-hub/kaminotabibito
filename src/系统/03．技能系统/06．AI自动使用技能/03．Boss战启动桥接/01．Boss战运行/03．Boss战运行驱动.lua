@@ -24,6 +24,7 @@ local _____7ED3_675FBoss_6218_533A_57DF_97F3_9891 = ____02_FF0EBoss_6218_533A_57
 local ____04_FF0EBoss_6218_8FD0_884C_5DE5_5177 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.04．Boss战运行工具")
 local _____5355_4F4D_662F_5426_6B7B_4EA1 = ____04_FF0EBoss_6218_8FD0_884C_5DE5_5177["单位是否死亡"]
 local _____8BFB_53D6Boss_6218_77E9_5F62 = ____04_FF0EBoss_6218_8FD0_884C_5DE5_5177["读取Boss战矩形"]
+local _____8BFB_53D6Boss_6218_5730_70B9_662F_5426_52A8_6001 = ____04_FF0EBoss_6218_8FD0_884C_5DE5_5177["读取Boss战地点是否动态"]
 local _____8BFB_53D6Boss_6218_97F3_9891 = ____04_FF0EBoss_6218_8FD0_884C_5DE5_5177["读取Boss战音频"]
 local _____8BFB_53D6Boss_6218_5355_4F4D_5E03_5C14 = ____04_FF0EBoss_6218_8FD0_884C_5DE5_5177["读取Boss战单位布尔"]
 local _____6267_884CBoss_6218_8F6C_573A_52A8_753B = ____04_FF0EBoss_6218_8FD0_884C_5DE5_5177["执行Boss战转场动画"]
@@ -51,6 +52,8 @@ local _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027 = ____index["启动Boss�
 local _____7ED3_675FBoss_8840_6761_5F31_70B9_97E7_6027 = ____index["结束Boss血条弱点韧性"]
 local ____09_FF0EBoss_62A4_536B_8840_6761_4F18_5148_7EA7_8C03_5EA6 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.09．Boss护卫血条优先级调度")
 local _____540C_6B65_5168_90E8Boss_62A4_536B_8840_6761_4F18_5148_7EA7 = ____09_FF0EBoss_62A4_536B_8840_6761_4F18_5148_7EA7_8C03_5EA6["同步全部Boss护卫血条优先级"]
+local ____01_FF0EBoss_81EA_52A8_6280_80FD_6CE8_518C_8868 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表")
+local _____6E05_7406Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587 = ____01_FF0EBoss_81EA_52A8_6280_80FD_6CE8_518C_8868["清理Boss自动技能启动上下文"]
 ____exports["停止Boss战运行驱动"] = function()
     if ____Boss_6218_8FD0_884C_5468_671F_56DE_8C03ID == 0 then
         return
@@ -81,6 +84,9 @@ local _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD = ____require_result_6["播�
 local GetUnitTypeId = jass.GetUnitTypeId
 local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.08．Boss死亡音效")
 local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_97F3_6548 = ____require_result_7["尝试播放Boss死亡音效"]
+local ____require_result_8 = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙")
+local _____91CD_5EFA_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899 = ____require_result_8["重建亚伦柯斯安兹封锁墙"]
+local _____6E05_7406_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899 = ____require_result_8["清理亚伦柯斯安兹封锁墙"]
 ____Boss_6218_8FD0_884C_5468_671F_56DE_8C03ID = 0
 local _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local function _____662F_745F_5170_8FEA_5C14Boss(bossUnit)
@@ -121,6 +127,7 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs, 
         return
     end
     context["是否已结束"] = true
+    _____6E05_7406_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899(context["Boss单位"])
     if (_____9009_9879 and _____9009_9879["跳过死亡音效"]) ~= true then
         _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_97F3_6548(context["Boss单位"])
     end
@@ -128,17 +135,18 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs, 
     _____5904_7406Boss_6218_62A4_536B_7ED3_675F(context)
     _____505C_6B62_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
     _____505C_6B62_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(context["Boss单位"])
+    _____6E05_7406Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587(context["Boss单位"])
     _____6E05_7406_5F53_524DBoss_5168_5C40(context["Boss单位"])
     _____6E05_7406Boss_6218_8FD0_884C_4E0A_4E0B_6587(context["Boss单位"])
     _____6E05_7406Boss_6218_5355_4F4D_5B57_6BB5(context["Boss单位"])
     _____6E05_7406Boss_7BAD_5934_7279_6548(context["Boss单位"])
     _____767B_8BB0Boss_6B7B_4EA1_5EF6_8FDF_6E05_7406YD_6570_636E(context, nowMs)
     _____7ED3_675FBoss_6218_533A_57DF_97F3_9891(context, nowMs)
-    local ____require_result_10 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.07．异界Boss死亡奖励")
-    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_10["发放异界Boss死亡奖励"]
+    local ____require_result_11 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.07．异界Boss死亡奖励")
+    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_11["发放异界Boss死亡奖励"]
     _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1(context["Boss单位"])
-    local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
-    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_11["尝试播放Boss死亡主线剧情"]
+    local ____require_result_12 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
+    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_12["尝试播放Boss死亡主线剧情"]
     if (_____9009_9879 and _____9009_9879["跳过死亡剧情"]) ~= true then
         _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5(context["Boss单位"])
     end
@@ -280,12 +288,20 @@ ____exports["启动Boss战运行"] = function(bossUnit)
         return
     end
     local rectHandle = _____8BFB_53D6Boss_6218_77E9_5F62()
+    local rectIsDynamic = _____8BFB_53D6Boss_6218_5730_70B9_662F_5426_52A8_6001()
     local battleSound = _____8BFB_53D6Boss_6218_97F3_9891(____Boss_6218_6218_6597_97F3_4E50_5B57_6BB5)
     local victorySound = _____8BFB_53D6Boss_6218_97F3_9891(____Boss_6218_80DC_5229_97F3_4E50_5B57_6BB5)
-    local context = _____521B_5EFABoss_6218_8FD0_884C_4E0A_4E0B_6587(bossUnit, rectHandle, battleSound, victorySound)
+    local context = _____521B_5EFABoss_6218_8FD0_884C_4E0A_4E0B_6587(
+        bossUnit,
+        rectHandle,
+        battleSound,
+        victorySound,
+        rectIsDynamic
+    )
     if context == nil then
         return
     end
+    _____91CD_5EFA_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899(bossUnit)
     _____8BB0_5F55Boss_6218_8FD0_884C_4E0A_4E0B_6587(context)
     _____786E_4FDDBoss_6218_8FD0_884C_9A71_52A8()
     if _____8BFB_53D6Boss_6218_5355_4F4D_5E03_5C14(bossUnit, "转换场景") then

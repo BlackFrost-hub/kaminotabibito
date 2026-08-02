@@ -3,6 +3,7 @@
 export const Boss战运行模块名 = "Boss战运行";
 
 export const Boss战地点字段 = "地点";
+export const Boss战地点动态字段 = "地点动态";
 export const Boss战战斗音乐字段 = "战斗音乐";
 export const Boss战胜利音乐字段 = "胜利音乐";
 export const Boss战箭头特效字段 = "箭头特效";

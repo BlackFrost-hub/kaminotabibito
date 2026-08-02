@@ -223,4 +223,20 @@ ____exports["创建单位绑定闪电"] = function(_____53C2_6570)
     _____786E_4FDD_5355_4F4D_7ED1_5B9A_95EA_7535Tick_5DF2_542F_52A8()
     return _____95EA_7535_53E5_67C4
 end
+____exports["销毁单位绑定闪电"] = function(_____95EA_7535_53E5_67C4)
+    if _____95EA_7535_53E5_67C4 == nil or _____95EA_7535_53E5_67C4 == 0 then
+        return
+    end
+    for _____5B9E_4F8BID_6587_672C in pairs(_____6D3B_8DC3_5355_4F4D_7ED1_5B9A_95EA_7535) do
+        do
+            local _____5B9E_4F8B = _____6D3B_8DC3_5355_4F4D_7ED1_5B9A_95EA_7535[_____5B9E_4F8BID_6587_672C]
+            if _____5B9E_4F8B == nil or _____5B9E_4F8B["闪电句柄"] ~= _____95EA_7535_53E5_67C4 then
+                goto __continue48
+            end
+            _____9500_6BC1_5355_4F4D_7ED1_5B9A_95EA_7535_5B9E_4F8B(_____5B9E_4F8B)
+            return
+        end
+        ::__continue48::
+    end
+end
 return ____exports

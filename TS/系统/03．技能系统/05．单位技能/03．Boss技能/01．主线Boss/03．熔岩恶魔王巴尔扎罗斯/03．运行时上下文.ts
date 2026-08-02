@@ -5,18 +5,10 @@ import { 创建单位运行时上下文工厂 } from "../../../../00．技能模
 import { 巴尔扎罗斯场地矩形组, 创建巴尔扎罗斯战斗区域组, 清理巴尔扎罗斯战斗区域组 } from "./01．场地配置";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-
-const jass = require("jass.common") as any;
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
-const 巴尔扎罗斯单位类型ID = stringToFourCC(巴尔扎罗斯单位技能配置.单位ID);
 
 export type 巴尔扎罗斯阶段 = 1 | 2 | 3;
 
@@ -39,6 +31,11 @@ export interface 巴尔扎罗斯运行时上下文 {
   末日熔爆引导中: boolean;
   末日熔爆下一次允许Ms: number;
   已触发低血量末日熔爆: boolean;
+  炙热奉献已初始化: boolean;
+  炙热奉献进行中: boolean;
+  炙热奉献已触发: boolean;
+  炙热奉献充能ID: number;
+  炙热奉献连接?: any;
   元素安全印记列表: Array<{ X: number; Y: number }>;
   测试固定安全区配置表?: Array<{ ID?: string; 名称?: string; 左: number; 右: number; 下: number; 上: number }>;
   恶魔咆哮波命中记录: Record<number, number>;
@@ -63,6 +60,10 @@ function 创建巴尔扎罗斯上下文(this: void, boss: any, 清理: 机制清
     末日熔爆引导中: false,
     末日熔爆下一次允许Ms: 0,
     已触发低血量末日熔爆: false,
+    炙热奉献已初始化: false,
+    炙热奉献进行中: false,
+    炙热奉献已触发: false,
+    炙热奉献充能ID: 0,
     元素安全印记列表: [],
     恶魔咆哮波命中记录: {},
     王者天罚命中记录: {},
@@ -72,13 +73,17 @@ function 创建巴尔扎罗斯上下文(this: void, boss: any, 清理: 机制清
   return context;
 }
 
+function 清理巴尔扎罗斯上下文机制(this: void, context: 巴尔扎罗斯运行时上下文): void {
+  清理巴尔扎罗斯战斗区域组(context.战斗区域组);
+}
+
 const 巴尔扎罗斯上下文工厂 = 创建单位运行时上下文工厂<巴尔扎罗斯运行时上下文>({
   名称: "巴尔扎罗斯",
   主动技能提示: 巴尔扎罗斯单位技能配置.主动技能提示,
   创建上下文: 创建巴尔扎罗斯上下文,
-  on清理: function 巴尔扎罗斯上下文清理战斗区域(this: void, context: 巴尔扎罗斯运行时上下文): void {
-    清理巴尔扎罗斯战斗区域组(context.战斗区域组);
-  },
+  死亡时自动清理: true,
+  on单位死亡: on巴尔扎罗斯死亡台词,
+  on清理: 清理巴尔扎罗斯上下文机制,
 });
 
 export function 获取巴尔扎罗斯上下文(this: void, boss: any): 巴尔扎罗斯运行时上下文 | undefined {
@@ -93,17 +98,12 @@ export function 清理巴尔扎罗斯上下文(this: void, boss: any): void {
   巴尔扎罗斯上下文工厂.清理上下文(boss);
 }
 
-let 巴尔扎罗斯死亡台词监听已注册 = false;
-
-function on巴尔扎罗斯死亡台词(this: void, dyingUnit: any): void {
-  if (GetUnitTypeId(dyingUnit) !== 巴尔扎罗斯单位类型ID) return;
+function on巴尔扎罗斯死亡台词(this: void, _context: 巴尔扎罗斯运行时上下文, dyingUnit: any, _killingUnit: any): void {
   播放巴尔扎罗斯台词(dyingUnit, "死亡", 0);
 }
 
 export function 注册巴尔扎罗斯运行时(this: void): void {
-  if (巴尔扎罗斯死亡台词监听已注册) return;
-  巴尔扎罗斯死亡台词监听已注册 = true;
-  registerDeathListener(on巴尔扎罗斯死亡台词);
+  // 死亡监听由上下文工厂统一注册，保留此入口兼容现有初始化调用。
 }
 
 export function 记录巴尔扎罗斯元素安全印记(this: void, boss: any, x: number, y: number): void {

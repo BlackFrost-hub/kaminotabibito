@@ -3,6 +3,7 @@ local ____exports = {}
 require("系统.06．经济系统.00．宝箱系统.09．宝箱主人台词")
 do
     local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.06．经济系统.00．宝箱系统.00．常量定义")
+    ____exports["影骨莫特斯盗贼宝箱可破坏物ID"] = ____00_FF0E_5E38_91CF_5B9A_4E49["影骨莫特斯盗贼宝箱可破坏物ID"]
     ____exports.CHEST_TYPES = ____00_FF0E_5E38_91CF_5B9A_4E49.CHEST_TYPES
     ____exports.DEFAULT_OPEN_TIME = ____00_FF0E_5E38_91CF_5B9A_4E49.DEFAULT_OPEN_TIME
     ____exports.INTERACT_RANGE = ____00_FF0E_5E38_91CF_5B9A_4E49.INTERACT_RANGE

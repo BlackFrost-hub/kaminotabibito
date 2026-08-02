@@ -2,6 +2,7 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
+import { 创建持续危险区域, type 持续危险区域实例 } from "../../../../../00．技能模板+函数/04．机制组件/03．持续危险区/01．持续危险区域";
 const {  巴尔扎罗斯单位技能配置,
   巴尔扎罗斯技能数值配置,
   播放塞拉台词,
@@ -12,8 +13,6 @@ const {  巴尔扎罗斯单位技能配置,
   获取Boss技能敌对英雄列表,
   创建循环点特效,
   停止循环点特效,
-  addPeriodicCallback,
-  removePeriodicCallback,
   getServerTime,
   GetUnitX,
   GetUnitY,
@@ -77,34 +76,47 @@ function 创建绝对零度领域(this: void, context: 巴尔扎罗斯运行时�
     }
   }
 
-  const tickId = addPeriodicCallback(config.Tick毫秒, function 塞拉绝对零度领域Tick(this: void): void {
-    const now = getServerTime();
-    if (now >= endMs || !单位有效(sera)) {
-      removePeriodicCallback(tickId);
-      delete 绝对零度领域状态表[seraId];
-      return;
-    }
-    const list = 获取Boss技能敌对英雄列表(context.Boss单位);
-    for (let i = 0; i < list.length; i++) {
-      const hero = list[i];
-      if (!单位有效(hero)) continue;
-      if (!点在圆内(GetUnitX(hero), GetUnitY(hero), x, y, config.半径)) continue;
-      const heroId = 取单位ID(hero);
-      零度领域减伤到期Ms表[heroId] = now + config.离开后减伤持续秒 * 1000;
-      registerManualBuff(
-        hero,
-        巴尔扎罗斯单位技能配置.BuffID.绝对零度领域,
-        config.离开后减伤持续秒,
-        config.造成伤害降低比例,
-        { sourceName: "塞拉-绝对零度领域" },
-      );
-      if (now >= (nextClear[heroId] ?? 0)) {
-        减少巴尔扎罗斯灼热层数(hero, config.周期清除灼热层数);
-        nextClear[heroId] = now + config.清层周期秒 * 1000;
+  let 区域实例: 持续危险区域实例 | undefined;
+  区域实例 = 创建持续危险区域({
+    X: x,
+    Y: y,
+    半径: config.半径,
+    持续时间: config.持续秒,
+    检测间隔: config.Tick毫秒 / 1000,
+    影响目标: "敌方",
+    所有者: context.Boss单位,
+    提示圈: false,
+    on周期: function 塞拉绝对零度领域周期(this: void, list: any[]): void {
+      if (!单位有效(sera)) {
+        区域实例?.销毁();
+        return;
       }
-    }
+      const now = getServerTime();
+      for (let i = 0; i < list.length; i++) {
+        const hero = list[i];
+        if (!单位有效(hero)) continue;
+        const heroId = 取单位ID(hero);
+        零度领域减伤到期Ms表[heroId] = now + config.离开后减伤持续秒 * 1000;
+        registerManualBuff(
+          hero,
+          巴尔扎罗斯单位技能配置.BuffID.绝对零度领域,
+          config.离开后减伤持续秒,
+          config.造成伤害降低比例,
+          { sourceName: "塞拉-绝对零度领域" },
+        );
+        if (now >= (nextClear[heroId] ?? 0)) {
+          减少巴尔扎罗斯灼热层数(hero, config.周期清除灼热层数);
+          nextClear[heroId] = now + config.清层周期秒 * 1000;
+        }
+      }
+    },
+    on销毁: function 塞拉绝对零度领域销毁(this: void): void {
+      delete 绝对零度领域状态表[seraId];
+    },
   });
-  context.清理.登记周期回调("塞拉-绝对零度领域Tick", tickId);
+  context.清理.登记清理("塞拉-绝对零度领域区域", function 塞拉绝对零度领域区域清理(this: void): void {
+    区域实例?.销毁();
+  });
 }
 
 export function 释放绝对零度领域(this: void, context: 巴尔扎罗斯运行时上下文, target: any): void {

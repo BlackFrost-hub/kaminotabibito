@@ -5,9 +5,9 @@ import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./0
 import { 播放莫尔特斯台词 } from "./13．台词播放";
 import { 单位有效, 播放莫尔特斯限时动作, 显示莫尔特斯大招吟唱条, 关闭莫尔特斯大招吟唱条 } from "./16．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
-const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -37,9 +37,6 @@ const { 创建限时摧毁目标组 } = require("系统.03．技能系统.00．�
 };
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
 };
 const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
@@ -90,20 +87,18 @@ function 根系觉醒失败爆发(this: void, context: 莫尔特斯运行时上�
     持续时间秒: 2,
   });
   const heroes = 获取Boss技能敌对英雄列表(boss);
-  const damage = 读取单位攻击力(boss) * cfg.全屏爆发伤害Boss攻击力比例;
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       来源: boss,
       目标: hero,
-      伤害: damage,
+      伤害公式: { 来源攻击力比例: cfg.全屏爆发伤害Boss攻击力比例 },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_PLANT,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
       技能实例ID,
       标签: "莫尔特斯根系觉醒",
     });

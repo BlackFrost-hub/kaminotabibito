@@ -7,7 +7,7 @@ import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 创建夏提雅鲜血印记 } from './04．鲜血印记';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直, 单位是否处于硬控制效果合集 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 夏提雅BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/03．异界Boss/02．夏提雅';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
@@ -19,9 +19,6 @@ const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害
 };
 const { registerAppliedFinalDamageListener } = require('系统.04．伤害系统.00．伤害计算.04．主计算流程') as {
   registerAppliedFinalDamageListener: (this: void, callback: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
-const { 造成单体技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const { registerManualBuff, getBuffRuntime } = require('系统.05．Buff系统.00．Buff系统') as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -119,22 +116,20 @@ function 执行强化穿刺命中(this: void, context: 夏提雅运行时上下�
   }
   播放Boss坐标音效(夏提雅数值与表现配置.音效.滴管穿心汲血, GetUnitX(target), GetUnitY(target), 夏提雅数值与表现配置.音效默认裁断距离);
   SetUnitFacing(boss, Atan2(dy, dx) * RAD_TO_DEG);
-  const damage = 计算组合技能伤害(boss, target, {
-    来源攻击力比例: cfg.强化穿刺伤害攻击力比例,
-    目标最大生命比例: cfg.强化穿刺伤害目标最大生命比例,
-  });
-  const hit = 造成单体技能伤害({
+  const hit = 执行Boss单体技能伤害({
     来源: boss,
     目标: target,
-    伤害: damage,
+    伤害公式: {
+      来源攻击力比例: cfg.强化穿刺伤害攻击力比例,
+      目标最大生命比例: cfg.强化穿刺伤害目标最大生命比例,
+    },
     attack: false,
     ranged: false,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_ENHANCED,
     weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-    来源类型: 'Boss技能',
     标签: '夏提雅·滴管长枪强化穿刺',
-  });
+  }).是否造成伤害;
   if (!hit) return;
   const effect = AddSpecialEffect(夏提雅数值与表现配置.表现资源.汲血穿刺特效路径, GetUnitX(target), GetUnitY(target));
   if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(1.1, effect);

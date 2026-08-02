@@ -7,12 +7,9 @@ import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 单位句柄存在, 单位存活 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
-import { 计算组合技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害";
+import { 执行Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 播放限时单位动画 } from "../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
-};
 const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -167,22 +164,20 @@ function 结算月光枷锁Tick伤害(this: void, caster: any, target: any, tick
   addDelayedCallback(R2I(config.Tick间隔秒 * tickIndex * 1000), function 月光枷锁Tick伤害回调(this: void): void {
     if (!单位有效(caster) || !单位有效(target)) return;
     if (月光枷锁绑定表[targetId] !== 记录) return;
-    const damage = 计算组合技能伤害(caster, target, {
-      来源攻击力比例: config.Tick伤害Boss攻击力比例,
-      目标最大生命比例: config.Tick伤害目标最大生命比例,
-      总倍率: config.Tick伤害总倍率,
-    });
-    造成单体技能伤害({
+    执行Boss单体技能伤害({
       技能ID: 月光枷锁技能ID,
       来源: caster,
       目标: target,
-      伤害: damage,
+      伤害公式: {
+        来源攻击力比例: config.Tick伤害Boss攻击力比例,
+        目标最大生命比例: config.Tick伤害目标最大生命比例,
+        总倍率: config.Tick伤害总倍率,
+      },
       attack: false,
       ranged: false,
       attackType: jass.ATTACK_TYPE_NORMAL,
       伤害类型: jass.DAMAGE_TYPE_PLANT,
       weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
     });
   });
 }

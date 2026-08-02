@@ -1,9 +1,7 @@
 /** @noSelfInFile */
 
 import { 单位未标记死亡 as 单位有效, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
+import { 执行Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const { 播放限时单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
   播放限时单位动画: (this: void, 参数: any) => any;
 };
@@ -36,10 +34,6 @@ const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require("
 };
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
-};
-
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 
 const jass = require("jass.common") as any;
@@ -142,14 +136,6 @@ export function 释放巴尔扎罗斯熔岩护盾(this: void, context: 巴尔扎
   });
 }
 
-function 计算反弹伤害(this: void, boss: any, attacker: any): number {
-  const config = 巴尔扎罗斯技能数值配置.熔岩护盾;
-  return 计算组合技能伤害(boss, attacker, {
-    来源攻击力比例: config.近战反弹Boss攻击力比例,
-    目标最大生命比例: config.近战反弹来源最大生命比例,
-  });
-}
-
 function on熔岩护盾反弹弹幕结束(this: void, 原因: string, 弹幕ID: number): void {
   if (原因 === "完成" || 原因 === "距离结束") return;
   delete 熔岩护盾反弹弹幕状态表[弹幕ID];
@@ -159,16 +145,19 @@ function on熔岩护盾反弹弹幕到达(this: void, 弹幕ID: number): void {
   const state = 熔岩护盾反弹弹幕状态表[弹幕ID];
   delete 熔岩护盾反弹弹幕状态表[弹幕ID];
   if (state == null || !单位有效(state.Boss单位) || !单位有效(state.攻击单位)) return;
-  造成单体技能伤害({
+  const config = 巴尔扎罗斯技能数值配置.熔岩护盾;
+  执行Boss单体技能伤害({
     来源: state.Boss单位,
     目标: state.攻击单位,
-    伤害: 计算反弹伤害(state.Boss单位, state.攻击单位),
+    伤害公式: {
+      来源攻击力比例: config.近战反弹Boss攻击力比例,
+      目标最大生命比例: config.近战反弹来源最大生命比例,
+    },
     attack: false,
     ranged: true,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_FIRE,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
   });
 }
 

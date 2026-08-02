@@ -66,6 +66,11 @@ function 更新单个弹幕(this: void, 实例: 原生弹幕内部实例): void 
   }
 
   const 移动完成 = 推进弹幕移动(实例, 弹幕Tick间隔);
+  const Tick回调 = 实例.参数.onTick;
+  if (Tick回调 != null) {
+    Tick回调(实例, 弹幕Tick间隔);
+  }
+  if (实例.已结束) return;
   if (处理弹幕命中(实例)) {
     结束原生弹幕实例(实例, "命中消失");
     return;

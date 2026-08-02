@@ -1,18 +1,17 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__Delete = ____lualib.__TS__Delete
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____on_6301_7EED_5355_4F4D_8FDE_7EBFTick, getServerTime, _____6301_7EED_5355_4F4D_8FDE_7EBF_8868
+local ____on_6301_7EED_5355_4F4D_8FDE_7EBFTick, getServerTime
 local ____17_FF0E_95EA_7535_6548_679C_4EE3_7801 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.17．闪电效果代码")
 local _____9ED8_8BA4_95EA_7535_6548_679C_4EE3_7801 = ____17_FF0E_95EA_7535_6548_679C_4EE3_7801["默认闪电效果代码"]
-function ____on_6301_7EED_5355_4F4D_8FDE_7EBFTick()
-    local now = getServerTime()
-    for key in pairs(_____6301_7EED_5355_4F4D_8FDE_7EBF_8868) do
-        local _____5B9E_4F8B = _____6301_7EED_5355_4F4D_8FDE_7EBF_8868[key]
-        if _____5B9E_4F8B ~= nil then
-            _____5B9E_4F8B["推进"](_____5B9E_4F8B, now)
-        end
+function ____on_6301_7EED_5355_4F4D_8FDE_7EBFTick(variable)
+    local _____5B9E_4F8B = variable
+    if _____5B9E_4F8B ~= nil then
+        _____5B9E_4F8B["推进"](
+            _____5B9E_4F8B,
+            getServerTime()
+        )
     end
 end
 local jass = require("jass.common")
@@ -29,9 +28,6 @@ local removePeriodicCallback = ____require_result_0.removePeriodicCallback
 getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 local isValidUnit = ____require_result_1.isValidUnit
-_____6301_7EED_5355_4F4D_8FDE_7EBF_8868 = {}
-local _____6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8ID = 0
-local _____4E0B_4E00_4E2A_6301_7EED_5355_4F4D_8FDE_7EBFID = 0
 local function _____8DDD_79BB_5E73_65B9(a, b)
     local dx = GetUnitX(a) - GetUnitX(b)
     local dy = GetUnitY(a) - GetUnitY(b)
@@ -40,34 +36,15 @@ end
 local function _____53D6_5355_4F4DZ(_____5355_4F4D, _____9AD8_5EA6)
     return GetUnitFlyHeight(_____5355_4F4D) + _____9AD8_5EA6
 end
-local function _____786E_4FDD_6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8(_____95F4_9694_6BEB_79D2)
-    if _____6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8ID ~= 0 then
-        return
-    end
-    _____6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8ID = addPeriodicCallback(_____95F4_9694_6BEB_79D2, ____on_6301_7EED_5355_4F4D_8FDE_7EBFTick)
-end
-local function _____5C1D_8BD5_505C_6B62_6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8()
-    for key in pairs(_____6301_7EED_5355_4F4D_8FDE_7EBF_8868) do
-        if _____6301_7EED_5355_4F4D_8FDE_7EBF_8868[key] ~= nil then
-            return
-        end
-    end
-    if _____6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8ID ~= 0 then
-        removePeriodicCallback(_____6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8ID)
-        _____6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8ID = 0
-    end
-end
 local _____6301_7EED_5355_4F4D_8FDE_7EBF_5B9E_73B0 = __TS__Class()
 _____6301_7EED_5355_4F4D_8FDE_7EBF_5B9E_73B0.name = "持续单位连线实现"
 function _____6301_7EED_5355_4F4D_8FDE_7EBF_5B9E_73B0.prototype.____constructor(self, _____95EA_7535, _____53C2_6570)
+    self["Tick回调ID"] = 0
     self["已停止"] = false
-    _____4E0B_4E00_4E2A_6301_7EED_5355_4F4D_8FDE_7EBFID = _____4E0B_4E00_4E2A_6301_7EED_5355_4F4D_8FDE_7EBFID + 1
-    self.ID = _____4E0B_4E00_4E2A_6301_7EED_5355_4F4D_8FDE_7EBFID
     self["闪电"] = _____95EA_7535
     self["参数"] = _____53C2_6570
     self["到期Ms"] = (_____53C2_6570["持续秒"] == nil or _____53C2_6570["持续秒"] <= 0) and 0 or getServerTime() + _____53C2_6570["持续秒"] * 1000
-    _____6301_7EED_5355_4F4D_8FDE_7EBF_8868[self.ID] = self
-    _____786E_4FDD_6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8(_____53C2_6570["Tick间隔毫秒"] or 30)
+    self["Tick回调ID"] = addPeriodicCallback(_____53C2_6570["Tick间隔毫秒"] or 30, ____on_6301_7EED_5355_4F4D_8FDE_7EBFTick, self)
 end
 _____6301_7EED_5355_4F4D_8FDE_7EBF_5B9E_73B0.prototype["推进"] = function(self, now)
     if self["已停止"] then
@@ -110,14 +87,16 @@ _____6301_7EED_5355_4F4D_8FDE_7EBF_5B9E_73B0.prototype["停止"] = function(self
         return
     end
     self["已停止"] = true
-    __TS__Delete(_____6301_7EED_5355_4F4D_8FDE_7EBF_8868, self.ID)
+    if self["Tick回调ID"] ~= 0 then
+        removePeriodicCallback(self["Tick回调ID"])
+        self["Tick回调ID"] = 0
+    end
     if self["闪电"] ~= nil and self["闪电"] ~= 0 then
         DestroyLightning(self["闪电"])
     end
     if self["参数"]["on断开"] ~= nil then
         self["参数"]["on断开"](_____539F_56E0)
     end
-    _____5C1D_8BD5_505C_6B62_6301_7EED_5355_4F4D_8FDE_7EBF_9A71_52A8()
 end
 ____exports["创建持续单位连线"] = function(_____53C2_6570)
     local _____8D77_70B9 = _____53C2_6570["起点单位"]

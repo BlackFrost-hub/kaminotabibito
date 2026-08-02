@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____542F_52A8_5F8B_6CD5_94FE_8DEF, _____6267_884C_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524, ____on_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524_751F_6548, _____521B_5EFA_53EC_5524_7269, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____542F_52A8_72EC_5360_5355_4F4D_8FDE_63A5, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, Sound3DII_CooPlayReuse, jass, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, Cos, Sin, UNIT_STATE_MAX_LIFE, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____5F8B_6CD5_53EC_5524_6280_80FDID, bj_DEGTORAD
+local _____542F_52A8_5F8B_6CD5_94FE_8DEF, _____6267_884C_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524, ____on_745F_5170_8FEA_5C14_5F8B_6CD5_53EC_5524_751F_6548, _____521B_5EFA_53EC_5524_7269, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____542F_52A8_72EC_5360_5355_4F4D_8FDE_63A5, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, Sound3DII_CooPlayReuse, jass, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, Cos, Sin, UNIT_STATE_MAX_LIFE, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____5F8B_6CD5_53EC_5524_6280_80FDID, bj_DEGTORAD
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
@@ -14,6 +14,8 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss单体技能伤害"]
 function _____542F_52A8_5F8B_6CD5_94FE_8DEF(boss, summon, _____5DF2_8FDE_63A5_76EE_6807)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["律法召唤"]
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * config["链接伤害Boss攻击力比例"]
@@ -43,7 +45,7 @@ function _____542F_52A8_5F8B_6CD5_94FE_8DEF(boss, summon, _____5DF2_8FDE_63A5_76
                 0,
                 config["链接惩罚音效裁断距离"]
             )
-            _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+            _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3({
                 ["技能ID"] = _____5F8B_6CD5_53EC_5524_6280_80FDID,
                 ["来源"] = boss,
                 ["目标"] = target,
@@ -52,8 +54,7 @@ function _____542F_52A8_5F8B_6CD5_94FE_8DEF(boss, summon, _____5DF2_8FDE_63A5_76
                 ranged = false,
                 attackType = jass.ATTACK_TYPE_NORMAL,
                 ["伤害类型"] = jass.DAMAGE_TYPE_MIND,
-                weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                ["来源类型"] = "Boss技能"
+                weaponType = jass.WEAPON_TYPE_WHOKNOWS
             })
         end
     })
@@ -149,10 +150,8 @@ local ____require_result_4 = require("系统.00．核心系统.00．玩家系统
 _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_4["取当前有效玩家人数"]
 local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
-local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_6["造成单体技能伤害"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.02．音效系统.index")
-Sound3DII_CooPlayReuse = ____require_result_7.Sound3DII_CooPlayReuse
+local ____require_result_6 = require("lib.扩展函数.封装函数.02．音效系统.index")
+Sound3DII_CooPlayReuse = ____require_result_6.Sound3DII_CooPlayReuse
 jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitStateJapi = japi.GetUnitState

@@ -2,6 +2,13 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____on_7EBF_6027_626B_63A0_547D_4E2DTick
+function ____on_7EBF_6027_626B_63A0_547D_4E2DTick(variable)
+    local _____5B9E_4F8B = variable
+    if _____5B9E_4F8B ~= nil then
+        _____5B9E_4F8B["推进Tick"](_____5B9E_4F8B)
+    end
+end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -37,10 +44,7 @@ _____7EBF_6027_626B_63A0_547D_4E2D_5B9E_73B0.prototype["启动"] = function(self
     if self["参数"]["最大次数"] <= 0 or self["参数"]["周期秒"] <= 0 then
         return
     end
-    self.timerID = addPeriodicCallback(
-        self["参数"]["周期秒"] * 1000,
-        function() return self:tick() end
-    )
+    self.timerID = addPeriodicCallback(self["参数"]["周期秒"] * 1000, ____on_7EBF_6027_626B_63A0_547D_4E2DTick, self)
 end
 _____7EBF_6027_626B_63A0_547D_4E2D_5B9E_73B0.prototype["销毁"] = function(self)
     if self["已销毁"] then
@@ -56,7 +60,7 @@ _____7EBF_6027_626B_63A0_547D_4E2D_5B9E_73B0.prototype["销毁"] = function(self
         ____opt_2(self["实例ID"])
     end
 end
-function _____7EBF_6027_626B_63A0_547D_4E2D_5B9E_73B0.prototype.tick(self)
+_____7EBF_6027_626B_63A0_547D_4E2D_5B9E_73B0.prototype["推进Tick"] = function(self)
     if self["已销毁"] then
         return
     end
@@ -91,14 +95,14 @@ _____7EBF_6027_626B_63A0_547D_4E2D_5B9E_73B0.prototype["处理命中"] = functio
             do
                 local _____76EE_6807 = _____654C_4EBA_5217_8868[i + 1]
                 if not self["是否可命中"](self, _____76EE_6807, _____4E0A_4E0B_6587) then
-                    goto __continue17
+                    goto __continue16
                 end
                 local ____self__53C2_6570__540C_76EE_6807_53EA_547D_4E2D_4E00_6B21_6 = self["参数"]["同目标只命中一次"]
                 if ____self__53C2_6570__540C_76EE_6807_53EA_547D_4E2D_4E00_6B21_6 == nil then
                     ____self__53C2_6570__540C_76EE_6807_53EA_547D_4E2D_4E00_6B21_6 = true
                 end
                 if ____self__53C2_6570__540C_76EE_6807_53EA_547D_4E2D_4E00_6B21_6 and self["是否已经命中"](self, _____76EE_6807) then
-                    goto __continue17
+                    goto __continue16
                 end
                 self["标记已命中"](self, _____76EE_6807)
                 local ____opt_7 = self["参数"]["on命中"]
@@ -106,7 +110,7 @@ _____7EBF_6027_626B_63A0_547D_4E2D_5B9E_73B0.prototype["处理命中"] = functio
                     ____opt_7(_____76EE_6807, _____4E0A_4E0B_6587)
                 end
             end
-            ::__continue17::
+            ::__continue16::
             i = i + 1
         end
     end

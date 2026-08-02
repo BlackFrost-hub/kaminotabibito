@@ -2,13 +2,16 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, 刷新影骨盗贼遗产Buff, type 影骨莫特斯运行时上下文 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯模型动画配置, 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
-import { 单位有效, 播放影骨莫特斯限时动作, 开始影骨莫特斯常规施法, stringToFourCC } from "./11．公共工具";
+import { 单位有效, stringToFourCC } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
+};
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
@@ -111,9 +114,6 @@ export function 释放影骨盗贼遗产(this: void, context: 影骨莫特斯运
   const 事件列表: 固定时间轴事件[] = [];
   for (let i = 0; i < count; i++) 追加遗产宝箱生成时间轴(事件列表, context, i);
   context.遗产宝箱已生成 = true;
-  开始影骨莫特斯常规施法(context.Boss单位, cfg.动画播放秒, "盗贼的遗产", "遗产宝箱正在依次出现");
-  播放影骨莫特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
-  播放影骨莫特斯台词(context.Boss单位, "盗贼的遗产");
   const 执行ID = context.盗贼遗产组合执行器.开始({
     key: "盗贼的遗产",
     单位: context.Boss单位,
@@ -121,7 +121,30 @@ export function 释放影骨盗贼遗产(this: void, context: 影骨莫特斯运
     最大持续毫秒: count * 500 + 500,
     阶段列表: 创建固定时间轴阶段列表(事件列表),
   });
-  if (执行ID === 0) context.遗产宝箱已生成 = false;
+  if (执行ID === 0) {
+    context.遗产宝箱已生成 = false;
+    return;
+  }
+  启动基础施法时间线({
+    名称: "影骨-盗贼遗产",
+    施法者: context.Boss单位,
+    硬直秒: cfg.动画播放秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    恢复动画编号: 影骨莫特斯模型动画配置.战斗待机编号,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.动画播放秒,
+      颜色ID: 4,
+      标题文本: "盗贼的遗产",
+      提示文本: "遗产宝箱正在依次出现",
+    },
+    清理: context.清理,
+    播放台词: function 影骨盗贼遗产台词(this: void): void {
+      播放影骨莫特斯台词(context.Boss单位, "盗贼的遗产");
+    },
+    on生效: function 影骨盗贼遗产时间线生效(this: void): void {},
+  });
 }
 
 function on影骨盗贼遗产施法(this: void, castingUnit: any, spellAbilityId: number): void {

@@ -10,13 +10,12 @@ local ____13_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_653E["播放莫尔特斯台词"]
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
-local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
-local _____5F00_59CB_83AB_5C14_7279_65AF_5927_62DB_65BD_6CD5 = ____16_FF0E_516C_5171_5DE5_5177["开始莫尔特斯大招施法"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss单体技能伤害"]
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
@@ -34,22 +33,24 @@ local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_4["施加快速减速Buff"]
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_5.registerManualBuff
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_6.addDelayedCallback
-local ____require_result_7 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
-local ____require_result_8 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
-local _____83AB_5C14_7279_65AFBuffID = ____require_result_8["莫尔特斯BuffID"]
-local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_9.debugLogForce
-local ____require_result_10 = require("lib.扩展函数.BJ函数.11．贴图函数")
-local CreateUbersplatBJ = ____require_result_10.CreateUbersplatBJ
-local ShowUbersplatBJ = ____require_result_10.ShowUbersplatBJ
-local SetUbersplatRenderAlways = ____require_result_10.SetUbersplatRenderAlways
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_4["启动基础施法时间线"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_5["施加快速减速Buff"]
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_6.registerManualBuff
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_7.addDelayedCallback
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+local ____require_result_9 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
+local _____83AB_5C14_7279_65AFBuffID = ____require_result_9["莫尔特斯BuffID"]
+local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_10.debugLogForce
+local ____require_result_11 = require("lib.扩展函数.BJ函数.11．贴图函数")
+local CreateUbersplatBJ = ____require_result_11.CreateUbersplatBJ
+local ShowUbersplatBJ = ____require_result_11.ShowUbersplatBJ
+local SetUbersplatRenderAlways = ____require_result_11.SetUbersplatRenderAlways
 local _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757 = "莫尔特斯-腐朽领域"
 local function _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
     local grid = context["根须宫格"]
@@ -148,8 +149,8 @@ local function _____521B_5EFA_8150_673D_9886_57DF_6CBC_6CFD_5730_8868(context)
                             "句柄=",
                             ubersplat
                         )
-                        local ____self_11 = context["清理"]
-                        ____self_11["登记贴图"](____self_11, "莫尔特斯-腐朽领域沼泽", ubersplat)
+                        local ____self_12 = context["清理"]
+                        ____self_12["登记贴图"](____self_12, "莫尔特斯-腐朽领域沼泽", ubersplat)
                         _____6210_529F_6570_91CF = _____6210_529F_6570_91CF + 1
                     end
                     ::__continue8::
@@ -182,8 +183,8 @@ local function _____521B_5EFA_51C0_5316_7B26_6587(context)
                     goto __continue13
                 end
                 local effect = AddSpecialEffect(cfg["净化符文模型路径"], cell["中心X"], cell["中心Y"])
-                local ____self_12 = context["清理"]
-                ____self_12["登记特效"](____self_12, "莫尔特斯-净化符文", effect)
+                local ____self_13 = context["清理"]
+                ____self_13["登记特效"](____self_13, "莫尔特斯-净化符文", effect)
                 _____521B_5EFA_6280_80FD_63D0_793A_5708({
                     ["类型"] = "白色安全圆",
                     X = cell["中心X"],
@@ -201,27 +202,27 @@ local function _____521B_5EFA_8150_673D_9886_57DF_4E2D_5FC3Tick_7279_6548(contex
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
     local _____6839_987B_9886_57DF_914D_7F6E = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根须领域"]
     local grid = context["根须宫格"]
-    local ____temp_13
-    if grid == nil then
-        ____temp_13 = nil
-    else
-        ____temp_13 = grid["格子列表"]
-    end
-    local _____683C_5B50_5217_8868 = ____temp_13
     local ____temp_14
-    if _____683C_5B50_5217_8868 ~= nil and #_____683C_5B50_5217_8868 > 0 then
-        ____temp_14 = _____683C_5B50_5217_8868[1]
-    else
+    if grid == nil then
         ____temp_14 = nil
+    else
+        ____temp_14 = grid["格子列表"]
     end
-    local _____9996_683C = ____temp_14
+    local _____683C_5B50_5217_8868 = ____temp_14
     local ____temp_15
     if _____683C_5B50_5217_8868 ~= nil and #_____683C_5B50_5217_8868 > 0 then
-        ____temp_15 = _____683C_5B50_5217_8868[#_____683C_5B50_5217_8868]
+        ____temp_15 = _____683C_5B50_5217_8868[1]
     else
         ____temp_15 = nil
     end
-    local _____672B_683C = ____temp_15
+    local _____9996_683C = ____temp_15
+    local ____temp_16
+    if _____683C_5B50_5217_8868 ~= nil and #_____683C_5B50_5217_8868 > 0 then
+        ____temp_16 = _____683C_5B50_5217_8868[#_____683C_5B50_5217_8868]
+    else
+        ____temp_16 = nil
+    end
+    local _____672B_683C = ____temp_16
     local _____4E2D_5FC3X = context["根须领域中心X"] or (_____9996_683C ~= nil and _____672B_683C ~= nil and (_____9996_683C["左"] + _____672B_683C["右"]) / 2 or _____6839_987B_9886_57DF_914D_7F6E["中心X"])
     local _____4E2D_5FC3Y = context["根须领域中心Y"] or (_____9996_683C ~= nil and _____672B_683C ~= nil and (_____9996_683C["下"] + _____672B_683C["上"]) / 2 or _____6839_987B_9886_57DF_914D_7F6E["中心Y"])
     _____521B_5EFA_70B9_7279_6548({
@@ -290,7 +291,7 @@ local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B(variable)
         ["持续秒"] = _____7A7F_523A_914D_7F6E["瞬时特效持续秒"],
         ["缩放"] = _____7A7F_523A_914D_7F6E["穿刺命中特效缩放"]
     })
-    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+    _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = context["Boss单位"],
         ["目标"] = target,
         ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["Boss单位"]),
@@ -299,7 +300,6 @@ local function _____83AB_5C14_7279_65AF_8150_673D_6CBC_6CFD_6839_987B(variable)
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_PLANT,
         weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能",
         ["技能实例ID"] = data["技能实例ID"],
         ["标签"] = "莫尔特斯腐朽领域根须"
     })
@@ -352,19 +352,32 @@ ____exports["触发莫尔特斯腐朽领域"] = function(context)
     end
     context["腐朽领域已触发"] = true
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
-    _____5F00_59CB_83AB_5C14_7279_65AF_5927_62DB_65BD_6CD5(context["Boss单位"], cfg["动作播放秒"], "腐朽领域", "腐败沼泽将在读条结束后覆盖场地")
-    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(context["Boss单位"], cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
-    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(context["Boss单位"], "低血量")
-    local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____7ED3_7B97_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5C55_5F00, context)
-    local ____self_16 = context["清理"]
-    ____self_16["登记延迟回调"](____self_16, "莫尔特斯-腐朽领域展开", delayedId)
+    _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
+        ["名称"] = "莫尔特斯-腐朽领域",
+        ["施法者"] = context["Boss单位"],
+        ["硬直秒"] = cfg["动作播放秒"],
+        ["动画编号"] = cfg["动画编号"],
+        ["动画速度"] = cfg["动画速度"],
+        ["吟唱条"] = {
+            ["通道"] = "大招",
+            ["总时长"] = cfg["动作播放秒"],
+            ["颜色ID"] = 3,
+            ["标题文本"] = "腐朽领域",
+            ["提示文本"] = "腐败沼泽将在读条结束后覆盖场地"
+        },
+        ["清理"] = context["清理"],
+        ["播放台词"] = function()
+            _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(context["Boss单位"], "低血量")
+        end,
+        ["on生效"] = function()
+            _____7ED3_7B97_83AB_5C14_7279_65AF_8150_673D_9886_57DF_5C55_5F00(context)
+        end
+    })
     debugLogForce(
         _____8150_673D_9886_57DF_8C03_8BD5_6A21_5757,
         "触发成功",
         "延迟毫秒=",
         cfg["动作播放秒"] * 1000,
-        "延迟ID=",
-        delayedId,
         "根须宫格=",
         context["根须宫格"] == nil and "nil" or "ready"
     )
@@ -382,10 +395,10 @@ ____exports["处理莫尔特斯沼泽腐败"] = function(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue32
+                    goto __continue34
                 end
                 if _____5904_7406_51C0_5316_7B26_6587(context, hero) then
-                    goto __continue32
+                    goto __continue34
                 end
                 _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                     context["Boss单位"],
@@ -396,7 +409,7 @@ ____exports["处理莫尔特斯沼泽腐败"] = function(context)
                 )
                 _____589E_52A0_73A9_5BB6_8150_8D25_503C(context, hero, cfg["沼泽每跳腐败值"])
             end
-            ::__continue32::
+            ::__continue34::
             i = i + 1
         end
     end

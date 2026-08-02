@@ -55,6 +55,26 @@ export interface 闪避判定结果 {
   闪避概率: number;
 }
 
+export type 闪避豁免判定器 = (this: void, context: 闪避判定上下文) => boolean;
+
+const 闪避豁免判定器列表: 闪避豁免判定器[] = [];
+
+export function registerDodgeBypassPredicate(this: void, callback: 闪避豁免判定器): void {
+  if (callback == null) return;
+  for (let i = 0; i < 闪避豁免判定器列表.length; i++) {
+    if (闪避豁免判定器列表[i] === callback) return;
+  }
+  闪避豁免判定器列表.push(callback);
+}
+
+function 命中闪避豁免(this: void, context: 闪避判定上下文): boolean {
+  for (let i = 0; i < 闪避豁免判定器列表.length; i++) {
+    const callback = 闪避豁免判定器列表[i];
+    if (callback != null && callback(context)) return true;
+  }
+  return false;
+}
+
 export interface 闪避成功记录 {
   attacker: any;
   target: any;
@@ -167,6 +187,9 @@ export function 执行闪避判定(this: void, context: 闪避判定上下文): 
   }
 
   if (context.isNormalAttack && context.isPhysicalDamage && 读取单位布尔(target, "普攻必中")) {
+    return { 结束链路: false, 伤害: currentDamage, 闪避概率: 0 };
+  }
+  if (命中闪避豁免(context)) {
     return { 结束链路: false, 伤害: currentDamage, 闪避概率: 0 };
   }
   if (读取单位字符串开关(attacker, "无视闪避")) {

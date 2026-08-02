@@ -13,12 +13,13 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
+local R2I = jass.R2I
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local function _____89C4_6574_6B21_6570(_____6B21_6570)
     if _____6B21_6570 == nil or _____6B21_6570 ~= _____6B21_6570 or _____6B21_6570 <= 0 then
         return 0
     end
-    return math.floor(_____6B21_6570)
+    return R2I(_____6B21_6570)
 end
 local function _____7C7B_578B_5339_914D(_____7C7B_578B, context)
     if _____7C7B_578B == "任意伤害" then

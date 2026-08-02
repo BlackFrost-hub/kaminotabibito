@@ -11,10 +11,12 @@ function ____on_5F71_9AA8_6280_80FD2Kill_5EF6_8FDF_51FB_6740(variable)
     if variable == nil then
         return
     end
+    local ____self_19 = variable["召唤组"]
+    local skeletons = ____self_19["取单位列表"](____self_19)
     do
         local i = 0
-        while i < #variable["骷髅列表"] do
-            local skeleton = variable["骷髅列表"][i + 1]
+        while i < #skeletons do
+            local skeleton = skeletons[i + 1]
             if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(skeleton) then
                 KillUnit(skeleton)
             end
@@ -29,11 +31,14 @@ function _____6E05_7406_5F71_9AA8_4E0A_4E00_6B21_53EC_5524_6D4B_8BD5(previous)
     if previous == nil then
         return
     end
-    previous["召唤组"]["已重组"] = true
+    local ____self_21 = previous["召唤组"]
+    local skeletons = ____self_21["取单位列表"](____self_21)
+    local ____self_22 = previous["召唤组"]
+    ____self_22["销毁"](____self_22)
     do
         local i = 0
-        while i < #previous["骷髅列表"] do
-            local skeleton = previous["骷髅列表"][i + 1]
+        while i < #skeletons do
+            local skeleton = skeletons[i + 1]
             if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(skeleton) then
                 KillUnit(skeleton)
             end
@@ -49,14 +54,18 @@ function _____5B89_6392_5F71_9AA8_9636_6BB5_5F3A_5316_6D4B_8BD5(player, context,
     local pid = GetPlayerId(player)
     _____6E05_7406_5F71_9AA8_4E0A_4E00_6B21_53EC_5524_6D4B_8BD5(_____5F71_9AA82Kill_6D4B_8BD5_8868[pid])
     local group = _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524(context)
-    if group == nil or #group["单位列表"] <= 0 then
+    if group == nil then
         return
     end
-    local variable = {["玩家ID"] = pid, ["骷髅列表"] = group["单位列表"], ["召唤组"] = group}
+    local skeletons = group["取单位列表"](group)
+    if #skeletons <= 0 then
+        return
+    end
+    local variable = {["玩家ID"] = pid, ["骷髅列表"] = skeletons, ["召唤组"] = group}
     _____5F71_9AA82Kill_6D4B_8BD5_8868[pid] = variable
     local delayedId = addDelayedCallback(3500, ____on_5F71_9AA8_6280_80FD2Kill_5EF6_8FDF_51FB_6740, variable)
-    local ____self_20 = context["清理"]
-    ____self_20["登记延迟回调"](____self_20, "影骨测试-阶段强化击杀", delayedId)
+    local ____self_23 = context["清理"]
+    ____self_23["登记延迟回调"](____self_23, "影骨测试-阶段强化击杀", delayedId)
 end
 local jass = require("jass.common")
 local japi = require("jass.japi")
@@ -93,6 +102,7 @@ local ____require_result_9 = require("系统.03．技能系统.05．单位技能
 local _____91CA_653E_5F71_9AA8_9634_5F71_7A7F_68AD = ____require_result_9["释放影骨阴影穿梭"]
 local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.04．骸骨召唤")
 _____91CA_653E_5F71_9AA8_9AB8_9AA8_53EC_5524 = ____require_result_10["释放影骨骸骨召唤"]
+local _____521B_5EFA_5F71_9AA8_53EC_5524_7EC4 = ____require_result_10["创建影骨召唤组"]
 local _____521B_5EFA_5F71_9AA8_53EC_5524_7269 = ____require_result_10["创建影骨召唤物"]
 local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.02．数值与表现配置")
 local _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____require_result_11["影骨莫特斯数值与表现配置"]
@@ -278,35 +288,15 @@ local function ____on_5F71_9AA8_6280_80FD2Kill_6D4B_8BD5_547D_4EE4(player, conte
     _____51C6_5907_5F71_9AA8_6D4B_8BD5_9636_6BB5(context, phase)
     local pid = GetPlayerId(player)
     local previous = _____5F71_9AA82Kill_6D4B_8BD5_8868[pid]
-    if previous ~= nil then
-        previous["召唤组"]["已重组"] = true
-        do
-            local i = 0
-            while i < #previous["骷髅列表"] do
-                local skeleton = previous["骷髅列表"][i + 1]
-                if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(skeleton) then
-                    KillUnit(skeleton)
-                end
-                i = i + 1
-            end
-        end
-    end
-    local group = {
-        ID = (context["下一个召唤组ID"] or 0) + 1,
-        ["阶段"] = context["阶段"],
-        ["总数"] = 4,
-        ["死亡数"] = 0,
-        ["已重组"] = false,
-        ["单位列表"] = {}
-    }
-    context["下一个召唤组ID"] = group.ID
+    _____6E05_7406_5F71_9AA8_4E0A_4E00_6B21_53EC_5524_6D4B_8BD5(previous)
+    local group = _____521B_5EFA_5F71_9AA8_53EC_5524_7EC4(context, phase, true, 4)
     context["当前召唤组"] = group
     local cfg = _____5F71_9AA8_83AB_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["骸骨召唤"]
     local skeletons = {}
     local skeletonTypeId = stringToFourCC(cfg["骷髅盗贼单位类型"])
     do
         local i = 0
-        while i < group["总数"] do
+        while i < 4 do
             local angle = GetRandomReal(0, 360)
             local distance = GetRandomReal(80, cfg["召唤偏移半径"])
             local x = _____6781_5750_6807X(
@@ -324,8 +314,7 @@ local function ____on_5F71_9AA8_6280_80FD2Kill_6D4B_8BD5_547D_4EE4(player, conte
                 skeletonTypeId,
                 x,
                 y,
-                group,
-                true
+                group
             )
             if instance ~= nil and ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(instance["单位"]) then
                 skeletons[#skeletons + 1] = instance["单位"]
@@ -333,15 +322,16 @@ local function ____on_5F71_9AA8_6280_80FD2Kill_6D4B_8BD5_547D_4EE4(player, conte
             i = i + 1
         end
     end
-    group["总数"] = #skeletons
-    if group["总数"] <= 0 then
+    group["结束批次"](group)
+    if #skeletons <= 0 then
+        group["销毁"](group)
         return
     end
     local variable = {["玩家ID"] = pid, ["骷髅列表"] = skeletons, ["召唤组"] = group}
     _____5F71_9AA82Kill_6D4B_8BD5_8868[pid] = variable
     local delayedId = addDelayedCallback(2000, ____on_5F71_9AA8_6280_80FD2Kill_5EF6_8FDF_51FB_6740, variable)
-    local ____self_19 = context["清理"]
-    ____self_19["登记延迟回调"](____self_19, "影骨测试-2-kill", delayedId)
+    local ____self_20 = context["清理"]
+    ____self_20["登记延迟回调"](____self_20, "影骨测试-2-kill", delayedId)
 end
 local function ____on_5F71_9AA8_6280_80FD3_6D4B_8BD5_547D_4EE4(player, context)
     local target = _____5F71_9AA8_6D4B_8BD5_6B65_5175[GetPlayerId(player)]
@@ -405,10 +395,10 @@ local function ____on_5F71_9AA8_6280_80FD4_2_6D4B_8BD5_547D_4EE4(player, context
     local _____53D8_91CF = {["来源单位"] = _____6765_6E90_5355_4F4D, ["目标单位"] = context["Boss单位"]}
     local _____7269_7406_4F24_5BB3_56DE_8C03ID = addDelayedCallback(1000, ____on_5F71_9AA8_6280_80FD4_2_7269_7406_4F24_5BB3, _____53D8_91CF)
     local _____9B54_6CD5_4F24_5BB3_56DE_8C03ID = addDelayedCallback(2000, ____on_5F71_9AA8_6280_80FD4_2_9B54_6CD5_4F24_5BB3, _____53D8_91CF)
-    local ____self_21 = context["清理"]
-    ____self_21["登记延迟回调"](____self_21, "影骨测试-4-2-物理伤害", _____7269_7406_4F24_5BB3_56DE_8C03ID)
-    local ____self_22 = context["清理"]
-    ____self_22["登记延迟回调"](____self_22, "影骨测试-4-2-魔法伤害", _____9B54_6CD5_4F24_5BB3_56DE_8C03ID)
+    local ____self_24 = context["清理"]
+    ____self_24["登记延迟回调"](____self_24, "影骨测试-4-2-物理伤害", _____7269_7406_4F24_5BB3_56DE_8C03ID)
+    local ____self_25 = context["清理"]
+    ____self_25["登记延迟回调"](____self_25, "影骨测试-4-2-魔法伤害", _____9B54_6CD5_4F24_5BB3_56DE_8C03ID)
     debugLogForce(_____5F71_9AA8_5E7D_5F71_7206_53D1_4F24_5BB3_6D4B_8BD5_6A21_5757_540D, "命令4-2已启动", "第1秒物理1000", "第2秒魔法1000")
 end
 local function ____on_5F71_9AA8_6280_80FD5_6D4B_8BD5_547D_4EE4(_player, context)

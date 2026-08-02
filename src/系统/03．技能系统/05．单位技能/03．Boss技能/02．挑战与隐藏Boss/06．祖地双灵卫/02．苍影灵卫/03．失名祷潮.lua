@@ -9,8 +9,8 @@ local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_
 local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
 local _____6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
@@ -34,13 +34,9 @@ local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_r
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.01．牵引系统.03．对外接口")
 local _____5F00_59CB_7275_5F15 = ____require_result_2["开始牵引"]
 local _____505C_6B62_7275_5F15 = ____require_result_2["停止牵引"]
-local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_3["造成AOE技能伤害"]
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_4.addDelayedCallback
-local addPeriodicCallback = ____require_result_4.addPeriodicCallback
-local removePeriodicCallback = ____require_result_4.removePeriodicCallback
-local getServerTime = ____require_result_4.getServerTime
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
+local getServerTime = ____require_result_3.getServerTime
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -212,9 +208,9 @@ ____exports["释放失名祷潮"] = function(context, target)
             i = i + 1
         end
     end
-    local ____self_11 = context["清理"]
-    ____self_11["登记清理"](
-        ____self_11,
+    local ____self_10 = context["清理"]
+    ____self_10["登记清理"](
+        ____self_10,
         "祖地双灵卫-失名祷潮牵引",
         function()
             do
@@ -241,37 +237,6 @@ ____exports["释放失名祷潮"] = function(context, target)
             end
             local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
             local barrage = nil
-            local monitorId = 0
-            monitorId = addPeriodicCallback(
-                10,
-                function()
-                    if barrage == nil or barrage["弹幕单位"] == nil or barrage["弹幕单位"] == 0 then
-                        return
-                    end
-                    local seal = context["镇魂印"]
-                    if seal == nil or seal["到期Ms"] <= getServerTime() then
-                        return
-                    end
-                    local hitRadius = seal["半径"] + cfg["宽度"] * 0.5
-                    local dx = GetUnitX(barrage["弹幕单位"]) - seal.X
-                    local dy = GetUnitY(barrage["弹幕单位"]) - seal.Y
-                    if dx * dx + dy * dy > hitRadius * hitRadius then
-                        return
-                    end
-                    SetUnitVertexColor(
-                        barrage["弹幕单位"],
-                        255,
-                        255,
-                        255,
-                        0
-                    )
-                    _____9500_6BC1_539F_751F_5F39_5E55(barrage["弹幕ID"])
-                    if monitorId > 0 then
-                        removePeriodicCallback(monitorId)
-                    end
-                    _____6D88_8017_9547_9B42_5370_5E76_538B_5236(context, boss)
-                end
-            )
             barrage = _____521B_5EFA_539F_751F_5F39_5E55({
                 ["所有者"] = boss,
                 ["载体模式"] = "单位",
@@ -299,24 +264,43 @@ ____exports["释放失名祷潮"] = function(context, target)
                     return false
                 end,
                 ["on命中"] = function(hit)
-                    local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
-                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                         ["来源"] = boss,
                         ["目标"] = hit,
-                        ["伤害"] = damage,
+                        ["伤害公式"] = {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]},
                         attack = false,
                         ranged = true,
                         attackType = ATTACK_TYPE_NORMAL,
                         ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
                         weaponType = WEAPON_TYPE_WHOKNOWS,
-                        ["来源类型"] = "Boss技能",
                         ["标签"] = "祖地双灵卫·失名祷潮"
                     })
                 end,
-                ["on到达目标点"] = function()
-                    if monitorId > 0 then
-                        removePeriodicCallback(monitorId)
+                onTick = function(instance)
+                    if instance["弹幕单位"] == nil or instance["弹幕单位"] == 0 then
+                        return
                     end
+                    local seal = context["镇魂印"]
+                    if seal == nil or seal["到期Ms"] <= getServerTime() then
+                        return
+                    end
+                    local hitRadius = seal["半径"] + cfg["宽度"] * 0.5
+                    local dx = GetUnitX(instance["弹幕单位"]) - seal.X
+                    local dy = GetUnitY(instance["弹幕单位"]) - seal.Y
+                    if dx * dx + dy * dy > hitRadius * hitRadius then
+                        return
+                    end
+                    SetUnitVertexColor(
+                        instance["弹幕单位"],
+                        255,
+                        255,
+                        255,
+                        0
+                    )
+                    _____9500_6BC1_539F_751F_5F39_5E55(instance.id)
+                    _____6D88_8017_9547_9B42_5370_5E76_538B_5236(context, boss)
+                end,
+                ["on到达目标点"] = function()
                     _____68C0_67E5_7977_6F6E_7A7F_8FC7_6821_51C6_8282_70B9(
                         context,
                         startX,
@@ -326,6 +310,17 @@ ____exports["释放失名祷潮"] = function(context, target)
                     )
                 end
             })
+            local ____self_11 = context["清理"]
+            ____self_11["登记清理"](
+                ____self_11,
+                "祖地双灵卫-失名祷潮弹幕",
+                function()
+                    if barrage ~= nil then
+                        barrage["销毁"](barrage, "手动销毁")
+                    end
+                    barrage = nil
+                end
+            )
         end
     )
     local ____self_12 = context["清理"]

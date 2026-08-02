@@ -82,3 +82,17 @@ function createSecondLegionUnit(id, parentId, options)
   unit:setProjectileImpactZ(options.projectileImpactZ or 60.0)
   return unit
 end
+
+function createSealGuardUnit(id, parentId, options)
+  options.name = options.name or options.displayName or id
+  local unit = createSecondLegionUnit(id, parentId, options)
+  unit:setRace(Race.Creeps)
+  unit:setLevel(options.level or 25)
+  unit:setUpgradesUsed(options.upgrades or 'R001')
+  unit:setUnitClassification(options.classification or '')
+  unit:setCanDropItemsOnDeath(false)
+  unit:setGoldBountyAwardedBase(0)
+  unit:setGoldBountyAwardedNumberofDice(0)
+  unit:setGoldBountyAwardedSidesperDie(0)
+  return unit
+end

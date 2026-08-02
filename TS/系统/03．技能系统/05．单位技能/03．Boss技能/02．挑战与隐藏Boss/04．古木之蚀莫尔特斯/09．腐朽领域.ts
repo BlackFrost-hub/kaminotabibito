@@ -3,11 +3,11 @@
 import { 增加玩家腐败值, 清除玩家腐败值, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯大招施法 } from "./16．公共工具";
+import { 单位有效 } from "./16．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
+import { 提交预计算Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
-const { 造成单体技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
+const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
@@ -30,6 +30,9 @@ const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
+};
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { 施加快速减速Buff } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number) => void;
@@ -206,7 +209,7 @@ function 莫尔特斯腐朽沼泽根须(this: void, variable?: any): void {
     持续秒: 穿刺配置.瞬时特效持续秒,
     缩放: 穿刺配置.穿刺命中特效缩放,
   });
-  造成单体技能伤害({
+  提交预计算Boss单体技能伤害({
     来源: context.Boss单位,
     目标: target,
     伤害: 读取单位攻击力(context.Boss单位),
@@ -215,7 +218,6 @@ function 莫尔特斯腐朽沼泽根须(this: void, variable?: any): void {
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_PLANT,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
     技能实例ID: data.技能实例ID,
     标签: "莫尔特斯腐朽领域根须",
   });
@@ -248,12 +250,28 @@ export function 触发莫尔特斯腐朽领域(this: void, context: 莫尔特斯
   }
   context.腐朽领域已触发 = true;
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
-  开始莫尔特斯大招施法(context.Boss单位, cfg.动作播放秒, "腐朽领域", "腐败沼泽将在读条结束后覆盖场地");
-  播放莫尔特斯限时动作(context.Boss单位, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
-  播放莫尔特斯台词(context.Boss单位, "低血量");
-  const delayedId = addDelayedCallback(cfg.动作播放秒 * 1000, 结算莫尔特斯腐朽领域展开, context);
-  context.清理.登记延迟回调("莫尔特斯-腐朽领域展开", delayedId);
-  debugLogForce(腐朽领域调试模块, "触发成功", "延迟毫秒=", cfg.动作播放秒 * 1000, "延迟ID=", delayedId, "根须宫格=", context.根须宫格 == null ? "nil" : "ready");
+  启动基础施法时间线({
+    名称: "莫尔特斯-腐朽领域",
+    施法者: context.Boss单位,
+    硬直秒: cfg.动作播放秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    吟唱条: {
+      通道: "大招",
+      总时长: cfg.动作播放秒,
+      颜色ID: 3,
+      标题文本: "腐朽领域",
+      提示文本: "腐败沼泽将在读条结束后覆盖场地",
+    },
+    清理: context.清理,
+    播放台词: function 莫尔特斯腐朽领域台词(this: void): void {
+      播放莫尔特斯台词(context.Boss单位, "低血量");
+    },
+    on生效: function 莫尔特斯腐朽领域时间线生效(this: void): void {
+      结算莫尔特斯腐朽领域展开(context);
+    },
+  });
+  debugLogForce(腐朽领域调试模块, "触发成功", "延迟毫秒=", cfg.动作播放秒 * 1000, "根须宫格=", context.根须宫格 == null ? "nil" : "ready");
 }
 
 export function 处理莫尔特斯沼泽腐败(this: void, context: 莫尔特斯运行时上下文): boolean {

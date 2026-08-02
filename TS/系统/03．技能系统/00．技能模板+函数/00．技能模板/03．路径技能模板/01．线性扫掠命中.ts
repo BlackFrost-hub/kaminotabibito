@@ -3,7 +3,7 @@
 const jass = require("jass.common") as any;
 
 const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
 
@@ -69,7 +69,7 @@ class 线性扫掠命中实现 implements 线性扫掠命中实例 {
     if (this.已销毁) return;
     if (this.参数.施法单位 == null || this.参数.施法单位 === 0) return;
     if (this.参数.最大次数 <= 0 || this.参数.周期秒 <= 0) return;
-    this.timerID = addPeriodicCallback(this.参数.周期秒 * 1000, () => this.tick());
+    this.timerID = addPeriodicCallback(this.参数.周期秒 * 1000, on线性扫掠命中Tick, this);
   }
 
   销毁(): void {
@@ -82,7 +82,7 @@ class 线性扫掠命中实现 implements 线性扫掠命中实例 {
     this.参数.on结束?.(this.实例ID);
   }
 
-  private tick(): void {
+  推进Tick(): void {
     if (this.已销毁) return;
     this.当前次数 += 1;
     this.当前X += Cos(this.参数.方向弧度) * this.参数.每次距离;
@@ -134,9 +134,13 @@ class 线性扫掠命中实现 implements 线性扫掠命中实例 {
   }
 }
 
+function on线性扫掠命中Tick(this: void, variable?: any): void {
+  const 实例 = variable as 线性扫掠命中实现 | undefined;
+  if (实例 != null) 实例.推进Tick();
+}
+
 export function 创建线性扫掠命中(参数: 线性扫掠命中参数): 线性扫掠命中实例 {
   const 实例 = new 线性扫掠命中实现(++下一个线性扫掠命中实例ID, 参数);
   实例.启动();
   return 实例;
 }
-

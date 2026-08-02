@@ -48,7 +48,7 @@ local EQUIP_EVENT_PLAYER_IDS = {
 }
 local _____88C5_5907_89C6_91CEBuffID = "C034"
 local _____88C5_5907_89C6_91CEBuff_663E_793A_6301_7EED_65F6_95F4 = 999999
-local _____4E0D_8D70_88C5_5907_7CFB_7EDF_7269_54C1ID_8868 = {I0FK = true, I0FL = true}
+local _____4E0D_8D70_88C5_5907_7CFB_7EDF_7269_54C1ID_8868 = {I0FK = true, I0FL = true, I0E5 = true}
 local function _____5237_65B0_88C5_5907_89C6_91CE_663E_793ABuff(self, unit, _____5F53_524D_89C6_91CE_52A0_6210)
     if unit == nil or unit == 0 then
         return

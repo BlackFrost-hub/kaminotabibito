@@ -118,6 +118,22 @@ function 解析模型文件(参数: 召唤物输入参数): string | undefined {
   return undefined;
 }
 
+function 解析添加技能列表(this: void, 参数: 召唤物输入参数): number[] | undefined {
+  const 原始技能列表 = 参数.添加技能;
+  if (原始技能列表 == null || 原始技能列表.length === 0) return undefined;
+  const 技能列表: number[] = [];
+  for (let i = 0; i < 原始技能列表.length; i++) {
+    const 原始技能 = 原始技能列表[i];
+    const 技能ID = typeof 原始技能 === "number"
+      ? 原始技能
+      : 原始技能.length === 4
+        ? stringToFourCC(原始技能)
+        : 0;
+    if (技能ID > 0) 技能列表.push(技能ID);
+  }
+  return 技能列表.length > 0 ? 技能列表 : undefined;
+}
+
 function 规范化召唤物参数输入(参数: 召唤物输入参数): 规范化召唤物参数 {
   return {
     主人单位: 参数.主人单位 ?? 参数.Master,
@@ -140,6 +156,8 @@ function 规范化召唤物参数输入(参数: 召唤物输入参数): 规范�
     攻击范围: 参数.攻击范围 ?? 参数.射程 ?? 参数.range ?? 参数.Rng,
     固定站桩: 参数.固定站桩,
     禁止普攻: 参数.禁止普攻,
+    添加技能: 解析添加技能列表(参数),
+    禁用路径: 参数.禁用路径,
     普攻弹道模型: 参数.普攻弹道模型 ?? 参数.弹道模型 ?? 参数.missileModel,
     普攻弹道弧度: 参数.普攻弹道弧度 ?? 参数.弹道弧度 ?? 参数.missileArc,
     普攻弹道速度: 参数.普攻弹道速度 ?? 参数.弹道速度 ?? 参数.missileSpeed,

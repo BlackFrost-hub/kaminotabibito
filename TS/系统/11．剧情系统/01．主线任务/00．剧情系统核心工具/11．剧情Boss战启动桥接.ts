@@ -20,7 +20,7 @@ const { 记录Boss自动技能启动, 是否已登记Boss自动技能 } = requir
 };
 
 import { 读取当前剧情动作上下文 } from "./01．剧情动作上下文";
-import { 剧情Boss预置暂停来源 } from "./03．剧情Boss预置桥接";
+import { 释放并登记剧情Boss预置随从, 剧情Boss预置暂停来源 } from "./03．剧情Boss预置桥接";
 
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 
@@ -31,6 +31,8 @@ export interface 剧情Boss战启动参数 {
 
 export function 启动剧情Boss战(this: void, bossUnit: any, 参数?: 剧情Boss战启动参数): boolean {
   if (bossUnit == null || bossUnit === 0) return false;
+
+  释放并登记剧情Boss预置随从(bossUnit);
 
   if (!是否已登记Boss自动技能(bossUnit)) {
     记录Boss自动技能启动(bossUnit, "Boss战.绑定单位");

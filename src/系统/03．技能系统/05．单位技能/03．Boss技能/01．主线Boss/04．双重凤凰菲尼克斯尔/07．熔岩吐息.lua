@@ -26,14 +26,15 @@ local _____505C_6B62_5468_671F = ____19_FF0E_516C_5171_5DE5_5177["停止周期"]
 local _____521B_5EFA_9884_8B66_6247_5F62 = ____19_FF0E_516C_5171_5DE5_5177["创建预警扇形"]
 local _____5355_4F4D_5728_6247_5F62_5185 = ____19_FF0E_516C_5171_5DE5_5177["单位在扇形内"]
 local _____8303_56F4_654C_4EBA = ____19_FF0E_516C_5171_5DE5_5177["范围敌人"]
-local _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击最大生命伤害"]
-local _____9020_6210_706B_7130_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成火焰伤害"]
+local _____53D6_83F2_5C3C_514B_65AF_5C14_6280_80FD_5F3A_5EA6_500D_7387 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔技能强度倍率"]
 local _____6DFB_52A0_5143_7D20_5C42_6570 = ____19_FF0E_516C_5171_5DE5_5177["添加元素层数"]
 local _____65BD_52A0_51CF_901F = ____19_FF0E_516C_5171_5DE5_5177["施加减速"]
 local _____53D6_5355_4F4DX = ____19_FF0E_516C_5171_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____19_FF0E_516C_5171_5DE5_5177["取单位Y"]
 local _____6781_5750_6807X = ____19_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____19_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
@@ -41,6 +42,9 @@ local GetUnitTypeId = jass.GetUnitTypeId
 local GetHandleId = jass.GetHandleId
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitFlyHeight = jass.GetUnitFlyHeight
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
+local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
+local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
@@ -85,7 +89,7 @@ ____exports["释放菲尼克斯尔熔岩吐息"] = function(context, target, ___
     _____5F00_59CB_65BD_6CD5_786C_76F4(boss, config["预警秒"] + config["持续秒"])
     _____8BBE_7F6E_5355_4F4D_52A8_753B(boss, _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第一形态"]["施法弯身"]["编号"], _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["动画"]["第一形态"]["施法弯身"]["倍速"])
     _____663E_793A_5E38_89C4_8BFB_6761(config["预警秒"], config["吟唱条颜色ID"], config["吟唱条标题文本"], config["吟唱条提示文本"])
-    _____521B_5EFA_9884_8B66_6247_5F62(boss, config["半径"], config["预警秒"])
+    _____521B_5EFA_9884_8B66_6247_5F62(boss, config["半径"], config["预警秒"], config["角度"])
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____83F2_5C3C_514B_65AF_5C14_97F3_6548_914D_7F6E["熔岩吐息"]["张口蓄力"],
         _____53D6_5355_4F4DX(boss),
@@ -129,13 +133,24 @@ ____exports["释放菲尼克斯尔熔岩吐息"] = function(context, target, ___
                             if not _____5355_4F4D_5728_6247_5F62_5185(boss, enemy, config["半径"], config["角度"]) then
                                 goto __continue11
                             end
-                            _____9020_6210_706B_7130_4F24_5BB3(
-                                boss,
-                                enemy,
-                                _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(boss, enemy, config["伤害Boss攻击力比例"], config["伤害目标最大生命比例"]) * _____4F24_5BB3_500D_7387,
-                                "AOE",
-                                _____4F24_5BB3_4E0A_4E0B_6587
-                            )
+                            if _____5355_4F4D_5B58_6D3B(enemy) then
+                                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                                    ["技能ID"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["技能ID"],
+                                    ["技能实例ID"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["技能实例ID"],
+                                    ["标签"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["标签"],
+                                    ["来源"] = boss,
+                                    ["目标"] = enemy,
+                                    ["伤害公式"] = {
+                                        ["来源攻击力比例"] = config["伤害Boss攻击力比例"],
+                                        ["目标最大生命比例"] = config["伤害目标最大生命比例"],
+                                        ["总倍率"] = _____53D6_83F2_5C3C_514B_65AF_5C14_6280_80FD_5F3A_5EA6_500D_7387(boss) * _____4F24_5BB3_500D_7387
+                                    },
+                                    ranged = true,
+                                    attackType = ATTACK_TYPE_NORMAL,
+                                    ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                                    weaponType = WEAPON_TYPE_WHOKNOWS
+                                })
+                            end
                             local id = GetHandleId(enemy) or 0
                             local _____7D2F_8BA1_79D2 = (_____547D_4E2D_7D2F_8BA1_79D2[id] or 0) + _____672C_6B21_8986_76D6_79D2
                             while _____7D2F_8BA1_79D2 + 0.0001 >= config["伤害基准Tick秒"] do
@@ -166,8 +181,8 @@ ____exports["释放菲尼克斯尔熔岩吐息"] = function(context, target, ___
                     end
                 end
             )
-            local ____self_1 = context["清理"]
-            ____self_1["登记周期回调"](____self_1, "菲尼克斯尔熔岩吐息Tick", tick)
+            local ____self_7 = context["清理"]
+            ____self_7["登记周期回调"](____self_7, "菲尼克斯尔熔岩吐息Tick", tick)
         end
     )
 end

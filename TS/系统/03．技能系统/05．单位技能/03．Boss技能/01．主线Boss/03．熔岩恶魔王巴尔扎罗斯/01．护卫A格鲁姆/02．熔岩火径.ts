@@ -2,6 +2,7 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 立即设置单位朝向 } from "../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
+import { 执行BossAOE技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 格鲁姆公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
   播放格鲁姆台词,
@@ -11,18 +12,16 @@ const {  巴尔扎罗斯技能数值配置,
   创建技能提示圈,
   创建线段危险区,
   获取Boss技能敌对英雄列表,
-  addPeriodicCallback,
-  removePeriodicCallback,
-  getServerTime,
   CosBJ,
   SinBJ,
   GetUnitX,
   GetUnitY,
   单位有效,
-  取单位ID,
   取方向角,
   计算火径持续伤害,
-  计算火径穿越伤害,
+  ATTACK_TYPE_NORMAL,
+  DAMAGE_TYPE_FIRE,
+  WEAPON_TYPE_WHOKNOWS,
   造成格鲁姆Boss技能伤害,
   播放点特效,
 } = 格鲁姆公共;
@@ -58,46 +57,48 @@ function 取火径参数(this: void, grum: any, target: any): 火径参数 {
   };
 }
 
-function 创建火径穿越检测(this: void, context: 巴尔扎罗斯运行时上下文, grum: any, center: 火径点, lineAngle: number, normalAngle: number): void {
-  const config = 巴尔扎罗斯技能数值配置.熔岩火径;
-  const sideMap: Record<number, number | undefined> = {};
-  const nextAllowed: Record<number, number | undefined> = {};
-  const lineX = CosBJ(lineAngle);
-  const lineY = SinBJ(lineAngle);
-  const normalX = CosBJ(normalAngle);
-  const normalY = SinBJ(normalAngle);
-  const halfLength = config.长度 * 0.5;
-  const endMs = getServerTime() + config.持续秒 * 1000;
-  const tickId = addPeriodicCallback(config.Tick间隔毫秒, function 格鲁姆火径穿越检测(this: void): void {
-    const now = getServerTime();
-    if (now >= endMs || !单位有效(grum)) {
-      removePeriodicCallback(tickId);
-      return;
-    }
-    const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
-    for (let i = 0; i < heroes.length; i++) {
-      const hero = heroes[i];
-      if (!单位有效(hero)) continue;
-      const dx = GetUnitX(hero) - center.x;
-      const dy = GetUnitY(hero) - center.y;
-      const along = dx * lineX + dy * lineY;
-      if (along < -halfLength || along > halfLength) continue;
-      const sideValue = dx * normalX + dy * normalY;
-      const side = sideValue >= 0 ? 1 : -1;
-      const id = 取单位ID(hero);
-      const oldSide = sideMap[id];
-      sideMap[id] = side;
-      if (oldSide == null || oldSide === side) continue;
-      if (now < (nextAllowed[id] ?? 0)) continue;
-      nextAllowed[id] = now + config.穿越防抖秒 * 1000;
-      造成格鲁姆Boss技能伤害(grum, hero, 计算火径穿越伤害(grum, hero), "AOE");
-      施加巴尔扎罗斯灼热(hero, config.灼热层数);
-    }
-  });
-  context.清理.登记周期回调("格鲁姆-熔岩火径穿越检测", tickId);
+interface 格鲁姆火径变量 {
+  context: 巴尔扎罗斯运行时上下文;
+  grum: any;
 }
 
-function 创建火径(this: void, context: 巴尔扎罗斯运行时上下文, center: 火径点, lineAngle: number, normalAngle: number): void {
+function 获取格鲁姆火径目标(this: void, variable?: any): any[] {
+  const state = variable as 格鲁姆火径变量 | undefined;
+  if (state == null || !单位有效(state.grum)) return [];
+  return 获取Boss技能敌对英雄列表(state.context.Boss单位);
+}
+
+function on格鲁姆火径周期(this: void, unit: any, variable?: any): void {
+  const state = variable as 格鲁姆火径变量 | undefined;
+  if (state == null || !单位有效(state.grum) || !单位有效(unit)) return;
+  const config = 巴尔扎罗斯技能数值配置.熔岩火径;
+  造成格鲁姆Boss技能伤害(state.grum, unit, 计算火径持续伤害(state.grum), "AOE");
+  施加巴尔扎罗斯灼热(unit, config.灼热层数);
+}
+
+function on格鲁姆火径穿越(this: void, unit: any, variable?: any): void {
+  const state = variable as 格鲁姆火径变量 | undefined;
+  if (state == null || !单位有效(state.grum) || !单位有效(unit)) return;
+  const config = 巴尔扎罗斯技能数值配置.熔岩火径;
+  执行BossAOE技能伤害({
+    来源: state.grum,
+    目标: unit,
+    伤害公式: {
+      来源攻击力比例: config.穿越伤害攻击力比例,
+      目标最大生命比例: config.穿越伤害目标最大生命比例,
+      总倍率: config.伤害总倍率,
+    },
+    attack: false,
+    ranged: true,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_FIRE,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    标签: "格鲁姆-熔岩火径-穿越",
+  });
+  施加巴尔扎罗斯灼热(unit, config.灼热层数);
+}
+
+function 创建火径(this: void, context: 巴尔扎罗斯运行时上下文, center: 火径点, lineAngle: number): void {
   const grum = context.格鲁姆;
   if (!单位有效(grum)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩火径;
@@ -115,17 +116,13 @@ function 创建火径(this: void, context: 巴尔扎罗斯运行时上下文, ce
     持续秒: config.持续秒,
     Tick间隔毫秒: config.Tick间隔毫秒,
     周期秒: config.周期秒,
-    单位列表: function 取火径目标(this: void): any[] {
-      return 获取Boss技能敌对英雄列表(context.Boss单位);
-    },
+    变量: { context, grum } as 格鲁姆火径变量,
+    单位列表: 获取格鲁姆火径目标,
+    穿越防抖秒: config.穿越防抖秒,
     提示圈: { 类型: "方向直线", 来源单位: grum },
-    on周期: function 格鲁姆火径周期(this: void, unit: any): void {
-      if (!单位有效(grum) || !单位有效(unit)) return;
-      造成格鲁姆Boss技能伤害(grum, unit, 计算火径持续伤害(grum), "AOE");
-      施加巴尔扎罗斯灼热(unit, config.灼热层数);
-    },
+    on周期: on格鲁姆火径周期,
+    on穿越: on格鲁姆火径穿越,
   });
-  创建火径穿越检测(context, grum, center, lineAngle, normalAngle);
 }
 
 export function 释放格鲁姆火径(this: void, context: 巴尔扎罗斯运行时上下文, target: any): void {
@@ -161,7 +158,7 @@ export function 释放格鲁姆火径(this: void, context: 巴尔扎罗斯运行
       播放格鲁姆台词(grum, "熔岩火径");
     },
     on生效: function 格鲁姆火径生效(this: void): void {
-      创建火径(context, fire.center, fire.lineAngle, fire.normalAngle);
+      创建火径(context, fire.center, fire.lineAngle);
     },
   });
 }

@@ -4,28 +4,26 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
 local _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF = _____6247_5F62_533A_57DF["单位是否在扇形区域"]
 local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
 local _____5F00_59CB_51FB_9000 = _____51FB_9000_7CFB_7EDF["开始击退"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
-local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技能伤害"]
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_6.getServerTime
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____8BBE_7F6E_7279_6548_989C_8272 = ____require_result_7["设置特效颜色"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_4.getServerTime
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____8BBE_7F6E_7279_6548_989C_8272 = ____require_result_5["设置特效颜色"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
@@ -62,8 +60,8 @@ local function _____64AD_653E_9ED1_7FFC_6A2A_626B_8868_73B0(albedo, facing, ____
     _____8BBE_7F6E_9ED1_7FFC_6A2A_626B_7279_6548_8868_73B0(impact, facing, visual["雅儿贝德重击特效缩放"], visual["雅儿贝德重击特效持续秒"])
 end
 local function _____7ED3_7B97_9ED1_7FFC_6A2A_626B(context, facing)
-    local ____opt_8 = context["雅儿贝德"]
-    local albedo = ____opt_8 and ____opt_8["单位"]
+    local ____opt_6 = context["雅儿贝德"]
+    local albedo = ____opt_6 and ____opt_6["单位"]
     if not _____5355_4F4D_6709_6548(albedo) or context["挑战已结束"] then
         return
     end
@@ -90,16 +88,15 @@ local function _____7ED3_7B97_9ED1_7FFC_6A2A_626B(context, facing)
                 ) then
                     goto __continue8
                 end
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["来源"] = albedo,
                     ["目标"] = target,
-                    ["伤害"] = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(albedo, target, {["来源攻击力比例"] = cfg["黑翼横扫伤害攻击力比例"], ["目标最大生命比例"] = cfg["黑翼横扫伤害目标最大生命比例"]}),
+                    ["伤害公式"] = {["来源攻击力比例"] = cfg["黑翼横扫伤害攻击力比例"], ["目标最大生命比例"] = cfg["黑翼横扫伤害目标最大生命比例"]},
                     attack = false,
                     ranged = false,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_NORMAL,
                     weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                    ["来源类型"] = "Boss技能",
                     ["标签"] = "雅儿贝德·黑翼横扫"
                 })
                 _____5F00_59CB_51FB_9000(target, {
@@ -130,8 +127,8 @@ ____exports["释放雅儿贝德黑翼横扫"] = function(context, target)
         GetUnitY(target) - GetUnitY(albedo),
         GetUnitX(target) - GetUnitX(albedo)
     ) * RAD_TO_DEG
-    local ____opt_12 = state["独占状态"]
-    local token = ____opt_12 and ____opt_12["开始"](____opt_12, {key = "雅儿贝德-黑翼横扫", ["优先级"] = 30, ["持续毫秒"] = (cfg["黑翼横扫预警秒"] + 1) * 1000, ["可被抢占"] = false}) or 0
+    local ____opt_10 = state["独占状态"]
+    local token = ____opt_10 and ____opt_10["开始"](____opt_10, {key = "雅儿贝德-黑翼横扫", ["优先级"] = 30, ["持续毫秒"] = (cfg["黑翼横扫预警秒"] + 1) * 1000, ["可被抢占"] = false}) or 0
     if token == 0 then
         return false
     end

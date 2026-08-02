@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 配置型攻击效果配置, 配置型攻击效果上下文, 配置型攻击效果伤害类型 } from "./00．类型定义";
+import type { 自适应共享周期驱动 } from "../../../04．机制组件/10．复杂战斗通用机制/17．周期机制调度器";
 import { 计算配置型攻击效果伤害 } from "./02．伤害计算";
 import {
   配置型攻击效果造成伤害,
@@ -13,9 +14,11 @@ const { 计算持续伤害最终值 } = require("系统.04．伤害系统.07．�
 };
 
 const jass = require("jass.common") as any;
-const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
+};
+const { 创建自适应共享周期驱动 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器") as {
+  创建自适应共享周期驱动: (this: void, 参数: any) => 自适应共享周期驱动;
 };
 
 const R2I = jass.R2I as (r: number) => number;
@@ -32,16 +35,30 @@ interface 配置型持续伤害记录 {
 }
 
 const 配置型持续伤害列表: 配置型持续伤害记录[] = [];
-let 配置型持续伤害Tick已注册 = false;
+let 配置型持续伤害驱动: 自适应共享周期驱动 | undefined;
 
 function 注册配置型持续伤害Tick(this: void): void {
-  if (配置型持续伤害Tick已注册) return;
-  配置型持续伤害Tick已注册 = true;
-  addPeriodicCallback(100, on配置型持续伤害Tick);
+  if (配置型持续伤害驱动 == null) {
+    配置型持续伤害驱动 = 创建自适应共享周期驱动({
+      名称: "配置型攻击持续伤害驱动",
+      最大检查间隔毫秒: 100,
+      取建议检查间隔毫秒: 取配置型持续伤害建议检查间隔,
+      onTick: on配置型持续伤害Tick,
+    });
+  }
+  配置型持续伤害驱动.刷新();
 }
 
-function on配置型持续伤害Tick(this: void): void {
-  const now = getServerTime();
+function 取配置型持续伤害建议检查间隔(this: void, _nowMs: number): number {
+  let 最短间隔 = 0;
+  for (let i = 0; i < 配置型持续伤害列表.length; i++) {
+    const 间隔 = 配置型持续伤害列表[i].intervalMs;
+    if (间隔 > 0 && (最短间隔 === 0 || 间隔 < 最短间隔)) 最短间隔 = 间隔;
+  }
+  return 最短间隔;
+}
+
+function on配置型持续伤害Tick(this: void, now: number): void {
   let write = 0;
   for (let i = 0; i < 配置型持续伤害列表.length; i++) {
     const record = 配置型持续伤害列表[i];

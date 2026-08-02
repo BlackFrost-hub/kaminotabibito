@@ -1,9 +1,5 @@
 /** @noSelfInFile */
 
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
-
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取或创建巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
@@ -12,6 +8,7 @@ import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -42,9 +39,6 @@ const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") 
   SinBJ: (this: void, degrees: number) => number;
 };
 
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
 const { 获取Boss护卫列表, 是否指定Boss护卫 } = require("系统.01．单位系统.10．护卫系统.index") as {
   获取Boss护卫列表: (this: void, boss: any, 只返回存活?: boolean) => any[];
   是否指定Boss护卫: (this: void, unit: any, boss: any) => boolean;
@@ -103,15 +97,6 @@ function 收集咆哮波候选单位(this: void, context: 巴尔扎罗斯运行�
 function 治疗单位(this: void, source: any, unit: any, amount: number): void {
   if (!单位有效(unit) || amount <= 0) return;
   doHeal({ HealSource: source, HealTarget: unit, HealAmount: amount, ItemHeal: false, HealEffect: false });
-}
-
-function 计算咆哮波伤害(this: void, boss: any, target: any, 伤害倍率: number): number {
-  const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: config.伤害Boss攻击力比例,
-    目标最大生命比例: config.伤害目标最大生命比例,
-    总倍率: config.伤害总倍率 * 伤害倍率,
-  });
 }
 
 function 记录咆哮波玩家命中(this: void, context: 巴尔扎罗斯运行时上下文, target: any): void {
@@ -202,17 +187,20 @@ function 执行咆哮波命中(this: void, context: 巴尔扎罗斯运行时上�
     治疗单位(boss, unit, GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.恶魔咆哮波.护卫命中治疗最大生命比例);
     return;
   }
-  造成AOE技能伤害({
+  执行BossAOE技能伤害({
     技能ID: 恶魔咆哮波技能ID,
     来源: boss,
     目标: unit,
-    伤害: 计算咆哮波伤害(boss, unit, 伤害倍率),
+    伤害公式: {
+      来源攻击力比例: 巴尔扎罗斯技能数值配置.恶魔咆哮波.伤害Boss攻击力比例,
+      目标最大生命比例: 巴尔扎罗斯技能数值配置.恶魔咆哮波.伤害目标最大生命比例,
+      总倍率: 巴尔扎罗斯技能数值配置.恶魔咆哮波.伤害总倍率 * 伤害倍率,
+    },
     attack: false,
     ranged: true,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_FIRE,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
   });
   记录咆哮波玩家命中(context, unit);
 }

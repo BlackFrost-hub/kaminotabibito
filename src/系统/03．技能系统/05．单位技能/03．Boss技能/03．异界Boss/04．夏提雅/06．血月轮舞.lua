@@ -10,8 +10,8 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
 local _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF = _____6247_5F62_533A_57DF["单位是否在扇形区域"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
@@ -28,14 +28,12 @@ local ____require_result_0 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
-local ____require_result_5 = require("平台扩展API动作")
-local _____8BBE_7279_6548_64AD_653E_52A8_753B_2 = ____require_result_5["设特效播放动画_2"]
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("平台扩展API动作")
+local _____8BBE_7279_6548_64AD_653E_52A8_753B_2 = ____require_result_4["设特效播放动画_2"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetHandleId = jass.GetHandleId
@@ -55,17 +53,15 @@ local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local DEG_TO_RAD = 0.017453292519943295
 local RAD_TO_DEG = 57.29577951308232
 local function _____9020_6210_8F6E_821E_4F24_5BB3(source, target, attackRatio, lifeRatio, tag)
-    local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(source, target, {["来源攻击力比例"] = attackRatio, ["目标最大生命比例"] = lifeRatio})
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
         ["来源"] = source,
         ["目标"] = target,
-        ["伤害"] = damage,
+        ["伤害公式"] = {["来源攻击力比例"] = attackRatio, ["目标最大生命比例"] = lifeRatio},
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_NORMAL,
         weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-        ["来源类型"] = "Boss技能",
         ["标签"] = tag
     })
 end
@@ -244,9 +240,9 @@ ____exports["释放夏提雅血月轮舞"] = function(context, target)
     if context["血月轮舞组合执行器"] == nil then
         context["血月轮舞组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "夏提雅-血月轮舞", ["清理"] = context["清理"], ["互斥组"] = "夏提雅普通技能"})
     end
-    local ____self_6 = context["血月轮舞组合执行器"]
-    local _____6267_884CID = ____self_6["开始"](
-        ____self_6,
+    local ____self_5 = context["血月轮舞组合执行器"]
+    local _____6267_884CID = ____self_5["开始"](
+        ____self_5,
         {
             key = "血月轮舞",
             ["单位"] = boss,

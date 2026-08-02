@@ -1,10 +1,11 @@
 /** @noSelfInFile */
 
 import { getServerTime } from "../../../../00．核心系统/05．中心计时器";
-import { Boss战单位字段, Boss战表名 } from "../00．常量定义";
+import { Boss战绑定单位字段, Boss战单位字段, Boss战表名 } from "../00．常量定义";
 import {
   Boss战可见度玩家槽位数,
   Boss战地点字段,
+  Boss战地点动态字段,
   Boss战开始提示文本,
   Boss战箭头特效字段,
   Boss战战斗音乐字段,
@@ -333,6 +334,10 @@ export function 读取Boss战矩形(this: void): any {
   return YDUserDataGetSafe("string", Boss战表名, Boss战地点字段, "rect");
 }
 
+export function 读取Boss战地点是否动态(this: void): boolean {
+  return YDUserDataGetSafe("string", Boss战表名, Boss战地点动态字段, "boolean") === true;
+}
+
 export function 读取Boss战音频(this: void, 字段名: string): any {
   return YDUserDataGetSafe("string", Boss战表名, 字段名, "sound");
 }
@@ -468,13 +473,20 @@ export function 纠偏玩家英雄位置(this: void, rectHandle: any): void {
   ForGroup(玩家英雄组, on玩家英雄纠偏单位);
 }
 
-export function 清理Boss战单位字段(this: void, bossUnit: any): void {
-  const 当前Boss战单位 = YDUserDataGetSafe("string", Boss战表名, Boss战单位字段, "unit");
-  if (当前Boss战单位 == null || 当前Boss战单位 === 0) return;
-  if (获取句柄ID(当前Boss战单位) !== 获取句柄ID(bossUnit)) return;
+function 清理Boss战全局单位字段(this: void, 字段名: string, bossHandleId: number): void {
+  const 当前单位 = YDUserDataGetSafe("string", Boss战表名, 字段名, "unit");
+  if (当前单位 == null || 当前单位 === 0) return;
+  if (获取句柄ID(当前单位) !== bossHandleId) return;
+  YDUserDataSetSafe("string", Boss战表名, 字段名, "unit", null);
+  YDUserDataClearSafe("string", Boss战表名, 字段名, "unit");
+}
 
-  YDUserDataSetSafe("string", Boss战表名, Boss战单位字段, "unit", null);
-  YDUserDataClearSafe("string", Boss战表名, Boss战单位字段, "unit");
+export function 清理Boss战单位字段(this: void, bossUnit: any): void {
+  const bossHandleId = 获取句柄ID(bossUnit);
+  if (bossHandleId === 0) return;
+
+  清理Boss战全局单位字段(Boss战单位字段, bossHandleId);
+  清理Boss战全局单位字段(Boss战绑定单位字段, bossHandleId);
 }
 
 export function 清理Boss箭头特效(this: void, bossUnit: any): void {

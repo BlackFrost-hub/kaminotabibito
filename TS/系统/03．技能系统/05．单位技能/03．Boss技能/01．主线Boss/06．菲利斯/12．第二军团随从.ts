@@ -4,15 +4,13 @@ import { 菲利斯单位技能配置 } from "./00．配置";
 import { 菲利斯数值与表现配置 } from "./02．数值与表现配置";
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 const jglobals = require("jass.globals") as { udg_Boss?: any };
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
 };
-const { getServerTime, addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -24,12 +22,9 @@ const { 获取Boss技能最近敌对英雄, 获取Boss技能敌对目标列表 }
   获取Boss技能最近敌对英雄: (this: void, boss: any) => any;
   获取Boss技能敌对目标列表: (this: void, boss: any) => any[];
 };
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 创建周期行为 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
+import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, unit: any, buffID: string, duration: number, effect: number, extras?: any) => void;
   getBuffRuntime: (this: void, unit: any, buffID: string) => any;
@@ -57,9 +52,6 @@ const { 开始充能, 停止充能 } = require("系统.03．技能系统.00．�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   广播单位提示: (this: void, sourceUnit: any, text: string, durationMs?: number) => void;
 };
@@ -71,11 +63,9 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitAnimation = jass.SetUnitAnimation as (unit: any, animationName: string) => void;
-const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -206,10 +196,7 @@ function 刷新护主盾阵(this: void, state: 菲利斯第二军团状态): voi
 }
 
 function 菲利斯护主盾阵伤害修正(this: void, context: any): number {
-  if (context == null || 当前状态 == null || context.target !== 当前状态.Boss单位) {
-    return context != null ? context.currentDamage : 0;
-  }
-  if (context.isDamageTransfer === true) return context.currentDamage;
+  if (context == null) return 0;
   const currentDamage = Number(context.currentDamage);
   if (!(currentDamage > 0)) return currentDamage;
   const runtime = getBuffRuntime(context.target, 菲利斯BuffID.护主盾阵);
@@ -217,6 +204,13 @@ function 菲利斯护主盾阵伤害修正(this: void, context: any): number {
   const ratio = Number(runtime.effect) || 0;
   if (!(ratio > 0)) return currentDamage;
   return currentDamage * (ratio < 1 ? 1 - ratio : 0);
+}
+
+function 满足菲利斯护主盾阵伤害条件(this: void, context: any): boolean {
+  if (context == null || 当前状态 == null || context.target !== 当前状态.Boss单位) return false;
+  if (context.isDamageTransfer === true) return false;
+  const runtime = getBuffRuntime(context.target, 菲利斯BuffID.护主盾阵);
+  return runtime != null && Number(runtime.effect) > 0;
 }
 
 function 获取有效术士(this: void, boss: any): any {
@@ -306,29 +300,26 @@ function 结算腐蚀法阵(this: void, state: 菲利斯第二军团状态, reco
 
   const targets = 获取Boss技能敌对目标列表(boss);
   const radius2 = cfg.爆炸半径 * cfg.爆炸半径;
-  const attack = 读取单位攻击力(warlock) * cfg.术士攻击力比例;
   for (let i = 0; i < targets.length; i++) {
     const target = targets[i];
     if (!单位存活(target)) continue;
     const dx = GetUnitX(target) - record.目标X;
     const dy = GetUnitY(target) - record.目标Y;
     if (dx * dx + dy * dy > radius2) continue;
-    const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
-    const damage = attack + (maxLife > 0 ? maxLife * cfg.目标最大生命比例 : 0);
-    if (damage > 0) {
-      造成AOE技能伤害({
-        来源: warlock,
-        目标: target,
-        伤害: damage,
-        attack: false,
-        ranged: true,
-        attackType: ATTACK_TYPE_NORMAL,
-        伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
-        weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
-        标签: "菲利斯-腐蚀法阵",
-      });
-    }
+    执行BossAOE技能伤害({
+      来源: warlock,
+      目标: target,
+      伤害公式: {
+        来源攻击力比例: cfg.术士攻击力比例,
+        目标最大生命比例: cfg.目标最大生命比例,
+      },
+      attack: false,
+      ranged: true,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      标签: "菲利斯-腐蚀法阵",
+    });
     if (!单位存活(target)) continue;
     施加快速减速Buff(warlock, target, cfg.减速比例, cfg.减速比例, cfg.减速持续秒, "菲利斯-腐蚀法阵", "技能");
     registerManualBuff(target, 菲利斯BuffID.腐蚀迟滞, cfg.减速持续秒, cfg.减速比例, {
@@ -389,7 +380,16 @@ function on菲利斯第二军团单位死亡(this: void, dyingUnit: any, _killin
 export function 注册菲利斯第二军团随从效果(this: void): void {
   if (已注册) return;
   已注册 = true;
-  registerDamageModifier(菲利斯护主盾阵伤害修正, 50);
+  创建条件伤害修正({
+    名称: "菲利斯护主盾阵承伤修正",
+    优先级: 50,
+    条件: 满足菲利斯护主盾阵伤害条件,
+    修正: 菲利斯护主盾阵伤害修正,
+  });
   registerDeathListener(on菲利斯第二军团单位死亡);
-  addPeriodicCallback(菲利斯数值与表现配置.第二军团护卫.检查间隔毫秒, 菲利斯第二军团Tick);
+  创建周期行为({
+    名称: "菲利斯-第二军团随从驱动",
+    间隔毫秒: 菲利斯数值与表现配置.第二军团护卫.检查间隔毫秒,
+    onTick: 菲利斯第二军团Tick,
+  });
 }

@@ -6,11 +6,13 @@ local _____83B7_53D6_53E5_67C4ID, _____5F53_524D_547D_4EE4_5141_8BB8_515C_5E95_4
 local ____05_FF0E_4E2D_5FC3_8BA1_65F6_5668 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____05_FF0E_4E2D_5FC3_8BA1_65F6_5668.getServerTime
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．常量定义")
+local ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5 = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战绑定单位字段"]
 local ____Boss_6218_5355_4F4D_5B57_6BB5 = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战单位字段"]
 local ____Boss_6218_8868_540D = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战表名"]
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.00．常量定义")
 local ____Boss_6218_53EF_89C1_5EA6_73A9_5BB6_69FD_4F4D_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战可见度玩家槽位数"]
 local ____Boss_6218_5730_70B9_5B57_6BB5 = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战地点字段"]
+local ____Boss_6218_5730_70B9_52A8_6001_5B57_6BB5 = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战地点动态字段"]
 local ____Boss_6218_5F00_59CB_63D0_793A_6587_672C = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战开始提示文本"]
 local ____Boss_6218_7BAD_5934_7279_6548_5B57_6BB5 = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战箭头特效字段"]
 local ____Boss_6218_8F6C_573A_540E_63D0_793A_6587_672C = ____00_FF0E_5E38_91CF_5B9A_4E49["Boss战转场后提示文本"]
@@ -363,6 +365,9 @@ end
 ____exports["读取Boss战矩形"] = function()
     return YDUserDataGetSafe("string", ____Boss_6218_8868_540D, ____Boss_6218_5730_70B9_5B57_6BB5, "rect")
 end
+____exports["读取Boss战地点是否动态"] = function()
+    return YDUserDataGetSafe("string", ____Boss_6218_8868_540D, ____Boss_6218_5730_70B9_52A8_6001_5B57_6BB5, "boolean") == true
+end
 ____exports["读取Boss战音频"] = function(_____5B57_6BB5_540D)
     return YDUserDataGetSafe("string", ____Boss_6218_8868_540D, _____5B57_6BB5_540D, "sound")
 end
@@ -387,13 +392,13 @@ ____exports["确保Boss战区域视野"] = function(rectHandle)
             do
                 local whichPlayer = Player(playerId)
                 if whichPlayer == nil or whichPlayer == 0 then
-                    goto __continue56
+                    goto __continue57
                 end
                 if _____73A9_5BB6_7EC4 ~= nil and _____73A9_5BB6_7EC4 ~= 0 and not IsPlayerInForce(whichPlayer, _____73A9_5BB6_7EC4) then
-                    goto __continue56
+                    goto __continue57
                 end
                 if _____8BFB_53D6_77E9_5F62_73A9_5BB6_53EF_89C1_5EA6_4FEE_6574_5668(rectHandleId, playerId) ~= nil then
-                    goto __continue56
+                    goto __continue57
                 end
                 local fogModifier = CreateFogModifierRect(
                     whichPlayer,
@@ -403,12 +408,12 @@ ____exports["确保Boss战区域视野"] = function(rectHandle)
                     false
                 )
                 if fogModifier == nil or fogModifier == 0 then
-                    goto __continue56
+                    goto __continue57
                 end
                 FogModifierStart(fogModifier)
                 _____8BB0_5F55_77E9_5F62_73A9_5BB6_53EF_89C1_5EA6_4FEE_6574_5668(rectHandleId, playerId, fogModifier)
             end
-            ::__continue56::
+            ::__continue57::
             playerId = playerId + 1
         end
     end
@@ -542,22 +547,30 @@ ____exports["纠偏玩家英雄位置"] = function(rectHandle)
     _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3Y = GetRectCenterY(rectHandle)
     ForGroup(_____73A9_5BB6_82F1_96C4_7EC4, ____on_73A9_5BB6_82F1_96C4_7EA0_504F_5355_4F4D)
 end
-____exports["清理Boss战单位字段"] = function(bossUnit)
-    local _____5F53_524DBoss_6218_5355_4F4D = YDUserDataGetSafe("string", ____Boss_6218_8868_540D, ____Boss_6218_5355_4F4D_5B57_6BB5, "unit")
-    if _____5F53_524DBoss_6218_5355_4F4D == nil or _____5F53_524DBoss_6218_5355_4F4D == 0 then
+local function _____6E05_7406Boss_6218_5168_5C40_5355_4F4D_5B57_6BB5(_____5B57_6BB5_540D, bossHandleId)
+    local _____5F53_524D_5355_4F4D = YDUserDataGetSafe("string", ____Boss_6218_8868_540D, _____5B57_6BB5_540D, "unit")
+    if _____5F53_524D_5355_4F4D == nil or _____5F53_524D_5355_4F4D == 0 then
         return
     end
-    if _____83B7_53D6_53E5_67C4ID(_____5F53_524DBoss_6218_5355_4F4D) ~= _____83B7_53D6_53E5_67C4ID(bossUnit) then
+    if _____83B7_53D6_53E5_67C4ID(_____5F53_524D_5355_4F4D) ~= bossHandleId then
         return
     end
     YDUserDataSetSafe(
         "string",
         ____Boss_6218_8868_540D,
-        ____Boss_6218_5355_4F4D_5B57_6BB5,
+        _____5B57_6BB5_540D,
         "unit",
         nil
     )
-    YDUserDataClearSafe("string", ____Boss_6218_8868_540D, ____Boss_6218_5355_4F4D_5B57_6BB5, "unit")
+    YDUserDataClearSafe("string", ____Boss_6218_8868_540D, _____5B57_6BB5_540D, "unit")
+end
+____exports["清理Boss战单位字段"] = function(bossUnit)
+    local bossHandleId = _____83B7_53D6_53E5_67C4ID(bossUnit)
+    if bossHandleId == 0 then
+        return
+    end
+    _____6E05_7406Boss_6218_5168_5C40_5355_4F4D_5B57_6BB5(____Boss_6218_5355_4F4D_5B57_6BB5, bossHandleId)
+    _____6E05_7406Boss_6218_5168_5C40_5355_4F4D_5B57_6BB5(____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5, bossHandleId)
 end
 ____exports["清理Boss箭头特效"] = function(bossUnit)
     local arrowEffect = YDUserDataGetSafe("unit", bossUnit, ____Boss_6218_7BAD_5934_7279_6548_5B57_6BB5, "effect")
@@ -576,7 +589,7 @@ ____exports["处理待清理Boss单位YD数据"] = function(nowMs)
             do
                 local task = _____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868[i + 1]
                 if nowMs < task["截止时间"] then
-                    goto __continue90
+                    goto __continue93
                 end
                 local currentContext = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(task.bossUnit)
                 if currentContext == nil or currentContext["运行代次"] == task["运行代次"] then
@@ -592,7 +605,7 @@ ____exports["处理待清理Boss单位YD数据"] = function(nowMs)
                 end
                 __TS__ArraySplice(_____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868, i, 1)
             end
-            ::__continue90::
+            ::__continue93::
             i = i - 1
         end
     end

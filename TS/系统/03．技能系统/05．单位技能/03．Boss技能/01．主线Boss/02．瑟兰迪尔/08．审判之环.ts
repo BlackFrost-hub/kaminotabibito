@@ -4,7 +4,7 @@ import { 单位存活 as 单位有效 } from "../../../../00．技能模板+函�
 import type { 瑟兰迪尔运行时上下文 } from "./03．运行时上下文";
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
-import { 计算组合技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害";
+import { 执行BossAOE技能伤害, 提交预计算BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -33,8 +33,7 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
 };
 
-const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 const jass = require("jass.common") as any;
@@ -58,7 +57,7 @@ function 播放点特效(this: void, model: string, x: number, y: number, durati
 
 function 造成伤害(this: void, boss: any, target: any, amount: number, damageType: any, 技能实例ID?: number): void {
   if (!单位有效(boss) || !单位有效(target) || amount <= 0) return;
-  造成AOE技能伤害({
+  提交预计算BossAOE技能伤害({
     来源: boss,
     目标: target,
     伤害: amount,
@@ -67,18 +66,24 @@ function 造成伤害(this: void, boss: any, target: any, amount: number, damage
     attackType: jass.ATTACK_TYPE_NORMAL,
     伤害类型: damageType,
     weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
     技能实例ID,
     标签: "瑟兰迪尔审判之环",
   });
 }
 
-function 按攻击和最大生命计算伤害(this: void, boss: any, target: any, 攻击力比例: number, 最大生命比例: number): number {
-  const config = 瑟兰迪尔数值与表现配置.审判之环;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: 攻击力比例,
-    目标最大生命比例: 最大生命比例,
-    总倍率: config.伤害总倍率,
+function 执行审判之环公式伤害(this: void, boss: any, target: any, 伤害类型: any, 伤害公式: any, 技能实例ID?: number): void {
+  if (!单位有效(boss) || !单位有效(target)) return;
+  执行BossAOE技能伤害({
+    来源: boss,
+    目标: target,
+    伤害公式,
+    attack: false,
+    ranged: false,
+    attackType: jass.ATTACK_TYPE_NORMAL,
+    伤害类型,
+    weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+    技能实例ID,
+    标签: "瑟兰迪尔审判之环",
   });
 }
 
@@ -185,15 +190,27 @@ function 结算瑟兰迪尔审判之环象限(this: void, boss: any, color: numb
     const y = GetUnitY(target);
     if (color === 1) {
       播放点特效(config.红特效, x, y, 1);
-      造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.红伤害Boss攻击力比例, config.红伤害目标最大生命比例), jass.DAMAGE_TYPE_FIRE, 技能实例ID);
+      执行审判之环公式伤害(boss, target, jass.DAMAGE_TYPE_FIRE, {
+        来源攻击力比例: config.红伤害Boss攻击力比例,
+        目标最大生命比例: config.红伤害目标最大生命比例,
+        总倍率: config.伤害总倍率,
+      }, 技能实例ID);
     } else if (color === 3) {
       播放点特效(config.绿特效, x, y, 1);
       const life = GetUnitState(target, UNIT_STATE_LIFE);
       const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
       if (maxLife > 0 && life / maxLife > 0.75) {
-        造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿高血伤害Boss攻击力比例, config.绿高血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING, 技能实例ID);
+        执行审判之环公式伤害(boss, target, jass.DAMAGE_TYPE_LIGHTNING, {
+          来源攻击力比例: config.绿高血伤害Boss攻击力比例,
+          目标最大生命比例: config.绿高血伤害目标最大生命比例,
+          总倍率: config.伤害总倍率,
+        }, 技能实例ID);
       } else {
-        造成伤害(boss, target, 按攻击和最大生命计算伤害(boss, target, config.绿低血伤害Boss攻击力比例, config.绿低血伤害目标最大生命比例), jass.DAMAGE_TYPE_LIGHTNING, 技能实例ID);
+        执行审判之环公式伤害(boss, target, jass.DAMAGE_TYPE_LIGHTNING, {
+          来源攻击力比例: config.绿低血伤害Boss攻击力比例,
+          目标最大生命比例: config.绿低血伤害目标最大生命比例,
+          总倍率: config.伤害总倍率,
+        }, 技能实例ID);
       }
     } else {
       播放点特效(config.金特效, x, y, 1);

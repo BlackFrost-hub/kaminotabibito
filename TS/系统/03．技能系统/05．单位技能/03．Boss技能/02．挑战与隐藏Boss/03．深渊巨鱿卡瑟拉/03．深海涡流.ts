@@ -4,12 +4,10 @@ import { 卡瑟拉单位技能配置 } from "./00．配置";
 import { 获取或创建卡瑟拉上下文, type 卡瑟拉运行时上下文 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, stringToFourCC, 距离XY, 限制数值, 播放卡瑟拉限时动作 } from "./14．公共工具";
+import { 单位有效, stringToFourCC, 距离XY, 限制数值 } from "./14．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -20,8 +18,8 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -64,17 +62,17 @@ function 结算深海涡流爆发(this: void, context: 卡瑟拉运行时上下�
     if (dist > cfg.最大半径) continue;
     const t = 限制数值(dist / cfg.最大半径, 0, 1);
     const coeff = cfg.最近伤害系数 - (cfg.最近伤害系数 - cfg.最远伤害系数) * t;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       技能ID: 深海涡流技能ID,
       来源: boss,
       目标: hero,
-      伤害: cfg.基础水伤害 * coeff,
+      伤害公式: { 固定值: cfg.基础水伤害 * coeff },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_COLD,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
+      标签: "卡瑟拉深海涡流",
     });
     施加眩晕(boss, hero, cfg.眩晕秒);
   }
@@ -84,11 +82,9 @@ export function 释放卡瑟拉深海涡流(this: void, context: 卡瑟拉运行
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 卡瑟拉数值与表现配置.深海涡流;
-  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.爆发延迟秒);
   const x = GetUnitX(boss);
   const y = GetUnitY(boss);
   const heroes = 获取Boss技能敌对英雄列表(boss);
-  播放卡瑟拉台词(boss, "深海涡流");
   播放Boss坐标音效(卡瑟拉音效配置.深海涡流.形成牵引, x, y, 卡瑟拉音效配置.默认裁断距离);
   播放限时涡流特效(context, x, y);
   创建技能提示圈({
@@ -111,10 +107,28 @@ export function 释放卡瑟拉深海涡流(this: void, context: 卡瑟拉运行
     抵抗后拉力倍率: cfg.抵抗后拉力倍率,
     清理篮子: context.清理,
   });
-  const id = addDelayedCallback(cfg.爆发延迟秒 * 1000, function 卡瑟拉深海涡流爆发(this: void): void {
-    结算深海涡流爆发(context, x, y);
+  启动基础施法时间线({
+    名称: "卡瑟拉-深海涡流",
+    施法者: boss,
+    硬直秒: cfg.爆发延迟秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    恢复动画编号: 5,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.爆发延迟秒,
+      颜色ID: cfg.吟唱条颜色ID,
+      标题文本: cfg.吟唱条标题文本,
+      提示文本: cfg.吟唱条提示文本,
+    },
+    清理: context.清理,
+    播放台词: function 卡瑟拉深海涡流台词(this: void): void {
+      播放卡瑟拉台词(boss, "深海涡流");
+    },
+    on生效: function 卡瑟拉深海涡流生效(this: void): void {
+      结算深海涡流爆发(context, x, y);
+    },
   });
-  context.清理.登记延迟回调("卡瑟拉-深海涡流爆发", id);
 }
 
 function on卡瑟拉深海涡流施法(this: void, castingUnit: any, spellAbilityId: number): void {

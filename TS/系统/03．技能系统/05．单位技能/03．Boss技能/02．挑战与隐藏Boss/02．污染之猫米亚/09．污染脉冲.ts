@@ -11,6 +11,7 @@ import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放"
 import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
 import { 创建原生弹幕 } from "../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕/03．对外接口";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
@@ -24,14 +25,12 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
-const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
@@ -39,7 +38,6 @@ const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
 const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, angle: number) => void) | undefined;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 const 污染脉冲弹幕飞行秒 = 0.5;
@@ -102,16 +100,16 @@ function 米亚污染脉冲弹幕命中(this: void, target: any, 弹幕ID: numbe
   if (单位在有效安全域内(context, target)) return;
 
   const config = 米亚技能数值配置.污染脉冲;
-  const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
-  const damage = maxLife * config.每波最大生命伤害比例 * 取米亚平台超载伤害倍率(target);
-  造成AOE技能伤害({
+  执行BossAOE技能伤害({
     来源: boss,
     目标: target,
-    伤害: damage,
+    伤害公式: {
+      目标最大生命比例: config.每波最大生命伤害比例,
+      总倍率: 取米亚平台超载伤害倍率(target),
+    },
     attackType: jass.ATTACK_TYPE_NORMAL,
     伤害类型: jass.DAMAGE_TYPE_POISON,
     weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
     技能实例ID: 弹幕上下文.技能实例ID,
     标签: "米亚污染脉冲",
   });

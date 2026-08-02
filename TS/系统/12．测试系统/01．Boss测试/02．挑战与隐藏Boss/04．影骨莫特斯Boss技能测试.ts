@@ -46,9 +46,10 @@ const { 释放影骨暗影禁锢 } = require("系统.03．技能系统.05．单�
 const { 释放影骨阴影穿梭 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.03．阴影穿梭") as {
   释放影骨阴影穿梭: (this: void, context: any) => void;
 };
-const { 释放影骨骸骨召唤, 创建影骨召唤物 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.04．骸骨召唤") as {
+const { 释放影骨骸骨召唤, 创建影骨召唤组, 创建影骨召唤物 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.04．骸骨召唤") as {
   释放影骨骸骨召唤: (this: void, context: any) => 影骨骸骨召唤测试组 | undefined;
-  创建影骨召唤物: (this: void, context: any, unitType: number, x: number, y: number, group?: any, canReform?: boolean) => any;
+  创建影骨召唤组: (this: void, context: any, 阶段?: 1 | 2 | 3, 允许重组?: boolean, 预期数量?: number) => 影骨骸骨召唤测试组;
+  创建影骨召唤物: (this: void, context: any, unitType: number, x: number, y: number, group?: 影骨骸骨召唤测试组) => any;
 };
 const { 影骨莫特斯数值与表现配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.05．影骨莫特斯.02．数值与表现配置") as {
   影骨莫特斯数值与表现配置: {
@@ -129,11 +130,11 @@ interface 影骨2Kill测试变量 {
 
 interface 影骨骸骨召唤测试组 {
   ID: number;
-  阶段: 1 | 2 | 3;
-  总数: number;
-  死亡数: number;
-  已重组: boolean;
-  单位列表: any[];
+  开始批次(预期登记数量?: number): void;
+  结束批次(): void;
+  取单位列表(): any[];
+  取总登记数量(): number;
+  销毁(): void;
 }
 
 interface 影骨幽影爆发伤害测试变量 {
@@ -276,8 +277,9 @@ function on影骨技能2P3测试命令(this: void, _player: any, context: any): 
 
 function on影骨技能2Kill延迟击杀(this: void, variable: 影骨2Kill测试变量): void {
   if (variable == null) return;
-  for (let i = 0; i < variable.骷髅列表.length; i++) {
-    const skeleton = variable.骷髅列表[i];
+  const skeletons = variable.召唤组.取单位列表();
+  for (let i = 0; i < skeletons.length; i++) {
+    const skeleton = skeletons[i];
     if (Boss测试单位存活(skeleton)) KillUnit(skeleton);
   }
   if (影骨2Kill测试表[variable.玩家ID] === variable) 影骨2Kill测试表[variable.玩家ID] = undefined;
@@ -288,38 +290,27 @@ function on影骨技能2Kill测试命令(this: void, player: any, context: any, 
   准备影骨测试阶段(context, phase);
   const pid = GetPlayerId(player);
   const previous = 影骨2Kill测试表[pid];
-  if (previous != null) {
-    previous.召唤组.已重组 = true;
-    for (let i = 0; i < previous.骷髅列表.length; i++) {
-      const skeleton = previous.骷髅列表[i];
-      if (Boss测试单位存活(skeleton)) KillUnit(skeleton);
-    }
-  }
+  清理影骨上一次召唤测试(previous);
 
-  const group = {
-    ID: (context.下一个召唤组ID || 0) + 1,
-    阶段: context.阶段,
-    总数: 4,
-    死亡数: 0,
-    已重组: false,
-    单位列表: [],
-  };
-  context.下一个召唤组ID = group.ID;
+  const group = 创建影骨召唤组(context, phase, true, 4);
   context.当前召唤组 = group;
 
   const cfg = 影骨莫特斯数值与表现配置.骸骨召唤;
   const skeletons: any[] = [];
   const skeletonTypeId = stringToFourCC(cfg.骷髅盗贼单位类型);
-  for (let i = 0; i < group.总数; i++) {
+  for (let i = 0; i < 4; i++) {
     const angle = GetRandomReal(0, 360);
     const distance = GetRandomReal(80, cfg.召唤偏移半径);
     const x = 极坐标X(GetUnitX(context.Boss单位), distance, angle);
     const y = 极坐标Y(GetUnitY(context.Boss单位), distance, angle);
-    const instance = 创建影骨召唤物(context, skeletonTypeId, x, y, group, true);
+    const instance = 创建影骨召唤物(context, skeletonTypeId, x, y, group);
     if (instance != null && Boss测试单位存活(instance.单位)) skeletons.push(instance.单位);
   }
-  group.总数 = skeletons.length;
-  if (group.总数 <= 0) return;
+  group.结束批次();
+  if (skeletons.length <= 0) {
+    group.销毁();
+    return;
+  }
 
   const variable: 影骨2Kill测试变量 = { 玩家ID: pid, 骷髅列表: skeletons, 召唤组: group };
   影骨2Kill测试表[pid] = variable;
@@ -329,9 +320,10 @@ function on影骨技能2Kill测试命令(this: void, player: any, context: any, 
 
 function 清理影骨上一次召唤测试(this: void, previous: 影骨2Kill测试变量 | undefined): void {
   if (previous == null) return;
-  previous.召唤组.已重组 = true;
-  for (let i = 0; i < previous.骷髅列表.length; i++) {
-    const skeleton = previous.骷髅列表[i];
+  const skeletons = previous.召唤组.取单位列表();
+  previous.召唤组.销毁();
+  for (let i = 0; i < skeletons.length; i++) {
+    const skeleton = skeletons[i];
     if (Boss测试单位存活(skeleton)) KillUnit(skeleton);
   }
 }
@@ -342,10 +334,12 @@ function 安排影骨阶段强化测试(this: void, player: any, context: any, p
   const pid = GetPlayerId(player);
   清理影骨上一次召唤测试(影骨2Kill测试表[pid]);
   const group = 释放影骨骸骨召唤(context);
-  if (group == null || group.单位列表.length <= 0) return;
+  if (group == null) return;
+  const skeletons = group.取单位列表();
+  if (skeletons.length <= 0) return;
   const variable: 影骨2Kill测试变量 = {
     玩家ID: pid,
-    骷髅列表: group.单位列表,
+    骷髅列表: skeletons,
     召唤组: group,
   };
   影骨2Kill测试表[pid] = variable;

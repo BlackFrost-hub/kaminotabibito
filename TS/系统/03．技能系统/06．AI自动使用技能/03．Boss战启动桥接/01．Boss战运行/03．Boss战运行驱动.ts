@@ -25,6 +25,7 @@ import { 尝试移除过期胜利音频, 结束Boss战区域音频 } from "./02�
 import {
   单位是否死亡,
   读取Boss战矩形,
+  读取Boss战地点是否动态,
   读取Boss战音频,
   读取Boss战单位布尔,
   执行Boss战转场动画,
@@ -53,6 +54,7 @@ import {
   结束Boss血条弱点韧性,
 } from "../03．Boss血条弱点韧性/index";
 import { 同步全部Boss护卫血条优先级 } from "./09．Boss护卫血条优先级调度";
+import { 清理Boss自动技能启动上下文 } from "../01．Boss自动技能注册表";
 
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, forceHandle: any, messageType: number, message: string) => void;
@@ -90,6 +92,10 @@ const {
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const { 尝试播放Boss死亡音效 } = require("./08．Boss死亡音效") as {
   尝试播放Boss死亡音效: (this: void, bossUnit: any) => void;
+};
+const { 重建亚伦柯斯安兹封锁墙, 清理亚伦柯斯安兹封锁墙 } = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙") as {
+  重建亚伦柯斯安兹封锁墙: (this: void, bossUnit: any) => void;
+  清理亚伦柯斯安兹封锁墙: (this: void, bossUnit: any) => void;
 };
 
 let Boss战运行周期回调ID = 0;
@@ -132,11 +138,13 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
   if (context.是否已结束) return;
 
   context.是否已结束 = true;
+  清理亚伦柯斯安兹封锁墙(context.Boss单位);
   if (选项?.跳过死亡音效 !== true) 尝试播放Boss死亡音效(context.Boss单位);
   结束Boss血条弱点韧性(context);
   处理Boss战护卫结束(context);
   停止赫萝昼夜被动(context.Boss单位);
   停止瑟兰迪尔Boss运行时(context.Boss单位);
+  清理Boss自动技能启动上下文(context.Boss单位);
   清理当前Boss全局(context.Boss单位);
   清理Boss战运行上下文(context.Boss单位);
   清理Boss战单位字段(context.Boss单位);
@@ -258,11 +266,13 @@ export function 启动Boss战运行(this: void, bossUnit: any): void {
   if (oldContext != null && !oldContext.是否已结束) return;
 
   const rectHandle = 读取Boss战矩形();
+  const rectIsDynamic = 读取Boss战地点是否动态();
   const battleSound = 读取Boss战音频(Boss战战斗音乐字段);
   const victorySound = 读取Boss战音频(Boss战胜利音乐字段);
-  const context = 创建Boss战运行上下文(bossUnit, rectHandle, battleSound, victorySound);
+  const context = 创建Boss战运行上下文(bossUnit, rectHandle, battleSound, victorySound, rectIsDynamic);
   if (context == null) return;
 
+  重建亚伦柯斯安兹封锁墙(bossUnit);
   记录Boss战运行上下文(context);
   确保Boss战运行驱动();
 

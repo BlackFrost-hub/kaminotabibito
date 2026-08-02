@@ -15,8 +15,6 @@ local ____13_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_653E["播放莫尔特斯台词"]
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
-local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
-local _____5F00_59CB_83AB_5C14_7279_65AF_5E38_89C4_65BD_6CD5 = ____16_FF0E_516C_5171_5DE5_5177["开始莫尔特斯常规施法"]
 local _____6781_5750_6807X = ____16_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____16_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____16_FF0E_516C_5171_5DE5_5177["点到线段距离平方"]
@@ -29,10 +27,12 @@ local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
 local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
@@ -306,18 +306,16 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
                 local hid = GetHandleId(hero) or 0
                 local oldHits = _____547D_4E2D_6B21_6570_8868[hid] or 0
                 _____547D_4E2D_6B21_6570_8868[hid] = oldHits + 1
-                local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["Boss攻击力比例"] * (1 + oldHits * cfg["重复命中增伤比例"])
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____626D_66F2_8346_68D8_97AD_7B1E_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
-                    ["伤害"] = damage,
+                    ["伤害公式"] = {["来源攻击力比例"] = cfg["Boss攻击力比例"], ["总倍率"] = 1 + oldHits * cfg["重复命中增伤比例"]},
                     attack = false,
                     ranged = false,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_PLANT,
-                    weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能"
+                    weaponType = WEAPON_TYPE_WHOKNOWS
                 })
                 _____5E94_7528_83AB_5C14_7279_65AF_8150_8D25_503C(context, hero, 8)
                 local _____5BC4_751F_6BCF_8DF3_4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["寄生每跳Boss攻击力比例"]
@@ -446,9 +444,30 @@ ____exports["释放莫尔特斯扭曲荆棘鞭笞"] = function(context)
     if _____6267_884CID == 0 then
         return
     end
-    _____5F00_59CB_83AB_5C14_7279_65AF_5E38_89C4_65BD_6CD5(boss, cfg["开始延迟秒"], "扭曲荆棘鞭笞", "荆棘将从场地边缘连续扫过")
-    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
-    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "扭曲荆棘鞭笞")
+    _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
+        ["名称"] = "莫尔特斯-扭曲荆棘鞭笞",
+        ["施法者"] = boss,
+        ["硬直秒"] = cfg["开始延迟秒"],
+        ["动画编号"] = cfg["动画编号"],
+        ["动画速度"] = cfg["动画速度"],
+        ["后续动画编号"] = 0,
+        ["后续动画速度"] = 1,
+        ["后续动画延迟毫秒"] = cfg["动作播放秒"] * 1000,
+        ["完成后恢复动作"] = false,
+        ["吟唱条"] = {
+            ["通道"] = "常规技能",
+            ["总时长"] = cfg["开始延迟秒"],
+            ["颜色ID"] = cfg["吟唱条颜色ID"],
+            ["标题文本"] = cfg["吟唱条标题文本"],
+            ["提示文本"] = cfg["吟唱条提示文本"]
+        },
+        ["清理"] = context["清理"],
+        ["播放台词"] = function()
+            _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "扭曲荆棘鞭笞")
+        end,
+        ["on生效"] = function()
+        end
+    })
 end
 local function ____on_83AB_5C14_7279_65AF_626D_66F2_8346_68D8_97AD_7B1E_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____626D_66F2_8346_68D8_97AD_7B1E_6280_80FDID then

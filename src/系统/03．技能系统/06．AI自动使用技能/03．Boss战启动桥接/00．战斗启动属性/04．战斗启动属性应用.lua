@@ -15,9 +15,11 @@ local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local Rect = jass.Rect
 local CreateSound = jass.CreateSound
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
+local YDUserDataClearSafe = ____require_result_0.YDUserDataClearSafe
 local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
 local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_1["按名字反查Boss单位ID"]
 local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
@@ -176,6 +178,36 @@ local function _____5199_5165Boss_6218_77E9_5F62(_____5C5E_6027_540D, _____53D8_
         _____77E9_5F62_53E5_67C4
     )
 end
+local function _____6E05_7406Boss_6218_5730_70B9()
+    YDUserDataClearSafe("string", "Boss战", "地点", "rect")
+    YDUserDataClearSafe("string", "Boss战", "地点动态", "boolean")
+end
+local function _____5199_5165Boss_6218_52A8_6001_77E9_5F62(_____914D_7F6E)
+    if _____914D_7F6E == nil then
+        return
+    end
+    if not (_____914D_7F6E["左"] < _____914D_7F6E["右"]) or not (_____914D_7F6E["下"] < _____914D_7F6E["上"]) then
+        return
+    end
+    local _____77E9_5F62_53E5_67C4 = Rect(_____914D_7F6E["左"], _____914D_7F6E["下"], _____914D_7F6E["右"], _____914D_7F6E["上"])
+    if _____77E9_5F62_53E5_67C4 == nil or _____77E9_5F62_53E5_67C4 == 0 then
+        return
+    end
+    YDUserDataSetSafe(
+        "string",
+        "Boss战",
+        "地点",
+        "rect",
+        _____77E9_5F62_53E5_67C4
+    )
+    YDUserDataSetSafe(
+        "string",
+        "Boss战",
+        "地点动态",
+        "boolean",
+        true
+    )
+end
 ____exports["应用Boss战启动属性配置"] = function(unit)
     if unit == nil or unit == 0 then
         return
@@ -190,7 +222,12 @@ ____exports["应用Boss战启动属性配置"] = function(unit)
     end
     _____5199_5165Boss_6218_97F3_9891("战斗音乐", _____914D_7F6E["战斗音乐路径"], _____914D_7F6E["战斗音乐变量名"])
     _____5199_5165Boss_6218_97F3_9891("胜利音乐", _____914D_7F6E["胜利音乐路径"], _____914D_7F6E["胜利音乐变量名"])
-    _____5199_5165Boss_6218_77E9_5F62("地点", _____914D_7F6E["地点变量名"])
+    _____6E05_7406Boss_6218_5730_70B9()
+    if _____914D_7F6E["动态地点矩形"] ~= nil then
+        _____5199_5165Boss_6218_52A8_6001_77E9_5F62(_____914D_7F6E["动态地点矩形"])
+    else
+        _____5199_5165Boss_6218_77E9_5F62("地点", _____914D_7F6E["地点变量名"])
+    end
     _____5199_5165Boss_6218_5355_4F4D_5E03_5C14(unit, "转换场景", _____914D_7F6E["转换场景"])
     _____5199_5165Boss_6218_5B57_7B26_4E32_8868_5B9E_6570(
         "BS移动X轴",

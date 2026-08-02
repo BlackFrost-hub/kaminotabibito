@@ -3,6 +3,8 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____00_FF0E_516C_5171 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．护卫B塞拉.00．公共")
 local _____585E_62C9_516C_5171 = ____00_FF0E_516C_5171["塞拉公共"]
+local ____01_FF0E_6301_7EED_5371_9669_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
+local _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____01_FF0E_6301_7EED_5371_9669_533A_57DF["创建持续危险区域"]
 local ____585E_62C9_516C_5171_0 = _____585E_62C9_516C_5171
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯单位技能配置"]
 local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯技能数值配置"]
@@ -14,8 +16,6 @@ local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____585E_62C9_516C_5171_0["创�
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____585E_62C9_516C_5171_0["获取Boss技能敌对英雄列表"]
 local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____585E_62C9_516C_5171_0["创建循环点特效"]
 local _____505C_6B62_5FAA_73AF_70B9_7279_6548 = ____585E_62C9_516C_5171_0["停止循环点特效"]
-local addPeriodicCallback = ____585E_62C9_516C_5171_0.addPeriodicCallback
-local removePeriodicCallback = ____585E_62C9_516C_5171_0.removePeriodicCallback
 local getServerTime = ____585E_62C9_516C_5171_0.getServerTime
 local GetUnitX = ____585E_62C9_516C_5171_0.GetUnitX
 local GetUnitY = ____585E_62C9_516C_5171_0.GetUnitY
@@ -106,32 +106,30 @@ local function _____521B_5EFA_7EDD_5BF9_96F6_5EA6_9886_57DF(context, x, y)
             i = i + 1
         end
     end
-    local tickId
-    tickId = addPeriodicCallback(
-        config["Tick毫秒"],
-        function()
-            local now = getServerTime()
-            if now >= endMs or not _____5355_4F4D_6709_6548(sera) then
-                removePeriodicCallback(tickId)
-                __TS__Delete(_____7EDD_5BF9_96F6_5EA6_9886_57DF_72B6_6001_8868, seraId)
+    local _____533A_57DF_5B9E_4F8B
+    _____533A_57DF_5B9E_4F8B = _____521B_5EFA_6301_7EED_5371_9669_533A_57DF({
+        X = x,
+        Y = y,
+        ["半径"] = config["半径"],
+        ["持续时间"] = config["持续秒"],
+        ["检测间隔"] = config["Tick毫秒"] / 1000,
+        ["影响目标"] = "敌方",
+        ["所有者"] = context["Boss单位"],
+        ["提示圈"] = false,
+        ["on周期"] = function(list)
+            if not _____5355_4F4D_6709_6548(sera) then
+                if _____533A_57DF_5B9E_4F8B ~= nil then
+                    _____533A_57DF_5B9E_4F8B["销毁"]()
+                end
                 return
             end
-            local list = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
+            local now = getServerTime()
             do
                 local i = 0
                 while i < #list do
                     do
                         local hero = list[i + 1]
                         if not _____5355_4F4D_6709_6548(hero) then
-                            goto __continue18
-                        end
-                        if not _____70B9_5728_5706_5185(
-                            GetUnitX(hero),
-                            GetUnitY(hero),
-                            x,
-                            y,
-                            config["半径"]
-                        ) then
                             goto __continue18
                         end
                         local heroId = _____53D6_5355_4F4DID(hero)
@@ -152,10 +150,21 @@ local function _____521B_5EFA_7EDD_5BF9_96F6_5EA6_9886_57DF(context, x, y)
                     i = i + 1
                 end
             end
+        end,
+        ["on销毁"] = function()
+            __TS__Delete(_____7EDD_5BF9_96F6_5EA6_9886_57DF_72B6_6001_8868, seraId)
+        end
+    })
+    local ____self_7 = context["清理"]
+    ____self_7["登记清理"](
+        ____self_7,
+        "塞拉-绝对零度领域区域",
+        function()
+            if _____533A_57DF_5B9E_4F8B ~= nil then
+                _____533A_57DF_5B9E_4F8B["销毁"]()
+            end
         end
     )
-    local ____self_3 = context["清理"]
-    ____self_3["登记周期回调"](____self_3, "塞拉-绝对零度领域Tick", tickId)
 end
 ____exports["释放绝对零度领域"] = function(context, target)
     local sera = context["塞拉"]

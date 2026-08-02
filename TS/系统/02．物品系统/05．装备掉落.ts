@@ -119,6 +119,9 @@ function pickFromWeightedPool(
 ): string[] {
   if (pool.length === 0) return [];
   if (picks === 1) {
+    for (let i = 0; i < pool.length; i++) {
+      if (pool[i].always) return [pool[i].id];
+    }
     const one = weightedPickOne(pool);
     return one ? [one] : [];
   }
@@ -134,13 +137,29 @@ function pickFromWeightedPool(
     }
   }
   if (out.length > picks) {
-    for (let i = out.length - 1; i >= 1; i--) {
-      const j = (jass as any).GetRandomInt(1, i + 1) as number;
-      const t = out[i];
-      out[i] = out[j - 1];
-      out[j - 1] = t;
+    const protectedOut: string[] = [];
+    const removableOut: string[] = [];
+    for (let i = 0; i < out.length; i++) {
+      let isAlways = false;
+      for (let j = 0; j < pool.length; j++) {
+        if (pool[j].always && pool[j].id === out[i]) {
+          isAlways = true;
+          break;
+        }
+      }
+      if (isAlways) protectedOut.push(out[i]);
+      else removableOut.push(out[i]);
     }
-    while (out.length > picks) out.pop();
+    for (let i = removableOut.length - 1; i >= 1; i--) {
+      const j = (jass as any).GetRandomInt(1, i + 1) as number;
+      const t = removableOut[i];
+      removableOut[i] = removableOut[j - 1];
+      removableOut[j - 1] = t;
+    }
+    out.length = 0;
+    for (let i = 0; i < protectedOut.length; i++) out.push(protectedOut[i]);
+    const removableToKeep = picks - protectedOut.length;
+    for (let i = 0; i < removableToKeep && i < removableOut.length; i++) out.push(removableOut[i]);
   }
   const needMore = picks - out.length;
   if (needMore <= 0) return out;

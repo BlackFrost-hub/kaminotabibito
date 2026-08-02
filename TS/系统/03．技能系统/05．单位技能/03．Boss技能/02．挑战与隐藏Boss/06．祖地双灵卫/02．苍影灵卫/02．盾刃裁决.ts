@@ -4,7 +4,7 @@ import type { 祖地双灵卫运行时上下文 } from '../01．运行时上下�
 import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
-import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 两点角度, 极坐标X, 极坐标Y, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 单位是否在扇形区域 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
 import { 创建原生弹幕 } from '../../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕/03．对外接口';
@@ -14,7 +14,6 @@ import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from '.
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能敌对英雄列表: (this: void, boss: any) => any[] };
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as { 造成AOE技能伤害: (this: void, params: any) => boolean };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
 };
@@ -56,8 +55,17 @@ const WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 
 function 造成裁决伤害(this: void, boss: any, target: any, attackRatio: number, lifeRatio: number, tag: string, weaponType: any): void {
-  const damage = 计算组合技能伤害(boss, target, { 来源攻击力比例: attackRatio, 目标最大生命比例: lifeRatio });
-  造成AOE技能伤害({ 来源: boss, 目标: target, 伤害: damage, attack: false, ranged: false, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType, 来源类型: 'Boss技能', 标签: tag });
+  执行BossAOE技能伤害({
+    来源: boss,
+    目标: target,
+    伤害公式: { 来源攻击力比例: attackRatio, 目标最大生命比例: lifeRatio },
+    attack: false,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_NORMAL,
+    weaponType,
+    标签: tag,
+  });
 }
 
 export function 释放盾刃裁决(this: void, context: 祖地双灵卫运行时上下文, target: any): boolean {

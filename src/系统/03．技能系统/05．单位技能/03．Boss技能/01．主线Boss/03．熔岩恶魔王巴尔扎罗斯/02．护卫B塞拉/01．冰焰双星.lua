@@ -3,62 +3,38 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____00_FF0E_516C_5171 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．护卫B塞拉.00．公共")
 local _____585E_62C9_516C_5171 = ____00_FF0E_516C_5171["塞拉公共"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
 local _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯音效配置"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____585E_62C9_516C_5171_1 = _____585E_62C9_516C_5171
-local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____585E_62C9_516C_5171_1["巴尔扎罗斯技能数值配置"]
-local _____64AD_653E_585E_62C9_53F0_8BCD = ____585E_62C9_516C_5171_1["播放塞拉台词"]
-local _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED = ____585E_62C9_516C_5171_1["施加巴尔扎罗斯灼热"]
-local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____585E_62C9_516C_5171_1["启动基础施法时间线"]
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____585E_62C9_516C_5171_1["创建技能提示圈"]
-local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____585E_62C9_516C_5171_1["施加快速减速Buff"]
-local _____521B_5EFA_539F_751F_5F39_5E55 = ____585E_62C9_516C_5171_1["创建原生弹幕"]
-local getUnitsInRange = ____585E_62C9_516C_5171_1.getUnitsInRange
-local isUnitEnemy = ____585E_62C9_516C_5171_1.isUnitEnemy
-local CosBJ = ____585E_62C9_516C_5171_1.CosBJ
-local SinBJ = ____585E_62C9_516C_5171_1.SinBJ
-local GetUnitX = ____585E_62C9_516C_5171_1.GetUnitX
-local GetUnitY = ____585E_62C9_516C_5171_1.GetUnitY
-local GetUnitFlyHeight = ____585E_62C9_516C_5171_1.GetUnitFlyHeight
-local SquareRoot = ____585E_62C9_516C_5171_1.SquareRoot
-local DAMAGE_TYPE_FIRE = ____585E_62C9_516C_5171_1.DAMAGE_TYPE_FIRE
-local DAMAGE_TYPE_COLD = ____585E_62C9_516C_5171_1.DAMAGE_TYPE_COLD
-local _____5355_4F4D_6709_6548 = ____585E_62C9_516C_5171_1["单位有效"]
-local _____53D6_65B9_5411_89D2 = ____585E_62C9_516C_5171_1["取方向角"]
-local _____53D6_5F62_6001_6280_80FD_500D_7387 = ____585E_62C9_516C_5171_1["取形态技能倍率"]
-local _____521B_5EFA_585E_62C9_70B9_7279_6548 = ____585E_62C9_516C_5171_1["创建塞拉点特效"]
-local _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3 = ____585E_62C9_516C_5171_1["造成塞拉Boss技能伤害"]
-local _____5F31_8FFD_8E2A_5F39_4F53_72B6_6001_8868 = ____585E_62C9_516C_5171_1["弱追踪弹体状态表"]
-local function _____8BA1_7B97_51B0_7403_4F24_5BB3(context, target)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["冰焰双星"]
-    local sera = context["塞拉"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
-        sera,
-        target,
-        {
-            ["来源攻击力比例"] = config["冰球伤害攻击力比例"],
-            ["目标最大生命比例"] = config["冰球伤害目标最大生命比例"],
-            ["总倍率"] = config["冰球伤害总倍率"] * _____53D6_5F62_6001_6280_80FD_500D_7387(context, "冰霜")
-        }
-    )
-end
-local function _____8BA1_7B97_706B_7403_4F24_5BB3(context, target)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["冰焰双星"]
-    local sera = context["塞拉"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
-        sera,
-        target,
-        {
-            ["来源攻击力比例"] = config["火球伤害攻击力比例"],
-            ["目标最大生命比例"] = config["火球伤害目标最大生命比例"],
-            ["总倍率"] = config["火球伤害总倍率"] * _____53D6_5F62_6001_6280_80FD_500D_7387(context, "火焰")
-        }
-    )
-end
+local ____585E_62C9_516C_5171_0 = _____585E_62C9_516C_5171
+local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯技能数值配置"]
+local _____64AD_653E_585E_62C9_53F0_8BCD = ____585E_62C9_516C_5171_0["播放塞拉台词"]
+local _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED = ____585E_62C9_516C_5171_0["施加巴尔扎罗斯灼热"]
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____585E_62C9_516C_5171_0["启动基础施法时间线"]
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____585E_62C9_516C_5171_0["创建技能提示圈"]
+local _____65BD_52A0_5FEB_901F_51CF_901FBuff = ____585E_62C9_516C_5171_0["施加快速减速Buff"]
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____585E_62C9_516C_5171_0["创建原生弹幕"]
+local getUnitsInRange = ____585E_62C9_516C_5171_0.getUnitsInRange
+local isUnitEnemy = ____585E_62C9_516C_5171_0.isUnitEnemy
+local CosBJ = ____585E_62C9_516C_5171_0.CosBJ
+local SinBJ = ____585E_62C9_516C_5171_0.SinBJ
+local GetUnitX = ____585E_62C9_516C_5171_0.GetUnitX
+local GetUnitY = ____585E_62C9_516C_5171_0.GetUnitY
+local GetUnitFlyHeight = ____585E_62C9_516C_5171_0.GetUnitFlyHeight
+local SquareRoot = ____585E_62C9_516C_5171_0.SquareRoot
+local DAMAGE_TYPE_FIRE = ____585E_62C9_516C_5171_0.DAMAGE_TYPE_FIRE
+local DAMAGE_TYPE_COLD = ____585E_62C9_516C_5171_0.DAMAGE_TYPE_COLD
+local ATTACK_TYPE_NORMAL = ____585E_62C9_516C_5171_0.ATTACK_TYPE_NORMAL
+local WEAPON_TYPE_WHOKNOWS = ____585E_62C9_516C_5171_0.WEAPON_TYPE_WHOKNOWS
+local _____5355_4F4D_6709_6548 = ____585E_62C9_516C_5171_0["单位有效"]
+local _____53D6_65B9_5411_89D2 = ____585E_62C9_516C_5171_0["取方向角"]
+local _____53D6_5F62_6001_6280_80FD_500D_7387 = ____585E_62C9_516C_5171_0["取形态技能倍率"]
+local _____521B_5EFA_585E_62C9_70B9_7279_6548 = ____585E_62C9_516C_5171_0["创建塞拉点特效"]
+local _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3 = ____585E_62C9_516C_5171_0["造成塞拉Boss技能伤害"]
+local _____5F31_8FFD_8E2A_5F39_4F53_72B6_6001_8868 = ____585E_62C9_516C_5171_0["弱追踪弹体状态表"]
 local function _____7ED3_7B97_51B0_7130AOE(context, hitUnit, _____7C7B_578B)
     local sera = context["塞拉"]
     if not _____5355_4F4D_6709_6548(sera) or not _____5355_4F4D_6709_6548(hitUnit) then
@@ -93,16 +69,24 @@ local function _____7ED3_7B97_51B0_7130AOE(context, hitUnit, _____7C7B_578B)
             do
                 local unit = targets[i + 1]
                 if not _____5355_4F4D_6709_6548(unit) or not isUnitEnemy(unit, sera) then
-                    goto __continue9
+                    goto __continue7
                 end
                 if _____7C7B_578B == "冰霜" then
-                    _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3(
-                        sera,
-                        unit,
-                        _____8BA1_7B97_51B0_7403_4F24_5BB3(context, unit),
-                        DAMAGE_TYPE_COLD,
-                        "AOE"
-                    )
+                    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                        ["来源"] = sera,
+                        ["目标"] = unit,
+                        ["伤害公式"] = {
+                            ["来源攻击力比例"] = config["冰球伤害攻击力比例"],
+                            ["目标最大生命比例"] = config["冰球伤害目标最大生命比例"],
+                            ["总倍率"] = config["冰球伤害总倍率"] * _____53D6_5F62_6001_6280_80FD_500D_7387(context, "冰霜")
+                        },
+                        attack = false,
+                        ranged = true,
+                        attackType = ATTACK_TYPE_NORMAL,
+                        ["伤害类型"] = DAMAGE_TYPE_COLD,
+                        weaponType = WEAPON_TYPE_WHOKNOWS,
+                        ["标签"] = "塞拉-冰焰双星-冰霜"
+                    })
                     _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                         sera,
                         unit,
@@ -111,17 +95,25 @@ local function _____7ED3_7B97_51B0_7130AOE(context, hitUnit, _____7C7B_578B)
                         config["冰球减速持续秒"]
                     )
                 else
-                    _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3(
-                        sera,
-                        unit,
-                        _____8BA1_7B97_706B_7403_4F24_5BB3(context, unit),
-                        DAMAGE_TYPE_FIRE,
-                        "AOE"
-                    )
+                    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                        ["来源"] = sera,
+                        ["目标"] = unit,
+                        ["伤害公式"] = {
+                            ["来源攻击力比例"] = config["火球伤害攻击力比例"],
+                            ["目标最大生命比例"] = config["火球伤害目标最大生命比例"],
+                            ["总倍率"] = config["火球伤害总倍率"] * _____53D6_5F62_6001_6280_80FD_500D_7387(context, "火焰")
+                        },
+                        attack = false,
+                        ranged = true,
+                        attackType = ATTACK_TYPE_NORMAL,
+                        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                        weaponType = WEAPON_TYPE_WHOKNOWS,
+                        ["标签"] = "塞拉-冰焰双星-火焰"
+                    })
                     _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["火球灼热层数"])
                 end
             end
-            ::__continue9::
+            ::__continue7::
             i = i + 1
         end
     end

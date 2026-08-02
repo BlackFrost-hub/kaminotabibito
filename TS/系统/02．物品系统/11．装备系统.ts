@@ -49,6 +49,7 @@ const 装备视野Buff显示持续时间 = 999999;
 const 不走装备系统物品ID表: Record<string, true> = {
   I0FK: true,
   I0FL: true,
+  I0E5: true,
 };
 
 interface StatEntry {

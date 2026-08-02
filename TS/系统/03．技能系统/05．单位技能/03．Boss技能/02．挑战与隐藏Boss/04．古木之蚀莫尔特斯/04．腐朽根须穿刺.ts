@@ -5,36 +5,27 @@ import { 获取或创建莫尔特斯上下文, type 莫尔特斯运行时上下�
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 应用莫尔特斯腐败值, 确保莫尔特斯根须宫格 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯常规施法, stringToFourCC } from "./16．公共工具";
+import { 单位有效, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 创建点名预警执行器 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/05．点名预警执行器";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
+import { 获取矩形区域单位 } from "../../../../00．技能模板+函数/01．技能函数/09．形状区域/矩形区域";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
+};
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const GetUnitX = jass.GetUnitX as (unit: any) => number;
-const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const IsUnitEnemy = jass.IsUnitEnemy as (unit: any, player: any) => boolean;
-const CreateGroup = jass.CreateGroup as () => any;
-const DestroyGroup = jass.DestroyGroup as (group: any) => void;
-const GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect as (group: any, rect: any, filter: any) => void;
-const FirstOfGroup = jass.FirstOfGroup as (group: any) => any;
-const GroupRemoveUnit = jass.GroupRemoveUnit as (group: any, unit: any) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
 const 腐朽根须穿刺技能ID = stringToFourCC(莫尔特斯数值与表现配置.腐朽根须穿刺.技能槽位);
@@ -83,30 +74,30 @@ function 结算单格根须穿刺(this: void, context: 莫尔特斯运行时上�
     缩放: cfg.根须特效缩放,
     动画索引: cfg.根须模型动画索引,
   });
-  const group = CreateGroup();
-  GroupEnumUnitsInRect(group, cell.矩形, null);
-  let unit = FirstOfGroup(group);
-  const damage = 读取单位攻击力(boss) * cfg.Boss攻击力比例;
-  while (unit != null && unit !== 0) {
-    GroupRemoveUnit(group, unit);
+  const units = 获取矩形区域单位({
+    X: cell.中心X,
+    Y: cell.中心Y,
+    长度: 莫尔特斯数值与表现配置.根须领域.单格边长,
+    宽度: 莫尔特斯数值与表现配置.根须领域.单格边长,
+    方向角: 0,
+  });
+  for (let i = 0; i < units.length; i++) {
+    const unit = units[i];
     if (单位有效(unit) && IsUnitEnemy(unit, GetOwningPlayer(boss)) === true) {
-      造成AOE技能伤害({
+      执行BossAOE技能伤害({
         技能ID: 腐朽根须穿刺技能ID,
         来源: boss,
         目标: unit,
-        伤害: damage,
+        伤害公式: { 来源攻击力比例: cfg.Boss攻击力比例 },
         attack: false,
         ranged: false,
         attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_PLANT,
         weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
       });
       应用莫尔特斯腐败值(context, unit, cfg.腐败值);
     }
-    unit = FirstOfGroup(group);
   }
-  DestroyGroup(group);
 }
 
 function 创建根须穿刺格子预警(this: void, context: 莫尔特斯运行时上下文, cell: any, index: number): void {
@@ -137,13 +128,34 @@ export function 释放莫尔特斯腐朽根须穿刺(this: void, context: 莫尔
   const cfg = 莫尔特斯数值与表现配置.腐朽根须穿刺;
   if (!单位有效(boss)) return;
   确保莫尔特斯根须宫格(context);
-  开始莫尔特斯常规施法(boss, cfg.预警秒, "腐朽根须穿刺", "随机地块即将钻出腐败根须");
-  播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
-  播放莫尔特斯台词(boss, "腐朽根须穿刺");
   const cells = 选择根须穿刺格子(context);
   for (let i = 0; i < cells.length; i++) {
     创建根须穿刺格子预警(context, cells[i], i);
   }
+  启动基础施法时间线({
+    名称: "莫尔特斯-腐朽根须穿刺",
+    施法者: boss,
+    硬直秒: cfg.预警秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    后续动画编号: 0,
+    后续动画速度: 1,
+    后续动画延迟毫秒: cfg.动作播放秒 * 1000,
+    完成后恢复动作: false,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.预警秒,
+      颜色ID: cfg.吟唱条颜色ID,
+      标题文本: cfg.吟唱条标题文本,
+      提示文本: cfg.吟唱条提示文本,
+    },
+    清理: context.清理,
+    播放台词: function 莫尔特斯腐朽根须穿刺台词(this: void): void {
+      播放莫尔特斯台词(boss, "腐朽根须穿刺");
+    },
+    on生效: function 莫尔特斯腐朽根须穿刺时间线生效(this: void): void {
+    },
+  });
 }
 
 function on莫尔特斯腐朽根须穿刺施法(this: void, castingUnit: any, spellAbilityId: number): void {

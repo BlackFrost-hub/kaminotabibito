@@ -4,7 +4,6 @@ import { 注册米亚腐化感染机制 } from "./04．腐化感染";
 import { 注册米亚腐化爪击 } from "./05．腐化爪击";
 import { 注册米亚污水喷吐 } from "./06．污水喷吐";
 import { 注册米亚腐化黏液涂层 } from "./13．腐化黏液涂层";
-import { 注册米亚终极污染 } from "./14．终极污染";
 import { 注册米亚技能调度 } from "./18．技能调度";
 
 export function 注册米亚技能结构(this: void): void {
@@ -12,6 +11,5 @@ export function 注册米亚技能结构(this: void): void {
   注册米亚腐化爪击();
   注册米亚污水喷吐();
   注册米亚腐化黏液涂层();
-  注册米亚终极污染();
   注册米亚技能调度();
 }

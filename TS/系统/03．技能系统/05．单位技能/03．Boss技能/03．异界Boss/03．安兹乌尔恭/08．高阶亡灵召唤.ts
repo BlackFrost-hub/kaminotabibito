@@ -3,7 +3,10 @@
 import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
-import { 创建召唤物 } from '../../../../00．技能模板+函数/01．技能函数/11．召唤物/04．对外接口';
+import { 创建可攻击机制单位 } from '../../../../00．技能模板+函数/04．机制组件/05．机制单位/01．可攻击机制单位';
+import type { 可攻击机制单位实例 } from '../../../../00．技能模板+函数/04．机制组件/05．机制单位/01．可攻击机制单位';
+import { 创建致命伤害保命与限时免疫 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/10．致命伤害保命与限时免疫';
+import type { 致命伤害保命与限时免疫控制器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/10．致命伤害保命与限时免疫';
 import { 播放安兹台词 } from './12．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 
@@ -15,9 +18,6 @@ const { 启动基础施法时间线 } = require('系统.03．技能系统.00．�
 };
 const { 获取Boss技能随机敌对英雄 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
-};
-const { registerDeathListener } = require('系统.00．核心系统.01．事件中心.07．单位死亡事件中心') as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 const { addDelayedCallback, removeDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -35,29 +35,16 @@ const { 创建Dz绑定单位特效, 获取Dz绑定单位特效, 销毁Dz绑定�
   获取Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => any;
   销毁Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => void;
 };
-const { registerDamageModifier, unregisterDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-  unregisterDamageModifier: (this: void, id: number) => boolean;
-};
-
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const DzSetEffectAnimation = japi.DzSetEffectAnimation as ((effect: any, animationIndex: number, flag: number) => void) | undefined;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const DEG_TO_RAD = 0.017453292519943295;
 const 高阶亡灵召唤大型技能Key = '高阶亡灵召唤';
@@ -66,16 +53,13 @@ const 高阶亡灵致命护盾特效Key = '安兹-高阶亡灵致命护盾';
 interface 高阶亡灵召唤实例 {
   context: 安兹运行时上下文;
   unit: any;
-  handleId: number;
+  机制单位: 可攻击机制单位实例;
   已移除: boolean;
-  致命保护修正器ID: number;
-  免伤截止Ms: number;
+  致命保护已触发: boolean;
+  致命保护?: 致命伤害保命与限时免疫控制器;
   致命护盾特效: any;
   致命护盾特效回调ID: number;
 }
-
-const 高阶亡灵实例表: Record<number, 高阶亡灵召唤实例 | undefined> = {};
-let 高阶亡灵死亡监听已注册 = false;
 
 interface 高阶亡灵致命护盾到期参数 {
   instance: 高阶亡灵召唤实例;
@@ -113,39 +97,19 @@ function 创建高阶亡灵致命护盾特效(this: void, instance: 高阶亡灵
   instance.致命护盾特效 = effect;
   if (DzSetEffectAnimation != null) DzSetEffectAnimation(effect, 1, 0);
   const 到期参数: 高阶亡灵致命护盾到期参数 = { instance, effect, callbackId: 0 };
-  const callbackId = addDelayedCallback(1000, on高阶亡灵致命护盾到期, 到期参数);
+  const callbackId = addDelayedCallback(cfg.高阶亡灵召唤致命保护免疫秒 * 1000, on高阶亡灵致命护盾到期, 到期参数);
   到期参数.callbackId = callbackId;
   instance.致命护盾特效回调ID = callbackId;
   instance.context.清理.登记延迟回调('安兹-高阶亡灵致命护盾到期', callbackId);
 }
 
-function 处理高阶亡灵致命保护(this: void, instance: 高阶亡灵召唤实例, damageContext: any): number {
-  const currentDamage = damageContext.currentDamage;
-  if (instance.已移除 || damageContext.target !== instance.unit || !(currentDamage > 0)) return currentDamage;
-
-  const now = getServerTime();
-  const immunityMs = 安兹乌尔恭数值与表现配置.阶段技能.高阶亡灵召唤致命保护免疫秒 * 1000;
-  if (now < instance.免伤截止Ms) return 0;
-
-  const currentLife = GetUnitState(instance.unit, UNIT_STATE_LIFE);
-  if (!(currentLife > 0) || currentDamage < currentLife) return currentDamage;
-
-  instance.免伤截止Ms = now + immunityMs;
-  SetUnitState(instance.unit, UNIT_STATE_LIFE, 1);
-  创建高阶亡灵致命护盾特效(instance);
-  return 0;
-}
-
 function 停用高阶亡灵致命保护(this: void, instance: 高阶亡灵召唤实例): void {
-  if (instance.致命保护修正器ID > 0) {
-    unregisterDamageModifier(instance.致命保护修正器ID);
-    instance.致命保护修正器ID = 0;
-  }
+  instance.致命保护?.停止();
+  instance.致命保护 = undefined;
   if (instance.致命护盾特效回调ID > 0) {
     removeDelayedCallback(instance.致命护盾特效回调ID);
     instance.致命护盾特效回调ID = 0;
   }
-  instance.免伤截止Ms = 0;
   if (instance.unit != null && instance.unit !== 0) {
     销毁Dz绑定单位特效(instance.unit, 高阶亡灵致命护盾特效Key);
   }
@@ -153,29 +117,62 @@ function 停用高阶亡灵致命保护(this: void, instance: 高阶亡灵召唤
 }
 
 function 创建高阶亡灵致命保护(this: void, instance: 高阶亡灵召唤实例): void {
-  const modifierId = registerDamageModifier(function 高阶亡灵致命保护修正(this: void, damageContext: any): number {
-    return 处理高阶亡灵致命保护(instance, damageContext);
-  }, -100001);
-  instance.致命保护修正器ID = modifierId;
+  const cfg = 安兹乌尔恭数值与表现配置.阶段技能;
+  instance.致命保护 = 创建致命伤害保命与限时免疫({
+    名称: '安兹-高阶亡灵致命保护',
+    单位: instance.unit,
+    固定生命下限: 1,
+    免疫持续秒: cfg.高阶亡灵召唤致命保护免疫秒,
+    生命下限修正优先级: -100001,
+    免疫修正优先级: -100000,
+    清理: instance.context.清理,
+    过滤致命伤害: function 高阶亡灵致命伤害过滤(this: void): boolean {
+      return !instance.已移除 && !instance.致命保护已触发;
+    },
+    过滤免疫伤害: function 高阶亡灵限时免疫过滤(this: void): boolean {
+      return !instance.已移除;
+    },
+    on触发: function 高阶亡灵致命保护触发(this: void): void {
+      instance.致命保护已触发 = true;
+      创建高阶亡灵致命护盾特效(instance);
+    },
+  });
 }
 
-function 清理高阶亡灵实例(this: void, instance: 高阶亡灵召唤实例): void {
+interface 高阶亡灵机制单位回调变量 {
+  instance?: 高阶亡灵召唤实例;
+}
+
+function 清理高阶亡灵状态(this: void, instance: 高阶亡灵召唤实例): void {
   if (instance.已移除) return;
   instance.已移除 = true;
   停用高阶亡灵致命保护(instance);
-  delete 高阶亡灵实例表[instance.handleId];
   if (instance.context.高阶亡灵召唤物 === instance.unit) instance.context.高阶亡灵召唤物 = undefined;
-  if (instance.unit != null && instance.unit !== 0) RemoveUnit(instance.unit);
   instance.unit = 0;
 }
 
-function on高阶亡灵死亡(this: void, dyingUnit: any, _killingUnit: any): void {
-  if (dyingUnit == null || dyingUnit === 0) return;
-  const instance = 高阶亡灵实例表[GetHandleId(dyingUnit)];
+function 清理高阶亡灵实例(this: void, instance: 高阶亡灵召唤实例): void {
   if (instance == null || instance.已移除) return;
-  delete 高阶亡灵实例表[instance.handleId];
+  instance.机制单位.销毁();
+}
+
+function on高阶亡灵机制单位销毁(this: void, _unit: any, variable?: any): void {
+  const instance = (variable as 高阶亡灵机制单位回调变量 | undefined)?.instance;
+  if (instance == null) return;
+  清理高阶亡灵状态(instance);
+}
+
+function on高阶亡灵尸体移除(this: void, variable?: any): void {
+  const instance = variable as 高阶亡灵召唤实例 | undefined;
+  if (instance == null || instance.已移除) return;
+  清理高阶亡灵实例(instance);
+}
+
+function on高阶亡灵机制单位死亡(this: void, _dyingUnit: any, _killingUnit: any, variable?: any): void {
+  const instance = (variable as 高阶亡灵机制单位回调变量 | undefined)?.instance;
+  if (instance == null || instance.已移除) return;
   const context = instance.context;
-  if (context.高阶亡灵召唤物 === dyingUnit) context.高阶亡灵召唤物 = undefined;
+  if (context.高阶亡灵召唤物 === instance.unit) context.高阶亡灵召唤物 = undefined;
   停用高阶亡灵致命保护(instance);
   if (!context.挑战已结束 && !context.清理.已清理()) {
     context.亡灵箭削弱到Ms = getServerTime() + 安兹乌尔恭数值与表现配置.阶段技能.高阶亡灵击败削弱秒 * 1000;
@@ -185,16 +182,8 @@ function on高阶亡灵死亡(this: void, dyingUnit: any, _killingUnit: any): vo
       3500,
     );
   }
-  const removeId = addDelayedCallback(3000, function 高阶亡灵尸体移除(this: void): void {
-    清理高阶亡灵实例(instance);
-  });
+  const removeId = addDelayedCallback(3000, on高阶亡灵尸体移除, instance);
   context.清理.登记延迟回调('安兹-高阶亡灵尸体移除', removeId);
-}
-
-function 确保高阶亡灵死亡监听(this: void): void {
-  if (高阶亡灵死亡监听已注册) return;
-  高阶亡灵死亡监听已注册 = true;
-  registerDeathListener(on高阶亡灵死亡);
 }
 
 function 播放召唤特效(this: void, model: string, x: number, y: number, scale: number): void {
@@ -211,7 +200,10 @@ function 创建高阶亡灵(this: void, context: 安兹运行时上下文, x: nu
   const boss = context.安兹单位;
   if (!单位有效(boss) || context.挑战已结束) return;
   const cfg = 安兹乌尔恭数值与表现配置.阶段技能;
-  const summon = 创建召唤物({
+  const 回调变量: 高阶亡灵机制单位回调变量 = {};
+  const 机制单位 = 创建可攻击机制单位({
+    清理: context.清理,
+    名称: '安兹-高阶亡灵召唤物',
     主人单位: boss,
     单位类型: cfg.高阶亡灵召唤单位ID,
     单位名称: cfg.高阶亡灵召唤单位名称,
@@ -231,28 +223,28 @@ function 创建高阶亡灵(this: void, context: 安兹运行时上下文, x: nu
     红: 150,
     绿: 205,
     蓝: 255,
+    变量: 回调变量,
+    on死亡: on高阶亡灵机制单位死亡,
+    on销毁: on高阶亡灵机制单位销毁,
   });
-  if (!单位有效(summon)) return;
+  if (机制单位 == null || !单位有效(机制单位.单位)) return;
+  const summon = 机制单位.单位;
   const instance: 高阶亡灵召唤实例 = {
     context,
     unit: summon,
-    handleId: GetHandleId(summon),
+    机制单位,
     已移除: false,
-    致命保护修正器ID: 0,
-    免伤截止Ms: 0,
+    致命保护已触发: false,
     致命护盾特效: null,
     致命护盾特效回调ID: 0,
   };
+  回调变量.instance = instance;
   context.高阶亡灵召唤物 = summon;
-  高阶亡灵实例表[instance.handleId] = instance;
   创建高阶亡灵致命保护(instance);
-  context.清理.登记清理('安兹-高阶亡灵召唤物', function 高阶亡灵挑战清理(this: void): void {
-    清理高阶亡灵实例(instance);
-  });
   if (单位有效(target)) IssueTargetOrder(summon, 'attack', target);
   广播单位提示(
     boss,
-    '|cffff6060[机制]|r 死亡骑士存活期间，安兹的亡灵箭伤害提高35%；死亡骑士受到致命伤害时保留1点生命并免伤1秒。（优先击败死亡骑士，可让后续亡灵箭降至基础值的75%。）',
+    '|cffff6060[机制]|r 死亡骑士存活期间，安兹的亡灵箭伤害提高35%；首次受到致命伤害时保留1点生命并免伤1秒，之后可正常击败。（护盾消失后再次集火，可让亡灵箭降至基础值的75%。）',
     3500,
   );
 }
@@ -279,7 +271,6 @@ export function 释放安兹高阶亡灵召唤(this: void, context: 安兹运行
   context.当前大型技能 = 高阶亡灵召唤大型技能Key;
   播放安兹台词(boss, '高阶亡灵召唤');
   播放Boss坐标音效(安兹乌尔恭数值与表现配置.音效.高阶亡灵召唤, GetUnitX(boss), GetUnitY(boss), 安兹乌尔恭数值与表现配置.音效默认裁断距离);
-  确保高阶亡灵死亡监听();
   播放召唤特效(cfg.表现资源.高阶亡灵召唤门特效路径, summonX, summonY, stage.高阶亡灵召唤门缩放);
   播放召唤特效(cfg.表现资源.高阶亡灵召唤外圈特效路径, summonX, summonY, stage.高阶亡灵召唤外圈缩放);
   播放召唤特效(cfg.表现资源.高阶亡灵召唤内圈特效路径, summonX, summonY, stage.高阶亡灵召唤内圈缩放);

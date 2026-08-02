@@ -243,9 +243,29 @@ function registerHeroDependents(whichHero: any): void {
   }
 }
 
+export type PlayerHeroListener = (this: void, whichPlayer: any, whichHero: any) => void;
+
+const playerHeroListeners: PlayerHeroListener[] = [];
+
+export function registerPlayerHeroListener(this: void, callback: PlayerHeroListener): void {
+  if (callback == null) return;
+  for (let i = 0; i < playerHeroListeners.length; i++) {
+    if (playerHeroListeners[i] === callback) return;
+  }
+  playerHeroListeners.push(callback);
+}
+
+function notifyPlayerHeroListeners(this: void, whichPlayer: any, whichHero: any): void {
+  for (let i = 0; i < playerHeroListeners.length; i++) {
+    const callback = playerHeroListeners[i];
+    if (callback != null) callback(whichPlayer, whichHero);
+  }
+}
+
 function registerPlayerHero(whichPlayer: any, whichHero: any): void {
   if (whichPlayer == null || whichPlayer === 0 || whichHero == null || whichHero === 0) return;
   YDUserDataSet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit", whichHero);
+  notifyPlayerHeroListeners(whichPlayer, whichHero);
   registerHeroDependents(whichHero);
 }
 

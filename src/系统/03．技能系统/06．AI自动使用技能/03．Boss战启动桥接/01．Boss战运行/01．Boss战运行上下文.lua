@@ -2,12 +2,26 @@ local ____lualib = require("lualib_bundle")
 local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
+local _____6309_77E9_5F62_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868
 local ____05_FF0E_4E2D_5FC3_8BA1_65F6_5668 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____05_FF0E_4E2D_5FC3_8BA1_65F6_5668.getServerTime
+____exports["清理矩形当前Boss战上下文"] = function(rectHandleId, expectedGeneration)
+    if rectHandleId == 0 then
+        return
+    end
+    local context = _____6309_77E9_5F62_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868[rectHandleId]
+    if context == nil then
+        return
+    end
+    if expectedGeneration ~= nil and context["运行代次"] ~= expectedGeneration then
+        return
+    end
+    _____6309_77E9_5F62_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868[rectHandleId] = nil
+end
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local _____6309Boss_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868 = {}
-local _____6309_77E9_5F62_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868 = {}
+_____6309_77E9_5F62_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868 = {}
 local _____77E9_5F62_73A9_5BB6_53EF_89C1_5EA6_7F13_5B58_8868 = {}
 local _____5168_5C40_8FD0_884C_4EE3_6B21 = 0
 local function _____83B7_53D6_53E5_67C4ID(handle)
@@ -44,7 +58,10 @@ local function _____83B7_53D6_6709_5E8F_53E5_67C4ID_5217_8868(____table)
     end
     return result
 end
-____exports["创建Boss战运行上下文"] = function(bossUnit, _____5730_70B9_77E9_5F62, _____6218_6597_97F3_4E50, _____80DC_5229_97F3_4E50)
+____exports["创建Boss战运行上下文"] = function(bossUnit, _____5730_70B9_77E9_5F62, _____6218_6597_97F3_4E50, _____80DC_5229_97F3_4E50, _____5730_70B9_77E9_5F62_662F_5426_52A8_6001)
+    if _____5730_70B9_77E9_5F62_662F_5426_52A8_6001 == nil then
+        _____5730_70B9_77E9_5F62_662F_5426_52A8_6001 = false
+    end
     local bossHandleId = _____83B7_53D6_53E5_67C4ID(bossUnit)
     if bossHandleId == 0 then
         return nil
@@ -55,6 +72,7 @@ ____exports["创建Boss战运行上下文"] = function(bossUnit, _____5730_70B9_
         ["Boss句柄ID"] = bossHandleId,
         ["地点矩形"] = _____5730_70B9_77E9_5F62,
         ["地点句柄ID"] = _____83B7_53D6_53E5_67C4ID(_____5730_70B9_77E9_5F62),
+        ["地点矩形是否动态"] = _____5730_70B9_77E9_5F62_662F_5426_52A8_6001,
         ["战斗音乐"] = _____6218_6597_97F3_4E50,
         ["胜利音乐"] = _____80DC_5229_97F3_4E50,
         ["运行代次"] = _____5168_5C40_8FD0_884C_4EE3_6B21,
@@ -97,7 +115,11 @@ ____exports["清理Boss战运行上下文"] = function(bossUnit)
     if bossHandleId == 0 then
         return
     end
+    local context = _____6309Boss_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868[bossHandleId]
     _____6309Boss_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868[bossHandleId] = nil
+    if context ~= nil then
+        ____exports["清理矩形当前Boss战上下文"](context["地点句柄ID"], context["运行代次"])
+    end
 end
 ____exports["读取矩形当前Boss战上下文"] = function(rectHandleId)
     if rectHandleId == 0 then
@@ -125,19 +147,6 @@ ____exports["获取全部矩形当前Boss战上下文"] = function()
         end
     end
     return result
-end
-____exports["清理矩形当前Boss战上下文"] = function(rectHandleId, expectedGeneration)
-    if rectHandleId == 0 then
-        return
-    end
-    local context = _____6309_77E9_5F62_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868[rectHandleId]
-    if context == nil then
-        return
-    end
-    if expectedGeneration ~= nil and context["运行代次"] ~= expectedGeneration then
-        return
-    end
-    _____6309_77E9_5F62_53E5_67C4_7D22_5F15_7684_8FD0_884C_4E0A_4E0B_6587_8868[rectHandleId] = nil
 end
 ____exports["读取矩形玩家可见度修整器"] = function(rectHandleId, playerId)
     if rectHandleId == 0 or playerId < 0 then

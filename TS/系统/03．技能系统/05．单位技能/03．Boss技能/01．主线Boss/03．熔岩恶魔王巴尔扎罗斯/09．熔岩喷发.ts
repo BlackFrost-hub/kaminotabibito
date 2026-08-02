@@ -1,9 +1,5 @@
 /** @noSelfInFile */
 
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
-
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取或创建巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
@@ -14,6 +10,7 @@ import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00�
 import { 开始原地击飞 } from "../../../../00．技能模板+函数/01．技能函数/03．跳跃·击飞/index";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 执行BossAOE技能伤害, 提交预计算BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -33,10 +30,6 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   CosBJ: (this: void, degrees: number) => number;
   SinBJ: (this: void, degrees: number) => number;
-};
-
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 
 const jass = require("jass.common") as any;
@@ -66,15 +59,6 @@ let 熔岩喷发已注册 = false;
 interface 熔岩喷发落点 {
   X: number;
   Y: number;
-}
-
-function 计算喷发伤害(this: void, boss: any, target: any): number {
-  const config = 巴尔扎罗斯技能数值配置.熔岩喷发;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: config.爆发伤害Boss攻击力比例,
-    目标最大生命比例: config.爆发伤害目标最大生命比例,
-    总倍率: config.爆发伤害总倍率,
-  });
 }
 
 function 创建随机落点(this: void, boss: any, target: any): 熔岩喷发落点 {
@@ -119,7 +103,7 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
         const unit = units[i];
         if (!单位有效(unit)) continue;
         const damage = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * config.残留伤害目标最大生命比例;
-        造成AOE技能伤害({
+        提交预计算BossAOE技能伤害({
           技能ID: 熔岩喷发技能ID,
           来源: boss,
           目标: unit,
@@ -129,7 +113,6 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
           attackType: ATTACK_TYPE_NORMAL,
           伤害类型: DAMAGE_TYPE_FIRE,
           weaponType: WEAPON_TYPE_WHOKNOWS,
-          来源类型: "Boss技能",
         });
         施加巴尔扎罗斯灼热(unit, config.残留灼热层数);
       }
@@ -142,17 +125,20 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
 
 function 处理熔岩喷发爆发命中(this: void, boss: any, unit: any, config: typeof 巴尔扎罗斯技能数值配置.熔岩喷发): void {
   if (!单位有效(unit)) return;
-  造成AOE技能伤害({
+  执行BossAOE技能伤害({
     技能ID: 熔岩喷发技能ID,
     来源: boss,
     目标: unit,
-    伤害: 计算喷发伤害(boss, unit),
+    伤害公式: {
+      来源攻击力比例: config.爆发伤害Boss攻击力比例,
+      目标最大生命比例: config.爆发伤害目标最大生命比例,
+      总倍率: config.爆发伤害总倍率,
+    },
     attack: false,
     ranged: true,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_FIRE,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
   });
   施加巴尔扎罗斯灼热(unit, config.爆发灼热层数);
   开始原地击飞(unit, {

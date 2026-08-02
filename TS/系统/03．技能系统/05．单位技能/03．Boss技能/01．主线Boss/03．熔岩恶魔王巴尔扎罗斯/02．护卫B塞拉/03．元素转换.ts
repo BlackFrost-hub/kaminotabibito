@@ -5,12 +5,12 @@ import { 塞拉公共 } from "./00．公共";
 import { 巴尔扎罗斯音效配置 } from "../02．数值与表现配置";
 import { 播放Boss坐标音效 } from "../../../00．公共/00．Boss音效播放";
 import { 播放限时单位动画 } from "../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
+import { 创建条件伤害修正 } from "../../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 const {  巴尔扎罗斯单位技能配置,
   巴尔扎罗斯技能数值配置,
   播放塞拉台词,
   registerManualBuff,
   移除单位指定Buff,
-  registerDamageModifier,
   getServerTime,
   GetUnitX,
   GetUnitY,
@@ -65,6 +65,14 @@ export function 切换塞拉形态(this: void, context: 巴尔扎罗斯运行时
   if (播放台词) 播放塞拉台词(sera, next === "火焰" ? "元素转换火焰" : "元素转换冰霜");
 }
 
+function 满足塞拉伤害修正条件(this: void, context: any): boolean {
+  const attackerId = 取单位ID(context.attacker);
+  if (attackerId !== 0 && (零度领域减伤到期Ms表[attackerId] ?? 0) > 0) return true;
+  const targetId = 取单位ID(context.target);
+  const form = targetId !== 0 ? 塞拉形态表[targetId] : undefined;
+  return (form === "火焰" && context.isWaterDamage === true) || (form === "冰霜" && context.isFireDamage === true);
+}
+
 function 塞拉伤害修正(this: void, context: any): number {
   const now = getServerTime();
   const attackerId = 取单位ID(context.attacker);
@@ -90,5 +98,10 @@ function 塞拉伤害修正(this: void, context: any): number {
 export function 确保塞拉伤害修正(this: void): void {
   if (塞拉伤害修正已注册) return;
   塞拉伤害修正已注册 = true;
-  registerDamageModifier(塞拉伤害修正, 65);
+  创建条件伤害修正({
+    名称: "塞拉元素转换伤害修正",
+    优先级: 65,
+    条件: 满足塞拉伤害修正条件,
+    修正: 塞拉伤害修正,
+  });
 }

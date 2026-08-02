@@ -13,8 +13,8 @@ local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_
 local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
 local _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放赤誓灵卫台词"]
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
@@ -23,15 +23,13 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
-local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_3["造成AOE技能伤害"]
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_4.addDelayedCallback
-local addPeriodicCallback = ____require_result_4.addPeriodicCallback
-local removePeriodicCallback = ____require_result_4.removePeriodicCallback
-local getServerTime = ____require_result_4.getServerTime
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
+local addPeriodicCallback = ____require_result_3.addPeriodicCallback
+local removePeriodicCallback = ____require_result_3.removePeriodicCallback
+local getServerTime = ____require_result_3.getServerTime
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
@@ -106,17 +104,15 @@ local function _____7ED3_7B97_8DF5_8E0F_4F24_5BB3(context, x, y, label)
                 ) then
                     goto __continue13
                 end
-                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = hit,
-                    ["伤害"] = damage,
+                    ["伤害公式"] = {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]},
                     attack = false,
                     ranged = false,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_NORMAL,
                     weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                    ["来源类型"] = "Boss技能",
                     ["标签"] = label
                 })
             end
@@ -220,13 +216,13 @@ ____exports["释放断誓践踏"] = function(context, target)
     _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD(boss, isBreakingNode and "双钥净化破壳" or "断誓践踏")
     local targetX = GetUnitX(target)
     local targetY = GetUnitY(target)
-    local ____temp_6
+    local ____temp_5
     if context["阶段"] == "P2侵蚀失衡" and context["首次变异守卫"] == "赤誓灵卫" then
-        ____temp_6 = context["誓盾"]
+        ____temp_5 = context["誓盾"]
     else
-        ____temp_6 = nil
+        ____temp_5 = nil
     end
-    local activeShield = ____temp_6
+    local activeShield = ____temp_5
     local firstTargetX = activeShield ~= nil and getServerTime() < activeShield["到期Ms"] and activeShield.X or targetX
     local firstTargetY = activeShield ~= nil and getServerTime() < activeShield["到期Ms"] and activeShield.Y or targetY
     local first = _____8BA1_7B97_8E0F_6B65_843D_70B9(
@@ -314,17 +310,15 @@ ____exports["释放断誓践踏"] = function(context, target)
                                 ) then
                                     goto __continue39
                                 end
-                                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = 0.08})
-                                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                                     ["来源"] = boss,
                                     ["目标"] = hit,
-                                    ["伤害"] = damage,
+                                    ["伤害公式"] = {["来源攻击力比例"] = 0.08},
                                     attack = false,
                                     ranged = true,
                                     attackType = ATTACK_TYPE_NORMAL,
                                     ["伤害类型"] = DAMAGE_TYPE_PLANT,
                                     weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                                    ["来源类型"] = "Boss技能",
                                     ["标签"] = "祖地双灵卫·断誓践踏魂裂"
                                 })
                             end
@@ -337,6 +331,8 @@ ____exports["释放断誓践踏"] = function(context, target)
                     end
                 end
             )
+            local ____self_6 = context["清理"]
+            ____self_6["登记周期回调"](____self_6, "祖地双灵卫-断誓践踏魂裂", crackTimer)
         end
     )
     local ____self_7 = context["清理"]

@@ -1,11 +1,17 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____6E05_7406_672F_58EB_65BD_6CD5, _____4E2D_65AD_672F_58EB_65BD_6CD5, _____6E05_7406_72B6_6001, _____7ED3_7B97_8150_8680_6CD5_9635, _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868, _____9020_6210AOE_6280_80FD_4F24_5BB3, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____83F2_5229_65AFBuffID, _____65BD_52A0_5FEB_901F_51CF_901FBuff, _____505C_6B62_5145_80FD, _____521B_5EFA_70B9_7279_6548, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitType, GetUnitStateJapi, UNIT_TYPE_DEAD, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS, _____5F53_524D_72B6_6001
+local _____5355_4F4D_5B58_6D3B, _____6E05_7406_672F_58EB_65BD_6CD5, _____4E2D_65AD_672F_58EB_65BD_6CD5, _____6E05_7406_72B6_6001, _____7ED3_7B97_8150_8680_6CD5_9635, _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____83F2_5229_65AFBuffID, _____65BD_52A0_5FEB_901F_51CF_901FBuff, _____505C_6B62_5145_80FD, _____521B_5EFA_70B9_7279_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitType, UNIT_TYPE_DEAD, UNIT_STATE_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS, _____5F53_524D_72B6_6001
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.02．数值与表现配置")
 local _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["菲利斯数值与表现配置"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.22．限次周期执行器")
+local _____521B_5EFA_5468_671F_884C_4E3A = ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668["创建周期行为"]
+local ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.11．条件伤害修正")
+local _____521B_5EFA_6761_4EF6_4F24_5BB3_4FEE_6B63 = ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63["创建条件伤害修正"]
 function _____5355_4F4D_5B58_6D3B(unit)
     if unit == nil or unit == 0 then
         return false
@@ -57,38 +63,32 @@ function _____7ED3_7B97_8150_8680_6CD5_9635(state, record)
     })
     local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868(boss)
     local radius2 = cfg["爆炸半径"] * cfg["爆炸半径"]
-    local attack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(warlock) * cfg["术士攻击力比例"]
     do
         local i = 0
         while i < #targets do
             do
                 local target = targets[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(target) then
-                    goto __continue53
+                    goto __continue55
                 end
                 local dx = GetUnitX(target) - record["目标X"]
                 local dy = GetUnitY(target) - record["目标Y"]
                 if dx * dx + dy * dy > radius2 then
-                    goto __continue53
+                    goto __continue55
                 end
-                local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
-                local damage = attack + (maxLife > 0 and maxLife * cfg["目标最大生命比例"] or 0)
-                if damage > 0 then
-                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                        ["来源"] = warlock,
-                        ["目标"] = target,
-                        ["伤害"] = damage,
-                        attack = false,
-                        ranged = true,
-                        attackType = ATTACK_TYPE_NORMAL,
-                        ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
-                        weaponType = WEAPON_TYPE_WHOKNOWS,
-                        ["来源类型"] = "Boss技能",
-                        ["标签"] = "菲利斯-腐蚀法阵"
-                    })
-                end
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = warlock,
+                    ["目标"] = target,
+                    ["伤害公式"] = {["来源攻击力比例"] = cfg["术士攻击力比例"], ["目标最大生命比例"] = cfg["目标最大生命比例"]},
+                    attack = false,
+                    ranged = true,
+                    attackType = ATTACK_TYPE_NORMAL,
+                    ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
+                    weaponType = WEAPON_TYPE_WHOKNOWS,
+                    ["标签"] = "菲利斯-腐蚀法阵"
+                })
                 if not _____5355_4F4D_5B58_6D3B(target) then
-                    goto __continue53
+                    goto __continue55
                 end
                 _____65BD_52A0_5FEB_901F_51CF_901FBuff(
                     warlock,
@@ -107,19 +107,17 @@ function _____7ED3_7B97_8150_8680_6CD5_9635(state, record)
                     {sourceName = "菲利斯-腐蚀法阵", stack = 1}
                 )
             end
-            ::__continue53::
+            ::__continue55::
             i = i + 1
         end
     end
 end
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_1.getServerTime
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_2.registerDeathListener
 local ____require_result_3 = require("系统.01．单位系统.10．护卫系统.index")
@@ -127,27 +125,21 @@ local _____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_3["获取Boss�
 local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能最近敌对英雄"]
 _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868 = ____require_result_4["获取Boss技能敌对目标列表"]
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成AOE技能伤害"]
-local ____require_result_6 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_6.registerDamageModifier
-local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_7.registerManualBuff
-local getBuffRuntime = ____require_result_7.getBuffRuntime
-_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_7["移除单位指定Buff"]
-local ____require_result_8 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.05．菲利斯")
-_____83F2_5229_65AFBuffID = ____require_result_8["菲利斯BuffID"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_9["施加快速减速Buff"]
-local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
-local _____5F00_59CB_5145_80FD = ____require_result_10["开始充能"]
-_____505C_6B62_5145_80FD = ____require_result_10["停止充能"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_12["读取单位攻击力"]
-local ____require_result_13 = require("系统.09．表现系统.06．广播提示消息.index")
-local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_13["广播单位提示"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_5.registerManualBuff
+local getBuffRuntime = ____require_result_5.getBuffRuntime
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_5["移除单位指定Buff"]
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.05．菲利斯")
+_____83F2_5229_65AFBuffID = ____require_result_6["菲利斯BuffID"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____65BD_52A0_5FEB_901F_51CF_901FBuff = ____require_result_7["施加快速减速Buff"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
+local _____5F00_59CB_5145_80FD = ____require_result_8["开始充能"]
+_____505C_6B62_5145_80FD = ____require_result_8["停止充能"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
+local ____require_result_10 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_10["广播单位提示"]
 local GetHandleId = jass.GetHandleId
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
@@ -155,10 +147,8 @@ GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
 IsUnitType = jass.IsUnitType
 local SetUnitAnimation = jass.SetUnitAnimation
-GetUnitStateJapi = japi.GetUnitState
 UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -262,17 +252,8 @@ local function _____5237_65B0_62A4_4E3B_76FE_9635(state)
     end
 end
 local function _____83F2_5229_65AF_62A4_4E3B_76FE_9635_4F24_5BB3_4FEE_6B63(context)
-    if context == nil or _____5F53_524D_72B6_6001 == nil or context.target ~= _____5F53_524D_72B6_6001["Boss单位"] then
-        local ____temp_14
-        if context ~= nil then
-            ____temp_14 = context.currentDamage
-        else
-            ____temp_14 = 0
-        end
-        return ____temp_14
-    end
-    if context.isDamageTransfer == true then
-        return context.currentDamage
+    if context == nil then
+        return 0
     end
     local currentDamage = __TS__Number(context.currentDamage)
     if not (currentDamage > 0) then
@@ -287,6 +268,16 @@ local function _____83F2_5229_65AF_62A4_4E3B_76FE_9635_4F24_5BB3_4FEE_6B63(conte
         return currentDamage
     end
     return currentDamage * (ratio < 1 and 1 - ratio or 0)
+end
+local function _____6EE1_8DB3_83F2_5229_65AF_62A4_4E3B_76FE_9635_4F24_5BB3_6761_4EF6(context)
+    if context == nil or _____5F53_524D_72B6_6001 == nil or context.target ~= _____5F53_524D_72B6_6001["Boss单位"] then
+        return false
+    end
+    if context.isDamageTransfer == true then
+        return false
+    end
+    local runtime = getBuffRuntime(context.target, _____83F2_5229_65AFBuffID["护主盾阵"])
+    return runtime ~= nil and __TS__Number(runtime.effect) > 0
 end
 local function _____83B7_53D6_6709_6548_672F_58EB(boss)
     local guards = _____83B7_53D6Boss_62A4_536B_5217_8868(boss, true)
@@ -392,13 +383,13 @@ ____exports["立即触发菲利斯第二军团随从测试"] = function(boss)
 end
 local function _____83F2_5229_65AF_7B2C_4E8C_519B_56E2Tick()
     local globalBoss = jglobals.udg_Boss
-    local _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF_result_15
+    local _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF_result_11
     if _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF(globalBoss) then
-        _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF_result_15 = globalBoss
+        _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF_result_11 = globalBoss
     else
-        _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF_result_15 = nil
+        _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF_result_11 = nil
     end
-    local boss = _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF_result_15
+    local boss = _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF_result_11
     if boss == nil and _____5F53_524D_72B6_6001 ~= nil and _____5355_4F4D_7C7B_578B_662F_83F2_5229_65AF(_____5F53_524D_72B6_6001["Boss单位"]) then
         boss = _____5F53_524D_72B6_6001["Boss单位"]
     end
@@ -430,8 +421,8 @@ ____exports["注册菲利斯第二军团随从效果"] = function()
         return
     end
     _____5DF2_6CE8_518C = true
-    registerDamageModifier(_____83F2_5229_65AF_62A4_4E3B_76FE_9635_4F24_5BB3_4FEE_6B63, 50)
+    _____521B_5EFA_6761_4EF6_4F24_5BB3_4FEE_6B63({["名称"] = "菲利斯护主盾阵承伤修正", ["优先级"] = 50, ["条件"] = _____6EE1_8DB3_83F2_5229_65AF_62A4_4E3B_76FE_9635_4F24_5BB3_6761_4EF6, ["修正"] = _____83F2_5229_65AF_62A4_4E3B_76FE_9635_4F24_5BB3_4FEE_6B63})
     registerDeathListener(____on_83F2_5229_65AF_7B2C_4E8C_519B_56E2_5355_4F4D_6B7B_4EA1)
-    addPeriodicCallback(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["第二军团护卫"]["检查间隔毫秒"], _____83F2_5229_65AF_7B2C_4E8C_519B_56E2Tick)
+    _____521B_5EFA_5468_671F_884C_4E3A({["名称"] = "菲利斯-第二军团随从驱动", ["间隔毫秒"] = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["第二军团护卫"]["检查间隔毫秒"], onTick = _____83F2_5229_65AF_7B2C_4E8C_519B_56E2Tick})
 end
 return ____exports

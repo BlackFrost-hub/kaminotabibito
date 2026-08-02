@@ -16,8 +16,7 @@ local _____53D6_5355_4F4DX = ____19_FF0E_516C_5171_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____19_FF0E_516C_5171_5DE5_5177["取单位Y"]
 local _____53D6_968F_673A_73A9_5BB6_82F1_96C4 = ____19_FF0E_516C_5171_5DE5_5177["取随机玩家英雄"]
 local _____64AD_653E_70B9_7279_6548 = ____19_FF0E_516C_5171_5DE5_5177["播放点特效"]
-local _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击最大生命伤害"]
-local _____9020_6210_6697_706B_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成暗火伤害"]
+local _____53D6_83F2_5C3C_514B_65AF_5C14_6280_80FD_5F3A_5EA6_500D_7387 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔技能强度倍率"]
 local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587 = ____19_FF0E_516C_5171_5DE5_5177["创建菲尼克斯尔独立伤害上下文"]
 local _____6DFB_52A0_5143_7D20_5C42_6570 = ____19_FF0E_516C_5171_5DE5_5177["添加元素层数"]
 local _____8BBE_7F6E_5355_4F4D_52A8_753B = ____19_FF0E_516C_5171_5DE5_5177["设置单位动画"]
@@ -30,6 +29,8 @@ local _____521B_5EFA_4E8C_9636_8D1D_585E_5C14XYZ_8F68_8FF9 = ____01_FF0ETS_539F_
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
 local ____16_FF0E_6280_80FD_63D0_793A_5708_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____16_FF0E_6280_80FD_63D0_793A_5708_5DE5_5382["创建技能提示圈"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitFlyHeight = jass.GetUnitFlyHeight
@@ -40,6 +41,9 @@ if ____jass_bj_RADTODEG_0 == nil then
     ____jass_bj_RADTODEG_0 = 57.29577951308232
 end
 local bj_RADTODEG = ____jass_bj_RADTODEG_0
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
+local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
+local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local function _____53D6_5750_6807_671D_5411_89D2(fromX, fromY, toX, toY)
     return Atan2(toY - fromY, toX - fromX) * bj_RADTODEG
 end
@@ -146,13 +150,24 @@ local function _____53D1_5C04_83F2_5C3C_514B_65AF_5C14_9AB8_9AA8_5F39_5E55_6CE2_
                                 _____53D6_5355_4F4DY(target),
                                 config["命中特效持续秒"] * 1000
                             )
-                            _____9020_6210_6697_706B_4F24_5BB3(
-                                boss,
-                                target,
-                                _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(boss, target, config["伤害Boss攻击力比例"], config["伤害目标最大生命比例"]) * repeatScale,
-                                "AOE",
-                                _____4F24_5BB3_4E0A_4E0B_6587
-                            )
+                            if _____5355_4F4D_5B58_6D3B(boss) and _____5355_4F4D_5B58_6D3B(target) then
+                                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                                    ["技能ID"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["技能ID"],
+                                    ["技能实例ID"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["技能实例ID"],
+                                    ["标签"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["标签"],
+                                    ["来源"] = boss,
+                                    ["目标"] = target,
+                                    ["伤害公式"] = {
+                                        ["来源攻击力比例"] = config["伤害Boss攻击力比例"],
+                                        ["目标最大生命比例"] = config["伤害目标最大生命比例"],
+                                        ["总倍率"] = _____53D6_83F2_5C3C_514B_65AF_5C14_6280_80FD_5F3A_5EA6_500D_7387(boss) * repeatScale
+                                    },
+                                    ranged = true,
+                                    attackType = ATTACK_TYPE_NORMAL,
+                                    ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
+                                    weaponType = WEAPON_TYPE_WHOKNOWS
+                                })
+                            end
                             _____6DFB_52A0_5143_7D20_5C42_6570(target, "暗", config["怨火层数"])
                         end
                     })
@@ -210,8 +225,8 @@ ____exports["初始化菲尼克斯尔骸骨弹幕节点"] = function(context)
             ____exports["释放菲尼克斯尔骸骨弹幕"](context)
         end
     )
-    local ____self_1 = context["清理"]
-    ____self_1["登记周期回调"](____self_1, "菲尼克斯尔-骸骨弹幕", timerId)
+    local ____self_7 = context["清理"]
+    ____self_7["登记周期回调"](____self_7, "菲尼克斯尔-骸骨弹幕", timerId)
 end
 ____exports["注册菲尼克斯尔骸骨弹幕"] = function()
 end

@@ -1,5 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local _____53D6_62A4_76FE_95EA_8272_7C7B_578B, _____6784_5EFA_4F24_5BB3_4FE1_606F, _____62A4_76FE_5438_6536_4F24_5BB3_4FEE_6B63, RMinBJ
 local ____01_FF0E_62A4_76FE_7C7B_578B = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.01．护盾类型")
 local _____62A4_76FE_7C7B_578B = ____01_FF0E_62A4_76FE_7C7B_578B["护盾类型"]
 local ____02_FF0E_62A4_76FE_5B9E_4F8B = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.02．护盾实例")
@@ -10,12 +11,7 @@ local ____03_FF0E_62A4_76FE_4F18_5148_7EA7 = require("系统.03．技能系统.0
 local _____83B7_53D6_53EF_5339_914D_62A4_76FE_5217_8868 = ____03_FF0E_62A4_76FE_4F18_5148_7EA7["获取可匹配护盾列表"]
 local ____03_FF0E_62A4_76FE_56DE_8C03_6A21_677F = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.11．回调模板.03．护盾回调模板")
 local _____663E_793A_62A4_76FE_7834_788E_6F02_6D6E_6587_5B57 = ____03_FF0E_62A4_76FE_56DE_8C03_6A21_677F["显示护盾破碎漂浮文字"]
-local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
-local RMinBJ = ____require_result_0.RMinBJ
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_1.registerDamageModifier
-local shieldModifierRegistered = false
-local function _____53D6_62A4_76FE_95EA_8272_7C7B_578B(_____62A4_76FE)
+function _____53D6_62A4_76FE_95EA_8272_7C7B_578B(_____62A4_76FE)
     if _____62A4_76FE["类型"] == _____62A4_76FE_7C7B_578B["物理"] then
         return 1
     end
@@ -48,7 +44,7 @@ local function _____53D6_62A4_76FE_95EA_8272_7C7B_578B(_____62A4_76FE)
     end
     return 0
 end
-local function _____6784_5EFA_4F24_5BB3_4FE1_606F(_____76EE_6807, _____4F24_5BB3_503C, _____662F_7269_7406_4F24_5BB3, _____662F_9B54_6CD5_4F24_5BB3, _____653B_51FB_8005, _____5C5E_6027)
+function _____6784_5EFA_4F24_5BB3_4FE1_606F(_____76EE_6807, _____4F24_5BB3_503C, _____662F_7269_7406_4F24_5BB3, _____662F_9B54_6CD5_4F24_5BB3, _____653B_51FB_8005, _____5C5E_6027)
     return {
         ["目标"] = _____76EE_6807,
         ["攻击者"] = _____653B_51FB_8005,
@@ -97,6 +93,7 @@ ____exports["吸收伤害"] = function(_____76EE_6807, _____4F24_5BB3_503C, ____
         _____5C5E_6027
     )
     local _____53EF_7528_62A4_76FE = _____83B7_53D6_53EF_5339_914D_62A4_76FE_5217_8868(_____5168_90E8_62A4_76FE, _____4F24_5BB3)
+    local _____963B_6B62_6EA2_51FA = false
     for ____, _____62A4_76FE in ipairs(_____53EF_7528_62A4_76FE) do
         if _____7ED3_679C["剩余伤害"] <= 0 then
             break
@@ -109,6 +106,9 @@ ____exports["吸收伤害"] = function(_____76EE_6807, _____4F24_5BB3_503C, ____
         _____7ED3_679C["剩余伤害"] = _____7ED3_679C["剩余伤害"] - _____5438_6536_91CF
         _____7ED3_679C["总吸收量"] = _____7ED3_679C["总吸收量"] + _____5438_6536_91CF
         if _____62A4_76FE["当前值"] <= 0 then
+            if _____62A4_76FE["溢出处理策略"] == "阻止传递" then
+                _____963B_6B62_6EA2_51FA = true
+            end
             local ____7ED3_679C__7834_788E_62A4_76FE_40 = _____7ED3_679C["破碎护盾"]
             ____7ED3_679C__7834_788E_62A4_76FE_40[#____7ED3_679C__7834_788E_62A4_76FE_40 + 1] = _____62A4_76FE
             _____5220_9664_62A4_76FE_5B9E_4F8B(_____62A4_76FE.id)
@@ -121,8 +121,41 @@ ____exports["吸收伤害"] = function(_____76EE_6807, _____4F24_5BB3_503C, ____
             end
         end
     end
+    if _____963B_6B62_6EA2_51FA then
+        _____7ED3_679C["剩余伤害"] = 0
+    end
     return _____7ED3_679C
 end
+function _____62A4_76FE_5438_6536_4F24_5BB3_4FEE_6B63(context)
+    local _____7ED3_679C = ____exports["吸收伤害"](
+        context.target,
+        context.currentDamage,
+        context.isPhysicalDamage,
+        context.isMagicDamage,
+        context.attacker,
+        {
+            ["是真实伤害"] = context.isTrueDamage == true,
+            ["是强化伤害"] = context.isEnhancedDamage == true,
+            ["是火属性伤害"] = context.isFireDamage == true,
+            ["是水属性伤害"] = context.isWaterDamage == true,
+            ["是冰属性伤害"] = context.isWaterDamage == true,
+            ["是雷属性伤害"] = context.isThunderDamage == true,
+            ["是金属性伤害"] = context.isMetalDamage == true,
+            ["是木属性伤害"] = context.isWoodDamage == true,
+            ["是风属性伤害"] = context.isWoodDamage == true,
+            ["是暗属性伤害"] = context.isDarkDamage == true,
+            ["是光属性伤害"] = context.isLightDamage == true,
+            ["是毒属性伤害"] = context.isMetalDamage == true,
+            ["是普攻"] = context.isNormalAttack == true
+        }
+    )
+    return _____7ED3_679C["剩余伤害"]
+end
+local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函数")
+RMinBJ = ____require_result_0.RMinBJ
+local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_1.registerDamageModifier
+local shieldModifierRegistered = false
 --- 注册护盾吸收到伤害系统
 -- 
 -- 在主计算流程的 YDWESetEventDamage 之前调用
@@ -131,33 +164,6 @@ ____exports["注册护盾吸收钩子"] = function()
         return
     end
     shieldModifierRegistered = true
-    registerDamageModifier(
-        function(context)
-            local _____7ED3_679C = ____exports["吸收伤害"](
-                context.target,
-                context.currentDamage,
-                context.isPhysicalDamage,
-                context.isMagicDamage,
-                context.attacker,
-                {
-                    ["是真实伤害"] = context.isTrueDamage == true,
-                    ["是强化伤害"] = context.isEnhancedDamage == true,
-                    ["是火属性伤害"] = context.isFireDamage == true,
-                    ["是水属性伤害"] = context.isWaterDamage == true,
-                    ["是冰属性伤害"] = context.isWaterDamage == true,
-                    ["是雷属性伤害"] = context.isThunderDamage == true,
-                    ["是金属性伤害"] = context.isMetalDamage == true,
-                    ["是木属性伤害"] = context.isWoodDamage == true,
-                    ["是风属性伤害"] = context.isWoodDamage == true,
-                    ["是暗属性伤害"] = context.isDarkDamage == true,
-                    ["是光属性伤害"] = context.isLightDamage == true,
-                    ["是毒属性伤害"] = context.isMetalDamage == true,
-                    ["是普攻"] = context.isNormalAttack == true
-                }
-            )
-            return _____7ED3_679C["剩余伤害"]
-        end,
-        100
-    )
+    registerDamageModifier(_____62A4_76FE_5438_6536_4F24_5BB3_4FEE_6B63, 100)
 end
 return ____exports

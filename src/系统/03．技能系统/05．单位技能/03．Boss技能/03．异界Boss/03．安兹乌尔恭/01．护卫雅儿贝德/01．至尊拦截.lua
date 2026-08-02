@@ -6,6 +6,8 @@ local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系
 local _____83B7_53D6_5168_90E8_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取全部安兹运行时上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local _____51FB_9000_7CFB_7EDF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
 local _____5F00_59CB_51FB_9000 = _____51FB_9000_7CFB_7EDF["开始击退"]
 local ____00_FF0E_51B2_950B_8868_73B0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.00．冲锋表现")
@@ -17,21 +19,17 @@ local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．�
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
-local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
-local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_3["造成AOE技能伤害"]
-local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_4.registerAppliedFinalDamageListener
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_6.addDelayedCallback
-local getServerTime = ____require_result_6.getServerTime
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
+local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_2.registerAppliedFinalDamageListener
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local getServerTime = ____require_result_4.getServerTime
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -53,8 +51,8 @@ local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
 local _____81F3_5C0A_62E6_622A_4F24_5BB3_76D1_542C_5DF2_6CE8_518C = false
 local function _____7ED3_7B97_81F3_5C0A_62E6_622A(context, x, y)
-    local ____opt_7 = context["雅儿贝德"]
-    local albedo = ____opt_7 and ____opt_7["单位"]
+    local ____opt_5 = context["雅儿贝德"]
+    local albedo = ____opt_5 and ____opt_5["单位"]
     if not _____5355_4F4D_6709_6548(albedo) or context["挑战已结束"] then
         return
     end
@@ -79,16 +77,15 @@ local function _____7ED3_7B97_81F3_5C0A_62E6_622A(context, x, y)
                 if dx * dx + dy * dy > radius * radius then
                     goto __continue6
                 end
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["来源"] = albedo,
                     ["目标"] = target,
-                    ["伤害"] = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(albedo, target, {["来源攻击力比例"] = cfg["守护者模式"]["至尊拦截伤害攻击力比例"], ["目标最大生命比例"] = cfg["守护者模式"]["至尊拦截伤害目标最大生命比例"]}),
+                    ["伤害公式"] = {["来源攻击力比例"] = cfg["守护者模式"]["至尊拦截伤害攻击力比例"], ["目标最大生命比例"] = cfg["守护者模式"]["至尊拦截伤害目标最大生命比例"]},
                     attack = false,
                     ranged = false,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_NORMAL,
                     weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                    ["来源类型"] = "Boss技能",
                     ["标签"] = "雅儿贝德·至尊拦截"
                 })
                 _____5F00_59CB_51FB_9000(target, {
@@ -139,8 +136,8 @@ ____exports["释放雅儿贝德至尊拦截"] = function(context, attacker)
     if distance <= 1 then
         return false
     end
-    local ____opt_11 = state["独占状态"]
-    local token = ____opt_11 and ____opt_11["开始"](____opt_11, {key = "雅儿贝德-至尊拦截", ["优先级"] = 50, ["持续毫秒"] = (cfg["至尊拦截预警秒"] + cfg["至尊拦截冲锋秒"] + 0.8) * 1000, ["可被抢占"] = false}) or 0
+    local ____opt_9 = state["独占状态"]
+    local token = ____opt_9 and ____opt_9["开始"](____opt_9, {key = "雅儿贝德-至尊拦截", ["优先级"] = 50, ["持续毫秒"] = (cfg["至尊拦截预警秒"] + cfg["至尊拦截冲锋秒"] + 0.8) * 1000, ["可被抢占"] = false}) or 0
     if token == 0 then
         return false
     end
@@ -186,8 +183,8 @@ ____exports["释放雅儿贝德至尊拦截"] = function(context, attacker)
             )
         end
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记延迟回调"](____self_13, "雅儿贝德-至尊拦截预警", delayedId)
+    local ____self_11 = context["清理"]
+    ____self_11["登记延迟回调"](____self_11, "雅儿贝德-至尊拦截预警", delayedId)
     return true
 end
 local function ____on_5B89_5179_627F_53D7_7206_53D1_4F24_5BB3(target, attacker, applied)

@@ -57,9 +57,11 @@ const { 释放巴尔扎罗斯熔岩喷发 } = require("系统.03．技能系统.
 const { 释放巴尔扎罗斯火焰锁链 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.10．火焰锁链") as {
   释放巴尔扎罗斯火焰锁链: (this: void, context: any) => void;
 };
-const { 释放格鲁姆重锤, 释放格鲁姆火径 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．护卫A格鲁姆.index") as {
+const { 释放格鲁姆重锤, 释放格鲁姆火径, 触发格鲁姆炙热奉献, 中断格鲁姆炙热奉献 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．护卫A格鲁姆.index") as {
   释放格鲁姆重锤: (this: void, context: any, target: any) => void;
   释放格鲁姆火径: (this: void, context: any, target: any) => void;
+  触发格鲁姆炙热奉献: (this: void, context: any) => number;
+  中断格鲁姆炙热奉献: (this: void, context: any) => boolean;
 };
 const { 释放冰焰双星, 释放绝对零度领域, 切换塞拉形态 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．护卫B塞拉.index") as {
   释放冰焰双星: (this: void, context: any, target: any, 测试类型?: "双星" | "火焰" | "冰霜") => void;
@@ -419,6 +421,42 @@ function on巴尔扎罗斯技能13冰霜破盾测试命令(this: void, player: a
   context.清理.登记延迟回调("巴尔扎罗斯测试-熔岩护盾冰霜破盾", 熔岩护盾冰霜测试回调ID);
 }
 
+function 准备巴尔扎罗斯炙热奉献测试生命(this: void, context: any): boolean {
+  const grum = context.格鲁姆;
+  if (!Boss测试单位存活(grum)) {
+    return false;
+  }
+  const boss = context.Boss单位;
+  if (!Boss测试单位存活(boss)) {
+    return false;
+  }
+  const maxLife = GetUnitState(grum, UNIT_STATE_MAX_LIFE);
+  SetUnitState(grum, UNIT_STATE_LIFE, maxLife * 0.19);
+  const bossMaxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE);
+  SetUnitState(boss, UNIT_STATE_LIFE, bossMaxLife * 0.8);
+  return true;
+}
+
+function on巴尔扎罗斯炙热奉献打断(this: void, variable?: any): void {
+  const context = variable as any;
+  if (context == null) {
+    return;
+  }
+  中断格鲁姆炙热奉献(context);
+}
+
+function on巴尔扎罗斯技能14测试命令(this: void, _player: any, context: any): void {
+  if (!准备巴尔扎罗斯炙热奉献测试生命(context)) return;
+  触发格鲁姆炙热奉献(context);
+}
+
+function on巴尔扎罗斯技能14打断测试命令(this: void, _player: any, context: any): void {
+  if (!准备巴尔扎罗斯炙热奉献测试生命(context)) return;
+  触发格鲁姆炙热奉献(context);
+  const callbackId = addDelayedCallback(1000, on巴尔扎罗斯炙热奉献打断, context);
+  context.清理.登记延迟回调("巴尔扎罗斯测试-炙热奉献打断", callbackId);
+}
+
 const 巴尔扎罗斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 1, 名称: "恶魔咆哮波", 执行: on巴尔扎罗斯技能1测试命令 },
   { 序号: 1, 命令: "1-2", 名称: "恶魔咆哮波(P2护卫模仿)", 执行: on巴尔扎罗斯技能1护卫模仿测试命令 },
@@ -438,6 +476,8 @@ const 巴尔扎罗斯测试技能列表: Boss测试技能命令[] = [
   { 序号: 13, 名称: "熔岩护盾(直接生成)", 执行: on巴尔扎罗斯技能13测试命令 },
   { 序号: 13, 命令: "13-2", 名称: "熔岩护盾(1秒后近战反弹)", 执行: on巴尔扎罗斯技能13近战反弹测试命令 },
   { 序号: 13, 命令: "13-3", 名称: "熔岩护盾(2秒后冰霜破盾)", 执行: on巴尔扎罗斯技能13冰霜破盾测试命令 },
+  { 序号: 14, 名称: "炙热奉献(8秒成功)", 执行: on巴尔扎罗斯技能14测试命令 },
+  { 序号: 14, 命令: "14-2", 名称: "炙热奉献(1秒后打断)", 执行: on巴尔扎罗斯技能14打断测试命令 },
 ];
 
 注册Boss测试命令组({

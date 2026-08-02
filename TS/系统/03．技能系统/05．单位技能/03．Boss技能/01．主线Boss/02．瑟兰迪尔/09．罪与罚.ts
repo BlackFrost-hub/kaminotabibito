@@ -7,6 +7,7 @@ import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 单位存活 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 提交预计算Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 import { 创建固定时间轴阶段列表 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
 
@@ -33,9 +34,6 @@ const { 播放限时单位动画 } = require("系统.03．技能系统.00．技�
 const { 获取Boss技能应攻击目标, 获取Boss技能最近敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能应攻击目标: (this: void, boss: any) => { targetRef: any } | null;
   获取Boss技能最近敌对英雄: (this: void, boss: any) => any;
-};
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
@@ -69,7 +67,7 @@ let 罪与罚已注册 = false;
 
 function 造成伤害(this: void, boss: any, target: any, amount: number, damageType: any): void {
   if (!单位有效(boss) || !单位有效(target) || amount <= 0) return;
-  造成单体技能伤害({
+  提交预计算Boss单体技能伤害({
     技能ID: 罪与罚技能ID,
     来源: boss,
     目标: target,
@@ -79,7 +77,6 @@ function 造成伤害(this: void, boss: any, target: any, amount: number, damage
     attackType: jass.ATTACK_TYPE_NORMAL,
     伤害类型: damageType,
     weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
   });
 }
 

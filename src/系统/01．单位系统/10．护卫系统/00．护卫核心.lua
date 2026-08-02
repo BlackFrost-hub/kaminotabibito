@@ -323,13 +323,30 @@ ____exports["登记护卫单位"] = function(guard, _____53C2_6570)
     if _____53C2_6570["标记为召唤单位"] == true then
         UnitAddType(guard, UNIT_TYPE_SUMMONED)
     end
+    local ____guard_10 = guard
+    local ____53C2_6570__4E3BBoss_5355_4F4D_11 = _____53C2_6570["主Boss单位"]
+    local ____53C2_6570__62A4_536B_7C7B_578B_12 = _____53C2_6570["护卫类型"]
+    local ____temp_13 = _____53C2_6570["标记为召唤单位"] == true
+    local ____temp_14 = _____53C2_6570["护卫血条优先级"] or (_____662F_5426_539F_8BB0_5F55 and oldRecord["护卫血条优先级"] or 0)
+    local ____temp_15 = _____53C2_6570["Boss结束处理"] or (_____662F_5426_539F_8BB0_5F55 and oldRecord["Boss结束处理"] or "注销")
+    local ____53C2_6570_on_6B7B_4EA1_9 = _____53C2_6570["on死亡"]
+    if ____53C2_6570_on_6B7B_4EA1_9 == nil then
+        local _____662F_5426_539F_8BB0_5F55_8
+        if _____662F_5426_539F_8BB0_5F55 then
+            _____662F_5426_539F_8BB0_5F55_8 = oldRecord["on死亡"]
+        else
+            _____662F_5426_539F_8BB0_5F55_8 = nil
+        end
+        ____53C2_6570_on_6B7B_4EA1_9 = _____662F_5426_539F_8BB0_5F55_8
+    end
     _____6309_62A4_536B_53E5_67C4_7D22_5F15_7684_8BB0_5F55_8868[guardHandleId] = {
-        ["护卫单位"] = guard,
-        ["主Boss单位"] = _____53C2_6570["主Boss单位"],
-        ["护卫类型"] = _____53C2_6570["护卫类型"],
-        ["是否召唤单位"] = _____53C2_6570["标记为召唤单位"] == true,
-        ["护卫血条优先级"] = _____53C2_6570["护卫血条优先级"] or (_____662F_5426_539F_8BB0_5F55 and oldRecord["护卫血条优先级"] or 0),
-        ["Boss结束处理"] = _____53C2_6570["Boss结束处理"] or (_____662F_5426_539F_8BB0_5F55 and oldRecord["Boss结束处理"] or "注销"),
+        ["护卫单位"] = ____guard_10,
+        ["主Boss单位"] = ____53C2_6570__4E3BBoss_5355_4F4D_11,
+        ["护卫类型"] = ____53C2_6570__62A4_536B_7C7B_578B_12,
+        ["是否召唤单位"] = ____temp_13,
+        ["护卫血条优先级"] = ____temp_14,
+        ["Boss结束处理"] = ____temp_15,
+        ["on死亡"] = ____53C2_6570_on_6B7B_4EA1_9,
         ["登记顺序"] = _____662F_5426_539F_8BB0_5F55 and oldRecord["登记顺序"] or _____62A4_536B_767B_8BB0_987A_5E8F_8BA1_6570
     }
     local list = _____6309Boss_53E5_67C4_7D22_5F15_7684_62A4_536B_53E5_67C4_8868[bossHandleId]
@@ -362,11 +379,11 @@ ____exports["创建护卫单位"] = function(_____53C2_6570)
     if unitTypeId == 0 then
         return nil
     end
-    local ____53C2_6570__6240_5C5E_73A9_5BB6_10 = _____53C2_6570["所属玩家"]
-    if ____53C2_6570__6240_5C5E_73A9_5BB6_10 == nil then
-        ____53C2_6570__6240_5C5E_73A9_5BB6_10 = GetOwningPlayer(_____53C2_6570["主Boss单位"])
+    local ____53C2_6570__6240_5C5E_73A9_5BB6_18 = _____53C2_6570["所属玩家"]
+    if ____53C2_6570__6240_5C5E_73A9_5BB6_18 == nil then
+        ____53C2_6570__6240_5C5E_73A9_5BB6_18 = GetOwningPlayer(_____53C2_6570["主Boss单位"])
     end
-    local owner = ____53C2_6570__6240_5C5E_73A9_5BB6_10
+    local owner = ____53C2_6570__6240_5C5E_73A9_5BB6_18
     if owner == nil or owner == 0 then
         return nil
     end
@@ -426,12 +443,12 @@ ____exports["获取护卫记录"] = function(unit)
     return record ~= nil and record["护卫单位"] == unit and record or nil
 end
 ____exports["获取护卫所属Boss"] = function(unit)
-    local ____opt_11 = ____exports["获取护卫记录"](unit)
-    return ____opt_11 and ____opt_11["主Boss单位"]
+    local ____opt_19 = ____exports["获取护卫记录"](unit)
+    return ____opt_19 and ____opt_19["主Boss单位"]
 end
 ____exports["获取护卫类型"] = function(unit)
-    local ____opt_13 = ____exports["获取护卫记录"](unit)
-    return ____opt_13 and ____opt_13["护卫类型"]
+    local ____opt_21 = ____exports["获取护卫记录"](unit)
+    return ____opt_21 and ____opt_21["护卫类型"]
 end
 ____exports["是否指定Boss护卫"] = function(unit, boss)
     local record = ____exports["获取护卫记录"](unit)
@@ -503,11 +520,14 @@ ____exports["处理Boss结束全部护卫"] = function(boss)
         end
     end
 end
-local function ____on_5355_4F4D_6B7B_4EA1(dyingUnit)
+local function ____on_5355_4F4D_6B7B_4EA1(dyingUnit, killingUnit)
     ____exports["处理Boss结束全部护卫"](dyingUnit)
     local record = ____exports["获取护卫记录"](dyingUnit)
     if record == nil then
         return
+    end
+    if record["on死亡"] ~= nil then
+        record["on死亡"](dyingUnit, killingUnit, record)
     end
     if record["护卫血条优先级"] > 0 then
         return

@@ -233,13 +233,21 @@ local function _____521D_59CB_5316_5355_4F4D_8303_56F4_5165_53E3()
                 if unit == nil then
                     goto __continue40
                 end
-                registerUnitInRangeTrigger(
-                    _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
-                    unit,
-                    _____914D_7F6E["注册范围"],
-                    nil,
-                    false
-                )
+                local _____5206_652F_5217_8868 = _____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)
+                do
+                    local j = 0
+                    while j < #_____5206_652F_5217_8868 do
+                        local _____5206_652F = _____5206_652F_5217_8868[j + 1]
+                        registerUnitInRangeTrigger(
+                            _____521B_5EFA_5165_53E3_89E6_53D1_5668({_____5206_652F}),
+                            unit,
+                            _____5206_652F["注册范围"] or _____914D_7F6E["注册范围"],
+                            nil,
+                            false
+                        )
+                        j = j + 1
+                    end
+                end
             end
             ::__continue40::
             i = i + 1
@@ -254,14 +262,14 @@ local function _____521D_59CB_5316_77E9_5F62_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_77E9_5F62_5165_53E3_914D_7F6E_8868[i + 1]
                 local _____77E9_5F62 = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["矩形变量名"])
                 if _____77E9_5F62 == nil then
-                    goto __continue44
+                    goto __continue46
                 end
                 TriggerRegisterEnterRectSimple(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
                     _____77E9_5F62
                 )
             end
-            ::__continue44::
+            ::__continue46::
             i = i + 1
         end
     end
@@ -274,7 +282,7 @@ local function _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_5168_5C40_5355_4F4D_5165_53E3_914D_7F6E_8868[i + 1]
                 local unit = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["单位变量名"])
                 if unit == nil then
-                    goto __continue48
+                    goto __continue50
                 end
                 registerUnitInRangeTrigger(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
@@ -284,7 +292,7 @@ local function _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()
                     false
                 )
             end
-            ::__continue48::
+            ::__continue50::
             i = i + 1
         end
     end
@@ -297,11 +305,11 @@ local function _____521D_59CB_5316_53EF_7834_574F_7269()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_53EF_7834_574F_7269_521D_59CB_5316_914D_7F6E_8868[i + 1]
                 local destructable = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["变量名"])
                 if destructable == nil then
-                    goto __continue52
+                    goto __continue54
                 end
                 SetDestructableInvulnerable(destructable, _____914D_7F6E["无敌"])
             end
-            ::__continue52::
+            ::__continue54::
             i = i + 1
         end
     end

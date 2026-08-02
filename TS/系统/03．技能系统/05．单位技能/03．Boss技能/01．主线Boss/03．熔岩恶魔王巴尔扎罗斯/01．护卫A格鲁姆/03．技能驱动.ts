@@ -3,6 +3,7 @@
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 释放格鲁姆重锤 } from "./01．熔岩重锤";
 import { 释放格鲁姆火径 } from "./02．熔岩火径";
+import { 初始化巴尔扎罗斯炙热奉献 } from "./03．炙热奉献";
 import { 格鲁姆公共 } from "./00．公共";
 import { 创建战斗技能调度器 } from "../../../../../00．技能模板+函数/00．技能模板/13．战斗技能调度模板/01．战斗技能调度模板";
 
@@ -36,6 +37,7 @@ function 格鲁姆重锤目标有效(this: void, context: 巴尔扎罗斯运行�
 }
 
 export function 初始化巴尔扎罗斯格鲁姆技能(this: void, context: 巴尔扎罗斯运行时上下文): void {
+  初始化巴尔扎罗斯炙热奉献(context);
   if (context.格鲁姆技能已初始化) return;
   context.格鲁姆技能已初始化 = true;
   const hammer = 巴尔扎罗斯技能数值配置.熔岩重锤;

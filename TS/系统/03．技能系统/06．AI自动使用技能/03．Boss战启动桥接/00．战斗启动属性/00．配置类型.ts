@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
-export type 战斗启动属性归类 = "Boss" | "英雄Boss" | "异界Boss";
+import type { 动态矩形区域配置 } from "../../../00．技能模板+函数/04．机制组件/02．战斗区域/01．动态矩形区域组";
+
+export type 战斗启动属性归类 = "Boss" | "英雄Boss" | "异界Boss";
 
 export const 默认Boss弱点数量基础值 = 3;
 
@@ -13,7 +15,9 @@ export interface 战斗启动属性配置 {
   战斗音乐路径?: string;
   胜利音乐路径?: string;
   地点变量名?: string;
-  转换场景?: boolean;
+  /** 不依赖地图编辑器句柄，Boss 战启动时按坐标动态创建。 */
+  动态地点矩形?: 动态矩形区域配置;
+  转换场景?: boolean;
   BS移动X轴?: number;
   BS移动Y轴?: number;
   玩家移动X轴?: number;

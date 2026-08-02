@@ -13,14 +13,19 @@ local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效")
 local _____521B_5EFA_77E9_5F62_63D0_793A_5708 = ____require_result_0["创建矩形提示圈"]
+local _____521B_5EFA_77E9_5F62_63D0_793A_5708_7279_6548 = ____require_result_0["创建矩形提示圈特效"]
 local _____521B_5EFA_65B9_5411_76F4_7EBF_63D0_793A_5708 = ____require_result_0["创建方向直线提示圈"]
 local _____521B_5EFA_767D_8272_65B9_5411_76F4_7EBF_63D0_793A_5708 = ____require_result_0["创建白色方向直线提示圈"]
 local _____521B_5EFA_767D_8272_6247_5F62_63D0_793A_5708 = ____require_result_0["创建白色扇形提示圈"]
 local _____521B_5EFA_7EA2_8272_6247_5F62_63D0_793A_5708 = ____require_result_0["创建红色扇形提示圈"]
-local _____521B_5EFA_8584_5706_5F62_63D0_793A_5708 = ____require_result_0["创建薄圆形提示圈"]
+local _____521B_5EFA_8584_5706_5F62_63D0_793A_5708_7279_6548 = ____require_result_0["创建薄圆形提示圈特效"]
 local _____521B_5EFA_767D_8272_5706_5F62_63D0_793A_5708 = ____require_result_0["创建白色圆形提示圈"]
 local _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708 = ____require_result_0["创建渐变圆形提示圈"]
+local _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708_7279_6548 = ____require_result_0["创建渐变圆形提示圈特效"]
 local _____521B_5EFA_53CC_73AF_63D0_793A_5708 = ____require_result_0["创建双环提示圈"]
+local _____521B_5EFA_53CC_73AF_63D0_793A_5708_7279_6548 = ____require_result_0["创建双环提示圈特效"]
+local _____6309_6240_5C5E_5355_4F4D_8BBE_7F6E_63D0_793A_5708_989C_8272 = ____require_result_0["按所属单位设置提示圈颜色"]
+local _____5B89_5168_9500_6BC1_7279_6548 = ____require_result_0["安全销毁特效"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
 local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_1["按英雄技能距离修正上下文修正距离"]
 local function _____8F6C_6570_5B57(value, _____9ED8_8BA4_503C)
@@ -157,6 +162,21 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
         if _____5BBD_5EA6 <= 0 or _____957F_5EA6 <= 0 then
             return nil
         end
+        if _____914D_7F6E["可手动销毁"] then
+            local effect = _____521B_5EFA_77E9_5F62_63D0_793A_5708_7279_6548(
+                x,
+                y,
+                _____5BBD_5EA6,
+                _____957F_5EA6,
+                _____53D6_671D_5411(_____914D_7F6E),
+                _____52A8_753B_901F_5EA6
+            )
+            if effect == nil or effect == 0 then
+                return nil
+            end
+            _____6309_6240_5C5E_5355_4F4D_8BBE_7F6E_63D0_793A_5708_989C_8272(effect, _____6765_6E90_5355_4F4D)
+            return effect
+        end
         _____521B_5EFA_77E9_5F62_63D0_793A_5708(
             x,
             y,
@@ -210,7 +230,9 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
             _____53D6_671D_5411(_____914D_7F6E),
             _____53D6_6247_5F62_5C3A_5BF8(_____914D_7F6E),
             _____6301_7EED_65F6_95F4,
-            _____52A8_753B_901F_5EA6
+            _____52A8_753B_901F_5EA6,
+            _____6765_6E90_5355_4F4D,
+            _____914D_7F6E["扇形角度"]
         )
         return nil
     end
@@ -222,7 +244,8 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
             _____53D6_6247_5F62_5C3A_5BF8(_____914D_7F6E),
             _____6301_7EED_65F6_95F4,
             _____52A8_753B_901F_5EA6,
-            _____6765_6E90_5355_4F4D
+            _____6765_6E90_5355_4F4D,
+            _____914D_7F6E["扇形角度"]
         )
         return nil
     end
@@ -231,15 +254,18 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
         return nil
     end
     if _____7C7B_578B == "圆形" or _____7C7B_578B == "敌方圆形" then
-        _____521B_5EFA_8584_5706_5F62_63D0_793A_5708(
+        local effect = _____521B_5EFA_8584_5706_5F62_63D0_793A_5708_7279_6548(
             x,
             y,
             _____534A_5F84,
-            _____6301_7EED_65F6_95F4,
             _____52A8_753B_901F_5EA6,
             _____6765_6E90_5355_4F4D
         )
-        return nil
+        if not _____914D_7F6E["可手动销毁"] then
+            _____5B89_5168_9500_6BC1_7279_6548(_____6301_7EED_65F6_95F4 <= 0 and 0.5 or _____6301_7EED_65F6_95F4 + 0.05, effect)
+            return nil
+        end
+        return effect
     end
     if _____7C7B_578B == "白色安全圆" then
         _____521B_5EFA_767D_8272_5706_5F62_63D0_793A_5708(
@@ -253,11 +279,29 @@ ____exports["创建技能提示圈"] = function(_____914D_7F6E)
         return nil
     end
     if _____7C7B_578B == "双环" then
+        if _____914D_7F6E["可手动销毁"] then
+            return _____521B_5EFA_53CC_73AF_63D0_793A_5708_7279_6548(
+                x,
+                y,
+                _____534A_5F84,
+                _____52A8_753B_901F_5EA6,
+                _____6765_6E90_5355_4F4D
+            )
+        end
         return _____521B_5EFA_53CC_73AF_63D0_793A_5708(
             x,
             y,
             _____534A_5F84,
             _____6301_7EED_65F6_95F4,
+            _____52A8_753B_901F_5EA6,
+            _____6765_6E90_5355_4F4D
+        )
+    end
+    if _____914D_7F6E["可手动销毁"] then
+        return _____521B_5EFA_6E10_53D8_5706_5F62_63D0_793A_5708_7279_6548(
+            x,
+            y,
+            _____534A_5F84,
             _____52A8_753B_901F_5EA6,
             _____6765_6E90_5355_4F4D
         )

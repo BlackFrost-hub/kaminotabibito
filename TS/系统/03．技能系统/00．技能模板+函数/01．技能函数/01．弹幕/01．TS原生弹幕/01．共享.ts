@@ -55,11 +55,13 @@ export const EXSetUnitFacing = japi.EXSetUnitFacing as ((unit: any, angle: numbe
 export const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => void) | undefined;
 export const DzSetEffectPos = japi.DzSetEffectPos as (effect: any, x: number, y: number, z: number) => void;
 export const DzSetEffectAnimation = japi.DzSetEffectAnimation as ((effect: any, animationIndex: number, flag: number) => void) | undefined;
+export const DzPlayEffectAnimation = japi.DzPlayEffectAnimation as ((effect: any, animationName: string, link: string) => void) | undefined;
 export const DzGetColor = japi.DzGetColor as (alpha: number, red: number, green: number, blue: number) => number;
 export const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as (effect: any, color: number) => void;
 export const EXEffectMatReset = japi.EXEffectMatReset as (effect: any) => void;
 export const EXEffectMatRotateY = japi.EXEffectMatRotateY as (effect: any, angle: number) => void;
 export const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, angle: number) => void;
+export const EXEffectMatScale = japi.EXEffectMatScale as (effect: any, x: number, y: number, z: number) => void;
 export const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
 
 export const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;

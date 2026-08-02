@@ -12,18 +12,18 @@ local ____04_FF0E_8150_5316_611F_67D3 = require("系统.03．技能系统.05．�
 local _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3 = ____04_FF0E_8150_5316_611F_67D3["添加米亚腐化感染"]
 local ____15_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.15．台词播放")
 local _____64AD_653E_7C73_4E9A_53F0_8BCD = ____15_FF0E_53F0_8BCD_64AD_653E["播放米亚台词"]
+local ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.11．条件伤害修正")
+local _____521B_5EFA_6761_4EF6_4F24_5BB3_4FEE_6B63 = ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63["创建条件伤害修正"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
 local ____require_result_2 = require("系统.04．伤害系统.01．伤害事件")
 local registerDamageCallback = ____require_result_2.registerDamageCallback
-local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_3.registerDamageModifier
-local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_4.registerManualBuff
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
+local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_3.registerManualBuff
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
@@ -88,9 +88,9 @@ local function _____767B_8BB0_8150_5316_9ECF_6DB2_4E0A_4E0B_6587(context)
         return
     end
     _____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868[id] = context
-    local ____self_6 = context["清理"]
-    ____self_6["登记清理"](
-        ____self_6,
+    local ____self_5 = context["清理"]
+    ____self_5["登记清理"](
+        ____self_5,
         "腐化黏液上下文索引",
         function()
             if _____8150_5316_9ECF_6DB2_4E0A_4E0B_6587_8868[id] == context then
@@ -154,6 +154,17 @@ local function _____5904_7406_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8(damage
     end
     return modifiedDamage
 end
+local function _____6EE1_8DB3_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8_6761_4EF6(damageContext)
+    local ____53D6_8150_5316_9ECF_6DB2_4E0A_4E0B_6587_7 = _____53D6_8150_5316_9ECF_6DB2_4E0A_4E0B_6587
+    local ____temp_6
+    if damageContext == nil then
+        ____temp_6 = nil
+    else
+        ____temp_6 = damageContext.target
+    end
+    local context = ____53D6_8150_5316_9ECF_6DB2_4E0A_4E0B_6587_7(____temp_6)
+    return context ~= nil and context["阶段"] == 3
+end
 ____exports["释放米亚全场腐化黏液"] = function(context)
     local boss = context["Boss单位"]
     local bossValid = _____5355_4F4D_6709_6548(boss)
@@ -181,11 +192,11 @@ ____exports["释放米亚全场腐化黏液"] = function(context)
                 local hero = heroes[i + 1]
                 local heroValid = _____5355_4F4D_6709_6548(hero)
                 if not heroValid then
-                    goto __continue28
+                    goto __continue29
                 end
                 _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, hero, 1, "腐化黏液涂层全场甩黏液")
             end
-            ::__continue28::
+            ::__continue29::
             i = i + 1
         end
     end
@@ -197,7 +208,7 @@ ____exports["注册米亚腐化黏液涂层"] = function()
     end
     _____7C73_4E9A_8150_5316_9ECF_6DB2_6D82_5C42_5DF2_6CE8_518C = true
     registerDamageCallback(_____5904_7406_8150_5316_9ECF_6DB2_8FD1_6218_53CD_566C, 0.03)
-    registerDamageModifier(_____5904_7406_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8, 35)
+    _____521B_5EFA_6761_4EF6_4F24_5BB3_4FEE_6B63({["名称"] = "米亚腐化黏液涂层承伤提高", ["优先级"] = 35, ["条件"] = _____6EE1_8DB3_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8_6761_4EF6, ["修正"] = _____5904_7406_8150_5316_9ECF_6DB2Boss_53D7_4F24_63D0_9AD8})
 end
 ____exports["刷新米亚腐化黏液涂层被动状态"] = function(context)
     if context == nil then

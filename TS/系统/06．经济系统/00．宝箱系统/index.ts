@@ -7,6 +7,7 @@ export {
   DropMode,
   宝箱首领奖励打开范围,
   ChestTypeConfig,
+  影骨莫特斯盗贼宝箱可破坏物ID,
   CHEST_TYPES,
   DEFAULT_OPEN_TIME,
   INTERACT_RANGE,

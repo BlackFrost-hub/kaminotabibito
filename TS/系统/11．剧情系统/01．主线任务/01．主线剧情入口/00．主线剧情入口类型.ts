@@ -21,6 +21,7 @@ export interface 主线NPC初始化配置 {
 export interface 主线剧情入口分支配置 {
   配置名: string;
   剧情片段ID?: string;
+  注册范围?: number;
   旧JASS触发器?: 旧主线剧情触发器名;
   需要剧情进度?: number;
   最低剧情进度?: number;

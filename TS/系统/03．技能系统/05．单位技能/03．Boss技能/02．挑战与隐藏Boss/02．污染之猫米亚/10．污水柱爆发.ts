@@ -10,7 +10,7 @@ import { 播放米亚台词 } from "./15．台词播放";
 import { 取米亚平台超载伤害倍率 } from "./12．平台超载惩罚";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 开始原地击飞 } from "../../../../00．技能模板+函数/01．技能函数/03．跳跃·击飞/index";
-import { 计算组合技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 创建点名预警执行器 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/05．点名预警执行器";
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -28,8 +28,7 @@ const { 创建持续危险区域 } = require("系统.03．技能系统.00．技�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
-const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
@@ -42,24 +41,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 interface 污水柱落点 {
   x: number;
   y: number;
-}
-
-function 计算污水柱爆发伤害(this: void, boss: any, target: any): number {
-  const config = 米亚技能数值配置.污水柱爆发;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: config.爆发伤害Boss攻击力比例,
-    目标最大生命比例: config.爆发伤害目标最大生命比例,
-    总倍率: config.爆发伤害总倍率,
-  });
-}
-
-function 计算污水柱水坑伤害(this: void, boss: any, target: any): number {
-  const config = 米亚技能数值配置.污水柱爆发;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: config.水坑每秒伤害Boss攻击力比例,
-    目标最大生命比例: config.水坑每秒伤害目标最大生命比例,
-    总倍率: config.水坑每秒伤害总倍率,
-  });
 }
 
 function 取污水柱数量(this: void): number {
@@ -136,14 +117,17 @@ function 创建污水柱残留水坑(this: void, context: 米亚运行时上下�
       for (let i = 0; i < 区域内单位.length; i++) {
         const target = 区域内单位[i];
         if (!单位有效(target)) continue;
-        造成AOE技能伤害({
+        执行BossAOE技能伤害({
           来源: context.Boss单位,
           目标: target,
-          伤害: 计算污水柱水坑伤害(context.Boss单位, target) * 取米亚平台超载伤害倍率(target),
+          伤害公式: {
+            来源攻击力比例: config.水坑每秒伤害Boss攻击力比例,
+            目标最大生命比例: config.水坑每秒伤害目标最大生命比例,
+            总倍率: config.水坑每秒伤害总倍率 * 取米亚平台超载伤害倍率(target),
+          },
           attackType: jass.ATTACK_TYPE_NORMAL,
           伤害类型: jass.DAMAGE_TYPE_POISON,
           weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-          来源类型: "Boss技能",
           技能实例ID,
           标签: "米亚污水柱爆发",
         });
@@ -168,14 +152,17 @@ function 结算污水柱爆发(this: void, context: 米亚运行时上下文, po
     const target = targets[i];
     if (!单位有效(target)) continue;
     if (距离平方(point.x, point.y, GetUnitX(target), GetUnitY(target)) > radius2) continue;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       来源: boss,
       目标: target,
-      伤害: 计算污水柱爆发伤害(boss, target) * 取米亚平台超载伤害倍率(target),
+      伤害公式: {
+        来源攻击力比例: config.爆发伤害Boss攻击力比例,
+        目标最大生命比例: config.爆发伤害目标最大生命比例,
+        总倍率: config.爆发伤害总倍率 * 取米亚平台超载伤害倍率(target),
+      },
       attackType: jass.ATTACK_TYPE_NORMAL,
       伤害类型: jass.DAMAGE_TYPE_POISON,
       weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
       技能实例ID,
       标签: "米亚污水柱爆发",
     });

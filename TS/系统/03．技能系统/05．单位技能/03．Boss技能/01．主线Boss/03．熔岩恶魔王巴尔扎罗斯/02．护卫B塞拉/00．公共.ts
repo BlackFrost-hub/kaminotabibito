@@ -32,9 +32,6 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
 };
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
 const { 创建点特效, 创建循环点特效, 停止循环点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
   创建循环点特效: (this: void, 参数: any) => any;
@@ -80,7 +77,6 @@ const 塞拉形态表: Record<number, "火焰" | "冰霜" | undefined> = {};
 const 零度领域减伤到期Ms表: Record<number, number | undefined> = {};
 const 绝对零度领域状态表: Record<number, { X: number; Y: number; 结束Ms: number } | undefined> = {};
 const 弱追踪弹体状态表: Record<number, { 锁定: boolean; 锁定角: number } | undefined> = {};
-let 塞拉伤害修正已注册 = false;
 
 function 取方向角(this: void, fromX: number, fromY: number, toX: number, toY: number): number {
   return Atan2(toY - fromY, toX - fromX) * BJ_RADTODEG;
@@ -196,7 +192,6 @@ export const 塞拉公共 = {
   获取Boss技能敌对英雄列表,
   registerManualBuff,
   移除单位指定Buff,
-  registerDamageModifier,
   创建点特效,
   创建循环点特效,
   停止循环点特效,

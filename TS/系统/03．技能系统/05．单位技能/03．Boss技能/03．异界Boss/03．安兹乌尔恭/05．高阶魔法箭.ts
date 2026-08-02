@@ -1,9 +1,7 @@
 /** @noSelfInFile */
 
 import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 获取或创建安兹运行时上下文, 标记安兹普通机制忙碌 } from './01．运行时上下文';
@@ -23,9 +21,6 @@ const { 获取Boss技能最高仇恨目标, 获取Boss技能随机敌对英雄, 
   获取Boss技能最高仇恨目标: (this: void, boss: any) => any;
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -64,15 +59,6 @@ function 取主要目标(this: void, boss: any): any {
   return 获取Boss技能随机敌对英雄(boss);
 }
 
-function 计算高阶魔法箭伤害(this: void, context: 安兹运行时上下文, boss: any, target: any): number {
-  const cfg = 安兹乌尔恭数值与表现配置.普通技能;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: cfg.高阶魔法箭伤害Boss攻击力比例,
-    目标最大生命比例: cfg.高阶魔法箭伤害目标最大生命比例,
-    总倍率: 取安兹亡灵箭伤害倍率(context),
-  });
-}
-
 function 高阶魔法箭结算(this: void, context: 安兹运行时上下文, x: number, y: number): void {
   const boss = context.安兹单位;
   if (context.挑战已结束 || context.清理.已清理() || !单位有效(boss)) return;
@@ -91,17 +77,20 @@ function 高阶魔法箭结算(this: void, context: 安兹运行时上下文, x:
     const dx = GetUnitX(target) - x;
     const dy = GetUnitY(target) - y;
     if (dx * dx + dy * dy > radiusSquared) continue;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       技能ID: 高阶魔法箭技能ID,
       来源: boss,
       目标: target,
-      伤害: 计算高阶魔法箭伤害(context, boss, target),
+      伤害公式: {
+        来源攻击力比例: cfg.普通技能.高阶魔法箭伤害Boss攻击力比例,
+        目标最大生命比例: cfg.普通技能.高阶魔法箭伤害目标最大生命比例,
+        总倍率: 取安兹亡灵箭伤害倍率(context),
+      },
       attack: false,
       ranged: true,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_MAGIC,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: 'Boss技能',
     });
   }
 }

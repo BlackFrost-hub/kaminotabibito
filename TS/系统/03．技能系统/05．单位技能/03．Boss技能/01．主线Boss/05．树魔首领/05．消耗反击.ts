@@ -8,9 +8,9 @@ import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．�
 import { 两点方向角, 单位是否在来源正面扇区, 单位是否在来源背后扇区 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/08．方位判定工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 提交预计算BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
-const { 造成AOE技能伤害, 创建技能伤害实例, 结束技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 创建技能伤害实例, 结束技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建技能伤害实例: (this: void, 参数?: any) => number;
   结束技能伤害实例: (this: void, 技能实例ID: number | undefined) => void;
 };
@@ -135,7 +135,7 @@ function 播放反击连线(this: void, boss: any, target: any): void {
 function on树魔首领反击冲击波命中(this: void, target: any, 弹幕ID: number): void {
   const state = 反击冲击波状态表[弹幕ID];
   if (state == null || !单位有效(state.Boss) || !单位有效(target)) return;
-  造成AOE技能伤害({
+  提交预计算BossAOE技能伤害({
     技能ID: 消耗反击技能ID,
     技能实例ID: state.技能实例ID,
     来源: state.Boss,
@@ -146,7 +146,6 @@ function on树魔首领反击冲击波命中(this: void, target: any, 弹幕ID: 
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_NORMAL,
     weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-    来源类型: "Boss技能",
   });
 }
 
@@ -254,6 +253,7 @@ export function 释放树魔首领消耗反击(this: void, context: 树魔首领
     特效回调ID: 0,
   };
   消耗反击状态表[hid] = state;
+  context.清理.登记清理("树魔首领-消耗反击状态", 清除消耗反击状态, boss);
   播放限时单位动画({
     单位: boss,
     动画编号: cfg.起手动画编号,

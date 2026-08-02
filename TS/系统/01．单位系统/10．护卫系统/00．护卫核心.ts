@@ -69,6 +69,7 @@ export interface 护卫登记参数 {
   标记为召唤单位?: boolean;
   护卫血条优先级?: number;
   Boss结束处理?: Boss结束护卫处理;
+  on死亡?: (this: void, 护卫单位: any, 击杀单位: any, 记录: 护卫记录) => void;
 }
 
 export type Boss结束护卫处理 = "击杀" | "移除" | "注销";
@@ -88,6 +89,7 @@ export interface 护卫记录 {
   是否召唤单位: boolean;
   护卫血条优先级: number;
   Boss结束处理: Boss结束护卫处理;
+  on死亡?: (this: void, 护卫单位: any, 击杀单位: any, 记录: 护卫记录) => void;
   登记顺序: number;
 }
 
@@ -341,6 +343,7 @@ export function 登记护卫单位(this: void, guard: any, 参数: 护卫登记�
     是否召唤单位: 参数.标记为召唤单位 === true,
     护卫血条优先级: 参数.护卫血条优先级 ?? (是否原记录 ? oldRecord!.护卫血条优先级 : 0),
     Boss结束处理: 参数.Boss结束处理 ?? (是否原记录 ? oldRecord!.Boss结束处理 : "注销"),
+    on死亡: 参数.on死亡 ?? (是否原记录 ? oldRecord!.on死亡 : undefined),
     登记顺序: 是否原记录 ? oldRecord!.登记顺序 : 护卫登记顺序计数,
   };
 
@@ -452,10 +455,11 @@ export function 处理Boss结束全部护卫(this: void, boss: any): void {
   }
 }
 
-function on单位死亡(this: void, dyingUnit: any): void {
+function on单位死亡(this: void, dyingUnit: any, killingUnit: any): void {
   处理Boss结束全部护卫(dyingUnit);
   const record = 获取护卫记录(dyingUnit);
   if (record == null) return;
+  if (record.on死亡 != null) record.on死亡(dyingUnit, killingUnit, record);
   // 有血条优先级的长期护卫保留登记，复活后可重新进入显示队列。
   if (record.护卫血条优先级 > 0) return;
   addDelayedCallback(10, function 延迟注销死亡护卫(this: void): void {

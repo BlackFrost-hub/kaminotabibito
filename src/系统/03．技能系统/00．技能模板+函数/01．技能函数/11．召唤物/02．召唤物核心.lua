@@ -20,6 +20,7 @@ local X_FixUnitStandingSafe = ____require_result_5.X_FixUnitStandingSafe
 local SetUnitState = jass.SetUnitState
 local SetUnitStateJapi = japi.SetUnitState
 local SetUnitVertexColor = jass.SetUnitVertexColor
+local SetUnitPathing = jass.SetUnitPathing
 local SetUnitAcquireRange = jass.SetUnitAcquireRange
 local ConvertUnitState = jass.ConvertUnitState
 local UnitApplyTimedLife = jass.UnitApplyTimedLife
@@ -51,7 +52,6 @@ local _____6B7B_4EA1_5220_9664_5EF6_8FDF_79D2_6570 = 3
 local _____6A21_5757_540D = "召唤物核心"
 local DEFAULT_TIMED_LIFE_BUFF = stringToFourCC("BHwe")
 local _____9650_65F6_53EC_5524_7269_5220_9664_8868 = {}
-local _____5F85_5EF6_8FDF_5220_9664_53EC_5524_7269_8868 = {}
 local _____5DF2_6CE8_518C_9650_65F6_53EC_5524_7269_5220_9664_76D1_542C = false
 local function _____8BBE_7F6E_6700_540E_521B_5EFA_5355_4F4D(unit)
     _G.bj_lastCreatedUnit = unit
@@ -72,9 +72,8 @@ local function _____8BBE_7F6E_5355_4F4D_98DE_884C_9AD8_5EA6(unit, height)
     _____8D4B_4E88_98DE_884C_9AD8_5EA6_80FD_529B(unit)
     SetUnitFlyHeight(unit, height, 0)
 end
-local function _____6267_884C_53EC_5524_7269_5EF6_8FDF_5220_9664(callbackId)
-    local unit = _____5F85_5EF6_8FDF_5220_9664_53EC_5524_7269_8868[callbackId]
-    _____5F85_5EF6_8FDF_5220_9664_53EC_5524_7269_8868[callbackId] = nil
+local function _____6267_884C_53EC_5524_7269_5EF6_8FDF_5220_9664(variable)
+    local unit = variable
     if unit == nil or unit == 0 then
         return
     end
@@ -89,12 +88,7 @@ local function ____on_9650_65F6_53EC_5524_7269_6B7B_4EA1_5220_9664(_____6B7B_4EA
         return
     end
     _____9650_65F6_53EC_5524_7269_5220_9664_8868[hid] = nil
-    local callbackId = 0
-    callbackId = addDelayedCallback(
-        _____6B7B_4EA1_5220_9664_5EF6_8FDF_79D2_6570 * 1000,
-        function() return _____6267_884C_53EC_5524_7269_5EF6_8FDF_5220_9664(callbackId) end
-    )
-    _____5F85_5EF6_8FDF_5220_9664_53EC_5524_7269_8868[callbackId] = _____6B7B_4EA1_5355_4F4D
+    addDelayedCallback(_____6B7B_4EA1_5220_9664_5EF6_8FDF_79D2_6570 * 1000, _____6267_884C_53EC_5524_7269_5EF6_8FDF_5220_9664, _____6B7B_4EA1_5355_4F4D)
 end
 local function _____786E_4FDD_9650_65F6_53EC_5524_7269_5220_9664_76D1_542C()
     if _____5DF2_6CE8_518C_9650_65F6_53EC_5524_7269_5220_9664_76D1_542C then
@@ -195,6 +189,21 @@ local function _____5E94_7528_53EC_5524_7269_5C5E_6027(unit, _____53C2_6570)
     end
     if _____53C2_6570["禁止普攻"] == true and DzUnitDisableAttack ~= nil then
         DzUnitDisableAttack(unit, true)
+    end
+    if _____53C2_6570["添加技能"] ~= nil then
+        do
+            local i = 0
+            while i < #_____53C2_6570["添加技能"] do
+                local _____6280_80FDID = _____53C2_6570["添加技能"][i + 1]
+                if _____6280_80FDID > 0 then
+                    UnitAddAbility(unit, _____6280_80FDID)
+                end
+                i = i + 1
+            end
+        end
+    end
+    if _____53C2_6570["禁用路径"] == true then
+        SetUnitPathing(unit, false)
     end
     if _____53C2_6570["普攻弹道模型"] ~= nil and _____53C2_6570["普攻弹道模型"] ~= "" and DzSetUnitMissileModel ~= nil then
         DzSetUnitMissileModel(unit, _____53C2_6570["普攻弹道模型"])

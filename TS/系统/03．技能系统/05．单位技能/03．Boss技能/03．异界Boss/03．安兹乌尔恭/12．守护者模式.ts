@@ -9,6 +9,8 @@ import { 安兹乌尔恭数值与表现配置 } from './02．数值与表现配�
 import { 创建联合战斗成员生命周期 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/20．联合战斗成员生命周期';
 import { 创建可抢占独占状态管理器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/19．可抢占独占状态';
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
+import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
+import { 创建条件伤害修正 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正';
 import { 推进雅儿贝德技能驱动 } from './01．护卫雅儿贝德/07．技能驱动';
 import { 注册雅儿贝德至尊拦截 } from './01．护卫雅儿贝德/01．至尊拦截';
 import { 注册雅儿贝德守护者之职责 } from './01．护卫雅儿贝德/03．守护者之职责';
@@ -22,9 +24,6 @@ const { 创建自定义护卫单位, 处理Boss结束全部护卫 } = require('�
 };
 const { 读取单位攻击力 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
   读取单位攻击力: (this: void, unit: any) => number;
-};
-const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
@@ -41,54 +40,46 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const DEG_TO_RAD = 0.017453292519943295;
 
-let 雅儿贝德伤害修正已注册 = false;
 let 雅儿贝德运行时驱动已注册 = false;
 
-function 查找联合上下文(this: void, unit: any): 安兹运行时上下文 | undefined {
-  const contexts = 获取全部安兹运行时上下文();
-  for (let i = 0; i < contexts.length; i++) {
-    const context = contexts[i];
-    if (context.安兹单位 === unit || context.雅儿贝德?.单位 === unit) return context;
-  }
-  return undefined;
-}
-
-function 雅儿贝德联合伤害修正(this: void, damage: any): number {
-  const context = 查找联合上下文(damage.target);
-  if (context == null || context.模式 !== '守护者介入' || context.雅儿贝德 == null) return damage.currentDamage;
-  const albedo = context.雅儿贝德.单位;
-  if (!单位有效(albedo)) return damage.currentDamage;
+function 创建雅儿贝德伤害机制(this: void, context: 安兹运行时上下文, albedo: any): void {
   const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
-  if (damage.target === albedo) {
-    const maxLife = GetUnitStateJapi(albedo, UNIT_STATE_MAX_LIFE);
-    const minimumLife = maxLife * cfg.雅儿贝德锁血比例;
-    const currentLife = GetUnitState(albedo, UNIT_STATE_LIFE);
-    const allowed = currentLife - minimumLife;
-    if (allowed <= 0) return 0;
-    return damage.currentDamage > allowed ? allowed : damage.currentDamage;
-  }
-  if (damage.target !== context.安兹单位 || context.当前大型技能 != null) return damage.currentDamage;
-  if (context.雅儿贝德.阶段状态 === '失衡' || context.雅儿贝德.阶段状态 === '已离场') return damage.currentDamage;
-  const radius = cfg.护卫减伤有效距离;
-  if (两单位距离平方(context.安兹单位, albedo) > radius * radius) return damage.currentDamage;
-  const reduction = context.雅儿贝德.当前生命比例 < cfg.雅儿贝德狂怒阈值
-    ? cfg.低血护卫减伤
-    : cfg.常驻护卫减伤;
-  return damage.currentDamage * (1 - reduction);
-}
-
-function 确保雅儿贝德伤害修正(this: void): void {
-  if (雅儿贝德伤害修正已注册) return;
-  雅儿贝德伤害修正已注册 = true;
-  registerDamageModifier(雅儿贝德联合伤害修正, 55);
+  创建伤害生命下限保护({
+    名称: '安兹-雅儿贝德锁血',
+    单位: albedo,
+    最大生命比例下限: cfg.雅儿贝德锁血比例,
+    修正优先级: 55,
+    清理: context.清理,
+  });
+  const boss = context.安兹单位;
+  创建条件伤害修正({
+    名称: '安兹-雅儿贝德护卫减伤',
+    优先级: 55,
+    清理: context.清理,
+    条件: function 安兹雅儿贝德护卫减伤条件(this: void, damage: any): boolean {
+      if (context.挑战已结束 || context.模式 !== '守护者介入') return false;
+      if (damage.target !== boss || !单位有效(boss) || !单位有效(albedo)) return false;
+      const state = context.雅儿贝德;
+      if (state == null || state.阶段状态 === '失衡' || state.阶段状态 === '已离场') return false;
+      if (context.当前大型技能 != null) return false;
+      const radius = cfg.护卫减伤有效距离;
+      return 两单位距离平方(boss, albedo) <= radius * radius;
+    },
+    修正: function 安兹雅儿贝德护卫减伤修正(this: void, damage: any): number {
+      const state = context.雅儿贝德;
+      if (state == null) return damage.currentDamage;
+      const reduction = state.当前生命比例 < cfg.雅儿贝德狂怒阈值
+        ? cfg.低血护卫减伤
+        : cfg.常驻护卫减伤;
+      return damage.currentDamage * (1 - reduction);
+    },
+  });
 }
 
 function 确保雅儿贝德运行时驱动(this: void): void {
@@ -169,7 +160,7 @@ export function 启动安兹守护者模式(this: void, context: 安兹运行时
   context.清理.登记清理('雅儿贝德护卫单位', function 清理雅儿贝德护卫单位(this: void): void {
     处理Boss结束全部护卫(boss);
   });
-  确保雅儿贝德伤害修正();
+  创建雅儿贝德伤害机制(context, albedo);
   确保雅儿贝德运行时驱动();
   注册雅儿贝德至尊拦截();
   注册雅儿贝德守护者之职责();

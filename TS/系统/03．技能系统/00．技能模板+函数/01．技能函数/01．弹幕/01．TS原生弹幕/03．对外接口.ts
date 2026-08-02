@@ -9,8 +9,10 @@ import {
   默认弹幕单位类型,
   DzGetColor,
   DzSetEffectAnimation,
+  DzPlayEffectAnimation,
   DzSetEffectVertexColor,
   DzSetEffectPos,
+  EXEffectMatScale,
   DzSetUnitModel,
   EC_CreateEffect,
   GetOwningPlayer,
@@ -141,13 +143,25 @@ function 创建弹幕附加特效(
     z,
     face + (特效参数.朝向角偏移 ?? 0),
     scale,
-    1,
+    特效参数.动画速度 ?? 1,
     -1,
   );
   if (effect == null || effect === 0) return null;
   DzSetEffectPos(effect, x, y, z);
   if (特效参数.动画索引 != null) {
     DzSetEffectAnimation?.(effect, 特效参数.动画索引, 0);
+  }
+  if (特效参数.动画名称 != null && DzPlayEffectAnimation != null) {
+    DzPlayEffectAnimation(effect, 特效参数.动画名称, 特效参数.动画链接 ?? "");
+  }
+  if (特效参数.缩放X != null || 特效参数.缩放Y != null || 特效参数.缩放Z != null) {
+    const 统一缩放 = scale;
+    EXEffectMatScale(
+      effect,
+      特效参数.缩放X ?? 统一缩放,
+      特效参数.缩放Y ?? 统一缩放,
+      特效参数.缩放Z ?? 统一缩放,
+    );
   }
   设置弹幕附加特效颜色(effect, 特效参数);
   return effect;

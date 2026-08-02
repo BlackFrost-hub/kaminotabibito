@@ -68,6 +68,7 @@ export function registerBridge(): void {
   expose("RectContainsLoc", rectArea.RectContainsLoc);
   expose("RectContainsUnit", rectArea.RectContainsUnit);
   expose("SetStackedSoundBJ", rectArea.SetStackedSoundBJ);
+  expose("CreateDestructableLoc", rectArea.CreateDestructableLoc);
   expose("GetEntireMapRect", rectArea.GetEntireMapRect);
   expose("TriggerRegisterUnitInRangeSimple", trigEvent.TriggerRegisterUnitInRangeSimple);
   expose("GetAttackedUnitBJ", trigEvent.GetAttackedUnitBJ);

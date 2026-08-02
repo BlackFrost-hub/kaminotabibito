@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_6709_6548_73A9_5BB6_4EBA_6570, _____53D6_8BC5_5492_76EE_6807, _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708, _____64AD_653E_70B9_540D_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____6536_96C6_5206_644A_76EE_6807, _____6CBB_7597_5168_90E8_73A9_5BB6, _____53D6_73A9_5BB6_4E2D_5FC3, _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____8C03_5EA6_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5, ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____6811_9B54_9996_9886BuffID, doHeal, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____521B_5EFA_70B9_7279_6548, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____8FDC_53E4_8BC5_5492_6280_80FDID
+local _____53D6_6709_6548_73A9_5BB6_4EBA_6570, _____53D6_8BC5_5492_76EE_6807, _____6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_5206_644A_5708Tick, _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708, _____64AD_653E_70B9_540D_7279_6548, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____6536_96C6_5206_644A_76EE_6807, _____6CBB_7597_5168_90E8_73A9_5BB6, _____53D6_73A9_5BB6_4E2D_5FC3, _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____8C03_5EA6_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1, _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5, ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548, GetUnitTypeId, GetSpellTargetUnit, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MIND, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addDelayedCallback, registerManualBuff, _____6811_9B54_9996_9886BuffID, doHeal, _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570, _____521B_5EFA_70B9_7279_6548, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____8FDC_53E4_8BC5_5492_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -20,6 +20,11 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____8DDD_79BB_5E73_65B9XY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离平方XY"]
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local _____63D0_4EA4_9884_8BA1_7B97BossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算BossAOE技能伤害"]
+local ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.22．限次周期执行器")
+local _____521B_5EFA_5468_671F_884C_4E3A = ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668["创建周期行为"]
 function _____53D6_6709_6548_73A9_5BB6_4EBA_6570()
     local count = _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570()
     return count > 0 and count or 1
@@ -35,24 +40,33 @@ function _____53D6_8BC5_5492_76EE_6807(boss)
     end
     return _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss)
 end
+function _____6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_5206_644A_5708Tick(______6267_884C_6B21_6570, variable)
+    if variable == nil then
+        return false
+    end
+    variable["已刷新毫秒"] = variable["已刷新毫秒"] + variable["刷新间隔毫秒"]
+    if not _____5355_4F4D_6709_6548(variable["目标"]) or variable["已刷新毫秒"] > variable["延迟毫秒"] then
+        return false
+    end
+    _____521B_5EFA_6280_80FD_63D0_793A_5708({["类型"] = "圆形", ["锚点单位"] = variable["目标"], ["半径"] = variable["半径"], ["持续时间"] = variable["刷新间隔毫秒"] / 1000 + 0.05})
+    return true
+end
 function _____542F_52A8_8DDF_968F_5206_644A_63D0_793A_5708(context, target)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["远古诅咒"]
-    local elapsed = 0
     _____521B_5EFA_6280_80FD_63D0_793A_5708({["类型"] = "圆形", ["锚点单位"] = target, ["半径"] = cfg["分摊半径"], ["持续时间"] = cfg["跟随提示圈刷新毫秒"] / 1000 + 0.05})
-    local id
-    id = addPeriodicCallback(
-        cfg["跟随提示圈刷新毫秒"],
-        function()
-            elapsed = elapsed + cfg["跟随提示圈刷新毫秒"]
-            if not _____5355_4F4D_6709_6548(target) or elapsed > cfg["延迟秒"] * 1000 then
-                removePeriodicCallback(id)
-                return
-            end
-            _____521B_5EFA_6280_80FD_63D0_793A_5708({["类型"] = "圆形", ["锚点单位"] = target, ["半径"] = cfg["分摊半径"], ["持续时间"] = cfg["跟随提示圈刷新毫秒"] / 1000 + 0.05})
-        end
-    )
-    local ____self_11 = context["清理"]
-    ____self_11["登记周期回调"](____self_11, "树魔首领-远古诅咒分摊提示", id)
+    _____521B_5EFA_5468_671F_884C_4E3A({
+        ["名称"] = "树魔首领-远古诅咒分摊提示",
+        ["间隔毫秒"] = cfg["跟随提示圈刷新毫秒"],
+        ["清理"] = context["清理"],
+        ["变量"] = {
+            ["目标"] = target,
+            ["已刷新毫秒"] = 0,
+            ["刷新间隔毫秒"] = cfg["跟随提示圈刷新毫秒"],
+            ["延迟毫秒"] = cfg["延迟秒"] * 1000,
+            ["半径"] = cfg["分摊半径"]
+        },
+        onTick = _____6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_5206_644A_5708Tick
+    })
 end
 function _____64AD_653E_70B9_540D_7279_6548(target)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["远古诅咒"]
@@ -98,7 +112,7 @@ function _____6536_96C6_5206_644A_76EE_6807(boss, target)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue13
+                    goto __continue14
                 end
                 if _____8DDD_79BB_5E73_65B9XY(
                     targetX,
@@ -109,7 +123,7 @@ function _____6536_96C6_5206_644A_76EE_6807(boss, target)
                     result[#result + 1] = hero
                 end
             end
-            ::__continue13::
+            ::__continue14::
             i = i + 1
         end
     end
@@ -126,7 +140,7 @@ function _____6CBB_7597_5168_90E8_73A9_5BB6(boss, amount)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue19
+                    goto __continue20
                 end
                 doHeal({
                     HealSource = boss,
@@ -136,7 +150,7 @@ function _____6CBB_7597_5168_90E8_73A9_5BB6(boss, amount)
                     HealEffect = true
                 })
             end
-            ::__continue19::
+            ::__continue20::
             i = i + 1
         end
     end
@@ -152,13 +166,13 @@ function _____53D6_73A9_5BB6_4E2D_5FC3(boss)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue23
+                    goto __continue24
                 end
                 sx = sx + GetUnitX(hero)
                 sy = sy + GetUnitY(hero)
                 count = count + 1
             end
-            ::__continue23::
+            ::__continue24::
             i = i + 1
         end
     end
@@ -194,7 +208,7 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, centerX
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue29
+                    goto __continue30
                 end
                 if _____8DDD_79BB_5E73_65B9XY(
                     centerX,
@@ -202,23 +216,21 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, centerX
                     GetUnitX(hero),
                     GetUnitY(hero)
                 ) > radius2 then
-                    goto __continue29
+                    goto __continue30
                 end
-                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hero, {["来源攻击力比例"] = cfg["后续爆发Boss攻击力比例"], ["目标最大生命比例"] = cfg["后续爆发目标最大生命比例"]})
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____8FDC_53E4_8BC5_5492_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = hero,
-                    ["伤害"] = damage,
+                    ["伤害公式"] = {["来源攻击力比例"] = cfg["后续爆发Boss攻击力比例"], ["目标最大生命比例"] = cfg["后续爆发目标最大生命比例"]},
                     attack = false,
                     ranged = false,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_ENHANCED,
-                    weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能"
+                    weaponType = WEAPON_TYPE_WHOKNOWS
                 })
             end
-            ::__continue29::
+            ::__continue30::
             i = i + 1
         end
     end
@@ -247,8 +259,8 @@ function _____8C03_5EA6_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context)
             _____6267_884C_8FDC_53E4_8BC5_5492_540E_7EED_7206_53D1(context, center.x, center.y)
         end
     )
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "树魔首领-远古诅咒二段", delayedID)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "树魔首领-远古诅咒二段", delayedID)
 end
 function _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5(context, target)
     local boss = context["Boss单位"]
@@ -265,7 +277,7 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5(context, target)
         do
             local i = 0
             while i < #splitTargets do
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____63D0_4EA4_9884_8BA1_7B97BossAOE_6280_80FD_4F24_5BB3({
                     ["技能ID"] = _____8FDC_53E4_8BC5_5492_6280_80FDID,
                     ["来源"] = boss,
                     ["目标"] = splitTargets[i + 1],
@@ -274,14 +286,13 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5(context, target)
                     ranged = false,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_MIND,
-                    weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能"
+                    weaponType = WEAPON_TYPE_WHOKNOWS
                 })
                 i = i + 1
             end
         end
     else
-        _____9020_6210AOE_6280_80FD_4F24_5BB3({
+        _____63D0_4EA4_9884_8BA1_7B97BossAOE_6280_80FD_4F24_5BB3({
             ["技能ID"] = _____8FDC_53E4_8BC5_5492_6280_80FDID,
             ["来源"] = boss,
             ["目标"] = target,
@@ -290,8 +301,7 @@ function _____6267_884C_8FDC_53E4_8BC5_5492_7B2C_4E00_6BB5(context, target)
             ranged = false,
             attackType = ATTACK_TYPE_NORMAL,
             ["伤害类型"] = DAMAGE_TYPE_MIND,
-            weaponType = WEAPON_TYPE_WHOKNOWS,
-            ["来源类型"] = "Boss技能"
+            weaponType = WEAPON_TYPE_WHOKNOWS
         })
     end
     _____6CBB_7597_5168_90E8_73A9_5BB6(boss, baseDamage)
@@ -372,10 +382,6 @@ function ____on_6811_9B54_9996_9886_8FDC_53E4_8BC5_5492_751F_6548(castingUnit, s
     end
     ____exports["释放树魔首领远古诅咒"](context)
 end
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-_____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_1["造成AOE技能伤害"]
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
 GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -390,28 +396,26 @@ ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND
 DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807 = ____require_result_4["获取Boss技能最高仇恨目标"]
-_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_5.addDelayedCallback
-addPeriodicCallback = ____require_result_5.addPeriodicCallback
-removePeriodicCallback = ____require_result_5.removePeriodicCallback
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_6.registerManualBuff
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领")
-_____6811_9B54_9996_9886BuffID = ____require_result_7["树魔首领BuffID"]
-local ____require_result_8 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-doHeal = ____require_result_8.doHeal
-local ____require_result_9 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
-_____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_9["取当前有效玩家人数"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807 = ____require_result_2["获取Boss技能最高仇恨目标"]
+_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_3.addDelayedCallback
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_4.registerManualBuff
+local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领")
+_____6811_9B54_9996_9886BuffID = ____require_result_5["树魔首领BuffID"]
+local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+doHeal = ____require_result_6.doHeal
+local ____require_result_7 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
+_____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_7["取当前有效玩家人数"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____8FDC_53E4_8BC5_5492_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["远古诅咒"]["技能槽位"])
 local _____8FDC_53E4_8BC5_5492_5DF2_6CE8_518C = false

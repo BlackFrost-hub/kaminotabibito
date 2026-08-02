@@ -8,16 +8,13 @@ import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放'
 import { 单位是否在扇形区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
 };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, params: any) => boolean;
 };
 const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -85,8 +82,17 @@ export function 释放亚伦柯斯亡者凝视(this: void, context: 亚伦柯斯
     for (let i = 0; i < heroes.length; i++) {
       const hit = heroes[i];
       if (!单位是否在扇形区域(hit, x, y, cfg.半径, facing, cfg.扇形角度)) continue;
-      const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-      造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '亚伦柯斯·亡者凝视' });
+      执行BossAOE技能伤害({
+        来源: boss,
+        目标: hit,
+        伤害公式: { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 },
+        attack: false,
+        ranged: true,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_MAGIC,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        标签: '亚伦柯斯·亡者凝视',
+      });
       开始硬直(hit, cfg.硬直秒);
     }
     if (context.当前大型技能 === 亡者凝视技能Key) context.当前大型技能 = undefined;

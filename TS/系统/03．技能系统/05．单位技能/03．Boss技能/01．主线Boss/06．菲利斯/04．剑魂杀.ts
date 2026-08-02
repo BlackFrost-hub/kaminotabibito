@@ -4,37 +4,24 @@ import { 菲利斯单位技能配置 } from "./00．配置";
 import { 登记菲利斯剑魂狼, 获取或创建菲利斯上下文, 获取菲利斯剑魂狼记录, 注销菲利斯剑魂狼, 菲利斯运行时上下文 } from "./01．运行时上下文";
 import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
 import { 播放菲利斯台词 } from "./08．台词播放";
-import { 单位有效, stringToFourCC, 取单位间角度, 极坐标X, 极坐标Y, 距离平方XY } from "./11．公共工具";
+import { 单位有效, stringToFourCC, 取单位间角度, 极坐标X, 极坐标Y } from "./11．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-const { 造成AOE技能伤害, 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
-};
+import { 执行BossAOE技能伤害, 执行Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 创建原生弹幕, 创建直线定点轨迹 } from "../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕";
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
-const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const SetUnitMoveSpeed = jass.SetUnitMoveSpeed as (unit: any, speed: number) => void;
-const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-const EXSetEffectXY = japi.EXSetEffectXY as ((effect: any, x: number, y: number) => void) | undefined;
-const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
-const DzPlayEffectAnimation = japi.DzPlayEffectAnimation as ((effect: any, animationName: string, link: string) => void) | undefined;
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -52,10 +39,6 @@ const { 获取Boss技能最近敌对英雄Ex, 获取Boss技能敌对英雄列表
   获取Boss技能最近敌对英雄Ex: (this: void, boss: any, centerUnit?: any, radius?: number) => any;
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
-};
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
@@ -67,9 +50,6 @@ const { 菲利斯BuffID } = require("系统.05．Buff系统.03．Buff表.01．Bo
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
-};
-const { EC_GetPointZ } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_GetPointZ: (this: void, x: number, y: number) => number;
 };
 
 const 菲利斯单位类型ID = stringToFourCC(菲利斯单位技能配置.单位ID);
@@ -83,8 +63,6 @@ interface 剑魂路径 {
   终点X: number;
   终点Y: number;
   朝向: number;
-  奔跑小狼特效?: any;
-  命中表: Record<number, true | undefined>;
 }
 
 function 增加Boss魔法充能(this: void, context: 菲利斯运行时上下文, amount: number): void {
@@ -103,9 +81,10 @@ function 取目标(this: void, boss: any): any {
 function 创建路径(this: void, boss: any, target: any): 剑魂路径[] {
   const cfg = 菲利斯数值与表现配置.剑魂杀;
   const targetAngle = 取单位间角度(boss, target);
-  const centerX = GetUnitX(target);
-  const centerY = GetUnitY(target);
   const halfDistance = cfg.路径距离 * 0.5;
+  // 路径以菲利斯为起点向正面展开，不再以被选目标坐标为交叉中心。
+  const centerX = 极坐标X(GetUnitX(boss), targetAngle, halfDistance);
+  const centerY = 极坐标Y(GetUnitY(boss), targetAngle, halfDistance);
   const paths: 剑魂路径[] = [];
   for (let i = 0; i < cfg.剑气数量; i++) {
     const side = (i === 0 ? 1 : -1) * cfg.路径交叉角度 * 0.5;
@@ -118,7 +97,6 @@ function 创建路径(this: void, boss: any, target: any): 剑魂路径[] {
       终点X: 极坐标X(centerX, pathAngle, halfDistance),
       终点Y: 极坐标Y(centerY, pathAngle, halfDistance),
       朝向: pathAngle,
-      命中表: {},
     });
     创建技能提示圈({
       类型: "矩形",
@@ -195,83 +173,96 @@ function 生成剑魂狼(this: void, context: 菲利斯运行时上下文, x: nu
   if (单位有效(target)) IssueTargetOrder(wolf.单位, "attack", target);
 }
 
+function 销毁剑魂路径弹幕(this: void, 弹幕: any): void {
+  if (弹幕 != null && 弹幕.销毁 != null) 弹幕.销毁("手动销毁");
+}
+
+function 菲利斯剑魂路径目标允许(this: void, boss: any, unit: any): boolean {
+  if (!单位有效(unit)) return false;
+  const heroes = 获取Boss技能敌对英雄列表(boss);
+  for (let i = 0; i < heroes.length; i++) {
+    if (heroes[i] === unit) return true;
+  }
+  return false;
+}
+
 function 执行剑魂路径(this: void, context: 菲利斯运行时上下文, paths: 剑魂路径[]): void {
   const boss = context.Boss单位;
   const cfg = 菲利斯数值与表现配置.剑魂杀;
   播放Boss坐标音效(菲利斯音效配置.剑魂杀.路径释放, GetUnitX(boss), GetUnitY(boss), 菲利斯音效配置.默认裁断距离);
-  for (let i = 0; i < paths.length; i++) {
-    const path = paths[i];
-    const effect = 创建点特效({
-      模型路径: cfg.小狼奔跑特效路径,
-      X: path.起点X,
-      Y: path.起点Y,
-      缩放: cfg.小狼奔跑特效缩放,
-      动画速度: cfg.小狼奔跑动画速度,
-      Z轴角度: path.朝向,
-      持续秒: cfg.飞行持续秒 + 0.1,
-    });
-    path.奔跑小狼特效 = effect;
-    if (effect != null && effect !== 0 && typeof DzPlayEffectAnimation === "function") {
-      DzPlayEffectAnimation(effect, cfg.小狼奔跑动画名, "");
-    }
-  }
-  let elapsedMs = 0;
   let hitCount = 0;
-  let callbackID = 0;
-  callbackID = addPeriodicCallback(cfg.Tick间隔毫秒, function 菲利斯剑魂杀飞行Tick(this: void): void {
-    if (!单位有效(boss) || context.清理.已清理()) {
-      removePeriodicCallback(callbackID);
+  let 完成路径数 = 0;
+  let 已生成剑魂狼 = false;
+  function 处理路径到达(this: void): void {
+    if (!单位有效(boss) || context.清理.已清理()) return;
+    完成路径数 += 1;
+    if (已生成剑魂狼 || 完成路径数 < paths.length) return;
+    已生成剑魂狼 = true;
+    if (hitCount >= cfg.合并命中次数) {
+      const x = (paths[0].终点X + paths[1].终点X) * 0.5;
+      const y = (paths[0].终点Y + paths[1].终点Y) * 0.5;
+      生成剑魂狼(context, x, y, true);
       return;
     }
-    elapsedMs += cfg.Tick间隔毫秒;
-    const progress = elapsedMs / (cfg.飞行持续秒 * 1000);
-    const p = progress >= 1 ? 1 : progress;
-      for (let i = 0; i < paths.length; i++) {
-        const path = paths[i];
-        const x = path.起点X + (path.终点X - path.起点X) * p;
-        const y = path.起点Y + (path.终点Y - path.起点Y) * p;
-        const runningWolfEffect = path.奔跑小狼特效;
-        if (runningWolfEffect != null && runningWolfEffect !== 0) {
-          if (typeof EXSetEffectXY === "function") EXSetEffectXY(runningWolfEffect, x, y);
-          if (typeof EXSetEffectZ === "function") EXSetEffectZ(runningWolfEffect, EC_GetPointZ(x, y));
-        }
-        创建点特效({ 模型路径: cfg.狼魂路径特效路径, X: x, Y: y, 缩放: cfg.狼魂路径特效缩放, 持续秒: cfg.狼魂路径特效持续秒 });
-      const heroes = 获取Boss技能敌对英雄列表(boss);
-      for (let h = 0; h < heroes.length; h++) {
-        const hero = heroes[h];
-        if (!单位有效(hero)) continue;
-        const hid = GetHandleId(hero) || 0;
-        if (hid === 0 || path.命中表[hid] === true) continue;
-        if (距离平方XY(GetUnitX(hero), GetUnitY(hero), x, y) > cfg.命中半径 * cfg.命中半径) continue;
-        path.命中表[hid] = true;
+    for (let i = 0; i < paths.length; i++) 生成剑魂狼(context, paths[i].终点X, paths[i].终点Y, false);
+  }
+  for (let i = 0; i < paths.length; i++) {
+    const path = paths[i];
+    let trailElapsedMs = 0;
+    const projectile = 创建原生弹幕({
+      所有者: boss,
+      载体模式: "特效",
+      X: path.起点X,
+      Y: path.起点Y,
+      方向角: path.朝向,
+      速度: cfg.路径距离 / cfg.飞行持续秒,
+      生命周期: cfg.飞行持续秒,
+      最大距离: cfg.路径距离,
+      轨迹采样器: 创建直线定点轨迹(path.起点X, path.起点Y, path.终点X, path.终点Y),
+      命中半径: cfg.命中半径,
+      影响目标: "敌方",
+      每单位最大命中次数: 1,
+      碰撞消失: false,
+      禁用碰撞: true,
+      附加特效1: {
+        模型: cfg.小狼奔跑特效路径,
+        跟随主弹幕参数: true,
+        缩放: cfg.小狼奔跑特效缩放,
+        动画名称: cfg.小狼奔跑动画名,
+        动画速度: cfg.小狼奔跑动画速度,
+      },
+      目标筛选: function 菲利斯剑魂路径目标筛选(this: void, unit: any): boolean {
+        return 菲利斯剑魂路径目标允许(boss, unit);
+      },
+      onTick: function 菲利斯剑魂路径表现Tick(this: void, instance: any, delta: number): void {
+        if (!单位有效(boss) || context.清理.已清理()) return;
+        trailElapsedMs += delta * 1000;
+        if (trailElapsedMs < cfg.Tick间隔毫秒) return;
+        trailElapsedMs = 0;
+        创建点特效({ 模型路径: cfg.狼魂路径特效路径, X: instance.当前X, Y: instance.当前Y, 缩放: cfg.狼魂路径特效缩放, 持续秒: cfg.狼魂路径特效持续秒 });
+      },
+      on命中: function 菲利斯剑魂路径命中(this: void, hero: any): void {
+        if (!单位有效(hero)) return;
         hitCount += 1;
         registerManualBuff(hero, 菲利斯BuffID.剑魂狼印, 4, 1, { sourceName: "菲利斯-剑魂杀" });
-        造成AOE技能伤害({
+        执行BossAOE技能伤害({
           技能ID: 剑魂杀技能ID,
           来源: boss,
           目标: hero,
-          伤害: 读取单位攻击力(boss) * cfg.路径伤害Boss攻击力比例,
+          伤害公式: { 来源攻击力比例: cfg.路径伤害Boss攻击力比例 },
           attack: false,
           ranged: false,
           attackType: ATTACK_TYPE_NORMAL,
           伤害类型: DAMAGE_TYPE_NORMAL,
           weaponType: WEAPON_TYPE_WHOKNOWS,
-          来源类型: "Boss技能",
         });
-      }
-    }
-    if (p >= 1) {
-      removePeriodicCallback(callbackID);
-      if (hitCount >= cfg.合并命中次数) {
-        const x = (paths[0].终点X + paths[1].终点X) * 0.5;
-        const y = (paths[0].终点Y + paths[1].终点Y) * 0.5;
-        生成剑魂狼(context, x, y, true);
-      } else {
-        for (let i = 0; i < paths.length; i++) 生成剑魂狼(context, paths[i].终点X, paths[i].终点Y, false);
-      }
-    }
-  });
-  context.清理.登记周期回调("菲利斯-剑魂杀飞行", callbackID);
+      },
+      on到达目标点: function 菲利斯剑魂路径到达终点(this: void): void {
+        处理路径到达();
+      },
+    });
+    context.清理.登记清理("菲利斯-剑魂杀路径弹幕", 销毁剑魂路径弹幕, projectile);
+  }
 }
 
 export function 释放菲利斯剑魂杀(this: void, context: 菲利斯运行时上下文): void {
@@ -308,17 +299,16 @@ function on剑魂狼最终伤害(this: void, target: any, _attacker: any, _appli
   const wolf = snapshot.originalAttacker;
   const record = 获取菲利斯剑魂狼记录(wolf);
   if (record == null || !单位有效(record.Boss单位) || !单位有效(target)) return;
-  造成单体技能伤害({
+  执行Boss单体技能伤害({
     技能ID: 剑魂杀技能ID,
     来源: record.Boss单位,
     目标: target,
-    伤害: GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * record.伤害比例,
+    伤害公式: { 目标最大生命比例: record.伤害比例 },
     attack: false,
     ranged: false,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_NORMAL,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
     标签: "菲利斯·剑魂狼攻击",
   });
 }

@@ -8,7 +8,7 @@ local __TS__New = ____lualib.__TS__New
 local __TS__Delete = ____lualib.__TS__Delete
 local Map = ____lualib.Map
 local ____exports = {}
-local _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84, _____5B89_5168_8BBE_7F6E_7279_6548_5750_6807, _____505C_6B62_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick, _____79FB_9664_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548, _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick, _____9650_5236_5230_989C_8272_5B57_8282, _____53D6_7279_6548_9876_70B9_989C_8272, _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4, _____521B_5EFA_5FAA_73AF_70B9_7279_6548_4E00_6B21, _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick, _____786E_4FDD_5FAA_73AF_70B9_7279_6548Tick, _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55, ____on_5FAA_73AF_70B9_7279_6548Tick, destroyBoundEffect, _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5, _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5, _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548, _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1, _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1, ____on_7279_6548_9500_6BC1_68C0_67E5, jass, addPeriodicCallback, removePeriodicCallback, getServerTime, EC_CreateEffect, DestroyEffect, EXSetEffectX, EXSetEffectY, EXSetEffectSize, EXEffectMatRotateX, EXEffectMatRotateY, EXEffectMatRotateZ, DzGetColor, DzSetEffectVertexColor, _____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868, _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868, _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID, _____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868, _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID, _____5FAA_73AF_70B9_7279_6548_68C0_67E5_95F4_9694_6BEB_79D2, _____5FAA_73AF_70B9_7279_6548_8868, _____5FAA_73AF_70B9_7279_6548_6570_91CF, _____5FAA_73AF_70B9_7279_6548_56DE_8C03ID, _____4E0B_4E00_4E2A_5FAA_73AF_70B9_7279_6548ID, unitEffectMap
+local _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84, _____5B89_5168_8BBE_7F6E_7279_6548_5750_6807, _____505C_6B62_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick, _____79FB_9664_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548, _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548Tick, _____9650_5236_5230_989C_8272_5B57_8282, _____53D6_7279_6548_9876_70B9_989C_8272, _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4, _____521B_5EFA_5FAA_73AF_70B9_7279_6548_4E00_6B21, _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick, _____786E_4FDD_5FAA_73AF_70B9_7279_6548Tick, _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55, ____on_5FAA_73AF_70B9_7279_6548Tick, destroyBoundEffect, _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5, _____786E_4FDD_7279_6548_9500_6BC1_68C0_67E5, _____5B89_6392_5B9A_65F6_9500_6BC1_7279_6548, _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1, _____5904_7406_7ED1_5B9A_7279_6548_9500_6BC1, ____on_7279_6548_9500_6BC1_68C0_67E5, jass, addPeriodicCallback, removePeriodicCallback, getServerTime, EC_CreateEffect, DestroyEffect, EXSetEffectXY, EXSetEffectX, EXSetEffectY, EXSetEffectSize, EXEffectMatRotateX, EXEffectMatRotateY, EXEffectMatRotateZ, DzGetColor, DzSetEffectVertexColor, _____7279_6548_9500_6BC1_68C0_67E5_95F4_9694_6BEB_79D2, _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868, _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_952E_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_7279_6548_5217_8868, _____7ED1_5B9A_7279_6548_9500_6BC1_5230_671F_6BEB_79D2_5217_8868, _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID, _____6D3B_8DC3_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5217_8868, _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_56DE_8C03ID, _____5FAA_73AF_70B9_7279_6548_68C0_67E5_95F4_9694_6BEB_79D2, _____5FAA_73AF_70B9_7279_6548_8868, _____5FAA_73AF_70B9_7279_6548_6570_91CF, _____5FAA_73AF_70B9_7279_6548_56DE_8C03ID, _____4E0B_4E00_4E2A_5FAA_73AF_70B9_7279_6548ID, unitEffectMap
 function _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84(modelPath)
     if (string.find(modelPath, "imports\\", nil, true) or 0) - 1 == 0 then
         return __TS__StringSubstring(modelPath, 8)
@@ -20,6 +20,10 @@ function _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84(modelPath)
 end
 function _____5B89_5168_8BBE_7F6E_7279_6548_5750_6807(effect, x, y)
     if effect == nil or effect == 0 then
+        return
+    end
+    if EXSetEffectXY ~= nil then
+        EXSetEffectXY(effect, x, y)
         return
     end
     if EXSetEffectX ~= nil then
@@ -152,13 +156,13 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
             local id = idText
             local _____8BB0_5F55 = _____5FAA_73AF_70B9_7279_6548_8868[id]
             if _____8BB0_5F55 == nil then
-                goto __continue71
+                goto __continue72
             end
             local _____53C2_6570 = _____8BB0_5F55["参数"]
             local alive = _____53C2_6570["存活条件"] == nil or _____53C2_6570["存活条件"]()
             if _____8BB0_5F55["已停止"] or not alive or _____8BB0_5F55["结束毫秒"] > 0 and now >= _____8BB0_5F55["结束毫秒"] then
                 _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55(id, _____8BB0_5F55)
-                goto __continue71
+                goto __continue72
             end
             if now >= _____8BB0_5F55["下次重建毫秒"] then
                 _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4(_____8BB0_5F55["当前特效"])
@@ -169,7 +173,7 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
                 _____8BB0_5F55["当前特效"] = nil
             end
         end
-        ::__continue71::
+        ::__continue72::
     end
     if _____5FAA_73AF_70B9_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick()
@@ -304,6 +308,7 @@ local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local DzBindEffect = japi.DzBindEffect
 local DzUnbindEffect = japi.DzUnbindEffect
+EXSetEffectXY = japi.EXSetEffectXY
 EXSetEffectX = japi.EXSetEffectX
 EXSetEffectY = japi.EXSetEffectY
 local EXSetEffectZ = japi.EXSetEffectZ
@@ -702,11 +707,11 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
         do
             local record = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key]
             if record == nil then
-                goto __continue143
+                goto __continue144
             end
             if not _____5355_4F4D_53EF_5750_6807_8DDF_968F(record.unit) then
                 _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548_8BB0_5F55(key, record)
-                goto __continue143
+                goto __continue144
             end
             local x = GetUnitX(record.unit)
             local y = GetUnitY(record.unit)
@@ -716,7 +721,7 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
                 EC_GetPointZ(x, y) + record.height
             )
         end
-        ::__continue143::
+        ::__continue144::
     end
     if _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()

@@ -5,6 +5,10 @@ import { 注册剧情运行时单位 } from "../../00．剧情系统核心工具
 import { 启动王城攻城战, 结束菲利斯攻城等待, 登记存活攻城单位为菲利斯护卫 } from "./31A．王城攻城战控制器";
 import { 准备耶提尔菲利斯协战 } from "./31B．耶提尔协战控制器";
 
+const { 开始第二章菲利斯攻城区域音乐 } = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐") as {
+  开始第二章菲利斯攻城区域音乐: (this: void) => boolean;
+};
+
 const jass = require("jass.common") as any;
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -75,6 +79,7 @@ export function 执行紧急会议(this: void): void {
 }
 
 export function 执行启动王城攻城战(this: void): void {
+  开始第二章菲利斯攻城区域音乐();
   启动王城攻城战();
   发布主线节点目标(32);
 }

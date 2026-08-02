@@ -20,43 +20,45 @@ local ____require_result_4 = require("系统.12．测试系统.00．测试系统
 local _____6807_8BB0_6D4B_8BD5Boss_8DF3_8FC7_6B7B_4EA1_7ED3_7B97 = ____require_result_4["标记测试Boss跳过死亡结算"]
 local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_5.addDelayedCallback
-local ____require_result_6 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用")
-local _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E = ____require_result_6["应用Boss战启动属性配置"]
-local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
-local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____require_result_7["安兹乌尔恭数值与表现配置"]
-local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.15．被动效果")
-local _____6CE8_518C_5B89_5179_88AB_52A8_6548_679C = ____require_result_8["注册安兹被动效果"]
-local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
-local _____83B7_53D6_6216_521B_5EFA_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_9["获取或创建安兹运行时上下文"]
-local _____6E05_7406_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_9["清理安兹运行时上下文"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．守护者模式")
-local _____542F_52A8_5B89_5179_5B88_62A4_8005_6A21_5F0F = ____require_result_10["启动安兹守护者模式"]
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.03．现实断裂")
-local _____91CA_653E_5B89_5179_73B0_5B9E_65AD_88C2 = ____require_result_11["释放安兹现实断裂"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.04．心脏掌握")
-local _____91CA_653E_5B89_5179_5FC3_810F_638C_63E1 = ____require_result_12["释放安兹心脏掌握"]
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.05．高阶魔法箭")
-local _____91CA_653E_5B89_5179_9AD8_9636_9B54_6CD5_7BAD = ____require_result_13["释放安兹高阶魔法箭"]
-local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.06．光辉翠绿体")
-local _____91CA_653E_5B89_5179_5149_8F89_7FE0_7EFF_4F53 = ____require_result_14["释放安兹光辉翠绿体"]
-local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.07．时间停止")
-local _____91CA_653E_5B89_5179_65F6_95F4_505C_6B62 = ____require_result_15["释放安兹时间停止"]
-local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.08．高阶亡灵召唤")
-local _____91CA_653E_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524 = ____require_result_16["释放安兹高阶亡灵召唤"]
-local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.09．天空坠落")
-local _____91CA_653E_5B89_5179_5929_7A7A_5760_843D = ____require_result_17["释放安兹天空坠落"]
-local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.10．一切生命的终点")
-local _____91CA_653E_5B89_5179_4E00_5207_751F_547D_7684_7EC8_70B9 = ____require_result_18["释放安兹一切生命的终点"]
-local ____require_result_19 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.01．至尊拦截")
-local _____91CA_653E_96C5_513F_8D1D_5FB7_81F3_5C0A_62E6_622A = ____require_result_19["释放雅儿贝德至尊拦截"]
-local ____require_result_20 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.02．黑翼横扫")
-local _____91CA_653E_96C5_513F_8D1D_5FB7_9ED1_7FFC_6A2A_626B = ____require_result_20["释放雅儿贝德黑翼横扫"]
-local ____require_result_21 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.03．守护者之职责")
-local _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23 = ____require_result_21["释放雅儿贝德守护者之职责"]
-local ____require_result_22 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.08．守护回归")
-local _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_56DE_5F52 = ____require_result_22["释放雅儿贝德守护回归"]
-local ____require_result_23 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.09．护卫反击")
-local _____91CA_653E_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB = ____require_result_23["释放雅儿贝德护卫反击"]
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_6["造成单体技能伤害"]
+local ____require_result_7 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用")
+local _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E = ____require_result_7["应用Boss战启动属性配置"]
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
+local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____require_result_8["安兹乌尔恭数值与表现配置"]
+local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.15．被动效果")
+local _____6CE8_518C_5B89_5179_88AB_52A8_6548_679C = ____require_result_9["注册安兹被动效果"]
+local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．运行时上下文")
+local _____83B7_53D6_6216_521B_5EFA_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_10["获取或创建安兹运行时上下文"]
+local _____6E05_7406_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____require_result_10["清理安兹运行时上下文"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．守护者模式")
+local _____542F_52A8_5B89_5179_5B88_62A4_8005_6A21_5F0F = ____require_result_11["启动安兹守护者模式"]
+local ____require_result_12 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.03．现实断裂")
+local _____91CA_653E_5B89_5179_73B0_5B9E_65AD_88C2 = ____require_result_12["释放安兹现实断裂"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.04．心脏掌握")
+local _____91CA_653E_5B89_5179_5FC3_810F_638C_63E1 = ____require_result_13["释放安兹心脏掌握"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.05．高阶魔法箭")
+local _____91CA_653E_5B89_5179_9AD8_9636_9B54_6CD5_7BAD = ____require_result_14["释放安兹高阶魔法箭"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.06．光辉翠绿体")
+local _____91CA_653E_5B89_5179_5149_8F89_7FE0_7EFF_4F53 = ____require_result_15["释放安兹光辉翠绿体"]
+local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.07．时间停止")
+local _____91CA_653E_5B89_5179_65F6_95F4_505C_6B62 = ____require_result_16["释放安兹时间停止"]
+local ____require_result_17 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.08．高阶亡灵召唤")
+local _____91CA_653E_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524 = ____require_result_17["释放安兹高阶亡灵召唤"]
+local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.09．天空坠落")
+local _____91CA_653E_5B89_5179_5929_7A7A_5760_843D = ____require_result_18["释放安兹天空坠落"]
+local ____require_result_19 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.10．一切生命的终点")
+local _____91CA_653E_5B89_5179_4E00_5207_751F_547D_7684_7EC8_70B9 = ____require_result_19["释放安兹一切生命的终点"]
+local ____require_result_20 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.01．至尊拦截")
+local _____91CA_653E_96C5_513F_8D1D_5FB7_81F3_5C0A_62E6_622A = ____require_result_20["释放雅儿贝德至尊拦截"]
+local ____require_result_21 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.02．黑翼横扫")
+local _____91CA_653E_96C5_513F_8D1D_5FB7_9ED1_7FFC_6A2A_626B = ____require_result_21["释放雅儿贝德黑翼横扫"]
+local ____require_result_22 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.03．守护者之职责")
+local _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23 = ____require_result_22["释放雅儿贝德守护者之职责"]
+local ____require_result_23 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.08．守护回归")
+local _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_56DE_5F52 = ____require_result_23["释放雅儿贝德守护回归"]
+local ____require_result_24 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.09．护卫反击")
+local _____91CA_653E_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB = ____require_result_24["释放雅儿贝德护卫反击"]
 local CreateUnit = jass.CreateUnit
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -67,7 +69,6 @@ local GetUnitFacing = jass.GetUnitFacing
 local SetHeroLevel = jass.SetHeroLevel
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
-local UnitDamageTarget = jass.UnitDamageTarget
 local Cos = jass.Cos
 local Sin = jass.Sin
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -135,11 +136,11 @@ local function _____521B_5EFA_6216_83B7_53D6_5B89_5179_6D4B_8BD5_4E0A_4E0B_6587(
     if runtime == nil or not _____542F_52A8_5B89_5179_5B88_62A4_8005_6A21_5F0F(runtime) then
         return nil
     end
-    local ____opt_24 = runtime["雅儿贝德"]
-    if ____opt_24 ~= nil then
-        ____opt_24 = ____opt_24["单位"]
+    local ____opt_25 = runtime["雅儿贝德"]
+    if ____opt_25 ~= nil then
+        ____opt_25 = ____opt_25["单位"]
     end
-    local albedo = ____opt_24
+    local albedo = ____opt_25
     if ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(albedo) then
         _____8BBE_7F6EBoss_6D4B_8BD5_5355_4F4D_6EE1_8840(albedo)
     end
@@ -184,11 +185,11 @@ local function _____7ED3_7B97_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_
     if _____53C2_6570 == nil then
         return
     end
-    local ____opt_28 = _____53C2_6570["运行时"]
-    if ____opt_28 ~= nil then
-        ____opt_28 = ____opt_28["高阶亡灵召唤物"]
+    local ____opt_29 = _____53C2_6570["运行时"]
+    if ____opt_29 ~= nil then
+        ____opt_29 = ____opt_29["高阶亡灵召唤物"]
     end
-    local summon = ____opt_28
+    local summon = ____opt_29
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(_____53C2_6570["来源单位"]) or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(summon) then
         return
     end
@@ -196,16 +197,19 @@ local function _____7ED3_7B97_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_
     if not (maxLife > 0) then
         return
     end
-    UnitDamageTarget(
-        _____53C2_6570["来源单位"],
-        summon,
-        maxLife * 2,
-        false,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_UNIVERSAL,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["来源"] = _____53C2_6570["来源单位"],
+        ["目标"] = summon,
+        ["伤害"] = maxLife * 2,
+        attack = false,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_UNIVERSAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "其他",
+        ["标签"] = "安兹测试-高阶亡灵致命保护",
+        ["参与技能伤害加成"] = false
+    })
 end
 local function _____6D4B_8BD5_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_4FDD_62A4(_player, context)
     if not _____91CA_653E_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524(context["运行时"]) then
@@ -213,8 +217,8 @@ local function _____6D4B_8BD5_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_
     end
     local delayMs = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["高阶亡灵召唤施法秒"] * 1000 + 2000
     local delayedId = addDelayedCallback(delayMs, _____7ED3_7B97_5B89_5179_9AD8_9636_4EA1_7075_53EC_5524_81F4_547D_4F24_5BB3, {["来源单位"] = context["目标单位"], ["运行时"] = context["运行时"]})
-    local ____self_30 = context["运行时"]["清理"]
-    ____self_30["登记延迟回调"](____self_30, "安兹测试-高阶亡灵致命保护", delayedId)
+    local ____self_31 = context["运行时"]["清理"]
+    ____self_31["登记延迟回调"](____self_31, "安兹测试-高阶亡灵致命保护", delayedId)
 end
 local function _____6D4B_8BD5_5B89_5179_5929_7A7A_5760_843D(_player, context)
     context["运行时"]["天空坠落已释放"] = false
@@ -246,15 +250,15 @@ local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23(
     _____91CA_653E_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D23(context["运行时"])
 end
 local function _____7ED3_7B97_5B88_62A4_804C_8D2320_767E_5206_6BD4_6700_5927_751F_547D_53D7_51FB(_____53C2_6570)
-    local ____temp_33 = _____53C2_6570 == nil
-    if not ____temp_33 then
-        local ____opt_31 = _____53C2_6570["雅儿贝德状态"]
-        if ____opt_31 ~= nil then
-            ____opt_31 = ____opt_31["守护连接生效"]
+    local ____temp_34 = _____53C2_6570 == nil
+    if not ____temp_34 then
+        local ____opt_32 = _____53C2_6570["雅儿贝德状态"]
+        if ____opt_32 ~= nil then
+            ____opt_32 = ____opt_32["守护连接生效"]
         end
-        ____temp_33 = ____opt_31 ~= true
+        ____temp_34 = ____opt_32 ~= true
     end
-    if ____temp_33 then
+    if ____temp_34 then
         return
     end
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(_____53C2_6570["来源单位"]) or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(_____53C2_6570["Boss单位"]) then
@@ -264,16 +268,19 @@ local function _____7ED3_7B97_5B88_62A4_804C_8D2320_767E_5206_6BD4_6700_5927_751
     if maxLife <= 0 then
         return
     end
-    UnitDamageTarget(
-        _____53C2_6570["来源单位"],
-        _____53C2_6570["Boss单位"],
-        maxLife * 0.2,
-        true,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_NORMAL,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["来源"] = _____53C2_6570["来源单位"],
+        ["目标"] = _____53C2_6570["Boss单位"],
+        ["伤害"] = maxLife * 0.2,
+        attack = true,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "其他",
+        ["标签"] = "安兹测试-守护者之职责受击",
+        ["参与技能伤害加成"] = false
+    })
 end
 local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D2320_767E_5206_6BD4_53D7_51FB(_player, context)
     if not _____542F_52A8_5B89_5179_5B88_62A4_8005_6A21_5F0F(context["运行时"]) then
@@ -289,16 +296,16 @@ local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_5B88_62A4_8005_4E4B_804C_8D232
     end
     local delayMs = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["守护者模式"]["守护者之职责预连接秒"] * 1000 + 50
     local delayedId = addDelayedCallback(delayMs, _____7ED3_7B97_5B88_62A4_804C_8D2320_767E_5206_6BD4_6700_5927_751F_547D_53D7_51FB, {["来源单位"] = context["目标单位"], ["Boss单位"] = context["Boss单位"], ["雅儿贝德状态"] = state})
-    local ____self_34 = context["运行时"]["清理"]
-    ____self_34["登记延迟回调"](____self_34, "安兹测试-守护职责-20%最大生命受击", delayedId)
+    local ____self_35 = context["运行时"]["清理"]
+    ____self_35["登记延迟回调"](____self_35, "安兹测试-守护职责-20%最大生命受击", delayedId)
 end
 local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_5B88_62A4_56DE_5F52(_player, context)
     local state = context["运行时"]["雅儿贝德"]
-    local ____opt_result_37
+    local ____opt_result_38
     if state ~= nil then
-        ____opt_result_37 = state["单位"]
+        ____opt_result_38 = state["单位"]
     end
-    local albedo = ____opt_result_37
+    local albedo = ____opt_result_38
     if state == nil or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(albedo) then
         return
     end
@@ -329,24 +336,27 @@ local function _____7ED3_7B97_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB_53D7_51FB(
         return
     end
     local damage = maxLife * cfg["护卫反击触发伤害最大生命比例"] / cfg["护卫反击承伤倍率"] + 1
-    UnitDamageTarget(
-        _____53C2_6570["来源单位"],
-        _____53C2_6570["雅儿贝德单位"],
-        damage,
-        true,
-        false,
-        ATTACK_TYPE_NORMAL,
-        DAMAGE_TYPE_UNIVERSAL,
-        WEAPON_TYPE_WHOKNOWS
-    )
+    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        ["来源"] = _____53C2_6570["来源单位"],
+        ["目标"] = _____53C2_6570["雅儿贝德单位"],
+        ["伤害"] = damage,
+        attack = true,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_UNIVERSAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "其他",
+        ["标签"] = "安兹测试-护卫反击受击",
+        ["参与技能伤害加成"] = false
+    })
 end
 local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB_81EA_52A8_53D7_51FB(_player, context)
     local state = context["运行时"]["雅儿贝德"]
-    local ____opt_result_40
+    local ____opt_result_41
     if state ~= nil then
-        ____opt_result_40 = state["单位"]
+        ____opt_result_41 = state["单位"]
     end
-    local albedo = ____opt_result_40
+    local albedo = ____opt_result_41
     local source = context["目标单位"]
     if state == nil or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(albedo) or not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(source) then
         return
@@ -364,8 +374,8 @@ local function _____6D4B_8BD5_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB_81EA_52A8_
         return
     end
     local delayedId = addDelayedCallback(50, _____7ED3_7B97_96C5_513F_8D1D_5FB7_62A4_536B_53CD_51FB_53D7_51FB, {["来源单位"] = source, ["雅儿贝德单位"] = albedo})
-    local ____self_41 = context["运行时"]["清理"]
-    ____self_41["登记延迟回调"](____self_41, "安兹测试-护卫反击自动受击", delayedId)
+    local ____self_42 = context["运行时"]["清理"]
+    ____self_42["登记延迟回调"](____self_42, "安兹测试-护卫反击自动受击", delayedId)
 end
 local _____5B89_5179_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "现实断裂", ["执行"] = _____6D4B_8BD5_5B89_5179_73B0_5B9E_65AD_88C2},

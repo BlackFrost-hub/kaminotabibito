@@ -7,7 +7,7 @@ import { 刷新夏提雅猎血连击Buff } from './03．滴管长枪连击';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 获取夏提雅英灵投影, 尝试触发英灵战乙女复刻 } from './09．英灵战乙女';
 import { 播放夏提雅台词 } from './18．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
@@ -15,9 +15,6 @@ import { 显示夏提雅常规吟唱条 } from './19．吟唱条';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -133,20 +130,18 @@ function 尝试安排滴管穿心英灵复刻(this: void, context: 夏提雅运�
         命中后结束: false,
         动画序号: p2.英灵复刻冲锋动画编号,
         命中回调: function 滴管穿心英灵命中(this: void, _source: any, hit: any): void {
-          const damage = 计算组合技能伤害(context.Boss单位, hit, {
-            来源攻击力比例: cfg.伤害攻击力比例 * p2.英灵复刻伤害比例,
-            目标最大生命比例: cfg.伤害目标最大生命比例 * p2.英灵复刻伤害比例,
-          });
-          造成AOE技能伤害({
+          执行BossAOE技能伤害({
             来源: context.Boss单位,
             目标: hit,
-            伤害: damage,
+            伤害公式: {
+              来源攻击力比例: cfg.伤害攻击力比例 * p2.英灵复刻伤害比例,
+              目标最大生命比例: cfg.伤害目标最大生命比例 * p2.英灵复刻伤害比例,
+            },
             attack: false,
             ranged: false,
             attackType: ATTACK_TYPE_NORMAL,
             伤害类型: DAMAGE_TYPE_NORMAL,
             weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-            来源类型: 'Boss技能',
             标签: '夏提雅·英灵复刻-滴管穿心',
           });
         },
@@ -214,20 +209,18 @@ export function 释放夏提雅滴管穿心(this: void, context: 夏提雅运行
       命中后结束: false,
       命中回调: function 滴管穿心命中(this: void, source: any, hit: any): void {
         播放Boss坐标音效(夏提雅数值与表现配置.音效.滴管穿心汲血, GetUnitX(hit), GetUnitY(hit), 夏提雅数值与表现配置.音效默认裁断距离);
-        const damage = 计算组合技能伤害(source, hit, {
-          来源攻击力比例: cfg.伤害攻击力比例,
-          目标最大生命比例: cfg.伤害目标最大生命比例,
-        });
-        造成AOE技能伤害({
+        执行BossAOE技能伤害({
           来源: source,
           目标: hit,
-          伤害: damage,
+          伤害公式: {
+            来源攻击力比例: cfg.伤害攻击力比例,
+            目标最大生命比例: cfg.伤害目标最大生命比例,
+          },
           attack: false,
           ranged: false,
           attackType: ATTACK_TYPE_NORMAL,
           伤害类型: DAMAGE_TYPE_NORMAL,
           weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-          来源类型: 'Boss技能',
           标签: '夏提雅·滴管穿心',
         });
         const effect = AddSpecialEffect(夏提雅数值与表现配置.表现资源.滴管穿心命中特效路径, GetUnitX(hit), GetUnitY(hit));

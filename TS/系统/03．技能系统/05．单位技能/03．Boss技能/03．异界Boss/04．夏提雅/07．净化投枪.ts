@@ -7,7 +7,7 @@ import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 净化落点内夏提雅鲜血印记 } from './04．鲜血印记';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 获取夏提雅英灵投影, 尝试触发英灵战乙女复刻 } from './09．英灵战乙女';
 import { 创建点名预警执行器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/05．点名预警执行器';
 import { 播放夏提雅台词 } from './18．台词播放';
@@ -20,7 +20,6 @@ const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 }
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
   获取Boss技能随机敌对英雄: (this: void, boss: any, centerUnit?: any, radius?: number, excludeList?: any[]) => any;
 };
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as { 造成AOE技能伤害: (this: void, 参数: any) => boolean };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as { YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void };
 const { 设置特效缩放 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as { 设置特效缩放: (this: void, effect: any, scale: number) => void };
@@ -132,11 +131,20 @@ function 尝试安排净化投枪英灵复刻(this: void, context: 夏提雅运�
         const dx = GetUnitX(heroes[i]) - x;
         const dy = GetUnitY(heroes[i]) - y;
         if (dx * dx + dy * dy > cfg.伤害半径 * cfg.伤害半径) continue;
-        const damage = 计算组合技能伤害(context.Boss单位, heroes[i], {
-          来源攻击力比例: cfg.伤害攻击力比例 * p2.英灵复刻伤害比例,
-          目标最大生命比例: cfg.伤害目标最大生命比例 * p2.英灵复刻伤害比例,
+        执行BossAOE技能伤害({
+          来源: context.Boss单位,
+          目标: heroes[i],
+          伤害公式: {
+            来源攻击力比例: cfg.伤害攻击力比例 * p2.英灵复刻伤害比例,
+            目标最大生命比例: cfg.伤害目标最大生命比例 * p2.英灵复刻伤害比例,
+          },
+          attack: false,
+          ranged: true,
+          attackType: ATTACK_TYPE_NORMAL,
+          伤害类型: DAMAGE_TYPE_MAGIC,
+          weaponType: WEAPON_TYPE_WHOKNOWS,
+          标签: '夏提雅·英灵复刻-净化投枪',
         });
-        造成AOE技能伤害({ 来源: context.Boss单位, 目标: heroes[i], 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '夏提雅·英灵复刻-净化投枪' });
       }
     },
   });
@@ -158,8 +166,17 @@ function 结算净化投枪落点(this: void, context: 夏提雅运行时上下�
     const dx = GetUnitX(heroes[i]) - x;
     const dy = GetUnitY(heroes[i]) - y;
     if (dx * dx + dy * dy > cfg.伤害半径 * cfg.伤害半径) continue;
-    const damage = 计算组合技能伤害(boss, heroes[i], { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-    造成AOE技能伤害({ 来源: boss, 目标: heroes[i], 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: tag });
+    执行BossAOE技能伤害({
+      来源: boss,
+      目标: heroes[i],
+      伤害公式: { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 },
+      attack: false,
+      ranged: true,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_MAGIC,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      标签: tag,
+    });
   }
 }
 

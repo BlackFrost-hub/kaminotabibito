@@ -8,9 +8,7 @@ import { 单位有效, stringToFourCC, 取难度, 取单位间角度, 极坐标X
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 执行战斗自身位移到坐标 } from "../../../../00．技能模板+函数/02．通用函数/20．位移技能限制";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
-};
+import { 提交预计算Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -64,29 +62,29 @@ let 全力封印斩已注册 = false;
 function 选择封印目标(this: void, boss: any): any[] {
   const heroes = 获取Boss技能敌对英雄列表(boss);
   const result: any[] = [];
+  const cfg = 菲利斯数值与表现配置.全力封印斩;
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
-    if (命令卡技能是否全部冷却中(hero, ["Q", "W", "E", "R"])) result.push(hero);
-  }
-  return result;
-}
+    const isTarget = 命令卡技能是否全部冷却中(hero, ["Q", "W", "E", "R"]);
 
-function 标记封印目标(this: void, boss: any, targets: any[]): void {
-  const cfg = 菲利斯数值与表现配置.全力封印斩;
-  for (let i = 0; i < targets.length; i++) {
-    const target = targets[i];
-    registerManualBuff(target, 菲利斯BuffID.封印标记, cfg.前摇秒 + 0.5, 0, { sourceName: "菲利斯-全力封印斩" });
+    // 不传来源单位，红/白颜色由提示圈类型显式决定，避免底层按归属玩家重染。
     创建技能提示圈({
-      类型: "渐变圆形",
-      X: GetUnitX(target),
-      Y: GetUnitY(target),
+      类型: isTarget ? "渐变圆形" : "白色安全圆",
+      X: GetUnitX(hero),
+      Y: GetUnitY(hero),
       半径: 220,
       持续时间: cfg.前摇秒,
-      来源单位: boss,
     });
-    创建点特效({ 模型路径: cfg.玩家封印特效路径, X: GetUnitX(target), Y: GetUnitY(target), 缩放: 1.0, 持续秒: cfg.前摇秒 + 0.2 });
+
+    // 法阵对所有候选目标提前创建，命中特效和结算仍只由有效目标触发。
+    创建点特效({ 模型路径: cfg.玩家封印特效路径, X: GetUnitX(hero), Y: GetUnitY(hero), 缩放: 1.0, 持续秒: cfg.前摇秒 + 0.2 });
+    if (!isTarget) continue;
+
+    result.push(hero);
+    registerManualBuff(hero, 菲利斯BuffID.封印标记, cfg.前摇秒 + 0.5, 0, { sourceName: "菲利斯-全力封印斩" });
   }
+  return result;
 }
 
 function 执行封印惩罚(this: void, boss: any, target: any): void {
@@ -98,7 +96,7 @@ function 执行封印惩罚(this: void, boss: any, target: any): void {
   if (manaLoss > 0) {
     const actualManaLoss = -魔法增减(target, -manaLoss, false, false);
     if (actualManaLoss > 0) {
-      造成单体技能伤害({
+      提交预计算Boss单体技能伤害({
         技能ID: 全力封印斩技能ID,
         来源: boss,
         目标: target,
@@ -108,7 +106,6 @@ function 执行封印惩罚(this: void, boss: any, target: any): void {
         attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_MAGIC,
         weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
       });
     }
   }
@@ -128,7 +125,6 @@ export function 释放菲利斯全力封印斩(this: void, context: 菲利斯运
   if (!单位有效(boss)) return;
   const cfg = 菲利斯数值与表现配置.全力封印斩;
   const targets = 选择封印目标(boss);
-  标记封印目标(boss, targets);
   if (targets.length > 0) {
     播放Boss坐标音效(菲利斯音效配置.全力封印斩.起手标记, GetUnitX(boss), GetUnitY(boss), 菲利斯音效配置.默认裁断距离);
   }

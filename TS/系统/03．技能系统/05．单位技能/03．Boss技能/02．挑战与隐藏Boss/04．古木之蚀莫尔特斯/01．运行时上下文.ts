@@ -6,20 +6,13 @@ import { 创建阶段上下文, type 阶段上下文 } from "../../../../00．�
 import { 莫尔特斯单位技能配置 } from "./00．配置";
 import { 莫尔特斯数值与表现配置 } from "./02．数值与表现配置";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 取单位ID, stringToFourCC } from "./16．公共工具";
+import { 单位有效, 取单位ID } from "./16．公共工具";
 import type { 固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 
 const jass = require("jass.common") as any;
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-
-const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
-let 莫尔特斯死亡监听已注册 = false;
 
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -122,6 +115,9 @@ const 莫尔特斯上下文工厂 = 创建单位运行时上下文工厂<莫尔�
   名称: "莫尔特斯",
   主动技能提示: 莫尔特斯单位技能配置.主动技能提示,
   创建上下文: 创建莫尔特斯上下文,
+  死亡时自动清理: true,
+  on单位死亡: on莫尔特斯单位死亡,
+  on清理: 清理莫尔特斯上下文机制,
 });
 
 export function 获取莫尔特斯上下文(this: void, boss: any): 莫尔特斯运行时上下文 | undefined {
@@ -137,8 +133,6 @@ export function 获取全部莫尔特斯上下文(this: void): 莫尔特斯运�
 }
 
 export function 清理莫尔特斯上下文(this: void, boss: any): void {
-  const context = 莫尔特斯上下文工厂.获取(boss);
-  if (context != null) 清理莫尔特斯腐败护盾(context);
   莫尔特斯上下文工厂.清理上下文(boss);
 }
 
@@ -217,6 +211,14 @@ function 清理莫尔特斯腐败护盾(this: void, context: 莫尔特斯运行�
   context.腐败护盾值 = 0;
 }
 
+function 清理莫尔特斯上下文机制(this: void, context: 莫尔特斯运行时上下文): void {
+  清理莫尔特斯腐败护盾(context);
+}
+
+function on莫尔特斯单位死亡(this: void, _context: 莫尔特斯运行时上下文, dyingUnit: any, _killingUnit: any): void {
+  播放莫尔特斯台词(dyingUnit, "死亡", 0);
+}
+
 function 创建莫尔特斯腐败护盾参数(this: void, context: 莫尔特斯运行时上下文, boss: any, value: number): any {
   return {
     类型: 护盾类型.通用,
@@ -275,14 +277,5 @@ export function 刷新Boss腐败护盾Buff(this: void, context: 莫尔特斯运�
   });
 }
 
-function on莫尔特斯死亡(this: void, dyingUnit: any): void {
-  if (GetUnitTypeId(dyingUnit) !== 莫尔特斯单位类型ID) return;
-  播放莫尔特斯台词(dyingUnit, "死亡", 0);
-  清理莫尔特斯上下文(dyingUnit);
-}
-
 export function 注册莫尔特斯运行时(this: void): void {
-  if (莫尔特斯死亡监听已注册) return;
-  莫尔特斯死亡监听已注册 = true;
-  registerDeathListener(on莫尔特斯死亡);
 }

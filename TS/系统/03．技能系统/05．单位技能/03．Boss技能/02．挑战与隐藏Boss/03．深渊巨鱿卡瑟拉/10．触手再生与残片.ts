@@ -13,13 +13,11 @@ import { 释放卡瑟拉共生电击 } from "./09．共生电击";
 import { 单位有效, 极坐标X, 极坐标Y, 距离XY, 取坐标角度 } from "./14．公共工具";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
+import { 创建限次周期执行器, type 限次周期执行器实例 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器';
 import { 创建战斗技能调度器 } from '../../../../00．技能模板+函数/00．技能模板/13．战斗技能调度模板/01．战斗技能调度模板';
 import { 创建血量节点触发器 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/01．血量节点触发器';
 import { 取单位ID } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
-
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
-};
+import { 执行Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
@@ -36,9 +34,7 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
-const { addPeriodicCallback, removePeriodicCallback, addDelayedCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
+const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
@@ -68,8 +64,7 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 interface 再生触手实例 {
   context: 卡瑟拉运行时上下文;
   触手单位: any;
-  剩余跳数: number;
-  周期ID: number;
+  周期?: 限次周期执行器实例;
 }
 
 let 已注册 = false;
@@ -103,31 +98,28 @@ function 创建地面触手残片(this: void, context: 卡瑟拉运行时上下�
   context.场上触手残片列表.push({ X: x, Y: y, 特效: effect, 已吸收: false });
 }
 
-function 结算再生触手一跳(this: void, data: 再生触手实例): void {
+function 结算再生触手一跳(this: void, data: 再生触手实例): boolean {
   const context = data.context;
   const boss = context.Boss单位;
-  if (!单位有效(boss) || !单位有效(data.触手单位) || data.剩余跳数 <= 0) {
-    removePeriodicCallback(data.周期ID);
-    return;
-  }
-  data.剩余跳数 = data.剩余跳数 - 1;
+  if (!单位有效(boss) || !单位有效(data.触手单位)) return false;
   const target = 选择最低生命玩家(boss);
-  if (!单位有效(target)) return;
+  if (!单位有效(target)) return true;
   const cfg = 卡瑟拉数值与表现配置.触手残片;
-  if (距离XY(GetUnitX(data.触手单位), GetUnitY(data.触手单位), GetUnitX(target), GetUnitY(target)) > cfg.再生触手攻击半径) return;
+  if (距离XY(GetUnitX(data.触手单位), GetUnitY(data.触手单位), GetUnitX(target), GetUnitY(target)) > cfg.再生触手攻击半径) return true;
   const damage = 读取单位攻击力(boss) * cfg.再生触手Boss攻击力比例;
-  造成单体技能伤害({
+  执行Boss单体技能伤害({
     来源: boss,
     目标: target,
-    伤害: damage,
+    伤害公式: { 来源攻击力比例: cfg.再生触手Boss攻击力比例 },
     attack: true,
     ranged: false,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_NORMAL,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
+    标签: "卡瑟拉触手再生",
   });
   治疗Boss固定值(boss, damage * cfg.再生触手吸血比例);
+  return true;
 }
 
 function 生成再生触手(this: void, context: 卡瑟拉运行时上下文): void {
@@ -159,13 +151,16 @@ function 生成再生触手(this: void, context: 卡瑟拉运行时上下文): v
   const data: 再生触手实例 = {
     context,
     触手单位: instance.单位,
-    剩余跳数: cfg.再生触手持续秒 / cfg.再生触手攻击间隔秒,
-    周期ID: 0,
   };
-  data.周期ID = addPeriodicCallback(cfg.再生触手攻击间隔秒 * 1000, function 卡瑟拉再生触手周期(this: void): void {
-    结算再生触手一跳(data);
+  data.周期 = 创建限次周期执行器({
+    名称: "卡瑟拉-再生触手周期",
+    间隔毫秒: cfg.再生触手攻击间隔秒 * 1000,
+    最大执行次数: cfg.再生触手持续秒 / cfg.再生触手攻击间隔秒,
+    清理: context.清理,
+    onTick: function 卡瑟拉再生触手周期(this: void): boolean {
+      return 结算再生触手一跳(data);
+    },
   });
-  context.清理.登记周期回调("卡瑟拉-再生触手周期", data.周期ID);
 }
 
 function 确保触手再生血量节点(this: void, context: 卡瑟拉运行时上下文): void {

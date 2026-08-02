@@ -7,6 +7,7 @@ import { 播放巴尔扎罗斯台词, 播放格鲁姆台词, 播放塞拉台词 
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
 import { 巴尔扎罗斯护卫配置, 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "./02．数值与表现配置";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 
 const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number) => any;
@@ -15,9 +16,8 @@ const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = requi
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
 };
-const { 创建自定义护卫单位, 获取护卫所属Boss, 处理Boss结束全部护卫 } = require("系统.01．单位系统.10．护卫系统.index") as {
+const { 创建自定义护卫单位, 处理Boss结束全部护卫 } = require("系统.01．单位系统.10．护卫系统.index") as {
   创建自定义护卫单位: (this: void, 参数: any, 创建器: (this: void) => any) => any;
-  获取护卫所属Boss: (this: void, guard: any) => any;
   处理Boss结束全部护卫: (this: void, boss: any) => void;
 };
 const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
@@ -29,12 +29,6 @@ const { X_FixUnitStandingSafe, X_RestoreUnitStandingSafe } = require("lib.扩展
   X_FixUnitStandingSafe: (this: void, unit: any) => void;
   X_RestoreUnitStandingSafe: (this: void, unit: any) => void;
 };
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
 const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
@@ -44,10 +38,6 @@ const jass = require("jass.common") as any;
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
-
-let 护卫死亡监听已注册 = false;
 let 熔核封印伤害修正已注册 = false;
 
 function 创建格鲁姆(this: void, context: 巴尔扎罗斯运行时上下文): any {
@@ -58,6 +48,7 @@ function 创建格鲁姆(this: void, context: 巴尔扎罗斯运行时上下文)
     护卫血条优先级: 200,
     标记为召唤单位: true,
     Boss结束处理: "移除",
+    on死亡: on巴尔扎罗斯护卫死亡,
   }, function 创建格鲁姆召唤物(this: void): any {
     return 创建召唤物({
       主人单位: context.Boss单位,
@@ -82,6 +73,7 @@ function 创建塞拉(this: void, context: 巴尔扎罗斯运行时上下文): a
     护卫血条优先级: 200,
     标记为召唤单位: true,
     Boss结束处理: "移除",
+    on死亡: on巴尔扎罗斯护卫死亡,
   }, function 创建塞拉召唤物(this: void): any {
     return 创建召唤物({
       主人单位: context.Boss单位,
@@ -127,8 +119,8 @@ function 双护卫都已死亡(this: void, context: 巴尔扎罗斯运行时上�
   return !单位有效(context.格鲁姆) && !单位有效(context.塞拉);
 }
 
-function on巴尔扎罗斯护卫死亡(this: void, dyingUnit: any): void {
-  const boss = 获取护卫所属Boss(dyingUnit);
+function on巴尔扎罗斯护卫死亡(this: void, dyingUnit: any, _killingUnit: any, record: any): void {
+  const boss = record?.主Boss单位;
   if (boss == null || boss === 0) return;
   const context = 获取巴尔扎罗斯上下文(boss);
   if (context == null) return;
@@ -157,14 +149,20 @@ function on熔核封印伤害修正(this: void, context: any): number {
   return context.currentDamage * 0.2;
 }
 
+function 满足熔核封印伤害条件(this: void, context: any): boolean {
+  if (context == null || !单位有效(context.target)) return false;
+  return getBuffRuntime(context.target, 巴尔扎罗斯单位技能配置.BuffID.熔核封印) != null;
+}
+
 function 确保全局监听(this: void): void {
-  if (!护卫死亡监听已注册) {
-    护卫死亡监听已注册 = true;
-    registerDeathListener(on巴尔扎罗斯护卫死亡);
-  }
   if (!熔核封印伤害修正已注册) {
     熔核封印伤害修正已注册 = true;
-    registerDamageModifier(on熔核封印伤害修正, 40);
+    创建条件伤害修正({
+      名称: "巴尔扎罗斯熔核封印承伤修正",
+      优先级: 40,
+      条件: 满足熔核封印伤害条件,
+      修正: on熔核封印伤害修正,
+    });
   }
 }
 

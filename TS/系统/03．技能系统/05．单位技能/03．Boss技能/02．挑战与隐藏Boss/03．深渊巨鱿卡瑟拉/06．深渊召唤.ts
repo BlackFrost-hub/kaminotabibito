@@ -3,7 +3,7 @@
 import { type 卡瑟拉运行时上下文, 增加玩家触手残片 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, 极坐标X, 极坐标Y, 播放卡瑟拉限时动作 } from "./14．公共工具";
+import { 单位有效, 极坐标X, 极坐标Y } from "./14．公共工具";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
   doHeal: (this: void, params: any) => number;
@@ -33,11 +33,8 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { 临时调整攻击 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   临时调整攻击: (this: void, unit: any, value: number) => void;
 };
-const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
-  开始硬直: (this: void, unit: any, 持续时间: number) => void;
-};
-const { 显示常规技能吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
-  显示常规技能吟唱条: (this: void, 参数: any) => void;
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { 登记护卫单位, 注销护卫单位 } = require("系统.01．单位系统.10．护卫系统.index") as {
   登记护卫单位: (this: void, unit: any, 参数: any) => any;
@@ -124,27 +121,36 @@ export function 释放卡瑟拉深渊召唤(this: void, context: 卡瑟拉运行
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.Boss潜入中) return;
   const cfg = 卡瑟拉数值与表现配置.深渊召唤;
-  开始硬直(boss, cfg.施法硬直秒);
-  显示常规技能吟唱条({
-    总时长: cfg.施法硬直秒,
-    颜色ID: cfg.吟唱条颜色ID,
-    标题文本: cfg.吟唱条标题文本,
-    提示文本: cfg.吟唱条提示文本,
+  启动基础施法时间线({
+    名称: "卡瑟拉-深渊召唤",
+    施法者: boss,
+    硬直秒: cfg.施法硬直秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    恢复动画编号: 5,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.施法硬直秒,
+      颜色ID: cfg.吟唱条颜色ID,
+      标题文本: cfg.吟唱条标题文本,
+      提示文本: cfg.吟唱条提示文本,
+    },
+    清理: context.清理,
+    播放台词: function 卡瑟拉深渊召唤开始提示(this: void): void {
+      播放卡瑟拉台词(boss, "深渊召唤");
+      播放Boss坐标音效(卡瑟拉音效配置.深渊召唤.幼鱿入场, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
+      尝试播放Boss拟声池({
+        标识: 卡瑟拉音效配置.怪物拟声.标识,
+        音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
+        X: GetUnitX(boss),
+        Y: GetUnitY(boss),
+        裁断距离: 卡瑟拉音效配置.默认裁断距离,
+        冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
+        触发概率百分比: 卡瑟拉音效配置.怪物拟声.关键机制触发概率百分比,
+      });
+    },
+    on生效: function 卡瑟拉深渊召唤时间线生效(this: void): void {
+      召唤深渊幼鱿(context);
+    },
   });
-  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.施法硬直秒);
-  播放卡瑟拉台词(boss, "深渊召唤");
-  播放Boss坐标音效(卡瑟拉音效配置.深渊召唤.幼鱿入场, GetUnitX(boss), GetUnitY(boss), 卡瑟拉音效配置.默认裁断距离);
-  尝试播放Boss拟声池({
-    标识: 卡瑟拉音效配置.怪物拟声.标识,
-    音效路径列表: 卡瑟拉音效配置.怪物拟声.音效路径列表,
-    X: GetUnitX(boss),
-    Y: GetUnitY(boss),
-    裁断距离: 卡瑟拉音效配置.默认裁断距离,
-    冷却Ms: 卡瑟拉音效配置.怪物拟声.冷却Ms,
-    触发概率百分比: 卡瑟拉音效配置.怪物拟声.关键机制触发概率百分比,
-  });
-  const id = addDelayedCallback(cfg.施法硬直秒 * 1000, function 卡瑟拉深渊召唤生成幼鱿(this: void): void {
-    召唤深渊幼鱿(context);
-  });
-  context.清理.登记延迟回调("卡瑟拉-深渊召唤生成幼鱿", id);
 }

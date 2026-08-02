@@ -14,6 +14,7 @@ const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
@@ -33,8 +34,15 @@ const { 创建Dz绑定单位特效, 销毁Dz绑定单位特效 } = require("lib.
   创建Dz绑定单位特效: (this: void, unit: any, attachPoint: string, modelPath: string, effectKey?: string, scale?: number) => any;
   销毁Dz绑定单位特效: (this: void, unit: any, effectKey?: string) => void;
 };
+const { 技能_设置技能冷却时间 } = require("平台扩展API动作") as {
+  技能_设置技能冷却时间: (this: void, unit: any, abilityId: number, cooldown: number, maxCooldown: number) => boolean;
+};
+const { 技能_获取技能当前冷却时间 } = require("平台扩展API取值") as {
+  技能_获取技能当前冷却时间: (this: void, unit: any, abilityId: number) => number;
+};
 
 const 原生领袖光环技能ID = stringToFourCC("A0LQ");
+const 剑气灵斩技能ID = stringToFourCC(菲利斯数值与表现配置.剑气灵斩.技能槽位);
 const 攻击力属性ID = 1;
 let 领袖光环已注册 = false;
 const 领袖光环特效键 = "菲利斯-领袖光环";
@@ -59,6 +67,20 @@ function 计算领袖光环攻击增量(this: void, target: any, 总层数: numb
   const 基础攻击力 = 当前攻击力 - 已应用攻击力增量;
   const 攻击力倍率 = 取领袖光环攻击力倍率(holder);
   return 基础攻击力 > 0 ? 基础攻击力 * 攻击力倍率 : 0;
+}
+
+function 同步剑气灵斩低血冷却(this: void, context: 菲利斯运行时上下文, low: boolean, wasLow: boolean): void {
+  if (low === wasLow) return;
+  const boss = context.Boss单位;
+  if (!单位有效(boss) || GetUnitAbilityLevel(boss, 剑气灵斩技能ID) <= 0) return;
+  const cfg = 菲利斯数值与表现配置;
+  const 当前冷却 = 技能_获取技能当前冷却时间(boss, 剑气灵斩技能ID) || 0;
+  if (low) {
+    const 缩短后冷却 = 当前冷却 * (1 - cfg.领袖光环.低血剑气灵斩冷却缩短);
+    技能_设置技能冷却时间(boss, 剑气灵斩技能ID, 缩短后冷却, cfg.剑气灵斩.低血冷却秒);
+    return;
+  }
+  技能_设置技能冷却时间(boss, 剑气灵斩技能ID, 当前冷却, cfg.剑气灵斩.冷却秒);
 }
 
 function 应用领袖光环攻击力差值(this: void, target: any, 差值: number): void {
@@ -95,6 +117,7 @@ function 刷新单个领袖光环(this: void, context: 菲利斯运行时上下�
   }
   const low = 生命比例(boss) < cfg.生命切换阈值;
   const wasLow = context.当前领袖光环低血;
+  同步剑气灵斩低血冷却(context, low, wasLow);
   context.当前领袖光环低血 = low;
   if (!wasLow && low) {
     播放Boss坐标音效(菲利斯音效配置.领袖光环.低血切换, GetUnitX(boss), GetUnitY(boss), 菲利斯音效配置.默认裁断距离);

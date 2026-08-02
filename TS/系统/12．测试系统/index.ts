@@ -26,6 +26,7 @@ const ENABLE_EXTERNAL_VOICE_PACK_TEST = true;
 const ENABLE_BOSS_DUAL_HEALTH_BAR_TEST = true;
 const ENABLE_BONE_SPEAR_EFFECT_TEST = true;
 const ENABLE_BOSS_3D_SOUND_TEST = true;
+const ENABLE_SERA_BARE_CREATE_TEST = true;
 
 function loadTests(): void {
   if (ENABLE_STES_EVENT_TEST) {
@@ -118,6 +119,10 @@ function loadTests(): void {
 
   if (ENABLE_BOSS_3D_SOUND_TEST) {
     require("系统.12．测试系统.17．Boss音效3D播放测试");
+  }
+
+  if (ENABLE_SERA_BARE_CREATE_TEST) {
+    require("系统.12．测试系统.18．塞拉裸创建测试");
   }
 
 }

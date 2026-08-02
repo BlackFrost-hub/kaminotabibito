@@ -14,7 +14,7 @@ const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统
   registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
@@ -55,7 +55,6 @@ export interface 战斗状态触发控制器 {
 
 const 战斗状态控制器表: Record<number, 战斗状态触发实现> = {};
 let 战斗状态控制器计数 = 0;
-let 战斗状态TickID = 0;
 
 function 单位有效(this: void, 单位: any): boolean {
   return 单位 != null && 单位 !== 0 && IsUnitType(单位, UNIT_TYPE_DEAD) !== true;
@@ -77,21 +76,6 @@ function 受伤达到进入战斗阈值(this: void, 单位: any, 主体类型: "
   return applied >= 最大生命 * 脱战伤害阈值比例;
 }
 
-function 确保战斗状态Tick(this: void, interval: number): void {
-  if (战斗状态TickID !== 0) return;
-  战斗状态TickID = addPeriodicCallback(interval, on战斗状态Tick);
-}
-
-function 尝试停止战斗状态Tick(this: void): void {
-  for (const key in 战斗状态控制器表) {
-    if (战斗状态控制器表[key] != null) return;
-  }
-  if (战斗状态TickID !== 0) {
-    removePeriodicCallback(战斗状态TickID);
-    战斗状态TickID = 0;
-  }
-}
-
 class 战斗状态触发实现 implements 战斗状态触发控制器 {
   readonly 名称: string;
   readonly 控制器ID: number;
@@ -103,6 +87,7 @@ class 战斗状态触发实现 implements 战斗状态触发控制器 {
   private 下次周期毫秒 = 0;
   private 已触发持续满足 = false;
   private 最近对方单位: any = null;
+  private Tick回调ID = 0;
 
   constructor(名称: string, 参数: 战斗状态触发参数) {
     this.名称 = 名称;
@@ -110,7 +95,7 @@ class 战斗状态触发实现 implements 战斗状态触发控制器 {
     this.控制器ID = ++战斗状态控制器计数;
     战斗状态控制器表[this.控制器ID] = this;
     const interval = 参数.检查间隔毫秒 ?? 200;
-    确保战斗状态Tick(interval);
+    this.Tick回调ID = addPeriodicCallback(interval, on战斗状态Tick, this);
   }
 
   是否战斗中(): boolean {
@@ -183,7 +168,10 @@ class 战斗状态触发实现 implements 战斗状态触发控制器 {
     if (this.已停止) return;
     this.已停止 = true;
     delete 战斗状态控制器表[this.控制器ID];
-    尝试停止战斗状态Tick();
+    if (this.Tick回调ID !== 0) {
+      removePeriodicCallback(this.Tick回调ID);
+      this.Tick回调ID = 0;
+    }
   }
 
   private 创建事件(now: number): 战斗状态事件 {
@@ -205,11 +193,9 @@ export function 创建战斗状态触发器(this: void, 参数: 战斗状态触�
   return new 战斗状态触发实现(参数.名称 ?? "战斗状态触发器", 参数);
 }
 
-function on战斗状态Tick(this: void): void {
-  for (const key in 战斗状态控制器表) {
-    const 控制器 = 战斗状态控制器表[key];
-    if (控制器 != null) 控制器.Tick();
-  }
+function on战斗状态Tick(this: void, variable?: any): void {
+  const 控制器 = variable as 战斗状态触发实现 | undefined;
+  if (控制器 != null) 控制器.Tick();
 }
 
 function on战斗状态伤害事件(this: void, target: any, attacker: any, applied: number, snapshot: any): void {

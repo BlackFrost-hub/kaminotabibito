@@ -1,9 +1,7 @@
 /** @noSelfInFile */
 
 import { 单位未标记死亡 as 单位有效, 极坐标X, 极坐标Y } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 获取或创建安兹运行时上下文, 标记安兹普通机制忙碌 } from './01．运行时上下文';
@@ -23,9 +21,6 @@ const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能�
 const { 创建原生弹幕, 创建直线定点轨迹 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index') as {
   创建原生弹幕: (this: void, 参数: any) => any;
   创建直线定点轨迹: (this: void, 起点X: number, 起点Y: number, 终点X: number, 终点Y: number) => any;
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const { 获取Boss技能最高仇恨目标, 获取Boss技能随机敌对英雄, 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能最高仇恨目标: (this: void, boss: any) => any;
@@ -67,14 +62,6 @@ function 取目标(this: void, boss: any): any {
 
 function 取方向角(this: void, boss: any, target: any): number {
   return Atan2(GetUnitY(target) - GetUnitY(boss), GetUnitX(target) - GetUnitX(boss)) * BJ_RADTODEG;
-}
-
-function 计算伤害(this: void, boss: any, target: any): number {
-  const config = 安兹乌尔恭数值与表现配置.普通技能;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: config.现实断裂伤害Boss攻击力比例,
-    目标最大生命比例: config.现实断裂伤害目标最大生命比例,
-  });
 }
 
 function 播放现实断裂命中特效(this: void, x: number, y: number): void {
@@ -133,17 +120,19 @@ export function 创建安兹现实断裂移动(this: void, context: 安兹运行
     },
     on命中: function 现实断裂命中(this: void, unit: any): void {
       if (!单位有效(unit)) return;
-      造成AOE技能伤害({
+      执行BossAOE技能伤害({
         技能ID: 现实断裂技能ID,
         来源: boss,
         目标: unit,
-        伤害: 计算伤害(boss, unit),
+        伤害公式: {
+          来源攻击力比例: 安兹乌尔恭数值与表现配置.普通技能.现实断裂伤害Boss攻击力比例,
+          目标最大生命比例: 安兹乌尔恭数值与表现配置.普通技能.现实断裂伤害目标最大生命比例,
+        },
         attack: false,
         ranged: true,
         attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_MAGIC,
         weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: 'Boss技能',
       });
       播放现实断裂命中特效(GetUnitX(unit), GetUnitY(unit));
     },

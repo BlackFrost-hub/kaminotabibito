@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
----
--- @noSelfInFile
+local ____require_result_0 = require("系统.06．经济系统.00．宝箱系统.00．常量定义")
+local _____5F71_9AA8_83AB_7279_65AF_76D7_8D3C_5B9D_7BB1_53EF_7834_574F_7269ID = ____require_result_0["影骨莫特斯盗贼宝箱可破坏物ID"]
 ____exports["影骨莫特斯模型动画配置"] = {["模型路径"] = "Boss\\ShadowboneMortes\\ShadowboneMortes.mdx", ["序列表"] = {
     {
         ["编号"] = 0,
@@ -180,7 +180,7 @@ ____exports["影骨莫特斯数值与表现配置"] = {
         ["开启引导秒"] = 3,
         ["每个宝箱Boss攻击提高"] = 0.03,
         ["瞬时特效持续秒"] = 2,
-        ["宝箱可破坏物ID"] = "B00Z",
+        ["宝箱可破坏物ID"] = _____5F71_9AA8_83AB_7279_65AF_76D7_8D3C_5B9D_7BB1_53EF_7834_574F_7269ID,
         ["宝箱点"] = {{X = 27458.8, Y = -21999.7, ["朝向"] = 325}, {X = 27438.5, Y = -22829, ["朝向"] = 45}, {X = 28497.1, Y = -22002, ["朝向"] = 225}, {X = 28374.8, Y = -22860.5, ["朝向"] = 135}}
     }
 }

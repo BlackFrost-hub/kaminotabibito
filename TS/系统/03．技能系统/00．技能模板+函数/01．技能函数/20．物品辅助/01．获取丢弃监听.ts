@@ -5,7 +5,7 @@ const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事�
   onItemDrop: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const jass = require("jass.common") as any;
 
@@ -15,13 +15,20 @@ const UnitItemInSlot = jass.UnitItemInSlot as (unit: any, slot: number) => any;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
 
-export type 获取丢弃回调 = (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void;
+export type 获取丢弃回调 = (this: void, unit: any, item: any, currentCount: number, previousCount: number, 变量?: any) => void;
 
 type 指定物品监听 = {
   物品类型ID: number;
   获取回调?: 获取丢弃回调;
   丢弃回调?: 获取丢弃回调;
+  变量?: any;
 };
+
+interface 延迟物品变化上下文 {
+  单位: any;
+  物品: any;
+  是否获取: boolean;
+}
 
 const 指定物品监听列表: 指定物品监听[] = [];
 const 单位物品持有数量表: Record<number, Record<number, number | undefined> | undefined> = {};
@@ -87,9 +94,9 @@ function 分发指定物品变化(this: void, unit: any, item: any, itemTypeId: 
     if (listener.物品类型ID !== itemTypeId) continue;
 
     if (isPickup) {
-      listener.获取回调?.(unit, item, currentCount, previousCount);
+      listener.获取回调?.(unit, item, currentCount, previousCount, listener.变量);
     } else {
-      listener.丢弃回调?.(unit, item, currentCount, previousCount);
+      listener.丢弃回调?.(unit, item, currentCount, previousCount, listener.变量);
     }
   }
 }
@@ -122,16 +129,18 @@ function 同步并分发物品变化(this: void, unit: any, item: any, isPickup:
   }
 }
 
+function on延迟同步物品变化(this: void, variable?: any): void {
+  const 上下文 = variable as 延迟物品变化上下文 | undefined;
+  if (上下文 == null) return;
+  同步并分发物品变化(上下文.单位, 上下文.物品, 上下文.是否获取);
+}
+
 function on物品获取监听(this: void, unit: any, item: any): void {
-  addDelayedCallback(10, () => {
-    同步并分发物品变化(unit, item, true);
-  });
+  addDelayedCallback(10, on延迟同步物品变化, { 单位: unit, 物品: item, 是否获取: true });
 }
 
 function on物品丢弃监听(this: void, unit: any, item: any): void {
-  addDelayedCallback(10, () => {
-    同步并分发物品变化(unit, item, false);
-  });
+  addDelayedCallback(10, on延迟同步物品变化, { 单位: unit, 物品: item, 是否获取: false });
 }
 
 function 初始化获取丢弃监听(this: void): void {
@@ -141,10 +150,10 @@ function 初始化获取丢弃监听(this: void): void {
   onItemDrop(on物品丢弃监听);
 }
 
-export function 监听指定物品获取丢弃(this: void, itemTypeId: number, 获取回调?: 获取丢弃回调, 丢弃回调?: 获取丢弃回调): void {
+export function 监听指定物品获取丢弃(this: void, itemTypeId: number, 获取回调?: 获取丢弃回调, 丢弃回调?: 获取丢弃回调, 变量?: any): void {
   if (itemTypeId === 0) return;
   初始化获取丢弃监听();
-  指定物品监听列表.push({ 物品类型ID: itemTypeId, 获取回调, 丢弃回调 });
+  指定物品监听列表.push({ 物品类型ID: itemTypeId, 获取回调, 丢弃回调, 变量 });
 
 }
 

@@ -10,11 +10,11 @@ function _____901A_77E5_95EA_907F_6700_7EC8_4F24_5BB3_76D1_542C(record, applied,
             do
                 local callback = _____95EA_907F_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868[i + 1]
                 if callback == nil then
-                    goto __continue15
+                    goto __continue24
                 end
                 callback(record, applied, snapshot)
             end
-            ::__continue15::
+            ::__continue24::
             i = i + 1
         end
     end
@@ -26,16 +26,16 @@ function _____95EA_907F_6700_7EC8_4F24_5BB3_6865_63A5(target, attacker, applied,
             do
                 local record = _____95EA_907F_6210_529F_8BB0_5F55_5217_8868[i + 1]
                 if record == nil then
-                    goto __continue19
+                    goto __continue28
                 end
                 if record.target ~= target or record.attacker ~= attacker then
-                    goto __continue19
+                    goto __continue28
                 end
                 __TS__ArraySplice(_____95EA_907F_6210_529F_8BB0_5F55_5217_8868, i, 1)
                 _____901A_77E5_95EA_907F_6700_7EC8_4F24_5BB3_76D1_542C(record, applied, snapshot)
                 return
             end
-            ::__continue19::
+            ::__continue28::
             i = i + 1
         end
     end
@@ -79,6 +79,35 @@ local function _____8C03_7528_73A9_5BB6_82F1_96C4_5224_5B9A(unit)
         return false
     end
     return hero == unit or GetHandleId(hero) == GetHandleId(unit)
+end
+local _____95EA_907F_8C41_514D_5224_5B9A_5668_5217_8868 = {}
+function ____exports.registerDodgeBypassPredicate(callback)
+    if callback == nil then
+        return
+    end
+    do
+        local i = 0
+        while i < #_____95EA_907F_8C41_514D_5224_5B9A_5668_5217_8868 do
+            if _____95EA_907F_8C41_514D_5224_5B9A_5668_5217_8868[i + 1] == callback then
+                return
+            end
+            i = i + 1
+        end
+    end
+    _____95EA_907F_8C41_514D_5224_5B9A_5668_5217_8868[#_____95EA_907F_8C41_514D_5224_5B9A_5668_5217_8868 + 1] = callback
+end
+local function _____547D_4E2D_95EA_907F_8C41_514D(context)
+    do
+        local i = 0
+        while i < #_____95EA_907F_8C41_514D_5224_5B9A_5668_5217_8868 do
+            local callback = _____95EA_907F_8C41_514D_5224_5B9A_5668_5217_8868[i + 1]
+            if callback ~= nil and callback(context) then
+                return true
+            end
+            i = i + 1
+        end
+    end
+    return false
 end
 _____95EA_907F_6210_529F_8BB0_5F55_5217_8868 = {}
 _____95EA_907F_6700_7EC8_4F24_5BB3_76D1_542C_5217_8868 = {}
@@ -168,6 +197,9 @@ ____exports["执行闪避判定"] = function(context)
         return {["结束链路"] = false, ["伤害"] = currentDamage, ["闪避概率"] = 0}
     end
     if context.isNormalAttack and context.isPhysicalDamage and _____8BFB_53D6_5355_4F4D_5E03_5C14(target, "普攻必中") then
+        return {["结束链路"] = false, ["伤害"] = currentDamage, ["闪避概率"] = 0}
+    end
+    if _____547D_4E2D_95EA_907F_8C41_514D(context) then
         return {["结束链路"] = false, ["伤害"] = currentDamage, ["闪避概率"] = 0}
     end
     if _____8BFB_53D6_5355_4F4D_5B57_7B26_4E32_5F00_5173(attacker, "无视闪避") then

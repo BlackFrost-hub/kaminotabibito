@@ -210,6 +210,34 @@ local function registerHeroDependents(whichHero)
         _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDFID = centerTimer.addDelayedCallback(_____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF_6BEB_79D2, ____on_542F_52A8_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217)
     end
 end
+local playerHeroListeners = {}
+function ____exports.registerPlayerHeroListener(callback)
+    if callback == nil then
+        return
+    end
+    do
+        local i = 0
+        while i < #playerHeroListeners do
+            if playerHeroListeners[i + 1] == callback then
+                return
+            end
+            i = i + 1
+        end
+    end
+    playerHeroListeners[#playerHeroListeners + 1] = callback
+end
+local function notifyPlayerHeroListeners(whichPlayer, whichHero)
+    do
+        local i = 0
+        while i < #playerHeroListeners do
+            local callback = playerHeroListeners[i + 1]
+            if callback ~= nil then
+                callback(whichPlayer, whichHero)
+            end
+            i = i + 1
+        end
+    end
+end
 local function registerPlayerHero(whichPlayer, whichHero)
     if whichPlayer == nil or whichPlayer == 0 or whichHero == nil or whichHero == 0 then
         return
@@ -222,6 +250,7 @@ local function registerPlayerHero(whichPlayer, whichHero)
         "unit",
         whichHero
     )
+    notifyPlayerHeroListeners(whichPlayer, whichHero)
     registerHeroDependents(whichHero)
 end
 function ____exports.directRegisterPlayerHero(whichPlayer, whichHero)

@@ -7,10 +7,8 @@ import { 播放里科特台词 } from "./10．台词播放";
 import { 单位有效, stringToFourCC, 取单位间角度 } from "./13．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 执行BossAOE技能伤害, 提交预计算BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 创建延迟改向弹幕, type 延迟改向弹幕上下文 } from "../../../../00．技能模板+函数/00．技能模板/09．复杂战斗模板/03．延迟改向弹幕模板";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -58,24 +56,24 @@ function 结算跳劈(this: void, boss: any, target: any): void {
   const cx = GetUnitX(target);
   const cy = GetUnitY(target);
   const radius2 = cfg.跳劈半径 * cfg.跳劈半径;
-  const damage = 读取单位攻击力(boss) * cfg.跳劈Boss攻击力比例;
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     const dx = GetUnitX(hero) - cx;
     const dy = GetUnitY(hero) - cy;
     if (dx * dx + dy * dy > radius2) continue;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       技能ID: 四重风刃技能ID,
       来源: boss,
       目标: hero,
-      伤害: damage,
+      伤害公式: {
+        来源攻击力比例: cfg.跳劈Boss攻击力比例,
+      },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_NORMAL,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
     });
     施加快速减速Buff(boss, hero, cfg.跳劈减速比例, cfg.跳劈减速比例, cfg.跳劈减速秒);
   }
@@ -116,7 +114,7 @@ function 发射单个龙卷风(this: void, context: 里科特运行时上下文,
       飞行高度: cfg.龙卷风飞行高度,
       on命中: function 里科特龙卷风命中(this: void, target: any): void {
         if (!单位有效(target)) return;
-        造成AOE技能伤害({
+        提交预计算BossAOE技能伤害({
           技能ID: 四重风刃技能ID,
           来源: boss,
           目标: target,
@@ -126,7 +124,6 @@ function 发射单个龙卷风(this: void, context: 里科特运行时上下文,
           attackType: ATTACK_TYPE_NORMAL,
           伤害类型: DAMAGE_TYPE_MAGIC,
           weaponType: WEAPON_TYPE_WHOKNOWS,
-          来源类型: "Boss技能",
         });
       },
     },

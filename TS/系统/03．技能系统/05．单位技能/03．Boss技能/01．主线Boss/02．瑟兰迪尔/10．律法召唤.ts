@@ -7,6 +7,7 @@ import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 提交预计算Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
@@ -25,9 +26,6 @@ const { 取当前有效玩家人数 } = require("系统.00．核心系统.00．�
 };
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number, model?: any) => any;
@@ -71,7 +69,7 @@ function 启动律法链路(this: void, boss: any, summon: any, 已连接目标:
     on距离超出: function 瑟兰迪尔律法链路距离惩罚(this: void, source: any, _connector: any, target: any): void {
       if (!单位有效(source) || !单位有效(target)) return;
       Sound3DII_CooPlayReuse(config.链接惩罚音效, GetUnitX(target), GetUnitY(target), 0, config.链接惩罚音效裁断距离);
-      造成单体技能伤害({
+      提交预计算Boss单体技能伤害({
         技能ID: 律法召唤技能ID,
         来源: boss,
         目标: target,
@@ -81,7 +79,6 @@ function 启动律法链路(this: void, boss: any, summon: any, 已连接目标:
         attackType: jass.ATTACK_TYPE_NORMAL,
         伤害类型: jass.DAMAGE_TYPE_MIND,
         weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
       });
     },
   });

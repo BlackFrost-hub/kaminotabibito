@@ -1,5 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectRest = ____lualib.__TS__ObjectRest
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
@@ -82,9 +83,12 @@ _____673A_5236_5355_4F4D_751F_547D_5468_671F_5B9E_73B0.prototype["结束"] = fun
 end
 ____exports["创建机制单位生命周期"] = function(_____53C2_6570)
     local _____5B9E_4F8B
+    local ____53C2_6570_4 = _____53C2_6570
+    local _____751F_547D_5468_671F_7ED3_675F_56DE_8C03 = ____53C2_6570_4["on结束"]
+    local _____57FA_7840_53C2_6570 = __TS__ObjectRest(____53C2_6570_4, {["on结束"] = true})
     local _____57FA_7840_5B9E_4F8B = _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D(__TS__ObjectAssign(
         {},
-        _____53C2_6570,
+        _____57FA_7840_53C2_6570,
         {
             ["on死亡"] = function(_____5355_4F4D, _____51FB_6740_8005)
                 if _____53C2_6570["on死亡"] ~= nil then
@@ -106,9 +110,9 @@ ____exports["创建机制单位生命周期"] = function(_____53C2_6570)
     end
     _____5B9E_4F8B = __TS__New(_____673A_5236_5355_4F4D_751F_547D_5468_671F_5B9E_73B0, _____57FA_7840_5B9E_4F8B, _____53C2_6570)
     if _____53C2_6570["清理"] ~= nil then
-        local ____self_4 = _____53C2_6570["清理"]
-        ____self_4["登记清理"](
-            ____self_4,
+        local ____self_5 = _____53C2_6570["清理"]
+        ____self_5["登记清理"](
+            ____self_5,
             _____53C2_6570["名称"],
             function()
                 if _____5B9E_4F8B ~= nil then

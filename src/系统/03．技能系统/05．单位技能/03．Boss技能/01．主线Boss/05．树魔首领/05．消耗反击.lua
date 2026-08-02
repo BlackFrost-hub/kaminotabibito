@@ -23,6 +23,8 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____63D0_4EA4_9884_8BA1_7B97BossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算BossAOE技能伤害"]
 function _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001(boss)
     local hid = GetHandleId(boss) or 0
     local state = _____6D88_8017_53CD_51FB_72B6_6001_8868[hid]
@@ -91,6 +93,8 @@ ____exports["释放树魔首领消耗反击"] = function(context)
         ["特效回调ID"] = 0
     }
     _____6D88_8017_53CD_51FB_72B6_6001_8868[hid] = state
+    local ____self_10 = context["清理"]
+    ____self_10["登记清理"](____self_10, "树魔首领-消耗反击状态", _____6E05_9664_6D88_8017_53CD_51FB_72B6_6001, boss)
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({
         ["单位"] = boss,
         ["动画编号"] = cfg["起手动画编号"],
@@ -140,7 +144,6 @@ function ____on_6811_9B54_9996_9886_6D88_8017_53CD_51FB_751F_6548(castingUnit, s
     ____exports["释放树魔首领消耗反击"](context)
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local _____521B_5EFA_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建技能伤害实例"]
 local _____7ED3_675F_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["结束技能伤害实例"]
 local jass = require("jass.common")
@@ -229,7 +232,7 @@ local function ____on_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2_547D_4E2D(tar
     if state == nil or not _____5355_4F4D_6709_6548(state.Boss) or not _____5355_4F4D_6709_6548(target) then
         return
     end
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____63D0_4EA4_9884_8BA1_7B97BossAOE_6280_80FD_4F24_5BB3({
         ["技能ID"] = _____6D88_8017_53CD_51FB_6280_80FDID,
         ["技能实例ID"] = state["技能实例ID"],
         ["来源"] = state.Boss,
@@ -239,8 +242,7 @@ local function ____on_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2_547D_4E2D(tar
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_NORMAL,
-        weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-        ["来源类型"] = "Boss技能"
+        weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE
     })
 end
 local function ____on_6811_9B54_9996_9886_53CD_51FB_51B2_51FB_6CE2_7ED3_675F(______539F_56E0, _____5F39_5E55ID)

@@ -1,8 +1,12 @@
 /** @noSelfInFile */
 
-const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+import type { 自适应共享周期驱动 } from "../../04．机制组件/10．复杂战斗通用机制/17．周期机制调度器";
+
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
+};
+const { 创建自适应共享周期驱动 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器") as {
+  创建自适应共享周期驱动: (this: void, 参数: any) => 自适应共享周期驱动;
 };
 const {
   监听指定物品获取丢弃,
@@ -50,7 +54,7 @@ type 持有型周期效果实例 = 持有型周期效果参数 & 持有型周期
 
 const 持有型周期效果实例表: 持有型周期效果实例[] = [];
 const 已注册监听物品类型: Record<number, boolean | undefined> = {};
-let 已注册持有型周期效果中心 = false;
+let 持有型周期效果驱动: 自适应共享周期驱动 | undefined;
 
 function 获取单位ID(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
@@ -110,8 +114,7 @@ function 处理丢弃(this: void, 配置: 持有型周期效果实例, unit: any
   };
 }
 
-function on持有型周期效果Tick(this: void): void {
-  const now = getServerTime();
+function on持有型周期效果Tick(this: void, now: number): void {
   for (let i = 0; i < 持有型周期效果实例表.length; i++) {
     const 配置 = 持有型周期效果实例表[i];
     if (配置.按单位独立计时 !== true) {
@@ -150,10 +153,25 @@ function on持有型周期效果Tick(this: void): void {
   }
 }
 
+function 取持有型周期效果建议检查间隔(this: void, _nowMs: number): number {
+  let 最短间隔 = 0;
+  for (let i = 0; i < 持有型周期效果实例表.length; i++) {
+    const 间隔 = 持有型周期效果实例表[i].间隔毫秒;
+    if (间隔 > 0 && (最短间隔 === 0 || 间隔 < 最短间隔)) 最短间隔 = 间隔;
+  }
+  return 最短间隔;
+}
+
 function 确保持有型周期效果中心已注册(this: void): void {
-  if (已注册持有型周期效果中心) return;
-  已注册持有型周期效果中心 = true;
-  addPeriodicCallback(100, on持有型周期效果Tick);
+  if (持有型周期效果驱动 == null) {
+    持有型周期效果驱动 = 创建自适应共享周期驱动({
+      名称: "持有型周期效果驱动",
+      最大检查间隔毫秒: 100,
+      取建议检查间隔毫秒: 取持有型周期效果建议检查间隔,
+      onTick: on持有型周期效果Tick,
+    });
+  }
+  持有型周期效果驱动.刷新();
 }
 
 function on持有型周期效果获取(this: void, unit: any, item: any, currentCount: number, previousCount: number): void {
@@ -228,7 +246,6 @@ function 创建持有型周期效果控制器(this: void, 配置: 持有型周�
 
 export function 注册持有型周期效果(this: void, 参数: 持有型周期效果参数): 持有型周期效果控制器 | null {
   if (参数 == null || 参数.物品类型ID === 0 || 参数.间隔毫秒 <= 0 || 参数.周期回调 == null) return null;
-  确保持有型周期效果中心已注册();
 
   const 配置 = {
     ...参数,
@@ -240,6 +257,7 @@ export function 注册持有型周期效果(this: void, 参数: 持有型周期�
   配置.获取单位数量 = 控制器.获取单位数量;
   配置.读取单位下次触发剩余毫秒 = 控制器.读取单位下次触发剩余毫秒;
   持有型周期效果实例表.push(配置);
+  确保持有型周期效果中心已注册();
   补登记初始单位(配置);
 
   if (已注册监听物品类型[参数.物品类型ID] !== true) {

@@ -7,9 +7,10 @@ import { 播放树魔首领台词 } from "./08．台词播放";
 import { 播放Boss坐标音效, 尝试播放Boss拟声池 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 
-const { 造成AOE技能伤害, 创建技能伤害实例, 结束技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 创建技能伤害实例, 结束技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建技能伤害实例: (this: void, 参数?: any) => number;
   结束技能伤害实例: (this: void, 技能实例ID: number | undefined) => void;
 };
@@ -25,9 +26,6 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
@@ -44,9 +42,6 @@ const { registerManualBuff, getBuffRuntime } = require("系统.05．Buff系统.0
 };
 const { 树魔首领BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领") as {
   树魔首领BuffID: { 古树衰弱: string };
-};
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
@@ -126,18 +121,19 @@ function on树魔首领扩散冲击波弹幕命中(this: void, target: any, 弹�
 
   state.已命中目标[targetID] = true;
   const cfg = 树魔首领数值与表现配置.扩散冲击波;
-  造成AOE技能伤害({
+  执行BossAOE技能伤害({
     技能ID: 扩散冲击波技能ID,
     技能实例ID: state.技能实例ID,
     来源: boss,
     目标: target,
-    伤害: 读取单位攻击力(boss) * cfg.Boss攻击力比例,
+    伤害公式: {
+      来源攻击力比例: cfg.Boss攻击力比例,
+    },
     attack: false,
     ranged: false,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_PLANT,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
   });
   施加古树衰弱(target);
 }
@@ -272,6 +268,11 @@ function 古树衰弱伤害修正(this: void, damageContext: any): number {
   return damageContext.currentDamage * (1 - reduce);
 }
 
+function 满足古树衰弱伤害条件(this: void, damageContext: any): boolean {
+  if (damageContext == null || damageContext.isNormalAttack !== true) return false;
+  return getBuffRuntime(damageContext.attacker, 树魔首领BuffID.古树衰弱) != null;
+}
+
 export function 注册树魔首领扩散冲击波(this: void): void {
   if (扩散冲击波已注册) return;
   扩散冲击波已注册 = true;
@@ -284,7 +285,12 @@ export function 注册树魔首领扩散冲击波(this: void): void {
       on树魔首领扩散冲击波生效(boss, 扩散冲击波技能ID);
     },
   });
-  registerDamageModifier(古树衰弱伤害修正, 35);
+  创建条件伤害修正({
+    名称: "树魔首领古树衰弱普攻降伤",
+    优先级: 35,
+    条件: 满足古树衰弱伤害条件,
+    修正: 古树衰弱伤害修正,
+  });
 }
 
 function on树魔首领扩散冲击波生效(this: void, castingUnit: any, spellAbilityId: number): void {

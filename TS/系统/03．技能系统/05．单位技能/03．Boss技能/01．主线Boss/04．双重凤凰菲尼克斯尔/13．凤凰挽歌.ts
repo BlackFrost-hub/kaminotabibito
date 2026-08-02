@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import type { 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
+import type { 菲尼克斯尔运行时上下文, 菲尼克斯尔元素类型 } from "./03．运行时上下文";
 import { 菲尼克斯尔场地配置 } from "./01．场地配置";
 import { 菲尼克斯尔数值与表现配置, 菲尼克斯尔音效配置 } from "./02．数值与表现配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
@@ -20,24 +20,29 @@ import {
   设置单位动画,
   开始施法硬直,
   添加元素层数,
-  造成暗火伤害,
   创建菲尼克斯尔独立伤害上下文,
-  取当前生命,
 } from "./19．公共工具";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 触发菲尼克斯尔怨火核心暴露 } from "./15．怨火核心暴露";
 
-function 玩家在安全区(this: void, unit: any): boolean {
+const jass = require("jass.common") as any;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+function 取玩家安全区元素(this: void, unit: any): 菲尼克斯尔元素类型 | undefined {
   const points = 菲尼克斯尔场地配置.挽歌安全区点位;
   const radius = 菲尼克斯尔数值与表现配置.凤凰挽歌.安全区半径;
   for (let i = 0; i < points.length; i++) {
     const p = points[i];
-    if (两点距离(取单位X(unit), 取单位Y(unit), p.x, p.y) <= radius) return true;
+    if (两点距离(取单位X(unit), 取单位Y(unit), p.x, p.y) <= radius) return p.元素 as 菲尼克斯尔元素类型;
   }
-  return false;
+  return undefined;
 }
 
 export function 释放菲尼克斯尔凤凰挽歌(this: void, context: 菲尼克斯尔运行时上下文): void {
-  if (context.当前形态 !== "第二形态" || !单位存活(context.Boss)) return;
+  if (context.当前形态 !== "第二形态" || !单位存活(context.Boss)) {
+    return;
+  }
   const config = 菲尼克斯尔数值与表现配置.凤凰挽歌;
   const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔凤凰挽歌", config.引导秒 + 2);
   播放菲尼克斯尔台词(context.Boss, "凤凰挽歌");
@@ -67,8 +72,26 @@ export function 释放菲尼克斯尔凤凰挽歌(this: void, context: 菲尼克
     const heroes = 取菲尼克斯尔敌对目标列表(context.Boss);
     for (let i = 0; i < heroes.length; i++) {
       const hero = heroes[i];
-      if (玩家在安全区(hero)) continue;
-      造成暗火伤害(context.Boss, hero, 取当前生命(hero) * config.当前生命损失比例, "AOE", 伤害上下文);
+      const 安全区元素 = 取玩家安全区元素(hero);
+      if (安全区元素 !== undefined) {
+        添加元素层数(hero, 安全区元素, config.规避叠层);
+        continue;
+      }
+      if (单位存活(context.Boss) && 单位存活(hero)) {
+        执行BossAOE技能伤害({
+          技能实例ID: 伤害上下文?.技能实例ID,
+          标签: 伤害上下文?.标签,
+          来源: context.Boss,
+          目标: hero,
+          伤害公式: {
+            目标当前生命比例: config.当前生命损失比例,
+          },
+          ranged: true,
+          attackType: ATTACK_TYPE_NORMAL,
+          伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
+          weaponType: WEAPON_TYPE_WHOKNOWS,
+        });
+      }
       添加元素层数(hero, "暗", config.规避叠层);
       创建点特效({
         模型路径: 菲尼克斯尔数值与表现配置.特效.凤凰挽歌叠加,

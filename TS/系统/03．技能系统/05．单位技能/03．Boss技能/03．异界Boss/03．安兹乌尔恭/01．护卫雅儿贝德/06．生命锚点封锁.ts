@@ -10,13 +10,9 @@ const { 开始护盾, 移除护盾 } = require('系统.03．技能系统.00．�
   开始护盾: (this: void, unit: any, 参数: any) => number;
   移除护盾: (this: void, shieldId: number) => boolean;
 };
-const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
-const { addPeriodicCallback, removePeriodicCallback, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
+const { addPeriodicCallback, removePeriodicCallback } = require('系统.00．核心系统.05．中心计时器') as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -28,14 +24,11 @@ const { 广播单位提示 } = require('系统.09．表现系统.06．广播提�
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const 生命锚点封锁锁链跟随键 = '雅儿贝德-生命锚点封锁锁链';
@@ -49,21 +42,6 @@ export interface 生命锚点封锁目标 {
 export interface 生命锚点封锁控制器 {
   是否生效(this: void): boolean;
   结束(this: void, 原因?: string): void;
-}
-
-const 锚点溢出伤害保护表: Record<number, true | undefined> = {};
-let 锚点溢出伤害保护已注册 = false;
-
-function 锚点溢出伤害保护(this: void, damage: any): number {
-  if (damage.target == null || damage.target === 0) return damage.currentDamage;
-  return 锚点溢出伤害保护表[GetHandleId(damage.target)] === true ? 0 : damage.currentDamage;
-}
-
-function 确保锚点溢出伤害保护(this: void): void {
-  if (锚点溢出伤害保护已注册) return;
-  锚点溢出伤害保护已注册 = true;
-  // 正式护盾在优先级 100 先吸收；这里在 90 只清掉击破护盾后的同次溢出伤害。
-  registerDamageModifier(锚点溢出伤害保护, 90);
 }
 
 function 选择未激活锚点(this: void, targets: 生命锚点封锁目标[]): 生命锚点封锁目标 | undefined {
@@ -94,14 +72,9 @@ export function 启动雅儿贝德生命锚点封锁(
   if (!(shieldValue > 0)) return undefined;
 
   const unit = blockTarget.单位;
-  const unitId = GetHandleId(unit);
   let shieldId = 0;
   let periodicId = 0;
   let cleaned = false;
-
-  function 清除溢出保护(this: void): void {
-    if (锚点溢出伤害保护表[unitId] === true) delete 锚点溢出伤害保护表[unitId];
-  }
 
   function 结束封锁(this: void, 原因: string = '阶段结束'): void {
     if (cleaned) return;
@@ -119,9 +92,6 @@ export function 启动雅儿贝德生命锚点封锁(
     if (原因 === '破碎') {
       const breakEffect = AddSpecialEffect(cfg.表现资源.雅儿贝德共同护盾破碎特效路径, GetUnitX(unit), GetUnitY(unit));
       if (breakEffect != null && breakEffect !== 0) YDWETimerDestroyEffectSafe(1.2, breakEffect);
-      addDelayedCallback(0, 清除溢出保护);
-    } else {
-      清除溢出保护();
     }
   }
 
@@ -149,9 +119,7 @@ export function 启动雅儿贝德生命锚点封锁(
     }
   }
 
-  确保锚点溢出伤害保护();
   blockTarget.设置封锁(true);
-  锚点溢出伤害保护表[unitId] = true;
   shieldId = 开始护盾(unit, {
     数值: shieldValue,
     持续时间: durationSeconds,
@@ -159,6 +127,7 @@ export function 启动雅儿贝德生命锚点封锁(
     显示护盾条: true,
     可驱散: false,
     标签: '雅儿贝德-生命锚点封锁',
+    溢出处理策略: '阻止传递',
     破碎回调: onShieldBreak,
     结束回调: onShieldEnd,
   });

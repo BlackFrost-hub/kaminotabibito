@@ -8,7 +8,7 @@ const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核�
   removeDelayedCallback: (this: void, id: number) => void;
 };
 
-export interface 机制单位生命周期参数 extends 可攻击机制单位参数 {
+export interface 机制单位生命周期参数 extends Omit<可攻击机制单位参数, "on结束"> {
   清理?: 机制清理篮子;
   名称: string;
   超时秒?: number;
@@ -86,8 +86,9 @@ class 机制单位生命周期实现 implements 机制单位生命周期实例 {
 
 export function 创建机制单位生命周期(this: void, 参数: 机制单位生命周期参数): 机制单位生命周期实例 | undefined {
   let 实例: 机制单位生命周期实现 | undefined;
+  const { on结束: 生命周期结束回调, ...基础参数 } = 参数;
   const 基础实例 = 创建可攻击机制单位({
-    ...参数,
+    ...基础参数,
     on死亡: function 机制单位生命周期死亡(this: void, 单位: any, 击杀者: any): void {
       if (参数.on死亡 != null) 参数.on死亡(单位, 击杀者);
       if (实例 != null) 实例.处理死亡(击杀者);

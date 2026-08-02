@@ -2,6 +2,8 @@
 local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹模型动画配置"]
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
@@ -27,24 +29,20 @@ local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_65
 local ____07_FF0E_6280_80FD_9A71_52A8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.01．护卫雅儿贝德.07．技能驱动")
 local _____521B_5EFA_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B_9884_8B66 = ____07_FF0E_6280_80FD_9A71_52A8["创建雅儿贝德时间停止冲锋预警"]
 local _____542F_52A8_96C5_513F_8D1D_5FB7_65F6_95F4_505C_6B62_51B2_950B = ____07_FF0E_6280_80FD_9A71_52A8["启动雅儿贝德时间停止冲锋"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
-local ____require_result_5 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_5["显示大招吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_5["关闭吟唱条"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
-local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_7.getServerTime
+local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_2["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_2["移除单位暂停"]
+local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_3["显示大招吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_5.getServerTime
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
@@ -145,22 +143,22 @@ local function _____521B_5EFA_65F6_95F4_505C_6B62_6301_7EED_8868_73B0(instance)
     local gear = AddSpecialEffectTarget(cfg["表现资源"]["时间停止齿轮特效路径"], boss, "origin")
     if clock ~= nil and clock ~= 0 then
         EXSetEffectSize(clock, cfg["阶段技能"]["时间停止钟面缩放"])
-        local ____instance__6301_7EED_7279_6548_5217_8868_8 = instance["持续特效列表"]
-        ____instance__6301_7EED_7279_6548_5217_8868_8[#____instance__6301_7EED_7279_6548_5217_8868_8 + 1] = clock
+        local ____instance__6301_7EED_7279_6548_5217_8868_6 = instance["持续特效列表"]
+        ____instance__6301_7EED_7279_6548_5217_8868_6[#____instance__6301_7EED_7279_6548_5217_8868_6 + 1] = clock
     end
     if gear ~= nil and gear ~= 0 then
         EXSetEffectSize(gear, cfg["阶段技能"]["时间停止齿轮缩放"])
-        local ____instance__6301_7EED_7279_6548_5217_8868_9 = instance["持续特效列表"]
-        ____instance__6301_7EED_7279_6548_5217_8868_9[#____instance__6301_7EED_7279_6548_5217_8868_9 + 1] = gear
+        local ____instance__6301_7EED_7279_6548_5217_8868_7 = instance["持续特效列表"]
+        ____instance__6301_7EED_7279_6548_5217_8868_7[#____instance__6301_7EED_7279_6548_5217_8868_7 + 1] = gear
     end
 end
 local function _____51BB_7ED3_65F6_95F4_505C_6B62_73A9_5BB6(instance)
-    local ____instance_context__6311_6218_5DF2_7ED3_675F_11 = instance.context["挑战已结束"]
-    if not ____instance_context__6311_6218_5DF2_7ED3_675F_11 then
-        local ____self_10 = instance.context["清理"]
-        ____instance_context__6311_6218_5DF2_7ED3_675F_11 = ____self_10["已清理"](____self_10)
+    local ____instance_context__6311_6218_5DF2_7ED3_675F_9 = instance.context["挑战已结束"]
+    if not ____instance_context__6311_6218_5DF2_7ED3_675F_9 then
+        local ____self_8 = instance.context["清理"]
+        ____instance_context__6311_6218_5DF2_7ED3_675F_9 = ____self_8["已清理"](____self_8)
     end
-    if ____instance_context__6311_6218_5DF2_7ED3_675F_11 then
+    if ____instance_context__6311_6218_5DF2_7ED3_675F_9 then
         return
     end
     instance.context["时间停止中"] = true
@@ -182,8 +180,8 @@ local function _____51BB_7ED3_65F6_95F4_505C_6B62_73A9_5BB6(instance)
                     goto __continue14
                 end
                 if _____6DFB_52A0_5355_4F4D_6682_505C(hero, _____65F6_95F4_505C_6B62_6682_505C_6765_6E90) then
-                    local ____instance__6682_505C_5355_4F4D_5217_8868_12 = instance["暂停单位列表"]
-                    ____instance__6682_505C_5355_4F4D_5217_8868_12[#____instance__6682_505C_5355_4F4D_5217_8868_12 + 1] = hero
+                    local ____instance__6682_505C_5355_4F4D_5217_8868_10 = instance["暂停单位列表"]
+                    ____instance__6682_505C_5355_4F4D_5217_8868_10[#____instance__6682_505C_5355_4F4D_5217_8868_10 + 1] = hero
                 end
             end
             ::__continue14::
@@ -246,17 +244,16 @@ local function _____64AD_653E_65F6_95F4_505C_6B62_7ED3_7B97_7279_6548(model, x, 
         ["持续秒"] = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["阶段技能"]["时间停止结算特效持续秒"]
     })
 end
-local function _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(boss, target, damage, tag)
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+local function _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(boss, target, _____4F24_5BB3_516C_5F0F, tag)
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
         ["来源"] = boss,
         ["目标"] = target,
-        ["伤害"] = damage,
+        ["伤害公式"] = _____4F24_5BB3_516C_5F0F,
         attack = false,
         ranged = true,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_MAGIC,
         weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能",
         ["标签"] = tag
     })
 end
@@ -284,12 +281,7 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_5730_9762_6CD5_9635(instance)
                 if dx * dx + dy * dy > radius2 then
                     goto __continue34
                 end
-                _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(
-                    boss,
-                    target,
-                    _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = cfg["阶段技能"]["时间停止地面法阵伤害Boss攻击力比例"], ["目标最大生命比例"] = cfg["阶段技能"]["时间停止地面法阵伤害目标最大生命比例"]}),
-                    "安兹·时间停止·地面法阵"
-                )
+                _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(boss, target, {["来源攻击力比例"] = cfg["阶段技能"]["时间停止地面法阵伤害Boss攻击力比例"], ["目标最大生命比例"] = cfg["阶段技能"]["时间停止地面法阵伤害目标最大生命比例"]}, "安兹·时间停止·地面法阵")
             end
             ::__continue34::
             i = i + 1
@@ -335,15 +327,11 @@ local function _____7ED3_7B97_65F6_95F4_505C_6B62_9B54_6CD5_7BAD(instance)
                 _____9020_6210_65F6_95F4_505C_6B62_4F24_5BB3(
                     boss,
                     target,
-                    _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
-                        boss,
-                        target,
-                        {
-                            ["来源攻击力比例"] = ordinary["高阶魔法箭伤害Boss攻击力比例"],
-                            ["目标最大生命比例"] = ordinary["高阶魔法箭伤害目标最大生命比例"],
-                            ["总倍率"] = _____53D6_5B89_5179_4EA1_7075_7BAD_4F24_5BB3_500D_7387(context)
-                        }
-                    ),
+                    {
+                        ["来源攻击力比例"] = ordinary["高阶魔法箭伤害Boss攻击力比例"],
+                        ["目标最大生命比例"] = ordinary["高阶魔法箭伤害目标最大生命比例"],
+                        ["总倍率"] = _____53D6_5B89_5179_4EA1_7075_7BAD_4F24_5BB3_500D_7387(context)
+                    },
                     "安兹·时间停止·高阶魔法箭"
                 )
             end
@@ -378,9 +366,9 @@ ____exports["释放安兹时间停止"] = function(context)
         GetUnitY(boss),
         _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记清理"](
-        ____self_13,
+    local ____self_11 = context["清理"]
+    ____self_11["登记清理"](
+        ____self_11,
         "安兹-时间停止实例",
         function()
             _____6E05_7406_65F6_95F4_505C_6B62_5B9E_4F8B(instance)

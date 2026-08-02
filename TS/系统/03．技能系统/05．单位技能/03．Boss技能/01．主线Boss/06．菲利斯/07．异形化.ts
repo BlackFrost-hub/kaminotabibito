@@ -6,6 +6,9 @@ import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．�
 import { 释放菲利斯剑气灵斩 } from "./05．剑气灵斩";
 import { 播放菲利斯台词 } from "./08．台词播放";
 import { 单位有效, stringToFourCC, 取难度, 距离平方XY } from "./11．公共工具";
+import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
+import { 创建持续危险区域, type 持续危险区域实例 } from "../../../../00．技能模板+函数/04．机制组件/03．持续危险区/01．持续危险区域";
+import { 创建周期行为 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
 import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
@@ -13,6 +16,7 @@ const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -28,22 +32,14 @@ const { 设置Boss血条头像 } = require("系统.03．技能系统.06．AI自�
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
 };
-const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
-  创建技能提示圈: (this: void, 配置: any) => any;
-};
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
-};
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { registerManualBuff, getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -68,6 +64,7 @@ const { 创建点特效, createUnitEffect } = require("lib.扩展函数.封装�
 
 const 菲利斯单位类型ID = stringToFourCC(菲利斯单位技能配置.单位ID);
 const 异形化技能ID = stringToFourCC(菲利斯数值与表现配置.异形化.技能槽位);
+const 当前异形化区域表: Record<number, 持续危险区域实例[] | undefined> = {};
 let 异形化已注册 = false;
 let 异形化伤害监听已注册 = false;
 
@@ -120,35 +117,53 @@ function 异形化伤害修正(this: void, damageContext: any): number {
   return damageContext.currentDamage;
 }
 
+function 满足异形化伤害条件(this: void, damageContext: any): boolean {
+  if (damageContext == null) return false;
+  const list = 获取全部菲利斯上下文();
+  const now = getServerTime();
+  for (let i = 0; i < list.length; i++) {
+    const context = list[i];
+    if (!context.异形化中 || now >= context.异形化结束Ms) continue;
+    const boss = context.Boss单位;
+    if (!单位有效(boss)) continue;
+    if (damageContext.attacker === boss || damageContext.target === boss) return true;
+  }
+  return false;
+}
+
+function 销毁菲利斯异形化区域(this: void, boss: any): void {
+  if (boss == null || boss === 0) return;
+  const bossID = GetHandleId(boss);
+  const 区域列表 = 当前异形化区域表[bossID];
+  if (区域列表 == null) return;
+  delete 当前异形化区域表[bossID];
+  for (let i = 0; i < 区域列表.length; i++) {
+    区域列表[i].销毁();
+  }
+}
+
+function 清理菲利斯异形化区域(this: void, value?: any): void {
+  const context = value as 菲利斯运行时上下文 | undefined;
+  if (context != null) 销毁菲利斯异形化区域(context.Boss单位);
+}
+
 function 结束异形化(this: void, context: 菲利斯运行时上下文): void {
   const boss = context.Boss单位;
   const cfg = 菲利斯数值与表现配置.异形化;
+  销毁菲利斯异形化区域(boss);
   if (单位有效(boss) && DzSetUnitModel != null) DzSetUnitModel(boss, cfg.常态模型路径);
   if (boss != null && boss !== 0) 设置Boss血条头像(boss, cfg.常态头像路径);
   context.异形化中 = false;
   context.异形化结束Ms = 0;
 }
 
-function 异形化Tick(this: void, context: 菲利斯运行时上下文, callbackID: number): void {
+function 异形化Tick(this: void, context: 菲利斯运行时上下文): boolean {
   const boss = context.Boss单位;
   const cfg = 菲利斯数值与表现配置.异形化;
   if (!单位有效(boss) || context.清理.已清理() || getServerTime() >= context.异形化结束Ms || getBuffRuntime(boss, 菲利斯BuffID.异形化) == null) {
-    removePeriodicCallback(callbackID);
     结束异形化(context);
-    return;
+    return false;
   }
-  创建技能提示圈({
-    类型: "圆形",
-    锚点单位: boss,
-    半径: cfg.近身扣血半径,
-    持续时间: cfg.Tick秒,
-  });
-  创建技能提示圈({
-    类型: "双环",
-    锚点单位: boss,
-    半径: cfg.牵引半径,
-    持续时间: cfg.Tick秒,
-  });
   创建点特效({ 模型路径: cfg.周期波动特效路径, X: GetUnitX(boss), Y: GetUnitY(boss), 缩放: 1.0, 持续秒: cfg.特效持续秒 });
 
   const heroes = 获取Boss技能敌对英雄列表(boss);
@@ -182,6 +197,7 @@ function 异形化Tick(this: void, context: 菲利斯运行时上下文, callbac
       });
     }
   }
+  return true;
 }
 
 function 启动异形化状态(this: void, context: 菲利斯运行时上下文): void {
@@ -200,13 +216,54 @@ function 启动异形化状态(this: void, context: 菲利斯运行时上下文)
   延迟播放Boss坐标音效(菲利斯音效配置.异形化.牵引波动, x, y, 菲利斯音效配置.异形化.牵引波动延迟Ms, 菲利斯音效配置.默认裁断距离);
   创建点特效({ 模型路径: cfg.爆发柱特效路径, X: x, Y: y, 缩放: 1.75, 持续秒: cfg.特效持续秒 });
   createUnitEffect(boss, "origin", cfg.持续气场特效路径, cfg.持续秒, "菲利斯-异形化持续气场");
+  销毁菲利斯异形化区域(boss);
+  当前异形化区域表[GetHandleId(boss)] = [
+    创建持续危险区域({
+      X: x,
+      Y: y,
+      锚点单位: boss,
+      半径: cfg.近身扣血半径,
+      持续时间: cfg.持续秒,
+      检测间隔: cfg.Tick秒,
+      所有者: boss,
+      影响目标: "敌方",
+      提示圈: {
+        类型: "圆形",
+        锚点单位: boss,
+        半径: cfg.近身扣血半径,
+        持续时间: cfg.持续秒,
+        可手动销毁: true,
+      },
+    }),
+    创建持续危险区域({
+      X: x,
+      Y: y,
+      锚点单位: boss,
+      半径: cfg.牵引半径,
+      持续时间: cfg.持续秒,
+      检测间隔: cfg.Tick秒,
+      所有者: boss,
+      影响目标: "敌方",
+      提示圈: {
+        类型: "双环",
+        锚点单位: boss,
+        半径: cfg.牵引半径,
+        持续时间: cfg.持续秒,
+        可手动销毁: true,
+      },
+    }),
+  ];
+  context.清理.登记清理("菲利斯-异形化持续危险区", 清理菲利斯异形化区域, context);
   释放菲利斯剑气灵斩(context);
 
-  let tickID = 0;
-  tickID = addPeriodicCallback(cfg.Tick秒 * 1000, function 菲利斯异形化Tick回调(this: void): void {
-    异形化Tick(context, tickID);
+  创建周期行为({
+    名称: "菲利斯-异形化Tick",
+    间隔毫秒: cfg.Tick秒 * 1000,
+    清理: context.清理,
+    onTick: function 菲利斯异形化Tick回调(this: void): boolean {
+      return 异形化Tick(context);
+    },
   });
-  context.清理.登记周期回调("菲利斯-异形化Tick", tickID);
 }
 
 export function 释放菲利斯异形化(this: void, context: 菲利斯运行时上下文): void {
@@ -245,7 +302,12 @@ export function 注册菲利斯异形化(this: void): void {
   if (!异形化伤害监听已注册) {
     异形化伤害监听已注册 = true;
     registerAppliedFinalDamageListener(on菲利斯最终伤害充能);
-    registerDamageModifier(异形化伤害修正, 60);
+    创建条件伤害修正({
+      名称: "菲利斯异形化伤害修正",
+      优先级: 60,
+      条件: 满足异形化伤害条件,
+      修正: 异形化伤害修正,
+    });
   }
   if (异形化已注册) return;
   异形化已注册 = true;

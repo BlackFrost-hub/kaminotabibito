@@ -2,6 +2,8 @@
 local ____exports = {}
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____00_FF0E_516C_5171 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．护卫A格鲁姆.00．公共")
 local _____683C_9C81_59C6_516C_5171 = ____00_FF0E_516C_5171["格鲁姆公共"]
 local ____683C_9C81_59C6_516C_5171_0 = _____683C_9C81_59C6_516C_5171
@@ -13,18 +15,16 @@ local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____683C_9C81_59C6_516
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____683C_9C81_59C6_516C_5171_0["创建技能提示圈"]
 local _____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____683C_9C81_59C6_516C_5171_0["创建线段危险区"]
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____683C_9C81_59C6_516C_5171_0["获取Boss技能敌对英雄列表"]
-local addPeriodicCallback = ____683C_9C81_59C6_516C_5171_0.addPeriodicCallback
-local removePeriodicCallback = ____683C_9C81_59C6_516C_5171_0.removePeriodicCallback
-local getServerTime = ____683C_9C81_59C6_516C_5171_0.getServerTime
 local CosBJ = ____683C_9C81_59C6_516C_5171_0.CosBJ
 local SinBJ = ____683C_9C81_59C6_516C_5171_0.SinBJ
 local GetUnitX = ____683C_9C81_59C6_516C_5171_0.GetUnitX
 local GetUnitY = ____683C_9C81_59C6_516C_5171_0.GetUnitY
 local _____5355_4F4D_6709_6548 = ____683C_9C81_59C6_516C_5171_0["单位有效"]
-local _____53D6_5355_4F4DID = ____683C_9C81_59C6_516C_5171_0["取单位ID"]
 local _____53D6_65B9_5411_89D2 = ____683C_9C81_59C6_516C_5171_0["取方向角"]
 local _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3 = ____683C_9C81_59C6_516C_5171_0["计算火径持续伤害"]
-local _____8BA1_7B97_706B_5F84_7A7F_8D8A_4F24_5BB3 = ____683C_9C81_59C6_516C_5171_0["计算火径穿越伤害"]
+local ATTACK_TYPE_NORMAL = ____683C_9C81_59C6_516C_5171_0.ATTACK_TYPE_NORMAL
+local DAMAGE_TYPE_FIRE = ____683C_9C81_59C6_516C_5171_0.DAMAGE_TYPE_FIRE
+local WEAPON_TYPE_WHOKNOWS = ____683C_9C81_59C6_516C_5171_0.WEAPON_TYPE_WHOKNOWS
 local _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3 = ____683C_9C81_59C6_516C_5171_0["造成格鲁姆Boss技能伤害"]
 local _____64AD_653E_70B9_7279_6548 = ____683C_9C81_59C6_516C_5171_0["播放点特效"]
 local function _____53D6_706B_5F84_53C2_6570(grum, target)
@@ -45,70 +45,47 @@ local function _____53D6_706B_5F84_53C2_6570(grum, target)
         normalAngle = normalAngle
     }
 end
-local function _____521B_5EFA_706B_5F84_7A7F_8D8A_68C0_6D4B(context, grum, center, lineAngle, normalAngle)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
-    local sideMap = {}
-    local nextAllowed = {}
-    local lineX = CosBJ(lineAngle)
-    local lineY = SinBJ(lineAngle)
-    local normalX = CosBJ(normalAngle)
-    local normalY = SinBJ(normalAngle)
-    local halfLength = config["长度"] * 0.5
-    local endMs = getServerTime() + config["持续秒"] * 1000
-    local tickId
-    tickId = addPeriodicCallback(
-        config["Tick间隔毫秒"],
-        function()
-            local now = getServerTime()
-            if now >= endMs or not _____5355_4F4D_6709_6548(grum) then
-                removePeriodicCallback(tickId)
-                return
-            end
-            local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
-            do
-                local i = 0
-                while i < #heroes do
-                    do
-                        local hero = heroes[i + 1]
-                        if not _____5355_4F4D_6709_6548(hero) then
-                            goto __continue7
-                        end
-                        local dx = GetUnitX(hero) - center.x
-                        local dy = GetUnitY(hero) - center.y
-                        local along = dx * lineX + dy * lineY
-                        if along < -halfLength or along > halfLength then
-                            goto __continue7
-                        end
-                        local sideValue = dx * normalX + dy * normalY
-                        local side = sideValue >= 0 and 1 or -1
-                        local id = _____53D6_5355_4F4DID(hero)
-                        local oldSide = sideMap[id]
-                        sideMap[id] = side
-                        if oldSide == nil or oldSide == side then
-                            goto __continue7
-                        end
-                        if now < (nextAllowed[id] or 0) then
-                            goto __continue7
-                        end
-                        nextAllowed[id] = now + config["穿越防抖秒"] * 1000
-                        _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(
-                            grum,
-                            hero,
-                            _____8BA1_7B97_706B_5F84_7A7F_8D8A_4F24_5BB3(grum, hero),
-                            "AOE"
-                        )
-                        _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(hero, config["灼热层数"])
-                    end
-                    ::__continue7::
-                    i = i + 1
-                end
-            end
-        end
-    )
-    local ____self_1 = context["清理"]
-    ____self_1["登记周期回调"](____self_1, "格鲁姆-熔岩火径穿越检测", tickId)
+local function _____83B7_53D6_683C_9C81_59C6_706B_5F84_76EE_6807(variable)
+    local state = variable
+    if state == nil or not _____5355_4F4D_6709_6548(state.grum) then
+        return {}
+    end
+    return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(state.context["Boss单位"])
 end
-local function _____521B_5EFA_706B_5F84(context, center, lineAngle, normalAngle)
+local function ____on_683C_9C81_59C6_706B_5F84_5468_671F(unit, variable)
+    local state = variable
+    if state == nil or not _____5355_4F4D_6709_6548(state.grum) or not _____5355_4F4D_6709_6548(unit) then
+        return
+    end
+    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
+    _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(
+        state.grum,
+        unit,
+        _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3(state.grum),
+        "AOE"
+    )
+    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["灼热层数"])
+end
+local function ____on_683C_9C81_59C6_706B_5F84_7A7F_8D8A(unit, variable)
+    local state = variable
+    if state == nil or not _____5355_4F4D_6709_6548(state.grum) or not _____5355_4F4D_6709_6548(unit) then
+        return
+    end
+    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+        ["来源"] = state.grum,
+        ["目标"] = unit,
+        ["伤害公式"] = {["来源攻击力比例"] = config["穿越伤害攻击力比例"], ["目标最大生命比例"] = config["穿越伤害目标最大生命比例"], ["总倍率"] = config["伤害总倍率"]},
+        attack = false,
+        ranged = true,
+        attackType = ATTACK_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["标签"] = "格鲁姆-熔岩火径-穿越"
+    })
+    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["灼热层数"])
+end
+local function _____521B_5EFA_706B_5F84(context, center, lineAngle)
     local grum = context["格鲁姆"]
     if not _____5355_4F4D_6709_6548(grum) then
         return
@@ -123,8 +100,8 @@ local function _____521B_5EFA_706B_5F84(context, center, lineAngle, normalAngle)
         config["持续秒"],
         lineAngle + 90
     )
-    local ____self_2 = context["清理"]
-    ____self_2["登记特效"](____self_2, "格鲁姆-熔岩火径主特效", effect)
+    local ____self_1 = context["清理"]
+    ____self_1["登记特效"](____self_1, "格鲁姆-熔岩火径主特效", effect)
     _____521B_5EFA_7EBF_6BB5_5371_9669_533A({
         ["清理"] = context["清理"],
         ["名称"] = "格鲁姆-熔岩火径",
@@ -136,30 +113,13 @@ local function _____521B_5EFA_706B_5F84(context, center, lineAngle, normalAngle)
         ["持续秒"] = config["持续秒"],
         ["Tick间隔毫秒"] = config["Tick间隔毫秒"],
         ["周期秒"] = config["周期秒"],
-        ["单位列表"] = function()
-            return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
-        end,
+        ["变量"] = {context = context, grum = grum},
+        ["单位列表"] = _____83B7_53D6_683C_9C81_59C6_706B_5F84_76EE_6807,
+        ["穿越防抖秒"] = config["穿越防抖秒"],
         ["提示圈"] = {["类型"] = "方向直线", ["来源单位"] = grum},
-        ["on周期"] = function(unit)
-            if not _____5355_4F4D_6709_6548(grum) or not _____5355_4F4D_6709_6548(unit) then
-                return
-            end
-            _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(
-                grum,
-                unit,
-                _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3(grum),
-                "AOE"
-            )
-            _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["灼热层数"])
-        end
+        ["on周期"] = ____on_683C_9C81_59C6_706B_5F84_5468_671F,
+        ["on穿越"] = ____on_683C_9C81_59C6_706B_5F84_7A7F_8D8A
     })
-    _____521B_5EFA_706B_5F84_7A7F_8D8A_68C0_6D4B(
-        context,
-        grum,
-        center,
-        lineAngle,
-        normalAngle
-    )
 end
 ____exports["释放格鲁姆火径"] = function(context, target)
     local grum = context["格鲁姆"]
@@ -199,7 +159,7 @@ ____exports["释放格鲁姆火径"] = function(context, target)
             _____64AD_653E_683C_9C81_59C6_53F0_8BCD(grum, "熔岩火径")
         end,
         ["on生效"] = function()
-            _____521B_5EFA_706B_5F84(context, fire.center, fire.lineAngle, fire.normalAngle)
+            _____521B_5EFA_706B_5F84(context, fire.center, fire.lineAngle)
         end
     })
 end

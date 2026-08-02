@@ -48,6 +48,9 @@ end
 local function _____662FP3(context)
     return context["阶段"] == 3
 end
+local function _____662FP1_6216P2(context)
+    return context["阶段"] == 1 or context["阶段"] == 2
+end
 ____exports["注册米亚技能调度"] = function()
     if _____7C73_4E9A_6280_80FD_8C03_5EA6_5668 ~= nil then
         return
@@ -118,7 +121,7 @@ ____exports["注册米亚技能调度"] = function()
                 ["首次延迟毫秒"] = 0,
                 ["忙碌毫秒"] = _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E["推进间隔毫秒"],
                 ["优先级"] = 190,
-                ["阶段允许"] = _____662FP1,
+                ["阶段允许"] = _____662FP1_6216P2,
                 ["可释放"] = function(context)
                     return not context["已触发分身50"] and _____5230_8FBE_751F_547D_9608_503C(context, clone["触发生命比例"][2])
                 end,
@@ -149,7 +152,7 @@ ____exports["注册米亚技能调度"] = function()
                 ["优先级"] = 20,
                 ["阶段允许"] = _____662FP2,
                 ["可释放"] = function(context)
-                    return (context["腐化转移污染平台ID"] or "") == ""
+                    return not context["腐化转移施法中"] and (context["腐化转移污染平台ID"] or "") == ""
                 end,
                 ["执行"] = function(context, _target, nowMs)
                     return _____91CA_653E_7C73_4E9A_8150_5316_8F6C_79FB(context, nowMs)

@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, createTimedUnitEffect, Sound3DII_CooPlayReuse, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, UnitRemoveAbility, _____6708_5149_67B7_9501_6280_80FDID, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, _____6708_5149_67B7_9501_7ED1_5B9A_8868
+local _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____53D1_5C04_6708_5149_67B7_9501_5F39_5E55, _____64AD_653E_6708_5149_67B7_9501_547D_4E2D_7279_6548, _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3, _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55, _____6E05_7406_6708_5149_67B7_9501_63A7_5236, _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D, jass, addDelayedCallback, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_539F_751F_5F39_5E55, _____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9, _____65BD_52A0_6269_5C55_63A7_5236, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, createTimedUnitEffect, Sound3DII_CooPlayReuse, GetUnitName, R2I, GetUnitX, GetUnitY, GetUnitFacing, SetUnitFacing, Atan2, GetHandleId, SetUnitAnimationByIndex, SetUnitTimeScale, UnitRemoveAbility, _____6708_5149_67B7_9501_6280_80FDID, BJ_RADTODEG, _____6708_5149_67B7_9501_6839_987BBuffID, _____6708_5149_67B7_9501_539F_751F_6839_987BBuff, _____6708_5149_67B7_9501_7ED1_5B9A_8868
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
@@ -16,8 +16,8 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_53E5_67C4_5B58_5728 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位句柄存在"]
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行Boss单体技能伤害"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 function _____64AD_653E_6708_5149_67B7_9501_65BD_6CD5_52A8_4F5C(caster)
@@ -105,18 +105,16 @@ function _____7ED3_7B97_6708_5149_67B7_9501Tick_4F24_5BB3(caster, target, tickIn
             if _____6708_5149_67B7_9501_7ED1_5B9A_8868[targetId] ~= _____8BB0_5F55 then
                 return
             end
-            local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(caster, target, {["来源攻击力比例"] = config["Tick伤害Boss攻击力比例"], ["目标最大生命比例"] = config["Tick伤害目标最大生命比例"], ["总倍率"] = config["Tick伤害总倍率"]})
-            _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+            _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3({
                 ["技能ID"] = _____6708_5149_67B7_9501_6280_80FDID,
                 ["来源"] = caster,
                 ["目标"] = target,
-                ["伤害"] = damage,
+                ["伤害公式"] = {["来源攻击力比例"] = config["Tick伤害Boss攻击力比例"], ["目标最大生命比例"] = config["Tick伤害目标最大生命比例"], ["总倍率"] = config["Tick伤害总倍率"]},
                 attack = false,
                 ranged = false,
                 attackType = jass.ATTACK_TYPE_NORMAL,
                 ["伤害类型"] = jass.DAMAGE_TYPE_PLANT,
-                weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                ["来源类型"] = "Boss技能"
+                weaponType = jass.WEAPON_TYPE_WHOKNOWS
             })
         end
     )
@@ -135,12 +133,12 @@ function _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(caster, target, 
     if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
         return nil
     end
-    local ____temp_13 = context ~= nil
-    if ____temp_13 then
-        local ____self_12 = context["清理"]
-        ____temp_13 = ____self_12["已清理"](____self_12)
+    local ____temp_12 = context ~= nil
+    if ____temp_12 then
+        local ____self_11 = context["清理"]
+        ____temp_12 = ____self_11["已清理"](____self_11)
     end
-    if ____temp_13 then
+    if ____temp_12 then
         return nil
     end
     local targetId = GetHandleId(target)
@@ -151,9 +149,9 @@ function _____521B_5EFA_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(caster, target, 
     local _____8BB0_5F55 = {["来源单位"] = caster, ["目标单位"] = target, ["已承受打断伤害"] = 0}
     _____6708_5149_67B7_9501_7ED1_5B9A_8868[targetId] = _____8BB0_5F55
     if context ~= nil then
-        local ____self_14 = context["清理"]
-        ____self_14["登记清理"](
-            ____self_14,
+        local ____self_13 = context["清理"]
+        ____self_13["登记清理"](
+            ____self_13,
             "月光枷锁绑定",
             function()
                 _____6E05_7406_6708_5149_67B7_9501_7ED1_5B9A_8BB0_5F55(targetId, _____8BB0_5F55, true)
@@ -237,33 +235,31 @@ function _____7ED3_7B97_745F_5170_8FEA_5C14_6708_5149_67B7_9501_547D_4E2D(caster
         end
     )
 end
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 jass = require("jass.common")
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-_____5F00_59CB_786C_76F4 = ____require_result_2["开始硬直"]
-local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-_____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_3["显示常规技能吟唱条"]
-_____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
-_____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．轨迹.index")
-_____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9 = ____require_result_5["创建追踪插值轨迹"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
-_____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_6["施加扩展控制"]
-local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_7.registerManualBuff
-_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_7["移除单位指定Buff"]
-local ____require_result_8 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_8.registerAppliedFinalDamageListener
-local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.14．月光碎片")
-local _____521B_5EFA_745F_5170_8FEA_5C14_6708_5149_788E_7247 = ____require_result_9["创建瑟兰迪尔月光碎片"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-createTimedUnitEffect = ____require_result_10.createTimedUnitEffect
-local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效系统.index")
-Sound3DII_CooPlayReuse = ____require_result_11.Sound3DII_CooPlayReuse
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+_____5F00_59CB_786C_76F4 = ____require_result_1["开始硬直"]
+local ____require_result_2 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+_____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_2["显示常规技能吟唱条"]
+_____5173_95ED_541F_5531_6761 = ____require_result_2["关闭吟唱条"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+_____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_3["创建原生弹幕"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．轨迹.index")
+_____521B_5EFA_8FFD_8E2A_63D2_503C_8F68_8FF9 = ____require_result_4["创建追踪插值轨迹"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
+_____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_5["施加扩展控制"]
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_6.registerManualBuff
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
+local ____require_result_7 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_7.registerAppliedFinalDamageListener
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.14．月光碎片")
+local _____521B_5EFA_745F_5170_8FEA_5C14_6708_5149_788E_7247 = ____require_result_8["创建瑟兰迪尔月光碎片"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+createTimedUnitEffect = ____require_result_9.createTimedUnitEffect
+local ____require_result_10 = require("lib.扩展函数.封装函数.02．音效系统.index")
+Sound3DII_CooPlayReuse = ____require_result_10.Sound3DII_CooPlayReuse
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitName = jass.GetUnitName

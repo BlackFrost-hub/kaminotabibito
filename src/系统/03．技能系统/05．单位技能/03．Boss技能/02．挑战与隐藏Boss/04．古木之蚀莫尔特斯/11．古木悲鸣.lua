@@ -18,8 +18,6 @@ local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____53D6_5355_4F4DID = ____16_FF0E_516C_5171_5DE5_5177["取单位ID"]
-local _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C = ____16_FF0E_516C_5171_5DE5_5177["播放莫尔特斯限时动作"]
-local _____5F00_59CB_83AB_5C14_7279_65AF_5927_62DB_65BD_6CD5 = ____16_FF0E_516C_5171_5DE5_5177["开始莫尔特斯大招施法"]
 local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____70B9_662F_5426_5904_4E8E_65B9_5411_969C_788D_7269_540E_65B9 = ____16_FF0E_516C_5171_5DE5_5177["点是否处于方向障碍物后方"]
 local _____53D6_5750_6807_89D2_5EA6 = ____16_FF0E_516C_5171_5DE5_5177["取坐标角度"]
@@ -31,6 +29,8 @@ local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64
 local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
 local _____9500_6BC1_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["销毁原生弹幕"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_0["设置特效缩放"]
 local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_0["创建Dz绑定单位特效"]
@@ -56,8 +56,8 @@ local ____require_result_3 = require("系统.03．技能系统.00．技能模板
 local _____65BD_52A0_6050_60E7 = ____require_result_3["施加恐惧"]
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_4.addDelayedCallback
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成AOE技能伤害"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_5["启动基础施法时间线"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____53E4_6728_60B2_9E23_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["古木悲鸣"]["技能槽位"])
 local _____5DF2_6CE8_518C = false
@@ -336,19 +336,17 @@ local function _____53E4_6728_60B2_9E23_5F39_5E55_547D_4E2D(target, projectileId
     if not (maxLife > 0) then
         return
     end
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
         ["技能ID"] = _____53E4_6728_60B2_9E23_6280_80FDID,
         ["来源"] = state.context["Boss单位"],
         ["目标"] = target,
-        ["伤害"] = maxLife * cfg["目标最大生命比例"],
+        ["伤害公式"] = {["目标最大生命比例"] = cfg["目标最大生命比例"]},
         attack = false,
         ranged = true,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_PLANT,
         weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能",
-        ["标签"] = "莫尔特斯·古木悲鸣",
-        ["伤害形态"] = "AOE"
+        ["标签"] = "莫尔特斯·古木悲鸣"
     })
     local after = _____5E94_7528_83AB_5C14_7279_65AF_8150_8D25_503C(state.context, target, cfg["腐败值"])
     if after >= cfg["恐惧阈值"] then
@@ -498,14 +496,29 @@ ____exports["释放莫尔特斯古木悲鸣"] = function(context)
         return
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["古木悲鸣"]
-    _____5F00_59CB_83AB_5C14_7279_65AF_5927_62DB_65BD_6CD5(boss, cfg["动作播放秒"], "古木悲鸣", "站到巨型蘑菇背向莫尔特斯的一侧，让蘑菇挡在你与Boss之间")
-    _____64AD_653E_83AB_5C14_7279_65AF_9650_65F6_52A8_4F5C(boss, cfg["动画编号"], cfg["动画速度"], cfg["动作播放秒"])
-    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "古木悲鸣")
     _____786E_4FDD_83AB_5C14_7279_65AF_6839_987B_5BAB_683C(context)
     _____786E_4FDD_60B2_9E23_8611_83C7_8868_73B0(context)
-    local delayedId = addDelayedCallback(cfg["动作播放秒"] * 1000, _____7ED3_7B97_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23, context)
-    local ____self_15 = context["清理"]
-    ____self_15["登记延迟回调"](____self_15, "莫尔特斯-古木悲鸣结算", delayedId)
+    _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
+        ["名称"] = "莫尔特斯-古木悲鸣",
+        ["施法者"] = boss,
+        ["硬直秒"] = cfg["动作播放秒"],
+        ["动画编号"] = cfg["动画编号"],
+        ["动画速度"] = cfg["动画速度"],
+        ["吟唱条"] = {
+            ["通道"] = "大招",
+            ["总时长"] = cfg["动作播放秒"],
+            ["颜色ID"] = 3,
+            ["标题文本"] = "古木悲鸣",
+            ["提示文本"] = "站到巨型蘑菇背向莫尔特斯的一侧，让蘑菇挡在你与Boss之间"
+        },
+        ["清理"] = context["清理"],
+        ["播放台词"] = function()
+            _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "古木悲鸣")
+        end,
+        ["on生效"] = function()
+            _____7ED3_7B97_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23(context)
+        end
+    })
 end
 local function ____on_83AB_5C14_7279_65AF_53E4_6728_60B2_9E23_65BD_6CD5(castingUnit, spellAbilityId)
     if spellAbilityId ~= _____53E4_6728_60B2_9E23_6280_80FDID then

@@ -4,7 +4,7 @@ import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 获取全部里科特上下文, type 里科特运行时上下文 } from "./01．运行时上下文";
 import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
-import { 单位有效, 播放里科特施法维持动作, 播放里科特限时动作, stringToFourCC, 距离平方XY } from "./13．公共工具";
+import { 单位有效, 播放里科特限时动作, stringToFourCC, 距离平方XY } from "./13．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
@@ -19,6 +19,9 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { createTimedUnitEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
   createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
@@ -62,7 +65,6 @@ export function 立即开启里科特破魔反击窗口(this: void, context: 里
   if (!单位有效(boss)) return;
   const cfg = 里科特数值与表现配置.破魔反击;
   context.破魔反击中 = true;
-  播放里科特施法维持动作(boss, cfg.反击窗口秒, cfg.动画速度);
   registerManualBuff(boss, 里科特BuffID.破魔反击, cfg.反击窗口秒, 1, { sourceName: "里科特-破魔反击" });
   播放Boss坐标音效(里科特音效配置.破魔反击.窗口开启, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
   createTimedUnitEffect(boss, "origin", cfg.反击特效路径, cfg.反击特效持续秒);
@@ -74,10 +76,25 @@ export function 立即开启里科特破魔反击窗口(this: void, context: 里
     持续时间: cfg.反击窗口秒,
     来源单位: boss,
   });
-  const id = addDelayedCallback(cfg.反击窗口秒 * 1000, function 里科特破魔反击窗口到期(this: void): void {
-    结束破魔反击窗口(context);
+  启动基础施法时间线({
+    名称: "里科特-破魔反击窗口",
+    施法者: boss,
+    硬直秒: cfg.施法硬直秒,
+    生效延迟秒: cfg.反击窗口秒,
+    动画编号: 8,
+    动画速度: cfg.动画速度,
+    后续动画编号: 9,
+    后续动画速度: 1,
+    后续动画延迟毫秒: cfg.施法动作原始时长秒 * 1000 / cfg.动画速度,
+    恢复动画编号: 3,
+    清理: context.清理,
+    on生效: function 里科特破魔反击窗口到期(this: void): void {
+      结束破魔反击窗口(context);
+    },
+    on结束: function 里科特破魔反击窗口时间线结束(this: void, 原因: any): void {
+      if (原因 !== "完成") 结束破魔反击窗口(context);
+    },
   });
-  context.清理.登记延迟回调("里科特-破魔反击窗口", id);
 }
 
 export function 释放里科特破魔反击(this: void, context: 里科特运行时上下文): void {

@@ -6,6 +6,8 @@ import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 施加巴尔扎罗斯灼热 } from "./16．灼热层数工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { stringToFourCC, 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import type { 周期行为实例 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
+import { 创建周期行为 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -24,10 +26,6 @@ const { 创建Boss战场地点位集 } = require("系统.03．技能系统.00．
 };
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
@@ -53,7 +51,7 @@ const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => 
 interface 地核状态 {
   context: 巴尔扎罗斯运行时上下文;
   coreUnit: any;
-  tickId: number;
+  tick?: 周期行为实例;
   stopped: boolean;
 }
 
@@ -98,21 +96,23 @@ function 掉落冷却水晶(this: void, x: number, y: number): void {
 function 停止地核(this: void, state: 地核状态): void {
   if (state.stopped) return;
   state.stopped = true;
-  if (state.tickId !== 0) {
-    removePeriodicCallback(state.tickId);
-    state.tickId = 0;
+  if (state.tick != null) {
+    state.tick.停止();
+    state.tick = undefined;
   }
 }
 
-function on地核Tick(this: void, state: 地核状态): void {
-  if (state.stopped) return;
+function on地核Tick(this: void, _执行次数: number, variable?: 地核状态): boolean {
+  const state = variable;
+  if (state == null || state.stopped) return false;
   const core = state.coreUnit;
   if (!单位有效(core)) {
     停止地核(state);
-    return;
+    return false;
   }
   播放地核Tick特效(GetUnitX(core), GetUnitY(core));
   地核叠加全场灼热(state.context);
+  return true;
 }
 
 function 创建地核单位(this: void, context: 巴尔扎罗斯运行时上下文, x: number, y: number): void {
@@ -120,7 +120,7 @@ function 创建地核单位(this: void, context: 巴尔扎罗斯运行时上下�
   if (!单位有效(boss)) return;
   const config = 巴尔扎罗斯技能数值配置.地核召唤;
   const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
-  const state: 地核状态 = { context, coreUnit: undefined, tickId: 0, stopped: false };
+  const state: 地核状态 = { context, coreUnit: undefined, tick: undefined, stopped: false };
   const core = 创建可攻击机制单位({
     清理: context.清理,
     名称: "巴尔扎罗斯-不稳定地核",
@@ -143,10 +143,13 @@ function 创建地核单位(this: void, context: 巴尔扎罗斯运行时上下�
   if (core == null || !单位有效(core.单位)) return;
   state.coreUnit = core.单位;
   播放Boss坐标音效(巴尔扎罗斯音效配置.地核召唤.地核出现, x, y, 巴尔扎罗斯音效配置.默认裁断距离);
-  state.tickId = addPeriodicCallback(config.Tick秒 * 1000, function 巴尔扎罗斯地核Tick(this: void): void {
-    on地核Tick(state);
+  state.tick = 创建周期行为({
+    名称: "巴尔扎罗斯-地核Tick",
+    间隔毫秒: config.Tick秒 * 1000,
+    清理: context.清理,
+    变量: state,
+    onTick: on地核Tick,
   });
-  context.清理.登记周期回调("巴尔扎罗斯-地核Tick", state.tickId);
 }
 
 export function 释放巴尔扎罗斯地核召唤(this: void, context: 巴尔扎罗斯运行时上下文): void {

@@ -6,6 +6,7 @@ import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚技能数值配置 } from "./02．数值与表现配置";
 import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 播放米亚台词 } from "./15．台词播放";
+import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
@@ -15,9 +16,6 @@ const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统
 };
 const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
   registerDamageCallback: (this: void, cb: (this: void, target: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttack?: boolean) => void, intervalSeconds?: number) => void;
-};
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -134,6 +132,11 @@ function 处理腐化黏液Boss受伤提高(this: void, damageContext: any): num
   return modifiedDamage;
 }
 
+function 满足腐化黏液Boss受伤提高条件(this: void, damageContext: any): boolean {
+  const context = 取腐化黏液上下文(damageContext == null ? undefined : damageContext.target);
+  return context != null && context.阶段 === 3;
+}
+
 export function 释放米亚全场腐化黏液(this: void, context: 米亚运行时上下文): boolean {
   const boss = context.Boss单位;
   const bossValid = 单位有效(boss);
@@ -166,7 +169,12 @@ export function 注册米亚腐化黏液涂层(this: void): void {
   if (米亚腐化黏液涂层已注册) return;
   米亚腐化黏液涂层已注册 = true;
   registerDamageCallback(处理腐化黏液近战反噬, 0.03);
-  registerDamageModifier(处理腐化黏液Boss受伤提高, 35);
+  创建条件伤害修正({
+    名称: "米亚腐化黏液涂层承伤提高",
+    优先级: 35,
+    条件: 满足腐化黏液Boss受伤提高条件,
+    修正: 处理腐化黏液Boss受伤提高,
+  });
 }
 
 export function 刷新米亚腐化黏液涂层被动状态(this: void, context: 米亚运行时上下文): void {

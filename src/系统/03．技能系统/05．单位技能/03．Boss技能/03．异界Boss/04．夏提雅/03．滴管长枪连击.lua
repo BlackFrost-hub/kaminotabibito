@@ -14,8 +14,8 @@ local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local _____5355_4F4D_662F_5426_5904_4E8E_786C_63A7_5236_6548_679C_5408_96C6 = ____01_FF0E_63A7_5236_4E0EBuff["单位是否处于硬控制效果合集"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行Boss单体技能伤害"]
 local ____02_FF0E_590F_63D0_96C5 = require("系统.05．Buff系统.03．Buff表.01．Boss.03．异界Boss.02．夏提雅")
 local _____590F_63D0_96C5BuffID = ____02_FF0E_590F_63D0_96C5["夏提雅BuffID"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -30,26 +30,24 @@ local ____require_result_0 = require("系统.04．伤害系统.00．伤害计算
 local registerDamageModifier = ____require_result_0.registerDamageModifier
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_1.registerAppliedFinalDamageListener
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_2["造成单体技能伤害"]
-local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_3.registerManualBuff
-local getBuffRuntime = ____require_result_3.getBuffRuntime
-local ____require_result_4 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_4.doHeal
-local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
-local getThreat = ____require_result_5.getThreat
-local setThreat = ____require_result_5.setThreat
-local ____require_result_6 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
-local _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_6["取当前有效玩家人数"]
-local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_7.addDelayedCallback
-local getServerTime = ____require_result_7.getServerTime
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_8.createUnitEffect
-local _____8BBE_7F6EDz_7ED1_5B9A_7279_6548_7F29_653E = ____require_result_8["设置Dz绑定特效缩放"]
-local ____require_result_9 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_9.YDWETimerDestroyEffectSafe
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_2.registerManualBuff
+local getBuffRuntime = ____require_result_2.getBuffRuntime
+local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_3.doHeal
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
+local getThreat = ____require_result_4.getThreat
+local setThreat = ____require_result_4.setThreat
+local ____require_result_5 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
+local _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_5["取当前有效玩家人数"]
+local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_6.addDelayedCallback
+local getServerTime = ____require_result_6.getServerTime
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____require_result_7.createUnitEffect
+local _____8BBE_7F6EDz_7ED1_5B9A_7279_6548_7F29_653E = ____require_result_7["设置Dz绑定特效缩放"]
+local ____require_result_8 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_8.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
@@ -130,19 +128,17 @@ local function _____6267_884C_5F3A_5316_7A7F_523A_547D_4E2D(context, target)
         boss,
         Atan2(dy, dx) * RAD_TO_DEG
     )
-    local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = cfg["强化穿刺伤害攻击力比例"], ["目标最大生命比例"] = cfg["强化穿刺伤害目标最大生命比例"]})
-    local hit = _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+    local hit = _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = boss,
         ["目标"] = target,
-        ["伤害"] = damage,
+        ["伤害公式"] = {["来源攻击力比例"] = cfg["强化穿刺伤害攻击力比例"], ["目标最大生命比例"] = cfg["强化穿刺伤害目标最大生命比例"]},
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_ENHANCED,
         weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-        ["来源类型"] = "Boss技能",
         ["标签"] = "夏提雅·滴管长枪强化穿刺"
-    })
+    })["是否造成伤害"]
     if not hit then
         return
     end
@@ -215,16 +211,16 @@ local function _____542F_52A8_5F3A_5316_7A7F_523A(context, target)
             _____6267_884C_5F3A_5316_7A7F_523A_547D_4E2D(context, target)
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记延迟回调"](____self_10, "夏提雅-滴管长枪强化穿刺", delayedId)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "夏提雅-滴管长枪强化穿刺", delayedId)
 end
 local function _____66FF_6362_5F3A_5316_7A7F_523A_666E_901A_653B_51FB(damageContext)
-    local ____83B7_53D6_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587_14 = _____83B7_53D6_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587
-    local ____opt_result_13
+    local ____83B7_53D6_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587_13 = _____83B7_53D6_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587
+    local ____opt_result_12
     if damageContext ~= nil then
-        ____opt_result_13 = damageContext.attacker
+        ____opt_result_12 = damageContext.attacker
     end
-    local context = ____83B7_53D6_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587_14(____opt_result_13)
+    local context = ____83B7_53D6_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587_13(____opt_result_12)
     if context == nil or not _____662F_590F_63D0_96C5_76F4_63A5_666E_901A_653B_51FB(damageContext, context) then
         return damageContext.currentDamage
     end
@@ -245,23 +241,23 @@ local function _____66FF_6362_5F3A_5316_7A7F_523A_666E_901A_653B_51FB(damageCont
 end
 local function ____on_590F_63D0_96C5_666E_901A_653B_51FB_6700_7EC8_4F24_5BB3(target, attacker, applied, snapshot)
     local context = _____83B7_53D6_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587(attacker)
-    local ____temp_18 = context == nil
-    if not ____temp_18 then
-        local ____opt_result_17
+    local ____temp_17 = context == nil
+    if not ____temp_17 then
+        local ____opt_result_16
         if snapshot ~= nil then
-            ____opt_result_17 = snapshot.isNormalAttack
+            ____opt_result_16 = snapshot.isNormalAttack
         end
-        ____temp_18 = ____opt_result_17 ~= true
+        ____temp_17 = ____opt_result_16 ~= true
     end
-    local ____temp_18_22 = ____temp_18
-    if not ____temp_18_22 then
-        local ____opt_result_21
+    local ____temp_17_21 = ____temp_17
+    if not ____temp_17_21 then
+        local ____opt_result_20
         if snapshot ~= nil then
-            ____opt_result_21 = snapshot.originalAttacker
+            ____opt_result_20 = snapshot.originalAttacker
         end
-        ____temp_18_22 = ____opt_result_21 ~= context["Boss单位"]
+        ____temp_17_21 = ____opt_result_20 ~= context["Boss单位"]
     end
-    if ____temp_18_22 then
+    if ____temp_17_21 then
         return
     end
     if context["待结算强化穿刺目标"] == target then

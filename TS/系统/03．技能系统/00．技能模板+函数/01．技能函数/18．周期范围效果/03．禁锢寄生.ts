@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { 每跳伤害计算器, 持续伤害组件, 持续原生效果参数 } from "./01．类型";
+import type { 自适应共享周期驱动 } from "../../04．机制组件/10．复杂战斗通用机制/17．周期机制调度器";
 
 const jass = require("jass.common") as any;
 
@@ -10,10 +11,11 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
 
-const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
+};
+const { 创建自适应共享周期驱动 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器") as {
+  创建自适应共享周期驱动: (this: void, 参数: any) => 自适应共享周期驱动;
 };
 const { SFB_setEntanglingRoots, SFB_setParasite } = require("lib.扩展函数.Star扩展函数.Star扩展库.04．快速Buff系统") as {
   SFB_setEntanglingRoots: (this: void, sourceUnit: any, u: any, time: number) => void;
@@ -49,7 +51,7 @@ interface 持续伤害实例 {
 const 持续伤害实例表: Record<number, 持续伤害实例 | undefined> = {};
 const 持续伤害ID列表: number[] = [];
 let 下一个持续伤害ID = 0;
-let 持续伤害回调ID = 0;
+let 持续伤害驱动: 自适应共享周期驱动 | undefined;
 
 function 转数字(this: void, value: any): number {
   if (value == null || value === false || value === "") return 0;
@@ -111,19 +113,32 @@ function 移除持续伤害(this: void, id: number): void {
   delete 持续伤害实例表[id];
   const index = 持续伤害ID列表.indexOf(id);
   if (index >= 0) 持续伤害ID列表.splice(index, 1);
-  if (持续伤害ID列表.length === 0 && 持续伤害回调ID !== 0) {
-    removePeriodicCallback(持续伤害回调ID);
-    持续伤害回调ID = 0;
-  }
 }
 
 function 确保持续伤害系统启动(this: void): void {
-  if (持续伤害回调ID !== 0) return;
-  持续伤害回调ID = addPeriodicCallback(100, 持续伤害系统Tick);
+  if (持续伤害驱动 == null) {
+    持续伤害驱动 = 创建自适应共享周期驱动({
+      名称: "禁锢寄生持续伤害驱动",
+      最大检查间隔毫秒: 100,
+      取建议检查间隔毫秒: 取持续伤害建议检查间隔,
+      onTick: 持续伤害系统Tick,
+    });
+  }
+  持续伤害驱动.刷新();
 }
 
-function 持续伤害系统Tick(this: void): void {
-  const now = getServerTime();
+function 取持续伤害建议检查间隔(this: void, _nowMs: number): number {
+  let 最短间隔 = 0;
+  for (let i = 0; i < 持续伤害ID列表.length; i++) {
+    const 实例 = 持续伤害实例表[持续伤害ID列表[i]];
+    if (实例 == null) continue;
+    const 间隔 = 实例.伤害间隔毫秒;
+    if (间隔 > 0 && (最短间隔 === 0 || 间隔 < 最短间隔)) 最短间隔 = 间隔;
+  }
+  return 最短间隔;
+}
+
+function 持续伤害系统Tick(this: void, now: number): void {
   let index = 0;
   while (index < 持续伤害ID列表.length) {
     const id = 持续伤害ID列表[index];

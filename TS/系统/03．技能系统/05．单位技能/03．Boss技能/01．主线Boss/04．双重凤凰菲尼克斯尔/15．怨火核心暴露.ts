@@ -17,14 +17,12 @@ import {
   取单位Y,
   设置单位动画,
 } from "./19．公共工具";
+import { 提交预计算Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 const jass = require("jass.common") as any;
 const RemoveUnit = jass.RemoveUnit as (whichUnit: any) => void;
 const DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND as any;
 
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
-};
 const { 减少生命值 } = require("系统.04．伤害系统.02．治疗系统.07．减少生命值") as {
   减少生命值: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean, effectPath?: string, 最低保留生命?: number) => number;
 };
@@ -33,7 +31,7 @@ function on菲尼克斯尔怨火核心死亡(this: void, context: 菲尼克斯�
   context.怨火核心暴露中 = false;
   const damage = 取最大生命(context.Boss) * 菲尼克斯尔数值与表现配置.机制.怨火核心摧毁Boss最大生命伤害比例;
   if (killer != null && killer !== 0) {
-    const 已造成伤害 = 造成单体技能伤害({
+    const 结果 = 提交预计算Boss单体技能伤害({
       来源: killer,
       目标: context.Boss,
       伤害: damage,
@@ -42,7 +40,7 @@ function on菲尼克斯尔怨火核心死亡(this: void, context: 菲尼克斯�
       标签: "菲尼克斯尔-摧毁怨火核心",
       参与技能伤害加成: false,
     });
-    if (!已造成伤害) 减少生命值(context.Boss, damage);
+    if (!结果.是否造成伤害) 减少生命值(context.Boss, damage);
   } else {
     减少生命值(context.Boss, damage);
   }

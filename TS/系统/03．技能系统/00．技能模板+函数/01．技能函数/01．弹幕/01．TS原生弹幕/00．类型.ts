@@ -24,6 +24,7 @@ export type 原生弹幕目标筛选 = (this: void, 目标单位: any, 弹幕ID:
 export type 原生弹幕命中回调 = (this: void, 目标单位: any, 弹幕ID: number) => void;
 export type 原生弹幕结束回调 = (this: void, 原因: 原生弹幕结束原因, 弹幕ID: number) => void;
 export type 原生弹幕到达目标点回调 = (this: void, 弹幕ID: number, 原因: "完成" | "距离结束") => void;
+export type 原生弹幕Tick回调 = (this: void, 实例: 原生弹幕内部实例, delta: number) => void;
 export type 原生弹幕阻挡回调 = (this: void, 来源单位: any, 伤害值: number, 弹幕ID: number) => void;
 export type 原生弹幕被击落回调 = (this: void, 击杀者: any, 弹幕ID: number) => void;
 export type 原生弹幕轨迹采样器 = (this: void, 实例: 原生弹幕内部实例, delta: number) => 原生弹幕轨迹采样结果;
@@ -53,7 +54,16 @@ export interface 原生弹幕附加特效参数 {
   朝向角偏移?: number;
   /** 创建后立即设置一次特效动画序号；不在移动 Tick 中重复播放。 */
   动画索引?: number;
+  /** 创建后立即播放一次指定动画名称；不在移动 Tick 中重复播放。 */
+  动画名称?: string;
+  动画链接?: string;
+  /** 创建时传给特效实例的动画播放速度。 */
+  动画速度?: number;
   缩放?: number;
+  /** 允许表现模型使用非均匀缩放；未填写的轴回退到统一缩放。 */
+  缩放X?: number;
+  缩放Y?: number;
+  缩放Z?: number;
   红?: number;
   绿?: number;
   蓝?: number;
@@ -134,6 +144,8 @@ export interface 原生弹幕参数 {
   on结束?: 原生弹幕结束回调;
   /** 到达轨迹终点或最大距离终点时触发；生命周期结束、手动销毁、被阻挡不触发。 */
   on到达目标点?: 原生弹幕到达目标点回调;
+  /** 每个原生弹幕驱动 Tick 在移动后触发一次；适合残影、轨迹采样等表现扩展。 */
+  onTick?: 原生弹幕Tick回调;
   on阻挡?: 原生弹幕阻挡回调;
   /** 弹幕单位被外部击杀时触发，可拿到击杀者；随后仍会统一触发 on结束("单位死亡", 弹幕ID)。 */
   on被击落?: 原生弹幕被击落回调;

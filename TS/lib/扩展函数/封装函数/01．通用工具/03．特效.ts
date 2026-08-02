@@ -26,6 +26,7 @@ const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => bo
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const DzBindEffect = japi.DzBindEffect as (widget: any, attachPoint: string, effect: any) => void;
 const DzUnbindEffect = japi.DzUnbindEffect as (effect: any) => void;
+const EXSetEffectXY = (japi as any).EXSetEffectXY as ((effect: any, x: number, y: number) => void) | undefined;
 const EXSetEffectX = (japi as any).EXSetEffectX as ((effect: any, x: number) => void) | undefined;
 const EXSetEffectY = (japi as any).EXSetEffectY as ((effect: any, y: number) => void) | undefined;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
@@ -47,6 +48,10 @@ function 规范化特效模型路径(modelPath: string): string {
 
 function 安全设置特效坐标(this: void, effect: any, x: number, y: number): void {
   if (effect == null || effect === 0) return;
+  if (EXSetEffectXY != null) {
+    EXSetEffectXY(effect, x, y);
+    return;
+  }
   if (EXSetEffectX != null) EXSetEffectX(effect, x);
   if (EXSetEffectY != null) EXSetEffectY(effect, y);
 }

@@ -25,12 +25,16 @@ local _____663E_793A_5927_62DB_8BFB_6761 = ____19_FF0E_516C_5171_5DE5_5177["显�
 local _____8BBE_7F6E_5355_4F4D_52A8_753B = ____19_FF0E_516C_5171_5DE5_5177["设置单位动画"]
 local _____5F00_59CB_65BD_6CD5_786C_76F4 = ____19_FF0E_516C_5171_5DE5_5177["开始施法硬直"]
 local _____6DFB_52A0_5143_7D20_5C42_6570 = ____19_FF0E_516C_5171_5DE5_5177["添加元素层数"]
-local _____9020_6210_6697_706B_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成暗火伤害"]
 local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587 = ____19_FF0E_516C_5171_5DE5_5177["创建菲尼克斯尔独立伤害上下文"]
-local _____53D6_5F53_524D_751F_547D = ____19_FF0E_516C_5171_5DE5_5177["取当前生命"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____15_FF0E_6028_706B_6838_5FC3_66B4_9732 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.15．怨火核心暴露")
 local _____89E6_53D1_83F2_5C3C_514B_65AF_5C14_6028_706B_6838_5FC3_66B4_9732 = ____15_FF0E_6028_706B_6838_5FC3_66B4_9732["触发菲尼克斯尔怨火核心暴露"]
-local function _____73A9_5BB6_5728_5B89_5168_533A(unit)
+local jass = require("jass.common")
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
+local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
+local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
+local function _____53D6_73A9_5BB6_5B89_5168_533A_5143_7D20(unit)
     local points = _____83F2_5C3C_514B_65AF_5C14_573A_5730_914D_7F6E["挽歌安全区点位"]
     local radius = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["凤凰挽歌"]["安全区半径"]
     do
@@ -43,12 +47,12 @@ local function _____73A9_5BB6_5728_5B89_5168_533A(unit)
                 p.x,
                 p.y
             ) <= radius then
-                return true
+                return p["元素"]
             end
             i = i + 1
         end
     end
-    return false
+    return nil
 end
 ____exports["释放菲尼克斯尔凤凰挽歌"] = function(context)
     if context["当前形态"] ~= "第二形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
@@ -97,16 +101,24 @@ ____exports["释放菲尼克斯尔凤凰挽歌"] = function(context)
                 while i < #heroes do
                     do
                         local hero = heroes[i + 1]
-                        if _____73A9_5BB6_5728_5B89_5168_533A(hero) then
+                        local _____5B89_5168_533A_5143_7D20 = _____53D6_73A9_5BB6_5B89_5168_533A_5143_7D20(hero)
+                        if _____5B89_5168_533A_5143_7D20 ~= nil then
+                            _____6DFB_52A0_5143_7D20_5C42_6570(hero, _____5B89_5168_533A_5143_7D20, config["规避叠层"])
                             goto __continue12
                         end
-                        _____9020_6210_6697_706B_4F24_5BB3(
-                            context.Boss,
-                            hero,
-                            _____53D6_5F53_524D_751F_547D(hero) * config["当前生命损失比例"],
-                            "AOE",
-                            _____4F24_5BB3_4E0A_4E0B_6587
-                        )
+                        if _____5355_4F4D_5B58_6D3B(context.Boss) and _____5355_4F4D_5B58_6D3B(hero) then
+                            _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                                ["技能实例ID"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["技能实例ID"],
+                                ["标签"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["标签"],
+                                ["来源"] = context.Boss,
+                                ["目标"] = hero,
+                                ["伤害公式"] = {["目标当前生命比例"] = config["当前生命损失比例"]},
+                                ranged = true,
+                                attackType = ATTACK_TYPE_NORMAL,
+                                ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
+                                weaponType = WEAPON_TYPE_WHOKNOWS
+                            })
+                        end
                         _____6DFB_52A0_5143_7D20_5C42_6570(hero, "暗", config["规避叠层"])
                         _____521B_5EFA_70B9_7279_6548({
                             ["模型路径"] = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["凤凰挽歌叠加"],
@@ -123,8 +135,8 @@ ____exports["释放菲尼克斯尔凤凰挽歌"] = function(context)
             end
         end
     )
-    local ____self_0 = context["清理"]
-    ____self_0["登记周期回调"](____self_0, "菲尼克斯尔凤凰挽歌Tick", tick)
+    local ____self_4 = context["清理"]
+    ____self_4["登记周期回调"](____self_4, "菲尼克斯尔凤凰挽歌Tick", tick)
     _____5EF6_8FDF(
         config["引导秒"] * 1000,
         function()
@@ -140,8 +152,8 @@ ____exports["初始化菲尼克斯尔凤凰挽歌节点"] = function(context)
             ____exports["释放菲尼克斯尔凤凰挽歌"](context)
         end
     )
-    local ____self_1 = context["清理"]
-    ____self_1["登记周期回调"](____self_1, "菲尼克斯尔-凤凰挽歌", timerId)
+    local ____self_5 = context["清理"]
+    ____self_5["登记周期回调"](____self_5, "菲尼克斯尔-凤凰挽歌", timerId)
 end
 ____exports["注册菲尼克斯尔凤凰挽歌"] = function()
 end

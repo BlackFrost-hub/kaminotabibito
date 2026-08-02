@@ -1,9 +1,7 @@
 /** @noSelfInFile */
 
 import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹模型动画配置, 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
@@ -23,9 +21,6 @@ import { 创建雅儿贝德时间停止冲锋预警, 启动雅儿贝德时间停
 
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -244,17 +239,16 @@ function 播放时间停止结算特效(this: void, model: string, x: number, y:
   });
 }
 
-function 造成时间停止伤害(this: void, boss: any, target: any, damage: number, tag: string): void {
-  造成AOE技能伤害({
+function 造成时间停止伤害(this: void, boss: any, target: any, 伤害公式: any, tag: string): void {
+  执行BossAOE技能伤害({
     来源: boss,
     目标: target,
-    伤害: damage,
+    伤害公式,
     attack: false,
     ranged: true,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_MAGIC,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: 'Boss技能',
     标签: tag,
   });
 }
@@ -282,10 +276,10 @@ function 结算时间停止地面法阵(this: void, instance: 时间停止实例
     造成时间停止伤害(
       boss,
       target,
-      计算组合技能伤害(boss, target, {
+      {
         来源攻击力比例: cfg.阶段技能.时间停止地面法阵伤害Boss攻击力比例,
         目标最大生命比例: cfg.阶段技能.时间停止地面法阵伤害目标最大生命比例,
-      }),
+      },
       '安兹·时间停止·地面法阵',
     );
   }
@@ -330,11 +324,11 @@ function 结算时间停止魔法箭(this: void, instance: 时间停止实例): 
     造成时间停止伤害(
       boss,
       target,
-      计算组合技能伤害(boss, target, {
+      {
         来源攻击力比例: ordinary.高阶魔法箭伤害Boss攻击力比例,
         目标最大生命比例: ordinary.高阶魔法箭伤害目标最大生命比例,
         总倍率: 取安兹亡灵箭伤害倍率(context),
-      }),
+      },
       '安兹·时间停止·高阶魔法箭',
     );
   }

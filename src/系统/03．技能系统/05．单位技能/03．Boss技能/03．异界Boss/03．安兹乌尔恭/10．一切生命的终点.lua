@@ -3,6 +3,8 @@ local ____exports = {}
 local _____505C_6B62_5973_5996_54ED_568E_8DEF_5F84_7279_6548
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_6A21_578B_52A8_753B_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹模型动画配置"]
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
@@ -38,8 +40,8 @@ function _____505C_6B62_5973_5996_54ED_568E_8DEF_5F84_7279_6548(instance)
     do
         local i = 0
         while i < #instance["女妖哭嚎路径特效列表"] do
-            local ____self_14 = instance["女妖哭嚎路径特效列表"][i + 1]
-            ____self_14["停止"](____self_14)
+            local ____self_13 = instance["女妖哭嚎路径特效列表"][i + 1]
+            ____self_13["停止"](____self_13)
             i = i + 1
         end
     end
@@ -47,26 +49,22 @@ function _____505C_6B62_5973_5996_54ED_568E_8DEF_5F84_7279_6548(instance)
 end
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
-local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_1["造成AOE技能伤害"]
-local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_2.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
-local ____require_result_3 = require("系统.09．表现系统.06．广播提示消息.index")
-local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_3["广播单位提示"]
-local ____require_result_4 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_4["显示大招吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_4["关闭吟唱条"]
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_6.getServerTime
+local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_1.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
+local ____require_result_2 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_2["广播单位提示"]
+local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_3["显示大招吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_5.getServerTime
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local Player = jass.Player
@@ -79,7 +77,6 @@ local DestroyEffect = jass.DestroyEffect
 local Cos = jass.Cos
 local Sin = jass.Sin
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -95,8 +92,8 @@ local function _____9500_6BC1_7279_6548(effect)
 end
 local function _____6E05_7406_751F_547D_951A_70B9(anchor)
     if anchor["停留控制器"] ~= nil then
-        local ____self_7 = anchor["停留控制器"]
-        ____self_7["停止"](____self_7)
+        local ____self_6 = anchor["停留控制器"]
+        ____self_6["停止"](____self_6)
         anchor["停留控制器"] = nil
     end
     _____505C_6B62_5FAA_73AF_70B9_7279_6548(anchor["地面环循环特效"])
@@ -104,8 +101,8 @@ local function _____6E05_7406_751F_547D_951A_70B9(anchor)
     _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI(anchor["激活进度UI"])
     anchor["圣光特效"] = 0
     anchor["激活进度UI"] = nil
-    local ____self_8 = anchor["单位实例"]
-    ____self_8["销毁"](____self_8)
+    local ____self_7 = anchor["单位实例"]
+    ____self_7["销毁"](____self_7)
 end
 local function _____6E05_7406_4E00_5207_751F_547D_7684_7EC8_70B9_5B9E_4F8B(instance)
     if instance["已清理"] then
@@ -116,9 +113,9 @@ local function _____6E05_7406_4E00_5207_751F_547D_7684_7EC8_70B9_5B9E_4F8B(insta
     _____9500_6BC1_7279_6548(instance["倒计时特效"])
     instance["倒计时特效"] = 0
     _____505C_6B62_5973_5996_54ED_568E_8DEF_5F84_7279_6548(instance)
-    local ____opt_9 = instance["锚点封锁"]
-    if ____opt_9 ~= nil then
-        ____opt_9["结束"]("一切生命的终点清理")
+    local ____opt_8 = instance["锚点封锁"]
+    if ____opt_8 ~= nil then
+        ____opt_8["结束"]("一切生命的终点清理")
     end
     instance["锚点封锁"] = nil
     do
@@ -190,8 +187,8 @@ local function _____6FC0_6D3B_751F_547D_951A_70B9(instance, anchor)
     end
     anchor["已激活"] = true
     if anchor["停留控制器"] ~= nil then
-        local ____self_11 = anchor["停留控制器"]
-        ____self_11["停止"](____self_11)
+        local ____self_10 = anchor["停留控制器"]
+        ____self_10["停止"](____self_10)
         anchor["停留控制器"] = nil
     end
     _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI(anchor["激活进度UI"])
@@ -265,8 +262,8 @@ local function _____521B_5EFA_751F_547D_951A_70B9(instance, x, y, index)
         ["已激活"] = false,
         ["已封锁"] = false
     }
-    local ____instance__951A_70B9_5217_8868_12 = instance["锚点列表"]
-    ____instance__951A_70B9_5217_8868_12[#____instance__951A_70B9_5217_8868_12 + 1] = anchor
+    local ____instance__951A_70B9_5217_8868_11 = instance["锚点列表"]
+    ____instance__951A_70B9_5217_8868_11[#____instance__951A_70B9_5217_8868_11 + 1] = anchor
     anchor["停留控制器"] = _____521B_5EFA_5355_4F4D_505C_7559_89E6_53D1_5668({
         ["名称"] = "安兹-生命锚点停留-" .. tostring(index + 1),
         ["中心单位"] = unitInstance["单位"],
@@ -365,8 +362,8 @@ local function _____64AD_653E_5973_5996_54ED_568E_8868_73B0(instance)
                 EXSetEffectSize(effect, stage["女妖哭嚎死亡波缩放"])
                 YDWETimerDestroyEffectSafe(stage["女妖哭嚎特效持续秒"], effect)
             end
-            local ____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_13 = instance["女妖哭嚎路径特效列表"]
-            ____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_13[#____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_13 + 1] = _____521B_5EFA_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548({
+            local ____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_12 = instance["女妖哭嚎路径特效列表"]
+            ____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_12[#____instance__5973_5996_54ED_568E_8DEF_5F84_7279_6548_5217_8868_12 + 1] = _____521B_5EFA_9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548({
                 ["模型路径"] = cfg["表现资源"]["女妖哭嚎路径叠加特效路径"],
                 ["起点X"] = x,
                 ["起点Y"] = y,
@@ -404,16 +401,15 @@ local function _____7ED3_7B97_5973_5996_54ED_568E(instance)
                 if not _____5355_4F4D_6709_6548(hero) or instance["庇护单位表"][GetHandleId(hero)] == true then
                     goto __continue54
                 end
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = hero,
-                    ["伤害"] = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * cfg["女妖哭嚎致命伤害最大生命比例"],
+                    ["伤害公式"] = {["目标最大生命比例"] = cfg["女妖哭嚎致命伤害最大生命比例"]},
                     attack = false,
                     ranged = true,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_UNIVERSAL,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能",
                     ["标签"] = "安兹·女妖哭嚎"
                 })
             end
@@ -460,9 +456,9 @@ ____exports["释放安兹一切生命的终点"] = function(context)
         GetUnitY(boss),
         _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
     )
-    local ____self_15 = context["清理"]
-    ____self_15["登记清理"](
-        ____self_15,
+    local ____self_14 = context["清理"]
+    ____self_14["登记清理"](
+        ____self_14,
         "安兹-一切生命的终点实例",
         function()
             _____6E05_7406_4E00_5207_751F_547D_7684_7EC8_70B9_5B9E_4F8B(instance)

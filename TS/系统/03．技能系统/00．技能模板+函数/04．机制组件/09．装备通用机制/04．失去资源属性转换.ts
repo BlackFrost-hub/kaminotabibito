@@ -14,7 +14,7 @@ const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
 
@@ -63,6 +63,7 @@ class 失去资源属性转换实现 implements 失去资源属性转换控制�
   readonly 控制器ID: number;
   private 参数: 失去资源属性转换参数;
   private 当前档位 = 0;
+  private Tick回调ID = 0;
   private 已停止 = false;
 
   constructor(名称: string, 参数: 失去资源属性转换参数, 控制器ID: number) {
@@ -70,8 +71,7 @@ class 失去资源属性转换实现 implements 失去资源属性转换控制�
     this.参数 = 参数;
     this.控制器ID = 控制器ID;
     this.刷新();
-    失去资源属性转换表[this.控制器ID] = this;
-    确保失去资源属性转换Tick(参数.检查间隔毫秒 ?? 200);
+    this.Tick回调ID = addPeriodicCallback(参数.检查间隔毫秒 ?? 200, on失去资源属性转换Tick, this);
   }
 
   读取档位(): number {
@@ -98,8 +98,10 @@ class 失去资源属性转换实现 implements 失去资源属性转换控制�
   停止(): void {
     if (this.已停止) return;
     this.已停止 = true;
-    delete 失去资源属性转换表[this.控制器ID];
-    尝试停止失去资源属性转换Tick();
+    if (this.Tick回调ID !== 0) {
+      removePeriodicCallback(this.Tick回调ID);
+      this.Tick回调ID = 0;
+    }
     if (this.当前档位 !== 0) {
       this.设置档位(0, 0);
     }
@@ -113,33 +115,14 @@ class 失去资源属性转换实现 implements 失去资源属性转换控制�
   }
 }
 
-const 失去资源属性转换表: Record<number, 失去资源属性转换实现> = {};
 let 失去资源属性转换计数 = 0;
-let 失去资源属性转换TickID = 0;
-
-function 确保失去资源属性转换Tick(this: void, interval: number): void {
-  if (失去资源属性转换TickID !== 0) return;
-  失去资源属性转换TickID = addPeriodicCallback(interval, on失去资源属性转换Tick);
-}
-
-function 尝试停止失去资源属性转换Tick(this: void): void {
-  for (const key in 失去资源属性转换表) {
-    if (失去资源属性转换表[key] != null) return;
-  }
-  if (失去资源属性转换TickID !== 0) {
-    removePeriodicCallback(失去资源属性转换TickID);
-    失去资源属性转换TickID = 0;
-  }
-}
 
 export function 创建失去资源属性转换(this: void, 参数: 失去资源属性转换参数): 失去资源属性转换控制器 {
   失去资源属性转换计数 += 1;
   return new 失去资源属性转换实现(参数.名称 ?? "失去资源属性转换", 参数, 失去资源属性转换计数);
 }
 
-function on失去资源属性转换Tick(this: void): void {
-  for (const key in 失去资源属性转换表) {
-    const 控制器 = 失去资源属性转换表[key];
-    if (控制器 != null) 控制器.刷新();
-  }
+function on失去资源属性转换Tick(this: void, variable?: any): void {
+  const 控制器 = variable as 失去资源属性转换实现 | undefined;
+  if (控制器 != null) 控制器.刷新();
 }

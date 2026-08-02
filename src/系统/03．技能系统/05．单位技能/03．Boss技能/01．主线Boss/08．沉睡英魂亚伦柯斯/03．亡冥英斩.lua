@@ -14,28 +14,26 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
+local _____521B_5EFA_76F4_7EBF_5B9A_70B9_8F68_8FF9 = ____01_FF0ETS_539F_751F_5F39_5E55["创建直线定点轨迹"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
-local addPeriodicCallback = ____require_result_3.addPeriodicCallback
-local removePeriodicCallback = ____require_result_3.removePeriodicCallback
-local getServerTime = ____require_result_3.getServerTime
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_GetPointZ = ____require_result_5.EC_GetPointZ
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local getServerTime = ____require_result_2.getServerTime
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_GetPointZ = ____require_result_4.EC_GetPointZ
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetHandleId = jass.GetHandleId
 local SetUnitFacing = jass.SetUnitFacing
 local IsUnitType = jass.IsUnitType
 local SquareRoot = jass.SquareRoot
@@ -53,17 +51,15 @@ local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 local RAD_TO_DEG = 57.29577951308232
 local _____4EA1_51A5_82F1_65A9_6280_80FDKey = "亡冥英斩"
 local function _____9020_6210_4EA1_51A5_82F1_65A9_4F24_5BB3(source, target, attackRatio, lifeRatio, tag)
-    local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(source, target, {["来源攻击力比例"] = attackRatio, ["目标最大生命比例"] = lifeRatio})
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
         ["来源"] = source,
         ["目标"] = target,
-        ["伤害"] = damage,
+        ["伤害公式"] = {["来源攻击力比例"] = attackRatio, ["目标最大生命比例"] = lifeRatio},
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_NORMAL,
         weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-        ["来源类型"] = "Boss技能",
         ["标签"] = tag
     })
 end
@@ -72,71 +68,26 @@ local function _____7ED3_675F_4EA1_51A5_82F1_65A9(context)
         context["当前大型技能"] = nil
     end
 end
-local function _____7ED3_675F_5F52_9B42_56DE_65A9_79FB_52A8(instance)
-    if instance["周期ID"] ~= 0 then
-        removePeriodicCallback(instance["周期ID"])
-        instance["周期ID"] = 0
+local function _____9500_6BC1_5F52_9B42_56DE_65A9_5F39_5E55(_____5F39_5E55)
+    if _____5F39_5E55 ~= nil and _____5F39_5E55["销毁"] ~= nil then
+        _____5F39_5E55["销毁"](_____5F39_5E55, "手动销毁")
     end
-    _____7ED3_675F_4EA1_51A5_82F1_65A9(instance.context)
 end
-local function _____7ED3_7B97_5F52_9B42_56DE_65A9_7ECF_8FC7_70B9(instance, x, y)
-    local boss = instance.context["Boss单位"]
-    local cfg = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["亡冥英斩"]
-    local hitRadius = cfg["路径宽度"] * 0.5
-    local hitRadiusSquared = hitRadius * hitRadius
-    local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+local function _____4E9A_4F26_67EF_65AF_5F52_9B42_76EE_6807_5141_8BB8(boss, target)
+    if not _____5355_4F4D_6709_6548(target) then
+        return false
+    end
+    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     do
         local i = 0
-        while i < #targets do
-            do
-                local target = targets[i + 1]
-                local handleId = GetHandleId(target)
-                if handleId == 0 or instance["已命中表"][handleId] == true then
-                    goto __continue9
-                end
-                local dx = GetUnitX(target) - x
-                local dy = GetUnitY(target) - y
-                if dx * dx + dy * dy > hitRadiusSquared then
-                    goto __continue9
-                end
-                instance["已命中表"][handleId] = true
-                _____9020_6210_4EA1_51A5_82F1_65A9_4F24_5BB3(
-                    boss,
-                    target,
-                    cfg["P3归魂伤害攻击力比例"],
-                    cfg["P3归魂伤害目标最大生命比例"],
-                    "亚伦柯斯·亡冥英斩-归魂回斩"
-                )
+        while i < #heroes do
+            if heroes[i + 1] == target then
+                return true
             end
-            ::__continue9::
             i = i + 1
         end
     end
-end
-local function _____63A8_8FDB_5F52_9B42_56DE_65A9(instance)
-    local context = instance.context
-    local boss = context["Boss单位"]
-    local cfg = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["亡冥英斩"]
-    if not _____5355_4F4D_6709_6548(boss) or context["战斗已结束"] or context["阶段"] ~= "P3最后的誓约" then
-        _____7ED3_675F_5F52_9B42_56DE_65A9_79FB_52A8(instance)
-        return
-    end
-    instance["已经过毫秒"] = instance["已经过毫秒"] + cfg["P3归魂Tick毫秒"]
-    local rawProgress = instance["已经过毫秒"] / (cfg["P3归魂推进秒"] * 1000)
-    local progress = rawProgress >= 1 and 1 or rawProgress
-    local x = instance["终点X"] + (instance["起点X"] - instance["终点X"]) * progress
-    local y = instance["终点Y"] + (instance["起点Y"] - instance["终点Y"]) * progress
-    if instance["特效"] ~= nil and instance["特效"] ~= 0 then
-        EXSetEffectXY(instance["特效"], x, y)
-        EXSetEffectZ(
-            instance["特效"],
-            EC_GetPointZ(x, y)
-        )
-    end
-    _____7ED3_7B97_5F52_9B42_56DE_65A9_7ECF_8FC7_70B9(instance, x, y)
-    if progress >= 1 then
-        _____7ED3_675F_5F52_9B42_56DE_65A9_79FB_52A8(instance)
-    end
+    return false
 end
 local function _____5B89_6392P3_5F52_9B42_56DE_65A9(context, startX, startY, endX, endY, distance, reverseFacing)
     local boss = context["Boss单位"]
@@ -162,8 +113,8 @@ local function _____5B89_6392P3_5F52_9B42_56DE_65A9(context, startX, startY, end
         )
         EXEffectMatRotateZ(trace, reverseFacing + cfg["P3剑痕朝向修正角度"])
         EXEffectMatScale(trace, distance / cfg["P3剑痕模型基准长度"], cfg["路径宽度"] / cfg["P3剑痕模型基准宽度"], 1)
-        local ____self_6 = context["清理"]
-        ____self_6["登记限时特效"](____self_6, "亚伦柯斯-归魂剑痕", trace, (cfg["P3归魂延迟秒"] + cfg["P3归魂推进秒"] + 0.1) * 1000)
+        local ____self_5 = context["清理"]
+        ____self_5["登记限时特效"](____self_5, "亚伦柯斯-归魂剑痕", trace, (cfg["P3归魂延迟秒"] + cfg["P3归魂推进秒"] + 0.1) * 1000)
     end
     local delayedId = addDelayedCallback(
         cfg["P3归魂延迟秒"] * 1000,
@@ -174,42 +125,54 @@ local function _____5B89_6392P3_5F52_9B42_56DE_65A9(context, startX, startY, end
             end
             _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["P3归魂动画编号"], ["持续秒"] = 1, ["恢复动画编号"] = 1})
             _____64AD_653EBoss_5750_6807_97F3_6548(_____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["音效"]["归魂剑痕"], endX, endY, _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["音效默认裁断距离"])
-            local effect = AddSpecialEffect(_____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["表现资源"]["归魂剑痕特效路径"], endX, endY)
-            if effect ~= nil and effect ~= 0 then
-                EXSetEffectXY(effect, endX, endY)
-                EXSetEffectZ(
-                    effect,
-                    EC_GetPointZ(endX, endY)
-                )
-                EXSetEffectSize(effect, cfg["P3归魂移动特效缩放"])
-                EXEffectMatRotateZ(effect, reverseFacing + cfg["P3剑痕朝向修正角度"])
-                local ____self_7 = context["清理"]
-                ____self_7["登记限时特效"](____self_7, "亚伦柯斯-归魂回斩移动特效", effect, (cfg["P3归魂推进秒"] + 0.1) * 1000)
-            end
-            local instance = {
-                context = context,
-                ["特效"] = effect,
-                ["起点X"] = startX,
-                ["起点Y"] = startY,
-                ["终点X"] = endX,
-                ["终点Y"] = endY,
-                ["已经过毫秒"] = 0,
-                ["周期ID"] = 0,
-                ["已命中表"] = {}
-            }
-            _____7ED3_7B97_5F52_9B42_56DE_65A9_7ECF_8FC7_70B9(instance, endX, endY)
-            instance["周期ID"] = addPeriodicCallback(
-                cfg["P3归魂Tick毫秒"],
-                function()
-                    _____63A8_8FDB_5F52_9B42_56DE_65A9(instance)
+            local _____5F39_5E55 = _____521B_5EFA_539F_751F_5F39_5E55({
+                ["所有者"] = boss,
+                ["载体模式"] = "特效",
+                X = endX,
+                Y = endY,
+                ["方向角"] = reverseFacing,
+                ["速度"] = distance / cfg["P3归魂推进秒"],
+                ["生命周期"] = cfg["P3归魂推进秒"],
+                ["最大距离"] = distance,
+                ["轨迹采样器"] = _____521B_5EFA_76F4_7EBF_5B9A_70B9_8F68_8FF9(endX, endY, startX, startY),
+                ["命中半径"] = cfg["路径宽度"] * 0.5,
+                ["影响目标"] = "敌方",
+                ["每单位最大命中次数"] = 1,
+                ["碰撞消失"] = false,
+                ["禁用碰撞"] = true,
+                ["附加特效1"] = {
+                    ["模型"] = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["表现资源"]["归魂剑痕特效路径"],
+                    ["跟随主弹幕参数"] = true,
+                    ["缩放X"] = distance / cfg["P3剑痕模型基准长度"],
+                    ["缩放Y"] = cfg["路径宽度"] / cfg["P3剑痕模型基准宽度"],
+                    ["缩放Z"] = 1,
+                    ["朝向角偏移"] = cfg["P3剑痕朝向修正角度"]
+                },
+                ["目标筛选"] = function(target)
+                    return _____4E9A_4F26_67EF_65AF_5F52_9B42_76EE_6807_5141_8BB8(boss, target)
+                end,
+                ["on命中"] = function(target)
+                    if not _____5355_4F4D_6709_6548(target) then
+                        return
+                    end
+                    _____9020_6210_4EA1_51A5_82F1_65A9_4F24_5BB3(
+                        boss,
+                        target,
+                        cfg["P3归魂伤害攻击力比例"],
+                        cfg["P3归魂伤害目标最大生命比例"],
+                        "亚伦柯斯·亡冥英斩-归魂回斩"
+                    )
+                end,
+                ["on结束"] = function()
+                    _____7ED3_675F_4EA1_51A5_82F1_65A9(context)
                 end
-            )
-            local ____self_8 = context["清理"]
-            ____self_8["登记周期回调"](____self_8, "亚伦柯斯-归魂回斩移动", instance["周期ID"])
+            })
+            local ____self_6 = context["清理"]
+            ____self_6["登记清理"](____self_6, "亚伦柯斯-归魂回斩弹幕", _____9500_6BC1_5F52_9B42_56DE_65A9_5F39_5E55, _____5F39_5E55)
         end
     )
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "亚伦柯斯-归魂回斩", delayedId)
+    local ____self_7 = context["清理"]
+    ____self_7["登记延迟回调"](____self_7, "亚伦柯斯-归魂回斩", delayedId)
 end
 ____exports["释放亚伦柯斯亡冥英斩"] = function(context, target)
     local boss = context["Boss单位"]
@@ -342,8 +305,8 @@ ____exports["释放亚伦柯斯亡冥英斩"] = function(context, target)
             end
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记延迟回调"](____self_10, "亚伦柯斯-亡冥英斩前摇", delayedId)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "亚伦柯斯-亡冥英斩前摇", delayedId)
     return true
 end
 ____exports["亡冥英斩迁移状态"] = {

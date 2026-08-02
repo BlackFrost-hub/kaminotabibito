@@ -2,16 +2,20 @@
 
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 获取或创建影骨莫特斯上下文, type 影骨莫特斯运行时上下文, type 影骨召唤组 } from "./01．运行时上下文";
-import { 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
+import { 影骨莫特斯模型动画配置, 影骨莫特斯数值与表现配置, 影骨莫特斯表现配置, 影骨莫特斯音效配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
-import { 单位有效, 播放影骨莫特斯限时动作, 开始影骨莫特斯常规施法, stringToFourCC, 极坐标X, 极坐标Y, 取单位ID } from "./11．公共工具";
+import { 单位有效, stringToFourCC, 极坐标X, 极坐标Y, 取单位ID } from "./11．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 计算组合技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害";
 import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 import { 创建固定时间轴阶段列表 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
+import { 创建召唤物组状态 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/03．召唤物组状态管理";
 import { 施加临时属性效果 } from "../../../../00．技能模板+函数/01．技能函数/20．物品辅助/19．临时属性效果";
 import type { 临时属性效果实例, 临时属性效果项 } from "../../../../00．技能模板+函数/01．技能函数/20．物品辅助/19．临时属性效果";
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
+};
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
@@ -74,8 +78,13 @@ interface 影骨符咒变量 {
 
 interface 影骨召唤物变量 {
   context: 影骨莫特斯运行时上下文;
-  group?: 影骨召唤组;
-  canReform: boolean;
+}
+
+interface 影骨召唤组变量 {
+  context: 影骨莫特斯运行时上下文;
+  阶段: 影骨莫特斯运行时上下文["阶段"];
+  允许重组: boolean;
+  重组已安排: boolean;
 }
 
 interface 影骨骸骨重组变量 {
@@ -224,34 +233,34 @@ function 影骨骸骨战士重组(this: void, variable: 影骨骸骨重组变量
   const angle = GetRandomReal(0, 360);
   const x = 极坐标X(GetUnitX(context.Boss单位), 影骨莫特斯数值与表现配置.骸骨召唤.召唤偏移半径, angle);
   const y = 极坐标Y(GetUnitY(context.Boss单位), 影骨莫特斯数值与表现配置.骸骨召唤.召唤偏移半径, angle);
-  创建影骨召唤物(context, 骸骨战士ID, x, y, undefined, false);
+  创建影骨召唤物(context, 骸骨战士ID, x, y);
   创建点特效({ 模型路径: 影骨莫特斯表现配置.骸骨战士重组, X: x, Y: y, 持续秒: 影骨莫特斯数值与表现配置.骸骨召唤.瞬时特效持续秒 });
   播放Boss坐标音效(随机取影骨音效路径(影骨莫特斯音效配置.骸骨召唤.骸骨战士重组列表), x, y, 影骨莫特斯音效配置.默认裁断距离);
 }
 
-function 尝试重组骸骨战士(this: void, context: 影骨莫特斯运行时上下文, group: 影骨召唤组): void {
-  if (group.已重组 || group.阶段 >= 3 || group.死亡数 < group.总数) return;
-  group.已重组 = true;
-  const id = addDelayedCallback(影骨莫特斯数值与表现配置.骸骨召唤.重组延迟秒 * 1000, 影骨骸骨战士重组, { context } as 影骨骸骨重组变量);
-  context.清理.登记延迟回调("影骨-骸骨重组", id);
+function 影骨召唤物死亡(this: void, unit: any, _killer: any, _group: 影骨召唤组, variable?: any): void {
+  清除影骨召唤物登记(unit);
+  const groupVariable = variable as 影骨召唤组变量 | undefined;
+  if (groupVariable == null) return;
+  const context = groupVariable.context;
+  创建骸骨符咒(context, GetUnitX(unit), GetUnitY(unit));
 }
 
-function 影骨召唤物死亡(this: void, unit: any, _killer: any, variable: 影骨召唤物变量): void {
-  清除影骨召唤物登记(unit);
-  if (variable == null) return;
-  const context = variable.context;
-  创建骸骨符咒(context, GetUnitX(unit), GetUnitY(unit));
-  if (variable.group != null && variable.canReform) {
-    variable.group.死亡数 += 1;
-    尝试重组骸骨战士(context, variable.group);
-  }
+function 影骨召唤组全部死亡(this: void, _group: 影骨召唤组, variable?: any): void {
+  const groupVariable = variable as 影骨召唤组变量 | undefined;
+  if (groupVariable == null || !groupVariable.允许重组 || groupVariable.重组已安排 || groupVariable.阶段 >= 3) return;
+  const context = groupVariable.context;
+  if (!单位有效(context.Boss单位)) return;
+  groupVariable.重组已安排 = true;
+  const id = addDelayedCallback(影骨莫特斯数值与表现配置.骸骨召唤.重组延迟秒 * 1000, 影骨骸骨战士重组, { context } as 影骨骸骨重组变量);
+  context.清理.登记延迟回调("影骨-骸骨重组", id);
 }
 
 function 影骨召唤物销毁(this: void, unit: any, variable: 影骨召唤物变量): void {
   清除影骨召唤物登记(unit);
 }
 
-export function 创建影骨召唤物(this: void, context: 影骨莫特斯运行时上下文, unitType: number, x: number, y: number, group?: 影骨召唤组, canReform: boolean = true): any {
+export function 创建影骨召唤物(this: void, context: 影骨莫特斯运行时上下文, unitType: number, x: number, y: number, group?: 影骨召唤组): any {
   const cfg = 影骨莫特斯数值与表现配置.骸骨召唤;
   const bossMaxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
   const 最大生命 = unitType === 骸骨战士ID
@@ -268,19 +277,36 @@ export function 创建影骨召唤物(this: void, context: 影骨莫特斯运行
     朝向: GetRandomReal(0, 360),
     最大生命,
     持续时间: unitType === 骸骨战士ID ? cfg.骸骨战士持续秒 : cfg.骷髅持续秒,
-    变量: { context, group, canReform } as 影骨召唤物变量,
-    on死亡: 影骨召唤物死亡,
+    变量: { context } as 影骨召唤物变量,
     on销毁: 影骨召唤物销毁,
   });
   if (instance != null && instance.单位 != null) {
     登记影骨召唤物(instance.单位, context);
-    if (group != null) group.单位列表.push(instance.单位);
+    if (group != null) group.登记(instance.单位);
     if (context.幽影爆发中) registerManualBuff(instance.单位, 影骨莫特斯BuffID.暗影强化, 影骨莫特斯数值与表现配置.幽影爆发.持续秒, 1, { sourceName: "影骨-暗影强化" });
     const target = 获取Boss技能随机敌对英雄(context.Boss单位);
     if (单位有效(target)) IssueTargetOrder(instance.单位, "attack", target);
     创建点特效({ 模型路径: 影骨莫特斯表现配置.骷髅出生, X: x, Y: y, 持续秒: cfg.瞬时特效持续秒 });
   }
   return instance;
+}
+
+export function 创建影骨召唤组(this: void, context: 影骨莫特斯运行时上下文, 阶段: 影骨莫特斯运行时上下文["阶段"] = context.阶段, 允许重组: boolean = true, 预期数量: number = 4): 影骨召唤组 {
+  const groupVariable: 影骨召唤组变量 = {
+    context,
+    阶段,
+    允许重组,
+    重组已安排: false,
+  };
+  const group = 创建召唤物组状态({
+    清理: context.清理,
+    名称: "影骨-骸骨召唤组",
+    变量: groupVariable,
+    on单位死亡: 影骨召唤物死亡,
+    on全部死亡: 影骨召唤组全部死亡,
+  });
+  group.开始批次(预期数量);
+  return group;
 }
 
 function 召唤影骨骷髅(this: void, context: 影骨莫特斯运行时上下文, group: 影骨召唤组, count: number): void {
@@ -296,7 +322,7 @@ function 召唤影骨骷髅(this: void, context: 影骨莫特斯运行时上下�
       soundY = y;
     }
     创建点特效({ 模型路径: 影骨莫特斯表现配置.骸骨召唤预警, X: x, Y: y, 持续秒: 影骨莫特斯数值与表现配置.骸骨召唤.瞬时特效持续秒 });
-    创建影骨召唤物(context, 骷髅盗贼ID, x, y, group, true);
+    创建影骨召唤物(context, 骷髅盗贼ID, x, y, group);
   }
   播放Boss坐标音效(影骨莫特斯音效配置.骸骨召唤.骷髅盗贼出生, soundX, soundY, 影骨莫特斯音效配置.默认裁断距离);
 }
@@ -313,14 +339,7 @@ export function 释放影骨骸骨召唤(this: void, context: 影骨莫特斯运
     });
   }
   if (context.骸骨召唤组合执行器.是否运行中()) return undefined;
-  const group: 影骨召唤组 = {
-    ID: ++context.下一个召唤组ID,
-    阶段: context.阶段,
-    总数: 4,
-    死亡数: 0,
-    已重组: false,
-    单位列表: [],
-  };
+  const group = 创建影骨召唤组(context, context.阶段, true, 4);
   const 执行ID = context.骸骨召唤组合执行器.开始({
     key: "骸骨召唤",
     单位: boss,
@@ -337,13 +356,34 @@ export function 释放影骨骸骨召唤(this: void, context: 影骨莫特斯运
       名称: "骸骨召唤第三批",
       执行: function 影骨骸骨召唤第三批(this: void): void {
         召唤影骨骷髅(context, group, 1);
+        group.结束批次();
       },
     }]),
   });
-  if (执行ID === 0) return undefined;
-  开始影骨莫特斯常规施法(boss, 3, "骸骨召唤", "莫特斯正在分批唤醒骸骨盗贼");
-  播放影骨莫特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动画播放秒);
-  播放影骨莫特斯台词(boss, "骸骨召唤");
+  if (执行ID === 0) {
+    group.销毁();
+    return undefined;
+  }
+  启动基础施法时间线({
+    名称: "影骨-骸骨召唤",
+    施法者: boss,
+    硬直秒: 3,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    恢复动画编号: 影骨莫特斯模型动画配置.战斗待机编号,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: 3,
+      颜色ID: 4,
+      标题文本: "骸骨召唤",
+      提示文本: "莫特斯正在分批唤醒骸骨盗贼",
+    },
+    清理: context.清理,
+    播放台词: function 影骨骸骨召唤台词(this: void): void {
+      播放影骨莫特斯台词(boss, "骸骨召唤");
+    },
+    on生效: function 影骨骸骨召唤时间线生效(this: void): void {},
+  });
   context.当前召唤组 = group;
   召唤影骨骷髅(context, group, 2);
   return group;

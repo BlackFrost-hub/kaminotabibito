@@ -18,6 +18,7 @@ import { 创建单位运行时上下文工厂 } from "../../../../00．技能模
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
 import { 创建阶段上下文, type 阶段上下文 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/01．阶段上下文";
 import type { 固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
+import type { 限时摧毁目标组实例 } from "../../../../00．技能模板+函数/04．机制组件/05．机制单位/02．限时摧毁目标组";
 
 const jass = require("jass.common") as any;
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
@@ -51,7 +52,7 @@ export interface 米亚运行时上下文 {
   腐化转移污染平台ID?: string;
   腐化转移污染结束Ms: number;
   腐化转移下次叠层Ms: number;
-  腐化转移组合执行器?: 固定组合技能执行器<米亚运行时上下文>;
+  腐化转移施法中: boolean;
   超载平台ID表: Record<string, boolean | undefined>;
   超载平台下次叠层Ms表: Record<string, number | undefined>;
   上次平台超载台词Ms: number;
@@ -59,7 +60,7 @@ export interface 米亚运行时上下文 {
   腐化黏液上次受伤提示Ms: number;
   终极污染引导中: boolean;
   终极污染组合执行器?: 固定组合技能执行器<米亚运行时上下文>;
-  终极污染核心列表: any[];
+  终极污染核心组?: 限时摧毁目标组实例;
   终极污染本次叠层表: Record<number, number | undefined>;
 }
 
@@ -135,13 +136,14 @@ function 创建米亚上下文(this: void, boss: any, 清理: 机制清理篮子
     腐化转移污染平台ID: "",
     腐化转移污染结束Ms: 0,
     腐化转移下次叠层Ms: 0,
+    腐化转移施法中: false,
     超载平台ID表: {},
     超载平台下次叠层Ms表: {},
     上次平台超载台词Ms: 0,
     腐化黏液近战冷却表: {},
     腐化黏液上次受伤提示Ms: 0,
     终极污染引导中: false,
-    终极污染核心列表: [],
+    终极污染核心组: undefined,
     终极污染本次叠层表: {},
   };
   context.腐化层数控制器 = 创建米亚腐化层数控制器(context);

@@ -71,10 +71,11 @@ export interface ChestTypeConfig {
 }
 
 export const 宝箱系统开关 = true;
+export const 影骨莫特斯盗贼宝箱可破坏物ID = "B00Z";
 
 export const CHEST_TYPES: ChestTypeConfig[] = [
   {
-    destructableType: "B00Z",
+    destructableType: 影骨莫特斯盗贼宝箱可破坏物ID,
     openTime: 3.0,
     name: "盗贼宝箱",
     picks: 1,

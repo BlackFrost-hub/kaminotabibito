@@ -4,37 +4,27 @@ import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科特阶段, type 里科特运行时上下文 } from "./01．运行时上下文";
 import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
-import { 单位有效, 播放里科特施法维持动作, stringToFourCC, 取坐标角度, 极坐标X, 极坐标Y, 点到线段距离平方 } from "./13．公共工具";
+import { 单位有效, stringToFourCC, 取坐标角度, 极坐标X, 极坐标Y, 点到线段距离平方 } from "./13．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 启动持续施法发射, 停止持续施法发射, type 持续施法发射回调上下文 } from "../../../../00．技能模板+函数/02．通用函数/14．持续施法发射";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-const CreateUnit = jass.CreateUnit as (id: any, unitid: number, x: number, y: number, face: number) => any;
 const RemoveUnit = jass.RemoveUnit as (whichUnit: any) => void;
-const SetUnitScale = jass.SetUnitScale as (whichUnit: any, scaleX: number, scaleY: number, scaleZ: number) => void;
-const SetUnitVertexColor = jass.SetUnitVertexColor as (whichUnit: any, red: number, green: number, blue: number, alpha: number) => void;
-const UnitAddAbility = jass.UnitAddAbility as (whichUnit: any, abilityId: number) => boolean;
-const SetUnitPathing = jass.SetUnitPathing as (whichUnit: any, flag: boolean) => void;
 const GetRandomReal = jass.GetRandomReal as (lowBound: number, highBound: number) => number;
-const DzSetUnitModel = japi.DzSetUnitModel as (this: void, whichUnit: any, modelPath: string) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { createTimedEffect, 创建点特效 } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
@@ -55,8 +45,8 @@ const { 里科特BuffID } = require("系统.05．Buff系统.03．Buff表.01．Bo
 const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容") as {
   施加眩晕: (this: void, source: any, target: any, duration: number) => void;
 };
-const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
-  X_FixUnitStandingSafe: (this: void, unit: any) => void;
+const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
+  创建召唤物: (this: void, 参数: any) => any;
 };
 
 interface 湮灭投影 {
@@ -70,16 +60,67 @@ const 湮灭之炮技能ID = stringToFourCC(里科特数值与表现配置.湮�
 const 蝗虫技能ID = stringToFourCC("Aloc");
 let 已注册 = false;
 
+function 启动湮灭投影施法动作(this: void, data: 湮灭投影, 持续秒: number): void {
+  if (!单位有效(data.投影)) return;
+  const cfg = 里科特数值与表现配置.湮灭之炮;
+  启动基础施法时间线({
+    名称: "里科特-湮灭投影施法",
+    施法者: data.投影,
+    硬直秒: cfg.施法硬直秒,
+    生效延迟秒: 持续秒,
+    动画编号: 8,
+    动画速度: cfg.动画速度,
+    后续动画编号: 9,
+    后续动画速度: 1,
+    后续动画延迟毫秒: cfg.施法动作原始时长秒 * 1000 / cfg.动画速度,
+    恢复动画编号: 3,
+    清理: data.context.清理,
+    on生效: function 里科特湮灭投影施法表现结束(this: void): void {},
+  });
+}
+
+function 启动湮灭之炮Boss施法动作(this: void, context: 里科特运行时上下文, 持续秒: number): void {
+  const boss = context.Boss单位;
+  const cfg = 里科特数值与表现配置.湮灭之炮;
+  启动基础施法时间线({
+    名称: "里科特-湮灭之炮施法",
+    施法者: boss,
+    硬直秒: cfg.施法硬直秒,
+    生效延迟秒: 持续秒,
+    动画编号: 8,
+    动画速度: cfg.动画速度,
+    后续动画编号: 9,
+    后续动画速度: 1,
+    后续动画延迟毫秒: cfg.施法动作原始时长秒 * 1000 / cfg.动画速度,
+    恢复动画编号: 3,
+    清理: context.清理,
+    播放台词: function 里科特湮灭之炮台词(this: void): void {
+      播放里科特台词(boss, "湮灭之炮");
+    },
+    on生效: function 里科特湮灭之炮施法表现结束(this: void): void {},
+  });
+}
+
 function 创建湮灭投影单位(this: void, boss: any, x: number, y: number, face: number): any {
   const cfg = 里科特数值与表现配置.湮灭之炮;
-  const projection = CreateUnit(GetOwningPlayer(boss), stringToFourCC(cfg.投影单位类型), x, y, face);
+  const projection = 创建召唤物({
+    主人单位: boss,
+    单位类型: stringToFourCC(cfg.投影单位类型),
+    X: x,
+    Y: y,
+    朝向: face,
+    飞行高度: 0,
+    模型文件: cfg.投影模型路径,
+    添加技能: [蝗虫技能ID],
+    禁用路径: true,
+    固定站桩: true,
+    缩放: cfg.投影缩放,
+    红: 160,
+    绿: 210,
+    蓝: 255,
+    透明度: cfg.投影透明度,
+  });
   if (projection == null || projection === 0) return projection;
-  DzSetUnitModel(projection, cfg.投影模型路径);
-  UnitAddAbility(projection, 蝗虫技能ID);
-  SetUnitPathing(projection, false);
-  X_FixUnitStandingSafe(projection);
-  SetUnitScale(projection, cfg.投影缩放, cfg.投影缩放, cfg.投影缩放);
-  SetUnitVertexColor(projection, 160, 210, 255, cfg.投影透明度);
   createTimedEffect(cfg.出现特效路径, x, y, 0, cfg.出现特效持续秒);
   return projection;
 }
@@ -124,24 +165,24 @@ function 结算湮灭之炮一跳(this: void, ctx: 持续施法发射回调上�
   创建湮灭之炮射线(ctx, 终点X, 终点Y);
 
   const heroes = 获取Boss技能敌对英雄列表(boss);
-  const damage = 读取单位攻击力(boss) * cfg.每跳Boss攻击力比例;
   const radius2 = 90 * 90;
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     const dist2 = 点到线段距离平方(GetUnitX(hero), GetUnitY(hero), ctx.起点X, ctx.起点Y, 终点X, 终点Y);
     if (dist2 <= radius2) {
-      造成AOE技能伤害({
+      执行BossAOE技能伤害({
         技能ID: 湮灭之炮技能ID,
         来源: boss,
         目标: hero,
-        伤害: damage,
+        伤害公式: {
+          来源攻击力比例: cfg.每跳Boss攻击力比例,
+        },
         attack: false,
         ranged: false,
         attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_MAGIC,
         weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
       });
     }
   }
@@ -194,13 +235,13 @@ function 调度单个湮灭投影(
   const face = 取坐标角度(px, py, GetUnitX(target), GetUnitY(target));
   const projection = 创建湮灭投影单位(boss, px, py, face);
   const delay = 阶段 >= 2 ? cfg.P2锁定前延迟秒 : cfg.锁定前延迟秒;
-  if (单位有效(projection)) 播放里科特施法维持动作(projection, delay + cfg.锁定持续秒, cfg.动画速度);
-  播放Boss坐标音效(里科特音效配置.湮灭之炮.投影锁定, px, py, 里科特音效配置.默认裁断距离);
   const data: 湮灭投影 = {
     context,
     投影: projection,
     目标: target,
   };
+  启动湮灭投影施法动作(data, delay + cfg.锁定持续秒);
+  播放Boss坐标音效(里科特音效配置.湮灭之炮.投影锁定, px, py, 里科特音效配置.默认裁断距离);
   if (projection != null && projection !== 0) context.清理.登记单位("里科特-湮灭投影", projection);
   registerManualBuff(target, 里科特BuffID.湮灭锁定, delay + cfg.锁定持续秒, 1, { sourceName: "里科特-湮灭锁定" });
   创建技能提示圈({
@@ -265,8 +306,7 @@ export function 释放里科特湮灭之炮(this: void, context: 里科特运行
   const cfg = 里科特数值与表现配置.湮灭之炮;
   const 阶段 = 刷新里科特阶段(context);
   const castDuration = 阶段 >= 2 ? cfg.P2锁定前延迟秒 : cfg.锁定前延迟秒;
-  播放里科特施法维持动作(boss, castDuration, cfg.动画速度);
-  播放里科特台词(boss, "湮灭之炮");
+  启动湮灭之炮Boss施法动作(context, castDuration);
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
     调度单个湮灭投影(context, 阶段, heroes[i]);

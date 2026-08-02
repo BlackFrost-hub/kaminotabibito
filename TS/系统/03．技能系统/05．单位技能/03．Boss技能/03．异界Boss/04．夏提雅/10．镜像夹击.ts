@@ -7,7 +7,7 @@ import { 重置夏提雅猎血连击 } from './01．运行时上下文';
 import { 清理英灵战乙女投影 } from './09．英灵战乙女';
 import { 开始冲锋, 停止单位位移 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import { 创建立即执行阶段, 创建延迟阶段 } from '../../../../00．技能模板+函数/00．技能模板/01．多阶段技能编排/06．技能阶段链执行器';
 import { 播放夏提雅台词 } from './18．台词播放';
@@ -57,9 +57,6 @@ const { createTimedEffect } = require('lib.扩展函数.封装函数.01．通用
 };
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const { 施加快速减速Buff } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff') as {
   施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number) => void;
@@ -178,20 +175,18 @@ function 启动镜像夹击投影冲锋(this: void, context: 夏提雅运行时�
 
 function 造成镜像夹击伤害(this: void, context: 夏提雅运行时上下文, target: any, ratio: number, tag: string): void {
   const cfg = 夏提雅数值与表现配置.P2;
-  const damage = 计算组合技能伤害(context.Boss单位, target, {
-    来源攻击力比例: cfg.镜像夹击本体伤害攻击力比例 * ratio,
-    目标最大生命比例: cfg.镜像夹击本体伤害目标最大生命比例 * ratio,
-  });
-  造成AOE技能伤害({
+  执行BossAOE技能伤害({
     来源: context.Boss单位,
     目标: target,
-    伤害: damage,
+    伤害公式: {
+      来源攻击力比例: cfg.镜像夹击本体伤害攻击力比例 * ratio,
+      目标最大生命比例: cfg.镜像夹击本体伤害目标最大生命比例 * ratio,
+    },
     attack: false,
     ranged: false,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
     weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-    来源类型: 'Boss技能',
     标签: tag,
   });
 }

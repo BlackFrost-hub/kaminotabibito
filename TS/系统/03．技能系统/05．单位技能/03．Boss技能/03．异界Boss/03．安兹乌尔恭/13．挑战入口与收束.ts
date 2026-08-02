@@ -13,6 +13,13 @@ const { 主动结束Boss战运行 } = require('系统.03．技能系统.06．AI�
 const { 清理Boss自动技能启动上下文 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表') as {
   清理Boss自动技能启动上下文: (this: void, boss: any) => void;
 };
+const { 打开Boss死亡首领奖励UI } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑') as {
+  打开Boss死亡首领奖励UI: (this: void, rewardPoolId: string) => void;
+};
+const { 安兹基础挑战奖励池ID, 安兹守护者挑战奖励池ID } = require('系统.02．物品系统.18．首领奖励选择.01．奖励配置表.20．异界_安兹乌尔恭战利品') as {
+  安兹基础挑战奖励池ID: string;
+  安兹守护者挑战奖励池ID: string;
+};
 const { addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
@@ -65,6 +72,7 @@ export function 启动安兹挑战收束(this: void, context: 安兹运行时上
     if (单位有效(albedo)) ShowUnit(albedo, false);
     ShowUnit(boss, false);
     主动结束Boss战运行(boss, { 跳过死亡音效: true, 跳过死亡剧情: true });
+    打开Boss死亡首领奖励UI(context.模式 === '守护者介入' ? 安兹守护者挑战奖励池ID : 安兹基础挑战奖励池ID);
     清理Boss自动技能启动上下文(boss);
     清理安兹运行时上下文(boss);
   });

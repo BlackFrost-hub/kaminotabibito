@@ -25,19 +25,26 @@ local _____663E_793A_81F4_547D_8BFB_6761 = ____19_FF0E_516C_5171_5DE5_5177["显�
 local _____5F00_59CB_65BD_6CD5_786C_76F4 = ____19_FF0E_516C_5171_5DE5_5177["开始施法硬直"]
 local _____8BBE_7F6E_5355_4F4D_52A8_753B = ____19_FF0E_516C_5171_5DE5_5177["设置单位动画"]
 local _____53D6_83F2_5C3C_514B_65AF_5C14_654C_5BF9_76EE_6807_5217_8868 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔敌对目标列表"]
-local _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击最大生命伤害"]
-local _____9020_6210_6697_706B_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成暗火伤害"]
+local _____53D6_83F2_5C3C_514B_65AF_5C14_6280_80FD_5F3A_5EA6_500D_7387 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔技能强度倍率"]
 local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587 = ____19_FF0E_516C_5171_5DE5_5177["创建菲尼克斯尔独立伤害上下文"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.18．单位动画守护")
 local _____521B_5EFA_5355_4F4D_52A8_753B_5B88_62A4 = ____require_result_0["创建单位动画守护"]
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
 local doHeal = ____require_result_2.doHeal
+local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_3.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
 local jass = require("jass.common")
 local KillUnit = jass.KillUnit
 local RemoveUnit = jass.RemoveUnit
 local SetUnitTimeScale = jass.SetUnitTimeScale
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
+local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
+local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local function _____64AD_653E_6C38_6052_8F6E_56DE_70B9_7279_6548(model, x, y, lifeMs, scale)
     return _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = model,
@@ -112,9 +119,16 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
     if context["永恒轮回已触发"] or context["当前形态"] ~= "第二形态" or not _____5355_4F4D_5B58_6D3B(context.Boss) then
         return
     end
+    local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]
     context["永恒轮回已触发"] = true
     context["当前形态"] = "永恒轮回"
-    local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]
+    registerManualBuff(
+        context.Boss,
+        _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["永恒轮回"],
+        config["永恒轮回引导秒"],
+        1,
+        {stack = 1, sourceName = "菲尼克斯尔-永恒轮回"}
+    )
     local _____4F24_5BB3_4E0A_4E0B_6587 = _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_72EC_7ACB_4F24_5BB3_4E0A_4E0B_6587("菲尼克斯尔永恒轮回", config["永恒轮回引导秒"] + 2)
     _____64AD_653E_83F2_5C3C_514B_65AF_5C14_53F0_8BCD(context.Boss, "永恒轮回")
     _____5F00_59CB_65BD_6CD5_786C_76F4(context.Boss, config["永恒轮回引导秒"])
@@ -157,8 +171,8 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                 ["间隔秒"] = eggAnimation["守护间隔秒"],
                 ["调试名"] = "菲尼克斯尔-凤凰蛋动画守护"
             })
-            local ____context__51E4_51F0_86CB_5217_8868_3 = context["凤凰蛋列表"]
-            ____context__51E4_51F0_86CB_5217_8868_3[#____context__51E4_51F0_86CB_5217_8868_3 + 1] = {["单位"] = egg, ["已摧毁"] = false}
+            local ____context__51E4_51F0_86CB_5217_8868_4 = context["凤凰蛋列表"]
+            ____context__51E4_51F0_86CB_5217_8868_4[#____context__51E4_51F0_86CB_5217_8868_4 + 1] = {["单位"] = egg, ["已摧毁"] = false}
             i = i + 1
         end
     end
@@ -187,13 +201,14 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
             end
         end
     )
-    local ____self_4 = context["清理"]
-    ____self_4["登记周期回调"](____self_4, "菲尼克斯尔-永恒轮回能量上升", _____80FD_91CF_4E0A_5347timerId)
+    local ____self_5 = context["清理"]
+    ____self_5["登记周期回调"](____self_5, "菲尼克斯尔-永恒轮回能量上升", _____80FD_91CF_4E0A_5347timerId)
     _____5EF6_8FDF(
         config["永恒轮回引导秒"] * 1000,
         function()
             _____505C_6B62_5468_671F(_____80FD_91CF_4E0A_5347timerId)
             SetUnitTimeScale(context.Boss, 1)
+            _____79FB_9664_5355_4F4D_6307_5B9ABuff(context.Boss, _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["永恒轮回"])
             local aliveEggs = 0
             do
                 local i = 0
@@ -223,13 +238,23 @@ ____exports["触发菲尼克斯尔永恒轮回"] = function(context)
                 do
                     local i = 0
                     while i < #heroes do
-                        _____9020_6210_6697_706B_4F24_5BB3(
-                            context.Boss,
-                            heroes[i + 1],
-                            _____8BA1_7B97_653B_51FB_6700_5927_751F_547D_4F24_5BB3(context.Boss, heroes[i + 1], config["轮回失败全场伤害Boss攻击力比例"], config["轮回失败全场伤害目标最大生命比例"]),
-                            "AOE",
-                            _____4F24_5BB3_4E0A_4E0B_6587
-                        )
+                        if _____5355_4F4D_5B58_6D3B(context.Boss) and _____5355_4F4D_5B58_6D3B(heroes[i + 1]) then
+                            _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                                ["技能实例ID"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["技能实例ID"],
+                                ["标签"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["标签"],
+                                ["来源"] = context.Boss,
+                                ["目标"] = heroes[i + 1],
+                                ["伤害公式"] = {
+                                    ["来源攻击力比例"] = config["轮回失败全场伤害Boss攻击力比例"],
+                                    ["目标最大生命比例"] = config["轮回失败全场伤害目标最大生命比例"],
+                                    ["总倍率"] = _____53D6_83F2_5C3C_514B_65AF_5C14_6280_80FD_5F3A_5EA6_500D_7387(context.Boss)
+                                },
+                                ranged = true,
+                                attackType = ATTACK_TYPE_NORMAL,
+                                ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
+                                weaponType = WEAPON_TYPE_WHOKNOWS
+                            })
+                        end
                         _____64AD_653E_6C38_6052_8F6E_56DE_70B9_7279_6548(
                             _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["特效"]["永恒轮回失败伤害"],
                             _____53D6_5355_4F4DX(heroes[i + 1]),
@@ -271,8 +296,8 @@ ____exports["初始化菲尼克斯尔永恒轮回节点"] = function(context)
             end
         end
     )
-    local ____self_5 = context["清理"]
-    ____self_5["登记周期回调"](____self_5, "菲尼克斯尔-永恒轮回检测", timerId)
+    local ____self_10 = context["清理"]
+    ____self_10["登记周期回调"](____self_10, "菲尼克斯尔-永恒轮回检测", timerId)
 end
 ____exports["注册菲尼克斯尔永恒轮回"] = function()
 end

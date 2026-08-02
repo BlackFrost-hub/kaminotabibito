@@ -7,3 +7,5 @@ export * from "./06．单位停留触发器";
 export * from "./07．战斗状态触发器";
 export * from "./08．次数型伤害免疫";
 export * from "./09．伤害生命下限保护";
+export * from "./10．致命伤害保命与限时免疫";
+export * from "./11．条件伤害修正";

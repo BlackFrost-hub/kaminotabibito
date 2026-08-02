@@ -3,16 +3,13 @@
 import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
+import { 执行BossAOE技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 开始击退 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { 开始雅儿贝德冲锋 } from './00．冲锋表现';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
-import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, 配置: any) => any;
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -98,24 +95,20 @@ export function 释放雅儿贝德守护回归(this: void, context: 安兹运行
       允许重复命中: false,
       命中后结束: false,
       命中回调: function 守护回归命中(this: void, mover: any, target: any): void {
-        const damage = 计算组合技能伤害(mover, target, {
-          来源攻击力比例: cfg.守护回归伤害攻击力比例,
-          目标最大生命比例: cfg.守护回归伤害目标最大生命比例,
+        执行BossAOE技能伤害({
+          来源: mover,
+          目标: target,
+          伤害公式: {
+            来源攻击力比例: cfg.守护回归伤害攻击力比例,
+            目标最大生命比例: cfg.守护回归伤害目标最大生命比例,
+          },
+          attack: false,
+          ranged: false,
+          attackType: ATTACK_TYPE_NORMAL,
+          伤害类型: DAMAGE_TYPE_NORMAL,
+          weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+          标签: '雅儿贝德·守护回归',
         });
-        if (damage > 0) {
-          造成AOE技能伤害({
-            来源: mover,
-            目标: target,
-            伤害: damage,
-            attack: false,
-            ranged: false,
-            attackType: ATTACK_TYPE_NORMAL,
-            伤害类型: DAMAGE_TYPE_NORMAL,
-            weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-            来源类型: 'Boss技能',
-            标签: '雅儿贝德·守护回归',
-          });
-        }
         开始击退(target, {
           来源单位: mover,
           距离: cfg.守护回归击退距离,

@@ -1,11 +1,8 @@
 /** @noSelfInFile */
 
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
-
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 立即设置单位朝向 } from "../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
+import { 执行BossAOE技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 格鲁姆公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
   播放格鲁姆台词,
@@ -18,6 +15,9 @@ const {  巴尔扎罗斯技能数值配置,
   GetUnitY,
   CosBJ,
   SinBJ,
+  ATTACK_TYPE_NORMAL,
+  DAMAGE_TYPE_FIRE,
+  WEAPON_TYPE_WHOKNOWS,
   快速控制_击晕,
   单位有效,
   点到单位距离平方,
@@ -35,15 +35,6 @@ function 目标在重锤扇形内(this: void, grum: any, target: any, facing: nu
   return 角度差绝对值(angle, facing) <= config.扇形角度 * 0.5;
 }
 
-function 计算重锤伤害(this: void, grum: any, target: any): number {
-  const config = 巴尔扎罗斯技能数值配置.熔岩重锤;
-  return 计算组合技能伤害(grum, target, {
-    来源攻击力比例: config.伤害攻击力比例,
-    目标最大生命比例: config.伤害目标最大生命比例,
-    总倍率: config.伤害总倍率,
-  });
-}
-
 function 创建重锤提示(this: void, grum: any, angle: number): void {
   const config = 巴尔扎罗斯技能数值配置.熔岩重锤;
   创建技能提示圈({
@@ -51,6 +42,7 @@ function 创建重锤提示(this: void, grum: any, angle: number): void {
     X: GetUnitX(grum),
     Y: GetUnitY(grum),
     朝向: angle,
+    扇形角度: config.扇形角度,
     扇形模型尺寸: config.扇形半径 / 512,
     持续时间: config.施法硬直秒,
   });
@@ -69,7 +61,21 @@ function 结算重锤(this: void, context: 巴尔扎罗斯运行时上下文, an
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!目标在重锤扇形内(grum, hero, angle)) continue;
-    造成格鲁姆Boss技能伤害(grum, hero, 计算重锤伤害(grum, hero), "AOE");
+    执行BossAOE技能伤害({
+      来源: grum,
+      目标: hero,
+      伤害公式: {
+        来源攻击力比例: config.伤害攻击力比例,
+        目标最大生命比例: config.伤害目标最大生命比例,
+        总倍率: config.伤害总倍率,
+      },
+      attack: false,
+      ranged: true,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_FIRE,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      标签: "格鲁姆-熔岩重锤",
+    });
     施加快速控制Buff(grum, hero, 快速控制_击晕, config.眩晕秒);
     施加巴尔扎罗斯灼热(hero, config.灼热层数);
   }

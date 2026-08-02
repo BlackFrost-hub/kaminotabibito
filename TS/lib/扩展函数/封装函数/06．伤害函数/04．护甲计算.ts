@@ -6,11 +6,11 @@
  */
 
 /**
- * 护甲减伤系数（游戏常数，默认0.06）
+ * 护甲减伤系数（项目游戏常数，固定0.02）
  * 公式：减伤比例 = 护甲 * 系数 / (护甲 * 系数 + 1)
  * 等价于：减伤比例 = 护甲 / (护甲 + 1/系数) = 护甲 / (护甲 + 50)
  */
-const ARMOR_FACTOR = 0.06;
+const ARMOR_FACTOR = 0.02;
 
 /**
  * 计算护甲减伤比例
@@ -60,12 +60,8 @@ export function calcPiercedArmorReduction(
 export function calcArmorFromReduction(reduction: number): number {
   if (reduction <= 0) return 0;
   if (reduction >= 1) return Infinity;
-  // reduction = armor * 0.06 / (armor * 0.06 + 1)
-  // reduction * (armor * 0.06 + 1) = armor * 0.06
-  // reduction * armor * 0.06 + reduction = armor * 0.06
-  // reduction = armor * 0.06 - reduction * armor * 0.06
-  // reduction = armor * 0.06 * (1 - reduction)
-  // armor = reduction / (0.06 * (1 - reduction))
+  // reduction = armor * 0.02 / (armor * 0.02 + 1)
+  // armor = reduction / (0.02 * (1 - reduction))
   return reduction / (ARMOR_FACTOR * (1 - reduction));
 }
 

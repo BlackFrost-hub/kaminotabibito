@@ -17,8 +17,8 @@ local ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236 = require("系统.03．技能系
 local _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807 = ____20_FF0E_4F4D_79FB_6280_80FD_9650_5236["执行战斗自身传送到坐标"]
 local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
 local _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF = _____6247_5F62_533A_57DF["单位是否在扇形区域"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.01．多阶段技能编排.06．技能阶段链执行器")
@@ -34,25 +34,23 @@ local ____require_result_0 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
-local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_3["读取Boss战运行上下文"]
-local ____require_result_4 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_4["显示大招吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_4["关闭吟唱条"]
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_5.getServerTime
-local addDelayedCallback = ____require_result_5.addDelayedCallback
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_6.YDWETimerDestroyEffectSafe
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
+local ____require_result_2 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
+local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_2["读取Boss战运行上下文"]
+local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_3["显示大招吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_4.getServerTime
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_8 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_8.CosBJ
-local SinBJ = ____require_result_8.SinBJ
+local ____require_result_7 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_7.CosBJ
+local SinBJ = ____require_result_7.SinBJ
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
@@ -78,11 +76,11 @@ local function _____53D6P3_8282_594F_500D_7387(context)
 end
 local function _____79FB_52A8_5230_573A_5730_4E2D_5FC3(boss)
     local battle = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(boss)
-    local ____opt_result_11
+    local ____opt_result_10
     if battle ~= nil then
-        ____opt_result_11 = battle["地点矩形"]
+        ____opt_result_10 = battle["地点矩形"]
     end
-    local rect = ____opt_result_11
+    local rect = ____opt_result_10
     if rect ~= nil and rect ~= 0 then
         _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(
             boss,
@@ -165,9 +163,9 @@ local function _____53D1_5C04_8840_6708_7EC8_821E_6247_533A_5F39_5E55(context, x
                     _____64AD_653E_8840_6708_7EC8_821E_56FE3_7279_6548(x, y, facing, cfg["终舞图3特效持续秒"])
                 end
             )
-            local ____self_12 = context["清理"]
-            ____self_12["登记延迟回调"](
-                ____self_12,
+            local ____self_11 = context["清理"]
+            ____self_11["登记延迟回调"](
+                ____self_11,
                 "夏提雅-血月终舞扇区图3-" .. tostring(i + 1),
                 _____7279_6548_5EF6_8FDFID
             )
@@ -207,17 +205,15 @@ local function _____53D1_5C04_8840_6708_7EC8_821E_6247_533A_5F39_5E55(context, x
                     )
                 end,
                 ["on命中"] = function(target)
-                    local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = cfg["扇区伤害攻击力比例"], ["目标最大生命比例"] = cfg["扇区伤害目标最大生命比例"]}) / count
-                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                         ["来源"] = boss,
                         ["目标"] = target,
-                        ["伤害"] = damage,
+                        ["伤害公式"] = {["来源攻击力比例"] = cfg["扇区伤害攻击力比例"], ["目标最大生命比例"] = cfg["扇区伤害目标最大生命比例"], ["总倍率"] = 1 / count},
                         attack = false,
                         ranged = true,
                         attackType = ATTACK_TYPE_NORMAL,
                         ["伤害类型"] = _____5F39_5E55_4F24_5BB3_7C7B_578B,
                         weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                        ["来源类型"] = "Boss技能",
                         ["标签"] = "夏提雅·血月终舞-扇区弹幕"
                     })
                 end
@@ -394,17 +390,15 @@ ____exports["释放夏提雅血月终舞"] = function(context, target)
                             GetUnitY(hit),
                             _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
                         )
-                        local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, hit, {["来源攻击力比例"] = cfg["终舞冲锋伤害攻击力比例"], ["目标最大生命比例"] = cfg["终舞冲锋伤害目标最大生命比例"]})
-                        _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                        _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                             ["来源"] = boss,
                             ["目标"] = hit,
-                            ["伤害"] = damage,
+                            ["伤害公式"] = {["来源攻击力比例"] = cfg["终舞冲锋伤害攻击力比例"], ["目标最大生命比例"] = cfg["终舞冲锋伤害目标最大生命比例"]},
                             attack = false,
                             ranged = false,
                             attackType = ATTACK_TYPE_NORMAL,
                             ["伤害类型"] = DAMAGE_TYPE_ENHANCED,
                             weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                            ["来源类型"] = "Boss技能",
                             ["标签"] = "夏提雅·血月终舞-俯冲"
                         })
                     end,

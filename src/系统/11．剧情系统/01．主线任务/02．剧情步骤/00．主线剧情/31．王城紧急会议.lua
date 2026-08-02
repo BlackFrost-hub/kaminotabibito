@@ -14,13 +14,15 @@ local _____7ED3_675F_83F2_5229_65AF_653B_57CE_7B49_5F85 = ____31A_FF0E_738B_57CE
 local _____767B_8BB0_5B58_6D3B_653B_57CE_5355_4F4D_4E3A_83F2_5229_65AF_62A4_536B = ____31A_FF0E_738B_57CE_653B_57CE_6218_63A7_5236_5668["登记存活攻城单位为菲利斯护卫"]
 local ____31B_FF0E_8036_63D0_5C14_534F_6218_63A7_5236_5668 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.31B．耶提尔协战控制器")
 local _____51C6_5907_8036_63D0_5C14_83F2_5229_65AF_534F_6218 = ____31B_FF0E_8036_63D0_5C14_534F_6218_63A7_5236_5668["准备耶提尔菲利斯协战"]
+local ____require_result_0 = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐")
+local _____5F00_59CB_7B2C_4E8C_7AE0_83F2_5229_65AF_653B_57CE_533A_57DF_97F3_4E50 = ____require_result_0["开始第二章菲利斯攻城区域音乐"]
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
-local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
-local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_1["按名字反查总单位ID"]
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_2["创建单位并登记排泄安全"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
+local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_2["按名字反查总单位ID"]
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_3["创建单位并登记排泄安全"]
 local Player = jass.Player
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
@@ -122,6 +124,7 @@ ____exports["执行紧急会议"] = function()
     ____exports["布置王城会议席位"]()
 end
 ____exports["执行启动王城攻城战"] = function()
+    _____5F00_59CB_7B2C_4E8C_7AE0_83F2_5229_65AF_653B_57CE_533A_57DF_97F3_4E50()
     _____542F_52A8_738B_57CE_653B_57CE_6218()
     _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807(32)
 end

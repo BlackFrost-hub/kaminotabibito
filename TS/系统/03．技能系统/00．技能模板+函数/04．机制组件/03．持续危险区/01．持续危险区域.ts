@@ -6,6 +6,7 @@ import type { 技能提示圈配置 } from "../../02．通用函数/16．技能�
 export interface 持续危险区域参数 {
   X: number;
   Y: number;
+  锚点单位?: any;
   半径: number;
   持续时间: number;
   检测间隔?: number;
@@ -38,6 +39,7 @@ function 转换为区域效果参数(this: void, 参数: 持续危险区域参�
   return {
     X: 参数.X,
     Y: 参数.Y,
+    锚点单位: 参数.锚点单位,
     半径: 参数.半径,
     持续时间: 参数.持续时间,
     检测间隔: 参数.检测间隔,

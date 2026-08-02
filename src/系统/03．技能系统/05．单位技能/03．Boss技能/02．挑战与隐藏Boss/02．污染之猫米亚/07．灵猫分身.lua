@@ -17,27 +17,26 @@ local ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI = require("系统.09．表现�
 local _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI = ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI["创建世界坐标进度UI"]
 local _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI = ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI["更新世界坐标进度UI"]
 local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____15_FF0E_4E16_754C_5750_6807_8FDB_5EA6UI["销毁世界坐标进度UI"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
-local _____521B_5EFA_53EC_5524_7269 = ____require_result_0["创建召唤物"]
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_2.registerDeathListener
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
-local _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548 = ____require_result_3["创建单位脚下点特效"]
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
-local X_FixUnitStandingSafe = ____require_result_4.X_FixUnitStandingSafe
-local ____require_result_5 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
-local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_6.doHeal
-local ____require_result_7 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_7.CosBJ
-local SinBJ = ____require_result_7.SinBJ
+local ____02_FF0E_9650_65F6_6467_6BC1_76EE_6807_7EC4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.02．限时摧毁目标组")
+local _____521B_5EFA_9650_65F6_6467_6BC1_76EE_6807_7EC4 = ____02_FF0E_9650_65F6_6467_6BC1_76EE_6807_7EC4["创建限时摧毁目标组"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local removeDelayedCallback = ____require_result_0.removeDelayedCallback
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+local getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
+local _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548 = ____require_result_1["创建单位脚下点特效"]
+local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
+local X_FixUnitStandingSafe = ____require_result_2.X_FixUnitStandingSafe
+local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
+local ____require_result_4 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_4.doHeal
+local ____require_result_5 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_5.CosBJ
+local SinBJ = ____require_result_5.SinBJ
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -45,13 +44,8 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local GetHandleId = jass.GetHandleId
-local GetUnitState = jass.GetUnitState
-local RemoveUnit = jass.RemoveUnit
-local IsUnitType = jass.IsUnitType
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6_8868 = {}
-local _____7C73_4E9A_7075_732B_5206_8EAB_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
 local function _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6(data)
     if data == nil then
         return
@@ -75,16 +69,6 @@ local function _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_5355_4F4D_5012_8BA1_
     end
     _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6(_____7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6_8868[GetHandleId(unit)])
 end
-local function ____on_7C73_4E9A_7075_732B_5206_8EAB_6B7B_4EA1(dyingUnit, _killingUnit)
-    _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_5355_4F4D_5012_8BA1_65F6(dyingUnit)
-end
-local function _____786E_4FDD_7C73_4E9A_7075_732B_5206_8EAB_6B7B_4EA1_76D1_542C()
-    if _____7C73_4E9A_7075_732B_5206_8EAB_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C then
-        return
-    end
-    _____7C73_4E9A_7075_732B_5206_8EAB_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = true
-    registerDeathListener(____on_7C73_4E9A_7075_732B_5206_8EAB_6B7B_4EA1)
-end
 local function _____66F4_65B0_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6(variable)
     local data = variable
     if data == nil then
@@ -104,15 +88,14 @@ local function _____66F4_65B0_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6(varia
     end
 end
 local function _____521B_5EFA_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6(context, unit, x, y)
-    local ____temp_9 = context == nil or context["清理"] == nil
-    if not ____temp_9 then
-        local ____self_8 = context["清理"]
-        ____temp_9 = ____self_8["已清理"](____self_8)
+    local ____temp_7 = context == nil or context["清理"] == nil
+    if not ____temp_7 then
+        local ____self_6 = context["清理"]
+        ____temp_7 = ____self_6["已清理"](____self_6)
     end
-    if ____temp_9 or not _____5355_4F4D_6709_6548(unit) then
+    if ____temp_7 or not _____5355_4F4D_6709_6548(unit) then
         return
     end
-    _____786E_4FDD_7C73_4E9A_7075_732B_5206_8EAB_6B7B_4EA1_76D1_542C()
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["灵猫分身"]
     local data = {
         context = context,
@@ -138,10 +121,10 @@ local function _____521B_5EFA_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6(conte
     end
     _____7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6_8868[GetHandleId(unit)] = data
     data["周期ID"] = addPeriodicCallback(100, _____66F4_65B0_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6, data)
-    local ____self_10 = context["清理"]
-    ____self_10["登记周期回调"](____self_10, "米亚-灵猫分身倒计时", data["周期ID"])
-    local ____self_11 = context["清理"]
-    ____self_11["登记清理"](____self_11, "米亚-灵猫分身倒计时UI", _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6, data)
+    local ____self_8 = context["清理"]
+    ____self_8["登记周期回调"](____self_8, "米亚-灵猫分身倒计时", data["周期ID"])
+    local ____self_9 = context["清理"]
+    ____self_9["登记清理"](____self_9, "米亚-灵猫分身倒计时UI", _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6, data)
 end
 local function _____64AD_653E_5206_8EAB_51FA_751F_8868_73B0(x, y)
     _____521B_5EFA_70B9_7279_6548({
@@ -164,56 +147,85 @@ local function _____6062_590DBoss_751F_547D(boss, amount)
         HealEffect = false
     })
 end
-local function _____5B89_6392_5206_8EAB_5230_671F_7ED3_7B97(context, summons)
+local function _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_63D0_793A_56DE_8C03(data)
+    if data["提醒回调ID"] ~= 0 then
+        removeDelayedCallback(data["提醒回调ID"])
+        data["提醒回调ID"] = 0
+    end
+end
+local function _____7C73_4E9A_7075_732B_5206_8EAB_5269_4F595_79D2_63D0_793A(variable)
+    local data = variable
+    if data == nil or data["已结算"] or not _____5355_4F4D_6709_6548(data.context["Boss单位"]) then
+        return
+    end
+    local ____temp_11 = data["目标组"] == nil
+    if not ____temp_11 then
+        local ____self_10 = data["目标组"]
+        ____temp_11 = ____self_10["取剩余数量"](____self_10) <= 0
+    end
+    if ____temp_11 then
+        return
+    end
+    data["提醒回调ID"] = 0
+    _____64AD_653E_7C73_4E9A_53F0_8BCD(data.context["Boss单位"], "灵猫分身", 2)
+end
+local function _____7ED3_7B97_7C73_4E9A_7075_732B_5206_8EAB_8D85_65F6(______5269_4F59_6570_91CF, variable)
+    local data = variable
+    if data == nil or data["已结算"] then
+        return
+    end
+    data["已结算"] = true
+    _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_63D0_793A_56DE_8C03(data)
+    local boss = data.context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) or data["目标组"] == nil then
+        return
+    end
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["灵猫分身"]
-    addDelayedCallback(
-        (config["持续秒"] - 5) * 1000,
-        function()
+    local healPerSummon = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config["未击杀每只恢复生命比例"]
+    local aliveCount = 0
+    local targets = data["目标组"]["目标单位列表"]
+    do
+        local i = 0
+        while i < #targets do
             do
-                local i = 0
-                while i < #summons do
-                    if _____5355_4F4D_6709_6548(summons[i + 1]) then
-                        _____64AD_653E_7C73_4E9A_53F0_8BCD(context["Boss单位"], "灵猫分身", 2)
-                        break
-                    end
-                    i = i + 1
+                local target = targets[i + 1]
+                if not target["是否存活"](target) then
+                    goto __continue29
                 end
+                aliveCount = aliveCount + 1
+                _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(target["单位"], {["模型路径"] = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx", ["持续秒"] = 1.2, ["缩放"] = 1})
             end
+            ::__continue29::
+            i = i + 1
         end
-    )
-    addDelayedCallback(
-        config["持续秒"] * 1000,
-        function()
-            local boss = context["Boss单位"]
-            if not _____5355_4F4D_6709_6548(boss) then
-                return
-            end
-            local healPerSummon = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * config["未击杀每只恢复生命比例"]
-            local aliveCount = 0
-            do
-                local i = 0
-                while i < #summons do
-                    do
-                        local summon = summons[i + 1]
-                        if not _____5355_4F4D_6709_6548(summon) then
-                            goto __continue31
-                        end
-                        aliveCount = aliveCount + 1
-                        _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(summon, {["模型路径"] = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx", ["持续秒"] = 1.2, ["缩放"] = 1})
-                        RemoveUnit(summon)
-                    end
-                    ::__continue31::
-                    i = i + 1
-                end
-            end
-            if aliveCount > 0 then
-                _____6062_590DBoss_751F_547D(boss, healPerSummon * aliveCount)
-                _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "灵猫分身", 3)
-            else
-                _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "灵猫分身", 4)
-            end
-        end
-    )
+    end
+    if aliveCount > 0 then
+        _____6062_590DBoss_751F_547D(boss, healPerSummon * aliveCount)
+        _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "灵猫分身", 3)
+    else
+        _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "灵猫分身", 4)
+    end
+end
+local function _____7ED3_7B97_7C73_4E9A_7075_732B_5206_8EAB_5168_706D(variable)
+    local data = variable
+    if data == nil or data["已结算"] then
+        return
+    end
+    data["已结算"] = true
+    _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_63D0_793A_56DE_8C03(data)
+    if _____5355_4F4D_6709_6548(data.context["Boss单位"]) then
+        _____64AD_653E_7C73_4E9A_53F0_8BCD(data.context["Boss单位"], "灵猫分身", 4)
+    end
+end
+local function _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_76EE_6807(unit, ______539F_56E0, ______51FB_6740_8005, _variable)
+    _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_5355_4F4D_5012_8BA1_65F6(unit)
+end
+local function _____7ED3_7B97_7C73_4E9A_7075_732B_5206_8EAB_7EC4_7ED3_675F(______662F_5426_6210_529F, ______5269_4F59_6570_91CF, variable, ______539F_56E0)
+    local data = variable
+    if data == nil then
+        return
+    end
+    _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_63D0_793A_56DE_8C03(data)
 end
 ____exports["触发米亚灵猫分身"] = function(context)
     local boss = context["Boss单位"]
@@ -227,7 +239,6 @@ ____exports["触发米亚灵猫分身"] = function(context)
     local maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     local rawAttack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss)
     local attack = rawAttack > 0 and rawAttack or _____7C73_4E9A_8FD0_884C_65F6_914D_7F6E["Boss攻击力兜底"]
-    local summons = {}
     _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "灵猫分身", 0)
     _____64AD_653EBoss_5750_6807_97F3_6548(_____7C73_4E9A_97F3_6548_914D_7F6E["灵猫分身"]["主辨识音"], bossX, bossY, _____7C73_4E9A_97F3_6548_914D_7F6E["默认裁断距离"])
     _____5EF6_8FDF_64AD_653EBoss_5750_6807_97F3_6548(
@@ -239,6 +250,7 @@ ____exports["触发米亚灵猫分身"] = function(context)
     )
     _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(boss, {["模型路径"] = "Common\\Effect\\Form\\Illusion\\MirrorImageIllusion.mdx", ["持续秒"] = 1.2, ["缩放"] = 1})
     local offsets = {-1, 1}
+    local _____76EE_6807_5217_8868 = {}
     do
         local i = 0
         while i < config["分身数量"] do
@@ -247,13 +259,13 @@ ____exports["触发米亚灵猫分身"] = function(context)
             local x = bossX + CosBJ(angle) * config["召唤距离"]
             local y = bossY + SinBJ(angle) * config["召唤距离"]
             _____64AD_653E_5206_8EAB_51FA_751F_8868_73B0(x, y)
-            local summon = _____521B_5EFA_53EC_5524_7269({
+            _____76EE_6807_5217_8868[#_____76EE_6807_5217_8868 + 1] = {
+                ["名称"] = "米亚-灵猫分身",
                 ["主人单位"] = boss,
                 ["单位名称"] = "腐化灵猫幻影",
                 X = x,
                 Y = y,
                 ["朝向"] = facing,
-                ["持续时间"] = config["持续秒"] + 0.5,
                 ["模型文件"] = _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E["模型"].Boss,
                 ["生命值"] = maxLife * config["分身生命比例"],
                 ["生命值受小怪倍率"] = false,
@@ -261,19 +273,49 @@ ____exports["触发米亚灵猫分身"] = function(context)
                 ["攻击间隔"] = config["分身攻击间隔"],
                 ["攻击范围"] = config["分身攻击范围"],
                 ["索敌范围"] = config["分身索敌范围"],
-                ["缩放"] = config["分身缩放"]
-            })
-            if _____5355_4F4D_6709_6548(summon) then
-                X_FixUnitStandingSafe(summon)
-                _____521B_5EFA_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6(context, summon, x, y)
-                summons[#summons + 1] = summon
-            end
+                ["缩放"] = config["分身缩放"],
+                ["on结束"] = _____6E05_7406_7C73_4E9A_7075_732B_5206_8EAB_76EE_6807
+            }
             i = i + 1
         end
     end
-    if #summons > 0 then
+    local data = {context = context, ["目标组"] = nil, ["提醒回调ID"] = 0, ["已结算"] = false}
+    local _____76EE_6807_7EC4 = _____521B_5EFA_9650_65F6_6467_6BC1_76EE_6807_7EC4({
+        ["名称"] = "米亚-灵猫分身组",
+        ["清理"] = context["清理"],
+        ["持续秒"] = config["持续秒"],
+        ["目标列表"] = _____76EE_6807_5217_8868,
+        ["变量"] = data,
+        ["on全部摧毁"] = _____7ED3_7B97_7C73_4E9A_7075_732B_5206_8EAB_5168_706D,
+        ["on超时"] = _____7ED3_7B97_7C73_4E9A_7075_732B_5206_8EAB_8D85_65F6,
+        ["on结束"] = _____7ED3_7B97_7C73_4E9A_7075_732B_5206_8EAB_7EC4_7ED3_675F
+    })
+    data["目标组"] = _____76EE_6807_7EC4
+    do
+        local i = 0
+        while i < #_____76EE_6807_7EC4["目标单位列表"] do
+            do
+                local target = _____76EE_6807_7EC4["目标单位列表"][i + 1]
+                if not target["是否存活"](target) then
+                    goto __continue44
+                end
+                X_FixUnitStandingSafe(target["单位"])
+                _____521B_5EFA_7C73_4E9A_7075_732B_5206_8EAB_5012_8BA1_65F6(
+                    context,
+                    target["单位"],
+                    GetUnitX(target["单位"]),
+                    GetUnitY(target["单位"])
+                )
+            end
+            ::__continue44::
+            i = i + 1
+        end
+    end
+    if #_____76EE_6807_7EC4["目标单位列表"] > 0 then
         _____64AD_653E_7C73_4E9A_53F0_8BCD(boss, "灵猫分身", 1)
-        _____5B89_6392_5206_8EAB_5230_671F_7ED3_7B97(context, summons)
+        data["提醒回调ID"] = addDelayedCallback((config["持续秒"] - 5) * 1000, _____7C73_4E9A_7075_732B_5206_8EAB_5269_4F595_79D2_63D0_793A, data)
+        local ____self_12 = context["清理"]
+        ____self_12["登记延迟回调"](____self_12, "米亚-灵猫分身剩余5秒提示", data["提醒回调ID"])
     end
     return true
 end

@@ -25,8 +25,7 @@ local _____505C_6B62_5468_671F = ____19_FF0E_516C_5171_5DE5_5177["停止周期"]
 local _____521B_5EFA_9884_8B66_5706 = ____19_FF0E_516C_5171_5DE5_5177["创建预警圆"]
 local _____64AD_653E_70B9_7279_6548 = ____19_FF0E_516C_5171_5DE5_5177["播放点特效"]
 local _____8303_56F4_654C_4EBA = ____19_FF0E_516C_5171_5DE5_5177["范围敌人"]
-local _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["计算攻击已损失伤害"]
-local _____9020_6210_706B_7130_4F24_5BB3 = ____19_FF0E_516C_5171_5DE5_5177["造成火焰伤害"]
+local _____53D6_83F2_5C3C_514B_65AF_5C14_6280_80FD_5F3A_5EA6_500D_7387 = ____19_FF0E_516C_5171_5DE5_5177["取菲尼克斯尔技能强度倍率"]
 local _____6DFB_52A0_5143_7D20_5C42_6570 = ____19_FF0E_516C_5171_5DE5_5177["添加元素层数"]
 local _____53D6_5355_4F4DX = ____19_FF0E_516C_5171_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____19_FF0E_516C_5171_5DE5_5177["取单位Y"]
@@ -34,11 +33,16 @@ local _____4E24_70B9_8DDD_79BB = ____19_FF0E_516C_5171_5DE5_5177["两点距离"]
 local _____6781_5750_6807X = ____19_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____19_FF0E_516C_5171_5DE5_5177["极坐标Y"]
 local _____79FB_52A8_5355_4F4D_5230 = ____19_FF0E_516C_5171_5DE5_5177["移动单位到"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local Atan2 = jass.Atan2
+local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
+local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
+local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local RAD_TO_DEG = 57.29577951308232
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____51E4_51F0_6F29_6DA1_6280_80FDID = stringToFourCC(_____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["技能壳"]["凤凰漩涡"])
@@ -78,20 +82,30 @@ ____exports["释放菲尼克斯尔凤凰漩涡"] = function(context, target, ___
                         local i = 0
                         while i < #enemies do
                             local u = enemies[i + 1]
-                            local damage = _____8BA1_7B97_653B_51FB_5DF2_635F_5931_4F24_5BB3(boss, u, config["伤害Boss攻击力比例"], config["伤害目标已损失生命比例"])
                             local distance = _____4E24_70B9_8DDD_79BB(
                                 _____53D6_5355_4F4DX(u),
                                 _____53D6_5355_4F4DY(u),
                                 x,
                                 y
                             )
-                            _____9020_6210_706B_7130_4F24_5BB3(
-                                boss,
-                                u,
-                                damage,
-                                "AOE",
-                                _____4F24_5BB3_4E0A_4E0B_6587
-                            )
+                            if _____5355_4F4D_5B58_6D3B(boss) and _____5355_4F4D_5B58_6D3B(u) then
+                                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                                    ["技能ID"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["技能ID"],
+                                    ["技能实例ID"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["技能实例ID"],
+                                    ["标签"] = _____4F24_5BB3_4E0A_4E0B_6587 and _____4F24_5BB3_4E0A_4E0B_6587["标签"],
+                                    ["来源"] = boss,
+                                    ["目标"] = u,
+                                    ["伤害公式"] = {
+                                        ["来源攻击力比例"] = config["伤害Boss攻击力比例"],
+                                        ["目标已损生命比例"] = config["伤害目标已损失生命比例"],
+                                        ["总倍率"] = _____53D6_83F2_5C3C_514B_65AF_5C14_6280_80FD_5F3A_5EA6_500D_7387(boss)
+                                    },
+                                    ranged = true,
+                                    attackType = ATTACK_TYPE_NORMAL,
+                                    ["伤害类型"] = DAMAGE_TYPE_FIRE,
+                                    weaponType = WEAPON_TYPE_WHOKNOWS
+                                })
+                            end
                             _____6DFB_52A0_5143_7D20_5C42_6570(u, "火", config["火印层数"])
                             if distance > config["中心半径"] then
                                 local angle = Atan2(
@@ -120,8 +134,8 @@ ____exports["释放菲尼克斯尔凤凰漩涡"] = function(context, target, ___
                     end
                 end
             )
-            local ____self_0 = context["清理"]
-            ____self_0["登记周期回调"](____self_0, "菲尼克斯尔凤凰漩涡Tick", tick)
+            local ____self_6 = context["清理"]
+            ____self_6["登记周期回调"](____self_6, "菲尼克斯尔凤凰漩涡Tick", tick)
         end
     )
 end

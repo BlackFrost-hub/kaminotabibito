@@ -13,7 +13,6 @@ local ____10_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_91CC_79D1_7279_53F0_8BCD = ____10_FF0E_53F0_8BCD_64AD_653E["播放里科特台词"]
 local ____13_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.07．里科特.13．公共工具")
 local _____5355_4F4D_6709_6548 = ____13_FF0E_516C_5171_5DE5_5177["单位有效"]
-local _____64AD_653E_91CC_79D1_7279_65BD_6CD5_7EF4_6301_52A8_4F5C = ____13_FF0E_516C_5171_5DE5_5177["播放里科特施法维持动作"]
 local stringToFourCC = ____13_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____53D6_5750_6807_89D2_5EA6 = ____13_FF0E_516C_5171_5DE5_5177["取坐标角度"]
 local _____6781_5750_6807X = ____13_FF0E_516C_5171_5DE5_5177["极坐标X"]
@@ -23,6 +22,8 @@ local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____14_FF0E_6301_7EED_65BD_6CD5_53D1_5C04 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.14．持续施法发射")
 local _____542F_52A8_6301_7EED_65BD_6CD5_53D1_5C04 = ____14_FF0E_6301_7EED_65BD_6CD5_53D1_5C04["启动持续施法发射"]
 local _____505C_6B62_6301_7EED_65BD_6CD5_53D1_5C04 = ____14_FF0E_6301_7EED_65BD_6CD5_53D1_5C04["停止持续施法发射"]
@@ -63,7 +64,7 @@ function _____8C03_5EA6P3_7729_6655_70AE(context, _____9636_6BB5, target)
                             do
                                 local hero = heroes[i + 1]
                                 if not _____5355_4F4D_6709_6548(hero) then
-                                    goto __continue31
+                                    goto __continue36
                                 end
                                 local dx = GetUnitX(hero) - cx
                                 local dy = GetUnitY(hero) - cy
@@ -71,85 +72,116 @@ function _____8C03_5EA6P3_7729_6655_70AE(context, _____9636_6BB5, target)
                                     _____65BD_52A0_7729_6655(boss, hero, cfg["P3眩晕秒"])
                                 end
                             end
-                            ::__continue31::
+                            ::__continue36::
                             i = i + 1
                         end
                     end
                 end
             )
-            local ____self_12 = context["清理"]
-            ____self_12["登记延迟回调"](____self_12, "里科特-P3湮灭眩晕炮结算", resolveId)
+            local ____self_11 = context["清理"]
+            ____self_11["登记延迟回调"](____self_11, "里科特-P3湮灭眩晕炮结算", resolveId)
         end
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记延迟回调"](____self_13, "里科特-P3湮灭眩晕炮预警", warningId)
+    local ____self_12 = context["清理"]
+    ____self_12["登记延迟回调"](____self_12, "里科特-P3湮灭眩晕炮预警", warningId)
 end
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-local GetOwningPlayer = jass.GetOwningPlayer
-local CreateUnit = jass.CreateUnit
 local RemoveUnit = jass.RemoveUnit
-local SetUnitScale = jass.SetUnitScale
-local SetUnitVertexColor = jass.SetUnitVertexColor
-local UnitAddAbility = jass.UnitAddAbility
-local SetUnitPathing = jass.SetUnitPathing
 GetRandomReal = jass.GetRandomReal
-local DzSetUnitModel = japi.DzSetUnitModel
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_2.addDelayedCallback
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_3.createTimedEffect
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_4["创建技能提示圈"]
-local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_6.registerManualBuff
-local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.06．里科特")
-local _____91CC_79D1_7279BuffID = ____require_result_7["里科特BuffID"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
-_____65BD_52A0_7729_6655 = ____require_result_8["施加眩晕"]
-local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
-local X_FixUnitStandingSafe = ____require_result_9.X_FixUnitStandingSafe
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_2.createTimedEffect
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.06．里科特")
+local _____91CC_79D1_7279BuffID = ____require_result_6["里科特BuffID"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
+_____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
+local _____521B_5EFA_53EC_5524_7269 = ____require_result_8["创建召唤物"]
 local _____91CC_79D1_7279_5355_4F4D_7C7B_578BID = stringToFourCC(_____91CC_79D1_7279_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____6E6E_706D_4E4B_70AE_6280_80FDID = stringToFourCC(_____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]["技能槽位"])
 local _____8757_866B_6280_80FDID = stringToFourCC("Aloc")
 local _____5DF2_6CE8_518C = false
+local function _____542F_52A8_6E6E_706D_6295_5F71_65BD_6CD5_52A8_4F5C(data, _____6301_7EED_79D2)
+    if not _____5355_4F4D_6709_6548(data["投影"]) then
+        return
+    end
+    local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]
+    _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
+        ["名称"] = "里科特-湮灭投影施法",
+        ["施法者"] = data["投影"],
+        ["硬直秒"] = cfg["施法硬直秒"],
+        ["生效延迟秒"] = _____6301_7EED_79D2,
+        ["动画编号"] = 8,
+        ["动画速度"] = cfg["动画速度"],
+        ["后续动画编号"] = 9,
+        ["后续动画速度"] = 1,
+        ["后续动画延迟毫秒"] = cfg["施法动作原始时长秒"] * 1000 / cfg["动画速度"],
+        ["恢复动画编号"] = 3,
+        ["清理"] = data.context["清理"],
+        ["on生效"] = function()
+        end
+    })
+end
+local function _____542F_52A8_6E6E_706D_4E4B_70AEBoss_65BD_6CD5_52A8_4F5C(context, _____6301_7EED_79D2)
+    local boss = context["Boss单位"]
+    local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]
+    _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
+        ["名称"] = "里科特-湮灭之炮施法",
+        ["施法者"] = boss,
+        ["硬直秒"] = cfg["施法硬直秒"],
+        ["生效延迟秒"] = _____6301_7EED_79D2,
+        ["动画编号"] = 8,
+        ["动画速度"] = cfg["动画速度"],
+        ["后续动画编号"] = 9,
+        ["后续动画速度"] = 1,
+        ["后续动画延迟毫秒"] = cfg["施法动作原始时长秒"] * 1000 / cfg["动画速度"],
+        ["恢复动画编号"] = 3,
+        ["清理"] = context["清理"],
+        ["播放台词"] = function()
+            _____64AD_653E_91CC_79D1_7279_53F0_8BCD(boss, "湮灭之炮")
+        end,
+        ["on生效"] = function()
+        end
+    })
+end
 local function _____521B_5EFA_6E6E_706D_6295_5F71_5355_4F4D(boss, x, y, face)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]
-    local projection = CreateUnit(
-        GetOwningPlayer(boss),
-        stringToFourCC(cfg["投影单位类型"]),
-        x,
-        y,
-        face
-    )
+    local projection = _____521B_5EFA_53EC_5524_7269({
+        ["主人单位"] = boss,
+        ["单位类型"] = stringToFourCC(cfg["投影单位类型"]),
+        X = x,
+        Y = y,
+        ["朝向"] = face,
+        ["飞行高度"] = 0,
+        ["模型文件"] = cfg["投影模型路径"],
+        ["添加技能"] = {_____8757_866B_6280_80FDID},
+        ["禁用路径"] = true,
+        ["固定站桩"] = true,
+        ["缩放"] = cfg["投影缩放"],
+        ["红"] = 160,
+        ["绿"] = 210,
+        ["蓝"] = 255,
+        ["透明度"] = cfg["投影透明度"]
+    })
     if projection == nil or projection == 0 then
         return projection
     end
-    DzSetUnitModel(projection, cfg["投影模型路径"])
-    UnitAddAbility(projection, _____8757_866B_6280_80FDID)
-    SetUnitPathing(projection, false)
-    X_FixUnitStandingSafe(projection)
-    SetUnitScale(projection, cfg["投影缩放"], cfg["投影缩放"], cfg["投影缩放"])
-    SetUnitVertexColor(
-        projection,
-        160,
-        210,
-        255,
-        cfg["投影透明度"]
-    )
     createTimedEffect(
         cfg["出现特效路径"],
         x,
@@ -196,7 +228,6 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_70AE_4E00_8DF3(ctx)
     _____521B_5EFA_6E6E_706D_4E4B_70AE_9884_8B66(ctx, boss)
     _____521B_5EFA_6E6E_706D_4E4B_70AE_5C04_7EBF(ctx, _____7EC8_70B9X, _____7EC8_70B9Y)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-    local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["每跳Boss攻击力比例"]
     local radius2 = 90 * 90
     do
         local i = 0
@@ -204,7 +235,7 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_70AE_4E00_8DF3(ctx)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue9
+                    goto __continue15
                 end
                 local dist2 = _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9(
                     GetUnitX(hero),
@@ -215,21 +246,20 @@ local function _____7ED3_7B97_6E6E_706D_4E4B_70AE_4E00_8DF3(ctx)
                     _____7EC8_70B9Y
                 )
                 if dist2 <= radius2 then
-                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                         ["技能ID"] = _____6E6E_706D_4E4B_70AE_6280_80FDID,
                         ["来源"] = boss,
                         ["目标"] = hero,
-                        ["伤害"] = damage,
+                        ["伤害公式"] = {["来源攻击力比例"] = cfg["每跳Boss攻击力比例"]},
                         attack = false,
                         ranged = false,
                         attackType = ATTACK_TYPE_NORMAL,
                         ["伤害类型"] = DAMAGE_TYPE_MAGIC,
-                        weaponType = WEAPON_TYPE_WHOKNOWS,
-                        ["来源类型"] = "Boss技能"
+                        weaponType = WEAPON_TYPE_WHOKNOWS
                     })
                 end
             end
-            ::__continue9::
+            ::__continue15::
             i = i + 1
         end
     end
@@ -305,14 +335,12 @@ local function _____8C03_5EA6_5355_4E2A_6E6E_706D_6295_5F71(context, _____9636_6
     )
     local projection = _____521B_5EFA_6E6E_706D_6295_5F71_5355_4F4D(boss, px, py, face)
     local delay = _____9636_6BB5 >= 2 and cfg["P2锁定前延迟秒"] or cfg["锁定前延迟秒"]
-    if _____5355_4F4D_6709_6548(projection) then
-        _____64AD_653E_91CC_79D1_7279_65BD_6CD5_7EF4_6301_52A8_4F5C(projection, delay + cfg["锁定持续秒"], cfg["动画速度"])
-    end
-    _____64AD_653EBoss_5750_6807_97F3_6548(_____91CC_79D1_7279_97F3_6548_914D_7F6E["湮灭之炮"]["投影锁定"], px, py, _____91CC_79D1_7279_97F3_6548_914D_7F6E["默认裁断距离"])
     local data = {context = context, ["投影"] = projection, ["目标"] = target}
+    _____542F_52A8_6E6E_706D_6295_5F71_65BD_6CD5_52A8_4F5C(data, delay + cfg["锁定持续秒"])
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____91CC_79D1_7279_97F3_6548_914D_7F6E["湮灭之炮"]["投影锁定"], px, py, _____91CC_79D1_7279_97F3_6548_914D_7F6E["默认裁断距离"])
     if projection ~= nil and projection ~= 0 then
-        local ____self_10 = context["清理"]
-        ____self_10["登记单位"](____self_10, "里科特-湮灭投影", projection)
+        local ____self_9 = context["清理"]
+        ____self_9["登记单位"](____self_9, "里科特-湮灭投影", projection)
     end
     registerManualBuff(
         target,
@@ -337,8 +365,8 @@ local function _____8C03_5EA6_5355_4E2A_6E6E_706D_6295_5F71(context, _____9636_6
             _____5F00_59CB_6E6E_706D_6295_5F71_70AE_51FB(data)
         end
     )
-    local ____self_11 = context["清理"]
-    ____self_11["登记延迟回调"](____self_11, "里科特-湮灭投影开炮", id)
+    local ____self_10 = context["清理"]
+    ____self_10["登记延迟回调"](____self_10, "里科特-湮灭投影开炮", id)
     if _____5355_4F4D_6709_6548(projection) then
         _____8C03_5EA6P3_7729_6655_70AE(context, _____9636_6BB5, target)
     end
@@ -351,8 +379,7 @@ ____exports["释放里科特湮灭之炮"] = function(context)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["湮灭之炮"]
     local _____9636_6BB5 = _____5237_65B0_91CC_79D1_7279_9636_6BB5(context)
     local castDuration = _____9636_6BB5 >= 2 and cfg["P2锁定前延迟秒"] or cfg["锁定前延迟秒"]
-    _____64AD_653E_91CC_79D1_7279_65BD_6CD5_7EF4_6301_52A8_4F5C(boss, castDuration, cfg["动画速度"])
-    _____64AD_653E_91CC_79D1_7279_53F0_8BCD(boss, "湮灭之炮")
+    _____542F_52A8_6E6E_706D_4E4B_70AEBoss_65BD_6CD5_52A8_4F5C(context, castDuration)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     do
         local i = 0

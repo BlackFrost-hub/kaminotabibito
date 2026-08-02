@@ -12,23 +12,21 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_3.getServerTime
-local addDelayedCallback = ____require_result_3.addDelayedCallback
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
-local ____require_result_6 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
-local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_6["读取Boss战运行上下文"]
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_2.getServerTime
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
+local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_5["读取Boss战运行上下文"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -76,11 +74,11 @@ local function _____7ED3_675F_82F1_7075_9668_661F(context)
 end
 local function _____53D6_82F1_7075_9668_661F_573A_5730(boss)
     local battle = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(boss)
-    local ____opt_result_9
+    local ____opt_result_8
     if battle ~= nil then
-        ____opt_result_9 = battle["地点矩形"]
+        ____opt_result_8 = battle["地点矩形"]
     end
-    local rect = ____opt_result_9
+    local rect = ____opt_result_8
     if rect == nil or rect == 0 then
         return {
             ["中心X"] = GetUnitX(boss),
@@ -230,17 +228,15 @@ local function _____7ED3_7B97_82F1_7075_9668_661F(context, x, y, radius, isP3)
                 if dx * dx + dy * dy > radius * radius then
                     goto __continue40
                 end
-                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = isP3 and cfg["英灵陨星"]["P3伤害攻击力比例"] or cfg["英灵陨星"]["伤害攻击力比例"], ["目标最大生命比例"] = isP3 and cfg["英灵陨星"]["P3伤害目标最大生命比例"] or cfg["英灵陨星"]["伤害目标最大生命比例"]})
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = target,
-                    ["伤害"] = damage,
+                    ["伤害公式"] = {["来源攻击力比例"] = isP3 and cfg["英灵陨星"]["P3伤害攻击力比例"] or cfg["英灵陨星"]["伤害攻击力比例"], ["目标最大生命比例"] = isP3 and cfg["英灵陨星"]["P3伤害目标最大生命比例"] or cfg["英灵陨星"]["伤害目标最大生命比例"]},
                     attack = false,
                     ranged = true,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能",
                     ["标签"] = isP3 and "亚伦柯斯·英灵陨星-送葬" or "亚伦柯斯·英灵陨星"
                 })
             end
@@ -280,8 +276,8 @@ local function _____5B89_6392_82F1_7075_9668_661F_843D_70B9(context, point, radi
             )
         end
     )
-    local ____self_10 = context["清理"]
-    ____self_10["登记延迟回调"](____self_10, "亚伦柯斯-英灵陨星单点结算", impactId)
+    local ____self_9 = context["清理"]
+    ____self_9["登记延迟回调"](____self_9, "亚伦柯斯-英灵陨星单点结算", impactId)
 end
 local function _____521B_5EFA_82F1_7075_9668_661F_6279_6B21(context, count, radius, isP2, isP3)
     local boss = context["Boss单位"]
@@ -345,8 +341,8 @@ ____exports["释放亚伦柯斯英灵陨星"] = function(context)
                     )
                 end
             )
-            local ____self_11 = context["清理"]
-            ____self_11["登记延迟回调"](____self_11, "亚伦柯斯-英灵陨星后续批次", batchId)
+            local ____self_10 = context["清理"]
+            ____self_10["登记延迟回调"](____self_10, "亚伦柯斯-英灵陨星后续批次", batchId)
             batch = batch + 1
         end
     end
@@ -356,8 +352,8 @@ ____exports["释放亚伦柯斯英灵陨星"] = function(context)
             _____7ED3_675F_82F1_7075_9668_661F(context)
         end
     )
-    local ____self_12 = context["清理"]
-    ____self_12["登记延迟回调"](____self_12, "亚伦柯斯-英灵陨星结束", finishId)
+    local ____self_11 = context["清理"]
+    ____self_11["登记延迟回调"](____self_11, "亚伦柯斯-英灵陨星结束", finishId)
     return true
 end
 ____exports["英灵陨星迁移状态"] = {

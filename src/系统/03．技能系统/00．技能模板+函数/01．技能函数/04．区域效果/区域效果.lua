@@ -11,7 +11,7 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__New = ____lualib.__TS__New
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local ____make_533A_57DF_6548_679C_53BB_91CDKey, _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8, _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B, _____6CE8_9500_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_7CFB_7EDFTick, addPeriodicCallback, removePeriodicCallback, getServerTime, _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668, _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID, _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55
+local ____make_533A_57DF_6548_679C_53BB_91CDKey, _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8, _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B, _____6CE8_9500_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_7CFB_7EDFTick, addPeriodicCallback, removePeriodicCallback, getServerTime, _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668, _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID, _____533A_57DF_6548_679C_7CFB_7EDF_68C0_67E5_95F4_9694_6BEB_79D2, _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B, _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55
 function ____make_533A_57DF_6548_679C_53BB_91CDKey(_____53BB_91CD_7EC4, _____5355_4F4DID)
     return (tostring(_____53BB_91CD_7EC4) .. ":") .. tostring(_____5355_4F4DID)
 end
@@ -19,7 +19,7 @@ function _____786E_4FDD_533A_57DF_6548_679C_7CFB_7EDF_5DF2_542F_52A8()
     if _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID ~= 0 then
         return
     end
-    _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID = addPeriodicCallback(100, _____533A_57DF_6548_679C_7CFB_7EDFTick)
+    _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID = addPeriodicCallback(_____533A_57DF_6548_679C_7CFB_7EDF_68C0_67E5_95F4_9694_6BEB_79D2, _____533A_57DF_6548_679C_7CFB_7EDFTick)
 end
 function _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B(_____5B9E_4F8B)
     _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B[#_____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B + 1] = _____5B9E_4F8B
@@ -62,8 +62,11 @@ local GroupRemoveUnit = jass.GroupRemoveUnit
 local DestroyGroup = jass.DestroyGroup
 local EXSetEffectZ = japi.EXSetEffectZ
 local EXSetEffectSize = japi.EXSetEffectSize
+local EXSetEffectXY = japi.EXSetEffectXY
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 addPeriodicCallback = ____require_result_0.addPeriodicCallback
 removePeriodicCallback = ____require_result_0.removePeriodicCallback
@@ -147,32 +150,73 @@ function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, ____
         end
     end
     if _____53C2_6570["提示圈"] ~= false and _____53C2_6570["显示提示圈"] ~= false and _____53C2_6570["持续时间"] > 0 then
-        local _____63D0_793A_5708_914D_7F6E = _____53C2_6570["提示圈"] or ({})
-        local ____521B_5EFA_6280_80FD_63D0_793A_5708_11 = _____521B_5EFA_6280_80FD_63D0_793A_5708
-        local ____temp_6 = _____63D0_793A_5708_914D_7F6E["类型"] or "渐变圆形"
-        local ____temp_7 = _____63D0_793A_5708_914D_7F6E.X or self["当前X"]
-        local ____temp_8 = _____63D0_793A_5708_914D_7F6E.Y or self["当前Y"]
-        local ____temp_9 = _____63D0_793A_5708_914D_7F6E["半径"] or _____53C2_6570["半径"]
-        local ____temp_10 = _____63D0_793A_5708_914D_7F6E["持续时间"] or _____53C2_6570["持续时间"]
-        local ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_5 = _____63D0_793A_5708_914D_7F6E["来源单位"]
-        if ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_5 == nil then
-            ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_5 = _____53C2_6570["所有者"]
+        local _____539F_59CB_63D0_793A_5708_914D_7F6E = _____53C2_6570["提示圈"] or ({})
+        local ____539F_59CB_63D0_793A_5708_914D_7F6E__951A_70B9_5355_4F4D_5 = _____539F_59CB_63D0_793A_5708_914D_7F6E["锚点单位"]
+        if ____539F_59CB_63D0_793A_5708_914D_7F6E__951A_70B9_5355_4F4D_5 == nil then
+            ____539F_59CB_63D0_793A_5708_914D_7F6E__951A_70B9_5355_4F4D_5 = _____53C2_6570["锚点单位"]
         end
-        self["提示圈特效"] = ____521B_5EFA_6280_80FD_63D0_793A_5708_11(__TS__ObjectAssign({}, _____63D0_793A_5708_914D_7F6E, {
-            ["类型"] = ____temp_6,
-            X = ____temp_7,
-            Y = ____temp_8,
-            ["半径"] = ____temp_9,
-            ["持续时间"] = ____temp_10,
-            ["来源单位"] = ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_5
+        local _____63D0_793A_5708_914D_7F6E = __TS__ObjectAssign({}, _____539F_59CB_63D0_793A_5708_914D_7F6E, {["锚点单位"] = ____539F_59CB_63D0_793A_5708_914D_7F6E__951A_70B9_5355_4F4D_5})
+        local _____6709_951A_70B9 = _____63D0_793A_5708_914D_7F6E["锚点单位"] ~= nil and _____63D0_793A_5708_914D_7F6E["锚点单位"] ~= 0
+        local ____521B_5EFA_6280_80FD_63D0_793A_5708_14 = _____521B_5EFA_6280_80FD_63D0_793A_5708
+        local ____temp_11 = _____63D0_793A_5708_914D_7F6E["类型"] or "渐变圆形"
+        local ____63D0_793A_5708_914D_7F6E_X_7 = _____63D0_793A_5708_914D_7F6E.X
+        if ____63D0_793A_5708_914D_7F6E_X_7 == nil then
+            local _____6709_951A_70B9_6
+            if _____6709_951A_70B9 then
+                _____6709_951A_70B9_6 = nil
+            else
+                _____6709_951A_70B9_6 = self["当前X"]
+            end
+            ____63D0_793A_5708_914D_7F6E_X_7 = _____6709_951A_70B9_6
+        end
+        local ____63D0_793A_5708_914D_7F6E_Y_9 = _____63D0_793A_5708_914D_7F6E.Y
+        if ____63D0_793A_5708_914D_7F6E_Y_9 == nil then
+            local _____6709_951A_70B9_8
+            if _____6709_951A_70B9 then
+                _____6709_951A_70B9_8 = nil
+            else
+                _____6709_951A_70B9_8 = self["当前Y"]
+            end
+            ____63D0_793A_5708_914D_7F6E_Y_9 = _____6709_951A_70B9_8
+        end
+        local ____temp_12 = _____63D0_793A_5708_914D_7F6E["半径"] or _____53C2_6570["半径"]
+        local ____temp_13 = _____63D0_793A_5708_914D_7F6E["持续时间"] or _____53C2_6570["持续时间"]
+        local ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_10 = _____63D0_793A_5708_914D_7F6E["来源单位"]
+        if ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_10 == nil then
+            ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_10 = _____53C2_6570["所有者"]
+        end
+        self["提示圈特效"] = ____521B_5EFA_6280_80FD_63D0_793A_5708_14(__TS__ObjectAssign({}, _____63D0_793A_5708_914D_7F6E, {
+            ["类型"] = ____temp_11,
+            X = ____63D0_793A_5708_914D_7F6E_X_7,
+            Y = ____63D0_793A_5708_914D_7F6E_Y_9,
+            ["半径"] = ____temp_12,
+            ["持续时间"] = ____temp_13,
+            ["来源单位"] = ____63D0_793A_5708_914D_7F6E__6765_6E90_5355_4F4D_10
         }))
     end
     _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B(self)
+end
+_____533A_57DF_6548_679C_5B9E_73B0.prototype["刷新锚点位置"] = function(self)
+    local _____951A_70B9_5355_4F4D = self["参数"]["锚点单位"]
+    if _____951A_70B9_5355_4F4D == nil or _____951A_70B9_5355_4F4D == 0 then
+        return
+    end
+    local x = GetUnitX(_____951A_70B9_5355_4F4D)
+    local y = GetUnitY(_____951A_70B9_5355_4F4D)
+    self["当前X"] = x
+    self["当前Y"] = y
+    if self["特效句柄"] ~= nil and self["特效句柄"] ~= 0 then
+        EXSetEffectXY(self["特效句柄"], x, y)
+    end
+    if self["提示圈特效"] ~= nil and self["提示圈特效"] ~= 0 then
+        EXSetEffectXY(self["提示圈特效"], x, y)
+    end
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["系统Tick"] = function(self, _____5F53_524D_65F6_95F4_6BEB_79D2)
     if self["已暂停值"] or self["已销毁值"] then
         return
     end
+    self["刷新锚点位置"](self)
     if self["销毁时间毫秒"] > 0 and _____5F53_524D_65F6_95F4_6BEB_79D2 >= self["销毁时间毫秒"] then
         self["销毁"](self)
         return
@@ -187,6 +231,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
     if self["已暂停值"] or self["已销毁值"] then
         return
     end
+    self["刷新锚点位置"](self)
     local _____95F4_9694 = self["检测间隔秒值"]
     if self["参数"]["持续时间"] > 0 then
         self["剩余时间值"] = self["剩余时间值"] - _____95F4_9694
@@ -207,21 +252,21 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
         do
             local hid = GetHandleId(_____5355_4F4D)
             if not self["是否影响目标"](self, _____5355_4F4D) then
-                goto __continue28
+                goto __continue32
             end
             _____65B0_96C6_5408[hid] = _____5355_4F4D
             if not _____662F_9996_6B21 and not self["当前单位集合"][hid] then
                 local _____4E0A_6B21_79BB_5F00 = self["单位最后离开时间"][hid]
                 if _____4E0A_6B21_79BB_5F00 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_79BB_5F00 >= _____9632_6296_6BEB_79D2 then
-                    local ____opt_12 = self["参数"]["on进入"]
-                    if ____opt_12 ~= nil then
-                        ____opt_12(_____5355_4F4D, self["参数"]["回调上下文ID"])
+                    local ____opt_15 = self["参数"]["on进入"]
+                    if ____opt_15 ~= nil then
+                        ____opt_15(_____5355_4F4D, self["参数"]["回调上下文ID"])
                     end
                 end
                 self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
             end
         end
-        ::__continue28::
+        ::__continue32::
     end
     local _____5F53_524D_5355_4F4DID_5217_8868 = _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4DID_6570_7EC4(self["当前单位集合"])
     do
@@ -231,9 +276,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
             if not _____65B0_96C6_5408[hid] then
                 local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
                 if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-                    local ____opt_14 = self["参数"]["on离开"]
-                    if ____opt_14 ~= nil then
-                        ____opt_14(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
+                    local ____opt_17 = self["参数"]["on离开"]
+                    if ____opt_17 ~= nil then
+                        ____opt_17(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
                     end
                 end
                 self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
@@ -254,37 +299,37 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     local _____53BB_91CDKey = ____make_533A_57DF_6548_679C_53BB_91CDKey(_____53BB_91CD_7EC4, _____5355_4F4DID)
                     local _____4E0A_6B21_4F24_5BB3_65F6_95F4 = _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey]
                     if _____4E0A_6B21_4F24_5BB3_65F6_95F4 ~= nil and _____5F53_524D_65F6_95F4 - _____4E0A_6B21_4F24_5BB3_65F6_95F4 < _____53BB_91CD_95F4_9694_6BEB_79D2 then
-                        goto __continue38
+                        goto __continue42
                     end
                     _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey] = _____5F53_524D_65F6_95F4
                 end
-                local ____9020_6210_6301_7EED_4F24_5BB3_19 = _____9020_6210_6301_7EED_4F24_5BB3
-                local ____self__53C2_6570__6240_6709_8005_16 = self["参数"]["所有者"]
-                if ____self__53C2_6570__6240_6709_8005_16 == nil then
-                    ____self__53C2_6570__6240_6709_8005_16 = _____5355_4F4D
+                local ____9020_6210_6301_7EED_4F24_5BB3_22 = _____9020_6210_6301_7EED_4F24_5BB3
+                local ____self__53C2_6570__6240_6709_8005_19 = self["参数"]["所有者"]
+                if ____self__53C2_6570__6240_6709_8005_19 == nil then
+                    ____self__53C2_6570__6240_6709_8005_19 = _____5355_4F4D
                 end
-                local ____self__53C2_6570__5468_671F_4F24_5BB3_18 = self["参数"]["周期伤害"]
-                local ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_17 = self["参数"]["周期伤害类型"]
-                if ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_17 == nil then
-                    ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_17 = DAMAGE_TYPE_NORMAL
+                local ____self__53C2_6570__5468_671F_4F24_5BB3_21 = self["参数"]["周期伤害"]
+                local ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_20 = self["参数"]["周期伤害类型"]
+                if ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_20 == nil then
+                    ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_20 = DAMAGE_TYPE_NORMAL
                 end
-                ____9020_6210_6301_7EED_4F24_5BB3_19(
-                    ____self__53C2_6570__6240_6709_8005_16,
+                ____9020_6210_6301_7EED_4F24_5BB3_22(
+                    ____self__53C2_6570__6240_6709_8005_19,
                     _____5355_4F4D,
-                    ____self__53C2_6570__5468_671F_4F24_5BB3_18,
-                    ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_17,
+                    ____self__53C2_6570__5468_671F_4F24_5BB3_21,
+                    ____self__53C2_6570__5468_671F_4F24_5BB3_7C7B_578B_20,
                     false,
                     ATTACK_TYPE_NORMAL,
                     nil,
                     {["伤害形态"] = "AOE"}
                 )
             end
-            ::__continue38::
+            ::__continue42::
         end
     end
-    local ____opt_20 = self["参数"]["on周期"]
-    if ____opt_20 ~= nil then
-        ____opt_20(_____5F53_524D_5355_4F4D_6570_7EC4, self["参数"]["回调上下文ID"])
+    local ____opt_23 = self["参数"]["on周期"]
+    if ____opt_23 ~= nil then
+        ____opt_23(_____5F53_524D_5355_4F4D_6570_7EC4, self["参数"]["回调上下文ID"])
     end
 end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["是否影响目标"] = function(self, _____5355_4F4D)
@@ -315,9 +360,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["销毁"] = function(self)
         DestroyEffect(self["提示圈特效"])
         self["提示圈特效"] = nil
     end
-    local ____opt_22 = self["参数"]["on销毁"]
-    if ____opt_22 ~= nil then
-        ____opt_22(self["参数"]["回调上下文ID"])
+    local ____opt_25 = self["参数"]["on销毁"]
+    if ____opt_25 ~= nil then
+        ____opt_25(self["参数"]["回调上下文ID"])
     end
     self["当前单位集合"] = {}
     self["单位最后进入时间"] = {}
@@ -351,9 +396,9 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["移动到"] = function(self, X, Y)
             local hid = _____5F53_524D_5355_4F4DID_5217_8868[i + 1]
             local _____4E0A_6B21_8FDB_5165 = self["单位最后进入时间"][hid]
             if _____4E0A_6B21_8FDB_5165 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8FDB_5165 >= _____9632_6296_6BEB_79D2 then
-                local ____opt_24 = self["参数"]["on离开"]
-                if ____opt_24 ~= nil then
-                    ____opt_24(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
+                local ____opt_27 = self["参数"]["on离开"]
+                if ____opt_27 ~= nil then
+                    ____opt_27(self["当前单位集合"][hid], self["参数"]["回调上下文ID"])
                 end
             end
             self["单位最后离开时间"][hid] = _____5F53_524D_65F6_95F4
@@ -388,6 +433,7 @@ __TS__SetDescriptor(
 )
 _____533A_57DF_6548_679C_5B9E_4F8BID_8BA1_6570_5668 = 0
 _____533A_57DF_6548_679C_7CFB_7EDF_56DE_8C03ID = 0
+_____533A_57DF_6548_679C_7CFB_7EDF_68C0_67E5_95F4_9694_6BEB_79D2 = 20
 _____6D3B_8DC3_533A_57DF_6548_679C_5B9E_4F8B = {}
 _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55 = {}
 ____exports["创建区域效果"] = function(_____53C2_6570)

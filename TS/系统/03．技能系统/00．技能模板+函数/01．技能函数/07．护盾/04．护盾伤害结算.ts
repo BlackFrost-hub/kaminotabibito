@@ -18,7 +18,7 @@ const { RMinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
 };
 
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (context: {
+  registerDamageModifier: (this: void, callback: (this: void, context: {
     target: any;
     attacker: any;
     baseDamage: number;
@@ -136,6 +136,7 @@ export function 吸收伤害(
   const 伤害 = 构建伤害信息(目标, 伤害值, 是物理伤害, 是魔法伤害, 攻击者, 属性);
   // 获取按优先级排序的可匹配护盾（通用护盾吸收所有伤害，包括真实伤害）
   const 可用护盾 = 获取可匹配护盾列表(全部护盾, 伤害);
+  let 阻止溢出 = false;
 
   // 按优先级依次吸收
   for (const 护盾 of 可用护盾) {
@@ -151,6 +152,7 @@ export function 吸收伤害(
 
     // 护盾破碎
     if (护盾.当前值 <= 0) {
+      if (护盾.溢出处理策略 === "阻止传递") 阻止溢出 = true;
       结果.破碎护盾.push(护盾);
       删除护盾实例(护盾.id);
 
@@ -169,6 +171,8 @@ export function 吸收伤害(
     }
   }
 
+  if (阻止溢出) 结果.剩余伤害 = 0;
+
   return 结果;
 }
 
@@ -180,31 +184,33 @@ export function 吸收伤害(
 export function 注册护盾吸收钩子(): void {
   if (shieldModifierRegistered) return;
   shieldModifierRegistered = true;
-  registerDamageModifier((context) => {
-    const 结果 = 吸收伤害(
-      context.target,
-      context.currentDamage,
-      context.isPhysicalDamage,
-      context.isMagicDamage,
-      context.attacker,
-      {
-        是真实伤害: context.isTrueDamage === true,
-        是强化伤害: context.isEnhancedDamage === true,
-        是火属性伤害: context.isFireDamage === true,
-        是水属性伤害: context.isWaterDamage === true,
-        是冰属性伤害: context.isWaterDamage === true,
-        是雷属性伤害: context.isThunderDamage === true,
-        是金属性伤害: context.isMetalDamage === true,
-        是木属性伤害: context.isWoodDamage === true,
-        是风属性伤害: context.isWoodDamage === true,
-        是暗属性伤害: context.isDarkDamage === true,
-        是光属性伤害: context.isLightDamage === true,
-        是毒属性伤害: context.isMetalDamage === true,
-        是普攻: context.isNormalAttack === true,
-      }
-    );
-    return 结果.剩余伤害;
-  }, 100);
+  registerDamageModifier(护盾吸收伤害修正, 100);
+}
+
+function 护盾吸收伤害修正(this: void, context: any): number {
+  const 结果 = 吸收伤害(
+    context.target,
+    context.currentDamage,
+    context.isPhysicalDamage,
+    context.isMagicDamage,
+    context.attacker,
+    {
+      是真实伤害: context.isTrueDamage === true,
+      是强化伤害: context.isEnhancedDamage === true,
+      是火属性伤害: context.isFireDamage === true,
+      是水属性伤害: context.isWaterDamage === true,
+      是冰属性伤害: context.isWaterDamage === true,
+      是雷属性伤害: context.isThunderDamage === true,
+      是金属性伤害: context.isMetalDamage === true,
+      是木属性伤害: context.isWoodDamage === true,
+      是风属性伤害: context.isWoodDamage === true,
+      是暗属性伤害: context.isDarkDamage === true,
+      是光属性伤害: context.isLightDamage === true,
+      是毒属性伤害: context.isMetalDamage === true,
+      是普攻: context.isNormalAttack === true,
+    }
+  );
+  return 结果.剩余伤害;
 }
 
 export {};

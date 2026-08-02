@@ -33,6 +33,14 @@ do
     end
 end
 do
+    local ____export = require("系统.07．地形系统.06．可破坏物数据.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.07．地形系统.07．区域背景音乐.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then

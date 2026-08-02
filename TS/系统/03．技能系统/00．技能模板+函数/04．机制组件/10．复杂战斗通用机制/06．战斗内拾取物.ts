@@ -16,7 +16,7 @@ const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | u
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
@@ -54,37 +54,12 @@ export interface 战斗内拾取物实例 {
   销毁(原因?: 战斗内拾取物结束原因): void;
 }
 
-const 拾取物表: Record<number, 战斗内拾取物实现 | undefined> = {};
 let 下一个拾取物ID = 0;
-let 拾取物驱动ID = 0;
 
 function 距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
   const dx = x2 - x1;
   const dy = y2 - y1;
   return SquareRoot(dx * dx + dy * dy);
-}
-
-function 确保驱动(this: void, 间隔毫秒: number): void {
-  if (拾取物驱动ID !== 0) return;
-  拾取物驱动ID = addPeriodicCallback(间隔毫秒, on拾取物Tick);
-}
-
-function 尝试停止驱动(this: void): void {
-  for (const key in 拾取物表) {
-    if (拾取物表[key] != null) return;
-  }
-  if (拾取物驱动ID !== 0) {
-    removePeriodicCallback(拾取物驱动ID);
-    拾取物驱动ID = 0;
-  }
-}
-
-function on拾取物Tick(this: void): void {
-  const now = getServerTime();
-  for (const key in 拾取物表) {
-    const 实例 = 拾取物表[key];
-    if (实例 != null) 实例.推进(now);
-  }
 }
 
 class 战斗内拾取物实现 implements 战斗内拾取物实例 {
@@ -94,6 +69,7 @@ class 战斗内拾取物实现 implements 战斗内拾取物实例 {
   private x: number;
   private y: number;
   private 到期时间 = 0;
+  private Tick回调ID = 0;
   private 已销毁 = false;
 
   constructor(ID: number, 参数: 战斗内拾取物参数, 特效: any) {
@@ -103,7 +79,7 @@ class 战斗内拾取物实现 implements 战斗内拾取物实例 {
     this.x = 参数.X;
     this.y = 参数.Y;
     if (参数.持续秒 != null && 参数.持续秒 > 0) this.到期时间 = getServerTime() + 参数.持续秒 * 1000;
-    拾取物表[ID] = this;
+    this.Tick回调ID = addPeriodicCallback(参数.Tick间隔毫秒 ?? 50, on拾取物Tick, this);
   }
 
   取X(): number {
@@ -123,10 +99,12 @@ class 战斗内拾取物实现 implements 战斗内拾取物实例 {
   销毁(原因: 战斗内拾取物结束原因 = "手动销毁"): void {
     if (this.已销毁) return;
     this.已销毁 = true;
-    delete 拾取物表[this.ID];
+    if (this.Tick回调ID !== 0) {
+      removePeriodicCallback(this.Tick回调ID);
+      this.Tick回调ID = 0;
+    }
     if (this.特效 != null && this.特效 !== 0) DestroyEffect(this.特效);
     if (this.参数.on销毁 != null) this.参数.on销毁(this, 原因, this.参数.变量);
-    尝试停止驱动();
   }
 
   推进(now: number): void {
@@ -179,6 +157,11 @@ class 战斗内拾取物实现 implements 战斗内拾取物实例 {
   }
 }
 
+function on拾取物Tick(this: void, variable?: any): void {
+  const 实例 = variable as 战斗内拾取物实现 | undefined;
+  if (实例 != null) 实例.推进(getServerTime());
+}
+
 export function 创建战斗内拾取物(this: void, 参数: 战斗内拾取物参数): 战斗内拾取物实例 | undefined {
   if (参数.模型路径 == null || 参数.模型路径 === "") return undefined;
   const effect = AddSpecialEffect(参数.模型路径, 参数.X, 参数.Y);
@@ -186,7 +169,6 @@ export function 创建战斗内拾取物(this: void, 参数: 战斗内拾取物�
   if (参数.高度 != null && typeof EXSetEffectZ === "function") EXSetEffectZ(effect, 参数.高度);
   if (参数.缩放 != null && typeof EXSetEffectSize === "function") EXSetEffectSize(effect, 参数.缩放);
   const 实例 = new 战斗内拾取物实现(++下一个拾取物ID, 参数, effect);
-  确保驱动(参数.Tick间隔毫秒 ?? 50);
   if (参数.清理 != null) {
     参数.清理.登记清理(参数.名称 + "#" + String(实例.ID), function 战斗内拾取物清理(this: void): void {
       实例.销毁();

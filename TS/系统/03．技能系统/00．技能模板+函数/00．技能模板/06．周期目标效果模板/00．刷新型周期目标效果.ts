@@ -3,7 +3,7 @@
 const jass = require("jass.common") as any;
 
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
@@ -38,13 +38,13 @@ interface 刷新型周期目标效果记录 {
   expireTime: number;
   nextTickTime: number;
   intervalMs: number;
+  检查间隔毫秒: number;
+  驱动ID: number;
   有效性检查?: (this: void, 上下文: 刷新型周期目标效果上下文) => boolean;
   on周期: (this: void, 上下文: 刷新型周期目标效果上下文) => void;
 }
 
 const 周期目标效果记录列表: 刷新型周期目标效果记录[] = [];
-let 周期目标效果驱动ID = 0;
-let 周期目标效果检查间隔毫秒 = 100;
 
 function 取单位句柄ID(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
@@ -78,30 +78,34 @@ function 记录仍有效(this: void, 记录: 刷新型周期目标效果记录, 
   return 记录.有效性检查(构建上下文(记录, now));
 }
 
-function on刷新型周期目标效果Tick(this: void): void {
-  const now = getServerTime();
-  let write = 0;
-  for (let i = 0; i < 周期目标效果记录列表.length; i++) {
-    const 记录 = 周期目标效果记录列表[i];
-    if (记录 == null || !记录仍有效(记录, now)) continue;
-    if (now >= 记录.nextTickTime) {
-      记录.on周期(构建上下文(记录, now));
-      记录.nextTickTime = now + 记录.intervalMs;
-    }
-    周期目标效果记录列表[write] = 记录;
-    write++;
+function 停止刷新型周期目标效果记录(this: void, 记录: 刷新型周期目标效果记录): void {
+  if (记录.驱动ID !== 0) {
+    removePeriodicCallback(记录.驱动ID);
+    记录.驱动ID = 0;
   }
-  while (周期目标效果记录列表.length > write) 周期目标效果记录列表.pop();
-  if (周期目标效果记录列表.length <= 0 && 周期目标效果驱动ID !== 0) {
-    removePeriodicCallback(周期目标效果驱动ID);
-    周期目标效果驱动ID = 0;
-  }
+  const index = 周期目标效果记录列表.indexOf(记录);
+  if (index >= 0) 周期目标效果记录列表.splice(index, 1);
 }
 
-function 确保刷新型周期目标效果驱动(this: void, 检查间隔毫秒: number): void {
-  if (周期目标效果驱动ID !== 0) return;
-  周期目标效果检查间隔毫秒 = 检查间隔毫秒 > 0 ? 检查间隔毫秒 : 100;
-  周期目标效果驱动ID = addPeriodicCallback(周期目标效果检查间隔毫秒, on刷新型周期目标效果Tick);
+function 更新刷新型周期目标效果驱动(this: void, 记录: 刷新型周期目标效果记录, 检查间隔毫秒: number): void {
+  const interval = 检查间隔毫秒 > 0 ? 检查间隔毫秒 : 100;
+  if (记录.驱动ID !== 0 && 记录.检查间隔毫秒 === interval) return;
+  if (记录.驱动ID !== 0) removePeriodicCallback(记录.驱动ID);
+  记录.检查间隔毫秒 = interval;
+  记录.驱动ID = addPeriodicCallback(interval, on刷新型周期目标效果Tick, 记录);
+}
+
+function on刷新型周期目标效果Tick(this: void, variable?: any): void {
+  const 记录 = variable as 刷新型周期目标效果记录 | undefined;
+  if (记录 == null || 记录.驱动ID === 0) return;
+  const now = getServerTime();
+  if (!记录仍有效(记录, now)) {
+    停止刷新型周期目标效果记录(记录);
+    return;
+  }
+  if (now < 记录.nextTickTime) return;
+  记录.on周期(构建上下文(记录, now));
+  记录.nextTickTime = now + 记录.intervalMs;
 }
 
 export function 施加或刷新周期目标效果(this: void, 参数: 刷新型周期目标效果参数): void {
@@ -123,20 +127,22 @@ export function 施加或刷新周期目标效果(this: void, 参数: 刷新型�
     if (参数.刷新时重置下次周期 === true) {
       记录.nextTickTime = now + 参数.间隔毫秒;
     }
-    确保刷新型周期目标效果驱动(参数.检查间隔毫秒 ?? 周期目标效果检查间隔毫秒);
+    if (参数.检查间隔毫秒 != null) 更新刷新型周期目标效果驱动(记录, 参数.检查间隔毫秒);
     return;
   }
 
-  周期目标效果记录列表.push({
+  const 记录: 刷新型周期目标效果记录 = {
     key,
     来源单位: 参数.来源单位,
     目标单位: 参数.目标单位,
     expireTime,
     nextTickTime: now + 参数.间隔毫秒,
     intervalMs: 参数.间隔毫秒,
+    检查间隔毫秒: 0,
+    驱动ID: 0,
     有效性检查: 参数.有效性检查,
     on周期: 参数.on周期,
-  });
-  确保刷新型周期目标效果驱动(参数.检查间隔毫秒 ?? 100);
+  };
+  周期目标效果记录列表.push(记录);
+  更新刷新型周期目标效果驱动(记录, 参数.检查间隔毫秒 ?? 100);
 }
-

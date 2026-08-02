@@ -7,7 +7,7 @@ import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配
 import { 执行战斗自身位移到坐标 } from '../../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 播放赤誓灵卫台词 } from '../12．台词播放';
 const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as { debugLogForce: (this: void, module: string, ...args: any[]) => void };
 
@@ -16,9 +16,6 @@ const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能�
 };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, params: any) => boolean;
 };
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -85,8 +82,17 @@ function 结算践踏伤害(this: void, context: 祖地双灵卫运行时上下�
   for (let i = 0; i < heroes.length; i++) {
     const hit = heroes[i];
     if (!点在圆内(GetUnitX(hit), GetUnitY(hit), x, y, cfg.落点半径)) continue;
-    const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-    造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: false, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: label });
+    执行BossAOE技能伤害({
+      来源: boss,
+      目标: hit,
+      伤害公式: { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 },
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_NORMAL,
+      weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+      标签: label,
+    });
   }
 }
 
@@ -175,11 +181,21 @@ export function 释放断誓践踏(this: void, context: 祖地双灵卫运行时
       for (let i = 0; i < heroes.length; i++) {
         const hit = heroes[i];
         if (!单位有效(hit) || !点在圆内(GetUnitX(hit), GetUnitY(hit), second.X, second.Y, cfg.落点半径)) continue;
-        const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: 0.08 });
-        造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_PLANT, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '祖地双灵卫·断誓践踏魂裂' });
+        执行BossAOE技能伤害({
+          来源: boss,
+          目标: hit,
+          伤害公式: { 来源攻击力比例: 0.08 },
+          attack: false,
+          ranged: true,
+          attackType: ATTACK_TYPE_NORMAL,
+          伤害类型: DAMAGE_TYPE_PLANT,
+          weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+          标签: '祖地双灵卫·断誓践踏魂裂',
+        });
       }
       if (ticks >= 4) removePeriodicCallback(crackTimer);
     });
+    context.清理.登记周期回调('祖地双灵卫-断誓践踏魂裂', crackTimer);
   });
   context.清理.登记延迟回调('祖地双灵卫-断誓践踏第二步', delayedId);
   return true;

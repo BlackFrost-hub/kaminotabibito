@@ -5,14 +5,13 @@ import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
-import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 两点角度, 极坐标X, 极坐标Y, 距离XY, 限制数值, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 获取条形区域单位 } from '../../../../../00．技能模板+函数/01．技能函数/09．形状区域/矩形区域';
 import { 创建点特效, 设置特效XYZ轴旋转 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as { 创建技能提示圈: (this: void, config: any) => any };
 const { 开始冲锋 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统') as { 开始冲锋: (this: void, unit: any, params: any) => number };
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as { 造成AOE技能伤害: (this: void, params: any) => boolean };
 const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
@@ -58,8 +57,17 @@ function 结算壁进路径(this: void, context: 祖地双灵卫运行时上下�
   for (let i = 0; i < targets.length; i++) {
     const target = targets[i];
     if (!单位有效(target) || target === boss || IsUnitEnemy(target, GetOwningPlayer(boss)) !== true) continue;
-    const damage = 计算组合技能伤害(boss, target, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-    造成AOE技能伤害({ 来源: boss, 目标: target, 伤害: damage, attack: false, ranged: false, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_METAL_HEAVY_BASH, 来源类型: 'Boss技能', 标签: '祖地双灵卫·誓锋壁进' });
+    执行BossAOE技能伤害({
+      来源: boss,
+      目标: target,
+      伤害公式: { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 },
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_NORMAL,
+      weaponType: WEAPON_TYPE_METAL_HEAVY_BASH,
+      标签: '祖地双灵卫·誓锋壁进',
+    });
   }
 }
 

@@ -1,8 +1,12 @@
 /** @noSelfInFile */
 
-const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+import type { 自适应共享周期驱动 } from "../../04．机制组件/10．复杂战斗通用机制/17．周期机制调度器";
+
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
+};
+const { 创建自适应共享周期驱动 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器") as {
+  创建自适应共享周期驱动: (this: void, 参数: any) => 自适应共享周期驱动;
 };
 const {
   监听指定物品获取丢弃,
@@ -11,8 +15,9 @@ const {
   监听指定物品获取丢弃: (
     this: void,
     itemTypeId: number,
-    获取回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void,
-    丢弃回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number) => void,
+    获取回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number, 变量?: any) => void,
+    丢弃回调?: (this: void, unit: any, item: any, currentCount: number, previousCount: number, 变量?: any) => void,
+    变量?: any,
   ) => void;
   获取单位当前持有指定物品数量: (this: void, unit: any, itemTypeId: number) => number;
 };
@@ -40,7 +45,7 @@ type 条件开关实例 = 条件开关效果参数 & {
 };
 
 const 条件开关实例表: 条件开关实例[] = [];
-let 已注册条件开关中心 = false;
+let 条件开关驱动: 自适应共享周期驱动 | undefined;
 
 function 获取单位ID(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
@@ -122,8 +127,7 @@ function 处理丢弃(this: void, 配置: 条件开关实例, unit: any, _item: 
   切换条件状态(配置, 状态);
 }
 
-function on条件开关效果Tick(this: void): void {
-  const now = getServerTime();
+function on条件开关效果Tick(this: void, now: number): void {
   for (let i = 0; i < 条件开关实例表.length; i++) {
     const 配置 = 条件开关实例表[i];
     if (now < 配置.下次触发时间) continue;
@@ -159,10 +163,35 @@ function on条件开关效果Tick(this: void): void {
   }
 }
 
+function 取条件开关建议检查间隔(this: void, _nowMs: number): number {
+  let 最短间隔 = 0;
+  for (let i = 0; i < 条件开关实例表.length; i++) {
+    const 间隔 = 条件开关实例表[i].检查间隔毫秒;
+    if (间隔 > 0 && (最短间隔 === 0 || 间隔 < 最短间隔)) 最短间隔 = 间隔;
+  }
+  return 最短间隔;
+}
+
 function 确保中心已注册(this: void): void {
-  if (已注册条件开关中心) return;
-  已注册条件开关中心 = true;
-  addPeriodicCallback(100, on条件开关效果Tick);
+  if (条件开关驱动 == null) {
+    条件开关驱动 = 创建自适应共享周期驱动({
+      名称: "条件开关效果驱动",
+      最大检查间隔毫秒: 100,
+      取建议检查间隔毫秒: 取条件开关建议检查间隔,
+      onTick: on条件开关效果Tick,
+    });
+  }
+  条件开关驱动.刷新();
+}
+
+function on条件开关物品获取(this: void, unit: any, item: any, currentCount: number, previousCount: number, variable?: any): void {
+  const 配置 = variable as 条件开关实例 | undefined;
+  if (配置 != null) 处理获得(配置, unit, item, currentCount, previousCount);
+}
+
+function on条件开关物品丢弃(this: void, unit: any, item: any, currentCount: number, previousCount: number, variable?: any): void {
+  const 配置 = variable as 条件开关实例 | undefined;
+  if (配置 != null) 处理丢弃(配置, unit, item, currentCount, previousCount);
 }
 
 export function 注册持有型条件开关效果(this: void, 参数: 条件开关效果参数): void {
@@ -176,18 +205,19 @@ export function 注册持有型条件开关效果(this: void, 参数: 条件开�
     return;
   }
 
-  确保中心已注册();
   const 配置: 条件开关实例 = {
     ...参数,
     下次触发时间: getServerTime() + 参数.检查间隔毫秒,
     单位状态: {},
   };
   条件开关实例表.push(配置);
+  确保中心已注册();
 
   监听指定物品获取丢弃(
     参数.物品类型ID,
-    (unit, item, currentCount, previousCount) => 处理获得(配置, unit, item, currentCount, previousCount),
-    (unit, item, currentCount, previousCount) => 处理丢弃(配置, unit, item, currentCount, previousCount),
+    on条件开关物品获取,
+    on条件开关物品丢弃,
+    配置,
   );
 }
 

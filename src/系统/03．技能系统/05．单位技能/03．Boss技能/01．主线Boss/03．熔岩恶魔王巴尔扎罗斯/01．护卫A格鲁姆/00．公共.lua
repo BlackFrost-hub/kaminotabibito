@@ -12,32 +12,30 @@ local ____14_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_683C_9C81_59C6_53F0_8BCD = ____14_FF0E_53F0_8BCD_64AD_653E["播放格鲁姆台词"]
 local ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.16．灼热层数工具")
 local _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED = ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177["施加巴尔扎罗斯灼热"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
-local _____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_4["创建线段危险区"]
-local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807 = ____require_result_5["获取Boss技能最高仇恨目标"]
-local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_5["获取Boss技能随机敌对英雄"]
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_6.addPeriodicCallback
-local removePeriodicCallback = ____require_result_6.removePeriodicCallback
-local getServerTime = ____require_result_6.getServerTime
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_7["施加快速控制Buff"]
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_8["设置特效XYZ轴旋转"]
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
-local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_9.CosBJ
-local SinBJ = ____require_result_9.SinBJ
+local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_0["读取单位攻击力"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.02．线段危险区")
+local _____521B_5EFA_7EBF_6BB5_5371_9669_533A = ____require_result_3["创建线段危险区"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807 = ____require_result_4["获取Boss技能最高仇恨目标"]
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_5.addPeriodicCallback
+local removePeriodicCallback = ____require_result_5.removePeriodicCallback
+local getServerTime = ____require_result_5.getServerTime
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____65BD_52A0_5FEB_901F_63A7_5236Buff = ____require_result_6["施加快速控制Buff"]
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C = ____require_result_7["设置特效XYZ轴旋转"]
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
+local ____require_result_8 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_8.CosBJ
+local SinBJ = ____require_result_8.SinBJ
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetHandleId = jass.GetHandleId
@@ -84,10 +82,6 @@ local function _____89D2_5EA6_5DEE_7EDD_5BF9_503C(a, b)
 end
 local function _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3(grum)
     return _____8BFB_53D6_5355_4F4D_653B_51FB_529B(grum) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]["持续伤害攻击力比例"] * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]["伤害总倍率"]
-end
-local function _____8BA1_7B97_706B_5F84_7A7F_8D8A_4F24_5BB3(grum, target)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(grum, target, {["来源攻击力比例"] = config["穿越伤害攻击力比例"], ["目标最大生命比例"] = config["穿越伤害目标最大生命比例"], ["总倍率"] = config["伤害总倍率"]})
 end
 local function _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3(source, target, amount, _____4F24_5BB3_5F62_6001)
     if not _____5355_4F4D_6709_6548(source) or not _____5355_4F4D_6709_6548(target) or not (amount > 0) then
@@ -156,7 +150,6 @@ ____exports["格鲁姆公共"] = {
     ["角度差绝对值"] = _____89D2_5EA6_5DEE_7EDD_5BF9_503C,
     ["点到单位距离平方"] = _____70B9_5230_5355_4F4D_8DDD_79BB_5E73_65B9,
     ["计算火径持续伤害"] = _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3,
-    ["计算火径穿越伤害"] = _____8BA1_7B97_706B_5F84_7A7F_8D8A_4F24_5BB3,
     ["造成格鲁姆Boss技能伤害"] = _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3,
     ["播放点特效"] = _____64AD_653E_70B9_7279_6548
 }

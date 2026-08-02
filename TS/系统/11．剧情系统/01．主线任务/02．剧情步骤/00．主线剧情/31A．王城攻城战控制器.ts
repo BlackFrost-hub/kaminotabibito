@@ -47,6 +47,10 @@ import { 创建并冻结剧情Boss预置 } from "../../00．剧情系统核心�
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 结算耶提尔菲利斯协战 } from "./31B．耶提尔协战控制器";
 
+const { 结束第二章菲利斯攻城区域音乐 } = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐") as {
+  结束第二章菲利斯攻城区域音乐: (this: void) => boolean;
+};
+
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const AddSpecialEffect = jass.AddSpecialEffect as (this: void, modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (this: void, effect: any) => void;
@@ -419,6 +423,7 @@ function on王城攻城单位死亡(this: void, dyingUnit: any): void {
     清理菲利斯攻城传送门(状态);
     结束菲利斯攻城等待();
     结算耶提尔菲利斯协战();
+    结束第二章菲利斯攻城区域音乐();
     return;
   }
   if (dyingUnit === 状态.防御法阵 && 状态.阶段 >= 1 && 状态.阶段 <= 3) {

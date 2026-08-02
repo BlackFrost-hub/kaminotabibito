@@ -100,7 +100,7 @@ export const 巴尔扎罗斯Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 90,
     canPurge: false,
-    tooltip: "设计预留：格鲁姆生命低于20%时引导8秒；引导期间击杀或打断格鲁姆可阻止完成，成功时按设计恢复Boss最大生命值12%并施加15秒熔岩暴走。当前运行时尚未接入该Buff的触发入口。",
+    tooltip: "格鲁姆生命低于20%时触发8秒献祭引导；引导期间击杀或打断格鲁姆可阻止完成。引导成功后格鲁姆死亡，巴尔扎罗斯恢复最大生命值12%，并获得持续15秒的熔岩暴走。",
   },
   [巴尔扎罗斯BuffID.塞拉火焰形态]: {
     buffID: 巴尔扎罗斯BuffID.塞拉火焰形态,

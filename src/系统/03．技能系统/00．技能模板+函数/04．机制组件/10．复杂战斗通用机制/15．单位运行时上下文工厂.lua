@@ -7,6 +7,8 @@ local ____01_FF0E_673A_5236_6E05_7406_7BEE_5B50 = require("系统.03．技能系
 local _____521B_5EFA_673A_5236_6E05_7406_7BEE_5B50 = ____01_FF0E_673A_5236_6E05_7406_7BEE_5B50["创建机制清理篮子"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_0.registerDeathListener
 local function _____9ED8_8BA4_53D6_5355_4F4DID(unit)
     if unit == nil or unit == 0 then
         return 0
@@ -17,13 +19,13 @@ ____exports["创建单位运行时上下文工厂"] = function(_____53C2_6570)
     local _____4E0A_4E0B_6587_8868 = {}
     local function _____83B7_53D6(unit)
         local id = _____9ED8_8BA4_53D6_5355_4F4DID(unit)
-        local ____temp_0
+        local ____temp_1
         if id == 0 then
-            ____temp_0 = nil
+            ____temp_1 = nil
         else
-            ____temp_0 = _____4E0A_4E0B_6587_8868[id]
+            ____temp_1 = _____4E0A_4E0B_6587_8868[id]
         end
-        return ____temp_0
+        return ____temp_1
     end
     local function _____83B7_53D6_6216_521B_5EFA(unit)
         local id = _____9ED8_8BA4_53D6_5355_4F4DID(unit)
@@ -65,10 +67,29 @@ ____exports["创建单位运行时上下文工厂"] = function(_____53C2_6570)
             if _____53C2_6570["on清理"] ~= nil then
                 _____53C2_6570["on清理"](context)
             end
-            local ____self_1 = context["清理"]
-            ____self_1["清理全部"](____self_1)
+            local ____self_2 = context["清理"]
+            ____self_2["清理全部"](____self_2)
         end
         __TS__Delete(_____4E0A_4E0B_6587_8868, id)
+    end
+    local function _____5904_7406_5355_4F4D_6B7B_4EA1(dyingUnit, killingUnit)
+        local id = _____9ED8_8BA4_53D6_5355_4F4DID(dyingUnit)
+        if id == 0 then
+            return
+        end
+        local context = _____4E0A_4E0B_6587_8868[id]
+        if context == nil then
+            return
+        end
+        if _____53C2_6570["on单位死亡"] ~= nil then
+            _____53C2_6570["on单位死亡"](context, dyingUnit, killingUnit)
+        end
+        if _____53C2_6570["死亡时自动清理"] and _____4E0A_4E0B_6587_8868[id] == context then
+            _____6E05_7406_4E0A_4E0B_6587(dyingUnit)
+        end
+    end
+    if _____53C2_6570["死亡时自动清理"] or _____53C2_6570["on单位死亡"] ~= nil then
+        registerDeathListener(_____5904_7406_5355_4F4D_6B7B_4EA1)
     end
     return {
         ["获取"] = _____83B7_53D6,

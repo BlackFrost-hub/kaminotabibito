@@ -7,7 +7,7 @@ import { 释放誓锋壁进 } from './02．苍影灵卫/01．誓锋壁进';
 import { 创建赤誓镇魂印 } from './01．赤誓灵卫/01．灵印折步';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import { 创建立即执行阶段, 创建延迟阶段 } from '../../../../00．技能模板+函数/00．技能模板/01．多阶段技能编排/06．技能阶段链执行器';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 两点角度, 极坐标X, 极坐标Y, 点到线段距离平方 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 执行战斗自身传送到坐标 } from '../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
@@ -20,9 +20,6 @@ const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能�
 };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, params: any) => boolean;
 };
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const jass = require('jass.common') as any;
@@ -111,8 +108,17 @@ export function 释放祖地双灵卫封门校验(this: void, context: 祖地双
           },
           on命中: function 封门校验灵魂潮命中(this: void, hit: any): void {
             if (誓盾是否阻挡(context, waveStartX, waveStartY, hit)) return;
-            const damage = 计算组合技能伤害(red, hit, { 来源攻击力比例: 0.95, 目标最大生命比例: 0.045 });
-            造成AOE技能伤害({ 来源: red, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_SHADOW_STRIKE, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·封门校验' });
+            执行BossAOE技能伤害({
+              来源: red,
+              目标: hit,
+              伤害公式: { 来源攻击力比例: 0.95, 目标最大生命比例: 0.045 },
+              attack: false,
+              ranged: true,
+              attackType: ATTACK_TYPE_NORMAL,
+              伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
+              weaponType: WEAPON_TYPE_WHOKNOWS,
+              标签: '祖地双灵卫·封门校验',
+            });
           },
           on到达目标点: function 封门校验灵魂潮结束(this: void): void {
             创建赤誓镇魂印(context, waveStartX, waveStartY);

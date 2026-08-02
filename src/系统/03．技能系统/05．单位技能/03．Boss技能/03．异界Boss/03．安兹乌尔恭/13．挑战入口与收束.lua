@@ -16,10 +16,15 @@ local ____require_result_0 = require("系统.03．技能系统.06．AI自动使�
 local _____4E3B_52A8_7ED3_675FBoss_6218_8FD0_884C = ____require_result_0["主动结束Boss战运行"]
 local ____require_result_1 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表")
 local _____6E05_7406Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587 = ____require_result_1["清理Boss自动技能启动上下文"]
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_3.YDWETimerDestroyEffectSafe
+local ____require_result_2 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑")
+local _____6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI = ____require_result_2["打开Boss死亡首领奖励UI"]
+local ____require_result_3 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.20．异界_安兹乌尔恭战利品")
+local _____5B89_5179_57FA_7840_6311_6218_5956_52B1_6C60ID = ____require_result_3["安兹基础挑战奖励池ID"]
+local _____5B89_5179_5B88_62A4_8005_6311_6218_5956_52B1_6C60ID = ____require_result_3["安兹守护者挑战奖励池ID"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -45,8 +50,8 @@ local function _____64AD_653E_6311_6218_7ED3_675F_95E8_6249(x, y)
 end
 ____exports["启动安兹挑战收束"] = function(context)
     local boss = context["安兹单位"]
-    local ____opt_4 = context["雅儿贝德"]
-    local albedo = ____opt_4 and ____opt_4["单位"]
+    local ____opt_6 = context["雅儿贝德"]
+    local albedo = ____opt_6 and ____opt_6["单位"]
     if context["挑战已结束"] or not _____5355_4F4D_6709_6548(boss) then
         return false
     end
@@ -62,10 +67,10 @@ ____exports["启动安兹挑战收束"] = function(context)
             context["雅儿贝德"]["阶段状态"] = "终局拦截"
         end
     end
-    local ____opt_8 = context["雅儿贝德"]
-    local ____opt_6 = ____opt_8 and ____opt_8["独占状态"]
-    if ____opt_6 ~= nil then
-        ____opt_6["取消当前"](____opt_6, "清理", "安兹挑战收束")
+    local ____opt_10 = context["雅儿贝德"]
+    local ____opt_8 = ____opt_10 and ____opt_10["独占状态"]
+    if ____opt_8 ~= nil then
+        ____opt_8["取消当前"](____opt_8, "清理", "安兹挑战收束")
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["守护者模式"]["挑战收束安兹姿势动画编号"], ["持续秒"] = cfg["守护者模式"]["挑战收束离场延迟秒"], ["恢复动画编号"] = 0})
@@ -80,27 +85,28 @@ ____exports["启动安兹挑战收束"] = function(context)
     local delayedId = addDelayedCallback(
         cfg["守护者模式"]["挑战收束离场延迟秒"] * 1000,
         function()
-            local ____opt_12 = context["雅儿贝德"]
-            local ____opt_10 = ____opt_12 and ____opt_12["成员生命周期"]
-            if ____opt_10 ~= nil then
-                ____opt_10["设置状态"](____opt_10, "雅儿贝德", "离场", "服从至尊命令")
+            local ____opt_14 = context["雅儿贝德"]
+            local ____opt_12 = ____opt_14 and ____opt_14["成员生命周期"]
+            if ____opt_12 ~= nil then
+                ____opt_12["设置状态"](____opt_12, "雅儿贝德", "离场", "服从至尊命令")
             end
-            local ____opt_16 = context["雅儿贝德"]
-            local ____opt_14 = ____opt_16 and ____opt_16["成员生命周期"]
-            if ____opt_14 ~= nil then
-                ____opt_14["设置状态"](____opt_14, "安兹", "离场", "试炼结束")
+            local ____opt_18 = context["雅儿贝德"]
+            local ____opt_16 = ____opt_18 and ____opt_18["成员生命周期"]
+            if ____opt_16 ~= nil then
+                ____opt_16["设置状态"](____opt_16, "安兹", "离场", "试炼结束")
             end
             if _____5355_4F4D_6709_6548(albedo) then
                 ShowUnit(albedo, false)
             end
             ShowUnit(boss, false)
             _____4E3B_52A8_7ED3_675FBoss_6218_8FD0_884C(boss, {["跳过死亡音效"] = true, ["跳过死亡剧情"] = true})
+            _____6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI(context["模式"] == "守护者介入" and _____5B89_5179_5B88_62A4_8005_6311_6218_5956_52B1_6C60ID or _____5B89_5179_57FA_7840_6311_6218_5956_52B1_6C60ID)
             _____6E05_7406Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587(boss)
             _____6E05_7406_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587(boss)
         end
     )
-    local ____self_18 = context["清理"]
-    ____self_18["登记延迟回调"](____self_18, "安兹-挑战收束离场", delayedId)
+    local ____self_20 = context["清理"]
+    ____self_20["登记延迟回调"](____self_20, "安兹-挑战收束离场", delayedId)
     return true
 end
 ____exports["绑定安兹挑战生命下限"] = function(context)

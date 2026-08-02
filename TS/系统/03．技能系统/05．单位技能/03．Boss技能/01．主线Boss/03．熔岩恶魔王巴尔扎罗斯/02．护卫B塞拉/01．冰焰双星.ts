@@ -1,11 +1,8 @@
 /** @noSelfInFile */
 
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
-
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
+import { 执行BossAOE技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 巴尔扎罗斯音效配置 } from "../02．数值与表现配置";
 import { 播放Boss坐标音效 } from "../../../00．公共/00．Boss音效播放";
 const {  巴尔扎罗斯技能数值配置,
@@ -25,6 +22,8 @@ const {  巴尔扎罗斯技能数值配置,
   SquareRoot,
   DAMAGE_TYPE_FIRE,
   DAMAGE_TYPE_COLD,
+  ATTACK_TYPE_NORMAL,
+  WEAPON_TYPE_WHOKNOWS,
   单位有效,
   取方向角,
   取形态技能倍率,
@@ -32,26 +31,6 @@ const {  巴尔扎罗斯技能数值配置,
   造成塞拉Boss技能伤害,
   弱追踪弹体状态表,
 } = 塞拉公共;
-
-function 计算冰球伤害(this: void, context: 巴尔扎罗斯运行时上下文, target: any): number {
-  const config = 巴尔扎罗斯技能数值配置.冰焰双星;
-  const sera = context.塞拉;
-  return 计算组合技能伤害(sera, target, {
-    来源攻击力比例: config.冰球伤害攻击力比例,
-    目标最大生命比例: config.冰球伤害目标最大生命比例,
-    总倍率: config.冰球伤害总倍率 * 取形态技能倍率(context, "冰霜"),
-  });
-}
-
-function 计算火球伤害(this: void, context: 巴尔扎罗斯运行时上下文, target: any): number {
-  const config = 巴尔扎罗斯技能数值配置.冰焰双星;
-  const sera = context.塞拉;
-  return 计算组合技能伤害(sera, target, {
-    来源攻击力比例: config.火球伤害攻击力比例,
-    目标最大生命比例: config.火球伤害目标最大生命比例,
-    总倍率: config.火球伤害总倍率 * 取形态技能倍率(context, "火焰"),
-  });
-}
 
 function 结算冰焰AOE(this: void, context: 巴尔扎罗斯运行时上下文, hitUnit: any, 类型: "冰霜" | "火焰"): void {
   const sera = context.塞拉;
@@ -69,10 +48,38 @@ function 结算冰焰AOE(this: void, context: 巴尔扎罗斯运行时上下文,
     const unit = targets[i];
     if (!单位有效(unit) || !isUnitEnemy(unit, sera)) continue;
     if (类型 === "冰霜") {
-      造成塞拉Boss技能伤害(sera, unit, 计算冰球伤害(context, unit), DAMAGE_TYPE_COLD, "AOE");
+      执行BossAOE技能伤害({
+        来源: sera,
+        目标: unit,
+        伤害公式: {
+          来源攻击力比例: config.冰球伤害攻击力比例,
+          目标最大生命比例: config.冰球伤害目标最大生命比例,
+          总倍率: config.冰球伤害总倍率 * 取形态技能倍率(context, "冰霜"),
+        },
+        attack: false,
+        ranged: true,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_COLD,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        标签: "塞拉-冰焰双星-冰霜",
+      });
       施加快速减速Buff(sera, unit, config.冰球减速比例, config.冰球减速比例, config.冰球减速持续秒);
     } else {
-      造成塞拉Boss技能伤害(sera, unit, 计算火球伤害(context, unit), DAMAGE_TYPE_FIRE, "AOE");
+      执行BossAOE技能伤害({
+        来源: sera,
+        目标: unit,
+        伤害公式: {
+          来源攻击力比例: config.火球伤害攻击力比例,
+          目标最大生命比例: config.火球伤害目标最大生命比例,
+          总倍率: config.火球伤害总倍率 * 取形态技能倍率(context, "火焰"),
+        },
+        attack: false,
+        ranged: true,
+        attackType: ATTACK_TYPE_NORMAL,
+        伤害类型: DAMAGE_TYPE_FIRE,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        标签: "塞拉-冰焰双星-火焰",
+      });
       施加巴尔扎罗斯灼热(unit, config.火球灼热层数);
     }
   }

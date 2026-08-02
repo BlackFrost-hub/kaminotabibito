@@ -8,7 +8,6 @@ import { 播放亚伦柯斯台词 } from './11．台词播放';
 import { 创建机制清理篮子, type 机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
 import { 创建单位运行时上下文工厂 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂';
 import { 创建周期机制调度器 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/17．周期机制调度器';
-import { stringToFourCC } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
@@ -16,9 +15,6 @@ import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用�
 const { getServerTime, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-};
-const { registerDeathListener } = require('系统.00．核心系统.01．事件中心.07．单位死亡事件中心') as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -30,7 +26,6 @@ const { SGSS_SetState } = require('lib.扩展函数.Star扩展函数.00．SGSS')
 const jass = require('jass.common') as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -42,7 +37,6 @@ const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const 攻击力属性ID = 1;
 const 攻速属性ID = 10;
-const 亚伦柯斯单位类型ID = stringToFourCC(亚伦柯斯单位技能配置.单位ID);
 
 export type 亚伦柯斯阶段 = '未启动' | 'P1守墓者苏醒' | 'P2旧誓回响' | 'P3最后的誓约' | '战败归静' | '已结束';
 
@@ -119,6 +113,8 @@ const 亚伦柯斯上下文工厂 = 创建单位运行时上下文工厂<亚伦�
   名称: '沉睡英魂·亚伦柯斯',
   主动技能提示: 亚伦柯斯单位技能配置.主动技能提示,
   创建上下文,
+  on单位死亡: on亚伦柯斯死亡,
+  死亡时自动清理: false,
   on清理: function 亚伦柯斯上下文清理(this: void, context: 亚伦柯斯运行时上下文): void {
     context.战斗已结束 = true;
     context.阶段 = '已结束';
@@ -185,10 +181,8 @@ function 推进亚伦柯斯运行时(this: void, context: 亚伦柯斯运行时�
   }
 }
 
-function on亚伦柯斯死亡(this: void, dyingUnit: any): void {
-  if (GetUnitTypeId(dyingUnit) !== 亚伦柯斯单位类型ID) return;
-  const context = 获取亚伦柯斯运行时上下文(dyingUnit);
-  if (context == null || context.战斗已结束) return;
+function on亚伦柯斯死亡(this: void, context: 亚伦柯斯运行时上下文, dyingUnit: any, _killingUnit: any): void {
+  if (context.战斗已结束) return;
   context.战斗已结束 = true;
   context.阶段 = '战败归静';
   context.当前大型技能 = undefined;
@@ -206,7 +200,6 @@ function on亚伦柯斯死亡(this: void, dyingUnit: any): void {
 export function 注册亚伦柯斯运行时(this: void): void {
   if (亚伦柯斯运行时已注册) return;
   亚伦柯斯运行时已注册 = true;
-  registerDeathListener(on亚伦柯斯死亡);
   创建周期机制调度器({
     名称: '亚伦柯斯-运行时阶段刷新',
     间隔毫秒: 200,

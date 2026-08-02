@@ -9,13 +9,14 @@ local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
+local ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.11．条件伤害修正")
+local _____521B_5EFA_6761_4EF6_4F24_5BB3_4FEE_6B63 = ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63["创建条件伤害修正"]
 local ____585E_62C9_516C_5171_0 = _____585E_62C9_516C_5171
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯单位技能配置"]
 local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____585E_62C9_516C_5171_0["巴尔扎罗斯技能数值配置"]
 local _____64AD_653E_585E_62C9_53F0_8BCD = ____585E_62C9_516C_5171_0["播放塞拉台词"]
 local registerManualBuff = ____585E_62C9_516C_5171_0.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____585E_62C9_516C_5171_0["移除单位指定Buff"]
-local registerDamageModifier = ____585E_62C9_516C_5171_0.registerDamageModifier
 local getServerTime = ____585E_62C9_516C_5171_0.getServerTime
 local GetUnitX = ____585E_62C9_516C_5171_0.GetUnitX
 local GetUnitY = ____585E_62C9_516C_5171_0.GetUnitY
@@ -79,6 +80,21 @@ ____exports["切换塞拉形态"] = function(context, next, _____64AD_653E_53F0_
         _____64AD_653E_585E_62C9_53F0_8BCD(sera, next == "火焰" and "元素转换火焰" or "元素转换冰霜")
     end
 end
+local function _____6EE1_8DB3_585E_62C9_4F24_5BB3_4FEE_6B63_6761_4EF6(context)
+    local attackerId = _____53D6_5355_4F4DID(context.attacker)
+    if attackerId ~= 0 and (_____96F6_5EA6_9886_57DF_51CF_4F24_5230_671FMs_8868[attackerId] or 0) > 0 then
+        return true
+    end
+    local targetId = _____53D6_5355_4F4DID(context.target)
+    local ____temp_1
+    if targetId ~= 0 then
+        ____temp_1 = _____585E_62C9_5F62_6001_8868[targetId]
+    else
+        ____temp_1 = nil
+    end
+    local form = ____temp_1
+    return form == "火焰" and context.isWaterDamage == true or form == "冰霜" and context.isFireDamage == true
+end
 local function _____585E_62C9_4F24_5BB3_4FEE_6B63(context)
     local now = getServerTime()
     local attackerId = _____53D6_5355_4F4DID(context.attacker)
@@ -92,13 +108,13 @@ local function _____585E_62C9_4F24_5BB3_4FEE_6B63(context)
         end
     end
     local targetId = _____53D6_5355_4F4DID(context.target)
-    local ____temp_1
+    local ____temp_2
     if targetId ~= 0 then
-        ____temp_1 = _____585E_62C9_5F62_6001_8868[targetId]
+        ____temp_2 = _____585E_62C9_5F62_6001_8868[targetId]
     else
-        ____temp_1 = nil
+        ____temp_2 = nil
     end
-    local form = ____temp_1
+    local form = ____temp_2
     if form == "火焰" and context.isWaterDamage == true then
         return context.currentDamage * (1 + _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["元素转换"]["受到克制伤害提高"])
     end
@@ -112,6 +128,6 @@ ____exports["确保塞拉伤害修正"] = function()
         return
     end
     _____585E_62C9_4F24_5BB3_4FEE_6B63_5DF2_6CE8_518C = true
-    registerDamageModifier(_____585E_62C9_4F24_5BB3_4FEE_6B63, 65)
+    _____521B_5EFA_6761_4EF6_4F24_5BB3_4FEE_6B63({["名称"] = "塞拉元素转换伤害修正", ["优先级"] = 65, ["条件"] = _____6EE1_8DB3_585E_62C9_4F24_5BB3_4FEE_6B63_6761_4EF6, ["修正"] = _____585E_62C9_4F24_5BB3_4FEE_6B63})
 end
 return ____exports

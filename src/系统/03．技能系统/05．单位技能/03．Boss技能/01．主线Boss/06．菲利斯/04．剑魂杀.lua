@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____589E_52A0Boss_9B54_6CD5_5145_80FD, _____53D6_76EE_6807, _____521B_5EFA_8DEF_5F84, _____751F_6210_5251_9B42_72FC, _____6267_884C_5251_9B42_8DEF_5F84, ____on_83F2_5229_65AF_5251_9B42_6740_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, GetUnitTypeId, GetUnitX, GetUnitY, GetOwningPlayer, GetHandleId, GetSpellTargetUnit, IssueTargetOrder, SetUnitMoveSpeed, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, EXSetEffectXY, EXSetEffectZ, DzPlayEffectAnimation, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D, _____767B_8BB0_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA, _____6CE8_9500_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, addPeriodicCallback, removePeriodicCallback, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, EC_GetPointZ, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_9B42_6740_6280_80FDID
+local _____589E_52A0Boss_9B54_6CD5_5145_80FD, _____53D6_76EE_6807, _____521B_5EFA_8DEF_5F84, _____751F_6210_5251_9B42_72FC, _____9500_6BC1_5251_9B42_8DEF_5F84_5F39_5E55, _____83F2_5229_65AF_5251_9B42_8DEF_5F84_76EE_6807_5141_8BB8, _____6267_884C_5251_9B42_8DEF_5F84, ____on_83F2_5229_65AF_5251_9B42_6740_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetOwningPlayer, GetSpellTargetUnit, IssueTargetOrder, SetUnitMoveSpeed, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D, _____767B_8BB0_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA, _____6CE8_9500_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_9B42_6740_6280_80FDID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
@@ -19,11 +19,16 @@ local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____53D6_5355_4F4D_95F4_89D2_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取单位间角度"]
 local _____6781_5750_6807X = ____11_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____11_FF0E_516C_5171_5DE5_5177["极坐标Y"]
-local _____8DDD_79BB_5E73_65B9XY = ____11_FF0E_516C_5171_5DE5_5177["距离平方XY"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行Boss单体技能伤害"]
+local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
+local _____521B_5EFA_76F4_7EBF_5B9A_70B9_8F68_8FF9 = ____01_FF0ETS_539F_751F_5F39_5E55["创建直线定点轨迹"]
 function _____589E_52A0Boss_9B54_6CD5_5145_80FD(context, amount)
     context["当前魔法充能"] = context["当前魔法充能"] + amount
     if context["当前魔法充能"] > _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]["魔法阈值"] then
@@ -40,9 +45,17 @@ end
 function _____521B_5EFA_8DEF_5F84(boss, target)
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑魂杀"]
     local targetAngle = _____53D6_5355_4F4D_95F4_89D2_5EA6(boss, target)
-    local centerX = GetUnitX(target)
-    local centerY = GetUnitY(target)
     local halfDistance = cfg["路径距离"] * 0.5
+    local centerX = _____6781_5750_6807X(
+        GetUnitX(boss),
+        targetAngle,
+        halfDistance
+    )
+    local centerY = _____6781_5750_6807Y(
+        GetUnitY(boss),
+        targetAngle,
+        halfDistance
+    )
     local paths = {}
     do
         local i = 0
@@ -56,8 +69,7 @@ function _____521B_5EFA_8DEF_5F84(boss, target)
                 ["起点Y"] = sy,
                 ["终点X"] = _____6781_5750_6807X(centerX, pathAngle, halfDistance),
                 ["终点Y"] = _____6781_5750_6807Y(centerY, pathAngle, halfDistance),
-                ["朝向"] = pathAngle,
-                ["命中表"] = {}
+                ["朝向"] = pathAngle
             }
             _____521B_5EFA_6280_80FD_63D0_793A_5708({
                 ["类型"] = "矩形",
@@ -129,6 +141,27 @@ function _____751F_6210_5251_9B42_72FC(context, x, y, big)
         IssueTargetOrder(wolf["单位"], "attack", target)
     end
 end
+function _____9500_6BC1_5251_9B42_8DEF_5F84_5F39_5E55(_____5F39_5E55)
+    if _____5F39_5E55 ~= nil and _____5F39_5E55["销毁"] ~= nil then
+        _____5F39_5E55["销毁"](_____5F39_5E55, "手动销毁")
+    end
+end
+function _____83F2_5229_65AF_5251_9B42_8DEF_5F84_76EE_6807_5141_8BB8(boss, unit)
+    if not _____5355_4F4D_6709_6548(unit) then
+        return false
+    end
+    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
+    do
+        local i = 0
+        while i < #heroes do
+            if heroes[i + 1] == unit then
+                return true
+            end
+            i = i + 1
+        end
+    end
+    return false
+end
 function _____6267_884C_5251_9B42_8DEF_5F84(context, paths)
     local boss = context["Boss单位"]
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑魂杀"]
@@ -138,139 +171,122 @@ function _____6267_884C_5251_9B42_8DEF_5F84(context, paths)
         GetUnitY(boss),
         _____83F2_5229_65AF_97F3_6548_914D_7F6E["默认裁断距离"]
     )
+    local hitCount = 0
+    local _____5B8C_6210_8DEF_5F84_6570 = 0
+    local _____5DF2_751F_6210_5251_9B42_72FC = false
+    local function _____5904_7406_8DEF_5F84_5230_8FBE()
+        local ____temp_10 = not _____5355_4F4D_6709_6548(boss)
+        if not ____temp_10 then
+            local ____self_9 = context["清理"]
+            ____temp_10 = ____self_9["已清理"](____self_9)
+        end
+        if ____temp_10 then
+            return
+        end
+        _____5B8C_6210_8DEF_5F84_6570 = _____5B8C_6210_8DEF_5F84_6570 + 1
+        if _____5DF2_751F_6210_5251_9B42_72FC or _____5B8C_6210_8DEF_5F84_6570 < #paths then
+            return
+        end
+        _____5DF2_751F_6210_5251_9B42_72FC = true
+        if hitCount >= cfg["合并命中次数"] then
+            local x = (paths[1]["终点X"] + paths[2]["终点X"]) * 0.5
+            local y = (paths[1]["终点Y"] + paths[2]["终点Y"]) * 0.5
+            _____751F_6210_5251_9B42_72FC(context, x, y, true)
+            return
+        end
+        do
+            local i = 0
+            while i < #paths do
+                _____751F_6210_5251_9B42_72FC(context, paths[i + 1]["终点X"], paths[i + 1]["终点Y"], false)
+                i = i + 1
+            end
+        end
+    end
     do
         local i = 0
         while i < #paths do
             local path = paths[i + 1]
-            local effect = _____521B_5EFA_70B9_7279_6548({
-                ["模型路径"] = cfg["小狼奔跑特效路径"],
+            local trailElapsedMs = 0
+            local projectile = _____521B_5EFA_539F_751F_5F39_5E55({
+                ["所有者"] = boss,
+                ["载体模式"] = "特效",
                 X = path["起点X"],
                 Y = path["起点Y"],
-                ["缩放"] = cfg["小狼奔跑特效缩放"],
-                ["动画速度"] = cfg["小狼奔跑动画速度"],
-                ["Z轴角度"] = path["朝向"],
-                ["持续秒"] = cfg["飞行持续秒"] + 0.1
-            })
-            path["奔跑小狼特效"] = effect
-            if effect ~= nil and effect ~= 0 and type(DzPlayEffectAnimation) == "function" then
-                DzPlayEffectAnimation(effect, cfg["小狼奔跑动画名"], "")
-            end
-            i = i + 1
-        end
-    end
-    local elapsedMs = 0
-    local hitCount = 0
-    local callbackID = 0
-    callbackID = addPeriodicCallback(
-        cfg["Tick间隔毫秒"],
-        function()
-            local ____temp_14 = not _____5355_4F4D_6709_6548(boss)
-            if not ____temp_14 then
-                local ____self_13 = context["清理"]
-                ____temp_14 = ____self_13["已清理"](____self_13)
-            end
-            if ____temp_14 then
-                removePeriodicCallback(callbackID)
-                return
-            end
-            elapsedMs = elapsedMs + cfg["Tick间隔毫秒"]
-            local progress = elapsedMs / (cfg["飞行持续秒"] * 1000)
-            local p = progress >= 1 and 1 or progress
-            do
-                local i = 0
-                while i < #paths do
-                    local path = paths[i + 1]
-                    local x = path["起点X"] + (path["终点X"] - path["起点X"]) * p
-                    local y = path["起点Y"] + (path["终点Y"] - path["起点Y"]) * p
-                    local runningWolfEffect = path["奔跑小狼特效"]
-                    if runningWolfEffect ~= nil and runningWolfEffect ~= 0 then
-                        if type(EXSetEffectXY) == "function" then
-                            EXSetEffectXY(runningWolfEffect, x, y)
-                        end
-                        if type(EXSetEffectZ) == "function" then
-                            EXSetEffectZ(
-                                runningWolfEffect,
-                                EC_GetPointZ(x, y)
-                            )
-                        end
+                ["方向角"] = path["朝向"],
+                ["速度"] = cfg["路径距离"] / cfg["飞行持续秒"],
+                ["生命周期"] = cfg["飞行持续秒"],
+                ["最大距离"] = cfg["路径距离"],
+                ["轨迹采样器"] = _____521B_5EFA_76F4_7EBF_5B9A_70B9_8F68_8FF9(path["起点X"], path["起点Y"], path["终点X"], path["终点Y"]),
+                ["命中半径"] = cfg["命中半径"],
+                ["影响目标"] = "敌方",
+                ["每单位最大命中次数"] = 1,
+                ["碰撞消失"] = false,
+                ["禁用碰撞"] = true,
+                ["附加特效1"] = {
+                    ["模型"] = cfg["小狼奔跑特效路径"],
+                    ["跟随主弹幕参数"] = true,
+                    ["缩放"] = cfg["小狼奔跑特效缩放"],
+                    ["动画名称"] = cfg["小狼奔跑动画名"],
+                    ["动画速度"] = cfg["小狼奔跑动画速度"]
+                },
+                ["目标筛选"] = function(unit)
+                    return _____83F2_5229_65AF_5251_9B42_8DEF_5F84_76EE_6807_5141_8BB8(boss, unit)
+                end,
+                onTick = function(instance, delta)
+                    local ____temp_12 = not _____5355_4F4D_6709_6548(boss)
+                    if not ____temp_12 then
+                        local ____self_11 = context["清理"]
+                        ____temp_12 = ____self_11["已清理"](____self_11)
                     end
+                    if ____temp_12 then
+                        return
+                    end
+                    trailElapsedMs = trailElapsedMs + delta * 1000
+                    if trailElapsedMs < cfg["Tick间隔毫秒"] then
+                        return
+                    end
+                    trailElapsedMs = 0
                     _____521B_5EFA_70B9_7279_6548({
                         ["模型路径"] = cfg["狼魂路径特效路径"],
-                        X = x,
-                        Y = y,
+                        X = instance["当前X"],
+                        Y = instance["当前Y"],
                         ["缩放"] = cfg["狼魂路径特效缩放"],
                         ["持续秒"] = cfg["狼魂路径特效持续秒"]
                     })
-                    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-                    do
-                        local h = 0
-                        while h < #heroes do
-                            do
-                                local hero = heroes[h + 1]
-                                if not _____5355_4F4D_6709_6548(hero) then
-                                    goto __continue28
-                                end
-                                local hid = GetHandleId(hero) or 0
-                                if hid == 0 or path["命中表"][hid] == true then
-                                    goto __continue28
-                                end
-                                if _____8DDD_79BB_5E73_65B9XY(
-                                    GetUnitX(hero),
-                                    GetUnitY(hero),
-                                    x,
-                                    y
-                                ) > cfg["命中半径"] * cfg["命中半径"] then
-                                    goto __continue28
-                                end
-                                path["命中表"][hid] = true
-                                hitCount = hitCount + 1
-                                registerManualBuff(
-                                    hero,
-                                    _____83F2_5229_65AFBuffID["剑魂狼印"],
-                                    4,
-                                    1,
-                                    {sourceName = "菲利斯-剑魂杀"}
-                                )
-                                _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                                    ["技能ID"] = _____5251_9B42_6740_6280_80FDID,
-                                    ["来源"] = boss,
-                                    ["目标"] = hero,
-                                    ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["路径伤害Boss攻击力比例"],
-                                    attack = false,
-                                    ranged = false,
-                                    attackType = ATTACK_TYPE_NORMAL,
-                                    ["伤害类型"] = DAMAGE_TYPE_NORMAL,
-                                    weaponType = WEAPON_TYPE_WHOKNOWS,
-                                    ["来源类型"] = "Boss技能"
-                                })
-                            end
-                            ::__continue28::
-                            h = h + 1
-                        end
+                end,
+                ["on命中"] = function(hero)
+                    if not _____5355_4F4D_6709_6548(hero) then
+                        return
                     end
-                    i = i + 1
+                    hitCount = hitCount + 1
+                    registerManualBuff(
+                        hero,
+                        _____83F2_5229_65AFBuffID["剑魂狼印"],
+                        4,
+                        1,
+                        {sourceName = "菲利斯-剑魂杀"}
+                    )
+                    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                        ["技能ID"] = _____5251_9B42_6740_6280_80FDID,
+                        ["来源"] = boss,
+                        ["目标"] = hero,
+                        ["伤害公式"] = {["来源攻击力比例"] = cfg["路径伤害Boss攻击力比例"]},
+                        attack = false,
+                        ranged = false,
+                        attackType = ATTACK_TYPE_NORMAL,
+                        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+                        weaponType = WEAPON_TYPE_WHOKNOWS
+                    })
+                end,
+                ["on到达目标点"] = function()
+                    _____5904_7406_8DEF_5F84_5230_8FBE()
                 end
-            end
-            if p >= 1 then
-                removePeriodicCallback(callbackID)
-                if hitCount >= cfg["合并命中次数"] then
-                    local x = (paths[1]["终点X"] + paths[2]["终点X"]) * 0.5
-                    local y = (paths[1]["终点Y"] + paths[2]["终点Y"]) * 0.5
-                    _____751F_6210_5251_9B42_72FC(context, x, y, true)
-                else
-                    do
-                        local i = 0
-                        while i < #paths do
-                            _____751F_6210_5251_9B42_72FC(context, paths[i + 1]["终点X"], paths[i + 1]["终点Y"], false)
-                            i = i + 1
-                        end
-                    end
-                end
-            end
+            })
+            local ____self_13 = context["清理"]
+            ____self_13["登记清理"](____self_13, "菲利斯-剑魂杀路径弹幕", _____9500_6BC1_5251_9B42_8DEF_5F84_5F39_5E55, projectile)
+            i = i + 1
         end
-    )
-    local ____self_15 = context["清理"]
-    ____self_15["登记周期回调"](____self_15, "菲利斯-剑魂杀飞行", callbackID)
+    end
 end
 ____exports["释放菲利斯剑魂杀"] = function(context)
     local boss = context["Boss单位"]
@@ -317,55 +333,37 @@ function ____on_83F2_5229_65AF_5251_9B42_6740_751F_6548(castingUnit, spellAbilit
     end
     ____exports["释放菲利斯剑魂杀"](context)
 end
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local jass = require("jass.common")
-local japi = require("jass.japi")
-local GetUnitStateJapi = japi.GetUnitState
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 GetOwningPlayer = jass.GetOwningPlayer
-GetHandleId = jass.GetHandleId
 GetSpellTargetUnit = jass.GetSpellTargetUnit
 IssueTargetOrder = jass.IssueTargetOrder
 SetUnitMoveSpeed = jass.SetUnitMoveSpeed
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-EXSetEffectXY = japi.EXSetEffectXY
-EXSetEffectZ = japi.EXSetEffectZ
-DzPlayEffectAnimation = japi.DzPlayEffectAnimation
-local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.03．固定受击次数机制单位")
-_____521B_5EFA_56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D = ____require_result_4["创建固定受击次数机制单位"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.index")
-_____767B_8BB0_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA = ____require_result_5["登记召唤物攻击恢复主人"]
-_____6CE8_9500_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA = ____require_result_5["注销召唤物攻击恢复主人"]
-local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex = ____require_result_6["获取Boss技能最近敌对英雄Ex"]
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_6["获取Boss技能敌对英雄列表"]
-local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_7.addPeriodicCallback
-removePeriodicCallback = ____require_result_7.removePeriodicCallback
-local ____require_result_8 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_8.registerAppliedFinalDamageListener
-local ____require_result_9 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_9.registerManualBuff
-local ____require_result_10 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.05．菲利斯")
-_____83F2_5229_65AFBuffID = ____require_result_10["菲利斯BuffID"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
-local ____require_result_12 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-EC_GetPointZ = ____require_result_12.EC_GetPointZ
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.03．固定受击次数机制单位")
+_____521B_5EFA_56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D = ____require_result_2["创建固定受击次数机制单位"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.index")
+_____767B_8BB0_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA = ____require_result_3["登记召唤物攻击恢复主人"]
+_____6CE8_9500_53EC_5524_7269_653B_51FB_6062_590D_4E3B_4EBA = ____require_result_3["注销召唤物攻击恢复主人"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex = ____require_result_4["获取Boss技能最近敌对英雄Ex"]
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_5.registerAppliedFinalDamageListener
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_6.registerManualBuff
+local ____require_result_7 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.05．菲利斯")
+_____83F2_5229_65AFBuffID = ____require_result_7["菲利斯BuffID"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
 _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____5251_9B42_6740_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑魂杀"]["技能槽位"])
 local _____5251_9B42_6740_5DF2_6CE8_518C = false
@@ -379,17 +377,16 @@ local function ____on_5251_9B42_72FC_6700_7EC8_4F24_5BB3(target, _attacker, _app
     if record == nil or not _____5355_4F4D_6709_6548(record["Boss单位"]) or not _____5355_4F4D_6709_6548(target) then
         return
     end
-    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+    _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3({
         ["技能ID"] = _____5251_9B42_6740_6280_80FDID,
         ["来源"] = record["Boss单位"],
         ["目标"] = target,
-        ["伤害"] = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * record["伤害比例"],
+        ["伤害公式"] = {["目标最大生命比例"] = record["伤害比例"]},
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_NORMAL,
         weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能",
         ["标签"] = "菲利斯·剑魂狼攻击"
     })
 end

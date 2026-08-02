@@ -24,6 +24,7 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
 local GetUnitState = jass.GetUnitState
+local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local UnitRemoveAbility = jass.UnitRemoveAbility
@@ -38,7 +39,12 @@ local _____83F2_5229_65AFBuffID = ____require_result_2["菲利斯BuffID"]
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFADz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_3["创建Dz绑定单位特效"]
 local _____9500_6BC1Dz_7ED1_5B9A_5355_4F4D_7279_6548 = ____require_result_3["销毁Dz绑定单位特效"]
+local ____require_result_4 = require("平台扩展API动作")
+local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_4["技能_设置技能冷却时间"]
+local ____require_result_5 = require("平台扩展API取值")
+local _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4 = ____require_result_5["技能_获取技能当前冷却时间"]
 local _____539F_751F_9886_8896_5149_73AF_6280_80FDID = stringToFourCC("A0LQ")
+local _____5251_6C14_7075_65A9_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]["技能槽位"])
 local _____653B_51FB_529B_5C5E_6027ID = 1
 local _____9886_8896_5149_73AF_5DF2_6CE8_518C = false
 local _____9886_8896_5149_73AF_7279_6548_952E = "菲利斯-领袖光环"
@@ -67,6 +73,23 @@ local function _____8BA1_7B97_9886_8896_5149_73AF_653B_51FB_589E_91CF(target, __
     local _____653B_51FB_529B_500D_7387 = _____53D6_9886_8896_5149_73AF_653B_51FB_529B_500D_7387(holder)
     return _____57FA_7840_653B_51FB_529B > 0 and _____57FA_7840_653B_51FB_529B * _____653B_51FB_529B_500D_7387 or 0
 end
+local function _____540C_6B65_5251_6C14_7075_65A9_4F4E_8840_51B7_5374(context, low, wasLow)
+    if low == wasLow then
+        return
+    end
+    local boss = context["Boss单位"]
+    if not _____5355_4F4D_6709_6548(boss) or GetUnitAbilityLevel(boss, _____5251_6C14_7075_65A9_6280_80FDID) <= 0 then
+        return
+    end
+    local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E
+    local _____5F53_524D_51B7_5374 = _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4(boss, _____5251_6C14_7075_65A9_6280_80FDID) or 0
+    if low then
+        local _____7F29_77ED_540E_51B7_5374 = _____5F53_524D_51B7_5374 * (1 - cfg["领袖光环"]["低血剑气灵斩冷却缩短"])
+        _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(boss, _____5251_6C14_7075_65A9_6280_80FDID, _____7F29_77ED_540E_51B7_5374, cfg["剑气灵斩"]["低血冷却秒"])
+        return
+    end
+    _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(boss, _____5251_6C14_7075_65A9_6280_80FDID, _____5F53_524D_51B7_5374, cfg["剑气灵斩"]["冷却秒"])
+end
 local function _____5E94_7528_9886_8896_5149_73AF_653B_51FB_529B_5DEE_503C(target, _____5DEE_503C)
     _____8C03_6574_72B6_6001ID_5C5E_6027(target, _____653B_51FB_529B_5C5E_6027ID, _____5DEE_503C)
 end
@@ -82,9 +105,9 @@ local function _____6CE8_518C_9886_8896_5149_73AF_6E05_7406(context)
     end
     context["领袖光环清理已注册"] = true
     local boss = context["Boss单位"]
-    local ____self_4 = context["清理"]
-    ____self_4["登记清理"](
-        ____self_4,
+    local ____self_6 = context["清理"]
+    ____self_6["登记清理"](
+        ____self_6,
         "菲利斯-领袖光环",
         function()
             _____540C_6B65_624B_52A8_6570_503CBuff_8303_56F4_5149_73AF(_____9886_8896_5149_73AF_8303_56F4ID, boss, false)
@@ -104,6 +127,7 @@ local function _____5237_65B0_5355_4E2A_9886_8896_5149_73AF(context)
     end
     local low = _____751F_547D_6BD4_4F8B(boss) < cfg["生命切换阈值"]
     local wasLow = context["当前领袖光环低血"]
+    _____540C_6B65_5251_6C14_7075_65A9_4F4E_8840_51B7_5374(context, low, wasLow)
     context["当前领袖光环低血"] = low
     if not wasLow and low then
         _____64AD_653EBoss_5750_6807_97F3_6548(

@@ -1,13 +1,11 @@
 /** @noSelfInFile */
 
 import { 单位未标记死亡 as 单位有效 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
 
 import type { 安兹运行时上下文 } from '../01．运行时上下文';
 import { 获取全部安兹运行时上下文 } from '../01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from '../02．数值与表现配置';
+import { 执行BossAOE技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 开始击退 } from '../../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { 开始雅儿贝德冲锋 } from './00．冲锋表现';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
@@ -19,9 +17,6 @@ const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能�
 };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const { registerAppliedFinalDamageListener } = require('系统.04．伤害系统.00．伤害计算.04．主计算流程') as {
   registerAppliedFinalDamageListener: (this: void, callback: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
@@ -72,19 +67,18 @@ function 结算至尊拦截(this: void, context: 安兹运行时上下文, x: nu
     const dx = GetUnitX(target) - x;
     const dy = GetUnitY(target) - y;
     if (dx * dx + dy * dy > radius * radius) continue;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       来源: albedo,
       目标: target,
-      伤害: 计算组合技能伤害(albedo, target, {
+      伤害公式: {
         来源攻击力比例: cfg.守护者模式.至尊拦截伤害攻击力比例,
         目标最大生命比例: cfg.守护者模式.至尊拦截伤害目标最大生命比例,
-      }),
+      },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_NORMAL,
       weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-      来源类型: 'Boss技能',
       标签: '雅儿贝德·至尊拦截',
     });
     开始击退(target, {

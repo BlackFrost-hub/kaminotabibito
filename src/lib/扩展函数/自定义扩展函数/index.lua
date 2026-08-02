@@ -5,6 +5,7 @@ local rangeQuery = require("lib.扩展函数.自定义扩展函数.01．选取�
 local conditionCheck = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 local debugOutput = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local heroBaseAttr = require("lib.扩展函数.自定义扩展函数.04．英雄基础属性")
+local unitStateSafety = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
 do
     local ____export = require("lib.扩展函数.自定义扩展函数.00．单位相关")
     for ____exportKey, ____exportValue in pairs(____export) do
@@ -45,6 +46,14 @@ do
         end
     end
 end
+do
+    local ____export = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 local function expose(self, name, fn)
     if type(fn) ~= "function" then
         return
@@ -76,5 +85,7 @@ function ____exports.registerBridge(self)
     expose(nil, "reportRuntimeError", debugOutput.reportRuntimeError)
     expose(nil, "safeExecute", debugOutput.safeExecute)
     expose(nil, "增加英雄基础全属性", heroBaseAttr["增加英雄基础全属性"])
+    expose(nil, "暂停并设置无敌安全", unitStateSafety["暂停并设置无敌安全"])
+    expose(nil, "解除暂停并取消无敌安全", unitStateSafety["解除暂停并取消无敌安全"])
 end
 return ____exports

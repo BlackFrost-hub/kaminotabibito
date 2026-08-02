@@ -6,13 +6,14 @@ local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local getServerTime = ____require_result_0.getServerTime
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_1.getUnitsInRange
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听")
-local _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03 = ____require_result_2["监听指定物品获取丢弃"]
-local _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF = ____require_result_2["获取单位当前持有指定物品数量"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.17．周期机制调度器")
+local _____521B_5EFA_81EA_9002_5E94_5171_4EAB_5468_671F_9A71_52A8 = ____require_result_1["创建自适应共享周期驱动"]
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_2.getUnitsInRange
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.01．获取丢弃监听")
+local _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03 = ____require_result_3["监听指定物品获取丢弃"]
+local _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF = ____require_result_3["获取单位当前持有指定物品数量"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
@@ -20,7 +21,7 @@ local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____8303_56F4_8109_51B2_5B9E_4F8B_8868 = {}
-local _____5DF2_6CE8_518C_8303_56F4_8109_51B2_4E2D_5FC3 = false
+local _____8303_56F4_8109_51B2_9A71_52A8
 local function _____83B7_53D6_5355_4F4DID(unit)
     if unit == nil or unit == 0 then
         return 0
@@ -66,8 +67,7 @@ local function _____5904_7406_4E22_5F03(_____914D_7F6E, unit, _item, currentCoun
     end
     _____914D_7F6E["单位状态"][unitId] = {["单位"] = unit, ["数量"] = currentCount}
 end
-local function ____on_8303_56F4_8109_51B2_6548_679CTick()
-    local now = getServerTime()
+local function ____on_8303_56F4_8109_51B2_6548_679CTick(now)
     do
         local i = 0
         while i < #_____8303_56F4_8109_51B2_5B9E_4F8B_8868 do
@@ -139,18 +139,48 @@ local function ____on_8303_56F4_8109_51B2_6548_679CTick()
         end
     end
 end
-local function _____786E_4FDD_4E2D_5FC3_5DF2_6CE8_518C()
-    if _____5DF2_6CE8_518C_8303_56F4_8109_51B2_4E2D_5FC3 then
-        return
+local function _____53D6_8303_56F4_8109_51B2_5EFA_8BAE_68C0_67E5_95F4_9694(_nowMs)
+    local _____6700_77ED_95F4_9694 = 0
+    do
+        local i = 0
+        while i < #_____8303_56F4_8109_51B2_5B9E_4F8B_8868 do
+            local _____95F4_9694 = _____8303_56F4_8109_51B2_5B9E_4F8B_8868[i + 1]["间隔毫秒"]
+            if _____95F4_9694 > 0 and (_____6700_77ED_95F4_9694 == 0 or _____95F4_9694 < _____6700_77ED_95F4_9694) then
+                _____6700_77ED_95F4_9694 = _____95F4_9694
+            end
+            i = i + 1
+        end
     end
-    _____5DF2_6CE8_518C_8303_56F4_8109_51B2_4E2D_5FC3 = true
-    addPeriodicCallback(100, ____on_8303_56F4_8109_51B2_6548_679CTick)
+    return _____6700_77ED_95F4_9694
+end
+local function _____786E_4FDD_4E2D_5FC3_5DF2_6CE8_518C()
+    if _____8303_56F4_8109_51B2_9A71_52A8 == nil then
+        _____8303_56F4_8109_51B2_9A71_52A8 = _____521B_5EFA_81EA_9002_5E94_5171_4EAB_5468_671F_9A71_52A8({["名称"] = "范围脉冲效果驱动", ["最大检查间隔毫秒"] = 100, ["取建议检查间隔毫秒"] = _____53D6_8303_56F4_8109_51B2_5EFA_8BAE_68C0_67E5_95F4_9694, onTick = ____on_8303_56F4_8109_51B2_6548_679CTick})
+    end
+    _____8303_56F4_8109_51B2_9A71_52A8["刷新"](_____8303_56F4_8109_51B2_9A71_52A8)
+end
+local function ____on_8303_56F4_8109_51B2_7269_54C1_83B7_53D6(unit, item, currentCount, previousCount, variable)
+    local _____914D_7F6E = variable
+    if _____914D_7F6E ~= nil then
+        _____5904_7406_83B7_5F97(
+            _____914D_7F6E,
+            unit,
+            item,
+            currentCount,
+            previousCount
+        )
+    end
+end
+local function ____on_8303_56F4_8109_51B2_7269_54C1_4E22_5F03(unit, item, currentCount, _previousCount, variable)
+    local _____914D_7F6E = variable
+    if _____914D_7F6E ~= nil then
+        _____5904_7406_4E22_5F03(_____914D_7F6E, unit, item, currentCount)
+    end
 end
 ____exports["注册范围脉冲效果"] = function(_____53C2_6570)
     if _____53C2_6570 == nil or _____53C2_6570["物品类型ID"] == 0 or _____53C2_6570["间隔毫秒"] <= 0 or _____53C2_6570["半径"] <= 0 or _____53C2_6570["脉冲回调"] == nil then
         return
     end
-    _____786E_4FDD_4E2D_5FC3_5DF2_6CE8_518C()
     local _____914D_7F6E = __TS__ObjectAssign(
         {},
         _____53C2_6570,
@@ -160,16 +190,7 @@ ____exports["注册范围脉冲效果"] = function(_____53C2_6570)
         }
     )
     _____8303_56F4_8109_51B2_5B9E_4F8B_8868[#_____8303_56F4_8109_51B2_5B9E_4F8B_8868 + 1] = _____914D_7F6E
-    _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03(
-        _____53C2_6570["物品类型ID"],
-        function(unit, item, currentCount, previousCount) return _____5904_7406_83B7_5F97(
-            _____914D_7F6E,
-            unit,
-            item,
-            currentCount,
-            previousCount
-        ) end,
-        function(unit, item, currentCount, _previousCount) return _____5904_7406_4E22_5F03(_____914D_7F6E, unit, item, currentCount) end
-    )
+    _____786E_4FDD_4E2D_5FC3_5DF2_6CE8_518C()
+    _____76D1_542C_6307_5B9A_7269_54C1_83B7_53D6_4E22_5F03(_____53C2_6570["物品类型ID"], ____on_8303_56F4_8109_51B2_7269_54C1_83B7_53D6, ____on_8303_56F4_8109_51B2_7269_54C1_4E22_5F03, _____914D_7F6E)
 end
 return ____exports

@@ -6,8 +6,10 @@ local CreateUnit = ____01_FF0E_5171_4EAB.CreateUnit
 local _____9ED8_8BA4_5F39_5E55_5355_4F4D_7C7B_578B = ____01_FF0E_5171_4EAB["默认弹幕单位类型"]
 local DzGetColor = ____01_FF0E_5171_4EAB.DzGetColor
 local DzSetEffectAnimation = ____01_FF0E_5171_4EAB.DzSetEffectAnimation
+local DzPlayEffectAnimation = ____01_FF0E_5171_4EAB.DzPlayEffectAnimation
 local DzSetEffectVertexColor = ____01_FF0E_5171_4EAB.DzSetEffectVertexColor
 local DzSetEffectPos = ____01_FF0E_5171_4EAB.DzSetEffectPos
+local EXEffectMatScale = ____01_FF0E_5171_4EAB.EXEffectMatScale
 local DzSetUnitModel = ____01_FF0E_5171_4EAB.DzSetUnitModel
 local EC_CreateEffect = ____01_FF0E_5171_4EAB.EC_CreateEffect
 local GetOwningPlayer = ____01_FF0E_5171_4EAB.GetOwningPlayer
@@ -206,7 +208,7 @@ local function _____521B_5EFA_5F39_5E55_9644_52A0_7279_6548(_____53C2_6570, x, y
         z,
         face + (_____7279_6548_53C2_6570["朝向角偏移"] or 0),
         scale,
-        1,
+        _____7279_6548_53C2_6570["动画速度"] or 1,
         -1
     )
     if effect == nil or effect == 0 then
@@ -217,6 +219,13 @@ local function _____521B_5EFA_5F39_5E55_9644_52A0_7279_6548(_____53C2_6570, x, y
         if DzSetEffectAnimation ~= nil then
             DzSetEffectAnimation(effect, _____7279_6548_53C2_6570["动画索引"], 0)
         end
+    end
+    if _____7279_6548_53C2_6570["动画名称"] ~= nil and DzPlayEffectAnimation ~= nil then
+        DzPlayEffectAnimation(effect, _____7279_6548_53C2_6570["动画名称"], _____7279_6548_53C2_6570["动画链接"] or "")
+    end
+    if _____7279_6548_53C2_6570["缩放X"] ~= nil or _____7279_6548_53C2_6570["缩放Y"] ~= nil or _____7279_6548_53C2_6570["缩放Z"] ~= nil then
+        local _____7EDF_4E00_7F29_653E = scale
+        EXEffectMatScale(effect, _____7279_6548_53C2_6570["缩放X"] or _____7EDF_4E00_7F29_653E, _____7279_6548_53C2_6570["缩放Y"] or _____7EDF_4E00_7F29_653E, _____7279_6548_53C2_6570["缩放Z"] or _____7EDF_4E00_7F29_653E)
     end
     _____8BBE_7F6E_5F39_5E55_9644_52A0_7279_6548_989C_8272(effect, _____7279_6548_53C2_6570)
     return effect

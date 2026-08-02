@@ -12,8 +12,7 @@ import {
   取单位Y,
   取随机玩家英雄,
   播放点特效,
-  计算攻击最大生命伤害,
-  造成暗火伤害,
+  取菲尼克斯尔技能强度倍率,
   创建菲尼克斯尔独立伤害上下文,
   添加元素层数,
   设置单位动画,
@@ -25,6 +24,7 @@ import {
 import type { 菲尼克斯尔伤害上下文参数 } from "./19．公共工具";
 import { 创建二阶贝塞尔XYZ轨迹, 创建原生弹幕 } from "../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕";
 import { 创建技能提示圈 } from "../../../../00．技能模板+函数/02．通用函数/16．技能提示圈工厂";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 const jass = require("jass.common") as any;
 const GetHandleId = jass.GetHandleId as (unit: any) => number;
@@ -32,6 +32,9 @@ const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const bj_RADTODEG = (jass.bj_RADTODEG ?? 57.29577951308232) as number;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 function 取坐标朝向角(this: void, fromX: number, fromY: number, toX: number, toY: number): number {
   return (Atan2(toY - fromY, toX - fromX) as number) * bj_RADTODEG;
@@ -117,7 +120,24 @@ function 发射菲尼克斯尔骸骨弹幕波次(this: void, context: 菲尼克�
           const repeatScale = hitCount > 0 ? 0.5 : 1;
           waveHitCount[targetId] = hitCount + 1;
           播放点特效(菲尼克斯尔数值与表现配置.特效.骨羽命中, 取单位X(target), 取单位Y(target), config.命中特效持续秒 * 1000);
-          造成暗火伤害(boss, target, 计算攻击最大生命伤害(boss, target, config.伤害Boss攻击力比例, config.伤害目标最大生命比例) * repeatScale, "AOE", 伤害上下文);
+          if (单位存活(boss) && 单位存活(target)) {
+            执行BossAOE技能伤害({
+              技能ID: 伤害上下文?.技能ID,
+              技能实例ID: 伤害上下文?.技能实例ID,
+              标签: 伤害上下文?.标签,
+              来源: boss,
+              目标: target,
+              伤害公式: {
+                来源攻击力比例: config.伤害Boss攻击力比例,
+                目标最大生命比例: config.伤害目标最大生命比例,
+                总倍率: 取菲尼克斯尔技能强度倍率(boss) * repeatScale,
+              },
+              ranged: true,
+              attackType: ATTACK_TYPE_NORMAL,
+              伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
+              weaponType: WEAPON_TYPE_WHOKNOWS,
+            });
+          }
           添加元素层数(target, "暗", config.怨火层数);
         },
       });

@@ -242,3 +242,13 @@ export function 创建单位绑定闪电(参数: 创建单位绑定闪电参数)
   确保单位绑定闪电Tick已启动();
   return 闪电句柄;
 }
+
+export function 销毁单位绑定闪电(this: void, 闪电句柄: any): void {
+  if (闪电句柄 == null || 闪电句柄 === 0) return;
+  for (const 实例ID文本 in 活跃单位绑定闪电) {
+    const 实例 = 活跃单位绑定闪电[实例ID文本 as unknown as number];
+    if (实例 == null || 实例.闪电句柄 !== 闪电句柄) continue;
+    销毁单位绑定闪电实例(实例);
+    return;
+  }
+}

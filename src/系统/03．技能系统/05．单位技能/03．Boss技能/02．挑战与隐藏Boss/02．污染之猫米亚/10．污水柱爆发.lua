@@ -22,8 +22,8 @@ local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.index")
 local _____5F00_59CB_539F_5730_51FB_98DE = ____index["开始原地击飞"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.05．点名预警执行器")
 local _____521B_5EFA_70B9_540D_9884_8B66_6267_884C_5668 = ____05_FF0E_70B9_540D_9884_8B66_6267_884C_5668["创建点名预警执行器"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
@@ -37,20 +37,11 @@ local _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_3["创�
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
 local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成AOE技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_5["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local GetRandomInt = jass.GetRandomInt
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local function _____8BA1_7B97_6C61_6C34_67F1_7206_53D1_4F24_5BB3(boss, target)
-    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["爆发伤害Boss攻击力比例"], ["目标最大生命比例"] = config["爆发伤害目标最大生命比例"], ["总倍率"] = config["爆发伤害总倍率"]})
-end
-local function _____8BA1_7B97_6C61_6C34_67F1_6C34_5751_4F24_5BB3(boss, target)
-    local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["水坑每秒伤害Boss攻击力比例"], ["目标最大生命比例"] = config["水坑每秒伤害目标最大生命比例"], ["总倍率"] = config["水坑每秒伤害总倍率"]})
-end
 local function _____53D6_6C61_6C34_67F1_6570_91CF()
     local playerCount = _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570()
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污水柱爆发"]
@@ -139,22 +130,25 @@ local function _____521B_5EFA_6C61_6C34_67F1_6B8B_7559_6C34_5751(context, point,
                     do
                         local target = _____533A_57DF_5185_5355_4F4D[i + 1]
                         if not _____5355_4F4D_6709_6548(target) then
-                            goto __continue18
+                            goto __continue16
                         end
-                        _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                        _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                             ["来源"] = context["Boss单位"],
                             ["目标"] = target,
-                            ["伤害"] = _____8BA1_7B97_6C61_6C34_67F1_6C34_5751_4F24_5BB3(context["Boss单位"], target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
+                            ["伤害公式"] = {
+                                ["来源攻击力比例"] = config["水坑每秒伤害Boss攻击力比例"],
+                                ["目标最大生命比例"] = config["水坑每秒伤害目标最大生命比例"],
+                                ["总倍率"] = config["水坑每秒伤害总倍率"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target)
+                            },
                             attackType = jass.ATTACK_TYPE_NORMAL,
                             ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
                             weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                            ["来源类型"] = "Boss技能",
                             ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
                             ["标签"] = "米亚污水柱爆发"
                         })
                         _____6DFB_52A0_7C73_4E9A_8150_5316_611F_67D3(context, target, config["水坑每秒腐化层数"], "污水柱残留水坑")
                     end
-                    ::__continue18::
+                    ::__continue16::
                     i = i + 1
                 end
             end
@@ -178,7 +172,7 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point, _____6280
             do
                 local target = targets[i + 1]
                 if not _____5355_4F4D_6709_6548(target) then
-                    goto __continue23
+                    goto __continue21
                 end
                 if _____8DDD_79BB_5E73_65B9(
                     point.x,
@@ -186,16 +180,19 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point, _____6280
                     GetUnitX(target),
                     GetUnitY(target)
                 ) > radius2 then
-                    goto __continue23
+                    goto __continue21
                 end
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = target,
-                    ["伤害"] = _____8BA1_7B97_6C61_6C34_67F1_7206_53D1_4F24_5BB3(boss, target) * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target),
+                    ["伤害公式"] = {
+                        ["来源攻击力比例"] = config["爆发伤害Boss攻击力比例"],
+                        ["目标最大生命比例"] = config["爆发伤害目标最大生命比例"],
+                        ["总倍率"] = config["爆发伤害总倍率"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target)
+                    },
                     attackType = jass.ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
                     weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能",
                     ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
                     ["标签"] = "米亚污水柱爆发"
                 })
@@ -210,7 +207,7 @@ local function _____7ED3_7B97_6C61_6C34_67F1_7206_53D1(context, point, _____6280
                     ["主单位"] = boss
                 })
             end
-            ::__continue23::
+            ::__continue21::
             i = i + 1
         end
     end

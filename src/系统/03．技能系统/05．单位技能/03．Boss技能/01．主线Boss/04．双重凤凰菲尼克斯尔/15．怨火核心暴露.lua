@@ -21,18 +21,18 @@ local _____64AD_653E_70B9_7279_6548 = ____19_FF0E_516C_5171_5DE5_5177["播放点
 local _____53D6_5355_4F4DX = ____19_FF0E_516C_5171_5DE5_5177["取单位X"]
 local _____53D6_5355_4F4DY = ____19_FF0E_516C_5171_5DE5_5177["取单位Y"]
 local _____8BBE_7F6E_5355_4F4D_52A8_753B = ____19_FF0E_516C_5171_5DE5_5177["设置单位动画"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss单体技能伤害"]
 local jass = require("jass.common")
 local RemoveUnit = jass.RemoveUnit
 local DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
-local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
-local _____51CF_5C11_751F_547D_503C = ____require_result_1["减少生命值"]
+local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.07．减少生命值")
+local _____51CF_5C11_751F_547D_503C = ____require_result_0["减少生命值"]
 local function ____on_83F2_5C3C_514B_65AF_5C14_6028_706B_6838_5FC3_6B7B_4EA1(context, unit, killer)
     context["怨火核心暴露中"] = false
     local damage = _____53D6_6700_5927_751F_547D(context.Boss) * _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["怨火核心摧毁Boss最大生命伤害比例"]
     if killer ~= nil and killer ~= 0 then
-        local _____5DF2_9020_6210_4F24_5BB3 = _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        local _____7ED3_679C = _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3({
             ["来源"] = killer,
             ["目标"] = context.Boss,
             ["伤害"] = damage,
@@ -41,7 +41,7 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_6028_706B_6838_5FC3_6B7B_4EA1(con
             ["标签"] = "菲尼克斯尔-摧毁怨火核心",
             ["参与技能伤害加成"] = false
         })
-        if not _____5DF2_9020_6210_4F24_5BB3 then
+        if not _____7ED3_679C["是否造成伤害"] then
             _____51CF_5C11_751F_547D_503C(context.Boss, damage)
         end
     else
@@ -101,7 +101,7 @@ ____exports["初始化菲尼克斯尔怨火核心暴露节点"] = function(conte
             ____exports["触发菲尼克斯尔怨火核心暴露"](context)
         end
     )
-    local ____self_2 = context["清理"]
-    ____self_2["登记周期回调"](____self_2, "菲尼克斯尔-怨火核心周期暴露", timerId)
+    local ____self_1 = context["清理"]
+    ____self_1["登记周期回调"](____self_1, "菲尼克斯尔-怨火核心周期暴露", timerId)
 end
 return ____exports

@@ -51,7 +51,7 @@ function on聊天1005测试(this: void): void {
   const 朝向 = GetUnitFacing(大法师);
 
   // 新模型 Birth 为 1000ms：1.0 倍速下完整延伸正好持续 1 秒。
-  创建红色扇形提示圈(x, y, 朝向, 扇形模型尺寸, 1.0, 1.0);
+  创建红色扇形提示圈(x, y, 朝向, 扇形模型尺寸, 1.0, 1.0, undefined, 扇形角度);
 
   const 命中单位 = 获取扇形区域单位({
     X: x,

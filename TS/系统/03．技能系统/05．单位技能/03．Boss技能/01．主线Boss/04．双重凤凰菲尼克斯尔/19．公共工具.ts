@@ -1,12 +1,11 @@
 /** @noSelfInFile */
 
 import type { 菲尼克斯尔元素类型, 菲尼克斯尔运行时上下文 } from "./03．运行时上下文";
+import type { 周期行为实例 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
+import { 创建周期行为 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 import { 菲尼克斯尔数值与表现配置 } from "./02．数值与表现配置";
-import type { 技能伤害形态 } from "../../../../../04．伤害系统/08．技能伤害系统";
 import { stringToFourCC, 距离XY, 点到线段距离平方, 极坐标X as 公共极坐标X, 极坐标Y as 公共极坐标Y } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
-import { 提交预计算Boss技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 单位是否在扇形区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
 
 const jass = require("jass.common") as any;
@@ -21,6 +20,7 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, whichAnimation: number) => void;
@@ -32,21 +32,15 @@ const R2I = jass.R2I as (x: number) => number;
 
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE;
-const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
-const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
-const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD;
-const DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON;
-const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE;
-const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
 
 const DzSetUnitModel = japi.DzSetUnitModel as (unit: any, model: string) => boolean;
 const DzSetUnitName = japi.DzSetUnitName as (unit: any, name: string) => boolean;
 
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
+  getServerTime: (this: void) => number;
 };
 const { 获取Boss技能敌对目标列表, 获取Boss技能随机敌对英雄, 获取Boss技能最近敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对目标列表: (this: void, boss: any) => any[];
@@ -92,6 +86,61 @@ const { 创建点特效, createTimedUnitEffect } = require('lib.扩展函数.封
 
 const RAD_TO_DEG = 57.29577951308232;
 const 快速控制_击晕 = 1;
+
+interface 菲尼克斯尔元素衰减状态 {
+  单位: any;
+  元素: 菲尼克斯尔元素类型;
+  下次衰减时间: number;
+}
+
+const 菲尼克斯尔元素衰减状态表: Record<string, 菲尼克斯尔元素衰减状态 | undefined> = {};
+let 菲尼克斯尔元素衰减周期: 周期行为实例 | undefined;
+
+function 取元素衰减键(this: void, unit: any, 元素: 菲尼克斯尔元素类型): string {
+  return (GetHandleId(unit) || 0).toString() + "|" + 元素;
+}
+
+function 清理菲尼克斯尔元素衰减周期(this: void): void {
+  for (const key in 菲尼克斯尔元素衰减状态表) return;
+  if (菲尼克斯尔元素衰减周期 == null) return;
+  菲尼克斯尔元素衰减周期.停止();
+  菲尼克斯尔元素衰减周期 = undefined;
+}
+
+function 菲尼克斯尔元素衰减Tick(this: void): void {
+  const now = getServerTime();
+  for (const key in 菲尼克斯尔元素衰减状态表) {
+    const state = 菲尼克斯尔元素衰减状态表[key];
+    if (state == null || 取元素层数(state.单位, state.元素) <= 0) {
+      delete 菲尼克斯尔元素衰减状态表[key];
+      continue;
+    }
+    if (now < state.下次衰减时间) continue;
+    减少元素层数(state.单位, state.元素, 1);
+    if (取元素层数(state.单位, state.元素) <= 0) {
+      delete 菲尼克斯尔元素衰减状态表[key];
+      continue;
+    }
+    state.下次衰减时间 = now + 菲尼克斯尔数值与表现配置.机制.元素层数衰减间隔秒 * 1000;
+  }
+  清理菲尼克斯尔元素衰减周期();
+}
+
+function 登记元素层数衰减(this: void, unit: any, 元素: 菲尼克斯尔元素类型): void {
+  const key = 取元素衰减键(unit, 元素);
+  菲尼克斯尔元素衰减状态表[key] = {
+    单位: unit,
+    元素,
+    下次衰减时间: getServerTime() + 菲尼克斯尔数值与表现配置.机制.元素脱离衰减等待秒 * 1000,
+  };
+  if (菲尼克斯尔元素衰减周期 == null || !菲尼克斯尔元素衰减周期.是否运行中()) {
+    菲尼克斯尔元素衰减周期 = 创建周期行为({
+      名称: "菲尼克斯尔-元素层数衰减",
+      间隔毫秒: 500,
+      onTick: 菲尼克斯尔元素衰减Tick,
+    });
+  }
+}
 
 export interface 菲尼克斯尔伤害上下文参数 {
   技能ID?: number;
@@ -222,8 +271,8 @@ export function 创建安全圆(this: void, x: number, y: number, radius: number
   创建技能提示圈({ 类型: "白色安全圆", X: x, Y: y, 半径: radius, 持续时间: duration });
 }
 
-export function 创建预警扇形(this: void, source: any, radius: number, duration: number): void {
-  创建技能提示圈({ 类型: "红色扇形", 锚点单位: source, 半径: radius, 持续时间: duration });
+export function 创建预警扇形(this: void, source: any, radius: number, duration: number, 扇形角度?: number): void {
+  创建技能提示圈({ 类型: "红色扇形", 锚点单位: source, 半径: radius, 扇形角度, 持续时间: duration });
 }
 
 export const 两点距离 = 距离XY;
@@ -249,60 +298,6 @@ export function 范围敌人(this: void, boss: any, x: number, y: number, radius
   return getEnemyUnitsInRange(boss, x, y, radius);
 }
 
-function 造成菲尼克斯尔Boss伤害(this: void, source: any, target: any, amount: number, damageType: any, 伤害形态: 技能伤害形态, 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  if (amount > 0 && 单位存活(source) && 单位存活(target)) {
-    提交预计算Boss技能伤害({
-      技能ID: 上下文?.技能ID,
-      技能实例ID: 上下文?.技能实例ID,
-      标签: 上下文?.标签,
-      来源: source,
-      目标: target,
-      伤害: amount,
-      ranged: true,
-      attackType: ATTACK_TYPE_NORMAL,
-      伤害类型: damageType,
-      weaponType: WEAPON_TYPE_WHOKNOWS,
-      伤害形态,
-    });
-  }
-}
-
-export function 造成火焰伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_FIRE, 伤害形态, 上下文);
-}
-
-export function 造成冰霜伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_COLD, 伤害形态, 上下文);
-}
-
-export function 造成毒火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_POISON, 伤害形态, 上下文);
-}
-
-export function 造成暗火伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_SHADOW_STRIKE, 伤害形态, 上下文);
-}
-
-export function 造成普通伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态 = "单体", 上下文?: 菲尼克斯尔伤害上下文参数): void {
-  造成菲尼克斯尔Boss伤害(source, target, amount, DAMAGE_TYPE_NORMAL, 伤害形态, 上下文);
-}
-
-export function 计算攻击最大生命伤害(this: void, source: any, target: any, attackRate: number, maxLifeRate: number): number {
-  return 计算组合技能伤害(source, target, {
-    来源攻击力比例: attackRate,
-    目标最大生命比例: maxLifeRate,
-    总倍率: 取菲尼克斯尔技能强度倍率(source),
-  });
-}
-
-export function 计算攻击已损失伤害(this: void, source: any, target: any, attackRate: number, lostLifeRate: number): number {
-  return 计算组合技能伤害(source, target, {
-    来源攻击力比例: attackRate,
-    目标已损生命比例: lostLifeRate,
-    总倍率: 取菲尼克斯尔技能强度倍率(source),
-  });
-}
-
 export function 取菲尼克斯尔技能强度倍率(this: void, source: any): number {
   if (!单位有效(source)) return 1;
   const layers = 获取单位Buff层数(source, 菲尼克斯尔单位技能配置.BuffID.导管破封);
@@ -311,6 +306,10 @@ export function 取菲尼克斯尔技能强度倍率(this: void, source: any): n
 }
 
 export function 开始施法硬直(this: void, unit: any, duration: number): void {
+  开始硬直(unit, duration);
+}
+
+export function 开始元素爆发硬直(this: void, unit: any, duration: number): void {
   开始硬直(unit, duration);
 }
 
@@ -343,6 +342,7 @@ export function 添加元素层数(this: void, unit: any, 元素: 菲尼克斯�
     stack: next,
     sourceName: 菲尼克斯尔单位技能配置.单位名称,
   });
+  登记元素层数衰减(unit, 元素);
   return next;
 }
 

@@ -32,4 +32,84 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.39．恶魔城调查")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.40．返回阿瓦尔汇报")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.41．熔岩恶魔试炼")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.42．火灵核心交付")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.42．巴尔扎罗斯前导")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.42．巴尔扎罗斯战后承接")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.43．菲尼克斯尔现身")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.44．菲尼克斯尔战后承接")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.46．沉睡英魂亚伦柯斯前导")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.48．封印核心场景")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

@@ -1,9 +1,6 @@
 /** @noSelfInFile */
 
 import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
 
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
@@ -12,6 +9,7 @@ import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 减少巴尔扎罗斯灼热层数 } from "./16．灼热层数工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
+import { 执行BossAOE技能伤害, 提交预计算BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -45,8 +43,7 @@ const { CosBJ, SinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") 
   SinBJ: (this: void, degrees: number) => number;
 };
 
-const { 造成AOE技能伤害, 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 创建独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   创建独立技能伤害实例: (this: void, 参数?: any) => number;
 };
 
@@ -211,19 +208,6 @@ function 点在安全区(this: void, unit: any, safePoints: 末日熔爆点[]): 
   return false;
 }
 
-function 计算外圈伤害(this: void, boss: any, target: any): number {
-  const config = 巴尔扎罗斯技能数值配置.末日熔爆;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: config.外圈伤害Boss攻击力比例,
-    目标最大生命比例: config.外圈伤害目标最大生命比例,
-    总倍率: config.外圈伤害总倍率,
-  });
-}
-
-function 计算安全区余波伤害(this: void, target: any): number {
-  return GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.末日熔爆.安全区余波目标最大生命比例;
-}
-
 function 播放爆发表现(this: void, center: 末日熔爆点): void {
   const config = 巴尔扎罗斯技能数值配置.末日熔爆;
   创建点特效({
@@ -259,31 +243,33 @@ function 结算末日熔爆(this: void, context: 巴尔扎罗斯运行时上下�
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     if (点在安全区(hero, safePoints)) {
-      造成AOE技能伤害({
+      提交预计算BossAOE技能伤害({
         来源: boss,
         目标: hero,
-        伤害: 计算安全区余波伤害(hero),
+        伤害: GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * config.安全区余波目标最大生命比例,
         attack: false,
         ranged: true,
         attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_FIRE,
         weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
         技能实例ID,
         标签: "巴尔扎罗斯末日熔爆",
       });
       减少巴尔扎罗斯灼热层数(hero, config.安全区清除灼热层数);
     } else {
-      造成AOE技能伤害({
+      执行BossAOE技能伤害({
         来源: boss,
         目标: hero,
-        伤害: 计算外圈伤害(boss, hero),
+        伤害公式: {
+          来源攻击力比例: config.外圈伤害Boss攻击力比例,
+          目标最大生命比例: config.外圈伤害目标最大生命比例,
+          总倍率: config.外圈伤害总倍率,
+        },
         attack: false,
         ranged: true,
         attackType: ATTACK_TYPE_NORMAL,
         伤害类型: DAMAGE_TYPE_FIRE,
         weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "Boss技能",
         技能实例ID,
         标签: "巴尔扎罗斯末日熔爆",
       });

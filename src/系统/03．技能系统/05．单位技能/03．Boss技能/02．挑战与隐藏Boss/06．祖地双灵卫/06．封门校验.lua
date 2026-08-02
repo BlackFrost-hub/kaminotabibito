@@ -13,8 +13,8 @@ local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_
 local ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.01．多阶段技能编排.06．技能阶段链执行器")
 local _____521B_5EFA_7ACB_5373_6267_884C_9636_6BB5 = ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668["创建立即执行阶段"]
 local _____521B_5EFA_5EF6_8FDF_9636_6BB5 = ____06_FF0E_6280_80FD_9636_6BB5_94FE_6267_884C_5668["创建延迟阶段"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
 local _____6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
@@ -35,10 +35,8 @@ local ____require_result_0 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
 local ____require_result_1 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_1["获取Boss技能敌对英雄列表"]
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_2["造成AOE技能伤害"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_3.getServerTime
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_2.getServerTime
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -170,17 +168,15 @@ ____exports["释放祖地双灵卫封门校验"] = function(context, target)
                                 if _____8A93_76FE_662F_5426_963B_6321(context, waveStartX, waveStartY, hit) then
                                     return
                                 end
-                                local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(red, hit, {["来源攻击力比例"] = 0.95, ["目标最大生命比例"] = 0.045})
-                                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                                     ["来源"] = red,
                                     ["目标"] = hit,
-                                    ["伤害"] = damage,
+                                    ["伤害公式"] = {["来源攻击力比例"] = 0.95, ["目标最大生命比例"] = 0.045},
                                     attack = false,
                                     ranged = true,
                                     attackType = ATTACK_TYPE_NORMAL,
                                     ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
                                     weaponType = WEAPON_TYPE_WHOKNOWS,
-                                    ["来源类型"] = "Boss技能",
                                     ["标签"] = "祖地双灵卫·封门校验"
                                 })
                             end,

@@ -74,6 +74,13 @@ function _____66F4_65B0_5355_4E2A_5F39_5E55(_____5B9E_4F8B)
         return
     end
     local _____79FB_52A8_5B8C_6210 = _____63A8_8FDB_5F39_5E55_79FB_52A8(_____5B9E_4F8B, _____5F39_5E55Tick_95F4_9694)
+    local ____Tick_56DE_8C03 = _____5B9E_4F8B["参数"].onTick
+    if ____Tick_56DE_8C03 ~= nil then
+        ____Tick_56DE_8C03(_____5B9E_4F8B, _____5F39_5E55Tick_95F4_9694)
+    end
+    if _____5B9E_4F8B["已结束"] then
+        return
+    end
     if _____5904_7406_5F39_5E55_547D_4E2D(_____5B9E_4F8B) then
         ____exports["结束原生弹幕实例"](_____5B9E_4F8B, "命中消失")
         return

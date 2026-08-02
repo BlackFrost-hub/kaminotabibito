@@ -1,6 +1,9 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local isValidUnit, _____83B7_53D6_5355_4F4DBuff_5C42_6570
+local _____53D6_5143_7D20BuffID, isValidUnit, registerManualBuff, getBuffRuntime, _____83B7_53D6_5355_4F4DBuff_5C42_6570, _____79FB_9664_5355_4F4D_6307_5B9ABuff
+local ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.22．限次周期执行器")
+local _____521B_5EFA_5468_671F_884C_4E3A = ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668["创建周期行为"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.00．配置")
 local _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲尼克斯尔单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.04．双重凤凰菲尼克斯尔.02．数值与表现配置")
@@ -11,24 +14,61 @@ local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
 local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["点到线段距离平方"]
 local _____516C_5171_6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
 local _____516C_5171_6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
-local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
-local _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss技能伤害"]
 local _____6247_5F62_533A_57DF = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
 local _____5355_4F4D_662F_5426_5728_6247_5F62_533A_57DF = _____6247_5F62_533A_57DF["单位是否在扇形区域"]
 ____exports["单位有效"] = function(unit)
     return unit ~= nil and unit ~= 0 and isValidUnit(unit)
 end
-____exports["取菲尼克斯尔技能强度倍率"] = function(source)
-    if not ____exports["单位有效"](source) then
-        return 1
+function _____53D6_5143_7D20BuffID(_____5143_7D20)
+    if _____5143_7D20 == "冰" then
+        return _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["冷焰印记"]
     end
-    local layers = _____83B7_53D6_5355_4F4DBuff_5C42_6570(source, _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["导管破封"])
-    if layers <= 0 then
-        return 1
+    if _____5143_7D20 == "毒" then
+        return _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["毒火蚀痕"]
     end
-    return 1 + layers * _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["每根导管技能强度提高"]
+    if _____5143_7D20 == "暗" then
+        return _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["怨火烙印"]
+    end
+    return _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["凤凰火印"]
+end
+____exports["取元素层数"] = function(unit, _____5143_7D20)
+    if not ____exports["单位有效"](unit) then
+        return 0
+    end
+    return _____83B7_53D6_5355_4F4DBuff_5C42_6570(
+        unit,
+        _____53D6_5143_7D20BuffID(_____5143_7D20)
+    )
+end
+____exports["减少元素层数"] = function(unit, _____5143_7D20, count)
+    if not ____exports["单位有效"](unit) or count <= 0 then
+        return
+    end
+    local buffID = _____53D6_5143_7D20BuffID(_____5143_7D20)
+    local current = _____83B7_53D6_5355_4F4DBuff_5C42_6570(unit, buffID)
+    local next = current - count
+    if next <= 0 then
+        _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, buffID)
+        return
+    end
+    local runtime = getBuffRuntime(unit, buffID)
+    local ____registerManualBuff_18 = registerManualBuff
+    local ____unit_17 = unit
+    local ____opt_result_15
+    if runtime ~= nil then
+        ____opt_result_15 = runtime.remaining
+    end
+    local ____opt_result_15_16 = ____opt_result_15
+    if ____opt_result_15_16 == nil then
+        ____opt_result_15_16 = 30
+    end
+    ____registerManualBuff_18(
+        ____unit_17,
+        buffID,
+        ____opt_result_15_16,
+        next,
+        {stack = next, sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
+    )
 end
 local jass = require("jass.common")
 local japi = require("jass.japi")
@@ -40,6 +80,7 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitState = jass.GetUnitState
+local GetHandleId = jass.GetHandleId
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
@@ -50,19 +91,13 @@ local SquareRoot = jass.SquareRoot
 local R2I = jass.R2I
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
-local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
-local DAMAGE_TYPE_POISON = jass.DAMAGE_TYPE_POISON
-local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
-local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local DzSetUnitModel = japi.DzSetUnitModel
 local DzSetUnitName = japi.DzSetUnitName
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local addPeriodicCallback = ____require_result_1.addPeriodicCallback
 local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local getServerTime = ____require_result_1.getServerTime
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_76EE_6807_5217_8868 = ____require_result_2["获取Boss技能敌对目标列表"]
 local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
@@ -74,10 +109,10 @@ local getEnemyUnitsInRange = ____require_result_4.getEnemyUnitsInRange
 local ____require_result_5 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
 local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_6.registerManualBuff
-local getBuffRuntime = ____require_result_6.getBuffRuntime
+registerManualBuff = ____require_result_6.registerManualBuff
+getBuffRuntime = ____require_result_6.getBuffRuntime
 _____83B7_53D6_5355_4F4DBuff_5C42_6570 = ____require_result_6["获取单位Buff层数"]
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
 local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_7["创建技能提示圈"]
 local ____require_result_8 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
@@ -96,6 +131,55 @@ local _____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
 local createTimedUnitEffect = ____require_result_11.createTimedUnitEffect
 local RAD_TO_DEG = 57.29577951308232
 local _____5FEB_901F_63A7_5236__51FB_6655 = 1
+local _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_72B6_6001_8868 = {}
+local _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F
+local function _____53D6_5143_7D20_8870_51CF_952E(unit, _____5143_7D20)
+    return (tostring(GetHandleId(unit) or 0) .. "|") .. _____5143_7D20
+end
+local function _____6E05_7406_83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F()
+    for key in pairs(_____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_72B6_6001_8868) do
+        return
+    end
+    if _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F == nil then
+        return
+    end
+    _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F["停止"](_____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F)
+    _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F = nil
+end
+local function _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CFTick()
+    local now = getServerTime()
+    for key in pairs(_____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_72B6_6001_8868) do
+        do
+            local state = _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_72B6_6001_8868[key]
+            if state == nil or ____exports["取元素层数"](state["单位"], state["元素"]) <= 0 then
+                __TS__Delete(_____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_72B6_6001_8868, key)
+                goto __continue8
+            end
+            if now < state["下次衰减时间"] then
+                goto __continue8
+            end
+            ____exports["减少元素层数"](state["单位"], state["元素"], 1)
+            if ____exports["取元素层数"](state["单位"], state["元素"]) <= 0 then
+                __TS__Delete(_____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_72B6_6001_8868, key)
+                goto __continue8
+            end
+            state["下次衰减时间"] = now + _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["元素层数衰减间隔秒"] * 1000
+        end
+        ::__continue8::
+    end
+    _____6E05_7406_83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F()
+end
+local function _____767B_8BB0_5143_7D20_5C42_6570_8870_51CF(unit, _____5143_7D20)
+    local key = _____53D6_5143_7D20_8870_51CF_952E(unit, _____5143_7D20)
+    _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_72B6_6001_8868[key] = {
+        ["单位"] = unit,
+        ["元素"] = _____5143_7D20,
+        ["下次衰减时间"] = getServerTime() + _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["元素脱离衰减等待秒"] * 1000
+    }
+    if _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F == nil or not _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F["是否运行中"](_____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F) then
+        _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CF_5468_671F = _____521B_5EFA_5468_671F_884C_4E3A({["名称"] = "菲尼克斯尔-元素层数衰减", ["间隔毫秒"] = 500, onTick = _____83F2_5C3C_514B_65AF_5C14_5143_7D20_8870_51CFTick})
+    end
+end
 ____exports["创建菲尼克斯尔独立伤害上下文"] = function(_____6807_7B7E, _____6301_7EED_65F6_95F4_79D2)
     return {
         ["技能实例ID"] = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = _____6807_7B7E, ["持续时间秒"] = _____6301_7EED_65F6_95F4_79D2}),
@@ -240,8 +324,14 @@ ____exports["创建安全圆"] = function(x, y, radius, duration)
         ["持续时间"] = duration
     })
 end
-____exports["创建预警扇形"] = function(source, radius, duration)
-    _____521B_5EFA_6280_80FD_63D0_793A_5708({["类型"] = "红色扇形", ["锚点单位"] = source, ["半径"] = radius, ["持续时间"] = duration})
+____exports["创建预警扇形"] = function(source, radius, duration, _____6247_5F62_89D2_5EA6)
+    _____521B_5EFA_6280_80FD_63D0_793A_5708({
+        ["类型"] = "红色扇形",
+        ["锚点单位"] = source,
+        ["半径"] = radius,
+        ["扇形角度"] = _____6247_5F62_89D2_5EA6,
+        ["持续时间"] = duration
+    })
 end
 ____exports["两点距离"] = _____8DDD_79BBXY
 ____exports["极坐标X"] = function(x, distance, angleDeg)
@@ -276,111 +366,20 @@ end
 ____exports["范围敌人"] = function(boss, x, y, radius)
     return getEnemyUnitsInRange(boss, x, y, radius)
 end
-local function _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(source, target, amount, damageType, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
-    if amount > 0 and ____exports["单位存活"](source) and ____exports["单位存活"](target) then
-        _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3({
-            ["技能ID"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["技能ID"],
-            ["技能实例ID"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["技能实例ID"],
-            ["标签"] = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["标签"],
-            ["来源"] = source,
-            ["目标"] = target,
-            ["伤害"] = amount,
-            ranged = true,
-            attackType = ATTACK_TYPE_NORMAL,
-            ["伤害类型"] = damageType,
-            weaponType = WEAPON_TYPE_WHOKNOWS,
-            ["伤害形态"] = _____4F24_5BB3_5F62_6001
-        })
+____exports["取菲尼克斯尔技能强度倍率"] = function(source)
+    if not ____exports["单位有效"](source) then
+        return 1
     end
-end
-____exports["造成火焰伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
-    if _____4F24_5BB3_5F62_6001 == nil then
-        _____4F24_5BB3_5F62_6001 = "单体"
+    local layers = _____83B7_53D6_5355_4F4DBuff_5C42_6570(source, _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["导管破封"])
+    if layers <= 0 then
+        return 1
     end
-    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
-        source,
-        target,
-        amount,
-        DAMAGE_TYPE_FIRE,
-        _____4F24_5BB3_5F62_6001,
-        _____4E0A_4E0B_6587
-    )
-end
-____exports["造成冰霜伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
-    if _____4F24_5BB3_5F62_6001 == nil then
-        _____4F24_5BB3_5F62_6001 = "单体"
-    end
-    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
-        source,
-        target,
-        amount,
-        DAMAGE_TYPE_COLD,
-        _____4F24_5BB3_5F62_6001,
-        _____4E0A_4E0B_6587
-    )
-end
-____exports["造成毒火伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
-    if _____4F24_5BB3_5F62_6001 == nil then
-        _____4F24_5BB3_5F62_6001 = "单体"
-    end
-    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
-        source,
-        target,
-        amount,
-        DAMAGE_TYPE_POISON,
-        _____4F24_5BB3_5F62_6001,
-        _____4E0A_4E0B_6587
-    )
-end
-____exports["造成暗火伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
-    if _____4F24_5BB3_5F62_6001 == nil then
-        _____4F24_5BB3_5F62_6001 = "单体"
-    end
-    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
-        source,
-        target,
-        amount,
-        DAMAGE_TYPE_SHADOW_STRIKE,
-        _____4F24_5BB3_5F62_6001,
-        _____4E0A_4E0B_6587
-    )
-end
-____exports["造成普通伤害"] = function(source, target, amount, _____4F24_5BB3_5F62_6001, _____4E0A_4E0B_6587)
-    if _____4F24_5BB3_5F62_6001 == nil then
-        _____4F24_5BB3_5F62_6001 = "单体"
-    end
-    _____9020_6210_83F2_5C3C_514B_65AF_5C14Boss_4F24_5BB3(
-        source,
-        target,
-        amount,
-        DAMAGE_TYPE_NORMAL,
-        _____4F24_5BB3_5F62_6001,
-        _____4E0A_4E0B_6587
-    )
-end
-____exports["计算攻击最大生命伤害"] = function(source, target, attackRate, maxLifeRate)
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
-        source,
-        target,
-        {
-            ["来源攻击力比例"] = attackRate,
-            ["目标最大生命比例"] = maxLifeRate,
-            ["总倍率"] = ____exports["取菲尼克斯尔技能强度倍率"](source)
-        }
-    )
-end
-____exports["计算攻击已损失伤害"] = function(source, target, attackRate, lostLifeRate)
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(
-        source,
-        target,
-        {
-            ["来源攻击力比例"] = attackRate,
-            ["目标已损生命比例"] = lostLifeRate,
-            ["总倍率"] = ____exports["取菲尼克斯尔技能强度倍率"](source)
-        }
-    )
+    return 1 + layers * _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["每根导管技能强度提高"]
 end
 ____exports["开始施法硬直"] = function(unit, duration)
+    _____5F00_59CB_786C_76F4(unit, duration)
+end
+____exports["开始元素爆发硬直"] = function(unit, duration)
     _____5F00_59CB_786C_76F4(unit, duration)
 end
 ____exports["施加减速"] = function(source, target, ratio, duration)
@@ -394,27 +393,6 @@ ____exports["施加减速"] = function(source, target, ratio, duration)
 end
 ____exports["施加短眩晕"] = function(source, target, duration)
     _____65BD_52A0_5FEB_901F_63A7_5236Buff(source, target, _____5FEB_901F_63A7_5236__51FB_6655, duration)
-end
-local function _____53D6_5143_7D20BuffID(_____5143_7D20)
-    if _____5143_7D20 == "冰" then
-        return _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["冷焰印记"]
-    end
-    if _____5143_7D20 == "毒" then
-        return _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["毒火蚀痕"]
-    end
-    if _____5143_7D20 == "暗" then
-        return _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["怨火烙印"]
-    end
-    return _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E.BuffID["凤凰火印"]
-end
-____exports["取元素层数"] = function(unit, _____5143_7D20)
-    if not ____exports["单位有效"](unit) then
-        return 0
-    end
-    return _____83B7_53D6_5355_4F4DBuff_5C42_6570(
-        unit,
-        _____53D6_5143_7D20BuffID(_____5143_7D20)
-    )
 end
 ____exports["添加元素层数"] = function(unit, _____5143_7D20, count, duration)
     if duration == nil then
@@ -435,37 +413,8 @@ ____exports["添加元素层数"] = function(unit, _____5143_7D20, count, durati
         next,
         {stack = next, sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
     )
+    _____767B_8BB0_5143_7D20_5C42_6570_8870_51CF(unit, _____5143_7D20)
     return next
-end
-____exports["减少元素层数"] = function(unit, _____5143_7D20, count)
-    if not ____exports["单位有效"](unit) or count <= 0 then
-        return
-    end
-    local buffID = _____53D6_5143_7D20BuffID(_____5143_7D20)
-    local current = _____83B7_53D6_5355_4F4DBuff_5C42_6570(unit, buffID)
-    local next = current - count
-    if next <= 0 then
-        _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, buffID)
-        return
-    end
-    local runtime = getBuffRuntime(unit, buffID)
-    local ____registerManualBuff_24 = registerManualBuff
-    local ____unit_23 = unit
-    local ____opt_result_21
-    if runtime ~= nil then
-        ____opt_result_21 = runtime.remaining
-    end
-    local ____opt_result_21_22 = ____opt_result_21
-    if ____opt_result_21_22 == nil then
-        ____opt_result_21_22 = 30
-    end
-    ____registerManualBuff_24(
-        ____unit_23,
-        buffID,
-        ____opt_result_21_22,
-        next,
-        {stack = next, sourceName = _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位名称"]}
-    )
 end
 ____exports["取最高元素"] = function(unit)
     local _____706B = ____exports["取元素层数"](unit, "火")

@@ -5,18 +5,10 @@ import { 创建单位运行时上下文工厂 } from "../../../../00．技能模
 import { 菲尼克斯尔场地配置 } from "./01．场地配置";
 import { 菲尼克斯尔单位技能配置 } from "./00．配置";
 import { 播放菲尼克斯尔台词 } from "./17．台词播放";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-
-const jass = require("jass.common") as any;
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
-const 菲尼克斯尔单位类型ID = stringToFourCC(菲尼克斯尔单位技能配置.单位ID);
 
 export type 菲尼克斯尔形态 = "第一形态" | "第二形态" | "永恒轮回";
 export type 菲尼克斯尔元素类型 = "火" | "冰" | "毒" | "暗";
@@ -75,6 +67,8 @@ const 菲尼克斯尔上下文工厂 = 创建单位运行时上下文工厂<菲�
   名称: "菲尼克斯尔",
   主动技能提示: 菲尼克斯尔单位技能配置.主动技能提示,
   创建上下文: 创建菲尼克斯尔上下文,
+  死亡时自动清理: true,
+  on单位死亡: on菲尼克斯尔死亡台词,
 });
 
 export function 获取菲尼克斯尔上下文(this: void, boss: any): 菲尼克斯尔运行时上下文 | undefined {
@@ -101,15 +95,10 @@ export function 取菲尼克斯尔战场中心(this: void): { x: number; y: numb
   };
 }
 
-let 菲尼克斯尔死亡台词监听已注册 = false;
-
-function on菲尼克斯尔死亡台词(this: void, dyingUnit: any): void {
-  if (GetUnitTypeId(dyingUnit) !== 菲尼克斯尔单位类型ID) return;
+function on菲尼克斯尔死亡台词(this: void, _context: 菲尼克斯尔运行时上下文, dyingUnit: any, _killingUnit: any): void {
   播放菲尼克斯尔台词(dyingUnit, "死亡", 0);
 }
 
 export function 注册菲尼克斯尔运行时(this: void): void {
-  if (菲尼克斯尔死亡台词监听已注册) return;
-  菲尼克斯尔死亡台词监听已注册 = true;
-  registerDeathListener(on菲尼克斯尔死亡台词);
+  // 死亡监听由上下文工厂统一注册，保留此入口兼容现有初始化调用。
 }

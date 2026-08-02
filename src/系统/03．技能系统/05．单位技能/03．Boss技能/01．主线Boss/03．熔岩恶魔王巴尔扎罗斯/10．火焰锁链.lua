@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____9009_62E9_706B_7130_9501_94FE_76EE_6807, _____8BA1_7B97_8D85_8DDD_4F24_5BB3, _____66F4_65B0_9501_94FE_5355_4F4D_4F4D_7F6E, _____505C_6B62_706B_7130_9501_94FE, ____on_706B_7130_9501_94FEBuff_79FB_9664, ____on_706B_7130_9501_94FETick, _____521B_5EFA_706B_7130_9501_94FE, ____on_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE_751F_6548, _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, addPeriodicCallback, removePeriodicCallback, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, SetUnitX, SetUnitY, Player, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, PLAYER_NEUTRAL_AGGRESSIVE, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____706B_7130_9501_94FE_6280_80FDID
+local _____9009_62E9_706B_7130_9501_94FE_76EE_6807, _____66F4_65B0_9501_94FE_5355_4F4D_4F4D_7F6E, _____505C_6B62_706B_7130_9501_94FE, ____on_706B_7130_9501_94FEBuff_79FB_9664, ____on_706B_7130_9501_94FETick, _____521B_5EFA_706B_7130_9501_94FE, ____on_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE_751F_6548, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D, _____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, GetUnitStateJapi, GetUnitTypeId, GetUnitX, GetUnitY, SetUnitX, SetUnitY, Player, UNIT_STATE_MAX_LIFE, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_FIRE, WEAPON_TYPE_WHOKNOWS, PLAYER_NEUTRAL_AGGRESSIVE, _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_7C7B_578BID, _____706B_7130_9501_94FE_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建巴尔扎罗斯上下文"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -18,6 +18,10 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local _____8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间距离平方"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行Boss单体技能伤害"]
+local ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.22．限次周期执行器")
+local _____521B_5EFA_5468_671F_884C_4E3A = ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668["创建周期行为"]
 function _____9009_62E9_706B_7130_9501_94FE_76EE_6807(boss)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["火焰锁链"]
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
@@ -46,10 +50,6 @@ function _____9009_62E9_706B_7130_9501_94FE_76EE_6807(boss)
     end
     return _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(boss)
 end
-function _____8BA1_7B97_8D85_8DDD_4F24_5BB3(boss, target)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["火焰锁链"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["超距伤害Boss攻击力比例"], ["目标最大生命比例"] = config["超距伤害目标最大生命比例"], ["总倍率"] = config["超距伤害总倍率"]})
-end
 function _____66F4_65B0_9501_94FE_5355_4F4D_4F4D_7F6E(state)
     local boss = state.context["Boss单位"]
     local target = state.target
@@ -71,17 +71,18 @@ function _____505C_6B62_706B_7130_9501_94FE(state, removeBuff)
         return
     end
     state.stopped = true
-    if state.tickId ~= 0 then
-        removePeriodicCallback(state.tickId)
-        state.tickId = 0
+    if state.tick ~= nil then
+        local ____self_7 = state.tick
+        ____self_7["停止"](____self_7)
+        state.tick = nil
     end
     if state.line ~= nil then
-        local ____self_9 = state.line
-        ____self_9["停止"](____self_9, "火焰锁链结束")
+        local ____self_8 = state.line
+        ____self_8["停止"](____self_8, "火焰锁链结束")
     end
     if state.chainInstance ~= nil then
-        local ____self_10 = state.chainInstance
-        ____self_10["销毁"](____self_10)
+        local ____self_9 = state.chainInstance
+        ____self_9["销毁"](____self_9)
         state.chainInstance = nil
         state.chainUnit = nil
     end
@@ -90,50 +91,51 @@ function _____505C_6B62_706B_7130_9501_94FE(state, removeBuff)
     end
 end
 function ____on_706B_7130_9501_94FEBuff_79FB_9664(unit, _buffID, row)
-    local ____temp_11
+    local ____temp_10
     if row ~= nil then
-        ____temp_11 = row.chainState
+        ____temp_10 = row.chainState
     else
-        ____temp_11 = nil
+        ____temp_10 = nil
     end
-    local state = ____temp_11
+    local state = ____temp_10
     if state ~= nil then
         _____505C_6B62_706B_7130_9501_94FE(state, false)
     end
 end
-function ____on_706B_7130_9501_94FETick(state)
-    if state.stopped then
-        return
+function ____on_706B_7130_9501_94FETick(______6267_884C_6B21_6570, variable)
+    local state = variable
+    if state == nil or state.stopped then
+        return false
     end
     local boss = state.context["Boss单位"]
     local target = state.target
     local chainUnit = state.chainUnit
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(target) or not _____5355_4F4D_6709_6548(chainUnit) then
         _____505C_6B62_706B_7130_9501_94FE(state, true)
-        return
+        return false
     end
     _____66F4_65B0_9501_94FE_5355_4F4D_4F4D_7F6E(state)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["火焰锁链"]
     if _____8DDD_79BB_5E73_65B9(boss, target) <= config["断链距离"] * config["断链距离"] then
-        return
+        return true
     end
     local now = getServerTime()
     if state.lastDamageMs > 0 and now - state.lastDamageMs < config["超距Tick秒"] * 1000 then
-        return
+        return true
     end
     state.lastDamageMs = now
-    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+    _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3({
         ["技能ID"] = _____706B_7130_9501_94FE_6280_80FDID,
         ["来源"] = boss,
         ["目标"] = target,
-        ["伤害"] = _____8BA1_7B97_8D85_8DDD_4F24_5BB3(boss, target),
+        ["伤害公式"] = {["来源攻击力比例"] = config["超距伤害Boss攻击力比例"], ["目标最大生命比例"] = config["超距伤害目标最大生命比例"], ["总倍率"] = config["超距伤害总倍率"]},
         attack = false,
         ranged = true,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_FIRE,
-        weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能"
+        weaponType = WEAPON_TYPE_WHOKNOWS
     })
+    return true
 end
 function _____521B_5EFA_706B_7130_9501_94FE(context, target)
     local boss = context["Boss单位"]
@@ -150,7 +152,7 @@ function _____521B_5EFA_706B_7130_9501_94FE(context, target)
         chainInstance = nil,
         chainUnit = nil,
         line = nil,
-        tickId = 0,
+        tick = nil,
         lastDamageMs = 0,
         stopped = false
     }
@@ -190,14 +192,13 @@ function _____521B_5EFA_706B_7130_9501_94FE(context, target)
             _____505C_6B62_706B_7130_9501_94FE(state, true)
         end
     })
-    state.tickId = addPeriodicCallback(
-        config["锁链Tick毫秒"],
-        function()
-            ____on_706B_7130_9501_94FETick(state)
-        end
-    )
-    local ____self_12 = context["清理"]
-    ____self_12["登记周期回调"](____self_12, "巴尔扎罗斯-火焰锁链Tick", state.tickId)
+    state.tick = _____521B_5EFA_5468_671F_884C_4E3A({
+        ["名称"] = "巴尔扎罗斯-火焰锁链Tick",
+        ["间隔毫秒"] = config["锁链Tick毫秒"],
+        ["清理"] = context["清理"],
+        ["变量"] = state,
+        onTick = ____on_706B_7130_9501_94FETick
+    })
     registerManualBuff(
         target,
         _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E.BuffID["火焰锁链"],
@@ -258,28 +259,22 @@ function ____on_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE_751F_6548(castingUn
     end
     ____exports["释放巴尔扎罗斯火焰锁链"](context)
 end
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-_____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.index")
-_____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_3["创建可攻击机制单位"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.07．机制连线.index")
-_____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF = ____require_result_4["创建持续单位连线"]
-local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
-_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_5["获取Boss技能随机敌对英雄"]
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-addPeriodicCallback = ____require_result_6.addPeriodicCallback
-removePeriodicCallback = ____require_result_6.removePeriodicCallback
-getServerTime = ____require_result_6.getServerTime
-local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_7.registerManualBuff
-_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_7["移除单位指定Buff"]
-local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_8["造成单体技能伤害"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.index")
+_____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D = ____require_result_2["创建可攻击机制单位"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.07．机制连线.index")
+_____521B_5EFA_6301_7EED_5355_4F4D_8FDE_7EBF = ____require_result_3["创建持续单位连线"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+_____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+_____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_4["获取Boss技能随机敌对英雄"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+getServerTime = ____require_result_5.getServerTime
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_6.registerManualBuff
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitStateJapi = japi.GetUnitState

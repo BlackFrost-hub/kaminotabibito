@@ -4,7 +4,7 @@ import { 单位存活 as 单位有效, 距离平方XY as 距离平方 } from "..
 import type { 瑟兰迪尔运行时上下文 } from "./03．运行时上下文";
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
-import { 执行Boss技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
@@ -185,7 +185,7 @@ function 创建终末审判时间轴事件(this: void, context: 瑟兰迪尔运�
         const target = targets[i];
         if (!单位有效(target)) continue;
         if (距离平方(GetUnitX(target), GetUnitY(target), bossX, bossY) > safeRadius2) {
-          执行Boss技能伤害({
+          执行BossAOE技能伤害({
             来源: boss,
             目标: target,
             伤害公式: {
@@ -200,7 +200,6 @@ function 创建终末审判时间轴事件(this: void, context: 瑟兰迪尔运�
             weaponType: jass.WEAPON_TYPE_WHOKNOWS,
             技能实例ID,
             标签: "瑟兰迪尔终末审判",
-            伤害形态: "AOE",
           });
         }
       }

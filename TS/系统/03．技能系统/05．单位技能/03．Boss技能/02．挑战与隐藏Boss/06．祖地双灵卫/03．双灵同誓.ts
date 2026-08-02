@@ -9,10 +9,10 @@ import type { 持续单位连线实例 } from '../../../../00．技能模板+函
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 import { 闪电效果代码 } from '../../../../00．技能模板+函数/02．通用函数/17．闪电效果代码';
+import { 创建友军范围承伤转移 } from '../../../../00．技能模板+函数/04．机制组件/09．装备通用机制/20．友军范围承伤转移';
+import { 创建条件伤害修正 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正';
+import { 提交预计算Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 
-const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
-  registerDamageModifier: (this: void, callback: (this: void, damage: any) => number, priority?: number) => number;
-};
 const { getServerTime } = require('系统.00．核心系统.05．中心计时器') as { getServerTime: (this: void) => number };
 const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff系统.00．Buff系统') as {
   registerManualBuff: (this: void, unit: any, buffId: string, duration: number, value: number, extras?: any) => void;
@@ -24,7 +24,6 @@ const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (model: string, unit: any, attachment: string) => any;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
@@ -33,7 +32,6 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 let 双灵同誓已注册 = false;
-let 正在结算同誓分担 = false;
 
 function 停止同誓连线(this: void, 连线: 持续单位连线实例 | undefined): void {
   if (连线 != null) 连线.停止('同誓保护关闭');
@@ -45,9 +43,68 @@ function 生命比例(this: void, unit: any): number {
   return maxLife > 0 ? GetUnitState(unit, UNIT_STATE_LIFE) / maxLife : 0;
 }
 
+function 取同誓低血单位(this: void, context: 祖地双灵卫运行时上下文): any {
+  if (context.低血保护守卫 === '赤誓灵卫') return context.赤誓灵卫单位;
+  if (context.低血保护守卫 === '苍影灵卫') return context.苍影灵卫单位;
+  return undefined;
+}
+
+function 取同誓高血单位(this: void, context: 祖地双灵卫运行时上下文): any {
+  if (context.低血保护守卫 === '赤誓灵卫') return context.苍影灵卫单位;
+  if (context.低血保护守卫 === '苍影灵卫') return context.赤誓灵卫单位;
+  return undefined;
+}
+
+function 确保同誓承伤转移(this: void, context: 祖地双灵卫运行时上下文): void {
+  if (context.同誓承伤转移 != null) return;
+  context.同誓承伤转移 = 创建友军范围承伤转移({
+    名称: '祖地双灵卫-双灵同誓',
+    清理: context.清理,
+    优先级: -71,
+    初始启用: false,
+    排除真实伤害: false,
+    获取转移比例: function 读取双灵同誓分担比例(this: void): number {
+      return 祖地双灵卫数值与表现配置.公共.同誓高血分担比例;
+    },
+    获取候选单位列表: function 获取双灵同誓承受者(this: void, event): any[] {
+      if (event.受击者 !== 取同誓低血单位(context)) return [];
+      const high = 取同誓高血单位(context);
+      return high != null && high !== 0 ? [high] : [];
+    },
+    可承受者: function 双灵同誓承受者有效(this: void, event): boolean {
+      const member = context.联合生命周期.按单位取成员(event.候选单位);
+      return member != null && member.状态 !== '崩解';
+    },
+    过滤伤害: function 过滤双灵同誓转移(this: void, event): boolean {
+      if (context.战斗已结束 || !context.同誓保护已启用) return false;
+      const member = context.联合生命周期.按单位取成员(event.受击者);
+      return member == null || member.状态 !== '崩解';
+    },
+    提交转移: function 提交双灵同誓转移伤害(this: void, event): number {
+      const source = event.攻击者 != null && event.攻击者 !== 0 ? event.攻击者 : event.受击者;
+      const result = 提交预计算Boss单体技能伤害({
+        来源: source,
+        目标: event.承受者,
+        伤害: event.计划转移伤害,
+        伤害类型: DAMAGE_TYPE_MAGIC,
+        attack: false,
+        ranged: true,
+        attackType: ATTACK_TYPE_NORMAL,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: 'Boss技能',
+        标签: '祖地双灵卫-双灵同誓-承伤转移',
+        参与技能伤害加成: false,
+        isDamageTransfer: true,
+      });
+      return result.是否造成伤害 ? result.伤害 : 0;
+    },
+  });
+}
+
 function 关闭同誓保护(this: void, context: 祖地双灵卫运行时上下文): void {
   const previousLow = context.低血保护守卫 === '赤誓灵卫' ? context.赤誓灵卫单位 : context.低血保护守卫 === '苍影灵卫' ? context.苍影灵卫单位 : undefined;
   context.同誓保护已启用 = false;
+  context.同誓承伤转移?.设置启用(false);
   context.低血保护守卫 = undefined;
   if (context.同誓保护特效 != null && context.同誓保护特效 !== 0) DestroyEffect(context.同誓保护特效);
   context.同誓保护特效 = undefined;
@@ -68,6 +125,8 @@ function 开启同誓保护(this: void, context: 祖地双灵卫运行时上下�
   播放Boss坐标音效(sound, GetUnitX(low), GetUnitY(low), 祖地双灵卫数值与表现配置.音效默认裁断距离);
   context.同誓保护已启用 = true;
   context.低血保护守卫 = lowName;
+  确保同誓承伤转移(context);
+  context.同誓承伤转移?.设置启用(true);
   if (low != null && low !== 0) {
     context.同誓保护特效 = AddSpecialEffectTarget(祖地双灵卫数值与表现配置.表现资源.公共.低血守卫保护特效路径, low, 'origin');
     registerManualBuff(low, 祖地双灵卫BuffID.双灵同誓, 3600, 祖地双灵卫数值与表现配置.公共.同誓低血减伤比例 * 100, { sourceName: '祖地双灵卫-双灵同誓' });
@@ -117,7 +176,8 @@ export function 更新祖地双灵同誓(this: void, context: 祖地双灵卫运
 }
 
 function on双灵同誓伤害修正(this: void, damage: any): number {
-  if (正在结算同誓分担) return damage.currentDamage;
+  if (damage == null) return 0;
+  if (damage.isDamageTransfer === true) return damage.currentDamage;
   const context = 获取祖地双灵卫运行时上下文(damage.target);
   if (context == null || context.战斗已结束) return damage.currentDamage;
   const member = context.联合生命周期.按单位取成员(damage.target);
@@ -130,22 +190,33 @@ function on双灵同誓伤害修正(this: void, damage: any): number {
   if (!context.同誓保护已启用 || context.低血保护守卫 == null) return result;
   const isLow = context.低血保护守卫 === '赤誓灵卫' ? damage.target === context.赤誓灵卫单位 : damage.target === context.苍影灵卫单位;
   if (!isLow) return result;
-  const high = context.低血保护守卫 === '赤誓灵卫' ? context.苍影灵卫单位 : context.赤誓灵卫单位;
   result *= 1 - 祖地双灵卫数值与表现配置.公共.同誓低血减伤比例;
-  const shared = result * 祖地双灵卫数值与表现配置.公共.同誓高血分担比例;
-  result -= shared;
-  if (shared > 0 && high != null && high !== 0) {
-    正在结算同誓分担 = true;
-    UnitDamageTarget(damage.attacker ?? damage.target, high, shared, false, true, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, WEAPON_TYPE_WHOKNOWS);
-    正在结算同誓分担 = false;
-  }
   return result;
+}
+
+function 满足双灵同誓伤害修正条件(this: void, damage: any): boolean {
+  if (damage == null || damage.isDamageTransfer === true) return false;
+  const context = 获取祖地双灵卫运行时上下文(damage.target);
+  if (context == null || context.战斗已结束) return false;
+  const member = context.联合生命周期.按单位取成员(damage.target);
+  if (member != null && member.状态 === '崩解') return true;
+  if (context.阶段 === 'P3双蚀共鸣' && context.P3共鸣层数 > 0) return true;
+  if (getServerTime() < context.净化易伤到Ms) return true;
+  if (!context.同誓保护已启用 || context.低血保护守卫 == null) return false;
+  return context.低血保护守卫 === '赤誓灵卫'
+    ? damage.target === context.赤誓灵卫单位
+    : damage.target === context.苍影灵卫单位;
 }
 
 export function 注册祖地双灵同誓(this: void): void {
   if (双灵同誓已注册) return;
   双灵同誓已注册 = true;
-  registerDamageModifier(on双灵同誓伤害修正, -70);
+  创建条件伤害修正({
+    名称: '祖地双灵卫-双灵同誓伤害修正',
+    优先级: -70,
+    条件: 满足双灵同誓伤害修正条件,
+    修正: on双灵同誓伤害修正,
+  });
 }
 
 export const 双灵同誓机制状态 = {

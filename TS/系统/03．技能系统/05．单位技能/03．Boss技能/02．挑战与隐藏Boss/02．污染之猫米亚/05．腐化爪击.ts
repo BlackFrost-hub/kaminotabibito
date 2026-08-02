@@ -6,11 +6,11 @@ import { 添加米亚腐化感染 } from "./04．腐化感染";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚技能数值配置, 米亚运行时配置 } from "./02．数值与表现配置";
 import { 播放米亚台词 } from "./15．台词播放";
-import { 开始米亚常规施法 } from "./19．施法提示";
 import { 取米亚污染标记伤害倍率 } from "./08．污染标记";
 import { 取米亚平台超载伤害倍率 } from "./12．平台超载惩罚";
 import { 开始跳跃 } from "../../../../00．技能模板+函数/01．技能函数/03．跳跃·击飞/01．跳跃系统/03．对外接口";
 import { stringToFourCC, 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 提交预计算Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const { 创建持续危险区域 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域") as {
@@ -19,14 +19,11 @@ const { 创建持续危险区域 } = require("系统.03．技能系统.00．技�
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 参数: any) => any;
 };
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
-};
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
@@ -130,7 +127,7 @@ function 结算米亚腐化爪击(this: void, variable?: any): void {
     const 污染标记伤害倍率 = 取米亚污染标记伤害倍率(context, actualTarget);
     const 平台超载伤害倍率 = 取米亚平台超载伤害倍率(actualTarget);
     const 伤害 = 攻击力 * config.攻击力倍率 * 污染标记伤害倍率 * 平台超载伤害倍率;
-    const 伤害已提交 = 造成单体技能伤害({
+    提交预计算Boss单体技能伤害({
       技能ID: 腐化爪击技能ID,
       来源: boss,
       目标: actualTarget,
@@ -138,7 +135,6 @@ function 结算米亚腐化爪击(this: void, variable?: any): void {
       attackType: jass.ATTACK_TYPE_NORMAL,
       伤害类型: jass.DAMAGE_TYPE_POISON,
       weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
     });
     添加米亚腐化感染(context, actualTarget, config.残留每秒腐化层数, "腐化爪击");
   }
@@ -202,10 +198,6 @@ export function 释放米亚腐化爪击(this: void, context: 米亚运行时上
   const landingY = startY + dy * ratio;
   const facing = Atan2(dy, dx) * BJ_RADTODEG;
   const jumpDuration = GetRandomReal(config.跳跃最短秒, config.跳跃最长秒);
-  SetUnitFacing(boss, facing);
-  开始米亚常规施法(boss, config.前摇秒, "腐化爪击", `锁定目标，${config.前摇秒}秒后跃击并留下半径${config.残留半径}码爪痕（离开红色路径、落点和爪痕）`);
-  SetUnitTimeScale(boss, 1);
-  SetUnitAnimationByIndex(boss, config.前摇动画编号);
   创建技能提示圈({
     类型: "方向直线",
     X: startX,
@@ -216,7 +208,7 @@ export function 释放米亚腐化爪击(this: void, context: 米亚运行时上
     持续时间: config.前摇秒,
     来源单位: boss,
   });
-  const delayedId = addDelayedCallback(config.前摇秒 * 1000, 开始米亚腐化爪击跳跃, {
+  const 跳跃数据: 米亚腐化爪击结算变量 = {
     context,
     target: actualTarget,
     落点X: landingX,
@@ -224,8 +216,31 @@ export function 释放米亚腐化爪击(this: void, context: 米亚运行时上
     朝向: facing,
     距离: distance,
     跳跃持续秒: jumpDuration,
-  } as 米亚腐化爪击结算变量);
-  context.清理.登记延迟回调("米亚-腐化爪击结算", delayedId);
+  };
+  启动基础施法时间线({
+    名称: "米亚-腐化爪击",
+    施法者: boss,
+    目标X: targetX,
+    目标Y: targetY,
+    硬直秒: config.前摇秒,
+    动画编号: config.前摇动画编号,
+    动画速度: 1,
+    完成后恢复动作: false,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: config.前摇秒,
+      颜色ID: 3,
+      标题文本: "腐化爪击",
+      提示文本: `锁定目标，${config.前摇秒}秒后跃击并留下半径${config.残留半径}码爪痕（离开红色路径、落点和爪痕）`,
+    },
+    清理: context.清理,
+    播放台词: function 米亚腐化爪击台词(this: void): void {
+      播放米亚台词(boss, "腐化爪击");
+    },
+    on生效: function 米亚腐化爪击时间线生效(this: void): void {
+      开始米亚腐化爪击跳跃(跳跃数据);
+    },
+  });
 }
 
 export function 注册米亚腐化爪击(this: void): void {

@@ -5,7 +5,7 @@ import type { 技能提示圈配置 } from "../../02．通用函数/16．技能�
 import { 创建技能提示圈 } from "../../02．通用函数/16．技能提示圈工厂";
 
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
@@ -39,41 +39,13 @@ interface 运行波次 {
   已触发: boolean;
 }
 
-const 多波延迟AOE表: Record<number, 多波延迟AOE实现 | undefined> = {};
-let 多波延迟AOE驱动ID = 0;
-let 下一个多波延迟AOEID = 0;
-
-function 确保多波延迟AOE驱动(this: void, 间隔毫秒: number): void {
-  if (多波延迟AOE驱动ID !== 0) return;
-  多波延迟AOE驱动ID = addPeriodicCallback(间隔毫秒, on多波延迟AOETick);
-}
-
-function 尝试停止多波延迟AOE驱动(this: void): void {
-  for (const key in 多波延迟AOE表) {
-    if (多波延迟AOE表[key] != null) return;
-  }
-  if (多波延迟AOE驱动ID !== 0) {
-    removePeriodicCallback(多波延迟AOE驱动ID);
-    多波延迟AOE驱动ID = 0;
-  }
-}
-
-function on多波延迟AOETick(this: void): void {
-  const now = getServerTime();
-  for (const key in 多波延迟AOE表) {
-    const 实例 = 多波延迟AOE表[key];
-    if (实例 != null) 实例.推进(now);
-  }
-}
-
 class 多波延迟AOE实现 implements 多波延迟AOE实例 {
-  readonly ID: number;
   private 参数: 多波延迟AOE参数;
   private 运行波次列表: 运行波次[] = [];
+  private Tick回调ID = 0;
   private 已停止 = false;
 
   constructor(参数: 多波延迟AOE参数) {
-    this.ID = ++下一个多波延迟AOEID;
     this.参数 = 参数;
     const now = getServerTime();
     for (let i = 0; i < 参数.波次列表.length; i++) {
@@ -82,8 +54,7 @@ class 多波延迟AOE实现 implements 多波延迟AOE实例 {
       this.创建提示圈(波次);
       if (参数.on预警 != null) 参数.on预警(波次, i + 1);
     }
-    多波延迟AOE表[this.ID] = this;
-    确保多波延迟AOE驱动(参数.Tick间隔毫秒 ?? 50);
+    this.Tick回调ID = addPeriodicCallback(参数.Tick间隔毫秒 ?? 50, on多波延迟AOETick, this);
   }
 
   推进(now: number): void {
@@ -104,9 +75,11 @@ class 多波延迟AOE实现 implements 多波延迟AOE实例 {
   停止(): void {
     if (this.已停止) return;
     this.已停止 = true;
-    delete 多波延迟AOE表[this.ID];
+    if (this.Tick回调ID !== 0) {
+      removePeriodicCallback(this.Tick回调ID);
+      this.Tick回调ID = 0;
+    }
     if (this.参数.on结束 != null) this.参数.on结束();
-    尝试停止多波延迟AOE驱动();
   }
 
   private 创建提示圈(波次: 多波延迟AOE波次): void {
@@ -120,6 +93,11 @@ class 多波延迟AOE实现 implements 多波延迟AOE实例 {
       ...(波次.提示圈 ?? {}),
     });
   }
+}
+
+function on多波延迟AOETick(this: void, variable?: any): void {
+  const 实例 = variable as 多波延迟AOE实现 | undefined;
+  if (实例 != null) 实例.推进(getServerTime());
 }
 
 export function 创建多波延迟AOE(this: void, 参数: 多波延迟AOE参数): 多波延迟AOE实例 {

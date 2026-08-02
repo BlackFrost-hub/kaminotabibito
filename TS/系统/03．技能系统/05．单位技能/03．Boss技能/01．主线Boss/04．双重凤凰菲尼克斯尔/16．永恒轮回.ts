@@ -27,18 +27,25 @@ import {
   开始施法硬直,
   设置单位动画,
   取菲尼克斯尔敌对目标列表,
-  计算攻击最大生命伤害,
-  造成暗火伤害,
+  取菲尼克斯尔技能强度倍率,
   创建菲尼克斯尔独立伤害上下文,
 } from "./19．公共工具";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核心功能") as {
   doHeal: (this: void, params: any) => number;
+};
+const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+  移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
 
 const jass = require("jass.common") as any;
 const KillUnit = jass.KillUnit as (whichUnit: any) => void;
 const RemoveUnit = jass.RemoveUnit as (whichUnit: any) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 function 播放永恒轮回点特效(this: void, model: string, x: number, y: number, lifeMs: number, scale: number): any {
   return 创建点特效({ 模型路径: model, X: x, Y: y, 缩放: scale, 持续秒: lifeMs / 1000 });
@@ -76,9 +83,13 @@ function 创建凤凰蛋死亡回调(this: void, context: 菲尼克斯尔运行�
 
 export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克斯尔运行时上下文): void {
   if (context.永恒轮回已触发 || context.当前形态 !== "第二形态" || !单位存活(context.Boss)) return;
+  const config = 菲尼克斯尔数值与表现配置.机制;
   context.永恒轮回已触发 = true;
   context.当前形态 = "永恒轮回";
-  const config = 菲尼克斯尔数值与表现配置.机制;
+  registerManualBuff(context.Boss, 菲尼克斯尔单位技能配置.BuffID.永恒轮回, config.永恒轮回引导秒, 1, {
+    stack: 1,
+    sourceName: "菲尼克斯尔-永恒轮回",
+  });
   const 伤害上下文 = 创建菲尼克斯尔独立伤害上下文("菲尼克斯尔永恒轮回", config.永恒轮回引导秒 + 2);
   播放菲尼克斯尔台词(context.Boss, "永恒轮回");
   开始施法硬直(context.Boss, config.永恒轮回引导秒);
@@ -122,6 +133,7 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
   延迟(config.永恒轮回引导秒 * 1000, function 菲尼克斯尔永恒轮回结算(this: void): void {
     停止周期(能量上升timerId);
     SetUnitTimeScale(context.Boss, 1);
+    移除单位指定Buff(context.Boss, 菲尼克斯尔单位技能配置.BuffID.永恒轮回);
     let aliveEggs = 0;
     for (let i = 0; i < context.凤凰蛋列表.length; i++) {
       if (单位存活(context.凤凰蛋列表[i].单位)) aliveEggs += 1;
@@ -132,7 +144,23 @@ export function 触发菲尼克斯尔永恒轮回(this: void, context: 菲尼克
       doHeal({ HealSource: context.Boss, HealTarget: context.Boss, HealAmount: heal, ItemHeal: false, HealEffect: false });
       const heroes = 取菲尼克斯尔敌对目标列表(context.Boss);
       for (let i = 0; i < heroes.length; i++) {
-        造成暗火伤害(context.Boss, heroes[i], 计算攻击最大生命伤害(context.Boss, heroes[i], config.轮回失败全场伤害Boss攻击力比例, config.轮回失败全场伤害目标最大生命比例), "AOE", 伤害上下文);
+        if (单位存活(context.Boss) && 单位存活(heroes[i])) {
+          执行BossAOE技能伤害({
+            技能实例ID: 伤害上下文?.技能实例ID,
+            标签: 伤害上下文?.标签,
+            来源: context.Boss,
+            目标: heroes[i],
+            伤害公式: {
+              来源攻击力比例: config.轮回失败全场伤害Boss攻击力比例,
+              目标最大生命比例: config.轮回失败全场伤害目标最大生命比例,
+              总倍率: 取菲尼克斯尔技能强度倍率(context.Boss),
+            },
+            ranged: true,
+            attackType: ATTACK_TYPE_NORMAL,
+            伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
+            weaponType: WEAPON_TYPE_WHOKNOWS,
+          });
+        }
         播放永恒轮回点特效(菲尼克斯尔数值与表现配置.特效.永恒轮回失败伤害, 取单位X(heroes[i]), 取单位Y(heroes[i]), 1500, config.永恒轮回失败伤害特效缩放);
       }
       清理菲尼克斯尔凤凰蛋(context);

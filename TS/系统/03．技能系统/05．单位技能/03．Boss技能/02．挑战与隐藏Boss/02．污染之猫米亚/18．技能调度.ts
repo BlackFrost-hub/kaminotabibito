@@ -36,6 +36,7 @@ function 到达生命阈值(this: void, context: 米亚运行时上下文, thres
 function 是P1(this: void, context: 米亚运行时上下文): boolean { return context.阶段 === 1; }
 function 是P2(this: void, context: 米亚运行时上下文): boolean { return context.阶段 === 2; }
 function 是P3(this: void, context: 米亚运行时上下文): boolean { return context.阶段 === 3; }
+function 是P1或P2(this: void, context: 米亚运行时上下文): boolean { return context.阶段 === 1 || context.阶段 === 2; }
 
 export function 注册米亚技能调度(this: void): void {
   if (米亚技能调度器 != null) return;
@@ -100,7 +101,7 @@ export function 注册米亚技能调度(this: void): void {
       首次延迟毫秒: 0,
       忙碌毫秒: 米亚运行时配置.推进间隔毫秒,
       优先级: 190,
-      阶段允许: 是P1,
+      阶段允许: 是P1或P2,
       可释放: function 米亚灵猫分身第二阈值可释放(this: void, context: 米亚运行时上下文): boolean {
         return !context.已触发分身50 && 到达生命阈值(context, clone.触发生命比例[1]);
       },
@@ -127,7 +128,7 @@ export function 注册米亚技能调度(this: void): void {
       优先级: 20,
       阶段允许: 是P2,
       可释放: function 米亚腐化转移可释放(this: void, context: 米亚运行时上下文): boolean {
-        return (context.腐化转移污染平台ID ?? "") === "";
+        return !context.腐化转移施法中 && (context.腐化转移污染平台ID ?? "") === "";
       },
       执行: function 执行米亚腐化转移(this: void, context: 米亚运行时上下文, _target: any, nowMs: number): boolean {
         return 释放米亚腐化转移(context, nowMs);

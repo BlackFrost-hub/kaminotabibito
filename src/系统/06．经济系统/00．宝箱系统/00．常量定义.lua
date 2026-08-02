@@ -13,8 +13,9 @@ local function stringToFourCC(s)
     return a * 16777216 + b * 65536 + c * 256 + d
 end
 ____exports["宝箱系统开关"] = true
+____exports["影骨莫特斯盗贼宝箱可破坏物ID"] = "B00Z"
 ____exports.CHEST_TYPES = {{
-    destructableType = "B00Z",
+    destructableType = ____exports["影骨莫特斯盗贼宝箱可破坏物ID"],
     openTime = 3,
     name = "盗贼宝箱",
     picks = 1,

@@ -46,6 +46,8 @@ local _____91CA_653E_5DF4_5C14_624E_7F57_65AF_706B_7130_9501_94FE = ____require_
 local ____require_result_15 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．护卫A格鲁姆.index")
 local _____91CA_653E_683C_9C81_59C6_91CD_9524 = ____require_result_15["释放格鲁姆重锤"]
 local _____91CA_653E_683C_9C81_59C6_706B_5F84 = ____require_result_15["释放格鲁姆火径"]
+local _____89E6_53D1_683C_9C81_59C6_7099_70ED_5949_732E = ____require_result_15["触发格鲁姆炙热奉献"]
+local _____4E2D_65AD_683C_9C81_59C6_7099_70ED_5949_732E = ____require_result_15["中断格鲁姆炙热奉献"]
 local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．护卫B塞拉.index")
 local _____91CA_653E_51B0_7130_53CC_661F = ____require_result_16["释放冰焰双星"]
 local _____91CA_653E_7EDD_5BF9_96F6_5EA6_9886_57DF = ____require_result_16["释放绝对零度领域"]
@@ -449,6 +451,43 @@ local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD13_51B0_971C_7834_76FE_6
     local ____self_27 = context["清理"]
     ____self_27["登记延迟回调"](____self_27, "巴尔扎罗斯测试-熔岩护盾冰霜破盾", _____7194_5CA9_62A4_76FE_51B0_971C_6D4B_8BD5_56DE_8C03ID)
 end
+local function _____51C6_5907_5DF4_5C14_624E_7F57_65AF_7099_70ED_5949_732E_6D4B_8BD5_751F_547D(context)
+    local grum = context["格鲁姆"]
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(grum) then
+        return false
+    end
+    local boss = context["Boss单位"]
+    if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(boss) then
+        return false
+    end
+    local maxLife = GetUnitState(grum, UNIT_STATE_MAX_LIFE)
+    SetUnitState(grum, UNIT_STATE_LIFE, maxLife * 0.19)
+    local bossMaxLife = GetUnitState(boss, UNIT_STATE_MAX_LIFE)
+    SetUnitState(boss, UNIT_STATE_LIFE, bossMaxLife * 0.8)
+    return true
+end
+local function ____on_5DF4_5C14_624E_7F57_65AF_7099_70ED_5949_732E_6253_65AD(variable)
+    local context = variable
+    if context == nil then
+        return
+    end
+    _____4E2D_65AD_683C_9C81_59C6_7099_70ED_5949_732E(context)
+end
+local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD14_6D4B_8BD5_547D_4EE4(_player, context)
+    if not _____51C6_5907_5DF4_5C14_624E_7F57_65AF_7099_70ED_5949_732E_6D4B_8BD5_751F_547D(context) then
+        return
+    end
+    _____89E6_53D1_683C_9C81_59C6_7099_70ED_5949_732E(context)
+end
+local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD14_6253_65AD_6D4B_8BD5_547D_4EE4(_player, context)
+    if not _____51C6_5907_5DF4_5C14_624E_7F57_65AF_7099_70ED_5949_732E_6D4B_8BD5_751F_547D(context) then
+        return
+    end
+    _____89E6_53D1_683C_9C81_59C6_7099_70ED_5949_732E(context)
+    local callbackId = addDelayedCallback(1000, ____on_5DF4_5C14_624E_7F57_65AF_7099_70ED_5949_732E_6253_65AD, context)
+    local ____self_28 = context["清理"]
+    ____self_28["登记延迟回调"](____self_28, "巴尔扎罗斯测试-炙热奉献打断", callbackId)
+end
 local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 1, ["名称"] = "恶魔咆哮波", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD1_6D4B_8BD5_547D_4EE4},
     {["序号"] = 1, ["命令"] = "1-2", ["名称"] = "恶魔咆哮波(P2护卫模仿)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD1_62A4_536B_6A21_4EFF_6D4B_8BD5_547D_4EE4},
@@ -467,7 +506,9 @@ local _____5DF4_5C14_624E_7F57_65AF_6D4B_8BD5_6280_80FD_5217_8868 = {
     {["序号"] = 12, ["名称"] = "塞拉切换冰霜形态", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD12_6D4B_8BD5_547D_4EE4},
     {["序号"] = 13, ["名称"] = "熔岩护盾(直接生成)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD13_6D4B_8BD5_547D_4EE4},
     {["序号"] = 13, ["命令"] = "13-2", ["名称"] = "熔岩护盾(1秒后近战反弹)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD13_8FD1_6218_53CD_5F39_6D4B_8BD5_547D_4EE4},
-    {["序号"] = 13, ["命令"] = "13-3", ["名称"] = "熔岩护盾(2秒后冰霜破盾)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD13_51B0_971C_7834_76FE_6D4B_8BD5_547D_4EE4}
+    {["序号"] = 13, ["命令"] = "13-3", ["名称"] = "熔岩护盾(2秒后冰霜破盾)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD13_51B0_971C_7834_76FE_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 14, ["名称"] = "炙热奉献(8秒成功)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD14_6D4B_8BD5_547D_4EE4},
+    {["序号"] = 14, ["命令"] = "14-2", ["名称"] = "炙热奉献(1秒后打断)", ["执行"] = ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD14_6253_65AD_6D4B_8BD5_547D_4EE4}
 }
 _____6CE8_518CBoss_6D4B_8BD5_547D_4EE4_7EC4({
     ["命令单位名"] = "巴尔扎罗斯",

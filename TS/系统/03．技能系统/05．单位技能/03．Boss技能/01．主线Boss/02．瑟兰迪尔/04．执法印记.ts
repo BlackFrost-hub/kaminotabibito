@@ -3,6 +3,7 @@
 import type { 瑟兰迪尔运行时上下文 } from "./03．运行时上下文";
 import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置";
 import { stringToFourCC, 单位存活 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -22,9 +23,6 @@ const { 设置强制攻击目标, 设置当前目标 } = require("系统.01．�
   设置强制攻击目标: (this: void, 敌人: any, 目标: any, 持续毫秒: number) => void;
   设置当前目标: (this: void, 敌人ID: number, 目标ID: number) => void;
 };
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
-};
 const { 取当前有效玩家人数 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数") as {
   取当前有效玩家人数: (this: void) => number;
 };
@@ -43,10 +41,16 @@ function 获取本次印记增伤(this: void): number {
   return 取当前有效玩家人数() <= 1 ? config.单人额外伤害加成 : config.Boss对标记目标伤害加成;
 }
 
+function 是执法印记伤害(this: void, context: any): boolean {
+  const config = 瑟兰迪尔数值与表现配置.执法印记;
+  if (!单位有效(context.attacker) || !单位有效(context.target)) return false;
+  if (GetUnitTypeId(context.attacker) !== 瑟兰迪尔单位ID) return false;
+  const buffRuntime = getBuffRuntime(context.target, config.BuffID);
+  return buffRuntime != null && buffRuntime.effect > 0;
+}
+
 function on执法印记伤害修正(this: void, context: any): number {
   const config = 瑟兰迪尔数值与表现配置.执法印记;
-  if (!单位有效(context.attacker) || !单位有效(context.target)) return context.currentDamage;
-  if (GetUnitTypeId(context.attacker) !== 瑟兰迪尔单位ID) return context.currentDamage;
   const buffRuntime = getBuffRuntime(context.target, config.BuffID);
   if (buffRuntime == null || buffRuntime.effect <= 0) return context.currentDamage;
   return context.currentDamage * (1 + buffRuntime.effect);
@@ -55,7 +59,12 @@ function on执法印记伤害修正(this: void, context: any): number {
 function 确保执法印记伤害修正(this: void): void {
   if (伤害修正已注册) return;
   伤害修正已注册 = true;
-  registerDamageModifier(on执法印记伤害修正, 35);
+  创建条件伤害修正({
+    名称: "瑟兰迪尔执法印记增伤",
+    优先级: 35,
+    条件: 是执法印记伤害,
+    修正: on执法印记伤害修正,
+  });
 }
 
 export function 选择瑟兰迪尔执法印记目标(this: void, context: 瑟兰迪尔运行时上下文): any {

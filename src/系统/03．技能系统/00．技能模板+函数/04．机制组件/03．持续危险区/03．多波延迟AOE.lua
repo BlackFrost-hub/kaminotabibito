@@ -1,52 +1,30 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____on_591A_6CE2_5EF6_8FDFAOETick, getServerTime, _____591A_6CE2_5EF6_8FDFAOE_8868
+local ____on_591A_6CE2_5EF6_8FDFAOETick, getServerTime
 local ____16_FF0E_6280_80FD_63D0_793A_5708_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____16_FF0E_6280_80FD_63D0_793A_5708_5DE5_5382["创建技能提示圈"]
-function ____on_591A_6CE2_5EF6_8FDFAOETick()
-    local now = getServerTime()
-    for key in pairs(_____591A_6CE2_5EF6_8FDFAOE_8868) do
-        local _____5B9E_4F8B = _____591A_6CE2_5EF6_8FDFAOE_8868[key]
-        if _____5B9E_4F8B ~= nil then
-            _____5B9E_4F8B["推进"](_____5B9E_4F8B, now)
-        end
+function ____on_591A_6CE2_5EF6_8FDFAOETick(variable)
+    local _____5B9E_4F8B = variable
+    if _____5B9E_4F8B ~= nil then
+        _____5B9E_4F8B["推进"](
+            _____5B9E_4F8B,
+            getServerTime()
+        )
     end
 end
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
 getServerTime = ____require_result_0.getServerTime
-_____591A_6CE2_5EF6_8FDFAOE_8868 = {}
-local _____591A_6CE2_5EF6_8FDFAOE_9A71_52A8ID = 0
-local _____4E0B_4E00_4E2A_591A_6CE2_5EF6_8FDFAOEID = 0
-local function _____786E_4FDD_591A_6CE2_5EF6_8FDFAOE_9A71_52A8(_____95F4_9694_6BEB_79D2)
-    if _____591A_6CE2_5EF6_8FDFAOE_9A71_52A8ID ~= 0 then
-        return
-    end
-    _____591A_6CE2_5EF6_8FDFAOE_9A71_52A8ID = addPeriodicCallback(_____95F4_9694_6BEB_79D2, ____on_591A_6CE2_5EF6_8FDFAOETick)
-end
-local function _____5C1D_8BD5_505C_6B62_591A_6CE2_5EF6_8FDFAOE_9A71_52A8()
-    for key in pairs(_____591A_6CE2_5EF6_8FDFAOE_8868) do
-        if _____591A_6CE2_5EF6_8FDFAOE_8868[key] ~= nil then
-            return
-        end
-    end
-    if _____591A_6CE2_5EF6_8FDFAOE_9A71_52A8ID ~= 0 then
-        removePeriodicCallback(_____591A_6CE2_5EF6_8FDFAOE_9A71_52A8ID)
-        _____591A_6CE2_5EF6_8FDFAOE_9A71_52A8ID = 0
-    end
-end
 local _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0 = __TS__Class()
 _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.name = "多波延迟AOE实现"
 function _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype.____constructor(self, _____53C2_6570)
     self["运行波次列表"] = {}
+    self["Tick回调ID"] = 0
     self["已停止"] = false
-    _____4E0B_4E00_4E2A_591A_6CE2_5EF6_8FDFAOEID = _____4E0B_4E00_4E2A_591A_6CE2_5EF6_8FDFAOEID + 1
-    self.ID = _____4E0B_4E00_4E2A_591A_6CE2_5EF6_8FDFAOEID
     self["参数"] = _____53C2_6570
     local now = getServerTime()
     do
@@ -62,8 +40,7 @@ function _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype.____constructor(self, _
             i = i + 1
         end
     end
-    _____591A_6CE2_5EF6_8FDFAOE_8868[self.ID] = self
-    _____786E_4FDD_591A_6CE2_5EF6_8FDFAOE_9A71_52A8(_____53C2_6570["Tick间隔毫秒"] or 50)
+    self["Tick回调ID"] = addPeriodicCallback(_____53C2_6570["Tick间隔毫秒"] or 50, ____on_591A_6CE2_5EF6_8FDFAOETick, self)
 end
 _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype["推进"] = function(self, now)
     if self["已停止"] then
@@ -76,7 +53,7 @@ _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype["推进"] = function(self, now)
             do
                 local _____8FD0_884C_6CE2_6B21 = self["运行波次列表"][i + 1]
                 if _____8FD0_884C_6CE2_6B21["已触发"] then
-                    goto __continue20
+                    goto __continue9
                 end
                 _____5168_90E8_89E6_53D1 = false
                 if now >= _____8FD0_884C_6CE2_6B21["到期Ms"] then
@@ -84,7 +61,7 @@ _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype["推进"] = function(self, now)
                     self["参数"]["on触发"](_____8FD0_884C_6CE2_6B21["波次"], i + 1)
                 end
             end
-            ::__continue20::
+            ::__continue9::
             i = i + 1
         end
     end
@@ -97,11 +74,13 @@ _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype["停止"] = function(self)
         return
     end
     self["已停止"] = true
-    __TS__Delete(_____591A_6CE2_5EF6_8FDFAOE_8868, self.ID)
+    if self["Tick回调ID"] ~= 0 then
+        removePeriodicCallback(self["Tick回调ID"])
+        self["Tick回调ID"] = 0
+    end
     if self["参数"]["on结束"] ~= nil then
         self["参数"]["on结束"]()
     end
-    _____5C1D_8BD5_505C_6B62_591A_6CE2_5EF6_8FDFAOE_9A71_52A8()
 end
 _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype["创建提示圈"] = function(self, _____6CE2_6B21)
     if _____6CE2_6B21["提示圈"] == false then

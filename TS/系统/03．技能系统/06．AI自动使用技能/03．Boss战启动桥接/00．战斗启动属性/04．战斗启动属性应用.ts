@@ -12,6 +12,7 @@ const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
+const Rect = jass.Rect as (minX: number, minY: number, maxX: number, maxY: number) => any;
 const CreateSound = jass.CreateSound as (
   fileName: string,
   looping: boolean,
@@ -22,8 +23,9 @@ const CreateSound = jass.CreateSound as (
   eaxSetting: string
 ) => any;
 
-const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataSetSafe, YDUserDataClearSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+  YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
 };
 const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．单位配置表.02．Boss配置表") as {
   按名字反查Boss单位ID: (this: void, name: string) => string | undefined;
@@ -129,6 +131,21 @@ function 写入Boss战矩形(this: void, 属性名: string, 变量名?: string):
   YDUserDataSetSafe("string", "Boss战", 属性名, "rect", 矩形句柄);
 }
 
+function 清理Boss战地点(this: void): void {
+  YDUserDataClearSafe("string", "Boss战", "地点", "rect");
+  YDUserDataClearSafe("string", "Boss战", "地点动态", "boolean");
+}
+
+function 写入Boss战动态矩形(this: void, 配置: 战斗启动属性配置["动态地点矩形"]): void {
+  if (配置 == null) return;
+  if (!(配置.左 < 配置.右) || !(配置.下 < 配置.上)) return;
+
+  const 矩形句柄 = Rect(配置.左, 配置.下, 配置.右, 配置.上);
+  if (矩形句柄 == null || 矩形句柄 === 0) return;
+  YDUserDataSetSafe("string", "Boss战", "地点", "rect", 矩形句柄);
+  YDUserDataSetSafe("string", "Boss战", "地点动态", "boolean", true);
+}
+
 export function 应用Boss战启动属性配置(this: void, unit: any): void {
   if (unit == null || unit === 0) return;
 
@@ -140,7 +157,9 @@ export function 应用Boss战启动属性配置(this: void, unit: any): void {
 
   写入Boss战音频("战斗音乐", 配置.战斗音乐路径, 配置.战斗音乐变量名);
   写入Boss战音频("胜利音乐", 配置.胜利音乐路径, 配置.胜利音乐变量名);
-  写入Boss战矩形("地点", 配置.地点变量名);
+  清理Boss战地点();
+  if (配置.动态地点矩形 != null) 写入Boss战动态矩形(配置.动态地点矩形);
+  else 写入Boss战矩形("地点", 配置.地点变量名);
   写入Boss战单位布尔(unit, "转换场景", 配置.转换场景);
   写入Boss战字符串表实数("BS移动X轴", 配置.BS移动X轴 ?? GetUnitX(unit));
   写入Boss战字符串表实数("BS移动Y轴", 配置.BS移动Y轴 ?? GetUnitY(unit));

@@ -4,12 +4,11 @@ import { 里科特单位技能配置 } from "./00．配置";
 import { 获取或创建里科特上下文, 刷新里科特阶段, type 里科特运行时上下文 } from "./01．运行时上下文";
 import { 里科特数值与表现配置, 里科特音效配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
-import { 单位有效, 播放里科特施法维持动作, stringToFourCC, 距离平方XY } from "./13．公共工具";
+import { 单位有效, stringToFourCC, 距离平方XY } from "./13．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
+import { 创建持续危险区域, type 持续危险区域实例 } from "../../../../00．技能模板+函数/04．机制组件/03．持续危险区/01．持续危险区域";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -22,19 +21,11 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
-  读取单位攻击力: (this: void, unit: any) => number;
-};
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { createTimedEffect } = require('lib.扩展函数.封装函数.01．通用工具.03．特效') as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
-};
-const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
-  创建技能提示圈: (this: void, 配置: any) => any;
 };
 const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
@@ -56,8 +47,7 @@ interface 湮灭风场 {
   context: 里科特运行时上下文;
   BossID: number;
   已锁定移动: boolean;
-  剩余跳数: number;
-  周期ID: number;
+  区域实例?: 持续危险区域实例;
   已结束: boolean;
 }
 
@@ -70,7 +60,11 @@ function 结束湮灭之风(this: void, data: 湮灭风场): void {
   if (data.已结束) return;
   data.已结束 = true;
   if (当前湮灭风场表[data.BossID] === data) delete 当前湮灭风场表[data.BossID];
-  removePeriodicCallback(data.周期ID);
+  if (data.区域实例 != null) {
+    const 区域实例 = data.区域实例;
+    data.区域实例 = undefined;
+    区域实例.销毁();
+  }
   const boss = data.context.Boss单位;
   if (boss == null || boss === 0) return;
   ShowUnit(boss, true);
@@ -97,40 +91,31 @@ function 施加湮灭之风随机控制(this: void, boss: any, hero: any): void 
 function 结算湮灭之风一跳(this: void, data: 湮灭风场): void {
   const context = data.context;
   const boss = context.Boss单位;
-  if (!单位有效(boss) || data.剩余跳数 <= 0) {
+  if (data.已结束 || !单位有效(boss)) {
     结束湮灭之风(data);
     return;
   }
-  data.剩余跳数 = data.剩余跳数 - 1;
   const cfg = 里科特数值与表现配置.湮灭之风;
   const bx = GetUnitX(boss);
   const by = GetUnitY(boss);
   const radius2 = cfg.半径 * cfg.半径;
-  const damage = 读取单位攻击力(boss) * cfg.Boss攻击力比例;
   const heroes = 获取Boss技能敌对英雄列表(boss);
-  创建技能提示圈({
-    类型: "圆形",
-    X: bx,
-    Y: by,
-    半径: cfg.半径,
-    持续时间: cfg.tick秒,
-    来源单位: boss,
-  });
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     if (距离平方XY(GetUnitX(hero), GetUnitY(hero), bx, by) > radius2) continue;
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       技能ID: 湮灭之风技能ID,
       来源: boss,
       目标: hero,
-      伤害: damage,
+      伤害公式: {
+        来源攻击力比例: cfg.Boss攻击力比例,
+      },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_MAGIC,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
     });
     施加快速控制Buff(boss, hero, 2, cfg.沉默秒);
   }
@@ -146,7 +131,6 @@ export function 释放里科特湮灭之风(this: void, context: 里科特运行
   const current = 当前湮灭风场表[bossId];
   if (current != null) 结束湮灭之风(current);
   const stage = 刷新里科特阶段(context);
-  if (stage >= 3) 播放里科特施法维持动作(boss, cfg.持续秒, cfg.动画速度);
   播放里科特台词(boss, "湮灭之风");
   播放Boss坐标音效(里科特音效配置.湮灭之风.风场展开, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
   createTimedEffect(cfg.扩散特效路径, GetUnitX(boss), GetUnitY(boss), 0, cfg.扩散特效持续秒);
@@ -161,20 +145,49 @@ export function 释放里科特湮灭之风(this: void, context: 里科特运行
     context,
     BossID: bossId,
     已锁定移动: 应锁定移动,
-    剩余跳数: cfg.持续秒 / cfg.tick秒,
-    周期ID: 0,
     已结束: false,
   };
   当前湮灭风场表[bossId] = data;
-  data.周期ID = addPeriodicCallback(cfg.tick秒 * 1000, function 里科特湮灭之风周期(this: void): void {
-    结算湮灭之风一跳(data);
+  data.区域实例 = 创建持续危险区域({
+    X: GetUnitX(boss),
+    Y: GetUnitY(boss),
+    锚点单位: boss,
+    半径: cfg.半径,
+    持续时间: cfg.持续秒,
+    检测间隔: cfg.tick秒,
+    所有者: boss,
+    影响目标: "敌方",
+    提示圈: {
+      类型: "圆形",
+      锚点单位: boss,
+      半径: cfg.半径,
+      持续时间: cfg.持续秒,
+      可手动销毁: true,
+    },
+    on周期: function 里科特湮灭之风区域周期(this: void): void {
+      结算湮灭之风一跳(data);
+    },
+    on销毁: function 里科特湮灭之风区域销毁(this: void): void {
+      结束湮灭之风(data);
+    },
   });
-  context.清理.登记周期回调("里科特-湮灭之风周期", data.周期ID);
   context.清理.登记清理("里科特-湮灭之风移动锁", 清理湮灭之风, data);
-  const id = addDelayedCallback(cfg.持续秒 * 1000, function 里科特湮灭之风结束显形(this: void): void {
-    结束湮灭之风(data);
-  });
-  context.清理.登记延迟回调("里科特-湮灭之风结束", id);
+  if (stage >= 3) {
+    启动基础施法时间线({
+      名称: "里科特-湮灭之风施法",
+      施法者: boss,
+      硬直秒: cfg.施法硬直秒,
+      生效延迟秒: cfg.持续秒,
+      动画编号: 8,
+      动画速度: cfg.动画速度,
+      后续动画编号: 9,
+      后续动画速度: 1,
+      后续动画延迟毫秒: cfg.施法动作原始时长秒 * 1000 / cfg.动画速度,
+      恢复动画编号: 3,
+      清理: context.清理,
+      on生效: function 里科特湮灭之风施法表现结束(this: void): void {},
+    });
+  }
 }
 
 function on里科特湮灭之风施法(this: void, castingUnit: any, spellAbilityId: number): void {

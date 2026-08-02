@@ -5,16 +5,17 @@ import { 获取或创建莫尔特斯上下文, type 莫尔特斯运行时上下�
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
 import { 应用莫尔特斯腐败值 } from "./03．腐败值与根须领域";
 import { 播放莫尔特斯台词 } from "./13．台词播放";
-import { 单位有效, 播放莫尔特斯限时动作, 开始莫尔特斯常规施法, 极坐标X, 极坐标Y, 点到线段距离平方, stringToFourCC } from "./16．公共工具";
+import { 单位有效, 极坐标X, 极坐标Y, 点到线段距离平方, stringToFourCC } from "./16．公共工具";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
+};
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -208,18 +209,19 @@ function 单通道鞭笞命中(this: void, context: 莫尔特斯运行时上下�
     const hid = GetHandleId(hero) || 0;
     const oldHits = 命中次数表[hid] ?? 0;
     命中次数表[hid] = oldHits + 1;
-    const damage = 读取单位攻击力(boss) * cfg.Boss攻击力比例 * (1 + oldHits * cfg.重复命中增伤比例);
-    造成AOE技能伤害({
+    执行BossAOE技能伤害({
       技能ID: 扭曲荆棘鞭笞技能ID,
       来源: boss,
       目标: hero,
-      伤害: damage,
+      伤害公式: {
+        来源攻击力比例: cfg.Boss攻击力比例,
+        总倍率: 1 + oldHits * cfg.重复命中增伤比例,
+      },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_PLANT,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
     });
     应用莫尔特斯腐败值(context, hero, 8);
     const 寄生每跳伤害 = 读取单位攻击力(boss) * cfg.寄生每跳Boss攻击力比例;
@@ -312,9 +314,30 @@ export function 释放莫尔特斯扭曲荆棘鞭笞(this: void, context: 莫尔
     阶段列表: 创建固定时间轴阶段列表(事件列表),
   });
   if (执行ID === 0) return;
-  开始莫尔特斯常规施法(boss, cfg.开始延迟秒, "扭曲荆棘鞭笞", "荆棘将从场地边缘连续扫过");
-  播放莫尔特斯限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.动作播放秒);
-  播放莫尔特斯台词(boss, "扭曲荆棘鞭笞");
+  启动基础施法时间线({
+    名称: "莫尔特斯-扭曲荆棘鞭笞",
+    施法者: boss,
+    硬直秒: cfg.开始延迟秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    后续动画编号: 0,
+    后续动画速度: 1,
+    后续动画延迟毫秒: cfg.动作播放秒 * 1000,
+    完成后恢复动作: false,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.开始延迟秒,
+      颜色ID: cfg.吟唱条颜色ID,
+      标题文本: cfg.吟唱条标题文本,
+      提示文本: cfg.吟唱条提示文本,
+    },
+    清理: context.清理,
+    播放台词: function 莫尔特斯扭曲荆棘鞭笞台词(this: void): void {
+      播放莫尔特斯台词(boss, "扭曲荆棘鞭笞");
+    },
+    on生效: function 莫尔特斯扭曲荆棘鞭笞时间线生效(this: void): void {
+    },
+  });
 }
 
 function on莫尔特斯扭曲荆棘鞭笞施法(this: void, castingUnit: any, spellAbilityId: number): void {

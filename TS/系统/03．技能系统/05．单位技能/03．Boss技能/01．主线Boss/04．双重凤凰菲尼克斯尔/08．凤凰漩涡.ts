@@ -20,8 +20,7 @@ import {
   创建预警圆,
   播放点特效,
   范围敌人,
-  计算攻击已损失伤害,
-  造成火焰伤害,
+  取菲尼克斯尔技能强度倍率,
   添加元素层数,
   取单位X,
   取单位Y,
@@ -31,11 +30,15 @@ import {
   移动单位到,
 } from "./19．公共工具";
 import type { 菲尼克斯尔伤害上下文参数 } from "./19．公共工具";
+import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const Atan2 = jass.Atan2 as (y: number, x: number) => number;
+const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
+const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
+const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const RAD_TO_DEG = 57.29577951308232;
 const 菲尼克斯尔单位类型ID = stringToFourCC(菲尼克斯尔单位技能配置.单位ID);
@@ -66,9 +69,25 @@ export function 释放菲尼克斯尔凤凰漩涡(this: void, context: 菲尼克
       const enemies = 范围敌人(boss, x, y, config.半径);
       for (let i = 0; i < enemies.length; i++) {
         const u = enemies[i];
-        const damage = 计算攻击已损失伤害(boss, u, config.伤害Boss攻击力比例, config.伤害目标已损失生命比例);
         const distance = 两点距离(取单位X(u), 取单位Y(u), x, y);
-        造成火焰伤害(boss, u, damage, "AOE", 伤害上下文);
+        if (单位存活(boss) && 单位存活(u)) {
+          执行BossAOE技能伤害({
+            技能ID: 伤害上下文?.技能ID,
+            技能实例ID: 伤害上下文?.技能实例ID,
+            标签: 伤害上下文?.标签,
+            来源: boss,
+            目标: u,
+            伤害公式: {
+              来源攻击力比例: config.伤害Boss攻击力比例,
+              目标已损生命比例: config.伤害目标已损失生命比例,
+              总倍率: 取菲尼克斯尔技能强度倍率(boss),
+            },
+            ranged: true,
+            attackType: ATTACK_TYPE_NORMAL,
+            伤害类型: DAMAGE_TYPE_FIRE,
+            weaponType: WEAPON_TYPE_WHOKNOWS,
+          });
+        }
         添加元素层数(u, "火", config.火印层数);
         if (distance > config.中心半径) {
           const angle = Atan2(y - 取单位Y(u), x - 取单位X(u)) * RAD_TO_DEG;

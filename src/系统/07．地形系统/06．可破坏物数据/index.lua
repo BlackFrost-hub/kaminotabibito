@@ -16,6 +16,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 function ____exports.init(self)
 end
 return ____exports

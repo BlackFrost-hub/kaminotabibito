@@ -9,16 +9,13 @@ import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../
 import { 施加快速减速Buff } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 开始牵引 } from '../../../../../00．技能模板+函数/01．技能函数/05．吸附·牵引/01．牵引系统/03．对外接口';
 import { 创建区域效果, type 区域效果实例 } from '../../../../../00．技能模板+函数/01．技能函数/04．区域效果/区域效果';
-import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
 };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, params: any) => boolean;
 };
 const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -134,8 +131,17 @@ export function 创建赤誓镇魂印(this: void, context: 祖地双灵卫运行
     const dx = GetUnitX(hit) - x;
     const dy = GetUnitY(hit) - y;
     if (dx * dx + dy * dy > radius2) continue;
-    const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-    造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: false, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_MAGIC, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·灵印折步镇魂印' });
+    执行BossAOE技能伤害({
+      来源: boss,
+      目标: hit,
+      伤害公式: { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 },
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_MAGIC,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      标签: '祖地双灵卫·灵印折步镇魂印',
+    });
   }
   context.清理.登记清理('祖地双灵卫-镇魂印区域', function 清理赤誓镇魂印(this: void): void {
     area.销毁();

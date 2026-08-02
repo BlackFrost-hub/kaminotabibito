@@ -5,7 +5,7 @@ import { 开始祖地双灵卫常规施法 } from '../01．运行时上下文';
 import { 祖地双灵卫数值与表现配置 } from '../02．数值与表现配置';
 import { 播放限时单位动画, 立即设置单位朝向 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 两点角度, 极坐标X, 极坐标Y, 点到线段距离平方, 单位有效 } from '../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { createTimedEffect, 创建点特效 } from '../../../../../../../lib/扩展函数/封装函数/01．通用工具/03．特效';
 import { 播放苍影灵卫台词 } from '../12．台词播放';
@@ -18,11 +18,8 @@ const { 开始牵引, 停止牵引 } = require('系统.03．技能系统.00．�
   开始牵引: (this: void, unit: any, params: any) => number;
   停止牵引: (this: void, id: number) => boolean;
 };
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as { 造成AOE技能伤害: (this: void, params: any) => boolean };
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
 
@@ -124,20 +121,6 @@ export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时
     if (!单位有效(boss) || context.战斗已结束) return;
     const heroes = 获取Boss技能敌对英雄列表(boss);
     let barrage: any = undefined;
-    let monitorId = 0;
-    monitorId = addPeriodicCallback(10, function 失名祷潮镇魂印拦截Tick(this: void): void {
-      if (barrage == null || barrage.弹幕单位 == null || barrage.弹幕单位 === 0) return;
-      const seal = context.镇魂印;
-      if (seal == null || seal.到期Ms <= getServerTime()) return;
-      const hitRadius = seal.半径 + cfg.宽度 * 0.5;
-      const dx = GetUnitX(barrage.弹幕单位) - seal.X;
-      const dy = GetUnitY(barrage.弹幕单位) - seal.Y;
-      if (dx * dx + dy * dy > hitRadius * hitRadius) return;
-      SetUnitVertexColor(barrage.弹幕单位, 255, 255, 255, 0);
-      销毁原生弹幕(barrage.弹幕ID);
-      if (monitorId > 0) removePeriodicCallback(monitorId);
-      消耗镇魂印并压制(context, boss);
-    });
     barrage = 创建原生弹幕({
       所有者: boss,
       载体模式: '单位',
@@ -157,13 +140,37 @@ export function 释放失名祷潮(this: void, context: 祖地双灵卫运行时
         return false;
       },
       on命中: function 失名祷潮命中(this: void, hit: any): void {
-        const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 });
-        造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_SHADOW_STRIKE, weaponType: WEAPON_TYPE_WHOKNOWS, 来源类型: 'Boss技能', 标签: '祖地双灵卫·失名祷潮' });
+        执行BossAOE技能伤害({
+          来源: boss,
+          目标: hit,
+          伤害公式: { 来源攻击力比例: cfg.伤害攻击力比例, 目标最大生命比例: cfg.伤害目标最大生命比例 },
+          attack: false,
+          ranged: true,
+          attackType: ATTACK_TYPE_NORMAL,
+          伤害类型: DAMAGE_TYPE_SHADOW_STRIKE,
+          weaponType: WEAPON_TYPE_WHOKNOWS,
+          标签: '祖地双灵卫·失名祷潮',
+        });
+      },
+      onTick: function 失名祷潮镇魂印拦截Tick(this: void, instance: any): void {
+        if (instance.弹幕单位 == null || instance.弹幕单位 === 0) return;
+        const seal = context.镇魂印;
+        if (seal == null || seal.到期Ms <= getServerTime()) return;
+        const hitRadius = seal.半径 + cfg.宽度 * 0.5;
+        const dx = GetUnitX(instance.弹幕单位) - seal.X;
+        const dy = GetUnitY(instance.弹幕单位) - seal.Y;
+        if (dx * dx + dy * dy > hitRadius * hitRadius) return;
+        SetUnitVertexColor(instance.弹幕单位, 255, 255, 255, 0);
+        销毁原生弹幕(instance.id);
+        消耗镇魂印并压制(context, boss);
       },
       on到达目标点: function 失名祷潮到达终点(this: void): void {
-        if (monitorId > 0) removePeriodicCallback(monitorId);
         检查祷潮穿过校准节点(context, startX, startY, endX, endY);
       },
+    });
+    context.清理.登记清理('祖地双灵卫-失名祷潮弹幕', function 清理失名祷潮弹幕(this: void): void {
+      if (barrage != null) barrage.销毁('手动销毁');
+      barrage = undefined;
     });
   });
   context.清理.登记延迟回调('祖地双灵卫-失名祷潮结算', resolveId);

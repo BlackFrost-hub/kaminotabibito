@@ -14,17 +14,15 @@ local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．�
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
 local _____83B7_53D6_5355_4F4D_786C_76F4_5269_4F59_65F6_95F4 = ____01_FF0E_63A7_5236_4E0EBuff["获取单位硬直剩余时间"]
 local _____8C03_6574_5355_4F4D_786C_76F4_65F6_95F4 = ____01_FF0E_63A7_5236_4E0EBuff["调整单位硬直时间"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行Boss单体技能伤害"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local getServerTime = ____require_result_1.getServerTime
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -65,9 +63,9 @@ local function _____7ED3_7B97_62A4_536B_53CD_51FB(context, attacker, token)
     local state = context["雅儿贝德"]
     local albedo = state and state["单位"]
     if state == nil or not _____5355_4F4D_6709_6548(albedo) or not _____5355_4F4D_6709_6548(attacker) or context["挑战已结束"] then
-        local ____opt_5 = state and state["独占状态"]
-        if ____opt_5 ~= nil then
-            ____opt_5["结束"](____opt_5, token, "取消", "反击目标失效")
+        local ____opt_4 = state and state["独占状态"]
+        if ____opt_4 ~= nil then
+            ____opt_4["结束"](____opt_4, token, "取消", "反击目标失效")
         end
         return
     end
@@ -75,35 +73,33 @@ local function _____7ED3_7B97_62A4_536B_53CD_51FB(context, attacker, token)
     local dx = GetUnitX(attacker) - GetUnitX(albedo)
     local dy = GetUnitY(attacker) - GetUnitY(albedo)
     if dx * dx + dy * dy <= cfg["护卫反击攻击距离"] * cfg["护卫反击攻击距离"] then
-        local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(albedo, attacker, {["来源攻击力比例"] = cfg["护卫反击伤害攻击力比例"], ["目标最大生命比例"] = cfg["护卫反击伤害目标最大生命比例"]})
-        local _____5DF2_547D_4E2D = _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+        local _____5DF2_547D_4E2D = _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3({
             ["来源"] = albedo,
             ["目标"] = attacker,
-            ["伤害"] = damage,
+            ["伤害公式"] = {["来源攻击力比例"] = cfg["护卫反击伤害攻击力比例"], ["目标最大生命比例"] = cfg["护卫反击伤害目标最大生命比例"]},
             attack = false,
             ranged = false,
             attackType = ATTACK_TYPE_NORMAL,
             ["伤害类型"] = DAMAGE_TYPE_NORMAL,
             weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-            ["来源类型"] = "Boss技能",
             ["标签"] = "雅儿贝德·护卫反击"
-        })
+        })["是否造成伤害"]
         if _____5DF2_547D_4E2D then
             _____64AD_653E_62A4_536B_53CD_51FB_547D_4E2D_7279_6548(attacker)
         end
     end
-    local ____opt_9 = state["独占状态"]
-    if ____opt_9 ~= nil then
-        ____opt_9["结束"](____opt_9, token, "完成")
+    local ____opt_8 = state["独占状态"]
+    if ____opt_8 ~= nil then
+        ____opt_8["结束"](____opt_8, token, "完成")
     end
 end
 local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, token)
     local state = context["雅儿贝德"]
     local albedo = state and state["单位"]
     if state == nil or not _____5355_4F4D_6709_6548(albedo) or not _____5355_4F4D_6709_6548(attacker) or context["挑战已结束"] then
-        local ____opt_13 = state and state["独占状态"]
-        if ____opt_13 ~= nil then
-            ____opt_13["结束"](____opt_13, token, "取消", "反击目标失效")
+        local ____opt_12 = state and state["独占状态"]
+        if ____opt_12 ~= nil then
+            ____opt_12["结束"](____opt_12, token, "取消", "反击目标失效")
         end
         return
     end
@@ -125,9 +121,9 @@ local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, t
             _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
         )
         if not _____5355_4F4D_6709_6548(albedo) or not _____5355_4F4D_6709_6548(attacker) or context["挑战已结束"] then
-            local ____opt_17 = guardState["独占状态"]
-            if ____opt_17 ~= nil then
-                ____opt_17["结束"](____opt_17, token, "取消", "反击目标失效")
+            local ____opt_16 = guardState["独占状态"]
+            if ____opt_16 ~= nil then
+                ____opt_16["结束"](____opt_16, token, "取消", "反击目标失效")
             end
             return
         end
@@ -146,8 +142,8 @@ local function _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, t
                 _____7ED3_7B97_62A4_536B_53CD_51FB(context, attacker, token)
             end
         )
-        local ____self_19 = context["清理"]
-        ____self_19["登记延迟回调"](____self_19, "雅儿贝德-护卫反击结算", damageId)
+        local ____self_18 = context["清理"]
+        ____self_18["登记延迟回调"](____self_18, "雅儿贝德-护卫反击结算", damageId)
     end
     if moveDistance <= 1 then
         _____64AD_653E_53CD_51FB_7838_51FB_5E76_7ED3_7B97()
@@ -247,8 +243,8 @@ ____exports["释放雅儿贝德护卫反击"] = function(context)
                     _____542F_52A8_62A4_536B_53CD_51FB_52A8_4F5C(context, attacker, token)
                 end
             )
-            local ____self_28 = context["清理"]
-            ____self_28["登记延迟回调"](____self_28, "雅儿贝德-护卫反击启动", triggerId)
+            local ____self_27 = context["清理"]
+            ____self_27["登记延迟回调"](____self_27, "雅儿贝德-护卫反击启动", triggerId)
         end,
         ["on结束"] = function()
             if not counterTriggered then

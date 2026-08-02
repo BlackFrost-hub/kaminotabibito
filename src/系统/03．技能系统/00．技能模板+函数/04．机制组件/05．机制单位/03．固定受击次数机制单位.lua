@@ -127,20 +127,27 @@ _____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.proto
     end
     return ____temp_7
 end
+_____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.prototype["处理单位失效"] = function(self)
+    local ____self_8 = self["基础实例"]
+    ____self_8["处理单位失效"](____self_8)
+end
 _____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.prototype["读取剩余次数"] = function(self)
     return self["剩余次数"]
 end
 _____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.prototype["设置剩余次数"] = function(self, _____6B21_6570)
     self["剩余次数"] = _____89C4_6574_6B21_6570(_____6B21_6570)
 end
-_____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.prototype["销毁"] = function(self)
+_____56FA_5B9A_53D7_51FB_6B21_6570_673A_5236_5355_4F4D_5B9E_4F8B_5B9E_73B0.prototype["销毁"] = function(self, _____539F_56E0)
+    if _____539F_56E0 == nil then
+        _____539F_56E0 = "主动销毁"
+    end
     if self["已销毁"] then
         return
     end
     self["已销毁"] = true
     __TS__Delete(_____56FA_5B9A_53D7_51FB_6B21_6570_5355_4F4D_8868, self.ID)
-    local ____self_8 = self["基础实例"]
-    ____self_8["销毁"](____self_8)
+    local ____self_9 = self["基础实例"]
+    ____self_9["销毁"](____self_9, _____539F_56E0)
 end
 ____exports["创建固定受击次数机制单位"] = function(_____53C2_6570)
     _____786E_4FDD_56FA_5B9A_53D7_51FB_6B21_6570_4F24_5BB3_4FEE_6B63()

@@ -3,13 +3,11 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____on_6218_6597_72B6_6001Tick, _____6218_6597_72B6_6001_63A7_5236_5668_8868
-function ____on_6218_6597_72B6_6001Tick()
-    for key in pairs(_____6218_6597_72B6_6001_63A7_5236_5668_8868) do
-        local _____63A7_5236_5668 = _____6218_6597_72B6_6001_63A7_5236_5668_8868[key]
-        if _____63A7_5236_5668 ~= nil then
-            _____63A7_5236_5668:Tick()
-        end
+local ____on_6218_6597_72B6_6001Tick
+function ____on_6218_6597_72B6_6001Tick(variable)
+    local _____63A7_5236_5668 = variable
+    if _____63A7_5236_5668 ~= nil then
+        _____63A7_5236_5668:Tick()
     end
 end
 ---
@@ -32,9 +30,8 @@ local ____require_result_2 = require("系统.00．核心系统.03．脱战系统
 local _____53D6_5355_4F4D_9ED8_8BA4_8131_6218_65F6_95F4_79D2 = ____require_result_2["取单位默认脱战时间秒"]
 local _____53D6_5355_4F4D_9ED8_8BA4_8131_6218_4E3B_4F53_7C7B_578B = ____require_result_2["取单位默认脱战主体类型"]
 local _____8131_6218_4F24_5BB3_9608_503C_6BD4_4F8B = ____require_result_2["脱战伤害阈值比例"]
-_____6218_6597_72B6_6001_63A7_5236_5668_8868 = {}
+local _____6218_6597_72B6_6001_63A7_5236_5668_8868 = {}
 local _____6218_6597_72B6_6001_63A7_5236_5668_8BA1_6570 = 0
-local _____6218_6597_72B6_6001TickID = 0
 local function _____5355_4F4D_6709_6548(_____5355_4F4D)
     return _____5355_4F4D ~= nil and _____5355_4F4D ~= 0 and IsUnitType(_____5355_4F4D, UNIT_TYPE_DEAD) ~= true
 end
@@ -57,23 +54,6 @@ local function _____53D7_4F24_8FBE_5230_8FDB_5165_6218_6597_9608_503C(_____5355_
     end
     return applied >= _____6700_5927_751F_547D * _____8131_6218_4F24_5BB3_9608_503C_6BD4_4F8B
 end
-local function _____786E_4FDD_6218_6597_72B6_6001Tick(interval)
-    if _____6218_6597_72B6_6001TickID ~= 0 then
-        return
-    end
-    _____6218_6597_72B6_6001TickID = addPeriodicCallback(interval, ____on_6218_6597_72B6_6001Tick)
-end
-local function _____5C1D_8BD5_505C_6B62_6218_6597_72B6_6001Tick()
-    for key in pairs(_____6218_6597_72B6_6001_63A7_5236_5668_8868) do
-        if _____6218_6597_72B6_6001_63A7_5236_5668_8868[key] ~= nil then
-            return
-        end
-    end
-    if _____6218_6597_72B6_6001TickID ~= 0 then
-        removePeriodicCallback(_____6218_6597_72B6_6001TickID)
-        _____6218_6597_72B6_6001TickID = 0
-    end
-end
 local _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0 = __TS__Class()
 _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.name = "战斗状态触发实现"
 function _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype.____constructor(self, _____540D_79F0, _____53C2_6570)
@@ -84,13 +64,14 @@ function _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype.____constructor(
     self["下次周期毫秒"] = 0
     self["已触发持续满足"] = false
     self["最近对方单位"] = nil
+    self["Tick回调ID"] = 0
     self["名称"] = _____540D_79F0
     self["参数"] = _____53C2_6570
     _____6218_6597_72B6_6001_63A7_5236_5668_8BA1_6570 = _____6218_6597_72B6_6001_63A7_5236_5668_8BA1_6570 + 1
     self["控制器ID"] = _____6218_6597_72B6_6001_63A7_5236_5668_8BA1_6570
     _____6218_6597_72B6_6001_63A7_5236_5668_8868[self["控制器ID"]] = self
     local interval = _____53C2_6570["检查间隔毫秒"] or 200
-    _____786E_4FDD_6218_6597_72B6_6001Tick(interval)
+    self["Tick回调ID"] = addPeriodicCallback(interval, ____on_6218_6597_72B6_6001Tick, self)
 end
 _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype["是否战斗中"] = function(self)
     return self["战斗中"]
@@ -184,7 +165,10 @@ _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype["停止"] = function(self
     end
     self["已停止"] = true
     __TS__Delete(_____6218_6597_72B6_6001_63A7_5236_5668_8868, self["控制器ID"])
-    _____5C1D_8BD5_505C_6B62_6218_6597_72B6_6001Tick()
+    if self["Tick回调ID"] ~= 0 then
+        removePeriodicCallback(self["Tick回调ID"])
+        self["Tick回调ID"] = 0
+    end
 end
 _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype["创建事件"] = function(self, now)
     return {["单位"] = self["参数"]["单位"], ["对方单位"] = self["最近对方单位"], ["已战斗毫秒"] = self["战斗开始毫秒"] > 0 and now - self["战斗开始毫秒"] or 0, ["距离上次战斗毫秒"] = self["上次战斗毫秒"] > 0 and now - self["上次战斗毫秒"] or 0}

@@ -9,7 +9,7 @@ import { 开始冲锋 } from '../../../../00．技能模板+函数/01．技能�
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
 import { 执行战斗自身传送到坐标 } from '../../../../00．技能模板+函数/02．通用函数/20．位移技能限制';
 import { 单位是否在扇形区域 } from '../../../../00．技能模板+函数/01．技能函数/09．形状区域/扇形区域';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 创建固定组合技能执行器 } from '../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器';
 import { 创建立即执行阶段, 创建延迟阶段 } from '../../../../00．技能模板+函数/00．技能模板/01．多阶段技能编排/06．技能阶段链执行器';
 import { 创建原生弹幕 } from '../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕/03．对外接口';
@@ -21,9 +21,6 @@ const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能�
 };
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
 };
 const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文') as {
   读取Boss战运行上下文: (this: void, boss: any) => any;
@@ -168,11 +165,21 @@ function 发射血月终舞扇区弹幕(this: void, context: 夏提雅运行时�
         return 单位有效(target) && 单位是否在扇形区域(target, x, y, cfg.扇区半径, facing, cfg.扇区角度);
       },
       on命中: function 夏提雅血月终舞扇区弹幕命中(this: void, target: any): void {
-        const damage = 计算组合技能伤害(boss, target, {
-          来源攻击力比例: cfg.扇区伤害攻击力比例,
-          目标最大生命比例: cfg.扇区伤害目标最大生命比例,
-        }) / count;
-        造成AOE技能伤害({ 来源: boss, 目标: target, 伤害: damage, attack: false, ranged: true, attackType: ATTACK_TYPE_NORMAL, 伤害类型: 弹幕伤害类型, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '夏提雅·血月终舞-扇区弹幕' });
+        执行BossAOE技能伤害({
+          来源: boss,
+          目标: target,
+          伤害公式: {
+            来源攻击力比例: cfg.扇区伤害攻击力比例,
+            目标最大生命比例: cfg.扇区伤害目标最大生命比例,
+            总倍率: 1 / count,
+          },
+          attack: false,
+          ranged: true,
+          attackType: ATTACK_TYPE_NORMAL,
+          伤害类型: 弹幕伤害类型,
+          weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+          标签: '夏提雅·血月终舞-扇区弹幕',
+        });
       },
     });
     if (barrage.弹幕单位 != null && barrage.弹幕单位 !== 0) SetUnitAnimationByIndex(barrage.弹幕单位, 0);
@@ -278,8 +285,17 @@ export function 释放夏提雅血月终舞(this: void, context: 夏提雅运行
       命中后结束: false,
       命中回调: function 夏提雅血月终舞冲锋命中(this: void, _source: any, hit: any): void {
         播放Boss坐标音效(夏提雅数值与表现配置.音效.血月终舞, GetUnitX(hit), GetUnitY(hit), 夏提雅数值与表现配置.音效默认裁断距离);
-        const damage = 计算组合技能伤害(boss, hit, { 来源攻击力比例: cfg.终舞冲锋伤害攻击力比例, 目标最大生命比例: cfg.终舞冲锋伤害目标最大生命比例 });
-        造成AOE技能伤害({ 来源: boss, 目标: hit, 伤害: damage, attack: false, ranged: false, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_ENHANCED, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: '夏提雅·血月终舞-俯冲' });
+        执行BossAOE技能伤害({
+          来源: boss,
+          目标: hit,
+          伤害公式: { 来源攻击力比例: cfg.终舞冲锋伤害攻击力比例, 目标最大生命比例: cfg.终舞冲锋伤害目标最大生命比例 },
+          attack: false,
+          ranged: false,
+          attackType: ATTACK_TYPE_NORMAL,
+          伤害类型: DAMAGE_TYPE_ENHANCED,
+          weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+          标签: '夏提雅·血月终舞-俯冲',
+        });
       },
       开始回调: function 夏提雅血月终舞冲锋动作(this: void): void {
         立即设置单位朝向(boss, finalFacing);

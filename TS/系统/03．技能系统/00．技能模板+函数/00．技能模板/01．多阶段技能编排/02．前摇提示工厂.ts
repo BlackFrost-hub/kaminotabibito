@@ -20,7 +20,7 @@ const {
   立即销毁提示圈特效,
 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.09．提示特效") as {
   创建矩形提示圈特效: (this: void, x: number, y: number, width: number, long: number, fac: number, speed?: number) => any;
-  创建红色扇形提示圈特效: (this: void, x: number, y: number, fac: number, size: number, speed?: number) => any;
+  创建红色扇形提示圈特效: (this: void, x: number, y: number, fac: number, size: number, speed?: number, 来源单位?: any, 扇形角度?: number) => any;
   创建薄圆形提示圈特效: (this: void, x: number, y: number, r: number, speed?: number, 来源单位?: any) => any;
   立即销毁提示圈特效: (this: void, e: any) => void;
 };
@@ -85,7 +85,7 @@ export function 创建冲锋路径前摇提示(路径长度: number, 路径宽�
   return 创建矩形前摇提示(路径宽度, 路径长度, 持续时间, 英雄技能距离修正);
 }
 
-export function 创建扇形前摇提示(半径: number, 持续时间: number, 英雄技能距离修正?: 英雄技能距离修正上下文): 前摇提示回调组 {
+export function 创建扇形前摇提示(半径: number, 持续时间: number, 英雄技能距离修正?: 英雄技能距离修正上下文, 扇形角度?: number): 前摇提示回调组 {
   return {
     创建提示特效: function (单位: any): any {
       const 修正半径 = 修正前摇距离(半径, 英雄技能距离修正, "扇形半径");
@@ -94,7 +94,9 @@ export function 创建扇形前摇提示(半径: number, 持续时间: number, �
         GetUnitY(单位),
         GetUnitFacing(单位),
         取扇形提示圈尺寸(修正半径),
-        持续时间 > 0 ? 1 / 持续时间 : 1.0
+        持续时间 > 0 ? 1 / 持续时间 : 1.0,
+        undefined,
+        扇形角度
       );
     },
     销毁提示特效: 默认销毁前摇提示特效,

@@ -17,6 +17,8 @@ local _____5173_95ED_83AB_5C14_7279_65AF_5927_62DB_541F_5531_6761 = ____16_FF0E_
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60 = ____00_FF0EBoss_97F3_6548_64AD_653E["尝试播放Boss拟声池"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_6B7B_4EA1(unit)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["根系觉醒"]
     _____521B_5EFA_70B9_7279_6548({
@@ -50,7 +52,6 @@ function _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1(unit)
     )
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建独立技能伤害实例"]
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
@@ -74,13 +75,11 @@ local ____require_result_3 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_9650_65F6_6467_6BC1_76EE_6807_7EC4 = ____require_result_3["创建限时摧毁目标组"]
 local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local ____require_result_5 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
-local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_6["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_6["移除单位暂停"]
-local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_7.addDelayedCallback
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_5["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_5["移除单位暂停"]
+local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_6.addDelayedCallback
 local _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_6682_505C_6765_6E90 = "Boss:Moltes:根系觉醒"
 local function _____5EF6_8FDF_9690_85CF_6839_7CFB_89C9_9192Boss(context)
     if context["腐败之源组"] ~= nil and _____5355_4F4D_6709_6548(context["Boss单位"]) then
@@ -145,7 +144,6 @@ local function _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
     )
     local _____6280_80FD_5B9E_4F8BID = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["来源类型"] = "Boss技能", ["标签"] = "莫尔特斯根系觉醒", ["持续时间秒"] = 2})
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-    local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["全屏爆发伤害Boss攻击力比例"]
     do
         local i = 0
         while i < #heroes do
@@ -154,16 +152,15 @@ local function _____6839_7CFB_89C9_9192_5931_8D25_7206_53D1(context)
                 if not _____5355_4F4D_6709_6548(hero) then
                     goto __continue14
                 end
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                     ["来源"] = boss,
                     ["目标"] = hero,
-                    ["伤害"] = damage,
+                    ["伤害公式"] = {["来源攻击力比例"] = cfg["全屏爆发伤害Boss攻击力比例"]},
                     attack = false,
                     ranged = false,
                     attackType = ATTACK_TYPE_NORMAL,
                     ["伤害类型"] = DAMAGE_TYPE_PLANT,
                     weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "Boss技能",
                     ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
                     ["标签"] = "莫尔特斯根系觉醒"
                 })
@@ -199,8 +196,8 @@ local function _____521B_5EFA_8150_8D25_4E4B_6E90_76EE_6807_5217_8868(context)
                 ["on销毁"] = _____83AB_5C14_7279_65AF_8150_8D25_4E4B_6E90_9500_6BC1
             }
             local circle = AddSpecialEffect(cfg["腐败之源脚下特效路径"], cell["中心X"], cell["中心Y"])
-            local ____self_8 = context["清理"]
-            ____self_8["登记特效"](____self_8, "莫尔特斯-腐败之源脚下圈", circle)
+            local ____self_7 = context["清理"]
+            ____self_7["登记特效"](____self_7, "莫尔特斯-腐败之源脚下圈", circle)
             i = i + 1
         end
     end
@@ -252,7 +249,7 @@ ____exports["触发莫尔特斯根系觉醒"] = function(context)
         ["on结束"] = _____83AB_5C14_7279_65AF_6839_7CFB_89C9_9192_7ED3_675F
     })
     local hideId = addDelayedCallback(cfg["显形动作秒"] * 1000, _____5EF6_8FDF_9690_85CF_6839_7CFB_89C9_9192Boss, context)
-    local ____self_9 = context["清理"]
-    ____self_9["登记延迟回调"](____self_9, "莫尔特斯-根系觉醒显形动作", hideId)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "莫尔特斯-根系觉醒显形动作", hideId)
 end
 return ____exports

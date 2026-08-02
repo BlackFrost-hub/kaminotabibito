@@ -3,6 +3,7 @@
 import type { 机制清理篮子 } from "../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
 import { 创建单位运行时上下文工厂 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
 import { 创建阶段上下文, type 阶段上下文 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/01．阶段上下文";
+import type { 召唤物组状态 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/03．召唤物组状态管理";
 import { 影骨莫特斯单位技能配置 } from "./00．配置";
 import { 影骨莫特斯数值与表现配置 } from "./02．数值与表现配置";
 import { 播放影骨莫特斯台词 } from "./08．台词播放";
@@ -11,11 +12,7 @@ import type { 固定组合技能执行器 } from "../../../../00．技能模板+
 import { 读取单位攻击力 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: number) => number;
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
 const { SGSS_SetState } = require("lib.扩展函数.Star扩展函数.00．SGSS") as {
   SGSS_SetState: (this: void, unit: any, id: number, value: number) => void;
 };
@@ -27,10 +24,8 @@ const { 技能_获取技能当前冷却时间, 技能_获取技能最大冷却�
   技能_获取技能最大冷却时间: (this: void, unit: any, abilityId: number) => number;
 };
 
-const 影骨莫特斯单位类型ID = stringToFourCC(影骨莫特斯单位技能配置.单位ID);
 const 幽影爆发技能ID = stringToFourCC(影骨莫特斯单位技能配置.技能壳.幽影爆发);
 const 攻击力属性ID = 1;
-let 影骨莫特斯死亡监听已注册 = false;
 
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -47,14 +42,7 @@ const { 影骨莫特斯BuffID } = require("系统.05．Buff系统.03．Buff表.0
 
 export type 影骨莫特斯阶段 = 1 | 2 | 3;
 
-export interface 影骨召唤组 {
-  ID: number;
-  阶段: 影骨莫特斯阶段;
-  总数: number;
-  死亡数: number;
-  已重组: boolean;
-  单位列表: any[];
-}
+export type 影骨召唤组 = 召唤物组状态;
 
 export interface 影骨盗贼遗产宝箱点 {
   X: number;
@@ -76,7 +64,6 @@ export interface 影骨莫特斯运行时上下文 {
   P3攻击力增量: number;
   P3幽影爆发原始最大冷却: number;
   当前召唤组?: 影骨召唤组;
-  下一个召唤组ID: number;
   遗产宝箱已生成: boolean;
   遗产宝箱点?: 影骨盗贼遗产宝箱点[];
   骸骨召唤组合执行器?: 固定组合技能执行器<影骨莫特斯运行时上下文>;
@@ -98,7 +85,6 @@ function 创建影骨莫特斯上下文(this: void, boss: any, 清理: 机制清
     P3强化已应用: false,
     P3攻击力增量: 0,
     P3幽影爆发原始最大冷却: 0,
-    下一个召唤组ID: 0,
     遗产宝箱已生成: false,
     遗产宝箱点: undefined,
   };
@@ -175,11 +161,17 @@ function 清理影骨莫特斯上下文机制(this: void, context: 影骨莫特�
   context.当前召唤组 = undefined;
 }
 
+function on影骨莫特斯单位死亡(this: void, _context: 影骨莫特斯运行时上下文, dyingUnit: any, _killingUnit: any): void {
+  播放影骨莫特斯台词(dyingUnit, "死亡", 0);
+}
+
 const 影骨莫特斯上下文工厂 = 创建单位运行时上下文工厂<影骨莫特斯运行时上下文>({
   名称: "影骨莫特斯",
   主动技能提示: 影骨莫特斯单位技能配置.主动技能提示,
   创建上下文: 创建影骨莫特斯上下文,
   on清理: 清理影骨莫特斯上下文机制,
+  死亡时自动清理: true,
+  on单位死亡: on影骨莫特斯单位死亡,
 });
 
 export function 获取影骨莫特斯上下文(this: void, boss: any): 影骨莫特斯运行时上下文 | undefined {
@@ -231,14 +223,4 @@ export function 刷新影骨盗贼遗产Buff(this: void, context: 影骨莫特�
   });
 }
 
-export function 注册影骨莫特斯运行时(this: void): void {
-  if (影骨莫特斯死亡监听已注册) return;
-  影骨莫特斯死亡监听已注册 = true;
-  registerDeathListener(on影骨莫特斯死亡);
-}
-
-function on影骨莫特斯死亡(this: void, dyingUnit: any): void {
-  if (GetUnitTypeId(dyingUnit) !== 影骨莫特斯单位类型ID) return;
-  播放影骨莫特斯台词(dyingUnit, "死亡", 0);
-  清理影骨莫特斯上下文(dyingUnit);
-}
+export function 注册影骨莫特斯运行时(this: void): void {}

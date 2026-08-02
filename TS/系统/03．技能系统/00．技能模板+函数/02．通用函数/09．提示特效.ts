@@ -78,6 +78,29 @@ const MODEL_LINE4X = MODEL_DIR + "UnifiedTip_Line4x.mdx";
 const MODEL_LINE5X = MODEL_DIR + "UnifiedTip_Line5x.mdx";
 const MODEL_LINE6X = MODEL_DIR + "UnifiedTip_Line6x.mdx";
 const MODEL_SECTOR = MODEL_DIR + "SimpleSectorTip.mdx";
+const MODEL_SECTOR_45 = MODEL_DIR + "SimpleSectorTip_45.mdx";
+const MODEL_SECTOR_50 = MODEL_DIR + "SimpleSectorTip_50.mdx";
+const MODEL_SECTOR_60 = MODEL_DIR + "SimpleSectorTip_60.mdx";
+const MODEL_SECTOR_80 = MODEL_DIR + "SimpleSectorTip_80.mdx";
+const MODEL_SECTOR_85 = MODEL_DIR + "SimpleSectorTip_85.mdx";
+const MODEL_SECTOR_90 = MODEL_DIR + "SimpleSectorTip_90.mdx";
+const MODEL_SECTOR_100 = MODEL_DIR + "SimpleSectorTip_100.mdx";
+const MODEL_SECTOR_110 = MODEL_DIR + "SimpleSectorTip_110.mdx";
+const MODEL_SECTOR_120 = MODEL_DIR + "SimpleSectorTip_120.mdx";
+const MODEL_SECTOR_130 = MODEL_DIR + "SimpleSectorTip_130.mdx";
+const 扇形提示模型角度列表 = [45, 50, 60, 80, 85, 90, 100, 110, 120, 130];
+const 扇形提示模型路径列表 = [
+  MODEL_SECTOR_45,
+  MODEL_SECTOR_50,
+  MODEL_SECTOR_60,
+  MODEL_SECTOR_80,
+  MODEL_SECTOR_85,
+  MODEL_SECTOR_90,
+  MODEL_SECTOR_100,
+  MODEL_SECTOR_110,
+  MODEL_SECTOR_120,
+  MODEL_SECTOR_130,
+];
 const MODEL_RING = MODEL_DIR + "UnifiedTip_Ring.mdx";
 const MODEL_RING_THICK = MODEL_DIR + "UnifiedTip_RingThick.mdx";
 const MODEL_RING_A = MODEL_DIR + "UnifiedTip_Ring_A.mdx";
@@ -184,7 +207,7 @@ function 确保特效步进缩放检查(): void {
   特效步进缩放检查回调ID = addPeriodicCallback(特效步进缩放检查间隔毫秒, on特效步进缩放检查);
 }
 
-function 安全销毁特效(duration: number, effect: any): void {
+export function 安全销毁特效(duration: number, effect: any): void {
   if (!effect) return;
 
   if (duration <= 0) {
@@ -442,16 +465,42 @@ export function 创建方向直线提示圈特效(
 // ==========================================================================================
 
 /**
+ * 选择与实际扇形角度最接近的预制模型。
+ * 未传角度时保留历史默认的 80°模型；超出资源范围时取边界模型。
+ */
+function 取最接近扇形提示模型(this: void, 扇形角度?: number): string {
+  if (扇形角度 == null) return MODEL_SECTOR;
+
+  const 目标角度 = typeof 扇形角度 === "number" ? 扇形角度 : Number(扇形角度);
+  if (目标角度 !== 目标角度) return MODEL_SECTOR;
+
+  let 最佳索引 = 0;
+  let 最小差值 = 目标角度 - 扇形提示模型角度列表[0];
+  if (最小差值 < 0) 最小差值 = -最小差值;
+
+  for (let i = 1; i < 扇形提示模型角度列表.length; i++) {
+    let 差值 = 目标角度 - 扇形提示模型角度列表[i];
+    if (差值 < 0) 差值 = -差值;
+    if (差值 < 最小差值) {
+      最小差值 = 差值;
+      最佳索引 = i;
+    }
+  }
+
+  return 扇形提示模型路径列表[最佳索引];
+}
+
+/**
  * 白色扇形提示圈
  * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
  */
 export function 创建白色扇形提示圈(
-  x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any
+  x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any, 扇形角度?: number
 ): void {
   x += CosBJ(fac) * 10;
   y += SinBJ(fac) * 10;
 
-  const e = AddSpecialEffect(MODEL_SECTOR, x, y);
+  const e = AddSpecialEffect(取最接近扇形提示模型(扇形角度), x, y);
   if (!e) return;
 
   按所属单位设置提示圈颜色(e, 来源单位, 提示圈友方色);
@@ -468,12 +517,12 @@ export function 创建白色扇形提示圈(
  * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
  */
 export function 创建红色扇形提示圈(
-  x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any
+  x: number, y: number, fac: number, size: number, time: number, speed?: number, 来源单位?: any, 扇形角度?: number
 ): void {
   x += CosBJ(fac) * 10;
   y += SinBJ(fac) * 10;
 
-  const e = AddSpecialEffect(MODEL_SECTOR, x, y);
+  const e = AddSpecialEffect(取最接近扇形提示模型(扇形角度), x, y);
   if (!e) return;
 
   按所属单位设置提示圈颜色(e, 来源单位);
@@ -490,12 +539,12 @@ export function 创建红色扇形提示圈(
  * `size = 1.0` 时，对应模型原始扇形尺寸：内侧约 32 半径，外侧约 512 半径。
  */
 export function 创建红色扇形提示圈特效(
-  x: number, y: number, fac: number, size: number, speed?: number, 来源单位?: any
+  x: number, y: number, fac: number, size: number, speed?: number, 来源单位?: any, 扇形角度?: number
 ): any {
   x += CosBJ(fac) * 10;
   y += SinBJ(fac) * 10;
 
-  const e = AddSpecialEffect(MODEL_SECTOR, x, y);
+  const e = AddSpecialEffect(取最接近扇形提示模型(扇形角度), x, y);
   if (!e) return;
 
   按所属单位设置提示圈颜色(e, 来源单位);
@@ -642,6 +691,18 @@ export function 创建白色圆形提示圈(
 export function 创建渐变圆形提示圈(
   x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any
 ): any {
+  const e = 创建渐变圆形提示圈特效(x, y, r, speed, 来源单位);
+  if (!e) return;
+
+  let duration = time <= 0 ? 0.1 : time + 0.05;
+  if (duration < 0.1) duration = 0.1;
+  安全销毁特效(duration, e);
+  return e;
+}
+
+export function 创建渐变圆形提示圈特效(
+  x: number, y: number, r: number, speed?: number, 来源单位?: any
+): any {
   const e = AddSpecialEffect(MODEL_RING_B, x, y);
   if (!e) return;
 
@@ -651,11 +712,6 @@ export function 创建渐变圆形提示圈(
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
   按所属单位设置提示圈颜色(e, 来源单位);
-
-  let duration = time <= 0 ? 0.1 : time + 0.05;
-  if (duration < 0.1) duration = 0.1;
-  安全销毁特效(duration, e);
-
   return e;
 }
 
@@ -673,6 +729,17 @@ export function 创建渐变圆形提示圈(
 export function 创建双环提示圈(
   x: number, y: number, r: number, time: number, speed?: number, 来源单位?: any
 ): any {
+  const e = 创建双环提示圈特效(x, y, r, speed, 来源单位);
+  if (!e) return;
+
+  const duration = time <= 0 ? 1 : time + 0.05;
+  安全销毁特效(duration, e);
+  return e;
+}
+
+export function 创建双环提示圈特效(
+  x: number, y: number, r: number, speed?: number, 来源单位?: any
+): any {
   const e = AddSpecialEffect(MODEL_RING_C, x, y);
   if (!e) return;
 
@@ -681,10 +748,6 @@ export function 创建双环提示圈(
   EXSetEffectSize(e, size);
   EXSetEffectSpeed(e, speed ?? 1.0);
   按所属单位设置提示圈颜色(e, 来源单位);
-
-  const duration = time <= 0 ? 1 : time + 0.05;
-  安全销毁特效(duration, e);
-
   return e;
 }
 

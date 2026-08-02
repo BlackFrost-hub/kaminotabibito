@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____6E05_7406_83AB_5C14_7279_65AF_8150_8D25_62A4_76FE, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____79FB_9664_5355_4F4D_6807_7B7E_62A4_76FE, _____83AB_5C14_7279_65AFBuffID, _____83AB_5C14_7279_65AF_8150_8D25_62A4_76FE_6807_7B7E
+local _____6E05_7406_83AB_5C14_7279_65AF_8150_8D25_62A4_76FE, _____6E05_7406_83AB_5C14_7279_65AF_4E0A_4E0B_6587_673A_5236, ____on_83AB_5C14_7279_65AF_5355_4F4D_6B7B_4EA1, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____79FB_9664_5355_4F4D_6807_7B7E_62A4_76FE, _____83AB_5C14_7279_65AFBuffID, _____83AB_5C14_7279_65AF_8150_8D25_62A4_76FE_6807_7B7E
 local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
 local ____01_FF0E_9636_6BB5_4E0A_4E0B_6587 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.01．阶段上下文")
@@ -14,7 +14,6 @@ local _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD = ____13_FF0E_53F0_8BCD_64AD_
 local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.16．公共工具")
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____53D6_5355_4F4DID = ____16_FF0E_516C_5171_5DE5_5177["取单位ID"]
-local stringToFourCC = ____16_FF0E_516C_5171_5DE5_5177.stringToFourCC
 function _____6E05_7406_83AB_5C14_7279_65AF_8150_8D25_62A4_76FE(context)
     local boss = context["Boss单位"]
     if boss ~= nil and boss ~= 0 then
@@ -23,31 +22,32 @@ function _____6E05_7406_83AB_5C14_7279_65AF_8150_8D25_62A4_76FE(context)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(boss, _____83AB_5C14_7279_65AFBuffID["腐败护盾"])
     context["腐败护盾值"] = 0
 end
+function _____6E05_7406_83AB_5C14_7279_65AF_4E0A_4E0B_6587_673A_5236(context)
+    _____6E05_7406_83AB_5C14_7279_65AF_8150_8D25_62A4_76FE(context)
+end
+function ____on_83AB_5C14_7279_65AF_5355_4F4D_6B7B_4EA1(_context, dyingUnit, _killingUnit)
+    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(dyingUnit, "死亡", 0)
+end
 local jass = require("jass.common")
-local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_0.registerDeathListener
-local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
-local _____83AB_5C14_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
-local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_1.registerManualBuff
-_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾")
-local _____5F00_59CB_62A4_76FE = ____require_result_2["开始护盾"]
-local _____62A4_76FE_7C7B_578B = ____require_result_2["护盾类型"]
-local _____67E5_8BE2_5355_4F4D_6807_7B7E_62A4_76FE_503C = ____require_result_2["查询单位标签护盾值"]
-local _____5145_80FD_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_2["充能单位标签护盾"]
-local _____5237_65B0_5355_4F4D_6807_7B7E_62A4_76FE_6301_7EED_65F6_95F4 = ____require_result_2["刷新单位标签护盾持续时间"]
-_____79FB_9664_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_2["移除单位标签护盾"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
-local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
-_____83AB_5C14_7279_65AFBuffID = ____require_result_4["莫尔特斯BuffID"]
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataSetSafe = ____require_result_5.YDUserDataSetSafe
+local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_0.registerManualBuff
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_0["移除单位指定Buff"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾")
+local _____5F00_59CB_62A4_76FE = ____require_result_1["开始护盾"]
+local _____62A4_76FE_7C7B_578B = ____require_result_1["护盾类型"]
+local _____67E5_8BE2_5355_4F4D_6807_7B7E_62A4_76FE_503C = ____require_result_1["查询单位标签护盾值"]
+local _____5145_80FD_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_1["充能单位标签护盾"]
+local _____5237_65B0_5355_4F4D_6807_7B7E_62A4_76FE_6301_7EED_65F6_95F4 = ____require_result_1["刷新单位标签护盾持续时间"]
+_____79FB_9664_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_1["移除单位标签护盾"]
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
+local ____require_result_3 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
+_____83AB_5C14_7279_65AFBuffID = ____require_result_3["莫尔特斯BuffID"]
+local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataSetSafe = ____require_result_4.YDUserDataSetSafe
 _____83AB_5C14_7279_65AF_8150_8D25_62A4_76FE_6807_7B7E = "莫尔特斯-腐败护盾"
 local function _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587(boss, _____6E05_7406)
     _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(boss, "开场", 0)
@@ -91,7 +91,14 @@ local function _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587(boss, _____6E05
     })
     return context
 end
-local _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({["名称"] = "莫尔特斯", ["主动技能提示"] = _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"], ["创建上下文"] = _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587})
+local _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382 = _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382({
+    ["名称"] = "莫尔特斯",
+    ["主动技能提示"] = _____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["主动技能提示"],
+    ["创建上下文"] = _____521B_5EFA_83AB_5C14_7279_65AF_4E0A_4E0B_6587,
+    ["死亡时自动清理"] = true,
+    ["on单位死亡"] = ____on_83AB_5C14_7279_65AF_5355_4F4D_6B7B_4EA1,
+    ["on清理"] = _____6E05_7406_83AB_5C14_7279_65AF_4E0A_4E0B_6587_673A_5236
+})
 ____exports["获取莫尔特斯上下文"] = function(boss)
     return _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
 end
@@ -102,10 +109,6 @@ ____exports["获取全部莫尔特斯上下文"] = function()
     return _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取全部"]()
 end
 ____exports["清理莫尔特斯上下文"] = function(boss)
-    local context = _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["获取"](boss)
-    if context ~= nil then
-        _____6E05_7406_83AB_5C14_7279_65AF_8150_8D25_62A4_76FE(context)
-    end
     _____83AB_5C14_7279_65AF_4E0A_4E0B_6587_5DE5_5382["清理上下文"](boss)
 end
 ____exports["刷新玩家腐败值Buff"] = function(_context, unit, stack)
@@ -174,14 +177,14 @@ ____exports["取腐败值最高玩家"] = function(context)
             local value = context["玩家腐败值表"][key] or 0
             local unit = context["玩家腐败值单位表"][key]
             if not _____5355_4F4D_6709_6548(unit) then
-                goto __continue21
+                goto __continue20
             end
             if value > bestValue then
                 bestValue = value
                 best = unit
             end
         end
-        ::__continue21::
+        ::__continue20::
     end
     return best
 end
@@ -256,18 +259,6 @@ ____exports["刷新Boss腐败护盾Buff"] = function(context)
         {stack = context["腐败护盾值"], sourceName = "莫尔特斯-腐败护盾"}
     )
 end
-local function ____on_83AB_5C14_7279_65AF_6B7B_4EA1(dyingUnit)
-    if GetUnitTypeId(dyingUnit) ~= _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID then
-        return
-    end
-    _____64AD_653E_83AB_5C14_7279_65AF_53F0_8BCD(dyingUnit, "死亡", 0)
-    ____exports["清理莫尔特斯上下文"](dyingUnit)
-end
 ____exports["注册莫尔特斯运行时"] = function()
-    if _____83AB_5C14_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C then
-        return
-    end
-    _____83AB_5C14_7279_65AF_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = true
-    registerDeathListener(____on_83AB_5C14_7279_65AF_6B7B_4EA1)
 end
 return ____exports

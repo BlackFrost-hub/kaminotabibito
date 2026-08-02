@@ -26,6 +26,8 @@ local regionMap = __TS__New(Map)
 local _____533A_57DF_4F20_9001_5DF2_521D_59CB_5316 = false
 local _____5355_4F4D_533A_57DF_4F20_9001_51B7_5374 = {}
 local _____533A_57DF_4F20_9001_8FDE_89E6_53D1_4FDD_62A4Ms = 500
+local _____5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001_8868 = {}
+local _____5F53_524D_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001
 local function dbg(_msg)
 end
 local function getStoryProgress()
@@ -311,6 +313,127 @@ local function initRegionTeleport()
 end
 local function onInitRegionTeleportDelayed()
     initRegionTeleport()
+end
+local function _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(handle)
+    return handle ~= nil and handle ~= 0
+end
+local function _____5267_60C5_4F20_9001_5355_4F4D_53EF_8FDB_5165(unit)
+    if not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(unit) then
+        return false
+    end
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) ~= true then
+        return false
+    end
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD) == true then
+        return false
+    end
+    local owner = jass.GetOwningPlayer(unit)
+    local neutralAggressive = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
+    return owner == nil or owner ~= neutralAggressive
+end
+local function _____7A7A_5267_60C5_4F20_9001_6E05_7406()
+end
+local function ____on_79FB_52A8_5267_60C5_73A9_5BB6_7EC4()
+    local _____72B6_6001 = _____5F53_524D_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001
+    if _____72B6_6001 == nil then
+        return
+    end
+    local unit = jass.GetEnumUnit()
+    if not _____5267_60C5_4F20_9001_5355_4F4D_53EF_8FDB_5165(unit) then
+        return
+    end
+    jass.SetUnitPosition(unit, _____72B6_6001["配置"]["目标X"], _____72B6_6001["配置"]["目标Y"])
+    if _____72B6_6001["配置"]["目标面向"] ~= nil then
+        jass.SetUnitFacing(unit, _____72B6_6001["配置"]["目标面向"])
+    end
+    jass.IssueImmediateOrder(unit, "stop")
+end
+local function _____6E05_7406_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001(_____72B6_6001)
+    local triggerId = __TS__Number(jass.GetHandleId(_____72B6_6001["触发器"]))
+    if _____72B6_6001["取消监听"] ~= nil then
+        _____72B6_6001["取消监听"]()
+    end
+    if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(_____72B6_6001["触发器"]) then
+        jass.DestroyTrigger(_____72B6_6001["触发器"])
+    end
+    if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(_____72B6_6001["矩形"]) then
+        jass.RemoveRect(_____72B6_6001["矩形"])
+    end
+    if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(_____72B6_6001["区域"]) then
+        jass.RemoveRegion(_____72B6_6001["区域"])
+    end
+    if triggerId > 0 then
+        _____5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001_8868[triggerId] = nil
+    end
+end
+local function ____on_5267_60C5_73A9_5BB6_7EC4_4F20_9001_8FDB_5165()
+    local trigger = jass.GetTriggeringTrigger()
+    local triggerId = __TS__Number(jass.GetHandleId(trigger))
+    local _____72B6_6001 = _____5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001_8868[triggerId]
+    if _____72B6_6001 == nil or _____72B6_6001["已触发"] then
+        return
+    end
+    if not _____72B6_6001["配置"]["条件"]() then
+        return
+    end
+    local enteringUnit = jass.GetTriggerUnit()
+    if not _____5267_60C5_4F20_9001_5355_4F4D_53EF_8FDB_5165(enteringUnit) then
+        return
+    end
+    if _____72B6_6001["配置"]["允许进入单位"] ~= nil and not _____72B6_6001["配置"]["允许进入单位"](enteringUnit) then
+        return
+    end
+    local _____73A9_5BB6_82F1_96C4_7EC4 = _____72B6_6001["配置"]["读取玩家英雄组"]()
+    if not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(_____73A9_5BB6_82F1_96C4_7EC4) then
+        return
+    end
+    _____72B6_6001["已触发"] = true
+    _____6E05_7406_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001(_____72B6_6001)
+    _____5F53_524D_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001 = _____72B6_6001
+    jass.ForGroup(_____73A9_5BB6_82F1_96C4_7EC4, ____on_79FB_52A8_5267_60C5_73A9_5BB6_7EC4)
+    _____5F53_524D_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001 = nil
+    if _____72B6_6001["配置"]["完成"] ~= nil then
+        _____72B6_6001["配置"]["完成"](enteringUnit)
+    end
+end
+--- 按剧情动作动态注册一次性玩家英雄组传送。
+-- 区域、触发器和监听都由地形系统统一创建与销毁；条件不满足时不会传送。
+____exports["注册剧情玩家组传送"] = function(_____914D_7F6E)
+    if _____914D_7F6E == nil or _____914D_7F6E["入口半径"] <= 0 or not _____914D_7F6E["条件"] or not _____914D_7F6E["读取玩家英雄组"] then
+        return _____7A7A_5267_60C5_4F20_9001_6E05_7406
+    end
+    local region = jass.CreateRegion()
+    local rect = jass.Rect(_____914D_7F6E["入口中心X"] - _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心Y"] - _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心X"] + _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心Y"] + _____914D_7F6E["入口半径"])
+    local trigger = jass.CreateTrigger()
+    if not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(region) or not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(rect) or not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(trigger) then
+        if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(rect) then
+            jass.RemoveRect(rect)
+        end
+        if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(region) then
+            jass.RemoveRegion(region)
+        end
+        if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(trigger) then
+            jass.DestroyTrigger(trigger)
+        end
+        return _____7A7A_5267_60C5_4F20_9001_6E05_7406
+    end
+    jass.RegionAddRect(region, rect)
+    jass.TriggerAddAction(trigger, ____on_5267_60C5_73A9_5BB6_7EC4_4F20_9001_8FDB_5165)
+    local _____72B6_6001 = {
+        ["配置"] = _____914D_7F6E,
+        ["区域"] = region,
+        ["矩形"] = rect,
+        ["触发器"] = trigger,
+        ["取消监听"] = regionEventCenter.registerEnterRegionTrigger(trigger, region, nil),
+        ["已触发"] = false
+    }
+    local triggerId = __TS__Number(jass.GetHandleId(trigger))
+    _____5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001_8868[triggerId] = _____72B6_6001
+    return function()
+        if not _____72B6_6001["已触发"] then
+            _____6E05_7406_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001(_____72B6_6001)
+        end
+    end
 end
 --- 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件）
 ____exports["init区域传送"] = function()

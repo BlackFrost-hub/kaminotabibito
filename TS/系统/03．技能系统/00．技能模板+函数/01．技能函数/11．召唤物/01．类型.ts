@@ -59,6 +59,10 @@ export interface 召唤物输入参数 {
   Rng?: number;
   固定站桩?: boolean;
   禁止普攻?: boolean;
+  /** 创建后附加的技能；可传 FourCC 字符串或已转换的技能 ID。 */
+  添加技能?: Array<string | number>;
+  /** 关闭单位路径阻挡，使机制单位不会阻塞或受地形寻路影响。 */
+  禁用路径?: boolean;
   普攻弹道模型?: string;
   弹道模型?: string;
   missileModel?: string;
@@ -117,6 +121,8 @@ export interface 规范化召唤物参数 {
   攻击范围?: number;
   固定站桩?: boolean;
   禁止普攻?: boolean;
+  添加技能?: number[];
+  禁用路径?: boolean;
   普攻弹道模型?: string;
   普攻弹道弧度?: number;
   普攻弹道速度?: number;

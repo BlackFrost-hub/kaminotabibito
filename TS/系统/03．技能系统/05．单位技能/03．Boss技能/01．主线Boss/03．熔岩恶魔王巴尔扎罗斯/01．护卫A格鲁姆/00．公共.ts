@@ -2,9 +2,6 @@
 
 import { 单位未标记死亡 as 单位有效, 取单位ID, 单位到点距离平方 as 点到单位距离平方 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 提交预计算Boss技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 巴尔扎罗斯技能数值配置 } from "../02．数值与表现配置";
@@ -90,15 +87,6 @@ function 计算火径持续伤害(this: void, grum: any): number {
     * 巴尔扎罗斯技能数值配置.熔岩火径.伤害总倍率;
 }
 
-function 计算火径穿越伤害(this: void, grum: any, target: any): number {
-  const config = 巴尔扎罗斯技能数值配置.熔岩火径;
-  return 计算组合技能伤害(grum, target, {
-    来源攻击力比例: config.穿越伤害攻击力比例,
-    目标最大生命比例: config.穿越伤害目标最大生命比例,
-    总倍率: config.伤害总倍率,
-  });
-}
-
 function 造成格鲁姆Boss技能伤害(this: void, source: any, target: any, amount: number, 伤害形态: 技能伤害形态): void {
   if (!单位有效(source) || !单位有效(target) || !(amount > 0)) return;
   提交预计算Boss技能伤害({
@@ -160,7 +148,6 @@ export const 格鲁姆公共 = {
   角度差绝对值,
   点到单位距离平方,
   计算火径持续伤害,
-  计算火径穿越伤害,
   造成格鲁姆Boss技能伤害,
   播放点特效,
 };

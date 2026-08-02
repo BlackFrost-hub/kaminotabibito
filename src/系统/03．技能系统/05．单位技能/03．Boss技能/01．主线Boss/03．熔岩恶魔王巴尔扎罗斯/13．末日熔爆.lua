@@ -15,33 +15,33 @@ local ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177 = require("系统.03．技能系
 local _____51CF_5C11_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570 = ____16_FF0E_707C_70ED_5C42_6570_5DE5_5177["减少巴尔扎罗斯灼热层数"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.03．Boss战场地点位")
-local _____521B_5EFABoss_6218_573A_5730_70B9_4F4D_96C6 = ____require_result_3["创建Boss战场地点位集"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.index")
-local _____521B_5EFA_8840_91CF_8282_70B9_89E6_53D1_5668 = ____require_result_4["创建血量节点触发器"]
-local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_6.registerManualBuff
-local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_7.addDelayedCallback
-local addPeriodicCallback = ____require_result_7.addPeriodicCallback
-local getServerTime = ____require_result_7.getServerTime
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
-local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_8["创建循环点特效"]
-local ____require_result_9 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_9.CosBJ
-local SinBJ = ____require_result_9.SinBJ
-local ____require_result_10 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_10["造成AOE技能伤害"]
-local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_10["创建独立技能伤害实例"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local _____63D0_4EA4_9884_8BA1_7B97BossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算BossAOE技能伤害"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_0["启动基础施法时间线"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_1["创建技能提示圈"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.02．战斗区域.03．Boss战场地点位")
+local _____521B_5EFABoss_6218_573A_5730_70B9_4F4D_96C6 = ____require_result_2["创建Boss战场地点位集"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.index")
+local _____521B_5EFA_8840_91CF_8282_70B9_89E6_53D1_5668 = ____require_result_3["创建血量节点触发器"]
+local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_5.registerManualBuff
+local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_6.addDelayedCallback
+local addPeriodicCallback = ____require_result_6.addPeriodicCallback
+local getServerTime = ____require_result_6.getServerTime
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
+local _____521B_5EFA_5FAA_73AF_70B9_7279_6548 = ____require_result_7["创建循环点特效"]
+local ____require_result_8 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_8.CosBJ
+local SinBJ = ____require_result_8.SinBJ
+local ____require_result_9 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_9["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -226,13 +226,6 @@ local function _____70B9_5728_5B89_5168_533A(unit, safePoints)
     end
     return false
 end
-local function _____8BA1_7B97_5916_5708_4F24_5BB3(boss, target)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, target, {["来源攻击力比例"] = config["外圈伤害Boss攻击力比例"], ["目标最大生命比例"] = config["外圈伤害目标最大生命比例"], ["总倍率"] = config["外圈伤害总倍率"]})
-end
-local function _____8BA1_7B97_5B89_5168_533A_4F59_6CE2_4F24_5BB3(target)
-    return GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]["安全区余波目标最大生命比例"]
-end
 local function _____64AD_653E_7206_53D1_8868_73B0(center)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["末日熔爆"]
     _____521B_5EFA_70B9_7279_6548({
@@ -275,40 +268,38 @@ local function _____7ED3_7B97_672B_65E5_7194_7206(context, center, safePoints, _
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue36
+                    goto __continue34
                 end
                 if _____70B9_5728_5B89_5168_533A(hero, safePoints) then
-                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    _____63D0_4EA4_9884_8BA1_7B97BossAOE_6280_80FD_4F24_5BB3({
                         ["来源"] = boss,
                         ["目标"] = hero,
-                        ["伤害"] = _____8BA1_7B97_5B89_5168_533A_4F59_6CE2_4F24_5BB3(hero),
+                        ["伤害"] = GetUnitStateJapi(hero, UNIT_STATE_MAX_LIFE) * config["安全区余波目标最大生命比例"],
                         attack = false,
                         ranged = true,
                         attackType = ATTACK_TYPE_NORMAL,
                         ["伤害类型"] = DAMAGE_TYPE_FIRE,
                         weaponType = WEAPON_TYPE_WHOKNOWS,
-                        ["来源类型"] = "Boss技能",
                         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
                         ["标签"] = "巴尔扎罗斯末日熔爆"
                     })
                     _____51CF_5C11_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570(hero, config["安全区清除灼热层数"])
                 else
-                    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                         ["来源"] = boss,
                         ["目标"] = hero,
-                        ["伤害"] = _____8BA1_7B97_5916_5708_4F24_5BB3(boss, hero),
+                        ["伤害公式"] = {["来源攻击力比例"] = config["外圈伤害Boss攻击力比例"], ["目标最大生命比例"] = config["外圈伤害目标最大生命比例"], ["总倍率"] = config["外圈伤害总倍率"]},
                         attack = false,
                         ranged = true,
                         attackType = ATTACK_TYPE_NORMAL,
                         ["伤害类型"] = DAMAGE_TYPE_FIRE,
                         weaponType = WEAPON_TYPE_WHOKNOWS,
-                        ["来源类型"] = "Boss技能",
                         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
                         ["标签"] = "巴尔扎罗斯末日熔爆"
                     })
                 end
             end
-            ::__continue36::
+            ::__continue34::
             i = i + 1
         end
     end
@@ -439,8 +430,8 @@ ____exports["初始化巴尔扎罗斯末日熔爆节点"] = function(context)
             _____5C1D_8BD5_5468_671F_89E6_53D1_672B_65E5_7194_7206(context)
         end
     )
-    local ____self_11 = context["清理"]
-    ____self_11["登记周期回调"](____self_11, "巴尔扎罗斯-末日熔爆周期", tickId)
+    local ____self_10 = context["清理"]
+    ____self_10["登记周期回调"](____self_10, "巴尔扎罗斯-末日熔爆周期", tickId)
 end
 ____exports["注册巴尔扎罗斯末日熔爆"] = function()
 end

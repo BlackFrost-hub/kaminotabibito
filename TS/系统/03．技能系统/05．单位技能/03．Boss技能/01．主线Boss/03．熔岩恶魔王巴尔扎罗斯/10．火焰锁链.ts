@@ -1,9 +1,5 @@
 /** @noSelfInFile */
 
-const { 计算组合技能伤害 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害") as {
-  计算组合技能伤害: (this: void, 来源: any, 目标: any, 参数: any) => number;
-};
-
 import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 获取或创建巴尔扎罗斯上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
@@ -12,6 +8,9 @@ import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { stringToFourCC, 单位未标记死亡 as 单位有效, 单位间距离平方 as 距离平方 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 执行Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import type { 周期行为实例 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
+import { 创建周期行为 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
   启动基础施法时间线: (this: void, 参数: any) => void;
@@ -29,18 +28,12 @@ const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 }
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
   获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
 };
-const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, unit: any, buffID: string) => boolean;
-};
-
-const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
 };
 
 const jass = require("jass.common") as any;
@@ -72,7 +65,7 @@ interface 火焰锁链状态 {
   chainInstance: any;
   chainUnit: any;
   line: any;
-  tickId: number;
+  tick?: 周期行为实例;
   lastDamageMs: number;
   stopped: boolean;
 }
@@ -95,15 +88,6 @@ function 选择火焰锁链目标(this: void, boss: any): any {
   return 获取Boss技能随机敌对英雄(boss);
 }
 
-function 计算超距伤害(this: void, boss: any, target: any): number {
-  const config = 巴尔扎罗斯技能数值配置.火焰锁链;
-  return 计算组合技能伤害(boss, target, {
-    来源攻击力比例: config.超距伤害Boss攻击力比例,
-    目标最大生命比例: config.超距伤害目标最大生命比例,
-    总倍率: config.超距伤害总倍率,
-  });
-}
-
 function 更新锁链单位位置(this: void, state: 火焰锁链状态): void {
   const boss = state.context.Boss单位;
   const target = state.target;
@@ -116,9 +100,9 @@ function 更新锁链单位位置(this: void, state: 火焰锁链状态): void {
 function 停止火焰锁链(this: void, state: 火焰锁链状态, removeBuff: boolean): void {
   if (state.stopped) return;
   state.stopped = true;
-  if (state.tickId !== 0) {
-    removePeriodicCallback(state.tickId);
-    state.tickId = 0;
+  if (state.tick != null) {
+    state.tick.停止();
+    state.tick = undefined;
   }
   if (state.line != null) state.line.停止("火焰锁链结束");
   if (state.chainInstance != null) {
@@ -134,33 +118,38 @@ function on火焰锁链Buff移除(this: void, unit: any, _buffID: string, row: a
   if (state != null) 停止火焰锁链(state, false);
 }
 
-function on火焰锁链Tick(this: void, state: 火焰锁链状态): void {
-  if (state.stopped) return;
+function on火焰锁链Tick(this: void, _执行次数: number, variable?: 火焰锁链状态): boolean {
+  const state = variable;
+  if (state == null || state.stopped) return false;
   const boss = state.context.Boss单位;
   const target = state.target;
   const chainUnit = state.chainUnit;
   if (!单位有效(boss) || !单位有效(target) || !单位有效(chainUnit)) {
     停止火焰锁链(state, true);
-    return;
+    return false;
   }
   更新锁链单位位置(state);
   const config = 巴尔扎罗斯技能数值配置.火焰锁链;
-  if (距离平方(boss, target) <= config.断链距离 * config.断链距离) return;
+  if (距离平方(boss, target) <= config.断链距离 * config.断链距离) return true;
   const now = getServerTime();
-  if (state.lastDamageMs > 0 && now - state.lastDamageMs < config.超距Tick秒 * 1000) return;
+  if (state.lastDamageMs > 0 && now - state.lastDamageMs < config.超距Tick秒 * 1000) return true;
   state.lastDamageMs = now;
-  造成单体技能伤害({
+  执行Boss单体技能伤害({
     技能ID: 火焰锁链技能ID,
     来源: boss,
     目标: target,
-    伤害: 计算超距伤害(boss, target),
+    伤害公式: {
+      来源攻击力比例: config.超距伤害Boss攻击力比例,
+      目标最大生命比例: config.超距伤害目标最大生命比例,
+      总倍率: config.超距伤害总倍率,
+    },
     attack: false,
     ranged: true,
     attackType: ATTACK_TYPE_NORMAL,
     伤害类型: DAMAGE_TYPE_FIRE,
     weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "Boss技能",
   });
+  return true;
 }
 
 function 创建火焰锁链(this: void, context: 巴尔扎罗斯运行时上下文, target: any): void {
@@ -176,7 +165,7 @@ function 创建火焰锁链(this: void, context: 巴尔扎罗斯运行时上下�
     chainInstance: undefined,
     chainUnit: undefined,
     line: undefined,
-    tickId: 0,
+    tick: undefined,
     lastDamageMs: 0,
     stopped: false,
   };
@@ -214,10 +203,13 @@ function 创建火焰锁链(this: void, context: 巴尔扎罗斯运行时上下�
       停止火焰锁链(state, true);
     },
   });
-  state.tickId = addPeriodicCallback(config.锁链Tick毫秒, function 巴尔扎罗斯火焰锁链Tick(this: void): void {
-    on火焰锁链Tick(state);
+  state.tick = 创建周期行为({
+    名称: "巴尔扎罗斯-火焰锁链Tick",
+    间隔毫秒: config.锁链Tick毫秒,
+    清理: context.清理,
+    变量: state,
+    onTick: on火焰锁链Tick,
   });
-  context.清理.登记周期回调("巴尔扎罗斯-火焰锁链Tick", state.tickId);
   registerManualBuff(target, 巴尔扎罗斯单位技能配置.BuffID.火焰锁链, config.持续秒, 0, {
     sourceName: "巴尔扎罗斯",
     chainState: state,

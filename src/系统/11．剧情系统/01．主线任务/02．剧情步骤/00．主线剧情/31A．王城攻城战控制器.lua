@@ -132,8 +132,8 @@ function ____on_83F2_5229_65AF_63A5_8FD1_89E6_53D1()
             IssueImmediateOrder(_____8036_63D0_5C14, "stop")
         end
     end
-    local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_13["播放主线剧情片段"]
+    local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_14["播放主线剧情片段"]
     _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5("elven_city_felice_projection_arrival", {["片段ID"] = "elven_city_felice_projection_arrival", ["触发配置名"] = "菲利斯接近范围", ["触发单位"] = _____5267_60C5_89E6_53D1_5355_4F4D})
 end
 function _____6CE8_518C_83F2_5229_65AF_63A5_8FD1_5BF9_767D_89E6_53D1(_____72B6_6001, _____83F2_5229_65AF)
@@ -212,6 +212,8 @@ addPeriodicCallback = ____require_result_9.addPeriodicCallback
 removePeriodicCallback = ____require_result_9.removePeriodicCallback
 local ____require_result_10 = require("系统.00．核心系统.09．游戏结算开关")
 local _____8BBE_7F6E_5168_4F53_73A9_5BB6_6E38_620F_5931_8D25 = ____require_result_10["设置全体玩家游戏失败"]
+local ____require_result_11 = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐")
+local _____7ED3_675F_7B2C_4E8C_7AE0_83F2_5229_65AF_653B_57CE_533A_57DF_97F3_4E50 = ____require_result_11["结束第二章菲利斯攻城区域音乐"]
 CreateTrigger = jass.CreateTrigger
 AddSpecialEffect = jass.AddSpecialEffect
 DestroyEffect = jass.DestroyEffect
@@ -340,8 +342,8 @@ local function _____521B_5EFA_653B_57CE_5355_4F4D(_____9884_7F6E, _____4E16_4EE3
         return false
     end
     _____5F53_524D_653B_57CE_5355_4F4D_4E16_4EE3_8868[GetHandleId(unit)] = _____4E16_4EE3
-    local ____72B6_6001__653B_57CE_5355_4F4D_11 = _____72B6_6001["攻城单位"]
-    ____72B6_6001__653B_57CE_5355_4F4D_11[#____72B6_6001__653B_57CE_5355_4F4D_11 + 1] = unit
+    local ____72B6_6001__653B_57CE_5355_4F4D_12 = _____72B6_6001["攻城单位"]
+    ____72B6_6001__653B_57CE_5355_4F4D_12[#____72B6_6001__653B_57CE_5355_4F4D_12 + 1] = unit
     IssueTargetOrder(unit, "attack", _____72B6_6001["防御法阵"])
     return true
 end
@@ -463,8 +465,8 @@ ____exports["登记存活攻城单位为菲利斯护卫"] = function()
     if _____72B6_6001 == nil or not _____5355_4F4D_5B58_6D3B(_____72B6_6001["菲利斯"]) then
         return 0
     end
-    local ____require_result_12 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.06．Boss战护卫")
-    local _____767B_8BB0Boss_6218_5F85_5E26_5165_62A4_536B = ____require_result_12["登记Boss战待带入护卫"]
+    local ____require_result_13 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.06．Boss战护卫")
+    local _____767B_8BB0Boss_6218_5F85_5E26_5165_62A4_536B = ____require_result_13["登记Boss战待带入护卫"]
     local count = 0
     do
         local i = 0
@@ -508,6 +510,7 @@ local function ____on_738B_57CE_653B_57CE_5355_4F4D_6B7B_4EA1(dyingUnit)
         _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____72B6_6001)
         ____exports["结束菲利斯攻城等待"]()
         _____7ED3_7B97_8036_63D0_5C14_83F2_5229_65AF_534F_6218()
+        _____7ED3_675F_7B2C_4E8C_7AE0_83F2_5229_65AF_653B_57CE_533A_57DF_97F3_4E50()
         return
     end
     if dyingUnit == _____72B6_6001["防御法阵"] and _____72B6_6001["阶段"] >= 1 and _____72B6_6001["阶段"] <= 3 then

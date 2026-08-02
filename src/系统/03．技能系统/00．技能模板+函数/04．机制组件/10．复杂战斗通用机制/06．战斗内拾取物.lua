@@ -1,16 +1,15 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__Delete = ____lualib.__TS__Delete
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____on_62FE_53D6_7269Tick, getServerTime, _____62FE_53D6_7269_8868
-function ____on_62FE_53D6_7269Tick()
-    local now = getServerTime()
-    for key in pairs(_____62FE_53D6_7269_8868) do
-        local _____5B9E_4F8B = _____62FE_53D6_7269_8868[key]
-        if _____5B9E_4F8B ~= nil then
-            _____5B9E_4F8B["推进"](_____5B9E_4F8B, now)
-        end
+local ____on_62FE_53D6_7269Tick, getServerTime
+function ____on_62FE_53D6_7269Tick(variable)
+    local _____5B9E_4F8B = variable
+    if _____5B9E_4F8B ~= nil then
+        _____5B9E_4F8B["推进"](
+            _____5B9E_4F8B,
+            getServerTime()
+        )
     end
 end
 local jass = require("jass.common")
@@ -28,35 +27,17 @@ local ____require_result_0 = require("系统.00．核心系统.05．中心计时
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
 getServerTime = ____require_result_0.getServerTime
-_____62FE_53D6_7269_8868 = {}
 local _____4E0B_4E00_4E2A_62FE_53D6_7269ID = 0
-local _____62FE_53D6_7269_9A71_52A8ID = 0
 local function _____8DDD_79BB(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
     return SquareRoot(dx * dx + dy * dy)
 end
-local function _____786E_4FDD_9A71_52A8(_____95F4_9694_6BEB_79D2)
-    if _____62FE_53D6_7269_9A71_52A8ID ~= 0 then
-        return
-    end
-    _____62FE_53D6_7269_9A71_52A8ID = addPeriodicCallback(_____95F4_9694_6BEB_79D2, ____on_62FE_53D6_7269Tick)
-end
-local function _____5C1D_8BD5_505C_6B62_9A71_52A8()
-    for key in pairs(_____62FE_53D6_7269_8868) do
-        if _____62FE_53D6_7269_8868[key] ~= nil then
-            return
-        end
-    end
-    if _____62FE_53D6_7269_9A71_52A8ID ~= 0 then
-        removePeriodicCallback(_____62FE_53D6_7269_9A71_52A8ID)
-        _____62FE_53D6_7269_9A71_52A8ID = 0
-    end
-end
 local _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0 = __TS__Class()
 _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0.name = "战斗内拾取物实现"
 function _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0.prototype.____constructor(self, ID, _____53C2_6570, _____7279_6548)
     self["到期时间"] = 0
+    self["Tick回调ID"] = 0
     self["已销毁"] = false
     self.ID = ID
     self["参数"] = _____53C2_6570
@@ -66,7 +47,7 @@ function _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0.prototype.____constructor(
     if _____53C2_6570["持续秒"] ~= nil and _____53C2_6570["持续秒"] > 0 then
         self["到期时间"] = getServerTime() + _____53C2_6570["持续秒"] * 1000
     end
-    _____62FE_53D6_7269_8868[ID] = self
+    self["Tick回调ID"] = addPeriodicCallback(_____53C2_6570["Tick间隔毫秒"] or 50, ____on_62FE_53D6_7269Tick, self)
 end
 _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0.prototype["取X"] = function(self)
     return self.x
@@ -89,14 +70,16 @@ _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0.prototype["销毁"] = function(self
         return
     end
     self["已销毁"] = true
-    __TS__Delete(_____62FE_53D6_7269_8868, self.ID)
+    if self["Tick回调ID"] ~= 0 then
+        removePeriodicCallback(self["Tick回调ID"])
+        self["Tick回调ID"] = 0
+    end
     if self["特效"] ~= nil and self["特效"] ~= 0 then
         DestroyEffect(self["特效"])
     end
     if self["参数"]["on销毁"] ~= nil then
         self["参数"]["on销毁"](self, _____539F_56E0, self["参数"]["变量"])
     end
-    _____5C1D_8BD5_505C_6B62_9A71_52A8()
 end
 _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0.prototype["推进"] = function(self, now)
     if self["已销毁"] then
@@ -127,7 +110,7 @@ _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0.prototype["检查拾取"] = functio
             do
                 local unit = units[i + 1]
                 if unit == nil or unit == 0 then
-                    goto __continue32
+                    goto __continue22
                 end
                 if _____8DDD_79BB(
                     self.x,
@@ -142,7 +125,7 @@ _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0.prototype["检查拾取"] = functio
                     return
                 end
             end
-            ::__continue32::
+            ::__continue22::
             i = i + 1
         end
     end
@@ -188,7 +171,6 @@ ____exports["创建战斗内拾取物"] = function(_____53C2_6570)
     local ____6218_6597_5185_62FE_53D6_7269_5B9E_73B0_1 = _____6218_6597_5185_62FE_53D6_7269_5B9E_73B0
     _____4E0B_4E00_4E2A_62FE_53D6_7269ID = _____4E0B_4E00_4E2A_62FE_53D6_7269ID + 1
     local _____5B9E_4F8B = __TS__New(____6218_6597_5185_62FE_53D6_7269_5B9E_73B0_1, _____4E0B_4E00_4E2A_62FE_53D6_7269ID, _____53C2_6570, effect)
-    _____786E_4FDD_9A71_52A8(_____53C2_6570["Tick间隔毫秒"] or 50)
     if _____53C2_6570["清理"] ~= nil then
         local ____self_2 = _____53C2_6570["清理"]
         ____self_2["登记清理"](

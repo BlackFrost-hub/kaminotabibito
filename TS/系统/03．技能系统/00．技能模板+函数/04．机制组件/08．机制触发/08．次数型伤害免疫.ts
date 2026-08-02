@@ -84,11 +84,12 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const R2I = jass.R2I as (value: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
 function 规整次数(this: void, 次数: number): number {
   if (次数 == null || 次数 !== 次数 || 次数 <= 0) return 0;
-  return math.floor(次数);
+  return R2I(次数);
 }
 
 function 类型匹配(this: void, 类型: 次数型伤害免疫类型, context: any): boolean {

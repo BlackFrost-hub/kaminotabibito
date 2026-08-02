@@ -13,8 +13,8 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____01_FF0E_63A7_5236_4E0EBuff = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
 local _____5F00_59CB_786C_76F4 = ____01_FF0E_63A7_5236_4E0EBuff["开始硬直"]
-local ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____21_FF0E_7EC4_5408_6280_80FD_4F24_5BB3["计算组合技能伤害"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____09_FF0E_82F1_7075_6218_4E59_5973 = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.09．英灵战乙女")
 local _____83B7_53D6_590F_63D0_96C5_82F1_7075_6295_5F71 = ____09_FF0E_82F1_7075_6218_4E59_5973["获取夏提雅英灵投影"]
 local _____5C1D_8BD5_89E6_53D1_82F1_7075_6218_4E59_5973_590D_523B = ____09_FF0E_82F1_7075_6218_4E59_5973["尝试触发英灵战乙女复刻"]
@@ -26,20 +26,18 @@ local ____19_FF0E_541F_5531_6761 = require("系统.03．技能系统.05．单位
 local _____663E_793A_590F_63D0_96C5_5E38_89C4_541F_5531_6761 = ____19_FF0E_541F_5531_6761["显示夏提雅常规吟唱条"]
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_0["创建技能提示圈"]
-local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_1["造成AOE技能伤害"]
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local getServerTime = ____require_result_2.getServerTime
-local ____require_result_3 = require("平台扩展API动作")
-local _____7279_6548_663E_793A__9690_85CF = ____require_result_3["特效显示_隐藏"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.冲锋残影表现")
-local _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0 = ____require_result_4["开始冲锋并附带残影表现"]
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_5.debugLogForce
-local ____require_result_6 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_6.CosBJ
-local SinBJ = ____require_result_6.SinBJ
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local getServerTime = ____require_result_1.getServerTime
+local ____require_result_2 = require("平台扩展API动作")
+local _____7279_6548_663E_793A__9690_85CF = ____require_result_2["特效显示_隐藏"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.冲锋残影表现")
+local _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0 = ____require_result_3["开始冲锋并附带残影表现"]
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_4.debugLogForce
+local ____require_result_5 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_5.CosBJ
+local SinBJ = ____require_result_5.SinBJ
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
@@ -151,17 +149,15 @@ local function _____5C1D_8BD5_5B89_6392_6EF4_7BA1_7A7F_5FC3_82F1_7075_590D_523B(
                         ["命中后结束"] = false,
                         ["动画序号"] = p2["英灵复刻冲锋动画编号"],
                         ["命中回调"] = function(_source, hit)
-                            local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(context["Boss单位"], hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"] * p2["英灵复刻伤害比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"] * p2["英灵复刻伤害比例"]})
-                            _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                            _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                                 ["来源"] = context["Boss单位"],
                                 ["目标"] = hit,
-                                ["伤害"] = damage,
+                                ["伤害公式"] = {["来源攻击力比例"] = cfg["伤害攻击力比例"] * p2["英灵复刻伤害比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"] * p2["英灵复刻伤害比例"]},
                                 attack = false,
                                 ranged = false,
                                 attackType = ATTACK_TYPE_NORMAL,
                                 ["伤害类型"] = DAMAGE_TYPE_NORMAL,
                                 weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                                ["来源类型"] = "Boss技能",
                                 ["标签"] = "夏提雅·英灵复刻-滴管穿心"
                             })
                         end
@@ -281,17 +277,15 @@ ____exports["释放夏提雅滴管穿心"] = function(context, target)
                             GetUnitY(hit),
                             _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效默认裁断距离"]
                         )
-                        local damage = _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(source, hit, {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]})
-                        _____9020_6210AOE_6280_80FD_4F24_5BB3({
+                        _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                             ["来源"] = source,
                             ["目标"] = hit,
-                            ["伤害"] = damage,
+                            ["伤害公式"] = {["来源攻击力比例"] = cfg["伤害攻击力比例"], ["目标最大生命比例"] = cfg["伤害目标最大生命比例"]},
                             attack = false,
                             ranged = false,
                             attackType = ATTACK_TYPE_NORMAL,
                             ["伤害类型"] = DAMAGE_TYPE_NORMAL,
                             weaponType = WEAPON_TYPE_METAL_HEAVY_SLICE,
-                            ["来源类型"] = "Boss技能",
                             ["标签"] = "夏提雅·滴管穿心"
                         })
                         local effect = AddSpecialEffect(
@@ -335,8 +329,8 @@ ____exports["释放夏提雅滴管穿心"] = function(context, target)
             end
         end
     )
-    local ____self_7 = context["清理"]
-    ____self_7["登记延迟回调"](____self_7, "夏提雅-滴管穿心预警", delayedId)
+    local ____self_6 = context["清理"]
+    ____self_6["登记延迟回调"](____self_6, "夏提雅-滴管穿心预警", delayedId)
     return true
 end
 ____exports["滴管穿心技能状态"] = {

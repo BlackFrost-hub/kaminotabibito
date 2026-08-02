@@ -5,21 +5,17 @@ import { 创建单位运行时上下文工厂 } from "../../../../00．技能模
 import { 里科特单位技能配置 } from "./00．配置";
 import { 里科特数值与表现配置 } from "./02．数值与表现配置";
 import { 播放里科特台词 } from "./10．台词播放";
-import { stringToFourCC } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 创建单次承伤上限 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/04．单次承伤上限";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
+const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
-
-const 里科特单位类型ID = stringToFourCC(里科特单位技能配置.单位ID);
-let 里科特死亡监听已注册 = false;
 
 export type 里科特阶段 = 1 | 2 | 3;
 
@@ -36,6 +32,16 @@ export interface 里科特运行时上下文 {
 
 function 创建里科特上下文(this: void, boss: any, 清理: 机制清理篮子): 里科特运行时上下文 {
   播放里科特台词(boss, "开场", 0);
+  if (里科特数值与表现配置.被动.普攻必中) {
+    YDUserDataSetSafe("unit", boss, "普攻必中", "boolean", true);
+  }
+  创建单次承伤上限({
+    名称: "里科特-神明祝福-单次承伤上限",
+    单位: boss,
+    最大生命比例: 里科特数值与表现配置.被动.单次最大生命伤害比例,
+    优先级: 80,
+    清理篮子: 清理,
+  });
   return {
     Boss单位: boss,
     阶段: 取里科特当前阶段(boss),
@@ -48,10 +54,16 @@ function 创建里科特上下文(this: void, boss: any, 清理: 机制清理篮
   };
 }
 
+function on里科特单位死亡(this: void, _context: 里科特运行时上下文, dyingUnit: any, _killingUnit: any): void {
+  播放里科特台词(dyingUnit, "死亡", 0);
+}
+
 const 里科特上下文工厂 = 创建单位运行时上下文工厂<里科特运行时上下文>({
   名称: "里科特",
   主动技能提示: 里科特单位技能配置.主动技能提示,
   创建上下文: 创建里科特上下文,
+  死亡时自动清理: true,
+  on单位死亡: on里科特单位死亡,
 });
 
 export function 获取里科特上下文(this: void, boss: any): 里科特运行时上下文 | undefined {
@@ -107,14 +119,4 @@ export function 清除里科特神风印记(this: void, context: 里科特运行
   }
 }
 
-function on里科特挑战结束(this: void, dyingUnit: any): void {
-  if (GetUnitTypeId(dyingUnit) !== 里科特单位类型ID) return;
-  播放里科特台词(dyingUnit, "死亡", 0);
-  清理里科特上下文(dyingUnit);
-}
-
-export function 注册里科特运行时(this: void): void {
-  if (里科特死亡监听已注册) return;
-  里科特死亡监听已注册 = true;
-  registerDeathListener(on里科特挑战结束);
-}
+export function 注册里科特运行时(this: void): void {}

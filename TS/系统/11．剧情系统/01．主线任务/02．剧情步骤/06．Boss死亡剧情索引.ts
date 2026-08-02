@@ -82,6 +82,19 @@ export const Boss死亡剧情索引表: Boss死亡剧情索引项[] = [
     剧情片段ID: "elven_city_chapter_end",
     说明: "当前 TS 暂按第二章末战 Boss = 里科特王子 假定绑定；源 JASS 仅能确认剧情进度 34 时死亡触发后进入章节末最终收束，具体死亡单位判定仍可能补正。",
   },
+  {
+    Boss单位名: "双重凤凰·菲尼克斯尔",
+    需要剧情进度: 44,
+    设置剧情进度: 45,
+    剧情片段ID: "molten_realm_phoenixel_aftermath",
+    说明: "菲尼克斯尔死亡后熄灭怨火、稳定传送阵并前往英灵墓地。",
+  },
+  {
+    Boss单位名: "沉睡英魂·亚伦柯斯",
+    需要剧情进度: 47,
+    设置剧情进度: 48,
+    说明: "亚伦柯斯死亡后开启通往封印核心的内层墓门；传送门由 Boss 死亡监听按场景时机注册。",
+  },
 ];
 
 function Boss单位名匹配(this: void, unitTypeId: number, Boss单位名: string): boolean {

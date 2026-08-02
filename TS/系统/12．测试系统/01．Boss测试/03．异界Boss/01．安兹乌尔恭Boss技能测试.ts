@@ -37,6 +37,9 @@ const { 标记测试Boss跳过死亡结算 } = require('系统.12．测试系统
 const { addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
+const { 造成单体技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
+  造成单体技能伤害: (this: void, 参数: any) => boolean;
+};
 const { 应用Boss战启动属性配置 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用') as {
   应用Boss战启动属性配置: (this: void, unit: any) => void;
 };
@@ -103,7 +106,6 @@ const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const SetHeroLevel = jass.SetHeroLevel as (hero: any, level: number, showEyeCandy: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (unit: any, x: number, y: number) => void;
-const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -218,16 +220,19 @@ function 结算安兹高阶亡灵召唤致命伤害(this: void, 参数?: 高阶�
   if (!Boss测试单位存活(参数.来源单位) || !Boss测试单位存活(summon)) return;
   const maxLife = GetUnitStateJapi(summon, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return;
-  UnitDamageTarget(
-    参数.来源单位,
-    summon,
-    maxLife * 2,
-    false,
-    false,
-    ATTACK_TYPE_NORMAL,
-    DAMAGE_TYPE_UNIVERSAL,
-    WEAPON_TYPE_WHOKNOWS,
-  );
+  造成单体技能伤害({
+    来源: 参数.来源单位,
+    目标: summon,
+    伤害: maxLife * 2,
+    attack: false,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_UNIVERSAL,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: '其他',
+    标签: '安兹测试-高阶亡灵致命保护',
+    参与技能伤害加成: false,
+  });
 }
 function 测试安兹高阶亡灵召唤致命保护(this: void, _player: any, context: 安兹测试上下文): void {
   if (!释放安兹高阶亡灵召唤(context.运行时)) return;
@@ -264,16 +269,19 @@ function 结算守护职责20百分比最大生命受击(this: void, 参数?: �
   if (!Boss测试单位存活(参数.来源单位) || !Boss测试单位存活(参数.Boss单位)) return;
   const maxLife = GetUnitStateJapi(参数.Boss单位, UNIT_STATE_MAX_LIFE);
   if (maxLife <= 0) return;
-  UnitDamageTarget(
-    参数.来源单位,
-    参数.Boss单位,
-    maxLife * 0.2,
-    true,
-    false,
-    ATTACK_TYPE_NORMAL,
-    DAMAGE_TYPE_NORMAL,
-    WEAPON_TYPE_WHOKNOWS,
-  );
+  造成单体技能伤害({
+    来源: 参数.来源单位,
+    目标: 参数.Boss单位,
+    伤害: maxLife * 0.2,
+    attack: true,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_NORMAL,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: '其他',
+    标签: '安兹测试-守护者之职责受击',
+    参与技能伤害加成: false,
+  });
 }
 function 测试雅儿贝德守护者之职责20百分比受击(this: void, _player: any, context: 安兹测试上下文): void {
   if (!启动安兹守护者模式(context.运行时)) return;
@@ -308,16 +316,19 @@ function 结算雅儿贝德护卫反击受击(this: void, 参数?: 护卫反击�
   const cfg = 安兹乌尔恭数值与表现配置.守护者模式;
   if (!(cfg.护卫反击承伤倍率 > 0)) return;
   const damage = maxLife * cfg.护卫反击触发伤害最大生命比例 / cfg.护卫反击承伤倍率 + 1;
-  UnitDamageTarget(
-    参数.来源单位,
-    参数.雅儿贝德单位,
-    damage,
-    true,
-    false,
-    ATTACK_TYPE_NORMAL,
-    DAMAGE_TYPE_UNIVERSAL,
-    WEAPON_TYPE_WHOKNOWS,
-  );
+  造成单体技能伤害({
+    来源: 参数.来源单位,
+    目标: 参数.雅儿贝德单位,
+    伤害: damage,
+    attack: true,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_UNIVERSAL,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: '其他',
+    标签: '安兹测试-护卫反击受击',
+    参与技能伤害加成: false,
+  });
 }
 function 测试雅儿贝德护卫反击自动受击(this: void, _player: any, context: 安兹测试上下文): void {
   const state = context.运行时.雅儿贝德;

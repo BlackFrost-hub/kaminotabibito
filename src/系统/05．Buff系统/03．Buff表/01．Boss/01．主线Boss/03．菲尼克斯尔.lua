@@ -7,7 +7,9 @@ ____exports["菲尼克斯尔BuffID"] = {
     ["怨火烙印"] = "BPH4",
     ["导管破封"] = "BPH5",
     ["怨火链接"] = "BPH6",
-    ["永恒轮回"] = "BPH7"
+    ["永恒轮回"] = "BPH7",
+    ["毒火枯竭"] = "BPH8",
+    ["暗火增幅"] = "BPH9"
 }
 ____exports["菲尼克斯尔Buff表"] = {
     [____exports["菲尼克斯尔BuffID"]["凤凰火印"]] = {
@@ -126,6 +128,40 @@ ____exports["菲尼克斯尔Buff表"] = {
         priority = 96,
         canPurge = false,
         tooltip = "菲尼克斯尔生命值≤5%时触发，持续15秒并生成4枚凤凰之卵；每枚凤凰蛋最大生命值为Boss最大生命值的8%。15秒后若仍有蛋存活，每枚恢复Boss最大生命值12%，并对全场每名玩家结算目标最大生命值20%+Boss当前攻击力×150%；4枚全部摧毁则Boss死亡。"
+    },
+    [____exports["菲尼克斯尔BuffID"]["毒火枯竭"]] = {
+        buffID = ____exports["菲尼克斯尔BuffID"]["毒火枯竭"],
+        buffName = "毒火枯竭",
+        icon = "BuffIcon\\Boss\\Phoenixel\\venomfire_corrosion.blp",
+        effect = "war3mapImported\\DemonicGatewayDeathEffect.mdx",
+        effectMode = "attach",
+        effectAttachPoint = "origin",
+        type = "Debuff:heal",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 85,
+        canPurge = false,
+        tooltip = "持续5秒；受到的所有治疗效果降低35%。"
+    },
+    [____exports["菲尼克斯尔BuffID"]["暗火增幅"]] = {
+        buffID = ____exports["菲尼克斯尔BuffID"]["暗火增幅"],
+        buffName = "暗火增幅",
+        icon = "BuffIcon\\Boss\\Phoenixel\\vengeful_flame_brand.blp",
+        effect = "war3mapImported\\[AKE]war3AKE.com - 8283802106102078364116188.mdx",
+        effectMode = "attach",
+        effectAttachPoint = "chest",
+        type = "Debuff:boss:skill-vulnerability",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 85,
+        canPurge = false,
+        tooltip = "持续8秒；菲尼克斯尔对你造成的下一次技能伤害提高20%，结算后立即消失。"
     }
 }
 ____exports.default = ____exports["菲尼克斯尔Buff表"]

@@ -10,14 +10,10 @@ import { 播放米亚台词 } from "./15．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 import { 创建固定时间轴阶段列表, type 固定时间轴事件 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
+import { 创建限时摧毁目标组, type 限时摧毁目标组实例 } from "../../../../00．技能模板+函数/04．机制组件/05．机制单位/02．限时摧毁目标组";
+import type { 可攻击机制单位参数, 可攻击机制单位结束原因 } from "../../../../00．技能模板+函数/04．机制组件/05．机制单位/01．可攻击机制单位";
 const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
-};
-const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
-  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
-  创建召唤物: (this: void, 参数: any) => any;
 };
 const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   开始硬直: (this: void, unit: any, durationSec: number) => void;
@@ -37,17 +33,13 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const KillUnit = jass.KillUnit as (unit: any) => void;
-const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
@@ -55,9 +47,6 @@ interface 终极污染核心点 {
   x: number;
   y: number;
 }
-
-const 终极污染核心上下文表: Record<number, 米亚运行时上下文 | undefined> = {};
-let 米亚终极污染已注册 = false;
 
 function 取核心出生点表(this: void): 终极污染核心点[] {
   const config = 米亚技能数值配置.终极污染;
@@ -115,57 +104,67 @@ function 播放终极污染引导表现(this: void, context: 米亚运行时上�
   });
 }
 
-function 创建终极污染核心(this: void, context: 米亚运行时上下文, point: 终极污染核心点, hp: number): any {
-  const config = 米亚技能数值配置.终极污染;
-  const boss = context.Boss单位;
-  const core = 创建召唤物({
-    主人单位: boss,
-    所属玩家: GetOwningPlayer(boss),
-    单位类型: 米亚单位技能配置.腐化核心单位ID,
-    单位名称: "米亚腐化核心",
-    模型文件: 米亚单位技能配置.特效.终极污染核心模型,
-    X: point.x,
-    Y: point.y,
-    持续时间: config.引导秒 + 2,
-    飞行高度: config.核心浮空高度,
-    生命值: hp,
-    生命值受小怪倍率: false,
-    固定站桩: true,
-    攻击力: 0,
-    攻击范围: 0,
-    索敌范围: 0,
-    缩放: config.核心缩放,
-  });
-  const coreValid = 单位有效(core);
-  if (!coreValid) return core;
-  const id = 取单位ID(core);
-  if (id !== 0) 终极污染核心上下文表[id] = context;
-  context.终极污染核心列表.push(core);
-  创建循环点特效({
-    模型路径: 米亚单位技能配置.特效.终极污染核心附着,
-    X: point.x,
-    Y: point.y,
-    Z: config.核心浮空高度,
-    缩放: 1,
-    总持续秒: config.引导秒,
-    重建间隔秒: 1,
-    单次持续秒: 0.9,
-    存活条件: function 米亚终极污染核心附着存活(this: void): boolean {
-      return context.终极污染引导中 && 单位有效(core);
-    },
-  });
-  return core;
-}
-
 function 创建终极污染核心组(this: void, context: 米亚运行时上下文): void {
   const config = 米亚技能数值配置.终极污染;
   const maxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
   const hp = maxLife * config.核心生命Boss最大生命比例;
   const points = 取核心出生点表();
   const count = config.核心数量 < points.length ? config.核心数量 : points.length;
-  context.终极污染核心列表 = [];
+  const 目标列表: 可攻击机制单位参数[] = [];
   for (let i = 0; i < count; i++) {
-    创建终极污染核心(context, points[i], hp);
+    const point = points[i];
+    目标列表.push({
+      主人单位: context.Boss单位,
+      所属玩家: GetOwningPlayer(context.Boss单位),
+      单位类型: 米亚单位技能配置.腐化核心单位ID,
+      单位名称: "米亚腐化核心",
+      模型路径: 米亚单位技能配置.特效.终极污染核心模型,
+      X: point.x,
+      Y: point.y,
+      持续时间: config.引导秒 + 2,
+      飞行高度: config.核心浮空高度,
+      生命值: hp,
+      生命值受小怪倍率: false,
+      固定站桩: true,
+      禁止普攻: true,
+      攻击范围: 0,
+      索敌范围: 0,
+      缩放: config.核心缩放,
+    });
+  }
+  const 核心组 = 创建限时摧毁目标组({
+    名称: "米亚-终极污染核心组",
+    清理: context.清理,
+    持续秒: config.引导秒,
+    目标列表,
+    on目标结束: function 米亚终极污染核心结束(this: void, _目标: any, 原因: 可攻击机制单位结束原因): void {
+      if (!context.终极污染引导中) return;
+      if (原因 === "被击杀" || 原因 === "自然到期") 播放米亚台词(context.Boss单位, "终极污染", 6);
+      if (context.终极污染核心组 != null && context.终极污染核心组.取剩余数量() === 1) {
+        播放米亚台词(context.Boss单位, "终极污染", 7);
+      }
+    },
+    on全部摧毁: function 米亚终极污染核心全灭(this: void): void {
+      打断终极污染(context);
+    },
+  });
+  context.终极污染核心组 = 核心组;
+  for (let i = 0; i < 核心组.目标单位列表.length; i++) {
+    const core = 核心组.目标单位列表[i];
+    const point = points[i];
+    创建循环点特效({
+      模型路径: 米亚单位技能配置.特效.终极污染核心附着,
+      X: point.x,
+      Y: point.y,
+      Z: config.核心浮空高度,
+      缩放: 1,
+      总持续秒: config.引导秒,
+      重建间隔秒: 1,
+      单次持续秒: 0.9,
+      存活条件: function 米亚终极污染核心附着存活(this: void): boolean {
+        return context.终极污染引导中 && core.是否存活();
+      },
+    });
   }
   广播单位提示(context.Boss单位, `终极污染开始，引导${config.引导秒}秒，每秒全场增加${config.每秒全场腐化层数}层腐化感染（${config.引导秒}秒内击破全部${config.核心数量}个腐化核心即可打断！）`, 4200);
   播放米亚台词(context.Boss单位, "终极污染", 2);
@@ -189,14 +188,9 @@ function 清退终极污染本次叠层(this: void, context: 米亚运行时上�
 }
 
 function 清理终极污染核心(this: void, context: 米亚运行时上下文): void {
-  const cores = context.终极污染核心列表;
-  for (let i = 0; i < cores.length; i++) {
-    const core = cores[i];
-    const id = 取单位ID(core);
-    if (id !== 0) 终极污染核心上下文表[id] = undefined;
-    if (单位有效(core)) RemoveUnit(core);
-  }
-  context.终极污染核心列表 = [];
+  const 核心组 = context.终极污染核心组;
+  context.终极污染核心组 = undefined;
+  if (核心组 != null) 核心组.结束(false, "机制清理");
 }
 
 export function 清理米亚终极污染(this: void, context: 米亚运行时上下文): void {
@@ -205,15 +199,6 @@ export function 清理米亚终极污染(this: void, context: 米亚运行时上
   清理终极污染核心(context);
   context.终极污染本次叠层表 = {};
   关闭吟唱条("致命惩罚");
-}
-
-function 终极污染是否全部核心死亡(this: void, context: 米亚运行时上下文): boolean {
-  const cores = context.终极污染核心列表;
-  if (cores.length <= 0) return false;
-  for (let i = 0; i < cores.length; i++) {
-    if (单位有效(cores[i])) return false;
-  }
-  return true;
 }
 
 function 执行终极污染打断(this: void, context: 米亚运行时上下文): void {
@@ -233,25 +218,6 @@ function 打断终极污染(this: void, context: 米亚运行时上下文): void
   if (!context.终极污染引导中) return;
   if (context.终极污染组合执行器?.停止(undefined, "中断") === true) return;
   执行终极污染打断(context);
-}
-
-function 终极污染核心死亡(this: void, dyingUnit: any, _killingUnit: any): void {
-  const id = 取单位ID(dyingUnit);
-  if (id === 0) return;
-  const context = 终极污染核心上下文表[id];
-  if (context == null) return;
-  终极污染核心上下文表[id] = undefined;
-  if (!context.终极污染引导中) return;
-  播放米亚台词(context.Boss单位, "终极污染", 6);
-  if (终极污染是否全部核心死亡(context)) {
-    打断终极污染(context);
-    return;
-  }
-  let alive = 0;
-  for (let i = 0; i < context.终极污染核心列表.length; i++) {
-    if (单位有效(context.终极污染核心列表[i])) alive += 1;
-  }
-  if (alive === 1) 播放米亚台词(context.Boss单位, "终极污染", 7);
 }
 
 function 终极污染每秒叠层(this: void, context: 米亚运行时上下文): void {
@@ -373,12 +339,6 @@ function 启动终极污染(this: void, context: 米亚运行时上下文): bool
   创建终极污染核心组(context);
   播放Boss坐标音效(米亚音效配置.终极污染.开始引导, 取米亚平台中心X(), 取米亚平台中心Y(), 米亚音效配置.默认裁断距离);
   return true;
-}
-
-export function 注册米亚终极污染(this: void): void {
-  if (米亚终极污染已注册) return;
-  米亚终极污染已注册 = true;
-  registerDeathListener(终极污染核心死亡);
 }
 
 export function 触发米亚终极污染(this: void, context: 米亚运行时上下文, 阈值序号: 0 | 1): boolean {

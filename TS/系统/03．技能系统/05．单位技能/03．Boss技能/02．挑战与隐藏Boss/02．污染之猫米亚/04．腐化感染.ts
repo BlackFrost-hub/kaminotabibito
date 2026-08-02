@@ -3,12 +3,10 @@
 import type { 米亚运行时上下文 } from "./03．运行时上下文";
 import { 米亚单位技能配置 } from "./00．配置";
 import { 米亚腐化感染配置 } from "./02．数值与表现配置";
+import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 
 const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
   getBuffRuntime: (this: void, unit: any, buffID: string) => { stack: number; remaining: number } | null;
-};
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -48,6 +46,15 @@ function 是米亚相关伤害来源(this: void, attacker: any, originalAttacker
   if (是米亚单位(attackerMaster)) return true;
   const mappedAttackerMaster = 取召唤物主人(attacker);
   return 是米亚单位(mappedAttackerMaster);
+}
+
+function 满足米亚腐化感染伤害条件(this: void, damageContext: any): boolean {
+  if (damageContext == null) return false;
+  const target = damageContext.target;
+  const buffRuntime = getBuffRuntime(target, 腐化感染BuffID);
+  const stack = buffRuntime == null ? 0 : Number(buffRuntime.stack) || 0;
+  if (stack <= 0) return false;
+  return 是米亚相关伤害来源(damageContext.attacker, damageContext.originalAttacker);
 }
 
 function 播放米亚腐化感染叠层爆发(this: void, unit: any): void {
@@ -119,5 +126,10 @@ export function 清空米亚腐化感染(this: void, context: 米亚运行时上
 export function 注册米亚腐化感染机制(this: void): void {
   if (米亚腐化感染机制已注册) return;
   米亚腐化感染机制已注册 = true;
-  registerDamageModifier(米亚腐化感染伤害修正, 30);
+  创建条件伤害修正({
+    名称: "米亚腐化感染伤害增幅",
+    优先级: 30,
+    条件: 满足米亚腐化感染伤害条件,
+    修正: 米亚腐化感染伤害修正,
+  });
 }

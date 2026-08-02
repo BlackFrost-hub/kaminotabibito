@@ -7,12 +7,9 @@ import { 创建反击窗口模板, type 反击窗口模板实例 } from '../../.
 import { 开始雅儿贝德冲锋 } from './00．冲锋表现';
 import { 播放限时单位动画 } from '../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直, 获取单位硬直剩余时间, 调整单位硬直时间 } from '../../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行Boss单体技能伤害 } from '../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 播放Boss坐标音效 } from '../../../00．公共/00．Boss音效播放';
 
-const { 造成单体技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成单体技能伤害: (this: void, 参数: any) => boolean;
-};
 const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
@@ -69,22 +66,20 @@ function 结算护卫反击(this: void, context: 安兹运行时上下文, attac
   const dx = GetUnitX(attacker) - GetUnitX(albedo);
   const dy = GetUnitY(attacker) - GetUnitY(albedo);
   if (dx * dx + dy * dy <= cfg.护卫反击攻击距离 * cfg.护卫反击攻击距离) {
-    const damage = 计算组合技能伤害(albedo, attacker, {
-      来源攻击力比例: cfg.护卫反击伤害攻击力比例,
-      目标最大生命比例: cfg.护卫反击伤害目标最大生命比例,
-    });
-    const 已命中 = 造成单体技能伤害({
+    const 已命中 = 执行Boss单体技能伤害({
       来源: albedo,
       目标: attacker,
-      伤害: damage,
+      伤害公式: {
+        来源攻击力比例: cfg.护卫反击伤害攻击力比例,
+        目标最大生命比例: cfg.护卫反击伤害目标最大生命比例,
+      },
       attack: false,
       ranged: false,
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_NORMAL,
       weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-      来源类型: 'Boss技能',
       标签: '雅儿贝德·护卫反击',
-    });
+    }).是否造成伤害;
     if (已命中) 播放护卫反击命中特效(attacker);
   }
   state.独占状态?.结束(token, '完成');

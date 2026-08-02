@@ -8,7 +8,8 @@ import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放'
 import { 开始冲锋 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统';
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 开始硬直 } from '../../../../00．技能模板+函数/02．通用函数/01．控制与Buff';
-import { 计算组合技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/21．组合技能伤害';
+import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
+import { 创建原生弹幕, 创建直线定点轨迹 } from '../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕';
 
 const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂') as {
   创建技能提示圈: (this: void, config: any) => any;
@@ -16,13 +17,8 @@ const { 创建技能提示圈 } = require('系统.03．技能系统.00．技能�
 const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
 };
-const { 造成AOE技能伤害 } = require('系统.04．伤害系统.08．技能伤害系统') as {
-  造成AOE技能伤害: (this: void, params: any) => boolean;
-};
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
+const { addDelayedCallback, getServerTime } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
 const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
@@ -36,7 +32,6 @@ const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
@@ -55,71 +50,34 @@ const RAD_TO_DEG = 57.29577951308232;
 const 亡冥英斩技能Key = '亡冥英斩';
 
 function 造成亡冥英斩伤害(this: void, source: any, target: any, attackRatio: number, lifeRatio: number, tag: string): void {
-  const damage = 计算组合技能伤害(source, target, { 来源攻击力比例: attackRatio, 目标最大生命比例: lifeRatio });
-  造成AOE技能伤害({ 来源: source, 目标: target, 伤害: damage, attack: false, ranged: false, attackType: ATTACK_TYPE_NORMAL, 伤害类型: DAMAGE_TYPE_NORMAL, weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE, 来源类型: 'Boss技能', 标签: tag });
+  执行BossAOE技能伤害({
+    来源: source,
+    目标: target,
+    伤害公式: { 来源攻击力比例: attackRatio, 目标最大生命比例: lifeRatio },
+    attack: false,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_NORMAL,
+    weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+    标签: tag,
+  });
 }
 
 function 结束亡冥英斩(this: void, context: 亚伦柯斯运行时上下文): void {
   if (context.当前大型技能 === 亡冥英斩技能Key) context.当前大型技能 = undefined;
 }
 
-interface 归魂回斩实例 {
-  context: 亚伦柯斯运行时上下文;
-  特效: any;
-  起点X: number;
-  起点Y: number;
-  终点X: number;
-  终点Y: number;
-  已经过毫秒: number;
-  周期ID: number;
-  已命中表: { [handleId: number]: boolean };
+function 销毁归魂回斩弹幕(this: void, 弹幕: any): void {
+  if (弹幕 != null && 弹幕.销毁 != null) 弹幕.销毁('手动销毁');
 }
 
-function 结束归魂回斩移动(this: void, instance: 归魂回斩实例): void {
-  if (instance.周期ID !== 0) {
-    removePeriodicCallback(instance.周期ID);
-    instance.周期ID = 0;
+function 亚伦柯斯归魂目标允许(this: void, boss: any, target: any): boolean {
+  if (!单位有效(target)) return false;
+  const heroes = 获取Boss技能敌对英雄列表(boss);
+  for (let i = 0; i < heroes.length; i++) {
+    if (heroes[i] === target) return true;
   }
-  结束亡冥英斩(instance.context);
-}
-
-function 结算归魂回斩经过点(this: void, instance: 归魂回斩实例, x: number, y: number): void {
-  const boss = instance.context.Boss单位;
-  const cfg = 亚伦柯斯正式设计配置.亡冥英斩;
-  const hitRadius = cfg.路径宽度 * 0.5;
-  const hitRadiusSquared = hitRadius * hitRadius;
-  const targets = 获取Boss技能敌对英雄列表(boss);
-  for (let i = 0; i < targets.length; i++) {
-    const target = targets[i];
-    const handleId = GetHandleId(target);
-    if (handleId === 0 || instance.已命中表[handleId] === true) continue;
-    const dx = GetUnitX(target) - x;
-    const dy = GetUnitY(target) - y;
-    if (dx * dx + dy * dy > hitRadiusSquared) continue;
-    instance.已命中表[handleId] = true;
-    造成亡冥英斩伤害(boss, target, cfg.P3归魂伤害攻击力比例, cfg.P3归魂伤害目标最大生命比例, '亚伦柯斯·亡冥英斩-归魂回斩');
-  }
-}
-
-function 推进归魂回斩(this: void, instance: 归魂回斩实例): void {
-  const context = instance.context;
-  const boss = context.Boss单位;
-  const cfg = 亚伦柯斯正式设计配置.亡冥英斩;
-  if (!单位有效(boss) || context.战斗已结束 || context.阶段 !== 'P3最后的誓约') {
-    结束归魂回斩移动(instance);
-    return;
-  }
-  instance.已经过毫秒 += cfg.P3归魂Tick毫秒;
-  const rawProgress = instance.已经过毫秒 / (cfg.P3归魂推进秒 * 1000);
-  const progress = rawProgress >= 1 ? 1 : rawProgress;
-  const x = instance.终点X + (instance.起点X - instance.终点X) * progress;
-  const y = instance.终点Y + (instance.起点Y - instance.终点Y) * progress;
-  if (instance.特效 != null && instance.特效 !== 0) {
-    EXSetEffectXY(instance.特效, x, y);
-    EXSetEffectZ(instance.特效, EC_GetPointZ(x, y));
-  }
-  结算归魂回斩经过点(instance, x, y);
-  if (progress >= 1) 结束归魂回斩移动(instance);
+  return false;
 }
 
 function 安排P3归魂回斩(this: void, context: 亚伦柯斯运行时上下文, startX: number, startY: number, endX: number, endY: number, distance: number, reverseFacing: number): void {
@@ -143,30 +101,41 @@ function 安排P3归魂回斩(this: void, context: 亚伦柯斯运行时上下�
     }
     播放限时单位动画({ 单位: boss, 动画编号: cfg.P3归魂动画编号, 持续秒: 1, 恢复动画编号: 1 });
     播放Boss坐标音效(亚伦柯斯正式设计配置.音效.归魂剑痕, endX, endY, 亚伦柯斯正式设计配置.音效默认裁断距离);
-    const effect = AddSpecialEffect(亚伦柯斯正式设计配置.表现资源.归魂剑痕特效路径, endX, endY);
-    if (effect != null && effect !== 0) {
-      EXSetEffectXY(effect, endX, endY);
-      EXSetEffectZ(effect, EC_GetPointZ(endX, endY));
-      EXSetEffectSize(effect, cfg.P3归魂移动特效缩放);
-      EXEffectMatRotateZ(effect, reverseFacing + cfg.P3剑痕朝向修正角度);
-      context.清理.登记限时特效('亚伦柯斯-归魂回斩移动特效', effect, (cfg.P3归魂推进秒 + 0.1) * 1000);
-    }
-    const instance: 归魂回斩实例 = {
-      context,
-      特效: effect,
-      起点X: startX,
-      起点Y: startY,
-      终点X: endX,
-      终点Y: endY,
-      已经过毫秒: 0,
-      周期ID: 0,
-      已命中表: {},
-    };
-    结算归魂回斩经过点(instance, endX, endY);
-    instance.周期ID = addPeriodicCallback(cfg.P3归魂Tick毫秒, function 亚伦柯斯归魂回斩移动Tick(this: void): void {
-      推进归魂回斩(instance);
+    const 弹幕 = 创建原生弹幕({
+      所有者: boss,
+      载体模式: '特效',
+      X: endX,
+      Y: endY,
+      方向角: reverseFacing,
+      速度: distance / cfg.P3归魂推进秒,
+      生命周期: cfg.P3归魂推进秒,
+      最大距离: distance,
+      轨迹采样器: 创建直线定点轨迹(endX, endY, startX, startY),
+      命中半径: cfg.路径宽度 * 0.5,
+      影响目标: '敌方',
+      每单位最大命中次数: 1,
+      碰撞消失: false,
+      禁用碰撞: true,
+      附加特效1: {
+        模型: 亚伦柯斯正式设计配置.表现资源.归魂剑痕特效路径,
+        跟随主弹幕参数: true,
+        缩放X: distance / cfg.P3剑痕模型基准长度,
+        缩放Y: cfg.路径宽度 / cfg.P3剑痕模型基准宽度,
+        缩放Z: 1,
+        朝向角偏移: cfg.P3剑痕朝向修正角度,
+      },
+      目标筛选: function 亚伦柯斯归魂回斩目标筛选(this: void, target: any): boolean {
+        return 亚伦柯斯归魂目标允许(boss, target);
+      },
+      on命中: function 亚伦柯斯归魂回斩命中(this: void, target: any): void {
+        if (!单位有效(target)) return;
+        造成亡冥英斩伤害(boss, target, cfg.P3归魂伤害攻击力比例, cfg.P3归魂伤害目标最大生命比例, '亚伦柯斯·亡冥英斩-归魂回斩');
+      },
+      on结束: function 亚伦柯斯归魂回斩结束(this: void): void {
+        结束亡冥英斩(context);
+      },
     });
-    context.清理.登记周期回调('亚伦柯斯-归魂回斩移动', instance.周期ID);
+    context.清理.登记清理('亚伦柯斯-归魂回斩弹幕', 销毁归魂回斩弹幕, 弹幕);
   });
   context.清理.登记延迟回调('亚伦柯斯-归魂回斩', delayedId);
 }

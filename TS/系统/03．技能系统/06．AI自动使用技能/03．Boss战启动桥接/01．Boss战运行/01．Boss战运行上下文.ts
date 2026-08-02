@@ -11,6 +11,7 @@ export interface Boss战运行上下文 {
   Boss句柄ID: number;
   地点矩形: any;
   地点句柄ID: number;
+  地点矩形是否动态: boolean;
   战斗音乐: any;
   胜利音乐: any;
   运行代次: number;
@@ -56,7 +57,7 @@ function 获取有序句柄ID列表(this: void, table: Record<number, any | unde
   return result;
 }
 
-export function 创建Boss战运行上下文(this: void, bossUnit: any, 地点矩形: any, 战斗音乐: any, 胜利音乐: any): Boss战运行上下文 | undefined {
+export function 创建Boss战运行上下文(this: void, bossUnit: any, 地点矩形: any, 战斗音乐: any, 胜利音乐: any, 地点矩形是否动态 = false): Boss战运行上下文 | undefined {
   const bossHandleId = 获取句柄ID(bossUnit);
   if (bossHandleId === 0) return undefined;
 
@@ -66,6 +67,7 @@ export function 创建Boss战运行上下文(this: void, bossUnit: any, 地点�
     Boss句柄ID: bossHandleId,
     地点矩形,
     地点句柄ID: 获取句柄ID(地点矩形),
+    地点矩形是否动态,
     战斗音乐,
     胜利音乐,
     运行代次: 全局运行代次,
@@ -106,7 +108,11 @@ export function 获取全部Boss战运行上下文(this: void): Boss战运行上
 export function 清理Boss战运行上下文(this: void, bossUnit: any): void {
   const bossHandleId = 获取句柄ID(bossUnit);
   if (bossHandleId === 0) return;
+  const context = 按Boss句柄索引的运行上下文表[bossHandleId];
   按Boss句柄索引的运行上下文表[bossHandleId] = undefined;
+  if (context != null) {
+    清理矩形当前Boss战上下文(context.地点句柄ID, context.运行代次);
+  }
 }
 
 export function 读取矩形当前Boss战上下文(this: void, rectHandleId: number): Boss战运行上下文 | undefined {

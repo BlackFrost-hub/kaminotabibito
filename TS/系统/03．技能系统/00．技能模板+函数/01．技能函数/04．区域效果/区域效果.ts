@@ -21,15 +21,18 @@ const GroupRemoveUnit = jass.GroupRemoveUnit as (whichGroup: any, whichUnit: any
 const DestroyGroup = jass.DestroyGroup as (whichGroup: any) => void;
 const EXSetEffectZ = japi.EXSetEffectZ as (effect: any, z: number) => void;
 const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, size: number) => void;
+const EXSetEffectXY = japi.EXSetEffectXY as (effect: any, x: number, y: number) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
 
 const {
   addPeriodicCallback,
   removePeriodicCallback,
   getServerTime,
 } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
@@ -56,6 +59,7 @@ import type { 技能提示圈配置 } from "../../02．通用函数/16．技能�
 export interface 区域效果参数 {
   X: number;
   Y: number;
+  锚点单位?: any;
   半径: number;
   持续时间: number;
   检测间隔?: number;
@@ -175,12 +179,17 @@ class 区域效果实现 implements 区域效果实例 {
 
     // 提示圈由区域效果统一拥有；调用方手动画圈时必须显式关闭这里，避免重复预警。
     if (参数.提示圈 !== false && 参数.显示提示圈 !== false && 参数.持续时间 > 0) {
-      const 提示圈配置 = 参数.提示圈 ?? {};
+      const 原始提示圈配置 = 参数.提示圈 ?? {};
+      const 提示圈配置 = {
+        ...原始提示圈配置,
+        锚点单位: 原始提示圈配置.锚点单位 ?? 参数.锚点单位,
+      };
+      const 有锚点 = 提示圈配置.锚点单位 != null && 提示圈配置.锚点单位 !== 0;
       this.提示圈特效 = 创建技能提示圈({
         ...提示圈配置,
         类型: 提示圈配置.类型 ?? "渐变圆形",
-        X: 提示圈配置.X ?? this.当前X,
-        Y: 提示圈配置.Y ?? this.当前Y,
+        X: 提示圈配置.X ?? (有锚点 ? undefined : this.当前X),
+        Y: 提示圈配置.Y ?? (有锚点 ? undefined : this.当前Y),
         半径: 提示圈配置.半径 ?? 参数.半径,
         持续时间: 提示圈配置.持续时间 ?? 参数.持续时间,
         来源单位: 提示圈配置.来源单位 ?? 参数.所有者,
@@ -202,8 +211,23 @@ class 区域效果实现 implements 区域效果实例 {
     return this.已暂停值;
   }
 
+  private 刷新锚点位置(): void {
+    const 锚点单位 = this.参数.锚点单位;
+    if (锚点单位 == null || 锚点单位 === 0) return;
+
+    const x = GetUnitX(锚点单位);
+    const y = GetUnitY(锚点单位);
+    this.当前X = x;
+    this.当前Y = y;
+    if (this.特效句柄 != null && this.特效句柄 !== 0) EXSetEffectXY(this.特效句柄, x, y);
+    if (this.提示圈特效 != null && this.提示圈特效 !== 0) EXSetEffectXY(this.提示圈特效, x, y);
+  }
+
   系统Tick(当前时间毫秒: number): void {
     if (this.已暂停值 || this.已销毁值) return;
+
+    // 锚点表现每个区域系统 Tick 更新，检测间隔只控制目标扫描频率。
+    this.刷新锚点位置();
 
     if (this.销毁时间毫秒 > 0 && 当前时间毫秒 >= this.销毁时间毫秒) {
       this.销毁();
@@ -220,6 +244,8 @@ class 区域效果实现 implements 区域效果实例 {
 
   private 执行检测(): void {
     if (this.已暂停值 || this.已销毁值) return;
+
+    this.刷新锚点位置();
 
     const 间隔 = this.检测间隔秒值;
     if (this.参数.持续时间 > 0) {
@@ -365,6 +391,7 @@ class 区域效果实现 implements 区域效果实例 {
 
 let 区域效果实例ID计数器 = 0;
 let 区域效果系统回调ID = 0;
+const 区域效果系统检查间隔毫秒 = 20;
 const 活跃区域效果实例: 区域效果实现[] = [];
 const 区域效果周期伤害去重记录: Record<string, number | undefined> = {};
 
@@ -376,7 +403,7 @@ function 确保区域效果系统已启动(): void {
   if (区域效果系统回调ID !== 0) {
     return;
   }
-  区域效果系统回调ID = addPeriodicCallback(100, 区域效果系统Tick);
+  区域效果系统回调ID = addPeriodicCallback(区域效果系统检查间隔毫秒, 区域效果系统Tick);
 }
 
 function 注册区域效果实例(实例: 区域效果实现): void {

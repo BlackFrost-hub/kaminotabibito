@@ -4,17 +4,15 @@ import { 卡瑟拉单位技能配置 } from "./00．配置";
 import { 获取或创建卡瑟拉上下文, type 卡瑟拉运行时上下文 } from "./01．运行时上下文";
 import { 卡瑟拉数值与表现配置, 卡瑟拉音效配置 } from "./02．数值与表现配置";
 import { 播放卡瑟拉台词 } from "./11．台词播放";
-import { 单位有效, stringToFourCC, 取单位间角度, 取坐标角度, 距离XY, 角度差, 极坐标X, 极坐标Y, 播放卡瑟拉限时动作 } from "./14．公共工具";
+import { 单位有效, stringToFourCC, 取单位间角度, 取坐标角度, 距离平方XY, 角度差, 极坐标X, 极坐标Y } from "./14．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import {
   创建二阶贝塞尔XYZ轨迹,
   创建原生弹幕,
 } from "../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕/index";
-import { 立即设置单位朝向 } from "../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
-};
+import { 创建限次周期执行器, type 限次周期执行器实例 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
+import { 提交预计算BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -30,19 +28,12 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const { 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
-};
+
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
 };
-const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
-  开始硬直: (this: void, 单位: any, 持续时间: number) => void;
-};
-const { 显示常规技能吟唱条 } = require("系统.09．表现系统.08．吟唱条.06．对外接口") as {
-  显示常规技能吟唱条: (this: void, 参数: any) => void;
+const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
+  启动基础施法时间线: (this: void, 参数: any) => any;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
@@ -73,7 +64,7 @@ interface 墨汁区域 {
   起点Y: number;
   方向角: number;
   剩余跳数: number;
-  周期ID: number;
+  周期?: 限次周期执行器实例;
   是否喷吐阶段: boolean;
   地面残留X: number;
   地面残留Y: number;
@@ -97,11 +88,16 @@ function 播放墨汁地面特效(this: void, context: 卡瑟拉运行时上下�
   context.清理.登记限时特效("卡瑟拉-墨汁地面残留", effect, cfg.残留秒 * 1000);
 }
 
-function 单位在墨汁扇形内(this: void, unit: any, area: 墨汁区域): boolean {
+function 单位在墨汁区域内(this: void, unit: any, area: 墨汁区域): boolean {
   const cfg = 卡瑟拉数值与表现配置.墨汁喷吐;
   const ux = GetUnitX(unit);
   const uy = GetUnitY(unit);
-  if (距离XY(ux, uy, area.起点X, area.起点Y) > cfg.扇形半径) return false;
+  if (!area.是否喷吐阶段) {
+    const 残留半径平方 = cfg.残留半径 * cfg.残留半径;
+    return 距离平方XY(ux, uy, area.地面残留X, area.地面残留Y) <= 残留半径平方;
+  }
+  const 扇形半径平方 = cfg.扇形半径 * cfg.扇形半径;
+  if (距离平方XY(ux, uy, area.起点X, area.起点Y) > 扇形半径平方) return false;
   const angle = 取坐标角度(area.起点X, area.起点Y, ux, uy);
   return 角度差(angle, area.方向角) <= cfg.扇形角度 * 0.5;
 }
@@ -169,10 +165,10 @@ function 结算墨汁区域伤害(this: void, area: 墨汁区域): void {
   }
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
-    if (!单位有效(hero) || !单位在墨汁扇形内(hero, area)) continue;
+    if (!单位有效(hero) || !单位在墨汁区域内(hero, area)) continue;
     const resisted = 满足属性抗性门槛(hero, "水", cfg.水抗门槛, true);
     const factor = resisted ? cfg.达标效果倍率 : 1;
-    造成AOE技能伤害({
+    提交预计算BossAOE技能伤害({
       技能ID: 墨汁喷吐技能ID,
       来源: boss,
       目标: hero,
@@ -182,7 +178,7 @@ function 结算墨汁区域伤害(this: void, area: 墨汁区域): void {
       attackType: ATTACK_TYPE_NORMAL,
       伤害类型: DAMAGE_TYPE_COLD,
       weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "Boss技能",
+      标签: "卡瑟拉墨汁喷吐",
     });
     施加快速控制Buff(boss, hero, 2, cfg.tick秒 * factor);
     registerManualBuff(hero, 卡瑟拉BuffID.墨汁遮蔽, cfg.tick秒 + 0.2, factor, { sourceName: "卡瑟拉-墨汁遮蔽" });
@@ -201,27 +197,46 @@ function 结算墨汁区域伤害(this: void, area: 墨汁区域): void {
   }
 }
 
+function 取墨汁区域后续执行次数(this: void, 总执行次数: number): number {
+  const 后续执行次数 = 总执行次数 - 1;
+  return 后续执行次数 > 0 ? 后续执行次数 : 0;
+}
+
+function 启动墨汁区域周期(this: void, area: 墨汁区域, 名称: string): 限次周期执行器实例 {
+  const cfg = 卡瑟拉数值与表现配置.墨汁喷吐;
+  const 喷吐阶段 = area.是否喷吐阶段;
+  const 总执行次数 = 喷吐阶段 ? cfg.持续秒 / 0.1 : cfg.残留秒 / cfg.tick秒;
+  const 周期间隔毫秒 = 喷吐阶段 ? 0.1 * 1000 : cfg.tick秒 * 1000;
+  return 创建限次周期执行器<墨汁区域>({
+    名称,
+    间隔毫秒: 周期间隔毫秒,
+    最大执行次数: 取墨汁区域后续执行次数(总执行次数),
+    变量: area,
+    清理: area.context.清理,
+    onTick: function 卡瑟拉墨汁区域周期(this: void, _执行次数: number, variable?: 墨汁区域): boolean {
+      return variable != null && 结算墨汁区域一跳(variable);
+    },
+  });
+}
+
 function 开始墨汁残留区域(this: void, area: 墨汁区域): void {
   const cfg = 卡瑟拉数值与表现配置.墨汁喷吐;
   播放墨汁地面特效(area.context, area.地面残留X, area.地面残留Y);
   area.是否喷吐阶段 = false;
   area.剩余跳数 = cfg.残留秒 / cfg.tick秒;
-  area.周期ID = addPeriodicCallback(cfg.tick秒 * 1000, function 卡瑟拉墨汁残留周期(this: void): void {
-    结算墨汁区域一跳(area);
-  });
-  area.context.清理.登记周期回调("卡瑟拉-墨汁残留周期", area.周期ID);
-  结算墨汁区域一跳(area);
+  const 周期 = 启动墨汁区域周期(area, "卡瑟拉-墨汁残留周期");
+  area.周期 = 周期;
+  const 继续执行 = 结算墨汁区域一跳(area);
+  if (!继续执行 && area.周期 === 周期) 周期.停止();
 }
 
-function 结算墨汁区域一跳(this: void, area: 墨汁区域): void {
+function 结算墨汁区域一跳(this: void, area: 墨汁区域): boolean {
   const boss = area.context.Boss单位;
   if (!单位有效(boss) || area.剩余跳数 <= 0) {
-    if (area.周期ID !== 0) {
-      removePeriodicCallback(area.周期ID);
-      area.周期ID = 0;
+    if (area.是否喷吐阶段) {
+      开始墨汁残留区域(area);
     }
-    if (area.是否喷吐阶段) 开始墨汁残留区域(area);
-    return;
+    return false;
   }
   area.剩余跳数 = area.剩余跳数 - 1;
   if (area.是否喷吐阶段) {
@@ -229,12 +244,10 @@ function 结算墨汁区域一跳(this: void, area: 墨汁区域): void {
   }
   结算墨汁区域伤害(area);
   if (area.剩余跳数 <= 0 && area.是否喷吐阶段) {
-    if (area.周期ID !== 0) {
-      removePeriodicCallback(area.周期ID);
-      area.周期ID = 0;
-    }
     开始墨汁残留区域(area);
+    return false;
   }
+  return true;
 }
 
 function 开始墨汁喷吐区域(this: void, context: 卡瑟拉运行时上下文, x: number, y: number, angle: number, groundX: number, groundY: number): void {
@@ -245,16 +258,15 @@ function 开始墨汁喷吐区域(this: void, context: 卡瑟拉运行时上下�
     起点Y: y,
     方向角: angle,
     剩余跳数: cfg.持续秒 / 0.1,
-    周期ID: 0,
+    周期: undefined,
     是否喷吐阶段: true,
     地面残留X: groundX,
     地面残留Y: groundY,
   };
-  area.周期ID = addPeriodicCallback(0.1 * 1000, function 卡瑟拉墨汁喷吐周期(this: void): void {
-    结算墨汁区域一跳(area);
-  });
-  context.清理.登记周期回调("卡瑟拉-墨汁喷吐周期", area.周期ID);
-  结算墨汁区域一跳(area);
+  const 周期 = 启动墨汁区域周期(area, "卡瑟拉-墨汁喷吐周期");
+  area.周期 = 周期;
+  const 继续执行 = 结算墨汁区域一跳(area);
+  if (!继续执行 && area.周期 === 周期) 周期.停止();
 }
 
 export function 释放卡瑟拉墨汁喷吐(this: void, context: 卡瑟拉运行时上下文): void {
@@ -263,29 +275,19 @@ export function 释放卡瑟拉墨汁喷吐(this: void, context: 卡瑟拉运行
   const target = 取墨汁喷吐目标(boss);
   if (!单位有效(target)) return;
   const cfg = 卡瑟拉数值与表现配置.墨汁喷吐;
-  开始硬直(boss, cfg.持续秒);
-  显示常规技能吟唱条({
-    总时长: cfg.持续秒,
-    颜色ID: cfg.吟唱条颜色ID,
-    标题文本: cfg.吟唱条标题文本,
-    提示文本: cfg.吟唱条提示文本,
-  });
-  播放卡瑟拉限时动作(boss, cfg.动画编号, cfg.动画速度, cfg.持续秒);
   const bx = GetUnitX(boss);
   const by = GetUnitY(boss);
-  let angle = 取单位间角度(boss, target);
-  // 锁定 Boss 面向对准喷吐方向
-  立即设置单位朝向(boss, angle);
+  const targetX = GetUnitX(target);
+  const targetY = GetUnitY(target);
+  const angle = 取单位间角度(boss, target);
   const effectX = 极坐标X(bx, angle, cfg.扇形半径 * 0.45);
   const effectY = 极坐标Y(by, angle, cfg.扇形半径 * 0.45);
-  播放卡瑟拉台词(boss, "墨汁喷吐");
-  播放Boss坐标音效(卡瑟拉音效配置.墨汁喷吐.主段, bx, by, 卡瑟拉音效配置.默认裁断距离);
   创建技能提示圈({
     类型: "扇形",
     X: bx,
     Y: by,
     半径: cfg.扇形半径,
-    角度: cfg.扇形角度,
+    扇形角度: cfg.扇形角度,
     朝向: angle,
     持续时间: cfg.持续秒,
     来源单位: boss,
@@ -293,6 +295,32 @@ export function 释放卡瑟拉墨汁喷吐(this: void, context: 卡瑟拉运行
   // 喷吐阶段开始时播放第一滴墨汁残留
   播放墨汁地面特效(context, effectX, effectY);
   开始墨汁喷吐区域(context, bx, by, angle, effectX, effectY);
+  启动基础施法时间线({
+    名称: "卡瑟拉-墨汁喷吐",
+    施法者: boss,
+    目标X: targetX,
+    目标Y: targetY,
+    生效前重新面向: false,
+    硬直秒: cfg.持续秒,
+    动画编号: cfg.动画编号,
+    动画速度: cfg.动画速度,
+    恢复动画编号: 5,
+    吟唱条: {
+      通道: "常规技能",
+      总时长: cfg.持续秒,
+      颜色ID: cfg.吟唱条颜色ID,
+      标题文本: cfg.吟唱条标题文本,
+      提示文本: cfg.吟唱条提示文本,
+    },
+    清理: context.清理,
+    播放台词: function 卡瑟拉墨汁喷吐开始提示(this: void): void {
+      播放卡瑟拉台词(boss, "墨汁喷吐");
+      播放Boss坐标音效(卡瑟拉音效配置.墨汁喷吐.主段, bx, by, 卡瑟拉音效配置.默认裁断距离);
+    },
+    on生效: function 卡瑟拉墨汁喷吐通道结束(this: void): void {
+      // 喷吐区域从施法开始运行，时间线生效点只负责结束硬直与吟唱。
+    },
+  });
 }
 
 function on卡瑟拉墨汁喷吐施法(this: void, castingUnit: any, spellAbilityId: number): void {

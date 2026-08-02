@@ -17,3 +17,4 @@ export * from "./18．技能互斥锁";
 export * from "./19．可抢占独占状态";
 export * from "./20．联合战斗成员生命周期";
 export * from "./21．不同技能序列状态";
+export * from "./22．限次周期执行器";

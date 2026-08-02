@@ -24,6 +24,8 @@ local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统
 local _____521B_5EFA_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5217_8868 = ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382["创建固定时间轴阶段列表"]
 local ____03_FF0E_5BF9_5916_63A5_53E3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____03_FF0E_5BF9_5916_63A5_53E3["创建原生弹幕"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_0["获取Boss技能敌对英雄列表"]
 local ____require_result_1 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
@@ -34,18 +36,15 @@ local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
 local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_4["造成AOE技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_4["创建独立技能伤害实例"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local GetUnitStateJapi = japi.GetUnitState
 local AddSpecialEffect = jass.AddSpecialEffect
 local GetHandleId = jass.GetHandleId
 local DestroyEffect = jass.DestroyEffect
 local EXSetEffectSize = japi.EXSetEffectSize
 local EXSetEffectZ = japi.EXSetEffectZ
 local EXEffectMatRotateZ = japi.EXEffectMatRotateZ
-local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____6C61_67D3_8109_51B2_5F39_5E55_98DE_884C_79D2 = 0.5
 local _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_4E0A_4E0B_6587_8868 = {}
@@ -131,16 +130,16 @@ local function _____7C73_4E9A_6C61_67D3_8109_51B2_5F39_5E55_547D_4E2D(target, __
         return
     end
     local config = _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["污染脉冲"]
-    local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
-    local damage = maxLife * config["每波最大生命伤害比例"] * _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target)
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
         ["来源"] = boss,
         ["目标"] = target,
-        ["伤害"] = damage,
+        ["伤害公式"] = {
+            ["目标最大生命比例"] = config["每波最大生命伤害比例"],
+            ["总倍率"] = _____53D6_7C73_4E9A_5E73_53F0_8D85_8F7D_4F24_5BB3_500D_7387(target)
+        },
         attackType = jass.ATTACK_TYPE_NORMAL,
         ["伤害类型"] = jass.DAMAGE_TYPE_POISON,
         weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能",
         ["技能实例ID"] = _____5F39_5E55_4E0A_4E0B_6587["技能实例ID"],
         ["标签"] = "米亚污染脉冲"
     })

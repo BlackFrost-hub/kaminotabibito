@@ -6,14 +6,14 @@ local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local _____53D6_53E5_67C4ID, _____8BA1_7B97_5750_6807_8DDD_79BB, _____53D6_8F83_5C0F_503C, _____53D6_8F83_5927_503C, _____53D6_6247_5F62_63D0_793A_5708_5C3A_5BF8, _____786E_4FDD_52A8_6001_6247_5F62_7CFB_7EDF_5DF2_542F_52A8, _____6CE8_518C_52A8_6001_6247_5F62_5B9E_4F8B, _____6CE8_9500_52A8_6001_6247_5F62_5B9E_4F8B, _____52A8_6001_6247_5F62_7CFB_7EDFTick, jass, GetHandleId, addPeriodicCallback, removePeriodicCallback, getServerTime, _____52A8_6001_6247_5F62_5B9E_4F8BID_8BA1_6570_5668, _____52A8_6001_6247_5F62_7CFB_7EDF_56DE_8C03ID, _____6D3B_8DC3_52A8_6001_6247_5F62_5B9E_4F8B
+local _____53D6_53E5_67C4ID, _____8BA1_7B97_5750_6807_8DDD_79BB, _____53D6_8F83_5C0F_503C, _____53D6_8F83_5927_503C, _____53D6_6247_5F62_63D0_793A_5708_5C3A_5BF8, _____786E_4FDD_52A8_6001_6247_5F62_7CFB_7EDF_5DF2_542F_52A8, _____6CE8_518C_52A8_6001_6247_5F62_5B9E_4F8B, _____6CE8_9500_52A8_6001_6247_5F62_5B9E_4F8B, _____52A8_6001_6247_5F62_7CFB_7EDFTick, GetHandleId, SquareRoot, addPeriodicCallback, removePeriodicCallback, getServerTime, _____52A8_6001_6247_5F62_5B9E_4F8BID_8BA1_6570_5668, _____52A8_6001_6247_5F62_7CFB_7EDF_56DE_8C03ID, _____52A8_6001_6247_5F62_7CFB_7EDF_68C0_67E5_95F4_9694_6BEB_79D2, _____6D3B_8DC3_52A8_6001_6247_5F62_5B9E_4F8B
 function _____53D6_53E5_67C4ID(h)
     return h ~= nil and h ~= 0 and GetHandleId(h) or 0 or 0
 end
 function _____8BA1_7B97_5750_6807_8DDD_79BB(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
-    return jass.SquareRoot(dx * dx + dy * dy)
+    return SquareRoot(dx * dx + dy * dy)
 end
 function _____53D6_8F83_5C0F_503C(a, b)
     return a < b and a or b
@@ -31,7 +31,7 @@ function _____786E_4FDD_52A8_6001_6247_5F62_7CFB_7EDF_5DF2_542F_52A8()
     if _____52A8_6001_6247_5F62_7CFB_7EDF_56DE_8C03ID ~= 0 then
         return
     end
-    _____52A8_6001_6247_5F62_7CFB_7EDF_56DE_8C03ID = addPeriodicCallback(100, _____52A8_6001_6247_5F62_7CFB_7EDFTick)
+    _____52A8_6001_6247_5F62_7CFB_7EDF_56DE_8C03ID = addPeriodicCallback(_____52A8_6001_6247_5F62_7CFB_7EDF_68C0_67E5_95F4_9694_6BEB_79D2, _____52A8_6001_6247_5F62_7CFB_7EDFTick)
 end
 function _____6CE8_518C_52A8_6001_6247_5F62_5B9E_4F8B(_____5B9E_4F8B)
     _____6D3B_8DC3_52A8_6001_6247_5F62_5B9E_4F8B[#_____6D3B_8DC3_52A8_6001_6247_5F62_5B9E_4F8B + 1] = _____5B9E_4F8B
@@ -58,13 +58,17 @@ function _____52A8_6001_6247_5F62_7CFB_7EDFTick()
         end
     end
 end
-jass = require("jass.common")
+--- 形状区域 - 动态扇形
+-- 支持扇形波前按时间推进。
+-- 默认模式为“每 0.02 秒只命中新扫到的那一圈”，也就是由近到远扫过去。
+local jass = require("jass.common")
 local japi = require("jass.japi")
 local AddSpecialEffect = jass.AddSpecialEffect
 local DestroyEffect = jass.DestroyEffect
 GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+SquareRoot = jass.SquareRoot
 local EXSetEffectZ = japi.EXSetEffectZ
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
@@ -125,7 +129,9 @@ function _____52A8_6001_6247_5F62_5B9E_73B0.prototype.____constructor(self, ____
             self["当前Y"],
             _____53C2_6570["方向角"],
             _____53D6_6247_5F62_63D0_793A_5708_5C3A_5BF8(self["当前半径值"]),
-            1 / _____53C2_6570["变化时间"]
+            1 / _____53C2_6570["变化时间"],
+            nil,
+            _____53C2_6570["扇形角度"]
         )
     end
     _____6CE8_518C_52A8_6001_6247_5F62_5B9E_4F8B(self)
@@ -314,6 +320,7 @@ __TS__SetDescriptor(
 )
 _____52A8_6001_6247_5F62_5B9E_4F8BID_8BA1_6570_5668 = 0
 _____52A8_6001_6247_5F62_7CFB_7EDF_56DE_8C03ID = 0
+_____52A8_6001_6247_5F62_7CFB_7EDF_68C0_67E5_95F4_9694_6BEB_79D2 = 20
 _____6D3B_8DC3_52A8_6001_6247_5F62_5B9E_4F8B = {}
 ____exports["创建动态扇形"] = function(_____53C2_6570)
     return __TS__New(_____52A8_6001_6247_5F62_5B9E_73B0, _____53C2_6570)

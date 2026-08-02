@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____64AD_653E_6269_6563_51B2_51FB_6CE2_84C4_529B_7279_6548, _____64AD_653E_6269_6563_51B2_51FB_6CE2_547D_4E2D_7279_6548, _____7ED3_675F_6269_6563_51B2_51FB_6CE2_98DE_884C_72B6_6001, _____6E05_7406_6269_6563_51B2_51FB_6CE2_98DE_884C_72B6_6001, ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_5F39_5E55_547D_4E2D, ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_5F39_5E55_7ED3_675F, _____65BD_52A0_53E4_6811_8870_5F31, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____6267_884C_6269_6563_51B2_51FB_6CE2, ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_751F_6548, _____9020_6210AOE_6280_80FD_4F24_5BB3, _____521B_5EFA_6280_80FD_4F24_5BB3_5B9E_4F8B, _____7ED3_675F_6280_80FD_4F24_5BB3_5B9E_4F8B, GetUnitTypeId, GetUnitX, GetUnitY, GetHandleId, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_539F_751F_5F39_5E55, _____9500_6BC1_539F_751F_5F39_5E55, registerManualBuff, _____6811_9B54_9996_9886BuffID, _____521B_5EFA_70B9_7279_6548, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6269_6563_51B2_51FB_6CE2_6280_80FDID, _____6269_6563_51B2_51FB_6CE2_5F39_5E55_72B6_6001_8868
+local _____64AD_653E_6269_6563_51B2_51FB_6CE2_84C4_529B_7279_6548, _____64AD_653E_6269_6563_51B2_51FB_6CE2_547D_4E2D_7279_6548, _____7ED3_675F_6269_6563_51B2_51FB_6CE2_98DE_884C_72B6_6001, _____6E05_7406_6269_6563_51B2_51FB_6CE2_98DE_884C_72B6_6001, ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_5F39_5E55_547D_4E2D, ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_5F39_5E55_7ED3_675F, _____65BD_52A0_53E4_6811_8870_5F31, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_5173_952E_602A_53EB, _____6267_884C_6269_6563_51B2_51FB_6CE2, ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_751F_6548, _____521B_5EFA_6280_80FD_4F24_5BB3_5B9E_4F8B, _____7ED3_675F_6280_80FD_4F24_5BB3_5B9E_4F8B, GetUnitTypeId, GetUnitX, GetUnitY, GetHandleId, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_PLANT, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____521B_5EFA_539F_751F_5F39_5E55, _____9500_6BC1_539F_751F_5F39_5E55, registerManualBuff, _____6811_9B54_9996_9886BuffID, _____521B_5EFA_70B9_7279_6548, _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID, _____6269_6563_51B2_51FB_6CE2_6280_80FDID, _____6269_6563_51B2_51FB_6CE2_5F39_5E55_72B6_6001_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -19,6 +19,10 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.11．条件伤害修正")
+local _____521B_5EFA_6761_4EF6_4F24_5BB3_4FEE_6B63 = ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63["创建条件伤害修正"]
 function _____64AD_653E_6269_6563_51B2_51FB_6CE2_84C4_529B_7279_6548(boss)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["扩散冲击波"]
     _____521B_5EFA_70B9_7279_6548({
@@ -87,18 +91,17 @@ function ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_5F39_5E55_547D_4E2D
     end
     state["已命中目标"][targetID] = true
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["扩散冲击波"]
-    _____9020_6210AOE_6280_80FD_4F24_5BB3({
+    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
         ["技能ID"] = _____6269_6563_51B2_51FB_6CE2_6280_80FDID,
         ["技能实例ID"] = state["技能实例ID"],
         ["来源"] = boss,
         ["目标"] = target,
-        ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["Boss攻击力比例"],
+        ["伤害公式"] = {["来源攻击力比例"] = cfg["Boss攻击力比例"]},
         attack = false,
         ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_PLANT,
-        weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能"
+        weaponType = WEAPON_TYPE_WHOKNOWS
     })
     _____65BD_52A0_53E4_6811_8870_5F31(target)
 end
@@ -191,8 +194,8 @@ function _____6267_884C_6269_6563_51B2_51FB_6CE2(context)
                 if _____5F39_5E55 == nil or _____5F39_5E55["弹幕ID"] == nil or _____5F39_5E55["弹幕ID"] <= 0 then
                     goto __continue23
                 end
-                local ____state__5F39_5E55ID_5217_8868_9 = state["弹幕ID列表"]
-                ____state__5F39_5E55ID_5217_8868_9[#____state__5F39_5E55ID_5217_8868_9 + 1] = _____5F39_5E55["弹幕ID"]
+                local ____state__5F39_5E55ID_5217_8868_7 = state["弹幕ID列表"]
+                ____state__5F39_5E55ID_5217_8868_7[#____state__5F39_5E55ID_5217_8868_7 + 1] = _____5F39_5E55["弹幕ID"]
                 state["剩余弹幕数"] = state["剩余弹幕数"] + 1
                 _____6269_6563_51B2_51FB_6CE2_5F39_5E55_72B6_6001_8868[_____5F39_5E55["弹幕ID"]] = state
             end
@@ -204,8 +207,8 @@ function _____6267_884C_6269_6563_51B2_51FB_6CE2(context)
         _____7ED3_675F_6269_6563_51B2_51FB_6CE2_98DE_884C_72B6_6001(state)
         return
     end
-    local ____self_10 = context["清理"]
-    ____self_10["登记清理"](____self_10, "树魔首领-扩散冲击波弹幕", _____6E05_7406_6269_6563_51B2_51FB_6CE2_98DE_884C_72B6_6001, state)
+    local ____self_8 = context["清理"]
+    ____self_8["登记清理"](____self_8, "树魔首领-扩散冲击波弹幕", _____6E05_7406_6269_6563_51B2_51FB_6CE2_98DE_884C_72B6_6001, state)
 end
 ____exports["释放树魔首领扩散冲击波"] = function(context)
     local boss = context["Boss单位"]
@@ -252,7 +255,6 @@ function ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_751F_6548(castingUn
     ____exports["释放树魔首领扩散冲击波"](context)
 end
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_0["造成AOE技能伤害"]
 _____521B_5EFA_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["创建技能伤害实例"]
 _____7ED3_675F_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["结束技能伤害实例"]
 local jass = require("jass.common")
@@ -265,24 +267,20 @@ local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
-_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
-_____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_4["创建原生弹幕"]
-_____9500_6BC1_539F_751F_5F39_5E55 = ____require_result_4["销毁原生弹幕"]
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_5.registerManualBuff
-local getBuffRuntime = ____require_result_5.getBuffRuntime
-local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领")
-_____6811_9B54_9996_9886BuffID = ____require_result_6["树魔首领BuffID"]
-local ____require_result_7 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_7.registerDamageModifier
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+_____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
+_____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_2["创建技能提示圈"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+_____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_3["创建原生弹幕"]
+_____9500_6BC1_539F_751F_5F39_5E55 = ____require_result_3["销毁原生弹幕"]
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_4.registerManualBuff
+local getBuffRuntime = ____require_result_4.getBuffRuntime
+local ____require_result_5 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.04．树魔首领")
+_____6811_9B54_9996_9886BuffID = ____require_result_5["树魔首领BuffID"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____6269_6563_51B2_51FB_6CE2_6280_80FDID = stringToFourCC(_____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["扩散冲击波"]["技能槽位"])
 local _____6269_6563_51B2_51FB_6CE2_5DF2_6CE8_518C = false
@@ -298,6 +296,12 @@ local function _____53E4_6811_8870_5F31_4F24_5BB3_4FEE_6B63(damageContext)
     local reduce = runtime.effect > 0 and runtime.effect or _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["扩散冲击波"]["攻击降低比例"]
     return damageContext.currentDamage * (1 - reduce)
 end
+local function _____6EE1_8DB3_53E4_6811_8870_5F31_4F24_5BB3_6761_4EF6(damageContext)
+    if damageContext == nil or damageContext.isNormalAttack ~= true then
+        return false
+    end
+    return getBuffRuntime(damageContext.attacker, _____6811_9B54_9996_9886BuffID["古树衰弱"]) ~= nil
+end
 ____exports["注册树魔首领扩散冲击波"] = function()
     if _____6269_6563_51B2_51FB_6CE2_5DF2_6CE8_518C then
         return
@@ -312,6 +316,6 @@ ____exports["注册树魔首领扩散冲击波"] = function()
             ____on_6811_9B54_9996_9886_6269_6563_51B2_51FB_6CE2_751F_6548(boss, _____6269_6563_51B2_51FB_6CE2_6280_80FDID)
         end
     })
-    registerDamageModifier(_____53E4_6811_8870_5F31_4F24_5BB3_4FEE_6B63, 35)
+    _____521B_5EFA_6761_4EF6_4F24_5BB3_4FEE_6B63({["名称"] = "树魔首领古树衰弱普攻降伤", ["优先级"] = 35, ["条件"] = _____6EE1_8DB3_53E4_6811_8870_5F31_4F24_5BB3_6761_4EF6, ["修正"] = _____53E4_6811_8870_5F31_4F24_5BB3_4FEE_6B63})
 end
 return ____exports

@@ -4,6 +4,8 @@ local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行Boss单体技能伤害"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["巴尔扎罗斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
@@ -16,26 +18,22 @@ local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_65
 local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
 local _____521B_5EFA_9501_5B9A_5355_4F4D_4E8C_9636_8D1D_585E_5C14XYZ_8F68_8FF9 = ____01_FF0ETS_539F_751F_5F39_5E55["创建锁定单位二阶贝塞尔XYZ轨迹"]
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
-local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.21．组合技能伤害")
-local _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3 = ____require_result_0["计算组合技能伤害"]
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
-local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____require_result_1["播放限时单位动画"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.index")
-local _____521B_5EFA_8840_91CF_8282_70B9_89E6_53D1_5668 = ____require_result_2["创建血量节点触发器"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾")
-local _____5F00_59CB_62A4_76FE = ____require_result_3["开始护盾"]
-local _____62A4_76FE_7C7B_578B = ____require_result_3["护盾类型"]
-local _____67E5_8BE2_5355_4F4D_6807_7B7E_62A4_76FE_503C = ____require_result_3["查询单位标签护盾值"]
-local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_4.registerDamageModifier
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_5.registerManualBuff
-local getBuffRuntime = ____require_result_5.getBuffRuntime
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_5["移除单位指定Buff"]
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_6.getServerTime
-local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_7["造成单体技能伤害"]
+local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
+local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____require_result_0["播放限时单位动画"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.index")
+local _____521B_5EFA_8840_91CF_8282_70B9_89E6_53D1_5668 = ____require_result_1["创建血量节点触发器"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾")
+local _____5F00_59CB_62A4_76FE = ____require_result_2["开始护盾"]
+local _____62A4_76FE_7C7B_578B = ____require_result_2["护盾类型"]
+local _____67E5_8BE2_5355_4F4D_6807_7B7E_62A4_76FE_503C = ____require_result_2["查询单位标签护盾值"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_3.registerDamageModifier
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_4.registerManualBuff
+local getBuffRuntime = ____require_result_4.getBuffRuntime
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_4["移除单位指定Buff"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_5.getServerTime
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -77,30 +75,30 @@ local function _____79FB_9664_4E00_5C42_7194_5CA9_66B4_8D70(boss)
     if runtime == nil then
         return
     end
-    local ____runtime_stack_8 = runtime.stack
-    if ____runtime_stack_8 == nil then
-        ____runtime_stack_8 = 1
+    local ____runtime_stack_6 = runtime.stack
+    if ____runtime_stack_6 == nil then
+        ____runtime_stack_6 = 1
     end
-    local stack = ____runtime_stack_8
+    local stack = ____runtime_stack_6
     if stack <= 1 then
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(boss, buffID)
         return
     end
-    local ____registerManualBuff_12 = registerManualBuff
-    local ____boss_11 = boss
-    local ____runtime_remaining_9 = runtime.remaining
-    if ____runtime_remaining_9 == nil then
-        ____runtime_remaining_9 = 10
+    local ____registerManualBuff_10 = registerManualBuff
+    local ____boss_9 = boss
+    local ____runtime_remaining_7 = runtime.remaining
+    if ____runtime_remaining_7 == nil then
+        ____runtime_remaining_7 = 10
     end
-    local ____runtime_effect_10 = runtime.effect
-    if ____runtime_effect_10 == nil then
-        ____runtime_effect_10 = 0
+    local ____runtime_effect_8 = runtime.effect
+    if ____runtime_effect_8 == nil then
+        ____runtime_effect_8 = 0
     end
-    ____registerManualBuff_12(
-        ____boss_11,
+    ____registerManualBuff_10(
+        ____boss_9,
         buffID,
-        ____runtime_remaining_9,
-        ____runtime_effect_10,
+        ____runtime_remaining_7,
+        ____runtime_effect_8,
         {stack = stack - 1, sourceName = "巴尔扎罗斯"}
     )
 end
@@ -157,10 +155,6 @@ ____exports["释放巴尔扎罗斯熔岩护盾"] = function(context)
         }
     )
 end
-local function _____8BA1_7B97_53CD_5F39_4F24_5BB3(boss, attacker)
-    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩护盾"]
-    return _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(boss, attacker, {["来源攻击力比例"] = config["近战反弹Boss攻击力比例"], ["目标最大生命比例"] = config["近战反弹来源最大生命比例"]})
-end
 local function ____on_7194_5CA9_62A4_76FE_53CD_5F39_5F39_5E55_7ED3_675F(_____539F_56E0, _____5F39_5E55ID)
     if _____539F_56E0 == "完成" or _____539F_56E0 == "距离结束" then
         return
@@ -173,16 +167,16 @@ local function ____on_7194_5CA9_62A4_76FE_53CD_5F39_5F39_5E55_5230_8FBE(_____5F3
     if state == nil or not _____5355_4F4D_6709_6548(state["Boss单位"]) or not _____5355_4F4D_6709_6548(state["攻击单位"]) then
         return
     end
-    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+    local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩护盾"]
+    _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = state["Boss单位"],
         ["目标"] = state["攻击单位"],
-        ["伤害"] = _____8BA1_7B97_53CD_5F39_4F24_5BB3(state["Boss单位"], state["攻击单位"]),
+        ["伤害公式"] = {["来源攻击力比例"] = config["近战反弹Boss攻击力比例"], ["目标最大生命比例"] = config["近战反弹来源最大生命比例"]},
         attack = false,
         ranged = true,
         attackType = ATTACK_TYPE_NORMAL,
         ["伤害类型"] = DAMAGE_TYPE_FIRE,
-        weaponType = WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能"
+        weaponType = WEAPON_TYPE_WHOKNOWS
     })
 end
 local function _____53D1_5C04_7194_5CA9_62A4_76FE_53CD_5F39_5F39_5E55(boss, attacker)

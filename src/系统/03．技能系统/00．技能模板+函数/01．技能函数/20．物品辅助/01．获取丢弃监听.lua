@@ -86,12 +86,24 @@ local function _____5206_53D1_6307_5B9A_7269_54C1_53D8_5316(unit, item, itemType
                 if isPickup then
                     local ____opt_4 = listener["获取回调"]
                     if ____opt_4 ~= nil then
-                        ____opt_4(unit, item, currentCount, previousCount)
+                        ____opt_4(
+                            unit,
+                            item,
+                            currentCount,
+                            previousCount,
+                            listener["变量"]
+                        )
                     end
                 else
                     local ____opt_6 = listener["丢弃回调"]
                     if ____opt_6 ~= nil then
-                        ____opt_6(unit, item, currentCount, previousCount)
+                        ____opt_6(
+                            unit,
+                            item,
+                            currentCount,
+                            previousCount,
+                            listener["变量"]
+                        )
                     end
                 end
             end
@@ -144,21 +156,18 @@ local function _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, isP
         )
     end
 end
+local function ____on_5EF6_8FDF_540C_6B65_7269_54C1_53D8_5316(variable)
+    local _____4E0A_4E0B_6587 = variable
+    if _____4E0A_4E0B_6587 == nil then
+        return
+    end
+    _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(_____4E0A_4E0B_6587["单位"], _____4E0A_4E0B_6587["物品"], _____4E0A_4E0B_6587["是否获取"])
+end
 local function ____on_7269_54C1_83B7_53D6_76D1_542C(unit, item)
-    addDelayedCallback(
-        10,
-        function()
-            _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, true)
-        end
-    )
+    addDelayedCallback(10, ____on_5EF6_8FDF_540C_6B65_7269_54C1_53D8_5316, {["单位"] = unit, ["物品"] = item, ["是否获取"] = true})
 end
 local function ____on_7269_54C1_4E22_5F03_76D1_542C(unit, item)
-    addDelayedCallback(
-        10,
-        function()
-            _____540C_6B65_5E76_5206_53D1_7269_54C1_53D8_5316(unit, item, false)
-        end
-    )
+    addDelayedCallback(10, ____on_5EF6_8FDF_540C_6B65_7269_54C1_53D8_5316, {["单位"] = unit, ["物品"] = item, ["是否获取"] = false})
 end
 local function _____521D_59CB_5316_83B7_53D6_4E22_5F03_76D1_542C()
     if _____5DF2_521D_59CB_5316_83B7_53D6_4E22_5F03_76D1_542C then
@@ -168,12 +177,12 @@ local function _____521D_59CB_5316_83B7_53D6_4E22_5F03_76D1_542C()
     onItemPickup(____on_7269_54C1_83B7_53D6_76D1_542C)
     onItemDrop(____on_7269_54C1_4E22_5F03_76D1_542C)
 end
-____exports["监听指定物品获取丢弃"] = function(itemTypeId, _____83B7_53D6_56DE_8C03, _____4E22_5F03_56DE_8C03)
+____exports["监听指定物品获取丢弃"] = function(itemTypeId, _____83B7_53D6_56DE_8C03, _____4E22_5F03_56DE_8C03, _____53D8_91CF)
     if itemTypeId == 0 then
         return
     end
     _____521D_59CB_5316_83B7_53D6_4E22_5F03_76D1_542C()
-    _____6307_5B9A_7269_54C1_76D1_542C_5217_8868[#_____6307_5B9A_7269_54C1_76D1_542C_5217_8868 + 1] = {["物品类型ID"] = itemTypeId, ["获取回调"] = _____83B7_53D6_56DE_8C03, ["丢弃回调"] = _____4E22_5F03_56DE_8C03}
+    _____6307_5B9A_7269_54C1_76D1_542C_5217_8868[#_____6307_5B9A_7269_54C1_76D1_542C_5217_8868 + 1] = {["物品类型ID"] = itemTypeId, ["获取回调"] = _____83B7_53D6_56DE_8C03, ["丢弃回调"] = _____4E22_5F03_56DE_8C03, ["变量"] = _____53D8_91CF}
 end
 ____exports["获取单位当前持有指定物品数量"] = function(unit, itemTypeId)
     local count = _____83B7_53D6_5355_4F4D_6307_5B9A_7269_54C1_6301_6709_6570_91CF(unit, itemTypeId)

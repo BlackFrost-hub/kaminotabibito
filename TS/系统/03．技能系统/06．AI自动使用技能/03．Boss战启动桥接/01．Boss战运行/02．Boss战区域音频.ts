@@ -22,6 +22,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 };
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
+const RemoveRect = jass.RemoveRect as (whichRect: any) => void;
 
 function 获取句柄ID(this: void, handle: any): number {
   if (handle == null || handle === 0) return 0;
@@ -45,6 +46,15 @@ function 移除上下文区域音频(this: void, context: Boss战运行上下文
   if (context.地点矩形 == null || context.地点矩形 === 0) return;
   矩形移除音频(context.地点矩形, context.战斗音乐);
   矩形移除音频(context.地点矩形, context.胜利音乐);
+}
+
+function 清理动态地点矩形(this: void, context: Boss战运行上下文): void {
+  if (!context.地点矩形是否动态) return;
+  if (context.地点矩形 == null || context.地点矩形 === 0) return;
+  const rectHandle = context.地点矩形;
+  context.地点矩形 = null;
+  context.地点句柄ID = 0;
+  RemoveRect(rectHandle);
 }
 
 export function 清理矩形Boss战候选音频(this: void, rectHandle: any): void {
@@ -110,12 +120,14 @@ export function 尝试移除过期胜利音频(this: void, context: Boss战运�
   const 当前矩形上下文 = 读取矩形当前Boss战上下文(context.地点句柄ID);
   if (当前矩形上下文 == null || 当前矩形上下文.运行代次 !== context.运行代次) {
     context.胜利音乐移除时间 = 0;
+    清理动态地点矩形(context);
     return true;
   }
 
   矩形移除音频(context.地点矩形, context.胜利音乐);
   context.胜利音乐移除时间 = 0;
   设置矩形当前Boss战上下文(context.地点句柄ID, undefined);
+  清理动态地点矩形(context);
 
   debugLogForce(Boss战运行模块名, "移除过期胜利音频", "rect=", context.地点句柄ID, "generation=", context.运行代次);
   return true;

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, Sound3DII_CooPlayReuse, jass, GetUnitStateJapi, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, Atan2, R2I, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
+local _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, Sound3DII_CooPlayReuse, jass, GetUnitStateJapi, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, Atan2, R2I, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
@@ -14,6 +14,8 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
+local _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss单体技能伤害"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
 local _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668["创建固定组合技能执行器"]
 local ____02_FF0E_56FA_5B9A_65F6_95F4_8F74_9636_6BB5_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.02．固定时间轴阶段工厂")
@@ -22,7 +24,7 @@ function _____9020_6210_4F24_5BB3(boss, target, amount, damageType)
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(target) or amount <= 0 then
         return
     end
-    _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+    _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3({
         ["技能ID"] = _____7F6A_4E0E_7F5A_6280_80FDID,
         ["来源"] = boss,
         ["目标"] = target,
@@ -31,8 +33,7 @@ function _____9020_6210_4F24_5BB3(boss, target, amount, damageType)
         ranged = false,
         attackType = jass.ATTACK_TYPE_NORMAL,
         ["伤害类型"] = damageType,
-        weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-        ["来源类型"] = "Boss技能"
+        weaponType = jass.WEAPON_TYPE_WHOKNOWS
     })
 end
 function _____64AD_653E_70B9_540D_7279_6548(target, duration)
@@ -116,15 +117,15 @@ ____exports["释放瑟兰迪尔罪与罚"] = function(context, target)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["罪与罚"]
     local boss = context["Boss单位"]
     local threatTarget = _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807(boss)
-    local ____target_11 = target
-    if ____target_11 == nil then
-        ____target_11 = threatTarget and threatTarget.targetRef
+    local ____target_10 = target
+    if ____target_10 == nil then
+        ____target_10 = threatTarget and threatTarget.targetRef
     end
-    local ____target_11_12 = ____target_11
-    if ____target_11_12 == nil then
-        ____target_11_12 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
+    local ____target_10_11 = ____target_10
+    if ____target_10_11 == nil then
+        ____target_10_11 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(boss)
     end
-    local actualTarget = ____target_11_12
+    local actualTarget = ____target_10_11
     if not _____5355_4F4D_6709_6548(boss) or not _____5355_4F4D_6709_6548(actualTarget) then
         return
     end
@@ -133,9 +134,9 @@ ____exports["释放瑟兰迪尔罪与罚"] = function(context, target)
     if context["罪与罚组合执行器"] == nil then
         context["罪与罚组合执行器"] = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "瑟兰迪尔-罪与罚", ["清理"] = context["清理"], ["互斥组"] = "瑟兰迪尔罪与罚"})
     end
-    local ____self_13 = context["罪与罚组合执行器"]
-    local _____6267_884CID = ____self_13["开始"](
-        ____self_13,
+    local ____self_12 = context["罪与罚组合执行器"]
+    local _____6267_884CID = ____self_12["开始"](
+        ____self_12,
         {
             key = "罪与罚",
             ["单位"] = boss,
@@ -329,10 +330,8 @@ _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____require_result_5["播放限�
 local ____require_result_6 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807 = ____require_result_6["获取Boss技能应攻击目标"]
 _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4 = ____require_result_6["获取Boss技能最近敌对英雄"]
-local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_7["造成单体技能伤害"]
-local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.index")
-Sound3DII_CooPlayReuse = ____require_result_8.Sound3DII_CooPlayReuse
+local ____require_result_7 = require("lib.扩展函数.封装函数.02．音效系统.index")
+Sound3DII_CooPlayReuse = ____require_result_7.Sound3DII_CooPlayReuse
 jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitStateJapi = japi.GetUnitState

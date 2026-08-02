@@ -37,6 +37,7 @@ export interface 固定受击次数机制单位参数 extends 可攻击机制单
 export interface 固定受击次数机制单位实例 extends 可攻击机制单位实例 {
   读取剩余次数(): number;
   设置剩余次数(次数: number): void;
+  销毁(原因?: "主动销毁" | "机制清理"): void;
 }
 
 interface 固定受击次数记录 {
@@ -128,6 +129,10 @@ class 固定受击次数机制单位实例实现 implements 固定受击次数�
     return !this.已销毁 && this.剩余次数 > 0 && this.基础实例.是否存活();
   }
 
+  处理单位失效(): void {
+    this.基础实例.处理单位失效();
+  }
+
   读取剩余次数(): number {
     return this.剩余次数;
   }
@@ -136,11 +141,11 @@ class 固定受击次数机制单位实例实现 implements 固定受击次数�
     this.剩余次数 = 规整次数(次数);
   }
 
-  销毁(): void {
+  销毁(原因: "主动销毁" | "机制清理" = "主动销毁"): void {
     if (this.已销毁) return;
     this.已销毁 = true;
     delete 固定受击次数单位表[this.ID];
-    this.基础实例.销毁();
+    this.基础实例.销毁(原因);
   }
 }
 

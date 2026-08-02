@@ -3,6 +3,7 @@ local ____exports = {}
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取当前剧情动作上下文"]
 local ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
+local _____91CA_653E_5E76_767B_8BB0_5267_60C5Boss_9884_7F6E_968F_4ECE = ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5["释放并登记剧情Boss预置随从"]
 local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5["剧情Boss预置暂停来源"]
 ---
 -- @noSelfInFile
@@ -23,6 +24,7 @@ ____exports["启动剧情Boss战"] = function(bossUnit, _____53C2_6570)
     if bossUnit == nil or bossUnit == 0 then
         return false
     end
+    _____91CA_653E_5E76_767B_8BB0_5267_60C5Boss_9884_7F6E_968F_4ECE(bossUnit)
     if not _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD(bossUnit) then
         _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8(bossUnit, "Boss战.绑定单位")
     end

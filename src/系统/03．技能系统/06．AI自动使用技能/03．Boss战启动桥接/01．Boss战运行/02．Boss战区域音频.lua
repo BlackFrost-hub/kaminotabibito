@@ -14,6 +14,7 @@ local SetStackedSoundBJ = ____require_result_0.SetStackedSoundBJ
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_1.debugLogForce
 local GetHandleId = jass.GetHandleId
+local RemoveRect = jass.RemoveRect
 local function _____83B7_53D6_53E5_67C4ID(handle)
     if handle == nil or handle == 0 then
         return 0
@@ -48,6 +49,18 @@ local function _____79FB_9664_4E0A_4E0B_6587_533A_57DF_97F3_9891(context)
     _____77E9_5F62_79FB_9664_97F3_9891(context["地点矩形"], context["战斗音乐"])
     _____77E9_5F62_79FB_9664_97F3_9891(context["地点矩形"], context["胜利音乐"])
 end
+local function _____6E05_7406_52A8_6001_5730_70B9_77E9_5F62(context)
+    if not context["地点矩形是否动态"] then
+        return
+    end
+    if context["地点矩形"] == nil or context["地点矩形"] == 0 then
+        return
+    end
+    local rectHandle = context["地点矩形"]
+    context["地点矩形"] = nil
+    context["地点句柄ID"] = 0
+    RemoveRect(rectHandle)
+end
 ____exports["清理矩形Boss战候选音频"] = function(rectHandle)
     if rectHandle == nil or rectHandle == 0 then
         return
@@ -61,12 +74,12 @@ ____exports["清理矩形Boss战候选音频"] = function(rectHandle)
                 local _____97F3_9891_53E5_67C4 = jglobals[_____53D8_91CF_540D]
                 local _____97F3_9891_53E5_67C4ID = _____83B7_53D6_53E5_67C4ID(_____97F3_9891_53E5_67C4)
                 if _____97F3_9891_53E5_67C4ID == 0 or _____5DF2_5904_7406_97F3_9891_8868[_____97F3_9891_53E5_67C4ID] then
-                    goto __continue16
+                    goto __continue19
                 end
                 _____5DF2_5904_7406_97F3_9891_8868[_____97F3_9891_53E5_67C4ID] = true
                 _____77E9_5F62_79FB_9664_97F3_9891(rectHandle, _____97F3_9891_53E5_67C4)
             end
-            ::__continue16::
+            ::__continue19::
             i = i + 1
         end
     end
@@ -128,11 +141,13 @@ ____exports["尝试移除过期胜利音频"] = function(context, nowMs)
     local _____5F53_524D_77E9_5F62_4E0A_4E0B_6587 = _____8BFB_53D6_77E9_5F62_5F53_524DBoss_6218_4E0A_4E0B_6587(context["地点句柄ID"])
     if _____5F53_524D_77E9_5F62_4E0A_4E0B_6587 == nil or _____5F53_524D_77E9_5F62_4E0A_4E0B_6587["运行代次"] ~= context["运行代次"] then
         context["胜利音乐移除时间"] = 0
+        _____6E05_7406_52A8_6001_5730_70B9_77E9_5F62(context)
         return true
     end
     _____77E9_5F62_79FB_9664_97F3_9891(context["地点矩形"], context["胜利音乐"])
     context["胜利音乐移除时间"] = 0
     _____8BBE_7F6E_77E9_5F62_5F53_524DBoss_6218_4E0A_4E0B_6587(context["地点句柄ID"], nil)
+    _____6E05_7406_52A8_6001_5730_70B9_77E9_5F62(context)
     debugLogForce(
         ____Boss_6218_8FD0_884C_6A21_5757_540D,
         "移除过期胜利音频",
