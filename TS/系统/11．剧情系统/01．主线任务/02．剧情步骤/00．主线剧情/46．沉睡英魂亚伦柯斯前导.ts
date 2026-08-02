@@ -48,6 +48,9 @@ const { YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．
 const { 缓存并移除亚伦柯斯安兹封锁墙 } = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙") as {
   缓存并移除亚伦柯斯安兹封锁墙: (this: void) => boolean;
 };
+const { 按步长调整玩家镜头高度 } = require("系统.09．表现系统.14．镜头高度控制.index") as {
+  按步长调整玩家镜头高度: (this: void, 玩家: any, 步数: number) => void;
+};
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
@@ -62,6 +65,7 @@ const { 清理菲尼克斯尔战后地形装饰 } = require("系统.11．剧情�
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
@@ -173,6 +177,9 @@ function 完成亚伦柯斯战后传送(this: void, 触发单位?: any): void {
   if (状态 == null || 状态.已传送) return;
   状态.已传送 = true;
   清理亚伦柯斯战后传送();
+  if (触发单位 != null && 触发单位 !== 0) {
+    按步长调整玩家镜头高度(GetOwningPlayer(触发单位), -6);
+  }
   开始监听封印核心入口();
   播放封印核心抵达对白(触发单位);
 }

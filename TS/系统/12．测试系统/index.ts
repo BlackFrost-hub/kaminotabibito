@@ -4,6 +4,9 @@
  * 通过开关控制是否加载各个测试模块。
  */
 
+/** 临时总开关；恢复测试时改回 true。 */
+const ENABLE_TEST_SYSTEM = false;
+
 const ENABLE_STES_EVENT_TEST = false;
 const ENABLE_YDLOCAL_TEST = false;
 const ENABLE_TEST_EVENT = false;
@@ -29,6 +32,8 @@ const ENABLE_BOSS_3D_SOUND_TEST = true;
 const ENABLE_SERA_BARE_CREATE_TEST = true;
 
 function loadTests(): void {
+  if (!ENABLE_TEST_SYSTEM) return;
+
   if (ENABLE_STES_EVENT_TEST) {
     require("系统.12．测试系统.STES事件测试");
   }

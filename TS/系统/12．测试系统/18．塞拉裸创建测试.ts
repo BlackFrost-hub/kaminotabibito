@@ -30,7 +30,7 @@ const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (
 const 模块名 = "塞拉裸创建测试";
 const 测试命令 = "123";
 const 玩家一 = Player(0);
-// 对应 objediting/Boss/HeroBoss/01-MainlineBoss/03-BalzarothMechanicUnits.lua 的 UnitDefinition:new('N03K', 'Nbrn')。
+// 对应 objediting/Boss/HeroBoss/01-MainlineBoss/03-BalzarothMechanicUnits.lua 的 UnitDefinition:new('N03K', 'nchr')。
 const 塞拉物编ID = "N03K";
 const 塞拉单位ID = stringToFourCCSafe(塞拉物编ID);
 

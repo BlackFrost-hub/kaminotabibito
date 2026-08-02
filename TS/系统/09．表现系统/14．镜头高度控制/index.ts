@@ -20,17 +20,27 @@ const 数字小键盘减号键 = 109;
 const CAMERA_FIELD_ZOFFSET = jass.CAMERA_FIELD_ZOFFSET;
 const GetCameraField = jass.GetCameraField as (field: any) => number;
 const SetCameraField = jass.SetCameraField as (field: any, value: number, duration: number) => void;
+const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 
 let 已初始化 = false;
 
-function 抬高镜头(this: any): void {
+export function 按步长调整本地镜头高度(this: void, 步数: number): void {
   const 当前镜头高度 = GetCameraField(CAMERA_FIELD_ZOFFSET);
-  SetCameraField(CAMERA_FIELD_ZOFFSET, 当前镜头高度 + 镜头高度步长, 0);
+  SetCameraField(CAMERA_FIELD_ZOFFSET, 当前镜头高度 + 步数 * 镜头高度步长, 0);
+}
+
+/** 只调整指定玩家的本地镜头，避免传送时影响其他玩家。 */
+export function 按步长调整玩家镜头高度(this: void, 玩家: any, 步数: number): void {
+  if (玩家 == null || 玩家 === 0 || GetLocalPlayer() !== 玩家) return;
+  按步长调整本地镜头高度(步数);
+}
+
+function 抬高镜头(this: any): void {
+  按步长调整本地镜头高度(1);
 }
 
 function 降低镜头(this: any): void {
-  const 当前镜头高度 = GetCameraField(CAMERA_FIELD_ZOFFSET);
-  SetCameraField(CAMERA_FIELD_ZOFFSET, 当前镜头高度 - 镜头高度步长, 0);
+  按步长调整本地镜头高度(-1);
 }
 
 /** Boss 测试场景使用，每次都固定设置为默认镜头高度以上 400。 */

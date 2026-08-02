@@ -49,11 +49,14 @@ const { 注册剧情玩家组传送 } = require("系统.07．地形系统.03．�
     条件: (this: void) => boolean;
     读取玩家英雄组: (this: void) => any;
     允许进入单位?: (this: void, unit: any) => boolean;
-    完成?: (this: void) => void;
+    完成?: (this: void, 触发单位?: any) => void;
   }) => (this: void) => void;
 };
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
   StarOther_PanCameraToTimedForPlayer: (this: void, whichPlayer: any, x: number, y: number, duration: number) => void;
+};
+const { 按步长调整玩家镜头高度 } = require("系统.09．表现系统.14．镜头高度控制.index") as {
+  按步长调整玩家镜头高度: (this: void, 玩家: any, 步数: number) => void;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
@@ -151,11 +154,14 @@ function 巴尔扎罗斯战后传送条件(this: void): boolean {
   return 读取剧情进度() === 43;
 }
 
-function 完成巴尔扎罗斯战后传送(this: void): void {
+function 完成巴尔扎罗斯战后传送(this: void, 触发单位?: any): void {
   const 状态 = 当前巴尔扎罗斯战后传送状态;
   if (状态 == null || 状态.已传送) return;
   状态.已传送 = true;
   清理巴尔扎罗斯战后传送(状态);
+  if (触发单位 != null && 触发单位 !== 0) {
+    按步长调整玩家镜头高度(GetOwningPlayer(触发单位), 6);
+  }
   清理剧情运行时单位("剧情运行时.巴尔扎罗斯玩家");
   当前巴尔扎罗斯战后传送状态 = undefined;
 }

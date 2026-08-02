@@ -683,7 +683,7 @@ ____exports["Boss配置表"] = {
         unit = "N03G"
     },
     N03J = {
-        _parent = "Npbm",
+        _parent = "nw2w",
         Name = "熔岩破坏者·格鲁姆",
         dmgplus1 = 2200,
         HP = 25000,
@@ -710,7 +710,7 @@ ____exports["Boss配置表"] = {
         unit = "N03J"
     },
     N03K = {
-        _parent = "Nbrn",
+        _parent = "nchr",
         Name = "冰焰巫师·塞拉",
         dmgplus1 = 1800,
         HP = 20000,

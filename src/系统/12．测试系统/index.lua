@@ -1,8 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 测试系统统一入口
--- 
--- 通过开关控制是否加载各个测试模块。
+--- 临时总开关；恢复测试时改回 true。
+local ENABLE_TEST_SYSTEM = false
 local ENABLE_STES_EVENT_TEST = false
 local ENABLE_YDLOCAL_TEST = false
 local ENABLE_TEST_EVENT = false
@@ -27,6 +26,9 @@ local ENABLE_BONE_SPEAR_EFFECT_TEST = true
 local ENABLE_BOSS_3D_SOUND_TEST = true
 local ENABLE_SERA_BARE_CREATE_TEST = true
 local function loadTests(self)
+    if not ENABLE_TEST_SYSTEM then
+        return
+    end
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")
     end

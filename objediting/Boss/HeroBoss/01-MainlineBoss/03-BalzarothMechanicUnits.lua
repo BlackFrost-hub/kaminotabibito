@@ -126,7 +126,7 @@ local function applyBalzarothGuardCommon(unit, name, modelFile, icon, hp, collis
   unit:setLevel(48)
   unit:setHitPointsMaximumBase(hp)
   unit:setHitPointsRegenerationType('always')
-  unit:setHitPointsRegenerationRate(0.0)
+  unit:setHitPointsRegenerationRate(hp * 0.008)
   unit:setManaMaximum(1000)
   unit:setManaInitialAmount(1000)
   unit:setManaRegeneration(10.0)
@@ -161,12 +161,12 @@ applyBalzarothGuardCommon(
   '熔岩破坏者·格鲁姆',
   'Boss\\Balzaroth\\Grum\\Grum.mdx',
   'Boss\\Balzaroth\\Icon\\GrumPortrait.blp',
-  25000,
+  30000,
   42.0
 )
 grumGuard:setAttacksEnabled(AttacksEnabled.AttackOneOnly)
 grumGuard:setAttack1AttackType(AttackType.Normal)
-grumGuard:setAttack1DamageBase(2200)
+grumGuard:setAttack1DamageBase(2640)
 grumGuard:setAttack1DamageNumberofDice(1)
 grumGuard:setAttack1DamageSidesperDie(1)
 grumGuard:setAttack1CooldownTime(1.0)
@@ -190,12 +190,12 @@ applyBalzarothGuardCommon(
   '冰焰巫师·塞拉',
   'Boss\\Balzaroth\\Sera\\Sera.mdx',
   'Boss\\Balzaroth\\Icon\\SeraPortrait.blp',
-  20000,
+  24000,
   32.0
 )
 seraGuard:setAttacksEnabled(AttacksEnabled.AttackOneOnly)
 seraGuard:setAttack1AttackType(AttackType.Magic)
-seraGuard:setAttack1DamageBase(1800)
+seraGuard:setAttack1DamageBase(2160)
 seraGuard:setAttack1DamageNumberofDice(1)
 seraGuard:setAttack1DamageSidesperDie(1)
 seraGuard:setAttack1CooldownTime(1.0)

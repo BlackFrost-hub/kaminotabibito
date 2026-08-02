@@ -42,7 +42,7 @@ export const 可破坏物数据 = {
   "B00W": {_parent: "FTtw", Name: "秋树", maxScale: 6.0, key: "B00W"},
   "B00X": {_parent: "LTbr", Name: "RW大书架", file: "Doodads\\Dungeon\\Props\\BigBookshelf\\BigBookshelf.mdl", pathTex: "PathTextures\\4x4Default.tga", maxScale: 2.2, minScale: 2.2, key: "B00X"},
   "B00Y": {_parent: "Ytlc", pathTex: "PathTextures\\8x8Default.tga", walkable: 1, key: "B00Y"},
-  "B00Z": {_parent: "LTbr", Name: "11宝箱", HP: 500.0, file: "Boss\\ShadowboneMortes\\ShadowboneMortesThievesLegacyChest.mdx", maxScale: 1.0, minScale: 1.0, EditorSuffix: "死灵盗贼", key: "B00Z"},
+  "BR02": {_parent: "LTbr", Name: "11宝箱", HP: 500.0, file: "Boss\\ShadowboneMortes\\ShadowboneMortesThievesLegacyChest.mdx", maxScale: 1.0, minScale: 1.0, EditorSuffix: "死灵盗贼", key: "BR02"},
   "B010": {_parent: "LTbr", Name: "根须", file: "war3mapImported\\2144.mdl", pathTex: "war3mapImported\\16X16genxu.tga", maxScale: 3.0, minScale: 3.0, EditorSuffix: "古木之蚀", key: "B010"},
   "DTg1": {_parent: "DTg1", minScale: 0.3, key: "DTg1"},
   "DTg5": {_parent: "DTg5", HP: 9999999.0, key: "DTg5"},

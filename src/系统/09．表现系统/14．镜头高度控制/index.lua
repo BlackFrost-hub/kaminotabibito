@@ -17,14 +17,24 @@ local _____6570_5B57_5C0F_952E_76D8_51CF_53F7_952E = 109
 local CAMERA_FIELD_ZOFFSET = jass.CAMERA_FIELD_ZOFFSET
 local GetCameraField = jass.GetCameraField
 local SetCameraField = jass.SetCameraField
+local GetLocalPlayer = jass.GetLocalPlayer
 local _____5DF2_521D_59CB_5316 = false
-local function _____62AC_9AD8_955C_5934(self)
+____exports["按步长调整本地镜头高度"] = function(_____6B65_6570)
     local _____5F53_524D_955C_5934_9AD8_5EA6 = GetCameraField(CAMERA_FIELD_ZOFFSET)
-    SetCameraField(CAMERA_FIELD_ZOFFSET, _____5F53_524D_955C_5934_9AD8_5EA6 + _____955C_5934_9AD8_5EA6_6B65_957F, 0)
+    SetCameraField(CAMERA_FIELD_ZOFFSET, _____5F53_524D_955C_5934_9AD8_5EA6 + _____6B65_6570 * _____955C_5934_9AD8_5EA6_6B65_957F, 0)
+end
+--- 只调整指定玩家的本地镜头，避免传送时影响其他玩家。
+____exports["按步长调整玩家镜头高度"] = function(_____73A9_5BB6, _____6B65_6570)
+    if _____73A9_5BB6 == nil or _____73A9_5BB6 == 0 or GetLocalPlayer() ~= _____73A9_5BB6 then
+        return
+    end
+    ____exports["按步长调整本地镜头高度"](_____6B65_6570)
+end
+local function _____62AC_9AD8_955C_5934(self)
+    ____exports["按步长调整本地镜头高度"](1)
 end
 local function _____964D_4F4E_955C_5934(self)
-    local _____5F53_524D_955C_5934_9AD8_5EA6 = GetCameraField(CAMERA_FIELD_ZOFFSET)
-    SetCameraField(CAMERA_FIELD_ZOFFSET, _____5F53_524D_955C_5934_9AD8_5EA6 - _____955C_5934_9AD8_5EA6_6B65_957F, 0)
+    ____exports["按步长调整本地镜头高度"](-1)
 end
 --- Boss 测试场景使用，每次都固定设置为默认镜头高度以上 400。
 ____exports["抬高Boss测试镜头"] = function()

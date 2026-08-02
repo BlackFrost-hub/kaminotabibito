@@ -77,6 +77,16 @@ const { 启用封印守卫战区域音乐, 清理封印守卫战区域音乐 } =
   启用封印守卫战区域音乐: (this: void) => boolean;
   清理封印守卫战区域音乐: (this: void) => boolean;
 };
+const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetPlayersAll: (this: void) => any;
+};
+const { safeForForce } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeForForce: (this: void, forceOrSelf: any, action: (this: void) => void) => void;
+};
+const { CameraSetEQNoiseForPlayer, CameraClearNoiseForPlayer } = require("lib.扩展函数.封装函数.07．镜头函数.01．镜头震动") as {
+  CameraSetEQNoiseForPlayer: (this: void, whichPlayer: any, magnitude: number) => void;
+  CameraClearNoiseForPlayer: (this: void, whichPlayer: any) => void;
+};
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
@@ -91,6 +101,7 @@ const 中立敌对玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 封印守卫战倒计时刷新毫秒 = 100;
 const 封印守卫战敌人目标重发间隔毫秒 = 1800;
 const 封印守卫战波次最大间隔秒 = 45;
+const 封印守卫战镜头震荡幅度 = 10;
 
 export const 封印守卫战持续秒 = 300;
 export const 封印守卫战锚点修复持续秒 = 40;
@@ -217,6 +228,24 @@ let 当前封印守卫战下一波索引 = 0;
 let 当前封印守卫战下次目标重发时间毫秒 = 0;
 let 当前封印守卫战运行中 = false;
 let 已注册封印守卫战死亡监听 = false;
+
+function on启动封印守卫战镜头震荡(this: void): void {
+  const 玩家 = jass.GetEnumPlayer();
+  CameraSetEQNoiseForPlayer(玩家, 封印守卫战镜头震荡幅度);
+}
+
+function on清理封印守卫战镜头震荡(this: void): void {
+  const 玩家 = jass.GetEnumPlayer();
+  CameraClearNoiseForPlayer(玩家);
+}
+
+function 启动封印守卫战镜头震荡(this: void): void {
+  safeForForce(GetPlayersAll(), on启动封印守卫战镜头震荡);
+}
+
+function 清理封印守卫战镜头震荡(this: void): void {
+  safeForForce(GetPlayersAll(), on清理封印守卫战镜头震荡);
+}
 
 function 句柄有效(this: void, handle: any): boolean {
   return handle != null && handle !== 0;
@@ -497,6 +526,7 @@ function 所有封印守卫战锚点已完成(this: void): boolean {
 function 处理封印守卫战失败(this: void): void {
   if (!当前封印守卫战运行中) return;
   当前封印守卫战运行中 = false;
+  清理封印守卫战镜头震荡();
   清理封印守卫战区域音乐();
   清理封印守卫战敌人();
   清理封印守卫战三路传送门();
@@ -507,6 +537,7 @@ function 处理封印守卫战失败(this: void): void {
 function 处理封印守卫战守护时限(this: void): void {
   if (!当前封印守卫战运行中) return;
   当前封印守卫战运行中 = false;
+  清理封印守卫战镜头震荡();
   清理封印守卫战区域音乐();
   停止封印守卫战倒计时();
   清理封印守卫战敌人();
@@ -626,6 +657,7 @@ export function 清理封印能量核心与守护倒计时(this: void): void {
 
 export function 清理封印守卫战(this: void): void {
   当前封印守卫战运行中 = false;
+  清理封印守卫战镜头震荡();
   清理封印守卫战区域音乐();
   清理封印守卫战敌人();
   清理封印守卫战三路传送门();
@@ -711,6 +743,7 @@ export function 启动封印守卫战(this: void): boolean {
   当前封印守卫战下一波索引 = 0;
   当前封印守卫战下次目标重发时间毫秒 = 0;
   启用封印守卫战区域音乐();
+  启动封印守卫战镜头震荡();
   确保封印守卫战死亡监听();
   return true;
 }

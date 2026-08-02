@@ -282,7 +282,7 @@ ____exports["可破坏物数据"] = {
         key = "B00X"
     },
     B00Y = {_parent = "Ytlc", pathTex = "PathTextures\\8x8Default.tga", walkable = 1, key = "B00Y"},
-    B00Z = {
+    BR02 = {
         _parent = "LTbr",
         Name = "11宝箱",
         HP = 500,
@@ -290,7 +290,7 @@ ____exports["可破坏物数据"] = {
         maxScale = 1,
         minScale = 1,
         EditorSuffix = "死灵盗贼",
-        key = "B00Z"
+        key = "BR02"
     },
     B010 = {
         _parent = "LTbr",

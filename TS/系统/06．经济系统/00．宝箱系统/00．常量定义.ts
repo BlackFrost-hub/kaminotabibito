@@ -71,7 +71,7 @@ export interface ChestTypeConfig {
 }
 
 export const 宝箱系统开关 = true;
-export const 影骨莫特斯盗贼宝箱可破坏物ID = "B00Z";
+export const 影骨莫特斯盗贼宝箱可破坏物ID = "BR02";
 
 export const CHEST_TYPES: ChestTypeConfig[] = [
   {
