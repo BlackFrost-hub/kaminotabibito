@@ -25,8 +25,8 @@ const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, 参数: any) => boolean;
+const { 造成批量AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成批量AOE技能伤害: (this: void, 参数: any) => number;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -158,28 +158,32 @@ function 引爆目标允许藤原妹红W伤害(this: void, target: any): boolean
   return true;
 }
 
+function 准备藤原妹红W周期目标伤害(this: void, target: any, _index: number): any {
+  return 周期目标允许藤原妹红W伤害(target) ? {} : undefined;
+}
+
+function 准备藤原妹红W引爆目标伤害(this: void, target: any, _index: number): any {
+  return 引爆目标允许藤原妹红W伤害(target) ? {} : undefined;
+}
+
 function 造成藤原妹红W周期伤害(this: void, context: 藤原妹红W运行时上下文): void {
   const caster = context.施法者;
   const target = context.护盾目标;
   if (!单位有效(caster) || !单位有效(target)) return;
   const targets = 获取范围敌军(caster, GetUnitX(target), GetUnitY(target), 藤原妹红单位技能配置.周期伤害半径);
-  for (let index = 0; index < targets.length; index++) {
-    const enemy = targets[index];
-    if (!周期目标允许藤原妹红W伤害(enemy)) continue;
-    造成AOE技能伤害({
-      来源: caster,
-      目标: enemy,
-      伤害: context.周期伤害,
-      伤害类型: DAMAGE_TYPE_FIRE,
-      attack: false,
-      ranged: false,
-      attackType: ATTACK_TYPE_NORMAL,
-      weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "单位技能",
-      技能ID: 主技能ID,
-      伤害形态: "AOE",
-    });
-  }
+  造成批量AOE技能伤害({
+    来源: caster,
+    目标列表: targets,
+    伤害: context.周期伤害,
+    伤害类型: DAMAGE_TYPE_FIRE,
+    attack: false,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "单位技能",
+    技能ID: 主技能ID,
+    每目标处理器: 准备藤原妹红W周期目标伤害,
+  });
 }
 
 function 藤原妹红W周期Tick(this: void, variable?: any): void {
@@ -271,23 +275,19 @@ function 引爆藤原妹红W护盾(this: void, context: 藤原妹红W运行时�
     藤原妹红单位技能配置.表现资源.引爆特效持续秒,
   );
   const targets = 获取范围敌军(caster, GetUnitX(target), GetUnitY(target), 藤原妹红单位技能配置.引爆范围);
-  for (let index = 0; index < targets.length; index++) {
-    const enemy = targets[index];
-    if (!引爆目标允许藤原妹红W伤害(enemy)) continue;
-    造成AOE技能伤害({
-      来源: caster,
-      目标: enemy,
-      伤害: damage,
-      伤害类型: DAMAGE_TYPE_FIRE,
-      attack: true,
-      ranged: false,
-      attackType: ATTACK_TYPE_NORMAL,
-      weaponType: WEAPON_TYPE_WHOKNOWS,
-      来源类型: "单位技能",
-      技能ID: 引爆技能ID,
-      伤害形态: "AOE",
-    });
-  }
+  造成批量AOE技能伤害({
+    来源: caster,
+    目标列表: targets,
+    伤害: damage,
+    伤害类型: DAMAGE_TYPE_FIRE,
+    attack: true,
+    ranged: false,
+    attackType: ATTACK_TYPE_NORMAL,
+    weaponType: WEAPON_TYPE_WHOKNOWS,
+    来源类型: "单位技能",
+    技能ID: 引爆技能ID,
+    每目标处理器: 准备藤原妹红W引爆目标伤害,
+  });
   移除单位标签护盾(target, 藤原妹红单位技能配置.护盾标签);
   清理藤原妹红W状态(caster, context.护盾ID);
 }

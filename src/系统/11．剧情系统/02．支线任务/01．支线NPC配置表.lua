@@ -21,7 +21,7 @@ ____exports.NPC_CONFIGS = {
         requireType = "对话",
         X = -26819.3,
         Y = -8344.6,
-        Facing = 220,
+        Facing = 180,
         enabled = true
     },
     {
@@ -236,18 +236,6 @@ ____exports.NPC_CONFIGS = {
         Y = -27943.2,
         Facing = 270,
         modelFIle = "war3mapImported\\Hero Druid.mdl",
-        enabled = true
-    },
-    {
-        NPCrequireName = "下级异端审查官-卢修斯",
-        requireID = 10015,
-        NpcNameID = "|cffff9900协助异端调查|r（|cffff00008级精英战斗任务|r）",
-        unitcode = "h010",
-        requireType = "任务",
-        X = -22800.6,
-        Y = -29084.3,
-        Facing = 90,
-        modelFIle = "units\\human\\BloodElfSpellThief\\BloodElfSpellThief",
         enabled = true
     },
     {

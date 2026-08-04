@@ -8,10 +8,6 @@ const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 const { 打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
   打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const ForGroup = jass.ForGroup as (whichGroup: any, callback: () => void) => void;
 const GetEnumUnit = jass.GetEnumUnit as () => any;
@@ -19,9 +15,8 @@ const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const CreateDestructable = jass.CreateDestructable as (objectid: number, x: number, y: number, face: number, scale: number, variation: number) => any;
 const DestructableRestoreLife = jass.DestructableRestoreLife as (d: any, life: number, birth: boolean) => void;
 
-export const 通用首领奖励宝箱可破坏物ID = "BR01";
+export const 通用首领奖励宝箱可破坏物ID = "BZX4";
 export const 通用首领奖励宝箱生命值 = 9999;
-const 调试模块 = "首领奖励宝箱";
 
 export type 宝箱首领奖励打开范围 = "开启者" | "所有玩家英雄";
 
@@ -62,7 +57,6 @@ export function 绑定宝箱首领奖励池(
   const handleId = GetHandleId(宝箱);
   宝箱实例奖励池.set(handleId, { 奖励池ID, 打开范围 });
   DestructableRestoreLife(宝箱, 通用首领奖励宝箱生命值, true);
-  debugLogForce(调试模块, "绑定奖励池", "chest=", handleId, "pool=", 奖励池ID, "range=", 打开范围, "life=", 通用首领奖励宝箱生命值);
 }
 
 export function 创建首领奖励宝箱(
@@ -81,16 +75,11 @@ export function 触发宝箱首领奖励(this: void, cfg: any, 开启者: any, �
   const 实例配置 = 取实例配置(宝箱);
   const 奖励池ID = 实例配置?.奖励池ID ?? cfg?.首领奖励池ID;
   if (奖励池ID == null || 奖励池ID === "") {
-    if (cfg?.destructableType === 通用首领奖励宝箱可破坏物ID) {
-      debugLogForce(调试模块, "通用首领奖励宝箱未绑定奖励池", "chest=", 宝箱 != null && 宝箱 !== 0 ? GetHandleId(宝箱) : 0);
-      return true;
-    }
     return false;
   }
 
   if (宝箱 != null && 宝箱 !== 0) 宝箱实例奖励池.delete(GetHandleId(宝箱));
   const 打开范围 = 实例配置?.打开范围 ?? cfg?.首领奖励打开范围;
-  debugLogForce(调试模块, "触发奖励池", "chest=", 宝箱 != null && 宝箱 !== 0 ? GetHandleId(宝箱) : 0, "pool=", 奖励池ID, "range=", 打开范围 ?? "开启者");
 
   if (打开范围 === "所有玩家英雄") {
     const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");

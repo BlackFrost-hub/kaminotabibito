@@ -64,6 +64,7 @@ local ____BJ_4FEE_6539_589E_52A0 = 0
 local _____5F53_524D_5168_5458_5956_52B1
 local _____5F53_524DBoss_6B7B_4EA1_9996_9886_5956_52B1_6C60ID = ""
 local _____8C7A_72FC_5F02_53D8_7D2F_8BA1_6B21_6570 = 0
+local ____Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID_5217_8868 = {}
 local function _____8BFB_53D6_73A9_5BB6_82F1_96C4_7EC4()
     return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
 end
@@ -389,7 +390,39 @@ local function _____53D6_5355_4F4D_540D_5339_914D_539F_59CBID(_____5355_4F4D_540
     end
     return 0
 end
-local function ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, ____Boss_5355_4F4D)
+local function _____521D_59CB_5316Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID_5217_8868()
+    do
+        local i = 0
+        while i < #____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868 do
+            local _____914D_7F6E = ____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
+            local _____5355_4F4D_7C7B_578BID_5217_8868 = {}
+            if _____914D_7F6E["Boss引用键"] == nil or _____914D_7F6E["Boss引用键"] == "" then
+                if _____914D_7F6E["Boss单位名"] ~= nil and _____914D_7F6E["Boss单位名"] ~= "" then
+                    local _____5355_4F4D_7C7B_578BID = _____53D6_5355_4F4D_540D_5339_914D_539F_59CBID(_____914D_7F6E["Boss单位名"])
+                    if _____5355_4F4D_7C7B_578BID > 0 then
+                        _____5355_4F4D_7C7B_578BID_5217_8868[#_____5355_4F4D_7C7B_578BID_5217_8868 + 1] = _____5355_4F4D_7C7B_578BID
+                    end
+                end
+                local _____540D_79F0_5217_8868 = _____914D_7F6E["Boss单位名列表"]
+                if _____540D_79F0_5217_8868 ~= nil then
+                    do
+                        local j = 0
+                        while j < #_____540D_79F0_5217_8868 do
+                            local _____5355_4F4D_7C7B_578BID = _____53D6_5355_4F4D_540D_5339_914D_539F_59CBID(_____540D_79F0_5217_8868[j + 1])
+                            if _____5355_4F4D_7C7B_578BID > 0 and __TS__ArrayIndexOf(_____5355_4F4D_7C7B_578BID_5217_8868, _____5355_4F4D_7C7B_578BID) < 0 then
+                                _____5355_4F4D_7C7B_578BID_5217_8868[#_____5355_4F4D_7C7B_578BID_5217_8868 + 1] = _____5355_4F4D_7C7B_578BID
+                            end
+                            j = j + 1
+                        end
+                    end
+                end
+            end
+            ____Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID_5217_8868[#____Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID_5217_8868 + 1] = _____5355_4F4D_7C7B_578BID_5217_8868
+            i = i + 1
+        end
+    end
+end
+local function ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, _____914D_7F6E_7D22_5F15, ____Boss_5355_4F4D, _____5355_4F4D_7C7B_578BID)
     if ____Boss_5355_4F4D == nil or ____Boss_5355_4F4D == 0 then
         return false
     end
@@ -397,21 +430,11 @@ local function ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, ____Boss_5
         local _____5F15_7528_5355_4F4D = _____89E3_6790Boss_5355_4F4D(_____914D_7F6E)
         return _____5F15_7528_5355_4F4D ~= nil and _____5F15_7528_5355_4F4D ~= 0 and _____5F15_7528_5355_4F4D == ____Boss_5355_4F4D
     end
-    local _____5355_4F4D_7C7B_578BID = GetUnitTypeId(____Boss_5355_4F4D)
-    if _____5355_4F4D_7C7B_578BID <= 0 then
-        return false
-    end
-    if _____914D_7F6E["Boss单位名"] ~= nil and _____914D_7F6E["Boss单位名"] ~= "" then
-        return _____53D6_5355_4F4D_540D_5339_914D_539F_59CBID(_____914D_7F6E["Boss单位名"]) == _____5355_4F4D_7C7B_578BID
-    end
-    local _____540D_79F0_5217_8868 = _____914D_7F6E["Boss单位名列表"]
-    if _____540D_79F0_5217_8868 == nil or #_____540D_79F0_5217_8868 <= 0 then
-        return false
-    end
+    local _____5355_4F4D_7C7B_578BID_5217_8868 = ____Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID_5217_8868[_____914D_7F6E_7D22_5F15 + 1]
     do
         local i = 0
-        while i < #_____540D_79F0_5217_8868 do
-            if _____53D6_5355_4F4D_540D_5339_914D_539F_59CBID(_____540D_79F0_5217_8868[i + 1]) == _____5355_4F4D_7C7B_578BID then
+        while i < #_____5355_4F4D_7C7B_578BID_5217_8868 do
+            if _____5355_4F4D_7C7B_578BID_5217_8868[i + 1] == _____5355_4F4D_7C7B_578BID then
                 return true
             end
             i = i + 1
@@ -419,15 +442,20 @@ local function ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, ____Boss_5
     end
     return false
 end
+_____521D_59CB_5316Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID_5217_8868()
 ____exports["获取Boss死亡结算配置"] = function(____Boss_5355_4F4D)
     if ____Boss_5355_4F4D == nil or ____Boss_5355_4F4D == 0 then
+        return nil
+    end
+    local _____5355_4F4D_7C7B_578BID = GetUnitTypeId(____Boss_5355_4F4D)
+    if _____5355_4F4D_7C7B_578BID <= 0 then
         return nil
     end
     do
         local i = 0
         while i < #____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868 do
             local _____914D_7F6E = ____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
-            if ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, ____Boss_5355_4F4D) then
+            if ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, i, ____Boss_5355_4F4D, _____5355_4F4D_7C7B_578BID) then
                 return _____914D_7F6E
             end
             i = i + 1

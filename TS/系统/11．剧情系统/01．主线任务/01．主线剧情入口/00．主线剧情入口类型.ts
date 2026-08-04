@@ -27,6 +27,8 @@ export interface 主线剧情入口分支配置 {
   最低剧情进度?: number;
   最高剧情进度?: number;
   需要物品名?: string;
+  仅玩家英雄?: boolean;
+  触发后注销?: boolean;
   说明?: string;
 }
 
@@ -99,6 +101,7 @@ export interface 主线剧情技能通道事件配置 {
 
 export interface 主线剧情最终伤害对白配置 {
   说话者: string;
+  说话者引用?: string;
   文本: string;
   持续时间: number;
   使用攻击者名?: boolean;

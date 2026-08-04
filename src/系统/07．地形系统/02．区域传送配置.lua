@@ -178,8 +178,8 @@ ____exports["区域传送配置"] = {
         bottom = -224,
         right = -416,
         top = 32,
-        teleportX = 29791.9,
-        teleportY = 11914.5,
+        teleportX = 29473.6,
+        teleportY = 11973.9,
         cameraTime = 0.1,
         text = "|cffffff00『系统提示』|r：现在的场景为：|cffff6600『食人魔Boss房』|r",
         condition = "zhuxian≥10",
@@ -257,5 +257,49 @@ ____exports["区域传送配置"] = {
         enabled = true
     }
 }
+--- 剧情按时机动态注册的传送点，坐标与进度条件统一维护在地形系统。
+____exports["剧情动态传送配置表"] = {jlc_desert_ogre_challenge = {
+    id = "jlc_desert_ogre_challenge",
+    name = "第一章-食人魔挑战裂缝",
+    ["入口中心X"] = -20606.8,
+    ["入口中心Y"] = 2780.5,
+    ["入口半径"] = 200,
+    ["目标X"] = 29473.6,
+    ["目标Y"] = 11973.9,
+    condition = "zhuxian≥10",
+    enabled = true
+}, jlc_balzaroth_aftermath = {
+    id = "jlc_balzaroth_aftermath",
+    name = "第三章-巴尔扎罗斯战后",
+    ["入口中心X"] = 28656,
+    ["入口中心Y"] = -3248,
+    ["入口半径"] = 200,
+    ["目标X"] = 7272.6,
+    ["目标Y"] = -7320.4,
+    condition = "zhuxian=43",
+    enabled = true
+}, jlc_felice_aftermath = {
+    id = "jlc_felice_aftermath",
+    name = "第三章-菲尼克斯尔战后",
+    ["入口中心X"] = 16184.4,
+    ["入口中心Y"] = -3983.5,
+    ["入口半径"] = 200,
+    ["目标X"] = 11001.9,
+    ["目标Y"] = -14942.2,
+    ["目标面向"] = 270,
+    condition = "zhuxian=45",
+    enabled = true
+}, jlc_aronkos_aftermath = {
+    id = "jlc_aronkos_aftermath",
+    name = "第三章-亚伦柯斯战后",
+    ["入口中心X"] = 8389.6,
+    ["入口中心Y"] = -12280.9,
+    ["入口半径"] = 200,
+    ["目标X"] = 10641.8,
+    ["目标Y"] = -9804.5,
+    ["目标面向"] = 90,
+    condition = "zhuxian=47||zhuxian=48",
+    enabled = true
+}}
 ____exports.default = ____exports["区域传送配置"]
 return ____exports

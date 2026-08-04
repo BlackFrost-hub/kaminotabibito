@@ -129,16 +129,13 @@ function ____exports.SFB_setNegativeBuff(sourceUnit, u, id, time, effectSourceNa
     end
 end
 function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effectSourceType)
-    if not SUC_IsValidUnit(u) or time == 0 then
+    if not SUC_IsValidUnit(u) or not (time > 0) then
         return
     end
     if SUC_IsUnitStructure(u) then
         return
     end
     if u == SFB_Unit then
-        return
-    end
-    if time <= 0 then
         return
     end
     if id == ____SFB__589E_76CABUFF["心灵之火"] or id == ____SFB__589E_76CABUFF["嗜血术"] then
@@ -165,7 +162,7 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effe
     end
     if shouldApplyControlReduction(id) then
         time = calcReducedControlDuration(u, time)
-        if time <= 0 then
+        if not (time > 0) then
             return
         end
     end
@@ -185,30 +182,29 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effe
         return
     end
     local fac = getAngleBetweenUnits(caster, u)
-    EXSetUnitFacing(nil, caster, fac)
+    EXSetUnitFacing(caster, fac)
     jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     local abilityId
     local orderStr
     repeat
-        local ____switch38 = id
-        local ____cond38 = ____switch38 == 0
-        if ____cond38 then
+        local ____switch37 = id
+        local ____cond37 = ____switch37 == 0
+        if ____cond37 then
             abilityId = ABILITY.STUN
             orderStr = ORDER.STUN
             break
         end
-        ____cond38 = ____cond38 or ____switch38 == 1
-        if ____cond38 then
+        ____cond37 = ____cond37 or ____switch37 == 1
+        if ____cond37 then
             abilityId = ABILITY.FREEZE
             orderStr = ORDER.FREEZE
             break
         end
-        ____cond38 = ____cond38 or ____switch38 == 2
-        if ____cond38 then
+        ____cond37 = ____cond37 or ____switch37 == 2
+        if ____cond37 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
-                nil,
                 caster,
                 abilityId,
                 1,
@@ -217,24 +213,23 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effe
             )
             break
         end
-        ____cond38 = ____cond38 or ____switch38 == 3
-        if ____cond38 then
+        ____cond37 = ____cond37 or ____switch37 == 3
+        if ____cond37 then
             abilityId = ABILITY.POLYMORPH
             orderStr = ORDER.POLYMORPH
             break
         end
-        ____cond38 = ____cond38 or ____switch38 == 4
-        if ____cond38 then
+        ____cond37 = ____cond37 or ____switch37 == 4
+        if ____cond37 then
             abilityId = ABILITY.INVIS
             orderStr = ORDER.INVIS
             break
         end
-        ____cond38 = ____cond38 or ____switch38 == 5
-        if ____cond38 then
+        ____cond37 = ____cond37 or ____switch37 == 5
+        if ____cond37 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
-                nil,
                 caster,
                 abilityId,
                 1,
@@ -248,7 +243,6 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effe
         end
     until true
     YDWESetUnitAbilityDataReal(
-        nil,
         caster,
         abilityId,
         1,
@@ -256,7 +250,6 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effe
         time
     )
     YDWESetUnitAbilityDataReal(
-        nil,
         caster,
         abilityId,
         1,
@@ -342,7 +335,7 @@ ____exports["SFB_施加通用Buff"] = function(_____6765_6E90_5355_4F4D, _____76
     ____exports.SFB_setBuff(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, ____Buff_7C7B_578B, _____6301_7EED_65F6_95F4)
 end
 function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, effectSourceType)
-    if not SUC_IsValidUnit(u) or time == 0 then
+    if not SUC_IsValidUnit(u) or not (time > 0) then
         return
     end
     if SUC_IsUnitStructure(u) then
@@ -351,7 +344,7 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, 
     if u == SFB_Unit then
         return
     end
-    if time <= 0 then
+    if not (time > 0) then
         return
     end
     local caster = SFB_Unit
@@ -359,10 +352,9 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, 
         return
     end
     local fac = getAngleBetweenUnits(caster, u)
-    EXSetUnitFacing(nil, caster, fac)
+    EXSetUnitFacing(caster, fac)
     jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     YDWESetUnitAbilityDataReal(
-        nil,
         caster,
         ABILITY.SLOW,
         1,
@@ -370,7 +362,6 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, 
         ms
     )
     YDWESetUnitAbilityDataReal(
-        nil,
         caster,
         ABILITY.SLOW,
         1,
@@ -378,7 +369,6 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, 
         as
     )
     YDWESetUnitAbilityDataReal(
-        nil,
         caster,
         ABILITY.SLOW,
         1,
@@ -386,7 +376,6 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, 
         time
     )
     YDWESetUnitAbilityDataReal(
-        nil,
         caster,
         ABILITY.SLOW,
         1,

@@ -12,20 +12,17 @@
  */
 
 const jass = require("jass.common") as any;
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
   getBuffRuntime: (this: void, unit: any, buffID: string) => { effect: number; effect2?: number; remaining: number } | null;
 };
 
 const { UnitHasBuffBJ, IsUnitDeadBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
-  UnitHasBuffBJ: (unit: any, buffId: number) => boolean;
-  IsUnitDeadBJ: (unit: any) => boolean;
+  UnitHasBuffBJ: (this: void, unit: any, buffId: number) => boolean;
+  IsUnitDeadBJ: (this: void, unit: any) => boolean;
 };
 
 const { IsUnitPausedBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
-  IsUnitPausedBJ: (unit: any) => boolean;
+  IsUnitPausedBJ: (this: void, unit: any) => boolean;
 };
 
 const {
@@ -52,6 +49,7 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
     HealManaAmount?: number;
     ItemHeal: boolean;
     HealEffect: boolean;
+    HealShowText?: boolean;
     ManaEffect?: boolean;
     ManaShowText?: boolean;
   }) => number;
@@ -120,14 +118,11 @@ let hotTickCallback: (() => void) | null = null;
  * 遍历所有HOT单位，执行恢复逻辑
  */
 function onHotTick(): void {
-  debugLogForce("持续治疗效果", "onHotTick", "hotUnits:", hotUnits.size);
   const toRemove: any[] = [];
 
   for (const target of hotUnits) {
-    debugLogForce("持续治疗效果", "tick开始", "target:", target);
     // 检查单位是否被暂停（暂停则跳过本次）
     if (IsUnitPausedBJ(target)) {
-      debugLogForce("持续治疗效果", "跳过暂停单位", "target:", target);
       continue;
     }
 
@@ -139,23 +134,20 @@ function onHotTick(): void {
     const tickHP = YDUserDataGetSafe("unit", target, ATTR_TICK_HP, "real");
     const tickMP = YDUserDataGetSafe("unit", target, ATTR_TICK_MP, "real");
     const source = YDUserDataGetSafe("unit", target, ATTR_SOURCE, "unit");
-    debugLogForce("持续治疗效果", "读取HOT数据", "target:", target, "countdown:", countdown, "tickHP:", tickHP, "tickMP:", tickMP, "source:", source);
 
     // 执行生命/魔法恢复（直接调用 doHeal，TS参数传参）
     if (tickHP > 0 || tickMP > 0) {
-      const healed = doHeal({
+      doHeal({
         HealSource: source,
         HealTarget: target,
         HealAmount: tickHP > 0 ? tickHP : 0,
         HealManaAmount: tickMP > 0 ? tickMP : 0,
         ItemHeal: true,
         HealEffect: false, // HOT通常不播放特效
+        HealShowText: false,
         ManaEffect: false,
-        ManaShowText: tickMP > 0,
+        ManaShowText: false,
       });
-      debugLogForce("持续治疗效果", "doHeal完成", "target:", target, "healed:", healed);
-    } else {
-      debugLogForce("持续治疗效果", "跳过doHeal", "target:", target, "tickHP:", tickHP, "tickMP:", tickMP);
     }
 
     // 检查结束条件
@@ -165,7 +157,6 @@ function onHotTick(): void {
       !buffAlive ||
       countdown <= 0 ||
       dead;
-    debugLogForce("持续治疗效果", "结束判定", "target:", target, "buffAlive:", buffAlive, "countdown:", countdown, "dead:", dead, "shouldEnd:", shouldEnd);
 
     if (shouldEnd) {
       toRemove.push(target);
@@ -228,7 +219,6 @@ export function startHot(
   if (!HOT_SYSTEM_ENABLED) return;
   if (target == null) return;
   if (duration <= 0) return;
-  debugLogForce("持续治疗效果", "startHot", "target:", target, "source:", source, "tickHP:", tickHP, "tickMP:", tickMP, "duration:", duration);
 
   // 设置倒计时和恢复量
   YDUserDataSetSafe("unit", target, ATTR_COUNTDOWN, "real", duration);
@@ -245,7 +235,6 @@ export function startHot(
   // 添加到HOT单位集合
   const isNew = !hotUnits.has(target);
   hotUnits.add(target);
-  debugLogForce("持续治疗效果", "加入热集合", "target:", target, "isNew:", isNew, "size:", hotUnits.size);
 
   // 确保中心计时器回调已注册
   if (isNew) {
@@ -258,7 +247,6 @@ export function startHot(
  */
 export function stopHot(target: any): void {
   if (target == null) return;
-  debugLogForce("持续治疗效果", "stopHot", "target:", target, "beforeSize:", hotUnits.size);
 
   // 从HOT单位集合移除
   hotUnits.delete(target);
@@ -272,7 +260,6 @@ export function stopHot(target: any): void {
 
   // 如果没有HOT单位了，注销中心计时器回调
   unregisterCenterTimerIfNeeded();
-  debugLogForce("持续治疗效果", "stopHot完成", "target:", target, "afterSize:", hotUnits.size);
 }
 
 /**

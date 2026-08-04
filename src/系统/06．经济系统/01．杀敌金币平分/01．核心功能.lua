@@ -11,6 +11,7 @@ local ____exports = {}
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.06．经济系统.01．杀敌金币平分.00．常量定义")
 local SHARE_RANGE = ____require_result_0.SHARE_RANGE
+local _____6740_654C_91D1_5E01_5E73_5206_7CFB_7EDF_542F_7528 = ____require_result_0["杀敌金币平分系统启用"]
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.index")
 local getObjectPropertyInteger = ____require_result_1.getObjectPropertyInteger
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
@@ -229,6 +230,9 @@ end
 -- 
 -- @param cb 回调函数
 function ____exports.registerGoldGainCallback(cb)
+    if not _____6740_654C_91D1_5E01_5E73_5206_7CFB_7EDF_542F_7528 then
+        return
+    end
     goldGainCallbacks[#goldGainCallbacks + 1] = cb
 end
 local _initialized = false
@@ -238,6 +242,9 @@ function ____exports.initGoldShareSystem()
         return
     end
     _initialized = true
+    if not _____6740_654C_91D1_5E01_5E73_5206_7CFB_7EDF_542F_7528 then
+        return
+    end
     registerDeathListener(onUnitDeathHandler)
 end
 ____exports.initGoldShareSystem()

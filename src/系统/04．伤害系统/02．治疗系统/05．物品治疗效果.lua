@@ -127,7 +127,7 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
         return
     end
     if abilId == ABIL_A08C then
-        if isHotActive(nil, target) then
+        if isHotActive(target) then
             local currentTickHP = YDUserDataGet(
                 nil,
                 "unit",
@@ -158,7 +158,6 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
         local tickHP = healHP * HOT_TICK_RATIO
         local tickMP = healMP * HOT_TICK_RATIO
         startHot(
-            nil,
             target,
             target,
             tickHP,

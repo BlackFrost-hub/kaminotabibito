@@ -160,10 +160,9 @@ export function SFB_setBuff(
   effectSourceName?: string,
   effectSourceType?: "装备" | "技能"
 ): void {
-  if (!SUC_IsValidUnit(u) || time === 0) return;
+  if (!SUC_IsValidUnit(u) || !(time > 0)) return;
   if (SUC_IsUnitStructure(u)) return;
   if (u === SFB_Unit) return;
-  if (time <= 0) return;
 
   if (id === SFB_增益BUFF.心灵之火 || id === SFB_增益BUFF.嗜血术) {
     SFB_setPositiveBuff(sourceUnit, u, id, time, effectSourceName, effectSourceType);
@@ -184,7 +183,7 @@ export function SFB_setBuff(
 
   if (shouldApplyControlReduction(id)) {
     time = calcReducedControlDuration(u, time);
-    if (time <= 0) return;
+    if (!(time > 0)) return;
   }
 
   if (id >= 21) {
@@ -253,10 +252,10 @@ export function SFB_setSlow(
   effectSourceName?: string,
   effectSourceType?: "装备" | "技能"
 ): void {
-  if (!SUC_IsValidUnit(u) || time === 0) return;
+  if (!SUC_IsValidUnit(u) || !(time > 0)) return;
   if (SUC_IsUnitStructure(u)) return;
   if (u === SFB_Unit) return;
-  if (time <= 0) return;
+  if (!(time > 0)) return;
 
   const caster = SFB_Unit;
   if (caster == null || caster === 0) return;

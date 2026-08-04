@@ -1,6 +1,12 @@
 /** @noSelfInFile */
 
-import { 启用单位头顶血条, 血条刷新间隔Tick, 血条尺寸, 血条资源 } from "./00．常量";
+import {
+  启用单位头顶血条,
+  血条刷新间隔Tick,
+  血条创建每批数量,
+  血条尺寸,
+  血条资源,
+} from "./00．常量";
 import type { 单位血条绑定, 单位血条帧组 } from "./01．类型";
 import { 取单位血条帧组, 回收单位血条帧组 } from "./03．血条池";
 
@@ -10,9 +16,6 @@ const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any
 
 const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: (this: void) => void) => void;
-};
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
-  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
 const { 查询单位可显示护盾值, 查询单位护盾列表, 护盾类型 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.index") as {
   查询单位可显示护盾值: (this: void, unit: any) => number;
@@ -41,22 +44,21 @@ const { TriggerRegisterEnterRectSimple } = require("lib.扩展函数.BJ函数.01
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetWorldBounds = jass.GetWorldBounds as () => any;
 const GetTriggerUnit = jass.GetTriggerUnit as () => any;
-const GetEnumUnit = jass.GetEnumUnit as () => any;
 const CreateTrigger = jass.CreateTrigger as () => any;
 const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: (this: void) => void) => void;
 const CreateGroup = jass.CreateGroup as () => any;
 const GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect as (group: any, rect: any, filter: any) => void;
-const ForGroup = jass.ForGroup as (group: any, callback: (this: void) => void) => void;
+const FirstOfGroup = jass.FirstOfGroup as (group: any) => any;
+const GroupRemoveUnit = jass.GroupRemoveUnit as (group: any, unit: any) => void;
 const DestroyGroup = jass.DestroyGroup as (group: any) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const IsUnitEnemy = jass.IsUnitEnemy as (unit: any, player: any) => boolean;
-const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const IsUnitEnemy = jass.IsUnitEnemy as (unit: any, whichPlayer: any) => boolean;
 const GetLocalPlayer = jass.GetLocalPlayer as () => any;
-const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: number) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitLevel = jass.GetUnitLevel as (unit: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const R2I = jass.R2I as (value: number) => number;
 const CreateTimer = jass.CreateTimer as () => any;
 const DestroyTimer = jass.DestroyTimer as (timer: any) => void;
 const GetExpiredTimer = jass.GetExpiredTimer as () => any;
@@ -87,14 +89,18 @@ const 生命状态 = jass.UNIT_STATE_LIFE;
 const 最大生命状态 = jass.UNIT_STATE_MAX_LIFE;
 const 魔法状态 = jass.UNIT_STATE_MANA;
 const 最大魔法状态 = jass.UNIT_STATE_MAX_MANA;
-const 蝗虫技能ID = stringToFourCCSafe("Aloc");
-
+const 单位死亡类型 = jass.UNIT_TYPE_DEAD;
+const 单位英雄类型 = jass.UNIT_TYPE_HERO;
 const 单位血条表 = new Map<number, 单位血条绑定>();
 const 单位ID列表: number[] = [];
+const 英雄死亡隐藏血条ID集合 = new Set<number>();
+const 待创建单位队列: any[] = [];
+const 待创建单位ID集合 = new Set<number>();
 const g = globalThis as any;
 
 let 已初始化 = false;
 let tick计数 = 0;
+let 待创建单位读取索引 = 0;
 
 function 取原生血条帧(this: void, unit: any): number {
   return DzFrameGetUnitHpBar(unit);
@@ -118,15 +124,21 @@ function 限制01(this: void, value: number): number {
 function 单位存活(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
   if (GetUnitTypeId(unit) === 0) return false;
-  if (IsUnitType(unit, jass.UNIT_TYPE_DEAD)) return false;
+  if (IsUnitType(unit, 单位死亡类型)) return false;
   return GetUnitState(unit, 生命状态) > 0.405;
 }
 
 function 单位可注册血条(this: void, unit: any): boolean {
-  if (!单位存活(unit)) return false;
-  if (IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE)) return false;
-  if (GetUnitAbilityLevel(unit, 蝗虫技能ID) > 0) return false;
-  return true;
+  return 单位存活(unit);
+}
+
+function 加入待创建单位(this: void, unit: any): void {
+  if (!单位可注册血条(unit)) return;
+  const unitId = GetHandleId(unit);
+  if (unitId === 0 || 单位血条表.has(unitId) || 待创建单位ID集合.has(unitId)) return;
+  隐藏单位原生血条(unit);
+  待创建单位ID集合.add(unitId);
+  待创建单位队列.push(unit);
 }
 
 function 取头顶高度(this: void, unit: any, isHero: boolean): number {
@@ -165,22 +177,16 @@ function 取血条名字文本(this: void, unit: any): string {
   return "|cffffe6a8" + 去除魔兽颜色码(GetUnitName(unit)) + "|r";
 }
 
-function 单位是优先血条单位(this: void, unit: any): boolean {
-  if (IsUnitType(unit, jass.UNIT_TYPE_HERO)) return true;
-  return GetUnitLevel(unit) >= 30;
-}
-
 function 自动注册单位头顶血条(this: void, unit: any): void {
-  if (!单位存活(unit)) return;
-  隐藏单位原生血条(unit);
-  注册单位头顶血条(unit);
+  if (!单位可注册血条(unit)) return;
+  加入待创建单位(unit);
 }
 
 function 取生命贴图(this: void, unit: any, lifePct: number): string {
   const localPlayer = GetLocalPlayer();
   if (IsUnitEnemy(unit, localPlayer)) return 血条资源.敌方生命;
   if (lifePct <= 0.60) {
-    const index = Math.floor(lifePct * 20);
+    const index = R2I(lifePct * 20);
     return 血条资源.生命低血渐变[index < 0 ? 0 : index > 12 ? 12 : index];
   }
   return 血条资源.友方生命;
@@ -387,7 +393,7 @@ export function 注册单位头顶血条(this: void, unit: any): void {
 
   const maxLife = GetUnitStateJapi(unit, 最大生命状态);
   const maxMana = GetUnitStateJapi(unit, 最大魔法状态);
-  const isHero = IsUnitType(unit, jass.UNIT_TYPE_HERO);
+  const isHero = IsUnitType(unit, 单位英雄类型);
   const binding: 单位血条绑定 = {
     单位: unit,
     单位ID: unitId,
@@ -410,6 +416,7 @@ export function 注册单位头顶血条(this: void, unit: any): void {
 function 注销单位头顶血条(this: void, unitId: number): void {
   const binding = 单位血条表.get(unitId);
   if (binding == null) return;
+  英雄死亡隐藏血条ID集合.delete(unitId);
   隐藏绑定(binding);
   回收单位血条帧组(binding.帧);
   单位血条表.delete(unitId);
@@ -441,11 +448,36 @@ function 刷新生命魔法(this: void, binding: 单位血条绑定): void {
   }
 }
 
+function 处理待创建单位(this: void): void {
+  let 本轮检查数量 = 0;
+  while (
+    本轮检查数量 < 血条创建每批数量
+    && 待创建单位读取索引 < 待创建单位队列.length
+  ) {
+    const unit = 待创建单位队列[待创建单位读取索引];
+    待创建单位读取索引++;
+    本轮检查数量++;
+
+    const unitId = GetHandleId(unit);
+    if (unitId !== 0) 待创建单位ID集合.delete(unitId);
+    if (!单位可注册血条(unit)) continue;
+    if (unitId === 0 || 单位血条表.has(unitId)) continue;
+    注册单位头顶血条(unit);
+  }
+
+  if (待创建单位读取索引 >= 待创建单位队列.length) {
+    待创建单位队列.length = 0;
+    待创建单位读取索引 = 0;
+  }
+}
+
 function 刷新所有单位头顶血条(this: void): void {
   if (!启用单位头顶血条) return;
   tick计数++;
   if (tick计数 < 血条刷新间隔Tick) return;
   tick计数 = 0;
+
+  处理待创建单位();
 
   let writeIndex = 0;
   for (let i = 0; i < 单位ID列表.length; i++) {
@@ -453,11 +485,25 @@ function 刷新所有单位头顶血条(this: void): void {
     const binding = 单位血条表.get(unitId);
     if (binding == null) continue;
     if (!单位存活(binding.单位)) {
+      if (binding.是否英雄 && GetUnitTypeId(binding.单位) !== 0) {
+        if (!英雄死亡隐藏血条ID集合.has(unitId)) {
+          英雄死亡隐藏血条ID集合.add(unitId);
+          隐藏绑定(binding);
+        }
+        单位ID列表[writeIndex] = unitId;
+        writeIndex++;
+        continue;
+      }
       注销单位头顶血条(unitId);
       continue;
     }
     单位ID列表[writeIndex] = unitId;
     writeIndex++;
+    if (英雄死亡隐藏血条ID集合.has(unitId)) {
+      英雄死亡隐藏血条ID集合.delete(unitId);
+      初始化帧内容(binding);
+      激活绑定显示(binding);
+    }
     隐藏单位原生血条(binding.单位);
     刷新生命魔法(binding);
   }
@@ -468,30 +514,18 @@ function 刷新所有单位头顶血条(this: void): void {
 
 function on单位进入地图(this: void): void {
   const unit = GetTriggerUnit();
-  隐藏单位原生血条(unit);
   自动注册单位头顶血条(unit);
-}
-
-function on枚举初始单位(this: void): void {
-  const unit = GetEnumUnit();
-  自动注册单位头顶血条(unit);
-}
-
-function on枚举隐藏原生血条(this: void): void {
-  隐藏单位原生血条(GetEnumUnit());
-}
-
-function 隐藏已有单位原生血条(this: void): void {
-  const group = CreateGroup();
-  GroupEnumUnitsInRect(group, GetWorldBounds(), null);
-  ForGroup(group, on枚举隐藏原生血条);
-  DestroyGroup(group);
 }
 
 function 注册已有单位(this: void): void {
   const group = CreateGroup();
   GroupEnumUnitsInRect(group, GetWorldBounds(), null);
-  ForGroup(group, on枚举初始单位);
+  let unit = FirstOfGroup(group);
+  while (unit != null && unit !== 0) {
+    GroupRemoveUnit(group, unit);
+    自动注册单位头顶血条(unit);
+    unit = FirstOfGroup(group);
+  }
   DestroyGroup(group);
 }
 
@@ -506,7 +540,6 @@ function 延迟初始化单位头顶血条(this: void): void {
   if (timer != null && timer !== 0) DestroyTimer(timer);
 
   DzDisableUnitPreselectUi();
-  隐藏已有单位原生血条();
   注册已有单位();
   注册进入事件();
   onTick10ms(刷新所有单位头顶血条);

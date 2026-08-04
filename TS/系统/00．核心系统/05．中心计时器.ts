@@ -13,7 +13,7 @@
  *
  * ## 时间模型（内部状态）
  * - **nowMs** ≈ `_serverTime + _millisCounter * 10`：`getServerTime()` / 多数逻辑用的「毫秒」。
- * - **服务器锚点**：`initCenterTimer` 内 `DzAPI_Map_GetGameStartTime()` → `_serverTime`（毫秒档，每秒整 tick 时 +1000）。
+ * - **时间锚点**：不读取平台服务器时间，从 0 开始按游戏逻辑时间递增。
  * - **游戏经过时间**：`_gameElapsedTime`（秒，含小数），写入 `jass.globals.udg_Elapsed`（若存在）。
  * - **游戏内 [秒,分,时]**：`_gameTimeHMS`，每秒推进并写入 `jass.udg_Time[0..2]`（若存在）。
  * - **日历**：`calcDate` / `updateDate` 与旧版 JASS `gettime.j` 一致：`BASE_TIMESTAMP`(2015-01-01 UTC) + `TIMEZONE_OFFSET`(东八区秒)。
@@ -35,15 +35,17 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
+// 不读取 DzAPI_Map_GetGameStartTime，保留 Warcraft 原生随机状态。
+// const japi = require("jass.japi") as any;
 const jassGlobals = require("jass.globals") as any;
 const R2I = jass.R2I as (value: number) => number;
 const CreateTimer = jass.CreateTimer as () => any;
 const DestroyTimer = jass.DestroyTimer as (whichTimer: any) => void;
 const TimerStart = jass.TimerStart as (whichTimer: any, timeout: number, periodic: boolean, handlerFunc: (this: void) => void) => void;
-const DzAPI_Map_GetGameStartTime = japi.DzAPI_Map_GetGameStartTime as () => number;
+// const DzAPI_Map_GetGameStartTime = japi.DzAPI_Map_GetGameStartTime as () => number;
 const 调试输出 = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   safeExecute: (this: void, module: string, callback: (this: void) => void) => boolean;
+  getCallbackDebugLabel: (this: void, callback: any) => string;
 };
 
 const NORMAL_MON_DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -76,6 +78,11 @@ const _tickCallbacks: Array<(this: void) => void> = [];
 /** 当前逻辑毫秒（与 getServerTime 一致） */
 function nowMs(): number {
   return _serverTime + _millisCounter * 10;
+}
+
+function gameElapsedMilliseconds(): number {
+  const elapsedSeconds = _gameTimeHMS[2] * 3600 + _gameTimeHMS[1] * 60 + _gameTimeHMS[0];
+  return elapsedSeconds * 1000 + _millisCounter * 10;
 }
 
 function intFloor(value: number): number {
@@ -197,6 +204,11 @@ function executeCurrentDelayedCallback(this: void): void {
   if (_currentDelayedCallback != null) _currentDelayedCallback(_currentDelayedVariable);
 }
 
+function getTimerCallbackModule(this: void, prefix: string, callback: any): string {
+  const callbackLabel = 调试输出.getCallbackDebugLabel(callback);
+  return callbackLabel !== "" ? prefix + " -> " + callbackLabel : prefix;
+}
+
 function runPeriodicCallbacks(): void {
   const now = nowMs();
   for (const p of _periodicCallbacks) {
@@ -204,7 +216,7 @@ function runPeriodicCallbacks(): void {
       p.lastRunTime = now;
       _currentPeriodicCallback = p.callback;
       _currentPeriodicVariable = p.variable;
-      调试输出.safeExecute("中心计时器-周期回调", executeCurrentPeriodicCallback);
+      调试输出.safeExecute(getTimerCallbackModule("中心计时器-周期回调", p.callback), executeCurrentPeriodicCallback);
       _currentPeriodicCallback = undefined;
       _currentPeriodicVariable = undefined;
     }
@@ -221,7 +233,7 @@ function runDelayedCallbacks(): void {
       d.active = false;
       _currentDelayedCallback = d.callback;
       _currentDelayedVariable = d.variable;
-      调试输出.safeExecute("中心计时器-延迟回调", executeCurrentDelayedCallback);
+      调试输出.safeExecute(getTimerCallbackModule("中心计时器-延迟回调", d.callback), executeCurrentDelayedCallback);
       _currentDelayedCallback = undefined;
       _currentDelayedVariable = undefined;
     } else {
@@ -243,7 +255,7 @@ function onTick(): void {
   }
 
   for (const cb of _tickCallbacks) {
-    调试输出.safeExecute("中心计时器-10ms回调", cb);
+    调试输出.safeExecute(getTimerCallbackModule("中心计时器-10ms回调", cb), cb);
   }
   runPeriodicCallbacks();
   runDelayedCallbacks();
@@ -252,7 +264,7 @@ function onTick(): void {
 
   _millisCounter = 0;
   _serverTime += 1000;
-  calcDate(_serverTime / 1000);
+  calcDate(BASE_TIMESTAMP + _serverTime / 1000);
 
   _gameTimeHMS[0]++;
   if (_gameTimeHMS[0] >= 60) {
@@ -272,7 +284,7 @@ function onTick(): void {
   }
 
   for (const cb of _secondCallbacks) {
-    调试输出.safeExecute("中心计时器-秒回调", cb);
+    调试输出.safeExecute(getTimerCallbackModule("中心计时器-秒回调", cb), cb);
   }
 }
 
@@ -286,7 +298,7 @@ export function getTime(i: number): number {
 }
 
 export function getGameTime(): number {
-  return nowMs() - (_initialized ? _serverTime : 0);
+  return gameElapsedMilliseconds();
 }
 
 export function getGameElapsedTime(): number {
@@ -304,7 +316,7 @@ export function getGameTimeFormatted(): {
   milliseconds: number;
   totalMs: number;
 } {
-  const totalMs = nowMs();
+  const totalMs = gameElapsedMilliseconds();
   const totalSec = intFloor(totalMs / 1000);
   return {
     hours: intFloor(totalSec / 3600),
@@ -391,15 +403,16 @@ export function initCenterTimer(): void {
   }
   _initialized = true;
 
-  const startTime = DzAPI_Map_GetGameStartTime();
-  _serverTime = startTime * 1000;
+  // 不再使用平台服务器开局时间，逻辑时钟从 0 开始。
+  // const startTime = DzAPI_Map_GetGameStartTime();
+  // _serverTime = startTime * 1000;
 
   const dr = jassGlobals.udg_N as number | undefined;
   if (dr !== undefined) {
     _gameDifficulty = maxNum(1, intFloor(dr));
   }
 
-  calcDate(_serverTime / 1000);
+  calcDate(BASE_TIMESTAMP + _serverTime / 1000);
 
   const timer = CreateTimer();
   TimerStart(timer, 0.01, true, onTick);

@@ -75,3 +75,8 @@ export const 血条层级 = {
 } as const;
 
 export const 血条刷新间隔Tick = 3;
+
+export const 血条创建每批数量 = 6;
+export const 血条敌人扫描半径 = 2000;
+export const 血条敌人扫描间隔Tick = 10;
+export const 血条扫描玩家数量 = 6;

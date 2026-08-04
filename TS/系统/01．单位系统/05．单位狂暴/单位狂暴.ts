@@ -39,7 +39,7 @@ function onDeath(this: void, dying: any, killer: any): void {
   const spawnUnitId = String(spawnRaw).trim();
   if (spawnUnitId === "") return;
 
-  const BERSERK_PROC = 1; // 100% for test
+  const BERSERK_PROC = 0.0625; // 默认6.25%触发
   if ((jass as any).GetRandomInt(1, 10000) as number > BERSERK_PROC * 10000) return;
 
   let x = 0;

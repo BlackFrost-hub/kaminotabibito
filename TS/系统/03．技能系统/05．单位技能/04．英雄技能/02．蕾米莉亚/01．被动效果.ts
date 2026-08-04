@@ -17,13 +17,16 @@ const { 单位满足击杀前置条件 } = require("系统.03．技能系统.05�
 const { 蕾米莉亚单位技能配置 } = require("系统.03．技能系统.05．单位技能.04．英雄技能.02．蕾米莉亚.00．配置") as {
   蕾米莉亚单位技能配置: {
     单位类型ID: number;
-    技能类型ID: number;
+    D: {
+      技能类型ID: number;
+    };
   };
 };
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
-function 重置蕾米莉亚恶魔突袭冷却(this: void, killerUnit: any): void {
+
+function 刷新蕾米莉亚恶魔突袭本次冷却(this: void, killerUnit: any): void {
   if (killerUnit == null || killerUnit === 0) return;
   if (GetUnitTypeId(killerUnit) !== 蕾米莉亚单位技能配置.单位类型ID) return;
 
@@ -31,12 +34,12 @@ function 重置蕾米莉亚恶魔突袭冷却(this: void, killerUnit: any): void
   if (owner == null || owner === 0) return;
   if (getRegisteredPlayerHero(owner) !== killerUnit) return;
 
-  YDWESetUnitAbilityStateSafe(killerUnit, 蕾米莉亚单位技能配置.技能类型ID, 1, 0.0);
+  YDWESetUnitAbilityStateSafe(killerUnit, 蕾米莉亚单位技能配置.D.技能类型ID, 1, 0.0);
 }
 
 function 处理蕾米莉亚击杀被动(this: void, dyingUnit: any, killingUnit: any): void {
   if (!单位满足击杀前置条件(dyingUnit)) return;
-  重置蕾米莉亚恶魔突袭冷却(killingUnit);
+  刷新蕾米莉亚恶魔突袭本次冷却(killingUnit);
 }
 
 export function 注册蕾米莉亚击杀被动(this: void): void {

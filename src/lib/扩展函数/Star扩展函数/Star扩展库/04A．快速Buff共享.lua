@@ -1,9 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local ____00_FF0EYDWE_51FD_6570 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local YDWESetUnitAbilityDataReal = ____00_FF0EYDWE_51FD_6570.YDWESetUnitAbilityDataReal
-local EXSetUnitFacing = ____00_FF0EYDWE_51FD_6570.EXSetUnitFacing
+local ____09_FF0EYDUserData_5B89_5168_7248 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local _____5B89_5168_8BBE_7F6E_5355_4F4D_6280_80FD_5B9E_6570_6570_636E = ____09_FF0EYDUserData_5B89_5168_7248["安全设置单位技能实数数据"]
 local ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local GS_Suspend = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF.GS_Suspend
 local _____8BBE_7F6E_5355_4F4D_6682_505C_65F6_95F4 = ____03_FF0E_786C_76F4_6682_505C_7CFB_7EDF["设置单位暂停时间"]
@@ -41,6 +40,10 @@ local _____56DB_8272_7801_8F6C_5B57_7B26_4E32 = fourCcUtil.fourCCToString
 local _____83B7_53D6_73A9_5BB6_9996_4E2A_82F1_96C4 = unitRelated.getPlayerFirstHero
 local YDUserDataGet = YDUserDataGetSafe
 local YDUserDataSet = YDUserDataSetSafe
+local YDWESetUnitAbilityDataReal = _____5B89_5168_8BBE_7F6E_5355_4F4D_6280_80FD_5B9E_6570_6570_636E
+local function EXSetUnitFacing(unit, angle)
+    japi.EXSetUnitFacing(unit, angle)
+end
 local function sym(name)
     local ____G_name_5 = _G[name]
     if ____G_name_5 == nil then
@@ -243,6 +246,9 @@ function ____exports.shouldApplyControlReduction(id)
     return id == 0 or id == 1 or id == 2 or id == 5 or id == ____exports["SFB_负面BUFF"]["睡眠"] or id == ____exports["SFB_负面BUFF"]["纠缠根须"] or id == ____exports["SFB_负面BUFF"]["飓风"]
 end
 function ____exports.registerSfbManualBuff(sourceUnit, u, id, time, effectValue, effectSourceName, effectSourceType)
+    if not (time > 0) then
+        return
+    end
     local buffID = SFB_BUFF_ID[id]
     if buffID == nil or buffID == "" then
         return
@@ -339,7 +345,7 @@ local function ____SFB__786E_4FDD_9A6C_7532_6280_80FD(abilityId)
     return true
 end
 ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, abilityId, orderStr, effectSourceName, effectSourceType)
-    if not SUC_IsValidUnit(u) or time <= 0 then
+    if not SUC_IsValidUnit(u) or not (time > 0) then
         return
     end
     if SUC_IsUnitStructure(u) then
@@ -356,7 +362,7 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
         return
     end
     local fac = ____exports.getAngleBetweenUnits(caster, u)
-    EXSetUnitFacing(nil, caster, fac)
+    EXSetUnitFacing(caster, fac)
     jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     SetUnitX(
         caster,
@@ -367,7 +373,6 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
         GetUnitY(u)
     )
     YDWESetUnitAbilityDataReal(
-        nil,
         caster,
         abilityId,
         1,
@@ -375,7 +380,6 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
         time
     )
     YDWESetUnitAbilityDataReal(
-        nil,
         caster,
         abilityId,
         1,
@@ -384,7 +388,6 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
     )
     if abilityId == ____exports.ABILITY.PARASITE then
         YDWESetUnitAbilityDataReal(
-            nil,
             caster,
             abilityId,
             1,
@@ -392,7 +395,6 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
             0
         )
         YDWESetUnitAbilityDataReal(
-            nil,
             caster,
             abilityId,
             1,
@@ -432,11 +434,10 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
         return false
     end
     local fac = ____exports.getAngleBetweenUnits(caster, u)
-    EXSetUnitFacing(nil, caster, fac)
+    EXSetUnitFacing(caster, fac)
     jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     if _____6301_7EED_65F6_95F4 > 0 then
         YDWESetUnitAbilityDataReal(
-            nil,
             caster,
             abilityId,
             1,
@@ -444,7 +445,6 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
             _____6301_7EED_65F6_95F4
         )
         YDWESetUnitAbilityDataReal(
-            nil,
             caster,
             abilityId,
             1,
@@ -465,6 +465,9 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
     return ____temp_12
 end
 ____exports["SFB_施加暂停类Buff"] = function(sourceUnit, u, id, time, effectSourceName, effectSourceType)
+    if not (time > 0) then
+        return
+    end
     ____exports.registerSfbManualBuff(
         sourceUnit,
         u,

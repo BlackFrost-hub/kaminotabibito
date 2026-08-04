@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____83B7_53D6_53E5_67C4ID, _____5F53_524D_547D_4EE4_5141_8BB8_515C_5E95_4E0B_4EE4, _____5355_4F4D_5728Boss_6218_8303_56F4_5185_6709_6548, _____8BB0_5F55_6700_8FD1_679A_4E3E_76EE_6807, ____on_679A_4E3E_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, _____8BFB_53D6_73A9_5BB6_82F1_96C4_7EC4, _____8BFB_53D6_5F53_524D_6709_6548_4EC7_6068_76EE_6807, _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA, _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA, RectContainsUnit, IsUnitPausedBJ, YDUserDataGetSafe, getEnemyThreats, isValidCombatEnemyUnit, debugLogForce, GetHandleId, GetUnitX, GetUnitY, IssueTargetOrder, GetUnitCurrentOrder, CreateGroup, DestroyGroup, GroupEnumUnitsInRange, FirstOfGroup, GroupRemoveUnit, ForGroup, GetEnumUnit, _____653B_51FB_547D_4EE4ID, _____653B_51FB_4E00_6B21_547D_4EE4ID, _____505C_6B62_547D_4EE4ID, _____4FDD_6301_547D_4EE4ID, _____6700_8FD1_654C_4EBA_679A_4E3EBoss, _____6700_8FD1_654C_4EBA_679A_4E3E_77E9_5F62, _____6700_8FD1_654C_4EBA_679A_4E3E_6700_5927_8DDD_79BB_5E73_65B9, _____6700_8FD1_654C_4EBA_679A_4E3E_7ED3_679C, _____6700_8FD1_654C_4EBA_679A_4E3E_6700_77ED_8DDD_79BB_5E73_65B9, _____6700_8FD1_654C_4EBA_679A_4E3E_6700_5C0F_53E5_67C4ID
+local _____83B7_53D6_53E5_67C4ID, _____5F53_524D_547D_4EE4_5141_8BB8_515C_5E95_4E0B_4EE4, _____5355_4F4D_5728Boss_6218_8303_56F4_5185_6709_6548, _____8BB0_5F55_6700_8FD1_679A_4E3E_76EE_6807, ____on_679A_4E3E_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, _____8BFB_53D6_73A9_5BB6_82F1_96C4_7EC4, _____8BFB_53D6_5F53_524D_6709_6548_4EC7_6068_76EE_6807, _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA, _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA, RectContainsUnit, IsUnitPausedBJ, YDUserDataGetSafe, getEnemyThreats, isValidCombatEnemyUnit, debugLogForce, _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5, GetHandleId, GetUnitX, GetUnitY, IssueTargetOrder, GetUnitCurrentOrder, CreateGroup, DestroyGroup, GroupEnumUnitsInRange, FirstOfGroup, GroupRemoveUnit, ForGroup, GetEnumUnit, _____505C_6B62_547D_4EE4ID, _____4FDD_6301_547D_4EE4ID, _____6700_8FD1_654C_4EBA_679A_4E3EBoss, _____6700_8FD1_654C_4EBA_679A_4E3E_77E9_5F62, _____6700_8FD1_654C_4EBA_679A_4E3E_6700_5927_8DDD_79BB_5E73_65B9, _____6700_8FD1_654C_4EBA_679A_4E3E_7ED3_679C, _____6700_8FD1_654C_4EBA_679A_4E3E_6700_77ED_8DDD_79BB_5E73_65B9, _____6700_8FD1_654C_4EBA_679A_4E3E_6700_5C0F_53E5_67C4ID
 local ____05_FF0E_4E2D_5FC3_8BA1_65F6_5668 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____05_FF0E_4E2D_5FC3_8BA1_65F6_5668.getServerTime
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．常量定义")
@@ -37,17 +37,14 @@ function _____5F53_524D_547D_4EE4_5141_8BB8_515C_5E95_4E0B_4EE4(boss)
     if boss == nil or boss == 0 then
         return false
     end
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(boss) then
+        return false
+    end
     if IsUnitPausedBJ(boss) then
         return false
     end
     local _____5F53_524D_547D_4EE4ID = GetUnitCurrentOrder(boss) or 0
     if _____5F53_524D_547D_4EE4ID == 0 then
-        return true
-    end
-    if _____5F53_524D_547D_4EE4ID == _____653B_51FB_547D_4EE4ID then
-        return true
-    end
-    if _____5F53_524D_547D_4EE4ID == _____653B_51FB_4E00_6B21_547D_4EE4ID then
         return true
     end
     if _____5F53_524D_547D_4EE4ID == _____505C_6B62_547D_4EE4ID then
@@ -202,24 +199,19 @@ ____exports["尝试兜底搜敌并下令"] = function(context, nowMs)
     end
     local threatTarget = _____8BFB_53D6_5F53_524D_6709_6548_4EC7_6068_76EE_6807(context)
     if threatTarget ~= nil and threatTarget ~= 0 then
-        context["最近兜底目标ID"] = 0
+        IssueTargetOrder(context["Boss单位"], "attack", threatTarget)
         return
     end
-    local ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_15 = _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA(context)
-    if ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_15 == nil then
-        ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_15 = _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA(context)
+    local ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_17 = _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA(context)
+    if ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_17 == nil then
+        ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_17 = _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA(context)
     end
-    local fallbackTarget = ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_15
+    local fallbackTarget = ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_17
     if fallbackTarget == nil or fallbackTarget == 0 then
         return
     end
     local fallbackTargetId = _____83B7_53D6_53E5_67C4ID(fallbackTarget)
-    local currentOrderId = GetUnitCurrentOrder(context["Boss单位"]) or 0
-    if context["最近兜底目标ID"] == fallbackTargetId and (currentOrderId == _____653B_51FB_547D_4EE4ID or currentOrderId == _____653B_51FB_4E00_6B21_547D_4EE4ID) then
-        return
-    end
     IssueTargetOrder(context["Boss单位"], "attack", fallbackTarget)
-    context["最近兜底目标ID"] = fallbackTargetId
     debugLogForce(
         ____Boss_6218_8FD0_884C_6A21_5757_540D,
         "兜底搜敌下令",
@@ -231,37 +223,42 @@ ____exports["尝试兜底搜敌并下令"] = function(context, nowMs)
 end
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.06．任务消息")
-local QuestMessageBJ = ____require_result_0.QuestMessageBJ
-local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_1.GetPlayersAll
-local ____require_result_2 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-RectContainsUnit = ____require_result_2.RectContainsUnit
-local ____require_result_3 = require("lib.扩展函数.BJ函数.05A．电影函数")
-local TransmissionFromUnitWithNameBJ = ____require_result_3.TransmissionFromUnitWithNameBJ
-local CinematicFilterGenericBJ = ____require_result_3.CinematicFilterGenericBJ
-local ____require_result_4 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-IsUnitPausedBJ = ____require_result_4.IsUnitPausedBJ
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataGetSafe = ____require_result_5.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_5.YDUserDataSetSafe
-local YDUserDataClearSafe = ____require_result_5.YDUserDataClearSafe
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-local YDUserDataClearTable = ____require_result_6.YDUserDataClearTable
-local ____require_result_7 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
-getEnemyThreats = ____require_result_7.getEnemyThreats
-local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.index")
-local Sound3DII_Mp3PlayReuse = ____require_result_8.Sound3DII_Mp3PlayReuse
-local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-local StarOther_PanCameraToTimedUnitForPlayer = ____require_result_9.StarOther_PanCameraToTimedUnitForPlayer
-local ____require_result_10 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local YDWEAngleBetweenUnits = ____require_result_10.YDWEAngleBetweenUnits
-local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-isValidCombatEnemyUnit = ____require_result_11.isValidCombatEnemyUnit
-local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_12.debugLogForce
-local ____require_result_13 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_13["移除单位暂停"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local ____require_result_1 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_1.QuestMessageBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_2.GetPlayersAll
+local ____require_result_3 = require("lib.扩展函数.BJ函数.04．矩形与区域")
+RectContainsUnit = ____require_result_3.RectContainsUnit
+local ____require_result_4 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local TransmissionFromUnitWithNameBJ = ____require_result_4.TransmissionFromUnitWithNameBJ
+local CinematicFilterGenericBJ = ____require_result_4.CinematicFilterGenericBJ
+local ____require_result_5 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+IsUnitPausedBJ = ____require_result_5.IsUnitPausedBJ
+local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataGetSafe = ____require_result_6.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_6.YDUserDataSetSafe
+local YDUserDataClearSafe = ____require_result_6.YDUserDataClearSafe
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+local YDUserDataClearTable = ____require_result_7.YDUserDataClearTable
+local ____require_result_8 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
+getEnemyThreats = ____require_result_8.getEnemyThreats
+local ____require_result_9 = require("lib.扩展函数.封装函数.02．音效系统.index")
+local Sound3DII_Mp3PlayReuse = ____require_result_9.Sound3DII_Mp3PlayReuse
+local ____require_result_10 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+local StarOther_PanCameraToTimedUnitForPlayer = ____require_result_10.StarOther_PanCameraToTimedUnitForPlayer
+local ____require_result_11 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local YDWEAngleBetweenUnits = ____require_result_11.YDWEAngleBetweenUnits
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+isValidCombatEnemyUnit = ____require_result_12.isValidCombatEnemyUnit
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_13.debugLogForce
+local ____require_result_14 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+_____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_14["单位是否正在原生施法"]
+local ____require_result_15 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_15["移除单位暂停"]
+local _____6E05_9664_5355_4F4D_5168_90E8_6682_505C_5360_7528 = ____require_result_15["清除单位全部暂停占用"]
 local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
 GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
@@ -272,6 +269,7 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local SquareRoot = jass.SquareRoot
 local IsUnitType = jass.IsUnitType
 local IsUnitInvulnerable = jass.IsUnitInvulnerable
+local PauseUnit = jass.PauseUnit
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local PingMinimap = jass.PingMinimap
 IssueTargetOrder = jass.IssueTargetOrder
@@ -282,11 +280,14 @@ local Player = jass.Player
 local IsPlayerInForce = jass.IsPlayerInForce
 CreateGroup = jass.CreateGroup
 DestroyGroup = jass.DestroyGroup
+local GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
 GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange
 FirstOfGroup = jass.FirstOfGroup
 GroupRemoveUnit = jass.GroupRemoveUnit
 ForGroup = jass.ForGroup
 GetEnumUnit = jass.GetEnumUnit
+local GetUnitTypeId = jass.GetUnitTypeId
+local SetUnitOwner = jass.SetUnitOwner
 local SetUnitPosition = jass.SetUnitPosition
 local SetUnitFacing = jass.SetUnitFacing
 local IsTerrainPathable = jass.IsTerrainPathable
@@ -305,11 +306,10 @@ local ____Quest_6D88_606F_8B66_544A = jglobals.bj_QUESTMESSAGE_WARNING
 local ____Quest_6D88_606F_5B8C_6210 = jglobals.bj_QUESTMESSAGE_COMPLETED
 local ____Quest_6D88_606F_79D8_5BC6 = jglobals.bj_QUESTMESSAGE_SECRET
 local bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET
-_____653B_51FB_547D_4EE4ID = OrderId("attack")
-_____653B_51FB_4E00_6B21_547D_4EE4ID = OrderId("attackonce")
 _____505C_6B62_547D_4EE4ID = OrderId("stop")
 _____4FDD_6301_547D_4EE4ID = OrderId("holdposition")
 local ____Boss_6B7B_4EA1_540EYD_6E05_8868_5EF6_8FDF_6BEB_79D2 = 10000
+local ____Boss_6218_4F20_9001_95E8_5355_4F4D_7C7B_578BID = stringToFourCCSafe("n05Q")
 _____6700_8FD1_654C_4EBA_679A_4E3EBoss = nil
 _____6700_8FD1_654C_4EBA_679A_4E3E_77E9_5F62 = nil
 _____6700_8FD1_654C_4EBA_679A_4E3E_6700_5927_8DDD_79BB_5E73_65B9 = 0
@@ -325,6 +325,9 @@ local _____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868 = {}
 local function ____on_73A9_5BB6_82F1_96C4_7EA0_504F_5355_4F4D()
     local unit = GetEnumUnit()
     if unit == nil or unit == 0 then
+        return
+    end
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(unit) then
         return
     end
     if IsUnitPausedBJ(unit) then
@@ -350,11 +353,11 @@ local function ____on_73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_5355_4F4D()
     SetUnitPosition(unit, _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3X, _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3Y)
 end
 local function _____8BFB_53D6_73A9_5BB6_7EC4()
-    local ____YDUserDataGetSafe_result_14 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
-    if ____YDUserDataGetSafe_result_14 == nil then
-        ____YDUserDataGetSafe_result_14 = GetPlayersAll()
+    local ____YDUserDataGetSafe_result_16 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
+    if ____YDUserDataGetSafe_result_16 == nil then
+        ____YDUserDataGetSafe_result_16 = GetPlayersAll()
     end
-    return ____YDUserDataGetSafe_result_14
+    return ____YDUserDataGetSafe_result_16
 end
 ____exports["单位是否死亡"] = function(unit)
     if unit == nil or unit == 0 then
@@ -477,11 +480,48 @@ ____exports["完成Boss战转场搬运"] = function(context)
         0.1
     )
 end
+local function handoffBossPortalToPlayerSeven(rectHandle)
+    if rectHandle == nil or rectHandle == 0 then
+        return
+    end
+    local group = CreateGroup()
+    if group == nil or group == 0 then
+        return
+    end
+    GroupEnumUnitsInRect(group, rectHandle, nil)
+    while true do
+        do
+            local unit = FirstOfGroup(group)
+            if unit == nil or unit == 0 then
+                break
+            end
+            GroupRemoveUnit(group, unit)
+            if GetUnitTypeId(unit) ~= ____Boss_6218_4F20_9001_95E8_5355_4F4D_7C7B_578BID then
+                goto __continue70
+            end
+            SetUnitOwner(
+                unit,
+                Player(6),
+                true
+            )
+        end
+        ::__continue70::
+    end
+    DestroyGroup(group)
+end
+local function forceResumeBossAfterTransition(boss)
+    if boss == nil or boss == 0 then
+        return
+    end
+    _____6E05_9664_5355_4F4D_5168_90E8_6682_505C_5360_7528(boss)
+    PauseUnit(boss, false)
+end
 ____exports["完成Boss战启动"] = function(context)
     _____63A5_7BA1Boss_6218_533A_57DF_97F3_9891(context)
     ____exports["确保Boss战区域视野"](context["地点矩形"])
     SetUnitInvulnerable(context["Boss单位"], false)
     _____79FB_9664_5355_4F4D_6682_505C(context["Boss单位"], _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
+    forceResumeBossAfterTransition(context["Boss单位"])
     if context["地点矩形"] ~= nil and context["地点矩形"] ~= 0 then
         PingMinimap(
             GetRectCenterX(context["地点矩形"]),
@@ -501,6 +541,7 @@ ____exports["完成Boss战启动"] = function(context)
         ____Boss_6218_5F00_59CB_63D0_793A_6587_672C
     )
     context["是否已激活"] = true
+    handoffBossPortalToPlayerSeven(context["地点矩形"])
     ____exports["尝试兜底搜敌并下令"](
         context,
         getServerTime()
@@ -516,6 +557,9 @@ ____exports["完成Boss战启动"] = function(context)
 end
 ____exports["纠偏Boss位置"] = function(context)
     if context["地点矩形"] == nil or context["地点矩形"] == 0 then
+        return
+    end
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(context["Boss单位"]) then
         return
     end
     if IsUnitPausedBJ(context["Boss单位"]) then
@@ -589,7 +633,7 @@ ____exports["处理待清理Boss单位YD数据"] = function(nowMs)
             do
                 local task = _____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868[i + 1]
                 if nowMs < task["截止时间"] then
-                    goto __continue93
+                    goto __continue101
                 end
                 local currentContext = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(task.bossUnit)
                 if currentContext == nil or currentContext["运行代次"] == task["运行代次"] then
@@ -605,7 +649,7 @@ ____exports["处理待清理Boss单位YD数据"] = function(nowMs)
                 end
                 __TS__ArraySplice(_____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868, i, 1)
             end
-            ::__continue93::
+            ::__continue101::
             i = i - 1
         end
     end

@@ -45,7 +45,6 @@ function ____exports.registerTaskUIHotkeys(self, opts)
         return
     end
     taskUIKeybindsInstalled = true
-    registerKeyUpSync(nil, KEY.J, handleTogglePanelHotkey)
     registerKeyUpSync(nil, KEY_NUM.K1, handleMainCategoryHotkey)
     registerKeyUpSync(nil, KEY_NUM.K2, handleSideCategoryHotkey)
     registerKeyUpSync(nil, KEY_NUM.K3, handleDailyCategoryHotkey)

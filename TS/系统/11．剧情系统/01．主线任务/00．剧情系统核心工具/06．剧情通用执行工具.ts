@@ -8,9 +8,10 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
   removePeriodicCallback: (this: void, callbackId: number) => void;
   getServerTime: (this: void) => number;
 };
-const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe, YDUserDataSetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+  YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
 };
 const { AdjustPlayerStateBJ } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   AdjustPlayerStateBJ: (this: void, delta: number, whichPlayer: any, whichPlayerState: any) => void;
@@ -30,8 +31,8 @@ const { ModifyGateBJ, ForGroupBJ, SetTimeOfDay } = require("lib.扩展函数.BJ�
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
 };
-const { SetStackedSoundBJ } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
-  SetStackedSoundBJ: (this: void, add: boolean, soundHandle: any, rectHandle: any) => void;
+const { 切换区域背景音乐表达式 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
+  切换区域背景音乐表达式: (this: void, expr: string | undefined, add: boolean) => number;
 };
 const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
   PlaySoundBJ: (this: void, soundHandle: any) => void;
@@ -62,7 +63,9 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
 const { questDB, QuestType, QuestStatus } = require("系统.08．任务系统.01．任务数据") as any;
-const { questManager } = require("系统.08．任务系统.02．任务管理器") as any;
+const { 触发任务UI刷新 } = require("系统.08．任务系统.02．任务管理器") as {
+  触发任务UI刷新: (this: void, playerId: number, questId?: string) => void;
+};
 const { 创建并冻结剧情Boss预置 } = require("./03．剧情Boss预置桥接") as {
   创建并冻结剧情Boss预置: (this: void, 参数: any) => any;
 };
@@ -101,6 +104,7 @@ const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: 
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
 const RemoveItem = jass.RemoveItem as (this: void, whichItem: any) => void;
+const SetItemPosition = jass.SetItemPosition as (this: void, whichItem: any, x: number, y: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
@@ -260,7 +264,9 @@ export function 读取语义单位引用(this: void, 引用: string): any {
 
 export function 读取触发单位(this: void): any {
   const 上下文 = 读取当前剧情动作上下文();
-  return 上下文.触发单位;
+  if (上下文.触发单位 != null && 上下文.触发单位 !== 0) return 上下文.触发单位;
+  // YD 临时数据在延迟动作或 ESC 快进期间可能短暂不可读，使用片段生命周期内的内存兜底。
+  return 读取剧情运行时单位("剧情.当前触发单位");
 }
 
 function 从单位移除指定物品(this: void, unit: any, 物品名: string): boolean {
@@ -309,6 +315,14 @@ function 调整玩家组金币(this: void, delta: number): void {
   玩家组金币调整栈.push(delta);
   safeForForce(玩家组, on调整枚举玩家金币);
   玩家组金币调整栈.pop();
+}
+
+/** 从当前剧情触发单位所属玩家扣除金币，供标准主线目标动作复用。 */
+export function 扣除触发单位金币(this: void, amount: number): void {
+  if (!(amount > 0)) return;
+  const unit = 读取触发单位();
+  if (unit == null || unit === 0) return;
+  AdjustPlayerStateBJ(-amount, GetOwningPlayer(unit), PLAYER_STATE_RESOURCE_GOLD);
 }
 
 export function 设置玩家英雄组控制状态(this: void, 暂停: boolean, 无敌: boolean): void {
@@ -389,10 +403,7 @@ export function 更新主线任务UI(this: void, 任务描述: string, 提示文
     任务.updatedAt = os.time();
   }
 
-  const 刷新函数 = (questManager as any).triggerUIRefresh;
-  if (typeof 刷新函数 === "function") {
-    刷新函数.call(questManager, 0, 主线运行时任务ID);
-  }
+  触发任务UI刷新(0, 主线运行时任务ID);
 
   if (提示文本 !== "") {
     QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, 提示文本);
@@ -414,6 +425,20 @@ export function 按名字给触发单位物品(this: void, 物品名: string): v
   const item = CreateItem(itemTypeId, 0, 0);
   if (item == null || item === 0) return;
   UnitAddItem(unit, item);
+}
+
+/** 需要区分同名物品时，按明确 raw ID 发放；背包满时把物品落在触发单位脚下。 */
+export function 按原始ID给触发单位物品(this: void, rawId: string): void {
+  const unit = 读取触发单位();
+  if (unit == null || unit === 0 || rawId === "") return;
+  const itemTypeId = stringToFourCCSafe(rawId);
+  if (!(itemTypeId > 0)) return;
+  const x = GetUnitX(unit);
+  const y = GetUnitY(unit);
+  const item = CreateItem(itemTypeId, x, y);
+  if (item == null || item === 0) return;
+  const added = (UnitAddItem as any)(unit, item);
+  if (!added) SetItemPosition(item, x, y);
 }
 
 export function 触发单位增加基础全属性(this: void, value: number, 提示模板: string): void {
@@ -481,10 +506,10 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
   if (npcUnit != null && npcUnit !== 0) {
     if (触发单位 != null && 触发单位 !== 0) {
       if (取参数文本(参数, "NPC转向目标") !== "" || 取参数文本(参数, "NPC转向触发单位") !== "") {
-        SetUnitFacing(npcUnit, GetUnitFacing(触发单位));
+        SetUnitFacing(npcUnit, YDWEAngleBetweenUnitsSafe(npcUnit, 触发单位));
       }
       if (取参数文本(参数, "触发单位转向目标") !== "" || 取参数文本(参数, "触发单位转向耗时") !== "") {
-        SetUnitFacing(触发单位, GetUnitFacing(npcUnit));
+        SetUnitFacing(触发单位, YDWEAngleBetweenUnitsSafe(触发单位, npcUnit));
       }
     }
     const 商店物品 = 取参数文本(参数, "商店新增物品");
@@ -526,8 +551,13 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
     if (destructable != null && destructable !== 0) RemoveDestructable(destructable);
   }
 
-  const 物品名 = 取参数文本(参数, "物品名") || 取参数文本(参数, "掉落物品名") || 取参数文本(参数, "奖励物品名");
-  if (物品名 !== "") 按名字给触发单位物品(物品名);
+  const 物品ID = 取参数文本(参数, "物品ID") || 取参数文本(参数, "物品RawID");
+  if (物品ID !== "") {
+    按原始ID给触发单位物品(物品ID);
+  } else {
+    const 物品名 = 取参数文本(参数, "物品名") || 取参数文本(参数, "掉落物品名") || 取参数文本(参数, "奖励物品名");
+    if (物品名 !== "") 按名字给触发单位物品(物品名);
+  }
 
   const 扣除金币 = 取参数数字(参数, "扣除金币");
   if (扣除金币 !== 0 && 触发单位 != null && 触发单位 !== 0) {
@@ -644,19 +674,7 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
 }
 
 function 切换区域音乐表达式(this: void, expr: string, add: boolean): void {
-  const list = expr.split(";");
-  for (let i = 0; i < list.length; i++) {
-    const item = list[i].trim();
-    if (item.length === 0) continue;
-    const at = item.indexOf("@");
-    if (at < 0) continue;
-    const soundVarName = item.substring(0, at).trim();
-    const rectVarName = item.substring(at + 1).trim();
-    const soundHandle = 读取全局句柄(soundVarName);
-    const rectHandle = 读取全局句柄(rectVarName);
-    if (soundHandle == null || soundHandle === 0 || rectHandle == null || rectHandle === 0) continue;
-    SetStackedSoundBJ(add, soundHandle, rectHandle);
-  }
+  切换区域背景音乐表达式(expr, add);
 }
 
 function 播放音效表达式(this: void, expr: string): void {

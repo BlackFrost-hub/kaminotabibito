@@ -35,8 +35,8 @@ local getServerTime = ____require_result_4.getServerTime
 local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataClearSafe = ____require_result_5.YDUserDataClearSafe
 local YDUserDataClearTableSafe = ____require_result_5.YDUserDataClearTableSafe
-local ____require_result_6 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-local SetStackedSoundBJ = ____require_result_6.SetStackedSoundBJ
+local ____require_result_6 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____6302_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_6["挂载区域背景音乐句柄"]
 local ____require_result_7 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetPlayersAll = ____require_result_7.GetPlayersAll
 local ____require_result_8 = require("lib.扩展函数.BJ函数.05A．电影函数")
@@ -52,7 +52,8 @@ local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local IsUnitInRangeXY = jass.IsUnitInRangeXY
 local Player = jass.Player
-local RemoveUnit = jass.RemoveUnit
+local ____require_result_11 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_11["立即移除单位并取消排泄登记"]
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitOwner = jass.SetUnitOwner
@@ -104,7 +105,7 @@ local function _____6267_884C_533A_57DF_97F3_4E50_5207_6362(_____914D_7F6E)
                 if _____58F0_97F3_53E5_67C4 == nil or _____77E9_5F62_53E5_67C4 == nil then
                     goto __continue12
                 end
-                SetStackedSoundBJ(_____6761_76EE["添加"], _____58F0_97F3_53E5_67C4, _____77E9_5F62_53E5_67C4)
+                _____6302_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(_____6761_76EE["添加"], _____58F0_97F3_53E5_67C4, _____77E9_5F62_53E5_67C4)
             end
             ::__continue12::
             i = i + 1
@@ -129,9 +130,24 @@ local function _____64AD_653E_6700_7EC8_4F24_5BB3_5BF9_767D_5217_8868(_____914D_
         while i < #_____914D_7F6E["对白列表"] do
             local _____5BF9_767D = _____914D_7F6E["对白列表"][i + 1]
             local _____8BF4_8BDD_8005 = _____5BF9_767D["使用攻击者名"] == true and _____653B_51FB_8005_540D or _____5BF9_767D["说话者"]
-            TransmissionFromUnitWithNameBJ(
-                GetPlayersAll(),
-                nil,
+            local ____temp_12
+            if _____5BF9_767D["说话者引用"] ~= nil then
+                ____temp_12 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(_____5BF9_767D["说话者引用"])
+            else
+                ____temp_12 = nil
+            end
+            local _____8BF4_8BDD_8005_5355_4F4D = ____temp_12
+            local ____TransmissionFromUnitWithNameBJ_15 = TransmissionFromUnitWithNameBJ
+            local ____GetPlayersAll_result_14 = GetPlayersAll()
+            local ____temp_13
+            if _____8BF4_8BDD_8005_5355_4F4D ~= nil and _____8BF4_8BDD_8005_5355_4F4D ~= 0 then
+                ____temp_13 = _____8BF4_8BDD_8005_5355_4F4D
+            else
+                ____temp_13 = nil
+            end
+            ____TransmissionFromUnitWithNameBJ_15(
+                ____GetPlayersAll_result_14,
+                ____temp_13,
                 _____8BF4_8BDD_8005,
                 nil,
                 _____5BF9_767D["文本"],
@@ -259,7 +275,7 @@ local function _____6267_884C_6700_7EC8_4F24_5BB3_63A8_8FDB_5267_60C5(_____914D_
     _____6267_884C_533A_57DF_97F3_4E50_5207_6362(_____914D_7F6E)
     _____64AD_653E_6700_7EC8_4F24_5BB3_5BF9_767D_5217_8868(_____914D_7F6E, attacker)
     if _____914D_7F6E["移除目标单位"] == true then
-        RemoveUnit(target)
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(target)
     end
     if _____914D_7F6E["清理Boss语义键"] ~= nil and _____914D_7F6E["清理Boss语义键"] ~= "" then
         YDUserDataClearSafe("string", "Boss", _____914D_7F6E["清理Boss语义键"], "unit")

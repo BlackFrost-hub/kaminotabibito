@@ -17,6 +17,9 @@ import { 尝试执行受击技能, 取随机坐标偏移, 获取技能命令字�
 
 const BUFF_BLOODLUST = 按名字反查BuffID("嗜血术") ?? "Bblo";
 const IssuePointOrder = jass.IssuePointOrder as (whichUnit: any, order: string, x: number, y: number) => boolean;
+const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+  单位是否正在原生施法: (this: void, unit: any) => boolean;
+};
 
 const 特殊逻辑映射: Record<string, (this: void, config: 受击反应配置, unit: any, source: any) => boolean> = {};
 
@@ -114,6 +117,7 @@ function 灵毒王蛇受击连招(this: void, _config: 受击反应配置, unit:
 
 export function 执行受击反应特殊逻辑(this: void, config: 受击反应配置, unit: any, source: any): boolean {
   if (config.特殊逻辑名 == null || config.特殊逻辑名 === "") return false;
+  if (单位是否正在原生施法(unit)) return false;
   const fn = 特殊逻辑映射[config.特殊逻辑名];
   if (fn == null) return false;
   return fn(config, unit, source);

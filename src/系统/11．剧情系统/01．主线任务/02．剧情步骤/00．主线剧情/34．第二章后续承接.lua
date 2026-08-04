@@ -7,6 +7,7 @@ local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11�
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
 local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["清理剧情运行时单位"]
+local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["注册剧情运行时单位"]
 local ____33A_FF0E_738B_5BAB_5BC6_5BA4_573A_666F_5355_4F4D = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.33A．王宫密室场景单位")
 local _____5B9A_4F4D_5E76_767B_8BB0_738B_5BAB_5BC6_5BA4_5267_60C5_5355_4F4D = ____33A_FF0E_738B_5BAB_5BC6_5BA4_573A_666F_5355_4F4D["定位并登记王宫密室剧情单位"]
 local _____738B_5BAB_5BC6_5BA4_573A_666F_7AD9_4F4D_8868 = ____33A_FF0E_738B_5BAB_5BC6_5BA4_573A_666F_5355_4F4D["王宫密室场景站位表"]
@@ -16,10 +17,21 @@ do
     ____exports["章节末最终收束剧情片段"] = ____34_FF0E_7B2C_4E8C_7AE0_540E_7EED_627F_63A5["章节末最终收束剧情片段"]
 end
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataClearSafe = ____require_result_0.YDUserDataClearSafe
+local ____require_result_0 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local getRegisteredPlayerHero = ____require_result_0.getRegisteredPlayerHero
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataClearSafe = ____require_result_1.YDUserDataClearSafe
 local RemoveUnit = jass.RemoveUnit
+local Player = jass.Player
+local _____7B2C_4E8C_7AE0_6218_540E_5BF9_767D_73A9_5BB6_5F15_7528 = "剧情运行时.第二章战后对白玩家"
+local function _____767B_8BB0_7B2C_4E8C_7AE0_6218_540E_5BF9_767D_73A9_5BB6()
+    local _____73A9_5BB6_5355_4F4D = getRegisteredPlayerHero(Player(0))
+    if _____73A9_5BB6_5355_4F4D ~= nil and _____73A9_5BB6_5355_4F4D ~= 0 then
+        _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____7B2C_4E8C_7AE0_6218_540E_5BF9_767D_73A9_5BB6_5F15_7528, _____73A9_5BB6_5355_4F4D)
+    end
+end
 ____exports["执行章节末最终收束"] = function(_____53C2_6570)
+    _____767B_8BB0_7B2C_4E8C_7AE0_6218_540E_5BF9_767D_73A9_5BB6()
     _____5199_5165_5267_60C5_8FDB_5EA6(__TS__Number(_____53C2_6570["设置剧情进度"]) or __TS__Number(_____53C2_6570["目标进度"]) or 35)
 end
 ____exports["执行布置王宫密室受伤现场"] = function()

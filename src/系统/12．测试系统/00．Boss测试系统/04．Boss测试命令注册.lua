@@ -13,15 +13,16 @@ local _____6E05_7406Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587 = ____requ
 local _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD = ____require_result_1["是否已登记Boss自动技能"]
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心")
 local _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C = ____require_result_2["注册聊天命令监听"]
-local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_3.debugLogForce
-local ____require_result_4 = require("系统.09．表现系统.14．镜头高度控制.index")
-local _____62AC_9AD8Boss_6D4B_8BD5_955C_5934 = ____require_result_4["抬高Boss测试镜头"]
+local ____require_result_3 = require("系统.12．测试系统.00．测试系统辅助函数")
+local _____662F_5141_8BB8_6D4B_8BD5_73A9_5BB6 = ____require_result_3["是允许测试玩家"]
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_4.debugLogForce
+local ____require_result_5 = require("系统.09．表现系统.14．镜头高度控制.index")
+local _____62AC_9AD8Boss_6D4B_8BD5_955C_5934 = ____require_result_5["抬高Boss测试镜头"]
 local jass = require("jass.common")
 local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetPlayerId = jass.GetPlayerId
-local GetPlayerName = jass.GetPlayerName
 local GetHandleId = jass.GetHandleId
 local GetUnitName = jass.GetUnitName
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -38,18 +39,15 @@ local UnitDamageTarget = jass.UnitDamageTarget
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_5 = require("系统.12．测试系统.00．Boss测试系统.02．Boss测试单位")
-local ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B = ____require_result_5["Boss测试单位存活"]
-local _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4 = ____require_result_5["获取Boss测试玩家基准英雄"]
-local _____521B_5EFABoss_6D4B_8BD5_4E34_65F6_6B65_5175 = ____require_result_5["创建Boss测试临时步兵"]
-local _____51FB_6740_6700_8FD1Boss_6D4B_8BD5_4E34_65F6_6B65_5175 = ____require_result_5["击杀最近Boss测试临时步兵"]
-local _____6E05_7406Boss_6D4B_8BD5_4E34_65F6_6B65_5175 = ____require_result_5["清理Boss测试临时步兵"]
+local ____require_result_6 = require("系统.12．测试系统.00．Boss测试系统.02．Boss测试单位")
+local ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B = ____require_result_6["Boss测试单位存活"]
+local _____83B7_53D6Boss_6D4B_8BD5_73A9_5BB6_57FA_51C6_82F1_96C4 = ____require_result_6["获取Boss测试玩家基准英雄"]
+local _____521B_5EFABoss_6D4B_8BD5_4E34_65F6_6B65_5175 = ____require_result_6["创建Boss测试临时步兵"]
+local _____51FB_6740_6700_8FD1Boss_6D4B_8BD5_4E34_65F6_6B65_5175 = ____require_result_6["击杀最近Boss测试临时步兵"]
+local _____6E05_7406Boss_6D4B_8BD5_4E34_65F6_6B65_5175 = ____require_result_6["清理Boss测试临时步兵"]
 local ____Boss_6D4B_8BD5_9009_62E9_547D_4EE4_8868 = {}
 local ____Boss_6D4B_8BD5_914D_7F6E_5217_8868 = {}
 local _____5DF2_6CE8_518C_6280_80FD_547D_4EE4_8868 = {}
-local ____Boss_6D4B_8BD5_73A9_5BB6ID = 0
-local ____Boss_6D4B_8BD5_73A9_5BB6_540D_79F0 = "WorldEdit"
-local ____Boss_6D4B_8BD5_5907_7528_73A9_5BB6_540D_79F0 = "九条艾莉莎"
 local ____Boss_6D4B_8BD5_5217_8868_547D_4EE4 = "Boss列表"
 local ____Boss_6D4B_8BD5_91CD_7F6E_547D_4EE4 = "Boss重置"
 local ____Boss_6D4B_8BD5_6E05_7406_547D_4EE4 = "Boss清理"
@@ -91,53 +89,46 @@ local function _____751F_6210_547D_4EE4_8BF4_660E(_____914D_7F6E)
     return text .. "。"
 end
 local function _____662F_5141_8BB8Boss_6D4B_8BD5_73A9_5BB6(player)
-    if player == nil or player == 0 then
-        return false
-    end
-    if GetPlayerId(player) ~= ____Boss_6D4B_8BD5_73A9_5BB6ID then
-        return false
-    end
-    local playerName = GetPlayerName(player) or ""
-    return playerName == ____Boss_6D4B_8BD5_73A9_5BB6_540D_79F0 or playerName == ____Boss_6D4B_8BD5_73A9_5BB6_540D_79F0 .. ":" or playerName == ____Boss_6D4B_8BD5_5907_7528_73A9_5BB6_540D_79F0 or playerName == ____Boss_6D4B_8BD5_5907_7528_73A9_5BB6_540D_79F0 .. ":"
+    return _____662F_5141_8BB8_6D4B_8BD5_73A9_5BB6(player)
 end
 local function _____4ECEBoss_6D4B_8BD5_4E0A_4E0B_6587_53D6Boss_5355_4F4D(context)
     if context == nil then
         return nil
     end
     local runtime = context["运行时"]
-    local ____array_21 = __TS__SparseArrayNew(
+    local ____array_22 = __TS__SparseArrayNew(
         context["Boss单位"],
         context.Boss,
         context["安兹单位"],
         context["赤誓灵卫单位"],
         context.red
     )
-    local ____opt_result_8
+    local ____opt_result_9
     if runtime ~= nil then
-        ____opt_result_8 = runtime["Boss单位"]
+        ____opt_result_9 = runtime["Boss单位"]
     end
-    __TS__SparseArrayPush(____array_21, ____opt_result_8)
-    local ____opt_result_11
+    __TS__SparseArrayPush(____array_22, ____opt_result_9)
+    local ____opt_result_12
     if runtime ~= nil then
-        ____opt_result_11 = runtime.Boss
+        ____opt_result_12 = runtime.Boss
     end
-    __TS__SparseArrayPush(____array_21, ____opt_result_11)
-    local ____opt_result_14
+    __TS__SparseArrayPush(____array_22, ____opt_result_12)
+    local ____opt_result_15
     if runtime ~= nil then
-        ____opt_result_14 = runtime["安兹单位"]
+        ____opt_result_15 = runtime["安兹单位"]
     end
-    __TS__SparseArrayPush(____array_21, ____opt_result_14)
-    local ____opt_result_17
+    __TS__SparseArrayPush(____array_22, ____opt_result_15)
+    local ____opt_result_18
     if runtime ~= nil then
-        ____opt_result_17 = runtime["赤誓灵卫单位"]
+        ____opt_result_18 = runtime["赤誓灵卫单位"]
     end
-    __TS__SparseArrayPush(____array_21, ____opt_result_17)
-    local ____opt_result_20
+    __TS__SparseArrayPush(____array_22, ____opt_result_18)
+    local ____opt_result_21
     if runtime ~= nil then
-        ____opt_result_20 = runtime.red
+        ____opt_result_21 = runtime.red
     end
-    __TS__SparseArrayPush(____array_21, ____opt_result_20)
-    local candidates = {__TS__SparseArraySpread(____array_21)}
+    __TS__SparseArrayPush(____array_22, ____opt_result_21)
+    local candidates = {__TS__SparseArraySpread(____array_22)}
     do
         local i = 0
         while i < #candidates do
@@ -250,7 +241,7 @@ local function ____onBoss_6D4B_8BD5_6280_80FD_547D_4EE4(player, command)
             do
                 local item = list[i + 1]
                 if _____83B7_53D6Boss_6D4B_8BD5_6280_80FD_547D_4EE4_6587_672C(item) ~= command then
-                    goto __continue35
+                    goto __continue33
                 end
                 local context = session["上下文"]
                 if context == nil then
@@ -265,7 +256,7 @@ local function ____onBoss_6D4B_8BD5_6280_80FD_547D_4EE4(player, command)
                 item["执行"](player, context)
                 return
             end
-            ::__continue35::
+            ::__continue33::
             i = i + 1
         end
     end
@@ -505,12 +496,12 @@ ____exports["注册Boss测试命令组"] = function(_____914D_7F6E)
                 local item = list[i + 1]
                 local _____547D_4EE4 = _____83B7_53D6Boss_6D4B_8BD5_6280_80FD_547D_4EE4_6587_672C(item)
                 if _____5DF2_6CE8_518C_6280_80FD_547D_4EE4_8868[_____547D_4EE4] == true then
-                    goto __continue84
+                    goto __continue82
                 end
                 _____5DF2_6CE8_518C_6280_80FD_547D_4EE4_8868[_____547D_4EE4] = true
                 _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____547D_4EE4, ____onBoss_6D4B_8BD5_6280_80FD_547D_4EE4)
             end
-            ::__continue84::
+            ::__continue82::
             i = i + 1
         end
     end

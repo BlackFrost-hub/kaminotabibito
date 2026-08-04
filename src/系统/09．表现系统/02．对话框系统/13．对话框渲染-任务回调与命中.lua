@@ -240,7 +240,10 @@ local function handleDialogPanelClick(self, state)
     if state.clickCooldown then
         return
     end
-    local entry = state.queue[state.currentIndex + 1]
+    local entry = getCurrentEntry(nil, state)
+    if entry == nil then
+        return
+    end
     if entry.isQuest then
         return
     end
@@ -316,24 +319,24 @@ local function startSkipKeyCooldown(self, pid)
     end
     g_skipKeyCooldown[pid + 1] = true
     repeat
-        local ____switch61 = pid
-        local ____cond61 = ____switch61 == 0
-        if ____cond61 then
+        local ____switch62 = pid
+        local ____cond62 = ____switch62 == 0
+        if ____cond62 then
             addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP0)
             return
         end
-        ____cond61 = ____cond61 or ____switch61 == 1
-        if ____cond61 then
+        ____cond62 = ____cond62 or ____switch62 == 1
+        if ____cond62 then
             addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP1)
             return
         end
-        ____cond61 = ____cond61 or ____switch61 == 2
-        if ____cond61 then
+        ____cond62 = ____cond62 or ____switch62 == 2
+        if ____cond62 then
             addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP2)
             return
         end
-        ____cond61 = ____cond61 or ____switch61 == 3
-        if ____cond61 then
+        ____cond62 = ____cond62 or ____switch62 == 3
+        if ____cond62 then
             addDelayedCallback(SKIP_KEY_COOLDOWN_SECONDS * 1000, skipKeyCooldownCallbackP3)
             return
         end
@@ -427,30 +430,30 @@ function ____exports.bindQuestSyncHandlersImpl(self, state)
     local rejectCallback
     local panelCallback
     repeat
-        local ____switch76 = state.playerId
-        local ____cond76 = ____switch76 == 0
-        if ____cond76 then
+        local ____switch77 = state.playerId
+        local ____cond77 = ____switch77 == 0
+        if ____cond77 then
             acceptCallback = questAcceptCallbackP0
             rejectCallback = questRejectCallbackP0
             panelCallback = dialogPanelHitCallbackP0
             break
         end
-        ____cond76 = ____cond76 or ____switch76 == 1
-        if ____cond76 then
+        ____cond77 = ____cond77 or ____switch77 == 1
+        if ____cond77 then
             acceptCallback = questAcceptCallbackP1
             rejectCallback = questRejectCallbackP1
             panelCallback = dialogPanelHitCallbackP1
             break
         end
-        ____cond76 = ____cond76 or ____switch76 == 2
-        if ____cond76 then
+        ____cond77 = ____cond77 or ____switch77 == 2
+        if ____cond77 then
             acceptCallback = questAcceptCallbackP2
             rejectCallback = questRejectCallbackP2
             panelCallback = dialogPanelHitCallbackP2
             break
         end
-        ____cond76 = ____cond76 or ____switch76 == 3
-        if ____cond76 then
+        ____cond77 = ____cond77 or ____switch77 == 3
+        if ____cond77 then
             acceptCallback = questAcceptCallbackP3
             rejectCallback = questRejectCallbackP3
             panelCallback = dialogPanelHitCallbackP3

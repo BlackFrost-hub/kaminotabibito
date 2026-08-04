@@ -66,9 +66,13 @@ const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动�
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
+const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const LoadInteger = jass.LoadInteger as (table: any, parentKey: number, childKey: number) => number;
 const StringHash = jass.StringHash as (value: string) => number;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, target: any, attachPointName: string) => any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
+};
 
 let Boss战启动Stes触发器: any | null = null;
 
@@ -80,6 +84,9 @@ const RETRY_DELAY_MS = 100;
 const Boss战箭头特效字段 = "箭头特效";
 const Boss战箭头特效模型 = "war3mapImported\\diwo2.mdx";
 const Boss战箭头特效挂点 = "origin";
+const 剧情Boss壳单位类型ID = stringToFourCCSafe("h01D");
+const 利尔伯特实际单位类型ID = stringToFourCCSafe("N05L");
+const 剧情Boss壳实际单位表键候选 = ["蛇人族卫队长", "利尔·伯特"];
 
 const 待补读Boss句柄表: Record<number, true | undefined> = {};
 
@@ -110,6 +117,32 @@ function 读取Boss战YD绑定单位(this: void): any {
   return YDUserDataGetSafe("string", Boss战表名, Boss战绑定单位字段, "unit");
 }
 
+/**
+ * 旧 JASS 的挑战入口先把 h01D 剧情壳写入 Boss战表，随后才创建真正的 N05L。
+ * 实际单位登记在 Boss/蛇人族卫队长，必须在 STES 事件消费前完成替换。
+ */
+function 解析实际Boss单位(this: void, bossUnit: any): any {
+  if (bossUnit == null || bossUnit === 0 || GetUnitTypeId(bossUnit) !== 剧情Boss壳单位类型ID) {
+    return bossUnit;
+  }
+
+  for (let i = 0; i < 剧情Boss壳实际单位表键候选.length; i++) {
+    const 表键 = 剧情Boss壳实际单位表键候选[i];
+    const actualBoss = YDUserDataGetSafe("string", "Boss", 表键, "unit");
+    if (actualBoss == null || actualBoss === 0 || GetUnitTypeId(actualBoss) !== 利尔伯特实际单位类型ID) {
+      continue;
+    }
+
+    YDUserDataSetSafe("string", Boss战表名, Boss战绑定单位字段, "unit", actualBoss);
+    YDUserDataSetSafe("string", Boss战表名, Boss战单位字段, "unit", actualBoss);
+    debugLogForce(Boss战启动桥接模块名, "解析剧情Boss壳", "shell=", GetUnitName(bossUnit), "actual=", GetUnitName(actualBoss), "tableKey=", 表键);
+    return actualBoss;
+  }
+
+  debugLogForce(Boss战启动桥接模块名, "剧情Boss壳未找到实际单位", "shell=", GetUnitName(bossUnit));
+  return bossUnit;
+}
+
 function 确保Boss战箭头特效(this: void, bossUnit: any): void {
   if (bossUnit == null || bossUnit === 0) return;
   const existed = YDUserDataGetSafe("unit", bossUnit, Boss战箭头特效字段, "effect");
@@ -122,6 +155,11 @@ function 确保Boss战箭头特效(this: void, bossUnit: any): void {
 
 function 登记Boss自动技能启动(this: void, bossUnit: any, source: "STES.Boss" | "Boss战.单位" | "Boss战.绑定单位"): void {
   if (bossUnit == null || bossUnit === 0) return;
+  bossUnit = 解析实际Boss单位(bossUnit);
+  if (bossUnit == null || bossUnit === 0 || GetUnitTypeId(bossUnit) === 剧情Boss壳单位类型ID) {
+    打印Boss战启动跳过("剧情壳没有对应的实际 Boss 单位");
+    return;
+  }
   if (是否已登记Boss自动技能(bossUnit)) {
     debugLogForce(Boss战启动桥接模块名, "已登记，跳过重复注册", "source=", source, "name=", GetUnitName(bossUnit));
     return;
@@ -136,13 +174,13 @@ function 登记Boss自动技能启动(this: void, bossUnit: any, source: "STES.B
 function 尝试从YDUserData补读Boss(this: void, bossHandleId: number): void {
   待补读Boss句柄表[bossHandleId] = undefined;
 
-  const bossUnit = 读取Boss战YD变量单位();
+  const bossUnit = 解析实际Boss单位(读取Boss战YD变量单位());
   if (bossUnit != null && bossUnit !== 0) {
     登记Boss自动技能启动(bossUnit, "Boss战.单位");
     return;
   }
 
-  const bindUnit = 读取Boss战YD绑定单位();
+  const bindUnit = 解析实际Boss单位(读取Boss战YD绑定单位());
   if (bindUnit != null && bindUnit !== 0) {
     登记Boss自动技能启动(bindUnit, "Boss战.绑定单位");
     return;

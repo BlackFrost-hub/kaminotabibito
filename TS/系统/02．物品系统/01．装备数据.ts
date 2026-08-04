@@ -99,13 +99,7 @@ items["I00P"] = {
   score: 295,
   level: "E-",
   dmg: 2,
-  hp: 50,
-  hpRegen: 50,
   all: 2,
-  magicDmg: 0.5,
-  cdReduction: 0.5,
-  mpCost: -0.2,
-  Buff: "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6",
 };
 items["I01K"] = {type: "道具/戒指/饰品", name: "初心戒指", goldPrice: 240, score: 392, level: "E-", int: 5, hp: 50, hpRegen: 2};
 items["I06X"] = {type: "道具/戒指/饰品", name: "初始魔法药水", goldPrice: 50, score: 400, level: "E", hot: "100mp", abilList: "A08C"};
@@ -373,8 +367,8 @@ items["I05M"] = {type: "其他", name: "脱战状态介绍", goldPrice: 2000, ab
 items["I05O"] = {type: "材料", name: "尘土之影", goldPrice: 0};
 items["I05P"] = {type: "鞋子", name: "熔岩灵鞋", goldPrice: 500, level: "E", hp: 450, hpRegen: 25, fireResist: 0.2, movespeed2: 75};
 items["I05Q"] = {type: "道具/戒指/饰品", name: "火焰护身符", goldPrice: 500, level: "E", hp: 800, hpRegen: 30, fireResist: 0.1};
-items["I05S"] = {type: "道具/戒指/饰品", name: "改良版医疗剂（中）", goldPrice: 300, level: "D", hot: "1400hp", abilList: "A08C"};
-items["I05U"] = {type: "道具/戒指/饰品", name: "改良版魔法药水（中）", goldPrice: 300, hot: "750mp", abilList: "A08C"};
+items["I05S"] = {type: "道具/戒指/饰品", name: "改良版医疗剂（中）", goldPrice: 300, level: "D", hot: "3000hp", abilList: "A08C"};
+items["I05U"] = {type: "道具/戒指/饰品", name: "改良版魔法药水（中）", goldPrice: 300, hot: "1500mp", abilList: "A08C"};
 items["I05V"] = {type: "材料", name: "熔岩能量", goldPrice: 50};
 items["I05W"] = {type: "道具/戒指/饰品", name: "|cffff0000熔岩宝石|r|cffffffcc（只可佩戴一件)|r", goldPrice: 900, level: "D-", hp: 600, magicDmg: 0.2, onlyone: true};
 items["I05X"] = {type: "任务", name: "希望获得品质不错的道具饰品", goldPrice: 0};

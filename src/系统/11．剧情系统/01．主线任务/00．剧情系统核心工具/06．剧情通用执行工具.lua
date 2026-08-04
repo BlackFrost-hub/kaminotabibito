@@ -7,7 +7,7 @@ local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__StringReplace = ____lualib.__TS__StringReplace
 local ____exports = {}
-local _____8BFB_53D6_5168_5C40_53E5_67C4, _____5207_6362_533A_57DF_97F3_4E50_8868_8FBE_5F0F, _____64AD_653E_97F3_6548_8868_8FBE_5F0F, jglobals, SetStackedSoundBJ, PlaySoundBJ
+local _____8BFB_53D6_5168_5C40_53E5_67C4, _____5207_6362_533A_57DF_97F3_4E50_8868_8FBE_5F0F, _____64AD_653E_97F3_6548_8868_8FBE_5F0F, jglobals, _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F, PlaySoundBJ
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取当前剧情动作上下文"]
 local _____5199_5165_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入剧情进度"]
@@ -31,32 +31,7 @@ function _____8BFB_53D6_5168_5C40_53E5_67C4(_____53D8_91CF_540D)
     return ____jglobals______53D8_91CF_540D_20
 end
 function _____5207_6362_533A_57DF_97F3_4E50_8868_8FBE_5F0F(expr, add)
-    local list = __TS__StringSplit(expr, ";")
-    do
-        local i = 0
-        while i < #list do
-            do
-                local item = __TS__StringTrim(list[i + 1])
-                if #item == 0 then
-                    goto __continue150
-                end
-                local at = (string.find(item, "@", nil, true) or 0) - 1
-                if at < 0 then
-                    goto __continue150
-                end
-                local soundVarName = __TS__StringTrim(__TS__StringSubstring(item, 0, at))
-                local rectVarName = __TS__StringTrim(__TS__StringSubstring(item, at + 1))
-                local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
-                local rectHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(rectVarName)
-                if soundHandle == nil or soundHandle == 0 or rectHandle == nil or rectHandle == 0 then
-                    goto __continue150
-                end
-                SetStackedSoundBJ(add, soundHandle, rectHandle)
-            end
-            ::__continue150::
-            i = i + 1
-        end
-    end
+    _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F(expr, add)
 end
 function _____64AD_653E_97F3_6548_8868_8FBE_5F0F(expr)
     local list = __TS__StringSplit(expr, ";")
@@ -66,15 +41,15 @@ function _____64AD_653E_97F3_6548_8868_8FBE_5F0F(expr)
             do
                 local soundVarName = __TS__StringTrim(list[i + 1])
                 if #soundVarName == 0 then
-                    goto __continue156
+                    goto __continue161
                 end
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
                 if soundHandle == nil or soundHandle == 0 then
-                    goto __continue156
+                    goto __continue161
                 end
                 PlaySoundBJ(soundHandle)
             end
-            ::__continue156::
+            ::__continue161::
             i = i + 1
         end
     end
@@ -90,6 +65,7 @@ local getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
+local YDWEAngleBetweenUnitsSafe = ____require_result_1.YDWEAngleBetweenUnitsSafe
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local AdjustPlayerStateBJ = ____require_result_2.AdjustPlayerStateBJ
 local ____require_result_3 = require("系统.00．核心系统.07．联机安全工具")
@@ -103,8 +79,8 @@ local ForGroupBJ = ____require_result_5.ForGroupBJ
 local SetTimeOfDay = ____require_result_5.SetTimeOfDay
 local ____require_result_6 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetPlayersAll = ____require_result_6.GetPlayersAll
-local ____require_result_7 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-SetStackedSoundBJ = ____require_result_7.SetStackedSoundBJ
+local ____require_result_7 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+_____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F = ____require_result_7["切换区域背景音乐表达式"]
 local ____require_result_8 = require("lib.扩展函数.BJ函数.14．音效函数")
 PlaySoundBJ = ____require_result_8.PlaySoundBJ
 local ____require_result_9 = require("lib.扩展函数.BJ函数.02．单位与英雄")
@@ -127,7 +103,7 @@ local questDB = ____require_result_16.questDB
 local QuestType = ____require_result_16.QuestType
 local QuestStatus = ____require_result_16.QuestStatus
 local ____require_result_17 = require("系统.08．任务系统.02．任务管理器")
-local questManager = ____require_result_17.questManager
+local _____89E6_53D1_4EFB_52A1UI_5237_65B0 = ____require_result_17["触发任务UI刷新"]
 local ____require_result_18 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
 local _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E = ____require_result_18["创建并冻结剧情Boss预置"]
 local ____require_result_19 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
@@ -150,6 +126,7 @@ local IssueImmediateOrder = jass.IssueImmediateOrder
 local Player = jass.Player
 local RemoveDestructable = jass.RemoveDestructable
 local RemoveItem = jass.RemoveItem
+local SetItemPosition = jass.SetItemPosition
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitOwner = jass.SetUnitOwner
@@ -326,7 +303,10 @@ ____exports["读取语义单位引用"] = function(_____5F15_7528)
 end
 ____exports["读取触发单位"] = function()
     local _____4E0A_4E0B_6587 = _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587()
-    return _____4E0A_4E0B_6587["触发单位"]
+    if _____4E0A_4E0B_6587["触发单位"] ~= nil and _____4E0A_4E0B_6587["触发单位"] ~= 0 then
+        return _____4E0A_4E0B_6587["触发单位"]
+    end
+    return _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D("剧情.当前触发单位")
 end
 local function _____4ECE_5355_4F4D_79FB_9664_6307_5B9A_7269_54C1(unit, _____7269_54C1_540D)
     if unit == nil or unit == 0 or _____7269_54C1_540D == "" then
@@ -370,11 +350,11 @@ local function _____5411_5546_5E97_6DFB_52A0_7269_54C1(unit, _____7269_54C1_540D
                 local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(items[i + 1])
                 local itemTypeId = stringToFourCCSafe(rawId)
                 if not (itemTypeId > 0) then
-                    goto __continue57
+                    goto __continue58
                 end
                 AddItemToStockBJ(itemTypeId, unit, 1, 1)
             end
-            ::__continue57::
+            ::__continue58::
             i = i + 1
         end
     end
@@ -395,6 +375,21 @@ local function _____8C03_6574_73A9_5BB6_7EC4_91D1_5E01(delta)
     _____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808[#_____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808 + 1] = delta
     safeForForce(_____73A9_5BB6_7EC4, ____on_8C03_6574_679A_4E3E_73A9_5BB6_91D1_5E01)
     table.remove(_____73A9_5BB6_7EC4_91D1_5E01_8C03_6574_6808)
+end
+--- 从当前剧情触发单位所属玩家扣除金币，供标准主线目标动作复用。
+____exports["扣除触发单位金币"] = function(amount)
+    if not (amount > 0) then
+        return
+    end
+    local unit = ____exports["读取触发单位"]()
+    if unit == nil or unit == 0 then
+        return
+    end
+    AdjustPlayerStateBJ(
+        -amount,
+        GetOwningPlayer(unit),
+        PLAYER_STATE_RESOURCE_GOLD
+    )
 end
 ____exports["设置玩家英雄组控制状态"] = function(_____6682_505C, _____65E0_654C)
     local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
@@ -508,10 +503,7 @@ ____exports["更新主线任务UI"] = function(_____4EFB_52A1_63CF_8FF0, _____63
         _____4EFB_52A1.description = _____4EFB_52A1_63CF_8FF0
         _____4EFB_52A1.updatedAt = os.time()
     end
-    local _____5237_65B0_51FD_6570 = questManager.triggerUIRefresh
-    if type(_____5237_65B0_51FD_6570) == "function" then
-        _____5237_65B0_51FD_6570:call(questManager, 0, _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
-    end
+    _____89E6_53D1_4EFB_52A1UI_5237_65B0(0, _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     if _____63D0_793A_6587_672C ~= "" then
         QuestMessageBJ(
             GetPlayersAll(),
@@ -548,6 +540,27 @@ ____exports["按名字给触发单位物品"] = function(_____7269_54C1_540D)
         return
     end
     UnitAddItem(unit, item)
+end
+--- 需要区分同名物品时，按明确 raw ID 发放；背包满时把物品落在触发单位脚下。
+____exports["按原始ID给触发单位物品"] = function(rawId)
+    local unit = ____exports["读取触发单位"]()
+    if unit == nil or unit == 0 or rawId == "" then
+        return
+    end
+    local itemTypeId = stringToFourCCSafe(rawId)
+    if not (itemTypeId > 0) then
+        return
+    end
+    local x = GetUnitX(unit)
+    local y = GetUnitY(unit)
+    local item = CreateItem(itemTypeId, x, y)
+    if item == nil or item == 0 then
+        return
+    end
+    local added = UnitAddItem(nil, unit, item)
+    if not added then
+        SetItemPosition(item, x, y)
+    end
 end
 ____exports["触发单位增加基础全属性"] = function(value, _____63D0_793A_6A21_677F)
     local unit = ____exports["读取触发单位"]()
@@ -634,13 +647,13 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
             if _____53D6_53C2_6570_6587_672C(_____53C2_6570, "NPC转向目标") ~= "" or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "NPC转向触发单位") ~= "" then
                 SetUnitFacing(
                     npcUnit,
-                    GetUnitFacing(_____89E6_53D1_5355_4F4D)
+                    YDWEAngleBetweenUnitsSafe(npcUnit, _____89E6_53D1_5355_4F4D)
                 )
             end
             if _____53D6_53C2_6570_6587_672C(_____53C2_6570, "触发单位转向目标") ~= "" or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "触发单位转向耗时") ~= "" then
                 SetUnitFacing(
                     _____89E6_53D1_5355_4F4D,
-                    GetUnitFacing(npcUnit)
+                    YDWEAngleBetweenUnitsSafe(_____89E6_53D1_5355_4F4D, npcUnit)
                 )
             end
         end
@@ -694,9 +707,14 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
             RemoveDestructable(destructable)
         end
     end
-    local _____7269_54C1_540D = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "物品名") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "掉落物品名") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "奖励物品名")
-    if _____7269_54C1_540D ~= "" then
-        ____exports["按名字给触发单位物品"](_____7269_54C1_540D)
+    local _____7269_54C1ID = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "物品ID") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "物品RawID")
+    if _____7269_54C1ID ~= "" then
+        ____exports["按原始ID给触发单位物品"](_____7269_54C1ID)
+    else
+        local _____7269_54C1_540D = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "物品名") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "掉落物品名") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "奖励物品名")
+        if _____7269_54C1_540D ~= "" then
+            ____exports["按名字给触发单位物品"](_____7269_54C1_540D)
+        end
     end
     local _____6263_9664_91D1_5E01 = _____53D6_53C2_6570_6570_5B57(_____53C2_6570, "扣除金币")
     if _____6263_9664_91D1_5E01 ~= 0 and _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then

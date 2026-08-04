@@ -13,6 +13,26 @@ const jglobals = require("jass.globals") as any;
 const { forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
     forEachUnitInGroup: (group: any, action: (unit: any) => void) => void;
 };
+const CreateCorpse = jass.CreateCorpse as (
+    this: void,
+    whichPlayer: any,
+    unitid: number,
+    x: number,
+    y: number,
+    facing: number,
+) => any;
+const GetLocationX = jass.GetLocationX as (this: void, whichLocation: any) => number;
+const GetLocationY = jass.GetLocationY as (this: void, whichLocation: any) => number;
+const SetUnitBlendTime = jass.SetUnitBlendTime as (this: void, whichUnit: any, blendTime: number) => void;
+const SetUnitAnimation = jass.SetUnitAnimation as (this: void, whichUnit: any, animation: string) => void;
+const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUnit: any) => void;
+const TimerStart = jass.TimerStart as (
+    this: void,
+    whichTimer: any,
+    timeout: number,
+    periodic: boolean,
+    handlerFunc: any,
+) => void;
 
 export function String2UnitIdBJ(unitIdString: string): number {
     return jass.UnitId(unitIdString);
@@ -225,6 +245,38 @@ export function DoesUnitGenerateAlarms(unit: any): boolean {
 
 export function GetUnitPropWindowBJ(unit: any): number {
     return jass.GetUnitPropWindow(unit) * jglobals.bj_RADTODEG;
+}
+
+/** 对应 Blizzard.j 的 CreatePermanentCorpseLocBJ。 */
+export function CreatePermanentCorpseLocBJ(
+    this: void,
+    style: number,
+    unitid: number,
+    whichPlayer: any,
+    loc: any,
+    facing: number,
+): any {
+    if (loc == null || loc === 0) return null;
+
+    const corpse = CreateCorpse(whichPlayer, unitid, GetLocationX(loc), GetLocationY(loc), facing);
+    jglobals.bj_lastCreatedUnit = corpse;
+    if (corpse == null || corpse === 0) return corpse;
+
+    SetUnitBlendTime(corpse, 0);
+    const fleshStyle = jglobals.bj_CORPSETYPE_FLESH;
+    const decayGroup = style === fleshStyle
+        ? jglobals.bj_suspendDecayFleshGroup
+        : jglobals.bj_suspendDecayBoneGroup;
+    SetUnitAnimation(corpse, style === fleshStyle ? "decay flesh" : "decay bone");
+    if (decayGroup != null && decayGroup !== 0) {
+        GroupAddUnit(decayGroup, corpse);
+    }
+
+    const decayTimer = jglobals.bj_delayedSuspendDecayTimer;
+    if (decayTimer != null && decayTimer !== 0) {
+        TimerStart(decayTimer, 0.05, false, null);
+    }
+    return corpse;
 }
 
 export {};

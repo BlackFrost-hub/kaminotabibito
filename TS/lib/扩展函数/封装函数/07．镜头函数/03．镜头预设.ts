@@ -75,8 +75,15 @@ export function 平移并应用镜头预设到全部玩家(this: void, 预设: �
   应用镜头预设给玩家组(GetPlayersAll(), 预设, duration);
 }
 
-export function 重置玩家镜头并平移到单位(this: void, whichPlayer: any, unit: any, duration: number): void {
+export function 重置玩家镜头并平移到单位(
+  this: void,
+  whichPlayer: any,
+  unit: any,
+  duration: number,
+  目标距离?: number,
+): void {
   if (GetLocalPlayer() !== whichPlayer) return;
+  if (目标距离 != null && 目标距离 > 0) SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 目标距离, 0);
   ResetToGameCamera(0);
   if (unit == null || unit === 0) return;
   StarOther_PanCameraToTimedUnitForPlayer(whichPlayer, unit, duration);

@@ -16,7 +16,7 @@ export type 游戏难度配置 = {
   公告文本: string;
 };
 
-export const 游戏难度选择延迟秒 = 11;
+export const 游戏难度选择延迟秒 = 20;
 export const 游戏难度全局变量名 = "udg_N";
 export const 弱点数量全局变量名 = "udg_R";
 

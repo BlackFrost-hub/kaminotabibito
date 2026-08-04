@@ -37,9 +37,6 @@ const { 装备等级显示文本, 装备名字颜色文本 } = require("系统.0
   装备等级显示文本: (this: void, _?: undefined, text?: string, level?: string) => string;
   装备名字颜色文本: (this: void, _?: undefined, text?: string, level?: string) => string;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { setLastCreatedItem } = require("系统.02．物品系统.09．装备排泄") as {
   setLastCreatedItem: (this: void, item: any) => void;
 };
@@ -173,11 +170,9 @@ function 解析物品池(this: void, poolStr: string): 物品池条目[] {
       const id = 解析掉落物品ID(splitParts[0] ?? "");
       const parsedWeight = parseFloat(splitParts[1] ?? "");
       const weight = parsedWeight > 0 ? parsedWeight : 1;
-      debugLogForce("宝箱掉落配置", "解析池条目", "raw=", trimmed, "id=", id, "weight=", weight);
       entries.push({ id, weight });
     } else {
       const id = 解析掉落物品ID(trimmed);
-      debugLogForce("宝箱掉落配置", "解析池条目", "raw=", trimmed, "id=", id, "weight=", 1);
       entries.push({ id, weight: 1 });
     }
   }
@@ -235,7 +230,6 @@ function 解析必掉物品(this: void, alwaysStr: string | undefined): string[]
     .split(";")
     .map(s => 解析掉落物品ID(s))
     .filter(itemId => items[itemId] != null);
-  debugLogForce("宝箱掉落配置", "解析必掉", "raw=", alwaysStr, "result=", result.join(","));
   return result;
 }
 
@@ -300,20 +294,7 @@ function 按权重抽取等级池(this: void, 候选等级池: 宝箱高级掉�
 }
 
 function 广播宝箱装备消息(this: void, 动作: { 文本前缀: string }, 上下文: 高级掉落执行上下文): void {
-  debugLogForce(
-    "宝箱掉落配置",
-    "广播检查",
-    "ownerUnit=",
-    上下文.宝箱主人 != null,
-    "itemId=",
-    上下文.最近装备物品ID ?? "",
-    "levelText=",
-    上下文.最近装备等级文本 ?? "",
-    "chestType=",
-    上下文.宝箱配置?.destructableType ?? ""
-  );
   if (!上下文.开启者 || !上下文.最近装备物品ID || !上下文.最近装备等级文本) {
-    debugLogForce("宝箱掉落配置", "跳过装备系统消息", "reason=", "missing_context");
     return;
   }
   const 装备名 = items[上下文.最近装备物品ID]?.name ?? 上下文.最近装备物品ID;
@@ -322,7 +303,6 @@ function 广播宝箱装备消息(this: void, 动作: { 文本前缀: string }, 
   const 等级文本 = 装备等级显示文本(undefined, 等级Key, 等级Key);
   const 装备文本 = 装备名字颜色文本(undefined, 装备名, 等级Key);
   const 文本 = `${玩家名}${动作.文本前缀}${等级文本}装备『${装备文本}』`;
-  debugLogForce("宝箱掉落配置", "发送装备系统消息", "text=", 文本, "icon=", 喇叭路径);
   for (let 玩家ID = 0; 玩家ID < 广播提示玩家槽数; 玩家ID++) {
     发送头像提示给玩家(Player(玩家ID), 喇叭路径, 文本, 装备系统消息持续毫秒);
   }
@@ -349,7 +329,6 @@ function 执行高级掉落动作(this: void, 动作: 宝箱高级掉落动作, 
       const 候选等级池 = 按权重抽取等级池(动作.候选等级池);
       if (!候选等级池) return;
       const itemId = 按物品池名随机装备ID(候选等级池.池名);
-      debugLogForce("宝箱掉落配置", "按等级池随机装备", "pool=", 候选等级池.池名, "itemId=", itemId);
       if (!itemId || items[itemId] == null) return;
       结果.push(itemId);
       上下文.最近装备物品ID = itemId;
@@ -358,7 +337,6 @@ function 执行高级掉落动作(this: void, 动作: 宝箱高级掉落动作, 
     }
     case "对开启者施加效果": {
       if (!上下文.开启者) return;
-      debugLogForce("宝箱掉落配置", "命中负面效果段", "lifeKeep=", 动作.保留当前生命比例 ?? "nil", "buffId=", 动作.BuffID ?? "nil", "customBuffId=", 动作.自定义BuffID ?? "nil", "buffTime=", 动作.Buff持续时间 ?? "nil");
       if (动作.命中特效模型路径 != null) {
         创建点特效({
           模型路径: 动作.命中特效模型路径,
@@ -393,11 +371,9 @@ function 执行高级掉落(this: void, config: ChestTypeConfig, 上下文: 高�
   const 高级掉落 = config.高级掉落;
   if (!高级掉落) return [];
   const roll = 上下文.指定主随机 != null ? 上下文.指定主随机 : randomInt(1, 100);
-  debugLogForce("宝箱掉落配置", "高级掉落主随机", "type=", config.destructableType, "roll=", roll, "preRolled=", 上下文.指定主随机 != null);
 
   for (const 掉落段 of 高级掉落.随机段) {
     if (roll < 掉落段.最小值 || roll > 掉落段.最大值) continue;
-    debugLogForce("宝箱掉落配置", "命中高级掉落段", "min=", 掉落段.最小值, "max=", 掉落段.最大值, "actionCount=", 掉落段.动作.length);
     const result: string[] = [];
     for (const 动作 of 掉落段.动作) {
       执行高级掉落动作(动作, result, 上下文);
@@ -409,7 +385,6 @@ function 执行高级掉落(this: void, config: ChestTypeConfig, 上下文: 高�
 }
 
 export function 执行宝箱掉落(config: ChestTypeConfig, opener?: any, ownerUnit?: any, 指定主随机?: number, x: number = 0, y: number = 0): string[] {
-  debugLogForce("宝箱掉落配置", "executeChestDrop", "type=", config.destructableType, "name=", config.name, "mode=", config.dropMode?.type ?? "none", "picks=", config.picks ?? 0);
   if (config.高级掉落) {
     return 执行高级掉落(config, {
       开启者: opener,
@@ -427,24 +402,19 @@ export function 执行宝箱掉落(config: ChestTypeConfig, opener?: any, ownerU
 export function 按可破坏物掉落(destructableType: string, opener?: any, ownerUnit?: any, 指定主随机?: number, x: number = 0, y: number = 0): string[] {
   const config = getChestConfigByString(destructableType);
   if (!config) {
-    debugLogForce("宝箱掉落配置", "未找到宝箱配置", "type=", destructableType);
     return [];
   }
-  debugLogForce("宝箱掉落配置", "命中宝箱配置", "type=", destructableType, "name=", config.name);
   return 执行宝箱掉落(config, opener, ownerUnit, 指定主随机, x, y);
 }
 
 export function 按宝箱配置掉落(config: ChestTypeConfig, opener?: any, ownerUnit?: any, 指定主随机?: number, x: number = 0, y: number = 0): string[] {
-  debugLogForce("宝箱掉落配置", "直接使用宝箱配置", "type=", config.destructableType, "name=", config.name);
   return 执行宝箱掉落(config, opener, ownerUnit, 指定主随机, x, y);
 }
 
 export function 创建掉落物品(itemId: string, x: number, y: number): any {
   if (!items[itemId]) {
-    debugLogForce("宝箱掉落配置", "未解析到物品ID", itemId, "x=", x, "y=", y);
   }
   const item = CreateItem(stringToFourCC(itemId), x, y);
-  debugLogForce("宝箱掉落配置", "创建掉落物品", "itemId=", itemId, "x=", x, "y=", y, "created=", item != null);
 
   if (item) {
     setLastCreatedItem(item);
@@ -459,27 +429,23 @@ function 获取掉落偏移(this: void, index: number): 掉落偏移 {
 
 export function 宝箱位置掉落(destructableType: string, x: number, y: number, opener?: any, ownerUnit?: any, 指定主随机?: number): any[] {
   const itemIds = 按可破坏物掉落(destructableType, opener, ownerUnit, 指定主随机, x, y);
-  debugLogForce("宝箱掉落配置", "宝箱掉落结果", "type=", destructableType, "x=", x, "y=", y, "itemIds=", itemIds.join(","));
   const createdItems: any[] = [];
   for (let i = 0; i < itemIds.length; i++) {
     const offset = 获取掉落偏移(i);
     const item = 创建掉落物品(itemIds[i], x + offset.dx, y + offset.dy);
     if (item) createdItems.push(item);
   }
-  debugLogForce("宝箱掉落配置", "宝箱掉落完成", "type=", destructableType, "count=", createdItems.length);
   return createdItems;
 }
 
 export function 宝箱配置掉落(config: ChestTypeConfig, x: number, y: number, opener?: any, ownerUnit?: any, 指定主随机?: number): any[] {
   const itemIds = 按宝箱配置掉落(config, opener, ownerUnit, 指定主随机, x, y);
-  debugLogForce("宝箱掉落配置", "宝箱掉落结果", "type=", config.destructableType, "x=", x, "y=", y, "itemIds=", itemIds.join(","));
   const createdItems: any[] = [];
   for (let i = 0; i < itemIds.length; i++) {
     const offset = 获取掉落偏移(i);
     const item = 创建掉落物品(itemIds[i], x + offset.dx, y + offset.dy);
     if (item) createdItems.push(item);
   }
-  debugLogForce("宝箱掉落配置", "宝箱掉落完成", "type=", config.destructableType, "count=", createdItems.length);
   return createdItems;
 }
 

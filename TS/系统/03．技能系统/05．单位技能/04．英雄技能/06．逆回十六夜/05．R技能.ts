@@ -23,14 +23,17 @@ const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Sta
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
-const { 造成AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
-  造成AOE技能伤害: (this: void, params: any) => boolean;
+const { 造成批量AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
+  造成批量AOE技能伤害: (this: void, params: any) => number;
 };
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getEnemyUnitsInRange: (this: void, source: any, x: number, y: number, radius: number) => any[];
 };
 const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境") as {
   施加眩晕: (this: void, source: any, target: any, duration: number, name?: string, type?: "装备" | "技能") => void;
+};
+const { ResetUnitAnimation } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
+  ResetUnitAnimation: (this: void, unit: any) => void;
 };
 const { 读取单位攻击力, 单位存活, 距离XY } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -56,7 +59,6 @@ const SetUnitFlyHeight = jass.SetUnitFlyHeight as (unit: any, height: number, ra
 const GetHeroStr = jass.GetHeroStr as (unit: any, includeBonuses: boolean) => number;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
-const ResetUnitAnimation = jass.ResetUnitAnimation as (unit: any) => void;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const R技能类型ID = stringToFourCCSafe(逆回十六夜单位技能配置.R技能ID);
 const R暂停来源 = "逆回十六夜-全力飞踢";
@@ -71,9 +73,19 @@ function 播放全力飞踢音效(this: void, unit: any, soundKey: string): void
 
 interface R上下文 { unit: any; }
 interface R施法记录 { unit: any; active: boolean; invincibleId: number; targetX: number; targetY: number; initialFlyHeight: number; damage: number; skillInstanceId?: number; }
+interface R命中处理变量 {
+  施法者: any;
+  配置: typeof 逆回十六夜单位技能配置.R;
+}
 const R施法表: Record<number, R施法记录 | undefined> = {};
 
 function 获取R上下文(this: void, unit: any): R上下文 { return { unit }; }
+
+function 处理逆回十六夜R目标结算后(this: void, target: any, _index: number, _成功: boolean, variable?: any): void {
+  const 变量 = variable as R命中处理变量 | undefined;
+  if (变量 == null) return;
+  施加眩晕(变量.施法者, target, 变量.配置.眩晕秒, "全力飞踢", "技能");
+}
 
 function 结束R施法(this: void, record: R施法记录): void {
   if (!record.active) return;
@@ -134,15 +146,13 @@ function 释放全力飞踢(this: void, _context: R上下文, unit: any, 技能�
         创建点特效({ 模型路径: cfg.命中特效B, X: x, Y: y, 缩放: 2, 持续秒: 1.5 });
         创建点特效({ 模型路径: cfg.命中特效C, X: x, Y: y, 持续秒: 1.5 });
         const targets = getEnemyUnitsInRange(caster, x, y, cfg.落地半径);
-        for (let i = 0; i < targets.length; i++) {
-          const target = targets[i];
-          造成AOE技能伤害({
-            来源: caster, 目标: target, 伤害: record.damage, 伤害类型: DAMAGE_TYPE_NORMAL,
-            来源类型: "单位技能", 技能ID: R技能类型ID,
-            技能实例ID: record.skillInstanceId, 参与技能伤害加成: true, 标签: "逆回十六夜-全力飞踢",
-          });
-          施加眩晕(caster, target, cfg.眩晕秒, "全力飞踢", "技能");
-        }
+        造成批量AOE技能伤害({
+          来源: caster, 目标列表: targets, 伤害: record.damage, 伤害类型: DAMAGE_TYPE_NORMAL,
+          来源类型: "单位技能", 技能ID: R技能类型ID,
+          技能实例ID: record.skillInstanceId, 参与技能伤害加成: true, 标签: "逆回十六夜-全力飞踢",
+          每目标结算后处理器: 处理逆回十六夜R目标结算后,
+          变量: { 施法者: caster, 配置: cfg },
+        });
       }
       结束R施法(record);
     }

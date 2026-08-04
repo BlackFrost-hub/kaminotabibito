@@ -6,8 +6,8 @@
  */
 
 const jass = require("jass.common") as any;
-const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
-  YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
@@ -34,13 +34,13 @@ const { getHeroDuration } = require("系统.05．Buff系统.01．控制抗性.01
  */
 export function getControlReduction(unit: any): number {
   // 先读取单位属性
-  const unitValue = YDUserDataGet("unit", unit, "眩晕抗性", "real");
+  const unitValue = YDUserDataGetSafe("unit", unit, "眩晕抗性", "real");
   if (unitValue > 0.01) return unitValue;
 
   // 再读取玩家属性
   const player = jass.GetOwningPlayer(unit);
   if (player != null) {
-    const playerValue = YDUserDataGet("player", player, "眩晕抗性", "real");
+    const playerValue = YDUserDataGetSafe("player", player, "眩晕抗性", "real");
     if (playerValue > 0.01) return playerValue;
   }
 

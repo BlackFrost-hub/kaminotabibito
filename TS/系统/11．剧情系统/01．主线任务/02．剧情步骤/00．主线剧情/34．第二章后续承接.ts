@@ -1,18 +1,30 @@
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 写入剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
-import { 清理剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
+import { 清理剧情运行时单位, 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 定位并登记王宫密室剧情单位, 王宫密室场景站位表, 播放王宫密室演出特效 } from "./33A．王宫密室场景单位";
 export { 章节末最终收束剧情片段 } from "../02．第二章/34．第二章后续承接";
 
 const jass = require("jass.common") as any;
+const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
+};
 const { YDUserDataClearSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
 };
 
 const RemoveUnit = jass.RemoveUnit as (this: void, whichUnit: any) => void;
+const Player = jass.Player as (this: void, playerId: number) => any;
+
+const 第二章战后对白玩家引用 = "剧情运行时.第二章战后对白玩家";
+
+function 登记第二章战后对白玩家(this: void): void {
+  const 玩家单位 = getRegisteredPlayerHero(Player(0));
+  if (玩家单位 != null && 玩家单位 !== 0) 注册剧情运行时单位(第二章战后对白玩家引用, 玩家单位);
+}
 
 export function 执行章节末最终收束(this: void, 参数: 剧情动作参数表): void {
+  登记第二章战后对白玩家();
   写入剧情进度(Number(参数.设置剧情进度) || Number(参数.目标进度) || 35);
 }
 

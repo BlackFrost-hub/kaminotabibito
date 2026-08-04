@@ -3,11 +3,12 @@
 const jass = require("jass.common") as Record<string, any>;
 import 区域背景音乐配置表 from "./01．区域背景音乐配置表";
 import type { 区域背景音乐配置项 } from "./00．区域背景音乐类型";
+import {
+  挂载区域背景音乐句柄,
+  卸载区域背景音乐句柄,
+} from "./04．区域背景音乐运行时";
 
 const jglobals = require("jass.globals") as Record<string, any>;
-const { SetStackedSoundBJ } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
-  SetStackedSoundBJ: (this: void, add: boolean, soundHandle: any, rectHandle: any) => void;
-};
 const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) => number;
 
 const 随机环境音乐结果 = new Map<string, string>();
@@ -25,15 +26,13 @@ function 读取音频句柄(this: void, 音乐变量名: string | undefined): an
 function 卸载区域音频(this: void, rectHandle: any, soundVarName: string | undefined): boolean {
   const soundHandle = 读取音频句柄(soundVarName);
   if (rectHandle == null || rectHandle === 0 || soundHandle == null || soundHandle === 0) return false;
-  SetStackedSoundBJ(false, soundHandle, rectHandle);
-  return true;
+  return 卸载区域背景音乐句柄(soundHandle, rectHandle);
 }
 
 function 挂载区域音频(this: void, rectHandle: any, soundVarName: string | undefined): boolean {
   const soundHandle = 读取音频句柄(soundVarName);
   if (rectHandle == null || rectHandle === 0 || soundHandle == null || soundHandle === 0) return false;
-  SetStackedSoundBJ(true, soundHandle, rectHandle);
-  return true;
+  return 挂载区域背景音乐句柄(true, soundHandle, rectHandle);
 }
 
 function 获取环境音乐变量名(this: void, 配置: 区域背景音乐配置项): string | undefined {

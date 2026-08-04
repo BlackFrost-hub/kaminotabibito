@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, cleanupOpening, startOpening, updateAllOpening, onChestCenterTimerTick, ensureRegisteredToCenterTimer, jass, DzUnitDisableAttack, GetRandomInt, forEachSorted, BJ_RADTODEG, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_HEIGHT_OFFSET, isChestType, getChestConfig, _____89E6_53D1_5B9D_7BB1_51C6_5907_5F00_542F_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_4E2D_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_5B8C_6210_56DE_8C03, _____521B_5EFA_8FDB_5EA6_6761_7279_6548, _____9500_6BC1_8FDB_5EA6_6761_7279_6548, dropItemsFromChestConfig, _____67E5_627E_5B9D_7BB1_4E3B_4EBA, _____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1, debugLogForce, CreateFloatTextOnUnit, _____8C03_8BD5_6A21_5757, ORDER_MOVE, ORDER_SMART, ORDER_ATTACK, ORDER_STOP, ORDER_HOLD_POSITION, openingMap, movingMap, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
+local angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, cleanupOpening, startOpening, updateAllOpening, onChestCenterTimerTick, ensureRegisteredToCenterTimer, jass, DzUnitDisableAttack, GetRandomInt, forEachSorted, BJ_RADTODEG, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_HEIGHT_OFFSET, isChestType, getChestConfig, _____89E6_53D1_5B9D_7BB1_51C6_5907_5F00_542F_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_4E2D_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_5B8C_6210_56DE_8C03, _____521B_5EFA_8FDB_5EA6_6761_7279_6548, _____9500_6BC1_8FDB_5EA6_6761_7279_6548, dropItemsFromChestConfig, _____67E5_627E_5B9D_7BB1_4E3B_4EBA, _____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1, CreateFloatTextOnUnit, ORDER_MOVE, ORDER_SMART, ORDER_ATTACK, ORDER_STOP, ORDER_HOLD_POSITION, openingMap, movingMap, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
 function angleBetweenPoints(x1, y1, x2, y2)
     return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
 end
@@ -33,20 +33,6 @@ function getOpenTime(destructableType)
     return config and config.openTime or DEFAULT_OPEN_TIME
 end
 function cleanupOpening(data, interrupted)
-    debugLogForce(
-        _____8C03_8BD5_6A21_5757,
-        "结束开启",
-        "unit=",
-        getUnitId(data.unit),
-        "target=",
-        jass.GetHandleId(data.target),
-        "interrupted=",
-        interrupted,
-        "elapsed=",
-        data.elapsed,
-        "openTime=",
-        data.openTime
-    )
     DzUnitDisableAttack(data.unit, false)
     if data.progressBar then
         _____9500_6BC1_8FDB_5EA6_6761_7279_6548(data.progressBar)
@@ -67,18 +53,6 @@ function cleanupOpening(data, interrupted)
     end
 end
 function startOpening(unit, target, openTime)
-    debugLogForce(
-        _____8C03_8BD5_6A21_5757,
-        "开始开启",
-        "unit=",
-        getUnitId(unit),
-        "target=",
-        jass.GetHandleId(target),
-        "type=",
-        jass.GetDestructableTypeId(target),
-        "openTime=",
-        openTime
-    )
     jass.IssueImmediateOrder(unit, "stop")
     if openTime <= 0 then
         openTime = 1
@@ -87,58 +61,23 @@ function startOpening(unit, target, openTime)
     local unitX = jass.GetUnitX(unit)
     local unitY = jass.GetUnitY(unit)
     local progressBar = _____521B_5EFA_8FDB_5EA6_6761_7279_6548(unit, {["高度偏移"] = PROGRESS_BAR_HEIGHT_OFFSET, ["动画序号"] = 0, ["动画速度"] = speed})
-    debugLogForce(
-        _____8C03_8BD5_6A21_5757,
-        "进度条创建后",
-        "unit=",
-        getUnitId(unit),
-        "progressBar=",
-        jass.GetHandleId(progressBar)
-    )
     DzUnitDisableAttack(unit, true)
-    debugLogForce(_____8C03_8BD5_6A21_5757, "开启瞬间禁攻已启用")
     local targetX = jass.GetDestructableX(target)
     local targetY = jass.GetDestructableY(target)
-    debugLogForce(
-        _____8C03_8BD5_6A21_5757,
-        "读取目标坐标",
-        "targetX=",
-        targetX,
-        "targetY=",
-        targetY
-    )
     local angle = angleBetweenPoints(unitX, unitY, targetX, targetY)
-    debugLogForce(_____8C03_8BD5_6A21_5757, "准备设置朝向", "angle=", angle)
     jass.SetUnitFacing(unit, angle)
-    debugLogForce(_____8C03_8BD5_6A21_5757, "设置朝向完成")
     local config = getChestConfig(jass.GetDestructableTypeId(target))
-    debugLogForce(_____8C03_8BD5_6A21_5757, "读取配置完成", "hasConfig=", config ~= nil)
     local highRoll = config and config["高级掉落"] and GetRandomInt(1, 100) or nil
     if config ~= nil and highRoll ~= nil then
-        debugLogForce(
-            _____8C03_8BD5_6A21_5757,
-            "预掷高级掉落",
-            "type=",
-            config.destructableType,
-            "roll=",
-            highRoll
-        )
     end
-    local ____config_18
+    local ____config_17
     if config then
-        ____config_18 = _____67E5_627E_5B9D_7BB1_4E3B_4EBA(config, target, "准备开启")
+        ____config_17 = _____67E5_627E_5B9D_7BB1_4E3B_4EBA(config, target, "准备开启")
     else
-        ____config_18 = nil
+        ____config_17 = nil
     end
-    local ownerUnit = ____config_18
-    debugLogForce(
-        _____8C03_8BD5_6A21_5757,
-        "准备开启主人",
-        "owner=",
-        ownerUnit and getUnitId(ownerUnit) or 0
-    )
+    local ownerUnit = ____config_17
     local chestName = config and config.name or "宝箱"
-    debugLogForce(_____8C03_8BD5_6A21_5757, "准备漂浮文字", "chestName=", chestName)
     showTextTag(
         unit,
         "开启宝箱中...",
@@ -146,7 +85,6 @@ function startOpening(unit, target, openTime)
         100,
         0
     )
-    debugLogForce(_____8C03_8BD5_6A21_5757, "漂浮文字完成")
     local data = {
         unit = unit,
         target = target,
@@ -160,16 +98,6 @@ function startOpening(unit, target, openTime)
     local unitId = getUnitId(unit)
     if unitId ~= 0 then
         openingMap:set(unitId, data)
-        debugLogForce(
-            _____8C03_8BD5_6A21_5757,
-            "写入 openingMap",
-            "unit=",
-            unitId,
-            "openingSize=",
-            openingMap.size,
-            "movingSize=",
-            movingMap.size
-        )
     end
     _____89E6_53D1_5B9D_7BB1_51C6_5907_5F00_542F_56DE_8C03(
         unit,
@@ -201,27 +129,27 @@ function updateAllOpening()
             end
             if completed or interrupted then
                 if completed then
-                    local ____data_chestConfig_21 = data.chestConfig
-                    if ____data_chestConfig_21 == nil then
-                        ____data_chestConfig_21 = getChestConfig(jass.GetDestructableTypeId(data.target))
+                    local ____data_chestConfig_20 = data.chestConfig
+                    if ____data_chestConfig_20 == nil then
+                        ____data_chestConfig_20 = getChestConfig(jass.GetDestructableTypeId(data.target))
                     end
-                    local cfg = ____data_chestConfig_21
-                    local ____cfg_22
+                    local cfg = ____data_chestConfig_20
+                    local ____cfg_21
                     if cfg then
-                        ____cfg_22 = _____67E5_627E_5B9D_7BB1_4E3B_4EBA(cfg, data.target, "开启完成")
+                        ____cfg_21 = _____67E5_627E_5B9D_7BB1_4E3B_4EBA(cfg, data.target, "开启完成")
                     else
-                        ____cfg_22 = nil
+                        ____cfg_21 = nil
                     end
-                    local ownerUnit = ____cfg_22
-                    local ____opt_result_25
+                    local ownerUnit = ____cfg_21
+                    local ____opt_result_24
                     if cfg ~= nil then
-                        ____opt_result_25 = cfg.name
+                        ____opt_result_24 = cfg.name
                     end
-                    local ____opt_result_25_26 = ____opt_result_25
-                    if ____opt_result_25_26 == nil then
-                        ____opt_result_25_26 = "宝箱"
+                    local ____opt_result_24_25 = ____opt_result_24
+                    if ____opt_result_24_25 == nil then
+                        ____opt_result_24_25 = "宝箱"
                     end
-                    local chestName = ____opt_result_25_26
+                    local chestName = ____opt_result_24_25
                     showTextTag(
                         data.unit,
                         "宝箱被打开了...",
@@ -229,35 +157,7 @@ function updateAllOpening()
                         100,
                         0
                     )
-                    local ____debugLogForce_33 = debugLogForce
-                    local ____unitId_31 = unitId
-                    local ____temp_32 = jass.GetHandleId(data.target)
-                    local ____opt_result_29
-                    if cfg ~= nil then
-                        ____opt_result_29 = cfg.destructableType
-                    end
-                    local ____opt_result_29_30 = ____opt_result_29
-                    if ____opt_result_29_30 == nil then
-                        ____opt_result_29_30 = "unknown"
-                    end
-                    ____debugLogForce_33(
-                        _____8C03_8BD5_6A21_5757,
-                        "开启完成",
-                        "unit=",
-                        ____unitId_31,
-                        "target=",
-                        ____temp_32,
-                        "destructableType=",
-                        ____opt_result_29_30
-                    )
-                    debugLogForce(
-                        _____8C03_8BD5_6A21_5757,
-                        "开启完成主人",
-                        "owner=",
-                        ownerUnit and getUnitId(ownerUnit) or 0
-                    )
                     cleanupOpening(data, false)
-                    debugLogForce(_____8C03_8BD5_6A21_5757, "完成回调前")
                     _____89E6_53D1_5B9D_7BB1_5F00_542F_5B8C_6210_56DE_8C03(
                         data.unit,
                         data.target,
@@ -266,43 +166,12 @@ function updateAllOpening()
                         cfg,
                         ownerUnit
                     )
-                    debugLogForce(_____8C03_8BD5_6A21_5757, "完成回调后")
                     if cfg then
                         local dropX = jass.GetDestructableX(data.target)
                         local dropY = jass.GetDestructableY(data.target)
                         local _____9996_9886_5956_52B1_5DF2_63A5_7BA1 = _____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1(cfg, data.unit, data.target)
                         if _____9996_9886_5956_52B1_5DF2_63A5_7BA1 then
-                            local ____debugLogForce_36 = debugLogForce
-                            local ____cfg_destructableType_35 = cfg.destructableType
-                            local ____cfg__9996_9886_5956_52B1_6C60ID_34 = cfg["首领奖励池ID"]
-                            if ____cfg__9996_9886_5956_52B1_6C60ID_34 == nil then
-                                ____cfg__9996_9886_5956_52B1_6C60ID_34 = ""
-                            end
-                            ____debugLogForce_36(
-                                _____8C03_8BD5_6A21_5757,
-                                "首领奖励宝箱已触发",
-                                "type=",
-                                ____cfg_destructableType_35,
-                                "x=",
-                                dropX,
-                                "y=",
-                                dropY,
-                                "rewardPool=",
-                                ____cfg__9996_9886_5956_52B1_6C60ID_34
-                            )
                         else
-                            debugLogForce(
-                                _____8C03_8BD5_6A21_5757,
-                                "掉落前",
-                                "type=",
-                                cfg.destructableType,
-                                "x=",
-                                dropX,
-                                "y=",
-                                dropY,
-                                "preRoll=",
-                                data.highRoll or "nil"
-                            )
                             dropItemsFromChestConfig(
                                 cfg,
                                 dropX,
@@ -311,13 +180,10 @@ function updateAllOpening()
                                 ownerUnit,
                                 data.highRoll
                             )
-                            debugLogForce(_____8C03_8BD5_6A21_5757, "掉落后")
                         end
                     end
                     if data.target then
-                        debugLogForce(_____8C03_8BD5_6A21_5757, "KillDestructable前")
                         jass.KillDestructable(data.target)
-                        debugLogForce(_____8C03_8BD5_6A21_5757, "KillDestructable后")
                     end
                 end
                 if not completed then
@@ -338,51 +204,11 @@ function updateAllOpening()
                 local targetType = jass.GetDestructableTypeId(data.target)
                 if targetType and isInteractable(targetType) then
                     local openTime = getOpenTime(targetType)
-                    debugLogForce(
-                        _____8C03_8BD5_6A21_5757,
-                        "移动到范围内，转入开启",
-                        "unit=",
-                        unitId,
-                        "target=",
-                        jass.GetHandleId(data.target),
-                        "targetType=",
-                        targetType,
-                        "openTime=",
-                        openTime
-                    )
                     startOpening(data.unit, data.target, openTime)
                 end
                 movingMap:delete(unitId)
-                debugLogForce(
-                    _____8C03_8BD5_6A21_5757,
-                    "移除 movingMap",
-                    "unit=",
-                    unitId,
-                    "openingSize=",
-                    openingMap.size,
-                    "movingSize=",
-                    movingMap.size
-                )
             elseif orderChanged then
                 movingMap:delete(unitId)
-                debugLogForce(
-                    _____8C03_8BD5_6A21_5757,
-                    "移动状态结束但未进范围",
-                    "unit=",
-                    unitId,
-                    "target=",
-                    jass.GetHandleId(data.target),
-                    "currentOrder=",
-                    currentOrder,
-                    "moveOrder=",
-                    ORDER_MOVE,
-                    "smartOrder=",
-                    ORDER_SMART,
-                    "openingSize=",
-                    openingMap.size,
-                    "movingSize=",
-                    movingMap.size
-                )
             end
         end
     )
@@ -402,8 +228,8 @@ function ensureRegisteredToCenterTimer()
         return
     end
     _registeredToCenterTimer = true
-    local ____G_37 = _G
-    local onTick10ms = ____G_37.onTick10ms
+    local ____G_26 = _G
+    local onTick10ms = ____G_26.onTick10ms
     onTick10ms(onChestCenterTimerTick)
 end
 --- 中断单位开启
@@ -412,13 +238,13 @@ function ____exports.interruptOpening(unit)
         return
     end
     local unitId = getUnitId(unit)
-    local ____temp_39
+    local ____temp_28
     if unitId ~= 0 then
-        ____temp_39 = openingMap:get(unitId)
+        ____temp_28 = openingMap:get(unitId)
     else
-        ____temp_39 = nil
+        ____temp_28 = nil
     end
-    local data = ____temp_39
+    local data = ____temp_28
     if data ~= nil then
         cleanupOpening(data, true)
     end
@@ -478,11 +304,8 @@ local ____require_result_11 = require("系统.06．经济系统.00．宝箱系�
 _____67E5_627E_5B9D_7BB1_4E3B_4EBA = ____require_result_11["查找宝箱主人"]
 local ____require_result_12 = require("系统.06．经济系统.00．宝箱系统.10．首领奖励宝箱")
 _____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1 = ____require_result_12["触发宝箱首领奖励"]
-local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_13.debugLogForce
 local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
 CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
-_____8C03_8BD5_6A21_5757 = "宝箱系统-核心"
 ORDER_MOVE = 851971
 ORDER_SMART = 851986
 ORDER_ATTACK = 851983
@@ -506,39 +329,11 @@ function ____exports.onUnitTargetChestPointOrder(unit, x, y)
         if isSamePoint(x, y, movingData.targetX, movingData.targetY) then
             return
         end
-        debugLogForce(
-            _____8C03_8BD5_6A21_5757,
-            "外部点地改写移动",
-            "unit=",
-            unitId,
-            "target=",
-            jass.GetHandleId(movingData.target),
-            "pointX=",
-            x,
-            "pointY=",
-            y,
-            "moveX=",
-            movingData.targetX,
-            "moveY=",
-            movingData.targetY
-        )
         movingMap:delete(unitId)
         return
     end
     local openingData = openingMap:get(unitId)
     if openingData ~= nil then
-        debugLogForce(
-            _____8C03_8BD5_6A21_5757,
-            "外部点地打断开启",
-            "unit=",
-            unitId,
-            "target=",
-            jass.GetHandleId(openingData.target),
-            "pointX=",
-            x,
-            "pointY=",
-            y
-        )
         ____exports.interruptOpening(unit)
     end
 end
@@ -555,30 +350,10 @@ function ____exports.onUnitTargetChestImmediateOrder(unit, orderId)
     end
     local movingData = movingMap:get(unitId)
     if movingData ~= nil then
-        debugLogForce(
-            _____8C03_8BD5_6A21_5757,
-            "外部即时命令打断移动",
-            "unit=",
-            unitId,
-            "target=",
-            jass.GetHandleId(movingData.target),
-            "orderId=",
-            orderId
-        )
         movingMap:delete(unitId)
     end
     local openingData = openingMap:get(unitId)
     if openingData ~= nil then
-        debugLogForce(
-            _____8C03_8BD5_6A21_5757,
-            "外部即时命令打断开启",
-            "unit=",
-            unitId,
-            "target=",
-            jass.GetHandleId(openingData.target),
-            "orderId=",
-            orderId
-        )
         ____exports.interruptOpening(unit)
     end
 end
@@ -593,76 +368,25 @@ CENTER_TIMER_TICKS = ceil(UPDATE_INTERVAL / 0.01)
 -- @param target 目标可破坏物
 function ____exports.onUnitTargetInteractable(unit, target)
     if not unit or not target then
-        debugLogForce(_____8C03_8BD5_6A21_5757, "进入交互失败: unit 或 target 为空")
         return
     end
     local targetType = jass.GetDestructableTypeId(target)
     if not isInteractable(targetType) then
-        debugLogForce(
-            _____8C03_8BD5_6A21_5757,
-            "进入交互失败: 目标不是宝箱/木桶",
-            "unit=",
-            getUnitId(unit),
-            "target=",
-            jass.GetHandleId(target),
-            "targetType=",
-            targetType
-        )
         return
     end
     local openTime = getOpenTime(targetType)
     local targetX = jass.GetDestructableX(target)
     local targetY = jass.GetDestructableY(target)
     local inRange = jass.IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE)
-    debugLogForce(
-        _____8C03_8BD5_6A21_5757,
-        "进入交互",
-        "unit=",
-        getUnitId(unit),
-        "target=",
-        jass.GetHandleId(target),
-        "targetType=",
-        targetType,
-        "inRange=",
-        inRange,
-        "openTime=",
-        openTime,
-        "targetX=",
-        targetX,
-        "targetY=",
-        targetY,
-        "currentOrder=",
-        jass.GetUnitCurrentOrder(unit)
-    )
     if not inRange then
         jass.IssuePointOrder(unit, "move", targetX, targetY)
         local data = {unit = unit, target = target, targetX = targetX, targetY = targetY}
         local unitId = getUnitId(unit)
         if unitId ~= 0 then
             movingMap:set(unitId, data)
-            debugLogForce(
-                _____8C03_8BD5_6A21_5757,
-                "写入 movingMap",
-                "unit=",
-                unitId,
-                "target=",
-                jass.GetHandleId(target),
-                "openingSize=",
-                openingMap.size,
-                "movingSize=",
-                movingMap.size
-            )
         end
         ensureRegisteredToCenterTimer()
     else
-        debugLogForce(
-            _____8C03_8BD5_6A21_5757,
-            "已在范围内，直接开启",
-            "unit=",
-            getUnitId(unit),
-            "target=",
-            jass.GetHandleId(target)
-        )
         startOpening(unit, target, openTime)
     end
 end
@@ -672,13 +396,13 @@ function ____exports.isUnitOpening(unit)
         return false
     end
     local unitId = getUnitId(unit)
-    local ____temp_38
+    local ____temp_27
     if unitId ~= 0 then
-        ____temp_38 = openingMap:has(unitId)
+        ____temp_27 = openingMap:has(unitId)
     else
-        ____temp_38 = false
+        ____temp_27 = false
     end
-    return ____temp_38
+    return ____temp_27
 end
 ____exports.onUnitTargetChest = ____exports.onUnitTargetInteractable
 ____exports.isUnitOpeningChest = ____exports.isUnitOpening

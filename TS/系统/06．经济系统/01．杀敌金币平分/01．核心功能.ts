@@ -12,7 +12,7 @@
 
 const jass = require("jass.common") as any;
 
-const { SHARE_RANGE } = require("系统.06．经济系统.01．杀敌金币平分.00．常量定义") as typeof import("./00．常量定义");
+const { SHARE_RANGE, 杀敌金币平分系统启用 } = require("系统.06．经济系统.01．杀敌金币平分.00．常量定义") as typeof import("./00．常量定义");
 
 const { getObjectPropertyInteger } = require("lib.扩展函数.YDWE函数.index") as {
   getObjectPropertyInteger: (objectType: number, objectId: number | string, property: string) => number;
@@ -278,6 +278,7 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
  * @param cb 回调函数
  */
 export function registerGoldGainCallback(cb: GoldGainCallback): void {
+  if (!杀敌金币平分系统启用) return;
   goldGainCallbacks.push(cb);
 }
 
@@ -293,6 +294,8 @@ let _initialized = false;
 export function initGoldShareSystem(this: void): void {
   if (_initialized) return;
   _initialized = true;
+
+  if (!杀敌金币平分系统启用) return;
 
   registerDeathListener(onUnitDeathHandler);
 }

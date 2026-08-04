@@ -16,7 +16,7 @@ const { safeTimerStart, safeDestroyTimer } = require("系统.00．核心系统.0
   safeTimerStart: (timer: any, timeout: number, periodic: boolean, action: () => void) => void;
   safeDestroyTimer: (timer: any) => void;
 };
-import { YDWESetUnitAbilityDataReal, EXSetUnitFacing } from "../../YDWE函数/00．YDWE函数";
+import { 安全设置单位技能实数数据 } from "../../YDWE函数/09．YDUserData安全版";
 import { GS_Suspend, 设置单位暂停时间 } from "./03．硬直暂停系统";
 import { SUC_IsUnitStructure, SUC_IsValidUnit } from "./08．单位判定与筛选函数";
 
@@ -50,6 +50,11 @@ const 四色码转字符串 = fourCcUtil.fourCCToString;
 const 获取玩家首个英雄 = unitRelated.getPlayerFirstHero;
 const YDUserDataGet = YDUserDataGetSafe;
 const YDUserDataSet = YDUserDataSetSafe;
+const YDWESetUnitAbilityDataReal = 安全设置单位技能实数数据;
+
+function EXSetUnitFacing(this: void, unit: any, angle: number): void {
+  japi.EXSetUnitFacing(unit, angle);
+}
 
 function sym(name: string): any {
   return (globalThis as any)[name]
@@ -247,6 +252,7 @@ export function registerSfbManualBuff(
   effectSourceName?: string,
   effectSourceType?: "装备" | "技能"
 ): void {
+  if (!(time > 0)) return;
   const buffID = SFB_BUFF_ID[id];
   if (buffID == null || buffID === "") return;
   registerManualBuff(u, buffID, time, effectValue, {
@@ -333,7 +339,7 @@ export function SFB_施加原生目标Buff(
   effectSourceName?: string,
   effectSourceType?: "装备" | "技能"
 ): void {
-  if (!SUC_IsValidUnit(u) || time <= 0) return;
+  if (!SUC_IsValidUnit(u) || !(time > 0)) return;
   if (SUC_IsUnitStructure(u)) return;
   if (u === SFB_Unit) return;
 
@@ -391,6 +397,7 @@ export function SFB_施加暂停类Buff(
   effectSourceName?: string,
   effectSourceType?: "装备" | "技能"
 ): void {
+  if (!(time > 0)) return;
   registerSfbManualBuff(sourceUnit, u, id, time, 0, effectSourceName, effectSourceType);
   if (id === 21) {
     设置单位暂停时间(u, "SFB_Stun", time);

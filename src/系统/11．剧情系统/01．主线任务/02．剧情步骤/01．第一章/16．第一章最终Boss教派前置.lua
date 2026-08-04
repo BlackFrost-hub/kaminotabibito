@@ -82,36 +82,62 @@ ____exports["护卫试炼后回村紧凑剧情片段"] = {
             ["使用原生电影系统"] = true
         }
     },
-    ["动作时间线"] = {{
-        ["序号"] = 1,
-        ["挂点"] = "beforeDialog",
-        ["对白序号"] = 1,
-        ["动作ID"] = "JLC精灵村_护卫试炼后回村",
-        ["名称"] = "护卫试炼后返回精灵村",
-        ["参数"] = {
-            ["触发进度"] = 16,
-            ["移除临时单位"] = "ZXCS.DW, ZXCS2.DW",
-            ["停止区域音乐"] = "gg_snd_JQBGM03 @ gg_rct________________QY",
-            ["开始音乐"] = "gg_snd_JQBGM04 @ gg_rct________________QY",
-            ["族长位置X"] = -26114.4,
-            ["族长位置Y"] = -28671.3,
-            ["旧JASS功能清单"] = "RemoveUnit / YDUserDataClearTable / SetUnitPosition / CinematicModeBJ / QuestMessageBJ"
+    ["动作时间线"] = {
+        {
+            ["序号"] = 1,
+            ["挂点"] = "beforeDialog",
+            ["对白序号"] = 1,
+            ["动作ID"] = "JLC精灵村_护卫试炼后回村",
+            ["名称"] = "护卫试炼后返回精灵村",
+            ["参数"] = {
+                ["触发进度"] = 16,
+                ["移除临时单位"] = "ZXCS.DW, ZXCS2.DW",
+                ["停止区域音乐"] = "gg_snd_JQBGM03 @ gg_rct________________QY",
+                ["开始音乐"] = "gg_snd_JQBGM04 @ gg_rct________________QY",
+                ["族长位置X"] = -26114.4,
+                ["族长位置Y"] = -28671.3,
+                ["旧JASS功能清单"] = "RemoveUnit / YDUserDataClearTable / SetUnitPosition / CinematicModeBJ / QuestMessageBJ"
+            }
+        },
+        {
+            ["序号"] = 2,
+            ["挂点"] = "beforeDialog",
+            ["对白序号"] = 1,
+            ["动作ID"] = "主线.写入进度",
+            ["名称"] = "进入第一章最终Boss节点",
+            ["参数"] = {["节点进度"] = 17}
+        },
+        {
+            ["序号"] = 3,
+            ["挂点"] = "afterDialog",
+            ["对白序号"] = 3,
+            ["动作ID"] = "JLC精灵村_教派袭击预置",
+            ["名称"] = "教派袭击演出单位预置",
+            ["参数"] = {["神秘人单位名"] = "奇异蒙面人", ["精灵护卫单位名"] = "精灵护卫, 精灵村守卫", ["临时树木数量"] = 21, ["旧JASS功能清单"] = "CreateUnit / DzDoodadCreate / ForForce镜头与视野"}
+        },
+        {
+            ["序号"] = 4,
+            ["挂点"] = "afterDialog",
+            ["对白序号"] = 6,
+            ["动作ID"] = "JLC精灵村_教派玩家入场",
+            ["名称"] = "玩家英雄进入教派袭击现场",
+            ["参数"] = {
+                ["玩家站位X"] = -26846.7,
+                ["玩家站位Y"] = -27820.8,
+                ["面向目标"] = "教派袭击现场神秘人",
+                ["播放动画"] = "Attack",
+                ["旧JASS功能清单"] = "SetUnitX / SetUnitY / EXSetUnitFacing(YDWEAngleBetweenUnits) / SetUnitAnimation / PauseUnit"
+            }
+        },
+        {
+            ["序号"] = 5,
+            ["挂点"] = "afterDialog",
+            ["对白序号"] = 9,
+            ["动作ID"] = "JLC精灵村_教派玩家恢复",
+            ["名称"] = "玩家英雄恢复并攻击神秘人",
+            ["参数"] = {["目标"] = "教派袭击现场神秘人", ["旧JASS功能清单"] = "PauseUnit(false) / SetUnitInvulnerable(false) / IssueTargetOrder(attack)"}
         }
-    }, {
-        ["序号"] = 2,
-        ["挂点"] = "beforeDialog",
-        ["对白序号"] = 1,
-        ["动作ID"] = "主线.写入进度",
-        ["名称"] = "进入第一章最终Boss节点",
-        ["参数"] = {["节点进度"] = 17}
-    }, {
-        ["序号"] = 3,
-        ["挂点"] = "afterDialog",
-        ["对白序号"] = 3,
-        ["动作ID"] = "JLC精灵村_教派袭击预置",
-        ["名称"] = "教派袭击演出单位预置",
-        ["参数"] = {["神秘人单位名"] = "奇异蒙面人", ["精灵护卫单位名"] = "精灵护卫, 精灵村守卫", ["临时树木数量"] = 21, ["旧JASS功能清单"] = "CreateUnit / DzDoodadCreate / ForForce镜头与视野"}
-    }}
+    }
 }
 ____exports["教派最终Boss启动紧凑剧情片段"] = {
     ["片段ID"] = "jlc_cult_final_boss_start",
@@ -198,11 +224,18 @@ ____exports["教派最终Boss启动紧凑剧情片段"] = {
         ["序号"] = 2,
         ["挂点"] = "afterDialog",
         ["对白序号"] = 8,
+        ["动作ID"] = "JLC精灵村_教派战斗收束",
+        ["名称"] = "退出教派电影演出并关闭演出音乐",
+        ["参数"] = {["旧JASS功能清单"] = "CinematicModeBJ(false) / SetStackedSoundBJ(false, JQBGM04)"}
+    }, {
+        ["序号"] = 3,
+        ["挂点"] = "afterDialog",
+        ["对白序号"] = 8,
         ["动作ID"] = "主线.发布节点目标",
         ["名称"] = "发布击败神秘蒙面人目标",
         ["参数"] = {["节点进度"] = 17}
     }, {
-        ["序号"] = 3,
+        ["序号"] = 4,
         ["挂点"] = "afterDialog",
         ["对白序号"] = 8,
         ["动作ID"] = "startBossFight",

@@ -143,6 +143,17 @@ export const 英雄升级配置列表: readonly 英雄升级配置[] = [
     ],
   },
   {
+    heroId: "E006",
+    heroName: "死神",
+    properName: "黑崎一护",
+    awakeningSkills: [
+      { level: 2, abilityId: "A01G" },
+      { level: 5, abilityId: "A01K" },
+      { level: 10, abilityId: "A01L" },
+      { level: 15, abilityId: "A01H" },
+    ],
+  },
+  {
     heroId: "H00Q",
     heroName: "爱德华·艾尔利克",
     properName: "钢之炼金术师",

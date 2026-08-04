@@ -9,6 +9,7 @@ import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．�
 export { 蛇人族藏品管家初见剧情片段 } from "../01．第一章/08．蛇人族藏品管家初见";
 
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
+const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 
 export function 执行蛇人族藏品管家初见(this: void, 参数: 剧情动作参数表): void {
@@ -17,6 +18,8 @@ export function 执行蛇人族藏品管家初见(this: void, 参数: 剧情动�
   if (键名 === "") return;
   const npc = YDUserDataGetSafe("string", "主线NPC", 键名, "unit");
   if (npc == null || npc === 0) return;
+  const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
+  if (触发单位 != null && 触发单位 !== 0) IssueImmediateOrder(触发单位, "stop");
   SetUnitOwner(npc, Player(6), true);
 }
 

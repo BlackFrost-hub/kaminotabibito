@@ -3,6 +3,7 @@ local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local __TS__Number = ____lualib.__TS__Number
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.03．Boss血条弱点韧性.01．常量定义")
 local ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E = ____01_FF0E_5E38_91CF_5B9A_4E49["Boss弱点反馈默认配置"]
@@ -21,6 +22,7 @@ local jglobals = require("jass.globals")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitState = jass.GetUnitState
 local R2I = jass.R2I
+local GetRandomInt = jass.GetRandomInt
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
@@ -101,13 +103,30 @@ local function _____8BFB_53D6_542F_52A8_5C5E_6027_5F31_70B9_6807_8BB0(_____914D_
 end
 local function _____4ECE_542F_52A8_5C5E_6027_521B_5EFA_5F31_70B9_5217_8868(_____914D_7F6E)
     local weakList = {}
+    local remainingCandidates = {}
     do
         local i = 0
         while i < #____Boss_5F31_70B9_5019_9009_5217_8868 do
             local candidate = ____Boss_5F31_70B9_5019_9009_5217_8868[i + 1]
             if _____8BFB_53D6_542F_52A8_5C5E_6027_5F31_70B9_6807_8BB0(_____914D_7F6E, candidate["弱点键"]) then
                 weakList[#weakList + 1] = candidate
+            else
+                remainingCandidates[#remainingCandidates + 1] = candidate
             end
+            i = i + 1
+        end
+    end
+    local requestedExtraWeakPointCount = R2I(_____914D_7F6E["额外随机弱点数"] or 0)
+    local extraWeakPointCount = requestedExtraWeakPointCount < #remainingCandidates and requestedExtraWeakPointCount or #remainingCandidates
+    do
+        local i = 0
+        while i < extraWeakPointCount do
+            if #remainingCandidates <= 0 then
+                break
+            end
+            local randomIndex = GetRandomInt(0, #remainingCandidates - 1)
+            weakList[#weakList + 1] = remainingCandidates[randomIndex + 1]
+            __TS__ArraySplice(remainingCandidates, randomIndex, 1)
             i = i + 1
         end
     end

@@ -38,7 +38,7 @@ local function onDeath(dying, killer)
     if spawnUnitId == "" then
         return
     end
-    local BERSERK_PROC = 1
+    local BERSERK_PROC = 0.0625
     if jass.GetRandomInt(1, 10000) > BERSERK_PROC * 10000 then
         return
     end

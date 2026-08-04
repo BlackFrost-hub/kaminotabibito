@@ -7,17 +7,34 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const {
-  DzTriggerRegisterKeyEventTrg,
-  DzTriggerRegisterMouseEventTrg,
-  DzTriggerRegisterMouseMoveEventTrg,
-  DzTriggerRegisterMouseWheelEventTrg,
-} = require("lib.扩展函数.KK扩展API.index") as {
-  DzTriggerRegisterKeyEventTrg: (this: void, trg: any, status: number, btn: number | string) => void;
-  DzTriggerRegisterMouseEventTrg: (this: void, trg: any, status: number, btn: number) => void;
-  DzTriggerRegisterMouseMoveEventTrg: (this: void, trg: any) => void;
-  DzTriggerRegisterMouseWheelEventTrg: (this: void, trg: any) => void;
-};
+const DzTriggerRegisterKeyEvent = japi.DzTriggerRegisterKeyEvent as (
+  this: void,
+  trigger: any,
+  key: number | string,
+  status: number,
+  sync: boolean,
+  callbackName: any,
+) => void;
+const DzTriggerRegisterMouseEvent = japi.DzTriggerRegisterMouseEvent as (
+  this: void,
+  trigger: any,
+  button: number,
+  status: number,
+  sync: boolean,
+  callbackName: any,
+) => void;
+const DzTriggerRegisterMouseMoveEvent = japi.DzTriggerRegisterMouseMoveEvent as (
+  this: void,
+  trigger: any,
+  sync: boolean,
+  callbackName: any,
+) => void;
+const DzTriggerRegisterMouseWheelEvent = japi.DzTriggerRegisterMouseWheelEvent as (
+  this: void,
+  trigger: any,
+  sync: boolean,
+  callbackName: any,
+) => void;
 
 import { MOUSE_BUTTON, MOUSE_STATE } from "./01．常量定义";
 import { createTriggerOrNull } from "./02．内部工具";
@@ -72,6 +89,22 @@ let mouseWheelTrigger: any = null;
 
 function getDispatchKey(this: void, a: number | string, b: number): string {
   return tostring(a) + ":" + tostring(b);
+}
+
+function registerSyncKeyToTrigger(this: void, trigger: any, status: number, key: number | string): void {
+  DzTriggerRegisterKeyEvent(trigger, key, status, true, null);
+}
+
+function registerSyncMouseButtonToTrigger(this: void, trigger: any, status: number, button: number): void {
+  DzTriggerRegisterMouseEvent(trigger, button, status, true, null);
+}
+
+function registerSyncMouseMoveToTrigger(this: void, trigger: any): void {
+  DzTriggerRegisterMouseMoveEvent(trigger, true, null);
+}
+
+function registerSyncMouseWheelToTrigger(this: void, trigger: any): void {
+  DzTriggerRegisterMouseWheelEvent(trigger, true, null);
 }
 
 function getTriggerInputPlayer(this: void): any {
@@ -140,11 +173,14 @@ function dispatchMouseCallbacks(this: void, callbacks: 同步鼠标回调[] | un
 function onSyncHardwareKey(this: void): void {
   const trigger = jass.GetTriggeringTrigger();
   if (trigger == null || trigger === 0) return;
-  const context = keyTriggerContextByHandle[jass.GetHandleId(trigger) as number];
+  const handleId = jass.GetHandleId(trigger) as number;
+  const context = keyTriggerContextByHandle[handleId];
   if (context == null) return;
   const key = japi.DzGetTriggerKey();
-  dispatchKeyCallbacks(keyCallbacksByKeyAndStatus[getDispatchKey(context.key, context.status)], {
-    player: getTriggerInputPlayer(),
+  const player = getTriggerInputPlayer();
+  const callbacks = keyCallbacksByKeyAndStatus[getDispatchKey(context.key, context.status)];
+  dispatchKeyCallbacks(callbacks, {
+    player,
     key,
     status: context.status,
   });
@@ -190,8 +226,9 @@ export function registerSyncHardwareKey(
     keyCallbacksByKeyAndStatus[dispatchKey] = callbacks;
     const trigger = createTriggerOrNull();
     if (trigger == null || trigger === 0) return null;
-    keyTriggerContextByHandle[jass.GetHandleId(trigger) as number] = { key, status };
-    DzTriggerRegisterKeyEventTrg(trigger, status, key);
+    const handleId = jass.GetHandleId(trigger) as number;
+    keyTriggerContextByHandle[handleId] = { key, status };
+    registerSyncKeyToTrigger(trigger, status, key);
     jass.TriggerAddAction(trigger, onSyncHardwareKey);
   }
   callbacks.push(callback);
@@ -212,7 +249,7 @@ export function registerSyncHardwareMouseButton(
     const trigger = createTriggerOrNull();
     if (trigger == null || trigger === 0) return null;
     mouseTriggerContextByHandle[jass.GetHandleId(trigger) as number] = { button, status };
-    DzTriggerRegisterMouseEventTrg(trigger, status, button);
+    registerSyncMouseButtonToTrigger(trigger, status, button);
     jass.TriggerAddAction(trigger, onSyncHardwareMouseButton);
   }
   callbacks.push(callback);
@@ -223,7 +260,7 @@ export function registerSyncHardwareMouseMove(this: void, callback: 同步鼠标
   if (mouseMoveTrigger == null || mouseMoveTrigger === 0) {
     mouseMoveTrigger = createTriggerOrNull();
     if (mouseMoveTrigger == null || mouseMoveTrigger === 0) return null;
-    DzTriggerRegisterMouseMoveEventTrg(mouseMoveTrigger);
+    registerSyncMouseMoveToTrigger(mouseMoveTrigger);
     jass.TriggerAddAction(mouseMoveTrigger, onSyncHardwareMouseMove);
   }
   moveCallbacks.push(callback);
@@ -234,7 +271,7 @@ export function registerSyncHardwareMouseWheel(this: void, callback: 同步鼠�
   if (mouseWheelTrigger == null || mouseWheelTrigger === 0) {
     mouseWheelTrigger = createTriggerOrNull();
     if (mouseWheelTrigger == null || mouseWheelTrigger === 0) return null;
-    DzTriggerRegisterMouseWheelEventTrg(mouseWheelTrigger);
+    registerSyncMouseWheelToTrigger(mouseWheelTrigger);
     jass.TriggerAddAction(mouseWheelTrigger, onSyncHardwareMouseWheel);
   }
   wheelCallbacks.push(callback);

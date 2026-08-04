@@ -84,11 +84,12 @@ local function dispatchSelectionListeners(player, playerId, unit, isSelected)
 end
 local function handleSelectionEvent(isSelected)
     local player = jass.GetTriggerPlayer()
+    local rawUnit = jass.GetTriggerUnit()
     if not isValidPlayer(player) then
         return
     end
     local playerId = jass.GetPlayerId(player)
-    local unit = jass.GetTriggerUnit()
+    local unit = rawUnit
     if not isRealUnit(unit) then
         if not isSelected then
             selectedCount[playerId] = 0

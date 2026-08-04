@@ -31,6 +31,8 @@ local _____6E05_9664_4EC7_6068_663E_793AById = ____require_result_2["清除仇�
 local _____6E05_9664_6240_6709_4EC7_6068_663E_793A = ____require_result_2["清除所有仇恨显示"]
 local ____require_result_3 = require("系统.09．表现系统.05．仇恨面板.05．仇恨面板")
 local _____81EA_52A8_5C55_5F00_4EC7_6068_9762_677F_4E00_6B21 = ____require_result_3["自动展开仇恨面板一次"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_4["单位是否正在原生施法"]
 local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local GetUnitX = jass.GetUnitX
@@ -43,6 +45,7 @@ local MAX_DISTANCE_SQ = 2500 * 2500
 local ISSUE_ORDER_DISTANCE_SQ = 1000 * 1000
 local _____5F3A_5236_76EE_6807_8865_53D1_547D_4EE4_95F4_9694Ms = 750
 local _____5F3A_5236_76EE_6807_4E0A_6B21_8865_53D1_547D_4EE4Ms = {}
+local _____65BD_6CD5_671F_95F4_8DF3_8FC7_653B_51FB_547D_4EE4 = {}
 local _____5468_671F_56DE_8C03ID = 0
 local _____6A21_5757_540D = "仇恨系统"
 local _nowMs = nil
@@ -61,6 +64,7 @@ end
 local function _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
     _____6E05_9664_4EC7_6068_663E_793AById(_____654C_4EBAID)
     __TS__Delete(_____5F3A_5236_76EE_6807_4E0A_6B21_8865_53D1_547D_4EE4Ms, _____654C_4EBAID)
+    __TS__Delete(_____65BD_6CD5_671F_95F4_8DF3_8FC7_653B_51FB_547D_4EE4, _____654C_4EBAID)
     clearAllThreatById(_____654C_4EBAID)
 end
 local function _____5C1D_8BD5_81EA_52A8_5C55_5F00_76EE_6807_73A9_5BB6_4EC7_6068_9762_677F(target)
@@ -92,6 +96,14 @@ local function _____6784_5EFA_8FC7_6EE4_51FD_6570(ex, ey, maxDistanceSq)
     end
 end
 local function _____9700_8981_4E0B_53D1_653B_51FB_547D_4EE4(_____654C_4EBA, _____654C_4EBAID, _____5F53_524D_76EE_6807ID, _____76EE_6807, filter)
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(_____654C_4EBA) then
+        _____65BD_6CD5_671F_95F4_8DF3_8FC7_653B_51FB_547D_4EE4[_____654C_4EBAID] = true
+        return false
+    end
+    if _____65BD_6CD5_671F_95F4_8DF3_8FC7_653B_51FB_547D_4EE4[_____654C_4EBAID] == true then
+        __TS__Delete(_____65BD_6CD5_671F_95F4_8DF3_8FC7_653B_51FB_547D_4EE4, _____654C_4EBAID)
+        return true
+    end
     if _____5F53_524D_76EE_6807ID ~= _____76EE_6807.targetHid then
         return true
     end
@@ -104,6 +116,11 @@ local function _____9700_8981_4E0B_53D1_653B_51FB_547D_4EE4(_____654C_4EBA, ____
     return _____5F53_524D_65F6_95F4 - _____4E0A_6B21_8865_53D1_65F6_95F4 >= _____5F3A_5236_76EE_6807_8865_53D1_547D_4EE4_95F4_9694Ms
 end
 local function _____4E0B_53D1_653B_51FB_547D_4EE4(_____654C_4EBA, _____654C_4EBAID, _____76EE_6807)
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(_____654C_4EBA) then
+        _____65BD_6CD5_671F_95F4_8DF3_8FC7_653B_51FB_547D_4EE4[_____654C_4EBAID] = true
+        return
+    end
+    __TS__Delete(_____65BD_6CD5_671F_95F4_8DF3_8FC7_653B_51FB_547D_4EE4, _____654C_4EBAID)
     IssueTargetOrder(_____654C_4EBA, "attack", _____76EE_6807.targetRef)
     _____8BBE_7F6E_5F53_524D_76EE_6807(_____654C_4EBAID, _____76EE_6807.targetHid)
     _____5F3A_5236_76EE_6807_4E0A_6B21_8865_53D1_547D_4EE4Ms[_____654C_4EBAID] = nowMs()
@@ -119,21 +136,21 @@ local function onTick()
                 local _____654C_4EBA = getEnemyRef(_____654C_4EBAID)
                 if _____654C_4EBA == nil or _____654C_4EBA == 0 then
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
-                    goto __continue20
+                    goto __continue23
                 end
                 if IsUnitType(_____654C_4EBA, UNIT_TYPE_DEAD) then
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
-                    goto __continue20
+                    goto __continue23
                 end
                 _____6E05_7406_654C_4EBA_8FC7_671F_4EC7_6068_6761_76EEById(_____654C_4EBAID)
                 if not hasThreatTable(_____654C_4EBAID) then
                     _____6E05_9664_4EC7_6068_663E_793AById(_____654C_4EBAID)
-                    goto __continue20
+                    goto __continue23
                 end
                 local _____6700_8FD1_53D7_4F24_65F6_95F4 = getEnemyLastThreatUpdateTimeById(_____654C_4EBAID)
                 if _____6700_8FD1_53D7_4F24_65F6_95F4 > 0 and nowMs() - _____6700_8FD1_53D7_4F24_65F6_95F4 >= _____4EC7_6068_6574_8868_8D85_65F6_6BEB_79D2 then
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
-                    goto __continue20
+                    goto __continue23
                 end
                 local ex = GetUnitX(_____654C_4EBA)
                 local ey = GetUnitY(_____654C_4EBA)
@@ -143,17 +160,17 @@ local function onTick()
                 local issueOrderBest = _____83B7_53D6_5E94_653B_51FB_76EE_6807(_____654C_4EBA, issueOrderFilter)
                 if best == nil then
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
-                    goto __continue20
+                    goto __continue23
                 end
                 local _____5F53_524D_76EE_6807ID = _____83B7_53D6_5F53_524D_76EE_6807ID(_____654C_4EBA)
                 if best.targetRef == nil or best.targetRef == 0 then
                     _____6E05_7406_654C_4EBA_4EC7_6068_72B6_6001(_____654C_4EBAID)
-                    goto __continue20
+                    goto __continue23
                 end
                 _____66F4_65B0_4EC7_6068_663E_793A(_____654C_4EBA, best.targetRef, best.threat)
                 _____5C1D_8BD5_81EA_52A8_5C55_5F00_76EE_6807_73A9_5BB6_4EC7_6068_9762_677F(best.targetRef)
                 if issueOrderBest == nil or issueOrderBest.targetRef == nil or issueOrderBest.targetRef == 0 then
-                    goto __continue20
+                    goto __continue23
                 end
                 if _____9700_8981_4E0B_53D1_653B_51FB_547D_4EE4(
                     _____654C_4EBA,
@@ -165,7 +182,7 @@ local function onTick()
                     _____4E0B_53D1_653B_51FB_547D_4EE4(_____654C_4EBA, _____654C_4EBAID, issueOrderBest)
                 end
             end
-            ::__continue20::
+            ::__continue23::
             i = i + 1
         end
     end
@@ -228,8 +245,8 @@ ____exports["初始化仇恨系统"] = function()
     if _____5468_671F_56DE_8C03ID ~= 0 then
         return
     end
-    local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-    local addPeriodicCallback = ____require_result_4.addPeriodicCallback
+    local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+    local addPeriodicCallback = ____require_result_5.addPeriodicCallback
     _____5468_671F_56DE_8C03ID = addPeriodicCallback(250, onTick)
 end
 --- 停用仇恨系统
@@ -237,8 +254,8 @@ ____exports["停用仇恨系统"] = function()
     if _____5468_671F_56DE_8C03ID == 0 then
         return
     end
-    local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-    local removePeriodicCallback = ____require_result_5.removePeriodicCallback
+    local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+    local removePeriodicCallback = ____require_result_6.removePeriodicCallback
     removePeriodicCallback(_____5468_671F_56DE_8C03ID)
     _____5468_671F_56DE_8C03ID = 0
     _____6E05_9664_6240_6709_5F53_524D_76EE_6807(nil)

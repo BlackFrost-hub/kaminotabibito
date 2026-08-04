@@ -48,7 +48,8 @@ export function registerTaskUIHotkeys(opts: RegisterTaskUIHotkeysOpts): void {
   currentHotkeyOpts = opts;
   if (taskUIKeybindsInstalled) return;
   taskUIKeybindsInstalled = true;
-  registerKeyUpSync(KEY.J, handleTogglePanelHotkey);
+  // 暂停 J 键打开任务面板；保留任务系统与其他 UI 入口正常初始化。
+  // registerKeyUpSync(KEY.J, handleTogglePanelHotkey);
   registerKeyUpSync(KEY_NUM.K1, handleMainCategoryHotkey);
   registerKeyUpSync(KEY_NUM.K2, handleSideCategoryHotkey);
   registerKeyUpSync(KEY_NUM.K3, handleDailyCategoryHotkey);

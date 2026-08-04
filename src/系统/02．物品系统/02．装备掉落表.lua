@@ -448,6 +448,8 @@ ____exports["装备掉落表"] = {
         id = "n01G",
         name = "奇妙鹿|cffff0000（Boss，LV7）|r",
         level = 7,
+        itemIds = "I011:always",
+        picks = 1,
         isUniversal = "FALSE",
         unitType = "elite"
     },

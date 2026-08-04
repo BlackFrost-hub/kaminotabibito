@@ -10,6 +10,9 @@ const { RectContainsUnit } = require("lib.扩展函数.BJ函数.04．矩形与�
 const { IsUnitPausedBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitPausedBJ: (this: void, unit: any) => boolean;
 };
+const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+  单位是否正在原生施法: (this: void, unit: any) => boolean;
+};
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
@@ -37,6 +40,7 @@ function 读取玩家英雄组(this: void): any {
 function on快速纠偏玩家英雄(this: void): void {
   const unit = GetEnumUnit();
   if (unit == null || unit === 0) return;
+  if (单位是否正在原生施法(unit)) return;
   if (IsUnitPausedBJ(unit)) return;
   if (当前纠偏矩形 != null && 当前纠偏矩形 !== 0 && !RectContainsUnit(当前纠偏矩形, unit)) return;
   if (!IsTerrainPathable(GetUnitX(unit), GetUnitY(unit), PATHING_TYPE_WALKABILITY)) return;

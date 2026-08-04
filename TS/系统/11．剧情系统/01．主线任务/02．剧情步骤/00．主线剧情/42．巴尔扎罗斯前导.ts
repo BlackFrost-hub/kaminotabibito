@@ -39,18 +39,16 @@ const { 获取玩家英雄单位组 } = require("系统.00．核心系统.00．�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
-const { 注册剧情玩家组传送 } = require("系统.07．地形系统.03．区域传送") as {
-  注册剧情玩家组传送: (this: void, 配置: {
-    入口中心X: number;
-    入口中心Y: number;
-    入口半径: number;
-    目标X: number;
-    目标Y: number;
-    条件: (this: void) => boolean;
+const { 注册剧情配置传送, 读取剧情传送配置 } = require("系统.07．地形系统.03．区域传送") as {
+  注册剧情配置传送: (this: void, 配置ID: string, 覆盖: {
     读取玩家英雄组: (this: void) => any;
     允许进入单位?: (this: void, unit: any) => boolean;
     完成?: (this: void, 触发单位?: any) => void;
   }) => (this: void) => void;
+  读取剧情传送配置: (this: void, 配置ID: string) => {
+    入口中心X: number;
+    入口中心Y: number;
+  } | undefined;
 };
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
   StarOther_PanCameraToTimedForPlayer: (this: void, whichPlayer: any, x: number, y: number, duration: number) => void;
@@ -91,9 +89,7 @@ const Boss待战暂停来源 = "剧情系统:巴尔扎罗斯待战";
 const Boss位置 = { X: 28640.0, Y: -3734.5, 朝向: 270.0 };
 const Boss进入范围 = 1600;
 const 战后返回面向 = 90;
-const 战后传送门位置 = { X: 28656.0, Y: -3248.0 };
-const 火焰神殿入口位置 = { X: 7272.6, Y: -7320.4 };
-const 战后传送门半径 = 210;
+const 巴尔扎罗斯战后传送配置ID = "jlc_balzaroth_aftermath";
 const 战后传送门模型 = "Common\\Effect\\Form\\Portal\\7sr_suramarcity_pylonfx.mdx";
 
 interface 巴尔扎罗斯前导状态 {
@@ -150,10 +146,6 @@ function 巴尔扎罗斯战后允许进入(this: void, unit: any): boolean {
   return 是玩家英雄组单位(unit);
 }
 
-function 巴尔扎罗斯战后传送条件(this: void): boolean {
-  return 读取剧情进度() === 43;
-}
-
 function 完成巴尔扎罗斯战后传送(this: void, 触发单位?: any): void {
   const 状态 = 当前巴尔扎罗斯战后传送状态;
   if (状态 == null || 状态.已传送) return;
@@ -167,25 +159,22 @@ function 完成巴尔扎罗斯战后传送(this: void, 触发单位?: any): void
 }
 
 function 创建巴尔扎罗斯战后传送门(this: void): void {
+  const 传送配置 = 读取剧情传送配置(巴尔扎罗斯战后传送配置ID);
+  if (传送配置 == null) return;
+
   const 状态 = 当前巴尔扎罗斯战后传送状态 ?? { 已传送: false };
   当前巴尔扎罗斯战后传送状态 = 状态;
   if (状态.已传送) return;
   if (!句柄有效(状态.传送门特效)) {
     状态.传送门特效 = 创建点特效({
       模型路径: 战后传送门模型,
-      X: 战后传送门位置.X,
-      Y: 战后传送门位置.Y,
+      X: 传送配置.入口中心X,
+      Y: 传送配置.入口中心Y,
       缩放: 2.2,
     });
   }
   if (状态.取消剧情传送注册 != null) return;
-  状态.取消剧情传送注册 = 注册剧情玩家组传送({
-    入口中心X: 战后传送门位置.X,
-    入口中心Y: 战后传送门位置.Y,
-    入口半径: 战后传送门半径,
-    目标X: 火焰神殿入口位置.X,
-    目标Y: 火焰神殿入口位置.Y,
-    条件: 巴尔扎罗斯战后传送条件,
+  状态.取消剧情传送注册 = 注册剧情配置传送(巴尔扎罗斯战后传送配置ID, {
     读取玩家英雄组: 获取玩家英雄单位组,
     允许进入单位: 巴尔扎罗斯战后允许进入,
     完成: 完成巴尔扎罗斯战后传送,

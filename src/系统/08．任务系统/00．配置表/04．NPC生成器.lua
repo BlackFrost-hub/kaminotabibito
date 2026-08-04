@@ -4,10 +4,10 @@ local __TS__New = ____lualib.__TS__New
 local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
-local ____03_FF0ENPC_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.03．NPC配置表")
-local NPC_CONFIGS = ____03_FF0ENPC_914D_7F6E_8868.NPC_CONFIGS
-local ____00_FF0E_5355_4F4D_76F8_5173 = require("lib.扩展函数.自定义扩展函数.00．单位相关")
-local createUnitWithOptions = ____00_FF0E_5355_4F4D_76F8_5173.createUnitWithOptions
+local ____01_FF0E_652F_7EBFNPC_914D_7F6E_8868 = require("系统.11．剧情系统.02．支线任务.01．支线NPC配置表")
+local NPC_CONFIGS = ____01_FF0E_652F_7EBFNPC_914D_7F6E_8868.NPC_CONFIGS
+local ____02_FF0E_5267_60C5NPC_521B_5EFA = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
+local _____521B_5EFA_5267_60C5NPC_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情NPC单位"]
 local ____05_FF0ENPC_521D_59CB_5316_52A8_4F5C = require("系统.08．任务系统.00．配置表.05．NPC初始化动作")
 local runNpcInitAction = ____05_FF0ENPC_521D_59CB_5316_52A8_4F5C.runNpcInitAction
 local ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548 = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效")
@@ -16,7 +16,6 @@ local tryAttachQuestMarkerForConfigNpc = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1
 -- 根据 NPC 配置表统一创建 NPC，并维护“配置 -> 已创建单位”的索引。
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local BJ_DEGTORAD = 0.017453292519943295
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local __pcallModelUnit = 0
@@ -109,16 +108,13 @@ local function createSingleNPC(npcConfig)
         debugLog(nil, "NPC生成器", "单位代码无效:", unitCode)
         return nil
     end
-    local facingDeg = npcConfig.Facing or 270
-    local facingRad = facingDeg * BJ_DEGTORAD
-    local unit = createUnitWithOptions(
-        nil,
-        15,
-        unitCode,
-        npcConfig.X,
-        npcConfig.Y,
-        facingRad
-    )
+    local unit = _____521B_5EFA_5267_60C5NPC_5355_4F4D({
+        ["单位ID"] = unitCode,
+        X = npcConfig.X,
+        Y = npcConfig.Y,
+        ["朝向"] = npcConfig.Facing or 270,
+        ["登记死亡排泄"] = true
+    })
     if not unit then
         debugLog(
             nil,

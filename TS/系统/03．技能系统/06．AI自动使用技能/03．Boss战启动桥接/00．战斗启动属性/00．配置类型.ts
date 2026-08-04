@@ -36,7 +36,8 @@ export interface 战斗启动属性配置 {
   魔法穿透?: number;
   弱点数量基础值?: number;
   弱点数量每层N增量?: number;
-  天生弱点数?: number;
+  天生弱点数?: number;
+  额外随机弱点数?: number;
   武器弱点数?: number;
   属性弱点数?: number;
   弓弱?: boolean;

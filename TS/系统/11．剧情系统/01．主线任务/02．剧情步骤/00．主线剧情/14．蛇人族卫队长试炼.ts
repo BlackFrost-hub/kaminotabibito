@@ -6,13 +6,15 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 
-const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const IssuePointOrder = jass.IssuePointOrder as (this: void, whichUnit: any, order: string, x: number, y: number) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
@@ -27,9 +29,10 @@ function 读取卫队长(this: void): any {
 export function 执行蛇人族卫队长入场(this: void, 参数: 剧情动作参数表): void {
   let 队长 = 读取卫队长();
   if (队长 == null || 队长 === 0) {
+    // 前置剧情创建 h01D NPC 壳；正式 Boss 战由旧 JASS 创建 N05L 实际战斗单位。
     const 队长类型ID = stringToFourCCSafe("h01D");
     if (!(队长类型ID > 0)) return;
-    队长 = CreateUnit(Player(6), 队长类型ID, Number(参数.出生X) || -22935.9, Number(参数.出生Y) || 3154.3, 0);
+    队长 = 创建单位并登记排泄安全(Player(6), 队长类型ID, Number(参数.出生X) || -22935.9, Number(参数.出生Y) || 3154.3, 0);
     if (队长 != null && 队长 !== 0) {
       YDUserDataSetSafe("string", "主线NPC", "蛇人族卫队长", "unit", 队长);
     }

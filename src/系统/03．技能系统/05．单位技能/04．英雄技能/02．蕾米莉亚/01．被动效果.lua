@@ -15,7 +15,7 @@ local ____require_result_4 = require("系统.03．技能系统.05．单位技能
 local _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_4["蕾米莉亚单位技能配置"]
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
-local function _____91CD_7F6E_857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_51B7_5374(killerUnit)
+local function _____5237_65B0_857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_672C_6B21_51B7_5374(killerUnit)
     if killerUnit == nil or killerUnit == 0 then
         return
     end
@@ -29,13 +29,13 @@ local function _____91CD_7F6E_857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_51B7_5374(
     if getRegisteredPlayerHero(owner) ~= killerUnit then
         return
     end
-    YDWESetUnitAbilityStateSafe(killerUnit, _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E["技能类型ID"], 1, 0)
+    YDWESetUnitAbilityStateSafe(killerUnit, _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.D["技能类型ID"], 1, 0)
 end
 local function _____5904_7406_857E_7C73_8389_4E9A_51FB_6740_88AB_52A8(dyingUnit, killingUnit)
     if not _____5355_4F4D_6EE1_8DB3_51FB_6740_524D_7F6E_6761_4EF6(dyingUnit) then
         return
     end
-    _____91CD_7F6E_857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_51B7_5374(killingUnit)
+    _____5237_65B0_857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_672C_6B21_51B7_5374(killingUnit)
 end
 ____exports["注册蕾米莉亚击杀被动"] = function()
     registerDeathListener(_____5904_7406_857E_7C73_8389_4E9A_51FB_6740_88AB_52A8)

@@ -17,18 +17,6 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLog: (this: void, module: string, ...args: any[]) => void;
-};
-const { 按名字反查杂鱼单位ID } = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表") as {
-  按名字反查杂鱼单位ID: (this: void, name: string) => string | undefined;
-};
-const { 按名字反查精英单位ID } = require("系统.01．单位系统.08．单位配置表.01．精英配置表") as {
-  按名字反查精英单位ID: (this: void, name: string) => string | undefined;
-};
-const { 按名字反查总单位ID } = require("系统.01．单位系统.08．单位配置表.04．总单位配置表") as {
-  按名字反查总单位ID: (this: void, name: string) => string | undefined;
-};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string) => number;
 };
@@ -49,35 +37,36 @@ const {
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, cb: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
 };
 const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetRandomDirectionDeg: (this: void) => number;
 };
-const { forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  forEachUnitInGroup: (this: void, group: any, action: (unit: any) => void) => void;
-};
-
 import type {
   刷怪延迟上下文,
   刷怪记录,
   怪物属性快照,
   怪物属性键,
 } from "./00．常量与类型";
+import type { 世界地图单位出生配置 } from "../00．单位初始化创建/02．世界地图单位初始化/00．开关与类型";
+import { 世界地图杂鱼出生配置表 } from "../00．单位初始化创建/02．世界地图单位初始化/01．杂鱼出生配置";
+import { 世界地图精英出生配置表 } from "../00．单位初始化创建/02．世界地图单位初始化/02．精英出生配置";
 import {
   中立敌对玩家ID,
   刷怪区域全局名,
   刷怪单位组键,
   刷怪延迟秒,
   刷怪表名,
-  怪物刷新模块名,
   特殊敌对玩家ID,
   需要复制的属性键列表,
 } from "./00．常量与类型";
 import {
   命中率固定配置表,
   暴击率固定配置表,
+  额外精英刷怪单位ID列表,
   特殊精英暴击覆写配置表,
   闪避率固定配置表,
 } from "./01．怪物刷新配置表";
@@ -88,6 +77,7 @@ const FirstOfGroup = jass.FirstOfGroup as (this: void, whichGroup: any) => any;
 const CreateGroup = jass.CreateGroup as (this: void) => any;
 const DestroyGroup = jass.DestroyGroup as (this: void, whichGroup: any) => void;
 const GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect as (this: void, whichGroup: any, r: any, filter: any) => void;
+const GetWorldBounds = jass.GetWorldBounds as (this: void) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (this: void, whichPlayer: any) => number;
@@ -100,12 +90,23 @@ const IsUnitRace = jass.IsUnitRace as (this: void, whichUnit: any, whichRace: an
 const Player = jass.Player as (this: void, playerId: number) => any;
 const RemoveUnit = jass.RemoveUnit as (this: void, whichUnit: any) => void;
 
-const 刷怪区域 = (jglobals as any)[刷怪区域全局名] as any;
 const 刷怪记录表 = new Map<number, 刷怪记录>();
 const 延迟刷新上下文队列: 刷怪延迟上下文[] = [];
-const 固定属性单位ID缓存 = new Map<string, number>();
+const 允许刷怪单位类型ID集合 = new Set<number>();
+type 单位固定属性配置 = { 属性名: 怪物属性键; 数值: number };
+type 特殊精英暴击覆写运行时配置 = { 单位类型ID: number; X: number; Y: number; 暴击率: number };
+const 固定属性配置缓存 = new Map<number, 单位固定属性配置[]>();
+const 特殊精英暴击覆写运行时配置表: 特殊精英暴击覆写运行时配置[] = [];
+
+const 初始收集每批单位数量 = 10;
+const 初始收集间隔毫秒 = 10;
 
 let 已初始化怪物刷新系统 = false;
+let 已初始化允许刷怪单位类型ID集合 = false;
+let 固定属性配置已初始化 = false;
+let 初始收集临时单位组: any = null;
+let 初始收集回调ID: number | undefined;
+let 死亡监听已注册 = false;
 
 function 绝对值(this: void, value: number): number {
   return value >= 0 ? value : -value;
@@ -133,8 +134,38 @@ function 清空单位组(this: void, 单位组: any): void {
   }
 }
 
+function 解析刷怪配置单位类型ID(this: void, 配置: 世界地图单位出生配置): number {
+  const 兼容单位ID = 配置.兼容单位ID?.trim();
+  if (兼容单位ID == null || 兼容单位ID.length < 4) return 0;
+  return stringToFourCCSafe(兼容单位ID.substring(0, 4));
+}
+
+function 添加刷怪配置表到白名单(this: void, 配置表: 世界地图单位出生配置[]): void {
+  for (const 配置 of 配置表) {
+    const 单位类型ID = 解析刷怪配置单位类型ID(配置);
+    if (单位类型ID > 0) 允许刷怪单位类型ID集合.add(单位类型ID);
+  }
+}
+
+function 添加直接单位ID列表到白名单(this: void, 单位ID列表: string[]): void {
+  for (const 单位ID of 单位ID列表) {
+    const 单位类型ID = 解析直接单位类型ID(单位ID);
+    if (单位类型ID > 0) 允许刷怪单位类型ID集合.add(单位类型ID);
+  }
+}
+
+function 确保允许刷怪单位类型ID集合已初始化(this: void): void {
+  if (已初始化允许刷怪单位类型ID集合) return;
+  已初始化允许刷怪单位类型ID集合 = true;
+  添加刷怪配置表到白名单(世界地图杂鱼出生配置表);
+  添加刷怪配置表到白名单(世界地图精英出生配置表);
+  添加直接单位ID列表到白名单(额外精英刷怪单位ID列表);
+}
+
 function 是刷怪候选单位(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
+  确保允许刷怪单位类型ID集合已初始化();
+  if (!允许刷怪单位类型ID集合.has(GetUnitTypeId(unit))) return false;
   const owner = GetOwningPlayer(unit);
   if (owner == null || owner === 0) return false;
   const playerId = GetPlayerId(owner);
@@ -164,35 +195,47 @@ function 写入怪物属性(this: void, unit: any, 属性名: 怪物属性键, v
   YDUserDataSetSafe("unit", unit, 属性名, "real", value);
 }
 
-function 按名字解析单位ID(this: void, 单位名: string): number | undefined {
-  const 已缓存 = 固定属性单位ID缓存.get(单位名);
-  if (typeof 已缓存 === "number") return 已缓存;
-
-  const rawId = 按名字反查杂鱼单位ID(单位名) ?? 按名字反查精英单位ID(单位名) ?? 按名字反查总单位ID(单位名);
-  if (rawId == null || rawId === "") {
-    debugLog(怪物刷新模块名, "固定属性配置反查失败", 单位名);
-    return undefined;
-  }
-
-  const unitTypeId = stringToFourCCSafe(rawId);
-  固定属性单位ID缓存.set(单位名, unitTypeId);
-  return unitTypeId;
+function 解析直接单位类型ID(this: void, 单位ID: string | undefined): number {
+  const 清理后单位ID = 单位ID?.trim();
+  if (清理后单位ID == null || 清理后单位ID.length < 4) return 0;
+  return stringToFourCCSafe(清理后单位ID.substring(0, 4));
 }
 
-function 写入固定属性配置(this: void, unit: any, 配置表: { 单位名: string; 属性名: 怪物属性键; 数值: number }[]): void {
-  const 单位类型ID = GetUnitTypeId(unit);
-  for (const 配置 of 配置表) {
-    const 配置单位ID = 按名字解析单位ID(配置.单位名);
-    if (配置单位ID == null) continue;
-    if (单位类型ID !== 配置单位ID) continue;
-    写入怪物属性(unit, 配置.属性名, 配置.数值);
+function 初始化固定属性配置缓存(this: void): void {
+  if (固定属性配置已初始化) return;
+  固定属性配置已初始化 = true;
+
+  const 固定属性配置表列表 = [暴击率固定配置表, 闪避率固定配置表, 命中率固定配置表];
+  for (const 配置表 of 固定属性配置表列表) {
+    for (const 配置 of 配置表) {
+      const 单位类型ID = 解析直接单位类型ID(配置.单位ID);
+      if (单位类型ID <= 0) continue;
+      let 单位属性配置列表 = 固定属性配置缓存.get(单位类型ID);
+      if (单位属性配置列表 == null) {
+        单位属性配置列表 = [];
+        固定属性配置缓存.set(单位类型ID, 单位属性配置列表);
+      }
+      单位属性配置列表.push({ 属性名: 配置.属性名, 数值: 配置.数值 });
+    }
+  }
+
+  for (const 配置 of 特殊精英暴击覆写配置表) {
+    特殊精英暴击覆写运行时配置表.push({
+      单位类型ID: 解析直接单位类型ID(配置.单位ID),
+      X: 配置.X,
+      Y: 配置.Y,
+      暴击率: 配置.暴击率,
+    });
   }
 }
 
 function 应用基础怪物属性(this: void, unit: any): void {
-  写入固定属性配置(unit, 暴击率固定配置表);
-  写入固定属性配置(unit, 闪避率固定配置表);
-  写入固定属性配置(unit, 命中率固定配置表);
+  const 单位属性配置列表 = 固定属性配置缓存.get(GetUnitTypeId(unit));
+  if (单位属性配置列表 != null) {
+    for (const 配置 of 单位属性配置列表) {
+      写入怪物属性(unit, 配置.属性名, 配置.数值);
+    }
+  }
 
   if (IsUnitType(unit, jass.UNIT_TYPE_HERO) || IsUnitRace(unit, jass.RACE_DEMON)) {
     写入怪物属性(unit, "暴击率", 0.10);
@@ -203,12 +246,8 @@ function 应用基础怪物属性(this: void, unit: any): void {
 
 function 应用特殊精英暴击覆写(this: void, unit: any, 出生X: number, 出生Y: number): void {
   const 单位类型ID = GetUnitTypeId(unit);
-  for (const 配置 of 特殊精英暴击覆写配置表) {
-    if (配置.单位名 != null && 配置.单位名 !== "") {
-      const 配置单位ID = 按名字解析单位ID(配置.单位名);
-      if (配置单位ID == null) continue;
-      if (单位类型ID !== 配置单位ID) continue;
-    }
+  for (const 配置 of 特殊精英暴击覆写运行时配置表) {
+    if (配置.单位类型ID <= 0 || 单位类型ID !== 配置.单位类型ID) continue;
     if (!实数近似相等(出生X, 配置.X, 0.05)) continue;
     if (!实数近似相等(出生Y, 配置.Y, 0.05)) continue;
     写入怪物属性(unit, "暴击率", 配置.暴击率);
@@ -224,27 +263,87 @@ function 初始化单个刷怪单位(this: void, unit: any): void {
   应用特殊精英暴击覆写(unit, 出生X, 出生Y);
 }
 
-function 处理刷怪区域枚举单位(this: void, unit: any): void {
+function 登记刷怪单位(this: void, unit: any): void {
   if (!是刷怪候选单位(unit)) return;
+
+  const 单位句柄ID = GetHandleId(unit);
+  if (刷怪记录表.has(单位句柄ID)) return;
+
   const 刷怪单位组 = 获取刷怪单位组();
-  GroupAddUnit(刷怪单位组, unit);
+  if (!IsUnitInGroup(unit, 刷怪单位组)) {
+    GroupAddUnit(刷怪单位组, unit);
+  }
   初始化单个刷怪单位(unit);
+}
+
+function 获取刷怪区域(this: void): any {
+  const 配置区域 = (jglobals as any)[刷怪区域全局名] as any;
+  if (配置区域 != null && 配置区域 !== 0) return 配置区域;
+
+  const 世界边界 = GetWorldBounds();
+  if (世界边界 != null && 世界边界 !== 0) {
+    return 世界边界;
+  }
+  return null;
+}
+
+function 处理刷怪区域枚举单位(this: void, unit: any): void {
+  登记刷怪单位(unit);
+}
+
+function 完成初始刷怪单位收集(this: void): void {
+  if (初始收集回调ID != null) {
+    removePeriodicCallback(初始收集回调ID);
+    初始收集回调ID = undefined;
+  }
+
+  if (初始收集临时单位组 != null && 初始收集临时单位组 !== 0) {
+    DestroyGroup(初始收集临时单位组);
+    初始收集临时单位组 = null;
+  }
+
+  if (死亡监听已注册) return;
+  死亡监听已注册 = true;
+  registerDeathListener(on刷怪单位死亡);
+}
+
+function on初始刷怪单位收集批次(this: void): void {
+  const 临时组 = 初始收集临时单位组;
+  if (临时组 == null || 临时组 === 0) {
+    完成初始刷怪单位收集();
+    return;
+  }
+
+  let 本批处理数量 = 0;
+  while (本批处理数量 < 初始收集每批单位数量) {
+    const 单位 = FirstOfGroup(临时组);
+    if (单位 == null || 单位 === 0) break;
+    GroupRemoveUnit(临时组, 单位);
+    处理刷怪区域枚举单位(单位);
+    本批处理数量++;
+  }
+
+  const 剩余单位 = FirstOfGroup(临时组);
+  if (剩余单位 == null || 剩余单位 === 0) {
+    完成初始刷怪单位收集();
+  }
 }
 
 function 收集初始刷怪单位(this: void): void {
   const 刷怪单位组 = 获取刷怪单位组();
   清空单位组(刷怪单位组);
   刷怪记录表.clear();
+  初始化固定属性配置缓存();
 
+  const 刷怪区域 = 获取刷怪区域();
   if (刷怪区域 == null || 刷怪区域 === 0) {
-    debugLog(怪物刷新模块名, "未找到刷怪矩形", 刷怪区域全局名, "跳过初始化");
+    完成初始刷怪单位收集();
     return;
   }
 
-  const 临时组 = CreateGroup();
-  GroupEnumUnitsInRect(临时组, 刷怪区域, null);
-  forEachUnitInGroup(临时组, 处理刷怪区域枚举单位);
-  DestroyGroup(临时组);
+  初始收集临时单位组 = CreateGroup();
+  GroupEnumUnitsInRect(初始收集临时单位组, 刷怪区域, null);
+  初始收集回调ID = addPeriodicCallback(初始收集间隔毫秒, on初始刷怪单位收集批次);
 }
 
 function 快照死亡怪物属性(this: void, unit: any): 怪物属性快照 {
@@ -273,10 +372,7 @@ function on怪物刷新计时器到期(this: void): void {
 
   const owner = Player(ctx.所有者玩家ID);
   const 新单位 = 创建单位并登记排泄安全(owner, ctx.单位类型ID, ctx.出生X, ctx.出生Y, GetRandomDirectionDeg());
-  if (新单位 == null || 新单位 === 0) {
-    debugLog(怪物刷新模块名, "刷新怪物失败", "typeId=", ctx.单位类型ID, "x=", ctx.出生X, "y=", ctx.出生Y);
-    return;
-  }
+  if (新单位 == null || 新单位 === 0) return;
 
   记录怪物出生点(新单位, ctx.出生X, ctx.出生Y);
   应用属性快照到新单位(新单位, ctx.属性快照);
@@ -306,26 +402,14 @@ function on刷怪单位死亡(this: void, dyingUnit: any, _killingUnit: any): vo
   if (!IsUnitInGroup(dyingUnit, 刷怪单位组)) return;
 
   const record = 刷怪记录表.get(GetHandleId(dyingUnit));
-  if (record != null) {
-    安排怪物延迟刷新(dyingUnit, record);
-    return;
-  }
-
-  const owner = GetOwningPlayer(dyingUnit);
-  if (owner == null || owner === 0) return;
-  安排怪物延迟刷新(dyingUnit, {
-    单位类型ID: GetUnitTypeId(dyingUnit),
-    所有者玩家ID: GetPlayerId(owner),
-    出生X: GetUnitX(dyingUnit),
-    出生Y: GetUnitY(dyingUnit),
-  });
+  if (record == null) return;
+  安排怪物延迟刷新(dyingUnit, record);
 }
 
 export function 初始化怪物刷新系统(this: void): void {
   if (已初始化怪物刷新系统) return;
   已初始化怪物刷新系统 = true;
   收集初始刷怪单位();
-  registerDeathListener(on刷怪单位死亡);
 }
 
 export function 获取刷怪单位组引用(this: void): any {
@@ -336,7 +420,5 @@ export function 是刷怪单位(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
   return IsUnitInGroup(unit, 获取刷怪单位组()) === true;
 }
-
-初始化怪物刷新系统();
 
 export {};

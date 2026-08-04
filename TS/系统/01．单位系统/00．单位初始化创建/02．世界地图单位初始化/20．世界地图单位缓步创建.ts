@@ -17,12 +17,6 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = requ
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
-const { 按名字反查杂鱼单位ID } = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表") as {
-  按名字反查杂鱼单位ID: (this: void, name: string) => string | undefined;
-};
-const { 按名字反查精英单位ID } = require("系统.01．单位系统.08．单位配置表.01．精英配置表") as {
-  按名字反查精英单位ID: (this: void, name: string) => string | undefined;
-};
 const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．单位配置表.02．Boss配置表") as {
   按名字反查Boss单位ID: (this: void, name: string) => string | undefined;
 };
@@ -105,10 +99,9 @@ let 当前默认任务ID: number | undefined;
 let 下一个缓步创建任务ID = 1;
 let 缓步创建调度器回调ID: number | undefined;
 const 缓步创建任务表: Record<number, 世界地图单位缓步创建任务 | undefined> = {};
+let 世界地图Boss初始注册完成回调: ((this: void) => void) | undefined;
 
 function 归类反查单位ID(this: void, 敌人归类: 世界地图敌人归类, 单位名: string): string | undefined {
-  if (敌人归类 === "杂鱼") return 按名字反查杂鱼单位ID(单位名);
-  if (敌人归类 === "精英") return 按名字反查精英单位ID(单位名);
   if (敌人归类 === "Boss") return 按名字反查Boss单位ID(单位名);
   if (敌人归类 === "异界Boss") return 按名字反查异界Boss单位ID(单位名);
   if (敌人归类 === "NPC") return 按名字反查总单位ID(单位名);
@@ -116,6 +109,14 @@ function 归类反查单位ID(this: void, 敌人归类: 世界地图敌人归类
 }
 
 function 解析世界地图单位ID(this: void, 配置: 世界地图单位出生配置): string | undefined {
+  if (配置.敌人归类 === "杂鱼" || 配置.敌人归类 === "精英") {
+    const 兼容单位ID = 配置.兼容单位ID?.trim();
+    if (兼容单位ID != null && 兼容单位ID.length >= 4) {
+      return 兼容单位ID.substring(0, 4);
+    }
+    return undefined;
+  }
+
   const 反查结果 = 归类反查单位ID(配置.敌人归类, 配置.单位名);
   if (反查结果 != null && 反查结果 !== "") {
     return 反查结果;
@@ -142,7 +143,7 @@ function 解析世界地图单位朝向(this: void, 配置: 世界地图单位�
 }
 
 function 解析世界地图单位玩家(this: void, 配置: 世界地图单位出生配置): any {
-  const 玩家ID = 配置.玩家ID ?? 中立敌对玩家ID;
+  const 玩家ID = 配置.玩家ID ?? (配置.敌人归类 === "NPC" ? 中立被动玩家ID : 中立敌对玩家ID);
   return Player(玩家ID);
 }
 
@@ -382,6 +383,11 @@ function 执行世界地图Boss初始注册配置表(this: void, 配置表: 世�
 
 function on世界地图Boss初始注册延迟回调(this: void): void {
   初始化世界地图Boss初始注册();
+  const 完成回调 = 世界地图Boss初始注册完成回调;
+  世界地图Boss初始注册完成回调 = undefined;
+  if (typeof 完成回调 === "function") {
+    完成回调();
+  }
 }
 
 export function 初始化世界地图Boss初始注册(this: void): number {
@@ -389,7 +395,8 @@ export function 初始化世界地图Boss初始注册(this: void): number {
     + 执行世界地图Boss初始注册配置表(世界地图Boss初始额外单位配置表);
 }
 
-export function 延迟初始化世界地图Boss初始注册(this: void): void {
+export function 延迟初始化世界地图Boss初始注册(this: void, 完成回调?: (this: void) => void): void {
+  世界地图Boss初始注册完成回调 = 完成回调;
   addDelayedCallback(世界地图Boss初始注册延迟秒 * 1000, on世界地图Boss初始注册延迟回调);
 }
 

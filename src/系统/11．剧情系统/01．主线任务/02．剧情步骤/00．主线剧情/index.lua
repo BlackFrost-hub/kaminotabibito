@@ -314,6 +314,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.50．异界隐藏挑战入口")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 ____exports["初始化前五个主线剧情核心"] = function()
     _____521D_59CB_5316_8FDB_5EA601__7CBE_7075_6751_957F_8001_53D1_5E03_4EFB_52A1_6838_5FC3()
     _____521D_59CB_5316_8FDB_5EA602__5730_7CBE_6D1E_7A9F_8FDB_5165_6F14_51FA_6838_5FC3()

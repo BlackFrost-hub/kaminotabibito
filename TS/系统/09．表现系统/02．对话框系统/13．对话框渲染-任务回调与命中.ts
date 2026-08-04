@@ -176,7 +176,8 @@ function handleDialogPanelClick(state: PlayerDialogState): void {
   }
   if (state.clickCooldown) return;
 
-  const entry = state.queue[state.currentIndex];
+  const entry = getCurrentEntry(state);
+  if (entry === undefined) return;
 
   // 情况 C：任务页，打字完成 → 不前进
   if (entry.isQuest) return;

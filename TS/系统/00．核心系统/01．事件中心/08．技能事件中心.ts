@@ -7,13 +7,14 @@ const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01�
   registerPlayerUnitEventForPlayerIds: (this: void, trig: any, playerIds: readonly number[], eventId: any, filter?: any) => void;
 };
 
-type SpellCallback = (castingUnit: any, spellAbilityId: number) => void;
+type SpellCallback = (this: void, castingUnit: any, spellAbilityId: number) => void;
 type SkillLearnCallback = (learningUnit: any, learnedAbilityId: number) => void;
 
 export const SPELL_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
 
 const channelListeners: SpellCallback[] = [];
 const effectListeners: SpellCallback[] = [];
+const endcastListeners: SpellCallback[] = [];
 const skillLearnListeners: SkillLearnCallback[] = [];
 let initialized = false;
 let skillLearnInitialized = false;
@@ -55,6 +56,15 @@ function onSpellEffect(): void {
   if (spellAbilityId == null) return;
 
   dispatchSpellListeners(effectListeners, castingUnit, spellAbilityId);
+}
+
+function onSpellEndcast(): void {
+  const castingUnit = jass.GetTriggerUnit();
+  if (castingUnit == null) return;
+  const spellAbilityId = jass.GetSpellAbilityId();
+  if (spellAbilityId == null) return;
+
+  dispatchSpellListeners(endcastListeners, castingUnit, spellAbilityId);
 }
 
 function onSkillLearn(): void {
@@ -103,6 +113,24 @@ export function unregisterSpellEffectListener(callback: SpellCallback): void {
 }
 
 /**
+ * 注册技能结束施法监听。
+ * 第一次使用时会自动初始化事件中心；同一回调不会重复注册。
+ */
+export function registerSpellEndcastListener(this: void, callback: SpellCallback): void {
+  if (typeof callback !== "function") return;
+  initSpellEventCenter();
+  if (!hasListener(endcastListeners, callback)) endcastListeners.push(callback);
+}
+
+/**
+ * 取消技能结束施法监听。
+ */
+export function unregisterSpellEndcastListener(this: void, callback: SpellCallback): void {
+  const index = endcastListeners.indexOf(callback);
+  if (index >= 0) endcastListeners.splice(index, 1);
+}
+
+/**
  * 注册学习技能监听。
  * 第一次使用时会自动初始化事件；同一回调不会重复注册。
  */
@@ -122,7 +150,7 @@ export function unregisterSkillLearnListener(callback: SkillLearnCallback): void
 
 /**
  * 初始化技能事件中心。
- * 统一注册 SPELL_CHANNEL / SPELL_EFFECT 两类原生事件，并集中派发给监听器。
+ * 统一注册 SPELL_CHANNEL / SPELL_EFFECT / SPELL_ENDCAST 三类原生事件，并集中派发给监听器。
  */
 export function initSpellEventCenter(): void {
   if (initialized) return;
@@ -135,6 +163,10 @@ export function initSpellEventCenter(): void {
   const effectTrigger = jass.CreateTrigger();
   playerUnitEvent.registerPlayerUnitEventForPlayerIds(effectTrigger, SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT);
   jass.TriggerAddAction(effectTrigger, onSpellEffect);
+
+  const endcastTrigger = jass.CreateTrigger();
+  playerUnitEvent.registerPlayerUnitEventForPlayerIds(endcastTrigger, SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_ENDCAST);
+  jass.TriggerAddAction(endcastTrigger, onSpellEndcast);
 }
 
 /**

@@ -4,11 +4,12 @@ local __TS__New = ____lualib.__TS__New
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local __TS__StringTrim = ____lualib.__TS__StringTrim
-local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__StringSplit = ____lualib.__TS__StringSplit
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
 local ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E = require("系统.07．地形系统.02．区域传送配置")
 local _____533A_57DF_4F20_9001_914D_7F6E = ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E.default
+local _____5267_60C5_52A8_6001_4F20_9001_914D_7F6E_8868 = ____02_FF0E_533A_57DF_4F20_9001_914D_7F6E["剧情动态传送配置表"]
 --- 区域传送：
 -- - 开局按 `区域传送配置` 批量创建 Region 并注册进入事件
 -- - 单位进入 Region 时，根据配置表把单位瞬移到目标点、移动镜头、显示文字
@@ -46,6 +47,20 @@ local function checkRegionCondition(cond, _unit)
         return true
     end
     local text = __TS__StringTrim(cond)
+    local alternatives = __TS__StringSplit(text, "||")
+    if #alternatives > 1 then
+        do
+            local i = 0
+            while i < #alternatives do
+                local alternative = __TS__StringTrim(alternatives[i + 1])
+                if alternative ~= "" and checkRegionCondition(alternative, _unit) then
+                    return true
+                end
+                i = i + 1
+            end
+        end
+        return false
+    end
     local current = getStoryProgress()
     local function evalByPrefix(prefix, matcher)
         if (string.find(text, prefix, nil, true) or 0) - 1 ~= 0 then
@@ -122,17 +137,17 @@ local function runRegionRule(rule, unit, owner)
         do
             local s = __TS__StringTrim(raw)
             if not s then
-                goto __continue26
+                goto __continue30
             end
             local percentIdx = (string.find(s, "%", nil, true) or 0) - 1
             if percentIdx <= 0 then
-                goto __continue26
+                goto __continue30
             end
             local weightStr = __TS__StringTrim(__TS__StringSubstring(s, 0, percentIdx))
             local rest = __TS__StringTrim(__TS__StringSubstring(s, percentIdx + 1))
             local weight = __TS__Number(weightStr)
             if not weight or not __TS__NumberIsFinite(__TS__Number(weight)) or weight <= 0 then
-                goto __continue26
+                goto __continue30
             end
             local colonIdx = (string.find(rest, ":", nil, true) or 0) - 1
             local actionName = __TS__StringTrim(colonIdx >= 0 and __TS__StringSubstring(rest, 0, colonIdx) or rest)
@@ -152,7 +167,7 @@ local function runRegionRule(rule, unit, owner)
                 end
             end
         end
-        ::__continue26::
+        ::__continue30::
     end
     if #items == 0 or totalWeight <= 0 then
         return
@@ -292,10 +307,10 @@ local function initRegionTeleport()
         do
             local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
             if cfg == nil or not cfg.enabled then
-                goto __continue67
+                goto __continue71
             end
             if not isValidRegionRect(cfg) then
-                goto __continue67
+                goto __continue71
             end
             local region = jass.CreateRegion()
             local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
@@ -307,7 +322,7 @@ local function initRegionTeleport()
                 cfg
             )
         end
-        ::__continue67::
+        ::__continue71::
     end
     jass.TriggerAddAction(trig, onRegionEnter)
 end
@@ -332,6 +347,10 @@ local function _____5267_60C5_4F20_9001_5355_4F4D_53EF_8FDB_5165(unit)
     return owner == nil or owner ~= neutralAggressive
 end
 local function _____7A7A_5267_60C5_4F20_9001_6E05_7406()
+end
+--- 读取地形系统集中维护的剧情动态传送配置。
+____exports["读取剧情传送配置"] = function(_____914D_7F6EID)
+    return _____5267_60C5_52A8_6001_4F20_9001_914D_7F6E_8868[_____914D_7F6EID]
 end
 local function ____on_79FB_52A8_5267_60C5_73A9_5BB6_7EC4()
     local _____72B6_6001 = _____5F53_524D_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001
@@ -434,6 +453,26 @@ ____exports["注册剧情玩家组传送"] = function(_____914D_7F6E)
             _____6E05_7406_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001(_____72B6_6001)
         end
     end
+end
+--- 按地形系统配置表中的 ID 注册剧情玩家组传送。
+-- 剧情侧只提供玩家组和生命周期回调，不再重复维护坐标、范围和进度条件。
+____exports["注册剧情配置传送"] = function(_____914D_7F6EID, _____8986_76D6)
+    local _____914D_7F6E = ____exports["读取剧情传送配置"](_____914D_7F6EID)
+    if _____914D_7F6E == nil or not _____914D_7F6E.enabled or _____8986_76D6 == nil or not _____8986_76D6["读取玩家英雄组"] then
+        return _____7A7A_5267_60C5_4F20_9001_6E05_7406
+    end
+    return ____exports["注册剧情玩家组传送"]({
+        ["入口中心X"] = _____914D_7F6E["入口中心X"],
+        ["入口中心Y"] = _____914D_7F6E["入口中心Y"],
+        ["入口半径"] = _____914D_7F6E["入口半径"],
+        ["目标X"] = _____914D_7F6E["目标X"],
+        ["目标Y"] = _____914D_7F6E["目标Y"],
+        ["目标面向"] = _____914D_7F6E["目标面向"],
+        ["条件"] = _____8986_76D6["条件"] or (function() return checkRegionCondition(_____914D_7F6E.condition, nil) end),
+        ["读取玩家英雄组"] = _____8986_76D6["读取玩家英雄组"],
+        ["允许进入单位"] = _____8986_76D6["允许进入单位"],
+        ["完成"] = _____8986_76D6["完成"]
+    })
 end
 --- 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件）
 ____exports["init区域传送"] = function()

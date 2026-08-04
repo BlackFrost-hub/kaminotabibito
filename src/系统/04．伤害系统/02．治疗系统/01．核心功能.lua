@@ -59,6 +59,7 @@ function cloneHealParams(params)
         HealEffect = params.HealEffect,
         HealEffectPath = params.HealEffectPath,
         UseDefaultHealEffect = params.UseDefaultHealEffect,
+        HealShowText = params.HealShowText,
         ManaEffect = params.ManaEffect,
         ManaEffectPath = params.ManaEffectPath,
         UseDefaultManaEffect = params.UseDefaultManaEffect,
@@ -289,6 +290,10 @@ function ____exports.doHeal(params)
     if UseDefaultHealEffect == nil then
         UseDefaultHealEffect = false
     end
+    local HealShowText = ____params_7.HealShowText
+    if HealShowText == nil then
+        HealShowText = true
+    end
     local ManaEffectPath = ____params_7.ManaEffectPath
     local UseDefaultManaEffect = ____params_7.UseDefaultManaEffect
     if UseDefaultManaEffect == nil then
@@ -333,7 +338,9 @@ function ____exports.doHeal(params)
                 if HealEffect or UseDefaultHealEffect then
                     playHealEffect(HealTarget, HealEffectPath)
                 end
-                ____exports.fireShowDamageEvent(HealTarget, actualHeal)
+                if HealShowText then
+                    ____exports.fireShowDamageEvent(HealTarget, actualHeal)
+                end
                 ____exports.fireHealEvent(HealSource, HealTarget, actualHeal)
                 addHealStats(HealTarget, actualHeal)
                 addPlayerHealStats(HealTarget, HealSource, actualHeal)

@@ -1,3 +1,5 @@
+/** @noSelfInFile */
+
 /**
  * 快捷键技能功能
  *
@@ -5,22 +7,45 @@
  */
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
-const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.index") as {
-  YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
 const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index") as {
-  SelectUnitForPlayerSingle: (unit: any, player: any) => void;
+  SelectUnitForPlayerSingle: (this: void, unit: any, player: any) => void;
 };
-const { DzTriggerRegisterKeyEventTrg } = require("lib.扩展函数.KK扩展API.index") as {
-  DzTriggerRegisterKeyEventTrg: (trg: any, status: number, btn: number | string) => void;
+const { String2OrderIdBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  String2OrderIdBJ: (this: void, orderIdString: string) => number;
 };
-const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (this: void, s: string) => number;
+const { registerSyncHardwareKey } = require("lib.扩展函数.封装函数.04．硬件输入.08．同步硬件输入中心") as {
+  registerSyncHardwareKey: (
+    this: void,
+    key: number | string,
+    status: number,
+    callback: (this: void, event: { player: any; key: number | string; status: number }) => void
+  ) => any;
 };
+const { KEY, KEY_STATE } = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义") as {
+  KEY: { B: number };
+  KEY_STATE: { UP: number };
+};
+const IssuePointOrderById = jass.IssuePointOrderById as (
+  this: void,
+  unit: any,
+  orderId: number,
+  x: number,
+  y: number
+) => boolean;
+const DzGetMouseTerrainX = (require("jass.japi") as any).DzGetMouseTerrainX as (this: void) => number;
+const DzGetMouseTerrainY = (require("jass.japi") as any).DzGetMouseTerrainY as (this: void) => number;
+const DzGetTriggerKeyPlayer = (require("jass.japi") as any).DzGetTriggerKeyPlayer as (this: void) => any;
 
-/** BB传送技能ID */
-const BB_TELEPORT_ABILITY = 'A0FC';
+interface 同步键盘事件 {
+  player: any;
+  key: number | string;
+  status: number;
+}
+
+const BB传送命令ID = String2OrderIdBJ("blink");
 
 /** 触发器 */
 let bbTeleportTrigger: any = null;
@@ -28,29 +53,29 @@ let bbTeleportTrigger: any = null;
 /**
  * 按B传送BB事件处理
  */
-function onBKeyTeleport(): void {
+function onBKeyTeleport(this: void, event: 同步键盘事件): void {
   // 检查按键是否为B
-  const key = japi.DzGetTriggerKey();
-  if (key !== 'B') return;
+  if (event.key !== KEY.B && event.key !== "B") {
+    return;
+  }
 
-  const player = japi.DzGetTriggerKeyPlayer();
+  const player = event.player || DzGetTriggerKeyPlayer();
+  if (player == null || player === 0) {
+    return;
+  }
 
   // 获取玩家的BB单位
-  const bbUnit = YDUserDataGet("player", player, "BB", "unit");
-  if (bbUnit == null) return;
+  const bbUnit = YDUserDataGetSafe("player", player, "BB", "unit");
+  if (bbUnit == null || bbUnit === 0) {
+    return;
+  }
 
   // 获取鼠标位置
-  const mouseX = japi.DzGetMouseTerrainX();
-  const mouseY = japi.DzGetMouseTerrainY();
+  const mouseX = DzGetMouseTerrainX();
+  const mouseY = DzGetMouseTerrainY();
 
-  // 直接发布点目标命令，使用技能ID
-  // 对于传送类技能，直接使用技能ID作为orderId
-  const abilityId = stringToFourCC(BB_TELEPORT_ABILITY);
-  jass.IssuePointOrderById(bbUnit, abilityId, mouseX, mouseY);
-
-  // 注：YDWEAbilityId2OrderId 是YDWE宏定义，非标准JAPI函数
-  // const orderId = japi.YDWEAbilityId2OrderId(BB_TELEPORT_ABILITY, "Order");
-  // jass.IssueNeutralPointOrderById(player, bbUnit, orderId, mouseX, mouseY);
+  // 物编技能A0FC继承闪烁，发布命令时使用技能的真实Order字段
+  IssuePointOrderById(bbUnit, BB传送命令ID, mouseX, mouseY);
 
   // 选中BB单位
   SelectUnitForPlayerSingle(bbUnit, player);
@@ -59,14 +84,10 @@ function onBKeyTeleport(): void {
 /**
  * 初始化按B传送BB功能
  */
-export function initBBTeleport(): void {
+export function initBBTeleport(this: void): void {
   if (bbTeleportTrigger != null) return;
 
-  bbTeleportTrigger = jass.CreateTrigger();
-
-  DzTriggerRegisterKeyEventTrg(bbTeleportTrigger, 0, 'B');
-
-  jass.TriggerAddAction(bbTeleportTrigger, onBKeyTeleport);
+  bbTeleportTrigger = registerSyncHardwareKey(KEY.B, KEY_STATE.UP, onBKeyTeleport);
 }
 
 export {};

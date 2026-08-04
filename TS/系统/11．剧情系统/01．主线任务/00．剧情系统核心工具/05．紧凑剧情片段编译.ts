@@ -9,6 +9,7 @@ export function 编译紧凑动作(this: void, 动作: 紧凑剧情动作行): �
       type: "wait",
       id: 动作.动作ID,
       名称: 动作.名称,
+      跳过也执行: 动作.跳过也执行 !== false,
       持续时间: ((参数 as any).等待秒数 as number | undefined) ?? 动作.时间秒 ?? 0,
       允许Esc跳过: true,
       使用原生电影系统: (参数 as any).使用原生电影系统 as boolean | undefined,
@@ -21,6 +22,7 @@ export function 编译紧凑动作(this: void, 动作: 紧凑剧情动作行): �
       type: "startBossFight",
       id: 动作.动作ID,
       名称: 动作.名称,
+      跳过也执行: 动作.跳过也执行 !== false,
       Boss引用: (参数 as any).Boss引用 as string | undefined,
       Boss名: (参数 as any).Boss名 as string | undefined,
     } as 剧情步骤;
@@ -30,6 +32,7 @@ export function 编译紧凑动作(this: void, 动作: 紧凑剧情动作行): �
     type: "runAction",
     id: 动作.动作ID,
     名称: 动作.名称,
+    跳过也执行: 动作.跳过也执行 !== false,
     动作ID: 动作.动作ID,
     参数: {
       挂点: 动作.挂点,

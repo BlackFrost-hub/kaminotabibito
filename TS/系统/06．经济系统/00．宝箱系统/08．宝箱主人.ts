@@ -8,15 +8,9 @@ const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GetDestructableX = jass.GetDestructableX as (whichDestructable: any) => number;
 const GetDestructableY = jass.GetDestructableY as (whichDestructable: any) => number;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
-const 调试模块 = "宝箱系统-主人搜索";
 
 function stringToFourCC(this: void, s: string): number {
   const a = s.length > 0 ? s.charCodeAt(0) : 0;
@@ -36,13 +30,11 @@ function 取搜索半径(this: void, 配置: ChestTypeConfig, 阶段: 宝箱主�
 
 export function 查找宝箱主人(this: void, 配置: ChestTypeConfig | undefined, 参考宝箱: any, 阶段: 宝箱主人搜索阶段): any | undefined {
   if (!配置?.主人配置 || 参考宝箱 == null || 参考宝箱 === 0) {
-    debugLogForce(调试模块, "搜索跳过", "stage=", 阶段, "hasConfig=", 配置 != null, "hasOwnerConfig=", 配置?.主人配置 != null, "hasChest=", 参考宝箱 != null && 参考宝箱 !== 0);
     return undefined;
   }
 
   const 搜索半径 = 取搜索半径(配置, 阶段);
   if (搜索半径 <= 0) {
-    debugLogForce(调试模块, "搜索跳过", "stage=", 阶段, "chest=", GetHandleId(参考宝箱), "radius=", 搜索半径);
     return undefined;
   }
 
@@ -52,12 +44,10 @@ export function 查找宝箱主人(this: void, 配置: ChestTypeConfig | undefin
 
   let 最近单位: any | undefined;
   let 最近距离平方 = 0;
-  let 类型命中数 = 0;
   const 单位列表 = getUnitsInRange(参考x, 参考y, 搜索半径);
   for (let i = 0; i < 单位列表.length; i++) {
     const 枚举单位 = 单位列表[i];
     if (GetUnitTypeId(枚举单位) !== 目标单位类型) continue;
-    类型命中数 = 类型命中数 + 1;
 
     const dx = GetUnitX(枚举单位) - 参考x;
     const dy = GetUnitY(枚举单位) - 参考y;
@@ -67,28 +57,6 @@ export function 查找宝箱主人(this: void, 配置: ChestTypeConfig | undefin
       最近距离平方 = 距离平方;
     }
   }
-  debugLogForce(
-    调试模块,
-    "搜索结果",
-    "stage=",
-    阶段,
-    "chest=",
-    GetHandleId(参考宝箱),
-    "chestType=",
-    配置.destructableType,
-    "expectedOwnerType=",
-    配置.主人配置.单位类型,
-    "radius=",
-    搜索半径,
-    "candidateCount=",
-    单位列表.length,
-    "typeMatches=",
-    类型命中数,
-    "owner=",
-    最近单位 != null ? GetHandleId(最近单位) : 0,
-    "distanceSq=",
-    最近距离平方,
-  );
   return 最近单位;
 }
 

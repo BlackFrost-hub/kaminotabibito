@@ -53,9 +53,12 @@ ____exports["平移并应用镜头预设到全部玩家"] = function(_____9884_8
         duration
     )
 end
-____exports["重置玩家镜头并平移到单位"] = function(whichPlayer, unit, duration)
+____exports["重置玩家镜头并平移到单位"] = function(whichPlayer, unit, duration, _____76EE_6807_8DDD_79BB)
     if GetLocalPlayer() ~= whichPlayer then
         return
+    end
+    if _____76EE_6807_8DDD_79BB ~= nil and _____76EE_6807_8DDD_79BB > 0 then
+        SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, _____76EE_6807_8DDD_79BB, 0)
     end
     ResetToGameCamera(0)
     if unit == nil or unit == 0 then

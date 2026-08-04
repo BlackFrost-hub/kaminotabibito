@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local jassStesHashtable, countOnJassStesTable, _____6253_5370Boss_6218_542F_52A8_8DF3_8FC7, _____8BFB_53D6Boss_6218YD_53D8_91CF_5355_4F4D, _____8BFB_53D6Boss_6218YD_7ED1_5B9A_5355_4F4D, _____786E_4FDDBoss_6218_7BAD_5934_7279_6548, _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8, _____5C1D_8BD5_4ECEYDUserData_8865_8BFBBoss, ____onBoss_6218_542F_52A8_5EF6_8FDF_8865_8BFB, _____5B89_6392_4E00_5E27_540E_8865_8BFBBoss, _____5904_7406Boss_6218_542F_52A8Stes, ____onBoss_6218_542F_52A8Stes_4E8B_4EF6Action, ____onRetryRegisterBoss_6218_542F_52A8Stes, scheduleRetry, ____tryRegisterBoss_6218_542F_52A8Stes, jass, jglobals, registerStesListener, ydlStes_syncTriggerStep, ydlStes_finishChildCleanup, ydlStes_readUnit5, YDUserDataGetSafe, YDUserDataSetSafe, addDelayedCallback, debugLogForce, ____Boss_6218_542F_52A8STES_4E8B_4EF6_540D, ____Boss_6218_8868_540D, ____Boss_6218_5355_4F4D_5B57_6BB5, ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5, ____Boss_6218_542F_52A8_6865_63A5_6A21_5757_540D, ____Boss_6218_542F_52A8_5EF6_8FDF_6BEB_79D2, _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8, _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD, _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E, _____542F_52A8Boss_6218_8FD0_884C, GetHandleId, GetUnitName, LoadInteger, StringHash, AddSpecialEffectTarget, ____Boss_6218_542F_52A8Stes_89E6_53D1_5668, REG_GUARD, TRIG_KEY, ATTEMPT_KEY, MAX_REG_ATTEMPTS, RETRY_DELAY_MS, ____Boss_6218_7BAD_5934_7279_6548_5B57_6BB5, ____Boss_6218_7BAD_5934_7279_6548_6A21_578B, ____Boss_6218_7BAD_5934_7279_6548_6302_70B9, _____5F85_8865_8BFBBoss_53E5_67C4_8868
+local jassStesHashtable, countOnJassStesTable, _____6253_5370Boss_6218_542F_52A8_8DF3_8FC7, _____8BFB_53D6Boss_6218YD_53D8_91CF_5355_4F4D, _____8BFB_53D6Boss_6218YD_7ED1_5B9A_5355_4F4D, _____89E3_6790_5B9E_9645Boss_5355_4F4D, _____786E_4FDDBoss_6218_7BAD_5934_7279_6548, _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8, _____5C1D_8BD5_4ECEYDUserData_8865_8BFBBoss, ____onBoss_6218_542F_52A8_5EF6_8FDF_8865_8BFB, _____5B89_6392_4E00_5E27_540E_8865_8BFBBoss, _____5904_7406Boss_6218_542F_52A8Stes, ____onBoss_6218_542F_52A8Stes_4E8B_4EF6Action, ____onRetryRegisterBoss_6218_542F_52A8Stes, scheduleRetry, ____tryRegisterBoss_6218_542F_52A8Stes, jass, jglobals, registerStesListener, ydlStes_syncTriggerStep, ydlStes_finishChildCleanup, ydlStes_readUnit5, YDUserDataGetSafe, YDUserDataSetSafe, addDelayedCallback, debugLogForce, ____Boss_6218_542F_52A8STES_4E8B_4EF6_540D, ____Boss_6218_8868_540D, ____Boss_6218_5355_4F4D_5B57_6BB5, ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5, ____Boss_6218_542F_52A8_6865_63A5_6A21_5757_540D, ____Boss_6218_542F_52A8_5EF6_8FDF_6BEB_79D2, _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8, _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD, _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E, _____542F_52A8Boss_6218_8FD0_884C, GetHandleId, GetUnitName, GetUnitTypeId, LoadInteger, StringHash, AddSpecialEffectTarget, ____Boss_6218_542F_52A8Stes_89E6_53D1_5668, REG_GUARD, TRIG_KEY, ATTEMPT_KEY, MAX_REG_ATTEMPTS, RETRY_DELAY_MS, ____Boss_6218_7BAD_5934_7279_6548_5B57_6BB5, ____Boss_6218_7BAD_5934_7279_6548_6A21_578B, ____Boss_6218_7BAD_5934_7279_6548_6302_70B9, _____5267_60C5Boss_58F3_5355_4F4D_7C7B_578BID, _____5229_5C14_4F2F_7279_5B9E_9645_5355_4F4D_7C7B_578BID, _____5267_60C5Boss_58F3_5B9E_9645_5355_4F4D_8868_952E_5019_9009, _____5F85_8865_8BFBBoss_53E5_67C4_8868
 function jassStesHashtable()
     local cands = {jglobals.STES___HT, jglobals.STES_HT, jglobals.udg_STES___HT, jglobals.udg_STES_HT}
     do
@@ -37,6 +37,57 @@ end
 function _____8BFB_53D6Boss_6218YD_7ED1_5B9A_5355_4F4D()
     return YDUserDataGetSafe("string", ____Boss_6218_8868_540D, ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5, "unit")
 end
+function _____89E3_6790_5B9E_9645Boss_5355_4F4D(bossUnit)
+    if bossUnit == nil or bossUnit == 0 or GetUnitTypeId(bossUnit) ~= _____5267_60C5Boss_58F3_5355_4F4D_7C7B_578BID then
+        return bossUnit
+    end
+    do
+        local i = 0
+        while i < #_____5267_60C5Boss_58F3_5B9E_9645_5355_4F4D_8868_952E_5019_9009 do
+            do
+                local _____8868_952E = _____5267_60C5Boss_58F3_5B9E_9645_5355_4F4D_8868_952E_5019_9009[i + 1]
+                local actualBoss = YDUserDataGetSafe("string", "Boss", _____8868_952E, "unit")
+                if actualBoss == nil or actualBoss == 0 or GetUnitTypeId(actualBoss) ~= _____5229_5C14_4F2F_7279_5B9E_9645_5355_4F4D_7C7B_578BID then
+                    goto __continue14
+                end
+                YDUserDataSetSafe(
+                    "string",
+                    ____Boss_6218_8868_540D,
+                    ____Boss_6218_7ED1_5B9A_5355_4F4D_5B57_6BB5,
+                    "unit",
+                    actualBoss
+                )
+                YDUserDataSetSafe(
+                    "string",
+                    ____Boss_6218_8868_540D,
+                    ____Boss_6218_5355_4F4D_5B57_6BB5,
+                    "unit",
+                    actualBoss
+                )
+                debugLogForce(
+                    ____Boss_6218_542F_52A8_6865_63A5_6A21_5757_540D,
+                    "解析剧情Boss壳",
+                    "shell=",
+                    GetUnitName(bossUnit),
+                    "actual=",
+                    GetUnitName(actualBoss),
+                    "tableKey=",
+                    _____8868_952E
+                )
+                return actualBoss
+            end
+            ::__continue14::
+            i = i + 1
+        end
+    end
+    debugLogForce(
+        ____Boss_6218_542F_52A8_6865_63A5_6A21_5757_540D,
+        "剧情Boss壳未找到实际单位",
+        "shell=",
+        GetUnitName(bossUnit)
+    )
+    return bossUnit
+end
 function _____786E_4FDDBoss_6218_7BAD_5934_7279_6548(bossUnit)
     if bossUnit == nil or bossUnit == 0 then
         return
@@ -59,6 +110,11 @@ function _____786E_4FDDBoss_6218_7BAD_5934_7279_6548(bossUnit)
 end
 function _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8(bossUnit, source)
     if bossUnit == nil or bossUnit == 0 then
+        return
+    end
+    bossUnit = _____89E3_6790_5B9E_9645Boss_5355_4F4D(bossUnit)
+    if bossUnit == nil or bossUnit == 0 or GetUnitTypeId(bossUnit) == _____5267_60C5Boss_58F3_5355_4F4D_7C7B_578BID then
+        _____6253_5370Boss_6218_542F_52A8_8DF3_8FC7("剧情壳没有对应的实际 Boss 单位")
         return
     end
     if _____662F_5426_5DF2_767B_8BB0Boss_81EA_52A8_6280_80FD(bossUnit) then
@@ -87,12 +143,12 @@ function _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8(bossUnit, source)
 end
 function _____5C1D_8BD5_4ECEYDUserData_8865_8BFBBoss(bossHandleId)
     _____5F85_8865_8BFBBoss_53E5_67C4_8868[bossHandleId] = nil
-    local bossUnit = _____8BFB_53D6Boss_6218YD_53D8_91CF_5355_4F4D()
+    local bossUnit = _____89E3_6790_5B9E_9645Boss_5355_4F4D(_____8BFB_53D6Boss_6218YD_53D8_91CF_5355_4F4D())
     if bossUnit ~= nil and bossUnit ~= 0 then
         _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8(bossUnit, "Boss战.单位")
         return
     end
-    local bindUnit = _____8BFB_53D6Boss_6218YD_7ED1_5B9A_5355_4F4D()
+    local bindUnit = _____89E3_6790_5B9E_9645Boss_5355_4F4D(_____8BFB_53D6Boss_6218YD_7ED1_5B9A_5355_4F4D())
     if bindUnit ~= nil and bindUnit ~= 0 then
         _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8(bindUnit, "Boss战.绑定单位")
         return
@@ -218,9 +274,12 @@ local ____require_result_8 = require("系统.03．技能系统.06．AI自动使�
 _____542F_52A8Boss_6218_8FD0_884C = ____require_result_8["启动Boss战运行"]
 GetHandleId = jass.GetHandleId
 GetUnitName = jass.GetUnitName
+GetUnitTypeId = jass.GetUnitTypeId
 LoadInteger = jass.LoadInteger
 StringHash = jass.StringHash
 AddSpecialEffectTarget = jass.AddSpecialEffectTarget
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
 ____Boss_6218_542F_52A8Stes_89E6_53D1_5668 = nil
 REG_GUARD = "__syzl_boss_ai_start_registered"
 TRIG_KEY = "__syzl_boss_ai_start_trig"
@@ -230,6 +289,9 @@ RETRY_DELAY_MS = 100
 ____Boss_6218_7BAD_5934_7279_6548_5B57_6BB5 = "箭头特效"
 ____Boss_6218_7BAD_5934_7279_6548_6A21_578B = "war3mapImported\\diwo2.mdx"
 ____Boss_6218_7BAD_5934_7279_6548_6302_70B9 = "origin"
+_____5267_60C5Boss_58F3_5355_4F4D_7C7B_578BID = stringToFourCCSafe("h01D")
+_____5229_5C14_4F2F_7279_5B9E_9645_5355_4F4D_7C7B_578BID = stringToFourCCSafe("N05L")
+_____5267_60C5Boss_58F3_5B9E_9645_5355_4F4D_8868_952E_5019_9009 = {"蛇人族卫队长", "利尔·伯特"}
 _____5F85_8865_8BFBBoss_53E5_67C4_8868 = {}
 ____exports["注册Boss战启动Stes桥接"] = function()
     ____tryRegisterBoss_6218_542F_52A8Stes()

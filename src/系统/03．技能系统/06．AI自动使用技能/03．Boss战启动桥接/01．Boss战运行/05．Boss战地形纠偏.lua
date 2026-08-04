@@ -5,8 +5,10 @@ local ____require_result_0 = require("lib.扩展函数.BJ函数.04．矩形与�
 local RectContainsUnit = ____require_result_0.RectContainsUnit
 local ____require_result_1 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
 local IsUnitPausedBJ = ____require_result_1.IsUnitPausedBJ
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_2["单位是否正在原生施法"]
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local SetUnitPosition = jass.SetUnitPosition
@@ -26,6 +28,9 @@ end
 local function ____on_5FEB_901F_7EA0_504F_73A9_5BB6_82F1_96C4()
     local unit = GetEnumUnit()
     if unit == nil or unit == 0 then
+        return
+    end
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(unit) then
         return
     end
     if IsUnitPausedBJ(unit) then

@@ -17,15 +17,22 @@ local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
 local ____require_result_4 = require("lib.扩展函数.BJ函数.01．触发与事件")
 local TriggerRegisterUnitInRangeSimple = ____require_result_4.TriggerRegisterUnitInRangeSimple
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.GS扩展库.00．极坐标投影")
-local GS_PolarProjectionBJ = ____require_result_5.GS_PolarProjectionBJ
-local ____require_result_6 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetRandomDirectionDeg = ____require_result_6.GetRandomDirectionDeg
+local ____require_result_5 = require("系统.07．地形系统.03．区域传送")
+local _____6CE8_518C_5267_60C5_914D_7F6E_4F20_9001 = ____require_result_5["注册剧情配置传送"]
+local _____8BFB_53D6_5267_60C5_4F20_9001_914D_7F6E = ____require_result_5["读取剧情传送配置"]
+local ____require_result_6 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_6["是玩家英雄组单位"]
+local _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = ____require_result_6["获取玩家英雄单位组"]
+local ____require_result_7 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local CreatePermanentCorpseLocBJ = ____require_result_7.CreatePermanentCorpseLocBJ
+local ____require_result_8 = require("lib.扩展函数.Star扩展函数.GS扩展库.00．极坐标投影")
+local GS_PolarProjectionBJ = ____require_result_8.GS_PolarProjectionBJ
+local ____require_result_9 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetRandomDirectionDeg = ____require_result_9.GetRandomDirectionDeg
 do
     local ____09_FF0E_72E9_730E_98DF_4EBA_9B54_4EFB_52A1_63A5_53D6 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.09．狩猎食人魔任务接取")
     ____exports["蛇人族接受食人魔任务剧情片段"] = ____09_FF0E_72E9_730E_98DF_4EBA_9B54_4EFB_52A1_63A5_53D6["蛇人族接受食人魔任务剧情片段"]
 end
-local CreatePermanentCorpseLocBJ = jass.CreatePermanentCorpseLocBJ
 local CreateUnit = jass.CreateUnit
 local GetUnitLoc = jass.GetUnitLoc
 local Player = jass.Player
@@ -33,6 +40,23 @@ local RemoveLocation = jass.RemoveLocation
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local bj_CORPSETYPE_BONE = require("jass.globals").bj_CORPSETYPE_BONE
+local _____98DF_4EBA_9B54_4EFB_52A1_4F20_9001_914D_7F6EID = "jlc_desert_ogre_challenge"
+local _____53D6_6D88_98DF_4EBA_9B54_4EFB_52A1_4F20_9001
+local function _____6CE8_518C_98DF_4EBA_9B54_4EFB_52A1_4F20_9001()
+    if _____53D6_6D88_98DF_4EBA_9B54_4EFB_52A1_4F20_9001 ~= nil then
+        return
+    end
+    _____53D6_6D88_98DF_4EBA_9B54_4EFB_52A1_4F20_9001 = _____6CE8_518C_5267_60C5_914D_7F6E_4F20_9001(
+        _____98DF_4EBA_9B54_4EFB_52A1_4F20_9001_914D_7F6EID,
+        {
+            ["读取玩家英雄组"] = _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4,
+            ["允许进入单位"] = _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D,
+            ["完成"] = function()
+                _____53D6_6D88_98DF_4EBA_9B54_4EFB_52A1_4F20_9001 = nil
+            end
+        }
+    )
+end
 local function _____521B_5EFA_6C99_6F20_98DF_4EBA_9B54_5C38_9AA8_5708(bossUnit)
     if bossUnit == nil or bossUnit == 0 then
         return
@@ -61,13 +85,14 @@ local function _____521B_5EFA_6C99_6F20_98DF_4EBA_9B54_5C38_9AA8_5708(bossUnit)
     end
 end
 ____exports["执行蛇人族接受食人魔任务"] = function(_____53C2_6570)
+    local _____4F20_9001_914D_7F6E = _____8BFB_53D6_5267_60C5_4F20_9001_914D_7F6E(_____98DF_4EBA_9B54_4EFB_52A1_4F20_9001_914D_7F6EID)
     local _____6B21_5143_88C2_7F1D_5355_4F4DID = stringToFourCCSafe("e08L")
-    if _____6B21_5143_88C2_7F1D_5355_4F4DID > 0 then
+    if _____4F20_9001_914D_7F6E ~= nil and _____6B21_5143_88C2_7F1D_5355_4F4DID > 0 then
         local _____88C2_7F1D_5355_4F4D = CreateUnit(
             Player(PLAYER_NEUTRAL_PASSIVE),
             _____6B21_5143_88C2_7F1D_5355_4F4DID,
-            -20606.8,
-            2780.5,
+            _____4F20_9001_914D_7F6E["入口中心X"],
+            _____4F20_9001_914D_7F6E["入口中心Y"],
             0
         )
         if _____88C2_7F1D_5355_4F4D ~= nil and _____88C2_7F1D_5355_4F4D ~= 0 then
@@ -78,6 +103,7 @@ ____exports["执行蛇人族接受食人魔任务"] = function(_____53C2_6570)
                 "unit",
                 _____88C2_7F1D_5355_4F4D
             )
+            _____6CE8_518C_98DF_4EBA_9B54_4EFB_52A1_4F20_9001()
         end
     end
     local bossRawId = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID("沙漠食人魔")
@@ -106,7 +132,7 @@ ____exports["执行蛇人族接受食人魔任务"] = function(_____53C2_6570)
     _____6DFB_52A0_5355_4F4D_6682_505C(bossUnit, _____6C99_6F20_98DF_4EBA_9B54_5F85_6218_6682_505C_6765_6E90)
     _____6CE8_518C_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1_5668(
         bossUnit,
-        __TS__Number(_____53C2_6570["注册范围"]) or 850,
+        __TS__Number(_____53C2_6570["注册范围"]) or 1000,
         "沙漠食人魔Boss启动",
         "jlc_desert_ogre_boss_start",
         "Boss.沙漠食人魔",

@@ -29,6 +29,8 @@ local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local IssueTargetOrder = jass.IssueTargetOrder
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_4["单位是否正在原生施法"]
 local function _____53D6_5355_4F4D_4EC7_6068(entries, unit)
     local hid = _____53D6_5355_4F4DID(unit)
     do
@@ -43,8 +45,8 @@ local function _____53D6_5355_4F4D_4EC7_6068(entries, unit)
     return 0
 end
 local function _____53D6_76EE_6807_8150_5316_5C42_6570(context, target)
-    local ____self_4 = context["腐化层数控制器"]
-    return ____self_4["取层数"](____self_4, target)
+    local ____self_5 = context["腐化层数控制器"]
+    return ____self_5["取层数"](____self_5, target)
 end
 local function _____6062_590DBoss_751F_547D(boss, ratio)
     if not _____5355_4F4D_5B58_6D3B(boss) or ratio <= 0 then
@@ -137,6 +139,9 @@ local function _____5F3A_5236_653B_51FB_6C61_67D3_6807_8BB0_76EE_6807(context, t
         return
     end
     setThreat(context["Boss单位"], target, 1000)
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(context["Boss单位"]) then
+        return
+    end
     IssueTargetOrder(context["Boss单位"], "attack", target)
 end
 ____exports["取米亚污染标记伤害倍率"] = function(context, target)

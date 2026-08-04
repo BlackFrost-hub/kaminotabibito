@@ -71,6 +71,7 @@ export interface HealParams {
   HealEffect: boolean;     // 是否播放生命治疗特效
   HealEffectPath?: string; // 生命治疗特效路径（可选）
   UseDefaultHealEffect?: boolean; // 无自定义路径时是否强制播放默认治疗特效
+  HealShowText?: boolean;  // 是否显示生命治疗漂浮字（默认true）
   ManaEffect?: boolean;    // 是否播放魔法恢复特效
   ManaEffectPath?: string; // 魔法恢复特效路径（可选）
   UseDefaultManaEffect?: boolean; // 无自定义路径时是否强制播放默认回蓝特效
@@ -127,6 +128,7 @@ function cloneHealParams(params: HealParams): HealParams {
     HealEffect: params.HealEffect,
     HealEffectPath: params.HealEffectPath,
     UseDefaultHealEffect: params.UseDefaultHealEffect,
+    HealShowText: params.HealShowText,
     ManaEffect: params.ManaEffect,
     ManaEffectPath: params.ManaEffectPath,
     UseDefaultManaEffect: params.UseDefaultManaEffect,
@@ -422,6 +424,7 @@ export function doHeal(this: void, params: HealParams): number {
     HealEffect,
     HealEffectPath,
     UseDefaultHealEffect = false,
+    HealShowText = true,
     ManaEffectPath,
     UseDefaultManaEffect = false,
     ManaShowText = true,
@@ -458,7 +461,7 @@ export function doHeal(this: void, params: HealParams): number {
 
         if (HealEffect || UseDefaultHealEffect) playHealEffect(HealTarget, HealEffectPath);
 
-        fireShowDamageEvent(HealTarget, actualHeal);
+        if (HealShowText) fireShowDamageEvent(HealTarget, actualHeal);
         fireHealEvent(HealSource, HealTarget, actualHeal);
 
         addHealStats(HealTarget, actualHeal);

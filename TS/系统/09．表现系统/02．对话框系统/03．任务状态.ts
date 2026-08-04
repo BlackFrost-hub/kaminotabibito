@@ -1,6 +1,6 @@
 import { getObjectProperty, ObjectType } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { DIALOG_NPC_CONFIGS, DialogNPCData } from "../../08．任务系统/00．配置表/01．对话配置表";
-import { NPC_CONFIGS, NPCData } from "../../08．任务系统/00．配置表/03．NPC配置表";
+import { NPC_CONFIGS, NPCData } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
 import { QUEST_CONFIGS, QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { questDB, QuestType, QuestStatus } from "../../08．任务系统/01．任务数据";
 import { fourCCToString } from "../../../lib/扩展函数/封装函数/01．通用工具/01．FourCC转换";

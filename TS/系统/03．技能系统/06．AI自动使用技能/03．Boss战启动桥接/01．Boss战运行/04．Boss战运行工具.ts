@@ -27,6 +27,9 @@ import { 接管Boss战区域音频 } from "./02．Boss战区域音频";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
+};
 
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, forceHandle: any, messageType: number, message: string) => void;
@@ -93,8 +96,12 @@ const { isValidCombatEnemyUnit } = require("lib.扩展函数.自定义扩展函�
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, moduleName: string, ...args: any[]) => void;
 };
-const { 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+  单位是否正在原生施法: (this: void, unit: any) => boolean;
+};
+const { 移除单位暂停, 清除单位全部暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
+  清除单位全部暂停占用: (this: void, unit: any) => boolean;
 };
 
 const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
@@ -107,6 +114,7 @@ const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const SquareRoot = jass.SquareRoot as (value: number) => number;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichType: number) => boolean;
 const IsUnitInvulnerable = jass.IsUnitInvulnerable as (whichUnit: any) => boolean;
+const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (whichUnit: any, flag: boolean) => void;
 const PingMinimap = jass.PingMinimap as (x: number, y: number, duration: number) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, target: any) => boolean;
@@ -117,11 +125,14 @@ const Player = jass.Player as (playerId: number) => any;
 const IsPlayerInForce = jass.IsPlayerInForce as (whichPlayer: any, whichForce: any) => boolean;
 const CreateGroup = jass.CreateGroup as () => any;
 const DestroyGroup = jass.DestroyGroup as (whichGroup: any) => void;
+const GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect as (this: void, whichGroup: any, whichRect: any, filter: any) => void;
 const GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange as (whichGroup: any, x: number, y: number, radius: number, filter: any) => void;
 const FirstOfGroup = jass.FirstOfGroup as (whichGroup: any) => any;
 const GroupRemoveUnit = jass.GroupRemoveUnit as (whichGroup: any, whichUnit: any) => void;
 const ForGroup = jass.ForGroup as (whichGroup: any, callback: () => void) => void;
 const GetEnumUnit = jass.GetEnumUnit as () => any;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
+const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 const SetUnitPosition = jass.SetUnitPosition as (whichUnit: any, x: number, y: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (whichUnit: any, angle: number) => void;
 const IsTerrainPathable = jass.IsTerrainPathable as (x: number, y: number, pathingType: number) => boolean;
@@ -143,11 +154,10 @@ const Quest消息完成 = jglobals.bj_QUESTMESSAGE_COMPLETED as number;
 const Quest消息秘密 = jglobals.bj_QUESTMESSAGE_SECRET as number;
 const bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET as number;
 
-const 攻击命令ID = OrderId("attack");
-const 攻击一次命令ID = OrderId("attackonce");
 const 停止命令ID = OrderId("stop");
 const 保持命令ID = OrderId("holdposition");
 const Boss死亡后YD清表延迟毫秒 = 10000;
+const Boss战传送门单位类型ID = stringToFourCCSafe("n05Q");
 
 interface 待清理BossYD任务 {
   bossUnit: any;
@@ -178,12 +188,11 @@ function 获取句柄ID(this: void, handle: any): number {
 
 function 当前命令允许兜底下令(this: void, boss: any): boolean {
   if (boss == null || boss === 0) return false;
+  if (单位是否正在原生施法(boss)) return false;
   if (IsUnitPausedBJ(boss)) return false;
 
   const 当前命令ID = GetUnitCurrentOrder(boss) || 0;
   if (当前命令ID === 0) return true;
-  if (当前命令ID === 攻击命令ID) return true;
-  if (当前命令ID === 攻击一次命令ID) return true;
   if (当前命令ID === 停止命令ID) return true;
   if (当前命令ID === 保持命令ID) return true;
   return false;
@@ -237,6 +246,7 @@ function on枚举玩家英雄组单位(this: void): void {
 function on玩家英雄纠偏单位(this: void): void {
   const unit = GetEnumUnit();
   if (unit == null || unit === 0) return;
+  if (单位是否正在原生施法(unit)) return;
   if (IsUnitPausedBJ(unit)) return;
   if (玩家英雄纠偏矩形 != null && 玩家英雄纠偏矩形 !== 0 && !RectContainsUnit(玩家英雄纠偏矩形, unit)) return;
   if (!IsTerrainPathable(GetUnitX(unit), GetUnitY(unit), PATHING_TYPE_WALKABILITY)) return;
@@ -408,12 +418,38 @@ export function 完成Boss战转场搬运(this: void, context: Boss战运行上�
   StarOther_PanCameraToTimedUnitForPlayer(GetOwningPlayer(触发玩家单位), 触发玩家单位, 0.1);
 }
 
+function handoffBossPortalToPlayerSeven(this: void, rectHandle: any): void {
+  if (rectHandle == null || rectHandle === 0) return;
+
+  const group = CreateGroup();
+  if (group == null || group === 0) return;
+
+  GroupEnumUnitsInRect(group, rectHandle, null);
+  while (true) {
+    const unit = FirstOfGroup(group);
+    if (unit == null || unit === 0) break;
+    GroupRemoveUnit(group, unit);
+
+    if (GetUnitTypeId(unit) !== Boss战传送门单位类型ID) continue;
+    SetUnitOwner(unit, Player(6), true);
+  }
+
+  DestroyGroup(group);
+}
+
+function forceResumeBossAfterTransition(this: void, boss: any): void {
+  if (boss == null || boss === 0) return;
+  清除单位全部暂停占用(boss);
+  PauseUnit(boss, false);
+}
+
 export function 完成Boss战启动(this: void, context: Boss战运行上下文): void {
   接管Boss战区域音频(context);
   确保Boss战区域视野(context.地点矩形);
 
   SetUnitInvulnerable(context.Boss单位, false);
   移除单位暂停(context.Boss单位, 剧情Boss预置暂停来源);
+  forceResumeBossAfterTransition(context.Boss单位);
 
   if (context.地点矩形 != null && context.地点矩形 !== 0) {
     PingMinimap(GetRectCenterX(context.地点矩形), GetRectCenterY(context.地点矩形), 15);
@@ -423,6 +459,7 @@ export function 完成Boss战启动(this: void, context: Boss战运行上下文)
 
   QuestMessageBJ(GetPlayersAll(), Quest消息警告, Boss战开始提示文本);
   context.是否已激活 = true;
+  handoffBossPortalToPlayerSeven(context.地点矩形);
   尝试兜底搜敌并下令(context, getServerTime());
 
   debugLogForce(Boss战运行模块名, "Boss战正式激活", "boss=", context.Boss句柄ID, "generation=", context.运行代次);
@@ -436,7 +473,7 @@ export function 尝试兜底搜敌并下令(this: void, context: Boss战运行�
 
   const threatTarget = 读取当前有效仇恨目标(context);
   if (threatTarget != null && threatTarget !== 0) {
-    context.最近兜底目标ID = 0;
+    IssueTargetOrder(context.Boss单位, "attack", threatTarget);
     return;
   }
 
@@ -444,19 +481,14 @@ export function 尝试兜底搜敌并下令(this: void, context: Boss战运行�
   if (fallbackTarget == null || fallbackTarget === 0) return;
 
   const fallbackTargetId = 获取句柄ID(fallbackTarget);
-  const currentOrderId = GetUnitCurrentOrder(context.Boss单位) || 0;
-  if (context.最近兜底目标ID === fallbackTargetId && (currentOrderId === 攻击命令ID || currentOrderId === 攻击一次命令ID)) {
-    return;
-  }
-
   IssueTargetOrder(context.Boss单位, "attack", fallbackTarget);
-  context.最近兜底目标ID = fallbackTargetId;
 
   debugLogForce(Boss战运行模块名, "兜底搜敌下令", "boss=", context.Boss句柄ID, "target=", fallbackTargetId);
 }
 
 export function 纠偏Boss位置(this: void, context: Boss战运行上下文): void {
   if (context.地点矩形 == null || context.地点矩形 === 0) return;
+  if (单位是否正在原生施法(context.Boss单位)) return;
   if (IsUnitPausedBJ(context.Boss单位)) return;
   if (!IsTerrainPathable(GetUnitX(context.Boss单位), GetUnitY(context.Boss单位), PATHING_TYPE_WALKABILITY)) return;
   SetUnitPosition(context.Boss单位, GetRectCenterX(context.地点矩形), GetRectCenterY(context.地点矩形));

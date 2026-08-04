@@ -27,8 +27,8 @@ const { YDUserDataClearSafe, YDUserDataClearTableSafe } = require("lib.扩展函
   YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
   YDUserDataClearTableSafe: (this: void, tableTypeName: string, tableKey: any) => void;
 };
-const { SetStackedSoundBJ } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
-  SetStackedSoundBJ: (this: void, add: boolean, soundHandle: any, rectHandle: any) => void;
+const { 挂载区域背景音乐句柄 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
+  挂载区域背景音乐句柄: (this: void, add: boolean, soundHandle: any, rectHandle: any) => boolean;
 };
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
@@ -76,7 +76,9 @@ const GetUnitState = jass.GetUnitState as (this: void, whichUnit: any, whichStat
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
 const IsUnitInRangeXY = jass.IsUnitInRangeXY as (this: void, whichUnit: any, x: number, y: number, distance: number) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
-const RemoveUnit = jass.RemoveUnit as (this: void, whichUnit: any) => void;
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
@@ -120,7 +122,7 @@ function 执行区域音乐切换(this: void, 配置: 主线剧情最终伤害�
     const 声音句柄 = 获取全局句柄(条目.声音变量名);
     const 矩形句柄 = 获取全局句柄(条目.矩形变量名);
     if (声音句柄 == null || 矩形句柄 == null) continue;
-    SetStackedSoundBJ(条目.添加, 声音句柄, 矩形句柄);
+    挂载区域背景音乐句柄(条目.添加, 声音句柄, 矩形句柄);
   }
 }
 
@@ -138,7 +140,17 @@ function 播放最终伤害对白列表(this: void, 配置: 主线剧情最终�
   for (let i = 0; i < 配置.对白列表.length; i++) {
     const 对白 = 配置.对白列表[i];
     const 说话者 = 对白.使用攻击者名 === true ? 攻击者名 : 对白.说话者;
-    TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, 说话者, null, 对白.文本, bj_TIMETYPE_SET, 对白.持续时间, true);
+    const 说话者单位 = 对白.说话者引用 != null ? 读取语义单位引用(对白.说话者引用) : null;
+    TransmissionFromUnitWithNameBJ(
+      GetPlayersAll(),
+      说话者单位 != null && 说话者单位 !== 0 ? 说话者单位 : null,
+      说话者,
+      null,
+      对白.文本,
+      bj_TIMETYPE_SET,
+      对白.持续时间,
+      true,
+    );
   }
 }
 
@@ -236,7 +248,7 @@ function 执行最终伤害推进剧情(this: void, 配置: 主线剧情最终�
   播放最终伤害对白列表(配置, attacker);
 
   if (配置.移除目标单位 === true) {
-    RemoveUnit(target);
+    立即移除单位并取消排泄登记(target);
   }
   if (配置.清理Boss语义键 != null && 配置.清理Boss语义键 !== "") {
     YDUserDataClearSafe("string", "Boss", 配置.清理Boss语义键, "unit");

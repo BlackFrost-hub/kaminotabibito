@@ -16,6 +16,9 @@ const { 记录Boss自动技能启动, 清理Boss自动技能启动上下文, 是
 const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事件中心.12．聊天命令事件中心") as {
   注册聊天命令监听: (this: void, 命令: string, 回调: (this: void, player: any, command: string) => void) => void;
 };
+const { 是允许测试玩家 } = require("系统.12．测试系统.00．测试系统辅助函数") as {
+  是允许测试玩家: (this: void, player: any) => boolean;
+};
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
@@ -27,7 +30,6 @@ const jass = require("jass.common") as any;
 const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (player: any, x: number, y: number, duration: number, text: string) => void;
 const GetLocalPlayer = jass.GetLocalPlayer as () => any;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
-const GetPlayerName = jass.GetPlayerName as (player: any) => string;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -68,9 +70,6 @@ interface Boss测试当前会话 {
 const Boss测试选择命令表: Record<string, Boss测试注册配置 | undefined> = {};
 const Boss测试配置列表: Boss测试注册配置[] = [];
 const 已注册技能命令表: Record<string, boolean | undefined> = {};
-const Boss测试玩家ID = 0;
-const Boss测试玩家名称 = "WorldEdit";
-const Boss测试备用玩家名称 = "九条艾莉莎";
 const Boss测试列表命令 = "Boss列表";
 const Boss测试重置命令 = "Boss重置";
 const Boss测试清理命令 = "Boss清理";
@@ -104,13 +103,7 @@ function 生成命令说明(this: void, 配置: Boss测试注册配置): string 
 }
 
 function 是允许Boss测试玩家(this: void, player: any): boolean {
-  if (player == null || player === 0) return false;
-  if (GetPlayerId(player) !== Boss测试玩家ID) return false;
-  const playerName = GetPlayerName(player) ?? "";
-  return playerName === Boss测试玩家名称
-    || playerName === Boss测试玩家名称 + ":"
-    || playerName === Boss测试备用玩家名称
-    || playerName === Boss测试备用玩家名称 + ":";
+  return 是允许测试玩家(player);
 }
 
 function 从Boss测试上下文取Boss单位(this: void, context: any): any {

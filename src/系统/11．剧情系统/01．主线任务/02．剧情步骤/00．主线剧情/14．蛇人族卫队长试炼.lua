@@ -7,9 +7,10 @@ local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local CreateUnit = jass.CreateUnit
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
 local IssuePointOrder = jass.IssuePointOrder
 local Player = jass.Player
 local SetUnitOwner = jass.SetUnitOwner
@@ -25,7 +26,7 @@ ____exports["执行蛇人族卫队长入场"] = function(_____53C2_6570)
         if not (_____961F_957F_7C7B_578BID > 0) then
             return
         end
-        _____961F_957F = CreateUnit(
+        _____961F_957F = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
             Player(6),
             _____961F_957F_7C7B_578BID,
             __TS__Number(_____53C2_6570["出生X"]) or -22935.9,

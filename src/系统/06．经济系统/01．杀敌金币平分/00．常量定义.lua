@@ -1,5 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+--- 杀敌金币平分系统总开关；排查击杀卡顿时可临时关闭。
+____exports["杀敌金币平分系统启用"] = true
 --- 平分范围（单位与死亡单位的距离）
 ____exports.SHARE_RANGE = 1000
 --- 平分比例（基础赏金的百分比）

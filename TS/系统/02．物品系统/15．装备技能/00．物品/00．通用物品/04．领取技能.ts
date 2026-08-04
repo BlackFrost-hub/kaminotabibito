@@ -17,7 +17,7 @@ const { 删除物品 } = require("./00．通用物品工具") as {
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const UnitAddAbility = jass.UnitAddAbility as (unit: any, abilityId: number) => boolean;
-const BJDebugMsg = jass.BJDebugMsg as (message: string) => void;
+const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (player: any, x: number, y: number, duration: number, message: string) => void;
 
 export function 处理通用物品领取技能(this: void, 单位: any, 物品: any): void {
   if (物品 == null || 物品 === 0) return;
@@ -30,7 +30,7 @@ export function 处理通用物品领取技能(this: void, 单位: any, 物品: 
   const 已领取 = YDUserDataGetSafe("player", 玩家, "FF领取", "boolean") === true;
   if (技能ID == null || 技能ID === 0 || 已领取) return;
 
-  BJDebugMsg("（领取成功）");
+  DisplayTimedTextToPlayer(玩家, 0, 0, 6, "（领取成功）");
   YDUserDataSetSafe("player", 玩家, "FF领取", "boolean", true);
   UnitAddAbility(单位, 技能ID);
 }

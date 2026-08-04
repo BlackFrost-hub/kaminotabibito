@@ -1,17 +1,16 @@
-local ____lualib = require("lualib_bundle")
-local __TS__Delete = ____lualib.__TS__Delete
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____6CE8_518C_8FD0_884C_65F6_533A_57DF_80CC_666F_97F3_4E50 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["注册运行时区域背景音乐"]
+local _____542F_7528_8FD0_884C_65F6_533A_57DF_80CC_666F_97F3_4E50 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["启用运行时区域背景音乐"]
+local _____505C_7528_8FD0_884C_65F6_533A_57DF_80CC_666F_97F3_4E50 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["停用运行时区域背景音乐"]
+local _____6E05_7406_8FD0_884C_65F6_533A_57DF_80CC_666F_97F3_4E50 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["清理运行时区域背景音乐"]
+local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["卸载区域背景音乐句柄"]
+local _____505C_6B62_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["停止区域背景音乐句柄"]
+local _____79FB_9664_533A_57DF_80CC_666F_97F3_4E50_77E9_5F62 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["移除区域背景音乐矩形"]
 ---
 -- @noSelfInFile
-local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-local SetStackedSoundBJ = ____require_result_0.SetStackedSoundBJ
-local Rect = jass.Rect
-local RemoveRect = jass.RemoveRect
-local CreateSound = jass.CreateSound
-local StopSound = jass.StopSound
-local _____52A8_6001_533A_57DF_80CC_666F_97F3_4E50_72B6_6001_8868 = {}
 ____exports["封印守卫战区域音乐配置"] = {
     ["键"] = "第三章.封印守卫战",
     ["音乐路径"] = "Sound\\BGM\\Scene\\SealCore\\void_light_seal_land_80k.mp3",
@@ -51,86 +50,17 @@ local _____56FE4_533A_57DF_5168_5C40_540D = "gg_rct______________027"
 local _____56FE4_65E7_80CC_666F_97F3_4E50_5168_5C40_540D = "gg_snd_baiyihu_yueya"
 local _____56FE4_65E7_80CC_666F_97F3_4E50_5DF2_6E05_7406 = false
 local _____7B2C_4E09_7AE0_4E9A_4F26_67EF_65AF_524D_5BFC_533A_57DF_80CC_666F_97F3_4E50_5DF2_6C38_4E45_6E05_7406 = false
-local function _____53E5_67C4_6709_6548(handle)
-    return handle ~= nil and handle ~= 0
-end
-local function _____914D_7F6E_6709_6548(_____914D_7F6E)
-    return _____914D_7F6E["键"] ~= "" and _____914D_7F6E["音乐路径"] ~= "" and (_____914D_7F6E["区域全局名"] ~= nil and _____914D_7F6E["区域全局名"] ~= "" or _____914D_7F6E["左"] ~= nil and _____914D_7F6E["右"] ~= nil and _____914D_7F6E["下"] ~= nil and _____914D_7F6E["上"] ~= nil and _____914D_7F6E["左"] < _____914D_7F6E["右"] and _____914D_7F6E["下"] < _____914D_7F6E["上"])
-end
 ____exports["注册动态区域背景音乐"] = function(_____914D_7F6E)
-    if not _____914D_7F6E_6709_6548(_____914D_7F6E) then
-        return false
-    end
-    if _____52A8_6001_533A_57DF_80CC_666F_97F3_4E50_72B6_6001_8868[_____914D_7F6E["键"]] ~= nil then
-        return true
-    end
-    local _____4F7F_7528_5730_56FE_77E9_5F62 = _____914D_7F6E["区域全局名"] ~= nil and _____914D_7F6E["区域全局名"] ~= ""
-    local _____4F7F_7528_5730_56FE_77E9_5F62_1
-    if _____4F7F_7528_5730_56FE_77E9_5F62 then
-        _____4F7F_7528_5730_56FE_77E9_5F62_1 = jglobals[_____914D_7F6E["区域全局名"]]
-    else
-        _____4F7F_7528_5730_56FE_77E9_5F62_1 = Rect(_____914D_7F6E["左"], _____914D_7F6E["下"], _____914D_7F6E["右"], _____914D_7F6E["上"])
-    end
-    local _____77E9_5F62 = _____4F7F_7528_5730_56FE_77E9_5F62_1
-    if not _____53E5_67C4_6709_6548(_____77E9_5F62) then
-        return false
-    end
-    local _____97F3_9891 = CreateSound(
-        _____914D_7F6E["音乐路径"],
-        true,
-        true,
-        true,
-        10,
-        10,
-        "DefaultEAXON"
-    )
-    if not _____53E5_67C4_6709_6548(_____97F3_9891) then
-        if not _____4F7F_7528_5730_56FE_77E9_5F62 then
-            RemoveRect(_____77E9_5F62)
-        end
-        return false
-    end
-    _____52A8_6001_533A_57DF_80CC_666F_97F3_4E50_72B6_6001_8868[_____914D_7F6E["键"]] = {["矩形"] = _____77E9_5F62, ["音频"] = _____97F3_9891, ["已挂载"] = false, ["是否自建矩形"] = not _____4F7F_7528_5730_56FE_77E9_5F62}
-    return true
+    return _____6CE8_518C_8FD0_884C_65F6_533A_57DF_80CC_666F_97F3_4E50(_____914D_7F6E)
 end
 ____exports["添加动态区域背景音乐"] = function(_____952E)
-    local _____72B6_6001 = _____52A8_6001_533A_57DF_80CC_666F_97F3_4E50_72B6_6001_8868[_____952E]
-    if _____72B6_6001 == nil then
-        return false
-    end
-    if _____72B6_6001["已挂载"] then
-        return true
-    end
-    SetStackedSoundBJ(true, _____72B6_6001["音频"], _____72B6_6001["矩形"])
-    _____72B6_6001["已挂载"] = true
-    return true
+    return _____542F_7528_8FD0_884C_65F6_533A_57DF_80CC_666F_97F3_4E50(_____952E)
 end
 ____exports["移除动态区域背景音乐"] = function(_____952E)
-    local _____72B6_6001 = _____52A8_6001_533A_57DF_80CC_666F_97F3_4E50_72B6_6001_8868[_____952E]
-    if _____72B6_6001 == nil then
-        return false
-    end
-    if not _____72B6_6001["已挂载"] then
-        return true
-    end
-    SetStackedSoundBJ(false, _____72B6_6001["音频"], _____72B6_6001["矩形"])
-    _____72B6_6001["已挂载"] = false
-    return true
+    return _____505C_7528_8FD0_884C_65F6_533A_57DF_80CC_666F_97F3_4E50(_____952E)
 end
 ____exports["清理动态区域背景音乐"] = function(_____952E)
-    local _____72B6_6001 = _____52A8_6001_533A_57DF_80CC_666F_97F3_4E50_72B6_6001_8868[_____952E]
-    if _____72B6_6001 == nil then
-        return false
-    end
-    ____exports["移除动态区域背景音乐"](_____952E)
-    if _____53E5_67C4_6709_6548(_____72B6_6001["音频"]) then
-        StopSound(_____72B6_6001["音频"], true, false)
-    end
-    if _____72B6_6001["是否自建矩形"] and _____53E5_67C4_6709_6548(_____72B6_6001["矩形"]) then
-        RemoveRect(_____72B6_6001["矩形"])
-    end
-    __TS__Delete(_____52A8_6001_533A_57DF_80CC_666F_97F3_4E50_72B6_6001_8868, _____952E)
-    return true
+    return _____6E05_7406_8FD0_884C_65F6_533A_57DF_80CC_666F_97F3_4E50(_____952E)
 end
 --- 移除编辑器图4区域原有的环境音效并释放该矩形；清理后不再恢复。
 local function _____6E05_7406_56FE4_65E7_80CC_666F_97F3_4E50()
@@ -139,15 +69,9 @@ local function _____6E05_7406_56FE4_65E7_80CC_666F_97F3_4E50()
     end
     local _____77E9_5F62 = jglobals[_____56FE4_533A_57DF_5168_5C40_540D]
     local _____97F3_9891 = jglobals[_____56FE4_65E7_80CC_666F_97F3_4E50_5168_5C40_540D]
-    if _____53E5_67C4_6709_6548(_____77E9_5F62) and _____53E5_67C4_6709_6548(_____97F3_9891) then
-        SetStackedSoundBJ(false, _____97F3_9891, _____77E9_5F62)
-    end
-    if _____53E5_67C4_6709_6548(_____97F3_9891) then
-        StopSound(_____97F3_9891, true, false)
-    end
-    if _____53E5_67C4_6709_6548(_____77E9_5F62) then
-        RemoveRect(_____77E9_5F62)
-    end
+    _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(_____97F3_9891, _____77E9_5F62)
+    _____505C_6B62_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(_____97F3_9891)
+    _____79FB_9664_533A_57DF_80CC_666F_97F3_4E50_77E9_5F62(_____77E9_5F62)
     _____56FE4_65E7_80CC_666F_97F3_4E50_5DF2_6E05_7406 = true
     return true
 end

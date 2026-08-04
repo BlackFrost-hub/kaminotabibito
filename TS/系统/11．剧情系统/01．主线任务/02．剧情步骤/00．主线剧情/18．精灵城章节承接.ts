@@ -48,28 +48,31 @@ function 确保第二幕主线任务已创建(this: void): void {
 
 export function 执行精灵城章节承接(this: void): void {
   设置触发单位控制状态(false, false);
+}
 
+function 执行精灵城章节承接演出(this: void, 参数: Record<string, string | number | boolean>): void {
   const 长老 = 读取语义单位引用("主线NPC.精灵村长老");
   if (长老 != null && 长老 !== 0) {
     EC_CreateEffect("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", GetUnitX(长老), GetUnitY(长老), 0, 270, 2, 1, 1.5);
   }
 
-  const 阻挡 = jglobals.gg_dest_B00X_0013;
+  const 阻挡名 = typeof 参数.隐藏阻挡 === "string" ? 参数.隐藏阻挡 : "gg_dest_B00X_0013";
+  const 阻挡 = jglobals[阻挡名];
   if (阻挡 != null && 阻挡 !== 0) {
     ShowDestructable(阻挡, false);
-  }
-
-  const 通行单位 = jglobals.gg_unit_n025_0033;
-  if (通行单位 != null && 通行单位 !== 0) {
-    SetUnitOwner(通行单位, Player(6), true);
   }
 }
 
 function 执行前往王城(this: void): void {
+  const 通行单位 = jglobals.gg_unit_n025_0033;
+  if (通行单位 != null && 通行单位 !== 0) {
+    SetUnitOwner(通行单位, Player(6), true);
+  }
   确保第二幕主线任务已创建();
 }
 
 export const 精灵城章节承接剧情动作注册表: Record<string, 剧情动作处理器> = {
   "JLC精灵城_章节承接": 执行精灵城章节承接,
+  "JLC精灵城_章节承接演出": 执行精灵城章节承接演出,
   "JLC精灵城_前往王城": 执行前往王城,
 };

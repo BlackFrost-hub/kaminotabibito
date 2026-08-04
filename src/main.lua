@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local runtime = require("jass.runtime")
-runtime.console = false
+runtime.console = true
 runtime.handle_level = 0
 local jassConsole = require("jass.console")
 require("jass.japi")

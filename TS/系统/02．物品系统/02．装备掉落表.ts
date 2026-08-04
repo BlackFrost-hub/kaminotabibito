@@ -81,7 +81,7 @@ export const 装备掉落表: Record<string, UnitData> = {
   "n049": { id: "n049", name: "|cff00ffff水触须|r|cffff0000（头目LV4）|r", level: 4, isUniversal: "FALSE", unitType: "elite" },
   "n00I": { id: "n00I", name: "神秘刺客", level: 4, isUniversal: "FALSE", unitType: "elite" },
   "n01E": { id: "n01E", name: "巨型史莱姆", level: 5, itemIds: "I00C:1;I00E:1;I00D:1;I00G:1", picks: 2, isUniversal: "FALSE", unitType: "elite" },
-  "n01G": { id: "n01G", name: "奇妙鹿|cffff0000（Boss，LV7）|r", level: 7, isUniversal: "FALSE", unitType: "elite" },
+  "n01G": { id: "n01G", name: "奇妙鹿|cffff0000（Boss，LV7）|r", level: 7, itemIds: "I011:always", picks: 1, isUniversal: "FALSE", unitType: "elite" },
   "n05B": { id: "n05B", name: "豺狼首领|cffff00ff（异变LV8）|r", level: 10, isUniversal: "FALSE", unitType: "elite" },
   "n05C": { id: "n05C", name: "豺狼守望者|cffff00ff（异变LV8）|r", level: 10, isUniversal: "FALSE", unitType: "elite" },
   "N00E": { id: "N00E", name: "湖中精灵", level: 10, isUniversal: "FALSE", unitType: "elite" },

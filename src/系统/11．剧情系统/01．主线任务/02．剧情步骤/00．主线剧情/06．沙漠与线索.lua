@@ -2,6 +2,8 @@ local ____lualib = require("lualib_bundle")
 local __TS__StringIncludes = ____lualib.__TS__StringIncludes
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
+local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
+local _____7ED9_73A9_5BB6_7EC4_6DFB_52A0_533A_57DF_89C6_91CE = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["给玩家组添加区域视野"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -45,13 +47,28 @@ local function _____6267_884C_7EBF_7D22NPC_5BF9_8BDD_524D_7F6E(_____53C2_6570)
         IssueImmediateOrder(_____89E6_53D1_5355_4F4D, "stop")
     end
 end
-____exports["执行沙漠情报商人对话前置"] = function(_____53C2_6570)
-    _____6267_884C_7EBF_7D22NPC_5BF9_8BDD_524D_7F6E(_____53C2_6570)
-    local ____53C2_6570__7834_574F_7269_3 = _____53C2_6570["破坏物"]
-    if ____53C2_6570__7834_574F_7269_3 == nil then
-        ____53C2_6570__7834_574F_7269_3 = ""
+____exports["执行沙漠情报商人对话前置"] = function(______53C2_6570)
+    local _____89E6_53D1_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
+    if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then
+        IssueImmediateOrder(_____89E6_53D1_5355_4F4D, "stop")
     end
-    local _____7834_574F_7269_540D = tostring(____53C2_6570__7834_574F_7269_3)
+end
+____exports["执行情报商人线索显视野"] = function(_____53C2_6570)
+    local ____53C2_6570__89C6_91CE_77E9_5F62_3 = _____53C2_6570["视野矩形"]
+    if ____53C2_6570__89C6_91CE_77E9_5F62_3 == nil then
+        ____53C2_6570__89C6_91CE_77E9_5F62_3 = ""
+    end
+    local _____89C6_91CE_77E9_5F62 = tostring(____53C2_6570__89C6_91CE_77E9_5F62_3)
+    if _____89C6_91CE_77E9_5F62 ~= "" then
+        _____7ED9_73A9_5BB6_7EC4_6DFB_52A0_533A_57DF_89C6_91CE(_____89C6_91CE_77E9_5F62)
+    end
+end
+____exports["执行情报商人线索清理阻挡物"] = function(_____53C2_6570)
+    local ____53C2_6570__7834_574F_7269_4 = _____53C2_6570["破坏物"]
+    if ____53C2_6570__7834_574F_7269_4 == nil then
+        ____53C2_6570__7834_574F_7269_4 = ""
+    end
+    local _____7834_574F_7269_540D = tostring(____53C2_6570__7834_574F_7269_4)
     if _____7834_574F_7269_540D == "" then
         return
     end
@@ -60,5 +77,11 @@ ____exports["执行沙漠情报商人对话前置"] = function(_____53C2_6570)
         RemoveDestructable(destructable)
     end
 end
-____exports["沙漠与线索剧情动作注册表"] = {["JLC沙漠_年轻佣兵对话前置"] = _____6267_884C_7EBF_7D22NPC_5BF9_8BDD_524D_7F6E, ["JLC沙漠_年长者对话前置"] = _____6267_884C_7EBF_7D22NPC_5BF9_8BDD_524D_7F6E, ["JLC沙漠_情报商人对话前置"] = ____exports["执行沙漠情报商人对话前置"]}
+____exports["沙漠与线索剧情动作注册表"] = {
+    ["JLC沙漠_年轻佣兵对话前置"] = _____6267_884C_7EBF_7D22NPC_5BF9_8BDD_524D_7F6E,
+    ["JLC沙漠_年长者对话前置"] = _____6267_884C_7EBF_7D22NPC_5BF9_8BDD_524D_7F6E,
+    ["JLC沙漠_情报商人对话前置"] = ____exports["执行沙漠情报商人对话前置"],
+    ["JLC沙漠_情报商人线索显视野"] = ____exports["执行情报商人线索显视野"],
+    ["JLC沙漠_情报商人线索清理阻挡物"] = ____exports["执行情报商人线索清理阻挡物"]
+}
 return ____exports

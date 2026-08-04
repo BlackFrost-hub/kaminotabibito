@@ -9,12 +9,13 @@ local _____8BFB_53D6_77E9_5F62_5F53_524DBoss_6218_4E0A_4E0B_6587 = ____01_FF0EBo
 local _____8BBE_7F6E_77E9_5F62_5F53_524DBoss_6218_4E0A_4E0B_6587 = ____01_FF0EBoss_6218_8FD0_884C_4E0A_4E0B_6587["设置矩形当前Boss战上下文"]
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-local SetStackedSoundBJ = ____require_result_0.SetStackedSoundBJ
+local ____require_result_0 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____6302_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_0["挂载区域背景音乐句柄"]
+local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_0["卸载区域背景音乐句柄"]
+local _____79FB_9664_533A_57DF_80CC_666F_97F3_4E50_77E9_5F62 = ____require_result_0["移除区域背景音乐矩形"]
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_1.debugLogForce
 local GetHandleId = jass.GetHandleId
-local RemoveRect = jass.RemoveRect
 local function _____83B7_53D6_53E5_67C4ID(handle)
     if handle == nil or handle == 0 then
         return 0
@@ -28,7 +29,7 @@ local function _____77E9_5F62_6DFB_52A0_97F3_9891(rectHandle, soundHandle)
     if soundHandle == nil or soundHandle == 0 then
         return
     end
-    SetStackedSoundBJ(true, soundHandle, rectHandle)
+    _____6302_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(true, soundHandle, rectHandle)
 end
 local function _____77E9_5F62_79FB_9664_97F3_9891(rectHandle, soundHandle)
     if rectHandle == nil or rectHandle == 0 then
@@ -37,7 +38,7 @@ local function _____77E9_5F62_79FB_9664_97F3_9891(rectHandle, soundHandle)
     if soundHandle == nil or soundHandle == 0 then
         return
     end
-    SetStackedSoundBJ(false, soundHandle, rectHandle)
+    _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(soundHandle, rectHandle)
 end
 local function _____79FB_9664_4E0A_4E0B_6587_533A_57DF_97F3_9891(context)
     if context == nil then
@@ -59,7 +60,7 @@ local function _____6E05_7406_52A8_6001_5730_70B9_77E9_5F62(context)
     local rectHandle = context["地点矩形"]
     context["地点矩形"] = nil
     context["地点句柄ID"] = 0
-    RemoveRect(rectHandle)
+    _____79FB_9664_533A_57DF_80CC_666F_97F3_4E50_77E9_5F62(rectHandle)
 end
 ____exports["清理矩形Boss战候选音频"] = function(rectHandle)
     if rectHandle == nil or rectHandle == 0 then

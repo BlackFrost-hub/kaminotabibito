@@ -21,21 +21,23 @@ local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩�
 local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
 local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
 local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成AOE技能伤害"]
+local _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成批量AOE技能伤害"]
 local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getEnemyUnitsInRange = ____require_result_6.getEnemyUnitsInRange
 local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
 local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
-local _____8DDD_79BBXY = ____require_result_8["距离XY"]
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_10.Sound3DII_UnitPlayReuse
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_11.stringToFourCCSafe
+local ____require_result_8 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local ResetUnitAnimation = ____require_result_8.ResetUnitAnimation
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_9["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_9["单位存活"]
+local _____8DDD_79BBXY = ____require_result_9["距离XY"]
+local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
+local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_11.Sound3DII_UnitPlayReuse
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_12.stringToFourCCSafe
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitX = jass.GetUnitX
@@ -45,7 +47,6 @@ local SetUnitFlyHeight = jass.SetUnitFlyHeight
 local GetHeroStr = jass.GetHeroStr
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
-local ResetUnitAnimation = jass.ResetUnitAnimation
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local ____R_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____9006_56DE_5341_516D_591C_5355_4F4D_6280_80FD_914D_7F6E["R技能ID"])
 local ____R_6682_505C_6765_6E90 = "逆回十六夜-全力飞踢"
@@ -61,6 +62,19 @@ end
 local ____R_65BD_6CD5_8868 = {}
 local function _____83B7_53D6R_4E0A_4E0B_6587(unit)
     return {unit = unit}
+end
+local function _____5904_7406_9006_56DE_5341_516D_591CR_76EE_6807_7ED3_7B97_540E(target, _index, ______6210_529F, variable)
+    local _____53D8_91CF = variable
+    if _____53D8_91CF == nil then
+        return
+    end
+    _____65BD_52A0_7729_6655(
+        _____53D8_91CF["施法者"],
+        target,
+        _____53D8_91CF["配置"]["眩晕秒"],
+        "全力飞踢",
+        "技能"
+    )
 end
 local function _____7ED3_675FR_65BD_6CD5(record)
     if not record.active then
@@ -134,31 +148,19 @@ local function _____91CA_653E_5168_529B_98DE_8E22(_context, unit, _____6280_80FD
                 })
                 _____521B_5EFA_70B9_7279_6548({["模型路径"] = cfg["命中特效C"], X = x, Y = y, ["持续秒"] = 1.5})
                 local targets = getEnemyUnitsInRange(caster, x, y, cfg["落地半径"])
-                do
-                    local i = 0
-                    while i < #targets do
-                        local target = targets[i + 1]
-                        _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                            ["来源"] = caster,
-                            ["目标"] = target,
-                            ["伤害"] = record.damage,
-                            ["伤害类型"] = DAMAGE_TYPE_NORMAL,
-                            ["来源类型"] = "单位技能",
-                            ["技能ID"] = ____R_6280_80FD_7C7B_578BID,
-                            ["技能实例ID"] = record.skillInstanceId,
-                            ["参与技能伤害加成"] = true,
-                            ["标签"] = "逆回十六夜-全力飞踢"
-                        })
-                        _____65BD_52A0_7729_6655(
-                            caster,
-                            target,
-                            cfg["眩晕秒"],
-                            "全力飞踢",
-                            "技能"
-                        )
-                        i = i + 1
-                    end
-                end
+                _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
+                    ["来源"] = caster,
+                    ["目标列表"] = targets,
+                    ["伤害"] = record.damage,
+                    ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+                    ["来源类型"] = "单位技能",
+                    ["技能ID"] = ____R_6280_80FD_7C7B_578BID,
+                    ["技能实例ID"] = record.skillInstanceId,
+                    ["参与技能伤害加成"] = true,
+                    ["标签"] = "逆回十六夜-全力飞踢",
+                    ["每目标结算后处理器"] = _____5904_7406_9006_56DE_5341_516D_591CR_76EE_6807_7ED3_7B97_540E,
+                    ["变量"] = {["施法者"] = caster, ["配置"] = cfg}
+                })
             end
             _____7ED3_675FR_65BD_6CD5(record)
         end

@@ -6,8 +6,8 @@ local ____exports = {}
 -- 
 -- 功能：计算削减后的控制时间，应用上限
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_0.YDUserDataGet
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_1.stringToFourCC
 local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.00．控制抗性常量")
@@ -19,25 +19,13 @@ local getHeroDuration = ____require_result_3.getHeroDuration
 -- 
 -- 优先级：单位属性 > 玩家属性
 function ____exports.getControlReduction(unit)
-    local unitValue = YDUserDataGet(
-        nil,
-        "unit",
-        unit,
-        "眩晕抗性",
-        "real"
-    )
+    local unitValue = YDUserDataGetSafe("unit", unit, "眩晕抗性", "real")
     if unitValue > 0.01 then
         return unitValue
     end
     local player = jass.GetOwningPlayer(unit)
     if player ~= nil then
-        local playerValue = YDUserDataGet(
-            nil,
-            "player",
-            player,
-            "眩晕抗性",
-            "real"
-        )
+        local playerValue = YDUserDataGetSafe("player", player, "眩晕抗性", "real")
         if playerValue > 0.01 then
             return playerValue
         end

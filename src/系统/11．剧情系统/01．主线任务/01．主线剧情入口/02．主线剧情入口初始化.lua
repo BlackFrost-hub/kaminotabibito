@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____01_FF0E_4E3B_7EBFNPC_521D_59CB_5316_914D_7F6E_8868 = require("系统.11．剧情系统.01．主线任务.01．主线剧情入口.01．主线NPC初始化配置表")
 local _____4E3B_7EBFNPC_521D_59CB_5316_5EF6_8FDF_79D2 = ____01_FF0E_4E3B_7EBFNPC_521D_59CB_5316_914D_7F6E_8868["主线NPC初始化延迟秒"]
@@ -7,6 +8,8 @@ local _____4E3B_7EBF_5267_60C5_5168_5C40_5355_4F4D_5165_53E3_914D_7F6E_8868 = __
 local _____4E3B_7EBF_5267_60C5_5355_4F4D_8303_56F4_5165_53E3_914D_7F6E_8868 = ____01_FF0E_4E3B_7EBFNPC_521D_59CB_5316_914D_7F6E_8868["主线剧情单位范围入口配置表"]
 local _____4E3B_7EBF_5267_60C5_53EF_7834_574F_7269_521D_59CB_5316_914D_7F6E_8868 = ____01_FF0E_4E3B_7EBFNPC_521D_59CB_5316_914D_7F6E_8868["主线剧情可破坏物初始化配置表"]
 local _____4E3B_7EBF_5267_60C5_77E9_5F62_5165_53E3_914D_7F6E_8868 = ____01_FF0E_4E3B_7EBFNPC_521D_59CB_5316_914D_7F6E_8868["主线剧情矩形入口配置表"]
+local ____02_FF0E_5267_60C5NPC_521B_5EFA = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
+local _____521B_5EFA_5267_60C5NPC_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情NPC单位"]
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
@@ -25,70 +28,40 @@ local _____521D_59CB_5316_8FDB_5EA605__51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_6
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local stringToFourCC = ____require_result_0.stringToFourCC
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
-local ____require_result_3 = require("lib.扩展函数.物品相关函数.物品判断函数")
-local UnitHasItemOfTypeBJ = ____require_result_3.UnitHasItemOfTypeBJ
-local ____require_result_4 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterEnterRectSimple = ____require_result_4.TriggerRegisterEnterRectSimple
-local ____require_result_5 = require("系统.02．物品系统.13．物品名反查")
-local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_5["按名字反查物品ID"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-local registerUnitInRangeTrigger = ____require_result_7.registerUnitInRangeTrigger
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
+local ____require_result_2 = require("lib.扩展函数.物品相关函数.物品判断函数")
+local UnitHasItemOfTypeBJ = ____require_result_2.UnitHasItemOfTypeBJ
+local ____require_result_3 = require("lib.扩展函数.BJ函数.01．触发与事件")
+local TriggerRegisterEnterRectSimple = ____require_result_3.TriggerRegisterEnterRectSimple
+local ____require_result_4 = require("系统.02．物品系统.13．物品名反查")
+local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_4["按名字反查物品ID"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
+local ____require_result_6 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
+local registerUnitInRangeTrigger = ____require_result_6.registerUnitInRangeTrigger
+local ____require_result_7 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_7["是玩家英雄组单位"]
 local ____require_result_8 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
 local _____67E5_627E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_8["查找主线剧情片段"]
 local ____require_result_9 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
 local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_9["播放主线剧情片段"]
 local CreateTrigger = jass.CreateTrigger
-local CreateUnit = jass.CreateUnit
 local GetHandleId = jass.GetHandleId
 local GetTriggerUnit = jass.GetTriggerUnit
 local GetTriggeringTrigger = jass.GetTriggeringTrigger
-local Player = jass.Player
 local SetDestructableInvulnerable = jass.SetDestructableInvulnerable
 local TriggerAddAction = jass.TriggerAddAction
-local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local ____require_result_10 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
-local X_FixUnitStandingSafe = ____require_result_10.X_FixUnitStandingSafe
-local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
+local DestroyTrigger = jass.DestroyTrigger
 local _____5DF2_8BF7_6C42_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = false
 local _____5DF2_6267_884C_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = false
 local ____NPC_8FD0_884C_65F6_8868 = {}
 local _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868 = {}
 local function _____83B7_53D6_5168_5C40_53E5_67C4(_____53D8_91CF_540D)
     return jglobals[_____53D8_91CF_540D]
-end
-local function _____8BFB_53D6_5DF2_7ED1_5B9ANPC(_____914D_7F6E)
-    if _____914D_7F6E["YD表"] == nil or _____914D_7F6E["YD键"] == nil or _____914D_7F6E["YD字段"] == nil then
-        return nil
-    end
-    local unit = YDUserDataGetSafe("string", _____914D_7F6E["YD表"], _____914D_7F6E["YD键"], _____914D_7F6E["YD类型"] or "unit")
-    local ____temp_11
-    if unit == nil or unit == 0 then
-        ____temp_11 = nil
-    else
-        ____temp_11 = unit
-    end
-    return ____temp_11
-end
-local function _____5199_5165NPC_7ED1_5B9A(_____914D_7F6E, unit)
-    if _____914D_7F6E["YD表"] == nil or _____914D_7F6E["YD键"] == nil or _____914D_7F6E["YD字段"] == nil then
-        return
-    end
-    YDUserDataSetSafe(
-        "string",
-        _____914D_7F6E["YD表"],
-        _____914D_7F6E["YD键"],
-        _____914D_7F6E["YD类型"] or "unit",
-        unit
-    )
 end
 local function _____8BB0_5F55NPC_8FD0_884C_65F6(_____914D_7F6E, unit)
     if unit == nil or unit == 0 then
@@ -98,22 +71,9 @@ local function _____8BB0_5F55NPC_8FD0_884C_65F6(_____914D_7F6E, unit)
     _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D("主线NPC." .. _____914D_7F6E["配置名"], unit)
 end
 local function _____521D_59CB_5316_5355_4E2ANPC(_____914D_7F6E)
-    local unit = _____8BFB_53D6_5DF2_7ED1_5B9ANPC(_____914D_7F6E)
+    local unit = _____521B_5EFA_5267_60C5NPC_5355_4F4D(_____914D_7F6E)
     if unit == nil then
-        unit = CreateUnit(
-            Player(_____914D_7F6E["玩家ID"] or _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID),
-            stringToFourCC(_____914D_7F6E["单位ID"]),
-            _____914D_7F6E.X,
-            _____914D_7F6E.Y,
-            _____914D_7F6E["朝向"]
-        )
-        _____5199_5165NPC_7ED1_5B9A(_____914D_7F6E, unit)
-    end
-    if _____914D_7F6E["初始化无敌"] == true then
-        SetUnitInvulnerable(unit, true)
-    end
-    if _____914D_7F6E["初始化固定站立"] == true then
-        X_FixUnitStandingSafe(unit)
+        return
     end
     _____8BB0_5F55NPC_8FD0_884C_65F6(_____914D_7F6E, unit)
 end
@@ -150,11 +110,20 @@ local function _____89E6_53D1_5355_4F4D_6EE1_8DB3_5165_53E3_7269_54C1_914D_7F6E(
     end
     return UnitHasItemOfTypeBJ(_____89E6_53D1_5355_4F4D, _____7269_54C1_7C7B_578BID)
 end
+local function _____89E6_53D1_5355_4F4D_6EE1_8DB3_73A9_5BB6_82F1_96C4_914D_7F6E(_____914D_7F6E, _____89E6_53D1_5355_4F4D)
+    if _____914D_7F6E["仅玩家英雄"] ~= true then
+        return true
+    end
+    return _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D)
+end
 local function _____5C1D_8BD5_64AD_653E_5165_53E3_914D_7F6E(_____914D_7F6E, _____89E6_53D1_5355_4F4D)
     if _____914D_7F6E == nil or _____914D_7F6E["剧情片段ID"] == nil then
         return false
     end
     if not _____5267_60C5_8FDB_5EA6_6EE1_8DB3_5165_53E3_914D_7F6E(_____914D_7F6E) then
+        return false
+    end
+    if not _____89E6_53D1_5355_4F4D_6EE1_8DB3_73A9_5BB6_82F1_96C4_914D_7F6E(_____914D_7F6E, _____89E6_53D1_5355_4F4D) then
         return false
     end
     if not _____89E6_53D1_5355_4F4D_6EE1_8DB3_5165_53E3_7269_54C1_914D_7F6E(_____914D_7F6E, _____89E6_53D1_5355_4F4D) then
@@ -203,9 +172,21 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_89E6_53D1()
     do
         local i = 0
         while i < #_____914D_7F6E_5217_8868 do
-            if _____5C1D_8BD5_64AD_653E_5165_53E3_914D_7F6E(_____914D_7F6E_5217_8868[i + 1], _____89E6_53D1_5355_4F4D) then
+            do
+                if not _____5C1D_8BD5_64AD_653E_5165_53E3_914D_7F6E(_____914D_7F6E_5217_8868[i + 1], _____89E6_53D1_5355_4F4D) then
+                    goto __continue30
+                end
+                if _____914D_7F6E_5217_8868[i + 1]["触发后注销"] == true then
+                    __TS__Delete(
+                        _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868,
+                        tostring(GetHandleId(trigger)
+                        )
+                    )
+                    DestroyTrigger(trigger)
+                end
                 return
             end
+            ::__continue30::
             i = i + 1
         end
     end
@@ -231,7 +212,7 @@ local function _____521D_59CB_5316_5355_4F4D_8303_56F4_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_5355_4F4D_8303_56F4_5165_53E3_914D_7F6E_8868[i + 1]
                 local unit = ____NPC_8FD0_884C_65F6_8868[_____914D_7F6E["NPC配置名"]]
                 if unit == nil then
-                    goto __continue40
+                    goto __continue38
                 end
                 local _____5206_652F_5217_8868 = _____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)
                 do
@@ -249,7 +230,7 @@ local function _____521D_59CB_5316_5355_4F4D_8303_56F4_5165_53E3()
                     end
                 end
             end
-            ::__continue40::
+            ::__continue38::
             i = i + 1
         end
     end
@@ -262,14 +243,14 @@ local function _____521D_59CB_5316_77E9_5F62_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_77E9_5F62_5165_53E3_914D_7F6E_8868[i + 1]
                 local _____77E9_5F62 = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["矩形变量名"])
                 if _____77E9_5F62 == nil then
-                    goto __continue46
+                    goto __continue44
                 end
                 TriggerRegisterEnterRectSimple(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
                     _____77E9_5F62
                 )
             end
-            ::__continue46::
+            ::__continue44::
             i = i + 1
         end
     end
@@ -282,7 +263,7 @@ local function _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_5168_5C40_5355_4F4D_5165_53E3_914D_7F6E_8868[i + 1]
                 local unit = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["单位变量名"])
                 if unit == nil then
-                    goto __continue50
+                    goto __continue48
                 end
                 registerUnitInRangeTrigger(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
@@ -292,7 +273,7 @@ local function _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()
                     false
                 )
             end
-            ::__continue50::
+            ::__continue48::
             i = i + 1
         end
     end
@@ -305,11 +286,11 @@ local function _____521D_59CB_5316_53EF_7834_574F_7269()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_53EF_7834_574F_7269_521D_59CB_5316_914D_7F6E_8868[i + 1]
                 local destructable = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["变量名"])
                 if destructable == nil then
-                    goto __continue54
+                    goto __continue52
                 end
                 SetDestructableInvulnerable(destructable, _____914D_7F6E["无敌"])
             end
-            ::__continue54::
+            ::__continue52::
             i = i + 1
         end
     end

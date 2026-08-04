@@ -44,13 +44,7 @@ ____exports.items.I00P = {
     score = 295,
     level = "E-",
     dmg = 2,
-    hp = 50,
-    hpRegen = 50,
-    all = 2,
-    magicDmg = 0.5,
-    cdReduction = 0.5,
-    mpCost = -0.2,
-    Buff = "Buff:dmg:AntiHeal200%;time3+Buff:dmg:Burn20;time6"
+    all = 2
 }
 ____exports.items.I01K = {
     type = "道具/戒指/饰品",
@@ -2154,14 +2148,14 @@ ____exports.items.I05S = {
     name = "改良版医疗剂（中）",
     goldPrice = 300,
     level = "D",
-    hot = "1400hp",
+    hot = "3000hp",
     abilList = "A08C"
 }
 ____exports.items.I05U = {
     type = "道具/戒指/饰品",
     name = "改良版魔法药水（中）",
     goldPrice = 300,
-    hot = "750mp",
+    hot = "1500mp",
     abilList = "A08C"
 }
 ____exports.items.I05V = {type = "材料", name = "熔岩能量", goldPrice = 50}

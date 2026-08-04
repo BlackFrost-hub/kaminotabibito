@@ -39,8 +39,8 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 
 // 导入HOT系统
 const { startHot, isHotActive } = require("系统.04．伤害系统.02．治疗系统.04．持续治疗效果") as {
-  startHot: (target: any, source: any, tickHP: number, tickMP: number, duration: number) => void;
-  isHotActive: (target: any) => boolean;
+  startHot: (this: void, target: any, source: any, tickHP: number, tickMP: number, duration: number) => void;
+  isHotActive: (this: void, target: any) => boolean;
 };
 
 const {

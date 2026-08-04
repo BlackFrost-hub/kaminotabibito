@@ -6,13 +6,12 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const BJ_DEGTORAD = 0.017453292519943295;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 
-import { NPC_CONFIGS, NPCData } from "./03．NPC配置表";
-import { createUnitWithOptions } from "../../../lib/扩展函数/自定义扩展函数/00．单位相关";
+import { NPC_CONFIGS, NPCData } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
+import { 创建剧情NPC单位 } from "../../11．剧情系统/00．公共/02．剧情NPC创建";
 import { runNpcInitAction } from "./05．NPC初始化动作";
 import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．对话框系统/09．NPC头顶与气泡特效";
 
@@ -104,9 +103,13 @@ function createSingleNPC(npcConfig: NPCData): any {
     return null;
   }
 
-  const facingDeg = npcConfig.Facing ?? 270;
-  const facingRad = facingDeg * BJ_DEGTORAD;
-  const unit = createUnitWithOptions(15, unitCode, npcConfig.X, npcConfig.Y, facingRad);
+  const unit = 创建剧情NPC单位({
+    单位ID: unitCode,
+    X: npcConfig.X,
+    Y: npcConfig.Y,
+    朝向: npcConfig.Facing ?? 270,
+    登记死亡排泄: true,
+  });
   if (!unit) {
     debugLog("NPC生成器", "创建单位失败:", tostring(npcConfig.NpcNameID), "(" + unitCode + ")");
     return null;

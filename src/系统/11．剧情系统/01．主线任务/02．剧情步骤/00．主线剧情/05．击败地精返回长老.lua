@@ -3,8 +3,6 @@ local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
-local ____02_FF0E_5267_60C5_6B65_9AA4_64AD_653E_5668 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____02_FF0E_5267_60C5_6B65_9AA4_64AD_653E_5668["播放主线剧情片段"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -18,12 +16,22 @@ local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWEAngleBetweenUnitsSafe = ____require_result_3.YDWEAngleBetweenUnitsSafe
 local ____require_result_4 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_4["是玩家英雄组单位"]
+local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0
+local function _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, _____4E0A_4E0B_6587)
+    if _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0 == nil then
+        local _____64AD_653E_5668_6A21_5757 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+        _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0 = _____64AD_653E_5668_6A21_5757["播放主线剧情片段"]
+    end
+    return _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0(_____7247_6BB5ID, _____4E0A_4E0B_6587)
+end
 local CreateTrigger = jass.CreateTrigger
+local DestroyTrigger = jass.DestroyTrigger
 local GetTriggerUnit = jass.GetTriggerUnit
 local IssueImmediateOrder = jass.IssueImmediateOrder
 local SetUnitFacingTimed = jass.SetUnitFacingTimed
 local TriggerAddAction = jass.TriggerAddAction
 local _____5DF2_521D_59CB_5316_8FDB_5EA605_6838_5FC3 = false
+local _____8FDB_5EA605_8303_56F4_89E6_53D1_5668 = nil
 local function ____on_51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_89E6_53D1()
     local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
     if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
@@ -33,7 +41,11 @@ local function ____on_51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_89E6_53D1()
         return
     end
     local _____7247_6BB5ID = "jlc_goblin_defeated_return_elder"
-    _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, {["片段ID"] = _____7247_6BB5ID, ["触发配置名"] = "击败地精返回长老核心", ["触发单位"] = _____89E6_53D1_5355_4F4D})
+    local _____5DF2_5F00_59CB_64AD_653E = _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, {["片段ID"] = _____7247_6BB5ID, ["触发配置名"] = "击败地精返回长老核心", ["触发单位"] = _____89E6_53D1_5355_4F4D})
+    if _____5DF2_5F00_59CB_64AD_653E and _____8FDB_5EA605_8303_56F4_89E6_53D1_5668 ~= nil and _____8FDB_5EA605_8303_56F4_89E6_53D1_5668 ~= 0 then
+        DestroyTrigger(_____8FDB_5EA605_8303_56F4_89E6_53D1_5668)
+        _____8FDB_5EA605_8303_56F4_89E6_53D1_5668 = nil
+    end
 end
 ____exports["执行击败地精回村前置"] = function(_____53C2_6570)
     local _____89E6_53D1_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
@@ -67,5 +79,6 @@ ____exports["初始化进度05_击败地精返回长老核心"] = function()
     local trigger = CreateTrigger()
     TriggerRegisterUnitInRangeSimple(trigger, 800, _____957F_8001_5355_4F4D)
     TriggerAddAction(trigger, ____on_51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_89E6_53D1)
+    _____8FDB_5EA605_8303_56F4_89E6_53D1_5668 = trigger
 end
 return ____exports

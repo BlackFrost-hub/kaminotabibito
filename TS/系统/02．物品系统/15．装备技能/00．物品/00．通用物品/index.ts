@@ -3,8 +3,8 @@
 const { onItemPickup } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
-const { 是玩家英雄组单位 } = require("./00．通用物品工具") as {
-  是玩家英雄组单位: (this: void, 单位: any) => boolean;
+const { 是玩家英雄或BB } = require("./00．通用物品工具") as {
+  是玩家英雄或BB: (this: void, 单位: any) => boolean;
 };
 const { 处理通用物品吃书清理 } = require("./01．吃书清理") as {
   处理通用物品吃书清理: (this: void, 单位: any, 物品: any) => void;
@@ -25,7 +25,7 @@ const { 处理万浴熔灵传送门 } = require("./01．传送集合") as {
 let 已初始化通用物品拾取 = false;
 
 function on通用物品拾取(this: void, 单位: any, 物品: any): void {
-  if (!是玩家英雄组单位(单位)) return;
+  if (!是玩家英雄或BB(单位)) return;
   处理通用物品吃书清理(单位, 物品);
   处理通用物品获取特效(单位, 物品);
   处理通用物品合成打造(单位, 物品);

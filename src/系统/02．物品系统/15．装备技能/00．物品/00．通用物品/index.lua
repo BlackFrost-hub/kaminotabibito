@@ -3,7 +3,7 @@ local ____exports = {}
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local onItemPickup = ____require_result_0.onItemPickup
 local ____require_result_1 = require("系统.02．物品系统.15．装备技能.00．物品.00．通用物品.00．通用物品工具")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
+local _____662F_73A9_5BB6_82F1_96C4_6216BB = ____require_result_1["是玩家英雄或BB"]
 local ____require_result_2 = require("系统.02．物品系统.15．装备技能.00．物品.00．通用物品.01．吃书清理")
 local _____5904_7406_901A_7528_7269_54C1_5403_4E66_6E05_7406 = ____require_result_2["处理通用物品吃书清理"]
 local ____require_result_3 = require("系统.02．物品系统.15．装备技能.00．物品.00．通用物品.02．获取特效")
@@ -16,7 +16,7 @@ local ____require_result_6 = require("系统.02．物品系统.15．装备技能
 local _____5904_7406_4E07_6D74_7194_7075_4F20_9001_95E8 = ____require_result_6["处理万浴熔灵传送门"]
 local _____5DF2_521D_59CB_5316_901A_7528_7269_54C1_62FE_53D6 = false
 local function ____on_901A_7528_7269_54C1_62FE_53D6(_____5355_4F4D, _____7269_54C1)
-    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____5355_4F4D) then
+    if not _____662F_73A9_5BB6_82F1_96C4_6216BB(_____5355_4F4D) then
         return
     end
     _____5904_7406_901A_7528_7269_54C1_5403_4E66_6E05_7406(_____5355_4F4D, _____7269_54C1)

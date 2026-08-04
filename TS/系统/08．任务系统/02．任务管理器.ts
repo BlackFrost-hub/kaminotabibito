@@ -162,6 +162,10 @@ function onQuestTimeLimitTick(this: void): void {
 
 export const questManager = QuestManager.getInstance();
 
+export function 触发任务UI刷新(this: void, playerId: number, questId?: string): void {
+  questManager.triggerUIRefresh(playerId, questId);
+}
+
 export function init(): void {
   questManager.initialize();
 }

@@ -71,7 +71,7 @@ export interface ChestTypeConfig {
 }
 
 export const 宝箱系统开关 = true;
-export const 影骨莫特斯盗贼宝箱可破坏物ID = "BR02";
+export const 影骨莫特斯盗贼宝箱可破坏物ID = "BZX4";
 
 export const CHEST_TYPES: ChestTypeConfig[] = [
   {
@@ -89,9 +89,6 @@ export const CHEST_TYPES: ChestTypeConfig[] = [
       { 最小值: 91, 最大值: 100, 动作: [{ type: "对开启者施加效果", 保留当前生命比例: 0.3, BuffID: 0, Buff持续时间: 1.5, 自定义BuffID: 影骨莫特斯BuffID.阴影陷阱眩晕, 自定义Buff来源名称: "影骨-阴影陷阱", 命中特效模型路径: "Common\\Effect\\Element\\Dark\\shadowslam(normal size).mdx", 命中特效持续秒: 2, 命中特效缩放: 1.1 }] },
     ] },
   },
-  { destructableType: "B003", openTime: 3.0, name: "普通宝箱", picks: 1, dropMode: { type: "score", range: { min: 100, max: 500 } } },
-  { destructableType: "BR01", openTime: 3.0, name: "首领奖励宝箱" },
-  { destructableType: "LTbx", openTime: 3.0, name: "木桶", picks: 1, dropMode: { type: "pool", items: "初心戒指:1.5;初始生命药水:1;初始魔法药水:2", always: "精灵铁剑" } },
 ];
 
 const _chestTypeIds = new Set<number>();

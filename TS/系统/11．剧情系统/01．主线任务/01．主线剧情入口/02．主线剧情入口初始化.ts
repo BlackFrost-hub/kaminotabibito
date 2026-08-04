@@ -3,9 +3,6 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (this: void, s: string) => number;
-};
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
@@ -28,6 +25,9 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
   registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => () => void;
 };
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
+};
 const { 查找主线剧情片段 } = require("../02．剧情步骤/02．剧情步骤播放器") as {
   查找主线剧情片段: (this: void, 片段ID: string) => any;
 };
@@ -44,6 +44,7 @@ import {
   主线剧情矩形入口配置表,
 } from "./01．主线NPC初始化配置表";
 import type { 主线NPC初始化配置, 主线剧情入口分支配置, 主线剧情入口配置 } from "./00．主线剧情入口类型";
+import { 创建剧情NPC单位 } from "../../00．公共/02．剧情NPC创建";
 import { 读取剧情进度 } from "../00．剧情系统核心工具/01．剧情动作上下文";
 import { 注册剧情运行时单位 } from "../00．剧情系统核心工具/08．剧情运行时单位";
 import { 初始化进度01_精灵村长老发布任务核心 } from "../02．剧情步骤/00．主线剧情/01．精灵村长老发布任务";
@@ -53,18 +54,12 @@ import { 初始化进度04_地精祭祀死亡演出核心 } from "../02．剧情
 import { 初始化进度05_击败地精返回长老核心 } from "../02．剧情步骤/00．主线剧情/05．击败地精返回长老";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
-const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetDestructableInvulnerable = jass.SetDestructableInvulnerable as (this: void, destructable: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
-const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
-  X_FixUnitStandingSafe: (this: void, unit: any) => void;
-};
-const 中立被动玩家ID = 15;
+const DestroyTrigger = jass.DestroyTrigger as (this: void, trig: any) => void;
 let 已请求初始化主线剧情入口 = false;
 let 已执行初始化主线剧情入口 = false;
 const NPC运行时表: Record<string, any> = {};
@@ -75,17 +70,6 @@ function 获取全局句柄(this: void, 变量名: string): any {
   return jglobals[变量名];
 }
 
-function 读取已绑定NPC(this: void, 配置: 主线NPC初始化配置): any {
-  if (配置.YD表 == null || 配置.YD键 == null || 配置.YD字段 == null) return undefined;
-  const unit = YDUserDataGetSafe("string", 配置.YD表, 配置.YD键, 配置.YD类型 ?? "unit");
-  return unit == null || unit === 0 ? undefined : unit;
-}
-
-function 写入NPC绑定(this: void, 配置: 主线NPC初始化配置, unit: any): void {
-  if (配置.YD表 == null || 配置.YD键 == null || 配置.YD字段 == null) return;
-  YDUserDataSetSafe("string", 配置.YD表, 配置.YD键, 配置.YD类型 ?? "unit", unit);
-}
-
 function 记录NPC运行时(this: void, 配置: 主线NPC初始化配置, unit: any): void {
   if (unit == null || unit === 0) return;
   NPC运行时表[配置.配置名] = unit;
@@ -93,13 +77,8 @@ function 记录NPC运行时(this: void, 配置: 主线NPC初始化配置, unit: 
 }
 
 function 初始化单个NPC(this: void, 配置: 主线NPC初始化配置): void {
-  let unit = 读取已绑定NPC(配置);
-  if (unit == null) {
-    unit = CreateUnit(Player(配置.玩家ID ?? 中立被动玩家ID), stringToFourCC(配置.单位ID), 配置.X, 配置.Y, 配置.朝向);
-    写入NPC绑定(配置, unit);
-  }
-  if (配置.初始化无敌 === true) SetUnitInvulnerable(unit, true);
-  if (配置.初始化固定站立 === true) X_FixUnitStandingSafe(unit);
+  const unit = 创建剧情NPC单位(配置);
+  if (unit == null) return;
   记录NPC运行时(配置, unit);
 }
 
@@ -124,9 +103,15 @@ function 触发单位满足入口物品配置(this: void, 配置: 主线剧情�
   return UnitHasItemOfTypeBJ(触发单位, 物品类型ID);
 }
 
+function 触发单位满足玩家英雄配置(this: void, 配置: 主线剧情入口分支配置, 触发单位: any): boolean {
+  if (配置.仅玩家英雄 !== true) return true;
+  return 是玩家英雄组单位(触发单位);
+}
+
 function 尝试播放入口配置(this: void, 配置: 主线剧情入口分支配置, 触发单位: any): boolean {
   if (配置 == null || 配置.剧情片段ID == null) return false;
   if (!剧情进度满足入口配置(配置)) return false;
+  if (!触发单位满足玩家英雄配置(配置, 触发单位)) return false;
   if (!触发单位满足入口物品配置(配置, 触发单位)) return false;
 
   const 片段 = 查找主线剧情片段(配置.剧情片段ID);
@@ -152,7 +137,12 @@ function on主线剧情入口触发(this: void): void {
 
   const 触发单位 = GetTriggerUnit();
   for (let i = 0; i < 配置列表.length; i++) {
-    if (尝试播放入口配置(配置列表[i], 触发单位)) return;
+    if (!尝试播放入口配置(配置列表[i], 触发单位)) continue;
+    if (配置列表[i].触发后注销 === true) {
+      delete 触发器ID对应入口配置列表[tostring(GetHandleId(trigger))];
+      DestroyTrigger(trigger);
+    }
+    return;
   }
 }
 

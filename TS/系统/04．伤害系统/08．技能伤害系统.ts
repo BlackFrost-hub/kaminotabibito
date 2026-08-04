@@ -78,6 +78,41 @@ export interface 技能伤害参数 {
   isDamageTransfer?: boolean;
 }
 
+type 技能伤害上下文参数 = Omit<技能伤害参数, "目标" | "伤害" | "伤害类型">;
+
+export interface 批量AOE技能伤害目标参数 {
+  伤害?: number;
+  伤害类型?: any;
+  attack?: boolean;
+  ranged?: boolean;
+  attackType?: any;
+  weaponType?: any;
+}
+
+export type 批量AOE技能伤害目标处理器 = (
+  this: void,
+  目标: any,
+  索引: number,
+  变量?: any,
+) => 批量AOE技能伤害目标参数 | undefined;
+
+export type 批量AOE技能伤害目标结算后处理器 = (
+  this: void,
+  目标: any,
+  索引: number,
+  成功: boolean,
+  变量?: any,
+) => void;
+
+export type 批量AOE技能伤害参数 = 技能伤害上下文参数 & {
+  目标列表: any[];
+  伤害?: number;
+  伤害类型?: any;
+  每目标处理器?: 批量AOE技能伤害目标处理器;
+  每目标结算后处理器?: 批量AOE技能伤害目标结算后处理器;
+  变量?: any;
+};
+
 export interface 技能伤害上下文 {
   isWrappedSkillDamage: boolean;
   isEquipmentSkillDamage: boolean;
@@ -227,7 +262,7 @@ export function 获取当前技能伤害上下文(this: void): 技能伤害上�
   return 技能伤害上下文栈[技能伤害上下文栈.length - 1] ?? null;
 }
 
-function 创建技能伤害上下文(this: void, 参数: 技能伤害参数): 技能伤害上下文 {
+function 创建技能伤害上下文(this: void, 参数: 技能伤害上下文参数): 技能伤害上下文 {
   const 来源类型 = 参数.来源类型 ?? 参数.装备技能类型 ?? "单位技能";
   const isEquipmentSkillDamage = 是装备技能伤害来源类型(来源类型);
   const equipmentSkillKind = 参数.装备技能类型 ?? (isEquipmentSkillDamage ? 来源类型 as 装备技能伤害类型 : undefined);
@@ -253,6 +288,20 @@ function 创建技能伤害上下文(this: void, 参数: 技能伤害参数): �
   };
 }
 
+function 结算技能伤害(
+  this: void,
+  来源: any,
+  目标: any,
+  伤害: number,
+  伤害类型: any,
+  attack: boolean,
+  ranged: boolean,
+  attackType: any,
+  weaponType: any,
+): boolean {
+  return UnitDamageTarget(来源, 目标, 伤害, attack, ranged, attackType, 伤害类型, weaponType);
+}
+
 export function 造成技能伤害(this: void, 参数: 技能伤害参数): boolean {
   if (参数 == null) return false;
   const 来源 = 参数.来源;
@@ -262,14 +311,14 @@ export function 造成技能伤害(this: void, 参数: 技能伤害参数): bool
 
   const 上下文 = 创建技能伤害上下文(参数);
   技能伤害上下文栈.push(上下文);
-  const result = UnitDamageTarget(
+  const result = 结算技能伤害(
     来源,
     目标,
     伤害,
+    参数.伤害类型,
     参数.attack === true,
     参数.ranged === true,
     参数.attackType ?? ATTACK_TYPE_NORMAL,
-    参数.伤害类型,
     参数.weaponType ?? WEAPON_TYPE_WHOKNOWS
   );
   技能伤害上下文栈.pop();
@@ -295,6 +344,49 @@ export function 造成AOE技能伤害(this: void, 参数: 技能伤害参数): b
     ...参数,
     伤害形态: "AOE",
   });
+}
+
+/**
+ * 在同一个技能伤害上下文中，按目标列表顺序逐个结算AOE伤害。
+ * 每目标处理器会在该目标真正受伤前执行，返回 undefined 可跳过该目标。
+ */
+export function 造成批量AOE技能伤害(this: void, 参数: 批量AOE技能伤害参数): number {
+  if (参数 == null || 参数.来源 == null || 参数.来源 === 0) return 0;
+  if (参数.目标列表 == null || 参数.目标列表.length === 0) return 0;
+
+  const 上下文 = 创建技能伤害上下文({ ...参数, 伤害形态: "AOE" });
+  const 每目标处理器 = 参数.每目标处理器;
+  const 每目标结算后处理器 = 参数.每目标结算后处理器;
+  const 基础伤害 = 参数.伤害 ?? 0;
+  const 基础伤害类型 = 参数.伤害类型;
+  let 成功数量 = 0;
+  技能伤害上下文栈.push(上下文);
+  for (let i = 0; i < 参数.目标列表.length; i++) {
+    const 目标 = 参数.目标列表[i];
+    if (目标 == null || 目标 === 0) continue;
+
+    const 目标参数 = 每目标处理器 != null ? 每目标处理器(目标, i, 参数.变量) : undefined;
+    if (每目标处理器 != null && 目标参数 == null) continue;
+
+    const 伤害 = 目标参数?.伤害 ?? 基础伤害;
+    const 伤害类型 = 目标参数?.伤害类型 ?? 基础伤害类型;
+    if (!(伤害 > 0) || 伤害类型 == null) continue;
+
+    const 成功 = 结算技能伤害(
+      参数.来源,
+      目标,
+      伤害,
+      伤害类型,
+      目标参数?.attack ?? 参数.attack ?? false,
+      目标参数?.ranged ?? 参数.ranged ?? false,
+      目标参数?.attackType ?? 参数.attackType ?? ATTACK_TYPE_NORMAL,
+      目标参数?.weaponType ?? 参数.weaponType ?? WEAPON_TYPE_WHOKNOWS,
+    );
+    if (成功) 成功数量 += 1;
+    if (每目标结算后处理器 != null) 每目标结算后处理器(目标, i, 成功, 参数.变量);
+  }
+  技能伤害上下文栈.pop();
+  return 成功数量;
 }
 
 export {};

@@ -5,18 +5,22 @@ local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local g = require("jass.globals")
-local ____YDWE_6A21_5757 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-local ____require_result_0 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local getRegisteredPlayerHero = ____require_result_0.getRegisteredPlayerHero
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
-local _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_2["沿角度步进直到地形阻挡"]
-local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-local StarOther_PanCameraToTimedForPlayer = ____require_result_3.StarOther_PanCameraToTimedForPlayer
-local ____G_4 = _G
-local onTick10ms = ____G_4.onTick10ms
-local offTick10ms = ____G_4.offTick10ms
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
+local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetRandomDirectionDeg = ____require_result_1.GetRandomDirectionDeg
+local ____require_result_2 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local getRegisteredPlayerHero = ____require_result_2.getRegisteredPlayerHero
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
+local _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_4["沿角度步进直到地形阻挡"]
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+local StarOther_PanCameraToTimedForPlayer = ____require_result_5.StarOther_PanCameraToTimedForPlayer
+local ____G_6 = _G
+local onTick10ms = ____G_6.onTick10ms
+local offTick10ms = ____G_6.offTick10ms
 local _____51B7_5374_6570_5B57_6587_672C_6A21_5757 = require("系统.09．表现系统.01．UI工具.06．冷却数字文本")
 local _____521B_5EFA_51B7_5374_6570_5B57_6587_672C_7EC4 = _____51B7_5374_6570_5B57_6587_672C_6A21_5757["创建冷却数字文本组"]
 local _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C_951A_70B9 = _____51B7_5374_6570_5B57_6587_672C_6A21_5757["设置冷却数字文本锚点"]
@@ -40,7 +44,6 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitName = jass.GetUnitName
 local ReviveHeroLoc = jass.ReviveHeroLoc
-local GetRandomDirectionDeg = jass.GetRandomDirectionDeg
 local Cos = jass.Cos
 local Sin = jass.Sin
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -401,6 +404,13 @@ local function _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss, _____68C0_6D4B
     })
     return {x = _____7ED3_679C["最终X"], y = _____7ED3_679C["最终Y"]}
 end
+local function _____8BFB_53D6_5F53_524D_590D_6D3BBoss()
+    local battleBoss = YDUserDataGetSafe("string", ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, "unit")
+    if _____662F_5426_6709_6548(battleBoss) then
+        return battleBoss
+    end
+    return g.udg_Boss
+end
 local function _____6267_884C_590D_6D3B(dyingUnit)
     if not _____662F_5426_6709_6548(dyingUnit) then
         return
@@ -412,12 +422,12 @@ local function _____6267_884C_590D_6D3B(dyingUnit)
         return
     end
     _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(_____53D6_82F1_96C4_680F_69FD_4F4D(dyingUnit))
-    local _____5269_4F59_6B21_6570 = ____YDWE_6A21_5757:YDUserDataGet("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
+    local _____5269_4F59_6B21_6570 = YDUserDataGetSafe("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
     if _____5269_4F59_6B21_6570 ~= nil and _____5269_4F59_6B21_6570 <= 0 then
         return
     end
     if _____5269_4F59_6B21_6570 ~= nil then
-        ____YDWE_6A21_5757:YDUserDataSet(
+        YDUserDataSetSafe(
             "string",
             _____590D_6D3B_6B21_6570_8868,
             _____590D_6D3B_6B21_6570_5C5E_6027,
@@ -425,7 +435,7 @@ local function _____6267_884C_590D_6D3B(dyingUnit)
             _____5269_4F59_6B21_6570 - 1
         )
     end
-    local boss = ____YDWE_6A21_5757:YDUserDataGet("string", ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, "unit")
+    local boss = _____8BFB_53D6_5F53_524D_590D_6D3BBoss()
     if _____662F_5426_6709_6548(boss) then
         local pos = _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss, dyingUnit)
         if pos == nil then
@@ -487,7 +497,7 @@ ____exports["初始化英雄复活"] = function()
     _____5DF2_6CE8_518C_6B7B_4EA1 = true
     _____521D_59CB_5316_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53()
     if _____8BBE_7F6E_6D4B_8BD5_6B21_6570 then
-        ____YDWE_6A21_5757:YDUserDataSet(
+        YDUserDataSetSafe(
             "string",
             _____590D_6D3B_6B21_6570_8868,
             _____590D_6D3B_6B21_6570_5C5E_6027,

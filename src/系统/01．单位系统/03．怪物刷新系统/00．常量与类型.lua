@@ -3,7 +3,6 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-____exports["怪物刷新模块名"] = "怪物刷新系统"
 ____exports["刷怪表名"] = "刷怪"
 ____exports["刷怪单位组键"] = "单位组"
 ____exports["刷怪延迟秒"] = 55

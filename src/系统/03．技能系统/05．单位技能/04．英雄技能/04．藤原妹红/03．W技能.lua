@@ -26,7 +26,7 @@ local ____require_result_4 = require("系统.00．核心系统.05．中心计时
 local addPeriodicCallback = ____require_result_4.addPeriodicCallback
 local removePeriodicCallback = ____require_result_4.removePeriodicCallback
 local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210AOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成AOE技能伤害"]
+local _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_5["造成批量AOE技能伤害"]
 local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_6.registerDeathListener
 local jass = require("jass.common")
@@ -178,6 +178,12 @@ local function _____5F15_7206_76EE_6807_5141_8BB8_85E4_539F_59B9_7EA2W_4F24_5BB3
     end
     return true
 end
+local function _____51C6_5907_85E4_539F_59B9_7EA2W_5468_671F_76EE_6807_4F24_5BB3(target, _index)
+    return _____5468_671F_76EE_6807_5141_8BB8_85E4_539F_59B9_7EA2W_4F24_5BB3(target) and ({}) or nil
+end
+local function _____51C6_5907_85E4_539F_59B9_7EA2W_5F15_7206_76EE_6807_4F24_5BB3(target, _index)
+    return _____5F15_7206_76EE_6807_5141_8BB8_85E4_539F_59B9_7EA2W_4F24_5BB3(target) and ({}) or nil
+end
 local function _____9020_6210_85E4_539F_59B9_7EA2W_5468_671F_4F24_5BB3(context)
     local caster = context["施法者"]
     local target = context["护盾目标"]
@@ -190,32 +196,19 @@ local function _____9020_6210_85E4_539F_59B9_7EA2W_5468_671F_4F24_5BB3(context)
         GetUnitY(target),
         _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["周期伤害半径"]
     )
-    do
-        local index = 0
-        while index < #targets do
-            do
-                local enemy = targets[index + 1]
-                if not _____5468_671F_76EE_6807_5141_8BB8_85E4_539F_59B9_7EA2W_4F24_5BB3(enemy) then
-                    goto __continue39
-                end
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                    ["来源"] = caster,
-                    ["目标"] = enemy,
-                    ["伤害"] = context["周期伤害"],
-                    ["伤害类型"] = DAMAGE_TYPE_FIRE,
-                    attack = false,
-                    ranged = false,
-                    attackType = ATTACK_TYPE_NORMAL,
-                    weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "单位技能",
-                    ["技能ID"] = _____4E3B_6280_80FDID,
-                    ["伤害形态"] = "AOE"
-                })
-            end
-            ::__continue39::
-            index = index + 1
-        end
-    end
+    _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
+        ["来源"] = caster,
+        ["目标列表"] = targets,
+        ["伤害"] = context["周期伤害"],
+        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+        attack = false,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "单位技能",
+        ["技能ID"] = _____4E3B_6280_80FDID,
+        ["每目标处理器"] = _____51C6_5907_85E4_539F_59B9_7EA2W_5468_671F_76EE_6807_4F24_5BB3
+    })
 end
 local function _____85E4_539F_59B9_7EA2W_5468_671FTick(variable)
     local context = variable
@@ -318,32 +311,19 @@ local function _____5F15_7206_85E4_539F_59B9_7EA2W_62A4_76FE(context, caster)
         GetUnitY(target),
         _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["引爆范围"]
     )
-    do
-        local index = 0
-        while index < #targets do
-            do
-                local enemy = targets[index + 1]
-                if not _____5F15_7206_76EE_6807_5141_8BB8_85E4_539F_59B9_7EA2W_4F24_5BB3(enemy) then
-                    goto __continue59
-                end
-                _____9020_6210AOE_6280_80FD_4F24_5BB3({
-                    ["来源"] = caster,
-                    ["目标"] = enemy,
-                    ["伤害"] = damage,
-                    ["伤害类型"] = DAMAGE_TYPE_FIRE,
-                    attack = true,
-                    ranged = false,
-                    attackType = ATTACK_TYPE_NORMAL,
-                    weaponType = WEAPON_TYPE_WHOKNOWS,
-                    ["来源类型"] = "单位技能",
-                    ["技能ID"] = _____5F15_7206_6280_80FDID,
-                    ["伤害形态"] = "AOE"
-                })
-            end
-            ::__continue59::
-            index = index + 1
-        end
-    end
+    _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
+        ["来源"] = caster,
+        ["目标列表"] = targets,
+        ["伤害"] = damage,
+        ["伤害类型"] = DAMAGE_TYPE_FIRE,
+        attack = true,
+        ranged = false,
+        attackType = ATTACK_TYPE_NORMAL,
+        weaponType = WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "单位技能",
+        ["技能ID"] = _____5F15_7206_6280_80FDID,
+        ["每目标处理器"] = _____51C6_5907_85E4_539F_59B9_7EA2W_5F15_7206_76EE_6807_4F24_5BB3
+    })
     _____79FB_9664_5355_4F4D_6807_7B7E_62A4_76FE(target, _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["护盾标签"])
     _____6E05_7406_85E4_539F_59B9_7EA2W_72B6_6001(caster, context["护盾ID"])
 end
@@ -364,10 +344,10 @@ local function _____85E4_539F_59B9_7EA2W_5355_4F4D_6B7B_4EA1(dyingUnit, _killing
         do
             local context = _____85E4_539F_59B9_7EA2W_4E0A_4E0B_6587_8868[__TS__Number(key)]
             if context == nil then
-                goto __continue66
+                goto __continue62
             end
             if context["施法者"] ~= dyingUnit and context["护盾目标"] ~= dyingUnit then
-                goto __continue66
+                goto __continue62
             end
             local caster = context["施法者"]
             _____6E05_7406_85E4_539F_59B9_7EA2W_72B6_6001(caster, context["护盾ID"])
@@ -378,7 +358,7 @@ local function _____85E4_539F_59B9_7EA2W_5355_4F4D_6B7B_4EA1(dyingUnit, _killing
                 )
             end
         end
-        ::__continue66::
+        ::__continue62::
     end
 end
 ____exports["注册藤原妹红W技能"] = function()

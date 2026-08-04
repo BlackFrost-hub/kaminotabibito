@@ -13,7 +13,7 @@ local _____5220_9664_7269_54C1 = ____require_result_2["删除物品"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
 local UnitAddAbility = jass.UnitAddAbility
-local BJDebugMsg = jass.BJDebugMsg
+local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 ____exports["处理通用物品领取技能"] = function(_____5355_4F4D, _____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return
@@ -31,7 +31,13 @@ ____exports["处理通用物品领取技能"] = function(_____5355_4F4D, _____72
     if _____6280_80FDID == nil or _____6280_80FDID == 0 or _____5DF2_9886_53D6 then
         return
     end
-    BJDebugMsg("（领取成功）")
+    DisplayTimedTextToPlayer(
+        _____73A9_5BB6,
+        0,
+        0,
+        6,
+        "（领取成功）"
+    )
     YDUserDataSetSafe(
         "player",
         _____73A9_5BB6,

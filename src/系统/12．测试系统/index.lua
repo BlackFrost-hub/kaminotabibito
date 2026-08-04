@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- 临时总开关；恢复测试时改回 true。
-local ENABLE_TEST_SYSTEM = false
+local ____00_FF0E_6D4B_8BD5_7CFB_7EDF_5F00_5173 = require("系统.12．测试系统.00．测试系统开关")
+local _____6D4B_8BD5_7CFB_7EDF_603B_5F00_5173 = ____00_FF0E_6D4B_8BD5_7CFB_7EDF_5F00_5173["测试系统总开关"]
 local ENABLE_STES_EVENT_TEST = false
 local ENABLE_YDLOCAL_TEST = false
 local ENABLE_TEST_EVENT = false
@@ -25,8 +25,12 @@ local ENABLE_BOSS_DUAL_HEALTH_BAR_TEST = true
 local ENABLE_BONE_SPEAR_EFFECT_TEST = true
 local ENABLE_BOSS_3D_SOUND_TEST = true
 local ENABLE_SERA_BARE_CREATE_TEST = true
+local ENABLE_MAIN_PROGRESS_TEST = true
 local function loadTests(self)
-    if not ENABLE_TEST_SYSTEM then
+    if ENABLE_MAIN_PROGRESS_TEST then
+        require("系统.12．测试系统.20．主线进度测试")
+    end
+    if not _____6D4B_8BD5_7CFB_7EDF_603B_5F00_5173 then
         return
     end
     if ENABLE_STES_EVENT_TEST then

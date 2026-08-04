@@ -171,6 +171,9 @@ end
 questTimeLimitTasks = {}
 questTimeLimitScanId = 0
 ____exports.questManager = QuestManager:getInstance()
+____exports["触发任务UI刷新"] = function(playerId, questId)
+    ____exports.questManager:triggerUIRefresh(playerId, questId)
+end
 function ____exports.init()
     ____exports.questManager:initialize()
 end

@@ -31,6 +31,7 @@ ____exports["英雄升级配置列表"] = {
     }},
     {heroId = "E004", heroName = "馒头卡", properName = "圆环之理", awakeningSkills = {{level = 2, abilityId = "A01U"}, {level = 5, abilityId = "A0LU"}, {level = 10, abilityId = "A01T"}, {level = 15, abilityId = "A0FR"}}},
     {heroId = "E07R", heroName = "月兔", properName = "狂气の月兔", awakeningSkills = {{level = 2, abilityId = "A0GK"}, {level = 5, abilityId = "A0GI"}, {level = 10, abilityId = "A0GH"}, {level = 15, abilityId = "A0GL"}}},
+    {heroId = "E006", heroName = "死神", properName = "黑崎一护", awakeningSkills = {{level = 2, abilityId = "A01G"}, {level = 5, abilityId = "A01K"}, {level = 10, abilityId = "A01L"}, {level = 15, abilityId = "A01H"}}},
     {heroId = "H00Q", heroName = "爱德华·艾尔利克", properName = "钢之炼金术师", extraAttrs = {{level = 2, repeatEveryLevel = true, manaRegenBonus = 0.3, note = "旧JASS逻辑：爱德华从2级开始，每次升级额外增加0.30法力回复。"}}}
 }
 ____exports["英雄升级配置表"] = (function()

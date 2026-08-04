@@ -28,19 +28,16 @@ const { 获取玩家英雄单位组, 是玩家英雄组单位 } = require("系�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
-const { 注册剧情玩家组传送 } = require("系统.07．地形系统.03．区域传送") as {
-  注册剧情玩家组传送: (this: void, 配置: {
-    入口中心X: number;
-    入口中心Y: number;
-    入口半径: number;
-    目标X: number;
-    目标Y: number;
-    目标面向?: number;
-    条件: (this: void) => boolean;
+const { 注册剧情配置传送, 读取剧情传送配置 } = require("系统.07．地形系统.03．区域传送") as {
+  注册剧情配置传送: (this: void, 配置ID: string, 覆盖: {
     读取玩家英雄组: (this: void) => any;
     允许进入单位?: (this: void, unit: any) => boolean;
-    完成?: (this: void) => void;
+    完成?: (this: void, 触发单位?: any) => void;
   }) => (this: void) => void;
+  读取剧情传送配置: (this: void, 配置ID: string) => {
+    入口中心X: number;
+    入口中心Y: number;
+  } | undefined;
 };
 const { YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
@@ -59,6 +56,7 @@ import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06
 import { 清理剧情运行时单位, 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 进入主线节点 } from "../../00．剧情系统核心工具/10．标准剧情动作";
 import { 开始监听封印核心入口 } from "./48．封印核心场景";
+import { 创建安兹隐藏挑战 } from "./50．异界隐藏挑战入口";
 const { 清理菲尼克斯尔战后地形装饰 } = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.43A．菲尼克斯尔战后地形装饰") as {
   清理菲尼克斯尔战后地形装饰: (this: void) => void;
 };
@@ -81,9 +79,7 @@ const 中立敌对玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 亚伦柯斯Boss名 = "沉睡英魂·亚伦柯斯";
 const 亚伦柯斯正式预置 = { X: 8322.9, Y: -14452.7, 朝向: 270 };
 const 亚伦柯斯进入范围 = 1400;
-const 亚伦柯斯战后入口 = { X: 8389.6, Y: -12280.9 };
-const 亚伦柯斯战后落点 = { X: 10641.8, Y: -9804.5 };
-const 亚伦柯斯战后传送半径 = 420;
+const 亚伦柯斯战后传送配置ID = "jlc_aronkos_aftermath";
 const 亚伦柯斯战后传送模型 = "Common\\Effect\\Form\\Portal\\RicketSecretRoomShift.mdx";
 
 interface 亚伦柯斯前导状态 {
@@ -138,11 +134,6 @@ function 清理亚伦柯斯战后传送(this: void): void {
   当前亚伦柯斯战后传送状态 = undefined;
 }
 
-function 剧情进度允许亚伦柯斯战后传送(this: void): boolean {
-  const 当前进度 = 读取剧情进度();
-  return 当前进度 === 47 || 当前进度 === 48;
-}
-
 function 读取亚伦柯斯战后玩家英雄组(this: void): any {
   return 获取玩家英雄单位组();
 }
@@ -185,27 +176,23 @@ function 完成亚伦柯斯战后传送(this: void, 触发单位?: any): void {
 }
 
 function 创建亚伦柯斯战后传送门(this: void): void {
+  const 传送配置 = 读取剧情传送配置(亚伦柯斯战后传送配置ID);
+  if (传送配置 == null) return;
+
   const 状态 = 当前亚伦柯斯战后传送状态 ?? { 已传送: false };
   当前亚伦柯斯战后传送状态 = 状态;
   if (状态.已传送) return;
   if (状态.传送门特效 == null || 状态.传送门特效 === 0) {
     状态.传送门特效 = 创建点特效({
       模型路径: 亚伦柯斯战后传送模型,
-      X: 亚伦柯斯战后入口.X,
-      Y: 亚伦柯斯战后入口.Y,
+      X: 传送配置.入口中心X,
+      Y: 传送配置.入口中心Y,
       Z: 0,
       缩放: 1,
     });
   }
   if (状态.取消传送注册 != null) return;
-  状态.取消传送注册 = 注册剧情玩家组传送({
-    入口中心X: 亚伦柯斯战后入口.X,
-    入口中心Y: 亚伦柯斯战后入口.Y,
-    入口半径: 亚伦柯斯战后传送半径,
-    目标X: 亚伦柯斯战后落点.X,
-    目标Y: 亚伦柯斯战后落点.Y,
-    目标面向: 90,
-    条件: 剧情进度允许亚伦柯斯战后传送,
+  状态.取消传送注册 = 注册剧情配置传送(亚伦柯斯战后传送配置ID, {
     读取玩家英雄组: 读取亚伦柯斯战后玩家英雄组,
     允许进入单位: 亚伦柯斯战后允许进入,
     完成: 完成亚伦柯斯战后传送,
@@ -221,6 +208,7 @@ function on亚伦柯斯死亡(this: void, dyingUnit: any, _killingUnit: any): vo
   if (墓地阻挡 != null && 墓地阻挡 !== 0) RemoveDestructable(墓地阻挡);
   进入主线节点(48);
   创建亚伦柯斯战后传送门();
+  创建安兹隐藏挑战();
 }
 
 function 播放亚伦柯斯前导(this: void, 触发单位: any): void {

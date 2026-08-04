@@ -13,6 +13,8 @@ local ____require_result_2 = require("系统.05．Buff系统.02．Buff数据表.
 local _____6309_540D_5B57_53CD_67E5BuffID = ____require_result_2["按名字反查BuffID"]
 local BUFF_BLOODLUST = _____6309_540D_5B57_53CD_67E5BuffID("嗜血术") or "Bblo"
 local IssuePointOrder = jass.IssuePointOrder
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_3["单位是否正在原生施法"]
 local _____7279_6B8A_903B_8F91_6620_5C04 = {}
 local function _____8718_86DB_5973_7687_53D7_51FB_55B7_5C04(_config, unit, source)
     if jass.GetRandomInt(1, 8) ~= 1 then
@@ -104,6 +106,9 @@ _____7279_6B8A_903B_8F91_6620_5C04["奇妙鹿受击反制"] = _____5947_5999_9E7
 _____7279_6B8A_903B_8F91_6620_5C04["灵毒王蛇受击连招"] = _____7075_6BD2_738B_86C7_53D7_51FB_8FDE_62DB
 ____exports["执行受击反应特殊逻辑"] = function(config, unit, source)
     if config["特殊逻辑名"] == nil or config["特殊逻辑名"] == "" then
+        return false
+    end
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(unit) then
         return false
     end
     local fn = _____7279_6B8A_903B_8F91_6620_5C04[config["特殊逻辑名"]]

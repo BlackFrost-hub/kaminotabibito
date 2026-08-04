@@ -4,12 +4,13 @@ local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____01_FF0E_533A_57DF_80CC_666F_97F3_4E50_914D_7F6E_8868 = require("系统.07．地形系统.07．区域背景音乐.01．区域背景音乐配置表")
 local _____533A_57DF_80CC_666F_97F3_4E50_914D_7F6E_8868 = ____01_FF0E_533A_57DF_80CC_666F_97F3_4E50_914D_7F6E_8868.default
+local ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____6302_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["挂载区域背景音乐句柄"]
+local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____04_FF0E_533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6["卸载区域背景音乐句柄"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-local SetStackedSoundBJ = ____require_result_0.SetStackedSoundBJ
 local GetRandomInt = jass.GetRandomInt
 local _____968F_673A_73AF_5883_97F3_4E50_7ED3_679C = __TS__New(Map)
 local function _____8BFB_53D6_533A_57DF_53E5_67C4(_____533A_57DF_53D8_91CF_540D)
@@ -29,16 +30,14 @@ local function _____5378_8F7D_533A_57DF_97F3_9891(rectHandle, soundVarName)
     if rectHandle == nil or rectHandle == 0 or soundHandle == nil or soundHandle == 0 then
         return false
     end
-    SetStackedSoundBJ(false, soundHandle, rectHandle)
-    return true
+    return _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(soundHandle, rectHandle)
 end
 local function _____6302_8F7D_533A_57DF_97F3_9891(rectHandle, soundVarName)
     local soundHandle = _____8BFB_53D6_97F3_9891_53E5_67C4(soundVarName)
     if rectHandle == nil or rectHandle == 0 or soundHandle == nil or soundHandle == 0 then
         return false
     end
-    SetStackedSoundBJ(true, soundHandle, rectHandle)
-    return true
+    return _____6302_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(true, soundHandle, rectHandle)
 end
 local function _____83B7_53D6_73AF_5883_97F3_4E50_53D8_91CF_540D(_____914D_7F6E)
     local _____968F_673A_5217_8868 = _____914D_7F6E["随机环境音乐变量名列表"]

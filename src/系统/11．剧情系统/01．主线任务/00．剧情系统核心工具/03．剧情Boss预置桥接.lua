@@ -6,12 +6,15 @@ local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧�
 local _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["写入当前剧情动作上下文"]
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
+local ____12_FF0E_5267_60C5Boss_6218_9884_8B66 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情Boss战预警")
+local _____53D1_5E03_4E3B_7EBFBoss_6218_524D_63D0_793A = ____12_FF0E_5267_60C5Boss_6218_9884_8B66["发布主线Boss战前提示"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
 local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
 local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_2["按名字反查Boss单位ID"]
@@ -29,8 +32,9 @@ local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩�
 local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_8["移除单位暂停"]
 local ____require_result_9 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.06．Boss战护卫")
 local _____767B_8BB0Boss_6218_5F85_5E26_5165_62A4_536B = ____require_result_9["登记Boss战待带入护卫"]
+local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
+local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_10["注册剧情运行时单位"]
 local CreateTrigger = jass.CreateTrigger
-local CreateUnit = jass.CreateUnit
 local GetHandleId = jass.GetHandleId
 local GetTriggerUnit = jass.GetTriggerUnit
 local GetTriggeringTrigger = jass.GetTriggeringTrigger
@@ -51,6 +55,7 @@ local GroupRemoveUnit = jass.GroupRemoveUnit
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local StopMusic = jass.StopMusic
 local TriggerAddAction = jass.TriggerAddAction
+local DestroyTrigger = jass.DestroyTrigger
 ____exports["剧情Boss预置暂停来源"] = "剧情系统:Boss预置"
 local _____8303_56F4_9884_7F6E_89E6_53D1_914D_7F6E_8868 = {}
 local _____5267_60C5Boss_9884_7F6E_968F_4ECE_8868 = {}
@@ -124,14 +129,19 @@ local function ____on_5267_60C5Boss_8303_56F4_9884_7F6E_89E6_53D1()
     if _____914D_7F6E["需要剧情进度"] ~= nil and _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= _____914D_7F6E["需要剧情进度"] then
         return
     end
+    __TS__Delete(
+        _____8303_56F4_9884_7F6E_89E6_53D1_914D_7F6E_8868,
+        GetHandleId(trigger)
+    )
+    DestroyTrigger(trigger)
     _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587({
         ["片段ID"] = _____914D_7F6E["剧情片段ID"],
         ["触发配置名"] = _____914D_7F6E["配置名"],
         ["触发单位"] = GetTriggerUnit()
     })
     if _____914D_7F6E["剧情片段ID"] ~= nil and _____914D_7F6E["剧情片段ID"] ~= "" then
-        local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-        local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_10["播放主线剧情片段"]
+        local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+        local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_11["播放主线剧情片段"]
         _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____914D_7F6E["剧情片段ID"])
     end
 end
@@ -188,9 +198,9 @@ ____exports["创建并登记剧情Boss预置随从"] = function(bossUnit, _____5
                 if not (unitTypeId > 0) then
                     goto __continue30
                 end
-                local ____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE_result_11 = _____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE(unitTypeId, _____53C2_6570.X, _____53C2_6570.Y)
-                if ____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE_result_11 == nil then
-                    ____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE_result_11 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
+                local ____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE_result_12 = _____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE(unitTypeId, _____53C2_6570.X, _____53C2_6570.Y)
+                if ____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE_result_12 == nil then
+                    ____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE_result_12 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
                         Player(15),
                         unitTypeId,
                         _____53C2_6570.X,
@@ -198,7 +208,7 @@ ____exports["创建并登记剧情Boss预置随从"] = function(bossUnit, _____5
                         _____53C2_6570["朝向"] or 0
                     )
                 end
-                local unit = ____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE_result_11
+                local unit = ____83B7_53D6_6216_6E05_7406_9644_8FD1_9884_7F6E_968F_4ECE_result_12
                 if unit == nil or unit == 0 then
                     goto __continue30
                 end
@@ -266,13 +276,27 @@ ____exports["消费剧情Boss战带入随从"] = function(bossUnit)
     return _____968F_4ECE_5217_8868
 end
 ____exports["创建并冻结剧情Boss预置"] = function(_____53C2_6570)
+    local _____952E_4FE1_606F = _____89E3_6790Boss_8868_952E(_____53C2_6570["Boss键"])
+    if _____952E_4FE1_606F["键名"] ~= "" then
+        local _____5DF2_6709Boss = YDUserDataGetSafe("string", _____952E_4FE1_606F["表名"], _____952E_4FE1_606F["键名"], "unit")
+        if _____5DF2_6709Boss ~= nil and _____5DF2_6709Boss ~= 0 and _____5355_4F4D_5B58_6D3B(_____5DF2_6709Boss) then
+            _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D((_____952E_4FE1_606F["表名"] .. ".") .. _____952E_4FE1_606F["键名"], _____5DF2_6709Boss)
+            if _____53C2_6570["预创建后暂停"] == true then
+                _____6DFB_52A0_5355_4F4D_6682_505C(_____5DF2_6709Boss, ____exports["剧情Boss预置暂停来源"])
+            end
+            if _____53C2_6570["预创建后无敌"] == true then
+                SetUnitInvulnerable(_____5DF2_6709Boss, true)
+            end
+            return _____5DF2_6709Boss
+        end
+    end
     local rawId = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID(_____53C2_6570["Boss名"])
     local unitTypeId = stringToFourCCSafe(rawId)
     if not (unitTypeId > 0) then
         return nil
     end
     StopMusic(false)
-    local bossUnit = CreateUnit(
+    local bossUnit = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
         Player(15),
         unitTypeId,
         _____53C2_6570.X,
@@ -282,13 +306,16 @@ ____exports["创建并冻结剧情Boss预置"] = function(_____53C2_6570)
     if bossUnit == nil or bossUnit == 0 then
         return nil
     end
+    if _____952E_4FE1_606F["键名"] ~= "" then
+        _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D((_____952E_4FE1_606F["表名"] .. ".") .. _____952E_4FE1_606F["键名"], bossUnit)
+    end
+    _____53D1_5E03_4E3B_7EBFBoss_6218_524D_63D0_793A(bossUnit)
     if _____53C2_6570["预创建后暂停"] == true then
         _____6DFB_52A0_5355_4F4D_6682_505C(bossUnit, ____exports["剧情Boss预置暂停来源"])
     end
     if _____53C2_6570["预创建后无敌"] == true then
         SetUnitInvulnerable(bossUnit, true)
     end
-    local _____952E_4FE1_606F = _____89E3_6790Boss_8868_952E(_____53C2_6570["Boss键"])
     if _____952E_4FE1_606F["键名"] ~= "" then
         YDUserDataSetSafe(
             "string",

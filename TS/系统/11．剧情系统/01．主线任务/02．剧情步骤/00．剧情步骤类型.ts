@@ -17,6 +17,8 @@ export interface 剧情步骤基础 {
   id?: string;
   名称?: string;
   可跳过?: boolean;
+  /** ESC 快进时是否执行该动作；未填写的旧配置保持执行以兼容既有剧情。 */
+  跳过也执行?: boolean;
   倍速系数?: number;
 }
 
@@ -170,6 +172,8 @@ export interface 紧凑剧情动作行 {
   对白序号?: number;
   时间秒?: number;
   名称?: string;
+  /** ESC 快进时是否执行该动作；纯演出动作应显式设为 false。 */
+  跳过也执行?: boolean;
   参数?: Record<string, string | number | boolean>;
   旧JASS?: string;
   说明?: string;

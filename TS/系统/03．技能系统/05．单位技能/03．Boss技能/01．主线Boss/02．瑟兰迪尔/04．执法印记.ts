@@ -32,6 +32,9 @@ const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (unit: any) => number;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
+const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+  单位是否正在原生施法: (this: void, unit: any) => boolean;
+};
 
 const 瑟兰迪尔单位ID = stringToFourCC("N057");
 let 伤害修正已注册 = false;
@@ -79,6 +82,7 @@ export function 释放瑟兰迪尔执法印记(this: void, context: 瑟兰迪尔
   const durationMs = config.持续秒 * 1000;
   setThreat(context.Boss单位, target, 1000);
   设置强制攻击目标(context.Boss单位, target, durationMs);
+  if (单位是否正在原生施法(context.Boss单位)) return true;
   IssueTargetOrder(context.Boss单位, "attack", target);
   设置当前目标(GetHandleId(context.Boss单位), GetHandleId(target));
   registerManualBuff(target, config.BuffID, config.持续秒, bonus, {

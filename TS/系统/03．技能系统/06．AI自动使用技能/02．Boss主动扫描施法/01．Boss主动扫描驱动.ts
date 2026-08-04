@@ -23,6 +23,9 @@ const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   getServerTime: (this: void) => number;
 };
+const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+  单位是否正在原生施法: (this: void, unit: any) => boolean;
+};
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
@@ -426,6 +429,9 @@ function 尝试驱动单个Boss(context: { Boss单位: any; 来源: string; 注�
     return;
   }
   if (配置.AI模式 !== "固定技能表") {
+    return;
+  }
+  if (单位是否正在原生施法(unit)) {
     return;
   }
 

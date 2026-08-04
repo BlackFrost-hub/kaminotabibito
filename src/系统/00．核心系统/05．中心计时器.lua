@@ -18,7 +18,7 @@ local ____exports = {}
 -- 
 -- ## 时间模型（内部状态）
 -- - **nowMs** ≈ `_serverTime + _millisCounter * 10`：`getServerTime()` / 多数逻辑用的「毫秒」。
--- - **服务器锚点**：`initCenterTimer` 内 `DzAPI_Map_GetGameStartTime()` → `_serverTime`（毫秒档，每秒整 tick 时 +1000）。
+-- - **时间锚点**：不读取平台服务器时间，从 0 开始按游戏逻辑时间递增。
 -- - **游戏经过时间**：`_gameElapsedTime`（秒，含小数），写入 `jass.globals.udg_Elapsed`（若存在）。
 -- - **游戏内 [秒,分,时]**：`_gameTimeHMS`，每秒推进并写入 `jass.udg_Time[0..2]`（若存在）。
 -- - **日历**：`calcDate` / `updateDate` 与旧版 JASS `gettime.j` 一致：`BASE_TIMESTAMP`(2015-01-01 UTC) + `TIMEZONE_OFFSET`(东八区秒)。
@@ -38,13 +38,11 @@ local ____exports = {}
 -- ## 副作用
 -- 模块加载即注册 `TimerStart(..., 0, false, initCenterTimer)`，游戏开始后一帧内拉起主循环。
 local jass = require("jass.common")
-local japi = require("jass.japi")
 local jassGlobals = require("jass.globals")
 local R2I = jass.R2I
 local CreateTimer = jass.CreateTimer
 local DestroyTimer = jass.DestroyTimer
 local TimerStart = jass.TimerStart
-local DzAPI_Map_GetGameStartTime = japi.DzAPI_Map_GetGameStartTime
 local _____8C03_8BD5_8F93_51FA = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local NORMAL_MON_DAYS = {
     0,
@@ -86,6 +84,10 @@ local _tickCallbacks = {}
 --- 当前逻辑毫秒（与 getServerTime 一致）
 local function nowMs()
     return _serverTime + _millisCounter * 10
+end
+local function gameElapsedMilliseconds()
+    local elapsedSeconds = _gameTimeHMS[3] * 3600 + _gameTimeHMS[2] * 60 + _gameTimeHMS[1]
+    return elapsedSeconds * 1000 + _millisCounter * 10
 end
 local function intFloor(value)
     return R2I(value)
@@ -215,6 +217,10 @@ local function executeCurrentDelayedCallback()
         _currentDelayedCallback(_currentDelayedVariable)
     end
 end
+local function getTimerCallbackModule(prefix, callback)
+    local callbackLabel = _____8C03_8BD5_8F93_51FA.getCallbackDebugLabel(callback)
+    return callbackLabel ~= "" and (prefix .. " -> ") .. callbackLabel or prefix
+end
 local function runPeriodicCallbacks()
     local now = nowMs()
     for ____, p in ipairs(_periodicCallbacks) do
@@ -222,7 +228,10 @@ local function runPeriodicCallbacks()
             p.lastRunTime = now
             _currentPeriodicCallback = p.callback
             _currentPeriodicVariable = p.variable
-            _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-周期回调", executeCurrentPeriodicCallback)
+            _____8C03_8BD5_8F93_51FA.safeExecute(
+                getTimerCallbackModule("中心计时器-周期回调", p.callback),
+                executeCurrentPeriodicCallback
+            )
             _currentPeriodicCallback = nil
             _currentPeriodicVariable = nil
         end
@@ -237,13 +246,16 @@ local function runDelayedCallbacks()
             do
                 local d = _delayedCallbacks[i + 1]
                 if not d.active then
-                    goto __continue34
+                    goto __continue36
                 end
                 if now >= d.dueTime then
                     d.active = false
                     _currentDelayedCallback = d.callback
                     _currentDelayedVariable = d.variable
-                    _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-延迟回调", executeCurrentDelayedCallback)
+                    _____8C03_8BD5_8F93_51FA.safeExecute(
+                        getTimerCallbackModule("中心计时器-延迟回调", d.callback),
+                        executeCurrentDelayedCallback
+                    )
                     _currentDelayedCallback = nil
                     _currentDelayedVariable = nil
                 else
@@ -251,7 +263,7 @@ local function runDelayedCallbacks()
                     writeIndex = writeIndex + 1
                 end
             end
-            ::__continue34::
+            ::__continue36::
             i = i + 1
         end
     end
@@ -270,7 +282,10 @@ local function onTick()
         jassGlobals.udg_Elapsed = _gameElapsedTime
     end
     for ____, cb in ipairs(_tickCallbacks) do
-        _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-10ms回调", cb)
+        _____8C03_8BD5_8F93_51FA.safeExecute(
+            getTimerCallbackModule("中心计时器-10ms回调", cb),
+            cb
+        )
     end
     runPeriodicCallbacks()
     runDelayedCallbacks()
@@ -279,7 +294,7 @@ local function onTick()
     end
     _millisCounter = 0
     _serverTime = _serverTime + 1000
-    calcDate(_serverTime / 1000)
+    calcDate(BASE_TIMESTAMP + _serverTime / 1000)
     _gameTimeHMS[1] = _gameTimeHMS[1] + 1
     if _gameTimeHMS[1] >= 60 then
         _gameTimeHMS[1] = 0
@@ -296,7 +311,10 @@ local function onTick()
         jt[2] = _gameTimeHMS[3]
     end
     for ____, cb in ipairs(_secondCallbacks) do
-        _____8C03_8BD5_8F93_51FA.safeExecute("中心计时器-秒回调", cb)
+        _____8C03_8BD5_8F93_51FA.safeExecute(
+            getTimerCallbackModule("中心计时器-秒回调", cb),
+            cb
+        )
     end
 end
 function ____exports.getServerTime()
@@ -309,7 +327,7 @@ function ____exports.getTime(i)
     return _timeCache[TIME_GET_KEYS[i + 1]]
 end
 function ____exports.getGameTime()
-    return nowMs() - (_initialized and _serverTime or 0)
+    return gameElapsedMilliseconds()
 end
 function ____exports.getGameElapsedTime()
     return _gameElapsedTime
@@ -318,7 +336,7 @@ function ____exports.getGameTimeHMS()
     return {_gameTimeHMS[1], _gameTimeHMS[2], _gameTimeHMS[3]}
 end
 function ____exports.getGameTimeFormatted()
-    local totalMs = nowMs()
+    local totalMs = gameElapsedMilliseconds()
     local totalSec = intFloor(totalMs / 1000)
     return {
         hours = intFloor(totalSec / 3600),
@@ -435,8 +453,6 @@ function ____exports.initCenterTimer()
         bootstrapTimer = nil
     end
     _initialized = true
-    local startTime = DzAPI_Map_GetGameStartTime()
-    _serverTime = startTime * 1000
     local dr = jassGlobals.udg_N
     if dr ~= nil then
         _gameDifficulty = maxNum(
@@ -444,7 +460,7 @@ function ____exports.initCenterTimer()
             intFloor(dr)
         )
     end
-    calcDate(_serverTime / 1000)
+    calcDate(BASE_TIMESTAMP + _serverTime / 1000)
     local timer = CreateTimer()
     TimerStart(timer, 0.01, true, onTick)
 end

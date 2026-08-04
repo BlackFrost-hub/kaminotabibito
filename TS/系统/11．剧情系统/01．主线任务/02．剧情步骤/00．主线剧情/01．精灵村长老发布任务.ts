@@ -1,11 +1,6 @@
 /** @noSelfInFile */
 
 const jglobals = require("jass.globals") as any;
-const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  添加单位暂停: (this: void, unit: any, source: string) => boolean;
-  移除单位暂停: (this: void, unit: any, source: string) => boolean;
-};
-const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 const { SetUnitFacingToFaceUnitTimed, ModifyHeroStat } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   SetUnitFacingToFaceUnitTimed: (this: void, whichUnit: any, target: any, duration: number) => void;
   ModifyHeroStat: (this: void, whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
@@ -20,16 +15,12 @@ const { RectContainsUnit } = require("lib.扩展函数.BJ函数.04．矩形与�
 const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
   TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
 };
-const { YDUserDataGetSafe, YDUserDataSetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
 };
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
-};
-const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．单位配置表.02．Boss配置表") as {
-  按名字反查Boss单位ID: (this: void, name: string) => string | undefined;
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
@@ -43,7 +34,6 @@ const {
   CreateFogModifierRect,
   CreateItem,
   CreateTrigger,
-  CreateUnit,
   DestroyGroup,
   FirstOfGroup,
   FogModifierStart,
@@ -60,12 +50,10 @@ const {
   IssueImmediateOrder,
   Location,
   Player,
-  PLAYER_NEUTRAL_PASSIVE,
   RemoveLocation,
   RemoveRect,
   SetUnitFacing,
   SetUnitFacingTimed,
-  SetUnitInvulnerable,
   SetUnitOwner,
   StopMusic,
   TriggerAddAction,
@@ -76,7 +64,6 @@ const {
   CreateFogModifierRect: (this: void, whichPlayer: any, whichState: any, where: any, useSharedVision: boolean, afterUnits: boolean) => any;
   CreateItem: (this: void, itemId: number, x: number, y: number) => any;
   CreateTrigger: (this: void) => any;
-  CreateUnit: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
   DestroyGroup: (this: void, whichGroup: any) => void;
   FirstOfGroup: (this: void, whichGroup: any) => any;
   FogModifierStart: (this: void, whichFog: any) => void;
@@ -93,12 +80,10 @@ const {
   IssueImmediateOrder: (this: void, whichUnit: any, order: string) => boolean;
   Location: (this: void, x: number, y: number) => any;
   Player: (this: void, whichPlayer: number) => any;
-  PLAYER_NEUTRAL_PASSIVE: number;
   RemoveLocation: (this: void, whichLocation: any) => void;
   RemoveRect: (this: void, whichRect: any) => void;
   SetUnitFacing: (this: void, whichUnit: any, facing: number) => void;
   SetUnitFacingTimed: (this: void, whichUnit: any, facing: number, duration: number) => void;
-  SetUnitInvulnerable: (this: void, whichUnit: any, flag: boolean) => void;
   SetUnitOwner: (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
   StopMusic: (this: void, fadeOut: boolean) => void;
   TriggerAddAction: (this: void, trig: any, action: (this: void) => void) => any;
@@ -110,7 +95,20 @@ const { 触发单位增加基础全属性 } = require("../../00．剧情系统�
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
-import { 播放主线剧情片段 } from "../02．剧情步骤播放器";
+import { 创建并冻结剧情Boss预置 } from "../../00．剧情系统核心工具/03．剧情Boss预置桥接";
+
+type 播放主线剧情片段函数 = (this: void, 片段ID: string, 上下文?: any) => boolean;
+let 播放主线剧情片段实现: 播放主线剧情片段函数 | undefined;
+
+function 播放主线剧情片段(this: void, 片段ID: string, 上下文?: any): boolean {
+  if (播放主线剧情片段实现 == null) {
+    const 播放器模块 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器") as {
+      播放主线剧情片段: 播放主线剧情片段函数;
+    };
+    播放主线剧情片段实现 = 播放器模块.播放主线剧情片段;
+  }
+  return 播放主线剧情片段实现(片段ID, 上下文);
+}
 
 const bj_HEROSTAT_STR = jglobals.bj_HEROSTAT_STR as number;
 const bj_HEROSTAT_AGI = jglobals.bj_HEROSTAT_AGI as number;
@@ -229,19 +227,21 @@ export function 执行地精区域显视野(this: void, 参数: 剧情动作参�
 }
 
 export function 执行地精祭祀Boss预备(this: void, 参数: 剧情动作参数表): void {
-  StopMusic(false);
-  const bossRawId = 按名字反查Boss单位ID(String(参数.Boss名 ?? "地精祭祀")) ?? 按名字反查Boss单位ID("地精祭祀|cffff0000（BossLV12）|r");
-  const bossTypeId = stringToFourCCSafe(bossRawId);
-  if (!(bossTypeId > 0)) return;
-  const bossUnit = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), bossTypeId, Number(参数.X) || -26032.4, Number(参数.Y) || -13789.5, Number(参数.朝向) || 270);
-  if (bossUnit == null || bossUnit === 0) return;
-  YDUserDataSetSafe("string", "Boss", "地精巫师", "unit", bossUnit);
-  if (参数.预创建后暂停 === true) {
-    添加单位暂停(bossUnit, 剧情Boss预置暂停来源);
-  } else {
-    移除单位暂停(bossUnit, 剧情Boss预置暂停来源);
-  }
-  SetUnitInvulnerable(bossUnit, 参数.预创建后无敌 === true);
+  // 创建、暂停、无敌、运行时登记和范围事件统一由通用 Boss 预置桥接处理。
+  // 这里保留原动作 ID 作为兼容入口，避免旧配置绕过统一生命周期。
+  创建并冻结剧情Boss预置({
+    Boss键: String(参数.Boss键 ?? "Boss.地精巫师"),
+    Boss名: String(参数.Boss名 ?? "地精祭祀|cffff0000（BossLV12）|r"),
+    X: Number(参数.X) || -26032.4,
+    Y: Number(参数.Y) || -13789.5,
+    朝向: Number(参数.朝向) || 270,
+    注册范围: Number(参数.注册范围) || 0,
+    预创建后暂停: 参数.预创建后暂停 === true,
+    预创建后无敌: 参数.预创建后无敌 === true,
+    范围触发配置名: String(参数.范围触发配置名 ?? "") || undefined,
+    范围触发剧情片段ID: String(参数.范围触发剧情片段ID ?? "") || undefined,
+    需要剧情进度: Number(参数.触发进度) || undefined,
+  });
 }
 
 export function 执行远古波动奖励(this: void, 参数: 剧情动作参数表): void {

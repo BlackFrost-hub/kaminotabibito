@@ -36,6 +36,9 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
+const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+  单位是否正在原生施法: (this: void, unit: any) => boolean;
+};
 
 function 取单位仇恨(this: void, entries: Array<{ targetHid: number; threat: number }>, unit: any): number {
   const hid = 取单位ID(unit);
@@ -110,6 +113,7 @@ function 强制攻击污染标记目标(this: void, context: 米亚运行时上�
   const targetAlive = 单位存活(target);
   if (!bossAlive || !targetAlive) return;
   setThreat(context.Boss单位, target, 1000);
+  if (单位是否正在原生施法(context.Boss单位)) return;
   IssueTargetOrder(context.Boss单位, "attack", target);
 }
 

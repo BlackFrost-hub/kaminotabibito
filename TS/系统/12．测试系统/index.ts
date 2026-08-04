@@ -4,8 +4,7 @@
  * 通过开关控制是否加载各个测试模块。
  */
 
-/** 临时总开关；恢复测试时改回 true。 */
-const ENABLE_TEST_SYSTEM = false;
+import { 测试系统总开关 } from "./00．测试系统开关";
 
 const ENABLE_STES_EVENT_TEST = false;
 const ENABLE_YDLOCAL_TEST = false;
@@ -30,9 +29,15 @@ const ENABLE_BOSS_DUAL_HEALTH_BAR_TEST = true;
 const ENABLE_BONE_SPEAR_EFFECT_TEST = true;
 const ENABLE_BOSS_3D_SOUND_TEST = true;
 const ENABLE_SERA_BARE_CREATE_TEST = true;
+const ENABLE_MAIN_PROGRESS_TEST = true;
 
 function loadTests(): void {
-  if (!ENABLE_TEST_SYSTEM) return;
+  // 主线进度指令作为独立调试入口保留，避免打开总开关时连带启动其他测试。
+  if (ENABLE_MAIN_PROGRESS_TEST) {
+    require("系统.12．测试系统.20．主线进度测试");
+  }
+
+  if (!测试系统总开关) return;
 
   if (ENABLE_STES_EVENT_TEST) {
     require("系统.12．测试系统.STES事件测试");

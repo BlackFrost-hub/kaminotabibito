@@ -32,7 +32,6 @@ ____exports["可破坏物数据"] = {
         key = "B001"
     },
     B002 = {_parent = "YT24", Name = "苏佩尔共和国桥", file = "war3mapImported\\Lordaeron The Most.mdl", key = "B002"},
-    B003 = {_parent = "LTbr", file = "war3mapImported\\boxxx.mdl", key = "B003"},
     B004 = {
         _parent = "LTr5",
         Name = "遗迹风斜坡 (用在沙漠地形或者海洋地形)",
@@ -120,15 +119,6 @@ ____exports["可破坏物数据"] = {
         selSize = 500,
         numVar = 1,
         key = "B00C"
-    },
-    B00D = {
-        _parent = "LTbr",
-        Name = "11宝箱",
-        HP = 500,
-        file = "Boss\\ShadowboneMortes\\ShadowboneMortesThievesLegacyChest.mdx",
-        maxScale = 1,
-        minScale = 1,
-        key = "B00D"
     },
     B00E = {
         _parent = "NTtc",
@@ -282,7 +272,7 @@ ____exports["可破坏物数据"] = {
         key = "B00X"
     },
     B00Y = {_parent = "Ytlc", pathTex = "PathTextures\\8x8Default.tga", walkable = 1, key = "B00Y"},
-    BR02 = {
+    BZX4 = {
         _parent = "LTbr",
         Name = "11宝箱",
         HP = 500,
@@ -290,7 +280,7 @@ ____exports["可破坏物数据"] = {
         maxScale = 1,
         minScale = 1,
         EditorSuffix = "死灵盗贼",
-        key = "BR02"
+        key = "BZX4"
     },
     B010 = {
         _parent = "LTbr",

@@ -3,14 +3,17 @@ local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local getObjectProperty = ____require_result_0.getObjectProperty
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
 local ObjectType = ____require_result_0.ObjectType
-local YDWEDistanceBetweenUnits = ____require_result_0.YDWEDistanceBetweenUnits
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
-local stringToFourCC = ____require_result_1.stringToFourCC
-local ____require_result_2 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local GetUnitLifePercentBJ = ____require_result_2.GetUnitLifePercentBJ
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local getObjectPropertySafe = ____require_result_1.getObjectPropertySafe
+local YDWEDistanceBetweenUnitsSafe = ____require_result_1.YDWEDistanceBetweenUnitsSafe
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
+local stringToFourCC = ____require_result_2.stringToFourCC
+local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local GetUnitLifePercentBJ = ____require_result_3.GetUnitLifePercentBJ
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_4["单位是否正在原生施法"]
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomInt = jass.GetRandomInt
 local GetRandomReal = jass.GetRandomReal
@@ -53,13 +56,13 @@ local function _____83B7_53D6Buff_6570_503CID(rawcode)
     return value
 end
 local function _____83B7_53D6_5F53_524D_73A9_5BB6_4EBA_6570()
-    local ____temp_3
+    local ____temp_5
     if jglobals.udg_T ~= nil then
-        ____temp_3 = jglobals.udg_T
+        ____temp_5 = jglobals.udg_T
     else
-        ____temp_3 = jglobals.T
+        ____temp_5 = jglobals.T
     end
-    local _____73A9_5BB6_4EBA_6570 = ____temp_3
+    local _____73A9_5BB6_4EBA_6570 = ____temp_5
     return __TS__Number(_____73A9_5BB6_4EBA_6570) or 0
 end
 ____exports["获取技能命令字串"] = function(skill)
@@ -75,7 +78,7 @@ ____exports["获取技能命令字串"] = function(skill)
     if cached ~= nil then
         return cached
     end
-    local value = getObjectProperty(ObjectType.ABILITY, skill["技能ID"], _____547D_4EE4_5B57_6BB5) or ""
+    local value = getObjectPropertySafe(ObjectType.ABILITY, skill["技能ID"], _____547D_4EE4_5B57_6BB5) or ""
     _____6280_80FD_547D_4EE4_7F13_5B58[_____7F13_5B58_952E] = value
     return value
 end
@@ -101,7 +104,7 @@ ____exports["受击技能是否满足条件"] = function(skill, unit, source)
         end
     end
     if source ~= nil and source ~= 0 then
-        local distance = YDWEDistanceBetweenUnits(unit, source)
+        local distance = YDWEDistanceBetweenUnitsSafe(unit, source)
         if skill["与伤害来源距离不大于"] ~= nil and distance > skill["与伤害来源距离不大于"] then
             return false
         end
@@ -148,6 +151,9 @@ local function _____53D6_76EE_6807_5750_6807(skill, unit, source)
     }
 end
 ____exports["尝试执行受击技能"] = function(skill, unit, source)
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(unit) then
+        return false
+    end
     if not ____exports["受击技能是否满足条件"](skill, unit, source) then
         return false
     end

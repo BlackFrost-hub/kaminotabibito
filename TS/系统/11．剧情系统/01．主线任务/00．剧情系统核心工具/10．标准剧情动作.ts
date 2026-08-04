@@ -7,7 +7,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 import type { 剧情动作参数表, 剧情动作处理器 } from "./00．剧情动作类型";
 import { 写入剧情进度 } from "./01．剧情动作上下文";
 import { 发送剧情小地图信号 } from "./02．剧情动作桥接";
-import { 停止触发单位, 更新主线任务UI } from "./06．剧情通用执行工具";
+import { 扣除触发单位金币, 给玩家组添加多个区域视野, 停止触发单位, 更新主线任务UI } from "./06．剧情通用执行工具";
 import { 获取主线节点配置 } from "./09．主线节点配置";
 
 const 标准剧情动作模块名 = "11．剧情系统-标准剧情动作";
@@ -37,6 +37,9 @@ export function 发布主线节点目标(this: void, 进度: number): boolean {
       持续时间: 节点.小地图.持续时间 ?? 20,
     });
   }
+  if (节点.解锁视野 != null && 节点.解锁视野 !== "") {
+    给玩家组添加多个区域视野(节点.解锁视野);
+  }
   return true;
 }
 
@@ -60,6 +63,10 @@ function 执行写入主线进度(this: void, 参数: 剧情动作参数表): vo
 
 function 执行发布主线节点目标(this: void, 参数: 剧情动作参数表): void {
   发布主线节点目标(读取节点进度(参数));
+  const 扣除金币 = typeof 参数.扣除金币 === "number"
+    ? 参数.扣除金币
+    : Number(参数.扣除金币 ?? 0);
+  if (扣除金币 > 0) 扣除触发单位金币(扣除金币);
 }
 
 function 执行进入主线节点(this: void, 参数: 剧情动作参数表): void {

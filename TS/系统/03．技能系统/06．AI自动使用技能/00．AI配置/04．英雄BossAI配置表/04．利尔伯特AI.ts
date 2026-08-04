@@ -5,7 +5,7 @@ import { 创建单位AI配置 } from "../02．AI配置工具";
 
 export const 利尔伯特AI配置: 单位AI配置 = 创建单位AI配置({
   AI配置ID: "利尔伯特AI",
-  单位ID: "h01D",
+  单位ID: "N05L",
   单位名: "利尔·伯特",
   归类: "英雄Boss",
   AI模式: "固定技能表",

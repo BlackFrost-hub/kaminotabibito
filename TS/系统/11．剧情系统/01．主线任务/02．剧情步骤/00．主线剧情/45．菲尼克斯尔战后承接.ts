@@ -11,33 +11,25 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
-const { 注册剧情玩家组传送 } = require("系统.07．地形系统.03．区域传送") as {
-  注册剧情玩家组传送: (this: void, 配置: {
-    入口中心X: number;
-    入口中心Y: number;
-    入口半径: number;
-    目标X: number;
-    目标Y: number;
-    目标面向?: number;
-    条件: (this: void) => boolean;
+const { 注册剧情配置传送, 读取剧情传送配置 } = require("系统.07．地形系统.03．区域传送") as {
+  注册剧情配置传送: (this: void, 配置ID: string, 覆盖: {
     读取玩家英雄组: (this: void) => any;
     允许进入单位?: (this: void, unit: any) => boolean;
-    完成?: (this: void) => void;
+    完成?: (this: void, 触发单位?: any) => void;
   }) => (this: void) => void;
+  读取剧情传送配置: (this: void, 配置ID: string) => {
+    入口中心X: number;
+    入口中心Y: number;
+  } | undefined;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
-import { 读取当前剧情动作上下文, 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 清理剧情运行时单位, 注册剧情运行时单位, 读取剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 
 const DestroyEffect = jass.DestroyEffect as (this: void, effect: any) => void;
 
-const 传送门X = 16184.4;
-const 传送门Y = -3983.5;
-const 英灵墓地X = 11001.9;
-const 英灵墓地Y = -14942.2;
-const 英灵墓地面向 = 270;
-const 传送门半径 = 420;
+const 菲尼克斯尔战后传送配置ID = "jlc_felice_aftermath";
 const 传送门模型 = "Common\\Effect\\Form\\Portal\\7sr_suramarcity_pylonfx.mdx";
 const 英灵墓地铭文模型 = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx";
 
@@ -107,10 +99,6 @@ function 读取菲尼克斯尔战后玩家英雄组(this: void): any {
   return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
 }
 
-function 剧情进度为45(this: void): boolean {
-  return 读取剧情进度() === 45;
-}
-
 function 菲尼克斯尔战后允许进入(this: void, unit: any): boolean {
   return 是玩家英雄组单位(unit);
 }
@@ -126,26 +114,22 @@ function 完成菲尼克斯尔战后传送(this: void): void {
 }
 
 function 创建菲尼克斯尔战后入口(this: void): void {
+  const 传送配置 = 读取剧情传送配置(菲尼克斯尔战后传送配置ID);
+  if (传送配置 == null) return;
+
   const 状态 = 当前战后状态 ?? { 已传送: false };
   当前战后状态 = 状态;
   if (状态.已传送) return;
   if (!句柄有效(状态.传送门特效)) {
     状态.传送门特效 = 创建点特效({
       模型路径: 传送门模型,
-      X: 传送门X,
-      Y: 传送门Y,
+      X: 传送配置.入口中心X,
+      Y: 传送配置.入口中心Y,
       缩放: 2.2,
     });
   }
   if (状态.取消剧情传送注册 != null) return;
-  状态.取消剧情传送注册 = 注册剧情玩家组传送({
-    入口中心X: 传送门X,
-    入口中心Y: 传送门Y,
-    入口半径: 传送门半径,
-    目标X: 英灵墓地X,
-    目标Y: 英灵墓地Y,
-    目标面向: 英灵墓地面向,
-    条件: 剧情进度为45,
+  状态.取消剧情传送注册 = 注册剧情配置传送(菲尼克斯尔战后传送配置ID, {
     读取玩家英雄组: 读取菲尼克斯尔战后玩家英雄组,
     允许进入单位: 菲尼克斯尔战后允许进入,
     完成: 完成菲尼克斯尔战后传送,

@@ -40,14 +40,18 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 
 import 主线剧情片段配置表 from "./01．剧情片段配置表";
 import type { 剧情动作参数表, 剧情动作执行上下文 } from "../00．剧情系统核心工具/00．剧情动作类型";
-import { 写入当前剧情动作上下文 } from "../00．剧情系统核心工具/01．剧情动作上下文";
-import { 按名字给触发单位物品, 执行通用剧情动作, 读取语义单位引用 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 读取剧情进度, 写入当前剧情动作上下文 } from "../00．剧情系统核心工具/01．剧情动作上下文";
+import { 按名字给触发单位物品, 按原始ID给触发单位物品, 执行通用剧情动作, 读取语义单位引用, 设置玩家英雄组控制状态 } from "../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 注册剧情运行时单位, 清理剧情运行时单位 } from "../00．剧情系统核心工具/08．剧情运行时单位";
 import { 启动剧情Boss战 } from "../00．剧情系统核心工具/11．剧情Boss战启动桥接";
-import { 退出剧情电影模式并恢复镜头 } from "../00．剧情系统核心工具/12．剧情电影镜头";
+import { 进入剧情电影模式, 退出剧情电影模式并恢复镜头 } from "../00．剧情系统核心工具/12．剧情电影镜头";
+import { 执行剧情片段清理 } from "../00．剧情系统核心工具/13．剧情片段清理注册表";
+import { 获取主线节点配置 } from "../00．剧情系统核心工具/09．主线节点配置";
 import type { 剧情片段配置, 剧情步骤 } from "./00．剧情步骤类型";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerPlayer = jass.GetTriggerPlayer as (this: void) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, whichPlayer: any) => number;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (
@@ -62,9 +66,12 @@ const TriggerRegisterPlayerEvent = jass.TriggerRegisterPlayerEvent as (this: voi
 const EVENT_PLAYER_END_CINEMATIC = jass.EVENT_PLAYER_END_CINEMATIC as any;
 const bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET as number;
 const bj_QUESTMESSAGE_HINT = jglobals.bj_QUESTMESSAGE_HINT as number;
+const bj_QUESTMESSAGE_UPDATED = jglobals.bj_QUESTMESSAGE_UPDATED as number;
 
 const 剧情播放器模块名 = "11．剧情系统-剧情步骤播放器";
 const 默认广播头像路径 = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp";
+const 剧情ESC双击间隔毫秒 = 300;
+const 当前剧情触发单位语义名 = "剧情.当前触发单位";
 
 export interface 剧情播放器运行时 {
   当前片段ID?: string;
@@ -92,6 +99,7 @@ const 默认剧情播放器运行时: 剧情播放器运行时 = {
 };
 
 const 剧情播放器运行时状态: 剧情播放器运行时 = { ...默认剧情播放器运行时 };
+const 剧情ESC最近按下时间表: Record<number, number | undefined> = {};
 let 当前片段: 剧情片段配置 | undefined;
 let 已初始化剧情步骤播放器 = false;
 const 剧情延迟任务列表: 剧情延迟任务[] = [];
@@ -135,6 +143,11 @@ function 结束当前剧情片段(this: void): void {
   剧情播放器运行时状态.当前片段ID = undefined;
   当前片段 = undefined;
   清理剧情延迟任务(播放世代);
+  清理剧情ESC按键状态();
+  执行剧情片段清理(片段ID);
+  清理剧情运行时单位(当前剧情触发单位语义名);
+  // 片段前置可能接管玩家英雄；正常结束和 Esc 跳过都必须释放该状态。
+  设置玩家英雄组控制状态(false, false);
   退出剧情电影模式并恢复镜头();
   if (片段ID !== "") debugLogForce(剧情播放器模块名, "剧情片段结束", 片段ID);
 }
@@ -237,7 +250,18 @@ function 执行对白步骤(this: void, 步骤: 剧情步骤): void {
   if (步骤.使用原生电影系统 === true) {
     const 说话者 = 步骤.说话者 ?? "系统";
     const 文本 = 步骤.文本;
-    TransmissionFromUnitWithNameBJ(GetPlayersAll(), null, 说话者, null, 文本, bj_TIMETYPE_SET, 计算步骤持续时间(持续时间), false);
+    const 说话者单位 = 读取说话者单位(说话者, 步骤.说话者引用);
+    进入剧情电影模式();
+    TransmissionFromUnitWithNameBJ(
+      GetPlayersAll(),
+      说话者单位 != null && 说话者单位 !== 0 ? 说话者单位 : null,
+      说话者,
+      null,
+      文本,
+      bj_TIMETYPE_SET,
+      计算步骤持续时间(持续时间),
+      false,
+    );
     剧情播放器运行时状态.当前步骤索引++;
     安排下一步(下一步延迟);
     return;
@@ -303,9 +327,15 @@ function 执行UI广播步骤(this: void, 步骤: 剧情步骤): void {
 }
 
 function 广播剧情跳过提示(this: void): void {
-  const 文本 = "|cffffff00『系统提示』：|r按下 |cffffcc00~|r 键可跳过当前剧情。";
+  const 文本 = "|cffffff00『系统提示』：|r请在 |cffffcc000.3 秒|r 内连续按下两次 |cffffcc00ESC|r 跳过当前剧情。";
   for (let i = 0; i < 4; i++) {
     发送头像提示给玩家(Player(i), 默认广播头像路径, 文本, 3200);
+  }
+}
+
+function 清理剧情ESC按键状态(this: void): void {
+  for (const playerId in 剧情ESC最近按下时间表) {
+    delete 剧情ESC最近按下时间表[Number(playerId)];
   }
 }
 
@@ -356,13 +386,20 @@ function 执行Boss战启动步骤(this: void, 步骤: 剧情步骤): void {
 
 function 执行给物品步骤(this: void, 步骤: 剧情步骤): void {
   if (步骤.type !== "giveItem") return;
+  const itemRawId = (步骤 as any).物品ID as string | undefined;
   const itemName = (步骤 as any).物品名 as string | undefined;
-  if (itemName != null && itemName !== "") 按名字给触发单位物品(itemName);
+  if (itemRawId != null && itemRawId !== "") {
+    按原始ID给触发单位物品(itemRawId);
+  } else if (itemName != null && itemName !== "") {
+    按名字给触发单位物品(itemName);
+  }
   剧情播放器运行时状态.当前步骤索引++;
   执行当前剧情步骤();
 }
 
 function 执行跳过模式步骤逻辑(this: void, 步骤: 剧情步骤): void {
+  // 旧配置未填写时保持执行；需要跳过的纯演出动作必须显式写 false。
+  if (步骤.跳过也执行 === false) return;
   switch (步骤.type) {
     case "dialog":
     case "broadcast":
@@ -377,8 +414,13 @@ function 执行跳过模式步骤逻辑(this: void, 步骤: 剧情步骤): void 
       return;
     }
     case "giveItem": {
+      const itemRawId = (步骤 as any).物品ID as string | undefined;
       const itemName = (步骤 as any).物品名 as string | undefined;
-      if (itemName != null && itemName !== "") 按名字给触发单位物品(itemName);
+      if (itemRawId != null && itemRawId !== "") {
+        按原始ID给触发单位物品(itemRawId);
+      } else if (itemName != null && itemName !== "") {
+        按名字给触发单位物品(itemName);
+      }
       return;
     }
     default:
@@ -392,6 +434,12 @@ function 快进执行当前片段剩余逻辑(this: void): void {
   for (let i = 剧情播放器运行时状态.当前步骤索引; i < 当前片段.步骤列表.length; i++) {
     执行跳过模式步骤逻辑(当前片段.步骤列表[i]);
   }
+}
+
+function 发送跳过后的主线引导(this: void): void {
+  const 节点 = 获取主线节点配置(读取剧情进度());
+  if (节点 == null || 节点.提示文本 === "") return;
+  QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_UPDATED, 节点.提示文本);
 }
 
 function 执行当前剧情步骤(this: void): void {
@@ -445,7 +493,13 @@ export function 播放主线剧情片段(this: void, 片段ID: string, 上下文
     return false;
   }
 
-  if (上下文 != null) 写入当前剧情动作上下文(上下文);
+  清理剧情运行时单位(当前剧情触发单位语义名);
+  if (上下文 != null) {
+    写入当前剧情动作上下文(上下文);
+    if (上下文.触发单位 != null && 上下文.触发单位 !== 0) {
+      注册剧情运行时单位(当前剧情触发单位语义名, 上下文.触发单位);
+    }
+  }
   当前片段 = 片段;
   剧情播放器运行时状态.播放世代++;
   剧情播放器运行时状态.当前片段ID = 片段ID;
@@ -465,9 +519,27 @@ export function 播放主线剧情片段(this: void, 片段ID: string, 上下文
 function on剧情ESC跳过(this: void): void {
   if (!剧情播放器运行时状态.是否正在播放 || 当前片段 == null) return;
   if (当前片段.可Esc整段跳过 !== true) return;
+
+  const player = GetTriggerPlayer();
+  if (player == null || player === 0) return;
+  const playerId = GetPlayerId(player);
+  const now = getServerTime();
+  const lastPressTime = 剧情ESC最近按下时间表[playerId];
+  if (lastPressTime == null || now - lastPressTime > 剧情ESC双击间隔毫秒 || now < lastPressTime) {
+    剧情ESC最近按下时间表[playerId] = now;
+    QuestMessageBJ(
+      GetPlayersAll(),
+      bj_QUESTMESSAGE_HINT,
+      "|cffffff00『系统提示』：|r已检测到第一次 |cffffcc00ESC|r，请在 |cffffcc000.3 秒|r 内再按一次跳过。",
+    );
+    return;
+  }
+
+  delete 剧情ESC最近按下时间表[playerId];
   剧情播放器运行时状态.是否请求跳过 = true;
   QuestMessageBJ(GetPlayersAll(), bj_QUESTMESSAGE_HINT, "|cffffff00『系统提示』：|r已跳过当前剧情。");
   快进执行当前片段剩余逻辑();
+  发送跳过后的主线引导();
   结束当前剧情片段();
 }
 

@@ -13,7 +13,7 @@ local function stringToFourCC(s)
     return a * 16777216 + b * 65536 + c * 256 + d
 end
 ____exports["宝箱系统开关"] = true
-____exports["影骨莫特斯盗贼宝箱可破坏物ID"] = "BR02"
+____exports["影骨莫特斯盗贼宝箱可破坏物ID"] = "BZX4"
 ____exports.CHEST_TYPES = {{
     destructableType = ____exports["影骨莫特斯盗贼宝箱可破坏物ID"],
     openTime = 3,
@@ -46,18 +46,6 @@ ____exports.CHEST_TYPES = {{
             ["命中特效缩放"] = 1.1
         }}}
     }}
-}, {
-    destructableType = "B003",
-    openTime = 3,
-    name = "普通宝箱",
-    picks = 1,
-    dropMode = {type = "score", range = {min = 100, max = 500}}
-}, {destructableType = "BR01", openTime = 3, name = "首领奖励宝箱"}, {
-    destructableType = "LTbx",
-    openTime = 3,
-    name = "木桶",
-    picks = 1,
-    dropMode = {type = "pool", items = "初心戒指:1.5;初始生命药水:1;初始魔法药水:2", always = "精灵铁剑"}
 }}
 local _chestTypeIds = __TS__New(Set)
 for ____, config in ipairs(____exports.CHEST_TYPES) do

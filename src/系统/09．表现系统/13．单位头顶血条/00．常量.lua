@@ -73,4 +73,8 @@ ____exports["血条层级"] = {
     ["控制台遮罩"] = 100
 }
 ____exports["血条刷新间隔Tick"] = 3
+____exports["血条创建每批数量"] = 6
+____exports["血条敌人扫描半径"] = 2000
+____exports["血条敌人扫描间隔Tick"] = 10
+____exports["血条扫描玩家数量"] = 6
 return ____exports

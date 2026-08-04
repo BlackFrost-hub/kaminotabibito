@@ -12,6 +12,7 @@ do
     ____exports["蛇人族藏品管家初见剧情片段"] = ____08_FF0E_86C7_4EBA_65CF_85CF_54C1_7BA1_5BB6_521D_89C1["蛇人族藏品管家初见剧情片段"]
 end
 local Player = jass.Player
+local IssueImmediateOrder = jass.IssueImmediateOrder
 local SetUnitOwner = jass.SetUnitOwner
 ____exports["执行蛇人族藏品管家初见"] = function(_____53C2_6570)
     local ____53C2_6570_NPC_1 = _____53C2_6570.NPC
@@ -26,6 +27,10 @@ ____exports["执行蛇人族藏品管家初见"] = function(_____53C2_6570)
     local npc = YDUserDataGetSafe("string", "主线NPC", _____952E_540D, "unit")
     if npc == nil or npc == 0 then
         return
+    end
+    local _____89E6_53D1_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
+    if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then
+        IssueImmediateOrder(_____89E6_53D1_5355_4F4D, "stop")
     end
     SetUnitOwner(
         npc,

@@ -40,6 +40,8 @@ local function _____786E_4FDD_7B2C_4E8C_5E55_4E3B_7EBF_4EFB_52A1_5DF2_521B_5EFA(
 end
 ____exports["执行精灵城章节承接"] = function()
     _____8BBE_7F6E_89E6_53D1_5355_4F4D_63A7_5236_72B6_6001(false, false)
+end
+local function _____6267_884C_7CBE_7075_57CE_7AE0_8282_627F_63A5_6F14_51FA(_____53C2_6570)
     local _____957F_8001 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528("主线NPC.精灵村长老")
     if _____957F_8001 ~= nil and _____957F_8001 ~= 0 then
         EC_CreateEffect(
@@ -53,10 +55,13 @@ ____exports["执行精灵城章节承接"] = function()
             1.5
         )
     end
-    local _____963B_6321 = jglobals.gg_dest_B00X_0013
+    local _____963B_6321_540D = type(_____53C2_6570["隐藏阻挡"]) == "string" and _____53C2_6570["隐藏阻挡"] or "gg_dest_B00X_0013"
+    local _____963B_6321 = jglobals[_____963B_6321_540D]
     if _____963B_6321 ~= nil and _____963B_6321 ~= 0 then
         ShowDestructable(_____963B_6321, false)
     end
+end
+local function _____6267_884C_524D_5F80_738B_57CE()
     local _____901A_884C_5355_4F4D = jglobals.gg_unit_n025_0033
     if _____901A_884C_5355_4F4D ~= nil and _____901A_884C_5355_4F4D ~= 0 then
         SetUnitOwner(
@@ -65,9 +70,7 @@ ____exports["执行精灵城章节承接"] = function()
             true
         )
     end
-end
-local function _____6267_884C_524D_5F80_738B_57CE()
     _____786E_4FDD_7B2C_4E8C_5E55_4E3B_7EBF_4EFB_52A1_5DF2_521B_5EFA()
 end
-____exports["精灵城章节承接剧情动作注册表"] = {["JLC精灵城_章节承接"] = ____exports["执行精灵城章节承接"], ["JLC精灵城_前往王城"] = _____6267_884C_524D_5F80_738B_57CE}
+____exports["精灵城章节承接剧情动作注册表"] = {["JLC精灵城_章节承接"] = ____exports["执行精灵城章节承接"], ["JLC精灵城_章节承接演出"] = _____6267_884C_7CBE_7075_57CE_7AE0_8282_627F_63A5_6F14_51FA, ["JLC精灵城_前往王城"] = _____6267_884C_524D_5F80_738B_57CE}
 return ____exports

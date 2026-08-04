@@ -3,6 +3,23 @@
 const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
+const jass = require("jass.common") as any;
+const 获取玩家ID = jass.GetPlayerId as (player: any) => number;
+const 获取玩家名称 = jass.GetPlayerName as (player: any) => string;
+
+const 测试玩家ID = 0;
+const 测试玩家名称 = "WorldEdit";
+const 测试备用玩家名称 = "九条艾莉莎";
+
+export function 是允许测试玩家(this: void, player: any): boolean {
+  if (player == null || player === 0) return false;
+  if (获取玩家ID(player) !== 测试玩家ID) return false;
+  const playerName = 获取玩家名称(player) ?? "";
+  return playerName === 测试玩家名称
+    || playerName === 测试玩家名称 + ":"
+    || playerName === 测试备用玩家名称
+    || playerName === 测试备用玩家名称 + ":";
+}
 
 export const 测试Boss跳过死亡结算字段 = "测试Boss跳过死亡结算";
 

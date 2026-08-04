@@ -5,7 +5,8 @@ const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
 const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．单位配置表.02．Boss配置表") as {
@@ -32,12 +33,15 @@ const { 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star�
 const { 登记Boss战待带入护卫 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.06．Boss战护卫") as {
   登记Boss战待带入护卫: (this: void, boss: any, guard: any, 护卫类型: string) => boolean;
 };
+const { 注册剧情运行时单位 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位") as {
+  注册剧情运行时单位: (this: void, 语义名: string, unit: any) => void;
+};
 
 import { 写入当前剧情动作上下文 } from "./01．剧情动作上下文";
 import { 读取剧情进度 } from "./01．剧情动作上下文";
+import { 发布主线Boss战前提示 } from "./12．剧情Boss战预警";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
@@ -58,6 +62,7 @@ const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, whichGroup: any, wh
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const StopMusic = jass.StopMusic as (this: void, fadeOut: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
+const DestroyTrigger = jass.DestroyTrigger as (this: void, whichTrigger: any) => void;
 
 interface 剧情Boss范围预置触发配置 {
   配置名: string;
@@ -149,6 +154,10 @@ function on剧情Boss范围预置触发(this: void): void {
   const 配置 = 范围预置触发配置表[GetHandleId(trigger)];
   if (配置 == null) return;
   if (配置.需要剧情进度 != null && 读取剧情进度() !== 配置.需要剧情进度) return;
+
+  // Boss 前导只允许成功消费一次；否则玩家进出范围会永久保留一个无效触发器。
+  delete 范围预置触发配置表[GetHandleId(trigger)];
+  DestroyTrigger(trigger);
 
   写入当前剧情动作上下文({
     片段ID: 配置.剧情片段ID,
@@ -267,14 +276,30 @@ export function 消费剧情Boss战带入随从(this: void, bossUnit: any): any[
 }
 
 export function 创建并冻结剧情Boss预置(this: void, 参数: 剧情Boss预置参数): any {
+  const 键信息 = 解析Boss表键(参数.Boss键);
+  if (键信息.键名 !== "") {
+    const 已有Boss = YDUserDataGetSafe("string", 键信息.表名, 键信息.键名, "unit");
+    if (已有Boss != null && 已有Boss !== 0 && 单位存活(已有Boss)) {
+      注册剧情运行时单位(`${键信息.表名}.${键信息.键名}`, 已有Boss);
+      if (参数.预创建后暂停 === true) 添加单位暂停(已有Boss, 剧情Boss预置暂停来源);
+      if (参数.预创建后无敌 === true) SetUnitInvulnerable(已有Boss, true);
+      return 已有Boss;
+    }
+  }
+
   const rawId = 按名字反查Boss单位ID(参数.Boss名);
   const unitTypeId = stringToFourCCSafe(rawId);
   if (!(unitTypeId > 0)) return null;
 
   StopMusic(false);
 
-  const bossUnit = CreateUnit(Player(15), unitTypeId, 参数.X, 参数.Y, 参数.朝向 ?? 0);
+  const bossUnit = 创建单位并登记排泄安全(Player(15), unitTypeId, 参数.X, 参数.Y, 参数.朝向 ?? 0);
   if (bossUnit == null || bossUnit === 0) return null;
+
+  if (键信息.键名 !== "") {
+    注册剧情运行时单位(`${键信息.表名}.${键信息.键名}`, bossUnit);
+  }
+  发布主线Boss战前提示(bossUnit);
 
   if (参数.预创建后暂停 === true) {
     添加单位暂停(bossUnit, 剧情Boss预置暂停来源);
@@ -283,7 +308,6 @@ export function 创建并冻结剧情Boss预置(this: void, 参数: 剧情Boss�
     SetUnitInvulnerable(bossUnit, true);
   }
 
-  const 键信息 = 解析Boss表键(参数.Boss键);
   if (键信息.键名 !== "") {
     YDUserDataSetSafe("string", 键信息.表名, 键信息.键名, "unit", bossUnit);
   }

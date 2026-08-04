@@ -57,6 +57,9 @@ const {
 const { 自动展开仇恨面板一次 } = require("系统.09．表现系统.05．仇恨面板.05．仇恨面板") as {
   自动展开仇恨面板一次: (this: void, playerId: number) => void;
 };
+const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+  单位是否正在原生施法: (this: void, 单位: any) => boolean;
+};
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const IsUnitType = jass.IsUnitType as (u: any, whichType: any) => boolean;
@@ -71,6 +74,7 @@ const MAX_DISTANCE_SQ = 2500 * 2500;
 const ISSUE_ORDER_DISTANCE_SQ = 1000 * 1000;
 const 强制目标补发命令间隔Ms = 750;
 const 强制目标上次补发命令Ms: Record<number, number | undefined> = {};
+const 施法期间跳过攻击命令: Record<number, true | undefined> = {};
 let 周期回调ID = 0;
 const 模块名 = "仇恨系统";
 let _nowMs: (() => number) | null = null;
@@ -90,6 +94,7 @@ function nowMs(): number {
 function 清理敌人仇恨状态(敌人ID: number): void {
   清除仇恨显示ById(敌人ID);
   delete 强制目标上次补发命令Ms[敌人ID];
+  delete 施法期间跳过攻击命令[敌人ID];
   clearAllThreatById(敌人ID);
 }
 
@@ -123,6 +128,16 @@ function 需要下发攻击命令(
   目标: { targetHid: number; targetRef: any; threat: number },
   filter: (entry: { targetHid: number; targetRef: any; threat: number }) => boolean
 ): boolean {
+  if (单位是否正在原生施法(敌人)) {
+    施法期间跳过攻击命令[敌人ID] = true;
+    return false;
+  }
+
+  if (施法期间跳过攻击命令[敌人ID] === true) {
+    delete 施法期间跳过攻击命令[敌人ID];
+    return true;
+  }
+
   if (当前目标ID !== 目标.targetHid) return true;
 
   const 强制目标 = 获取强制攻击目标(敌人, filter);
@@ -134,6 +149,12 @@ function 需要下发攻击命令(
 }
 
 function 下发攻击命令(this: void, 敌人: any, 敌人ID: number, 目标: { targetHid: number; targetRef: any; threat: number }): void {
+  if (单位是否正在原生施法(敌人)) {
+    施法期间跳过攻击命令[敌人ID] = true;
+    return;
+  }
+
+  delete 施法期间跳过攻击命令[敌人ID];
   IssueTargetOrder(敌人, "attack", 目标.targetRef);
   设置当前目标(敌人ID, 目标.targetHid);
   强制目标上次补发命令Ms[敌人ID] = nowMs();

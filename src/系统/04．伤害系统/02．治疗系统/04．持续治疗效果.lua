@@ -3,7 +3,7 @@ local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local __TS__Iterator = ____lualib.__TS__Iterator
 local ____exports = {}
-local unregisterCenterTimerIfNeeded, debugLogForce, YDUserDataClearSafe, offSecond, ATTR_COUNTDOWN, ATTR_TICK_HP, ATTR_TICK_MP, ATTR_SOURCE, ATTR_BUFF_ID, hotUnits, registeredToCenterTimer, hotTickCallback
+local unregisterCenterTimerIfNeeded, YDUserDataClearSafe, offSecond, ATTR_COUNTDOWN, ATTR_TICK_HP, ATTR_TICK_MP, ATTR_SOURCE, ATTR_BUFF_ID, hotUnits, registeredToCenterTimer, hotTickCallback
 function unregisterCenterTimerIfNeeded()
     if not registeredToCenterTimer then
         return
@@ -22,14 +22,6 @@ function ____exports.stopHot(target)
     if target == nil then
         return
     end
-    debugLogForce(
-        "持续治疗效果",
-        "stopHot",
-        "target:",
-        target,
-        "beforeSize:",
-        hotUnits.size
-    )
     hotUnits:delete(target)
     YDUserDataClearSafe("unit", target, ATTR_COUNTDOWN, "real")
     YDUserDataClearSafe("unit", target, ATTR_TICK_HP, "real")
@@ -37,14 +29,6 @@ function ____exports.stopHot(target)
     YDUserDataClearSafe("unit", target, ATTR_SOURCE, "unit")
     YDUserDataClearSafe("unit", target, ATTR_BUFF_ID, "string")
     unregisterCenterTimerIfNeeded()
-    debugLogForce(
-        "持续治疗效果",
-        "stopHot完成",
-        "target:",
-        target,
-        "afterSize:",
-        hotUnits.size
-    )
 end
 --- 持续治疗效果（HOT）系统
 -- 
@@ -56,24 +40,22 @@ end
 -- 1. 直接调用 doHeal 执行治疗，不需要通过STES事件
 -- 2. Buff ID列表可根据需要扩展
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_0.debugLogForce
-local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
-local getBuffRuntime = ____require_result_1.getBuffRuntime
-local ____require_result_2 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local UnitHasBuffBJ = ____require_result_2.UnitHasBuffBJ
-local IsUnitDeadBJ = ____require_result_2.IsUnitDeadBJ
-local ____require_result_3 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-local IsUnitPausedBJ = ____require_result_3.IsUnitPausedBJ
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_4.YDUserDataSetSafe
-YDUserDataClearSafe = ____require_result_4.YDUserDataClearSafe
-local ____G_5 = _G
-local onSecond = ____G_5.onSecond
-offSecond = ____G_5.offSecond
-local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_6.doHeal
+local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
+local getBuffRuntime = ____require_result_0.getBuffRuntime
+local ____require_result_1 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local UnitHasBuffBJ = ____require_result_1.UnitHasBuffBJ
+local IsUnitDeadBJ = ____require_result_1.IsUnitDeadBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local IsUnitPausedBJ = ____require_result_2.IsUnitPausedBJ
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
+YDUserDataClearSafe = ____require_result_3.YDUserDataClearSafe
+local ____G_4 = _G
+local onSecond = ____G_4.onSecond
+offSecond = ____G_4.offSecond
+local ____require_result_5 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_5.doHeal
 --- 持续恢复相关Buff ID（没有这些Buff时效果结束）
 local HOT_BUFF_IDS = {1112109677, 1112109671, 1112109676, 1114793322}
 local HOT_BUFF_POOL_IDS = {"C027"}
@@ -96,7 +78,7 @@ local function hasAnyHotBuff(unit)
         end
     end
     for ____, buffId in ipairs(HOT_BUFF_IDS) do
-        if UnitHasBuffBJ(nil, unit, buffId) then
+        if UnitHasBuffBJ(unit, buffId) then
             return true
         end
     end
@@ -108,13 +90,10 @@ hotTickCallback = nil
 --- 中心计时器每秒回调
 -- 遍历所有HOT单位，执行恢复逻辑
 local function onHotTick()
-    debugLogForce("持续治疗效果", "onHotTick", "hotUnits:", hotUnits.size)
     local toRemove = {}
     for ____, target in __TS__Iterator(hotUnits) do
         do
-            debugLogForce("持续治疗效果", "tick开始", "target:", target)
-            if IsUnitPausedBJ(nil, target) then
-                debugLogForce("持续治疗效果", "跳过暂停单位", "target:", target)
+            if IsUnitPausedBJ(target) then
                 goto __continue11
             end
             local countdown = YDUserDataGetSafe("unit", target, ATTR_COUNTDOWN, "real") - 1
@@ -128,81 +107,35 @@ local function onHotTick()
             local tickHP = YDUserDataGetSafe("unit", target, ATTR_TICK_HP, "real")
             local tickMP = YDUserDataGetSafe("unit", target, ATTR_TICK_MP, "real")
             local source = YDUserDataGetSafe("unit", target, ATTR_SOURCE, "unit")
-            debugLogForce(
-                "持续治疗效果",
-                "读取HOT数据",
-                "target:",
-                target,
-                "countdown:",
-                countdown,
-                "tickHP:",
-                tickHP,
-                "tickMP:",
-                tickMP,
-                "source:",
-                source
-            )
             if tickHP > 0 or tickMP > 0 then
-                local ____doHeal_9 = doHeal
-                local ____temp_7
+                local ____doHeal_8 = doHeal
+                local ____temp_6
                 if tickHP > 0 then
-                    ____temp_7 = tickHP
+                    ____temp_6 = tickHP
+                else
+                    ____temp_6 = 0
+                end
+                local ____temp_7
+                if tickMP > 0 then
+                    ____temp_7 = tickMP
                 else
                     ____temp_7 = 0
                 end
-                local ____temp_8
-                if tickMP > 0 then
-                    ____temp_8 = tickMP
-                else
-                    ____temp_8 = 0
-                end
-                local healed = ____doHeal_9({
+                ____doHeal_8({
                     HealSource = source,
                     HealTarget = target,
-                    HealAmount = ____temp_7,
-                    HealManaAmount = ____temp_8,
+                    HealAmount = ____temp_6,
+                    HealManaAmount = ____temp_7,
                     ItemHeal = true,
                     HealEffect = false,
+                    HealShowText = false,
                     ManaEffect = false,
-                    ManaShowText = tickMP > 0
+                    ManaShowText = false
                 })
-                debugLogForce(
-                    "持续治疗效果",
-                    "doHeal完成",
-                    "target:",
-                    target,
-                    "healed:",
-                    healed
-                )
-            else
-                debugLogForce(
-                    "持续治疗效果",
-                    "跳过doHeal",
-                    "target:",
-                    target,
-                    "tickHP:",
-                    tickHP,
-                    "tickMP:",
-                    tickMP
-                )
             end
             local buffAlive = hasAnyHotBuff(target)
-            local dead = IsUnitDeadBJ(nil, target)
+            local dead = IsUnitDeadBJ(target)
             local shouldEnd = not buffAlive or countdown <= 0 or dead
-            debugLogForce(
-                "持续治疗效果",
-                "结束判定",
-                "target:",
-                target,
-                "buffAlive:",
-                buffAlive,
-                "countdown:",
-                countdown,
-                "dead:",
-                dead,
-                "shouldEnd:",
-                shouldEnd
-            )
             if shouldEnd then
                 toRemove[#toRemove + 1] = target
             end
@@ -239,20 +172,6 @@ function ____exports.startHot(target, source, tickHP, tickMP, duration, _interva
     if duration <= 0 then
         return
     end
-    debugLogForce(
-        "持续治疗效果",
-        "startHot",
-        "target:",
-        target,
-        "source:",
-        source,
-        "tickHP:",
-        tickHP,
-        "tickMP:",
-        tickMP,
-        "duration:",
-        duration
-    )
     YDUserDataSetSafe(
         "unit",
         target,
@@ -281,19 +200,19 @@ function ____exports.startHot(target, source, tickHP, tickMP, duration, _interva
         "unit",
         source
     )
-    local ____temp_11
+    local ____temp_10
     if extraOptions ~= nil then
-        ____temp_11 = extraOptions
+        ____temp_10 = extraOptions
     else
-        local ____temp_10
+        local ____temp_9
         if type(_intervalOrOptions) == "number" then
-            ____temp_10 = nil
+            ____temp_9 = nil
         else
-            ____temp_10 = _intervalOrOptions
+            ____temp_9 = _intervalOrOptions
         end
-        ____temp_11 = ____temp_10
+        ____temp_10 = ____temp_9
     end
-    local options = ____temp_11
+    local options = ____temp_10
     if options ~= nil and options.BuffID ~= nil and options.BuffID ~= "" then
         YDUserDataSetSafe(
             "unit",
@@ -307,16 +226,6 @@ function ____exports.startHot(target, source, tickHP, tickMP, duration, _interva
     end
     local isNew = not hotUnits:has(target)
     hotUnits:add(target)
-    debugLogForce(
-        "持续治疗效果",
-        "加入热集合",
-        "target:",
-        target,
-        "isNew:",
-        isNew,
-        "size:",
-        hotUnits.size
-    )
     if isNew then
         ensureCenterTimerRegistered()
     end
@@ -329,8 +238,8 @@ end
 function ____exports.getHotUnitCount()
     return hotUnits.size
 end
-local ____require_result_12 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
-local STES_FireWithParams = ____require_result_12.STES_FireWithParams
+local ____require_result_11 = require("lib.扩展函数.Star扩展函数.Star扩展库.02．Star自定义事件")
+local STES_FireWithParams = ____require_result_11.STES_FireWithParams
 --- STES事件名称
 ____exports.HOT_EVENT_NAME = "持续治疗效果"
 --- 触发"持续治疗效果"事件
@@ -358,21 +267,21 @@ local hotTrigger = nil
 --- STES事件处理函数
 -- 接收参数：HealTarget, HealSource, hotTickHP, hotTickMP
 local function onHotEvent()
-    local ____require_result_13 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
-    local YDLocal1Get = ____require_result_13.YDLocal1Get
+    local ____require_result_12 = require("lib.扩展函数.YDWE函数.02．YDLocal兼容")
+    local YDLocal1Get = ____require_result_12.YDLocal1Get
     local target = YDLocal1Get(nil, "unit", "HealTarget")
     local source = YDLocal1Get(nil, "unit", "HealSource")
     local tickHP = YDLocal1Get(nil, "real", "hotTickHP")
     local tickMP = YDLocal1Get(nil, "real", "hotTickMP")
     local duration = YDUserDataGetSafe("unit", target, ATTR_COUNTDOWN, "real")
     if duration <= 0 then
-        local ____temp_14
+        local ____temp_13
         if tickHP > 0 then
-            ____temp_14 = tickHP
+            ____temp_13 = tickHP
         else
-            ____temp_14 = 10
+            ____temp_13 = 10
         end
-        duration = ____temp_14
+        duration = ____temp_13
     end
     ____exports.startHot(
         target,
@@ -390,8 +299,8 @@ function ____exports.initHotSystem()
     if hotTrigger ~= nil then
         return
     end
-    local ____require_result_15 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
-    local registerStesListener = ____require_result_15.registerStesListener
+    local ____require_result_14 = require("lib.扩展函数.YDWE函数.05．STES子触发公共工具")
+    local registerStesListener = ____require_result_14.registerStesListener
     hotTrigger = registerStesListener(nil, ____exports.HOT_EVENT_NAME, onHotEvent)
 end
 --- 检查系统是否已初始化

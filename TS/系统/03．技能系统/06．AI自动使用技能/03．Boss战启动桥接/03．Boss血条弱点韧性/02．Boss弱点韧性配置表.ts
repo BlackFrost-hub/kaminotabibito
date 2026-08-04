@@ -15,6 +15,7 @@ const jglobals = require("jass.globals") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichState: number) => number;
 const R2I = jass.R2I as (r: number) => number;
+const GetRandomInt = jass.GetRandomInt as (this: void, lowBound: number, highBound: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as number;
 
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
@@ -107,12 +108,27 @@ function 读取启动属性弱点标记(this: void, 配置: 战斗启动属性�
 
 function 从启动属性创建弱点列表(this: void, 配置: 战斗启动属性配置): Boss弱点定义[] {
   const weakList: Boss弱点定义[] = [];
+  const remainingCandidates: Boss弱点定义[] = [];
   for (let i = 0; i < Boss弱点候选列表.length; i++) {
     const candidate = Boss弱点候选列表[i];
     if (读取启动属性弱点标记(配置, candidate.弱点键)) {
       weakList.push(candidate);
+    } else {
+      remainingCandidates.push(candidate);
     }
   }
+
+  const requestedExtraWeakPointCount = R2I(配置.额外随机弱点数 ?? 0);
+  const extraWeakPointCount = requestedExtraWeakPointCount < remainingCandidates.length
+    ? requestedExtraWeakPointCount
+    : remainingCandidates.length;
+  for (let i = 0; i < extraWeakPointCount; i++) {
+    if (remainingCandidates.length <= 0) break;
+    const randomIndex = GetRandomInt(0, remainingCandidates.length - 1);
+    weakList.push(remainingCandidates[randomIndex]);
+    remainingCandidates.splice(randomIndex, 1);
+  }
+
   return weakList;
 }
 

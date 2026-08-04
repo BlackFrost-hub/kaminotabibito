@@ -49,9 +49,6 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数") as {
   StarOther_PanCameraToTimedForPlayer: (this: void, whichPlayer: any, x: number, y: number, duration: number) => void;
 };
-const { debugLog } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLog: (this: void, module: string, ...args: any[]) => void;
-};
 
 import 英雄选择配置表, { 英雄选择配置 } from "./00．英雄选择配置表";
 
@@ -65,6 +62,11 @@ const directRegisterPlayerHero = bridge.directRegisterPlayerHero;
 const 默认英雄禁用技能原始ID = "Ane2";
 const 默认BB单位原始ID = "ewsp";
 const 英雄选择轮询间隔毫秒 = 50;
+
+function 获取句柄ID(this: void, 句柄: any): number {
+  if (句柄 == null || 句柄 === 0 || typeof jass.GetHandleId !== "function") return 0;
+  return jass.GetHandleId(句柄);
+}
 
 export type 英雄选择状态 = {
   是否已初始化: boolean;
@@ -127,9 +129,15 @@ export function 注册英雄选择旧单位事件(this: void, 已确认单位: �
     const 目标单位 = 获取注册目标单位(已确认单位, 注册项.目标单位);
     const 旧触发 = 获取旧触发对象(注册项.旧触发名);
     const 原生事件 = 获取原生单位事件(注册项.事件名);
-    if (目标单位 == null || 目标单位 === 0) continue;
-    if (旧触发 == null || 旧触发 === 0) continue;
-    if (原生事件 == null) continue;
+    if (目标单位 == null || 目标单位 === 0) {
+      continue;
+    }
+    if (旧触发 == null || 旧触发 === 0) {
+      continue;
+    }
+    if (原生事件 == null) {
+      continue;
+    }
     jass.TriggerRegisterUnitEvent(旧触发, 目标单位, 原生事件);
     已注册数量++;
   }
@@ -162,7 +170,7 @@ function 减少点击次数(this: void, 玩家: any): number {
 }
 
 function 清空点击次数(this: void, 玩家: any): void {
-  ydSafe.YDUserDataClearSafe("player", 玩家, 英雄选择配置表.英雄点击次数键, "string");
+  ydSafe.YDUserDataClearSafe("player", 玩家, 英雄选择配置表.英雄点击次数键, "real");
 }
 
 function 更新等待确认玩家数(this: void): void {
@@ -193,8 +201,9 @@ function 轮询点击次数衰减(this: void): void {
     if (过期列表 == null || 过期列表.length <= 0) continue;
 
     while (过期列表.length > 0 && 过期列表[0] <= 现在毫秒) {
+      const 过期时间 = 过期列表[0];
       过期列表.shift();
-      减少点击次数(jass.Player(玩家ID));
+      const 衰减后次数 = 减少点击次数(jass.Player(玩家ID));
     }
     if (过期列表.length > 0) 仍有待处理任务 = true;
   }
@@ -206,7 +215,9 @@ function 轮询点击次数衰减(this: void): void {
 }
 
 function 确保点击次数轮询已启动(this: void): void {
-  if (点击次数轮询ID != null) return;
+  if (点击次数轮询ID != null) {
+    return;
+  }
   点击次数轮询ID = centerTimer.addPeriodicCallback(英雄选择轮询间隔毫秒, 轮询点击次数衰减);
 }
 
@@ -219,7 +230,7 @@ function 记录一次点击确认窗口(this: void, 玩家: any): void {
     点击次数过期时间表[玩家ID] = 列表;
   }
   列表.push(过期时间);
-  增加点击次数(玩家);
+  const 新点击次数 = 增加点击次数(玩家);
   更新等待确认玩家数();
   确保点击次数轮询已启动();
 }
@@ -281,15 +292,21 @@ function 获取英雄单击介绍文本(this: void, 英雄: any): string | undef
 
 function 显示英雄单击介绍(this: void, 玩家: any, 英雄: any): void {
   const 文本 = 获取英雄单击介绍文本(英雄);
-  if (文本 == null || 文本 === "") return;
+  if (文本 == null || 文本 === "") {
+    return;
+  }
   DisplayTimedTextToPlayer(玩家, 0, 0, 英雄选择配置表.单击介绍显示秒数, 文本);
 }
 
 function 执行选择确认公共触发(this: void): void {
   const 触发名 = 英雄选择配置表.选择确认后直接执行触发名;
-  if (触发名 == null || 触发名 === "") return;
+  if (触发名 == null || 触发名 === "") {
+    return;
+  }
   const 触发器 = 获取旧触发对象(触发名);
-  if (触发器 == null || 触发器 === 0) return;
+  if (触发器 == null || 触发器 === 0) {
+    return;
+  }
   if (typeof jass.TriggerExecute === "function") {
     jass.TriggerExecute(触发器);
   }
@@ -301,7 +318,9 @@ function 发送英雄确认公告(this: void, 玩家: any, 英雄: any): void {
 }
 
 function 确保英雄注册桥接已初始化(this: void): void {
-  if (英雄注册桥接已初始化) return;
+  if (英雄注册桥接已初始化) {
+    return;
+  }
   if (typeof initPlayerHeroGetBridge === "function") {
     initPlayerHeroGetBridge();
   }
@@ -310,7 +329,9 @@ function 确保英雄注册桥接已初始化(this: void): void {
 
 function 确认英雄选择(this: void, 玩家: any, 英雄: any): void {
   const 出生点 = 获取英雄出生点();
-  if (出生点 == null) return;
+  if (出生点 == null) {
+    return;
+  }
 
   const BB单位类型ID = 解析单位类型ID(英雄选择配置表.BB单位名);
   const 禁用技能ID = 解析技能类型ID(英雄选择配置表.英雄禁用技能名);
@@ -345,24 +366,44 @@ function 确认英雄选择(this: void, 玩家: any, 英雄: any): void {
   directRegisterPlayerHero(玩家, 英雄);
 
   当前状态.已确认玩家数 = 当前状态.已确认玩家数 + 1;
-  debugLog("HeroSelect", "confirm", jass.GetPlayerId(玩家), jass.GetUnitName(英雄));
 }
 
 function 应忽略本次选择(this: void, 玩家: any, 玩家ID: number, 单位: any, isSelected: boolean): boolean {
-  if (当前状态.是否已关闭) return true;
-  if (isSelected !== true) return true;
-  if (!是可选玩家(玩家ID)) return true;
-  if (!是英雄选择区域内单位(单位)) return true;
-  if (jass.IsUnitType(单位, jass.UNIT_TYPE_HERO) !== true) return true;
-  if (jass.GetOwningPlayer(单位) !== jass.Player(jass.PLAYER_NEUTRAL_PASSIVE)) return true;
-  if (玩家是否已选择英雄(玩家)) return true;
+  if (当前状态.是否已关闭) {
+    return true;
+  }
+  if (isSelected !== true) {
+    return true;
+  }
+  if (!是可选玩家(玩家ID)) {
+    return true;
+  }
+  const 选择区域 = 获取配置矩形(英雄选择配置表.选择区域全局名);
+  if (选择区域 == null || 选择区域 === 0) {
+    return true;
+  }
+  if (!是英雄选择区域内单位(单位)) {
+    return true;
+  }
+  if (jass.IsUnitType(单位, jass.UNIT_TYPE_HERO) !== true) {
+    return true;
+  }
+  const 单位所有者 = jass.GetOwningPlayer(单位);
+  const 中立被动玩家 = jass.Player(jass.PLAYER_NEUTRAL_PASSIVE);
+  if (单位所有者 !== 中立被动玩家) {
+    return true;
+  }
+  if (玩家是否已选择英雄(玩家)) {
+    return true;
+  }
   return false;
 }
 
 function on英雄选择事件(this: void, 玩家: any, 玩家ID: number, 单位: any, isSelected: boolean): void {
   if (应忽略本次选择(玩家, 玩家ID, 单位, isSelected)) return;
 
-  if (获取点击次数(玩家) >= 2) {
+  const 当前点击次数 = 获取点击次数(玩家);
+  if (当前点击次数 >= 1) {
     确认英雄选择(玩家, 单位);
     return;
   }
@@ -372,7 +413,9 @@ function on英雄选择事件(this: void, 玩家: any, 玩家ID: number, 单位:
 }
 
 function 关闭英雄选择系统(this: void): void {
-  if (当前状态.是否已关闭) return;
+  if (当前状态.是否已关闭) {
+    return;
+  }
   当前状态.是否已关闭 = true;
 
   for (let i = 0; i < 英雄选择配置表.可选玩家ID列表.length; i++) {
@@ -390,17 +433,22 @@ function 关闭英雄选择系统(this: void): void {
 function 初始化选中事件中心(this: void): void {
   for (let i = 0; i < 英雄选择配置表.可选玩家ID列表.length; i++) {
     const 玩家ID = 英雄选择配置表.可选玩家ID列表[i];
-    selectionCenter.initPlayerSelectionCenter(jass.Player(玩家ID));
+    const 玩家 = jass.Player(玩家ID);
+    selectionCenter.initPlayerSelectionCenter(玩家);
   }
   selectionCenter.addSelectionListener(on英雄选择事件);
 }
 
 export function 初始化英雄选择系统(this: void): void {
-  if (当前状态.是否已初始化) return;
+  if (当前状态.是否已初始化) {
+    return;
+  }
   当前状态.是否已初始化 = true;
 
   初始化选中事件中心();
-  centerTimer.addDelayedCallback(英雄选择配置表.选择系统关闭秒数 * 1000, 关闭英雄选择系统);
+  if (英雄选择配置表.选择系统关闭秒数 > 0) {
+    centerTimer.addDelayedCallback(英雄选择配置表.选择系统关闭秒数 * 1000, 关闭英雄选择系统);
+  }
 }
 
 export {};

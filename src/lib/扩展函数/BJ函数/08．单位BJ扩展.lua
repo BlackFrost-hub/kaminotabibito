@@ -10,6 +10,13 @@ local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local forEachUnitInGroup = ____require_result_0.forEachUnitInGroup
+local CreateCorpse = jass.CreateCorpse
+local GetLocationX = jass.GetLocationX
+local GetLocationY = jass.GetLocationY
+local SetUnitBlendTime = jass.SetUnitBlendTime
+local SetUnitAnimation = jass.SetUnitAnimation
+local GroupAddUnit = jass.GroupAddUnit
+local TimerStart = jass.TimerStart
 function ____exports.String2UnitIdBJ(unitIdString)
     return jass.UnitId(unitIdString)
 end
@@ -186,5 +193,40 @@ function ____exports.DoesUnitGenerateAlarms(unit)
 end
 function ____exports.GetUnitPropWindowBJ(unit)
     return jass.GetUnitPropWindow(unit) * jglobals.bj_RADTODEG
+end
+--- 对应 Blizzard.j 的 CreatePermanentCorpseLocBJ。
+function ____exports.CreatePermanentCorpseLocBJ(style, unitid, whichPlayer, loc, facing)
+    if loc == nil or loc == 0 then
+        return nil
+    end
+    local corpse = CreateCorpse(
+        whichPlayer,
+        unitid,
+        GetLocationX(loc),
+        GetLocationY(loc),
+        facing
+    )
+    jglobals.bj_lastCreatedUnit = corpse
+    if corpse == nil or corpse == 0 then
+        return corpse
+    end
+    SetUnitBlendTime(corpse, 0)
+    local fleshStyle = jglobals.bj_CORPSETYPE_FLESH
+    local ____temp_2
+    if style == fleshStyle then
+        ____temp_2 = jglobals.bj_suspendDecayFleshGroup
+    else
+        ____temp_2 = jglobals.bj_suspendDecayBoneGroup
+    end
+    local decayGroup = ____temp_2
+    SetUnitAnimation(corpse, style == fleshStyle and "decay flesh" or "decay bone")
+    if decayGroup ~= nil and decayGroup ~= 0 then
+        GroupAddUnit(decayGroup, corpse)
+    end
+    local decayTimer = jglobals.bj_delayedSuspendDecayTimer
+    if decayTimer ~= nil and decayTimer ~= 0 then
+        TimerStart(decayTimer, 0.05, false, nil)
+    end
+    return corpse
 end
 return ____exports

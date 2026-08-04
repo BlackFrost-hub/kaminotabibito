@@ -10,11 +10,10 @@ local createTriggerOrNull = ____02_FF0E_5185_90E8_5DE5_5177.createTriggerOrNull
 -- 统一收口 `*Trg` 同步入口。回调会在全端对称触发，业务侧用 player 判断输入所属玩家。
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
-local DzTriggerRegisterKeyEventTrg = ____require_result_0.DzTriggerRegisterKeyEventTrg
-local DzTriggerRegisterMouseEventTrg = ____require_result_0.DzTriggerRegisterMouseEventTrg
-local DzTriggerRegisterMouseMoveEventTrg = ____require_result_0.DzTriggerRegisterMouseMoveEventTrg
-local DzTriggerRegisterMouseWheelEventTrg = ____require_result_0.DzTriggerRegisterMouseWheelEventTrg
+local DzTriggerRegisterKeyEvent = japi.DzTriggerRegisterKeyEvent
+local DzTriggerRegisterMouseEvent = japi.DzTriggerRegisterMouseEvent
+local DzTriggerRegisterMouseMoveEvent = japi.DzTriggerRegisterMouseMoveEvent
+local DzTriggerRegisterMouseWheelEvent = japi.DzTriggerRegisterMouseWheelEvent
 local keyCallbacksByKeyAndStatus = {}
 local mouseCallbacksByButtonAndStatus = {}
 local moveCallbacks = {}
@@ -25,6 +24,30 @@ local mouseMoveTrigger = nil
 local mouseWheelTrigger = nil
 local function getDispatchKey(a, b)
     return (tostring(a) .. ":") .. tostring(b)
+end
+local function registerSyncKeyToTrigger(trigger, status, key)
+    DzTriggerRegisterKeyEvent(
+        trigger,
+        key,
+        status,
+        true,
+        nil
+    )
+end
+local function registerSyncMouseButtonToTrigger(trigger, status, button)
+    DzTriggerRegisterMouseEvent(
+        trigger,
+        button,
+        status,
+        true,
+        nil
+    )
+end
+local function registerSyncMouseMoveToTrigger(trigger)
+    DzTriggerRegisterMouseMoveEvent(trigger, true, nil)
+end
+local function registerSyncMouseWheelToTrigger(trigger)
+    DzTriggerRegisterMouseWheelEvent(trigger, true, nil)
 end
 local function getTriggerInputPlayer()
     local player = japi.DzGetTriggerKeyPlayer()
@@ -106,19 +129,15 @@ local function onSyncHardwareKey()
     if trigger == nil or trigger == 0 then
         return
     end
-    local context = keyTriggerContextByHandle[jass.GetHandleId(trigger)]
+    local handleId = jass.GetHandleId(trigger)
+    local context = keyTriggerContextByHandle[handleId]
     if context == nil then
         return
     end
     local key = japi.DzGetTriggerKey()
-    dispatchKeyCallbacks(
-        keyCallbacksByKeyAndStatus[getDispatchKey(context.key, context.status)],
-        {
-            player = getTriggerInputPlayer(),
-            key = key,
-            status = context.status
-        }
-    )
+    local player = getTriggerInputPlayer()
+    local callbacks = keyCallbacksByKeyAndStatus[getDispatchKey(context.key, context.status)]
+    dispatchKeyCallbacks(callbacks, {player = player, key = key, status = context.status})
 end
 local function onSyncHardwareMouseButton()
     local trigger = jass.GetTriggeringTrigger()
@@ -170,8 +189,9 @@ function ____exports.registerSyncHardwareKey(key, status, callback)
         if trigger == nil or trigger == 0 then
             return nil
         end
-        keyTriggerContextByHandle[jass.GetHandleId(trigger)] = {key = key, status = status}
-        DzTriggerRegisterKeyEventTrg(trigger, status, key)
+        local handleId = jass.GetHandleId(trigger)
+        keyTriggerContextByHandle[handleId] = {key = key, status = status}
+        registerSyncKeyToTrigger(trigger, status, key)
         jass.TriggerAddAction(trigger, onSyncHardwareKey)
     end
     callbacks[#callbacks + 1] = callback
@@ -188,7 +208,7 @@ function ____exports.registerSyncHardwareMouseButton(button, status, callback)
             return nil
         end
         mouseTriggerContextByHandle[jass.GetHandleId(trigger)] = {button = button, status = status}
-        DzTriggerRegisterMouseEventTrg(trigger, status, button)
+        registerSyncMouseButtonToTrigger(trigger, status, button)
         jass.TriggerAddAction(trigger, onSyncHardwareMouseButton)
     end
     callbacks[#callbacks + 1] = callback
@@ -200,7 +220,7 @@ function ____exports.registerSyncHardwareMouseMove(callback)
         if mouseMoveTrigger == nil or mouseMoveTrigger == 0 then
             return nil
         end
-        DzTriggerRegisterMouseMoveEventTrg(mouseMoveTrigger)
+        registerSyncMouseMoveToTrigger(mouseMoveTrigger)
         jass.TriggerAddAction(mouseMoveTrigger, onSyncHardwareMouseMove)
     end
     moveCallbacks[#moveCallbacks + 1] = callback
@@ -212,7 +232,7 @@ function ____exports.registerSyncHardwareMouseWheel(callback)
         if mouseWheelTrigger == nil or mouseWheelTrigger == 0 then
             return nil
         end
-        DzTriggerRegisterMouseWheelEventTrg(mouseWheelTrigger)
+        registerSyncMouseWheelToTrigger(mouseWheelTrigger)
         jass.TriggerAddAction(mouseWheelTrigger, onSyncHardwareMouseWheel)
     end
     wheelCallbacks[#wheelCallbacks + 1] = callback

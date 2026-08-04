@@ -15,15 +15,11 @@ const jglobals = require("jass.globals") as any;
 const { createDelayedCall } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   createDelayedCall: (this: void, delaySec: number, callback: () => void) => { id: number };
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 
 const GetTriggerUnit = jass.GetTriggerUnit as () => any;
 const GetOrderTargetDestructable = jass.GetOrderTargetDestructable as () => any;
 const GetDestructableTypeId = jass.GetDestructableTypeId as (destructable: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 
 
 const { onUnitTargetInteractable, onUnitTargetChestPointOrder, onUnitTargetChestImmediateOrder, isInteractable } = require("系统.06．经济系统.00．宝箱系统.03．宝箱核心") as {
@@ -76,7 +72,6 @@ const ATTEMPT_KEY = "__syzl_chestSystem_attempt";
 const MAX_REG_ATTEMPTS = 30;
 const RETRY_SEC = 0.1;
 const GLOBAL_ORDER_GUARD = "__syzl_chestSystem_global_target_listener";
-const 调试模块 = "宝箱系统-目标指令";
 
 /** STES事件名：单位发布目标命令 */
 const STES_EVENT_UNIT_TARGET_ORDER = "单位发布目标命令";
@@ -92,35 +87,16 @@ const 已注册宝箱英雄 = new Set<number>();
 function onUnitIssuedTargetOrder(this: void): void {
   const unit = GetTriggerUnit();
   if (unit == null || unit === 0) {
-    debugLogForce(调试模块, "单位特定目标命令跳过", "reason=触发单位为空");
     return;
   }
 
   const target = GetOrderTargetDestructable();
   if (target == null || target === 0) {
-    debugLogForce(调试模块, "单位特定目标命令跳过", "reason=目标可破坏物为空", "unit=", GetHandleId(unit));
     return;
   }
 
-  const unitId = GetHandleId(unit);
   const targetType = GetDestructableTypeId(target);
   const 可交互 = isInteractable(targetType);
-  debugLogForce(
-    调试模块,
-    "单位特定目标命令",
-    "unit=",
-    unitId,
-    "unitType=",
-    GetUnitTypeId(unit),
-    "registered=",
-    已注册宝箱英雄.has(unitId),
-    "target=",
-    GetHandleId(target),
-    "targetType=",
-    targetType,
-    "interactable=",
-    可交互,
-  );
   if (!可交互) return;
 
   onUnitTargetInteractable(unit, target);
@@ -132,24 +108,6 @@ function onGlobalTargetOrder(this: void, unit: any, orderId: number, _targetUnit
   const targetType = GetDestructableTypeId(targetDestructable);
   const 已登记 = 已注册宝箱英雄.has(unitId);
   const 可交互 = isInteractable(targetType);
-  debugLogForce(
-    调试模块,
-    "全局目标命令",
-    "orderId=",
-    orderId,
-    "unit=",
-    unitId,
-    "unitType=",
-    GetUnitTypeId(unit),
-    "registered=",
-    已登记,
-    "target=",
-    GetHandleId(targetDestructable),
-    "targetType=",
-    targetType,
-    "interactable=",
-    可交互,
-  );
   if (!已登记 || !可交互) return;
 
   onUnitTargetInteractable(unit, targetDestructable);
@@ -212,7 +170,6 @@ function tryRegisterTargetOrderStes(this: void): void {
   g[ATTEMPT_KEY] = attempt;
 
   if (count >= 1 || attempt >= MAX_REG_ATTEMPTS) {
-    debugLogForce(调试模块, "STES目标命令监听结果", "count=", count, "attempt=", attempt, "registered=", count >= 1);
     g[REG_GUARD] = true;
     return;
   }
@@ -229,7 +186,6 @@ function ensureGlobalTargetOrderListener(this: void): void {
   orderEventCenter.registerTargetOrderListener(onGlobalTargetOrder);
   orderEventCenter.registerPointOrderListener(onGlobalPointOrder);
   orderEventCenter.registerImmediateOrderListener(onGlobalImmediateOrder);
-  debugLogForce(调试模块, "全局命令监听已注册");
 }
 
 // ==========================================================================================
@@ -246,7 +202,6 @@ export function registerChestSystemHero(this: void, hero: any): void {
 
   const heroId = GetHandleId(hero);
   已注册宝箱英雄.add(heroId);
-  debugLogForce(调试模块, "登记宝箱英雄", "unit=", heroId, "unitType=", GetUnitTypeId(hero), "registeredCount=", 已注册宝箱英雄.size);
   ensureGlobalTargetOrderListener();
 
   // 注册单位目标命令事件

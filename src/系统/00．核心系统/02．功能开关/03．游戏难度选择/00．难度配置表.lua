@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-____exports["游戏难度选择延迟秒"] = 11
+____exports["游戏难度选择延迟秒"] = 20
 ____exports["游戏难度全局变量名"] = "udg_N"
 ____exports["弱点数量全局变量名"] = "udg_R"
 ____exports["游戏难度配置表"] = {

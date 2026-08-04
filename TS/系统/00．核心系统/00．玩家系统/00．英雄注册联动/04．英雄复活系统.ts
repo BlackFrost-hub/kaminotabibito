@@ -2,11 +2,14 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const g = require("jass.globals") as { udg_FHD?: any; [key: string]: any };
+const g = require("jass.globals") as { udg_FHD?: any; udg_Boss?: any; [key: string]: any };
 
-const YDWE模块 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
-  YDUserDataGet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
-  YDUserDataSet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string, value: any) => void;
+const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
+  YDUserDataSetSafe: (this: void, tableTypeName: string, tableKey: any, attr: string, valueTypeName: string, value: any) => void;
+};
+const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetRandomDirectionDeg: (this: void) => number;
 };
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
@@ -85,7 +88,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const ReviveHeroLoc = jass.ReviveHeroLoc as (whichHero: any, loc: any, showExp: boolean) => void;
-const GetRandomDirectionDeg = jass.GetRandomDirectionDeg as () => number;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
@@ -337,6 +339,12 @@ function 寻找可通行复活点(this: void, boss: any, 检测单位: any): { x
   return { x: 结果.最终X, y: 结果.最终Y };
 }
 
+function 读取当前复活Boss(this: void): any {
+  const battleBoss = YDUserDataGetSafe("string", Boss战表, Boss战单位属性, "unit");
+  if (是否有效(battleBoss)) return battleBoss;
+  return g.udg_Boss;
+}
+
 function 执行复活(this: void, dyingUnit: any): void {
   if (!是否有效(dyingUnit)) return;
   if (!是玩家英雄(dyingUnit)) return;
@@ -344,14 +352,14 @@ function 执行复活(this: void, dyingUnit: any): void {
 
   隐藏英雄栏倒计时(取英雄栏槽位(dyingUnit));
 
-  const 剩余次数 = YDWE模块.YDUserDataGet("string", 复活次数表, 复活次数属性, "integer") as number | undefined;
+  const 剩余次数 = YDUserDataGetSafe("string", 复活次数表, 复活次数属性, "integer") as number | undefined;
   if (剩余次数 != null && 剩余次数 <= 0) return;
 
   if (剩余次数 != null) {
-    YDWE模块.YDUserDataSet("string", 复活次数表, 复活次数属性, "integer", 剩余次数 - 1);
+    YDUserDataSetSafe("string", 复活次数表, 复活次数属性, "integer", 剩余次数 - 1);
   }
 
-  const boss = YDWE模块.YDUserDataGet("string", Boss战表, Boss战单位属性, "unit");
+  const boss = 读取当前复活Boss();
   if (是否有效(boss)) {
     const pos = 寻找可通行复活点(boss, dyingUnit);
     if (pos == null) return;
@@ -389,7 +397,7 @@ export function 初始化英雄复活(this: void): void {
   初始化英雄栏倒计时框体();
 
   if (设置测试次数) {
-    YDWE模块.YDUserDataSet("string", 复活次数表, 复活次数属性, "integer", 测试复活次数);
+    YDUserDataSetSafe("string", 复活次数表, 复活次数属性, "integer", 测试复活次数);
   }
 
   const 死亡模块 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心");

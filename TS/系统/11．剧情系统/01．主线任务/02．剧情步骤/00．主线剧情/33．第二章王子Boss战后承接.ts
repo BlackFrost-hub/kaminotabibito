@@ -17,6 +17,9 @@ import {
 export { 章节末战后承接剧情片段 } from "../02．第二章/33．第二章王子Boss战后承接";
 
 const jass = require("jass.common") as any;
+const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
+};
 
 const { 播放原生任务音效 } = require("lib.扩展函数.封装函数.02．音效系统.07．原生任务音效") as {
   播放原生任务音效: (this: void, 类型: "警告") => void;
@@ -30,6 +33,7 @@ const { 消费世界地图单位缓存, 王宫禁卫缓存键表 } = require("�
 };
 
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
+const Player = jass.Player as (this: void, playerId: number) => any;
 
 const 里科特登场特效 = "war3mapImported\\BlueRitualTarget.mdx";
 const 王宫潜入镜头预设: 剧情镜头预设参数 = {
@@ -54,6 +58,12 @@ const 王宫密室对峙镜头预设: 剧情镜头预设参数 = {
   观察区域: 50,
   远景剪裁: 6000,
 };
+const 第二章战后对白玩家引用 = "剧情运行时.第二章战后对白玩家";
+
+function 登记第二章战后对白玩家(this: void): void {
+  const 玩家单位 = getRegisteredPlayerHero(Player(0));
+  if (玩家单位 != null && 玩家单位 !== 0) 注册剧情运行时单位(第二章战后对白玩家引用, 玩家单位);
+}
 
 function 登记王宫四名预置禁卫(this: void): void {
   for (let i = 0; i < 王宫禁卫缓存键表.length; i++) {
@@ -67,6 +77,7 @@ function 登记王宫四名预置禁卫(this: void): void {
 
 export function 执行章节末长对白承接(this: void, 参数: 剧情动作参数表): void {
   进入剧情电影模式();
+  登记第二章战后对白玩家();
   写入剧情进度(Number(参数.设置剧情进度) || Number(参数.目标进度) || 33);
 }
 

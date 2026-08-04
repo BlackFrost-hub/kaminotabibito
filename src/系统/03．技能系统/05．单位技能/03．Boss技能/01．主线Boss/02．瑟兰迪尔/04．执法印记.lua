@@ -26,6 +26,8 @@ local GetUnitName = jass.GetUnitName
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetHandleId = jass.GetHandleId
 local IssueTargetOrder = jass.IssueTargetOrder
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_6["单位是否正在原生施法"]
 local _____745F_5170_8FEA_5C14_5355_4F4DID = stringToFourCC("N057")
 local _____4F24_5BB3_4FEE_6B63_5DF2_6CE8_518C = false
 local function _____83B7_53D6_672C_6B21_5370_8BB0_589E_4F24()
@@ -60,11 +62,11 @@ local function _____786E_4FDD_6267_6CD5_5370_8BB0_4F24_5BB3_4FEE_6B63()
 end
 ____exports["选择瑟兰迪尔执法印记目标"] = function(context)
     local threatTarget = _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807(context["Boss单位"])
-    local ____temp_8 = threatTarget and threatTarget.targetRef
-    if ____temp_8 == nil then
-        ____temp_8 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(context["Boss单位"])
+    local ____temp_9 = threatTarget and threatTarget.targetRef
+    if ____temp_9 == nil then
+        ____temp_9 = _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4(context["Boss单位"])
     end
-    return ____temp_8
+    return ____temp_9
 end
 ____exports["释放瑟兰迪尔执法印记"] = function(context, target)
     local config = _____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["执法印记"]
@@ -75,6 +77,9 @@ ____exports["释放瑟兰迪尔执法印记"] = function(context, target)
     local durationMs = config["持续秒"] * 1000
     setThreat(context["Boss单位"], target, 1000)
     _____8BBE_7F6E_5F3A_5236_653B_51FB_76EE_6807(context["Boss单位"], target, durationMs)
+    if _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5(context["Boss单位"]) then
+        return true
+    end
     IssueTargetOrder(context["Boss单位"], "attack", target)
     _____8BBE_7F6E_5F53_524D_76EE_6807(
         GetHandleId(context["Boss单位"]),

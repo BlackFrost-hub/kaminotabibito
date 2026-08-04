@@ -2,7 +2,6 @@
 
 const jass = require("jass.common") as any;
 
-export const 怪物刷新模块名 = "怪物刷新系统";
 export const 刷怪表名 = "刷怪";
 export const 刷怪单位组键 = "单位组";
 export const 刷怪延迟秒 = 55.0;
@@ -30,14 +29,14 @@ export interface 刷怪延迟上下文 {
 }
 
 export interface 特殊精英暴击覆写配置 {
-  单位名?: string;
+  单位ID?: string;
   X: number;
   Y: number;
   暴击率: number;
 }
 
 export interface 固定属性配置 {
-  单位名: string;
+  单位ID: string;
   属性名: 怪物属性键;
   数值: number;
 }

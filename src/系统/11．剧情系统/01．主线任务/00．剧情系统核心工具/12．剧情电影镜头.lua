@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 ---
 -- @noSelfInFile
@@ -13,11 +14,37 @@ local _____91CD_7F6E_73A9_5BB6_955C_5934_5E76_5E73_79FB_5230_5355_4F4D = ____req
 local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local getRegisteredPlayerHero = ____require_result_3.getRegisteredPlayerHero
 local GetLocalPlayer = jass.GetLocalPlayer
+local GetPlayerId = jass.GetPlayerId
+local GetCameraField = jass.GetCameraField
+local SetCameraField = jass.SetCameraField
+local CAMERA_FIELD_TARGET_DISTANCE = jass.CAMERA_FIELD_TARGET_DISTANCE
+local CAMERA_FIELD_ZOFFSET = jass.CAMERA_FIELD_ZOFFSET
 local _____5267_60C5_7535_5F71_6A21_5F0F_5DF2_5F00_542F = false
+local _____5267_60C5_7535_5F71_6A21_5F0F_524D_955C_5934_72B6_6001_8868 = {}
+local function _____8BB0_5F55_672C_5730_73A9_5BB6_955C_5934_72B6_6001()
+    local localPlayer = GetLocalPlayer()
+    local playerId = GetPlayerId(localPlayer)
+    _____5267_60C5_7535_5F71_6A21_5F0F_524D_955C_5934_72B6_6001_8868[playerId] = {
+        ["目标距离"] = GetCameraField(CAMERA_FIELD_TARGET_DISTANCE),
+        ["高度偏移"] = GetCameraField(CAMERA_FIELD_ZOFFSET)
+    }
+end
+local function _____6062_590D_672C_5730_73A9_5BB6_955C_5934_72B6_6001()
+    local localPlayer = GetLocalPlayer()
+    local playerId = GetPlayerId(localPlayer)
+    local _____72B6_6001 = _____5267_60C5_7535_5F71_6A21_5F0F_524D_955C_5934_72B6_6001_8868[playerId]
+    if _____72B6_6001 == nil then
+        return
+    end
+    SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, _____72B6_6001["目标距离"], 0)
+    SetCameraField(CAMERA_FIELD_ZOFFSET, _____72B6_6001["高度偏移"], 0)
+    __TS__Delete(_____5267_60C5_7535_5F71_6A21_5F0F_524D_955C_5934_72B6_6001_8868, playerId)
+end
 ____exports["进入剧情电影模式"] = function()
     if _____5267_60C5_7535_5F71_6A21_5F0F_5DF2_5F00_542F then
         return
     end
+    _____8BB0_5F55_672C_5730_73A9_5BB6_955C_5934_72B6_6001()
     _____5267_60C5_7535_5F71_6A21_5F0F_5DF2_5F00_542F = true
     CinematicModeBJ(
         true,
@@ -39,5 +66,6 @@ ____exports["退出剧情电影模式并恢复镜头"] = function()
     local localPlayer = GetLocalPlayer()
     local hero = getRegisteredPlayerHero(localPlayer)
     _____91CD_7F6E_73A9_5BB6_955C_5934_5E76_5E73_79FB_5230_5355_4F4D(localPlayer, hero, 0)
+    _____6062_590D_672C_5730_73A9_5BB6_955C_5934_72B6_6001()
 end
 return ____exports

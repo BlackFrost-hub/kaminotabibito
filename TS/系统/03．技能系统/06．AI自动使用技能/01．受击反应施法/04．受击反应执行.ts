@@ -4,16 +4,21 @@ import type { 受击反应技能配置 } from "./00．配置类型";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { getObjectProperty, ObjectType, YDWEDistanceBetweenUnits } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
-  getObjectProperty: (this: void, objectType: number, objectId: number | string, property: string) => string;
+const { ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
   ObjectType: { ABILITY: number };
-  YDWEDistanceBetweenUnits: (this: void, a: any, b: any) => number;
+};
+const { getObjectPropertySafe, YDWEDistanceBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  getObjectPropertySafe: (this: void, objectType: number, objectId: number | string, property: string) => string;
+  YDWEDistanceBetweenUnitsSafe: (this: void, a: any, b: any) => number;
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string) => number;
 };
 const { GetUnitLifePercentBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   GetUnitLifePercentBJ: (this: void, whichUnit: any) => number;
+};
+const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+  单位是否正在原生施法: (this: void, unit: any) => boolean;
 };
 
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
@@ -71,7 +76,7 @@ export function 获取技能命令字串(this: void, skill: 受击反应技能�
   const cached = 技能命令缓存[缓存键];
   if (cached != null) return cached;
 
-  const value = getObjectProperty(ObjectType.ABILITY, skill.技能ID, 命令字段) || "";
+  const value = getObjectPropertySafe(ObjectType.ABILITY, skill.技能ID, 命令字段) || "";
   技能命令缓存[缓存键] = value;
   return value;
 }
@@ -93,7 +98,7 @@ export function 受击技能是否满足条件(this: void, skill: 受击反应�
   }
 
   if (source != null && source !== 0) {
-    const distance = YDWEDistanceBetweenUnits(unit, source);
+    const distance = YDWEDistanceBetweenUnitsSafe(unit, source);
     if (skill.与伤害来源距离不大于 != null && distance > skill.与伤害来源距离不大于) return false;
     if (skill.与伤害来源距离不小于 != null && distance < skill.与伤害来源距离不小于) return false;
   }
@@ -127,6 +132,7 @@ function 取目标坐标(this: void, skill: 受击反应技能配置, unit: any,
 }
 
 export function 尝试执行受击技能(this: void, skill: 受击反应技能配置, unit: any, source: any): boolean {
+  if (单位是否正在原生施法(unit)) return false;
   if (!受击技能是否满足条件(skill, unit, source)) return false;
 
   const order = 获取技能命令字串(skill);

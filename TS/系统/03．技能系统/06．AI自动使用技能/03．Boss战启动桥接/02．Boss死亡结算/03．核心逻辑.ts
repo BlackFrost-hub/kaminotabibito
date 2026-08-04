@@ -78,6 +78,7 @@ const BJ修改增加 = 0;
 let 当前全员奖励: Boss死亡全员奖励 | undefined;
 let 当前Boss死亡首领奖励池ID = "";
 let 豺狼异变累计次数 = 0;
+const Boss死亡配置单位类型ID列表: number[][] = [];
 
 function 读取玩家英雄组(this: void): any {
   return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
@@ -293,7 +294,34 @@ function 取单位名匹配原始ID(this: void, 单位名: string): number {
   return 0;
 }
 
-function Boss单位匹配配置(this: void, 配置: Boss死亡结算配置, Boss单位: any): boolean {
+function 初始化Boss死亡配置单位类型ID列表(this: void): void {
+  for (let i = 0; i < Boss死亡非UI掉落与清理配置表.length; i++) {
+    const 配置 = Boss死亡非UI掉落与清理配置表[i];
+    const 单位类型ID列表: number[] = [];
+
+    // 带引用键的配置必须保持按具体单位句柄匹配，不能扩大为同类型单位。
+    if (配置.Boss引用键 == null || 配置.Boss引用键 === "") {
+      if (配置.Boss单位名 != null && 配置.Boss单位名 !== "") {
+        const 单位类型ID = 取单位名匹配原始ID(配置.Boss单位名);
+        if (单位类型ID > 0) 单位类型ID列表.push(单位类型ID);
+      }
+
+      const 名称列表 = 配置.Boss单位名列表;
+      if (名称列表 != null) {
+        for (let j = 0; j < 名称列表.length; j++) {
+          const 单位类型ID = 取单位名匹配原始ID(名称列表[j]);
+          if (单位类型ID > 0 && 单位类型ID列表.indexOf(单位类型ID) < 0) {
+            单位类型ID列表.push(单位类型ID);
+          }
+        }
+      }
+    }
+
+    Boss死亡配置单位类型ID列表.push(单位类型ID列表);
+  }
+}
+
+function Boss单位匹配配置(this: void, 配置: Boss死亡结算配置, 配置索引: number, Boss单位: any, 单位类型ID: number): boolean {
   if (Boss单位 == null || Boss单位 === 0) return false;
 
   if (配置.Boss引用键 != null && 配置.Boss引用键 !== "") {
@@ -301,26 +329,22 @@ function Boss单位匹配配置(this: void, 配置: Boss死亡结算配置, Boss
     return 引用单位 != null && 引用单位 !== 0 && 引用单位 === Boss单位;
   }
 
-  const 单位类型ID = GetUnitTypeId(Boss单位);
-  if (单位类型ID <= 0) return false;
-
-  if (配置.Boss单位名 != null && 配置.Boss单位名 !== "") {
-    return 取单位名匹配原始ID(配置.Boss单位名) === 单位类型ID;
-  }
-
-  const 名称列表 = 配置.Boss单位名列表;
-  if (名称列表 == null || 名称列表.length <= 0) return false;
-  for (let i = 0; i < 名称列表.length; i++) {
-    if (取单位名匹配原始ID(名称列表[i]) === 单位类型ID) return true;
+  const 单位类型ID列表 = Boss死亡配置单位类型ID列表[配置索引];
+  for (let i = 0; i < 单位类型ID列表.length; i++) {
+    if (单位类型ID列表[i] === 单位类型ID) return true;
   }
   return false;
 }
 
+初始化Boss死亡配置单位类型ID列表();
+
 export function 获取Boss死亡结算配置(this: void, Boss单位: any): Boss死亡结算配置 | undefined {
   if (Boss单位 == null || Boss单位 === 0) return undefined;
+  const 单位类型ID = GetUnitTypeId(Boss单位);
+  if (单位类型ID <= 0) return undefined;
   for (let i = 0; i < Boss死亡非UI掉落与清理配置表.length; i++) {
     const 配置 = Boss死亡非UI掉落与清理配置表[i];
-    if (Boss单位匹配配置(配置, Boss单位)) return 配置;
+    if (Boss单位匹配配置(配置, i, Boss单位, 单位类型ID)) return 配置;
   }
   return undefined;
 }

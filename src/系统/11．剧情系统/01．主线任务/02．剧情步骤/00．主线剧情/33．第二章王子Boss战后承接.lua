@@ -22,14 +22,17 @@ do
     ____exports["章节末战后承接剧情片段"] = ____33_FF0E_7B2C_4E8C_7AE0_738B_5B50Boss_6218_540E_627F_63A5["章节末战后承接剧情片段"]
 end
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.封装函数.02．音效系统.07．原生任务音效")
-local _____64AD_653E_539F_751F_4EFB_52A1_97F3_6548 = ____require_result_0["播放原生任务音效"]
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_1.createTimedEffect
-local ____require_result_2 = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.09．世界地图单位缓存")
-local _____6D88_8D39_4E16_754C_5730_56FE_5355_4F4D_7F13_5B58 = ____require_result_2["消费世界地图单位缓存"]
-local _____738B_5BAB_7981_536B_7F13_5B58_952E_8868 = ____require_result_2["王宫禁卫缓存键表"]
+local ____require_result_0 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local getRegisteredPlayerHero = ____require_result_0.getRegisteredPlayerHero
+local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效系统.07．原生任务音效")
+local _____64AD_653E_539F_751F_4EFB_52A1_97F3_6548 = ____require_result_1["播放原生任务音效"]
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_2.createTimedEffect
+local ____require_result_3 = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.09．世界地图单位缓存")
+local _____6D88_8D39_4E16_754C_5730_56FE_5355_4F4D_7F13_5B58 = ____require_result_3["消费世界地图单位缓存"]
+local _____738B_5BAB_7981_536B_7F13_5B58_952E_8868 = ____require_result_3["王宫禁卫缓存键表"]
 local IssueImmediateOrder = jass.IssueImmediateOrder
+local Player = jass.Player
 local _____91CC_79D1_7279_767B_573A_7279_6548 = "war3mapImported\\BlueRitualTarget.mdx"
 local _____738B_5BAB_6F5C_5165_955C_5934_9884_8BBE = {
     X = 15890.13,
@@ -53,6 +56,13 @@ local _____738B_5BAB_5BC6_5BA4_5BF9_5CD9_955C_5934_9884_8BBE = {
     ["观察区域"] = 50,
     ["远景剪裁"] = 6000
 }
+local _____7B2C_4E8C_7AE0_6218_540E_5BF9_767D_73A9_5BB6_5F15_7528 = "剧情运行时.第二章战后对白玩家"
+local function _____767B_8BB0_7B2C_4E8C_7AE0_6218_540E_5BF9_767D_73A9_5BB6()
+    local _____73A9_5BB6_5355_4F4D = getRegisteredPlayerHero(Player(0))
+    if _____73A9_5BB6_5355_4F4D ~= nil and _____73A9_5BB6_5355_4F4D ~= 0 then
+        _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____7B2C_4E8C_7AE0_6218_540E_5BF9_767D_73A9_5BB6_5F15_7528, _____73A9_5BB6_5355_4F4D)
+    end
+end
 local function _____767B_8BB0_738B_5BAB_56DB_540D_9884_7F6E_7981_536B()
     do
         local i = 0
@@ -61,18 +71,19 @@ local function _____767B_8BB0_738B_5BAB_56DB_540D_9884_7F6E_7981_536B()
                 local _____7F13_5B58_952E = _____738B_5BAB_7981_536B_7F13_5B58_952E_8868[i + 1]
                 local _____7981_536B = _____6D88_8D39_4E16_754C_5730_56FE_5355_4F4D_7F13_5B58(_____7F13_5B58_952E)
                 if _____7981_536B == nil or _____7981_536B == 0 then
-                    goto __continue4
+                    goto __continue6
                 end
                 IssueImmediateOrder(_____7981_536B, "stop")
                 _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____7F13_5B58_952E, _____7981_536B)
             end
-            ::__continue4::
+            ::__continue6::
             i = i + 1
         end
     end
 end
 ____exports["执行章节末长对白承接"] = function(_____53C2_6570)
     _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F()
+    _____767B_8BB0_7B2C_4E8C_7AE0_6218_540E_5BF9_767D_73A9_5BB6()
     _____5199_5165_5267_60C5_8FDB_5EA6(__TS__Number(_____53C2_6570["设置剧情进度"]) or __TS__Number(_____53C2_6570["目标进度"]) or 33)
 end
 ____exports["执行章节末紧急警告"] = function(______53C2_6570)

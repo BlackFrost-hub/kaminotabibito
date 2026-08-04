@@ -14,16 +14,20 @@ import {
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { SetStackedSoundBJ } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
-  SetStackedSoundBJ: (this: void, add: boolean, soundHandle: any, rectHandle: any) => void;
+const {
+  挂载区域背景音乐句柄,
+  卸载区域背景音乐句柄,
+  移除区域背景音乐矩形,
+} = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
+  挂载区域背景音乐句柄: (this: void, add: boolean, soundHandle: any, rectHandle: any) => boolean;
+  卸载区域背景音乐句柄: (this: void, soundHandle: any, rectHandle: any) => boolean;
+  移除区域背景音乐矩形: (this: void, rectHandle: any) => boolean;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, moduleName: string, ...args: any[]) => void;
 };
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
-const RemoveRect = jass.RemoveRect as (whichRect: any) => void;
-
 function 获取句柄ID(this: void, handle: any): number {
   if (handle == null || handle === 0) return 0;
   return GetHandleId(handle) || 0;
@@ -32,13 +36,13 @@ function 获取句柄ID(this: void, handle: any): number {
 function 矩形添加音频(this: void, rectHandle: any, soundHandle: any): void {
   if (rectHandle == null || rectHandle === 0) return;
   if (soundHandle == null || soundHandle === 0) return;
-  SetStackedSoundBJ(true, soundHandle, rectHandle);
+  挂载区域背景音乐句柄(true, soundHandle, rectHandle);
 }
 
 function 矩形移除音频(this: void, rectHandle: any, soundHandle: any): void {
   if (rectHandle == null || rectHandle === 0) return;
   if (soundHandle == null || soundHandle === 0) return;
-  SetStackedSoundBJ(false, soundHandle, rectHandle);
+  卸载区域背景音乐句柄(soundHandle, rectHandle);
 }
 
 function 移除上下文区域音频(this: void, context: Boss战运行上下文 | undefined): void {
@@ -54,7 +58,7 @@ function 清理动态地点矩形(this: void, context: Boss战运行上下文): 
   const rectHandle = context.地点矩形;
   context.地点矩形 = null;
   context.地点句柄ID = 0;
-  RemoveRect(rectHandle);
+  移除区域背景音乐矩形(rectHandle);
 }
 
 export function 清理矩形Boss战候选音频(this: void, rectHandle: any): void {

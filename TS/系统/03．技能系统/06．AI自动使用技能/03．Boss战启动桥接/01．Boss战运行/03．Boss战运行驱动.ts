@@ -11,6 +11,7 @@ import {
   Boss战运行Tick毫秒,
   Boss战运行模块名,
 } from "./00．常量定义";
+import { Boss战表名, Boss战单位字段 } from "../00．常量定义";
 import {
   type Boss战运行上下文,
   创建Boss战运行上下文,
@@ -64,6 +65,9 @@ const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, moduleName: string, ...args: any[]) => void;
+};
+const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
@@ -122,6 +126,11 @@ function 停止瑟兰迪尔Boss运行时(this: void, bossUnit: any): void {
 function 写入当前Boss全局(this: void, bossUnit: any): void {
   if (bossUnit == null || bossUnit === 0) return;
   jglobals.udg_Boss = bossUnit;
+}
+
+function 写入当前Boss战单位字段(this: void, bossUnit: any): void {
+  if (bossUnit == null || bossUnit === 0) return;
+  YDUserDataSetSafe("string", Boss战表名, Boss战单位字段, "unit", bossUnit);
 }
 
 function 清理当前Boss全局(this: void, bossUnit: any): void {
@@ -261,6 +270,7 @@ export function 启动Boss战运行(this: void, bossUnit: any): void {
   if (bossUnit == null || bossUnit === 0) return;
 
   写入当前Boss全局(bossUnit);
+  写入当前Boss战单位字段(bossUnit);
 
   const oldContext = 读取Boss战运行上下文(bossUnit);
   if (oldContext != null && !oldContext.是否已结束) return;

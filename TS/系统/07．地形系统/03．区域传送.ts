@@ -10,8 +10,8 @@ const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   getServerTime: (this: void) => number;
 };
-import 区域传送配置 from "./02．区域传送配置";
-import type { RegionConfig } from "./02．区域传送配置";
+import 区域传送配置, { 剧情动态传送配置表 } from "./02．区域传送配置";
+import type { RegionConfig, 剧情动态传送配置 } from "./02．区域传送配置";
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.index") as {
   StarOther_PanCameraToTimedForPlayer: (this: void, whichPlayer: any, x: number, y: number, duration: number) => void;
 };
@@ -74,6 +74,17 @@ function getStoryProgress(): number {
 function checkRegionCondition(cond: string, _unit: any): boolean {
   if (!cond || cond === "always") return true;
   const text = cond.trim();
+
+  // 剧情动态配置支持多个进度值的“或”条件，例如 zhuxian=47||zhuxian=48。
+  const alternatives = text.split("||");
+  if (alternatives.length > 1) {
+    for (let i = 0; i < alternatives.length; i++) {
+      const alternative = alternatives[i].trim();
+      if (alternative !== "" && checkRegionCondition(alternative, _unit)) return true;
+    }
+    return false;
+  }
+
   const current = getStoryProgress();
   const evalByPrefix = (prefix: string, matcher: (current: number, target: number) => boolean): boolean | null => {
     if (text.indexOf(prefix) !== 0) return null;
@@ -312,6 +323,18 @@ function 剧情传送单位可进入(this: void, unit: any): boolean {
 
 function 空剧情传送清理(this: void): void {}
 
+export interface 剧情配置传送覆盖 {
+  条件?: (this: void) => boolean;
+  读取玩家英雄组: (this: void) => any;
+  允许进入单位?: (this: void, unit: any) => boolean;
+  完成?: (this: void, 触发单位?: any) => void;
+}
+
+/** 读取地形系统集中维护的剧情动态传送配置。 */
+export function 读取剧情传送配置(this: void, 配置ID: string): 剧情动态传送配置 | undefined {
+  return 剧情动态传送配置表[配置ID];
+}
+
 function on移动剧情玩家组(this: void): void {
   const 状态 = 当前剧情玩家组传送状态;
   if (状态 == null) return;
@@ -392,6 +415,33 @@ export function 注册剧情玩家组传送(this: void, 配置: 剧情玩家组�
   return function 清理已注册剧情玩家组传送(this: void): void {
     if (!状态.已触发) 清理剧情玩家组传送状态(状态);
   };
+}
+
+/**
+ * 按地形系统配置表中的 ID 注册剧情玩家组传送。
+ * 剧情侧只提供玩家组和生命周期回调，不再重复维护坐标、范围和进度条件。
+ */
+export function 注册剧情配置传送(
+  配置ID: string,
+  覆盖: 剧情配置传送覆盖,
+): (this: void) => void {
+  const 配置 = 读取剧情传送配置(配置ID);
+  if (配置 == null || !配置.enabled || 覆盖 == null || !覆盖.读取玩家英雄组) {
+    return 空剧情传送清理;
+  }
+
+  return 注册剧情玩家组传送({
+    入口中心X: 配置.入口中心X,
+    入口中心Y: 配置.入口中心Y,
+    入口半径: 配置.入口半径,
+    目标X: 配置.目标X,
+    目标Y: 配置.目标Y,
+    目标面向: 配置.目标面向,
+    条件: 覆盖.条件 ?? (() => checkRegionCondition(配置.condition, undefined)),
+    读取玩家英雄组: 覆盖.读取玩家英雄组,
+    允许进入单位: 覆盖.允许进入单位,
+    完成: 覆盖.完成,
+  });
 }
 
 /** 在游戏初始化时调用（建议用 0.00 秒计时器或地图初始化事件） */

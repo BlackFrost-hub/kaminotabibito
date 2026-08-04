@@ -16,7 +16,7 @@ ____exports["蛇人族接受食人魔任务紧凑剧情片段"] = {
         ["对白序号"] = 1,
         ["动作ID"] = "SRZ蛇人族_接受食人魔任务",
         ["名称"] = "拾取狩猎食人魔任务物品后创建沙漠食人魔预置",
-        ["参数"] = {["触发进度"] = 9, ["注册范围"] = 850, ["旧JASS功能清单"] = "RemoveItem(I0D0) / CreateUnit(次元裂缝) / QuestSetDescription / QuestMessageBJ / CreateUnit(沙漠食人魔) / PauseUnit / SetUnitInvulnerable / TriggerRegisterUnitInRangeSimple / CreatePermanentCorpseLocBJ"}
+        ["参数"] = {["触发进度"] = 9, ["注册范围"] = 1000, ["旧JASS功能清单"] = "RemoveItem(I0D0) / CreateUnit(次元裂缝) / QuestSetDescription / QuestMessageBJ / CreateUnit(沙漠食人魔) / PauseUnit / SetUnitInvulnerable / TriggerRegisterUnitInRangeSimple / CreatePermanentCorpseLocBJ"}
     }, {
         ["序号"] = 2,
         ["挂点"] = "afterDialog",

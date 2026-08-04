@@ -20,7 +20,6 @@ export interface Boss战运行上下文 {
   等待激活截止时间: number;
   转场提示时间: number;
   下次兜底搜敌时间: number;
-  最近兜底目标ID: number;
   胜利音乐移除时间: number;
   是否已结束: boolean;
 }
@@ -76,7 +75,6 @@ export function 创建Boss战运行上下文(this: void, bossUnit: any, 地点�
     等待激活截止时间: 0,
     转场提示时间: 0,
     下次兜底搜敌时间: 0,
-    最近兜底目标ID: 0,
     胜利音乐移除时间: 0,
     是否已结束: false,
   };

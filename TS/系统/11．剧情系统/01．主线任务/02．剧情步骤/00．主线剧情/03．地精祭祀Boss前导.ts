@@ -11,9 +11,11 @@ const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
-const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+};
+const { 启动剧情Boss战 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.11．剧情Boss战启动桥接") as {
+  启动剧情Boss战: (this: void, bossUnit: any, 参数?: { 触发单位?: any; 暂停来源?: string }) => boolean;
 };
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
@@ -28,7 +30,19 @@ const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩�
 import type { 剧情动作参数表 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import type { 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
-import { 播放主线剧情片段 } from "../02．剧情步骤播放器";
+
+type 播放主线剧情片段函数 = (this: void, 片段ID: string, 上下文?: any) => boolean;
+let 播放主线剧情片段实现: 播放主线剧情片段函数 | undefined;
+
+function 播放主线剧情片段(this: void, 片段ID: string, 上下文?: any): boolean {
+  if (播放主线剧情片段实现 == null) {
+    const 播放器模块 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器") as {
+      播放主线剧情片段: 播放主线剧情片段函数;
+    };
+    播放主线剧情片段实现 = 播放器模块.播放主线剧情片段;
+  }
+  return 播放主线剧情片段实现(片段ID, 上下文);
+}
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
@@ -79,10 +93,7 @@ export function 执行地精祭祀Boss战正式注册(this: void, 参数: 剧情
     TriggerRegisterUnitEvent(技能触发器, bossUnit, EVENT_UNIT_SPELL_EFFECT);
   }
   const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
-  YDUserDataSetSafe("string", "Boss战", "绑定单位", "unit", bossUnit);
-  if (触发单位 != null && 触发单位 !== 0) {
-    YDUserDataSetSafe("string", "Boss战", "触发玩家", "unit", 触发单位);
-  }
+  启动剧情Boss战(bossUnit, { 触发单位, 暂停来源: 剧情Boss预置暂停来源 });
 }
 
 function on地精祭祀Boss前导范围触发(this: void): void {
@@ -117,7 +128,7 @@ function on检查并注册地精祭祀Boss范围(this: void): void {
 }
 
 export const 地精祭祀Boss前导剧情动作注册表: Record<string, 剧情动作处理器> = {
-  "JLC精灵村_创建地精祭祀Boss预备": 执行地精祭祀Boss前导激活,
+  "JLC精灵村_地精祭祀Boss前导激活": 执行地精祭祀Boss前导激活,
   "JLC精灵村_地精祭祀Boss战正式注册": 执行地精祭祀Boss战正式注册,
 };
 

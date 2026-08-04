@@ -3,6 +3,7 @@
 // if ((globalThis as any).DEBUG_EQUIP_SKIP_DROP === undefined) (globalThis as any).DEBUG_EQUIP_SKIP_DROP = true;
 const jass = require("jass.common") as any;
 const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
+const GetItemCharges = jass.GetItemCharges as (this: void, item: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemPickup: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
@@ -44,6 +45,22 @@ const { 是否允许装备次数叠加 } = require("系统.02．物品系统.16�
 };
 
 const EQUIP_EVENT_PLAYER_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 13] as const;
+let 装备物品消息静默层数 = 0;
+
+export function beginEquipItemMessageSilence(this: void): void {
+  装备物品消息静默层数 += 1;
+}
+
+export function endEquipItemMessageSilence(this: void): void {
+  if (装备物品消息静默层数 > 0) {
+    装备物品消息静默层数 -= 1;
+  }
+}
+
+function isEquipItemMessageSilenced(this: void): boolean {
+  return 装备物品消息静默层数 > 0;
+}
+
 const 装备视野BuffID = "C034";
 const 装备视野Buff显示持续时间 = 999999;
 const 不走装备系统物品ID表: Record<string, true> = {
@@ -92,6 +109,57 @@ function parsePrimaryBonus(s: string, primaryStr: string): Record<string, number
   return out;
 }
 
+/** 合成直接移除物品时，补偿该物品已经由装备系统加入的属性。 */
+export function 处理合成消耗装备属性(this: void, unit: any, item: any, consumedCount: number): void {
+  if (unit == null || unit === 0 || item == null || item === 0 || !(consumedCount > 0)) return;
+  if (isSpecialUnit(unit)) return;
+
+  const idStr = fourCCToString(GetItemTypeId(item));
+  if (不走装备系统物品ID表[idStr] === true) return;
+  const itemData = itemRelatedFns.getItemDataEntry(item);
+  if (!itemData) return;
+  const skipType = itemData.type;
+  if (skipType === "任务" || skipType === "药剂" || skipType === "食品") return;
+
+  const charges = GetItemCharges(item);
+  const itemCount = charges > 0 ? charges : 1;
+  const itemNamePlain = 去除颜色代码(String(itemData.name || ""));
+  let mult = 1;
+  if (是否允许装备次数叠加(itemNamePlain)) {
+    mult = consumedCount < itemCount ? consumedCount : itemCount;
+  } else if (consumedCount < itemCount) {
+    // 未按次数计算属性的充能物品，只有整件移除时才需要回退属性。
+    return;
+  }
+
+  const primaryBonus = itemData.primaryBonus;
+  let primary: Record<string, number> = {};
+  if (primaryBonus) {
+    const typeId = GetUnitTypeId(unit);
+    const unitId = typeId !== 0 ? fourCCToString(typeId) : "";
+    const primaryStr = unitId !== "" ? getObjectProperty(ObjectType.UNIT, unitId, "Primary") : "";
+    primary = parsePrimaryBonus(primaryBonus, primaryStr);
+  }
+
+  const merged: Record<string, number> = {};
+  for (const e of itemRelatedFns.STAT_CONFIG) {
+    merged[e.key] = (itemData[e.key] ?? 0) + (primary[e.key] ?? 0);
+  }
+  merged["moveSpeed"] = (itemData.moveSpeed ?? 0) + (primary["moveSpeed"] ?? 0);
+
+  const playerStats: StatEntry[] = [];
+  for (const e of itemRelatedFns.STAT_CONFIG) {
+    const value = merged[e.key];
+    if (value == null || value === 0) continue;
+    playerStats.push({ name: e.name, value: -value * mult });
+  }
+
+  const tempReadMap = applyEquipStatsTS(unit, playerStats);
+  if (tempReadMap["视野"] != null) {
+    刷新装备视野显示Buff(unit, Number(tempReadMap["视野"]) || 0);
+  }
+}
+
 /**
  * 处理物品拾取/丢弃的核心逻辑
  */
@@ -109,7 +177,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   if (不走装备系统物品ID表[idStr] === true) return;
   const itemData = itemRelatedFns.getItemDataEntry(item);
   if (!itemData) {
-    if (isPickup) {
+    if (isPickup && !isEquipItemMessageSilenced()) {
       const displayName = (typeof slk !== "undefined" && slk.item && (slk.item as Record<string, { name?: string }>)[idStr]?.name) || idStr;
       const border = "|cff606060────────────────────────|r";
       const msg = border + "\n|cffffff00『系统消息』：|r"+"检测到|cFF87CEEB【装备】|r"+"|cFFFFD700" + "『"+ displayName +"』" +"|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n" + border;
@@ -166,7 +234,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   const coloredLevel = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, levelText) : 装备颜色代码 + levelText + "|r";
   const coloredName = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, 装备原名) : 装备颜色代码 + 装备原名 + "|r";
     // 消耗品丢弃不显示消息，但仍计算属性
-  if (!isConsumable) {
+  if (!isConsumable && !isEquipItemMessageSilenced()) {
     let msg = "|cffffff00『系统消息』：|r" + "|cFF87CEEB【装备】|r " + actionText + coloredLevel + "级装备『" + coloredName + "』";
         for (const stat of playerStats) {
       const sign = stat.value > 0 ? "+" : "";
@@ -199,11 +267,11 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   if (hasMovespeed2 && unit != null && typeof equipMovespeed.getMaxMovespeed2Info === "function") {
     const ms = equipMovespeed.getMaxMovespeed2Info(unit, isDrop ? item : undefined);
     if (ms.value > 0) test5Parts.push("移动速度为：" + tostring(ms.value));
-    if (ms.value > 0 && ms.name !== "" && ms.count >= 2) {
+    if (ms.value > 0 && ms.name !== "" && ms.count >= 2 && !isEquipItemMessageSilenced()) {
       jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "|cffffff00『系统提示』：|r有多个不可叠加移速装备，当前只生效|cff00bfff『" + ms.name + "』|r");
     }
   }
-  if (test5Parts.length > 0) {
+  if (test5Parts.length > 0 && !isEquipItemMessageSilenced()) {
     jass.DisplayTimedTextToPlayer(owner, 0, 0.02, 5, "|cffffff00『系统消息』：|r" + playerName + "的当前装备加成" + test5Parts.join("，"));
   }
 }

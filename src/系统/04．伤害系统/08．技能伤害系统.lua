@@ -197,6 +197,18 @@ local function _____521B_5EFA_6280_80FD_4F24_5BB3_4E0A_4E0B_6587(_____53C2_6570)
         isDamageTransfer = _____53C2_6570.isDamageTransfer == true
     }
 end
+local function _____7ED3_7B97_6280_80FD_4F24_5BB3(_____6765_6E90, _____76EE_6807, _____4F24_5BB3, _____4F24_5BB3_7C7B_578B, attack, ranged, attackType, weaponType)
+    return UnitDamageTarget(
+        _____6765_6E90,
+        _____76EE_6807,
+        _____4F24_5BB3,
+        attack,
+        ranged,
+        attackType,
+        _____4F24_5BB3_7C7B_578B,
+        weaponType
+    )
+end
 ____exports["造成技能伤害"] = function(_____53C2_6570)
     if _____53C2_6570 == nil then
         return false
@@ -209,10 +221,12 @@ ____exports["造成技能伤害"] = function(_____53C2_6570)
     end
     local _____4E0A_4E0B_6587 = _____521B_5EFA_6280_80FD_4F24_5BB3_4E0A_4E0B_6587(_____53C2_6570)
     _____6280_80FD_4F24_5BB3_4E0A_4E0B_6587_6808[#_____6280_80FD_4F24_5BB3_4E0A_4E0B_6587_6808 + 1] = _____4E0A_4E0B_6587
+    local ____7ED3_7B97_6280_80FD_4F24_5BB3_16 = _____7ED3_7B97_6280_80FD_4F24_5BB3
     local ____array_15 = __TS__SparseArrayNew(
         _____6765_6E90,
         _____76EE_6807,
         _____4F24_5BB3,
+        _____53C2_6570["伤害类型"],
         _____53C2_6570.attack == true,
         _____53C2_6570.ranged == true
     )
@@ -220,13 +234,13 @@ ____exports["造成技能伤害"] = function(_____53C2_6570)
     if ____53C2_6570_attackType_13 == nil then
         ____53C2_6570_attackType_13 = ATTACK_TYPE_NORMAL
     end
-    __TS__SparseArrayPush(____array_15, ____53C2_6570_attackType_13, _____53C2_6570["伤害类型"])
+    __TS__SparseArrayPush(____array_15, ____53C2_6570_attackType_13)
     local ____53C2_6570_weaponType_14 = _____53C2_6570.weaponType
     if ____53C2_6570_weaponType_14 == nil then
         ____53C2_6570_weaponType_14 = WEAPON_TYPE_WHOKNOWS
     end
     __TS__SparseArrayPush(____array_15, ____53C2_6570_weaponType_14)
-    local result = UnitDamageTarget(__TS__SparseArraySpread(____array_15))
+    local result = ____7ED3_7B97_6280_80FD_4F24_5BB3_16(__TS__SparseArraySpread(____array_15))
     table.remove(_____6280_80FD_4F24_5BB3_4E0A_4E0B_6587_6808)
     return result
 end
@@ -238,5 +252,106 @@ ____exports["造成单体技能伤害"] = function(_____53C2_6570)
 end
 ____exports["造成AOE技能伤害"] = function(_____53C2_6570)
     return ____exports["造成技能伤害"](__TS__ObjectAssign({}, _____53C2_6570, {["伤害形态"] = "AOE"}))
+end
+--- 在同一个技能伤害上下文中，按目标列表顺序逐个结算AOE伤害。
+-- 每目标处理器会在该目标真正受伤前执行，返回 undefined 可跳过该目标。
+____exports["造成批量AOE技能伤害"] = function(_____53C2_6570)
+    if _____53C2_6570 == nil or _____53C2_6570["来源"] == nil or _____53C2_6570["来源"] == 0 then
+        return 0
+    end
+    if _____53C2_6570["目标列表"] == nil or #_____53C2_6570["目标列表"] == 0 then
+        return 0
+    end
+    local _____4E0A_4E0B_6587 = _____521B_5EFA_6280_80FD_4F24_5BB3_4E0A_4E0B_6587(__TS__ObjectAssign({}, _____53C2_6570, {["伤害形态"] = "AOE"}))
+    local _____6BCF_76EE_6807_5904_7406_5668 = _____53C2_6570["每目标处理器"]
+    local _____6BCF_76EE_6807_7ED3_7B97_540E_5904_7406_5668 = _____53C2_6570["每目标结算后处理器"]
+    local _____57FA_7840_4F24_5BB3 = _____53C2_6570["伤害"] or 0
+    local _____57FA_7840_4F24_5BB3_7C7B_578B = _____53C2_6570["伤害类型"]
+    local _____6210_529F_6570_91CF = 0
+    _____6280_80FD_4F24_5BB3_4E0A_4E0B_6587_6808[#_____6280_80FD_4F24_5BB3_4E0A_4E0B_6587_6808 + 1] = _____4E0A_4E0B_6587
+    do
+        local i = 0
+        while i < #_____53C2_6570["目标列表"] do
+            do
+                local _____76EE_6807 = _____53C2_6570["目标列表"][i + 1]
+                if _____76EE_6807 == nil or _____76EE_6807 == 0 then
+                    goto __continue52
+                end
+                local ____temp_17
+                if _____6BCF_76EE_6807_5904_7406_5668 ~= nil then
+                    ____temp_17 = _____6BCF_76EE_6807_5904_7406_5668(_____76EE_6807, i, _____53C2_6570["变量"])
+                else
+                    ____temp_17 = nil
+                end
+                local _____76EE_6807_53C2_6570 = ____temp_17
+                if _____6BCF_76EE_6807_5904_7406_5668 ~= nil and _____76EE_6807_53C2_6570 == nil then
+                    goto __continue52
+                end
+                local _____4F24_5BB3 = _____76EE_6807_53C2_6570 and _____76EE_6807_53C2_6570["伤害"] or _____57FA_7840_4F24_5BB3
+                local ____temp_22 = _____76EE_6807_53C2_6570 and _____76EE_6807_53C2_6570["伤害类型"]
+                if ____temp_22 == nil then
+                    ____temp_22 = _____57FA_7840_4F24_5BB3_7C7B_578B
+                end
+                local _____4F24_5BB3_7C7B_578B = ____temp_22
+                if not (_____4F24_5BB3 > 0) or _____4F24_5BB3_7C7B_578B == nil then
+                    goto __continue52
+                end
+                local ____7ED3_7B97_6280_80FD_4F24_5BB3_40 = _____7ED3_7B97_6280_80FD_4F24_5BB3
+                local ____53C2_6570__6765_6E90_39 = _____53C2_6570["来源"]
+                local ____temp_25 = _____76EE_6807_53C2_6570 and _____76EE_6807_53C2_6570.attack
+                if ____temp_25 == nil then
+                    ____temp_25 = _____53C2_6570.attack
+                end
+                local ____temp_25_26 = ____temp_25
+                if ____temp_25_26 == nil then
+                    ____temp_25_26 = false
+                end
+                local ____temp_29 = _____76EE_6807_53C2_6570 and _____76EE_6807_53C2_6570.ranged
+                if ____temp_29 == nil then
+                    ____temp_29 = _____53C2_6570.ranged
+                end
+                local ____temp_29_30 = ____temp_29
+                if ____temp_29_30 == nil then
+                    ____temp_29_30 = false
+                end
+                local ____temp_33 = _____76EE_6807_53C2_6570 and _____76EE_6807_53C2_6570.attackType
+                if ____temp_33 == nil then
+                    ____temp_33 = _____53C2_6570.attackType
+                end
+                local ____temp_33_34 = ____temp_33
+                if ____temp_33_34 == nil then
+                    ____temp_33_34 = ATTACK_TYPE_NORMAL
+                end
+                local ____temp_37 = _____76EE_6807_53C2_6570 and _____76EE_6807_53C2_6570.weaponType
+                if ____temp_37 == nil then
+                    ____temp_37 = _____53C2_6570.weaponType
+                end
+                local ____temp_37_38 = ____temp_37
+                if ____temp_37_38 == nil then
+                    ____temp_37_38 = WEAPON_TYPE_WHOKNOWS
+                end
+                local _____6210_529F = ____7ED3_7B97_6280_80FD_4F24_5BB3_40(
+                    ____53C2_6570__6765_6E90_39,
+                    _____76EE_6807,
+                    _____4F24_5BB3,
+                    _____4F24_5BB3_7C7B_578B,
+                    ____temp_25_26,
+                    ____temp_29_30,
+                    ____temp_33_34,
+                    ____temp_37_38
+                )
+                if _____6210_529F then
+                    _____6210_529F_6570_91CF = _____6210_529F_6570_91CF + 1
+                end
+                if _____6BCF_76EE_6807_7ED3_7B97_540E_5904_7406_5668 ~= nil then
+                    _____6BCF_76EE_6807_7ED3_7B97_540E_5904_7406_5668(_____76EE_6807, i, _____6210_529F, _____53C2_6570["变量"])
+                end
+            end
+            ::__continue52::
+            i = i + 1
+        end
+    end
+    table.remove(_____6280_80FD_4F24_5BB3_4E0A_4E0B_6587_6808)
+    return _____6210_529F_6570_91CF
 end
 return ____exports

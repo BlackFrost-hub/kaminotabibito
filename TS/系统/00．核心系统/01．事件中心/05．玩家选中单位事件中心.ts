@@ -64,10 +64,13 @@ function dispatchSelectionListeners(player: any, playerId: number, unit: any, is
 
 function handleSelectionEvent(isSelected: boolean): void {
   const player = jass.GetTriggerPlayer();
-  if (!isValidPlayer(player)) return;
+  const rawUnit = jass.GetTriggerUnit();
+  if (!isValidPlayer(player)) {
+    return;
+  }
 
   const playerId = jass.GetPlayerId(player);
-  const unit = jass.GetTriggerUnit();
+  const unit = rawUnit;
 
   if (!isRealUnit(unit)) {
     if (!isSelected) {
@@ -80,7 +83,9 @@ function handleSelectionEvent(isSelected: boolean): void {
 
   const list = getSelectedUnitList(playerId);
   const hid = getUnitHandleId(unit);
-  if (hid === 0) return;
+  if (hid === 0) {
+    return;
+  }
 
   if (isSelected) {
     if (findSelectedUnitIndex(list, unit) < 0) {
@@ -117,9 +122,13 @@ function ensureSelectionTriggers(): void {
 }
 
 function registerSelectionTriggersForPlayer(whichPlayer: any): void {
-  if (!isValidPlayer(whichPlayer)) return;
+  if (!isValidPlayer(whichPlayer)) {
+    return;
+  }
   const playerId = jass.GetPlayerId(whichPlayer);
-  if (registeredPlayers[playerId]) return;
+  if (registeredPlayers[playerId]) {
+    return;
+  }
 
   ensureSelectionTriggers();
 
@@ -154,8 +163,12 @@ function normalizeSelectionListener(arg1: any, arg2?: any): SelectionListener | 
  */
 export function addSelectionListener(arg1: any, arg2?: any): void {
   const listener = normalizeSelectionListener(arg1, arg2);
-  if (typeof listener !== "function") return;
-  if (selectionListeners.indexOf(listener) >= 0) return;
+  if (typeof listener !== "function") {
+    return;
+  }
+  if (selectionListeners.indexOf(listener) >= 0) {
+    return;
+  }
   selectionListeners.push(listener);
 }
 

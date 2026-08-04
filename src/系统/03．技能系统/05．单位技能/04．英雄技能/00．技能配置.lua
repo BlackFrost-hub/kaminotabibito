@@ -1,12 +1,7 @@
-local ____lualib = require("lualib_bundle")
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.02．蕾米莉亚.00．配置")
+local _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["蕾米莉亚单位技能配置"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.03．阿伦劳特.00．配置")
 local _____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["阿伦劳特单位技能配置"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.04．藤原妹红.00．配置")
@@ -19,28 +14,11 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____5B89_65AF_827E_5C14_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["安斯艾尔单位技能配置"]
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.01．技能配置工具")
 local _____521B_5EFA_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_0["创建单位技能配置"]
-local ____require_result_1 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.00．玩家英雄配置")
-local _____6309_540D_5B57_53CD_67E5_73A9_5BB6_82F1_96C4_5355_4F4DID = ____require_result_1["按名字反查玩家英雄单位ID"]
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
-local ____require_result_3 = require("系统.03．技能系统.08．技能数据表.01．技能名反查")
-local _____6309_540D_5B57_53CD_67E5_6280_80FDID = ____require_result_3["按名字反查技能ID"]
-local _____857E_7C73_8389_4E9A_5355_4F4DID = _____6309_540D_5B57_53CD_67E5_73A9_5BB6_82F1_96C4_5355_4F4DID("蕾米莉亚")
-local _____857E_7C73_8389_4E9A_6076_9B54_7A81_88ADID = _____6309_540D_5B57_53CD_67E5_6280_80FDID("A-蕾米莉亚-恶魔突袭（D）")
-if _____857E_7C73_8389_4E9A_5355_4F4DID == nil or _____857E_7C73_8389_4E9A_5355_4F4DID == "" then
-    error(
-        __TS__New(Error, "无法反查英雄单位ID：蕾米莉亚"),
-        0
-    )
-end
-if _____857E_7C73_8389_4E9A_6076_9B54_7A81_88ADID == nil or _____857E_7C73_8389_4E9A_6076_9B54_7A81_88ADID == "" then
-    error(
-        __TS__New(Error, "无法反查技能ID：A-蕾米莉亚-恶魔突袭（D）"),
-        0
-    )
-end
-local _____857E_7C73_8389_4E9A_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____857E_7C73_8389_4E9A_5355_4F4DID)
-local _____857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_7C7B_578BID = stringToFourCCSafe(_____857E_7C73_8389_4E9A_6076_9B54_7A81_88ADID)
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local _____857E_7C73_8389_4E9A_5355_4F4D_7C7B_578BID = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"]
+local _____857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_7C7B_578BID = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.D["技能类型ID"]
+local _____857E_7C73_8389_4E9ABloodyMagicSquare_7C7B_578BID = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.W["技能类型ID"]
 local _____9006_56DE_5341_516D_591C_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____9006_56DE_5341_516D_591C_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 ____exports["英雄技能配置表"] = {
     _____521B_5EFA_5355_4F4D_6280_80FD_914D_7F6E({
@@ -51,18 +29,28 @@ ____exports["英雄技能配置表"] = {
         ["说明"] = "占位示例，后续按实际英雄技能替换。"
     }),
     _____521B_5EFA_5355_4F4D_6280_80FD_914D_7F6E({
+        ["技能ID"] = "蕾米莉亚-Bloody Magic Square",
+        ["技能名"] = "红符“Bloody Magic Square”（W）",
+        ["归类"] = "英雄",
+        ["触发方式"] = "主动",
+        ["单位类型列表"] = {_____857E_7C73_8389_4E9A_5355_4F4D_7C7B_578BID},
+        ["说明"] = "开启后增加10%基础生命值和10%力量，并通过百分比生命回复每秒恢复最大生命值1%；持续10次，每次对600码内敌人造成随机火/暗属性伤害。",
+        ["配置数据"] = {
+            ["技能ID"] = _____857E_7C73_8389_4E9ABloodyMagicSquare_7C7B_578BID,
+            ["快捷键序号"] = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.W["快捷键序号"],
+            ["延迟启动毫秒"] = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.W["延迟启动毫秒"],
+            ["周期间隔毫秒"] = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.W["周期间隔毫秒"],
+            ["持续次数"] = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.W["持续次数"],
+            ["伤害范围"] = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.W["伤害范围"]
+        }
+    }),
+    _____521B_5EFA_5355_4F4D_6280_80FD_914D_7F6E({
         ["技能ID"] = "蕾米莉亚-击杀重置恶魔突袭",
         ["技能名称"] = "蕾米莉亚-击杀重置恶魔突袭（D）",
         ["归类"] = "英雄",
         ["触发方式"] = "死亡",
         ["单位类型列表"] = {_____857E_7C73_8389_4E9A_5355_4F4D_7C7B_578BID},
-        ["配置数据"] = {
-            ["英雄名"] = "蕾米莉亚",
-            ["单位名"] = "蕾米莉亚",
-            ["技能名称"] = "A-蕾米莉亚-恶魔突袭（D）",
-            ["技能ID"] = _____857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_7C7B_578BID,
-            ["冷却重置值"] = 0
-        }
+        ["配置数据"] = {["英雄名"] = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E["英雄名"], ["单位名"] = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E["英雄名"], ["技能名称"] = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.D["技能名称"], ["技能ID"] = _____857E_7C73_8389_4E9A_6076_9B54_7A81_88AD_7C7B_578BID}
     }),
     _____521B_5EFA_5355_4F4D_6280_80FD_914D_7F6E({
         ["技能ID"] = "阿伦劳特-神圣护甲/裁决护盾",

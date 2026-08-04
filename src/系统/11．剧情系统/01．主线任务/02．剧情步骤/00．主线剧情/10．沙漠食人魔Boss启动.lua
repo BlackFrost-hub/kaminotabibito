@@ -17,8 +17,12 @@ local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWEAngleBetweenUnitsSafe = ____require_result_2.YDWEAngleBetweenUnitsSafe
 local ____require_result_3 = require("lib.扩展函数.BJ函数.14．音效函数")
 local PlaySoundBJ = ____require_result_3.PlaySoundBJ
-local ____require_result_4 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local IsUnitAliveBJ = ____require_result_4.IsUnitAliveBJ
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_4.EC_CreateEffect
+local ____require_result_5 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_5.IsUnitAliveBJ
+local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+local StarOther_PanCameraToTimedUnitForPlayer = ____require_result_6.StarOther_PanCameraToTimedUnitForPlayer
 do
     local ____10_FF0E_6C99_6F20_98DF_4EBA_9B54Boss_542F_52A8 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.10．沙漠食人魔Boss启动")
     ____exports["沙漠食人魔Boss启动剧情片段"] = ____10_FF0E_6C99_6F20_98DF_4EBA_9B54Boss_542F_52A8["沙漠食人魔Boss启动剧情片段"]
@@ -29,8 +33,41 @@ local Player = jass.Player
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitOwner = jass.SetUnitOwner
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
+local function _____64AD_653E_6C99_6F20_98DF_4EBA_9B54_5F00_6218_7279_6548(bossUnit)
+    local x = GetUnitX(bossUnit)
+    local y = GetUnitY(bossUnit)
+    EC_CreateEffect(
+        "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl",
+        x,
+        y,
+        0,
+        270,
+        2.5,
+        1,
+        1
+    )
+    do
+        local i = 1
+        while i <= 6 do
+            local angle = 60 * i * math.pi / 180
+            EC_CreateEffect(
+                "war3mapImported\\blood2022720203813.mdl",
+                x + math.cos(angle) * 150,
+                y + math.sin(angle) * 150,
+                0,
+                270,
+                2,
+                1,
+                1
+            )
+            i = i + 1
+        end
+    end
+end
 ____exports["执行沙漠食人魔Boss前置"] = function()
     local bossUnit = YDUserDataGetSafe("string", "Boss", "沙漠食人魔", "unit")
     if bossUnit == nil or bossUnit == 0 or not IsUnitAliveBJ(bossUnit) then
@@ -52,6 +89,11 @@ ____exports["执行沙漠食人魔Boss前置"] = function()
     SetUnitInvulnerable(bossUnit, true)
     local _____4E0A_4E0B_6587 = _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587()
     if _____4E0A_4E0B_6587["触发单位"] ~= nil and _____4E0A_4E0B_6587["触发单位"] ~= 0 then
+        StarOther_PanCameraToTimedUnitForPlayer(
+            GetOwningPlayer(_____4E0A_4E0B_6587["触发单位"]),
+            bossUnit,
+            0.75
+        )
         SetUnitFacing(
             bossUnit,
             YDWEAngleBetweenUnitsSafe(bossUnit, _____4E0A_4E0B_6587["触发单位"])
@@ -63,11 +105,12 @@ ____exports["执行沙漠食人魔Boss开战"] = function(_____53C2_6570)
     if bossUnit == nil or bossUnit == 0 or not IsUnitAliveBJ(bossUnit) then
         return
     end
-    local ____53C2_6570__64AD_653E_97F3_6548_5 = _____53C2_6570["播放音效"]
-    if ____53C2_6570__64AD_653E_97F3_6548_5 == nil then
-        ____53C2_6570__64AD_653E_97F3_6548_5 = ""
+    local ____53C2_6570__64AD_653E_97F3_6548_7 = _____53C2_6570["播放音效"]
+    if ____53C2_6570__64AD_653E_97F3_6548_7 == nil then
+        ____53C2_6570__64AD_653E_97F3_6548_7 = ""
     end
-    local _____97F3_6548_53D8_91CF_540D = tostring(____53C2_6570__64AD_653E_97F3_6548_5)
+    local _____97F3_6548_53D8_91CF_540D = tostring(____53C2_6570__64AD_653E_97F3_6548_7)
+    _____64AD_653E_6C99_6F20_98DF_4EBA_9B54_5F00_6218_7279_6548(bossUnit)
     if _____97F3_6548_53D8_91CF_540D ~= "" then
         local soundHandle = jglobals[_____97F3_6548_53D8_91CF_540D]
         if soundHandle ~= nil and soundHandle ~= 0 then

@@ -31,8 +31,6 @@ local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
 local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
 local StarOther_PanCameraToTimedForPlayer = ____require_result_8.StarOther_PanCameraToTimedForPlayer
-local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLog = ____require_result_9.debugLog
 local GroupAddUnit = jass.GroupAddUnit
 local GetRectCenterX = jass.GetRectCenterX
 local GetRectCenterY = jass.GetRectCenterY
@@ -42,6 +40,12 @@ local directRegisterPlayerHero = bridge.directRegisterPlayerHero
 local _____9ED8_8BA4_82F1_96C4_7981_7528_6280_80FD_539F_59CBID = "Ane2"
 local _____9ED8_8BA4BB_5355_4F4D_539F_59CBID = "ewsp"
 local _____82F1_96C4_9009_62E9_8F6E_8BE2_95F4_9694_6BEB_79D2 = 50
+local function _____83B7_53D6_53E5_67C4ID(_____53E5_67C4)
+    if _____53E5_67C4 == nil or _____53E5_67C4 == 0 or type(jass.GetHandleId) ~= "function" then
+        return 0
+    end
+    return jass.GetHandleId(_____53E5_67C4)
+end
 local _____5F53_524D_72B6_6001 = {["是否已初始化"] = false, ["是否已关闭"] = false, ["已确认玩家数"] = 0, ["正在等待二击确认玩家数"] = 0}
 local _____70B9_51FB_6B21_6570_8FC7_671F_65F6_95F4_8868 = {}
 local _____70B9_51FB_6B21_6570_8F6E_8BE2ID
@@ -82,18 +86,18 @@ ____exports["注册英雄选择旧单位事件"] = function(_____5DF2_786E_8BA4_
                 local _____65E7_89E6_53D1 = _____83B7_53D6_65E7_89E6_53D1_5BF9_8C61(_____6CE8_518C_9879["旧触发名"])
                 local _____539F_751F_4E8B_4EF6 = _____83B7_53D6_539F_751F_5355_4F4D_4E8B_4EF6(_____6CE8_518C_9879["事件名"])
                 if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 then
-                    goto __continue10
+                    goto __continue12
                 end
                 if _____65E7_89E6_53D1 == nil or _____65E7_89E6_53D1 == 0 then
-                    goto __continue10
+                    goto __continue12
                 end
                 if _____539F_751F_4E8B_4EF6 == nil then
-                    goto __continue10
+                    goto __continue12
                 end
                 jass.TriggerRegisterUnitEvent(_____65E7_89E6_53D1, _____76EE_6807_5355_4F4D, _____539F_751F_4E8B_4EF6)
                 _____5DF2_6CE8_518C_6570_91CF = _____5DF2_6CE8_518C_6570_91CF + 1
             end
-            ::__continue10::
+            ::__continue12::
             i = i + 1
         end
     end
@@ -126,7 +130,7 @@ local function _____51CF_5C11_70B9_51FB_6B21_6570(_____73A9_5BB6)
     return _____65B0_503C
 end
 local function _____6E05_7A7A_70B9_51FB_6B21_6570(_____73A9_5BB6)
-    ydSafe.YDUserDataClearSafe("player", _____73A9_5BB6, _____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄点击次数键"], "string")
+    ydSafe.YDUserDataClearSafe("player", _____73A9_5BB6, _____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄点击次数键"], "real")
 end
 local function _____66F4_65B0_7B49_5F85_786E_8BA4_73A9_5BB6_6570()
     local _____6570_91CF = 0
@@ -160,17 +164,18 @@ local function _____8F6E_8BE2_70B9_51FB_6B21_6570_8870_51CF()
                 local _____73A9_5BB6ID = _____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"][i + 1]
                 local _____8FC7_671F_5217_8868 = _____70B9_51FB_6B21_6570_8FC7_671F_65F6_95F4_8868[_____73A9_5BB6ID]
                 if _____8FC7_671F_5217_8868 == nil or #_____8FC7_671F_5217_8868 <= 0 then
-                    goto __continue28
+                    goto __continue30
                 end
                 while #_____8FC7_671F_5217_8868 > 0 and _____8FC7_671F_5217_8868[1] <= _____73B0_5728_6BEB_79D2 do
+                    local _____8FC7_671F_65F6_95F4 = _____8FC7_671F_5217_8868[1]
                     table.remove(_____8FC7_671F_5217_8868, 1)
-                    _____51CF_5C11_70B9_51FB_6B21_6570(jass.Player(_____73A9_5BB6ID))
+                    local _____8870_51CF_540E_6B21_6570 = _____51CF_5C11_70B9_51FB_6B21_6570(jass.Player(_____73A9_5BB6ID))
                 end
                 if #_____8FC7_671F_5217_8868 > 0 then
                     _____4ECD_6709_5F85_5904_7406_4EFB_52A1 = true
                 end
             end
-            ::__continue28::
+            ::__continue30::
             i = i + 1
         end
     end
@@ -194,7 +199,7 @@ local function _____8BB0_5F55_4E00_6B21_70B9_51FB_786E_8BA4_7A97_53E3(_____73A9_
         _____70B9_51FB_6B21_6570_8FC7_671F_65F6_95F4_8868[_____73A9_5BB6ID] = _____5217_8868
     end
     _____5217_8868[#_____5217_8868 + 1] = _____8FC7_671F_65F6_95F4
-    _____589E_52A0_70B9_51FB_6B21_6570(_____73A9_5BB6)
+    local _____65B0_70B9_51FB_6B21_6570 = _____589E_52A0_70B9_51FB_6B21_6570(_____73A9_5BB6)
     _____66F4_65B0_7B49_5F85_786E_8BA4_73A9_5BB6_6570()
     _____786E_4FDD_70B9_51FB_6B21_6570_8F6E_8BE2_5DF2_542F_52A8()
 end
@@ -215,26 +220,26 @@ local function _____73A9_5BB6_662F_5426_5DF2_9009_62E9_82F1_96C4(_____73A9_5BB6)
     return ydSafe.YDUserDataGetSafe("player", _____73A9_5BB6, _____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄已选择标记键"], "boolean") == true
 end
 local function _____89E3_6790_6280_80FD_7C7B_578BID(_____6280_80FD_540D)
-    local ____temp_10
+    local ____temp_9
     if _____6280_80FD_540D == nil then
-        ____temp_10 = nil
+        ____temp_9 = nil
     else
-        ____temp_10 = _____6309_540D_5B57_53CD_67E5_6280_80FDID(_____6280_80FD_540D)
+        ____temp_9 = _____6309_540D_5B57_53CD_67E5_6280_80FDID(_____6280_80FD_540D)
     end
-    local _____539F_59CBID = ____temp_10
+    local _____539F_59CBID = ____temp_9
     if _____539F_59CBID ~= nil and _____539F_59CBID ~= "" then
         return stringToFourCCSafe(_____539F_59CBID)
     end
     return stringToFourCCSafe(_____9ED8_8BA4_82F1_96C4_7981_7528_6280_80FD_539F_59CBID)
 end
 local function _____89E3_6790_5355_4F4D_7C7B_578BID(_____5355_4F4D_540D)
-    local ____temp_11
+    local ____temp_10
     if _____5355_4F4D_540D == nil then
-        ____temp_11 = nil
+        ____temp_10 = nil
     else
-        ____temp_11 = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)
+        ____temp_10 = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)
     end
-    local _____539F_59CBID = ____temp_11
+    local _____539F_59CBID = ____temp_10
     if _____539F_59CBID ~= nil and _____539F_59CBID ~= "" then
         return stringToFourCCSafe(_____539F_59CBID)
     end
@@ -367,12 +372,6 @@ local function _____786E_8BA4_82F1_96C4_9009_62E9(_____73A9_5BB6, _____82F1_96C4
     _____786E_4FDD_82F1_96C4_6CE8_518C_6865_63A5_5DF2_521D_59CB_5316()
     directRegisterPlayerHero(_____73A9_5BB6, _____82F1_96C4)
     _____5F53_524D_72B6_6001["已确认玩家数"] = _____5F53_524D_72B6_6001["已确认玩家数"] + 1
-    debugLog(
-        "HeroSelect",
-        "confirm",
-        jass.GetPlayerId(_____73A9_5BB6),
-        jass.GetUnitName(_____82F1_96C4)
-    )
 end
 local function _____5E94_5FFD_7565_672C_6B21_9009_62E9(_____73A9_5BB6, _____73A9_5BB6ID, _____5355_4F4D, isSelected)
     if _____5F53_524D_72B6_6001["是否已关闭"] then
@@ -384,13 +383,19 @@ local function _____5E94_5FFD_7565_672C_6B21_9009_62E9(_____73A9_5BB6, _____73A9
     if not _____662F_53EF_9009_73A9_5BB6(_____73A9_5BB6ID) then
         return true
     end
+    local _____9009_62E9_533A_57DF = _____83B7_53D6_914D_7F6E_77E9_5F62(_____82F1_96C4_9009_62E9_914D_7F6E_8868["选择区域全局名"])
+    if _____9009_62E9_533A_57DF == nil or _____9009_62E9_533A_57DF == 0 then
+        return true
+    end
     if not _____662F_82F1_96C4_9009_62E9_533A_57DF_5185_5355_4F4D(_____5355_4F4D) then
         return true
     end
     if jass.IsUnitType(_____5355_4F4D, jass.UNIT_TYPE_HERO) ~= true then
         return true
     end
-    if jass.GetOwningPlayer(_____5355_4F4D) ~= jass.Player(jass.PLAYER_NEUTRAL_PASSIVE) then
+    local _____5355_4F4D_6240_6709_8005 = jass.GetOwningPlayer(_____5355_4F4D)
+    local _____4E2D_7ACB_88AB_52A8_73A9_5BB6 = jass.Player(jass.PLAYER_NEUTRAL_PASSIVE)
+    if _____5355_4F4D_6240_6709_8005 ~= _____4E2D_7ACB_88AB_52A8_73A9_5BB6 then
         return true
     end
     if _____73A9_5BB6_662F_5426_5DF2_9009_62E9_82F1_96C4(_____73A9_5BB6) then
@@ -402,7 +407,8 @@ local function ____on_82F1_96C4_9009_62E9_4E8B_4EF6(_____73A9_5BB6, _____73A9_5B
     if _____5E94_5FFD_7565_672C_6B21_9009_62E9(_____73A9_5BB6, _____73A9_5BB6ID, _____5355_4F4D, isSelected) then
         return
     end
-    if _____83B7_53D6_70B9_51FB_6B21_6570(_____73A9_5BB6) >= 2 then
+    local _____5F53_524D_70B9_51FB_6B21_6570 = _____83B7_53D6_70B9_51FB_6B21_6570(_____73A9_5BB6)
+    if _____5F53_524D_70B9_51FB_6B21_6570 >= 1 then
         _____786E_8BA4_82F1_96C4_9009_62E9(_____73A9_5BB6, _____5355_4F4D)
         return
     end
@@ -437,7 +443,8 @@ local function _____521D_59CB_5316_9009_4E2D_4E8B_4EF6_4E2D_5FC3()
         local i = 0
         while i < #_____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"] do
             local _____73A9_5BB6ID = _____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"][i + 1]
-            selectionCenter.initPlayerSelectionCenter(jass.Player(_____73A9_5BB6ID))
+            local _____73A9_5BB6 = jass.Player(_____73A9_5BB6ID)
+            selectionCenter.initPlayerSelectionCenter(_____73A9_5BB6)
             i = i + 1
         end
     end
@@ -449,6 +456,8 @@ ____exports["初始化英雄选择系统"] = function()
     end
     _____5F53_524D_72B6_6001["是否已初始化"] = true
     _____521D_59CB_5316_9009_4E2D_4E8B_4EF6_4E2D_5FC3()
-    centerTimer.addDelayedCallback(_____82F1_96C4_9009_62E9_914D_7F6E_8868["选择系统关闭秒数"] * 1000, _____5173_95ED_82F1_96C4_9009_62E9_7CFB_7EDF)
+    if _____82F1_96C4_9009_62E9_914D_7F6E_8868["选择系统关闭秒数"] > 0 then
+        centerTimer.addDelayedCallback(_____82F1_96C4_9009_62E9_914D_7F6E_8868["选择系统关闭秒数"] * 1000, _____5173_95ED_82F1_96C4_9009_62E9_7CFB_7EDF)
+    end
 end
 return ____exports

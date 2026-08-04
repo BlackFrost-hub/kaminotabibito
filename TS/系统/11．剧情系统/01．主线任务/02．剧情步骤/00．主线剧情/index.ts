@@ -42,6 +42,7 @@ export * from "./44．菲尼克斯尔Boss战";
 export * from "./45．菲尼克斯尔战后承接";
 export * from "./46．沉睡英魂亚伦柯斯前导";
 export * from "./47．沉睡英魂亚伦柯斯Boss战";
+export * from "./50．异界隐藏挑战入口";
 
 export function 初始化前五个主线剧情核心(this: void): void {
   初始化进度01_精灵村长老发布任务核心();
