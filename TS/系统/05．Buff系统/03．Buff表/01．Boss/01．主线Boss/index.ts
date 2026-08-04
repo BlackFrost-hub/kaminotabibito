@@ -8,6 +8,7 @@ import { 树魔首领Buff表 } from './04．树魔首领';
 import { 菲利斯Buff表 } from './05．菲利斯';
 import { 里科特Buff表 } from './06．里科特';
 import { 亚伦柯斯Buff表 } from './07．亚伦柯斯';
+import { 食人魔Buff表 } from './08．食人魔';
 
 export * from './01．瑟兰迪尔';
 export * from './02．巴尔扎罗斯';
@@ -16,6 +17,7 @@ export * from './04．树魔首领';
 export * from './05．菲利斯';
 export * from './06．里科特';
 export * from './07．亚伦柯斯';
+export * from './08．食人魔';
 
 export const 主线BossBuff表: Record<string, BuffData> = {
   ...瑟兰迪尔Buff表,
@@ -25,4 +27,5 @@ export const 主线BossBuff表: Record<string, BuffData> = {
   ...菲利斯Buff表,
   ...里科特Buff表,
   ...亚伦柯斯Buff表,
+  ...食人魔Buff表,
 };
