@@ -10,10 +10,11 @@ const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核�
   removeDelayedCallback: (this: void, id: number) => void;
 };
 
-import { DIALOG_NPC_CONFIGS } from "../../08．任务系统/00．配置表/01．对话配置表";
-import { QUEST_CONFIGS } from "../../08．任务系统/00．配置表/02．任务配置表";
-import type { NPCData } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
+import { 对话NPC配置列表 } from "../../08．任务系统/00．配置表/01．对话配置表";
+import { 任务配置列表 } from "../../08．任务系统/00．配置表/02．任务配置表";
+import type { 支线NPC配置 } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
 import { createUnitEffect, destroyUnitEffect } from "../../../lib/扩展函数/封装函数/01．通用工具/03．特效";
+import { YDWEAngleBetweenUnitsSafe } from "../../../lib/扩展函数/YDWE函数/09．YDUserData安全版";
 
 /** NPC 对话占用与气泡状态固定绑定到 4 个玩家槽位。 */
 const MAX_PLAYERS = 4;
@@ -28,8 +29,11 @@ const NPC_BUBBLE_EFFECT_KEY = "npc_bubble";
 const g_bubbleEffects: any[] = [];
 const g_bubbleScheduleTaskIds: Array<number | undefined> = [];
 const g_npcUnits: any[] = [];
+const g_npc配置朝向列表: Array<number | undefined> = [];
 const g_npcOccupiedBy: Map<number, number> = new Map();
 const g_npcPromptEffectByHandle = new Map<number, boolean>();
+
+const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 
 type Player = any;
 
@@ -76,18 +80,19 @@ function attachNpcPromptEffect(unit: any, modelPath: string): void {
   }
 }
 
-function npcConfigQualifiesForQuestMarker(npc: NPCData): boolean {
-  if (npc.requireID == null) return false;
-  const rid = npc.requireID;
-  const hasDialog = DIALOG_NPC_CONFIGS.some(d => d.requireid === rid);
-  const hasEnabledQuest = QUEST_CONFIGS.some(q => q.requireID === rid && q.enabled !== false);
-  if (npc.requireType === "任务") return true;
+function npcConfigQualifiesForQuestMarker(npc: 支线NPC配置 | null | undefined): boolean {
+  if (npc == null) return false;
+  if (npc.任务ID == null) return false;
+  const rid = npc.任务ID;
+  const hasDialog = 对话NPC配置列表.some(d => d.对话ID === rid);
+  const hasEnabledQuest = 任务配置列表.some(q => q.任务ID === rid && q.启用 !== false);
+  if (npc.类型 === "任务") return true;
   return hasDialog || hasEnabledQuest;
 }
 
-export function tryAttachQuestMarkerForConfigNpc(unit: any, npcConfig: NPCData): void {
-  if (!unit || !npcConfigQualifiesForQuestMarker(npcConfig)) return;
-  if (npcConfig.requireType === "对话") {
+export function tryAttachQuestMarkerForConfigNpc(unit: any, npcConfig: 支线NPC配置 | null | undefined): void {
+  if (!unit || npcConfig == null || !npcConfigQualifiesForQuestMarker(npcConfig)) return;
+  if (npcConfig.类型 === "对话") {
     attachNpcPromptEffect(unit, NPC_OVERHEAD_BLUE_EXCL);
   } else {
     attachNpcPromptEffect(unit, NPC_OVERHEAD_YELLOW_EXCL);
@@ -222,6 +227,28 @@ export function releaseNpcOccupation(playerId: number): void {
 
 export function getNpcUnit(playerId: number): any {
   return g_npcUnits[playerId];
+}
+
+export function 让对话NPC面向玩家单位(
+  this: void,
+  玩家ID: number,
+  NPC单位: any,
+  玩家单位: any,
+  配置朝向: number | undefined,
+): void {
+  if (玩家ID < 0 || 玩家ID >= MAX_PLAYERS) return;
+  if (!NPC单位 || !玩家单位 || 配置朝向 == null) return;
+  g_npc配置朝向列表[玩家ID] = 配置朝向;
+  SetUnitFacing(NPC单位, YDWEAngleBetweenUnitsSafe(NPC单位, 玩家单位));
+}
+
+export function 恢复对话NPC配置朝向(this: void, 玩家ID: number): void {
+  if (玩家ID < 0 || 玩家ID >= MAX_PLAYERS) return;
+  const NPC单位 = g_npcUnits[玩家ID];
+  const 配置朝向 = g_npc配置朝向列表[玩家ID];
+  g_npc配置朝向列表[玩家ID] = undefined;
+  if (!NPC单位 || 配置朝向 == null) return;
+  SetUnitFacing(NPC单位, 配置朝向);
 }
 
 export function tryOccupyNpc(p: Player, npcUnit: any): boolean {

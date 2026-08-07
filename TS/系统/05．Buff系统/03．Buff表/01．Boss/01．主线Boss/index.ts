@@ -9,6 +9,10 @@ import { 菲利斯Buff表 } from './05．菲利斯';
 import { 里科特Buff表 } from './06．里科特';
 import { 亚伦柯斯Buff表 } from './07．亚伦柯斯';
 import { 食人魔Buff表 } from './08．食人魔';
+import { 地精祭祀Buff表 } from './09．地精祭祀';
+import { 利尔伯特Buff表 } from './10．利尔·伯特';
+import { 教派剑士Buff表 } from './11．教派剑士';
+import { 教派学者Buff表 } from './12．教派学者';
 
 export * from './01．瑟兰迪尔';
 export * from './02．巴尔扎罗斯';
@@ -18,6 +22,10 @@ export * from './05．菲利斯';
 export * from './06．里科特';
 export * from './07．亚伦柯斯';
 export * from './08．食人魔';
+export * from './09．地精祭祀';
+export * from './10．利尔·伯特';
+export * from './11．教派剑士';
+export * from './12．教派学者';
 
 export const 主线BossBuff表: Record<string, BuffData> = {
   ...瑟兰迪尔Buff表,
@@ -28,4 +36,8 @@ export const 主线BossBuff表: Record<string, BuffData> = {
   ...里科特Buff表,
   ...亚伦柯斯Buff表,
   ...食人魔Buff表,
+  ...地精祭祀Buff表,
+  ...利尔伯特Buff表,
+  ...教派剑士Buff表,
+  ...教派学者Buff表,
 };

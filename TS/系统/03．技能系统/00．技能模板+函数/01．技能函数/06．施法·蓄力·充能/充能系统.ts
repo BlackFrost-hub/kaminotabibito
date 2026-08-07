@@ -28,9 +28,6 @@ const {
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   YDWETimerDestroyEffect: (duration: number, effect: any) => void;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const {
   添加单位暂停,
   移除单位暂停,
@@ -41,8 +38,6 @@ const {
 
 import { 创建进度条特效, 销毁单位进度条特效, 默认进度条高度偏移 } from "./进度条特效";
 import { 单位是否处于硬控制效果合集 } from "../../02．通用函数/01．控制与Buff";
-
-const 调试模块名 = "充能系统";
 
 const GetHandleId = jass.GetHandleId as (h: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (u: any) => number;
@@ -355,10 +350,7 @@ export function 取消注册充能打断回调(回调: 充能打断回调): void
 }
 
 export function 开始充能(单位: any, 参数: 充能参数): number {
-  debugLogForce(调试模块名, "开始充能被调用");
-
   if (!单位存活(单位) || 参数.持续时间 <= 0) {
-    debugLogForce(调试模块名, "单位不存在或持续时间无效");
     return 0;
   }
 

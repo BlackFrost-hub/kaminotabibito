@@ -77,9 +77,10 @@ function 补充Boss魔法(this: void, context: 菲利斯运行时上下文, amou
   }
 }
 
-function 创建方向特效(this: void, model: string, x: number, y: number, angle: number, scale: number, duration: number): void {
+function 创建方向特效(this: void, model: string, x: number, y: number, angle: number, scale: number, duration: number): any {
   const effect = 创建点特效({ 模型路径: model, X: x, Y: y, 缩放: scale, 持续秒: duration });
   设置特效XYZ轴旋转(effect, { Z轴角度: angle });
+  return effect;
 }
 
 function 结算剑气初始命中(this: void, context: 菲利斯运行时上下文, ax: number, ay: number, bx: number, by: number, width: number): void {
@@ -148,7 +149,8 @@ function 创建侵蚀残留(this: void, context: 菲利斯运行时上下文, ax
   const cfg = 菲利斯数值与表现配置.剑气灵斩;
   const midX = (ax + bx) * 0.5;
   const midY = (ay + by) * 0.5;
-  创建方向特效(cfg.残留特效路径, midX, midY, angle + cfg.残留特效朝向偏移角度, cfg.残留特效缩放 * effectScaleMultiplier, cfg.侵蚀持续秒);
+  const 残留特效 = 创建方向特效(cfg.残留特效路径, midX, midY, angle + cfg.残留特效朝向偏移角度, cfg.残留特效缩放 * effectScaleMultiplier, cfg.侵蚀持续秒);
+  context.清理.登记限时特效("菲利斯-剑气灵斩侵蚀残留特效", 残留特效, cfg.侵蚀持续秒 * 1000);
   const 路径预警 = 创建技能提示圈({
     类型: "矩形",
     X: ax,
@@ -222,7 +224,8 @@ export function 释放菲利斯剑气灵斩(this: void, context: 菲利斯运行
     },
     on生效: function 菲利斯剑气灵斩生效(this: void): void {
       播放Boss坐标音效(菲利斯音效配置.剑气灵斩.斩出侵蚀, ax, ay, 菲利斯音效配置.默认裁断距离);
-      创建方向特效(cfg.剑气特效路径, ax, ay, angle, cfg.剑气特效缩放 * effectScaleMultiplier, cfg.剑气特效持续秒);
+      const 剑气特效 = 创建方向特效(cfg.剑气特效路径, ax, ay, angle, cfg.剑气特效缩放 * effectScaleMultiplier, cfg.剑气特效持续秒);
+      context.清理.登记限时特效("菲利斯-剑气灵斩剑气特效", 剑气特效, cfg.剑气特效持续秒 * 1000);
       结算剑气初始命中(context, ax, ay, bx, by, width);
       创建侵蚀残留(context, ax, ay, bx, by, angle, width, effectScaleMultiplier);
     },

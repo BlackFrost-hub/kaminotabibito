@@ -122,8 +122,8 @@ local function _____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50(_____8
     local _____97F3_9891_53E5_67C4 = CreateSound(
         _____8DEF_5F84,
         true,
-        true,
-        true,
+        false,
+        false,
         10,
         10,
         "DefaultEAXON"

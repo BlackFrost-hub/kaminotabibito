@@ -196,7 +196,7 @@ export const 英雄选择配置表: 英雄选择配置 = {
 |cffff00ff缺点：|r|cffff0000释放技能消耗自身生命|r`,
   },
   必须保留的旧单位事件注册项: [
-    { 目标单位: "英雄", 旧触发名: "gg_trg_DMboss______01______TS___u", 事件名: "EVENT_UNIT_PICKUP_ITEM" },
+    { 目标单位: "英雄", 旧触发名: "gg_trg_DMboss______01", 事件名: "EVENT_UNIT_PICKUP_ITEM" },
     { 目标单位: "BB", 旧触发名: "gg_trg____________________________ZH", 事件名: "EVENT_UNIT_SPELL_EFFECT" },
     { 目标单位: "英雄", 旧触发名: "gg_trg____________________________ZH", 事件名: "EVENT_UNIT_SPELL_EFFECT" },
     { 目标单位: "英雄", 旧触发名: "gg_trg_______Boss______JQ00", 事件名: "EVENT_UNIT_SPELL_EFFECT" },

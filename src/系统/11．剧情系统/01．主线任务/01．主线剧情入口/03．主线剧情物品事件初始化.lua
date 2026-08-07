@@ -22,8 +22,8 @@ local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
-local ____require_result_3 = require("lib.扩展函数.物品相关函数.物品判断函数")
-local UnitHasItemOfTypeBJ = ____require_result_3.UnitHasItemOfTypeBJ
+local ____require_result_3 = require("系统.03．技能系统.04．快捷键技能.02．按Ctrl切换背包")
+local _____73A9_5BB6_4E3B_526F_80CC_5305_6301_6709_7269_54C1 = ____require_result_3["玩家主副背包持有物品"]
 local ____require_result_4 = require("系统.02．物品系统.13．物品名反查")
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_4["按名字反查物品ID"]
 local ____require_result_5 = require("lib.扩展函数.BJ函数.05A．电影函数")
@@ -84,7 +84,7 @@ local function _____547D_4E2D_7269_54C1_4E8B_4EF6_914D_7F6E(_____914D_7F6E, ____
         return false
     end
     if _____914D_7F6E["按持有物品校验"] == true then
-        return UnitHasItemOfTypeBJ(unit, _____7269_54C1_7C7B_578BID) == true
+        return _____73A9_5BB6_4E3B_526F_80CC_5305_6301_6709_7269_54C1(unit, _____7269_54C1_7C7B_578BID)
     end
     return GetItemTypeId(item) == _____7269_54C1_7C7B_578BID
 end

@@ -7959,21 +7959,6 @@ obj=slk.item.shwd:new('I0CY')
 	obj.powerup='0'
 	obj.cooldownID='A0LH'
 table.insert(xG_item_luaObj,obj)
-obj=slk.item.mort:new('I0D0')
-	obj._parent='mort'
-	obj.Name='接受任务-|cffff0000狩猎食人魔（等级24）|r'
-	obj.Tip='接受任务-|cffff0000狩猎食人魔（等级24）|r'
-	obj.Ubertip='任务介绍：接受蛇人族的条件，帮忙狩猎沙漠食人魔，以获得|cffccffcc『夜光翡翠』|n|r|cffffffcc『任务提示』：接受则即将面临|r|cffff0000『Boss战』|r|cffffffcc，实力不够则会|r|cffff0000团灭|r|cffffffcc，请准备充分再来！|n|r|cffffff00『点击接受任务』|r'
-	obj.Description='任务介绍：接受蛇人族的条件，帮忙狩猎沙漠食人魔，以获得|cffccffcc『夜光翡翠』|n|r|cffffffcc『任务提示』：接受则即将面临|r|cffff0000『Boss战』|r|cffffffcc，实力不够则会|r|cffff0000团灭|r|cffffffcc，请准备充分再来！|n|r|cffffff00『点击接受任务』|r'
-	obj.HP='1'
-	obj.goldcost='0'
-	obj.Art='ReplaceableTextures/CommandButtons/BTN000359.blp'
-	obj.abilList=' '
-	obj.uses='1'
-	obj.stockRegen='99999'
-	obj.class='Artifact'
-	obj.cooldownID='A0LH'
-table.insert(xG_item_luaObj,obj)
 obj=slk.item.ratc:new('I0D3')
 	obj._parent='ratc'
 	obj.Name='|cffffcc99沙烈魔斧|r'

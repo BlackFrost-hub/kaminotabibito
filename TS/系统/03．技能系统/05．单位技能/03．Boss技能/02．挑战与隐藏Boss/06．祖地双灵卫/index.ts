@@ -13,3 +13,4 @@ export * from './09．同息归寂';
 export * from './10．技能入口';
 export * from './11．被动效果';
 export * from './12．台词播放';
+export * from './13．战斗结束事件';

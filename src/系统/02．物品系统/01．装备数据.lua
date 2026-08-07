@@ -2146,16 +2146,32 @@ ____exports.items.I05Q = {
 ____exports.items.I05S = {
     type = "道具/戒指/饰品",
     name = "改良版医疗剂（中）",
-    goldPrice = 300,
+    goldPrice = 1500,
     level = "D",
-    hot = "3000hp",
+    hot = "5000hp",
     abilList = "A08C"
 }
 ____exports.items.I05U = {
     type = "道具/戒指/饰品",
     name = "改良版魔法药水（中）",
-    goldPrice = 300,
-    hot = "1500mp",
+    goldPrice = 1500,
+    hot = "2200mp",
+    abilList = "A08C"
+}
+____exports.items.IEM1 = {
+    type = "药剂/食品",
+    name = "精灵魔法药水",
+    goldPrice = 750,
+    level = "D",
+    hot = "1000mp",
+    abilList = "A08C"
+}
+____exports.items.IEL1 = {
+    type = "药剂/食品",
+    name = "精灵生命药水",
+    goldPrice = 750,
+    level = "D",
+    hot = "2400hp",
     abilList = "A08C"
 }
 ____exports.items.I05V = {type = "材料", name = "熔岩能量", goldPrice = 50}
@@ -3495,7 +3511,6 @@ ____exports.items.I0CT = {type = "任务", name = "|cff99ccff驱散灵树邪气|
 ____exports.items.I0CW = {type = "任务", name = "领取技能", goldPrice = 2000}
 ____exports.items.I0CX = {type = "任务", name = "领悟暗之力", goldPrice = 2000, PowerUP = "2all"}
 ____exports.items.I0CY = {type = "材料", name = "荧光草", goldPrice = 0}
-____exports.items.I0D0 = {type = "任务", name = "接受任务-|cffff0000狩猎食人魔（等级24）|r", goldPrice = 0}
 ____exports.items.I0D3 = {
     type = "主武器",
     name = "|cffffcc99沙烈魔斧|r",
@@ -4359,6 +4374,52 @@ ____exports.items.I0G7 = {
     mp = 1000,
     magicDmg = 0.18,
     cdReduction = 0.1
+}
+____exports.items.I0H0 = {
+    type = "道具/戒指/饰品",
+    name = "淤泥猎手腕甲",
+    goldPrice = 980,
+    score = 4900,
+    level = "C+",
+    dmg = 100,
+    str = 28,
+    armor = 14,
+    atkSpeed = 0.15
+}
+____exports.items.I0H1 = {
+    type = "衣服",
+    name = "沉淤守卫胸甲",
+    goldPrice = 1020,
+    score = 5100,
+    level = "C+",
+    hp = 2200,
+    armor = 32,
+    magicResist = 0.15,
+    waterResist = 0.18
+}
+____exports.items.I0H2 = {
+    type = "主武器",
+    name = "浊潮祭杖",
+    goldPrice = 1040,
+    score = 5200,
+    level = "C+",
+    dmg = 140,
+    int = 36,
+    magicDmg = 0.15,
+    waterDmg = 0.18,
+    weaponType = "法杖"
+}
+____exports.items.I0H3 = {
+    type = "道具/戒指/饰品",
+    name = "净水核心护符",
+    goldPrice = 1000,
+    score = 5000,
+    level = "C+",
+    all = 20,
+    hp = 1200,
+    skillHeal = 0.12,
+    waterResist = 0.15,
+    cdReduction = 0.07
 }
 ____exports.items.I0FJ = {type = "任务", name = "骸骨圣杯碎片", goldPrice = 0}
 ____exports.items.I0FM = {type = "道具/戒指/饰品", name = "火把", goldPrice = 200, abilList = "IP01"}

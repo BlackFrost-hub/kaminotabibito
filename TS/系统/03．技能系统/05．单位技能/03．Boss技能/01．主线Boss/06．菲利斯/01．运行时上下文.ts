@@ -24,8 +24,8 @@ export interface 菲利斯运行时上下文 {
   清理: 机制清理篮子;
   当前魔法充能: number;
   当前领袖光环低血: boolean;
-  原生领袖光环已移除: boolean;
   领袖光环清理已注册: boolean;
+  异形化准备中: boolean;
   异形化中: boolean;
   异形化结束Ms: number;
   已初始化: boolean;
@@ -42,8 +42,8 @@ function 创建菲利斯上下文(this: void, boss: any, 清理: 机制清理篮
     清理,
     当前魔法充能: 0,
     当前领袖光环低血: false,
-    原生领袖光环已移除: false,
     领袖光环清理已注册: false,
+    异形化准备中: false,
     异形化中: false,
     异形化结束Ms: 0,
     已初始化: false,

@@ -10,12 +10,17 @@ local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local ____12_FF0E_7B2C_4E8C_519B_56E2_968F_4ECE = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.12．第二军团随从")
 local _____6CE8_518C_83F2_5229_65AF_7B2C_4E8C_519B_56E2_968F_4ECE_6548_679C = ____12_FF0E_7B2C_4E8C_519B_56E2_968F_4ECE["注册菲利斯第二军团随从效果"]
+local ____07_FF0E_5F02_5F62_5316 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.07．异形化")
+local _____521D_59CB_5316_83F2_5229_65AF_5F02_5F62_5316_5145_80FD = ____07_FF0E_5F02_5F62_5316["初始化菲利斯异形化充能"]
 local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表")
 local _____6CE8_518CBoss_81EA_52A8_6280_80FD_542F_52A8_76D1_542C = ____require_result_0["注册Boss自动技能启动监听"]
 local _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____83F2_5229_65AF_88AB_52A8_5DF2_6CE8_518C = false
 local function ____on_83F2_5229_65AFBoss_542F_52A8(_____542F_52A8_4E0A_4E0B_6587)
-    _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587(_____542F_52A8_4E0A_4E0B_6587["Boss单位"])
+    local context = _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587(_____542F_52A8_4E0A_4E0B_6587["Boss单位"])
+    if context ~= nil then
+        _____521D_59CB_5316_83F2_5229_65AF_5F02_5F62_5316_5145_80FD(context)
+    end
 end
 ____exports["注册菲利斯被动效果"] = function()
     if _____83F2_5229_65AF_88AB_52A8_5DF2_6CE8_518C then

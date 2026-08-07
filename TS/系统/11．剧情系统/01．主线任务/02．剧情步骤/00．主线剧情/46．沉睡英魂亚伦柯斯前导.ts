@@ -1,7 +1,6 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const jglobals = require("jass.globals") as any;
 
 const { 暂停并设置无敌安全, 解除暂停并取消无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
   暂停并设置无敌安全: (this: void, unit: any, 来源: string) => boolean;
@@ -42,8 +41,9 @@ const { 注册剧情配置传送, 读取剧情传送配置 } = require("系统.0
 const { YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
 };
-const { 缓存并移除亚伦柯斯安兹封锁墙 } = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙") as {
+const { 缓存并移除亚伦柯斯安兹封锁墙, 重建亚伦柯斯安兹封锁墙 } = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙") as {
   缓存并移除亚伦柯斯安兹封锁墙: (this: void) => boolean;
+  重建亚伦柯斯安兹封锁墙: (this: void, bossUnit: any) => void;
 };
 const { 按步长调整玩家镜头高度 } = require("系统.09．表现系统.14．镜头高度控制.index") as {
   按步长调整玩家镜头高度: (this: void, 玩家: any, 步数: number) => void;
@@ -53,6 +53,7 @@ import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．�
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 创建并冻结剧情Boss预置 } from "../../00．剧情系统核心工具/03．剧情Boss预置桥接";
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 应用第三章电影镜头 } from "./40-50．第三章电影镜头";
 import { 清理剧情运行时单位, 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 进入主线节点 } from "../../00．剧情系统核心工具/10．标准剧情动作";
 import { 开始监听封印核心入口 } from "./48．封印核心场景";
@@ -70,7 +71,6 @@ const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing:
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
 const DestroyEffect = jass.DestroyEffect as (this: void, whichEffect: any) => void;
-const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
 
 export const 亚伦柯斯Boss键 = "Boss.沉睡英魂·亚伦柯斯";
 export const 亚伦柯斯待战暂停来源 = "剧情系统:亚伦柯斯待战";
@@ -204,14 +204,13 @@ function on亚伦柯斯死亡(this: void, dyingUnit: any, _killingUnit: any): vo
   if (状态 == null || 状态.Boss单位 !== dyingUnit) return;
   清理亚伦柯斯前导状态(状态);
   清理菲尼克斯尔战后地形装饰();
-  const 墓地阻挡 = jglobals.gg_dest_Dofw_10481;
-  if (墓地阻挡 != null && 墓地阻挡 !== 0) RemoveDestructable(墓地阻挡);
   进入主线节点(48);
   创建亚伦柯斯战后传送门();
   创建安兹隐藏挑战();
 }
 
 function 播放亚伦柯斯前导(this: void, 触发单位: any): void {
+  应用第三章电影镜头(46);
   const { 播放主线剧情片段 } = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器") as {
     播放主线剧情片段: (this: void, 片段ID: string, 上下文?: any) => boolean;
   };
@@ -238,6 +237,7 @@ function on亚伦柯斯范围触发(this: void): void {
   SetUnitFacing(触发单位, YDWEAngleBetweenUnitsSafe(触发单位, 状态.Boss单位));
   进入主线节点(46);
   播放亚伦柯斯前导(触发单位);
+  重建亚伦柯斯安兹封锁墙(状态.Boss单位);
 }
 
 function 注册亚伦柯斯范围监听(this: void, 状态: 亚伦柯斯前导状态): void {

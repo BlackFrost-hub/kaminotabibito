@@ -13,6 +13,7 @@ local GetItemTypeId = jass.GetItemTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
+local GetUnitName = jass.GetUnitName
 local _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E = {
     ["单位类型"] = "e08P",
     ModelFileID = "war3mapImported\\ArcherGryphonKotSHV1.01.mdl",
@@ -48,6 +49,7 @@ ____exports["处理瑟兰迪尔的决心使用"] = function(ctx)
     _____521B_5EFA_53EC_5524_7269({
         ["主人单位"] = caster,
         ["单位类型"] = _____745F_5170_8FEA_5C14_7684_51B3_5FC3_914D_7F6E["单位类型"],
+        ["单位名称"] = GetUnitName(caster) .. "的水元素",
         X = GetUnitX(caster),
         Y = GetUnitY(caster),
         ["朝向"] = GetUnitFacing(caster),

@@ -61,14 +61,18 @@ const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, unit: any, order: string) => boolean;
+const IssuePointOrder = jass.IssuePointOrder as (this: void, unit: any, order: string, x: number, y: number) => boolean;
 const IssueTargetOrder = jass.IssueTargetOrder as (this: void, unit: any, order: string, target: any) => boolean;
 const Player = jass.Player as (this: void, playerId: number) => any;
+const PauseUnit = jass.PauseUnit as (this: void, unit: any, flag: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
+const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, unit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, unit: any, owner: any, changeColor: boolean) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
+const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
 
 const 敌军玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
-const 友军玩家ID = jass.PLAYER_NEUTRAL_PASSIVE as number;
+const 友军玩家ID = 6;
 const 攻城开始延迟毫秒 = 5000;
 const 攻城目标重发间隔毫秒 = 1800;
 const 防御法阵X = -6992.3;
@@ -80,6 +84,7 @@ const 菲利斯攻城传送门X = -7025.6;
 const 菲利斯攻城传送门Y = -16713.7;
 const 菲利斯对白触发范围 = 600;
 const 耶提尔靠近玩家偏移X = 160;
+const 友军推进前线Y = -15350;
 const 进攻朝向 = 90;
 const 防守朝向 = 270;
 
@@ -249,6 +254,7 @@ function 应用友军动态属性(this: void, unit: any, 预置: 友军单位预
   GS_UnitPry(unit, 0, 0, 目标最大生命 - GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE));
   GS_UnitPry(unit, 0, 2, 目标攻击力 - GS_LoadUintProperty(unit, 2));
   GS_UnitPry(unit, 0, 3, 目标护甲 - GS_LoadUintProperty(unit, 3));
+  SetUnitState(unit, jass.UNIT_STATE_LIFE, GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE));
 }
 
 function 创建友军单位(this: void, 预置: 友军单位预置, 基准: 友军属性基准): void {
@@ -257,16 +263,20 @@ function 创建友军单位(this: void, 预置: 友军单位预置, 基准: 友�
   const unit = 创建单位并登记排泄安全(Player(友军玩家ID), unitTypeId, 预置.X, 预置.Y, 预置.朝向);
   if (!单位存活(unit)) return;
   应用友军动态属性(unit, 预置, 基准);
-  IssueImmediateOrder(unit, "holdposition");
+  IssuePointOrder(unit, "attack", 预置.X, 友军推进前线Y);
 }
 
 function 布置耶提尔与友军(this: void): void {
   const 耶提尔 = 读取语义单位引用("主线NPC.耶提尔");
   const 基准 = 读取友军属性基准(耶提尔);
   if (单位存活(耶提尔)) {
+    SetUnitOwner(耶提尔, Player(友军玩家ID), true);
+    SetUnitState(耶提尔, jass.UNIT_STATE_LIFE, GetUnitStateJapi(耶提尔, jass.UNIT_STATE_MAX_LIFE));
+    PauseUnit(耶提尔, false);
+    SetUnitInvulnerable(耶提尔, false);
     SetUnitPosition(耶提尔, -6924.1, -13933.9);
     SetUnitFacing(耶提尔, 防守朝向);
-    IssueImmediateOrder(耶提尔, "holdposition");
+    IssuePointOrder(耶提尔, "attack", 防御法阵X, 友军推进前线Y);
   }
   for (let i = 0; i < 友军单位预置表.length; i++) 创建友军单位(友军单位预置表[i], 基准);
 }
@@ -344,6 +354,11 @@ function on菲利斯接近触发(this: void): void {
 
   状态.菲利斯出场对话已触发 = true;
   结束菲利斯攻城等待();
+  if (单位存活(状态.菲利斯)) {
+    IssueImmediateOrder(状态.菲利斯, "stop");
+    PauseUnit(状态.菲利斯, true);
+    SetUnitInvulnerable(状态.菲利斯, true);
+  }
 
   let 剧情触发单位 = 状态.触发单位;
   if (由玩家英雄触发) {
@@ -413,6 +428,8 @@ function on启动菲利斯出场(this: void, 预期世代?: any): void {
   创建菲利斯攻城传送门(状态);
   注册菲利斯接近对白触发(状态, bossUnit);
   IssueTargetOrder(bossUnit, "attack", 状态.防御法阵);
+  const 耶提尔 = 读取语义单位引用("主线NPC.耶提尔");
+  if (单位存活(耶提尔)) IssueTargetOrder(耶提尔, "attack", bossUnit);
   启动攻城目标重发();
 }
 

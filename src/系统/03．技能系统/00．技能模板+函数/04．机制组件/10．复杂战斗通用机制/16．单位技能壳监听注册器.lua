@@ -3,6 +3,8 @@ local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位有效"]
+local ____12_FF0EJASS_539F_751F_522B_540D = require("lib.扩展函数.封装函数.01．通用工具.12．JASS原生别名")
+local IssueImmediateOrder = ____12_FF0EJASS_539F_751F_522B_540D.IssueImmediateOrder
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
@@ -20,6 +22,7 @@ local function ____on_5355_4F4D_6280_80FD_58F3_76D1_542C_65BD_6CD5(castingUnit, 
         return
     end
     local unitTypeId = GetUnitTypeId(castingUnit)
+    local _____5DF2_63A5_7BA1_539F_751F_6280_80FD_58F3 = false
     do
         local i = 0
         while i < #_____76D1_542C_5217_8868 do
@@ -31,6 +34,7 @@ local function ____on_5355_4F4D_6280_80FD_58F3_76D1_542C_65BD_6CD5(castingUnit, 
                 if unitTypeId ~= _____8F6CID(_____53C2_6570["单位类型ID"]) then
                     goto __continue6
                 end
+                _____5DF2_63A5_7BA1_539F_751F_6280_80FD_58F3 = true
                 local context = _____53C2_6570["获取或创建上下文"](castingUnit)
                 if context == nil then
                     goto __continue6
@@ -57,6 +61,9 @@ local function ____on_5355_4F4D_6280_80FD_58F3_76D1_542C_65BD_6CD5(castingUnit, 
             ::__continue6::
             i = i + 1
         end
+    end
+    if _____5DF2_63A5_7BA1_539F_751F_6280_80FD_58F3 then
+        IssueImmediateOrder(castingUnit, "stop")
     end
 end
 local function _____786E_4FDD_5355_4F4D_6280_80FD_58F3_603B_76D1_542C()

@@ -16,6 +16,7 @@ local ____require_result_4 = require("lib.扩展函数.封装函数.04．硬件�
 local KEY = ____require_result_4.KEY
 local KEY_STATE = ____require_result_4.KEY_STATE
 local IssuePointOrderById = jass.IssuePointOrderById
+local DzIsChatBoxOpen = require("jass.japi").DzIsChatBoxOpen
 local DzGetMouseTerrainX = require("jass.japi").DzGetMouseTerrainX
 local DzGetMouseTerrainY = require("jass.japi").DzGetMouseTerrainY
 local DzGetTriggerKeyPlayer = require("jass.japi").DzGetTriggerKeyPlayer
@@ -24,6 +25,9 @@ local ____BB_4F20_9001_547D_4EE4ID = String2OrderIdBJ("blink")
 local bbTeleportTrigger = nil
 --- 按B传送BB事件处理
 local function onBKeyTeleport(event)
+    if DzIsChatBoxOpen() == true then
+        return
+    end
     if event.key ~= KEY.B and event.key ~= "B" then
         return
     end

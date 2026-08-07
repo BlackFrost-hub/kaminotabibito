@@ -10,8 +10,8 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
 };
-const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
-  UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
+const { 玩家主副背包持有物品 } = require("系统.03．技能系统.04．快捷键技能.02．按Ctrl切换背包") as {
+  玩家主副背包持有物品: (this: void, hero: any, itemTypeId: number) => boolean;
 };
 const { TriggerRegisterEnterRectSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
   TriggerRegisterEnterRectSimple: (this: void, trig: any, r: any) => any;
@@ -43,7 +43,12 @@ import {
   主线剧情可破坏物初始化配置表,
   主线剧情矩形入口配置表,
 } from "./01．主线NPC初始化配置表";
-import type { 主线NPC初始化配置, 主线剧情入口分支配置, 主线剧情入口配置 } from "./00．主线剧情入口类型";
+import type {
+  主线NPC初始化配置,
+  主线剧情入口分支配置,
+  主线剧情入口配置,
+  主线剧情全局单位入口配置,
+} from "./00．主线剧情入口类型";
 import { 创建剧情NPC单位 } from "../../00．公共/02．剧情NPC创建";
 import { 读取剧情进度 } from "../00．剧情系统核心工具/01．剧情动作上下文";
 import { 注册剧情运行时单位 } from "../00．剧情系统核心工具/08．剧情运行时单位";
@@ -60,10 +65,13 @@ const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
 const SetDestructableInvulnerable = jass.SetDestructableInvulnerable as (this: void, destructable: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 const DestroyTrigger = jass.DestroyTrigger as (this: void, trig: any) => void;
+const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+const Player = jass.Player as (this: void, playerId: number) => any;
 let 已请求初始化主线剧情入口 = false;
 let 已执行初始化主线剧情入口 = false;
 const NPC运行时表: Record<string, any> = {};
 const 触发器ID对应入口配置列表: Record<string, 主线剧情入口分支配置[]> = {};
+const 动态入口单位表: Record<string, any> = {};
 
 
 function 获取全局句柄(this: void, 变量名: string): any {
@@ -100,16 +108,17 @@ function 触发单位满足入口物品配置(this: void, 配置: 主线剧情�
   if (触发单位 == null || 触发单位 === 0) return false;
   const 物品类型ID = stringToFourCCSafe(按名字反查物品ID(配置.需要物品名));
   if (!(物品类型ID > 0)) return false;
-  return UnitHasItemOfTypeBJ(触发单位, 物品类型ID);
+  return 玩家主副背包持有物品(触发单位, 物品类型ID);
 }
 
-function 触发单位满足玩家英雄配置(this: void, 配置: 主线剧情入口分支配置, 触发单位: any): boolean {
-  if (配置.仅玩家英雄 !== true) return true;
-  return 是玩家英雄组单位(触发单位);
+function 触发单位满足玩家英雄配置(this: void, _配置: 主线剧情入口分支配置, 触发单位: any): boolean {
+  // 主线的矩形与单位范围入口统一只接受已注册玩家英雄，避免召唤物、NPC 或小怪推进剧情。
+  return 触发单位 != null && 触发单位 !== 0 && 是玩家英雄组单位(触发单位);
 }
 
 function 尝试播放入口配置(this: void, 配置: 主线剧情入口分支配置, 触发单位: any): boolean {
   if (配置 == null || 配置.剧情片段ID == null) return false;
+  if (配置.运行时条件 != null && !配置.运行时条件()) return false;
   if (!剧情进度满足入口配置(配置)) return false;
   if (!触发单位满足玩家英雄配置(配置, 触发单位)) return false;
   if (!触发单位满足入口物品配置(配置, 触发单位)) return false;
@@ -153,6 +162,19 @@ function 创建入口触发器(this: void, 配置列表: 主线剧情入口分�
   return trigger;
 }
 
+/** 为剧情中途创建或重新布置的 NPC 动态注册主线范围入口。 */
+export function 注册主线剧情运行时单位范围入口(
+  this: void,
+  unit: any,
+  配置: 主线剧情入口分支配置,
+): (this: void) => void {
+  if (unit == null || unit === 0 || !(配置.注册范围 != null && 配置.注册范围 > 0)) {
+    return function 空范围入口清理(this: void): void {};
+  }
+  const trigger = 创建入口触发器([配置]);
+  return registerUnitInRangeTrigger(trigger, unit, 配置.注册范围, null, false);
+}
+
 function 展开入口剧情分支(this: void, 配置: 主线剧情入口配置): 主线剧情入口分支配置[] {
   const 分支列表 = 配置.剧情进度分支;
   if (分支列表 != null && 分支列表.length > 0) return 分支列表;
@@ -184,10 +206,41 @@ function 初始化矩形入口(this: void): void {
 function 初始化全局单位入口(this: void): void {
   for (let i = 0; i < 主线剧情全局单位入口配置表.length; i++) {
     const 配置 = 主线剧情全局单位入口配置表[i];
+    if (配置.动态创建 != null) continue;
+    if (配置.单位变量名 == null || 配置.单位变量名 === "") continue;
     const unit = 获取全局句柄(配置.单位变量名);
     if (unit == null) continue;
     registerUnitInRangeTrigger(创建入口触发器(展开入口剧情分支(配置)), unit, 配置.注册范围, null, false);
   }
+}
+
+function 查找全局单位入口配置(this: void, 配置名: string): 主线剧情全局单位入口配置 | undefined {
+  for (let i = 0; i < 主线剧情全局单位入口配置表.length; i++) {
+    const 配置 = 主线剧情全局单位入口配置表[i];
+    if (配置.配置名 === 配置名) return 配置;
+  }
+  return undefined;
+}
+
+/** 动态创建并注册需要在剧情节点出现的全局单位入口。 */
+export function 动态创建并注册主线剧情全局单位入口(this: void, 配置名: string): any {
+  const 已创建单位 = 动态入口单位表[配置名];
+  if (已创建单位 != null && 已创建单位 !== 0) return 已创建单位;
+
+  const 配置 = 查找全局单位入口配置(配置名);
+  if (配置 == null || 配置.动态创建 == null) return null;
+  const 动态配置 = 配置.动态创建;
+  const unitTypeId = stringToFourCCSafe(动态配置.单位ID);
+  if (!(unitTypeId > 0)) return null;
+
+  const unit = CreateUnit(Player(Math.max(0, 动态配置.玩家ID - 1)), unitTypeId, 动态配置.X, 动态配置.Y, 动态配置.朝向);
+  if (unit == null || unit === 0) return null;
+  动态入口单位表[配置名] = unit;
+  if (配置.单位变量名 != null && 配置.单位变量名 !== "") jglobals[配置.单位变量名] = unit;
+
+  const trigger = 创建入口触发器(展开入口剧情分支(配置));
+  registerUnitInRangeTrigger(trigger, unit, 配置.注册范围, null, 配置.触发后注销 === true);
+  return unit;
 }
 
 function 初始化可破坏物(this: void): void {

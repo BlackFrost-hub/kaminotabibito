@@ -5,12 +5,14 @@ local __TS__ArraySome = ____lualib.__TS__ArraySome
 local ____exports = {}
 local cancelBubbleEffectSchedule, removeDelayedCallback, MAX_PLAYERS, BUBBLE_EFFECT_PATH, NPC_BUBBLE_EFFECT_KEY, g_bubbleEffects, g_bubbleScheduleTaskIds, g_npcUnits, g_bubbleScheduleNpcUnit
 local ____01_FF0E_5BF9_8BDD_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.01．对话配置表")
-local DIALOG_NPC_CONFIGS = ____01_FF0E_5BF9_8BDD_914D_7F6E_8868.DIALOG_NPC_CONFIGS
+local _____5BF9_8BDDNPC_914D_7F6E_5217_8868 = ____01_FF0E_5BF9_8BDD_914D_7F6E_8868["对话NPC配置列表"]
 local ____02_FF0E_4EFB_52A1_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.02．任务配置表")
-local QUEST_CONFIGS = ____02_FF0E_4EFB_52A1_914D_7F6E_8868.QUEST_CONFIGS
+local _____4EFB_52A1_914D_7F6E_5217_8868 = ____02_FF0E_4EFB_52A1_914D_7F6E_8868["任务配置列表"]
 local ____03_FF0E_7279_6548 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createUnitEffect = ____03_FF0E_7279_6548.createUnitEffect
 local destroyUnitEffect = ____03_FF0E_7279_6548.destroyUnitEffect
+local ____09_FF0EYDUserData_5B89_5168_7248 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWEAngleBetweenUnitsSafe = ____09_FF0EYDUserData_5B89_5168_7248.YDWEAngleBetweenUnitsSafe
 function cancelBubbleEffectSchedule(self, playerId)
     if playerId < 0 or playerId >= MAX_PLAYERS then
         return
@@ -64,8 +66,10 @@ NPC_BUBBLE_EFFECT_KEY = "npc_bubble"
 g_bubbleEffects = {}
 g_bubbleScheduleTaskIds = {}
 g_npcUnits = {}
+local ____g_npc_914D_7F6E_671D_5411_5217_8868 = {}
 local g_npcOccupiedBy = __TS__New(Map)
 local g_npcPromptEffectByHandle = __TS__New(Map)
+local SetUnitFacing = jass.SetUnitFacing
 local function npcPromptHandleKey(self, unit)
     if not unit then
         return 0
@@ -120,28 +124,31 @@ local function attachNpcPromptEffect(self, unit, modelPath)
     end
 end
 local function npcConfigQualifiesForQuestMarker(self, npc)
-    if npc.requireID == nil then
+    if npc == nil then
         return false
     end
-    local rid = npc.requireID
+    if npc["任务ID"] == nil then
+        return false
+    end
+    local rid = npc["任务ID"]
     local hasDialog = __TS__ArraySome(
-        DIALOG_NPC_CONFIGS,
-        function(____, d) return d.requireid == rid end
+        _____5BF9_8BDDNPC_914D_7F6E_5217_8868,
+        function(____, d) return d["对话ID"] == rid end
     )
     local hasEnabledQuest = __TS__ArraySome(
-        QUEST_CONFIGS,
-        function(____, q) return q.requireID == rid and q.enabled ~= false end
+        _____4EFB_52A1_914D_7F6E_5217_8868,
+        function(____, q) return q["任务ID"] == rid and q["启用"] ~= false end
     )
-    if npc.requireType == "任务" then
+    if npc["类型"] == "任务" then
         return true
     end
     return hasDialog or hasEnabledQuest
 end
 function ____exports.tryAttachQuestMarkerForConfigNpc(self, unit, npcConfig)
-    if not unit or not npcConfigQualifiesForQuestMarker(nil, npcConfig) then
+    if not unit or npcConfig == nil or not npcConfigQualifiesForQuestMarker(nil, npcConfig) then
         return
     end
-    if npcConfig.requireType == "对话" then
+    if npcConfig["类型"] == "对话" then
         attachNpcPromptEffect(nil, unit, NPC_OVERHEAD_BLUE_EXCL)
     else
         attachNpcPromptEffect(nil, unit, NPC_OVERHEAD_YELLOW_EXCL)
@@ -239,24 +246,24 @@ local function bubbleScheduleCallbackP3(self)
 end
 local function startBubbleScheduleTask(self, playerId, delay)
     repeat
-        local ____switch54 = playerId
-        local ____cond54 = ____switch54 == 0
-        if ____cond54 then
+        local ____switch55 = playerId
+        local ____cond55 = ____switch55 == 0
+        if ____cond55 then
             g_bubbleScheduleTaskIds[playerId + 1] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP0)
             return
         end
-        ____cond54 = ____cond54 or ____switch54 == 1
-        if ____cond54 then
+        ____cond55 = ____cond55 or ____switch55 == 1
+        if ____cond55 then
             g_bubbleScheduleTaskIds[playerId + 1] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP1)
             return
         end
-        ____cond54 = ____cond54 or ____switch54 == 2
-        if ____cond54 then
+        ____cond55 = ____cond55 or ____switch55 == 2
+        if ____cond55 then
             g_bubbleScheduleTaskIds[playerId + 1] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP2)
             return
         end
-        ____cond54 = ____cond54 or ____switch54 == 3
-        if ____cond54 then
+        ____cond55 = ____cond55 or ____switch55 == 3
+        if ____cond55 then
             g_bubbleScheduleTaskIds[playerId + 1] = addDelayedCallback(delay * 1000, bubbleScheduleCallbackP3)
             return
         end
@@ -289,6 +296,31 @@ function ____exports.releaseNpcOccupation(self, playerId)
 end
 function ____exports.getNpcUnit(self, playerId)
     return g_npcUnits[playerId + 1]
+end
+____exports["让对话NPC面向玩家单位"] = function(_____73A9_5BB6ID, ____NPC_5355_4F4D, _____73A9_5BB6_5355_4F4D, _____914D_7F6E_671D_5411)
+    if _____73A9_5BB6ID < 0 or _____73A9_5BB6ID >= MAX_PLAYERS then
+        return
+    end
+    if not ____NPC_5355_4F4D or not _____73A9_5BB6_5355_4F4D or _____914D_7F6E_671D_5411 == nil then
+        return
+    end
+    ____g_npc_914D_7F6E_671D_5411_5217_8868[_____73A9_5BB6ID + 1] = _____914D_7F6E_671D_5411
+    SetUnitFacing(
+        ____NPC_5355_4F4D,
+        YDWEAngleBetweenUnitsSafe(____NPC_5355_4F4D, _____73A9_5BB6_5355_4F4D)
+    )
+end
+____exports["恢复对话NPC配置朝向"] = function(_____73A9_5BB6ID)
+    if _____73A9_5BB6ID < 0 or _____73A9_5BB6ID >= MAX_PLAYERS then
+        return
+    end
+    local ____NPC_5355_4F4D = g_npcUnits[_____73A9_5BB6ID + 1]
+    local _____914D_7F6E_671D_5411 = ____g_npc_914D_7F6E_671D_5411_5217_8868[_____73A9_5BB6ID + 1]
+    ____g_npc_914D_7F6E_671D_5411_5217_8868[_____73A9_5BB6ID + 1] = nil
+    if not ____NPC_5355_4F4D or _____914D_7F6E_671D_5411 == nil then
+        return
+    end
+    SetUnitFacing(____NPC_5355_4F4D, _____914D_7F6E_671D_5411)
 end
 function ____exports.tryOccupyNpc(self, p, npcUnit)
     if not npcUnit then

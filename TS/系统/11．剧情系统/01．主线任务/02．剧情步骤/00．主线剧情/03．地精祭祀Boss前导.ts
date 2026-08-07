@@ -1,16 +1,11 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const jglobals = require("jass.globals") as any;
 const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 
-const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
-};
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
@@ -20,9 +15,6 @@ const { 启动剧情Boss战 } = require("系统.11．剧情系统.01．主线任
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
 };
-const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
-  TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
-};
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
@@ -31,41 +23,18 @@ import type { 剧情动作参数表 } from "../../00．剧情系统核心工具/
 import type { 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 
-type 播放主线剧情片段函数 = (this: void, 片段ID: string, 上下文?: any) => boolean;
-let 播放主线剧情片段实现: 播放主线剧情片段函数 | undefined;
-
-function 播放主线剧情片段(this: void, 片段ID: string, 上下文?: any): boolean {
-  if (播放主线剧情片段实现 == null) {
-    const 播放器模块 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器") as {
-      播放主线剧情片段: 播放主线剧情片段函数;
-    };
-    播放主线剧情片段实现 = 播放器模块.播放主线剧情片段;
-  }
-  return 播放主线剧情片段实现(片段ID, 上下文);
-}
-
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
-const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
-const TriggerRegisterUnitEvent = jass.TriggerRegisterUnitEvent as (this: void, trig: any, whichUnit: any, whichEvent: any) => any;
 
-const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
-const EVENT_UNIT_SPELL_EFFECT = jass.EVENT_UNIT_SPELL_EFFECT as any;
 
 let 已初始化进度03核心 = false;
-let 已注册地精祭祀Boss范围 = false;
-let 地精祭祀Boss范围轮询ID = 0;
 
 function 读取地精巫师Boss(this: void): any {
   return YDUserDataGetSafe("string", "Boss", "地精巫师", "unit");
 }
 
 function Boss仍是前导状态(this: void, bossUnit: any): boolean {
-  if (bossUnit == null || bossUnit === 0 || !IsUnitAliveBJ(bossUnit)) return false;
-  return GetOwningPlayer(bossUnit) === Player(PLAYER_NEUTRAL_PASSIVE);
+  return bossUnit != null && bossUnit !== 0 && IsUnitAliveBJ(bossUnit);
 }
 
 export function 执行地精祭祀Boss前导激活(this: void, 参数: 剧情动作参数表): void {
@@ -87,44 +56,8 @@ export function 执行地精祭祀Boss前导激活(this: void, 参数: 剧情动
 export function 执行地精祭祀Boss战正式注册(this: void, 参数: 剧情动作参数表): void {
   const bossUnit = 读取地精巫师Boss();
   if (bossUnit == null || bossUnit === 0 || !IsUnitAliveBJ(bossUnit)) return;
-  const 技能触发器名 = String(参数.注册Boss技能事件 ?? "");
-  const 技能触发器 = 技能触发器名 !== "" ? jglobals[技能触发器名] : null;
-  if (技能触发器 != null && 技能触发器 !== 0) {
-    TriggerRegisterUnitEvent(技能触发器, bossUnit, EVENT_UNIT_SPELL_EFFECT);
-  }
   const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
   启动剧情Boss战(bossUnit, { 触发单位, 暂停来源: 剧情Boss预置暂停来源 });
-}
-
-function on地精祭祀Boss前导范围触发(this: void): void {
-  const bossUnit = 读取地精巫师Boss();
-  const 触发单位 = GetTriggerUnit();
-  if (读取剧情进度() !== 2) return;
-  if (!Boss仍是前导状态(bossUnit)) return;
-  if (!是玩家英雄组单位(触发单位)) return;
-
-  const 片段ID = "jlc_goblin_boss_intro";
-  播放主线剧情片段(片段ID, { 片段ID, 触发配置名: "地精祭祀Boss前导核心", 触发单位 });
-}
-
-function 注册地精祭祀Boss范围(this: void, bossUnit: any): void {
-  if (已注册地精祭祀Boss范围) return;
-  if (bossUnit == null || bossUnit === 0) return;
-  const trigger = CreateTrigger();
-  TriggerRegisterUnitInRangeSimple(trigger, 750, bossUnit);
-  TriggerAddAction(trigger, on地精祭祀Boss前导范围触发);
-  已注册地精祭祀Boss范围 = true;
-}
-
-function on检查并注册地精祭祀Boss范围(this: void): void {
-  const bossUnit = 读取地精巫师Boss();
-  if (bossUnit != null && bossUnit !== 0) {
-    注册地精祭祀Boss范围(bossUnit);
-    if (地精祭祀Boss范围轮询ID !== 0) {
-      removePeriodicCallback(地精祭祀Boss范围轮询ID);
-      地精祭祀Boss范围轮询ID = 0;
-    }
-  }
 }
 
 export const 地精祭祀Boss前导剧情动作注册表: Record<string, 剧情动作处理器> = {
@@ -135,14 +68,4 @@ export const 地精祭祀Boss前导剧情动作注册表: Record<string, 剧情�
 export function 初始化进度03_地精祭祀Boss前导核心(this: void): void {
   if (已初始化进度03核心) return;
   已初始化进度03核心 = true;
-
-  const bossUnit = 读取地精巫师Boss();
-  if (bossUnit != null && bossUnit !== 0) {
-    注册地精祭祀Boss范围(bossUnit);
-    return;
-  }
-
-  if (地精祭祀Boss范围轮询ID === 0) {
-    地精祭祀Boss范围轮询ID = addPeriodicCallback(500, on检查并注册地精祭祀Boss范围);
-  }
 }

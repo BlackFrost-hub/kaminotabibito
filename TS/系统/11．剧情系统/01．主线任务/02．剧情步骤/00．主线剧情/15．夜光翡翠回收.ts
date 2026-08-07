@@ -44,8 +44,9 @@ const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息"
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  getServerTime: (this: void) => number;
 };
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -62,22 +63,24 @@ import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心
 export { 沙漠情报商人回收夜光翡翠剧情片段 } from "../01．第一章/15．夜光翡翠回收";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
+const CreateGroup = jass.CreateGroup as (this: void) => any;
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const DestroyTrigger = jass.DestroyTrigger as (this: void, trig: any) => void;
 const DestroyGroup = jass.DestroyGroup as (this: void, whichGroup: any) => void;
 const FirstOfGroup = jass.FirstOfGroup as (this: void, whichGroup: any) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
-const GetFilterUnit = jass.GetFilterUnit as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetUnitName = jass.GetUnitName as (this: void, whichUnit: any) => string;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, whichGroup: any, whichUnit: any) => boolean;
-const GetUnitsInRectMatching = jass.GetUnitsInRectMatching as (this: void, whichRect: any, filter: any) => any;
+const GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect as (this: void, whichGroup: any, whichRect: any, filter: any) => void;
 const IsPlayerInForce = jass.IsPlayerInForce as (this: void, whichPlayer: any, whichForce: any) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
+const Rect = jass.Rect as (this: void, minX: number, minY: number, maxX: number, maxY: number) => any;
+const RemoveRect = jass.RemoveRect as (this: void, whichRect: any) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, actionFunc: (this: void) => void) => any;
 
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
@@ -85,26 +88,32 @@ const bj_QUESTMESSAGE_WARNING = jassGlobals.bj_QUESTMESSAGE_WARNING as number;
 const bj_TIMETYPE_SET = jassGlobals.bj_TIMETYPE_SET as number;
 const 回村剧情片段ID = "jlc_return_village_after_guard_duel";
 const 裂缝入口触发器列表: any[] = [];
+let 裂缝入口生效时间毫秒 = 0;
 
-function 是村内旧精灵护卫(this: void): boolean {
-  const unit = GetFilterUnit();
+function 是村内旧精灵护卫(this: void, unit: any): boolean {
   if (unit == null || unit === 0 || GetUnitTypeId(unit) !== stringToFourCCSafe("nhea")) return false;
   const 玩家组 = YDUserDataGetSafe("string", "玩家", "玩家组", "force");
   return 玩家组 != null && 玩家组 !== 0 && !IsPlayerInForce(GetOwningPlayer(unit), 玩家组);
 }
 
 function 清理村内旧精灵护卫(this: void): void {
-  const 矩形 = jassGlobals.gg_rct________________QY;
-  if (矩形 == null || 矩形 === 0) return;
-  const 单位组 = GetUnitsInRectMatching(矩形, jass.Condition(是村内旧精灵护卫));
-  if (单位组 == null || 单位组 === 0) return;
+  // 旧 gg_rct________________QY 在部分运行路径已被释放；这里使用同范围临时矩形，避免清理动作打断剧情。
+  const 矩形 = Rect(-30016, -30464, -22240, -26016);
+  const 单位组 = CreateGroup();
+  if (矩形 == null || 矩形 === 0 || 单位组 == null || 单位组 === 0) {
+    if (矩形 != null && 矩形 !== 0) RemoveRect(矩形);
+    if (单位组 != null && 单位组 !== 0) DestroyGroup(单位组);
+    return;
+  }
+  GroupEnumUnitsInRect(单位组, 矩形, null);
   let unit = FirstOfGroup(单位组);
   while (unit != null && unit !== 0) {
     GroupRemoveUnit(单位组, unit);
-    立即移除单位并取消排泄登记(unit);
+    if (是村内旧精灵护卫(unit)) 立即移除单位并取消排泄登记(unit);
     unit = FirstOfGroup(单位组);
   }
   DestroyGroup(单位组);
+  RemoveRect(矩形);
 }
 
 function 清理裂缝回村入口(this: void): void {
@@ -113,6 +122,7 @@ function 清理裂缝回村入口(this: void): void {
     if (trigger != null && trigger !== 0) DestroyTrigger(trigger);
   }
   裂缝入口触发器列表.length = 0;
+  裂缝入口生效时间毫秒 = 0;
 }
 
 function 清理语义单位(this: void, 表: string, 键: string): void {
@@ -124,6 +134,9 @@ function 清理语义单位(this: void, 表: string, 键: string): void {
 function 触发裂缝回村(this: void): void {
   const 当前进度 = Number(YDUserDataGetSafe("string", "剧情进度", "整数", "integer"));
   if (当前进度 !== 16) return;
+  // 注册范围事件时，已经站在裂缝附近的英雄可能被引擎立即判定进入。
+  // 延后一秒启用入口，防止 15 -> 16 收尾在创建裂缝的同一时点直接推进到 17。
+  if (裂缝入口生效时间毫秒 <= 0 || getServerTime() < 裂缝入口生效时间毫秒) return;
 
   const 触发单位 = GetTriggerUnit();
   if (!是玩家英雄组单位(触发单位)) return;
@@ -178,6 +191,7 @@ export function 执行情报商人回收夜光翡翠(this: void, 参数: 剧情�
   const 裂缝类型ID = stringToFourCCSafe(按名字反查总单位ID("进入单位范围用"));
   if (!(裂缝类型ID > 0)) return;
 
+  裂缝入口生效时间毫秒 = getServerTime() + 1000;
   const 裂缝A = 创建单位并登记排泄安全(Player(PLAYER_NEUTRAL_PASSIVE), 裂缝类型ID, -27182.1, -25485.2, 0);
   const 裂缝B = 创建单位并登记排泄安全(Player(PLAYER_NEUTRAL_PASSIVE), 裂缝类型ID, -24123.4, -26338.8, 0);
 

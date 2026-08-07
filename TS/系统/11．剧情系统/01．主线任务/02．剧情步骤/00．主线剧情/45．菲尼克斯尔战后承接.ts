@@ -26,11 +26,12 @@ const { 注册剧情配置传送, 读取剧情传送配置 } = require("系统.0
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 清理剧情运行时单位, 注册剧情运行时单位, 读取剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
+import { 应用第三章电影镜头 } from "./40-50．第三章电影镜头";
 
 const DestroyEffect = jass.DestroyEffect as (this: void, effect: any) => void;
 
 const 菲尼克斯尔战后传送配置ID = "jlc_felice_aftermath";
-const 传送门模型 = "Common\\Effect\\Form\\Portal\\7sr_suramarcity_pylonfx.mdx";
+const 传送门模型 = "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdl";
 const 英灵墓地铭文模型 = "Common\\Effect\\Form\\MagicCircle\\SpiritGuardSoulSeal.mdx";
 
 interface 英灵墓地铭文位置 {
@@ -125,7 +126,8 @@ function 创建菲尼克斯尔战后入口(this: void): void {
       模型路径: 传送门模型,
       X: 传送配置.入口中心X,
       Y: 传送配置.入口中心Y,
-      缩放: 2.2,
+      Z轴角度: 180,
+      缩放: 1.0,
     });
   }
   if (状态.取消剧情传送注册 != null) return;
@@ -137,6 +139,7 @@ function 创建菲尼克斯尔战后入口(this: void): void {
 }
 
 export function 执行准备菲尼克斯尔战后(this: void, _参数: 剧情动作参数表): void {
+  应用第三章电影镜头(43);
   const 上下文 = 读取当前剧情动作上下文();
   if (!句柄有效(读取剧情运行时单位("主线NPC.菲尼克斯尔残响")) && 句柄有效(上下文.触发单位)) {
     注册剧情运行时单位("主线NPC.菲尼克斯尔残响", 上下文.触发单位);

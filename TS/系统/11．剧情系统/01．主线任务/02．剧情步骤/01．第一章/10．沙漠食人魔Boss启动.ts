@@ -41,7 +41,7 @@ export const 沙漠食人魔Boss启动紧凑剧情片段: 紧凑剧情片段配�
       参数: {
         Boss键: "Boss.沙漠食人魔",
         播放音效: "gg_snd_GWSY05",
-        战斗桥接: "Boss战.绑定单位 -> gg_trg_Boss____________u",
+        战斗桥接: "Boss战.绑定单位 -> TS 统一 Boss 战运行器",
         旧JASS功能清单: "EC_CreateEffect / PlaySoundBJ / PauseUnit(false) / SetUnitInvulnerable(false) / ConditionalTriggerExecute",
       },
     },

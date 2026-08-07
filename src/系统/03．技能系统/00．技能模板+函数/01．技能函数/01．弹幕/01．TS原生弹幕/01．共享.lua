@@ -63,6 +63,7 @@ end
 ____exports.bj_RADTODEG = ____jass_bj_RADTODEG_0
 ____exports["蝗虫技能ID"] = 1097625443
 ____exports["默认弹幕单位类型"] = 1700880737
+____exports["可攻击摧毁弹幕单位类型"] = 1700880738
 ____exports["弹幕Tick间隔"] = 0.01
 local _____7A7ASelf = nil
 function ____exports.CreateUnit(owner, unitTypeId, x, y, facing)

@@ -72,7 +72,7 @@ ____exports["地精洞窟演出紧凑剧情片段"] = {
             ["跳过也执行"] = false,
             ["动作ID"] = "JLC精灵村_地精洞窟祭坛演出开始",
             ["名称"] = "关闭黑幕并切入祭坛镜头",
-            ["参数"] = {["关闭电影滤镜"] = true, ["开启区域音乐"] = "gg_snd_JQBGM01 @ gg_rct______________102", ["视角镜头"] = "gg_cam___________________005", ["旧JASS功能清单"] = "DisplayCineFilter(false) / SetStackedSoundBJ(true, gg_snd_JQBGM01, gg_rct______________102) / CreateUnit(演员1-6) / CameraSetupApplyForceDuration"}
+            ["参数"] = {["关闭电影滤镜"] = true, ["开启区域音乐"] = "gg_snd_JQBGM01 @ gg_rct______________102", ["旧JASS功能清单"] = "DisplayCineFilter(false) / SetStackedSoundBJ(true, gg_snd_JQBGM01, gg_rct______________102) / CreateUnit(演员1-6) / CameraSetupApplyForceDuration"}
         },
         {
             ["序号"] = 4,

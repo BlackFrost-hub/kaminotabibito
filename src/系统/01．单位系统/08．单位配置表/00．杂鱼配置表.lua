@@ -1555,6 +1555,40 @@ ____exports["杂鱼配置表"] = {
         bountyplus = 0,
         collision = 24,
         unit = "n06D"
+    },
+    n07B = {
+        _parent = "nslm",
+        Name = "腐淤战士",
+        dmgplus1 = 1150,
+        HP = 7200,
+        def = 22,
+        cool1 = 1.15,
+        Art = "Unit\\Minion\\Icon\\mia_sludge_warrior.blp",
+        level = 27,
+        spd = 310,
+        upgrades = "R001,R002",
+        regenHP = 57.6,
+        canFlee = 0,
+        hostilePal = 1,
+        unit = "n07B"
+    },
+    n07C = {
+        _parent = "nslf",
+        Name = "腐淤投手",
+        dmgplus1 = 1320,
+        HP = 6400,
+        def = 18,
+        cool1 = 1.7,
+        Art = "Unit\\Minion\\Icon\\mia_sludge_thrower.blp",
+        level = 27,
+        spd = 295,
+        rangeN1 = 650,
+        acquire = 850,
+        upgrades = "R001,R002",
+        regenHP = 51.2,
+        canFlee = 0,
+        hostilePal = 1,
+        unit = "n07C"
     }
 }
 ____exports["按名字反查杂鱼单位ID"] = _____521B_5EFA_5355_4F4D_540D_53CD_67E5_5668(____exports["杂鱼配置表"])

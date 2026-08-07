@@ -80,7 +80,7 @@ function 结算冰焰AOE(this: void, context: 巴尔扎罗斯运行时上下文,
         weaponType: WEAPON_TYPE_WHOKNOWS,
         标签: "塞拉-冰焰双星-火焰",
       });
-      施加巴尔扎罗斯灼热(unit, config.火球灼热层数);
+      施加巴尔扎罗斯灼热(context, unit, config.火球灼热层数);
     }
   }
 }

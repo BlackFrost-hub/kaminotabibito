@@ -214,13 +214,13 @@ local function pickNpcCompleteTextByBranch(self, raw, branchIndex)
     return lines[branchIndex + 1]
 end
 local function shouldUseGenericGiveFailHint(self, quest)
-    if quest.type ~= "给予" then
+    if quest["类型"] ~= "给予" then
         return false
     end
-    if quest.rewardDisplay and quest.rewardDisplay ~= "" then
+    if quest["奖励显示"] and quest["奖励显示"] ~= "" then
         return true
     end
-    local reward = quest.reward or ""
+    local reward = quest["奖励"] or ""
     return (string.find(reward, ":", nil, true) or 0) - 1 >= 0
 end
 function ____exports.handleQuestSubmit(self, params)
@@ -230,6 +230,8 @@ function ____exports.handleQuestSubmit(self, params)
     local heroName = ____params_3.heroName
     local dialogOwnerId = ____params_3.dialogOwnerId
     local npcUnit = ____params_3.npcUnit
+    local _____5BF9_8BDD_76EE_6807_5355_4F4D = ____params_3["对话目标单位"]
+    local ____NPC_914D_7F6E_671D_5411 = ____params_3["NPC配置朝向"]
     local parseDialogText = ____params_3.parseDialogText
     local openDialog = ____params_3.openDialog
     local refreshTaskUIForAllClientsSoon = ____params_3.refreshTaskUIForAllClientsSoon
@@ -241,14 +243,14 @@ function ____exports.handleQuestSubmit(self, params)
         ____callbackOwner_4 = nil
     end
     local hero = ____callbackOwner_4
-    local requireItem = quest.requireItem
-    local requiredResources = quest.requiredResources
-    local requireCount = normalizeRequireCount(nil, quest.requireCount)
-    local questId = quest.requireID ~= nil and tostring(quest.requireID) or ""
+    local requireItem = quest["需求物品"]
+    local requiredResources = quest["需求资源"]
+    local requireCount = normalizeRequireCount(nil, quest["需求数量"])
+    local questId = quest["任务ID"] ~= nil and tostring(quest["任务ID"]) or ""
     local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
     local rewardBranchIndex = -1
     local useGenericGiveFailHint = shouldUseGenericGiveFailHint(nil, quest)
-    if quest.type == "击杀" or quest.type == "目标击杀" then
+    if quest["类型"] == "击杀" or quest["类型"] == "目标击杀" then
         local done = isKillQuestObjectiveCompleted(nil, dialogOwnerId, questId, requireCount)
         if not done then
             showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r任务目标尚未完成，无法提交。")
@@ -256,7 +258,7 @@ function ____exports.handleQuestSubmit(self, params)
         end
     end
     local function broadcastQuestComplete(self)
-        local rewardStr = quest.rewardDisplay or quest.reward or "无"
+        local rewardStr = quest["奖励显示"] or quest["奖励"] or "无"
         local isAll = not rewardStr or (string.find(rewardStr, "所有玩家", nil, true) or 0) - 1 ~= -1 or (string.find(rewardStr, "all", nil, true) or 0) - 1 ~= -1 or (string.find(rewardStr, "完成任务的玩家", nil, true) or 0) - 1 == -1 and (string.find(rewardStr, "Player", nil, true) or 0) - 1 == -1
         local targetLabel = isAll and "|cffffcc00所有玩家|r" or ("|cff00ccff" .. tostring(playerName)) .. "|r"
         local TARGET_PREFIXES = {"所有玩家", "完成任务的玩家", "Player"}
@@ -283,7 +285,7 @@ function ____exports.handleQuestSubmit(self, params)
             ),
             "、"
         )
-        local msg = (("|cffffff00『系统提示』：|r" .. ("|cff00ff66" .. tostring(playerName)) .. "|r") .. (" 完成了 |cffffcc00『" .. tostring(quest.name)) .. "』|r，") .. ((targetLabel .. " 获得了奖励：|cffff9900") .. cleanReward) .. "|r"
+        local msg = (("|cffffff00『系统提示』：|r" .. ("|cff00ff66" .. tostring(playerName)) .. "|r") .. (" 完成了 |cffffcc00『" .. tostring(quest["名称"])) .. "』|r，") .. ((targetLabel .. " 获得了奖励：|cffff9900") .. cleanReward) .. "|r"
         do
             local i = 0
             while i < 4 do
@@ -307,8 +309,13 @@ function ____exports.handleQuestSubmit(self, params)
         end
         broadcastQuestComplete(nil)
         refreshTaskUIForAllClientsSoon(nil, dialogOwnerId, questId)
-        if quest.NpcCompleteText then
-            local completeRaw = pickNpcCompleteTextByBranch(nil, quest.NpcCompleteText, rewardBranchIndex)
+        local function _____6267_884C_4EFB_52A1_5B8C_6210_540E_52A8_4F5C()
+            if quest["完成后动作"] then
+                quest["完成后动作"](quest, dialogOwnerId)
+            end
+        end
+        if quest["NPC完成对白"] then
+            local completeRaw = pickNpcCompleteTextByBranch(nil, quest["NPC完成对白"], rewardBranchIndex)
             local completeLines = parseDialogText(nil, completeRaw, npcName, heroName)
             addDelayedCallback(
                 10,
@@ -316,10 +323,18 @@ function ____exports.handleQuestSubmit(self, params)
                     openDialog(
                         nil,
                         jass.Player(dialogOwnerId),
-                        npcUnit and ({lines = completeLines, npcUnit = npcUnit}) or ({lines = completeLines})
+                        npcUnit and ({
+                            lines = completeLines,
+                            npcUnit = npcUnit,
+                            ["对话目标单位"] = _____5BF9_8BDD_76EE_6807_5355_4F4D,
+                            ["NPC配置朝向"] = ____NPC_914D_7F6E_671D_5411,
+                            onFinish = _____6267_884C_4EFB_52A1_5B8C_6210_540E_52A8_4F5C
+                        }) or ({lines = completeLines, onFinish = _____6267_884C_4EFB_52A1_5B8C_6210_540E_52A8_4F5C})
                     )
                 end
             )
+        else
+            _____6267_884C_4EFB_52A1_5B8C_6210_540E_52A8_4F5C()
         end
     end
     if requiredResources then
@@ -339,7 +354,7 @@ function ____exports.handleQuestSubmit(self, params)
             2,
             playerName
         )
-        local rewardResult = applyRewardWithContext(nil, quest.reward or "", {triggerPlayerId = dialogOwnerId})
+        local rewardResult = applyRewardWithContext(nil, quest["奖励"] or "", {triggerPlayerId = dialogOwnerId})
         rewardBranchIndex = rewardResult.matchedRuleIndex
         onComplete(nil)
         return
@@ -350,7 +365,7 @@ function ____exports.handleQuestSubmit(self, params)
             return
         end
         local ____temp_5
-        if quest.type == "给予" then
+        if quest["类型"] == "给予" then
             ____temp_5 = npcUnit
         else
             ____temp_5 = hero
@@ -374,7 +389,7 @@ function ____exports.handleQuestSubmit(self, params)
             end
             return
         end
-        if quest.type == "给予" and not isSubmitItemMatchedRequire(nil, submitInfo, requireItem) then
+        if quest["类型"] == "给予" and not isSubmitItemMatchedRequire(nil, submitInfo, requireItem) then
             local wrongItem = UnitGetItemByTypeId(sourceUnit, itemId)
             if wrongItem then
                 local back = ReturnItemToHeroOrDropBJ(wrongItem, sourceUnit, hero)
@@ -398,9 +413,9 @@ function ____exports.handleQuestSubmit(self, params)
         end
         local itemCount = GetItemTypeTotalCountByChargesBJ(sourceUnit, itemId)
         if itemCount >= requireCount then
-            if quest.type == "给予" then
-                local preview = previewRewardMatchWithContext(nil, quest.reward or "", {triggerPlayerId = dialogOwnerId, submittedItemId = submitInfo.itemCode, submittedItemLevel = submitInfo.itemLevel})
-                if preview.matchedRuleIndex < 0 and (string.find(quest.reward or "", ":", nil, true) or 0) - 1 >= 0 then
+            if quest["类型"] == "给予" then
+                local preview = previewRewardMatchWithContext(nil, quest["奖励"] or "", {triggerPlayerId = dialogOwnerId, submittedItemId = submitInfo.itemCode, submittedItemLevel = submitInfo.itemLevel})
+                if preview.matchedRuleIndex < 0 and (string.find(quest["奖励"] or "", ":", nil, true) or 0) - 1 >= 0 then
                     local backItem = UnitGetItemByTypeId(sourceUnit, itemId)
                     if backItem then
                         local back = ReturnItemToHeroOrDropBJ(backItem, sourceUnit, hero)
@@ -432,7 +447,7 @@ function ____exports.handleQuestSubmit(self, params)
                     2,
                     playerName
                 )
-                local rewardResult = applyRewardWithContext(nil, quest.reward or "", {triggerPlayerId = dialogOwnerId, submittedItemId = submitInfo.itemCode, submittedItemLevel = submitInfo.itemLevel})
+                local rewardResult = applyRewardWithContext(nil, quest["奖励"] or "", {triggerPlayerId = dialogOwnerId, submittedItemId = submitInfo.itemCode, submittedItemLevel = submitInfo.itemLevel})
                 rewardBranchIndex = rewardResult.matchedRuleIndex
                 onComplete(nil)
             else
@@ -455,7 +470,7 @@ function ____exports.handleQuestSubmit(self, params)
         2,
         playerName
     )
-    local rewardResult = applyRewardWithContext(nil, quest.reward or "", {triggerPlayerId = dialogOwnerId})
+    local rewardResult = applyRewardWithContext(nil, quest["奖励"] or "", {triggerPlayerId = dialogOwnerId})
     rewardBranchIndex = rewardResult.matchedRuleIndex
     onComplete(nil)
 end

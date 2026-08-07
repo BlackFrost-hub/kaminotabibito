@@ -366,6 +366,15 @@ local function ____on_79FB_52A8_5267_60C5_73A9_5BB6_7EC4()
         jass.SetUnitFacing(unit, _____72B6_6001["配置"]["目标面向"])
     end
     jass.IssueImmediateOrder(unit, "stop")
+    local _____955C_5934_5E73_79FB_65F6_957F = _____72B6_6001["配置"]["镜头平移时长"]
+    if _____955C_5934_5E73_79FB_65F6_957F ~= nil and _____955C_5934_5E73_79FB_65F6_957F > 0 then
+        StarOther_PanCameraToTimedForPlayer(
+            jass.GetOwningPlayer(unit),
+            _____72B6_6001["配置"]["目标X"],
+            _____72B6_6001["配置"]["目标Y"],
+            _____955C_5934_5E73_79FB_65F6_957F
+        )
+    end
 end
 local function _____6E05_7406_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001(_____72B6_6001)
     local triggerId = __TS__Number(jass.GetHandleId(_____72B6_6001["触发器"]))
@@ -468,6 +477,7 @@ ____exports["注册剧情配置传送"] = function(_____914D_7F6EID, _____8986_7
         ["目标X"] = _____914D_7F6E["目标X"],
         ["目标Y"] = _____914D_7F6E["目标Y"],
         ["目标面向"] = _____914D_7F6E["目标面向"],
+        ["镜头平移时长"] = _____914D_7F6E["镜头平移时长"],
         ["条件"] = _____8986_76D6["条件"] or (function() return checkRegionCondition(_____914D_7F6E.condition, nil) end),
         ["读取玩家英雄组"] = _____8986_76D6["读取玩家英雄组"],
         ["允许进入单位"] = _____8986_76D6["允许进入单位"],

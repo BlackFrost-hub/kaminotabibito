@@ -12,9 +12,8 @@ const {
 const { 创建并冻结剧情Boss预置 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接") as {
   创建并冻结剧情Boss预置: (this: void, 参数: any) => any;
 };
-const { 暂停并设置无敌安全, 解除暂停并取消无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
   暂停并设置无敌安全: (this: void, unit: any, 来源: string) => boolean;
-  解除暂停并取消无敌安全: (this: void, unit: any, 来源: string) => boolean;
 };
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
@@ -60,6 +59,7 @@ const { 按步长调整玩家镜头高度 } = require("系统.09．表现系统.
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取当前剧情动作上下文, 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 应用第三章电影镜头 } from "./40-50．第三章电影镜头";
 import { 清理剧情运行时单位, 注册剧情运行时单位, 读取剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 进入主线节点 } from "../../00．剧情系统核心工具/10．标准剧情动作";
 import { 启动剧情Boss战 } from "../../00．剧情系统核心工具/11．剧情Boss战启动桥接";
@@ -87,10 +87,10 @@ const Boss键 = "Boss.熔岩恶魔王";
 const Boss名 = "熔岩恶魔王·巴尔扎罗斯";
 const Boss待战暂停来源 = "剧情系统:巴尔扎罗斯待战";
 const Boss位置 = { X: 28640.0, Y: -3734.5, 朝向: 270.0 };
+const 战后返回位置 = { X: 28263.5, Y: 1946.2, 朝向: 270.0 };
 const Boss进入范围 = 1600;
-const 战后返回面向 = 90;
 const 巴尔扎罗斯战后传送配置ID = "jlc_balzaroth_aftermath";
-const 战后传送门模型 = "Common\\Effect\\Form\\Portal\\7sr_suramarcity_pylonfx.mdx";
+const 战后传送门模型 = "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdl";
 
 interface 巴尔扎罗斯前导状态 {
   世代: number;
@@ -123,10 +123,10 @@ function 句柄有效(this: void, handle: any): boolean {
 function on返回巴尔扎罗斯触发区域(this: void): void {
   const unit = GetEnumUnit();
   if (!句柄有效(unit)) return;
-  SetUnitPosition(unit, Boss位置.X, Boss位置.Y);
-  SetUnitFacing(unit, 战后返回面向);
+  SetUnitPosition(unit, 战后返回位置.X, 战后返回位置.Y);
+  SetUnitFacing(unit, 战后返回位置.朝向);
   IssueImmediateOrder(unit, "stop");
-  StarOther_PanCameraToTimedForPlayer(GetOwningPlayer(unit), Boss位置.X, Boss位置.Y, 0.1);
+  StarOther_PanCameraToTimedForPlayer(GetOwningPlayer(unit), 战后返回位置.X, 战后返回位置.Y, 0.1);
 }
 
 function 返回巴尔扎罗斯触发区域(this: void): void {
@@ -170,7 +170,8 @@ function 创建巴尔扎罗斯战后传送门(this: void): void {
       模型路径: 战后传送门模型,
       X: 传送配置.入口中心X,
       Y: 传送配置.入口中心Y,
-      缩放: 2.2,
+      Z轴角度: 270,
+      缩放: 1.0,
     });
   }
   if (状态.取消剧情传送注册 != null) return;
@@ -182,6 +183,7 @@ function 创建巴尔扎罗斯战后传送门(this: void): void {
 }
 
 function 播放巴尔扎罗斯前导(this: void, 触发单位: any): void {
+  应用第三章电影镜头(42);
   const { 播放主线剧情片段 } = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器") as {
     播放主线剧情片段: (this: void, 片段ID: string, 上下文?: any) => boolean;
   };
@@ -276,7 +278,6 @@ export function 执行启动巴尔扎罗斯Boss战(this: void, _参数: 剧情�
   if (!单位存活(bossUnit)) return;
 
   const 玩家单位 = 读取剧情运行时单位("剧情运行时.巴尔扎罗斯玩家") ?? 读取当前剧情动作上下文().触发单位;
-  解除暂停并取消无敌安全(bossUnit, Boss待战暂停来源);
   启动剧情Boss战(bossUnit, {
     触发单位: 玩家单位,
     暂停来源: Boss待战暂停来源,

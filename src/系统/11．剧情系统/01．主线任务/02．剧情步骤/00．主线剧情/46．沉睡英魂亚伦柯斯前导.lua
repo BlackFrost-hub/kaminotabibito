@@ -1,12 +1,14 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____6E05_7406_4E9A_4F26_67EF_65AF_8303_56F4_76D1_542C, _____6E05_7406_4E9A_4F26_67EF_65AF_524D_5BFC_72B6_6001, _____6E05_7406_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001, _____8BFB_53D6_4E9A_4F26_67EF_65AF_6218_540E_73A9_5BB6_82F1_96C4_7EC4, _____4E9A_4F26_67EF_65AF_6218_540E_5141_8BB8_8FDB_5165, _____64AD_653E_5C01_5370_6838_5FC3_62B5_8FBE_5BF9_767D, _____5B8C_6210_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001, _____521B_5EFA_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_95E8, ____on_4E9A_4F26_67EF_65AF_6B7B_4EA1, jglobals, _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168, IsUnitAliveBJ, unregisterDeathListener, safeDestroyTrigger, _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, _____521B_5EFA_70B9_7279_6548, _____6CE8_518C_5267_60C5_914D_7F6E_4F20_9001, _____8BFB_53D6_5267_60C5_4F20_9001_914D_7F6E, _____6309_6B65_957F_8C03_6574_73A9_5BB6_955C_5934_9AD8_5EA6, _____6E05_7406_83F2_5C3C_514B_65AF_5C14_6218_540E_5730_5F62_88C5_9970, GetOwningPlayer, DestroyEffect, RemoveDestructable, _____4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_914D_7F6EID, _____4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_6A21_578B, _____5F53_524D_4E9A_4F26_67EF_65AF_524D_5BFC_72B6_6001, _____5F53_524D_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_72B6_6001, _____5DF2_64AD_653E_5C01_5370_6838_5FC3_62B5_8FBE_5BF9_767D
+local _____5355_4F4D_5B58_6D3B, _____6E05_7406_4E9A_4F26_67EF_65AF_8303_56F4_76D1_542C, _____6E05_7406_4E9A_4F26_67EF_65AF_524D_5BFC_72B6_6001, _____6E05_7406_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001, _____8BFB_53D6_4E9A_4F26_67EF_65AF_6218_540E_73A9_5BB6_82F1_96C4_7EC4, _____4E9A_4F26_67EF_65AF_6218_540E_5141_8BB8_8FDB_5165, _____64AD_653E_5C01_5370_6838_5FC3_62B5_8FBE_5BF9_767D, _____5B8C_6210_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001, _____521B_5EFA_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_95E8, ____on_4E9A_4F26_67EF_65AF_6B7B_4EA1, _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168, IsUnitAliveBJ, unregisterDeathListener, safeDestroyTrigger, _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, _____521B_5EFA_70B9_7279_6548, _____6CE8_518C_5267_60C5_914D_7F6E_4F20_9001, _____8BFB_53D6_5267_60C5_4F20_9001_914D_7F6E, _____6309_6B65_957F_8C03_6574_73A9_5BB6_955C_5934_9AD8_5EA6, _____6E05_7406_83F2_5C3C_514B_65AF_5C14_6218_540E_5730_5F62_88C5_9970, GetOwningPlayer, DestroyEffect, _____4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_914D_7F6EID, _____4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_6A21_578B, _____5F53_524D_4E9A_4F26_67EF_65AF_524D_5BFC_72B6_6001, _____5F53_524D_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_72B6_6001, _____5DF2_64AD_653E_5C01_5370_6838_5FC3_62B5_8FBE_5BF9_767D
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
 local ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
 local _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E = ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5["创建并冻结剧情Boss预置"]
 local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
+local ____40_2D50_FF0E_7B2C_4E09_7AE0_7535_5F71_955C_5934 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.40-50．第三章电影镜头")
+local _____5E94_7528_7B2C_4E09_7AE0_7535_5F71_955C_5934 = ____40_2D50_FF0E_7B2C_4E09_7AE0_7535_5F71_955C_5934["应用第三章电影镜头"]
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
 local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["清理剧情运行时单位"]
 local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["注册剧情运行时单位"]
@@ -129,10 +131,6 @@ function ____on_4E9A_4F26_67EF_65AF_6B7B_4EA1(dyingUnit, _killingUnit)
     end
     _____6E05_7406_4E9A_4F26_67EF_65AF_524D_5BFC_72B6_6001(_____72B6_6001)
     _____6E05_7406_83F2_5C3C_514B_65AF_5C14_6218_540E_5730_5F62_88C5_9970()
-    local _____5893_5730_963B_6321 = jglobals.gg_dest_Dofw_10481
-    if _____5893_5730_963B_6321 ~= nil and _____5893_5730_963B_6321 ~= 0 then
-        RemoveDestructable(_____5893_5730_963B_6321)
-    end
     _____8FDB_5165_4E3B_7EBF_8282_70B9(48)
     _____521B_5EFA_4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_95E8()
     _____521B_5EFA_5B89_5179_9690_85CF_6311_6218()
@@ -140,7 +138,6 @@ end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
 local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_0["暂停并设置无敌安全"]
 _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168 = ____require_result_0["解除暂停并取消无敌安全"]
@@ -166,6 +163,7 @@ local ____require_result_8 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWEAngleBetweenUnitsSafe = ____require_result_8.YDWEAngleBetweenUnitsSafe
 local ____require_result_9 = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙")
 local _____7F13_5B58_5E76_79FB_9664_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899 = ____require_result_9["缓存并移除亚伦柯斯安兹封锁墙"]
+local _____91CD_5EFA_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899 = ____require_result_9["重建亚伦柯斯安兹封锁墙"]
 local ____require_result_10 = require("系统.09．表现系统.14．镜头高度控制.index")
 _____6309_6B65_957F_8C03_6574_73A9_5BB6_955C_5934_9AD8_5EA6 = ____require_result_10["按步长调整玩家镜头高度"]
 local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.43A．菲尼克斯尔战后地形装饰")
@@ -179,7 +177,6 @@ local SetUnitFacing = jass.SetUnitFacing
 local SetUnitOwner = jass.SetUnitOwner
 local SetUnitPosition = jass.SetUnitPosition
 DestroyEffect = jass.DestroyEffect
-RemoveDestructable = jass.RemoveDestructable
 ____exports["亚伦柯斯Boss键"] = "Boss.沉睡英魂·亚伦柯斯"
 ____exports["亚伦柯斯待战暂停来源"] = "剧情系统:亚伦柯斯待战"
 local _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = jass.PLAYER_NEUTRAL_AGGRESSIVE
@@ -190,6 +187,7 @@ _____4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_914D_7F6EID = "jlc_aronkos_aftermat
 _____4E9A_4F26_67EF_65AF_6218_540E_4F20_9001_6A21_578B = "Common\\Effect\\Form\\Portal\\RicketSecretRoomShift.mdx"
 _____5DF2_64AD_653E_5C01_5370_6838_5FC3_62B5_8FBE_5BF9_767D = false
 local function _____64AD_653E_4E9A_4F26_67EF_65AF_524D_5BFC(_____89E6_53D1_5355_4F4D)
+    _____5E94_7528_7B2C_4E09_7AE0_7535_5F71_955C_5934(46)
     local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
     local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_13["播放主线剧情片段"]
     _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5("molten_realm_aronkos_intro", {["片段ID"] = "molten_realm_aronkos_intro", ["触发配置名"] = "沉睡英魂亚伦柯斯前导范围入口", ["触发单位"] = _____89E6_53D1_5355_4F4D})
@@ -220,6 +218,7 @@ local function ____on_4E9A_4F26_67EF_65AF_8303_56F4_89E6_53D1()
     )
     _____8FDB_5165_4E3B_7EBF_8282_70B9(46)
     _____64AD_653E_4E9A_4F26_67EF_65AF_524D_5BFC(_____89E6_53D1_5355_4F4D)
+    _____91CD_5EFA_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899(_____72B6_6001["Boss单位"])
 end
 local function _____6CE8_518C_4E9A_4F26_67EF_65AF_8303_56F4_76D1_542C(_____72B6_6001)
     local trigger = CreateTrigger()

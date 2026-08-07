@@ -43,7 +43,6 @@ export const 地精洞窟演出紧凑剧情片段: 紧凑剧情片段配置 = {
       参数: {
         关闭电影滤镜: true,
         开启区域音乐: "gg_snd_JQBGM01 @ gg_rct______________102",
-        视角镜头: "gg_cam___________________005",
         旧JASS功能清单: "DisplayCineFilter(false) / SetStackedSoundBJ(true, gg_snd_JQBGM01, gg_rct______________102) / CreateUnit(演员1-6) / CameraSetupApplyForceDuration",
       },
     },

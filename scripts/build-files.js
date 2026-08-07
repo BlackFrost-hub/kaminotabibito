@@ -12,6 +12,42 @@ const SYNC_LUA_SCRIPT = path.join(ROOT_DIR, "scripts", "sync-lua-from-ts.js");
 const TSTL_CONFIG_PARSER = require(
   path.join(ROOT_DIR, "node_modules", "typescript-to-lua", "dist", "cli", "tsconfig.js")
 );
+const WINDOWS_WRITE_RETRY_CODES = new Set(["UNKNOWN", "EBUSY", "EACCES", "EPERM"]);
+const WINDOWS_WRITE_RETRY_DELAYS_MS = [25, 50, 100, 200, 400, 800];
+
+function waitMilliseconds(milliseconds) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+}
+
+function isRetryableWindowsWriteError(error) {
+  return (
+    process.platform === "win32" &&
+    error != null &&
+    typeof error === "object" &&
+    WINDOWS_WRITE_RETRY_CODES.has(error.code)
+  );
+}
+
+function writeFileWithRetry(fileName, data, writeByteOrderMark) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      ts.sys.writeFile(fileName, data, writeByteOrderMark);
+      return;
+    } catch (error) {
+      if (!isRetryableWindowsWriteError(error) || attempt >= WINDOWS_WRITE_RETRY_DELAYS_MS.length) {
+        throw error;
+      }
+      const delayMs = WINDOWS_WRITE_RETRY_DELAYS_MS[attempt];
+      console.warn(
+        "build-files: output temporarily unavailable, retrying in " +
+          delayMs +
+          "ms: " +
+          path.relative(ROOT_DIR, fileName)
+      );
+      waitMilliseconds(delayMs);
+    }
+  }
+}
 
 function isPathInside(parentPath, childPath) {
   const relativePath = path.relative(parentPath, childPath);
@@ -137,7 +173,11 @@ function compileSelectedFiles(sourceFiles) {
     return 1;
   }
 
-  const emitResult = new tstl.Transpiler().emit({ program, sourceFiles: selectedSourceFiles });
+  const emitResult = new tstl.Transpiler().emit({
+    program,
+    sourceFiles: selectedSourceFiles,
+    writeFile: writeFileWithRetry,
+  });
   const emitDiagnostics = ts.sortAndDeduplicateDiagnostics(emitResult.diagnostics);
   reportDiagnostics(emitDiagnostics);
   return hasErrorDiagnostics(emitDiagnostics) || emitResult.emitSkipped ? 1 : 0;

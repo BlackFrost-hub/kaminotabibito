@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local dispatchSpellListeners, dispatchSkillLearnListeners, onSpellChannel, onSpellEffect, onSpellEndcast, onSkillLearn, jass, playerUnitEvent, channelListeners, effectListeners, endcastListeners, skillLearnListeners, initialized, skillLearnInitialized
+local dispatchSpellListeners, dispatchSkillLearnListeners, onSpellChannel, onSpellEffect, onSpellFinish, onSpellEndcast, onSkillLearn, jass, playerUnitEvent, channelListeners, effectListeners, finishListeners, endcastListeners, skillLearnListeners, initialized, skillLearnInitialized
 function dispatchSpellListeners(list, castingUnit, spellAbilityId)
     do
         local i = 0
@@ -49,6 +49,17 @@ function onSpellEffect()
     end
     dispatchSpellListeners(effectListeners, castingUnit, spellAbilityId)
 end
+function onSpellFinish()
+    local castingUnit = jass.GetTriggerUnit()
+    if castingUnit == nil then
+        return
+    end
+    local spellAbilityId = jass.GetSpellAbilityId()
+    if spellAbilityId == nil then
+        return
+    end
+    dispatchSpellListeners(finishListeners, castingUnit, spellAbilityId)
+end
 function onSpellEndcast()
     local castingUnit = jass.GetTriggerUnit()
     if castingUnit == nil then
@@ -72,7 +83,7 @@ function onSkillLearn()
     dispatchSkillLearnListeners(skillLearnListeners, learningUnit, learnedAbilityId)
 end
 --- 初始化技能事件中心。
--- 统一注册 SPELL_CHANNEL / SPELL_EFFECT / SPELL_ENDCAST 三类原生事件，并集中派发给监听器。
+-- 统一注册 SPELL_CHANNEL / SPELL_EFFECT / SPELL_FINISH / SPELL_ENDCAST 原生事件，并集中派发给监听器。
 function ____exports.initSpellEventCenter()
     if initialized then
         return
@@ -84,6 +95,9 @@ function ____exports.initSpellEventCenter()
     local effectTrigger = jass.CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(effectTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT)
     jass.TriggerAddAction(effectTrigger, onSpellEffect)
+    local finishTrigger = jass.CreateTrigger()
+    playerUnitEvent.registerPlayerUnitEventForPlayerIds(finishTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_FINISH)
+    jass.TriggerAddAction(finishTrigger, onSpellFinish)
     local endcastTrigger = jass.CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(endcastTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_ENDCAST)
     jass.TriggerAddAction(endcastTrigger, onSpellEndcast)
@@ -120,6 +134,7 @@ ____exports.SPELL_EVENT_PLAYER_IDS = {
 }
 channelListeners = {}
 effectListeners = {}
+finishListeners = {}
 endcastListeners = {}
 skillLearnListeners = {}
 initialized = false
@@ -170,6 +185,23 @@ function ____exports.unregisterSpellEffectListener(callback)
     local index = __TS__ArrayIndexOf(effectListeners, callback)
     if index >= 0 then
         __TS__ArraySplice(effectListeners, index, 1)
+    end
+end
+--- 注册技能成功完成监听。
+function ____exports.registerSpellFinishListener(callback)
+    if type(callback) ~= "function" then
+        return
+    end
+    ____exports.initSpellEventCenter()
+    if not hasListener(finishListeners, callback) then
+        finishListeners[#finishListeners + 1] = callback
+    end
+end
+--- 取消技能成功完成监听。
+function ____exports.unregisterSpellFinishListener(callback)
+    local index = __TS__ArrayIndexOf(finishListeners, callback)
+    if index >= 0 then
+        __TS__ArraySplice(finishListeners, index, 1)
     end
 end
 --- 注册技能结束施法监听。

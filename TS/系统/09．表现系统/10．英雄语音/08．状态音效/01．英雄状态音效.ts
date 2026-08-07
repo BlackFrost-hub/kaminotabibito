@@ -20,11 +20,6 @@ const { addDelayedCallback, getServerTime } = require("系统.00．核心系统.
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
   getServerTime: (this: void) => number;
 };
-const { PlaySoundBJ, StopSoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
-  PlaySoundBJ: (this: void, soundHandle: any) => void;
-  StopSoundBJ: (this: void, soundHandle: any, fadeOut: boolean) => void;
-};
-
 import {
   低血状态音效配置列表,
   受伤语音冷却秒,
@@ -44,7 +39,13 @@ const GetUnitStateJass = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const IsUnitInGroup = jass.IsUnitInGroup as (unit: any, whichGroup: any) => boolean;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ as (soundHandle: any, volumePercent: number, whichUnit: any) => void;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
+const SetSoundVolume = jass.SetSoundVolume as (soundHandle: any, volume: number) => void;
+const SetSoundPosition = jass.SetSoundPosition as (soundHandle: any, x: number, y: number, z: number) => void;
+const StartSound = jass.StartSound as (soundHandle: any) => void;
+const StopSound = jass.StopSound as (soundHandle: any, killWhenDone: boolean, fadeOut: boolean) => void;
 
 interface 延迟状态音效记录 {
   目标: any;
@@ -133,13 +134,19 @@ function 本地播放单位语音(this: void, unit: any, soundHandle: any): void
   const owner = GetOwningPlayer(unit);
   if (owner == null || owner === 0) return;
   if (GetLocalPlayer() !== owner) return;
-  PlaySoundBJ(soundHandle);
+  StartSound(soundHandle);
+}
+
+function 播放单位3D音效(this: void, unit: any, soundHandle: any): void {
+  SetSoundVolume(soundHandle, 100);
+  SetSoundPosition(soundHandle, GetUnitX(unit), GetUnitY(unit), GetUnitFlyHeight(unit));
+  StartSound(soundHandle);
 }
 
 function 播放状态音效(this: void, unit: any, soundHandle: any, 是否3D: boolean): void {
   if (soundHandle == null || soundHandle === 0) return;
   if (是否3D) {
-    PlaySoundOnUnitBJ(soundHandle, 100, unit);
+    播放单位3D音效(unit, soundHandle);
     return;
   }
   本地播放单位语音(unit, soundHandle);
@@ -240,7 +247,7 @@ function 尝试播放低血状态语音(this: void, target: any): void {
     const soundHandle = 随机取音效(config.音效列表);
     if (soundHandle == null || soundHandle === 0) return;
     if (config.停止音效 != null && config.停止音效 !== 0) {
-      StopSoundBJ(config.停止音效, false);
+      StopSound(config.停止音效, false, false);
     }
     播放状态音效(target, soundHandle, config.是否3D);
     进入状态音效冷却(target, 状态不佳语音字段, config.冷却秒);

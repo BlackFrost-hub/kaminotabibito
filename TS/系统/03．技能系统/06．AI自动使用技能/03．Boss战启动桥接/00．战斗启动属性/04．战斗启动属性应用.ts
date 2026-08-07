@@ -104,7 +104,8 @@ function 获取或创建Boss战路径音乐(this: void, 路径?: string): any {
   const 已缓存 = Boss战路径音乐缓存[路径];
   if (已缓存 != null && 已缓存 !== 0) return 已缓存;
 
-  const 音频句柄 = CreateSound(路径, true, true, true, 10, 10, "DefaultEAXON");
+  // 区域 BGM 由 RegisterStackedSound 按矩形控制，不能创建成会受距离裁断的 3D 音频。
+  const 音频句柄 = CreateSound(路径, true, false, false, 10, 10, "DefaultEAXON");
   if (音频句柄 == null || 音频句柄 === 0) return null;
   Boss战路径音乐缓存[路径] = 音频句柄;
   debugLogForce(模块名, "创建路径音乐缓存", "path=", 路径);

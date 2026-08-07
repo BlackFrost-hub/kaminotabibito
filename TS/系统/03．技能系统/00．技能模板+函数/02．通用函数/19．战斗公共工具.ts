@@ -20,6 +20,7 @@ const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => boolean;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
+const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_ATTACK = ConvertUnitState(0x15);
 
 const { stringToFourCC: 转四字码 } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
@@ -62,6 +63,11 @@ export function 单位有效(this: void, unit: any): boolean {
 export function 读取单位攻击力(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
   return Number(GetUnitStateJapi(unit, UNIT_STATE_ATTACK)) || 0;
+}
+
+export function 读取单位最大生命(this: void, unit: any): number {
+  if (unit == null || unit === 0) return 0;
+  return Number(GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)) || 0;
 }
 
 export function 距离平方XY(this: void, x1: number, y1: number, x2: number, y2: number): number {

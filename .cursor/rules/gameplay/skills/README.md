@@ -4,6 +4,7 @@
 
 | 场景 | 先读 |
 |------|------|
+| 玩家英雄、英雄主动技能、英雄升级技能、动作/特效/伤害时点 | [hero-production-workflow.mdc](hero-production-workflow.mdc) |
 | 新建或维护 Boss、Boss 技能、奖励、护卫、验收 | [boss-production-workflow.mdc](boss-production-workflow.mdc) |
 | 玩家人数、人数变化或 Boss 运行时状态 | [boss-skill-runtime.mdc](boss-skill-runtime.mdc) |
 | 单体、AOE、独立技能、位移或伤害形态 | [skill-damage-shape-and-independent-skill.mdc](skill-damage-shape-and-independent-skill.mdc) |

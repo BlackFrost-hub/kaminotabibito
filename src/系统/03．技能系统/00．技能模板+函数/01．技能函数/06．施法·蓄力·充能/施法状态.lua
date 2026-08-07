@@ -9,6 +9,7 @@ local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local _____6280_80FD_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local registerSpellChannelListener = _____6280_80FD_4E8B_4EF6_4E2D_5FC3.registerSpellChannelListener
+local registerSpellFinishListener = _____6280_80FD_4E8B_4EF6_4E2D_5FC3.registerSpellFinishListener
 local registerSpellEndcastListener = _____6280_80FD_4E8B_4EF6_4E2D_5FC3.registerSpellEndcastListener
 local _____5355_4F4D_6B7B_4EA1_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = _____5355_4F4D_6B7B_4EA1_4E8B_4EF6_4E2D_5FC3.registerDeathListener
@@ -38,10 +39,11 @@ local function _____6E05_7406_6B7B_4EA1_5355_4F4D_65BD_6CD5_72B6_6001(_____6B7B_
     end
 end
 registerSpellChannelListener(_____5904_7406_539F_751F_65BD_6CD5_5F00_59CB)
+registerSpellFinishListener(_____5904_7406_539F_751F_65BD_6CD5_7ED3_675F)
 registerSpellEndcastListener(_____5904_7406_539F_751F_65BD_6CD5_7ED3_675F)
 registerDeathListener(_____6E05_7406_6B7B_4EA1_5355_4F4D_65BD_6CD5_72B6_6001)
 --- 判断单位是否处于魔兽原生技能的施法阶段。
--- 状态由 SPELL_CHANNEL / SPELL_ENDCAST 事件维护，不使用轮询或单位组扫描。
+-- 状态由 SPELL_CHANNEL / SPELL_FINISH / SPELL_ENDCAST 事件维护，不使用轮询或单位组扫描。
 ____exports["单位是否正在原生施法"] = function(_____5355_4F4D)
     local _____5355_4F4DID = _____53D6_5355_4F4D_53E5_67C4ID(_____5355_4F4D)
     return _____5355_4F4DID ~= 0 and _____539F_751F_65BD_6CD5_72B6_6001[_____5355_4F4DID] == true

@@ -18,6 +18,8 @@ local debugLogForce = ____require_result_3.debugLogForce
 local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 local _____4E3B_7EBF_8FDB_5EA6_547D_4EE4_524D_7F00 = "进度"
 local _____6A21_5757_540D = "主线进度测试"
+local _____4E3B_7EBF_8FDB_5EA6_6700_5C0F_503C = 0
+local _____4E3B_7EBF_8FDB_5EA6_6700_5927_503C = 50
 local function _____53D1_9001_6D4B_8BD5_63D0_793A(player, text)
     DisplayTimedTextToPlayer(
         player,
@@ -36,7 +38,7 @@ local function _____89E3_6790_4E3B_7EBF_8FDB_5EA6(command)
         return nil
     end
     local progress = __TS__Number(text)
-    if progress ~= progress or progress < 0 or progress ~= math.floor(progress) then
+    if progress ~= progress or progress < _____4E3B_7EBF_8FDB_5EA6_6700_5C0F_503C or progress > _____4E3B_7EBF_8FDB_5EA6_6700_5927_503C or progress ~= math.floor(progress) then
         return nil
     end
     return progress
@@ -47,8 +49,15 @@ local function ____on_4E3B_7EBF_8FDB_5EA6_547D_4EE4(player, command)
     end
     local progress = _____89E3_6790_4E3B_7EBF_8FDB_5EA6(command)
     if progress == nil then
-        _____53D1_9001_6D4B_8BD5_63D0_793A(player, "命令格式：进度+数字，例如：进度15")
-        debugLogForce(_____6A21_5757_540D, "命令格式无效", "command", command)
+        _____53D1_9001_6D4B_8BD5_63D0_793A(player, "命令格式：进度+数字，范围 0-50，例如：进度15")
+        debugLogForce(
+            _____6A21_5757_540D,
+            "命令格式无效或超出范围",
+            "command",
+            command,
+            "范围",
+            "0-50"
+        )
         return
     end
     local previousProgress = _____8BFB_53D6_5267_60C5_8FDB_5EA6()

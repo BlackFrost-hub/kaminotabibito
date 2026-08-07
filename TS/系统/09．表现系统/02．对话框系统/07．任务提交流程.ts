@@ -12,7 +12,7 @@ import {
   UnitGetItemByTypeId,
   UnitHasItemOfTypeBJ
 } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
-import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
+import { 任务配置 } from "../../08．任务系统/00．配置表/02．任务配置表";
 import itemsData from "../../02．物品系统/01．装备数据";
 import { questDB } from "../../08．任务系统/01．任务数据";
 import { applyRewardWithContext, getPlayerFirstHero, previewRewardMatchWithContext } from "./08．任务奖励执行";
@@ -150,37 +150,39 @@ function pickNpcCompleteTextByBranch(raw: string, branchIndex: number): string {
   return lines[branchIndex];
 }
 
-function shouldUseGenericGiveFailHint(quest: QuestConfig): boolean {
-  if (quest.type !== "给予") return false;
-  if (quest.rewardDisplay && quest.rewardDisplay !== "") return true;
-  const reward = quest.reward || "";
+function shouldUseGenericGiveFailHint(quest: 任务配置): boolean {
+  if (quest.类型 !== "给予") return false;
+  if (quest.奖励显示 && quest.奖励显示 !== "") return true;
+  const reward = quest.奖励 || "";
   // 有条件分支（冒号）时，视为“外部展示 + 内部执行”模式
   return reward.indexOf(":") >= 0;
 }
 
 // ========== 虚拟分区：任务提交流程入口（击杀/收集/给予三合一） ==========
 export function handleQuestSubmit(params: {
-  quest: QuestConfig;
+  quest: 任务配置;
   npcName: string;
   heroName: string;
   dialogOwnerId: number;
   npcUnit?: any;
+  对话目标单位?: any;
+  NPC配置朝向?: number;
   parseDialogText: (raw: string, npcName: string, heroName: string) => Array<{ title: string; text: string; duration: number }>;
   openDialog: (player: any, data: any) => void;
   refreshTaskUIForAllClientsSoon: (playerId: number, questId?: string) => void;
 }): void {
-  const { quest, npcName, heroName, dialogOwnerId, npcUnit, parseDialogText, openDialog, refreshTaskUIForAllClientsSoon } = params;
+  const { quest, npcName, heroName, dialogOwnerId, npcUnit, 对话目标单位, NPC配置朝向, parseDialogText, openDialog, refreshTaskUIForAllClientsSoon } = params;
   const callbackOwner = jass.Player(dialogOwnerId);
   const hero = callbackOwner ? getPlayerFirstHero(callbackOwner) : null;
-  const requireItem = quest.requireItem;
-  const requiredResources = quest.requiredResources;
-  const requireCount = normalizeRequireCount(quest.requireCount);
-  const questId = quest.requireID != null ? quest.requireID.toString() : "";
+  const requireItem = quest.需求物品;
+  const requiredResources = quest.需求资源;
+  const requireCount = normalizeRequireCount(quest.需求数量);
+  const questId = quest.任务ID != null ? quest.任务ID.toString() : "";
   const playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) || "冒险者";
   let rewardBranchIndex = -1;
   const useGenericGiveFailHint = shouldUseGenericGiveFailHint(quest);
 
-  if (quest.type === "击杀" || quest.type === "目标击杀") {
+  if (quest.类型 === "击杀" || quest.类型 === "目标击杀") {
     const done = isKillQuestObjectiveCompleted(dialogOwnerId, questId, requireCount);
     if (!done) {
       showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r任务目标尚未完成，无法提交。");
@@ -189,7 +191,7 @@ export function handleQuestSubmit(params: {
   }
 
   function broadcastQuestComplete(): void {
-    const rewardStr = quest.rewardDisplay || quest.reward || "无";
+    const rewardStr = quest.奖励显示 || quest.奖励 || "无";
     const isAll = !rewardStr || rewardStr.indexOf("所有玩家") !== -1 || rewardStr.indexOf("all") !== -1
       || (rewardStr.indexOf("完成任务的玩家") === -1 && rewardStr.indexOf("Player") === -1);
     const targetLabel = isAll ? "|cffffcc00所有玩家|r" : `|cff00ccff${playerName}|r`;
@@ -209,7 +211,7 @@ export function handleQuestSubmit(params: {
     const msg =
       `|cffffff00『系统提示』：|r` +
       `|cff00ff66${playerName}|r` +
-      ` 完成了 |cffffcc00『${quest.name}』|r，` +
+      ` 完成了 |cffffcc00『${quest.名称}』|r，` +
       `${targetLabel} 获得了奖励：|cffff9900${cleanReward}|r`;
     for (let i = 0; i < 4; i++) {
       const p = jass.Player(i);
@@ -226,13 +228,23 @@ export function handleQuestSubmit(params: {
     }
     broadcastQuestComplete();
     refreshTaskUIForAllClientsSoon(dialogOwnerId, questId);
-    if (quest.NpcCompleteText) {
-      const completeRaw = pickNpcCompleteTextByBranch(quest.NpcCompleteText, rewardBranchIndex);
+    function 执行任务完成后动作(this: void): void {
+      if (quest.完成后动作) quest.完成后动作(dialogOwnerId);
+    }
+    if (quest.NPC完成对白) {
+      const completeRaw = pickNpcCompleteTextByBranch(quest.NPC完成对白, rewardBranchIndex);
       const completeLines = parseDialogText(completeRaw, npcName, heroName);
       /** 必须带 npcUnit，否则 openNpcDialog 不会挂 qipao（与进行中/接取对白一致） */
       addDelayedCallback(10, () => {
-        openDialog(jass.Player(dialogOwnerId), npcUnit ? { lines: completeLines, npcUnit } : { lines: completeLines });
+        openDialog(
+          jass.Player(dialogOwnerId),
+          npcUnit
+            ? { lines: completeLines, npcUnit, 对话目标单位, NPC配置朝向, onFinish: 执行任务完成后动作 }
+            : { lines: completeLines, onFinish: 执行任务完成后动作 },
+        );
       });
+    } else {
+      执行任务完成后动作();
     }
   }
 
@@ -243,7 +255,7 @@ export function handleQuestSubmit(params: {
       return;
     }
     setQuestState(dialogOwnerId, questId, 2, playerName);
-    const rewardResult = applyRewardWithContext(quest.reward || "", { triggerPlayerId: dialogOwnerId });
+    const rewardResult = applyRewardWithContext(quest.奖励 || "", { triggerPlayerId: dialogOwnerId });
     rewardBranchIndex = rewardResult.matchedRuleIndex;
     onComplete();
     return;
@@ -254,7 +266,7 @@ export function handleQuestSubmit(params: {
       showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444你没有英雄单位！|r");
       return;
     }
-    const sourceUnit = quest.type === "给予" ? npcUnit : hero;
+    const sourceUnit = quest.类型 === "给予" ? npcUnit : hero;
     if (!sourceUnit) {
       if (useGenericGiveFailHint) {
         showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。");
@@ -273,7 +285,7 @@ export function handleQuestSubmit(params: {
       }
       return;
     }
-    if (quest.type === "给予" && !isSubmitItemMatchedRequire(submitInfo, requireItem)) {
+    if (quest.类型 === "给予" && !isSubmitItemMatchedRequire(submitInfo, requireItem)) {
       const wrongItem = UnitGetItemByTypeId(sourceUnit, itemId);
       if (wrongItem) {
         const back = ReturnItemToHeroOrDropBJ(wrongItem, sourceUnit, hero);
@@ -297,13 +309,13 @@ export function handleQuestSubmit(params: {
     }
     const itemCount = GetItemTypeTotalCountByChargesBJ(sourceUnit, itemId);
     if (itemCount >= requireCount) {
-      if (quest.type === "给予") {
-        const preview = previewRewardMatchWithContext(quest.reward || "", {
+      if (quest.类型 === "给予") {
+        const preview = previewRewardMatchWithContext(quest.奖励 || "", {
           triggerPlayerId: dialogOwnerId,
           submittedItemId: submitInfo.itemCode,
           submittedItemLevel: submitInfo.itemLevel,
         });
-        if (preview.matchedRuleIndex < 0 && (quest.reward || "").indexOf(":") >= 0) {
+        if (preview.matchedRuleIndex < 0 && (quest.奖励 || "").indexOf(":") >= 0) {
           const backItem = UnitGetItemByTypeId(sourceUnit, itemId);
           if (backItem) {
             const back = ReturnItemToHeroOrDropBJ(backItem, sourceUnit, hero);
@@ -329,7 +341,7 @@ export function handleQuestSubmit(params: {
       const consumed = ConsumeItemTypeCountByChargesBJ(sourceUnit, itemId, requireCount);
       if (consumed) {
         setQuestState(dialogOwnerId, questId, 2, playerName);
-        const rewardResult = applyRewardWithContext(quest.reward || "", {
+        const rewardResult = applyRewardWithContext(quest.奖励 || "", {
           triggerPlayerId: dialogOwnerId,
           submittedItemId: submitInfo.itemCode,
           submittedItemLevel: submitInfo.itemLevel,
@@ -350,7 +362,7 @@ export function handleQuestSubmit(params: {
   }
 
   setQuestState(dialogOwnerId, questId, 2, playerName);
-  const rewardResult = applyRewardWithContext(quest.reward || "", { triggerPlayerId: dialogOwnerId });
+  const rewardResult = applyRewardWithContext(quest.奖励 || "", { triggerPlayerId: dialogOwnerId });
   rewardBranchIndex = rewardResult.matchedRuleIndex;
   onComplete();
 }

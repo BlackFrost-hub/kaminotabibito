@@ -24,8 +24,10 @@ import { createFrame, setButtonText, FrameType } from "../09．表现系统/01�
 import { displayText, displayQuest, isDialogActive, setDialogFinishCallback } from "../09．表现系统/02．对话框系统/00．对话框渲染核心";
 import {
   destroyBubbleEffect,
+  让对话NPC面向玩家单位,
   releaseNpcOccupation,
   removeQuestMarkerAfterNpcTriggered,
+  恢复对话NPC配置朝向,
   scheduleBubbleEffectAfterOverheadClear,
   scheduleGrayQuestMarkerAfterBubbleFade,
   scheduleYellowQuestMarkerAfterBubbleFade,
@@ -67,6 +69,10 @@ export interface NpcDialogData {
   quest?: NpcDialogQuest;
   /** NPC单位（用于显示气泡特效） */
   npcUnit?: any;
+  /** 正在与 NPC 对话的玩家单位，用于让 NPC 面向玩家。 */
+  对话目标单位?: any;
+  /** 对话结束后恢复的 NPC 配置表朝向。 */
+  NPC配置朝向?: number;
   /**
    * 兼容保留。传入 `npcUnit` 时会移除头顶叹号/问号。
    * 为 **true** 时全房一致延迟约 0.85s 再挂 qipao（勿用本地是否真有叹号判断，避免联机 desync）；为 **false** 则立刻挂。
@@ -81,6 +87,8 @@ export interface NpcDialogData {
    * 为 true：对话结束并销毁气泡后，再延迟 `NPC_OVERHEAD_MARKER_AFTER_BUBBLE_DELAY` 秒恢复黄色叹号（拒绝任务、条件失败等）。
    */
   restoreYellowQuestMarkerAfterDialog?: boolean;
+  /** 对话队列完整结束后的同步回调。 */
+  onFinish?: (this: void) => void;
 }
 
 /**
@@ -102,6 +110,7 @@ export function openNpcDialog(p: any, data: NpcDialogData): boolean {
     setDialogNpcUnit(p, data.npcUnit);
     const removedOverheadMarker = removeQuestMarkerAfterNpcTriggered(data.npcUnit);
     const pid = (jass as any).GetPlayerId(p);
+    让对话NPC面向玩家单位(pid, data.npcUnit, data.对话目标单位, data.NPC配置朝向);
     /** 必须用配置位而非「本地是否拆掉过叹号」：各客户端本地头顶表可能不一致，会导致 qipao 分支不同 → desync */
     const waitQipaoAfterOverheadClear = data.removeOverheadMarkerOnOpen === true;
     if (!shouldSkipNewBubbleSchedule(pid, data.npcUnit)) {
@@ -110,6 +119,7 @@ export function openNpcDialog(p: any, data: NpcDialogData): boolean {
     setDialogFinishCallback(p, () => {
       // 对话完整结束后释放占用与气泡
       const pid = (jass as any).GetPlayerId(p);
+      恢复对话NPC配置朝向(pid);
       releaseNpcOccupation(pid);
       destroyBubbleEffect(pid);
       if (data.applyGrayQuestMarkerAfterDialog === true && data.npcUnit) {
@@ -118,6 +128,8 @@ export function openNpcDialog(p: any, data: NpcDialogData): boolean {
       if (data.restoreYellowQuestMarkerAfterDialog === true && data.npcUnit) {
         scheduleYellowQuestMarkerAfterBubbleFade(data.npcUnit);
       }
+      const 对话结束回调 = data.onFinish;
+      if (对话结束回调 != null) 对话结束回调();
     });
   }
 

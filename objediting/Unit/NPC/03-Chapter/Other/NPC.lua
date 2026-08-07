@@ -10,6 +10,7 @@ chiwei:setIconGameInterface('Unit\\NPC\\03-Chapter\\Other\\Icon\\Chiwei.blp')
 chiwei:setHideMinimapDisplay(true)
 chiwei:setLevel(10)
 chiwei:setScalingValue(1.5)
+chiwei:setSpeedBase(400)
 chiwei:setRace(Race.Demon)
 chiwei:setUpgradesUsed('')
 

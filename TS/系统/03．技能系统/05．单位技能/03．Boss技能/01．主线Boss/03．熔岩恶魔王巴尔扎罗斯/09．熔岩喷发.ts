@@ -114,7 +114,7 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
           伤害类型: DAMAGE_TYPE_FIRE,
           weaponType: WEAPON_TYPE_WHOKNOWS,
         });
-        施加巴尔扎罗斯灼热(unit, config.残留灼热层数);
+        施加巴尔扎罗斯灼热(context, unit, config.残留灼热层数);
       }
     },
   });
@@ -123,7 +123,8 @@ function 创建熔岩残留区(this: void, context: 巴尔扎罗斯运行时上�
   });
 }
 
-function 处理熔岩喷发爆发命中(this: void, boss: any, unit: any, config: typeof 巴尔扎罗斯技能数值配置.熔岩喷发): void {
+function 处理熔岩喷发爆发命中(this: void, context: 巴尔扎罗斯运行时上下文, unit: any, config: typeof 巴尔扎罗斯技能数值配置.熔岩喷发): void {
+  const boss = context.Boss单位;
   if (!单位有效(unit)) return;
   执行BossAOE技能伤害({
     技能ID: 熔岩喷发技能ID,
@@ -140,7 +141,7 @@ function 处理熔岩喷发爆发命中(this: void, boss: any, unit: any, config
     伤害类型: DAMAGE_TYPE_FIRE,
     weaponType: WEAPON_TYPE_WHOKNOWS,
   });
-  施加巴尔扎罗斯灼热(unit, config.爆发灼热层数);
+  施加巴尔扎罗斯灼热(context, unit, config.爆发灼热层数);
   开始原地击飞(unit, {
     持续时间: config.爆发持续顶飞秒,
     最小高度: 180,
@@ -178,7 +179,7 @@ function 执行熔岩喷发爆发(this: void, context: 巴尔扎罗斯运行时�
         const handleId = GetHandleId(unit);
         if (爆发命中记录[handleId]) continue;
         爆发命中记录[handleId] = true;
-        处理熔岩喷发爆发命中(boss, unit, config);
+        处理熔岩喷发爆发命中(context, unit, config);
       }
     },
     on销毁: function 巴尔扎罗斯熔岩喷发爆发结束(this: void): void {

@@ -22,9 +22,16 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____95EA_7535_6548_679C_4EE3_7801 = ____require_result_1["闪电效果代码"]
 local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_2.registerManualBuff
+local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
+local _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_3["取当前有效玩家人数"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local function _____53D6_5BFC_7BA1_751F_547D(____Boss_6700_5927_751F_547D)
+    local config = _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]
+    local _____5355_4EBA_500D_7387 = _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570() <= 1 and config["单人导管生命倍率"] or 1
+    return ____Boss_6700_5927_751F_547D * config["导管生命Boss最大生命比例"] * _____5355_4EBA_500D_7387
+end
 local function ____on_83F2_5C3C_514B_65AF_5C14_5BFC_7BA1_6B7B_4EA1(context, unit)
     if context["当前形态"] ~= "第一形态" then
         return
@@ -89,11 +96,11 @@ ____exports["初始化菲尼克斯尔永恒冰核与导管"] = function(context)
                 _____83F2_5C3C_514B_65AF_5C14_5355_4F4D_6280_80FD_914D_7F6E["模型"]["能量导管"],
                 p.x,
                 p.y,
-                maxLife * _____83F2_5C3C_514B_65AF_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["机制"]["导管生命Boss最大生命比例"],
+                _____53D6_5BFC_7BA1_751F_547D(maxLife),
                 _____521B_5EFA_5BFC_7BA1_6B7B_4EA1_56DE_8C03(context)
             )
-            local ____context__5BFC_7BA1_5217_8868_3 = context["导管列表"]
-            ____context__5BFC_7BA1_5217_8868_3[#____context__5BFC_7BA1_5217_8868_3 + 1] = {["单位"] = conduit, ["已摧毁"] = false}
+            local ____context__5BFC_7BA1_5217_8868_4 = context["导管列表"]
+            ____context__5BFC_7BA1_5217_8868_4[#____context__5BFC_7BA1_5217_8868_4 + 1] = {["单位"] = conduit, ["已摧毁"] = false}
             if _____5355_4F4D_6709_6548(conduit) and _____5355_4F4D_6709_6548(context["永恒冰核"]) then
                 local lightning = _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535({
                     ["效果代码"] = _____95EA_7535_6548_679C_4EE3_7801["蓝色细束"],
@@ -104,8 +111,8 @@ ____exports["初始化菲尼克斯尔永恒冰核与导管"] = function(context)
                     ["终点高度偏移"] = 140,
                     ["任一死亡时销毁"] = true
                 })
-                local ____self_4 = context["清理"]
-                ____self_4["登记闪电"](____self_4, "菲尼克斯尔导管闪电", lightning)
+                local ____self_5 = context["清理"]
+                ____self_5["登记闪电"](____self_5, "菲尼克斯尔导管闪电", lightning)
             end
             i = i + 1
         end

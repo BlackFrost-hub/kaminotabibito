@@ -31,12 +31,6 @@ const { SetTimeOfDay } = require("lib.扩展函数.BJ函数.07．杂项") as {
 const { TriggerRegisterEnterRectSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
   TriggerRegisterEnterRectSimple: (this: void, trig: any, r: any) => any;
 };
-const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
-  GetPlayersAll: (this: void) => any;
-};
-const { safeForForce } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeForForce: (this: void, whichForce: any, callback: (this: void) => void) => void;
-};
 const { 切换区域背景音乐表达式 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
   切换区域背景音乐表达式: (this: void, expr: string | undefined, add: boolean) => number;
 };
@@ -99,20 +93,6 @@ const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const DisplayCineFilter = jass.DisplayCineFilter as (this: void, flag: boolean) => void;
-const CameraSetupApplyForPlayer = jass.CameraSetupApplyForPlayer as (
-  this: void,
-  doPan: boolean,
-  whichSetup: any,
-  whichPlayer: any,
-  duration: number,
-) => void;
-const CameraSetupApplyForceDuration = jass.CameraSetupApplyForceDuration as (
-  this: void,
-  whichSetup: any,
-  doPan: boolean,
-  duration: number,
-) => void;
-const GetEnumPlayer = jass.GetEnumPlayer as (this: void) => any;
 const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 
@@ -155,17 +135,6 @@ function 结束地精洞窟演出音乐(this: void): void {
   停止地精洞窟演出音乐();
   // 源 JASS 在正常结束和跳过分支后都会切回默认区域音乐。
   切换地精洞窟区域音乐(true, "gg_snd_BGM002", "gg_rct______________025");
-}
-
-function 应用地精洞窟源镜头(this: void): boolean {
-  const camera = jglobals.gg_cam___________________005;
-  if (camera == null || camera === 0) return false;
-  if (typeof CameraSetupApplyForceDuration === "function") {
-    CameraSetupApplyForceDuration(camera, true, 0);
-    return true;
-  }
-  safeForForce(GetPlayersAll(), () => CameraSetupApplyForPlayer(true, camera, GetEnumPlayer(), 0));
-  return true;
 }
 
 function 创建地精洞窟临时单位(this: void, rawId: string, x: number, y: number, facing: number, key: string): any {
@@ -250,8 +219,8 @@ export function 执行地精洞窟祭坛演出开始(this: void): void {
   创建地精洞窟临时单位("n01H", -25994.5, -13977.6, 90, "5");
   创建地精洞窟临时单位("nhef", -25909.9, -14001.3, 90, "6");
 
-  // 源 JASS 在前六个演出单位就位后应用 CameraSetup 005，再继续创建后续祭坛单位。
-  if (!应用地精洞窟源镜头()) 应用剧情电影镜头(地精洞窟镜头预设, 0);
+  // 直接使用 CameraSetup 005 的具体参数，避免依赖未导出的旧镜头接口。
+  应用剧情电影镜头(地精洞窟镜头预设, 0);
 
   const bossUnit = 读取剧情运行时单位("Boss.地精巫师");
   if (有效单位(bossUnit)) {

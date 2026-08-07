@@ -27,7 +27,6 @@ local GetUnitState = jass.GetUnitState
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitRemoveAbility = jass.UnitRemoveAbility
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
@@ -43,7 +42,6 @@ local ____require_result_4 = require("平台扩展API动作")
 local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_4["技能_设置技能冷却时间"]
 local ____require_result_5 = require("平台扩展API取值")
 local _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4 = ____require_result_5["技能_获取技能当前冷却时间"]
-local _____539F_751F_9886_8896_5149_73AF_6280_80FDID = stringToFourCC("A0LQ")
 local _____5251_6C14_7075_65A9_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]["技能槽位"])
 local _____653B_51FB_529B_5C5E_6027ID = 1
 local _____9886_8896_5149_73AF_5DF2_6CE8_518C = false
@@ -121,10 +119,6 @@ local function _____5237_65B0_5355_4E2A_9886_8896_5149_73AF(context)
         return
     end
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["领袖光环"]
-    if not context["原生领袖光环已移除"] then
-        UnitRemoveAbility(boss, _____539F_751F_9886_8896_5149_73AF_6280_80FDID)
-        context["原生领袖光环已移除"] = true
-    end
     local low = _____751F_547D_6BD4_4F8B(boss) < cfg["生命切换阈值"]
     local wasLow = context["当前领袖光环低血"]
     _____540C_6B65_5251_6C14_7075_65A9_4F4E_8840_51B7_5374(context, low, wasLow)

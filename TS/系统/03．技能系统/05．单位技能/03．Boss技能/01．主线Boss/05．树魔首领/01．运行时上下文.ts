@@ -17,6 +17,7 @@ export interface 树魔首领运行时上下文 {
   清理: 机制清理篮子;
   随从组: 召唤物组状态;
   随从特性已初始化: boolean;
+  剧情带入随从已登记: boolean;
   当前随从数量: number;
   当前兽群层数: number;
   兽群攻击力增量: number;
@@ -42,6 +43,7 @@ function 创建树魔首领上下文(this: void, boss: any, 清理: 机制清理
       全灭后保留死亡记录: false,
     }),
     随从特性已初始化: false,
+    剧情带入随从已登记: false,
     当前随从数量: 0,
     当前兽群层数: 0,
     兽群攻击力增量: 0,

@@ -17,6 +17,9 @@ const { UnitItemInSlotBJ } = require("lib.扩展函数.BJ函数.index") as {
 const { UnitRemoveItemSwapped } = require("lib.扩展函数.BJ函数.index") as {
   UnitRemoveItemSwapped: (this: void, whichItem: any, whichHero: any) => void;
 };
+const { 单位是否暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  单位是否暂停: (this: void, unit: any) => boolean;
+};
 const { registerSyncHardwareKey } = require("lib.扩展函数.封装函数.04．硬件输入.08．同步硬件输入中心") as {
   registerSyncHardwareKey: (
     this: void,
@@ -34,8 +37,11 @@ const { beginEquipItemMessageSilence, endEquipItemMessageSilence } = require("�
   endEquipItemMessageSilence: (this: void) => void;
 };
 const UnitAddItem = jass.UnitAddItem as (this: void, unit: any, item: any) => boolean;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 const IsUnitSelected = jass.IsUnitSelected as (this: void, unit: any, player: any) => boolean;
+const IsUnitPaused = jass.IsUnitPaused as (this: void, unit: any) => boolean;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const RemoveItem = jass.RemoveItem as (this: void, item: any) => void;
 
 interface 同步键盘事件 {
   player: any;
@@ -78,6 +84,49 @@ function swapItems(this: void, unit1: any, unit2: any, slot: number): void {
   }
 }
 
+/** 在单个单位的六个物品栏中查找指定 Raw ID 的物品。 */
+function 查找单位背包物品(this: void, unit: any, itemTypeId: number): any {
+  if (unit == null || unit === 0 || !(itemTypeId > 0)) return null;
+  for (let slot = 1; slot <= 6; slot++) {
+    const item = UnitItemInSlotBJ(unit, slot);
+    if (item != null && item !== 0 && GetItemTypeId(item) === itemTypeId) return item;
+  }
+  return null;
+}
+
+/** 获取英雄对应的副背包马甲；与 Ctrl 切包使用同一份玩家数据。 */
+function 获取副背包马甲(this: void, hero: any): any {
+  if (hero == null || hero === 0) return null;
+  return YDUserDataGetSafe("player", GetOwningPlayer(hero), "切换背包辅助", "unit");
+}
+
+/**
+ * 在英雄主背包与副背包马甲的 12 个格子中查找指定物品。
+ * 剧情物品交付、入口校验均应使用此函数，避免 Ctrl 切包后被误判为未携带。
+ */
+export function 查找玩家主副背包物品(this: void, hero: any, itemTypeId: number): any {
+  const 主背包物品 = 查找单位背包物品(hero, itemTypeId);
+  if (主背包物品 != null && 主背包物品 !== 0) return 主背包物品;
+
+  const 副背包马甲 = 获取副背包马甲(hero);
+  if (副背包马甲 == null || 副背包马甲 === 0 || 副背包马甲 === hero) return null;
+  return 查找单位背包物品(副背包马甲, itemTypeId);
+}
+
+/** 检查英雄主背包与副背包马甲的 12 个格子是否持有指定物品。 */
+export function 玩家主副背包持有物品(this: void, hero: any, itemTypeId: number): boolean {
+  const item = 查找玩家主副背包物品(hero, itemTypeId);
+  return item != null && item !== 0;
+}
+
+/** 从英雄主背包或副背包马甲中移除一件指定物品。 */
+export function 移除玩家主副背包物品(this: void, hero: any, itemTypeId: number): boolean {
+  const item = 查找玩家主副背包物品(hero, itemTypeId);
+  if (item == null || item === 0) return false;
+  RemoveItem(item);
+  return true;
+}
+
 /**
  * 按Ctrl切换背包事件处理
  */
@@ -90,6 +139,11 @@ function onCtrlSwitchBag(this: void, event: 同步键盘事件): void {
   // 获取玩家的英雄
   const hero = YDUserDataGetSafe("player", player, "英雄", "unit");
   if (hero == null || hero === 0) {
+    return;
+  }
+
+  // 剧情交付与控制期间禁止切包，避免任务物品在提交结算前被移入辅助背包。
+  if (单位是否暂停(hero) || IsUnitPaused(hero)) {
     return;
   }
 

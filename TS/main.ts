@@ -1,6 +1,6 @@
 // main.ts
 const runtime = require("jass.runtime") as { console?: boolean; handle_level?: number };
-runtime.console = true;
+runtime.console = false;
 runtime.handle_level = 0;
 const jassConsole = require("jass.console") as { write: (s: string) => void };
 require("jass.japi"); // 1.27 平台扩展入口；不要假设存在 Blz* 原生函数

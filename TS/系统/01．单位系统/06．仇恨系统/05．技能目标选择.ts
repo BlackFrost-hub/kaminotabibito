@@ -5,14 +5,14 @@ import { getEnemyThreats, getHighestThreat } from "./00．仇恨存储";
 import { 获取应攻击目标 } from "./02．目标选择";
 
 const jass = require("jass.common") as any;
-const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+const { getRegisteredPlayerHero, 获取玩家英雄单位组 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
+  获取玩家英雄单位组: (this: void) => any;
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, rawId: string | undefined | null) => number;
 };
 
-const Player = jass.Player as (id: number) => any;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichUnitType: any) => boolean;
 const IsUnitEnemy = jass.IsUnitEnemy as (whichUnit: any, whichPlayer: any) => boolean;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
@@ -21,16 +21,15 @@ const IsUnitIllusion = jass.IsUnitIllusion as (whichUnit: any) => boolean;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
-const CreateGroup = jass.CreateGroup as () => any;
-const DestroyGroup = jass.DestroyGroup as (whichGroup: any) => void;
-const GroupEnumUnitsOfPlayer = jass.GroupEnumUnitsOfPlayer as (whichGroup: any, whichPlayer: any, filter: any) => void;
-const FirstOfGroup = jass.FirstOfGroup as (whichGroup: any) => any;
-const GroupRemoveUnit = jass.GroupRemoveUnit as (whichGroup: any, whichUnit: any) => void;
+const ForGroup = jass.ForGroup as (whichGroup: any, callback: (this: void) => void) => void;
+const GetEnumUnit = jass.GetEnumUnit as () => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
 const UNIT_TYPE_SUMMONED = jass.UNIT_TYPE_SUMMONED as any;
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const 蝗虫技能ID = stringToFourCCSafe("Aloc");
+const Boss技能默认目标范围 = 2500;
+const Boss技能默认目标范围平方 = Boss技能默认目标范围 * Boss技能默认目标范围;
 
 export interface Boss技能仇恨目标 {
   targetHid: number;
@@ -44,6 +43,7 @@ export type Boss技能英雄过滤器 = (this: void, hero: any) => boolean;
 export type Boss技能英雄权重函数 = (this: void, hero: any) => number;
 
 const Boss技能测试目标列表: any[] = [];
+let 玩家英雄单位组快照缓存: any[] = [];
 
 export function 获取Boss技能最高仇恨目标(
   this: void,
@@ -112,12 +112,14 @@ function 获取Boss技能目标优先级(this: void, unit: any): number {
 function 添加Boss技能敌对目标(
   this: void,
   unit: any,
+  boss: any,
   bossOwner: any,
   playerHeroes: any[],
   otherHeroes: any[],
   normalUnits: any[]
 ): void {
   if (!单位可作为Boss技能敌对目标(unit, bossOwner)) return;
+  if (距离平方(boss, unit) > Boss技能默认目标范围平方) return;
   if (单位在列表中(unit, playerHeroes) || 单位在列表中(unit, otherHeroes) || 单位在列表中(unit, normalUnits)) return;
   if (单位是已注册玩家英雄(unit)) playerHeroes.push(unit);
   else if (IsUnitType(unit, UNIT_TYPE_HERO) === true) otherHeroes.push(unit);
@@ -135,6 +137,15 @@ function 获取最高优先级目标数量(this: void, targets: any[]): number {
 export function 注册Boss技能测试目标(this: void, unit: any): void {
   if (!单位有效(unit) || 单位在列表中(unit, Boss技能测试目标列表)) return;
   Boss技能测试目标列表.push(unit);
+}
+
+/**
+ * 查询单位是否由 Boss 技能测试系统显式登记。
+ * 这里不检查存活状态，因为单位死亡事件回调执行时仍需要识别刚死亡的测试靶。
+ */
+export function 是否已登记Boss技能测试目标(this: void, unit: any): boolean {
+  if (unit == null || unit === 0) return false;
+  return 单位在列表中(unit, Boss技能测试目标列表);
 }
 
 export function 注销Boss技能测试目标(this: void, unit: any): void {
@@ -157,6 +168,21 @@ function 获取有效Boss技能测试目标列表(this: void, boss: any): any[] 
   return result;
 }
 
+function 收集玩家英雄单位组成员(this: void): void {
+  const unit = GetEnumUnit();
+  if (unit != null && unit !== 0) 玩家英雄单位组快照缓存.push(unit);
+}
+
+function 获取玩家英雄单位组快照(this: void): any[] {
+  const group = 获取玩家英雄单位组();
+  if (group == null || group === 0) return [];
+  玩家英雄单位组快照缓存 = [];
+  ForGroup(group, 收集玩家英雄单位组成员);
+  const result = 玩家英雄单位组快照缓存;
+  玩家英雄单位组快照缓存 = [];
+  return result;
+}
+
 export function 获取Boss技能敌对英雄列表(this: void, boss: any): any[] {
   return 获取Boss技能敌对目标列表(boss);
 }
@@ -171,20 +197,13 @@ export function 获取Boss技能敌对目标列表(this: void, boss: any): any[]
   const testTargets = 获取有效Boss技能测试目标列表(boss);
   if (testTargets.length > 0) {
     for (let i = 0; i < testTargets.length; i++) {
-      添加Boss技能敌对目标(testTargets[i], bossOwner, playerHeroes, otherHeroes, normalUnits);
+      添加Boss技能敌对目标(testTargets[i], boss, bossOwner, playerHeroes, otherHeroes, normalUnits);
     }
   } else {
-    const group = CreateGroup();
-    for (let pid = 0; pid <= 5; pid++) {
-      GroupEnumUnitsOfPlayer(group, Player(pid), null);
-      let unit = FirstOfGroup(group);
-      while (unit != null && unit !== 0) {
-        GroupRemoveUnit(group, unit);
-        添加Boss技能敌对目标(unit, bossOwner, playerHeroes, otherHeroes, normalUnits);
-        unit = FirstOfGroup(group);
-      }
+    const 玩家英雄列表 = 获取玩家英雄单位组快照();
+    for (let i = 0; i < 玩家英雄列表.length; i++) {
+      添加Boss技能敌对目标(玩家英雄列表[i], boss, bossOwner, playerHeroes, otherHeroes, normalUnits);
     }
-    DestroyGroup(group);
   }
   for (let i = 0; i < playerHeroes.length; i++) result.push(playerHeroes[i]);
   for (let i = 0; i < otherHeroes.length; i++) result.push(otherHeroes[i]);

@@ -32,6 +32,7 @@ local ____require_result_9 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetPlayersAll = ____require_result_9.GetPlayersAll
 local ____require_result_10 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_10.addDelayedCallback
+local getServerTime = ____require_result_10.getServerTime
 local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
 local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_11["创建单位并登记排泄安全"]
 local ____require_result_12 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
@@ -43,30 +44,32 @@ do
     ____exports["沙漠情报商人回收夜光翡翠剧情片段"] = ____15_FF0E_591C_5149_7FE1_7FE0_56DE_6536["沙漠情报商人回收夜光翡翠剧情片段"]
 end
 local CreateTrigger = jass.CreateTrigger
+local CreateGroup = jass.CreateGroup
 local CreateUnit = jass.CreateUnit
 local DestroyTrigger = jass.DestroyTrigger
 local DestroyGroup = jass.DestroyGroup
 local FirstOfGroup = jass.FirstOfGroup
 local GetTriggerUnit = jass.GetTriggerUnit
 local GetTriggeringTrigger = jass.GetTriggeringTrigger
-local GetFilterUnit = jass.GetFilterUnit
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitName = jass.GetUnitName
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GroupRemoveUnit = jass.GroupRemoveUnit
-local GetUnitsInRectMatching = jass.GetUnitsInRectMatching
+local GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
 local IsPlayerInForce = jass.IsPlayerInForce
 local Player = jass.Player
+local Rect = jass.Rect
+local RemoveRect = jass.RemoveRect
 local TriggerAddAction = jass.TriggerAddAction
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local bj_QUESTMESSAGE_WARNING = jassGlobals.bj_QUESTMESSAGE_WARNING
 local bj_TIMETYPE_SET = jassGlobals.bj_TIMETYPE_SET
 local _____56DE_6751_5267_60C5_7247_6BB5ID = "jlc_return_village_after_guard_duel"
 local _____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868 = {}
-local function _____662F_6751_5185_65E7_7CBE_7075_62A4_536B()
-    local unit = GetFilterUnit()
+local _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 = 0
+local function _____662F_6751_5185_65E7_7CBE_7075_62A4_536B(unit)
     if unit == nil or unit == 0 or GetUnitTypeId(unit) ~= stringToFourCCSafe("nhea") then
         return false
     end
@@ -77,24 +80,28 @@ local function _____662F_6751_5185_65E7_7CBE_7075_62A4_536B()
     )
 end
 local function _____6E05_7406_6751_5185_65E7_7CBE_7075_62A4_536B()
-    local _____77E9_5F62 = jassGlobals.gg_rct________________QY
-    if _____77E9_5F62 == nil or _____77E9_5F62 == 0 then
+    local _____77E9_5F62 = Rect(-30016, -30464, -22240, -26016)
+    local _____5355_4F4D_7EC4 = CreateGroup()
+    if _____77E9_5F62 == nil or _____77E9_5F62 == 0 or _____5355_4F4D_7EC4 == nil or _____5355_4F4D_7EC4 == 0 then
+        if _____77E9_5F62 ~= nil and _____77E9_5F62 ~= 0 then
+            RemoveRect(_____77E9_5F62)
+        end
+        if _____5355_4F4D_7EC4 ~= nil and _____5355_4F4D_7EC4 ~= 0 then
+            DestroyGroup(_____5355_4F4D_7EC4)
+        end
         return
     end
-    local _____5355_4F4D_7EC4 = GetUnitsInRectMatching(
-        _____77E9_5F62,
-        jass.Condition(_____662F_6751_5185_65E7_7CBE_7075_62A4_536B)
-    )
-    if _____5355_4F4D_7EC4 == nil or _____5355_4F4D_7EC4 == 0 then
-        return
-    end
+    GroupEnumUnitsInRect(_____5355_4F4D_7EC4, _____77E9_5F62, nil)
     local unit = FirstOfGroup(_____5355_4F4D_7EC4)
     while unit ~= nil and unit ~= 0 do
         GroupRemoveUnit(_____5355_4F4D_7EC4, unit)
-        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
+        if _____662F_6751_5185_65E7_7CBE_7075_62A4_536B(unit) then
+            _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
+        end
         unit = FirstOfGroup(_____5355_4F4D_7EC4)
     end
     DestroyGroup(_____5355_4F4D_7EC4)
+    RemoveRect(_____77E9_5F62)
 end
 local function _____6E05_7406_88C2_7F1D_56DE_6751_5165_53E3()
     do
@@ -108,6 +115,7 @@ local function _____6E05_7406_88C2_7F1D_56DE_6751_5165_53E3()
         end
     end
     __TS__ArraySetLength(_____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868, 0)
+    _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 = 0
 end
 local function _____6E05_7406_8BED_4E49_5355_4F4D(_____8868, _____952E)
     local unit = YDUserDataGetSafe("string", _____8868, _____952E, "unit")
@@ -119,6 +127,9 @@ end
 local function _____89E6_53D1_88C2_7F1D_56DE_6751()
     local _____5F53_524D_8FDB_5EA6 = __TS__Number(YDUserDataGetSafe("string", "剧情进度", "整数", "integer"))
     if _____5F53_524D_8FDB_5EA6 ~= 16 then
+        return
+    end
+    if _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 <= 0 or getServerTime() < _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 then
         return
     end
     local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
@@ -189,6 +200,7 @@ ____exports["执行情报商人回收夜光翡翠"] = function(_____53C2_6570)
     if not (_____88C2_7F1D_7C7B_578BID > 0) then
         return
     end
+    _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 = getServerTime() + 1000
     local _____88C2_7F1DA = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
         Player(PLAYER_NEUTRAL_PASSIVE),
         _____88C2_7F1D_7C7B_578BID,

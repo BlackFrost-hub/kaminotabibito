@@ -76,6 +76,7 @@ export const bj_RADTODEG = jass.bj_RADTODEG ?? 57.29577951308232;
 
 export const 蝗虫技能ID = 0x416c6f63; // 'Aloc'
 export const 默认弹幕单位类型 = 1700880737; // 'eaaa'，objediting/units.lua 中的 TS 原生弹幕马甲
+export const 可攻击摧毁弹幕单位类型 = 1700880738; // 'eaab'，无 Aloc 的可攻击弹幕马甲
 export const 弹幕Tick间隔 = 0.01;
 
 const 空Self = undefined as any;

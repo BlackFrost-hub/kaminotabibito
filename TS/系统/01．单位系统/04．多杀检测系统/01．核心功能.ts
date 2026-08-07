@@ -35,7 +35,7 @@
  *
  * 【示例】
  * // JASS 端调用示例
- * call YDLocal5Set(group, "killGroup", GetUnitsInRectAll(gg_rct_Area))
+ * call YDLocal5Set(group, "killGroup", GetUnitsInRectAll(某个矩形区域))
  * call YDLocal5Set(real, "killWindow", 3.00)
  * call YDLocal5Set(integer, "killThreshold", 3)
  * call YDLocal5Set(unit, "effectSource", gg_unit_hfoo_0001)

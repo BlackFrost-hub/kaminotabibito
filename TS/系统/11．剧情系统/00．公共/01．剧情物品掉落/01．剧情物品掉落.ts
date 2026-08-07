@@ -12,6 +12,10 @@ const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品�
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
 };
+const { 是否允许限次物品掉落, 记录限次物品掉落 } = require("系统.02．物品系统.19．掉落次数限制表") as {
+  是否允许限次物品掉落: (this: void, itemId: string) => boolean;
+  记录限次物品掉落: (this: void, itemId: string) => void;
+};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
@@ -70,6 +74,7 @@ const bj_GATEOPERATION_OPEN = jglobals.bj_GATEOPERATION_OPEN as number;
 const bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET as number;
 
 interface 已解析剧情物品掉落动作配置 extends 剧情物品掉落动作配置 {
+  物品ID?: string;
   物品类型ID?: number;
 }
 
@@ -102,9 +107,11 @@ function 初始化配置缓存(this: void): void {
     for (let j = 0; j < 配置.动作列表.length; j++) {
       const 动作 = 配置.动作列表[j];
       if (动作.动作类型 === "掉落物品") {
+        const 物品ID = 按名字反查物品ID(动作.物品名 ?? "");
         动作列表.push({
           ...动作,
-          物品类型ID: stringToFourCCSafe(按名字反查物品ID(动作.物品名 ?? "")),
+          物品ID,
+          物品类型ID: stringToFourCCSafe(物品ID),
         });
         continue;
       }
@@ -147,8 +154,11 @@ function 满足动作前置(this: void, 动作: 已解析剧情物品掉落动�
 }
 
 function 执行掉落物品动作(this: void, dyingUnit: any, 动作: 已解析剧情物品掉落动作配置): void {
+  const 物品ID = 动作.物品ID;
+  if (物品ID == null || !是否允许限次物品掉落(物品ID)) return;
   if ((动作.物品类型ID ?? 0) === 0) return;
-  创建物品并注册排泄监听(动作.物品类型ID ?? 0, GetUnitX(dyingUnit), GetUnitY(dyingUnit));
+  const createdItem = 创建物品并注册排泄监听(动作.物品类型ID ?? 0, GetUnitX(dyingUnit), GetUnitY(dyingUnit));
+  if (createdItem != null && createdItem !== 0) 记录限次物品掉落(物品ID);
 }
 
 function 读取全局可破坏物(this: void, 全局名: string): any {

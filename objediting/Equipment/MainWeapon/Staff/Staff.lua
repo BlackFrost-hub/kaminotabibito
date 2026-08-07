@@ -59,3 +59,15 @@ createEquipmentItem('I0F6', '腐败根须法杖', {
   tooltipExtended = '|cffccffff[主武器/法杖]-自然暗法|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+170|n智力+50|n风/木属性伤害+20%|n暗属性伤害+18%|n冷却缩减+10%|n|cffffffcc[特效]|r|n腐败根须：技能造成伤害时，有15%概率缠绕目标1.5秒，并造成攻击力30%的风/木属性伤害，随后2秒内每秒再造成攻击力25%的风/木属性伤害，冷却4秒。|n|cFF808080腐败根须缠成杖身，黑绿脉络里仍在缓慢输送魔力。|r',
   description = '|cffccffff[主武器/法杖]-自然暗法|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+170|n智力+50|n风/木属性伤害+20%|n暗属性伤害+18%|n冷却缩减+10%|n|cffffffcc[特效]|r|n腐败根须：技能造成伤害时，有15%概率缠绕目标1.5秒，并造成攻击力30%的风/木属性伤害，随后2秒内每秒再造成攻击力25%的风/木属性伤害，冷却4秒。|n|cFF808080腐败根须缠成杖身，黑绿脉络里仍在缓慢输送魔力。|r',
 })
+
+createEquipmentItem('I0H2', '浊潮祭杖', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\mia_turbid_tide_staff.blp',
+  model = 'war3mapImported\\SylvanEdge.mdl',
+  abilities = ' ',
+  classification = 'Campaign',
+  level = 5,
+  score = 5200,
+  tooltipExtended = '|cffccffff[主武器/法杖]-水系法术|r|n|cffffcc99等级：C+|n评分：5200|r|n|cffffffcc[基础属性]|r|n攻击力+140|n智力+36|n魔法伤害+15%|n水属性伤害+18%|n|cFF808080杖首封存着一小股尚未净化的浊潮，施法时会沿银色杖身逆流而上。|r',
+  description = '|cffccffff[主武器/法杖]-水系法术|r|n|cffffcc99等级：C+|n评分：5200|r|n|cffffffcc[基础属性]|r|n攻击力+140|n智力+36|n魔法伤害+15%|n水属性伤害+18%|n|cFF808080杖首封存着一小股尚未净化的浊潮，施法时会沿银色杖身逆流而上。|r',
+})

@@ -7,7 +7,7 @@ local ____exports = {}
 -- 2. 范围内友方英雄平分40%金币
 -- 3. 播放金币音效、显示漂浮文字
 -- 
--- 触发条件：死亡单位属于中立敌对(玩家12)或玩家8(粉色)
+-- 触发条件：死亡单位属于中立敌对(玩家12)或玩家8(粉色)，且由正在游戏的真人玩家单位击杀
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.06．经济系统.01．杀敌金币平分.00．常量定义")
 local SHARE_RANGE = ____require_result_0.SHARE_RANGE
@@ -62,20 +62,6 @@ end
 local function getUnitBounty(unitType)
     return getObjectPropertyInteger(nil, 2, unitType, "bountyplus")
 end
---- 检查单位是否为玩家英雄
-local function isPlayerHero(unit)
-    local heroGroup = YDUserDataGet(
-        nil,
-        "string",
-        "玩家英雄",
-        "单位组",
-        "group"
-    )
-    if not heroGroup or not unit then
-        return false
-    end
-    return jass.IsUnitInGroup(unit, heroGroup) == true
-end
 --- 获取英雄单位组
 local function getHeroGroup()
     return YDUserDataGet(
@@ -85,6 +71,23 @@ local function getHeroGroup()
         "单位组",
         "group"
     )
+end
+--- 获取击杀单位所属的在线真人玩家；非玩家单位不参与任何金币结算。
+local function getActiveUserPlayerForUnit(unit)
+    if unit == nil or unit == 0 then
+        return nil
+    end
+    local owner = jass.GetOwningPlayer(unit)
+    if owner == nil then
+        return nil
+    end
+    if jass.GetPlayerController(owner) ~= jass.MAP_CONTROL_USER then
+        return nil
+    end
+    if jass.GetPlayerSlotState(owner) ~= jass.PLAYER_SLOT_STATE_PLAYING then
+        return nil
+    end
+    return owner
 end
 --- 检查死亡单位是否触发金币平分（中立敌对或玩家8）
 local function isValidDyingUnit(dyingUnit)
@@ -179,6 +182,10 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if not isValidDyingUnit(dyingUnit) then
         return
     end
+    local killerPlayer = getActiveUserPlayerForUnit(killer)
+    if killerPlayer == nil then
+        return
+    end
     local dyingUnitType = jass.GetUnitTypeId(dyingUnit)
     if not dyingUnitType then
         return
@@ -187,15 +194,7 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if baseBounty <= 0 then
         return
     end
-    if killer ~= nil then
-        local killerPlayer = jass.GetOwningPlayer(killer)
-        if killerPlayer ~= nil then
-            giveGoldToPlayer(killer, killerPlayer, baseBounty, false)
-        end
-    end
-    if not isPlayerHero(killer) then
-        return
-    end
+    giveGoldToPlayer(killer, killerPlayer, baseBounty, false)
     local shareGold = jass.R2I(baseBounty / 10) * 4
     if shareGold <= 0 then
         return
@@ -210,9 +209,8 @@ local function onUnitDeathHandler(dyingUnit, killer)
         ____temp_10 = 0
     end
     local dyingY = ____temp_10
-    local killerPlayer = jass.GetOwningPlayer(killer)
     local heroGroup = getHeroGroup()
-    if killerPlayer == nil or heroGroup == nil then
+    if heroGroup == nil then
         return
     end
     _____5E73_5206_6B7B_4EA1X = dyingX

@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5355_4F4D_5B58_6D3B, _____505C_6B62_653B_57CE_76EE_6807_91CD_53D1, ____on_91CD_53D1_653B_57CE_76EE_6807, _____542F_52A8_653B_57CE_76EE_6807_91CD_53D1, _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8, _____521B_5EFA_83F2_5229_65AF_653B_57CE_4F20_9001_95E8, ____on_5EF6_8FDF_9500_6BC1_83F2_5229_65AF_63A5_8FD1_89E6_53D1_5668, _____6CE8_9500_83F2_5229_65AF_63A5_8FD1_76D1_542C, ____on_83F2_5229_65AF_63A5_8FD1_89E6_53D1, _____6CE8_518C_83F2_5229_65AF_63A5_8FD1_5BF9_767D_89E6_53D1, ____on_542F_52A8_83F2_5229_65AF_51FA_573A, jass, registerUnitInRangeTrigger, safeTriggerAddAction, safeDestroyTrigger, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, CreateTrigger, AddSpecialEffect, DestroyEffect, GetTriggerUnit, GetUnitState, GetUnitTypeId, GetUnitX, GetUnitY, IssueImmediateOrder, IssueTargetOrder, Player, SetUnitOwner, SetUnitPosition, _____654C_519B_73A9_5BB6ID, _____653B_57CE_76EE_6807_91CD_53D1_95F4_9694_6BEB_79D2, _____83F2_5229_65AF_51FA_73B0X, _____83F2_5229_65AF_51FA_73B0Y, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8_6A21_578B, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8X, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8Y, _____83F2_5229_65AF_5BF9_767D_89E6_53D1_8303_56F4, _____8036_63D0_5C14_9760_8FD1_73A9_5BB6_504F_79FBX, _____8FDB_653B_671D_5411, _____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001
+local _____5355_4F4D_5B58_6D3B, _____505C_6B62_653B_57CE_76EE_6807_91CD_53D1, ____on_91CD_53D1_653B_57CE_76EE_6807, _____542F_52A8_653B_57CE_76EE_6807_91CD_53D1, _____6E05_7406_83F2_5229_65AF_653B_57CE_4F20_9001_95E8, _____521B_5EFA_83F2_5229_65AF_653B_57CE_4F20_9001_95E8, ____on_5EF6_8FDF_9500_6BC1_83F2_5229_65AF_63A5_8FD1_89E6_53D1_5668, _____6CE8_9500_83F2_5229_65AF_63A5_8FD1_76D1_542C, ____on_83F2_5229_65AF_63A5_8FD1_89E6_53D1, _____6CE8_518C_83F2_5229_65AF_63A5_8FD1_5BF9_767D_89E6_53D1, ____on_542F_52A8_83F2_5229_65AF_51FA_573A, jass, registerUnitInRangeTrigger, safeTriggerAddAction, safeDestroyTrigger, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, CreateTrigger, AddSpecialEffect, DestroyEffect, GetTriggerUnit, GetUnitState, GetUnitTypeId, GetUnitX, GetUnitY, IssueImmediateOrder, IssueTargetOrder, Player, PauseUnit, SetUnitInvulnerable, SetUnitOwner, SetUnitPosition, _____654C_519B_73A9_5BB6ID, _____653B_57CE_76EE_6807_91CD_53D1_95F4_9694_6BEB_79D2, _____83F2_5229_65AF_51FA_73B0X, _____83F2_5229_65AF_51FA_73B0Y, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8_6A21_578B, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8X, _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8Y, _____83F2_5229_65AF_5BF9_767D_89E6_53D1_8303_56F4, _____8036_63D0_5C14_9760_8FD1_73A9_5BB6_504F_79FBX, _____8FDB_653B_671D_5411, _____5F53_524D_738B_57CE_653B_57CE_6218_72B6_6001
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取当前剧情动作上下文"]
 local ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
@@ -120,6 +120,11 @@ function ____on_83F2_5229_65AF_63A5_8FD1_89E6_53D1()
     end
     _____72B6_6001["菲利斯出场对话已触发"] = true
     ____exports["结束菲利斯攻城等待"]()
+    if _____5355_4F4D_5B58_6D3B(_____72B6_6001["菲利斯"]) then
+        IssueImmediateOrder(_____72B6_6001["菲利斯"], "stop")
+        PauseUnit(_____72B6_6001["菲利斯"], true)
+        SetUnitInvulnerable(_____72B6_6001["菲利斯"], true)
+    end
     local _____5267_60C5_89E6_53D1_5355_4F4D = _____72B6_6001["触发单位"]
     if _____7531_73A9_5BB6_82F1_96C4_89E6_53D1 then
         _____5267_60C5_89E6_53D1_5355_4F4D = _____8FDB_5165_5355_4F4D
@@ -181,6 +186,10 @@ function ____on_542F_52A8_83F2_5229_65AF_51FA_573A(_____9884_671F_4E16_4EE3)
     _____521B_5EFA_83F2_5229_65AF_653B_57CE_4F20_9001_95E8(_____72B6_6001)
     _____6CE8_518C_83F2_5229_65AF_63A5_8FD1_5BF9_767D_89E6_53D1(_____72B6_6001, bossUnit)
     IssueTargetOrder(bossUnit, "attack", _____72B6_6001["防御法阵"])
+    local _____8036_63D0_5C14 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528("主线NPC.耶提尔")
+    if _____5355_4F4D_5B58_6D3B(_____8036_63D0_5C14) then
+        IssueTargetOrder(_____8036_63D0_5C14, "attack", bossUnit)
+    end
     _____542F_52A8_653B_57CE_76EE_6807_91CD_53D1()
 end
 jass = require("jass.common")
@@ -224,13 +233,17 @@ GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 IssueImmediateOrder = jass.IssueImmediateOrder
+local IssuePointOrder = jass.IssuePointOrder
 IssueTargetOrder = jass.IssueTargetOrder
 Player = jass.Player
+PauseUnit = jass.PauseUnit
 local SetUnitFacing = jass.SetUnitFacing
+SetUnitInvulnerable = jass.SetUnitInvulnerable
 SetUnitOwner = jass.SetUnitOwner
 SetUnitPosition = jass.SetUnitPosition
+local SetUnitState = jass.SetUnitState
 _____654C_519B_73A9_5BB6ID = jass.PLAYER_NEUTRAL_AGGRESSIVE
-local _____53CB_519B_73A9_5BB6ID = jass.PLAYER_NEUTRAL_PASSIVE
+local _____53CB_519B_73A9_5BB6ID = 6
 local _____653B_57CE_5F00_59CB_5EF6_8FDF_6BEB_79D2 = 5000
 _____653B_57CE_76EE_6807_91CD_53D1_95F4_9694_6BEB_79D2 = 1800
 local _____9632_5FA1_6CD5_9635X = -6992.3
@@ -242,6 +255,7 @@ _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8X = -7025.6
 _____83F2_5229_65AF_653B_57CE_4F20_9001_95E8Y = -16713.7
 _____83F2_5229_65AF_5BF9_767D_89E6_53D1_8303_56F4 = 600
 _____8036_63D0_5C14_9760_8FD1_73A9_5BB6_504F_79FBX = 160
+local _____53CB_519B_63A8_8FDB_524D_7EBFY = -15350
 _____8FDB_653B_671D_5411 = 90
 local _____9632_5B88_671D_5411 = 270
 local _____7B2C_4E00_6CE2_5355_4F4D_9884_7F6E = {
@@ -407,6 +421,11 @@ local function _____5E94_7528_53CB_519B_52A8_6001_5C5E_6027(unit, _____9884_7F6E
         3,
         _____76EE_6807_62A4_7532 - GS_LoadUintProperty(unit, 3)
     )
+    SetUnitState(
+        unit,
+        jass.UNIT_STATE_LIFE,
+        GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE)
+    )
 end
 local function _____521B_5EFA_53CB_519B_5355_4F4D(_____9884_7F6E, _____57FA_51C6)
     local unitTypeId = _____8BFB_53D6_5355_4F4D_7C7B_578BID(_____9884_7F6E["单位名"])
@@ -424,15 +443,27 @@ local function _____521B_5EFA_53CB_519B_5355_4F4D(_____9884_7F6E, _____57FA_51C6
         return
     end
     _____5E94_7528_53CB_519B_52A8_6001_5C5E_6027(unit, _____9884_7F6E, _____57FA_51C6)
-    IssueImmediateOrder(unit, "holdposition")
+    IssuePointOrder(unit, "attack", _____9884_7F6E.X, _____53CB_519B_63A8_8FDB_524D_7EBFY)
 end
 local function _____5E03_7F6E_8036_63D0_5C14_4E0E_53CB_519B()
     local _____8036_63D0_5C14 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528("主线NPC.耶提尔")
     local _____57FA_51C6 = _____8BFB_53D6_53CB_519B_5C5E_6027_57FA_51C6(_____8036_63D0_5C14)
     if _____5355_4F4D_5B58_6D3B(_____8036_63D0_5C14) then
+        SetUnitOwner(
+            _____8036_63D0_5C14,
+            Player(_____53CB_519B_73A9_5BB6ID),
+            true
+        )
+        SetUnitState(
+            _____8036_63D0_5C14,
+            jass.UNIT_STATE_LIFE,
+            GetUnitStateJapi(_____8036_63D0_5C14, jass.UNIT_STATE_MAX_LIFE)
+        )
+        PauseUnit(_____8036_63D0_5C14, false)
+        SetUnitInvulnerable(_____8036_63D0_5C14, false)
         SetUnitPosition(_____8036_63D0_5C14, -6924.1, -13933.9)
         SetUnitFacing(_____8036_63D0_5C14, _____9632_5B88_671D_5411)
-        IssueImmediateOrder(_____8036_63D0_5C14, "holdposition")
+        IssuePointOrder(_____8036_63D0_5C14, "attack", _____9632_5FA1_6CD5_9635X, _____53CB_519B_63A8_8FDB_524D_7EBFY)
     end
     do
         local i = 0

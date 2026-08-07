@@ -31,6 +31,7 @@ export interface 剧情动态传送配置 {
   目标X: number;
   目标Y: number;
   目标面向?: number;
+  镜头平移时长?: number;
   condition: string;
   enabled: boolean;
 }
@@ -288,13 +289,25 @@ export const 区域传送配置: Record<string, RegionConfig> = {
     cameraTime: 0.1,
     text: "|cffffff00『系统提示』|r：现在的场景为：|cff993366『万浴熔灵』|r",
     condition: "always",
-    rule: "40%KillUnit:|cffffff00『系统提示』|r：触发单位跳入熔浆不知所踪;20%传送:14783,-14913;20%传送:19009,-11590;20%传送:21077,-16342",
+    rule: "40%KillUnit:|cffffff00『系统提示』|r：{unit}跳入熔浆不知所踪;20%传送:14783,-14913;20%传送:19009,-11590;20%传送:21077,-16342",
     enabled: true
   }
 };
 
 /** 剧情按时机动态注册的传送点，坐标与进度条件统一维护在地形系统。 */
 export const 剧情动态传送配置表: Record<string, 剧情动态传送配置> = {
+  "jlc_elven_palace_secret_room": {
+    id: "jlc_elven_palace_secret_room",
+    name: "第二章-王宫传承密室入口",
+    入口中心X: 15920.5,
+    入口中心Y: -24201.2,
+    入口半径: 200,
+    目标X: 14557.3,
+    目标Y: -28784.5,
+    目标面向: 90,
+    condition: "zhuxian=33",
+    enabled: true,
+  },
   "jlc_desert_ogre_challenge": {
     id: "jlc_desert_ogre_challenge",
     name: "第一章-食人魔挑战裂缝",
@@ -314,6 +327,7 @@ export const 剧情动态传送配置表: Record<string, 剧情动态传送配�
     入口半径: 200,
     目标X: 7272.6,
     目标Y: -7320.4,
+    镜头平移时长: 0.1,
     condition: "zhuxian=43",
     enabled: true,
   },
@@ -326,6 +340,7 @@ export const 剧情动态传送配置表: Record<string, 剧情动态传送配�
     目标X: 11001.9,
     目标Y: -14942.2,
     目标面向: 270,
+    镜头平移时长: 0.1,
     condition: "zhuxian=45",
     enabled: true,
   },
@@ -338,6 +353,7 @@ export const 剧情动态传送配置表: Record<string, 剧情动态传送配�
     目标X: 10641.8,
     目标Y: -9804.5,
     目标面向: 90,
+    镜头平移时长: 0.1,
     condition: "zhuxian=47||zhuxian=48",
     enabled: true,
   },

@@ -35,6 +35,9 @@ const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff
 const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文') as {
   读取Boss战运行上下文: (this: void, boss: any) => any;
 };
+const { 取当前有效玩家人数 } = require('系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数') as {
+  取当前有效玩家人数: (this: void) => number;
+};
 const { getServerTime, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -110,6 +113,11 @@ function 完成墓碑安魂(this: void, context: 亚伦柯斯运行时上下文,
   if (release != null && release !== 0) YDWETimerDestroyEffectSafe(1.4, release);
   播放亚伦柯斯台词(context.Boss单位, '墓碑安魂');
   if (context.未安魂墓碑数量 <= 0) 进入亚伦柯斯P3(context);
+}
+
+function 取本轮安魂持续秒(this: void): number {
+  const cfg = 亚伦柯斯正式设计配置.旧誓墓碑;
+  return 取当前有效玩家人数() <= 1 ? cfg.单人安魂持续秒 : cfg.多人安魂持续秒;
 }
 
 function 范围内存在玩家(this: void, context: 亚伦柯斯运行时上下文, state: 旧誓墓碑状态): boolean {
@@ -196,10 +204,11 @@ function 尝试释放墓碑残影(this: void, context: 亚伦柯斯运行时上�
 }
 
 function 亚伦柯斯墓碑推进周期(this: void, _执行次数: number, variable?: any): boolean {
-  const data = variable as { context?: 亚伦柯斯运行时上下文; cfg?: any } | undefined;
+  const data = variable as { context?: 亚伦柯斯运行时上下文; cfg?: any; 安魂持续秒?: number } | undefined;
   const context = data?.context;
   const cfg = data?.cfg;
-  if (context == null || cfg == null) return false;
+  const 安魂持续秒 = data?.安魂持续秒;
+  if (context == null || cfg == null || 安魂持续秒 == null) return false;
   if (context.战斗已结束 || context.阶段 !== 'P2旧誓回响') return false;
 
   const current = getServerTime();
@@ -213,8 +222,8 @@ function 亚伦柯斯墓碑推进周期(this: void, _执行次数: number, varia
       if (state.安魂进度秒 < 0) state.安魂进度秒 = 0;
     }
     更新世界坐标进度UI(state.安魂进度UI, state.安魂进度秒);
-    设置世界坐标进度UI显示(state.安魂进度UI, hasPlayer || state.安魂进度秒 > 0);
-    if (state.安魂进度秒 >= cfg.安魂持续秒) {
+    设置世界坐标进度UI显示(state.安魂进度UI, true);
+    if (state.安魂进度秒 >= 安魂持续秒) {
       完成墓碑安魂(context, state);
       continue;
     }
@@ -227,6 +236,7 @@ export function 启动亚伦柯斯旧誓墓碑(this: void, context: 亚伦柯斯
   const boss = context.Boss单位;
   if (!单位有效(boss) || context.战斗已结束 || context.阶段 !== 'P2旧誓回响' || context.墓碑机制已启动) return false;
   const cfg = 亚伦柯斯正式设计配置.旧誓墓碑;
+  const 安魂持续秒 = 取本轮安魂持续秒();
   const battle = 读取Boss战运行上下文(boss);
   const rect = battle?.地点矩形;
   const centerX = rect != null && rect !== 0 ? GetRectCenterX(rect) : 亚伦柯斯单位技能配置.正式场地.中心X;
@@ -254,13 +264,13 @@ export function 启动亚伦柯斯旧誓墓碑(this: void, context: 亚伦柯斯
         X: x,
         Y: y,
         Z: 220,
-        最大值: cfg.安魂持续秒,
+        最大值: 安魂持续秒,
         当前值: 0,
         标题: '安魂',
         数值后缀: '秒',
         类型: '安魂',
         平滑过渡秒: cfg.检查间隔秒,
-        初始显示: false,
+        初始显示: true,
         雾中可见: false,
       }),
       下次残影Ms: now + cfg.残影斩击间隔秒 * 1000,
@@ -277,7 +287,7 @@ export function 启动亚伦柯斯旧誓墓碑(this: void, context: 亚伦柯斯
     名称: '亚伦柯斯-旧誓墓碑推进',
     间隔毫秒: cfg.检查间隔秒 * 1000,
     清理: context.清理,
-    变量: { context, cfg },
+    变量: { context, cfg, 安魂持续秒 },
     onTick: 亚伦柯斯墓碑推进周期,
   });
   return true;

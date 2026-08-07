@@ -83,7 +83,7 @@ local function _____5730_6838_53E0_52A0_5168_573A_707C_70ED(context)
         while i < #heroes do
             local hero = heroes[i + 1]
             if _____5355_4F4D_6709_6548(hero) then
-                _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(hero, _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["地核召唤"]["Tick灼热层数"])
+                _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(context, hero, _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["地核召唤"]["Tick灼热层数"])
             end
             i = i + 1
         end

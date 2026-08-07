@@ -105,6 +105,8 @@ const { 移除单位暂停, 清除单位全部暂停占用 } = require("lib.扩�
 };
 
 const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
+const 剧情触发单位控制暂停来源 = "剧情系统:触发单位控制";
+const Boss战转场暂停来源 = "Boss战运行:转场等待";
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
@@ -122,6 +124,7 @@ const IssueImmediateOrder = jass.IssueImmediateOrder as (whichUnit: any, order: 
 const GetUnitCurrentOrder = jass.GetUnitCurrentOrder as (whichUnit: any) => number;
 const OrderId = jass.OrderId as (orderString: string) => number;
 const Player = jass.Player as (playerId: number) => any;
+const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const IsPlayerInForce = jass.IsPlayerInForce as (whichPlayer: any, whichForce: any) => boolean;
 const CreateGroup = jass.CreateGroup as () => any;
 const DestroyGroup = jass.DestroyGroup as (whichGroup: any) => void;
@@ -176,6 +179,7 @@ let 最近敌人枚举最小句柄ID = 0;
 let 玩家英雄纠偏矩形: any = null;
 let 玩家英雄纠偏中心X = 0;
 let 玩家英雄纠偏中心Y = 0;
+let 玩家英雄转场搬运数量 = 0;
 const 玩家地形纠偏步长 = 150;
 const 玩家地形纠偏最大步数 = 24;
 
@@ -257,6 +261,7 @@ function on玩家英雄转场搬运单位(this: void): void {
   const unit = GetEnumUnit();
   if (unit == null || unit === 0) return;
   SetUnitPosition(unit, 玩家英雄纠偏中心X, 玩家英雄纠偏中心Y);
+  玩家英雄转场搬运数量++;
 }
 
 function 读取玩家组(this: void): any {
@@ -396,17 +401,20 @@ export function 完成Boss战转场搬运(this: void, context: Boss战运行上�
   const playerX = 读取Boss战实数("玩家移动X轴");
   const playerY = 读取Boss战实数("玩家移动Y轴");
   const 玩家英雄组 = 读取玩家英雄组();
+  let 已迁移预置随从数量 = 0;
 
   DisplayCineFilter(false);
 
   if (bossX !== 0 || bossY !== 0) {
+    const { 迁移剧情Boss预置随从 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接") as {
+      迁移剧情Boss预置随从: (this: void, bossUnit: any, 原BossX: number, 原BossY: number, 目标BossX: number, 目标BossY: number) => number;
+    };
+    已迁移预置随从数量 = 迁移剧情Boss预置随从(boss, GetUnitX(boss), GetUnitY(boss), bossX, bossY);
     SetUnitPosition(boss, bossX, bossY);
     IssueImmediateOrder(boss, "holdposition");
   }
 
-  if (触发玩家单位 == null || 触发玩家单位 === 0) return;
-
-  SetUnitPosition(触发玩家单位, playerX, playerY);
+  玩家英雄转场搬运数量 = 0;
   if (玩家英雄组 != null && 玩家英雄组 !== 0) {
     玩家英雄纠偏矩形 = null;
     玩家英雄纠偏中心X = playerX;
@@ -414,8 +422,25 @@ export function 完成Boss战转场搬运(this: void, context: Boss战运行上�
     ForGroup(玩家英雄组, on玩家英雄转场搬运单位);
   }
 
-  SetUnitFacing(触发玩家单位, YDWEAngleBetweenUnits(触发玩家单位, boss));
-  StarOther_PanCameraToTimedUnitForPlayer(GetOwningPlayer(触发玩家单位), 触发玩家单位, 0.1);
+  if (触发玩家单位 != null && 触发玩家单位 !== 0) {
+    SetUnitPosition(触发玩家单位, playerX, playerY);
+    SetUnitFacing(触发玩家单位, YDWEAngleBetweenUnits(触发玩家单位, boss));
+    StarOther_PanCameraToTimedUnitForPlayer(GetOwningPlayer(触发玩家单位), 触发玩家单位, 0.1);
+  }
+
+  debugLogForce(
+    Boss战运行模块名,
+    "Boss战转场搬运",
+    "boss=", context.Boss句柄ID,
+    "rect=", context.地点句柄ID,
+    "bossX=", bossX,
+    "bossY=", bossY,
+    "playerX=", playerX,
+    "playerY=", playerY,
+    "heroCount=", 玩家英雄转场搬运数量,
+    "preplacedFollowerCount=", 已迁移预置随从数量,
+    "triggerUnit=", 触发玩家单位,
+  );
 }
 
 function handoffBossPortalToPlayerSeven(this: void, rectHandle: any): void {
@@ -444,12 +469,26 @@ function forceResumeBossAfterTransition(this: void, boss: any): void {
 }
 
 export function 完成Boss战启动(this: void, context: Boss战运行上下文): void {
+  const { 释放并登记剧情Boss预置随从 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接") as {
+    释放并登记剧情Boss预置随从: (this: void, bossUnit: any) => any[];
+  };
+
   接管Boss战区域音频(context);
   确保Boss战区域视野(context.地点矩形);
 
+  // 这里才是正式开战点：转场已完成，统一恢复 Boss 并释放战前演员随从。
+  释放并登记剧情Boss预置随从(context.Boss单位);
+  SetUnitOwner(context.Boss单位, Player(PLAYER_NEUTRAL_AGGRESSIVE), true);
   SetUnitInvulnerable(context.Boss单位, false);
   移除单位暂停(context.Boss单位, 剧情Boss预置暂停来源);
+  移除单位暂停(context.Boss单位, Boss战转场暂停来源);
   forceResumeBossAfterTransition(context.Boss单位);
+
+  // 战前对白只暂停当前触发英雄；正式激活时与 Boss/随从一起恢复控制。
+  const 触发玩家单位 = 读取Boss战单位("触发玩家");
+  if (触发玩家单位 != null && 触发玩家单位 !== 0) {
+    移除单位暂停(触发玩家单位, 剧情触发单位控制暂停来源);
+  }
 
   if (context.地点矩形 != null && context.地点矩形 !== 0) {
     PingMinimap(GetRectCenterX(context.地点矩形), GetRectCenterY(context.地点矩形), 15);

@@ -1,6 +1,6 @@
 import type { 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 停止触发单位, 读取触发单位, 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
-import { 发布主线节点目标 } from "../../00．剧情系统核心工具/10．标准剧情动作";
+import { 进入主线节点 } from "../../00．剧情系统核心工具/10．标准剧情动作";
 import { 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 启动王城攻城战, 结束菲利斯攻城等待, 登记存活攻城单位为菲利斯护卫 } from "./31A．王城攻城战控制器";
 import { 准备耶提尔菲利斯协战 } from "./31B．耶提尔协战控制器";
@@ -24,6 +24,7 @@ const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定�
 const Player = jass.Player as (this: void, playerId: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facingAngle: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
+const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, whichUnit: any, height: number, rate: number) => void;
 const 中立被动玩家ID = 15;
 
 interface 会议席位预置 {
@@ -32,10 +33,11 @@ interface 会议席位预置 {
   X: number;
   Y: number;
   朝向: number;
+  飞行高度?: number;
 }
 
 const 会议席位预置表: 会议席位预置[] = [
-  { 角色名: "克林姆德王", 单位名: "克林姆德王", X: 13013.3, Y: -23968.5, 朝向: 270 },
+  { 角色名: "克林姆德王", 单位名: "克林姆德王", X: 13013.3, Y: -23968.5, 朝向: 270, 飞行高度: -100 },
   { 角色名: "耶提尔", 单位名: "防卫部长-耶提尔", X: 12735.6, Y: -24115.1, 朝向: 0 },
   { 角色名: "赫克提尔", 单位名: "术法长老-赫克提尔", X: 13332.9, Y: -24146.4, 朝向: 180 },
   { 角色名: "里凡特", 单位名: "第一王子-里凡特", X: 12736.0, Y: -24254.7, 朝向: 0 },
@@ -58,6 +60,7 @@ function 读取或创建会议NPC(this: void, 预置: 会议席位预置): any {
 
   SetUnitPosition(unit, 预置.X, 预置.Y);
   SetUnitFacing(unit, 预置.朝向);
+  if (预置.飞行高度 != null) SetUnitFlyHeight(unit, 预置.飞行高度, 0);
   注册剧情运行时单位(语义引用, unit);
   return unit;
 }
@@ -70,7 +73,7 @@ export function 布置王城会议席位(this: void): void {
 
 export function 执行前往会议室任务(this: void): void {
   布置王城会议席位();
-  发布主线节点目标(31);
+  进入主线节点(31);
 }
 
 export function 执行紧急会议(this: void): void {
@@ -81,7 +84,7 @@ export function 执行紧急会议(this: void): void {
 export function 执行启动王城攻城战(this: void): void {
   开始第二章菲利斯攻城区域音乐();
   启动王城攻城战();
-  发布主线节点目标(32);
+  进入主线节点(32);
 }
 
 export function 执行准备耶提尔菲利斯协战(this: void): void {

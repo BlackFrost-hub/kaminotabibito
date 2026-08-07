@@ -35,6 +35,7 @@ const IssuePointOrderById = jass.IssuePointOrderById as (
   x: number,
   y: number
 ) => boolean;
+const DzIsChatBoxOpen = (require("jass.japi") as any).DzIsChatBoxOpen as (this: void) => boolean;
 const DzGetMouseTerrainX = (require("jass.japi") as any).DzGetMouseTerrainX as (this: void) => number;
 const DzGetMouseTerrainY = (require("jass.japi") as any).DzGetMouseTerrainY as (this: void) => number;
 const DzGetTriggerKeyPlayer = (require("jass.japi") as any).DzGetTriggerKeyPlayer as (this: void) => any;
@@ -54,6 +55,8 @@ let bbTeleportTrigger: any = null;
  * 按B传送BB事件处理
  */
 function onBKeyTeleport(this: void, event: 同步键盘事件): void {
+  if (DzIsChatBoxOpen() === true) return;
+
   // 检查按键是否为B
   if (event.key !== KEY.B && event.key !== "B") {
     return;

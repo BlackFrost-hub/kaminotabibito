@@ -409,3 +409,27 @@ createEquipmentItem('I0G7', '第二军团攻城秘戒', {
   tooltipExtended = '|cffccffff[饰品]-法术/循环|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+42|n魔法值+1000|n魔法伤害+18%|n冷却缩减+10%|n|cFF808080戒面上的攻城术式已经沉寂，但环绕其间的苍蓝魔力仍能加速施法循环。|r',
   description = '|cffccffff[饰品]-法术/循环|r|n|cffffcc99等级：B|n评分：6250|r|n|cffffffcc[基础属性]|r|n智力+42|n魔法值+1000|n魔法伤害+18%|n冷却缩减+10%|n|cFF808080戒面上的攻城术式已经沉寂，但环绕其间的苍蓝魔力仍能加速施法循环。|r',
 })
+
+createEquipmentItem('I0H0', '淤泥猎手腕甲', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Gloves\\mia_sludge_hunter_bracers.blp',
+  model = 'war3mapImported\\Gloves.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  score = 4900,
+  tooltipExtended = '|cffccffff[手套/腕甲]-近战/攻防|r|n|cffffcc99等级：C+|n评分：4900|r|n|cffffffcc[基础属性]|r|n攻击力+100|n力量+28|n护甲+14|n攻击速度+15%|n|cFF808080银扣封住了腕甲缝隙里缓慢渗动的紫色污泥，挥击时会发出沉闷的水声。|r',
+  description = '|cffccffff[手套/腕甲]-近战/攻防|r|n|cffffcc99等级：C+|n评分：4900|r|n|cffffffcc[基础属性]|r|n攻击力+100|n力量+28|n护甲+14|n攻击速度+15%|n|cFF808080银扣封住了腕甲缝隙里缓慢渗动的紫色污泥，挥击时会发出沉闷的水声。|r',
+})
+
+createEquipmentItem('I0H3', '净水核心护符', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\mia_purified_water_core_amulet.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  score = 5000,
+  tooltipExtended = '|cffccffff[饰品/护符]-通用/净水|r|n|cffffcc99等级：C+|n评分：5000|r|n|cffffffcc[基础属性]|r|n全属性+20|n生命值+1200|n技能治疗率+12%|n水属性抗性+15%|n冷却缩减+7%|n|cFF808080净化后的水核仍映着淡紫色潮纹，贴近时能听见清澈而稳定的流动声。|r',
+  description = '|cffccffff[饰品/护符]-通用/净水|r|n|cffffcc99等级：C+|n评分：5000|r|n|cffffffcc[基础属性]|r|n全属性+20|n生命值+1200|n技能治疗率+12%|n水属性抗性+15%|n冷却缩减+7%|n|cFF808080净化后的水核仍映着淡紫色潮纹，贴近时能听见清澈而稳定的流动声。|r',
+})

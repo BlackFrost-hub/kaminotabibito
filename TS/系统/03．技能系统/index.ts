@@ -18,9 +18,11 @@ require("系统.03．技能系统.02．技能消耗.index");
 const 快捷键技能模块 = require("系统.03．技能系统.04．快捷键技能.index") as {
   initBBTeleport?: (this: void) => void;
   initSwitchBag?: (this: void) => void;
+  init挑战技能?: (this: void) => void;
 };
 快捷键技能模块.initBBTeleport?.();
 快捷键技能模块.initSwitchBag?.();
+快捷键技能模块.init挑战技能?.();
 
 require("系统.03．技能系统.01．显示技能名字");
 

@@ -18,18 +18,18 @@ function getItemsByScoreRange(minScore, maxScore)
     for id in pairs(itemsData) do
         do
             if type(id) ~= "string" or #id ~= 4 then
-                goto __continue91
+                goto __continue89
             end
             local entry = itemsData[id]
             local score = entry and entry.score
             if type(score) ~= "number" then
-                goto __continue91
+                goto __continue89
             end
             if score >= minScore and score <= maxScore then
                 result[#result + 1] = id
             end
         end
-        ::__continue91::
+        ::__continue89::
     end
     __TS__ArraySort(result)
     return result
@@ -53,6 +53,9 @@ local ____require_result_2 = require("系统.00．核心系统.01．事件中心
 local registerDeathListener = ____require_result_2.registerDeathListener
 local idData = require("系统.02．物品系统.02．装备掉落表").default or require("系统.02．物品系统.02．装备掉落表").idData or ({})
 itemsData = require("系统.02．物品系统.01．装备数据").default or ({})
+local ____require_result_3 = require("系统.02．物品系统.19．掉落次数限制表")
+local _____662F_5426_5141_8BB8_9650_6B21_7269_54C1_6389_843D = ____require_result_3["是否允许限次物品掉落"]
+local _____8BB0_5F55_9650_6B21_7269_54C1_6389_843D = ____require_result_3["记录限次物品掉落"]
 local PREFIX = "|cffffff00『系统提示』：|r"
 local function typeIdToUnitId(typeId)
     for id in pairs(idData) do
@@ -142,11 +145,11 @@ local function weightedPickOne(pool)
         sum = sum + p.weight
     end
     if sum <= 0 then
-        local ____opt_3 = pool[jass.GetRandomInt(1, #pool)]
-        if ____opt_3 ~= nil then
-            ____opt_3 = ____opt_3.id
+        local ____opt_4 = pool[jass.GetRandomInt(1, #pool)]
+        if ____opt_4 ~= nil then
+            ____opt_4 = ____opt_4.id
         end
-        return ____opt_3
+        return ____opt_4
     end
     local r = jass.GetRandomReal(0, 1) * sum
     local acc = 0
@@ -163,19 +166,6 @@ end
 local function pickFromWeightedPool(pool, picks)
     if #pool == 0 then
         return {}
-    end
-    if picks == 1 then
-        do
-            local i = 0
-            while i < #pool do
-                if pool[i + 1].always then
-                    return {pool[i + 1].id}
-                end
-                i = i + 1
-            end
-        end
-        local one = weightedPickOne(pool)
-        return one and ({one}) or ({})
     end
     local out = {}
     for ____, p in ipairs(pool) do
@@ -308,17 +298,24 @@ local function pickFromEqualPool(ids, picks)
     return out
 end
 local function createItemAtUnit(unit, itemId)
+    if not _____662F_5426_5141_8BB8_9650_6B21_7269_54C1_6389_843D(itemId) then
+        return
+    end
     local four = stringToFourCC(itemId)
     local loc = jass.GetUnitLoc(unit)
+    local createdItem = nil
     if loc then
-        itemCreateFns["在点创建物品并注册排泄监听"](four, loc)
+        createdItem = itemCreateFns["在点创建物品并注册排泄监听"](four, loc)
     elseif jass.GetUnitX ~= nil then
         local x = jass.GetUnitX(unit)
         local y = jass.GetUnitY(unit)
-        itemCreateFns["创建物品并注册排泄监听"](four, x, y)
+        createdItem = itemCreateFns["创建物品并注册排泄监听"](four, x, y)
     end
     if loc then
         jass.RemoveLocation(loc)
+    end
+    if createdItem ~= nil and createdItem ~= 0 then
+        _____8BB0_5F55_9650_6B21_7269_54C1_6389_843D(itemId)
     end
 end
 local function onUnitDeath(unit, _killer)
@@ -373,15 +370,15 @@ local function onUnitDeath(unit, _killer)
     for ____, rule in ipairs(DROP_RULES) do
         do
             if typeId ~= stringToFourCC(rule.unitId) then
-                goto __continue84
+                goto __continue82
             end
             local r = jass.GetRandomInt(1, 10000)
             if r > rule.proc * 10000 then
-                goto __continue84
+                goto __continue82
             end
             local list = getItemsByScoreRange(rule.minScore, rule.maxScore)
             if #list == 0 then
-                goto __continue84
+                goto __continue82
             end
             local idx = jass.GetRandomInt(1, #list)
             local itemId = list[idx]
@@ -390,7 +387,7 @@ local function onUnitDeath(unit, _killer)
             end
             break
         end
-        ::__continue84::
+        ::__continue82::
     end
 end
 registerDeathListener(onUnitDeath)

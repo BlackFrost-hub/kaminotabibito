@@ -43,7 +43,7 @@ ____exports["沙漠食人魔Boss启动紧凑剧情片段"] = {
         ["对白序号"] = 3,
         ["动作ID"] = "SRZ蛇人族_沙漠食人魔Boss开战",
         ["名称"] = "沙漠食人魔Boss战正式开战",
-        ["参数"] = {["Boss键"] = "Boss.沙漠食人魔", ["播放音效"] = "gg_snd_GWSY05", ["战斗桥接"] = "Boss战.绑定单位 -> gg_trg_Boss____________u", ["旧JASS功能清单"] = "EC_CreateEffect / PlaySoundBJ / PauseUnit(false) / SetUnitInvulnerable(false) / ConditionalTriggerExecute"}
+        ["参数"] = {["Boss键"] = "Boss.沙漠食人魔", ["播放音效"] = "gg_snd_GWSY05", ["战斗桥接"] = "Boss战.绑定单位 -> TS 统一 Boss 战运行器", ["旧JASS功能清单"] = "EC_CreateEffect / PlaySoundBJ / PauseUnit(false) / SetUnitInvulnerable(false) / ConditionalTriggerExecute"}
     }}
 }
 ____exports["沙漠食人魔Boss启动剧情片段"] = _____7F16_8BD1_7D27_51D1_5267_60C5_7247_6BB5(____exports["沙漠食人魔Boss启动紧凑剧情片段"])

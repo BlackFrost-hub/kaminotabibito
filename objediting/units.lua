@@ -218,3 +218,50 @@ eaaa:setPointValue(0)
 eaaa:setPriority(0)
 eaaa:setFormationRank(0)
 eaaa:setCanFlee(false)
+
+-- TS native attackable projectile dummy without Locust
+local eaab = UnitDefinition:new('eaab', 'ewsp')
+applyCommonDummyUnit(eaab, {
+  name = '[System]TS Native Attackable Projectile Dummy',
+  abilities = '',
+  modelFile = '.mdl',
+  scale = 2.50,
+  icon = 'ReplaceableTextures\\CommandButtons\\BTNHumArtilleryUpOne.blp',
+  special = 'Units\\NightElf\\Wisp\\WispExplode.mdl',
+  animationBlend = 0.0,
+  animationRunSpeed = 0.0,
+  animationWalkSpeed = 0.0,
+  movementType = MovementType.Fly,
+  minHeight = 0.0,
+  height = 75.0,
+  classification = '',
+  hp = 99,
+  hpRegen = -1.0,
+  hideMinimap = false,
+  sightDay = 500,
+  sightNight = 500,
+  turnRate = 1.0,
+  propulsionWindow = 1.0,
+  selectionScale = 1.0,
+})
+eaab:setModelFileExtraVersions('0')
+applyNoCostNoBounty(eaab)
+eaab:setSelectionCircleHeight(0.0)
+eaab:setSelectionCircleOnWater(false)
+eaab:setScaleProjectiles(false)
+eaab:setAllowCustomTeamColor(0)
+eaab:setTeamColor(-1)
+eaab:setTintingColorRed(255)
+eaab:setTintingColorGreen(255)
+eaab:setTintingColorBlue(255)
+eaab:setElevationSamplePoints(0)
+eaab:setElevationSampleRadius(50.0)
+eaab:setFogOfWarSampleRadius(0.0)
+eaab:setDeathTimeseconds(1.0)
+eaab:setStockStartDelay(0)
+eaab:setStockReplenishInterval(0)
+eaab:setStockMaximum(0)
+eaab:setPointValue(0)
+eaab:setPriority(0)
+eaab:setFormationRank(0)
+eaab:setCanFlee(false)

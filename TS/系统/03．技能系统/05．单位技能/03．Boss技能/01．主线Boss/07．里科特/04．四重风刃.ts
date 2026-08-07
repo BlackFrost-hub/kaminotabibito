@@ -50,17 +50,15 @@ function 取四重风刃目标(this: void, boss: any): any {
   return 单位有效(target) ? target : 获取Boss技能随机敌对英雄(boss, boss, 里科特数值与表现配置.四重风刃.施法距离 + 300);
 }
 
-function 结算跳劈(this: void, boss: any, target: any): void {
+function 结算跳劈(this: void, boss: any, 中心X: number, 中心Y: number): void {
   const cfg = 里科特数值与表现配置.四重风刃;
   const heroes = 获取Boss技能敌对英雄列表(boss);
-  const cx = GetUnitX(target);
-  const cy = GetUnitY(target);
   const radius2 = cfg.跳劈半径 * cfg.跳劈半径;
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
-    const dx = GetUnitX(hero) - cx;
-    const dy = GetUnitY(hero) - cy;
+    const dx = GetUnitX(hero) - 中心X;
+    const dy = GetUnitY(hero) - 中心Y;
     if (dx * dx + dy * dy > radius2) continue;
     执行BossAOE技能伤害({
       技能ID: 四重风刃技能ID,
@@ -90,7 +88,14 @@ function 取龙卷风阶段改向角度(this: void, context: 里科特运行时�
   return 取单位间角度(上下文.弹幕单位, boss);
 }
 
-function 发射单个龙卷风(this: void, context: 里科特运行时上下文, 阶段: 里科特阶段, angle: number): void {
+function 发射单个龙卷风(
+  this: void,
+  context: 里科特运行时上下文,
+  阶段: 里科特阶段,
+  起点X: number,
+  起点Y: number,
+  angle: number,
+): void {
   const boss = context.Boss单位;
   const cfg = 里科特数值与表现配置.四重风刃;
   const damage = 读取单位攻击力(boss) * cfg.龙卷风Boss攻击力比例;
@@ -100,8 +105,8 @@ function 发射单个龙卷风(this: void, context: 里科特运行时上下文,
     弹幕: {
       所有者: boss,
       所属玩家: GetOwningPlayer(boss),
-      X: GetUnitX(boss),
-      Y: GetUnitY(boss),
+      X: 起点X,
+      Y: 起点Y,
       方向角: angle,
       速度: cfg.龙卷风速度,
       最大距离: 阶段 === 1 ? cfg.龙卷风射程 : cfg.龙卷风射程 * cfg.阶段改向最大距离倍率,
@@ -137,11 +142,17 @@ function 发射单个龙卷风(this: void, context: 里科特运行时上下文,
   });
 }
 
-function 发射四重龙卷风(this: void, context: 里科特运行时上下文, 阶段: 里科特阶段): void {
+function 发射四重龙卷风(
+  this: void,
+  context: 里科特运行时上下文,
+  阶段: 里科特阶段,
+  起点X: number,
+  起点Y: number,
+): void {
   const boss = context.Boss单位;
   if (单位有效(boss)) 播放Boss坐标音效(里科特音效配置.四重风刃.四龙卷发射, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
   for (let i = 0; i < 4; i++) {
-    发射单个龙卷风(context, 阶段, i * 90 + 45);
+    发射单个龙卷风(context, 阶段, 起点X, 起点Y, i * 90 + 45);
   }
 }
 
@@ -152,10 +163,12 @@ export function 释放里科特四重风刃(this: void, context: 里科特运行
   if (!单位有效(target)) return;
   const cfg = 里科特数值与表现配置.四重风刃;
   const 阶段 = 刷新里科特阶段(context);
+  const 预警中心X = GetUnitX(target);
+  const 预警中心Y = GetUnitY(target);
   创建技能提示圈({
     类型: "圆形",
-    X: GetUnitX(target),
-    Y: GetUnitY(target),
+    X: 预警中心X,
+    Y: 预警中心Y,
     半径: cfg.跳劈半径,
     持续时间: cfg.前摇秒,
     来源单位: boss,
@@ -179,9 +192,9 @@ export function 释放里科特四重风刃(this: void, context: 里科特运行
     },
     on生效: function 里科特四重风刃生效(this: void): void {
       播放Boss坐标音效(里科特音效配置.四重风刃.跳劈身法掠风, GetUnitX(boss), GetUnitY(boss), 里科特音效配置.默认裁断距离);
-      结算跳劈(boss, target);
+      结算跳劈(boss, 预警中心X, 预警中心Y);
       const id = addDelayedCallback(cfg.龙卷风延迟秒 * 1000, function 里科特四重龙卷风延迟发射(this: void): void {
-        发射四重龙卷风(context, 阶段);
+        发射四重龙卷风(context, 阶段, 预警中心X, 预警中心Y);
       });
       context.清理.登记延迟回调("里科特-四重龙卷风", id);
     },

@@ -68,6 +68,10 @@ local ____opt_2 = _____5FEB_6377_952E_6280_80FD_6A21_5757.initSwitchBag
 if ____opt_2 ~= nil then
     ____opt_2()
 end
+local ____opt_4 = _____5FEB_6377_952E_6280_80FD_6A21_5757["init挑战技能"]
+if ____opt_4 ~= nil then
+    ____opt_4()
+end
 require("系统.03．技能系统.01．显示技能名字")
 local ____ai_6280_80FD_7CFB_7EDF = require("系统.03．技能系统.06．AI自动使用技能.index")
 ____ai_6280_80FD_7CFB_7EDF.init()

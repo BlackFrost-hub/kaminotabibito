@@ -47,10 +47,10 @@ export const 蛇人族入口紧凑剧情片段: 紧凑剧情片段配置 = {
     {
       序号: 5, 挂点: "afterDialog", 对白序号: 4,
       跳过也执行: true,
-      动作ID: "主线.发布节点目标", 名称: "发布前往蛇人族藏品处目标",
+      动作ID: "SRZ蛇人族_入口收尾", 名称: "发布前往蛇人族藏品处目标并扣除通行费",
       参数: {
         节点进度: 8,
-        扣除金币: 233,
+        入口通行费: 233,
         解锁视野: "gg_rct______________108, gg_rct______________107",
         旧JASS功能清单: "AdjustPlayerStateBJ / CreateFogModifierRectBJ / PingMinimap / QuestMessageBJ",
       },

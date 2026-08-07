@@ -29,7 +29,10 @@ export interface 剧情对白步骤 extends 剧情步骤基础 {
   文本: string;
   持续时间: number;
   使用原生电影系统?: boolean;
+  原生对白自动开启电影模式?: boolean;
   原生电影阻塞?: boolean;
+  /** 仅当前对白允许 ESC；用于同一剧情中前段不可跳过、后段可跳过。 */
+  可Esc跳过?: boolean;
 }
 
 export interface 剧情广播步骤 extends 剧情步骤基础 {
@@ -161,7 +164,12 @@ export interface 紧凑剧情对白行 {
   文本: string;
   持续时间: number;
   使用原生电影系统?: boolean;
+  原生对白自动开启电影模式?: boolean;
   原生电影阻塞?: boolean;
+  /** 将该行编译为广播系统消息，而不是电影对白。 */
+  广播?: boolean;
+  广播渠道?: "cinematic" | "ui";
+  可Esc跳过?: boolean;
   备注?: string;
 }
 
@@ -188,5 +196,7 @@ export interface 紧凑剧情片段配置 {
   默认倍速?: number;
   默认对白持续时间?: number;
   对白列表: 紧凑剧情对白行[];
+  /** 从指定对白序号起统一编译为广播；之前的对白保持原有电影对白行为。 */
+  广播起始序号?: number;
   动作时间线?: 紧凑剧情动作行[];
 }

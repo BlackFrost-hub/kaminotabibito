@@ -250,7 +250,8 @@ export function SFB_setSlow(
   ms: number,
   time: number,
   effectSourceName?: string,
-  effectSourceType?: "装备" | "技能"
+  effectSourceType?: "装备" | "技能",
+  displayBuffID?: string,
 ): void {
   if (!SUC_IsValidUnit(u) || !(time > 0)) return;
   if (SUC_IsUnitStructure(u)) return;
@@ -269,6 +270,6 @@ export function SFB_setSlow(
   YDWESetUnitAbilityDataReal(caster, ABILITY.SLOW, 1, 102, time);
   YDWESetUnitAbilityDataReal(caster, ABILITY.SLOW, 1, 103, time);
 
-  registerSfbManualBuff(sourceUnit, u, 7, time, ms, effectSourceName, effectSourceType);
+  registerSfbManualBuff(sourceUnit, u, 7, time, ms, effectSourceName, effectSourceType, displayBuffID);
   IssueTargetOrderById(caster, ORDER.SLOW, u);
 }

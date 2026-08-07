@@ -19,31 +19,27 @@ local ____require_result_3 = require("lib.扩展函数.BJ函数.07．杂项")
 local SetTimeOfDay = ____require_result_3.SetTimeOfDay
 local ____require_result_4 = require("lib.扩展函数.BJ函数.01．触发与事件")
 local TriggerRegisterEnterRectSimple = ____require_result_4.TriggerRegisterEnterRectSimple
-local ____require_result_5 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_5.GetPlayersAll
-local ____require_result_6 = require("系统.00．核心系统.07．联机安全工具")
-local safeForForce = ____require_result_6.safeForForce
-local ____require_result_7 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
-local _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F = ____require_result_7["切换区域背景音乐表达式"]
-local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_8["创建单位并登记排泄安全"]
-local ____require_result_9 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
-local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_9["立即移除单位并取消排泄登记"]
-local ____require_result_10 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_10.EC_CreateEffect
-local ____require_result_11 = require("lib.扩展函数.BJ函数.14．音效函数")
-local PlaySoundBJ = ____require_result_11.PlaySoundBJ
-local ____require_result_12 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情电影镜头")
-local _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F = ____require_result_12["进入剧情电影模式"]
-local _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934 = ____require_result_12["退出剧情电影模式并恢复镜头"]
-local ____require_result_13 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_13["添加单位暂停"]
-local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
-local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_14["注册剧情片段清理"]
-local ____require_result_15 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
-local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["注册剧情运行时单位"]
-local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["读取剧情运行时单位"]
-local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["清理剧情运行时单位"]
+local ____require_result_5 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F = ____require_result_5["切换区域背景音乐表达式"]
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_6["创建单位并登记排泄安全"]
+local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_7["立即移除单位并取消排泄登记"]
+local ____require_result_8 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_8.EC_CreateEffect
+local ____require_result_9 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundBJ = ____require_result_9.PlaySoundBJ
+local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情电影镜头")
+local _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F = ____require_result_10["进入剧情电影模式"]
+local _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934 = ____require_result_10["退出剧情电影模式并恢复镜头"]
+local ____require_result_11 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_11["添加单位暂停"]
+local ____require_result_12 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
+local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_12["注册剧情片段清理"]
+local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
+local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["注册剧情运行时单位"]
+local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["读取剧情运行时单位"]
+local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["清理剧情运行时单位"]
 local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0
 local function _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, _____4E0A_4E0B_6587)
     if _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0 == nil then
@@ -63,9 +59,6 @@ local Player = jass.Player
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local PauseUnit = jass.PauseUnit
 local DisplayCineFilter = jass.DisplayCineFilter
-local CameraSetupApplyForPlayer = jass.CameraSetupApplyForPlayer
-local CameraSetupApplyForceDuration = jass.CameraSetupApplyForceDuration
-local GetEnumPlayer = jass.GetEnumPlayer
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
 local _____5DF2_521D_59CB_5316_8FDB_5EA602_6838_5FC3 = false
@@ -103,26 +96,6 @@ end
 local function _____7ED3_675F_5730_7CBE_6D1E_7A9F_6F14_51FA_97F3_4E50()
     _____505C_6B62_5730_7CBE_6D1E_7A9F_6F14_51FA_97F3_4E50()
     _____5207_6362_5730_7CBE_6D1E_7A9F_533A_57DF_97F3_4E50(true, "gg_snd_BGM002", "gg_rct______________025")
-end
-local function _____5E94_7528_5730_7CBE_6D1E_7A9F_6E90_955C_5934()
-    local camera = jglobals.gg_cam___________________005
-    if camera == nil or camera == 0 then
-        return false
-    end
-    if type(CameraSetupApplyForceDuration) == "function" then
-        CameraSetupApplyForceDuration(camera, true, 0)
-        return true
-    end
-    safeForForce(
-        GetPlayersAll(),
-        function() return CameraSetupApplyForPlayer(
-            true,
-            camera,
-            GetEnumPlayer(),
-            0
-        ) end
-    )
-    return true
 end
 local function _____521B_5EFA_5730_7CBE_6D1E_7A9F_4E34_65F6_5355_4F4D(rawId, x, y, facing, key)
     local unitTypeId = __TS__Number(require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe(rawId))
@@ -176,8 +149,8 @@ local function _____6E05_7406_5730_7CBE_6D1E_7A9F_6F14_51FA()
     _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____5730_7CBE_6D1E_7A9F_4E34_65F6_5355_4F4D_952E_524D_7F00 .. "100")
     local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
     if _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 then
-        local ____require_result_16 = require("lib.扩展函数.BJ函数.07．杂项")
-        local ForGroupBJ = ____require_result_16.ForGroupBJ
+        local ____require_result_14 = require("lib.扩展函数.BJ函数.07．杂项")
+        local ForGroupBJ = ____require_result_14.ForGroupBJ
         ForGroupBJ(
             _____73A9_5BB6_82F1_96C4_7EC4,
             function()
@@ -275,9 +248,7 @@ ____exports["执行地精洞窟祭坛演出开始"] = function()
         90,
         "6"
     )
-    if not _____5E94_7528_5730_7CBE_6D1E_7A9F_6E90_955C_5934() then
-        _____5E94_7528_5267_60C5_7535_5F71_955C_5934(_____5730_7CBE_6D1E_7A9F_955C_5934_9884_8BBE, 0)
-    end
+    _____5E94_7528_5267_60C5_7535_5F71_955C_5934(_____5730_7CBE_6D1E_7A9F_955C_5934_9884_8BBE, 0)
     local bossUnit = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D("Boss.地精巫师")
     if _____6709_6548_5355_4F4D(bossUnit) then
         SetUnitInvulnerable(bossUnit, true)
@@ -416,8 +387,8 @@ ____exports["执行地精洞窟演出收尾"] = function()
     _____7ED3_675F_5730_7CBE_6D1E_7A9F_6F14_51FA_97F3_4E50()
     local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
     if _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 then
-        local ____require_result_17 = require("lib.扩展函数.BJ函数.07．杂项")
-        local ForGroupBJ = ____require_result_17.ForGroupBJ
+        local ____require_result_15 = require("lib.扩展函数.BJ函数.07．杂项")
+        local ForGroupBJ = ____require_result_15.ForGroupBJ
         ForGroupBJ(
             _____73A9_5BB6_82F1_96C4_7EC4,
             function()

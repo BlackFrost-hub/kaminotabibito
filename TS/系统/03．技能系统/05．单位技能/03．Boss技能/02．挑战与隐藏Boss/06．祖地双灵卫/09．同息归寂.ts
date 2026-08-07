@@ -9,12 +9,10 @@ import { 播放限时单位动画 } from '../../../../00．技能模板+函数/0
 import { 祖地双灵卫BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/02．挑战与隐藏Boss/05．祖地双灵卫';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
+import { 派发祖地双灵卫战斗结束 } from './13．战斗结束事件';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
 const { 主动结束Boss战运行 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动') as {
   主动结束Boss战运行: (this: void, boss: any, options?: any) => boolean;
-};
-const { 打开Boss死亡首领奖励UI } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑') as {
-  打开Boss死亡首领奖励UI: (this: void, rewardPoolId: string) => void;
 };
 const { getServerTime, addDelayedCallback } = require('系统.00．核心系统.05．中心计时器') as {
   getServerTime: (this: void) => number;
@@ -45,7 +43,6 @@ const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: 
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => void) | undefined;
-const 双灵卫奖励池ID = 'chapter2.hidden.ancestral_twin_guards';
 
 function 取名称(this: void, context: 祖地双灵卫运行时上下文, unit: any): 祖地双灵卫名称 | undefined {
   if (unit === context.赤誓灵卫单位) return '赤誓灵卫';
@@ -162,7 +159,7 @@ export function 执行祖地双灵卫净化收束(this: void, context: 祖地双
   const delayedId = addDelayedCallback(祖地双灵卫数值与表现配置.P3.最终净化结算延迟毫秒, function 双灵卫净化结算(this: void): void {
     主动结束Boss战运行(red, { 跳过死亡音效: true, 跳过死亡剧情: true });
     主动结束Boss战运行(azure, { 跳过死亡音效: true, 跳过死亡剧情: true });
-    打开Boss死亡首领奖励UI(双灵卫奖励池ID);
+    派发祖地双灵卫战斗结束(red, azure);
     SetUnitVertexColor(red, 255, 255, 255, 0);
     SetUnitVertexColor(azure, 255, 255, 255, 0);
     ShowUnit(red, false);

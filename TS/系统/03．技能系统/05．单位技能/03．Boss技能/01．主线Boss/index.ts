@@ -6,3 +6,8 @@ export * from './05．树魔首领/index';
 export * from './06．菲利斯/index';
 export * from './07．里科特/index';
 export * from './08．沉睡英魂亚伦柯斯/index';
+export * from './09．地精祭祀/index';
+export * from './10．杀戮食人魔/index';
+export * from './11．利尔·伯特/index';
+export * from './12．教派剑士/index';
+export * from './13．教派学者/index';

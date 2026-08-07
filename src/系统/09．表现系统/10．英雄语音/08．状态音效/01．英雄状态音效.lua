@@ -26,9 +26,6 @@ local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_4.addDelayedCallback
 local getServerTime = ____require_result_4.getServerTime
-local ____require_result_5 = require("lib.扩展函数.BJ函数.14．音效函数")
-local PlaySoundBJ = ____require_result_5.PlaySoundBJ
-local StopSoundBJ = ____require_result_5.StopSoundBJ
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomInt = jass.GetRandomInt
@@ -36,7 +33,13 @@ local GetUnitStateJass = jass.GetUnitState
 local GetUnitStateJapi = japi.GetUnitState
 local IsUnitInGroup = jass.IsUnitInGroup
 local IsUnitType = jass.IsUnitType
-local PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
+local GetUnitFlyHeight = jass.GetUnitFlyHeight
+local SetSoundVolume = jass.SetSoundVolume
+local SetSoundPosition = jass.SetSoundPosition
+local StartSound = jass.StartSound
+local StopSound = jass.StopSound
 local _____5EF6_8FDF_72B6_6001_97F3_6548_961F_5217 = {}
 local _____51B7_5374_961F_5217 = {}
 local _____72B6_6001_97F3_6548_5DF2_521D_59CB_5316 = false
@@ -139,14 +142,24 @@ local function _____672C_5730_64AD_653E_5355_4F4D_8BED_97F3(unit, soundHandle)
     if GetLocalPlayer() ~= owner then
         return
     end
-    PlaySoundBJ(soundHandle)
+    StartSound(soundHandle)
+end
+local function _____64AD_653E_5355_4F4D3D_97F3_6548(unit, soundHandle)
+    SetSoundVolume(soundHandle, 100)
+    SetSoundPosition(
+        soundHandle,
+        GetUnitX(unit),
+        GetUnitY(unit),
+        GetUnitFlyHeight(unit)
+    )
+    StartSound(soundHandle)
 end
 local function _____64AD_653E_72B6_6001_97F3_6548(unit, soundHandle, _____662F_54263D)
     if soundHandle == nil or soundHandle == 0 then
         return
     end
     if _____662F_54263D then
-        PlaySoundOnUnitBJ(soundHandle, 100, unit)
+        _____64AD_653E_5355_4F4D3D_97F3_6548(unit, soundHandle)
         return
     end
     _____672C_5730_64AD_653E_5355_4F4D_8BED_97F3(unit, soundHandle)
@@ -189,7 +202,7 @@ local function _____5904_7406_72B6_6001_97F3_6548_51B7_5374_5230_671F()
             do
                 local record = _____51B7_5374_961F_5217[i + 1]
                 if record["单位"] == nil or record["单位"] == 0 then
-                    goto __continue46
+                    goto __continue47
                 end
                 if record["到期时间"] <= now then
                     YDUserDataSetSafe(
@@ -199,12 +212,12 @@ local function _____5904_7406_72B6_6001_97F3_6548_51B7_5374_5230_671F()
                         "boolean",
                         false
                     )
-                    goto __continue46
+                    goto __continue47
                 end
                 _____51B7_5374_961F_5217[writeIndex + 1] = record
                 writeIndex = writeIndex + 1
             end
-            ::__continue46::
+            ::__continue47::
             i = i + 1
         end
     end
@@ -298,23 +311,23 @@ local function _____5C1D_8BD5_64AD_653E_4F4E_8840_72B6_6001_8BED_97F3(target)
             do
                 local config = _____4F4E_8840_72B6_6001_97F3_6548_914D_7F6E_5217_8868[i + 1]
                 if lifePercent < config["最小生命百分比"] or lifePercent > config["最大生命百分比"] then
-                    goto __continue70
+                    goto __continue71
                 end
                 if not _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0(target, config["英雄名"]) then
-                    goto __continue70
+                    goto __continue71
                 end
                 local soundHandle = _____968F_673A_53D6_97F3_6548(config["音效列表"])
                 if soundHandle == nil or soundHandle == 0 then
                     return
                 end
                 if config["停止音效"] ~= nil and config["停止音效"] ~= 0 then
-                    StopSoundBJ(config["停止音效"], false)
+                    StopSound(config["停止音效"], false, false)
                 end
                 _____64AD_653E_72B6_6001_97F3_6548(target, soundHandle, config["是否3D"])
                 _____8FDB_5165_72B6_6001_97F3_6548_51B7_5374(target, _____72B6_6001_4E0D_4F73_8BED_97F3_5B57_6BB5, config["冷却秒"])
                 return
             end
-            ::__continue70::
+            ::__continue71::
             i = i + 1
         end
     end
@@ -325,21 +338,21 @@ local function _____5904_7406_5EF6_8FDF_72B6_6001_97F3_6548_961F_5217()
         do
             local record = table.remove(_____5EF6_8FDF_72B6_6001_97F3_6548_961F_5217, 1)
             if record == nil then
-                goto __continue76
+                goto __continue77
             end
             local target = record["目标"]
             if not _____76EE_6807_6EE1_8DB3_72B6_6001_97F3_6548_524D_7F6E(target, record["伤害"]) then
-                goto __continue76
+                goto __continue77
             end
             local maxLife = _____53D6_6700_5927_751F_547D(target)
             if maxLife <= 0 then
-                goto __continue76
+                goto __continue77
             end
             _____5C1D_8BD5_64AD_653E_6218_51B5_52A3_52BF_8BED_97F3(record, maxLife)
             _____5C1D_8BD5_64AD_653E_53D7_4F24_8BED_97F3(record, maxLife)
             _____5C1D_8BD5_64AD_653E_4F4E_8840_72B6_6001_8BED_97F3(target)
         end
-        ::__continue76::
+        ::__continue77::
     end
 end
 local function _____72B6_6001_97F3_6548_6700_7EC8_4F24_5BB3_56DE_8C03(target, attacker, applied, _snapshot)

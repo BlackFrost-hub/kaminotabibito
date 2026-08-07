@@ -77,7 +77,7 @@ function 结算重锤(this: void, context: 巴尔扎罗斯运行时上下文, an
       标签: "格鲁姆-熔岩重锤",
     });
     施加快速控制Buff(grum, hero, 快速控制_击晕, config.眩晕秒);
-    施加巴尔扎罗斯灼热(hero, config.灼热层数);
+    施加巴尔扎罗斯灼热(context, hero, config.灼热层数);
   }
 }
 

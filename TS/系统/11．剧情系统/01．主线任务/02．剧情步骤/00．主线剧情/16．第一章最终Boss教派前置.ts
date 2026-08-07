@@ -26,6 +26,9 @@ const { CinematicModeBJ } = require("lib.扩展函数.BJ函数.05A．电影函�
 const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数") as {
   StarOther_PanCameraToTimedForPlayer: (this: void, whichPlayer: any, x: number, y: number, duration: number) => void;
 };
+const { 应用镜头预设给玩家 } = require("lib.扩展函数.封装函数.07．镜头函数.03．镜头预设") as {
+  应用镜头预设给玩家: (this: void, whichPlayer: any, 预设: 教派镜头预设参数, duration: number) => void;
+};
 const { safeForForce } = require("系统.00．核心系统.07．联机安全工具") as {
   safeForForce: (this: void, whichForce: any, callback: (this: void) => void) => void;
 };
@@ -46,15 +49,14 @@ const { 注册剧情运行时单位, 读取剧情运行时单位, 清理剧情�
   读取剧情运行时单位: (this: void, 语义名: string) => any;
   清理剧情运行时单位: (this: void, 语义名: string) => void;
 };
-const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-  removeDelayedCallback: (this: void, id: number) => void;
-};
 const { DzDoodadRemove } = require("lib.扩展函数.KK扩展API.00．装饰物函数") as {
   DzDoodadRemove: (this: void, doodad: number) => void;
 };
 const { 卸载区域背景音乐句柄 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
   卸载区域背景音乐句柄: (this: void, soundHandle: any, rectHandle: any) => boolean;
+};
+const { GetUnitsInRectMatching: BJGetUnitsInRectMatching } = require("lib.扩展函数.封装函数.01．通用工具.12．JASS原生别名") as {
+  GetUnitsInRectMatching: (this: void, whichRect: any, filter: any) => any;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
@@ -71,7 +73,7 @@ const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, whichGroup: any, whichUnit: any) => boolean;
-const GetUnitsInRectMatching = jass.GetUnitsInRectMatching as (this: void, whichRect: any, filter: any) => any;
+const GetUnitsInRectMatching = BJGetUnitsInRectMatching;
 const IsPlayerInForce = jass.IsPlayerInForce as (this: void, whichPlayer: any, whichForce: any) => boolean;
 const ShowUnit = jass.ShowUnit as (this: void, whichUnit: any, show: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
@@ -80,26 +82,52 @@ const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) 
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, whichUnit: any, animation: string) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (this: void, whichUnit: any, order: string, target: any) => boolean;
-const CameraSetupApplyForPlayer = jass.CameraSetupApplyForPlayer as (this: void, doPan: boolean, whichSetup: any, whichPlayer: any, duration: number) => void;
 const GetEnumPlayer = jass.GetEnumPlayer as (this: void) => any;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
-const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
-const SetCameraFieldForPlayer = jass.SetCameraFieldForPlayer as (this: void, whichPlayer: any, whichField: number, value: number, duration: number) => void;
-const ResetToGameCameraForPlayer = jass.ResetToGameCameraForPlayer as (this: void, whichPlayer: any, duration: number) => void;
 
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 
 const 教派现场单位键前缀 = "剧情运行时.教派袭击现场.";
 const 教派现场树木: number[] = [];
-let 教派镜头切换延迟ID = 0;
+
+interface 教派镜头预设参数 {
+  X: number;
+  Y: number;
+  距离到目标: number;
+  远景剪裁: number;
+  旋转角度: number;
+  攻角: number;
+  滚动角度: number;
+  观察区域: number;
+  高度偏移: number;
+}
+
+const 教派镜头A: 教派镜头预设参数 = {
+  X: -24221.7,
+  Y: -27206.4,
+  高度偏移: 0,
+  旋转角度: 270,
+  攻角: 320,
+  距离到目标: 3400,
+  滚动角度: 0,
+  观察区域: 70,
+  远景剪裁: 5500,
+};
+const 教派镜头B: 教派镜头预设参数 = {
+  X: -26699.9,
+  Y: -28368.4,
+  高度偏移: 0,
+  旋转角度: 270,
+  攻角: 320,
+  距离到目标: 2800,
+  滚动角度: 0,
+  观察区域: 50,
+  远景剪裁: 5000,
+};
 
 function 清理教派袭击现场对象(this: void): void {
-  if (教派镜头切换延迟ID !== 0) {
-    removeDelayedCallback(教派镜头切换延迟ID);
-    教派镜头切换延迟ID = 0;
-  }
   for (let i = 1; i <= 6; i++) {
     const unit = 读取剧情运行时单位(`${教派现场单位键前缀}${i}`);
     if (unit != null && unit !== 0) 立即移除单位并取消排泄登记(unit);
@@ -124,9 +152,6 @@ function 清理教派袭击现场(this: void): void {
     });
   }
   退出剧情电影模式并恢复镜头();
-  const localPlayer = GetLocalPlayer();
-  SetCameraFieldForPlayer(localPlayer, jass.CAMERA_FIELD_TARGET_DISTANCE as number, 3000, 0);
-  ResetToGameCameraForPlayer(localPlayer, 0);
 }
 
 function 读取教派现场单位类型(this: void, rawId: string): number {
@@ -227,20 +252,16 @@ export function 执行教派袭击预置(this: void): void {
   }
 
   const 玩家组 = GetPlayersAll();
-  const 镜头A = jassGlobalsCamera("gg_cam_Camera_014_______u");
-  if (镜头A != null && 镜头A !== 0) {
-    safeForForce(玩家组, () => {
-      const player = GetEnumPlayer();
-      CameraSetupApplyForPlayer(true, 镜头A, player, 0);
-      StarOther_PanCameraToTimedForPlayer(player, -26236.2, -28701.7, 5);
-    });
-  }
-  if (教派镜头切换延迟ID !== 0) removeDelayedCallback(教派镜头切换延迟ID);
-  教派镜头切换延迟ID = addDelayedCallback(5000, () => {
-    教派镜头切换延迟ID = 0;
-    const 镜头B = jassGlobalsCamera("gg_cam_Camera_014");
-    if (镜头B == null || 镜头B === 0) return;
-    safeForForce(GetPlayersAll(), () => CameraSetupApplyForPlayer(true, 镜头B, GetEnumPlayer(), 0));
+  safeForForce(玩家组, () => {
+    const player = GetEnumPlayer();
+    应用镜头预设给玩家(player, 教派镜头A, 0);
+    StarOther_PanCameraToTimedForPlayer(player, -26236.2, -28701.7, 5);
+  });
+}
+
+function 执行教派镜头B(this: void): void {
+  safeForForce(GetPlayersAll(), () => {
+    应用镜头预设给玩家(GetEnumPlayer(), 教派镜头B, 0);
   });
 }
 
@@ -274,7 +295,6 @@ function 执行教派现场玩家恢复(this: void): void {
     if (神秘人 != null && 神秘人 !== 0) IssueTargetOrder(unit, "attack", 神秘人);
   });
   if (神秘人 != null && 神秘人 !== 0) {
-    SetUnitFacing(神秘人, 90);
     EC_CreateEffect(
       "Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl",
       GetUnitX(神秘人),
@@ -286,6 +306,12 @@ function 执行教派现场玩家恢复(this: void): void {
       1,
     );
   }
+}
+
+function 执行教派蒙面人面向玩家(this: void): void {
+  const 神秘人 = 读取剧情运行时单位(`${教派现场单位键前缀}1`);
+  if (神秘人 == null || 神秘人 === 0) return;
+  SetUnitFacing(神秘人, 90);
 }
 
 function jassGlobalsCamera(this: void, name: string): any {
@@ -302,9 +328,11 @@ function 执行教派战斗收束(this: void): void {
 export function 执行教派Boss随机姿态(this: void, 参数: 剧情动作参数表): void {
   const roll = GetRandomInt(1, 2);
   const boss名 = roll === 1 ? String(参数.剑士姿态Boss名 ?? "教派剑士") : String(参数.学者姿态Boss名 ?? "教派学者");
+  const 战斗姿态单位类型 = roll === 1 ? "N05N" : "N05M";
   创建并冻结剧情Boss预置({
     Boss键: String(参数.Boss键 ?? "Boss.蒙面人"),
     Boss名: boss名,
+    允许单位类型: [战斗姿态单位类型],
     X: Number(参数.出生X) || 0,
     Y: Number(参数.出生Y) || 0,
     朝向: Number(参数.朝向) || 0,
@@ -316,6 +344,8 @@ export function 执行教派Boss随机姿态(this: void, 参数: 剧情动作参
 export const 第一章最终Boss教派前置剧情动作注册表: Record<string, 剧情动作处理器> = {
   "JLC精灵村_护卫试炼后回村": 执行护卫试炼后回村,
   "JLC精灵村_教派袭击预置": 执行教派袭击预置,
+  "JLC精灵村_教派镜头B": 执行教派镜头B,
+  "JLC精灵村_教派蒙面人面向玩家": 执行教派蒙面人面向玩家,
   "JLC精灵村_教派Boss随机姿态": 执行教派Boss随机姿态,
   "JLC精灵村_教派玩家入场": 执行教派现场玩家入场,
   "JLC精灵村_教派玩家恢复": 执行教派现场玩家恢复,

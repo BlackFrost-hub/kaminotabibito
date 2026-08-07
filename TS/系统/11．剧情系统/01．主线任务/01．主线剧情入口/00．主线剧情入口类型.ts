@@ -29,6 +29,7 @@ export interface 主线剧情入口分支配置 {
   需要物品名?: string;
   仅玩家英雄?: boolean;
   触发后注销?: boolean;
+  运行时条件?: (this: void) => boolean;
   说明?: string;
 }
 
@@ -50,8 +51,17 @@ export interface 主线剧情矩形入口配置 extends 主线剧情入口配置
 
 export interface 主线剧情全局单位入口配置 extends 主线剧情入口配置基础 {
   触发方式: "全局单位范围";
-  单位变量名: string;
+  单位变量名?: string;
   注册范围: number;
+  动态创建?: 主线剧情全局单位动态创建配置;
+}
+
+export interface 主线剧情全局单位动态创建配置 {
+  单位ID: string;
+  X: number;
+  Y: number;
+  朝向: number;
+  玩家ID: number;
 }
 
 export type 主线剧情入口配置 =

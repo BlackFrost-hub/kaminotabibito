@@ -276,6 +276,18 @@ function 登记刷怪单位(this: void, unit: any): void {
   初始化单个刷怪单位(unit);
 }
 
+/** 供任务等运行时入口把新建敌人纳入同一套死亡刷新流程。 */
+export function 登记动态刷怪单位(this: void, unit: any): boolean {
+  if (unit == null || unit === 0) return false;
+  初始化怪物刷新系统();
+  确保允许刷怪单位类型ID集合已初始化();
+  const 单位类型ID = GetUnitTypeId(unit);
+  if (单位类型ID <= 0) return false;
+  允许刷怪单位类型ID集合.add(单位类型ID);
+  登记刷怪单位(unit);
+  return 刷怪记录表.has(GetHandleId(unit));
+}
+
 function 获取刷怪区域(this: void): any {
   const 配置区域 = (jglobals as any)[刷怪区域全局名] as any;
   if (配置区域 != null && 配置区域 !== 0) return 配置区域;

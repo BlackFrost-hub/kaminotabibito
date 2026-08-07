@@ -4,7 +4,7 @@ import { 编译紧凑剧情片段 } from "../../00．剧情系统核心工具/05
 export const 地精祭祀Boss前导紧凑剧情片段: 紧凑剧情片段配置 = {
   片段ID: "jlc_goblin_boss_intro",
   名称: "地精祭祀Boss前导",
-  触发条件: "剧情进度 == 2 且玩家进入地精祭祀 755 范围",
+  触发条件: "剧情进度 == 2 且玩家进入地精祭祀 700 范围",
   可Esc整段跳过: true,
   默认倍速: 1,
   默认对白持续时间: 3,
@@ -21,7 +21,7 @@ export const 地精祭祀Boss前导紧凑剧情片段: 紧凑剧情片段配置 
       跳过也执行: true,
       动作ID: "JLC精灵村_地精祭祀Boss前导激活", 名称: "地精祭祀现身前切入Boss预备",
       参数: {
-        触发范围: 755,
+        触发范围: 700,
         Boss键: "Boss.地精巫师",
         Boss名: "地精祭祀|cffff0000（BossLV12）|r",
         地点矩形: "gg_rct______________111",
@@ -60,7 +60,6 @@ export const 地精祭祀Boss前导紧凑剧情片段: 紧凑剧情片段配置 
       动作ID: "JLC精灵村_地精祭祀Boss战正式注册", 名称: "前导对白结束后启动地精祭祀 Boss 战",
       参数: {
         Boss键: "Boss.地精巫师",
-        注册Boss技能事件: "gg_trg_______Boss001",
         Boss战绑定单位字段: "Boss战.绑定单位",
         Boss战触发玩家字段: "Boss战.触发玩家",
         Boss战地点字段: "Boss战.地点",
@@ -76,7 +75,7 @@ export const 地精祭祀Boss前导紧凑剧情片段: 紧凑剧情片段配置 
         触发单位取消无敌: true,
         玩家英雄组恢复控制: true,
         玩家英雄组取消无敌: true,
-        旧JASS功能清单: "TriggerRegisterUnitEvent(gg_trg_______Boss001) / YDUserDataSet(魔抗/减少控制时间/弱点/护盾/Boss战字段) / ConditionalTriggerExecute(gg_trg_Boss____________u)",
+        旧JASS功能清单: "YDUserDataSet(魔抗/减少控制时间/弱点/护盾/Boss战字段) / TS 统一 Boss 战运行器",
       },
     },
     {

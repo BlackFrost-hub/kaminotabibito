@@ -17,6 +17,9 @@ import { 里科特AI配置 } from "./13．里科特AI";
 import { 卡瑟拉AI配置 } from "./14．深渊巨鱿卡瑟拉AI";
 import { 莫尔特斯AI配置 } from "./15．古木之蚀莫尔特斯AI";
 import { 影骨莫特斯AI配置 } from "./16．影骨莫特斯AI";
+import { 地精祭祀AI配置 } from "./17．地精祭祀AI";
+import { 教派恶魔军官AI配置 } from "./18．教派恶魔军官AI";
+import { 亚伦柯斯AI配置 } from "./19．亚伦柯斯AI";
 
 
 export const 英雄BossAI配置表: 单位AI配置[] = [
@@ -36,4 +39,7 @@ export const 英雄BossAI配置表: 单位AI配置[] = [
   卡瑟拉AI配置,
   莫尔特斯AI配置,
   影骨莫特斯AI配置,
+  地精祭祀AI配置,
+  教派恶魔军官AI配置,
+  亚伦柯斯AI配置,
 ];

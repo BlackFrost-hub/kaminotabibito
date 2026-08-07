@@ -20,9 +20,11 @@ const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
 const 技能事件中心 = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellChannelListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
+  registerSpellFinishListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
   registerSpellEndcastListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const registerSpellChannelListener = 技能事件中心.registerSpellChannelListener;
+const registerSpellFinishListener = 技能事件中心.registerSpellFinishListener;
 const registerSpellEndcastListener = 技能事件中心.registerSpellEndcastListener;
 
 const 单位死亡事件中心 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
@@ -53,12 +55,13 @@ function 清理死亡单位施法状态(this: void, 死亡单位: any, _击杀�
 }
 
 registerSpellChannelListener(处理原生施法开始);
+registerSpellFinishListener(处理原生施法结束);
 registerSpellEndcastListener(处理原生施法结束);
 registerDeathListener(清理死亡单位施法状态);
 
 /**
  * 判断单位是否处于魔兽原生技能的施法阶段。
- * 状态由 SPELL_CHANNEL / SPELL_ENDCAST 事件维护，不使用轮询或单位组扫描。
+ * 状态由 SPELL_CHANNEL / SPELL_FINISH / SPELL_ENDCAST 事件维护，不使用轮询或单位组扫描。
  */
 export function 单位是否正在原生施法(this: void, 单位: any): boolean {
   const 单位ID = 取单位句柄ID(单位);

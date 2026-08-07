@@ -2,7 +2,7 @@
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
-import { 读取触发单位, 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 给玩家组添加多个区域视野, 读取触发单位, 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 清理剧情运行时单位, 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 
 const jass = require("jass.common") as any;
@@ -34,11 +34,25 @@ const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { 动态矩形区域配置表, 注册动态矩形区域, 注销动态矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  动态矩形区域配置表: Record<string, { 键: string; 左: number; 右: number; 下: number; 上: number; 说明?: string }>;
+  注册动态矩形区域: (this: void, 配置: { 键: string; 左: number; 右: number; 下: number; 上: number; 说明?: string }) => any;
+  注销动态矩形区域: (this: void, 键: string) => boolean;
+};
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
 };
 const { YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
+};
+const { YDUserDataSetSafe, YDUserDataClearSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+  YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
+};
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
 };
 const { TriggerRegisterEnterRectSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
   TriggerRegisterEnterRectSimple: (this: void, trigger: any, rect: any) => any;
@@ -52,18 +66,32 @@ const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息"
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
 };
+const { RectContainsUnit } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
+  RectContainsUnit: (this: void, rect: any, unit: any) => boolean;
+};
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const Rect = jass.Rect as (this: void, minX: number, minY: number, maxX: number, maxY: number) => any;
-const RemoveRect = jass.RemoveRect as (this: void, rect: any) => void;
+const CreateDestructable = jass.CreateDestructable as (
+  this: void,
+  objectid: number,
+  x: number,
+  y: number,
+  facing: number,
+  scale: number,
+  variation: number,
+) => any;
+const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetUnitState = jass.GetUnitState as (this: void, whichUnit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
+const IssuePointOrder = jass.IssuePointOrder as (this: void, whichUnit: any, order: string, x: number, y: number) => boolean;
 const IssueTargetOrder = jass.IssueTargetOrder as (this: void, whichUnit: any, order: string, target: any) => boolean;
 const Player = jass.Player as (this: void, playerId: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
+const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, whichTrigger: any, action: (this: void) => void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetPlayerState = jass.GetPlayerState as (this: void, whichPlayer: any, whichPlayerState: any) => number;
@@ -75,9 +103,19 @@ const bj_QUESTMESSAGE_WARNING = jglobals.bj_QUESTMESSAGE_WARNING as number;
 
 const 中立被动玩家ID = 15;
 const 调查范围 = 450;
-const 下层仓库入口触发半径 = 700;
+
+export function 执行开启恶魔城领主区域视野(this: void): void {
+  给玩家组添加多个区域视野("gg_rct________________RYEMC");
+}
+const 下层仓库入口矩形键 = "剧情.恶魔城下层仓库入口";
 const 下层仓库清理者待战暂停来源 = "剧情系统:恶魔城下层仓库清理者待战";
 const 下层仓库赤尾待战暂停来源 = "剧情系统:恶魔城下层仓库赤尾待战";
+const 下层仓库动态Boss待战暂停来源 = "剧情系统:恶魔城教派恶魔军官待战";
+const 赤尾前往下层仓库保底间隔毫秒 = 400;
+const 赤尾到达下层仓库距离平方 = 96 * 96;
+const 下层仓库赤尾对白X = 20171.3;
+const 下层仓库赤尾对白Y = -18292.4;
+const 下层仓库赤尾对白朝向 = 45;
 
 export interface 恶魔城调查场景站位 {
   X: number;
@@ -100,6 +138,17 @@ let 已触发锻造区证人 = false;
 let 已触发赤尾交易 = false;
 let 已支付赤尾定金 = false;
 let 取消赤尾范围监听: (() => void) | undefined;
+let 赤尾移动保底回调ID = 0;
+let 赤尾移动世代 = 0;
+let 赤尾移动状态: {
+  世代: number;
+  单位: any;
+  目标X: number;
+  目标Y: number;
+  运行中: boolean;
+} | undefined;
+let 下层仓库赤尾已到达对白位置 = false;
+let 下层仓库待触发玩家单位: any = null;
 let 下层仓库入口矩形: any = null;
 let 下层仓库入口触发器: any = null;
 let 已触发下层仓库伏击 = false;
@@ -107,9 +156,12 @@ let 下层仓库触发玩家单位: any = null;
 let 下层仓库赤尾: any = null;
 let 下层仓库清理者学者: any = null;
 let 下层仓库清理者战士: any = null;
+let 下层仓库动态Boss: any = null;
+let 下层仓库Dofw图4: any = null;
+let 下层仓库Dofw图5: any = null;
 let 下层仓库赤尾已死亡 = false;
 let 下层仓库战斗进行中 = false;
-let 下层仓库剩余清理者 = 0;
+let 下层仓库剩余敌人 = 0;
 let 下层仓库战斗世代 = 0;
 let 下层仓库战斗结算已安排 = false;
 let 已注册下层仓库死亡监听 = false;
@@ -149,17 +201,96 @@ function 转向目标(this: void, 来源单位: any, 目标单位: any): void {
   SetUnitFacing(来源单位, 朝向);
 }
 
+function 清理赤尾移动保底(this: void): void {
+  if (赤尾移动保底回调ID !== 0) {
+    removePeriodicCallback(赤尾移动保底回调ID);
+    赤尾移动保底回调ID = 0;
+  }
+  if (赤尾移动状态 != null) 赤尾移动状态.运行中 = false;
+  赤尾移动状态 = undefined;
+}
+
+function on赤尾移动保底Tick(this: void, variable?: any): void {
+  const 参数 = variable as { 世代?: number } | undefined;
+  const 状态 = 赤尾移动状态;
+  const 世代 = 参数 != null ? 参数.世代 : undefined;
+  if (状态 == null || !状态.运行中 || 世代 !== 状态.世代 || 世代 !== 赤尾移动世代) {
+    if (赤尾移动保底回调ID !== 0 && (状态 == null || !状态.运行中)) {
+      removePeriodicCallback(赤尾移动保底回调ID);
+      赤尾移动保底回调ID = 0;
+    }
+    return;
+  }
+  if (读取剧情进度() !== 39 || !单位存活(状态.单位)) {
+    清理赤尾移动保底();
+    return;
+  }
+
+  const dx = GetUnitX(状态.单位) - 状态.目标X;
+  const dy = GetUnitY(状态.单位) - 状态.目标Y;
+  if (dx * dx + dy * dy <= 赤尾到达下层仓库距离平方) {
+    IssueImmediateOrder(状态.单位, "holdposition");
+    SetUnitFacing(状态.单位, 下层仓库赤尾对白朝向);
+    下层仓库赤尾已到达对白位置 = true;
+    清理赤尾移动保底();
+    const 待触发玩家 = 下层仓库待触发玩家单位;
+    if (
+      单位有效(待触发玩家) &&
+      是玩家英雄组单位(待触发玩家) &&
+      下层仓库入口矩形 != null &&
+      RectContainsUnit(下层仓库入口矩形, 待触发玩家)
+    ) {
+      下层仓库待触发玩家单位 = null;
+      触发下层仓库伏击(待触发玩家);
+    }
+    return;
+  }
+
+  // 赤尾是中立被动单位，原生游荡逻辑可能重新接管；在抵达前周期性补发移动命令。
+  IssuePointOrder(状态.单位, "move", 状态.目标X, 状态.目标Y);
+}
+
+function 赤尾转向触发玩家(this: void, _参数?: 剧情动作参数表): void {
+  const 赤尾 = 读取语义单位引用("主线NPC.赤尾");
+  const 触发单位 = 读取触发单位();
+  if (单位有效(赤尾) && 单位有效(触发单位)) 转向目标(赤尾, 触发单位);
+}
+
+function 赤尾前往下层仓库(this: void, 参数?: 剧情动作参数表): void {
+  if (!已支付赤尾定金) return;
+  const 赤尾 = 读取语义单位引用("主线NPC.赤尾");
+  if (!单位存活(赤尾)) return;
+
+  清理赤尾移动保底();
+  下层仓库赤尾已到达对白位置 = false;
+  下层仓库待触发玩家单位 = null;
+  const 世代 = ++赤尾移动世代;
+  const 目标X = 读取动作数字(参数 ?? {}, "赤尾X", 下层仓库赤尾对白X);
+  const 目标Y = 读取动作数字(参数 ?? {}, "赤尾Y", 下层仓库赤尾对白Y);
+  赤尾移动状态 = { 世代, 单位: 赤尾, 目标X, 目标Y, 运行中: true };
+  IssuePointOrder(赤尾, "move", 目标X, 目标Y);
+  赤尾移动保底回调ID = addPeriodicCallback(
+    赤尾前往下层仓库保底间隔毫秒,
+    on赤尾移动保底Tick,
+    { 世代 },
+  );
+}
+
 function on锻造区证人范围触发(this: void): void {
   if (已触发锻造区证人 || 读取剧情进度() !== 39) return;
+  const 触发单位 = GetTriggerUnit();
+  if (触发单位 == null || 触发单位 === 0 || !是玩家英雄组单位(触发单位)) return;
   已触发锻造区证人 = true;
-  播放调查剧情("molten_realm_forge_witness", GetTriggerUnit(), "恶魔城锻造区证人入口");
+  播放调查剧情("molten_realm_forge_witness", 触发单位, "恶魔城锻造区证人入口");
 }
 
 function on赤尾范围触发(this: void): void {
   if (已触发赤尾交易 || 读取剧情进度() !== 39) return;
   if (已支付赤尾定金) return;
+  const 触发单位 = GetTriggerUnit();
+  if (触发单位 == null || 触发单位 === 0 || !是玩家英雄组单位(触发单位)) return;
   已触发赤尾交易 = true;
-  播放调查剧情("molten_realm_redtail_meet", GetTriggerUnit(), "恶魔城赤尾交易入口");
+  播放调查剧情("molten_realm_redtail_meet", 触发单位, "恶魔城赤尾交易入口");
 }
 
 function 注册单位范围入口(this: void, unit: any, range: number, action: (this: void) => void, 一次性 = true): () => void {
@@ -173,42 +304,49 @@ function 清理下层仓库入口监听(this: void): void {
   if (下层仓库入口触发器 != null && 下层仓库入口触发器 !== 0) {
     safeDestroyTrigger(下层仓库入口触发器);
   }
-  if (下层仓库入口矩形 != null && 下层仓库入口矩形 !== 0) {
-    RemoveRect(下层仓库入口矩形);
-  }
+  注销动态矩形区域(下层仓库入口矩形键);
   下层仓库入口触发器 = null;
   下层仓库入口矩形 = null;
 }
 
-function on进入下层仓库入口(this: void): void {
+function 触发下层仓库伏击(this: void, 触发单位: any): void {
   if (已触发下层仓库伏击 || 读取剧情进度() !== 39) return;
-  const 触发单位 = GetTriggerUnit();
+  if (!已支付赤尾定金 || !下层仓库赤尾已到达对白位置) return;
   if (触发单位 == null || 触发单位 === 0 || !是玩家英雄组单位(触发单位)) return;
   已触发下层仓库伏击 = true;
   下层仓库触发玩家单位 = 触发单位;
+  下层仓库待触发玩家单位 = null;
   清理下层仓库入口监听();
   播放调查剧情("molten_realm_warehouse_ambush", 触发单位, "恶魔城下层仓库入口");
 }
 
+function on进入下层仓库入口(this: void): void {
+  if (已触发下层仓库伏击 || 读取剧情进度() !== 39) return;
+  // 必须先完成赤尾交易并支付定金，避免玩家跳过线索直接进入仓库伏击。
+  if (!已支付赤尾定金) return;
+  const 触发单位 = GetTriggerUnit();
+  if (触发单位 == null || 触发单位 === 0 || !是玩家英雄组单位(触发单位)) return;
+  if (!下层仓库赤尾已到达对白位置) {
+    // 玩家可以先到仓库，但必须等赤尾走到对白站位；入口监听保持有效，不消费这次触发。
+    下层仓库待触发玩家单位 = 触发单位;
+    return;
+  }
+  触发下层仓库伏击(触发单位);
+}
+
 function 注册下层仓库入口监听(this: void): void {
   if (下层仓库入口触发器 != null && 下层仓库入口触发器 !== 0) return;
-  const 入口 = 恶魔城调查场景站位表.下层仓库入口;
-  下层仓库入口矩形 = Rect(
-    入口.X - 下层仓库入口触发半径,
-    入口.Y - 下层仓库入口触发半径,
-    入口.X + 下层仓库入口触发半径,
-    入口.Y + 下层仓库入口触发半径,
-  );
+  下层仓库入口矩形 = 注册动态矩形区域(动态矩形区域配置表[下层仓库入口矩形键]);
   if (下层仓库入口矩形 == null || 下层仓库入口矩形 === 0) return;
   下层仓库入口触发器 = CreateTrigger();
   if (下层仓库入口触发器 == null || 下层仓库入口触发器 === 0) {
-    RemoveRect(下层仓库入口矩形);
+    注销动态矩形区域(下层仓库入口矩形键);
     下层仓库入口矩形 = null;
     return;
   }
   if (safeTriggerAddAction(下层仓库入口触发器, on进入下层仓库入口) == null) {
     safeDestroyTrigger(下层仓库入口触发器);
-    RemoveRect(下层仓库入口矩形);
+    注销动态矩形区域(下层仓库入口矩形键);
     下层仓库入口触发器 = null;
     下层仓库入口矩形 = null;
     return;
@@ -296,6 +434,22 @@ function 创建并冻结下层仓库清理者(
 function 清理下层仓库战斗运行时引用(this: void): void {
   清理剧情运行时单位("剧情单位.教派清理者（学者）");
   清理剧情运行时单位("剧情单位.教派清理者（战士）");
+  清理剧情运行时单位("剧情单位.教派恶魔军官");
+
+  if (单位有效(下层仓库动态Boss)) {
+    立即移除单位并取消排泄登记(下层仓库动态Boss);
+  }
+  YDUserDataClearSafe("string", "Boss", "教派恶魔军官", "unit");
+  下层仓库动态Boss = null;
+
+  if (下层仓库Dofw图4 != null && 下层仓库Dofw图4 !== 0) {
+    RemoveDestructable(下层仓库Dofw图4);
+  }
+  if (下层仓库Dofw图5 != null && 下层仓库Dofw图5 !== 0) {
+    RemoveDestructable(下层仓库Dofw图5);
+  }
+  下层仓库Dofw图4 = null;
+  下层仓库Dofw图5 = null;
 }
 
 function 安排下层仓库战斗结算(this: void): void {
@@ -321,7 +475,9 @@ function 结算下层仓库战斗(this: void, variable?: any): void {
   清理下层仓库战斗运行时引用();
   下层仓库清理者学者 = null;
   下层仓库清理者战士 = null;
-  下层仓库剩余清理者 = 0;
+  下层仓库剩余敌人 = 0;
+  下层仓库赤尾已到达对白位置 = false;
+  下层仓库待触发玩家单位 = null;
 
   if (赤尾存活) {
     播放调查剧情("molten_realm_warehouse_survivor_aftermath", 触发单位, "恶魔城下层仓库战后");
@@ -340,32 +496,41 @@ function on下层仓库单位死亡(this: void, dyingUnit: any, _killingUnit: an
     return;
   }
 
-  let 是清理者 = false;
+  let 是伏击敌人 = false;
   if (dyingUnit === 下层仓库清理者学者 || dyingUnit === 下层仓库清理者战士) {
-    是清理者 = true;
+    是伏击敌人 = true;
   }
-  if (!是清理者) return;
+  if (dyingUnit === 下层仓库动态Boss) {
+    是伏击敌人 = true;
+  }
+  if (!是伏击敌人) return;
 
-  if (下层仓库剩余清理者 > 0) 下层仓库剩余清理者--;
-  if (下层仓库剩余清理者 <= 0) 安排下层仓库战斗结算();
+  if (下层仓库剩余敌人 > 0) 下层仓库剩余敌人--;
+  if (下层仓库剩余敌人 <= 0) 安排下层仓库战斗结算();
 }
 
 function 布置下层仓库伏击(this: void, 参数: 剧情动作参数表): void {
-  if (下层仓库战斗进行中 || 下层仓库清理者学者 != null || 下层仓库清理者战士 != null) return;
+  if (
+    下层仓库战斗进行中 ||
+    下层仓库清理者学者 != null ||
+    下层仓库清理者战士 != null ||
+    下层仓库动态Boss != null
+  ) return;
 
   const 赤尾 = 读取语义单位引用("主线NPC.赤尾");
   if (!单位有效(赤尾)) return;
+  if (!下层仓库赤尾已到达对白位置) return;
+
+  // 赤尾已经走到对白站位；这里只接管暂停和朝向，不再瞬移覆盖实际移动。
+  清理赤尾移动保底();
 
   下层仓库战斗世代++;
   下层仓库赤尾 = 赤尾;
   下层仓库赤尾已死亡 = !单位存活(赤尾);
   下层仓库战斗结算已安排 = false;
-  下层仓库剩余清理者 = 0;
+  下层仓库剩余敌人 = 0;
 
-  const 赤尾X = 读取动作数字(参数, "赤尾X", 20171.3);
-  const 赤尾Y = 读取动作数字(参数, "赤尾Y", -18292.4);
-  const 赤尾朝向 = 读取动作数字(参数, "赤尾朝向", 45);
-  SetUnitPosition(赤尾, 赤尾X, 赤尾Y);
+  const 赤尾朝向 = 读取动作数字(参数, "赤尾朝向", 下层仓库赤尾对白朝向);
   SetUnitFacing(赤尾, 赤尾朝向);
   IssueImmediateOrder(赤尾, "stop");
   if (!下层仓库赤尾已死亡) 暂停并设置无敌安全(赤尾, 下层仓库赤尾待战暂停来源);
@@ -385,8 +550,36 @@ function 布置下层仓库伏击(this: void, 参数: 剧情动作参数表): vo
     "剧情单位.教派清理者（战士）",
   );
 
-  if (单位有效(下层仓库清理者学者)) 下层仓库剩余清理者++;
-  if (单位有效(下层仓库清理者战士)) 下层仓库剩余清理者++;
+  const 教派恶魔军官类型ID = stringToFourCCSafe("O002");
+  if (教派恶魔军官类型ID > 0) {
+    下层仓库动态Boss = 创建单位并登记排泄安全(
+      Player(中立敌对玩家ID),
+      教派恶魔军官类型ID,
+      20581.7,
+      -17857.8,
+      225,
+    );
+    if (单位有效(下层仓库动态Boss)) {
+      SetUnitPosition(下层仓库动态Boss, 20581.7, -17857.8);
+      SetUnitFacing(下层仓库动态Boss, 225);
+      IssueImmediateOrder(下层仓库动态Boss, "stop");
+      暂停并设置无敌安全(下层仓库动态Boss, 下层仓库动态Boss待战暂停来源);
+      注册剧情运行时单位("剧情单位.教派恶魔军官", 下层仓库动态Boss);
+      YDUserDataSetSafe("string", "Boss", "教派恶魔军官", "unit", 下层仓库动态Boss);
+    } else {
+      下层仓库动态Boss = null;
+    }
+  }
+
+  const Dofw类型ID = stringToFourCCSafe("Dofw");
+  if (Dofw类型ID > 0) {
+    下层仓库Dofw图4 = CreateDestructable(Dofw类型ID, 19455.5, -19092.3, 180, 1, 0);
+    下层仓库Dofw图5 = CreateDestructable(Dofw类型ID, 20854.4, -17065.4, 270, 1, 0);
+  }
+
+  if (单位有效(下层仓库清理者学者)) 下层仓库剩余敌人++;
+  if (单位有效(下层仓库清理者战士)) 下层仓库剩余敌人++;
+  if (单位有效(下层仓库动态Boss)) 下层仓库剩余敌人++;
   if (!已注册下层仓库死亡监听) {
     registerDeathListener(on下层仓库单位死亡);
     已注册下层仓库死亡监听 = true;
@@ -416,10 +609,15 @@ function 开启下层仓库战斗(this: void, _参数: 剧情动作参数表): v
     转向目标(下层仓库清理者战士, 赤尾);
     IssueTargetOrder(下层仓库清理者战士, "attack", 赤尾);
   }
+  if (单位有效(下层仓库动态Boss)) {
+    解除暂停并取消无敌安全(下层仓库动态Boss, 下层仓库动态Boss待战暂停来源);
+    转向目标(下层仓库动态Boss, 赤尾);
+    IssueTargetOrder(下层仓库动态Boss, "attack", 赤尾);
+  }
   if (单位存活(赤尾)) {
     解除暂停并取消无敌安全(赤尾, 下层仓库赤尾待战暂停来源);
   }
-  if (下层仓库剩余清理者 <= 0) 安排下层仓库战斗结算();
+  if (下层仓库剩余敌人 <= 0) 安排下层仓库战斗结算();
 }
 
 function 记录下层仓库证据(this: void, _参数: 剧情动作参数表): void {
@@ -446,9 +644,12 @@ export function 执行布置恶魔城调查(this: void, _参数: 剧情动作参
 }
 
 export const 恶魔城调查剧情动作注册表: Record<string, 剧情动作处理器> = {
+  "第三章_开启恶魔城领主区域视野": 执行开启恶魔城领主区域视野,
   "第三章_布置恶魔城调查": 执行布置恶魔城调查,
   "第三章_支付赤尾定金": 支付赤尾定金,
   "第三章_结束赤尾交易尝试": 结束赤尾交易尝试,
+  "第三章_赤尾转向触发玩家": 赤尾转向触发玩家,
+  "第三章_赤尾前往下层仓库": 赤尾前往下层仓库,
   "第三章_布置下层仓库伏击": 布置下层仓库伏击,
   "第三章_下层仓库清理者转向赤尾": 下层仓库清理者转向赤尾,
   "第三章_开启下层仓库战斗": 开启下层仓库战斗,

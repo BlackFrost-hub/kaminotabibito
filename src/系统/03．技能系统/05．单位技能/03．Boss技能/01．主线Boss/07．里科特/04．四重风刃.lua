@@ -34,11 +34,9 @@ function _____53D6_56DB_91CD_98CE_5203_76EE_6807(boss)
     end
     return _____5355_4F4D_6709_6548_result_6
 end
-function _____7ED3_7B97_8DF3_5288(boss, target)
+function _____7ED3_7B97_8DF3_5288(boss, _____4E2D_5FC3X, _____4E2D_5FC3Y)
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-    local cx = GetUnitX(target)
-    local cy = GetUnitY(target)
     local radius2 = cfg["跳劈半径"] * cfg["跳劈半径"]
     do
         local i = 0
@@ -48,8 +46,8 @@ function _____7ED3_7B97_8DF3_5288(boss, target)
                 if not _____5355_4F4D_6709_6548(hero) then
                     goto __continue5
                 end
-                local dx = GetUnitX(hero) - cx
-                local dy = GetUnitY(hero) - cy
+                local dx = GetUnitX(hero) - _____4E2D_5FC3X
+                local dy = GetUnitY(hero) - _____4E2D_5FC3Y
                 if dx * dx + dy * dy > radius2 then
                     goto __continue5
                 end
@@ -89,7 +87,7 @@ function _____53D6_9F99_5377_98CE_9636_6BB5_6539_5411_89D2_5EA6(context, _____96
     end
     return _____53D6_5355_4F4D_95F4_89D2_5EA6(_____4E0A_4E0B_6587["弹幕单位"], boss)
 end
-function _____53D1_5C04_5355_4E2A_9F99_5377_98CE(context, _____9636_6BB5, angle)
+function _____53D1_5C04_5355_4E2A_9F99_5377_98CE(context, _____9636_6BB5, _____8D77_70B9X, _____8D77_70B9Y, angle)
     local boss = context["Boss单位"]
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(boss) * cfg["龙卷风Boss攻击力比例"]
@@ -99,8 +97,8 @@ function _____53D1_5C04_5355_4E2A_9F99_5377_98CE(context, _____9636_6BB5, angle)
         ["弹幕"] = {
             ["所有者"] = boss,
             ["所属玩家"] = GetOwningPlayer(boss),
-            X = GetUnitX(boss),
-            Y = GetUnitY(boss),
+            X = _____8D77_70B9X,
+            Y = _____8D77_70B9Y,
             ["方向角"] = angle,
             ["速度"] = cfg["龙卷风速度"],
             ["最大距离"] = _____9636_6BB5 == 1 and cfg["龙卷风射程"] or cfg["龙卷风射程"] * cfg["阶段改向最大距离倍率"],
@@ -137,7 +135,7 @@ function _____53D1_5C04_5355_4E2A_9F99_5377_98CE(context, _____9636_6BB5, angle)
         end
     })
 end
-function _____53D1_5C04_56DB_91CD_9F99_5377_98CE(context, _____9636_6BB5)
+function _____53D1_5C04_56DB_91CD_9F99_5377_98CE(context, _____9636_6BB5, _____8D77_70B9X, _____8D77_70B9Y)
     local boss = context["Boss单位"]
     if _____5355_4F4D_6709_6548(boss) then
         _____64AD_653EBoss_5750_6807_97F3_6548(
@@ -150,7 +148,13 @@ function _____53D1_5C04_56DB_91CD_9F99_5377_98CE(context, _____9636_6BB5)
     do
         local i = 0
         while i < 4 do
-            _____53D1_5C04_5355_4E2A_9F99_5377_98CE(context, _____9636_6BB5, i * 90 + 45)
+            _____53D1_5C04_5355_4E2A_9F99_5377_98CE(
+                context,
+                _____9636_6BB5,
+                _____8D77_70B9X,
+                _____8D77_70B9Y,
+                i * 90 + 45
+            )
             i = i + 1
         end
     end
@@ -166,10 +170,12 @@ ____exports["释放里科特四重风刃"] = function(context)
     end
     local cfg = _____91CC_79D1_7279_6570_503C_4E0E_8868_73B0_914D_7F6E["四重风刃"]
     local _____9636_6BB5 = _____5237_65B0_91CC_79D1_7279_9636_6BB5(context)
+    local _____9884_8B66_4E2D_5FC3X = GetUnitX(target)
+    local _____9884_8B66_4E2D_5FC3Y = GetUnitY(target)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "圆形",
-        X = GetUnitX(target),
-        Y = GetUnitY(target),
+        X = _____9884_8B66_4E2D_5FC3X,
+        Y = _____9884_8B66_4E2D_5FC3Y,
         ["半径"] = cfg["跳劈半径"],
         ["持续时间"] = cfg["前摇秒"],
         ["来源单位"] = boss
@@ -198,11 +204,11 @@ ____exports["释放里科特四重风刃"] = function(context)
                 GetUnitY(boss),
                 _____91CC_79D1_7279_97F3_6548_914D_7F6E["默认裁断距离"]
             )
-            _____7ED3_7B97_8DF3_5288(boss, target)
+            _____7ED3_7B97_8DF3_5288(boss, _____9884_8B66_4E2D_5FC3X, _____9884_8B66_4E2D_5FC3Y)
             local id = addDelayedCallback(
                 cfg["龙卷风延迟秒"] * 1000,
                 function()
-                    _____53D1_5C04_56DB_91CD_9F99_5377_98CE(context, _____9636_6BB5)
+                    _____53D1_5C04_56DB_91CD_9F99_5377_98CE(context, _____9636_6BB5, _____9884_8B66_4E2D_5FC3X, _____9884_8B66_4E2D_5FC3Y)
                 end
             )
             local ____self_7 = context["清理"]

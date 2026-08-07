@@ -3,7 +3,7 @@ local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local resolveNpcDialogName, openDialogForConfiguredNpc, onPlayerSelectedUnit, jass, openNpcDialog, DIALOG_PLAYER_SLOTS
 local ____03_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统.03．任务状态")
-local ensureQuestConfigsRegistered = ____03_FF0E_4EFB_52A1_72B6_6001.ensureQuestConfigsRegistered
+local _____786E_4FDD_4EFB_52A1_914D_7F6E_5DF2_6CE8_518C = ____03_FF0E_4EFB_52A1_72B6_6001["确保任务配置已注册"]
 local hasPlayerAcceptedQuest = ____03_FF0E_4EFB_52A1_72B6_6001.hasPlayerAcceptedQuest
 local hasPlayerCompletedQuest = ____03_FF0E_4EFB_52A1_72B6_6001.hasPlayerCompletedQuest
 local ____03_FF0E_4EFB_52A1_72B6_6001 = require("系统.09．表现系统.02．对话框系统.03．任务状态")
@@ -18,10 +18,10 @@ local buildQuestCompletedDialog = ____04_FF0E_5BF9_8BDD_6784_5EFA.buildQuestComp
 local buildQuestInProgressDialog = ____04_FF0E_5BF9_8BDD_6784_5EFA.buildQuestInProgressDialog
 local buildQuestOfferDialog = ____04_FF0E_5BF9_8BDD_6784_5EFA.buildQuestOfferDialog
 function resolveNpcDialogName(npcConfig)
-    if npcConfig.NPCrequireName ~= nil and npcConfig.NPCrequireName ~= "" then
-        return npcConfig.NPCrequireName
+    if npcConfig["NPC名称"] ~= nil and npcConfig["NPC名称"] ~= "" then
+        return npcConfig["NPC名称"]
     end
-    return npcConfig.NpcNameID or ""
+    return npcConfig["NPC配置名"] or ""
 end
 function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if not triggerPlayer or not npcConfig or not npcUnit then
@@ -42,31 +42,34 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if npcName == "" then
         return
     end
+    local _____5BF9_8BDDNPC_4E0A_4E0B_6587 = {npcUnit = npcUnit, ["对话目标单位"] = hero, ["NPC配置朝向"] = npcConfig["朝向"]}
     local acceptedQuest = findAcceptedQuestBySubmitNpc(nil, npcName, playerId)
-    if acceptedQuest and acceptedQuest.requireID then
+    if acceptedQuest and acceptedQuest["任务ID"] then
         local acceptedDialog = buildQuestInProgressDialog(
             nil,
             acceptedQuest,
             npcName,
             playerId,
-            npcUnit
+            npcUnit,
+            hero,
+            npcConfig["朝向"]
         )
         openNpcDialog(
             nil,
             triggerPlayer,
-            __TS__ObjectAssign({}, acceptedDialog, {npcUnit = npcUnit})
+            __TS__ObjectAssign({}, acceptedDialog, _____5BF9_8BDDNPC_4E0A_4E0B_6587)
         )
         return
     end
     local quest = findQuestByNpc(nil, npcName)
-    if quest and quest.requireID then
-        local questIdStr = tostring(quest.requireID)
-        if hasPlayerCompletedQuest(nil, playerId, questIdStr) and not quest.repeatable then
+    if quest and quest["任务ID"] then
+        local questIdStr = tostring(quest["任务ID"])
+        if hasPlayerCompletedQuest(nil, playerId, questIdStr) and not quest["可重复"] then
             local dialogData = buildQuestCompletedDialog(nil, quest, npcName)
             openNpcDialog(
                 nil,
                 triggerPlayer,
-                __TS__ObjectAssign({}, dialogData, {npcUnit = npcUnit})
+                __TS__ObjectAssign({}, dialogData, _____5BF9_8BDDNPC_4E0A_4E0B_6587)
             )
             return
         end
@@ -76,12 +79,14 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
                 quest,
                 npcName,
                 playerId,
-                npcUnit
+                npcUnit,
+                hero,
+                npcConfig["朝向"]
             )
             openNpcDialog(
                 nil,
                 triggerPlayer,
-                __TS__ObjectAssign({}, dialogData, {npcUnit = npcUnit})
+                __TS__ObjectAssign({}, dialogData, _____5BF9_8BDDNPC_4E0A_4E0B_6587)
             )
             return
         end
@@ -90,12 +95,14 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
             quest,
             npcName,
             playerId,
-            npcUnit
+            npcUnit,
+            hero,
+            npcConfig["朝向"]
         )
         openNpcDialog(
             nil,
             triggerPlayer,
-            __TS__ObjectAssign({}, dialogData, {npcUnit = npcUnit})
+            __TS__ObjectAssign({}, dialogData, _____5BF9_8BDDNPC_4E0A_4E0B_6587)
         )
         return
     end
@@ -105,7 +112,7 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
         openNpcDialog(
             nil,
             triggerPlayer,
-            __TS__ObjectAssign({}, dialogData, {npcUnit = npcUnit})
+            __TS__ObjectAssign({}, dialogData, _____5BF9_8BDDNPC_4E0A_4E0B_6587)
         )
     end
 end
@@ -125,7 +132,7 @@ function onPlayerSelectedUnit(triggerPlayer, playerId, selectedUnit, isSelected)
     end
     local unitName = jass.GetUnitName(selectedUnit)
     local npcConfig = findEnabledNpcConfigBySelectedUnit(nil, selectedUnit, unitName)
-    if not npcConfig or npcConfig.requireID == nil then
+    if not npcConfig or npcConfig["任务ID"] == nil then
         return
     end
     local hero = getPlayerFirstHero(nil, triggerPlayer)
@@ -151,7 +158,7 @@ local function registerDialogSelectionListener()
     cb(nil, onPlayerSelectedUnit)
 end
 function ____exports.initDialogEntrySelectionTrigger()
-    ensureQuestConfigsRegistered(nil)
+    _____786E_4FDD_4EFB_52A1_914D_7F6E_5DF2_6CE8_518C(nil)
     if dialogSelectionListenerRegistered then
         return
     end

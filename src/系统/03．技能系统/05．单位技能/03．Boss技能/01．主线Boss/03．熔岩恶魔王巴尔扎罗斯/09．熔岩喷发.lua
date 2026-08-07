@@ -96,7 +96,7 @@ function _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, x, y)
                             ["伤害类型"] = DAMAGE_TYPE_FIRE,
                             weaponType = WEAPON_TYPE_WHOKNOWS
                         })
-                        _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["残留灼热层数"])
+                        _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(context, unit, config["残留灼热层数"])
                     end
                     ::__continue11::
                     i = i + 1
@@ -113,7 +113,8 @@ function _____521B_5EFA_7194_5CA9_6B8B_7559_533A(context, x, y)
         end
     )
 end
-function _____5904_7406_7194_5CA9_55B7_53D1_7206_53D1_547D_4E2D(boss, unit, config)
+function _____5904_7406_7194_5CA9_55B7_53D1_7206_53D1_547D_4E2D(context, unit, config)
+    local boss = context["Boss单位"]
     if not _____5355_4F4D_6709_6548(unit) then
         return
     end
@@ -128,7 +129,7 @@ function _____5904_7406_7194_5CA9_55B7_53D1_7206_53D1_547D_4E2D(boss, unit, conf
         ["伤害类型"] = DAMAGE_TYPE_FIRE,
         weaponType = WEAPON_TYPE_WHOKNOWS
     })
-    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["爆发灼热层数"])
+    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(context, unit, config["爆发灼热层数"])
     _____5F00_59CB_539F_5730_51FB_98DE(unit, {
         ["持续时间"] = config["爆发持续顶飞秒"],
         ["最小高度"] = 180,
@@ -186,7 +187,7 @@ function _____6267_884C_7194_5CA9_55B7_53D1_7206_53D1(context, _____843D_70B9)
                             goto __continue20
                         end
                         _____7206_53D1_547D_4E2D_8BB0_5F55[handleId] = true
-                        _____5904_7406_7194_5CA9_55B7_53D1_7206_53D1_547D_4E2D(boss, unit, config)
+                        _____5904_7406_7194_5CA9_55B7_53D1_7206_53D1_547D_4E2D(context, unit, config)
                     end
                     ::__continue20::
                     i = i + 1

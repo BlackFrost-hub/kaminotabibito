@@ -64,7 +64,7 @@ local function ____on_683C_9C81_59C6_706B_5F84_5468_671F(unit, variable)
         _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3(state.grum),
         "AOE"
     )
-    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["灼热层数"])
+    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(state.context, unit, config["灼热层数"])
 end
 local function ____on_683C_9C81_59C6_706B_5F84_7A7F_8D8A(unit, variable)
     local state = variable
@@ -83,7 +83,7 @@ local function ____on_683C_9C81_59C6_706B_5F84_7A7F_8D8A(unit, variable)
         weaponType = WEAPON_TYPE_WHOKNOWS,
         ["标签"] = "格鲁姆-熔岩火径-穿越"
     })
-    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["灼热层数"])
+    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(state.context, unit, config["灼热层数"])
 end
 local function _____521B_5EFA_706B_5F84(context, center, lineAngle)
     local grum = context["格鲁姆"]

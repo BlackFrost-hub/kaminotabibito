@@ -24,6 +24,28 @@ const registerSpellChannelListener = 技能事件模块.registerSpellChannelList
 const ITEM_USE_ORDER_IDS = new Set([
   852008, 852009, 852010, 852011, 852012, 852013, 852622,
 ]);
+const 技能显示名称覆盖表: Record<string, string | undefined> = {};
+
+function stringToFourCC(this: void, rawId: string): number {
+  if (rawId.length < 4) return 0;
+  return rawId.charCodeAt(0) * 0x1000000
+    + rawId.charCodeAt(1) * 0x10000
+    + rawId.charCodeAt(2) * 0x100
+    + rawId.charCodeAt(3);
+}
+
+function 技能显示名称覆盖键(this: void, unitTypeId: number, abilityId: number): string {
+  return `${unitTypeId}:${abilityId}`;
+}
+
+/** 通用技能壳必须按单位类型覆盖为真实技能名，避免显示底层系统壳名称。 */
+export function 注册技能显示名称覆盖(this: void, unitRawId: string, abilityRawId: string, name: string): void {
+  if (name === "") return;
+  const unitTypeId = stringToFourCC(unitRawId);
+  const abilityId = stringToFourCC(abilityRawId);
+  if (unitTypeId === 0 || abilityId === 0) return;
+  技能显示名称覆盖表[技能显示名称覆盖键(unitTypeId, abilityId)] = name;
+}
 
 function getAbilityName(this: void, unit: any, abilityId: number, level: number): string {
   if (typeof japi.DzGetUnitAbilityTip === "function") {
@@ -43,7 +65,8 @@ function onSpellChannel(this: void, castingUnit: any, spellAbilityId: number): v
   if (ITEM_USE_ORDER_IDS.has(orderId)) return;
 
   const level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId);
-  const skillName = getAbilityName(castingUnit, spellAbilityId, level);
+  const skillName = 技能显示名称覆盖表[技能显示名称覆盖键(jass.GetUnitTypeId(castingUnit), spellAbilityId)]
+    || getAbilityName(castingUnit, spellAbilityId, level);
   if (!skillName) return;
 
   CreateFloatTextOnUnit(castingUnit, skillName, {
@@ -63,4 +86,3 @@ if (typeof registerSpellChannelListener === "function") {
   registerSpellChannelListener(onSpellChannel);
 }
 
-export {};

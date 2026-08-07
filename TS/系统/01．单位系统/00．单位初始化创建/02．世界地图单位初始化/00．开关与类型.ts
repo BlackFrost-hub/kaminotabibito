@@ -1,6 +1,6 @@
 export type 世界地图敌人归类 = "杂鱼" | "精英" | "Boss" | "异界Boss" | "NPC";
 
-export type 世界地图单位朝向 = number | "随机";
+export type 世界地图单位朝向 = number | `${number}` | "随机";
 
 export interface 世界地图单位出生配置 {
   配置名?: string;

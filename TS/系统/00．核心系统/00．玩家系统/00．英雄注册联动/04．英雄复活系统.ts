@@ -15,7 +15,10 @@ const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩�
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+};
+const { 开始无敌帧 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧") as {
+  开始无敌帧: (this: void, unit: any, duration: number) => number;
 };
 const { 沿角度步进直到地形阻挡 } = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进") as {
   沿角度步进直到地形阻挡: (this: void, 参数: {
@@ -94,12 +97,12 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 const Location = jass.Location as (x: number, y: number) => any;
 const RemoveLocation = jass.RemoveLocation as (loc: any) => void;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
 const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 const R2I = jass.R2I as (value: number) => number;
 
 const 复活延迟秒 = 10.0;
+const 复活无敌秒 = 1.0;
 const 复活半径 = 400.0;
 const 复活推进步数 = 20;
 const 复活次数属性 = "次数";
@@ -345,6 +348,20 @@ function 读取当前复活Boss(this: void): any {
   return g.udg_Boss;
 }
 
+function on复活镜头移动(this: void, variable?: any): void {
+  if (variable == null) return;
+  移动镜头到玩家(variable.玩家, variable.x, variable.y);
+}
+
+function 施加复活无敌(this: void, hero: any): void {
+  if (!是否有效(hero)) return;
+  开始无敌帧(hero, 复活无敌秒);
+}
+
+function on英雄死亡延迟复活(this: void, variable?: any): void {
+  执行复活(variable);
+}
+
 function 执行复活(this: void, dyingUnit: any): void {
   if (!是否有效(dyingUnit)) return;
   if (!是玩家英雄(dyingUnit)) return;
@@ -369,26 +386,21 @@ function 执行复活(this: void, dyingUnit: any): void {
     RemoveLocation(loc);
     SetUnitX(dyingUnit, pos.x);
     SetUnitY(dyingUnit, pos.y);
-    SetUnitInvulnerable(dyingUnit, false);
-    addDelayedCallback(0, function(this: void): void {
-      移动镜头到玩家(GetOwningPlayer(dyingUnit), pos.x, pos.y);
-    });
+    施加复活无敌(dyingUnit);
+    addDelayedCallback(0, on复活镜头移动, { 玩家: GetOwningPlayer(dyingUnit), x: pos.x, y: pos.y });
   } else {
     const 复活点 = g.udg_FHD;
     if (!是否有效(复活点)) return;
     ReviveHeroLoc(dyingUnit, 复活点, true);
-    addDelayedCallback(0, function(this: void): void {
-      移动镜头到玩家(GetOwningPlayer(dyingUnit), GetUnitX(dyingUnit), GetUnitY(dyingUnit));
-    });
+    施加复活无敌(dyingUnit);
+    addDelayedCallback(0, on复活镜头移动, { 玩家: GetOwningPlayer(dyingUnit), x: GetUnitX(dyingUnit), y: GetUnitY(dyingUnit) });
   }
 }
 
 function 英雄死亡延迟复活(this: void, dyingUnit: any, 击杀者: any): void {
   if (!是玩家英雄(dyingUnit)) return;
   启动英雄栏倒计时(dyingUnit);
-  addDelayedCallback(复活延迟秒 * 1000, function(this: void): void {
-    执行复活(dyingUnit);
-  });
+  addDelayedCallback(复活延迟秒 * 1000, on英雄死亡延迟复活, dyingUnit);
 }
 
 export function 初始化英雄复活(this: void): void {

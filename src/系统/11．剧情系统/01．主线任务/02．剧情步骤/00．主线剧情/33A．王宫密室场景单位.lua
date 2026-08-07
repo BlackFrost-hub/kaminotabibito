@@ -5,6 +5,7 @@ local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
 local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["注册剧情运行时单位"]
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
@@ -16,12 +17,15 @@ local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____require_result_4.createTimedEffect
 local ForGroup = jass.ForGroup
+local GetDestructableX = jass.GetDestructableX
+local GetDestructableY = jass.GetDestructableY
 local GetEnumUnit = jass.GetEnumUnit
 local IssueImmediateOrder = jass.IssueImmediateOrder
 local Player = jass.Player
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
+local _____738B_5BAB_4F20_9001_95E8_5C01_5370_7279_6548 = "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl"
 ____exports["王宫密室场景站位表"] = {
     ["伪装卫兵王宫异变"] = {X = 16116.2, Y = -24363.8, ["朝向"] = 180},
     ["里科特王宫异变"] = {X = 15635.6, Y = -24270.9, ["朝向"] = 360},
@@ -37,6 +41,17 @@ ____exports["王宫密室场景站位表"] = {
     ["艾伦密室门外"] = {X = 15709.1, Y = -24275.2, ["朝向"] = 270},
     ["里凡特密室门外"] = {X = 16102, Y = -24243.5, ["朝向"] = 270},
     ["耶提尔返回王宫"] = {X = 15947.6, Y = -24545.3, ["朝向"] = 90}
+}
+____exports["王宫密室对峙镜头预设"] = {
+    X = 14646.39,
+    Y = -28294.6,
+    ["高度偏移"] = 220,
+    ["旋转角度"] = 110,
+    ["攻角"] = 324,
+    ["距离到目标"] = 2000,
+    ["滚动角度"] = 0,
+    ["观察区域"] = 70,
+    ["远景剪裁"] = 3000
 }
 ____exports["王宫密室演出特效表"] = {["里科特进入传承密室"] = {["模型路径"] = "Common\\Effect\\Form\\Portal\\RicketSecretRoomShift.mdx", ["持续秒"] = 3}, ["里科特战后撤离"] = {["模型路径"] = "Common\\Effect\\Form\\Portal\\RicketVoidEscape.mdx", ["持续秒"] = 3}, ["玩家队伍抵达传承密室"] = {["模型路径"] = "Common\\Effect\\Form\\Portal\\PalaceSecretRoomArrival.mdx", ["持续秒"] = 4}, ["里凡特开启传承密室门"] = {["模型路径"] = "Common\\Effect\\Form\\Portal\\RoyalBloodlineGate.mdx", ["持续秒"] = 8}}
 local _____5F53_524D_73A9_5BB6_961F_4F0D_8F6C_573A_7AD9_4F4D
@@ -97,6 +112,19 @@ ____exports["播放王宫密室演出特效"] = function(_____7279_6548_952E, __
         _____7AD9_4F4D.Y,
         0,
         _____7279_6548["持续秒"]
+    )
+end
+____exports["播放王宫传送门封印特效"] = function()
+    local _____4F20_9001_95E8 = jglobals.gg_dest_B00K_5466
+    if _____4F20_9001_95E8 == nil or _____4F20_9001_95E8 == 0 then
+        return
+    end
+    createTimedEffect(
+        _____738B_5BAB_4F20_9001_95E8_5C01_5370_7279_6548,
+        GetDestructableX(_____4F20_9001_95E8),
+        GetDestructableY(_____4F20_9001_95E8),
+        0,
+        1
     )
 end
 ____exports["移动玩家英雄组到王宫密室"] = function()

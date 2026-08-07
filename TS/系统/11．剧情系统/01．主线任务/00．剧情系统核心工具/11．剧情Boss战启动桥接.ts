@@ -19,13 +19,19 @@ const { 记录Boss自动技能启动, 是否已登记Boss自动技能 } = requir
   记录Boss自动技能启动: (this: void, unit: any, source: "Boss战.绑定单位") => any;
   是否已登记Boss自动技能: (this: void, unit: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { 解除暂停并取消无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  解除暂停并取消无敌安全: (this: void, unit: any, 来源: string) => boolean;
+};
 
 import { 读取当前剧情动作上下文 } from "./01．剧情动作上下文";
 import { 释放并登记剧情Boss预置随从, 剧情Boss预置暂停来源 } from "./03．剧情Boss预置桥接";
 import { 发布主线Boss战前提示 } from "./12．剧情Boss战预警";
 
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
+const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 
 export interface 剧情Boss战启动参数 {
   触发单位?: any;
@@ -37,8 +43,19 @@ export function 启动剧情Boss战(this: void, bossUnit: any, 参数?: 剧情Bo
 
   释放并登记剧情Boss预置随从(bossUnit);
 
-  if (!是否已登记Boss自动技能(bossUnit)) {
+  const 已登记自动技能 = 是否已登记Boss自动技能(bossUnit);
+  if (!已登记自动技能) {
     记录Boss自动技能启动(bossUnit, "Boss战.绑定单位");
+  }
+  if (jass.GetUnitName(bossUnit) === "树魔首领") {
+    debugLogForce(
+      "树魔首领-主动施法诊断",
+      "剧情开战桥接",
+      "hid=", jass.GetHandleId(bossUnit),
+      "typeId=", jass.GetUnitTypeId(bossUnit),
+      "已登记=", 已登记自动技能,
+      "登记后=", 是否已登记Boss自动技能(bossUnit)
+    );
   }
   应用Boss战启动属性配置(bossUnit);
   YDUserDataSetSafe("string", "Boss战", "绑定单位", "unit", bossUnit);
@@ -51,8 +68,9 @@ export function 启动剧情Boss战(this: void, bossUnit: any, 参数?: 剧情Bo
   发布主线Boss战前提示(bossUnit);
   const 暂停来源 = 参数?.暂停来源 ?? 剧情Boss预置暂停来源;
   const 存在其他暂停来源 = 单位是否存在其他暂停占用(bossUnit, 暂停来源);
-  移除单位暂停(bossUnit, 暂停来源);
-  // 兼容旧 JASS/地图预置直接 PauseUnit(true) 而未进入暂停来源池的 Boss。
+  const 已解除安全待战 = 解除暂停并取消无敌安全(bossUnit, 暂停来源);
+  if (!已解除安全待战) 移除单位暂停(bossUnit, 暂停来源);
+  // 兼容地图预置或旧剧情直接 PauseUnit(true) 的 Boss，同时不覆盖其他来源占用。
   if (!存在其他暂停来源) PauseUnit(bossUnit, false);
   SetUnitInvulnerable(bossUnit, false);
   启动Boss战运行(bossUnit);

@@ -5,7 +5,7 @@ local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
 local ____01_FF0E_652F_7EBFNPC_914D_7F6E_8868 = require("系统.11．剧情系统.02．支线任务.01．支线NPC配置表")
-local NPC_CONFIGS = ____01_FF0E_652F_7EBFNPC_914D_7F6E_8868.NPC_CONFIGS
+local _____652F_7EBFNPC_914D_7F6E_5217_8868 = ____01_FF0E_652F_7EBFNPC_914D_7F6E_8868["支线NPC配置列表"]
 local ____02_FF0E_5267_60C5NPC_521B_5EFA = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
 local _____521B_5EFA_5267_60C5NPC_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情NPC单位"]
 local ____05_FF0ENPC_521D_59CB_5316_52A8_4F5C = require("系统.08．任务系统.00．配置表.05．NPC初始化动作")
@@ -37,14 +37,14 @@ local function registerCreatedNpcUnit(npcConfig, unit)
     if not unit then
         return
     end
-    if npcConfig.requireID ~= nil then
-        g_npcUnitByRequireId:set(npcConfig.requireID, unit)
+    if npcConfig["任务ID"] ~= nil then
+        g_npcUnitByRequireId:set(npcConfig["任务ID"], unit)
     end
-    if npcConfig.NpcNameID and npcConfig.NpcNameID ~= "" then
-        g_npcUnitByNpcNameId:set(npcConfig.NpcNameID, unit)
+    if npcConfig["NPC配置名"] and npcConfig["NPC配置名"] ~= "" then
+        g_npcUnitByNpcNameId:set(npcConfig["NPC配置名"], unit)
     end
-    if npcConfig.NPCrequireName and npcConfig.NPCrequireName ~= "" then
-        g_npcUnitByDisplayName:set(npcConfig.NPCrequireName, unit)
+    if npcConfig["NPC名称"] and npcConfig["NPC名称"] ~= "" then
+        g_npcUnitByDisplayName:set(npcConfig["NPC名称"], unit)
     end
 end
 local npcQuestMarkerNoModelQueue = {}
@@ -81,7 +81,7 @@ local function onNpcSetModelDelayed()
     end
 end
 local function scheduleTryAttachQuestMarker(unit, npcConfig)
-    if npcConfig.modelFIle then
+    if npcConfig["模型路径"] then
         npcQuestMarkerAfterModelQueue[#npcQuestMarkerAfterModelQueue + 1] = {unit = unit, npcConfig = npcConfig}
         addDelayedCallback(DELAY_QUEST_MARKER_AFTER_SET_MODEL * 1000, onNpcQuestMarkerAfterModelDelayed)
     else
@@ -94,25 +94,25 @@ local function scheduleSetUnitModel(unit, modelPath, npcLabel)
     addDelayedCallback(10, onNpcSetModelDelayed)
 end
 local function createSingleNPC(npcConfig)
-    if not npcConfig.unitcode or npcConfig.X == nil or npcConfig.Y == nil then
+    if not npcConfig["单位ID"] or npcConfig["坐标X"] == nil or npcConfig["坐标Y"] == nil then
         debugLog(
             nil,
             "NPC生成器",
             "配置不完整，跳过:",
-            tostring(npcConfig.NpcNameID)
+            tostring(npcConfig["NPC配置名"])
         )
         return nil
     end
-    local unitCode = npcConfig.unitcode
+    local unitCode = npcConfig["单位ID"]
     if #unitCode ~= 4 then
         debugLog(nil, "NPC生成器", "单位代码无效:", unitCode)
         return nil
     end
     local unit = _____521B_5EFA_5267_60C5NPC_5355_4F4D({
         ["单位ID"] = unitCode,
-        X = npcConfig.X,
-        Y = npcConfig.Y,
-        ["朝向"] = npcConfig.Facing or 270,
+        X = npcConfig["坐标X"],
+        Y = npcConfig["坐标Y"],
+        ["朝向"] = npcConfig["朝向"] or 270,
         ["登记死亡排泄"] = true
     })
     if not unit then
@@ -120,107 +120,107 @@ local function createSingleNPC(npcConfig)
             nil,
             "NPC生成器",
             "创建单位失败:",
-            tostring(npcConfig.NpcNameID),
+            tostring(npcConfig["NPC配置名"]),
             ("(" .. unitCode) .. ")"
         )
         return nil
     end
-    if npcConfig.modelFIle then
+    if npcConfig["模型路径"] then
         scheduleSetUnitModel(
             unit,
-            npcConfig.modelFIle,
-            tostring(npcConfig.NpcNameID)
+            npcConfig["模型路径"],
+            tostring(npcConfig["NPC配置名"])
         )
     end
-    runNpcInitAction(nil, unit, npcConfig.initAction)
+    runNpcInitAction(nil, unit, npcConfig["初始化动作"])
     scheduleTryAttachQuestMarker(unit, npcConfig)
     registerCreatedNpcUnit(npcConfig, unit)
     debugLog(
         nil,
         "NPC生成器",
         "成功创建NPC:",
-        tostring(npcConfig.NpcNameID),
+        tostring(npcConfig["NPC配置名"]),
         "at",
-        ((("(" .. tostring(npcConfig.X)) .. ", ") .. tostring(npcConfig.Y)) .. ")"
+        ((("(" .. tostring(npcConfig["坐标X"])) .. ", ") .. tostring(npcConfig["坐标Y"])) .. ")"
     )
     return unit
 end
-function ____exports.initializeNPCs()
+____exports["初始化NPC"] = function()
     debugLog(nil, "NPC生成器", "开始初始化NPC...")
     g_npcUnitByRequireId:clear()
     g_npcUnitByNpcNameId:clear()
     g_npcUnitByDisplayName:clear()
-    for ____, npcConfig in ipairs(NPC_CONFIGS) do
-        if npcConfig.enabled == true then
+    for ____, npcConfig in ipairs(_____652F_7EBFNPC_914D_7F6E_5217_8868) do
+        if npcConfig["启用"] == true and npcConfig["自动创建"] ~= false then
             createSingleNPC(npcConfig)
         end
     end
 end
-function ____exports.createNPCByName(npcName)
+____exports["按名称创建NPC"] = function(____NPC_540D_79F0)
     local npcConfig = __TS__ArrayFind(
-        NPC_CONFIGS,
-        function(____, npc) return npc.NpcNameID == npcName or npc.NPCrequireName == npcName end
+        _____652F_7EBFNPC_914D_7F6E_5217_8868,
+        function(____, npc) return npc["NPC配置名"] == ____NPC_540D_79F0 or npc["NPC名称"] == ____NPC_540D_79F0 end
     )
     if not npcConfig then
-        debugLog(nil, "NPC生成器", "未找到NPC配置:", npcName)
+        debugLog(nil, "NPC生成器", "未找到NPC配置:", ____NPC_540D_79F0)
         return nil
     end
-    if npcConfig.enabled ~= true then
-        debugLog(nil, "NPC生成器", "NPC未启用:", npcName)
+    if npcConfig["启用"] ~= true then
+        debugLog(nil, "NPC生成器", "NPC未启用:", ____NPC_540D_79F0)
         return nil
     end
     return createSingleNPC(npcConfig)
 end
-function ____exports.createNPCByQuestId(requireID)
+____exports["按任务ID创建NPC"] = function(_____4EFB_52A1ID)
     local npcConfig = __TS__ArrayFind(
-        NPC_CONFIGS,
-        function(____, npc) return npc.requireID == requireID end
+        _____652F_7EBFNPC_914D_7F6E_5217_8868,
+        function(____, npc) return npc["任务ID"] == _____4EFB_52A1ID end
     )
     if not npcConfig then
         debugLog(
             nil,
             "NPC生成器",
             "未找到任务ID对应的NPC:",
-            tostring(requireID)
+            tostring(_____4EFB_52A1ID)
         )
         return nil
     end
-    if npcConfig.enabled ~= true then
+    if npcConfig["启用"] ~= true then
         debugLog(
             nil,
             "NPC生成器",
             "NPC未启用:",
-            tostring(npcConfig.NpcNameID),
+            tostring(npcConfig["NPC配置名"]),
             "(任务ID:",
-            tostring(requireID) .. ")"
+            tostring(_____4EFB_52A1ID) .. ")"
         )
         return nil
     end
     return createSingleNPC(npcConfig)
 end
-function ____exports.getEnabledNPCs()
+____exports["获取已启用NPC配置"] = function()
     return __TS__ArrayFilter(
-        NPC_CONFIGS,
-        function(____, npc) return npc.enabled == true end
+        _____652F_7EBFNPC_914D_7F6E_5217_8868,
+        function(____, npc) return npc["启用"] == true end
     )
 end
-function ____exports.getAllNPCs()
-    return {table.unpack(NPC_CONFIGS)}
+____exports["获取全部NPC配置"] = function()
+    return {table.unpack(_____652F_7EBFNPC_914D_7F6E_5217_8868)}
 end
-function ____exports.findExistingNpcByRequireId(requireID)
-    local ____temp_2 = g_npcUnitByRequireId:get(requireID)
+____exports["按任务ID查找已创建NPC"] = function(_____4EFB_52A1ID)
+    local ____temp_2 = g_npcUnitByRequireId:get(_____4EFB_52A1ID)
     if ____temp_2 == nil then
         ____temp_2 = nil
     end
     return ____temp_2
 end
-function ____exports.findExistingNpcByName(npcName)
-    if not npcName then
+____exports["按名称查找已创建NPC"] = function(____NPC_540D_79F0)
+    if not ____NPC_540D_79F0 then
         return nil
     end
-    local ____temp_3 = g_npcUnitByNpcNameId:get(npcName)
+    local ____temp_3 = g_npcUnitByNpcNameId:get(____NPC_540D_79F0)
     if ____temp_3 == nil then
-        ____temp_3 = g_npcUnitByDisplayName:get(npcName)
+        ____temp_3 = g_npcUnitByDisplayName:get(____NPC_540D_79F0)
     end
     local ____temp_3_4 = ____temp_3
     if ____temp_3_4 == nil then
@@ -229,6 +229,6 @@ function ____exports.findExistingNpcByName(npcName)
     return ____temp_3_4
 end
 function ____exports.init()
-    ____exports.initializeNPCs()
+    ____exports["初始化NPC"]()
 end
 return ____exports

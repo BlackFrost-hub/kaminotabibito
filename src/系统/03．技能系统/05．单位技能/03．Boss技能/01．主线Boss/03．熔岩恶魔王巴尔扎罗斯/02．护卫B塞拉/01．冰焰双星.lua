@@ -110,7 +110,7 @@ local function _____7ED3_7B97_51B0_7130AOE(context, hitUnit, _____7C7B_578B)
                         weaponType = WEAPON_TYPE_WHOKNOWS,
                         ["标签"] = "塞拉-冰焰双星-火焰"
                     })
-                    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(unit, config["火球灼热层数"])
+                    _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(context, unit, config["火球灼热层数"])
                 end
             end
             ::__continue7::

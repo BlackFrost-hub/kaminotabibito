@@ -2,8 +2,10 @@
 
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
+import type { 剧情镜头预设参数 } from "../../00．剧情系统核心工具/12．剧情电影镜头";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
@@ -22,6 +24,8 @@ const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用
 };
 
 const ForGroup = jass.ForGroup as (this: void, whichGroup: any, callback: (this: void) => void) => void;
+const GetDestructableX = jass.GetDestructableX as (this: void, destructable: any) => number;
+const GetDestructableY = jass.GetDestructableY as (this: void, destructable: any) => number;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const Player = jass.Player as (this: void, playerId: number) => any;
@@ -29,6 +33,7 @@ const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facingA
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
 
 const 中立被动玩家ID = 15;
+const 王宫传送门封印特效 = "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl";
 
 export interface 王宫密室场景站位 {
   X: number;
@@ -53,6 +58,18 @@ export const 王宫密室场景站位表 = {
   里凡特密室门外: { X: 16102.0, Y: -24243.5, 朝向: 270 },
   耶提尔返回王宫: { X: 15947.6, Y: -24545.3, 朝向: 90 },
 } as const satisfies Record<string, 王宫密室场景站位>;
+
+export const 王宫密室对峙镜头预设: 剧情镜头预设参数 = {
+  X: 14646.39,
+  Y: -28294.6,
+  高度偏移: 220,
+  旋转角度: 110,
+  攻角: 324,
+  距离到目标: 2000,
+  滚动角度: 0,
+  观察区域: 70,
+  远景剪裁: 3000,
+};
 
 export const 王宫密室演出特效表 = {
   里科特进入传承密室: { 模型路径: "Common\\Effect\\Form\\Portal\\RicketSecretRoomShift.mdx", 持续秒: 3 },
@@ -116,6 +133,12 @@ export function 播放王宫密室演出特效(
 ): void {
   const 特效 = 王宫密室演出特效表[特效键];
   createTimedEffect(特效.模型路径, 站位.X, 站位.Y, 0, 特效.持续秒);
+}
+
+export function 播放王宫传送门封印特效(this: void): void {
+  const 传送门 = jglobals.gg_dest_B00K_5466;
+  if (传送门 == null || 传送门 === 0) return;
+  createTimedEffect(王宫传送门封印特效, GetDestructableX(传送门), GetDestructableY(传送门), 0, 1);
 }
 
 export function 移动玩家英雄组到王宫密室(this: void): void {

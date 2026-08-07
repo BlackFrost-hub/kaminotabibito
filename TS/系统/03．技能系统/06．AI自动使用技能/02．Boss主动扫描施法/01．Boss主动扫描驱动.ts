@@ -7,14 +7,16 @@ import { 英雄BossAI配置表 } from "../00．AI配置/04．英雄BossAI配置�
 import { 异界BossAI配置表 } from "../00．AI配置/05．异界BossAI配置表";
 import { 获取所有Boss自动技能启动上下文, 清理Boss自动技能启动上下文 } from "../03．Boss战启动桥接/01．Boss自动技能注册表";
 import { Boss自动施法是否开启 } from "../04．Boss自动施法开关";
+import { 设置单位技能壳普通提示 } from "../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
+import type { 单位技能壳提示配置 } from "../../00．技能模板+函数/02．通用函数/15．单位技能壳提示";
 
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
 const GetUnitState = jass.GetUnitState as (whichUnit: any, whichUnitState: number) => number;
-const IssueImmediateOrder = jass.IssueImmediateOrder as (whichUnit: any, order: string) => boolean;
-const IssuePointOrder = jass.IssuePointOrder as (whichUnit: any, order: string, x: number, y: number) => boolean;
-const IssueTargetOrder = jass.IssueTargetOrder as (whichUnit: any, order: string, targetWidget: any) => boolean;
+const IssueImmediateOrderById = jass.IssueImmediateOrderById as (whichUnit: any, orderId: number) => boolean;
+const IssuePointOrderById = jass.IssuePointOrderById as (whichUnit: any, orderId: number, x: number, y: number) => boolean;
+const IssueTargetOrderById = jass.IssueTargetOrderById as (whichUnit: any, orderId: number, targetWidget: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as number;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as number;
@@ -23,8 +25,12 @@ const { addPeriodicCallback, getServerTime } = require("系统.00．核心系统
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
   getServerTime: (this: void) => number;
 };
-const { 单位是否正在原生施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
+const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
+  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
+};
+const { 单位是否正在原生施法, 单位是否正在施法 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态") as {
   单位是否正在原生施法: (this: void, unit: any) => boolean;
+  单位是否正在施法: (this: void, unit: any) => boolean;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -36,11 +42,7 @@ const { SUC_IsUnitAlive, SUC_MatchBasicTarget } = require("lib.扩展函数.Star
   SUC_IsUnitAlive: (this: void, unit: any) => boolean;
   SUC_MatchBasicTarget: (this: void, target: any, source: any, wantEnemy: boolean) => boolean;
 };
-const { ObjectType } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
-  ObjectType: { ABILITY: number };
-};
-const { getObjectPropertySafe, YDWEDistanceBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  getObjectPropertySafe: (this: void, objectType: number, objectId: number | string, property: string) => string;
+const { YDWEDistanceBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWEDistanceBetweenUnitsSafe: (this: void, a: any, b: any) => number;
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -60,8 +62,12 @@ const platformAbilityApi = require("平台扩展API取值") as {
   技能_获取技能当前冷却时间: (this: void, 单位: any, 技能代码: number) => number;
   技能_获取技能施法距离: (this: void, 单位: any, 技能代码: number) => number;
   技能_获取技能施法范围: (this: void, 单位: any, 技能代码: number) => number;
+  技能_获取技能命令编号: (this: void, 单位: any, 技能代码: number) => number;
 };
-const { 技能_获取技能当前冷却时间, 技能_获取技能施法距离, 技能_获取技能施法范围 } = platformAbilityApi;
+const { 技能_获取技能当前冷却时间, 技能_获取技能施法距离, 技能_获取技能施法范围, 技能_获取技能命令编号 } = platformAbilityApi;
+const { 技能_设置技能冷却时间 } = require("平台扩展API动作") as {
+  技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
+};
 
 const 模块名 = "Boss主动扫描施法";
 const 默认扫描间隔毫秒 = 250;
@@ -70,10 +76,11 @@ const 默认公共施法间隔毫秒 = 1000;
 interface Boss主动运行状态 {
   下次检查时间: number;
   下次可施法时间: number;
+  树魔下次技能索引: number;
+  技能提示已初始化: boolean;
 }
 
 const Boss主动运行状态表: Record<number, Boss主动运行状态 | undefined> = {};
-const 技能命令缓存: Record<string, string | undefined> = {};
 const 技能能力ID缓存: Record<string, number | undefined> = {};
 const 技能施法距离缓存: Record<string, number | undefined> = {};
 const 技能施法范围缓存: Record<string, number | undefined> = {};
@@ -141,12 +148,12 @@ function 读取技能表数值(skillId: string, field: "Rng" | "Area"): number {
   return value;
 }
 
-function 读取技能命令字符串(skillId: string): string {
-  const cached = 技能命令缓存[skillId];
-  if (cached != null) return cached;
-  const value = getObjectPropertySafe(ObjectType.ABILITY, skillId, "Order") || "";
-  技能命令缓存[skillId] = value;
-  return value;
+function 读取技能命令编号(unit: any, skill: AI技能覆盖配置): number {
+  const skillId = skill.技能ID ?? "";
+  if (skillId === "") return 0;
+  const abilityId = 读取技能能力ID(skillId);
+  if (abilityId === 0) return 0;
+  return 技能_获取技能命令编号(unit, abilityId) || 0;
 }
 
 function 读取技能能力ID(skillId: string): number {
@@ -190,6 +197,8 @@ function 获取Boss主动运行状态(unit: any): Boss主动运行状态 {
     state = {
       下次检查时间: 0,
       下次可施法时间: 0,
+      树魔下次技能索引: 0,
+      技能提示已初始化: false,
     };
     Boss主动运行状态表[handleId] = state;
   }
@@ -266,6 +275,10 @@ function 是否满足技能释放条件(
   return true;
 }
 
+function 是树魔首领AI(this: void, 配置: 单位AI配置): boolean {
+  return 配置.AI配置ID === "树魔首领AI";
+}
+
 function 是否满足技能运行时可用条件(unit: any, 技能: AI技能覆盖配置): boolean {
   const 条件 = 技能.运行时可用条件;
   return 条件 == null || 条件(unit);
@@ -291,6 +304,51 @@ function 按单位获取Boss主动AI配置(unit: any): 单位AI配置 | undefine
   }
 
   return undefined;
+}
+
+function 初始化Boss技能提示(this: void, unit: any): void {
+  const 配置 = 按单位获取Boss主动AI配置(unit);
+  if (配置 == null) return;
+
+  const state = 获取Boss主动运行状态(unit);
+  if (state.技能提示已初始化) return;
+
+  const 技能列表 = 配置.技能覆盖 ?? [];
+  const 提示列表: 单位技能壳提示配置[] = [];
+  for (let i = 0; i < 技能列表.length; i++) {
+    const 技能 = 技能列表[i];
+    const 技能ID = 技能.技能ID;
+    if (技能ID == null || 技能ID.length < 4 || 技能.技能名 === "") continue;
+    提示列表.push({ 技能ID, 提示: 技能.技能名 });
+  }
+  设置单位技能壳普通提示(unit, 提示列表);
+  state.技能提示已初始化 = true;
+}
+
+function 读取Boss技能配置冷却秒(this: void, unit: any, 技能: AI技能覆盖配置): number {
+  const 动态读取器 = 技能.冷却秒读取器;
+  const 冷却秒 = 动态读取器 != null ? 动态读取器(unit) : 技能.冷却秒;
+  return 冷却秒 != null && 冷却秒 > 0 ? 冷却秒 : 0;
+}
+
+function onBoss通魔技能生效(this: void, castingUnit: any, spellAbilityId: number): void {
+  const 配置 = 按单位获取Boss主动AI配置(castingUnit);
+  if (配置 == null || spellAbilityId === 0) return;
+
+  const 技能列表 = 配置.技能覆盖 ?? [];
+  let 匹配技能: AI技能覆盖配置 | undefined;
+  for (let i = 0; i < 技能列表.length; i++) {
+    const 技能ID = 技能列表[i]?.技能ID;
+    if (技能ID != null && 技能ID !== "" && 读取技能能力ID(技能ID) === spellAbilityId) {
+      匹配技能 = 技能列表[i];
+      break;
+    }
+  }
+  if (匹配技能 == null) return;
+
+  const 配置冷却 = 读取Boss技能配置冷却秒(castingUnit, 匹配技能);
+  if (配置冷却 <= 0) return;
+  技能_设置技能冷却时间(castingUnit, spellAbilityId, 配置冷却, 配置冷却);
 }
 
 function 选择主动施法目标(
@@ -326,54 +384,57 @@ function 选择主动施法目标(
 function 执行技能下单(
   unit: any,
   技能: AI技能覆盖配置,
-  命令字符串: string,
+  命令ID: number,
   target: any | null
 ): boolean {
   const 施法目标类型 = 技能.施法目标类型 ?? "自动";
   if (施法目标类型 === "无目标") {
-    return IssueImmediateOrder(unit, 命令字符串) === true;
+    return IssueImmediateOrderById(unit, 命令ID) === true;
   }
 
   if (施法目标类型 === "自己") {
-    return IssueTargetOrder(unit, 命令字符串, unit) === true;
+    return IssueTargetOrderById(unit, 命令ID, unit) === true;
   }
 
   if (施法目标类型 === "单位") {
     if (target == null || target === 0) return false;
-    return IssueTargetOrder(unit, 命令字符串, target) === true;
+    return IssueTargetOrderById(unit, 命令ID, target) === true;
   }
 
   if (施法目标类型 === "点") {
     const pointTarget = target != null && target !== 0 ? target : unit;
     const x = jass.GetUnitX(pointTarget);
     const y = jass.GetUnitY(pointTarget);
-    return IssuePointOrder(unit, 命令字符串, x, y) === true;
+    return IssuePointOrderById(unit, 命令ID, x, y) === true;
   }
 
   if (施法目标类型 === "单位或点") {
     if (target != null && target !== 0) {
-      return IssueTargetOrder(unit, 命令字符串, target) === true;
+      return IssueTargetOrderById(unit, 命令ID, target) === true;
     }
     const x = jass.GetUnitX(unit);
     const y = jass.GetUnitY(unit);
-    return IssuePointOrder(unit, 命令字符串, x, y) === true;
+    return IssuePointOrderById(unit, 命令ID, x, y) === true;
   }
 
   if (target != null && target !== 0) {
-    return IssueTargetOrder(unit, 命令字符串, target) === true;
+    return IssueTargetOrderById(unit, 命令ID, target) === true;
   }
 
-  return IssueImmediateOrder(unit, 命令字符串) === true;
+  return IssueImmediateOrderById(unit, 命令ID) === true;
 }
 
 function 选择可施法技能(
   unit: any,
-  配置: 单位AI配置
-): { skill: AI技能覆盖配置; target: any | null; coolMs: number; range: number; area: number } | null {
+  配置: 单位AI配置,
+  起始技能索引?: number
+): { skill: AI技能覆盖配置; target: any | null; coolMs: number; range: number; area: number; 下次技能索引: number } | null {
+  const 按配置顺序轮换 = 起始技能索引 != null;
   const 技能列表 = (配置.技能覆盖 ?? [])
     .filter((skill) => skill != null && !skill.禁用 && skill.技能ID != null && skill.技能ID !== "")
-    .slice()
-    .sort((a, b) => {
+    .slice();
+  if (!按配置顺序轮换) {
+    技能列表.sort((a, b) => {
       const 权重A = a.权重 ?? 0;
       const 权重B = b.权重 ?? 0;
       if (权重A !== 权重B) return 权重B - 权重A;
@@ -381,16 +442,26 @@ function 选择可施法技能(
       const idB = b.技能ID ?? "";
       return idA < idB ? -1 : 1;
     });
+  }
+
+  let 实际起始索引 = 起始技能索引 ?? 0;
+  if (实际起始索引 < 0 || 实际起始索引 >= 技能列表.length) {
+    实际起始索引 = 0;
+  }
 
   for (let i = 0; i < 技能列表.length; i++) {
-    const skill = 技能列表[i];
+    const 技能索引 = (实际起始索引 + i) % 技能列表.length;
+    const skill = 技能列表[技能索引];
     const skillId = skill.技能ID as string;
     if (skillId == null || skillId === "") continue;
+    const abilityId = 读取技能能力ID(skillId);
+    const 技能等级 = abilityId === 0 ? 0 : jass.GetUnitAbilityLevel(unit, abilityId);
+    const coolMs = 读取技能当前冷却毫秒(unit, skillId);
+    const orderId = 读取技能命令编号(unit, skill);
+
     if (!是否满足技能运行时可用条件(unit, skill)) continue;
 
-    const abilityId = 读取技能能力ID(skillId);
-    if (abilityId === 0 || jass.GetUnitAbilityLevel(unit, abilityId) <= 0) continue;
-    const coolMs = 读取技能当前冷却毫秒(unit, skillId);
+    if (abilityId === 0 || 技能等级 <= 0) continue;
     if (coolMs > 0) continue;
 
     const range = skill.最大施法距离 ?? 读取技能实时施法距离(unit, skillId) ?? 配置.默认施法距离 ?? 1200;
@@ -403,10 +474,9 @@ function 选择可施法技能(
       if (target == null || target === 0) continue;
     }
 
-    const order = 读取技能命令字符串(skillId);
-    if (order === "") continue;
+    if (orderId === 0) continue;
 
-    return { skill, target, coolMs, range, area };
+    return { skill, target, coolMs, range, area, 下次技能索引: (技能索引 + 1) % 技能列表.length };
   }
 
   return null;
@@ -431,12 +501,13 @@ function 尝试驱动单个Boss(context: { Boss单位: any; 来源: string; 注�
   if (配置.AI模式 !== "固定技能表") {
     return;
   }
-  if (单位是否正在原生施法(unit)) {
+  if (单位是否正在原生施法(unit) || 单位是否正在施法(unit)) {
     return;
   }
 
   const now = getServerTime();
   const state = 获取Boss主动运行状态(unit);
+  const 是树魔首领 = 是树魔首领AI(配置);
   const 检查间隔 = 配置.检查间隔Ms ?? 默认扫描间隔毫秒;
   if (state.下次检查时间 > now) {
     return;
@@ -447,16 +518,27 @@ function 尝试驱动单个Boss(context: { Boss单位: any; 来源: string; 注�
     return;
   }
 
-  const 选择结果 = 选择可施法技能(unit, 配置);
+  const 选择结果 = 选择可施法技能(
+    unit,
+    配置,
+    是树魔首领 ? state.树魔下次技能索引 : undefined
+  );
   if (选择结果 == null) {
     return;
   }
 
-  const { skill, target, coolMs, range, area } = 选择结果;
-  const order = 读取技能命令字符串(skill.技能ID as string);
-  const 成功 = 执行技能下单(unit, skill, order, target);
+  const { skill, target, coolMs, range, area, 下次技能索引 } = 选择结果;
+  const orderId = 读取技能命令编号(unit, skill);
+  const 成功 = 执行技能下单(unit, skill, orderId, target);
   if (!成功) {
+    if (是树魔首领) {
+      state.树魔下次技能索引 = 下次技能索引;
+    }
     return;
+  }
+
+  if (是树魔首领) {
+    state.树魔下次技能索引 = 下次技能索引;
   }
 
   state.下次可施法时间 = now + (配置.公共施法间隔Ms ?? 默认公共施法间隔毫秒);
@@ -484,8 +566,11 @@ function 尝试驱动单个Boss(context: { Boss单位: any; 来源: string; 注�
 }
 
 function onBoss主动扫描Tick(this: void): void {
-  if (!Boss自动施法是否开启()) return;
   const contexts = 获取所有Boss自动技能启动上下文();
+  for (let i = 0; i < contexts.length; i++) {
+    初始化Boss技能提示(contexts[i].Boss单位);
+  }
+  if (!Boss自动施法是否开启()) return;
   for (let i = 0; i < contexts.length; i++) {
     尝试驱动单个Boss(contexts[i]);
   }
@@ -493,6 +578,7 @@ function onBoss主动扫描Tick(this: void): void {
 
 export function initBoss主动扫描施法(this: void): void {
   if (Boss主动扫描回调ID !== 0) return;
+  registerSpellEffectListener(onBoss通魔技能生效);
   Boss主动扫描回调ID = addPeriodicCallback(250, onBoss主动扫描Tick);
 }
 

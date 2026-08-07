@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
+import type { 巴尔扎罗斯运行时上下文 } from "./03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "./00．配置";
+import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -23,8 +25,9 @@ export function 获取巴尔扎罗斯灼热层数(this: void, target: any): numb
   return 限制灼热层数(runtime?.stack ?? 0);
 }
 
-export function 施加巴尔扎罗斯灼热(this: void, target: any, 层数: number, 持续秒: number = 灼热默认持续秒): void {
-  if (target == null || target === 0 || 层数 <= 0) return;
+export function 施加巴尔扎罗斯灼热(this: void, context: 巴尔扎罗斯运行时上下文, target: any, 层数: number, 持续秒: number = 灼热默认持续秒): void {
+  if (context == null || context.清理.已清理() || !单位有效(context.Boss单位)) return;
+  if (!单位有效(target) || 层数 <= 0) return;
   const nextStack = 限制灼热层数(获取巴尔扎罗斯灼热层数(target) + 层数);
   registerManualBuff(target, 巴尔扎罗斯单位技能配置.BuffID.灼热, 持续秒, nextStack, {
     stack: nextStack,

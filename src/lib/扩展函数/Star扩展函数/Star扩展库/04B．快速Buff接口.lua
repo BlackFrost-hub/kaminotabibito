@@ -334,7 +334,7 @@ end
 ____exports["SFB_施加通用Buff"] = function(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, ____Buff_7C7B_578B, _____6301_7EED_65F6_95F4)
     ____exports.SFB_setBuff(_____6765_6E90_5355_4F4D, _____76EE_6807_5355_4F4D, ____Buff_7C7B_578B, _____6301_7EED_65F6_95F4)
 end
-function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, effectSourceType)
+function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, effectSourceType, displayBuffID)
     if not SUC_IsValidUnit(u) or not (time > 0) then
         return
     end
@@ -389,7 +389,8 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, 
         time,
         ms,
         effectSourceName,
-        effectSourceType
+        effectSourceType,
+        displayBuffID
     )
     IssueTargetOrderById(caster, ORDER.SLOW, u)
 end

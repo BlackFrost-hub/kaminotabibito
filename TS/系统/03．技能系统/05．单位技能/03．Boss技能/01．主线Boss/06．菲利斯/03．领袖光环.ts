@@ -17,7 +17,6 @@ const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: number) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 
@@ -41,7 +40,6 @@ const { 技能_获取技能当前冷却时间 } = require("平台扩展API取值
   技能_获取技能当前冷却时间: (this: void, unit: any, abilityId: number) => number;
 };
 
-const 原生领袖光环技能ID = stringToFourCC("A0LQ");
 const 剑气灵斩技能ID = stringToFourCC(菲利斯数值与表现配置.剑气灵斩.技能槽位);
 const 攻击力属性ID = 1;
 let 领袖光环已注册 = false;
@@ -111,10 +109,6 @@ function 刷新单个领袖光环(this: void, context: 菲利斯运行时上下�
   注册领袖光环清理(context);
   if (!单位有效(boss)) return;
   const cfg = 菲利斯数值与表现配置.领袖光环;
-  if (!context.原生领袖光环已移除) {
-    UnitRemoveAbility(boss, 原生领袖光环技能ID);
-    context.原生领袖光环已移除 = true;
-  }
   const low = 生命比例(boss) < cfg.生命切换阈值;
   const wasLow = context.当前领袖光环低血;
   同步剑气灵斩低血冷却(context, low, wasLow);

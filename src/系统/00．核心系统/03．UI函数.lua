@@ -11,8 +11,10 @@ local isDialogActive = ____00_FF0E_5BF9_8BDD_6846_6E32_67D3_6838_5FC3.isDialogAc
 local setDialogFinishCallback = ____00_FF0E_5BF9_8BDD_6846_6E32_67D3_6838_5FC3.setDialogFinishCallback
 local ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548 = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效")
 local destroyBubbleEffect = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.destroyBubbleEffect
+local _____8BA9_5BF9_8BDDNPC_9762_5411_73A9_5BB6_5355_4F4D = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548["让对话NPC面向玩家单位"]
 local releaseNpcOccupation = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.releaseNpcOccupation
 local removeQuestMarkerAfterNpcTriggered = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.removeQuestMarkerAfterNpcTriggered
+local _____6062_590D_5BF9_8BDDNPC_914D_7F6E_671D_5411 = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548["恢复对话NPC配置朝向"]
 local scheduleBubbleEffectAfterOverheadClear = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.scheduleBubbleEffectAfterOverheadClear
 local scheduleGrayQuestMarkerAfterBubbleFade = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.scheduleGrayQuestMarkerAfterBubbleFade
 local scheduleYellowQuestMarkerAfterBubbleFade = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.scheduleYellowQuestMarkerAfterBubbleFade
@@ -56,6 +58,7 @@ function ____exports.openNpcDialog(self, p, data)
         setDialogNpcUnit(nil, p, data.npcUnit)
         local removedOverheadMarker = removeQuestMarkerAfterNpcTriggered(nil, data.npcUnit)
         local pid = jass.GetPlayerId(p)
+        _____8BA9_5BF9_8BDDNPC_9762_5411_73A9_5BB6_5355_4F4D(pid, data.npcUnit, data["对话目标单位"], data["NPC配置朝向"])
         --- 必须用配置位而非「本地是否拆掉过叹号」：各客户端本地头顶表可能不一致，会导致 qipao 分支不同 → desync
         local waitQipaoAfterOverheadClear = data.removeOverheadMarkerOnOpen == true
         if not shouldSkipNewBubbleSchedule(nil, pid, data.npcUnit) then
@@ -66,6 +69,7 @@ function ____exports.openNpcDialog(self, p, data)
             p,
             function()
                 local pid = jass.GetPlayerId(p)
+                _____6062_590D_5BF9_8BDDNPC_914D_7F6E_671D_5411(pid)
                 releaseNpcOccupation(nil, pid)
                 destroyBubbleEffect(nil, pid)
                 if data.applyGrayQuestMarkerAfterDialog == true and data.npcUnit then
@@ -73,6 +77,10 @@ function ____exports.openNpcDialog(self, p, data)
                 end
                 if data.restoreYellowQuestMarkerAfterDialog == true and data.npcUnit then
                     scheduleYellowQuestMarkerAfterBubbleFade(nil, data.npcUnit)
+                end
+                local _____5BF9_8BDD_7ED3_675F_56DE_8C03 = data.onFinish
+                if _____5BF9_8BDD_7ED3_675F_56DE_8C03 ~= nil then
+                    _____5BF9_8BDD_7ED3_675F_56DE_8C03()
                 end
             end
         )

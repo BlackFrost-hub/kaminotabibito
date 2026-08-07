@@ -19,12 +19,16 @@ local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_0.onTick10ms
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.index")
-local _____67E5_8BE2_5355_4F4D_53EF_663E_793A_62A4_76FE_503C = ____require_result_1["查询单位可显示护盾值"]
-local _____67E5_8BE2_5355_4F4D_62A4_76FE_5217_8868 = ____require_result_1["查询单位护盾列表"]
-local _____62A4_76FE_7C7B_578B = ____require_result_1["护盾类型"]
-local ____require_result_2 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterEnterRectSimple = ____require_result_2.TriggerRegisterEnterRectSimple
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．共享")
+local _____53EF_653B_51FB_6467_6BC1_5F39_5E55_5355_4F4D_7C7B_578B = ____require_result_2["可攻击摧毁弹幕单位类型"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.index")
+local _____67E5_8BE2_5355_4F4D_53EF_663E_793A_62A4_76FE_503C = ____require_result_3["查询单位可显示护盾值"]
+local _____67E5_8BE2_5355_4F4D_62A4_76FE_5217_8868 = ____require_result_3["查询单位护盾列表"]
+local _____62A4_76FE_7C7B_578B = ____require_result_3["护盾类型"]
+local ____require_result_4 = require("lib.扩展函数.BJ函数.01．触发与事件")
+local TriggerRegisterEnterRectSimple = ____require_result_4.TriggerRegisterEnterRectSimple
 local GetHandleId = jass.GetHandleId
 local GetWorldBounds = jass.GetWorldBounds
 local GetTriggerUnit = jass.GetTriggerUnit
@@ -38,6 +42,7 @@ local DestroyGroup = jass.DestroyGroup
 local IsUnitType = jass.IsUnitType
 local IsUnitEnemy = jass.IsUnitEnemy
 local GetLocalPlayer = jass.GetLocalPlayer
+local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetUnitState = jass.GetUnitState
 local GetUnitLevel = jass.GetUnitLevel
 local GetUnitName = jass.GetUnitName
@@ -62,6 +67,8 @@ local _____9B54_6CD5_72B6_6001 = jass.UNIT_STATE_MANA
 local _____6700_5927_9B54_6CD5_72B6_6001 = jass.UNIT_STATE_MAX_MANA
 local _____5355_4F4D_6B7B_4EA1_7C7B_578B = jass.UNIT_TYPE_DEAD
 local _____5355_4F4D_82F1_96C4_7C7B_578B = jass.UNIT_TYPE_HERO
+local _____5355_4F4D_53E4_6811_7C7B_578B = jass.UNIT_TYPE_ANCIENT
+local _____8757_866B_6280_80FDID = stringToFourCCSafe("Aloc")
 local _____5355_4F4D_8840_6761_8868 = __TS__New(Map)
 local _____5355_4F4DID_5217_8868 = {}
 local _____82F1_96C4_6B7B_4EA1_9690_85CF_8840_6761ID_96C6_5408 = __TS__New(Set)
@@ -107,7 +114,16 @@ local function _____5355_4F4D_5B58_6D3B(unit)
     return GetUnitState(unit, _____751F_547D_72B6_6001) > 0.405
 end
 local function _____5355_4F4D_53EF_6CE8_518C_8840_6761(unit)
-    return _____5355_4F4D_5B58_6D3B(unit)
+    if not _____5355_4F4D_5B58_6D3B(unit) then
+        return false
+    end
+    if GetUnitAbilityLevel(unit, _____8757_866B_6280_80FDID) > 0 then
+        return false
+    end
+    if IsUnitType(unit, _____5355_4F4D_53E4_6811_7C7B_578B) and GetUnitTypeId(unit) ~= _____53EF_653B_51FB_6467_6BC1_5F39_5E55_5355_4F4D_7C7B_578B then
+        return false
+    end
+    return true
 end
 local function _____52A0_5165_5F85_521B_5EFA_5355_4F4D(unit)
     if not _____5355_4F4D_53EF_6CE8_518C_8840_6761(unit) then
@@ -148,16 +164,16 @@ local function _____53BB_9664_9B54_517D_989C_8272_7801(text)
                     local next = __TS__StringCharAt(text, i + 1)
                     if next == "r" or next == "R" then
                         i = i + 1
-                        goto __continue24
+                        goto __continue27
                     end
                     if next == "c" or next == "C" then
                         i = i + 9
-                        goto __continue24
+                        goto __continue27
                     end
                 end
                 result = result .. ch
             end
-            ::__continue24::
+            ::__continue27::
             i = i + 1
         end
     end
@@ -269,15 +285,15 @@ local function _____5408_5E76_62A4_76FE_663E_793A_5206_6BB5(unit)
             do
                 local shield = list[i + 1]
                 if shield == nil or not shield["显示护盾条"] or not (shield["当前值"] > 0) then
-                    goto __continue55
+                    goto __continue58
                 end
                 local found = false
                 do
                     local j = 0
                     while j < #result do
                         if result[j + 1]["类型"] == shield["类型"] then
-                            local ____result_index_3, _____6570_503C_4 = result[j + 1], "数值"
-                            ____result_index_3[_____6570_503C_4] = ____result_index_3[_____6570_503C_4] + shield["当前值"]
+                            local ____result_index_5, _____6570_503C_6 = result[j + 1], "数值"
+                            ____result_index_5[_____6570_503C_6] = ____result_index_5[_____6570_503C_6] + shield["当前值"]
                             found = true
                             break
                         end
@@ -288,7 +304,7 @@ local function _____5408_5E76_62A4_76FE_663E_793A_5206_6BB5(unit)
                     result[#result + 1] = {["类型"] = shield["类型"], ["数值"] = shield["当前值"]}
                 end
             end
-            ::__continue55::
+            ::__continue58::
             i = i + 1
         end
     end
@@ -504,14 +520,14 @@ local function _____5904_7406_5F85_521B_5EFA_5355_4F4D()
                 _____5F85_521B_5EFA_5355_4F4DID_96C6_5408:delete(unitId)
             end
             if not _____5355_4F4D_53EF_6CE8_518C_8840_6761(unit) then
-                goto __continue94
+                goto __continue97
             end
             if unitId == 0 or _____5355_4F4D_8840_6761_8868:has(unitId) then
-                goto __continue94
+                goto __continue97
             end
             ____exports["注册单位头顶血条"](unit)
         end
-        ::__continue94::
+        ::__continue97::
     end
     if _____5F85_521B_5EFA_5355_4F4D_8BFB_53D6_7D22_5F15 >= #_____5F85_521B_5EFA_5355_4F4D_961F_5217 then
         __TS__ArraySetLength(_____5F85_521B_5EFA_5355_4F4D_961F_5217, 0)
@@ -536,7 +552,7 @@ local function _____5237_65B0_6240_6709_5355_4F4D_5934_9876_8840_6761()
                 local unitId = _____5355_4F4DID_5217_8868[i + 1]
                 local binding = _____5355_4F4D_8840_6761_8868:get(unitId)
                 if binding == nil then
-                    goto __continue103
+                    goto __continue106
                 end
                 if not _____5355_4F4D_5B58_6D3B(binding["单位"]) then
                     if binding["是否英雄"] and GetUnitTypeId(binding["单位"]) ~= 0 then
@@ -546,10 +562,10 @@ local function _____5237_65B0_6240_6709_5355_4F4D_5934_9876_8840_6761()
                         end
                         _____5355_4F4DID_5217_8868[writeIndex + 1] = unitId
                         writeIndex = writeIndex + 1
-                        goto __continue103
+                        goto __continue106
                     end
                     _____6CE8_9500_5355_4F4D_5934_9876_8840_6761(unitId)
-                    goto __continue103
+                    goto __continue106
                 end
                 _____5355_4F4DID_5217_8868[writeIndex + 1] = unitId
                 writeIndex = writeIndex + 1
@@ -561,7 +577,7 @@ local function _____5237_65B0_6240_6709_5355_4F4D_5934_9876_8840_6761()
                 _____9690_85CF_5355_4F4D_539F_751F_8840_6761(binding["单位"])
                 _____5237_65B0_751F_547D_9B54_6CD5(binding)
             end
-            ::__continue103::
+            ::__continue106::
             i = i + 1
         end
     end

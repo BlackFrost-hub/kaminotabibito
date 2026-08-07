@@ -62,8 +62,11 @@ const TriggerRegisterPlayerChatEvent = jass.TriggerRegisterPlayerChatEvent as (
   exactMatchOnly: boolean,
 ) => any;
 const TriggerRegisterPlayerEvent = jass.TriggerRegisterPlayerEvent as (this: void, trig: any, whichPlayer: any, whichPlayerEvent: any) => any;
+const IsUnitType = jass.IsUnitType as (this: void, whichUnit: any, whichType: any) => boolean;
+const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 
 const EVENT_PLAYER_END_CINEMATIC = jass.EVENT_PLAYER_END_CINEMATIC as any;
+const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET as number;
 const bj_QUESTMESSAGE_HINT = jglobals.bj_QUESTMESSAGE_HINT as number;
 const bj_QUESTMESSAGE_UPDATED = jglobals.bj_QUESTMESSAGE_UPDATED as number;
@@ -106,6 +109,21 @@ const 剧情延迟任务列表: 剧情延迟任务[] = [];
 let 剧情延迟任务扫描回调ID = 0;
 let 执行主线剧情动作函数: ((动作ID: string, 参数: 剧情动作参数表) => void) | undefined;
 
+const 第二三章友方NPC引用白名单: Record<string, true | undefined> = {
+  "主线NPC.阿莫斯": true,
+  "主线NPC.艾伦": true,
+  "主线NPC.赤尾": true,
+  "主线NPC.锻造区证人": true,
+  "主线NPC.恶魔城领主": true,
+  "主线NPC.菲尼克斯尔残响": true,
+  "主线NPC.赫克提尔": true,
+  "主线NPC.皇家禁卫": true,
+  "主线NPC.克林姆德王": true,
+  "主线NPC.里凡特": true,
+  "主线NPC.耶提尔": true,
+  "剧情运行时.封印核心奥斯特利一世": true,
+};
+
 export function 创建剧情播放器运行时(this: void): 剧情播放器运行时 {
   return { ...默认剧情播放器运行时 };
 }
@@ -134,8 +152,28 @@ function 安排下一步(this: void, delaySeconds: number): void {
   });
 }
 
+function 完成第二三章友方NPC归属收尾(this: void, 片段: 剧情片段配置 | undefined): void {
+  if (片段 == null) return;
+  const 是第二章 = 片段.片段ID.indexOf("elven_city_") === 0 || 片段.片段ID === "elven_forest_gate_arrival";
+  const 是第三章 = 片段.片段ID.indexOf("molten_realm_") === 0;
+  if (!是第二章 && !是第三章) return;
+
+  const 已处理引用: Record<string, true | undefined> = {};
+  for (let i = 0; i < 片段.步骤列表.length; i++) {
+    const 步骤 = 片段.步骤列表[i];
+    if (步骤.type !== "dialog") continue;
+    const 引用 = 步骤.说话者引用;
+    if (引用 == null || 第二三章友方NPC引用白名单[引用] !== true || 已处理引用[引用] === true) continue;
+    已处理引用[引用] = true;
+    const unit = 读取语义单位引用(引用);
+    if (unit == null || unit === 0 || IsUnitType(unit, UNIT_TYPE_DEAD) === true) continue;
+    SetUnitOwner(unit, Player(6), true);
+  }
+}
+
 function 结束当前剧情片段(this: void): void {
   const 片段ID = 剧情播放器运行时状态.当前片段ID ?? "";
+  const 已完成片段 = 当前片段;
   const 播放世代 = 剧情播放器运行时状态.播放世代;
   剧情播放器运行时状态.是否正在播放 = false;
   剧情播放器运行时状态.是否请求跳过 = false;
@@ -144,6 +182,7 @@ function 结束当前剧情片段(this: void): void {
   当前片段 = undefined;
   清理剧情延迟任务(播放世代);
   清理剧情ESC按键状态();
+  完成第二三章友方NPC归属收尾(已完成片段);
   执行剧情片段清理(片段ID);
   清理剧情运行时单位(当前剧情触发单位语义名);
   // 片段前置可能接管玩家英雄；正常结束和 Esc 跳过都必须释放该状态。
@@ -251,7 +290,7 @@ function 执行对白步骤(this: void, 步骤: 剧情步骤): void {
     const 说话者 = 步骤.说话者 ?? "系统";
     const 文本 = 步骤.文本;
     const 说话者单位 = 读取说话者单位(说话者, 步骤.说话者引用);
-    进入剧情电影模式();
+    if (步骤.原生对白自动开启电影模式 !== false) 进入剧情电影模式();
     TransmissionFromUnitWithNameBJ(
       GetPlayersAll(),
       说话者单位 != null && 说话者单位 !== 0 ? 说话者单位 : null,
@@ -518,7 +557,8 @@ export function 播放主线剧情片段(this: void, 片段ID: string, 上下文
 
 function on剧情ESC跳过(this: void): void {
   if (!剧情播放器运行时状态.是否正在播放 || 当前片段 == null) return;
-  if (当前片段.可Esc整段跳过 !== true) return;
+  const 当前步骤 = 当前片段.步骤列表[剧情播放器运行时状态.当前步骤索引];
+  if (当前步骤?.可跳过 === false || (当前片段.可Esc整段跳过 !== true && 当前步骤?.可跳过 !== true)) return;
 
   const player = GetTriggerPlayer();
   if (player == null || player === 0) return;

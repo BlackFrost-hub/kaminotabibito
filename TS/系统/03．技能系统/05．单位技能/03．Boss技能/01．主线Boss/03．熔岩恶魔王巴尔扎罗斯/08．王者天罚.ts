@@ -93,7 +93,7 @@ function 记录天罚玩家命中(this: void, context: 巴尔扎罗斯运行时�
   if (hid === 0) return;
   context.王者天罚命中记录[hid] = (context.王者天罚命中记录[hid] ?? 0) + 1;
   if (context.王者天罚命中记录[hid] >= 3) {
-    施加巴尔扎罗斯灼热(target, 巴尔扎罗斯技能数值配置.王者天罚.连续三波灼热层数);
+    施加巴尔扎罗斯灼热(context, target, 巴尔扎罗斯技能数值配置.王者天罚.连续三波灼热层数);
     context.王者天罚命中记录[hid] = 0;
   }
 }

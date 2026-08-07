@@ -1,7 +1,7 @@
 import { getObjectProperty, ObjectType } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
-import { DIALOG_NPC_CONFIGS, DialogNPCData } from "../../08．任务系统/00．配置表/01．对话配置表";
-import { NPC_CONFIGS, NPCData } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
-import { QUEST_CONFIGS, QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
+import { 对话NPC配置列表, 对话NPC配置 } from "../../08．任务系统/00．配置表/01．对话配置表";
+import { 支线NPC配置列表, 支线NPC配置 } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
+import { 任务配置列表, 任务配置 } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { questDB, QuestType, QuestStatus } from "../../08．任务系统/01．任务数据";
 import { fourCCToString } from "../../../lib/扩展函数/封装函数/01．通用工具/01．FourCC转换";
 
@@ -9,12 +9,12 @@ const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 
 // ========== 虚拟分区：奖励展示文案解析 ==========
-export function resolveRewardDisplayText(quest: Partial<QuestConfig> | null | undefined): string {
+export function resolveRewardDisplayText(quest: Partial<任务配置> | null | undefined): string {
   if (!quest) return "无";
-  if (quest.rewardDisplay && quest.rewardDisplay !== "") return quest.rewardDisplay;
+  if (quest.奖励显示 && quest.奖励显示 !== "") return quest.奖励显示;
 
-  const type = quest.type || "";
-  const reward = quest.reward || "";
+  const type = quest.类型 || "";
+  const reward = quest.奖励 || "";
 
   // 外部展示文案（与内部 reward 执行规则解耦）：不写死具体句子
   if (type === "给予" && reward.indexOf(":") >= 0) {
@@ -29,40 +29,40 @@ function normalizeRequireCount(count?: number): number {
 }
 
 // ========== 虚拟分区：任务配置注册到 questDB ==========
-export function ensureQuestConfigsRegistered(): void {
+export function 确保任务配置已注册(): void {
   const g = globalThis as any;
   if (g.__questConfigsRegistered) return;
   g.__questConfigsRegistered = true;
 
-  for (const cfg of QUEST_CONFIGS) {
-    if (cfg.enabled !== true) continue;
-    if (!cfg.requireID) continue;
-    const questId = cfg.requireID.toString();
+  for (const cfg of 任务配置列表) {
+    if (cfg.启用 !== true) continue;
+    if (!cfg.任务ID) continue;
+    const questId = cfg.任务ID.toString();
     if (questDB.getQuest(questId)) continue;
 
     let iconPath = "";
-    if (cfg.startNpc) {
-      const npcCfg = NPC_CONFIGS.find(n => n.NPCrequireName === cfg.startNpc || n.NpcNameID === cfg.startNpc);
-      if (npcCfg && npcCfg.unitcode) {
-        iconPath = getObjectProperty(ObjectType.UNIT, npcCfg.unitcode, "Art");
+    if (cfg.开始NPC) {
+      const npcCfg = 支线NPC配置列表.find(n => n.NPC名称 === cfg.开始NPC || n.NPC配置名 === cfg.开始NPC);
+      if (npcCfg && npcCfg.单位ID) {
+        iconPath = getObjectProperty(ObjectType.UNIT, npcCfg.单位ID, "Art");
       }
     }
 
     questDB.registerQuest({
       id: questId,
       type: QuestType.DAILY,
-      title: cfg.name || questId,
-      description: cfg.desc || cfg.name || "",
-      objectives: cfg.requireItem || cfg.targetUnit ? [{
+      title: cfg.名称 || questId,
+      description: cfg.描述 || cfg.名称 || "",
+      objectives: cfg.需求物品 || cfg.目标单位 ? [{
         id: "obj1",
-        description: cfg.desc || cfg.name || "",
+        description: cfg.描述 || cfg.名称 || "",
         current: 0,
-        required: normalizeRequireCount(cfg.requireCount),
+        required: normalizeRequireCount(cfg.需求数量),
         completed: false,
       }] : [],
       rewards: [{ type: "gold", value: 0, description: resolveRewardDisplayText(cfg) }],
       status: QuestStatus.UNDISCOVERED,
-      startNpc: cfg.startNpc,
+      startNpc: cfg.开始NPC,
       icon: iconPath || undefined,
       createdAt: 0,
       updatedAt: 0,
@@ -123,37 +123,37 @@ export function hasPlayerCompletedQuest(playerId: number, questId: string): bool
 }
 
 // ========== 虚拟分区：NPC/任务/对话配置查询 ==========
-export function findQuestByNpc(npcName: string): QuestConfig | undefined {
-  return QUEST_CONFIGS.find(quest => quest.enabled === true && quest.startNpc === npcName && quest.requireID);
+export function findQuestByNpc(npcName: string): 任务配置 | undefined {
+  return 任务配置列表.find(quest => quest.启用 === true && quest.开始NPC === npcName && quest.任务ID);
 }
 
-export function resolveQuestEndNpc(quest: QuestConfig): string {
-  const endNpc = quest.endNpc;
-  if (!endNpc || endNpc === "没有") return quest.startNpc || "";
+export function resolveQuestEndNpc(quest: 任务配置): string {
+  const endNpc = quest.结束NPC;
+  if (!endNpc || endNpc === "没有") return quest.开始NPC || "";
   return endNpc;
 }
 
-export function findAcceptedQuestBySubmitNpc(npcName: string, playerId: number): QuestConfig | undefined {
-  return QUEST_CONFIGS.find(quest => {
-    if (quest.enabled !== true) return false;
-    if (!quest.requireID) return false;
-    const questId = quest.requireID.toString();
+export function findAcceptedQuestBySubmitNpc(npcName: string, playerId: number): 任务配置 | undefined {
+  return 任务配置列表.find(quest => {
+    if (quest.启用 !== true) return false;
+    if (!quest.任务ID) return false;
+    const questId = quest.任务ID.toString();
     if (!hasPlayerAcceptedQuest(playerId, questId)) return false;
     return resolveQuestEndNpc(quest) === npcName;
   });
 }
 
-export function findDialogConfig(npcName: string): DialogNPCData | undefined {
-  return DIALOG_NPC_CONFIGS.find(config => config.NPC === npcName);
+export function findDialogConfig(npcName: string): 对话NPC配置 | undefined {
+  return 对话NPC配置列表.find(config => config.NPC名称 === npcName);
 }
 
-export function findEnabledNpcConfigBySelectedUnit(unit: any, unitName: string): NPCData | null {
+export function findEnabledNpcConfigBySelectedUnit(unit: any, unitName: string): 支线NPC配置 | null {
   if (!unit || !unitName) return null;
   const selectedUnitCode = fourCCToString(GetUnitTypeId(unit) as number);
-  for (const npc of NPC_CONFIGS) {
-    if (npc.enabled !== true) continue;
-    if (npc.unitcode && npc.unitcode !== selectedUnitCode) continue;
-    if (npc.NPCrequireName === unitName || npc.NpcNameID === unitName) return npc;
+  for (const npc of 支线NPC配置列表) {
+    if (npc.启用 !== true) continue;
+    if (npc.单位ID && npc.单位ID !== selectedUnitCode) continue;
+    if (npc.NPC名称 === unitName || npc.NPC配置名 === unitName) return npc;
   }
   return null;
 }

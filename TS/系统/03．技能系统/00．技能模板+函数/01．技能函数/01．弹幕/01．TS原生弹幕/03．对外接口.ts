@@ -6,6 +6,7 @@
 import type { 原生弹幕参数, 原生弹幕实例, 原生弹幕结束原因, 原生弹幕内部实例, 原生弹幕附加特效参数 } from "./00．类型";
 import {
   CreateUnit,
+  可攻击摧毁弹幕单位类型,
   默认弹幕单位类型,
   DzGetColor,
   DzSetEffectAnimation,
@@ -42,6 +43,9 @@ import { 创建弹幕命中规则状态, 重置弹幕命中规则状态 } from "
 import { 结束原生弹幕实例, 确保原生弹幕驱动 } from "./04．驱动/index";
 import { 确保弹幕死亡事件监听 } from "./05．死亡事件/index";
 
+const jass = require("jass.common") as any;
+const UNIT_TYPE_WARD = jass.UNIT_TYPE_WARD as any;
+
 const { 按英雄技能距离修正上下文修正距离 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index") as {
   按英雄技能距离修正上下文修正距离: (this: void, 基础距离: number, 上下文: any, 默认用途?: string) => number;
 };
@@ -72,7 +76,9 @@ function 解析弹幕方向(this: void, 参数: 原生弹幕参数): number {
 function 创建或取得弹幕单位(this: void, 参数: 原生弹幕参数, x: number, y: number, face: number): any {
   if (参数.载体模式 === "特效") return null;
   if (参数.弹幕单位 != null && 参数.弹幕单位 !== 0) return 参数.弹幕单位;
-  return CreateUnit(解析弹幕玩家(参数), 参数.弹幕单位类型 ?? 默认弹幕单位类型, x, y, face);
+  const unitType = 参数.弹幕单位类型
+    ?? (弹幕可被攻击摧毁(参数) ? 可攻击摧毁弹幕单位类型 : 默认弹幕单位类型);
+  return CreateUnit(解析弹幕玩家(参数), unitType, x, y, face);
 }
 
 function 激活非牛头人弹幕可选取(this: void, 实例: 原生弹幕内部实例): void {
@@ -88,7 +94,7 @@ function 激活非牛头人弹幕可选取(this: void, 实例: 原生弹幕内�
 }
 
 function 弹幕可被攻击摧毁(this: void, 参数: 原生弹幕参数): boolean {
-  return 参数.可被攻击摧毁 === true || 参数.可被摧毁 === true;
+  return 参数.可攻击摧毁 === true || 参数.可被攻击摧毁 === true || 参数.可被摧毁 === true;
 }
 
 function 限制弹幕特效颜色字节(this: void, value: number): number {
@@ -108,9 +114,15 @@ function 设置弹幕附加特效颜色(this: void, effect: any, 参数: 原生�
 }
 
 function 初始化弹幕单位类别(this: void, 参数: 原生弹幕参数, 弹幕单位: any): void {
-  // 物编默认已设置 ancient,mechanical,ward；这里为外部传入的弹幕单位补齐运行时分类。
-  UnitAddType(弹幕单位, UNIT_TYPE_ANCIENT);
-  UnitAddType(弹幕单位, UNIT_TYPE_MECHANICAL);
+  // 可攻击摧毁弹幕不保留任何单位分类，避免被技能目标过滤排除。
+  if (弹幕可被攻击摧毁(参数)) {
+    UnitRemoveType(弹幕单位, UNIT_TYPE_ANCIENT);
+    UnitRemoveType(弹幕单位, UNIT_TYPE_MECHANICAL);
+    UnitRemoveType(弹幕单位, UNIT_TYPE_WARD);
+  } else {
+    UnitAddType(弹幕单位, UNIT_TYPE_ANCIENT);
+    UnitAddType(弹幕单位, UNIT_TYPE_MECHANICAL);
+  }
 
   if (参数.不可阻挡 === true) {
     UnitAddType(弹幕单位, UNIT_TYPE_TAUREN);

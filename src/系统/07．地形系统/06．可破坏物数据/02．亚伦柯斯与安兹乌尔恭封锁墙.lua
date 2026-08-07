@@ -16,7 +16,7 @@ local Location = jass.Location
 local RemoveLocation = jass.RemoveLocation
 local GetUnitTypeId = jass.GetUnitTypeId
 local _____5C01_9501_5899_7269_7F16ID = stringToFourCCSafe("Dofw")
-local _____5C01_9501_5899_521B_5EFA_671D_5411 = 90
+local _____5C01_9501_5899_521B_5EFA_671D_5411 = 270
 local _____5C01_9501_5899_7F29_653E = 1
 local _____5C01_9501_5899_53D8_4F53 = 0
 local _____4E9A_4F26_67EF_65AF_5355_4F4DID = stringToFourCCSafe("U006")
@@ -24,6 +24,7 @@ local _____5B89_5179_4E4C_5C14_606D_5355_4F4DID = stringToFourCCSafe("U007")
 local _____5C01_9501_5899_5168_5C40_540D_8868 = {"gg_dest_Dofw_4579", "gg_dest_Dofw_4580", "gg_dest_Dofw_5037", "gg_dest_Dofw_5038"}
 local _____5C01_9501_5899_5750_6807_7F13_5B58
 local _____5DF2_521B_5EFA_5C01_9501_5899 = {}
+local _____4E9A_4F26_67EF_65AF_5893_5730_963B_6321_5168_5C40_540D = "gg_dest_Dofw_10481"
 local function _____53E5_67C4_6709_6548(handle)
     return handle ~= nil and handle ~= 0
 end
@@ -117,5 +118,14 @@ ____exports["清理亚伦柯斯安兹封锁墙"] = function(bossUnit)
         end
     end
     _____5DF2_521B_5EFA_5C01_9501_5899 = {}
+    if GetUnitTypeId(bossUnit) ~= _____4E9A_4F26_67EF_65AF_5355_4F4DID then
+        return
+    end
+    local _____5893_5730_963B_6321 = jglobals[_____4E9A_4F26_67EF_65AF_5893_5730_963B_6321_5168_5C40_540D]
+    if not _____53E5_67C4_6709_6548(_____5893_5730_963B_6321) then
+        return
+    end
+    RemoveDestructable(_____5893_5730_963B_6321)
+    jglobals[_____4E9A_4F26_67EF_65AF_5893_5730_963B_6321_5168_5C40_540D] = nil
 end
 return ____exports

@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB, _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B, _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807, _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2, _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5F00_59CB, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5B8C_6210, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_7ED3_675F, _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5, _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8, _____6811_9B54_5DEB_533B_6CBB_7597Tick, _____8FDB_5165_65E0_4ECE_66B4_6012, _____9000_51FA_65E0_4ECE_66B4_6012, _____6E05_9664_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_968F_4ECE_72B6_6001, GetUnitStateJapi, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimation, SetUnitAnimationByIndex, SetUnitTimeScale, GetUnitDefaultMoveSpeed, GetUnitState, AddSpecialEffectTarget, DestroyEffect, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____6811_9B54_9996_9886BuffID, SGSS_SetState, _____83B7_53D6Boss_62A4_536B_5217_8868, _____662F_5426_6307_5B9ABoss_62A4_536B, _____653B_51FB_529B_5C5E_6027ID, _____653B_901F_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868
+local _____53EC_5524_843D_70B9_5468_56F4_53EF_901A_884C, _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB, _____53D6_5355_4F4D_7F3A_8840_6BD4_4F8B, _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807, _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2, _____9762_5411_6811_9B54_5DEB_533B_6CBB_7597_76EE_6807, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5F00_59CB, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_5B8C_6210, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_7ED3_675F, _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5, _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8, _____6811_9B54_5DEB_533B_6CBB_7597Tick, _____8FDB_5165_65E0_4ECE_66B4_6012, _____9000_51FA_65E0_4ECE_66B4_6012, _____6E05_9664_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_517D_7FA4_653B_51FB_529B_52A0_6210, _____5237_65B0_968F_4ECE_72B6_6001, GetUnitStateJapi, GetUnitX, GetUnitY, SetUnitFacing, SetUnitAnimation, SetUnitAnimationByIndex, SetUnitTimeScale, GetUnitDefaultMoveSpeed, GetUnitState, AddSpecialEffectTarget, DestroyEffect, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, getServerTime, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____6811_9B54_9996_9886BuffID, SGSS_SetState, CosBJ, SinBJ, _____83B7_53D6Boss_62A4_536B_5217_8868, _____662F_5426_6307_5B9ABoss_62A4_536B, X_IsTerrainWalkableSafe, _____653B_51FB_529B_5C5E_6027ID, _____653B_901F_5C5E_6027ID, _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID, _____968F_4ECE_53EC_5524_843D_70B9_901A_884C_4F59_91CF, _____6811_9B54_5DEB_533B_6CBB_7597_5145_80FD_8BB0_5F55_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.00．配置")
 local _____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["树魔首领单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.05．树魔首领.01．运行时上下文")
@@ -30,6 +30,23 @@ local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技�
 local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.22．限次周期执行器")
 local _____521B_5EFA_5468_671F_884C_4E3A = ____22_FF0E_9650_6B21_5468_671F_6267_884C_5668["创建周期行为"]
+function _____53EC_5524_843D_70B9_5468_56F4_53EF_901A_884C(x, y)
+    if not X_IsTerrainWalkableSafe(x, y) then
+        return false
+    end
+    do
+        local angle = 0
+        while angle < 360 do
+            local checkX = x + CosBJ(angle) * _____968F_4ECE_53EC_5524_843D_70B9_901A_884C_4F59_91CF
+            local checkY = y + SinBJ(angle) * _____968F_4ECE_53EC_5524_843D_70B9_901A_884C_4F59_91CF
+            if not X_IsTerrainWalkableSafe(checkX, checkY) then
+                return false
+            end
+            angle = angle + 45
+        end
+    end
+    return true
+end
 function _____5C1D_8BD5_64AD_653E_6811_9B54_9996_9886_602A_53EB(boss, _____89E6_53D1_6982_7387_767E_5206_6BD4)
     local soundCfg = _____6811_9B54_9996_9886_97F3_6548_914D_7F6E
     _____5C1D_8BD5_64AD_653EBoss_62DF_58F0_6C60({
@@ -79,13 +96,13 @@ function _____9009_62E9_5DEB_533B_6CBB_7597_76EE_6807(context)
     if target ~= nil then
         return target
     end
-    local ____temp_10
+    local ____temp_12
     if bossMissingRatio > 0 then
-        ____temp_10 = boss
+        ____temp_12 = boss
     else
-        ____temp_10 = nil
+        ____temp_12 = nil
     end
-    return ____temp_10
+    return ____temp_12
 end
 function _____53D1_8D77_6811_9B54_5DEB_533B_7597_6CE2(context, witchDoctor)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
@@ -272,8 +289,8 @@ function _____5237_65B0_968F_4ECE_72B6_6001(context)
         return
     end
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
-    local ____self_15 = context["随从组"]
-    local count = ____self_15["取存活数量"](____self_15)
+    local ____self_17 = context["随从组"]
+    local count = ____self_17["取存活数量"](____self_17)
     context["当前随从数量"] = count
     context["当前兽群层数"] = count < cfg["兽群最高层数"] and count or cfg["兽群最高层数"]
     _____5237_65B0_517D_7FA4_653B_51FB_529B_52A0_6210(context)
@@ -329,15 +346,19 @@ _____6811_9B54_9996_9886BuffID = ____require_result_2["树魔首领BuffID"]
 local ____require_result_3 = require("lib.扩展函数.Star扩展函数.00．SGSS")
 SGSS_SetState = ____require_result_3.SGSS_SetState
 local ____require_result_4 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_4.CosBJ
-local SinBJ = ____require_result_4.SinBJ
+CosBJ = ____require_result_4.CosBJ
+SinBJ = ____require_result_4.SinBJ
 local ____require_result_5 = require("系统.01．单位系统.10．护卫系统.index")
 local _____521B_5EFA_62A4_536B_5355_4F4D = ____require_result_5["创建护卫单位"]
 _____83B7_53D6Boss_62A4_536B_5217_8868 = ____require_result_5["获取Boss护卫列表"]
 _____662F_5426_6307_5B9ABoss_62A4_536B = ____require_result_5["是否指定Boss护卫"]
 local _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B = ____require_result_5["处理Boss结束全部护卫"]
 local ____require_result_6 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
-local _____6D88_8D39_5267_60C5Boss_6218_5E26_5165_968F_4ECE = ____require_result_6["消费剧情Boss战带入随从"]
+local _____8BFB_53D6_5267_60C5Boss_6218_5E26_5165_968F_4ECE = ____require_result_6["读取剧情Boss战带入随从"]
+local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
+X_IsTerrainWalkableSafe = ____require_result_7.X_IsTerrainWalkableSafe
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
+local _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_8["沿角度步进直到地形阻挡"]
 _____653B_51FB_529B_5C5E_6027ID = 1
 _____653B_901F_5C5E_6027ID = 10
 _____53E0_52A0_79FB_52A8_901F_5EA6_5C5E_6027ID = 9
@@ -346,13 +367,27 @@ local _____730E_5934_8005_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_
 local _____5DEB_533B_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["召唤物ID"]["巫医"])
 local _____6295_63B7_8005_5355_4F4D_7C7B_578BID = stringToFourCC(_____6811_9B54_9996_9886_5355_4F4D_6280_80FD_914D_7F6E["召唤物ID"]["投掷者"])
 local _____6811_9B54_9996_9886_968F_4ECE_7279_6027_5DF2_6CE8_518C = false
+local _____968F_4ECE_53EC_5524_5019_9009_89D2_5EA6_504F_79FB = {
+    0,
+    30,
+    -30,
+    60,
+    -60,
+    90,
+    -90,
+    135,
+    -135,
+    180
+}
+local _____968F_4ECE_53EC_5524_5019_9009_8DDD_79BB_6BD4_4F8B = {1, 0.8, 0.6, 0.4}
+_____968F_4ECE_53EC_5524_843D_70B9_901A_884C_4F59_91CF = 96
 local function _____662F_6811_9B54_9996_9886(unit)
     return _____5355_4F4D_5B58_6D3B(unit) and GetUnitTypeId(unit) == _____6811_9B54_9996_9886_5355_4F4D_7C7B_578BID
 end
 local function _____7EDF_8BA1_6811_9B54_968F_4ECE(context)
     local result = {["猎头者"] = 0, ["巫医"] = 0, ["投掷者"] = 0}
-    local ____self_7 = context["随从组"]
-    local list = ____self_7["取单位列表"](____self_7)
+    local ____self_9 = context["随从组"]
+    local list = ____self_9["取单位列表"](____self_9)
     do
         local i = 0
         while i < #list do
@@ -377,34 +412,71 @@ local function _____7EDF_8BA1_6811_9B54_968F_4ECE(context)
     return result
 end
 local function _____767B_8BB0_5267_60C5_5E26_5165_6811_9B54_968F_4ECE(context)
-    local list = _____6D88_8D39_5267_60C5Boss_6218_5E26_5165_968F_4ECE(context["Boss单位"])
+    if context["剧情带入随从已登记"] then
+        return
+    end
+    local list = _____8BFB_53D6_5267_60C5Boss_6218_5E26_5165_968F_4ECE(context["Boss单位"])
+    if #list <= 0 then
+        return
+    end
     do
         local i = 0
         while i < #list do
             do
                 local minion = list[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(minion) then
-                    goto __continue12
+                    goto __continue14
                 end
-                local ____self_8 = context["随从组"]
-                ____self_8["登记"](____self_8, minion)
+                local ____self_10 = context["随从组"]
+                ____self_10["登记"](____self_10, minion)
                 if GetUnitTypeId(minion) == _____5DEB_533B_5355_4F4D_7C7B_578BID then
                     _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8(context, minion)
                 end
             end
-            ::__continue12::
+            ::__continue14::
             i = i + 1
         end
     end
+    context["剧情带入随从已登记"] = true
 end
 local function _____8BA1_7B97_968F_4ECE_53EC_5524_70B9(boss, _____7F16_5236, _____69FD_4F4D_5E8F_53F7)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
     local _____5C45_4E2D_69FD_4F4D = _____69FD_4F4D_5E8F_53F7 - (_____7F16_5236["数量"] - 1) * 0.5
-    local angle = GetUnitFacing(boss) + _____7F16_5236["相对Boss朝向角度"] + _____5C45_4E2D_69FD_4F4D * _____7F16_5236["槽位间隔角度"] + GetRandomReal(-cfg["召唤角度抖动"], cfg["召唤角度抖动"])
-    return {
-        x = GetUnitX(boss) + CosBJ(angle) * _____7F16_5236["召唤距离"],
-        y = GetUnitY(boss) + SinBJ(angle) * _____7F16_5236["召唤距离"]
-    }
+    local _____57FA_51C6_89D2_5EA6 = GetUnitFacing(boss) + _____7F16_5236["相对Boss朝向角度"] + _____5C45_4E2D_69FD_4F4D * _____7F16_5236["槽位间隔角度"] + GetRandomReal(-cfg["召唤角度抖动"], cfg["召唤角度抖动"])
+    local bossX = GetUnitX(boss)
+    local bossY = GetUnitY(boss)
+    do
+        local distanceIndex = 0
+        while distanceIndex < #_____968F_4ECE_53EC_5524_5019_9009_8DDD_79BB_6BD4_4F8B do
+            local distance = _____7F16_5236["召唤距离"] * _____968F_4ECE_53EC_5524_5019_9009_8DDD_79BB_6BD4_4F8B[distanceIndex + 1]
+            do
+                local angleIndex = 0
+                while angleIndex < #_____968F_4ECE_53EC_5524_5019_9009_89D2_5EA6_504F_79FB do
+                    do
+                        local angle = _____57FA_51C6_89D2_5EA6 + _____968F_4ECE_53EC_5524_5019_9009_89D2_5EA6_504F_79FB[angleIndex + 1]
+                        local result = _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321({
+                            ["起点X"] = bossX,
+                            ["起点Y"] = bossY,
+                            ["角度度"] = angle,
+                            ["单步距离"] = distance,
+                            ["步数"] = 1
+                        })
+                        if result["是否提前停止"] then
+                            goto __continue21
+                        end
+                        if not _____53EC_5524_843D_70B9_5468_56F4_53EF_901A_884C(result["最终X"], result["最终Y"]) then
+                            goto __continue21
+                        end
+                        return {x = result["最终X"], y = result["最终Y"]}
+                    end
+                    ::__continue21::
+                    angleIndex = angleIndex + 1
+                end
+            end
+            distanceIndex = distanceIndex + 1
+        end
+    end
+    return {x = bossX, y = bossY}
 end
 local function _____83B7_53D6_6811_9B54_968F_4ECE_62A4_536B_7C7B_578B(unitTypeId)
     if unitTypeId == _____730E_5934_8005_5355_4F4D_7C7B_578BID then
@@ -449,8 +521,8 @@ local function _____53EC_5524_6811_9B54_968F_4ECE(context, unitTypeId, _____7F16
     if minion == nil or minion == 0 then
         return nil
     end
-    local ____self_9 = context["随从组"]
-    ____self_9["登记"](____self_9, minion)
+    local ____self_11 = context["随从组"]
+    ____self_11["登记"](____self_11, minion)
     return minion
 end
 local function _____968F_673A_53D6_97F3_6548_8DEF_5F84(list)
@@ -468,20 +540,20 @@ ____exports["测试触发树魔巫医疗波"] = function(context)
     if target == nil or target == 0 then
         return false
     end
-    local ____self_11 = context["随从组"]
-    local list = ____self_11["取单位列表"](____self_11)
+    local ____self_13 = context["随从组"]
+    local list = ____self_13["取单位列表"](____self_13)
     do
         local i = 0
         while i < #list do
             do
                 local witchDoctor = list[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(witchDoctor) or GetUnitTypeId(witchDoctor) ~= _____5DEB_533B_5355_4F4D_7C7B_578BID then
-                    goto __continue62
+                    goto __continue75
                 end
                 _____542F_52A8_5DEB_533B_6CBB_7597_6CE2_65BD_6CD5(context, witchDoctor, target)
                 return true
             end
-            ::__continue62::
+            ::__continue75::
             i = i + 1
         end
     end
@@ -495,14 +567,14 @@ local function _____8865_5145_6307_5B9A_7C7B_578B_968F_4ECE(context, unitTypeId,
             do
                 local minion = _____53EC_5524_6811_9B54_968F_4ECE(context, unitTypeId, _____7F16_5236, i)
                 if minion == nil or minion == 0 then
-                    goto __continue66
+                    goto __continue79
                 end
                 created = created + 1
                 if unitTypeId == _____5DEB_533B_5355_4F4D_7C7B_578BID then
                     _____542F_52A8_5DEB_533B_6CBB_7597_9A71_52A8(context, minion)
                 end
             end
-            ::__continue66::
+            ::__continue79::
             i = i + 1
         end
     end
@@ -536,25 +608,25 @@ ____exports["初始化树魔首领随从特性"] = function(context)
     local cfg = _____6811_9B54_9996_9886_6570_503C_4E0E_8868_73B0_914D_7F6E["随从特性"]
     context["随从特性已初始化"] = true
     local boss = context["Boss单位"]
-    local ____self_12 = context["清理"]
-    ____self_12["登记清理"](
-        ____self_12,
+    local ____self_14 = context["清理"]
+    ____self_14["登记清理"](
+        ____self_14,
         "树魔首领-护卫登记清理",
         function()
             _____5904_7406Boss_7ED3_675F_5168_90E8_62A4_536B(boss)
         end
     )
-    local ____self_13 = context["清理"]
-    ____self_13["登记清理"](
-        ____self_13,
+    local ____self_15 = context["清理"]
+    ____self_15["登记清理"](
+        ____self_15,
         "树魔首领-兽群攻击力回滚",
         function()
             _____6E05_9664_517D_7FA4_653B_51FB_529B_52A0_6210(context)
         end
     )
-    local ____self_14 = context["清理"]
-    ____self_14["登记清理"](
-        ____self_14,
+    local ____self_16 = context["清理"]
+    ____self_16["登记清理"](
+        ____self_16,
         "树魔首领-无从暴怒清理",
         function()
             _____9000_51FA_65E0_4ECE_66B4_6012(context)

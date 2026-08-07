@@ -250,10 +250,11 @@ export function registerSfbManualBuff(
   time: number,
   effectValue: number,
   effectSourceName?: string,
-  effectSourceType?: "装备" | "技能"
+  effectSourceType?: "装备" | "技能",
+  displayBuffID?: string,
 ): void {
   if (!(time > 0)) return;
-  const buffID = SFB_BUFF_ID[id];
+  const buffID = displayBuffID != null && displayBuffID !== "" ? displayBuffID : SFB_BUFF_ID[id];
   if (buffID == null || buffID === "") return;
   registerManualBuff(u, buffID, time, effectValue, {
     sourceName: getUnitSourceName(sourceUnit, u),

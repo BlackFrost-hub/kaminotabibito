@@ -1,8 +1,10 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
+local _____5F39_5E55_53EF_88AB_653B_51FB_6467_6BC1
 local ____01_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．共享")
 local CreateUnit = ____01_FF0E_5171_4EAB.CreateUnit
+local _____53EF_653B_51FB_6467_6BC1_5F39_5E55_5355_4F4D_7C7B_578B = ____01_FF0E_5171_4EAB["可攻击摧毁弹幕单位类型"]
 local _____9ED8_8BA4_5F39_5E55_5355_4F4D_7C7B_578B = ____01_FF0E_5171_4EAB["默认弹幕单位类型"]
 local DzGetColor = ____01_FF0E_5171_4EAB.DzGetColor
 local DzSetEffectAnimation = ____01_FF0E_5171_4EAB.DzSetEffectAnimation
@@ -47,6 +49,9 @@ local _____7ED3_675F_539F_751F_5F39_5E55_5B9E_4F8B = ____index["结束原生弹�
 local _____786E_4FDD_539F_751F_5F39_5E55_9A71_52A8 = ____index["确保原生弹幕驱动"]
 local ____index = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.05．死亡事件.index")
 local _____786E_4FDD_5F39_5E55_6B7B_4EA1_4E8B_4EF6_76D1_542C = ____index["确保弹幕死亡事件监听"]
+function _____5F39_5E55_53EF_88AB_653B_51FB_6467_6BC1(_____53C2_6570)
+    return _____53C2_6570["可攻击摧毁"] == true or _____53C2_6570["可被攻击摧毁"] == true or _____53C2_6570["可被摧毁"] == true
+end
 ____exports["销毁原生弹幕"] = function(_____5F39_5E55ID, _____539F_56E0)
     if _____539F_56E0 == nil then
         _____539F_56E0 = "手动销毁"
@@ -89,6 +94,8 @@ ____exports["造成原生弹幕阻挡伤害"] = function(_____5F39_5E55ID, _____
     end
     return false
 end
+local jass = require("jass.common")
+local UNIT_TYPE_WARD = jass.UNIT_TYPE_WARD
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.11．技能属性修正.index")
 local _____6309_82F1_96C4_6280_80FD_8DDD_79BB_4FEE_6B63_4E0A_4E0B_6587_4FEE_6B63_8DDD_79BB = ____require_result_0["按英雄技能距离修正上下文修正距离"]
 local function _____89E3_6790_5F39_5E55_73A9_5BB6(_____53C2_6570)
@@ -134,9 +141,10 @@ local function _____521B_5EFA_6216_53D6_5F97_5F39_5E55_5355_4F4D(_____53C2_6570,
     if _____53C2_6570["弹幕单位"] ~= nil and _____53C2_6570["弹幕单位"] ~= 0 then
         return _____53C2_6570["弹幕单位"]
     end
+    local unitType = _____53C2_6570["弹幕单位类型"] or (_____5F39_5E55_53EF_88AB_653B_51FB_6467_6BC1(_____53C2_6570) and _____53EF_653B_51FB_6467_6BC1_5F39_5E55_5355_4F4D_7C7B_578B or _____9ED8_8BA4_5F39_5E55_5355_4F4D_7C7B_578B)
     return CreateUnit(
         _____89E3_6790_5F39_5E55_73A9_5BB6(_____53C2_6570),
-        _____53C2_6570["弹幕单位类型"] or _____9ED8_8BA4_5F39_5E55_5355_4F4D_7C7B_578B,
+        unitType,
         x,
         y,
         face
@@ -155,9 +163,6 @@ local function _____6FC0_6D3B_975E_725B_5934_4EBA_5F39_5E55_53EF_9009_53D6(_____
     SetUnitPosition(_____5B9E_4F8B["弹幕单位"], x, y)
     _____5B9E_4F8B["当前X"] = x
     _____5B9E_4F8B["当前Y"] = y
-end
-local function _____5F39_5E55_53EF_88AB_653B_51FB_6467_6BC1(_____53C2_6570)
-    return _____53C2_6570["可被攻击摧毁"] == true or _____53C2_6570["可被摧毁"] == true
 end
 local function _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(value)
     if value < 0 then
@@ -183,8 +188,14 @@ local function _____8BBE_7F6E_5F39_5E55_9644_52A0_7279_6548_989C_8272(effect, __
     )
 end
 local function _____521D_59CB_5316_5F39_5E55_5355_4F4D_7C7B_522B(_____53C2_6570, _____5F39_5E55_5355_4F4D)
-    UnitAddType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_ANCIENT)
-    UnitAddType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_MECHANICAL)
+    if _____5F39_5E55_53EF_88AB_653B_51FB_6467_6BC1(_____53C2_6570) then
+        UnitRemoveType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_ANCIENT)
+        UnitRemoveType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_MECHANICAL)
+        UnitRemoveType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_WARD)
+    else
+        UnitAddType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_ANCIENT)
+        UnitAddType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_MECHANICAL)
+    end
     if _____53C2_6570["不可阻挡"] == true then
         UnitAddType(_____5F39_5E55_5355_4F4D, UNIT_TYPE_TAUREN)
     else

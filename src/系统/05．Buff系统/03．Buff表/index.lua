@@ -11,6 +11,8 @@ local ____04_FF0E_5C5E_6027 = require("系统.05．Buff系统.03．Buff表.04．
 local _____5C5E_6027Buff_8868 = ____04_FF0E_5C5E_6027["属性Buff表"]
 local ____05_FF0E_5149_73AF = require("系统.05．Buff系统.03．Buff表.05．光环")
 local _____5149_73AFBuff_8868 = ____05_FF0E_5149_73AF["光环Buff表"]
+local ____04_FF0E_5355_4F4D = require("系统.05．Buff系统.03．Buff表.04．单位.index")
+local _____5355_4F4DBuff_8868 = ____04_FF0E_5355_4F4D["单位Buff表"]
 local ____01_FF0EBoss = require("系统.05．Buff系统.03．Buff表.01．Boss.index")
 local ____BossBuff_8868 = ____01_FF0EBoss["BossBuff表"]
 local ____02_FF0E_82F1_96C4 = require("系统.05．Buff系统.03．Buff表.02．英雄.index")
@@ -24,6 +26,7 @@ ____exports["分类Buff表"] = __TS__ObjectAssign(
     _____63A7_5236Buff_8868,
     _____5C5E_6027Buff_8868,
     _____5149_73AFBuff_8868,
+    _____5355_4F4DBuff_8868,
     ____BossBuff_8868,
     _____82F1_96C4Buff_8868,
     _____88C5_5907Buff_8868

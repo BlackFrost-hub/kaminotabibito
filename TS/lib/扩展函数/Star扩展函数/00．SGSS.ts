@@ -15,6 +15,8 @@ const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: numbe
 const IncUnitAbilityLevel = jass.IncUnitAbilityLevel as (unit: any, abilityId: number) => void;
 const DecUnitAbilityLevel = jass.DecUnitAbilityLevel as (unit: any, abilityId: number) => void;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
+const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const SetUnitStateJass = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitStateJapi = japi.SetUnitState as (unit: any, state: any, value: number) => void;
 const EXGetUnitAbility = japi.EXGetUnitAbility as (unit: any, abilityId: number) => any;
@@ -91,6 +93,7 @@ function setAbilityDataA(u: any, raw: string, value: number): void {
   if (!u || code === 0) return;
   if (GetUnitAbilityLevel(u, code) === 0) {
     UnitAddAbility(u, code);
+    if (GetUnitAbilityLevel(u, code) === 0) return;
   }
   const abil = EXGetUnitAbility(u, code);
   if (abil) EXSetAbilityDataReal(abil, 1, 108, value);
@@ -103,6 +106,7 @@ function setAbilityDataABC(u: any, raw: string, a: number, b: number, c: number)
   if (!u || code === 0) return;
   if (GetUnitAbilityLevel(u, code) === 0) {
     UnitAddAbility(u, code);
+    if (GetUnitAbilityLevel(u, code) === 0) return;
   }
   const abil = EXGetUnitAbility(u, code);
   if (abil) {
@@ -211,7 +215,12 @@ function setSight(u: any, v: number): void {
   saveReal(u, key, next);
 }
 
+function 单位可更新属性(this: void, u: any): boolean {
+  return u != null && u !== 0 && IsUnitType(u, UNIT_TYPE_DEAD) !== true;
+}
+
 export function SGSS_SetState(u: any, id: number, v: number): void {
+  if (!单位可更新属性(u)) return;
   if (id === 1) setAtk(u, v);
   else if (id === 2) setArmor(u, v);
   else if (id === 3) setState3(u, v, 0, 0);
@@ -226,6 +235,7 @@ export function SGSS_SetState(u: any, id: number, v: number): void {
 }
 
 export function SGSS_SetStatePercentumEX2(u: any, id: number, v: number): void {
+  if (!单位可更新属性(u)) return;
   const hpPct = sh("生命值百分比加成");
   const hpAdd = sh("生命值百分比加成增值");
   const mpPct = sh("法力值百分比加成");

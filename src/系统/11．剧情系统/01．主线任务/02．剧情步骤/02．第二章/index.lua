@@ -49,7 +49,7 @@ do
     end
 end
 do
-    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．第二章.25．猎魂试探")
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．第二章.25．巨魔猎头者拦路")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -57,7 +57,7 @@ do
     end
 end
 do
-    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．第二章.26．巨魔首领战前")
+    local ____export = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．第二章.26．树魔首领战前")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

@@ -72,6 +72,7 @@ const GetRectMinY = jass.GetRectMinY as (this: void, whichRect: any) => number;
 const GetRectMaxY = jass.GetRectMaxY as (this: void, whichRect: any) => number;
 const ShowUnit = jass.ShowUnit as (this: void, whichUnit: any, show: boolean) => void;
 const R2I = jass.R2I as (this: void, r: number) => number;
+const S2R = jass.S2R as (this: void, value: string) => number;
 const 中立敌对玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 中立被动玩家ID = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const 世界地图随机单位默认玩家ID = 中立被动玩家ID;
@@ -139,7 +140,10 @@ function 解析世界地图单位朝向(this: void, 配置: 世界地图单位�
   if (配置.朝向 === "随机") {
     return GetRandomDirectionDeg();
   }
-  return 配置.朝向;
+  if (typeof 配置.朝向 === "number") {
+    return 配置.朝向;
+  }
+  return S2R(配置.朝向);
 }
 
 function 解析世界地图单位玩家(this: void, 配置: 世界地图单位出生配置): any {

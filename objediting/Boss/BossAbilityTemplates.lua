@@ -145,10 +145,12 @@ end
 
 local noTargetChannelIds = {
   'AN00', 'AN01', 'AN02', 'AN03',
+  'AN04', 'AN05', 'AN06',
 }
 
 local noTargetChannelOrderIds = {
   'thunderclap', 'warstomp', 'roar', 'howlofterror',
+  'thunderclap', 'warstomp', 'roar',
 }
 
 for index, id in ipairs(noTargetChannelIds) do

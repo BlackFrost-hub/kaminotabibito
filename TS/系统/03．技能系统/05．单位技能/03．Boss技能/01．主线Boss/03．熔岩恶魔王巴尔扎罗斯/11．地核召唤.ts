@@ -83,7 +83,7 @@ function 地核叠加全场灼热(this: void, context: 巴尔扎罗斯运行时�
   const heroes = 获取Boss技能敌对英雄列表(boss);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
-    if (单位有效(hero)) 施加巴尔扎罗斯灼热(hero, 巴尔扎罗斯技能数值配置.地核召唤.Tick灼热层数);
+    if (单位有效(hero)) 施加巴尔扎罗斯灼热(context, hero, 巴尔扎罗斯技能数值配置.地核召唤.Tick灼热层数);
   }
 }
 

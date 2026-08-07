@@ -10,7 +10,7 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 
-import { NPC_CONFIGS, NPCData } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
+import { 支线NPC配置列表, 支线NPC配置 } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
 import { 创建剧情NPC单位 } from "../../11．剧情系统/00．公共/02．剧情NPC创建";
 import { runNpcInitAction } from "./05．NPC初始化动作";
 import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．对话框系统/09．NPC头顶与气泡特效";
@@ -38,21 +38,21 @@ const g_npcUnitByDisplayName = new Map<string, any>();
 const DELAY_QUEST_MARKER_NO_CUSTOM_MODEL = 0.01;
 const DELAY_QUEST_MARKER_AFTER_SET_MODEL = 0.02;
 
-function registerCreatedNpcUnit(npcConfig: NPCData, unit: any): void {
+function registerCreatedNpcUnit(npcConfig: 支线NPC配置, unit: any): void {
   if (!unit) return;
-  if (npcConfig.requireID != null) {
-    g_npcUnitByRequireId.set(npcConfig.requireID, unit);
+  if (npcConfig.任务ID != null) {
+    g_npcUnitByRequireId.set(npcConfig.任务ID, unit);
   }
-  if (npcConfig.NpcNameID && npcConfig.NpcNameID !== "") {
-    g_npcUnitByNpcNameId.set(npcConfig.NpcNameID, unit);
+  if (npcConfig.NPC配置名 && npcConfig.NPC配置名 !== "") {
+    g_npcUnitByNpcNameId.set(npcConfig.NPC配置名, unit);
   }
-  if (npcConfig.NPCrequireName && npcConfig.NPCrequireName !== "") {
-    g_npcUnitByDisplayName.set(npcConfig.NPCrequireName, unit);
+  if (npcConfig.NPC名称 && npcConfig.NPC名称 !== "") {
+    g_npcUnitByDisplayName.set(npcConfig.NPC名称, unit);
   }
 }
 
-const npcQuestMarkerNoModelQueue: Array<{ unit: any; npcConfig: NPCData }> = [];
-const npcQuestMarkerAfterModelQueue: Array<{ unit: any; npcConfig: NPCData }> = [];
+const npcQuestMarkerNoModelQueue: Array<{ unit: any; npcConfig: 支线NPC配置 }> = [];
+const npcQuestMarkerAfterModelQueue: Array<{ unit: any; npcConfig: 支线NPC配置 }> = [];
 const npcSetModelQueue: Array<{ unit: any; modelPath: string; npcLabel: string }> = [];
 
 function onNpcQuestMarkerNoModelDelayed(this: void): void {
@@ -76,8 +76,8 @@ function onNpcSetModelDelayed(this: void): void {
   }
 }
 
-function scheduleTryAttachQuestMarker(unit: any, npcConfig: NPCData): void {
-  if (npcConfig.modelFIle) {
+function scheduleTryAttachQuestMarker(unit: any, npcConfig: 支线NPC配置): void {
+  if (npcConfig.模型路径) {
     npcQuestMarkerAfterModelQueue.push({ unit, npcConfig });
     addDelayedCallback(DELAY_QUEST_MARKER_AFTER_SET_MODEL * 1000, onNpcQuestMarkerAfterModelDelayed);
   } else {
@@ -91,13 +91,13 @@ function scheduleSetUnitModel(unit: any, modelPath: string, npcLabel: string): v
   addDelayedCallback(10, onNpcSetModelDelayed);
 }
 
-function createSingleNPC(npcConfig: NPCData): any {
-  if (!npcConfig.unitcode || npcConfig.X == null || npcConfig.Y == null) {
-    debugLog("NPC生成器", "配置不完整，跳过:", tostring(npcConfig.NpcNameID));
+function createSingleNPC(npcConfig: 支线NPC配置): any {
+  if (!npcConfig.单位ID || npcConfig.坐标X == null || npcConfig.坐标Y == null) {
+    debugLog("NPC生成器", "配置不完整，跳过:", tostring(npcConfig.NPC配置名));
     return null;
   }
 
-  const unitCode = npcConfig.unitcode;
+  const unitCode = npcConfig.单位ID;
   if (unitCode.length !== 4) {
     debugLog("NPC生成器", "单位代码无效:", unitCode);
     return null;
@@ -105,92 +105,92 @@ function createSingleNPC(npcConfig: NPCData): any {
 
   const unit = 创建剧情NPC单位({
     单位ID: unitCode,
-    X: npcConfig.X,
-    Y: npcConfig.Y,
-    朝向: npcConfig.Facing ?? 270,
+    X: npcConfig.坐标X,
+    Y: npcConfig.坐标Y,
+    朝向: npcConfig.朝向 ?? 270,
     登记死亡排泄: true,
   });
   if (!unit) {
-    debugLog("NPC生成器", "创建单位失败:", tostring(npcConfig.NpcNameID), "(" + unitCode + ")");
+    debugLog("NPC生成器", "创建单位失败:", tostring(npcConfig.NPC配置名), "(" + unitCode + ")");
     return null;
   }
 
-  if (npcConfig.modelFIle) {
-    scheduleSetUnitModel(unit, npcConfig.modelFIle, tostring(npcConfig.NpcNameID));
+  if (npcConfig.模型路径) {
+    scheduleSetUnitModel(unit, npcConfig.模型路径, tostring(npcConfig.NPC配置名));
   }
 
-  runNpcInitAction(unit, npcConfig.initAction);
+  runNpcInitAction(unit, npcConfig.初始化动作);
   scheduleTryAttachQuestMarker(unit, npcConfig);
   registerCreatedNpcUnit(npcConfig, unit);
 
   debugLog(
     "NPC生成器",
     "成功创建NPC:",
-    tostring(npcConfig.NpcNameID),
+    tostring(npcConfig.NPC配置名),
     "at",
-    "(" + tostring(npcConfig.X) + ", " + tostring(npcConfig.Y) + ")"
+    "(" + tostring(npcConfig.坐标X) + ", " + tostring(npcConfig.坐标Y) + ")"
   );
   return unit;
 }
 
-export function initializeNPCs(): void {
+export function 初始化NPC(): void {
   debugLog("NPC生成器", "开始初始化NPC...");
   g_npcUnitByRequireId.clear();
   g_npcUnitByNpcNameId.clear();
   g_npcUnitByDisplayName.clear();
 
-  for (const npcConfig of NPC_CONFIGS) {
-    if (npcConfig.enabled === true) {
+  for (const npcConfig of 支线NPC配置列表) {
+    if (npcConfig.启用 === true && npcConfig.自动创建 !== false) {
       createSingleNPC(npcConfig);
     }
   }
 }
 
-export function createNPCByName(npcName: string): any {
-  const npcConfig = NPC_CONFIGS.find((npc) => npc.NpcNameID === npcName || npc.NPCrequireName === npcName);
+export function 按名称创建NPC(NPC名称: string): any {
+  const npcConfig = 支线NPC配置列表.find((npc) => npc.NPC配置名 === NPC名称 || npc.NPC名称 === NPC名称);
   if (!npcConfig) {
-    debugLog("NPC生成器", "未找到NPC配置:", npcName);
+    debugLog("NPC生成器", "未找到NPC配置:", NPC名称);
     return null;
   }
-  if (npcConfig.enabled !== true) {
-    debugLog("NPC生成器", "NPC未启用:", npcName);
+  if (npcConfig.启用 !== true) {
+    debugLog("NPC生成器", "NPC未启用:", NPC名称);
     return null;
   }
   return createSingleNPC(npcConfig);
 }
 
-export function createNPCByQuestId(requireID: number): any {
-  const npcConfig = NPC_CONFIGS.find((npc) => npc.requireID === requireID);
+export function 按任务ID创建NPC(任务ID: number): any {
+  const npcConfig = 支线NPC配置列表.find((npc) => npc.任务ID === 任务ID);
   if (!npcConfig) {
-    debugLog("NPC生成器", "未找到任务ID对应的NPC:", tostring(requireID));
+    debugLog("NPC生成器", "未找到任务ID对应的NPC:", tostring(任务ID));
     return null;
   }
-  if (npcConfig.enabled !== true) {
-    debugLog("NPC生成器", "NPC未启用:", tostring(npcConfig.NpcNameID), "(任务ID:", tostring(requireID) + ")");
+  if (npcConfig.启用 !== true) {
+    debugLog("NPC生成器", "NPC未启用:", tostring(npcConfig.NPC配置名), "(任务ID:", tostring(任务ID) + ")");
     return null;
   }
   return createSingleNPC(npcConfig);
 }
 
-export function getEnabledNPCs(): NPCData[] {
-  return NPC_CONFIGS.filter((npc) => npc.enabled === true);
+export function 获取已启用NPC配置(): 支线NPC配置[] {
+  return 支线NPC配置列表.filter((npc) => npc.启用 === true);
 }
 
-export function getAllNPCs(): NPCData[] {
-  return [...NPC_CONFIGS];
+export function 获取全部NPC配置(): 支线NPC配置[] {
+  return [...支线NPC配置列表];
 }
 
-export function findExistingNpcByRequireId(requireID: number): any {
-  return g_npcUnitByRequireId.get(requireID) ?? null;
+export function 按任务ID查找已创建NPC(任务ID: number): any {
+  return g_npcUnitByRequireId.get(任务ID) ?? null;
 }
 
-export function findExistingNpcByName(npcName: string): any {
-  if (!npcName) return null;
-  return g_npcUnitByNpcNameId.get(npcName) ?? g_npcUnitByDisplayName.get(npcName) ?? null;
+export function 按名称查找已创建NPC(NPC名称: string): any {
+  if (!NPC名称) return null;
+  return g_npcUnitByNpcNameId.get(NPC名称) ?? g_npcUnitByDisplayName.get(NPC名称) ?? null;
 }
 
 export function init(): void {
-  initializeNPCs();
+  初始化NPC();
 }
 
 export {};

@@ -1,12 +1,9 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____66F4_65B0_9B54_6CD5_663E_793A, _____9500_6BC1_83F2_5229_65AF_5F02_5F62_5316_533A_57DF, _____6E05_7406_83F2_5229_65AF_5F02_5F62_5316_533A_57DF, _____7ED3_675F_5F02_5F62_5316, _____5F02_5F62_5316Tick, _____542F_52A8_5F02_5F62_5316_72B6_6001, ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548, GetUnitStateJapi, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, DzSetUnitModel, _____8BBE_7F6EBoss_8840_6761_5934_50CF, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, getServerTime, registerManualBuff, getBuffRuntime, _____83F2_5229_65AFBuffID, _____5F00_59CB_7275_5F15, _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664, _____9B54_6CD5_589E_51CF, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5F02_5F62_5316_6280_80FDID, _____5F53_524D_5F02_5F62_5316_533A_57DF_8868
-local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
-local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
+local _____66F4_65B0_9B54_6CD5_663E_793A, _____9500_6BC1_83F2_5229_65AF_5F02_5F62_5316_533A_57DF, _____6E05_7406_83F2_5229_65AF_5F02_5F62_5316_533A_57DF, _____7ED3_675F_5F02_5F62_5316, _____5F02_5F62_5316Tick, _____542F_52A8_5F02_5F62_5316_72B6_6001, GetUnitStateJapi, GetHandleId, GetUnitX, GetUnitY, GetUnitState, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, DzSetUnitModel, _____8BBE_7F6EBoss_8840_6761_5934_50CF, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, getServerTime, registerManualBuff, getBuffRuntime, _____83F2_5229_65AFBuffID, _____5F00_59CB_7275_5F15, _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664, _____9B54_6CD5_589E_51CF, _____521B_5EFA_70B9_7279_6548, createUnitEffect, _____5F53_524D_5F02_5F62_5316_533A_57DF_8868
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
 local _____83B7_53D6_5168_90E8_83F2_5229_65AF_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取全部菲利斯上下文"]
-local _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建菲利斯上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.02．数值与表现配置")
 local _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["菲利斯数值与表现配置"]
 local _____83F2_5229_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["菲利斯音效配置"]
@@ -16,7 +13,6 @@ local ____08_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_83F2_5229_65AF_53F0_8BCD = ____08_FF0E_53F0_8BCD_64AD_653E["播放菲利斯台词"]
 local ____11_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.11．公共工具")
 local _____5355_4F4D_6709_6548 = ____11_FF0E_516C_5171_5DE5_5177["单位有效"]
-local stringToFourCC = ____11_FF0E_516C_5171_5DE5_5177.stringToFourCC
 local _____53D6_96BE_5EA6 = ____11_FF0E_516C_5171_5DE5_5177["取难度"]
 local _____8DDD_79BB_5E73_65B9XY = ____11_FF0E_516C_5171_5DE5_5177["距离平方XY"]
 local ____11_FF0E_6761_4EF6_4F24_5BB3_4FEE_6B63 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.11．条件伤害修正")
@@ -28,8 +24,6 @@ local _____521B_5EFA_5468_671F_884C_4E3A = ____22_FF0E_9650_6B21_5468_671F_6267_
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____5EF6_8FDF_64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["延迟播放Boss坐标音效"]
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 function _____66F4_65B0_9B54_6CD5_663E_793A(context)
     local boss = context["Boss单位"]
     local maxMana = GetUnitStateJapi(boss, UNIT_STATE_MAX_MANA)
@@ -116,7 +110,7 @@ function _____5F02_5F62_5316Tick(context)
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue41
+                    goto __continue42
                 end
                 local distance2 = _____8DDD_79BB_5E73_65B9XY(
                     GetUnitX(boss),
@@ -153,7 +147,7 @@ function _____5F02_5F62_5316Tick(context)
                     })
                 end
             end
-            ::__continue41::
+            ::__continue42::
             i = i + 1
         end
     end
@@ -166,6 +160,7 @@ function _____542F_52A8_5F02_5F62_5316_72B6_6001(context)
     local y = GetUnitY(boss)
     context["当前魔法充能"] = 0
     _____66F4_65B0_9B54_6CD5_663E_793A(context)
+    context["异形化准备中"] = false
     context["异形化中"] = true
     context["异形化结束Ms"] = getServerTime() + cfg["持续秒"] * 1000
     registerManualBuff(
@@ -256,10 +251,10 @@ ____exports["释放菲利斯异形化"] = function(context)
         return
     end
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]
-    local available = context["当前魔法充能"] > GetUnitState(boss, UNIT_STATE_MANA) and context["当前魔法充能"] or GetUnitState(boss, UNIT_STATE_MANA)
-    if available < cfg["魔法阈值"] or context["异形化中"] then
+    if context["当前魔法充能"] < cfg["魔法阈值"] or context["异形化中"] or context["异形化准备中"] then
         return
     end
+    context["异形化准备中"] = true
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
         ["施法者"] = boss,
         ["目标X"] = GetUnitX(boss),
@@ -282,23 +277,9 @@ ____exports["释放菲利斯异形化"] = function(context)
         end
     })
 end
-function ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548(castingUnit, spellAbilityId)
-    if spellAbilityId ~= _____5F02_5F62_5316_6280_80FDID then
-        return
-    end
-    if not _____5355_4F4D_6709_6548(castingUnit) or GetUnitTypeId(castingUnit) ~= _____83F2_5229_65AF_5355_4F4D_7C7B_578BID then
-        return
-    end
-    local context = _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587(castingUnit)
-    if context == nil then
-        return
-    end
-    ____exports["释放菲利斯异形化"](context)
-end
 local jass = require("jass.common")
 local japi = require("jass.japi")
 GetUnitStateJapi = japi.GetUnitState
-GetUnitTypeId = jass.GetUnitTypeId
 GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -331,8 +312,6 @@ _____9B54_6CD5_589E_51CF = ____require_result_9["魔法增减"]
 local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
 createUnitEffect = ____require_result_10.createUnitEffect
-_____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
-_____5F02_5F62_5316_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]["技能槽位"])
 _____5F53_524D_5F02_5F62_5316_533A_57DF_8868 = {}
 local _____5F02_5F62_5316_5DF2_6CE8_518C = false
 local _____5F02_5F62_5316_4F24_5BB3_76D1_542C_5DF2_6CE8_518C = false
@@ -345,6 +324,9 @@ local function _____7D2F_8BA1_5F02_5F62_5316_9B54_6CD5(context, amount)
         context["当前魔法充能"] = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]["魔法阈值"]
     end
     _____66F4_65B0_9B54_6CD5_663E_793A(context)
+    if context["当前魔法充能"] >= _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]["魔法阈值"] then
+        ____exports["释放菲利斯异形化"](context)
+    end
 end
 local function ____on_83F2_5229_65AF_6700_7EC8_4F24_5BB3_5145_80FD(_target, attacker, applied)
     if not (applied > 0) or not _____5355_4F4D_6709_6548(attacker) then
@@ -357,7 +339,7 @@ local function ____on_83F2_5229_65AF_6700_7EC8_4F24_5BB3_5145_80FD(_target, atta
             do
                 local context = contexts[i + 1]
                 if context["Boss单位"] ~= attacker then
-                    goto __continue10
+                    goto __continue11
                 end
                 local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["异形化"]
                 _____7D2F_8BA1_5F02_5F62_5316_9B54_6CD5(
@@ -366,7 +348,7 @@ local function ____on_83F2_5229_65AF_6700_7EC8_4F24_5BB3_5145_80FD(_target, atta
                 )
                 return
             end
-            ::__continue10::
+            ::__continue11::
             i = i + 1
         end
     end
@@ -383,11 +365,11 @@ local function _____5F02_5F62_5316_4F24_5BB3_4FEE_6B63(damageContext)
             do
                 local context = list[i + 1]
                 if not context["异形化中"] or getServerTime() >= context["异形化结束Ms"] then
-                    goto __continue15
+                    goto __continue16
                 end
                 local boss = context["Boss单位"]
                 if not _____5355_4F4D_6709_6548(boss) then
-                    goto __continue15
+                    goto __continue16
                 end
                 if damageContext.attacker == boss then
                     return damageContext.currentDamage * (1 + cfg["造成和受到伤害提高"])
@@ -399,7 +381,7 @@ local function _____5F02_5F62_5316_4F24_5BB3_4FEE_6B63(damageContext)
                     return damageContext.currentDamage * (1 + cfg["造成和受到伤害提高"])
                 end
             end
-            ::__continue15::
+            ::__continue16::
             i = i + 1
         end
     end
@@ -417,17 +399,17 @@ local function _____6EE1_8DB3_5F02_5F62_5316_4F24_5BB3_6761_4EF6(damageContext)
             do
                 local context = list[i + 1]
                 if not context["异形化中"] or now >= context["异形化结束Ms"] then
-                    goto __continue24
+                    goto __continue25
                 end
                 local boss = context["Boss单位"]
                 if not _____5355_4F4D_6709_6548(boss) then
-                    goto __continue24
+                    goto __continue25
                 end
                 if damageContext.attacker == boss or damageContext.target == boss then
                     return true
                 end
             end
-            ::__continue24::
+            ::__continue25::
             i = i + 1
         end
     end
@@ -443,14 +425,10 @@ ____exports["注册菲利斯异形化"] = function()
         return
     end
     _____5F02_5F62_5316_5DF2_6CE8_518C = true
-    _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
-        ["名称"] = "07．异形化",
-        ["单位类型ID"] = _____83F2_5229_65AF_5355_4F4D_7C7B_578BID,
-        ["技能ID"] = _____5F02_5F62_5316_6280_80FDID,
-        ["获取或创建上下文"] = _____83B7_53D6_6216_521B_5EFA_83F2_5229_65AF_4E0A_4E0B_6587,
-        ["释放技能"] = function(_context, boss)
-            ____on_83F2_5229_65AF_5F02_5F62_5316_751F_6548(boss, _____5F02_5F62_5316_6280_80FDID)
-        end
-    })
+end
+____exports["初始化菲利斯异形化充能"] = function(context)
+    context["当前魔法充能"] = 0
+    context["异形化准备中"] = false
+    _____66F4_65B0_9B54_6CD5_663E_793A(context)
 end
 return ____exports

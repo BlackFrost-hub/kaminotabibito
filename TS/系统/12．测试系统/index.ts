@@ -21,6 +21,11 @@ const ENABLE_TREE_LORD_BOSS_SKILL_TEST = true;
 const ENABLE_AINZ_BOSS_SKILL_TEST = true;
 const ENABLE_SHALLTEAR_BOSS_SKILL_TEST = true;
 const ENABLE_ARONKOS_BOSS_SKILL_TEST = true;
+const ENABLE_OGRE_BOSS_SKILL_TEST = true;
+const ENABLE_GOBLIN_PRIEST_BOSS_SKILL_TEST = true;
+const ENABLE_LIR_BOSS_SKILL_TEST = true;
+const ENABLE_MASKED_SWORDSMAN_BOSS_SKILL_TEST = true;
+const ENABLE_MASKED_SCHOLAR_BOSS_SKILL_TEST = true;
 const ENABLE_ANCESTRAL_TWIN_GUARDS_BOSS_SKILL_TEST = true;
 const ENABLE_LATER_BOSS_SKILL_TEST = true;
 const ENABLE_PASSIVE_ITEM_COOLDOWN_UI_TEST = true;
@@ -30,6 +35,10 @@ const ENABLE_BONE_SPEAR_EFFECT_TEST = true;
 const ENABLE_BOSS_3D_SOUND_TEST = true;
 const ENABLE_SERA_BARE_CREATE_TEST = true;
 const ENABLE_MAIN_PROGRESS_TEST = true;
+const ENABLE_FULL_MAP_DYNAMIC_BGM_TEST = true;
+const ENABLE_EXILED_WATER_MONSTER_ENTRY_TEST = true;
+const ENABLE_MORTES_ENTRY_REQUIREMENT_TEST = true;
+const ENABLE_SEAL_GUARD_ENEMY_SKILL_TEST = true;
 
 function loadTests(): void {
   // 主线进度指令作为独立调试入口保留，避免打开总开关时连带启动其他测试。
@@ -38,6 +47,10 @@ function loadTests(): void {
   }
 
   if (!测试系统总开关) return;
+
+  if (ENABLE_FULL_MAP_DYNAMIC_BGM_TEST) {
+    require("系统.12．测试系统.21．全图动态BGM测试");
+  }
 
   if (ENABLE_STES_EVENT_TEST) {
     require("系统.12．测试系统.STES事件测试");
@@ -99,6 +112,26 @@ function loadTests(): void {
     require("系统.12．测试系统.01．Boss测试.01．主线Boss.06．亚伦柯斯Boss技能测试");
   }
 
+  if (ENABLE_OGRE_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.01．Boss测试.01．主线Boss.08．食人魔Boss技能测试");
+  }
+
+  if (ENABLE_GOBLIN_PRIEST_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.01．Boss测试.01．主线Boss.09．地精祭祀Boss技能测试");
+  }
+
+  if (ENABLE_LIR_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.01．Boss测试.01．主线Boss.10．利尔伯特Boss技能测试");
+  }
+
+  if (ENABLE_MASKED_SWORDSMAN_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.01．Boss测试.01．主线Boss.11．教派剑士Boss技能测试");
+  }
+
+  if (ENABLE_MASKED_SCHOLAR_BOSS_SKILL_TEST) {
+    require("系统.12．测试系统.01．Boss测试.01．主线Boss.12．教派学者Boss技能测试");
+  }
+
   if (ENABLE_ANCESTRAL_TWIN_GUARDS_BOSS_SKILL_TEST) {
     require("系统.12．测试系统.01．Boss测试.02．挑战与隐藏Boss.05．祖地双灵卫Boss技能测试");
   }
@@ -133,6 +166,18 @@ function loadTests(): void {
 
   if (ENABLE_SERA_BARE_CREATE_TEST) {
     require("系统.12．测试系统.18．塞拉裸创建测试");
+  }
+
+  if (ENABLE_EXILED_WATER_MONSTER_ENTRY_TEST) {
+    require("系统.12．测试系统.22．被驱逐的水怪入口测试");
+  }
+
+  if (ENABLE_MORTES_ENTRY_REQUIREMENT_TEST) {
+    require("系统.12．测试系统.23．莫特斯进入条件测试");
+  }
+
+  if (ENABLE_SEAL_GUARD_ENEMY_SKILL_TEST) {
+    require("系统.12．测试系统.24．封印守卫战敌人技能测试");
   }
 
 }

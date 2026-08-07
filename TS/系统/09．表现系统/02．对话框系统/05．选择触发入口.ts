@@ -8,7 +8,7 @@ const ____selectionCenter = require("系统.00．核心系统.01．事件中心.
   addSelectionListener?: (listener: (player: any, playerId: number, unit: any, isSelected: boolean) => void) => void;
 };
 
-import { ensureQuestConfigsRegistered, hasPlayerAcceptedQuest, hasPlayerCompletedQuest } from "./03．任务状态";
+import { 确保任务配置已注册, hasPlayerAcceptedQuest, hasPlayerCompletedQuest } from "./03．任务状态";
 import {
   findAcceptedQuestBySubmitNpc,
   findEnabledNpcConfigBySelectedUnit,
@@ -33,10 +33,10 @@ function registerDialogSelectionListener(): void {
 }
 
 function resolveNpcDialogName(npcConfig: any): string {
-  if (npcConfig.NPCrequireName != null && npcConfig.NPCrequireName !== "") {
-    return npcConfig.NPCrequireName;
+  if (npcConfig.NPC名称 != null && npcConfig.NPC名称 !== "") {
+    return npcConfig.NPC名称;
   }
-  return npcConfig.NpcNameID || "";
+  return npcConfig.NPC配置名 || "";
 }
 
 function openDialogForConfiguredNpc(triggerPlayer: any, npcConfig: any, npcUnit: any): void {
@@ -51,36 +51,41 @@ function openDialogForConfiguredNpc(triggerPlayer: any, npcConfig: any, npcUnit:
 
   const npcName = resolveNpcDialogName(npcConfig);
   if (npcName === "") return;
+  const 对话NPC上下文 = {
+    npcUnit,
+    对话目标单位: hero,
+    NPC配置朝向: npcConfig.朝向,
+  };
 
   const acceptedQuest = findAcceptedQuestBySubmitNpc(npcName, playerId);
-  if (acceptedQuest && acceptedQuest.requireID) {
-    const acceptedDialog = buildQuestInProgressDialog(acceptedQuest, npcName, playerId, npcUnit);
-    openNpcDialog(triggerPlayer, { ...acceptedDialog, npcUnit });
+  if (acceptedQuest && acceptedQuest.任务ID) {
+    const acceptedDialog = buildQuestInProgressDialog(acceptedQuest, npcName, playerId, npcUnit, hero, npcConfig.朝向);
+    openNpcDialog(triggerPlayer, { ...acceptedDialog, ...对话NPC上下文 });
     return;
   }
 
   const quest = findQuestByNpc(npcName);
-  if (quest && quest.requireID) {
-    const questIdStr = quest.requireID.toString();
-    if (hasPlayerCompletedQuest(playerId, questIdStr) && !quest.repeatable) {
+  if (quest && quest.任务ID) {
+    const questIdStr = quest.任务ID.toString();
+    if (hasPlayerCompletedQuest(playerId, questIdStr) && !quest.可重复) {
       const dialogData = buildQuestCompletedDialog(quest, npcName);
-      openNpcDialog(triggerPlayer, { ...dialogData, npcUnit });
+      openNpcDialog(triggerPlayer, { ...dialogData, ...对话NPC上下文 });
       return;
     }
     if (hasPlayerAcceptedQuest(playerId, questIdStr)) {
-      const dialogData = buildQuestInProgressDialog(quest, npcName, playerId, npcUnit);
-      openNpcDialog(triggerPlayer, { ...dialogData, npcUnit });
+      const dialogData = buildQuestInProgressDialog(quest, npcName, playerId, npcUnit, hero, npcConfig.朝向);
+      openNpcDialog(triggerPlayer, { ...dialogData, ...对话NPC上下文 });
       return;
     }
-    const dialogData = buildQuestOfferDialog(quest, npcName, playerId, npcUnit);
-    openNpcDialog(triggerPlayer, { ...dialogData, npcUnit });
+    const dialogData = buildQuestOfferDialog(quest, npcName, playerId, npcUnit, hero, npcConfig.朝向);
+    openNpcDialog(triggerPlayer, { ...dialogData, ...对话NPC上下文 });
     return;
   }
 
   const heroName = jass.GetUnitName(hero);
   const dialogData = buildDialogData(npcName, heroName);
   if (dialogData) {
-    openNpcDialog(triggerPlayer, { ...dialogData, npcUnit });
+    openNpcDialog(triggerPlayer, { ...dialogData, ...对话NPC上下文 });
   }
 }
 
@@ -94,7 +99,7 @@ function onPlayerSelectedUnit(triggerPlayer: any, playerId: number, selectedUnit
 
   const unitName = jass.GetUnitName(selectedUnit);
   const npcConfig = findEnabledNpcConfigBySelectedUnit(selectedUnit, unitName);
-  if (!npcConfig || npcConfig.requireID == null) return;
+  if (!npcConfig || npcConfig.任务ID == null) return;
 
   const hero = getPlayerFirstHero(triggerPlayer);
   if (!hero) return;
@@ -104,7 +109,7 @@ function onPlayerSelectedUnit(triggerPlayer: any, playerId: number, selectedUnit
 }
 
 export function initDialogEntrySelectionTrigger(): void {
-  ensureQuestConfigsRegistered();
+  确保任务配置已注册();
   if (dialogSelectionListenerRegistered) return;
   dialogSelectionListenerRegistered = true;
   registerDialogSelectionListener();

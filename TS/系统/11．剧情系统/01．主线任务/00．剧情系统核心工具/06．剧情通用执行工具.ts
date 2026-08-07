@@ -34,6 +34,10 @@ const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
 const { 切换区域背景音乐表达式 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
   切换区域背景音乐表达式: (this: void, expr: string | undefined, add: boolean) => number;
 };
+const { 获取动态矩形区域, 按配置键注册动态矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取动态矩形区域: (this: void, 键: string) => any;
+  按配置键注册动态矩形区域: (this: void, 键: string) => any;
+};
 const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
   PlaySoundBJ: (this: void, soundHandle: any) => void;
 };
@@ -42,16 +46,14 @@ const { ModifyHeroStat } = require("lib.扩展函数.BJ函数.02．单位与英�
 };
 const {
   AddItemToStockBJ,
-  GetItemOfTypeFromUnitBJ,
 } = require("lib.扩展函数.BJ函数.03．物品与库存") as {
   AddItemToStockBJ: (this: void, whichItemId: number, whichUnit: any, currentStock: number, stockMax: number) => void;
-  GetItemOfTypeFromUnitBJ: (this: void, whichUnit: any, itemId: number) => any;
 };
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, whichForce: any, messageType: number, message: string) => void;
 };
-const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
-  UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
+const { 移除玩家主副背包物品 } = require("系统.03．技能系统.04．快捷键技能.02．按Ctrl切换背包") as {
+  移除玩家主副背包物品: (this: void, hero: any, itemTypeId: number) => boolean;
 };
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
@@ -103,7 +105,6 @@ const GetUnitFacing = jass.GetUnitFacing as (this: void, whichUnit: any) => numb
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
-const RemoveItem = jass.RemoveItem as (this: void, whichItem: any) => void;
 const SetItemPosition = jass.SetItemPosition as (this: void, whichItem: any, x: number, y: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
@@ -273,11 +274,7 @@ function 从单位移除指定物品(this: void, unit: any, 物品名: string): 
   if (unit == null || unit === 0 || 物品名 === "") return false;
   const itemTypeId = stringToFourCCSafe(按名字反查物品ID(物品名));
   if (!(itemTypeId > 0)) return false;
-  if (!UnitHasItemOfTypeBJ(unit, itemTypeId)) return false;
-  const item = GetItemOfTypeFromUnitBJ(unit, itemTypeId);
-  if (item == null || item === 0) return false;
-  RemoveItem(item);
-  return true;
+  return 移除玩家主副背包物品(unit, itemTypeId);
 }
 
 function on设置枚举英雄暂停无敌(this: void): void {
@@ -364,7 +361,9 @@ function on给枚举玩家添加区域视野(this: void): void {
 }
 
 export function 给玩家组添加区域视野(this: void, rectVarName: string): void {
-  const rectHandle = 读取全局句柄(rectVarName);
+  const rectHandle = 读取全局句柄(rectVarName)
+    ?? 获取动态矩形区域(rectVarName)
+    ?? 按配置键注册动态矩形区域(rectVarName);
   if (rectHandle == null || rectHandle === 0) return;
   const 玩家组 = YDUserDataGetSafe("string", "玩家", "玩家组", "force");
   if (玩家组 == null || 玩家组 === 0) return;
@@ -613,7 +612,7 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
     });
   }
 
-  const 需要启动Boss = (Boss键 !== "" || Boss名 !== "") && (取参数文本(参数, "注册Boss技能事件") !== "" || 取参数文本(参数, "Boss战绑定单位字段") !== "" || 取参数文本(参数, "Boss战战斗音乐") !== "" || 取参数文本(参数, "Boss战胜利音乐") !== "" || 取参数文本(参数, "Boss战地点字段") !== "" || 取参数文本(参数, "Boss战地点") !== "");
+  const 需要启动Boss = (Boss键 !== "" || Boss名 !== "") && (取参数文本(参数, "Boss战绑定单位字段") !== "" || 取参数文本(参数, "Boss战战斗音乐") !== "" || 取参数文本(参数, "Boss战胜利音乐") !== "" || 取参数文本(参数, "Boss战地点字段") !== "" || 取参数文本(参数, "Boss战地点") !== "");
   if (需要启动Boss) {
     const bossUnit = 读取语义单位引用(Boss键 !== "" ? Boss键 : `Boss.${Boss名}`);
     if (bossUnit != null && bossUnit !== 0) {

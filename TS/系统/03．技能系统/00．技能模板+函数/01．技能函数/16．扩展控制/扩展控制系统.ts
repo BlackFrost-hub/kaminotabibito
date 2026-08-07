@@ -46,9 +46,6 @@ const {
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getEnemyUnitsInRange: (this: void, centerUnit: any, x: number, y: number, radius: number) => any[];
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { 通知控制Debuff事件 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.09．装备通用机制.06．控制Debuff联动") as {
   通知控制Debuff事件: (this: void, event: {
     来源单位: any;
@@ -113,7 +110,6 @@ const DzGetUnitDisableControlOrder = japi.DzGetUnitDisableControlOrder as (单�
 const DzUnitOrdersForceStop = japi.DzUnitOrdersForceStop as (单位: any, 清空队列: boolean) => void;
 const DzUnitDisableAttack = japi.DzUnitDisableAttack as (单位: any, 是否禁用: boolean) => void;
 
-const 模块名 = "扩展控制系统";
 const bj_DEGTORAD = (jglobals.bj_DEGTORAD ?? 0.017453292519943295) as number;
 const bj_RADTODEG = (jglobals.bj_RADTODEG ?? 57.29577951308232) as number;
 
@@ -216,7 +212,6 @@ function 内部清除扩展控制(目标ID: number, 指定类型?: 扩展控制�
   if (记录 == null) return false;
   if (指定类型 != null && 记录.类型 !== 指定类型) return false;
   清理扩展控制记录(目标ID, 记录);
-  debugLogForce(模块名, "清除扩展控制", "目标ID=", 目标ID, "类型=", 记录.类型);
   return true;
 }
 
@@ -506,14 +501,12 @@ export function 施加扩展控制(
     });
     if (!ok) return 0;
     通知控制Debuff事件({ 来源单位, 目标单位, 类型: 类型 as string, 持续时间: 实际持续时间, BuffID: "C016", 是否控制: true, 原始参数: 规范参数 });
-    debugLogForce(模块名, "施加扩展控制", "类型=", 类型, "来源=", 取单位ID(来源单位), "目标=", 目标ID, "持续=", 实际持续时间);
     return 目标ID;
   }
   if (定义.类型分类 === "快速控制") {
     if (定义.快速控制ID == null) return 0;
     施加快速控制Buff(来源单位, 目标单位, 定义.快速控制ID, 实际持续时间);
     通知控制Debuff事件({ 来源单位, 目标单位, 类型: 类型 as string, 持续时间: 实际持续时间, 是否控制: true, 原始参数: 规范参数 });
-    debugLogForce(模块名, "施加扩展控制", "类型=", 类型, "来源=", 取单位ID(来源单位), "目标=", 目标ID, "持续=", 实际持续时间);
     return 目标ID;
   }
   确保初始化();
@@ -530,7 +523,6 @@ export function 施加扩展控制(
   });
   生效扩展控制首帧(记录);
   通知控制Debuff事件({ 来源单位, 目标单位, 类型: 类型 as string, 持续时间: 实际持续时间, BuffID: 记录.BuffID, 是否控制: true, 原始参数: 规范参数 });
-  debugLogForce(模块名, "施加扩展控制", "类型=", 类型, "来源=", 取单位ID(来源单位), "目标=", 目标ID, "持续=", 实际持续时间);
   return 目标ID;
 }
 

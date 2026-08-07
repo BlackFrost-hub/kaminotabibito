@@ -45,6 +45,7 @@ export interface 可攻击机制单位参数 {
   护甲?: number;
   固定站桩?: boolean;
   禁止普攻?: boolean;
+  禁用路径?: boolean;
   生命值受小怪倍率?: boolean;
   飞行高度?: number;
   缩放?: number;
@@ -199,6 +200,7 @@ export function 创建可攻击机制单位(this: void, 参数: 可攻击机制�
     护甲: 参数.护甲,
     固定站桩: 参数.固定站桩,
     禁止普攻: 参数.禁止普攻,
+    禁用路径: 参数.禁用路径,
     生命值受小怪倍率: 参数.生命值受小怪倍率 === false ? false : true,
     飞行高度: 参数.飞行高度,
     缩放: 参数.缩放,

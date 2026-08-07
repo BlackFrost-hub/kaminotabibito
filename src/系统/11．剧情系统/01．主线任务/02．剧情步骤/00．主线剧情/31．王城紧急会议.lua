@@ -5,7 +5,7 @@ local _____505C_6B62_89E6_53D1_5355_4F4D = ____06_FF0E_5267_60C5_901A_7528_6267_
 local _____8BFB_53D6_89E6_53D1_5355_4F4D = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取触发单位"]
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
 local ____10_FF0E_6807_51C6_5267_60C5_52A8_4F5C = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.10．标准剧情动作")
-local _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807 = ____10_FF0E_6807_51C6_5267_60C5_52A8_4F5C["发布主线节点目标"]
+local _____8FDB_5165_4E3B_7EBF_8282_70B9 = ____10_FF0E_6807_51C6_5267_60C5_52A8_4F5C["进入主线节点"]
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
 local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["注册剧情运行时单位"]
 local ____31A_FF0E_738B_57CE_653B_57CE_6218_63A7_5236_5668 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.31A．王城攻城战控制器")
@@ -26,6 +26,7 @@ local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_
 local Player = jass.Player
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
+local SetUnitFlyHeight = jass.SetUnitFlyHeight
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
 local _____4F1A_8BAE_5E2D_4F4D_9884_7F6E_8868 = {
     {
@@ -33,7 +34,8 @@ local _____4F1A_8BAE_5E2D_4F4D_9884_7F6E_8868 = {
         ["单位名"] = "克林姆德王",
         X = 13013.3,
         Y = -23968.5,
-        ["朝向"] = 270
+        ["朝向"] = 270,
+        ["飞行高度"] = -100
     },
     {
         ["角色名"] = "耶提尔",
@@ -103,6 +105,9 @@ local function _____8BFB_53D6_6216_521B_5EFA_4F1A_8BAENPC(_____9884_7F6E)
     end
     SetUnitPosition(unit, _____9884_7F6E.X, _____9884_7F6E.Y)
     SetUnitFacing(unit, _____9884_7F6E["朝向"])
+    if _____9884_7F6E["飞行高度"] ~= nil then
+        SetUnitFlyHeight(unit, _____9884_7F6E["飞行高度"], 0)
+    end
     _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____8BED_4E49_5F15_7528, unit)
     return unit
 end
@@ -117,7 +122,7 @@ ____exports["布置王城会议席位"] = function()
 end
 ____exports["执行前往会议室任务"] = function()
     ____exports["布置王城会议席位"]()
-    _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807(31)
+    _____8FDB_5165_4E3B_7EBF_8282_70B9(31)
 end
 ____exports["执行紧急会议"] = function()
     _____505C_6B62_89E6_53D1_5355_4F4D()
@@ -126,7 +131,7 @@ end
 ____exports["执行启动王城攻城战"] = function()
     _____5F00_59CB_7B2C_4E8C_7AE0_83F2_5229_65AF_653B_57CE_533A_57DF_97F3_4E50()
     _____542F_52A8_738B_57CE_653B_57CE_6218()
-    _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807(32)
+    _____8FDB_5165_4E3B_7EBF_8282_70B9(32)
 end
 ____exports["执行准备耶提尔菲利斯协战"] = function()
     _____7ED3_675F_83F2_5229_65AF_653B_57CE_7B49_5F85()

@@ -58,6 +58,7 @@ function _____521B_5EFA_65B9_5411_7279_6548(model, x, y, angle, scale, duration)
         ["持续秒"] = duration
     })
     _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C(effect, {["Z轴角度"] = angle})
+    return effect
 end
 function _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(context, ax, ay, bx, by, width)
     local boss = context["Boss单位"]
@@ -150,7 +151,7 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]
     local midX = (ax + bx) * 0.5
     local midY = (ay + by) * 0.5
-    _____521B_5EFA_65B9_5411_7279_6548(
+    local _____6B8B_7559_7279_6548 = _____521B_5EFA_65B9_5411_7279_6548(
         cfg["残留特效路径"],
         midX,
         midY,
@@ -158,6 +159,8 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
         cfg["残留特效缩放"] * effectScaleMultiplier,
         cfg["侵蚀持续秒"]
     )
+    local ____self_8 = context["清理"]
+    ____self_8["登记限时特效"](____self_8, "菲利斯-剑气灵斩侵蚀残留特效", _____6B8B_7559_7279_6548, cfg["侵蚀持续秒"] * 1000)
     local _____8DEF_5F84_9884_8B66 = _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "矩形",
         X = ax,
@@ -170,8 +173,8 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
         ["可手动销毁"] = true
     })
     if _____8DEF_5F84_9884_8B66 ~= nil and _____8DEF_5F84_9884_8B66 ~= 0 then
-        local ____self_8 = context["清理"]
-        ____self_8["登记限时特效"](____self_8, "菲利斯-剑气灵斩路径预警", _____8DEF_5F84_9884_8B66, cfg["侵蚀持续秒"] * 1000)
+        local ____self_9 = context["清理"]
+        ____self_9["登记限时特效"](____self_9, "菲利斯-剑气灵斩路径预警", _____8DEF_5F84_9884_8B66, cfg["侵蚀持续秒"] * 1000)
     end
     _____521B_5EFA_7EBF_6BB5_5371_9669_533A({
         ["清理"] = context["清理"],
@@ -219,8 +222,8 @@ ____exports["释放菲利斯剑气灵斩"] = function(context)
         ["可手动销毁"] = true
     })
     if _____65BD_6CD5_9884_8B66 ~= nil and _____65BD_6CD5_9884_8B66 ~= 0 then
-        local ____self_9 = context["清理"]
-        ____self_9["登记限时特效"](____self_9, "菲利斯-剑气灵斩施法预警", _____65BD_6CD5_9884_8B66, cfg["施法硬直秒"] * 1000)
+        local ____self_10 = context["清理"]
+        ____self_10["登记限时特效"](____self_10, "菲利斯-剑气灵斩施法预警", _____65BD_6CD5_9884_8B66, cfg["施法硬直秒"] * 1000)
     end
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
         ["施法者"] = boss,
@@ -233,7 +236,7 @@ ____exports["释放菲利斯剑气灵斩"] = function(context)
         end,
         ["on生效"] = function()
             _____64AD_653EBoss_5750_6807_97F3_6548(_____83F2_5229_65AF_97F3_6548_914D_7F6E["剑气灵斩"]["斩出侵蚀"], ax, ay, _____83F2_5229_65AF_97F3_6548_914D_7F6E["默认裁断距离"])
-            _____521B_5EFA_65B9_5411_7279_6548(
+            local _____5251_6C14_7279_6548 = _____521B_5EFA_65B9_5411_7279_6548(
                 cfg["剑气特效路径"],
                 ax,
                 ay,
@@ -241,6 +244,8 @@ ____exports["释放菲利斯剑气灵斩"] = function(context)
                 cfg["剑气特效缩放"] * effectScaleMultiplier,
                 cfg["剑气特效持续秒"]
             )
+            local ____self_11 = context["清理"]
+            ____self_11["登记限时特效"](____self_11, "菲利斯-剑气灵斩剑气特效", _____5251_6C14_7279_6548, cfg["剑气特效持续秒"] * 1000)
             _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(
                 context,
                 ax,

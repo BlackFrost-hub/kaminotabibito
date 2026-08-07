@@ -12,8 +12,8 @@ const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { UnitHasItemOfTypeBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
-  UnitHasItemOfTypeBJ: (this: void, whichUnit: any, itemTypeId: number) => boolean;
+const { 玩家主副背包持有物品 } = require("系统.03．技能系统.04．快捷键技能.02．按Ctrl切换背包") as {
+  玩家主副背包持有物品: (this: void, hero: any, itemTypeId: number) => boolean;
 };
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
@@ -84,7 +84,7 @@ function 命中物品事件配置(this: void, 配置: 主线剧情物品事件�
   const 物品类型ID = 获取物品事件配置类型ID(配置);
   if (!(物品类型ID > 0)) return false;
   if (配置.按持有物品校验 === true) {
-    return UnitHasItemOfTypeBJ(unit, 物品类型ID) === true;
+    return 玩家主副背包持有物品(unit, 物品类型ID);
   }
   return GetItemTypeId(item) === 物品类型ID;
 }

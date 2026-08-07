@@ -44,7 +44,7 @@ local MULTI_KILL_SYSTEM_ENABLED = ____00_FF0E_5E38_91CF_5B9A_4E49.MULTI_KILL_SYS
 -- 
 -- 【示例】
 -- // JASS 端调用示例
--- call YDLocal5Set(group, "killGroup", GetUnitsInRectAll(gg_rct_Area))
+-- call YDLocal5Set(group, "killGroup", GetUnitsInRectAll(某个矩形区域))
 -- call YDLocal5Set(real, "killWindow", 3.00)
 -- call YDLocal5Set(integer, "killThreshold", 3)
 -- call YDLocal5Set(unit, "effectSource", gg_unit_hfoo_0001)

@@ -73,7 +73,7 @@ function on格鲁姆火径周期(this: void, unit: any, variable?: any): void {
   if (state == null || !单位有效(state.grum) || !单位有效(unit)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩火径;
   造成格鲁姆Boss技能伤害(state.grum, unit, 计算火径持续伤害(state.grum), "AOE");
-  施加巴尔扎罗斯灼热(unit, config.灼热层数);
+  施加巴尔扎罗斯灼热(state.context, unit, config.灼热层数);
 }
 
 function on格鲁姆火径穿越(this: void, unit: any, variable?: any): void {
@@ -95,7 +95,7 @@ function on格鲁姆火径穿越(this: void, unit: any, variable?: any): void {
     weaponType: WEAPON_TYPE_WHOKNOWS,
     标签: "格鲁姆-熔岩火径-穿越",
   });
-  施加巴尔扎罗斯灼热(unit, config.灼热层数);
+  施加巴尔扎罗斯灼热(state.context, unit, config.灼热层数);
 }
 
 function 创建火径(this: void, context: 巴尔扎罗斯运行时上下文, center: 火径点, lineAngle: number): void {

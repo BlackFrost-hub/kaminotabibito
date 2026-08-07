@@ -14,26 +14,29 @@ local ____require_result_1 = require("lib.扩展函数.物品相关函数.创建
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_1["创建物品并注册排泄监听"]
 local ____require_result_2 = require("系统.02．物品系统.13．物品名反查")
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_2["按名字反查物品ID"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
-local ____require_result_5 = require("lib.扩展函数.BJ函数.07．杂项")
-local ModifyGateBJ = ____require_result_5.ModifyGateBJ
+local ____require_result_3 = require("系统.02．物品系统.19．掉落次数限制表")
+local _____662F_5426_5141_8BB8_9650_6B21_7269_54C1_6389_843D = ____require_result_3["是否允许限次物品掉落"]
+local _____8BB0_5F55_9650_6B21_7269_54C1_6389_843D = ____require_result_3["记录限次物品掉落"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_5.YDUserDataGetSafe
 local ____require_result_6 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_6.GetPlayersAll
-local ____require_result_7 = require("lib.扩展函数.BJ函数.05A．电影函数")
-local TransmissionFromUnitWithNameBJ = ____require_result_7.TransmissionFromUnitWithNameBJ
-local ____require_result_8 = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表")
-local _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID = ____require_result_8["按名字反查杂鱼单位ID"]
-local ____require_result_9 = require("系统.01．单位系统.08．单位配置表.01．精英配置表")
-local _____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID = ____require_result_9["按名字反查精英单位ID"]
-local ____require_result_10 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_10["按名字反查Boss单位ID"]
-local ____require_result_11 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
-local _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_11["按名字反查异界Boss单位ID"]
-local ____require_result_12 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.00．玩家英雄配置")
-local _____6309_540D_5B57_53CD_67E5_73A9_5BB6_82F1_96C4_5355_4F4DID = ____require_result_12["按名字反查玩家英雄单位ID"]
+local ModifyGateBJ = ____require_result_6.ModifyGateBJ
+local ____require_result_7 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_7.GetPlayersAll
+local ____require_result_8 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local TransmissionFromUnitWithNameBJ = ____require_result_8.TransmissionFromUnitWithNameBJ
+local ____require_result_9 = require("系统.01．单位系统.08．单位配置表.00．杂鱼配置表")
+local _____6309_540D_5B57_53CD_67E5_6742_9C7C_5355_4F4DID = ____require_result_9["按名字反查杂鱼单位ID"]
+local ____require_result_10 = require("系统.01．单位系统.08．单位配置表.01．精英配置表")
+local _____6309_540D_5B57_53CD_67E5_7CBE_82F1_5355_4F4DID = ____require_result_10["按名字反查精英单位ID"]
+local ____require_result_11 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_11["按名字反查Boss单位ID"]
+local ____require_result_12 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
+local _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_12["按名字反查异界Boss单位ID"]
+local ____require_result_13 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.00．玩家英雄配置")
+local _____6309_540D_5B57_53CD_67E5_73A9_5BB6_82F1_96C4_5355_4F4DID = ____require_result_13["按名字反查玩家英雄单位ID"]
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomInt = jass.GetRandomInt
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -72,10 +75,14 @@ local function _____521D_59CB_5316_914D_7F6E_7F13_5B58()
                         do
                             local _____52A8_4F5C = _____914D_7F6E["动作列表"][j + 1]
                             if _____52A8_4F5C["动作类型"] == "掉落物品" then
+                                local _____7269_54C1ID = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____52A8_4F5C["物品名"] or "")
                                 _____52A8_4F5C_5217_8868[#_____52A8_4F5C_5217_8868 + 1] = __TS__ObjectAssign(
                                     {},
                                     _____52A8_4F5C,
-                                    {["物品类型ID"] = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____52A8_4F5C["物品名"] or ""))}
+                                    {
+                                        ["物品ID"] = _____7269_54C1ID,
+                                        ["物品类型ID"] = stringToFourCCSafe(_____7269_54C1ID)
+                                    }
                                 )
                                 goto __continue9
                             end
@@ -116,14 +123,21 @@ local function _____6EE1_8DB3_52A8_4F5C_524D_7F6E(_____52A8_4F5C)
     return true
 end
 local function _____6267_884C_6389_843D_7269_54C1_52A8_4F5C(dyingUnit, _____52A8_4F5C)
+    local _____7269_54C1ID = _____52A8_4F5C["物品ID"]
+    if _____7269_54C1ID == nil or not _____662F_5426_5141_8BB8_9650_6B21_7269_54C1_6389_843D(_____7269_54C1ID) then
+        return
+    end
     if (_____52A8_4F5C["物品类型ID"] or 0) == 0 then
         return
     end
-    _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C(
+    local createdItem = _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C(
         _____52A8_4F5C["物品类型ID"] or 0,
         GetUnitX(dyingUnit),
         GetUnitY(dyingUnit)
     )
+    if createdItem ~= nil and createdItem ~= 0 then
+        _____8BB0_5F55_9650_6B21_7269_54C1_6389_843D(_____7269_54C1ID)
+    end
 end
 local function _____8BFB_53D6_5168_5C40_53EF_7834_574F_7269(_____5168_5C40_540D)
     return jglobals[_____5168_5C40_540D]
@@ -136,11 +150,11 @@ local function _____6267_884C_5F00_542F_5927_95E8_52A8_4F5C(_____52A8_4F5C)
             do
                 local _____5927_95E8 = _____8BFB_53D6_5168_5C40_53EF_7834_574F_7269(_____5927_95E8_5217_8868[i + 1])
                 if _____5927_95E8 == nil or _____5927_95E8 == 0 then
-                    goto __continue23
+                    goto __continue25
                 end
                 ModifyGateBJ(bj_GATEOPERATION_OPEN, _____5927_95E8)
             end
-            ::__continue23::
+            ::__continue25::
             i = i + 1
         end
     end
@@ -186,7 +200,7 @@ local function _____5904_7406_5267_60C5_7269_54C1_6389_843D(dyingUnit)
             do
                 local _____914D_7F6E = _____5DF2_89E3_6790_914D_7F6E_8868[i + 1]
                 if _____914D_7F6E["触发单位类型ID"] ~= dyingTypeId then
-                    goto __continue34
+                    goto __continue36
                 end
                 do
                     local j = 0
@@ -196,7 +210,7 @@ local function _____5904_7406_5267_60C5_7269_54C1_6389_843D(dyingUnit)
                     end
                 end
             end
-            ::__continue34::
+            ::__continue36::
             i = i + 1
         end
     end

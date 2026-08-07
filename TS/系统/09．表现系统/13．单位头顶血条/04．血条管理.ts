@@ -17,6 +17,12 @@ const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any
 const { onTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: (this: void) => void) => void;
 };
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
+};
+const { 可攻击摧毁弹幕单位类型 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.01．共享") as {
+  可攻击摧毁弹幕单位类型: number;
+};
 const { 查询单位可显示护盾值, 查询单位护盾列表, 护盾类型 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.index") as {
   查询单位可显示护盾值: (this: void, unit: any) => number;
   查询单位护盾列表: (this: void, unit: any) => Array<{ 类型: number; 当前值: number; 显示护盾条: boolean }>;
@@ -54,6 +60,7 @@ const DestroyGroup = jass.DestroyGroup as (group: any) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const IsUnitEnemy = jass.IsUnitEnemy as (unit: any, whichPlayer: any) => boolean;
 const GetLocalPlayer = jass.GetLocalPlayer as () => any;
+const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: number) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitLevel = jass.GetUnitLevel as (unit: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
@@ -91,6 +98,8 @@ const 魔法状态 = jass.UNIT_STATE_MANA;
 const 最大魔法状态 = jass.UNIT_STATE_MAX_MANA;
 const 单位死亡类型 = jass.UNIT_TYPE_DEAD;
 const 单位英雄类型 = jass.UNIT_TYPE_HERO;
+const 单位古树类型 = jass.UNIT_TYPE_ANCIENT;
+const 蝗虫技能ID = stringToFourCCSafe("Aloc");
 const 单位血条表 = new Map<number, 单位血条绑定>();
 const 单位ID列表: number[] = [];
 const 英雄死亡隐藏血条ID集合 = new Set<number>();
@@ -129,7 +138,10 @@ function 单位存活(this: void, unit: any): boolean {
 }
 
 function 单位可注册血条(this: void, unit: any): boolean {
-  return 单位存活(unit);
+  if (!单位存活(unit)) return false;
+  if (GetUnitAbilityLevel(unit, 蝗虫技能ID) > 0) return false;
+  if (IsUnitType(unit, 单位古树类型) && GetUnitTypeId(unit) !== 可攻击摧毁弹幕单位类型) return false;
+  return true;
 }
 
 function 加入待创建单位(this: void, unit: any): void {

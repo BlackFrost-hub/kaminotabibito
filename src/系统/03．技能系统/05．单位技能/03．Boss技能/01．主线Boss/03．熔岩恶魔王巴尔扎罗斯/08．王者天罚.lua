@@ -59,7 +59,7 @@ function _____8BB0_5F55_5929_7F5A_73A9_5BB6_547D_4E2D(context, target)
     end
     context["王者天罚命中记录"][hid] = (context["王者天罚命中记录"][hid] or 0) + 1
     if context["王者天罚命中记录"][hid] >= 3 then
-        _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(target, _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["王者天罚"]["连续三波灼热层数"])
+        _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(context, target, _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["王者天罚"]["连续三波灼热层数"])
         context["王者天罚命中记录"][hid] = 0
     end
 end

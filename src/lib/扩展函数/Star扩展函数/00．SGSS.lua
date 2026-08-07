@@ -19,6 +19,8 @@ local UnitRemoveAbility = jass.UnitRemoveAbility
 local IncUnitAbilityLevel = jass.IncUnitAbilityLevel
 local DecUnitAbilityLevel = jass.DecUnitAbilityLevel
 local GetUnitState = jass.GetUnitState
+local IsUnitType = jass.IsUnitType
+local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local SetUnitStateJass = jass.SetUnitState
 local SetUnitStateJapi = japi.SetUnitState
 local EXGetUnitAbility = japi.EXGetUnitAbility
@@ -154,6 +156,9 @@ local function setAbilityDataA(u, raw, value)
     end
     if GetUnitAbilityLevel(u, code) == 0 then
         UnitAddAbility(u, code)
+        if GetUnitAbilityLevel(u, code) == 0 then
+            return
+        end
     end
     local abil = EXGetUnitAbility(u, code)
     if abil then
@@ -169,6 +174,9 @@ local function setAbilityDataABC(u, raw, a, b, c)
     end
     if GetUnitAbilityLevel(u, code) == 0 then
         UnitAddAbility(u, code)
+        if GetUnitAbilityLevel(u, code) == 0 then
+            return
+        end
     end
     local abil = EXGetUnitAbility(u, code)
     if abil then
@@ -288,7 +296,13 @@ local function setSight(u, v)
     _____540C_6B65_5355_4F4D_89C6_91CE_6280_80FD(u, next)
     saveReal(u, key, next)
 end
+local function _____5355_4F4D_53EF_66F4_65B0_5C5E_6027(u)
+    return u ~= nil and u ~= 0 and IsUnitType(u, UNIT_TYPE_DEAD) ~= true
+end
 function ____exports.SGSS_SetState(u, id, v)
+    if not _____5355_4F4D_53EF_66F4_65B0_5C5E_6027(u) then
+        return
+    end
     if id == 1 then
         setAtk(u, v)
     elseif id == 2 then
@@ -314,6 +328,9 @@ function ____exports.SGSS_SetState(u, id, v)
     end
 end
 function ____exports.SGSS_SetStatePercentumEX2(u, id, v)
+    if not _____5355_4F4D_53EF_66F4_65B0_5C5E_6027(u) then
+        return
+    end
     local hpPct = sh("生命值百分比加成")
     local hpAdd = sh("生命值百分比加成增值")
     local mpPct = sh("法力值百分比加成")

@@ -16,4 +16,12 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.03．技能系统.04．快捷键技能.03．挑战技能.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 return ____exports

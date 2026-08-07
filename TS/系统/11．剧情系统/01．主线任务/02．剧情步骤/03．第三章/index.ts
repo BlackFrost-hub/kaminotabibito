@@ -12,3 +12,4 @@ export * from "./43．菲尼克斯尔现身";
 export * from "./44．菲尼克斯尔战后承接";
 export * from "./46．沉睡英魂亚伦柯斯前导";
 export * from "./48．封印核心场景";
+export * from "./50．封印守卫战收束";

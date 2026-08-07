@@ -94,12 +94,17 @@ const {
 };
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
+const SetUnitInvulnerable = jass.SetUnitInvulnerable as (whichUnit: any, flag: boolean) => void;
 const { 尝试播放Boss死亡音效 } = require("./08．Boss死亡音效") as {
   尝试播放Boss死亡音效: (this: void, bossUnit: any) => void;
 };
 const { 重建亚伦柯斯安兹封锁墙, 清理亚伦柯斯安兹封锁墙 } = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙") as {
   重建亚伦柯斯安兹封锁墙: (this: void, bossUnit: any) => void;
   清理亚伦柯斯安兹封锁墙: (this: void, bossUnit: any) => void;
+};
+const { 重建祖地双灵卫力量之墙, 清理祖地双灵卫力量之墙 } = require("系统.07．地形系统.06．可破坏物数据.04．祖地双灵卫力量之墙") as {
+  重建祖地双灵卫力量之墙: (this: void, bossUnit: any) => void;
+  清理祖地双灵卫力量之墙: (this: void, bossUnit: any) => void;
 };
 
 let Boss战运行周期回调ID = 0;
@@ -148,6 +153,7 @@ function 结束Boss战运行上下文(this: void, context: Boss战运行上下�
 
   context.是否已结束 = true;
   清理亚伦柯斯安兹封锁墙(context.Boss单位);
+  清理祖地双灵卫力量之墙(context.Boss单位);
   if (选项?.跳过死亡音效 !== true) 尝试播放Boss死亡音效(context.Boss单位);
   结束Boss血条弱点韧性(context);
   处理Boss战护卫结束(context);
@@ -284,9 +290,15 @@ export function 启动Boss战运行(this: void, bossUnit: any): void {
 
   重建亚伦柯斯安兹封锁墙(bossUnit);
   记录Boss战运行上下文(context);
+  重建祖地双灵卫力量之墙(bossUnit);
   确保Boss战运行驱动();
 
   if (读取Boss战单位布尔(bossUnit, "转换场景")) {
+    const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+      添加单位暂停: (this: void, unit: any, source: string) => boolean;
+    };
+    添加单位暂停(bossUnit, "Boss战运行:转场等待");
+    SetUnitInvulnerable(bossUnit, true);
     const nowMs = getServerTime();
     context.等待激活截止时间 = nowMs + 2000;
     context.转场提示时间 = nowMs + 3000;

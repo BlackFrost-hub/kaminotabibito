@@ -22,6 +22,7 @@ local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_STATE_ATTACK = ConvertUnitState(21)
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local _____8F6C_56DB_5B57_7801 = ____require_result_0.stringToFourCC
@@ -57,6 +58,12 @@ ____exports["读取单位攻击力"] = function(unit)
         return 0
     end
     return __TS__Number(GetUnitStateJapi(unit, UNIT_STATE_ATTACK)) or 0
+end
+____exports["读取单位最大生命"] = function(unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    return __TS__Number(GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)) or 0
 end
 ____exports["距离平方XY"] = function(x1, y1, x2, y2)
     local dx = x2 - x1

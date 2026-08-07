@@ -1,11 +1,13 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53E5_67C4_6709_6548, ____on_8FD4_56DE_5DF4_5C14_624E_7F57_65AF_89E6_53D1_533A_57DF, _____8FD4_56DE_5DF4_5C14_624E_7F57_65AF_89E6_53D1_533A_57DF, _____6E05_7406_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001, _____5DF4_5C14_624E_7F57_65AF_6218_540E_5141_8BB8_8FDB_5165, _____5B8C_6210_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001, _____521B_5EFA_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001_95E8, _____6E05_7406_5DF4_5C14_624E_7F57_65AF_8303_56F4_76D1_542C, _____64AD_653E_5DF4_5C14_624E_7F57_65AF_6218_540E_627F_63A5, ____on_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1, YDUserDataClearSafe, unregisterDeathListener, safeDestroyTrigger, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4, _____521B_5EFA_70B9_7279_6548, _____6CE8_518C_5267_60C5_914D_7F6E_4F20_9001, _____8BFB_53D6_5267_60C5_4F20_9001_914D_7F6E, StarOther_PanCameraToTimedForPlayer, _____6309_6B65_957F_8C03_6574_73A9_5BB6_955C_5934_9AD8_5EA6, _____542F_7528_7B2C_4E09_7AE0_4E9A_4F26_67EF_65AF_524D_5BFC_533A_57DF_80CC_666F_97F3_4E50, DestroyEffect, ForGroup, GetEnumUnit, GetOwningPlayer, SetUnitFacing, SetUnitPosition, IssueImmediateOrder, ____Boss_4F4D_7F6E, _____6218_540E_8FD4_56DE_9762_5411, _____5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001_914D_7F6EID, _____6218_540E_4F20_9001_95E8_6A21_578B, _____5F53_524D_5DF4_5C14_624E_7F57_65AF_524D_5BFC_72B6_6001, _____5DF2_6CE8_518C_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1_76D1_542C, _____5F53_524D_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001_72B6_6001
+local _____53E5_67C4_6709_6548, ____on_8FD4_56DE_5DF4_5C14_624E_7F57_65AF_89E6_53D1_533A_57DF, _____8FD4_56DE_5DF4_5C14_624E_7F57_65AF_89E6_53D1_533A_57DF, _____6E05_7406_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001, _____5DF4_5C14_624E_7F57_65AF_6218_540E_5141_8BB8_8FDB_5165, _____5B8C_6210_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001, _____521B_5EFA_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001_95E8, _____6E05_7406_5DF4_5C14_624E_7F57_65AF_8303_56F4_76D1_542C, _____64AD_653E_5DF4_5C14_624E_7F57_65AF_6218_540E_627F_63A5, ____on_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1, YDUserDataClearSafe, unregisterDeathListener, safeDestroyTrigger, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4, _____521B_5EFA_70B9_7279_6548, _____6CE8_518C_5267_60C5_914D_7F6E_4F20_9001, _____8BFB_53D6_5267_60C5_4F20_9001_914D_7F6E, StarOther_PanCameraToTimedForPlayer, _____6309_6B65_957F_8C03_6574_73A9_5BB6_955C_5934_9AD8_5EA6, _____542F_7528_7B2C_4E09_7AE0_4E9A_4F26_67EF_65AF_524D_5BFC_533A_57DF_80CC_666F_97F3_4E50, DestroyEffect, ForGroup, GetEnumUnit, GetOwningPlayer, SetUnitFacing, SetUnitPosition, IssueImmediateOrder, _____6218_540E_8FD4_56DE_4F4D_7F6E, _____5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001_914D_7F6EID, _____6218_540E_4F20_9001_95E8_6A21_578B, _____5F53_524D_5DF4_5C14_624E_7F57_65AF_524D_5BFC_72B6_6001, _____5DF2_6CE8_518C_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1_76D1_542C, _____5F53_524D_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001_72B6_6001
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取当前剧情动作上下文"]
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
 local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
+local ____40_2D50_FF0E_7B2C_4E09_7AE0_7535_5F71_955C_5934 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.40-50．第三章电影镜头")
+local _____5E94_7528_7B2C_4E09_7AE0_7535_5F71_955C_5934 = ____40_2D50_FF0E_7B2C_4E09_7AE0_7535_5F71_955C_5934["应用第三章电影镜头"]
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
 local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["清理剧情运行时单位"]
 local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["注册剧情运行时单位"]
@@ -24,13 +26,13 @@ function ____on_8FD4_56DE_5DF4_5C14_624E_7F57_65AF_89E6_53D1_533A_57DF()
     if not _____53E5_67C4_6709_6548(unit) then
         return
     end
-    SetUnitPosition(unit, ____Boss_4F4D_7F6E.X, ____Boss_4F4D_7F6E.Y)
-    SetUnitFacing(unit, _____6218_540E_8FD4_56DE_9762_5411)
+    SetUnitPosition(unit, _____6218_540E_8FD4_56DE_4F4D_7F6E.X, _____6218_540E_8FD4_56DE_4F4D_7F6E.Y)
+    SetUnitFacing(unit, _____6218_540E_8FD4_56DE_4F4D_7F6E["朝向"])
     IssueImmediateOrder(unit, "stop")
     StarOther_PanCameraToTimedForPlayer(
         GetOwningPlayer(unit),
-        ____Boss_4F4D_7F6E.X,
-        ____Boss_4F4D_7F6E.Y,
+        _____6218_540E_8FD4_56DE_4F4D_7F6E.X,
+        _____6218_540E_8FD4_56DE_4F4D_7F6E.Y,
         0.1
     )
 end
@@ -81,7 +83,13 @@ function _____521B_5EFA_5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001_95E8()
         return
     end
     if not _____53E5_67C4_6709_6548(_____72B6_6001["传送门特效"]) then
-        _____72B6_6001["传送门特效"] = _____521B_5EFA_70B9_7279_6548({["模型路径"] = _____6218_540E_4F20_9001_95E8_6A21_578B, X = _____4F20_9001_914D_7F6E["入口中心X"], Y = _____4F20_9001_914D_7F6E["入口中心Y"], ["缩放"] = 2.2})
+        _____72B6_6001["传送门特效"] = _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = _____6218_540E_4F20_9001_95E8_6A21_578B,
+            X = _____4F20_9001_914D_7F6E["入口中心X"],
+            Y = _____4F20_9001_914D_7F6E["入口中心Y"],
+            ["Z轴角度"] = 270,
+            ["缩放"] = 1
+        })
     end
     if _____72B6_6001["取消剧情传送注册"] ~= nil then
         return
@@ -138,7 +146,6 @@ local ____require_result_1 = require("系统.11．剧情系统.01．主线任务
 local _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E = ____require_result_1["创建并冻结剧情Boss预置"]
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
 local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_2["暂停并设置无敌安全"]
-local _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168 = ____require_result_2["解除暂停并取消无敌安全"]
 local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local IsUnitAliveBJ = ____require_result_3.IsUnitAliveBJ
 local ____require_result_4 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
@@ -180,17 +187,18 @@ local _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local ____Boss_952E = "Boss.熔岩恶魔王"
 local ____Boss_540D = "熔岩恶魔王·巴尔扎罗斯"
 local ____Boss_5F85_6218_6682_505C_6765_6E90 = "剧情系统:巴尔扎罗斯待战"
-____Boss_4F4D_7F6E = {X = 28640, Y = -3734.5, ["朝向"] = 270}
+local ____Boss_4F4D_7F6E = {X = 28640, Y = -3734.5, ["朝向"] = 270}
+_____6218_540E_8FD4_56DE_4F4D_7F6E = {X = 28263.5, Y = 1946.2, ["朝向"] = 270}
 local ____Boss_8FDB_5165_8303_56F4 = 1600
-_____6218_540E_8FD4_56DE_9762_5411 = 90
 _____5DF4_5C14_624E_7F57_65AF_6218_540E_4F20_9001_914D_7F6EID = "jlc_balzaroth_aftermath"
-_____6218_540E_4F20_9001_95E8_6A21_578B = "Common\\Effect\\Form\\Portal\\7sr_suramarcity_pylonfx.mdx"
+_____6218_540E_4F20_9001_95E8_6A21_578B = "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdl"
 local _____4E0B_4E00_4EE3_5DF4_5C14_624E_7F57_65AF_524D_5BFC_4E16_4EE3 = 0
 _____5DF2_6CE8_518C_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1_76D1_542C = false
 local function _____5355_4F4D_5B58_6D3B(unit)
     return unit ~= nil and unit ~= 0 and IsUnitAliveBJ(unit)
 end
 local function _____64AD_653E_5DF4_5C14_624E_7F57_65AF_524D_5BFC(_____89E6_53D1_5355_4F4D)
+    _____5E94_7528_7B2C_4E09_7AE0_7535_5F71_955C_5934(42)
     local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
     local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_14["播放主线剧情片段"]
     _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5("molten_realm_balzaroth_intro", {["片段ID"] = "molten_realm_balzaroth_intro", ["触发配置名"] = "巴尔扎罗斯旧熔炉门入口", ["触发单位"] = _____89E6_53D1_5355_4F4D})
@@ -297,7 +305,6 @@ ____exports["执行启动巴尔扎罗斯Boss战"] = function(______53C2_6570)
         ____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D_result_16 = _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587()["触发单位"]
     end
     local _____73A9_5BB6_5355_4F4D = ____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D_result_16
-    _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(bossUnit, ____Boss_5F85_6218_6682_505C_6765_6E90)
     _____542F_52A8_5267_60C5Boss_6218(bossUnit, {["触发单位"] = _____73A9_5BB6_5355_4F4D, ["暂停来源"] = ____Boss_5F85_6218_6682_505C_6765_6E90})
 end
 local function _____6267_884C_51C6_5907_5DF4_5C14_624E_7F57_65AF_524D_5BFC_52A8_4F5C(______53C2_6570)

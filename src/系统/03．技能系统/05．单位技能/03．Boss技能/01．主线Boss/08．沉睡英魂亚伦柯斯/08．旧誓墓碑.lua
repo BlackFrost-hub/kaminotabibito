@@ -42,11 +42,13 @@ local registerManualBuff = ____require_result_2.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
 local ____require_result_3 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
 local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_3["读取Boss战运行上下文"]
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_4.getServerTime
-local addDelayedCallback = ____require_result_4.addDelayedCallback
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
+local ____require_result_4 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
+local _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_4["取当前有效玩家人数"]
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_5.getServerTime
+local addDelayedCallback = ____require_result_5.addDelayedCallback
+local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_6.YDWETimerDestroyEffectSafe
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -127,6 +129,10 @@ local function _____5B8C_6210_5893_7891_5B89_9B42(context, state)
     if context["未安魂墓碑数量"] <= 0 then
         _____8FDB_5165_4E9A_4F26_67EF_65AFP3(context)
     end
+end
+local function _____53D6_672C_8F6E_5B89_9B42_6301_7EED_79D2()
+    local cfg = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["旧誓墓碑"]
+    return _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570() <= 1 and cfg["单人安魂持续秒"] or cfg["多人安魂持续秒"]
 end
 local function _____8303_56F4_5185_5B58_5728_73A9_5BB6(context, state)
     local radius = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["旧誓墓碑"]["安魂范围"]
@@ -239,19 +245,20 @@ local function _____5C1D_8BD5_91CA_653E_5893_7891_6B8B_5F71(context, state, now)
                     end
                 end
             )
-            local ____self_6 = context["清理"]
-            ____self_6["登记延迟回调"](____self_6, "亚伦柯斯-墓碑残影飞行结束", clearId)
+            local ____self_7 = context["清理"]
+            ____self_7["登记延迟回调"](____self_7, "亚伦柯斯-墓碑残影飞行结束", clearId)
         end
     )
-    local ____self_7 = context["清理"]
-    ____self_7["登记延迟回调"](____self_7, "亚伦柯斯-墓碑残影", delayedId)
+    local ____self_8 = context["清理"]
+    ____self_8["登记延迟回调"](____self_8, "亚伦柯斯-墓碑残影", delayedId)
     return true
 end
 local function _____4E9A_4F26_67EF_65AF_5893_7891_63A8_8FDB_5468_671F(______6267_884C_6B21_6570, variable)
     local data = variable
     local context = data and data.context
     local cfg = data and data.cfg
-    if context == nil or cfg == nil then
+    local _____5B89_9B42_6301_7EED_79D2 = data and data["安魂持续秒"]
+    if context == nil or cfg == nil or _____5B89_9B42_6301_7EED_79D2 == nil then
         return false
     end
     if context["战斗已结束"] or context["阶段"] ~= "P2旧誓回响" then
@@ -264,7 +271,7 @@ local function _____4E9A_4F26_67EF_65AF_5893_7891_63A8_8FDB_5468_671F(______6267
             do
                 local state = context["墓碑状态列表"][i + 1]
                 if state["已安魂"] then
-                    goto __continue40
+                    goto __continue41
                 end
                 local hasPlayer = _____8303_56F4_5185_5B58_5728_73A9_5BB6(context, state)
                 if hasPlayer then
@@ -276,16 +283,16 @@ local function _____4E9A_4F26_67EF_65AF_5893_7891_63A8_8FDB_5468_671F(______6267
                     end
                 end
                 _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI(state["安魂进度UI"], state["安魂进度秒"])
-                _____8BBE_7F6E_4E16_754C_5750_6807_8FDB_5EA6UI_663E_793A(state["安魂进度UI"], hasPlayer or state["安魂进度秒"] > 0)
-                if state["安魂进度秒"] >= cfg["安魂持续秒"] then
+                _____8BBE_7F6E_4E16_754C_5750_6807_8FDB_5EA6UI_663E_793A(state["安魂进度UI"], true)
+                if state["安魂进度秒"] >= _____5B89_9B42_6301_7EED_79D2 then
                     _____5B8C_6210_5893_7891_5B89_9B42(context, state)
-                    goto __continue40
+                    goto __continue41
                 end
                 if current >= state["下次残影Ms"] then
                     _____5C1D_8BD5_91CA_653E_5893_7891_6B8B_5F71(context, state, current)
                 end
             end
-            ::__continue40::
+            ::__continue41::
             i = i + 1
         end
     end
@@ -297,12 +304,13 @@ ____exports["启动亚伦柯斯旧誓墓碑"] = function(context)
         return false
     end
     local cfg = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["旧誓墓碑"]
+    local _____5B89_9B42_6301_7EED_79D2 = _____53D6_672C_8F6E_5B89_9B42_6301_7EED_79D2()
     local battle = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(boss)
-    local ____opt_result_14
+    local ____opt_result_17
     if battle ~= nil then
-        ____opt_result_14 = battle["地点矩形"]
+        ____opt_result_17 = battle["地点矩形"]
     end
-    local rect = ____opt_result_14
+    local rect = ____opt_result_17
     local centerX = rect ~= nil and rect ~= 0 and GetRectCenterX(rect) or _____4E9A_4F26_67EF_65AF_5355_4F4D_6280_80FD_914D_7F6E["正式场地"]["中心X"]
     local centerY = rect ~= nil and rect ~= 0 and GetRectCenterY(rect) or _____4E9A_4F26_67EF_65AF_5355_4F4D_6280_80FD_914D_7F6E["正式场地"]["中心Y"]
     local facings = {90, 210, 330}
@@ -330,25 +338,25 @@ ____exports["启动亚伦柯斯旧誓墓碑"] = function(context)
                     X = x,
                     Y = y,
                     Z = 220,
-                    ["最大值"] = cfg["安魂持续秒"],
+                    ["最大值"] = _____5B89_9B42_6301_7EED_79D2,
                     ["当前值"] = 0,
                     ["标题"] = "安魂",
                     ["数值后缀"] = "秒",
                     ["类型"] = "安魂",
                     ["平滑过渡秒"] = cfg["检查间隔秒"],
-                    ["初始显示"] = false,
+                    ["初始显示"] = true,
                     ["雾中可见"] = false
                 }),
                 ["下次残影Ms"] = now + cfg["残影斩击间隔秒"] * 1000
             }
-            local ____context__5893_7891_72B6_6001_5217_8868_15 = context["墓碑状态列表"]
-            ____context__5893_7891_72B6_6001_5217_8868_15[#____context__5893_7891_72B6_6001_5217_8868_15 + 1] = state
+            local ____context__5893_7891_72B6_6001_5217_8868_18 = context["墓碑状态列表"]
+            ____context__5893_7891_72B6_6001_5217_8868_18[#____context__5893_7891_72B6_6001_5217_8868_18 + 1] = state
             i = i + 1
         end
     end
-    local ____self_16 = context["清理"]
-    ____self_16["登记清理"](
-        ____self_16,
+    local ____self_19 = context["清理"]
+    ____self_19["登记清理"](
+        ____self_19,
         "亚伦柯斯-旧誓墓碑统一清理",
         function()
             _____6E05_7406_5893_7891_5217_8868(context)
@@ -360,7 +368,7 @@ ____exports["启动亚伦柯斯旧誓墓碑"] = function(context)
         ["名称"] = "亚伦柯斯-旧誓墓碑推进",
         ["间隔毫秒"] = cfg["检查间隔秒"] * 1000,
         ["清理"] = context["清理"],
-        ["变量"] = {context = context, cfg = cfg},
+        ["变量"] = {context = context, cfg = cfg, ["安魂持续秒"] = _____5B89_9B42_6301_7EED_79D2},
         onTick = _____4E9A_4F26_67EF_65AF_5893_7891_63A8_8FDB_5468_671F
     })
     return true

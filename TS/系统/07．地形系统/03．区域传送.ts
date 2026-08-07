@@ -29,6 +29,7 @@ export interface 剧情玩家组传送配置 {
   目标X: number;
   目标Y: number;
   目标面向?: number;
+  镜头平移时长?: number;
   条件: (this: void) => boolean;
   读取玩家英雄组: (this: void) => any;
   允许进入单位?: (this: void, unit: any) => boolean;
@@ -345,6 +346,10 @@ function on移动剧情玩家组(this: void): void {
     (jass as any).SetUnitFacing(unit, 状态.配置.目标面向);
   }
   (jass as any).IssueImmediateOrder(unit, "stop");
+  const 镜头平移时长 = 状态.配置.镜头平移时长;
+  if (镜头平移时长 != null && 镜头平移时长 > 0) {
+    StarOther_PanCameraToTimedForPlayer((jass as any).GetOwningPlayer(unit), 状态.配置.目标X, 状态.配置.目标Y, 镜头平移时长);
+  }
 }
 
 function 清理剧情玩家组传送状态(this: void, 状态: 剧情玩家组传送状态): void {
@@ -437,6 +442,7 @@ export function 注册剧情配置传送(
     目标X: 配置.目标X,
     目标Y: 配置.目标Y,
     目标面向: 配置.目标面向,
+    镜头平移时长: 配置.镜头平移时长,
     条件: 覆盖.条件 ?? (() => checkRegionCondition(配置.condition, undefined)),
     读取玩家英雄组: 覆盖.读取玩家英雄组,
     允许进入单位: 覆盖.允许进入单位,

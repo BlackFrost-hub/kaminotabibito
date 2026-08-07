@@ -14,6 +14,7 @@ const GetItemTypeId = jass.GetItemTypeId as (whichItem: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (whichUnit: any) => number;
+const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
 
 const 瑟兰迪尔的决心配置 = {
   单位类型: "e08P",
@@ -49,6 +50,7 @@ export function 处理瑟兰迪尔的决心使用(this: void, ctx: 物品技能�
   创建召唤物({
     主人单位: caster,
     单位类型: 瑟兰迪尔的决心配置.单位类型,
+    单位名称: GetUnitName(caster) + "的水元素",
     X: GetUnitX(caster),
     Y: GetUnitY(caster),
     朝向: GetUnitFacing(caster),

@@ -99,3 +99,58 @@ createEquipmentItem('I00Y', '|cFF800000触手残片|r', {
   tooltipExtended = '|cFFFFFFCC『材料』|n|r|cFFFFFF00效果：|n|r|cFF00CCFF水/冰属性抗性+7%（每个残片）|n|r|cFF00FF00已经持有2片残片时，每次拾取新的残片都可以恢复已损失HP20%的HP|n|r|cFFFF0000每块未被拾取的残片都会增加卡瑟拉100/5秒生命恢复！|n|r|cFF808080鱿鱼死亡后掉落的残片，似乎能够抵御来自海底的力量|r',
   description = '|cFFFFFFCC『材料』|n|r|cFFFFFF00效果：|n|r|cFF00CCFF水/冰属性抗性+7%（每个残片）|n|r|cFF00FF00已经持有2片残片时，每次拾取新的残片都可以恢复已损失HP20%的HP|n|r|cFFFF0000每块未被拾取的残片都会增加卡瑟拉100/5秒生命恢复！|n|r|cFF808080鱿鱼死亡后掉落的残片，似乎能够抵御来自海底的力量|r',
 })
+
+local function createElfPotion(id, name, description, icon, model, buttonX)
+  local item = ItemDefinition:new(id, 'hslv')
+  item:setName(name)
+  item:setTooltipBasic(name)
+  item:setTooltipExtended(description)
+  item:setDescription(description)
+  item:setInterfaceIcon(icon)
+  item:setModelUsed(model)
+  item:setButtonPositionX(buttonX)
+  item:setButtonPositionY(2)
+  item:setAbilities('A08C')
+  item:setCooldownGroup('A08C')
+  item:setClassification('Purchasable')
+  item:setLevel(0)
+  item:setLevelUnclassified(0)
+  item:setGoldCost(750)
+  item:setLumberCost(0)
+  item:setHitPoints(100)
+  item:setPriority(750)
+  item:setScalingValue(1.0)
+  item:setStockMaximum(2)
+  item:setStockReplenishInterval(0)
+  item:setStockStartDelay(0)
+  item:setCanBeDropped(true)
+  item:setDroppedWhenCarrierDies(false)
+  item:setCanBeSoldByMerchants(true)
+  item:setCanBeSoldToMerchants(true)
+  item:setActivelyUsed(true)
+  item:setPerishable(true)
+  item:setUseAutomaticallyWhenAcquired(false)
+  item:setIgnoreCooldown(false)
+  item:setIncludeAsRandomChoice(false)
+  item:setValidTargetForTransformation(false)
+  item:setNumberofCharges(3)
+  return item
+end
+
+createElfPotion(
+  'IEM1',
+  '精灵魔法药水',
+  '|cffffffcc药品|n|r在10秒内恢复英雄1000魔法值|cffccffff|n|r|cffffffcc不会因战斗而打断效果|r',
+  'ReplaceableTextures\\CommandButtons\\BTN000114.blp',
+  'war3mapImported\\PotionBlueGreater.mdl',
+  3
+)
+
+createElfPotion(
+  'IEL1',
+  '精灵生命药水',
+  '|cffffffcc药品|n|r在10秒内恢复英雄2400生命值|cffccffff|n|r|cffffffcc不会因战斗而打断效果|r',
+  'ReplaceableTextures\\CommandButtons\\BTN000113.blp',
+  'war3mapImported\\PotionGreen.mdl',
+  1
+)

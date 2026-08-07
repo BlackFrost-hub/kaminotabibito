@@ -30,7 +30,7 @@ const RemoveLocation = jass.RemoveLocation as (this: void, location: any) => voi
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 
 const 封锁墙物编ID = stringToFourCCSafe("Dofw");
-const 封锁墙创建朝向 = 90;
+const 封锁墙创建朝向 = 270;
 const 封锁墙缩放 = 1;
 const 封锁墙变体 = 0;
 const 亚伦柯斯单位ID = stringToFourCCSafe("U006");
@@ -50,6 +50,7 @@ interface 封锁墙坐标记录 {
 
 let 封锁墙坐标缓存: 封锁墙坐标记录[] | undefined;
 let 已创建封锁墙: any[] = [];
+const 亚伦柯斯墓地阻挡全局名 = "gg_dest_Dofw_10481";
 
 function 句柄有效(this: void, handle: any): boolean {
   return handle != null && handle !== 0;
@@ -122,6 +123,12 @@ export function 清理亚伦柯斯安兹封锁墙(this: void, bossUnit: any): vo
     if (句柄有效(destructable)) RemoveDestructable(destructable);
   }
   已创建封锁墙 = [];
+
+  if (GetUnitTypeId(bossUnit) !== 亚伦柯斯单位ID) return;
+  const 墓地阻挡 = jglobals[亚伦柯斯墓地阻挡全局名];
+  if (!句柄有效(墓地阻挡)) return;
+  RemoveDestructable(墓地阻挡);
+  jglobals[亚伦柯斯墓地阻挡全局名] = null;
 }
 
 export {};

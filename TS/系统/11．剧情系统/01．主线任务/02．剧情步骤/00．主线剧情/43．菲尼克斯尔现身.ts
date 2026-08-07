@@ -45,6 +45,7 @@ const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star�
 import { 菲尼克斯尔场地配置 } from "../../../../03．技能系统/05．单位技能/03．Boss技能/01．主线Boss/04．双重凤凰菲尼克斯尔/01．场地配置";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 应用第三章电影镜头 } from "./40-50．第三章电影镜头";
 import { 清理剧情运行时单位, 注册剧情运行时单位, 读取剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 尝试播放Boss死亡主线剧情 } from "../06．Boss死亡剧情索引";
 
@@ -117,6 +118,7 @@ function 创建神殿入口表现(this: void, 状态: 菲尼克斯尔现身状�
 }
 
 function 播放菲尼克斯尔现身(this: void, 触发单位: any): void {
+  应用第三章电影镜头(43);
   const { 播放主线剧情片段 } = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器") as {
     播放主线剧情片段: (this: void, 片段ID: string, 上下文?: any) => boolean;
   };

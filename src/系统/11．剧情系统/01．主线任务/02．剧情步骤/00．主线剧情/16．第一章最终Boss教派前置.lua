@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local _____6559_6D3E_73B0_573A_73A9_5BB6_82F1_96C4_7EC4, jassGlobalsCamera, YDUserDataGetSafe
+local _____6559_6D3E_73B0_573A_73A9_5BB6_82F1_96C4_7EC4, YDUserDataGetSafe
 local ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
 local _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E = ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5["创建并冻结剧情Boss预置"]
 local ____12_FF0E_5267_60C5_7535_5F71_955C_5934 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情电影镜头")
@@ -10,9 +10,6 @@ local _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F = ____12_FF0E_5267_60C5_7535_
 local _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934 = ____12_FF0E_5267_60C5_7535_5F71_955C_5934["退出剧情电影模式并恢复镜头"]
 function _____6559_6D3E_73B0_573A_73A9_5BB6_82F1_96C4_7EC4()
     return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
-end
-function jassGlobalsCamera(name)
-    return require("jass.globals")[name]
 end
 ---
 -- @noSelfInFile
@@ -34,27 +31,28 @@ local ____require_result_5 = require("lib.扩展函数.BJ函数.05A．电影函�
 local CinematicModeBJ = ____require_result_5.CinematicModeBJ
 local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
 local StarOther_PanCameraToTimedForPlayer = ____require_result_6.StarOther_PanCameraToTimedForPlayer
-local ____require_result_7 = require("系统.00．核心系统.07．联机安全工具")
-local safeForForce = ____require_result_7.safeForForce
-local ____require_result_8 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_8.EC_CreateEffect
-local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_9["创建单位并登记排泄安全"]
-local ____require_result_10 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
-local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_10["立即移除单位并取消排泄登记"]
-local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
-local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_11["注册剧情片段清理"]
-local ____require_result_12 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
-local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_12["注册剧情运行时单位"]
-local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_12["读取剧情运行时单位"]
-local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_12["清理剧情运行时单位"]
-local ____require_result_13 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_13.addDelayedCallback
-local removeDelayedCallback = ____require_result_13.removeDelayedCallback
+local ____require_result_7 = require("lib.扩展函数.封装函数.07．镜头函数.03．镜头预设")
+local _____5E94_7528_955C_5934_9884_8BBE_7ED9_73A9_5BB6 = ____require_result_7["应用镜头预设给玩家"]
+local ____require_result_8 = require("系统.00．核心系统.07．联机安全工具")
+local safeForForce = ____require_result_8.safeForForce
+local ____require_result_9 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_9.EC_CreateEffect
+local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_10["创建单位并登记排泄安全"]
+local ____require_result_11 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_11["立即移除单位并取消排泄登记"]
+local ____require_result_12 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
+local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_12["注册剧情片段清理"]
+local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
+local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["注册剧情运行时单位"]
+local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["读取剧情运行时单位"]
+local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["清理剧情运行时单位"]
 local ____require_result_14 = require("lib.扩展函数.KK扩展API.00．装饰物函数")
 local DzDoodadRemove = ____require_result_14.DzDoodadRemove
 local ____require_result_15 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
 local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_15["卸载区域背景音乐句柄"]
+local ____require_result_16 = require("lib.扩展函数.封装函数.01．通用工具.12．JASS原生别名")
+local BJGetUnitsInRectMatching = ____require_result_16.GetUnitsInRectMatching
 do
     local ____16_FF0E_7B2C_4E00_7AE0_6700_7EC8Boss_6559_6D3E_524D_7F6E = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.16．第一章最终Boss教派前置")
     ____exports["护卫试炼后回村剧情片段"] = ____16_FF0E_7B2C_4E00_7AE0_6700_7EC8Boss_6559_6D3E_524D_7F6E["护卫试炼后回村剧情片段"]
@@ -69,7 +67,7 @@ local GetRandomInt = jass.GetRandomInt
 local GetOwningPlayer = jass.GetOwningPlayer
 local Player = jass.Player
 local GroupRemoveUnit = jass.GroupRemoveUnit
-local GetUnitsInRectMatching = jass.GetUnitsInRectMatching
+local GetUnitsInRectMatching = BJGetUnitsInRectMatching
 local IsPlayerInForce = jass.IsPlayerInForce
 local ShowUnit = jass.ShowUnit
 local SetUnitFacing = jass.SetUnitFacing
@@ -78,23 +76,36 @@ local PauseUnit = jass.PauseUnit
 local SetUnitAnimation = jass.SetUnitAnimation
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local IssueTargetOrder = jass.IssueTargetOrder
-local CameraSetupApplyForPlayer = jass.CameraSetupApplyForPlayer
 local GetEnumPlayer = jass.GetEnumPlayer
 local GetEnumUnit = jass.GetEnumUnit
-local GetLocalPlayer = jass.GetLocalPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local SetCameraFieldForPlayer = jass.SetCameraFieldForPlayer
-local ResetToGameCameraForPlayer = jass.ResetToGameCameraForPlayer
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local _____6559_6D3E_73B0_573A_5355_4F4D_952E_524D_7F00 = "剧情运行时.教派袭击现场."
 local _____6559_6D3E_73B0_573A_6811_6728 = {}
-local _____6559_6D3E_955C_5934_5207_6362_5EF6_8FDFID = 0
+local _____6559_6D3E_955C_5934A = {
+    X = -24221.7,
+    Y = -27206.4,
+    ["高度偏移"] = 0,
+    ["旋转角度"] = 270,
+    ["攻角"] = 320,
+    ["距离到目标"] = 3400,
+    ["滚动角度"] = 0,
+    ["观察区域"] = 70,
+    ["远景剪裁"] = 5500
+}
+local _____6559_6D3E_955C_5934B = {
+    X = -26699.9,
+    Y = -28368.4,
+    ["高度偏移"] = 0,
+    ["旋转角度"] = 270,
+    ["攻角"] = 320,
+    ["距离到目标"] = 2800,
+    ["滚动角度"] = 0,
+    ["观察区域"] = 50,
+    ["远景剪裁"] = 5000
+}
 local function _____6E05_7406_6559_6D3E_88AD_51FB_73B0_573A_5BF9_8C61()
-    if _____6559_6D3E_955C_5934_5207_6362_5EF6_8FDFID ~= 0 then
-        removeDelayedCallback(_____6559_6D3E_955C_5934_5207_6362_5EF6_8FDFID)
-        _____6559_6D3E_955C_5934_5207_6362_5EF6_8FDFID = 0
-    end
     do
         local i = 1
         while i <= 6 do
@@ -135,18 +146,15 @@ local function _____6E05_7406_6559_6D3E_88AD_51FB_73B0_573A()
         )
     end
     _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934()
-    local localPlayer = GetLocalPlayer()
-    SetCameraFieldForPlayer(localPlayer, jass.CAMERA_FIELD_TARGET_DISTANCE, 3000, 0)
-    ResetToGameCameraForPlayer(localPlayer, 0)
 end
 local function _____8BFB_53D6_6559_6D3E_73B0_573A_5355_4F4D_7C7B_578B(rawId)
     return __TS__Number(require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe(rawId))
 end
 local function _____6E05_7406_8BED_4E49_5355_4F4D(_____8868, _____952E)
-    local ____require_result_16 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-    local YDUserDataGetSafe = ____require_result_16.YDUserDataGetSafe
-    local ____require_result_17 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-    local YDUserDataClearTable = ____require_result_17.YDUserDataClearTable
+    local ____require_result_17 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+    local YDUserDataGetSafe = ____require_result_17.YDUserDataGetSafe
+    local ____require_result_18 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+    local YDUserDataClearTable = ____require_result_18.YDUserDataClearTable
     local unit = YDUserDataGetSafe("string", _____8868, _____952E, "unit")
     if unit ~= nil and unit ~= 0 then
         _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
@@ -288,36 +296,23 @@ ____exports["执行教派袭击预置"] = function()
         end
     end
     local _____73A9_5BB6_7EC4 = GetPlayersAll()
-    local _____955C_5934A = jassGlobalsCamera("gg_cam_Camera_014_______u")
-    if _____955C_5934A ~= nil and _____955C_5934A ~= 0 then
-        safeForForce(
-            _____73A9_5BB6_7EC4,
-            function()
-                local player = GetEnumPlayer()
-                CameraSetupApplyForPlayer(true, _____955C_5934A, player, 0)
-                StarOther_PanCameraToTimedForPlayer(player, -26236.2, -28701.7, 5)
-            end
-        )
-    end
-    if _____6559_6D3E_955C_5934_5207_6362_5EF6_8FDFID ~= 0 then
-        removeDelayedCallback(_____6559_6D3E_955C_5934_5207_6362_5EF6_8FDFID)
-    end
-    _____6559_6D3E_955C_5934_5207_6362_5EF6_8FDFID = addDelayedCallback(
-        5000,
+    safeForForce(
+        _____73A9_5BB6_7EC4,
         function()
-            _____6559_6D3E_955C_5934_5207_6362_5EF6_8FDFID = 0
-            local _____955C_5934B = jassGlobalsCamera("gg_cam_Camera_014")
-            if _____955C_5934B == nil or _____955C_5934B == 0 then
-                return
-            end
-            safeForForce(
-                GetPlayersAll(),
-                function() return CameraSetupApplyForPlayer(
-                    true,
-                    _____955C_5934B,
-                    GetEnumPlayer(),
-                    0
-                ) end
+            local player = GetEnumPlayer()
+            _____5E94_7528_955C_5934_9884_8BBE_7ED9_73A9_5BB6(player, _____6559_6D3E_955C_5934A, 0)
+            StarOther_PanCameraToTimedForPlayer(player, -26236.2, -28701.7, 5)
+        end
+    )
+end
+local function _____6267_884C_6559_6D3E_955C_5934B()
+    safeForForce(
+        GetPlayersAll(),
+        function()
+            _____5E94_7528_955C_5934_9884_8BBE_7ED9_73A9_5BB6(
+                GetEnumPlayer(),
+                _____6559_6D3E_955C_5934B,
+                0
             )
         end
     )
@@ -366,7 +361,6 @@ local function _____6267_884C_6559_6D3E_73B0_573A_73A9_5BB6_6062_590D()
         end
     )
     if _____795E_79D8_4EBA ~= nil and _____795E_79D8_4EBA ~= 0 then
-        SetUnitFacing(_____795E_79D8_4EBA, 90)
         EC_CreateEffect(
             "Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl",
             GetUnitX(_____795E_79D8_4EBA),
@@ -379,6 +373,16 @@ local function _____6267_884C_6559_6D3E_73B0_573A_73A9_5BB6_6062_590D()
         )
     end
 end
+local function _____6267_884C_6559_6D3E_8499_9762_4EBA_9762_5411_73A9_5BB6()
+    local _____795E_79D8_4EBA = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____6559_6D3E_73B0_573A_5355_4F4D_952E_524D_7F00 .. "1")
+    if _____795E_79D8_4EBA == nil or _____795E_79D8_4EBA == 0 then
+        return
+    end
+    SetUnitFacing(_____795E_79D8_4EBA, 90)
+end
+local function jassGlobalsCamera(name)
+    return require("jass.globals")[name]
+end
 local function _____6267_884C_6559_6D3E_6218_6597_6536_675F()
     _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934()
     local sound = jassGlobalsCamera("gg_snd_JQBGM04")
@@ -387,29 +391,31 @@ local function _____6267_884C_6559_6D3E_6218_6597_6536_675F()
 end
 ____exports["执行教派Boss随机姿态"] = function(_____53C2_6570)
     local roll = GetRandomInt(1, 2)
-    local ____temp_20
+    local ____temp_21
     if roll == 1 then
-        local ____53C2_6570__5251_58EB_59FF_6001Boss_540D_18 = _____53C2_6570["剑士姿态Boss名"]
-        if ____53C2_6570__5251_58EB_59FF_6001Boss_540D_18 == nil then
-            ____53C2_6570__5251_58EB_59FF_6001Boss_540D_18 = "教派剑士"
+        local ____53C2_6570__5251_58EB_59FF_6001Boss_540D_19 = _____53C2_6570["剑士姿态Boss名"]
+        if ____53C2_6570__5251_58EB_59FF_6001Boss_540D_19 == nil then
+            ____53C2_6570__5251_58EB_59FF_6001Boss_540D_19 = "教派剑士"
         end
-        ____temp_20 = tostring(____53C2_6570__5251_58EB_59FF_6001Boss_540D_18)
+        ____temp_21 = tostring(____53C2_6570__5251_58EB_59FF_6001Boss_540D_19)
     else
-        local ____53C2_6570__5B66_8005_59FF_6001Boss_540D_19 = _____53C2_6570["学者姿态Boss名"]
-        if ____53C2_6570__5B66_8005_59FF_6001Boss_540D_19 == nil then
-            ____53C2_6570__5B66_8005_59FF_6001Boss_540D_19 = "教派学者"
+        local ____53C2_6570__5B66_8005_59FF_6001Boss_540D_20 = _____53C2_6570["学者姿态Boss名"]
+        if ____53C2_6570__5B66_8005_59FF_6001Boss_540D_20 == nil then
+            ____53C2_6570__5B66_8005_59FF_6001Boss_540D_20 = "教派学者"
         end
-        ____temp_20 = tostring(____53C2_6570__5B66_8005_59FF_6001Boss_540D_19)
+        ____temp_21 = tostring(____53C2_6570__5B66_8005_59FF_6001Boss_540D_20)
     end
-    local ____boss_540D = ____temp_20
-    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_22 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
-    local ____53C2_6570_Boss_952E_21 = _____53C2_6570["Boss键"]
-    if ____53C2_6570_Boss_952E_21 == nil then
-        ____53C2_6570_Boss_952E_21 = "Boss.蒙面人"
+    local ____boss_540D = ____temp_21
+    local _____6218_6597_59FF_6001_5355_4F4D_7C7B_578B = roll == 1 and "N05N" or "N05M"
+    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_23 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
+    local ____53C2_6570_Boss_952E_22 = _____53C2_6570["Boss键"]
+    if ____53C2_6570_Boss_952E_22 == nil then
+        ____53C2_6570_Boss_952E_22 = "Boss.蒙面人"
     end
-    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_22({
-        ["Boss键"] = tostring(____53C2_6570_Boss_952E_21),
+    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_23({
+        ["Boss键"] = tostring(____53C2_6570_Boss_952E_22),
         ["Boss名"] = ____boss_540D,
+        ["允许单位类型"] = {_____6218_6597_59FF_6001_5355_4F4D_7C7B_578B},
         X = __TS__Number(_____53C2_6570["出生X"]) or 0,
         Y = __TS__Number(_____53C2_6570["出生Y"]) or 0,
         ["朝向"] = __TS__Number(_____53C2_6570["朝向"]) or 0,
@@ -420,6 +426,8 @@ end
 ____exports["第一章最终Boss教派前置剧情动作注册表"] = {
     ["JLC精灵村_护卫试炼后回村"] = ____exports["执行护卫试炼后回村"],
     ["JLC精灵村_教派袭击预置"] = ____exports["执行教派袭击预置"],
+    ["JLC精灵村_教派镜头B"] = _____6267_884C_6559_6D3E_955C_5934B,
+    ["JLC精灵村_教派蒙面人面向玩家"] = _____6267_884C_6559_6D3E_8499_9762_4EBA_9762_5411_73A9_5BB6,
     ["JLC精灵村_教派Boss随机姿态"] = ____exports["执行教派Boss随机姿态"],
     ["JLC精灵村_教派玩家入场"] = _____6267_884C_6559_6D3E_73B0_573A_73A9_5BB6_5165_573A,
     ["JLC精灵村_教派玩家恢复"] = _____6267_884C_6559_6D3E_73B0_573A_73A9_5BB6_6062_590D,

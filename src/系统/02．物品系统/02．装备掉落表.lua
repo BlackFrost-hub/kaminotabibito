@@ -719,6 +719,15 @@ ____exports["装备掉落表"] = {
         isUniversal = "FALSE",
         unitType = "elite"
     },
+    n07D = {
+        id = "n07D",
+        name = "腐淤狂战士",
+        level = 29,
+        itemIds = "I0H0:1;I0H1:1;I0H2:1;I0H3:1",
+        picks = 2,
+        isUniversal = "FALSE",
+        unitType = "elite"
+    },
     n00K = {
         id = "n00K",
         name = "黑暗魔法女王",
@@ -990,7 +999,7 @@ ____exports["装备掉落表"] = {
     },
     O002 = {
         id = "O002",
-        name = "黑暗恶魔军官",
+        name = "教派恶魔军官",
         level = 37,
         itemIds = "I07F:1;I07E:1;I07D:1",
         picks = 2,

@@ -57,8 +57,8 @@
   - `elven_city_palace_guard`
   - `elven_city_side_quest_discover`
   - `elven_city_king_audience`
-  - `elven_city_hunter_start`
-  - `elven_city_troll_leader_start`
+  - `elven_city_troll_guard_start`
+  - `elven_city_treant_leader_start`
   - `elven_city_treant_leader_death`
   - `elven_city_report_magic_letter`
   - `elven_city_hectel_decode`

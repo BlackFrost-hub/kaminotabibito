@@ -38,9 +38,15 @@ const { 闪电效果代码 } = require("系统.03．技能系统.00．技能模�
 const { 注册封印守卫战区域音乐 } = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐") as {
   注册封印守卫战区域音乐: (this: void) => boolean;
 };
+const { 动态矩形区域配置表, 注册动态矩形区域, 注销动态矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  动态矩形区域配置表: Record<string, { 键: string; 左: number; 右: number; 下: number; 上: number; 说明?: string }>;
+  注册动态矩形区域: (this: void, 配置: { 键: string; 左: number; 右: number; 下: number; 上: number; 说明?: string }) => any;
+  注销动态矩形区域: (this: void, 键: string) => boolean;
+};
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 应用第三章电影镜头 } from "./40-50．第三章电影镜头";
 import { 读取语义单位引用, 设置玩家英雄组控制状态 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 清理剧情运行时单位, 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 发布主线节点目标 } from "../../00．剧情系统核心工具/10．标准剧情动作";
@@ -48,9 +54,7 @@ import { 发布主线节点目标 } from "../../00．剧情系统核心工具/10
 const CreateRegion = jass.CreateRegion as (this: void) => any;
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const Rect = jass.Rect as (this: void, minX: number, minY: number, maxX: number, maxY: number) => any;
 const RegionAddRect = jass.RegionAddRect as (this: void, region: any, rect: any) => void;
-const RemoveRect = jass.RemoveRect as (this: void, rect: any) => void;
 const RemoveRegion = jass.RemoveRegion as (this: void, region: any) => void;
 const Player = jass.Player as (this: void, playerId: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
@@ -73,7 +77,7 @@ const DestroyLightning = jass.DestroyLightning as (this: void, whichLightning: a
 
 const 中立被动玩家ID = 15;
 const 封印核心纯对白来源 = "剧情系统:封印核心纯对白";
-const 封印核心入口半径 = 480;
+const 封印核心入口矩形键 = "剧情.封印核心入口";
 
 export const 封印核心场景站位表 = {
   A入口: { X: 2480.1, Y: -9696.2, 朝向: 178.32 },
@@ -83,7 +87,7 @@ export const 封印核心场景站位表 = {
   E奥斯特利一世: { X: 975.9, Y: -9652.2, 朝向: 314.20 },
 } as const;
 
-const 七色闪电演出表 = [
+export const 封印核心七色闪电配置表 = [
   { 代码: 闪电效果代码.红色光束, X: 2630.6, Y: -8719.3 },
   { 代码: 闪电效果代码.粉色光束, X: 1148.2, Y: -7998.1 },
   { 代码: 闪电效果代码.黄色光束, X: -337.3, Y: -8510.6 },
@@ -116,6 +120,7 @@ interface 封印核心入口监听状态 {
 let 当前封印核心场景状态: 封印核心场景状态 | undefined;
 let 当前封印核心入口监听: 封印核心入口监听状态 | undefined;
 let 当前玩家对白站位: typeof 封印核心场景站位表.B玩家 | undefined;
+let 当前封印核心奥斯特利一世记录: 封印核心场景单位记录 | undefined;
 
 function 句柄有效(this: void, handle: any): boolean {
   return handle != null && handle !== 0;
@@ -199,14 +204,15 @@ function 创建封印核心场景单位(this: void, 状态: 封印核心场景�
   );
   if (奥斯特利一世 == null) return false;
   状态.单位列表.push(奥斯特利一世);
+  当前封印核心奥斯特利一世记录 = 奥斯特利一世;
   return true;
 }
 
 function 创建七色闪电(this: void, 状态: 封印核心场景状态): void {
   if (状态.闪电列表.length > 0) return;
   const 目标 = 封印核心场景站位表.E奥斯特利一世;
-  for (let i = 0; i < 七色闪电演出表.length; i++) {
-    const 配置 = 七色闪电演出表[i];
+  for (let i = 0; i < 封印核心七色闪电配置表.length; i++) {
+    const 配置 = 封印核心七色闪电配置表[i];
     const 闪电 = AddLightningEx(配置.代码, false, 配置.X, 配置.Y, 1700.0, 目标.X, 目标.Y, 250.8);
     if (句柄有效(闪电)) 状态.闪电列表.push(闪电);
   }
@@ -223,12 +229,22 @@ function 清理封印核心闪电(this: void, 状态: 封印核心场景状态):
 function 清理封印核心场景单位(this: void, 状态: 封印核心场景状态): void {
   for (let i = 0; i < 状态.单位列表.length; i++) {
     const 记录 = 状态.单位列表[i];
+    if (记录 === 当前封印核心奥斯特利一世记录) continue;
     解除暂停并取消无敌安全(记录.单位, `${封印核心纯对白来源}:${记录.运行时键}`);
     if (记录.临时创建 && 句柄有效(记录.单位)) 立即移除单位并取消排泄登记(记录.单位);
     清理剧情运行时单位(记录.运行时键);
   }
   状态.单位列表.length = 0;
   清理剧情运行时单位("剧情运行时.封印核心玩家");
+}
+
+export function 清理封印核心收束说话者(this: void): void {
+  const 记录 = 当前封印核心奥斯特利一世记录;
+  if (记录 == null) return;
+  解除暂停并取消无敌安全(记录.单位, `${封印核心纯对白来源}:${记录.运行时键}`);
+  if (记录.临时创建 && 句柄有效(记录.单位)) 立即移除单位并取消排泄登记(记录.单位);
+  清理剧情运行时单位(记录.运行时键);
+  当前封印核心奥斯特利一世记录 = undefined;
 }
 
 export function 清理封印核心场景(this: void): void {
@@ -249,6 +265,7 @@ export function 布置封印核心纯对白(this: void): boolean {
   const 状态: 封印核心场景状态 = { 单位列表: [], 闪电列表: [], 已清理: false };
   当前封印核心场景状态 = 状态;
   移动玩家队伍到对白站位();
+  应用第三章电影镜头(48);
   设置玩家英雄组控制状态(true, false);
   if (!创建封印核心场景单位(状态)) {
     清理封印核心场景();
@@ -269,8 +286,8 @@ function 清理封印核心入口监听(this: void): void {
   if (状态 == null) return;
   if (状态.取消监听 != null) 状态.取消监听();
   if (句柄有效(状态.触发器)) safeDestroyTrigger(状态.触发器);
-  if (句柄有效(状态.矩形)) RemoveRect(状态.矩形);
   if (句柄有效(状态.区域)) RemoveRegion(状态.区域);
+  注销动态矩形区域(封印核心入口矩形键);
   当前封印核心入口监听 = undefined;
 }
 
@@ -304,25 +321,20 @@ export function 开始监听封印核心入口(this: void): void {
   注册封印守卫战区域音乐();
 
   const 区域 = CreateRegion();
-  const 矩形 = Rect(
-    封印核心场景站位表.A入口.X - 封印核心入口半径,
-    封印核心场景站位表.A入口.Y - 封印核心入口半径,
-    封印核心场景站位表.A入口.X + 封印核心入口半径,
-    封印核心场景站位表.A入口.Y + 封印核心入口半径,
-  );
+  const 矩形 = 注册动态矩形区域(动态矩形区域配置表[封印核心入口矩形键]);
   const 触发器 = CreateTrigger();
   if (!句柄有效(区域) || !句柄有效(矩形) || !句柄有效(触发器)) {
-    if (句柄有效(矩形)) RemoveRect(矩形);
     if (句柄有效(区域)) RemoveRegion(区域);
     if (句柄有效(触发器)) safeDestroyTrigger(触发器);
+    注销动态矩形区域(封印核心入口矩形键);
     return;
   }
 
   RegionAddRect(区域, 矩形);
   if (safeTriggerAddAction(触发器, on封印核心入口触发) == null) {
-    RemoveRect(矩形);
     RemoveRegion(区域);
     safeDestroyTrigger(触发器);
+    注销动态矩形区域(封印核心入口矩形键);
     return;
   }
 
@@ -352,9 +364,14 @@ export function 执行清理封印核心入口(this: void, _参数: 剧情动作
   清理封印核心场景();
 }
 
+export function 执行清理封印核心收束(this: void, _参数: 剧情动作参数表): void {
+  清理封印核心收束说话者();
+}
+
 export const 封印核心场景剧情动作注册表: Record<string, 剧情动作处理器> = {
   "第三章_布置封印核心纯对白": 执行布置封印核心纯对白,
   "第三章_创建封印核心七色光束": 执行创建封印核心七色光束,
   "第三章_结束封印核心纯对白": 执行结束封印核心纯对白,
   "第三章_清理封印核心入口": 执行清理封印核心入口,
+  "第三章_清理封印核心收束": 执行清理封印核心收束,
 };

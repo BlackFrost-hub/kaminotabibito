@@ -6,7 +6,7 @@ const UI函数 = require("系统.00．核心系统.03．UI函数") as {
 import { GetItemTypeCountInUnitBJ, RemoveItemTypeFromUnitBJ } from "../../../lib/扩展函数/BJ函数/03．物品与库存";
 import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
-import { QuestData as QuestConfig } from "../../08．任务系统/00．配置表/02．任务配置表";
+import { 任务配置 } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, showLocalHint } from "./02．对话框业务逻辑";
 const ____npcEffect = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效") as {
   getNpcUnit: (this: void, playerId: number) => any;
@@ -58,17 +58,30 @@ function grantQuestItems(hero: any, questItems?: string): void {
   }
 }
 
-function canAcceptQuestByRequirements(quest: QuestConfig, hero: any): boolean {
-  const req = quest.requirements;
+function canAcceptQuestByRequirements(quest: 任务配置, hero: any): boolean {
+  const req = quest.接取条件;
   if (!req || req === "") return true;
-  // 当前仅实现：英雄等级＜N（不用正则，兼容 TSTL）
-  const markerA = "英雄等级<";
-  const markerB = "英雄等级＜";
-  let pos = req.indexOf(markerA);
-  let offset = markerA.length;
+  // 支持英雄等级＜N / 英雄等级＞N（不用正则，兼容 TSTL）
+  const lessMarkerA = "英雄等级<";
+  const lessMarkerB = "英雄等级＜";
+  const greaterMarkerA = "英雄等级>";
+  const greaterMarkerB = "英雄等级＞";
+  let isGreaterThan = false;
+  let pos = req.indexOf(lessMarkerA);
+  let offset = lessMarkerA.length;
   if (pos < 0) {
-    pos = req.indexOf(markerB);
-    offset = markerB.length;
+    pos = req.indexOf(lessMarkerB);
+    offset = lessMarkerB.length;
+  }
+  if (pos < 0) {
+    pos = req.indexOf(greaterMarkerA);
+    offset = greaterMarkerA.length;
+    isGreaterThan = pos >= 0;
+  }
+  if (pos < 0) {
+    pos = req.indexOf(greaterMarkerB);
+    offset = greaterMarkerB.length;
+    isGreaterThan = pos >= 0;
   }
   if (pos < 0) return true;
   const raw = req.substring(pos + offset).trim();
@@ -82,10 +95,10 @@ function canAcceptQuestByRequirements(quest: QuestConfig, hero: any): boolean {
   const limit = Number(digits);
   if (!hero) return false;
   const level = jass.GetHeroLevel(hero) as number;
-  return level < limit;
+  return isGreaterThan ? level > limit : level < limit;
 }
 
-function getQuestRewardDisplayText(quest: QuestConfig): string {
+function getQuestRewardDisplayText(quest: 任务配置): string {
   return resolveRewardDisplayText(quest);
 }
 
@@ -145,43 +158,52 @@ export function buildDialogData(npcName: string, heroName: string): NpcDialogDat
     };
   }
   return {
-    lines: parseDialogText(dialogConfig.Text || "", npcName, heroName),
+    lines: parseDialogText(dialogConfig.对话文本 || "", npcName, heroName),
     removeOverheadMarkerOnOpen: true,
   };
 }
 
-export function buildQuestCompletedDialog(quest: QuestConfig, npcName: string): NpcDialogData {
-  let msg = quest.afterCompleteDialog || quest.NpcCompleteText || DEFAULT_AFTER_COMPLETE_MSG;
+export function buildQuestCompletedDialog(quest: 任务配置, npcName: string): NpcDialogData {
+  let msg = quest.完成后对白 || quest.NPC完成对白 || DEFAULT_AFTER_COMPLETE_MSG;
   if (msg === "默认") msg = DEFAULT_AFTER_COMPLETE_MSG;
   return { lines: [{ title: npcName, text: msg, duration: 4 }], removeOverheadMarkerOnOpen: true };
 }
 
-export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialogOwnerId: number, npcUnit?: any): NpcDialogData {
+export function buildQuestOfferDialog(
+  quest: 任务配置,
+  npcName: string,
+  dialogOwnerId: number,
+  npcUnit?: any,
+  对话目标单位?: any,
+  NPC配置朝向?: number,
+): NpcDialogData {
   const dialogOwner = jass.Player(dialogOwnerId);
   const ownerHero = dialogOwner ? getPlayerFirstHero(dialogOwner) : null;
   const heroName = ownerHero ? jass.GetUnitName(ownerHero) : "你";
-  const questDesc = quest.desc || quest.name || "未知任务";
+  const questDesc = quest.描述 || quest.名称 || "未知任务";
   const rewardText = getQuestRewardDisplayText(quest);
-  const startLines = quest.NpcStartText
-    ? parseDialogText(quest.NpcStartText, npcName, heroName)
-    : [{ title: npcName, text: `我有任务要交给你：${quest.name}`, duration: 4 }];
+  const startLines = quest.NPC开始对白
+    ? parseDialogText(quest.NPC开始对白, npcName, heroName)
+    : [{ title: npcName, text: `我有任务要交给你：${quest.名称}`, duration: 4 }];
 
   return {
     lines: startLines,
     removeOverheadMarkerOnOpen: true,
     quest: {
       title: npcName,
-      text: `【${quest.name}】\n\n${questDesc}\n\n奖励：${rewardText}`,
+      text: `【${quest.名称}】\n\n${questDesc}\n\n奖励：${rewardText}`,
       onAccept: () => {
-        const questId = quest.requireID != null ? quest.requireID.toString() : "";
+        const questId = quest.任务ID != null ? quest.任务ID.toString() : "";
         const playerObj = jass.Player(dialogOwnerId);
         const hero = playerObj ? getPlayerFirstHero(playerObj) : null;
         const currentNpcUnit = npcUnit || getDialogNpcUnit(dialogOwnerId);
         if (!canAcceptQuestByRequirements(quest, hero)) {
-          const failRaw = quest.AcceptFailedText || "当前条件不满足，无法接受该任务。";
+          const failRaw = quest.接取失败对白 || "当前条件不满足，无法接受该任务。";
           scheduleOpenDialogLater(playerObj, {
             lines: parseDialogText(failRaw, npcName, heroName),
             npcUnit: currentNpcUnit,
+            对话目标单位,
+            NPC配置朝向,
             removeOverheadMarkerOnOpen: false,
             restoreYellowQuestMarkerAfterDialog: true,
           });
@@ -190,14 +212,17 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
         if (!hasPlayerAcceptedQuest(dialogOwnerId, questId)) {
           const playerName = jass.GetPlayerName(playerObj) || "冒险者";
           setQuestState(dialogOwnerId, questId, 1, playerName);
-          grantQuestItems(hero, quest.questItems);
+          grantQuestItems(hero, quest.任务物品);
+          if (quest.接取后动作) quest.接取后动作(dialogOwnerId);
           refreshTaskUIForAllClientsSoon(dialogOwnerId, questId);
         }
-        const acceptedRaw = quest.QuestAcceptedMsg || DEFAULT_QUEST_ACCEPTED_MSG;
+        const acceptedRaw = quest.任务接受对白 || DEFAULT_QUEST_ACCEPTED_MSG;
         const acceptedLines = parseDialogText(acceptedRaw, npcName, heroName);
         scheduleOpenDialogLater(jass.Player(dialogOwnerId), {
           lines: acceptedLines,
           npcUnit: currentNpcUnit,
+          对话目标单位,
+          NPC配置朝向,
           removeOverheadMarkerOnOpen: false,
           applyGrayQuestMarkerAfterDialog: true,
         });
@@ -207,7 +232,7 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
       },
       onReject: () => {
         const currentNpcUnit = npcUnit || getDialogNpcUnit(dialogOwnerId);
-        showLocalHint(dialogOwnerId, `|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『${quest.name}』|r`);
+        showLocalHint(dialogOwnerId, `|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『${quest.名称}』|r`);
         if (currentNpcUnit) {
           scheduleYellowQuestMarkerAfterBubbleFade(currentNpcUnit);
         }
@@ -216,23 +241,30 @@ export function buildQuestOfferDialog(quest: QuestConfig, npcName: string, dialo
   };
 }
 
-export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, dialogOwnerId: number, npcUnit?: any): NpcDialogData {
+export function buildQuestInProgressDialog(
+  quest: 任务配置,
+  npcName: string,
+  dialogOwnerId: number,
+  npcUnit?: any,
+  对话目标单位?: any,
+  NPC配置朝向?: number,
+): NpcDialogData {
   const dialogOwner = jass.Player(dialogOwnerId);
   const ownerHero = dialogOwner ? getPlayerFirstHero(dialogOwner) : null;
   const heroName = ownerHero ? jass.GetUnitName(ownerHero) : "你";
-  const questDesc = quest.desc || quest.name || "";
+  const questDesc = quest.描述 || quest.名称 || "";
   const rewardText = getQuestRewardDisplayText(quest);
-  const requireCount = normalizeRequireCount(quest.requireCount);
+  const requireCount = normalizeRequireCount(quest.需求数量);
 
   return {
     lines: [],
     quest: {
       title: npcName,
-      text: `【${quest.name}】进行中...\n\n任务目标：${questDesc}\n进度：0/${requireCount}\n\n奖励：${rewardText}`,
+      text: `【${quest.名称}】进行中...\n\n任务目标：${questDesc}\n进度：0/${requireCount}\n\n奖励：${rewardText}`,
       acceptText: "提交任务",
       rejectText: "暂时忽略",
       onAccept: () => {
-        const questIdStr = quest.requireID != null ? quest.requireID.toString() : "";
+        const questIdStr = quest.任务ID != null ? quest.任务ID.toString() : "";
         const currentNpcUnit = npcUnit || getDialogNpcUnit(dialogOwnerId);
         handleQuestSubmit({
           quest,
@@ -240,6 +272,8 @@ export function buildQuestInProgressDialog(quest: QuestConfig, npcName: string, 
           heroName,
           dialogOwnerId,
           npcUnit: currentNpcUnit,
+          对话目标单位,
+          NPC配置朝向,
           parseDialogText,
           openDialog: openNpcDialog,
           refreshTaskUIForAllClientsSoon,

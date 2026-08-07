@@ -32,6 +32,10 @@ const idData =
   {};
 const itemsData =
   (require("系统.02．物品系统.01．装备数据") as { default?: Record<string, { score?: number }> }).default ?? {};
+const { 是否允许限次物品掉落, 记录限次物品掉落 } = require("系统.02．物品系统.19．掉落次数限制表") as {
+  是否允许限次物品掉落: (this: void, itemId: string) => boolean;
+  记录限次物品掉落: (this: void, itemId: string) => void;
+};
 interface UnitDataEntry {
   id: string;
   itemIds?: string | number;
@@ -118,13 +122,6 @@ function pickFromWeightedPool(
   picks: number
 ): string[] {
   if (pool.length === 0) return [];
-  if (picks === 1) {
-    for (let i = 0; i < pool.length; i++) {
-      if (pool[i].always) return [pool[i].id];
-    }
-    const one = weightedPickOne(pool);
-    return one ? [one] : [];
-  }
   const out: string[] = [];
   for (const p of pool) {
     if (p.weight >= 1 || p.always) {
@@ -192,16 +189,20 @@ function pickFromEqualPool(ids: string[], picks: number): string[] {
 }
 
 function createItemAtUnit(unit: any, itemId: string): void {
+  if (!是否允许限次物品掉落(itemId)) return;
+
   const four = stringToFourCC(itemId);
   const loc: any = (jass as any).GetUnitLoc(unit);
+  let createdItem: any = null;
   if (loc) {
-    itemCreateFns.在点创建物品并注册排泄监听(four, loc);
+    createdItem = itemCreateFns.在点创建物品并注册排泄监听(four, loc);
   } else if ((jass as any).GetUnitX != null) {
     const x = (jass as any).GetUnitX(unit);
     const y = (jass as any).GetUnitY(unit);
-    itemCreateFns.创建物品并注册排泄监听(four, x, y);
+    createdItem = itemCreateFns.创建物品并注册排泄监听(four, x, y);
   }
   if (loc) (jass as any).RemoveLocation(loc);
+  if (createdItem != null && createdItem !== 0) 记录限次物品掉落(itemId);
 }
 
 function onUnitDeath(this: void, unit: any, _killer: any): void {

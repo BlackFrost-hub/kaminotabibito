@@ -245,11 +245,11 @@ end
 function ____exports.shouldApplyControlReduction(id)
     return id == 0 or id == 1 or id == 2 or id == 5 or id == ____exports["SFB_负面BUFF"]["睡眠"] or id == ____exports["SFB_负面BUFF"]["纠缠根须"] or id == ____exports["SFB_负面BUFF"]["飓风"]
 end
-function ____exports.registerSfbManualBuff(sourceUnit, u, id, time, effectValue, effectSourceName, effectSourceType)
+function ____exports.registerSfbManualBuff(sourceUnit, u, id, time, effectValue, effectSourceName, effectSourceType, displayBuffID)
     if not (time > 0) then
         return
     end
-    local buffID = SFB_BUFF_ID[id]
+    local buffID = displayBuffID ~= nil and displayBuffID ~= "" and displayBuffID or SFB_BUFF_ID[id]
     if buffID == nil or buffID == "" then
         return
     end

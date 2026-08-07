@@ -65,8 +65,20 @@ const {
   是否指定Boss护卫: (this: void, unit: any, boss: any) => boolean;
   处理Boss结束全部护卫: (this: void, boss: any) => void;
 };
-const { 消费剧情Boss战带入随从 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接") as {
-  消费剧情Boss战带入随从: (this: void, boss: any) => any[];
+const { 读取剧情Boss战带入随从 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接") as {
+  读取剧情Boss战带入随从: (this: void, boss: any) => any[];
+};
+const { X_IsTerrainWalkableSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
+  X_IsTerrainWalkableSafe: (this: void, x: number, y: number) => boolean;
+};
+const { 沿角度步进直到地形阻挡 } = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进") as {
+  沿角度步进直到地形阻挡: (this: void, 参数: {
+    起点X: number;
+    起点Y: number;
+    角度度: number;
+    单步距离: number;
+    步数: number;
+  }) => { 最终X: number; 最终Y: number; 是否提前停止: boolean };
 };
 
 const 攻击力属性ID = 1;
@@ -78,6 +90,10 @@ const 巫医单位类型ID = stringToFourCC(树魔首领单位技能配置.召�
 const 投掷者单位类型ID = stringToFourCC(树魔首领单位技能配置.召唤物ID.投掷者);
 
 let 树魔首领随从特性已注册 = false;
+
+const 随从召唤候选角度偏移 = [0, 30, -30, 60, -60, 90, -90, 135, -135, 180];
+const 随从召唤候选距离比例 = [1, 0.8, 0.6, 0.4];
+const 随从召唤落点通行余量 = 96;
 
 function 是树魔首领(this: void, unit: any): boolean {
   return 单位存活(unit) && GetUnitTypeId(unit) === 树魔首领单位类型ID;
@@ -117,13 +133,16 @@ function 统计树魔随从(this: void, context: 树魔首领运行时上下文)
 }
 
 function 登记剧情带入树魔随从(this: void, context: 树魔首领运行时上下文): void {
-  const list = 消费剧情Boss战带入随从(context.Boss单位);
+  if (context.剧情带入随从已登记) return;
+  const list = 读取剧情Boss战带入随从(context.Boss单位);
+  if (list.length <= 0) return;
   for (let i = 0; i < list.length; i++) {
     const minion = list[i];
     if (!单位存活(minion)) continue;
     context.随从组.登记(minion);
     if (GetUnitTypeId(minion) === 巫医单位类型ID) 启动巫医治疗驱动(context, minion);
   }
+  context.剧情带入随从已登记 = true;
 }
 
 function 计算随从召唤点(
@@ -134,14 +153,41 @@ function 计算随从召唤点(
 ): { x: number; y: number } {
   const cfg = 树魔首领数值与表现配置.随从特性;
   const 居中槽位 = 槽位序号 - (编制.数量 - 1) * 0.5;
-  const angle = GetUnitFacing(boss)
+  const 基准角度 = GetUnitFacing(boss)
     + 编制.相对Boss朝向角度
     + 居中槽位 * 编制.槽位间隔角度
     + GetRandomReal(-cfg.召唤角度抖动, cfg.召唤角度抖动);
-  return {
-    x: GetUnitX(boss) + CosBJ(angle) * 编制.召唤距离,
-    y: GetUnitY(boss) + SinBJ(angle) * 编制.召唤距离,
-  };
+  const bossX = GetUnitX(boss);
+  const bossY = GetUnitY(boss);
+
+  for (let distanceIndex = 0; distanceIndex < 随从召唤候选距离比例.length; distanceIndex++) {
+    const distance = 编制.召唤距离 * 随从召唤候选距离比例[distanceIndex];
+    for (let angleIndex = 0; angleIndex < 随从召唤候选角度偏移.length; angleIndex++) {
+      const angle = 基准角度 + 随从召唤候选角度偏移[angleIndex];
+      const result = 沿角度步进直到地形阻挡({
+        起点X: bossX,
+        起点Y: bossY,
+        角度度: angle,
+        单步距离: distance,
+        步数: 1,
+      });
+      if (result.是否提前停止) continue;
+      if (!召唤落点周围可通行(result.最终X, result.最终Y)) continue;
+      return { x: result.最终X, y: result.最终Y };
+    }
+  }
+
+  return { x: bossX, y: bossY };
+}
+
+function 召唤落点周围可通行(this: void, x: number, y: number): boolean {
+  if (!X_IsTerrainWalkableSafe(x, y)) return false;
+  for (let angle = 0; angle < 360; angle += 45) {
+    const checkX = x + CosBJ(angle) * 随从召唤落点通行余量;
+    const checkY = y + SinBJ(angle) * 随从召唤落点通行余量;
+    if (!X_IsTerrainWalkableSafe(checkX, checkY)) return false;
+  }
+  return true;
 }
 
 function 获取树魔随从护卫类型(this: void, unitTypeId: number): string {

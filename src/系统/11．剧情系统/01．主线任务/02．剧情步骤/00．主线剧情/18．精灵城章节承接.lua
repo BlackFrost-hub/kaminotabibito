@@ -3,6 +3,8 @@ local ____exports = {}
 local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
 local _____8BBE_7F6E_89E6_53D1_5355_4F4D_63A7_5236_72B6_6001 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["设置触发单位控制状态"]
+local ____02_FF0E_4E3B_7EBF_5267_60C5_5165_53E3_521D_59CB_5316 = require("系统.11．剧情系统.01．主线任务.01．主线剧情入口.02．主线剧情入口初始化")
+local _____52A8_6001_521B_5EFA_5E76_6CE8_518C_4E3B_7EBF_5267_60C5_5168_5C40_5355_4F4D_5165_53E3 = ____02_FF0E_4E3B_7EBF_5267_60C5_5165_53E3_521D_59CB_5316["动态创建并注册主线剧情全局单位入口"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -18,9 +20,7 @@ do
 end
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local Player = jass.Player
 local QuestSetCompleted = jass.QuestSetCompleted
-local SetUnitOwner = jass.SetUnitOwner
 local ShowDestructable = jass.ShowDestructable
 local bj_QUESTTYPE_REQ_DISCOVERED = jglobals.bj_QUESTTYPE_REQ_DISCOVERED
 local function _____786E_4FDD_7B2C_4E8C_5E55_4E3B_7EBF_4EFB_52A1_5DF2_521B_5EFA()
@@ -62,14 +62,7 @@ local function _____6267_884C_7CBE_7075_57CE_7AE0_8282_627F_63A5_6F14_51FA(_____
     end
 end
 local function _____6267_884C_524D_5F80_738B_57CE()
-    local _____901A_884C_5355_4F4D = jglobals.gg_unit_n025_0033
-    if _____901A_884C_5355_4F4D ~= nil and _____901A_884C_5355_4F4D ~= 0 then
-        SetUnitOwner(
-            _____901A_884C_5355_4F4D,
-            Player(6),
-            true
-        )
-    end
+    local _____901A_884C_5355_4F4D = _____52A8_6001_521B_5EFA_5E76_6CE8_518C_4E3B_7EBF_5267_60C5_5168_5C40_5355_4F4D_5165_53E3("精灵森谷传送抵达")
     _____786E_4FDD_7B2C_4E8C_5E55_4E3B_7EBF_4EFB_52A1_5DF2_521B_5EFA()
 end
 ____exports["精灵城章节承接剧情动作注册表"] = {["JLC精灵城_章节承接"] = ____exports["执行精灵城章节承接"], ["JLC精灵城_章节承接演出"] = _____6267_884C_7CBE_7075_57CE_7AE0_8282_627F_63A5_6F14_51FA, ["JLC精灵城_前往王城"] = _____6267_884C_524D_5F80_738B_57CE}

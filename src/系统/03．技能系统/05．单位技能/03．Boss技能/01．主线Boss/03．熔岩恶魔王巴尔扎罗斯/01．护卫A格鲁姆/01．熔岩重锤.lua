@@ -111,7 +111,7 @@ local function _____7ED3_7B97_91CD_9524(context, angle)
                     ["标签"] = "格鲁姆-熔岩重锤"
                 })
                 _____65BD_52A0_5FEB_901F_63A7_5236Buff(grum, hero, _____5FEB_901F_63A7_5236__51FB_6655, config["眩晕秒"])
-                _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(hero, config["灼热层数"])
+                _____65BD_52A0_5DF4_5C14_624E_7F57_65AF_707C_70ED(context, hero, config["灼热层数"])
             end
             ::__continue9::
             i = i + 1

@@ -43,7 +43,7 @@ ____exports["英雄选择配置表"] = {
         ["|cffff0000炎|r|cffff7f7f杀|r姬"] = "|cffffff80横冲直撞的力量型冲锋英雄，恢复能力较高|r\n|cffff9900力量：30（+3.8）|r\n|cff00ff00敏捷：20（+2）|r\n|cff00ccff智力：20（+1.2）|r\n|cffffffcc主要输出伤害：|r|cffff6600火焰魔法|r\n|cffffffcc主要输出方式：|r|cffcc99ff技能90%↑|r\n|cffffffcc多人Boss战定位：|r|cffff0000控场，前排，辅助，输出|r\n|cffff9900随游戏推进强度指数：|r|cffffcc996-6-6-6|r\n|cffff99cc推荐寻找装备属性：|r力量，魔法伤害增幅，火魔法增幅，生命恢复增幅\n|cffff00ff优点：|r|cffff0000生命恢复略高|r\n|cffff00ff缺点：|r|cffff0000释放技能消耗自身生命|r"
     },
     ["必须保留的旧单位事件注册项"] = {
-        {["目标单位"] = "英雄", ["旧触发名"] = "gg_trg_DMboss______01______TS___u", ["事件名"] = "EVENT_UNIT_PICKUP_ITEM"},
+        {["目标单位"] = "英雄", ["旧触发名"] = "gg_trg_DMboss______01", ["事件名"] = "EVENT_UNIT_PICKUP_ITEM"},
         {["目标单位"] = "BB", ["旧触发名"] = "gg_trg____________________________ZH", ["事件名"] = "EVENT_UNIT_SPELL_EFFECT"},
         {["目标单位"] = "英雄", ["旧触发名"] = "gg_trg____________________________ZH", ["事件名"] = "EVENT_UNIT_SPELL_EFFECT"},
         {["目标单位"] = "英雄", ["旧触发名"] = "gg_trg_______Boss______JQ00", ["事件名"] = "EVENT_UNIT_SPELL_EFFECT"},

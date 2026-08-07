@@ -23,7 +23,6 @@ local jass = require("jass.common")
 local AddSpecialEffect = jass.AddSpecialEffect
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetRandomInt = jass.GetRandomInt
 local Location = jass.Location
 local RemoveLocation = jass.RemoveLocation
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -31,6 +30,7 @@ local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_2["获取Boss技能随机敌对英雄"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____require_result_3["创建技能提示圈"]
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
@@ -420,11 +420,10 @@ ____exports["处理莫尔特斯沼泽根须"] = function(context)
         return false
     end
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐朽领域"]
-    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
-    if #heroes <= 0 then
+    local target = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(context["Boss单位"])
+    if target == nil then
         return false
     end
-    local target = heroes[GetRandomInt(0, #heroes - 1) + 1]
     if not _____5355_4F4D_6709_6548(target) then
         return true
     end

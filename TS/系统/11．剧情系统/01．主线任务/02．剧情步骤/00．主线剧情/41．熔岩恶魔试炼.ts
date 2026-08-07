@@ -1,6 +1,11 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
+
+const { ModifyGateBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  ModifyGateBJ: (this: void, gateOperation: number, gate: any) => void;
+};
 
 const { YDUserDataSetSafe, YDUserDataClearSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -33,18 +38,33 @@ const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取当前剧情动作上下文, 读取剧情进度, 写入剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
+import { 应用第三章电影镜头 } from "./40-50．第三章电影镜头";
 import { 清理剧情运行时单位, 注册剧情运行时单位, 读取剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 发布主线节点目标 } from "../../00．剧情系统核心工具/10．标准剧情动作";
 import { 启动剧情Boss战 } from "../../00．剧情系统核心工具/11．剧情Boss战启动桥接";
 import { 执行准备巴尔扎罗斯前导 } from "./42．巴尔扎罗斯前导";
 
 const CreateTrigger = jass.CreateTrigger as (this: void) => any;
+const CreateGroup = jass.CreateGroup as (this: void) => any;
+const DestroyGroup = jass.DestroyGroup as (this: void, group: any) => void;
+const FirstOfGroup = jass.FirstOfGroup as (this: void, group: any) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange as (this: void, group: any, x: number, y: number, radius: number, filter: any) => void;
+const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, group: any, unit: any) => void;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
+const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
+const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
@@ -56,8 +76,11 @@ const Boss名 = "熔岩恶魔";
 const BossA = { X: 19616.6, Y: -6856.6, 朝向: 270 };
 const 玩家B = { X: 19918.3, Y: -8256.0 };
 const 火灵核心交付点C = { X: 19266.9, Y: -7532.9 };
-const 火山试炼范围 = 1600;
+const 火山试炼触发范围 = 1200;
+const 火山试炼小怪暂停范围 = 1200;
+const 火山试炼小怪暂停来源 = "剧情系统:熔岩恶魔试炼对白";
 const Boss待战暂停来源 = "剧情系统:熔岩恶魔待战";
+const 单位类型英雄 = jass.UNIT_TYPE_HERO as any;
 
 interface 火山试炼状态 {
   世代: number;
@@ -65,6 +88,7 @@ interface 火山试炼状态 {
   玩家单位?: any;
   范围触发器?: any;
   取消范围监听?: () => void;
+  暂停小怪列表: any[];
   已进入战斗: boolean;
 }
 
@@ -90,6 +114,34 @@ function 清理火山试炼范围监听(this: void, 状态: 火山试炼状态):
   状态.范围触发器 = undefined;
 }
 
+function 恢复火山试炼范围小怪(this: void, 状态: 火山试炼状态): void {
+  for (let i = 0; i < 状态.暂停小怪列表.length; i++) {
+    移除单位暂停(状态.暂停小怪列表[i], 火山试炼小怪暂停来源);
+  }
+  状态.暂停小怪列表 = [];
+}
+
+function 暂停火山试炼范围小怪(this: void, 状态: 火山试炼状态, 玩家单位: any): void {
+  恢复火山试炼范围小怪(状态);
+  const group = CreateGroup();
+  if (group == null || group === 0) return;
+
+  GroupEnumUnitsInRange(group, GetUnitX(玩家单位), GetUnitY(玩家单位), 火山试炼小怪暂停范围, null);
+  const 玩家 = GetOwningPlayer(玩家单位);
+  while (true) {
+    const unit = FirstOfGroup(group);
+    if (unit == null || unit === 0) break;
+    GroupRemoveUnit(group, unit);
+    if (!单位存活(unit)
+      || unit === 状态.Boss单位
+      || 是玩家英雄组单位(unit)
+      || IsUnitType(unit, 单位类型英雄)
+      || !IsUnitEnemy(unit, 玩家)) continue;
+    if (添加单位暂停(unit, 火山试炼小怪暂停来源)) 状态.暂停小怪列表.push(unit);
+  }
+  DestroyGroup(group);
+}
+
 function on火山试炼范围触发(this: void): void {
   const 状态 = 当前火山试炼状态;
   if (状态 == null || 状态.已进入战斗 || 读取剧情进度() !== 41) return;
@@ -105,7 +157,9 @@ function on火山试炼范围触发(this: void): void {
   SetUnitPosition(触发单位, 玩家B.X, 玩家B.Y);
   SetUnitFacing(状态.Boss单位, YDWEAngleBetweenUnitsSafe(状态.Boss单位, 触发单位));
   SetUnitFacing(触发单位, YDWEAngleBetweenUnitsSafe(触发单位, 状态.Boss单位));
-  播放主线剧情("molten_realm_fire_trial", 触发单位, "熔岩恶魔试炼入口");
+  暂停火山试炼范围小怪(状态, 触发单位);
+  应用第三章电影镜头(41);
+  播放主线剧情("molten_realm_fire_trial", 触发单位, "熔岩恶魔试炼范围");
 }
 
 function 注册火山试炼范围监听(this: void, 状态: 火山试炼状态): void {
@@ -116,7 +170,7 @@ function 注册火山试炼范围监听(this: void, 状态: 火山试炼状态):
     return;
   }
   状态.范围触发器 = trigger;
-  状态.取消范围监听 = registerUnitInRangeTrigger(trigger, 状态.Boss单位, 火山试炼范围, null, false);
+  状态.取消范围监听 = registerUnitInRangeTrigger(trigger, 状态.Boss单位, 火山试炼触发范围, null, false);
 }
 
 function 准备火山试炼Boss(this: void): any {
@@ -128,8 +182,8 @@ function 准备火山试炼Boss(this: void): any {
       X: BossA.X,
       Y: BossA.Y,
       朝向: BossA.朝向,
-      预创建后暂停: true,
-      预创建后无敌: true,
+      预创建后暂停: false,
+      预创建后无敌: false,
     });
   }
   if (!单位存活(bossUnit)) return null;
@@ -156,6 +210,7 @@ export function 执行准备火山之灵试炼(this: void): void {
   当前火山试炼状态 = {
     世代: 下一代火山试炼世代,
     Boss单位: bossUnit,
+    暂停小怪列表: [],
     已进入战斗: false,
   };
   if (!已注册死亡监听) {
@@ -176,6 +231,9 @@ function on播放火灵核心交付(预期世代?: any): void {
 function on熔岩恶魔死亡(this: void, dyingUnit: any, _killingUnit: any): void {
   const 状态 = 当前火山试炼状态;
   if (状态 == null || 状态.Boss单位 !== dyingUnit) return;
+
+  ModifyGateBJ(jglobals.bj_GATEOPERATION_OPEN, jglobals.gg_dest_ATg3_10381);
+  ModifyGateBJ(jglobals.bj_GATEOPERATION_OPEN, jglobals.gg_dest_B00J_10382);
 
   清理火山试炼范围监听(状态);
   if (已注册死亡监听) {
@@ -207,17 +265,24 @@ export function 执行完成火灵核心交付(this: void, _参数: 剧情动作
 }
 
 export function 执行启动火山之灵试炼(this: void, _参数: 剧情动作参数表): void {
-  const bossUnit = 读取语义单位引用(Boss键);
-  if (!单位存活(bossUnit)) return;
   const 状态 = 当前火山试炼状态;
+  if (状态 != null) 恢复火山试炼范围小怪(状态);
+  const bossUnit = 状态?.Boss单位 ?? 读取语义单位引用(Boss键);
+  if (!单位存活(bossUnit)) return;
   启动剧情Boss战(bossUnit, {
     触发单位: 状态?.玩家单位 ?? 读取当前剧情动作上下文().触发单位,
     暂停来源: Boss待战暂停来源,
   });
 }
 
+export function 执行恢复火山之灵试炼小怪(this: void, _参数: 剧情动作参数表): void {
+  const 状态 = 当前火山试炼状态;
+  if (状态 != null) 恢复火山试炼范围小怪(状态);
+}
+
 export const 熔岩恶魔试炼剧情动作注册表: Record<string, 剧情动作处理器> = {
   "第三章_准备火山之灵试炼": 执行准备火山之灵试炼,
+  "第三章_恢复火山之灵试炼小怪": 执行恢复火山之灵试炼小怪,
   "第三章_启动火山之灵试炼": 执行启动火山之灵试炼,
   "第三章_完成火灵核心交付": 执行完成火灵核心交付,
   "第三章_清理火灵核心交付": 执行清理火灵核心交付,

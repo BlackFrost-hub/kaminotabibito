@@ -18,15 +18,15 @@ const jass = require("jass.common") as any;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const Location = jass.Location as (x: number, y: number) => any;
 const RemoveLocation = jass.RemoveLocation as (whichLocation: any) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { 获取Boss技能敌对英雄列表 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
+const { 获取Boss技能敌对英雄列表, 获取Boss技能随机敌对英雄 } = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择") as {
   获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
+  获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
 };
 const { 创建技能提示圈 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂") as {
   创建技能提示圈: (this: void, 配置: any) => any;
@@ -292,9 +292,8 @@ export function 处理莫尔特斯沼泽腐败(this: void, context: 莫尔特斯
 export function 处理莫尔特斯沼泽根须(this: void, context: 莫尔特斯运行时上下文): boolean {
   if (!context.腐朽领域已生效 || !单位有效(context.Boss单位)) return false;
   const cfg = 莫尔特斯数值与表现配置.腐朽领域;
-  const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
-  if (heroes.length <= 0) return false;
-  const target = heroes[GetRandomInt(0, heroes.length - 1)];
+  const target = 获取Boss技能随机敌对英雄(context.Boss单位);
+  if (target == null) return false;
   if (!单位有效(target)) return true;
   const x = GetUnitX(target);
   const y = GetUnitY(target);

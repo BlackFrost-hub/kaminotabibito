@@ -5,7 +5,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "./00．剧情动作类型";
-import { 写入剧情进度 } from "./01．剧情动作上下文";
+import { 读取剧情进度, 写入剧情进度 } from "./01．剧情动作上下文";
 import { 发送剧情小地图信号 } from "./02．剧情动作桥接";
 import { 扣除触发单位金币, 给玩家组添加多个区域视野, 停止触发单位, 更新主线任务UI } from "./06．剧情通用执行工具";
 import { 获取主线节点配置 } from "./09．主线节点配置";
@@ -37,6 +37,16 @@ export function 发布主线节点目标(this: void, 进度: number): boolean {
       持续时间: 节点.小地图.持续时间 ?? 20,
     });
   }
+  if (节点.小地图列表 != null) {
+    for (let i = 0; i < 节点.小地图列表.length; i++) {
+      const 小地图 = 节点.小地图列表[i];
+      发送剧情小地图信号({
+        X: 小地图.X,
+        Y: 小地图.Y,
+        持续时间: 小地图.持续时间 ?? 20,
+      });
+    }
+  }
   if (节点.解锁视野 != null && 节点.解锁视野 !== "") {
     给玩家组添加多个区域视野(节点.解锁视野);
   }
@@ -48,7 +58,9 @@ export function 进入主线节点(this: void, 进度: number): boolean {
     debugLogForce(标准剧情动作模块名, "找不到主线节点配置", 进度);
     return false;
   }
+  const 旧进度 = 读取剧情进度();
   写入剧情进度(进度);
+  debugLogForce(标准剧情动作模块名, "进入主线节点", 旧进度, "->", 进度);
   return 发布主线节点目标(进度);
 }
 

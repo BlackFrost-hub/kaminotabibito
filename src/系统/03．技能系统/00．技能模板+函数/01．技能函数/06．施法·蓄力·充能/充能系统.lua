@@ -178,12 +178,9 @@ local registerPointOrderListener = ____require_result_1.registerPointOrderListen
 local registerTargetOrderListener = ____require_result_1.registerTargetOrderListener
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 YDWETimerDestroyEffect = ____require_result_2.YDWETimerDestroyEffect
-local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLogForce = ____require_result_3.debugLogForce
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
-_____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
-local _____8C03_8BD5_6A21_5757_540D = "充能系统"
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_3["添加单位暂停"]
+_____79FB_9664_5355_4F4D_6682_505C = ____require_result_3["移除单位暂停"]
 local GetHandleId = jass.GetHandleId
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitState = jass.GetUnitState
@@ -337,17 +334,15 @@ ____exports["取消注册充能打断回调"] = function(_____56DE_8C03)
     __TS__ArraySplice(_____5145_80FD_6253_65AD_56DE_8C03_5217_8868, _____7D22_5F15, 1)
 end
 ____exports["开始充能"] = function(_____5355_4F4D, _____53C2_6570)
-    debugLogForce(_____8C03_8BD5_6A21_5757_540D, "开始充能被调用")
     if not _____5355_4F4D_5B58_6D3B(_____5355_4F4D) or _____53C2_6570["持续时间"] <= 0 then
-        debugLogForce(_____8C03_8BD5_6A21_5757_540D, "单位不存在或持续时间无效")
         return 0
     end
     ____exports["停止单位充能"](_____5355_4F4D)
     local _____5355_4F4DID = _____53D6_53E5_67C4ID(_____5355_4F4D)
     local _____6301_7EED_65F6_95F4 = _____53C2_6570["持续时间"]
-    local ____4E0B_4E00_4E2A_5145_80FDID_5 = _____4E0B_4E00_4E2A_5145_80FDID
-    _____4E0B_4E00_4E2A_5145_80FDID = ____4E0B_4E00_4E2A_5145_80FDID_5 + 1
-    local _____5145_80FDID = ____4E0B_4E00_4E2A_5145_80FDID_5
+    local ____4E0B_4E00_4E2A_5145_80FDID_4 = _____4E0B_4E00_4E2A_5145_80FDID
+    _____4E0B_4E00_4E2A_5145_80FDID = ____4E0B_4E00_4E2A_5145_80FDID_4 + 1
+    local _____5145_80FDID = ____4E0B_4E00_4E2A_5145_80FDID_4
     local _____663E_793A_8FDB_5EA6_6761_7279_6548 = _____53C2_6570["显示进度条特效"] ~= false
     local _____8FC7_7A0B_7279_6548 = _____53C2_6570["过程特效"]
     local _____8FC7_7A0B_7279_6548_751F_547D_5468_671F = _____5F52_4E00_5316_65F6_95F4(_____53C2_6570["过程特效生命周期"], DEFAULT_EFFECT_DURATION)

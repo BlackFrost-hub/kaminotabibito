@@ -17,6 +17,11 @@ local ENABLE_TREE_LORD_BOSS_SKILL_TEST = true
 local ENABLE_AINZ_BOSS_SKILL_TEST = true
 local ENABLE_SHALLTEAR_BOSS_SKILL_TEST = true
 local ENABLE_ARONKOS_BOSS_SKILL_TEST = true
+local ENABLE_OGRE_BOSS_SKILL_TEST = true
+local ENABLE_GOBLIN_PRIEST_BOSS_SKILL_TEST = true
+local ENABLE_LIR_BOSS_SKILL_TEST = true
+local ENABLE_MASKED_SWORDSMAN_BOSS_SKILL_TEST = true
+local ENABLE_MASKED_SCHOLAR_BOSS_SKILL_TEST = true
 local ENABLE_ANCESTRAL_TWIN_GUARDS_BOSS_SKILL_TEST = true
 local ENABLE_LATER_BOSS_SKILL_TEST = true
 local ENABLE_PASSIVE_ITEM_COOLDOWN_UI_TEST = true
@@ -26,12 +31,19 @@ local ENABLE_BONE_SPEAR_EFFECT_TEST = true
 local ENABLE_BOSS_3D_SOUND_TEST = true
 local ENABLE_SERA_BARE_CREATE_TEST = true
 local ENABLE_MAIN_PROGRESS_TEST = true
+local ENABLE_FULL_MAP_DYNAMIC_BGM_TEST = true
+local ENABLE_EXILED_WATER_MONSTER_ENTRY_TEST = true
+local ENABLE_MORTES_ENTRY_REQUIREMENT_TEST = true
+local ENABLE_SEAL_GUARD_ENEMY_SKILL_TEST = true
 local function loadTests(self)
     if ENABLE_MAIN_PROGRESS_TEST then
         require("系统.12．测试系统.20．主线进度测试")
     end
     if not _____6D4B_8BD5_7CFB_7EDF_603B_5F00_5173 then
         return
+    end
+    if ENABLE_FULL_MAP_DYNAMIC_BGM_TEST then
+        require("系统.12．测试系统.21．全图动态BGM测试")
     end
     if ENABLE_STES_EVENT_TEST then
         require("系统.12．测试系统.STES事件测试")
@@ -78,6 +90,21 @@ local function loadTests(self)
     if ENABLE_ARONKOS_BOSS_SKILL_TEST then
         require("系统.12．测试系统.01．Boss测试.01．主线Boss.06．亚伦柯斯Boss技能测试")
     end
+    if ENABLE_OGRE_BOSS_SKILL_TEST then
+        require("系统.12．测试系统.01．Boss测试.01．主线Boss.08．食人魔Boss技能测试")
+    end
+    if ENABLE_GOBLIN_PRIEST_BOSS_SKILL_TEST then
+        require("系统.12．测试系统.01．Boss测试.01．主线Boss.09．地精祭祀Boss技能测试")
+    end
+    if ENABLE_LIR_BOSS_SKILL_TEST then
+        require("系统.12．测试系统.01．Boss测试.01．主线Boss.10．利尔伯特Boss技能测试")
+    end
+    if ENABLE_MASKED_SWORDSMAN_BOSS_SKILL_TEST then
+        require("系统.12．测试系统.01．Boss测试.01．主线Boss.11．教派剑士Boss技能测试")
+    end
+    if ENABLE_MASKED_SCHOLAR_BOSS_SKILL_TEST then
+        require("系统.12．测试系统.01．Boss测试.01．主线Boss.12．教派学者Boss技能测试")
+    end
     if ENABLE_ANCESTRAL_TWIN_GUARDS_BOSS_SKILL_TEST then
         require("系统.12．测试系统.01．Boss测试.02．挑战与隐藏Boss.05．祖地双灵卫Boss技能测试")
     end
@@ -105,6 +132,15 @@ local function loadTests(self)
     end
     if ENABLE_SERA_BARE_CREATE_TEST then
         require("系统.12．测试系统.18．塞拉裸创建测试")
+    end
+    if ENABLE_EXILED_WATER_MONSTER_ENTRY_TEST then
+        require("系统.12．测试系统.22．被驱逐的水怪入口测试")
+    end
+    if ENABLE_MORTES_ENTRY_REQUIREMENT_TEST then
+        require("系统.12．测试系统.23．莫特斯进入条件测试")
+    end
+    if ENABLE_SEAL_GUARD_ENEMY_SKILL_TEST then
+        require("系统.12．测试系统.24．封印守卫战敌人技能测试")
     end
 end
 loadTests(nil)

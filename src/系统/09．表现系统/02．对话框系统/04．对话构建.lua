@@ -72,17 +72,30 @@ local function grantQuestItems(self, hero, questItems)
     end
 end
 local function canAcceptQuestByRequirements(self, quest, hero)
-    local req = quest.requirements
+    local req = quest["接取条件"]
     if not req or req == "" then
         return true
     end
-    local markerA = "英雄等级<"
-    local markerB = "英雄等级＜"
-    local pos = (string.find(req, markerA, nil, true) or 0) - 1
-    local offset = #markerA
+    local lessMarkerA = "英雄等级<"
+    local lessMarkerB = "英雄等级＜"
+    local greaterMarkerA = "英雄等级>"
+    local greaterMarkerB = "英雄等级＞"
+    local isGreaterThan = false
+    local pos = (string.find(req, lessMarkerA, nil, true) or 0) - 1
+    local offset = #lessMarkerA
     if pos < 0 then
-        pos = (string.find(req, markerB, nil, true) or 0) - 1
-        offset = #markerB
+        pos = (string.find(req, lessMarkerB, nil, true) or 0) - 1
+        offset = #lessMarkerB
+    end
+    if pos < 0 then
+        pos = (string.find(req, greaterMarkerA, nil, true) or 0) - 1
+        offset = #greaterMarkerA
+        isGreaterThan = pos >= 0
+    end
+    if pos < 0 then
+        pos = (string.find(req, greaterMarkerB, nil, true) or 0) - 1
+        offset = #greaterMarkerB
+        isGreaterThan = pos >= 0
     end
     if pos < 0 then
         return true
@@ -109,7 +122,13 @@ local function canAcceptQuestByRequirements(self, quest, hero)
         return false
     end
     local level = jass.GetHeroLevel(hero)
-    return level < limit
+    local ____isGreaterThan_3
+    if isGreaterThan then
+        ____isGreaterThan_3 = level > limit
+    else
+        ____isGreaterThan_3 = level < limit
+    end
+    return ____isGreaterThan_3
 end
 local function getQuestRewardDisplayText(self, quest)
     return resolveRewardDisplayText(nil, quest)
@@ -153,17 +172,17 @@ function ____exports.parseDialogText(self, raw, npcName, heroName)
         do
             local trimmed = __TS__StringTrim(part)
             if not trimmed then
-                goto __continue34
+                goto __continue36
             end
             local withoutOrder = trimOrderedPrefix(nil, trimmed)
             local parsed = tryParseSpeakerLine(nil, withoutOrder)
             if parsed then
                 lines[#lines + 1] = {title = parsed.title, text = parsed.text, duration = 4}
-                goto __continue34
+                goto __continue36
             end
             lines[#lines + 1] = {title = npcName, text = trimmed, duration = 4}
         end
-        ::__continue34::
+        ::__continue36::
     end
     return #lines > 0 and lines or ({{title = npcName, text = raw, duration = 4}})
 end
@@ -173,38 +192,38 @@ function ____exports.buildDialogData(self, npcName, heroName)
         return {lines = {{title = npcName, text = "你好，有什么可以帮你的吗？", duration = 3}}, removeOverheadMarkerOnOpen = true}
     end
     return {
-        lines = ____exports.parseDialogText(nil, dialogConfig.Text or "", npcName, heroName),
+        lines = ____exports.parseDialogText(nil, dialogConfig["对话文本"] or "", npcName, heroName),
         removeOverheadMarkerOnOpen = true
     }
 end
 function ____exports.buildQuestCompletedDialog(self, quest, npcName)
-    local msg = quest.afterCompleteDialog or quest.NpcCompleteText or DEFAULT_AFTER_COMPLETE_MSG
+    local msg = quest["完成后对白"] or quest["NPC完成对白"] or DEFAULT_AFTER_COMPLETE_MSG
     if msg == "默认" then
         msg = DEFAULT_AFTER_COMPLETE_MSG
     end
     return {lines = {{title = npcName, text = msg, duration = 4}}, removeOverheadMarkerOnOpen = true}
 end
-function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, npcUnit)
+function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, npcUnit, _____5BF9_8BDD_76EE_6807_5355_4F4D, ____NPC_914D_7F6E_671D_5411)
     local dialogOwner = jass.Player(dialogOwnerId)
-    local ____dialogOwner_3
+    local ____dialogOwner_4
     if dialogOwner then
-        ____dialogOwner_3 = getPlayerFirstHero(nil, dialogOwner)
+        ____dialogOwner_4 = getPlayerFirstHero(nil, dialogOwner)
     else
-        ____dialogOwner_3 = nil
+        ____dialogOwner_4 = nil
     end
-    local ownerHero = ____dialogOwner_3
-    local ____ownerHero_4
+    local ownerHero = ____dialogOwner_4
+    local ____ownerHero_5
     if ownerHero then
-        ____ownerHero_4 = jass.GetUnitName(ownerHero)
+        ____ownerHero_5 = jass.GetUnitName(ownerHero)
     else
-        ____ownerHero_4 = "你"
+        ____ownerHero_5 = "你"
     end
-    local heroName = ____ownerHero_4
-    local questDesc = quest.desc or quest.name or "未知任务"
+    local heroName = ____ownerHero_5
+    local questDesc = quest["描述"] or quest["名称"] or "未知任务"
     local rewardText = getQuestRewardDisplayText(nil, quest)
-    local startLines = quest.NpcStartText and ____exports.parseDialogText(nil, quest.NpcStartText, npcName, heroName) or ({{
+    local startLines = quest["NPC开始对白"] and ____exports.parseDialogText(nil, quest["NPC开始对白"], npcName, heroName) or ({{
         title = npcName,
-        text = "我有任务要交给你：" .. tostring(quest.name),
+        text = "我有任务要交给你：" .. tostring(quest["名称"]),
         duration = 4
     }})
     return {
@@ -212,26 +231,28 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
         removeOverheadMarkerOnOpen = true,
         quest = {
             title = npcName,
-            text = (((("【" .. tostring(quest.name)) .. "】\n\n") .. questDesc) .. "\n\n奖励：") .. rewardText,
+            text = (((("【" .. tostring(quest["名称"])) .. "】\n\n") .. questDesc) .. "\n\n奖励：") .. rewardText,
             onAccept = function()
-                local questId = quest.requireID ~= nil and tostring(quest.requireID) or ""
+                local questId = quest["任务ID"] ~= nil and tostring(quest["任务ID"]) or ""
                 local playerObj = jass.Player(dialogOwnerId)
-                local ____playerObj_5
+                local ____playerObj_6
                 if playerObj then
-                    ____playerObj_5 = getPlayerFirstHero(nil, playerObj)
+                    ____playerObj_6 = getPlayerFirstHero(nil, playerObj)
                 else
-                    ____playerObj_5 = nil
+                    ____playerObj_6 = nil
                 end
-                local hero = ____playerObj_5
+                local hero = ____playerObj_6
                 local currentNpcUnit = npcUnit or getDialogNpcUnit(dialogOwnerId)
                 if not canAcceptQuestByRequirements(nil, quest, hero) then
-                    local failRaw = quest.AcceptFailedText or "当前条件不满足，无法接受该任务。"
+                    local failRaw = quest["接取失败对白"] or "当前条件不满足，无法接受该任务。"
                     scheduleOpenDialogLater(
                         nil,
                         playerObj,
                         {
                             lines = ____exports.parseDialogText(nil, failRaw, npcName, heroName),
                             npcUnit = currentNpcUnit,
+                            ["对话目标单位"] = _____5BF9_8BDD_76EE_6807_5355_4F4D,
+                            ["NPC配置朝向"] = ____NPC_914D_7F6E_671D_5411,
                             removeOverheadMarkerOnOpen = false,
                             restoreYellowQuestMarkerAfterDialog = true
                         }
@@ -247,15 +268,25 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                         1,
                         playerName
                     )
-                    grantQuestItems(nil, hero, quest.questItems)
+                    grantQuestItems(nil, hero, quest["任务物品"])
+                    if quest["接取后动作"] then
+                        quest["接取后动作"](quest, dialogOwnerId)
+                    end
                     refreshTaskUIForAllClientsSoon(nil, dialogOwnerId, questId)
                 end
-                local acceptedRaw = quest.QuestAcceptedMsg or DEFAULT_QUEST_ACCEPTED_MSG
+                local acceptedRaw = quest["任务接受对白"] or DEFAULT_QUEST_ACCEPTED_MSG
                 local acceptedLines = ____exports.parseDialogText(nil, acceptedRaw, npcName, heroName)
                 scheduleOpenDialogLater(
                     nil,
                     jass.Player(dialogOwnerId),
-                    {lines = acceptedLines, npcUnit = currentNpcUnit, removeOverheadMarkerOnOpen = false, applyGrayQuestMarkerAfterDialog = true}
+                    {
+                        lines = acceptedLines,
+                        npcUnit = currentNpcUnit,
+                        ["对话目标单位"] = _____5BF9_8BDD_76EE_6807_5355_4F4D,
+                        ["NPC配置朝向"] = ____NPC_914D_7F6E_671D_5411,
+                        removeOverheadMarkerOnOpen = false,
+                        applyGrayQuestMarkerAfterDialog = true
+                    }
                 )
                 if hasPlayerAcceptedQuest(nil, dialogOwnerId, questId) then
                     showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r该任务已经接受过了")
@@ -266,7 +297,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                 showLocalHint(
                     nil,
                     dialogOwnerId,
-                    ("|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『" .. tostring(quest.name)) .. "』|r"
+                    ("|cffffff00『系统提示』：|r|cffff4444已拒绝任务 『" .. tostring(quest["名称"])) .. "』|r"
                 )
                 if currentNpcUnit then
                     scheduleYellowQuestMarkerAfterBubbleFade(nil, currentNpcUnit)
@@ -275,34 +306,34 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
         }
     }
 end
-function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId, npcUnit)
+function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId, npcUnit, _____5BF9_8BDD_76EE_6807_5355_4F4D, ____NPC_914D_7F6E_671D_5411)
     local dialogOwner = jass.Player(dialogOwnerId)
-    local ____dialogOwner_6
+    local ____dialogOwner_7
     if dialogOwner then
-        ____dialogOwner_6 = getPlayerFirstHero(nil, dialogOwner)
+        ____dialogOwner_7 = getPlayerFirstHero(nil, dialogOwner)
     else
-        ____dialogOwner_6 = nil
+        ____dialogOwner_7 = nil
     end
-    local ownerHero = ____dialogOwner_6
-    local ____ownerHero_7
+    local ownerHero = ____dialogOwner_7
+    local ____ownerHero_8
     if ownerHero then
-        ____ownerHero_7 = jass.GetUnitName(ownerHero)
+        ____ownerHero_8 = jass.GetUnitName(ownerHero)
     else
-        ____ownerHero_7 = "你"
+        ____ownerHero_8 = "你"
     end
-    local heroName = ____ownerHero_7
-    local questDesc = quest.desc or quest.name or ""
+    local heroName = ____ownerHero_8
+    local questDesc = quest["描述"] or quest["名称"] or ""
     local rewardText = getQuestRewardDisplayText(nil, quest)
-    local requireCount = normalizeRequireCount(nil, quest.requireCount)
+    local requireCount = normalizeRequireCount(nil, quest["需求数量"])
     return {
         lines = {},
         quest = {
             title = npcName,
-            text = (((((("【" .. tostring(quest.name)) .. "】进行中...\n\n任务目标：") .. questDesc) .. "\n进度：0/") .. tostring(requireCount)) .. "\n\n奖励：") .. rewardText,
+            text = (((((("【" .. tostring(quest["名称"])) .. "】进行中...\n\n任务目标：") .. questDesc) .. "\n进度：0/") .. tostring(requireCount)) .. "\n\n奖励：") .. rewardText,
             acceptText = "提交任务",
             rejectText = "暂时忽略",
             onAccept = function()
-                local questIdStr = quest.requireID ~= nil and tostring(quest.requireID) or ""
+                local questIdStr = quest["任务ID"] ~= nil and tostring(quest["任务ID"]) or ""
                 local currentNpcUnit = npcUnit or getDialogNpcUnit(dialogOwnerId)
                 handleQuestSubmit(nil, {
                     quest = quest,
@@ -310,6 +341,8 @@ function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwne
                     heroName = heroName,
                     dialogOwnerId = dialogOwnerId,
                     npcUnit = currentNpcUnit,
+                    ["对话目标单位"] = _____5BF9_8BDD_76EE_6807_5355_4F4D,
+                    ["NPC配置朝向"] = ____NPC_914D_7F6E_671D_5411,
                     parseDialogText = ____exports.parseDialogText,
                     openDialog = openNpcDialog,
                     refreshTaskUIForAllClientsSoon = refreshTaskUIForAllClientsSoon

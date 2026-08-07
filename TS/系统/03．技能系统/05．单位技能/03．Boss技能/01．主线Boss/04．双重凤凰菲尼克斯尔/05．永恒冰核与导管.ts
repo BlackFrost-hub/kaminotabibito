@@ -22,9 +22,18 @@ const { 闪电效果代码 } = require("系统.03．技能系统.00．技能模�
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
+const { 取当前有效玩家人数 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数") as {
+  取当前有效玩家人数: (this: void) => number;
+};
 const jass = require("jass.common") as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
+
+function 取导管生命(this: void, Boss最大生命: number): number {
+  const config = 菲尼克斯尔数值与表现配置.机制;
+  const 单人倍率 = 取当前有效玩家人数() <= 1 ? config.单人导管生命倍率 : 1;
+  return Boss最大生命 * config.导管生命Boss最大生命比例 * 单人倍率;
+}
 
 function on菲尼克斯尔导管死亡(this: void, context: 菲尼克斯尔运行时上下文, unit: any): void {
   if (context.当前形态 !== "第一形态") return;
@@ -76,7 +85,7 @@ export function 初始化菲尼克斯尔永恒冰核与导管(this: void, contex
       菲尼克斯尔单位技能配置.模型.能量导管,
       p.x,
       p.y,
-      maxLife * 菲尼克斯尔数值与表现配置.机制.导管生命Boss最大生命比例,
+      取导管生命(maxLife),
       创建导管死亡回调(context)
     );
     context.导管列表.push({ 单位: conduit, 已摧毁: false });

@@ -7,7 +7,7 @@
  * 2. 范围内友方英雄平分40%金币
  * 3. 播放金币音效、显示漂浮文字
  *
- * 触发条件：死亡单位属于中立敌对(玩家12)或玩家8(粉色)
+ * 触发条件：死亡单位属于中立敌对(玩家12)或玩家8(粉色)，且由正在游戏的真人玩家单位击杀
  */
 
 const jass = require("jass.common") as any;
@@ -119,16 +119,19 @@ function getUnitBounty(this: void, unitType: number): number {
   return getObjectPropertyInteger(2, unitType, "bountyplus");
 }
 
-/** 检查单位是否为玩家英雄 */
-function isPlayerHero(this: void, unit: any): boolean {
-  const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group");
-  if (!heroGroup || !unit) return false;
-  return jass.IsUnitInGroup(unit, heroGroup) === true;
-}
-
 /** 获取英雄单位组 */
 function getHeroGroup(this: void): any {
   return YDUserDataGet("string", "玩家英雄", "单位组", "group");
+}
+
+/** 获取击杀单位所属的在线真人玩家；非玩家单位不参与任何金币结算。 */
+function getActiveUserPlayerForUnit(this: void, unit: any): any {
+  if (unit == null || unit === 0) return null;
+  const owner = jass.GetOwningPlayer(unit);
+  if (owner == null) return null;
+  if (jass.GetPlayerController(owner) !== jass.MAP_CONTROL_USER) return null;
+  if (jass.GetPlayerSlotState(owner) !== jass.PLAYER_SLOT_STATE_PLAYING) return null;
+  return owner;
 }
 
 /** 检查死亡单位是否触发金币平分（中立敌对或玩家8） */
@@ -227,6 +230,10 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
   // 检查死亡单位是否有效
   if (!isValidDyingUnit(dyingUnit)) return;
 
+  // 只有在线真人玩家所属的单位击杀才进入金币结算。
+  const killerPlayer = getActiveUserPlayerForUnit(killer);
+  if (killerPlayer == null) return;
+
   // 获取死亡单位赏金
   const dyingUnitType = jass.GetUnitTypeId(dyingUnit);
   if (!dyingUnitType) return;
@@ -235,15 +242,7 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
   if (baseBounty <= 0) return;
 
   // 击杀者获得金币
-  if (killer != null) {
-    const killerPlayer = jass.GetOwningPlayer(killer);
-    if (killerPlayer != null) {
-      giveGoldToPlayer(killer, killerPlayer, baseBounty, false);
-    }
-  }
-
-  // 检查击杀者是否为玩家英雄（触发平分）
-  if (!isPlayerHero(killer)) return;
+  giveGoldToPlayer(killer, killerPlayer, baseBounty, false);
 
   // 计算平分金币（基础赏金的40%）
   const shareGold = jass.R2I(baseBounty / 10) * 4;
@@ -252,10 +251,9 @@ function onUnitDeathHandler(this: void, dyingUnit: any, killer: any): void {
   // 获取范围内友方英雄
   const dyingX = jass.GetUnitX(dyingUnit) ?? 0;
   const dyingY = jass.GetUnitY(dyingUnit) ?? 0;
-  const killerPlayer = jass.GetOwningPlayer(killer);
   const heroGroup = getHeroGroup();
 
-  if (killerPlayer == null || heroGroup == null) return;
+  if (heroGroup == null) return;
 
   平分死亡X = dyingX;
   平分死亡Y = dyingY;

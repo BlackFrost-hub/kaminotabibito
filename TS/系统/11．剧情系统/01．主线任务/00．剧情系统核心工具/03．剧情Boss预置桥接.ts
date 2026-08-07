@@ -36,8 +36,10 @@ const { 登记Boss战待带入护卫 } = require("系统.03．技能系统.06．
 const { 注册剧情运行时单位 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位") as {
   注册剧情运行时单位: (this: void, 语义名: string, unit: any) => void;
 };
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, unit: any) => boolean;
+};
 
-import { 写入当前剧情动作上下文 } from "./01．剧情动作上下文";
 import { 读取剧情进度 } from "./01．剧情动作上下文";
 import { 发布主线Boss战前提示 } from "./12．剧情Boss战预警";
 
@@ -46,13 +48,16 @@ const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
+const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const GetPlayerId = jass.GetPlayerId as (this: void, whichPlayer: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
+const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const IsUnitType = jass.IsUnitType as (this: void, whichUnit: any, whichType: any) => boolean;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
+const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const CreateGroup = jass.CreateGroup as (this: void) => any;
 const DestroyGroup = jass.DestroyGroup as (this: void, whichGroup: any) => void;
@@ -69,6 +74,7 @@ interface 剧情Boss范围预置触发配置 {
   剧情片段ID?: string;
   Boss键?: string;
   需要剧情进度?: number;
+  Boss句柄ID: number;
 }
 
 export const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
@@ -76,6 +82,8 @@ export const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 interface 剧情Boss预置参数 {
   Boss键?: string;
   Boss名: string;
+  /** 仅允许这些战斗壳复用 Boss 绑定，避免把剧情 NPC 壳当成实际 Boss。 */
+  允许单位类型?: readonly string[];
   X: number;
   Y: number;
   朝向?: number;
@@ -97,6 +105,7 @@ export interface 剧情Boss预置随从参数 {
 }
 
 const 范围预置触发配置表: Record<number, 剧情Boss范围预置触发配置> = {};
+const 剧情Boss范围触发器表: Record<number, any | undefined> = {};
 const 剧情Boss预置随从表: Record<number, any[] | undefined> = {};
 const 剧情Boss战带入随从表: Record<number, any[] | undefined> = {};
 
@@ -104,6 +113,15 @@ const 剧情Boss预置随从搜索半径 = 120;
 
 function 单位存活(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitType(unit, UNIT_TYPE_DEAD) !== true;
+}
+
+function 单位类型符合白名单(this: void, unit: any, 允许单位类型: readonly string[] | undefined): boolean {
+  if (允许单位类型 == null || 允许单位类型.length <= 0) return true;
+  const unitTypeId = GetUnitTypeId(unit);
+  for (let i = 0; i < 允许单位类型.length; i++) {
+    if (unitTypeId === stringToFourCCSafe(允许单位类型[i])) return true;
+  }
+  return false;
 }
 
 /**
@@ -124,7 +142,7 @@ function 获取或清理附近预置随从(this: void, unitTypeId: number, x: nu
     const owner = GetOwningPlayer(candidate);
     const dx = GetUnitX(candidate) - x;
     const dy = GetUnitY(candidate) - y;
-    const isStaticNeutralHostile = GetPlayerId(owner) === 15 && dx * dx + dy * dy <= 剧情Boss预置随从搜索半径 * 剧情Boss预置随从搜索半径;
+    const isStaticNeutralHostile = GetPlayerId(owner) === PLAYER_NEUTRAL_AGGRESSIVE && dx * dx + dy * dy <= 剧情Boss预置随从搜索半径 * 剧情Boss预置随从搜索半径;
     if (!isStaticNeutralHostile || !单位存活(candidate)) continue;
 
     if (result == null && GetUnitTypeId(candidate) === unitTypeId) {
@@ -154,22 +172,25 @@ function on剧情Boss范围预置触发(this: void): void {
   const 配置 = 范围预置触发配置表[GetHandleId(trigger)];
   if (配置 == null) return;
   if (配置.需要剧情进度 != null && 读取剧情进度() !== 配置.需要剧情进度) return;
+  const 触发单位 = GetTriggerUnit();
+  if (触发单位 == null || 触发单位 === 0 || !是玩家英雄组单位(触发单位)) return;
 
-  // Boss 前导只允许成功消费一次；否则玩家进出范围会永久保留一个无效触发器。
-  delete 范围预置触发配置表[GetHandleId(trigger)];
-  DestroyTrigger(trigger);
-
-  写入当前剧情动作上下文({
-    片段ID: 配置.剧情片段ID,
-    触发配置名: 配置.配置名,
-    触发单位: GetTriggerUnit(),
-  });
+  let 已成功消费 = true;
   if (配置.剧情片段ID != null && 配置.剧情片段ID !== "") {
     const { 播放主线剧情片段 } = require("../02．剧情步骤/02．剧情步骤播放器") as {
-      播放主线剧情片段: (this: void, 片段ID: string) => boolean;
+      播放主线剧情片段: (this: void, 片段ID: string, 上下文?: any) => boolean;
     };
-    播放主线剧情片段(配置.剧情片段ID);
+    已成功消费 = 播放主线剧情片段(配置.剧情片段ID, {
+      片段ID: 配置.剧情片段ID,
+      触发配置名: 配置.配置名,
+      触发单位,
+    });
   }
+  if (!已成功消费) return;
+
+  delete 范围预置触发配置表[GetHandleId(trigger)];
+  delete 剧情Boss范围触发器表[配置.Boss句柄ID];
+  DestroyTrigger(trigger);
 }
 
 export function 注册剧情Boss范围预置触发器(
@@ -183,6 +204,9 @@ export function 注册剧情Boss范围预置触发器(
 ): any {
   if (bossUnit == null || bossUnit === 0) return null;
   if (!(注册范围 > 0)) return null;
+  const bossHandleId = GetHandleId(bossUnit);
+  const 已有触发器 = 剧情Boss范围触发器表[bossHandleId];
+  if (已有触发器 != null && 已有触发器 !== 0) return 已有触发器;
 
   const trigger = CreateTrigger();
   TriggerAddAction(trigger, on剧情Boss范围预置触发);
@@ -192,7 +216,9 @@ export function 注册剧情Boss范围预置触发器(
     剧情片段ID,
     Boss键,
     需要剧情进度,
+    Boss句柄ID: bossHandleId,
   };
+  剧情Boss范围触发器表[bossHandleId] = trigger;
   return trigger;
 }
 
@@ -232,7 +258,7 @@ export function 创建并登记剧情Boss预置随从(
     if (!(unitTypeId > 0)) continue;
 
     const unit = 获取或清理附近预置随从(unitTypeId, 参数.X, 参数.Y)
-      ?? 创建单位并登记排泄安全(Player(15), unitTypeId, 参数.X, 参数.Y, 参数.朝向 ?? 0);
+      ?? 创建单位并登记排泄安全(Player(PLAYER_NEUTRAL_AGGRESSIVE), unitTypeId, 参数.X, 参数.Y, 参数.朝向 ?? 0);
     if (unit == null || unit === 0) continue;
 
     SetUnitFacing(unit, 参数.朝向 ?? 0);
@@ -266,6 +292,35 @@ export function 释放并登记剧情Boss预置随从(this: void, bossUnit: any)
   return 带入列表;
 }
 
+/**
+ * 转场 Boss 的战前演员随从保留相对站位带入正式战场；随后由正式激活统一解除暂停与无敌。
+ */
+export function 迁移剧情Boss预置随从(
+  this: void,
+  bossUnit: any,
+  原BossX: number,
+  原BossY: number,
+  目标BossX: number,
+  目标BossY: number,
+): number {
+  if (bossUnit == null || bossUnit === 0) return 0;
+
+  const handleId = GetHandleId(bossUnit);
+  const 随从列表 = 剧情Boss预置随从表[handleId] ?? 剧情Boss战带入随从表[handleId];
+  if (随从列表 == null) return 0;
+
+  let 已迁移数量 = 0;
+  for (let i = 0; i < 随从列表.length; i++) {
+    const unit = 随从列表[i];
+    if (!单位存活(unit)) continue;
+    const 相对X = GetUnitX(unit) - 原BossX;
+    const 相对Y = GetUnitY(unit) - 原BossY;
+    SetUnitPosition(unit, 目标BossX + 相对X, 目标BossY + 相对Y);
+    已迁移数量++;
+  }
+  return 已迁移数量;
+}
+
 /** 树魔首领随从特性消费带入单位，避免初始化时重复补出同类型单位。 */
 export function 消费剧情Boss战带入随从(this: void, bossUnit: any): any[] {
   if (bossUnit == null || bossUnit === 0) return [];
@@ -275,15 +330,39 @@ export function 消费剧情Boss战带入随从(this: void, bossUnit: any): any[
   return 随从列表;
 }
 
+/** 读取待带入随从快照；供 Boss 专属机制登记，不提前消费护卫系统的待带入数据。 */
+export function 读取剧情Boss战带入随从(this: void, bossUnit: any): any[] {
+  if (bossUnit == null || bossUnit === 0) return [];
+  const 随从列表 = 剧情Boss战带入随从表[GetHandleId(bossUnit)] ?? [];
+  return 随从列表.slice();
+}
+
 export function 创建并冻结剧情Boss预置(this: void, 参数: 剧情Boss预置参数): any {
   const 键信息 = 解析Boss表键(参数.Boss键);
   if (键信息.键名 !== "") {
     const 已有Boss = YDUserDataGetSafe("string", 键信息.表名, 键信息.键名, "unit");
     if (已有Boss != null && 已有Boss !== 0 && 单位存活(已有Boss)) {
-      注册剧情运行时单位(`${键信息.表名}.${键信息.键名}`, 已有Boss);
-      if (参数.预创建后暂停 === true) 添加单位暂停(已有Boss, 剧情Boss预置暂停来源);
-      if (参数.预创建后无敌 === true) SetUnitInvulnerable(已有Boss, true);
-      return 已有Boss;
+      if (单位类型符合白名单(已有Boss, 参数.允许单位类型)) {
+        SetUnitOwner(已有Boss, Player(PLAYER_NEUTRAL_AGGRESSIVE), true);
+        SetUnitFacing(已有Boss, 参数.朝向 ?? 0);
+        注册剧情运行时单位(`${键信息.表名}.${键信息.键名}`, 已有Boss);
+        if (参数.预创建后暂停 === true) 添加单位暂停(已有Boss, 剧情Boss预置暂停来源);
+        if (参数.预创建后无敌 === true) SetUnitInvulnerable(已有Boss, true);
+        if ((参数.注册范围 ?? 0) > 0) {
+          注册剧情Boss范围预置触发器(
+            已有Boss,
+            参数.注册范围 ?? 0,
+            参数.范围触发配置名 ?? `${参数.Boss名}范围预置触发`,
+            参数.范围触发剧情片段ID,
+            参数.Boss键,
+            参数.需要剧情进度,
+          );
+        }
+        return 已有Boss;
+      }
+
+      // 绑定的是剧情 NPC 壳（例如 n05H）时，先清掉旧壳，再创建正确的战斗姿态壳。
+      立即移除单位并取消排泄登记(已有Boss);
     }
   }
 
@@ -293,7 +372,7 @@ export function 创建并冻结剧情Boss预置(this: void, 参数: 剧情Boss�
 
   StopMusic(false);
 
-  const bossUnit = 创建单位并登记排泄安全(Player(15), unitTypeId, 参数.X, 参数.Y, 参数.朝向 ?? 0);
+  const bossUnit = 创建单位并登记排泄安全(Player(PLAYER_NEUTRAL_AGGRESSIVE), unitTypeId, 参数.X, 参数.Y, 参数.朝向 ?? 0);
   if (bossUnit == null || bossUnit === 0) return null;
 
   if (键信息.键名 !== "") {

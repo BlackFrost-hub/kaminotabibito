@@ -30,6 +30,8 @@ const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (
 
 const 主线进度命令前缀 = "进度";
 const 模块名 = "主线进度测试";
+const 主线进度最小值 = 0;
+const 主线进度最大值 = 50;
 
 function 发送测试提示(this: void, player: any, text: string): void {
   DisplayTimedTextToPlayer(player, 0, 0, 6, "[测试] " + text);
@@ -42,7 +44,7 @@ function 解析主线进度(this: void, command: string): number | undefined {
   if (text === "") return undefined;
 
   const progress = Number(text);
-  if (progress !== progress || progress < 0 || progress !== Math.floor(progress)) return undefined;
+  if (progress !== progress || progress < 主线进度最小值 || progress > 主线进度最大值 || progress !== Math.floor(progress)) return undefined;
   return progress;
 }
 
@@ -51,8 +53,8 @@ function on主线进度命令(this: void, player: any, command: string): void {
 
   const progress = 解析主线进度(command);
   if (progress == null) {
-    发送测试提示(player, "命令格式：进度+数字，例如：进度15");
-    debugLogForce(模块名, "命令格式无效", "command", command);
+    发送测试提示(player, "命令格式：进度+数字，范围 0-50，例如：进度15");
+    debugLogForce(模块名, "命令格式无效或超出范围", "command", command, "范围", "0-50");
     return;
   }
 

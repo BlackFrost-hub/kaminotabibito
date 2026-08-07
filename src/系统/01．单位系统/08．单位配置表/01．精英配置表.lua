@@ -2076,6 +2076,32 @@ ____exports["精英配置表"] = {
         bountyplus = 0,
         collision = 24,
         unit = "n06F"
+    },
+    n07D = {
+        _parent = "n04X",
+        Name = "腐淤狂战士",
+        dmgplus1 = 3795,
+        HP = 19320,
+        def = 40.25,
+        cool1 = 1,
+        Art = "Unit\\Elite\\Icon\\mia_sludge_berserker.blp",
+        file = "units\\creeps\\SludgeMonster\\SludgeMonster.mdl",
+        abilList = "A0HU",
+        level = 29,
+        spd = 400,
+        atkType1 = "hero",
+        weapType1 = "MetalHeavyChop",
+        mana0 = 1000,
+        manaN = 1000,
+        modelScale = 2,
+        upgrades = "R001,R002",
+        regenHP = 154.56,
+        regenMana = 1,
+        acquire = 600,
+        bountyplus = 1667,
+        canFlee = 0,
+        hostilePal = 1,
+        unit = "n07D"
     }
 }
 ____exports["按名字反查精英单位ID"] = _____521B_5EFA_5355_4F4D_540D_53CD_67E5_5668(____exports["精英配置表"])

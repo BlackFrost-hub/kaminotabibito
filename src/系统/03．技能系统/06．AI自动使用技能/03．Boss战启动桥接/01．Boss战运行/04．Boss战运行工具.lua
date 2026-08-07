@@ -202,11 +202,11 @@ ____exports["尝试兜底搜敌并下令"] = function(context, nowMs)
         IssueTargetOrder(context["Boss单位"], "attack", threatTarget)
         return
     end
-    local ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_17 = _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA(context)
-    if ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_17 == nil then
-        ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_17 = _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA(context)
+    local ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_19 = _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA(context)
+    if ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_19 == nil then
+        ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_19 = _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA(context)
     end
-    local fallbackTarget = ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_17
+    local fallbackTarget = ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_19
     if fallbackTarget == nil or fallbackTarget == 0 then
         return
     end
@@ -260,6 +260,8 @@ local ____require_result_15 = require("lib.扩展函数.Star扩展函数.Star扩
 local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_15["移除单位暂停"]
 local _____6E05_9664_5355_4F4D_5168_90E8_6682_505C_5360_7528 = ____require_result_15["清除单位全部暂停占用"]
 local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
+local _____5267_60C5_89E6_53D1_5355_4F4D_63A7_5236_6682_505C_6765_6E90 = "剧情系统:触发单位控制"
+local ____Boss_6218_8F6C_573A_6682_505C_6765_6E90 = "Boss战运行:转场等待"
 GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -277,6 +279,7 @@ local IssueImmediateOrder = jass.IssueImmediateOrder
 GetUnitCurrentOrder = jass.GetUnitCurrentOrder
 local OrderId = jass.OrderId
 local Player = jass.Player
+local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local IsPlayerInForce = jass.IsPlayerInForce
 CreateGroup = jass.CreateGroup
 DestroyGroup = jass.DestroyGroup
@@ -319,6 +322,7 @@ _____6700_8FD1_654C_4EBA_679A_4E3E_6700_5C0F_53E5_67C4ID = 0
 local _____73A9_5BB6_82F1_96C4_7EA0_504F_77E9_5F62 = nil
 local _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3X = 0
 local _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3Y = 0
+local _____73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_6570_91CF = 0
 local _____73A9_5BB6_5730_5F62_7EA0_504F_6B65_957F = 150
 local _____73A9_5BB6_5730_5F62_7EA0_504F_6700_5927_6B65_6570 = 24
 local _____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868 = {}
@@ -351,6 +355,7 @@ local function ____on_73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_5355_4F4D()
         return
     end
     SetUnitPosition(unit, _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3X, _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3Y)
+    _____73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_6570_91CF = _____73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_6570_91CF + 1
 end
 local function _____8BFB_53D6_73A9_5BB6_7EC4()
     local ____YDUserDataGetSafe_result_16 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
@@ -455,29 +460,61 @@ ____exports["完成Boss战转场搬运"] = function(context)
     local playerX = ____exports["读取Boss战实数"]("玩家移动X轴")
     local playerY = ____exports["读取Boss战实数"]("玩家移动Y轴")
     local _____73A9_5BB6_82F1_96C4_7EC4 = _____8BFB_53D6_73A9_5BB6_82F1_96C4_7EC4()
+    local _____5DF2_8FC1_79FB_9884_7F6E_968F_4ECE_6570_91CF = 0
     DisplayCineFilter(false)
     if bossX ~= 0 or bossY ~= 0 then
+        local ____require_result_17 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
+        local _____8FC1_79FB_5267_60C5Boss_9884_7F6E_968F_4ECE = ____require_result_17["迁移剧情Boss预置随从"]
+        _____5DF2_8FC1_79FB_9884_7F6E_968F_4ECE_6570_91CF = _____8FC1_79FB_5267_60C5Boss_9884_7F6E_968F_4ECE(
+            boss,
+            GetUnitX(boss),
+            GetUnitY(boss),
+            bossX,
+            bossY
+        )
         SetUnitPosition(boss, bossX, bossY)
         IssueImmediateOrder(boss, "holdposition")
     end
-    if _____89E6_53D1_73A9_5BB6_5355_4F4D == nil or _____89E6_53D1_73A9_5BB6_5355_4F4D == 0 then
-        return
-    end
-    SetUnitPosition(_____89E6_53D1_73A9_5BB6_5355_4F4D, playerX, playerY)
+    _____73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_6570_91CF = 0
     if _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 then
         _____73A9_5BB6_82F1_96C4_7EA0_504F_77E9_5F62 = nil
         _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3X = playerX
         _____73A9_5BB6_82F1_96C4_7EA0_504F_4E2D_5FC3Y = playerY
         ForGroup(_____73A9_5BB6_82F1_96C4_7EC4, ____on_73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_5355_4F4D)
     end
-    SetUnitFacing(
-        _____89E6_53D1_73A9_5BB6_5355_4F4D,
-        YDWEAngleBetweenUnits(_____89E6_53D1_73A9_5BB6_5355_4F4D, boss)
-    )
-    StarOther_PanCameraToTimedUnitForPlayer(
-        GetOwningPlayer(_____89E6_53D1_73A9_5BB6_5355_4F4D),
-        _____89E6_53D1_73A9_5BB6_5355_4F4D,
-        0.1
+    if _____89E6_53D1_73A9_5BB6_5355_4F4D ~= nil and _____89E6_53D1_73A9_5BB6_5355_4F4D ~= 0 then
+        SetUnitPosition(_____89E6_53D1_73A9_5BB6_5355_4F4D, playerX, playerY)
+        SetUnitFacing(
+            _____89E6_53D1_73A9_5BB6_5355_4F4D,
+            YDWEAngleBetweenUnits(_____89E6_53D1_73A9_5BB6_5355_4F4D, boss)
+        )
+        StarOther_PanCameraToTimedUnitForPlayer(
+            GetOwningPlayer(_____89E6_53D1_73A9_5BB6_5355_4F4D),
+            _____89E6_53D1_73A9_5BB6_5355_4F4D,
+            0.1
+        )
+    end
+    debugLogForce(
+        ____Boss_6218_8FD0_884C_6A21_5757_540D,
+        "Boss战转场搬运",
+        "boss=",
+        context["Boss句柄ID"],
+        "rect=",
+        context["地点句柄ID"],
+        "bossX=",
+        bossX,
+        "bossY=",
+        bossY,
+        "playerX=",
+        playerX,
+        "playerY=",
+        playerY,
+        "heroCount=",
+        _____73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_6570_91CF,
+        "preplacedFollowerCount=",
+        _____5DF2_8FC1_79FB_9884_7F6E_968F_4ECE_6570_91CF,
+        "triggerUnit=",
+        _____89E6_53D1_73A9_5BB6_5355_4F4D
     )
 end
 local function handoffBossPortalToPlayerSeven(rectHandle)
@@ -517,11 +554,24 @@ local function forceResumeBossAfterTransition(boss)
     PauseUnit(boss, false)
 end
 ____exports["完成Boss战启动"] = function(context)
+    local ____require_result_18 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
+    local _____91CA_653E_5E76_767B_8BB0_5267_60C5Boss_9884_7F6E_968F_4ECE = ____require_result_18["释放并登记剧情Boss预置随从"]
     _____63A5_7BA1Boss_6218_533A_57DF_97F3_9891(context)
     ____exports["确保Boss战区域视野"](context["地点矩形"])
+    _____91CA_653E_5E76_767B_8BB0_5267_60C5Boss_9884_7F6E_968F_4ECE(context["Boss单位"])
+    SetUnitOwner(
+        context["Boss单位"],
+        Player(PLAYER_NEUTRAL_AGGRESSIVE),
+        true
+    )
     SetUnitInvulnerable(context["Boss单位"], false)
     _____79FB_9664_5355_4F4D_6682_505C(context["Boss单位"], _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
+    _____79FB_9664_5355_4F4D_6682_505C(context["Boss单位"], ____Boss_6218_8F6C_573A_6682_505C_6765_6E90)
     forceResumeBossAfterTransition(context["Boss单位"])
+    local _____89E6_53D1_73A9_5BB6_5355_4F4D = ____exports["读取Boss战单位"]("触发玩家")
+    if _____89E6_53D1_73A9_5BB6_5355_4F4D ~= nil and _____89E6_53D1_73A9_5BB6_5355_4F4D ~= 0 then
+        _____79FB_9664_5355_4F4D_6682_505C(_____89E6_53D1_73A9_5BB6_5355_4F4D, _____5267_60C5_89E6_53D1_5355_4F4D_63A7_5236_6682_505C_6765_6E90)
+    end
     if context["地点矩形"] ~= nil and context["地点矩形"] ~= 0 then
         PingMinimap(
             GetRectCenterX(context["地点矩形"]),
@@ -633,7 +683,7 @@ ____exports["处理待清理Boss单位YD数据"] = function(nowMs)
             do
                 local task = _____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868[i + 1]
                 if nowMs < task["截止时间"] then
-                    goto __continue101
+                    goto __continue102
                 end
                 local currentContext = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(task.bossUnit)
                 if currentContext == nil or currentContext["运行代次"] == task["运行代次"] then
@@ -649,7 +699,7 @@ ____exports["处理待清理Boss单位YD数据"] = function(nowMs)
                 end
                 __TS__ArraySplice(_____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868, i, 1)
             end
-            ::__continue101::
+            ::__continue102::
             i = i - 1
         end
     end

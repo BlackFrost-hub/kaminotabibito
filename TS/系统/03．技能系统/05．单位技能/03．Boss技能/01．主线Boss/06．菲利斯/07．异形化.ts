@@ -1,21 +1,18 @@
 /** @noSelfInFile */
 
-import { 菲利斯单位技能配置 } from "./00．配置";
 import { 获取全部菲利斯上下文, 获取或创建菲利斯上下文, 菲利斯运行时上下文 } from "./01．运行时上下文";
 import { 菲利斯数值与表现配置, 菲利斯音效配置 } from "./02．数值与表现配置";
 import { 释放菲利斯剑气灵斩 } from "./05．剑气灵斩";
 import { 播放菲利斯台词 } from "./08．台词播放";
-import { 单位有效, stringToFourCC, 取难度, 距离平方XY } from "./11．公共工具";
+import { 单位有效, 取难度, 距离平方XY } from "./11．公共工具";
 import { 创建条件伤害修正 } from "../../../../00．技能模板+函数/04．机制组件/08．机制触发/11．条件伤害修正";
 import { 创建持续危险区域, type 持续危险区域实例 } from "../../../../00．技能模板+函数/04．机制组件/03．持续危险区/01．持续危险区域";
 import { 创建周期行为 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/22．限次周期执行器";
 import { 延迟播放Boss坐标音效, 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
-import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
-const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
@@ -62,8 +59,6 @@ const { 创建点特效, createUnitEffect } = require("lib.扩展函数.封装�
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
 };
 
-const 菲利斯单位类型ID = stringToFourCC(菲利斯单位技能配置.单位ID);
-const 异形化技能ID = stringToFourCC(菲利斯数值与表现配置.异形化.技能槽位);
 const 当前异形化区域表: Record<number, 持续危险区域实例[] | undefined> = {};
 let 异形化已注册 = false;
 let 异形化伤害监听已注册 = false;
@@ -85,6 +80,9 @@ function 累计异形化魔法(this: void, context: 菲利斯运行时上下文,
     context.当前魔法充能 = 菲利斯数值与表现配置.异形化.魔法阈值;
   }
   更新魔法显示(context);
+  if (context.当前魔法充能 >= 菲利斯数值与表现配置.异形化.魔法阈值) {
+    释放菲利斯异形化(context);
+  }
 }
 
 function on菲利斯最终伤害充能(this: void, _target: any, attacker: any, applied: number): void {
@@ -207,6 +205,7 @@ function 启动异形化状态(this: void, context: 菲利斯运行时上下文)
   const y = GetUnitY(boss);
   context.当前魔法充能 = 0;
   更新魔法显示(context);
+  context.异形化准备中 = false;
   context.异形化中 = true;
   context.异形化结束Ms = getServerTime() + cfg.持续秒 * 1000;
   registerManualBuff(boss, 菲利斯BuffID.异形化, cfg.持续秒, cfg.造成和受到伤害提高, { sourceName: "菲利斯-异形化" });
@@ -270,10 +269,8 @@ export function 释放菲利斯异形化(this: void, context: 菲利斯运行时
   const boss = context.Boss单位;
   if (!单位有效(boss)) return;
   const cfg = 菲利斯数值与表现配置.异形化;
-  const available = context.当前魔法充能 > GetUnitState(boss, UNIT_STATE_MANA)
-    ? context.当前魔法充能
-    : GetUnitState(boss, UNIT_STATE_MANA);
-  if (available < cfg.魔法阈值 || context.异形化中) return;
+  if (context.当前魔法充能 < cfg.魔法阈值 || context.异形化中 || context.异形化准备中) return;
+  context.异形化准备中 = true;
 
   启动基础施法时间线({
     施法者: boss,
@@ -311,21 +308,10 @@ export function 注册菲利斯异形化(this: void): void {
   }
   if (异形化已注册) return;
   异形化已注册 = true;
-  注册单位技能壳监听({
-    名称: "07．异形化",
-    单位类型ID: 菲利斯单位类型ID,
-    技能ID: 异形化技能ID,
-    获取或创建上下文: 获取或创建菲利斯上下文,
-    释放技能: function 单位技能壳监听释放(this: void, _context: 菲利斯运行时上下文, boss: any): void {
-      on菲利斯异形化生效(boss, 异形化技能ID);
-    },
-  });
 }
 
-function on菲利斯异形化生效(this: void, castingUnit: any, spellAbilityId: number): void {
-  if (spellAbilityId !== 异形化技能ID) return;
-  if (!单位有效(castingUnit) || GetUnitTypeId(castingUnit) !== 菲利斯单位类型ID) return;
-  const context = 获取或创建菲利斯上下文(castingUnit);
-  if (context == null) return;
-  释放菲利斯异形化(context);
+export function 初始化菲利斯异形化充能(this: void, context: 菲利斯运行时上下文): void {
+  context.当前魔法充能 = 0;
+  context.异形化准备中 = false;
+  更新魔法显示(context);
 }

@@ -5,9 +5,11 @@ const { 申请单位暂停独立占用, 释放单位暂停来源全部 } = requi
   申请单位暂停独立占用: (this: void, unit: any, 来源: string) => boolean;
   释放单位暂停来源全部: (this: void, unit: any, 来源: string) => boolean;
 };
+const { SUC_IsUnitInvincible } = require("lib.扩展函数.Star扩展函数.Star扩展库.08．单位判定与筛选函数") as {
+  SUC_IsUnitInvincible: (this: void, unit: any) => boolean;
+};
 
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
-const IsUnitInvulnerable = jass.IsUnitInvulnerable as (this: void, unit: any) => boolean;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, unit: any, flag: boolean) => void;
 
 interface 无敌占用记录 {
@@ -30,6 +32,13 @@ function 查找来源(this: void, 来源列表: string[], 来源: string): numbe
   return -1;
 }
 
+export function 单位是否无敌安全(this: void, unit: any): boolean {
+  if (unit == null || unit === 0) return false;
+  const unitId = 读取句柄ID(unit);
+  if (unitId !== 0 && 无敌占用记录表[unitId] != null) return true;
+  return SUC_IsUnitInvincible(unit);
+}
+
 /**
  * 统一维护剧情单位的待战状态。
  * 暂停使用来源计数，解除时只释放本次来源，避免破坏其他系统的暂停占用。
@@ -43,16 +52,24 @@ export function 暂停并设置无敌安全(this: void, unit: any, 来源: strin
   if (记录 == null) {
     记录 = {
       单位: unit,
-      原始无敌: IsUnitInvulnerable(unit),
+      原始无敌: SUC_IsUnitInvincible(unit),
       来源列表: [],
     };
     无敌占用记录表[单位ID] = 记录;
   }
 
-  if (查找来源(记录.来源列表, 来源) < 0) 记录.来源列表.push(来源);
+  const 来源索引 = 查找来源(记录.来源列表, 来源);
+  const 新增来源 = 来源索引 < 0;
+  if (新增来源) 记录.来源列表.push(来源);
   const 已暂停 = 申请单位暂停独立占用(unit, 来源);
-  SetUnitInvulnerable(unit, true);
-  return 已暂停;
+  if (已暂停) {
+    SetUnitInvulnerable(unit, true);
+    return true;
+  }
+
+  if (新增来源) 记录.来源列表.pop();
+  if (记录.来源列表.length <= 0) delete 无敌占用记录表[单位ID];
+  return false;
 }
 
 /** 解除由暂停并设置无敌安全建立的剧情待战状态。 */
