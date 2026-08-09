@@ -30,6 +30,7 @@ const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as 
 const g_npcUnitByRequireId = new Map<number, any>();
 const g_npcUnitByNpcNameId = new Map<string, any>();
 const g_npcUnitByDisplayName = new Map<string, any>();
+const g_npcConfigByUnitHandleId = new Map<number, 支线NPC配置>();
 
 /**
  * 顶部标记若在 SetUnitModel 前或同帧绑定，换模时可能被顶掉。
@@ -40,6 +41,10 @@ const DELAY_QUEST_MARKER_AFTER_SET_MODEL = 0.02;
 
 function registerCreatedNpcUnit(npcConfig: 支线NPC配置, unit: any): void {
   if (!unit) return;
+  const handleId = typeof jass.GetHandleId === "function" ? (jass.GetHandleId(unit) as number) : 0;
+  if (handleId > 0) {
+    g_npcConfigByUnitHandleId.set(handleId, npcConfig);
+  }
   if (npcConfig.任务ID != null) {
     g_npcUnitByRequireId.set(npcConfig.任务ID, unit);
   }
@@ -138,6 +143,7 @@ export function 初始化NPC(): void {
   g_npcUnitByRequireId.clear();
   g_npcUnitByNpcNameId.clear();
   g_npcUnitByDisplayName.clear();
+  g_npcConfigByUnitHandleId.clear();
 
   for (const npcConfig of 支线NPC配置列表) {
     if (npcConfig.启用 === true && npcConfig.自动创建 !== false) {
@@ -187,6 +193,28 @@ export function 按任务ID查找已创建NPC(任务ID: number): any {
 export function 按名称查找已创建NPC(NPC名称: string): any {
   if (!NPC名称) return null;
   return g_npcUnitByNpcNameId.get(NPC名称) ?? g_npcUnitByDisplayName.get(NPC名称) ?? null;
+}
+
+/** 登记由其他出生系统创建的任务 NPC，并补齐对话查表与头顶任务标记。 */
+export function 登记外部任务NPC单位(任务ID: number, 单位: any): boolean {
+  if (!单位 || 单位 === 0) return false;
+  const npcConfig = 支线NPC配置列表.find((npc) => npc.任务ID === 任务ID && npc.启用 === true);
+  if (!npcConfig) return false;
+
+  const handleId = typeof jass.GetHandleId === "function" ? (jass.GetHandleId(单位) as number) : 0;
+  if (handleId > 0 && g_npcConfigByUnitHandleId.get(handleId) === npcConfig) return true;
+
+  registerCreatedNpcUnit(npcConfig, 单位);
+  scheduleTryAttachQuestMarker(单位, npcConfig);
+  return true;
+}
+
+/** 按真实单位句柄回查配置，避免编辑器显示名与配置展示名不一致导致对话入口失配。 */
+export function 按单位查找NPC配置(单位: any): 支线NPC配置 | null {
+  if (!单位 || 单位 === 0) return null;
+  const handleId = typeof jass.GetHandleId === "function" ? (jass.GetHandleId(单位) as number) : 0;
+  if (handleId <= 0) return null;
+  return g_npcConfigByUnitHandleId.get(handleId) ?? null;
 }
 
 export function init(): void {

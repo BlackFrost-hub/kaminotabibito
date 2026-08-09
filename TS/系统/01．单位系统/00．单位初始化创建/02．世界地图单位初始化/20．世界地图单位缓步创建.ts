@@ -167,6 +167,13 @@ function 解析世界地图物品ID(this: void, 物品名: string): string | und
   return undefined;
 }
 
+function 登记世界地图外部任务NPC单位(this: void, 任务ID: number, 单位: any): void {
+  const NPC生成器 = require("系统.08．任务系统.00．配置表.04．NPC生成器") as {
+    登记外部任务NPC单位: (this: void, 任务ID: number, 单位: any) => boolean;
+  };
+  NPC生成器.登记外部任务NPC单位(任务ID, 单位);
+}
+
 function 创建世界地图单位实例(this: void, 配置: 世界地图单位出生配置): any {
   const 单位ID = 解析世界地图单位ID(配置);
   if (单位ID == null) return undefined;
@@ -176,6 +183,9 @@ function 创建世界地图单位实例(this: void, 配置: 世界地图单位�
   const 玩家 = 解析世界地图单位玩家(配置);
   const unit = 创建单位并登记排泄安全(玩家, 单位类型ID, 配置.X, 配置.Y, 面向角度);
   尝试缓存世界地图单位(配置, unit);
+  if (配置.任务NPC任务ID != null) {
+    登记世界地图外部任务NPC单位(配置.任务NPC任务ID, unit);
+  }
   return unit;
 }
 

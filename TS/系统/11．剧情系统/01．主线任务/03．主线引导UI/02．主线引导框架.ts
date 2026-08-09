@@ -81,7 +81,7 @@ export function 创建主线引导帧(this: void): void {
 
   // 放大效果帧（默认隐藏）
   帧.放大效果 = DzCreateFrameByTagName("BACKDROP", "放大效果", 帧.主线任务, "template", 0);
-  DzFrameSetAbsolutePoint(帧.放大效果, FRAME_POINT_CENTER, 0.07, 0.55);
+  DzFrameSetPoint(帧.放大效果, FRAME_POINT_CENTER, 帧.主线任务, FRAME_POINT_CENTER, 0, 0);
   DzFrameSetSize(帧.放大效果, 0.04, 0.04);
   DzFrameSetTexture(帧.放大效果, BTN_ICON_TEXTURE, 0);
   DzFrameShow(帧.放大效果, false);

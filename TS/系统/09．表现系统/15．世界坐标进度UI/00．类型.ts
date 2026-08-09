@@ -6,6 +6,8 @@ export interface 世界坐标进度UI参数 {
   X: number;
   Y: number;
   Z?: number;
+  屏幕X偏移?: number;
+  屏幕Y偏移?: number;
   最大值: number;
   当前值?: number;
   标题?: string;
@@ -41,4 +43,3 @@ export interface 世界坐标进度UI {
   已显示: boolean;
   已销毁: boolean;
 }
-

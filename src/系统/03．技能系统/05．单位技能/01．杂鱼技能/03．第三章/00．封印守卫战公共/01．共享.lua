@@ -5,6 +5,7 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
 local ____exports = {}
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("lib.扩展函数.BJ函数.02．单位与英雄")
@@ -26,6 +27,7 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitState = jass.GetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local IssueTargetOrder = jass.IssueTargetOrder
 local IssuePointOrder = jass.IssuePointOrder
 local IssueImmediateOrder = jass.IssueImmediateOrder
@@ -276,7 +278,7 @@ ____exports["读取单位攻击力"] = function(unit)
     return GS_LoadUintProperty(unit, 2)
 end
 ____exports["读取单位最大生命"] = function(unit)
-    return GetUnitState(unit, UNIT_STATE_MAX_LIFE) or 0
+    return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) or 0
 end
 ____exports["读取单位生命"] = function(unit)
     return GetUnitState(unit, jass.UNIT_STATE_LIFE) or 0

@@ -11,6 +11,13 @@ const jglobals = require("jass.globals") as any;
 const { 创建剧情NPC单位 } = require("系统.11．剧情系统.00．公共.02．剧情NPC创建") as {
   创建剧情NPC单位: (this: void, config: any) => any;
 };
+const { 消费世界地图单位缓存, 祖地双灵卫守门单位缓存键 } = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.09．世界地图单位缓存") as {
+  消费世界地图单位缓存: (this: void, 缓存键: string) => any;
+  祖地双灵卫守门单位缓存键: string;
+};
+const { 注册世界地图全部单位创建完成监听 } = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.10．世界地图单位总调度") as {
+  注册世界地图全部单位创建完成监听: (this: void, 监听函数: (this: void) => void) => void;
+};
 const { addSelectionListener } = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心") as {
   addSelectionListener: (
     this: void,
@@ -74,18 +81,14 @@ function 打开配置闸门(this: void, variableName: string): boolean {
 
 function 确保创建守门单位(this: void): any {
   if (句柄有效(祖地双灵卫副本状态.守门单位)) return 祖地双灵卫副本状态.守门单位;
-  const cfg = 祖地双灵卫副本配置.守门单位;
-  const unit = 创建剧情NPC单位({
-    单位ID: cfg.单位ID,
-    X: cfg.X,
-    Y: cfg.Y,
-    朝向: cfg.朝向,
-    玩家ID: 15,
-    初始化无敌: true,
-    初始化固定站立: true,
-  });
+  const unit = 消费世界地图单位缓存(祖地双灵卫守门单位缓存键);
+  if (!句柄有效(unit)) return null;
   祖地双灵卫副本状态.守门单位 = unit;
   return unit;
+}
+
+function on世界地图单位创建完成(this: void): void {
+  确保创建守门单位();
 }
 
 function 确保创建本思雅(this: void): any {
@@ -317,6 +320,7 @@ function on祖地双灵卫剧情进度变化(this: void, newProgress: number, _o
 export function init祖地双灵卫入口与对话(this: void): void {
   if (入口模块已初始化) return;
   入口模块已初始化 = true;
+  注册世界地图全部单位创建完成监听(on世界地图单位创建完成);
   确保创建守门单位();
   确保创建本思雅();
   注册守门范围();

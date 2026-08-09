@@ -95,6 +95,16 @@ function ____exports.getPlayerFirstHero(self, player)
     if not player then
         return nil
     end
+    local registeredHero = YDUserDataGet(
+        nil,
+        "player",
+        player,
+        "英雄",
+        "unit"
+    )
+    if registeredHero ~= nil and registeredHero ~= 0 and jass.GetOwningPlayer(registeredHero) == player and jass.IsUnitType(registeredHero, jass.UNIT_TYPE_HERO) then
+        return registeredHero
+    end
     local heroGroup = YDUserDataGet(
         nil,
         "string",

@@ -45,12 +45,14 @@ local stringToFourCCSafe = ____require_result_11.stringToFourCCSafe
 local ____require_result_12 = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.02．通用物品技能槽位配置")
 local _____901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E_8868 = ____require_result_12["通用物品技能槽位配置表"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local IsUnitType = jass.IsUnitType
 local GetRandomInt = jass.GetRandomInt
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -201,7 +203,7 @@ local function ____on_6DF1_6E0A_9B54_5492_76EE_6807_65BD_6CD5(castingUnit, _spel
     end
     local cfg = _____6740_622E_98DF_4EBA_9B54_6280_80FD_914D_7F6E["深渊魔咒"]
     local difficulty = getGameDifficulty() > 0 and getGameDifficulty() or 1
-    local damage = GetUnitState(castingUnit, UNIT_STATE_MAX_LIFE) * (cfg["最大生命基础比例"] + cfg["最大生命每层难度比例"] * difficulty) + _____8BFB_53D6_5355_4F4D_653B_51FB_529B(castingUnit) * (cfg["攻击力基础比例"] + cfg["攻击力每层难度比例"] * difficulty)
+    local damage = GetUnitStateJapi(castingUnit, UNIT_STATE_MAX_LIFE) * (cfg["最大生命基础比例"] + cfg["最大生命每层难度比例"] * difficulty) + _____8BFB_53D6_5355_4F4D_653B_51FB_529B(castingUnit) * (cfg["攻击力基础比例"] + cfg["攻击力每层难度比例"] * difficulty)
     local receiver = _____53D6_968F_673A_8F6C_79FB_76EE_6807(boss, castingUnit)
     if not _____5355_4F4D_5B58_6D3B(receiver) then
         return

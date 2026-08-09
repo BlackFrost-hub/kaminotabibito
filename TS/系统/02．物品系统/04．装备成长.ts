@@ -21,9 +21,11 @@ const { onItemUse } = require("系统.00．核心系统.01．事件中心.04．�
   onItemUse: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const g = require("jass.globals") as { [k: string]: any };
-const { AddGoldWithFeedback, fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  AddGoldWithFeedback: (p: { delta: number; player?: any; unit?: any }) => void;
+const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (this: void, four: number) => string;
+};
+const { 显示金币获得反馈 } = require("系统.06．经济系统.01．杀敌金币平分.01．核心功能") as {
+  显示金币获得反馈: (this: void, unit: any, player: any, gold: number) => void;
 };
 const { IsUnitIllusionBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩展") as {
   IsUnitIllusionBJ: (unit: any) => boolean;
@@ -35,6 +37,9 @@ const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
 };
 const { applyEquipStatsTS } = require("lib.扩展函数.Star扩展函数.01．装备属性应用") as {
   applyEquipStatsTS: (this: void, unit: any, stats: { name: string; value: number }[]) => Record<string, number>;
+};
+const { GS_Unit_Pry_change } = require("lib.扩展函数.Star扩展函数.02．GS单位属性") as {
+  GS_Unit_Pry_change: (this: void, unit: any, propertyType: number, value: number) => void;
 };
 const { onSecond, offSecond } = globalThis as unknown as {
   onSecond: (this: void, cb: () => void) => void;
@@ -162,6 +167,37 @@ function applyStats(unit: any, statEffects: { name: string; key: string; value: 
   applyEquipStatsTS(unit, payload);
 }
 
+/** 永久 PowerUP 写入白字基础属性；临时效果仍由装备属性应用器处理。 */
+function applyPermanentBaseStats(unit: any, statEffects: { name: string; key: string; value: number }[]): void {
+  for (let i = 0; i < statEffects.length; i++) {
+    const effect = statEffects[i];
+    const value = effect.value;
+    if (value === 0) continue;
+
+    if (effect.key === "hp") {
+      GS_Unit_Pry_change(unit, 0, value);
+    } else if (effect.key === "mp") {
+      GS_Unit_Pry_change(unit, 1, value);
+    } else if (effect.key === "dmg") {
+      GS_Unit_Pry_change(unit, 2, value);
+    } else if (effect.key === "armor") {
+      GS_Unit_Pry_change(unit, 3, value);
+    } else if (effect.key === "str") {
+      (jass as any).SetHeroStr(unit, (jass as any).GetHeroStr(unit, false) + value, true);
+    } else if (effect.key === "agi") {
+      (jass as any).SetHeroAgi(unit, (jass as any).GetHeroAgi(unit, false) + value, true);
+    } else if (effect.key === "int") {
+      (jass as any).SetHeroInt(unit, (jass as any).GetHeroInt(unit, false) + value, true);
+    } else if (effect.key === "all") {
+      (jass as any).SetHeroStr(unit, (jass as any).GetHeroStr(unit, false) + value, true);
+      (jass as any).SetHeroAgi(unit, (jass as any).GetHeroAgi(unit, false) + value, true);
+      (jass as any).SetHeroInt(unit, (jass as any).GetHeroInt(unit, false) + value, true);
+    } else {
+      applyEquipStatsTS(unit, [effect]);
+    }
+  }
+}
+
 /** 分 10 份给经验，避免跳级触发不到 */
 function addHeroXP(unit: any, amount: number): void {
   if (amount <= 0) return;
@@ -195,18 +231,40 @@ function getPctStatValue(unit: any, key: string): number {
   return 0;
 }
 
+function 增加金币并显示反馈(this: void, unit: any, delta: number): void {
+  if (delta === 0) return;
+  const player = jass.GetOwningPlayer(unit);
+  if (player == null || player === 0) return;
+  const stateGold = (jass as any).ConvertPlayerState(1);
+  const current = (jass as any).GetPlayerState(player, stateGold) as number;
+  const next = current + delta < 0 ? 0 : current + delta;
+  const actualDelta = next - current;
+  if (actualDelta === 0) return;
+  (jass as any).SetPlayerState(player, stateGold, next);
+  显示金币获得反馈(unit, player, actualDelta);
+}
+
 /** 对 unit 所属玩家的金币做一次百分比加减（pct 可负） */
 function applyGoldPct(unit: any, pct: number): void {
   const player = (jass as any).GetOwningPlayer(unit);
   if (!player) return;
   const stateGold = (jass as any).ConvertPlayerState(1);
-  const cur: number = (jass as any).GetPlayerState(player, stateGold);
-  const delta = round(cur * pct);
-  const newVal = cur + delta < 0 ? 0 : cur + delta;
-  (jass as any).SetPlayerState(player, stateGold, newVal);
+  const current = (jass as any).GetPlayerState(player, stateGold) as number;
+  增加金币并显示反馈(unit, round(current * pct));
 }
 
-function executeSegment(unit: any, seg: Segment): void {
+function 物品使用原生金币能力(this: void, entry: any): boolean {
+  const abilityIds = String(entry.abilList || "").split(",");
+  for (let i = 0; i < abilityIds.length; i++) {
+    const abilityId = abilityIds[i].trim();
+    if (abilityId === "") continue;
+    const abilityData = typeof slk !== "undefined" && slk.ability ? (slk.ability as Record<string, any>)[abilityId] : null;
+    if (abilityData != null && String(abilityData._parent || "") === "AIgo") return true;
+  }
+  return false;
+}
+
+function executeSegment(unit: any, seg: Segment, nativeGoldAbility: boolean): void {
   const statEffects: { name: string; key: string; value: number }[] = [];
   let goldPct = 0;
   const goldFixed: { min: number; max: number }[] = [];
@@ -280,24 +338,29 @@ function executeSegment(unit: any, seg: Segment): void {
         const b = mn < mx ? mx : mn;
         delta = (jass as any).GetRandomInt(a, b);
       }
-      if (delta !== 0) AddGoldWithFeedback({ delta, unit });
+      if (delta !== 0) {
+        if (nativeGoldAbility) {
+          显示金币获得反馈(unit, jass.GetOwningPlayer(unit), delta);
+        } else {
+          增加金币并显示反馈(unit, delta);
+        }
+      }
     }
   }
 
   if (statEffects.length > 0) {
-    applyStats(unit, statEffects, true);
-    // 临时效果：timer 到期后撤销
     if (seg.timeSec > 0) {
+      applyStats(unit, statEffects, true);
       const capturedStats: { name: string; key: string; value: number }[] = statEffects;
       const capturedUnit = unit;
       安排装备成长属性回退(capturedUnit, capturedStats, seg.timeSec);
+    } else {
+      applyPermanentBaseStats(unit, statEffects);
     }
   }
 }
 
-function onUseItem(): void {
-  const unit = (jass as any).GetManipulatingUnit();
-  const item = (jass as any).GetManipulatedItem();
+function onUseItem(this: void, unit: any, item: any): void {
   if (!unit || !item) return;
   if (jass.IsUnitType(unit, (jass as any).UNIT_TYPE_SUMMONED)) return;
   if (IsUnitIllusionBJ(unit)) return;
@@ -312,8 +375,9 @@ function onUseItem(): void {
   安排装备成长防抖清理(key, 0.5);
 
   const segments = parsePowerUP(entry.PowerUP);
+  const nativeGoldAbility = 物品使用原生金币能力(entry);
   for (const seg of segments) {
-    executeSegment(unit, seg);
+    executeSegment(unit, seg, nativeGoldAbility);
   }
 }
 
@@ -405,9 +469,7 @@ function init(): void {
   if ((g as any)[INIT_KEY]) return;
   (g as any)[INIT_KEY] = true;
   // 使用物品事件中心注册，减少触发器数量
-  onItemUse((unit, item) => {
-    onUseItem();
-  });
+  onItemUse(onUseItem);
 }
 
 init();

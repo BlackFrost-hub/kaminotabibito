@@ -7,8 +7,8 @@ local ____require_result_0 = require("系统.00．核心系统.05．中心计时
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local _____73A9_5BB6_7CFB_7EDF_5E38_91CF = require("系统.00．核心系统.00．玩家系统.00．常量")
 local selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-local YDUserDataGet = ____require_result_1.YDUserDataGet
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local commandBarAbility = require("系统.03．技能系统.01．技能冷却.04．命令卡技能槽位")
 local _____83B7_53D6_73A9_5BB6_552F_4E00_9009_4E2D_5355_4F4D = selectionCenterSystem.getSoleSelectedUnitForPlayer
 local _____56FA_5B9A_69FD_4F4D_8868 = {Q = {x = 0, y = 2}, W = {x = 1, y = 2}, E = {x = 2, y = 2}, R = {x = 3, y = 2}}
@@ -60,13 +60,7 @@ local function _____83B7_53D6_5DF2_6CE8_518C_73A9_5BB6_82F1_96C4(whichPlayer)
     if not isValidHandle(whichPlayer) then
         return nil
     end
-    local hero = YDUserDataGet(
-        nil,
-        "player",
-        whichPlayer,
-        _____73A9_5BB6_7CFB_7EDF_5E38_91CF.YD_ATTR_PLAYER_HERO_UNIT,
-        "unit"
-    )
+    local hero = YDUserDataGetSafe("player", whichPlayer, _____73A9_5BB6_7CFB_7EDF_5E38_91CF.YD_ATTR_PLAYER_HERO_UNIT, "unit")
     local ____isValidHandle_result_2
     if isValidHandle(hero) then
         ____isValidHandle_result_2 = hero

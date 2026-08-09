@@ -146,6 +146,23 @@ function isValidDyingUnit(this: void, dyingUnit: any): boolean {
 // 金币给予与反馈
 // ==========================================================================================
 
+/** 仅播放金币音效并显示漂浮文字，不修改玩家金币。 */
+export function 显示金币获得反馈(this: void, unit: any, player: any, gold: number): void {
+  if (unit == null || unit === 0 || player == null || player === 0 || gold === 0) return;
+
+  Sound3DII_Mp3PlayReuse(SOUND_GOLD, player);
+  if (typeof CreateFloatTextOnUnit === "function") {
+    CreateFloatTextOnUnit(unit, (gold > 0 ? "+" : "") + gold, {
+      size: 12,
+      red: GOLD_R,
+      green: GOLD_G,
+      blue: GOLD_B,
+      alpha: 0,
+      duration: GOLD_FLOAT_DURATION_SEC,
+    });
+  }
+}
+
 /**
  * 给予玩家金币（带音效和漂浮文字）
  */
@@ -164,22 +181,7 @@ function giveGoldToPlayer(this: void, unit: any, player: any, baseGold: number, 
 
   // 给予金币
   AdjustPlayerStateBJ(finalGold, player, jass.PLAYER_STATE_RESOURCE_GOLD);
-
-  // 播放金币音效（函数内部有本地玩家判断）
-  Sound3DII_Mp3PlayReuse(SOUND_GOLD, player);
-
-  // 显示漂浮文字
-  const text = "+" + finalGold;
-  if (typeof CreateFloatTextOnUnit === "function") {
-    CreateFloatTextOnUnit(unit, text, {
-      size: 12,
-      red: GOLD_R,
-      green: GOLD_G,
-      blue: GOLD_B,
-      alpha: 0,
-      duration: GOLD_FLOAT_DURATION_SEC,
-    });
-  }
+  显示金币获得反馈(unit, player, finalGold);
 }
 
 function 处理平分英雄(this: void, hero: any): void {

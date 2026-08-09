@@ -30,6 +30,7 @@ local GetRandomInt = jass.GetRandomInt
 local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 local _____6A21_5757_540D = "物品评分测试"
 local _____7269_54C1_8BC4_5206_547D_4EE4_524D_7F00 = "物品+"
+local _____7269_54C1_5185_90E8ID_547D_4EE4_524D_7F00 = "WP"
 local _____968F_673A6000_5206_88C5_5907_547D_4EE4 = "djcs"
 local _____9ED8_8BA4_968F_673A_76EE_6807_8BC4_5206 = 6000
 local _____8BC4_5206_6D6E_52A8_8303_56F4 = 500
@@ -107,6 +108,13 @@ local function _____89E3_6790_76EE_6807_8BC4_5206(command)
         return nil
     end
     return score
+end
+local function _____89E3_6790_7269_54C1_5185_90E8ID(command)
+    if __TS__StringSubstring(command, 0, #_____7269_54C1_5185_90E8ID_547D_4EE4_524D_7F00) ~= _____7269_54C1_5185_90E8ID_547D_4EE4_524D_7F00 then
+        return nil
+    end
+    local itemId = __TS__StringSubstring(command, #_____7269_54C1_5185_90E8ID_547D_4EE4_524D_7F00)
+    return #itemId == 4 and itemId or nil
 end
 local function _____521B_5EFA_7269_54C1(itemId, x, y)
     local itemTypeId = stringToFourCCSafe(itemId)
@@ -211,7 +219,7 @@ local function _____521B_5EFA_5341_4EF6_968F_673A_8BC4_5206_88C5_5907(player)
                 end
                 local offset = _____6279_91CF_521B_5EFA_504F_79FB[i + 1]
                 if not _____521B_5EFA_7269_54C1(itemId, heroX + offset[1], heroY + offset[2]) then
-                    goto __continue30
+                    goto __continue32
                 end
                 createdCount = createdCount + 1
                 local data = _____88C5_5907_6570_636E[itemId]
@@ -221,7 +229,7 @@ local function _____521B_5EFA_5341_4EF6_968F_673A_8BC4_5206_88C5_5907(player)
                 end
                 createdNames = (((createdNames .. name) .. "（") .. tostring(data and data.score or 0)) .. "）"
             end
-            ::__continue30::
+            ::__continue32::
             i = i + 1
         end
     end
@@ -260,6 +268,38 @@ local function ____on_968F_673A6000_5206_88C5_5907_547D_4EE4(player, _command)
     end
     _____521B_5EFA_5341_4EF6_968F_673A_8BC4_5206_88C5_5907(player)
 end
+local function ____on_7269_54C1_5185_90E8ID_547D_4EE4(player, command)
+    if not _____662F_5141_8BB8_6D4B_8BD5_73A9_5BB6(player) then
+        return
+    end
+    local itemId = _____89E3_6790_7269_54C1_5185_90E8ID(command)
+    if itemId == nil then
+        _____53D1_9001_5931_8D25_63D0_793A(player, "命令格式：WP加4位物品内部ID，例如 WPe0XX。")
+        return
+    end
+    local hero = _____83B7_53D6_6D4B_8BD5_82F1_96C4(player)
+    if not _____662F_6709_6548_53E5_67C4(hero) then
+        _____53D1_9001_5931_8D25_63D0_793A(player, "未找到该玩家的注册英雄。")
+        return
+    end
+    if not _____521B_5EFA_7269_54C1(
+        itemId,
+        GetUnitX(hero),
+        GetUnitY(hero)
+    ) then
+        _____53D1_9001_5931_8D25_63D0_793A(player, ("创建物品失败：" .. itemId) .. "。")
+        return
+    end
+    DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        6,
+        ("[物品测试] 已在注册英雄脚下创建物品 " .. itemId) .. "。"
+    )
+    debugLogForce(_____6A21_5757_540D, "按内部ID创建物品", "itemId", itemId)
+end
 _____6CE8_518C_804A_5929_547D_4EE4_524D_7F00_76D1_542C(_____7269_54C1_8BC4_5206_547D_4EE4_524D_7F00, ____on_7269_54C1_8BC4_5206_547D_4EE4)
+_____6CE8_518C_804A_5929_547D_4EE4_524D_7F00_76D1_542C(_____7269_54C1_5185_90E8ID_547D_4EE4_524D_7F00, ____on_7269_54C1_5185_90E8ID_547D_4EE4)
 _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____968F_673A6000_5206_88C5_5907_547D_4EE4, ____on_968F_673A6000_5206_88C5_5907_547D_4EE4)
 return ____exports

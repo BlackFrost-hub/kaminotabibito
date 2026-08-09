@@ -18,6 +18,10 @@ import { 记录首领奖励待选择, 清除首领奖励待选择, 自动随机�
 import { 创建首领奖励标题贴图 } from "./11．奖励标题贴图";
 import { 创建首领奖励底部操作按钮 } from "./12．底部操作按钮";
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const 首领奖励面板贴图 = "UI\\BossReward\\boss_reward_panel_v2.tga";
 const 选中边框贴图 = "UI\\BossReward\\reward_selected_border.tga";
 const 勾选标记贴图 = "UI\\BossReward\\reward_check_badge.tga";
@@ -57,6 +61,7 @@ const 暂不选择命中X = 0.143;
 const 暂不选择命中Y = -0.126;
 const 暂不选择命中宽度 = 确认领取命中宽度;
 const 暂不选择命中高度 = 确认领取命中高度;
+const 首领奖励界面调试模块 = "首领奖励界面诊断";
 
 const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (玩家: any, x: number, y: number, 持续时间: number, 文本: string) => void;
 const GetPlayerId = jass.GetPlayerId as (玩家: any) => number;
@@ -95,17 +100,9 @@ interface 首领奖励槽位状态 {
   关闭按钮文字: number;
 }
 
-interface 首领奖励选项点击路由 {
-  槽位ID: number;
-  序号: number;
-}
-
 let 首领奖励界面已初始化 = false;
 let 首领奖励首个面板帧 = 0;
 const 首领奖励槽位表: Record<number, 首领奖励槽位状态 | undefined> = {};
-const 选项点击路由表: Record<number, 首领奖励选项点击路由 | undefined> = {};
-const 确认点击路由表: Record<number, number | undefined> = {};
-const 关闭点击路由表: Record<number, number | undefined> = {};
 
 function 创建槽位状态(this: void, 玩家ID: number): 首领奖励槽位状态 {
   return {
@@ -156,13 +153,7 @@ function 是否本地槽位(this: void, 状态: 首领奖励槽位状态): boole
   return 状态.玩家 != null && 状态.玩家 !== 0 && 状态.玩家 === 本地玩家;
 }
 
-function 获取触发UI帧(this: void): number {
-  if ((japi as any).DzGetTriggerUIEventFrame != null) return (japi as any).DzGetTriggerUIEventFrame();
-  return 0;
-}
-
 function 获取触发UI玩家(this: void): any {
-  if ((japi as any).DzGetTriggerKeyPlayer != null) return (japi as any).DzGetTriggerKeyPlayer();
   if ((japi as any).DzGetTriggerUIEventPlayer != null) return (japi as any).DzGetTriggerUIEventPlayer();
   return null;
 }
@@ -173,44 +164,14 @@ function 获取触发玩家ID(this: void): number {
   return GetPlayerId(玩家);
 }
 
-function 触发玩家匹配槽位(this: void, 状态: 首领奖励槽位状态): boolean {
-  return 获取触发玩家ID() === 状态.玩家ID;
+function 获取触发玩家槽位状态(this: void): 首领奖励槽位状态 | undefined {
+  const 玩家ID = 获取触发玩家ID();
+  if (玩家ID < 0) return undefined;
+  return 获取槽位状态(玩家ID);
 }
 
 function 获取槽位后缀(this: void, 状态: 首领奖励槽位状态): string {
   return "_s" + 状态.槽位ID;
-}
-
-function 获取鼠标焦点帧(this: void): number {
-  if ((japi as any).DzGetMouseFocus != null) return (japi as any).DzGetMouseFocus();
-  return 0;
-}
-
-function 获取父帧(this: void, 帧: number): number {
-  if (帧 === 0 || (japi as any).DzFrameGetParent == null) return 0;
-  return (japi as any).DzFrameGetParent(帧);
-}
-
-function 查找选项点击路由(this: void, 起始帧: number): 首领奖励选项点击路由 | undefined {
-  let 帧 = 起始帧;
-  for (let 层级 = 0; 层级 < 8; 层级++) {
-    if (帧 === 0) return undefined;
-    const 路由 = 选项点击路由表[帧];
-    if (路由 != null) return 路由;
-    帧 = 获取父帧(帧);
-  }
-  return undefined;
-}
-
-function 查找按钮槽位路由(this: void, 起始帧: number, 路由表: Record<number, number | undefined>): number | undefined {
-  let 帧 = 起始帧;
-  for (let 层级 = 0; 层级 < 8; 层级++) {
-    if (帧 === 0) return undefined;
-    const 槽位ID = 路由表[帧];
-    if (槽位ID != null) return 槽位ID;
-    帧 = 获取父帧(帧);
-  }
-  return undefined;
 }
 
 function 创建首领奖励面板兜底(this: void, 状态: 首领奖励槽位状态): number | null {
@@ -363,15 +324,29 @@ function 切换选项(this: void, 状态: 首领奖励槽位状态, 序号: numb
   刷新选项显示(状态);
 }
 
-function 点击奖励选项帧(this: void): void {
-  let 触发帧 = 获取触发UI帧();
-  if (触发帧 === 0) 触发帧 = 获取鼠标焦点帧();
-  const 路由 = 查找选项点击路由(触发帧);
-  if (路由 == null) return;
-  const 状态 = 获取槽位状态(路由.槽位ID);
-  if (状态 == null || !触发玩家匹配槽位(状态)) return;
-  切换选项(状态, 路由.序号);
+function 点击奖励选项(this: void, 序号: number): void {
+  const 状态 = 获取触发玩家槽位状态();
+  if (状态 == null || !状态.面板已显示) return;
+  切换选项(状态, 序号);
 }
+
+function 点击奖励选项0(this: void): void { 点击奖励选项(0); }
+function 点击奖励选项1(this: void): void { 点击奖励选项(1); }
+function 点击奖励选项2(this: void): void { 点击奖励选项(2); }
+function 点击奖励选项3(this: void): void { 点击奖励选项(3); }
+function 点击奖励选项4(this: void): void { 点击奖励选项(4); }
+function 点击奖励选项5(this: void): void { 点击奖励选项(5); }
+function 点击奖励选项6(this: void): void { 点击奖励选项(6); }
+
+const 奖励选项点击函数表: Array<(this: void) => void> = [
+  点击奖励选项0,
+  点击奖励选项1,
+  点击奖励选项2,
+  点击奖励选项3,
+  点击奖励选项4,
+  点击奖励选项5,
+  点击奖励选项6,
+];
 
 function 创建选项图标按钮(this: void, 状态: 首领奖励槽位状态, 父帧: number, 序号: number): void {
   const 后缀 = 获取槽位后缀(状态);
@@ -402,8 +377,7 @@ function 创建选项图标按钮(this: void, 状态: 首领奖励槽位状态, 
     设置帧相对位置(图标按钮, FramePoint.CENTER, 父帧, FramePoint.CENTER, 槽位中心X[序号], 槽位图标Y);
     设置帧尺寸(图标按钮, { width: 槽位点击宽度, height: 槽位点击高度 });
     japi.DzFrameSetPriority(图标按钮, 30);
-    选项点击路由表[图标按钮] = { 槽位ID: 状态.槽位ID, 序号 };
-    设置帧点击事件(图标按钮, 点击奖励选项帧 as any, true);
+    设置帧点击事件(图标按钮, 奖励选项点击函数表[序号] as any, true);
   }
   状态.选项图标[序号] = 图标;
   状态.选项图标按钮[序号] = 图标按钮;
@@ -413,11 +387,13 @@ function 创建选项图标按钮(this: void, 状态: 首领奖励槽位状态, 
 
 function 隐藏槽位界面(this: void, 状态: 首领奖励槽位状态): void {
   状态.面板已显示 = false;
+  debugLogForce(首领奖励界面调试模块, "隐藏槽位", "玩家ID", 状态.玩家ID, "面板", 状态.面板帧, "本地槽位", 是否本地槽位(状态));
   if (状态.面板帧 !== 0 && 是否本地槽位(状态)) 隐藏帧(状态.面板帧);
 }
 
 function 显示槽位界面(this: void, 状态: 首领奖励槽位状态): void {
   状态.面板已显示 = true;
+  debugLogForce(首领奖励界面调试模块, "显示槽位", "玩家ID", 状态.玩家ID, "面板", 状态.面板帧, "本地槽位", 是否本地槽位(状态));
   if (状态.面板帧 !== 0 && 是否本地槽位(状态)) 显示帧(状态.面板帧);
 }
 
@@ -443,40 +419,14 @@ function 确认领取槽位(this: void, 状态: 首领奖励槽位状态): void 
 }
 
 function 点击确认领取帧(this: void): void {
-  const 原始触发帧 = 获取触发UI帧();
-  const 鼠标焦点帧 = 获取鼠标焦点帧();
-  let 触发帧 = 原始触发帧;
-  if (触发帧 === 0) 触发帧 = 鼠标焦点帧;
-  const 槽位ID = 查找按钮槽位路由(触发帧, 确认点击路由表);
-  if (槽位ID == null) {
-    return;
-  }
-  const 状态 = 获取槽位状态(槽位ID);
-  if (状态 == null) {
-    return;
-  }
-  if (!触发玩家匹配槽位(状态)) {
-    return;
-  }
+  const 状态 = 获取触发玩家槽位状态();
+  if (状态 == null || !状态.面板已显示) return;
   确认领取槽位(状态);
 }
 
 function 点击关闭界面帧(this: void): void {
-  const 原始触发帧 = 获取触发UI帧();
-  const 鼠标焦点帧 = 获取鼠标焦点帧();
-  let 触发帧 = 原始触发帧;
-  if (触发帧 === 0) 触发帧 = 鼠标焦点帧;
-  const 槽位ID = 查找按钮槽位路由(触发帧, 关闭点击路由表);
-  if (槽位ID == null) {
-    return;
-  }
-  const 状态 = 获取槽位状态(槽位ID);
-  if (状态 == null) {
-    return;
-  }
-  if (!触发玩家匹配槽位(状态)) {
-    return;
-  }
+  const 状态 = 获取触发玩家槽位状态();
+  if (状态 == null || !状态.面板已显示) return;
   隐藏槽位界面(状态);
   提示(状态, "已暂存本次奖励，可按 F7 再次打开选择。");
 }
@@ -488,8 +438,7 @@ function 创建首领奖励内容(this: void, 状态: 首领奖励槽位状态):
   for (let 序号 = 0; 序号 < 槽位中心X.length; 序号++) {
     状态.已选择[序号] = false;
     创建选项图标按钮(状态, 父帧, 序号);
-    状态.选项按钮[序号] = 创建文字按钮(状态, "首领奖励选项按钮" + 序号, 父帧, "", 槽位中心X[序号], 槽位按钮Y, 槽位按钮宽度, 槽位按钮高度, 点击奖励选项帧);
-    if (状态.选项按钮[序号] !== 0) 选项点击路由表[状态.选项按钮[序号]] = { 槽位ID: 状态.槽位ID, 序号 };
+    状态.选项按钮[序号] = 创建文字按钮(状态, "首领奖励选项按钮" + 序号, 父帧, "", 槽位中心X[序号], 槽位按钮Y, 槽位按钮宽度, 槽位按钮高度, 奖励选项点击函数表[序号]);
   }
   状态.详情装饰 = 创建帧({ type: FrameType.BACKDROP, name: "首领奖励详情装饰" + 获取槽位后缀(状态), parent: 父帧, template: "template", visible: true }) || 0;
   if (状态.详情装饰 !== 0) {
@@ -522,12 +471,6 @@ function 创建首领奖励内容(this: void, 状态: 首领奖励槽位状态):
   状态.关闭按钮 = 关闭底部按钮.按钮;
   状态.确认按钮文字 = 确认底部按钮.文本;
   状态.关闭按钮文字 = 关闭底部按钮.文本;
-  if (状态.确认按钮 !== 0) 确认点击路由表[状态.确认按钮] = 状态.槽位ID;
-  if (状态.关闭按钮 !== 0) 关闭点击路由表[状态.关闭按钮] = 状态.槽位ID;
-  if (确认底部按钮.命中框 !== 0) 确认点击路由表[确认底部按钮.命中框] = 状态.槽位ID;
-  if (关闭底部按钮.命中框 !== 0) 关闭点击路由表[关闭底部按钮.命中框] = 状态.槽位ID;
-  if (状态.确认按钮文字 !== 0) 确认点击路由表[状态.确认按钮文字] = 状态.槽位ID;
-  if (状态.关闭按钮文字 !== 0) 关闭点击路由表[状态.关闭按钮文字] = 状态.槽位ID;
   状态.内容已创建 = true;
 }
 
@@ -564,6 +507,7 @@ export function 初始化首领奖励选择界面(this: void): void {
 export function 打开首领奖励选择界面(this: void, 奖励池ID: string, 玩家: any): void {
   初始化首领奖励选择界面();
   const 奖励池 = 查找首领奖励池(奖励池ID);
+  debugLogForce(首领奖励界面调试模块, "打开入口", "奖励池ID", 奖励池ID, "奖励池存在", 奖励池 != null, "玩家存在", 玩家 != null && 玩家 !== 0);
   if (奖励池 == null || 玩家 == null || 玩家 === 0) return;
   自动随机发放旧待选择首领奖励(玩家, 奖励池ID);
   const 玩家ID = GetPlayerId(玩家);
@@ -601,6 +545,18 @@ export function 切换首领奖励选择界面(this: void, 奖励池ID: string, 
   初始化首领奖励选择界面();
   if (玩家 == null || 玩家 === 0) return;
   const 状态 = 获取槽位状态(GetPlayerId(玩家));
+  debugLogForce(
+    首领奖励界面调试模块,
+    "切换入口",
+    "状态存在",
+    状态 != null,
+    "面板",
+    状态 == null ? 0 : 状态.面板帧,
+    "已显示",
+    状态 != null && 状态.面板已显示,
+    "本地槽位",
+    状态 != null && 是否本地槽位(状态)
+  );
   if (状态 != null && 状态.面板已显示) {
     隐藏槽位界面(状态);
     return;

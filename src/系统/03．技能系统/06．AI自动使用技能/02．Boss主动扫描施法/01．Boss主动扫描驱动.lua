@@ -11,7 +11,7 @@ local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local ____exports = {}
-local _____8BFB_53D6_6280_80FD_80FD_529BID, stringToFourCCSafe, _____6280_80FD_80FD_529BID_7F13_5B58
+local _____53D6_5355_4F4D_53E5_67C4ID, _____8BFB_53D6_6280_80FD_80FD_529BID, _____83B7_53D6Boss_4E3B_52A8_8FD0_884C_72B6_6001, jass, stringToFourCCSafe, ____Boss_4E3B_52A8_8FD0_884C_72B6_6001_8868, _____6280_80FD_80FD_529BID_7F13_5B58
 local ____02_FF0EAI_914D_7F6E_5DE5_5177 = require("系统.03．技能系统.06．AI自动使用技能.00．AI配置.02．AI配置工具")
 local _____89E3_6790_5355_4F4DAI_914D_7F6E_5355_4F4D_7C7B_578BID = ____02_FF0EAI_914D_7F6E_5DE5_5177["解析单位AI配置单位类型ID"]
 local ____01_FF0EBossAI_914D_7F6E_8868 = require("系统.03．技能系统.06．AI自动使用技能.00．AI配置.01．BossAI配置表.index")
@@ -27,6 +27,13 @@ local ____04_FF0EBoss_81EA_52A8_65BD_6CD5_5F00_5173 = require("系统.03．技�
 local ____Boss_81EA_52A8_65BD_6CD5_662F_5426_5F00_542F = ____04_FF0EBoss_81EA_52A8_65BD_6CD5_5F00_5173["Boss自动施法是否开启"]
 local ____15_FF0E_5355_4F4D_6280_80FD_58F3_63D0_793A = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.15．单位技能壳提示")
 local _____8BBE_7F6E_5355_4F4D_6280_80FD_58F3_666E_901A_63D0_793A = ____15_FF0E_5355_4F4D_6280_80FD_58F3_63D0_793A["设置单位技能壳普通提示"]
+function _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    local handleId = jass.GetHandleId(unit)
+    return handleId or 0
+end
 function _____8BFB_53D6_6280_80FD_80FD_529BID(skillId)
     local cached = _____6280_80FD_80FD_529BID_7F13_5B58[skillId]
     if cached ~= nil then
@@ -36,7 +43,22 @@ function _____8BFB_53D6_6280_80FD_80FD_529BID(skillId)
     _____6280_80FD_80FD_529BID_7F13_5B58[skillId] = value
     return value
 end
-local jass = require("jass.common")
+function _____83B7_53D6Boss_4E3B_52A8_8FD0_884C_72B6_6001(unit)
+    local handleId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local state = ____Boss_4E3B_52A8_8FD0_884C_72B6_6001_8868[handleId]
+    if state == nil then
+        state = {
+            ["下次检查时间"] = 0,
+            ["下次可施法时间"] = 0,
+            ["树魔下次技能索引"] = 0,
+            ["技能提示已初始化"] = false,
+            ["技能下次可用时间表"] = {}
+        }
+        ____Boss_4E3B_52A8_8FD0_884C_72B6_6001_8868[handleId] = state
+    end
+    return state
+end
+jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitName = jass.GetUnitName
 local GetUnitState = jass.GetUnitState
@@ -80,7 +102,7 @@ local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_resu
 local _____6A21_5757_540D = "Boss主动扫描施法"
 local _____9ED8_8BA4_626B_63CF_95F4_9694_6BEB_79D2 = 250
 local _____9ED8_8BA4_516C_5171_65BD_6CD5_95F4_9694_6BEB_79D2 = 1000
-local ____Boss_4E3B_52A8_8FD0_884C_72B6_6001_8868 = {}
+____Boss_4E3B_52A8_8FD0_884C_72B6_6001_8868 = {}
 _____6280_80FD_80FD_529BID_7F13_5B58 = {}
 local _____6280_80FD_65BD_6CD5_8DDD_79BB_7F13_5B58 = {}
 local _____6280_80FD_65BD_6CD5_8303_56F4_7F13_5B58 = {}
@@ -95,13 +117,6 @@ __TS__SparseArrayPush(
     table.unpack(_____5F02_754CBossAI_914D_7F6E_8868)
 )
 local ____Boss_4E3B_52A8_626B_63CF_914D_7F6E_8868 = {__TS__SparseArraySpread(____array_11)}
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    local handleId = jass.GetHandleId(unit)
-    return handleId or 0
-end
 local function _____8BFB_53D6_6570_503C_5B57_6BB5(raw)
     if raw == nil then
         return 0
@@ -196,10 +211,16 @@ local function _____8BFB_53D6_6280_80FD_5F53_524D_51B7_5374_6BEB_79D2(unit, skil
         return 0
     end
     local currentCooldown = _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4(unit, abilityId) or 0
-    if currentCooldown <= 0 then
-        return 0
+    local _____5E73_53F0_51B7_5374_6BEB_79D2 = currentCooldown > 0 and currentCooldown * 1000 or 0
+    local state = _____83B7_53D6Boss_4E3B_52A8_8FD0_884C_72B6_6001(unit)
+    local _____4E0B_6B21_53EF_7528_65F6_95F4 = state["技能下次可用时间表"][abilityId] or 0
+    local now = getServerTime()
+    local _____8FD0_884C_65F6_51B7_5374_6BEB_79D2 = _____4E0B_6B21_53EF_7528_65F6_95F4 - now
+    if _____8FD0_884C_65F6_51B7_5374_6BEB_79D2 <= 0 then
+        state["技能下次可用时间表"][abilityId] = nil
+        _____8FD0_884C_65F6_51B7_5374_6BEB_79D2 = 0
     end
-    return currentCooldown * 1000
+    return _____5E73_53F0_51B7_5374_6BEB_79D2 > _____8FD0_884C_65F6_51B7_5374_6BEB_79D2 and _____5E73_53F0_51B7_5374_6BEB_79D2 or _____8FD0_884C_65F6_51B7_5374_6BEB_79D2
 end
 local function _____8BFB_53D6_6280_80FD_5B9E_65F6_65BD_6CD5_8DDD_79BB(unit, skillId)
     local abilityId = _____8BFB_53D6_6280_80FD_80FD_529BID(skillId)
@@ -220,15 +241,6 @@ local function _____8BFB_53D6_6280_80FD_5B9E_65F6_65BD_6CD5_8303_56F4(unit, skil
         end
     end
     return _____8BFB_53D6_6280_80FD_8868_6570_503C(skillId, "Area")
-end
-local function _____83B7_53D6Boss_4E3B_52A8_8FD0_884C_72B6_6001(unit)
-    local handleId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    local state = ____Boss_4E3B_52A8_8FD0_884C_72B6_6001_8868[handleId]
-    if state == nil then
-        state = {["下次检查时间"] = 0, ["下次可施法时间"] = 0, ["树魔下次技能索引"] = 0, ["技能提示已初始化"] = false}
-        ____Boss_4E3B_52A8_8FD0_884C_72B6_6001_8868[handleId] = state
-    end
-    return state
 end
 local function _____6E05_7406Boss_4E3B_52A8_8FD0_884C_72B6_6001(unit)
     local handleId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
@@ -409,6 +421,8 @@ local function ____onBoss_901A_9B54_6280_80FD_751F_6548(castingUnit, spellAbilit
     if _____914D_7F6E_51B7_5374 <= 0 then
         return
     end
+    local state = _____83B7_53D6Boss_4E3B_52A8_8FD0_884C_72B6_6001(castingUnit)
+    state["技能下次可用时间表"][spellAbilityId] = getServerTime() + _____914D_7F6E_51B7_5374 * 1000
     _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(castingUnit, spellAbilityId, _____914D_7F6E_51B7_5374, _____914D_7F6E_51B7_5374)
 end
 local function _____9009_62E9_4E3B_52A8_65BD_6CD5_76EE_6807(unit, _____914D_7F6E, _____6280_80FD, _____8303_56F4)
@@ -610,6 +624,12 @@ local function _____5C1D_8BD5_9A71_52A8_5355_4E2ABoss(context)
             state["树魔下次技能索引"] = _____4E0B_6B21_6280_80FD_7D22_5F15
         end
         return
+    end
+    local skillId = skill["技能ID"] or ""
+    local abilityId = _____8BFB_53D6_6280_80FD_80FD_529BID(skillId)
+    local _____914D_7F6E_51B7_5374 = _____8BFB_53D6Boss_6280_80FD_914D_7F6E_51B7_5374_79D2(unit, skill)
+    if abilityId ~= 0 and _____914D_7F6E_51B7_5374 > 0 then
+        state["技能下次可用时间表"][abilityId] = now + _____914D_7F6E_51B7_5374 * 1000
     end
     if _____662F_6811_9B54_9996_9886 then
         state["树魔下次技能索引"] = _____4E0B_6B21_6280_80FD_7D22_5F15

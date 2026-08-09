@@ -1,9 +1,10 @@
 local ____lualib = require("lualib_bundle")
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
-local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
+local _____8DF3_8FC7_8868_8FBE_5F0F_7A7A_683C, _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0, _____8BFB_53D6_8868_8FBE_5F0F_6570_5B57, _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C, _____8BFB_53D6_8868_8FBE_5F0F_4E58_9664, _____8BFB_53D6_8868_8FBE_5F0F_52A0_51CF
 local ____index = require("lib.扩展函数.BJ函数.index")
 local IMaxBJ = ____index.IMaxBJ
 local ____index = require("lib.扩展函数.自定义扩展函数.index")
@@ -11,7 +12,124 @@ local getPlayerFirstHero = ____index.getPlayerFirstHero
 local ____06_FF0E_4EFB_52A1_5956_52B1_89E3_6790 = require("系统.09．表现系统.02．对话框系统.06．任务奖励解析")
 local bindRewardParseHeroResolver = ____06_FF0E_4EFB_52A1_5956_52B1_89E3_6790.bindRewardParseHeroResolver
 local isConditionMatchedWithContext = ____06_FF0E_4EFB_52A1_5956_52B1_89E3_6790.isConditionMatchedWithContext
+function _____8DF3_8FC7_8868_8FBE_5F0F_7A7A_683C(_____72B6_6001)
+    while _____72B6_6001["位置"] < #_____72B6_6001["文本"] and __TS__StringCharAt(_____72B6_6001["文本"], _____72B6_6001["位置"]) == " " do
+        _____72B6_6001["位置"] = _____72B6_6001["位置"] + 1
+    end
+end
+function _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, _____6807_8BB0)
+    _____8DF3_8FC7_8868_8FBE_5F0F_7A7A_683C(_____72B6_6001)
+    if __TS__StringSubstring(_____72B6_6001["文本"], _____72B6_6001["位置"], _____72B6_6001["位置"] + #_____6807_8BB0) ~= _____6807_8BB0 then
+        return false
+    end
+    _____72B6_6001["位置"] = _____72B6_6001["位置"] + #_____6807_8BB0
+    return true
+end
+function _____8BFB_53D6_8868_8FBE_5F0F_6570_5B57(_____72B6_6001)
+    _____8DF3_8FC7_8868_8FBE_5F0F_7A7A_683C(_____72B6_6001)
+    local _____6574_6570 = 0
+    local _____5C0F_6570 = 0
+    local _____5C0F_6570_4F4D_500D_7387 = 0.1
+    local _____5DF2_8BFB_53D6 = false
+    local _____6B63_5728_8BFB_53D6_5C0F_6570 = false
+    while _____72B6_6001["位置"] < #_____72B6_6001["文本"] do
+        do
+            local _____5B57_7B26 = __TS__StringCharAt(_____72B6_6001["文本"], _____72B6_6001["位置"])
+            if _____5B57_7B26 >= "0" and _____5B57_7B26 <= "9" then
+                _____5DF2_8BFB_53D6 = true
+                local _____6570_5B57 = (string.byte(_____5B57_7B26, 1) or 0 / 0) - 48
+                if _____6B63_5728_8BFB_53D6_5C0F_6570 then
+                    _____5C0F_6570 = _____5C0F_6570 + _____6570_5B57 * _____5C0F_6570_4F4D_500D_7387
+                    _____5C0F_6570_4F4D_500D_7387 = _____5C0F_6570_4F4D_500D_7387 * 0.1
+                else
+                    _____6574_6570 = _____6574_6570 * 10 + _____6570_5B57
+                end
+                _____72B6_6001["位置"] = _____72B6_6001["位置"] + 1
+                goto __continue40
+            end
+            if _____5B57_7B26 == "." and not _____6B63_5728_8BFB_53D6_5C0F_6570 then
+                _____6B63_5728_8BFB_53D6_5C0F_6570 = true
+                _____72B6_6001["位置"] = _____72B6_6001["位置"] + 1
+                goto __continue40
+            end
+            break
+        end
+        ::__continue40::
+    end
+    return _____5DF2_8BFB_53D6 and _____6574_6570 + _____5C0F_6570 or 0
+end
+function _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C(_____72B6_6001)
+    _____8DF3_8FC7_8868_8FBE_5F0F_7A7A_683C(_____72B6_6001)
+    if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "+") then
+        return _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C(_____72B6_6001)
+    end
+    if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "-") then
+        return 0 - _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C(_____72B6_6001)
+    end
+    if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "(") then
+        local _____6570_503C = _____8BFB_53D6_8868_8FBE_5F0F_52A0_51CF(_____72B6_6001)
+        _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, ")")
+        return _____6570_503C
+    end
+    if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "IMaxBJ") then
+        if not _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "(") then
+            return 0
+        end
+        local _____5DE6_503C = _____8BFB_53D6_8868_8FBE_5F0F_52A0_51CF(_____72B6_6001)
+        _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, ",")
+        local _____53F3_503C = _____8BFB_53D6_8868_8FBE_5F0F_52A0_51CF(_____72B6_6001)
+        _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, ")")
+        return IMaxBJ(_____5DE6_503C, _____53F3_503C)
+    end
+    if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "英雄等级") or _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "等级") then
+        return _____72B6_6001["英雄等级"]
+    end
+    return _____8BFB_53D6_8868_8FBE_5F0F_6570_5B57(_____72B6_6001)
+end
+function _____8BFB_53D6_8868_8FBE_5F0F_4E58_9664(_____72B6_6001)
+    local _____6570_503C = _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C(_____72B6_6001)
+    while _____72B6_6001["位置"] < #_____72B6_6001["文本"] do
+        do
+            if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "*") then
+                _____6570_503C = _____6570_503C * _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C(_____72B6_6001)
+                goto __continue53
+            end
+            if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "/") then
+                local _____9664_6570 = _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C(_____72B6_6001)
+                if _____9664_6570 ~= 0 then
+                    _____6570_503C = _____6570_503C / _____9664_6570
+                end
+                goto __continue53
+            end
+            break
+        end
+        ::__continue53::
+    end
+    return _____6570_503C
+end
+function _____8BFB_53D6_8868_8FBE_5F0F_52A0_51CF(_____72B6_6001)
+    local _____6570_503C = _____8BFB_53D6_8868_8FBE_5F0F_4E58_9664(_____72B6_6001)
+    while _____72B6_6001["位置"] < #_____72B6_6001["文本"] do
+        do
+            if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "+") then
+                _____6570_503C = _____6570_503C + _____8BFB_53D6_8868_8FBE_5F0F_4E58_9664(_____72B6_6001)
+                goto __continue58
+            end
+            if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "-") then
+                _____6570_503C = _____6570_503C - _____8BFB_53D6_8868_8FBE_5F0F_4E58_9664(_____72B6_6001)
+                goto __continue58
+            end
+            break
+        end
+        ::__continue58::
+    end
+    return _____6570_503C
+end
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.Star扩展函数.02．GS单位属性")
+local GS_UnitPry = ____require_result_0.GS_UnitPry
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
+local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_1["调整玩家属性"]
 local function getUserPlayers(self)
     local out = {}
     do
@@ -57,6 +175,7 @@ local function gainLevel(self, players, value)
     end
 end
 local function gainHeroStat(self, players, statName, value)
+    local integerValue = jass.R2I(value)
     for ____, p in ipairs(players) do
         do
             local hero = getPlayerFirstHero(nil, p)
@@ -66,19 +185,19 @@ local function gainHeroStat(self, players, statName, value)
             if statName == "力量" then
                 jass.SetHeroStr(
                     hero,
-                    jass.GetHeroStr(hero, false) + value,
+                    jass.GetHeroStr(hero, false) + integerValue,
                     true
                 )
             elseif statName == "敏捷" then
                 jass.SetHeroAgi(
                     hero,
-                    jass.GetHeroAgi(hero, false) + value,
+                    jass.GetHeroAgi(hero, false) + integerValue,
                     true
                 )
             elseif statName == "智力" then
                 jass.SetHeroInt(
                     hero,
-                    jass.GetHeroInt(hero, false) + value,
+                    jass.GetHeroInt(hero, false) + integerValue,
                     true
                 )
             end
@@ -86,46 +205,71 @@ local function gainHeroStat(self, players, statName, value)
         ::__continue21::
     end
 end
-local function readFirstNumber(self, s)
-    local found = false
-    local n = 0
-    do
-        local i = 0
-        while i < #s do
-            local c = __TS__StringCharAt(s, i)
-            if c >= "0" and c <= "9" then
-                found = true
-                n = n * 10 + ((string.byte(c, 1) or 0 / 0) - 48)
-            elseif found then
-                break
-            end
-            i = i + 1
+local function gainAttack(players, value)
+    for ____, p in ipairs(players) do
+        local hero = getPlayerFirstHero(nil, p)
+        if hero then
+            GS_UnitPry(hero, 0, 2, value)
         end
     end
-    return n
+end
+local function gainPlayerAttribute(players, attributeName, value)
+    for ____, player in ipairs(players) do
+        local hero = getPlayerFirstHero(nil, player)
+        if hero then
+            _____8C03_6574_73A9_5BB6_5C5E_6027(hero, attributeName, value)
+        end
+    end
+end
+local function _____83B7_53D6_5956_52B1_82F1_96C4_7B49_7EA7(triggerPlayerId)
+    local ____temp_2
+    if triggerPlayerId ~= nil then
+        ____temp_2 = jass.Player(triggerPlayerId)
+    else
+        ____temp_2 = nil
+    end
+    local player = ____temp_2
+    local ____player_3
+    if player then
+        ____player_3 = getPlayerFirstHero(nil, player)
+    else
+        ____player_3 = nil
+    end
+    local hero = ____player_3
+    return hero and jass.GetHeroLevel(hero) or 1
 end
 local function resolveAmountExpr(self, expr, triggerPlayerId)
-    local text = __TS__StringTrim(expr)
-    if (string.find(text, "IMaxBJ(", nil, true) or 0) - 1 == 0 then
-        local ____temp_0
-        if triggerPlayerId ~= nil then
-            ____temp_0 = jass.Player(triggerPlayerId)
-        else
-            ____temp_0 = nil
-        end
-        local player = ____temp_0
-        local ____player_1
-        if player then
-            ____player_1 = getPlayerFirstHero(nil, player)
-        else
-            ____player_1 = nil
-        end
-        local hero = ____player_1
-        local level = hero and jass.GetHeroLevel(hero) or 1
-        local a = 20000 - (level - 20) * 1000
-        return IMaxBJ(a, 10000)
+    local _____72B6_6001 = {
+        ["文本"] = __TS__StringTrim(expr),
+        ["位置"] = 0,
+        ["英雄等级"] = _____83B7_53D6_5956_52B1_82F1_96C4_7B49_7EA7(triggerPlayerId)
+    }
+    return _____8BFB_53D6_8868_8FBE_5F0F_52A0_51CF(_____72B6_6001)
+end
+local function _____63D0_53D6_7C7B_578B_524D_6570_503C_8868_8FBE_5F0F(_____6587_672C, _____7C7B_578B_540D)
+    local _____4F4D_7F6E = (string.find(_____6587_672C, _____7C7B_578B_540D, nil, true) or 0) - 1
+    return _____4F4D_7F6E >= 0 and __TS__StringTrim(__TS__StringSubstring(_____6587_672C, 0, _____4F4D_7F6E)) or ""
+end
+local function _____63D0_53D6_5C5E_6027_6570_503C_8868_8FBE_5F0F(_____6587_672C, _____5C5E_6027_540D)
+    local _____4F4D_7F6E = (string.find(_____6587_672C, _____5C5E_6027_540D, nil, true) or 0) - 1
+    if _____4F4D_7F6E < 0 then
+        return ""
     end
-    return readFirstNumber(nil, text)
+    local _____524D_6BB5 = __TS__StringTrim(__TS__StringSubstring(_____6587_672C, 0, _____4F4D_7F6E))
+    if _____524D_6BB5 ~= "" then
+        return __TS__StringTrim(table.concat(
+            __TS__StringSplit(_____524D_6BB5, "%"),
+            ""
+        ))
+    end
+    local _____540E_6BB5 = __TS__StringTrim(__TS__StringSubstring(_____6587_672C, _____4F4D_7F6E + #_____5C5E_6027_540D))
+    while string.sub(_____540E_6BB5, 1, 1) == ":" or string.sub(_____540E_6BB5, 1, 1) == "+" or string.sub(_____540E_6BB5, 1, 1) == "＋" do
+        _____540E_6BB5 = __TS__StringTrim(__TS__StringSubstring(_____540E_6BB5, 1))
+    end
+    return __TS__StringTrim(table.concat(
+        __TS__StringSplit(_____540E_6BB5, "%"),
+        ""
+    ))
 end
 local function executeOneRewardExpr(self, expr, triggerPlayerId)
     local text = __TS__StringTrim(expr)
@@ -146,53 +290,151 @@ local function executeOneRewardExpr(self, expr, triggerPlayerId)
         end
     end
     if (string.find(payload, "经验", nil, true) or 0) - 1 >= 0 or (string.find(payload, "exp", nil, true) or 0) - 1 >= 0 then
-        local value = resolveAmountExpr(nil, payload, triggerPlayerId)
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_7C7B_578B_524D_6570_503C_8868_8FBE_5F0F(
+                payload,
+                (string.find(payload, "经验", nil, true) or 0) - 1 >= 0 and "经验" or "exp"
+            ),
+            triggerPlayerId
+        )
         if value > 0 then
             gainExp(nil, targetPlayers, value)
         end
         return
     end
     if (string.find(payload, "金币", nil, true) or 0) - 1 >= 0 or (string.find(payload, "gold", nil, true) or 0) - 1 >= 0 then
-        local value = resolveAmountExpr(nil, payload, triggerPlayerId)
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_7C7B_578B_524D_6570_503C_8868_8FBE_5F0F(
+                payload,
+                (string.find(payload, "金币", nil, true) or 0) - 1 >= 0 and "金币" or "gold"
+            ),
+            triggerPlayerId
+        )
         if value > 0 then
             gainGold(nil, targetPlayers, value)
         end
         return
     end
     if (string.find(payload, "能量碎片", nil, true) or 0) - 1 >= 0 or (string.find(payload, "木头", nil, true) or 0) - 1 >= 0 or (string.find(payload, "木材", nil, true) or 0) - 1 >= 0 or (string.find(payload, "wood", nil, true) or 0) - 1 >= 0 then
-        local value = resolveAmountExpr(nil, payload, triggerPlayerId)
+        local _____7C7B_578B_540D = "能量碎片"
+        if (string.find(payload, "木头", nil, true) or 0) - 1 >= 0 then
+            _____7C7B_578B_540D = "木头"
+        elseif (string.find(payload, "木材", nil, true) or 0) - 1 >= 0 then
+            _____7C7B_578B_540D = "木材"
+        elseif (string.find(payload, "wood", nil, true) or 0) - 1 >= 0 then
+            _____7C7B_578B_540D = "wood"
+        end
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_7C7B_578B_524D_6570_503C_8868_8FBE_5F0F(payload, _____7C7B_578B_540D),
+            triggerPlayerId
+        )
         if value > 0 then
             gainLumber(nil, targetPlayers, value)
         end
         return
     end
-    if (string.find(payload, "等级", nil, true) or 0) - 1 >= 0 or (string.find(payload, "level", nil, true) or 0) - 1 >= 0 then
-        local value = resolveAmountExpr(nil, payload, triggerPlayerId)
+    local _____4EE5_7B49_7EA7_7ED3_5C3E = #payload > #"等级" and __TS__StringSubstring(payload, #payload - #"等级") == "等级"
+    local _____4EE5Level_7ED3_5C3E = #payload > #"level" and __TS__StringSubstring(payload, #payload - #"level") == "level"
+    if _____4EE5_7B49_7EA7_7ED3_5C3E or _____4EE5Level_7ED3_5C3E then
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_7C7B_578B_524D_6570_503C_8868_8FBE_5F0F(payload, _____4EE5_7B49_7EA7_7ED3_5C3E and "等级" or "level"),
+            triggerPlayerId
+        )
         if value > 0 then
             gainLevel(nil, targetPlayers, value)
         end
         return
     end
+    if (string.find(payload, "攻击力", nil, true) or 0) - 1 >= 0 then
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_5C5E_6027_6570_503C_8868_8FBE_5F0F(payload, "攻击力"),
+            triggerPlayerId
+        )
+        if value > 0 then
+            gainAttack(targetPlayers, value)
+        end
+        return
+    end
+    if (string.find(payload, "智力成长", nil, true) or 0) - 1 >= 0 then
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_5C5E_6027_6570_503C_8868_8FBE_5F0F(payload, "智力成长"),
+            triggerPlayerId
+        )
+        if value ~= 0 then
+            gainPlayerAttribute(targetPlayers, "智力成长", value)
+        end
+        return
+    end
+    local _____767E_5206_6BD4_5C5E_6027_540D_5217_8868 = {"金属性抗性", "魔法伤害", "暴击伤害", "暴击率"}
+    for ____, _____5C5E_6027_540D in ipairs(_____767E_5206_6BD4_5C5E_6027_540D_5217_8868) do
+        do
+            if (string.find(payload, _____5C5E_6027_540D, nil, true) or 0) - 1 < 0 then
+                goto __continue89
+            end
+            local value = resolveAmountExpr(
+                nil,
+                _____63D0_53D6_5C5E_6027_6570_503C_8868_8FBE_5F0F(payload, _____5C5E_6027_540D),
+                triggerPlayerId
+            )
+            if value ~= 0 then
+                gainPlayerAttribute(
+                    targetPlayers,
+                    _____5C5E_6027_540D,
+                    (string.find(payload, "%", nil, true) or 0) - 1 >= 0 and value / 100 or value
+                )
+            end
+            return
+        end
+        ::__continue89::
+    end
     if (string.find(payload, "力量", nil, true) or 0) - 1 >= 0 then
-        local value = resolveAmountExpr(nil, payload, triggerPlayerId)
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_5C5E_6027_6570_503C_8868_8FBE_5F0F(payload, "力量"),
+            triggerPlayerId
+        )
         if value > 0 then
             gainHeroStat(nil, targetPlayers, "力量", value)
         end
         return
     end
     if (string.find(payload, "敏捷", nil, true) or 0) - 1 >= 0 then
-        local value = resolveAmountExpr(nil, payload, triggerPlayerId)
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_5C5E_6027_6570_503C_8868_8FBE_5F0F(payload, "敏捷"),
+            triggerPlayerId
+        )
         if value > 0 then
             gainHeroStat(nil, targetPlayers, "敏捷", value)
         end
         return
     end
     if (string.find(payload, "智力", nil, true) or 0) - 1 >= 0 then
-        local value = resolveAmountExpr(nil, payload, triggerPlayerId)
+        local value = resolveAmountExpr(
+            nil,
+            _____63D0_53D6_5C5E_6027_6570_503C_8868_8FBE_5F0F(payload, "智力"),
+            triggerPlayerId
+        )
         if value > 0 then
             gainHeroStat(nil, targetPlayers, "智力", value)
         end
     end
+end
+local function _____662F_5426_5956_52B1_6761_4EF6(_____6761_4EF6)
+    local _____6587_672C = __TS__StringTrim(_____6761_4EF6)
+    if (string.find(_____6587_672C, "英雄等级", nil, true) or 0) - 1 == 0 then
+        return true
+    end
+    if (string.find(_____6587_672C, "装备等级", nil, true) or 0) - 1 == 0 then
+        return true
+    end
+    return (string.find(_____6587_672C, "|", nil, true) or 0) - 1 >= 0 and (string.find(_____6587_672C, "I", nil, true) or 0) - 1 >= 0
 end
 function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
     if not rewardRaw or rewardRaw == "" then
@@ -207,14 +449,17 @@ function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
             do
                 local line = __TS__StringTrim(lines[lineIdx + 1])
                 if line == "" then
-                    goto __continue57
+                    goto __continue105
                 end
                 local colon = (string.find(line, ":", nil, true) or 0) - 1
-                if colon > 0 then
+                if colon > 0 and _____662F_5426_5956_52B1_6761_4EF6(__TS__StringSubstring(line, 0, colon)) then
                     local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
                     local expr = __TS__StringTrim(__TS__StringSubstring(line, colon + 1))
+                    if expr == "" then
+                        goto __continue105
+                    end
                     if not isConditionMatchedWithContext(nil, cond, ctx) then
-                        goto __continue57
+                        goto __continue105
                     end
                     local parts = __TS__StringSplit(expr, ";")
                     for ____, p in ipairs(parts) do
@@ -229,7 +474,7 @@ function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
                     executeOneRewardExpr(nil, p, ctx.triggerPlayerId)
                 end
             end
-            ::__continue57::
+            ::__continue105::
             lineIdx = lineIdx + 1
         end
     end
@@ -246,18 +491,24 @@ function ____exports.previewRewardMatchWithContext(self, rewardRaw, ctx)
             do
                 local line = __TS__StringTrim(lines[lineIdx + 1])
                 if line == "" then
-                    goto __continue68
+                    goto __continue117
                 end
                 local colon = (string.find(line, ":", nil, true) or 0) - 1
                 if colon <= 0 then
-                    goto __continue68
+                    goto __continue117
                 end
                 local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
+                if not _____662F_5426_5956_52B1_6761_4EF6(cond) then
+                    goto __continue117
+                end
+                if __TS__StringTrim(__TS__StringSubstring(line, colon + 1)) == "" then
+                    goto __continue117
+                end
                 if isConditionMatchedWithContext(nil, cond, ctx) then
                     return {matchedRuleIndex = lineIdx, matchedCondition = cond}
                 end
             end
-            ::__continue68::
+            ::__continue117::
             lineIdx = lineIdx + 1
         end
     end

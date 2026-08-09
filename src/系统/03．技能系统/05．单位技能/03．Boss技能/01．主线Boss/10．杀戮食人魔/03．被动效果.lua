@@ -56,10 +56,12 @@ local stringToFourCCSafe = ____require_result_14.stringToFourCCSafe
 local ____require_result_15 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_15.debugLogForce
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -392,7 +394,7 @@ local function _____5C1D_8BD5_89E6_53D1_5FC3_810F_638C_63E1(boss, target)
         threshold = threshold * cfg["单人斩杀线倍率"]
     end
     local _____5F53_524D_751F_547D = GetUnitState(target, UNIT_STATE_LIFE)
-    local _____6700_5927_751F_547D = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local _____6700_5927_751F_547D = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     if _____5F53_524D_751F_547D > _____6700_5927_751F_547D * threshold then
         return
     end

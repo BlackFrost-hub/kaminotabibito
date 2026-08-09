@@ -11,7 +11,7 @@ const ENABLE_YDLOCAL_TEST = false;
 const ENABLE_TEST_EVENT = false;
 const ENABLE_GOLD_BURST_TEST = true;
 const ENABLE_BROADCAST_HINT_TEST = true;
-const ENABLE_BOSS_REWARD_SELECTION_TEST = false;
+const ENABLE_BOSS_REWARD_SELECTION_TEST = true;
 const ENABLE_THRANDUIL_BOSS_SKILL_TEST = true;
 const ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST = true;
 const ENABLE_BALZAROTH_BOSS_SKILL_TEST = true;
@@ -39,6 +39,10 @@ const ENABLE_FULL_MAP_DYNAMIC_BGM_TEST = true;
 const ENABLE_EXILED_WATER_MONSTER_ENTRY_TEST = true;
 const ENABLE_MORTES_ENTRY_REQUIREMENT_TEST = true;
 const ENABLE_SEAL_GUARD_ENEMY_SKILL_TEST = true;
+const ENABLE_PLAYER_HERO_REGISTRATION_TEST = true;
+const ENABLE_TEST_PLAYER_WHITELIST_UNLOCK = true;
+const ENABLE_HERO_LEVEL_LOOP_TEST = true;
+const ENABLE_ITEM_SCORE_TEST = true;
 
 function loadTests(): void {
   // 主线进度指令作为独立调试入口保留，避免打开总开关时连带启动其他测试。
@@ -178,6 +182,22 @@ function loadTests(): void {
 
   if (ENABLE_SEAL_GUARD_ENEMY_SKILL_TEST) {
     require("系统.12．测试系统.24．封印守卫战敌人技能测试");
+  }
+
+  if (ENABLE_PLAYER_HERO_REGISTRATION_TEST) {
+    require("系统.12．测试系统.25．玩家英雄注册测试");
+  }
+
+  if (ENABLE_TEST_PLAYER_WHITELIST_UNLOCK) {
+    require("系统.12．测试系统.26．测试玩家白名单解锁");
+  }
+
+  if (ENABLE_HERO_LEVEL_LOOP_TEST) {
+    require("系统.12．测试系统.27．英雄循环升级测试");
+  }
+
+  if (ENABLE_ITEM_SCORE_TEST) {
+    require("系统.12．测试系统.19．物品评分测试");
   }
 
 }

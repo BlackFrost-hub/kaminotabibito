@@ -14,9 +14,6 @@ const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩�
 const { 单位是否匹配玩家英雄名称 } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名") as {
   单位是否匹配玩家英雄名称: (this: void, unit: any, name: string) => boolean;
 };
-const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
-  PlaySoundBJ: (this: void, soundHandle: any) => void;
-};
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
@@ -33,6 +30,7 @@ const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => 
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 const IsUnitInRange = jass.IsUnitInRange as (this: void, unit: any, otherUnit: any, distance: number) => boolean;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
+const StartSound = jass.StartSound as (this: void, soundHandle: any) => void;
 
 let 英雄购物音效已初始化 = false;
 let 购物音效冷却中 = false;
@@ -70,7 +68,7 @@ function 开始购物音效冷却(this: void): void {
 function 本地播放购物音效(this: void, whichPlayer: any, soundHandle: any): void {
   if (soundHandle == null || soundHandle === 0) return;
   if (GetLocalPlayer() !== whichPlayer) return;
-  PlaySoundBJ(soundHandle);
+  StartSound(soundHandle);
 }
 
 function 处理购物音效(this: void, whichPlayer: any, _playerId: number, selectedUnit: any, isSelected: boolean): void {

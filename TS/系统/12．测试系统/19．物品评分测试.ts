@@ -48,6 +48,7 @@ const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (
 
 const 模块名 = "物品评分测试";
 const 物品评分命令前缀 = "物品+";
+const 物品内部ID命令前缀 = "WP";
 const 随机6000分装备命令 = "djcs";
 const 默认随机目标评分 = 6000;
 const 评分浮动范围 = 500;
@@ -111,6 +112,12 @@ function 解析目标评分(this: void, command: string): number | undefined {
   const score = Number(text);
   if (score !== score || score <= 0) return undefined;
   return score;
+}
+
+function 解析物品内部ID(this: void, command: string): string | undefined {
+  if (command.substring(0, 物品内部ID命令前缀.length) !== 物品内部ID命令前缀) return undefined;
+  const itemId = command.substring(物品内部ID命令前缀.length);
+  return itemId.length === 4 ? itemId : undefined;
 }
 
 function 创建物品(this: void, itemId: string, x: number, y: number): boolean {
@@ -210,7 +217,32 @@ function on随机6000分装备命令(this: void, player: any, _command: string):
   创建十件随机评分装备(player);
 }
 
+function on物品内部ID命令(this: void, player: any, command: string): void {
+  if (!是允许测试玩家(player)) return;
+
+  const itemId = 解析物品内部ID(command);
+  if (itemId == null) {
+    发送失败提示(player, "命令格式：WP加4位物品内部ID，例如 WPe0XX。");
+    return;
+  }
+
+  const hero = 获取测试英雄(player);
+  if (!是有效句柄(hero)) {
+    发送失败提示(player, "未找到该玩家的注册英雄。");
+    return;
+  }
+
+  if (!创建物品(itemId, GetUnitX(hero), GetUnitY(hero))) {
+    发送失败提示(player, "创建物品失败：" + itemId + "。");
+    return;
+  }
+
+  DisplayTimedTextToPlayer(player, 0, 0, 6, "[物品测试] 已在注册英雄脚下创建物品 " + itemId + "。");
+  debugLogForce(模块名, "按内部ID创建物品", "itemId", itemId);
+}
+
 注册聊天命令前缀监听(物品评分命令前缀, on物品评分命令);
+注册聊天命令前缀监听(物品内部ID命令前缀, on物品内部ID命令);
 注册聊天命令监听(随机6000分装备命令, on随机6000分装备命令);
 
 export {};

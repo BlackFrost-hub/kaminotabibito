@@ -6,6 +6,7 @@
  * - `DzTriggerRegisterKeyEventTrg` 视为同步入口，不包本地玩家判断
  * - `DzTriggerRegisterKeyEventByCode(..., false, ...)` 视为本地入口，必须经由
  *   `runFalseLocalRegistration(...)` 包装，并支持可选 `playerId`
+ * - `registerKeyUpSync` 先在本机过滤聊天框，再通过同步数据回调全端派发
  */
 
 const jass = require("jass.common") as any;
@@ -15,11 +16,41 @@ const { DzTriggerRegisterKeyEventTrg } = require("lib.扩展函数.KK扩展API.i
 };
 declare const string: { char: (n: number) => string } | undefined;
 
+const CreateTrigger = jass.CreateTrigger as (this: void) => any;
+const TriggerAddAction = jass.TriggerAddAction as (
+  this: void,
+  trigger: any,
+  callback: (this: void) => void
+) => any;
+const I2S = jass.I2S as (this: void, value: number) => string;
+const S2I = jass.S2I as (this: void, value: string) => number;
+const DzTriggerRegisterKeyEventByCode = japi.DzTriggerRegisterKeyEventByCode as (
+  this: void,
+  trigger: any,
+  keyCode: number,
+  status: number,
+  sync: boolean,
+  callback: (this: void) => void
+) => void;
+const DzTriggerRegisterSyncData = japi.DzTriggerRegisterSyncData as (
+  this: void,
+  trigger: any,
+  prefix: string,
+  server: boolean
+) => void;
+const DzSyncData = japi.DzSyncData as (this: void, prefix: string, data: string) => void;
+const DzGetTriggerSyncPlayer = japi.DzGetTriggerSyncPlayer as (this: void) => any;
+const DzGetTriggerSyncData = japi.DzGetTriggerSyncData as (this: void) => string;
+const DzGetTriggerKey = japi.DzGetTriggerKey as (this: void) => number;
+
 import { createTriggerOrNull, runFalseLocalRegistration } from "./02．内部工具";
 import { KEY_STATE } from "./01．常量定义";
 
-const syncKeyUpCallbackByTriggerHid: Record<number, ((player: any, key: number) => void) | undefined> = {};
+const syncKeyUpCallbacksByKey: Record<number, Array<(player: any, key: number) => void> | undefined> = {};
+const syncKeyUpTriggerByKey: Record<number, any | undefined> = {};
 const localKeyCallbacksByKeyAndStatus: Record<string, Array<(this: any) => void> | undefined> = {};
+const syncKeyUpPrefix = "KEYUP";
+let syncKeyUpDataTrigger: any = null;
 
 export function isKeyDown(keyCode: number): boolean {
   return !!japi.DzIsKeyDown(keyCode);
@@ -144,28 +175,52 @@ export function registerKeyUpLocal(keyCode: number, callback: (player: any, key:
 }
 
 export function registerKeyUpSync(keyCode: number, callback: (player: any, key: number) => void): any {
-  const trig = createTriggerOrNull();
-  if (!trig) return null;
-  DzTriggerRegisterKeyEventTrg(trig, KEY_STATE.UP, keyCode);
-  syncKeyUpCallbackByTriggerHid[jass.GetHandleId(trig) as number] = callback;
-  jass.TriggerAddAction(trig, onSyncKeyUp);
+  ensureSyncKeyUpDataTrigger();
+
+  let callbacks = syncKeyUpCallbacksByKey[keyCode];
+  if (callbacks == null) {
+    callbacks = [];
+    syncKeyUpCallbacksByKey[keyCode] = callbacks;
+  }
+  callbacks.push(callback);
+
+  let trig = syncKeyUpTriggerByKey[keyCode];
+  if (trig != null && trig !== 0) return trig;
+  trig = CreateTrigger();
+  if (trig == null || trig === 0) return null;
+  syncKeyUpTriggerByKey[keyCode] = trig;
+  DzTriggerRegisterKeyEventByCode(trig, keyCode, KEY_STATE.UP, false, onLocalSyncKeyUpRequest);
   return trig;
 }
 
-function onSyncKeyUp(): void {
-  const trig = jass.GetTriggeringTrigger();
-  if (!trig) return;
-  const cb = syncKeyUpCallbackByTriggerHid[jass.GetHandleId(trig) as number];
-  if (typeof cb !== "function") return;
-  const triggerPlayer = japi.DzGetTriggerKeyPlayer();
-  const localPlayer = jass.GetLocalPlayer();
-  // sync=true 热键仍会全房触发；这里只用本机聊天框状态过滤触发玩家本机的按键输入。
-  // 已经过联机持续输入 J 压测，未发现掉线；但理论上仍保留约 1% 的状态分叉/掉线猜想风险。
-  if (triggerPlayer === localPlayer && isChatInputActive()) return;
-  cb(triggerPlayer, japi.DzGetTriggerKey());
+function ensureSyncKeyUpDataTrigger(this: void): void {
+  if (syncKeyUpDataTrigger != null && syncKeyUpDataTrigger !== 0) return;
+  syncKeyUpDataTrigger = CreateTrigger();
+  if (syncKeyUpDataTrigger == null || syncKeyUpDataTrigger === 0) return;
+  TriggerAddAction(syncKeyUpDataTrigger, onSyncKeyUpData);
+  DzTriggerRegisterSyncData(syncKeyUpDataTrigger, syncKeyUpPrefix, false);
 }
 
-function isChatInputActive(): boolean {
+function onLocalSyncKeyUpRequest(this: void): void {
+  if (isChatInputActive()) return;
+  const keyCode = DzGetTriggerKey();
+  if (!(keyCode > 0)) return;
+  DzSyncData(syncKeyUpPrefix, I2S(keyCode));
+}
+
+function onSyncKeyUpData(this: void): void {
+  const triggerPlayer = DzGetTriggerSyncPlayer();
+  if (triggerPlayer == null || triggerPlayer === 0) return;
+  const keyCode = S2I(DzGetTriggerSyncData());
+  const callbacks = syncKeyUpCallbacksByKey[keyCode];
+  if (callbacks == null) return;
+  for (let i = 0; i < callbacks.length; i++) {
+    const callback = callbacks[i];
+    if (typeof callback === "function") callback(triggerPlayer, keyCode);
+  }
+}
+
+function isChatInputActive(this: void): boolean {
   if (japi.DzIsChatBoxOpen()) return true;
 
   const chatEditBar = japi.DzFrameGetChatEditBar();

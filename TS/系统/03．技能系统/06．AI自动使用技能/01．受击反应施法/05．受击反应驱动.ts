@@ -16,6 +16,9 @@ const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统
     cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void
   ) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 import type { 受击反应配置 } from "./00．配置类型";
 import { 按名字反查任意单位ID } from "./01．单位名反查";
@@ -25,7 +28,12 @@ import { 尝试执行受击技能 } from "./04．受击反应执行";
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
+const GetUnitName = jass.GetUnitName as (whichUnit: any) => string;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
+
+const 模块名 = "受击反应施法";
+const 最低单位公共冷却Ms = 5000;
+const 失败诊断间隔Ms = 5000;
 
 interface 已解析受击反应配置 extends 受击反应配置 {
   单位类型ID: number;
@@ -34,6 +42,7 @@ interface 已解析受击反应配置 extends 受击反应配置 {
 let 已初始化 = false;
 const 受击反应配置索引: Record<number, 已解析受击反应配置[]> = {};
 const 单位独立冷却表: Record<number, number> = {};
+const 单位失败诊断时间表: Record<number, number> = {};
 
 function 构建配置索引(this: void): void {
   const 列表 = 受击反应配置表;
@@ -72,6 +81,47 @@ function 刷新单位独立冷却(this: void, unit: any, cooldownMs: number): vo
   单位独立冷却表[handleId] = getServerTime() + cooldownMs;
 }
 
+function 读取单位公共冷却Ms(this: void, config: 已解析受击反应配置): number {
+  const 配置冷却Ms = config.单位独立冷却Ms ?? 最低单位公共冷却Ms;
+  return 配置冷却Ms > 最低单位公共冷却Ms ? 配置冷却Ms : 最低单位公共冷却Ms;
+}
+
+function 记录受击反应诊断(
+  this: void,
+  config: 已解析受击反应配置,
+  target: any,
+  attacker: any,
+  applied: number,
+  executed: boolean,
+  cooldownMs: number
+): void {
+  const targetHid = GetHandleId(target);
+  const now = getServerTime();
+  if (!executed && (单位失败诊断时间表[targetHid] ?? 0) > now) return;
+  单位失败诊断时间表[targetHid] = now + 失败诊断间隔Ms;
+
+  debugLogForce(
+    模块名,
+    executed ? "受击施法下单成功" : "受击施法下单失败",
+    "config=",
+    config.配置ID,
+    "target=",
+    GetUnitName(target),
+    "targetHid=",
+    targetHid,
+    "attacker=",
+    GetUnitName(attacker),
+    "attackerHid=",
+    GetHandleId(attacker),
+    "applied=",
+    applied,
+    "logic=",
+    config.特殊逻辑名 ?? config.技能列表?.[0]?.技能ID ?? "无",
+    "公共冷却Ms=",
+    cooldownMs
+  );
+}
+
 function 执行表驱动受击反应(this: void, config: 已解析受击反应配置, target: any, attacker: any): boolean {
   const skills = config.技能列表;
   if (skills == null || skills.length <= 0) return false;
@@ -107,8 +157,10 @@ function onAppliedFinalDamage(this: void, target: any, attacker: any, applied: n
       executed = 执行表驱动受击反应(config, target, attacker);
     }
 
+    const cooldownMs = 读取单位公共冷却Ms(config);
+    记录受击反应诊断(config, target, attacker, applied, executed, cooldownMs);
     if (executed) {
-      刷新单位独立冷却(target, config.单位独立冷却Ms ?? 1050);
+      刷新单位独立冷却(target, cooldownMs);
       return;
     }
   }

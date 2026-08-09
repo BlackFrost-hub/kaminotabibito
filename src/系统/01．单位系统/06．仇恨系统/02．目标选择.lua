@@ -7,14 +7,15 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 --- 02．目标选择
 -- 
--- 从仇恨表中选出应攻击目标（返回含 targetRef），施加目标粘性防止频繁横跳。
--- 切换条件：新目标仇恨 >= 当前目标仇恨的 1.2 倍。
+-- 从仇恨表中选出应攻击目标（返回含 targetRef）。
+-- 普通攻击可严格选择最高仇恨；Boss 主动施法保留高出当前目标至少 20% 才切换的粘性规则。
 -- 
 -- 初始化时注册清除回调到 00．仇恨存储，实现 removeTarget/clearAllThreat 自动联动清理。
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
 local getHighestThreat = ____require_result_0.getHighestThreat
 local getThreatByHid = ____require_result_0.getThreatByHid
+local getEnemyThreats = ____require_result_0.getEnemyThreats
 local _____6CE8_518C_5F53_524D_76EE_6807_6E05_9664_56DE_8C03 = ____require_result_0["注册当前目标清除回调"]
 local GetHandleId = jass.GetHandleId
 local _____5F53_524D_76EE_6807_8868 = {}
@@ -141,10 +142,8 @@ ____exports["获取强制目标敌人引用"] = function(_____654C_4EBAID)
     end
     return _____8BB0_5F55.enemyRef
 end
---- 根据仇恨表和粘性规则选出应攻击目标。
--- 
--- @param filter 由驱动层传入，过滤死亡/超距目标（filter 接收 ThreatEntry，含 targetRef）
-____exports["获取应攻击目标"] = function(_____654C_4EBA, filter)
+--- 严格选择过滤范围内的最高仇恨攻击目标；明确的强制点名优先。
+____exports["获取最高仇恨攻击目标"] = function(_____654C_4EBA, filter)
     local _____654C_4EBAID = _____53D6_5355_4F4DID(_____654C_4EBA)
     if _____654C_4EBAID == 0 then
         return nil
@@ -153,7 +152,17 @@ ____exports["获取应攻击目标"] = function(_____654C_4EBA, filter)
     if _____5F3A_5236_76EE_6807 ~= nil then
         return _____5F3A_5236_76EE_6807
     end
-    local best = getHighestThreat(_____654C_4EBA, filter)
+    return getHighestThreat(_____654C_4EBA, filter)
+end
+--- Boss 主动施法目标：最高仇恨有效且比当前目标高至少 20% 时才切换。
+-- 
+-- @param filter 由驱动层传入，过滤死亡/超距目标（filter 接收 ThreatEntry，含 targetRef）
+____exports["获取应攻击目标"] = function(_____654C_4EBA, filter)
+    local _____654C_4EBAID = _____53D6_5355_4F4DID(_____654C_4EBA)
+    if _____654C_4EBAID == 0 then
+        return nil
+    end
+    local best = ____exports["获取最高仇恨攻击目标"](_____654C_4EBA, filter)
     if best == nil then
         return nil
     end
@@ -161,13 +170,13 @@ ____exports["获取应攻击目标"] = function(_____654C_4EBA, filter)
     if _____5F53_524D_8BB0_5F55 ~= nil and _____5F53_524D_8BB0_5F55.targetHid ~= 0 and _____5F53_524D_8BB0_5F55.targetHid ~= best.targetHid then
         local _____5F53_524D_4EC7_6068 = getThreatByHid(_____654C_4EBA, _____5F53_524D_8BB0_5F55.targetHid)
         if _____5F53_524D_4EC7_6068 > 0 and best.threat < _____5F53_524D_4EC7_6068 * 1.2 then
-            local entries = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储").getEnemyThreats
-            local _____5217_8868 = entries(_____654C_4EBA)
+            local _____5217_8868 = getEnemyThreats(_____654C_4EBA)
             do
                 local i = 0
                 while i < #_____5217_8868 do
-                    if _____5217_8868[i + 1].targetHid == _____5F53_524D_8BB0_5F55.targetHid then
-                        return _____5217_8868[i + 1]
+                    local entry = _____5217_8868[i + 1]
+                    if entry.targetHid == _____5F53_524D_8BB0_5F55.targetHid and (filter == nil or filter(entry)) then
+                        return entry
                     end
                     i = i + 1
                 end

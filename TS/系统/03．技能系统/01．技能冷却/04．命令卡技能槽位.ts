@@ -3,10 +3,9 @@
 const japi = require("jass.japi") as any;
 const ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   ABILITY_DATA_HOTKEY: number;
-  YDWEGetUnitAbilityDataString: (u: any, abilcode: number, level: number, dataType: number) => string;
 };
-const { YDWEGetUnitAbilityDataString } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
-  YDWEGetUnitAbilityDataString: (u: any, abilcode: number, level: number, dataType: number) => string;
+const { YDWEGetUnitAbilityDataStringSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDWEGetUnitAbilityDataStringSafe: (this: void, u: any, abilcode: number, level: number, dataType: number) => string;
 };
 
 const DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton as (row: number, column: number) => number;
@@ -67,7 +66,7 @@ function 读取按钮技能热键(this: void, whichHero: any, x: number, y: numb
   const abilityId = 读取命令卡按钮能力Id(x, y);
   if (abilityId === 0) return null;
 
-  const rawHotkey = YDWEGetUnitAbilityDataString(whichHero, abilityId, 1, ydweAbility.ABILITY_DATA_HOTKEY);
+  const rawHotkey = YDWEGetUnitAbilityDataStringSafe(whichHero, abilityId, 1, ydweAbility.ABILITY_DATA_HOTKEY);
   if (rawHotkey == null || rawHotkey === "") return null;
   return 归一化热键(rawHotkey);
 }

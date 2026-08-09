@@ -30,6 +30,7 @@ export const 装备掉落表: Record<string, UnitData> = {
   "nane": { id: "nane", name: "阿卡那瑟德掘地者", level: 8, itemIds: "I03Y:7%;I04R:7%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
   "nanw": { id: "nanw", name: "阿卡那瑟德战士", level: 8, itemIds: "I03Y:7%;I04R:7%", picks: 2, isUniversal: "FALSE", unitType: "normal" },
   "n001": { id: "n001", name: "史莱姆", level: 10, unitType: "normal" },
+  "nsea": { id: "nsea", name: "植物", itemIds: "I0A0:always", picks: 1, isUniversal: "FALSE", unitType: "normal" },
   "n01Z": { id: "n01Z", name: "小蛇", level: 10, unitType: "normal" },
   "N00B": { id: "N00B", name: "地精剑客", level: 11, itemIds: "I02C:1.5;I01G:1;I02D:1;I02F:1;I02E:1;I02G:1", picks: 4, isUniversal: "FALSE", unitType: "elite" },
   "nbdm": { id: "nbdm", name: "蛇之盗贼", level: 11, unitType: "normal" },

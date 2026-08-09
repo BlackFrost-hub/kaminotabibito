@@ -146,6 +146,14 @@ export const 激活传送点配置: Record<string, PointConfig> = {
     UnitID: "e08L",
     text: "|cffffff00『系统提示』|r：激活『熔岩荒地』传送点。",
     enabled: true
+  },
+  "19": {
+    name: "静灵森",
+    teleportX: "-26262.5",
+    teleportY: "-9687.2",
+    UnitID: "e08L",
+    text: "|cffffff00『系统提示』|r：激活『静灵森』传送点。",
+    enabled: true
   }
 };
 export default 激活传送点配置;

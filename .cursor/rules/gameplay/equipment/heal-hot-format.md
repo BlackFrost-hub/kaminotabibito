@@ -5,10 +5,12 @@
 ```text
 hot: "段1+段2+..."
 abilList: "ID1,ID2,..."
+hotDuration: 3
 ```
 
 - `+` 分隔多段，每段对应 `abilList` 中一个技能 ID，对应一次 `TriggerExecute`
 - 段数与 `abilList` 中 ID 数量严格一一对应
+- `hotDuration` 可选，仅用于 `A08C` 持续治疗；不填时默认 10 秒
 
 ---
 

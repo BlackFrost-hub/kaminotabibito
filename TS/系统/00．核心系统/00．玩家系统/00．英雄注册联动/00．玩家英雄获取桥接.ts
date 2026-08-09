@@ -41,9 +41,9 @@ const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事
   registerChestSystemHero: (this: void, whichHero: any) => void;
 };
 
-const heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index") as {
-  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
-};
+// const heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index") as {
+//   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+// };
 
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
@@ -167,15 +167,15 @@ function 处理英雄依赖注册任务一步(this: void, 任务: 英雄依赖�
       debugLog("Bridge", "registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
       invokeSelectionCenterInit(owner);
       invokeSelectionCenterSeed(owner, whichHero);
-      if (typeof heroVoiceSystem.onPlayerHeroRegistered === "function") {
-        heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero);
-      }
+      // if (typeof heroVoiceSystem.onPlayerHeroRegistered === "function") {
+      //   heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero);
+      // }
       break;
     case 5:
       if (!uiRegisteredPlayers.has(playerId)) {
         invokeUiAttrOnPlayerHeroRegistered(owner, whichHero);
       }
-      break;
+        break;
     case 6:
       if (!uiRegisteredPlayers.has(playerId) && typeof dialogSystem.onPlayerHeroRegistered === "function") {
         dialogSystem.onPlayerHeroRegistered(owner, whichHero);

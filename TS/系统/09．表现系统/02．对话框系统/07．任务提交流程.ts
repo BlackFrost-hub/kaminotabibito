@@ -1,5 +1,10 @@
 const jass = require("jass.common") as any;
 const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const UnitRemoveItem = jass.UnitRemoveItem as (this: void, unit: any, item: any) => boolean;
+const RemoveItem = jass.RemoveItem as (this: void, item: any) => void;
+const UnitAddItem = jass.UnitAddItem as (this: void, unit: any, item: any) => boolean;
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (this: void, four: number) => string;
 };
@@ -7,20 +12,26 @@ const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工
 import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import {
   ConsumeItemTypeCountByChargesBJ,
+  GetItemOfTypeFromUnitBJ,
   GetItemTypeTotalCountByChargesBJ,
-  ReturnItemToHeroOrDropBJ,
-  UnitGetItemByTypeId,
   UnitHasItemOfTypeBJ
 } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { 任务配置 } from "../../08．任务系统/00．配置表/02．任务配置表";
 import itemsData from "../../02．物品系统/01．装备数据";
+import { findStatKey, getItemDataEntry, getItemDataEntryByIdStr } from "../../../lib/扩展函数/物品相关函数/装备数据查询";
 import { questDB } from "../../08．任务系统/01．任务数据";
 import { applyRewardWithContext, getPlayerFirstHero, previewRewardMatchWithContext } from "./08．任务奖励执行";
 import { showLocalHint } from "./02．对话框业务逻辑";
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
 };
-import { setQuestState } from "./03．任务状态";
+const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.index") as {
+  创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
+};
+const { 发放任务物品 } = require("系统.09．表现系统.02．对话框系统.14．任务物品发放") as {
+  发放任务物品: (this: void, unit: any, itemConfig: string | undefined) => number;
+};
+import { resolveRewardDisplayText, setQuestState } from "./03．任务状态";
 import { removeQuestMarkerAfterNpcTriggered } from "./09．NPC头顶与气泡特效";
 const { addDelayedCallback } = globalThis as unknown as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
@@ -29,6 +40,39 @@ const { addDelayedCallback } = globalThis as unknown as {
 // ========== 虚拟分区：提交工具（资源扣除/物品解析/条件匹配） ==========
 function normalizeRequireCount(count?: number): number {
   return count != null && count > 1 ? count : 1;
+}
+
+interface 任务物品升级结果 {
+  原物品: any;
+  新物品类型ID: number;
+}
+
+function 查找首个任务物品升级(this: void, 英雄: any, 升级配置: string | undefined): 任务物品升级结果 | null {
+  if (英雄 == null || 英雄 === 0 || !升级配置 || 升级配置 === "") return null;
+  const 升级规则列表 = 升级配置.split("|");
+  for (let i = 0; i < 升级规则列表.length; i++) {
+    const 升级规则 = 升级规则列表[i].trim();
+    const 分隔位置 = 升级规则.indexOf(">");
+    if (分隔位置 <= 0) continue;
+    const 原物品类型ID = stringToFourCC(升级规则.substring(0, 分隔位置).trim());
+    const 新物品类型ID = stringToFourCC(升级规则.substring(分隔位置 + 1).trim());
+    if (原物品类型ID === 0 || 新物品类型ID === 0) continue;
+    const 原物品 = GetItemOfTypeFromUnitBJ(英雄, 原物品类型ID);
+    if (原物品 != null && 原物品 !== 0) return { 原物品, 新物品类型ID };
+  }
+  return null;
+}
+
+function 执行任务物品升级(this: void, 英雄: any, 匹配: 任务物品升级结果): boolean {
+  const x = GetUnitX(英雄);
+  const y = GetUnitY(英雄);
+  const 新物品 = 创建物品并注册排泄监听(匹配.新物品类型ID, x, y);
+  if (新物品 == null || 新物品 === 0) return false;
+
+  UnitRemoveItem(英雄, 匹配.原物品);
+  RemoveItem(匹配.原物品);
+  UnitAddItem(英雄, 新物品);
+  return true;
 }
 
 function tryConsumeRequiredResources(player: any, requiredResources?: string, requireCount?: number): boolean {
@@ -84,8 +128,30 @@ function parseAllowedEquipLevels(requireItem: string): Set<string> {
   return out;
 }
 
+function parseRequiredEquipStatKey(this: void, requireItem: string): string {
+  const marker = "装备属性:";
+  if (requireItem.indexOf(marker) !== 0) return "";
+  return findStatKey(requireItem.substring(marker.length).trim());
+}
+
 function resolveSubmitItem(hero: any, requireItem: string): { itemId: number; itemCode: string; itemLevel: string } {
   if (!hero || !requireItem) return { itemId: 0, itemCode: "", itemLevel: "" };
+  const requiredStatKey = parseRequiredEquipStatKey(requireItem);
+  if (requiredStatKey !== "") {
+    for (let slot = 0; slot < 6; slot++) {
+      const item = jass.UnitItemInSlot(hero, slot);
+      if (!item) continue;
+      const data = getItemDataEntry(item);
+      if (!data || typeof data[requiredStatKey] !== "number" || data[requiredStatKey] <= 0) continue;
+      const itemId = GetItemTypeId(item) as number;
+      return {
+        itemId,
+        itemCode: fourCCToString(itemId),
+        itemLevel: (data.level as string) || "",
+      };
+    }
+    return { itemId: 0, itemCode: "", itemLevel: "" };
+  }
   if (requireItem.indexOf("装备等级:") === 0) {
     for (let slot = 0; slot < 6; slot++) {
       const item = jass.UnitItemInSlot(hero, slot);
@@ -127,6 +193,11 @@ function resolveSubmitItem(hero: any, requireItem: string): { itemId: number; it
 
 function isSubmitItemMatchedRequire(submitInfo: { itemId: number; itemCode: string; itemLevel: string }, requireItem: string): boolean {
   if (!requireItem || submitInfo.itemId === 0) return false;
+  const requiredStatKey = parseRequiredEquipStatKey(requireItem);
+  if (requiredStatKey !== "") {
+    const data = getItemDataEntryByIdStr(submitInfo.itemCode);
+    return data != null && typeof data[requiredStatKey] === "number" && data[requiredStatKey] > 0;
+  }
   if (requireItem.indexOf("装备等级:") === 0) {
     const allowLevels = parseAllowedEquipLevels(requireItem);
     return submitInfo.itemLevel !== "" && allowLevels.has(submitInfo.itemLevel);
@@ -181,6 +252,8 @@ export function handleQuestSubmit(params: {
   const playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) || "冒险者";
   let rewardBranchIndex = -1;
   const useGenericGiveFailHint = shouldUseGenericGiveFailHint(quest);
+  let 待执行物品升级: 任务物品升级结果 | null = null;
+  let 待消耗提交物品ID = 0;
 
   if (quest.类型 === "击杀" || quest.类型 === "目标击杀") {
     const done = isKillQuestObjectiveCompleted(dialogOwnerId, questId, requireCount);
@@ -188,15 +261,31 @@ export function handleQuestSubmit(params: {
       showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r任务目标尚未完成，无法提交。");
       return;
     }
+    if (quest.提交物品升级) {
+      待执行物品升级 = 查找首个任务物品升级(hero, quest.提交物品升级);
+      if (待执行物品升级 == null) {
+        showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r请携带任务要求的初级德鲁伊指引灯笼后再提交。");
+        return;
+      }
+    }
+    if (quest.提交消耗物品) {
+      const 提交物品 = resolveSubmitItem(hero, quest.提交消耗物品);
+      if (提交物品.itemId === 0) {
+        showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r请携带任务要求的物品后再提交。");
+        return;
+      }
+      待消耗提交物品ID = 提交物品.itemId;
+    }
   }
 
   function broadcastQuestComplete(): void {
-    const rewardStr = quest.奖励显示 || quest.奖励 || "无";
-    const isAll = !rewardStr || rewardStr.indexOf("所有玩家") !== -1 || rewardStr.indexOf("all") !== -1
-      || (rewardStr.indexOf("完成任务的玩家") === -1 && rewardStr.indexOf("Player") === -1);
+    const rewardStr = resolveRewardDisplayText(quest);
+    const rewardRule = quest.奖励 || "";
+    const isAll = !rewardRule || rewardRule.indexOf("所有玩家") !== -1 || rewardRule.indexOf("all") !== -1
+      || (rewardRule.indexOf("完成任务的玩家") === -1 && rewardRule.indexOf("Player") === -1);
     const targetLabel = isAll ? "|cffffcc00所有玩家|r" : `|cff00ccff${playerName}|r`;
     const TARGET_PREFIXES = ["所有玩家", "完成任务的玩家", "Player"];
-    const cleanReward = rewardStr.split(";").map((seg: string) => {
+    const cleanReward = rewardStr.split("\n").join("；").split(";").map((seg: string) => {
       let s: string = seg.trim();
       for (const prefix of TARGET_PREFIXES) {
         if (s.startsWith(prefix)) {
@@ -266,15 +355,7 @@ export function handleQuestSubmit(params: {
       showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444你没有英雄单位！|r");
       return;
     }
-    const sourceUnit = quest.类型 === "给予" ? npcUnit : hero;
-    if (!sourceUnit) {
-      if (useGenericGiveFailHint) {
-        showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。");
-      } else {
-        showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444未找到任务NPC单位，无法提交给予任务。|r");
-      }
-      return;
-    }
+    const sourceUnit = hero;
     const submitInfo = resolveSubmitItem(sourceUnit, requireItem);
     const itemId = submitInfo.itemId;
     if (itemId === 0) {
@@ -286,24 +367,10 @@ export function handleQuestSubmit(params: {
       return;
     }
     if (quest.类型 === "给予" && !isSubmitItemMatchedRequire(submitInfo, requireItem)) {
-      const wrongItem = UnitGetItemByTypeId(sourceUnit, itemId);
-      if (wrongItem) {
-        const back = ReturnItemToHeroOrDropBJ(wrongItem, sourceUnit, hero);
-        if (useGenericGiveFailHint) {
-          showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。");
-        } else {
-          if (back === "dropped") {
-            showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交物品不符合条件，已返还并掉落在英雄脚下。");
-          } else {
-            showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交物品不符合条件，已返还给你。");
-          }
-        }
+      if (useGenericGiveFailHint) {
+        showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。");
       } else {
-        if (useGenericGiveFailHint) {
-          showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。");
-        } else {
-          showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交物品不符合条件。");
-        }
+        showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交物品不符合条件。");
       }
       return;
     }
@@ -316,24 +383,10 @@ export function handleQuestSubmit(params: {
           submittedItemLevel: submitInfo.itemLevel,
         });
         if (preview.matchedRuleIndex < 0 && (quest.奖励 || "").indexOf(":") >= 0) {
-          const backItem = UnitGetItemByTypeId(sourceUnit, itemId);
-          if (backItem) {
-            const back = ReturnItemToHeroOrDropBJ(backItem, sourceUnit, hero);
-            if (useGenericGiveFailHint) {
-              showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。");
-            } else {
-              if (back === "dropped") {
-                showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r该物品不符合任务奖励条件，已返还并掉落在英雄脚下。");
-              } else {
-                showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r该物品不符合任务奖励条件，已返还给你。");
-              }
-            }
+          if (useGenericGiveFailHint) {
+            showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。");
           } else {
-            if (useGenericGiveFailHint) {
-              showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r提交失败，请更换任务物品后重试。");
-            } else {
-              showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r该物品不符合任务奖励条件。");
-            }
+            showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r该物品不符合任务奖励条件。");
           }
           return;
         }
@@ -361,6 +414,18 @@ export function handleQuestSubmit(params: {
     return;
   }
 
+  if (待执行物品升级 != null && !执行任务物品升级(hero, 待执行物品升级)) {
+    showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r灯笼升级失败，请重试。");
+    return;
+  }
+  if (待消耗提交物品ID !== 0 && !ConsumeItemTypeCountByChargesBJ(hero, 待消耗提交物品ID, 1)) {
+    showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r任务物品删除失败，请重试。");
+    return;
+  }
+  if (quest.奖励物品 && 发放任务物品(hero, quest.奖励物品) <= 0) {
+    showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r任务奖励物品发放失败，请重试。");
+    return;
+  }
   setQuestState(dialogOwnerId, questId, 2, playerName);
   const rewardResult = applyRewardWithContext(quest.奖励 || "", { triggerPlayerId: dialogOwnerId });
   rewardBranchIndex = rewardResult.matchedRuleIndex;

@@ -4,6 +4,9 @@ local ____exports = {}
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local AttachSoundToUnit = jass.AttachSoundToUnit
+local SetSoundVolume = jass.SetSoundVolume
+local StartSound = jass.StartSound
 local ____jglobals_bj_CINEMODE_GAMESPEED_0 = jglobals.bj_CINEMODE_GAMESPEED
 if ____jglobals_bj_CINEMODE_GAMESPEED_0 == nil then
     ____jglobals_bj_CINEMODE_GAMESPEED_0 = 0
@@ -290,7 +293,13 @@ end
 function ____exports.PlaySoundBJ(soundHandle)
     jglobals.bj_lastPlayedSound = soundHandle
     if soundHandle ~= nil then
-        jass.StartSound(soundHandle)
+        StartSound(soundHandle)
     end
+end
+--- 与 Blizzard.j 的 PlaySoundOnUnitBJ 保持一致。
+function ____exports.PlaySoundOnUnitBJ(soundHandle, volumePercent, whichUnit)
+    AttachSoundToUnit(soundHandle, whichUnit)
+    SetSoundVolume(soundHandle, volumePercent)
+    ____exports.PlaySoundBJ(soundHandle)
 end
 return ____exports

@@ -118,10 +118,10 @@ export function getCooldownReduction(unit: any): number {
 }
 
 /**
- * 获取冷却缩减加成属性（突破上限）
+ * 获取额外冷却缩减上限属性
  */
-export function getCooldownReductionBonus(unit: any): number {
-  return getCooldownAttrValue(unit, "冷却缩减加成");
+export function getCooldownReductionCapIncrease(unit: any): number {
+  return getCooldownAttrValue(unit, "冷却缩减上限");
 }
 
 //=============================================================================
@@ -132,10 +132,10 @@ export function getCooldownReductionBonus(unit: any): number {
  * 获取技能冷却上限
  *
  * @param abilityId 技能ID
- * @param hasBonus 是否有突破上限属性
+ * @param capIncrease 额外冷却缩减上限
  * @returns 冷却上限
  */
-export function getCooldownCap(abilityId: number, hasBonus: boolean): number {
+export function getCooldownCap(abilityId: number, capIncrease: number): number {
   const entries = Object.entries(SKILL_COOLDOWN_CAPS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
   // 检查技能独立上限
   for (const [配置键名, cap] of entries) {
@@ -144,13 +144,7 @@ export function getCooldownCap(abilityId: number, hasBonus: boolean): number {
     }
   }
 
-  // 通用上限 + 突破加成
-  if (hasBonus) {
-    const bonus = 0; // 需要从单位读取
-    return COOLDOWN_REDUCTION_CAP + bonus;
-  }
-
-  return COOLDOWN_REDUCTION_CAP;
+  return COOLDOWN_REDUCTION_CAP + capIncrease;
 }
 
 /**
@@ -159,7 +153,7 @@ export function getCooldownCap(abilityId: number, hasBonus: boolean): number {
 export function applyCooldownCap(
   reduction: number,
   abilityId: number,
-  bonus: number
+  capIncrease: number
 ): number {
   const entries = Object.entries(SKILL_COOLDOWN_CAPS).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
   // 检查技能独立上限
@@ -169,8 +163,7 @@ export function applyCooldownCap(
     }
   }
 
-  // 通用上限 + 突破加成
-  const cap = COOLDOWN_REDUCTION_CAP + bonus;
+  const cap = COOLDOWN_REDUCTION_CAP + capIncrease;
   return reduction < cap ? reduction : cap;
 }
 

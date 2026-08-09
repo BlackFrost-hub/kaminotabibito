@@ -127,7 +127,8 @@ ____exports["构建物品提示内容"] = function(item, hero)
     local name = GetItemName(item) or ""
     local rawText = _____5B89_5168_53D6_7269_54C1_5B9E_4F8B_6570_636E_5B57_7B26_4E32(item, itemTypeId, 3) or ""
     local renderedText = hero ~= nil and hero ~= 0 and _____6E32_67D3_52A8_6001_6587_672C(hero, rawText, {appendAltHint = false, preserveFormula = true}) or rawText
-    local dynamicText = _____6E05_7406_7269_54C1_63D0_793A_6B63_6587(renderedText)
+    local cleanedDynamicText = _____6E05_7406_7269_54C1_63D0_793A_6B63_6587(renderedText)
+    local dynamicText = cleanedDynamicText == "" and "这是物品提示模拟系统测试" or "这是物品提示模拟系统测试|n" .. cleanedDynamicText
     local manaCost = _____53D6_7269_54C1_4E3B_52A8_84DD_8017(itemTypeId)
     local activeUsable = _____7269_54C1_6709_4E3B_52A8_6280_80FD(itemTypeId)
     local activeUseHotkey = activeUsable and _____53D6_7269_54C1_5F53_524D_5C0F_952E_76D8_5FEB_6377_952E(hero, item) or ""

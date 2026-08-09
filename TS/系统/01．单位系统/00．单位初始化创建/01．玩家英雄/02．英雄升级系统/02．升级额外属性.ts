@@ -15,7 +15,8 @@ const UNIT_STATE_ATTACK1_BASE = 0x12;
 const UNIT_STATE_MANA_REGEN = 0x20;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as number;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as number;
-const SetUnitStateJapi = japi.SetUnitState as (whichUnit: any, whichState: number, newVal: number) => void;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, whichUnit: any, whichState: number) => number;
+const SetUnitStateJapi = japi.SetUnitState as (this: void, whichUnit: any, whichState: number, newVal: number) => void;
 
 function 匹配额外属性规则(this: void, unit: any, rule: import("./00．类型定义").升级额外属性配置): boolean {
   if (rule.onlyMelee === true && jass.IsUnitType(unit, jass.UNIT_TYPE_MELEE_ATTACKER) !== true) return false;
@@ -24,7 +25,7 @@ function 匹配额外属性规则(this: void, unit: any, rule: import("./00．�
 }
 
 function 增加单位状态(this: void, unit: any, state: any, delta: number): void {
-  const current = (jass.GetUnitState(unit, state) as number) || 0;
+  const current = GetUnitStateJapi(unit, state) || 0;
   SetUnitStateJapi(unit, state, current + delta);
 }
 

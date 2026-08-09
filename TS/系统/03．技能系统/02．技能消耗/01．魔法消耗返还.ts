@@ -8,10 +8,14 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
-const { YDUserDataGet, YDWEGetUnitAbilityDataInteger, YDWEGetUnitAbilityDataReal } = require("lib.扩展函数.YDWE函数.index") as {
-  YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
-  YDWEGetUnitAbilityDataInteger: (u: any, abilcode: number, level: number, data_type: number) => number;
-  YDWEGetUnitAbilityDataReal: (u: any, abilcode: number, level: number, data_type: number) => number;
+const {
+  YDUserDataGetSafe,
+  YDWEGetUnitAbilityDataIntegerSafe,
+  YDWEGetUnitAbilityDataRealSafe,
+} = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+  YDWEGetUnitAbilityDataIntegerSafe: (this: void, u: any, abilcode: number, level: number, data_type: number) => number;
+  YDWEGetUnitAbilityDataRealSafe: (this: void, u: any, abilcode: number, level: number, data_type: number) => number;
 };
 const { PERCENT_COST_THRESHOLD } = require("系统.03．技能系统.02．技能消耗.00．消耗常量") as {
   PERCENT_COST_THRESHOLD: number;
@@ -25,14 +29,14 @@ const { PERCENT_COST_THRESHOLD } = require("系统.03．技能系统.02．技能
  * 获取技能固定消耗
  */
 export function getAbilityManaCost(this: void, unit: any, abilityId: number, level: number): number {
-  return YDWEGetUnitAbilityDataInteger(unit, abilityId, level, 104);
+  return YDWEGetUnitAbilityDataIntegerSafe(unit, abilityId, level, 104);
 }
 
 /**
  * 获取技能百分比消耗
  */
 export function getAbilityPercentCost(this: void, unit: any, abilityId: number, level: number): number {
-  return YDWEGetUnitAbilityDataReal(unit, abilityId, level, 102);
+  return YDWEGetUnitAbilityDataRealSafe(unit, abilityId, level, 102);
 }
 
 /**
@@ -66,7 +70,7 @@ export function calcTotalManaCost(
 export function getManaCostReduction(this: void, unit: any): number {
   const player = jass.GetOwningPlayer(unit);
   if (player == null) return 0;
-  return YDUserDataGet("player", player, "魔法消耗", "real");
+  return YDUserDataGetSafe("player", player, "魔法消耗", "real");
 }
 
 /**

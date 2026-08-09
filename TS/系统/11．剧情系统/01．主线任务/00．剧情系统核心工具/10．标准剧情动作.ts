@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
@@ -9,6 +11,7 @@ import { 读取剧情进度, 写入剧情进度 } from "./01．剧情动作上�
 import { 发送剧情小地图信号 } from "./02．剧情动作桥接";
 import { 扣除触发单位金币, 给玩家组添加多个区域视野, 停止触发单位, 更新主线任务UI } from "./06．剧情通用执行工具";
 import { 获取主线节点配置 } from "./09．主线节点配置";
+import { 剧情非Boss复活点配置表 } from "../../00．公共/03．剧情非Boss复活点配置表";
 
 const 标准剧情动作模块名 = "11．剧情系统-标准剧情动作";
 
@@ -89,11 +92,24 @@ function 执行停止剧情触发单位(this: void): void {
   停止触发单位();
 }
 
+function 执行设置非Boss复活点(this: void, 参数: 剧情动作参数表): void {
+  const 复活点键 = String(参数.复活点键 ?? "");
+  const 配置 = 剧情非Boss复活点配置表[复活点键];
+  if (配置 == null) {
+    debugLogForce(标准剧情动作模块名, "找不到非Boss复活点配置", 复活点键);
+    return;
+  }
+  const 旧复活点 = jglobals.udg_FHD;
+  if (旧复活点 != null && 旧复活点 !== 0) jass.RemoveLocation(旧复活点);
+  jglobals.udg_FHD = jass.Location(配置.X, 配置.Y);
+}
+
 const 标准剧情动作注册表: Record<string, 剧情动作处理器> = {
   "主线.写入进度": 执行写入主线进度,
   "主线.发布节点目标": 执行发布主线节点目标,
   "主线.进入节点": 执行进入主线节点,
   "剧情.停止触发单位": 执行停止剧情触发单位,
+  "剧情.设置非Boss复活点": 执行设置非Boss复活点,
 };
 
 export function 查找标准剧情动作处理器(this: void, 动作ID: string): 剧情动作处理器 | undefined {

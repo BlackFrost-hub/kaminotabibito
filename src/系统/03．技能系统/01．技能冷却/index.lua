@@ -48,7 +48,7 @@ local ____require_result_1 = require("系统.03．技能系统.01．技能冷却
 local _____68C0_67E5_51B7_5374_9ED1_540D_5355 = ____require_result_1.isBlacklistedSkill
 local _____68C0_67E5_6392_9664_5355_4F4D = ____require_result_1.isExcludedUnit
 local _____8BFB_53D6_51B7_5374_7F29_51CF = ____require_result_1.getCooldownReduction
-local _____8BFB_53D6_51B7_5374_7F29_51CF_52A0_6210 = ____require_result_1.getCooldownReductionBonus
+local _____8BFB_53D6_51B7_5374_7F29_51CF_4E0A_9650 = ____require_result_1.getCooldownReductionCapIncrease
 local _____5E94_7528_51B7_5374_4E0A_9650 = ____require_result_1.applyCooldownCap
 local _____8BA1_7B97_5B9E_9645_51B7_5374 = ____require_result_1.calcActualCooldown
 local _____8BBE_7F6E_6280_80FD_51B7_5374 = ____require_result_1.setAbilityCooldown
@@ -70,11 +70,11 @@ end
 local function getCooldownReduction(unit)
     return _____8BFB_53D6_51B7_5374_7F29_51CF(unit)
 end
-local function getCooldownReductionBonus(unit)
-    return _____8BFB_53D6_51B7_5374_7F29_51CF_52A0_6210(unit)
+local function getCooldownReductionCapIncrease(unit)
+    return _____8BFB_53D6_51B7_5374_7F29_51CF_4E0A_9650(unit)
 end
-local function applyCooldownCap(reduction, abilityId, bonus)
-    return _____5E94_7528_51B7_5374_4E0A_9650(reduction, abilityId, bonus)
+local function applyCooldownCap(reduction, abilityId, capIncrease)
+    return _____5E94_7528_51B7_5374_4E0A_9650(reduction, abilityId, capIncrease)
 end
 local function calcActualCooldown(baseCooldown, reduction)
     return _____8BA1_7B97_5B9E_9645_51B7_5374(baseCooldown, reduction)
@@ -119,8 +119,8 @@ local function onSpellEffectForCooldown(castingUnit, spellAbilityId)
     if reduction < 0.01 then
         return
     end
-    local bonus = getCooldownReductionBonus(castingUnit)
-    local cappedReduction = applyCooldownCap(reduction, spellAbilityId, bonus)
+    local capIncrease = getCooldownReductionCapIncrease(castingUnit)
+    local cappedReduction = applyCooldownCap(reduction, spellAbilityId, capIncrease)
     local actualCooldown = calcActualCooldown(baseCooldown, cappedReduction)
     if handleSpecialSkillCooldown(castingUnit, spellAbilityId, cappedReduction) then
         return

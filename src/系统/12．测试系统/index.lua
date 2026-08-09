@@ -7,7 +7,7 @@ local ENABLE_YDLOCAL_TEST = false
 local ENABLE_TEST_EVENT = false
 local ENABLE_GOLD_BURST_TEST = true
 local ENABLE_BROADCAST_HINT_TEST = true
-local ENABLE_BOSS_REWARD_SELECTION_TEST = false
+local ENABLE_BOSS_REWARD_SELECTION_TEST = true
 local ENABLE_THRANDUIL_BOSS_SKILL_TEST = true
 local ENABLE_DAMAGE_NUMBER_PREFIX_MODEL_TEST = true
 local ENABLE_BALZAROTH_BOSS_SKILL_TEST = true
@@ -35,6 +35,10 @@ local ENABLE_FULL_MAP_DYNAMIC_BGM_TEST = true
 local ENABLE_EXILED_WATER_MONSTER_ENTRY_TEST = true
 local ENABLE_MORTES_ENTRY_REQUIREMENT_TEST = true
 local ENABLE_SEAL_GUARD_ENEMY_SKILL_TEST = true
+local ENABLE_PLAYER_HERO_REGISTRATION_TEST = true
+local ENABLE_TEST_PLAYER_WHITELIST_UNLOCK = true
+local ENABLE_HERO_LEVEL_LOOP_TEST = true
+local ENABLE_ITEM_SCORE_TEST = true
 local function loadTests(self)
     if ENABLE_MAIN_PROGRESS_TEST then
         require("系统.12．测试系统.20．主线进度测试")
@@ -141,6 +145,18 @@ local function loadTests(self)
     end
     if ENABLE_SEAL_GUARD_ENEMY_SKILL_TEST then
         require("系统.12．测试系统.24．封印守卫战敌人技能测试")
+    end
+    if ENABLE_PLAYER_HERO_REGISTRATION_TEST then
+        require("系统.12．测试系统.25．玩家英雄注册测试")
+    end
+    if ENABLE_TEST_PLAYER_WHITELIST_UNLOCK then
+        require("系统.12．测试系统.26．测试玩家白名单解锁")
+    end
+    if ENABLE_HERO_LEVEL_LOOP_TEST then
+        require("系统.12．测试系统.27．英雄循环升级测试")
+    end
+    if ENABLE_ITEM_SCORE_TEST then
+        require("系统.12．测试系统.19．物品评分测试")
     end
 end
 loadTests(nil)

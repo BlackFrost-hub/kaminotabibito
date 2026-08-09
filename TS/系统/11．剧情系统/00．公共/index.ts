@@ -1,5 +1,6 @@
 export * from "./01．剧情物品掉落";
 export * from "./02．剧情NPC创建";
+export * from "./03．剧情非Boss复活点配置表";
 
 import { init剧情物品掉落 } from "./01．剧情物品掉落";
 

@@ -1,5 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
 local ____01_FF0E_5355_4F4D_540D_53CD_67E5 = require("系统.03．技能系统.06．AI自动使用技能.01．受击反应施法.01．单位名反查")
 local _____6309_540D_5B57_53CD_67E5_4EFB_610F_5355_4F4DID = ____01_FF0E_5355_4F4D_540D_53CD_67E5["按名字反查任意单位ID"]
@@ -20,12 +23,19 @@ local ____require_result_2 = require("系统.00．核心系统.00．玩家系统
 local getRegisteredPlayerHero = ____require_result_2.getRegisteredPlayerHero
 local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_3.registerAppliedFinalDamageListener
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_4.debugLogForce
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetUnitName = jass.GetUnitName
 local GetUnitTypeId = jass.GetUnitTypeId
+local _____6A21_5757_540D = "受击反应施法"
+local _____6700_4F4E_5355_4F4D_516C_5171_51B7_5374Ms = 5000
+local _____5931_8D25_8BCA_65AD_95F4_9694Ms = 5000
 local _____5DF2_521D_59CB_5316 = false
 local _____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15 = {}
 local _____5355_4F4D_72EC_7ACB_51B7_5374_8868 = {}
+local _____5355_4F4D_5931_8D25_8BCA_65AD_65F6_95F4_8868 = {}
 local function _____6784_5EFA_914D_7F6E_7D22_5F15()
     local _____5217_8868 = _____53D7_51FB_53CD_5E94_914D_7F6E_8868
     do
@@ -42,8 +52,8 @@ local function _____6784_5EFA_914D_7F6E_7D22_5F15()
                 if _____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15[typeId] == nil then
                     _____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15[typeId] = {}
                 end
-                local ____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15_typeId_4 = _____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15[typeId]
-                ____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15_typeId_4[#____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15_typeId_4 + 1] = _____89E3_6790_914D_7F6E
+                local ____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15_typeId_5 = _____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15[typeId]
+                ____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15_typeId_5[#____53D7_51FB_53CD_5E94_914D_7F6E_7D22_5F15_typeId_5 + 1] = _____89E3_6790_914D_7F6E
             end
             ::__continue4::
             i = i + 1
@@ -68,6 +78,44 @@ end
 local function _____5237_65B0_5355_4F4D_72EC_7ACB_51B7_5374(unit, cooldownMs)
     local handleId = GetHandleId(unit)
     _____5355_4F4D_72EC_7ACB_51B7_5374_8868[handleId] = getServerTime() + cooldownMs
+end
+local function _____8BFB_53D6_5355_4F4D_516C_5171_51B7_5374Ms(config)
+    local _____914D_7F6E_51B7_5374Ms = config["单位独立冷却Ms"] or _____6700_4F4E_5355_4F4D_516C_5171_51B7_5374Ms
+    return _____914D_7F6E_51B7_5374Ms > _____6700_4F4E_5355_4F4D_516C_5171_51B7_5374Ms and _____914D_7F6E_51B7_5374Ms or _____6700_4F4E_5355_4F4D_516C_5171_51B7_5374Ms
+end
+local function _____8BB0_5F55_53D7_51FB_53CD_5E94_8BCA_65AD(config, target, attacker, applied, executed, cooldownMs)
+    local targetHid = GetHandleId(target)
+    local now = getServerTime()
+    if not executed and (_____5355_4F4D_5931_8D25_8BCA_65AD_65F6_95F4_8868[targetHid] or 0) > now then
+        return
+    end
+    _____5355_4F4D_5931_8D25_8BCA_65AD_65F6_95F4_8868[targetHid] = now + _____5931_8D25_8BCA_65AD_95F4_9694Ms
+    local ____debugLogForce_12 = debugLogForce
+    local ____array_11 = __TS__SparseArrayNew(
+        _____6A21_5757_540D,
+        executed and "受击施法下单成功" or "受击施法下单失败",
+        "config=",
+        config["配置ID"],
+        "target=",
+        GetUnitName(target),
+        "targetHid=",
+        targetHid,
+        "attacker=",
+        GetUnitName(attacker),
+        "attackerHid=",
+        GetHandleId(attacker),
+        "applied=",
+        applied,
+        "logic="
+    )
+    local ____config__7279_6B8A_903B_8F91_540D_10 = config["特殊逻辑名"]
+    if ____config__7279_6B8A_903B_8F91_540D_10 == nil then
+        local ____opt_8 = config["技能列表"]
+        local ____opt_6 = ____opt_8 and ____opt_8[1]
+        ____config__7279_6B8A_903B_8F91_540D_10 = ____opt_6 and ____opt_6["技能ID"]
+    end
+    __TS__SparseArrayPush(____array_11, ____config__7279_6B8A_903B_8F91_540D_10 or "无", "公共冷却Ms=", cooldownMs)
+    ____debugLogForce_12(__TS__SparseArraySpread(____array_11))
 end
 local function _____6267_884C_8868_9A71_52A8_53D7_51FB_53CD_5E94(config, target, attacker)
     local skills = config["技能列表"]
@@ -110,10 +158,10 @@ local function onAppliedFinalDamage(target, attacker, applied, _snapshot)
             do
                 local config = configs[i + 1]
                 if (config["最小受伤值"] or 1) > applied then
-                    goto __continue24
+                    goto __continue27
                 end
                 if config["要求伤害来源为注册玩家英雄"] ~= false and not _____4F24_5BB3_6765_6E90_662F_5426_6CE8_518C_73A9_5BB6_82F1_96C4(attacker) then
-                    goto __continue24
+                    goto __continue27
                 end
                 local executed = false
                 if config["特殊逻辑名"] ~= nil and config["特殊逻辑名"] ~= "" then
@@ -121,12 +169,21 @@ local function onAppliedFinalDamage(target, attacker, applied, _snapshot)
                 else
                     executed = _____6267_884C_8868_9A71_52A8_53D7_51FB_53CD_5E94(config, target, attacker)
                 end
+                local cooldownMs = _____8BFB_53D6_5355_4F4D_516C_5171_51B7_5374Ms(config)
+                _____8BB0_5F55_53D7_51FB_53CD_5E94_8BCA_65AD(
+                    config,
+                    target,
+                    attacker,
+                    applied,
+                    executed,
+                    cooldownMs
+                )
                 if executed then
-                    _____5237_65B0_5355_4F4D_72EC_7ACB_51B7_5374(target, config["单位独立冷却Ms"] or 1050)
+                    _____5237_65B0_5355_4F4D_72EC_7ACB_51B7_5374(target, cooldownMs)
                     return
                 end
             end
-            ::__continue24::
+            ::__continue27::
             i = i + 1
         end
     end

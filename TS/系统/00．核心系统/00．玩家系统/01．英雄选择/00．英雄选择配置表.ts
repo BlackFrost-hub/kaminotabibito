@@ -209,6 +209,7 @@ export const 英雄选择配置表: 英雄选择配置 = {
     { 目标单位: "英雄", 旧触发名: "gg_trg_________________________SW", 事件名: "EVENT_UNIT_DEATH" },
     { 目标单位: "英雄", 旧触发名: "gg_trg_Y________________________YDML", 事件名: "EVENT_UNIT_ISSUED_POINT_ORDER" },
     { 目标单位: "英雄", 旧触发名: "gg_trg____________________________ZH_______________TS___u", 事件名: "EVENT_UNIT_SPELL_EFFECT" },
+    { 目标单位: "BB", 旧触发名: "gg_trg____________________________ZH_______________TS___u", 事件名: "EVENT_UNIT_SPELL_EFFECT" },
      
   ],
 } as const;

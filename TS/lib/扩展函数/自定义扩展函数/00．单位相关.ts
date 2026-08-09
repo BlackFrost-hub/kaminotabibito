@@ -98,7 +98,18 @@ export function createUnitWithOptionsAndRegisterDeathCleanup(
 export function getPlayerFirstHero(player: any): any {
     if (!player) return null;
 
-    // 通过 YDUserData 获取"玩家英雄-单位组"后遍历，避免整图枚举
+    // 当前英雄注册桥接按玩家保存正式英雄；优先读取这一权威来源。
+    const registeredHero = YDUserDataGet("player", player, "英雄", "unit") as any;
+    if (
+        registeredHero != null &&
+        registeredHero !== 0 &&
+        jass.GetOwningPlayer(registeredHero) === player &&
+        jass.IsUnitType(registeredHero, jass.UNIT_TYPE_HERO)
+    ) {
+        return registeredHero;
+    }
+
+    // 兼容旧流程：通过"玩家英雄-单位组"查找，不进行整图枚举。
     const heroGroup = YDUserDataGet("string", "玩家英雄", "单位组", "group") as any;
     if (!heroGroup) return null;
 

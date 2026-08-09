@@ -41,14 +41,14 @@ function suppressPendingMoveAfterGroundStack(u)
     )
 end
 function initHashtable()
-    local ____temp_2
+    local ____temp_3
     if HT ~= nil then
-        ____temp_2 = HT
+        ____temp_3 = HT
     else
         HT = jass.InitHashtable()
-        ____temp_2 = HT
+        ____temp_3 = HT
     end
-    return ____temp_2
+    return ____temp_3
 end
 function ItemStacked()
     local i = 0
@@ -231,20 +231,20 @@ function isStackableItemType(item)
     end
     local itemType = jass.GetItemType(item)
     local itemTypeId = jass.GetItemTypeId(item)
-    local ____temp_3
-    if jass.ITEM_TYPE_CHARGED ~= nil then
-        ____temp_3 = jass.ITEM_TYPE_CHARGED
-    else
-        ____temp_3 = jass.ConvertItemType(1)
-    end
-    local chargedType = ____temp_3
     local ____temp_4
-    if jass.ITEM_TYPE_PURCHASABLE ~= nil then
-        ____temp_4 = jass.ITEM_TYPE_PURCHASABLE
+    if jass.ITEM_TYPE_CHARGED ~= nil then
+        ____temp_4 = jass.ITEM_TYPE_CHARGED
     else
-        ____temp_4 = jass.ConvertItemType(4)
+        ____temp_4 = jass.ConvertItemType(1)
     end
-    local purchasableType = ____temp_4
+    local chargedType = ____temp_4
+    local ____temp_5
+    if jass.ITEM_TYPE_PURCHASABLE ~= nil then
+        ____temp_5 = jass.ITEM_TYPE_PURCHASABLE
+    else
+        ____temp_5 = jass.ConvertItemType(4)
+    end
+    local purchasableType = ____temp_5
     return itemType == chargedType or itemType == purchasableType or _____7269_54C1_5728_53E0_52A0_767D_540D_5355(itemTypeId)
 end
 function ____exports.StarItem_ItemStack_Act2()
@@ -365,13 +365,13 @@ function ____exports.StarItem_ItemStack_Cond2()
         if manipulatedItem ~= nil and isStackableItemType(manipulatedItem) then
             local triggerUnit = jass.GetTriggerUnit()
             while i < 6 do
-                local ____temp_5
+                local ____temp_6
                 if triggerUnit ~= nil then
-                    ____temp_5 = jass.UnitItemInSlot(triggerUnit, i)
+                    ____temp_6 = jass.UnitItemInSlot(triggerUnit, i)
                 else
-                    ____temp_5 = nil
+                    ____temp_6 = nil
                 end
-                local itemInSlot = ____temp_5
+                local itemInSlot = ____temp_6
                 if itemInSlot ~= nil and jass.GetItemTypeId(manipulatedItem) == jass.GetItemTypeId(itemInSlot) and manipulatedItem ~= itemInSlot then
                     ExecuteTryPickUpTriggers(triggerUnit, manipulatedItem)
                     local beforeCharges = jass.GetItemCharges(itemInSlot)
@@ -397,22 +397,24 @@ function ____exports.StarItem_ItemStack_Cond2()
 end
 jass = require("jass.common")
 local jglobals = require("jass.globals")
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 centerTimer = _G
 local playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")
-local ____require_result_0 = require("lib.扩展函数.物品相关函数.物品叠加配置")
-_____7269_54C1_5728_53E0_52A0_767D_540D_5355 = ____require_result_0["物品在叠加白名单"]
+local ____require_result_1 = require("lib.扩展函数.物品相关函数.物品叠加配置")
+_____7269_54C1_5728_53E0_52A0_767D_540D_5355 = ____require_result_1["物品在叠加白名单"]
 ABIL_INVENTORY = 1095331446
 local DEFAULT_ITEM_PICKUP_RANGE = 500
 PICKUP_RECHECK_DELAY_MS = 100
 STOP_QUEUE_DEFER_MS = 16
 FALLBACK_ORDER_MOVE = 851971
 FALLBACK_ORDER_SMART = 851986
-local ____jglobals_bj_RADTODEG_1 = jglobals.bj_RADTODEG
-if ____jglobals_bj_RADTODEG_1 == nil then
-    ____jglobals_bj_RADTODEG_1 = 57.29577951308232
+local ____jglobals_bj_RADTODEG_2 = jglobals.bj_RADTODEG
+if ____jglobals_bj_RADTODEG_2 == nil then
+    ____jglobals_bj_RADTODEG_2 = 57.29577951308232
 end
-BJ_RADTODEG = ____jglobals_bj_RADTODEG_1
+BJ_RADTODEG = ____jglobals_bj_RADTODEG_2
 cachedOrderMove = 0
 cachedOrderSmart = 0
 HT = nil
@@ -447,13 +449,24 @@ StarItem_StackedAfterCharges = 0
 function ____exports.StarItem_GetTriggerUnit()
     return StarItem_CallBackUnit
 end
+local function isPlayerHeroOrBB(unit)
+    if unit == nil or unit == 0 then
+        return false
+    end
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) then
+        return true
+    end
+    local owner = jass.GetOwningPlayer(unit)
+    if owner == nil or owner == 0 then
+        return false
+    end
+    return YDUserDataGetSafe("player", owner, "BB", "unit") == unit
+end
 local function isHeroTriggerUnit()
-    local u = jass.GetTriggerUnit()
-    return u ~= nil and u ~= 0 and jass.IsUnitType(u, jass.UNIT_TYPE_HERO)
+    return isPlayerHeroOrBB(jass.GetTriggerUnit())
 end
 local function isHeroFilterUnit()
-    local u = jass.GetFilterUnit()
-    return u ~= nil and u ~= 0 and jass.IsUnitType(u, jass.UNIT_TYPE_HERO)
+    return isPlayerHeroOrBB(jass.GetFilterUnit())
 end
 local function StarItem_UnitOrderCond()
     return isHeroTriggerUnit() and ____exports.StarItem_ItemStack_Cond()

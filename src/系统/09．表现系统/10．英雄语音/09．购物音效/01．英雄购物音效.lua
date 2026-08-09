@@ -14,15 +14,14 @@ local ____require_result_1 = require("系统.00．核心系统.00．玩家系统
 local getRegisteredPlayerHero = ____require_result_1.getRegisteredPlayerHero
 local ____require_result_2 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名")
 local _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0 = ____require_result_2["单位是否匹配玩家英雄名称"]
-local ____require_result_3 = require("lib.扩展函数.BJ函数.14．音效函数")
-local PlaySoundBJ = ____require_result_3.PlaySoundBJ
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_3.addDelayedCallback
 local GetLocalPlayer = jass.GetLocalPlayer
 local IsUnitType = jass.IsUnitType
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local IsUnitInRange = jass.IsUnitInRange
 local GetRandomInt = jass.GetRandomInt
+local StartSound = jass.StartSound
 local _____82F1_96C4_8D2D_7269_97F3_6548_5DF2_521D_59CB_5316 = false
 local _____8D2D_7269_97F3_6548_51B7_5374_4E2D = false
 local function _____662F_8D2D_7269_5546_5E97(unit)
@@ -71,7 +70,7 @@ local function _____672C_5730_64AD_653E_8D2D_7269_97F3_6548(whichPlayer, soundHa
     if GetLocalPlayer() ~= whichPlayer then
         return
     end
-    PlaySoundBJ(soundHandle)
+    StartSound(soundHandle)
 end
 local function _____5904_7406_8D2D_7269_97F3_6548(whichPlayer, _playerId, selectedUnit, isSelected)
     if isSelected ~= true then

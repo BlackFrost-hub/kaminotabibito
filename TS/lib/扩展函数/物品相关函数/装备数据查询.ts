@@ -18,7 +18,7 @@ export const STAT_CONFIG: { name: string; key: string }[] = [
   { name: "技能治疗率", key: "skillHeal" }, { name: "受到的治疗率", key: "healReceived" },
   { name: "重伤", key: "wound" },
   { name: "魔法恢复", key: "mpRegen" }, { name: "魔法恢复%", key: "mpRegenPct" }, { name: "魔法消耗", key: "mpCost" },
-  { name: "冷却缩减", key: "cdReduction" }, { name: "命中率", key: "accuracy" }, { name: "闪避率", key: "dodge" },
+  { name: "冷却缩减", key: "cdReduction" }, { name: "冷却缩减上限", key: "cdReductionCap" }, { name: "命中率", key: "accuracy" }, { name: "闪避率", key: "dodge" },
   { name: "护甲穿透", key: "armorPierce" }, { name: "魔法穿透", key: "magicPierce" },
   { name: "技能伤害", key: "skillDmg" }, { name: "主动技能伤害", key: "activeSkillDmg" }, { name: "装备伤害", key: "equipmentDmg" }, { name: "攻击特效伤害", key: "attackEffectDmg" }, { name: "普攻强化伤害", key: "normalAttackEnhanceDmg" }, { name: "技能抗性", key: "skillResist" }, { name: "魔法伤害", key: "magicDmg" },
   { name: "持续伤害", key: "dotDmg" },
@@ -58,7 +58,7 @@ if (!NAME_TO_KEY["独立技能伤害"]) NAME_TO_KEY["独立技能伤害"] = "act
 export const PERCENT_STAT_NAMES = [
   "暴击率", "暴击伤害", "命中率", "护甲穿透", "魔法穿透", "技能伤害", "主动技能伤害", "独立技能伤害",
   "装备伤害", "攻击特效伤害", "普攻强化伤害",
-  "闪避率", "魔抗", "冷却缩减", "伤害吸血", "魔法伤害吸血", "普攻伤害吸血",
+  "闪避率", "魔抗", "冷却缩减", "冷却缩减上限", "伤害吸血", "魔法伤害吸血", "普攻伤害吸血",
   "攻速",
   "生命恢复%", "魔法恢复%", "技能治疗率", "受到的治疗率", "魔法消耗", "重伤",
   "技能抗性", "魔法伤害", "持续伤害", "物理伤害", "物理抗性", "强化伤害", "普攻伤害", "普攻抗性",

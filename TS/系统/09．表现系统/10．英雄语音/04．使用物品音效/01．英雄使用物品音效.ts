@@ -17,13 +17,15 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
+const { PlaySoundOnUnitBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundOnUnitBJ: (this: void, soundHandle: any, volumePercent: number, whichUnit: any) => void;
+};
 
 const GetLocalPlayer = jass.GetLocalPlayer as () => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitCurrentOrder = jass.GetUnitCurrentOrder as (unit: any) => number;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
-const PlaySoundBJ = jass.PlaySoundBJ as (soundHandle: any) => void;
-const PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ as (soundHandle: any, volumePercent: number, whichUnit: any) => void;
+const StartSound = jass.StartSound as (this: void, soundHandle: any) => void;
 
 const {
   英雄使用物品音效配置列表,
@@ -78,7 +80,7 @@ function 播放物品使用音效(unit: any, config: { 英雄名: string; 是否
   }
 
   if (GetOwningPlayer(unit) === GetLocalPlayer()) {
-    PlaySoundBJ(soundHandle);
+    StartSound(soundHandle);
   }
 }
 

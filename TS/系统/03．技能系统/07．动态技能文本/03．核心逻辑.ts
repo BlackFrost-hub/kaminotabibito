@@ -7,6 +7,12 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const heroConfigTool = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as {
+  获取单位玩家英雄配置: (this: void, unit: any) => Record<string, any> | null;
+};
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
+};
 const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照") as {
   获取本地选中技能快照: (this: void) => {
     hero: any | null;
@@ -602,7 +608,6 @@ function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
   const newTip = 替换公式(unit, originalTip);
   if (newTip !== currentTip) {
     DzSetUnitAbilityUberTip(unit, abilityId, newTip);
-    DzSetUnitAbilityUpdate(unit, abilityId);
     return true;
   }
   return false;
@@ -616,8 +621,28 @@ function 恢复单个技能原始文本(this: void, unit: any, abilityId: number
   if (currentTip === originalTip) return false;
 
   DzSetUnitAbilityUberTip(unit, abilityId, originalTip);
-  DzSetUnitAbilityUpdate(unit, abilityId);
   return true;
+}
+
+function 解析配置技能列表(this: void, hero: any): number[] {
+  const config = heroConfigTool.获取单位玩家英雄配置(hero);
+  if (config == null) return [];
+
+  const result: number[] = [];
+  const seen: Record<number, boolean | undefined> = {};
+  const fields = [config.heroAbilList, config.abilList];
+  for (let i = 0; i < fields.length; i++) {
+    const rawList = fields[i];
+    if (typeof rawList !== "string") continue;
+    const parts = rawList.split(",");
+    for (let j = 0; j < parts.length; j++) {
+      const abilityId = stringToFourCCSafe(parts[j]);
+      if (abilityId === 0 || seen[abilityId] === true) continue;
+      seen[abilityId] = true;
+      result.push(abilityId);
+    }
+  }
+  return result;
 }
 
 /**
@@ -639,11 +664,13 @@ export function 检查英雄技能(this: void, hero: any): void {
 export function 恢复英雄技能原始文本(this: void, hero: any): void {
   if (!isValidHandle(hero)) return;
 
-  const abilityIds = 已处理技能缓存[生成英雄缓存键(hero)] || 获取快照技能列表(hero);
+  const cacheKey = 生成英雄缓存键(hero);
+  const cachedAbilityIds = 已处理技能缓存[cacheKey];
+  const abilityIds = cachedAbilityIds || 获取快照技能列表(hero);
   for (let i = 0; i < abilityIds.length; i++) {
     恢复单个技能原始文本(hero, abilityIds[i]);
   }
-  delete 已处理技能缓存[生成英雄缓存键(hero)];
+  delete 已处理技能缓存[cacheKey];
 }
 
 export function 恢复单个英雄技能原始文本(this: void, hero: any, abilityId: number): void {
@@ -655,4 +682,35 @@ export function 刷新单个英雄技能动态文本(this: void, hero: any, abil
   if (!isValidHandle(hero) || abilityId === 0) return;
   if (GetUnitAbilityLevel(hero, abilityId) <= 0) return;
   处理技能提示(hero, abilityId);
+}
+
+function 本地刷新指定英雄动态文本(this: void, hero: any): void {
+  const 快照 = selectionSnapshotSystem.获取本地选中技能快照();
+  if (快照.hero !== hero) return;
+  检查英雄技能(hero);
+}
+
+/** 装备属性变化后的同步技能界面刷新。调用者必须处于全端对称事件。 */
+export function 同步刷新英雄技能界面(this: void, hero: any): void {
+  if (!isValidHandle(hero)) return;
+
+  本地刷新指定英雄动态文本(hero);
+  const abilityIds = 解析配置技能列表(hero);
+  for (let i = 0; i < abilityIds.length; i++) {
+    DzSetUnitAbilityUpdate(hero, abilityIds[i]);
+  }
+}
+
+export function 同步刷新英雄技能原始界面(this: void, hero: any): void {
+  if (!isValidHandle(hero)) return;
+
+  const 快照 = selectionSnapshotSystem.获取本地选中技能快照();
+  if (快照.hero === hero) {
+    恢复英雄技能原始文本(hero);
+  }
+
+  const abilityIds = 解析配置技能列表(hero);
+  for (let i = 0; i < abilityIds.length; i++) {
+    DzSetUnitAbilityUpdate(hero, abilityIds[i]);
+  }
 }

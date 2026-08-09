@@ -142,6 +142,14 @@ ____exports["装备掉落表"] = {
         unitType = "normal"
     },
     n001 = {id = "n001", name = "史莱姆", level = 10, unitType = "normal"},
+    nsea = {
+        id = "nsea",
+        name = "植物",
+        itemIds = "I0A0:always",
+        picks = 1,
+        isUniversal = "FALSE",
+        unitType = "normal"
+    },
     n01Z = {id = "n01Z", name = "小蛇", level = 10, unitType = "normal"},
     N00B = {
         id = "N00B",

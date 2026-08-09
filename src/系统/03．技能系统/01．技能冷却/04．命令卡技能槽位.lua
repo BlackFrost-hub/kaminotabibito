@@ -7,8 +7,8 @@ local ____exports = {}
 -- @noSelfInFile
 local japi = require("jass.japi")
 local ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local YDWEGetUnitAbilityDataString = ____require_result_0.YDWEGetUnitAbilityDataString
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWEGetUnitAbilityDataStringSafe = ____require_result_0.YDWEGetUnitAbilityDataStringSafe
 local DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton
 local KKCommandButtonGetAbilityId = japi.KKCommandButtonGetAbilityId
 ____exports["命令卡热键槽位表"] = {
@@ -82,13 +82,7 @@ local function _____8BFB_53D6_6309_94AE_6280_80FD_70ED_952E(whichHero, x, y)
     if abilityId == 0 then
         return nil
     end
-    local rawHotkey = YDWEGetUnitAbilityDataString(
-        nil,
-        whichHero,
-        abilityId,
-        1,
-        ydweAbility.ABILITY_DATA_HOTKEY
-    )
+    local rawHotkey = YDWEGetUnitAbilityDataStringSafe(whichHero, abilityId, 1, ydweAbility.ABILITY_DATA_HOTKEY)
     if rawHotkey == nil or rawHotkey == "" then
         return nil
     end

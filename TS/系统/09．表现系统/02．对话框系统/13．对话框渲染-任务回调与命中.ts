@@ -1,8 +1,11 @@
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
+const { DzTriggerRegisterKeyEventTrg } = require("lib.扩展函数.KK扩展API.index") as {
+  DzTriggerRegisterKeyEventTrg: (this: void, trg: any, status: number, btn: number | string) => void;
+};
 
-import { frameSetScriptByCode, registerKeyEventByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
+import { frameSetScriptByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 import { KEY_STATE } from "../../../lib/扩展函数/封装函数/04．硬件输入/01．常量定义";
 import { stringLengthCompat } from "./12．对话框渲染-播放与状态管理";
 import { applyPortraitFrames } from "./12．对话框渲染-播放与状态管理";
@@ -25,6 +28,7 @@ import {
   g_questCallbacksByPlayer,
   g_states,
   japi,
+  jass,
   KEY_SKIP_DIALOG,
   MAX_PLAYERS,
 } from "./10．对话框渲染-Dz与状态";
@@ -315,10 +319,17 @@ function skipDialogLocal(): void {
 }
 
 let g_skipKeyInitialized = false;
+
+function onRawSkipKeyEntry(): void {
+  skipDialogLocal();
+}
+
 export function initSkipKeyListener(): void {
   if (g_skipKeyInitialized) return;
   g_skipKeyInitialized = true;
-  registerKeyEventByCode(KEY_SKIP_DIALOG, KEY_STATE.DOWN, true, skipDialogLocal);
+  const rawDebugTrigger = jass.CreateTrigger();
+  DzTriggerRegisterKeyEventTrg(rawDebugTrigger, KEY_STATE.DOWN, KEY_SKIP_DIALOG);
+  jass.TriggerAddAction(rawDebugTrigger, onRawSkipKeyEntry);
 }
 
 // ========== 虚拟分区：任务按钮/面板/文本帧的点击回调绑定 ==========

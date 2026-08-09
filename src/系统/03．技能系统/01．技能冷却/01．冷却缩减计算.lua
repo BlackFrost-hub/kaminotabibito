@@ -60,16 +60,16 @@ end
 function ____exports.getCooldownReduction(unit)
     return getCooldownAttrValue(unit, "冷却缩减")
 end
---- 获取冷却缩减加成属性（突破上限）
-function ____exports.getCooldownReductionBonus(unit)
-    return getCooldownAttrValue(unit, "冷却缩减加成")
+--- 获取额外冷却缩减上限属性
+function ____exports.getCooldownReductionCapIncrease(unit)
+    return getCooldownAttrValue(unit, "冷却缩减上限")
 end
 --- 获取技能冷却上限
 -- 
 -- @param abilityId 技能ID
--- @param hasBonus 是否有突破上限属性
+-- @param capIncrease 额外冷却缩减上限
 -- @returns 冷却上限
-function ____exports.getCooldownCap(abilityId, hasBonus)
+function ____exports.getCooldownCap(abilityId, capIncrease)
     local entries = __TS__ArraySort(
         __TS__ObjectEntries(SKILL_COOLDOWN_CAPS),
         function(____, ____bindingPattern0, ____bindingPattern1)
@@ -87,14 +87,10 @@ function ____exports.getCooldownCap(abilityId, hasBonus)
             return cap
         end
     end
-    if hasBonus then
-        local bonus = 0
-        return COOLDOWN_REDUCTION_CAP + bonus
-    end
-    return COOLDOWN_REDUCTION_CAP
+    return COOLDOWN_REDUCTION_CAP + capIncrease
 end
 --- 应用冷却缩减上限
-function ____exports.applyCooldownCap(reduction, abilityId, bonus)
+function ____exports.applyCooldownCap(reduction, abilityId, capIncrease)
     local entries = __TS__ArraySort(
         __TS__ObjectEntries(SKILL_COOLDOWN_CAPS),
         function(____, ____bindingPattern0, ____bindingPattern1)
@@ -112,7 +108,7 @@ function ____exports.applyCooldownCap(reduction, abilityId, bonus)
             return reduction < cap and reduction or cap
         end
     end
-    local cap = COOLDOWN_REDUCTION_CAP + bonus
+    local cap = COOLDOWN_REDUCTION_CAP + capIncrease
     return reduction < cap and reduction or cap
 end
 --- 获取技能原始冷却时间

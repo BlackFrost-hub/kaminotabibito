@@ -45,14 +45,10 @@ local function _____795E_7F57_6218_58EB_53D7_51FB_968F_673A_6280_80FD(_config, u
     return executed
 end
 local function _____6BD4_90A3_540D_5C45_5929_5B50_53D7_51FB_968F_673A_6280_80FD(_config, unit, source)
-    local roll = jass.GetRandomInt(1, 2)
-    local executed = false
-    if roll == 1 then
-        if GetUnitLifePercentBJ(unit) <= 80 then
-            executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = "A0H0", ["施法方式"] = "对单位", ["目标来源"] = "伤害来源", ["下单归属"] = "中立敌对"}, unit, source) or executed
-        end
-        return executed
+    if jass.GetRandomInt(1, 2) == 1 then
+        return false
     end
+    local executed = false
     if GetUnitLifePercentBJ(unit) <= 70 then
         executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = "A0H5", ["施法方式"] = "立即", ["下单归属"] = "中立敌对"}, unit, source) or executed
     end

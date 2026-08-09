@@ -12,8 +12,11 @@ const { 按任务ID创建NPC, 按任务ID查找已创建NPC } = require("系统.
   按任务ID创建NPC: (this: void, 任务ID: number) => any;
   按任务ID查找已创建NPC: (this: void, 任务ID: number) => any;
 };
+const { 注册动态支线配置 } = require("系统.11．剧情系统.02．支线任务.00A．动态支线注册") as {
+  注册动态支线配置: (this: void, 任务配置: any, NPC配置?: any) => boolean;
+};
 
-import { 被驱逐的水怪入口配置 } from "./00．入口配置";
+import { 被驱逐的水怪入口配置, 被驱逐的水怪NPC配置列表, 被驱逐的水怪任务配置列表 } from "./00．入口配置";
 
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const 水龙蛇单位类型ID = stringToFourCCSafe(被驱逐的水怪入口配置.前置Boss单位ID);
@@ -24,6 +27,7 @@ function on水龙蛇死亡(this: void, dyingUnit: any, _killingUnit: any): void 
   if (dyingUnit == null || dyingUnit === 0) return;
   if (GetUnitTypeId(dyingUnit) !== 水龙蛇单位类型ID) return;
   if (按任务ID查找已创建NPC(被驱逐的水怪入口配置.任务ID) != null) return;
+  if (!注册动态支线配置(被驱逐的水怪任务配置列表[0], 被驱逐的水怪NPC配置列表[0])) return;
   按任务ID创建NPC(被驱逐的水怪入口配置.任务ID);
 }
 

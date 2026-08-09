@@ -34,8 +34,6 @@ local ABIL_A08C = stringToFourCC("A08C")
 local GROUP_HEAL_RADIUS = 1000
 --- HOT持续时间
 local HOT_DURATION = 10
---- HOT每秒恢复比例
-local HOT_TICK_RATIO = 0.1
 --- 系统开关
 local HEAL_ITEM_SYSTEM_ENABLED = true
 --- 检查单位是否可以被治疗（有效单位 + 友方或自身）
@@ -54,7 +52,7 @@ end
 -- @param target 目标单位
 -- @param healHP 治疗HP量
 -- @param healMP 治疗MP量
-function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
+function ____exports.doHealItemEffect(abilId, target, healHP, healMP, hotDuration)
     if not HEAL_ITEM_SYSTEM_ENABLED then
         return
     end
@@ -127,6 +125,7 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
         return
     end
     if abilId == ABIL_A08C then
+        local duration = hotDuration ~= nil and hotDuration > 0 and hotDuration or HOT_DURATION
         if isHotActive(target) then
             local currentTickHP = YDUserDataGet(
                 nil,
@@ -155,14 +154,14 @@ function ____exports.doHealItemEffect(abilId, target, healHP, healMP)
                 return
             end
         end
-        local tickHP = healHP * HOT_TICK_RATIO
-        local tickMP = healMP * HOT_TICK_RATIO
+        local tickHP = healHP / duration
+        local tickMP = healMP / duration
         startHot(
             target,
             target,
             tickHP,
             tickMP,
-            HOT_DURATION
+            duration
         )
         return
     end
@@ -173,12 +172,18 @@ end
 -- @param target 目标单位
 -- @param healHP 治疗HP量
 -- @param healMP 治疗MP量
-function ____exports.doHealItemEffectById(abilIdStr, target, healHP, healMP)
+function ____exports.doHealItemEffectById(abilIdStr, target, healHP, healMP, hotDuration)
     if type(abilIdStr) ~= "string" or #abilIdStr ~= 4 then
         return
     end
     local abilId = stringToFourCC(abilIdStr)
-    ____exports.doHealItemEffect(abilId, target, healHP, healMP)
+    ____exports.doHealItemEffect(
+        abilId,
+        target,
+        healHP,
+        healMP,
+        hotDuration
+    )
 end
 --- 检查技能ID是否为物品治疗技能
 function ____exports.isHealItemAbility(abilId)

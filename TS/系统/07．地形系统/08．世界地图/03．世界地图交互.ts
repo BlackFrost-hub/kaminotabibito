@@ -14,14 +14,6 @@ const Frame工具 = require("lib.扩展函数.封装函数.04．硬件输入.07�
     playerId?: number,
   ) => void;
 };
-const 同步输入 = require("lib.扩展函数.封装函数.04．硬件输入.08．同步硬件输入中心") as {
-  registerSyncHardwareKey: (
-    this: void,
-    key: number | string,
-    status: number,
-    callback: (this: void, event: { player: any; key: number; status: number }) => void,
-  ) => any;
-};
 const 硬件常量 = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义") as {
   KEY: { M: number };
   KEY_STATE: { DOWN: number };
@@ -42,9 +34,31 @@ import { 获取世界地图地点帧, 世界地图帧 } from "./02．世界地�
 const DzFrameShow = japi.DzFrameShow as (this: void, frame: number, show: boolean) => void;
 const DzGetTriggerUIEventFrame = japi.DzGetTriggerUIEventFrame as (this: void) => number;
 const DzIsChatBoxOpen = japi.DzIsChatBoxOpen as (this: void) => boolean;
+const DzTriggerRegisterKeyEventByCode = japi.DzTriggerRegisterKeyEventByCode as (
+  this: void,
+  trigger: any,
+  keyCode: number,
+  status: number,
+  sync: boolean,
+  callback: (this: void) => void,
+) => void;
+const DzTriggerRegisterSyncData = japi.DzTriggerRegisterSyncData as (
+  this: void,
+  trigger: any,
+  prefix: string,
+  server: boolean,
+) => void;
+const DzSyncData = japi.DzSyncData as (this: void, prefix: string, data: string) => void;
+const DzGetTriggerSyncPlayer = japi.DzGetTriggerSyncPlayer as (this: void) => any;
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const CreateTimer = jass.CreateTimer as (this: void) => any;
+const CreateTrigger = jass.CreateTrigger as (this: void) => any;
+const TriggerAddAction = jass.TriggerAddAction as (
+  this: void,
+  trigger: any,
+  callback: (this: void) => void,
+) => any;
 const TimerStart = jass.TimerStart as (
   this: void,
   timer: any,
@@ -59,11 +73,14 @@ const DestroyTimer = jass.DestroyTimer as (this: void, timer: any) => void;
 const 地点鼠标进入事件 = 2;
 const 地点鼠标离开事件 = 3;
 const 地图展开延迟秒 = 0.3;
+const 世界地图按键同步前缀 = "WMAP";
 
 const 玩家地图打开状态表: Record<number, boolean | undefined> = {};
 const 地图展开玩家表: Record<number, any> = {};
 
 let 世界地图交互已初始化 = false;
+let 世界地图本机按键触发器: any = null;
+let 世界地图同步触发器: any = null;
 
 function 获取矩形(this: void, 矩形键: string | undefined): any {
   if (矩形键 == null || 矩形键 === "") return null;
@@ -146,10 +163,14 @@ export function 刷新世界地图当前位置(this: void, 玩家: any): void {
   }
 }
 
-function on世界地图按键(this: void, event: { player: any; key: number; status: number }): void {
-  const 玩家 = event.player;
-  if (玩家 == null || 玩家 === 0) return;
+function on世界地图本机按键(this: void): void {
   if (DzIsChatBoxOpen() === true) return;
+  DzSyncData(世界地图按键同步前缀, "1");
+}
+
+function on世界地图按键同步(this: void): void {
+  const 玩家 = DzGetTriggerSyncPlayer();
+  if (玩家 == null || 玩家 === 0) return;
 
   刷新世界地图当前位置(玩家);
   音效函数.Sound3DII_Mp3Play("XT\\YX-FY.mp3", 玩家);
@@ -178,5 +199,16 @@ export function 初始化世界地图交互(this: void): void {
   if (世界地图交互已初始化) return;
   世界地图交互已初始化 = true;
   注册地点悬停事件();
-  同步输入.registerSyncHardwareKey(硬件常量.KEY.M, 硬件常量.KEY_STATE.DOWN, on世界地图按键);
+  世界地图同步触发器 = CreateTrigger();
+  TriggerAddAction(世界地图同步触发器, on世界地图按键同步);
+  DzTriggerRegisterSyncData(世界地图同步触发器, 世界地图按键同步前缀, false);
+
+  世界地图本机按键触发器 = CreateTrigger();
+  DzTriggerRegisterKeyEventByCode(
+    世界地图本机按键触发器,
+    硬件常量.KEY.M,
+    硬件常量.KEY_STATE.DOWN,
+    false,
+    on世界地图本机按键,
+  );
 }

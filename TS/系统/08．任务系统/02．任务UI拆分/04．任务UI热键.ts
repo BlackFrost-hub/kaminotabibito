@@ -8,7 +8,7 @@ let currentHotkeyOpts: RegisterTaskUIHotkeysOpts | null = null;
 let taskUIKeybindsInstalled = false;
 
 export interface RegisterTaskUIHotkeysOpts {
-  /** 用 `registerKeyUpSync`：sync=true 全房触发，回调内用 DzGetTriggerKeyPlayer 区分按键者 */
+  /** 用 `registerKeyUpSync`：本机过滤聊天框后，经同步数据回调全端派发。 */
   registerKeyUpSync: any;
   KEY: any;
   KEY_NUM: any;

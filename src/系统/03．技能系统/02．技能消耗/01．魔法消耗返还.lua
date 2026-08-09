@@ -6,31 +6,19 @@ local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.index")
-local YDUserDataGet = ____require_result_0.YDUserDataGet
-local YDWEGetUnitAbilityDataInteger = ____require_result_0.YDWEGetUnitAbilityDataInteger
-local YDWEGetUnitAbilityDataReal = ____require_result_0.YDWEGetUnitAbilityDataReal
+local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
+local YDWEGetUnitAbilityDataIntegerSafe = ____require_result_0.YDWEGetUnitAbilityDataIntegerSafe
+local YDWEGetUnitAbilityDataRealSafe = ____require_result_0.YDWEGetUnitAbilityDataRealSafe
 local ____require_result_1 = require("系统.03．技能系统.02．技能消耗.00．消耗常量")
 local PERCENT_COST_THRESHOLD = ____require_result_1.PERCENT_COST_THRESHOLD
 --- 获取技能固定消耗
 function ____exports.getAbilityManaCost(unit, abilityId, level)
-    return YDWEGetUnitAbilityDataInteger(
-        nil,
-        unit,
-        abilityId,
-        level,
-        104
-    )
+    return YDWEGetUnitAbilityDataIntegerSafe(unit, abilityId, level, 104)
 end
 --- 获取技能百分比消耗
 function ____exports.getAbilityPercentCost(unit, abilityId, level)
-    return YDWEGetUnitAbilityDataReal(
-        nil,
-        unit,
-        abilityId,
-        level,
-        102
-    )
+    return YDWEGetUnitAbilityDataRealSafe(unit, abilityId, level, 102)
 end
 --- 计算技能总消耗
 function ____exports.calcTotalManaCost(unit, abilityId, level)
@@ -48,13 +36,7 @@ function ____exports.getManaCostReduction(unit)
     if player == nil then
         return 0
     end
-    return YDUserDataGet(
-        nil,
-        "player",
-        player,
-        "魔法消耗",
-        "real"
-    )
+    return YDUserDataGetSafe("player", player, "魔法消耗", "real")
 end
 --- 计算写入原生技能实例的最终魔法消耗。
 -- 固定蓝耗读取物编原值；百分比蓝耗按当前最大魔法计算；最后套用技能消耗减少。

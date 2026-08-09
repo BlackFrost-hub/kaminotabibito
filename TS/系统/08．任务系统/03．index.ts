@@ -71,6 +71,12 @@ if (ENABLE_QUEST_RUNTIME_CORE) {
   require("系统.08．任务系统.01．任务数据");
   const 任务管理器 = require("系统.08．任务系统.02．任务管理器") as { init?: () => void };
   if (typeof 任务管理器.init === "function") 任务管理器.init();
+  if (ENABLE_QUEST_CONFIG_TABLE) {
+    const { 初始化击杀任务进度 } = require("系统.08．任务系统.04．击杀任务进度") as {
+      初始化击杀任务进度: (this: void) => void;
+    };
+    初始化击杀任务进度();
+  }
   // 注册20个假主线任务用于测试
   // registerDummyMainQuests();
 }

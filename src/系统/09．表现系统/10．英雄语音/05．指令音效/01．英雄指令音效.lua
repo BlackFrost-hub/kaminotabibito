@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local _____53D6_6CE8_518C_82F1_96C4, _____662F_6CE8_518C_73A9_5BB6_82F1_96C4_5355_4F4D, _____53D6_82F1_96C4_6307_4EE4_97F3_6548_914D_7F6E, _____53D6_968F_673A_97F3_6548, _____53D6_5F53_524D_4E8B_4EF6_97F3_6548, _____672C_5730_64AD_653E, _____51B7_5374_7ED3_675F, _____542F_52A8_6307_4EE4_97F3_6548_51B7_5374_68C0_67E5, _____8BB0_5F55_5E76_5F00_59CB_51B7_5374, _____53D6_4E8B_4EF6_51B7_5374, _____53D6_4E8B_4EF6_51B7_5374_5B57_6BB5, _____5904_7406_6307_5B9A_4E8B_4EF6_6307_4EE4_97F3_6548, jass, _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0, YDUserDataGetSafe, YDUserDataSetSafe, addPeriodicCallback, removePeriodicCallback, getServerTime, PlaySoundBJ, GetTriggerPlayer, GetOwningPlayer, GetRandomInt, IsUnitType, EventUnitSelected, EventUnitIssuedPointOrder, EventUnitTargetInRange, _____53D6_6CE8_518C_82F1_96C4_7F13_5B58, _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_95F4_9694_6BEB_79D2, _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID, _____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868, _____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868, _____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868
+local _____53D6_6CE8_518C_82F1_96C4, _____662F_6CE8_518C_73A9_5BB6_82F1_96C4_5355_4F4D, _____53D6_82F1_96C4_6307_4EE4_97F3_6548_914D_7F6E, _____53D6_968F_673A_97F3_6548, _____53D6_5F53_524D_4E8B_4EF6_97F3_6548, _____672C_5730_64AD_653E, _____51B7_5374_7ED3_675F, _____542F_52A8_6307_4EE4_97F3_6548_51B7_5374_68C0_67E5, _____8BB0_5F55_5E76_5F00_59CB_51B7_5374, _____53D6_4E8B_4EF6_51B7_5374, _____53D6_4E8B_4EF6_51B7_5374_5B57_6BB5, _____5904_7406_6307_5B9A_4E8B_4EF6_6307_4EE4_97F3_6548, jass, _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0, YDUserDataGetSafe, YDUserDataSetSafe, addPeriodicCallback, removePeriodicCallback, getServerTime, GetTriggerPlayer, GetOwningPlayer, GetRandomInt, IsUnitType, GetLocalPlayer, StartSound, EventUnitSelected, EventUnitIssuedPointOrder, EventUnitTargetInRange, _____53D6_6CE8_518C_82F1_96C4_7F13_5B58, _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_95F4_9694_6BEB_79D2, _____6307_4EE4_97F3_6548_51B7_5374_68C0_67E5_56DE_8C03ID, _____6307_4EE4_97F3_6548_51B7_5374_5355_4F4D_5217_8868, _____6307_4EE4_97F3_6548_51B7_5374_5B57_6BB5_5217_8868, _____6307_4EE4_97F3_6548_51B7_5374_5230_671F_6BEB_79D2_5217_8868
 local ____00_FF0E_914D_7F6E = require("系统.09．表现系统.10．英雄语音.05．指令音效.00．配置")
 local _____82F1_96C4_6307_4EE4_97F3_6548_914D_7F6E_5217_8868 = ____00_FF0E_914D_7F6E["英雄指令音效配置列表"]
 local _____82F1_96C4_6307_4EE4_97F3_6548_653B_51FB_51B7_5374 = ____00_FF0E_914D_7F6E["英雄指令音效攻击冷却"]
@@ -62,11 +62,11 @@ function _____53D6_968F_673A_97F3_6548(soundList)
         return soundList[1]
     end
     local index = GetRandomInt(1, #soundList) - 1
-    local ____soundList_index_7 = soundList[index + 1]
-    if ____soundList_index_7 == nil then
-        ____soundList_index_7 = nil
+    local ____soundList_index_6 = soundList[index + 1]
+    if ____soundList_index_6 == nil then
+        ____soundList_index_6 = nil
     end
-    return ____soundList_index_7
+    return ____soundList_index_6
 end
 function _____53D6_5F53_524D_4E8B_4EF6_97F3_6548(unit, eventId)
     local config = _____53D6_82F1_96C4_6307_4EE4_97F3_6548_914D_7F6E(unit)
@@ -92,10 +92,10 @@ function _____672C_5730_64AD_653E(soundHandle)
     if triggerPlayer == nil or triggerPlayer == 0 then
         return
     end
-    if jass.GetLocalPlayer() ~= triggerPlayer then
+    if GetLocalPlayer() ~= triggerPlayer then
         return
     end
-    PlaySoundBJ(soundHandle)
+    StartSound(soundHandle)
 end
 function _____51B7_5374_7ED3_675F()
     local now = getServerTime()
@@ -221,13 +221,13 @@ local ____require_result_5 = require("系统.00．核心系统.05．中心计时
 addPeriodicCallback = ____require_result_5.addPeriodicCallback
 removePeriodicCallback = ____require_result_5.removePeriodicCallback
 getServerTime = ____require_result_5.getServerTime
-local ____require_result_6 = require("lib.扩展函数.BJ函数.14．音效函数")
-PlaySoundBJ = ____require_result_6.PlaySoundBJ
 local GetTriggerUnit = jass.GetTriggerUnit
 GetTriggerPlayer = jass.GetTriggerPlayer
 GetOwningPlayer = jass.GetOwningPlayer
 GetRandomInt = jass.GetRandomInt
 IsUnitType = jass.IsUnitType
+GetLocalPlayer = jass.GetLocalPlayer
+StartSound = jass.StartSound
 EventUnitSelected = jass.EVENT_UNIT_SELECTED
 EventUnitIssuedPointOrder = jass.EVENT_UNIT_ISSUED_POINT_ORDER
 EventUnitTargetInRange = jass.EVENT_UNIT_TARGET_IN_RANGE

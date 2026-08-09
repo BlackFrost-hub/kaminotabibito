@@ -1,4 +1,6 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local Set = ____lualib.Set
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
@@ -8,15 +10,32 @@ local _____83B7_53D6_73A9_5BB6_540D_79F0 = jass.GetPlayerName
 local _____6D4B_8BD5_73A9_5BB6ID = 0
 local _____6D4B_8BD5_73A9_5BB6_540D_79F0 = "WorldEdit"
 local _____6D4B_8BD5_5907_7528_73A9_5BB6_540D_79F0 = "九条艾莉莎"
+local _____6D4B_8BD5_7A7AID_73A9_5BB6_540D_79F0 = ""
+local _____6D4B_8BD5_7A7A_683CID_73A9_5BB6_540D_79F0 = " "
+local _____5DF2_767B_8BB0_6D4B_8BD5_73A9_5BB6_540D_79F0_8868 = __TS__New(Set)
+____exports["登记测试玩家"] = function(player)
+    if player == nil or player == 0 then
+        return
+    end
+    local playerName = _____83B7_53D6_73A9_5BB6_540D_79F0(player) or ""
+    if playerName == "" then
+        return
+    end
+    _____5DF2_767B_8BB0_6D4B_8BD5_73A9_5BB6_540D_79F0_8868:add(playerName)
+end
 ____exports["是允许测试玩家"] = function(player)
     if player == nil or player == 0 then
         return false
     end
-    if _____83B7_53D6_73A9_5BB6ID(player) ~= _____6D4B_8BD5_73A9_5BB6ID then
+    local playerId = _____83B7_53D6_73A9_5BB6ID(player)
+    local playerName = _____83B7_53D6_73A9_5BB6_540D_79F0(player) or ""
+    if _____5DF2_767B_8BB0_6D4B_8BD5_73A9_5BB6_540D_79F0_8868:has(playerName) then
+        return true
+    end
+    if playerId ~= _____6D4B_8BD5_73A9_5BB6ID then
         return false
     end
-    local playerName = _____83B7_53D6_73A9_5BB6_540D_79F0(player) or ""
-    return playerName == _____6D4B_8BD5_73A9_5BB6_540D_79F0 or playerName == _____6D4B_8BD5_73A9_5BB6_540D_79F0 .. ":" or playerName == _____6D4B_8BD5_5907_7528_73A9_5BB6_540D_79F0 or playerName == _____6D4B_8BD5_5907_7528_73A9_5BB6_540D_79F0 .. ":"
+    return playerName == _____6D4B_8BD5_73A9_5BB6_540D_79F0 or playerName == _____6D4B_8BD5_73A9_5BB6_540D_79F0 .. ":" or playerName == _____6D4B_8BD5_5907_7528_73A9_5BB6_540D_79F0 or playerName == _____6D4B_8BD5_5907_7528_73A9_5BB6_540D_79F0 .. ":" or playerName == _____6D4B_8BD5_7A7AID_73A9_5BB6_540D_79F0 or playerName == _____6D4B_8BD5_7A7A_683CID_73A9_5BB6_540D_79F0
 end
 ____exports["测试Boss跳过死亡结算字段"] = "测试Boss跳过死亡结算"
 ____exports["创建测试中心平移映射"] = function(_____6B63_5F0F_4E2D_5FC3X, _____6B63_5F0F_4E2D_5FC3Y, _____6D4B_8BD5_4E2D_5FC3X, _____6D4B_8BD5_4E2D_5FC3Y)

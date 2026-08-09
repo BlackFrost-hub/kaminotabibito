@@ -1923,8 +1923,6 @@ ____exports.items.I00W = {
     weaponType = "斧锤"
 }
 ____exports.items.I00Y = {type = "材料", name = "|cFF800000触手残片|r", goldPrice = 150}
-____exports.items.I012 = {type = "任务", name = "猎杀豺狼人", goldPrice = 0}
-____exports.items.I013 = {type = "任务", name = "采集荧光草", goldPrice = 0}
 ____exports.items.I014 = {type = "道具/戒指/饰品", name = "鱼竿", goldPrice = 150, abilList = "A017"}
 ____exports.items.I015 = {type = "主武器", name = "盗贼刀", goldPrice = 0}
 ____exports.items.I016 = {type = "主武器", name = "蛇缠剑", goldPrice = 0}
@@ -1982,7 +1980,7 @@ ____exports.items.I02H = {
     name = "螃蟹肉（生）",
     goldPrice = 50,
     hot = "200hp",
-    recipe = "h00C:10->I02H*2:5",
+    recipe = "h00C:10->I02I*2:5",
     abilList = "A002"
 }
 ____exports.items.I02I = {
@@ -2036,7 +2034,6 @@ ____exports.items.I035 = {
     movespeed2 = 45
 }
 ____exports.items.I036 = {type = "材料", name = "金块", goldPrice = 10000}
-____exports.items.I03I = {type = "任务", name = "获取蜘蛛毒液", goldPrice = 0}
 ____exports.items.I03L = {type = "材料", name = "蜘蛛体液", goldPrice = 100}
 ____exports.items.I03M = {type = "材料", name = "异常蜘蛛毒素", goldPrice = 500}
 ____exports.items.I03V = {
@@ -2184,8 +2181,6 @@ ____exports.items.I05W = {
     magicDmg = 0.2,
     onlyone = true
 }
-____exports.items.I05X = {type = "任务", name = "希望获得品质不错的道具饰品", goldPrice = 0}
-____exports.items.I05Y = {type = "材料", name = "熔岩能量", goldPrice = 0}
 ____exports.items.I05Z = {type = "药剂/食品", name = "熔岩魔力药剂", goldPrice = 1000, abilList = "A07N"}
 ____exports.items.I060 = {
     type = "主武器",
@@ -3254,7 +3249,6 @@ ____exports.items.I09Y = {
     hpRegenPct = 0.01,
     weaponType = "匕首"
 }
-____exports.items.I09Z = {type = "任务", name = "收集豺狼皮", goldPrice = 0}
 ____exports.items.I0A0 = {
     type = "材料",
     name = "|cffff00ff聚灵花|r",
@@ -3262,7 +3256,6 @@ ____exports.items.I0A0 = {
     PowerUP = "8000exp",
     abilList = "A0LH"
 }
-____exports.items.I0A1 = {type = "任务", name = "寻找聚灵花", goldPrice = 0}
 ____exports.items.I0A2 = {
     type = "材料",
     name = "|cff99cc00曼陀罗草|r",
@@ -3270,8 +3263,6 @@ ____exports.items.I0A2 = {
     PowerUP = "2000exp",
     abilList = "A0LH"
 }
-____exports.items.I0A3 = {type = "任务", name = "有提高视力的道具吗", goldPrice = 0}
-____exports.items.I0A7 = {type = "任务", name = "收集20个蝎肉", goldPrice = 0, int = 5}
 ____exports.items.I0A8 = {
     type = "提升属性的物品",
     name = "沙漠苹果",
@@ -3299,6 +3290,7 @@ ____exports.items.I0AB = {
     goldPrice = 500,
     level = "E",
     hot = "15%hp;1000hp",
+    hotDuration = 3,
     abilList = "A08C"
 }
 ____exports.items.I0AC = {
@@ -3322,11 +3314,9 @@ ____exports.items.I0AE = {
     PowerUP = "2dmg",
     abilList = "A0LH"
 }
-____exports.items.I0AF = {type = "任务", name = "7个蝎壳", goldPrice = 0}
 ____exports.items.I0AG = {type = "任务", name = "|cffc0c0c0藏宝图第一张|r", goldPrice = 100}
 ____exports.items.I0AH = {type = "任务", name = "|cffc0c0c0藏宝图第二张|r", goldPrice = 100}
 ____exports.items.I0AI = {type = "任务", name = "|cffc0c0c0藏宝图第三张|r", goldPrice = 100}
-____exports.items.I0AN = {type = "任务", name = "送信", goldPrice = 0}
 ____exports.items.I0AO = {type = "材料", name = "信件", goldPrice = 100}
 ____exports.items.I0AP = {type = "材料", name = "高原狼肉", goldPrice = 200}
 ____exports.items.I0AQ = {
@@ -3366,7 +3356,6 @@ ____exports.items.I0B8 = {type = "其他", name = "阅读描述的内容（其�
 ____exports.items.I0B9 = {type = "其他", name = "阅读描述的内容（其四）|cffff0000LV55|r", goldPrice = 0}
 ____exports.items.I0BA = {type = "其他", name = "阅读描述的内容（其一）|cffff0000LV25|r", goldPrice = 0}
 ____exports.items.I0BB = {type = "其他", name = "阅读描述的内容（其二）|cffff0000LV35|r", goldPrice = 0}
-____exports.items.I0BC = {type = "任务", name = "净化狂暴之熊", goldPrice = 0}
 ____exports.items.I0BG = {type = "任务", name = "净化精英狂暴之熊", goldPrice = 0}
 ____exports.items.I0BK = {
     type = "任务",
@@ -3389,9 +3378,6 @@ ____exports.items.I0BM = {
     atkSpeed = 0.03,
     cdReduction = 0.01
 }
-____exports.items.I0BN = {type = "任务", name = "给予圣果", goldPrice = 0}
-____exports.items.I0BO = {type = "任务", name = "补充生命力", goldPrice = 0, abilList = "A0LH"}
-____exports.items.I0BP = {type = "任务", name = "帮助被驱逐的水怪（|cffff000040级战斗事件|r）", goldPrice = 0}
 ____exports.items.I0BT = {type = "材料", name = "|cffff6600狂之气息|r", goldPrice = 400}
 ____exports.items.I0BU = {
     type = "副武器",
@@ -3487,15 +3473,6 @@ ____exports.items.I0CH = {
     cdReduction = 15,
     accuracy = -0.15
 }
-____exports.items.I0CI = {type = "任务", name = "消失的笛子", goldPrice = 0}
-____exports.items.I0CJ = {
-    type = "任务",
-    name = "|cffff0000失踪的精灵村民（Boss战任务）|r",
-    goldPrice = 0,
-    critRate = 1,
-    critDmg = 0.01
-}
-____exports.items.I0CM = {type = "任务", name = "|cffff9900协助异端调查|r（|cffff00008级精英战斗任务|r）", goldPrice = 0}
 ____exports.items.I0CO = {
     type = "提升属性的物品",
     name = "学识书",
@@ -3503,9 +3480,7 @@ ____exports.items.I0CO = {
     PowerUP = "900exp;2dmg",
     abilList = "A0LH"
 }
-____exports.items.I0CP = {type = "任务", name = "|cffff00ff暗狱之书|r|cffffff00（寻找物品任务）|r", goldPrice = 0}
 ____exports.items.I0CQ = {type = "任务", name = "|cffcc99ff暗狱之书|r", goldPrice = 0, maxDrops = 1}
-____exports.items.I0CR = {type = "任务", name = "收集|cff99cc00有毒杂草|r", goldPrice = 0}
 ____exports.items.I0CS = {type = "材料", name = "有毒杂草", goldPrice = 150}
 ____exports.items.I0CT = {type = "任务", name = "|cff99ccff驱散灵树邪气|r（|cffff000015级精英战斗|r）", goldPrice = 0, int = 1}
 ____exports.items.I0CW = {type = "任务", name = "领取技能", goldPrice = 2000}

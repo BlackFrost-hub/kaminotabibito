@@ -22,10 +22,6 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
-const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
-  PlaySoundBJ: (this: void, soundHandle: any) => void;
-};
-
 import {
   英雄指令音效配置列表,
   英雄指令音效攻击冷却,
@@ -45,6 +41,8 @@ const GetTriggerPlayer = jass.GetTriggerPlayer as () => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: number) => boolean;
+const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
+const StartSound = jass.StartSound as (this: void, soundHandle: any) => void;
 
 const EventUnitSelected = jass.EVENT_UNIT_SELECTED as number;
 const EventUnitIssuedPointOrder = jass.EVENT_UNIT_ISSUED_POINT_ORDER as number;
@@ -118,8 +116,8 @@ function 本地播放(this: void, soundHandle: any): void {
   if (soundHandle == null || soundHandle === 0) return;
   const triggerPlayer = GetTriggerPlayer();
   if (triggerPlayer == null || triggerPlayer === 0) return;
-  if (jass.GetLocalPlayer() !== triggerPlayer) return;
-  PlaySoundBJ(soundHandle);
+  if (GetLocalPlayer() !== triggerPlayer) return;
+  StartSound(soundHandle);
 }
 
 function 冷却结束(this: void): void {

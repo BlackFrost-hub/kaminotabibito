@@ -56,7 +56,14 @@ ____exports["创建主线引导帧"] = function()
         "template",
         0
     )
-    DzFrameSetAbsolutePoint(____exports["帧"]["放大效果"], FRAME_POINT_CENTER, 0.07, 0.55)
+    DzFrameSetPoint(
+        ____exports["帧"]["放大效果"],
+        FRAME_POINT_CENTER,
+        ____exports["帧"]["主线任务"],
+        FRAME_POINT_CENTER,
+        0,
+        0
+    )
     DzFrameSetSize(____exports["帧"]["放大效果"], 0.04, 0.04)
     DzFrameSetTexture(____exports["帧"]["放大效果"], BTN_ICON_TEXTURE, 0)
     DzFrameShow(____exports["帧"]["放大效果"], false)

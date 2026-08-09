@@ -7,6 +7,8 @@ local _____83B7_53D6_5C5E_6027_503C = ____02_FF0E_5C5E_6027_8BA1_7B97["获取属
 local ____03_FF0E_6838_5FC3_903B_8F91 = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑")
 local _____6062_590D_82F1_96C4_6280_80FD_539F_59CB_6587_672C = ____03_FF0E_6838_5FC3_903B_8F91["恢复英雄技能原始文本"]
 local _____68C0_67E5_82F1_96C4_6280_80FD = ____03_FF0E_6838_5FC3_903B_8F91["检查英雄技能"]
+local _____540C_6B65_5237_65B0_82F1_96C4_6280_80FD_754C_9762 = ____03_FF0E_6838_5FC3_903B_8F91["同步刷新英雄技能界面"]
+local _____540C_6B65_5237_65B0_82F1_96C4_6280_80FD_539F_59CB_754C_9762 = ____03_FF0E_6838_5FC3_903B_8F91["同步刷新英雄技能原始界面"]
 --- 动态技能文本系统 - 入口与导出
 -- 
 -- 改为和冷却/蓝耗一致的本地选中驱动：
@@ -15,20 +17,22 @@ local _____68C0_67E5_82F1_96C4_6280_80FD = ____03_FF0E_6838_5FC3_903B_8F91["检�
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
-local ____require_result_1 = require("lib.扩展函数.封装函数.04．硬件输入.index")
-local isKeyDown = ____require_result_1.isKeyDown
+local syncHardwareInput = require("lib.扩展函数.封装函数.04．硬件输入.08．同步硬件输入中心")
+local ____require_result_1 = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
+local KEY_STATE = ____require_result_1.KEY_STATE
+local ____require_result_2 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local getRegisteredPlayerHero = ____require_result_2.getRegisteredPlayerHero
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local _____529F_80FD_5F00_5173_6A21_5757 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_2.debugLog
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_3.debugLog
 local MODULE_NAME = "动态技能文本"
 local REFRESH_MS = 300
 local ALT_KEY_CODE = 18
 local initialized = false
 local _____5F53_524D_751F_6548_82F1_96C4 = nil
 local _____5F53_524D_5FEB_7167_7B7E_540D = ""
-local ____Alt_662F_5426_6309_4E0B = false
-local ____Alt_539F_6587_82F1_96C4 = nil
+local ____Alt_540C_6B65_6309_4E0B = false
 local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
@@ -54,13 +58,13 @@ local function _____6784_5EFA_52A8_6001_6587_672C_5FEB_7167_7B7E_540D(hero)
         while i < #_____6280_80FD_70ED_952E_5217_8868 do
             local _____70ED_952E = _____6280_80FD_70ED_952E_5217_8868[i + 1]
             local abilityId = _____547D_4EE4_5361_5FEB_7167.skills[_____70ED_952E] or 0
-            local ____temp_3
+            local ____temp_4
             if abilityId ~= 0 then
-                ____temp_3 = jass.GetUnitAbilityLevel(hero, abilityId)
+                ____temp_4 = jass.GetUnitAbilityLevel(hero, abilityId)
             else
-                ____temp_3 = 0
+                ____temp_4 = 0
             end
-            local level = ____temp_3
+            local level = ____temp_4
             _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868 + 1] = (((_____70ED_952E .. "=") .. tostring(abilityId)) .. ":") .. tostring(level)
             i = i + 1
         end
@@ -86,55 +90,62 @@ local function _____6062_590D_5F53_524D_751F_6548_82F1_96C4()
     _____5F53_524D_751F_6548_82F1_96C4 = nil
     _____5F53_524D_5FEB_7167_7B7E_540D = ""
 end
-local function _____5E94_7528Alt_539F_6587_6A21_5F0F()
-    if not ____Alt_662F_5426_6309_4E0B or not isValidHandle(_____5F53_524D_751F_6548_82F1_96C4) then
-        ____Alt_539F_6587_82F1_96C4 = nil
+local function _____5904_7406_540C_6B65Alt_6309_4E0B(event)
+    if ____Alt_540C_6B65_6309_4E0B then
         return
     end
-    if ____Alt_539F_6587_82F1_96C4 == _____5F53_524D_751F_6548_82F1_96C4 then
+    local ____temp_5
+    if event ~= nil then
+        ____temp_5 = event.player
+    else
+        ____temp_5 = nil
+    end
+    local player = ____temp_5
+    local hero = getRegisteredPlayerHero(player)
+    if not isValidHandle(hero) then
         return
     end
-    _____6062_590D_82F1_96C4_6280_80FD_539F_59CB_6587_672C(_____5F53_524D_751F_6548_82F1_96C4)
-    ____Alt_539F_6587_82F1_96C4 = _____5F53_524D_751F_6548_82F1_96C4
+    ____Alt_540C_6B65_6309_4E0B = true
+    _____540C_6B65_5237_65B0_82F1_96C4_6280_80FD_539F_59CB_754C_9762(hero)
 end
-local function _____5237_65B0Alt_6309_952E_72B6_6001()
-    local _____5F53_524D_662F_5426_6309_4E0B = isKeyDown(nil, ALT_KEY_CODE) == true
-    if _____5F53_524D_662F_5426_6309_4E0B == ____Alt_662F_5426_6309_4E0B then
+local function _____5904_7406_540C_6B65Alt_677E_5F00(event)
+    if not ____Alt_540C_6B65_6309_4E0B then
         return
     end
-    ____Alt_662F_5426_6309_4E0B = _____5F53_524D_662F_5426_6309_4E0B
-    if ____Alt_662F_5426_6309_4E0B then
-        _____5E94_7528Alt_539F_6587_6A21_5F0F()
+    local ____temp_6
+    if event ~= nil then
+        ____temp_6 = event.player
+    else
+        ____temp_6 = nil
+    end
+    local player = ____temp_6
+    local hero = getRegisteredPlayerHero(player)
+    if not isValidHandle(hero) then
         return
     end
-    if isValidHandle(_____5F53_524D_751F_6548_82F1_96C4) then
-        _____68C0_67E5_82F1_96C4_6280_80FD(_____5F53_524D_751F_6548_82F1_96C4)
-    end
-    ____Alt_539F_6587_82F1_96C4 = nil
+    ____Alt_540C_6B65_6309_4E0B = false
+    _____540C_6B65_5237_65B0_82F1_96C4_6280_80FD_754C_9762(hero)
 end
 local function onTick()
-    _____5237_65B0Alt_6309_952E_72B6_6001()
     local _____5DF2_5F00_542F = _____529F_80FD_5F00_5173_6A21_5757["本地玩家是否开启动态技能文本"]()
-    local _____5DF2_5F00_542F_4
+    local _____5DF2_5F00_542F_7
     if _____5DF2_5F00_542F then
-        _____5DF2_5F00_542F_4 = _____83B7_53D6_672C_5730_5F53_524D_9009_4E2D_82F1_96C4()
+        _____5DF2_5F00_542F_7 = _____83B7_53D6_672C_5730_5F53_524D_9009_4E2D_82F1_96C4()
     else
-        _____5DF2_5F00_542F_4 = nil
+        _____5DF2_5F00_542F_7 = nil
     end
-    local localHero = _____5DF2_5F00_542F_4
+    local localHero = _____5DF2_5F00_542F_7
     if _____5F53_524D_751F_6548_82F1_96C4 ~= localHero then
         if isValidHandle(_____5F53_524D_751F_6548_82F1_96C4) then
             _____6062_590D_82F1_96C4_6280_80FD_539F_59CB_6587_672C(_____5F53_524D_751F_6548_82F1_96C4)
         end
         _____5F53_524D_751F_6548_82F1_96C4 = localHero
         _____5F53_524D_5FEB_7167_7B7E_540D = ""
-        ____Alt_539F_6587_82F1_96C4 = nil
     end
     if not isValidHandle(_____5F53_524D_751F_6548_82F1_96C4) then
         return
     end
     if not _____5DF2_5F00_542F then
-        ____Alt_539F_6587_82F1_96C4 = nil
         return
     end
     local nextSignature = _____6784_5EFA_52A8_6001_6587_672C_5FEB_7167_7B7E_540D(_____5F53_524D_751F_6548_82F1_96C4)
@@ -142,7 +153,6 @@ local function onTick()
         _____5F53_524D_5FEB_7167_7B7E_540D = nextSignature
         _____68C0_67E5_82F1_96C4_6280_80FD(_____5F53_524D_751F_6548_82F1_96C4)
     end
-    _____5E94_7528Alt_539F_6587_6A21_5F0F()
 end
 function ____exports.registerDynamicSkillTextHero(whichHero)
     if not isValidHandle(whichHero) then
@@ -157,6 +167,8 @@ function ____exports.initDynamicSkillTextSystem()
     initialized = true
     selectionSnapshotSystem["初始化本地选中技能快照"]()
     addPeriodicCallback(REFRESH_MS, onTick)
+    syncHardwareInput.registerSyncHardwareKey(ALT_KEY_CODE, KEY_STATE.DOWN, _____5904_7406_540C_6B65Alt_6309_4E0B)
+    syncHardwareInput.registerSyncHardwareKey(ALT_KEY_CODE, KEY_STATE.UP, _____5904_7406_540C_6B65Alt_677E_5F00)
     debugLog(nil, MODULE_NAME, "初始化动态技能文本系统")
 end
 function ____exports.restoreDynamicSkillTextCurrentHero()

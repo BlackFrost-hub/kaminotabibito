@@ -10,7 +10,7 @@ const { onItemUse } = require("系统.00．核心系统.01．事件中心.04．�
   onItemUse: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const { doHealItemEffectById } = require("系统.04．伤害系统.02．治疗系统.05．物品治疗效果") as {
-  doHealItemEffectById: (this: void, abilId: string, target: any, healHP: number, healMP: number) => void;
+  doHealItemEffectById: (this: void, abilId: string, target: any, healHP: number, healMP: number, hotDuration?: number) => void;
 };
 
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
@@ -19,7 +19,7 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
   getServerTime: (this: void) => number;
 };
 
-const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { hot?: string; abilList?: string }> }).default;
+const itemsData = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, { hot?: string; hotDuration?: number; abilList?: string }> }).default;
 const { fourCCToString, isSpecialUnit } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (this: void, four: number) => string;
   isSpecialUnit: (unit: any) => boolean;
@@ -34,16 +34,17 @@ const {
 };
 
 /** 直接执行物品治疗效果，不再经过 STES / YDLocal */
-function applyItemHeal(this: void, unit: any, hp: number, mp: number, abilId: string): void {
-  doHealItemEffectById(abilId, unit, hp, mp);
+function applyItemHeal(this: void, unit: any, hp: number, mp: number, abilId: string, hotDuration?: number): void {
+  doHealItemEffectById(abilId, unit, hp, mp, hotDuration);
 }
 
 function executeSegment(
   unit: any,
   seg: { tokens: string[]; abilId: string; waitSec: number },
+  hotDuration?: number,
 ): void {
   const { hp, mp } = calcEquipHealHpMp(seg.tokens, unit);
-  applyItemHeal(unit, hp, mp, seg.abilId);
+  applyItemHeal(unit, hp, mp, seg.abilId, hotDuration);
 }
 
 const 装备回复计时检查间隔毫秒 = 10;
@@ -51,6 +52,7 @@ const 装备回复防抖键列表: string[] = [];
 const 装备回复防抖到期毫秒列表: number[] = [];
 const 装备回复延迟单位列表: any[] = [];
 const 装备回复延迟段列表: { tokens: string[]; abilId: string; waitSec: number }[] = [];
+const 装备回复延迟持续时间列表: (number | undefined)[] = [];
 const 装备回复延迟到期毫秒列表: number[] = [];
 let 装备回复计时检查回调ID = 0;
 
@@ -71,9 +73,10 @@ function 安排装备回复防抖清理(this: void, key: string, delaySec: numbe
   确保装备回复计时检查();
 }
 
-function 安排装备回复延迟段(this: void, unit: any, seg: { tokens: string[]; abilId: string; waitSec: number }): void {
+function 安排装备回复延迟段(this: void, unit: any, seg: { tokens: string[]; abilId: string; waitSec: number }, hotDuration?: number): void {
   装备回复延迟单位列表.push(unit);
   装备回复延迟段列表.push(seg);
+  装备回复延迟持续时间列表.push(hotDuration);
   装备回复延迟到期毫秒列表.push(getServerTime() + seg.waitSec * 1000);
   确保装备回复计时检查();
 }
@@ -99,10 +102,11 @@ function 处理装备回复延迟段到期(this: void, now: number): void {
   let writeIndex = 0;
   for (let i = 0; i < 装备回复延迟单位列表.length; i++) {
     if (now >= 装备回复延迟到期毫秒列表[i]) {
-      executeSegment(装备回复延迟单位列表[i], 装备回复延迟段列表[i]);
+      executeSegment(装备回复延迟单位列表[i], 装备回复延迟段列表[i], 装备回复延迟持续时间列表[i]);
     } else {
       装备回复延迟单位列表[writeIndex] = 装备回复延迟单位列表[i];
       装备回复延迟段列表[writeIndex] = 装备回复延迟段列表[i];
+      装备回复延迟持续时间列表[writeIndex] = 装备回复延迟持续时间列表[i];
       装备回复延迟到期毫秒列表[writeIndex] = 装备回复延迟到期毫秒列表[i];
       writeIndex += 1;
     }
@@ -110,6 +114,7 @@ function 处理装备回复延迟段到期(this: void, now: number): void {
   for (let i = 装备回复延迟单位列表.length - 1; i >= writeIndex; i--) {
     装备回复延迟单位列表.pop();
     装备回复延迟段列表.pop();
+    装备回复延迟持续时间列表.pop();
     装备回复延迟到期毫秒列表.pop();
   }
 }
@@ -133,7 +138,7 @@ function onUseItem(this: void, eventUnit?: any, eventItem?: any): void {
   if (isSpecialUnit(unit)) return;
   const itemId = GetItemTypeId(item);
   const idStr = fourCCToString(itemId);
-  const entry = (itemsData as Record<string, { hot?: string; abilList?: string }>)[idStr];
+  const entry = (itemsData as Record<string, { hot?: string; hotDuration?: number; abilList?: string }>)[idStr];
   if (!entry || !entry.hot || !entry.abilList) return;
 
   const glob = globalThis as any;
@@ -146,9 +151,9 @@ function onUseItem(this: void, eventUnit?: any, eventItem?: any): void {
   for (const seg of segments) {
     if (seg.abilId === "") continue;
     if (seg.waitSec <= 0) {
-      executeSegment(unit, seg);
+      executeSegment(unit, seg, entry.hotDuration);
     } else {
-      安排装备回复延迟段(unit, seg);
+      安排装备回复延迟段(unit, seg, entry.hotDuration);
     }
   }
 }

@@ -22,8 +22,10 @@ local GetLocalPlayer = jass.GetLocalPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
-local PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ
 local GetRandomInt = jass.GetRandomInt
+local AttachSoundToUnit = jass.AttachSoundToUnit
+local SetSoundVolume = jass.SetSoundVolume
+local StartSound = jass.StartSound
 local _____5DF2_521D_59CB_5316_82F1_96C4_95EA_907F_8BED_97F3 = false
 local _____95EA_907F_8BED_97F3_51B7_5374_7ED3_675F_5355_4F4D_961F_5217 = {}
 local function _____53D6_82F1_96C4_540D(unit)
@@ -119,7 +121,9 @@ local function _____672C_5730_73A9_5BB6_64AD_653E(unit, soundHandle)
     if GetLocalPlayer() ~= owner then
         return
     end
-    PlaySoundOnUnitBJ(soundHandle, 100, unit)
+    AttachSoundToUnit(soundHandle, unit)
+    SetSoundVolume(soundHandle, 100)
+    StartSound(soundHandle)
 end
 local function _____82F1_96C4_95EA_907F_8BED_97F3_51B7_5374_7ED3_675F()
     local target = table.remove(_____95EA_907F_8BED_97F3_51B7_5374_7ED3_675F_5355_4F4D_961F_5217, 1)

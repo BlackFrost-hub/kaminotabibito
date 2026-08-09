@@ -194,7 +194,7 @@ export function 创建世界坐标进度UI(this: void, 参数: 世界坐标进�
   };
   const z = 参数.Z ?? 180;
   const fogVisible = 参数.雾中可见 ?? false;
-  DzFrameBindWorldPos(root, 参数.X, 参数.Y, z, 0, 0, fogVisible);
+  DzFrameBindWorldPos(root, 参数.X, 参数.Y, z, 参数.屏幕X偏移 ?? 0, 参数.屏幕Y偏移 ?? 0, fogVisible);
   刷新填充(ui);
   刷新文本(ui);
   DzFrameShow(root, visible);
@@ -244,4 +244,3 @@ export function 销毁世界坐标进度UI(this: void, ui: 世界坐标进度UI 
   DzDestroyFrame(ui.根帧);
   尝试停止世界坐标进度UI驱动();
 }
-

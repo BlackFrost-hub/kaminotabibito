@@ -63,6 +63,11 @@ if ENABLE_QUEST_RUNTIME_CORE then
     if type(_____4EFB_52A1_7BA1_7406_5668.init) == "function" then
         _____4EFB_52A1_7BA1_7406_5668:init()
     end
+    if ENABLE_QUEST_CONFIG_TABLE then
+        local ____require_result_0 = require("系统.08．任务系统.04．击杀任务进度")
+        local _____521D_59CB_5316_51FB_6740_4EFB_52A1_8FDB_5EA6 = ____require_result_0["初始化击杀任务进度"]
+        _____521D_59CB_5316_51FB_6740_4EFB_52A1_8FDB_5EA6()
+    end
 end
 if ENABLE_QUEST_UI_MODULE then
     local manager = require("系统.08．任务系统.02．任务UI拆分.11．任务UI管理器")

@@ -78,6 +78,7 @@ interface Boss主动运行状态 {
   下次可施法时间: number;
   树魔下次技能索引: number;
   技能提示已初始化: boolean;
+  技能下次可用时间表: Record<number, number | undefined>;
 }
 
 const Boss主动运行状态表: Record<number, Boss主动运行状态 | undefined> = {};
@@ -167,9 +168,20 @@ function 读取技能能力ID(skillId: string): number {
 function 读取技能当前冷却毫秒(unit: any, skillId: string): number {
   const abilityId = 读取技能能力ID(skillId);
   if (abilityId === 0) return 0;
+
   const currentCooldown = 技能_获取技能当前冷却时间(unit, abilityId) || 0;
-  if (currentCooldown <= 0) return 0;
-  return currentCooldown * 1000;
+  const 平台冷却毫秒 = currentCooldown > 0 ? currentCooldown * 1000 : 0;
+
+  const state = 获取Boss主动运行状态(unit);
+  const 下次可用时间 = state.技能下次可用时间表[abilityId] ?? 0;
+  const now = getServerTime();
+  let 运行时冷却毫秒 = 下次可用时间 - now;
+  if (运行时冷却毫秒 <= 0) {
+    state.技能下次可用时间表[abilityId] = undefined;
+    运行时冷却毫秒 = 0;
+  }
+
+  return 平台冷却毫秒 > 运行时冷却毫秒 ? 平台冷却毫秒 : 运行时冷却毫秒;
 }
 
 function 读取技能实时施法距离(unit: any, skillId: string): number {
@@ -199,6 +211,7 @@ function 获取Boss主动运行状态(unit: any): Boss主动运行状态 {
       下次可施法时间: 0,
       树魔下次技能索引: 0,
       技能提示已初始化: false,
+      技能下次可用时间表: {},
     };
     Boss主动运行状态表[handleId] = state;
   }
@@ -348,6 +361,9 @@ function onBoss通魔技能生效(this: void, castingUnit: any, spellAbilityId: 
 
   const 配置冷却 = 读取Boss技能配置冷却秒(castingUnit, 匹配技能);
   if (配置冷却 <= 0) return;
+
+  const state = 获取Boss主动运行状态(castingUnit);
+  state.技能下次可用时间表[spellAbilityId] = getServerTime() + 配置冷却 * 1000;
   技能_设置技能冷却时间(castingUnit, spellAbilityId, 配置冷却, 配置冷却);
 }
 
@@ -535,6 +551,13 @@ function 尝试驱动单个Boss(context: { Boss单位: any; 来源: string; 注�
       state.树魔下次技能索引 = 下次技能索引;
     }
     return;
+  }
+
+  const skillId = skill.技能ID ?? "";
+  const abilityId = 读取技能能力ID(skillId);
+  const 配置冷却 = 读取Boss技能配置冷却秒(unit, skill);
+  if (abilityId !== 0 && 配置冷却 > 0) {
+    state.技能下次可用时间表[abilityId] = now + 配置冷却 * 1000;
   }
 
   if (是树魔首领) {

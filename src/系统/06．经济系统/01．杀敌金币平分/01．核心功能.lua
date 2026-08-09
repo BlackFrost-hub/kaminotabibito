@@ -97,6 +97,27 @@ local function isValidDyingUnit(dyingUnit)
     local playerId = getUnitOwnerId(nil, dyingUnit)
     return playerId == 12 or playerId == 7
 end
+--- 仅播放金币音效并显示漂浮文字，不修改玩家金币。
+____exports["显示金币获得反馈"] = function(unit, player, gold)
+    if unit == nil or unit == 0 or player == nil or player == 0 or gold == 0 then
+        return
+    end
+    Sound3DII_Mp3PlayReuse(SOUND_GOLD, player)
+    if type(CreateFloatTextOnUnit) == "function" then
+        CreateFloatTextOnUnit(
+            unit,
+            (gold > 0 and "+" or "") .. tostring(gold),
+            {
+                size = 12,
+                red = GOLD_R,
+                green = GOLD_G,
+                blue = GOLD_B,
+                alpha = 0,
+                duration = GOLD_FLOAT_DURATION_SEC
+            }
+        )
+    end
+end
 --- 给予玩家金币（带音效和漂浮文字）
 local function giveGoldToPlayer(unit, player, baseGold, isShared)
     local params = {unit = unit, player = player, baseGold = baseGold, isShared = isShared}
@@ -108,18 +129,7 @@ local function giveGoldToPlayer(unit, player, baseGold, isShared)
     end
     local finalGold = params.finalGold or baseGold
     AdjustPlayerStateBJ(nil, finalGold, player, jass.PLAYER_STATE_RESOURCE_GOLD)
-    Sound3DII_Mp3PlayReuse(SOUND_GOLD, player)
-    local text = "+" .. tostring(finalGold)
-    if type(CreateFloatTextOnUnit) == "function" then
-        CreateFloatTextOnUnit(unit, text, {
-            size = 12,
-            red = GOLD_R,
-            green = GOLD_G,
-            blue = GOLD_B,
-            alpha = 0,
-            duration = GOLD_FLOAT_DURATION_SEC
-        })
-    end
+    ____exports["显示金币获得反馈"](unit, player, finalGold)
 end
 local function _____5904_7406_5E73_5206_82F1_96C4(hero)
     if not hero then

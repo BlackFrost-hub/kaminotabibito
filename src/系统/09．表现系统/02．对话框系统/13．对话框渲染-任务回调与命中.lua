@@ -3,7 +3,6 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
 local frameSetScriptByCode = ____index.frameSetScriptByCode
-local registerKeyEventByCode = ____index.registerKeyEventByCode
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
 local KEY_STATE = ____01_FF0E_5E38_91CF_5B9A_4E49.KEY_STATE
 local ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406 = require("系统.09．表现系统.02．对话框系统.12．对话框渲染-播放与状态管理")
@@ -37,6 +36,7 @@ local findFirstQuestEntryIndex = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_
 local g_questCallbacksByPlayer = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_questCallbacksByPlayer
 local g_states = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.g_states
 local japi = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.japi
+local jass = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.jass
 local KEY_SKIP_DIALOG = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.KEY_SKIP_DIALOG
 local MAX_PLAYERS = ____10_FF0E_5BF9_8BDD_6846_6E32_67D3_2DDz_4E0E_72B6_6001.MAX_PLAYERS
 local ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406 = require("系统.09．表现系统.02．对话框系统.12．对话框渲染-播放与状态管理")
@@ -47,6 +47,8 @@ local playEntry = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_60
 local stopTyping = ____12_FF0E_5BF9_8BDD_6846_6E32_67D3_2D_64AD_653E_4E0E_72B6_6001_7BA1_7406.stopTyping
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("lib.扩展函数.KK扩展API.index")
+local DzTriggerRegisterKeyEventTrg = ____require_result_1.DzTriggerRegisterKeyEventTrg
 local function getCurrentEntry(self, state)
     return state.queue[state.currentIndex + 1]
 end
@@ -409,18 +411,17 @@ local function skipDialogLocal(self)
     end
 end
 local g_skipKeyInitialized = false
+local function onRawSkipKeyEntry(self)
+    skipDialogLocal(nil)
+end
 function ____exports.initSkipKeyListener(self)
     if g_skipKeyInitialized then
         return
     end
     g_skipKeyInitialized = true
-    registerKeyEventByCode(
-        nil,
-        KEY_SKIP_DIALOG,
-        KEY_STATE.DOWN,
-        true,
-        skipDialogLocal
-    )
+    local rawDebugTrigger = jass.CreateTrigger()
+    DzTriggerRegisterKeyEventTrg(rawDebugTrigger, KEY_STATE.DOWN, KEY_SKIP_DIALOG)
+    jass.TriggerAddAction(rawDebugTrigger, onRawSkipKeyEntry)
 end
 function ____exports.bindQuestSyncHandlersImpl(self, state)
     if state.questSyncHandlersBound or not state.frames or #state.frames == 0 then
@@ -430,30 +431,30 @@ function ____exports.bindQuestSyncHandlersImpl(self, state)
     local rejectCallback
     local panelCallback
     repeat
-        local ____switch77 = state.playerId
-        local ____cond77 = ____switch77 == 0
-        if ____cond77 then
+        local ____switch78 = state.playerId
+        local ____cond78 = ____switch78 == 0
+        if ____cond78 then
             acceptCallback = questAcceptCallbackP0
             rejectCallback = questRejectCallbackP0
             panelCallback = dialogPanelHitCallbackP0
             break
         end
-        ____cond77 = ____cond77 or ____switch77 == 1
-        if ____cond77 then
+        ____cond78 = ____cond78 or ____switch78 == 1
+        if ____cond78 then
             acceptCallback = questAcceptCallbackP1
             rejectCallback = questRejectCallbackP1
             panelCallback = dialogPanelHitCallbackP1
             break
         end
-        ____cond77 = ____cond77 or ____switch77 == 2
-        if ____cond77 then
+        ____cond78 = ____cond78 or ____switch78 == 2
+        if ____cond78 then
             acceptCallback = questAcceptCallbackP2
             rejectCallback = questRejectCallbackP2
             panelCallback = dialogPanelHitCallbackP2
             break
         end
-        ____cond77 = ____cond77 or ____switch77 == 3
-        if ____cond77 then
+        ____cond78 = ____cond78 or ____switch78 == 3
+        if ____cond78 then
             acceptCallback = questAcceptCallbackP3
             rejectCallback = questRejectCallbackP3
             panelCallback = dialogPanelHitCallbackP3

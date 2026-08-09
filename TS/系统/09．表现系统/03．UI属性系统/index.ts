@@ -13,7 +13,7 @@ export { createUiFrames, showDamagePanel, updateDamagePanel, updateDetailPanels 
 export * from "./03．系统入口";
 
 const { initUiAttributeSystem } = require("系统.09．表现系统.03．UI属性系统.03．系统入口") as {
-  initUiAttributeSystem: () => void;
+  initUiAttributeSystem: (this: void) => void;
 };
 
 export function init(): void {

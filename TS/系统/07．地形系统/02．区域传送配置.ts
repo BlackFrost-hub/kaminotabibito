@@ -12,6 +12,18 @@ export interface RegionConfig {
   text?: string;
   condition: string;
   firstEnterActions?: string;
+  最低英雄等级?: number;
+  首次进入创建单位?: {
+    单位ID: string;
+    所属玩家: "中立敌对";
+    x: number;
+    y: number;
+    随机面向?: boolean;
+  };
+  传送后广播?: {
+    文本: string;
+    持续时间毫秒?: number;
+  };
   rule?: string;
   enabled: boolean;
 }
@@ -290,6 +302,31 @@ export const 区域传送配置: Record<string, RegionConfig> = {
     text: "|cffffff00『系统提示』|r：现在的场景为：|cff993366『万浴熔灵』|r",
     condition: "always",
     rule: "40%KillUnit:|cffffff00『系统提示』|r：{unit}跳入熔浆不知所踪;20%传送:14783,-14913;20%传送:19009,-11590;20%传送:21077,-16342",
+    enabled: true
+  },
+  "19": {
+    id: "19",
+    name: "聚灵花盛开处",
+    left: -22272,
+    bottom: -30240,
+    right: -21952,
+    top: -29536,
+    teleportX: -24150.5,
+    teleportY: -17284.6,
+    cameraTime: 0.1,
+    condition: "always",
+    最低英雄等级: 18,
+    首次进入创建单位: {
+      单位ID: "nsea",
+      所属玩家: "中立敌对",
+      x: -26368.6,
+      y: -16911.5,
+      随机面向: true
+    },
+    传送后广播: {
+      文本: "居然还有这种奇景，星空之下又是一片生机。",
+      持续时间毫秒: 5000
+    },
     enabled: true
   }
 };

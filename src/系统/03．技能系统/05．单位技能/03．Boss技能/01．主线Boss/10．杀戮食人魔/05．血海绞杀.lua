@@ -31,10 +31,12 @@ local EC_CreateEffect = ____require_result_5.EC_CreateEffect
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local SetUnitState = jass.SetUnitState
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local IsUnitType = jass.IsUnitType
@@ -227,7 +229,7 @@ local function ____on_8840_6D77_7EDE_6740_5F00_59CB(variable)
     local boss = data["上下文"]["Boss单位"]
     local cfg = _____6740_622E_98DF_4EBA_9B54_6280_80FD_914D_7F6E["血海绞杀"]
     local currentLife = GetUnitState(boss, UNIT_STATE_LIFE)
-    local cost = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg["最大生命消耗比例"]
+    local cost = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg["最大生命消耗比例"]
     local _____6263_8840_540E_751F_547D = currentLife - cost > 1 and currentLife - cost or 1
     SetUnitState(boss, UNIT_STATE_LIFE, _____6263_8840_540E_751F_547D)
     _____5F00_59CB_786C_76F4(boss, cfg["施法硬直秒"])

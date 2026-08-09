@@ -14,16 +14,13 @@ const { 获取单位玩家英雄配置 } = require("系统.01．单位系统.00�
 const { 单位是否匹配玩家英雄名称 } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名") as {
   单位是否匹配玩家英雄名称: (this: void, unit: any, name: string) => boolean;
 };
-const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
-  PlaySoundBJ: (this: void, soundHandle: any) => void;
-};
-
 import { 英雄升级音效配置列表, 英雄升级音效配置 } from "./00．配置";
 
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: number) => boolean;
+const StartSound = jass.StartSound as (this: void, soundHandle: any) => void;
 
 let 英雄升级音效已初始化 = false;
 
@@ -51,7 +48,7 @@ function 本地播放升级音效(this: void, unit: any, soundHandle: any): void
   const owner = GetOwningPlayer(unit);
   if (owner == null || owner === 0) return;
   if (GetLocalPlayer() !== owner) return;
-  PlaySoundBJ(soundHandle);
+  StartSound(soundHandle);
 }
 
 function on英雄升级语音(this: void, heroUnit: any): void {

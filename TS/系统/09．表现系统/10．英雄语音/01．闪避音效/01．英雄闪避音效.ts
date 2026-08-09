@@ -19,13 +19,14 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
-
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: number) => boolean;
-const PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ as (this: void, soundHandle: any, volumePercent: number, whichUnit: any) => void;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
+const AttachSoundToUnit = jass.AttachSoundToUnit as (this: void, soundHandle: any, unit: any) => void;
+const SetSoundVolume = jass.SetSoundVolume as (this: void, soundHandle: any, volume: number) => void;
+const StartSound = jass.StartSound as (this: void, soundHandle: any) => void;
 
 let 已初始化英雄闪避语音 = false;
 const 闪避语音冷却结束单位队列: any[] = [];
@@ -75,7 +76,9 @@ function 本地玩家播放(this: void, unit: any, soundHandle: any): void {
   const owner = GetOwningPlayer(unit);
   if (owner == null || owner === 0) return;
   if (GetLocalPlayer() !== owner) return;
-  PlaySoundOnUnitBJ(soundHandle, 100, unit);
+  AttachSoundToUnit(soundHandle, unit);
+  SetSoundVolume(soundHandle, 100);
+  StartSound(soundHandle);
 }
 
 function 英雄闪避语音冷却结束(this: void): void {

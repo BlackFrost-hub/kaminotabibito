@@ -13,11 +13,16 @@ const centerTimer = require("系统.00．核心系统.05．中心计时器") as 
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
-const dzSync = require("lib.扩展函数.KK扩展API.04．同步数据安全版") as {
-  DzSyncDataSafe: (this: void, prefix: string, data: string) => void;
-  DzTriggerRegisterSyncDataSafe: (this: void, trig: any, prefix: string, server: boolean) => void;
-  DzGetTriggerSyncPlayerSafe: (this: void) => any;
-  DzGetTriggerSyncDataSafe: (this: void) => string;
+const {
+  DzSyncData,
+  DzTriggerRegisterSyncDataTrg,
+  DzGetTriggerSyncPlayer,
+  DzGetTriggerSyncData,
+} = require("lib.扩展函数.KK扩展API.02．事件注册函数") as {
+  DzSyncData: (this: void, prefix: string, data: string) => void;
+  DzTriggerRegisterSyncDataTrg: (this: void, trig: any, prefix: string, server: boolean) => void;
+  DzGetTriggerSyncPlayer: (this: void) => any;
+  DzGetTriggerSyncData: (this: void) => string;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -65,14 +70,14 @@ function 停止重试(this: void): void {
 function on收到同步种子(this: void): void {
   if (已设置) return;
 
-  const 发送玩家 = dzSync.DzGetTriggerSyncPlayerSafe();
+  const 发送玩家 = DzGetTriggerSyncPlayer();
   const 发送玩家ID = 发送玩家 == null || 发送玩家 === 0 ? -1 : GetPlayerId(发送玩家);
   if (发送玩家ID !== 权威玩家ID) {
     输出日志("拒绝非权威种子", "发送玩家ID=", 发送玩家ID);
     return;
   }
 
-  const seed = S2I(dzSync.DzGetTriggerSyncDataSafe());
+  const seed = S2I(DzGetTriggerSyncData());
   if (seed <= 0 || seed > 最大种子) {
     输出日志("拒绝无效种子", "seed=", seed);
     return;
@@ -104,13 +109,13 @@ function on尝试发送种子(this: void): void {
   const seed = 标准化种子(serverTimeMs);
   本机已发送 = true;
   输出日志("权威端发送", "seed=", seed, "serverTimeMs=", serverTimeMs);
-  dzSync.DzSyncDataSafe(同步前缀, I2S(seed));
+  DzSyncData(同步前缀, I2S(seed));
 }
 
 function 初始化同步随机种子(this: void): void {
   const 同步触发器 = CreateTrigger();
   TriggerAddAction(同步触发器, on收到同步种子);
-  dzSync.DzTriggerRegisterSyncDataSafe(同步触发器, 同步前缀, true);
+  DzTriggerRegisterSyncDataTrg(同步触发器, 同步前缀, true);
   重试任务ID = centerTimer.addPeriodicCallback(重试间隔毫秒, on尝试发送种子);
   输出日志("同步监听已注册", "prefix=", 同步前缀, "权威玩家ID=", 权威玩家ID, "重试任务ID=", 重试任务ID);
 }

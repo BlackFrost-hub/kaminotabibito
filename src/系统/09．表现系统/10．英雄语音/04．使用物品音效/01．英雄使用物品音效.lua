@@ -14,17 +14,18 @@ local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_5 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_5.PlaySoundOnUnitBJ
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitCurrentOrder = jass.GetUnitCurrentOrder
 local GetRandomInt = jass.GetRandomInt
-local PlaySoundBJ = jass.PlaySoundBJ
-local PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ
-local ____require_result_5 = require("系统.09．表现系统.10．英雄语音.04．使用物品音效.00．配置")
-local _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_914D_7F6E_5217_8868 = ____require_result_5["英雄使用物品音效配置列表"]
-local _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_51B7_5374 = ____require_result_5["英雄使用物品音效冷却"]
-local _____82F1_96C4_4F7F_7528_7269_54C1_547D_4EE4_6700_5C0F = ____require_result_5["英雄使用物品命令最小"]
-local _____82F1_96C4_4F7F_7528_7269_54C1_547D_4EE4_6700_5927 = ____require_result_5["英雄使用物品命令最大"]
+local StartSound = jass.StartSound
+local ____require_result_6 = require("系统.09．表现系统.10．英雄语音.04．使用物品音效.00．配置")
+local _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_914D_7F6E_5217_8868 = ____require_result_6["英雄使用物品音效配置列表"]
+local _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_51B7_5374 = ____require_result_6["英雄使用物品音效冷却"]
+local _____82F1_96C4_4F7F_7528_7269_54C1_547D_4EE4_6700_5C0F = ____require_result_6["英雄使用物品命令最小"]
+local _____82F1_96C4_4F7F_7528_7269_54C1_547D_4EE4_6700_5927 = ____require_result_6["英雄使用物品命令最大"]
 local _____51B7_5374_5355_4F4D_5B57_6BB5 = "使用物品语音"
 local _____82F1_96C4_4F7F_7528_7269_54C1_97F3_6548_5DF2_521D_59CB_5316 = false
 local _____7269_54C1_4F7F_7528_97F3_6548_51B7_5374_7ED3_675F_5355_4F4D_961F_5217 = {}
@@ -76,7 +77,7 @@ local function _____64AD_653E_7269_54C1_4F7F_7528_97F3_6548(unit, config)
         return
     end
     if GetOwningPlayer(unit) == GetLocalPlayer() then
-        PlaySoundBJ(soundHandle)
+        StartSound(soundHandle)
     end
 end
 local function _____5904_7406_7269_54C1_4F7F_7528_97F3_6548(unit, item)

@@ -11,7 +11,6 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local jglobals = require("jass.globals")
 local ____Frame_5DE5_5177 = require("lib.扩展函数.封装函数.04．硬件输入.07．Frame函数")
-local _____540C_6B65_8F93_5165 = require("lib.扩展函数.封装函数.04．硬件输入.08．同步硬件输入中心")
 local _____786C_4EF6_5E38_91CF = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
 local _____82F1_96C4_6865_63A5 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local _____77E9_5F62_51FD_6570 = require("lib.扩展函数.BJ函数.04．矩形与区域")
@@ -19,9 +18,15 @@ local _____97F3_6548_51FD_6570 = require("lib.扩展函数.封装函数.02．音
 local DzFrameShow = japi.DzFrameShow
 local DzGetTriggerUIEventFrame = japi.DzGetTriggerUIEventFrame
 local DzIsChatBoxOpen = japi.DzIsChatBoxOpen
+local DzTriggerRegisterKeyEventByCode = japi.DzTriggerRegisterKeyEventByCode
+local DzTriggerRegisterSyncData = japi.DzTriggerRegisterSyncData
+local DzSyncData = japi.DzSyncData
+local DzGetTriggerSyncPlayer = japi.DzGetTriggerSyncPlayer
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetPlayerId = jass.GetPlayerId
 local CreateTimer = jass.CreateTimer
+local CreateTrigger = jass.CreateTrigger
+local TriggerAddAction = jass.TriggerAddAction
 local TimerStart = jass.TimerStart
 local GetExpiredTimer = jass.GetExpiredTimer
 local GetHandleId = jass.GetHandleId
@@ -29,9 +34,12 @@ local DestroyTimer = jass.DestroyTimer
 local _____5730_70B9_9F20_6807_8FDB_5165_4E8B_4EF6 = 2
 local _____5730_70B9_9F20_6807_79BB_5F00_4E8B_4EF6 = 3
 local _____5730_56FE_5C55_5F00_5EF6_8FDF_79D2 = 0.3
+local _____4E16_754C_5730_56FE_6309_952E_540C_6B65_524D_7F00 = "WMAP"
 local _____73A9_5BB6_5730_56FE_6253_5F00_72B6_6001_8868 = {}
 local _____5730_56FE_5C55_5F00_73A9_5BB6_8868 = {}
 local _____4E16_754C_5730_56FE_4EA4_4E92_5DF2_521D_59CB_5316 = false
+local _____4E16_754C_5730_56FE_672C_673A_6309_952E_89E6_53D1_5668 = nil
+local _____4E16_754C_5730_56FE_540C_6B65_89E6_53D1_5668 = nil
 local function _____83B7_53D6_77E9_5F62(_____77E9_5F62_952E)
     if _____77E9_5F62_952E == nil or _____77E9_5F62_952E == "" then
         return nil
@@ -144,12 +152,15 @@ ____exports["刷新世界地图当前位置"] = function(_____73A9_5BB6)
         end
     end
 end
-local function ____on_4E16_754C_5730_56FE_6309_952E(event)
-    local _____73A9_5BB6 = event.player
-    if _____73A9_5BB6 == nil or _____73A9_5BB6 == 0 then
+local function ____on_4E16_754C_5730_56FE_672C_673A_6309_952E()
+    if DzIsChatBoxOpen() == true then
         return
     end
-    if DzIsChatBoxOpen() == true then
+    DzSyncData(_____4E16_754C_5730_56FE_6309_952E_540C_6B65_524D_7F00, "1")
+end
+local function ____on_4E16_754C_5730_56FE_6309_952E_540C_6B65()
+    local _____73A9_5BB6 = DzGetTriggerSyncPlayer()
+    if _____73A9_5BB6 == nil or _____73A9_5BB6 == 0 then
         return
     end
     ____exports["刷新世界地图当前位置"](_____73A9_5BB6)
@@ -173,12 +184,12 @@ local function _____6CE8_518C_5730_70B9_60AC_505C_4E8B_4EF6()
             do
                 local _____5730_70B9_5E27 = _____4E16_754C_5730_56FE_5E27["地点帧组表"][_____7D22_5F15 + 1]
                 if _____5730_70B9_5E27 == nil then
-                    goto __continue41
+                    goto __continue42
                 end
                 ____Frame_5DE5_5177.frameSetScriptByCode(_____5730_70B9_5E27["按钮"], _____5730_70B9_9F20_6807_8FDB_5165_4E8B_4EF6, ____on_5730_70B9_9F20_6807_8FDB_5165, false)
                 ____Frame_5DE5_5177.frameSetScriptByCode(_____5730_70B9_5E27["按钮"], _____5730_70B9_9F20_6807_79BB_5F00_4E8B_4EF6, ____on_5730_70B9_9F20_6807_79BB_5F00, false)
             end
-            ::__continue41::
+            ::__continue42::
             _____7D22_5F15 = _____7D22_5F15 + 1
         end
     end
@@ -189,6 +200,16 @@ ____exports["初始化世界地图交互"] = function()
     end
     _____4E16_754C_5730_56FE_4EA4_4E92_5DF2_521D_59CB_5316 = true
     _____6CE8_518C_5730_70B9_60AC_505C_4E8B_4EF6()
-    _____540C_6B65_8F93_5165.registerSyncHardwareKey(_____786C_4EF6_5E38_91CF.KEY.M, _____786C_4EF6_5E38_91CF.KEY_STATE.DOWN, ____on_4E16_754C_5730_56FE_6309_952E)
+    _____4E16_754C_5730_56FE_540C_6B65_89E6_53D1_5668 = CreateTrigger()
+    TriggerAddAction(_____4E16_754C_5730_56FE_540C_6B65_89E6_53D1_5668, ____on_4E16_754C_5730_56FE_6309_952E_540C_6B65)
+    DzTriggerRegisterSyncData(_____4E16_754C_5730_56FE_540C_6B65_89E6_53D1_5668, _____4E16_754C_5730_56FE_6309_952E_540C_6B65_524D_7F00, false)
+    _____4E16_754C_5730_56FE_672C_673A_6309_952E_89E6_53D1_5668 = CreateTrigger()
+    DzTriggerRegisterKeyEventByCode(
+        _____4E16_754C_5730_56FE_672C_673A_6309_952E_89E6_53D1_5668,
+        _____786C_4EF6_5E38_91CF.KEY.M,
+        _____786C_4EF6_5E38_91CF.KEY_STATE.DOWN,
+        false,
+        ____on_4E16_754C_5730_56FE_672C_673A_6309_952E
+    )
 end
 return ____exports

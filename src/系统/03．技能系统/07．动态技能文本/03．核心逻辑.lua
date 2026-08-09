@@ -7,6 +7,7 @@ local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__StringReplace = ____lualib.__TS__StringReplace
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
+local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local _____63D0_53D6_500D_7387
@@ -42,9 +43,12 @@ end
 -- 遍历本地玩家选中单位的命令卡技能，动态替换描述中的公式为实际伤害数值
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local heroConfigTool = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_0.debugLog
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_1.debugLog
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetHandleId = jass.GetHandleId
 local R2I = jass.R2I
@@ -665,7 +669,6 @@ local function _____5904_7406_6280_80FD_63D0_793A(unit, abilityId)
     local newTip = _____66FF_6362_516C_5F0F(unit, originalTip)
     if newTip ~= currentTip then
         DzSetUnitAbilityUberTip(unit, abilityId, newTip)
-        DzSetUnitAbilityUpdate(unit, abilityId)
         return true
     end
     return false
@@ -680,8 +683,46 @@ local function _____6062_590D_5355_4E2A_6280_80FD_539F_59CB_6587_672C(unit, abil
         return false
     end
     DzSetUnitAbilityUberTip(unit, abilityId, originalTip)
-    DzSetUnitAbilityUpdate(unit, abilityId)
     return true
+end
+local function _____89E3_6790_914D_7F6E_6280_80FD_5217_8868(hero)
+    local config = heroConfigTool["获取单位玩家英雄配置"](hero)
+    if config == nil then
+        return {}
+    end
+    local result = {}
+    local seen = {}
+    local fields = {config.heroAbilList, config.abilList}
+    do
+        local i = 0
+        while i < #fields do
+            do
+                local rawList = fields[i + 1]
+                if type(rawList) ~= "string" then
+                    goto __continue138
+                end
+                local parts = __TS__StringSplit(rawList, ",")
+                do
+                    local j = 0
+                    while j < #parts do
+                        do
+                            local abilityId = stringToFourCCSafe(parts[j + 1])
+                            if abilityId == 0 or seen[abilityId] == true then
+                                goto __continue141
+                            end
+                            seen[abilityId] = true
+                            result[#result + 1] = abilityId
+                        end
+                        ::__continue141::
+                        j = j + 1
+                    end
+                end
+            end
+            ::__continue138::
+            i = i + 1
+        end
+    end
+    return result
 end
 --- 检查本地主控单位的命令卡技能
 ____exports["检查英雄技能"] = function(hero)
@@ -705,7 +746,9 @@ ____exports["恢复英雄技能原始文本"] = function(hero)
     if not isValidHandle(hero) then
         return
     end
-    local abilityIds = _____5DF2_5904_7406_6280_80FD_7F13_5B58[_____751F_6210_82F1_96C4_7F13_5B58_952E(hero)] or _____83B7_53D6_5FEB_7167_6280_80FD_5217_8868(hero)
+    local cacheKey = _____751F_6210_82F1_96C4_7F13_5B58_952E(hero)
+    local cachedAbilityIds = _____5DF2_5904_7406_6280_80FD_7F13_5B58[cacheKey]
+    local abilityIds = cachedAbilityIds or _____83B7_53D6_5FEB_7167_6280_80FD_5217_8868(hero)
     do
         local i = 0
         while i < #abilityIds do
@@ -713,10 +756,7 @@ ____exports["恢复英雄技能原始文本"] = function(hero)
             i = i + 1
         end
     end
-    __TS__Delete(
-        _____5DF2_5904_7406_6280_80FD_7F13_5B58,
-        _____751F_6210_82F1_96C4_7F13_5B58_952E(hero)
-    )
+    __TS__Delete(_____5DF2_5904_7406_6280_80FD_7F13_5B58, cacheKey)
 end
 ____exports["恢复单个英雄技能原始文本"] = function(hero, abilityId)
     if not isValidHandle(hero) or abilityId == 0 then
@@ -732,5 +772,44 @@ ____exports["刷新单个英雄技能动态文本"] = function(hero, abilityId)
         return
     end
     _____5904_7406_6280_80FD_63D0_793A(hero, abilityId)
+end
+local function _____672C_5730_5237_65B0_6307_5B9A_82F1_96C4_52A8_6001_6587_672C(hero)
+    local _____5FEB_7167 = selectionSnapshotSystem["获取本地选中技能快照"]()
+    if _____5FEB_7167.hero ~= hero then
+        return
+    end
+    ____exports["检查英雄技能"](hero)
+end
+--- 装备属性变化后的同步技能界面刷新。调用者必须处于全端对称事件。
+____exports["同步刷新英雄技能界面"] = function(hero)
+    if not isValidHandle(hero) then
+        return
+    end
+    _____672C_5730_5237_65B0_6307_5B9A_82F1_96C4_52A8_6001_6587_672C(hero)
+    local abilityIds = _____89E3_6790_914D_7F6E_6280_80FD_5217_8868(hero)
+    do
+        local i = 0
+        while i < #abilityIds do
+            DzSetUnitAbilityUpdate(hero, abilityIds[i + 1])
+            i = i + 1
+        end
+    end
+end
+____exports["同步刷新英雄技能原始界面"] = function(hero)
+    if not isValidHandle(hero) then
+        return
+    end
+    local _____5FEB_7167 = selectionSnapshotSystem["获取本地选中技能快照"]()
+    if _____5FEB_7167.hero == hero then
+        ____exports["恢复英雄技能原始文本"](hero)
+    end
+    local abilityIds = _____89E3_6790_914D_7F6E_6280_80FD_5217_8868(hero)
+    do
+        local i = 0
+        while i < #abilityIds do
+            DzSetUnitAbilityUpdate(hero, abilityIds[i + 1])
+            i = i + 1
+        end
+    end
 end
 return ____exports

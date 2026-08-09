@@ -14,12 +14,11 @@ local ____require_result_2 = require("系统.01．单位系统.00．单位初始
 local _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_914D_7F6E = ____require_result_2["获取单位玩家英雄配置"]
 local ____require_result_3 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名")
 local _____5355_4F4D_662F_5426_5339_914D_73A9_5BB6_82F1_96C4_540D_79F0 = ____require_result_3["单位是否匹配玩家英雄名称"]
-local ____require_result_4 = require("lib.扩展函数.BJ函数.14．音效函数")
-local PlaySoundBJ = ____require_result_4.PlaySoundBJ
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
+local StartSound = jass.StartSound
 local _____82F1_96C4_5347_7EA7_97F3_6548_5DF2_521D_59CB_5316 = false
 local function _____53D6_5355_4F4D_5339_914D_540D_5217_8868(unit)
     local config = _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_914D_7F6E(unit)
@@ -27,16 +26,16 @@ local function _____53D6_5355_4F4D_5339_914D_540D_5217_8868(unit)
         return {}
     end
     local result = {}
-    local ____config_Name_5 = config.Name
-    if ____config_Name_5 == nil then
-        ____config_Name_5 = ""
+    local ____config_Name_4 = config.Name
+    if ____config_Name_4 == nil then
+        ____config_Name_4 = ""
     end
-    local name = __TS__StringTrim(tostring(____config_Name_5))
-    local ____config_Propernames_6 = config.Propernames
-    if ____config_Propernames_6 == nil then
-        ____config_Propernames_6 = ""
+    local name = __TS__StringTrim(tostring(____config_Name_4))
+    local ____config_Propernames_5 = config.Propernames
+    if ____config_Propernames_5 == nil then
+        ____config_Propernames_5 = ""
     end
-    local proper = __TS__StringTrim(tostring(____config_Propernames_6))
+    local proper = __TS__StringTrim(tostring(____config_Propernames_5))
     if name ~= "" then
         result[#result + 1] = name
     end
@@ -69,7 +68,7 @@ local function _____672C_5730_64AD_653E_5347_7EA7_97F3_6548(unit, soundHandle)
     if GetLocalPlayer() ~= owner then
         return
     end
-    PlaySoundBJ(soundHandle)
+    StartSound(soundHandle)
 end
 local function ____on_82F1_96C4_5347_7EA7_8BED_97F3(heroUnit)
     if heroUnit == nil or heroUnit == 0 then

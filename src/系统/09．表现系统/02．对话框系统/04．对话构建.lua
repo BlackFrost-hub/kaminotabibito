@@ -1,9 +1,9 @@
 local ____lualib = require("lualib_bundle")
-local __TS__StringSplit = ____lualib.__TS__StringSplit
-local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
 local __TS__Number = ____lualib.__TS__Number
+local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
 local ____02_FF0E_5BF9_8BDD_6846_4E1A_52A1_903B_8F91 = require("系统.09．表现系统.02．对话框系统.02．对话框业务逻辑")
 local DEFAULT_AFTER_COMPLETE_MSG = ____02_FF0E_5BF9_8BDD_6846_4E1A_52A1_903B_8F91.DEFAULT_AFTER_COMPLETE_MSG
@@ -30,8 +30,8 @@ local ____npcEffect = require("系统.09．表现系统.02．对话框系统.09�
 local function getDialogNpcUnit(playerId)
     return ____npcEffect.getNpcUnit(playerId)
 end
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local stringToFourCC = ____require_result_0.stringToFourCC
+local ____require_result_0 = require("系统.09．表现系统.02．对话框系统.14．任务物品发放")
+local _____53D1_653E_4EFB_52A1_7269_54C1 = ____require_result_0["发放任务物品"]
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
 local ____G_1 = _G
 local addDelayedCallback = ____G_1.addDelayedCallback
@@ -50,26 +50,6 @@ local function normalizeRequireCount(self, count)
 end
 local function refreshTaskUIForAllClientsSoon(self, playerId, questId)
     questManager:triggerUIRefresh(playerId, questId)
-end
-local function grantQuestItems(self, hero, questItems)
-    if not hero or not questItems or questItems == "" then
-        return
-    end
-    local items = __TS__StringSplit(questItems, "|")
-    for ____, raw in ipairs(items) do
-        do
-            local itemCode = __TS__StringTrim(raw)
-            if #itemCode ~= 4 then
-                goto __continue9
-            end
-            local itemId = stringToFourCC(itemCode)
-            if itemId == 0 then
-                goto __continue9
-            end
-            jass.UnitAddItemById(hero, itemId)
-        end
-        ::__continue9::
-    end
 end
 local function canAcceptQuestByRequirements(self, quest, hero)
     local req = quest["接取条件"]
@@ -131,7 +111,7 @@ local function canAcceptQuestByRequirements(self, quest, hero)
     return ____isGreaterThan_3
 end
 local function getQuestRewardDisplayText(self, quest)
-    return resolveRewardDisplayText(nil, quest)
+    return resolveRewardDisplayText(quest)
 end
 function ____exports.parseDialogText(self, raw, npcName, heroName)
     local lines = {}
@@ -172,17 +152,17 @@ function ____exports.parseDialogText(self, raw, npcName, heroName)
         do
             local trimmed = __TS__StringTrim(part)
             if not trimmed then
-                goto __continue36
+                goto __continue30
             end
             local withoutOrder = trimOrderedPrefix(nil, trimmed)
             local parsed = tryParseSpeakerLine(nil, withoutOrder)
             if parsed then
                 lines[#lines + 1] = {title = parsed.title, text = parsed.text, duration = 4}
-                goto __continue36
+                goto __continue30
             end
             lines[#lines + 1] = {title = npcName, text = trimmed, duration = 4}
         end
-        ::__continue36::
+        ::__continue30::
     end
     return #lines > 0 and lines or ({{title = npcName, text = raw, duration = 4}})
 end
@@ -268,7 +248,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                         1,
                         playerName
                     )
-                    grantQuestItems(nil, hero, quest["任务物品"])
+                    _____53D1_653E_4EFB_52A1_7269_54C1(hero, quest["任务物品"])
                     if quest["接取后动作"] then
                         quest["接取后动作"](quest, dialogOwnerId)
                     end

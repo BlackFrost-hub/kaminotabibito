@@ -50,7 +50,7 @@ local function _____8BA1_7B97_53EC_5524_751F_547D_503C(_____6301_6709_8005, ____
     return _____57FA_7840_503C + GetUnitStateJapi(_____6301_6709_8005, _____6700_5927_751F_547D_72B6_6001) * _____7CFB_6570
 end
 local function _____8BA1_7B97_53EC_5524_653B_51FB_529B(_____6301_6709_8005, _____57FA_7840_503C, _____653B_51FB_72B6_6001, _____7CFB_6570)
-    return _____57FA_7840_503C + jass.GetUnitState(
+    return _____57FA_7840_503C + GetUnitStateJapi(
         _____6301_6709_8005,
         jass.ConvertUnitState(_____653B_51FB_72B6_6001)
     ) * _____7CFB_6570

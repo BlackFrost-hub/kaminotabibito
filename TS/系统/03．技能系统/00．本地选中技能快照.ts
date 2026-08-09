@@ -8,8 +8,8 @@ const 玩家系统常量 = require("系统.00．核心系统.00．玩家系统.0
 const selectionCenterSystem = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心") as {
   getSoleSelectedUnitForPlayer: (this: void, playerId: number) => any | null;
 };
-const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
-  YDUserDataGet: (tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataGetSafe: (this: void, tableTypeName: string, tableKey: any, attr: string, valueTypeName: string) => any;
 };
 const commandBarAbility = require("系统.03．技能系统.01．技能冷却.04．命令卡技能槽位") as {
   读取命令卡按钮能力Id: (this: void, x: number, y: number) => number;
@@ -81,7 +81,7 @@ function 读取玩家唯一选中英雄(this: void, playerId: number): any | nul
 
 function 获取已注册玩家英雄(this: void, whichPlayer: any): any | null {
   if (!isValidHandle(whichPlayer)) return null;
-  const hero = YDUserDataGet("player", whichPlayer, 玩家系统常量.YD_ATTR_PLAYER_HERO_UNIT, "unit");
+  const hero = YDUserDataGetSafe("player", whichPlayer, 玩家系统常量.YD_ATTR_PLAYER_HERO_UNIT, "unit");
   return isValidHandle(hero) ? hero : null;
 }
 

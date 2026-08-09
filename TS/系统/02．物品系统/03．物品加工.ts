@@ -18,6 +18,7 @@
  */
 
 const jass = require("jass.common") as any;
+const R2I = jass.R2I as (value: number) => number;
 const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
@@ -28,10 +29,10 @@ const { onItemPickup, onItemDrop } = require("系统.00．核心系统.01．事�
   onItemDrop: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
 const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
-  getItemDataEntry: (this: void, item: any) => any | null;
+  getItemDataEntry: (this: void, item: any) => { recipe?: string } | null;
 };
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  createTimedEffect: (modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
 const 漂浮文字模块 = require("lib.扩展函数.封装函数.03．漂浮文字.index") as {
   CreateFloatTextAtPoint: (this: void, x: number, y: number, text: string, options?: any) => any;
@@ -48,10 +49,17 @@ const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品�
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+const { 创建世界坐标进度UI, 更新世界坐标进度UI, 销毁世界坐标进度UI } = require("系统.09．表现系统.15．世界坐标进度UI.index") as {
+  创建世界坐标进度UI: (this: void, 参数: any) => any;
+  更新世界坐标进度UI: (this: void, ui: any, 当前值: number, 立即更新?: boolean) => void;
+  销毁世界坐标进度UI: (this: void, ui: any) => void;
+};
 
 const CAMPFIRE_ID = 0x68303043; // 'h00C'
 const EFFECT_FIREBOMB = "war3mapImported\\Firebomb.mdl";
 const CAMPFIRE_EVENT_PLAYER_IDS = [0, 1, 2, 3] as const;
+const 加工UI基础高度 = 100;
+const 加工UI屏幕行距 = 0.010;
 
 type ResultOpt = { prob?: number; itemId: number; qty: number };
 type RecipeParsed = { cookSec: number; timeoutSec: number; results: ResultOpt[] };
@@ -62,10 +70,14 @@ type ItemState = {
   stage: "raw" | "done";
   cookTimer?: any;
   burnTimer?: any;
+  UI?: any;
+  行号?: number;
+  开始毫秒?: number;
+  到期毫秒?: number;
 };
 
-const itemState = new Map<number, ItemState>();       // itemHandleId -> state
-const campfireItems = new Map<number, Set<number>>(); // campfireHandleId -> itemHandleId 集合
+const itemState: Record<number, ItemState | undefined> = {};       // itemHandleId -> state
+const campfireItems: Record<number, number[] | undefined> = {};     // campfireHandleId -> itemHandleId 列表
 
 const 物品加工计时检查间隔毫秒 = 10;
 const 物品加工任务ID列表: number[] = [];
@@ -77,15 +89,77 @@ const 物品加工任务结果列表: ResultOpt[][] = [];
 const 物品加工任务到期毫秒列表: number[] = [];
 let 物品加工计时检查回调ID = 0;
 let 下一个物品加工任务ID = 0;
+let 正在将加工产物放回篝火 = false;
 
 function getHandleIdSafe(handle: any): number {
   if (!handle) return 0;
   return ((jass as any).GetHandleId(handle) as number) || 0;
 }
 
+function 取物品加工行号(this: void, item: any): number {
+  const itemId = getHandleIdSafe(item);
+  const state = itemState[itemId];
+  return state?.行号 ?? 0;
+}
+
+function 分配物品加工行号(this: void, campfireId: number): number {
+  const items = campfireItems[campfireId];
+  if (items == null || items.length === 0) return 0;
+  let row = 0;
+  while (true) {
+    let occupied = false;
+    for (let i = 0; i < items.length; i++) {
+      const state = itemState[items[i]];
+      if (state != null && state.行号 === row) {
+        occupied = true;
+        break;
+      }
+    }
+    if (!occupied) return row;
+    row += 1;
+  }
+}
+
+function 创建物品加工UI(this: void, item: any, campfire: any, maximum: number, current: number, title: string): any {
+  if (!(maximum > 0)) return null;
+  const { x, y } = getUnitXY(campfire);
+  return 创建世界坐标进度UI({
+    X: x,
+    Y: y,
+    Z: 加工UI基础高度,
+    屏幕Y偏移: 取物品加工行号(item) * 加工UI屏幕行距,
+    最大值: maximum,
+    当前值: current,
+    标题: title,
+    数值后缀: "秒",
+    类型: "自然",
+    平滑过渡秒: 0.05,
+    初始显示: true,
+    雾中可见: false,
+  });
+}
+
+function 销毁物品加工UI(this: void, state: ItemState | undefined): void {
+  if (state == null || state.UI == null) return;
+  销毁世界坐标进度UI(state.UI);
+  state.UI = undefined;
+}
+
+function 刷新物品加工UI(this: void, item: any, now: number, type: "burn" | "cook"): void {
+  const state = itemState[getHandleIdSafe(item)];
+  if (state == null || state.UI == null || state.开始毫秒 == null || state.到期毫秒 == null) return;
+  if (type === "cook") {
+    const elapsed = (now - state.开始毫秒) / 1000;
+    更新世界坐标进度UI(state.UI, elapsed);
+    return;
+  }
+  const remaining = (state.到期毫秒 - now) / 1000;
+  更新世界坐标进度UI(state.UI, remaining > 0 ? remaining : 0);
+}
+
 function 处理烤焦到期(this: void, item: any, campfire: any): void {
   const itemId = getHandleIdSafe(item);
-  if (itemId === 0 || !itemState.has(itemId)) return;
+  if (itemId === 0 || !itemState[itemId]) return;
   const name = getItemNameSafe(item);
   floatBurnText(campfire, name);
   (jass as any).RemoveItem(item);
@@ -94,7 +168,9 @@ function 处理烤焦到期(this: void, item: any, campfire: any): void {
 
 function 处理加工到期(this: void, item: any, campfire: any, timeoutSec: number, results: ResultOpt[]): void {
   const itemId = getHandleIdSafe(item);
-  if (itemId === 0 || !itemState.has(itemId)) return;
+  if (itemId === 0 || !itemState[itemId]) return;
+  const state = itemState[itemId];
+  const oldRow = state?.行号 ?? 0;
   // 加工完成：替换物品
   playFinishEffect(campfire);
 
@@ -127,10 +203,10 @@ function 处理加工到期(this: void, item: any, campfire: any, timeoutSec: nu
       const itemId = getHandleIdSafe(it);
       const campfireId = getHandleIdSafe(campfire);
       if (itemId !== 0 && campfireId !== 0) {
-        itemState.set(itemId, { item: it, campfire, stage: "done" });
-        let set = campfireItems.get(campfireId);
-        if (!set) { set = new Set<number>(); campfireItems.set(campfireId, set); }
-        set.add(itemId);
+        itemState[itemId] = { item: it, campfire, stage: "done", 行号: oldRow };
+        let items = campfireItems[campfireId];
+        if (!items) { items = []; campfireItems[campfireId] = items; }
+        items.push(itemId);
       }
       if (timeout > 0) startBurnTimer(it, campfire, timeout);
     }
@@ -155,13 +231,13 @@ function getItemNameSafe(item: any): string {
 
 function getItemChargesSafe(item: any): number {
   const n = (jass as any).GetItemCharges(item);
-  const v = jass.R2I((Number(n as any) as any) ?? 0) || 0;
+  const v = R2I((Number(n as any) as any) ?? 0) || 0;
   return v > 0 ? v : 1;
 }
 
 function setItemChargesSafe(item: any, n: number): void {
   if (!item) return;
-  const v = jass.R2I(n) || 1;
+  const v = R2I(n) || 1;
   (jass as any).SetItemCharges(item, v > 0 ? v : 1);
 }
 
@@ -193,7 +269,7 @@ function playFinishEffect(campfire: any): void {
 
 function getRecipeForItem(item: any): RecipeParsed | null {
   const entry = itemRelatedFns.getItemDataEntry(item);
-  const recipe = entry && entry.recipe ? entry.recipe : undefined;
+  const recipe: string | undefined = entry && entry.recipe ? entry.recipe : undefined;
   if (!recipe) return null;
 
   // 只处理 h00C: 前缀
@@ -212,8 +288,8 @@ function getRecipeForItem(item: any): RecipeParsed | null {
   const resultsStr = rest.substring(arrowIdx + 2, colonIdx).trim();
   const timeoutStr = rest.substring(colonIdx + 1).trim();
 
-  const cookSec = jass.R2I(parseFloat(cookStr) || 0);
-  const timeoutSec = jass.R2I(parseFloat(timeoutStr) || 0);
+  const cookSec = R2I(parseFloat(cookStr) || 0);
+  const timeoutSec = R2I(parseFloat(timeoutStr) || 0);
   if (cookSec <= 0) return null;
 
   const rawOpts = resultsStr.split(";").map((s: string) => s.trim()).filter((s: string) => s !== "");
@@ -232,7 +308,7 @@ function getRecipeForItem(item: any): RecipeParsed | null {
     const starIdx = s.indexOf("*");
     const idPart = (starIdx >= 0 ? s.substring(0, starIdx) : s).trim();
     const qtyPart = (starIdx >= 0 ? s.substring(starIdx + 1) : "").trim();
-    const qty = jass.R2I(parseFloat(qtyPart) || 1);
+    const qty = R2I(parseFloat(qtyPart) || 1);
     const itemId = fourCCToInt(idPart);
     if (itemId !== 0 && qty > 0) opts.push({ prob, itemId, qty });
   }
@@ -264,7 +340,7 @@ function pickResult(results: ResultOpt[]): ResultOpt {
   // 全 0：均匀
   if (total <= 0) {
     const idx = (jass as any).GetRandomInt(1, results.length);
-    return (results as any)[idx];
+    return results[idx - 1];
   }
   let roll = ((jass as any).GetRandomReal(0, 1) as number) * total;
   for (let i = 0; i < results.length; i++) {
@@ -281,7 +357,10 @@ function createItemAtCampfire(campfire: any, itemId: number): any {
 
 function tryGiveItemToCampfire(campfire: any, item: any): boolean {
   if (!item) return false;
-  return !!(jass as any).UnitAddItem(campfire, item);
+  正在将加工产物放回篝火 = true;
+  const success = !!(jass as any).UnitAddItem(campfire, item);
+  正在将加工产物放回篝火 = false;
+  return success;
 }
 
 function 停止物品加工计时检查(this: void): void {
@@ -351,6 +430,7 @@ function on物品加工计时检查(this: void): void {
         );
       }
     } else {
+      刷新物品加工UI(物品加工任务物品列表[i], now, 物品加工任务类型列表[i]);
       物品加工任务ID列表[writeIndex] = taskId;
       物品加工任务类型列表[writeIndex] = 物品加工任务类型列表[i];
       物品加工任务物品列表[writeIndex] = 物品加工任务物品列表[i];
@@ -380,41 +460,60 @@ function on物品加工计时检查(this: void): void {
 function untrackItem(item: any): void {
   const itemId = getHandleIdSafe(item);
   if (itemId === 0) return;
-  const st = itemState.get(itemId);
+  const st = itemState[itemId];
   if (!st) return;
+  销毁物品加工UI(st);
   if (st.cookTimer) 取消物品加工任务引用(st.cookTimer);
   if (st.burnTimer) 取消物品加工任务引用(st.burnTimer);
-  itemState.delete(itemId);
+  itemState[itemId] = undefined;
 
   const campfireId = getHandleIdSafe(st.campfire);
-  const set = campfireItems.get(campfireId);
-  if (set) {
-    set.delete(itemId);
-    if (set.size === 0) campfireItems.delete(campfireId);
+  const items = campfireItems[campfireId];
+  if (items) {
+    for (let i = 0; i < items.length; i++) {
+      if (items[i] === itemId) {
+        items.splice(i, 1);
+        break;
+      }
+    }
+    if (items.length === 0) campfireItems[campfireId] = undefined;
   }
 }
 
 function startBurnTimer(item: any, campfire: any, sec: number): void {
-  const st = itemState.get(getHandleIdSafe(item));
+  const st = itemState[getHandleIdSafe(item)];
+  if (st == null) return;
+  销毁物品加工UI(st);
+  const startMs = getServerTime();
+  st.开始毫秒 = startMs;
+  st.到期毫秒 = startMs + sec * 1000;
+  if (sec > 0) {
+    st.UI = 创建物品加工UI(item, campfire, sec, sec, st.stage === "done" ? "烧烤失败" : getItemNameSafe(item));
+  }
   const taskId = 安排物品加工任务("burn", item, campfire, sec, 0, []);
-  if (st) st.burnTimer = taskId;
+  st.burnTimer = taskId;
 }
 
 function startCookTimer(item: any, campfire: any, recipe: RecipeParsed): void {
-  const st = itemState.get(getHandleIdSafe(item));
+  const st = itemState[getHandleIdSafe(item)];
+  if (st == null) return;
+  销毁物品加工UI(st);
+  const startMs = getServerTime();
+  st.开始毫秒 = startMs;
+  st.到期毫秒 = startMs + recipe.cookSec * 1000;
+  st.UI = 创建物品加工UI(item, campfire, recipe.cookSec, 0, getItemNameSafe(item));
   const taskId = 安排物品加工任务("cook", item, campfire, recipe.cookSec, recipe.timeoutSec, recipe.results);
-  if (st) st.cookTimer = taskId;
+  st.cookTimer = taskId;
 }
 
-function onAnyPickup(): void {
-  const u = (jass as any).GetTriggerUnit();
-  const item = (jass as any).GetManipulatedItem();
+function onAnyPickup(this: void, u: any, item: any): void {
   if (!u || !item) return;
+  if (正在将加工产物放回篝火 && isCampfire(u)) return;
 
   // 取回：其他单位拾取了处于追踪中的 item
   if (!isCampfire(u)) {
     const itemId = getHandleIdSafe(item);
-    if (itemId !== 0 && itemState.has(itemId)) {
+    if (itemId !== 0 && itemState[itemId]) {
       untrackItem(item);
     }
     return;
@@ -424,14 +523,15 @@ function onAnyPickup(): void {
   const itemId = getHandleIdSafe(item);
   const campfireId = getHandleIdSafe(u);
   if (itemId === 0 || campfireId === 0) return;
-  if (itemState.has(itemId)) return;
+  if (itemState[itemId]) return;
 
   const recipe = getRecipeForItem(item);
   const campfire = u;
-  itemState.set(itemId, { item, campfire, stage: "raw" });
-  let set = campfireItems.get(campfireId);
-  if (!set) { set = new Set<number>(); campfireItems.set(campfireId, set); }
-  set.add(itemId);
+  let items = campfireItems[campfireId];
+  if (!items) { items = []; campfireItems[campfireId] = items; }
+  const 行号 = 分配物品加工行号(campfireId);
+  itemState[itemId] = { item, campfire, stage: "raw", 行号 };
+  items.push(itemId);
 
   if (!recipe) {
     // 无 recipe：15 秒烤焦倒计时
@@ -442,33 +542,32 @@ function onAnyPickup(): void {
   }
 }
 
+function 处理物品丢弃事件(this: void, unit: any, item: any): void {
+  const itemId = getHandleIdSafe(item);
+  if (unit && item && isCampfire(unit) && itemId !== 0 && itemState[itemId]) {
+    untrackItem(item);
+  }
+}
+
 function onCampfireDeath(this: void, dyingUnit: any): void {
   if (!dyingUnit || !isCampfire(dyingUnit)) return;
   const campfireId = getHandleIdSafe(dyingUnit);
-  const set = campfireItems.get(campfireId);
-  if (!set) return;
-  const itemIds = Array.from(set.values());
+  const items = campfireItems[campfireId];
+  if (!items) return;
+  const itemIds = items.slice();
   for (let i = 0; i < itemIds.length; i++) {
-    const st = itemState.get(itemIds[i]);
+    const st = itemState[itemIds[i]];
     if (st) {
       untrackItem(st.item);
     }
   }
-  campfireItems.delete(campfireId);
+  campfireItems[campfireId] = undefined;
 }
 
 export function init物品加工(): void {
   // 使用物品事件中心注册，减少触发器数量
-  onItemPickup((unit, item) => {
-    onAnyPickup();
-  });
-
-  onItemDrop((unit, item) => {
-    const itemId = getHandleIdSafe(item);
-    if (unit && item && isCampfire(unit) && itemId !== 0 && itemState.has(itemId)) {
-      untrackItem(item);
-    }
-  });
+  onItemPickup(onAnyPickup);
+  onItemDrop(处理物品丢弃事件);
 
   registerDeathListener(onCampfireDeath);
 }

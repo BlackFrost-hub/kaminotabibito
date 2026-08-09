@@ -93,6 +93,7 @@ const GetUnitName = jass.GetUnitName as (unit: any) => string;
 const ReviveHeroLoc = jass.ReviveHeroLoc as (whichHero: any, loc: any, showExp: boolean) => void;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
+const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 const Location = jass.Location as (x: number, y: number) => any;
@@ -103,7 +104,7 @@ const R2I = jass.R2I as (value: number) => number;
 
 const 复活延迟秒 = 10.0;
 const 复活无敌秒 = 1.0;
-const 复活半径 = 400.0;
+const 复活半径 = 500.0;
 const 复活推进步数 = 20;
 const 复活次数属性 = "次数";
 const 复活次数表 = "团队复活";
@@ -153,6 +154,12 @@ function 取英雄栏槽位(this: void, unit: any): number {
   const playerId = GetPlayerId(owner);
   if (playerId < 0 || playerId >= 英雄栏文本框体数量) return -1;
   return playerId;
+}
+
+function 是否本地英雄栏槽位(this: void, 槽位: number): boolean {
+  const localPlayer = GetLocalPlayer();
+  if (!是否有效(localPlayer)) return false;
+  return GetPlayerId(localPlayer) === 槽位;
 }
 
 function 十倍精度文本(this: void, value: number): string {
@@ -214,7 +221,7 @@ function 刷新英雄栏倒计时文本(this: void, 槽位: number): void {
   const 文本组 = 英雄栏倒计时文本组表[槽位];
   if (文本组 != null) {
     设置冷却数字文本(文本组, 十倍精度文本(英雄栏倒计时剩余秒表[槽位]));
-    显示冷却数字文本(文本组, true);
+    显示冷却数字文本(文本组, 是否本地英雄栏槽位(槽位));
     return;
   }
   const 底阴影框体 = 英雄栏倒计时底阴影框体表[槽位];
@@ -234,7 +241,7 @@ function 刷新英雄栏倒计时文本(this: void, 槽位: number): void {
 function 创建英雄栏倒计时框体(this: void, 槽位: number): number {
   const gameUI = DzGetGameUI();
   if (gameUI === 0) return 0;
-  const button = DzFrameGetHeroBarButton(槽位);
+  const button = DzFrameGetHeroBarButton(0);
   if (button === 0) return 0;
 
   const 文本组 = 创建冷却数字文本组({
@@ -307,11 +314,12 @@ function 启动英雄栏倒计时(this: void, unit: any): void {
   const 左描边框体 = 英雄栏倒计时左描边框体表[槽位];
   const 右描边框体 = 英雄栏倒计时右描边框体表[槽位];
   const 阴影框体 = 英雄栏倒计时阴影框体表[槽位];
-  if (底阴影框体 !== 0) DzFrameShow(底阴影框体, true);
-  if (左描边框体 !== 0) DzFrameShow(左描边框体, true);
-  if (右描边框体 !== 0) DzFrameShow(右描边框体, true);
-  if (阴影框体 !== 0) DzFrameShow(阴影框体, true);
-  DzFrameShow(frame, true);
+  const 本地可见 = 是否本地英雄栏槽位(槽位);
+  if (底阴影框体 !== 0) DzFrameShow(底阴影框体, 本地可见);
+  if (左描边框体 !== 0) DzFrameShow(左描边框体, 本地可见);
+  if (右描边框体 !== 0) DzFrameShow(右描边框体, 本地可见);
+  if (阴影框体 !== 0) DzFrameShow(阴影框体, 本地可见);
+  DzFrameShow(frame, 本地可见);
 
   if (!已注册英雄栏倒计时Tick) {
     已注册英雄栏倒计时Tick = true;

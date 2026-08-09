@@ -100,7 +100,10 @@ export function 构建物品提示内容(this: void, item: any, hero?: any): 物
   const name = GetItemName(item) || "";
   const rawText = 安全取物品实例数据字符串(item, itemTypeId, 3) || "";
   const renderedText = hero != null && hero !== 0 ? 渲染动态文本(hero, rawText, { appendAltHint: false, preserveFormula: true }) : rawText;
-  const dynamicText = 清理物品提示正文(renderedText);
+  const cleanedDynamicText = 清理物品提示正文(renderedText);
+  const dynamicText = cleanedDynamicText === ""
+    ? "这是物品提示模拟系统测试"
+    : "这是物品提示模拟系统测试|n" + cleanedDynamicText;
   const manaCost = 取物品主动蓝耗(itemTypeId);
   const activeUsable = 物品有主动技能(itemTypeId);
   const activeUseHotkey = activeUsable ? 取物品当前小键盘快捷键(hero, item) : "";

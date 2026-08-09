@@ -76,6 +76,7 @@ let 路人NPC已完成 = false;
 let 商人已完成 = false;
 let 全部创建完成回调: ((this: void) => void) | undefined;
 let 全部创建完成回调已触发 = false;
+const 世界地图全部单位创建完成监听表: Array<() => void> = [];
 let 当前精英选项: 世界地图单位缓步创建选项 | undefined;
 let 当前路人NPC选项: 世界地图单位缓步创建选项 | undefined;
 let 当前商人选项: 世界地图单位缓步创建选项 | undefined;
@@ -257,8 +258,17 @@ function 总调度监视回调(this: void): void {
       if (typeof 完成回调 === "function") {
         完成回调();
       }
+      for (const 监听函数 of 世界地图全部单位创建完成监听表) {
+        监听函数();
+      }
     }
   }
+}
+
+export function 注册世界地图全部单位创建完成监听(this: void, 监听函数: () => void): void {
+  if (typeof 监听函数 !== "function") return;
+  世界地图全部单位创建完成监听表.push(监听函数);
+  if (当前状态.当前阶段 === "完成") 监听函数();
 }
 
 function 启动总调度监视(this: void, 间隔秒: number): void {

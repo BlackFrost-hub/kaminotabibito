@@ -202,6 +202,7 @@ local GetUnitName = jass.GetUnitName
 ReviveHeroLoc = jass.ReviveHeroLoc
 local Cos = jass.Cos
 local Sin = jass.Sin
+local GetLocalPlayer = jass.GetLocalPlayer
 GetOwningPlayer = jass.GetOwningPlayer
 GetPlayerId = jass.GetPlayerId
 Location = jass.Location
@@ -211,7 +212,7 @@ SetUnitY = jass.SetUnitY
 local R2I = jass.R2I
 local _____590D_6D3B_5EF6_8FDF_79D2 = 10
 _____590D_6D3B_65E0_654C_79D2 = 1
-_____590D_6D3B_534A_5F84 = 400
+_____590D_6D3B_534A_5F84 = 500
 _____590D_6D3B_63A8_8FDB_6B65_6570 = 20
 _____590D_6D3B_6B21_6570_5C5E_6027 = "次数"
 _____590D_6D3B_6B21_6570_8868 = "团队复活"
@@ -289,6 +290,13 @@ _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868 = {
     0,
     0
 }
+local function _____662F_5426_672C_5730_82F1_96C4_680F_69FD_4F4D(_____69FD_4F4D)
+    local localPlayer = GetLocalPlayer()
+    if not _____662F_5426_6709_6548(localPlayer) then
+        return false
+    end
+    return GetPlayerId(localPlayer) == _____69FD_4F4D
+end
 local function _____5341_500D_7CBE_5EA6_6587_672C(value)
     local _____5341_500D_6574_6570 = R2I(value * 10 + 0.5)
     local _____6574_6570_90E8_5206 = R2I(_____5341_500D_6574_6570 / 10)
@@ -338,7 +346,10 @@ local function _____5237_65B0_82F1_96C4_680F_5012_8BA1_65F6_6587_672C(_____69FD_
             _____6587_672C_7EC4,
             _____5341_500D_7CBE_5EA6_6587_672C(_____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[_____69FD_4F4D + 1])
         )
-        _____663E_793A_51B7_5374_6570_5B57_6587_672C(_____6587_672C_7EC4, true)
+        _____663E_793A_51B7_5374_6570_5B57_6587_672C(
+            _____6587_672C_7EC4,
+            _____662F_5426_672C_5730_82F1_96C4_680F_69FD_4F4D(_____69FD_4F4D)
+        )
         return
     end
     local _____5E95_9634_5F71_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1]
@@ -376,7 +387,7 @@ local function _____521B_5EFA_82F1_96C4_680F_5012_8BA1_65F6_6846_4F53(_____69FD_
     if gameUI == 0 then
         return 0
     end
-    local button = DzFrameGetHeroBarButton(_____69FD_4F4D)
+    local button = DzFrameGetHeroBarButton(0)
     if button == 0 then
         return 0
     end
@@ -437,18 +448,18 @@ local function ____on_82F1_96C4_680F_5012_8BA1_65F6Tick()
             do
                 local _____5269_4F59_79D2 = _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[i + 1]
                 if _____5269_4F59_79D2 <= 0 then
-                    goto __continue45
+                    goto __continue47
                 end
                 local _____65B0_5269_4F59_79D2 = _____5269_4F59_79D2 - 0.01
                 if _____65B0_5269_4F59_79D2 <= 0 then
                     _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(i)
-                    goto __continue45
+                    goto __continue47
                 end
                 _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868[i + 1] = _____65B0_5269_4F59_79D2
                 _____5237_65B0_82F1_96C4_680F_5012_8BA1_65F6_6587_672C(i)
                 _____4ECD_6709_5012_8BA1_65F6 = true
             end
-            ::__continue45::
+            ::__continue47::
             i = i + 1
         end
     end
@@ -472,19 +483,20 @@ local function _____542F_52A8_82F1_96C4_680F_5012_8BA1_65F6(unit)
     local _____5DE6_63CF_8FB9_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1]
     local _____53F3_63CF_8FB9_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868[_____69FD_4F4D + 1]
     local _____9634_5F71_6846_4F53 = _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868[_____69FD_4F4D + 1]
+    local _____672C_5730_53EF_89C1 = _____662F_5426_672C_5730_82F1_96C4_680F_69FD_4F4D(_____69FD_4F4D)
     if _____5E95_9634_5F71_6846_4F53 ~= 0 then
-        DzFrameShow(_____5E95_9634_5F71_6846_4F53, true)
+        DzFrameShow(_____5E95_9634_5F71_6846_4F53, _____672C_5730_53EF_89C1)
     end
     if _____5DE6_63CF_8FB9_6846_4F53 ~= 0 then
-        DzFrameShow(_____5DE6_63CF_8FB9_6846_4F53, true)
+        DzFrameShow(_____5DE6_63CF_8FB9_6846_4F53, _____672C_5730_53EF_89C1)
     end
     if _____53F3_63CF_8FB9_6846_4F53 ~= 0 then
-        DzFrameShow(_____53F3_63CF_8FB9_6846_4F53, true)
+        DzFrameShow(_____53F3_63CF_8FB9_6846_4F53, _____672C_5730_53EF_89C1)
     end
     if _____9634_5F71_6846_4F53 ~= 0 then
-        DzFrameShow(_____9634_5F71_6846_4F53, true)
+        DzFrameShow(_____9634_5F71_6846_4F53, _____672C_5730_53EF_89C1)
     end
-    DzFrameShow(frame, true)
+    DzFrameShow(frame, _____672C_5730_53EF_89C1)
     if not _____5DF2_6CE8_518C_82F1_96C4_680F_5012_8BA1_65F6Tick then
         _____5DF2_6CE8_518C_82F1_96C4_680F_5012_8BA1_65F6Tick = true
         onTick10ms(____on_82F1_96C4_680F_5012_8BA1_65F6Tick)

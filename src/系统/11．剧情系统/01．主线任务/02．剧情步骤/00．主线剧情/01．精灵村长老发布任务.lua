@@ -51,9 +51,7 @@ local GetUnitY = ____require_result_8.GetUnitY
 local GetUnitsInRectMatching = ____require_result_8.GetUnitsInRectMatching
 local GroupRemoveUnit = ____require_result_8.GroupRemoveUnit
 local IssueImmediateOrder = ____require_result_8.IssueImmediateOrder
-local Location = ____require_result_8.Location
 local Player = ____require_result_8.Player
-local RemoveLocation = ____require_result_8.RemoveLocation
 local RemoveRect = ____require_result_8.RemoveRect
 local SetUnitFacing = ____require_result_8.SetUnitFacing
 local SetUnitFacingTimed = ____require_result_8.SetUnitFacingTimed
@@ -131,13 +129,6 @@ local function _____5BF9_6240_6709_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE(rectV
         end
     end
 end
-local function _____91CD_8BBE_5267_60C5FHD_70B9(x, y)
-    local oldLocation = jglobals.udg_FHD
-    if oldLocation ~= nil and oldLocation ~= 0 then
-        RemoveLocation(oldLocation)
-    end
-    jglobals.udg_FHD = Location(x, y)
-end
 local function _____521B_5EFA_968F_673A_91D1_5149_6212_6307()
     local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID("金光戒指")
     local itemTypeId = stringToFourCCSafe(rawId)
@@ -196,7 +187,6 @@ ____exports["执行长老对话前置"] = function(_____53C2_6570)
             true
         )
     end
-    _____91CD_8BBE_5267_60C5FHD_70B9(-26218.6, -28632.4)
     _____521B_5EFA_968F_673A_91D1_5149_6212_6307()
     StopMusic(false)
     if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 and _____53C2_6570["触发单位发布命令"] ~= nil then

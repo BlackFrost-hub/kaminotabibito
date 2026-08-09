@@ -119,16 +119,19 @@ local ____require_result_2 = require("系统.00．核心系统.01．事件中心
 local onItemUse = ____require_result_2.onItemUse
 local g = require("jass.globals")
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local AddGoldWithFeedback = ____require_result_3.AddGoldWithFeedback
 local fourCCToString = ____require_result_3.fourCCToString
-local ____require_result_4 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-local IsUnitIllusionBJ = ____require_result_4.IsUnitIllusionBJ
+local ____require_result_4 = require("系统.06．经济系统.01．杀敌金币平分.01．核心功能")
+local _____663E_793A_91D1_5E01_83B7_5F97_53CD_9988 = ____require_result_4["显示金币获得反馈"]
+local ____require_result_5 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local IsUnitIllusionBJ = ____require_result_5.IsUnitIllusionBJ
 local itemRelatedFns = require("lib.扩展函数.物品相关函数.index")
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
-applyEquipStatsTS = ____require_result_5.applyEquipStatsTS
-local ____G_6 = _G
-local onSecond = ____G_6.onSecond
-local offSecond = ____G_6.offSecond
+local ____require_result_6 = require("lib.扩展函数.Star扩展函数.01．装备属性应用")
+applyEquipStatsTS = ____require_result_6.applyEquipStatsTS
+local ____require_result_7 = require("lib.扩展函数.Star扩展函数.02．GS单位属性")
+local GS_Unit_Pry_change = ____require_result_7.GS_Unit_Pry_change
+local ____G_8 = _G
+local onSecond = ____G_8.onSecond
+local offSecond = ____G_8.offSecond
 local function parsePowerUP(powerUpStr)
     local segments = {}
     local rawSegs = __TS__StringSplit(powerUpStr, "+")
@@ -286,6 +289,68 @@ local function parsePowerUP(powerUpStr)
     end
     return segments
 end
+--- 永久 PowerUP 写入白字基础属性；临时效果仍由装备属性应用器处理。
+local function applyPermanentBaseStats(unit, statEffects)
+    do
+        local i = 0
+        while i < #statEffects do
+            do
+                local effect = statEffects[i + 1]
+                local value = effect.value
+                if value == 0 then
+                    goto __continue41
+                end
+                if effect.key == "hp" then
+                    GS_Unit_Pry_change(unit, 0, value)
+                elseif effect.key == "mp" then
+                    GS_Unit_Pry_change(unit, 1, value)
+                elseif effect.key == "dmg" then
+                    GS_Unit_Pry_change(unit, 2, value)
+                elseif effect.key == "armor" then
+                    GS_Unit_Pry_change(unit, 3, value)
+                elseif effect.key == "str" then
+                    jass.SetHeroStr(
+                        unit,
+                        jass.GetHeroStr(unit, false) + value,
+                        true
+                    )
+                elseif effect.key == "agi" then
+                    jass.SetHeroAgi(
+                        unit,
+                        jass.GetHeroAgi(unit, false) + value,
+                        true
+                    )
+                elseif effect.key == "int" then
+                    jass.SetHeroInt(
+                        unit,
+                        jass.GetHeroInt(unit, false) + value,
+                        true
+                    )
+                elseif effect.key == "all" then
+                    jass.SetHeroStr(
+                        unit,
+                        jass.GetHeroStr(unit, false) + value,
+                        true
+                    )
+                    jass.SetHeroAgi(
+                        unit,
+                        jass.GetHeroAgi(unit, false) + value,
+                        true
+                    )
+                    jass.SetHeroInt(
+                        unit,
+                        jass.GetHeroInt(unit, false) + value,
+                        true
+                    )
+                else
+                    applyEquipStatsTS(unit, {effect})
+                end
+            end
+            ::__continue41::
+            i = i + 1
+        end
+    end
+end
 --- 分 10 份给经验，避免跳级触发不到
 local function addHeroXP(unit, amount)
     if amount <= 0 then
@@ -346,6 +411,24 @@ local function getPctStatValue(unit, key)
     end
     return 0
 end
+local function _____589E_52A0_91D1_5E01_5E76_663E_793A_53CD_9988(unit, delta)
+    if delta == 0 then
+        return
+    end
+    local player = jass.GetOwningPlayer(unit)
+    if player == nil or player == 0 then
+        return
+    end
+    local stateGold = jass.ConvertPlayerState(1)
+    local current = jass.GetPlayerState(player, stateGold)
+    local next = current + delta < 0 and 0 or current + delta
+    local actualDelta = next - current
+    if actualDelta == 0 then
+        return
+    end
+    jass.SetPlayerState(player, stateGold, next)
+    _____663E_793A_91D1_5E01_83B7_5F97_53CD_9988(unit, player, actualDelta)
+end
 --- 对 unit 所属玩家的金币做一次百分比加减（pct 可负）
 local function applyGoldPct(unit, pct)
     local player = jass.GetOwningPlayer(unit)
@@ -353,12 +436,43 @@ local function applyGoldPct(unit, pct)
         return
     end
     local stateGold = jass.ConvertPlayerState(1)
-    local cur = jass.GetPlayerState(player, stateGold)
-    local delta = round(cur * pct)
-    local newVal = cur + delta < 0 and 0 or cur + delta
-    jass.SetPlayerState(player, stateGold, newVal)
+    local current = jass.GetPlayerState(player, stateGold)
+    _____589E_52A0_91D1_5E01_5E76_663E_793A_53CD_9988(
+        unit,
+        round(current * pct)
+    )
 end
-local function executeSegment(unit, seg)
+local function _____7269_54C1_4F7F_7528_539F_751F_91D1_5E01_80FD_529B(entry)
+    local abilityIds = __TS__StringSplit(
+        tostring(entry.abilList or ""),
+        ","
+    )
+    do
+        local i = 0
+        while i < #abilityIds do
+            do
+                local abilityId = __TS__StringTrim(abilityIds[i + 1])
+                if abilityId == "" then
+                    goto __continue74
+                end
+                local ____temp_9
+                if type(slk) ~= "nil" and slk.ability then
+                    ____temp_9 = slk.ability[abilityId]
+                else
+                    ____temp_9 = nil
+                end
+                local abilityData = ____temp_9
+                if abilityData ~= nil and tostring(abilityData._parent or "") == "AIgo" then
+                    return true
+                end
+            end
+            ::__continue74::
+            i = i + 1
+        end
+    end
+    return false
+end
+local function executeSegment(unit, seg, nativeGoldAbility)
     local statEffects = {}
     local goldPct = 0
     local goldFixed = {}
@@ -373,30 +487,30 @@ local function executeSegment(unit, seg)
                     goldFixed[#goldFixed + 1] = {min = mn, max = mx}
                 end
             elseif eff.type == "exp" then
-                local ____eff_isLevelMult_7
+                local ____eff_isLevelMult_10
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_7 = jass.R2I(getHeroLevel(unit) * eff.value)
+                    ____eff_isLevelMult_10 = jass.R2I(getHeroLevel(unit) * eff.value)
                 else
-                    ____eff_isLevelMult_7 = jass.R2I(eff.value)
+                    ____eff_isLevelMult_10 = jass.R2I(eff.value)
                 end
-                local amount = ____eff_isLevelMult_7
+                local amount = ____eff_isLevelMult_10
                 addHeroXP(unit, amount)
             elseif eff.type == "level" then
                 local cur = getHeroLevel(unit)
-                local ____eff_isLevelMult_8
+                local ____eff_isLevelMult_11
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_8 = jass.R2I(cur * eff.value)
+                    ____eff_isLevelMult_11 = jass.R2I(cur * eff.value)
                 else
-                    ____eff_isLevelMult_8 = jass.R2I(eff.value)
+                    ____eff_isLevelMult_11 = jass.R2I(eff.value)
                 end
-                local add = ____eff_isLevelMult_8
+                local add = ____eff_isLevelMult_11
                 if add > 0 then
                     jass.SetHeroLevel(unit, cur + add, true)
                 end
             elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
                 local name = itemRelatedFns.KEY_TO_NAME[eff.key]
                 if name == nil then
-                    goto __continue56
+                    goto __continue78
                 end
                 local val
                 if eff.isPct then
@@ -409,7 +523,7 @@ local function executeSegment(unit, seg)
                 statEffects[#statEffects + 1] = {name = name, key = eff.key, value = val}
             end
         end
-        ::__continue56::
+        ::__continue78::
     end
     if goldPct ~= 0 then
         if seg.timeSec <= 0 then
@@ -441,41 +555,49 @@ local function executeSegment(unit, seg)
                 local mx = jass.R2I(goldFixed[i + 1].max)
                 local delta = mn
                 if mx ~= mn then
-                    local ____temp_9
+                    local ____temp_12
                     if mn < mx then
-                        ____temp_9 = mn
+                        ____temp_12 = mn
                     else
-                        ____temp_9 = mx
+                        ____temp_12 = mx
                     end
-                    local a = ____temp_9
-                    local ____temp_10
+                    local a = ____temp_12
+                    local ____temp_13
                     if mn < mx then
-                        ____temp_10 = mx
+                        ____temp_13 = mx
                     else
-                        ____temp_10 = mn
+                        ____temp_13 = mn
                     end
-                    local b = ____temp_10
+                    local b = ____temp_13
                     delta = jass.GetRandomInt(a, b)
                 end
                 if delta ~= 0 then
-                    AddGoldWithFeedback(nil, {delta = delta, unit = unit})
+                    if nativeGoldAbility then
+                        _____663E_793A_91D1_5E01_83B7_5F97_53CD_9988(
+                            unit,
+                            jass.GetOwningPlayer(unit),
+                            delta
+                        )
+                    else
+                        _____589E_52A0_91D1_5E01_5E76_663E_793A_53CD_9988(unit, delta)
+                    end
                 end
                 i = i + 1
             end
         end
     end
     if #statEffects > 0 then
-        applyStats(unit, statEffects, true)
         if seg.timeSec > 0 then
+            applyStats(unit, statEffects, true)
             local capturedStats = statEffects
             local capturedUnit = unit
             _____5B89_6392_88C5_5907_6210_957F_5C5E_6027_56DE_9000(capturedUnit, capturedStats, seg.timeSec)
+        else
+            applyPermanentBaseStats(unit, statEffects)
         end
     end
 end
-local function onUseItem()
-    local unit = jass.GetManipulatingUnit()
-    local item = jass.GetManipulatedItem()
+local function onUseItem(unit, item)
     if not unit or not item then
         return
     end
@@ -498,8 +620,9 @@ local function onUseItem()
     glob[key] = true
     _____5B89_6392_88C5_5907_6210_957F_9632_6296_6E05_7406(key, 0.5)
     local segments = parsePowerUP(entry.PowerUP)
+    local nativeGoldAbility = _____7269_54C1_4F7F_7528_539F_751F_91D1_5E01_80FD_529B(entry)
     for ____, seg in ipairs(segments) do
-        executeSegment(unit, seg)
+        executeSegment(unit, seg, nativeGoldAbility)
     end
 end
 local INIT_KEY = "__EquipPowerUPInited"
@@ -515,9 +638,7 @@ local function init()
         return
     end
     g[INIT_KEY] = true
-    onItemUse(function(unit, item)
-        onUseItem()
-    end)
+    onItemUse(onUseItem)
 end
 init()
 return ____exports

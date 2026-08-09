@@ -11,11 +11,12 @@ local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_2.registerDeathListener
-local ____require_result_3 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名")
-local _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_5168_90E8_540D_79F0 = ____require_result_3["获取单位玩家英雄全部名称"]
-local PlaySoundBJ = jass.PlaySoundBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundBJ = ____require_result_2.PlaySoundBJ
+local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_3.registerDeathListener
+local ____require_result_4 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.03．玩家英雄别名")
+local _____83B7_53D6_5355_4F4D_73A9_5BB6_82F1_96C4_5168_90E8_540D_79F0 = ____require_result_4["获取单位玩家英雄全部名称"]
 local GetRandomInt = jass.GetRandomInt
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetHandleId = jass.GetHandleId
@@ -49,11 +50,11 @@ local function _____53D6_6B7B_4EA1_97F3_6548(unit)
                     goto __continue9
                 end
                 local _____7D22_5F15 = GetRandomInt(1, #_____914D_7F6E["音效列表"]) - 1
-                local ____914D_7F6E__97F3_6548_5217_8868_index_4 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
-                if ____914D_7F6E__97F3_6548_5217_8868_index_4 == nil then
-                    ____914D_7F6E__97F3_6548_5217_8868_index_4 = nil
+                local ____914D_7F6E__97F3_6548_5217_8868_index_5 = _____914D_7F6E["音效列表"][_____7D22_5F15 + 1]
+                if ____914D_7F6E__97F3_6548_5217_8868_index_5 == nil then
+                    ____914D_7F6E__97F3_6548_5217_8868_index_5 = nil
                 end
-                return ____914D_7F6E__97F3_6548_5217_8868_index_4
+                return ____914D_7F6E__97F3_6548_5217_8868_index_5
             end
             ::__continue9::
             i = i + 1

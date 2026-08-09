@@ -3,6 +3,7 @@ import { splitItemBuffSegments } from "./02．DOT解析";
 // ========== 虚拟分区：工厂 ==========
 export function createDotBaseUtils(deps: {
   jass: any;
+  getUnitStateJapi: (this: void, unit: any, state: any) => number;
   g: any;
   itemsData: Record<string, { Buff?: string }>;
   fourCCToString: (this: void, four: number) => string;
@@ -19,6 +20,7 @@ export function createDotBaseUtils(deps: {
 } {
   // 提取 deps 到局部变量，避免 TSTL 生成冒号调用
   const jass = deps.jass;
+  const getUnitStateJapi = deps.getUnitStateJapi;
   const g = deps.g;
   const itemsData = deps.itemsData;
   const fourCCToString = deps.fourCCToString;
@@ -110,7 +112,7 @@ export function createDotBaseUtils(deps: {
     else if (g.UNIT_STATE_MAX_LIFE != null) maxLifeState = g.UNIT_STATE_MAX_LIFE;
     else maxLifeState = jass.ConvertUnitState(1);
     if (maxLifeState == null) return 0;
-    const v = jass.GetUnitState(targetUnit, maxLifeState);
+    const v = getUnitStateJapi(targetUnit, maxLifeState);
     return typeof v === "number" && isFinite(v) && v > 0 ? v : 0;
   }
 

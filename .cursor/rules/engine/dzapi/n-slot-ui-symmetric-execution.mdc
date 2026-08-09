@@ -109,6 +109,15 @@ function startRefreshTimer(): void {
 - 头像 `DzFrameSetTexture`：**建帧时设一次**；周期回调只刷文字等，周期里**不再** `getHeroIcon` / `getObjectProperty`。
 - 换英雄改头像：在**业务事件**里单次改，勿挂回高频 tick。
 
+### 3.4 单位技能实例 API 与本地命令卡返回值
+
+- `DzSetUnitAbilityUpdate` 会刷新真实单位技能实例，**不能在本机异步路径调用**。本地 Alt、选择状态、命令卡或其他仅当前客户端成立的数据，不得决定是否调用或传入什么单位、技能 ID。
+- `KKCommandButtonGetAbilityId` 的官方返回值标记为**异步**。它读取的是当前客户端命令卡按钮绑定的技能，只能用于本地 UI 展示、提示和诊断。
+- 严禁把 `KKCommandButtonGetAbilityId` 的返回值传给 `DzSetUnitAbilityCost`、`DzSetUnitAbilityCool`、`DzSetUnitAbilityUpdate` 或其他会修改真实单位、技能实例和共享游戏状态的 API。
+- 技能冷却、魔耗等真实数据必须从全端一致的英雄配置、技能配置、同步事件和同步属性中确定；本地命令卡只负责最终显示。
+
+典型反例：全端周期计时器读取各端不同的本地命令卡技能 ID，再调用 `DzSetUnitAbilityCost`。计时器虽然全端同次数执行，但输入已经异步，仍会造成游戏状态分叉。
+
 ---
 
 ## 4. N 槽位 UI（与 §1 呼应：技术落地）

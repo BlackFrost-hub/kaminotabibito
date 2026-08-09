@@ -29,10 +29,12 @@ local EC_CreateEffect = ____require_result_5.EC_CreateEffect
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
+local SetUnitStateJapi = japi.SetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IsUnitType = jass.IsUnitType
@@ -271,7 +273,7 @@ local function ____on_98CE_66B4_4E4B_9524_751F_6548()
                 ["基础眩晕秒"] = cfg["眩晕秒"] * singlePlayerMultiplier
             }
             if projectile["弹幕单位"] ~= nil and projectile["弹幕单位"] ~= 0 then
-                SetUnitState(projectile["弹幕单位"], UNIT_STATE_MAX_LIFE, projectileLife)
+                SetUnitStateJapi(projectile["弹幕单位"], UNIT_STATE_MAX_LIFE, projectileLife)
                 SetUnitState(projectile["弹幕单位"], UNIT_STATE_LIFE, projectileLife)
             end
             debugLogForce(

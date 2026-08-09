@@ -1,32 +1,57 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local onSyncKeyUp, isChatInputActive, getLocalDispatchKey, dispatchLocalKeyEvent, onLocalKeyDownEvent, onLocalKeyUpEvent, jass, japi, syncKeyUpCallbackByTriggerHid, localKeyCallbacksByKeyAndStatus
+local ensureSyncKeyUpDataTrigger, onLocalSyncKeyUpRequest, onSyncKeyUpData, isChatInputActive, getLocalDispatchKey, dispatchLocalKeyEvent, onLocalKeyDownEvent, onLocalKeyUpEvent, japi, CreateTrigger, TriggerAddAction, I2S, S2I, DzTriggerRegisterSyncData, DzSyncData, DzGetTriggerSyncPlayer, DzGetTriggerSyncData, DzGetTriggerKey, syncKeyUpCallbacksByKey, localKeyCallbacksByKeyAndStatus, syncKeyUpPrefix, syncKeyUpDataTrigger
 local ____02_FF0E_5185_90E8_5DE5_5177 = require("lib.扩展函数.封装函数.04．硬件输入.02．内部工具")
 local createTriggerOrNull = ____02_FF0E_5185_90E8_5DE5_5177.createTriggerOrNull
 local runFalseLocalRegistration = ____02_FF0E_5185_90E8_5DE5_5177.runFalseLocalRegistration
 local ____01_FF0E_5E38_91CF_5B9A_4E49 = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
 local KEY_STATE = ____01_FF0E_5E38_91CF_5B9A_4E49.KEY_STATE
-function onSyncKeyUp(self)
-    local trig = jass.GetTriggeringTrigger()
-    if not trig then
+function ensureSyncKeyUpDataTrigger()
+    if syncKeyUpDataTrigger ~= nil and syncKeyUpDataTrigger ~= 0 then
         return
     end
-    local cb = syncKeyUpCallbackByTriggerHid[jass.GetHandleId(trig)]
-    if type(cb) ~= "function" then
+    syncKeyUpDataTrigger = CreateTrigger()
+    if syncKeyUpDataTrigger == nil or syncKeyUpDataTrigger == 0 then
         return
     end
-    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
-    local localPlayer = jass.GetLocalPlayer()
-    if triggerPlayer == localPlayer and isChatInputActive(nil) then
+    TriggerAddAction(syncKeyUpDataTrigger, onSyncKeyUpData)
+    DzTriggerRegisterSyncData(syncKeyUpDataTrigger, syncKeyUpPrefix, false)
+end
+function onLocalSyncKeyUpRequest()
+    if isChatInputActive() then
         return
     end
-    cb(
-        nil,
-        triggerPlayer,
-        japi.DzGetTriggerKey()
+    local keyCode = DzGetTriggerKey()
+    if not (keyCode > 0) then
+        return
+    end
+    DzSyncData(
+        syncKeyUpPrefix,
+        I2S(keyCode)
     )
 end
-function isChatInputActive(self)
+function onSyncKeyUpData()
+    local triggerPlayer = DzGetTriggerSyncPlayer()
+    if triggerPlayer == nil or triggerPlayer == 0 then
+        return
+    end
+    local keyCode = S2I(DzGetTriggerSyncData())
+    local callbacks = syncKeyUpCallbacksByKey[keyCode]
+    if callbacks == nil then
+        return
+    end
+    do
+        local i = 0
+        while i < #callbacks do
+            local callback = callbacks[i + 1]
+            if type(callback) == "function" then
+                callback(nil, triggerPlayer, keyCode)
+            end
+            i = i + 1
+        end
+    end
+end
+function isChatInputActive()
     if japi.DzIsChatBoxOpen() then
         return true
     end
@@ -40,7 +65,7 @@ function getLocalDispatchKey(keyCode, status)
     return (tostring(keyCode) .. ":") .. tostring(status)
 end
 function dispatchLocalKeyEvent(status)
-    if isChatInputActive(nil) then
+    if isChatInputActive() then
         return
     end
     local key = japi.DzGetTriggerKey()
@@ -65,12 +90,32 @@ end
 function onLocalKeyUpEvent()
     dispatchLocalKeyEvent(KEY_STATE.UP)
 end
-jass = require("jass.common")
+--- 硬件输入 - 键盘函数
+-- 
+-- 约定：
+-- - `DzTriggerRegisterKeyEventTrg` 视为同步入口，不包本地玩家判断
+-- - `DzTriggerRegisterKeyEventByCode(..., false, ...)` 视为本地入口，必须经由
+--   `runFalseLocalRegistration(...)` 包装，并支持可选 `playerId`
+-- - `registerKeyUpSync` 先在本机过滤聊天框，再通过同步数据回调全端派发
+local jass = require("jass.common")
 japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.KK扩展API.index")
 local DzTriggerRegisterKeyEventTrg = ____require_result_0.DzTriggerRegisterKeyEventTrg
-syncKeyUpCallbackByTriggerHid = {}
+CreateTrigger = jass.CreateTrigger
+TriggerAddAction = jass.TriggerAddAction
+I2S = jass.I2S
+S2I = jass.S2I
+local DzTriggerRegisterKeyEventByCode = japi.DzTriggerRegisterKeyEventByCode
+DzTriggerRegisterSyncData = japi.DzTriggerRegisterSyncData
+DzSyncData = japi.DzSyncData
+DzGetTriggerSyncPlayer = japi.DzGetTriggerSyncPlayer
+DzGetTriggerSyncData = japi.DzGetTriggerSyncData
+DzGetTriggerKey = japi.DzGetTriggerKey
+syncKeyUpCallbacksByKey = {}
+local syncKeyUpTriggerByKey = {}
 localKeyCallbacksByKeyAndStatus = {}
+syncKeyUpPrefix = "KEYUP"
+syncKeyUpDataTrigger = nil
 function ____exports.isKeyDown(self, keyCode)
     return not not japi.DzIsKeyDown(keyCode)
 end
@@ -211,13 +256,29 @@ function ____exports.registerKeyUpLocal(self, keyCode, callback, playerId)
     return ____exports.registerKeyUp(nil, keyCode, callback, playerId)
 end
 function ____exports.registerKeyUpSync(self, keyCode, callback)
-    local trig = createTriggerOrNull(nil)
-    if not trig then
+    ensureSyncKeyUpDataTrigger()
+    local callbacks = syncKeyUpCallbacksByKey[keyCode]
+    if callbacks == nil then
+        callbacks = {}
+        syncKeyUpCallbacksByKey[keyCode] = callbacks
+    end
+    callbacks[#callbacks + 1] = callback
+    local trig = syncKeyUpTriggerByKey[keyCode]
+    if trig ~= nil and trig ~= 0 then
+        return trig
+    end
+    trig = CreateTrigger()
+    if trig == nil or trig == 0 then
         return nil
     end
-    DzTriggerRegisterKeyEventTrg(nil, trig, KEY_STATE.UP, keyCode)
-    syncKeyUpCallbackByTriggerHid[jass.GetHandleId(trig)] = callback
-    jass.TriggerAddAction(trig, onSyncKeyUp)
+    syncKeyUpTriggerByKey[keyCode] = trig
+    DzTriggerRegisterKeyEventByCode(
+        trig,
+        keyCode,
+        KEY_STATE.UP,
+        false,
+        onLocalSyncKeyUpRequest
+    )
     return trig
 end
 function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, action, playerId)

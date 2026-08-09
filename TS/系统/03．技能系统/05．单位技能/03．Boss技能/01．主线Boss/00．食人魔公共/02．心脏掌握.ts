@@ -50,10 +50,12 @@ const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通�
   stringToFourCCSafe: (this: void, text: string) => number;
 };
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
@@ -239,7 +241,7 @@ function 尝试触发心脏掌握(this: void, boss: any, target: any): void {
   let threshold = info.配置.基础斩杀线比例 + info.配置.每层难度斩杀线比例 * difficulty;
   if (取当前有效玩家人数() <= 1) threshold *= info.配置.单人斩杀线倍率;
   const currentLife = GetUnitState(target, UNIT_STATE_LIFE);
-  const maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE);
+  const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0) || currentLife > maxLife * threshold) return;
 
   state.冷却结束毫秒 = now + info.配置.冷却秒 * 1000;

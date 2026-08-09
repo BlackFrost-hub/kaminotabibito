@@ -18,9 +18,19 @@ const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star�
 const { YDUserDataGet } = require("lib.扩展函数.YDWE函数.01．YDUserData兼容") as {
   YDUserDataGet: (tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
+const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
+  广播单位提示: (this: void, 来源单位: any, 文本: string, 持续时间?: number) => void;
+};
 const regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
   registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => (this: void) => void;
 };
+const GetHeroLevel = (jass as any).GetHeroLevel as (unit: any) => number;
+const CreateUnit = (jass as any).CreateUnit as (owner: any, unitId: number, x: number, y: number, facing: number) => any;
+const GetRandomReal = (jass as any).GetRandomReal as (lowBound: number, highBound: number) => number;
+const Player = (jass as any).Player as (playerId: number) => any;
 
 export interface 剧情玩家组传送配置 {
   入口中心X: number;
@@ -50,6 +60,7 @@ const regionMap = new Map<number, RegionConfig>();
 let 区域传送已初始化 = false;
 const 单位区域传送冷却: Record<number, number> = {};
 const 区域传送连触发保护Ms = 500;
+const 区域传送首次进入已处理: Record<string, boolean> = {};
 const 剧情玩家组传送状态表: Record<number, 剧情玩家组传送状态 | undefined> = {};
 let 当前剧情玩家组传送状态: 剧情玩家组传送状态 | undefined;
 
@@ -215,6 +226,33 @@ function isRegionTeleportCoolingDown(this: void, unit: any): boolean {
   return false;
 }
 
+function 满足区域传送最低等级(this: void, cfg: RegionConfig, unit: any): boolean {
+  const 最低英雄等级 = cfg.最低英雄等级;
+  if (最低英雄等级 == null || 最低英雄等级 <= 0) return true;
+  return GetHeroLevel(unit) >= 最低英雄等级;
+}
+
+function 执行区域传送首次进入创建(this: void, cfg: RegionConfig): void {
+  if (区域传送首次进入已处理[cfg.id] === true) return;
+  const 创建配置 = cfg.首次进入创建单位;
+  if (创建配置 == null) return;
+
+  const 单位类型ID = stringToFourCCSafe(创建配置.单位ID);
+  if (单位类型ID === 0) return;
+  if (创建配置.所属玩家 !== "中立敌对") return;
+
+  区域传送首次进入已处理[cfg.id] = true;
+  const 中立敌对 = Player((jass as any).PLAYER_NEUTRAL_AGGRESSIVE);
+  const 面向角度 = 创建配置.随机面向 ? GetRandomReal(0, 360) : 0;
+  CreateUnit(中立敌对, 单位类型ID, 创建配置.x, 创建配置.y, 面向角度);
+}
+
+function 执行区域传送后广播(this: void, cfg: RegionConfig, unit: any): void {
+  const 广播配置 = cfg.传送后广播;
+  if (广播配置 == null || 广播配置.文本 === "") return;
+  广播单位提示(unit, 广播配置.文本, 广播配置.持续时间毫秒);
+}
+
 function onRegionEnter(this: void): void {
   const unit = (jass as any).GetTriggerUnit();
   const region = (jass as any).GetTriggeringRegion();
@@ -237,6 +275,7 @@ function onRegionEnter(this: void): void {
   if (cfg == null) return;
   // 先检查配置里的前置 condition（目前仅 always/空，复杂语法预留）
   if (!checkRegionCondition(cfg.condition, unit)) return;
+  if (!满足区域传送最低等级(cfg, unit)) return;
   if (isRegionTeleportCoolingDown(unit)) return;
 
   // 若 teleportX/Y 都为 0 且存在 rule，则走自定义 rule 流程，否则走普通固定传送
@@ -252,14 +291,18 @@ function onRegionEnter(this: void): void {
   const player = owner;
   if (player != null) {
     StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime);
-    (jass as any).DisplayTimedTextToPlayer(
-      player,
-      0,
-      0,
-      8,
-      cfg.text
-    );
+    if (cfg.text != null && cfg.text !== "") {
+      (jass as any).DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        8,
+        cfg.text
+      );
+    }
   }
+  执行区域传送首次进入创建(cfg);
+  执行区域传送后广播(cfg, unit);
 }
 
 function isValidRegionRect(this: void, cfg: RegionConfig): boolean {

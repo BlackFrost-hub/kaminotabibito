@@ -9,6 +9,7 @@ import type {
 } from "./00．类型";
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
 };
@@ -42,6 +43,7 @@ const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const IssueTargetOrder = jass.IssueTargetOrder as (this: void, unit: any, order: string, target: any) => boolean;
 const IssuePointOrder = jass.IssuePointOrder as (this: void, unit: any, order: string, x: number, y: number) => boolean;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, unit: any, order: string) => boolean;
@@ -250,7 +252,7 @@ export function 读取单位攻击力(this: void, unit: any): number {
 }
 
 export function 读取单位最大生命(this: void, unit: any): number {
-  return GetUnitState(unit, UNIT_STATE_MAX_LIFE) || 0;
+  return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) || 0;
 }
 
 export function 读取单位生命(this: void, unit: any): number {

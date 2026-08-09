@@ -8,6 +8,9 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
+const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundBJ: (this: void, soundHandle: any) => void;
+};
 
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -17,7 +20,6 @@ const { 获取单位玩家英雄全部名称 } = require("系统.01．单位系�
 };
 import { 英雄死亡音效冷却, 取英雄死亡音效配置 } from "./00．配置";
 
-const PlaySoundBJ = jass.PlaySoundBJ as (this: void, soundHandle: any) => void;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;

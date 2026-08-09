@@ -18,9 +18,9 @@ const 广播提示消息系统 = require("系统.09．表现系统.06．广播�
 const 游戏说明手册 = require("系统.09．表现系统.07．游戏说明手册.index") as {
   init: (this: void) => void;
 };
-const 英雄语音系统 = require("系统.09．表现系统.10．英雄语音.index") as {
-  init: (this: void) => void;
-};
+// const 英雄语音系统 = require("系统.09．表现系统.10．英雄语音.index") as {
+//   init: (this: void) => void;
+// };
 const 物品提示模拟 = require("系统.09．表现系统.12．物品提示模拟.index") as {
   init: (this: void) => void;
 };
@@ -42,7 +42,7 @@ export function init(this: void): void {
   }
 
   UI属性系统.initUiAttributeSystem();
-  英雄语音系统.init();
+  // 英雄语音系统.init();
   require("系统.09．表现系统.02．对话框系统.index");
   require("系统.09．表现系统.08．吟唱条.index");
   require("系统.09．表现系统.11．背景框.index");

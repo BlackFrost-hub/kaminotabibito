@@ -48,9 +48,7 @@ const {
   GetUnitsInRectMatching,
   GroupRemoveUnit,
   IssueImmediateOrder,
-  Location,
   Player,
-  RemoveLocation,
   RemoveRect,
   SetUnitFacing,
   SetUnitFacingTimed,
@@ -78,9 +76,7 @@ const {
   GetUnitsInRectMatching: (this: void, whichRect: any, filter: any) => any;
   GroupRemoveUnit: (this: void, whichGroup: any, whichUnit: any) => void;
   IssueImmediateOrder: (this: void, whichUnit: any, order: string) => boolean;
-  Location: (this: void, x: number, y: number) => any;
   Player: (this: void, whichPlayer: number) => any;
-  RemoveLocation: (this: void, whichLocation: any) => void;
   RemoveRect: (this: void, whichRect: any) => void;
   SetUnitFacing: (this: void, whichUnit: any, facing: number) => void;
   SetUnitFacingTimed: (this: void, whichUnit: any, facing: number, duration: number) => void;
@@ -150,14 +146,6 @@ function 对所有玩家添加区域视野(this: void, rectVarName: string): voi
   }
 }
 
-function 重设剧情FHD点(this: void, x: number, y: number): void {
-  const oldLocation = jglobals.udg_FHD;
-  if (oldLocation != null && oldLocation !== 0) {
-    RemoveLocation(oldLocation);
-  }
-  jglobals.udg_FHD = Location(x, y);
-}
-
 function 创建随机金光戒指(this: void): void {
   const rawId = 按名字反查物品ID("金光戒指");
   const itemTypeId = stringToFourCCSafe(rawId);
@@ -195,7 +183,6 @@ export function 执行长老对话前置(this: void, 参数: 剧情动作参数�
   const 自然传送门 = jglobals.gg_unit_n025_0372;
   对所有玩家添加区域视野("gg_rct________________QY");
   if (自然传送门 != null && 自然传送门 !== 0) SetUnitOwner(自然传送门, Player(6), true);
-  重设剧情FHD点(-26218.6, -28632.4);
   创建随机金光戒指();
   StopMusic(false);
 

@@ -20,6 +20,13 @@ export function buildObjectiveText(quest: QuestData, index: number): string {
   const obj = quest.objectives[index];
   if (!obj) return "";
   const mark = obj.completed ? "|cffffcc00鈭�|r" : "|cffffcc00脳|r";
+  const progressMarkerIndex = obj.description.indexOf("N/");
+  if (progressMarkerIndex >= 0) {
+    const progressText = obj.description.substring(0, progressMarkerIndex)
+      + String(obj.current)
+      + obj.description.substring(progressMarkerIndex + 1);
+    return mark + " " + progressText;
+  }
   return mark + " " + obj.description + " (" + obj.current + "/" + obj.required + ")";
 }
 

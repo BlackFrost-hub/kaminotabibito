@@ -1,41 +1,26 @@
 local ____lualib = require("lualib_bundle")
-local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local __TS__Iterator = ____lualib.__TS__Iterator
+local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local ____exports = {}
-local ____00_FF0EYDWE_51FD_6570 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local getObjectProperty = ____00_FF0EYDWE_51FD_6570.getObjectProperty
-local ObjectType = ____00_FF0EYDWE_51FD_6570.ObjectType
 local ____01_FF0E_5BF9_8BDD_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.01．对话配置表")
 local _____5BF9_8BDDNPC_914D_7F6E_5217_8868 = ____01_FF0E_5BF9_8BDD_914D_7F6E_8868["对话NPC配置列表"]
 local ____01_FF0E_652F_7EBFNPC_914D_7F6E_8868 = require("系统.11．剧情系统.02．支线任务.01．支线NPC配置表")
 local _____652F_7EBFNPC_914D_7F6E_5217_8868 = ____01_FF0E_652F_7EBFNPC_914D_7F6E_8868["支线NPC配置列表"]
 local ____02_FF0E_4EFB_52A1_914D_7F6E_8868 = require("系统.08．任务系统.00．配置表.02．任务配置表")
 local _____4EFB_52A1_914D_7F6E_5217_8868 = ____02_FF0E_4EFB_52A1_914D_7F6E_8868["任务配置列表"]
+local ____05_FF0E_4EFB_52A1_914D_7F6E_6CE8_518C = require("系统.08．任务系统.00．配置表.05．任务配置注册")
+local _____6CE8_518C_5355_4E2A_4EFB_52A1_914D_7F6E_5230_4EFB_52A1_5E93 = ____05_FF0E_4EFB_52A1_914D_7F6E_6CE8_518C["注册单个任务配置到任务库"]
+local resolveRewardDisplayText = ____05_FF0E_4EFB_52A1_914D_7F6E_6CE8_518C.resolveRewardDisplayText
+local ____04_FF0ENPC_751F_6210_5668 = require("系统.08．任务系统.00．配置表.04．NPC生成器")
+local _____6309_5355_4F4D_67E5_627ENPC_914D_7F6E = ____04_FF0ENPC_751F_6210_5668["按单位查找NPC配置"]
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
-local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
 local ____01_FF0EFourCC_8F6C_6362 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local fourCCToString = ____01_FF0EFourCC_8F6C_6362.fourCCToString
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
-function ____exports.resolveRewardDisplayText(self, quest)
-    if not quest then
-        return "无"
-    end
-    if quest["奖励显示"] and quest["奖励显示"] ~= "" then
-        return quest["奖励显示"]
-    end
-    local ____type = quest["类型"] or ""
-    local reward = quest["奖励"] or ""
-    if ____type == "给予" and (string.find(reward, ":", nil, true) or 0) - 1 >= 0 then
-        return "给予未知奖励"
-    end
-    return reward ~= "" and reward or "无"
-end
-local function normalizeRequireCount(self, count)
-    return count ~= nil and count > 1 and count or 1
-end
+____exports.resolveRewardDisplayText = resolveRewardDisplayText
 ____exports["确保任务配置已注册"] = function(self)
     local g = _G
     if g.__questConfigsRegistered then
@@ -45,50 +30,23 @@ ____exports["确保任务配置已注册"] = function(self)
     for ____, cfg in ipairs(_____4EFB_52A1_914D_7F6E_5217_8868) do
         do
             if cfg["启用"] ~= true then
-                goto __continue9
+                goto __continue4
             end
             if not cfg["任务ID"] then
-                goto __continue9
+                goto __continue4
             end
-            local questId = tostring(cfg["任务ID"])
-            if questDB:getQuest(questId) then
-                goto __continue9
-            end
-            local iconPath = ""
+            local npcCfg = nil
             if cfg["开始NPC"] then
-                local npcCfg = __TS__ArrayFind(
-                    _____652F_7EBFNPC_914D_7F6E_5217_8868,
-                    function(____, n) return n["NPC名称"] == cfg["开始NPC"] or n["NPC配置名"] == cfg["开始NPC"] end
-                )
-                if npcCfg and npcCfg["单位ID"] then
-                    iconPath = getObjectProperty(nil, ObjectType.UNIT, npcCfg["单位ID"], "Art")
+                for ____, _____914D_7F6E in ipairs(_____652F_7EBFNPC_914D_7F6E_5217_8868) do
+                    if _____914D_7F6E["NPC名称"] == cfg["开始NPC"] or _____914D_7F6E["NPC配置名"] == cfg["开始NPC"] then
+                        npcCfg = _____914D_7F6E
+                        break
+                    end
                 end
             end
-            questDB:registerQuest({
-                id = questId,
-                type = QuestType.DAILY,
-                title = cfg["名称"] or questId,
-                description = cfg["描述"] or cfg["名称"] or "",
-                objectives = (cfg["需求物品"] or cfg["目标单位"]) and ({{
-                    id = "obj1",
-                    description = cfg["描述"] or cfg["名称"] or "",
-                    current = 0,
-                    required = normalizeRequireCount(nil, cfg["需求数量"]),
-                    completed = false
-                }}) or ({}),
-                rewards = {{
-                    type = "gold",
-                    value = 0,
-                    description = ____exports.resolveRewardDisplayText(nil, cfg)
-                }},
-                status = QuestStatus.UNDISCOVERED,
-                startNpc = cfg["开始NPC"],
-                icon = iconPath or nil,
-                createdAt = 0,
-                updatedAt = 0
-            })
+            _____6CE8_518C_5355_4E2A_4EFB_52A1_914D_7F6E_5230_4EFB_52A1_5E93(cfg, npcCfg)
         end
-        ::__continue9::
+        ::__continue4::
     end
 end
 function ____exports.getQuestState(self, playerId, questId)
@@ -173,6 +131,14 @@ function ____exports.findQuestByNpc(self, npcName)
         function(____, quest) return quest["启用"] == true and quest["开始NPC"] == npcName and quest["任务ID"] end
     )
 end
+function ____exports.findQuestById(self, _____4EFB_52A1ID)
+    for ____, _____4EFB_52A1 in ipairs(_____4EFB_52A1_914D_7F6E_5217_8868) do
+        if _____4EFB_52A1["启用"] == true and _____4EFB_52A1["任务ID"] == _____4EFB_52A1ID then
+            return _____4EFB_52A1
+        end
+    end
+    return nil
+end
 function ____exports.resolveQuestEndNpc(self, quest)
     local endNpc = quest["结束NPC"]
     if not endNpc or endNpc == "没有" then
@@ -180,23 +146,33 @@ function ____exports.resolveQuestEndNpc(self, quest)
     end
     return endNpc
 end
-function ____exports.findAcceptedQuestBySubmitNpc(self, npcName, playerId)
-    return __TS__ArrayFind(
-        _____4EFB_52A1_914D_7F6E_5217_8868,
-        function(____, quest)
+function ____exports.findAcceptedQuestBySubmitNpc(self, npcName, playerId, npcQuestId, npcConfigName)
+    for ____, quest in ipairs(_____4EFB_52A1_914D_7F6E_5217_8868) do
+        do
             if quest["启用"] ~= true then
-                return false
+                goto __continue39
             end
             if not quest["任务ID"] then
-                return false
+                goto __continue39
             end
             local questId = tostring(quest["任务ID"])
             if not ____exports.hasPlayerAcceptedQuest(nil, playerId, questId) then
-                return false
+                goto __continue39
             end
-            return ____exports.resolveQuestEndNpc(nil, quest) == npcName
+            local explicitEndNpc = quest["结束NPC"]
+            if explicitEndNpc and explicitEndNpc ~= "没有" then
+                if explicitEndNpc == npcName or explicitEndNpc == npcConfigName then
+                    return quest
+                end
+                goto __continue39
+            end
+            if npcQuestId ~= nil and quest["任务ID"] == npcQuestId then
+                return quest
+            end
         end
-    )
+        ::__continue39::
+    end
+    return nil
 end
 function ____exports.findDialogConfig(self, npcName)
     return __TS__ArrayFind(
@@ -208,20 +184,24 @@ function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
     if not unit or not unitName then
         return nil
     end
+    local registeredConfig = _____6309_5355_4F4D_67E5_627ENPC_914D_7F6E(unit)
+    if registeredConfig and registeredConfig["启用"] == true then
+        return registeredConfig
+    end
     local selectedUnitCode = fourCCToString(GetUnitTypeId(unit))
     for ____, npc in ipairs(_____652F_7EBFNPC_914D_7F6E_5217_8868) do
         do
             if npc["启用"] ~= true then
-                goto __continue48
+                goto __continue52
             end
             if npc["单位ID"] and npc["单位ID"] ~= selectedUnitCode then
-                goto __continue48
+                goto __continue52
             end
             if npc["NPC名称"] == unitName or npc["NPC配置名"] == unitName then
                 return npc
             end
         end
-        ::__continue48::
+        ::__continue52::
     end
     return nil
 end

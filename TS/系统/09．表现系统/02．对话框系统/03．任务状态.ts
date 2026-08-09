@@ -1,32 +1,15 @@
-import { getObjectProperty, ObjectType } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { 对话NPC配置列表, 对话NPC配置 } from "../../08．任务系统/00．配置表/01．对话配置表";
 import { 支线NPC配置列表, 支线NPC配置 } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
 import { 任务配置列表, 任务配置 } from "../../08．任务系统/00．配置表/02．任务配置表";
-import { questDB, QuestType, QuestStatus } from "../../08．任务系统/01．任务数据";
+import { 注册单个任务配置到任务库, resolveRewardDisplayText } from "../../08．任务系统/00．配置表/05．任务配置注册";
+import { 按单位查找NPC配置 } from "../../08．任务系统/00．配置表/04．NPC生成器";
+import { questDB, QuestStatus } from "../../08．任务系统/01．任务数据";
 import { fourCCToString } from "../../../lib/扩展函数/封装函数/01．通用工具/01．FourCC转换";
 
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 
-// ========== 虚拟分区：奖励展示文案解析 ==========
-export function resolveRewardDisplayText(quest: Partial<任务配置> | null | undefined): string {
-  if (!quest) return "无";
-  if (quest.奖励显示 && quest.奖励显示 !== "") return quest.奖励显示;
-
-  const type = quest.类型 || "";
-  const reward = quest.奖励 || "";
-
-  // 外部展示文案（与内部 reward 执行规则解耦）：不写死具体句子
-  if (type === "给予" && reward.indexOf(":") >= 0) {
-    return "给予未知奖励";
-  }
-
-  return reward !== "" ? reward : "无";
-}
-
-function normalizeRequireCount(count?: number): number {
-  return count != null && count > 1 ? count : 1;
-}
+export { resolveRewardDisplayText };
 
 // ========== 虚拟分区：任务配置注册到 questDB ==========
 export function 确保任务配置已注册(): void {
@@ -37,36 +20,16 @@ export function 确保任务配置已注册(): void {
   for (const cfg of 任务配置列表) {
     if (cfg.启用 !== true) continue;
     if (!cfg.任务ID) continue;
-    const questId = cfg.任务ID.toString();
-    if (questDB.getQuest(questId)) continue;
-
-    let iconPath = "";
+    let npcCfg: 支线NPC配置 | null = null;
     if (cfg.开始NPC) {
-      const npcCfg = 支线NPC配置列表.find(n => n.NPC名称 === cfg.开始NPC || n.NPC配置名 === cfg.开始NPC);
-      if (npcCfg && npcCfg.单位ID) {
-        iconPath = getObjectProperty(ObjectType.UNIT, npcCfg.单位ID, "Art");
+      for (const 配置 of 支线NPC配置列表) {
+        if (配置.NPC名称 === cfg.开始NPC || 配置.NPC配置名 === cfg.开始NPC) {
+          npcCfg = 配置;
+          break;
+        }
       }
     }
-
-    questDB.registerQuest({
-      id: questId,
-      type: QuestType.DAILY,
-      title: cfg.名称 || questId,
-      description: cfg.描述 || cfg.名称 || "",
-      objectives: cfg.需求物品 || cfg.目标单位 ? [{
-        id: "obj1",
-        description: cfg.描述 || cfg.名称 || "",
-        current: 0,
-        required: normalizeRequireCount(cfg.需求数量),
-        completed: false,
-      }] : [],
-      rewards: [{ type: "gold", value: 0, description: resolveRewardDisplayText(cfg) }],
-      status: QuestStatus.UNDISCOVERED,
-      startNpc: cfg.开始NPC,
-      icon: iconPath || undefined,
-      createdAt: 0,
-      updatedAt: 0,
-    });
+    注册单个任务配置到任务库(cfg, npcCfg);
   }
 }
 
@@ -127,20 +90,40 @@ export function findQuestByNpc(npcName: string): 任务配置 | undefined {
   return 任务配置列表.find(quest => quest.启用 === true && quest.开始NPC === npcName && quest.任务ID);
 }
 
+export function findQuestById(任务ID: number): 任务配置 | undefined {
+  for (const 任务 of 任务配置列表) {
+    if (任务.启用 === true && 任务.任务ID === 任务ID) return 任务;
+  }
+  return undefined;
+}
+
 export function resolveQuestEndNpc(quest: 任务配置): string {
   const endNpc = quest.结束NPC;
   if (!endNpc || endNpc === "没有") return quest.开始NPC || "";
   return endNpc;
 }
 
-export function findAcceptedQuestBySubmitNpc(npcName: string, playerId: number): 任务配置 | undefined {
-  return 任务配置列表.find(quest => {
-    if (quest.启用 !== true) return false;
-    if (!quest.任务ID) return false;
+export function findAcceptedQuestBySubmitNpc(
+  npcName: string,
+  playerId: number,
+  npcQuestId?: number,
+  npcConfigName?: string,
+): 任务配置 | undefined {
+  for (const quest of 任务配置列表) {
+    if (quest.启用 !== true) continue;
+    if (!quest.任务ID) continue;
     const questId = quest.任务ID.toString();
-    if (!hasPlayerAcceptedQuest(playerId, questId)) return false;
-    return resolveQuestEndNpc(quest) === npcName;
-  });
+    if (!hasPlayerAcceptedQuest(playerId, questId)) continue;
+
+    const explicitEndNpc = quest.结束NPC;
+    if (explicitEndNpc && explicitEndNpc !== "没有") {
+      if (explicitEndNpc === npcName || explicitEndNpc === npcConfigName) return quest;
+      continue;
+    }
+
+    if (npcQuestId != null && quest.任务ID === npcQuestId) return quest;
+  }
+  return undefined;
 }
 
 export function findDialogConfig(npcName: string): 对话NPC配置 | undefined {
@@ -149,6 +132,8 @@ export function findDialogConfig(npcName: string): 对话NPC配置 | undefined {
 
 export function findEnabledNpcConfigBySelectedUnit(unit: any, unitName: string): 支线NPC配置 | null {
   if (!unit || !unitName) return null;
+  const registeredConfig = 按单位查找NPC配置(unit);
+  if (registeredConfig && registeredConfig.启用 === true) return registeredConfig;
   const selectedUnitCode = fourCCToString(GetUnitTypeId(unit) as number);
   for (const npc of 支线NPC配置列表) {
     if (npc.启用 !== true) continue;

@@ -8,6 +8,7 @@ export interface 世界地图单位出生配置 {
   敌人归类: 世界地图敌人归类;
   单位名: string;
   兼容单位ID?: string;
+  任务NPC任务ID?: number;
   X: number;
   Y: number;
   朝向: 世界地图单位朝向;

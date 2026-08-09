@@ -1,3 +1,4 @@
+/** @noSelfInFile */
 /**
  * KK扩展API - 事件注册函数
  *

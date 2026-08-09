@@ -31,10 +31,12 @@ const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通�
 };
 
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
+const SetUnitStateJapi = japi.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
@@ -193,7 +195,7 @@ function on风暴之锤生效(this: void): void {
       基础眩晕秒: cfg.眩晕秒 * singlePlayerMultiplier,
     };
     if (projectile.弹幕单位 != null && projectile.弹幕单位 !== 0) {
-      SetUnitState(projectile.弹幕单位, UNIT_STATE_MAX_LIFE, projectileLife);
+      SetUnitStateJapi(projectile.弹幕单位, UNIT_STATE_MAX_LIFE, projectileLife);
       SetUnitState(projectile.弹幕单位, UNIT_STATE_LIFE, projectileLife);
     }
     debugLogForce('沙漠食人魔-风暴之锤', '弹幕已创建', 'barrageId=', 弹幕ID, 'bossHid=', GetHandleId(data.Boss单位), 'targetHid=', GetHandleId(data.指定目标), 'life=', projectileLife, 'singlePlayerMultiplier=', singlePlayerMultiplier);

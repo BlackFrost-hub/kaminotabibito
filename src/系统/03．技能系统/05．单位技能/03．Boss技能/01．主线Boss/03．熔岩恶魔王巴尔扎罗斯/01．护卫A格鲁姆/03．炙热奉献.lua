@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_6700_5927_751F_547D, jass
+local _____53D6_6700_5927_751F_547D, jass, GetUnitStateJapi
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["巴尔扎罗斯单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
@@ -11,7 +11,7 @@ local _____64AD_653E_683C_9C81_59C6_53F0_8BCD = ____14_FF0E_53F0_8BCD_64AD_653E[
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 function _____53D6_6700_5927_751F_547D(unit)
-    return jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE) or 0
+    return GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE) or 0
 end
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
 local _____5F00_59CB_5145_80FD = ____require_result_0["开始充能"]
@@ -33,6 +33,8 @@ local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_5["显示大�
 local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.18．单位动画守护")
 local _____521B_5EFA_5355_4F4D_52A8_753B_5B88_62A4 = ____require_result_6["创建单位动画守护"]
 jass = require("jass.common")
+local japi = require("jass.japi")
+GetUnitStateJapi = japi.GetUnitState
 local KillUnit = jass.KillUnit
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale

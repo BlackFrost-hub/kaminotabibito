@@ -32,10 +32,12 @@ const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通�
   stringToFourCCSafe: (this: void, text: string) => number;
 };
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
@@ -180,7 +182,7 @@ function on血海绞杀开始(this: void, variable?: any): void {
   const boss = data.上下文.Boss单位;
   const cfg = 杀戮食人魔技能配置.血海绞杀;
   const currentLife = GetUnitState(boss, UNIT_STATE_LIFE);
-  const cost = GetUnitState(boss, UNIT_STATE_MAX_LIFE) * cfg.最大生命消耗比例;
+  const cost = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE) * cfg.最大生命消耗比例;
   const 扣血后生命 = currentLife - cost > 1 ? currentLife - cost : 1;
   SetUnitState(boss, UNIT_STATE_LIFE, 扣血后生命);
   开始硬直(boss, cfg.施法硬直秒);

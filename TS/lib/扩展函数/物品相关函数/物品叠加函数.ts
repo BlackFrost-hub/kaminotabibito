@@ -8,6 +8,9 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+    YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+};
 const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
     registerUnitEventTrigger: (this: void, trigger: any, unit: any, eventId: any, once?: boolean) => () => void;
 };
@@ -259,14 +262,21 @@ function CheakPickUp(): boolean {
     return CheakPickUpForTrigger(trig, false);
 }
 
+function isPlayerHeroOrBB(unit: any): boolean {
+    if (unit === null || unit === 0) return false;
+    if (jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)) return true;
+
+    const owner = jass.GetOwningPlayer(unit);
+    if (owner === null || owner === 0) return false;
+    return YDUserDataGetSafe("player", owner, "BB", "unit") === unit;
+}
+
 function isHeroTriggerUnit(): boolean {
-    const u = jass.GetTriggerUnit();
-    return u !== null && u !== 0 && jass.IsUnitType(u, jass.UNIT_TYPE_HERO);
+    return isPlayerHeroOrBB(jass.GetTriggerUnit());
 }
 
 function isHeroFilterUnit(): boolean {
-    const u = jass.GetFilterUnit();
-    return u !== null && u !== 0 && jass.IsUnitType(u, jass.UNIT_TYPE_HERO);
+    return isPlayerHeroOrBB(jass.GetFilterUnit());
 }
 
 function hasInventoryAbility(unit: any): boolean {

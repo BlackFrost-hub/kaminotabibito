@@ -22,11 +22,20 @@ local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩�
 local StarOther_PanCameraToTimedForPlayer = ____require_result_1.StarOther_PanCameraToTimedForPlayer
 local ____require_result_2 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local YDUserDataGet = ____require_result_2.YDUserDataGet
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
 local regionEventCenter = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
+local GetHeroLevel = jass.GetHeroLevel
+local CreateUnit = jass.CreateUnit
+local GetRandomReal = jass.GetRandomReal
+local Player = jass.Player
 local regionMap = __TS__New(Map)
 local _____533A_57DF_4F20_9001_5DF2_521D_59CB_5316 = false
 local _____5355_4F4D_533A_57DF_4F20_9001_51B7_5374 = {}
 local _____533A_57DF_4F20_9001_8FDE_89E6_53D1_4FDD_62A4Ms = 500
+local _____533A_57DF_4F20_9001_9996_6B21_8FDB_5165_5DF2_5904_7406 = {}
 local _____5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001_8868 = {}
 local _____5F53_524D_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001
 local function dbg(_msg)
@@ -239,6 +248,46 @@ local function isRegionTeleportCoolingDown(unit)
     _____5355_4F4D_533A_57DF_4F20_9001_51B7_5374[id] = now
     return false
 end
+local function _____6EE1_8DB3_533A_57DF_4F20_9001_6700_4F4E_7B49_7EA7(cfg, unit)
+    local _____6700_4F4E_82F1_96C4_7B49_7EA7 = cfg["最低英雄等级"]
+    if _____6700_4F4E_82F1_96C4_7B49_7EA7 == nil or _____6700_4F4E_82F1_96C4_7B49_7EA7 <= 0 then
+        return true
+    end
+    return GetHeroLevel(unit) >= _____6700_4F4E_82F1_96C4_7B49_7EA7
+end
+local function _____6267_884C_533A_57DF_4F20_9001_9996_6B21_8FDB_5165_521B_5EFA(cfg)
+    if _____533A_57DF_4F20_9001_9996_6B21_8FDB_5165_5DF2_5904_7406[cfg.id] == true then
+        return
+    end
+    local _____521B_5EFA_914D_7F6E = cfg["首次进入创建单位"]
+    if _____521B_5EFA_914D_7F6E == nil then
+        return
+    end
+    local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____521B_5EFA_914D_7F6E["单位ID"])
+    if _____5355_4F4D_7C7B_578BID == 0 then
+        return
+    end
+    if _____521B_5EFA_914D_7F6E["所属玩家"] ~= "中立敌对" then
+        return
+    end
+    _____533A_57DF_4F20_9001_9996_6B21_8FDB_5165_5DF2_5904_7406[cfg.id] = true
+    local _____4E2D_7ACB_654C_5BF9 = Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
+    local _____9762_5411_89D2_5EA6 = _____521B_5EFA_914D_7F6E["随机面向"] and GetRandomReal(0, 360) or 0
+    CreateUnit(
+        _____4E2D_7ACB_654C_5BF9,
+        _____5355_4F4D_7C7B_578BID,
+        _____521B_5EFA_914D_7F6E.x,
+        _____521B_5EFA_914D_7F6E.y,
+        _____9762_5411_89D2_5EA6
+    )
+end
+local function _____6267_884C_533A_57DF_4F20_9001_540E_5E7F_64AD(cfg, unit)
+    local _____5E7F_64AD_914D_7F6E = cfg["传送后广播"]
+    if _____5E7F_64AD_914D_7F6E == nil or _____5E7F_64AD_914D_7F6E["文本"] == "" then
+        return
+    end
+    _____5E7F_64AD_5355_4F4D_63D0_793A(unit, _____5E7F_64AD_914D_7F6E["文本"], _____5E7F_64AD_914D_7F6E["持续时间毫秒"])
+end
 local function onRegionEnter()
     local unit = jass.GetTriggerUnit()
     local region = jass.GetTriggeringRegion()
@@ -262,6 +311,9 @@ local function onRegionEnter()
     if not checkRegionCondition(cfg.condition, unit) then
         return
     end
+    if not _____6EE1_8DB3_533A_57DF_4F20_9001_6700_4F4E_7B49_7EA7(cfg, unit) then
+        return
+    end
     if isRegionTeleportCoolingDown(unit) then
         return
     end
@@ -275,14 +327,18 @@ local function onRegionEnter()
     local player = owner
     if player ~= nil then
         StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime)
-        jass.DisplayTimedTextToPlayer(
-            player,
-            0,
-            0,
-            8,
-            cfg.text
-        )
+        if cfg.text ~= nil and cfg.text ~= "" then
+            jass.DisplayTimedTextToPlayer(
+                player,
+                0,
+                0,
+                8,
+                cfg.text
+            )
+        end
     end
+    _____6267_884C_533A_57DF_4F20_9001_9996_6B21_8FDB_5165_521B_5EFA(cfg)
+    _____6267_884C_533A_57DF_4F20_9001_540E_5E7F_64AD(cfg, unit)
 end
 local function isValidRegionRect(cfg)
     return cfg.left < cfg.right and cfg.bottom < cfg.top
@@ -307,10 +363,10 @@ local function initRegionTeleport()
         do
             local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
             if cfg == nil or not cfg.enabled then
-                goto __continue71
+                goto __continue82
             end
             if not isValidRegionRect(cfg) then
-                goto __continue71
+                goto __continue82
             end
             local region = jass.CreateRegion()
             local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
@@ -322,7 +378,7 @@ local function initRegionTeleport()
                 cfg
             )
         end
-        ::__continue71::
+        ::__continue82::
     end
     jass.TriggerAddAction(trig, onRegionEnter)
 end

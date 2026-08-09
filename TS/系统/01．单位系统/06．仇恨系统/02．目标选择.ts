@@ -2,8 +2,8 @@
 /**
  * 02．目标选择
  *
- * 从仇恨表中选出应攻击目标（返回含 targetRef），施加目标粘性防止频繁横跳。
- * 切换条件：新目标仇恨 >= 当前目标仇恨的 1.2 倍。
+ * 从仇恨表中选出应攻击目标（返回含 targetRef）。
+ * 普通攻击可严格选择最高仇恨；Boss 主动施法保留高出当前目标至少 20% 才切换的粘性规则。
  *
  * 初始化时注册清除回调到 00．仇恨存储，实现 removeTarget/clearAllThreat 自动联动清理。
  */
@@ -13,10 +13,12 @@ const jass = require("jass.common") as any;
 const {
   getHighestThreat,
   getThreatByHid,
+  getEnemyThreats,
   注册当前目标清除回调,
 } = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储") as {
   getHighestThreat: (this: void, 敌人: any, filter?: (entry: { targetHid: number; targetRef: any; threat: number }) => boolean) => { targetHid: number; targetRef: any; threat: number } | null;
   getThreatByHid: (this: void, 敌人: any, 目标ID: number) => number;
+  getEnemyThreats: (this: void, 敌人: any) => { targetHid: number; targetRef: any; threat: number }[];
   注册当前目标清除回调: (this: void, fn: (敌人ID: number, 目标ID: number) => void) => void;
 };
 
@@ -143,10 +145,10 @@ export function 获取强制目标敌人引用(this: void, 敌人ID: number): an
 }
 
 /**
- * 根据仇恨表和粘性规则选出应攻击目标。
- * @param filter 由驱动层传入，过滤死亡/超距目标（filter 接收 ThreatEntry，含 targetRef）
+ * 严格选择过滤范围内的最高仇恨攻击目标；明确的强制点名优先。
  */
-export function 获取应攻击目标(
+export function 获取最高仇恨攻击目标(
+  this: void,
   敌人: any,
   filter?: (entry: { targetHid: number; targetRef: any; threat: number }) => boolean
 ): { targetHid: number; targetRef: any; threat: number } | null {
@@ -155,21 +157,32 @@ export function 获取应攻击目标(
 
   const 强制目标 = 获取强制攻击目标(敌人, filter);
   if (强制目标 != null) return 强制目标;
+  return getHighestThreat(敌人, filter);
+}
 
-  const best = getHighestThreat(敌人, filter);
+/**
+ * Boss 主动施法目标：最高仇恨有效且比当前目标高至少 20% 时才切换。
+ * @param filter 由驱动层传入，过滤死亡/超距目标（filter 接收 ThreatEntry，含 targetRef）
+ */
+export function 获取应攻击目标(
+  this: void,
+  敌人: any,
+  filter?: (entry: { targetHid: number; targetRef: any; threat: number }) => boolean
+): { targetHid: number; targetRef: any; threat: number } | null {
+  const 敌人ID = 取单位ID(敌人);
+  if (敌人ID === 0) return null;
+
+  const best = 获取最高仇恨攻击目标(敌人, filter);
   if (best == null) return null;
 
   const 当前记录 = 当前目标表[敌人ID];
   if (当前记录 != null && 当前记录.targetHid !== 0 && 当前记录.targetHid !== best.targetHid) {
     const 当前仇恨 = getThreatByHid(敌人, 当前记录.targetHid);
     if (当前仇恨 > 0 && best.threat < 当前仇恨 * 1.2) {
-      // 从仇恨表找当前目标的 entry（含 targetRef）
-      const entries = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储").getEnemyThreats;
-      const 列表 = entries(敌人) as { targetHid: number; targetRef: any; threat: number }[];
+      const 列表 = getEnemyThreats(敌人);
       for (let i = 0; i < 列表.length; i++) {
-        if (列表[i].targetHid === 当前记录.targetHid) {
-          return 列表[i];
-        }
+        const entry = 列表[i];
+        if (entry.targetHid === 当前记录.targetHid && (filter == null || filter(entry))) return entry;
       }
     }
   }

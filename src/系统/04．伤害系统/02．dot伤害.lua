@@ -36,6 +36,8 @@ local syncDotBuff = ____00_FF0EBuff_7CFB_7EDF.syncDotBuff
 -- - 反恢复：装备 `Buff:dmg:AntiHeal200%;time3` → 精神伤害，每秒 regenHP×200%，持续 time 秒。
 -- - 燃烧：装备 `Buff:dmg:Burn50;time5` → 火焰伤害，每秒固定 damage 点，持续 time 秒（数值由解析结果决定）。
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local g = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
@@ -69,7 +71,13 @@ end
 local dotTicks = {}
 local equipDataMod = require("系统.02．物品系统.01．装备数据")
 local itemsData = equipDataMod.items or equipDataMod.default or ({})
-local dotBaseUtils = createDotBaseUtils(nil, {jass = jass, g = g, itemsData = itemsData, fourCCToString = fourCCToString})
+local dotBaseUtils = createDotBaseUtils(nil, {
+    jass = jass,
+    getUnitStateJapi = GetUnitStateJapi,
+    g = g,
+    itemsData = itemsData,
+    fourCCToString = fourCCToString
+})
 local function removeDotTicksForTargetHid(self, typeId, tgtHid)
     do
         local i = #dotTicks - 1

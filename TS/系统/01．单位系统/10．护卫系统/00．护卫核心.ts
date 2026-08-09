@@ -8,6 +8,9 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+const { registerPlayerUnitEventForPlayerIds } = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
+  registerPlayerUnitEventForPlayerIds: (this: void, trig: any, playerIds: readonly number[], eventId: any, filter?: any) => void;
+};
 const { addDelayedCallback, addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -21,8 +24,8 @@ const { IsUnitPausedBJ } = require("lib.扩展函数.BJ函数.08．单位BJ扩�
 const { isValidCombatEnemyUnit } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isValidCombatEnemyUnit: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
-const { 获取应攻击目标 } = require("系统.01．单位系统.06．仇恨系统.02．目标选择") as {
-  获取应攻击目标: (this: void, enemy: any, filter?: (entry: { targetHid: number; targetRef: any; threat: number }) => boolean) => { targetHid: number; targetRef: any; threat: number } | null;
+const { 获取最高仇恨攻击目标 } = require("系统.01．单位系统.06．仇恨系统.02．目标选择") as {
+  获取最高仇恨攻击目标: (this: void, enemy: any, filter?: (entry: { targetHid: number; targetRef: any; threat: number }) => boolean) => { targetHid: number; targetRef: any; threat: number } | null;
 };
 
 const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -47,9 +50,14 @@ const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => numbe
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const OrderId = jass.OrderId as (order: string) => number;
+const GetAttacker = jass.GetAttacker as () => any;
+const GetTriggerUnit = jass.GetTriggerUnit as () => any;
+const CreateTrigger = jass.CreateTrigger as () => any;
+const TriggerAddAction = jass.TriggerAddAction as (trig: any, action: () => void) => any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_TYPE_SUMMONED = jass.UNIT_TYPE_SUMMONED as any;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
+const EVENT_PLAYER_UNIT_ATTACKED = jass.EVENT_PLAYER_UNIT_ATTACKED as any;
 
 const 护卫驱动间隔毫秒 = 250;
 const 护卫保护Boss范围 = 1500;
@@ -62,6 +70,7 @@ const 攻击一次命令ID = OrderId("attackonce");
 const 移动命令ID = OrderId("move");
 const 停止命令ID = OrderId("stop");
 const 保持命令ID = OrderId("holdposition");
+const 护卫攻击事件玩家ID = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] as const;
 
 export interface 护卫登记参数 {
   主Boss单位: any;
@@ -99,6 +108,7 @@ const 按护卫句柄索引的记录表: Record<number, 护卫记录 | undefined
 const 按Boss句柄索引的护卫句柄表: Record<number, number[] | undefined> = {};
 let 护卫登记顺序计数 = 0;
 let 护卫驱动回调ID = 0;
+let 护卫攻击纠偏事件已注册 = false;
 
 interface 护卫驱动状态 {
   模式: "无" | "攻击" | "回位";
@@ -149,7 +159,7 @@ function 单位可作为仇恨目标(this: void, entry: { targetRef: any }): boo
 }
 
 function 获取护卫仇恨目标(this: void, guard: any): any {
-  const entry = 获取应攻击目标(guard, 单位可作为仇恨目标);
+  const entry = 获取最高仇恨攻击目标(guard, 单位可作为仇恨目标);
   return entry == null ? null : entry.targetRef;
 }
 
@@ -222,6 +232,45 @@ function 驱动护卫攻击(this: void, guard: any, target: any, state: 护卫�
     state.模式 = "攻击";
     state.攻击目标ID = targetId;
   }
+}
+
+function on护卫开始攻击(this: void): void {
+  const guard = GetAttacker();
+  const guardHandleId = 获取句柄ID(guard);
+  if (guardHandleId === 0) return;
+  const record = 按护卫句柄索引的记录表[guardHandleId];
+  if (record == null || record.护卫单位 !== guard || !单位存活(record.主Boss单位)) return;
+
+  const 玩家组 = YDUserDataGetSafe("string", "玩家", "玩家组", "force");
+  let target = 获取护卫仇恨目标(guard);
+  if (target == null || target === 0) target = 选择Boss附近战斗目标(record.主Boss单位, 玩家组);
+  if (target == null || target === 0) return;
+
+  let state = 按护卫句柄索引的驱动状态表[guardHandleId];
+  if (state == null) {
+    state = 创建空驱动状态();
+    按护卫句柄索引的驱动状态表[guardHandleId] = state;
+  }
+
+  const actualTargetId = 获取句柄ID(GetTriggerUnit());
+  const expectedTargetId = 获取句柄ID(target);
+  if (actualTargetId === expectedTargetId) {
+    state.模式 = "攻击";
+    state.攻击目标ID = expectedTargetId;
+    return;
+  }
+
+  state.模式 = "攻击";
+  state.攻击目标ID = actualTargetId;
+  驱动护卫攻击(guard, target, state);
+}
+
+function 注册护卫攻击纠偏事件(this: void): void {
+  if (护卫攻击纠偏事件已注册) return;
+  护卫攻击纠偏事件已注册 = true;
+  const trig = CreateTrigger();
+  registerPlayerUnitEventForPlayerIds(trig, 护卫攻击事件玩家ID, EVENT_PLAYER_UNIT_ATTACKED);
+  TriggerAddAction(trig, on护卫开始攻击);
 }
 
 function 刷新护卫返回点(this: void, boss: any, state: 护卫驱动状态): void {
@@ -303,6 +352,7 @@ function on护卫驱动Tick(this: void): void {
 
 function 确保护卫驱动已启动(this: void): void {
   if (护卫驱动回调ID !== 0) return;
+  注册护卫攻击纠偏事件();
   护卫驱动回调ID = addPeriodicCallback(护卫驱动间隔毫秒, on护卫驱动Tick);
 }
 

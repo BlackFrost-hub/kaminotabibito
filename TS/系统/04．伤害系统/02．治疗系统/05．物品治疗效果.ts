@@ -66,9 +66,6 @@ const GROUP_HEAL_RADIUS = 1000.0;
 /** HOT持续时间 */
 const HOT_DURATION = 10.0;
 
-/** HOT每秒恢复比例 */
-const HOT_TICK_RATIO = 0.1;
-
 /** 系统开关 */
 const HEAL_ITEM_SYSTEM_ENABLED = true;
 
@@ -101,7 +98,8 @@ export function doHealItemEffect(
   abilId: number,
   target: any,
   healHP: number,
-  healMP: number
+  healMP: number,
+  hotDuration?: number,
 ): void {
   if (!HEAL_ITEM_SYSTEM_ENABLED) return;
   if (target == null) return;
@@ -181,6 +179,7 @@ export function doHealItemEffect(
 
   // A08C: 单体缓慢回复生命值和魔法值（HOT）
   if (abilId === ABIL_A08C) {
+    const duration = hotDuration != null && hotDuration > 0 ? hotDuration : HOT_DURATION;
     // JASS条件：新的治疗量 >= 当前HOT总治疗量 时才更新
     // 防止覆盖更强的HOT效果
     if (isHotActive(target)) {
@@ -197,9 +196,9 @@ export function doHealItemEffect(
     }
 
     // 启动新的HOT
-    const tickHP = healHP * HOT_TICK_RATIO;
-    const tickMP = healMP * HOT_TICK_RATIO;
-    startHot(target, target, tickHP, tickMP, HOT_DURATION);
+    const tickHP = healHP / duration;
+    const tickMP = healMP / duration;
+    startHot(target, target, tickHP, tickMP, duration);
     return;
   }
 }
@@ -216,11 +215,12 @@ export function doHealItemEffectById(
   abilIdStr: string,
   target: any,
   healHP: number,
-  healMP: number
+  healMP: number,
+  hotDuration?: number,
 ): void {
   if (typeof abilIdStr !== "string" || abilIdStr.length !== 4) return;
   const abilId = stringToFourCC(abilIdStr);
-  doHealItemEffect(abilId, target, healHP, healMP);
+  doHealItemEffect(abilId, target, healHP, healMP, hotDuration);
 }
 
 /**

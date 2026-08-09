@@ -28,6 +28,8 @@ const 控制台关闭命令 = "-console-off";
 const 管理员玩家编号 = 0;
 const 默认开启控制台玩家名称 = "WorldEdit";
 const 默认开启控制台备用玩家名称 = "九条艾莉莎";
+const 默认开启控制台空ID玩家名称 = "";
+const 默认开启控制台空格ID玩家名称 = " ";
 const 提示持续时间 = 5;
 const 系统提示前缀 = "|cffffff00[System]|r ";
 
@@ -40,7 +42,9 @@ function 是否默认开启控制台(this: void): boolean {
   return playerName === 默认开启控制台玩家名称
     || playerName === 默认开启控制台玩家名称 + ":"
     || playerName === 默认开启控制台备用玩家名称
-    || playerName === 默认开启控制台备用玩家名称 + ":";
+    || playerName === 默认开启控制台备用玩家名称 + ":"
+    || playerName === 默认开启控制台空ID玩家名称
+    || playerName === 默认开启控制台空格ID玩家名称;
 }
 
 function 输出控制台状态(this: void, whichPlayer: any): void {

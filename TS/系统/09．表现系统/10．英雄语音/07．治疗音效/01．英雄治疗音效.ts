@@ -21,6 +21,9 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string | undefined | null) => number;
 };
+const { PlaySoundOnUnitBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundOnUnitBJ: (this: void, soundHandle: any, volumePercent: number, whichUnit: any) => void;
+};
 
 import { 英雄治疗音效配置列表, 英雄治疗音效冷却, 治疗音效排除来源Rawcode列表 } from "./00．配置";
 
@@ -28,7 +31,6 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const IsUnitAlly = jass.IsUnitAlly as (unit: any, whichPlayer: any) => boolean;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
-const PlaySoundOnUnitBJ = jass.PlaySoundOnUnitBJ as (soundHandle: any, volumePercent: number, whichUnit: any) => void;
 
 const 冷却字段 = "受到帮助语音";
 

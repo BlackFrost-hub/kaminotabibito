@@ -52,17 +52,23 @@ function 获取单位ID(this: void, unit: any): number {
   return GetHandleId(unit) || 0;
 }
 
-function 数字升序排序(this: void, a: number, b: number): number {
-  return a - b;
+function 按升序插入数字(this: void, 数字列表: number[], 数字: number): void {
+  let 插入位置 = 数字列表.length;
+  for (let i = 0; i < 数字列表.length; i++) {
+    if (数字 < 数字列表[i]) {
+      插入位置 = i;
+      break;
+    }
+  }
+  数字列表.splice(插入位置, 0, 数字);
 }
 
 function 获取有序单位状态ID列表(this: void, 状态表: Record<number, 条件开关状态 | undefined>): number[] {
   const ids: number[] = [];
   for (const unitKey in 状态表) {
     const unitId = Number(unitKey);
-    if (!isNaN(unitId)) ids.push(unitId);
+    if (!isNaN(unitId)) 按升序插入数字(ids, unitId);
   }
-  ids.sort(数字升序排序);
   return ids;
 }
 

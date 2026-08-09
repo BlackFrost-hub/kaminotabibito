@@ -1,4 +1,5 @@
 local ____lualib = require("lualib_bundle")
+local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local ____exports = {}
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
@@ -27,6 +28,11 @@ function ____exports.buildObjectiveText(self, quest, index)
         return ""
     end
     local mark = obj.completed and "|cffffcc00鈭�|r" or "|cffffcc00脳|r"
+    local progressMarkerIndex = (string.find(obj.description, "N/", nil, true) or 0) - 1
+    if progressMarkerIndex >= 0 then
+        local progressText = (__TS__StringSubstring(obj.description, 0, progressMarkerIndex) .. tostring(obj.current)) .. __TS__StringSubstring(obj.description, progressMarkerIndex + 1)
+        return (mark .. " ") .. progressText
+    end
     return ((((((mark .. " ") .. obj.description) .. " (") .. tostring(obj.current)) .. "/") .. tostring(obj.required)) .. ")"
 end
 function ____exports.buildRewardText(self, quest)

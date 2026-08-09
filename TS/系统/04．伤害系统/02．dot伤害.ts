@@ -16,6 +16,8 @@
  */
 // ========== 虚拟分区：运行时依赖 ==========
 const jass = require("jass.common") as Record<string, unknown>;
+const japi = require("jass.japi") as Record<string, unknown>;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const g = require("jass.globals") as Record<string, unknown>;
 
 // ========== 虚拟分区：DOT 子模块导入 ==========
@@ -87,6 +89,7 @@ const equipDataMod = require("系统.02．物品系统.01．装备数据") as {
 const itemsData = equipDataMod.items ?? equipDataMod.default ?? {};
 const dotBaseUtils = createDotBaseUtils({
   jass: jass as any,
+  getUnitStateJapi: GetUnitStateJapi,
   g: g as any,
   itemsData: itemsData as Record<string, { Buff?: string }>,
   fourCCToString,

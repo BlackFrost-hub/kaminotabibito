@@ -10,6 +10,7 @@ local ____02_FF0EDOT_89E3_6790 = require("系统.04．伤害系统.01．DOT定�
 local splitItemBuffSegments = ____02_FF0EDOT_89E3_6790.splitItemBuffSegments
 function ____exports.createDotBaseUtils(self, deps)
     local jass = deps.jass
+    local getUnitStateJapi = deps.getUnitStateJapi
     local g = deps.g
     local itemsData = deps.itemsData
     local fourCCToString = deps.fourCCToString
@@ -148,7 +149,7 @@ function ____exports.createDotBaseUtils(self, deps)
         if maxLifeState == nil then
             return 0
         end
-        local v = jass.GetUnitState(targetUnit, maxLifeState)
+        local v = getUnitStateJapi(targetUnit, maxLifeState)
         return type(v) == "number" and __TS__NumberIsFinite(__TS__Number(v)) and v > 0 and v or 0
     end
     local function getTargetRegenHP(self, targetUnit)

@@ -13,6 +13,7 @@ local UNIT_STATE_ATTACK1_BASE = 18
 local UNIT_STATE_MANA_REGEN = 32
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
+local GetUnitStateJapi = japi.GetUnitState
 local SetUnitStateJapi = japi.SetUnitState
 local function _____5339_914D_989D_5916_5C5E_6027_89C4_5219(unit, rule)
     if rule.onlyMelee == true and jass.IsUnitType(unit, jass.UNIT_TYPE_MELEE_ATTACKER) ~= true then
@@ -24,7 +25,7 @@ local function _____5339_914D_989D_5916_5C5E_6027_89C4_5219(unit, rule)
     return true
 end
 local function _____589E_52A0_5355_4F4D_72B6_6001(unit, state, delta)
-    local current = jass.GetUnitState(unit, state) or 0
+    local current = GetUnitStateJapi(unit, state) or 0
     SetUnitStateJapi(unit, state, current + delta)
 end
 local function _____5E94_7528_5355_6761_989D_5916_5C5E_6027_89C4_5219(unit, level, rule)

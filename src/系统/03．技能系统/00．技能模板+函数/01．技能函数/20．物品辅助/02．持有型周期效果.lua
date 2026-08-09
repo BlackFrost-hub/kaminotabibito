@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__Number = ____lualib.__TS__Number
 local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
-local __TS__ArraySort = ____lualib.__TS__ArraySort
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
@@ -24,18 +24,28 @@ local function _____83B7_53D6_5355_4F4DID(unit)
     end
     return GetHandleId(unit) or 0
 end
-local function _____6570_5B57_5347_5E8F_6392_5E8F(a, b)
-    return a - b
+local function _____6309_5347_5E8F_63D2_5165_6570_5B57(_____6570_5B57_5217_8868, _____6570_5B57)
+    local _____63D2_5165_4F4D_7F6E = #_____6570_5B57_5217_8868
+    do
+        local i = 0
+        while i < #_____6570_5B57_5217_8868 do
+            if _____6570_5B57 < _____6570_5B57_5217_8868[i + 1] then
+                _____63D2_5165_4F4D_7F6E = i
+                break
+            end
+            i = i + 1
+        end
+    end
+    __TS__ArraySplice(_____6570_5B57_5217_8868, _____63D2_5165_4F4D_7F6E, 0, _____6570_5B57)
 end
 local function _____83B7_53D6_6709_5E8F_5355_4F4D_72B6_6001ID_5217_8868(_____72B6_6001_8868)
     local ids = {}
     for unitKey in pairs(_____72B6_6001_8868) do
         local unitId = __TS__Number(unitKey)
         if not __TS__NumberIsNaN(__TS__Number(unitId)) then
-            ids[#ids + 1] = unitId
+            _____6309_5347_5E8F_63D2_5165_6570_5B57(ids, unitId)
         end
     end
-    __TS__ArraySort(ids, _____6570_5B57_5347_5E8F_6392_5E8F)
     return ids
 end
 local function _____5904_7406_83B7_5F97(_____914D_7F6E, unit, _item, currentCount, previousCount)
@@ -95,7 +105,7 @@ local function ____on_6301_6709_578B_5468_671F_6548_679CTick(now)
                 local _____914D_7F6E = _____6301_6709_578B_5468_671F_6548_679C_5B9E_4F8B_8868[i + 1]
                 if _____914D_7F6E["按单位独立计时"] ~= true then
                     if now < _____914D_7F6E["下次触发时间"] then
-                        goto __continue20
+                        goto __continue23
                     end
                     _____914D_7F6E["下次触发时间"] = now + _____914D_7F6E["间隔毫秒"]
                 end
@@ -109,7 +119,7 @@ local function ____on_6301_6709_578B_5468_671F_6548_679CTick(now)
                             local _____72B6_6001 = _____914D_7F6E["单位状态"][unitId]
                             if _____72B6_6001 == nil or _____72B6_6001["单位"] == nil or _____72B6_6001["单位"] == 0 then
                                 _____5F85_6E05_7406[#_____5F85_6E05_7406 + 1] = unitId
-                                goto __continue24
+                                goto __continue27
                             end
                             local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(_____72B6_6001["单位"], _____914D_7F6E["物品类型ID"])
                             if currentCount <= 0 then
@@ -118,18 +128,18 @@ local function ____on_6301_6709_578B_5468_671F_6548_679CTick(now)
                                 if ____opt_11 ~= nil then
                                     ____opt_11(_____72B6_6001["单位"], _____72B6_6001["数量"])
                                 end
-                                goto __continue24
+                                goto __continue27
                             end
                             _____72B6_6001["数量"] = 1
                             if _____914D_7F6E["按单位独立计时"] == true then
                                 if now < _____72B6_6001["下次触发时间"] then
-                                    goto __continue24
+                                    goto __continue27
                                 end
                                 _____72B6_6001["下次触发时间"] = now + _____914D_7F6E["间隔毫秒"]
                             end
                             _____914D_7F6E["周期回调"](_____72B6_6001["单位"], 1)
                         end
-                        ::__continue24::
+                        ::__continue27::
                         unitIndex = unitIndex + 1
                     end
                 end
@@ -141,7 +151,7 @@ local function ____on_6301_6709_578B_5468_671F_6548_679CTick(now)
                     end
                 end
             end
-            ::__continue20::
+            ::__continue23::
             i = i + 1
         end
     end
@@ -225,11 +235,11 @@ local function _____8865_767B_8BB0_521D_59CB_5355_4F4D(_____914D_7F6E)
                 local unit = _____5355_4F4D_5217_8868[i + 1]
                 local unitId = _____83B7_53D6_5355_4F4DID(unit)
                 if unitId == 0 then
-                    goto __continue51
+                    goto __continue54
                 end
                 local currentCount = _____83B7_53D6_5355_4F4D_5F53_524D_6301_6709_6307_5B9A_7269_54C1_6570_91CF(unit, _____914D_7F6E["物品类型ID"])
                 if currentCount <= 0 then
-                    goto __continue51
+                    goto __continue54
                 end
                 _____914D_7F6E["单位状态"][unitId] = {
                     ["单位"] = unit,
@@ -241,7 +251,7 @@ local function _____8865_767B_8BB0_521D_59CB_5355_4F4D(_____914D_7F6E)
                     ____opt_13(unit, 1)
                 end
             end
-            ::__continue51::
+            ::__continue54::
             i = i + 1
         end
     end

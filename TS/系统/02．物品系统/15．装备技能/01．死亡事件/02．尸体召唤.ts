@@ -51,7 +51,7 @@ function 计算召唤生命值(this: void, 持有者: any, 基础值: number, �
 }
 
 function 计算召唤攻击力(this: void, 持有者: any, 基础值: number, 攻击状态: number, 系数: number): number {
-  return 基础值 + (jass.GetUnitState(持有者, jass.ConvertUnitState(攻击状态)) as number) * 系数;
+  return 基础值 + (GetUnitStateJapi(持有者, jass.ConvertUnitState(攻击状态)) as number) * 系数;
 }
 
 function 创建尸体召唤物(this: void, 持有者: any, 上下文: 死亡事件上下文): void {

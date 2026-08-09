@@ -34,6 +34,6 @@ end
 local ____require_result_0 = require("系统.09．表现系统.03．UI属性系统.03．系统入口")
 local initUiAttributeSystem = ____require_result_0.initUiAttributeSystem
 function ____exports.init()
-    initUiAttributeSystem(nil)
+    initUiAttributeSystem()
 end
 return ____exports

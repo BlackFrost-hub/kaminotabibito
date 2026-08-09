@@ -482,7 +482,7 @@ function taskUIInitPcallBody(): void {
   pcallInitTarget?.runInitBodyInPcall();
 }
 
-// ── 虚拟分区：热键回调：sync=true 全房触发，按 triggerPlayerId 路由到对应槽位 ──
+// ── 虚拟分区：热键同步回调：按触发玩家路由到对应槽位 ──
 let __togglePanelTriggerPlayer: any = null;
 
 function taskUITogglePanelPcallBody(): void {

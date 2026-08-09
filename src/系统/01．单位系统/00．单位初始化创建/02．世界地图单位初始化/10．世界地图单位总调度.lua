@@ -52,6 +52,7 @@ local _____8DEF_4EBANPC_5DF2_5B8C_6210 = false
 local _____5546_4EBA_5DF2_5B8C_6210 = false
 local _____5168_90E8_521B_5EFA_5B8C_6210_56DE_8C03
 local _____5168_90E8_521B_5EFA_5B8C_6210_56DE_8C03_5DF2_89E6_53D1 = false
+local _____4E16_754C_5730_56FE_5168_90E8_5355_4F4D_521B_5EFA_5B8C_6210_76D1_542C_8868 = {}
 local _____5F53_524D_7CBE_82F1_9009_9879
 local _____5F53_524D_8DEF_4EBANPC_9009_9879
 local _____5F53_524D_5546_4EBA_9009_9879
@@ -219,7 +220,19 @@ local function _____603B_8C03_5EA6_76D1_89C6_56DE_8C03()
             if type(_____5B8C_6210_56DE_8C03) == "function" then
                 _____5B8C_6210_56DE_8C03()
             end
+            for ____, _____76D1_542C_51FD_6570 in ipairs(_____4E16_754C_5730_56FE_5168_90E8_5355_4F4D_521B_5EFA_5B8C_6210_76D1_542C_8868) do
+                _____76D1_542C_51FD_6570()
+            end
         end
+    end
+end
+____exports["注册世界地图全部单位创建完成监听"] = function(_____76D1_542C_51FD_6570)
+    if type(_____76D1_542C_51FD_6570) ~= "function" then
+        return
+    end
+    _____4E16_754C_5730_56FE_5168_90E8_5355_4F4D_521B_5EFA_5B8C_6210_76D1_542C_8868[#_____4E16_754C_5730_56FE_5168_90E8_5355_4F4D_521B_5EFA_5B8C_6210_76D1_542C_8868 + 1] = _____76D1_542C_51FD_6570
+    if _____5F53_524D_72B6_6001["当前阶段"] == "完成" then
+        _____76D1_542C_51FD_6570()
     end
 end
 local function _____542F_52A8_603B_8C03_5EA6_76D1_89C6(_____95F4_9694_79D2)

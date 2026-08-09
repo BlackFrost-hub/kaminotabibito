@@ -1,6 +1,9 @@
 /** @noSelfInFile */
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const AttachSoundToUnit = jass.AttachSoundToUnit as (this: void, soundHandle: any, unit: any) => void;
+const SetSoundVolume = jass.SetSoundVolume as (this: void, soundHandle: any, volume: number) => void;
+const StartSound = jass.StartSound as (this: void, soundHandle: any) => void;
 
 export const bj_CINEMODE_GAMESPEED = jglobals.bj_CINEMODE_GAMESPEED ?? 0;
 export const bj_CINEMODE_INTERFACEFADE = jglobals.bj_CINEMODE_INTERFACEFADE ?? 0.5;
@@ -131,11 +134,18 @@ export function IsDawnDuskEnabled(): boolean {
   return !!bj_useDawnDuskSounds;
 }
 
-export function PlaySoundBJ(soundHandle: any): void {
+export function PlaySoundBJ(this: void, soundHandle: any): void {
   jglobals.bj_lastPlayedSound = soundHandle;
   if (soundHandle != null) {
-    jass.StartSound(soundHandle);
+    StartSound(soundHandle);
   }
+}
+
+/** 与 Blizzard.j 的 PlaySoundOnUnitBJ 保持一致。 */
+export function PlaySoundOnUnitBJ(this: void, soundHandle: any, volumePercent: number, whichUnit: any): void {
+  AttachSoundToUnit(soundHandle, whichUnit);
+  SetSoundVolume(soundHandle, volumePercent);
+  PlaySoundBJ(soundHandle);
 }
 
 export {};

@@ -14,8 +14,8 @@ const ____npcEffect = require("系统.09．表现系统.02．对话框系统.09�
   scheduleGrayQuestMarkerAfterBubbleFade: (this: void, npcUnit: any) => void;
 };
 function getDialogNpcUnit(this: void, playerId: number): any { return ____npcEffect.getNpcUnit(playerId); }
-const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
-  stringToFourCC: (this: void, s: string) => number;
+const { 发放任务物品 } = require("系统.09．表现系统.02．对话框系统.14．任务物品发放") as {
+  发放任务物品: (this: void, unit: any, itemConfig: string | undefined) => number;
 };
 import { findDialogConfig } from "./03．任务状态";
 import { hasPlayerAcceptedQuest, hasPlayerCompletedQuest, setQuestState } from "./03．任务状态";
@@ -44,18 +44,6 @@ function normalizeRequireCount(count?: number): number {
 
 function refreshTaskUIForAllClientsSoon(playerId: number, questId?: string): void {
   questManager.triggerUIRefresh(playerId, questId);
-}
-
-function grantQuestItems(hero: any, questItems?: string): void {
-  if (!hero || !questItems || questItems === "") return;
-  const items = questItems.split("|");
-  for (const raw of items) {
-    const itemCode = raw.trim();
-    if (itemCode.length !== 4) continue;
-    const itemId = stringToFourCC(itemCode);
-    if (itemId === 0) continue;
-    jass.UnitAddItemById(hero, itemId);
-  }
 }
 
 function canAcceptQuestByRequirements(quest: 任务配置, hero: any): boolean {
@@ -212,7 +200,7 @@ export function buildQuestOfferDialog(
         if (!hasPlayerAcceptedQuest(dialogOwnerId, questId)) {
           const playerName = jass.GetPlayerName(playerObj) || "冒险者";
           setQuestState(dialogOwnerId, questId, 1, playerName);
-          grantQuestItems(hero, quest.任务物品);
+          发放任务物品(hero, quest.任务物品);
           if (quest.接取后动作) quest.接取后动作(dialogOwnerId);
           refreshTaskUIForAllClientsSoon(dialogOwnerId, questId);
         }

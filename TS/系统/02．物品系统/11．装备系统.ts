@@ -30,6 +30,12 @@ const itemRelatedFns = require("lib.扩展函数.物品相关函数.index") as {
   是否百分比装备属性名: (this: void, name: string) => boolean;
   getItemDataEntry: (this: void, item: any) => any | null;
 };
+const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
+};
+const dynamicSkillText = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑") as {
+  同步刷新英雄技能界面: (this: void, hero: any) => void;
+};
 const { getObjectProperty, ObjectType } = require("lib.扩展函数.YDWE函数.index") as {
   getObjectProperty: (objectType: number, objectId: string | number, property: string) => string;
   ObjectType: { UNIT: number };
@@ -119,7 +125,7 @@ export function 处理合成消耗装备属性(this: void, unit: any, item: any,
   const itemData = itemRelatedFns.getItemDataEntry(item);
   if (!itemData) return;
   const skipType = itemData.type;
-  if (skipType === "任务" || skipType === "药剂" || skipType === "食品") return;
+  if (skipType === "任务" || skipType === "药剂" || skipType === "食品" || String(itemData.PowerUP || "").trim() !== "") return;
 
   const charges = GetItemCharges(item);
   const itemCount = charges > 0 ? charges : 1;
@@ -173,6 +179,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     equipShared.skipNextDrop = false;
     return;
   }
+  if (getRegisteredPlayerHero(player) !== unit) return;
   const idStr = fourCCToString(GetItemTypeId(item));
   if (不走装备系统物品ID表[idStr] === true) return;
   const itemData = itemRelatedFns.getItemDataEntry(item);
@@ -186,7 +193,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     return;
   }
   const skipType = itemData.type;
-  if (skipType === "任务" || skipType === "药剂" || skipType === "食品") return;
+  if (skipType === "任务" || skipType === "药剂" || skipType === "食品" || String(itemData.PowerUP || "").trim() !== "") return;
   // 消耗品（有 hot）用完后会触发 DROP，不提示「丢弃」，但仍需计算属性
   const isConsumable = isDrop && itemData.hot != null;
   // 拾取时：装备限制不通过则不加属性、不提示"获得"，并标记跳过下一次 DROP（装备限制会 UnitRemoveItem 触发丢弃）
@@ -233,7 +240,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   const 装备颜色代码 = 装备等级颜色代码(undefined, levelText);
   const coloredLevel = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, levelText) : 装备颜色代码 + levelText + "|r";
   const coloredName = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, 装备原名) : 装备颜色代码 + 装备原名 + "|r";
-    // 消耗品丢弃不显示消息，但仍计算属性
+  // 消耗品丢弃不显示消息，但仍计算属性。
   if (!isConsumable && !isEquipItemMessageSilenced()) {
     let msg = "|cffffff00『系统消息』：|r" + "|cFF87CEEB【装备】|r " + actionText + coloredLevel + "级装备『" + coloredName + "』";
         for (const stat of playerStats) {
@@ -248,6 +255,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   }
 
   const tempReadMap = applyEquipStatsTS(unit, playerStats);
+  dynamicSkillText.同步刷新英雄技能界面(unit);
   if (tempReadMap["视野"] != null) {
     刷新装备视野显示Buff(unit, Number(tempReadMap["视野"]) || 0);
   }
@@ -280,14 +288,18 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
 /**
  * 初始化事件：使用物品事件中心统一注册
  */
+function 处理装备拾取事件(this: void, unit: any, item: any): void {
+  handleItemEvent(unit, item, true);
+}
+
+function 处理装备丢弃事件(this: void, unit: any, item: any): void {
+  handleItemEvent(unit, item, false);
+}
+
 function initEvents(): void {
   // 使用物品事件中心注册，减少触发器数量
-  onItemPickup((unit, item) => {
-    handleItemEvent(unit, item, true);
-  });
-  onItemDrop((unit, item) => {
-    handleItemEvent(unit, item, false);
-  });
+  onItemPickup(处理装备拾取事件);
+  onItemDrop(处理装备丢弃事件);
 }
 
 initEvents();

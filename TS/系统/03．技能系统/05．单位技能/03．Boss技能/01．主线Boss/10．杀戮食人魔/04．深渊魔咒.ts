@@ -50,12 +50,14 @@ const { 通用物品技能槽位配置表 } = require('系统.02．物品系统.
   通用物品技能槽位配置表: Array<{ 技能ID: string }>;
 };
 const jass = require('jass.common') as any;
+const japi = require('jass.japi') as any;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
@@ -141,7 +143,7 @@ function on深渊魔咒目标施法(this: void, castingUnit: any, _spellAbilityI
   }
   const cfg = 杀戮食人魔技能配置.深渊魔咒;
   const difficulty = getGameDifficulty() > 0 ? getGameDifficulty() : 1;
-  const damage = GetUnitState(castingUnit, UNIT_STATE_MAX_LIFE) * (cfg.最大生命基础比例 + cfg.最大生命每层难度比例 * difficulty)
+  const damage = GetUnitStateJapi(castingUnit, UNIT_STATE_MAX_LIFE) * (cfg.最大生命基础比例 + cfg.最大生命每层难度比例 * difficulty)
     + 读取单位攻击力(castingUnit) * (cfg.攻击力基础比例 + cfg.攻击力每层难度比例 * difficulty);
   const receiver = 取随机转移目标(boss, castingUnit);
   if (!单位存活(receiver)) return;

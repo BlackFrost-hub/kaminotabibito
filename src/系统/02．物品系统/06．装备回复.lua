@@ -1,14 +1,26 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local applyItemHeal, executeSegment, _____505C_6B62_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5, _____5904_7406_88C5_5907_56DE_590D_9632_6296_5230_671F, _____5904_7406_88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5230_671F, ____on_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5, doHealItemEffectById, removePeriodicCallback, getServerTime, calcEquipHealHpMp, _____88C5_5907_56DE_590D_9632_6296_952E_5217_8868, _____88C5_5907_56DE_590D_9632_6296_5230_671F_6BEB_79D2_5217_8868, _____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868, _____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868, _____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868, _____88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5_56DE_8C03ID
-function applyItemHeal(unit, hp, mp, abilId)
-    doHealItemEffectById(abilId, unit, hp, mp)
+local applyItemHeal, executeSegment, _____505C_6B62_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5, _____5904_7406_88C5_5907_56DE_590D_9632_6296_5230_671F, _____5904_7406_88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5230_671F, ____on_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5, doHealItemEffectById, removePeriodicCallback, getServerTime, calcEquipHealHpMp, _____88C5_5907_56DE_590D_9632_6296_952E_5217_8868, _____88C5_5907_56DE_590D_9632_6296_5230_671F_6BEB_79D2_5217_8868, _____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868, _____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868, _____88C5_5907_56DE_590D_5EF6_8FDF_6301_7EED_65F6_95F4_5217_8868, _____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868, _____88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5_56DE_8C03ID
+function applyItemHeal(unit, hp, mp, abilId, hotDuration)
+    doHealItemEffectById(
+        abilId,
+        unit,
+        hp,
+        mp,
+        hotDuration
+    )
 end
-function executeSegment(unit, seg)
+function executeSegment(unit, seg, hotDuration)
     local ____calcEquipHealHpMp_result_5 = calcEquipHealHpMp(nil, seg.tokens, unit)
     local hp = ____calcEquipHealHpMp_result_5.hp
     local mp = ____calcEquipHealHpMp_result_5.mp
-    applyItemHeal(unit, hp, mp, seg.abilId)
+    applyItemHeal(
+        unit,
+        hp,
+        mp,
+        seg.abilId,
+        hotDuration
+    )
 end
 function _____505C_6B62_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5()
     if _____88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5_56DE_8C03ID <= 0 then
@@ -47,10 +59,11 @@ function _____5904_7406_88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5230_671F(now)
         local i = 0
         while i < #_____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868 do
             if now >= _____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868[i + 1] then
-                executeSegment(_____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868[i + 1], _____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868[i + 1])
+                executeSegment(_____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868[i + 1], _____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868[i + 1], _____88C5_5907_56DE_590D_5EF6_8FDF_6301_7EED_65F6_95F4_5217_8868[i + 1])
             else
                 _____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868[writeIndex + 1] = _____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868[i + 1]
                 _____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868[writeIndex + 1] = _____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868[i + 1]
+                _____88C5_5907_56DE_590D_5EF6_8FDF_6301_7EED_65F6_95F4_5217_8868[writeIndex + 1] = _____88C5_5907_56DE_590D_5EF6_8FDF_6301_7EED_65F6_95F4_5217_8868[i + 1]
                 _____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868[writeIndex + 1] = _____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868[i + 1]
                 writeIndex = writeIndex + 1
             end
@@ -62,6 +75,7 @@ function _____5904_7406_88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5230_671F(now)
         while i >= writeIndex do
             table.remove(_____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868)
             table.remove(_____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868)
+            table.remove(_____88C5_5907_56DE_590D_5EF6_8FDF_6301_7EED_65F6_95F4_5217_8868)
             table.remove(_____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868)
             i = i - 1
         end
@@ -99,6 +113,7 @@ _____88C5_5907_56DE_590D_9632_6296_952E_5217_8868 = {}
 _____88C5_5907_56DE_590D_9632_6296_5230_671F_6BEB_79D2_5217_8868 = {}
 _____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868 = {}
 _____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868 = {}
+_____88C5_5907_56DE_590D_5EF6_8FDF_6301_7EED_65F6_95F4_5217_8868 = {}
 _____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868 = {}
 _____88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5_56DE_8C03ID = 0
 local function _____786E_4FDD_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5()
@@ -112,9 +127,10 @@ local function _____5B89_6392_88C5_5907_56DE_590D_9632_6296_6E05_7406(key, delay
     _____88C5_5907_56DE_590D_9632_6296_5230_671F_6BEB_79D2_5217_8868[#_____88C5_5907_56DE_590D_9632_6296_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + delaySec * 1000
     _____786E_4FDD_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5()
 end
-local function _____5B89_6392_88C5_5907_56DE_590D_5EF6_8FDF_6BB5(unit, seg)
+local function _____5B89_6392_88C5_5907_56DE_590D_5EF6_8FDF_6BB5(unit, seg, hotDuration)
     _____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868[#_____88C5_5907_56DE_590D_5EF6_8FDF_5355_4F4D_5217_8868 + 1] = unit
     _____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868[#_____88C5_5907_56DE_590D_5EF6_8FDF_6BB5_5217_8868 + 1] = seg
+    _____88C5_5907_56DE_590D_5EF6_8FDF_6301_7EED_65F6_95F4_5217_8868[#_____88C5_5907_56DE_590D_5EF6_8FDF_6301_7EED_65F6_95F4_5217_8868 + 1] = hotDuration
     _____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868[#_____88C5_5907_56DE_590D_5EF6_8FDF_5230_671F_6BEB_79D2_5217_8868 + 1] = getServerTime() + seg.waitSec * 1000
     _____786E_4FDD_88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5()
 end
@@ -156,9 +172,9 @@ local function onUseItem(eventUnit, eventItem)
                 goto __continue34
             end
             if seg.waitSec <= 0 then
-                executeSegment(unit, seg)
+                executeSegment(unit, seg, entry.hotDuration)
             else
-                _____5B89_6392_88C5_5907_56DE_590D_5EF6_8FDF_6BB5(unit, seg)
+                _____5B89_6392_88C5_5907_56DE_590D_5EF6_8FDF_6BB5(unit, seg, entry.hotDuration)
             end
         end
         ::__continue34::

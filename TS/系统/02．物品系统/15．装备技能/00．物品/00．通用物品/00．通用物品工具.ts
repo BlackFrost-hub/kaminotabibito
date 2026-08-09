@@ -30,6 +30,11 @@ const 物编类型_物品 = 3;
 const 不走吃书残留清理物品ID: Record<number, true> = {
   [stringToFourCCSafe("I0FK")]: true,
   [stringToFourCCSafe("I0FL")]: true,
+  [stringToFourCCSafe("I01A")]: true,
+  [stringToFourCCSafe("I04U")]: true,
+  [stringToFourCCSafe("I09A")]: true,
+  [stringToFourCCSafe("I09L")]: true,
+  [stringToFourCCSafe("I09T")]: true,
 };
 
 export function 是玩家英雄组单位(this: void, 单位: any): boolean {

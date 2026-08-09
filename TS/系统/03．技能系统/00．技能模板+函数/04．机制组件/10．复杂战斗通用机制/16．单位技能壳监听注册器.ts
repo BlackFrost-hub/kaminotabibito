@@ -1,7 +1,6 @@
 /** @noSelfInFile */
 
 import { stringToFourCC, 单位有效 } from "../../02．通用函数/19．战斗公共工具";
-import { IssueImmediateOrder } from "../../../../../lib/扩展函数/封装函数/01．通用工具/12．JASS原生别名";
 
 const jass = require("jass.common") as any;
 
@@ -45,12 +44,10 @@ function 转ID(this: void, id: string | number): number {
 function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilityId: number): void {
   if (!单位有效(castingUnit)) return;
   const unitTypeId = GetUnitTypeId(castingUnit);
-  let 已接管原生技能壳 = false;
   for (let i = 0; i < 监听列表.length; i++) {
     const 参数 = 监听列表[i];
     if (spellAbilityId !== 转ID(参数.技能ID)) continue;
     if (unitTypeId !== 转ID(参数.单位类型ID)) continue;
-    已接管原生技能壳 = true;
     const context = 参数.获取或创建上下文(castingUnit);
     if (context == null) continue;
     if (参数.可释放 != null && !参数.可释放(context, castingUnit)) continue;
@@ -66,9 +63,6 @@ function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilit
     绑定单位当前独立技能伤害实例(castingUnit, 技能实例ID);
     参数.释放技能(context, castingUnit, 技能实例ID);
   }
-  // 回调返回后再停止，确保目标型技能仍能在事件上下文中读取 GetSpellTarget*。
-  // 该 stop 会替换暂停期间残留的通魔命令，避免解除暂停后引擎恢复通魔并重复触发。
-  if (已接管原生技能壳) IssueImmediateOrder(castingUnit, "stop");
 }
 
 function 确保单位技能壳总监听(this: void): void {

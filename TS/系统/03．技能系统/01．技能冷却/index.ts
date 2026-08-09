@@ -19,7 +19,7 @@ const {
   isBlacklistedSkill: 检查冷却黑名单,
   isExcludedUnit: 检查排除单位,
   getCooldownReduction: 读取冷却缩减,
-  getCooldownReductionBonus: 读取冷却缩减加成,
+  getCooldownReductionCapIncrease: 读取冷却缩减上限,
   applyCooldownCap: 应用冷却上限,
   calcActualCooldown: 计算实际冷却,
   setAbilityCooldown: 设置技能冷却,
@@ -28,7 +28,7 @@ const {
   isBlacklistedSkill: (this: void, abilityId: number) => boolean;
   isExcludedUnit: (this: void, unit: any) => boolean;
   getCooldownReduction: (this: void, unit: any) => number;
-  getCooldownReductionBonus: (this: void, unit: any) => number;
+  getCooldownReductionCapIncrease: (this: void, unit: any) => number;
   applyCooldownCap: (this: void, reduction: number, abilityId: number, bonus: number) => number;
   calcActualCooldown: (this: void, baseCooldown: number, reduction: number) => number;
   setAbilityCooldown: (this: void, unit: any, abilityId: number, level: number, cooldown: number) => void;
@@ -65,12 +65,12 @@ function getCooldownReduction(this: void, unit: any): number {
   return 读取冷却缩减(unit);
 }
 
-function getCooldownReductionBonus(this: void, unit: any): number {
-  return 读取冷却缩减加成(unit);
+function getCooldownReductionCapIncrease(this: void, unit: any): number {
+  return 读取冷却缩减上限(unit);
 }
 
-function applyCooldownCap(this: void, reduction: number, abilityId: number, bonus: number): number {
-  return 应用冷却上限(reduction, abilityId, bonus);
+function applyCooldownCap(this: void, reduction: number, abilityId: number, capIncrease: number): number {
+  return 应用冷却上限(reduction, abilityId, capIncrease);
 }
 
 function calcActualCooldown(this: void, baseCooldown: number, reduction: number): number {
@@ -112,8 +112,8 @@ function onSpellEffectForCooldown(this: void, castingUnit: any, spellAbilityId: 
   const reduction = getCooldownReduction(castingUnit);
   if (reduction < 0.01) return;
 
-  const bonus = getCooldownReductionBonus(castingUnit);
-  const cappedReduction = applyCooldownCap(reduction, spellAbilityId, bonus);
+  const capIncrease = getCooldownReductionCapIncrease(castingUnit);
+  const cappedReduction = applyCooldownCap(reduction, spellAbilityId, capIncrease);
   const actualCooldown = calcActualCooldown(baseCooldown, cappedReduction);
 
   if (handleSpecialSkillCooldown(castingUnit, spellAbilityId, cappedReduction)) return;

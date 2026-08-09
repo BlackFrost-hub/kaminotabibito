@@ -6,9 +6,13 @@ local ____exports = {}
 -- 所有客户端只在同一同步回调中设置 JASS 随机种子，避免各端设置时机不同。
 local jass = require("jass.common")
 local centerTimer = require("系统.00．核心系统.05．中心计时器")
-local dzSync = require("lib.扩展函数.KK扩展API.04．同步数据安全版")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
+local ____require_result_0 = require("lib.扩展函数.KK扩展API.02．事件注册函数")
+local DzSyncData = ____require_result_0.DzSyncData
+local DzTriggerRegisterSyncDataTrg = ____require_result_0.DzTriggerRegisterSyncDataTrg
+local DzGetTriggerSyncPlayer = ____require_result_0.DzGetTriggerSyncPlayer
+local DzGetTriggerSyncData = ____require_result_0.DzGetTriggerSyncData
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_1.debugLogForce
 local CreateTrigger = jass.CreateTrigger
 local TriggerAddAction = jass.TriggerAddAction
 local GetLocalPlayer = jass.GetLocalPlayer
@@ -50,13 +54,13 @@ local function ____on_6536_5230_540C_6B65_79CD_5B50()
     if _____5DF2_8BBE_7F6E then
         return
     end
-    local _____53D1_9001_73A9_5BB6 = dzSync.DzGetTriggerSyncPlayerSafe()
+    local _____53D1_9001_73A9_5BB6 = DzGetTriggerSyncPlayer()
     local _____53D1_9001_73A9_5BB6ID = (_____53D1_9001_73A9_5BB6 == nil or _____53D1_9001_73A9_5BB6 == 0) and -1 or GetPlayerId(_____53D1_9001_73A9_5BB6)
     if _____53D1_9001_73A9_5BB6ID ~= _____6743_5A01_73A9_5BB6ID then
         _____8F93_51FA_65E5_5FD7("拒绝非权威种子", "发送玩家ID=", _____53D1_9001_73A9_5BB6ID)
         return
     end
-    local seed = S2I(dzSync.DzGetTriggerSyncDataSafe())
+    local seed = S2I(DzGetTriggerSyncData())
     if seed <= 0 or seed > _____6700_5927_79CD_5B50 then
         _____8F93_51FA_65E5_5FD7("拒绝无效种子", "seed=", seed)
         return
@@ -107,7 +111,7 @@ local function ____on_5C1D_8BD5_53D1_9001_79CD_5B50()
         "serverTimeMs=",
         serverTimeMs
     )
-    dzSync.DzSyncDataSafe(
+    DzSyncData(
         _____540C_6B65_524D_7F00,
         I2S(seed)
     )
@@ -115,7 +119,7 @@ end
 local function _____521D_59CB_5316_540C_6B65_968F_673A_79CD_5B50()
     local _____540C_6B65_89E6_53D1_5668 = CreateTrigger()
     TriggerAddAction(_____540C_6B65_89E6_53D1_5668, ____on_6536_5230_540C_6B65_79CD_5B50)
-    dzSync.DzTriggerRegisterSyncDataSafe(_____540C_6B65_89E6_53D1_5668, _____540C_6B65_524D_7F00, true)
+    DzTriggerRegisterSyncDataTrg(_____540C_6B65_89E6_53D1_5668, _____540C_6B65_524D_7F00, true)
     _____91CD_8BD5_4EFB_52A1ID = centerTimer.addPeriodicCallback(_____91CD_8BD5_95F4_9694_6BEB_79D2, ____on_5C1D_8BD5_53D1_9001_79CD_5B50)
     _____8F93_51FA_65E5_5FD7(
         "同步监听已注册",

@@ -15,6 +15,9 @@ const { 读取语义单位引用 } = require("系统.11．剧情系统.01．主�
 const { tryAttachQuestMarkerForConfigNpc } = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效") as {
   tryAttachQuestMarkerForConfigNpc: (this: void, 单位: any, NPC配置: any) => void;
 };
+const { 注册动态支线配置 } = require("系统.11．剧情系统.02．支线任务.00A．动态支线注册") as {
+  注册动态支线配置: (this: void, 任务配置: any, NPC配置?: any) => boolean;
+};
 
 import {
   赫克提尔归位X,
@@ -23,7 +26,7 @@ import {
   赫克提尔语义引用,
   莫尔特斯解锁剧情进度,
 } from "./00．常量";
-import { 莫尔特斯NPC配置列表 } from "./02．入口配置";
+import { 莫尔特斯NPC配置列表, 莫尔特斯任务配置列表 } from "./02．入口配置";
 
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, 单位: any, 命令: string) => boolean;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, 单位: any, 朝向: number) => void;
@@ -39,6 +42,8 @@ function 句柄有效(this: void, 句柄: any): boolean {
 
 function 启用莫尔特斯NPC配置(this: void): any {
   const NPC配置 = 莫尔特斯NPC配置列表[0];
+  const 任务配置 = 莫尔特斯任务配置列表[0];
+  if (!注册动态支线配置(任务配置, NPC配置)) return null;
   if (NPC配置 != null) NPC配置.启用 = true;
   return NPC配置;
 }

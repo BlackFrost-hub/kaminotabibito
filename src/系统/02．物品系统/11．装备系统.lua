@@ -26,16 +26,19 @@ local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用�
 local fourCCToString = ____require_result_3.fourCCToString
 local isSpecialUnit = ____require_result_3.isSpecialUnit
 local itemRelatedFns = require("lib.扩展函数.物品相关函数.index")
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.index")
-local getObjectProperty = ____require_result_4.getObjectProperty
-local ObjectType = ____require_result_4.ObjectType
-local ____require_result_5 = require("系统.00．核心系统.01．颜色常量")
-local _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801 = ____require_result_5["装备等级颜色代码"]
-local _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7 = ____require_result_5["是否彩虹装备等级"]
-local _____5F69_8679_989C_8272_6587_672C = ____require_result_5["彩虹颜色文本"]
-local _____53BB_9664_989C_8272_4EE3_7801 = ____require_result_5["去除颜色代码"]
-local ____require_result_6 = require("系统.02．物品系统.16．装备次数叠加配置")
-local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0 = ____require_result_6["是否允许装备次数叠加"]
+local ____require_result_4 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local getRegisteredPlayerHero = ____require_result_4.getRegisteredPlayerHero
+local dynamicSkillText = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑")
+local ____require_result_5 = require("lib.扩展函数.YDWE函数.index")
+local getObjectProperty = ____require_result_5.getObjectProperty
+local ObjectType = ____require_result_5.ObjectType
+local ____require_result_6 = require("系统.00．核心系统.01．颜色常量")
+local _____88C5_5907_7B49_7EA7_989C_8272_4EE3_7801 = ____require_result_6["装备等级颜色代码"]
+local _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7 = ____require_result_6["是否彩虹装备等级"]
+local _____5F69_8679_989C_8272_6587_672C = ____require_result_6["彩虹颜色文本"]
+local _____53BB_9664_989C_8272_4EE3_7801 = ____require_result_6["去除颜色代码"]
+local ____require_result_7 = require("系统.02．物品系统.16．装备次数叠加配置")
+local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0 = ____require_result_7["是否允许装备次数叠加"]
 local EQUIP_EVENT_PLAYER_IDS = {
     0,
     1,
@@ -129,7 +132,7 @@ ____exports["处理合成消耗装备属性"] = function(unit, item, consumedCou
         return
     end
     local skipType = itemData.type
-    if skipType == "任务" or skipType == "药剂" or skipType == "食品" then
+    if skipType == "任务" or skipType == "药剂" or skipType == "食品" or __TS__StringTrim(tostring(itemData.PowerUP or "")) ~= "" then
         return
     end
     local charges = GetItemCharges(item)
@@ -151,18 +154,18 @@ ____exports["处理合成消耗装备属性"] = function(unit, item, consumedCou
     end
     local merged = {}
     for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
-        local ____e_key_8 = e.key
-        local ____itemData_e_key_7 = itemData[e.key]
-        if ____itemData_e_key_7 == nil then
-            ____itemData_e_key_7 = 0
+        local ____e_key_9 = e.key
+        local ____itemData_e_key_8 = itemData[e.key]
+        if ____itemData_e_key_8 == nil then
+            ____itemData_e_key_8 = 0
         end
-        merged[____e_key_8] = ____itemData_e_key_7 + (primary[e.key] or 0)
+        merged[____e_key_9] = ____itemData_e_key_8 + (primary[e.key] or 0)
     end
-    local ____itemData_moveSpeed_9 = itemData.moveSpeed
-    if ____itemData_moveSpeed_9 == nil then
-        ____itemData_moveSpeed_9 = 0
+    local ____itemData_moveSpeed_10 = itemData.moveSpeed
+    if ____itemData_moveSpeed_10 == nil then
+        ____itemData_moveSpeed_10 = 0
     end
-    merged.moveSpeed = ____itemData_moveSpeed_9 + (primary.moveSpeed or 0)
+    merged.moveSpeed = ____itemData_moveSpeed_10 + (primary.moveSpeed or 0)
     local playerStats = {}
     for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
         do
@@ -198,6 +201,9 @@ local function handleItemEvent(self, unit, item, isPickup)
         equipShared.skipNextDrop = false
         return
     end
+    if getRegisteredPlayerHero(player) ~= unit then
+        return
+    end
     local idStr = fourCCToString(GetItemTypeId(item))
     if _____4E0D_8D70_88C5_5907_7CFB_7EDF_7269_54C1ID_8868[idStr] == true then
         return
@@ -205,12 +211,12 @@ local function handleItemEvent(self, unit, item, isPickup)
     local itemData = itemRelatedFns.getItemDataEntry(item)
     if not itemData then
         if isPickup and not isEquipItemMessageSilenced() then
-            local ____temp_12 = type(slk) ~= "nil" and slk.item
-            if ____temp_12 then
-                local ____opt_10 = slk.item[idStr]
-                ____temp_12 = ____opt_10 and ____opt_10.name
+            local ____temp_13 = type(slk) ~= "nil" and slk.item
+            if ____temp_13 then
+                local ____opt_11 = slk.item[idStr]
+                ____temp_13 = ____opt_11 and ____opt_11.name
             end
-            local displayName = ____temp_12 or idStr
+            local displayName = ____temp_13 or idStr
             local border = "|cff606060────────────────────────|r"
             local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
             jass.DisplayTimedTextToPlayer(
@@ -224,7 +230,7 @@ local function handleItemEvent(self, unit, item, isPickup)
         return
     end
     local skipType = itemData.type
-    if skipType == "任务" or skipType == "药剂" or skipType == "食品" then
+    if skipType == "任务" or skipType == "药剂" or skipType == "食品" or __TS__StringTrim(tostring(itemData.PowerUP or "")) ~= "" then
         return
     end
     local isConsumable = isDrop and itemData.hot ~= nil
@@ -233,19 +239,19 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
     local charges = jass.GetItemCharges(item)
     local itemNamePlain = _____53BB_9664_989C_8272_4EE3_7801(tostring(itemData.name or ""))
-    local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_14
+    local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_15
     if _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0(itemNamePlain) then
-        local ____temp_13
+        local ____temp_14
         if charges > 0 then
-            ____temp_13 = charges
+            ____temp_14 = charges
         else
-            ____temp_13 = 1
+            ____temp_14 = 1
         end
-        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_14 = ____temp_13
+        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_15 = ____temp_14
     else
-        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_14 = 1
+        _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_15 = 1
     end
-    local mult = _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_14
+    local mult = _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_15
     local isAdd = isPickup
     local primaryBonus = itemData.primaryBonus
     local primary = {}
@@ -257,18 +263,18 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
     local merged = {}
     for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
-        local ____e_key_16 = e.key
-        local ____itemData_e_key_15 = itemData[e.key]
-        if ____itemData_e_key_15 == nil then
-            ____itemData_e_key_15 = 0
+        local ____e_key_17 = e.key
+        local ____itemData_e_key_16 = itemData[e.key]
+        if ____itemData_e_key_16 == nil then
+            ____itemData_e_key_16 = 0
         end
-        merged[____e_key_16] = ____itemData_e_key_15 + (primary[e.key] or 0)
+        merged[____e_key_17] = ____itemData_e_key_16 + (primary[e.key] or 0)
     end
-    local ____itemData_moveSpeed_17 = itemData.moveSpeed
-    if ____itemData_moveSpeed_17 == nil then
-        ____itemData_moveSpeed_17 = 0
+    local ____itemData_moveSpeed_18 = itemData.moveSpeed
+    if ____itemData_moveSpeed_18 == nil then
+        ____itemData_moveSpeed_18 = 0
     end
-    merged.moveSpeed = ____itemData_moveSpeed_17 + (primary.moveSpeed or 0)
+    merged.moveSpeed = ____itemData_moveSpeed_18 + (primary.moveSpeed or 0)
     local playerStats = {}
     local function addStat(____, val, name)
         if val == nil or val == 0 then
@@ -310,6 +316,7 @@ local function handleItemEvent(self, unit, item, isPickup)
         )
     end
     local tempReadMap = applyEquipStatsTS(unit, playerStats)
+    dynamicSkillText["同步刷新英雄技能界面"](unit)
     if tempReadMap["视野"] ~= nil then
         _____5237_65B0_88C5_5907_89C6_91CE_663E_793ABuff(
             nil,
@@ -324,7 +331,7 @@ local function handleItemEvent(self, unit, item, isPickup)
             do
                 local statName = playerStats[i + 1].name
                 if statName == "移动速度" then
-                    goto __continue54
+                    goto __continue55
                 end
                 local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
                 local num = __TS__Number(val)
@@ -334,21 +341,21 @@ local function handleItemEvent(self, unit, item, isPickup)
                 ) .. "%") or (nearZero and "0" or tostring(num))
                 test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
             end
-            ::__continue54::
+            ::__continue55::
             i = i + 1
         end
     end
     local hasMovespeed2 = itemData.movespeed2 ~= nil
     if hasMovespeed2 and unit ~= nil and type(equipMovespeed.getMaxMovespeed2Info) == "function" then
-        local ____equipMovespeed_getMaxMovespeed2Info_20 = equipMovespeed.getMaxMovespeed2Info
-        local ____unit_19 = unit
-        local ____isDrop_18
+        local ____equipMovespeed_getMaxMovespeed2Info_21 = equipMovespeed.getMaxMovespeed2Info
+        local ____unit_20 = unit
+        local ____isDrop_19
         if isDrop then
-            ____isDrop_18 = item
+            ____isDrop_19 = item
         else
-            ____isDrop_18 = nil
+            ____isDrop_19 = nil
         end
-        local ms = ____equipMovespeed_getMaxMovespeed2Info_20(equipMovespeed, ____unit_19, ____isDrop_18)
+        local ms = ____equipMovespeed_getMaxMovespeed2Info_21(equipMovespeed, ____unit_20, ____isDrop_19)
         if ms.value > 0 then
             test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
         end
@@ -373,13 +380,15 @@ local function handleItemEvent(self, unit, item, isPickup)
     end
 end
 --- 初始化事件：使用物品事件中心统一注册
+local function _____5904_7406_88C5_5907_62FE_53D6_4E8B_4EF6(unit, item)
+    handleItemEvent(nil, unit, item, true)
+end
+local function _____5904_7406_88C5_5907_4E22_5F03_4E8B_4EF6(unit, item)
+    handleItemEvent(nil, unit, item, false)
+end
 local function initEvents(self)
-    onItemPickup(function(unit, item)
-        handleItemEvent(nil, unit, item, true)
-    end)
-    onItemDrop(function(unit, item)
-        handleItemEvent(nil, unit, item, false)
-    end)
+    onItemPickup(_____5904_7406_88C5_5907_62FE_53D6_4E8B_4EF6)
+    onItemDrop(_____5904_7406_88C5_5907_4E22_5F03_4E8B_4EF6)
 end
 initEvents(nil)
 return ____exports

@@ -48,10 +48,12 @@ local EC_CreateEffect = ____require_result_9.EC_CreateEffect
 local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_10.stringToFourCCSafe
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetHandleId = jass.GetHandleId
 local GetUnitState = jass.GetUnitState
+local GetUnitStateJapi = japi.GetUnitState
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -303,7 +305,7 @@ local function _____5C1D_8BD5_89E6_53D1_5FC3_810F_638C_63E1(boss, target)
         threshold = threshold * info["配置"]["单人斩杀线倍率"]
     end
     local currentLife = GetUnitState(target, UNIT_STATE_LIFE)
-    local maxLife = GetUnitState(target, UNIT_STATE_MAX_LIFE)
+    local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     if not (maxLife > 0) or currentLife > maxLife * threshold then
         return
     end

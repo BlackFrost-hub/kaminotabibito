@@ -29,6 +29,7 @@ local debugLog = ____require_result_1.debugLog
 local g_npcUnitByRequireId = __TS__New(Map)
 local g_npcUnitByNpcNameId = __TS__New(Map)
 local g_npcUnitByDisplayName = __TS__New(Map)
+local g_npcConfigByUnitHandleId = __TS__New(Map)
 --- 顶部标记若在 SetUnitModel 前或同帧绑定，换模时可能被顶掉。
 -- 有自定义模型时延后到换模之后；无模型时也与 CreateUnit 错开一帧。
 local DELAY_QUEST_MARKER_NO_CUSTOM_MODEL = 0.01
@@ -36,6 +37,10 @@ local DELAY_QUEST_MARKER_AFTER_SET_MODEL = 0.02
 local function registerCreatedNpcUnit(npcConfig, unit)
     if not unit then
         return
+    end
+    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(unit) or 0
+    if handleId > 0 then
+        g_npcConfigByUnitHandleId:set(handleId, npcConfig)
     end
     if npcConfig["任务ID"] ~= nil then
         g_npcUnitByRequireId:set(npcConfig["任务ID"], unit)
@@ -150,6 +155,7 @@ ____exports["初始化NPC"] = function()
     g_npcUnitByRequireId:clear()
     g_npcUnitByNpcNameId:clear()
     g_npcUnitByDisplayName:clear()
+    g_npcConfigByUnitHandleId:clear()
     for ____, npcConfig in ipairs(_____652F_7EBFNPC_914D_7F6E_5217_8868) do
         if npcConfig["启用"] == true and npcConfig["自动创建"] ~= false then
             createSingleNPC(npcConfig)
@@ -227,6 +233,37 @@ ____exports["按名称查找已创建NPC"] = function(____NPC_540D_79F0)
         ____temp_3_4 = nil
     end
     return ____temp_3_4
+end
+--- 登记由其他出生系统创建的任务 NPC，并补齐对话查表与头顶任务标记。
+____exports["登记外部任务NPC单位"] = function(_____4EFB_52A1ID, _____5355_4F4D)
+    if not _____5355_4F4D or _____5355_4F4D == 0 then
+        return false
+    end
+    local npcConfig = __TS__ArrayFind(
+        _____652F_7EBFNPC_914D_7F6E_5217_8868,
+        function(____, npc) return npc["任务ID"] == _____4EFB_52A1ID and npc["启用"] == true end
+    )
+    if not npcConfig then
+        return false
+    end
+    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(_____5355_4F4D) or 0
+    if handleId > 0 and g_npcConfigByUnitHandleId:get(handleId) == npcConfig then
+        return true
+    end
+    registerCreatedNpcUnit(npcConfig, _____5355_4F4D)
+    scheduleTryAttachQuestMarker(_____5355_4F4D, npcConfig)
+    return true
+end
+--- 按真实单位句柄回查配置，避免编辑器显示名与配置展示名不一致导致对话入口失配。
+____exports["按单位查找NPC配置"] = function(_____5355_4F4D)
+    if not _____5355_4F4D or _____5355_4F4D == 0 then
+        return nil
+    end
+    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(_____5355_4F4D) or 0
+    if handleId <= 0 then
+        return nil
+    end
+    return g_npcConfigByUnitHandleId:get(handleId) or nil
 end
 function ____exports.init()
     ____exports["初始化NPC"]()

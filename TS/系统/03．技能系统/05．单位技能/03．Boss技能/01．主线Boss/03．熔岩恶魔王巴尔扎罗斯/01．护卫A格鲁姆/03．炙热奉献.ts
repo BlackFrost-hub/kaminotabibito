@@ -33,6 +33,8 @@ const { 创建单位动画守护 } = require("系统.03．技能系统.00．技�
   创建单位动画守护: (this: void, 参数: any) => any;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const KillUnit = jass.KillUnit as (unit: any) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
@@ -122,7 +124,7 @@ function on炙热奉献结束(this: void, context: 巴尔扎罗斯运行时上�
 }
 
 function 取最大生命(this: void, unit: any): number {
-  return (jass.GetUnitState(unit, jass.UNIT_STATE_MAX_LIFE) as number) || 0;
+  return (GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE) as number) || 0;
 }
 
 export function 触发格鲁姆炙热奉献(this: void, context: 巴尔扎罗斯运行时上下文): number {

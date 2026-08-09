@@ -8,6 +8,7 @@ local _____8D6B_514B_63D0_5C14_8BED_4E49_5F15_7528 = ____00_FF0E_5E38_91CF["赫�
 local _____83AB_5C14_7279_65AF_89E3_9501_5267_60C5_8FDB_5EA6 = ____00_FF0E_5E38_91CF["莫尔特斯解锁剧情进度"]
 local ____02_FF0E_5165_53E3_914D_7F6E = require("系统.11．剧情系统.02．支线任务.04．莫尔特斯.02．入口配置")
 local _____83AB_5C14_7279_65AFNPC_914D_7F6E_5217_8868 = ____02_FF0E_5165_53E3_914D_7F6E["莫尔特斯NPC配置列表"]
+local _____83AB_5C14_7279_65AF_4EFB_52A1_914D_7F6E_5217_8868 = ____02_FF0E_5165_53E3_914D_7F6E["莫尔特斯任务配置列表"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -20,6 +21,8 @@ local ____require_result_2 = require("系统.11．剧情系统.01．主线任务
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____require_result_2["读取语义单位引用"]
 local ____require_result_3 = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效")
 local tryAttachQuestMarkerForConfigNpc = ____require_result_3.tryAttachQuestMarkerForConfigNpc
+local ____require_result_4 = require("系统.11．剧情系统.02．支线任务.00A．动态支线注册")
+local _____6CE8_518C_52A8_6001_652F_7EBF_914D_7F6E = ____require_result_4["注册动态支线配置"]
 local IssueImmediateOrder = jass.IssueImmediateOrder
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
@@ -31,6 +34,10 @@ local function _____53E5_67C4_6709_6548(_____53E5_67C4)
 end
 local function _____542F_7528_83AB_5C14_7279_65AFNPC_914D_7F6E()
     local ____NPC_914D_7F6E = _____83AB_5C14_7279_65AFNPC_914D_7F6E_5217_8868[1]
+    local _____4EFB_52A1_914D_7F6E = _____83AB_5C14_7279_65AF_4EFB_52A1_914D_7F6E_5217_8868[1]
+    if not _____6CE8_518C_52A8_6001_652F_7EBF_914D_7F6E(_____4EFB_52A1_914D_7F6E, ____NPC_914D_7F6E) then
+        return nil
+    end
     if ____NPC_914D_7F6E ~= nil then
         ____NPC_914D_7F6E["启用"] = true
     end

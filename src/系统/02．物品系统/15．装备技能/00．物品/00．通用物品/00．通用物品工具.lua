@@ -24,7 +24,12 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local _____7269_7F16_7C7B_578B__7269_54C1 = 3
 local _____4E0D_8D70_5403_4E66_6B8B_7559_6E05_7406_7269_54C1ID = {
     [stringToFourCCSafe("I0FK")] = true,
-    [stringToFourCCSafe("I0FL")] = true
+    [stringToFourCCSafe("I0FL")] = true,
+    [stringToFourCCSafe("I01A")] = true,
+    [stringToFourCCSafe("I04U")] = true,
+    [stringToFourCCSafe("I09A")] = true,
+    [stringToFourCCSafe("I09L")] = true,
+    [stringToFourCCSafe("I09T")] = true
 }
 ____exports["是玩家英雄组单位"] = function(_____5355_4F4D)
     return _____6838_5FC3_662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____5355_4F4D)
