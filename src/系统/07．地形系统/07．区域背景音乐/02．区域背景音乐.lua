@@ -10,15 +10,11 @@ local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____04_FF0E_533A_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local _____7EDF_4E00_77E9_5F62_533A_57DF_8BFB_53D6 = require("系统.07．地形系统.09．动态矩形区域注册表.04．统一矩形区域读取")
 local jglobals = require("jass.globals")
 local GetRandomInt = jass.GetRandomInt
+local _____83B7_53D6_77E9_5F62_533A_57DF_5217_8868 = _____7EDF_4E00_77E9_5F62_533A_57DF_8BFB_53D6["获取矩形区域列表"]
 local _____968F_673A_73AF_5883_97F3_4E50_7ED3_679C = __TS__New(Map)
-local function _____8BFB_53D6_533A_57DF_53E5_67C4(_____533A_57DF_53D8_91CF_540D)
-    if _____533A_57DF_53D8_91CF_540D == nil or _____533A_57DF_53D8_91CF_540D == "" then
-        return nil
-    end
-    return jglobals[_____533A_57DF_53D8_91CF_540D] or nil
-end
 local function _____8BFB_53D6_97F3_9891_53E5_67C4(_____97F3_4E50_53D8_91CF_540D)
     if _____97F3_4E50_53D8_91CF_540D == nil or _____97F3_4E50_53D8_91CF_540D == "" then
         return nil
@@ -62,28 +58,24 @@ ____exports["初始化区域环境背景音乐"] = function()
     do
         local i = 0
         while i < #_____533A_57DF_80CC_666F_97F3_4E50_914D_7F6E_8868 do
+            local _____914D_7F6E = _____533A_57DF_80CC_666F_97F3_4E50_914D_7F6E_8868[i + 1]
+            local _____73AF_5883_97F3_4E50_53D8_91CF_540D = _____83B7_53D6_73AF_5883_97F3_4E50_53D8_91CF_540D(_____914D_7F6E)
+            local _____77E9_5F62_5217_8868 = _____83B7_53D6_77E9_5F62_533A_57DF_5217_8868(_____914D_7F6E["矩形区域名称列表"])
             do
-                local _____914D_7F6E = _____533A_57DF_80CC_666F_97F3_4E50_914D_7F6E_8868[i + 1]
-                local rectHandle = _____8BFB_53D6_533A_57DF_53E5_67C4(_____914D_7F6E["区域变量名"])
-                if rectHandle == nil or rectHandle == 0 then
-                    goto __continue16
-                end
-                local _____73AF_5883_97F3_4E50_53D8_91CF_540D = _____83B7_53D6_73AF_5883_97F3_4E50_53D8_91CF_540D(_____914D_7F6E)
-                if _____6302_8F7D_533A_57DF_97F3_9891(rectHandle, _____73AF_5883_97F3_4E50_53D8_91CF_540D) then
-                    count = count + 1
+                local _____77E9_5F62_7D22_5F15 = 0
+                while _____77E9_5F62_7D22_5F15 < #_____77E9_5F62_5217_8868 do
+                    if _____6302_8F7D_533A_57DF_97F3_9891(_____77E9_5F62_5217_8868[_____77E9_5F62_7D22_5F15 + 1], _____73AF_5883_97F3_4E50_53D8_91CF_540D) then
+                        count = count + 1
+                    end
+                    _____77E9_5F62_7D22_5F15 = _____77E9_5F62_7D22_5F15 + 1
                 end
             end
-            ::__continue16::
             i = i + 1
         end
     end
     return count
 end
-____exports["清空单个区域背景音乐"] = function(_____914D_7F6E)
-    local rectHandle = _____8BFB_53D6_533A_57DF_53E5_67C4(_____914D_7F6E["区域变量名"])
-    if rectHandle == nil or rectHandle == 0 then
-        return 0
-    end
+local function _____6E05_7A7A_77E9_5F62_533A_57DF_80CC_666F_97F3_4E50(rectHandle, _____914D_7F6E)
     local count = 0
     if _____5378_8F7D_533A_57DF_97F3_9891(rectHandle, _____914D_7F6E["默认环境音乐变量名"]) then
         count = count + 1
@@ -108,6 +100,18 @@ ____exports["清空单个区域背景音乐"] = function(_____914D_7F6E)
     end
     return count
 end
+____exports["清空单个区域背景音乐"] = function(_____914D_7F6E)
+    local count = 0
+    local _____77E9_5F62_5217_8868 = _____83B7_53D6_77E9_5F62_533A_57DF_5217_8868(_____914D_7F6E["矩形区域名称列表"])
+    do
+        local _____77E9_5F62_7D22_5F15 = 0
+        while _____77E9_5F62_7D22_5F15 < #_____77E9_5F62_5217_8868 do
+            count = count + _____6E05_7A7A_77E9_5F62_533A_57DF_80CC_666F_97F3_4E50(_____77E9_5F62_5217_8868[_____77E9_5F62_7D22_5F15 + 1], _____914D_7F6E)
+            _____77E9_5F62_7D22_5F15 = _____77E9_5F62_7D22_5F15 + 1
+        end
+    end
+    return count
+end
 ____exports["清空指定场景区域背景音乐"] = function(_____573A_666F_5B9A_4E49)
     if _____573A_666F_5B9A_4E49 == nil or _____573A_666F_5B9A_4E49 == "" then
         return 0
@@ -119,11 +123,11 @@ ____exports["清空指定场景区域背景音乐"] = function(_____573A_666F_5B
             do
                 local _____914D_7F6E = _____533A_57DF_80CC_666F_97F3_4E50_914D_7F6E_8868[i + 1]
                 if _____914D_7F6E["场景定义"] ~= _____573A_666F_5B9A_4E49 then
-                    goto __continue31
+                    goto __continue32
                 end
                 count = count + ____exports["清空单个区域背景音乐"](_____914D_7F6E)
             end
-            ::__continue31::
+            ::__continue32::
             i = i + 1
         end
     end

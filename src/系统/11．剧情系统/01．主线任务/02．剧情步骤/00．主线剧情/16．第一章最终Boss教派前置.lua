@@ -15,44 +15,46 @@ end
 -- @noSelfInFile
 local jass = require("jass.common")
 local jassGlobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
-local YDWEAngleBetweenUnitsSafe = ____require_result_0.YDWEAngleBetweenUnitsSafe
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local ____require_result_2 = require("lib.扩展函数.KK扩展API.00．装饰物函数")
-local DzDoodadCreate = ____require_result_2.DzDoodadCreate
-local ____require_result_3 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetRandomDirectionDeg = ____require_result_3.GetRandomDirectionDeg
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
+local YDWEAngleBetweenUnitsSafe = ____require_result_1.YDWEAngleBetweenUnitsSafe
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
+local ____require_result_3 = require("lib.扩展函数.KK扩展API.00．装饰物函数")
+local DzDoodadCreate = ____require_result_3.DzDoodadCreate
 local ____require_result_4 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_4.GetPlayersAll
-local ForGroupBJ = ____require_result_4.ForGroupBJ
-local ____require_result_5 = require("lib.扩展函数.BJ函数.05A．电影函数")
-local CinematicModeBJ = ____require_result_5.CinematicModeBJ
-local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-local StarOther_PanCameraToTimedForPlayer = ____require_result_6.StarOther_PanCameraToTimedForPlayer
-local ____require_result_7 = require("lib.扩展函数.封装函数.07．镜头函数.03．镜头预设")
-local _____5E94_7528_955C_5934_9884_8BBE_7ED9_73A9_5BB6 = ____require_result_7["应用镜头预设给玩家"]
-local ____require_result_8 = require("系统.00．核心系统.07．联机安全工具")
-local safeForForce = ____require_result_8.safeForForce
-local ____require_result_9 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_9.EC_CreateEffect
-local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_10["创建单位并登记排泄安全"]
-local ____require_result_11 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
-local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_11["立即移除单位并取消排泄登记"]
-local ____require_result_12 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
-local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_12["注册剧情片段清理"]
-local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
-local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["注册剧情运行时单位"]
-local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["读取剧情运行时单位"]
-local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_13["清理剧情运行时单位"]
-local ____require_result_14 = require("lib.扩展函数.KK扩展API.00．装饰物函数")
-local DzDoodadRemove = ____require_result_14.DzDoodadRemove
-local ____require_result_15 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
-local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_15["卸载区域背景音乐句柄"]
-local ____require_result_16 = require("lib.扩展函数.封装函数.01．通用工具.12．JASS原生别名")
-local BJGetUnitsInRectMatching = ____require_result_16.GetUnitsInRectMatching
+local GetRandomDirectionDeg = ____require_result_4.GetRandomDirectionDeg
+local ____require_result_5 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_5.GetPlayersAll
+local ForGroupBJ = ____require_result_5.ForGroupBJ
+local ____require_result_6 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local CinematicModeBJ = ____require_result_6.CinematicModeBJ
+local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+local StarOther_PanCameraToTimedForPlayer = ____require_result_7.StarOther_PanCameraToTimedForPlayer
+local ____require_result_8 = require("lib.扩展函数.封装函数.07．镜头函数.03．镜头预设")
+local _____5E94_7528_955C_5934_9884_8BBE_7ED9_73A9_5BB6 = ____require_result_8["应用镜头预设给玩家"]
+local ____require_result_9 = require("系统.00．核心系统.07．联机安全工具")
+local safeForForce = ____require_result_9.safeForForce
+local ____require_result_10 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_10.EC_CreateEffect
+local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_11["创建单位并登记排泄安全"]
+local ____require_result_12 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_12["立即移除单位并取消排泄登记"]
+local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
+local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_13["注册剧情片段清理"]
+local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
+local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["注册剧情运行时单位"]
+local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["读取剧情运行时单位"]
+local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["清理剧情运行时单位"]
+local ____require_result_15 = require("lib.扩展函数.KK扩展API.00．装饰物函数")
+local DzDoodadRemove = ____require_result_15.DzDoodadRemove
+local ____require_result_16 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_16["卸载区域背景音乐句柄"]
+local ____require_result_17 = require("lib.扩展函数.封装函数.01．通用工具.12．JASS原生别名")
+local BJGetUnitsInRectMatching = ____require_result_17.GetUnitsInRectMatching
 do
     local ____16_FF0E_7B2C_4E00_7AE0_6700_7EC8Boss_6559_6D3E_524D_7F6E = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.16．第一章最终Boss教派前置")
     ____exports["护卫试炼后回村剧情片段"] = ____16_FF0E_7B2C_4E00_7AE0_6700_7EC8Boss_6559_6D3E_524D_7F6E["护卫试炼后回村剧情片段"]
@@ -151,10 +153,10 @@ local function _____8BFB_53D6_6559_6D3E_73B0_573A_5355_4F4D_7C7B_578B(rawId)
     return __TS__Number(require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe(rawId))
 end
 local function _____6E05_7406_8BED_4E49_5355_4F4D(_____8868, _____952E)
-    local ____require_result_17 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-    local YDUserDataGetSafe = ____require_result_17.YDUserDataGetSafe
-    local ____require_result_18 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-    local YDUserDataClearTable = ____require_result_18.YDUserDataClearTable
+    local ____require_result_18 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+    local YDUserDataGetSafe = ____require_result_18.YDUserDataGetSafe
+    local ____require_result_19 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+    local YDUserDataClearTable = ____require_result_19.YDUserDataClearTable
     local unit = YDUserDataGetSafe("string", _____8868, _____952E, "unit")
     if unit ~= nil and unit ~= 0 then
         _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
@@ -173,7 +175,7 @@ local function _____662F_5E94_9690_85CF_7684_6751_5185_4E2D_7ACB_5355_4F4D()
     )
 end
 local function _____9690_85CF_6751_5185_4E2D_7ACB_5355_4F4D()
-    local _____77E9_5F62 = jassGlobals.gg_rct________________QY
+    local _____77E9_5F62 = _____83B7_53D6_77E9_5F62_533A_57DF("精灵村")
     if _____77E9_5F62 == nil or _____77E9_5F62 == 0 then
         return
     end
@@ -386,34 +388,34 @@ end
 local function _____6267_884C_6559_6D3E_6218_6597_6536_675F()
     _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934()
     local sound = jassGlobalsCamera("gg_snd_JQBGM04")
-    local rect = jassGlobalsCamera("gg_rct________________QY")
+    local rect = _____83B7_53D6_77E9_5F62_533A_57DF("精灵村")
     _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(sound, rect)
 end
 ____exports["执行教派Boss随机姿态"] = function(_____53C2_6570)
     local roll = GetRandomInt(1, 2)
-    local ____temp_21
+    local ____temp_22
     if roll == 1 then
-        local ____53C2_6570__5251_58EB_59FF_6001Boss_540D_19 = _____53C2_6570["剑士姿态Boss名"]
-        if ____53C2_6570__5251_58EB_59FF_6001Boss_540D_19 == nil then
-            ____53C2_6570__5251_58EB_59FF_6001Boss_540D_19 = "教派剑士"
+        local ____53C2_6570__5251_58EB_59FF_6001Boss_540D_20 = _____53C2_6570["剑士姿态Boss名"]
+        if ____53C2_6570__5251_58EB_59FF_6001Boss_540D_20 == nil then
+            ____53C2_6570__5251_58EB_59FF_6001Boss_540D_20 = "教派剑士"
         end
-        ____temp_21 = tostring(____53C2_6570__5251_58EB_59FF_6001Boss_540D_19)
+        ____temp_22 = tostring(____53C2_6570__5251_58EB_59FF_6001Boss_540D_20)
     else
-        local ____53C2_6570__5B66_8005_59FF_6001Boss_540D_20 = _____53C2_6570["学者姿态Boss名"]
-        if ____53C2_6570__5B66_8005_59FF_6001Boss_540D_20 == nil then
-            ____53C2_6570__5B66_8005_59FF_6001Boss_540D_20 = "教派学者"
+        local ____53C2_6570__5B66_8005_59FF_6001Boss_540D_21 = _____53C2_6570["学者姿态Boss名"]
+        if ____53C2_6570__5B66_8005_59FF_6001Boss_540D_21 == nil then
+            ____53C2_6570__5B66_8005_59FF_6001Boss_540D_21 = "教派学者"
         end
-        ____temp_21 = tostring(____53C2_6570__5B66_8005_59FF_6001Boss_540D_20)
+        ____temp_22 = tostring(____53C2_6570__5B66_8005_59FF_6001Boss_540D_21)
     end
-    local ____boss_540D = ____temp_21
+    local ____boss_540D = ____temp_22
     local _____6218_6597_59FF_6001_5355_4F4D_7C7B_578B = roll == 1 and "N05N" or "N05M"
-    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_23 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
-    local ____53C2_6570_Boss_952E_22 = _____53C2_6570["Boss键"]
-    if ____53C2_6570_Boss_952E_22 == nil then
-        ____53C2_6570_Boss_952E_22 = "Boss.蒙面人"
+    local ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_24 = _____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E
+    local ____53C2_6570_Boss_952E_23 = _____53C2_6570["Boss键"]
+    if ____53C2_6570_Boss_952E_23 == nil then
+        ____53C2_6570_Boss_952E_23 = "Boss.蒙面人"
     end
-    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_23({
-        ["Boss键"] = tostring(____53C2_6570_Boss_952E_22),
+    ____521B_5EFA_5E76_51BB_7ED3_5267_60C5Boss_9884_7F6E_24({
+        ["Boss键"] = tostring(____53C2_6570_Boss_952E_23),
         ["Boss名"] = ____boss_540D,
         ["允许单位类型"] = {_____6218_6597_59FF_6001_5355_4F4D_7C7B_578B},
         X = __TS__Number(_____53C2_6570["出生X"]) or 0,

@@ -5,17 +5,17 @@ local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local neutralPassivePlayer, dbg, resolveGgUnitByKey, parseCoord, resolveWatchUnit, runActivationEffects, onActivationPointEnter, registerOnePoint, initActivationPointsInternal, jass, g, stringToFourCC, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, Sound3DII_Mp3PlayReuse, unitSpecificEventCenter, ACTIVATION_SOUND, activationPointTriggerKeyByHid, activationPointTriggerFiredByKey, activationPointTriggerWatchUnitByKey, activationPointTriggerHandleByKey, activationPointTriggerUnregisterByKey, ACTIVATION_RANGE
+local neutralPassivePlayer, dbg, resolveGgUnitByKey, parseCoord, resolveWatchUnit, runActivationEffects, onActivationPointEnter, registerOnePoint, initActivationPointsInternal, jass, g, _____83B7_53D6_77E9_5F62_533A_57DF, stringToFourCC, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, Sound3DII_Mp3PlayReuse, unitSpecificEventCenter, ACTIVATION_SOUND, activationPointTriggerKeyByHid, activationPointTriggerFiredByKey, activationPointTriggerWatchUnitByKey, activationPointTriggerHandleByKey, activationPointTriggerUnregisterByKey, ACTIVATION_RANGE
 local ____04_FF0E_6FC0_6D3B_4F20_9001_70B9_914D_7F6E = require("系统.07．地形系统.04．激活传送点配置")
 local _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E = ____04_FF0E_6FC0_6D3B_4F20_9001_70B9_914D_7F6E.default
 function neutralPassivePlayer()
-    local ____temp_5
+    local ____temp_6
     if jass.PLAYER_NEUTRAL_PASSIVE ~= nil then
-        ____temp_5 = jass.PLAYER_NEUTRAL_PASSIVE
+        ____temp_6 = jass.PLAYER_NEUTRAL_PASSIVE
     else
-        ____temp_5 = 15
+        ____temp_6 = 15
     end
-    local pid = ____temp_5
+    local pid = ____temp_6
     return jass.Player(pid)
 end
 function dbg(_msg)
@@ -64,13 +64,13 @@ function resolveWatchUnit(cfg)
         if passive == nil then
             return nil
         end
-        local ____temp_6
+        local ____temp_7
         if type(jass.bj_UNIT_FACING) == "number" then
-            ____temp_6 = jass.bj_UNIT_FACING
+            ____temp_7 = jass.bj_UNIT_FACING
         else
-            ____temp_6 = 270
+            ____temp_7 = 270
         end
-        local face = ____temp_6
+        local face = ____temp_7
         local u = jass.CreateUnit(
             passive,
             four,
@@ -78,13 +78,13 @@ function resolveWatchUnit(cfg)
             ty,
             face
         )
-        local ____temp_7
+        local ____temp_8
         if u ~= nil and u ~= 0 then
-            ____temp_7 = u
+            ____temp_8 = u
         else
-            ____temp_7 = nil
+            ____temp_8 = nil
         end
-        return ____temp_7
+        return ____temp_8
     end
     if cfg.UnitID ~= nil and (string.find(cfg.UnitID, "gg_", nil, true) or 0) - 1 == 0 then
         return resolveGgUnitByKey(cfg.UnitID)
@@ -92,7 +92,6 @@ function resolveWatchUnit(cfg)
     return nil
 end
 function runActivationEffects(cfg, watchUnit)
-    local gg = g
     if cfg.UnitID ~= nil and watchUnit ~= nil and watchUnit ~= 0 then
         local p6 = jass.Player(6)
         if p6 then
@@ -100,7 +99,7 @@ function runActivationEffects(cfg, watchUnit)
         end
     end
     if cfg.reveal ~= nil then
-        local revealRect = gg[cfg.reveal]
+        local revealRect = _____83B7_53D6_77E9_5F62_533A_57DF(cfg.reveal)
         if revealRect then
             local mode = jass.FOG_OF_WAR_VISIBLE
             jass.SetFogStateRect(
@@ -219,17 +218,19 @@ function initActivationPointsInternal()
 end
 jass = require("jass.common")
 g = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-stringToFourCC = ____require_result_0.stringToFourCC
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-_____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_2["是玩家英雄组单位"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.index")
-Sound3DII_Mp3PlayReuse = ____require_result_3.Sound3DII_Mp3PlayReuse
-local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_4.debugLog
-local setDebug = ____require_result_4.setDebug
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+_____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
+stringToFourCC = ____require_result_1.stringToFourCC
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+_____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_3["是玩家英雄组单位"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.index")
+Sound3DII_Mp3PlayReuse = ____require_result_4.Sound3DII_Mp3PlayReuse
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_5.debugLog
+local setDebug = ____require_result_5.setDebug
 unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav"
 activationPointTriggerKeyByHid = {}

@@ -10,7 +10,7 @@ export const 单位N05U战斗启动属性配置: 战斗启动属性配置 = {
   战斗音乐路径: "Sound\\BGM\\Scene\\SealCore\\Yasunori Nishiki - The One Who Bestows Power.mp3",
   战斗音乐变量名: "gg_snd_battleBosszuizhong01",
   胜利音乐变量名: "gg_snd_shengliBgm",
-  地点变量名: "gg_rct______________1522",
+  地点区域名称: "异界Boss.战斗区域",
   转换场景: true,
   BS移动X轴: 26503.00,
   BS移动Y轴: 20921.80,

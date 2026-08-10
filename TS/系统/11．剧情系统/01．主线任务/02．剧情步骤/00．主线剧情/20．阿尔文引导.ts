@@ -144,7 +144,7 @@ export function 执行清理王城门禁矩形监听(this: void): void {
 }
 
 export function 执行阿尔文对话开启视野(this: void): void {
-  给玩家组添加多个区域视野("gg_rct______________026");
+  给玩家组添加多个区域视野("精灵传送阵");
 }
 
 export const 阿尔文引导剧情动作注册表: Record<string, 剧情动作处理器> = {

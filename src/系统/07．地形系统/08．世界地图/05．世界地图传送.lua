@@ -18,9 +18,13 @@ local _____7535_5F71_51FD_6570 = require("lib.扩展函数.BJ函数.05A．电影
 local _____955C_5934_51FD_6570 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
 local _____97F3_6548_51FD_6570 = require("lib.扩展函数.封装函数.02．音效系统.04．MP3音效播放")
 local _____5267_60C5_8FDB_5EA6_7CFB_7EDF = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
+local _____8C03_8BD5_8F93_51FA = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local DzGetTriggerUIEventFrame = japi.DzGetTriggerUIEventFrame
 local DzGetTriggerUIEventPlayer = japi.DzGetTriggerUIEventPlayer
 local GetLocalPlayer = jass.GetLocalPlayer
+local GetPlayerId = jass.GetPlayerId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local SetUnitPosition = jass.SetUnitPosition
 local CreateTimer = jass.CreateTimer
 local TimerStart = jass.TimerStart
@@ -127,6 +131,25 @@ local function _____6267_884C_4F20_9001_914D_7F6E(_____914D_7F6E, _____73A9_5BB6
     end
     _____521B_5EFA_4E16_754C_5730_56FE_9ED1_5E55Timer()
     _____97F3_6548_51FD_6570.Sound3DII_Mp3Play("XT\\YX-CS.mp3", _____73A9_5BB6)
+    _____8C03_8BD5_8F93_51FA.debugLogForce(
+        "世界地图传送",
+        "执行传送",
+        "地点ID=",
+        _____914D_7F6E["地点ID"],
+        "配置ID=",
+        _____914D_7F6E["配置ID"],
+        "玩家ID=",
+        GetPlayerId(_____73A9_5BB6),
+        "英雄当前位置=",
+        GetUnitX(_____82F1_96C4),
+        GetUnitY(_____82F1_96C4),
+        "目标坐标=",
+        _____914D_7F6E["目标X"],
+        _____914D_7F6E["目标Y"],
+        "镜头坐标=",
+        _____914D_7F6E["镜头X"],
+        _____914D_7F6E["镜头Y"]
+    )
     if _____914D_7F6E["镜头先于单位"] then
         _____955C_5934_51FD_6570.StarOther_PanCameraToTimedForPlayer(_____73A9_5BB6, _____914D_7F6E["镜头X"], _____914D_7F6E["镜头Y"], _____955C_5934_79FB_52A8_79D2)
         SetUnitPosition(_____82F1_96C4, _____914D_7F6E["目标X"], _____914D_7F6E["目标Y"])

@@ -9,7 +9,7 @@ local _____4E16_754C_5730_56FE_5E27 = ____02_FF0E_4E16_754C_5730_56FE_754C_9762[
 -- @noSelfInFile
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local jglobals = require("jass.globals")
+local _____7EDF_4E00_77E9_5F62_533A_57DF_8BFB_53D6 = require("系统.07．地形系统.09．动态矩形区域注册表.04．统一矩形区域读取")
 local ____Frame_5DE5_5177 = require("lib.扩展函数.封装函数.04．硬件输入.07．Frame函数")
 local _____786C_4EF6_5E38_91CF = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义")
 local _____82F1_96C4_6865_63A5 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
@@ -31,6 +31,7 @@ local TimerStart = jass.TimerStart
 local GetExpiredTimer = jass.GetExpiredTimer
 local GetHandleId = jass.GetHandleId
 local DestroyTimer = jass.DestroyTimer
+local _____83B7_53D6_77E9_5F62_533A_57DF = _____7EDF_4E00_77E9_5F62_533A_57DF_8BFB_53D6["获取矩形区域"]
 local _____5730_70B9_9F20_6807_8FDB_5165_4E8B_4EF6 = 2
 local _____5730_70B9_9F20_6807_79BB_5F00_4E8B_4EF6 = 3
 local _____5730_56FE_5C55_5F00_5EF6_8FDF_79D2 = 0.3
@@ -40,18 +41,21 @@ local _____5730_56FE_5C55_5F00_73A9_5BB6_8868 = {}
 local _____4E16_754C_5730_56FE_4EA4_4E92_5DF2_521D_59CB_5316 = false
 local _____4E16_754C_5730_56FE_672C_673A_6309_952E_89E6_53D1_5668 = nil
 local _____4E16_754C_5730_56FE_540C_6B65_89E6_53D1_5668 = nil
-local function _____83B7_53D6_77E9_5F62(_____77E9_5F62_952E)
-    if _____77E9_5F62_952E == nil or _____77E9_5F62_952E == "" then
-        return nil
-    end
-    return jglobals[_____77E9_5F62_952E]
-end
-local function _____5355_4F4D_4F4D_4E8E_77E9_5F62(unit, _____77E9_5F62_952E)
-    local rect = _____83B7_53D6_77E9_5F62(_____77E9_5F62_952E)
-    if rect == nil or rect == 0 then
+local function _____5355_4F4D_4F4D_4E8E_4EFB_4E00_77E9_5F62(unit, _____77E9_5F62_533A_57DF_540D_79F0_5217_8868)
+    if _____77E9_5F62_533A_57DF_540D_79F0_5217_8868 == nil then
         return false
     end
-    return _____77E9_5F62_51FD_6570.RectContainsUnit(rect, unit)
+    do
+        local _____7D22_5F15 = 0
+        while _____7D22_5F15 < #_____77E9_5F62_533A_57DF_540D_79F0_5217_8868 do
+            local rect = _____83B7_53D6_77E9_5F62_533A_57DF(_____77E9_5F62_533A_57DF_540D_79F0_5217_8868[_____7D22_5F15 + 1])
+            if rect ~= nil and rect ~= 0 and _____77E9_5F62_51FD_6570.RectContainsUnit(rect, unit) then
+                return true
+            end
+            _____7D22_5F15 = _____7D22_5F15 + 1
+        end
+    end
+    return false
 end
 local function _____627E_5230_89E6_53D1_5730_70B9_7D22_5F15(_____89E6_53D1_5E27)
     do
@@ -138,16 +142,16 @@ ____exports["刷新世界地图当前位置"] = function(_____73A9_5BB6)
         while _____7D22_5F15 < #_____4E16_754C_5730_56FE_5730_70B9_914D_7F6E_8868 do
             do
                 local _____914D_7F6E = _____4E16_754C_5730_56FE_5730_70B9_914D_7F6E_8868[_____7D22_5F15 + 1]
-                local _____4F4D_4E8E_5F53_524D_5730_70B9 = _____5355_4F4D_4F4D_4E8E_77E9_5F62(_____82F1_96C4, _____914D_7F6E["当前位置矩形键1"]) or _____5355_4F4D_4F4D_4E8E_77E9_5F62(_____82F1_96C4, _____914D_7F6E["当前位置矩形键2"]) or _____5355_4F4D_4F4D_4E8E_77E9_5F62(_____82F1_96C4, _____914D_7F6E["当前位置矩形键3"])
+                local _____4F4D_4E8E_5F53_524D_5730_70B9 = _____5355_4F4D_4F4D_4E8E_4EFB_4E00_77E9_5F62(_____82F1_96C4, _____914D_7F6E["当前位置矩形区域名称列表"])
                 if not _____4F4D_4E8E_5F53_524D_5730_70B9 or not _____662F_672C_5730_73A9_5BB6 then
-                    goto __continue30
+                    goto __continue31
                 end
                 local _____5730_70B9_5E27 = _____83B7_53D6_4E16_754C_5730_56FE_5730_70B9_5E27(_____914D_7F6E["地点ID"])
                 if _____5730_70B9_5E27 ~= nil then
                     DzFrameShow(_____5730_70B9_5E27["当前位置箭头"], true)
                 end
             end
-            ::__continue30::
+            ::__continue31::
             _____7D22_5F15 = _____7D22_5F15 + 1
         end
     end
@@ -184,12 +188,12 @@ local function _____6CE8_518C_5730_70B9_60AC_505C_4E8B_4EF6()
             do
                 local _____5730_70B9_5E27 = _____4E16_754C_5730_56FE_5E27["地点帧组表"][_____7D22_5F15 + 1]
                 if _____5730_70B9_5E27 == nil then
-                    goto __continue42
+                    goto __continue43
                 end
                 ____Frame_5DE5_5177.frameSetScriptByCode(_____5730_70B9_5E27["按钮"], _____5730_70B9_9F20_6807_8FDB_5165_4E8B_4EF6, ____on_5730_70B9_9F20_6807_8FDB_5165, false)
                 ____Frame_5DE5_5177.frameSetScriptByCode(_____5730_70B9_5E27["按钮"], _____5730_70B9_9F20_6807_79BB_5F00_4E8B_4EF6, ____on_5730_70B9_9F20_6807_79BB_5F00, false)
             end
-            ::__continue42::
+            ::__continue43::
             _____7D22_5F15 = _____7D22_5F15 + 1
         end
     end

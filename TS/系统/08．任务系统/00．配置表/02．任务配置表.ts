@@ -1,13 +1,24 @@
 import { 静态支线任务配置列表 } from "../../11．剧情系统/02．支线任务/00．支线交互配置";
 import { 污染之猫米亚任务配置列表 } from "../../11．剧情系统/02．支线任务/02．污染之猫米亚/02．入口配置";
 
+export interface 任务结束NPC配置 {
+  NPC名称: string;
+  NPC配置名?: string;
+  单位ID: string;
+  坐标X: number;
+  坐标Y: number;
+  朝向: number;
+  模型路径?: string;
+  初始化动作?: string;
+}
+
 export interface 任务配置 {
   任务ID?: number;
   名称?: string;
   类型?: string;
   开始NPC?: string;
   结束NPC?: string;
-  结束NPC位置?: string;
+  结束NPC配置?: 任务结束NPC配置;
   前置任务ID?: number;
   任务物品?: string;
   需求物品?: string;

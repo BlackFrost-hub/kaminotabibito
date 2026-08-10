@@ -8,9 +8,7 @@ export interface 世界地图地点配置 {
   箭头Y?: number;
   初始提示: string;
   初始图标?: string;
-  当前位置矩形键1?: string;
-  当前位置矩形键2?: string;
-  当前位置矩形键3?: string;
+  当前位置矩形区域名称列表?: string[];
 }
 
 export type 世界地图解锁来源 = "主线剧情" | "区域探索" | "支线剧情" | "隐藏条件";
@@ -18,15 +16,17 @@ export type 世界地图解锁来源 = "主线剧情" | "区域探索" | "支线
 export interface 世界地图解锁配置 {
   地点ID: number;
   解锁来源?: 世界地图解锁来源;
-  矩形键?: string;
+  矩形区域名称?: string;
   目标剧情进度?: number;
   解锁提示: string;
   解锁图标: string;
   解锁后注册传送?: boolean;
+  /** 区域首次探索解锁地点时，为玩家组开放的矩形视野。 */
+  进入后开启视野?: string;
 }
 
 export interface 世界地图旅行奖励配置 {
-  矩形键: string;
+  矩形区域名称: string;
   旅行编号: number;
 }
 

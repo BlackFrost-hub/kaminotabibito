@@ -6,14 +6,14 @@ local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local _____7EDD_5BF9_503C, _____5B9E_6570_8FD1_4F3C_76F8_7B49, _____83B7_53D6_5237_602A_5355_4F4D_7EC4, _____6E05_7A7A_5355_4F4D_7EC4, _____89E3_6790_5237_602A_914D_7F6E_5355_4F4D_7C7B_578BID, _____6DFB_52A0_5237_602A_914D_7F6E_8868_5230_767D_540D_5355, _____6DFB_52A0_76F4_63A5_5355_4F4DID_5217_8868_5230_767D_540D_5355, _____786E_4FDD_5141_8BB8_5237_602A_5355_4F4D_7C7B_578BID_96C6_5408_5DF2_521D_59CB_5316, _____662F_5237_602A_5019_9009_5355_4F4D, _____8BB0_5F55_602A_7269_51FA_751F_70B9, _____8BFB_53D6_602A_7269_5C5E_6027, _____5199_5165_602A_7269_5C5E_6027, _____89E3_6790_76F4_63A5_5355_4F4D_7C7B_578BID, _____521D_59CB_5316_56FA_5B9A_5C5E_6027_914D_7F6E_7F13_5B58, _____5E94_7528_57FA_7840_602A_7269_5C5E_6027, _____5E94_7528_7279_6B8A_7CBE_82F1_66B4_51FB_8986_5199, _____521D_59CB_5316_5355_4E2A_5237_602A_5355_4F4D, _____767B_8BB0_5237_602A_5355_4F4D, _____83B7_53D6_5237_602A_533A_57DF, _____5904_7406_5237_602A_533A_57DF_679A_4E3E_5355_4F4D, _____5B8C_6210_521D_59CB_5237_602A_5355_4F4D_6536_96C6, ____on_521D_59CB_5237_602A_5355_4F4D_6536_96C6_6279_6B21, _____6536_96C6_521D_59CB_5237_602A_5355_4F4D, _____5FEB_7167_6B7B_4EA1_602A_7269_5C5E_6027, _____5E94_7528_5C5E_6027_5FEB_7167_5230_65B0_5355_4F4D, ____on_602A_7269_5237_65B0_8BA1_65F6_5668_5230_671F, _____5B89_6392_602A_7269_5EF6_8FDF_5237_65B0, ____on_5237_602A_5355_4F4D_6B7B_4EA1, jass, jglobals, stringToFourCCSafe, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, YDUserDataGetSafe, YDUserDataSetSafe, YDUserDataHasSafe, YDUserDataClearTableSafe, registerDeathListener, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, GetRandomDirectionDeg, GroupAddUnit, GroupRemoveUnit, FirstOfGroup, CreateGroup, DestroyGroup, GroupEnumUnitsInRect, GetWorldBounds, GetHandleId, GetOwningPlayer, GetPlayerId, GetUnitTypeId, GetUnitX, GetUnitY, IsUnitInGroup, IsUnitType, IsUnitRace, Player, RemoveUnit, _____5237_602A_8BB0_5F55_8868, _____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_961F_5217, _____5141_8BB8_5237_602A_5355_4F4D_7C7B_578BID_96C6_5408, _____56FA_5B9A_5C5E_6027_914D_7F6E_7F13_5B58, _____7279_6B8A_7CBE_82F1_66B4_51FB_8986_5199_8FD0_884C_65F6_914D_7F6E_8868, _____521D_59CB_6536_96C6_6BCF_6279_5355_4F4D_6570_91CF, _____521D_59CB_6536_96C6_95F4_9694_6BEB_79D2, _____5DF2_521D_59CB_5316_602A_7269_5237_65B0_7CFB_7EDF, _____5DF2_521D_59CB_5316_5141_8BB8_5237_602A_5355_4F4D_7C7B_578BID_96C6_5408, _____56FA_5B9A_5C5E_6027_914D_7F6E_5DF2_521D_59CB_5316, _____521D_59CB_6536_96C6_4E34_65F6_5355_4F4D_7EC4, _____521D_59CB_6536_96C6_56DE_8C03ID, _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C
+local _____7EDD_5BF9_503C, _____5B9E_6570_8FD1_4F3C_76F8_7B49, _____83B7_53D6_5237_602A_5355_4F4D_7EC4, _____6E05_7A7A_5355_4F4D_7EC4, _____89E3_6790_5237_602A_914D_7F6E_5355_4F4D_7C7B_578BID, _____6DFB_52A0_5237_602A_914D_7F6E_8868_5230_767D_540D_5355, _____6DFB_52A0_76F4_63A5_5355_4F4DID_5217_8868_5230_767D_540D_5355, _____786E_4FDD_5141_8BB8_5237_602A_5355_4F4D_7C7B_578BID_96C6_5408_5DF2_521D_59CB_5316, _____662F_5237_602A_5019_9009_5355_4F4D, _____8BB0_5F55_602A_7269_51FA_751F_70B9, _____8BFB_53D6_602A_7269_5C5E_6027, _____5199_5165_602A_7269_5C5E_6027, _____89E3_6790_76F4_63A5_5355_4F4D_7C7B_578BID, _____521D_59CB_5316_56FA_5B9A_5C5E_6027_914D_7F6E_7F13_5B58, _____5E94_7528_57FA_7840_602A_7269_5C5E_6027, _____5E94_7528_7279_6B8A_7CBE_82F1_66B4_51FB_8986_5199, _____521D_59CB_5316_5355_4E2A_5237_602A_5355_4F4D, _____767B_8BB0_5237_602A_5355_4F4D, _____83B7_53D6_5237_602A_533A_57DF, _____5904_7406_5237_602A_533A_57DF_679A_4E3E_5355_4F4D, _____5B8C_6210_521D_59CB_5237_602A_5355_4F4D_6536_96C6, ____on_521D_59CB_5237_602A_5355_4F4D_6536_96C6_6279_6B21, _____6536_96C6_521D_59CB_5237_602A_5355_4F4D, _____5FEB_7167_6B7B_4EA1_602A_7269_5C5E_6027, _____5E94_7528_5C5E_6027_5FEB_7167_5230_65B0_5355_4F4D, ____on_602A_7269_5237_65B0_8BA1_65F6_5668_5230_671F, _____5B89_6392_602A_7269_5EF6_8FDF_5237_65B0, ____on_5237_602A_5355_4F4D_6B7B_4EA1, jass, _____83B7_53D6_77E9_5F62_533A_57DF, stringToFourCCSafe, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, YDUserDataGetSafe, YDUserDataSetSafe, YDUserDataHasSafe, YDUserDataClearTableSafe, registerDeathListener, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, GetRandomDirectionDeg, GroupAddUnit, GroupRemoveUnit, FirstOfGroup, CreateGroup, DestroyGroup, GroupEnumUnitsInRect, GetWorldBounds, GetHandleId, GetOwningPlayer, GetPlayerId, GetUnitTypeId, GetUnitX, GetUnitY, IsUnitInGroup, IsUnitType, IsUnitRace, Player, RemoveUnit, _____5237_602A_8BB0_5F55_8868, _____5EF6_8FDF_5237_65B0_4E0A_4E0B_6587_961F_5217, _____5141_8BB8_5237_602A_5355_4F4D_7C7B_578BID_96C6_5408, _____56FA_5B9A_5C5E_6027_914D_7F6E_7F13_5B58, _____7279_6B8A_7CBE_82F1_66B4_51FB_8986_5199_8FD0_884C_65F6_914D_7F6E_8868, _____521D_59CB_6536_96C6_6BCF_6279_5355_4F4D_6570_91CF, _____521D_59CB_6536_96C6_95F4_9694_6BEB_79D2, _____5DF2_521D_59CB_5316_602A_7269_5237_65B0_7CFB_7EDF, _____5DF2_521D_59CB_5316_5141_8BB8_5237_602A_5355_4F4D_7C7B_578BID_96C6_5408, _____56FA_5B9A_5C5E_6027_914D_7F6E_5DF2_521D_59CB_5316, _____521D_59CB_6536_96C6_4E34_65F6_5355_4F4D_7EC4, _____521D_59CB_6536_96C6_56DE_8C03ID, _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C
 local ____01_FF0E_6742_9C7C_51FA_751F_914D_7F6E = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.01．杂鱼出生配置")
 local _____4E16_754C_5730_56FE_6742_9C7C_51FA_751F_914D_7F6E_8868 = ____01_FF0E_6742_9C7C_51FA_751F_914D_7F6E["世界地图杂鱼出生配置表"]
 local ____02_FF0E_7CBE_82F1_51FA_751F_914D_7F6E = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.02．精英出生配置")
 local _____4E16_754C_5730_56FE_7CBE_82F1_51FA_751F_914D_7F6E_8868 = ____02_FF0E_7CBE_82F1_51FA_751F_914D_7F6E["世界地图精英出生配置表"]
 local ____00_FF0E_5E38_91CF_4E0E_7C7B_578B = require("系统.01．单位系统.03．怪物刷新系统.00．常量与类型")
 local _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = ____00_FF0E_5E38_91CF_4E0E_7C7B_578B["中立敌对玩家ID"]
-local _____5237_602A_533A_57DF_5168_5C40_540D = ____00_FF0E_5E38_91CF_4E0E_7C7B_578B["刷怪区域全局名"]
+local _____5237_602A_533A_57DF_540D_79F0 = ____00_FF0E_5E38_91CF_4E0E_7C7B_578B["刷怪区域名称"]
 local _____5237_602A_5355_4F4D_7EC4_952E = ____00_FF0E_5E38_91CF_4E0E_7C7B_578B["刷怪单位组键"]
 local _____5237_602A_5EF6_8FDF_79D2 = ____00_FF0E_5E38_91CF_4E0E_7C7B_578B["刷怪延迟秒"]
 local _____5237_602A_8868_540D = ____00_FF0E_5E38_91CF_4E0E_7C7B_578B["刷怪表名"]
@@ -58,8 +58,8 @@ function _____6E05_7A7A_5355_4F4D_7EC4(_____5355_4F4D_7EC4)
     end
 end
 function _____89E3_6790_5237_602A_914D_7F6E_5355_4F4D_7C7B_578BID(_____914D_7F6E)
-    local ____opt_6 = _____914D_7F6E["兼容单位ID"]
-    local _____517C_5BB9_5355_4F4DID = ____opt_6 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
+    local ____opt_7 = _____914D_7F6E["兼容单位ID"]
+    local _____517C_5BB9_5355_4F4DID = ____opt_7 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
     if _____517C_5BB9_5355_4F4DID == nil or #_____517C_5BB9_5355_4F4DID < 4 then
         return 0
     end
@@ -143,8 +143,8 @@ function _____5199_5165_602A_7269_5C5E_6027(unit, _____5C5E_6027_540D, value)
     )
 end
 function _____89E3_6790_76F4_63A5_5355_4F4D_7C7B_578BID(_____5355_4F4DID)
-    local ____opt_8 = _____5355_4F4DID
-    local _____6E05_7406_540E_5355_4F4DID = ____opt_8 and __TS__StringTrim(_____5355_4F4DID)
+    local ____opt_9 = _____5355_4F4DID
+    local _____6E05_7406_540E_5355_4F4DID = ____opt_9 and __TS__StringTrim(_____5355_4F4DID)
     if _____6E05_7406_540E_5355_4F4DID == nil or #_____6E05_7406_540E_5355_4F4DID < 4 then
         return 0
     end
@@ -236,7 +236,7 @@ function _____767B_8BB0_5237_602A_5355_4F4D(unit)
     _____521D_59CB_5316_5355_4E2A_5237_602A_5355_4F4D(unit)
 end
 function _____83B7_53D6_5237_602A_533A_57DF()
-    local _____914D_7F6E_533A_57DF = jglobals[_____5237_602A_533A_57DF_5168_5C40_540D]
+    local _____914D_7F6E_533A_57DF = _____83B7_53D6_77E9_5F62_533A_57DF(_____5237_602A_533A_57DF_540D_79F0)
     if _____914D_7F6E_533A_57DF ~= nil and _____914D_7F6E_533A_57DF ~= 0 then
         return _____914D_7F6E_533A_57DF
     end
@@ -372,24 +372,25 @@ ____exports["初始化怪物刷新系统"] = function()
     _____6536_96C6_521D_59CB_5237_602A_5355_4F4D()
 end
 jass = require("jass.common")
-jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-_____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
-local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
-YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
-YDUserDataHasSafe = ____require_result_2.YDUserDataHasSafe
-YDUserDataClearTableSafe = ____require_result_2.YDUserDataClearTableSafe
-local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-registerDeathListener = ____require_result_3.registerDeathListener
-local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_4.addDelayedCallback
-addPeriodicCallback = ____require_result_4.addPeriodicCallback
-removePeriodicCallback = ____require_result_4.removePeriodicCallback
-local ____require_result_5 = require("lib.扩展函数.BJ函数.07．杂项")
-GetRandomDirectionDeg = ____require_result_5.GetRandomDirectionDeg
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+_____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+_____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_2["创建单位并登记排泄安全"]
+local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
+YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
+YDUserDataHasSafe = ____require_result_3.YDUserDataHasSafe
+YDUserDataClearTableSafe = ____require_result_3.YDUserDataClearTableSafe
+local ____require_result_4 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+registerDeathListener = ____require_result_4.registerDeathListener
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_5.addDelayedCallback
+addPeriodicCallback = ____require_result_5.addPeriodicCallback
+removePeriodicCallback = ____require_result_5.removePeriodicCallback
+local ____require_result_6 = require("lib.扩展函数.BJ函数.07．杂项")
+GetRandomDirectionDeg = ____require_result_6.GetRandomDirectionDeg
 GroupAddUnit = jass.GroupAddUnit
 GroupRemoveUnit = jass.GroupRemoveUnit
 FirstOfGroup = jass.FirstOfGroup

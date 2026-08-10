@@ -4,6 +4,9 @@ const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
 };
@@ -120,7 +123,7 @@ function 执行区域音乐切换(this: void, 配置: 主线剧情最终伤害�
   for (let i = 0; i < 配置.区域音乐切换.length; i++) {
     const 条目 = 配置.区域音乐切换[i];
     const 声音句柄 = 获取全局句柄(条目.声音变量名);
-    const 矩形句柄 = 获取全局句柄(条目.矩形变量名);
+    const 矩形句柄 = 获取矩形区域(条目.矩形区域名称);
     if (声音句柄 == null || 矩形句柄 == null) continue;
     挂载区域背景音乐句柄(条目.添加, 声音句柄, 矩形句柄);
   }

@@ -7,6 +7,9 @@ import { GetItemTypeCountInUnitBJ, RemoveItemTypeFromUnitBJ } from "../../../lib
 import { getItemName } from "../../../lib/扩展函数/YDWE函数/00．YDWE函数";
 import { UnitHasItemOfTypeBJ } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { 任务配置 } from "../../08．任务系统/00．配置表/02．任务配置表";
+const { 创建任务结束NPC } = require("系统.08．任务系统.00．配置表.04．NPC生成器") as {
+  创建任务结束NPC: (this: void, 任务: 任务配置) => any;
+};
 import { DEFAULT_AFTER_COMPLETE_MSG, DEFAULT_QUEST_ACCEPTED_MSG, showLocalHint } from "./02．对话框业务逻辑";
 const ____npcEffect = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效") as {
   getNpcUnit: (this: void, playerId: number) => any;
@@ -198,6 +201,10 @@ export function buildQuestOfferDialog(
           return;
         }
         if (!hasPlayerAcceptedQuest(dialogOwnerId, questId)) {
+          if (quest.结束NPC配置 && !创建任务结束NPC(quest)) {
+            showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r任务目标暂时无法出现，请稍后重试。");
+            return;
+          }
           const playerName = jass.GetPlayerName(playerObj) || "冒险者";
           setQuestState(dialogOwnerId, questId, 1, playerName);
           发放任务物品(hero, quest.任务物品);

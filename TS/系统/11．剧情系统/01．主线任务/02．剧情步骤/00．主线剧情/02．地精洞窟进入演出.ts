@@ -2,6 +2,9 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -122,19 +125,19 @@ function 切换地精洞窟区域音乐(this: void, add: boolean, soundName: str
 }
 
 function 开始地精洞窟演出音乐(this: void): void {
-  地精洞窟演出音乐已启动 = 切换地精洞窟区域音乐(true, "gg_snd_JQBGM01", "gg_rct______________102");
+  地精洞窟演出音乐已启动 = 切换地精洞窟区域音乐(true, "gg_snd_JQBGM01", "地精洞窟.演出音乐区域");
 }
 
 function 停止地精洞窟演出音乐(this: void): void {
   if (!地精洞窟演出音乐已启动) return;
-  切换地精洞窟区域音乐(false, "gg_snd_JQBGM01", "gg_rct______________102");
+  切换地精洞窟区域音乐(false, "gg_snd_JQBGM01", "地精洞窟.演出音乐区域");
   地精洞窟演出音乐已启动 = false;
 }
 
 function 结束地精洞窟演出音乐(this: void): void {
   停止地精洞窟演出音乐();
   // 源 JASS 在正常结束和跳过分支后都会切回默认区域音乐。
-  切换地精洞窟区域音乐(true, "gg_snd_BGM002", "gg_rct______________025");
+  切换地精洞窟区域音乐(true, "gg_snd_BGM002", "地精洞窟.区域2");
 }
 
 function 创建地精洞窟临时单位(this: void, rawId: string, x: number, y: number, facing: number, key: string): any {
@@ -338,7 +341,7 @@ export function 初始化进度02_地精洞窟进入演出核心(this: void): vo
   if (已初始化进度02核心) return;
   已初始化进度02核心 = true;
 
-  const rect = jglobals.gg_rct______________020;
+  const rect = 获取矩形区域("地精洞窟.剧情进入区域");
   if (rect == null || rect === 0) return;
   const trigger = CreateTrigger();
   TriggerRegisterEnterRectSimple(trigger, rect);

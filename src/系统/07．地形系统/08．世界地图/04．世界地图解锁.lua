@@ -10,12 +10,13 @@ local _____6CE8_518C_4E16_754C_5730_56FE_5730_70B9_4F20_9001 = ____05_FF0E_4E16_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local jglobals = require("jass.globals")
+local _____7EDF_4E00_77E9_5F62_533A_57DF_8BFB_53D6 = require("系统.07．地形系统.09．动态矩形区域注册表.04．统一矩形区域读取")
 local _____533A_57DF_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
 local _____82F1_96C4_6865_63A5 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local ____YD_5B89_5168_7248 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local ____FourCC_5B89_5168_7248 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local _____5267_60C5_8FDB_5EA6_7CFB_7EDF = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
+local _____5267_60C5_89C6_91CE_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local CreateTrigger = jass.CreateTrigger
 local TriggerAddAction = jass.TriggerAddAction
 local CreateRegion = jass.CreateRegion
@@ -25,16 +26,17 @@ local GetTriggeringRegion = jass.GetTriggeringRegion
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local UnitAddItemById = jass.UnitAddItemById
-local _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_77E9_5F62_952E = {}
+local _____83B7_53D6_77E9_5F62_533A_57DF = _____7EDF_4E00_77E9_5F62_533A_57DF_8BFB_53D6["获取矩形区域"]
+local _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_77E9_5F62_533A_57DF_540D_79F0 = {}
 local _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_53E5_67C4ID = {}
 local _____4E16_754C_5730_56FE_533A_57DF_8FD0_884C_914D_7F6E_8868 = {}
 local _____5DF2_89E3_9501_5730_70B9_8868 = {}
 local _____4E16_754C_5730_56FE_89E3_9501_5DF2_521D_59CB_5316 = false
-local function _____53D6_6216_521B_5EFA_533A_57DF_914D_7F6E(_____77E9_5F62_952E)
-    local _____914D_7F6E = _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_77E9_5F62_952E[_____77E9_5F62_952E]
+local function _____53D6_6216_521B_5EFA_533A_57DF_914D_7F6E(_____77E9_5F62_533A_57DF_540D_79F0)
+    local _____914D_7F6E = _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_77E9_5F62_533A_57DF_540D_79F0[_____77E9_5F62_533A_57DF_540D_79F0]
     if _____914D_7F6E == nil then
-        _____914D_7F6E = {["矩形键"] = _____77E9_5F62_952E}
-        _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_77E9_5F62_952E[_____77E9_5F62_952E] = _____914D_7F6E
+        _____914D_7F6E = {["矩形区域名称"] = _____77E9_5F62_533A_57DF_540D_79F0}
+        _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_77E9_5F62_533A_57DF_540D_79F0[_____77E9_5F62_533A_57DF_540D_79F0] = _____914D_7F6E
         _____4E16_754C_5730_56FE_533A_57DF_8FD0_884C_914D_7F6E_8868[#_____4E16_754C_5730_56FE_533A_57DF_8FD0_884C_914D_7F6E_8868 + 1] = _____914D_7F6E
     end
     return _____914D_7F6E
@@ -45,10 +47,10 @@ local function _____6784_5EFA_533A_57DF_8FD0_884C_914D_7F6E()
         while _____7D22_5F15 < #_____4E16_754C_5730_56FE_89E3_9501_914D_7F6E_8868 do
             do
                 local _____89E3_9501_914D_7F6E = _____4E16_754C_5730_56FE_89E3_9501_914D_7F6E_8868[_____7D22_5F15 + 1]
-                if _____89E3_9501_914D_7F6E["解锁来源"] ~= nil and _____89E3_9501_914D_7F6E["解锁来源"] ~= "区域探索" or _____89E3_9501_914D_7F6E["矩形键"] == nil then
+                if _____89E3_9501_914D_7F6E["解锁来源"] ~= nil and _____89E3_9501_914D_7F6E["解锁来源"] ~= "区域探索" or _____89E3_9501_914D_7F6E["矩形区域名称"] == nil then
                     goto __continue6
                 end
-                _____53D6_6216_521B_5EFA_533A_57DF_914D_7F6E(_____89E3_9501_914D_7F6E["矩形键"])["解锁配置索引"] = _____7D22_5F15
+                _____53D6_6216_521B_5EFA_533A_57DF_914D_7F6E(_____89E3_9501_914D_7F6E["矩形区域名称"])["解锁配置索引"] = _____7D22_5F15
             end
             ::__continue6::
             _____7D22_5F15 = _____7D22_5F15 + 1
@@ -58,7 +60,7 @@ local function _____6784_5EFA_533A_57DF_8FD0_884C_914D_7F6E()
         local _____7D22_5F15 = 0
         while _____7D22_5F15 < #_____4E16_754C_5730_56FE_65C5_884C_5956_52B1_914D_7F6E_8868 do
             local _____5956_52B1_914D_7F6E = _____4E16_754C_5730_56FE_65C5_884C_5956_52B1_914D_7F6E_8868[_____7D22_5F15 + 1]
-            _____53D6_6216_521B_5EFA_533A_57DF_914D_7F6E(_____5956_52B1_914D_7F6E["矩形键"])["旅行奖励配置索引"] = _____7D22_5F15
+            _____53D6_6216_521B_5EFA_533A_57DF_914D_7F6E(_____5956_52B1_914D_7F6E["矩形区域名称"])["旅行奖励配置索引"] = _____7D22_5F15
             _____7D22_5F15 = _____7D22_5F15 + 1
         end
     end
@@ -100,6 +102,9 @@ local function _____5E94_7528_5730_70B9_89E3_9501(_____914D_7F6E_7D22_5F15)
     if _____914D_7F6E["解锁后注册传送"] == true then
         _____6CE8_518C_4E16_754C_5730_56FE_5730_70B9_4F20_9001(_____914D_7F6E["地点ID"])
     end
+    if _____914D_7F6E["进入后开启视野"] ~= nil and _____914D_7F6E["进入后开启视野"] ~= "" then
+        _____5267_60C5_89C6_91CE_5DE5_5177["给玩家组添加多个区域视野"](_____914D_7F6E["进入后开启视野"])
+    end
 end
 local function _____5904_7406_533A_57DF_5730_70B9_89E3_9501(_____914D_7F6E_7D22_5F15)
     if _____914D_7F6E_7D22_5F15 == nil then
@@ -117,13 +122,13 @@ local function ____on_5267_60C5_8FDB_5EA6_53D8_66F4_89E3_9501_4E16_754C_5730_56F
             do
                 local _____914D_7F6E = _____4E16_754C_5730_56FE_89E3_9501_914D_7F6E_8868[_____7D22_5F15 + 1]
                 if _____914D_7F6E["解锁来源"] ~= "主线剧情" or _____914D_7F6E["目标剧情进度"] == nil then
-                    goto __continue23
+                    goto __continue24
                 end
                 if _____914D_7F6E["目标剧情进度"] > _____65E7_8FDB_5EA6 and _____914D_7F6E["目标剧情进度"] <= _____65B0_8FDB_5EA6 then
                     _____5E94_7528_5730_70B9_89E3_9501(_____7D22_5F15)
                 end
             end
-            ::__continue23::
+            ::__continue24::
             _____7D22_5F15 = _____7D22_5F15 + 1
         end
     end
@@ -136,13 +141,13 @@ local function _____6062_590D_5F53_524D_5267_60C5_8FDB_5EA6_5730_56FE_89E3_9501(
             do
                 local _____914D_7F6E = _____4E16_754C_5730_56FE_89E3_9501_914D_7F6E_8868[_____7D22_5F15 + 1]
                 if _____914D_7F6E["解锁来源"] ~= "主线剧情" or _____914D_7F6E["目标剧情进度"] == nil then
-                    goto __continue28
+                    goto __continue29
                 end
                 if _____914D_7F6E["目标剧情进度"] <= _____5F53_524D_5267_60C5_8FDB_5EA6 then
                     _____5E94_7528_5730_70B9_89E3_9501(_____7D22_5F15)
                 end
             end
-            ::__continue28::
+            ::__continue29::
             _____7D22_5F15 = _____7D22_5F15 + 1
         end
     end
@@ -164,7 +169,7 @@ local function ____on_4E16_754C_5730_56FE_533A_57DF_8FDB_5165()
     _____5904_7406_533A_57DF_5730_70B9_89E3_9501(_____8FD0_884C_914D_7F6E["解锁配置索引"])
 end
 local function _____6CE8_518C_533A_57DF(_____4E1A_52A1_89E6_53D1_5668, _____8FD0_884C_914D_7F6E)
-    local rect = jglobals[_____8FD0_884C_914D_7F6E["矩形键"]]
+    local rect = _____83B7_53D6_77E9_5F62_533A_57DF(_____8FD0_884C_914D_7F6E["矩形区域名称"])
     if rect == nil or rect == 0 then
         return
     end

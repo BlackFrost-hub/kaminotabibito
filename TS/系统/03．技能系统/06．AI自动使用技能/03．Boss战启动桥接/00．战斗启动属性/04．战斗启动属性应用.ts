@@ -7,6 +7,9 @@ import { 异界Boss战斗启动属性配置表 } from "./03．异界Boss战斗�
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const GetHandleId = jass.GetHandleId as (whichHandle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
@@ -125,9 +128,9 @@ function 写入Boss战音频(this: void, 属性名: string, 路径?: string, 变
   YDUserDataSetSafe("string", "Boss战", 属性名, "sound", 音频句柄);
 }
 
-function 写入Boss战矩形(this: void, 属性名: string, 变量名?: string): void {
-  if (变量名 == null || 变量名 === "") return;
-  const 矩形句柄 = jglobals[变量名];
+function 写入Boss战矩形(this: void, 属性名: string, 区域名称?: string): void {
+  if (区域名称 == null || 区域名称 === "") return;
+  const 矩形句柄 = 获取矩形区域(区域名称);
   if (矩形句柄 == null) return;
   YDUserDataSetSafe("string", "Boss战", 属性名, "rect", 矩形句柄);
 }
@@ -160,7 +163,7 @@ export function 应用Boss战启动属性配置(this: void, unit: any): void {
   写入Boss战音频("胜利音乐", 配置.胜利音乐路径, 配置.胜利音乐变量名);
   清理Boss战地点();
   if (配置.动态地点矩形 != null) 写入Boss战动态矩形(配置.动态地点矩形);
-  else 写入Boss战矩形("地点", 配置.地点变量名);
+  else 写入Boss战矩形("地点", 配置.地点区域名称);
   写入Boss战单位布尔(unit, "转换场景", 配置.转换场景);
   写入Boss战字符串表实数("BS移动X轴", 配置.BS移动X轴 ?? GetUnitX(unit));
   写入Boss战字符串表实数("BS移动Y轴", 配置.BS移动Y轴 ?? GetUnitY(unit));

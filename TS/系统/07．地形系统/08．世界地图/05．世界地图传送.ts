@@ -53,6 +53,9 @@ const 音效函数 = require("lib.扩展函数.封装函数.02．音效系统.04
 const 剧情进度系统 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文") as {
   读取剧情进度: (this: void) => number;
 };
+const 调试输出 = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 import { 世界地图传送配置表 } from "./01．世界地图地点配置";
 import { 获取世界地图地点帧 } from "./02．世界地图界面";
@@ -62,6 +65,9 @@ import type { 世界地图传送配置 } from "./00．类型定义";
 const DzGetTriggerUIEventFrame = japi.DzGetTriggerUIEventFrame as (this: void) => number;
 const DzGetTriggerUIEventPlayer = japi.DzGetTriggerUIEventPlayer as (this: void) => any;
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
 const CreateTimer = jass.CreateTimer as (this: void) => any;
 const TimerStart = jass.TimerStart as (
@@ -151,6 +157,16 @@ function 执行传送配置(this: void, 配置: 世界地图传送配置, 玩家
 
   创建世界地图黑幕Timer();
   音效函数.Sound3DII_Mp3Play("XT\\YX-CS.mp3", 玩家);
+  调试输出.debugLogForce(
+    "世界地图传送",
+    "执行传送",
+    "地点ID=", 配置.地点ID,
+    "配置ID=", 配置.配置ID,
+    "玩家ID=", GetPlayerId(玩家),
+    "英雄当前位置=", GetUnitX(英雄), GetUnitY(英雄),
+    "目标坐标=", 配置.目标X, 配置.目标Y,
+    "镜头坐标=", 配置.镜头X, 配置.镜头Y,
+  );
 
   if (配置.镜头先于单位) {
     镜头函数.StarOther_PanCameraToTimedForPlayer(玩家, 配置.镜头X, 配置.镜头Y, 镜头移动秒);

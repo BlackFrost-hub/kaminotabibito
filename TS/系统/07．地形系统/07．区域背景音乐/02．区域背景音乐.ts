@@ -1,6 +1,9 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as Record<string, any>;
+const 统一矩形区域读取 = require("系统.07．地形系统.09．动态矩形区域注册表.04．统一矩形区域读取") as {
+  获取矩形区域列表: (this: void, 名称列表: string[]) => any[];
+};
 import 区域背景音乐配置表 from "./01．区域背景音乐配置表";
 import type { 区域背景音乐配置项 } from "./00．区域背景音乐类型";
 import {
@@ -10,13 +13,9 @@ import {
 
 const jglobals = require("jass.globals") as Record<string, any>;
 const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) => number;
+const 获取矩形区域列表 = 统一矩形区域读取.获取矩形区域列表;
 
 const 随机环境音乐结果 = new Map<string, string>();
-
-function 读取区域句柄(this: void, 区域变量名: string | undefined): any {
-  if (区域变量名 == null || 区域变量名 === "") return null;
-  return jglobals[区域变量名] || null;
-}
 
 function 读取音频句柄(this: void, 音乐变量名: string | undefined): any {
   if (音乐变量名 == null || 音乐变量名 === "") return null;
@@ -57,19 +56,16 @@ export function 初始化区域环境背景音乐(this: void): number {
   随机环境音乐结果.clear();
   for (let i = 0; i < 区域背景音乐配置表.length; i++) {
     const 配置 = 区域背景音乐配置表[i];
-    const rectHandle = 读取区域句柄(配置.区域变量名);
-    if (rectHandle == null || rectHandle === 0) continue;
-
     const 环境音乐变量名 = 获取环境音乐变量名(配置);
-    if (挂载区域音频(rectHandle, 环境音乐变量名)) count++;
+    const 矩形列表 = 获取矩形区域列表(配置.矩形区域名称列表);
+    for (let 矩形索引 = 0; 矩形索引 < 矩形列表.length; 矩形索引++) {
+      if (挂载区域音频(矩形列表[矩形索引], 环境音乐变量名)) count++;
+    }
   }
   return count;
 }
 
-export function 清空单个区域背景音乐(this: void, 配置: 区域背景音乐配置项): number {
-  const rectHandle = 读取区域句柄(配置.区域变量名);
-  if (rectHandle == null || rectHandle === 0) return 0;
-
+function 清空矩形区域背景音乐(this: void, rectHandle: any, 配置: 区域背景音乐配置项): number {
   let count = 0;
   if (卸载区域音频(rectHandle, 配置.默认环境音乐变量名)) count++;
   const 随机列表 = 配置.随机环境音乐变量名列表;
@@ -80,6 +76,15 @@ export function 清空单个区域背景音乐(this: void, 配置: 区域背景�
   }
   if (卸载区域音频(rectHandle, 配置.战斗音乐变量名)) count++;
   if (卸载区域音频(rectHandle, 配置.胜利音乐变量名)) count++;
+  return count;
+}
+
+export function 清空单个区域背景音乐(this: void, 配置: 区域背景音乐配置项): number {
+  let count = 0;
+  const 矩形列表 = 获取矩形区域列表(配置.矩形区域名称列表);
+  for (let 矩形索引 = 0; 矩形索引 < 矩形列表.length; 矩形索引++) {
+    count += 清空矩形区域背景音乐(矩形列表[矩形索引], 配置);
+  }
   return count;
 }
 

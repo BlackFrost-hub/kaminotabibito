@@ -59,6 +59,15 @@ const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
 const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   QuestMessageBJ: (this: void, force: any, messageType: number, message: string) => void;
 };
+const {
+  动态矩形区域配置表,
+  按配置键注册动态矩形区域,
+  注销动态矩形区域,
+} = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  动态矩形区域配置表: Record<string, { 键: string; 左: number; 右: number; 下: number; 上: number }>;
+  按配置键注册动态矩形区域: (this: void, 键: string) => any;
+  注销动态矩形区域: (this: void, 键: string) => boolean;
+};
 
 import { 创建剧情NPC单位 } from "../../00．公共/02．剧情NPC创建";
 import { 启动剧情Boss战 } from "../../01．主线任务/00．剧情系统核心工具/11．剧情Boss战启动桥接";
@@ -88,18 +97,14 @@ const GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange as (this: void, group: 
 const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, group: any, unit: any) => void;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, unit: any, order: string) => boolean;
 const Player = jass.Player as (this: void, playerId: number) => any;
-const Rect = jass.Rect as (this: void, minX: number, minY: number, maxX: number, maxY: number) => any;
-const RemoveRect = jass.RemoveRect as (this: void, rect: any) => void;
 const SetPlayerState = jass.SetPlayerState as (this: void, player: any, state: any, value: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, animationIndex: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, unit: any, flag: boolean) => void;
 const Sin = jass.Sin as (this: void, radians: number) => number;
 
-const 精灵城左 = -16512;
-const 精灵城右 = -3744;
-const 精灵城下 = -13280;
-const 精灵城上 = -5632;
+const 精灵城执法监听矩形键 = "支线.瑟兰迪尔精灵城执法监听";
+const 精灵城执法监听配置 = 动态矩形区域配置表[精灵城执法监听矩形键];
 const 执法单位检查范围 = 500;
 const 瑟兰迪尔出生前方距离 = 250;
 const 概率检查冷却毫秒 = 1000;
@@ -140,7 +145,10 @@ function 单位位于精灵城(this: void, unit: any): boolean {
   if (!单位有效(unit)) return false;
   const x = GetUnitX(unit);
   const y = GetUnitY(unit);
-  return x >= 精灵城左 && x <= 精灵城右 && y >= 精灵城下 && y <= 精灵城上;
+  return x >= 精灵城执法监听配置.左
+    && x <= 精灵城执法监听配置.右
+    && y >= 精灵城执法监听配置.下
+    && y <= 精灵城执法监听配置.上;
 }
 
 function 是可游玩英雄(this: void, unit: any): boolean {
@@ -270,9 +278,7 @@ function 注销执法入口(this: void): void {
   }
   攻击监听触发器 = null;
   攻击监听动作 = null;
-  if (精灵城监听矩形 != null && 精灵城监听矩形 !== 0) {
-    RemoveRect(精灵城监听矩形);
-  }
+  注销动态矩形区域(精灵城执法监听矩形键);
   精灵城监听矩形 = null;
 }
 
@@ -361,7 +367,8 @@ function 执行全员治安罚款(this: void): void {
     const player = Player(playerId);
     if (!是有效在线玩家(player)) continue;
     const currentGold = GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD);
-    SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, Math.max(0, currentGold - 10000));
+    const remainingGold = currentGold > 10000 ? currentGold - 10000 : 0;
+    SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, remainingGold);
   }
   QuestMessageBJ(
     GetPlayersAll(),
@@ -388,10 +395,10 @@ function on瑟兰迪尔死亡(this: void, dyingUnit: any, _killingUnit: any): vo
 export function 初始化瑟兰迪尔执法事件(this: void): void {
   if (攻击监听触发器 != null || 入口已触发) return;
 
-  精灵城监听矩形 = Rect(精灵城左, 精灵城下, 精灵城右, 精灵城上);
+  精灵城监听矩形 = 按配置键注册动态矩形区域(精灵城执法监听矩形键);
   const trigger = CreateTrigger();
   if (trigger == null || trigger === 0) {
-    if (精灵城监听矩形 != null && 精灵城监听矩形 !== 0) RemoveRect(精灵城监听矩形);
+    注销动态矩形区域(精灵城执法监听矩形键);
     精灵城监听矩形 = null;
     return;
   }
@@ -399,7 +406,7 @@ export function 初始化瑟兰迪尔执法事件(this: void): void {
   const action = safeTriggerAddAction(trigger, on玩家攻击中立NPC);
   if (action == null) {
     safeDestroyTrigger(trigger);
-    if (精灵城监听矩形 != null && 精灵城监听矩形 !== 0) RemoveRect(精灵城监听矩形);
+    注销动态矩形区域(精灵城执法监听矩形键);
     精灵城监听矩形 = null;
     return;
   }

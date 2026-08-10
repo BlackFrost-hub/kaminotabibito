@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____79FB_9664_83AB_7279_65AF_6D1E_7A9F_533A_57DF_80CC_666F_97F3_4E50, _____6062_590D_83AB_7279_65AF_6D1E_7A9F_533A_57DF_80CC_666F_97F3_4E50, _____6CE8_9500_83AB_7279_65AF_8303_56F4_76D1_542C, _____6CE8_9500_83AB_7279_65AF_6B7B_4EA1_76D1_542C, ____on_83AB_7279_65AF_6B7B_4EA1, _____64AD_653E_83AB_7279_65AF_7B2C_4E94_6BB5_5BF9_767D, _____64AD_653E_83AB_7279_65AF_7B2C_56DB_6BB5_5BF9_767D, _____64AD_653E_83AB_7279_65AF_7B2C_4E09_6BB5_5BF9_767D, _____64AD_653E_83AB_7279_65AF_7B2C_4E8C_6BB5_5BF9_767D, _____64AD_653E_83AB_7279_65AF_7B2C_4E00_6BB5_5BF9_767D, ____on_83AB_7279_65AF_5BF9_767D_7ED3_675F, ____on_83AB_7279_65AF_8303_56F4_89E6_53D1, _____6CE8_518C_83AB_7279_65AF_8303_56F4_76D1_542C, jglobals, addDelayedCallback, registerUnitInRangeTrigger, unregisterDeathListener, safeTriggerAddAction, safeDestroyTrigger, _____5E7F_64AD_5355_4F4D_63D0_793A, YDWEAngleBetweenUnitsSafe, debugLogForce, SetStackedSoundBJ, _____542F_52A8_5267_60C5Boss_6218, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90, CreateTrigger, GetTriggerUnit, IssueImmediateOrder, SetUnitFacing
+local _____79FB_9664_83AB_7279_65AF_6D1E_7A9F_533A_57DF_80CC_666F_97F3_4E50, _____6062_590D_83AB_7279_65AF_6D1E_7A9F_533A_57DF_80CC_666F_97F3_4E50, _____6CE8_9500_83AB_7279_65AF_8303_56F4_76D1_542C, _____6CE8_9500_83AB_7279_65AF_6B7B_4EA1_76D1_542C, ____on_83AB_7279_65AF_6B7B_4EA1, _____64AD_653E_83AB_7279_65AF_7B2C_4E94_6BB5_5BF9_767D, _____64AD_653E_83AB_7279_65AF_7B2C_56DB_6BB5_5BF9_767D, _____64AD_653E_83AB_7279_65AF_7B2C_4E09_6BB5_5BF9_767D, _____64AD_653E_83AB_7279_65AF_7B2C_4E8C_6BB5_5BF9_767D, _____64AD_653E_83AB_7279_65AF_7B2C_4E00_6BB5_5BF9_767D, ____on_83AB_7279_65AF_5BF9_767D_7ED3_675F, ____on_83AB_7279_65AF_8303_56F4_89E6_53D1, _____6CE8_518C_83AB_7279_65AF_8303_56F4_76D1_542C, jglobals, _____83B7_53D6_77E9_5F62_533A_57DF, addDelayedCallback, registerUnitInRangeTrigger, unregisterDeathListener, safeTriggerAddAction, safeDestroyTrigger, _____5E7F_64AD_5355_4F4D_63D0_793A, YDWEAngleBetweenUnitsSafe, debugLogForce, SetStackedSoundBJ, _____542F_52A8_5267_60C5Boss_6218, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90, CreateTrigger, GetTriggerUnit, IssueImmediateOrder, SetUnitFacing
 local ____00_FF0E_5E38_91CF = require("系统.11．剧情系统.02．支线任务.04．莫特斯.00．常量")
 local _____83AB_7279_65AFBoss_5355_4F4DID = ____00_FF0E_5E38_91CF["莫特斯Boss单位ID"]
 local _____83AB_7279_65AFBoss_51FA_751FX = ____00_FF0E_5E38_91CF["莫特斯Boss出生X"]
@@ -21,14 +21,22 @@ function _____79FB_9664_83AB_7279_65AF_6D1E_7A9F_533A_57DF_80CC_666F_97F3_4E50()
     if _____83AB_7279_65AF_8FD0_884C_72B6_6001["洞窟区域背景音乐已移除"] then
         return
     end
-    SetStackedSoundBJ(false, jglobals.gg_snd_BGM014, jglobals.gg_rct______________066)
+    SetStackedSoundBJ(
+        false,
+        jglobals.gg_snd_BGM014,
+        _____83B7_53D6_77E9_5F62_533A_57DF("盗贼洞窟")
+    )
     _____83AB_7279_65AF_8FD0_884C_72B6_6001["洞窟区域背景音乐已移除"] = true
 end
 function _____6062_590D_83AB_7279_65AF_6D1E_7A9F_533A_57DF_80CC_666F_97F3_4E50()
     if not _____83AB_7279_65AF_8FD0_884C_72B6_6001["洞窟区域背景音乐已移除"] then
         return
     end
-    SetStackedSoundBJ(true, jglobals.gg_snd_BGM014, jglobals.gg_rct______________066)
+    SetStackedSoundBJ(
+        true,
+        jglobals.gg_snd_BGM014,
+        _____83B7_53D6_77E9_5F62_533A_57DF("盗贼洞窟")
+    )
     _____83AB_7279_65AF_8FD0_884C_72B6_6001["洞窟区域背景音乐已移除"] = false
 end
 function _____6CE8_9500_83AB_7279_65AF_8303_56F4_76D1_542C()
@@ -181,33 +189,35 @@ end
 -- @noSelfInFile
 local jass = require("jass.common")
 jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-registerUnitInRangeTrigger = ____require_result_1.registerUnitInRangeTrigger
-local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_2.registerDeathListener
-unregisterDeathListener = ____require_result_2.unregisterDeathListener
-local ____require_result_3 = require("系统.00．核心系统.07．联机安全工具")
-safeTriggerAddAction = ____require_result_3.safeTriggerAddAction
-safeDestroyTrigger = ____require_result_3.safeDestroyTrigger
-local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
-_____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_5["添加单位暂停"]
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataSetSafe = ____require_result_6.YDUserDataSetSafe
-YDWEAngleBetweenUnitsSafe = ____require_result_6.YDWEAngleBetweenUnitsSafe
-local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_7.debugLogForce
-local ____require_result_8 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-SetStackedSoundBJ = ____require_result_8.SetStackedSoundBJ
-local ____require_result_9 = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
-local _____521B_5EFA_5267_60C5NPC_5355_4F4D = ____require_result_9["创建剧情NPC单位"]
-local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.11．剧情Boss战启动桥接")
-_____542F_52A8_5267_60C5Boss_6218 = ____require_result_10["启动剧情Boss战"]
-local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
-_____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = ____require_result_11["剧情Boss预置暂停来源"]
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+_____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
+registerUnitInRangeTrigger = ____require_result_2.registerUnitInRangeTrigger
+local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_3.registerDeathListener
+unregisterDeathListener = ____require_result_3.unregisterDeathListener
+local ____require_result_4 = require("系统.00．核心系统.07．联机安全工具")
+safeTriggerAddAction = ____require_result_4.safeTriggerAddAction
+safeDestroyTrigger = ____require_result_4.safeDestroyTrigger
+local ____require_result_5 = require("系统.09．表现系统.06．广播提示消息.index")
+_____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_5["广播单位提示"]
+local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_6["添加单位暂停"]
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataSetSafe = ____require_result_7.YDUserDataSetSafe
+YDWEAngleBetweenUnitsSafe = ____require_result_7.YDWEAngleBetweenUnitsSafe
+local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_8.debugLogForce
+local ____require_result_9 = require("lib.扩展函数.BJ函数.04．矩形与区域")
+SetStackedSoundBJ = ____require_result_9.SetStackedSoundBJ
+local ____require_result_10 = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
+local _____521B_5EFA_5267_60C5NPC_5355_4F4D = ____require_result_10["创建剧情NPC单位"]
+local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.11．剧情Boss战启动桥接")
+_____542F_52A8_5267_60C5Boss_6218 = ____require_result_11["启动剧情Boss战"]
+local ____require_result_12 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
+_____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = ____require_result_12["剧情Boss预置暂停来源"]
 CreateTrigger = jass.CreateTrigger
 GetTriggerUnit = jass.GetTriggerUnit
 IssueImmediateOrder = jass.IssueImmediateOrder

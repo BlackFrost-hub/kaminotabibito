@@ -46,7 +46,7 @@ export interface 主线剧情单位范围入口配置 extends 主线剧情入口
 
 export interface 主线剧情矩形入口配置 extends 主线剧情入口配置基础 {
   触发方式: "矩形进入";
-  矩形变量名: string;
+  矩形区域名称: string;
 }
 
 export interface 主线剧情全局单位入口配置 extends 主线剧情入口配置基础 {
@@ -120,7 +120,7 @@ export interface 主线剧情最终伤害对白配置 {
 export interface 主线剧情区域音乐切换配置 {
   添加: boolean;
   声音变量名: string;
-  矩形变量名: string;
+  矩形区域名称: string;
 }
 
 export interface 主线剧情支线任务发现配置 {

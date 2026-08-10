@@ -2,6 +2,9 @@
 
 const jass = require("jass.common") as any;
 const jassGlobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const { YDUserDataGetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -182,7 +185,7 @@ function 是应隐藏的村内中立单位(this: void): boolean {
 }
 
 function 隐藏村内中立单位(this: void): void {
-  const 矩形 = jassGlobals.gg_rct________________QY;
+  const 矩形 = 获取矩形区域("精灵村");
   if (矩形 == null || 矩形 === 0) return;
   const 单位组 = GetUnitsInRectMatching(矩形, Condition(是应隐藏的村内中立单位));
   if (单位组 == null || 单位组 === 0) return;
@@ -321,7 +324,7 @@ function jassGlobalsCamera(this: void, name: string): any {
 function 执行教派战斗收束(this: void): void {
   退出剧情电影模式并恢复镜头();
   const sound = jassGlobalsCamera("gg_snd_JQBGM04");
-  const rect = jassGlobalsCamera("gg_rct________________QY");
+  const rect = 获取矩形区域("精灵村");
   卸载区域背景音乐句柄(sound, rect);
 }
 

@@ -26,17 +26,19 @@ local scheduleGrayQuestMarkerAfterBubbleFade = ____09_FF0ENPC_5934_9876_4E0E_6C1
 local scheduleYellowQuestMarkerAfterBubbleFade = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1_7279_6548.scheduleYellowQuestMarkerAfterBubbleFade
 local jass = require("jass.common")
 local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
+local ____require_result_0 = require("系统.08．任务系统.00．配置表.04．NPC生成器")
+local _____521B_5EFA_4EFB_52A1_7ED3_675FNPC = ____require_result_0["创建任务结束NPC"]
 local ____npcEffect = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效")
 local function getDialogNpcUnit(playerId)
     return ____npcEffect.getNpcUnit(playerId)
 end
-local ____require_result_0 = require("系统.09．表现系统.02．对话框系统.14．任务物品发放")
-local _____53D1_653E_4EFB_52A1_7269_54C1 = ____require_result_0["发放任务物品"]
+local ____require_result_1 = require("系统.09．表现系统.02．对话框系统.14．任务物品发放")
+local _____53D1_653E_4EFB_52A1_7269_54C1 = ____require_result_1["发放任务物品"]
 local openNpcDialog = ____UI_51FD_6570.openNpcDialog
-local ____G_1 = _G
-local addDelayedCallback = ____G_1.addDelayedCallback
-local ____require_result_2 = require("系统.08．任务系统.02．任务管理器")
-local questManager = ____require_result_2.questManager
+local ____G_2 = _G
+local addDelayedCallback = ____G_2.addDelayedCallback
+local ____require_result_3 = require("系统.08．任务系统.02．任务管理器")
+local questManager = ____require_result_3.questManager
 local function scheduleOpenDialogLater(self, player, data)
     addDelayedCallback(
         10,
@@ -102,13 +104,13 @@ local function canAcceptQuestByRequirements(self, quest, hero)
         return false
     end
     local level = jass.GetHeroLevel(hero)
-    local ____isGreaterThan_3
+    local ____isGreaterThan_4
     if isGreaterThan then
-        ____isGreaterThan_3 = level > limit
+        ____isGreaterThan_4 = level > limit
     else
-        ____isGreaterThan_3 = level < limit
+        ____isGreaterThan_4 = level < limit
     end
-    return ____isGreaterThan_3
+    return ____isGreaterThan_4
 end
 local function getQuestRewardDisplayText(self, quest)
     return resolveRewardDisplayText(quest)
@@ -185,20 +187,20 @@ function ____exports.buildQuestCompletedDialog(self, quest, npcName)
 end
 function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, npcUnit, _____5BF9_8BDD_76EE_6807_5355_4F4D, ____NPC_914D_7F6E_671D_5411)
     local dialogOwner = jass.Player(dialogOwnerId)
-    local ____dialogOwner_4
+    local ____dialogOwner_5
     if dialogOwner then
-        ____dialogOwner_4 = getPlayerFirstHero(nil, dialogOwner)
+        ____dialogOwner_5 = getPlayerFirstHero(nil, dialogOwner)
     else
-        ____dialogOwner_4 = nil
+        ____dialogOwner_5 = nil
     end
-    local ownerHero = ____dialogOwner_4
-    local ____ownerHero_5
+    local ownerHero = ____dialogOwner_5
+    local ____ownerHero_6
     if ownerHero then
-        ____ownerHero_5 = jass.GetUnitName(ownerHero)
+        ____ownerHero_6 = jass.GetUnitName(ownerHero)
     else
-        ____ownerHero_5 = "你"
+        ____ownerHero_6 = "你"
     end
-    local heroName = ____ownerHero_5
+    local heroName = ____ownerHero_6
     local questDesc = quest["描述"] or quest["名称"] or "未知任务"
     local rewardText = getQuestRewardDisplayText(nil, quest)
     local startLines = quest["NPC开始对白"] and ____exports.parseDialogText(nil, quest["NPC开始对白"], npcName, heroName) or ({{
@@ -215,13 +217,13 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
             onAccept = function()
                 local questId = quest["任务ID"] ~= nil and tostring(quest["任务ID"]) or ""
                 local playerObj = jass.Player(dialogOwnerId)
-                local ____playerObj_6
+                local ____playerObj_7
                 if playerObj then
-                    ____playerObj_6 = getPlayerFirstHero(nil, playerObj)
+                    ____playerObj_7 = getPlayerFirstHero(nil, playerObj)
                 else
-                    ____playerObj_6 = nil
+                    ____playerObj_7 = nil
                 end
-                local hero = ____playerObj_6
+                local hero = ____playerObj_7
                 local currentNpcUnit = npcUnit or getDialogNpcUnit(dialogOwnerId)
                 if not canAcceptQuestByRequirements(nil, quest, hero) then
                     local failRaw = quest["接取失败对白"] or "当前条件不满足，无法接受该任务。"
@@ -240,6 +242,10 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
                     return
                 end
                 if not hasPlayerAcceptedQuest(nil, dialogOwnerId, questId) then
+                    if quest["结束NPC配置"] and not _____521B_5EFA_4EFB_52A1_7ED3_675FNPC(quest) then
+                        showLocalHint(nil, dialogOwnerId, "|cffffff00『系统提示』：|r任务目标暂时无法出现，请稍后重试。")
+                        return
+                    end
                     local playerName = jass.GetPlayerName(playerObj) or "冒险者"
                     setQuestState(
                         nil,
@@ -288,20 +294,20 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
 end
 function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwnerId, npcUnit, _____5BF9_8BDD_76EE_6807_5355_4F4D, ____NPC_914D_7F6E_671D_5411)
     local dialogOwner = jass.Player(dialogOwnerId)
-    local ____dialogOwner_7
+    local ____dialogOwner_8
     if dialogOwner then
-        ____dialogOwner_7 = getPlayerFirstHero(nil, dialogOwner)
+        ____dialogOwner_8 = getPlayerFirstHero(nil, dialogOwner)
     else
-        ____dialogOwner_7 = nil
+        ____dialogOwner_8 = nil
     end
-    local ownerHero = ____dialogOwner_7
-    local ____ownerHero_8
+    local ownerHero = ____dialogOwner_8
+    local ____ownerHero_9
     if ownerHero then
-        ____ownerHero_8 = jass.GetUnitName(ownerHero)
+        ____ownerHero_9 = jass.GetUnitName(ownerHero)
     else
-        ____ownerHero_8 = "你"
+        ____ownerHero_9 = "你"
     end
-    local heroName = ____ownerHero_8
+    local heroName = ____ownerHero_9
     local questDesc = quest["描述"] or quest["名称"] or ""
     local rewardText = getQuestRewardDisplayText(nil, quest)
     local requireCount = normalizeRequireCount(nil, quest["需求数量"])

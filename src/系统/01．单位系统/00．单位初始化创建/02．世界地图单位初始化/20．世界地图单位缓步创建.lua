@@ -36,8 +36,8 @@ function _____5F52_7C7B_53CD_67E5_5355_4F4DID(_____654C_4EBA_5F52_7C7B, _____535
 end
 function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
     if _____914D_7F6E["敌人归类"] == "杂鱼" or _____914D_7F6E["敌人归类"] == "精英" then
-        local ____opt_11 = _____914D_7F6E["兼容单位ID"]
-        local _____517C_5BB9_5355_4F4DID = ____opt_11 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
+        local ____opt_13 = _____914D_7F6E["兼容单位ID"]
+        local _____517C_5BB9_5355_4F4DID = ____opt_13 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
         if _____517C_5BB9_5355_4F4DID ~= nil and #_____517C_5BB9_5355_4F4DID >= 4 then
             return __TS__StringSubstring(_____517C_5BB9_5355_4F4DID, 0, 4)
         end
@@ -51,8 +51,8 @@ function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
     if _____603B_8868_53CD_67E5_7ED3_679C ~= nil and _____603B_8868_53CD_67E5_7ED3_679C ~= "" then
         return _____603B_8868_53CD_67E5_7ED3_679C
     end
-    local ____opt_13 = _____914D_7F6E["兼容单位ID"]
-    local _____517C_5BB9_5355_4F4DID = ____opt_13 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
+    local ____opt_15 = _____914D_7F6E["兼容单位ID"]
+    local _____517C_5BB9_5355_4F4DID = ____opt_15 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
     if _____517C_5BB9_5355_4F4DID ~= nil and #_____517C_5BB9_5355_4F4DID >= 4 then
         return __TS__StringSubstring(_____517C_5BB9_5355_4F4DID, 0, 4)
     end
@@ -163,32 +163,35 @@ end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
-stringToFourCC = ____require_result_0.stringToFourCC
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-_____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
-local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
-GetRandomDirectionDeg = ____require_result_2.GetRandomDirectionDeg
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_3.addDelayedCallback
-local addPeriodicCallback = ____require_result_3.addPeriodicCallback
-local removePeriodicCallback = ____require_result_3.removePeriodicCallback
-local ____require_result_4 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-_____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_4["按名字反查Boss单位ID"]
-local ____require_result_5 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
-_____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_5["按名字反查异界Boss单位ID"]
-local ____require_result_6 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
-_____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_6["按名字反查总单位ID"]
-local ____require_result_7 = require("系统.02．物品系统.13．物品名反查")
-local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_7["按名字反查物品ID"]
-local ____require_result_8 = require("lib.扩展函数.物品相关函数.创建物品函数")
-local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_8["创建物品并注册排泄监听"]
-local ____require_result_9 = require("lib.扩展函数.BJ函数.03．物品与库存")
-local AddItemToStockBJ = ____require_result_9.AddItemToStockBJ
-local ____require_result_10 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataSetSafe = ____require_result_10.YDUserDataSetSafe
-YDUserDataClearSafe = ____require_result_10.YDUserDataClearSafe
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
+stringToFourCC = ____require_result_1.stringToFourCC
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+_____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_3["创建单位并登记排泄安全"]
+local ____require_result_4 = require("lib.扩展函数.BJ函数.07．杂项")
+GetRandomDirectionDeg = ____require_result_4.GetRandomDirectionDeg
+local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_5.addDelayedCallback
+local addPeriodicCallback = ____require_result_5.addPeriodicCallback
+local removePeriodicCallback = ____require_result_5.removePeriodicCallback
+local ____require_result_6 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+_____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_6["按名字反查Boss单位ID"]
+local ____require_result_7 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
+_____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_7["按名字反查异界Boss单位ID"]
+local ____require_result_8 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
+_____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_8["按名字反查总单位ID"]
+local ____require_result_9 = require("系统.02．物品系统.13．物品名反查")
+local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_9["按名字反查物品ID"]
+local ____require_result_10 = require("lib.扩展函数.物品相关函数.创建物品函数")
+local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_10["创建物品并注册排泄监听"]
+local ____require_result_11 = require("lib.扩展函数.BJ函数.03．物品与库存")
+local AddItemToStockBJ = ____require_result_11.AddItemToStockBJ
+local ____require_result_12 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataSetSafe = ____require_result_12.YDUserDataSetSafe
+YDUserDataClearSafe = ____require_result_12.YDUserDataClearSafe
 Player = jass.Player
 local GetRandomReal = jass.GetRandomReal
 local GetRectMinX = jass.GetRectMinX
@@ -225,6 +228,14 @@ local function _____83B7_53D6_968F_673A_77E9_5F62Y(rect)
     )
 end
 local function _____89E3_6790_4E16_754C_5730_56FE_7269_54C1ID(_____7269_54C1_540D)
+    local _____540E_7F00_5206_9694_4F4D_7F6E = (string.find(_____7269_54C1_540D, "#", nil, true) or 0) - 1
+    if _____540E_7F00_5206_9694_4F4D_7F6E > 0 then
+        local _____6307_5B9A_7269_54C1ID = __TS__StringSubstring(_____7269_54C1_540D, _____540E_7F00_5206_9694_4F4D_7F6E + 1)
+        if #_____6307_5B9A_7269_54C1ID == 4 and stringToFourCCSafe(_____6307_5B9A_7269_54C1ID) > 0 then
+            return _____6307_5B9A_7269_54C1ID
+        end
+        _____7269_54C1_540D = __TS__StringSubstring(_____7269_54C1_540D, 0, _____540E_7F00_5206_9694_4F4D_7F6E)
+    end
     local _____53CD_67E5_7ED3_679C = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_540D)
     if _____53CD_67E5_7ED3_679C ~= nil and _____53CD_67E5_7ED3_679C ~= "" then
         return _____53CD_67E5_7ED3_679C
@@ -305,16 +316,16 @@ local function _____5904_7406_5168_90E8_7F13_6B65_521B_5EFA_4EFB_52A1()
     for ____, _____4EFB_52A1 in ipairs(__TS__ObjectValues(_____7F13_6B65_521B_5EFA_4EFB_52A1_8868)) do
         do
             if _____4EFB_52A1 == nil then
-                goto __continue47
+                goto __continue49
             end
             _____4EFB_52A1["已累计毫秒"] = _____4EFB_52A1["已累计毫秒"] + _____7F13_6B65_521B_5EFA_8C03_5EA6_5668_95F4_9694_6BEB_79D2
             if _____4EFB_52A1["已累计毫秒"] < _____4EFB_52A1["批次间隔毫秒"] then
-                goto __continue47
+                goto __continue49
             end
             _____4EFB_52A1["已累计毫秒"] = 0
             _____6267_884C_5355_4E2A_7F13_6B65_521B_5EFA_4EFB_52A1_4E00_6279(_____4EFB_52A1)
         end
-        ::__continue47::
+        ::__continue49::
     end
     _____5982_65E0_4EFB_52A1_5219_505C_6B62_7F13_6B65_521B_5EFA_8C03_5EA6_5668()
 end
@@ -392,7 +403,7 @@ local function _____89E3_6790_533A_57DF_968F_673A_521B_5EFA_5355_4F4DID(_____535
     return nil
 end
 local function _____6267_884C_5355_6761_4E2D_7ACB_751F_7269_521B_5EFA(_____914D_7F6E)
-    local rect = jglobals[_____914D_7F6E["矩形变量名"]]
+    local rect = _____83B7_53D6_77E9_5F62_533A_57DF(_____914D_7F6E["矩形区域名称"])
     if rect == nil then
         return 0
     end
@@ -462,7 +473,7 @@ local function _____6267_884C_5355_6761_4E16_754C_5730_56FE_690D_7269_5355_4F4D_
     return _____5355_4F4D
 end
 local function _____6267_884C_5355_6761_4E16_754C_5730_56FE_690D_7269_968F_673A_7269_54C1_521B_5EFA(_____914D_7F6E)
-    local rect = jglobals[_____914D_7F6E["矩形变量名"]]
+    local rect = _____83B7_53D6_77E9_5F62_533A_57DF(_____914D_7F6E["矩形区域名称"])
     if rect == nil then
         return 0
     end

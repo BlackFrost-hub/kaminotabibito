@@ -43,14 +43,16 @@ local RemoveItem = jass.RemoveItem
 local UnitAddItem = jass.UnitAddItem
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local stringToFourCC = ____require_result_1.stringToFourCC
-local ____require_result_2 = require("lib.扩展函数.物品相关函数.index")
-local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_2["创建物品并注册排泄监听"]
-local ____require_result_3 = require("系统.09．表现系统.02．对话框系统.14．任务物品发放")
-local _____53D1_653E_4EFB_52A1_7269_54C1 = ____require_result_3["发放任务物品"]
-local ____G_4 = _G
-local addDelayedCallback = ____G_4.addDelayedCallback
+local ____require_result_1 = require("系统.08．任务系统.00．配置表.04．NPC生成器")
+local _____6E05_7406_4EFB_52A1_7ED3_675FNPC = ____require_result_1["清理任务结束NPC"]
+local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local stringToFourCC = ____require_result_2.stringToFourCC
+local ____require_result_3 = require("lib.扩展函数.物品相关函数.index")
+local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_3["创建物品并注册排泄监听"]
+local ____require_result_4 = require("系统.09．表现系统.02．对话框系统.14．任务物品发放")
+local _____53D1_653E_4EFB_52A1_7269_54C1 = ____require_result_4["发放任务物品"]
+local ____G_5 = _G
+local addDelayedCallback = ____G_5.addDelayedCallback
 local function normalizeRequireCount(self, count)
     return count ~= nil and count > 1 and count or 1
 end
@@ -318,25 +320,25 @@ local function shouldUseGenericGiveFailHint(self, quest)
     return (string.find(reward, ":", nil, true) or 0) - 1 >= 0
 end
 function ____exports.handleQuestSubmit(self, params)
-    local ____params_5 = params
-    local quest = ____params_5.quest
-    local npcName = ____params_5.npcName
-    local heroName = ____params_5.heroName
-    local dialogOwnerId = ____params_5.dialogOwnerId
-    local npcUnit = ____params_5.npcUnit
-    local _____5BF9_8BDD_76EE_6807_5355_4F4D = ____params_5["对话目标单位"]
-    local ____NPC_914D_7F6E_671D_5411 = ____params_5["NPC配置朝向"]
-    local parseDialogText = ____params_5.parseDialogText
-    local openDialog = ____params_5.openDialog
-    local refreshTaskUIForAllClientsSoon = ____params_5.refreshTaskUIForAllClientsSoon
+    local ____params_6 = params
+    local quest = ____params_6.quest
+    local npcName = ____params_6.npcName
+    local heroName = ____params_6.heroName
+    local dialogOwnerId = ____params_6.dialogOwnerId
+    local npcUnit = ____params_6.npcUnit
+    local _____5BF9_8BDD_76EE_6807_5355_4F4D = ____params_6["对话目标单位"]
+    local ____NPC_914D_7F6E_671D_5411 = ____params_6["NPC配置朝向"]
+    local parseDialogText = ____params_6.parseDialogText
+    local openDialog = ____params_6.openDialog
+    local refreshTaskUIForAllClientsSoon = ____params_6.refreshTaskUIForAllClientsSoon
     local callbackOwner = jass.Player(dialogOwnerId)
-    local ____callbackOwner_6
+    local ____callbackOwner_7
     if callbackOwner then
-        ____callbackOwner_6 = getPlayerFirstHero(nil, callbackOwner)
+        ____callbackOwner_7 = getPlayerFirstHero(nil, callbackOwner)
     else
-        ____callbackOwner_6 = nil
+        ____callbackOwner_7 = nil
     end
-    local hero = ____callbackOwner_6
+    local hero = ____callbackOwner_7
     local requireItem = quest["需求物品"]
     local requiredResources = quest["需求资源"]
     local requireCount = normalizeRequireCount(nil, quest["需求数量"])
@@ -431,6 +433,7 @@ function ____exports.handleQuestSubmit(self, params)
             if quest["完成后动作"] then
                 quest["完成后动作"](quest, dialogOwnerId)
             end
+            _____6E05_7406_4EFB_52A1_7ED3_675FNPC(quest)
         end
         if quest["NPC完成对白"] then
             local completeRaw = pickNpcCompleteTextByBranch(nil, quest["NPC完成对白"], rewardBranchIndex)

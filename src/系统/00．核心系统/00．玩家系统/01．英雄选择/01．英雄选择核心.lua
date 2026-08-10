@@ -9,31 +9,31 @@ local _____82F1_96C4_9009_62E9_914D_7F6E_8868 = ____00_FF0E_82F1_96C4_9009_62E9_
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
 local centerTimer = require("系统.00．核心系统.05．中心计时器")
 local selectionCenter = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 local bridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local ydSafe = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local ____require_result_0 = require("lib.扩展函数.BJ函数.06．任务消息")
-local QuestMessageBJ = ____require_result_0.QuestMessageBJ
-local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_1.GetPlayersAll
-local ____require_result_2 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local ModifyHeroSkillPoints = ____require_result_2.ModifyHeroSkillPoints
-local ____require_result_3 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-local RectContainsUnitBJ = ____require_result_3.RectContainsUnit
-local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_4["创建单位并登记排泄安全"]
-local ____require_result_5 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
-local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_5["按名字反查总单位ID"]
-local ____require_result_6 = require("系统.03．技能系统.08．技能数据表.01．技能名反查")
-local _____6309_540D_5B57_53CD_67E5_6280_80FDID = ____require_result_6["按名字反查技能ID"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
-local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-local StarOther_PanCameraToTimedForPlayer = ____require_result_8.StarOther_PanCameraToTimedForPlayer
+local ____require_result_1 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_1.QuestMessageBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_2.GetPlayersAll
+local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local ModifyHeroSkillPoints = ____require_result_3.ModifyHeroSkillPoints
+local ____require_result_4 = require("lib.扩展函数.BJ函数.04．矩形与区域")
+local RectContainsUnitBJ = ____require_result_4.RectContainsUnit
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_5["创建单位并登记排泄安全"]
+local ____require_result_6 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
+local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_6["按名字反查总单位ID"]
+local ____require_result_7 = require("系统.03．技能系统.08．技能数据表.01．技能名反查")
+local _____6309_540D_5B57_53CD_67E5_6280_80FDID = ____require_result_7["按名字反查技能ID"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_8.stringToFourCCSafe
+local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+local StarOther_PanCameraToTimedForPlayer = ____require_result_9.StarOther_PanCameraToTimedForPlayer
 local GroupAddUnit = jass.GroupAddUnit
-local GetRectCenterX = jass.GetRectCenterX
-local GetRectCenterY = jass.GetRectCenterY
 local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 local initPlayerHeroGetBridge = bridge.initPlayerHeroGetBridge
 local directRegisterPlayerHero = bridge.directRegisterPlayerHero
@@ -206,11 +206,11 @@ end
 local function _____662F_53EF_9009_73A9_5BB6(_____73A9_5BB6ID)
     return __TS__ArrayIndexOf(_____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"], _____73A9_5BB6ID) >= 0
 end
-local function _____83B7_53D6_914D_7F6E_77E9_5F62(_____5168_5C40_540D)
-    return jglobals[_____5168_5C40_540D]
+local function _____83B7_53D6_914D_7F6E_77E9_5F62(_____533A_57DF_540D_79F0)
+    return _____83B7_53D6_77E9_5F62_533A_57DF(_____533A_57DF_540D_79F0)
 end
 local function _____662F_82F1_96C4_9009_62E9_533A_57DF_5185_5355_4F4D(_____5355_4F4D)
-    local _____9009_62E9_533A_57DF = _____83B7_53D6_914D_7F6E_77E9_5F62(_____82F1_96C4_9009_62E9_914D_7F6E_8868["选择区域全局名"])
+    local _____9009_62E9_533A_57DF = _____83B7_53D6_914D_7F6E_77E9_5F62(_____82F1_96C4_9009_62E9_914D_7F6E_8868["选择区域名称"])
     if _____9009_62E9_533A_57DF == nil or _____9009_62E9_533A_57DF == 0 then
         return false
     end
@@ -220,40 +220,33 @@ local function _____73A9_5BB6_662F_5426_5DF2_9009_62E9_82F1_96C4(_____73A9_5BB6)
     return ydSafe.YDUserDataGetSafe("player", _____73A9_5BB6, _____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄已选择标记键"], "boolean") == true
 end
 local function _____89E3_6790_6280_80FD_7C7B_578BID(_____6280_80FD_540D)
-    local ____temp_9
+    local ____temp_10
     if _____6280_80FD_540D == nil then
-        ____temp_9 = nil
+        ____temp_10 = nil
     else
-        ____temp_9 = _____6309_540D_5B57_53CD_67E5_6280_80FDID(_____6280_80FD_540D)
+        ____temp_10 = _____6309_540D_5B57_53CD_67E5_6280_80FDID(_____6280_80FD_540D)
     end
-    local _____539F_59CBID = ____temp_9
+    local _____539F_59CBID = ____temp_10
     if _____539F_59CBID ~= nil and _____539F_59CBID ~= "" then
         return stringToFourCCSafe(_____539F_59CBID)
     end
     return stringToFourCCSafe(_____9ED8_8BA4_82F1_96C4_7981_7528_6280_80FD_539F_59CBID)
 end
 local function _____89E3_6790_5355_4F4D_7C7B_578BID(_____5355_4F4D_540D)
-    local ____temp_10
+    local ____temp_11
     if _____5355_4F4D_540D == nil then
-        ____temp_10 = nil
+        ____temp_11 = nil
     else
-        ____temp_10 = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)
+        ____temp_11 = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)
     end
-    local _____539F_59CBID = ____temp_10
+    local _____539F_59CBID = ____temp_11
     if _____539F_59CBID ~= nil and _____539F_59CBID ~= "" then
         return stringToFourCCSafe(_____539F_59CBID)
     end
     return stringToFourCCSafe(_____9ED8_8BA4BB_5355_4F4D_539F_59CBID)
 end
 local function _____83B7_53D6_82F1_96C4_51FA_751F_70B9()
-    local _____51FA_751F_533A_57DF = _____83B7_53D6_914D_7F6E_77E9_5F62(_____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄出生区域全局名"])
-    if _____51FA_751F_533A_57DF == nil or _____51FA_751F_533A_57DF == 0 then
-        return nil
-    end
-    return {
-        X = GetRectCenterX(_____51FA_751F_533A_57DF),
-        Y = GetRectCenterY(_____51FA_751F_533A_57DF)
-    }
+    return {X = _____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄出生坐标"].X, Y = _____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄出生坐标"].Y}
 end
 local function _____5199_5165_73A9_5BB6_82F1_96C4_540D_5B57_7B26_4E32(_____73A9_5BB6, _____82F1_96C4)
     local _____5B57_7B26_4E32_6570_7EC4 = jglobals.udg_String
@@ -383,7 +376,7 @@ local function _____5E94_5FFD_7565_672C_6B21_9009_62E9(_____73A9_5BB6, _____73A9
     if not _____662F_53EF_9009_73A9_5BB6(_____73A9_5BB6ID) then
         return true
     end
-    local _____9009_62E9_533A_57DF = _____83B7_53D6_914D_7F6E_77E9_5F62(_____82F1_96C4_9009_62E9_914D_7F6E_8868["选择区域全局名"])
+    local _____9009_62E9_533A_57DF = _____83B7_53D6_914D_7F6E_77E9_5F62(_____82F1_96C4_9009_62E9_914D_7F6E_8868["选择区域名称"])
     if _____9009_62E9_533A_57DF == nil or _____9009_62E9_533A_57DF == 0 then
         return true
     end

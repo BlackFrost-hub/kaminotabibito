@@ -31,6 +31,7 @@ local GetHeroLevel = jass.GetHeroLevel
 local CreateUnit = jass.CreateUnit
 local GetRandomReal = jass.GetRandomReal
 local Player = jass.Player
+local SetUnitFacing = jass.SetUnitFacing
 local regionMap = __TS__New(Map)
 local _____533A_57DF_4F20_9001_5DF2_521D_59CB_5316 = false
 local _____5355_4F4D_533A_57DF_4F20_9001_51B7_5374 = {}
@@ -323,6 +324,9 @@ local function onRegionEnter()
         return
     end
     jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
+    if cfg.teleportFacing ~= nil then
+        SetUnitFacing(unit, cfg.teleportFacing)
+    end
     jass.IssueImmediateOrder(unit, "stop")
     local player = owner
     if player ~= nil then
@@ -363,10 +367,10 @@ local function initRegionTeleport()
         do
             local cfg = _____533A_57DF_4F20_9001_914D_7F6E[k]
             if cfg == nil or not cfg.enabled then
-                goto __continue82
+                goto __continue83
             end
             if not isValidRegionRect(cfg) then
-                goto __continue82
+                goto __continue83
             end
             local region = jass.CreateRegion()
             local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
@@ -378,7 +382,7 @@ local function initRegionTeleport()
                 cfg
             )
         end
-        ::__continue82::
+        ::__continue83::
     end
     jass.TriggerAddAction(trig, onRegionEnter)
 end

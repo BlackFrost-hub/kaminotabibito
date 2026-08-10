@@ -6,10 +6,10 @@ const jglobals = require("jass.globals") as Record<string, any>;
 const { SetStackedSoundBJ } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
   SetStackedSoundBJ: (this: void, add: boolean, soundHandle: any, rectHandle: any) => void;
 };
-const { 注册动态矩形区域, 按配置键注册动态矩形区域, 获取动态矩形区域, 读取动态矩形区域组子区域键, 注销动态矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+const { 注册动态矩形区域, 按配置键注册动态矩形区域, 获取矩形区域, 读取动态矩形区域组子区域键, 注销动态矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
   注册动态矩形区域: (this: void, 配置: { 键: string; 左: number; 右: number; 下: number; 上: number; 说明?: string }) => any;
   按配置键注册动态矩形区域: (this: void, 键: string) => any;
-  获取动态矩形区域: (this: void, 键: string) => any;
+  获取矩形区域: (this: void, 名称: string) => any;
   读取动态矩形区域组子区域键: (this: void, 组键: string, 用途?: "全部" | "背景音乐") => string[];
   注销动态矩形区域: (this: void, 键: string) => boolean;
 };
@@ -30,7 +30,7 @@ const StopSound = jass.StopSound as (this: void, soundHandle: any, killWhenDone:
 export interface 区域背景音乐运行时注册配置 {
   键: string;
   音乐路径: string;
-  区域全局名?: string;
+  矩形区域名称?: string;
   区域动态组键?: string;
   区域动态键?: string;
   区域动态键列表?: string[];
@@ -81,7 +81,7 @@ export function 移除区域背景音乐矩形(this: void, rectHandle: any): boo
   return true;
 }
 
-/** 兼容剧情配置里的“声音全局名 @ 矩形全局名; ...”表达式。 */
+/** 兼容剧情配置里的“声音全局名 @ 矩形区域名称; ...”表达式。 */
 export function 切换区域背景音乐表达式(this: void, expr: string | undefined, add: boolean): number {
   if (expr == null || expr === "") return 0;
 
@@ -94,9 +94,7 @@ export function 切换区域背景音乐表达式(this: void, expr: string | und
     if (at < 0) continue;
     const soundHandle = 读取全局句柄(item.substring(0, at).trim());
     const rectName = item.substring(at + 1).trim();
-    const rectHandle = 读取全局句柄(rectName)
-      || 获取动态矩形区域(rectName)
-      || 按配置键注册动态矩形区域(rectName);
+    const rectHandle = 获取矩形区域(rectName);
     if (挂载区域背景音乐句柄(add, soundHandle, rectHandle)) count++;
   }
   return count;
@@ -105,7 +103,7 @@ export function 切换区域背景音乐表达式(this: void, expr: string | und
 function 运行时配置有效(this: void, 配置: 区域背景音乐运行时注册配置): boolean {
   return 配置.键 !== ""
     && 配置.音乐路径 !== ""
-    && ((配置.区域全局名 != null && 配置.区域全局名 !== "")
+    && ((配置.矩形区域名称 != null && 配置.矩形区域名称 !== "")
       || (配置.区域动态组键 != null && 配置.区域动态组键 !== "")
       || (配置.区域动态键 != null && 配置.区域动态键 !== "")
       || (配置.区域动态键列表 != null && 配置.区域动态键列表.length > 0)
@@ -119,7 +117,7 @@ export function 注册运行时区域背景音乐(this: void, 配置: 区域背�
   if (!运行时配置有效(配置)) return false;
   if (区域背景音乐运行时状态表[配置.键] != null) return true;
 
-  const 使用地图矩形 = 配置.区域全局名 != null && 配置.区域全局名 !== "";
+  const 使用地图矩形 = 配置.矩形区域名称 != null && 配置.矩形区域名称 !== "";
   const 共享动态矩形键列表: string[] = [];
   if (!使用地图矩形 && 配置.区域动态键 != null && 配置.区域动态键 !== "") {
     共享动态矩形键列表.push(配置.区域动态键);
@@ -141,7 +139,7 @@ export function 注册运行时区域背景音乐(this: void, 配置: 区域背�
   const 矩形列表: any[] = [];
   const 拥有动态矩形键列表: string[] = [];
   if (使用地图矩形) {
-    const 矩形 = 读取全局句柄(配置.区域全局名);
+    const 矩形 = 获取矩形区域(配置.矩形区域名称 as string);
     if (句柄有效(矩形)) 矩形列表.push(矩形);
   } else if (共享动态矩形键列表.length > 0) {
     for (let i = 0; i < 共享动态矩形键列表.length; i++) {

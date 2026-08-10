@@ -7,7 +7,7 @@ export const 刷怪单位组键 = "单位组";
 export const 刷怪延迟秒 = 55.0;
 export const 中立敌对玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 export const 特殊敌对玩家ID = 7;
-export const 刷怪区域全局名 = "gg_rct_____________u";
+export const 刷怪区域名称 = "怪物刷新区域";
 
 export type 怪物属性键 = "暴击率" | "暴击伤害" | "魔抗" | "命中率" | "闪避率";
 export type 怪物属性快照 = Partial<Record<怪物属性键, number>>;

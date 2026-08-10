@@ -160,34 +160,34 @@ function 切换蒙面人死亡区域音乐(this: void, add: boolean, soundName: 
 
 function 停止蒙面人死亡区域音乐(this: void): void {
   const rects = [
-    "gg_rct______________055", "gg_rct_____________001", "gg_rct______________086", "gg_rct______________083",
-    "gg_rct______________081", "gg_rct_007____________u", "gg_rct________________00X", "gg_rct______________084",
+    "沙漠区域.区域1", "沙漠绿洲", "悲风山谷", "沙漠区域.区域3",
+    "巨石峡谷", "奇幻湖", "史莱姆草原", "精灵森",
   ];
   for (let i = 0; i < rects.length; i++) 切换蒙面人死亡区域音乐(false, "gg_snd_JQBGM03", rects[i]);
 }
 
 function 播放蒙面人死亡胜利音乐(this: void): void {
-  切换蒙面人死亡区域音乐(false, "gg_snd_shengliBgm2", "gg_rct________________QY");
-  切换蒙面人死亡区域音乐(true, "gg_snd_shengliBgm2", "gg_rct________________QY");
+  切换蒙面人死亡区域音乐(false, "gg_snd_shengliBgm2", "精灵村");
+  切换蒙面人死亡区域音乐(true, "gg_snd_shengliBgm2", "精灵村");
 }
 
 function 添加蒙面人死亡环境音乐(this: void): void {
-  切换蒙面人死亡区域音乐(true, "gg_snd_BGM006", "gg_rct________________00X");
-  切换蒙面人死亡区域音乐(true, "gg_snd_BGM007", "gg_rct______________084");
-  切换蒙面人死亡区域音乐(true, "gg_snd_BGM006", "gg_rct_007____________u");
-  切换蒙面人死亡区域音乐(true, "gg_snd_BGM008", "gg_rct______________081");
-  切换蒙面人死亡区域音乐(true, "gg_snd_bgm003", "gg_rct_____________001");
+  切换蒙面人死亡区域音乐(true, "gg_snd_BGM006", "史莱姆草原");
+  切换蒙面人死亡区域音乐(true, "gg_snd_BGM007", "精灵森");
+  切换蒙面人死亡区域音乐(true, "gg_snd_BGM006", "奇幻湖");
+  切换蒙面人死亡区域音乐(true, "gg_snd_BGM008", "巨石峡谷");
+  切换蒙面人死亡区域音乐(true, "gg_snd_bgm003", "沙漠绿洲");
   const 背景音乐 = GetRandomInt(1, 2) === 1 ? "gg_snd_BGM016" : "gg_snd_BGM017";
-  切换蒙面人死亡区域音乐(true, 背景音乐, "gg_rct______________055");
-  切换蒙面人死亡区域音乐(true, 背景音乐, "gg_rct______________086");
-  切换蒙面人死亡区域音乐(true, 背景音乐, "gg_rct______________083");
+  切换蒙面人死亡区域音乐(true, 背景音乐, "沙漠区域.区域1");
+  切换蒙面人死亡区域音乐(true, 背景音乐, "悲风山谷");
+  切换蒙面人死亡区域音乐(true, 背景音乐, "沙漠区域.区域3");
 }
 
 function 恢复蒙面人死亡区域音乐(this: void): void {
   蒙面人死亡环境音乐延迟ID = 0;
-  切换蒙面人死亡区域音乐(false, "gg_snd_shengliBgm2", "gg_rct________________QY");
-  切换蒙面人死亡区域音乐(false, "gg_snd_zhuchengBGM01", "gg_rct________________QY");
-  切换蒙面人死亡区域音乐(true, "gg_snd_zhuchengBGM01", "gg_rct________________QY");
+  切换蒙面人死亡区域音乐(false, "gg_snd_shengliBgm2", "精灵村");
+  切换蒙面人死亡区域音乐(false, "gg_snd_zhuchengBGM01", "精灵村");
+  切换蒙面人死亡区域音乐(true, "gg_snd_zhuchengBGM01", "精灵村");
 }
 
 function 启动蒙面人死亡胜利音乐(this: void): void {

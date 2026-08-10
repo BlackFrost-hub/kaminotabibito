@@ -30,11 +30,18 @@ local g_npcUnitByRequireId = __TS__New(Map)
 local g_npcUnitByNpcNameId = __TS__New(Map)
 local g_npcUnitByDisplayName = __TS__New(Map)
 local g_npcConfigByUnitHandleId = __TS__New(Map)
+local g_endNpcUnitByQuestId = __TS__New(Map)
+local GetHandleId = jass.GetHandleId
+local GetUnitTypeId = jass.GetUnitTypeId
+local RemoveUnit = jass.RemoveUnit
 --- 顶部标记若在 SetUnitModel 前或同帧绑定，换模时可能被顶掉。
 -- 有自定义模型时延后到换模之后；无模型时也与 CreateUnit 错开一帧。
 local DELAY_QUEST_MARKER_NO_CUSTOM_MODEL = 0.01
 local DELAY_QUEST_MARKER_AFTER_SET_MODEL = 0.02
-local function registerCreatedNpcUnit(npcConfig, unit)
+local function registerCreatedNpcUnit(npcConfig, unit, registerQuestId)
+    if registerQuestId == nil then
+        registerQuestId = true
+    end
     if not unit then
         return
     end
@@ -42,7 +49,7 @@ local function registerCreatedNpcUnit(npcConfig, unit)
     if handleId > 0 then
         g_npcConfigByUnitHandleId:set(handleId, npcConfig)
     end
-    if npcConfig["任务ID"] ~= nil then
+    if registerQuestId and npcConfig["任务ID"] ~= nil then
         g_npcUnitByRequireId:set(npcConfig["任务ID"], unit)
     end
     if npcConfig["NPC配置名"] and npcConfig["NPC配置名"] ~= "" then
@@ -50,6 +57,24 @@ local function registerCreatedNpcUnit(npcConfig, unit)
     end
     if npcConfig["NPC名称"] and npcConfig["NPC名称"] ~= "" then
         g_npcUnitByDisplayName:set(npcConfig["NPC名称"], unit)
+    end
+end
+local function unregisterCreatedNpcUnit(npcConfig, unit)
+    if not unit or unit == 0 then
+        return
+    end
+    local handleId = GetHandleId(unit)
+    if handleId > 0 then
+        g_npcConfigByUnitHandleId:delete(handleId)
+    end
+    if npcConfig["任务ID"] ~= nil and g_npcUnitByRequireId:get(npcConfig["任务ID"]) == unit then
+        g_npcUnitByRequireId:delete(npcConfig["任务ID"])
+    end
+    if npcConfig["NPC配置名"] and g_npcUnitByNpcNameId:get(npcConfig["NPC配置名"]) == unit then
+        g_npcUnitByNpcNameId:delete(npcConfig["NPC配置名"])
+    end
+    if npcConfig["NPC名称"] and g_npcUnitByDisplayName:get(npcConfig["NPC名称"]) == unit then
+        g_npcUnitByDisplayName:delete(npcConfig["NPC名称"])
     end
 end
 local npcQuestMarkerNoModelQueue = {}
@@ -98,7 +123,10 @@ local function scheduleSetUnitModel(unit, modelPath, npcLabel)
     npcSetModelQueue[#npcSetModelQueue + 1] = {unit = unit, modelPath = modelPath, npcLabel = npcLabel}
     addDelayedCallback(10, onNpcSetModelDelayed)
 end
-local function createSingleNPC(npcConfig)
+local function createSingleNPC(npcConfig, registerQuestId)
+    if registerQuestId == nil then
+        registerQuestId = true
+    end
     if not npcConfig["单位ID"] or npcConfig["坐标X"] == nil or npcConfig["坐标Y"] == nil then
         debugLog(
             nil,
@@ -139,7 +167,7 @@ local function createSingleNPC(npcConfig)
     end
     runNpcInitAction(nil, unit, npcConfig["初始化动作"])
     scheduleTryAttachQuestMarker(unit, npcConfig)
-    registerCreatedNpcUnit(npcConfig, unit)
+    registerCreatedNpcUnit(npcConfig, unit, registerQuestId)
     debugLog(
         nil,
         "NPC生成器",
@@ -156,6 +184,7 @@ ____exports["初始化NPC"] = function()
     g_npcUnitByNpcNameId:clear()
     g_npcUnitByDisplayName:clear()
     g_npcConfigByUnitHandleId:clear()
+    g_endNpcUnitByQuestId:clear()
     for ____, npcConfig in ipairs(_____652F_7EBFNPC_914D_7F6E_5217_8868) do
         if npcConfig["启用"] == true and npcConfig["自动创建"] ~= false then
             createSingleNPC(npcConfig)
@@ -233,6 +262,55 @@ ____exports["按名称查找已创建NPC"] = function(____NPC_540D_79F0)
         ____temp_3_4 = nil
     end
     return ____temp_3_4
+end
+--- 按任务中的结构化配置创建唯一的提交 NPC，不覆盖开始 NPC 的任务 ID 索引。
+____exports["创建任务结束NPC"] = function(_____4EFB_52A1)
+    local _____4EFB_52A1ID = _____4EFB_52A1["任务ID"]
+    local _____7ED3_675F_914D_7F6E = _____4EFB_52A1["结束NPC配置"]
+    if _____4EFB_52A1ID == nil or _____7ED3_675F_914D_7F6E == nil then
+        return nil
+    end
+    local _____5DF2_521B_5EFA_5355_4F4D = g_endNpcUnitByQuestId:get(_____4EFB_52A1ID)
+    if _____5DF2_521B_5EFA_5355_4F4D and GetUnitTypeId(_____5DF2_521B_5EFA_5355_4F4D) > 0 then
+        return _____5DF2_521B_5EFA_5355_4F4D
+    end
+    local npcConfig = {
+        ["NPC名称"] = _____7ED3_675F_914D_7F6E["NPC名称"],
+        ["任务ID"] = _____4EFB_52A1ID,
+        ["NPC配置名"] = _____7ED3_675F_914D_7F6E["NPC配置名"] or _____7ED3_675F_914D_7F6E["NPC名称"],
+        ["单位ID"] = _____7ED3_675F_914D_7F6E["单位ID"],
+        ["类型"] = "任务",
+        ["坐标X"] = _____7ED3_675F_914D_7F6E["坐标X"],
+        ["坐标Y"] = _____7ED3_675F_914D_7F6E["坐标Y"],
+        ["朝向"] = _____7ED3_675F_914D_7F6E["朝向"],
+        ["模型路径"] = _____7ED3_675F_914D_7F6E["模型路径"],
+        ["初始化动作"] = _____7ED3_675F_914D_7F6E["初始化动作"],
+        ["自动创建"] = false,
+        ["启用"] = true
+    }
+    local unit = createSingleNPC(npcConfig, false)
+    if unit then
+        g_endNpcUnitByQuestId:set(_____4EFB_52A1ID, unit)
+    end
+    return unit
+end
+--- 提交对白结束后移除动态目标 NPC，并清除对话查表。
+____exports["清理任务结束NPC"] = function(_____4EFB_52A1)
+    local _____4EFB_52A1ID = _____4EFB_52A1["任务ID"]
+    local _____7ED3_675F_914D_7F6E = _____4EFB_52A1["结束NPC配置"]
+    if _____4EFB_52A1ID == nil or _____7ED3_675F_914D_7F6E == nil then
+        return
+    end
+    local unit = g_endNpcUnitByQuestId:get(_____4EFB_52A1ID)
+    if not unit or unit == 0 then
+        return
+    end
+    local npcConfig = {["NPC名称"] = _____7ED3_675F_914D_7F6E["NPC名称"], ["任务ID"] = _____4EFB_52A1ID, ["NPC配置名"] = _____7ED3_675F_914D_7F6E["NPC配置名"] or _____7ED3_675F_914D_7F6E["NPC名称"]}
+    unregisterCreatedNpcUnit(npcConfig, unit)
+    g_endNpcUnitByQuestId:delete(_____4EFB_52A1ID)
+    if GetUnitTypeId(unit) > 0 then
+        RemoveUnit(unit)
+    end
 end
 --- 登记由其他出生系统创建的任务 NPC，并补齐对话查表与头顶任务标记。
 ____exports["登记外部任务NPC单位"] = function(_____4EFB_52A1ID, _____5355_4F4D)

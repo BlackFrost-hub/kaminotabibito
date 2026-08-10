@@ -11,6 +11,7 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 };
 
 import { 支线NPC配置列表, 支线NPC配置 } from "../../11．剧情系统/02．支线任务/01．支线NPC配置表";
+import type { 任务配置 } from "./02．任务配置表";
 import { 创建剧情NPC单位 } from "../../11．剧情系统/00．公共/02．剧情NPC创建";
 import { runNpcInitAction } from "./05．NPC初始化动作";
 import { tryAttachQuestMarkerForConfigNpc } from "../../09．表现系统/02．对话框系统/09．NPC头顶与气泡特效";
@@ -31,6 +32,10 @@ const g_npcUnitByRequireId = new Map<number, any>();
 const g_npcUnitByNpcNameId = new Map<string, any>();
 const g_npcUnitByDisplayName = new Map<string, any>();
 const g_npcConfigByUnitHandleId = new Map<number, 支线NPC配置>();
+const g_endNpcUnitByQuestId = new Map<number, any>();
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 
 /**
  * 顶部标记若在 SetUnitModel 前或同帧绑定，换模时可能被顶掉。
@@ -39,13 +44,13 @@ const g_npcConfigByUnitHandleId = new Map<number, 支线NPC配置>();
 const DELAY_QUEST_MARKER_NO_CUSTOM_MODEL = 0.01;
 const DELAY_QUEST_MARKER_AFTER_SET_MODEL = 0.02;
 
-function registerCreatedNpcUnit(npcConfig: 支线NPC配置, unit: any): void {
+function registerCreatedNpcUnit(npcConfig: 支线NPC配置, unit: any, registerQuestId: boolean = true): void {
   if (!unit) return;
   const handleId = typeof jass.GetHandleId === "function" ? (jass.GetHandleId(unit) as number) : 0;
   if (handleId > 0) {
     g_npcConfigByUnitHandleId.set(handleId, npcConfig);
   }
-  if (npcConfig.任务ID != null) {
+  if (registerQuestId && npcConfig.任务ID != null) {
     g_npcUnitByRequireId.set(npcConfig.任务ID, unit);
   }
   if (npcConfig.NPC配置名 && npcConfig.NPC配置名 !== "") {
@@ -53,6 +58,21 @@ function registerCreatedNpcUnit(npcConfig: 支线NPC配置, unit: any): void {
   }
   if (npcConfig.NPC名称 && npcConfig.NPC名称 !== "") {
     g_npcUnitByDisplayName.set(npcConfig.NPC名称, unit);
+  }
+}
+
+function unregisterCreatedNpcUnit(npcConfig: 支线NPC配置, unit: any): void {
+  if (!unit || unit === 0) return;
+  const handleId = GetHandleId(unit);
+  if (handleId > 0) g_npcConfigByUnitHandleId.delete(handleId);
+  if (npcConfig.任务ID != null && g_npcUnitByRequireId.get(npcConfig.任务ID) === unit) {
+    g_npcUnitByRequireId.delete(npcConfig.任务ID);
+  }
+  if (npcConfig.NPC配置名 && g_npcUnitByNpcNameId.get(npcConfig.NPC配置名) === unit) {
+    g_npcUnitByNpcNameId.delete(npcConfig.NPC配置名);
+  }
+  if (npcConfig.NPC名称 && g_npcUnitByDisplayName.get(npcConfig.NPC名称) === unit) {
+    g_npcUnitByDisplayName.delete(npcConfig.NPC名称);
   }
 }
 
@@ -96,7 +116,7 @@ function scheduleSetUnitModel(unit: any, modelPath: string, npcLabel: string): v
   addDelayedCallback(10, onNpcSetModelDelayed);
 }
 
-function createSingleNPC(npcConfig: 支线NPC配置): any {
+function createSingleNPC(npcConfig: 支线NPC配置, registerQuestId: boolean = true): any {
   if (!npcConfig.单位ID || npcConfig.坐标X == null || npcConfig.坐标Y == null) {
     debugLog("NPC生成器", "配置不完整，跳过:", tostring(npcConfig.NPC配置名));
     return null;
@@ -126,7 +146,7 @@ function createSingleNPC(npcConfig: 支线NPC配置): any {
 
   runNpcInitAction(unit, npcConfig.初始化动作);
   scheduleTryAttachQuestMarker(unit, npcConfig);
-  registerCreatedNpcUnit(npcConfig, unit);
+  registerCreatedNpcUnit(npcConfig, unit, registerQuestId);
 
   debugLog(
     "NPC生成器",
@@ -144,6 +164,7 @@ export function 初始化NPC(): void {
   g_npcUnitByNpcNameId.clear();
   g_npcUnitByDisplayName.clear();
   g_npcConfigByUnitHandleId.clear();
+  g_endNpcUnitByQuestId.clear();
 
   for (const npcConfig of 支线NPC配置列表) {
     if (npcConfig.启用 === true && npcConfig.自动创建 !== false) {
@@ -193,6 +214,52 @@ export function 按任务ID查找已创建NPC(任务ID: number): any {
 export function 按名称查找已创建NPC(NPC名称: string): any {
   if (!NPC名称) return null;
   return g_npcUnitByNpcNameId.get(NPC名称) ?? g_npcUnitByDisplayName.get(NPC名称) ?? null;
+}
+
+/** 按任务中的结构化配置创建唯一的提交 NPC，不覆盖开始 NPC 的任务 ID 索引。 */
+export function 创建任务结束NPC(this: void, 任务: 任务配置): any {
+  const 任务ID = 任务.任务ID;
+  const 结束配置 = 任务.结束NPC配置;
+  if (任务ID == null || 结束配置 == null) return null;
+
+  const 已创建单位 = g_endNpcUnitByQuestId.get(任务ID);
+  if (已创建单位 && GetUnitTypeId(已创建单位) > 0) return 已创建单位;
+
+  const npcConfig: 支线NPC配置 = {
+    NPC名称: 结束配置.NPC名称,
+    任务ID,
+    NPC配置名: 结束配置.NPC配置名 || 结束配置.NPC名称,
+    单位ID: 结束配置.单位ID,
+    类型: "任务",
+    坐标X: 结束配置.坐标X,
+    坐标Y: 结束配置.坐标Y,
+    朝向: 结束配置.朝向,
+    模型路径: 结束配置.模型路径,
+    初始化动作: 结束配置.初始化动作,
+    自动创建: false,
+    启用: true,
+  };
+  const unit = createSingleNPC(npcConfig, false);
+  if (unit) g_endNpcUnitByQuestId.set(任务ID, unit);
+  return unit;
+}
+
+/** 提交对白结束后移除动态目标 NPC，并清除对话查表。 */
+export function 清理任务结束NPC(this: void, 任务: 任务配置): void {
+  const 任务ID = 任务.任务ID;
+  const 结束配置 = 任务.结束NPC配置;
+  if (任务ID == null || 结束配置 == null) return;
+  const unit = g_endNpcUnitByQuestId.get(任务ID);
+  if (!unit || unit === 0) return;
+
+  const npcConfig: 支线NPC配置 = {
+    NPC名称: 结束配置.NPC名称,
+    任务ID,
+    NPC配置名: 结束配置.NPC配置名 || 结束配置.NPC名称,
+  };
+  unregisterCreatedNpcUnit(npcConfig, unit);
+  g_endNpcUnitByQuestId.delete(任务ID);
+  if (GetUnitTypeId(unit) > 0) RemoveUnit(unit);
 }
 
 /** 登记由其他出生系统创建的任务 NPC，并补齐对话查表与头顶任务标记。 */

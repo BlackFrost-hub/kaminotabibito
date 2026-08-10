@@ -8,6 +8,7 @@ export interface RegionConfig {
   top: number;
   teleportX: number;
   teleportY: number;
+  teleportFacing?: number;
   cameraTime: number;
   text?: string;
   condition: string;
@@ -327,6 +328,20 @@ export const 区域传送配置: Record<string, RegionConfig> = {
       文本: "居然还有这种奇景，星空之下又是一片生机。",
       持续时间毫秒: 5000
     },
+    enabled: true
+  },
+  "20": {
+    id: "20",
+    name: "迷雾森林",
+    left: -29952,
+    bottom: -22656,
+    right: -29728,
+    top: -22144,
+    teleportX: -15593.2,
+    teleportY: -29676.9,
+    teleportFacing: 180,
+    cameraTime: 0.1,
+    condition: "always",
     enabled: true
   }
 };

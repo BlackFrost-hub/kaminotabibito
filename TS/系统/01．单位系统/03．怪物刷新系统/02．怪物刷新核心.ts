@@ -15,7 +15,9 @@
  */
 
 const jass = require("jass.common") as any;
-const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string) => number;
@@ -56,7 +58,7 @@ import { 世界地图杂鱼出生配置表 } from "../00．单位初始化创建
 import { 世界地图精英出生配置表 } from "../00．单位初始化创建/02．世界地图单位初始化/02．精英出生配置";
 import {
   中立敌对玩家ID,
-  刷怪区域全局名,
+  刷怪区域名称,
   刷怪单位组键,
   刷怪延迟秒,
   刷怪表名,
@@ -289,7 +291,7 @@ export function 登记动态刷怪单位(this: void, unit: any): boolean {
 }
 
 function 获取刷怪区域(this: void): any {
-  const 配置区域 = (jglobals as any)[刷怪区域全局名] as any;
+  const 配置区域 = 获取矩形区域(刷怪区域名称);
   if (配置区域 != null && 配置区域 !== 0) return 配置区域;
 
   const 世界边界 = GetWorldBounds();

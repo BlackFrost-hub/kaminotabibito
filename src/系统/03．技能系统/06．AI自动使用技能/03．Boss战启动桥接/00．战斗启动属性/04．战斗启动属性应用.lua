@@ -11,38 +11,40 @@ local ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = r
 local _____5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = ____03_FF0E_5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868["异界Boss战斗启动属性配置表"]
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local Rect = jass.Rect
 local CreateSound = jass.CreateSound
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
-local YDUserDataClearSafe = ____require_result_0.YDUserDataClearSafe
-local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_1["按名字反查Boss单位ID"]
-local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
-local _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_2["按名字反查异界Boss单位ID"]
-local ____require_result_3 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.00．玩家英雄配置")
-local _____6309_540D_5B57_53CD_67E5_73A9_5BB6_82F1_96C4_5355_4F4DID = ____require_result_3["按名字反查玩家英雄单位ID"]
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_5.debugLogForce
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
+local YDUserDataClearSafe = ____require_result_1.YDUserDataClearSafe
+local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_2["按名字反查Boss单位ID"]
+local ____require_result_3 = require("系统.01．单位系统.08．单位配置表.03．异界Boss配置表")
+local _____6309_540D_5B57_53CD_67E5_5F02_754CBoss_5355_4F4DID = ____require_result_3["按名字反查异界Boss单位ID"]
+local ____require_result_4 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.00．玩家英雄配置")
+local _____6309_540D_5B57_53CD_67E5_73A9_5BB6_82F1_96C4_5355_4F4DID = ____require_result_4["按名字反查玩家英雄单位ID"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_6.debugLogForce
 local _____6A21_5757_540D = "Boss战启动属性应用"
 local _____5DF2_5E94_7528_5C5E_6027_5355_4F4D_8868 = {}
 local ____Boss_6218_8DEF_5F84_97F3_4E50_7F13_5B58 = {}
-local ____array_6 = __TS__SparseArrayNew(table.unpack(____Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868))
+local ____array_7 = __TS__SparseArrayNew(table.unpack(____Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868))
 __TS__SparseArrayPush(
-    ____array_6,
+    ____array_7,
     table.unpack(_____82F1_96C4Boss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868)
 )
 __TS__SparseArrayPush(
-    ____array_6,
+    ____array_7,
     table.unpack(_____5F02_754CBoss_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868)
 )
-local _____5168_90E8_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = {__TS__SparseArraySpread(____array_6)}
+local _____5168_90E8_6218_6597_542F_52A8_5C5E_6027_914D_7F6E_8868 = {__TS__SparseArraySpread(____array_7)}
 local function _____89E3_6790_914D_7F6E_5355_4F4D_7C7B_578BID(_____914D_7F6E)
     if _____914D_7F6E["单位ID"] ~= nil and _____914D_7F6E["单位ID"] ~= "" then
         return stringToFourCCSafe(_____914D_7F6E["单位ID"])
@@ -146,11 +148,11 @@ local function _____8BFB_53D6_53D8_91CF_97F3_9891(_____53D8_91CF_540D)
     return _____97F3_9891_53E5_67C4
 end
 local function _____5199_5165Boss_6218_97F3_9891(_____5C5E_6027_540D, _____8DEF_5F84, _____53D8_91CF_540D)
-    local ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_7 = _____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50(_____8DEF_5F84)
-    if ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_7 == nil then
-        ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_7 = _____8BFB_53D6_53D8_91CF_97F3_9891(_____53D8_91CF_540D)
+    local ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_8 = _____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50(_____8DEF_5F84)
+    if ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_8 == nil then
+        ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_8 = _____8BFB_53D6_53D8_91CF_97F3_9891(_____53D8_91CF_540D)
     end
-    local _____97F3_9891_53E5_67C4 = ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_7
+    local _____97F3_9891_53E5_67C4 = ____83B7_53D6_6216_521B_5EFABoss_6218_8DEF_5F84_97F3_4E50_result_8
     if _____97F3_9891_53E5_67C4 == nil or _____97F3_9891_53E5_67C4 == 0 then
         return
     end
@@ -162,11 +164,11 @@ local function _____5199_5165Boss_6218_97F3_9891(_____5C5E_6027_540D, _____8DEF_
         _____97F3_9891_53E5_67C4
     )
 end
-local function _____5199_5165Boss_6218_77E9_5F62(_____5C5E_6027_540D, _____53D8_91CF_540D)
-    if _____53D8_91CF_540D == nil or _____53D8_91CF_540D == "" then
+local function _____5199_5165Boss_6218_77E9_5F62(_____5C5E_6027_540D, _____533A_57DF_540D_79F0)
+    if _____533A_57DF_540D_79F0 == nil or _____533A_57DF_540D_79F0 == "" then
         return
     end
-    local _____77E9_5F62_53E5_67C4 = jglobals[_____53D8_91CF_540D]
+    local _____77E9_5F62_53E5_67C4 = _____83B7_53D6_77E9_5F62_533A_57DF(_____533A_57DF_540D_79F0)
     if _____77E9_5F62_53E5_67C4 == nil then
         return
     end
@@ -226,7 +228,7 @@ ____exports["应用Boss战启动属性配置"] = function(unit)
     if _____914D_7F6E["动态地点矩形"] ~= nil then
         _____5199_5165Boss_6218_52A8_6001_77E9_5F62(_____914D_7F6E["动态地点矩形"])
     else
-        _____5199_5165Boss_6218_77E9_5F62("地点", _____914D_7F6E["地点变量名"])
+        _____5199_5165Boss_6218_77E9_5F62("地点", _____914D_7F6E["地点区域名称"])
     end
     _____5199_5165Boss_6218_5355_4F4D_5E03_5C14(unit, "转换场景", _____914D_7F6E["转换场景"])
     _____5199_5165Boss_6218_5B57_7B26_4E32_8868_5B9E_6570(

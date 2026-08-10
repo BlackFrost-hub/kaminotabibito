@@ -99,8 +99,10 @@ export function findQuestById(任务ID: number): 任务配置 | undefined {
 
 export function resolveQuestEndNpc(quest: 任务配置): string {
   const endNpc = quest.结束NPC;
-  if (!endNpc || endNpc === "没有") return quest.开始NPC || "";
-  return endNpc;
+  if (endNpc && endNpc !== "没有") return endNpc;
+  const endNpcConfig = quest.结束NPC配置;
+  if (endNpcConfig) return endNpcConfig.NPC配置名 || endNpcConfig.NPC名称;
+  return quest.开始NPC || "";
 }
 
 export function findAcceptedQuestBySubmitNpc(
@@ -115,7 +117,7 @@ export function findAcceptedQuestBySubmitNpc(
     const questId = quest.任务ID.toString();
     if (!hasPlayerAcceptedQuest(playerId, questId)) continue;
 
-    const explicitEndNpc = quest.结束NPC;
+    const explicitEndNpc = quest.结束NPC || (quest.结束NPC配置 && (quest.结束NPC配置.NPC配置名 || quest.结束NPC配置.NPC名称));
     if (explicitEndNpc && explicitEndNpc !== "没有") {
       if (explicitEndNpc === npcName || explicitEndNpc === npcConfigName) return quest;
       continue;

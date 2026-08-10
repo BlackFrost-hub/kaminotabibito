@@ -1,6 +1,9 @@
 /** @noSelfInFile */
 
 const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 const { SetUnitFacingToFaceUnitTimed, ModifyHeroStat } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   SetUnitFacingToFaceUnitTimed: (this: void, whichUnit: any, target: any, duration: number) => void;
   ModifyHeroStat: (this: void, whichStat: number, whichHero: any, modifyMethod: number, value: number) => void;
@@ -137,7 +140,7 @@ function 分割名称列表(this: void, value: string | undefined): string[] {
 }
 
 function 对所有玩家添加区域视野(this: void, rectVarName: string): void {
-  const rectHandle = jglobals[rectVarName];
+  const rectHandle = 获取矩形区域(rectVarName);
   if (rectHandle == null || rectHandle === 0) return;
   for (let playerId = 0; playerId < 8; playerId++) {
     const fogModifier = CreateFogModifierRect(Player(playerId), FOG_OF_WAR_VISIBLE, rectHandle, true, false);
@@ -158,7 +161,7 @@ export function 执行村口放行前置(this: void, 参数: 剧情动作参数�
   const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
   const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
   if (门禁矩形 === "") return;
-  const rectHandle = jglobals[门禁矩形];
+  const rectHandle = 获取矩形区域(门禁矩形);
   const 门卫组 = GetUnitsInRectMatching(rectHandle, Condition(是自然守护者));
   if (门卫组 != null && 门卫组 !== 0) {
     let unit = FirstOfGroup(门卫组);
@@ -181,7 +184,7 @@ export function 执行长老对话前置(this: void, 参数: 剧情动作参数�
   const 触发单位 = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit");
   const 长老单位 = 读取长老单位();
   const 自然传送门 = jglobals.gg_unit_n025_0372;
-  对所有玩家添加区域视野("gg_rct________________QY");
+  对所有玩家添加区域视野("精灵村");
   if (自然传送门 != null && 自然传送门 !== 0) SetUnitOwner(自然传送门, Player(6), true);
   创建随机金光戒指();
   StopMusic(false);
@@ -251,7 +254,7 @@ function 写入并播放剧情(this: void, 片段ID: string, 触发配置名: st
 
 function 触发单位在村口放行矩形内(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
-  const rect = jglobals.gg_rct______________077;
+  const rect = 获取矩形区域("精灵村.门禁区域");
   if (rect == null || rect === 0) return false;
   return RectContainsUnit(rect, unit);
 }
@@ -274,8 +277,8 @@ function on精灵村长老发布任务触发(this: void): void {
   写入并播放剧情("jlc_elven_village_elder_quest", "精灵村长老发布任务核心", 触发单位);
 }
 
-function 注册矩形进入(this: void, 矩形变量名: string, action: (this: void) => void): void {
-  const rect = jglobals[矩形变量名];
+function 注册矩形进入(this: void, 矩形区域名称: string, action: (this: void) => void): void {
+  const rect = 获取矩形区域(矩形区域名称);
   if (rect == null || rect === 0) return;
   const trigger = CreateTrigger();
   TriggerRegisterEnterRectSimple(trigger, rect);

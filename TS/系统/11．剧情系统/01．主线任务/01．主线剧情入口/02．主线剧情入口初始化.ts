@@ -2,6 +2,9 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -197,7 +200,7 @@ function 初始化单位范围入口(this: void): void {
 function 初始化矩形入口(this: void): void {
   for (let i = 0; i < 主线剧情矩形入口配置表.length; i++) {
     const 配置 = 主线剧情矩形入口配置表[i];
-    const 矩形 = 获取全局句柄(配置.矩形变量名);
+    const 矩形 = 获取矩形区域(配置.矩形区域名称);
     if (矩形 == null) continue;
     TriggerRegisterEnterRectSimple(创建入口触发器(展开入口剧情分支(配置)), 矩形);
   }

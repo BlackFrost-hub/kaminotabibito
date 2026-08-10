@@ -2021,7 +2021,7 @@ ____exports.items.I034 = {
     goldPrice = 50,
     level = "E",
     hot = "50%hpLost;50%mpLost",
-    abilList = "A015,A08C"
+    abilList = "A015"
 }
 ____exports.items.I035 = {
     type = "鞋子",

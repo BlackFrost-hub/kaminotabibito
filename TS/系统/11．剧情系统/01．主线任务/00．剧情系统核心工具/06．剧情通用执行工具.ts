@@ -34,9 +34,8 @@ const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
 const { 切换区域背景音乐表达式 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
   切换区域背景音乐表达式: (this: void, expr: string | undefined, add: boolean) => number;
 };
-const { 获取动态矩形区域, 按配置键注册动态矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
-  获取动态矩形区域: (this: void, 键: string) => any;
-  按配置键注册动态矩形区域: (this: void, 键: string) => any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
 };
 const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
   PlaySoundBJ: (this: void, soundHandle: any) => void;
@@ -133,7 +132,7 @@ const 剧情玩家英雄控制暂停来源 = "剧情系统:玩家英雄控制";
 const 剧情触发单位控制暂停来源 = "剧情系统:触发单位控制";
 const 已创建视野修整器: Record<string, true | undefined> = {};
 interface 玩家组视野上下文 {
-  矩形变量名: string;
+  矩形区域名称: string;
   矩形句柄: any;
 }
 const 玩家组视野上下文栈: 玩家组视野上下文[] = [];
@@ -352,7 +351,7 @@ function on给枚举玩家添加区域视野(this: void): void {
   if (上下文 == null) return;
   const whichPlayer = GetEnumPlayer();
   if (whichPlayer == null || whichPlayer === 0) return;
-  const key = `${上下文.矩形变量名}#${GetPlayerId(whichPlayer)}`;
+  const key = `${上下文.矩形区域名称}#${GetPlayerId(whichPlayer)}`;
   if (已创建视野修整器[key]) return;
   const fogModifier = CreateFogModifierRect(whichPlayer, FOG_OF_WAR_VISIBLE, 上下文.矩形句柄, true, false);
   if (fogModifier == null || fogModifier === 0) return;
@@ -360,20 +359,18 @@ function on给枚举玩家添加区域视野(this: void): void {
   已创建视野修整器[key] = true;
 }
 
-export function 给玩家组添加区域视野(this: void, rectVarName: string): void {
-  const rectHandle = 读取全局句柄(rectVarName)
-    ?? 获取动态矩形区域(rectVarName)
-    ?? 按配置键注册动态矩形区域(rectVarName);
+export function 给玩家组添加区域视野(this: void, 矩形区域名称: string): void {
+  const rectHandle = 获取矩形区域(矩形区域名称);
   if (rectHandle == null || rectHandle === 0) return;
   const 玩家组 = YDUserDataGetSafe("string", "玩家", "玩家组", "force");
   if (玩家组 == null || 玩家组 === 0) return;
-  玩家组视野上下文栈.push({ 矩形变量名: rectVarName, 矩形句柄: rectHandle });
+  玩家组视野上下文栈.push({ 矩形区域名称, 矩形句柄: rectHandle });
   safeForForce(玩家组, on给枚举玩家添加区域视野);
   玩家组视野上下文栈.pop();
 }
 
-export function 给玩家组添加多个区域视野(this: void, rectVarNames: string): void {
-  const 列表 = 分割名称列表(rectVarNames);
+export function 给玩家组添加多个区域视野(this: void, 矩形区域名称列表: string): void {
+  const 列表 = 分割名称列表(矩形区域名称列表);
   for (let i = 0; i < 列表.length; i++) {
     给玩家组添加区域视野(列表[i]);
   }
@@ -635,9 +632,9 @@ export function 执行通用剧情动作(this: void, 参数: 剧情动作参数�
           YDUserDataSetSafe("string", "Boss战", "胜利音乐", "sound", 音频句柄);
         }
       }
-      const 地点变量名 = 取参数文本(参数, "Boss战地点字段") || 取参数文本(参数, "Boss战地点");
-      if (地点变量名 !== "") {
-        const rectHandle = 读取全局句柄(地点变量名);
+      const 地点区域名称 = 取参数文本(参数, "Boss战地点字段") || 取参数文本(参数, "Boss战地点");
+      if (地点区域名称 !== "") {
+        const rectHandle = 获取矩形区域(地点区域名称);
         if (rectHandle != null && rectHandle !== 0) {
           YDUserDataSetSafe("string", "Boss战", "地点", "rect", rectHandle);
         }

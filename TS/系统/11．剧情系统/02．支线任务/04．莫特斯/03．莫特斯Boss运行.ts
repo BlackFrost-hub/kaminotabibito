@@ -2,6 +2,9 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, 延迟毫秒: number, 回调: (this: void) => void) => number;
@@ -77,13 +80,13 @@ const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, 单位: any
 
 function 移除莫特斯洞窟区域背景音乐(this: void): void {
   if (莫特斯运行状态.洞窟区域背景音乐已移除) return;
-  SetStackedSoundBJ(false, jglobals.gg_snd_BGM014, jglobals.gg_rct______________066);
+  SetStackedSoundBJ(false, jglobals.gg_snd_BGM014, 获取矩形区域("盗贼洞窟"));
   莫特斯运行状态.洞窟区域背景音乐已移除 = true;
 }
 
 function 恢复莫特斯洞窟区域背景音乐(this: void): void {
   if (!莫特斯运行状态.洞窟区域背景音乐已移除) return;
-  SetStackedSoundBJ(true, jglobals.gg_snd_BGM014, jglobals.gg_rct______________066);
+  SetStackedSoundBJ(true, jglobals.gg_snd_BGM014, 获取矩形区域("盗贼洞窟"));
   莫特斯运行状态.洞窟区域背景音乐已移除 = false;
 }
 

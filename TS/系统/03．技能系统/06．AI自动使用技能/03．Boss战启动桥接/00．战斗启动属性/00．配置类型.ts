@@ -14,7 +14,7 @@ export interface 战斗启动属性配置 {
   胜利音乐变量名?: string;
   战斗音乐路径?: string;
   胜利音乐路径?: string;
-  地点变量名?: string;
+  地点区域名称?: string;
   /** 不依赖地图编辑器句柄，Boss 战启动时按坐标动态创建。 */
   动态地点矩形?: 动态矩形区域配置;
   转换场景?: boolean;

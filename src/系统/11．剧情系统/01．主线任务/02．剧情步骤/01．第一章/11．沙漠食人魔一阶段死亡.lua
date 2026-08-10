@@ -30,7 +30,7 @@ ____exports["沙漠食人魔一阶段死亡紧凑剧情片段"] = {
                 ["蜥蜴人单位名"] = "神秘蜥蜴人",
                 ["二阶段Boss名"] = "杀戮食人魔",
                 ["Boss键"] = "Boss.杀戮食人魔",
-                ["停止区域音乐"] = "gg_snd_shengliBgm @ gg_rct______________047",
+                ["停止区域音乐"] = "gg_snd_shengliBgm @ 沙漠区域.Boss战区域",
                 ["播放音效"] = "gg_snd_GWSY07",
                 ["旧JASS功能清单"] = "UnitSuspendDecay / SetStackedSoundBJ(false, shengliBgm) / CreateUnit裂隙与蜥蜴人 / CreateUnit二阶段Boss并暂停无敌"
             }

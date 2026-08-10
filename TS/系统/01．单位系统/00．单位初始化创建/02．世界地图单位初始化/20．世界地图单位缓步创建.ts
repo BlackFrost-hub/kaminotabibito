@@ -1,10 +1,15 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string) => number;
+};
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -160,6 +165,15 @@ function 获取随机矩形Y(this: void, rect: any): number {
 }
 
 function 解析世界地图物品ID(this: void, 物品名: string): string | undefined {
+  const 后缀分隔位置 = 物品名.indexOf("#");
+  if (后缀分隔位置 > 0) {
+    const 指定物品ID = 物品名.substring(后缀分隔位置 + 1);
+    if (指定物品ID.length === 4 && stringToFourCCSafe(指定物品ID) > 0) {
+      return 指定物品ID;
+    }
+    物品名 = 物品名.substring(0, 后缀分隔位置);
+  }
+
   const 反查结果 = 按名字反查物品ID(物品名);
   if (反查结果 != null && 反查结果 !== "") {
     return 反查结果;
@@ -426,7 +440,7 @@ function 解析区域随机创建单位ID(this: void, 单位名: string): string
 }
 
 function 执行单条中立生物创建(this: void, 配置: 中立生物创建配置): number {
-  const rect = (jglobals as Record<string, any>)[配置.矩形变量名];
+  const rect = 获取矩形区域(配置.矩形区域名称);
   if (rect == null) return 0;
 
   const 单位ID = 解析区域随机创建单位ID(配置.单位名);
@@ -481,7 +495,7 @@ function 执行单条世界地图植物单位创建(this: void, 配置: 世界�
 }
 
 function 执行单条世界地图植物随机物品创建(this: void, 配置: 世界地图植物随机物品配置): number {
-  const rect = (jglobals as Record<string, any>)[配置.矩形变量名];
+  const rect = 获取矩形区域(配置.矩形区域名称);
   if (rect == null) return 0;
 
   const 物品ID = 解析世界地图物品ID(配置.物品名);

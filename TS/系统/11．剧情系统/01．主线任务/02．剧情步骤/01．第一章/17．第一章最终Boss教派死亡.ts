@@ -39,7 +39,7 @@ export const 教派最终Boss死亡紧凑剧情片段: 紧凑剧情片段配置 
       参数: {
         触发进度: 17,
         死亡单位名: "教派剑士 或 教派学者",
-        停止区域音乐: "gg_snd_JQBGM03 @ gg_rct______________055; gg_snd_JQBGM03 @ gg_rct_____________001; gg_snd_JQBGM03 @ gg_rct______________086; gg_snd_JQBGM03 @ gg_rct______________083; gg_snd_JQBGM03 @ gg_rct______________081; gg_snd_JQBGM03 @ gg_rct_007____________u; gg_snd_JQBGM03 @ gg_rct________________00X; gg_snd_JQBGM03 @ gg_rct______________084",
+        停止区域音乐: "gg_snd_JQBGM03 @ 沙漠区域.区域1; gg_snd_JQBGM03 @ 沙漠绿洲; gg_snd_JQBGM03 @ 悲风山谷; gg_snd_JQBGM03 @ 沙漠区域.区域3; gg_snd_JQBGM03 @ 巨石峡谷; gg_snd_JQBGM03 @ 奇幻湖; gg_snd_JQBGM03 @ 史莱姆草原; gg_snd_JQBGM03 @ 精灵森",
         恢复环境音乐: "BGM006/BGM007/BGM008/bgm003/BGM016或BGM017",
         旧JASS功能清单: "CinematicModeBJ(true) / Camera 014 / KillUnit机械单位 / CreateUnit神秘人残影 / HolyBolt与Resurrect特效 / 玩家英雄移位、朝向、攻击动作并暂停",
       },

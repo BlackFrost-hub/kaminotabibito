@@ -1,6 +1,6 @@
 export interface 区域背景音乐配置项 {
   场景定义: string;
-  区域变量名: string;
+  矩形区域名称列表: string[];
   默认环境音乐变量名?: string;
   随机环境音乐变量名列表?: string[];
   随机音乐组?: string;

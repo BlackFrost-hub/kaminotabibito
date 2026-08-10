@@ -2,7 +2,9 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const jglobals = require("jass.globals") as any;
+const 统一矩形区域读取 = require("系统.07．地形系统.09．动态矩形区域注册表.04．统一矩形区域读取") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const Frame工具 = require("lib.扩展函数.封装函数.04．硬件输入.07．Frame函数") as {
   frameSetScriptByCode: (
@@ -69,6 +71,7 @@ const TimerStart = jass.TimerStart as (
 const GetExpiredTimer = jass.GetExpiredTimer as (this: void) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const DestroyTimer = jass.DestroyTimer as (this: void, timer: any) => void;
+const 获取矩形区域 = 统一矩形区域读取.获取矩形区域;
 
 const 地点鼠标进入事件 = 2;
 const 地点鼠标离开事件 = 3;
@@ -82,15 +85,13 @@ let 世界地图交互已初始化 = false;
 let 世界地图本机按键触发器: any = null;
 let 世界地图同步触发器: any = null;
 
-function 获取矩形(this: void, 矩形键: string | undefined): any {
-  if (矩形键 == null || 矩形键 === "") return null;
-  return jglobals[矩形键];
-}
-
-function 单位位于矩形(this: void, unit: any, 矩形键: string | undefined): boolean {
-  const rect = 获取矩形(矩形键);
-  if (rect == null || rect === 0) return false;
-  return 矩形函数.RectContainsUnit(rect, unit);
+function 单位位于任一矩形(this: void, unit: any, 矩形区域名称列表: string[] | undefined): boolean {
+  if (矩形区域名称列表 == null) return false;
+  for (let 索引 = 0; 索引 < 矩形区域名称列表.length; 索引++) {
+    const rect = 获取矩形区域(矩形区域名称列表[索引]);
+    if (rect != null && rect !== 0 && 矩形函数.RectContainsUnit(rect, unit)) return true;
+  }
+  return false;
 }
 
 function 找到触发地点索引(this: void, 触发帧: number): number {
@@ -153,10 +154,7 @@ export function 刷新世界地图当前位置(this: void, 玩家: any): void {
 
   for (let 索引 = 0; 索引 < 世界地图地点配置表.length; 索引++) {
     const 配置 = 世界地图地点配置表[索引];
-    const 位于当前地点 =
-      单位位于矩形(英雄, 配置.当前位置矩形键1) ||
-      单位位于矩形(英雄, 配置.当前位置矩形键2) ||
-      单位位于矩形(英雄, 配置.当前位置矩形键3);
+    const 位于当前地点 = 单位位于任一矩形(英雄, 配置.当前位置矩形区域名称列表);
     if (!位于当前地点 || !是本地玩家) continue;
     const 地点帧 = 获取世界地图地点帧(配置.地点ID);
     if (地点帧 != null) DzFrameShow(地点帧.当前位置箭头, true);

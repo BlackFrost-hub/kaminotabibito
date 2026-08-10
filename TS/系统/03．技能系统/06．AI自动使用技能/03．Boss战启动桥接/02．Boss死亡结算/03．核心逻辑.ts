@@ -57,6 +57,9 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 const { 打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
   打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
@@ -74,11 +77,17 @@ const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 
 const 攻击力属性ID = 1;
 const BJ修改增加 = 0;
+const 模块名 = "Boss死亡结算";
+const 掉落调试结算键 = "龙虾守卫";
 
 let 当前全员奖励: Boss死亡全员奖励 | undefined;
 let 当前Boss死亡首领奖励池ID = "";
 let 豺狼异变累计次数 = 0;
 const Boss死亡配置单位类型ID列表: number[][] = [];
+
+function 需要输出掉落调试(this: void, 配置: Boss死亡结算配置): boolean {
+  return 配置.键 === 掉落调试结算键;
+}
 
 function 读取玩家英雄组(this: void): any {
   return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
@@ -244,14 +253,30 @@ function 掉落Boss死亡直接物品(this: void, 配置: Boss死亡结算配置
   const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
   if (物品列表 != null) {
     for (let i = 0; i < 物品列表.length; i++) {
-      const 物品ID = stringToFourCCSafe(按名字反查物品ID(物品列表[i]));
-      if (物品ID > 0) CreateItem(物品ID, 位置.x, 位置.y);
+      const 物品名 = 物品列表[i];
+      const 原始物品ID = 按名字反查物品ID(物品名);
+      const 物品ID = stringToFourCCSafe(原始物品ID);
+      if (物品ID <= 0) {
+        if (需要输出掉落调试(配置)) debugLogForce(模块名, "直接掉落反查失败", "名称", 物品名, "rawId", 原始物品ID);
+        continue;
+      }
+      const 已创建物品 = CreateItem(物品ID, 位置.x, 位置.y);
+      if (需要输出掉落调试(配置)) {
+        debugLogForce(模块名, "创建直接掉落", "名称", 物品名, "rawId", 原始物品ID, "itemId", 物品ID, "created", 已创建物品 != null && 已创建物品 !== 0, "x", 位置.x, "y", 位置.y);
+      }
     }
   }
   if (物品ID列表 != null) {
     for (let i = 0; i < 物品ID列表.length; i++) {
       const 物品ID = stringToFourCCSafe(物品ID列表[i]);
-      if (物品ID > 0) CreateItem(物品ID, 位置.x, 位置.y);
+      if (物品ID <= 0) {
+        if (需要输出掉落调试(配置)) debugLogForce(模块名, "直接掉落内部ID无效", "rawId", 物品ID列表[i]);
+        continue;
+      }
+      const 已创建物品 = CreateItem(物品ID, 位置.x, 位置.y);
+      if (需要输出掉落调试(配置)) {
+        debugLogForce(模块名, "创建直接掉落", "rawId", 物品ID列表[i], "itemId", 物品ID, "created", 已创建物品 != null && 已创建物品 !== 0, "x", 位置.x, "y", 位置.y);
+      }
     }
   }
 }
@@ -294,6 +319,11 @@ function 取单位名匹配原始ID(this: void, 单位名: string): number {
   return 0;
 }
 
+function 添加Boss死亡匹配单位ID(this: void, 单位类型ID列表: number[], 原始ID: string | undefined): void {
+  const 单位类型ID = stringToFourCCSafe(原始ID);
+  if (单位类型ID > 0 && 单位类型ID列表.indexOf(单位类型ID) < 0) 单位类型ID列表.push(单位类型ID);
+}
+
 function 初始化Boss死亡配置单位类型ID列表(this: void): void {
   for (let i = 0; i < Boss死亡非UI掉落与清理配置表.length; i++) {
     const 配置 = Boss死亡非UI掉落与清理配置表[i];
@@ -301,9 +331,15 @@ function 初始化Boss死亡配置单位类型ID列表(this: void): void {
 
     // 带引用键的配置必须保持按具体单位句柄匹配，不能扩大为同类型单位。
     if (配置.Boss引用键 == null || 配置.Boss引用键 === "") {
+      添加Boss死亡匹配单位ID(单位类型ID列表, 配置.Boss单位ID);
+      const 原始ID列表 = 配置.Boss单位ID列表;
+      if (原始ID列表 != null) {
+        for (let j = 0; j < 原始ID列表.length; j++) 添加Boss死亡匹配单位ID(单位类型ID列表, 原始ID列表[j]);
+      }
+
       if (配置.Boss单位名 != null && 配置.Boss单位名 !== "") {
         const 单位类型ID = 取单位名匹配原始ID(配置.Boss单位名);
-        if (单位类型ID > 0) 单位类型ID列表.push(单位类型ID);
+        if (单位类型ID > 0 && 单位类型ID列表.indexOf(单位类型ID) < 0) 单位类型ID列表.push(单位类型ID);
       }
 
       const 名称列表 = 配置.Boss单位名列表;
@@ -344,7 +380,10 @@ export function 获取Boss死亡结算配置(this: void, Boss单位: any): Boss�
   if (单位类型ID <= 0) return undefined;
   for (let i = 0; i < Boss死亡非UI掉落与清理配置表.length; i++) {
     const 配置 = Boss死亡非UI掉落与清理配置表[i];
-    if (Boss单位匹配配置(配置, i, Boss单位, 单位类型ID)) return 配置;
+    if (Boss单位匹配配置(配置, i, Boss单位, 单位类型ID)) {
+      if (需要输出掉落调试(配置)) debugLogForce(模块名, "匹配死亡结算配置", "结算键", 配置.键, "单位类型ID", 单位类型ID);
+      return 配置;
+    }
   }
   return undefined;
 }
@@ -359,6 +398,10 @@ export function 按结算键获取Boss死亡结算配置(this: void, 结算键: 
 export function 执行Boss死亡结算(this: void, 配置: Boss死亡结算配置, Boss单位?: any, 击杀者?: any): boolean {
   const 运行Boss单位 = 解析Boss单位(配置, Boss单位);
   if (!处理Boss死亡特殊逻辑前置(配置, 击杀者)) return false;
+
+  if (需要输出掉落调试(配置)) {
+    debugLogForce(模块名, "开始执行死亡结算", "结算键", 配置.键, "Boss单位类型ID", 运行Boss单位 != null && 运行Boss单位 !== 0 ? GetUnitTypeId(运行Boss单位) : 0);
+  }
 
   打开Boss死亡首领奖励UI(配置.首领奖励池ID);
   掉落Boss死亡直接物品(配置, 运行Boss单位, 击杀者);

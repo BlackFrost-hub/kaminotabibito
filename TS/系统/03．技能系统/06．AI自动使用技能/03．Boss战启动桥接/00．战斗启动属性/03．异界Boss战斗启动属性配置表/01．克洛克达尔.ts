@@ -2,7 +2,7 @@
 
 import type { 战斗启动属性配置 } from "../00．配置类型";
 import { 默认Boss弱点数量基础值 } from "../00．配置类型";
-import { 异界Boss默认死亡奖励基础全属性, 异界Boss死亡奖励提示文案模板, 异界Boss统一转换场景, 异界Boss统一胜利音乐变量名, 异界Boss统一地点变量名, 异界Boss统一BS移动X轴, 异界Boss统一BS移动Y轴, 异界Boss统一玩家移动X轴, 异界Boss统一玩家移动Y轴 } from "./00．异界Boss共享配置";
+import { 异界Boss默认死亡奖励基础全属性, 异界Boss死亡奖励提示文案模板, 异界Boss统一转换场景, 异界Boss统一胜利音乐变量名, 异界Boss统一地点区域名称, 异界Boss统一BS移动X轴, 异界Boss统一BS移动Y轴, 异界Boss统一玩家移动X轴, 异界Boss统一玩家移动Y轴 } from "./00．异界Boss共享配置";
 
 export const 单位E079战斗启动属性配置: 战斗启动属性配置 = {
     归类: "异界Boss",
@@ -10,7 +10,7 @@ export const 单位E079战斗启动属性配置: 战斗启动属性配置 = {
     单位名: "克洛克达尔",
     转换场景: 异界Boss统一转换场景,
     胜利音乐变量名: 异界Boss统一胜利音乐变量名,
-    地点变量名: 异界Boss统一地点变量名,
+    地点区域名称: 异界Boss统一地点区域名称,
     BS移动X轴: 异界Boss统一BS移动X轴,
     BS移动Y轴: 异界Boss统一BS移动Y轴,
     玩家移动X轴: 异界Boss统一玩家移动X轴,

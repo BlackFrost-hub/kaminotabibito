@@ -1,18 +1,12 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 ____exports["激活传送点配置"] = {
-    ["1"] = {
-        name = "111",
-        UnitID = "gg_unit_htow_0030",
-        text = "|cffffff00『系统提示』|r：激活|cffff8080『精灵森』|r传送点。",
-        reveal = "gg_rct______________002",
-        enabled = true
-    },
+    ["1"] = {name = "111", UnitID = "gg_unit_htow_0030", text = "|cffffff00『系统提示』|r：激活|cffff8080『精灵森』|r传送点。", enabled = true},
     ["2"] = {
         name = "精灵森",
         UnitID = "gg_unit_n025_0373",
         text = "|cffffff00『系统提示』|r：激活|cffff8080『精灵森』|r传送点。",
-        reveal = "gg_rct________________RYEMC",
+        reveal = "熔岩恶魔城",
         enabled = true
     },
     ["3"] = {

@@ -31,6 +31,7 @@ const GetHeroLevel = (jass as any).GetHeroLevel as (unit: any) => number;
 const CreateUnit = (jass as any).CreateUnit as (owner: any, unitId: number, x: number, y: number, facing: number) => any;
 const GetRandomReal = (jass as any).GetRandomReal as (lowBound: number, highBound: number) => number;
 const Player = (jass as any).Player as (playerId: number) => any;
+const SetUnitFacing = (jass as any).SetUnitFacing as (unit: any, facing: number) => void;
 
 export interface 剧情玩家组传送配置 {
   入口中心X: number;
@@ -286,6 +287,7 @@ function onRegionEnter(this: void): void {
   }
   // dbg("准备传送至: " + cfg.teleportX + "," + cfg.teleportY);
   (jass as any).SetUnitPosition(unit, cfg.teleportX, cfg.teleportY);
+  if (cfg.teleportFacing != null) SetUnitFacing(unit, cfg.teleportFacing);
   (jass as any).IssueImmediateOrder(unit, "stop");
   // dbg("传送完成");
   const player = owner;

@@ -8,6 +8,9 @@
  */
 const jass = require("jass.common") as Record<string, unknown>;
 const g = require("jass.globals") as Record<string, unknown>;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
 };
@@ -184,8 +187,6 @@ function resolveWatchUnit(cfg: PointConfig): any {
 }
 
 function runActivationEffects(cfg: PointConfig, watchUnit: any): void {
-  const gg = g as any;
-
   if (
     cfg.UnitID != null &&
     watchUnit != null &&
@@ -196,7 +197,7 @@ function runActivationEffects(cfg: PointConfig, watchUnit: any): void {
   }
 
   if (cfg.reveal != null) {
-    const revealRect = gg[cfg.reveal];
+    const revealRect = 获取矩形区域(cfg.reveal);
     if (revealRect) {
       const mode = (jass as any).FOG_OF_WAR_VISIBLE;
       (jass as any).SetFogStateRect((jass as any).Player(0), mode, revealRect, true);

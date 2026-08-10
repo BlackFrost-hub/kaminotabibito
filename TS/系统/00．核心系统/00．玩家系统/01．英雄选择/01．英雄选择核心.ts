@@ -2,6 +2,9 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
@@ -53,8 +56,6 @@ const { StarOther_PanCameraToTimedForPlayer } = require("lib.扩展函数.Star�
 import 英雄选择配置表, { 英雄选择配置 } from "./00．英雄选择配置表";
 
 const GroupAddUnit = jass.GroupAddUnit as (whichGroup: any, whichUnit: any) => void;
-const GetRectCenterX = jass.GetRectCenterX as (whichRect: any) => number;
-const GetRectCenterY = jass.GetRectCenterY as (whichRect: any) => number;
 const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (whichPlayer: any, x: number, y: number, duration: number, message: string) => void;
 const initPlayerHeroGetBridge = bridge.initPlayerHeroGetBridge;
 const directRegisterPlayerHero = bridge.directRegisterPlayerHero;
@@ -239,12 +240,12 @@ function 是可选玩家(this: void, 玩家ID: number): boolean {
   return 英雄选择配置表.可选玩家ID列表.indexOf(玩家ID) >= 0;
 }
 
-function 获取配置矩形(this: void, 全局名: string): any {
-  return (jglobals as Record<string, any>)[全局名];
+function 获取配置矩形(this: void, 区域名称: string): any {
+  return 获取矩形区域(区域名称);
 }
 
 function 是英雄选择区域内单位(this: void, 单位: any): boolean {
-  const 选择区域 = 获取配置矩形(英雄选择配置表.选择区域全局名);
+  const 选择区域 = 获取配置矩形(英雄选择配置表.选择区域名称);
   if (选择区域 == null || 选择区域 === 0) return false;
   return RectContainsUnitBJ(选择区域, 单位) === true;
 }
@@ -270,11 +271,9 @@ function 解析单位类型ID(this: void, 单位名: string | undefined): number
 }
 
 function 获取英雄出生点(this: void): { X: number; Y: number } | undefined {
-  const 出生区域 = 获取配置矩形(英雄选择配置表.英雄出生区域全局名);
-  if (出生区域 == null || 出生区域 === 0) return undefined;
   return {
-    X: GetRectCenterX(出生区域),
-    Y: GetRectCenterY(出生区域),
+    X: 英雄选择配置表.英雄出生坐标.X,
+    Y: 英雄选择配置表.英雄出生坐标.Y,
   };
 }
 
@@ -378,7 +377,7 @@ function 应忽略本次选择(this: void, 玩家: any, 玩家ID: number, 单位
   if (!是可选玩家(玩家ID)) {
     return true;
   }
-  const 选择区域 = 获取配置矩形(英雄选择配置表.选择区域全局名);
+  const 选择区域 = 获取配置矩形(英雄选择配置表.选择区域名称);
   if (选择区域 == null || 选择区域 === 0) {
     return true;
   }

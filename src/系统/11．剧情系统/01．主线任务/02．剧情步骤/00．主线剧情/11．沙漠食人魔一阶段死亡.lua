@@ -27,48 +27,50 @@ end
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_0["添加单位暂停"]
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_1["添加单位暂停"]
 local _____6C99_6F20_98DF_4EBA_9B54_4E8C_9636_6BB5_5F85_6218_6682_505C_6765_6E90 = "剧情系统:沙漠食人魔二阶段待战"
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
-local YDWEAngleBetweenUnitsSafe = ____require_result_1.YDWEAngleBetweenUnitsSafe
-local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
-local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_2["按名字反查Boss单位ID"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
-local ____require_result_4 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑")
-local _____6309_7ED3_7B97_952E_6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_4["按结算键执行Boss死亡结算"]
-local ____require_result_5 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.04．死亡事件桥接")
-local _____6D88_8D39_4FDD_7559_5267_60C5Boss_6B7B_4EA1_51FB_6740_8005 = ____require_result_5["消费保留剧情Boss死亡击杀者"]
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_6["创建单位并登记排泄安全"]
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
-local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_7["立即移除单位并取消排泄登记"]
-local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-local StarOther_PanCameraToTimedUnitForPlayer = ____require_result_8.StarOther_PanCameraToTimedUnitForPlayer
-local ____require_result_9 = require("lib.扩展函数.BJ函数.14．音效函数")
-local PlaySoundBJ = ____require_result_9.PlaySoundBJ
-local ____require_result_10 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
-local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_10["卸载区域背景音乐句柄"]
-local ____require_result_11 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_11.GetPlayersAll
-local ____require_result_12 = require("lib.扩展函数.BJ函数.06．任务消息")
-local QuestMessageBJ = ____require_result_12.QuestMessageBJ
-local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
-local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_13["注册剧情片段清理"]
-local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
-local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["注册剧情运行时单位"]
-local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["读取剧情运行时单位"]
-local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["清理剧情运行时单位"]
-local ____require_result_15 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_15.addDelayedCallback
-local removeDelayedCallback = ____require_result_15.removeDelayedCallback
-local addPeriodicCallback = ____require_result_15.addPeriodicCallback
-local removePeriodicCallback = ____require_result_15.removePeriodicCallback
-local ____require_result_16 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_16.EC_CreateEffect
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
+local YDWEAngleBetweenUnitsSafe = ____require_result_2.YDWEAngleBetweenUnitsSafe
+local ____require_result_3 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
+local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_3["按名字反查Boss单位ID"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
+local ____require_result_5 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑")
+local _____6309_7ED3_7B97_952E_6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_5["按结算键执行Boss死亡结算"]
+local ____require_result_6 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.04．死亡事件桥接")
+local _____6D88_8D39_4FDD_7559_5267_60C5Boss_6B7B_4EA1_51FB_6740_8005 = ____require_result_6["消费保留剧情Boss死亡击杀者"]
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_7["创建单位并登记排泄安全"]
+local ____require_result_8 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_8["立即移除单位并取消排泄登记"]
+local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+local StarOther_PanCameraToTimedUnitForPlayer = ____require_result_9.StarOther_PanCameraToTimedUnitForPlayer
+local ____require_result_10 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundBJ = ____require_result_10.PlaySoundBJ
+local ____require_result_11 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_11["卸载区域背景音乐句柄"]
+local ____require_result_12 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_12.GetPlayersAll
+local ____require_result_13 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_13.QuestMessageBJ
+local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
+local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_14["注册剧情片段清理"]
+local ____require_result_15 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
+local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["注册剧情运行时单位"]
+local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["读取剧情运行时单位"]
+local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["清理剧情运行时单位"]
+local ____require_result_16 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_16.addDelayedCallback
+local removeDelayedCallback = ____require_result_16.removeDelayedCallback
+local addPeriodicCallback = ____require_result_16.addPeriodicCallback
+local removePeriodicCallback = ____require_result_16.removePeriodicCallback
+local ____require_result_17 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_17.EC_CreateEffect
 do
     local ____11_FF0E_6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.11．沙漠食人魔一阶段死亡")
     ____exports["沙漠食人魔一阶段死亡剧情片段"] = ____11_FF0E_6C99_6F20_98DF_4EBA_9B54_4E00_9636_6BB5_6B7B_4EA1["沙漠食人魔一阶段死亡剧情片段"]
@@ -177,25 +179,25 @@ end
 ____exports["执行沙漠食人魔一阶段死亡前置"] = function(_____53C2_6570)
     local _____4E0A_4E0B_6587_89E6_53D1_5355_4F4D = _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587()["触发单位"]
     local _____4E8B_4EF6_6B7B_4EA1_5355_4F4D = GetDyingUnit()
-    local ____temp_17
+    local ____temp_18
     if _____4E8B_4EF6_6B7B_4EA1_5355_4F4D ~= nil and _____4E8B_4EF6_6B7B_4EA1_5355_4F4D ~= 0 then
-        ____temp_17 = _____4E8B_4EF6_6B7B_4EA1_5355_4F4D
+        ____temp_18 = _____4E8B_4EF6_6B7B_4EA1_5355_4F4D
     else
-        ____temp_17 = _____4E0A_4E0B_6587_89E6_53D1_5355_4F4D
+        ____temp_18 = _____4E0A_4E0B_6587_89E6_53D1_5355_4F4D
     end
-    local dyingUnit = ____temp_17
+    local dyingUnit = ____temp_18
     if dyingUnit == nil or dyingUnit == 0 then
         return
     end
     local killingUnit = _____6D88_8D39_4FDD_7559_5267_60C5Boss_6B7B_4EA1_51FB_6740_8005(dyingUnit)
     _____5F85_5904_7406_4E00_9636_6BB5_6B7B_4EA1_5355_4F4D = dyingUnit
-    local ____temp_18
+    local ____temp_19
     if killingUnit ~= nil and killingUnit ~= 0 then
-        ____temp_18 = killingUnit
+        ____temp_19 = killingUnit
     else
-        ____temp_18 = nil
+        ____temp_19 = nil
     end
-    _____5F85_5F00_6218_76EE_6807_5355_4F4D = ____temp_18
+    _____5F85_5F00_6218_76EE_6807_5355_4F4D = ____temp_19
     if _____5F85_5F00_6218_76EE_6807_5355_4F4D ~= nil then
         local _____4E0A_4E0B_6587 = _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587()
         _____5199_5165_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587(__TS__ObjectAssign({}, _____4E0A_4E0B_6587, {["触发单位"] = _____5F85_5F00_6218_76EE_6807_5355_4F4D}))
@@ -205,7 +207,7 @@ ____exports["执行沙漠食人魔一阶段死亡前置"] = function(_____53C2_6
     _____4E00_9636_6BB5_6B7B_4EA1X = GetUnitX(dyingUnit)
     _____4E00_9636_6BB5_6B7B_4EA1Y = GetUnitY(dyingUnit)
     local _____80DC_5229_97F3_6548 = jglobals.gg_snd_shengliBgm
-    local _____6218_6597_533A_57DF = jglobals.gg_rct______________047
+    local _____6218_6597_533A_57DF = _____83B7_53D6_77E9_5F62_533A_57DF("沙漠区域.Boss战区域")
     _____5378_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4(_____80DC_5229_97F3_6548, _____6218_6597_533A_57DF)
     local riftTypeId = stringToFourCCSafe("e08M")
     local riftUnit = nil
@@ -355,12 +357,12 @@ local function _____5B8C_6210_6C99_6F20_98DF_4EBA_9B54_4E8C_9636_6BB5_663E_73B0_
 end
 ____exports["执行杀戮食人魔显现"] = function(_____53C2_6570)
     _____5B8C_6210_6C99_6F20_98DF_4EBA_9B54_4E8C_9636_6BB5_663E_73B0_8109_51B2()
-    local ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_20 = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID
-    local ____53C2_6570__4E8C_9636_6BB5Boss_540D_19 = _____53C2_6570["二阶段Boss名"]
-    if ____53C2_6570__4E8C_9636_6BB5Boss_540D_19 == nil then
-        ____53C2_6570__4E8C_9636_6BB5Boss_540D_19 = "杀戮食人魔"
+    local ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_21 = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID
+    local ____53C2_6570__4E8C_9636_6BB5Boss_540D_20 = _____53C2_6570["二阶段Boss名"]
+    if ____53C2_6570__4E8C_9636_6BB5Boss_540D_20 == nil then
+        ____53C2_6570__4E8C_9636_6BB5Boss_540D_20 = "杀戮食人魔"
     end
-    local bossRawId = ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_20(tostring(____53C2_6570__4E8C_9636_6BB5Boss_540D_19))
+    local bossRawId = ____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID_21(tostring(____53C2_6570__4E8C_9636_6BB5Boss_540D_20))
     local bossTypeId = stringToFourCCSafe(bossRawId)
     if not (bossTypeId > 0) then
         return
@@ -444,11 +446,11 @@ ____exports["执行杀戮食人魔显现"] = function(_____53C2_6570)
     _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54 = bossUnit
 end
 ____exports["执行沙漠食人魔二阶段演出收束"] = function()
-    local ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_21 = _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54
-    if ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_21 == nil then
-        ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_21 = YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit")
+    local ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_22 = _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54
+    if ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_22 == nil then
+        ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_22 = YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit")
     end
-    local bossUnit = ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_21
+    local bossUnit = ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_22
     _____6062_590D_73A9_5BB6_82F1_96C4_63A7_5236()
     local _____8725_8734_4EBA = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____8725_8734_4EBA_8FD0_884C_65F6_952E)
     if _____8725_8734_4EBA ~= nil and _____8725_8734_4EBA ~= 0 and _____5F85_5F00_6218_76EE_6807_5355_4F4D ~= nil and _____5F85_5F00_6218_76EE_6807_5355_4F4D ~= 0 then
@@ -494,11 +496,11 @@ ____exports["执行沙漠食人魔二阶段演出收束"] = function()
     end
 end
 ____exports["执行沙漠食人魔二阶段开战"] = function()
-    local ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_22 = _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54
-    if ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_22 == nil then
-        ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_22 = YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit")
+    local ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_23 = _____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54
+    if ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_23 == nil then
+        ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_23 = YDUserDataGetSafe("string", "Boss", "杀戮食人魔", "unit")
     end
-    local bossUnit = ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_22
+    local bossUnit = ____5F85_5F00_6218_6740_622E_98DF_4EBA_9B54_23
     if bossUnit == nil or bossUnit == 0 then
         return
     end

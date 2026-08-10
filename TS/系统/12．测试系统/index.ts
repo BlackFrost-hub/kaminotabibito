@@ -31,6 +31,7 @@ const ENABLE_LATER_BOSS_SKILL_TEST = true;
 const ENABLE_PASSIVE_ITEM_COOLDOWN_UI_TEST = true;
 const ENABLE_EXTERNAL_VOICE_PACK_TEST = true;
 const ENABLE_BOSS_DUAL_HEALTH_BAR_TEST = true;
+const ENABLE_LOBSTER_GUARD_DROP_TEST = true;
 const ENABLE_BONE_SPEAR_EFFECT_TEST = true;
 const ENABLE_BOSS_3D_SOUND_TEST = true;
 const ENABLE_SERA_BARE_CREATE_TEST = true;
@@ -158,6 +159,10 @@ function loadTests(): void {
 
   if (ENABLE_BOSS_DUAL_HEALTH_BAR_TEST) {
     require("系统.12．测试系统.01．Boss测试.15．Boss双血条测试");
+  }
+
+  if (ENABLE_LOBSTER_GUARD_DROP_TEST) {
+    require("系统.12．测试系统.01．Boss测试.16．龙虾守卫掉落测试");
   }
 
   if (ENABLE_BONE_SPEAR_EFFECT_TEST) {

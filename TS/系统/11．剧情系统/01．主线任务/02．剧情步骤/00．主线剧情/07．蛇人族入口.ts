@@ -1,7 +1,9 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
@@ -36,7 +38,7 @@ const PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD as number;
 export function 执行蛇人族入口区域清理(this: void, 参数: 剧情动作参数表): void {
   const 矩形名 = String(参数.触发区域 ?? "");
   if (矩形名 === "") return;
-  const rectHandle = jglobals[矩形名];
+  const rectHandle = 获取矩形区域(矩形名);
   if (rectHandle != null && rectHandle !== 0) RemoveRect(rectHandle);
 }
 
@@ -80,7 +82,8 @@ export function 执行蛇人族入口收尾(this: void, 参数: 剧情动作参�
   const 玩家 = GetOwningPlayer(触发单位);
   if (玩家 == null || 玩家 === 0) return;
   const 当前金币 = Number(GetPlayerState(玩家, PLAYER_STATE_RESOURCE_GOLD)) || 0;
-  SetPlayerState(玩家, PLAYER_STATE_RESOURCE_GOLD, Math.max(0, 当前金币 - 费用));
+  const 剩余金币 = 当前金币 - 费用;
+  SetPlayerState(玩家, PLAYER_STATE_RESOURCE_GOLD, 剩余金币 > 0 ? 剩余金币 : 0);
 }
 
 function 清理蛇人族入口(this: void): void {

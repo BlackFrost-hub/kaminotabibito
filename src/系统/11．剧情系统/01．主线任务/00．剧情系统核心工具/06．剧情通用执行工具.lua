@@ -82,8 +82,7 @@ local GetPlayersAll = ____require_result_6.GetPlayersAll
 local ____require_result_7 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
 _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F = ____require_result_7["切换区域背景音乐表达式"]
 local ____require_result_8 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
-local _____83B7_53D6_52A8_6001_77E9_5F62_533A_57DF = ____require_result_8["获取动态矩形区域"]
-local _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_8["按配置键注册动态矩形区域"]
+local _____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_8["获取矩形区域"]
 local ____require_result_9 = require("lib.扩展函数.BJ函数.14．音效函数")
 PlaySoundBJ = ____require_result_9.PlaySoundBJ
 local ____require_result_10 = require("lib.扩展函数.BJ函数.02．单位与英雄")
@@ -421,7 +420,7 @@ local function ____on_7ED9_679A_4E3E_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE()
     if whichPlayer == nil or whichPlayer == 0 then
         return
     end
-    local key = (_____4E0A_4E0B_6587["矩形变量名"] .. "#") .. tostring(GetPlayerId(whichPlayer))
+    local key = (_____4E0A_4E0B_6587["矩形区域名称"] .. "#") .. tostring(GetPlayerId(whichPlayer))
     if _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] then
         return
     end
@@ -438,16 +437,8 @@ local function ____on_7ED9_679A_4E3E_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE()
     FogModifierStart(fogModifier)
     _____5DF2_521B_5EFA_89C6_91CE_4FEE_6574_5668[key] = true
 end
-____exports["给玩家组添加区域视野"] = function(rectVarName)
-    local ____8BFB_53D6_5168_5C40_53E5_67C4_result_22 = _____8BFB_53D6_5168_5C40_53E5_67C4(rectVarName)
-    if ____8BFB_53D6_5168_5C40_53E5_67C4_result_22 == nil then
-        ____8BFB_53D6_5168_5C40_53E5_67C4_result_22 = _____83B7_53D6_52A8_6001_77E9_5F62_533A_57DF(rectVarName)
-    end
-    local ____8BFB_53D6_5168_5C40_53E5_67C4_result_22_23 = ____8BFB_53D6_5168_5C40_53E5_67C4_result_22
-    if ____8BFB_53D6_5168_5C40_53E5_67C4_result_22_23 == nil then
-        ____8BFB_53D6_5168_5C40_53E5_67C4_result_22_23 = _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF(rectVarName)
-    end
-    local rectHandle = ____8BFB_53D6_5168_5C40_53E5_67C4_result_22_23
+____exports["给玩家组添加区域视野"] = function(_____77E9_5F62_533A_57DF_540D_79F0)
+    local rectHandle = _____83B7_53D6_77E9_5F62_533A_57DF(_____77E9_5F62_533A_57DF_540D_79F0)
     if rectHandle == nil or rectHandle == 0 then
         return
     end
@@ -455,12 +446,12 @@ ____exports["给玩家组添加区域视野"] = function(rectVarName)
     if _____73A9_5BB6_7EC4 == nil or _____73A9_5BB6_7EC4 == 0 then
         return
     end
-    _____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808[#_____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808 + 1] = {["矩形变量名"] = rectVarName, ["矩形句柄"] = rectHandle}
+    _____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808[#_____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808 + 1] = {["矩形区域名称"] = _____77E9_5F62_533A_57DF_540D_79F0, ["矩形句柄"] = rectHandle}
     safeForForce(_____73A9_5BB6_7EC4, ____on_7ED9_679A_4E3E_73A9_5BB6_6DFB_52A0_533A_57DF_89C6_91CE)
     table.remove(_____73A9_5BB6_7EC4_89C6_91CE_4E0A_4E0B_6587_6808)
 end
-____exports["给玩家组添加多个区域视野"] = function(rectVarNames)
-    local _____5217_8868 = _____5206_5272_540D_79F0_5217_8868(rectVarNames)
+____exports["给玩家组添加多个区域视野"] = function(_____77E9_5F62_533A_57DF_540D_79F0_5217_8868)
+    local _____5217_8868 = _____5206_5272_540D_79F0_5217_8868(_____77E9_5F62_533A_57DF_540D_79F0_5217_8868)
     do
         local i = 0
         while i < #_____5217_8868 do
@@ -491,15 +482,15 @@ ____exports["更新主线任务UI"] = function(_____4EFB_52A1_63CF_8FF0, _____63
         })
         questDB:acceptQuest(0, _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     end
-    local ____opt_26 = questDB.globalData
-    if ____opt_26 ~= nil then
-        ____opt_26 = ____opt_26.quests
+    local ____opt_24 = questDB.globalData
+    if ____opt_24 ~= nil then
+        ____opt_24 = ____opt_24.quests
     end
-    local ____opt_result_28
-    if ____opt_26 ~= nil then
-        ____opt_result_28 = ____opt_26:get(_____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
+    local ____opt_result_26
+    if ____opt_24 ~= nil then
+        ____opt_result_26 = ____opt_24:get(_____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     end
-    local _____4EFB_52A1 = ____opt_result_28
+    local _____4EFB_52A1 = ____opt_result_26
     if _____4EFB_52A1 ~= nil and _____4EFB_52A1_63CF_8FF0 ~= "" then
         _____4EFB_52A1.description = _____4EFB_52A1_63CF_8FF0
         _____4EFB_52A1.updatedAt = os.time()
@@ -635,13 +626,13 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
         ____exports["给玩家组添加区域视野"](_____53EF_89C1_533A_57DF2)
     end
     local ____NPC_5F15_7528 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "NPC") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "长老单位")
-    local ____temp_29
+    local ____temp_27
     if ____NPC_5F15_7528 ~= "" then
-        ____temp_29 = ____exports["读取语义单位引用"](____NPC_5F15_7528)
+        ____temp_27 = ____exports["读取语义单位引用"](____NPC_5F15_7528)
     else
-        ____temp_29 = nil
+        ____temp_27 = nil
     end
-    local npcUnit = ____temp_29
+    local npcUnit = ____temp_27
     local _____89E6_53D1_5355_4F4D = ____exports["读取触发单位"]()
     if npcUnit ~= nil and npcUnit ~= 0 then
         if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then
@@ -808,9 +799,9 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
                     )
                 end
             end
-            local _____5730_70B9_53D8_91CF_540D = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "Boss战地点字段") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "Boss战地点")
-            if _____5730_70B9_53D8_91CF_540D ~= "" then
-                local rectHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(_____5730_70B9_53D8_91CF_540D)
+            local _____5730_70B9_533A_57DF_540D_79F0 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "Boss战地点字段") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "Boss战地点")
+            if _____5730_70B9_533A_57DF_540D_79F0 ~= "" then
+                local rectHandle = _____83B7_53D6_77E9_5F62_533A_57DF(_____5730_70B9_533A_57DF_540D_79F0)
                 if rectHandle ~= nil and rectHandle ~= 0 then
                     YDUserDataSetSafe(
                         "string",

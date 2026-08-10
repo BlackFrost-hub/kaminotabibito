@@ -30,7 +30,7 @@ local function _____8725_8734_602A_7269_53D7_51FB_55B7_706B(_config, unit, sourc
 end
 local function _____6E56_5E95_5143_7D20_53D7_51FB_8FDE_62DB(_config, unit, source)
     local executed = false
-    executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = "A04U", ["施法方式"] = "对单位", ["目标来源"] = "伤害来源", ["下单归属"] = "中立敌对"}, unit, source) or executed
+    executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = "A04X", ["施法方式"] = "对单位", ["目标来源"] = "伤害来源", ["下单归属"] = "中立敌对"}, unit, source) or executed
     local skillId = jass.GetRandomInt(1, 2) == 1 and "A04Q" or "A04P"
     executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = skillId, ["施法方式"] = "对单位", ["目标来源"] = "伤害来源", ["下单归属"] = "中立敌对"}, unit, source) or executed
     return executed

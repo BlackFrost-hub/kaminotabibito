@@ -197,7 +197,7 @@ local bj_QUESTMESSAGE_WARNING = jglobals.bj_QUESTMESSAGE_WARNING
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
 local _____8C03_67E5_8303_56F4 = 450
 ____exports["执行开启恶魔城领主区域视野"] = function()
-    _____7ED9_73A9_5BB6_7EC4_6DFB_52A0_591A_4E2A_533A_57DF_89C6_91CE("gg_rct________________RYEMC")
+    _____7ED9_73A9_5BB6_7EC4_6DFB_52A0_591A_4E2A_533A_57DF_89C6_91CE("熔岩恶魔城")
 end
 _____4E0B_5C42_4ED3_5E93_5165_53E3_77E9_5F62_952E = "剧情.恶魔城下层仓库入口"
 local _____4E0B_5C42_4ED3_5E93_6E05_7406_8005_5F85_6218_6682_505C_6765_6E90 = "剧情系统:恶魔城下层仓库清理者待战"

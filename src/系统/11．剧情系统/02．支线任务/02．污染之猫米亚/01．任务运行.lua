@@ -10,10 +10,6 @@ local _____7C73_4E9ABoss_533A_843D_70B9X = ____00_FF0E_5E38_91CF["米亚Boss区�
 local _____7C73_4E9ABoss_533A_843D_70B9Y = ____00_FF0E_5E38_91CF["米亚Boss区落点Y"]
 local _____7C73_4E9ABoss_533A_843D_70B9_671D_5411 = ____00_FF0E_5E38_91CF["米亚Boss区落点朝向"]
 local _____7C73_4E9A_4F20_9001_5165_53E3_534A_5F84 = ____00_FF0E_5E38_91CF["米亚传送入口半径"]
-local _____7C73_4E9A_5165_53E3_533A_57DF_4E0A = ____00_FF0E_5E38_91CF["米亚入口区域上"]
-local _____7C73_4E9A_5165_53E3_533A_57DF_4E0B = ____00_FF0E_5E38_91CF["米亚入口区域下"]
-local _____7C73_4E9A_5165_53E3_533A_57DF_53F3 = ____00_FF0E_5E38_91CF["米亚入口区域右"]
-local _____7C73_4E9A_5165_53E3_533A_57DF_5DE6 = ____00_FF0E_5E38_91CF["米亚入口区域左"]
 local _____7C73_4E9A_5165_6C34X = ____00_FF0E_5E38_91CF["米亚入水X"]
 local _____7C73_4E9A_5165_6C34Y = ____00_FF0E_5E38_91CF["米亚入水Y"]
 local _____7C73_4E9A_5165_6C34_671D_5411 = ____00_FF0E_5E38_91CF["米亚入水朝向"]
@@ -104,6 +100,9 @@ local ____require_result_14 = require("系统.02．物品系统.18．首领奖�
 local _____7C73_4E9A_5956_52B1_6C60ID = ____require_result_14["米亚奖励池ID"]
 local ____require_result_15 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面")
 local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_15["打开首领奖励选择界面"]
+local ____require_result_16 = require("系统.07．地形系统.09．动态矩形区域注册表.02．动态矩形区域动作")
+local _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_16["按配置键注册动态矩形区域"]
+local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_16["注销动态矩形区域"]
 local CreateRegion = jass.CreateRegion
 local CreateTrigger = jass.CreateTrigger
 local GetHandleId = jass.GetHandleId
@@ -124,6 +123,7 @@ local SetUnitPathing = jass.SetUnitPathing
 local SetUnitPosition = jass.SetUnitPosition
 local _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = jass.PLAYER_NEUTRAL_PASSIVE
+local _____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E = "支线.米亚一次性入口监听"
 local _____6C38_4E45_4F20_9001_72B6_6001_8868 = {}
 local _____7C73_4E9A_4EFB_52A1_5185_5BB9_5DF2_521B_5EFA = false
 local _____6C61_67D3_533A_9996_6B21_62B5_8FBE_5DF2_64AD_653E = false
@@ -228,9 +228,7 @@ local function _____6E05_7406_7C73_4E9A_5165_53E3_76D1_542C()
     if _____53E5_67C4_6709_6548(_____72B6_6001["区域"]) then
         RemoveRegion(_____72B6_6001["区域"])
     end
-    if _____53E5_67C4_6709_6548(_____72B6_6001["矩形"]) then
-        RemoveRect(_____72B6_6001["矩形"])
-    end
+    _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E)
     _____5F53_524D_7C73_4E9A_5165_53E3_76D1_542C = nil
 end
 local function _____521B_5EFA_7C73_4E9A_5355_4F4D()
@@ -368,7 +366,7 @@ local function _____6CE8_518C_7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C()
         return false
     end
     local region = CreateRegion()
-    local rect = Rect(_____7C73_4E9A_5165_53E3_533A_57DF_5DE6, _____7C73_4E9A_5165_53E3_533A_57DF_4E0B, _____7C73_4E9A_5165_53E3_533A_57DF_53F3, _____7C73_4E9A_5165_53E3_533A_57DF_4E0A)
+    local rect = _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF(_____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E)
     local trigger = CreateTrigger()
     if not _____53E5_67C4_6709_6548(region) or not _____53E5_67C4_6709_6548(rect) or not _____53E5_67C4_6709_6548(trigger) then
         if _____53E5_67C4_6709_6548(trigger) then
@@ -377,16 +375,14 @@ local function _____6CE8_518C_7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C()
         if _____53E5_67C4_6709_6548(region) then
             RemoveRegion(region)
         end
-        if _____53E5_67C4_6709_6548(rect) then
-            RemoveRect(rect)
-        end
+        _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E)
         return false
     end
     RegionAddRect(region, rect)
     if safeTriggerAddAction(trigger, ____on_7C73_4E9A_5165_53E3_533A_57DF_8FDB_5165) == nil then
         safeDestroyTrigger(trigger)
         RemoveRegion(region)
-        RemoveRect(rect)
+        _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E)
         return false
     end
     _____5F53_524D_7C73_4E9A_5165_53E3_76D1_542C = {

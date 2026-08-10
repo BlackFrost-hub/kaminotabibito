@@ -14,7 +14,7 @@ local SetStackedSoundBJ = ____require_result_0.SetStackedSoundBJ
 local ____require_result_1 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
 local _____6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_1["注册动态矩形区域"]
 local _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_1["按配置键注册动态矩形区域"]
-local _____83B7_53D6_52A8_6001_77E9_5F62_533A_57DF = ____require_result_1["获取动态矩形区域"]
+local _____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_1["获取矩形区域"]
 local _____8BFB_53D6_52A8_6001_77E9_5F62_533A_57DF_7EC4_5B50_533A_57DF_952E = ____require_result_1["读取动态矩形区域组子区域键"]
 local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_1["注销动态矩形区域"]
 local RemoveRect = jass.RemoveRect
@@ -55,7 +55,7 @@ ____exports["移除区域背景音乐矩形"] = function(rectHandle)
     RemoveRect(rectHandle)
     return true
 end
---- 兼容剧情配置里的“声音全局名 @ 矩形全局名; ...”表达式。
+--- 兼容剧情配置里的“声音全局名 @ 矩形区域名称; ...”表达式。
 ____exports["切换区域背景音乐表达式"] = function(expr, add)
     if expr == nil or expr == "" then
         return 0
@@ -76,7 +76,7 @@ ____exports["切换区域背景音乐表达式"] = function(expr, add)
                 end
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(__TS__StringTrim(__TS__StringSubstring(item, 0, at)))
                 local rectName = __TS__StringTrim(__TS__StringSubstring(item, at + 1))
-                local rectHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(rectName) or _____83B7_53D6_52A8_6001_77E9_5F62_533A_57DF(rectName) or _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF(rectName)
+                local rectHandle = _____83B7_53D6_77E9_5F62_533A_57DF(rectName)
                 if ____exports["挂载区域背景音乐句柄"](add, soundHandle, rectHandle) then
                     count = count + 1
                 end
@@ -88,7 +88,7 @@ ____exports["切换区域背景音乐表达式"] = function(expr, add)
     return count
 end
 local function _____8FD0_884C_65F6_914D_7F6E_6709_6548(_____914D_7F6E)
-    return _____914D_7F6E["键"] ~= "" and _____914D_7F6E["音乐路径"] ~= "" and (_____914D_7F6E["区域全局名"] ~= nil and _____914D_7F6E["区域全局名"] ~= "" or _____914D_7F6E["区域动态组键"] ~= nil and _____914D_7F6E["区域动态组键"] ~= "" or _____914D_7F6E["区域动态键"] ~= nil and _____914D_7F6E["区域动态键"] ~= "" or _____914D_7F6E["区域动态键列表"] ~= nil and #_____914D_7F6E["区域动态键列表"] > 0 or _____914D_7F6E["左"] ~= nil and _____914D_7F6E["右"] ~= nil and _____914D_7F6E["下"] ~= nil and _____914D_7F6E["上"] ~= nil and _____914D_7F6E["左"] < _____914D_7F6E["右"] and _____914D_7F6E["下"] < _____914D_7F6E["上"])
+    return _____914D_7F6E["键"] ~= "" and _____914D_7F6E["音乐路径"] ~= "" and (_____914D_7F6E["矩形区域名称"] ~= nil and _____914D_7F6E["矩形区域名称"] ~= "" or _____914D_7F6E["区域动态组键"] ~= nil and _____914D_7F6E["区域动态组键"] ~= "" or _____914D_7F6E["区域动态键"] ~= nil and _____914D_7F6E["区域动态键"] ~= "" or _____914D_7F6E["区域动态键列表"] ~= nil and #_____914D_7F6E["区域动态键列表"] > 0 or _____914D_7F6E["左"] ~= nil and _____914D_7F6E["右"] ~= nil and _____914D_7F6E["下"] ~= nil and _____914D_7F6E["上"] ~= nil and _____914D_7F6E["左"] < _____914D_7F6E["右"] and _____914D_7F6E["下"] < _____914D_7F6E["上"])
 end
 --- 注册运行时区域。注册只创建句柄，不自动播放；需要播放时显式调用启用。
 ____exports["注册运行时区域背景音乐"] = function(_____914D_7F6E)
@@ -98,7 +98,7 @@ ____exports["注册运行时区域背景音乐"] = function(_____914D_7F6E)
     if _____533A_57DF_80CC_666F_97F3_4E50_8FD0_884C_65F6_72B6_6001_8868[_____914D_7F6E["键"]] ~= nil then
         return true
     end
-    local _____4F7F_7528_5730_56FE_77E9_5F62 = _____914D_7F6E["区域全局名"] ~= nil and _____914D_7F6E["区域全局名"] ~= ""
+    local _____4F7F_7528_5730_56FE_77E9_5F62 = _____914D_7F6E["矩形区域名称"] ~= nil and _____914D_7F6E["矩形区域名称"] ~= ""
     local _____5171_4EAB_52A8_6001_77E9_5F62_952E_5217_8868 = {}
     if not _____4F7F_7528_5730_56FE_77E9_5F62 and _____914D_7F6E["区域动态键"] ~= nil and _____914D_7F6E["区域动态键"] ~= "" then
         _____5171_4EAB_52A8_6001_77E9_5F62_952E_5217_8868[#_____5171_4EAB_52A8_6001_77E9_5F62_952E_5217_8868 + 1] = _____914D_7F6E["区域动态键"]
@@ -131,7 +131,7 @@ ____exports["注册运行时区域背景音乐"] = function(_____914D_7F6E)
     local _____77E9_5F62_5217_8868 = {}
     local _____62E5_6709_52A8_6001_77E9_5F62_952E_5217_8868 = {}
     if _____4F7F_7528_5730_56FE_77E9_5F62 then
-        local _____77E9_5F62 = _____8BFB_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["区域全局名"])
+        local _____77E9_5F62 = _____83B7_53D6_77E9_5F62_533A_57DF(_____914D_7F6E["矩形区域名称"])
         if _____53E5_67C4_6709_6548(_____77E9_5F62) then
             _____77E9_5F62_5217_8868[#_____77E9_5F62_5217_8868 + 1] = _____77E9_5F62
         end

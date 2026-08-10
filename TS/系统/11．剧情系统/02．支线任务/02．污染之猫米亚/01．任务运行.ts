@@ -66,6 +66,10 @@ const { 米亚奖励池ID } = require("系统.02．物品系统.18．首领奖�
 const { 打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
   打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
 };
+const { 按配置键注册动态矩形区域, 注销动态矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.02．动态矩形区域动作") as {
+  按配置键注册动态矩形区域: (this: void, 键: string) => any;
+  注销动态矩形区域: (this: void, 键: string) => boolean;
+};
 
 import {
   米亚Boss区入口ID,
@@ -76,10 +80,6 @@ import {
   米亚Boss区落点Y,
   米亚Boss区落点朝向,
   米亚传送入口半径,
-  米亚入口区域上,
-  米亚入口区域下,
-  米亚入口区域右,
-  米亚入口区域左,
   米亚入水X,
   米亚入水Y,
   米亚入水朝向,
@@ -119,6 +119,7 @@ const SetUnitPathing = jass.SetUnitPathing as (this: void, unit: any, flag: bool
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
 const 中立敌对玩家ID = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 中立被动玩家ID = jass.PLAYER_NEUTRAL_PASSIVE as number;
+const 米亚一次性入口监听矩形键 = "支线.米亚一次性入口监听";
 
 interface 永久传送状态 {
   ID: string;
@@ -257,7 +258,7 @@ function 清理米亚入口监听(this: void): void {
   状态.取消监听();
   if (句柄有效(状态.触发器)) safeDestroyTrigger(状态.触发器);
   if (句柄有效(状态.区域)) RemoveRegion(状态.区域);
-  if (句柄有效(状态.矩形)) RemoveRect(状态.矩形);
+  注销动态矩形区域(米亚一次性入口监听矩形键);
   当前米亚入口监听 = undefined;
 }
 
@@ -376,12 +377,12 @@ function on米亚入口区域进入(this: void): void {
 function 注册米亚一次性入口监听(this: void): boolean {
   if (当前米亚入口监听 != null) return false;
   const region = CreateRegion();
-  const rect = Rect(米亚入口区域左, 米亚入口区域下, 米亚入口区域右, 米亚入口区域上);
+  const rect = 按配置键注册动态矩形区域(米亚一次性入口监听矩形键);
   const trigger = CreateTrigger();
   if (!句柄有效(region) || !句柄有效(rect) || !句柄有效(trigger)) {
     if (句柄有效(trigger)) safeDestroyTrigger(trigger);
     if (句柄有效(region)) RemoveRegion(region);
-    if (句柄有效(rect)) RemoveRect(rect);
+    注销动态矩形区域(米亚一次性入口监听矩形键);
     return false;
   }
 
@@ -389,7 +390,7 @@ function 注册米亚一次性入口监听(this: void): boolean {
   if (safeTriggerAddAction(trigger, on米亚入口区域进入) == null) {
     safeDestroyTrigger(trigger);
     RemoveRegion(region);
-    RemoveRect(rect);
+    注销动态矩形区域(米亚一次性入口监听矩形键);
     return false;
   }
   当前米亚入口监听 = {

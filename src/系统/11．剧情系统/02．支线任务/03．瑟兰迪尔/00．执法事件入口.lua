@@ -85,6 +85,10 @@ local ____require_result_10 = require("lib.扩展函数.BJ函数.07．杂项")
 local GetPlayersAll = ____require_result_10.GetPlayersAll
 local ____require_result_11 = require("lib.扩展函数.BJ函数.06．任务消息")
 local QuestMessageBJ = ____require_result_11.QuestMessageBJ
+local ____require_result_12 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____52A8_6001_77E9_5F62_533A_57DF_914D_7F6E_8868 = ____require_result_12["动态矩形区域配置表"]
+local _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_12["按配置键注册动态矩形区域"]
+local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_12["注销动态矩形区域"]
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local Cos = jass.Cos
@@ -110,17 +114,13 @@ local GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange
 local GroupRemoveUnit = jass.GroupRemoveUnit
 local IssueImmediateOrder = jass.IssueImmediateOrder
 local Player = jass.Player
-local Rect = jass.Rect
-local RemoveRect = jass.RemoveRect
 local SetPlayerState = jass.SetPlayerState
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitFacing = jass.SetUnitFacing
 SetUnitInvulnerable = jass.SetUnitInvulnerable
 local Sin = jass.Sin
-local _____7CBE_7075_57CE_5DE6 = -16512
-local _____7CBE_7075_57CE_53F3 = -3744
-local _____7CBE_7075_57CE_4E0B = -13280
-local _____7CBE_7075_57CE_4E0A = -5632
+local _____7CBE_7075_57CE_6267_6CD5_76D1_542C_77E9_5F62_952E = "支线.瑟兰迪尔精灵城执法监听"
+local _____7CBE_7075_57CE_6267_6CD5_76D1_542C_914D_7F6E = _____52A8_6001_77E9_5F62_533A_57DF_914D_7F6E_8868[_____7CBE_7075_57CE_6267_6CD5_76D1_542C_77E9_5F62_952E]
 local _____6267_6CD5_5355_4F4D_68C0_67E5_8303_56F4 = 500
 local _____745F_5170_8FEA_5C14_51FA_751F_524D_65B9_8DDD_79BB = 250
 local _____6982_7387_68C0_67E5_51B7_5374_6BEB_79D2 = 1000
@@ -150,7 +150,7 @@ local function _____5355_4F4D_4F4D_4E8E_7CBE_7075_57CE(unit)
     end
     local x = GetUnitX(unit)
     local y = GetUnitY(unit)
-    return x >= _____7CBE_7075_57CE_5DE6 and x <= _____7CBE_7075_57CE_53F3 and y >= _____7CBE_7075_57CE_4E0B and y <= _____7CBE_7075_57CE_4E0A
+    return x >= _____7CBE_7075_57CE_6267_6CD5_76D1_542C_914D_7F6E["左"] and x <= _____7CBE_7075_57CE_6267_6CD5_76D1_542C_914D_7F6E["右"] and y >= _____7CBE_7075_57CE_6267_6CD5_76D1_542C_914D_7F6E["下"] and y <= _____7CBE_7075_57CE_6267_6CD5_76D1_542C_914D_7F6E["上"]
 end
 local function _____662F_53EF_6E38_73A9_82F1_96C4(unit)
     if not _____5355_4F4D_6709_6548(unit) or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(unit) then
@@ -273,9 +273,7 @@ local function _____6CE8_9500_6267_6CD5_5165_53E3()
     end
     _____653B_51FB_76D1_542C_89E6_53D1_5668 = nil
     _____653B_51FB_76D1_542C_52A8_4F5C = nil
-    if _____7CBE_7075_57CE_76D1_542C_77E9_5F62 ~= nil and _____7CBE_7075_57CE_76D1_542C_77E9_5F62 ~= 0 then
-        RemoveRect(_____7CBE_7075_57CE_76D1_542C_77E9_5F62)
-    end
+    _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7CBE_7075_57CE_6267_6CD5_76D1_542C_77E9_5F62_952E)
     _____7CBE_7075_57CE_76D1_542C_77E9_5F62 = nil
 end
 local function _____521B_5EFA_5E76_64AD_653E_5723_5149_7279_6548(victim)
@@ -371,16 +369,13 @@ local function _____6267_884C_5168_5458_6CBB_5B89_7F5A_6B3E()
             do
                 local player = Player(playerId)
                 if not _____662F_6709_6548_5728_7EBF_73A9_5BB6(player) then
-                    goto __continue55
+                    goto __continue54
                 end
                 local currentGold = GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD)
-                SetPlayerState(
-                    player,
-                    jass.PLAYER_STATE_RESOURCE_GOLD,
-                    math.max(0, currentGold - 10000)
-                )
+                local remainingGold = currentGold > 10000 and currentGold - 10000 or 0
+                SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_GOLD, remainingGold)
             end
-            ::__continue55::
+            ::__continue54::
             playerId = playerId + 1
         end
     end
@@ -409,21 +404,17 @@ ____exports["初始化瑟兰迪尔执法事件"] = function()
     if _____653B_51FB_76D1_542C_89E6_53D1_5668 ~= nil or _____5165_53E3_5DF2_89E6_53D1 then
         return
     end
-    _____7CBE_7075_57CE_76D1_542C_77E9_5F62 = Rect(_____7CBE_7075_57CE_5DE6, _____7CBE_7075_57CE_4E0B, _____7CBE_7075_57CE_53F3, _____7CBE_7075_57CE_4E0A)
+    _____7CBE_7075_57CE_76D1_542C_77E9_5F62 = _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF(_____7CBE_7075_57CE_6267_6CD5_76D1_542C_77E9_5F62_952E)
     local trigger = CreateTrigger()
     if trigger == nil or trigger == 0 then
-        if _____7CBE_7075_57CE_76D1_542C_77E9_5F62 ~= nil and _____7CBE_7075_57CE_76D1_542C_77E9_5F62 ~= 0 then
-            RemoveRect(_____7CBE_7075_57CE_76D1_542C_77E9_5F62)
-        end
+        _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7CBE_7075_57CE_6267_6CD5_76D1_542C_77E9_5F62_952E)
         _____7CBE_7075_57CE_76D1_542C_77E9_5F62 = nil
         return
     end
     local action = safeTriggerAddAction(trigger, ____on_73A9_5BB6_653B_51FB_4E2D_7ACBNPC)
     if action == nil then
         safeDestroyTrigger(trigger)
-        if _____7CBE_7075_57CE_76D1_542C_77E9_5F62 ~= nil and _____7CBE_7075_57CE_76D1_542C_77E9_5F62 ~= 0 then
-            RemoveRect(_____7CBE_7075_57CE_76D1_542C_77E9_5F62)
-        end
+        _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7CBE_7075_57CE_6267_6CD5_76D1_542C_77E9_5F62_952E)
         _____7CBE_7075_57CE_76D1_542C_77E9_5F62 = nil
         return
     end

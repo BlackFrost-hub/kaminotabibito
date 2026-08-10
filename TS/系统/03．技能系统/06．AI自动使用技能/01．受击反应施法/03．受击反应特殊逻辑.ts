@@ -35,7 +35,7 @@ function 蜥蜴怪物受击喷火(this: void, _config: 受击反应配置, unit:
 
 function 湖底元素受击连招(this: void, _config: 受击反应配置, unit: any, source: any): boolean {
   let executed = false;
-  executed = 尝试执行受击技能({ 技能ID: "A04U", 施法方式: "对单位", 目标来源: "伤害来源", 下单归属: "中立敌对" }, unit, source) || executed;
+  executed = 尝试执行受击技能({ 技能ID: "A04X", 施法方式: "对单位", 目标来源: "伤害来源", 下单归属: "中立敌对" }, unit, source) || executed;
   const skillId = jass.GetRandomInt(1, 2) === 1 ? "A04Q" : "A04P";
   executed = 尝试执行受击技能({ 技能ID: skillId, 施法方式: "对单位", 目标来源: "伤害来源", 下单归属: "中立敌对" }, unit, source) || executed;
   return executed;

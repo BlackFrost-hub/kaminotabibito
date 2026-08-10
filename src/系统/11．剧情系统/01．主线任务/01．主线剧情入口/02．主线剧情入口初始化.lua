@@ -28,27 +28,29 @@ local _____521D_59CB_5316_8FDB_5EA605__51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_6
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
-local ____require_result_2 = require("系统.03．技能系统.04．快捷键技能.02．按Ctrl切换背包")
-local _____73A9_5BB6_4E3B_526F_80CC_5305_6301_6709_7269_54C1 = ____require_result_2["玩家主副背包持有物品"]
-local ____require_result_3 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterEnterRectSimple = ____require_result_3.TriggerRegisterEnterRectSimple
-local ____require_result_4 = require("系统.02．物品系统.13．物品名反查")
-local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_4["按名字反查物品ID"]
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
-local ____require_result_6 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-local registerUnitInRangeTrigger = ____require_result_6.registerUnitInRangeTrigger
-local ____require_result_7 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_7["是玩家英雄组单位"]
-local ____require_result_8 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-local _____67E5_627E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_8["查找主线剧情片段"]
+local ____require_result_0 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____83B7_53D6_77E9_5F62_533A_57DF = ____require_result_0["获取矩形区域"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_2.YDUserDataSetSafe
+local ____require_result_3 = require("系统.03．技能系统.04．快捷键技能.02．按Ctrl切换背包")
+local _____73A9_5BB6_4E3B_526F_80CC_5305_6301_6709_7269_54C1 = ____require_result_3["玩家主副背包持有物品"]
+local ____require_result_4 = require("lib.扩展函数.BJ函数.01．触发与事件")
+local TriggerRegisterEnterRectSimple = ____require_result_4.TriggerRegisterEnterRectSimple
+local ____require_result_5 = require("系统.02．物品系统.13．物品名反查")
+local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_5["按名字反查物品ID"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
+local ____require_result_7 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
+local registerUnitInRangeTrigger = ____require_result_7.registerUnitInRangeTrigger
+local ____require_result_8 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_8["是玩家英雄组单位"]
 local ____require_result_9 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_9["播放主线剧情片段"]
+local _____67E5_627E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_9["查找主线剧情片段"]
+local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_10["播放主线剧情片段"]
 local CreateTrigger = jass.CreateTrigger
 local GetHandleId = jass.GetHandleId
 local GetTriggerUnit = jass.GetTriggerUnit
@@ -259,7 +261,7 @@ local function _____521D_59CB_5316_77E9_5F62_5165_53E3()
         while i < #_____4E3B_7EBF_5267_60C5_77E9_5F62_5165_53E3_914D_7F6E_8868 do
             do
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_77E9_5F62_5165_53E3_914D_7F6E_8868[i + 1]
-                local _____77E9_5F62 = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["矩形变量名"])
+                local _____77E9_5F62 = _____83B7_53D6_77E9_5F62_533A_57DF(_____914D_7F6E["矩形区域名称"])
                 if _____77E9_5F62 == nil then
                     goto __continue47
                 end

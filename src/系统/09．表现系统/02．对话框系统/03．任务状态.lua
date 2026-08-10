@@ -141,36 +141,40 @@ function ____exports.findQuestById(self, _____4EFB_52A1ID)
 end
 function ____exports.resolveQuestEndNpc(self, quest)
     local endNpc = quest["结束NPC"]
-    if not endNpc or endNpc == "没有" then
-        return quest["开始NPC"] or ""
+    if endNpc and endNpc ~= "没有" then
+        return endNpc
     end
-    return endNpc
+    local endNpcConfig = quest["结束NPC配置"]
+    if endNpcConfig then
+        return endNpcConfig["NPC配置名"] or endNpcConfig["NPC名称"]
+    end
+    return quest["开始NPC"] or ""
 end
 function ____exports.findAcceptedQuestBySubmitNpc(self, npcName, playerId, npcQuestId, npcConfigName)
     for ____, quest in ipairs(_____4EFB_52A1_914D_7F6E_5217_8868) do
         do
             if quest["启用"] ~= true then
-                goto __continue39
+                goto __continue40
             end
             if not quest["任务ID"] then
-                goto __continue39
+                goto __continue40
             end
             local questId = tostring(quest["任务ID"])
             if not ____exports.hasPlayerAcceptedQuest(nil, playerId, questId) then
-                goto __continue39
+                goto __continue40
             end
-            local explicitEndNpc = quest["结束NPC"]
+            local explicitEndNpc = quest["结束NPC"] or quest["结束NPC配置"] and (quest["结束NPC配置"]["NPC配置名"] or quest["结束NPC配置"]["NPC名称"])
             if explicitEndNpc and explicitEndNpc ~= "没有" then
                 if explicitEndNpc == npcName or explicitEndNpc == npcConfigName then
                     return quest
                 end
-                goto __continue39
+                goto __continue40
             end
             if npcQuestId ~= nil and quest["任务ID"] == npcQuestId then
                 return quest
             end
         end
-        ::__continue39::
+        ::__continue40::
     end
     return nil
 end
@@ -192,16 +196,16 @@ function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
     for ____, npc in ipairs(_____652F_7EBFNPC_914D_7F6E_5217_8868) do
         do
             if npc["启用"] ~= true then
-                goto __continue52
+                goto __continue53
             end
             if npc["单位ID"] and npc["单位ID"] ~= selectedUnitCode then
-                goto __continue52
+                goto __continue53
             end
             if npc["NPC名称"] == unitName or npc["NPC配置名"] == unitName then
                 return npc
             end
         end
-        ::__continue52::
+        ::__continue53::
     end
     return nil
 end

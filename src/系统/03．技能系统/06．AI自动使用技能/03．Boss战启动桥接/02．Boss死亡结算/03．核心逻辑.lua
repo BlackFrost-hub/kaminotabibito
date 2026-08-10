@@ -46,6 +46,8 @@ local ____require_result_13 = require("系统.00．核心系统.05．中心计�
 local addDelayedCallback = ____require_result_13.addDelayedCallback
 local ____require_result_14 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面")
 local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_14["打开首领奖励选择界面"]
+local ____require_result_15 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_15.debugLogForce
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -61,37 +63,42 @@ local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____653B_51FB_529B_5C5E_6027ID = 1
 local ____BJ_4FEE_6539_589E_52A0 = 0
+local _____6A21_5757_540D = "Boss死亡结算"
+local _____6389_843D_8C03_8BD5_7ED3_7B97_952E = "龙虾守卫"
 local _____5F53_524D_5168_5458_5956_52B1
 local _____5F53_524DBoss_6B7B_4EA1_9996_9886_5956_52B1_6C60ID = ""
 local _____8C7A_72FC_5F02_53D8_7D2F_8BA1_6B21_6570 = 0
 local ____Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID_5217_8868 = {}
+local function _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E)
+    return _____914D_7F6E["键"] == _____6389_843D_8C03_8BD5_7ED3_7B97_952E
+end
 local function _____8BFB_53D6_73A9_5BB6_82F1_96C4_7EC4()
     return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
 end
 local function _____53D6_7ED3_7B97_6D88_606F_679A_4E3E(_____63D0_793A_7C7B_578B)
     repeat
-        local ____switch4 = _____63D0_793A_7C7B_578B
-        local ____cond4 = ____switch4 == "UNITACQUIRED"
-        if ____cond4 then
+        local ____switch5 = _____63D0_793A_7C7B_578B
+        local ____cond5 = ____switch5 == "UNITACQUIRED"
+        if ____cond5 then
             return jglobals.bj_QUESTMESSAGE_UNITACQUIRED
         end
-        ____cond4 = ____cond4 or ____switch4 == "ITEMACQUIRED"
-        if ____cond4 then
+        ____cond5 = ____cond5 or ____switch5 == "ITEMACQUIRED"
+        if ____cond5 then
             return jglobals.bj_QUESTMESSAGE_ITEMACQUIRED
         end
-        ____cond4 = ____cond4 or ____switch4 == "COMPLETED"
-        if ____cond4 then
+        ____cond5 = ____cond5 or ____switch5 == "COMPLETED"
+        if ____cond5 then
             return jglobals.bj_QUESTMESSAGE_COMPLETED
         end
-        ____cond4 = ____cond4 or ____switch4 == "ALWAYSHINT"
-        if ____cond4 then
+        ____cond5 = ____cond5 or ____switch5 == "ALWAYSHINT"
+        if ____cond5 then
             return jglobals.bj_QUESTMESSAGE_ALWAYSHINT
         end
-        ____cond4 = ____cond4 or ____switch4 == "WARNING"
-        if ____cond4 then
+        ____cond5 = ____cond5 or ____switch5 == "WARNING"
+        if ____cond5 then
             return jglobals.bj_QUESTMESSAGE_WARNING
         end
-        ____cond4 = ____cond4 or ____switch4 == "UPDATED"
+        ____cond5 = ____cond5 or ____switch5 == "UPDATED"
         do
             return jglobals.bj_QUESTMESSAGE_UPDATED
         end
@@ -321,10 +328,44 @@ local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, 
         do
             local i = 0
             while i < #_____7269_54C1_5217_8868 do
-                local _____7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_5217_8868[i + 1]))
-                if _____7269_54C1ID > 0 then
-                    CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+                do
+                    local _____7269_54C1_540D = _____7269_54C1_5217_8868[i + 1]
+                    local _____539F_59CB_7269_54C1ID = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_540D)
+                    local _____7269_54C1ID = stringToFourCCSafe(_____539F_59CB_7269_54C1ID)
+                    if _____7269_54C1ID <= 0 then
+                        if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
+                            debugLogForce(
+                                _____6A21_5757_540D,
+                                "直接掉落反查失败",
+                                "名称",
+                                _____7269_54C1_540D,
+                                "rawId",
+                                _____539F_59CB_7269_54C1ID
+                            )
+                        end
+                        goto __continue67
+                    end
+                    local _____5DF2_521B_5EFA_7269_54C1 = CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+                    if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
+                        debugLogForce(
+                            _____6A21_5757_540D,
+                            "创建直接掉落",
+                            "名称",
+                            _____7269_54C1_540D,
+                            "rawId",
+                            _____539F_59CB_7269_54C1ID,
+                            "itemId",
+                            _____7269_54C1ID,
+                            "created",
+                            _____5DF2_521B_5EFA_7269_54C1 ~= nil and _____5DF2_521B_5EFA_7269_54C1 ~= 0,
+                            "x",
+                            _____4F4D_7F6E.x,
+                            "y",
+                            _____4F4D_7F6E.y
+                        )
+                    end
                 end
+                ::__continue67::
                 i = i + 1
             end
         end
@@ -333,10 +374,33 @@ local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, 
         do
             local i = 0
             while i < #_____7269_54C1ID_5217_8868 do
-                local _____7269_54C1ID = stringToFourCCSafe(_____7269_54C1ID_5217_8868[i + 1])
-                if _____7269_54C1ID > 0 then
-                    CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+                do
+                    local _____7269_54C1ID = stringToFourCCSafe(_____7269_54C1ID_5217_8868[i + 1])
+                    if _____7269_54C1ID <= 0 then
+                        if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
+                            debugLogForce(_____6A21_5757_540D, "直接掉落内部ID无效", "rawId", _____7269_54C1ID_5217_8868[i + 1])
+                        end
+                        goto __continue73
+                    end
+                    local _____5DF2_521B_5EFA_7269_54C1 = CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
+                    if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
+                        debugLogForce(
+                            _____6A21_5757_540D,
+                            "创建直接掉落",
+                            "rawId",
+                            _____7269_54C1ID_5217_8868[i + 1],
+                            "itemId",
+                            _____7269_54C1ID,
+                            "created",
+                            _____5DF2_521B_5EFA_7269_54C1 ~= nil and _____5DF2_521B_5EFA_7269_54C1 ~= 0,
+                            "x",
+                            _____4F4D_7F6E.x,
+                            "y",
+                            _____4F4D_7F6E.y
+                        )
+                    end
                 end
+                ::__continue73::
                 i = i + 1
             end
         end
@@ -390,6 +454,12 @@ local function _____53D6_5355_4F4D_540D_5339_914D_539F_59CBID(_____5355_4F4D_540
     end
     return 0
 end
+local function _____6DFB_52A0Boss_6B7B_4EA1_5339_914D_5355_4F4DID(_____5355_4F4D_7C7B_578BID_5217_8868, _____539F_59CBID)
+    local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____539F_59CBID)
+    if _____5355_4F4D_7C7B_578BID > 0 and __TS__ArrayIndexOf(_____5355_4F4D_7C7B_578BID_5217_8868, _____5355_4F4D_7C7B_578BID) < 0 then
+        _____5355_4F4D_7C7B_578BID_5217_8868[#_____5355_4F4D_7C7B_578BID_5217_8868 + 1] = _____5355_4F4D_7C7B_578BID
+    end
+end
 local function _____521D_59CB_5316Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID_5217_8868()
     do
         local i = 0
@@ -397,9 +467,20 @@ local function _____521D_59CB_5316Boss_6B7B_4EA1_914D_7F6E_5355_4F4D_7C7B_578BID
             local _____914D_7F6E = ____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
             local _____5355_4F4D_7C7B_578BID_5217_8868 = {}
             if _____914D_7F6E["Boss引用键"] == nil or _____914D_7F6E["Boss引用键"] == "" then
+                _____6DFB_52A0Boss_6B7B_4EA1_5339_914D_5355_4F4DID(_____5355_4F4D_7C7B_578BID_5217_8868, _____914D_7F6E["Boss单位ID"])
+                local _____539F_59CBID_5217_8868 = _____914D_7F6E["Boss单位ID列表"]
+                if _____539F_59CBID_5217_8868 ~= nil then
+                    do
+                        local j = 0
+                        while j < #_____539F_59CBID_5217_8868 do
+                            _____6DFB_52A0Boss_6B7B_4EA1_5339_914D_5355_4F4DID(_____5355_4F4D_7C7B_578BID_5217_8868, _____539F_59CBID_5217_8868[j + 1])
+                            j = j + 1
+                        end
+                    end
+                end
                 if _____914D_7F6E["Boss单位名"] ~= nil and _____914D_7F6E["Boss单位名"] ~= "" then
                     local _____5355_4F4D_7C7B_578BID = _____53D6_5355_4F4D_540D_5339_914D_539F_59CBID(_____914D_7F6E["Boss单位名"])
-                    if _____5355_4F4D_7C7B_578BID > 0 then
+                    if _____5355_4F4D_7C7B_578BID > 0 and __TS__ArrayIndexOf(_____5355_4F4D_7C7B_578BID_5217_8868, _____5355_4F4D_7C7B_578BID) < 0 then
                         _____5355_4F4D_7C7B_578BID_5217_8868[#_____5355_4F4D_7C7B_578BID_5217_8868 + 1] = _____5355_4F4D_7C7B_578BID
                     end
                 end
@@ -456,6 +537,16 @@ ____exports["获取Boss死亡结算配置"] = function(____Boss_5355_4F4D)
         while i < #____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868 do
             local _____914D_7F6E = ____Boss_6B7B_4EA1_975EUI_6389_843D_4E0E_6E05_7406_914D_7F6E_8868[i + 1]
             if ____Boss_5355_4F4D_5339_914D_914D_7F6E(_____914D_7F6E, i, ____Boss_5355_4F4D, _____5355_4F4D_7C7B_578BID) then
+                if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
+                    debugLogForce(
+                        _____6A21_5757_540D,
+                        "匹配死亡结算配置",
+                        "结算键",
+                        _____914D_7F6E["键"],
+                        "单位类型ID",
+                        _____5355_4F4D_7C7B_578BID
+                    )
+                end
                 return _____914D_7F6E
             end
             i = i + 1
@@ -479,6 +570,16 @@ ____exports["执行Boss死亡结算"] = function(_____914D_7F6E, ____Boss_5355_4
     local _____8FD0_884CBoss_5355_4F4D = _____89E3_6790Boss_5355_4F4D(_____914D_7F6E, ____Boss_5355_4F4D)
     if not _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_524D_7F6E(_____914D_7F6E, _____51FB_6740_8005) then
         return false
+    end
+    if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
+        debugLogForce(
+            _____6A21_5757_540D,
+            "开始执行死亡结算",
+            "结算键",
+            _____914D_7F6E["键"],
+            "Boss单位类型ID",
+            _____8FD0_884CBoss_5355_4F4D ~= nil and _____8FD0_884CBoss_5355_4F4D ~= 0 and GetUnitTypeId(_____8FD0_884CBoss_5355_4F4D) or 0
+        )
     end
     ____exports["打开Boss死亡首领奖励UI"](_____914D_7F6E["首领奖励池ID"])
     _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, _____8FD0_884CBoss_5355_4F4D, _____51FB_6740_8005)

@@ -17,6 +17,9 @@ import {
   UnitHasItemOfTypeBJ
 } from "../../../lib/扩展函数/物品相关函数/物品判断函数";
 import { 任务配置 } from "../../08．任务系统/00．配置表/02．任务配置表";
+const { 清理任务结束NPC } = require("系统.08．任务系统.00．配置表.04．NPC生成器") as {
+  清理任务结束NPC: (this: void, 任务: 任务配置) => void;
+};
 import itemsData from "../../02．物品系统/01．装备数据";
 import { findStatKey, getItemDataEntry, getItemDataEntryByIdStr } from "../../../lib/扩展函数/物品相关函数/装备数据查询";
 import { questDB } from "../../08．任务系统/01．任务数据";
@@ -319,6 +322,7 @@ export function handleQuestSubmit(params: {
     refreshTaskUIForAllClientsSoon(dialogOwnerId, questId);
     function 执行任务完成后动作(this: void): void {
       if (quest.完成后动作) quest.完成后动作(dialogOwnerId);
+      清理任务结束NPC(quest);
     }
     if (quest.NPC完成对白) {
       const completeRaw = pickNpcCompleteTextByBranch(quest.NPC完成对白, rewardBranchIndex);

@@ -20,7 +20,7 @@ export const 地精洞窟演出紧凑剧情片段: 紧凑剧情片段配置 = {
       跳过也执行: true,
       动作ID: "JLC精灵村_地精洞窟演出前置", 名称: "进入洞窟后切入地精洞窟演出",
       参数: {
-        触发区域: "gg_rct______________020",
+        触发区域: "地精洞窟.剧情进入区域",
         Boss键: "Boss.地精巫师",
         开启电影模式: true,
         玩家英雄组暂停: true,
@@ -42,8 +42,8 @@ export const 地精洞窟演出紧凑剧情片段: 紧凑剧情片段配置 = {
       动作ID: "JLC精灵村_地精洞窟祭坛演出开始", 名称: "关闭黑幕并切入祭坛镜头",
       参数: {
         关闭电影滤镜: true,
-        开启区域音乐: "gg_snd_JQBGM01 @ gg_rct______________102",
-        旧JASS功能清单: "DisplayCineFilter(false) / SetStackedSoundBJ(true, gg_snd_JQBGM01, gg_rct______________102) / CreateUnit(演员1-6) / CameraSetupApplyForceDuration",
+        开启区域音乐: "gg_snd_JQBGM01 @ 地精洞窟.演出音乐区域",
+        旧JASS功能清单: "DisplayCineFilter(false) / SetStackedSoundBJ(true, gg_snd_JQBGM01, 全局变量矩形区域102) / CreateUnit(演员1-6) / CameraSetupApplyForceDuration",
       },
     },
     {

@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 动态矩形区域配置表 } from "../../../07．地形系统/09．动态矩形区域注册表/01．动态矩形区域配置表";
+
 export const 米亚任务ID = 10021;
 export const 米亚NPC单位ID = "n07A";
 export const 米亚单位ID = "N00V";
@@ -23,10 +25,11 @@ export const 米亚Boss区落点X = 16017.8;
 export const 米亚Boss区落点Y = -6750.4;
 export const 米亚Boss区落点朝向 = 180;
 
-export const 米亚入口区域左 = 13344;
-export const 米亚入口区域右 = 13824;
-export const 米亚入口区域下 = -9056;
-export const 米亚入口区域上 = -6176;
+const 米亚入口区域配置 = 动态矩形区域配置表["支线.米亚一次性入口监听"];
+export const 米亚入口区域左 = 米亚入口区域配置.左;
+export const 米亚入口区域右 = 米亚入口区域配置.右;
+export const 米亚入口区域下 = 米亚入口区域配置.下;
+export const 米亚入口区域上 = 米亚入口区域配置.上;
 
 export const 米亚入水X = 13030.5;
 export const 米亚入水Y = -7561.3;

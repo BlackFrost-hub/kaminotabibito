@@ -2,6 +2,9 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
 };
@@ -180,7 +183,7 @@ export function 执行沙漠食人魔一阶段死亡前置(this: void, 参数: �
   一阶段死亡X = GetUnitX(dyingUnit);
   一阶段死亡Y = GetUnitY(dyingUnit);
   const 胜利音效 = jglobals.gg_snd_shengliBgm;
-  const 战斗区域 = jglobals.gg_rct______________047;
+  const 战斗区域 = 获取矩形区域("沙漠区域.Boss战区域");
   卸载区域背景音乐句柄(胜利音效, 战斗区域);
 
   const riftTypeId = stringToFourCCSafe("e08M");

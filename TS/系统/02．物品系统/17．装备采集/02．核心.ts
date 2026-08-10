@@ -7,7 +7,9 @@
  */
 
 const jass = require("jass.common") as any;
-const jglobals = require("jass.globals") as any;
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 
 const { 采集配置列表 } = require("系统.02．物品系统.17．装备采集.00．公共.01．配置表") as {
   采集配置列表: import("./00．公共/01．配置表").采集配置项[];
@@ -56,7 +58,7 @@ function 取采集配置(this: void, 物品ID: number): import("./00．公共/01
 }
 
 function 获取区域rect(this: void, rect名: string): any {
-  return (jglobals as any)[rect名];
+  return 获取矩形区域(rect名);
 }
 
 function 在区域随机位置刷新采集物品(this: void, 物品ID: number, rect名: string): void {
@@ -77,14 +79,14 @@ function 处理采集物品拾取(this: void, 单位: any, 物品: any): void {
   const 物品ID = 取物品类型ID(物品);
   const 配置 = 取采集配置(物品ID);
   if (配置 == null) return;
-  addDelayedCallback(配置.刷新延迟秒 * 1000, () => 在区域随机位置刷新采集物品(物品ID, 配置.刷新区域Rect名));
+  addDelayedCallback(配置.刷新延迟秒 * 1000, () => 在区域随机位置刷新采集物品(物品ID, 配置.刷新区域名称));
 }
 
 function 处理采集物品丢弃(this: void, 单位: any, 物品: any): void {
   const 物品ID = 取物品类型ID(物品);
   const 配置 = 取采集配置(物品ID);
   if (配置 == null) return;
-  addDelayedCallback(配置.刷新延迟秒 * 1000, () => 在区域随机位置刷新采集物品(物品ID, 配置.刷新区域Rect名));
+  addDelayedCallback(配置.刷新延迟秒 * 1000, () => 在区域随机位置刷新采集物品(物品ID, 配置.刷新区域名称));
 }
 
 export function 初始化装备采集(this: void): void {

@@ -21,7 +21,7 @@ export const 沙漠食人魔Boss启动紧凑剧情片段: 紧凑剧情片段配�
         触发进度: 10,
         Boss键: "Boss.沙漠食人魔",
         触发范围: 1000,
-        解锁视野: "gg_rct______________047",
+        解锁视野: "沙漠区域.Boss战区域",
         旧JASS功能清单: "GroupAddUnit / SetUnitOwner / PauseUnit(true) / SetUnitInvulnerable(true) / 镜头与朝向预置",
       },
     },

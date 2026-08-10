@@ -39,6 +39,9 @@ export interface Boss死亡击杀者奖励 {
 
 export interface Boss死亡结算配置 {
   键: string;
+  /** 优先使用物编 raw id 匹配，避免颜色码、等级后缀或同名单位导致名称反查失败。 */
+  Boss单位ID?: string;
+  Boss单位ID列表?: string[];
   Boss单位名?: string;
   Boss单位名列表?: string[];
   Boss引用键?: string;
