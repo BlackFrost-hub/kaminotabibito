@@ -11,7 +11,7 @@ createMeleeBossHeroUnit('N00V', '污染之猫·腐化者米亚', {
 
   -- Second-chapter hidden Boss baseline.
   level = 11,
-  hp = 36800,
+  hp = 29440,
   mana = 1100,
   initialMana = 1100,
   manaRegen = 11.0,
@@ -26,7 +26,7 @@ createMeleeBossHeroUnit('N00V', '污染之猫·腐化者米亚', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 1750,
+  damageBase = 1400,
   attackCooldown = 1.0,
   attackType = AttackType.Chaos,
   defense = 35,

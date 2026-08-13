@@ -1,7 +1,6 @@
 local ____lualib = require("lualib_bundle")
-local Set = ____lualib.Set
-local __TS__New = ____lualib.__TS__New
 local Map = ____lualib.Map
+local __TS__New = ____lualib.__TS__New
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
 ---
@@ -22,6 +21,8 @@ local beginEquipItemMessageSilence = ____require_result_4.beginEquipItemMessageS
 local endEquipItemMessageSilence = ____require_result_4.endEquipItemMessageSilence
 local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_5.debugLogForce
+local ____require_result_6 = require("系统.02．物品系统.15．装备技能.00．物品.00．通用物品.00．通用物品工具")
+local _____662F_4E00_6B21_6027_6253_9020_58F3_7C7B_578BID = ____require_result_6["是一次性打造壳类型ID"]
 local GetItemTypeId = jass.GetItemTypeId
 local GetItemCharges = jass.GetItemCharges
 local SetItemCharges = jass.SetItemCharges
@@ -31,21 +32,6 @@ local UnitAddItem = jass.UnitAddItem
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local _____5408_6210_8C03_8BD5_6A21_5757 = "装备合成"
-local _____4E00_6B21_6027_6253_9020_58F3_7C7B_578BID_5217_8868 = {
-    "I01A",
-    "I04U",
-    "I09A",
-    "I09L",
-    "I09T"
-}
-local _____4E00_6B21_6027_6253_9020_58F3_7C7B_578BID_96C6_5408 = __TS__New(Set)
-do
-    local i = 0
-    while i < #_____4E00_6B21_6027_6253_9020_58F3_7C7B_578BID_5217_8868 do
-        _____4E00_6B21_6027_6253_9020_58F3_7C7B_578BID_96C6_5408:add(stringToFourCCSafe(_____4E00_6B21_6027_6253_9020_58F3_7C7B_578BID_5217_8868[i + 1]))
-        i = i + 1
-    end
-end
 local function _____8F93_51FA_5408_6210_8C03_8BD5_65E5_5FD7(...)
     debugLogForce(_____5408_6210_8C03_8BD5_6A21_5757, ...)
 end
@@ -96,7 +82,21 @@ local _____5408_6210_914D_65B9_5B9A_4E49_5217_8868 = {
         {"炽热能量#I08Z", 3},
         {"食尸鬼头颅#I064", 1},
         {"合成|打造#I09A", 1}
-    }, ["产物"] = "熔狱头骷#I09E"}
+    }, ["产物"] = "熔狱头骷#I09E"},
+    {["材料"] = {{"星露花#I0H4", 3}, {"精灵药水合成#I0HE", 1}}, ["产物"] = "星露生命精华#I0H7"},
+    {["材料"] = {{"晨曦花#I0H5", 3}, {"精灵药水合成#I0HE", 1}}, ["产物"] = "晨曦魔力精华#I0H8"},
+    {["材料"] = {{"月影花#I0H6", 3}, {"精灵药水合成#I0HE", 1}}, ["产物"] = "月影灵息精华#I0H9"},
+    {["材料"] = {{"星露花#I0H4", 2}, {"晨曦花#I0H5", 1}, {"精灵生命药水#IEL1", 1}, {"精灵药水合成#I0HE", 1}}, ["产物"] = "星曦复苏药剂#I0HA"},
+    {["材料"] = {{"晨曦花#I0H5", 2}, {"月影花#I0H6", 1}, {"精灵魔法药水#IEM1", 1}, {"精灵药水合成#I0HE", 1}}, ["产物"] = "曦月澄明药剂#I0HB"},
+    {["材料"] = {{"星露花#I0H4", 1}, {"月影花#I0H6", 2}, {"精灵生命药水#IEL1", 1}, {"精灵药水合成#I0HE", 1}}, ["产物"] = "星月净愈药剂#I0HC"},
+    {["材料"] = {
+        {"星露花#I0H4", 1},
+        {"晨曦花#I0H5", 1},
+        {"月影花#I0H6", 1},
+        {"精灵生命药水#IEL1", 1},
+        {"精灵魔法药水#IEM1", 1},
+        {"精灵药水合成#I0HE", 1}
+    }, ["产物"] = "精灵王城三花灵药#I0HD"}
 }
 local _____5408_6210_914D_65B9_7D22_5F15 = __TS__New(Map)
 local _____5408_6210_6210_529F_7279_6548_8DEF_5F84 = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdl"
@@ -122,7 +122,7 @@ local function _____5408_5E76_539F_6599(_____539F_6599_5217_8868)
                 local count = _____539F_6599_5217_8868[i + 1][2]
                 local itemTypeId = _____89E3_6790_5408_6210_7269_54C1_7C7B_578BID(_____7269_54C1_540D)
                 if not (itemTypeId > 0) or not (count > 0) then
-                    goto __continue10
+                    goto __continue8
                 end
                 local merged = false
                 do
@@ -130,14 +130,14 @@ local function _____5408_5E76_539F_6599(_____539F_6599_5217_8868)
                     while j < #_____7ED3_679C do
                         do
                             if _____7ED3_679C[j + 1]["物品类型ID"] ~= itemTypeId then
-                                goto __continue13
+                                goto __continue11
                             end
-                            local ____7ED3_679C_index_6, _____6570_91CF_7 = _____7ED3_679C[j + 1], "数量"
-                            ____7ED3_679C_index_6[_____6570_91CF_7] = ____7ED3_679C_index_6[_____6570_91CF_7] + count
+                            local ____7ED3_679C_index_7, _____6570_91CF_8 = _____7ED3_679C[j + 1], "数量"
+                            ____7ED3_679C_index_7[_____6570_91CF_8] = ____7ED3_679C_index_7[_____6570_91CF_8] + count
                             merged = true
                             break
                         end
-                        ::__continue13::
+                        ::__continue11::
                         j = j + 1
                     end
                 end
@@ -145,7 +145,7 @@ local function _____5408_5E76_539F_6599(_____539F_6599_5217_8868)
                     _____7ED3_679C[#_____7ED3_679C + 1] = {["物品类型ID"] = itemTypeId, ["数量"] = count}
                 end
             end
-            ::__continue10::
+            ::__continue8::
             i = i + 1
         end
     end
@@ -197,7 +197,7 @@ local function _____8BFB_53D6_80CC_5305_72B6_6001(_____5355_4F4D, _____89E6_53D1
             do
                 local _____7269_54C1 = UnitItemInSlot(_____5355_4F4D, i)
                 if _____7269_54C1 == nil or _____7269_54C1 == 0 then
-                    goto __continue28
+                    goto __continue26
                 end
                 if _____7269_54C1 == _____89E6_53D1_7269_54C1 then
                     _____627E_5230_89E6_53D1_7269_54C1 = true
@@ -210,7 +210,7 @@ local function _____8BFB_53D6_80CC_5305_72B6_6001(_____5355_4F4D, _____89E6_53D1
                     ["跳过实际消耗"] = false
                 }
             end
-            ::__continue28::
+            ::__continue26::
             i = i + 1
         end
     end
@@ -250,14 +250,14 @@ local function _____6784_5EFA_6D88_8017_8BA1_5212(_____5355_4F4D, _____89E6_53D1
                     do
                         local _____80CC_5305_7269_54C1 = _____80CC_5305_72B6_6001[j + 1]
                         if _____80CC_5305_7269_54C1["物品类型ID"] ~= _____6750_6599["物品类型ID"] or _____80CC_5305_7269_54C1["可用数量"] <= 0 then
-                            goto __continue37
+                            goto __continue35
                         end
                         local _____672C_6B21_6D88_8017 = _____80CC_5305_7269_54C1["可用数量"] < _____9700_8981_6570_91CF and _____80CC_5305_7269_54C1["可用数量"] or _____9700_8981_6570_91CF
                         _____80CC_5305_7269_54C1["可用数量"] = _____80CC_5305_7269_54C1["可用数量"] - _____672C_6B21_6D88_8017
                         _____80CC_5305_7269_54C1["消耗数量"] = _____80CC_5305_7269_54C1["消耗数量"] + _____672C_6B21_6D88_8017
                         _____9700_8981_6570_91CF = _____9700_8981_6570_91CF - _____672C_6B21_6D88_8017
                     end
-                    ::__continue37::
+                    ::__continue35::
                     j = j + 1
                 end
             end
@@ -341,7 +341,7 @@ local function _____6D88_8017_5408_6210_6750_6599(_____5355_4F4D, _____7269_54C1
                         "item",
                         fourCCToStringSafe(_____72B6_6001["物品类型ID"])
                     )
-                    goto __continue50
+                    goto __continue48
                 end
                 local charges = GetItemCharges(_____72B6_6001["物品"])
                 _____8F93_51FA_5408_6210_8C03_8BD5_65E5_5FD7(
@@ -360,7 +360,7 @@ local function _____6D88_8017_5408_6210_6750_6599(_____5355_4F4D, _____7269_54C1
                     RemoveItem(_____72B6_6001["物品"])
                 end
             end
-            ::__continue50::
+            ::__continue48::
             i = i + 1
         end
     end
@@ -409,7 +409,7 @@ ____exports["是一次性打造壳"] = function(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
     end
-    return _____4E00_6B21_6027_6253_9020_58F3_7C7B_578BID_96C6_5408:has(GetItemTypeId(_____7269_54C1))
+    return _____662F_4E00_6B21_6027_6253_9020_58F3_7C7B_578BID(GetItemTypeId(_____7269_54C1))
 end
 local function _____5904_7406_6307_5B9A_7C7B_578B_7269_54C1_5408_6210_6253_9020(_____5355_4F4D, _____7269_54C1, _____7269_54C1_7C7B_578BID, _____4F7F_7528_865A_62DF_89E6_53D1_6750_6599)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 or not (_____7269_54C1_7C7B_578BID > 0) then
@@ -445,11 +445,14 @@ ____exports["处理通用物品合成打造"] = function(_____5355_4F4D, _____72
         false
     )
 end
-____exports["处理一次性打造壳合成"] = function(_____5355_4F4D, _____7269_54C1_7C7B_578BID)
-    if not _____4E00_6B21_6027_6253_9020_58F3_7C7B_578BID_96C6_5408:has(_____7269_54C1_7C7B_578BID) then
+____exports["处理一次性打造壳合成"] = function(_____5355_4F4D, _____7269_54C1_7C7B_578BID, _____7269_54C1)
+    if not _____662F_4E00_6B21_6027_6253_9020_58F3_7C7B_578BID(_____7269_54C1_7C7B_578BID) then
         return
     end
     _____5904_7406_6307_5B9A_7C7B_578B_7269_54C1_5408_6210_6253_9020(_____5355_4F4D, nil, _____7269_54C1_7C7B_578BID, true)
+    if _____7269_54C1 ~= nil and _____7269_54C1 ~= 0 then
+        RemoveItem(_____7269_54C1)
+    end
 end
 _____521D_59CB_5316_5408_6210_914D_65B9()
 return ____exports

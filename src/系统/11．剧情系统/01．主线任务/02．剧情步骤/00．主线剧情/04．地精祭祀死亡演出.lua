@@ -18,8 +18,8 @@ local ModifyGateBJ = ____require_result_2.ModifyGateBJ
 local ForGroupBJ = ____require_result_2.ForGroupBJ
 local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local SetUnitLifePercentBJ = ____require_result_3.SetUnitLifePercentBJ
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_4.EC_CreateEffect
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
 local ____require_result_5 = require("系统.01．单位系统.08．单位配置表.02．Boss配置表")
 local _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID = ____require_result_5["按名字反查Boss单位ID"]
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
@@ -107,16 +107,14 @@ local function ____on_5730_7CBE_6B7B_4EA1_8840_6DB2_7279_6548()
         return
     end
     _____8840_6DB2_7279_6548_6B21_6570 = _____8840_6DB2_7279_6548_6B21_6570 + 1
-    EC_CreateEffect(
-        "Objects\\Spawnmodels\\Human\\HumanBlood\\BloodElfSpellThiefBlood.mdl",
-        GetUnitX(_____6B8B_8840_5730_7CBE),
-        GetUnitY(_____6B8B_8840_5730_7CBE),
-        0,
-        270,
-        1.5,
-        1,
-        2
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = "Objects\\Spawnmodels\\Human\\HumanBlood\\BloodElfSpellThiefBlood.mdl",
+        X = GetUnitX(_____6B8B_8840_5730_7CBE),
+        Y = GetUnitY(_____6B8B_8840_5730_7CBE),
+        ["面向角度"] = 270,
+        ["缩放"] = 1.5,
+        ["持续秒"] = 2
+    })
 end
 local function _____542F_52A8_5730_7CBE_6B7B_4EA1_8840_6DB2_7279_6548()
     if _____8840_6DB2_7279_6548_5468_671FID ~= 0 then
@@ -131,16 +129,14 @@ local function ____on_795E_79D8_4EBA_7B2C_4E8C_9ED1_6D1E()
     if _____795E_79D8_4EBA == nil or _____795E_79D8_4EBA == 0 then
         return
     end
-    EC_CreateEffect(
-        "war3mapImported\\blackhole.mdx",
-        GetUnitX(_____795E_79D8_4EBA),
-        GetUnitY(_____795E_79D8_4EBA),
-        0,
-        270,
-        3,
-        1,
-        4
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = "war3mapImported\\blackhole.mdx",
+        X = GetUnitX(_____795E_79D8_4EBA),
+        Y = GetUnitY(_____795E_79D8_4EBA),
+        ["面向角度"] = 270,
+        ["缩放"] = 3,
+        ["持续秒"] = 4
+    })
 end
 local function ____on_795E_79D8_4EBA_6DE1_51FA()
     local _____795E_79D8_4EBA = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____5730_7CBE_6B7B_4EA1_795E_79D8_4EBA_5355_4F4D_952E)
@@ -181,19 +177,17 @@ local function _____64AD_653E_5730_7CBE_62B9_9664_7279_6548()
     if _____6B8B_8840_5730_7CBE == nil or _____6B8B_8840_5730_7CBE == 0 then
         return
     end
-    EC_CreateEffect(
-        "war3mapImported\\Eraser.mdx",
-        GetUnitX(_____6B8B_8840_5730_7CBE),
-        GetUnitY(_____6B8B_8840_5730_7CBE),
-        0,
-        270,
-        2.2,
-        1,
-        2
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = "war3mapImported\\Eraser.mdx",
+        X = GetUnitX(_____6B8B_8840_5730_7CBE),
+        Y = GetUnitY(_____6B8B_8840_5730_7CBE),
+        ["面向角度"] = 270,
+        ["缩放"] = 2.2,
+        ["持续秒"] = 2
+    })
 end
 local function ____on_5730_7CBE_6B7B_4EA1_6F14_51FA_79FB_52A8_82F1_96C4()
-    local unit = jass.GetEnumUnit()
+    local unit = jass:GetEnumUnit()
     if unit == nil or unit == 0 then
         return
     end
@@ -237,16 +231,14 @@ local function _____521B_5EFA_5730_7CBE_6B7B_4EA1_795E_79D8_4EBA_6F14_51FA(_____
         return nil
     end
     _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____5730_7CBE_6B7B_4EA1_795E_79D8_4EBA_5355_4F4D_952E, _____795E_79D8_4EBA)
-    EC_CreateEffect(
-        "war3mapImported\\blackhole.mdx",
-        GetUnitX(_____795E_79D8_4EBA),
-        GetUnitY(_____795E_79D8_4EBA),
-        0,
-        270,
-        3,
-        1,
-        4
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = "war3mapImported\\blackhole.mdx",
+        X = GetUnitX(_____795E_79D8_4EBA),
+        Y = GetUnitY(_____795E_79D8_4EBA),
+        ["面向角度"] = 270,
+        ["缩放"] = 3,
+        ["持续秒"] = 4
+    })
     IssuePointOrder(_____795E_79D8_4EBA, "move", -26296.4, -13702.4)
     if _____6B8B_8840_5730_7CBE ~= nil and _____6B8B_8840_5730_7CBE ~= 0 then
         SetUnitFacing(

@@ -21,10 +21,11 @@ const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统
 const { YDWESetEventDamage } = require("lib.扩展函数.封装函数.06．伤害函数.index") as {
   YDWESetEventDamage: (this: void, amount: number) => boolean;
 };
-const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, callbackId: number) => void;
-  getServerTime: (this: void) => number;
+const { 创建可取消任务组 } = require("系统.00．核心系统.05．中心计时器") as {
+  创建可取消任务组: (this: void) => {
+    添加延迟: (this: void, 毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any) => number;
+    清空: (this: void) => void;
+  };
 };
 const { YDUserDataClearSafe, YDUserDataClearTableSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataClearSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => void;
@@ -97,8 +98,7 @@ const bj_QUESTTYPE_OPT_UNDISCOVERED = jglobals.bj_QUESTTYPE_OPT_UNDISCOVERED as 
 const bj_TIMETYPE_SET = jglobals.bj_TIMETYPE_SET as number;
 
 let 已初始化主线剧情特殊事件 = false;
-const 延迟显示任务: Array<{ dueTime: number; 配置: 主线剧情最终伤害事件配置 }> = [];
-let 延迟显示扫描ID = 0;
+const 延迟显示任务组 = 创建可取消任务组();
 
 function 获取全局句柄(this: void, 变量名: string): any {
   return jglobals[变量名];
@@ -171,36 +171,13 @@ function 执行主线剧情延迟显示(this: void, 配置: 主线剧情最终�
   }
 }
 
-function on主线剧情延迟显示扫描(this: void): void {
-  const now = getServerTime();
-  let writeIndex = 0;
-  for (let i = 0; i < 延迟显示任务.length; i++) {
-    const task = 延迟显示任务[i];
-    if (now >= task.dueTime) {
-      执行主线剧情延迟显示(task.配置);
-      continue;
-    }
-    延迟显示任务[writeIndex] = task;
-    writeIndex++;
-  }
-  for (let i = 延迟显示任务.length - 1; i >= writeIndex; i--) {
-    延迟显示任务.pop();
-  }
-  if (延迟显示任务.length === 0 && 延迟显示扫描ID !== 0) {
-    removePeriodicCallback(延迟显示扫描ID);
-    延迟显示扫描ID = 0;
-  }
-}
-
 function 启动延迟显示(this: void, 配置: 主线剧情最终伤害事件配置): void {
   if (配置.延迟显示 == null) return;
-  延迟显示任务.push({
-    dueTime: getServerTime() + 配置.延迟显示.延迟秒数 * 1000,
+  延迟显示任务组.添加延迟(
+    配置.延迟显示.延迟秒数 * 1000,
+    执行主线剧情延迟显示,
     配置,
-  });
-  if (延迟显示扫描ID === 0) {
-    延迟显示扫描ID = addPeriodicCallback(10, on主线剧情延迟显示扫描);
-  }
+  );
 }
 
 function 命中技能通道事件配置(this: void, 配置: 主线剧情技能通道事件配置, castingUnit: any, spellAbilityId: number): boolean {

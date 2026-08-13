@@ -89,4 +89,5 @@ ____exports["杀戮食人魔技能配置"] = {
         ["起手音效路径"] = "war3mapImported\\GWSY04.wav"
     }
 }
+____exports["杀戮食人魔音效配置"] = {["默认裁断距离"] = 2800, ["深渊魔咒"] = {["生效"] = "Sound\\Boss\\Ogre\\SFX\\ogre_abyss_curse_cast_64k.mp3"}, ["痛之束缚"] = {["建立"] = "Sound\\Boss\\Ogre\\SFX\\ogre_pain_bond_chain_64k.mp3"}, ["疼痛复仇"] = {["解控"] = "Sound\\Boss\\Ogre\\SFX\\ogre_pain_revenge_breakout_64k.mp3"}}
 return ____exports

@@ -54,3 +54,64 @@ createChapter3OtherNpc(
   1.25,
   45.0
 )
+
+local function createDemonCityQuestNpc(id, name, modelFile, icon, scale)
+  local unit = UnitDefinition:new(id, 'n03W')
+  unit:setDependencyEquivalents('')
+  unit:setNameEditorSuffix('')
+  unit:setName(name)
+  unit:setTooltipBasic(name)
+  unit:setTooltipExtended(name)
+  unit:setDescription(name)
+  unit:setNormalAbilities('Aneu,Avul,Apit')
+  unit:setModelFile(modelFile)
+  unit:setModelFileExtraVersions('0')
+  unit:setIconGameInterface(icon)
+  unit:setHideMinimapDisplay(true)
+  unit:setScalingValue(scale)
+  unit:setSpeedBase(1)
+  unit:setTurnRate(2.0)
+  unit:setRace(Race.Demon)
+  unit:setUpgradesUsed('')
+  return unit
+end
+
+createDemonCityQuestNpc(
+  'n06H',
+  '年轻恶魔·泽迦',
+  'Unit\\NPC\\03-Chapter\\Other\\DemonCity\\YoungDemon.mdx',
+  'Unit\\NPC\\03-Chapter\\Other\\Icon\\YoungDemon.blp',
+  1.15
+)
+
+createDemonCityQuestNpc(
+  'n06I',
+  '王墓守陵人',
+  'Unit\\NPC\\03-Chapter\\Other\\DemonCity\\RoyalGravekeeper.mdx',
+  'Unit\\NPC\\03-Chapter\\Other\\Icon\\RoyalGravekeeper.blp',
+  1.15
+)
+
+createDemonCityQuestNpc(
+  'n06J',
+  '熔灵工匠',
+  'Unit\\NPC\\03-Chapter\\Other\\DemonCity\\MoltenArtisan.mdx',
+  'Unit\\NPC\\03-Chapter\\Other\\Icon\\MoltenArtisan.blp',
+  1.15
+)
+
+createDemonCityQuestNpc(
+  'n06K',
+  '熔火酒窖管事',
+  'Unit\\NPC\\03-Chapter\\Other\\DemonCity\\WineCellarManager.mdx',
+  'Unit\\NPC\\03-Chapter\\Other\\Icon\\WineCellarManager.blp',
+  1.25
+)
+
+createDemonCityQuestNpc(
+  'n06L',
+  '恶魔城外巡卫',
+  'Unit\\NPC\\03-Chapter\\Other\\DemonCity\\DemonGuard.mdx',
+  'Unit\\NPC\\03-Chapter\\Other\\Icon\\DemonGuard.blp',
+  1.25
+)

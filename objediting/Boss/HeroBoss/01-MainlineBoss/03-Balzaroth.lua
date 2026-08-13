@@ -10,7 +10,7 @@ createMeleeBossHeroUnit('N03G', '熔岩恶魔王·巴尔扎罗斯', {
   description = '熔岩恶魔王·巴尔扎罗斯',
 
   level = 40,
-  hp = 42000,
+  hp = 33600,
   mana = 2000,
   initialMana = 2000,
   manaRegen = 25.0,
@@ -22,7 +22,7 @@ createMeleeBossHeroUnit('N03G', '熔岩恶魔王·巴尔扎罗斯', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 2000,
+  damageBase = 1600,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 1.0,

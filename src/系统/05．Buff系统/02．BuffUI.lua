@@ -83,10 +83,10 @@ function renderBuffBarLocal(vm)
                         uiShowFrame(slot.root)
                     end
                     if slot.remainText ~= 0 then
-                        japi.DzFrameSetText(slot.remainText, slotVM.remainText)
+                        japi:DzFrameSetText(slot.remainText, slotVM.remainText)
                     end
                     if slot.stackText ~= 0 then
-                        japi.DzFrameSetText(slot.stackText, slotVM.stackText)
+                        japi:DzFrameSetText(slot.stackText, slotVM.stackText)
                         if slotVM.stackText ~= "" then
                             if slot.stackBadge ~= 0 then
                                 uiShowFrame(slot.stackBadge)
@@ -100,10 +100,10 @@ function renderBuffBarLocal(vm)
                         end
                     end
                     if slot.tipBodyText ~= 0 then
-                        japi.DzFrameSetText(slot.tipBodyText, slotVM.tooltipBodyText)
+                        japi:DzFrameSetText(slot.tipBodyText, slotVM.tooltipBodyText)
                     end
                     if slot.tipSourceText ~= 0 then
-                        japi.DzFrameSetText(slot.tipSourceText, slotVM.tooltipSourceText)
+                        japi:DzFrameSetText(slot.tipSourceText, slotVM.tooltipSourceText)
                     end
                     if slot.hit ~= 0 then
                         uiShowFrame(slot.hit)
@@ -128,7 +128,7 @@ function rebuildAllBuffBarViewModels()
     end
 end
 function syncBuffBar()
-    local localPlayerId = jass.GetPlayerId(jass.GetLocalPlayer())
+    local localPlayerId = jass:GetPlayerId(jass:GetLocalPlayer())
     rebuildAllBuffBarViewModels()
     local ____temp_1
     if localPlayerId >= 0 then
@@ -146,9 +146,9 @@ function syncBuffBar()
         "BuffUI",
         (((((("pid=" .. tostring(localPlayerId)) .. " vm=") .. (viewModel and "yes" or "nil")) .. " vis=") .. tostring(visCount)) .. " slotsLen=") .. tostring(#slots)
     )
-    if jass.GetLocalPlayer() == jass.Player(localPlayerId) and viewModel then
+    if jass:GetLocalPlayer() == jass:Player(localPlayerId) and viewModel then
         renderBuffBarLocal(viewModel)
-    elseif jass.GetLocalPlayer() == jass.Player(localPlayerId) then
+    elseif jass:GetLocalPlayer() == jass:Player(localPlayerId) then
         hideAllSlots()
     end
 end
@@ -233,13 +233,13 @@ local function uiCreateTextLabel(name, parent, text, position, size)
     )
 end
 local function getTriggerUiEventFrame()
-    return japi.DzGetTriggerUIEventFrame()
+    return japi:DzGetTriggerUIEventFrame()
 end
 local function setFrameLevelSafe(frame, level)
     if frame == 0 then
         return
     end
-    japi.DzFrameSetPriority(frame, level)
+    japi:DzFrameSetPriority(frame, level)
 end
 local function showSlotTooltipByIndex(index)
     local s = slots[index + 1]
@@ -322,7 +322,7 @@ local function createOneSlot(index, parent)
         {width = ICON_W, height = 0.014}
     ) or 0
     if remainText and remainText ~= 0 then
-        japi.DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
+        japi:DzFrameSetTextAlignment(remainText, ____UI_5DE5_5177.FramePoint.CENTER)
         setFrameLevelSafe(remainText, 182)
     end
     local stackBadge = uiCreateFrame({
@@ -359,9 +359,9 @@ local function createOneSlot(index, parent)
         {width = STACK_BADGE_W * 0.86, height = STACK_BADGE_H * 0.72}
     ) or 0
     if stackText and stackText ~= 0 then
-        japi.DzFrameSetTextAlignment(stackText, -1)
-        japi.DzFrameSetTextAlignment(stackText, STACK_BADGE_TEXT_ALIGN_CENTER)
-        japi.DzFrameSetFont(stackText, STACK_BADGE_FONT, STACK_BADGE_FONT_SIZE, 0)
+        japi:DzFrameSetTextAlignment(stackText, -1)
+        japi:DzFrameSetTextAlignment(stackText, STACK_BADGE_TEXT_ALIGN_CENTER)
+        japi:DzFrameSetFont(stackText, STACK_BADGE_FONT, STACK_BADGE_FONT_SIZE, 0)
         setFrameLevelSafe(stackText, 184)
     end
     local hit = uiCreateFrame({
@@ -375,7 +375,7 @@ local function createOneSlot(index, parent)
     }) or 0
     if hit and hit ~= 0 then
         hoverSlotIndexByFrameId[hit] = index
-        japi.DzFrameSetAllPoints(hit, bd)
+        japi:DzFrameSetAllPoints(hit, bd)
         setFrameLevelSafe(hit, 181)
         uiSetFrameHoverEvents(hit, onSlotHoverEnter, onSlotHoverLeave, false)
     end
@@ -424,8 +424,8 @@ local function createOneSlot(index, parent)
         {width = boxW - TIP_PAD_X * 2, height = 0.037}
     ) or 0
     if tipBodyText and tipBodyText ~= 0 then
-        japi.DzFrameSetTextAlignment(tipBodyText, -1)
-        japi.DzFrameSetTextAlignment(tipBodyText, 0)
+        japi:DzFrameSetTextAlignment(tipBodyText, -1)
+        japi:DzFrameSetTextAlignment(tipBodyText, 0)
         setFrameLevelSafe(tipBodyText, 201)
         uiHideFrame(tipBodyText)
     end
@@ -449,8 +449,8 @@ local function createOneSlot(index, parent)
         {width = boxW - TIP_PAD_X * 2, height = TIP_SOURCE_H}
     ) or 0
     if tipSourceText and tipSourceText ~= 0 then
-        japi.DzFrameSetTextAlignment(tipSourceText, -1)
-        japi.DzFrameSetTextAlignment(tipSourceText, 6)
+        japi:DzFrameSetTextAlignment(tipSourceText, -1)
+        japi:DzFrameSetTextAlignment(tipSourceText, 6)
         setFrameLevelSafe(tipSourceText, 201)
         uiHideFrame(tipSourceText)
     end
@@ -471,7 +471,7 @@ local function initSelectionCentersForBuffUi()
     do
         local playerId = 0
         while playerId < MAX_PLAYER_ID do
-            initPlayerSelectionCenterImported(jass.Player(playerId))
+            initPlayerSelectionCenterImported(jass:Player(playerId))
             playerId = playerId + 1
         end
     end

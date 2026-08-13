@@ -92,4 +92,5 @@ ____exports["沙漠食人魔技能配置"] = {
         ["音效全局变量名"] = "gg_snd_GWSY06"
     }
 }
+____exports["沙漠食人魔音效配置"] = {["默认裁断距离"] = 2800, ["食人魔咒"] = {["生效"] = "Sound\\Boss\\Ogre\\SFX\\ogre_curse_cast_64k.mp3"}, ["蓄力重击"] = {["爆炸"] = "Sound\\Boss\\Ogre\\SFX\\ogre_charge_explosion_64k.mp3"}}
 return ____exports

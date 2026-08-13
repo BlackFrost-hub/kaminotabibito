@@ -2,7 +2,7 @@
 
 import { 教派学者单位技能配置 } from './00．配置';
 import { 获取全部教派学者上下文, 获取或创建教派学者上下文, 教派学者单位存活, type 教派学者运行时上下文 } from './01．运行时上下文';
-import { 教派学者技能配置 } from './02．数值与表现配置';
+import { 教派学者技能配置, 教派学者音效配置 } from './02．数值与表现配置';
 import { 创建原生弹幕, 销毁原生弹幕 } from '../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕';
 import { 创建召唤物 } from '../../../../00．技能模板+函数/01．技能函数/11．召唤物/04．对外接口';
 import { 两点角度, 读取单位攻击力, 读取单位最大生命 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
@@ -123,6 +123,7 @@ function on暗影索命被击落(this: void, killer: any, barrageId: number): vo
     ManaEffect: true,
   });
   const 实际回魔 = GetUnitState(killer, UNIT_STATE_MANA) - 击落前魔法值;
+  Sound3DII_CooPlayReuse(教派学者音效配置.弹幕击落, GetUnitX(killer), GetUnitY(killer), 0, 教派学者技能配置.公共施法.音效裁断距离);
 }
 
 function on暗影索命结束(this: void, reason: any, barrageId: number): void {

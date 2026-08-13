@@ -45,7 +45,7 @@ local function _____6784_5EFA_52A8_6001_6587_672C_5FEB_7167_7B7E_540D(hero)
     end
     local _____547D_4EE4_5361_5FEB_7167 = selectionSnapshotSystem["获取本地选中技能快照"]()
     local _____7247_6BB5_5217_8868 = {}
-    _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868 + 1] = "hero=" .. tostring(hero)
+    _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868 + 1] = "hero=" .. tostring(nil, hero)
     local _____6280_80FD_70ED_952E_5217_8868 = {
         "Q",
         "W",
@@ -60,7 +60,7 @@ local function _____6784_5EFA_52A8_6001_6587_672C_5FEB_7167_7B7E_540D(hero)
             local abilityId = _____547D_4EE4_5361_5FEB_7167.skills[_____70ED_952E] or 0
             local ____temp_4
             if abilityId ~= 0 then
-                ____temp_4 = jass.GetUnitAbilityLevel(hero, abilityId)
+                ____temp_4 = jass:GetUnitAbilityLevel(hero, abilityId)
             else
                 ____temp_4 = 0
             end
@@ -74,7 +74,7 @@ local function _____6784_5EFA_52A8_6001_6587_672C_5FEB_7167_7B7E_540D(hero)
         while i < #_____52A8_6001_6587_672C_767D_540D_5355 do
             local _____5C5E_6027_540D = _____52A8_6001_6587_672C_767D_540D_5355[i + 1]
             local _____5C5E_6027_503C = _____83B7_53D6_5C5E_6027_503C(hero, _____5C5E_6027_540D)
-            _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868 + 1] = (("attr:" .. _____5C5E_6027_540D) .. "=") .. tostring(_____5C5E_6027_503C)
+            _____7247_6BB5_5217_8868[#_____7247_6BB5_5217_8868 + 1] = (("attr:" .. _____5C5E_6027_540D) .. "=") .. tostring(nil, _____5C5E_6027_503C)
             i = i + 1
         end
     end

@@ -118,6 +118,21 @@ local function _____7FFB_8BD1_5355_6761_5956_52B1(_____539F_6587)
         local _____6570_503C = _____63D0_53D6_5C5E_6027_5956_52B1_6570_503C(_____6587_672C, "智力成长")
         return ("智力成长提升" .. _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(_____6570_503C)) .. "点"
     end
+    local _____5347_7EA7_6240_9700_7ECF_9A8C_6807_8BB0 = "升级所需经验的"
+    local _____5347_7EA7_6240_9700_7ECF_9A8C_4F4D_7F6E = (string.find(_____6587_672C, _____5347_7EA7_6240_9700_7ECF_9A8C_6807_8BB0, nil, true) or 0) - 1
+    if _____5347_7EA7_6240_9700_7ECF_9A8C_4F4D_7F6E >= 0 then
+        local _____767E_5206_6BD4_5F00_59CB = _____5347_7EA7_6240_9700_7ECF_9A8C_4F4D_7F6E + #_____5347_7EA7_6240_9700_7ECF_9A8C_6807_8BB0
+        local _____767E_5206_53F7_4F4D_7F6E = (string.find(
+            _____6587_672C,
+            "%",
+            math.max(_____767E_5206_6BD4_5F00_59CB + 1, 1),
+            true
+        ) or 0) - 1
+        if _____767E_5206_53F7_4F4D_7F6E >= _____767E_5206_6BD4_5F00_59CB then
+            return ("按当前英雄等级获得升级所需经验的" .. __TS__StringTrim(__TS__StringSubstring(_____6587_672C, _____767E_5206_6BD4_5F00_59CB, _____767E_5206_53F7_4F4D_7F6E))) .. "%"
+        end
+        return "按当前英雄等级获得升级所需经验"
+    end
     local _____7ECF_9A8C_4F4D_7F6E = (string.find(_____6587_672C, "经验", nil, true) or 0) - 1
     if _____7ECF_9A8C_4F4D_7F6E >= 0 then
         local _____6570_503C = _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(__TS__StringSubstring(_____6587_672C, 0, _____7ECF_9A8C_4F4D_7F6E))
@@ -143,11 +158,11 @@ local function _____7FFB_8BD1_5355_6761_5956_52B1(_____539F_6587)
         do
             local _____5C5E_6027_4F4D_7F6E = (string.find(_____6587_672C, _____5C5E_6027_540D, nil, true) or 0) - 1
             if _____5C5E_6027_4F4D_7F6E < 0 then
-                goto __continue31
+                goto __continue33
             end
             return ((_____5C5E_6027_540D .. "提升") .. _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(__TS__StringSubstring(_____6587_672C, 0, _____5C5E_6027_4F4D_7F6E))) .. "点"
         end
-        ::__continue31::
+        ::__continue33::
     end
     local _____7B49_7EA7_4F4D_7F6E = #_____6587_672C - #"等级"
     if _____7B49_7EA7_4F4D_7F6E > 0 and __TS__StringSubstring(_____6587_672C, _____7B49_7EA7_4F4D_7F6E) == "等级" then
@@ -177,10 +192,10 @@ local function _____7FFB_8BD1_5956_52B1_6761_4EF6(_____539F_6587)
     local _____6587_672C = __TS__StringTrim(_____539F_6587)
     local _____7B49_7EA7 = _____8BFB_53D6_6761_4EF6_6570_5B57(_____6587_672C)
     if (string.find(_____6587_672C, "英雄等级≤", nil, true) or 0) - 1 == 0 or (string.find(_____6587_672C, "英雄等级<=", nil, true) or 0) - 1 == 0 then
-        return ("英雄等级" .. tostring(_____7B49_7EA7)) .. "级及以下"
+        return ("英雄等级" .. tostring(nil, _____7B49_7EA7)) .. "级及以下"
     end
     if (string.find(_____6587_672C, "英雄等级＞", nil, true) or 0) - 1 == 0 or (string.find(_____6587_672C, "英雄等级>", nil, true) or 0) - 1 == 0 then
-        return ("英雄等级高于" .. tostring(_____7B49_7EA7)) .. "级"
+        return ("英雄等级高于" .. tostring(nil, _____7B49_7EA7)) .. "级"
     end
     if (string.find(_____6587_672C, "装备等级", nil, true) or 0) - 1 == 0 then
         return "提交符合要求的装备时"
@@ -210,14 +225,14 @@ ____exports["解析任务奖励展示文本"] = function(_____539F_6587)
         do
             local _____884C = __TS__StringTrim(_____884C_6587_672C)
             if _____884C == "" or _____884C == "外部：" or _____884C == "内部：" then
-                goto __continue50
+                goto __continue52
             end
             local _____5192_53F7_4F4D_7F6E = (string.find(_____884C, ":", nil, true) or 0) - 1
             if _____5192_53F7_4F4D_7F6E > 0 and _____662F_5426_5956_52B1_6761_4EF6_6587_672C(__TS__StringSubstring(_____884C, 0, _____5192_53F7_4F4D_7F6E)) then
                 local _____6761_4EF6 = __TS__StringTrim(__TS__StringSubstring(_____884C, 0, _____5192_53F7_4F4D_7F6E))
                 local _____5956_52B1_90E8_5206 = __TS__StringTrim(__TS__StringSubstring(_____884C, _____5192_53F7_4F4D_7F6E + 1))
                 if _____5956_52B1_90E8_5206 == "" then
-                    goto __continue50
+                    goto __continue52
                 end
                 local _____5956_52B1_5217_8868 = __TS__StringSplit(_____5956_52B1_90E8_5206, ";")
                 local _____5C55_793A_5956_52B1 = {}
@@ -230,7 +245,7 @@ ____exports["解析任务奖励展示文本"] = function(_____539F_6587)
                 if #_____5C55_793A_5956_52B1 > 0 then
                     _____8F93_51FA_884C[#_____8F93_51FA_884C + 1] = (_____7FFB_8BD1_5956_52B1_6761_4EF6(_____6761_4EF6) .. "：") .. table.concat(_____5C55_793A_5956_52B1, "、")
                 end
-                goto __continue50
+                goto __continue52
             end
             local _____5956_52B1_5217_8868 = __TS__StringSplit(_____884C, ";")
             local _____5C55_793A_5956_52B1 = {}
@@ -244,7 +259,7 @@ ____exports["解析任务奖励展示文本"] = function(_____539F_6587)
                 _____8F93_51FA_884C[#_____8F93_51FA_884C + 1] = table.concat(_____5C55_793A_5956_52B1, "、")
             end
         end
-        ::__continue50::
+        ::__continue52::
     end
     return #_____8F93_51FA_884C > 0 and table.concat(_____8F93_51FA_884C, "\n") or "无"
 end
@@ -259,6 +274,30 @@ local function normalizeRequireCount(count)
     return count ~= nil and count > 1 and count or 1
 end
 local function _____6784_5EFA_4EFB_52A1_76EE_6807(cfg)
+    if cfg["击杀目标组"] and #cfg["击杀目标组"] > 0 then
+        local _____76EE_6807_5217_8868 = {}
+        do
+            local i = 0
+            while i < #cfg["击杀目标组"] do
+                do
+                    local _____76EE_6807_7EC4 = cfg["击杀目标组"][i + 1]
+                    if not _____76EE_6807_7EC4 or not _____76EE_6807_7EC4["目标单位"] or _____76EE_6807_7EC4["需求数量"] <= 0 then
+                        goto __continue71
+                    end
+                    _____76EE_6807_5217_8868[#_____76EE_6807_5217_8868 + 1] = {
+                        id = "kill_group_" .. tostring(nil, i),
+                        description = "击杀" .. _____76EE_6807_7EC4["显示名"],
+                        current = 0,
+                        required = _____76EE_6807_7EC4["需求数量"],
+                        completed = false
+                    }
+                end
+                ::__continue71::
+                i = i + 1
+            end
+        end
+        return _____76EE_6807_5217_8868
+    end
     if cfg["目标单位分别击杀"] == true and cfg["目标单位"] then
         local _____5355_4F4D_5217_8868 = __TS__StringSplit(cfg["目标单位"], "|")
         local _____663E_793A_540D_5217_8868 = __TS__StringSplit(cfg["目标单位显示名"] or "", "|")
@@ -269,7 +308,7 @@ local function _____6784_5EFA_4EFB_52A1_76EE_6807(cfg)
                 do
                     local _____5355_4F4D_4EE3_7801 = __TS__StringTrim(_____5355_4F4D_5217_8868[i + 1])
                     if _____5355_4F4D_4EE3_7801 == "" then
-                        goto __continue69
+                        goto __continue75
                     end
                     local _____663E_793A_540D = __TS__StringTrim(_____663E_793A_540D_5217_8868[i + 1] or _____5355_4F4D_4EE3_7801)
                     _____76EE_6807_5217_8868[#_____76EE_6807_5217_8868 + 1] = {
@@ -280,11 +319,20 @@ local function _____6784_5EFA_4EFB_52A1_76EE_6807(cfg)
                         completed = false
                     }
                 end
-                ::__continue69::
+                ::__continue75::
                 i = i + 1
             end
         end
         return _____76EE_6807_5217_8868
+    end
+    if (cfg["类型"] == "调查" or cfg["类型"] == "防守") and cfg["需求数量"] ~= nil and cfg["需求数量"] > 0 then
+        return {{
+            id = "obj1",
+            description = cfg["进度文本"] or cfg["描述"] or cfg["名称"] or "",
+            current = 0,
+            required = cfg["需求数量"],
+            completed = false
+        }}
     end
     if not cfg["需求物品"] and not cfg["目标单位"] then
         return {}
@@ -322,7 +370,9 @@ ____exports["注册单个任务配置到任务库"] = function(cfg, npcCfg)
         }},
         status = QuestStatus.UNDISCOVERED,
         startNpc = cfg["开始NPC"],
+        requiredQuests = cfg["前置任务ID"] ~= nil and ({tostring(cfg["前置任务ID"])}) or nil,
         icon = iconPath or nil,
+        ["内部限时秒"] = cfg["内部限时秒"],
         createdAt = 0,
         updatedAt = 0
     })

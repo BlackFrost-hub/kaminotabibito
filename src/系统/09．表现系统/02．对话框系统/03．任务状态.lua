@@ -16,6 +16,8 @@ local _____6309_5355_4F4D_67E5_627ENPC_914D_7F6E = ____04_FF0ENPC_751F_6210_5668
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
+local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
+local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
 local ____01_FF0EFourCC_8F6C_6362 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local fourCCToString = ____01_FF0EFourCC_8F6C_6362.fourCCToString
 local jass = require("jass.common")
@@ -61,7 +63,7 @@ function ____exports.getQuestState(self, playerId, questId)
 end
 function ____exports.setQuestState(self, playerId, questId, state, playerName)
     if state == 1 then
-        questDB:acceptQuest(playerId, questId)
+        questManager:onQuestAccepted(playerId, questId)
         if playerName then
             local def = questDB:getQuest(questId)
             if def then
@@ -107,7 +109,7 @@ function ____exports.setQuestState(self, playerId, questId, state, playerName)
             ____temp_2 = nil
         end
         local savedAccepterName = ____temp_2
-        questDB:completeQuest(playerId, questId)
+        questManager:onQuestCompleted(playerId, questId)
         if playerName then
             local def = questDB:getQuest(questId)
             if def then
@@ -125,6 +127,28 @@ end
 function ____exports.hasPlayerCompletedQuest(self, playerId, questId)
     return ____exports.getQuestState(nil, playerId, questId) == 2
 end
+____exports["读取任务目标进度"] = function(playerId, questId)
+    local globalData = questDB.globalData
+    local ____temp_3
+    if globalData ~= nil then
+        ____temp_3 = globalData.quests:get(questId)
+    else
+        ____temp_3 = nil
+    end
+    local activeQuest = ____temp_3
+    if activeQuest == nil or activeQuest.objectives == nil or activeQuest.objectives.length == 0 then
+        return nil
+    end
+    local objective = activeQuest.objectives[0]
+    if objective == nil then
+        return nil
+    end
+    return {["当前"] = objective.current, ["需求"] = objective.required}
+end
+____exports["任务目标是否完成"] = function(playerId, questId)
+    local _____8FDB_5EA6 = ____exports["读取任务目标进度"](playerId, questId)
+    return _____8FDB_5EA6 ~= nil and _____8FDB_5EA6["当前"] >= _____8FDB_5EA6["需求"]
+end
 function ____exports.findQuestByNpc(self, npcName)
     return __TS__ArrayFind(
         _____4EFB_52A1_914D_7F6E_5217_8868,
@@ -136,6 +160,49 @@ function ____exports.findQuestById(self, _____4EFB_52A1ID)
         if _____4EFB_52A1["启用"] == true and _____4EFB_52A1["任务ID"] == _____4EFB_52A1ID then
             return _____4EFB_52A1
         end
+    end
+    return nil
+end
+local function _____4EFB_52A1_5339_914D_5F53_524DNPC(_____4EFB_52A1, npcName, npcQuestId, npcConfigName)
+    if _____4EFB_52A1["任务ID"] == npcQuestId then
+        return true
+    end
+    if _____4EFB_52A1["开始NPC"] == npcName then
+        return true
+    end
+    return npcConfigName ~= nil and npcConfigName ~= "" and _____4EFB_52A1["开始NPC"] == npcConfigName
+end
+local function _____4EFB_52A1_524D_7F6E_5747_5DF2_5B8C_6210(playerId, _____4EFB_52A1ID)
+    local _____4EFB_52A1_5B9A_4E49 = questDB:getQuest(_____4EFB_52A1ID)
+    if _____4EFB_52A1_5B9A_4E49 == nil or not _____4EFB_52A1_5B9A_4E49.requiredQuests or #_____4EFB_52A1_5B9A_4E49.requiredQuests == 0 then
+        return true
+    end
+    for ____, _____524D_7F6E_4EFB_52A1ID in ipairs(_____4EFB_52A1_5B9A_4E49.requiredQuests) do
+        if not ____exports.hasPlayerCompletedQuest(nil, playerId, _____524D_7F6E_4EFB_52A1ID) then
+            return false
+        end
+    end
+    return true
+end
+function ____exports.findAvailableQuestByNpc(npcName, playerId, npcQuestId, npcConfigName)
+    for ____, _____4EFB_52A1 in ipairs(_____4EFB_52A1_914D_7F6E_5217_8868) do
+        do
+            if _____4EFB_52A1["启用"] ~= true or not _____4EFB_52A1["任务ID"] then
+                goto __continue49
+            end
+            if not _____4EFB_52A1_5339_914D_5F53_524DNPC(_____4EFB_52A1, npcName, npcQuestId, npcConfigName) then
+                goto __continue49
+            end
+            local _____4EFB_52A1ID = tostring(_____4EFB_52A1["任务ID"])
+            if ____exports.hasPlayerAcceptedQuest(nil, playerId, _____4EFB_52A1ID) or ____exports.hasPlayerCompletedQuest(nil, playerId, _____4EFB_52A1ID) then
+                goto __continue49
+            end
+            if not _____4EFB_52A1_524D_7F6E_5747_5DF2_5B8C_6210(playerId, _____4EFB_52A1ID) then
+                goto __continue49
+            end
+            return _____4EFB_52A1
+        end
+        ::__continue49::
     end
     return nil
 end
@@ -154,27 +221,27 @@ function ____exports.findAcceptedQuestBySubmitNpc(self, npcName, playerId, npcQu
     for ____, quest in ipairs(_____4EFB_52A1_914D_7F6E_5217_8868) do
         do
             if quest["启用"] ~= true then
-                goto __continue40
+                goto __continue59
             end
             if not quest["任务ID"] then
-                goto __continue40
+                goto __continue59
             end
             local questId = tostring(quest["任务ID"])
             if not ____exports.hasPlayerAcceptedQuest(nil, playerId, questId) then
-                goto __continue40
+                goto __continue59
             end
             local explicitEndNpc = quest["结束NPC"] or quest["结束NPC配置"] and (quest["结束NPC配置"]["NPC配置名"] or quest["结束NPC配置"]["NPC名称"])
             if explicitEndNpc and explicitEndNpc ~= "没有" then
                 if explicitEndNpc == npcName or explicitEndNpc == npcConfigName then
                     return quest
                 end
-                goto __continue40
+                goto __continue59
             end
             if npcQuestId ~= nil and quest["任务ID"] == npcQuestId then
                 return quest
             end
         end
-        ::__continue40::
+        ::__continue59::
     end
     return nil
 end
@@ -196,16 +263,16 @@ function ____exports.findEnabledNpcConfigBySelectedUnit(self, unit, unitName)
     for ____, npc in ipairs(_____652F_7EBFNPC_914D_7F6E_5217_8868) do
         do
             if npc["启用"] ~= true then
-                goto __continue53
+                goto __continue72
             end
             if npc["单位ID"] and npc["单位ID"] ~= selectedUnitCode then
-                goto __continue53
+                goto __continue72
             end
             if npc["NPC名称"] == unitName or npc["NPC配置名"] == unitName then
                 return npc
             end
         end
-        ::__continue53::
+        ::__continue72::
     end
     return nil
 end

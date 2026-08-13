@@ -2,7 +2,7 @@
 
 import { 利尔伯特单位技能配置 } from './00．配置';
 import { 获取全部利尔伯特上下文, 获取或创建利尔伯特上下文, 利尔伯特单位存活, type 利尔伯特运行时上下文 } from './01．运行时';
-import { 利尔伯特技能配置 } from './02．数值与表现配置';
+import { 利尔伯特技能配置, 利尔伯特音效配置 } from './02．数值与表现配置';
 import { 目标是否面向来源 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/08．方位判定工具';
 import { 执行Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 
@@ -28,6 +28,9 @@ const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC�
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
+};
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
 };
 const jass = require('jass.common') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -80,7 +83,10 @@ function 提交正义审判附加伤害(this: void, 上下文: 利尔伯特运�
     标签,
   });
   上下文.正义审判递归锁 = false;
-  if (结果.是否造成伤害) 播放正义审判命中特效(目标单位);
+  if (结果.是否造成伤害) {
+    播放正义审判命中特效(目标单位);
+    播放Boss坐标音效(利尔伯特音效配置.正义审判.审判命中, GetUnitX(目标单位), GetUnitY(目标单位), 利尔伯特音效配置.默认裁断距离);
+  }
   return 结果;
 }
 
@@ -125,6 +131,7 @@ function on正义审判周期(this: void): void {
       });
       if (结果.是否造成伤害) {
         播放正义审判命中特效(目标);
+        播放Boss坐标音效(利尔伯特音效配置.正义审判.审判命中, GetUnitX(目标), GetUnitY(目标), 利尔伯特音效配置.默认裁断距离);
       }
     }
   }

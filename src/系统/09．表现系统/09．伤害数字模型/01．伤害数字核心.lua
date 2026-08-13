@@ -321,7 +321,7 @@ local function _____521B_5EFA_6A21_578B_7279_6548(modelPath, x, y, z, color, sca
     return {effect = effect, xOffset = 0, scale = scale, popScale = popScale}
 end
 local function _____521B_5EFA_6570_5B57_7279_6548(digit, x, y, z, color)
-    local modelPath = (_____6A21_578B_57FA_7840_8DEF_5F84 .. tostring(digit)) .. _____6A21_578B_6269_5C55_540D
+    local modelPath = (_____6A21_578B_57FA_7840_8DEF_5F84 .. tostring(nil, digit)) .. _____6A21_578B_6269_5C55_540D
     return _____521B_5EFA_6A21_578B_7279_6548(
         modelPath,
         x,
@@ -334,7 +334,7 @@ local function _____521B_5EFA_6570_5B57_7279_6548(digit, x, y, z, color)
 end
 local function _____521B_5EFA_4F24_5BB3_6570_5B57_7EC4(target, amount, source, damageType, prefixModel)
     local hasAmount = amount >= _____6700_5C0F_663E_793A_4F24_5BB3
-    local text = hasAmount and tostring(amount) or ""
+    local text = hasAmount and tostring(nil, amount) or ""
     local len = #text
     if not hasAmount and prefixModel == nil then
         return

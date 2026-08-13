@@ -20,7 +20,7 @@ end
 --- 注册20个假的主线任务用于测试（状态为进行中，直接显示在UI中）
 local function registerDummyMainQuests(self)
     local db = QuestDatabase:getInstance()
-    local now = os.time()
+    local now = os:time()
     do
         local i = 1
         while i <= 20 do

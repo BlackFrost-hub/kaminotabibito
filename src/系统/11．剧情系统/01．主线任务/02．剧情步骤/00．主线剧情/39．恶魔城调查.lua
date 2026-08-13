@@ -138,7 +138,7 @@ local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
 local ____require_result_3 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
 local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_3["按名字反查总单位ID"]
 local ____require_result_4 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-local registerUnitInRangeTrigger = ____require_result_4.registerUnitInRangeTrigger
+local registerOneShotUnitRangeListener = ____require_result_4.registerOneShotUnitRangeListener
 local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_5.registerDeathListener
 unregisterDeathListener = ____require_result_5.unregisterDeathListener
@@ -186,7 +186,6 @@ local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local TriggerAddAction = jass.TriggerAddAction
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerState = jass.GetPlayerState
 local PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD
@@ -340,47 +339,36 @@ local function _____8D64_5C3E_524D_5F80_4E0B_5C42_4ED3_5E93(_____53C2_6570)
     IssuePointOrder(_____8D64_5C3E, "move", _____76EE_6807X, _____76EE_6807Y)
     _____8D64_5C3E_79FB_52A8_4FDD_5E95_56DE_8C03ID = addPeriodicCallback(_____8D64_5C3E_524D_5F80_4E0B_5C42_4ED3_5E93_4FDD_5E95_95F4_9694_6BEB_79D2, ____on_8D64_5C3E_79FB_52A8_4FDD_5E95Tick, {["世代"] = _____4E16_4EE3})
 end
-local function ____on_953B_9020_533A_8BC1_4EBA_8303_56F4_89E6_53D1()
+local function ____on_953B_9020_533A_8BC1_4EBA_8303_56F4_89E6_53D1(_____89E6_53D1_5355_4F4D)
     if _____5DF2_89E6_53D1_953B_9020_533A_8BC1_4EBA or _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 39 then
-        return
+        return false
     end
-    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if _____89E6_53D1_5355_4F4D == nil or _____89E6_53D1_5355_4F4D == 0 or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
-        return
+    if _____89E6_53D1_5355_4F4D == nil or _____89E6_53D1_5355_4F4D == 0 then
+        return false
     end
     _____5DF2_89E6_53D1_953B_9020_533A_8BC1_4EBA = true
     _____64AD_653E_8C03_67E5_5267_60C5("molten_realm_forge_witness", _____89E6_53D1_5355_4F4D, "恶魔城锻造区证人入口")
+    return true
 end
-local function ____on_8D64_5C3E_8303_56F4_89E6_53D1()
+local function ____on_8D64_5C3E_8303_56F4_89E6_53D1(_____89E6_53D1_5355_4F4D)
     if _____5DF2_89E6_53D1_8D64_5C3E_4EA4_6613 or _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 39 then
-        return
+        return false
     end
     if _____5DF2_652F_4ED8_8D64_5C3E_5B9A_91D1 then
-        return
+        return false
     end
-    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if _____89E6_53D1_5355_4F4D == nil or _____89E6_53D1_5355_4F4D == 0 or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
-        return
+    if _____89E6_53D1_5355_4F4D == nil or _____89E6_53D1_5355_4F4D == 0 then
+        return false
     end
     _____5DF2_89E6_53D1_8D64_5C3E_4EA4_6613 = true
     _____64AD_653E_8C03_67E5_5267_60C5("molten_realm_redtail_meet", _____89E6_53D1_5355_4F4D, "恶魔城赤尾交易入口")
+    return true
 end
-local function _____6CE8_518C_5355_4F4D_8303_56F4_5165_53E3(unit, range, action, _____4E00_6B21_6027)
-    if _____4E00_6B21_6027 == nil then
-        _____4E00_6B21_6027 = true
-    end
+local function _____6CE8_518C_5355_4F4D_8303_56F4_5165_53E3(unit, range, action)
     if unit == nil or unit == 0 then
         return _____7A7A_53D6_6D88_8303_56F4_76D1_542C
     end
-    local trigger = CreateTrigger()
-    TriggerAddAction(trigger, action)
-    return registerUnitInRangeTrigger(
-        trigger,
-        unit,
-        range,
-        nil,
-        _____4E00_6B21_6027
-    )
+    return registerOneShotUnitRangeListener(unit, range, action, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D)
 end
 local function ____on_8FDB_5165_4E0B_5C42_4ED3_5E93_5165_53E3()
     if _____5DF2_89E6_53D1_4E0B_5C42_4ED3_5E93_4F0F_51FB or _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 39 then
@@ -663,7 +651,7 @@ ____exports["执行布置恶魔城调查"] = function(______53C2_6570)
     _____521B_5EFA_5E76_767B_8BB0_8C03_67E5_5355_4F4D("n03Y", ____exports["恶魔城调查场景站位表"]["锻造区双持居民"], "主线NPC.锻造区双持居民")
     local _____8D64_5C3E = _____521B_5EFA_5E76_767B_8BB0_8C03_67E5_5355_4F4D("n03Z", ____exports["恶魔城调查场景站位表"]["赤尾"], "主线NPC.赤尾")
     _____6CE8_518C_5355_4F4D_8303_56F4_5165_53E3(_____953B_9020_533A_8BC1_4EBA, _____8C03_67E5_8303_56F4, ____on_953B_9020_533A_8BC1_4EBA_8303_56F4_89E6_53D1)
-    _____53D6_6D88_8D64_5C3E_8303_56F4_76D1_542C = _____6CE8_518C_5355_4F4D_8303_56F4_5165_53E3(_____8D64_5C3E, _____8C03_67E5_8303_56F4, ____on_8D64_5C3E_8303_56F4_89E6_53D1, false)
+    _____53D6_6D88_8D64_5C3E_8303_56F4_76D1_542C = _____6CE8_518C_5355_4F4D_8303_56F4_5165_53E3(_____8D64_5C3E, _____8C03_67E5_8303_56F4, ____on_8D64_5C3E_8303_56F4_89E6_53D1)
     _____6CE8_518C_4E0B_5C42_4ED3_5E93_5165_53E3_76D1_542C()
 end
 ____exports["恶魔城调查剧情动作注册表"] = {

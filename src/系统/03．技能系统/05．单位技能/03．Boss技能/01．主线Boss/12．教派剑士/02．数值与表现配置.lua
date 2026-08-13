@@ -127,4 +127,12 @@ ____exports["教派剑士技能配置"] = {
         ["分身状态名"] = "深渊分身"
     }
 }
+____exports["教派剑士音效配置"] = {
+    ["音效裁断距离"] = 2800,
+    ["死亡结算"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_death_64k.mp3",
+    ["深渊旋风"] = {["旋风起手"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_cyclone_cast_64k.mp3"},
+    ["黑洞跨越"] = {["黑洞开启"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_hole_open_64k.mp3", ["进入黑洞"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_hole_enter_64k.mp3", ["黑洞被摧毁"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_hole_destroy_64k.mp3", ["Boss出现"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_hole_exit_64k.mp3"},
+    ["魔祭吸魂"] = {["起手施法"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_sacrifice_cast_64k.mp3", ["魔祭生效"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_sacrifice_effect_64k.mp3", ["结算吸魂"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_sacrifice_settle_64k.mp3", ["反噬"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_sacrifice_backlash_64k.mp3"},
+    ["深渊分身"] = {["分身死亡爆炸"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_clone_explode_64k.mp3"}
+}
 return ____exports

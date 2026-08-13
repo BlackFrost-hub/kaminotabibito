@@ -9,6 +9,7 @@ local _____83B7_53D6_6216_521B_5EFA_5229_5C14_4F2F_7279_4E0A_4E0B_6587 = ____01_
 local _____5229_5C14_4F2F_7279_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6["利尔伯特单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.11．利尔·伯特.02．数值与表现配置")
 local _____5229_5C14_4F2F_7279_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["利尔伯特技能配置"]
+local _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["利尔伯特音效配置"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local ____10_FF0E_5229_5C14_B7_4F2F_7279 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.10．利尔·伯特")
@@ -36,6 +37,8 @@ local ____require_result_8 = require("lib.扩展函数.物品相关函数.装备
 local getItemDataEntry = ____require_result_8.getItemDataEntry
 local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
+local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_10["播放Boss坐标音效"]
 local jass = require("jass.common")
 local globals = require("jass.globals")
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -189,6 +192,12 @@ local function ____on_68C0_67E5_5931_8D25_60E9_7F5A(variable)
                         _____7279_6548["动画速度"],
                         _____7279_6548["持续秒"]
                     )
+                    _____64AD_653EBoss_5750_6807_97F3_6548(
+                        _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["检查"]["失败惩罚"],
+                        GetUnitX(target),
+                        GetUnitY(target),
+                        _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["默认裁断距离"]
+                    )
                 end
             end
             ::__continue29::
@@ -210,8 +219,8 @@ local function _____89E6_53D1_68C0_67E5_5931_8D25(_____72B6_6001, _____9608_503C
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____72B6_6001["上下文"]["Boss单位"], _____5229_5C14_4F2F_7279BuffID["检查中"])
     local _____914D_7F6E = _____5229_5C14_4F2F_7279_6280_80FD_914D_7F6E["检查"]
     _____72B6_6001["失败惩罚回调ID"] = addDelayedCallback(_____914D_7F6E["失败惩罚延迟秒"] * 1000, ____on_68C0_67E5_5931_8D25_60E9_7F5A, _____72B6_6001)
-    local ____self_10 = _____72B6_6001["上下文"]["清理"]
-    ____self_10["登记延迟回调"](____self_10, "检查失败惩罚", _____72B6_6001["失败惩罚回调ID"])
+    local ____self_11 = _____72B6_6001["上下文"]["清理"]
+    ____self_11["登记延迟回调"](____self_11, "检查失败惩罚", _____72B6_6001["失败惩罚回调ID"])
 end
 local function ____on_5229_5C14_4F2F_7279_627F_53D7_6700_7EC8_4F24_5BB3(target, _attacker, applied, _snapshot)
     if not (applied > 0) or target == nil or target == 0 or GetUnitTypeId(target) ~= _____5229_5C14_4F2F_7279_5355_4F4D_7C7B_578BID then
@@ -258,6 +267,12 @@ ____exports["释放利尔伯特检查"] = function(_____4E0A_4E0B_6587, target)
     _____4E0A_4E0B_6587["检查状态"] = _____72B6_6001
     _____5F00_59CB_786C_76F4(boss, _____914D_7F6E["施法硬直秒"])
     SetUnitAnimationByIndex(boss, _____914D_7F6E["动作编号"])
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["检查"]["装备抽取"],
+        GetUnitX(target),
+        GetUnitY(target),
+        _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({
         ["通道"] = _____914D_7F6E["读条通道"],
         ["总时长"] = _____914D_7F6E["通魔施法秒"],
@@ -272,14 +287,14 @@ ____exports["释放利尔伯特检查"] = function(_____4E0A_4E0B_6587, target)
         0,
         {sourceUnit = boss, effectSourceName = "检查", effectSourceType = "技能"}
     )
-    local ____self_15 = _____4E0A_4E0B_6587["清理"]
-    ____self_15["登记清理"](____self_15, "检查状态清理", ____on_68C0_67E5_8FD0_884C_65F6_6E05_7406, _____72B6_6001)
-    local _____8BFB_6761_56DE_8C03ID = addDelayedCallback(_____914D_7F6E["通魔施法秒"] * 1000, ____on_68C0_67E5_8BFB_6761_7ED3_675F, {["通道"] = _____914D_7F6E["读条通道"], ["Boss单位"] = boss})
     local ____self_16 = _____4E0A_4E0B_6587["清理"]
-    ____self_16["登记延迟回调"](____self_16, "检查读条结束", _____8BFB_6761_56DE_8C03ID)
-    _____72B6_6001["正常结束回调ID"] = addDelayedCallback(_____914D_7F6E["检查持续秒"] * 1000, ____on_68C0_67E5_6B63_5E38_7ED3_675F, _____72B6_6001)
+    ____self_16["登记清理"](____self_16, "检查状态清理", ____on_68C0_67E5_8FD0_884C_65F6_6E05_7406, _____72B6_6001)
+    local _____8BFB_6761_56DE_8C03ID = addDelayedCallback(_____914D_7F6E["通魔施法秒"] * 1000, ____on_68C0_67E5_8BFB_6761_7ED3_675F, {["通道"] = _____914D_7F6E["读条通道"], ["Boss单位"] = boss})
     local ____self_17 = _____4E0A_4E0B_6587["清理"]
-    ____self_17["登记延迟回调"](____self_17, "检查正常结束", _____72B6_6001["正常结束回调ID"])
+    ____self_17["登记延迟回调"](____self_17, "检查读条结束", _____8BFB_6761_56DE_8C03ID)
+    _____72B6_6001["正常结束回调ID"] = addDelayedCallback(_____914D_7F6E["检查持续秒"] * 1000, ____on_68C0_67E5_6B63_5E38_7ED3_675F, _____72B6_6001)
+    local ____self_18 = _____4E0A_4E0B_6587["清理"]
+    ____self_18["登记延迟回调"](____self_18, "检查正常结束", _____72B6_6001["正常结束回调ID"])
     return true
 end
 local function ____on_5229_5C14_4F2F_7279_68C0_67E5_751F_6548(castingUnit, spellAbilityId)

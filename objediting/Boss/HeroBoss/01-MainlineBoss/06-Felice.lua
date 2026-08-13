@@ -9,7 +9,7 @@ createMeleeBossHeroUnit('N05T', '菲利斯', {
   description = '菲利斯',
 
   level = 30,
-  hp = 26000,
+  hp = 20800,
   mana = 10000,
   initialMana = 99999,
   manaRegen = 5.0,
@@ -20,7 +20,7 @@ createMeleeBossHeroUnit('N05T', '菲利斯', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 1400,
+  damageBase = 1120,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 1.1,

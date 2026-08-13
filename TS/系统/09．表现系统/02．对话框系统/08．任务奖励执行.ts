@@ -1,4 +1,6 @@
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const DzGetUnitNeededXP = japi.DzGetUnitNeededXP as (this: void, unit: any, level: number) => number;
 
 import { IMaxBJ } from "../../../lib/扩展函数/BJ函数/index";
 import { getPlayerFirstHero } from "../../../lib/扩展函数/自定义扩展函数/index";
@@ -45,6 +47,18 @@ function gainExp(players: any[], value: number): void {
   for (const p of players) {
     const hero = getPlayerFirstHero(p);
     if (hero) jass.AddHeroXP(hero, value, true);
+  }
+}
+
+function gainCurrentLevelNeededExpRate(this: void, players: any[], rate: number): void {
+  if (rate <= 0) return;
+  for (const p of players) {
+    const hero = getPlayerFirstHero(p);
+    if (!hero) continue;
+    const level = jass.GetHeroLevel(hero) as number;
+    const neededExp = DzGetUnitNeededXP(hero, level) as number;
+    const value = jass.R2I(neededExp * rate) as number;
+    if (value > 0) jass.AddHeroXP(hero, value, true);
   }
 }
 
@@ -235,6 +249,18 @@ function executeOneRewardExpr(expr: string, triggerPlayerId?: number): void {
       while (payload.charAt(0) === "+" || payload.charAt(0) === "＋") payload = payload.substring(1).trim();
       break;
     }
+  }
+  const neededExpMarker = "升级所需经验的";
+  const neededExpMarkerPos = payload.indexOf(neededExpMarker);
+  if (neededExpMarkerPos >= 0) {
+    const percentStart = neededExpMarkerPos + neededExpMarker.length;
+    const percentEnd = payload.indexOf("%", percentStart);
+    if (percentEnd >= percentStart) {
+      const percentText = payload.substring(percentStart, percentEnd).trim();
+      const rate = resolveAmountExpr(percentText, triggerPlayerId) / 100;
+      gainCurrentLevelNeededExpRate(targetPlayers, rate);
+    }
+    return;
   }
   if (payload.indexOf("经验") >= 0 || payload.indexOf("exp") >= 0) {
     const value = resolveAmountExpr(提取类型前数值表达式(payload, payload.indexOf("经验") >= 0 ? "经验" : "exp"), triggerPlayerId);

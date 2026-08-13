@@ -2,7 +2,7 @@
 
 import { 利尔伯特单位技能配置 } from './00．配置';
 import { 获取利尔伯特上下文, 获取或创建利尔伯特上下文, 利尔伯特单位存活, type 利尔检查状态, type 利尔伯特运行时上下文 } from './01．运行时';
-import { 利尔伯特技能配置 } from './02．数值与表现配置';
+import { 利尔伯特技能配置, 利尔伯特音效配置 } from './02．数值与表现配置';
 import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 利尔伯特BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/10．利尔·伯特';
 
@@ -38,6 +38,9 @@ const { getItemDataEntry } = require('lib.扩展函数.物品相关函数.装备
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
+};
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
 };
 const jass = require('jass.common') as any;
 const globals = require('jass.globals') as { udg_N?: number; [key: string]: any };
@@ -170,6 +173,7 @@ function on检查失败惩罚(this: void, variable?: any): void {
     if (结果.是否造成伤害) {
       const 特效 = 配置.失败惩罚命中特效;
       EC_CreateEffect(特效.路径, GetUnitX(target), GetUnitY(target), 特效.Z, 特效.朝向, 特效.缩放, 特效.动画速度, 特效.持续秒);
+      播放Boss坐标音效(利尔伯特音效配置.检查.失败惩罚, GetUnitX(target), GetUnitY(target), 利尔伯特音效配置.默认裁断距离);
     }
   }
   结束检查状态(状态);
@@ -230,6 +234,7 @@ export function 释放利尔伯特检查(this: void, 上下文: 利尔伯特运�
   上下文.检查状态 = 状态;
   开始硬直(boss, 配置.施法硬直秒);
   SetUnitAnimationByIndex(boss, 配置.动作编号);
+  播放Boss坐标音效(利尔伯特音效配置.检查.装备抽取, GetUnitX(target), GetUnitY(target), 利尔伯特音效配置.默认裁断距离);
   显示常规技能吟唱条({ 通道: 配置.读条通道, 总时长: 配置.通魔施法秒, 颜色ID: 配置.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
   registerManualBuff(boss, 利尔伯特BuffID.检查中, 配置.检查持续秒, 0, { sourceUnit: boss, effectSourceName: '检查', effectSourceType: '技能' });
   上下文.清理.登记清理('检查状态清理', on检查运行时清理, 状态);

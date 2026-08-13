@@ -9,7 +9,7 @@ createMeleeBossHeroUnit('N05U', '里科特', {
   description = '里科特',
 
   level = 30,
-  hp = 32000,
+  hp = 25600,
   mana = 1000,
   initialMana = 99999,
   manaRegen = 5.0,
@@ -20,7 +20,7 @@ createMeleeBossHeroUnit('N05U', '里科特', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 1600,
+  damageBase = 1280,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 1.0,

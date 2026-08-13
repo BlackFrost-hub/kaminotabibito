@@ -180,7 +180,7 @@ function _____5904_7406Boss_6218_542F_52A8Stes()
                 _____767B_8BB0Boss_81EA_52A8_6280_80FD_542F_52A8(stesBoss, "STES.Boss")
                 return true
             end
-            local handleId = GetHandleId(jass.GetTriggeringTrigger())
+            local handleId = GetHandleId(jass:GetTriggeringTrigger())
             _____5F85_8865_8BFBBoss_53E5_67C4_8868[handleId] = true
             _____5B89_6392_4E00_5E27_540E_8865_8BFBBoss()
         end)

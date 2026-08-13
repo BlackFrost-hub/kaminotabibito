@@ -1,4 +1,6 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local Set = ____lualib.Set
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 ---
 -- @noSelfInFile
@@ -22,6 +24,22 @@ local ITEM_TYPE_CHARGED = jass.ITEM_TYPE_CHARGED
 local ITEM_TYPE_PURCHASABLE = jass.ITEM_TYPE_PURCHASABLE
 local GetOwningPlayer = jass.GetOwningPlayer
 local _____7269_7F16_7C7B_578B__7269_54C1 = 3
+local _____4E00_6B21_6027_6253_9020_58F3_7269_54C1ID_5217_8868 = {
+    "I01A",
+    "I04U",
+    "I09A",
+    "I09L",
+    "I09T",
+    "I0HE"
+}
+local _____4E00_6B21_6027_6253_9020_58F3_7269_54C1ID_96C6_5408 = __TS__New(Set)
+do
+    local i = 0
+    while i < #_____4E00_6B21_6027_6253_9020_58F3_7269_54C1ID_5217_8868 do
+        _____4E00_6B21_6027_6253_9020_58F3_7269_54C1ID_96C6_5408:add(stringToFourCCSafe(_____4E00_6B21_6027_6253_9020_58F3_7269_54C1ID_5217_8868[i + 1]))
+        i = i + 1
+    end
+end
 local _____4E0D_8D70_5403_4E66_6B8B_7559_6E05_7406_7269_54C1ID = {
     [stringToFourCCSafe("I0FK")] = true,
     [stringToFourCCSafe("I0FL")] = true,
@@ -69,6 +87,15 @@ ____exports["是可清理吃书残留"] = function(_____7269_54C1)
         return false
     end
     return getObjectPropertyIntegerSafe(_____7269_7F16_7C7B_578B__7269_54C1, _____7269_54C1_7C7B_578BID, "perishable") == 1
+end
+____exports["是一次性打造壳类型ID"] = function(_____7269_54C1_7C7B_578BID)
+    return _____4E00_6B21_6027_6253_9020_58F3_7269_54C1ID_96C6_5408:has(_____7269_54C1_7C7B_578BID)
+end
+____exports["是一次性打造壳"] = function(_____7269_54C1)
+    if _____7269_54C1 == nil or _____7269_54C1 == 0 then
+        return false
+    end
+    return ____exports["是一次性打造壳类型ID"](GetItemTypeId(_____7269_54C1))
 end
 ____exports["删除物品"] = function(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then

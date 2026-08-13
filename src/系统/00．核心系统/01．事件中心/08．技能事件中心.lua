@@ -28,55 +28,55 @@ function dispatchSkillLearnListeners(list, learningUnit, learnedAbilityId)
     end
 end
 function onSpellChannel()
-    local castingUnit = jass.GetTriggerUnit()
+    local castingUnit = jass:GetTriggerUnit()
     if castingUnit == nil then
         return
     end
-    local spellAbilityId = jass.GetSpellAbilityId()
+    local spellAbilityId = jass:GetSpellAbilityId()
     if spellAbilityId == nil then
         return
     end
     dispatchSpellListeners(channelListeners, castingUnit, spellAbilityId)
 end
 function onSpellEffect()
-    local castingUnit = jass.GetTriggerUnit()
+    local castingUnit = jass:GetTriggerUnit()
     if castingUnit == nil then
         return
     end
-    local spellAbilityId = jass.GetSpellAbilityId()
+    local spellAbilityId = jass:GetSpellAbilityId()
     if spellAbilityId == nil then
         return
     end
     dispatchSpellListeners(effectListeners, castingUnit, spellAbilityId)
 end
 function onSpellFinish()
-    local castingUnit = jass.GetTriggerUnit()
+    local castingUnit = jass:GetTriggerUnit()
     if castingUnit == nil then
         return
     end
-    local spellAbilityId = jass.GetSpellAbilityId()
+    local spellAbilityId = jass:GetSpellAbilityId()
     if spellAbilityId == nil then
         return
     end
     dispatchSpellListeners(finishListeners, castingUnit, spellAbilityId)
 end
 function onSpellEndcast()
-    local castingUnit = jass.GetTriggerUnit()
+    local castingUnit = jass:GetTriggerUnit()
     if castingUnit == nil then
         return
     end
-    local spellAbilityId = jass.GetSpellAbilityId()
+    local spellAbilityId = jass:GetSpellAbilityId()
     if spellAbilityId == nil then
         return
     end
     dispatchSpellListeners(endcastListeners, castingUnit, spellAbilityId)
 end
 function onSkillLearn()
-    local learningUnit = jass.GetTriggerUnit()
+    local learningUnit = jass:GetTriggerUnit()
     if learningUnit == nil then
         return
     end
-    local learnedAbilityId = jass.GetLearnedSkill()
+    local learnedAbilityId = jass:GetLearnedSkill()
     if learnedAbilityId == nil then
         return
     end
@@ -89,18 +89,18 @@ function ____exports.initSpellEventCenter()
         return
     end
     initialized = true
-    local channelTrigger = jass.CreateTrigger()
+    local channelTrigger = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(channelTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_CHANNEL)
-    jass.TriggerAddAction(channelTrigger, onSpellChannel)
-    local effectTrigger = jass.CreateTrigger()
+    jass:TriggerAddAction(channelTrigger, onSpellChannel)
+    local effectTrigger = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(effectTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_EFFECT)
-    jass.TriggerAddAction(effectTrigger, onSpellEffect)
-    local finishTrigger = jass.CreateTrigger()
+    jass:TriggerAddAction(effectTrigger, onSpellEffect)
+    local finishTrigger = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(finishTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_FINISH)
-    jass.TriggerAddAction(finishTrigger, onSpellFinish)
-    local endcastTrigger = jass.CreateTrigger()
+    jass:TriggerAddAction(finishTrigger, onSpellFinish)
+    local endcastTrigger = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(endcastTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_SPELL_ENDCAST)
-    jass.TriggerAddAction(endcastTrigger, onSpellEndcast)
+    jass:TriggerAddAction(endcastTrigger, onSpellEndcast)
 end
 --- 初始化学习技能事件。
 function ____exports.initSkillLearnEvent()
@@ -108,9 +108,9 @@ function ____exports.initSkillLearnEvent()
         return
     end
     skillLearnInitialized = true
-    local learnTrigger = jass.CreateTrigger()
+    local learnTrigger = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(learnTrigger, ____exports.SPELL_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_HERO_SKILL)
-    jass.TriggerAddAction(learnTrigger, onSkillLearn)
+    jass:TriggerAddAction(learnTrigger, onSkillLearn)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")

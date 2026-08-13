@@ -28,6 +28,7 @@ local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
 local SetUnitFlyHeight = jass.SetUnitFlyHeight
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
+local _____8BED_7EF4_539F_59CB_4F4D_7F6E = {X = 23021.7, Y = -23819.4, ["朝向"] = 180}
 local _____4F1A_8BAE_5E2D_4F4D_9884_7F6E_8868 = {
     {
         ["角色名"] = "克林姆德王",
@@ -119,6 +120,15 @@ ____exports["布置王城会议席位"] = function()
             i = i + 1
         end
     end
+end
+____exports["归位内务总管语维"] = function()
+    local _____8BED_7EF4 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528("主线NPC.语维")
+    if _____8BED_7EF4 == nil or _____8BED_7EF4 == 0 then
+        return
+    end
+    SetUnitPosition(_____8BED_7EF4, _____8BED_7EF4_539F_59CB_4F4D_7F6E.X, _____8BED_7EF4_539F_59CB_4F4D_7F6E.Y)
+    SetUnitFacing(_____8BED_7EF4, _____8BED_7EF4_539F_59CB_4F4D_7F6E["朝向"])
+    _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D("主线NPC.语维", _____8BED_7EF4)
 end
 ____exports["执行前往会议室任务"] = function()
     ____exports["布置王城会议席位"]()

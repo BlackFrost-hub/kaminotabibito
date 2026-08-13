@@ -80,6 +80,17 @@ function 翻译单条奖励(this: void, 原文: string): string {
     return "智力成长提升" + 翻译数值表达式(数值) + "点";
   }
 
+  const 升级所需经验标记 = "升级所需经验的";
+  const 升级所需经验位置 = 文本.indexOf(升级所需经验标记);
+  if (升级所需经验位置 >= 0) {
+    const 百分比开始 = 升级所需经验位置 + 升级所需经验标记.length;
+    const 百分号位置 = 文本.indexOf("%", 百分比开始);
+    if (百分号位置 >= 百分比开始) {
+      return "按当前英雄等级获得升级所需经验的" + 文本.substring(百分比开始, 百分号位置).trim() + "%";
+    }
+    return "按当前英雄等级获得升级所需经验";
+  }
+
   const 经验位置 = 文本.indexOf("经验");
   if (经验位置 >= 0) {
     const 数值 = 翻译数值表达式(文本.substring(0, 经验位置));
@@ -187,6 +198,21 @@ function normalizeRequireCount(this: void, count?: number): number {
 }
 
 function 构建任务目标(this: void, cfg: 任务配置): Array<{ id: string; description: string; current: number; required: number; completed: boolean }> {
+  if (cfg.击杀目标组 && cfg.击杀目标组.length > 0) {
+    const 目标列表: Array<{ id: string; description: string; current: number; required: number; completed: boolean }> = [];
+    for (let i = 0; i < cfg.击杀目标组.length; i++) {
+      const 目标组 = cfg.击杀目标组[i];
+      if (!目标组 || !目标组.目标单位 || 目标组.需求数量 <= 0) continue;
+      目标列表.push({
+        id: "kill_group_" + tostring(i),
+        description: "击杀" + 目标组.显示名,
+        current: 0,
+        required: 目标组.需求数量,
+        completed: false,
+      });
+    }
+    return 目标列表;
+  }
   if (cfg.目标单位分别击杀 === true && cfg.目标单位) {
     const 单位列表 = cfg.目标单位.split("|");
     const 显示名列表 = (cfg.目标单位显示名 || "").split("|");
@@ -198,6 +224,15 @@ function 构建任务目标(this: void, cfg: 任务配置): Array<{ id: string; 
       目标列表.push({ id: "kill_" + 单位代码, description: "击杀" + 显示名, current: 0, required: 1, completed: false });
     }
     return 目标列表;
+  }
+  if ((cfg.类型 === "调查" || cfg.类型 === "防守") && cfg.需求数量 != null && cfg.需求数量 > 0) {
+    return [{
+      id: "obj1",
+      description: cfg.进度文本 || cfg.描述 || cfg.名称 || "",
+      current: 0,
+      required: cfg.需求数量,
+      completed: false,
+    }];
   }
   if (!cfg.需求物品 && !cfg.目标单位) return [];
   return [{
@@ -232,7 +267,9 @@ export function 注册单个任务配置到任务库(
     rewards: [{ type: "gold", value: 0, description: resolveRewardDisplayText(cfg) }],
     status: QuestStatus.UNDISCOVERED,
     startNpc: cfg.开始NPC,
+    requiredQuests: cfg.前置任务ID != null ? [cfg.前置任务ID.toString()] : undefined,
     icon: iconPath || undefined,
+    内部限时秒: cfg.内部限时秒,
     createdAt: 0,
     updatedAt: 0,
   });

@@ -24,31 +24,26 @@ local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_1["
 local ____require_result_2 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local IsUnitAliveBJ = ____require_result_2.IsUnitAliveBJ
 local ____require_result_3 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-local registerUnitInRangeTrigger = ____require_result_3.registerUnitInRangeTrigger
+local registerOneShotUnitRangeListener = ____require_result_3.registerOneShotUnitRangeListener
 local ____require_result_4 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_4.registerDeathListener
 local unregisterDeathListener = ____require_result_4.unregisterDeathListener
-local ____require_result_5 = require("系统.00．核心系统.07．联机安全工具")
-local safeTriggerAddAction = ____require_result_5.safeTriggerAddAction
-local safeDestroyTrigger = ____require_result_5.safeDestroyTrigger
+local ____require_result_5 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_5["是玩家英雄组单位"]
 local ____require_result_6 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_6["是玩家英雄组单位"]
-local ____require_result_7 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = ____require_result_7["获取玩家英雄单位组"]
-local ____require_result_8 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWEAngleBetweenUnitsSafe = ____require_result_8.YDWEAngleBetweenUnitsSafe
-local YDUserDataClearSafe = ____require_result_8.YDUserDataClearSafe
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
-local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.43A．菲尼克斯尔战后地形装饰")
-local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_6218_540E_5730_5F62_88C5_9970 = ____require_result_10["创建菲尼克斯尔战后地形装饰"]
-local ____require_result_11 = require("lib.扩展函数.Star扩展函数.Star扩展库.index")
-local StarOther_PanCameraToTimedForPlayer = ____require_result_11.StarOther_PanCameraToTimedForPlayer
-local CreateTrigger = jass.CreateTrigger
+local _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = ____require_result_6["获取玩家英雄单位组"]
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWEAngleBetweenUnitsSafe = ____require_result_7.YDWEAngleBetweenUnitsSafe
+local YDUserDataClearSafe = ____require_result_7.YDUserDataClearSafe
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_9 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.43A．菲尼克斯尔战后地形装饰")
+local _____521B_5EFA_83F2_5C3C_514B_65AF_5C14_6218_540E_5730_5F62_88C5_9970 = ____require_result_9["创建菲尼克斯尔战后地形装饰"]
+local ____require_result_10 = require("lib.扩展函数.Star扩展函数.Star扩展库.index")
+local StarOther_PanCameraToTimedForPlayer = ____require_result_10.StarOther_PanCameraToTimedForPlayer
 local ForGroup = jass.ForGroup
 local GetEnumUnit = jass.GetEnumUnit
 local GetOwningPlayer = jass.GetOwningPlayer
-local GetTriggerUnit = jass.GetTriggerUnit
 local IssueImmediateOrder = jass.IssueImmediateOrder
 local Player = jass.Player
 local SetUnitFacing = jass.SetUnitFacing
@@ -90,11 +85,7 @@ local function _____6E05_7406_83F2_5C3C_514B_65AF_5C14_8303_56F4_76D1_542C(_____
     if _____72B6_6001["取消范围监听"] ~= nil then
         _____72B6_6001["取消范围监听"]()
     end
-    if _____72B6_6001["范围触发器"] ~= nil and _____72B6_6001["范围触发器"] ~= 0 then
-        safeDestroyTrigger(_____72B6_6001["范围触发器"])
-    end
     _____72B6_6001["取消范围监听"] = nil
-    _____72B6_6001["范围触发器"] = nil
 end
 local function _____521B_5EFA_795E_6BBF_5165_53E3_8868_73B0(_____72B6_6001)
     if _____72B6_6001["已创建神殿入口表现"] then
@@ -111,18 +102,17 @@ local function _____521B_5EFA_795E_6BBF_5165_53E3_8868_73B0(_____72B6_6001)
 end
 local function _____64AD_653E_83F2_5C3C_514B_65AF_5C14_73B0_8EAB(_____89E6_53D1_5355_4F4D)
     _____5E94_7528_7B2C_4E09_7AE0_7535_5F71_955C_5934(43)
-    local ____require_result_12 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_12["播放主线剧情片段"]
+    local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_11["播放主线剧情片段"]
     _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5("molten_realm_phoenixel_reveal", {["片段ID"] = "molten_realm_phoenixel_reveal", ["触发配置名"] = "火焰神殿菲尼克斯尔现身", ["触发单位"] = _____89E6_53D1_5355_4F4D})
 end
-local function ____on_83F2_5C3C_514B_65AF_5C14_8303_56F4_89E6_53D1()
+local function ____on_83F2_5C3C_514B_65AF_5C14_8303_56F4_89E6_53D1(_____89E6_53D1_5355_4F4D)
     local _____72B6_6001 = _____5F53_524D_83F2_5C3C_514B_65AF_5C14_73B0_8EAB_72B6_6001
     if _____72B6_6001 == nil or _____72B6_6001["已触发现身"] or _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 43 then
-        return
+        return false
     end
-    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if not _____5355_4F4D_5B58_6D3B(_____89E6_53D1_5355_4F4D) or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
-        return
+    if not _____5355_4F4D_5B58_6D3B(_____89E6_53D1_5355_4F4D) then
+        return false
     end
     _____72B6_6001["已触发现身"] = true
     _____6E05_7406_83F2_5C3C_514B_65AF_5C14_8303_56F4_76D1_542C(_____72B6_6001)
@@ -136,24 +126,10 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_8303_56F4_89E6_53D1()
         YDWEAngleBetweenUnitsSafe(_____89E6_53D1_5355_4F4D, _____72B6_6001["Boss单位"])
     )
     _____64AD_653E_83F2_5C3C_514B_65AF_5C14_73B0_8EAB(_____89E6_53D1_5355_4F4D)
+    return true
 end
 local function _____6CE8_518C_83F2_5C3C_514B_65AF_5C14_8303_56F4_76D1_542C(_____72B6_6001)
-    local trigger = CreateTrigger()
-    if trigger == nil or trigger == 0 then
-        return
-    end
-    if safeTriggerAddAction(trigger, ____on_83F2_5C3C_514B_65AF_5C14_8303_56F4_89E6_53D1) == nil then
-        safeDestroyTrigger(trigger)
-        return
-    end
-    _____72B6_6001["范围触发器"] = trigger
-    _____72B6_6001["取消范围监听"] = registerUnitInRangeTrigger(
-        trigger,
-        _____72B6_6001["Boss单位"],
-        _____83F2_5C3C_514B_65AF_5C14_8FDB_5165_8303_56F4,
-        nil,
-        false
-    )
+    _____72B6_6001["取消范围监听"] = registerOneShotUnitRangeListener(_____72B6_6001["Boss单位"], _____83F2_5C3C_514B_65AF_5C14_8FDB_5165_8303_56F4, ____on_83F2_5C3C_514B_65AF_5C14_8303_56F4_89E6_53D1, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D)
 end
 local function ____on_83F2_5C3C_514B_65AF_5C14_6B7B_4EA1(dyingUnit, _killingUnit)
     local _____72B6_6001 = _____5F53_524D_83F2_5C3C_514B_65AF_5C14_73B0_8EAB_72B6_6001
@@ -181,15 +157,15 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_6B7B_4EA1(dyingUnit, _killingUnit
     _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5(dyingUnit)
 end
 ____exports["获取菲尼克斯尔Boss"] = function()
-    local ____temp_15 = _____5F53_524D_83F2_5C3C_514B_65AF_5C14_73B0_8EAB_72B6_6001 and _____5F53_524D_83F2_5C3C_514B_65AF_5C14_73B0_8EAB_72B6_6001["Boss单位"]
-    if ____temp_15 == nil then
-        ____temp_15 = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D("剧情运行时.菲尼克斯尔")
+    local ____temp_14 = _____5F53_524D_83F2_5C3C_514B_65AF_5C14_73B0_8EAB_72B6_6001 and _____5F53_524D_83F2_5C3C_514B_65AF_5C14_73B0_8EAB_72B6_6001["Boss单位"]
+    if ____temp_14 == nil then
+        ____temp_14 = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D("剧情运行时.菲尼克斯尔")
     end
-    local ____temp_15_16 = ____temp_15
-    if ____temp_15_16 == nil then
-        ____temp_15_16 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(____exports["菲尼克斯尔Boss键"])
+    local ____temp_14_15 = ____temp_14
+    if ____temp_14_15 == nil then
+        ____temp_14_15 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(____exports["菲尼克斯尔Boss键"])
     end
-    return ____temp_15_16
+    return ____temp_14_15
 end
 ____exports["执行准备菲尼克斯尔现身"] = function()
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 43 then

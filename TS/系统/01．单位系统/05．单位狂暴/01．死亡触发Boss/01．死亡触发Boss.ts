@@ -75,7 +75,7 @@ function 初始化配置缓存(this: void): void {
 
   for (let i = 0; i < 死亡触发Boss配置表.length; i++) {
     const 配置 = 死亡触发Boss配置表[i];
-    const 触发单位ID = 按名字反查任意单位ID(配置.触发单位名);
+    const 触发单位ID = 配置.触发单位ID ?? 按名字反查任意单位ID(配置.触发单位名);
     const Boss单位ID = 按名字反查任意单位ID(配置.Boss单位名);
     if (触发单位ID == null || Boss单位ID == null) continue;
 

@@ -16,40 +16,33 @@ local _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807 = ____10_FF0E_6807_51C6_5267_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.07．联机安全工具")
-local safeTriggerAddAction = ____require_result_0.safeTriggerAddAction
-local safeDestroyTrigger = ____require_result_0.safeDestroyTrigger
-local ____require_result_1 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
-local registerEnterRegionTrigger = ____require_result_1.registerEnterRegionTrigger
-local ____require_result_2 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = ____require_result_2["获取玩家英雄单位组"]
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_2["是玩家英雄组单位"]
-local ____require_result_3 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
-local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_3["按名字反查总单位ID"]
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_5["创建单位并登记排泄安全"]
-local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
-local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_6["立即移除单位并取消排泄登记"]
-local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
-local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_7["暂停并设置无敌安全"]
-local _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168 = ____require_result_7["解除暂停并取消无敌安全"]
-local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local IsUnitAliveBJ = ____require_result_8.IsUnitAliveBJ
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.17．闪电效果代码")
-local _____95EA_7535_6548_679C_4EE3_7801 = ____require_result_9["闪电效果代码"]
-local ____require_result_10 = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐")
-local _____6CE8_518C_5C01_5370_5B88_536B_6218_533A_57DF_97F3_4E50 = ____require_result_10["注册封印守卫战区域音乐"]
-local ____require_result_11 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
-local _____52A8_6001_77E9_5F62_533A_57DF_914D_7F6E_8868 = ____require_result_11["动态矩形区域配置表"]
-local _____6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_11["注册动态矩形区域"]
-local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_11["注销动态矩形区域"]
-local CreateRegion = jass.CreateRegion
-local CreateTrigger = jass.CreateTrigger
+local ____require_result_0 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
+local _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C = ____require_result_0["创建矩形进入监听"]
+local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____83B7_53D6_73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = ____require_result_1["获取玩家英雄单位组"]
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
+local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
+local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_2["按名字反查总单位ID"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_4["创建单位并登记排泄安全"]
+local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_5["立即移除单位并取消排泄登记"]
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
+local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_6["暂停并设置无敌安全"]
+local _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168 = ____require_result_6["解除暂停并取消无敌安全"]
+local ____require_result_7 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_7.IsUnitAliveBJ
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.17．闪电效果代码")
+local _____95EA_7535_6548_679C_4EE3_7801 = ____require_result_8["闪电效果代码"]
+local ____require_result_9 = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐")
+local _____6CE8_518C_5C01_5370_5B88_536B_6218_533A_57DF_97F3_4E50 = ____require_result_9["注册封印守卫战区域音乐"]
+local ____require_result_10 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____52A8_6001_77E9_5F62_533A_57DF_914D_7F6E_8868 = ____require_result_10["动态矩形区域配置表"]
+local _____6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_10["注册动态矩形区域"]
+local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_10["注销动态矩形区域"]
 local GetTriggerUnit = jass.GetTriggerUnit
-local RegionAddRect = jass.RegionAddRect
-local RemoveRegion = jass.RemoveRegion
 local Player = jass.Player
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitPosition = jass.SetUnitPosition
@@ -146,20 +139,20 @@ local function _____521B_5EFA_5C01_5370_6838_5FC3_573A_666F_5355_4F4D(_____72B6_
     if _____91CC_79D1_7279 == nil then
         return false
     end
-    local ____72B6_6001__5355_4F4D_5217_8868_12 = _____72B6_6001["单位列表"]
-    ____72B6_6001__5355_4F4D_5217_8868_12[#____72B6_6001__5355_4F4D_5217_8868_12 + 1] = _____91CC_79D1_7279
+    local ____72B6_6001__5355_4F4D_5217_8868_11 = _____72B6_6001["单位列表"]
+    ____72B6_6001__5355_4F4D_5217_8868_11[#____72B6_6001__5355_4F4D_5217_8868_11 + 1] = _____91CC_79D1_7279
     local _____6559_7687 = _____8BFB_53D6_6216_521B_5EFA_573A_666F_5355_4F4D("主线NPC.封印核心教皇", "剧情运行时.封印核心教皇", "精灵审判官", ____exports["封印核心场景站位表"]["D教皇"])
     if _____6559_7687 == nil then
         return false
     end
-    local ____72B6_6001__5355_4F4D_5217_8868_13 = _____72B6_6001["单位列表"]
-    ____72B6_6001__5355_4F4D_5217_8868_13[#____72B6_6001__5355_4F4D_5217_8868_13 + 1] = _____6559_7687
+    local ____72B6_6001__5355_4F4D_5217_8868_12 = _____72B6_6001["单位列表"]
+    ____72B6_6001__5355_4F4D_5217_8868_12[#____72B6_6001__5355_4F4D_5217_8868_12 + 1] = _____6559_7687
     local _____5965_65AF_7279_5229_4E00_4E16 = _____8BFB_53D6_6216_521B_5EFA_573A_666F_5355_4F4D("主线NPC.封印核心奥斯特利一世", "剧情运行时.封印核心奥斯特利一世", "血精灵守护者", ____exports["封印核心场景站位表"]["E奥斯特利一世"])
     if _____5965_65AF_7279_5229_4E00_4E16 == nil then
         return false
     end
-    local ____72B6_6001__5355_4F4D_5217_8868_14 = _____72B6_6001["单位列表"]
-    ____72B6_6001__5355_4F4D_5217_8868_14[#____72B6_6001__5355_4F4D_5217_8868_14 + 1] = _____5965_65AF_7279_5229_4E00_4E16
+    local ____72B6_6001__5355_4F4D_5217_8868_13 = _____72B6_6001["单位列表"]
+    ____72B6_6001__5355_4F4D_5217_8868_13[#____72B6_6001__5355_4F4D_5217_8868_13 + 1] = _____5965_65AF_7279_5229_4E00_4E16
     _____5F53_524D_5C01_5370_6838_5FC3_5965_65AF_7279_5229_4E00_4E16_8BB0_5F55 = _____5965_65AF_7279_5229_4E00_4E16
     return true
 end
@@ -183,8 +176,8 @@ local function _____521B_5EFA_4E03_8272_95EA_7535(_____72B6_6001)
                 250.8
             )
             if _____53E5_67C4_6709_6548(_____95EA_7535) then
-                local ____72B6_6001__95EA_7535_5217_8868_15 = _____72B6_6001["闪电列表"]
-                ____72B6_6001__95EA_7535_5217_8868_15[#____72B6_6001__95EA_7535_5217_8868_15 + 1] = _____95EA_7535
+                local ____72B6_6001__95EA_7535_5217_8868_14 = _____72B6_6001["闪电列表"]
+                ____72B6_6001__95EA_7535_5217_8868_14[#____72B6_6001__95EA_7535_5217_8868_14 + 1] = _____95EA_7535
             end
             i = i + 1
         end
@@ -278,21 +271,13 @@ local function _____6E05_7406_5C01_5370_6838_5FC3_5165_53E3_76D1_542C()
     if _____72B6_6001 == nil then
         return
     end
-    if _____72B6_6001["取消监听"] ~= nil then
-        _____72B6_6001["取消监听"](_____72B6_6001)
-    end
-    if _____53E5_67C4_6709_6548(_____72B6_6001["触发器"]) then
-        safeDestroyTrigger(_____72B6_6001["触发器"])
-    end
-    if _____53E5_67C4_6709_6548(_____72B6_6001["区域"]) then
-        RemoveRegion(_____72B6_6001["区域"])
-    end
+    _____72B6_6001["取消"]()
     _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____5C01_5370_6838_5FC3_5165_53E3_77E9_5F62_952E)
     _____5F53_524D_5C01_5370_6838_5FC3_5165_53E3_76D1_542C = nil
 end
 local function _____64AD_653E_5C01_5370_6838_5FC3_7EAF_5BF9_767D(_____89E6_53D1_5355_4F4D)
-    local ____require_result_16 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_16["播放主线剧情片段"]
+    local ____require_result_15 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_15["播放主线剧情片段"]
     local _____5DF2_64AD_653E = _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5("molten_realm_seal_core_dialogue", {["片段ID"] = "molten_realm_seal_core_dialogue", ["触发配置名"] = "封印核心入口", ["触发单位"] = _____89E6_53D1_5355_4F4D})
     if not _____5DF2_64AD_653E then
         ____exports["清理封印核心场景"]()
@@ -320,33 +305,17 @@ ____exports["开始监听封印核心入口"] = function()
         return
     end
     _____6CE8_518C_5C01_5370_5B88_536B_6218_533A_57DF_97F3_4E50()
-    local _____533A_57DF = CreateRegion()
     local _____77E9_5F62 = _____6CE8_518C_52A8_6001_77E9_5F62_533A_57DF(_____52A8_6001_77E9_5F62_533A_57DF_914D_7F6E_8868[_____5C01_5370_6838_5FC3_5165_53E3_77E9_5F62_952E])
-    local _____89E6_53D1_5668 = CreateTrigger()
-    if not _____53E5_67C4_6709_6548(_____533A_57DF) or not _____53E5_67C4_6709_6548(_____77E9_5F62) or not _____53E5_67C4_6709_6548(_____89E6_53D1_5668) then
-        if _____53E5_67C4_6709_6548(_____533A_57DF) then
-            RemoveRegion(_____533A_57DF)
-        end
-        if _____53E5_67C4_6709_6548(_____89E6_53D1_5668) then
-            safeDestroyTrigger(_____89E6_53D1_5668)
-        end
+    if not _____53E5_67C4_6709_6548(_____77E9_5F62) then
         _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____5C01_5370_6838_5FC3_5165_53E3_77E9_5F62_952E)
         return
     end
-    RegionAddRect(_____533A_57DF, _____77E9_5F62)
-    if safeTriggerAddAction(_____89E6_53D1_5668, ____on_5C01_5370_6838_5FC3_5165_53E3_89E6_53D1) == nil then
-        RemoveRegion(_____533A_57DF)
-        safeDestroyTrigger(_____89E6_53D1_5668)
+    local _____76D1_542C = _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C(_____77E9_5F62, ____on_5C01_5370_6838_5FC3_5165_53E3_89E6_53D1, nil)
+    if _____76D1_542C == nil then
         _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____5C01_5370_6838_5FC3_5165_53E3_77E9_5F62_952E)
         return
     end
-    _____5F53_524D_5C01_5370_6838_5FC3_5165_53E3_76D1_542C = {
-        ["区域"] = _____533A_57DF,
-        ["矩形"] = _____77E9_5F62,
-        ["触发器"] = _____89E6_53D1_5668,
-        ["取消监听"] = registerEnterRegionTrigger(_____89E6_53D1_5668, _____533A_57DF, nil),
-        ["已触发"] = false
-    }
+    _____5F53_524D_5C01_5370_6838_5FC3_5165_53E3_76D1_542C = {["取消"] = _____76D1_542C["取消"], ["已触发"] = false}
 end
 ____exports["执行布置封印核心纯对白"] = function(______53C2_6570)
     ____exports["布置封印核心纯对白"]()

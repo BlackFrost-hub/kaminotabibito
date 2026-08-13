@@ -3,18 +3,20 @@
 import { 藤原妹红单位技能配置 } from "./00．配置";
 import { 读取单位攻击力, 单位未标记死亡 as 单位有效 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import {
+  主动引爆护盾仍有效,
+  创建主动引爆护盾,
+  引爆主动引爆护盾,
+  护盾类型,
+  清理主动引爆护盾,
+  type 主动引爆护盾控制器,
+} from "../../../00．技能模板+函数/01．技能函数/07．护盾";
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
 };
 const { 获取范围敌军 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   获取范围敌军: (this: void, source: any, x: number, y: number, radius: number) => any[];
-};
-const { 开始护盾, 护盾类型, 查询单位标签护盾值, 移除单位标签护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾") as {
-  开始护盾: (this: void, unit: any, params: any) => number;
-  护盾类型: { 通用: number };
-  查询单位标签护盾值: (this: void, unit: any, tag: string) => number;
-  移除单位标签护盾: (this: void, unit: any, tag: string) => void;
 };
 const { createUnitEffect, destroyUnitEffect, createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
@@ -39,10 +41,6 @@ const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
-const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
-const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
@@ -57,7 +55,7 @@ interface 藤原妹红W运行时上下文 {
   护盾ID: number;
   周期回调ID: number;
   周期伤害: number;
-  主技能已禁用: boolean;
+  护盾控制器?: 主动引爆护盾控制器;
 }
 
 const 藤原妹红单位类型ID = stringToFourCCSafe(藤原妹红单位技能配置.单位类型ID);
@@ -82,7 +80,7 @@ export function 获取或创建藤原妹红W上下文(this: void, unit: any): �
     护盾ID: 0,
     周期回调ID: 0,
     周期伤害: 0,
-    主技能已禁用: false,
+    护盾控制器: undefined,
   };
   藤原妹红W上下文表[unitId] = created;
   return created;
@@ -93,54 +91,30 @@ function 获取藤原妹红W上下文(this: void, unit: any): 藤原妹红W运�
   return unitId === 0 ? undefined : 藤原妹红W上下文表[unitId];
 }
 
-function 按护盾查找藤原妹红W上下文(this: void, shieldTarget: any, shieldId: number): 藤原妹红W运行时上下文 | undefined {
-  for (const key in 藤原妹红W上下文表) {
-    const context = 藤原妹红W上下文表[Number(key)];
-    if (context == null) continue;
-    if (context.护盾目标 !== shieldTarget) continue;
-    if (context.护盾ID !== shieldId) continue;
-    return context;
-  }
-  return undefined;
-}
-
 function 清理藤原妹红W状态(this: void, unit: any, shieldId?: number): void {
   const context = 获取藤原妹红W上下文(unit);
   if (context == null) return;
   if (shieldId != null && context.护盾ID !== 0 && context.护盾ID !== shieldId) return;
 
+  const 控制器 = context.护盾控制器;
+  context.护盾控制器 = undefined;
+  清理主动引爆护盾(控制器, "技能状态清理");
+}
+
+function 藤原妹红W护盾清理(this: void, _controller: 主动引爆护盾控制器, _reason: string): void {
+  const context = 获取藤原妹红W上下文(_controller.施法者);
+  destroyUnitEffect(_controller.护盾目标, 藤原妹红单位技能配置.表现资源.护盾特效键);
+  if (context == null) return;
+  if (context.护盾控制器 != null && context.护盾控制器 !== _controller) return;
+
   if (context.周期回调ID !== 0) {
     removePeriodicCallback(context.周期回调ID);
     context.周期回调ID = 0;
   }
-  if (context.护盾目标 != null && context.护盾目标 !== 0) {
-    destroyUnitEffect(context.护盾目标, 藤原妹红单位技能配置.表现资源.护盾特效键);
-  }
   context.护盾目标 = undefined;
   context.护盾ID = 0;
   context.周期伤害 = 0;
-
-  if (context.主技能已禁用) {
-    const owner = GetOwningPlayer(unit);
-    if (owner != null && owner !== 0) SetPlayerAbilityAvailable(owner, 主技能ID, true);
-    context.主技能已禁用 = false;
-  }
-  UnitRemoveAbility(unit, 引爆技能ID);
-}
-
-function 藤原妹红W护盾破碎(this: void, unit: any, shieldId: number, _absorbed: number): void {
-  const context = 按护盾查找藤原妹红W上下文(unit, shieldId);
-  if (context != null) 清理藤原妹红W状态(context.施法者, shieldId);
-}
-
-function 藤原妹红W护盾到期(this: void, unit: any, shieldId: number): void {
-  const context = 按护盾查找藤原妹红W上下文(unit, shieldId);
-  if (context != null) 清理藤原妹红W状态(context.施法者, shieldId);
-}
-
-function 藤原妹红W护盾结束(this: void, unit: any, shieldId: number, _reason: string): void {
-  const context = 按护盾查找藤原妹红W上下文(unit, shieldId);
-  if (context != null) 清理藤原妹红W状态(context.施法者, shieldId);
+  context.护盾控制器 = undefined;
 }
 
 function 周期目标允许藤原妹红W伤害(this: void, target: any): boolean {
@@ -193,7 +167,7 @@ function 藤原妹红W周期Tick(this: void, variable?: any): void {
     清理藤原妹红W状态(context.施法者, context.护盾ID);
     return;
   }
-  if (!(查询单位标签护盾值(context.护盾目标, 藤原妹红单位技能配置.护盾标签) > 0)) {
+  if (!主动引爆护盾仍有效(context.护盾控制器)) {
     清理藤原妹红W状态(context.施法者, context.护盾ID);
     return;
   }
@@ -206,7 +180,6 @@ function 创建藤原妹红W护盾(this: void, context: 藤原妹红W运行时�
 
   const target = GetSpellTargetUnit();
   if (!单位有效(target)) return false;
-  if (查询单位标签护盾值(target, 藤原妹红单位技能配置.护盾标签) > 0) return false;
 
   const attack = 读取单位攻击力(caster);
   const shieldValue = attack * 藤原妹红单位技能配置.护盾值攻击力倍率;
@@ -216,36 +189,32 @@ function 创建藤原妹红W护盾(this: void, context: 藤原妹红W运行时�
   context.施法者 = caster;
   context.护盾目标 = target;
   context.周期伤害 = periodicDamage;
-  context.主技能已禁用 = true;
-  const owner = GetOwningPlayer(caster);
-  if (owner != null && owner !== 0) SetPlayerAbilityAvailable(owner, 主技能ID, false);
-  UnitAddAbility(caster, 引爆技能ID);
-  if (owner != null && owner !== 0) SetPlayerAbilityAvailable(owner, 引爆技能ID, true);
-  createUnitEffect(
-    target,
-    藤原妹红单位技能配置.表现资源.护盾特效挂点,
-    藤原妹红单位技能配置.表现资源.护盾特效路径,
-    undefined,
-    藤原妹红单位技能配置.表现资源.护盾特效键,
-  );
-
-  const shieldId = 开始护盾(target, {
-    类型: 护盾类型.通用,
-    数值: shieldValue,
-    持续时间: 藤原妹红单位技能配置.护盾持续秒,
-    来源单位: caster,
-    显示护盾条: true,
-    可驱散: false,
-    标签: 藤原妹红单位技能配置.护盾标签,
-    破碎回调: 藤原妹红W护盾破碎,
-    到期回调: 藤原妹红W护盾到期,
-    结束回调: 藤原妹红W护盾结束,
+  const 控制器 = 创建主动引爆护盾({
+    名称: "藤原妹红-火焰护盾",
+    施法者: caster,
+    护盾目标: target,
+    主技能ID,
+    引爆技能ID,
+    护盾标签: 藤原妹红单位技能配置.护盾标签,
+    护盾参数: {
+      类型: 护盾类型.通用,
+      数值: shieldValue,
+      持续时间: 藤原妹红单位技能配置.护盾持续秒,
+      来源单位: caster,
+      显示护盾条: true,
+      可驱散: false,
+    },
+    on创建前: 藤原妹红W护盾创建前,
+    on清理: 藤原妹红W护盾清理,
+    on引爆前: 藤原妹红W护盾引爆前,
   });
-  if (shieldId === 0) {
-    清理藤原妹红W状态(caster);
+  if (控制器 == null) {
+    context.护盾目标 = undefined;
+    context.周期伤害 = 0;
     return false;
   }
-  context.护盾ID = shieldId;
+  context.护盾控制器 = 控制器;
+  context.护盾ID = 控制器.护盾ID;
   context.周期回调ID = addPeriodicCallback(
     藤原妹红单位技能配置.周期伤害间隔毫秒,
     藤原妹红W周期Tick,
@@ -254,19 +223,19 @@ function 创建藤原妹红W护盾(this: void, context: 藤原妹红W运行时�
   return true;
 }
 
-function 引爆藤原妹红W护盾(this: void, context: 藤原妹红W运行时上下文, caster: any): void {
-  if (!单位有效(caster) || context.护盾ID === 0) return;
-  const target = context.护盾目标;
-  if (!单位有效(target)) {
-    清理藤原妹红W状态(caster, context.护盾ID);
-    return;
-  }
-  const damage = 查询单位标签护盾值(target, 藤原妹红单位技能配置.护盾标签);
-  if (!(damage > 0)) {
-    清理藤原妹红W状态(caster, context.护盾ID);
-    return;
-  }
+function 藤原妹红W护盾创建前(this: void, controller: 主动引爆护盾控制器): void {
+  createUnitEffect(
+    controller.护盾目标,
+    藤原妹红单位技能配置.表现资源.护盾特效挂点,
+    藤原妹红单位技能配置.表现资源.护盾特效路径,
+    undefined,
+    藤原妹红单位技能配置.表现资源.护盾特效键,
+  );
+}
 
+function 藤原妹红W护盾引爆前(this: void, controller: 主动引爆护盾控制器, damage: number): void {
+  const caster = controller.施法者;
+  const target = controller.护盾目标;
   createTimedEffect(
     藤原妹红单位技能配置.表现资源.引爆特效路径,
     GetUnitX(caster),
@@ -288,8 +257,11 @@ function 引爆藤原妹红W护盾(this: void, context: 藤原妹红W运行时�
     技能ID: 引爆技能ID,
     每目标处理器: 准备藤原妹红W引爆目标伤害,
   });
-  移除单位标签护盾(target, 藤原妹红单位技能配置.护盾标签);
-  清理藤原妹红W状态(caster, context.护盾ID);
+}
+
+function 引爆藤原妹红W护盾(this: void, context: 藤原妹红W运行时上下文, caster: any): void {
+  if (!单位有效(caster)) return;
+  引爆主动引爆护盾(context.护盾控制器);
 }
 
 function 藤原妹红W主技能监听(this: void, _context: 藤原妹红W运行时上下文, caster: any): void {

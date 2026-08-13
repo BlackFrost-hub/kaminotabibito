@@ -39,7 +39,7 @@ ____exports["是否普通敌人"] = function(unit)
     if unit == nil or unit == 0 then
         return false
     end
-    local RACE_BEAST = jass.ConvertRace(8)
+    local RACE_BEAST = jass:ConvertRace(8)
     return IsUnitRace(unit, RACE_DEMON) == true or IsUnitRace(unit, RACE_BEAST) == true
 end
 --- 判断是否是蝼蚁敌人（普通敌人 + 非恶魔 + 非英雄）
@@ -53,7 +53,7 @@ ____exports["是否蝼蚁敌人"] = function(unit)
     if IsUnitType(unit, UNIT_TYPE_HERO) == true then
         return false
     end
-    local RACE_BEAST = jass.ConvertRace(8)
+    local RACE_BEAST = jass:ConvertRace(8)
     return IsUnitRace(unit, RACE_BEAST) == true
 end
 return ____exports

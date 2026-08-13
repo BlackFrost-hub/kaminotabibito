@@ -215,14 +215,22 @@ ____exports["装备掉落表"] = {
         isUniversal = "FALSE",
         unitType = "normal"
     },
-    n04G = {id = "n04G", name = "咆哮之熊", level = 18, unitType = "normal"},
+    n04G = {
+        id = "n04G",
+        name = "咆哮之熊",
+        level = 18,
+        itemIds = "I0HJ:18%",
+        picks = 1,
+        isUniversal = "FALSE",
+        unitType = "normal"
+    },
     nslr = {id = "nslr", name = "蜥蜴怪物", level = 18, unitType = "normal"},
     n037 = {
         id = "n037",
         name = "恶魔犬",
         level = 19,
-        itemIds = "I06A:8%;I06B:8%;I066:2%;I065:2%;I069:8%;I090:2%;I091:2%;I08Y:2%;I08Z:16%",
-        picks = 7,
+        itemIds = "I06A:8%;I06B:8%;I066:2%;I065:2%;I069:8%;I090:2%;I091:2%;I08Y:2%;I08Z:16%;I0HM:14%",
+        picks = 8,
         isUniversal = "TRUE",
         unitType = "normal"
     },
@@ -317,7 +325,15 @@ ____exports["装备掉落表"] = {
         isUniversal = "FALSE",
         unitType = "normal"
     },
-    n04Y = {id = "n04Y", name = "树魔猎手", level = 24, unitType = "normal"},
+    n04Y = {
+        id = "n04Y",
+        name = "树魔猎手",
+        level = 24,
+        itemIds = "I0HK:18%",
+        picks = 1,
+        isUniversal = "FALSE",
+        unitType = "normal"
+    },
     u002 = {
         id = "u002",
         name = "双翼恶魔",
@@ -339,8 +355,8 @@ ____exports["装备掉落表"] = {
         id = "n00Y",
         name = "火焰恶魔",
         level = 24,
-        itemIds = "I068:7%;I066:2%;I065:2%;I069:8%;I090:2%;I091:2%;I08Y:2%;I08Z:16%",
-        picks = 8,
+        itemIds = "I068:7%;I066:2%;I065:2%;I069:8%;I090:2%;I091:2%;I08Y:2%;I08Z:16%;I0HN:14%",
+        picks = 9,
         isUniversal = "FALSE",
         unitType = "normal"
     },
@@ -397,8 +413,8 @@ ____exports["装备掉落表"] = {
         id = "n04K",
         name = "大嘴食人花",
         level = 26,
-        itemIds = "I0BU:4%;I0BW:2%;I0BV:2%",
-        picks = 1,
+        itemIds = "I0BU:4%;I0BW:2%;I0BV:2%;I0HL:18%",
+        picks = 2,
         isUniversal = "FALSE",
         unitType = "normal"
     },
@@ -449,15 +465,6 @@ ____exports["装备掉落表"] = {
         level = 5,
         itemIds = "I00C:1;I00E:1;I00D:1;I00G:1",
         picks = 2,
-        isUniversal = "FALSE",
-        unitType = "elite"
-    },
-    n01G = {
-        id = "n01G",
-        name = "奇妙鹿|cffff0000（Boss，LV7）|r",
-        level = 7,
-        itemIds = "I011:always",
-        picks = 1,
         isUniversal = "FALSE",
         unitType = "elite"
     },

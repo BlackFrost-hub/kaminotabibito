@@ -34,7 +34,6 @@ export interface 莫特斯隐藏副本运行状态 {
   当前洞窟守卫: any;
   当前暂停小怪: any[];
   莫特斯单位: any;
-  莫特斯范围触发器: any;
   取消莫特斯范围监听?: (this: void) => void;
   莫特斯对白已触发: boolean;
   莫特斯战斗已启动: boolean;
@@ -53,7 +52,6 @@ export const 莫特斯运行状态: 莫特斯隐藏副本运行状态 = {
   当前洞窟守卫: null,
   当前暂停小怪: [],
   莫特斯单位: null,
-  莫特斯范围触发器: null,
   取消莫特斯范围监听: undefined,
   莫特斯对白已触发: false,
   莫特斯战斗已启动: false,

@@ -13,32 +13,25 @@ local _____542F_52A8_5267_60C5Boss_6218 = ____require_result_1["启动剧情Boss
 local ____require_result_2 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.13．战斗结束事件")
 local ____register_7956_5730_53CC_7075_536B_6218_6597_7ED3_675FListener = ____require_result_2["register祖地双灵卫战斗结束Listener"]
 local ____require_result_3 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
-local registerEnterRegionTrigger = ____require_result_3.registerEnterRegionTrigger
-local ____require_result_4 = require("系统.00．核心系统.07．联机安全工具")
-local safeTriggerAddAction = ____require_result_4.safeTriggerAddAction
-local safeDestroyTrigger = ____require_result_4.safeDestroyTrigger
-local ____require_result_5 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_5["是玩家英雄组单位"]
-local ____require_result_6 = require("系统.09．表现系统.06．广播提示消息.index")
-local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_6["广播单位提示"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548 = ____require_result_7["创建单位脚下点特效"]
-local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_8.addDelayedCallback
-local addPeriodicCallback = ____require_result_8.addPeriodicCallback
-local removePeriodicCallback = ____require_result_8.removePeriodicCallback
-local getServerTime = ____require_result_8.getServerTime
-local CreateRegion = jass.CreateRegion
-local CreateTrigger = jass.CreateTrigger
+local _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C = ____require_result_3["创建矩形进入监听"]
+local ____require_result_4 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_4["是玩家英雄组单位"]
+local ____require_result_5 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_5["广播单位提示"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
+local _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548 = ____require_result_6["创建单位脚下点特效"]
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_7.addDelayedCallback
+local addPeriodicCallback = ____require_result_7.addPeriodicCallback
+local removePeriodicCallback = ____require_result_7.removePeriodicCallback
+local getServerTime = ____require_result_7.getServerTime
 local GetTriggerUnit = jass.GetTriggerUnit
 local Rect = jass.Rect
-local RegionAddRect = jass.RegionAddRect
 local RemoveRect = jass.RemoveRect
-local RemoveRegion = jass.RemoveRegion
 local ____Boss_9884_8B66_5237_65B0_6BEB_79D2 = 100
 local ____Boss_573A_666F_6A21_5757_5DF2_521D_59CB_5316 = false
-local ____Boss_5165_53E3_89E6_53D1_5668 = nil
+local ____Boss_5165_53E3_76D1_542C = nil
 local ____Boss_9884_8B66_5468_671FID = 0
 local ____Boss_9884_8B66_7ED3_675F_6BEB_79D2 = 0
 local function _____53E5_67C4_6709_6548(handle)
@@ -84,8 +77,8 @@ local function _____521B_5EFA_53CC_7075_536B_9884_7F6E()
             if not _____53E5_67C4_6709_6548(boss) then
                 return false
             end
-            local ____7956_5730_53CC_7075_536B_526F_672C_72B6_6001_Boss_5355_4F4D_5217_8868_9 = _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["Boss单位列表"]
-            ____7956_5730_53CC_7075_536B_526F_672C_72B6_6001_Boss_5355_4F4D_5217_8868_9[#____7956_5730_53CC_7075_536B_526F_672C_72B6_6001_Boss_5355_4F4D_5217_8868_9 + 1] = boss
+            local ____7956_5730_53CC_7075_536B_526F_672C_72B6_6001_Boss_5355_4F4D_5217_8868_8 = _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["Boss单位列表"]
+            ____7956_5730_53CC_7075_536B_526F_672C_72B6_6001_Boss_5355_4F4D_5217_8868_8[#____7956_5730_53CC_7075_536B_526F_672C_72B6_6001_Boss_5355_4F4D_5217_8868_8 + 1] = boss
             _____521B_5EFA_5355_4F4D_811A_4E0B_70B9_7279_6548(boss, {["模型路径"] = _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["Boss脚下特效"]["路径"], ["缩放"] = _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["Boss脚下特效"]["缩放"], ["持续秒"] = 3.2})
             i = i + 1
         end
@@ -157,40 +150,26 @@ local function ____on_8FDB_5165_7956_5730_53CC_7075_536BBoss_5165_53E3()
     if not _____53E5_67C4_6709_6548(hero) or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(hero) then
         return
     end
+    if ____Boss_5165_53E3_76D1_542C ~= nil then
+        ____Boss_5165_53E3_76D1_542C["取消"]()
+    end
+    ____Boss_5165_53E3_76D1_542C = nil
     _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["Boss场景已触发"] = true
     _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["Boss场景触发英雄"] = hero
     _____5E7F_64AD_5355_4F4D_63D0_793A(hero, "怎么什么都没有？这里明明残留着很强的气息。", 4200)
     addDelayedCallback(5600, _____5F00_59CBBoss_9884_8B66)
 end
 local function _____6CE8_518CBoss_5165_53E3()
-    if _____53E5_67C4_6709_6548(____Boss_5165_53E3_89E6_53D1_5668) then
+    if ____Boss_5165_53E3_76D1_542C ~= nil then
         return
     end
     local cfg = _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["Boss入口"]
-    local region = CreateRegion()
     local rect = Rect(cfg.X - cfg["半径"], cfg.Y - cfg["半径"], cfg.X + cfg["半径"], cfg.Y + cfg["半径"])
-    local trigger = CreateTrigger()
-    if not _____53E5_67C4_6709_6548(region) or not _____53E5_67C4_6709_6548(rect) or not _____53E5_67C4_6709_6548(trigger) then
-        if _____53E5_67C4_6709_6548(trigger) then
-            safeDestroyTrigger(trigger)
-        end
-        if _____53E5_67C4_6709_6548(region) then
-            RemoveRegion(region)
-        end
-        if _____53E5_67C4_6709_6548(rect) then
-            RemoveRect(rect)
-        end
+    if not _____53E5_67C4_6709_6548(rect) then
         return
     end
-    RegionAddRect(region, rect)
+    ____Boss_5165_53E3_76D1_542C = _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C(rect, ____on_8FDB_5165_7956_5730_53CC_7075_536BBoss_5165_53E3, nil)
     RemoveRect(rect)
-    if safeTriggerAddAction(trigger, ____on_8FDB_5165_7956_5730_53CC_7075_536BBoss_5165_53E3) == nil then
-        safeDestroyTrigger(trigger)
-        RemoveRegion(region)
-        return
-    end
-    registerEnterRegionTrigger(trigger, region, nil)
-    ____Boss_5165_53E3_89E6_53D1_5668 = trigger
 end
 local function ____on_7956_5730_53CC_7075_536B_6218_6597_7ED3_675F(_red, _azure)
     if _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["Boss战已完成"] then

@@ -131,7 +131,34 @@ local function _____589E_52A0_51FB_6740_4EFB_52A1_8FDB_5EA6(_____73A9_5BB6ID, __
         return
     end
     local _____76EE_6807 = _____4EFB_52A1.objectives[1]
-    if _____914D_7F6E["目标单位分别击杀"] == true then
+    if _____914D_7F6E["击杀目标组"] and #_____914D_7F6E["击杀目标组"] > 0 then
+        _____76EE_6807 = nil
+        do
+            local i = 0
+            while i < #_____914D_7F6E["击杀目标组"] do
+                do
+                    local _____76EE_6807_7EC4 = _____914D_7F6E["击杀目标组"][i + 1]
+                    if not _____76EE_6807_7EC4 or not _____76EE_6807_5355_4F4D_5339_914D(_____76EE_6807_7EC4["目标单位"], _____6B7B_4EA1_5355_4F4D_4EE3_7801) then
+                        goto __continue31
+                    end
+                    local _____76EE_6807ID = "kill_group_" .. tostring(nil, i)
+                    do
+                        local j = 0
+                        while j < #_____4EFB_52A1.objectives do
+                            if _____4EFB_52A1.objectives[j + 1] ~= nil and _____4EFB_52A1.objectives[j + 1].id == _____76EE_6807ID then
+                                _____76EE_6807 = _____4EFB_52A1.objectives[j + 1]
+                                break
+                            end
+                            j = j + 1
+                        end
+                    end
+                    break
+                end
+                ::__continue31::
+                i = i + 1
+            end
+        end
+    elseif _____914D_7F6E["目标单位分别击杀"] == true then
         _____76EE_6807 = nil
         local _____76EE_6807ID = "kill_" .. _____6B7B_4EA1_5355_4F4D_4EE3_7801
         do
@@ -159,12 +186,12 @@ local function _____589E_52A0_51FB_6740_4EFB_52A1_8FDB_5EA6(_____73A9_5BB6ID, __
                 do
                     local _____5F53_524D_76EE_6807 = _____4EFB_52A1.objectives[i + 1]
                     if not _____5F53_524D_76EE_6807 then
-                        goto __continue36
+                        goto __continue43
                     end
                     _____603B_8FDB_5EA6 = _____603B_8FDB_5EA6 + (_____5F53_524D_76EE_6807.id == _____76EE_6807.id and _____65B0_8FDB_5EA6 or _____5F53_524D_76EE_6807.current)
                     _____603B_9700_6C42 = _____603B_9700_6C42 + _____5F53_524D_76EE_6807.required
                 end
-                ::__continue36::
+                ::__continue43::
                 i = i + 1
             end
         end
@@ -188,18 +215,18 @@ local function ____on_4EFB_52A1_76EE_6807_5355_4F4D_6B7B_4EA1(_____6B7B_4EA1_535
             do
                 local _____4EFB_52A1 = _____8FDB_884C_4E2D_4EFB_52A1[i + 1]
                 if not _____4EFB_52A1 or _____4EFB_52A1.status ~= QuestStatus.IN_PROGRESS then
-                    goto __continue42
+                    goto __continue49
                 end
                 local _____914D_7F6E = _____67E5_627E_4EFB_52A1_914D_7F6E(_____4EFB_52A1.id)
                 if not _____914D_7F6E or not _____662F_51FB_6740_4EFB_52A1_914D_7F6E(_____914D_7F6E) then
-                    goto __continue42
+                    goto __continue49
                 end
                 if not _____73A9_5BB6_82F1_96C4_6EE1_8DB3_51FB_6740_643A_5E26_6761_4EF6(_____51FB_6740_73A9_5BB6, _____914D_7F6E["击杀携带物品"]) then
-                    goto __continue42
+                    goto __continue49
                 end
                 _____589E_52A0_51FB_6740_4EFB_52A1_8FDB_5EA6(_____73A9_5BB6ID, _____4EFB_52A1, _____914D_7F6E, _____6B7B_4EA1_5355_4F4D_4EE3_7801)
             end
-            ::__continue42::
+            ::__continue49::
             i = i + 1
         end
     end

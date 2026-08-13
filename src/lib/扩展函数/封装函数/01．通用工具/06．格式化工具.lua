@@ -10,10 +10,14 @@ local jass = require("jass.common")
 -- @returns 格式化后的字符串
 function ____exports.formatNumber(self, num)
     if num >= 10 then
-        return tostring(jass.R2I(num)
+        return tostring(
+            nil,
+            jass:R2I(num)
         )
     else
-        return tostring(jass.R2I(num * 10) / 10
+        return tostring(
+            nil,
+            jass:R2I(num * 10) / 10
         )
     end
 end
@@ -23,8 +27,10 @@ end
 -- @param decimals 小数位数
 -- @returns 格式化后的字符串
 function ____exports.formatNumberDecimals(self, num, decimals)
-    local multiplier = jass.Pow(10, decimals)
-    return tostring(jass.R2I(num * multiplier) / multiplier
+    local multiplier = jass:Pow(10, decimals)
+    return tostring(
+        nil,
+        jass:R2I(num * multiplier) / multiplier
     )
 end
 --- 格式化百分比

@@ -2,7 +2,7 @@
 
 import { 教派学者单位技能配置 } from './00．配置';
 import { 获取或创建教派学者上下文, 教派学者单位存活, type 教派学者运行时上下文 } from './01．运行时上下文';
-import { 教派学者技能配置 } from './02．数值与表现配置';
+import { 教派学者技能配置, 教派学者音效配置 } from './02．数值与表现配置';
 import { 播放教派学者台词 } from './09．台词播放';
 import { 极坐标X, 极坐标Y, 距离平方XY } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
@@ -28,6 +28,9 @@ const { 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统
 };
 const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC扩展库') as {
   EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, size: number, speed: number, time: number) => any;
+};
+const { Sound3DII_CooPlayReuse } = require('lib.扩展函数.封装函数.02．音效系统.03．3D音效播放') as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
@@ -164,6 +167,7 @@ function on冥之念欲结算(this: void, variable?: any): void {
   }
   const 配置 = 教派学者技能配置.冥之念欲;
   EC_CreateEffect(配置.结算特效路径, 状态.Boss快照X, 状态.Boss快照Y, 0, 0, 配置.结算特效缩放, 1, 1);
+  Sound3DII_CooPlayReuse(教派学者音效配置.冥之念欲.结算惩罚, 状态.Boss快照X, 状态.Boss快照Y, 0, 教派学者技能配置.公共施法.音效裁断距离);
   const 目标列表 = 获取Boss技能敌对英雄列表(boss);
   let 违规数 = 0;
   let 命中数 = 0;
@@ -178,6 +182,7 @@ function on冥之念欲结算(this: void, variable?: any): void {
 
 function 创建冥之念预警(this: void, 状态: 冥之念欲状态): void {
   const 配置 = 教派学者技能配置.冥之念欲;
+  Sound3DII_CooPlayReuse(教派学者音效配置.冥之念欲.预警提示, 状态.Boss快照X, 状态.Boss快照Y, 0, 教派学者技能配置.公共施法.音效裁断距离);
   if (状态.类型 === '念引') {
     EC_CreateEffect(配置.主提示圈路径, 状态.Boss快照X, 状态.Boss快照Y, 0, 配置.提示圈朝向, 配置.念引主提示圈缩放, 配置.念引主提示圈速度, 配置.念引提示持续秒);
     EC_CreateEffect(配置.次提示圈路径, 状态.Boss快照X, 状态.Boss快照Y, 0, 配置.提示圈朝向, 配置.念引次提示圈缩放, 1, 配置.念引提示持续秒);
@@ -230,6 +235,7 @@ function 启动冥之念欲机制(this: void, 上下文: 教派学者运行时�
   上下文.清理.登记清理('教派学者-冥之念欲清理', on冥之念欲清理, 状态);
   const 移除量 = 按比例移除最大生命(boss, 配置.自损最大生命比例, true);
   EC_CreateEffect(配置.自损特效路径, GetUnitX(boss), GetUnitY(boss), 0, 0, 配置.自损特效缩放, 1, 1);
+  Sound3DII_CooPlayReuse(教派学者音效配置.冥之念欲.起手自损, GetUnitX(boss), GetUnitY(boss), 0, 教派学者技能配置.公共施法.音效裁断距离);
   const buffID = 取得冥之念BuffID(类型);
   for (let i = 0; i < 状态.Buff目标列表.length; i++) {
     const target = 状态.Buff目标列表[i];

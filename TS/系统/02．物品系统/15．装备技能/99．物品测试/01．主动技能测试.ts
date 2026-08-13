@@ -29,11 +29,13 @@ import {
   物品主动技能测试命令列表,
   物品主动技能测试命令说明文本列表,
   物品主动技能测试清理装备列表,
+  精灵药水测试装备列表,
 } from "./00．测试配置";
 
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const CreateItem = jass.CreateItem as (itemId: number, x: number, y: number) => any;
 const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => boolean;
+const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -52,6 +54,7 @@ const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 
 const 模块名 = "物品主动技能测试";
+const 精灵药水套装测试命令 = "192";
 const 物品冷却刷新命令 = "wpcd";
 const 物品负面清除测试减速命令 = "wpslow";
 const 打印注册命令日志 = false;
@@ -205,8 +208,8 @@ function 初始化测试物品技能ID表(this: void): void {
   已初始化测试物品技能ID表 = true;
 
   const 测试物品RawID表: Record<string, boolean> = {};
-  for (let i = 0; i < 物品主动技能测试发放顺序.length; i++) {
-    const 装备名 = 物品主动技能测试发放顺序[i];
+  for (let i = 0; i < 物品主动技能测试清理装备列表.length; i++) {
+    const 装备名 = 物品主动技能测试清理装备列表[i];
     const rawId = 按名字反查物品ID(装备名);
     if (rawId != null && rawId !== "") 测试物品RawID表[rawId] = true;
     const 装备项 = rawId != null ? 装备数据[rawId] : undefined;
@@ -271,6 +274,29 @@ function on聊天挂载减速测试(this: void, player: any, _command: string): 
 
 function 发放单个装备(this: void, unit: any, 序号: number): void {
   丢弃测试装备(unit);
+  if (序号 === 192) {
+    let 创建数量 = 0;
+    const x = GetUnitX(unit);
+    const y = GetUnitY(unit);
+    for (let i = 0; i < 精灵药水测试装备列表.length; i++) {
+      const 装备名 = 精灵药水测试装备列表[i];
+      const rawId = 按名字反查物品ID(装备名);
+      const itemTypeId = stringToFourCCSafe(rawId);
+      if (itemTypeId === 0) {
+        debugLogForce(模块名, "未找到精灵药水ID", 装备名);
+        continue;
+      }
+      const item = CreateItem(itemTypeId, x, y);
+      if (item == null || item === 0) {
+        debugLogForce(模块名, "创建精灵药水失败", 装备名, rawId, itemTypeId);
+        continue;
+      }
+      UnitAddItem(unit, item);
+      创建数量 += 1;
+    }
+    debugLogForce(模块名, "已发放全部精灵药水", "创建数量", 创建数量);
+    return;
+  }
   if (序号 > 0 && 序号 <= 物品主动技能测试发放顺序.length) {
     const 装备名 = 物品主动技能测试发放顺序[序号 - 1];
     if (发放装备(unit, 装备名)) {
@@ -288,6 +314,11 @@ function on聊天wp测试(this: void, player: any, command: string): void {
     return;
   }
 
+  if (command === 精灵药水套装测试命令) {
+    发放单个装备(unit, 192);
+    return;
+  }
+
   for (let i = 0; i < 物品主动技能测试命令列表.length; i++) {
     if (command === 物品主动技能测试命令列表[i]) {
       发放单个装备(unit, i + 1);
@@ -299,6 +330,7 @@ function on聊天wp测试(this: void, player: any, command: string): void {
 for (let i = 0; i < 物品主动技能测试命令列表.length; i++) {
   注册聊天命令监听(物品主动技能测试命令列表[i], on聊天wp测试);
 }
+注册聊天命令监听(精灵药水套装测试命令, on聊天wp测试);
 注册聊天命令监听(物品冷却刷新命令, on聊天刷新物品冷却);
 注册聊天命令监听(物品负面清除测试减速命令, on聊天挂载减速测试);
 

@@ -8,6 +8,7 @@ local _____83B7_53D6_6216_521B_5EFA_6559_6D3E_5B66_8005_4E0A_4E0B_6587 = ____01_
 local _____6559_6D3E_5B66_8005_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["教派学者单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.13．教派学者.02．数值与表现配置")
 local _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派学者技能配置"]
+local _____6559_6D3E_5B66_8005_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派学者音效配置"]
 local ____09_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.13．教派学者.09．台词播放")
 local _____64AD_653E_6559_6D3E_5B66_8005_53F0_8BCD = ____09_FF0E_53F0_8BCD_64AD_653E["播放教派学者台词"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
@@ -35,8 +36,10 @@ local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_4.YDUserDataSetSafe
 local ____require_result_5 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
 local EC_CreateEffect = ____require_result_5.EC_CreateEffect
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
+local ____require_result_6 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_6.Sound3DII_CooPlayReuse
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -83,8 +86,8 @@ local function _____5F00_59CB_6DF1_6E0A_4E4B_7262_65BD_6CD5_8868_73B0(_____4E0A_
         ["提示文本"] = _____914D_7F6E["读条提示"]
     })
     local _____56DE_8C03ID = addDelayedCallback(_____516C_5171["通魔施法秒"] * 1000, ____on_6559_6D3E_5B66_8005_8BFB_6761_5173_95ED, {["通道"] = _____914D_7F6E["读条通道"], ["Boss单位"] = boss})
-    local ____self_7 = _____4E0A_4E0B_6587["清理"]
-    ____self_7["登记延迟回调"](____self_7, "教派学者-深渊之牢读条关闭", _____56DE_8C03ID)
+    local ____self_8 = _____4E0A_4E0B_6587["清理"]
+    ____self_8["登记延迟回调"](____self_8, "教派学者-深渊之牢读条关闭", _____56DE_8C03ID)
 end
 local function _____6062_590D_6DF1_6E0A_7262_7B3C_6697_6297(variable)
     local _____72B6_6001 = variable
@@ -132,14 +135,14 @@ local function _____65BD_52A0_6DF1_6E0A_7262_7B3C_6697_6297(_____72B6_6001)
         ["Buff运行时"] = getBuffRuntime(target, _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E.Buff["深渊牢笼暗抗"]),
         ["周期回调ID"] = 0
     }
-    local ____self_8 = _____72B6_6001["上下文"]["清理"]
-    ____self_8["登记清理"](____self_8, "教派学者-深渊牢笼暗抗恢复", _____6062_590D_6DF1_6E0A_7262_7B3C_6697_6297, _____6697_6297_72B6_6001)
-    _____6697_6297_72B6_6001["周期回调ID"] = addPeriodicCallback(_____914D_7F6E["暗抗Buff检查间隔秒"] * 1000, ____on_6DF1_6E0A_7262_7B3C_6697_6297Buff_68C0_67E5, _____6697_6297_72B6_6001)
     local ____self_9 = _____72B6_6001["上下文"]["清理"]
-    ____self_9["登记周期回调"](____self_9, "教派学者-深渊牢笼暗抗Buff检查", _____6697_6297_72B6_6001["周期回调ID"])
-    local _____56DE_8C03ID = addDelayedCallback(_____914D_7F6E["暗抗持续秒"] * 1000, _____6062_590D_6DF1_6E0A_7262_7B3C_6697_6297, _____6697_6297_72B6_6001)
+    ____self_9["登记清理"](____self_9, "教派学者-深渊牢笼暗抗恢复", _____6062_590D_6DF1_6E0A_7262_7B3C_6697_6297, _____6697_6297_72B6_6001)
+    _____6697_6297_72B6_6001["周期回调ID"] = addPeriodicCallback(_____914D_7F6E["暗抗Buff检查间隔秒"] * 1000, ____on_6DF1_6E0A_7262_7B3C_6697_6297Buff_68C0_67E5, _____6697_6297_72B6_6001)
     local ____self_10 = _____72B6_6001["上下文"]["清理"]
-    ____self_10["登记延迟回调"](____self_10, "教派学者-深渊牢笼暗抗到期", _____56DE_8C03ID)
+    ____self_10["登记周期回调"](____self_10, "教派学者-深渊牢笼暗抗Buff检查", _____6697_6297_72B6_6001["周期回调ID"])
+    local _____56DE_8C03ID = addDelayedCallback(_____914D_7F6E["暗抗持续秒"] * 1000, _____6062_590D_6DF1_6E0A_7262_7B3C_6697_6297, _____6697_6297_72B6_6001)
+    local ____self_11 = _____72B6_6001["上下文"]["清理"]
+    ____self_11["登记延迟回调"](____self_11, "教派学者-深渊牢笼暗抗到期", _____56DE_8C03ID)
 end
 local function _____7ED3_675F_6DF1_6E0A_4E4B_7262(_____72B6_6001, _____539F_56E0)
     if _____72B6_6001["已结束"] then
@@ -196,6 +199,13 @@ local function _____7ED3_7B97_6DF1_6E0A_4E4B_7262_79BB_5F00(_____72B6_6001)
             1,
             1
         )
+        Sound3DII_CooPlayReuse(
+            _____6559_6D3E_5B66_8005_97F3_6548_914D_7F6E["深渊之牢"]["离开命中"],
+            GetUnitX(target),
+            GetUnitY(target),
+            0,
+            _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["公共施法"]["音效裁断距离"]
+        )
     end
     _____7ED3_675F_6DF1_6E0A_4E4B_7262(_____72B6_6001, "目标离开牢笼")
 end
@@ -246,6 +256,13 @@ local function _____7ED3_7B97_6DF1_6E0A_4E4B_7262_53CD_566C(_____72B6_6001)
         1,
         1
     )
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5B66_8005_97F3_6548_914D_7F6E["深渊之牢"]["无伤反噬"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["公共施法"]["音效裁断距离"]
+    )
     _____65BD_52A0_6DF1_6E0A_7262_7B3C_6697_6297(_____72B6_6001)
     _____7ED3_675F_6DF1_6E0A_4E4B_7262(_____72B6_6001, "无伤完成")
 end
@@ -291,8 +308,8 @@ local function _____542F_52A8_6DF1_6E0A_4E4B_7262_673A_5236(_____4E0A_4E0B_6587,
         ["周期回调ID"] = 0
     }
     _____4E0A_4E0B_6587["深渊之牢状态"] = _____72B6_6001
-    local ____self_13 = _____4E0A_4E0B_6587["清理"]
-    ____self_13["登记清理"](____self_13, "教派学者-深渊之牢清理", ____on_6DF1_6E0A_4E4B_7262_6E05_7406, _____72B6_6001)
+    local ____self_14 = _____4E0A_4E0B_6587["清理"]
+    ____self_14["登记清理"](____self_14, "教派学者-深渊之牢清理", ____on_6DF1_6E0A_4E4B_7262_6E05_7406, _____72B6_6001)
     registerManualBuff(
         target,
         _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E.Buff["深渊牢笼"],
@@ -310,9 +327,16 @@ local function _____542F_52A8_6DF1_6E0A_4E4B_7262_673A_5236(_____4E0A_4E0B_6587,
         1,
         _____914D_7F6E["持续秒"]
     )
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5B66_8005_97F3_6548_914D_7F6E["深渊之牢"]["牢笼锁定"],
+        _____72B6_6001["中心X"],
+        _____72B6_6001["中心Y"],
+        0,
+        _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["公共施法"]["音效裁断距离"]
+    )
     _____72B6_6001["周期回调ID"] = addPeriodicCallback(_____914D_7F6E["检查间隔秒"] * 1000, ____on_6DF1_6E0A_4E4B_7262_5468_671F, _____72B6_6001)
-    local ____self_14 = _____4E0A_4E0B_6587["清理"]
-    ____self_14["登记周期回调"](____self_14, "教派学者-深渊之牢周期", _____72B6_6001["周期回调ID"])
+    local ____self_15 = _____4E0A_4E0B_6587["清理"]
+    ____self_15["登记周期回调"](____self_15, "教派学者-深渊之牢周期", _____72B6_6001["周期回调ID"])
     return true
 end
 local function ____on_6DF1_6E0A_4E4B_7262_5EF6_8FDF_542F_52A8(variable)
@@ -327,8 +351,8 @@ ____exports["释放教派学者深渊之牢"] = function(_____4E0A_4E0B_6587, ta
     end
     _____5F00_59CB_6DF1_6E0A_4E4B_7262_65BD_6CD5_8868_73B0(_____4E0A_4E0B_6587)
     local _____56DE_8C03ID = addDelayedCallback(_____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["公共施法"]["通魔施法秒"] * 1000, ____on_6DF1_6E0A_4E4B_7262_5EF6_8FDF_542F_52A8, {["上下文"] = _____4E0A_4E0B_6587, ["目标单位"] = target})
-    local ____self_17 = _____4E0A_4E0B_6587["清理"]
-    ____self_17["登记延迟回调"](____self_17, "教派学者-深渊之牢测试释放", _____56DE_8C03ID)
+    local ____self_18 = _____4E0A_4E0B_6587["清理"]
+    ____self_18["登记延迟回调"](____self_18, "教派学者-深渊之牢测试释放", _____56DE_8C03ID)
     return true
 end
 ____exports["注册教派学者深渊之牢"] = function()

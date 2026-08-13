@@ -54,9 +54,29 @@ class QuestManager {
     }
   }
 
+  /** 登记任务的内部限时；该限时只服务运行时判定，不会自动让任务失败。 */
+  private setupInternalTimeLimit(questId: string): void {
+    const quest = (questDB as any).globalData?.quests.get(questId);
+    if (!quest || !quest.内部限时秒 || quest.内部限时秒 <= 0) return;
+    questInternalTimeLimitTasks.set(questId, getServerTime() + quest.内部限时秒 * 1000);
+  }
+
+  public 任务内部限时是否有效(questId: string): boolean {
+    const deadline = questInternalTimeLimitTasks.get(questId);
+    if (deadline == null) return false;
+    if (getServerTime() <= deadline) return true;
+    questInternalTimeLimitTasks.delete(questId);
+    return false;
+  }
+
+  public 清理任务内部限时(questId: string): void {
+    questInternalTimeLimitTasks.delete(questId);
+  }
+
   public onQuestFailed(playerId: number, questId: string): boolean {
     const success = questDB.failQuest(playerId, questId);
     if (success) {
+      this.清理任务内部限时(questId);
       this.triggerUIRefresh(playerId, questId);
     }
 
@@ -67,6 +87,7 @@ class QuestManager {
     const nativeHandle = (questDB as any).globalData?.quests.get(questId)?.nativeHandle;
     const success = questDB.abandonQuest(playerId, questId);
     if (success) {
+      this.清理任务内部限时(questId);
       if (nativeHandle) {
         jass.DestroyQuest(nativeHandle);
       }
@@ -92,6 +113,7 @@ class QuestManager {
     const success = questDB.acceptQuest(playerId, questId);
     if (success) {
       this.setupTimeLimit(playerId, questId);
+      this.setupInternalTimeLimit(questId);
       this.triggerUIRefresh(playerId, questId);
     }
 
@@ -101,6 +123,7 @@ class QuestManager {
   public onQuestCompleted(playerId: number, questId: string): boolean {
     const success = questDB.completeQuest(playerId, questId);
     if (success) {
+      this.清理任务内部限时(questId);
       this.triggerUIRefresh(playerId, questId);
     }
 
@@ -137,6 +160,7 @@ interface QuestTimeLimitTask {
 }
 
 const questTimeLimitTasks: QuestTimeLimitTask[] = [];
+const questInternalTimeLimitTasks = new Map<string, number>();
 let questTimeLimitScanId = 0;
 
 function onQuestTimeLimitTick(this: void): void {
@@ -161,6 +185,14 @@ function onQuestTimeLimitTick(this: void): void {
 }
 
 export const questManager = QuestManager.getInstance();
+
+export function 任务内部限时是否有效(this: void, questId: string): boolean {
+  return questManager.任务内部限时是否有效(questId);
+}
+
+export function 清理任务内部限时(this: void, questId: string): void {
+  questManager.清理任务内部限时(questId);
+}
 
 export function 触发任务UI刷新(this: void, playerId: number, questId?: string): void {
   questManager.triggerUIRefresh(playerId, questId);

@@ -143,7 +143,7 @@ local function _____6587_672C_8F6C_5E03_5C14_6574_6570(text, fallback)
 end
 local function _____6309_952E_7801_8F6C_6587_672C(keyCode)
     local keyName = _____6309_952E_7801_5230_540D_8868[keyCode]
-    return keyName == nil and tostring(keyCode) or keyName
+    return keyName == nil and tostring(nil, keyCode) or keyName
 end
 local function _____6587_672C_8F6C_6309_952E_7801(text, fallback)
     local normalized = string.upper(__TS__StringTrim(text))

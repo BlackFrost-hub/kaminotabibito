@@ -32,10 +32,10 @@ local _____7269_7F16_5B57_7B26_4E32_7F13_5B58_952E_5217_8868 = {}
 local _____7269_54C1_6570_636E_5B57_7B26_4E32_7F13_5B58_952E_5217_8868 = {}
 local _____7269_54C1_63D0_793A_7F13_5B58_6E05_7406TickID = 0
 local function _____53D6_7269_7F16_7F13_5B58_952E(objectType, objectId, property)
-    return (((tostring(objectType) .. ":") .. tostring(objectId)) .. ":") .. property
+    return (((tostring(objectType) .. ":") .. tostring(nil, objectId)) .. ":") .. property
 end
 local function _____53D6_7269_54C1_6570_636E_7F13_5B58_952E(itemKey, dataType)
-    return (tostring(itemKey) .. ":") .. tostring(dataType)
+    return (tostring(nil, itemKey) .. ":") .. tostring(dataType)
 end
 ____exports["清空物品提示读取缓存"] = function()
     _____7269_7F16_5B57_7B26_4E32_7F13_5B58 = {}

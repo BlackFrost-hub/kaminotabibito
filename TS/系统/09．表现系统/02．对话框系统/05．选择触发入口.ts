@@ -14,6 +14,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index"
 import { 确保任务配置已注册, hasPlayerAcceptedQuest, hasPlayerCompletedQuest } from "./03．任务状态";
 import {
   findAcceptedQuestBySubmitNpc,
+  findAvailableQuestByNpc,
   findEnabledNpcConfigBySelectedUnit,
   findQuestById,
 } from "./03．任务状态";
@@ -74,6 +75,13 @@ function openDialogForConfiguredNpc(triggerPlayer: any, npcConfig: any, npcUnit:
     return;
   }
 
+  const availableQuest = findAvailableQuestByNpc(npcName, playerId, npcQuestId, npcConfig.NPC配置名);
+  if (availableQuest && availableQuest.任务ID) {
+    const dialogData = buildQuestOfferDialog(availableQuest, npcName, playerId, npcUnit, hero, npcConfig.朝向);
+    openNpcDialog(triggerPlayer, { ...dialogData, ...对话NPC上下文 });
+    return;
+  }
+
   const quest = findQuestById(npcQuestId);
   if (quest && quest.任务ID) {
     const questIdStr = quest.任务ID.toString();
@@ -87,9 +95,6 @@ function openDialogForConfiguredNpc(triggerPlayer: any, npcConfig: any, npcUnit:
       openNpcDialog(triggerPlayer, { ...dialogData, ...对话NPC上下文 });
       return;
     }
-    const dialogData = buildQuestOfferDialog(quest, npcName, playerId, npcUnit, hero, npcConfig.朝向);
-    openNpcDialog(triggerPlayer, { ...dialogData, ...对话NPC上下文 });
-    return;
   }
 
   const heroName = jass.GetUnitName(hero);

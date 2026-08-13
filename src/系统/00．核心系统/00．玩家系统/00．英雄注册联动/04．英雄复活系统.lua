@@ -100,7 +100,7 @@ function _____6267_884C_590D_6D3B(dyingUnit)
     if not _____662F_73A9_5BB6_82F1_96C4(dyingUnit) then
         return
     end
-    if jass.IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) ~= true then
+    if jass:IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) ~= true then
         return
     end
     _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(_____53D6_82F1_96C4_680F_69FD_4F4D(dyingUnit))

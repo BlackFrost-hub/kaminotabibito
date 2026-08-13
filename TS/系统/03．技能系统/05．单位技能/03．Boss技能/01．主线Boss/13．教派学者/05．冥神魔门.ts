@@ -2,7 +2,7 @@
 
 import { 教派学者单位技能配置 } from './00．配置';
 import { 获取全部教派学者上下文, 获取或创建教派学者上下文, 教派学者单位存活, type 教派学者运行时上下文 } from './01．运行时上下文';
-import { 教派学者技能配置 } from './02．数值与表现配置';
+import { 教派学者技能配置, 教派学者音效配置 } from './02．数值与表现配置';
 import { 播放教派学者台词 } from './09．台词播放';
 import { 创建可攻击机制单位, type 可攻击机制单位实例, type 可攻击机制单位结束原因 } from '../../../../00．技能模板+函数/04．机制组件/05．机制单位/01．可攻击机制单位';
 import { 创建召唤物组状态, type 召唤物组状态 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/03．召唤物组状态管理';
@@ -41,6 +41,9 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require('lib.扩展函数.YDWE�
 };
 const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC扩展库') as {
   EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, size: number, speed: number, time: number) => any;
+};
+const { Sound3DII_CooPlayReuse } = require('lib.扩展函数.封装函数.02．音效系统.03．3D音效播放') as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
@@ -241,7 +244,10 @@ function on魔门机制结束(this: void, _unit: any, reason: 可攻击机制单
   if (状态 == null || 状态.已结束) return;
   状态.门实例 = undefined;
   状态.门单位 = undefined;
-  if (reason === '被击杀' && killer != null && killer !== 0) 触发魔门反噬(状态);
+  if (reason === '被击杀' && killer != null && killer !== 0) {
+    Sound3DII_CooPlayReuse(教派学者音效配置.冥神魔门.魔门被摧毁, 状态.门X, 状态.门Y, 0, 教派学者技能配置.公共施法.音效裁断距离);
+    触发魔门反噬(状态);
+  }
   结束冥神魔门(状态, reason === '被击杀' ? '次元之门被摧毁' : reason);
 }
 
@@ -266,6 +272,7 @@ function 创建魔门召唤物(this: void, 状态: 冥神魔门状态): void {
   if (summon == null || summon === 0) {
     return;
   }
+  Sound3DII_CooPlayReuse(教派学者音效配置.冥神魔门.召唤物出现, GetUnitX(summon), GetUnitY(summon), 0, 教派学者技能配置.公共施法.音效裁断距离);
   状态.召唤组.登记(summon);
   状态.已召唤次数++;
 }
@@ -413,6 +420,7 @@ function 启动冥神魔门机制(this: void, 上下文: 教派学者运行时�
   状态.门单位 = 状态.门实例.单位;
   设置单位实数属性(状态.门单位, '魔抗', 配置.魔抗);
   播放教派学者台词(状态.门单位, '冥神魔门');
+  Sound3DII_CooPlayReuse(教派学者音效配置.冥神魔门.魔门开启, 状态.门X, 状态.门Y, 0, 教派学者技能配置.公共施法.音效裁断距离);
   状态.召唤组.开始批次(配置.召唤次数);
   状态.召唤周期ID = addPeriodicCallback(配置.召唤间隔秒 * 1000, on魔门召唤周期, 状态);
   上下文.清理.登记周期回调('教派学者-冥神魔门召唤周期', 状态.召唤周期ID);

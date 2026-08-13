@@ -8,6 +8,7 @@ local _____83B7_53D6_6216_521B_5EFA_6559_6D3E_5B66_8005_4E0A_4E0B_6587 = ____01_
 local _____6559_6D3E_5B66_8005_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["教派学者单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.13．教派学者.02．数值与表现配置")
 local _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派学者技能配置"]
+local _____6559_6D3E_5B66_8005_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派学者音效配置"]
 local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
 local _____9500_6BC1_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["销毁原生弹幕"]
@@ -126,6 +127,13 @@ local function ____on_6697_5F71_7D22_547D_88AB_51FB_843D(killer, barrageId)
         ManaEffect = true
     })
     local _____5B9E_9645_56DE_9B54 = GetUnitState(killer, UNIT_STATE_MANA) - _____51FB_843D_524D_9B54_6CD5_503C
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5B66_8005_97F3_6548_914D_7F6E["弹幕击落"],
+        GetUnitX(killer),
+        GetUnitY(killer),
+        0,
+        _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["公共施法"]["音效裁断距离"]
+    )
 end
 local function ____on_6697_5F71_7D22_547D_7ED3_675F(reason, barrageId)
     local _____72B6_6001 = _____6697_5F71_5F39_5E55_72B6_6001_8868[barrageId]

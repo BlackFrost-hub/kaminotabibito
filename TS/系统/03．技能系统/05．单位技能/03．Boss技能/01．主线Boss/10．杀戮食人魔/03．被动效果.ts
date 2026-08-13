@@ -4,7 +4,7 @@ import { 创建条件伤害修正 } from '../../../../00．技能模板+函数/0
 import { 提交预计算BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 杀戮食人魔单位技能配置 } from './00．配置';
 import { 获取全部杀戮食人魔上下文, 获取或创建杀戮食人魔上下文, type 杀戮食人魔运行时上下文 } from './01．运行时上下文';
-import { 杀戮食人魔技能配置 } from './02．数值与表现配置';
+import { 杀戮食人魔技能配置, 杀戮食人魔音效配置 } from './02．数值与表现配置';
 import { 食人魔BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/08．食人魔';
 import { 极坐标X, 极坐标Y } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 
@@ -63,6 +63,9 @@ const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
+};
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -154,6 +157,7 @@ function 触发疼痛复仇解控(this: void, context: 杀戮食人魔运行时�
   const currentMaxCooldown = 技能_获取技能最大冷却时间(boss, 血海绞杀技能ID) || configuredMaxCooldown;
   技能_设置技能冷却时间(boss, 血海绞杀技能ID, 0, currentMaxCooldown);
   EC_CreateEffect(杀戮食人魔技能配置.疼痛复仇.解控特效, GetUnitX(boss), GetUnitY(boss), 0, 270, 2.5, 1, 1);
+  播放Boss坐标音效(杀戮食人魔音效配置.疼痛复仇.解控, GetUnitX(boss), GetUnitY(boss), 杀戮食人魔音效配置.默认裁断距离);
 }
 
 function on杀戮食人魔受到最终伤害(this: void, target: any, _attacker: any, applied: number, _snapshot: any): void {

@@ -291,10 +291,14 @@ local function _____5305_88C5_52A8_6001_6570_503C(_____6570_503C_6587_672C)
 end
 local function _____683C_5F0F_5316_52A8_6001_6574_6570(value)
     if value >= 0 then
-        return tostring(R2I(value + 0.5)
+        return tostring(
+            nil,
+            R2I(value + 0.5)
         )
     end
-    return "-" .. tostring(R2I(-value + 0.5)
+    return "-" .. tostring(
+        nil,
+        R2I(-value + 0.5)
     )
 end
 local function _____89E3_6790_52A8_6001_6570_503C_6807_8BB0(text, _____8D77_59CB_4F4D_7F6E)

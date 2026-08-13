@@ -30,7 +30,7 @@ local function goldRateCallback(params)
     local goldRate = getPlayerGoldRate(player)
     local finalGold = baseGold
     if goldRate >= GOLD_RATE_THRESHOLD then
-        finalGold = jass.R2I(baseGold * (1 + goldRate))
+        finalGold = jass:R2I(baseGold * (1 + goldRate))
     end
     return __TS__ObjectAssign({}, params, {finalGold = finalGold})
 end

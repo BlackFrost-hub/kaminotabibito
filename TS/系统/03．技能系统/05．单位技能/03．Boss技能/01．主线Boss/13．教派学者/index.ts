@@ -11,5 +11,6 @@ export * from './05．冥神魔门';
 export * from './06．冥之念欲';
 export * from './07．邪狱追魂冥法';
 export * from './08．技能入口';
+export * from './10．受击反应观察';
 
 注册教派学者技能结构();

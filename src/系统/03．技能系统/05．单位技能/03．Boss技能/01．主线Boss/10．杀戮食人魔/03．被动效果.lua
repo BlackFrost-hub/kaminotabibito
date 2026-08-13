@@ -12,6 +12,7 @@ local _____83B7_53D6_5168_90E8_6740_622E_98DF_4EBA_9B54_4E0A_4E0B_6587 = ____01_
 local _____83B7_53D6_6216_521B_5EFA_6740_622E_98DF_4EBA_9B54_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建杀戮食人魔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.10．杀戮食人魔.02．数值与表现配置")
 local _____6740_622E_98DF_4EBA_9B54_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["杀戮食人魔技能配置"]
+local _____6740_622E_98DF_4EBA_9B54_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["杀戮食人魔音效配置"]
 local ____08_FF0E_98DF_4EBA_9B54 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.08．食人魔")
 local _____98DF_4EBA_9B54BuffID = ____08_FF0E_98DF_4EBA_9B54["食人魔BuffID"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
@@ -55,6 +56,8 @@ local ____require_result_14 = require("lib.扩展函数.封装函数.01．通用
 local stringToFourCCSafe = ____require_result_14.stringToFourCCSafe
 local ____require_result_15 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_15.debugLogForce
+local ____require_result_16 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_16["播放Boss坐标音效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -134,12 +137,12 @@ local function ____on_75BC_75DB_590D_4EC7_589E_4F24_5C42_5230_671F(variable)
 end
 local function _____6DFB_52A0_75BC_75DB_590D_4EC7_589E_4F24_5C42(context)
     local cfg = _____6740_622E_98DF_4EBA_9B54_6280_80FD_914D_7F6E["疼痛复仇"]
-    local ____context_16, _____4E0B_4E00_589E_4F24_5C42ID_17 = context, "下一增伤层ID"
-    local ____context__4E0B_4E00_589E_4F24_5C42ID_18 = ____context_16[_____4E0B_4E00_589E_4F24_5C42ID_17]
-    ____context_16[_____4E0B_4E00_589E_4F24_5C42ID_17] = ____context__4E0B_4E00_589E_4F24_5C42ID_18 + 1
-    local id = ____context__4E0B_4E00_589E_4F24_5C42ID_18
-    local ____context__589E_4F24_5C42_5217_8868_19 = context["增伤层列表"]
-    ____context__589E_4F24_5C42_5217_8868_19[#____context__589E_4F24_5C42_5217_8868_19 + 1] = {
+    local ____context_17, _____4E0B_4E00_589E_4F24_5C42ID_18 = context, "下一增伤层ID"
+    local ____context__4E0B_4E00_589E_4F24_5C42ID_19 = ____context_17[_____4E0B_4E00_589E_4F24_5C42ID_18]
+    ____context_17[_____4E0B_4E00_589E_4F24_5C42ID_18] = ____context__4E0B_4E00_589E_4F24_5C42ID_19 + 1
+    local id = ____context__4E0B_4E00_589E_4F24_5C42ID_19
+    local ____context__589E_4F24_5C42_5217_8868_20 = context["增伤层列表"]
+    ____context__589E_4F24_5C42_5217_8868_20[#____context__589E_4F24_5C42_5217_8868_20 + 1] = {
         ID = id,
         ["到期毫秒"] = getServerTime() + cfg["增伤持续秒"] * 1000
     }
@@ -162,6 +165,12 @@ local function _____89E6_53D1_75BC_75DB_590D_4EC7_89E3_63A7(context)
         2.5,
         1,
         1
+    )
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____6740_622E_98DF_4EBA_9B54_97F3_6548_914D_7F6E["疼痛复仇"]["解控"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____6740_622E_98DF_4EBA_9B54_97F3_6548_914D_7F6E["默认裁断距离"]
     )
 end
 local function ____on_6740_622E_98DF_4EBA_9B54_53D7_5230_6700_7EC8_4F24_5BB3(target, _attacker, applied, _snapshot)
@@ -449,12 +458,12 @@ local function _____5C1D_8BD5_89E6_53D1_5FC3_810F_638C_63E1(boss, target)
     })
     local _____7B2C_4E8C_6BB5_56DE_8C03ID = addDelayedCallback(cfg["第二段预警秒"] * 1000, ____on_5FC3_810F_638C_63E1_7B2C_4E8C_6BB5_9884_8B66, data)
     local _____7ED3_7B97_56DE_8C03ID = addDelayedCallback(cfg["预警秒"] * 1000, ____on_5FC3_810F_638C_63E1_7ED3_7B97, data)
-    local ____self_20 = context["清理"]
-    ____self_20["登记清理"](____self_20, "杀戮食人魔-心脏掌握表现", ____on_5FC3_810F_638C_63E1_4E0A_4E0B_6587_6E05_7406, data)
     local ____self_21 = context["清理"]
-    ____self_21["登记延迟回调"](____self_21, "杀戮食人魔-心脏掌握第二段预警", _____7B2C_4E8C_6BB5_56DE_8C03ID)
+    ____self_21["登记清理"](____self_21, "杀戮食人魔-心脏掌握表现", ____on_5FC3_810F_638C_63E1_4E0A_4E0B_6587_6E05_7406, data)
     local ____self_22 = context["清理"]
-    ____self_22["登记延迟回调"](____self_22, "杀戮食人魔-心脏掌握结算", _____7ED3_7B97_56DE_8C03ID)
+    ____self_22["登记延迟回调"](____self_22, "杀戮食人魔-心脏掌握第二段预警", _____7B2C_4E8C_6BB5_56DE_8C03ID)
+    local ____self_23 = context["清理"]
+    ____self_23["登记延迟回调"](____self_23, "杀戮食人魔-心脏掌握结算", _____7ED3_7B97_56DE_8C03ID)
     debugLogForce(
         "杀戮食人魔-心脏掌握",
         "触发预警表现",

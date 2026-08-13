@@ -9,32 +9,35 @@ local _____83B7_53D6_5730_7CBE_796D_7940_8303_56F4_76EE_6807 = ____01_FF0E_8FD0_
 local _____5730_7CBE_796D_7940_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["地精祭祀单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.09．地精祭祀.02．数值与表现配置")
 local _____5730_7CBE_796D_7940_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["地精祭祀技能配置"]
+local _____5730_7CBE_796D_7940_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["地精祭祀音效配置"]
 local ____16_FF0E_6280_80FD_63D0_793A_5708_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____16_FF0E_6280_80FD_63D0_793A_5708_5DE5_5382["创建技能提示圈"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
 local _____63D0_4EA4_9884_8BA1_7B97BossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算BossAOE技能伤害"]
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____5F00_59CB_786C_76F4 = ____require_result_1["开始硬直"]
-local ____require_result_2 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_2["显示常规技能吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_2["关闭吟唱条"]
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_3.addDelayedCallback
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_4.EC_CreateEffect
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
+local ____require_result_0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_0["播放Boss坐标音效"]
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_2["开始硬直"]
+local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_3["显示常规技能吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_5.EC_CreateEffect
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
 local jass = require("jass.common")
 local globals = require("jass.globals")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local ____require_result_6 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_6.CosBJ
-local SinBJ = ____require_result_6.SinBJ
+local ____require_result_7 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_7.CosBJ
+local SinBJ = ____require_result_7.SinBJ
 local GetRandomReal = jass.GetRandomReal
 local SetUnitAnimation = jass.SetUnitAnimation
 local StartSound = jass.StartSound
@@ -72,6 +75,8 @@ local function ____on_6BD2_8574_843D_70B9_7ED3_7B97(variable)
     local boss = _____5FEB_7167["上下文"]["Boss单位"]
     local _____914D_7F6E = _____5730_7CBE_796D_7940_6280_80FD_914D_7F6E["毒蕴"]
     _____64AD_653E_6BD2_8574_70B9_7279_6548(_____914D_7F6E["爆炸特效"], _____5FEB_7167.X, _____5FEB_7167.Y)
+    local _____843D_70B9_97F3_6548 = _____5FEB_7167["伤害分支"] == "暗伤" and _____5730_7CBE_796D_7940_97F3_6548_914D_7F6E["毒蕴"]["暗伤爆炸"] or _____5730_7CBE_796D_7940_97F3_6548_914D_7F6E["毒蕴"]["酸伤爆炸"]
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____843D_70B9_97F3_6548, _____5FEB_7167.X, _____5FEB_7167.Y, _____5730_7CBE_796D_7940_97F3_6548_914D_7F6E["默认裁断距离"])
     local _____76EE_6807_5217_8868 = _____83B7_53D6_5730_7CBE_796D_7940_8303_56F4_76EE_6807(
         boss,
         _____5FEB_7167.X,
@@ -207,8 +212,8 @@ local function _____521B_5EFA_6BD2_8574_968F_673A_843D_70B9(_____4E0A_4E0B_6587,
             })
             _____64AD_653E_6BD2_8574_70B9_7279_6548(_____914D_7F6E["预警特效"], _____843D_70B9.X, _____843D_70B9.Y)
             local _____56DE_8C03ID = addDelayedCallback(_____914D_7F6E["预警秒"] * 1000, ____on_6BD2_8574_843D_70B9_7ED3_7B97, _____5FEB_7167)
-            local ____self_7 = _____4E0A_4E0B_6587["清理"]
-            ____self_7["登记延迟回调"](____self_7, "地精祭祀-毒蕴落点结算", _____56DE_8C03ID)
+            local ____self_8 = _____4E0A_4E0B_6587["清理"]
+            ____self_8["登记延迟回调"](____self_8, "地精祭祀-毒蕴落点结算", _____56DE_8C03ID)
             i = i + 1
         end
     end
@@ -236,8 +241,8 @@ ____exports["释放地精祭祀毒蕴"] = function(_____4E0A_4E0B_6587)
     end
     _____521B_5EFA_6BD2_8574_968F_673A_843D_70B9(_____4E0A_4E0B_6587, bossX, bossY)
     local _____8BFB_6761_56DE_8C03ID = addDelayedCallback(_____914D_7F6E["施法硬直秒"] * 1000, ____on_6BD2_8574_8BFB_6761_7ED3_675F)
-    local ____self_10 = _____4E0A_4E0B_6587["清理"]
-    ____self_10["登记延迟回调"](____self_10, "地精祭祀-毒蕴读条结束", _____8BFB_6761_56DE_8C03ID)
+    local ____self_11 = _____4E0A_4E0B_6587["清理"]
+    ____self_11["登记延迟回调"](____self_11, "地精祭祀-毒蕴读条结束", _____8BFB_6761_56DE_8C03ID)
     return true
 end
 local function ____on_5730_7CBE_796D_7940_6BD2_8574_751F_6548(castingUnit, spellAbilityId)

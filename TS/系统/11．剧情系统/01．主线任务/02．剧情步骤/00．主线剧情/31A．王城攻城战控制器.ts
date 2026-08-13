@@ -23,12 +23,8 @@ const { GS_LoadUintProperty, GS_UnitPry } = require("lib.扩展函数.Star扩展
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => (this: void) => void;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (this: void, unit: any, range: number, callback: (this: void, enteringUnit: any) => boolean, predicate?: (this: void, enteringUnit: any) => boolean) => (this: void) => void;
 };
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -51,11 +47,9 @@ const { 结束第二章菲利斯攻城区域音乐 } = require("系统.07．地�
   结束第二章菲利斯攻城区域音乐: (this: void) => boolean;
 };
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const AddSpecialEffect = jass.AddSpecialEffect as (this: void, modelName: string, x: number, y: number) => any;
 const DestroyEffect = jass.DestroyEffect as (this: void, effect: any) => void;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -117,13 +111,8 @@ interface 王城攻城战状态 {
   周期回调ID: number;
   菲利斯: any;
   菲利斯攻城传送门特效: any;
-  菲利斯接近触发器: any;
   取消菲利斯接近监听: ((this: void) => void) | undefined;
   菲利斯出场对话已触发: boolean;
-}
-
-interface 菲利斯接近触发清理参数 {
-  触发器: any;
 }
 
 const 第一波单位预置: 攻城单位预置[] = [
@@ -290,22 +279,10 @@ function 创建城门防御法阵(this: void): any {
   return unit;
 }
 
-function on延迟销毁菲利斯接近触发器(this: void, variable?: any): void {
-  const 参数 = variable as 菲利斯接近触发清理参数 | undefined;
-  if (参数 == null || 参数.触发器 == null || 参数.触发器 === 0) return;
-  safeDestroyTrigger(参数.触发器);
-}
-
 function 注销菲利斯接近监听(this: void, 状态: 王城攻城战状态): void {
   const 取消监听 = 状态.取消菲利斯接近监听;
   状态.取消菲利斯接近监听 = undefined;
   if (取消监听 != null) 取消监听();
-
-  const 触发器 = 状态.菲利斯接近触发器;
-  状态.菲利斯接近触发器 = null;
-  if (触发器 != null && 触发器 !== 0) {
-    addDelayedCallback(1, on延迟销毁菲利斯接近触发器, { 触发器 } as 菲利斯接近触发清理参数);
-  }
 }
 
 export function 结束菲利斯攻城等待(this: void): void {
@@ -316,9 +293,7 @@ export function 结束菲利斯攻城等待(this: void): void {
     if (单位存活(状态.攻城单位[i])) IssueImmediateOrder(状态.攻城单位[i], "stop");
   }
   if (单位存活(状态.菲利斯)) IssueImmediateOrder(状态.菲利斯, "stop");
-  if (状态.菲利斯接近触发器 != null && 状态.菲利斯接近触发器 !== 0) {
-    注销菲利斯接近监听(状态);
-  }
+  if (状态.取消菲利斯接近监听 != null) 注销菲利斯接近监听(状态);
 }
 
 export function 登记存活攻城单位为菲利斯护卫(this: void): number {
@@ -341,16 +316,15 @@ export function 登记存活攻城单位为菲利斯护卫(this: void): number {
   return count;
 }
 
-function on菲利斯接近触发(this: void): void {
+function on菲利斯接近触发(this: void, 进入单位: any): boolean {
   const 状态 = 当前王城攻城战状态;
-  if (状态 == null || 状态.阶段 !== 3 || 状态.菲利斯出场对话已触发) return;
+  if (状态 == null || 状态.阶段 !== 3 || 状态.菲利斯出场对话已触发) return true;
 
-  const 进入单位 = GetTriggerUnit();
-  if (!单位存活(进入单位)) return;
+  if (!单位存活(进入单位)) return false;
   const 耶提尔 = 读取语义单位引用("主线NPC.耶提尔");
   const 由耶提尔触发 = 单位存活(耶提尔) && 进入单位 === 耶提尔;
   const 由玩家英雄触发 = 是玩家英雄组单位(进入单位);
-  if (!由耶提尔触发 && !由玩家英雄触发) return;
+  if (!由耶提尔触发 && !由玩家英雄触发) return false;
 
   状态.菲利斯出场对话已触发 = true;
   结束菲利斯攻城等待();
@@ -377,25 +351,16 @@ function on菲利斯接近触发(this: void): void {
     触发配置名: "菲利斯接近范围",
     触发单位: 剧情触发单位,
   });
+  return true;
 }
 
 function 注册菲利斯接近对白触发(this: void, 状态: 王城攻城战状态, 菲利斯: any): void {
-  const 触发器 = CreateTrigger();
   状态.菲利斯 = 菲利斯;
-  状态.菲利斯接近触发器 = 触发器;
   状态.菲利斯出场对话已触发 = false;
-
-  if (safeTriggerAddAction(触发器, on菲利斯接近触发) == null) {
-    状态.菲利斯接近触发器 = null;
-    safeDestroyTrigger(触发器);
-    return;
-  }
-  状态.取消菲利斯接近监听 = registerUnitInRangeTrigger(
-    触发器,
+  状态.取消菲利斯接近监听 = registerOneShotUnitRangeListener(
     菲利斯,
     菲利斯对白触发范围,
-    null,
-    false
+    on菲利斯接近触发,
   );
 }
 
@@ -503,7 +468,6 @@ export function 启动王城攻城战(this: void): void {
     周期回调ID: 0,
     菲利斯: null,
     菲利斯攻城传送门特效: null,
-    菲利斯接近触发器: null,
     取消菲利斯接近监听: undefined,
     菲利斯出场对话已触发: false,
   };

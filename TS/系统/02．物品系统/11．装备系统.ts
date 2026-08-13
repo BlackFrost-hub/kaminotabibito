@@ -67,6 +67,12 @@ function isEquipItemMessageSilenced(this: void): boolean {
   return 装备物品消息静默层数 > 0;
 }
 
+function 应跳过装备属性结算(this: void, itemData: any): boolean {
+  const itemType = itemData.type;
+  if (itemType === "任务" || itemType === "药剂" || itemType === "食品") return true;
+  return String(itemData.PowerUP || "").trim() !== "" && itemData.PowerUP仍结算装备属性 !== true;
+}
+
 const 装备视野BuffID = "C034";
 const 装备视野Buff显示持续时间 = 999999;
 const 不走装备系统物品ID表: Record<string, true> = {
@@ -124,8 +130,7 @@ export function 处理合成消耗装备属性(this: void, unit: any, item: any,
   if (不走装备系统物品ID表[idStr] === true) return;
   const itemData = itemRelatedFns.getItemDataEntry(item);
   if (!itemData) return;
-  const skipType = itemData.type;
-  if (skipType === "任务" || skipType === "药剂" || skipType === "食品" || String(itemData.PowerUP || "").trim() !== "") return;
+  if (应跳过装备属性结算(itemData)) return;
 
   const charges = GetItemCharges(item);
   const itemCount = charges > 0 ? charges : 1;
@@ -192,8 +197,7 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
     }
     return;
   }
-  const skipType = itemData.type;
-  if (skipType === "任务" || skipType === "药剂" || skipType === "食品" || String(itemData.PowerUP || "").trim() !== "") return;
+  if (应跳过装备属性结算(itemData)) return;
   // 消耗品（有 hot）用完后会触发 DROP，不提示「丢弃」，但仍需计算属性
   const isConsumable = isDrop && itemData.hot != null;
   // 拾取时：装备限制不通过则不加属性、不提示"获得"，并标记跳过下一次 DROP（装备限制会 UnitRemoveItem 触发丢弃）

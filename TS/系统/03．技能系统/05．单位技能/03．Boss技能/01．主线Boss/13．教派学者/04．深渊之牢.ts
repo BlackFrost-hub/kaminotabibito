@@ -2,7 +2,7 @@
 
 import { 教派学者单位技能配置 } from './00．配置';
 import { 获取或创建教派学者上下文, 教派学者单位存活, type 教派学者运行时上下文 } from './01．运行时上下文';
-import { 教派学者技能配置 } from './02．数值与表现配置';
+import { 教派学者技能配置, 教派学者音效配置 } from './02．数值与表现配置';
 import { 播放教派学者台词 } from './09．台词播放';
 import { 距离平方XY } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 执行Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
@@ -32,6 +32,9 @@ const { YDUserDataGetSafe, YDUserDataSetSafe } = require('lib.扩展函数.YDWE�
 };
 const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC扩展库') as {
   EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, size: number, speed: number, time: number) => any;
+};
+const { Sound3DII_CooPlayReuse } = require('lib.扩展函数.封装函数.02．音效系统.03．3D音效播放') as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
@@ -184,6 +187,7 @@ function 结算深渊之牢离开(this: void, 状态: 深渊之牢状态): void 
   if (结果.是否造成伤害) {
     施加快速控制Buff(boss, target, 0, 配置.离开眩晕秒, '教派学者-深渊之牢', '技能');
     EC_CreateEffect(配置.离开命中特效路径, GetUnitX(target), GetUnitY(target), 0, 0, 配置.离开命中特效缩放, 1, 1);
+    Sound3DII_CooPlayReuse(教派学者音效配置.深渊之牢.离开命中, GetUnitX(target), GetUnitY(target), 0, 教派学者技能配置.公共施法.音效裁断距离);
   }
   结束深渊之牢(状态, '目标离开牢笼');
 }
@@ -208,6 +212,7 @@ function 结算深渊之牢反噬(this: void, 状态: 深渊之牢状态): void 
   EC_CreateEffect(配置.反噬特效路径1, GetUnitX(boss), GetUnitY(boss), 0, 0, 1, 1, 1);
   EC_CreateEffect(配置.反噬特效路径2, GetUnitX(boss), GetUnitY(boss), 0, 0, 1, 1, 1);
   EC_CreateEffect(配置.反噬特效路径3, GetUnitX(target), GetUnitY(target), 0, 0, 1, 1, 1);
+  Sound3DII_CooPlayReuse(教派学者音效配置.深渊之牢.无伤反噬, GetUnitX(boss), GetUnitY(boss), 0, 教派学者技能配置.公共施法.音效裁断距离);
   施加深渊牢笼暗抗(状态);
   结束深渊之牢(状态, '无伤完成');
 }
@@ -253,6 +258,7 @@ function 启动深渊之牢机制(this: void, 上下文: 教派学者运行时�
     effectSourceType: '技能',
   });
   EC_CreateEffect(配置.牢笼模型路径, 状态.中心X, 状态.中心Y, 0, 0, 配置.牢笼缩放, 1, 配置.持续秒);
+  Sound3DII_CooPlayReuse(教派学者音效配置.深渊之牢.牢笼锁定, 状态.中心X, 状态.中心Y, 0, 教派学者技能配置.公共施法.音效裁断距离);
   状态.周期回调ID = addPeriodicCallback(配置.检查间隔秒 * 1000, on深渊之牢周期, 状态);
   上下文.清理.登记周期回调('教派学者-深渊之牢周期', 状态.周期回调ID);
   return true;

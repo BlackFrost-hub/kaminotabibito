@@ -84,7 +84,7 @@ function _____9650_5236_5230_989C_8272_5B57_8282(value)
     if value > 255 then
         return 255
     end
-    return jass.R2I(value)
+    return jass:R2I(value)
 end
 function _____53D6_7279_6548_9876_70B9_989C_8272(_____53C2_6570)
     if _____53C2_6570["顶点颜色"] ~= nil then
@@ -156,13 +156,13 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
             local id = idText
             local _____8BB0_5F55 = _____5FAA_73AF_70B9_7279_6548_8868[id]
             if _____8BB0_5F55 == nil then
-                goto __continue72
+                goto __continue74
             end
             local _____53C2_6570 = _____8BB0_5F55["参数"]
             local alive = _____53C2_6570["存活条件"] == nil or _____53C2_6570["存活条件"]()
             if _____8BB0_5F55["已停止"] or not alive or _____8BB0_5F55["结束毫秒"] > 0 and now >= _____8BB0_5F55["结束毫秒"] then
                 _____79FB_9664_5FAA_73AF_70B9_7279_6548_8BB0_5F55(id, _____8BB0_5F55)
-                goto __continue72
+                goto __continue74
             end
             if now >= _____8BB0_5F55["下次重建毫秒"] then
                 _____9500_6BC1_5FAA_73AF_70B9_7279_6548_53E5_67C4(_____8BB0_5F55["当前特效"])
@@ -173,7 +173,7 @@ function ____on_5FAA_73AF_70B9_7279_6548Tick()
                 _____8BB0_5F55["当前特效"] = nil
             end
         end
-        ::__continue72::
+        ::__continue74::
     end
     if _____5FAA_73AF_70B9_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5FAA_73AF_70B9_7279_6548Tick()
@@ -202,7 +202,7 @@ function destroyBoundEffect(effect)
     if not effect then
         return
     end
-    jass.DestroyEffect(effect)
+    jass:DestroyEffect(effect)
 end
 function _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5()
     if _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID <= 0 then
@@ -230,7 +230,7 @@ function _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1(now)
             local effect = _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868[i + 1]
             if now >= _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868[i + 1] then
                 if effect then
-                    jass.DestroyEffect(effect)
+                    jass:DestroyEffect(effect)
                 end
             else
                 _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868[writeIndex + 1] = effect
@@ -382,7 +382,7 @@ ____exports["创建点特效"] = function(_____53C2_6570)
         _____53C2_6570.X,
         _____53C2_6570.Y,
         _____53C2_6570.Z or 0,
-        0,
+        _____53C2_6570["面向角度"] or 0,
         _____53C2_6570["缩放"] or 1,
         _____53C2_6570["动画速度"] or 1,
         duration
@@ -399,6 +399,13 @@ ____exports["创建点特效"] = function(_____53C2_6570)
         DzSetEffectVertexColor(effect, color)
     end
     return effect
+end
+--- 销毁由创建点特效创建的常驻点特效。
+____exports["销毁点特效"] = function(effect)
+    if effect == nil or effect == 0 then
+        return
+    end
+    DestroyEffect(effect)
 end
 local _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0 = __TS__Class()
 _____9010_6BB5_76F4_7EBF_8DEF_5F84_70B9_7279_6548_5B9E_73B0.name = "逐段直线路径点特效实现"
@@ -523,7 +530,7 @@ local function getUnitEffectHandleId(unit)
     if not unit then
         return 0
     end
-    return jass.GetHandleId(unit)
+    return jass:GetHandleId(unit)
 end
 local function getUnitEffectKey(unit, effectKey)
     local handleId = getUnitEffectHandleId(unit)
@@ -560,7 +567,7 @@ function ____exports.createUnitEffect(unit, attachPoint, modelPath, duration, ef
     if existingEffect then
         destroyBoundEffect(existingEffect)
     end
-    local effect = jass.AddSpecialEffectTarget(
+    local effect = jass:AddSpecialEffectTarget(
         _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84(modelPath),
         unit,
         attachPoint
@@ -707,11 +714,11 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
         do
             local record = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key]
             if record == nil then
-                goto __continue144
+                goto __continue146
             end
             if not _____5355_4F4D_53EF_5750_6807_8DDF_968F(record.unit) then
                 _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548_8BB0_5F55(key, record)
-                goto __continue144
+                goto __continue146
             end
             local x = GetUnitX(record.unit)
             local y = GetUnitY(record.unit)
@@ -721,7 +728,7 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
                 EC_GetPointZ(x, y) + record.height
             )
         end
-        ::__continue144::
+        ::__continue146::
     end
     if _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF <= 0 then
         _____505C_6B62_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()

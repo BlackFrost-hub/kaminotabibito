@@ -9,8 +9,8 @@ local _____52A8_6001_521B_5EFA_5E76_6CE8_518C_4E3B_7EBF_5267_60C5_5168_5C40_5355
 -- @noSelfInFile
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_0.EC_CreateEffect
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_0["创建点特效"]
 local ____require_result_1 = require("lib.扩展函数.BJ函数.06．任务消息")
 local CreateQuestBJ = ____require_result_1.CreateQuestBJ
 local GetLastCreatedQuestBJ = ____require_result_1.GetLastCreatedQuestBJ
@@ -44,16 +44,15 @@ end
 local function _____6267_884C_7CBE_7075_57CE_7AE0_8282_627F_63A5_6F14_51FA(_____53C2_6570)
     local _____957F_8001 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528("主线NPC.精灵村长老")
     if _____957F_8001 ~= nil and _____957F_8001 ~= 0 then
-        EC_CreateEffect(
-            "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl",
-            GetUnitX(_____957F_8001),
-            GetUnitY(_____957F_8001),
-            0,
-            270,
-            2,
-            1,
-            1.5
-        )
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl",
+            X = GetUnitX(_____957F_8001),
+            Y = GetUnitY(_____957F_8001),
+            ["面向角度"] = 270,
+            ["缩放"] = 2,
+            ["动画速度"] = 1,
+            ["持续秒"] = 1.5
+        })
     end
     local _____963B_6321_540D = type(_____53C2_6570["隐藏阻挡"]) == "string" and _____53C2_6570["隐藏阻挡"] or "gg_dest_B00X_0013"
     local _____963B_6321 = jglobals[_____963B_6321_540D]

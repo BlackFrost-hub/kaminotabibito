@@ -48,7 +48,7 @@ local function goldGainCallback(params)
     local goldRate = getPlayerGoldRate(player)
     local finalGold = baseGold
     if goldRate >= GOLD_RATE_THRESHOLD then
-        finalGold = jass.R2I(baseGold * (1 + goldRate))
+        finalGold = jass:R2I(baseGold * (1 + goldRate))
     end
     AdjustPlayerStateBJ(nil, finalGold, player, jass.PLAYER_STATE_RESOURCE_GOLD)
     fireStesEvent(unit, finalGold)

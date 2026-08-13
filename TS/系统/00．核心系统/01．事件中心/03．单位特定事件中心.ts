@@ -11,6 +11,14 @@ type Listener = {
   once: boolean;
 };
 
+type OneShotRangeListener = {
+  trigger: any;
+  callback: (this: void, enteringUnit: any) => boolean;
+  predicate?: (this: void, enteringUnit: any) => boolean;
+  unregisterRange: (this: void) => void;
+  active: boolean;
+};
+
 const unitEventListeners: Record<string, Listener[]> = {};
 const unitEventRegistered: Record<string, boolean> = {};
 const unitEventMasters: Record<string, any> = {};
@@ -22,6 +30,7 @@ const unitInRangeRegistered: Record<string, boolean> = {};
 const unitInRangeMasters: Record<string, any> = {};
 const unitInRangeMasterActions: Record<string, any> = {};
 const unitInRangeKeyByMasterHid: Record<string, string> = {};
+const oneShotRangeListeners: Record<string, OneShotRangeListener | undefined> = {};
 
 function handleKey(handle: any): string {
   return tostring(handle);
@@ -139,6 +148,25 @@ function dispatchUnitInRangeMaster(): void {
   cleanupUnitInRangeMaster(key);
 }
 
+function dispatchOneShotRangeListener(this: void): void {
+  const listenerTrigger = jass.GetTriggeringTrigger();
+  if (!listenerTrigger) return;
+  const key = tostring(jass.GetHandleId(listenerTrigger));
+  const listener = oneShotRangeListeners[key];
+  if (listener == null || !listener.active) return;
+
+  const enteringUnit = jass.GetTriggerUnit();
+  if (listener.predicate != null && !listener.predicate(enteringUnit)) return;
+  if (!listener.callback(enteringUnit)) return;
+  // 回调可能主动清理整组监听；此时不要重复销毁当前触发器。
+  if (!listener.active) return;
+
+  listener.active = false;
+  listener.unregisterRange();
+  delete oneShotRangeListeners[key];
+  jass.DestroyTrigger(listener.trigger);
+}
+
 function addListener(
   store: Record<string, Listener[]>,
   key: string,
@@ -219,6 +247,45 @@ export function registerUnitInRangeTrigger(
   }
 
   return addListener(unitInRangeListeners, key, trigger, once, cleanupUnitInRangeMaster);
+}
+
+/**
+ * 注册通用的一次性单位范围监听。
+ * 回调返回 true 才会注销；返回 false 时保留监听，适合等待玩家英雄而忽略其他单位。
+ */
+export function registerOneShotUnitRangeListener(
+  unit: any,
+  range: number,
+  callback: (this: void, enteringUnit: any) => boolean,
+  predicate?: (this: void, enteringUnit: any) => boolean,
+): () => void {
+  if (!unit || !(range > 0) || callback == null) return () => {};
+
+  const trigger = jass.CreateTrigger();
+  if (!trigger) return () => {};
+  const key = tostring(jass.GetHandleId(trigger));
+  let unregisterRange = function 空范围监听注销(this: void): void {};
+  function 调用范围监听注销(this: void): void {
+    unregisterRange();
+  }
+  const listener: OneShotRangeListener = {
+    trigger,
+    callback,
+    predicate,
+    unregisterRange: 调用范围监听注销,
+    active: true,
+  };
+  oneShotRangeListeners[key] = listener;
+  jass.TriggerAddAction(trigger, dispatchOneShotRangeListener);
+  unregisterRange = registerUnitInRangeTrigger(trigger, unit, range, null, false);
+
+  return () => {
+    if (!listener.active) return;
+    listener.active = false;
+    unregisterRange();
+    delete oneShotRangeListeners[key];
+    jass.DestroyTrigger(trigger);
+  };
 }
 
 export {};

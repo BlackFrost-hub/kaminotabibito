@@ -28,16 +28,20 @@ const { safeTriggerAddAction, safeTriggerRemoveAction, safeDestroyTrigger } = re
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
-const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
+const { 广播单位提示, 播放广播对白序列 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   广播单位提示: (this: void, sourceUnit: any, text: string, duration?: number) => void;
-};
-const { 广播提示滑入毫秒, 广播提示淡出毫秒 } = require("系统.09．表现系统.06．广播提示消息.00．常量定义") as {
-  广播提示滑入毫秒: number;
-  广播提示淡出毫秒: number;
+  播放广播对白序列: (this: void, 配置: any) => void;
 };
 const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const { 暂停并设置无敌安全, 解除暂停并取消无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
+  解除暂停并取消无敌安全: (this: void, unit: any, source: string) => boolean;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; 持续秒?: number }) => any;
 };
 const { 创建单位绑定闪电, 销毁单位绑定闪电 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电") as {
   创建单位绑定闪电: (this: void, params: {
@@ -72,7 +76,6 @@ const {
 import { 创建剧情NPC单位 } from "../../00．公共/02．剧情NPC创建";
 import { 启动剧情Boss战 } from "../../01．主线任务/00．剧情系统核心工具/11．剧情Boss战启动桥接";
 
-const AddSpecialEffect = jass.AddSpecialEffect as (this: void, modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (this: void, modelName: string, target: any, attachPoint: string) => any;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const CreateGroup = jass.CreateGroup as (this: void) => any;
@@ -100,7 +103,6 @@ const Player = jass.Player as (this: void, playerId: number) => any;
 const SetPlayerState = jass.SetPlayerState as (this: void, player: any, state: any, value: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, animationIndex: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, unit: any, flag: boolean) => void;
 const Sin = jass.Sin as (this: void, radians: number) => number;
 
 const 精灵城执法监听矩形键 = "支线.瑟兰迪尔精灵城执法监听";
@@ -183,10 +185,6 @@ function 读取附近执法触发概率(this: void, victim: any): number {
   return 有执法队长 ? 10 : (有普通队员 ? 5 : 0);
 }
 
-function 取广播完整播放毫秒(this: void, 停留毫秒: number): number {
-  return 广播提示滑入毫秒 + 停留毫秒 + 广播提示淡出毫秒;
-}
-
 function 清理逮捕表现(this: void): void {
   const state = 当前执法状态;
   if (state == null) return;
@@ -207,51 +205,43 @@ function 释放演出暂停(this: void): void {
     移除单位暂停(state.触发英雄, 演出暂停来源);
   }
   if (state.Boss单位 != null && state.Boss单位 !== 0) {
-    移除单位暂停(state.Boss单位, 演出暂停来源);
+    if (!解除暂停并取消无敌安全(state.Boss单位, 演出暂停来源)) {
+      移除单位暂停(state.Boss单位, 演出暂停来源);
+    }
   }
 }
 
-function 播放第六段对白(this: void): void {
+function 校验执法对白状态(this: void): boolean {
   const state = 当前执法状态;
-  if (state == null || !单位有效(state.Boss单位)) return;
-  广播单位提示(state.触发英雄, "看来这次解释不清了。大家小心，先挡住他！", 3200);
-  addDelayedCallback(取广播完整播放毫秒(3200), on执法对白结束);
+  return state != null && 单位有效(state.Boss单位);
 }
 
-function 播放第五段对白(this: void): void {
+function 读取执法对白单位(this: void, 说话者键: string): any {
   const state = 当前执法状态;
-  if (state == null || !单位有效(state.Boss单位)) return;
-  广播单位提示(state.Boss单位, "拒捕、袭击城民，还企图以武力抗法。很好，那就由我亲自执行裁决。", 4200);
-  addDelayedCallback(取广播完整播放毫秒(4200), 播放第六段对白);
+  if (state == null) return null;
+  return 说话者键 === "Boss" ? state.Boss单位 : state.触发英雄;
 }
 
-function 播放第四段对白(this: void): void {
-  const state = 当前执法状态;
-  if (state == null || !单位有效(state.Boss单位)) return;
-  清理逮捕表现();
-  广播单位提示(state.触发英雄, "等等，事情还没弄清楚，不能就这么把我们带走！", 3400);
-  addDelayedCallback(取广播完整播放毫秒(3400), 播放第五段对白);
+function on执法单句播放前(this: void, 序号: number): void {
+  if (序号 === 4) 清理逮捕表现();
 }
 
-function 播放第三段对白(this: void): void {
-  const state = 当前执法状态;
-  if (state == null || !单位有效(state.Boss单位)) return;
-  广播单位提示(state.Boss单位, "武器已经落在无辜者身上，这不叫误会。放下武器，跟我回执法厅。", 4200);
-  addDelayedCallback(取广播完整播放毫秒(4200), 播放第四段对白);
-}
-
-function 播放第二段对白(this: void): void {
-  const state = 当前执法状态;
-  if (state == null || !单位有效(state.Boss单位)) return;
-  广播单位提示(state.触发英雄, "误会，我们只是……一时没控制好手。", 3000);
-  addDelayedCallback(取广播完整播放毫秒(3000), 播放第三段对白);
-}
-
-function 播放第一段对白(this: void): void {
-  const state = 当前执法状态;
-  if (state == null || !单位有效(state.Boss单位)) return;
-  广播单位提示(state.Boss单位, "住手。这里是精灵王城，不是任由外来者撒野的地方。", 3500);
-  addDelayedCallback(取广播完整播放毫秒(3500), 播放第二段对白);
+function 播放执法对白(this: void): void {
+  播放广播对白序列({
+    对白列表: [
+      { 说话者键: "Boss", 文本: "住手。这里是精灵王城，不是任由外来者撒野的地方。", 停留毫秒: 3500 },
+      { 说话者键: "玩家", 文本: "误会，我们只是……一时没控制好手。", 停留毫秒: 3000 },
+      { 说话者键: "Boss", 文本: "武器已经落在无辜者身上，这不叫误会。放下武器，跟我回执法厅。", 停留毫秒: 4200 },
+      { 说话者键: "玩家", 文本: "等等，事情还没弄清楚，不能就这么把我们带走！", 停留毫秒: 3400 },
+      { 说话者键: "Boss", 文本: "拒捕、袭击城民，还企图以武力抗法。很好，那就由我亲自执行裁决。", 停留毫秒: 4200 },
+      { 说话者键: "玩家", 文本: "看来这次解释不清了。大家小心，先挡住他！", 停留毫秒: 3200 },
+    ],
+    读取说话单位: 读取执法对白单位,
+    播放单句: 广播单位提示,
+    播放前校验: 校验执法对白状态,
+    单句播放前: on执法单句播放前,
+    播放完成: on执法对白结束,
+  });
 }
 
 function on执法对白结束(this: void): void {
@@ -264,10 +254,9 @@ function on执法对白结束(this: void): void {
 
   state.已启动战斗 = true;
   清理逮捕表现();
-  const 已启动 = 启动剧情Boss战(state.Boss单位, { 触发单位: state.触发英雄 });
+  const 已启动 = 启动剧情Boss战(state.Boss单位, { 触发单位: state.触发英雄, 暂停来源: 演出暂停来源 });
   释放演出暂停();
   if (!已启动) {
-    SetUnitInvulnerable(state.Boss单位, false);
     state.已启动战斗 = false;
   }
 }
@@ -283,8 +272,12 @@ function 注销执法入口(this: void): void {
 }
 
 function 创建并播放圣光特效(this: void, victim: any): void {
-  const effect = AddSpecialEffect(圣光特效, GetUnitX(victim), GetUnitY(victim));
-  if (effect != null && effect !== 0) DestroyEffect(effect);
+  创建点特效({
+    模型路径: 圣光特效,
+    X: GetUnitX(victim),
+    Y: GetUnitY(victim),
+    持续秒: 1,
+  });
 }
 
 function 开始瑟兰迪尔执法演出(this: void, hero: any, victim: any): boolean {
@@ -317,9 +310,8 @@ function 开始瑟兰迪尔执法演出(this: void, hero: any, victim: any): boo
   IssueImmediateOrder(hero, "stop");
   IssueImmediateOrder(boss, "stop");
   SetUnitFacing(boss, (facing + 180) % 360);
-  SetUnitInvulnerable(boss, true);
   添加单位暂停(hero, 演出暂停来源);
-  添加单位暂停(boss, 演出暂停来源);
+  暂停并设置无敌安全(boss, 演出暂停来源);
   SetUnitAnimationByIndex(boss, 9);
 
   创建并播放圣光特效(victim);
@@ -332,7 +324,7 @@ function 开始瑟兰迪尔执法演出(this: void, hero: any, victim: any): boo
     起点高度偏移: 120,
     终点高度偏移: 80,
   });
-  播放第一段对白();
+  播放执法对白();
   return true;
 }
 

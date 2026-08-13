@@ -12,7 +12,7 @@ local SetUnitManaPercentBJ = ____require_result_0.SetUnitManaPercentBJ
 local GetUnitLifePercent = ____require_result_0.GetUnitLifePercent
 local GetUnitManaPercent = ____require_result_0.GetUnitManaPercent
 local ModifyHeroStat = ____require_result_0.ModifyHeroStat
-local HS = jass.InitHashtable()
+local HS = jass:InitHashtable()
 local GetHandleId = jass.GetHandleId
 local LoadReal = jass.LoadReal
 local SaveReal = jass.SaveReal
@@ -66,7 +66,7 @@ function ____exports.GS_LoadUintProperty(u, i)
         ) or 0
     end
     if i == 5 then
-        return jass.GetUnitMoveSpeed(u) or 0
+        return jass:GetUnitMoveSpeed(u) or 0
     end
     return loadReal(
         HS,

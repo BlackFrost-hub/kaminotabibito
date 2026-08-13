@@ -24,15 +24,11 @@ const { addSelectionListener } = require("系统.00．核心系统.01．事件�
     listener: (this: void, player: any, playerId: number, unit: any, isSelected: boolean) => void,
   ) => void;
 };
-const { registerEnterRegionTrigger } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
-  registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => (this: void) => void;
+const { 创建矩形进入监听 } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
+  创建矩形进入监听: (this: void, rect: any, callback: (this: void) => void, filter?: any) => { 取消: (this: void) => void } | null;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
 };
 const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   广播单位提示: (this: void, sourceUnit: any, text: string, durationMs?: number) => void;
@@ -45,14 +41,12 @@ const { 是玩家英雄组单位, getRegisteredPlayerHero } = require("系统.00
   getRegisteredPlayerHero: (this: void, player: any) => any;
 };
 
-const CreateRegion = jass.CreateRegion as (this: void) => any;
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const PingMinimap = jass.PingMinimap as (this: void, x: number, y: number, duration: number) => void;
 const Rect = jass.Rect as (this: void, minX: number, minY: number, maxX: number, maxY: number) => any;
-const RegionAddRect = jass.RegionAddRect as (this: void, region: any, rect: any) => void;
+const RemoveRect = jass.RemoveRect as (this: void, rect: any) => void;
 
 const 玩家最小ID = 0;
 const 玩家最大ID = 5;
@@ -60,7 +54,7 @@ const 守门触发半径 = 280;
 const 守门警告已播放表: Record<number, boolean | undefined> = {};
 
 let 入口模块已初始化 = false;
-let 守门范围触发器: any = null;
+let 守门范围监听: { 取消: (this: void) => void } | null = null;
 let 本思雅待对话玩家: any = null;
 let 本思雅待对话英雄: any = null;
 
@@ -296,19 +290,12 @@ function on进入祖地守门范围(this: void): void {
 }
 
 function 注册守门范围(this: void): void {
-  if (句柄有效(守门范围触发器)) return;
+  if (守门范围监听 != null) return;
   const cfg = 祖地双灵卫副本配置.守门单位;
-  const region = CreateRegion();
   const rect = Rect(cfg.X - 守门触发半径, cfg.Y - 守门触发半径, cfg.X + 守门触发半径, cfg.Y + 守门触发半径);
-  const trigger = CreateTrigger();
-  if (!句柄有效(region) || !句柄有效(rect) || !句柄有效(trigger)) return;
-  RegionAddRect(region, rect);
-  if (safeTriggerAddAction(trigger, on进入祖地守门范围) == null) {
-    safeDestroyTrigger(trigger);
-    return;
-  }
-  registerEnterRegionTrigger(trigger, region, null);
-  守门范围触发器 = trigger;
+  if (!句柄有效(rect)) return;
+  守门范围监听 = 创建矩形进入监听(rect, on进入祖地守门范围, null);
+  RemoveRect(rect);
 }
 
 function on祖地双灵卫剧情进度变化(this: void, newProgress: number, _oldProgress: number): void {

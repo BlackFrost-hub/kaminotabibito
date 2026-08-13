@@ -8,6 +8,7 @@ local _____83B7_53D6_6216_521B_5EFA_5229_5C14_4F2F_7279_4E0A_4E0B_6587 = ____01_
 local _____5229_5C14_4F2F_7279_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6["利尔伯特单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.11．利尔·伯特.02．数值与表现配置")
 local _____5229_5C14_4F2F_7279_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["利尔伯特技能配置"]
+local _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["利尔伯特音效配置"]
 local ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.08．方位判定工具")
 local _____76EE_6807_662F_5426_9762_5411_6765_6E90 = ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177["目标是否面向来源"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
@@ -36,6 +37,8 @@ local ____require_result_6 = require("lib.扩展函数.Star扩展函数.04．EC�
 local EC_CreateEffect = ____require_result_6.EC_CreateEffect
 local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_8["播放Boss坐标音效"]
 local jass = require("jass.common")
 local globals = require("jass.globals")
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -130,6 +133,12 @@ local function ____on_5BA1_5224_62F7_95EE_7ED3_7B97(variable)
         end
         if _____7ED3_679C["是否造成伤害"] then
             _____64AD_653E_5BA1_5224_62F7_95EE_7279_6548(_____914D_7F6E["命中特效"], target)
+            _____64AD_653EBoss_5750_6807_97F3_6548(
+                _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["审判拷问"]["结算命中"],
+                GetUnitX(target),
+                GetUnitY(target),
+                _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["默认裁断距离"]
+            )
             _____65BD_52A0_5FEB_901F_63A7_5236Buff(
                 boss,
                 target,
@@ -166,6 +175,12 @@ ____exports["释放利尔伯特审判拷问"] = function(_____4E0A_4E0B_6587, ta
         ["提示文本"] = _____914D_7F6E["读条提示"]
     })
     _____64AD_653E_5BA1_5224_62F7_95EE_7279_6548(_____914D_7F6E["起始特效"], target)
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["审判拷问"]["锁定"],
+        GetUnitX(target),
+        GetUnitY(target),
+        _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     registerManualBuff(
         target,
         _____5229_5C14_4F2F_7279BuffID["审判拷问"],
@@ -174,14 +189,14 @@ ____exports["释放利尔伯特审判拷问"] = function(_____4E0A_4E0B_6587, ta
         {sourceUnit = boss, effectSourceName = "审判拷问", effectSourceType = "技能"}
     )
     _____72B6_6001["Buff运行时"] = getBuffRuntime(target, _____5229_5C14_4F2F_7279BuffID["审判拷问"])
-    local ____self_10 = _____4E0A_4E0B_6587["清理"]
-    ____self_10["登记清理"](____self_10, "审判拷问状态清理", _____6E05_7406_5BA1_5224_62F7_95EE_72B6_6001, _____72B6_6001)
-    local _____8BFB_6761_56DE_8C03ID = addDelayedCallback(_____914D_7F6E["通魔施法秒"] * 1000, ____on_5BA1_5224_62F7_95EE_8BFB_6761_7ED3_675F, {["通道"] = _____914D_7F6E["读条通道"], ["Boss单位"] = boss})
     local ____self_11 = _____4E0A_4E0B_6587["清理"]
-    ____self_11["登记延迟回调"](____self_11, "审判拷问读条结束", _____8BFB_6761_56DE_8C03ID)
-    local _____7ED3_7B97_56DE_8C03ID = addDelayedCallback(_____914D_7F6E["持续秒"] * 1000, ____on_5BA1_5224_62F7_95EE_7ED3_7B97, _____72B6_6001)
+    ____self_11["登记清理"](____self_11, "审判拷问状态清理", _____6E05_7406_5BA1_5224_62F7_95EE_72B6_6001, _____72B6_6001)
+    local _____8BFB_6761_56DE_8C03ID = addDelayedCallback(_____914D_7F6E["通魔施法秒"] * 1000, ____on_5BA1_5224_62F7_95EE_8BFB_6761_7ED3_675F, {["通道"] = _____914D_7F6E["读条通道"], ["Boss单位"] = boss})
     local ____self_12 = _____4E0A_4E0B_6587["清理"]
-    ____self_12["登记延迟回调"](____self_12, "审判拷问结算", _____7ED3_7B97_56DE_8C03ID)
+    ____self_12["登记延迟回调"](____self_12, "审判拷问读条结束", _____8BFB_6761_56DE_8C03ID)
+    local _____7ED3_7B97_56DE_8C03ID = addDelayedCallback(_____914D_7F6E["持续秒"] * 1000, ____on_5BA1_5224_62F7_95EE_7ED3_7B97, _____72B6_6001)
+    local ____self_13 = _____4E0A_4E0B_6587["清理"]
+    ____self_13["登记延迟回调"](____self_13, "审判拷问结算", _____7ED3_7B97_56DE_8C03ID)
     return true
 end
 local function ____on_5229_5C14_4F2F_7279_5BA1_5224_62F7_95EE_751F_6548(castingUnit, spellAbilityId)

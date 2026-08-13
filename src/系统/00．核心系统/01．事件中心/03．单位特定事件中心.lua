@@ -14,11 +14,12 @@ local unitInRangeRegistered = {}
 local unitInRangeMasters = {}
 local unitInRangeMasterActions = {}
 local unitInRangeKeyByMasterHid = {}
+local oneShotRangeListeners = {}
 local function handleKey(handle)
-    return tostring(handle)
+    return tostring(nil, handle)
 end
 local function filterKey(filter)
-    return filter == nil and "null" or tostring(filter)
+    return filter == nil and "null" or tostring(nil, filter)
 end
 local function normalizeFilter(filter)
     local ____temp_0
@@ -30,10 +31,10 @@ local function normalizeFilter(filter)
     return ____temp_0
 end
 local function unitEventKey(unit, eventId)
-    return (handleKey(unit) .. ":") .. tostring(eventId)
+    return (handleKey(unit) .. ":") .. tostring(nil, eventId)
 end
 local function unitRangeKey(unit, range, filter)
-    return (((handleKey(unit) .. ":") .. tostring(range)) .. ":") .. filterKey(filter)
+    return (((handleKey(unit) .. ":") .. tostring(nil, range)) .. ":") .. filterKey(filter)
 end
 local function hasListener(list, trigger)
     do
@@ -57,9 +58,9 @@ local function dispatchListeners(list)
                 if not listener or not listener.active or not listener.trigger then
                     goto __continue13
                 end
-                local passed = jass.TriggerEvaluate(listener.trigger)
+                local passed = jass:TriggerEvaluate(listener.trigger)
                 if passed then
-                    jass.TriggerExecute(listener.trigger)
+                    jass:TriggerExecute(listener.trigger)
                 end
                 if listener.once then
                     listener.active = false
@@ -112,11 +113,13 @@ local function cleanupUnitEventMaster(key)
     if master then
         local action = unitEventMasterActions[key]
         if action then
-            jass.TriggerRemoveAction(master, action)
+            jass:TriggerRemoveAction(master, action)
         end
-        jass.DestroyTrigger(master)
+        jass:DestroyTrigger(master)
     end
-    local hid = master and tostring(jass.GetHandleId(master)
+    local hid = master and tostring(
+        nil,
+        jass:GetHandleId(master)
     ) or ""
     if hid ~= "" then
         __TS__Delete(unitEventKeyByMasterHid, hid)
@@ -135,11 +138,13 @@ local function cleanupUnitInRangeMaster(key)
     if master then
         local action = unitInRangeMasterActions[key]
         if action then
-            jass.TriggerRemoveAction(master, action)
+            jass:TriggerRemoveAction(master, action)
         end
-        jass.DestroyTrigger(master)
+        jass:DestroyTrigger(master)
     end
-    local hid = master and tostring(jass.GetHandleId(master)
+    local hid = master and tostring(
+        nil,
+        jass:GetHandleId(master)
     ) or ""
     if hid ~= "" then
         __TS__Delete(unitInRangeKeyByMasterHid, hid)
@@ -150,11 +155,13 @@ local function cleanupUnitInRangeMaster(key)
     __TS__Delete(unitInRangeListeners, key)
 end
 local function dispatchUnitEventMaster()
-    local trig = jass.GetTriggeringTrigger()
+    local trig = jass:GetTriggeringTrigger()
     if not trig then
         return
     end
-    local key = unitEventKeyByMasterHid[tostring(jass.GetHandleId(trig)
+    local key = unitEventKeyByMasterHid[tostring(
+        nil,
+        jass:GetHandleId(trig)
     )]
     if not key then
         return
@@ -163,17 +170,47 @@ local function dispatchUnitEventMaster()
     cleanupUnitEventMaster(key)
 end
 local function dispatchUnitInRangeMaster()
-    local trig = jass.GetTriggeringTrigger()
+    local trig = jass:GetTriggeringTrigger()
     if not trig then
         return
     end
-    local key = unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(trig)
+    local key = unitInRangeKeyByMasterHid[tostring(
+        nil,
+        jass:GetHandleId(trig)
     )]
     if not key then
         return
     end
     dispatchListeners(unitInRangeListeners[key] or ({}))
     cleanupUnitInRangeMaster(key)
+end
+local function dispatchOneShotRangeListener()
+    local listenerTrigger = jass:GetTriggeringTrigger()
+    if not listenerTrigger then
+        return
+    end
+    local key = tostring(
+        nil,
+        jass:GetHandleId(listenerTrigger)
+    )
+    local listener = oneShotRangeListeners[key]
+    if listener == nil or not listener.active then
+        return
+    end
+    local enteringUnit = jass:GetTriggerUnit()
+    if listener.predicate ~= nil and not listener.predicate(enteringUnit) then
+        return
+    end
+    if not listener.callback(enteringUnit) then
+        return
+    end
+    if not listener.active then
+        return
+    end
+    listener.active = false
+    listener.unregisterRange()
+    __TS__Delete(oneShotRangeListeners, key)
+    jass:DestroyTrigger(listener.trigger)
 end
 local function addListener(store, key, trigger, once, cleanupWhenEmpty)
     store[key] = store[key] or ({})
@@ -212,14 +249,16 @@ function ____exports.registerUnitEventTrigger(trigger, unit, eventId, once)
     end
     local key = unitEventKey(unit, eventId)
     if not unitEventRegistered[key] then
-        local master = jass.CreateTrigger()
+        local master = jass:CreateTrigger()
         unitEventMasters[key] = master
         unitEventRegistered[key] = true
         unitEventListeners[key] = unitEventListeners[key] or ({})
-        unitEventKeyByMasterHid[tostring(jass.GetHandleId(master)
+        unitEventKeyByMasterHid[tostring(
+            nil,
+            jass:GetHandleId(master)
         )] = key
-        jass.TriggerRegisterUnitEvent(master, unit, eventId)
-        unitEventMasterActions[key] = jass.TriggerAddAction(master, dispatchUnitEventMaster)
+        jass:TriggerRegisterUnitEvent(master, unit, eventId)
+        unitEventMasterActions[key] = jass:TriggerAddAction(master, dispatchUnitEventMaster)
     end
     return addListener(
         unitEventListeners,
@@ -243,14 +282,16 @@ function ____exports.registerUnitInRangeTrigger(trigger, unit, range, filter, on
     local key = unitRangeKey(unit, range, filter)
     if not unitInRangeRegistered[key] then
         local normalizedFilter = normalizeFilter(filter)
-        local master = jass.CreateTrigger()
+        local master = jass:CreateTrigger()
         unitInRangeMasters[key] = master
         unitInRangeRegistered[key] = true
         unitInRangeListeners[key] = unitInRangeListeners[key] or ({})
-        unitInRangeKeyByMasterHid[tostring(jass.GetHandleId(master)
+        unitInRangeKeyByMasterHid[tostring(
+            nil,
+            jass:GetHandleId(master)
         )] = key
-        jass.TriggerRegisterUnitInRange(master, unit, range, normalizedFilter)
-        unitInRangeMasterActions[key] = jass.TriggerAddAction(master, dispatchUnitInRangeMaster)
+        jass:TriggerRegisterUnitInRange(master, unit, range, normalizedFilter)
+        unitInRangeMasterActions[key] = jass:TriggerAddAction(master, dispatchUnitInRangeMaster)
     end
     return addListener(
         unitInRangeListeners,
@@ -259,5 +300,52 @@ function ____exports.registerUnitInRangeTrigger(trigger, unit, range, filter, on
         once,
         cleanupUnitInRangeMaster
     )
+end
+--- 注册通用的一次性单位范围监听。
+-- 回调返回 true 才会注销；返回 false 时保留监听，适合等待玩家英雄而忽略其他单位。
+function ____exports.registerOneShotUnitRangeListener(unit, range, callback, predicate)
+    if not unit or not (range > 0) or callback == nil then
+        return function()
+        end
+    end
+    local trigger = jass:CreateTrigger()
+    if not trigger then
+        return function()
+        end
+    end
+    local key = tostring(
+        nil,
+        jass:GetHandleId(trigger)
+    )
+    local function unregisterRange()
+    end
+    local function _____8C03_7528_8303_56F4_76D1_542C_6CE8_9500()
+        unregisterRange()
+    end
+    local listener = {
+        trigger = trigger,
+        callback = callback,
+        predicate = predicate,
+        unregisterRange = _____8C03_7528_8303_56F4_76D1_542C_6CE8_9500,
+        active = true
+    }
+    oneShotRangeListeners[key] = listener
+    jass:TriggerAddAction(trigger, dispatchOneShotRangeListener)
+    unregisterRange = ____exports.registerUnitInRangeTrigger(
+        trigger,
+        unit,
+        range,
+        nil,
+        false
+    )
+    return function()
+        if not listener.active then
+            return
+        end
+        listener.active = false
+        unregisterRange()
+        __TS__Delete(oneShotRangeListeners, key)
+        jass:DestroyTrigger(trigger)
+    end
 end
 return ____exports

@@ -28,3 +28,4 @@ export * from "./22．幸运值/index";
 export * from "./23．光环/index";
 export * from "./24．魔法吸收护盾/index";
 export * from "./25．站桩弹幕射击单位/index";
+export * from "./27．通用防守/index";

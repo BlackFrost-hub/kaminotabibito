@@ -2,7 +2,7 @@
 
 import { 教派剑士单位技能配置 } from './00．配置';
 import { 获取或创建教派剑士上下文, 教派剑士单位存活, type 教派剑士运行时上下文 } from './01．运行时上下文';
-import { 教派剑士技能配置 } from './02．数值与表现配置';
+import { 教派剑士技能配置, 教派剑士音效配置 } from './02．数值与表现配置';
 import { 播放教派剑士台词 } from './11．台词播放';
 import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 读取单位最大生命 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
@@ -53,6 +53,9 @@ const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC�
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
+};
+const { Sound3DII_CooPlayReuse } = require('lib.扩展函数.封装函数.02．音效系统.03．3D音效播放') as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -110,6 +113,7 @@ function 触发魔祭反噬(this: void, 状态: 魔祭吸魂状态, attacker: an
   const 配置 = 教派剑士技能配置.魔祭吸魂;
   const difficulty = getGameDifficulty() > 0 ? getGameDifficulty() : 1;
   const ratio = 配置.反噬最大生命基础比例 - 配置.每难度降低反噬比例 * difficulty;
+  Sound3DII_CooPlayReuse(教派剑士音效配置.魔祭吸魂.反噬, GetUnitX(boss), GetUnitY(boss), 0, 教派剑士音效配置.音效裁断距离);
   结束魔祭吸魂(状态, '受到火/光伤害反噬');
   执行非伤害生命移除({
     目标: boss,
@@ -153,6 +157,7 @@ function on魔祭吸魂全体结算(this: void, variable?: any): void {
   const 配置 = 教派剑士技能配置.魔祭吸魂;
   const 目标列表 = 获取Boss技能敌对英雄列表(boss);
   状态.累计最终伤害 = 0;
+  Sound3DII_CooPlayReuse(教派剑士音效配置.魔祭吸魂.结算吸魂, GetUnitX(boss), GetUnitY(boss), 0, 教派剑士音效配置.音效裁断距离);
   for (let i = 0; i < 目标列表.length; i++) {
     const target = 目标列表[i];
     if (!教派剑士单位存活(target)) continue;
@@ -204,6 +209,7 @@ function on魔祭吸魂施法完成(this: void, variable?: any): void {
     return;
   }
   状态.阶段 = '生效';
+  Sound3DII_CooPlayReuse(教派剑士音效配置.魔祭吸魂.魔祭生效, GetUnitX(boss), GetUnitY(boss), 0, 教派剑士音效配置.音效裁断距离);
   registerManualBuff(boss, 教派剑士BuffID.魔祭吸魂, 配置.状态持续秒, 配置.伤害提高比例, { sourceUnit: boss, effectSourceName: '魔祭吸魂', effectSourceType: '技能' });
   const 结算ID = addDelayedCallback(配置.全体结算延迟秒 * 1000, on魔祭吸魂全体结算, 状态);
   const 到期ID = addDelayedCallback(配置.状态持续秒 * 1000, on魔祭吸魂状态到期, 状态);
@@ -222,6 +228,7 @@ export function 释放教派剑士魔祭吸魂(this: void, 上下文: 教派剑�
   开始硬直(boss, 配置.施法秒);
   SetUnitAnimationByIndex(boss, 配置.动作编号);
   播放教派剑士台词(boss, '魔祭吸魂');
+  Sound3DII_CooPlayReuse(教派剑士音效配置.魔祭吸魂.起手施法, GetUnitX(boss), GetUnitY(boss), 0, 教派剑士音效配置.音效裁断距离);
   EC_CreateEffect(配置.起始特效路径, GetUnitX(boss), GetUnitY(boss), 0, 270, 配置.起始特效缩放, 1, 配置.起始特效持续秒);
   显示常规技能吟唱条({ 通道: 配置.读条通道, 总时长: 配置.施法秒, 颜色ID: 配置.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
   const 完成ID = addDelayedCallback(配置.施法秒 * 1000, on魔祭吸魂施法完成, 状态);

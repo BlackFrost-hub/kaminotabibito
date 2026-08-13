@@ -25,26 +25,21 @@ local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
 local ____require_result_4 = require("系统.00．核心系统.07．联机安全工具")
 local safeForForce = ____require_result_4.safeForForce
 local ____require_result_5 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-local registerUnitInRangeTrigger = ____require_result_5.registerUnitInRangeTrigger
-local ____require_result_6 = require("系统.00．核心系统.07．联机安全工具")
-local safeTriggerAddAction = ____require_result_6.safeTriggerAddAction
-local safeDestroyTrigger = ____require_result_6.safeDestroyTrigger
-local ____require_result_7 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_7["是玩家英雄组单位"]
-local ____require_result_8 = require("系统.02．物品系统.18．首领奖励选择.08．奖励物品发放")
-local _____53D1_653E_9996_9886_5956_52B1_88C5_5907 = ____require_result_8["发放首领奖励装备"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.11．装备常量")
-local _____7B2C_4E8C_7AE0_540E_6BB5Boss_6218_5229_54C1_88C5_5907_540D = ____require_result_9["第二章后段Boss战利品装备名"]
+local registerOneShotUnitRangeListener = ____require_result_5.registerOneShotUnitRangeListener
+local ____require_result_6 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_6["是玩家英雄组单位"]
+local ____require_result_7 = require("系统.02．物品系统.18．首领奖励选择.08．奖励物品发放")
+local _____53D1_653E_9996_9886_5956_52B1_88C5_5907 = ____require_result_7["发放首领奖励装备"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.11．装备常量")
+local _____7B2C_4E8C_7AE0_540E_6BB5Boss_6218_5229_54C1_88C5_5907_540D = ____require_result_8["第二章后段Boss战利品装备名"]
 local GetDestructableX = jass.GetDestructableX
 local GetDestructableY = jass.GetDestructableY
-local CreateTrigger = jass.CreateTrigger
 local GetItemX = jass.GetItemX
 local GetItemY = jass.GetItemY
 local GetEnumPlayer = jass.GetEnumPlayer
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerState = jass.GetPlayerState
 local GetRandomInt = jass.GetRandomInt
-local GetTriggerUnit = jass.GetTriggerUnit
 local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -225,35 +220,11 @@ local function _____53D1_653E_8036_63D0_5C14_5B58_6D3B_5956_52B1(_____5956_52B1_
         _____53D1_9001_5267_60C5_4EFB_52A1_6D88_606F({["消息类型"] = bj_QUESTMESSAGE_ITEMACQUIRED, ["文本"] = "|cffffff00『额外奖励』：|r所有英雄收到|cffffff005000金币|r！"})
     end
 end
-local function ____on_5EF6_8FDF_9500_6BC1_8036_63D0_5C14_6218_540E_89E6_53D1_5668(variable)
-    local _____53C2_6570 = variable
-    if _____53C2_6570 == nil or _____53C2_6570["触发器"] == nil or _____53C2_6570["触发器"] == 0 then
-        return
-    end
-    local _____53D6_6D88_76D1_542C = _____53C2_6570["状态"]["取消领取监听"]
-    _____53C2_6570["状态"]["取消领取监听"] = nil
-    if _____53D6_6D88_76D1_542C ~= nil then
-        _____53D6_6D88_76D1_542C()
-    end
-    safeDestroyTrigger(_____53C2_6570["触发器"])
-end
 local function _____6E05_7406_8036_63D0_5C14_6218_540E_9886_53D6_76D1_542C(_____72B6_6001)
     local _____53D6_6D88_76D1_542C = _____72B6_6001["取消领取监听"]
     _____72B6_6001["取消领取监听"] = nil
     if _____53D6_6D88_76D1_542C ~= nil then
         _____53D6_6D88_76D1_542C()
-    end
-    local _____89E6_53D1_5668 = _____72B6_6001["领取触发器"]
-    _____72B6_6001["领取触发器"] = nil
-    if _____89E6_53D1_5668 ~= nil and _____89E6_53D1_5668 ~= 0 then
-        safeDestroyTrigger(_____89E6_53D1_5668)
-    end
-end
-local function _____5B8C_6210_8036_63D0_5C14_6218_540E_4E00_6B21_6027_76D1_542C(_____72B6_6001)
-    local _____89E6_53D1_5668 = _____72B6_6001["领取触发器"]
-    _____72B6_6001["领取触发器"] = nil
-    if _____89E6_53D1_5668 ~= nil and _____89E6_53D1_5668 ~= 0 then
-        addDelayedCallback(1, ____on_5EF6_8FDF_9500_6BC1_8036_63D0_5C14_6218_540E_89E6_53D1_5668, {["状态"] = _____72B6_6001, ["触发器"] = _____89E6_53D1_5668})
     end
 end
 local function _____6E05_7A7A_8036_63D0_5C14_6218_540E_5956_52B1_72B6_6001()
@@ -272,19 +243,19 @@ local function ____on_53D1_653E_8036_63D0_5C14_6218_540E_5956_52B1(variable)
     _____5F53_524D_8036_63D0_5C14_6218_540E_5956_52B1_72B6_6001 = nil
     _____53D1_653E_8036_63D0_5C14_5B58_6D3B_5956_52B1(_____72B6_6001["奖励档位"])
 end
-local function ____on_8036_63D0_5C14_6218_540E_5956_52B1_63A5_8FD1()
+local function ____on_8036_63D0_5C14_6218_540E_5956_52B1_63A5_8FD1(_____8FDB_5165_5355_4F4D)
     local _____72B6_6001 = _____5F53_524D_8036_63D0_5C14_6218_540E_5956_52B1_72B6_6001
     if _____72B6_6001 == nil or _____72B6_6001["已领取"] then
-        return
+        return true
     end
-    local _____8FDB_5165_5355_4F4D = GetTriggerUnit()
-    if not _____5355_4F4D_6709_6548(_____8FDB_5165_5355_4F4D) or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____8FDB_5165_5355_4F4D) then
-        return
+    if not _____5355_4F4D_6709_6548(_____8FDB_5165_5355_4F4D) then
+        return false
     end
     _____72B6_6001["已领取"] = true
-    _____5B8C_6210_8036_63D0_5C14_6218_540E_4E00_6B21_6027_76D1_542C(_____72B6_6001)
+    _____72B6_6001["取消领取监听"] = nil
     _____5E7F_64AD_5355_4F4D_63D0_793A(_____72B6_6001["耶提尔"], _____8036_63D0_5C14_6218_540E_5BF9_767D, _____8036_63D0_5C14_6218_540E_5BF9_767D_6301_7EED_6BEB_79D2)
     addDelayedCallback(_____8036_63D0_5C14_6218_540E_5BF9_767D_6301_7EED_6BEB_79D2, ____on_53D1_653E_8036_63D0_5C14_6218_540E_5956_52B1, {["世代"] = _____72B6_6001["世代"]})
+    return true
 end
 ____exports["布置耶提尔战后奖励NPC"] = function()
     local _____72B6_6001 = _____5F53_524D_8036_63D0_5C14_6218_540E_5956_52B1_72B6_6001
@@ -299,20 +270,7 @@ ____exports["布置耶提尔战后奖励NPC"] = function()
     SetUnitPosition(_____72B6_6001["耶提尔"], _____8036_63D0_5C14_6218_540E_4F4D_7F6EX, _____8036_63D0_5C14_6218_540E_4F4D_7F6EY)
     SetUnitFacing(_____72B6_6001["耶提尔"], _____8036_63D0_5C14_6218_540E_671D_5411)
     IssueImmediateOrder(_____72B6_6001["耶提尔"], "holdposition")
-    local _____89E6_53D1_5668 = CreateTrigger()
-    _____72B6_6001["领取触发器"] = _____89E6_53D1_5668
-    if safeTriggerAddAction(_____89E6_53D1_5668, ____on_8036_63D0_5C14_6218_540E_5956_52B1_63A5_8FD1) == nil then
-        _____72B6_6001["领取触发器"] = nil
-        safeDestroyTrigger(_____89E6_53D1_5668)
-        return
-    end
-    _____72B6_6001["取消领取监听"] = registerUnitInRangeTrigger(
-        _____89E6_53D1_5668,
-        _____72B6_6001["耶提尔"],
-        _____8036_63D0_5C14_6218_540E_5956_52B1_89E6_53D1_8303_56F4,
-        nil,
-        false
-    )
+    _____72B6_6001["取消领取监听"] = registerOneShotUnitRangeListener(_____72B6_6001["耶提尔"], _____8036_63D0_5C14_6218_540E_5956_52B1_89E6_53D1_8303_56F4, ____on_8036_63D0_5C14_6218_540E_5956_52B1_63A5_8FD1, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D)
 end
 ____exports["结算耶提尔菲利斯协战"] = function()
     local _____72B6_6001 = _____5F53_524D_8036_63D0_5C14_534F_6218_72B6_6001
@@ -338,7 +296,6 @@ ____exports["结算耶提尔菲利斯协战"] = function()
         ["耶提尔"] = _____72B6_6001["耶提尔"],
         ["奖励档位"] = _____5956_52B1_6863_4F4D,
         ["已领取"] = false,
-        ["领取触发器"] = nil,
         ["取消领取监听"] = nil
     }
 end

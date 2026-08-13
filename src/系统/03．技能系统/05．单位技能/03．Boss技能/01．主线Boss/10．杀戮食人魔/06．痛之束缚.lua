@@ -8,6 +8,7 @@ local _____83B7_53D6_6740_622E_98DF_4EBA_9B54_4E0A_4E0B_6587 = ____01_FF0E_8FD0_
 local _____83B7_53D6_6216_521B_5EFA_6740_622E_98DF_4EBA_9B54_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建杀戮食人魔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.10．杀戮食人魔.02．数值与表现配置")
 local _____6740_622E_98DF_4EBA_9B54_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["杀戮食人魔技能配置"]
+local _____6740_622E_98DF_4EBA_9B54_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["杀戮食人魔音效配置"]
 local ____08_FF0E_98DF_4EBA_9B54 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.08．食人魔")
 local _____98DF_4EBA_9B54BuffID = ____08_FF0E_98DF_4EBA_9B54["食人魔BuffID"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
@@ -31,6 +32,8 @@ local ____require_result_5 = require("lib.扩展函数.Star扩展函数.04．EC�
 local EC_CreateEffect = ____require_result_5.EC_CreateEffect
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_7["播放Boss坐标音效"]
 local jass = require("jass.common")
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -133,10 +136,16 @@ local function _____5EFA_7ACB_75DB_4E4B_675F_7F1A(data)
         {sourceUnit = boss, sourceName = "杀戮食人魔-痛之束缚"}
     )
     context["束缚周期ID"] = addPeriodicCallback(100, ____on_75DB_4E4B_675F_7F1A_5468_671F, context)
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____6740_622E_98DF_4EBA_9B54_97F3_6548_914D_7F6E["痛之束缚"]["建立"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____6740_622E_98DF_4EBA_9B54_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     if not context["束缚清理已登记"] then
         context["束缚清理已登记"] = true
-        local ____self_7 = context["清理"]
-        ____self_7["登记清理"](____self_7, "杀戮食人魔-痛之束缚", ____on_75DB_4E4B_675F_7F1A_4E0A_4E0B_6587_6E05_7406, context)
+        local ____self_8 = context["清理"]
+        ____self_8["登记清理"](____self_8, "杀戮食人魔-痛之束缚", ____on_75DB_4E4B_675F_7F1A_4E0A_4E0B_6587_6E05_7406, context)
     end
 end
 local function ____on_75DB_4E4B_675F_7F1A_751F_6548()

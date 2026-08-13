@@ -51,7 +51,7 @@ local function _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_82F1_96C4(playerId)
     if not isValidHandle(selectedUnit) then
         return nil
     end
-    if jass.IsUnitType(selectedUnit, jass.UNIT_TYPE_HERO) ~= true then
+    if jass:IsUnitType(selectedUnit, jass.UNIT_TYPE_HERO) ~= true then
         return nil
     end
     return selectedUnit
@@ -70,15 +70,15 @@ local function _____83B7_53D6_5DF2_6CE8_518C_73A9_5BB6_82F1_96C4(whichPlayer)
     return ____isValidHandle_result_2
 end
 local function _____83B7_53D6_672C_5730_5F53_524D_9009_4E2D_82F1_96C4()
-    local localPlayer = jass.GetLocalPlayer()
+    local localPlayer = jass:GetLocalPlayer()
     if not isValidHandle(localPlayer) then
         return nil
     end
-    local selectedHero = _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_82F1_96C4(jass.GetPlayerId(localPlayer))
+    local selectedHero = _____8BFB_53D6_73A9_5BB6_552F_4E00_9009_4E2D_82F1_96C4(jass:GetPlayerId(localPlayer))
     if not isValidHandle(selectedHero) then
         return nil
     end
-    local owner = jass.GetOwningPlayer(selectedHero)
+    local owner = jass:GetOwningPlayer(selectedHero)
     if not isValidHandle(owner) then
         return nil
     end

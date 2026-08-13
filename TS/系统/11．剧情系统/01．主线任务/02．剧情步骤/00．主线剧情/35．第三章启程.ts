@@ -14,12 +14,14 @@ const { X_FixUnitStandingSafe } = require("lib.扩展函数.Star扩展函数.Sta
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
 };
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => (this: void) => void;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (
+    this: void,
+    unit: any,
+    range: number,
+    callback: (this: void, enteringUnit: any) => boolean,
+    predicate?: (this: void, enteringUnit: any) => boolean,
+  ) => () => void;
 };
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -36,8 +38,6 @@ import { 发布主线节点目标, 进入主线节点 } from "../../00．剧情�
 import { 布置耶提尔战后奖励NPC } from "./31B．耶提尔协战控制器";
 export { 王城战后与第三章启程剧情片段 } from "../03．第三章/35．王城战后与第三章启程";
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const Player = jass.Player as (this: void, playerId: number) => any;
 
 const 第三章启程进度 = 36;
@@ -50,7 +50,6 @@ const 熔岩小镇位置 = { X: 8668.3, Y: -20334.0 };
 interface 王宫启程传送门状态 {
   传送门: any;
   已切换熔岩小镇引导: boolean;
-  范围触发器?: any;
   取消范围监听?: (this: void) => void;
 }
 
@@ -62,9 +61,7 @@ function 单位存活(this: void, unit: any): boolean {
 
 function 清理王宫启程传送门监听(this: void, 状态: 王宫启程传送门状态): void {
   if (状态.取消范围监听 != null) 状态.取消范围监听();
-  if (状态.范围触发器 != null && 状态.范围触发器 !== 0) safeDestroyTrigger(状态.范围触发器);
   状态.取消范围监听 = undefined;
-  状态.范围触发器 = undefined;
 }
 
 function 切换到熔岩小镇引导(this: void): void {
@@ -80,26 +77,24 @@ function 切换到熔岩小镇引导(this: void): void {
   发布主线节点目标(第三章启程进度);
 }
 
-function on玩家抵达王宫启程传送门(this: void): void {
+function on玩家抵达王宫启程传送门(this: void, 触发单位: any): boolean {
   const 状态 = 当前王宫启程传送门状态;
-  if (状态 == null || 状态.已切换熔岩小镇引导 || 读取剧情进度() !== 第三章启程进度) return;
-  const 触发单位 = GetTriggerUnit();
-  if (!单位存活(触发单位) || !是玩家英雄组单位(触发单位)) return;
+  if (状态 == null || 状态.已切换熔岩小镇引导 || 读取剧情进度() !== 第三章启程进度) return false;
+  if (!单位存活(触发单位)) return false;
 
   状态.已切换熔岩小镇引导 = true;
   清理王宫启程传送门监听(状态);
   切换到熔岩小镇引导();
+  return true;
 }
 
 function 注册王宫启程传送门范围监听(this: void, 状态: 王宫启程传送门状态): void {
-  const trigger = CreateTrigger();
-  if (trigger == null || trigger === 0) return;
-  if (safeTriggerAddAction(trigger, on玩家抵达王宫启程传送门) == null) {
-    safeDestroyTrigger(trigger);
-    return;
-  }
-  状态.范围触发器 = trigger;
-  状态.取消范围监听 = registerUnitInRangeTrigger(trigger, 状态.传送门, 王宫启程传送门进入范围, null, false);
+  状态.取消范围监听 = registerOneShotUnitRangeListener(
+    状态.传送门,
+    王宫启程传送门进入范围,
+    on玩家抵达王宫启程传送门,
+    是玩家英雄组单位,
+  );
 }
 
 function 创建王宫启程传送门(this: void): any {

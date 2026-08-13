@@ -3,16 +3,24 @@ local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
+local _____5355_4F4D_5B58_6D3B, _____5141_8BB8_8BC5_5492_8F6C_79FB_76EE_6807, getRegisteredPlayerHero, GetUnitState, IsUnitType, GetOwningPlayer, UNIT_STATE_LIFE, UNIT_TYPE_DEAD
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.01．沙漠食人魔.00．配置")
 local _____6C99_6F20_98DF_4EBA_9B54_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["沙漠食人魔单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.01．沙漠食人魔.02．数值与表现配置")
 local _____6C99_6F20_98DF_4EBA_9B54_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["沙漠食人魔技能配置"]
+local _____6C99_6F20_98DF_4EBA_9B54_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["沙漠食人魔音效配置"]
 local ____08_FF0E_98DF_4EBA_9B54 = require("系统.05．Buff系统.03．Buff表.01．Boss.01．主线Boss.08．食人魔")
 local _____98DF_4EBA_9B54BuffID = ____08_FF0E_98DF_4EBA_9B54["食人魔BuffID"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss单体技能伤害"]
+function _____5355_4F4D_5B58_6D3B(unit)
+    return unit ~= nil and unit ~= 0 and not IsUnitType(unit, UNIT_TYPE_DEAD) and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
+end
+function _____5141_8BB8_8BC5_5492_8F6C_79FB_76EE_6807(hero)
+    return _____5355_4F4D_5B58_6D3B(hero) and getRegisteredPlayerHero(GetOwningPlayer(hero)) == hero
+end
 local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_0.debugLogForce
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
@@ -26,11 +34,10 @@ local ____require_result_4 = require("系统.05．Buff系统.06．负面效果�
 local _____5355_4F4D_662F_5426_514D_75AB_8D1F_9762_6548_679CBuffID = ____require_result_4["单位是否免疫负面效果BuffID"]
 local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
 local _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4 = ____require_result_5["获取Boss技能随机敌对英雄"]
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_5["获取Boss技能敌对英雄列表"]
 local ____require_result_6 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
 local _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_6["取当前有效玩家人数"]
 local ____require_result_7 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local getRegisteredPlayerHero = ____require_result_7.getRegisteredPlayerHero
+getRegisteredPlayerHero = ____require_result_7.getRegisteredPlayerHero
 local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
 local getGameDifficulty = ____require_result_8.getGameDifficulty
 local addDelayedCallback = ____require_result_8.addDelayedCallback
@@ -42,6 +49,8 @@ local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用
 local stringToFourCCSafe = ____require_result_11.stringToFourCCSafe
 local ____require_result_12 = require("系统.02．物品系统.15．装备技能.03．主动技能.00．公共.02．通用物品技能槽位配置")
 local _____901A_7528_7269_54C1_6280_80FD_69FD_4F4D_914D_7F6E_8868 = ____require_result_12["通用物品技能槽位配置表"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_13["播放Boss坐标音效"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -49,14 +58,13 @@ local GetUnitTypeId = jass.GetUnitTypeId
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
+GetUnitState = jass.GetUnitState
 local GetUnitStateJapi = japi.GetUnitState
-local IsUnitType = jass.IsUnitType
-local GetRandomInt = jass.GetRandomInt
-local GetOwningPlayer = jass.GetOwningPlayer
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+IsUnitType = jass.IsUnitType
+GetOwningPlayer = jass.GetOwningPlayer
+UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -65,17 +73,14 @@ local _____98DF_4EBA_9B54_5492_6280_80FDID = stringToFourCCSafe(_____6C99_6F20_9
 local _____98DF_4EBA_9B54_5492_6765_6E90_8868 = {}
 local _____98DF_4EBA_9B54_5492_5DF2_6CE8_518C = false
 local _____98DF_4EBA_9B54_5492_65BD_6CD5_76D1_542C_5DF2_6CE8_518C = false
-local function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and not IsUnitType(unit, UNIT_TYPE_DEAD) and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
-end
 local function _____83B7_53D6_6C99_6F20_98DF_4EBA_9B54_6280_80FD_4E0A_4E0B_6587(boss)
-    local _____5355_4F4D_5B58_6D3B_result_13
+    local _____5355_4F4D_5B58_6D3B_result_14
     if _____5355_4F4D_5B58_6D3B(boss) then
-        _____5355_4F4D_5B58_6D3B_result_13 = boss
+        _____5355_4F4D_5B58_6D3B_result_14 = boss
     else
-        _____5355_4F4D_5B58_6D3B_result_13 = nil
+        _____5355_4F4D_5B58_6D3B_result_14 = nil
     end
-    return _____5355_4F4D_5B58_6D3B_result_13
+    return _____5355_4F4D_5B58_6D3B_result_14
 end
 local function _____53D6_98DF_4EBA_9B54_5492_76EE_6807(boss)
     local spellTarget = GetSpellTargetUnit()
@@ -120,8 +125,14 @@ local function ____on_65BD_52A0_98DF_4EBA_9B54_5492(variable)
         {sourceUnit = data["Boss单位"], sourceName = "沙漠食人魔-食人魔咒"}
     )
     local runtime = getBuffRuntime(data["目标单位"], _____98DF_4EBA_9B54BuffID["食人魔咒"])
-    local ____debugLogForce_19 = debugLogForce
-    local ____array_18 = __TS__SparseArrayNew(
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____6C99_6F20_98DF_4EBA_9B54_97F3_6548_914D_7F6E["食人魔咒"]["生效"],
+        GetUnitX(data["目标单位"]),
+        GetUnitY(data["目标单位"]),
+        _____6C99_6F20_98DF_4EBA_9B54_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
+    local ____debugLogForce_20 = debugLogForce
+    local ____array_19 = __TS__SparseArrayNew(
         "沙漠食人魔-食人魔咒",
         "诅咒Buff施加诊断",
         "bossHid=",
@@ -136,16 +147,16 @@ local function ____on_65BD_52A0_98DF_4EBA_9B54_5492(variable)
         runtime ~= nil,
         "remaining="
     )
-    local ____opt_result_16
+    local ____opt_result_17
     if runtime ~= nil then
-        ____opt_result_16 = runtime.remaining
+        ____opt_result_17 = runtime.remaining
     end
-    local ____opt_result_16_17 = ____opt_result_16
-    if ____opt_result_16_17 == nil then
-        ____opt_result_16_17 = 0
+    local ____opt_result_17_18 = ____opt_result_17
+    if ____opt_result_17_18 == nil then
+        ____opt_result_17_18 = 0
     end
-    __TS__SparseArrayPush(____array_18, ____opt_result_16_17)
-    ____debugLogForce_19(__TS__SparseArraySpread(____array_18))
+    __TS__SparseArrayPush(____array_19, ____opt_result_17_18)
+    ____debugLogForce_20(__TS__SparseArraySpread(____array_19))
     debugLogForce(
         "沙漠食人魔-食人魔咒",
         "诅咒已施加",
@@ -163,22 +174,18 @@ local function _____53D6_968F_673A_8F6C_79FB_76EE_6807(boss, cursedHero)
     if _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570() <= 1 then
         return cursedHero
     end
-    local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-    local candidates = {}
-    do
-        local i = 0
-        while i < #heroes do
-            local hero = heroes[i + 1]
-            if hero ~= cursedHero and _____5355_4F4D_5B58_6D3B(hero) and getRegisteredPlayerHero(GetOwningPlayer(hero)) == hero then
-                candidates[#candidates + 1] = hero
-            end
-            i = i + 1
-        end
+    local receiver = _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(
+        boss,
+        nil,
+        nil,
+        {cursedHero},
+        _____5141_8BB8_8BC5_5492_8F6C_79FB_76EE_6807
+    )
+    local ____receiver_21 = receiver
+    if ____receiver_21 == nil then
+        ____receiver_21 = cursedHero
     end
-    if #candidates == 0 then
-        return cursedHero
-    end
-    return candidates[GetRandomInt(0, #candidates - 1) + 1]
+    return ____receiver_21
 end
 local function _____662F_7269_54C1_6280_80FD(_____6280_80FDID)
     do

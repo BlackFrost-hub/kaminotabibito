@@ -112,6 +112,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.02．物品系统.20．普通小怪额外掉落.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 require("系统.02．物品系统.03．物品加工")
 require("系统.02．物品系统.04．装备成长")
 require("系统.02．物品系统.05．装备掉落")
@@ -122,7 +130,9 @@ require("系统.02．物品系统.09．装备排泄")
 require("系统.02．物品系统.10．装备限制")
 require("系统.02．物品系统.11．装备系统")
 require("系统.02．物品系统.15．装备技能.index")
+require("系统.02．物品系统.17．装备采集.02．核心")
 require("系统.02．物品系统.18．首领奖励选择.index")
+require("系统.02．物品系统.20．普通小怪额外掉落.index")
 --- 初始化物品系统
 -- 在 main.ts 中调用以确保所有模块已加载
 function ____exports.init(self)

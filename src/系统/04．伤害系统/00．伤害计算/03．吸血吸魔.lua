@@ -88,7 +88,7 @@ function ____exports.getHeroForAncientUnit(ancientUnit)
     if ancientUnit == nil then
         return nil
     end
-    local owner = jass.GetOwningPlayer(ancientUnit)
+    local owner = jass:GetOwningPlayer(ancientUnit)
     if owner == nil then
         return nil
     end
@@ -101,8 +101,8 @@ function ____exports.getHeroForAncientUnit(ancientUnit)
         nil,
         heroGroup,
         function(enumUnit)
-            if enumUnit ~= nil and jass.GetOwningPlayer(enumUnit) == owner then
-                if jass.IsUnitType(enumUnit, jass.UNIT_TYPE_HERO) then
+            if enumUnit ~= nil and jass:GetOwningPlayer(enumUnit) == owner then
+                if jass:IsUnitType(enumUnit, jass.UNIT_TYPE_HERO) then
                     foundHero = enumUnit
                 end
             end
@@ -227,14 +227,14 @@ function ____exports.applyLifeSteal(attacker, heal, showText)
     if heal <= 0 or attacker == nil then
         return
     end
-    local currentLife = jass.GetUnitState(attacker, jass.UNIT_STATE_LIFE)
+    local currentLife = jass:GetUnitState(attacker, jass.UNIT_STATE_LIFE)
     local maxLife = GetUnitStateJapi(attacker, jass.UNIT_STATE_MAX_LIFE)
     local lifeGap = maxLife - currentLife
     local actualHeal = heal < lifeGap and heal or lifeGap
     if actualHeal <= 0 then
         return
     end
-    jass.SetUnitState(attacker, jass.UNIT_STATE_LIFE, currentLife + actualHeal)
+    jass:SetUnitState(attacker, jass.UNIT_STATE_LIFE, currentLife + actualHeal)
     if showText then
         showLifeStealText(attacker, actualHeal)
     end
@@ -245,7 +245,7 @@ end
 -- @param damage 最终伤害
 -- @returns 吸魔值
 function ____exports.calcManaSteal(attacker, damage)
-    if not jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO) then
+    if not jass:IsUnitType(attacker, jass.UNIT_TYPE_HERO) then
         return 0
     end
     local isPlayer = isPlayerUnit(nil, attacker)
@@ -278,14 +278,14 @@ function ____exports.applyManaSteal(attacker, mana, showText)
     if mana <= 0 or attacker == nil then
         return
     end
-    local currentMana = jass.GetUnitState(attacker, jass.UNIT_STATE_MANA)
+    local currentMana = jass:GetUnitState(attacker, jass.UNIT_STATE_MANA)
     local maxMana = GetUnitStateJapi(attacker, jass.UNIT_STATE_MAX_MANA)
     local manaGap = maxMana - currentMana
     local actualMana = mana < manaGap and mana or manaGap
     if actualMana <= 0 then
         return
     end
-    jass.SetUnitState(attacker, jass.UNIT_STATE_MANA, currentMana + actualMana)
+    jass:SetUnitState(attacker, jass.UNIT_STATE_MANA, currentMana + actualMana)
     if showText then
         showManaStealText(attacker, actualMana)
     end

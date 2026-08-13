@@ -81,4 +81,8 @@ ____exports["广播单位提示"] = function(_____6765_6E90_5355_4F4D, _____6587
         end
     end
 end
+do
+    local ____05_FF0E_5E7F_64AD_5BF9_767D_5E8F_5217 = require("系统.09．表现系统.06．广播提示消息.05．广播对白序列")
+    ____exports["播放广播对白序列"] = ____05_FF0E_5E7F_64AD_5BF9_767D_5E8F_5217["播放广播对白序列"]
+end
 return ____exports

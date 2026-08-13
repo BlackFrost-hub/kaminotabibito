@@ -21,7 +21,7 @@ const { 发放任务物品 } = require("系统.09．表现系统.02．对话框�
   发放任务物品: (this: void, unit: any, itemConfig: string | undefined) => number;
 };
 import { findDialogConfig } from "./03．任务状态";
-import { hasPlayerAcceptedQuest, hasPlayerCompletedQuest, setQuestState } from "./03．任务状态";
+import { hasPlayerAcceptedQuest, hasPlayerCompletedQuest, setQuestState, 读取任务目标进度 } from "./03．任务状态";
 import { getPlayerFirstHero } from "./08．任务奖励执行";
 import { handleQuestSubmit } from "./07．任务提交流程";
 import { resolveRewardDisplayText } from "./03．任务状态";
@@ -250,12 +250,16 @@ export function buildQuestInProgressDialog(
   const questDesc = quest.描述 || quest.名称 || "";
   const rewardText = getQuestRewardDisplayText(quest);
   const requireCount = normalizeRequireCount(quest.需求数量);
+  const 当前进度 = 读取任务目标进度(dialogOwnerId, quest.任务ID != null ? quest.任务ID.toString() : "");
+  const 任务进度文本 = 当前进度 != null
+    ? (quest.进度文本 || `进度：N/${当前进度.需求}`).replace("N", 当前进度.当前.toString())
+    : `进度：0/${requireCount}`;
 
   return {
     lines: [],
     quest: {
       title: npcName,
-      text: `【${quest.名称}】进行中...\n\n任务目标：${questDesc}\n进度：0/${requireCount}\n\n奖励：${rewardText}`,
+      text: `【${quest.名称}】进行中...\n\n任务目标：${questDesc}\n${任务进度文本}\n\n奖励：${rewardText}`,
       acceptText: "提交任务",
       rejectText: "暂时忽略",
       onAccept: () => {

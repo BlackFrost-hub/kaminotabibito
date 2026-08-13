@@ -15,8 +15,8 @@ const { ForGroupBJ, GetPlayersAll } = require("lib.扩展函数.BJ函数.07．�
 const { RectContainsUnit } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
   RectContainsUnit: (this: void, rectHandle: any, whichUnit: any) => boolean;
 };
-const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
-  TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (this: void, unit: any, range: number, callback: (this: void, enteringUnit: any) => boolean, predicate?: (this: void, enteringUnit: any) => boolean) => () => void;
 };
 const { YDUserDataGetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -36,7 +36,6 @@ const {
   Condition,
   CreateFogModifierRect,
   CreateItem,
-  CreateTrigger,
   DestroyGroup,
   FirstOfGroup,
   FogModifierStart,
@@ -44,7 +43,6 @@ const {
   GetEnumUnit,
   GetFilterUnit,
   GetRandomReal,
-  GetTriggerUnit,
   GetUnitTypeId,
   GetUnitX,
   GetUnitY,
@@ -57,14 +55,11 @@ const {
   SetUnitFacingTimed,
   SetUnitOwner,
   StopMusic,
-  TriggerAddAction,
-  TriggerRegisterEnterRectSimple,
 } = require("lib.扩展函数.封装函数.01．通用工具.12．JASS原生别名") as {
   AddSpecialEffect: (this: void, modelName: string, x: number, y: number) => any;
   Condition: (this: void, func: (this: void) => boolean) => any;
   CreateFogModifierRect: (this: void, whichPlayer: any, whichState: any, where: any, useSharedVision: boolean, afterUnits: boolean) => any;
   CreateItem: (this: void, itemId: number, x: number, y: number) => any;
-  CreateTrigger: (this: void) => any;
   DestroyGroup: (this: void, whichGroup: any) => void;
   FirstOfGroup: (this: void, whichGroup: any) => any;
   FogModifierStart: (this: void, whichFog: any) => void;
@@ -72,7 +67,6 @@ const {
   GetEnumUnit: (this: void) => any;
   GetFilterUnit: (this: void) => any;
   GetRandomReal: (this: void, lowBound: number, highBound: number) => number;
-  GetTriggerUnit: (this: void) => any;
   GetUnitTypeId: (this: void, whichUnit: any) => number;
   GetUnitX: (this: void, whichUnit: any) => number;
   GetUnitY: (this: void, whichUnit: any) => number;
@@ -85,8 +79,6 @@ const {
   SetUnitFacingTimed: (this: void, whichUnit: any, facing: number, duration: number) => void;
   SetUnitOwner: (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
   StopMusic: (this: void, fadeOut: boolean) => void;
-  TriggerAddAction: (this: void, trig: any, action: (this: void) => void) => any;
-  TriggerRegisterEnterRectSimple: (this: void, trig: any, r: any) => any;
 };
 const { 触发单位增加基础全属性 } = require("../../00．剧情系统核心工具/06．剧情通用执行工具") as {
   触发单位增加基础全属性: (this: void, value: number, template: string) => void;
@@ -259,43 +251,36 @@ function 触发单位在村口放行矩形内(this: void, unit: any): boolean {
   return RectContainsUnit(rect, unit);
 }
 
-function on精灵村村口放行触发(this: void): void {
-  if (已触发村口放行) return;
-  const 触发单位 = GetTriggerUnit();
-  if (!是玩家英雄组单位(触发单位)) return;
-  if (读取剧情进度() > 0) return;
-  if (!触发单位在村口放行矩形内(触发单位)) return;
+function on精灵村村口放行触发(this: void, 触发单位: any): boolean {
+  if (已触发村口放行) return true;
+  if (读取剧情进度() > 0) return true;
+  if (!触发单位在村口放行矩形内(触发单位)) return false;
   if (写入并播放剧情("jlc_elven_village_gate_release", "精灵村村口放行核心", 触发单位)) {
     已触发村口放行 = true;
+    return true;
   }
+  return false;
 }
 
-function on精灵村长老发布任务触发(this: void): void {
-  const 触发单位 = GetTriggerUnit();
-  if (!是玩家英雄组单位(触发单位)) return;
-  if (读取剧情进度() >= 1) return;
-  写入并播放剧情("jlc_elven_village_elder_quest", "精灵村长老发布任务核心", 触发单位);
-}
-
-function 注册矩形进入(this: void, 矩形区域名称: string, action: (this: void) => void): void {
-  const rect = 获取矩形区域(矩形区域名称);
-  if (rect == null || rect === 0) return;
-  const trigger = CreateTrigger();
-  TriggerRegisterEnterRectSimple(trigger, rect);
-  TriggerAddAction(trigger, action);
-}
-
-function 注册单位范围(this: void, unit: any, range: number, action: (this: void) => void): void {
-  if (unit == null || unit === 0) return;
-  const trigger = CreateTrigger();
-  TriggerRegisterUnitInRangeSimple(trigger, range, unit);
-  TriggerAddAction(trigger, action);
+function on精灵村长老发布任务触发(this: void, 触发单位: any): boolean {
+  if (读取剧情进度() >= 1) return true;
+  return 写入并播放剧情("jlc_elven_village_elder_quest", "精灵村长老发布任务核心", 触发单位);
 }
 
 export function 初始化进度01_精灵村长老发布任务核心(this: void): void {
   if (已初始化进度01核心) return;
   已初始化进度01核心 = true;
 
-  注册单位范围(YDUserDataGetSafe("string", "主线NPC", "自然守护者", "unit"), 500, on精灵村村口放行触发);
-  注册单位范围(YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit"), 800, on精灵村长老发布任务触发);
+  registerOneShotUnitRangeListener(
+    YDUserDataGetSafe("string", "主线NPC", "自然守护者", "unit"),
+    500,
+    on精灵村村口放行触发,
+    是玩家英雄组单位,
+  );
+  registerOneShotUnitRangeListener(
+    YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit"),
+    800,
+    on精灵村长老发布任务触发,
+    是玩家英雄组单位,
+  );
 }

@@ -8,8 +8,6 @@ const {
   取单位X,
   取单位Y,
   注册指定单位暴击后监听,
-  播放动作,
-  恢复时间流速,
 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   转四位ID: (this: void, rawIdText: string) => number;
   单位拥有原生Buff: (this: void, unit: any, buffId: number) => boolean;
@@ -18,16 +16,14 @@ const {
   取单位X: (this: void, unit: any) => number;
   取单位Y: (this: void, unit: any) => number;
   注册指定单位暴击后监听: (this: void, unitTypeId: number, handler: (this: void, record: any, applied: number, snapshot: any) => void) => void;
-  播放动作: (this: void, unit: any, animationIndex: number, timeScale: number) => void;
-  恢复时间流速: (this: void, unit: any) => void;
 };
 const { 造成批量AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成批量AOE技能伤害: (this: void, 参数: any) => number;
 };
 const jass = require("jass.common") as any;
 const DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED as any;
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+const { 播放限时单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
+  播放限时单位动画: (this: void, 参数: any) => any;
 };
 const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
   开始硬直: (this: void, unit: any, durationSec: number) => any;
@@ -46,7 +42,6 @@ const { cloud单位技能配置 } = require("系统.03．技能系统.05．单�
 
 const cloud单位类型ID = 转四位ID(cloud单位技能配置.单位ID);
 const cloud触发BuffID = 转四位ID(cloud单位技能配置.触发BuffID);
-const cloud待恢复流速队列: any[] = [];
 
 interface cloud溅射伤害变量 {
   主目标: any;
@@ -58,18 +53,16 @@ function 准备cloud溅射伤害目标(this: void, target: any, _index: number, 
   return {};
 }
 
-function 处理cloud硬直恢复(this: void): void {
-  const unit = cloud待恢复流速队列.shift();
-  if (unit == null) return;
-  恢复时间流速(unit);
-}
-
 function cloud暴击后处理(this: void, record: any, applied: number, _snapshot: any): void {
   if (!单位拥有原生Buff(record.attacker, cloud触发BuffID)) return;
   开始硬直(record.attacker, cloud单位技能配置.硬直毫秒 * 0.001);
-  播放动作(record.attacker, cloud单位技能配置.动作序号, cloud单位技能配置.动作时间流速);
-  cloud待恢复流速队列.push(record.attacker);
-  addDelayedCallback(cloud单位技能配置.硬直毫秒, 处理cloud硬直恢复);
+  播放限时单位动画({
+    单位: record.attacker,
+    动画编号: cloud单位技能配置.动作序号,
+    持续秒: cloud单位技能配置.硬直毫秒 * 0.001,
+    动画速度: cloud单位技能配置.动作时间流速,
+    恢复动画: false,
+  });
   const x = 取单位X(record.target);
   const y = 取单位Y(record.target);
   在坐标播放特效(cloud单位技能配置.特效路径, x, y, 0, 1, 1);

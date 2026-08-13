@@ -126,9 +126,9 @@ function on影骨骷髅偷窃修正(this: void, damageContext: any): number {
   const nextGold = gold - stolen;
   SetPlayerState(owner, PLAYER_STATE_RESOURCE_GOLD, nextGold > 0 ? nextGold : 0);
   if (gold < GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)) {
-    return damageContext.currentDamage + 计算组合技能伤害(context.Boss单位, target, {
-      来源攻击力比例: cfg.贫血惩罚Boss攻击力比例,
-      目标最大生命比例: cfg.贫血惩罚目标最大生命比例,
+    return damageContext.currentDamage + 计算组合技能伤害(attacker, target, {
+      来源最大生命比例: cfg.贫血惩罚小弟最大生命比例,
+      总倍率: cfg.贫血惩罚伤害倍率,
     });
   }
   return damageContext.currentDamage;

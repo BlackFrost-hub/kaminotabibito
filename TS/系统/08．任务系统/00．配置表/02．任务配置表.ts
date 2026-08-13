@@ -12,6 +12,12 @@ export interface 任务结束NPC配置 {
   初始化动作?: string;
 }
 
+export interface 击杀目标组配置 {
+  目标单位: string;
+  显示名: string;
+  需求数量: number;
+}
+
 export interface 任务配置 {
   任务ID?: number;
   名称?: string;
@@ -22,10 +28,12 @@ export interface 任务配置 {
   前置任务ID?: number;
   任务物品?: string;
   需求物品?: string;
+  需求物品分别提交?: boolean;
   需求资源?: string;
   目标单位?: string;
   目标单位分别击杀?: boolean;
   目标单位显示名?: string;
+  击杀目标组?: 击杀目标组配置[];
   击杀携带物品?: string;
   提交消耗物品?: string;
   提交物品升级?: string;
@@ -35,6 +43,11 @@ export interface 任务配置 {
   奖励?: string;
   奖励显示?: string;
   奖励物品?: string;
+  /** 从竖线分隔的物品列表中随机发放一件。 */
+  随机奖励物品?: string;
+  /** 只在内部限时内完成时追加的奖励，不进入普通任务奖励展示。 */
+  限时完成奖励?: string;
+  限时完成奖励物品?: string;
   描述?: string;
   进度文本?: string;
   失败文本?: string;
@@ -42,6 +55,10 @@ export interface 任务配置 {
   任务接受对白?: string;
   接取失败对白?: string;
   NPC完成对白?: string;
+  /** 在内部限时内完成时使用的额外完成对白。 */
+  限时完成对白?: string;
+  /** 只用于运行时判定，默认不在玩家 UI 展示。 */
+  内部限时秒?: number;
   完成后对白 ?: string;
   接取后动作?: (this: 任务配置, 玩家ID: number) => void;
   完成后动作?: (this: 任务配置, 玩家ID: number) => void;

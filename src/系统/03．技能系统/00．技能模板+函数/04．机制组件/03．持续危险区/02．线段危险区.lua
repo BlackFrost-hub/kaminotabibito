@@ -86,7 +86,7 @@ _____7EBF_6BB5_5371_9669_533A_5B9E_73B0.prototype["停止"] = function(self)
     end
 end
 _____7EBF_6BB5_5371_9669_533A_5B9E_73B0.prototype["推进单位"] = function(self, now, _____5355_4F4D)
-    local id = jass.GetHandleId(_____5355_4F4D)
+    local id = jass:GetHandleId(_____5355_4F4D)
     local dx = GetUnitX(_____5355_4F4D) - self["参数"]["起点X"]
     local dy = GetUnitY(_____5355_4F4D) - self["参数"]["起点Y"]
     local _____524D_5411_8DDD_79BB = dx * self["前向X"] + dy * self["前向Y"]

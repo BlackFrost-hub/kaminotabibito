@@ -61,3 +61,25 @@ export const 地精祭祀技能配置 = {
     原生冷却秒: 15,
   },
 } as const;
+
+export const 地精祭祀音效配置 = {
+  默认裁断距离: 2800,
+  破坏死光: {
+    蓄力: 'Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_destroy_light_charge_64k.mp3',
+    命中: 'Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_destroy_light_hit_64k.mp3',
+  },
+  血爆: {
+    爆炸命中: 'Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_blood_explosion_64k.mp3',
+  },
+  毒蕴: {
+    暗伤爆炸: 'Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_poison_shadow_hit_64k.mp3',
+    酸伤爆炸: 'Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_poison_acid_hit_64k.mp3',
+  },
+  受击召唤: {
+    召唤出现: 'Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_summon_appear_64k.mp3',
+  },
+  通用: {
+    Boss受击: 'Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_boss_hit_64k.mp3',
+    Boss死亡: 'Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_boss_death_64k.mp3',
+  },
+} as const;

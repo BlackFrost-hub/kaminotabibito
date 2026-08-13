@@ -63,23 +63,21 @@ end
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.09．表现系统.06．广播提示消息.index")
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_0["广播单位提示"]
+local _____64AD_653E_5E7F_64AD_5BF9_767D_5E8F_5217 = ____require_result_0["播放广播对白序列"]
 local ____require_result_1 = require("系统.09．表现系统.06．广播提示消息.00．常量定义")
 local _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 = ____require_result_1["广播提示玩家槽数"]
-local _____5E7F_64AD_63D0_793A_6ED1_5165_6BEB_79D2 = ____require_result_1["广播提示滑入毫秒"]
-local _____5E7F_64AD_63D0_793A_6DE1_51FA_6BEB_79D2 = ____require_result_1["广播提示淡出毫秒"]
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_2.addDelayedCallback
 local addPeriodicCallback = ____require_result_2.addPeriodicCallback
 local removePeriodicCallback = ____require_result_2.removePeriodicCallback
-local ____require_result_3 = require("系统.00．核心系统.07．联机安全工具")
-local safeTriggerAddAction = ____require_result_3.safeTriggerAddAction
-local safeDestroyTrigger = ____require_result_3.safeDestroyTrigger
-local ____require_result_4 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
-local registerEnterRegionTrigger = ____require_result_4.registerEnterRegionTrigger
-local ____require_result_5 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_5["是玩家英雄组单位"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
+local ____require_result_3 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
+local _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C = ____require_result_3["创建矩形进入监听"]
+local ____require_result_4 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_4["是玩家英雄组单位"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
+local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_6["暂停并设置无敌安全"]
 local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
 local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_7["创建单位并登记排泄安全"]
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
@@ -103,22 +101,16 @@ local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_resul
 local ____require_result_16 = require("系统.07．地形系统.09．动态矩形区域注册表.02．动态矩形区域动作")
 local _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_16["按配置键注册动态矩形区域"]
 local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_16["注销动态矩形区域"]
-local CreateRegion = jass.CreateRegion
-local CreateTrigger = jass.CreateTrigger
 local GetHandleId = jass.GetHandleId
 local GetTriggeringTrigger = jass.GetTriggeringTrigger
 local GetTriggerUnit = jass.GetTriggerUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local IssueImmediateOrder = jass.IssueImmediateOrder
-local PauseUnit = jass.PauseUnit
 local Player = jass.Player
 local Rect = jass.Rect
-local RegionAddRect = jass.RegionAddRect
 local RemoveRect = jass.RemoveRect
-local RemoveRegion = jass.RemoveRegion
 local SetUnitFacing = jass.SetUnitFacing
-local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitPathing = jass.SetUnitPathing
 local SetUnitPosition = jass.SetUnitPosition
 local _____4E2D_7ACB_654C_5BF9_73A9_5BB6ID = jass.PLAYER_NEUTRAL_AGGRESSIVE
@@ -133,22 +125,12 @@ _____5F53_524D_7C73_4E9A_6F14_51FA_73A9_5BB6_5355_4F4D = nil
 local _____5F53_524D_7C73_4E9A_5165_53E3_76D1_542C
 local _____7C73_4E9A_767B_5CB8_79FB_52A8_56DE_8C03ID = 0
 local _____7C73_4E9A_767B_5CB8_79FB_52A8_6B65_6570 = 0
-local function _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(_____505C_7559_6BEB_79D2)
-    return _____5E7F_64AD_63D0_793A_6ED1_5165_6BEB_79D2 + _____505C_7559_6BEB_79D2 + _____5E7F_64AD_63D0_793A_6DE1_51FA_6BEB_79D2
-end
-local function _____64AD_653E_6C61_67D3_533A_9996_6B21_62B5_8FBE_7B2C_4E8C_6BB5()
-    if not _____53E5_67C4_6709_6548(_____6C61_67D3_533A_9996_6B21_62B5_8FBE_5355_4F4D) then
-        return
-    end
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____6C61_67D3_533A_9996_6B21_62B5_8FBE_5355_4F4D, "越往西走，水面上的紫黑色沉积越厚。污染源应该就在那个方向。", 4800)
+local function _____8BFB_53D6_6C61_67D3_533A_9996_6B21_62B5_8FBE_5355_4F4D(______8BF4_8BDD_8005_952E)
+    return _____6C61_67D3_533A_9996_6B21_62B5_8FBE_5355_4F4D
 end
 local function _____64AD_653E_6C61_67D3_533A_9996_6B21_62B5_8FBE_7B2C_4E00_6BB5(unit)
     _____6C61_67D3_533A_9996_6B21_62B5_8FBE_5355_4F4D = unit
-    _____5E7F_64AD_5355_4F4D_63D0_793A(unit, "刚踏出裂隙，一股浓重的污臭便从水道深处涌来，连呼吸都带着刺痛。", 4800)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(4800),
-        _____64AD_653E_6C61_67D3_533A_9996_6B21_62B5_8FBE_7B2C_4E8C_6BB5
-    )
+    _____64AD_653E_5E7F_64AD_5BF9_767D_5E8F_5217({["对白列表"] = {{["说话者键"] = "玩家", ["文本"] = "刚踏出裂隙，一股浓重的污臭便从水道深处涌来，连呼吸都带着刺痛。", ["停留毫秒"] = 4800}, {["说话者键"] = "玩家", ["文本"] = "越往西走，水面上的紫黑色沉积越厚。污染源应该就在那个方向。", ["停留毫秒"] = 4800}}, ["读取说话单位"] = _____8BFB_53D6_6C61_67D3_533A_9996_6B21_62B5_8FBE_5355_4F4D, ["播放单句"] = _____5E7F_64AD_5355_4F4D_63D0_793A})
 end
 local function ____on_6C38_4E45_4F20_9001_8FDB_5165()
     local trigger = GetTriggeringTrigger()
@@ -172,26 +154,13 @@ local function ____on_6C38_4E45_4F20_9001_8FDB_5165()
     end
 end
 local function _____6CE8_518C_6C38_4E45_4F20_9001_5165_53E3(ID, _____5165_53E3X, _____5165_53E3Y, _____5165_53E3_9762_5411, _____76EE_6807X, _____76EE_6807Y, _____76EE_6807_9762_5411, _____9996_6B21_62B5_8FBE_5E7F_64AD, _____663E_793A_4F20_9001_95E8)
-    local region = CreateRegion()
     local rect = Rect(_____5165_53E3X - _____7C73_4E9A_4F20_9001_5165_53E3_534A_5F84, _____5165_53E3Y - _____7C73_4E9A_4F20_9001_5165_53E3_534A_5F84, _____5165_53E3X + _____7C73_4E9A_4F20_9001_5165_53E3_534A_5F84, _____5165_53E3Y + _____7C73_4E9A_4F20_9001_5165_53E3_534A_5F84)
-    local trigger = CreateTrigger()
-    if not _____53E5_67C4_6709_6548(region) or not _____53E5_67C4_6709_6548(rect) or not _____53E5_67C4_6709_6548(trigger) then
-        if _____53E5_67C4_6709_6548(trigger) then
-            safeDestroyTrigger(trigger)
-        end
-        if _____53E5_67C4_6709_6548(region) then
-            RemoveRegion(region)
-        end
-        if _____53E5_67C4_6709_6548(rect) then
-            RemoveRect(rect)
-        end
+    if not _____53E5_67C4_6709_6548(rect) then
         return false
     end
-    RegionAddRect(region, rect)
+    local _____76D1_542C = _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C(rect, ____on_6C38_4E45_4F20_9001_8FDB_5165, nil)
     RemoveRect(rect)
-    if safeTriggerAddAction(trigger, ____on_6C38_4E45_4F20_9001_8FDB_5165) == nil then
-        safeDestroyTrigger(trigger)
-        RemoveRegion(region)
+    if _____76D1_542C == nil then
         return false
     end
     local _____72B6_6001 = {
@@ -199,12 +168,12 @@ local function _____6CE8_518C_6C38_4E45_4F20_9001_5165_53E3(ID, _____5165_53E3X,
         ["目标X"] = _____76EE_6807X,
         ["目标Y"] = _____76EE_6807Y,
         ["目标面向"] = _____76EE_6807_9762_5411,
-        ["触发器"] = trigger,
-        ["区域"] = region,
-        ["取消监听"] = registerEnterRegionTrigger(trigger, region, nil),
+        ["触发器"] = _____76D1_542C["触发器"],
+        ["区域"] = _____76D1_542C["区域"],
+        ["取消监听"] = _____76D1_542C["取消"],
         ["首次抵达广播"] = _____9996_6B21_62B5_8FBE_5E7F_64AD
     }
-    _____6C38_4E45_4F20_9001_72B6_6001_8868[GetHandleId(trigger)] = _____72B6_6001
+    _____6C38_4E45_4F20_9001_72B6_6001_8868[GetHandleId(_____76D1_542C["触发器"])] = _____72B6_6001
     if _____663E_793A_4F20_9001_95E8 then
         _____521B_5EFA_70B9_7279_6548({
             ["模型路径"] = _____7C73_4E9A_6C38_4E45_4F20_9001_95E8_6A21_578B,
@@ -221,13 +190,7 @@ local function _____6E05_7406_7C73_4E9A_5165_53E3_76D1_542C()
     if _____72B6_6001 == nil then
         return
     end
-    _____72B6_6001["取消监听"]()
-    if _____53E5_67C4_6709_6548(_____72B6_6001["触发器"]) then
-        safeDestroyTrigger(_____72B6_6001["触发器"])
-    end
-    if _____53E5_67C4_6709_6548(_____72B6_6001["区域"]) then
-        RemoveRegion(_____72B6_6001["区域"])
-    end
+    _____72B6_6001["取消"]()
     _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E)
     _____5F53_524D_7C73_4E9A_5165_53E3_76D1_542C = nil
 end
@@ -246,8 +209,7 @@ local function _____521B_5EFA_7C73_4E9A_5355_4F4D()
         return nil
     end
     _____5F53_524D_7C73_4E9A_5355_4F4D = unit
-    PauseUnit(unit, true)
-    SetUnitInvulnerable(unit, true)
+    _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168(unit, "支线.污染之猫米亚待战")
     SetUnitPathing(unit, false)
     return unit
 end
@@ -264,40 +226,23 @@ local function _____521B_5EFA_7C73_4E9A_767B_5CB8_6C34_82B1()
         ["持续秒"] = 1.4
     })
 end
-local function _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_4E94_6BB5()
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____5F53_524D_7C73_4E9A_5355_4F4D, "你也想把这里洗干净……不许碰我的水！", 4200)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(4200),
-        _____542F_52A8_7C73_4E9ABoss_6218
-    )
+local function _____8BFB_53D6_7C73_4E9A_5BF9_767D_5355_4F4D(_____8BF4_8BDD_8005_952E)
+    local ____temp_17
+    if _____8BF4_8BDD_8005_952E == "米亚" then
+        ____temp_17 = _____5F53_524D_7C73_4E9A_5355_4F4D
+    else
+        ____temp_17 = _____5F53_524D_7C73_4E9A_6F14_51FA_73A9_5BB6_5355_4F4D
+    end
+    return ____temp_17
 end
-local function _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_56DB_6BB5()
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____5F53_524D_7C73_4E9A_6F14_51FA_73A9_5BB6_5355_4F4D, "那就只能先阻止你了。", 3400)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(3400),
-        _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_4E94_6BB5
-    )
-end
-local function _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_4E09_6BB5()
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____5F53_524D_7C73_4E9A_5355_4F4D, "中毒？不……黑色的水才不会痛。只要全都染黑，就没有谁能再伤害米亚。", 5200)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(5200),
-        _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_56DB_6BB5
-    )
-end
-local function _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_4E8C_6BB5()
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____5F53_524D_7C73_4E9A_6F14_51FA_73A9_5BB6_5355_4F4D, "原来污染水源的就是你。城里的人正在中毒，水源必须恢复原样。", 4800)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(4800),
-        _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_4E09_6BB5
-    )
-end
-local function _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_4E00_6BB5()
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____5F53_524D_7C73_4E9A_5355_4F4D, "别再靠近……清水会刺痛我。这里已经是米亚的巢。", 4400)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(4400),
-        _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_4E8C_6BB5
-    )
+local function _____64AD_653E_7C73_4E9A_5BF9_8BDD()
+    _____64AD_653E_5E7F_64AD_5BF9_767D_5E8F_5217({["对白列表"] = {
+        {["说话者键"] = "米亚", ["文本"] = "别再靠近……清水会刺痛我。这里已经是米亚的巢。", ["停留毫秒"] = 4400},
+        {["说话者键"] = "玩家", ["文本"] = "原来污染水源的就是你。城里的人正在中毒，水源必须恢复原样。", ["停留毫秒"] = 4800},
+        {["说话者键"] = "米亚", ["文本"] = "中毒？不……黑色的水才不会痛。只要全都染黑，就没有谁能再伤害米亚。", ["停留毫秒"] = 5200},
+        {["说话者键"] = "玩家", ["文本"] = "那就只能先阻止你了。", ["停留毫秒"] = 3400},
+        {["说话者键"] = "米亚", ["文本"] = "你也想把这里洗干净……不许碰我的水！", ["停留毫秒"] = 4200}
+    }, ["读取说话单位"] = _____8BFB_53D6_7C73_4E9A_5BF9_767D_5355_4F4D, ["播放单句"] = _____5E7F_64AD_5355_4F4D_63D0_793A, ["播放完成"] = _____542F_52A8_7C73_4E9ABoss_6218})
 end
 local function _____5B8C_6210_7C73_4E9A_767B_5CB8()
     if not _____53E5_67C4_6709_6548(_____5F53_524D_7C73_4E9A_5355_4F4D) or not _____53E5_67C4_6709_6548(_____5F53_524D_7C73_4E9A_6F14_51FA_73A9_5BB6_5355_4F4D) then
@@ -313,7 +258,7 @@ local function _____5B8C_6210_7C73_4E9A_767B_5CB8()
         _____5F53_524D_7C73_4E9A_6F14_51FA_73A9_5BB6_5355_4F4D,
         YDWEAngleBetweenUnitsSafe(_____5F53_524D_7C73_4E9A_6F14_51FA_73A9_5BB6_5355_4F4D, _____5F53_524D_7C73_4E9A_5355_4F4D)
     )
-    _____64AD_653E_7C73_4E9A_5BF9_8BDD_7B2C_4E00_6BB5()
+    _____64AD_653E_7C73_4E9A_5BF9_8BDD()
 end
 local function ____on_7C73_4E9A_767B_5CB8_79FB_52A8()
     if not _____53E5_67C4_6709_6548(_____5F53_524D_7C73_4E9A_5355_4F4D) then
@@ -365,33 +310,17 @@ local function _____6CE8_518C_7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C()
     if _____5F53_524D_7C73_4E9A_5165_53E3_76D1_542C ~= nil then
         return false
     end
-    local region = CreateRegion()
     local rect = _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF(_____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E)
-    local trigger = CreateTrigger()
-    if not _____53E5_67C4_6709_6548(region) or not _____53E5_67C4_6709_6548(rect) or not _____53E5_67C4_6709_6548(trigger) then
-        if _____53E5_67C4_6709_6548(trigger) then
-            safeDestroyTrigger(trigger)
-        end
-        if _____53E5_67C4_6709_6548(region) then
-            RemoveRegion(region)
-        end
+    if not _____53E5_67C4_6709_6548(rect) then
         _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E)
         return false
     end
-    RegionAddRect(region, rect)
-    if safeTriggerAddAction(trigger, ____on_7C73_4E9A_5165_53E3_533A_57DF_8FDB_5165) == nil then
-        safeDestroyTrigger(trigger)
-        RemoveRegion(region)
+    local _____76D1_542C = _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C(rect, ____on_7C73_4E9A_5165_53E3_533A_57DF_8FDB_5165, nil)
+    if _____76D1_542C == nil then
         _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF(_____7C73_4E9A_4E00_6B21_6027_5165_53E3_76D1_542C_77E9_5F62_952E)
         return false
     end
-    _____5F53_524D_7C73_4E9A_5165_53E3_76D1_542C = {
-        ["区域"] = region,
-        ["矩形"] = rect,
-        ["触发器"] = trigger,
-        ["取消监听"] = registerEnterRegionTrigger(trigger, region, nil),
-        ["已触发"] = false
-    }
+    _____5F53_524D_7C73_4E9A_5165_53E3_76D1_542C = {["取消"] = _____76D1_542C["取消"], ["已触发"] = false}
     return true
 end
 ____exports["接受污染之猫米亚任务后创建入口"] = function(______4EFB_52A1_914D_7F6E, ______73A9_5BB6ID)
@@ -429,7 +358,7 @@ ____exports["完成污染之猫米亚任务后打开首领奖励"] = function(__
         local _____73A9_5BB6ID = 0
         while _____73A9_5BB6ID < _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 do
             local _____73A9_5BB6 = Player(_____73A9_5BB6ID)
-            if _____73A9_5BB6 ~= nil and jass.GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
+            if _____73A9_5BB6 ~= nil and jass:GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
                 _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____7C73_4E9A_5956_52B1_6C60ID, _____73A9_5BB6)
             end
             _____73A9_5BB6ID = _____73A9_5BB6ID + 1

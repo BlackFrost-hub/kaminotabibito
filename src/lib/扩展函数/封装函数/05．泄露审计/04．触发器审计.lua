@@ -6,7 +6,7 @@ local untrack = ____01_FF0E_6838_5FC3_7EDF_8BA1.untrack
 --- 泄露审计 - 触发器
 local jass = require("jass.common")
 function ____exports.createTrigger(self, tag)
-    local trg = jass.CreateTrigger()
+    local trg = jass:CreateTrigger()
     track(nil, "trigger", trg, tag)
     return trg
 end
@@ -15,6 +15,6 @@ function ____exports.destroyTrigger(self, trg)
         return
     end
     untrack(nil, "trigger", trg)
-    jass.DestroyTrigger(trg)
+    jass:DestroyTrigger(trg)
 end
 return ____exports

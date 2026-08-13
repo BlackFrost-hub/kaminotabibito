@@ -9,7 +9,12 @@ local ____Boss_6B7B_4EA1_97F3_6548_914D_7F6E_8868 = {
     {["单位ID"] = "N05T", ["音效路径"] = "Sound\\Boss\\Felice\\SFX\\felice_defeat_soul_command_fades_puremix_12_fade.mp3", ["裁断距离"] = 2800},
     {["单位ID"] = "N05V", ["音效路径"] = "Sound\\Boss\\Kasela\\SFX\\kasela_defeat_abyss_squid_sinks_01.mp3", ["裁断距离"] = 2800},
     {["单位ID"] = "N05W", ["音效路径"] = "Sound\\Boss\\Moltes\\SFX\\moltes_defeat_rotten_tree_quiet_11_subtle_tailfade.mp3", ["裁断距离"] = 2800},
-    {["单位ID"] = "N01Y", ["音效路径"] = "Sound\\Boss\\ShadowboneMortes\\SFX\\shadowbone_mortes_defeat_shadowbone_falls_05_sandy_layered.mp3", ["裁断距离"] = 2800}
+    {["单位ID"] = "N01Y", ["音效路径"] = "Sound\\Boss\\ShadowboneMortes\\SFX\\shadowbone_mortes_defeat_shadowbone_falls_05_sandy_layered.mp3", ["裁断距离"] = 2800},
+    {["单位ID"] = "N00C", ["音效路径"] = "Sound\\Boss\\GoblinPriest\\SFX\\goblinpriest_boss_death_64k.mp3", ["裁断距离"] = 2800},
+    {["单位ID"] = "N05J", ["音效路径"] = "Sound\\Boss\\Ogre\\SFX\\ogre_phase_transition_64k.mp3", ["裁断距离"] = 2800},
+    {["单位ID"] = "N05K", ["音效路径"] = "Sound\\Boss\\Ogre\\SFX\\ogre_boss_death_64k.mp3", ["裁断距离"] = 2800},
+    {["单位ID"] = "N05M", ["音效路径"] = "Sound\\Boss\\Scholar\\SFX\\scholar_death_64k.mp3", ["裁断距离"] = 2800},
+    {["单位ID"] = "N05N", ["音效路径"] = "Sound\\Boss\\Swordsman\\SFX\\swordsman_death_64k.mp3", ["裁断距离"] = 2800}
 }
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")

@@ -12,6 +12,7 @@ import { 创建线段危险区 } from "../../../../00．技能模板+函数/04�
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
@@ -48,9 +49,13 @@ const { doHeal } = require("系统.04．伤害系统.02．治疗系统.01．核�
 const { 魔法增减 } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
   魔法增减: (this: void, target: any, amount: number, showText?: boolean, showEffect?: boolean) => number;
 };
+const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  getServerTime: (this: void) => number;
+};
 
 const 菲利斯单位类型ID = stringToFourCC(菲利斯单位技能配置.单位ID);
 const 剑气灵斩技能ID = stringToFourCC(菲利斯数值与表现配置.剑气灵斩.技能槽位);
+const 菲利斯侵蚀上次结算时间表: Record<number, Record<number, number | undefined> | undefined> = {};
 let 剑气灵斩已注册 = false;
 
 function 取目标(this: void, boss: any): any {
@@ -115,9 +120,35 @@ function 获取菲利斯侵蚀残留目标(this: void, variable?: any): any[] {
   return 获取Boss技能敌对英雄列表(context.Boss单位);
 }
 
+function 清理菲利斯侵蚀结算记录(this: void, variable?: any): void {
+  const context = variable as 菲利斯运行时上下文 | undefined;
+  if (context == null) return;
+  const bossId = GetHandleId(context.Boss单位);
+  if (bossId !== 0) delete 菲利斯侵蚀上次结算时间表[bossId];
+}
+
+function 本Tick允许菲利斯侵蚀结算(this: void, context: 菲利斯运行时上下文, hero: any): boolean {
+  const bossId = GetHandleId(context.Boss单位);
+  const heroId = GetHandleId(hero);
+  if (bossId === 0 || heroId === 0) return false;
+
+  let 目标结算时间表 = 菲利斯侵蚀上次结算时间表[bossId];
+  if (目标结算时间表 == null) {
+    目标结算时间表 = {};
+    菲利斯侵蚀上次结算时间表[bossId] = 目标结算时间表;
+  }
+
+  const nowMs = getServerTime();
+  const lastMs = 目标结算时间表[heroId];
+  if (lastMs != null && nowMs - lastMs < 菲利斯数值与表现配置.剑气灵斩.侵蚀Tick秒 * 1000) return false;
+  目标结算时间表[heroId] = nowMs;
+  return true;
+}
+
 function on菲利斯侵蚀残留周期(this: void, hero: any, variable?: any): void {
   const context = variable as 菲利斯运行时上下文 | undefined;
   if (context == null || !单位有效(context.Boss单位) || !单位有效(hero)) return;
+  if (!本Tick允许菲利斯侵蚀结算(context, hero)) return;
   const boss = context.Boss单位;
   const cfg = 菲利斯数值与表现配置.剑气灵斩;
   const 伤害结果 = 执行BossAOE技能伤害({
@@ -147,6 +178,7 @@ function on菲利斯侵蚀残留周期(this: void, hero: any, variable?: any): v
 function 创建侵蚀残留(this: void, context: 菲利斯运行时上下文, ax: number, ay: number, bx: number, by: number, angle: number, width: number, effectScaleMultiplier: number): void {
   const boss = context.Boss单位;
   const cfg = 菲利斯数值与表现配置.剑气灵斩;
+  context.清理.登记清理("菲利斯-剑气灵斩侵蚀结算记录", 清理菲利斯侵蚀结算记录, context);
   const midX = (ax + bx) * 0.5;
   const midY = (ay + by) * 0.5;
   const 残留特效 = 创建方向特效(cfg.残留特效路径, midX, midY, angle + cfg.残留特效朝向偏移角度, cfg.残留特效缩放 * effectScaleMultiplier, cfg.侵蚀持续秒);

@@ -12,13 +12,13 @@ local function _____7ED9_4E88_5347_7EA7_88C5_5907(_____5355_4F4D, _____5347_7EA7
     if not (_____5347_7EA7_56DB_5B57_7801 > 0) then
         return
     end
-    local x = jass.GetUnitX(_____5355_4F4D)
-    local y = jass.GetUnitY(_____5355_4F4D)
+    local x = jass:GetUnitX(_____5355_4F4D)
+    local y = jass:GetUnitY(_____5355_4F4D)
     local item = itemJudgeFns["创建物品并注册排泄监听"](_____5347_7EA7_56DB_5B57_7801, x, y)
     if item == nil or item == 0 then
         return
     end
-    jass.UnitAddItem(_____5355_4F4D, item)
+    jass:UnitAddItem(_____5355_4F4D, item)
 end
 local function _____5904_7406_5355_4E2A_51FB_6740_53E0_5C42(_____51FB_6740_8005, _____914D_7F6E)
     local _____7269_54C1_56DB_5B57_7801 = _____53D6_7269_54C1_56DB_5B57_7801(_____914D_7F6E["装备ID"])
@@ -29,21 +29,21 @@ local function _____5904_7406_5355_4E2A_51FB_6740_53E0_5C42(_____51FB_6740_8005,
     if item == nil or item == 0 then
         return
     end
-    local _____5F53_524D_5C42_6570 = jass.GetItemCharges(item)
+    local _____5F53_524D_5C42_6570 = jass:GetItemCharges(item)
     if _____914D_7F6E["满层升级到装备名"] == nil then
         if _____5F53_524D_5C42_6570 >= _____914D_7F6E["最大层数"] then
             return
         end
         local _____65B0_5C42_6570 = _____5F53_524D_5C42_6570 + _____914D_7F6E["每次增加层数"] >= _____914D_7F6E["最大层数"] and _____914D_7F6E["最大层数"] or _____5F53_524D_5C42_6570 + _____914D_7F6E["每次增加层数"]
-        jass.SetItemCharges(item, _____65B0_5C42_6570)
+        jass:SetItemCharges(item, _____65B0_5C42_6570)
         return
     end
     local _____65B0_5C42_6570 = _____5F53_524D_5C42_6570 + _____914D_7F6E["每次增加层数"]
-    jass.SetItemCharges(item, _____65B0_5C42_6570)
+    jass:SetItemCharges(item, _____65B0_5C42_6570)
     if _____65B0_5C42_6570 < _____914D_7F6E["最大层数"] then
         return
     end
-    jass.RemoveItem(item)
+    jass:RemoveItem(item)
     _____7ED9_4E88_5347_7EA7_88C5_5907(_____51FB_6740_8005, _____914D_7F6E["满层升级到装备ID"])
 end
 ____exports["处理击杀叠层"] = function(_____4E0A_4E0B_6587)

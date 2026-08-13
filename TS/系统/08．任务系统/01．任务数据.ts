@@ -64,6 +64,8 @@ export interface QuestData {
   startNpc?: string;
   endNpc?: string;
   timeLimit?: number; // 时间限制（秒），0表示无限制
+  /** 内部限时：只用于任务运行时判定，不显示在任务面板。 */
+  内部限时秒?: number;
   createdAt: number; // 任务创建时间戳
   updatedAt: number; // 最后更新时间戳
   nativeHandle?: number; // War3原生任务句柄（CreateQuest返回值）

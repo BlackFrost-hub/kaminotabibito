@@ -57,7 +57,7 @@ function ____exports.withTimer(delaySec, callback, periodic, name)
     if periodic == nil then
         periodic = false
     end
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     if not t then
         callback()
         return nil
@@ -91,7 +91,7 @@ function ____exports.stopTimer(t)
     if not t then
         return
     end
-    jass.PauseTimer(t)
+    jass:PauseTimer(t)
     safeDestroyTimer(t)
 end
 return ____exports

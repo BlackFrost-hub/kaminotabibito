@@ -20,7 +20,7 @@ local function getOrCreateCooReuseSound(path, model)
     if hit then
         return hit
     end
-    local sound = jass.CreateSound(
+    local sound = jass:CreateSound(
         path,
         false,
         true,
@@ -50,9 +50,9 @@ function ____exports.Sound3DII_CooPlayPool4MultiInstanceRare(path, x, y, z, cuto
     if model == nil then
         model = getDefaultSoundModel()
     end
-    local pathHash = jass.StringHash(path)
-    local count = jass.LoadInteger(hash, pathHash, KEY_COUNT) or 0
-    local index = jass.LoadInteger(hash, pathHash, KEY_INDEX) or 0
+    local pathHash = jass:StringHash(path)
+    local count = jass:LoadInteger(hash, pathHash, KEY_COUNT) or 0
+    local index = jass:LoadInteger(hash, pathHash, KEY_INDEX) or 0
     if count > POOL_MAX then
         count = POOL_MAX
     end
@@ -70,8 +70,8 @@ function ____exports.Sound3DII_CooPlayPool4MultiInstanceRare(path, x, y, z, cuto
             model
         )
         if sound then
-            jass.SaveInteger(hash, pathHash, KEY_COUNT, count + 1 > POOL_MAX and POOL_MAX or count + 1)
-            jass.SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
+            jass:SaveInteger(hash, pathHash, KEY_COUNT, count + 1 > POOL_MAX and POOL_MAX or count + 1)
+            jass:SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
         end
     else
         sound = getSoundInternal(
@@ -84,11 +84,11 @@ function ____exports.Sound3DII_CooPlayPool4MultiInstanceRare(path, x, y, z, cuto
             model
         )
         if sound then
-            jass.SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
+            jass:SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
         end
     end
     if sound then
-        jass.StartSound(sound)
+        jass:StartSound(sound)
         ____exports.lastPlayedSound = sound
     end
     return sound
@@ -118,11 +118,11 @@ function ____exports.Sound3DII_CooPlayReuse(path, x, y, z, cutoff, model)
     )
     local started = cooReuseHadStartedByPath
     if started[path] then
-        jass.StopSound(sound, false, false)
+        jass:StopSound(sound, false, false)
     else
         started[path] = true
     end
-    jass.StartSound(sound)
+    jass:StartSound(sound)
     ____exports.lastPlayedSound = sound
     return sound
 end
@@ -133,9 +133,9 @@ end
 -- @param cutoff 裁断距离
 -- @param model 声音模型（可选）
 function ____exports.Sound3DII_UnitPlay(path, unit, cutoff, model)
-    local x = jass.GetUnitX(unit)
-    local y = jass.GetUnitY(unit)
-    local z = jass.GetUnitFlyHeight(unit)
+    local x = jass:GetUnitX(unit)
+    local y = jass:GetUnitY(unit)
+    local z = jass:GetUnitFlyHeight(unit)
     return ____exports.Sound3DII_CooPlayReuse(
         path,
         x,
@@ -146,9 +146,9 @@ function ____exports.Sound3DII_UnitPlay(path, unit, cutoff, model)
     )
 end
 function ____exports.Sound3DII_UnitPlayReuse(path, unit, cutoff, model)
-    local x = jass.GetUnitX(unit)
-    local y = jass.GetUnitY(unit)
-    local z = jass.GetUnitFlyHeight(unit)
+    local x = jass:GetUnitX(unit)
+    local y = jass:GetUnitY(unit)
+    local z = jass:GetUnitFlyHeight(unit)
     return ____exports.Sound3DII_CooPlayReuse(
         path,
         x,
@@ -165,9 +165,9 @@ end
 -- @param cutoff 裁断距离
 -- @param model 声音模型（可选）
 function ____exports.Sound3DII_LocPlay(path, loc, cutoff, model)
-    local x = jass.GetLocationX(loc)
-    local y = jass.GetLocationY(loc)
-    local z = jass.GetLocationZ(loc)
+    local x = jass:GetLocationX(loc)
+    local y = jass:GetLocationY(loc)
+    local z = jass:GetLocationZ(loc)
     return ____exports.Sound3DII_CooPlayReuse(
         path,
         x,
@@ -178,9 +178,9 @@ function ____exports.Sound3DII_LocPlay(path, loc, cutoff, model)
     )
 end
 function ____exports.Sound3DII_LocPlayReuse(path, loc, cutoff, model)
-    local x = jass.GetLocationX(loc)
-    local y = jass.GetLocationY(loc)
-    local z = jass.GetLocationZ(loc)
+    local x = jass:GetLocationX(loc)
+    local y = jass:GetLocationY(loc)
+    local z = jass:GetLocationZ(loc)
     return ____exports.Sound3DII_CooPlayReuse(
         path,
         x,

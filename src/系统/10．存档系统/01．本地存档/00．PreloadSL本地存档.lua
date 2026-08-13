@@ -82,7 +82,7 @@ local function _____6784_5EFA_6574_6570_8F7D_8377(fieldCount)
                 payload = payload .. _____5B57_6BB5_5206_9694_7B26
             end
             local value = _____5B57_6BB5_503C_8868[index]
-            payload = payload .. tostring(value == nil and 0 or value)
+            payload = payload .. tostring(nil, value == nil and 0 or value)
             index = index + 1
         end
     end
@@ -169,7 +169,7 @@ end
 local function _____6784_5EFA_4FDD_5B58_6574_6570_6587_672C(key, value)
     local absValue = value < 0 and -value or value
     local typeValue = value < 0 and 2 or 1
-    return ((((((("\")\ncall SetPlayerTechMaxAllowed(Player(14)," .. tostring(key)) .. ",") .. tostring(typeValue)) .. ")\ncall SetPlayerTechMaxAllowed(Player(15),") .. tostring(key)) .. ",") .. tostring(absValue)) .. ")\n//"
+    return ((((((("\")\ncall SetPlayerTechMaxAllowed(Player(14)," .. tostring(nil, key)) .. ",") .. tostring(nil, typeValue)) .. ")\ncall SetPlayerTechMaxAllowed(Player(15),") .. tostring(nil, key)) .. ",") .. tostring(nil, absValue)) .. ")\n//"
 end
 local function _____5199_5165_539F_751FPreload_6574_6570(key, value)
     Preload(_____6784_5EFA_4FDD_5B58_6574_6570_6587_672C(key, value))
@@ -259,7 +259,7 @@ ____exports["PreloadSL设置整数"] = function(player, index, value)
     if ____YDWE_5B58_6863_63A5_53E3_662F_5426_5B58_5728() then
         YDWE_PreloadSL_Set(
             player,
-            tostring(index),
+            tostring(nil, index),
             index,
             value
         )
@@ -271,7 +271,7 @@ ____exports["PreloadSL读取整数"] = function(player, index)
     if ____YDWE_5B58_6863_63A5_53E3_662F_5426_5B58_5728() then
         return YDWE_PreloadSL_Get(
             player,
-            tostring(index),
+            tostring(nil, index),
             index
         )
     end

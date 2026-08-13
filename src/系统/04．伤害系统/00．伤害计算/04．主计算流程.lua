@@ -196,9 +196,9 @@ local function notifyAppliedFinalDamageListeners(target, attacker, applied, snap
 end
 local function captureDamageTypeSnapshot()
     local skillContext = _____83B7_53D6_5F53_524D_6280_80FD_4F24_5BB3_4E0A_4E0B_6587()
-    local rawAttackType = ConvertAttackType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_ATTACK_TYPE))
-    local rawDamageType = ConvertDamageType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_DAMAGE_TYPE))
-    local rawWeaponType = ConvertWeaponType(_____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_WEAPON_TYPE))
+    local rawAttackType = ConvertAttackType(_____4F24_5BB3_51FD_6570:EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_ATTACK_TYPE))
+    local rawDamageType = ConvertDamageType(_____4F24_5BB3_51FD_6570:EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_DAMAGE_TYPE))
+    local rawWeaponType = ConvertWeaponType(_____4F24_5BB3_51FD_6570:EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_WEAPON_TYPE))
     return {
         rawAttackType = rawAttackType,
         rawDamageType = rawDamageType,
@@ -206,14 +206,14 @@ local function captureDamageTypeSnapshot()
         effectiveAttackType = rawAttackType,
         effectiveDamageType = rawDamageType,
         effectiveWeaponType = rawWeaponType,
-        isPhysicalDamage = _____4F24_5BB3_51FD_6570.isPhysicalDamage(),
-        isMagicDamage = _____4F24_5BB3_51FD_6570.isMagicDamage(),
-        isEnhancedDamage = _____4F24_5BB3_51FD_6570.isEnhancedDamage(),
-        isTrueDamage = _____4F24_5BB3_51FD_6570.isTrueDamage(),
-        isNormalAttack = _____4F24_5BB3_51FD_6570.isNormalAttack(),
-        isRangedAttack = _____4F24_5BB3_51FD_6570.EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_IS_RANGED) == 1,
-        isSkillAttack = _____4F24_5BB3_51FD_6570.isSkillAttack(),
-        isSkillDamage = _____4F24_5BB3_51FD_6570.isSkillDamage(),
+        isPhysicalDamage = _____4F24_5BB3_51FD_6570:isPhysicalDamage(),
+        isMagicDamage = _____4F24_5BB3_51FD_6570:isMagicDamage(),
+        isEnhancedDamage = _____4F24_5BB3_51FD_6570:isEnhancedDamage(),
+        isTrueDamage = _____4F24_5BB3_51FD_6570:isTrueDamage(),
+        isNormalAttack = _____4F24_5BB3_51FD_6570:isNormalAttack(),
+        isRangedAttack = _____4F24_5BB3_51FD_6570:EXGetEventDamageData(_____4F24_5BB3_51FD_6570.EVENT_DAMAGE_DATA_IS_RANGED) == 1,
+        isSkillAttack = _____4F24_5BB3_51FD_6570:isSkillAttack(),
+        isSkillDamage = _____4F24_5BB3_51FD_6570:isSkillDamage(),
         isWrappedSkillDamage = (skillContext and skillContext.isWrappedSkillDamage) == true,
         isEquipmentSkillDamage = (skillContext and skillContext.isEquipmentSkillDamage) == true,
         isNonEquipmentSkillDamage = (skillContext and skillContext.isNonEquipmentSkillDamage) == true,
@@ -229,13 +229,13 @@ local function captureDamageTypeSnapshot()
         isSingleTargetSkillDamage = (skillContext and skillContext.isSingleTargetSkillDamage) == true,
         isAoeSkillDamage = (skillContext and skillContext.isAoeSkillDamage) == true,
         isDamageTransfer = (skillContext and skillContext.isDamageTransfer) == true,
-        isMetalDamage = _____4F24_5BB3_51FD_6570.isMetalDamage(),
-        isWoodDamage = _____4F24_5BB3_51FD_6570.isWoodDamage(),
-        isWaterDamage = _____4F24_5BB3_51FD_6570.isWaterDamage(),
-        isFireDamage = _____4F24_5BB3_51FD_6570.isFireDamage(),
-        isThunderDamage = _____4F24_5BB3_51FD_6570.isThunderDamage(),
-        isLightDamage = _____4F24_5BB3_51FD_6570.isLightDamage(),
-        isDarkDamage = _____4F24_5BB3_51FD_6570.isDarkDamage()
+        isMetalDamage = _____4F24_5BB3_51FD_6570:isMetalDamage(),
+        isWoodDamage = _____4F24_5BB3_51FD_6570:isWoodDamage(),
+        isWaterDamage = _____4F24_5BB3_51FD_6570:isWaterDamage(),
+        isFireDamage = _____4F24_5BB3_51FD_6570:isFireDamage(),
+        isThunderDamage = _____4F24_5BB3_51FD_6570:isThunderDamage(),
+        isLightDamage = _____4F24_5BB3_51FD_6570:isLightDamage(),
+        isDarkDamage = _____4F24_5BB3_51FD_6570:isDarkDamage()
     }
 end
 local function _____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3(source, target, amount, request, defaultAttack, defaultRanged, defaultAttackType, defaultWeaponType)
@@ -514,7 +514,7 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
     local conversionContext = __TS__ObjectAssign({target = target, attacker = attacker, originalAttacker = originalAttacker, baseDamage = baseDamage}, snapshot)
     applyDamageTypeConversions(conversionContext)
     if conversionContext.reapplyDamage ~= nil then
-        _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
+        _____4F24_5BB3_51FD_6570:YDWESetEventDamage(0)
         local ____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3_51 = _____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3
         local ____temp_50
         if originalAttacker ~= nil and originalAttacker ~= 0 then
@@ -567,7 +567,7 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
         snapshot
     )
     if result.immune then
-        _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
+        _____4F24_5BB3_51FD_6570:YDWESetEventDamage(0)
         notifyAppliedFinalDamageListeners(target, attacker, 0, snapshot)
         if result.showDodge then
         end
@@ -620,7 +620,7 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
         })
     end
     if finalDamage ~= baseDamage then
-        _____4F24_5BB3_51FD_6570.YDWESetEventDamage(finalDamage)
+        _____4F24_5BB3_51FD_6570:YDWESetEventDamage(finalDamage)
     end
     notifyAppliedFinalDamageListeners(target, attacker, finalDamage, snapshot)
     applyLifeAndManaSteal(

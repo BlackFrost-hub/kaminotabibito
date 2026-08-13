@@ -47,10 +47,12 @@ local ____require_result_7 = require("系统.00．核心系统.01．事件中心
 local registerUnitInRangeTrigger = ____require_result_7.registerUnitInRangeTrigger
 local ____require_result_8 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_8["是玩家英雄组单位"]
-local ____require_result_9 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-local _____67E5_627E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_9["查找主线剧情片段"]
+local ____require_result_9 = require("系统.08．任务系统.00．配置表.04．NPC生成器")
+local _____767B_8BB0_5916_90E8_4EFB_52A1NPC_5355_4F4D = ____require_result_9["登记外部任务NPC单位"]
 local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_10["播放主线剧情片段"]
+local _____67E5_627E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_10["查找主线剧情片段"]
+local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_11["播放主线剧情片段"]
 local CreateTrigger = jass.CreateTrigger
 local GetHandleId = jass.GetHandleId
 local GetTriggerUnit = jass.GetTriggerUnit
@@ -74,6 +76,9 @@ local function _____8BB0_5F55NPC_8FD0_884C_65F6(_____914D_7F6E, unit)
     end
     ____NPC_8FD0_884C_65F6_8868[_____914D_7F6E["配置名"]] = unit
     _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D("主线NPC." .. _____914D_7F6E["配置名"], unit)
+    if _____914D_7F6E["任务NPC任务ID"] ~= nil then
+        _____767B_8BB0_5916_90E8_4EFB_52A1NPC_5355_4F4D(_____914D_7F6E["任务NPC任务ID"], unit)
+    end
 end
 local function _____521D_59CB_5316_5355_4E2ANPC(_____914D_7F6E)
     local unit = _____521B_5EFA_5267_60C5NPC_5355_4F4D(_____914D_7F6E)
@@ -86,7 +91,9 @@ local function _____8BB0_5F55_5165_53E3_89E6_53D1_5668_914D_7F6E(trigger, _____9
     if trigger == nil then
         return
     end
-    _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868[tostring(GetHandleId(trigger)
+    _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868[tostring(
+        nil,
+        GetHandleId(trigger)
     )] = _____914D_7F6E_5217_8868
 end
 local function _____5267_60C5_8FDB_5EA6_6EE1_8DB3_5165_53E3_914D_7F6E(_____914D_7F6E)
@@ -168,7 +175,9 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_89E6_53D1()
     if trigger == nil then
         return
     end
-    local _____914D_7F6E_5217_8868 = _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868[tostring(GetHandleId(trigger)
+    local _____914D_7F6E_5217_8868 = _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868[tostring(
+        nil,
+        GetHandleId(trigger)
     )]
     if _____914D_7F6E_5217_8868 == nil then
         return
@@ -179,19 +188,21 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_89E6_53D1()
         while i < #_____914D_7F6E_5217_8868 do
             do
                 if not _____5C1D_8BD5_64AD_653E_5165_53E3_914D_7F6E(_____914D_7F6E_5217_8868[i + 1], _____89E6_53D1_5355_4F4D) then
-                    goto __continue30
+                    goto __continue31
                 end
                 if _____914D_7F6E_5217_8868[i + 1]["触发后注销"] == true then
                     __TS__Delete(
                         _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868,
-                        tostring(GetHandleId(trigger)
+                        tostring(
+                            nil,
+                            GetHandleId(trigger)
                         )
                     )
                     DestroyTrigger(trigger)
                 end
                 return
             end
-            ::__continue30::
+            ::__continue31::
             i = i + 1
         end
     end
@@ -232,7 +243,7 @@ local function _____521D_59CB_5316_5355_4F4D_8303_56F4_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_5355_4F4D_8303_56F4_5165_53E3_914D_7F6E_8868[i + 1]
                 local unit = ____NPC_8FD0_884C_65F6_8868[_____914D_7F6E["NPC配置名"]]
                 if unit == nil then
-                    goto __continue41
+                    goto __continue42
                 end
                 local _____5206_652F_5217_8868 = _____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)
                 do
@@ -250,7 +261,7 @@ local function _____521D_59CB_5316_5355_4F4D_8303_56F4_5165_53E3()
                     end
                 end
             end
-            ::__continue41::
+            ::__continue42::
             i = i + 1
         end
     end
@@ -263,14 +274,14 @@ local function _____521D_59CB_5316_77E9_5F62_5165_53E3()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_77E9_5F62_5165_53E3_914D_7F6E_8868[i + 1]
                 local _____77E9_5F62 = _____83B7_53D6_77E9_5F62_533A_57DF(_____914D_7F6E["矩形区域名称"])
                 if _____77E9_5F62 == nil then
-                    goto __continue47
+                    goto __continue48
                 end
                 TriggerRegisterEnterRectSimple(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
                     _____77E9_5F62
                 )
             end
-            ::__continue47::
+            ::__continue48::
             i = i + 1
         end
     end
@@ -282,14 +293,14 @@ local function _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()
             do
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_5168_5C40_5355_4F4D_5165_53E3_914D_7F6E_8868[i + 1]
                 if _____914D_7F6E["动态创建"] ~= nil then
-                    goto __continue51
+                    goto __continue52
                 end
                 if _____914D_7F6E["单位变量名"] == nil or _____914D_7F6E["单位变量名"] == "" then
-                    goto __continue51
+                    goto __continue52
                 end
                 local unit = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["单位变量名"])
                 if unit == nil then
-                    goto __continue51
+                    goto __continue52
                 end
                 registerUnitInRangeTrigger(
                     _____521B_5EFA_5165_53E3_89E6_53D1_5668(_____5C55_5F00_5165_53E3_5267_60C5_5206_652F(_____914D_7F6E)),
@@ -299,7 +310,7 @@ local function _____521D_59CB_5316_5168_5C40_5355_4F4D_5165_53E3()
                     false
                 )
             end
-            ::__continue51::
+            ::__continue52::
             i = i + 1
         end
     end
@@ -364,11 +375,11 @@ local function _____521D_59CB_5316_53EF_7834_574F_7269()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_53EF_7834_574F_7269_521D_59CB_5316_914D_7F6E_8868[i + 1]
                 local destructable = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["变量名"])
                 if destructable == nil then
-                    goto __continue67
+                    goto __continue68
                 end
                 SetDestructableInvulnerable(destructable, _____914D_7F6E["无敌"])
             end
-            ::__continue67::
+            ::__continue68::
             i = i + 1
         end
     end

@@ -55,3 +55,6 @@ export function 广播单位提示(this: void, 来源单位: any, 文本: string
     入队头像提示(玩家ID, 头像路径, 文本, 持续时间);
   }
 }
+
+export { 播放广播对白序列 } from "./05．广播对白序列";
+export type { 广播对白序列项, 广播对白序列配置 } from "./05．广播对白序列";

@@ -10,6 +10,7 @@
 | `Debuff` | [`debuff.md`](debuff.md) | 点名、诅咒、拘束、倒计时。 |
 | `Explosion` | [`explosion.md`](explosion.md) | 瞬时爆发、破碎、炸裂。 |
 | `Illusion` | [`illusion.md`](illusion.md) | 镜像、残影、镜框、投影。 |
+| `Investigation` | [`investigation.md`](investigation.md) | 调查点、剧情线索和可交互环境标记。 |
 | `Line` | [`line.md`](line.md) | 直线波、切面、丝带、贯穿层。 |
 | `MagicCircle` | [`magic-circle.md`](magic-circle.md) | 地面或空中的法阵、符文。 |
 | `Marker` | [`marker.md`](marker.md) | 墓碑、锚点、机制实体标记。 |

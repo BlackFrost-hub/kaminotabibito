@@ -27,6 +27,12 @@ const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: 
 const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, whichUnit: any, height: number, rate: number) => void;
 const 中立被动玩家ID = 15;
 
+const 语维原始位置 = {
+  X: 23021.7,
+  Y: -23819.4,
+  朝向: 180,
+};
+
 interface 会议席位预置 {
   角色名: string;
   单位名: string;
@@ -69,6 +75,14 @@ export function 布置王城会议席位(this: void): void {
   for (let i = 0; i < 会议席位预置表.length; i++) {
     读取或创建会议NPC(会议席位预置表[i]);
   }
+}
+
+export function 归位内务总管语维(this: void): void {
+  const 语维 = 读取语义单位引用("主线NPC.语维");
+  if (语维 == null || 语维 === 0) return;
+  SetUnitPosition(语维, 语维原始位置.X, 语维原始位置.Y);
+  SetUnitFacing(语维, 语维原始位置.朝向);
+  注册剧情运行时单位("主线NPC.语维", 语维);
 }
 
 export function 执行前往会议室任务(this: void): void {

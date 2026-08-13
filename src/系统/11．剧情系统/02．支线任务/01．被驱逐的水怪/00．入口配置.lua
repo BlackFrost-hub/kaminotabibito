@@ -1,17 +1,13 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____6CE8_9500_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C, _____6CE8_9500_5361_745F_62C9_6B7B_4EA1_76D1_542C, _____6E05_7406_5361_745F_62C9_5165_53E3_76D1_542C, ____on_5361_745F_62C9_6B7B_4EA1, unregisterDeathListener, safeDestroyTrigger, _____5F53_524D_5361_745F_62C9_5355_4F4D, _____5361_745F_62C9_5165_53E3_8303_56F4_89E6_53D1_5668, _____53D6_6D88_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C, _____5DF2_6CE8_518C_5361_745F_62C9_6B7B_4EA1_76D1_542C
+local _____6CE8_9500_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C, _____6CE8_9500_5361_745F_62C9_6B7B_4EA1_76D1_542C, _____6E05_7406_5361_745F_62C9_5165_53E3_76D1_542C, ____on_5361_745F_62C9_6B7B_4EA1, unregisterDeathListener, _____5F53_524D_5361_745F_62C9_5355_4F4D, _____53D6_6D88_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C, _____5DF2_6CE8_518C_5361_745F_62C9_6B7B_4EA1_76D1_542C
 local ____02_FF0E_5267_60C5NPC_521B_5EFA = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
 local _____521B_5EFA_5267_60C5NPC_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情NPC单位"]
 function _____6CE8_9500_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C()
     if _____53D6_6D88_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C ~= nil then
         _____53D6_6D88_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C()
     end
-    if _____5361_745F_62C9_5165_53E3_8303_56F4_89E6_53D1_5668 ~= nil and _____5361_745F_62C9_5165_53E3_8303_56F4_89E6_53D1_5668 ~= 0 then
-        safeDestroyTrigger(_____5361_745F_62C9_5165_53E3_8303_56F4_89E6_53D1_5668)
-    end
     _____53D6_6D88_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C = nil
-    _____5361_745F_62C9_5165_53E3_8303_56F4_89E6_53D1_5668 = nil
 end
 function _____6CE8_9500_5361_745F_62C9_6B7B_4EA1_76D1_542C()
     if not _____5DF2_6CE8_518C_5361_745F_62C9_6B7B_4EA1_76D1_542C then
@@ -36,35 +32,26 @@ local jass = require("jass.common")
 local ____require_result_0 = require("系统.09．表现系统.06．广播提示消息.index")
 local _____53D1_9001_5934_50CF_63D0_793A_7ED9_73A9_5BB6 = ____require_result_0["发送头像提示给玩家"]
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_0["广播单位提示"]
+local _____64AD_653E_5E7F_64AD_5BF9_767D_5E8F_5217 = ____require_result_0["播放广播对白序列"]
 local ____require_result_1 = require("系统.09．表现系统.06．广播提示消息.00．常量定义")
 local _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 = ____require_result_1["广播提示玩家槽数"]
 local _____5E7F_64AD_63D0_793A_5587_53ED_5934_50CF = ____require_result_1["广播提示喇叭头像"]
-local _____5E7F_64AD_63D0_793A_6ED1_5165_6BEB_79D2 = ____require_result_1["广播提示滑入毫秒"]
-local _____5E7F_64AD_63D0_793A_6DE1_51FA_6BEB_79D2 = ____require_result_1["广播提示淡出毫秒"]
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local ____require_result_3 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-local registerUnitInRangeTrigger = ____require_result_3.registerUnitInRangeTrigger
-local ____require_result_4 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_4.registerDeathListener
-unregisterDeathListener = ____require_result_4.unregisterDeathListener
-local ____require_result_5 = require("系统.00．核心系统.07．联机安全工具")
-local safeTriggerAddAction = ____require_result_5.safeTriggerAddAction
-safeDestroyTrigger = ____require_result_5.safeDestroyTrigger
-local ____require_result_6 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_6["是玩家英雄组单位"]
-local ____require_result_7 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index")
-local _____5361_745F_62C9_5956_52B1_6C60ID = ____require_result_7["卡瑟拉奖励池ID"]
-local ____require_result_8 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面")
-local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_8["打开首领奖励选择界面"]
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
+local registerOneShotUnitRangeListener = ____require_result_2.registerOneShotUnitRangeListener
+local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_3.registerDeathListener
+unregisterDeathListener = ____require_result_3.unregisterDeathListener
+local ____require_result_4 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_4["是玩家英雄组单位"]
+local ____require_result_5 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index")
+local _____5361_745F_62C9_5956_52B1_6C60ID = ____require_result_5["卡瑟拉奖励池ID"]
+local ____require_result_6 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面")
+local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_6["打开首领奖励选择界面"]
 local _____5361_745F_62C9_5DF2_521B_5EFA = false
 _____5F53_524D_5361_745F_62C9_5355_4F4D = nil
-_____5361_745F_62C9_5165_53E3_8303_56F4_89E6_53D1_5668 = nil
 local _____5361_745F_62C9_5165_53E3_5DF2_89E6_53D1 = false
 local _____5361_745F_62C9_5165_53E3_5BF9_767D_5DF2_5B8C_6210 = false
 _____5DF2_6CE8_518C_5361_745F_62C9_6B7B_4EA1_76D1_542C = false
-local GetTriggerUnit = jass.GetTriggerUnit
-local CreateTrigger = jass.CreateTrigger
 local Player = jass.Player
 local PingMinimap = jass.PingMinimap
 local function _____5E7F_64AD_5361_745F_62C9_6311_6218_63D0_793A()
@@ -85,62 +72,23 @@ end
 local function ____on_5361_745F_62C9_5165_53E3_5BF9_767D_7ED3_675F()
     _____5361_745F_62C9_5165_53E3_5BF9_767D_5DF2_5B8C_6210 = true
 end
-local _____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E00_6BB5_505C_7559_6BEB_79D2 = 4800
-local _____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E8C_6BB5_505C_7559_6BEB_79D2 = 6800
-local _____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E09_6BB5_505C_7559_6BEB_79D2 = 4200
-local function _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(_____505C_7559_6BEB_79D2)
-    return _____5E7F_64AD_63D0_793A_6ED1_5165_6BEB_79D2 + _____505C_7559_6BEB_79D2 + _____5E7F_64AD_63D0_793A_6DE1_51FA_6BEB_79D2
+local function _____8BFB_53D6_5361_745F_62C9_5165_53E3_8BF4_8BDD_5355_4F4D(______8BF4_8BDD_8005_952E)
+    return _____5F53_524D_5361_745F_62C9_5355_4F4D
 end
-local function _____64AD_653E_5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E09_6BB5()
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____5F53_524D_5361_745F_62C9_5355_4F4D, "潮汐战戟，还有你们想夺回的一切，都在这里。既然敢踏进我的领地，就用性命来证明你们配得上它。", _____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E09_6BB5_505C_7559_6BEB_79D2)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(_____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E09_6BB5_505C_7559_6BEB_79D2),
-        ____on_5361_745F_62C9_5165_53E3_5BF9_767D_7ED3_675F
-    )
+local function _____64AD_653E_5361_745F_62C9_5165_53E3_5E7F_64AD()
+    _____64AD_653E_5E7F_64AD_5BF9_767D_5E8F_5217({["对白列表"] = {{["说话者键"] = "卡瑟拉", ["文本"] = "你们终于来到这里了……水龙蛇替我守住的最后一道屏障，竟也没能拦住你们。", ["停留毫秒"] = 4800}, {["说话者键"] = "卡瑟拉", ["文本"] = "沃利尔斯还在奢望重返故海。可从我自深渊苏醒的那一刻起，这片湖底便只听从我的意志。", ["停留毫秒"] = 6800}, {["说话者键"] = "卡瑟拉", ["文本"] = "潮汐战戟，还有你们想夺回的一切，都在这里。既然敢踏进我的领地，就用性命来证明你们配得上它。", ["停留毫秒"] = 4200}}, ["读取说话单位"] = _____8BFB_53D6_5361_745F_62C9_5165_53E3_8BF4_8BDD_5355_4F4D, ["播放单句"] = _____5E7F_64AD_5355_4F4D_63D0_793A, ["播放完成"] = ____on_5361_745F_62C9_5165_53E3_5BF9_767D_7ED3_675F})
 end
-local function _____64AD_653E_5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E8C_6BB5()
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____5F53_524D_5361_745F_62C9_5355_4F4D, "沃利尔斯还在奢望重返故海。可从我自深渊苏醒的那一刻起，这片湖底便只听从我的意志。", _____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E8C_6BB5_505C_7559_6BEB_79D2)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(_____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E8C_6BB5_505C_7559_6BEB_79D2),
-        _____64AD_653E_5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E09_6BB5
-    )
-end
-local function _____64AD_653E_5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E00_6BB5()
-    _____5E7F_64AD_5355_4F4D_63D0_793A(_____5F53_524D_5361_745F_62C9_5355_4F4D, "你们终于来到这里了……水龙蛇替我守住的最后一道屏障，竟也没能拦住你们。", _____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E00_6BB5_505C_7559_6BEB_79D2)
-    addDelayedCallback(
-        _____53D6_5E7F_64AD_5B8C_6574_64AD_653E_6BEB_79D2(_____5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E00_6BB5_505C_7559_6BEB_79D2),
-        _____64AD_653E_5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E8C_6BB5
-    )
-end
-local function ____on_5361_745F_62C9_8303_56F4_89E6_53D1()
+local function ____on_5361_745F_62C9_8303_56F4_89E6_53D1(______89E6_53D1_5355_4F4D)
     if _____5361_745F_62C9_5165_53E3_5DF2_89E6_53D1 or _____5F53_524D_5361_745F_62C9_5355_4F4D == nil or _____5F53_524D_5361_745F_62C9_5355_4F4D == 0 then
-        return
-    end
-    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if _____89E6_53D1_5355_4F4D == nil or _____89E6_53D1_5355_4F4D == 0 or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
-        return
+        return true
     end
     _____5361_745F_62C9_5165_53E3_5DF2_89E6_53D1 = true
     _____6E05_7406_5361_745F_62C9_5165_53E3_76D1_542C()
-    _____64AD_653E_5361_745F_62C9_5165_53E3_5E7F_64AD_7B2C_4E00_6BB5()
+    _____64AD_653E_5361_745F_62C9_5165_53E3_5E7F_64AD()
+    return true
 end
 local function _____6CE8_518C_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C()
-    local trigger = CreateTrigger()
-    if trigger == nil or trigger == 0 then
-        return
-    end
-    if safeTriggerAddAction(trigger, ____on_5361_745F_62C9_8303_56F4_89E6_53D1) == nil then
-        safeDestroyTrigger(trigger)
-        return
-    end
-    _____5361_745F_62C9_5165_53E3_8303_56F4_89E6_53D1_5668 = trigger
-    _____53D6_6D88_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C = registerUnitInRangeTrigger(
-        trigger,
-        _____5F53_524D_5361_745F_62C9_5355_4F4D,
-        1000,
-        nil,
-        false
-    )
+    _____53D6_6D88_5361_745F_62C9_5165_53E3_8303_56F4_76D1_542C = registerOneShotUnitRangeListener(_____5F53_524D_5361_745F_62C9_5355_4F4D, 1000, ____on_5361_745F_62C9_8303_56F4_89E6_53D1, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D)
     registerDeathListener(____on_5361_745F_62C9_6B7B_4EA1)
     _____5DF2_6CE8_518C_5361_745F_62C9_6B7B_4EA1_76D1_542C = true
 end
@@ -178,7 +126,7 @@ local function _____5B8C_6210_88AB_9A71_9010_7684_6C34_602A_4EFB_52A1_540E_6253_
         local _____73A9_5BB6ID = 0
         while _____73A9_5BB6ID < _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 do
             local _____73A9_5BB6 = Player(_____73A9_5BB6ID)
-            if _____73A9_5BB6 ~= nil and jass.GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
+            if _____73A9_5BB6 ~= nil and jass:GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
                 _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____5361_745F_62C9_5956_52B1_6C60ID, _____73A9_5BB6)
             end
             _____73A9_5BB6ID = _____73A9_5BB6ID + 1

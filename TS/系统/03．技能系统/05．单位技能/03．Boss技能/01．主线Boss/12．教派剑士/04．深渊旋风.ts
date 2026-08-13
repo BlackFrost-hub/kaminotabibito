@@ -2,7 +2,7 @@
 
 import { 教派剑士单位技能配置 } from './00．配置';
 import { 获取或创建教派剑士上下文, 教派剑士单位存活, type 教派剑士运行时上下文 } from './01．运行时上下文';
-import { 教派剑士技能配置 } from './02．数值与表现配置';
+import { 教派剑士技能配置, 教派剑士音效配置 } from './02．数值与表现配置';
 import { 播放教派剑士台词 } from './11．台词播放';
 import { 创建原生弹幕, 销毁原生弹幕 } from '../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕';
 import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
@@ -40,6 +40,9 @@ const { getEnemyUnitsInRange } = require('lib.扩展函数.自定义扩展函数
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
+};
+const { Sound3DII_CooPlayReuse } = require('lib.扩展函数.封装函数.02．音效系统.03．3D音效播放') as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -257,6 +260,7 @@ export function 释放教派剑士深渊旋风(this: void, 上下文: 教派剑�
   开始硬直(boss, 配置.施法硬直秒);
   SetUnitAnimation(boss, 配置.动作名);
   播放教派剑士台词(boss, '深渊旋风');
+  Sound3DII_CooPlayReuse(教派剑士音效配置.深渊旋风.旋风起手, GetUnitX(boss), GetUnitY(boss), 0, 教派剑士音效配置.音效裁断距离);
   registerManualBuff(boss, 教派剑士BuffID.深渊旋风, 配置.施法硬直秒, 0, { sourceUnit: boss, effectSourceName: '深渊旋风', effectSourceType: '技能' });
   显示常规技能吟唱条({ 通道: 配置.读条通道, 总时长: 配置.施法硬直秒, 颜色ID: 配置.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
   状态.周期回调ID = addPeriodicCallback(配置.轮次间隔秒 * 1000, on深渊旋风轮次, 状态);

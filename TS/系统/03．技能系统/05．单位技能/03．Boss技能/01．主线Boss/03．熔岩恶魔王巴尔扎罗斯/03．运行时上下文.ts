@@ -9,6 +9,9 @@ import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
 };
+const { 创建合法决斗场景单位 } = require("系统.11．剧情系统.02．支线任务.00．通用小任务.03．恶魔城支线.01．任务运行") as {
+  创建合法决斗场景单位: (this: void) => void;
+};
 
 export type 巴尔扎罗斯阶段 = 1 | 2 | 3;
 
@@ -100,6 +103,7 @@ export function 清理巴尔扎罗斯上下文(this: void, boss: any): void {
 
 function on巴尔扎罗斯死亡台词(this: void, _context: 巴尔扎罗斯运行时上下文, dyingUnit: any, _killingUnit: any): void {
   播放巴尔扎罗斯台词(dyingUnit, "死亡", 0);
+  创建合法决斗场景单位();
 }
 
 export function 注册巴尔扎罗斯运行时(this: void): void {

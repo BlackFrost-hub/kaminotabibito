@@ -8,6 +8,7 @@ local _____83B7_53D6_6216_521B_5EFA_5229_5C14_4F2F_7279_4E0A_4E0B_6587 = ____01_
 local _____5229_5C14_4F2F_7279_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6["利尔伯特单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.11．利尔·伯特.02．数值与表现配置")
 local _____5229_5C14_4F2F_7279_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["利尔伯特技能配置"]
+local _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["利尔伯特音效配置"]
 local ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.08．方位判定工具")
 local _____76EE_6807_662F_5426_9762_5411_6765_6E90 = ____08_FF0E_65B9_4F4D_5224_5B9A_5DE5_5177["目标是否面向来源"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
@@ -28,6 +29,8 @@ local ____require_result_5 = require("lib.扩展函数.Star扩展函数.04．EC�
 local EC_CreateEffect = ____require_result_5.EC_CreateEffect
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_7["播放Boss坐标音效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -86,6 +89,12 @@ local function _____63D0_4EA4_6B63_4E49_5BA1_5224_9644_52A0_4F24_5BB3(_____4E0A_
     _____4E0A_4E0B_6587["正义审判递归锁"] = false
     if _____7ED3_679C["是否造成伤害"] then
         _____64AD_653E_6B63_4E49_5BA1_5224_547D_4E2D_7279_6548(_____76EE_6807_5355_4F4D)
+        _____64AD_653EBoss_5750_6807_97F3_6548(
+            _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["正义审判"]["审判命中"],
+            GetUnitX(_____76EE_6807_5355_4F4D),
+            GetUnitY(_____76EE_6807_5355_4F4D),
+            _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["默认裁断距离"]
+        )
     end
     return _____7ED3_679C
 end
@@ -104,19 +113,19 @@ local function ____on_5229_5C14_9020_6210_6700_7EC8_4F24_5BB3(target, attacker, 
     if _____4E0A_4E0B_6587 == nil or _____4E0A_4E0B_6587["正义审判递归锁"] then
         return
     end
-    local ____opt_result_9
+    local ____opt_result_10
     if snapshot ~= nil then
-        ____opt_result_9 = snapshot.effectiveDamageType
+        ____opt_result_10 = snapshot.effectiveDamageType
     end
-    local ____temp_13 = ____opt_result_9 == DAMAGE_TYPE_MIND
-    if not ____temp_13 then
-        local ____opt_result_12
+    local ____temp_14 = ____opt_result_10 == DAMAGE_TYPE_MIND
+    if not ____temp_14 then
+        local ____opt_result_13
         if snapshot ~= nil then
-            ____opt_result_12 = snapshot.rawDamageType
+            ____opt_result_13 = snapshot.rawDamageType
         end
-        ____temp_13 = ____opt_result_12 == DAMAGE_TYPE_MIND
+        ____temp_14 = ____opt_result_13 == DAMAGE_TYPE_MIND
     end
-    if ____temp_13 then
+    if ____temp_14 then
         return
     end
     if not _____662F_6B63_4E49_5BA1_5224_6709_6548_76EE_6807(attacker, target) then
@@ -126,8 +135,8 @@ local function ____on_5229_5C14_9020_6210_6700_7EC8_4F24_5BB3(target, attacker, 
         return
     end
     local _____56DE_8C03ID = addDelayedCallback(0, ____on_6B63_4E49_5BA1_5224_9644_52A0_4F24_5BB3, {["上下文"] = _____4E0A_4E0B_6587, ["目标单位"] = target, ["原伤害"] = applied})
-    local ____self_14 = _____4E0A_4E0B_6587["清理"]
-    ____self_14["登记延迟回调"](____self_14, "正义审判附加伤害", _____56DE_8C03ID)
+    local ____self_15 = _____4E0A_4E0B_6587["清理"]
+    ____self_15["登记延迟回调"](____self_15, "正义审判附加伤害", _____56DE_8C03ID)
 end
 local function ____on_6B63_4E49_5BA1_5224_5468_671F()
     local _____4E0A_4E0B_6587_5217_8868 = _____83B7_53D6_5168_90E8_5229_5C14_4F2F_7279_4E0A_4E0B_6587()
@@ -165,6 +174,12 @@ local function ____on_6B63_4E49_5BA1_5224_5468_671F()
                             })
                             if _____7ED3_679C["是否造成伤害"] then
                                 _____64AD_653E_6B63_4E49_5BA1_5224_547D_4E2D_7279_6548(_____76EE_6807)
+                                _____64AD_653EBoss_5750_6807_97F3_6548(
+                                    _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["正义审判"]["审判命中"],
+                                    GetUnitX(_____76EE_6807),
+                                    GetUnitY(_____76EE_6807),
+                                    _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["默认裁断距离"]
+                                )
                             end
                         end
                         ::__continue23::
@@ -178,11 +193,11 @@ local function ____on_6B63_4E49_5BA1_5224_5468_671F()
     end
 end
 local function ____on_5229_5C14_4F2F_7279_6218_6597_542F_52A8(context)
-    local ____opt_result_17
+    local ____opt_result_18
     if context ~= nil then
-        ____opt_result_17 = context["Boss单位"]
+        ____opt_result_18 = context["Boss单位"]
     end
-    local boss = ____opt_result_17
+    local boss = ____opt_result_18
     _____83B7_53D6_6216_521B_5EFA_5229_5C14_4F2F_7279_4E0A_4E0B_6587(boss)
 end
 ____exports["注册利尔伯特正义审判"] = function()

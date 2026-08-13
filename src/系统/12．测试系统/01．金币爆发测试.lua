@@ -27,28 +27,28 @@ function playGoldBurstStep(ctx, p0)
     if ctx.count >= ctx.times then
         return
     end
-    local t = jass.CreateTimer()
+    local t = jass:CreateTimer()
     if not t then
         return
     end
-    goldBurstCtxByTimerHid[jass.GetHandleId(t)] = ctx
-    jass.TimerStart(t, ctx.interval, false, onGoldBurstTimerExpire)
+    goldBurstCtxByTimerHid[jass:GetHandleId(t)] = ctx
+    jass:TimerStart(t, ctx.interval, false, onGoldBurstTimerExpire)
 end
 function onGoldBurstTimerExpire()
-    local t = jass.GetExpiredTimer()
+    local t = jass:GetExpiredTimer()
     if not t then
         return
     end
-    local hid = jass.GetHandleId(t)
+    local hid = jass:GetHandleId(t)
     local ctx = goldBurstCtxByTimerHid[hid]
     __TS__Delete(goldBurstCtxByTimerHid, hid)
-    jass.DestroyTimer(t)
+    jass:DestroyTimer(t)
     if not ctx then
         return
     end
     playGoldBurstStep(
         ctx,
-        jass.Player(0)
+        jass:Player(0)
     )
 end
 jass = require("jass.common")
@@ -74,11 +74,11 @@ local GOLD_BURST_555_TIMES = 12
 local GOLD_BURST_555_INTERVAL_SEC = 1 / 11
 goldBurstCtxByTimerHid = {}
 local function onChat2222(self)
-    local p0 = jass.Player(0)
+    local p0 = jass:Player(0)
     local ctx = {kind = "2222", times = GOLD_BURST_TIMES, interval = GOLD_BURST_INTERVAL_SEC, count = 0}
     playGoldBurstStep(ctx, p0)
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
+    jass:DisplayTimedTextToPlayer(
+        jass:Player(0),
         0,
         0,
         10,
@@ -86,11 +86,11 @@ local function onChat2222(self)
     )
 end
 local function onChat555(self)
-    local p0 = jass.Player(0)
+    local p0 = jass:Player(0)
     local ctx = {kind = "555", times = GOLD_BURST_555_TIMES, interval = GOLD_BURST_555_INTERVAL_SEC, count = 0}
     playGoldBurstStep(ctx, p0)
-    jass.DisplayTimedTextToPlayer(
-        jass.Player(0),
+    jass:DisplayTimedTextToPlayer(
+        jass:Player(0),
         0,
         0,
         12,

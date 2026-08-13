@@ -101,6 +101,8 @@ export interface 点特效参数 extends 特效XYZ轴旋转参数 {
   X: number;
   Y: number;
   Z?: number;
+  /** 原生特效朝向角度；不填写时保持默认 0 度。 */
+  面向角度?: number;
   持续秒?: number;
   缩放?: number;
   动画速度?: number;
@@ -138,7 +140,7 @@ export function 创建点特效(参数: 点特效参数): any {
     参数.X,
     参数.Y,
     参数.Z ?? 0,
-    0,
+    参数.面向角度 ?? 0,
     参数.缩放 ?? 1,
     参数.动画速度 ?? 1,
     duration,
@@ -151,6 +153,12 @@ export function 创建点特效(参数: 点特效参数): any {
   const color = 取特效顶点颜色(参数);
   if (color != null) DzSetEffectVertexColor(effect, color);
   return effect;
+}
+
+/** 销毁由创建点特效创建的常驻点特效。 */
+export function 销毁点特效(this: void, effect: any): void {
+  if (effect == null || effect === 0) return;
+  DestroyEffect(effect);
 }
 
 export interface 逐段直线路径点特效参数 extends Omit<点特效参数, 'X' | 'Y'> {

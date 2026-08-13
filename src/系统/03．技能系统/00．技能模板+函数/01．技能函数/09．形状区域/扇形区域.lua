@@ -45,7 +45,7 @@ local function _____53D6_6700_5C0F_5939_89D2(_____89D2_5EA6A, _____89D2_5EA6B)
     return _____7EDD_5BF9_503C(_____5DEE_503C)
 end
 local function _____53D6_5750_6807_671D_5411_89D2(_____6E90X, _____6E90Y, _____76EE_6807X, _____76EE_6807Y)
-    return jass.Atan2(_____76EE_6807Y - _____6E90Y, _____76EE_6807X - _____6E90X) * bj_RADTODEG
+    return jass:Atan2(_____76EE_6807Y - _____6E90Y, _____76EE_6807X - _____6E90X) * bj_RADTODEG
 end
 ____exports["单位是否在扇形区域"] = function(_____5355_4F4D, X, Y, _____534A_5F84, _____65B9_5411_89D2, _____6247_5F62_89D2_5EA6, _____5305_542B_8FB9_754C)
     if _____5305_542B_8FB9_754C == nil then

@@ -5,3 +5,4 @@
 export * from "./01．按B传送BB";
 export * from "./02．按Ctrl切换背包";
 export * from "./03．挑战技能/index";
+export * from "./04．环境互动/index";

@@ -343,6 +343,20 @@ export const 区域传送配置: Record<string, RegionConfig> = {
     cameraTime: 0.1,
     condition: "always",
     enabled: true
+  },
+  "21": {
+    id: "21",
+    name: "矩形区域019传送",
+    left: 16416,
+    bottom: -23936,
+    right: 16640,
+    top: -23776,
+    teleportX: 22068.0,
+    teleportY: -23116.6,
+    teleportFacing: 270,
+    cameraTime: 0.1,
+    condition: "always",
+    enabled: true
   }
 };
 

@@ -39,6 +39,9 @@ const { 创建单位绑定闪电, 销毁单位绑定闪电 } = require('系统.0
   创建单位绑定闪电: (this: void, 参数: any) => any;
   销毁单位绑定闪电: (this: void, 闪电句柄: any) => void;
 };
+const { 开始方向抵抗牵引 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.方向抵抗牵引') as {
+  开始方向抵抗牵引: (this: void, 参数: any) => { 停止: (this: void) => void };
+};
 const { 显示大招吟唱条, 关闭吟唱条 } = require('系统.09．表现系统.08．吟唱条.06．对外接口') as {
   显示大招吟唱条: (this: void, 参数: any) => void;
   关闭吟唱条: (this: void, 通道?: string) => void;
@@ -57,16 +60,11 @@ const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
-const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (unit: any, animation: string) => void;
 const GetUnitStateJapi = japi.GetUnitState as (unit: any, state: any) => number;
 const UnitResetCooldown = jass.UnitResetCooldown as (unit: any) => void;
-const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const Cos = jass.Cos as (radians: number) => number;
-const Sin = jass.Sin as (radians: number) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -117,8 +115,7 @@ export interface 食人魔雷霆震怒配置 {
 interface 雷霆震怒数据 {
   Boss单位: any;
   配置: 食人魔雷霆震怒配置;
-  剩余牵引次数: number;
-  周期ID: number;
+  牵引控制器?: { 停止: (this: void) => void };
   无敌尚未恢复: boolean;
   起手闪电句柄列表: any[];
 }
@@ -240,42 +237,38 @@ function on食人魔击杀(this: void, dyingUnit: any, killingUnit: any): void {
   debugLogForce('食人魔-共享机制', '击杀啃食开始', 'bossHid=', 取句柄ID(killingUnit), 'targetHid=', 取句柄ID(dyingUnit), 'difficulty=', difficulty, 'duration=', duration, '动画编号=', 啃食动画编号, '是玩家英雄=', 是玩家英雄, '是测试目标=', 是测试目标, '暂停无敌成功=', 暂停无敌成功, '完成回调ID=', 状态.完成回调ID);
 }
 
-function on雷霆震怒牵引(this: void, variable?: any): void {
-  const data = variable as 雷霆震怒数据 | undefined;
-  if (data == null) return;
-  if (!单位存活(data.Boss单位)) {
-    if (data.周期ID > 0) removePeriodicCallback(data.周期ID);
-    return;
-  }
-  const boss = data.Boss单位;
-  const cfg = data.配置;
-  const bx = GetUnitX(boss);
-  const by = GetUnitY(boss);
-  const targets = 获取Boss技能敌对英雄列表(boss);
-  const maxDistanceSquared = cfg.牵引范围 * cfg.牵引范围;
-  let movedCount = 0;
-  for (let i = 0; i < targets.length; i++) {
-    const target = targets[i];
-    if (!单位存活(target)) continue;
-    const dx = bx - GetUnitX(target);
-    const dy = by - GetUnitY(target);
-    if (dx * dx + dy * dy > maxDistanceSquared) continue;
-    const angle = Atan2(dy, dx);
-    SetUnitX(target, GetUnitX(target) + Cos(angle) * cfg.每次牵引距离);
-    SetUnitY(target, GetUnitY(target) + Sin(angle) * cfg.每次牵引距离);
-    movedCount++;
-  }
-  data.剩余牵引次数--;
-  if (data.剩余牵引次数 <= 0 && data.周期ID > 0) {
-    removePeriodicCallback(data.周期ID);
-    data.周期ID = 0;
-  }
+function 获取雷霆震怒牵引目标(this: void, data: 雷霆震怒数据): any[] {
+  return 获取Boss技能敌对英雄列表(data.Boss单位);
+}
+
+function 过滤雷霆震怒牵引目标(this: void, data: 雷霆震怒数据, target: any): boolean {
+  if (!单位存活(target) || !单位存活(data.Boss单位)) return false;
+  const dx = GetUnitX(data.Boss单位) - GetUnitX(target);
+  const dy = GetUnitY(data.Boss单位) - GetUnitY(target);
+  return dx * dx + dy * dy <= data.配置.牵引范围 * data.配置.牵引范围;
 }
 
 function on雷霆震怒开始牵引(this: void, variable?: any): void {
   const data = variable as 雷霆震怒数据 | undefined;
   if (data == null || !单位存活(data.Boss单位)) return;
-  data.周期ID = addPeriodicCallback(data.配置.牵引间隔秒 * 1000, on雷霆震怒牵引, data);
+  data.牵引控制器 = 开始方向抵抗牵引({
+    名称: '食人魔-雷霆震怒',
+    目标单位列表: [],
+    目标单位提供器: function 雷霆震怒动态目标(this: void): any[] {
+      return 获取雷霆震怒牵引目标(data);
+    },
+    中心单位: data.Boss单位,
+    持续秒: data.配置.牵引间隔秒 * (data.配置.牵引次数 + 1),
+    每秒拉力速度: data.配置.每次牵引距离 / data.配置.牵引间隔秒,
+    抵抗方向角度: 0,
+    启用方向抵抗: false,
+    Tick毫秒: data.配置.牵引间隔秒 * 1000,
+    最大执行次数: data.配置.牵引次数,
+    到达距离: 0,
+    过滤单位: function 雷霆震怒目标过滤(this: void, target: any): boolean {
+      return 过滤雷霆震怒牵引目标(data, target);
+    },
+  });
 }
 
 function on雷霆震怒结算(this: void, variable?: any): void {
@@ -328,8 +321,8 @@ function on雷霆震怒结算(this: void, variable?: any): void {
 function on雷霆震怒硬直结束(this: void, variable?: any): void {
   const data = variable as 雷霆震怒数据 | undefined;
   if (data == null) return;
-  if (data.周期ID > 0) removePeriodicCallback(data.周期ID);
-  data.周期ID = 0;
+  if (data.牵引控制器 != null) data.牵引控制器.停止();
+  data.牵引控制器 = undefined;
   if (data.无敌尚未恢复) {
     data.无敌尚未恢复 = false;
     if (单位存活(data.Boss单位)) {
@@ -369,8 +362,7 @@ export function 施放食人魔雷霆震怒(this: void, boss: any, 配置: 食�
   const data: 雷霆震怒数据 = {
     Boss单位: boss,
     配置,
-    剩余牵引次数: 配置.牵引次数,
-    周期ID: 0,
+    牵引控制器: undefined,
     无敌尚未恢复: true,
     起手闪电句柄列表: [],
   };

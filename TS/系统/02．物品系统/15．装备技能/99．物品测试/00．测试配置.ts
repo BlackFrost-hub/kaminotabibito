@@ -1,6 +1,16 @@
 /** @noSelfInFile */
 
-const 物品测试最大序号 = 191;
+const 物品测试最大序号 = 192;
+
+export const 精灵药水测试装备列表 = [
+  "星露生命精华",
+  "晨曦魔力精华",
+  "月影灵息精华",
+  "星曦复苏药剂",
+  "曦月澄明药剂",
+  "星月净愈药剂",
+  "精灵王城三花灵药",
+];
 
 export const 物品测试序号装备名表: Record<number, string> = {
   1: "回沙之书",
@@ -194,6 +204,7 @@ export const 物品测试序号装备名表: Record<number, string> = {
   189: "滴管长枪投影",
   190: "真祖女武神血铠",
   191: "英灵战乙女蔷薇镜",
+  192: "星露生命精华",
 };
 
 function 取序号装备名(this: void, 序号: number): string {
@@ -219,7 +230,17 @@ function 生成测试装备顺序(this: void): string[] {
 
 export const 物品主动技能测试命令列表 = 生成测试命令列表();
 export const 物品主动技能测试发放顺序 = 生成测试装备顺序();
-export const 物品主动技能测试清理装备列表 = 物品主动技能测试发放顺序;
+
+function 生成测试清理装备列表(this: void): string[] {
+  const result = 物品主动技能测试发放顺序.slice();
+  for (let i = 0; i < 精灵药水测试装备列表.length; i++) {
+    const 装备名 = 精灵药水测试装备列表[i];
+    if (result.indexOf(装备名) < 0) result.push(装备名);
+  }
+  return result;
+}
+
+export const 物品主动技能测试清理装备列表 = 生成测试清理装备列表();
 
 export interface 物品主动技能测试命令说明 {
   序号: number;
@@ -235,7 +256,7 @@ function 生成测试命令说明列表(this: void): 物品主动技能测试命
     list.push({
       序号,
       命令: "wp" + 序号,
-      装备名,
+      装备名: 序号 === 192 ? "全部精灵药水" : 装备名,
     });
   }
   return list;

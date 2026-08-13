@@ -2,9 +2,13 @@
 
 import { 地精祭祀单位技能配置 } from './00．配置';
 import { 获取或创建地精祭祀上下文, 获取地精祭祀范围目标, 地精祭祀单位存活, type 地精祭祀运行时上下文 } from './01．运行时上下文';
-import { 地精祭祀技能配置 } from './02．数值与表现配置';
+import { 地精祭祀技能配置, 地精祭祀音效配置 } from './02．数值与表现配置';
 import { 创建技能提示圈 } from '../../../../00．技能模板+函数/02．通用函数/16．技能提示圈工厂';
 import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
+
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
+};
 
 const { registerSpellEffectListener } = require('系统.00．核心系统.01．事件中心.08．技能事件中心') as {
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
@@ -67,6 +71,7 @@ function on血爆结算(this: void, variable?: any): void {
   const boss = 快照.上下文.Boss单位;
   const 配置 = 地精祭祀技能配置.血爆;
   播放地精祭祀点特效(配置.爆炸特效, 快照.X, 快照.Y);
+  播放Boss坐标音效(地精祭祀音效配置.血爆.爆炸命中, 快照.X, 快照.Y, 地精祭祀音效配置.默认裁断距离);
   const 目标列表 = 获取地精祭祀范围目标(boss, 快照.X, 快照.Y, 配置.作用半径, 配置.最大飞行高度);
   for (let i = 0; i < 目标列表.length; i++) {
     const 目标 = 目标列表[i];

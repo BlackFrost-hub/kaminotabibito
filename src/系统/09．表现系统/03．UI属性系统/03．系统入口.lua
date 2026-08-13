@@ -15,7 +15,7 @@ function registerKey(status, keyCode, action)
     )
 end
 function dispatchTabKey(show)
-    if getTriggerKeyPlayer(nil) ~= jass.GetLocalPlayer() then
+    if getTriggerKeyPlayer(nil) ~= jass:GetLocalPlayer() then
         return
     end
     showDamagePanel(show)
@@ -41,8 +41,8 @@ function dispatchFocusHotkey(keyCode)
     end
     panCameraToTimedForPlayer(
         p,
-        jass.GetUnitX(hero),
-        jass.GetUnitY(hero),
+        jass:GetUnitX(hero),
+        jass:GetUnitY(hero),
         0.05
     )
 end

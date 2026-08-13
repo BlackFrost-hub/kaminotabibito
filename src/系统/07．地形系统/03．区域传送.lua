@@ -182,7 +182,7 @@ local function runRegionRule(rule, unit, owner)
     if #items == 0 or totalWeight <= 0 then
         return
     end
-    local r = jass.GetRandomInt(1, totalWeight)
+    local r = jass:GetRandomInt(1, totalWeight)
     local chosen
     for ____, it in ipairs(items) do
         if r <= it.weight then
@@ -195,9 +195,9 @@ local function runRegionRule(rule, unit, owner)
         chosen = items[#items]
     end
     local unitName = "单位"
-    local n = jass.GetUnitName(unit)
+    local n = jass:GetUnitName(unit)
     if n ~= nil then
-        unitName = tostring(n)
+        unitName = tostring(nil, n)
     end
     local function formatText(raw)
         if not raw then
@@ -209,10 +209,10 @@ local function runRegionRule(rule, unit, owner)
         )
     end
     if chosen.action == "KillUnit" then
-        jass.KillUnit(unit)
+        jass:KillUnit(unit)
         local msg = formatText(chosen.text)
         if msg and owner ~= nil then
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 owner,
                 0,
                 0,
@@ -222,11 +222,11 @@ local function runRegionRule(rule, unit, owner)
         end
     elseif chosen.action == "Teleport" then
         if chosen.x ~= nil and chosen.y ~= nil then
-            jass.SetUnitPosition(unit, chosen.x, chosen.y)
+            jass:SetUnitPosition(unit, chosen.x, chosen.y)
         end
         local msg = formatText(nil)
         if msg and owner ~= nil then
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 owner,
                 0,
                 0,
@@ -237,10 +237,10 @@ local function runRegionRule(rule, unit, owner)
     end
 end
 local function isAliveHero(unit)
-    return unit ~= nil and unit ~= 0 and jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) == true and jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD) ~= true
+    return unit ~= nil and unit ~= 0 and jass:IsUnitType(unit, jass.UNIT_TYPE_HERO) == true and jass:IsUnitType(unit, jass.UNIT_TYPE_DEAD) ~= true
 end
 local function isRegionTeleportCoolingDown(unit)
-    local id = jass.GetHandleId(unit)
+    local id = jass:GetHandleId(unit)
     local now = getServerTime()
     local last = _____5355_4F4D_533A_57DF_4F20_9001_51B7_5374[id] or 0
     if last > 0 and now - last < _____533A_57DF_4F20_9001_8FDE_89E6_53D1_4FDD_62A4Ms then
@@ -290,22 +290,22 @@ local function _____6267_884C_533A_57DF_4F20_9001_540E_5E7F_64AD(cfg, unit)
     _____5E7F_64AD_5355_4F4D_63D0_793A(unit, _____5E7F_64AD_914D_7F6E["文本"], _____5E7F_64AD_914D_7F6E["持续时间毫秒"])
 end
 local function onRegionEnter()
-    local unit = jass.GetTriggerUnit()
-    local region = jass.GetTriggeringRegion()
+    local unit = jass:GetTriggerUnit()
+    local region = jass:GetTriggeringRegion()
     if unit == nil or region == nil then
         return
     end
     if not isAliveHero(unit) then
         return
     end
-    local owner = jass.GetOwningPlayer(unit)
+    local owner = jass:GetOwningPlayer(unit)
     if owner ~= nil and jass.PLAYER_NEUTRAL_AGGRESSIVE ~= nil then
-        local neutralAgg = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
+        local neutralAgg = jass:Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
         if owner == neutralAgg then
             return
         end
     end
-    local cfg = regionMap:get(jass.GetHandleId(region))
+    local cfg = regionMap:get(jass:GetHandleId(region))
     if cfg == nil then
         return
     end
@@ -323,16 +323,16 @@ local function onRegionEnter()
         runRegionRule(cfg.rule, unit, owner)
         return
     end
-    jass.SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
+    jass:SetUnitPosition(unit, cfg.teleportX, cfg.teleportY)
     if cfg.teleportFacing ~= nil then
         SetUnitFacing(unit, cfg.teleportFacing)
     end
-    jass.IssueImmediateOrder(unit, "stop")
+    jass:IssueImmediateOrder(unit, "stop")
     local player = owner
     if player ~= nil then
         StarOther_PanCameraToTimedForPlayer(player, cfg.teleportX, cfg.teleportY, cfg.cameraTime)
         if cfg.text ~= nil and cfg.text ~= "" then
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 player,
                 0,
                 0,
@@ -352,7 +352,7 @@ local function initRegionTeleport()
         return
     end
     _____533A_57DF_4F20_9001_5DF2_521D_59CB_5316 = true
-    local trig = jass.CreateTrigger()
+    local trig = jass:CreateTrigger()
     local total = 0
     local enabledCount = 0
     for k in pairs(_____533A_57DF_4F20_9001_914D_7F6E) do
@@ -372,19 +372,19 @@ local function initRegionTeleport()
             if not isValidRegionRect(cfg) then
                 goto __continue83
             end
-            local region = jass.CreateRegion()
-            local rect = jass.Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
-            jass.RegionAddRect(region, rect)
-            jass.RemoveRect(rect)
+            local region = jass:CreateRegion()
+            local rect = jass:Rect(cfg.left, cfg.bottom, cfg.right, cfg.top)
+            jass:RegionAddRect(region, rect)
+            jass:RemoveRect(rect)
             regionEventCenter.registerEnterRegionTrigger(trig, region, nil)
             regionMap:set(
-                jass.GetHandleId(region),
+                jass:GetHandleId(region),
                 cfg
             )
         end
         ::__continue83::
     end
-    jass.TriggerAddAction(trig, onRegionEnter)
+    jass:TriggerAddAction(trig, onRegionEnter)
 end
 local function onInitRegionTeleportDelayed()
     initRegionTeleport()
@@ -396,14 +396,14 @@ local function _____5267_60C5_4F20_9001_5355_4F4D_53EF_8FDB_5165(unit)
     if not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(unit) then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_HERO) ~= true then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_HERO) ~= true then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD) == true then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_DEAD) == true then
         return false
     end
-    local owner = jass.GetOwningPlayer(unit)
-    local neutralAggressive = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
+    local owner = jass:GetOwningPlayer(unit)
+    local neutralAggressive = jass:Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
     return owner == nil or owner ~= neutralAggressive
 end
 local function _____7A7A_5267_60C5_4F20_9001_6E05_7406()
@@ -417,19 +417,19 @@ local function ____on_79FB_52A8_5267_60C5_73A9_5BB6_7EC4()
     if _____72B6_6001 == nil then
         return
     end
-    local unit = jass.GetEnumUnit()
+    local unit = jass:GetEnumUnit()
     if not _____5267_60C5_4F20_9001_5355_4F4D_53EF_8FDB_5165(unit) then
         return
     end
-    jass.SetUnitPosition(unit, _____72B6_6001["配置"]["目标X"], _____72B6_6001["配置"]["目标Y"])
+    jass:SetUnitPosition(unit, _____72B6_6001["配置"]["目标X"], _____72B6_6001["配置"]["目标Y"])
     if _____72B6_6001["配置"]["目标面向"] ~= nil then
-        jass.SetUnitFacing(unit, _____72B6_6001["配置"]["目标面向"])
+        jass:SetUnitFacing(unit, _____72B6_6001["配置"]["目标面向"])
     end
-    jass.IssueImmediateOrder(unit, "stop")
+    jass:IssueImmediateOrder(unit, "stop")
     local _____955C_5934_5E73_79FB_65F6_957F = _____72B6_6001["配置"]["镜头平移时长"]
     if _____955C_5934_5E73_79FB_65F6_957F ~= nil and _____955C_5934_5E73_79FB_65F6_957F > 0 then
         StarOther_PanCameraToTimedForPlayer(
-            jass.GetOwningPlayer(unit),
+            jass:GetOwningPlayer(unit),
             _____72B6_6001["配置"]["目标X"],
             _____72B6_6001["配置"]["目标Y"],
             _____955C_5934_5E73_79FB_65F6_957F
@@ -437,26 +437,26 @@ local function ____on_79FB_52A8_5267_60C5_73A9_5BB6_7EC4()
     end
 end
 local function _____6E05_7406_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001(_____72B6_6001)
-    local triggerId = __TS__Number(jass.GetHandleId(_____72B6_6001["触发器"]))
+    local triggerId = __TS__Number(jass:GetHandleId(_____72B6_6001["触发器"]))
     if _____72B6_6001["取消监听"] ~= nil then
         _____72B6_6001["取消监听"]()
     end
     if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(_____72B6_6001["触发器"]) then
-        jass.DestroyTrigger(_____72B6_6001["触发器"])
+        jass:DestroyTrigger(_____72B6_6001["触发器"])
     end
     if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(_____72B6_6001["矩形"]) then
-        jass.RemoveRect(_____72B6_6001["矩形"])
+        jass:RemoveRect(_____72B6_6001["矩形"])
     end
     if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(_____72B6_6001["区域"]) then
-        jass.RemoveRegion(_____72B6_6001["区域"])
+        jass:RemoveRegion(_____72B6_6001["区域"])
     end
     if triggerId > 0 then
         _____5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001_8868[triggerId] = nil
     end
 end
 local function ____on_5267_60C5_73A9_5BB6_7EC4_4F20_9001_8FDB_5165()
-    local trigger = jass.GetTriggeringTrigger()
-    local triggerId = __TS__Number(jass.GetHandleId(trigger))
+    local trigger = jass:GetTriggeringTrigger()
+    local triggerId = __TS__Number(jass:GetHandleId(trigger))
     local _____72B6_6001 = _____5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001_8868[triggerId]
     if _____72B6_6001 == nil or _____72B6_6001["已触发"] then
         return
@@ -464,7 +464,7 @@ local function ____on_5267_60C5_73A9_5BB6_7EC4_4F20_9001_8FDB_5165()
     if not _____72B6_6001["配置"]["条件"]() then
         return
     end
-    local enteringUnit = jass.GetTriggerUnit()
+    local enteringUnit = jass:GetTriggerUnit()
     if not _____5267_60C5_4F20_9001_5355_4F4D_53EF_8FDB_5165(enteringUnit) then
         return
     end
@@ -478,7 +478,7 @@ local function ____on_5267_60C5_73A9_5BB6_7EC4_4F20_9001_8FDB_5165()
     _____72B6_6001["已触发"] = true
     _____6E05_7406_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001(_____72B6_6001)
     _____5F53_524D_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001 = _____72B6_6001
-    jass.ForGroup(_____73A9_5BB6_82F1_96C4_7EC4, ____on_79FB_52A8_5267_60C5_73A9_5BB6_7EC4)
+    jass:ForGroup(_____73A9_5BB6_82F1_96C4_7EC4, ____on_79FB_52A8_5267_60C5_73A9_5BB6_7EC4)
     _____5F53_524D_5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001 = nil
     if _____72B6_6001["配置"]["完成"] ~= nil then
         _____72B6_6001["配置"]["完成"](enteringUnit)
@@ -490,23 +490,23 @@ ____exports["注册剧情玩家组传送"] = function(_____914D_7F6E)
     if _____914D_7F6E == nil or _____914D_7F6E["入口半径"] <= 0 or not _____914D_7F6E["条件"] or not _____914D_7F6E["读取玩家英雄组"] then
         return _____7A7A_5267_60C5_4F20_9001_6E05_7406
     end
-    local region = jass.CreateRegion()
-    local rect = jass.Rect(_____914D_7F6E["入口中心X"] - _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心Y"] - _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心X"] + _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心Y"] + _____914D_7F6E["入口半径"])
-    local trigger = jass.CreateTrigger()
+    local region = jass:CreateRegion()
+    local rect = jass:Rect(_____914D_7F6E["入口中心X"] - _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心Y"] - _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心X"] + _____914D_7F6E["入口半径"], _____914D_7F6E["入口中心Y"] + _____914D_7F6E["入口半径"])
+    local trigger = jass:CreateTrigger()
     if not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(region) or not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(rect) or not _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(trigger) then
         if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(rect) then
-            jass.RemoveRect(rect)
+            jass:RemoveRect(rect)
         end
         if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(region) then
-            jass.RemoveRegion(region)
+            jass:RemoveRegion(region)
         end
         if _____5267_60C5_4F20_9001_53E5_67C4_6709_6548(trigger) then
-            jass.DestroyTrigger(trigger)
+            jass:DestroyTrigger(trigger)
         end
         return _____7A7A_5267_60C5_4F20_9001_6E05_7406
     end
-    jass.RegionAddRect(region, rect)
-    jass.TriggerAddAction(trigger, ____on_5267_60C5_73A9_5BB6_7EC4_4F20_9001_8FDB_5165)
+    jass:RegionAddRect(region, rect)
+    jass:TriggerAddAction(trigger, ____on_5267_60C5_73A9_5BB6_7EC4_4F20_9001_8FDB_5165)
     local _____72B6_6001 = {
         ["配置"] = _____914D_7F6E,
         ["区域"] = region,
@@ -515,7 +515,7 @@ ____exports["注册剧情玩家组传送"] = function(_____914D_7F6E)
         ["取消监听"] = regionEventCenter.registerEnterRegionTrigger(trigger, region, nil),
         ["已触发"] = false
     }
-    local triggerId = __TS__Number(jass.GetHandleId(trigger))
+    local triggerId = __TS__Number(jass:GetHandleId(trigger))
     _____5267_60C5_73A9_5BB6_7EC4_4F20_9001_72B6_6001_8868[triggerId] = _____72B6_6001
     return function()
         if not _____72B6_6001["已触发"] then

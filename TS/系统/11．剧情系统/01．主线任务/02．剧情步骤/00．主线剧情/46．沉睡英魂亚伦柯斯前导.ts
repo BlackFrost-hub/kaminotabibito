@@ -9,16 +9,12 @@ const { 暂停并设置无敌安全, 解除暂停并取消无敌安全 } = requi
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
 };
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => () => void;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (this: void, unit: any, range: number, callback: (this: void, enteringUnit: any) => boolean, predicate?: (this: void, enteringUnit: any) => boolean) => () => void;
 };
 const { registerDeathListener, unregisterDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
   unregisterDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
 };
 const { 获取玩家英雄单位组, 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   获取玩家英雄单位组: (this: void) => any;
@@ -62,8 +58,6 @@ const { 清理菲尼克斯尔战后地形装饰 } = require("系统.11．剧情�
   清理菲尼克斯尔战后地形装饰: (this: void) => void;
 };
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
@@ -85,7 +79,6 @@ const 亚伦柯斯战后传送模型 = "Common\\Effect\\Form\\Portal\\RicketSecr
 interface 亚伦柯斯前导状态 {
   Boss单位: any;
   已触发对白: boolean;
-  范围触发器?: any;
   取消范围监听?: () => void;
   已注册死亡监听: boolean;
 }
@@ -107,9 +100,7 @@ function 单位存活(this: void, unit: any): boolean {
 function 清理亚伦柯斯范围监听(this: void, 状态: 亚伦柯斯前导状态): void {
   const 取消范围监听 = 状态.取消范围监听;
   if (取消范围监听 != null) 取消范围监听();
-  if (状态.范围触发器 != null && 状态.范围触发器 !== 0) safeDestroyTrigger(状态.范围触发器);
   状态.取消范围监听 = undefined;
-  状态.范围触发器 = undefined;
 }
 
 function 清理亚伦柯斯前导状态(this: void, 状态: 亚伦柯斯前导状态): void {
@@ -221,14 +212,12 @@ function 播放亚伦柯斯前导(this: void, 触发单位: any): void {
   });
 }
 
-function on亚伦柯斯范围触发(this: void): void {
+function on亚伦柯斯范围触发(this: void, 触发单位: any): boolean {
   const 状态 = 当前亚伦柯斯前导状态;
-  if (状态 == null || 状态.已触发对白) return;
+  if (状态 == null || 状态.已触发对白) return false;
   const 当前进度 = 读取剧情进度();
-  if (当前进度 !== 45 && 当前进度 !== 46) return;
-
-  const 触发单位 = GetTriggerUnit();
-  if (!单位存活(触发单位) || !是玩家英雄组单位(触发单位)) return;
+  if (当前进度 !== 45 && 当前进度 !== 46) return false;
+  if (!单位存活(触发单位)) return false;
 
   状态.已触发对白 = true;
   清理亚伦柯斯范围监听(状态);
@@ -238,17 +227,16 @@ function on亚伦柯斯范围触发(this: void): void {
   进入主线节点(46);
   播放亚伦柯斯前导(触发单位);
   重建亚伦柯斯安兹封锁墙(状态.Boss单位);
+  return true;
 }
 
 function 注册亚伦柯斯范围监听(this: void, 状态: 亚伦柯斯前导状态): void {
-  const trigger = CreateTrigger();
-  if (trigger == null || trigger === 0) return;
-  if (safeTriggerAddAction(trigger, on亚伦柯斯范围触发) == null) {
-    safeDestroyTrigger(trigger);
-    return;
-  }
-  状态.范围触发器 = trigger;
-  状态.取消范围监听 = registerUnitInRangeTrigger(trigger, 状态.Boss单位, 亚伦柯斯进入范围, null, false);
+  状态.取消范围监听 = registerOneShotUnitRangeListener(
+    状态.Boss单位,
+    亚伦柯斯进入范围,
+    on亚伦柯斯范围触发,
+    是玩家英雄组单位,
+  );
 }
 
 function 确保亚伦柯斯待战单位(this: void): any {

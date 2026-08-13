@@ -2,7 +2,7 @@
 
 import { 利尔伯特单位技能配置 } from './00．配置';
 import { 获取或创建利尔伯特上下文, 利尔伯特单位存活, type 利尔伯特运行时上下文 } from './01．运行时';
-import { 利尔伯特技能配置 } from './02．数值与表现配置';
+import { 利尔伯特技能配置, 利尔伯特音效配置 } from './02．数值与表现配置';
 import { 目标是否面向来源 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/08．方位判定工具';
 import { 执行Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 利尔伯特BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/10．利尔·伯特';
@@ -36,6 +36,9 @@ const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC�
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
+};
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
 };
 const jass = require('jass.common') as any;
 const globals = require('jass.globals') as { udg_N?: number; [key: string]: any };
@@ -132,6 +135,7 @@ function on审判拷问结算(this: void, variable?: any): void {
     if (!原本不死) 移除单位不死(target);
     if (结果.是否造成伤害) {
       播放审判拷问特效(配置.命中特效, target);
+      播放Boss坐标音效(利尔伯特音效配置.审判拷问.结算命中, GetUnitX(target), GetUnitY(target), 利尔伯特音效配置.默认裁断距离);
       施加快速控制Buff(boss, target, 0, 配置.眩晕秒, '利尔·伯特-审判拷问', '技能');
     }
   }
@@ -156,6 +160,7 @@ export function 释放利尔伯特审判拷问(this: void, 上下文: 利尔伯�
   SetUnitAnimationByIndex(boss, 配置.动作编号);
   显示常规技能吟唱条({ 通道: 配置.读条通道, 总时长: 配置.通魔施法秒, 颜色ID: 配置.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
   播放审判拷问特效(配置.起始特效, target);
+  播放Boss坐标音效(利尔伯特音效配置.审判拷问.锁定, GetUnitX(target), GetUnitY(target), 利尔伯特音效配置.默认裁断距离);
   registerManualBuff(target, 利尔伯特BuffID.审判拷问, 配置.持续秒, 0, { sourceUnit: boss, effectSourceName: '审判拷问', effectSourceType: '技能' });
   状态.Buff运行时 = getBuffRuntime(target, 利尔伯特BuffID.审判拷问);
   上下文.清理.登记清理('审判拷问状态清理', 清理审判拷问状态, 状态);

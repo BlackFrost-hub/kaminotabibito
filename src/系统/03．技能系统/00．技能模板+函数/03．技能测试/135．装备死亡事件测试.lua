@@ -21,9 +21,9 @@ local function _____521B_5EFA_5E76_7ED9_4E88_88C5_5907(_____5355_4F4D, _____88C5
         debugLogForce(_____6A21_5757_540D, "未找到装备", _____88C5_5907_540D)
         return
     end
-    local x = jass.GetUnitX(_____5355_4F4D)
-    local y = jass.GetUnitY(_____5355_4F4D)
-    local item = jass.CreateItem(
+    local x = jass:GetUnitX(_____5355_4F4D)
+    local y = jass:GetUnitY(_____5355_4F4D)
+    local item = jass:CreateItem(
         stringToFourCC(_____7269_54C1ID),
         x,
         y
@@ -32,7 +32,7 @@ local function _____521B_5EFA_5E76_7ED9_4E88_88C5_5907(_____5355_4F4D, _____88C5
         debugLogForce(_____6A21_5757_540D, "创建物品失败", _____88C5_5907_540D, _____7269_54C1ID)
         return
     end
-    jass.UnitAddItem(_____5355_4F4D, item)
+    jass:UnitAddItem(_____5355_4F4D, item)
 end
 local function ____on_804A_59291039_6D4B_8BD5()
     local _____5927_6CD5_5E08 = g.gg_unit_Hamg_0002

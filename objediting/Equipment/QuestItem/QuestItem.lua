@@ -31,3 +31,88 @@ createEquipmentItem('I0G9', '火灵核心', {
   tooltipExtended = '|cffffffcc[任务物品]|r|n击败熔岩恶魔后凝结的火灵核心。|n|cFF808080嵌入古老熔核封印后会燃尽自身，暂时压制熔岩恶魔王的再生。|r',
   description = '|cffffffcc[任务物品]|r|n击败熔岩恶魔后凝结的火灵核心。|n|cFF808080嵌入古老熔核封印后会燃尽自身，暂时压制熔岩恶魔王的再生。|r',
 })
+
+createEquipmentItem('I0JX', '迟到的熔火酒', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\QuestItem\\late_molten_wine.blp',
+  model = 'Equipment\\Model\\QuestItem\\BrownCup.mdx',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 1,
+  charges = 1,
+  priority = 50,
+  goldCost = 0,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffffffcc[任务物品]|r|n酒窖管事托付的一壶熔火酒。|n|cFF808080瓶口封着厚重红蜡，必须趁热送到恶魔城外巡卫手中。|r',
+  description = '|cffffffcc[任务物品]|r|n酒窖管事托付的一壶熔火酒。|n|cFF808080瓶口封着厚重红蜡，必须趁热送到恶魔城外巡卫手中。|r',
+})
+
+createEquipmentItem('I0JY', '遗失的仪式角饰', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\QuestItem\\lost_ritual_horn.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 1,
+  charges = 1,
+  priority = 50,
+  goldCost = 0,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffffffcc[任务物品]|r|n年轻恶魔成年仪式上必须佩戴的黑银角饰。|n|cFF808080表面留着恶魔犬的齿痕，好在核心刻纹没有受损。|r',
+  description = '|cffffffcc[任务物品]|r|n年轻恶魔成年仪式上必须佩戴的黑银角饰。|n|cFF808080表面留着恶魔犬的齿痕，好在核心刻纹没有受损。|r',
+})
+
+createEquipmentItem('I0JZ', '王族旧誓印', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\QuestItem\\royal_old_oath_seal.blp',
+  model = 'Objects\\InventoryItems\\tome\\tome.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 1,
+  charges = 1,
+  priority = 50,
+  goldCost = 0,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffffffcc[任务物品]|r|n从旧墓门誓约标志下取出的王族印记。|n|cFF808080冰冷刻纹仍在低声重复守陵人的古老誓词。|r',
+  description = '|cffffffcc[任务物品]|r|n从旧墓门誓约标志下取出的王族印记。|n|cFF808080冰冷刻纹仍在低声重复守陵人的古老誓词。|r',
+})
+
+createEquipmentItem('I0K0', '余焰采样器', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\QuestItem\\ember_sampling_vessel.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 1,
+  charges = 1,
+  priority = 50,
+  goldCost = 0,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffffffcc[任务物品]|r|n熔灵工匠制作的耐高温采样容器。|n|cFF808080需要依次记录四处余焰的温度与脉动，才能压出稳定样本。|r',
+  description = '|cffffffcc[任务物品]|r|n熔灵工匠制作的耐高温采样容器。|n|cFF808080需要依次记录四处余焰的温度与脉动，才能压出稳定样本。|r',
+})
+
+createEquipmentItem('I0K1', '稳定余焰样本', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\QuestItem\\stable_ember_sample.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 1,
+  charges = 1,
+  priority = 50,
+  goldCost = 0,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffffffcc[任务物品]|r|n由四处熔核余焰共同压成的稳定样本。|n|cFF808080离开熔灵核心后仍保持固定脉动，可交给熔灵工匠重铸炉心。|r',
+  description = '|cffffffcc[任务物品]|r|n由四处熔核余焰共同压成的稳定样本。|n|cFF808080离开熔灵核心后仍保持固定脉动，可交给熔灵工匠重铸炉心。|r',
+})

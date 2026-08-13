@@ -7,6 +7,7 @@ local _____83B7_53D6_6216_521B_5EFA_5229_5C14_4F2F_7279_4E0A_4E0B_6587 = ____01_
 local _____5229_5C14_4F2F_7279_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6["利尔伯特单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.11．利尔·伯特.02．数值与表现配置")
 local _____5229_5C14_4F2F_7279_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["利尔伯特技能配置"]
+local _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["利尔伯特音效配置"]
 local ____16_FF0E_6280_80FD_63D0_793A_5708_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．技能提示圈工厂")
 local _____521B_5EFA_6280_80FD_63D0_793A_5708 = ____16_FF0E_6280_80FD_63D0_793A_5708_5DE5_5382["创建技能提示圈"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
@@ -29,6 +30,8 @@ local ____require_result_6 = require("lib.扩展函数.Star扩展函数.04．EC�
 local EC_CreateEffect = ____require_result_6.EC_CreateEffect
 local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_8["播放Boss坐标音效"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -65,6 +68,7 @@ local function ____on_88C2_5730_65A9_7ED3_7B97(variable)
             local _____843D_70B9 = _____5FEB_7167["落点列表"][i + 1]
             _____64AD_653E_88C2_5730_65A9_70B9_7279_6548(_____914D_7F6E["命中特效"], _____843D_70B9.X, _____843D_70B9.Y)
             _____64AD_653E_88C2_5730_65A9_70B9_7279_6548(_____914D_7F6E["爆炸特效"], _____843D_70B9.X, _____843D_70B9.Y)
+            _____64AD_653EBoss_5750_6807_97F3_6548(_____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["裂地斩"]["爆炸命中"], _____843D_70B9.X, _____843D_70B9.Y, _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["默认裁断距离"])
             local _____76EE_6807_5217_8868 = getEnemyUnitsInRange(boss, _____843D_70B9.X, _____843D_70B9.Y, _____914D_7F6E["作用半径"])
             do
                 local j = 0
@@ -134,6 +138,12 @@ ____exports["释放利尔伯特裂地斩"] = function(_____4E0A_4E0B_6587)
     end
     _____5F00_59CB_786C_76F4(boss, _____914D_7F6E["施法硬直秒"])
     SetUnitAnimationByIndex(boss, _____914D_7F6E["动作编号"])
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["裂地斩"]["蓄力"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5229_5C14_4F2F_7279_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({
         ["通道"] = _____914D_7F6E["读条通道"],
         ["总时长"] = _____914D_7F6E["施法硬直秒"],
@@ -160,8 +170,8 @@ ____exports["释放利尔伯特裂地斩"] = function(_____4E0A_4E0B_6587)
     end
     local _____5FEB_7167 = {["上下文"] = _____4E0A_4E0B_6587, ["落点列表"] = _____843D_70B9_5217_8868}
     local _____56DE_8C03ID = addDelayedCallback(_____914D_7F6E["预警秒"] * 1000, ____on_88C2_5730_65A9_7ED3_7B97, _____5FEB_7167)
-    local ____self_10 = _____4E0A_4E0B_6587["清理"]
-    ____self_10["登记延迟回调"](____self_10, "裂地斩结算", _____56DE_8C03ID)
+    local ____self_11 = _____4E0A_4E0B_6587["清理"]
+    ____self_11["登记延迟回调"](____self_11, "裂地斩结算", _____56DE_8C03ID)
     return true
 end
 local function ____on_5229_5C14_4F2F_7279_88C2_5730_65A9_751F_6548(castingUnit, spellAbilityId)

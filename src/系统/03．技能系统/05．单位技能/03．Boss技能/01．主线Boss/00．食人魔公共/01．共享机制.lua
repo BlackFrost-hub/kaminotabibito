@@ -35,13 +35,15 @@ local _____95EA_7535_6548_679C_4EE3_7801 = ____require_result_7["闪电效果代
 local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.10．跳链.单位绑定闪电")
 local _____521B_5EFA_5355_4F4D_7ED1_5B9A_95EA_7535 = ____require_result_8["创建单位绑定闪电"]
 local _____9500_6BC1_5355_4F4D_7ED1_5B9A_95EA_7535 = ____require_result_8["销毁单位绑定闪电"]
-local ____require_result_9 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_9["显示大招吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_9["关闭吟唱条"]
-local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_10.debugLogForce
-local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_11.Sound3DII_CooPlayReuse
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.方向抵抗牵引")
+local _____5F00_59CB_65B9_5411_62B5_6297_7275_5F15 = ____require_result_9["开始方向抵抗牵引"]
+local ____require_result_10 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_10["显示大招吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_10["关闭吟唱条"]
+local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_11.debugLogForce
+local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -49,16 +51,11 @@ local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local SetUnitX = jass.SetUnitX
-local SetUnitY = jass.SetUnitY
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local SetUnitAnimation = jass.SetUnitAnimation
 local GetUnitStateJapi = japi.GetUnitState
 local UnitResetCooldown = jass.UnitResetCooldown
-local Atan2 = jass.Atan2
-local Cos = jass.Cos
-local Sin = jass.Sin
 local IsUnitType = jass.IsUnitType
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -273,64 +270,40 @@ local function ____on_98DF_4EBA_9B54_51FB_6740(dyingUnit, killingUnit)
         _____72B6_6001["完成回调ID"]
     )
 end
-local function ____on_96F7_9706_9707_6012_7275_5F15(variable)
-    local data = variable
-    if data == nil then
-        return
+local function _____83B7_53D6_96F7_9706_9707_6012_7275_5F15_76EE_6807(data)
+    return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(data["Boss单位"])
+end
+local function _____8FC7_6EE4_96F7_9706_9707_6012_7275_5F15_76EE_6807(data, target)
+    if not _____5355_4F4D_5B58_6D3B(target) or not _____5355_4F4D_5B58_6D3B(data["Boss单位"]) then
+        return false
     end
-    if not _____5355_4F4D_5B58_6D3B(data["Boss单位"]) then
-        if data["周期ID"] > 0 then
-            removePeriodicCallback(data["周期ID"])
-        end
-        return
-    end
-    local boss = data["Boss单位"]
-    local cfg = data["配置"]
-    local bx = GetUnitX(boss)
-    local by = GetUnitY(boss)
-    local targets = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
-    local maxDistanceSquared = cfg["牵引范围"] * cfg["牵引范围"]
-    local movedCount = 0
-    do
-        local i = 0
-        while i < #targets do
-            do
-                local target = targets[i + 1]
-                if not _____5355_4F4D_5B58_6D3B(target) then
-                    goto __continue33
-                end
-                local dx = bx - GetUnitX(target)
-                local dy = by - GetUnitY(target)
-                if dx * dx + dy * dy > maxDistanceSquared then
-                    goto __continue33
-                end
-                local angle = Atan2(dy, dx)
-                SetUnitX(
-                    target,
-                    GetUnitX(target) + Cos(angle) * cfg["每次牵引距离"]
-                )
-                SetUnitY(
-                    target,
-                    GetUnitY(target) + Sin(angle) * cfg["每次牵引距离"]
-                )
-                movedCount = movedCount + 1
-            end
-            ::__continue33::
-            i = i + 1
-        end
-    end
-    data["剩余牵引次数"] = data["剩余牵引次数"] - 1
-    if data["剩余牵引次数"] <= 0 and data["周期ID"] > 0 then
-        removePeriodicCallback(data["周期ID"])
-        data["周期ID"] = 0
-    end
+    local dx = GetUnitX(data["Boss单位"]) - GetUnitX(target)
+    local dy = GetUnitY(data["Boss单位"]) - GetUnitY(target)
+    return dx * dx + dy * dy <= data["配置"]["牵引范围"] * data["配置"]["牵引范围"]
 end
 local function ____on_96F7_9706_9707_6012_5F00_59CB_7275_5F15(variable)
     local data = variable
     if data == nil or not _____5355_4F4D_5B58_6D3B(data["Boss单位"]) then
         return
     end
-    data["周期ID"] = addPeriodicCallback(data["配置"]["牵引间隔秒"] * 1000, ____on_96F7_9706_9707_6012_7275_5F15, data)
+    data["牵引控制器"] = _____5F00_59CB_65B9_5411_62B5_6297_7275_5F15({
+        ["名称"] = "食人魔-雷霆震怒",
+        ["目标单位列表"] = {},
+        ["目标单位提供器"] = function()
+            return _____83B7_53D6_96F7_9706_9707_6012_7275_5F15_76EE_6807(data)
+        end,
+        ["中心单位"] = data["Boss单位"],
+        ["持续秒"] = data["配置"]["牵引间隔秒"] * (data["配置"]["牵引次数"] + 1),
+        ["每秒拉力速度"] = data["配置"]["每次牵引距离"] / data["配置"]["牵引间隔秒"],
+        ["抵抗方向角度"] = 0,
+        ["启用方向抵抗"] = false,
+        ["Tick毫秒"] = data["配置"]["牵引间隔秒"] * 1000,
+        ["最大执行次数"] = data["配置"]["牵引次数"],
+        ["到达距离"] = 0,
+        ["过滤单位"] = function(target)
+            return _____8FC7_6EE4_96F7_9706_9707_6012_7275_5F15_76EE_6807(data, target)
+        end
+    })
 end
 local function ____on_96F7_9706_9707_6012_7ED3_7B97(variable)
     local data = variable
@@ -365,12 +338,12 @@ local function ____on_96F7_9706_9707_6012_7ED3_7B97(variable)
             do
                 local center = centers[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(center) then
-                    goto __continue43
+                    goto __continue39
                 end
                 local cdx = GetUnitX(center) - bx
                 local cdy = GetUnitY(center) - by
                 if cdx * cdx + cdy * cdy > selectSquared then
-                    goto __continue43
+                    goto __continue39
                 end
                 local cx = GetUnitX(center)
                 local cy = GetUnitY(center)
@@ -400,12 +373,12 @@ local function ____on_96F7_9706_9707_6012_7ED3_7B97(variable)
                         do
                             local target = centers[j + 1]
                             if not _____5355_4F4D_5B58_6D3B(target) then
-                                goto __continue47
+                                goto __continue43
                             end
                             local dx = GetUnitX(target) - cx
                             local dy = GetUnitY(target) - cy
                             if dx * dx + dy * dy > hitSquared then
-                                goto __continue47
+                                goto __continue43
                             end
                             _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
                                 ["来源"] = boss,
@@ -419,12 +392,12 @@ local function ____on_96F7_9706_9707_6012_7ED3_7B97(variable)
                                 ["标签"] = "食人魔·雷霆震怒"
                             })
                         end
-                        ::__continue47::
+                        ::__continue43::
                         j = j + 1
                     end
                 end
             end
-            ::__continue43::
+            ::__continue39::
             i = i + 1
         end
     end
@@ -434,10 +407,10 @@ local function ____on_96F7_9706_9707_6012_786C_76F4_7ED3_675F(variable)
     if data == nil then
         return
     end
-    if data["周期ID"] > 0 then
-        removePeriodicCallback(data["周期ID"])
+    if data["牵引控制器"] ~= nil then
+        data["牵引控制器"]["停止"]()
     end
-    data["周期ID"] = 0
+    data["牵引控制器"] = nil
     if data["无敌尚未恢复"] then
         data["无敌尚未恢复"] = false
         if _____5355_4F4D_5B58_6D3B(data["Boss单位"]) then
@@ -487,8 +460,7 @@ ____exports["施放食人魔雷霆震怒"] = function(boss, _____914D_7F6E)
     local data = {
         ["Boss单位"] = boss,
         ["配置"] = _____914D_7F6E,
-        ["剩余牵引次数"] = _____914D_7F6E["牵引次数"],
-        ["周期ID"] = 0,
+        ["牵引控制器"] = nil,
         ["无敌尚未恢复"] = true,
         ["起手闪电句柄列表"] = {}
     }

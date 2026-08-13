@@ -11,6 +11,7 @@ local _____83B7_53D6_6216_521B_5EFA_6559_6D3E_5251_58EB_4E0A_4E0B_6587 = ____01_
 local _____6559_6D3E_5251_58EB_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["教派剑士单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.12．教派剑士.02．数值与表现配置")
 local _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派剑士技能配置"]
+local _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派剑士音效配置"]
 local ____11_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.12．教派剑士.11．台词播放")
 local _____64AD_653E_6559_6D3E_5251_58EB_53F0_8BCD = ____11_FF0E_53F0_8BCD_64AD_653E["播放教派剑士台词"]
 local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
@@ -46,8 +47,10 @@ local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.01�
 local getEnemyUnitsInRange = ____require_result_6.getEnemyUnitsInRange
 local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
-local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_8.debugLogForce
+local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_8.Sound3DII_CooPlayReuse
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_9.debugLogForce
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetRandomReal = jass.GetRandomReal
@@ -258,8 +261,8 @@ local function ____on_6DF1_6E0A_65CB_98CE_53D1_5C04(variable)
         Y = Y,
         ["禁止结算"] = false
     }
-    local ____5FEB_7167__72B6_6001__5F39_5E55ID_5217_8868_9 = _____5FEB_7167["状态"]["弹幕ID列表"]
-    ____5FEB_7167__72B6_6001__5F39_5E55ID_5217_8868_9[#____5FEB_7167__72B6_6001__5F39_5E55ID_5217_8868_9 + 1] = _____5F39_5E55["弹幕ID"]
+    local ____5FEB_7167__72B6_6001__5F39_5E55ID_5217_8868_10 = _____5FEB_7167["状态"]["弹幕ID列表"]
+    ____5FEB_7167__72B6_6001__5F39_5E55ID_5217_8868_10[#____5FEB_7167__72B6_6001__5F39_5E55ID_5217_8868_10 + 1] = _____5F39_5E55["弹幕ID"]
     debugLogForce(
         "教派剑士-深渊旋风",
         "旋风弹幕发射",
@@ -306,8 +309,8 @@ local function ____on_6DF1_6E0A_65CB_98CE_8F6E_6B21(variable)
     })
     local _____5FEB_7167 = {["状态"] = _____72B6_6001, ["角度"] = _____89D2_5EA6}
     local _____53D1_5C04_56DE_8C03ID = addDelayedCallback(_____914D_7F6E["预警秒"] * 1000, ____on_6DF1_6E0A_65CB_98CE_53D1_5C04, _____5FEB_7167)
-    local ____self_10 = _____72B6_6001["上下文"]["清理"]
-    ____self_10["登记延迟回调"](____self_10, "教派剑士-深渊旋风发射", _____53D1_5C04_56DE_8C03ID)
+    local ____self_11 = _____72B6_6001["上下文"]["清理"]
+    ____self_11["登记延迟回调"](____self_11, "教派剑士-深渊旋风发射", _____53D1_5C04_56DE_8C03ID)
     debugLogForce(
         "教派剑士-深渊旋风",
         "轮次预警",
@@ -326,21 +329,21 @@ local function ____on_6DF1_6E0A_65CB_98CE_8F6E_6B21(variable)
             _____72B6_6001["周期回调ID"] = 0
         end
         local _____6536_675F_56DE_8C03ID = addDelayedCallback((_____914D_7F6E["预警秒"] + _____914D_7F6E["末轮收束冗余秒"]) * 1000, ____on_6DF1_6E0A_65CB_98CE_672B_8F6E_6536_675F, _____72B6_6001)
-        local ____self_11 = _____72B6_6001["上下文"]["清理"]
-        ____self_11["登记延迟回调"](____self_11, "教派剑士-深渊旋风末轮收束", _____6536_675F_56DE_8C03ID)
+        local ____self_12 = _____72B6_6001["上下文"]["清理"]
+        ____self_12["登记延迟回调"](____self_12, "教派剑士-深渊旋风末轮收束", _____6536_675F_56DE_8C03ID)
     end
 end
 local function _____6559_6D3E_5251_58EB_65CB_98CE_9B54_6CD5_514D_75AB_4FEE_6B63(context)
     if context == nil or context.target == nil or context.target == 0 or context.isMagicDamage ~= true then
-        local ____opt_result_14
+        local ____opt_result_15
         if context ~= nil then
-            ____opt_result_14 = context.currentDamage
+            ____opt_result_15 = context.currentDamage
         end
-        local ____opt_result_14_15 = ____opt_result_14
-        if ____opt_result_14_15 == nil then
-            ____opt_result_14_15 = 0
+        local ____opt_result_15_16 = ____opt_result_15
+        if ____opt_result_15_16 == nil then
+            ____opt_result_15_16 = 0
         end
-        return ____opt_result_14_15
+        return ____opt_result_15_16
     end
     if GetUnitTypeId(context.target) ~= _____6559_6D3E_5251_58EB_5355_4F4D_7C7B_578BID then
         return context.currentDamage
@@ -374,11 +377,18 @@ ____exports["释放教派剑士深渊旋风"] = function(_____4E0A_4E0B_6587)
         ["弹幕ID列表"] = {}
     }
     _____4E0A_4E0B_6587["旋风状态"] = _____72B6_6001
-    local ____self_20 = _____4E0A_4E0B_6587["清理"]
-    ____self_20["登记清理"](____self_20, "教派剑士-深渊旋风清理", ____on_6DF1_6E0A_65CB_98CE_6E05_7406, _____72B6_6001)
+    local ____self_21 = _____4E0A_4E0B_6587["清理"]
+    ____self_21["登记清理"](____self_21, "教派剑士-深渊旋风清理", ____on_6DF1_6E0A_65CB_98CE_6E05_7406, _____72B6_6001)
     _____5F00_59CB_786C_76F4(boss, _____914D_7F6E["施法硬直秒"])
     SetUnitAnimation(boss, _____914D_7F6E["动作名"])
     _____64AD_653E_6559_6D3E_5251_58EB_53F0_8BCD(boss, "深渊旋风")
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["深渊旋风"]["旋风起手"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
+    )
     registerManualBuff(
         boss,
         _____6559_6D3E_5251_58EBBuffID["深渊旋风"],
@@ -394,8 +404,8 @@ ____exports["释放教派剑士深渊旋风"] = function(_____4E0A_4E0B_6587)
         ["提示文本"] = _____914D_7F6E["读条提示"]
     })
     _____72B6_6001["周期回调ID"] = addPeriodicCallback(_____914D_7F6E["轮次间隔秒"] * 1000, ____on_6DF1_6E0A_65CB_98CE_8F6E_6B21, _____72B6_6001)
-    local ____self_21 = _____4E0A_4E0B_6587["清理"]
-    ____self_21["登记周期回调"](____self_21, "教派剑士-深渊旋风轮次", _____72B6_6001["周期回调ID"])
+    local ____self_22 = _____4E0A_4E0B_6587["清理"]
+    ____self_22["登记周期回调"](____self_22, "教派剑士-深渊旋风轮次", _____72B6_6001["周期回调ID"])
     debugLogForce(
         "教派剑士-深渊旋风",
         "施法开始",

@@ -108,13 +108,13 @@ local function ensureStesKeys(self)
     if keysInitialized then
         return
     end
-    skey_count = jass.StringHash("count")
+    skey_count = jass:StringHash("count")
     ____exports.skey_count = skey_count
-    skey_countEx = jass.StringHash("countEx")
+    skey_countEx = jass:StringHash("countEx")
     ____exports.skey_countEx = skey_countEx
-    skey_index = jass.StringHash("index")
+    skey_index = jass:StringHash("index")
     ____exports.skey_index = skey_index
-    skey_indexEx = jass.StringHash("indexEx")
+    skey_indexEx = jass:StringHash("indexEx")
     ____exports.skey_indexEx = skey_indexEx
     keysInitialized = true
     if jglobals then
@@ -147,7 +147,7 @@ local function ensureLuaOnlyStesTable(self)
     if StarBaseHT ~= nil and StarBaseHT ~= 0 then
         return
     end
-    local ht = jass.InitHashtable()
+    local ht = jass:InitHashtable()
     StarBaseHT = ht
     ____exports.StarBaseHT = StarBaseHT
     local g = _G
@@ -158,12 +158,12 @@ local function init(self)
     refreshStesBinding(nil)
 end
 --- 获取自定义事件系统使用的全局哈希表（与 JASS STES_GetTable 相同语义）
-function ____exports.STES_GetTable()
+function ____exports.STES_GetTable(self, ____self)
     init(nil)
     return StarBaseHT
 end
 --- 为触发器注册自定义事件
-function ____exports.STES_Register(a, b, c)
+function ____exports.STES_Register(self, ____self, a, b, c)
     init(nil)
     refreshStesBinding(nil)
     if not StarBaseHT then
@@ -187,17 +187,17 @@ function ____exports.STES_Register(a, b, c)
     if type(name) ~= "string" or t == nil or t == 0 then
         return
     end
-    local hash = jass.StringHash(name)
-    local hd = jass.GetHandleId(t)
-    local index = jass.LoadInteger(StarBaseHT, hash, skey_index)
-    local index2 = jass.LoadInteger(StarBaseHT, hd, skey_index)
-    jass.SaveTriggerHandle(StarBaseHT, hash, index, t)
-    jass.SaveInteger(StarBaseHT, hash, skey_index, index + 1)
-    jass.SaveStr(StarBaseHT, hd, index2, name)
-    jass.SaveInteger(StarBaseHT, hd, skey_index, index2 + 1)
+    local hash = jass:StringHash(name)
+    local hd = jass:GetHandleId(t)
+    local index = jass:LoadInteger(StarBaseHT, hash, skey_index)
+    local index2 = jass:LoadInteger(StarBaseHT, hd, skey_index)
+    jass:SaveTriggerHandle(StarBaseHT, hash, index, t)
+    jass:SaveInteger(StarBaseHT, hash, skey_index, index + 1)
+    jass:SaveStr(StarBaseHT, hd, index2, name)
+    jass:SaveInteger(StarBaseHT, hd, skey_index, index2 + 1)
 end
 --- RegisterEx：与 zinc STES_RegisterEx 一致（函数字符串 ↔ 事件名字符串，使用 skey_indexEx）
-function ____exports.STES_RegisterEx(funcName, eventName)
+function ____exports.STES_RegisterEx(self, ____self, funcName, eventName)
     init(nil)
     refreshStesBinding(nil)
     if not StarBaseHT then
@@ -209,37 +209,37 @@ function ____exports.STES_RegisterEx(funcName, eventName)
     if type(funcName) ~= "string" or type(eventName) ~= "string" then
         return
     end
-    local hash = jass.StringHash(eventName)
-    local hd = jass.StringHash(funcName)
-    local index = jass.LoadInteger(StarBaseHT, hash, skey_indexEx)
-    local index2 = jass.LoadInteger(StarBaseHT, hd, skey_indexEx)
-    jass.SaveStr(StarBaseHT, hash, index, funcName)
-    jass.SaveInteger(StarBaseHT, hash, skey_indexEx, index + 1)
-    jass.SaveStr(StarBaseHT, hd, index2, eventName)
-    jass.SaveInteger(StarBaseHT, hd, skey_indexEx, index2 + 1)
+    local hash = jass:StringHash(eventName)
+    local hd = jass:StringHash(funcName)
+    local index = jass:LoadInteger(StarBaseHT, hash, skey_indexEx)
+    local index2 = jass:LoadInteger(StarBaseHT, hd, skey_indexEx)
+    jass:SaveStr(StarBaseHT, hash, index, funcName)
+    jass:SaveInteger(StarBaseHT, hash, skey_indexEx, index + 1)
+    jass:SaveStr(StarBaseHT, hd, index2, eventName)
+    jass:SaveInteger(StarBaseHT, hd, skey_indexEx, index2 + 1)
 end
 --- 与 JASS STES_GetUnitEvent 一致：I2S(GetHandleId(u)) + name
-function ____exports.STES_GetUnitEvent(u, name)
+function ____exports.STES_GetUnitEvent(self, ____self, u, name)
     if u == nil or u == 0 then
         return name
     end
-    return tostring(jass.GetHandleId(u)) .. name
+    return tostring(jass:GetHandleId(u)) .. name
 end
 --- 与 JASS STES_Execute 一致：仅遍历触发器，Evaluate 通过才 Execute
-function ____exports.STES_Execute(name)
+function ____exports.STES_Execute(self, ____self, name)
     init(nil)
     refreshStesBinding(nil)
     if not StarBaseHT then
         return
     end
-    local hash = jass.StringHash(name)
-    local index = jass.LoadInteger(StarBaseHT, hash, skey_index)
+    local hash = jass:StringHash(name)
+    local index = jass:LoadInteger(StarBaseHT, hash, skey_index)
     local i = 0
     while i < index do
-        local t = jass.LoadTriggerHandle(StarBaseHT, hash, i)
+        local t = jass:LoadTriggerHandle(StarBaseHT, hash, i)
         if t then
-            if jass.TriggerEvaluate(t) then
-                jass.TriggerExecute(t)
+            if jass:TriggerEvaluate(t) then
+                jass:TriggerExecute(t)
             end
         end
         i = i + 1
@@ -252,13 +252,13 @@ function ____exports.STES_Fire(name)
     if not StarBaseHT then
         return
     end
-    local hash = jass.StringHash(name)
-    local loopIndex = jass.LoadInteger(StarBaseHT, hash, skey_index)
+    local hash = jass:StringHash(name)
+    local loopIndex = jass:LoadInteger(StarBaseHT, hash, skey_index)
     _indexStack[#_indexStack + 1] = getG_SIndex(nil)
     do
         local i = 0
         while i < loopIndex do
-            local trg = jass.LoadTriggerHandle(StarBaseHT, hash, i)
+            local trg = jass:LoadTriggerHandle(StarBaseHT, hash, i)
             if trg then
                 YDLocalExecuteTrigger(nil, trg)
                 saveParentIndex(nil, trg)
@@ -278,13 +278,13 @@ function ____exports.STES_FireWithParams(name, params)
     if not StarBaseHT then
         return
     end
-    local hash = jass.StringHash(name)
-    local loopIndex = jass.LoadInteger(StarBaseHT, hash, skey_index)
+    local hash = jass:StringHash(name)
+    local loopIndex = jass:LoadInteger(StarBaseHT, hash, skey_index)
     _indexStack[#_indexStack + 1] = getG_SIndex(nil)
     do
         local i = 0
         while i < loopIndex do
-            local trg = jass.LoadTriggerHandle(StarBaseHT, hash, i)
+            local trg = jass:LoadTriggerHandle(StarBaseHT, hash, i)
             if trg then
                 YDLocalExecuteTrigger(nil, trg)
                 saveParentIndex(nil, trg)
@@ -317,13 +317,13 @@ function ____exports.STES_FireWithReal11Step(name, realParamKey)
     if realParamKey == "" then
         return
     end
-    local hash = jass.StringHash(name)
-    local loopIndex = jass.LoadInteger(StarBaseHT, hash, skey_index)
+    local hash = jass:StringHash(name)
+    local loopIndex = jass:LoadInteger(StarBaseHT, hash, skey_index)
     _indexStack[#_indexStack + 1] = getG_SIndex(nil)
     do
         local i = 0
         while i < loopIndex do
-            local trg = jass.LoadTriggerHandle(StarBaseHT, hash, i)
+            local trg = jass:LoadTriggerHandle(StarBaseHT, hash, i)
             if trg then
                 YDLocalExecuteTrigger(nil, trg)
                 saveParentIndex(nil, trg)
@@ -338,7 +338,7 @@ function ____exports.STES_FireWithReal11Step(name, realParamKey)
     setG_LIndex(nil, prevIndex)
 end
 --- 清除触发器在 STES 中注册的指定事件名（修正 zinc 中误写 hash 父键的问题）
-function ____exports.STES_RemoveEvent(t, targetName)
+function ____exports.STES_RemoveEvent(self, ____self, t, targetName)
     init(nil)
     refreshStesBinding(nil)
     if not StarBaseHT or t == nil or t == 0 then
@@ -348,37 +348,37 @@ function ____exports.STES_RemoveEvent(t, targetName)
         return
     end
     local HT = StarBaseHT
-    local hd = jass.GetHandleId(t)
-    local evCount = jass.LoadInteger(HT, hd, skey_index)
+    local hd = jass:GetHandleId(t)
+    local evCount = jass:LoadInteger(HT, hd, skey_index)
     local i = 0
     while i < evCount do
         do
-            local nm = jass.LoadStr(HT, hd, i)
+            local nm = jass:LoadStr(HT, hd, i)
             if nm == targetName then
-                local nameHash = jass.StringHash(nm)
-                local a = jass.LoadInteger(HT, nameHash, skey_index)
+                local nameHash = jass:StringHash(nm)
+                local a = jass:LoadInteger(HT, nameHash, skey_index)
                 local b = 0
                 while b < a do
-                    local t1 = jass.LoadTriggerHandle(HT, nameHash, b)
+                    local t1 = jass:LoadTriggerHandle(HT, nameHash, b)
                     if t1 == t then
                         a = a - 1
-                        local tTop = jass.LoadTriggerHandle(HT, nameHash, a)
-                        jass.SaveTriggerHandle(HT, nameHash, b, tTop)
-                        jass.SaveInteger(HT, nameHash, skey_index, a)
+                        local tTop = jass:LoadTriggerHandle(HT, nameHash, a)
+                        jass:SaveTriggerHandle(HT, nameHash, b, tTop)
+                        jass:SaveInteger(HT, nameHash, skey_index, a)
                         if a >= b then
                             break
                         end
                     end
                     b = b + 1
                 end
-                jass.SaveStr(
+                jass:SaveStr(
                     HT,
                     hd,
                     i,
-                    jass.LoadStr(HT, hd, evCount - 1)
+                    jass:LoadStr(HT, hd, evCount - 1)
                 )
                 evCount = evCount - 1
-                jass.SaveInteger(HT, hd, skey_index, evCount)
+                jass:SaveInteger(HT, hd, skey_index, evCount)
                 if i >= evCount then
                     break
                 end
@@ -390,28 +390,28 @@ function ____exports.STES_RemoveEvent(t, targetName)
     end
 end
 --- 清除触发器上绑定的所有 STES 事件
-function ____exports.STES_Remove(t)
+function ____exports.STES_Remove(self, ____self, t)
     init(nil)
     refreshStesBinding(nil)
     if not StarBaseHT or t == nil or t == 0 then
         return
     end
     local HT = StarBaseHT
-    local hd = jass.GetHandleId(t)
-    local evCount = jass.LoadInteger(HT, hd, skey_index)
+    local hd = jass:GetHandleId(t)
+    local evCount = jass:LoadInteger(HT, hd, skey_index)
     local i = 0
     while i < evCount do
-        local nm = jass.LoadStr(HT, hd, i)
-        local nameHash = jass.StringHash(nm)
-        local a = jass.LoadInteger(HT, nameHash, skey_index)
+        local nm = jass:LoadStr(HT, hd, i)
+        local nameHash = jass:StringHash(nm)
+        local a = jass:LoadInteger(HT, nameHash, skey_index)
         local b = 0
         while b < a do
-            local t1 = jass.LoadTriggerHandle(HT, nameHash, b)
+            local t1 = jass:LoadTriggerHandle(HT, nameHash, b)
             if t1 == t then
                 a = a - 1
-                local tTop = jass.LoadTriggerHandle(HT, nameHash, a)
-                jass.SaveTriggerHandle(HT, nameHash, b, tTop)
-                jass.SaveInteger(HT, nameHash, skey_index, a)
+                local tTop = jass:LoadTriggerHandle(HT, nameHash, a)
+                jass:SaveTriggerHandle(HT, nameHash, b, tTop)
+                jass:SaveInteger(HT, nameHash, skey_index, a)
                 if a >= b then
                     break
                 end
@@ -420,7 +420,7 @@ function ____exports.STES_Remove(t)
         end
         i = i + 1
     end
-    jass.FlushChildHashtable(HT, hd)
+    jass:FlushChildHashtable(HT, hd)
 end
 ____exports.StarBaseHT = StarBaseHT
 ____exports.skey_count = skey_count

@@ -18,6 +18,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.11．剧情系统.02．支线任务.00．通用小任务.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 function ____exports.init()
     ____init_88AB_9A71_9010_7684_6C34_602A()
     ____init_6C61_67D3_4E4B_732B_7C73_4E9A()

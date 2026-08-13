@@ -24,6 +24,42 @@ createEquipmentItem('I0EB', '纯净水源吊坠', {
   description = '|cffccffff[道具/饰品]-生存/恢复|r|n|cffffcc99等级：B|n评分：6800|r|n|cffffffcc[基础属性]|r|n生命值+2600|n魔法抗性+25%|n治疗效果+20%|n生命恢复+120|n|cffffffcc[特效]|r|n净水回响：受到伤害时恢复5%最大生命值，冷却18秒。|n|cFF808080污染水域中仅存的一缕清流被封入吊坠，像在浊浪里固执发光。|r',
 })
 
+createEquipmentItem('I0HF', '王城荣誉徽记', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\wangcheng_honor_badge.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  score = 5200,
+  tooltipExtended = '|cffccffff[道具/饰品]-均衡/守护|r|n|cffffcc99等级：C+|n评分：5200|r|n|cffffffcc[基础属性]|r|n全属性+20|n护甲+12|n生命值+900|n|cFF808080王城卫队授予守护边境者的正式徽记，记录着一次不容忽视的功绩。|r',
+  description = '|cffccffff[道具/饰品]-均衡/守护|r|n|cffffcc99等级：C+|n评分：5200|r|n|cffffffcc[基础属性]|r|n全属性+20|n护甲+12|n生命值+900|n|cFF808080王城卫队授予守护边境者的正式徽记，记录着一次不容忽视的功绩。|r',
+})
+
+createEquipmentItem('I0HG', '王城先行者徽印', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\wangcheng_pioneer_seal.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 5900,
+  tooltipExtended = '|cffccffff[道具/饰品]-敏捷/机动|r|n|cffffcc99等级：B-|n评分：5900|r|n|cffffffcc[基础属性]|r|n攻击力+80|n敏捷+28|n攻击速度+25%|n移动速度+10%|n冷却缩减+6%|n|cFF808080只有最先赶到边境、最先回应王城号令的人，才会得到这枚先行者徽印。|r',
+  description = '|cffccffff[道具/饰品]-敏捷/机动|r|n|cffffcc99等级：B-|n评分：5900|r|n|cffffffcc[基础属性]|r|n攻击力+80|n敏捷+28|n攻击速度+25%|n移动速度+10%|n冷却缩减+6%|n|cFF808080只有最先赶到边境、最先回应王城号令的人，才会得到这枚先行者徽印。|r',
+})
+
+createEquipmentItem('I0HI', '花灵祝福', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\flower_spirit_blessing.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  score = 5600,
+  tooltipExtended = '|cffccffff[道具/饰品]-恢复/自然守护|r|n|cffffcc99等级：C+|n评分：5600|r|n|cffffffcc[基础属性]|r|n生命值+1600|n生命恢复+80|n治疗效果+18%|n冷却缩减+8%|n木属性抗性+15%|n|cFF808080花灵从重新盛放的花圃中凝成的祝福，柔和的微光会回应守护者的呼吸。|r',
+  description = '|cffccffff[道具/饰品]-恢复/自然守护|r|n|cffffcc99等级：C+|n评分：5600|r|n|cffffffcc[基础属性]|r|n生命值+1600|n生命恢复+80|n治疗效果+18%|n冷却缩减+8%|n木属性抗性+15%|n|cFF808080花灵从重新盛放的花圃中凝成的祝福，柔和的微光会回应守护者的呼吸。|r',
+})
+
 createEquipmentItem('I0E0', '执法者徽记', {
   baseId = 'azhr',
   icon = 'Equipment\\Icon\\Item\\enforcer_badge.blp',
@@ -432,4 +468,228 @@ createEquipmentItem('I0H3', '净水核心护符', {
   score = 5000,
   tooltipExtended = '|cffccffff[饰品/护符]-通用/净水|r|n|cffffcc99等级：C+|n评分：5000|r|n|cffffffcc[基础属性]|r|n全属性+20|n生命值+1200|n技能治疗率+12%|n水属性抗性+15%|n冷却缩减+7%|n|cFF808080净化后的水核仍映着淡紫色潮纹，贴近时能听见清澈而稳定的流动声。|r',
   description = '|cffccffff[饰品/护符]-通用/净水|r|n|cffffcc99等级：C+|n评分：5000|r|n|cffffffcc[基础属性]|r|n全属性+20|n生命值+1200|n技能治疗率+12%|n水属性抗性+15%|n冷却缩减+7%|n|cFF808080净化后的水核仍映着淡紫色潮纹，贴近时能听见清澈而稳定的流动声。|r',
+})
+
+createEquipmentItem('I0H4', '星露花', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\starlit_flower.blp',
+  model = 'war3mapImported\\AnimatedFlowerAv343.mdx',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 0,
+  unclassifiedLevel = 0,
+  priority = 100,
+  goldCost = 0,
+  hitPoints = 1,
+  charges = 1,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffc0c0c0材料|r|n|cff99ccff在精灵王城外野地生长的星辉花朵，可用于制作药水与任务物品。|r',
+  description = '|cffc0c0c0材料|r|n|cff99ccff在精灵王城外野地生长的星辉花朵，可用于制作药水与任务物品。|r',
+})
+
+createEquipmentItem('I0H5', '晨曦花', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\dawn_flower.blp',
+  model = 'war3mapImported\\AnimatedFlowerDv014.mdx',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 0,
+  unclassifiedLevel = 0,
+  priority = 110,
+  goldCost = 0,
+  hitPoints = 1,
+  charges = 1,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffc0c0c0材料|r|n|cffffcc66吸收晨光后绽放的金色花朵，可用于制作药水与任务物品。|r',
+  description = '|cffc0c0c0材料|r|n|cffffcc66吸收晨光后绽放的金色花朵，可用于制作药水与任务物品。|r',
+})
+
+createEquipmentItem('I0H6', '月影花', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\moonshadow_flower.blp',
+  model = 'war3mapImported\\AnimatedFlowerEv017.mdx',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 0,
+  unclassifiedLevel = 0,
+  priority = 120,
+  goldCost = 0,
+  hitPoints = 1,
+  charges = 1,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffc0c0c0材料|r|n|cffcc99ff只在月色下凝聚灵力的紫色花朵，可用于制作药水与任务物品。|r',
+  description = '|cffc0c0c0材料|r|n|cffcc99ff只在月色下凝聚灵力的紫色花朵，可用于制作药水与任务物品。|r',
+})
+
+createEquipmentItem('I0HJ', '月纹熊革', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\moonmarked_bear_leather.blp',
+  model = 'Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 0,
+  unclassifiedLevel = 0,
+  priority = 130,
+  goldCost = 650,
+  hitPoints = 1,
+  charges = 1,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = true,
+  tooltipExtended = '|cffc0c0c0材料|r|n|cffd8d8e8带有天然月纹的厚实熊革，适合制作承受冲击的甲料。|r',
+  description = '|cffc0c0c0材料|r|n|cffd8d8e8带有天然月纹的厚实熊革，适合制作承受冲击的甲料。|r',
+})
+
+createEquipmentItem('I0HK', '古树韧藤', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\ancient_tree_tough_vine.blp',
+  model = 'Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 0,
+  unclassifiedLevel = 0,
+  priority = 140,
+  goldCost = 700,
+  hitPoints = 1,
+  charges = 1,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = true,
+  tooltipExtended = '|cffc0c0c0材料|r|n|cff99cc66树魔长期滋养的坚韧藤条，纤维紧密，适合作为复合甲料骨架。|r',
+  description = '|cffc0c0c0材料|r|n|cff99cc66树魔长期滋养的坚韧藤条，纤维紧密，适合作为复合甲料骨架。|r',
+})
+
+createEquipmentItem('I0HL', '食人花灵纤', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\devouring_flower_spirit_fiber.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 0,
+  unclassifiedLevel = 0,
+  priority = 150,
+  goldCost = 750,
+  hitPoints = 1,
+  charges = 1,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = true,
+  tooltipExtended = '|cffc0c0c0材料|r|n|cffcc99ff从大嘴食人花体内取得的灵性纤维，能够隔离腐气与轻微术法侵蚀。|r',
+  description = '|cffc0c0c0材料|r|n|cffcc99ff从大嘴食人花体内取得的灵性纤维，能够隔离腐气与轻微术法侵蚀。|r',
+})
+
+createEquipmentItem('I0HM', '熔痕犬牙', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\scorched_hellhound_fang.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 0,
+  unclassifiedLevel = 0,
+  priority = 160,
+  goldCost = 900,
+  hitPoints = 1,
+  charges = 1,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = true,
+  tooltipExtended = '|cffc0c0c0材料|r|n|cffff9966恶魔犬的焦黑獠牙，内部残留着沿裂纹扩散的火毒。|r',
+  description = '|cffc0c0c0材料|r|n|cffff9966恶魔犬的焦黑獠牙，内部残留着沿裂纹扩散的火毒。|r',
+})
+
+createEquipmentItem('I0HN', '恶魔锻火结晶', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\demon_forgefire_crystal.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 0,
+  unclassifiedLevel = 0,
+  priority = 170,
+  goldCost = 1000,
+  hitPoints = 1,
+  charges = 1,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = true,
+  tooltipExtended = '|cffc0c0c0材料|r|n|cffff7733火焰恶魔体内凝结的黑曜晶核，能够长时间维持恶魔锻炉般的高温。|r',
+  description = '|cffc0c0c0材料|r|n|cffff7733火焰恶魔体内凝结的黑曜晶核，能够长时间维持恶魔锻炉般的高温。|r',
+})
+
+createEquipmentItem('I0JU', '王墓守誓徽章', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\royal_tomb_oathkeeper_medallion.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 7,
+  score = 9000,
+  tooltipExtended = '|cffccffff[饰品/徽章]-全能抗压|r|n|cffffcc99等级：B++|n评分：9000|r|n|cffffffcc[基础属性]|r|n全属性+36|n生命值+2600|n护甲+30|n眩晕抗性+22%|n|cFF808080这枚徽章见证过无数守陵人完成轮值，旧誓早已刻进冰冷的黑银。|r',
+  description = '|cffccffff[饰品/徽章]-全能抗压|r|n|cffffcc99等级：B++|n评分：9000|r|n|cffffffcc[基础属性]|r|n全属性+36|n生命值+2600|n护甲+30|n眩晕抗性+22%|n|cFF808080这枚徽章见证过无数守陵人完成轮值，旧誓早已刻进冰冷的黑银。|r',
+})
+
+createEquipmentItem('I0JV', '恒燃余焰核心', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\eternal_ember_forge_core.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 7,
+  score = 9500,
+  tooltipExtended = '|cffccffff[饰品/核心]-火系施法循环|r|n|cffffcc99等级：B++|n评分：9500|r|n|cffffffcc[基础属性]|r|n智力+62|n魔法伤害+22%|n火属性伤害+25%|n冷却缩减+12%|n魔法恢复+24|n|cFF808080工匠以黑铁箍住熔核最后的余温，使它在离开炉心后依旧缓慢燃烧。|r',
+  description = '|cffccffff[饰品/核心]-火系施法循环|r|n|cffffcc99等级：B++|n评分：9500|r|n|cffffffcc[基础属性]|r|n智力+62|n魔法伤害+22%|n火属性伤害+25%|n冷却缩减+12%|n魔法恢复+24|n|cFF808080工匠以黑铁箍住熔核最后的余温，使它在离开炉心后依旧缓慢燃烧。|r',
+})
+
+createEquipmentItem('I0JW', '余烬寻路灯', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\ember_wayfinder_lantern.blp',
+  model = 'war3mapImported\\Lightforged Lantern.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 6500,
+  tooltipExtended = '|cffccffff[饰品/灯具]-技能追猎|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n全属性+20|n技能伤害+12%|n冷却缩减+8%|n移动速度+8%|n视野范围+600|n|cFF808080灯芯里的余烬会偏向最近的岔路，在恶魔迷宫的黑暗中留下稳定方向。|r',
+  description = '|cffccffff[饰品/灯具]-技能追猎|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n全属性+20|n技能伤害+12%|n冷却缩减+8%|n移动速度+8%|n视野范围+600|n|cFF808080灯芯里的余烬会偏向最近的岔路，在恶魔迷宫的黑暗中留下稳定方向。|r',
+})
+
+createEquipmentItem('I0K2', '恶契饮血护腕', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Item\\demonic_blood_pact_bracer.blp',
+  model = 'war3mapImported\\Gloves.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 8200,
+  tooltipExtended = '|cffccffff[饰品/护腕]-普攻续航|r|n|cffffcc99等级：B+|n评分：8200|r|n|cffffffcc[基础属性]|r|n攻击力+135|n力量+32|n生命值+900|n普攻伤害吸血+7%|n|cFF808080护腕内侧刻着旧式恶魔血契，只有持续挥动兵刃时，暗红纹路才会逐渐苏醒。|r',
+  description = '|cffccffff[饰品/护腕]-普攻续航|r|n|cffffcc99等级：B+|n评分：8200|r|n|cffffffcc[基础属性]|r|n攻击力+135|n力量+32|n生命值+900|n普攻伤害吸血+7%|n|cFF808080护腕内侧刻着旧式恶魔血契，只有持续挥动兵刃时，暗红纹路才会逐渐苏醒。|r',
+})
+
+createEquipmentItem('I0K3', '裂境黑曜护符', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\rift_obsidian_amulet.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 8200,
+  tooltipExtended = '|cffccffff[饰品/护符]-均衡抗压|r|n|cffffcc99等级：B+|n评分：8200|r|n|cffffffcc[基础属性]|r|n生命值+3000|n护甲+38|n魔法抗性+18%|n冷却缩减+8%|n|cFF808080黑曜石的裂口被银线重新缝合，曾经撕开边界的力量如今只为持有者抵挡冲击。|r',
+  description = '|cffccffff[饰品/护符]-均衡抗压|r|n|cffffcc99等级：B+|n评分：8200|r|n|cffffffcc[基础属性]|r|n生命值+3000|n护甲+38|n魔法抗性+18%|n冷却缩减+8%|n|cFF808080黑曜石的裂口被银线重新缝合，曾经撕开边界的力量如今只为持有者抵挡冲击。|r',
+})
+
+createEquipmentItem('I0K4', '魔焰统御法印', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\demonflame_dominion_sigil.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 8200,
+  tooltipExtended = '|cffccffff[饰品/法印]-魔焰输出循环|r|n|cffffcc99等级：B+|n评分：8200|r|n|cffffffcc[基础属性]|r|n智力+50|n魔法伤害+18%|n暗属性伤害+18%|n冷却缩减+10%|n魔法恢复+18|n|cFF808080敌对领袖以法印约束麾下魔焰，失去主人后，其中的火光仍在服从更强的意志。|r',
+  description = '|cffccffff[饰品/法印]-魔焰输出循环|r|n|cffffcc99等级：B+|n评分：8200|r|n|cffffffcc[基础属性]|r|n智力+50|n魔法伤害+18%|n暗属性伤害+18%|n冷却缩减+10%|n魔法恢复+18|n|cFF808080敌对领袖以法印约束麾下魔焰，失去主人后，其中的火光仍在服从更强的意志。|r',
 })

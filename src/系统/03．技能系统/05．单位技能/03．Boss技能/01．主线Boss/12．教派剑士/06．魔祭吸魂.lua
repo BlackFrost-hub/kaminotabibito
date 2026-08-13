@@ -8,6 +8,7 @@ local _____83B7_53D6_6216_521B_5EFA_6559_6D3E_5251_58EB_4E0A_4E0B_6587 = ____01_
 local _____6559_6D3E_5251_58EB_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["教派剑士单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.12．教派剑士.02．数值与表现配置")
 local _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派剑士技能配置"]
+local _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派剑士音效配置"]
 local ____11_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.12．教派剑士.11．台词播放")
 local _____64AD_653E_6559_6D3E_5251_58EB_53F0_8BCD = ____11_FF0E_53F0_8BCD_64AD_653E["播放教派剑士台词"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
@@ -50,8 +51,10 @@ local ____require_result_11 = require("lib.扩展函数.Star扩展函数.04．EC
 local EC_CreateEffect = ____require_result_11.EC_CreateEffect
 local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_12.stringToFourCCSafe
-local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_13.debugLogForce
+local ____require_result_13 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_13.Sound3DII_CooPlayReuse
+local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_14.debugLogForce
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -127,6 +130,13 @@ local function _____89E6_53D1_9B54_796D_53CD_566C(_____72B6_6001, attacker)
     local _____914D_7F6E = _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["魔祭吸魂"]
     local difficulty = getGameDifficulty() > 0 and getGameDifficulty() or 1
     local ratio = _____914D_7F6E["反噬最大生命基础比例"] - _____914D_7F6E["每难度降低反噬比例"] * difficulty
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["魔祭吸魂"]["反噬"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
+    )
     _____7ED3_675F_9B54_796D_5438_9B42(_____72B6_6001, "受到火/光伤害反噬")
     _____6267_884C_975E_4F24_5BB3_751F_547D_79FB_9664({
         ["目标"] = boss,
@@ -155,15 +165,15 @@ local function ____on_9B54_796D_5438_9B42_6700_7EC8_4F24_5BB3(target, attacker, 
     if not (applied > 0) then
         return
     end
-    local ____temp_17 = attacker ~= nil and attacker ~= 0 and GetUnitTypeId(attacker) == _____6559_6D3E_5251_58EB_5355_4F4D_7C7B_578BID
-    if ____temp_17 then
-        local ____opt_result_16
+    local ____temp_18 = attacker ~= nil and attacker ~= 0 and GetUnitTypeId(attacker) == _____6559_6D3E_5251_58EB_5355_4F4D_7C7B_578BID
+    if ____temp_18 then
+        local ____opt_result_17
         if snapshot ~= nil then
-            ____opt_result_16 = snapshot.skillDamageTag
+            ____opt_result_17 = snapshot.skillDamageTag
         end
-        ____temp_17 = ____opt_result_16 == _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["魔祭吸魂"]["伤害标签"]
+        ____temp_18 = ____opt_result_17 == _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["魔祭吸魂"]["伤害标签"]
     end
-    if ____temp_17 then
+    if ____temp_18 then
         local _____4E0A_4E0B_6587 = _____83B7_53D6_6216_521B_5EFA_6559_6D3E_5251_58EB_4E0A_4E0B_6587(attacker)
         local _____72B6_6001 = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["魔祭状态"]
         if _____72B6_6001 ~= nil and not _____72B6_6001["已结束"] and _____72B6_6001["阶段"] == "生效" then
@@ -180,23 +190,23 @@ local function ____on_9B54_796D_5438_9B42_6700_7EC8_4F24_5BB3(target, attacker, 
             )
         end
     end
-    local ____temp_27 = target == nil or target == 0 or GetUnitTypeId(target) ~= _____6559_6D3E_5251_58EB_5355_4F4D_7C7B_578BID
-    if not ____temp_27 then
-        local ____opt_result_22
+    local ____temp_28 = target == nil or target == 0 or GetUnitTypeId(target) ~= _____6559_6D3E_5251_58EB_5355_4F4D_7C7B_578BID
+    if not ____temp_28 then
+        local ____opt_result_23
         if snapshot ~= nil then
-            ____opt_result_22 = snapshot.isFireDamage
+            ____opt_result_23 = snapshot.isFireDamage
         end
-        local ____temp_26 = ____opt_result_22 ~= true
-        if ____temp_26 then
-            local ____opt_result_25
+        local ____temp_27 = ____opt_result_23 ~= true
+        if ____temp_27 then
+            local ____opt_result_26
             if snapshot ~= nil then
-                ____opt_result_25 = snapshot.isLightDamage
+                ____opt_result_26 = snapshot.isLightDamage
             end
-            ____temp_26 = ____opt_result_25 ~= true
+            ____temp_27 = ____opt_result_26 ~= true
         end
-        ____temp_27 = ____temp_26
+        ____temp_28 = ____temp_27
     end
-    if ____temp_27 then
+    if ____temp_28 then
         return
     end
     local _____4E0A_4E0B_6587 = _____83B7_53D6_6216_521B_5EFA_6559_6D3E_5251_58EB_4E0A_4E0B_6587(target)
@@ -207,15 +217,15 @@ local function ____on_9B54_796D_5438_9B42_6700_7EC8_4F24_5BB3(target, attacker, 
 end
 local function _____9B54_796D_5438_9B42_589E_4F24_4FEE_6B63(context)
     if context == nil or context.attacker == nil or context.attacker == 0 or GetUnitTypeId(context.attacker) ~= _____6559_6D3E_5251_58EB_5355_4F4D_7C7B_578BID then
-        local ____opt_result_32
+        local ____opt_result_33
         if context ~= nil then
-            ____opt_result_32 = context.currentDamage
+            ____opt_result_33 = context.currentDamage
         end
-        local ____opt_result_32_33 = ____opt_result_32
-        if ____opt_result_32_33 == nil then
-            ____opt_result_32_33 = 0
+        local ____opt_result_33_34 = ____opt_result_33
+        if ____opt_result_33_34 == nil then
+            ____opt_result_33_34 = 0
         end
-        return ____opt_result_32_33
+        return ____opt_result_33_34
     end
     local _____4E0A_4E0B_6587 = _____83B7_53D6_6216_521B_5EFA_6559_6D3E_5251_58EB_4E0A_4E0B_6587(context.attacker)
     local _____72B6_6001 = _____4E0A_4E0B_6587 and _____4E0A_4E0B_6587["魔祭状态"]
@@ -233,6 +243,13 @@ local function ____on_9B54_796D_5438_9B42_5168_4F53_7ED3_7B97(variable)
     local _____914D_7F6E = _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["魔祭吸魂"]
     local _____76EE_6807_5217_8868 = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
     _____72B6_6001["累计最终伤害"] = 0
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["魔祭吸魂"]["结算吸魂"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
+    )
     do
         local i = 0
         while i < #_____76EE_6807_5217_8868 do
@@ -332,6 +349,13 @@ local function ____on_9B54_796D_5438_9B42_65BD_6CD5_5B8C_6210(variable)
         return
     end
     _____72B6_6001["阶段"] = "生效"
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["魔祭吸魂"]["魔祭生效"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
+    )
     registerManualBuff(
         boss,
         _____6559_6D3E_5251_58EBBuffID["魔祭吸魂"],
@@ -341,10 +365,10 @@ local function ____on_9B54_796D_5438_9B42_65BD_6CD5_5B8C_6210(variable)
     )
     local _____7ED3_7B97ID = addDelayedCallback(_____914D_7F6E["全体结算延迟秒"] * 1000, ____on_9B54_796D_5438_9B42_5168_4F53_7ED3_7B97, _____72B6_6001)
     local _____5230_671FID = addDelayedCallback(_____914D_7F6E["状态持续秒"] * 1000, ____on_9B54_796D_5438_9B42_72B6_6001_5230_671F, _____72B6_6001)
-    local ____self_36 = _____72B6_6001["上下文"]["清理"]
-    ____self_36["登记延迟回调"](____self_36, "教派剑士-魔祭吸魂全体结算", _____7ED3_7B97ID)
     local ____self_37 = _____72B6_6001["上下文"]["清理"]
-    ____self_37["登记延迟回调"](____self_37, "教派剑士-魔祭吸魂状态到期", _____5230_671FID)
+    ____self_37["登记延迟回调"](____self_37, "教派剑士-魔祭吸魂全体结算", _____7ED3_7B97ID)
+    local ____self_38 = _____72B6_6001["上下文"]["清理"]
+    ____self_38["登记延迟回调"](____self_38, "教派剑士-魔祭吸魂状态到期", _____5230_671FID)
     debugLogForce(
         "教派剑士-魔祭吸魂",
         "施法成功并进入两秒状态",
@@ -370,11 +394,18 @@ ____exports["释放教派剑士魔祭吸魂"] = function(_____4E0A_4E0B_6587)
         ["累计最终伤害"] = 0
     }
     _____4E0A_4E0B_6587["魔祭状态"] = _____72B6_6001
-    local ____self_40 = _____4E0A_4E0B_6587["清理"]
-    ____self_40["登记清理"](____self_40, "教派剑士-魔祭吸魂清理", ____on_9B54_796D_5438_9B42_6E05_7406, _____72B6_6001)
+    local ____self_41 = _____4E0A_4E0B_6587["清理"]
+    ____self_41["登记清理"](____self_41, "教派剑士-魔祭吸魂清理", ____on_9B54_796D_5438_9B42_6E05_7406, _____72B6_6001)
     _____5F00_59CB_786C_76F4(boss, _____914D_7F6E["施法秒"])
     SetUnitAnimationByIndex(boss, _____914D_7F6E["动作编号"])
     _____64AD_653E_6559_6D3E_5251_58EB_53F0_8BCD(boss, "魔祭吸魂")
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["魔祭吸魂"]["起手施法"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
+    )
     EC_CreateEffect(
         _____914D_7F6E["起始特效路径"],
         GetUnitX(boss),
@@ -393,8 +424,8 @@ ____exports["释放教派剑士魔祭吸魂"] = function(_____4E0A_4E0B_6587)
         ["提示文本"] = _____914D_7F6E["读条提示"]
     })
     local _____5B8C_6210ID = addDelayedCallback(_____914D_7F6E["施法秒"] * 1000, ____on_9B54_796D_5438_9B42_65BD_6CD5_5B8C_6210, _____72B6_6001)
-    local ____self_41 = _____4E0A_4E0B_6587["清理"]
-    ____self_41["登记延迟回调"](____self_41, "教派剑士-魔祭吸魂施法完成", _____5B8C_6210ID)
+    local ____self_42 = _____4E0A_4E0B_6587["清理"]
+    ____self_42["登记延迟回调"](____self_42, "教派剑士-魔祭吸魂施法完成", _____5B8C_6210ID)
     debugLogForce(
         "教派剑士-魔祭吸魂",
         "1.2秒施法开始",

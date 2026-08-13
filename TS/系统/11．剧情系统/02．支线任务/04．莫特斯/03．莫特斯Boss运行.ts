@@ -9,29 +9,25 @@ const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, 延迟毫秒: number, 回调: (this: void) => void) => number;
 };
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (
     this: void,
-    触发器: any,
     单位: any,
     范围: number,
-    过滤器?: any,
-    单次?: boolean,
+    回调: (this: void, 进入单位: any) => boolean,
+    条件?: (this: void, 进入单位: any) => boolean,
   ) => (this: void) => void;
 };
 const { registerDeathListener, unregisterDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, 回调: (this: void, 死亡单位: any, 击杀单位: any) => void) => void;
   unregisterDeathListener: (this: void, 回调: (this: void, 死亡单位: any, 击杀单位: any) => void) => void;
 };
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, 触发器: any, 回调: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, 触发器: any) => void;
-};
-const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
+const { 广播单位提示, 播放广播对白序列 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   广播单位提示: (this: void, 来源单位: any, 文本: string, 持续时间?: number) => void;
+  播放广播对白序列: (this: void, 配置: any) => void;
 };
-const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  添加单位暂停: (this: void, 单位: any, 来源: string) => boolean;
+const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  暂停并设置无敌安全: (this: void, 单位: any, 来源: string) => boolean;
 };
 const { YDUserDataSetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, 表类型: string, 表名: any, 字段: string, 值类型: string, 值: any) => void;
@@ -66,17 +62,13 @@ import {
   关闭莫特斯洞窟门,
   单位存活,
   句柄有效,
-  取广播完整播放毫秒,
   打开莫特斯洞窟门,
   是莫特斯副本玩家英雄,
   莫特斯运行状态,
 } from "./01．运行状态";
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, 单位: any, 命令: string) => boolean;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, 单位: any, 角度: number) => void;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, 单位: any, 无敌: boolean) => void;
 
 function 移除莫特斯洞窟区域背景音乐(this: void): void {
   if (莫特斯运行状态.洞窟区域背景音乐已移除) return;
@@ -93,8 +85,6 @@ function 恢复莫特斯洞窟区域背景音乐(this: void): void {
 function 注销莫特斯范围监听(this: void): void {
   if (莫特斯运行状态.取消莫特斯范围监听 != null) 莫特斯运行状态.取消莫特斯范围监听();
   莫特斯运行状态.取消莫特斯范围监听 = undefined;
-  if (句柄有效(莫特斯运行状态.莫特斯范围触发器)) safeDestroyTrigger(莫特斯运行状态.莫特斯范围触发器);
-  莫特斯运行状态.莫特斯范围触发器 = null;
 }
 
 function 注销莫特斯死亡监听(this: void): void {
@@ -115,42 +105,29 @@ function on莫特斯死亡(this: void, 死亡单位: any, _击杀单位: any): v
   莫特斯运行状态.当前入口英雄 = null;
 }
 
-function 播放莫特斯第五段对白(this: void): void {
-  if (!单位存活(莫特斯运行状态.莫特斯单位)) return;
-  广播单位提示(莫特斯运行状态.莫特斯单位, "很好。既然主动走进我的巢穴，就把命和财物都留下吧。", 3800);
-  addDelayedCallback(取广播完整播放毫秒(3800), on莫特斯对白结束);
+function 读取莫特斯对白单位(this: void, 说话者键: string): any {
+  return 说话者键 === "Boss" ? 莫特斯运行状态.莫特斯单位 : 莫特斯运行状态.当前入口英雄;
 }
 
-function 播放莫特斯第四段对白(this: void): void {
-  if (!单位存活(莫特斯运行状态.莫特斯单位)) return;
-  if (!单位存活(莫特斯运行状态.当前入口英雄)) {
-    on莫特斯对白结束();
-    return;
-  }
-  广播单位提示(莫特斯运行状态.当前入口英雄, "那就看看，今天倒下的究竟是谁。", 2800);
-  addDelayedCallback(取广播完整播放毫秒(2800), 播放莫特斯第五段对白);
+function 校验莫特斯单句(this: void, _序号: number, 说话者键: string): boolean {
+  return 单位存活(读取莫特斯对白单位(说话者键));
 }
 
-function 播放莫特斯第三段对白(this: void): void {
-  if (!单位存活(莫特斯运行状态.莫特斯单位)) return;
-  广播单位提示(莫特斯运行状态.莫特斯单位, "血债？沙漠里每天都有人死。只有踩过弱者尸体的人，才有资格活下去。", 4800);
-  addDelayedCallback(取广播完整播放毫秒(4800), 播放莫特斯第四段对白);
-}
-
-function 播放莫特斯第二段对白(this: void): void {
-  if (!单位存活(莫特斯运行状态.莫特斯单位)) return;
-  if (!单位存活(莫特斯运行状态.当前入口英雄)) {
-    on莫特斯对白结束();
-    return;
-  }
-  广播单位提示(莫特斯运行状态.当前入口英雄, "你就是莫特斯？佣兵团的血债，该算清了。", 3200);
-  addDelayedCallback(取广播完整播放毫秒(3200), 播放莫特斯第三段对白);
-}
-
-function 播放莫特斯第一段对白(this: void): void {
-  if (!单位存活(莫特斯运行状态.莫特斯单位)) return;
-  广播单位提示(莫特斯运行状态.莫特斯单位, "脚步声比我预想得更近。看来外面那些废物没能拦住你们。", 4200);
-  addDelayedCallback(取广播完整播放毫秒(4200), 播放莫特斯第二段对白);
+function 播放莫特斯对白(this: void): void {
+  播放广播对白序列({
+    对白列表: [
+      { 说话者键: "Boss", 文本: "脚步声比我预想得更近。看来外面那些废物没能拦住你们。", 停留毫秒: 4200 },
+      { 说话者键: "玩家", 文本: "你就是莫特斯？佣兵团的血债，该算清了。", 停留毫秒: 3200 },
+      { 说话者键: "Boss", 文本: "血债？沙漠里每天都有人死。只有踩过弱者尸体的人，才有资格活下去。", 停留毫秒: 4800 },
+      { 说话者键: "玩家", 文本: "那就看看，今天倒下的究竟是谁。", 停留毫秒: 2800 },
+      { 说话者键: "Boss", 文本: "很好。既然主动走进我的巢穴，就把命和财物都留下吧。", 停留毫秒: 3800 },
+    ],
+    读取说话单位: 读取莫特斯对白单位,
+    播放单句: 广播单位提示,
+    单句播放前校验: 校验莫特斯单句,
+    播放中止: on莫特斯对白结束,
+    播放完成: on莫特斯对白结束,
+  });
 }
 
 function on莫特斯对白结束(this: void): void {
@@ -173,14 +150,11 @@ function on莫特斯对白结束(this: void): void {
   注册莫特斯范围监听();
 }
 
-function on莫特斯范围触发(this: void): void {
+function on莫特斯范围触发(this: void, 触发英雄: any): boolean {
   if (莫特斯运行状态.莫特斯对白已触发
     || 莫特斯运行状态.莫特斯战斗已启动
     || 莫特斯运行状态.莫特斯已经死亡
-    || !单位存活(莫特斯运行状态.莫特斯单位)) return;
-
-  const 触发英雄 = GetTriggerUnit();
-  if (!是莫特斯副本玩家英雄(触发英雄)) return;
+    || !单位存活(莫特斯运行状态.莫特斯单位)) return true;
 
   莫特斯运行状态.莫特斯对白已触发 = true;
   莫特斯运行状态.当前入口英雄 = 触发英雄;
@@ -194,29 +168,21 @@ function on莫特斯范围触发(this: void): void {
     触发英雄,
     YDWEAngleBetweenUnitsSafe(触发英雄, 莫特斯运行状态.莫特斯单位),
   );
-  播放莫特斯第一段对白();
+  播放莫特斯对白();
+  return true;
 }
 
 function 注册莫特斯范围监听(this: void): void {
   if (!单位存活(莫特斯运行状态.莫特斯单位)
-    || 句柄有效(莫特斯运行状态.莫特斯范围触发器)
+    || 莫特斯运行状态.取消莫特斯范围监听 != null
     || 莫特斯运行状态.莫特斯战斗已启动
     || 莫特斯运行状态.莫特斯已经死亡) return;
 
-  const 触发器 = CreateTrigger();
-  if (!句柄有效(触发器)) return;
-  if (safeTriggerAddAction(触发器, on莫特斯范围触发) == null) {
-    safeDestroyTrigger(触发器);
-    return;
-  }
-
-  莫特斯运行状态.莫特斯范围触发器 = 触发器;
-  莫特斯运行状态.取消莫特斯范围监听 = registerUnitInRangeTrigger(
-    触发器,
+  莫特斯运行状态.取消莫特斯范围监听 = registerOneShotUnitRangeListener(
     莫特斯运行状态.莫特斯单位,
     莫特斯Boss触发范围,
-    null,
-    false,
+    on莫特斯范围触发,
+    是莫特斯副本玩家英雄,
   );
 }
 
@@ -239,8 +205,7 @@ export function 确保创建莫特斯(this: void): void {
 
   莫特斯运行状态.莫特斯单位 = Boss单位;
   IssueImmediateOrder(Boss单位, "stop");
-  SetUnitInvulnerable(Boss单位, true);
-  添加单位暂停(Boss单位, 剧情Boss预置暂停来源);
+  暂停并设置无敌安全(Boss单位, 剧情Boss预置暂停来源);
   YDUserDataSetSafe("string", "Boss", 莫特斯Boss表键, "unit", Boss单位);
   注册莫特斯范围监听();
   if (!莫特斯运行状态.莫特斯死亡监听已注册) {

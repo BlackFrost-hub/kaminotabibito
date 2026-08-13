@@ -8,20 +8,23 @@ local _____83B7_53D6_5730_7CBE_796D_7940_8303_56F4_76EE_6807 = ____01_FF0E_8FD0_
 local _____5730_7CBE_796D_7940_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["地精祭祀单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.09．地精祭祀.02．数值与表现配置")
 local _____5730_7CBE_796D_7940_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["地精祭祀技能配置"]
+local _____5730_7CBE_796D_7940_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["地精祭祀音效配置"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellChannelListener = ____require_result_0.registerSpellChannelListener
-local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
-local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["启动基础施法时间线"]
-local ____require_result_2 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_2["显示常规技能吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_2["关闭吟唱条"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedUnitEffect = ____require_result_3.createTimedUnitEffect
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
+local ____require_result_0 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_0["播放Boss坐标音效"]
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellChannelListener = ____require_result_1.registerSpellChannelListener
+local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线")
+local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_2["启动基础施法时间线"]
+local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_3["显示常规技能吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedUnitEffect = ____require_result_4.createTimedUnitEffect
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -41,6 +44,7 @@ local function _____7ED3_7B97_5730_7CBE_796D_7940_7834_574F_6B7B_5149(_____4E0A_
     local _____914D_7F6E = _____5730_7CBE_796D_7940_6280_80FD_914D_7F6E["破坏死光"]
     local _____7ED3_7B97X = GetUnitX(_____76EE_6807_5355_4F4D)
     local _____7ED3_7B97Y = GetUnitY(_____76EE_6807_5355_4F4D)
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____5730_7CBE_796D_7940_97F3_6548_914D_7F6E["破坏死光"]["命中"], _____7ED3_7B97X, _____7ED3_7B97Y, _____5730_7CBE_796D_7940_97F3_6548_914D_7F6E["默认裁断距离"])
     local _____76EE_6807_5217_8868 = _____83B7_53D6_5730_7CBE_796D_7940_8303_56F4_76EE_6807(
         boss,
         _____7ED3_7B97X,
@@ -83,6 +87,12 @@ ____exports["释放地精祭祀破坏死光"] = function(_____4E0A_4E0B_6587, __
     end
     local _____914D_7F6E = _____5730_7CBE_796D_7940_6280_80FD_914D_7F6E["破坏死光"]
     local _____6570_636E = {["上下文"] = _____4E0A_4E0B_6587, ["目标单位"] = _____76EE_6807_5355_4F4D}
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____5730_7CBE_796D_7940_97F3_6548_914D_7F6E["破坏死光"]["蓄力"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        _____5730_7CBE_796D_7940_97F3_6548_914D_7F6E["默认裁断距离"]
+    )
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
         ["名称"] = "地精祭祀-破坏死光-测试释放",
         ["施法者"] = boss,

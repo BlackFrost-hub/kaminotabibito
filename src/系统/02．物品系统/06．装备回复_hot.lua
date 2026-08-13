@@ -57,12 +57,12 @@ function ____exports.calcEquipHealHpMp(self, tokens, unit)
     local mp = 0
     local maxHp = GetUnitStateJapi(
         unit,
-        jass.ConvertUnitState(1)
+        jass:ConvertUnitState(1)
     )
-    local curHp = jass.GetWidgetLife(unit)
+    local curHp = jass:GetWidgetLife(unit)
     local maxMp = GetUnitStateJapi(
         unit,
-        jass.ConvertUnitState(3)
+        jass:ConvertUnitState(3)
     )
     local lostHp = maxHp - curHp
     for ____, rawToken in ipairs(tokens) do

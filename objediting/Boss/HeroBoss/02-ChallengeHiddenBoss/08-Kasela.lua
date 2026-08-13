@@ -9,7 +9,7 @@ createRangedBossHeroUnit('N05V', '深渊巨鱿·卡瑟拉', {
   description = '深渊巨鱿·卡瑟拉',
 
   level = 35,
-  hp = 36800,
+  hp = 29440,
   mana = 1000,
   initialMana = 1000,
   manaRegen = 12.5,
@@ -23,7 +23,7 @@ createRangedBossHeroUnit('N05V', '深渊巨鱿·卡瑟拉', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 1840,
+  damageBase = 1472,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 1.1,

@@ -15,6 +15,8 @@ export interface 主线NPC初始化配置 {
   YD类型?: "unit";
   初始化无敌?: boolean;
   初始化固定站立?: boolean;
+  /** 由支线任务系统接管的外部任务 NPC，不在支线 NPC 生成器中重复创建。 */
+  任务NPC任务ID?: number;
   说明?: string;
 }
 

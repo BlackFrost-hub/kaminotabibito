@@ -35,3 +35,15 @@ createEquipmentItem('I0FT', '赤誓断界剑', {
   tooltipExtended = '|cffccffff[主武器/长剑]-物理/位移爆发|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+180|n力量+35|n护甲穿透+22%|n生命值+1200|n|cffffffcc[装备效果]|r|n誓锋壁进：战斗中完成自身主动位移（冲锋、跳跃、闪烁或瞬间移动）后，获得持续8秒的誓锋强化，冷却10秒。强化期间，下一次纯普通攻击造成130%伤害；命中时对攻击方向前方100°、360码内的其他敌人造成攻击力70%的物理伤害，并使自身获得最大生命8%的护盾，持续4秒。击退、击飞等外力位移不触发。|n|cFF808080剑脊上的赤誓只承认向前的脚步，以及挡在同伴身前的锋刃。|r',
   description = '|cffccffff[主武器/长剑]-物理/位移爆发|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+180|n力量+35|n护甲穿透+22%|n生命值+1200|n|cffffffcc[装备效果]|r|n誓锋壁进：战斗中完成自身主动位移（冲锋、跳跃、闪烁或瞬间移动）后，获得持续8秒的誓锋强化，冷却10秒。强化期间，下一次纯普通攻击造成130%伤害；命中时对攻击方向前方100°、360码内的其他敌人造成攻击力70%的物理伤害，并使自身获得最大生命8%的护盾，持续4秒。击退、击飞等外力位移不触发。|n|cFF808080剑脊上的赤誓只承认向前的脚步，以及挡在同伴身前的锋刃。|r',
 })
+
+createEquipmentItem('I0K5', '赤契噬魂刃', {
+  baseId = 'ratc',
+  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\crimson_soul_devouring_blade.blp',
+  model = 'Common\\Model\\wepon\\zb12.mdx',
+  abilities = ' ',
+  classification = 'Campaign',
+  level = 7,
+  score = 9200,
+  tooltipExtended = '|cffff8080[主武器/剑]-持续汲血输出|r|n|cffffcc99等级：B++|n评分：9200|r|n|cffffffcc[基础属性]|r|n攻击力+185|n力量+40|n生命值+1200|n伤害吸血+8%|n|cFF808080剑锋上的赤色契文从不回应迟疑者，只有迅速结束战斗的人才能压住它对灵魂的饥渴。|r',
+  description = '|cffff8080[主武器/剑]-持续汲血输出|r|n|cffffcc99等级：B++|n评分：9200|r|n|cffffffcc[基础属性]|r|n攻击力+185|n力量+40|n生命值+1200|n伤害吸血+8%|n|cFF808080剑锋上的赤色契文从不回应迟疑者，只有迅速结束战斗的人才能压住它对灵魂的饥渴。|r',
+})

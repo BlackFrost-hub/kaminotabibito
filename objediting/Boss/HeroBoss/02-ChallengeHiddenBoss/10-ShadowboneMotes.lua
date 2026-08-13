@@ -9,7 +9,7 @@ createMeleeBossHeroUnit('N01Y', '影骨·莫特斯', {
   description = '影骨·莫特斯',
 
   level = 40,
-  hp = 16100,
+  hp = 12880,
   mana = 800,
   initialMana = 800,
   manaRegen = 8.0,
@@ -20,7 +20,7 @@ createMeleeBossHeroUnit('N01Y', '影骨·莫特斯', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 920,
+  damageBase = 736,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 1.2,

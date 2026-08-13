@@ -25,7 +25,7 @@ local function _____89C4_6574_6570_91CF(_____503C, _____9ED8_8BA4_503C)
     if _____503C == nil or _____503C < 1 then
         return _____9ED8_8BA4_503C
     end
-    return math.floor(_____503C)
+    return math:floor(_____503C)
 end
 local function _____89E3_6790_5BAB_683C_5C3A_5BF8(_____53C2_6570, _____884C_6570, _____5217_6570)
     local _____539F_59CB_5355_683C_5BBD_5EA6 = _____53C2_6570["单格宽度"] or _____53C2_6570["单格边长"]

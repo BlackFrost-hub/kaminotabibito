@@ -11,7 +11,7 @@ local aronkos = createMeleeBossHeroUnit('U006', '沉睡英魂·亚伦柯斯', {
   requirements = 'unp1,unp2',
 
   level = 40,
-  hp = 68000,
+  hp = 54400,
   mana = 1000,
   initialMana = 1000,
   manaRegen = 10.0,
@@ -26,7 +26,7 @@ local aronkos = createMeleeBossHeroUnit('U006', '沉睡英魂·亚伦柯斯', {
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
   primaryAttribute = 'STR',
-  damageBase = 2350,
+  damageBase = 1880,
   damageDice = 2,
   damageSides = 6,
   attackCooldown = 0.8,

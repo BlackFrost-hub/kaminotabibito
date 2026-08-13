@@ -2,7 +2,7 @@
 
 import { 教派剑士单位技能配置 } from './00．配置';
 import { 获取全部教派剑士上下文, 获取或创建教派剑士上下文, 教派剑士单位存活, type 教派剑士运行时上下文 } from './01．运行时上下文';
-import { 教派剑士技能配置 } from './02．数值与表现配置';
+import { 教派剑士技能配置, 教派剑士音效配置 } from './02．数值与表现配置';
 import { 播放教派剑士台词 } from './11．台词播放';
 import { 创建可攻击机制单位, type 可攻击机制单位实例, type 可攻击机制单位结束原因 } from '../../../../00．技能模板+函数/04．机制组件/05．机制单位/01．可攻击机制单位';
 import { 开始冲锋 } from '../../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/01．击退系统/03．对外接口';
@@ -52,6 +52,9 @@ const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC�
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
+};
+const { Sound3DII_CooPlayReuse } = require('lib.扩展函数.封装函数.02．音效系统.03．3D音效播放') as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -174,6 +177,7 @@ function 结算黑洞摧毁(this: void, 状态: 黑洞跨越状态, killer: any)
   const 配置 = 教派剑士技能配置.黑洞跨越;
   const boss = 状态.上下文.Boss单位;
   EC_CreateEffect(配置.黑洞摧毁特效路径, 状态.黑洞X, 状态.黑洞Y, 0, 0, 配置.黑洞摧毁特效缩放, 1, 配置.黑洞摧毁特效持续秒);
+  Sound3DII_CooPlayReuse(教派剑士音效配置.黑洞跨越.黑洞被摧毁, 状态.黑洞X, 状态.黑洞Y, 0, 教派剑士音效配置.音效裁断距离);
   const 单位列表 = getUnitsInRange(状态.黑洞X, 状态.黑洞Y, 配置.摧毁爆炸半径);
   let 命中数 = 0;
   for (let i = 0; i < 单位列表.length; i++) {
@@ -231,6 +235,7 @@ function on黑洞Boss出现(this: void, variable?: any): void {
   状态.Boss已隐藏 = false;
   激活黑洞强化普攻(状态.上下文);
   播放教派剑士台词(boss, '黑洞跨越');
+  Sound3DII_CooPlayReuse(教派剑士音效配置.黑洞跨越.Boss出现, GetUnitX(boss), GetUnitY(boss), 0, 教派剑士音效配置.音效裁断距离);
   const target = 状态.出口目标;
   const 已下达攻击 = target != null && target !== 0 && 教派剑士单位存活(target)
     ? IssueTargetOrder(boss, 'attack', target)
@@ -291,6 +296,7 @@ function on黑洞移动检查(this: void, variable?: any): void {
   }
   恢复黑洞奔跑属性(状态);
   状态.阶段 = '消失';
+  Sound3DII_CooPlayReuse(教派剑士音效配置.黑洞跨越.进入黑洞, GetUnitX(boss), GetUnitY(boss), 0, 教派剑士音效配置.音效裁断距离);
   const 黑洞实例 = 状态.黑洞实例;
   状态.黑洞实例 = undefined;
   状态.黑洞单位 = undefined;
@@ -383,6 +389,7 @@ export function 释放教派剑士黑洞跨越(this: void, 上下文: 教派剑�
   上下文.清理.登记清理('教派剑士-黑洞跨越清理', on黑洞跨越清理, 状态);
   开始硬直(boss, 配置.施法硬直秒);
   SetUnitAnimation(boss, 配置.动作名);
+  Sound3DII_CooPlayReuse(教派剑士音效配置.黑洞跨越.黑洞开启, GetUnitX(boss), GetUnitY(boss), 0, 教派剑士音效配置.音效裁断距离);
   显示常规技能吟唱条({ 通道: 配置.读条通道, 总时长: 配置.施法硬直秒, 颜色ID: 配置.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
   状态.启动回调ID = addDelayedCallback(配置.施法硬直秒 * 1000, on开始黑洞奔跑, 状态);
   上下文.清理.登记延迟回调('教派剑士-黑洞奔跑开始', 状态.启动回调ID);

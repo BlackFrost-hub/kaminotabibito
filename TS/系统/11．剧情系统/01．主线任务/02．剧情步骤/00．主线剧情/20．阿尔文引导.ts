@@ -1,8 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; 面向角度?: number; 缩放?: number; 动画速度?: number; 持续秒?: number }) => any;
 };
 const {
   启用第二章精灵城背景音乐,
@@ -14,12 +14,8 @@ const {
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
-};
-const { registerEnterRegionTrigger } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
-  registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => () => void;
+const { 创建矩形进入监听 } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
+  创建矩形进入监听: (this: void, rect: any, callback: (this: void) => void, filter?: any) => { 取消: (this: void) => void } | null;
 };
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -39,21 +35,14 @@ import {
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 export { 阿尔文接引剧情片段 } from "../02．第二章/20．阿尔文引导";
 
-const CreateRegion = jass.CreateRegion as (this: void) => any;
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const RegionAddRect = jass.RegionAddRect as (this: void, region: any, rect: any) => void;
-const RemoveRegion = jass.RemoveRegion as (this: void, region: any) => void;
 
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const 王城门禁矩形键 = "剧情.王城门禁入口";
 
 interface 王城门禁监听状态 {
-  区域: any;
-  矩形: any;
-  触发器: any;
-  取消监听?: () => void;
+  取消: (this: void) => void;
   已触发: boolean;
 }
 
@@ -66,9 +55,7 @@ function 句柄有效(this: void, handle: any): boolean {
 function 清理王城门禁矩形监听(this: void): void {
   const 状态 = 王城门禁监听;
   if (状态 == null) return;
-  if (状态.取消监听 != null) 状态.取消监听();
-  if (句柄有效(状态.触发器)) safeDestroyTrigger(状态.触发器);
-  if (句柄有效(状态.区域)) RemoveRegion(状态.区域);
+  状态.取消();
   注销动态矩形区域(王城门禁矩形键);
   王城门禁监听 = undefined;
 }
@@ -96,27 +83,18 @@ function on王城门禁矩形进入(this: void): void {
 
 function 注册王城门禁矩形监听(this: void): void {
   if (读取剧情进度() !== 21 || 王城门禁监听 != null) return;
-  const 区域 = CreateRegion();
   const 矩形 = 注册动态矩形区域(动态矩形区域配置表[王城门禁矩形键]);
-  const 触发器 = CreateTrigger();
-  if (!句柄有效(区域) || !句柄有效(矩形) || !句柄有效(触发器)) {
-    if (句柄有效(区域)) RemoveRegion(区域);
-    if (句柄有效(触发器)) safeDestroyTrigger(触发器);
+  if (!句柄有效(矩形)) {
     注销动态矩形区域(王城门禁矩形键);
     return;
   }
-  RegionAddRect(区域, 矩形);
-  if (safeTriggerAddAction(触发器, on王城门禁矩形进入) == null) {
-    RemoveRegion(区域);
+  const 监听 = 创建矩形进入监听(矩形, on王城门禁矩形进入, null);
+  if (监听 == null) {
     注销动态矩形区域(王城门禁矩形键);
-    safeDestroyTrigger(触发器);
     return;
   }
   王城门禁监听 = {
-    区域,
-    矩形,
-    触发器,
-    取消监听: registerEnterRegionTrigger(触发器, 区域, null),
+    取消: 监听.取消,
     已触发: false,
   };
 }
@@ -125,7 +103,15 @@ export function 执行阿尔文接引(this: void): void {
   停止触发单位();
   const 阿尔文 = 读取语义单位引用("主线NPC.阿尔文");
   if (阿尔文 == null || 阿尔文 === 0) return;
-  EC_CreateEffect("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", GetUnitX(阿尔文), GetUnitY(阿尔文), 0, 270, 2, 1, 1.5);
+  创建点特效({
+    模型路径: "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl",
+    X: GetUnitX(阿尔文),
+    Y: GetUnitY(阿尔文),
+    面向角度: 270,
+    缩放: 2,
+    动画速度: 1,
+    持续秒: 1.5,
+  });
 }
 
 export function 执行启用第二章精灵城背景音乐(this: void): void {

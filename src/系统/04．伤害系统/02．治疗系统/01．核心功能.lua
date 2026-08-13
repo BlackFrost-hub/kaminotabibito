@@ -25,7 +25,7 @@ function _____5904_7406_5F85_9500_6BC1_6CBB_7597_7279_6548()
                 if _____5F53_524D_65F6_95F4 < _____8BB0_5F55["到期时间"] then
                     goto __continue4
                 end
-                jass.DestroyEffect(_____8BB0_5F55["句柄"])
+                jass:DestroyEffect(_____8BB0_5F55["句柄"])
                 __TS__ArraySplice(_____5F85_9500_6BC1_6CBB_7597_7279_6548_5217_8868, i, 1)
             end
             ::__continue4::
@@ -162,9 +162,9 @@ function playHealEffect(target, effectPath)
         return
     end
     local path = effectPath ~= nil and effectPath ~= "" and effectPath or DEFAULT_HEAL_EFFECT_PATH
-    local x = jass.GetUnitX(target)
-    local y = jass.GetUnitY(target)
-    local eff = jass.AddSpecialEffect(path, x, y)
+    local x = jass:GetUnitX(target)
+    local y = jass:GetUnitY(target)
+    local eff = jass:AddSpecialEffect(path, x, y)
     _____5B89_6392_6CBB_7597_7279_6548_9500_6BC1(eff, 1)
 end
 --- 触发数值显示事件
@@ -191,7 +191,7 @@ function addHealStats(target, amount)
     if target == nil or amount <= 0 then
         return
     end
-    local hid = jass.GetHandleId(target)
+    local hid = jass:GetHandleId(target)
     if hid == nil or hid == 0 then
         return
     end
@@ -224,17 +224,17 @@ function shouldRecordPlayerHeal(target, sourcePlayer)
     if playerForce == nil then
         return false
     end
-    local targetPlayer = jass.GetOwningPlayer(target)
-    if not jass.IsPlayerInForce(targetPlayer, playerForce) then
+    local targetPlayer = jass:GetOwningPlayer(target)
+    if not jass:IsPlayerInForce(targetPlayer, playerForce) then
         return false
     end
-    return jass.IsUnitAlly(target, sourcePlayer) or sourcePlayer == targetPlayer
+    return jass:IsUnitAlly(target, sourcePlayer) or sourcePlayer == targetPlayer
 end
 function addPlayerHealStats(target, source, amount)
     if source == nil or amount <= 0 then
         return
     end
-    local sourcePlayer = jass.GetOwningPlayer(source)
+    local sourcePlayer = jass:GetOwningPlayer(source)
     if not shouldRecordPlayerHeal(target, sourcePlayer) then
         return
     end
@@ -306,7 +306,7 @@ function ____exports.doHeal(params)
     if HealTarget == nil then
         return 0
     end
-    if jass.IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
+    if jass:IsUnitType(HealTarget, jass.UNIT_TYPE_DEAD) then
         return 0
     end
     if HealAmount <= 0 and HealManaAmount <= 0 then
@@ -452,7 +452,7 @@ local function playManaEffect(target, effectPath)
         return
     end
     local path = effectPath ~= nil and effectPath ~= "" and effectPath or DEFAULT_MANA_HEAL_EFFECT_PATH
-    local eff = jass.AddSpecialEffectTarget(path, target, "origin")
+    local eff = jass:AddSpecialEffectTarget(path, target, "origin")
     _____5B89_6392_6CBB_7597_7279_6548_9500_6BC1(eff, 1)
 end
 --- 显示魔法恢复漂浮字
@@ -487,7 +487,7 @@ function ____exports.restoreMana(target, amount, manaEffect, manaEffectPath, man
     if target == nil or amount <= 0 then
         return 0
     end
-    if jass.IsUnitType(target, jass.UNIT_TYPE_DEAD) then
+    if jass:IsUnitType(target, jass.UNIT_TYPE_DEAD) then
         return 0
     end
     local actualMana = applyManaRestore(target, amount)
@@ -563,7 +563,7 @@ function ____exports.getTotalHealed(unit)
     if unit == nil then
         return 0
     end
-    local hid = jass.GetHandleId(unit)
+    local hid = jass:GetHandleId(unit)
     if hid == nil or hid == 0 then
         return 0
     end

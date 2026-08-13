@@ -2,7 +2,7 @@
 
 import { 利尔伯特单位技能配置 } from './00．配置';
 import { 获取或创建利尔伯特上下文, 利尔伯特单位存活, type 利尔伯特运行时上下文 } from './01．运行时';
-import { 利尔伯特技能配置 } from './02．数值与表现配置';
+import { 利尔伯特技能配置, 利尔伯特音效配置 } from './02．数值与表现配置';
 import { 创建技能提示圈 } from '../../../../00．技能模板+函数/02．通用函数/16．技能提示圈工厂';
 import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 
@@ -31,6 +31,9 @@ const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC�
 };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
+};
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
 };
 const jass = require('jass.common') as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -68,6 +71,7 @@ function on裂地斩结算(this: void, variable?: any): void {
     const 落点 = 快照.落点列表[i];
     播放裂地斩点特效(配置.命中特效, 落点.X, 落点.Y);
     播放裂地斩点特效(配置.爆炸特效, 落点.X, 落点.Y);
+    播放Boss坐标音效(利尔伯特音效配置.裂地斩.爆炸命中, 落点.X, 落点.Y, 利尔伯特音效配置.默认裁断距离);
     const 目标列表 = getEnemyUnitsInRange(boss, 落点.X, 落点.Y, 配置.作用半径);
     for (let j = 0; j < 目标列表.length; j++) {
       const 目标 = 目标列表[j];
@@ -114,6 +118,7 @@ export function 释放利尔伯特裂地斩(this: void, 上下文: 利尔伯特�
   }
   开始硬直(boss, 配置.施法硬直秒);
   SetUnitAnimationByIndex(boss, 配置.动作编号);
+  播放Boss坐标音效(利尔伯特音效配置.裂地斩.蓄力, GetUnitX(boss), GetUnitY(boss), 利尔伯特音效配置.默认裁断距离);
   显示常规技能吟唱条({ 通道: 配置.读条通道, 总时长: 配置.施法硬直秒, 颜色ID: 配置.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
   for (let i = 0; i < 落点列表.length; i++) {
     const 落点 = 落点列表[i];

@@ -10,7 +10,7 @@ local __TS__ArrayFind = ____lualib.__TS__ArrayFind
 local ____exports = {}
 --- 获取当前时间戳（War3 Lua 环境下替代 Date.now）
 local function now(self)
-    return os.time()
+    return os:time()
 end
 ____exports.QuestType = ____exports.QuestType or ({})
 ____exports.QuestType.MAIN = "主线"

@@ -43,8 +43,15 @@ const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定�
 const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
   立即移除单位并取消排泄登记: (this: void, unit: any) => void;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, size: number, speed: number, time: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: {
+    模型路径: string;
+    X: number;
+    Y: number;
+    面向角度?: number;
+    缩放?: number;
+    持续秒?: number;
+  }) => any;
 };
 const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
   PlaySoundBJ: (this: void, soundHandle: any) => void;
@@ -53,8 +60,11 @@ const { 进入剧情电影模式, 退出剧情电影模式并恢复镜头 } = re
   进入剧情电影模式: (this: void) => void;
   退出剧情电影模式并恢复镜头: (this: void) => void;
 };
-const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  添加单位暂停: (this: void, unit: any, 来源: string) => boolean;
+const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  暂停并设置无敌安全: (this: void, unit: any, 来源: string) => boolean;
+};
+const { 设置玩家英雄组控制状态 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具") as {
+  设置玩家英雄组控制状态: (this: void, 暂停: boolean, 无敌: boolean) => void;
 };
 const { 注册剧情片段清理 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表") as {
   注册剧情片段清理: (this: void, 片段ID: string, 清理函数: (this: void) => void) => void;
@@ -93,8 +103,6 @@ const KillUnit = jass.KillUnit as (this: void, whichUnit: any) => void;
 const IssuePointOrder = jass.IssuePointOrder as (this: void, whichUnit: any, order: string, x: number, y: number) => boolean;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const DisplayCineFilter = jass.DisplayCineFilter as (this: void, flag: boolean) => void;
 const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
@@ -173,18 +181,7 @@ function 清理地精洞窟演出(this: void): void {
   const 魔法核心 = 读取剧情运行时单位(`${地精洞窟临时单位键前缀}100`);
   if (有效单位(魔法核心)) 立即移除单位并取消排泄登记(魔法核心);
   清理剧情运行时单位(`${地精洞窟临时单位键前缀}100`);
-  const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
-  if (玩家英雄组 != null && 玩家英雄组 !== 0) {
-    const { ForGroupBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
-      ForGroupBJ: (this: void, whichGroup: any, callback: (this: void) => void) => void;
-    };
-    ForGroupBJ(玩家英雄组, () => {
-      const unit = jass.GetEnumUnit();
-      if (unit == null || unit === 0) return;
-      PauseUnit(unit, false);
-      SetUnitInvulnerable(unit, false);
-    });
-  }
+  设置玩家英雄组控制状态(false, false);
   退出剧情电影模式并恢复镜头();
 }
 
@@ -227,8 +224,7 @@ export function 执行地精洞窟祭坛演出开始(this: void): void {
 
   const bossUnit = 读取剧情运行时单位("Boss.地精巫师");
   if (有效单位(bossUnit)) {
-    SetUnitInvulnerable(bossUnit, true);
-    添加单位暂停(bossUnit, 剧情Boss预置暂停来源);
+    暂停并设置无敌安全(bossUnit, 剧情Boss预置暂停来源);
   }
 }
 
@@ -262,16 +258,14 @@ export function 执行地精洞窟演员动作(this: void, 参数: 剧情动作�
     移除地精洞窟临时单位("2");
     创建地精洞窟临时单位("n008", -25909.9, -14001.3, 90, "7");
     创建地精洞窟临时单位("n008", -25994.5, -13977.6, 90, "8");
-    EC_CreateEffect(
-      "Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdl",
-      -25959.4,
-      -14091,
-      0,
-      270,
-      2,
-      1,
-      2,
-    );
+    创建点特效({
+      模型路径: "Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdl",
+      X: -25959.4,
+      Y: -14091,
+      面向角度: 270,
+      缩放: 2,
+      持续秒: 2,
+    });
     播放地精洞窟仪式音效();
     return;
   }
@@ -313,18 +307,7 @@ export function 执行地精洞窟演员动作(this: void, 参数: 剧情动作�
 export function 执行地精洞窟演出收尾(this: void): void {
   DisplayCineFilter(false);
   结束地精洞窟演出音乐();
-  const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
-  if (玩家英雄组 != null && 玩家英雄组 !== 0) {
-    const { ForGroupBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
-      ForGroupBJ: (this: void, whichGroup: any, callback: (this: void) => void) => void;
-    };
-    ForGroupBJ(玩家英雄组, () => {
-      const unit = jass.GetEnumUnit();
-      if (unit == null || unit === 0) return;
-      SetUnitInvulnerable(unit, false);
-      PauseUnit(unit, false);
-    });
-  }
+  设置玩家英雄组控制状态(false, false);
   退出剧情电影模式并恢复镜头();
 }
 

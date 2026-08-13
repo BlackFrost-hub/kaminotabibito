@@ -4,6 +4,7 @@ import { 任务配置列表, 任务配置 } from "../../08．任务系统/00．�
 import { 注册单个任务配置到任务库, resolveRewardDisplayText } from "../../08．任务系统/00．配置表/05．任务配置注册";
 import { 按单位查找NPC配置 } from "../../08．任务系统/00．配置表/04．NPC生成器";
 import { questDB, QuestStatus } from "../../08．任务系统/01．任务数据";
+import { questManager } from "../../08．任务系统/02．任务管理器";
 import { fourCCToString } from "../../../lib/扩展函数/封装函数/01．通用工具/01．FourCC转换";
 
 const jass = require("jass.common") as any;
@@ -43,7 +44,7 @@ export function getQuestState(playerId: number, questId: string): number {
 
 export function setQuestState(playerId: number, questId: string, state: number, playerName?: string): void {
   if (state === 1) {
-    questDB.acceptQuest(playerId, questId);
+    questManager.onQuestAccepted(playerId, questId);
     if (playerName) {
       const def = questDB.getQuest(questId);
       if (def) def.accepterName = playerName;
@@ -66,7 +67,7 @@ export function setQuestState(playerId: number, questId: string, state: number, 
       if (playerName) active.completerName = playerName;
     }
     const savedAccepterName = active != null ? active.accepterName : undefined;
-    questDB.completeQuest(playerId, questId);
+    questManager.onQuestCompleted(playerId, questId);
     if (playerName) {
       const def = questDB.getQuest(questId);
       if (def) {
@@ -85,6 +86,20 @@ export function hasPlayerCompletedQuest(playerId: number, questId: string): bool
   return getQuestState(playerId, questId) === 2;
 }
 
+export function 读取任务目标进度(this: void, playerId: number, questId: string): { 当前: number; 需求: number } | null {
+  const globalData = (questDB as any).globalData;
+  const activeQuest = globalData != null ? globalData.quests.get(questId) : null;
+  if (activeQuest == null || activeQuest.objectives == null || activeQuest.objectives.length === 0) return null;
+  const objective = activeQuest.objectives[0];
+  if (objective == null) return null;
+  return { 当前: objective.current, 需求: objective.required };
+}
+
+export function 任务目标是否完成(this: void, playerId: number, questId: string): boolean {
+  const 进度 = 读取任务目标进度(playerId, questId);
+  return 进度 != null && 进度.当前 >= 进度.需求;
+}
+
 // ========== 虚拟分区：NPC/任务/对话配置查询 ==========
 export function findQuestByNpc(npcName: string): 任务配置 | undefined {
   return 任务配置列表.find(quest => quest.启用 === true && quest.开始NPC === npcName && quest.任务ID);
@@ -93,6 +108,45 @@ export function findQuestByNpc(npcName: string): 任务配置 | undefined {
 export function findQuestById(任务ID: number): 任务配置 | undefined {
   for (const 任务 of 任务配置列表) {
     if (任务.启用 === true && 任务.任务ID === 任务ID) return 任务;
+  }
+  return undefined;
+}
+
+function 任务匹配当前NPC(
+  this: void,
+  任务: 任务配置,
+  npcName: string,
+  npcQuestId?: number,
+  npcConfigName?: string,
+): boolean {
+  if (任务.任务ID === npcQuestId) return true;
+  if (任务.开始NPC === npcName) return true;
+  return npcConfigName != null && npcConfigName !== "" && 任务.开始NPC === npcConfigName;
+}
+
+function 任务前置均已完成(this: void, playerId: number, 任务ID: string): boolean {
+  const 任务定义 = questDB.getQuest(任务ID);
+  if (任务定义 == null || !任务定义.requiredQuests || 任务定义.requiredQuests.length === 0) return true;
+  for (const 前置任务ID of 任务定义.requiredQuests) {
+    if (!hasPlayerCompletedQuest(playerId, 前置任务ID)) return false;
+  }
+  return true;
+}
+
+export function findAvailableQuestByNpc(
+  this: void,
+  npcName: string,
+  playerId: number,
+  npcQuestId?: number,
+  npcConfigName?: string,
+): 任务配置 | undefined {
+  for (const 任务 of 任务配置列表) {
+    if (任务.启用 !== true || !任务.任务ID) continue;
+    if (!任务匹配当前NPC(任务, npcName, npcQuestId, npcConfigName)) continue;
+    const 任务ID = 任务.任务ID.toString();
+    if (hasPlayerAcceptedQuest(playerId, 任务ID) || hasPlayerCompletedQuest(playerId, 任务ID)) continue;
+    if (!任务前置均已完成(playerId, 任务ID)) continue;
+    return 任务;
   }
   return undefined;
 }

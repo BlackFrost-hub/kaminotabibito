@@ -9,4 +9,5 @@ export { 吸收伤害, 注册护盾吸收钩子 } from "./04．护盾伤害结�
 export * from "./05．护盾生命周期";
 export * from "./07．护盾系统";
 export * from "./08．世界坐标护盾条";
+export * from "./09．主动引爆护盾";
 export * from "../../00．技能模板/11．回调模板/03．护盾回调模板";

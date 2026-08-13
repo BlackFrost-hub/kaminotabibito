@@ -65,10 +65,10 @@ function ____exports.applyEquipStatsTS(unit, stats)
     if not unit or not stats or #stats == 0 then
         return readBack
     end
-    local owner = jass.GetOwningPlayer(unit)
+    local owner = jass:GetOwningPlayer(unit)
     local heroGroup = getHeroGroup()
-    local isHeroByGroup = not not (heroGroup and jass.IsUnitInGroup(unit, heroGroup))
-    local isHeroByType = not not jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
+    local isHeroByGroup = not not (heroGroup and jass:IsUnitInGroup(unit, heroGroup))
+    local isHeroByType = not not jass:IsUnitType(unit, jass.UNIT_TYPE_HERO)
     local isHero = isHeroByGroup or not heroGroup and isHeroByType
     for ____, s in ipairs(stats) do
         do
@@ -122,7 +122,7 @@ function ____exports.applyEquipStatsTS(unit, stats)
             elseif name == "经验获取率" and owner then
                 local t = __TS__Number(g.udg_T) or 1
                 local base = 0.35 + 0.65 * t
-                jass.SetPlayerHandicapXP(owner, base * value)
+                jass:SetPlayerHandicapXP(owner, base * value)
             end
         end
         ::__continue19::

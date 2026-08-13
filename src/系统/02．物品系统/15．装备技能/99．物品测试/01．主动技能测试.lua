@@ -16,6 +16,7 @@ local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F = ____00_
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试命令列表"]
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_547D_4EE4_8BF4_660E_6587_672C_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试命令说明文本列表"]
 local _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_6E05_7406_88C5_5907_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["物品主动技能测试清理装备列表"]
+local _____7CBE_7075_836F_6C34_6D4B_8BD5_88C5_5907_5217_8868 = ____00_FF0E_6D4B_8BD5_914D_7F6E["精灵药水测试装备列表"]
 function _____53D1_653E_76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5(unit, _____88C5_5907_540D, rawId, itemTypeId)
     local offsetX = 0
     if rawId == "I0FL" then
@@ -74,6 +75,7 @@ local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_
 IssueTargetOrder = jass.IssueTargetOrder
 CreateItem = jass.CreateItem
 local UnitRemoveItem = jass.UnitRemoveItem
+local UnitAddItem = jass.UnitAddItem
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetItemTypeId = jass.GetItemTypeId
@@ -91,6 +93,7 @@ local GroupRemoveUnit = jass.GroupRemoveUnit
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 _____6A21_5757_540D = "物品主动技能测试"
+local _____7CBE_7075_836F_6C34_5957_88C5_6D4B_8BD5_547D_4EE4 = "192"
 local _____7269_54C1_51B7_5374_5237_65B0_547D_4EE4 = "wpcd"
 local _____7269_54C1_8D1F_9762_6E05_9664_6D4B_8BD5_51CF_901F_547D_4EE4 = "wpslow"
 local _____6253_5370_6CE8_518C_547D_4EE4_65E5_5FD7 = false
@@ -288,8 +291,8 @@ local function _____521D_59CB_5316_6D4B_8BD5_7269_54C1_6280_80FDID_8868()
     local _____6D4B_8BD5_7269_54C1RawID_8868 = {}
     do
         local i = 0
-        while i < #_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F do
-            local _____88C5_5907_540D = _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[i + 1]
+        while i < #_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_6E05_7406_88C5_5907_5217_8868 do
+            local _____88C5_5907_540D = _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_6E05_7406_88C5_5907_5217_8868[i + 1]
             local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D)
             if rawId ~= nil and rawId ~= "" then
                 _____6D4B_8BD5_7269_54C1RawID_8868[rawId] = true
@@ -393,6 +396,42 @@ local function ____on_804A_5929_6302_8F7D_51CF_901F_6D4B_8BD5(player, _command)
 end
 local function _____53D1_653E_5355_4E2A_88C5_5907(unit, _____5E8F_53F7)
     _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)
+    if _____5E8F_53F7 == 192 then
+        local _____521B_5EFA_6570_91CF = 0
+        local x = GetUnitX(unit)
+        local y = GetUnitY(unit)
+        do
+            local i = 0
+            while i < #_____7CBE_7075_836F_6C34_6D4B_8BD5_88C5_5907_5217_8868 do
+                do
+                    local _____88C5_5907_540D = _____7CBE_7075_836F_6C34_6D4B_8BD5_88C5_5907_5217_8868[i + 1]
+                    local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D)
+                    local itemTypeId = stringToFourCCSafe(rawId)
+                    if itemTypeId == 0 then
+                        debugLogForce(_____6A21_5757_540D, "未找到精灵药水ID", _____88C5_5907_540D)
+                        goto __continue72
+                    end
+                    local item = CreateItem(itemTypeId, x, y)
+                    if item == nil or item == 0 then
+                        debugLogForce(
+                            _____6A21_5757_540D,
+                            "创建精灵药水失败",
+                            _____88C5_5907_540D,
+                            rawId,
+                            itemTypeId
+                        )
+                        goto __continue72
+                    end
+                    UnitAddItem(unit, item)
+                    _____521B_5EFA_6570_91CF = _____521B_5EFA_6570_91CF + 1
+                end
+                ::__continue72::
+                i = i + 1
+            end
+        end
+        debugLogForce(_____6A21_5757_540D, "已发放全部精灵药水", "创建数量", _____521B_5EFA_6570_91CF)
+        return
+    end
     if _____5E8F_53F7 > 0 and _____5E8F_53F7 <= #_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F then
         local _____88C5_5907_540D = _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[_____5E8F_53F7]
         if _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D) then
@@ -407,6 +446,10 @@ local function ____on_804A_5929wp_6D4B_8BD5(player, command)
     local unit = _____83B7_53D6_73A9_5BB6_6D4B_8BD5_5355_4F4D(player)
     if unit == nil or unit == 0 then
         debugLogForce(_____6A21_5757_540D, "未找到红色测试玩家英雄")
+        return
+    end
+    if command == _____7CBE_7075_836F_6C34_5957_88C5_6D4B_8BD5_547D_4EE4 then
+        _____53D1_653E_5355_4E2A_88C5_5907(unit, 192)
         return
     end
     do
@@ -427,6 +470,7 @@ do
         i = i + 1
     end
 end
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____7CBE_7075_836F_6C34_5957_88C5_6D4B_8BD5_547D_4EE4, ____on_804A_5929wp_6D4B_8BD5)
 _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____7269_54C1_51B7_5374_5237_65B0_547D_4EE4, ____on_804A_5929_5237_65B0_7269_54C1_51B7_5374)
 _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____7269_54C1_8D1F_9762_6E05_9664_6D4B_8BD5_51CF_901F_547D_4EE4, ____on_804A_5929_6302_8F7D_51CF_901F_6D4B_8BD5)
 if _____6253_5370_6CE8_518C_547D_4EE4_65E5_5FD7 then

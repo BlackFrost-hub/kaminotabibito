@@ -13,41 +13,44 @@ local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local YDWEAngleBetweenUnitsSafe = ____require_result_1.YDWEAngleBetweenUnitsSafe
-local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_2.GetPlayersAll
-local ForGroupBJ = ____require_result_2.ForGroupBJ
-local ____require_result_3 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
-local _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F = ____require_result_3["切换区域背景音乐表达式"]
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_4.EC_CreateEffect
+local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_2["添加单位暂停"]
+local _____91CA_653E_5355_4F4D_6682_505C_6765_6E90_5168_90E8 = ____require_result_2["释放单位暂停来源全部"]
+local ____require_result_3 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_3.GetPlayersAll
+local ForGroupBJ = ____require_result_3.ForGroupBJ
+local ____require_result_4 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F = ____require_result_4["切换区域背景音乐表达式"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local YDWETimerDestroyEffect = ____require_result_5.YDWETimerDestroyEffect
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_6["创建单位并登记排泄安全"]
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
-local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_7["立即移除单位并取消排泄登记"]
-local ____require_result_8 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
-local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_8["注册剧情片段清理"]
-local ____require_result_9 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
-local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_9["注册剧情运行时单位"]
-local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_9["读取剧情运行时单位"]
-local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_9["清理剧情运行时单位"]
-local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情电影镜头")
-local _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F = ____require_result_10["进入剧情电影模式"]
-local _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934 = ____require_result_10["退出剧情电影模式并恢复镜头"]
-local _____5E94_7528_5267_60C5_7535_5F71_955C_5934 = ____require_result_10["应用剧情电影镜头"]
-local ____require_result_11 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_11.addDelayedCallback
-local removeDelayedCallback = ____require_result_11.removeDelayedCallback
-local addPeriodicCallback = ____require_result_11.addPeriodicCallback
-local removePeriodicCallback = ____require_result_11.removePeriodicCallback
-local ____require_result_12 = require("系统.02．物品系统.13．物品名反查")
-local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_12["按名字反查物品ID"]
-local ____require_result_13 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑")
-local _____6309_7ED3_7B97_952E_6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_13["按结算键执行Boss死亡结算"]
-local ____require_result_14 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.04．死亡事件桥接")
-local _____6D88_8D39_4FDD_7559_5267_60C5Boss_6B7B_4EA1_51FB_6740_8005 = ____require_result_14["消费保留剧情Boss死亡击杀者"]
+local ____require_result_6 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local YDWETimerDestroyEffect = ____require_result_6.YDWETimerDestroyEffect
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_7["创建单位并登记排泄安全"]
+local ____require_result_8 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_8["立即移除单位并取消排泄登记"]
+local ____require_result_9 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
+local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_9["注册剧情片段清理"]
+local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
+local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_10["注册剧情运行时单位"]
+local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_10["读取剧情运行时单位"]
+local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_10["清理剧情运行时单位"]
+local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情电影镜头")
+local _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F = ____require_result_11["进入剧情电影模式"]
+local _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934 = ____require_result_11["退出剧情电影模式并恢复镜头"]
+local _____5E94_7528_5267_60C5_7535_5F71_955C_5934 = ____require_result_11["应用剧情电影镜头"]
+local ____require_result_12 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_12.addDelayedCallback
+local removeDelayedCallback = ____require_result_12.removeDelayedCallback
+local addPeriodicCallback = ____require_result_12.addPeriodicCallback
+local removePeriodicCallback = ____require_result_12.removePeriodicCallback
+local ____require_result_13 = require("系统.02．物品系统.13．物品名反查")
+local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_13["按名字反查物品ID"]
+local ____require_result_14 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.03．核心逻辑")
+local _____6309_7ED3_7B97_952E_6267_884CBoss_6B7B_4EA1_7ED3_7B97 = ____require_result_14["按结算键执行Boss死亡结算"]
+local ____require_result_15 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.02．Boss死亡结算.04．死亡事件桥接")
+local _____6D88_8D39_4FDD_7559_5267_60C5Boss_6B7B_4EA1_51FB_6740_8005 = ____require_result_15["消费保留剧情Boss死亡击杀者"]
 do
     local ____17_FF0E_7B2C_4E00_7AE0_6700_7EC8Boss_6559_6D3E_6B7B_4EA1 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.17．第一章最终Boss教派死亡")
     ____exports["教派最终Boss死亡剧情片段"] = ____17_FF0E_7B2C_4E00_7AE0_6700_7EC8Boss_6559_6D3E_6B7B_4EA1["教派最终Boss死亡剧情片段"]
@@ -74,8 +77,6 @@ local SetUnitX = jass.SetUnitX
 local SetUnitY = jass.SetUnitY
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitAnimation = jass.SetUnitAnimation
-local PauseUnit = jass.PauseUnit
-local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitVertexColor = jass.SetUnitVertexColor
 local GetEnumUnit = jass.GetEnumUnit
 local Player = jass.Player
@@ -85,6 +86,7 @@ local bj_QUESTMESSAGE_HINT = require("jass.globals").bj_QUESTMESSAGE_HINT
 local bj_QUESTMESSAGE_UPDATED = require("jass.globals").bj_QUESTMESSAGE_UPDATED
 local _____8499_9762_4EBA_6B7B_4EA1_73B0_573A_6B8B_5F71_952E = "剧情运行时.蒙面人死亡.残影"
 local _____8499_9762_4EBA_6B7B_4EA1_51FB_6740_73A9_5BB6_952E = "剧情运行时.蒙面人死亡.击杀玩家"
+local _____8499_9762_4EBA_6B7B_4EA1_73B0_573A_73A9_5BB6_6682_505C_6765_6E90 = "剧情系统:蒙面人死亡现场"
 local _____8499_9762_4EBA_6B7B_4EA1_73AF_5883_97F3_4E50_5EF6_8FDFID = 0
 local _____8499_9762_4EBA_6B7B_4EA1_97F3_4E50_5DF2_542F_52A8 = false
 local _____8499_9762_4EBA_6B7B_4EA1_6B8B_5F71_6E10_9690_5468_671FID = 0
@@ -203,8 +205,7 @@ local function _____6062_590D_8499_9762_4EBA_6B7B_4EA1_73A9_5BB6_63A7_5236()
     if not _____53E5_67C4_6709_6548(unit) then
         return
     end
-    PauseUnit(unit, false)
-    SetUnitInvulnerable(unit, false)
+    _____91CA_653E_5355_4F4D_6682_505C_6765_6E90_5168_90E8(unit, _____8499_9762_4EBA_6B7B_4EA1_73B0_573A_73A9_5BB6_6682_505C_6765_6E90)
 end
 local function _____6E05_7406_8499_9762_4EBA_6B7B_4EA1_73B0_573A()
     if _____8499_9762_4EBA_6B7B_4EA1_73AF_5883_97F3_4E50_5EF6_8FDFID ~= 0 then
@@ -266,7 +267,7 @@ local function _____5E03_7F6E_8499_9762_4EBA_6B7B_4EA1_73B0_573A_82F1_96C4()
         YDWEAngleBetweenUnitsSafe(unit, _____8499_9762_4EBA_6B7B_4EA1_679A_4E3E_6B8B_5F71)
     )
     SetUnitAnimation(unit, "Attack")
-    PauseUnit(unit, true)
+    _____6DFB_52A0_5355_4F4D_6682_505C(unit, _____8499_9762_4EBA_6B7B_4EA1_73B0_573A_73A9_5BB6_6682_505C_6765_6E90)
 end
 local function _____73A9_5BB6_82F1_96C4_8FDB_5165_8499_9762_4EBA_6B7B_4EA1_73B0_573A(_____6B8B_5F71)
     local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
@@ -282,7 +283,7 @@ local function _____91CA_653E_8499_9762_4EBA_6B7B_4EA1_73B0_573A_82F1_96C4()
     if not _____53E5_67C4_6709_6548(unit) then
         return
     end
-    PauseUnit(unit, false)
+    _____91CA_653E_5355_4F4D_6682_505C_6765_6E90_5168_90E8(unit, _____8499_9762_4EBA_6B7B_4EA1_73B0_573A_73A9_5BB6_6682_505C_6765_6E90)
     local radians = GetUnitFacing(unit) * bj_DEGTORAD
     IssuePointOrder(
         unit,
@@ -345,31 +346,29 @@ ____exports["执行蒙面人死亡"] = function(______53C2_6570)
     local _____51FB_6740_73A9_5BB6 = _____8BFB_53D6_8499_9762_4EBA_6B7B_4EA1_51FB_6740_73A9_5BB6(dyingUnit)
     _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____8499_9762_4EBA_6B7B_4EA1_51FB_6740_73A9_5BB6_952E, _____51FB_6740_73A9_5BB6)
     if _____6B8B_5F71 ~= nil and _____6B8B_5F71 ~= 0 then
-        EC_CreateEffect(
-            "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl",
-            GetUnitX(_____6B8B_5F71),
-            GetUnitY(_____6B8B_5F71),
-            0,
-            270,
-            2,
-            1,
-            3
-        )
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl",
+            X = GetUnitX(_____6B8B_5F71),
+            Y = GetUnitY(_____6B8B_5F71),
+            ["面向角度"] = 270,
+            ["缩放"] = 2,
+            ["动画速度"] = 1,
+            ["持续秒"] = 3
+        })
         local _____6B8B_5F71_6D41_8840_7279_6548 = AddSpecialEffectTarget("Objects\\Spawnmodels\\Human\\HumanBlood\\BloodElfSpellThiefBlood.mdl", _____6B8B_5F71, "origin")
         if _____6B8B_5F71_6D41_8840_7279_6548 ~= nil and _____6B8B_5F71_6D41_8840_7279_6548 ~= 0 then
             YDWETimerDestroyEffect(4, _____6B8B_5F71_6D41_8840_7279_6548)
         end
     end
-    EC_CreateEffect(
-        "Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl",
-        -26846.7,
-        -27820.8,
-        0,
-        270,
-        1.65,
-        1,
-        3
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = "Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl",
+        X = -26846.7,
+        Y = -27820.8,
+        ["面向角度"] = 270,
+        ["缩放"] = 1.65,
+        ["动画速度"] = 1,
+        ["持续秒"] = 3
+    })
     _____73A9_5BB6_82F1_96C4_8FDB_5165_8499_9762_4EBA_6B7B_4EA1_73B0_573A(_____6B8B_5F71)
     _____6309_7ED3_7B97_952E_6267_884CBoss_6B7B_4EA1_7ED3_7B97("蒙面人", dyingUnit, _____51FB_6740_73A9_5BB6)
 end
@@ -378,16 +377,15 @@ ____exports["执行蒙面人死亡残影遁走"] = function()
     if not _____53E5_67C4_6709_6548(_____6B8B_5F71) then
         return
     end
-    EC_CreateEffect(
-        "war3mapImported\\[AKE]war3AKE.com - 8853914802857115659031497.mdl",
-        GetUnitX(_____6B8B_5F71),
-        GetUnitY(_____6B8B_5F71),
-        0,
-        270,
-        1.25,
-        1,
-        5
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = "war3mapImported\\[AKE]war3AKE.com - 8853914802857115659031497.mdl",
+        X = GetUnitX(_____6B8B_5F71),
+        Y = GetUnitY(_____6B8B_5F71),
+        ["面向角度"] = 270,
+        ["缩放"] = 1.25,
+        ["动画速度"] = 1,
+        ["持续秒"] = 5
+    })
     if _____8499_9762_4EBA_6B7B_4EA1_6B8B_5F71_6E10_9690_5468_671FID ~= 0 then
         removePeriodicCallback(_____8499_9762_4EBA_6B7B_4EA1_6B8B_5F71_6E10_9690_5468_671FID)
     end
@@ -405,11 +403,11 @@ ____exports["执行蒙面人死亡关闭电影模式"] = function()
     _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934()
 end
 ____exports["执行蒙面人死亡收尾"] = function(_____53C2_6570)
-    local ____53C2_6570__56FA_5B9A_6389_843D_7269_54C1_540D_15 = _____53C2_6570["固定掉落物品名"]
-    if ____53C2_6570__56FA_5B9A_6389_843D_7269_54C1_540D_15 == nil then
-        ____53C2_6570__56FA_5B9A_6389_843D_7269_54C1_540D_15 = ""
+    local ____53C2_6570__56FA_5B9A_6389_843D_7269_54C1_540D_16 = _____53C2_6570["固定掉落物品名"]
+    if ____53C2_6570__56FA_5B9A_6389_843D_7269_54C1_540D_16 == nil then
+        ____53C2_6570__56FA_5B9A_6389_843D_7269_54C1_540D_16 = ""
     end
-    local _____56FA_5B9A_6389_843D_7269_54C1_540D = tostring(____53C2_6570__56FA_5B9A_6389_843D_7269_54C1_540D_15)
+    local _____56FA_5B9A_6389_843D_7269_54C1_540D = tostring(____53C2_6570__56FA_5B9A_6389_843D_7269_54C1_540D_16)
     local _____56FA_5B9A_6389_843D_7269_54C1ID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____56FA_5B9A_6389_843D_7269_54C1_540D))
     if _____56FA_5B9A_6389_843D_7269_54C1ID > 0 then
         CreateItem(

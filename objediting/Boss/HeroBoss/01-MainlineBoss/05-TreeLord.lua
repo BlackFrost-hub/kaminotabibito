@@ -9,7 +9,7 @@ createMeleeBossHeroUnit('N05S', '树魔首领', {
   description = '树魔首领',
 
   level = 30,
-  hp = 20000,
+  hp = 16000,
   mana = 1000,
   initialMana = 1000,
   manaRegen = 5.0,
@@ -20,7 +20,7 @@ createMeleeBossHeroUnit('N05S', '树魔首领', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 1200,
+  damageBase = 960,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 1.2,

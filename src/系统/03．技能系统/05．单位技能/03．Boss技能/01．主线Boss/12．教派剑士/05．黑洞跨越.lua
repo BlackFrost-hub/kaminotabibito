@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local _____4FEE_6539_5355_4F4D_5B9E_6570_5C5E_6027, _____6062_590D_9ED1_6D1E_5954_8DD1_5C5E_6027, _____6E05_9664_9ED1_6D1E_5F3A_5316_666E_653B, _____6FC0_6D3B_9ED1_6D1E_5F3A_5316_666E_653B, _____7ED3_675F_9ED1_6D1E_8DE8_8D8A, ____on_9ED1_6D1EBoss_51FA_73B0, ____on_521B_5EFA_9ED1_6D1E_51FA_53E3, _____5B89_6392_9ED1_6D1E_79FB_52A8_68C0_67E5, ____on_9ED1_6D1E_79FB_52A8_68C0_67E5, addDelayedCallback, removeDelayedCallback, _____6DFB_52A0_5355_4F4D_6682_505C, _____79FB_9664_5355_4F4D_6682_505C, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____5173_95ED_541F_5531_6761, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, YDUserDataGetSafe, YDUserDataSetSafe, EC_CreateEffect, debugLogForce, GetHandleId, GetUnitFacing, GetUnitX, GetUnitY, SetUnitFacing, ShowUnit, IssuePointOrder, IssueTargetOrder, _____9ED1_6D1E_6682_505C_6765_6E90
+local _____4FEE_6539_5355_4F4D_5B9E_6570_5C5E_6027, _____6062_590D_9ED1_6D1E_5954_8DD1_5C5E_6027, _____6E05_9664_9ED1_6D1E_5F3A_5316_666E_653B, _____6FC0_6D3B_9ED1_6D1E_5F3A_5316_666E_653B, _____7ED3_675F_9ED1_6D1E_8DE8_8D8A, ____on_9ED1_6D1EBoss_51FA_73B0, ____on_521B_5EFA_9ED1_6D1E_51FA_53E3, _____5B89_6392_9ED1_6D1E_79FB_52A8_68C0_67E5, ____on_9ED1_6D1E_79FB_52A8_68C0_67E5, addDelayedCallback, removeDelayedCallback, _____6DFB_52A0_5355_4F4D_6682_505C, _____79FB_9664_5355_4F4D_6682_505C, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____5173_95ED_541F_5531_6761, _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4, YDUserDataGetSafe, YDUserDataSetSafe, EC_CreateEffect, Sound3DII_CooPlayReuse, debugLogForce, GetHandleId, GetUnitFacing, GetUnitX, GetUnitY, SetUnitFacing, ShowUnit, IssuePointOrder, IssueTargetOrder, _____9ED1_6D1E_6682_505C_6765_6E90
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.12．教派剑士.00．配置")
 local _____6559_6D3E_5251_58EB_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["教派剑士单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.12．教派剑士.01．运行时上下文")
@@ -10,6 +10,7 @@ local _____83B7_53D6_6216_521B_5EFA_6559_6D3E_5251_58EB_4E0A_4E0B_6587 = ____01_
 local _____6559_6D3E_5251_58EB_5355_4F4D_5B58_6D3B = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["教派剑士单位存活"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.12．教派剑士.02．数值与表现配置")
 local _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派剑士技能配置"]
+local _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["教派剑士音效配置"]
 local ____11_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.12．教派剑士.11．台词播放")
 local _____64AD_653E_6559_6D3E_5251_58EB_53F0_8BCD = ____11_FF0E_53F0_8BCD_64AD_653E["播放教派剑士台词"]
 local ____01_FF0E_53EF_653B_51FB_673A_5236_5355_4F4D = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.05．机制单位.01．可攻击机制单位")
@@ -85,8 +86,8 @@ function _____6FC0_6D3B_9ED1_6D1E_5F3A_5316_666E_653B(_____4E0A_4E0B_6587)
         {sourceUnit = _____4E0A_4E0B_6587["Boss单位"], effectSourceName = "黑洞强化普攻", effectSourceType = "技能"}
     )
     _____4E0A_4E0B_6587["黑洞强化普攻清除回调ID"] = addDelayedCallback(_____914D_7F6E["强化普攻窗口秒"] * 1000, _____6E05_9664_9ED1_6D1E_5F3A_5316_666E_653B, _____4E0A_4E0B_6587)
-    local ____self_13 = _____4E0A_4E0B_6587["清理"]
-    ____self_13["登记延迟回调"](____self_13, "教派剑士-黑洞强化普攻窗口", _____4E0A_4E0B_6587["黑洞强化普攻清除回调ID"])
+    local ____self_14 = _____4E0A_4E0B_6587["清理"]
+    ____self_14["登记延迟回调"](____self_14, "教派剑士-黑洞强化普攻窗口", _____4E0A_4E0B_6587["黑洞强化普攻清除回调ID"])
     debugLogForce(
         "教派剑士-黑洞跨越",
         "强化普攻窗口激活",
@@ -143,14 +144,21 @@ function ____on_9ED1_6D1EBoss_51FA_73B0(variable)
     _____72B6_6001["Boss已隐藏"] = false
     _____6FC0_6D3B_9ED1_6D1E_5F3A_5316_666E_653B(_____72B6_6001["上下文"])
     _____64AD_653E_6559_6D3E_5251_58EB_53F0_8BCD(boss, "黑洞跨越")
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["黑洞跨越"]["Boss出现"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
+    )
     local target = _____72B6_6001["出口目标"]
-    local ____temp_14
+    local ____temp_15
     if target ~= nil and target ~= 0 and _____6559_6D3E_5251_58EB_5355_4F4D_5B58_6D3B(target) then
-        ____temp_14 = IssueTargetOrder(boss, "attack", target)
+        ____temp_15 = IssueTargetOrder(boss, "attack", target)
     else
-        ____temp_14 = false
+        ____temp_15 = false
     end
-    local _____5DF2_4E0B_8FBE_653B_51FB = ____temp_14
+    local _____5DF2_4E0B_8FBE_653B_51FB = ____temp_15
     debugLogForce(
         "教派剑士-黑洞跨越",
         "Boss出现并追击出口目标",
@@ -209,8 +217,8 @@ function ____on_521B_5EFA_9ED1_6D1E_51FA_53E3(variable)
     )
     _____72B6_6001["阶段"] = "出口等待"
     _____72B6_6001["出现回调ID"] = addDelayedCallback(_____914D_7F6E["出口等待秒"] * 1000, ____on_9ED1_6D1EBoss_51FA_73B0, _____72B6_6001)
-    local ____self_15 = _____72B6_6001["上下文"]["清理"]
-    ____self_15["登记延迟回调"](____self_15, "教派剑士-黑洞出现", _____72B6_6001["出现回调ID"])
+    local ____self_16 = _____72B6_6001["上下文"]["清理"]
+    ____self_16["登记延迟回调"](____self_16, "教派剑士-黑洞出现", _____72B6_6001["出现回调ID"])
     debugLogForce(
         "教派剑士-黑洞跨越",
         "出口创建",
@@ -230,8 +238,8 @@ function _____5B89_6392_9ED1_6D1E_79FB_52A8_68C0_67E5(_____72B6_6001)
     end
     local _____914D_7F6E = _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["黑洞跨越"]
     _____72B6_6001["移动检查回调ID"] = addDelayedCallback(_____914D_7F6E["移动检查间隔秒"] * 1000, ____on_9ED1_6D1E_79FB_52A8_68C0_67E5, _____72B6_6001)
-    local ____self_16 = _____72B6_6001["上下文"]["清理"]
-    ____self_16["登记延迟回调"](____self_16, "教派剑士-黑洞移动检查", _____72B6_6001["移动检查回调ID"])
+    local ____self_17 = _____72B6_6001["上下文"]["清理"]
+    ____self_17["登记延迟回调"](____self_17, "教派剑士-黑洞移动检查", _____72B6_6001["移动检查回调ID"])
 end
 function ____on_9ED1_6D1E_79FB_52A8_68C0_67E5(variable)
     local _____72B6_6001 = variable
@@ -251,12 +259,12 @@ function ____on_9ED1_6D1E_79FB_52A8_68C0_67E5(variable)
         _____72B6_6001["黑洞X"],
         _____72B6_6001["黑洞Y"]
     ) <= _____914D_7F6E["黑洞进入距离"] * _____914D_7F6E["黑洞进入距离"]
-    local ____temp_18 = _____72B6_6001["黑洞实例"] == nil
-    if not ____temp_18 then
-        local ____self_17 = _____72B6_6001["黑洞实例"]
-        ____temp_18 = not ____self_17["是否存活"](____self_17)
+    local ____temp_19 = _____72B6_6001["黑洞实例"] == nil
+    if not ____temp_19 then
+        local ____self_18 = _____72B6_6001["黑洞实例"]
+        ____temp_19 = not ____self_18["是否存活"](____self_18)
     end
-    if ____temp_18 then
+    if ____temp_19 then
         _____7ED3_675F_9ED1_6D1E_8DE8_8D8A(_____72B6_6001, "黑洞失效")
         return
     end
@@ -267,6 +275,13 @@ function ____on_9ED1_6D1E_79FB_52A8_68C0_67E5(variable)
     end
     _____6062_590D_9ED1_6D1E_5954_8DD1_5C5E_6027(_____72B6_6001)
     _____72B6_6001["阶段"] = "消失"
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["黑洞跨越"]["进入黑洞"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
+    )
     local _____9ED1_6D1E_5B9E_4F8B = _____72B6_6001["黑洞实例"]
     _____72B6_6001["黑洞实例"] = nil
     _____72B6_6001["黑洞单位"] = nil
@@ -275,8 +290,8 @@ function ____on_9ED1_6D1E_79FB_52A8_68C0_67E5(variable)
     ShowUnit(boss, false)
     _____72B6_6001["Boss已隐藏"] = true
     _____72B6_6001["出口回调ID"] = addDelayedCallback(_____914D_7F6E["消失等待秒"] * 1000, ____on_521B_5EFA_9ED1_6D1E_51FA_53E3, _____72B6_6001)
-    local ____self_19 = _____72B6_6001["上下文"]["清理"]
-    ____self_19["登记延迟回调"](____self_19, "教派剑士-黑洞出口", _____72B6_6001["出口回调ID"])
+    local ____self_20 = _____72B6_6001["上下文"]["清理"]
+    ____self_20["登记延迟回调"](____self_20, "教派剑士-黑洞出口", _____72B6_6001["出口回调ID"])
     debugLogForce(
         "教派剑士-黑洞跨越",
         "成功进入黑洞并消失",
@@ -315,8 +330,10 @@ local ____require_result_10 = require("lib.扩展函数.Star扩展函数.04．EC
 EC_CreateEffect = ____require_result_10.EC_CreateEffect
 local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_11.stringToFourCCSafe
-local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_12.debugLogForce
+local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_13.debugLogForce
 local jass = require("jass.common")
 GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -364,6 +381,13 @@ local function _____7ED3_7B97_9ED1_6D1E_6467_6BC1(_____72B6_6001, killer)
         _____914D_7F6E["黑洞摧毁特效缩放"],
         1,
         _____914D_7F6E["黑洞摧毁特效持续秒"]
+    )
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["黑洞跨越"]["黑洞被摧毁"],
+        _____72B6_6001["黑洞X"],
+        _____72B6_6001["黑洞Y"],
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
     )
     local _____5355_4F4D_5217_8868 = getUnitsInRange(_____72B6_6001["黑洞X"], _____72B6_6001["黑洞Y"], _____914D_7F6E["摧毁爆炸半径"])
     local _____547D_4E2D_6570 = 0
@@ -508,15 +532,15 @@ local function ____on_5F00_59CB_9ED1_6D1E_5954_8DD1(variable)
 end
 local function _____9ED1_6D1E_514B_5236_5C5E_6027_627F_4F24_4FEE_6B63(context)
     if context == nil or context.target == nil or context.target == 0 or context.isFireDamage ~= true and context.isLightDamage ~= true then
-        local ____opt_result_22
+        local ____opt_result_23
         if context ~= nil then
-            ____opt_result_22 = context.currentDamage
+            ____opt_result_23 = context.currentDamage
         end
-        local ____opt_result_22_23 = ____opt_result_22
-        if ____opt_result_22_23 == nil then
-            ____opt_result_22_23 = 0
+        local ____opt_result_23_24 = ____opt_result_23
+        if ____opt_result_23_24 == nil then
+            ____opt_result_23_24 = 0
         end
-        return ____opt_result_22_23
+        return ____opt_result_23_24
     end
     local _____4E0A_4E0B_6587_5217_8868 = _____83B7_53D6_5168_90E8_6559_6D3E_5251_58EB_4E0A_4E0B_6587()
     do
@@ -571,10 +595,17 @@ ____exports["释放教派剑士黑洞跨越"] = function(_____4E0A_4E0B_6587)
         ["出现回调ID"] = 0
     }
     _____4E0A_4E0B_6587["黑洞状态"] = _____72B6_6001
-    local ____self_26 = _____4E0A_4E0B_6587["清理"]
-    ____self_26["登记清理"](____self_26, "教派剑士-黑洞跨越清理", ____on_9ED1_6D1E_8DE8_8D8A_6E05_7406, _____72B6_6001)
+    local ____self_27 = _____4E0A_4E0B_6587["清理"]
+    ____self_27["登记清理"](____self_27, "教派剑士-黑洞跨越清理", ____on_9ED1_6D1E_8DE8_8D8A_6E05_7406, _____72B6_6001)
     _____5F00_59CB_786C_76F4(boss, _____914D_7F6E["施法硬直秒"])
     SetUnitAnimation(boss, _____914D_7F6E["动作名"])
+    Sound3DII_CooPlayReuse(
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["黑洞跨越"]["黑洞开启"],
+        GetUnitX(boss),
+        GetUnitY(boss),
+        0,
+        _____6559_6D3E_5251_58EB_97F3_6548_914D_7F6E["音效裁断距离"]
+    )
     _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({
         ["通道"] = _____914D_7F6E["读条通道"],
         ["总时长"] = _____914D_7F6E["施法硬直秒"],
@@ -583,8 +614,8 @@ ____exports["释放教派剑士黑洞跨越"] = function(_____4E0A_4E0B_6587)
         ["提示文本"] = _____914D_7F6E["读条提示"]
     })
     _____72B6_6001["启动回调ID"] = addDelayedCallback(_____914D_7F6E["施法硬直秒"] * 1000, ____on_5F00_59CB_9ED1_6D1E_5954_8DD1, _____72B6_6001)
-    local ____self_27 = _____4E0A_4E0B_6587["清理"]
-    ____self_27["登记延迟回调"](____self_27, "教派剑士-黑洞奔跑开始", _____72B6_6001["启动回调ID"])
+    local ____self_28 = _____4E0A_4E0B_6587["清理"]
+    ____self_28["登记延迟回调"](____self_28, "教派剑士-黑洞奔跑开始", _____72B6_6001["启动回调ID"])
     debugLogForce(
         "教派剑士-黑洞跨越",
         "施法前摇开始",

@@ -36,8 +36,8 @@ function _____5F52_7C7B_53CD_67E5_5355_4F4DID(_____654C_4EBA_5F52_7C7B, _____535
 end
 function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
     if _____914D_7F6E["敌人归类"] == "杂鱼" or _____914D_7F6E["敌人归类"] == "精英" then
-        local ____opt_13 = _____914D_7F6E["兼容单位ID"]
-        local _____517C_5BB9_5355_4F4DID = ____opt_13 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
+        local ____opt_14 = _____914D_7F6E["兼容单位ID"]
+        local _____517C_5BB9_5355_4F4DID = ____opt_14 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
         if _____517C_5BB9_5355_4F4DID ~= nil and #_____517C_5BB9_5355_4F4DID >= 4 then
             return __TS__StringSubstring(_____517C_5BB9_5355_4F4DID, 0, 4)
         end
@@ -51,8 +51,8 @@ function _____89E3_6790_4E16_754C_5730_56FE_5355_4F4DID(_____914D_7F6E)
     if _____603B_8868_53CD_67E5_7ED3_679C ~= nil and _____603B_8868_53CD_67E5_7ED3_679C ~= "" then
         return _____603B_8868_53CD_67E5_7ED3_679C
     end
-    local ____opt_15 = _____914D_7F6E["兼容单位ID"]
-    local _____517C_5BB9_5355_4F4DID = ____opt_15 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
+    local ____opt_16 = _____914D_7F6E["兼容单位ID"]
+    local _____517C_5BB9_5355_4F4DID = ____opt_16 and __TS__StringTrim(_____914D_7F6E["兼容单位ID"])
     if _____517C_5BB9_5355_4F4DID ~= nil and #_____517C_5BB9_5355_4F4DID >= 4 then
         return __TS__StringSubstring(_____517C_5BB9_5355_4F4DID, 0, 4)
     end
@@ -187,11 +187,13 @@ local ____require_result_9 = require("系统.02．物品系统.13．物品名反
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_9["按名字反查物品ID"]
 local ____require_result_10 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_10["创建物品并注册排泄监听"]
-local ____require_result_11 = require("lib.扩展函数.BJ函数.03．物品与库存")
-local AddItemToStockBJ = ____require_result_11.AddItemToStockBJ
-local ____require_result_12 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataSetSafe = ____require_result_12.YDUserDataSetSafe
-YDUserDataClearSafe = ____require_result_12.YDUserDataClearSafe
+local ____require_result_11 = require("系统.02．物品系统.17．装备采集.02．核心")
+local _____767B_8BB0_91C7_96C6_7269_54C1_5B9E_4F8B = ____require_result_11["登记采集物品实例"]
+local ____require_result_12 = require("lib.扩展函数.BJ函数.03．物品与库存")
+local AddItemToStockBJ = ____require_result_12.AddItemToStockBJ
+local ____require_result_13 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataSetSafe = ____require_result_13.YDUserDataSetSafe
+YDUserDataClearSafe = ____require_result_13.YDUserDataClearSafe
 Player = jass.Player
 local GetRandomReal = jass.GetRandomReal
 local GetRectMinX = jass.GetRectMinX
@@ -490,6 +492,7 @@ local function _____6267_884C_5355_6761_4E16_754C_5730_56FE_690D_7269_968F_673A_
             local y = _____83B7_53D6_968F_673A_77E9_5F62Y(rect)
             local _____7269_54C1 = _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C(_____7269_54C1_7C7B_578BID, x, y)
             if _____7269_54C1 ~= nil and _____7269_54C1 ~= 0 then
+                _____767B_8BB0_91C7_96C6_7269_54C1_5B9E_4F8B(_____7269_54C1, _____7269_54C1_7C7B_578BID, _____914D_7F6E["矩形区域名称"])
                 _____5DF2_521B_5EFA_6570_91CF = _____5DF2_521B_5EFA_6570_91CF + 1
             end
             i = i + 1

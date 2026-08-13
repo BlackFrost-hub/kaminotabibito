@@ -4,6 +4,13 @@ import { 阿伦劳特单位技能配置 } from "./00．配置";
 import { 单位有效 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 开始击退 } from "../../../00．技能模板+函数/01．技能函数/02．冲锋·击退/击退系统";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import {
+  创建主动引爆护盾,
+  引爆主动引爆护盾,
+  护盾类型,
+  清理主动引爆护盾,
+  type 主动引爆护盾控制器,
+} from "../../../00．技能模板+函数/01．技能函数/07．护盾";
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
@@ -16,12 +23,6 @@ const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函
 };
 const { 开始无敌帧 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧") as {
   开始无敌帧: (this: void, unit: any, duration: number) => number;
-};
-const { 开始护盾, 护盾类型, 查询单位标签护盾值, 移除单位标签护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾") as {
-  开始护盾: (this: void, unit: any, params: any) => number;
-  护盾类型: { 通用: number };
-  查询单位标签护盾值: (this: void, unit: any, tag: string) => number;
-  移除单位标签护盾: (this: void, unit: any, tag: string) => void;
 };
 const {
   创建单位坐标跟随特效,
@@ -45,10 +46,6 @@ const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, 
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
-const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
-const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
@@ -64,6 +61,7 @@ const 裁决审判强化BuffID = stringToFourCCSafe(阿伦劳特单位技能配�
 export interface 阿伦劳特运行时上下文 {
   单位: any;
   裁决护盾ID: number;
+  裁决护盾控制器?: 主动引爆护盾控制器;
 }
 
 const 阿伦劳特上下文表: Record<number, 阿伦劳特运行时上下文 | undefined> = {};
@@ -82,6 +80,7 @@ export function 获取或创建阿伦劳特上下文(this: void, unit: any): 阿
   const created: 阿伦劳特运行时上下文 = {
     单位: unit,
     裁决护盾ID: 0,
+    裁决护盾控制器: undefined,
   };
   阿伦劳特上下文表[unitId] = created;
   return created;
@@ -102,61 +101,73 @@ function 清理裁决护盾技能状态(this: void, unit: any, shieldId?: number
   if (context == null) return;
   if (shieldId != null && context.裁决护盾ID !== 0 && context.裁决护盾ID !== shieldId) return;
 
+  const 控制器 = context.裁决护盾控制器;
+  context.裁决护盾控制器 = undefined;
+  清理主动引爆护盾(控制器, "技能状态清理");
+}
+
+function 阿伦劳特裁决护盾清理(this: void, controller: 主动引爆护盾控制器, _reason: string): void {
+  销毁单位坐标跟随特效(controller.护盾目标, 阿伦劳特单位技能配置.表现资源.裁决护盾特效键);
+  const context = 取阿伦劳特上下文(controller.施法者);
+  if (context == null) return;
+  if (context.裁决护盾控制器 != null && context.裁决护盾控制器 !== controller) return;
   context.裁决护盾ID = 0;
-  销毁单位坐标跟随特效(unit, 阿伦劳特单位技能配置.表现资源.裁决护盾特效键);
-  UnitRemoveAbility(unit, 引爆技能ID);
-  const owner = GetOwningPlayer(unit);
-  if (owner != null && owner !== 0) SetPlayerAbilityAvailable(owner, 主技能ID, true);
-}
-
-function 阿伦劳特护盾破碎(this: void, unit: any, shieldId: number, _absorbed: number): void {
-  清理裁决护盾技能状态(unit, shieldId);
-}
-
-function 阿伦劳特护盾结束(this: void, unit: any, shieldId: number, _reason: string): void {
-  清理裁决护盾技能状态(unit, shieldId);
+  context.裁决护盾控制器 = undefined;
 }
 
 function 创建裁决护盾(this: void, unit: any): boolean {
   if (!单位有效(unit) || GetUnitTypeId(unit) !== 暗形态单位ID) return false;
   const context = 获取或创建阿伦劳特上下文(unit);
   if (context == null) return false;
-  if (查询单位标签护盾值(unit, 阿伦劳特单位技能配置.裁决护盾标签) > 0) return false;
-
   const config = 阿伦劳特单位技能配置;
   const 强化 = 单位拥有原生Buff(unit, 裁决审判强化BuffID);
   const 护盾值 = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     * (强化 ? config.裁决护盾强化最大生命比例 : config.裁决护盾默认最大生命比例);
   if (!(护盾值 > 0)) return false;
 
-  const owner = GetOwningPlayer(unit);
-  if (owner != null && owner !== 0) SetPlayerAbilityAvailable(owner, 主技能ID, false);
-  UnitAddAbility(unit, 引爆技能ID);
+  const 控制器 = 创建主动引爆护盾({
+    名称: "阿伦劳特-裁决护盾",
+    施法者: unit,
+    护盾目标: unit,
+    主技能ID,
+    引爆技能ID,
+    护盾标签: config.裁决护盾标签,
+    护盾参数: {
+      类型: 护盾类型.通用,
+      数值: 护盾值,
+      持续时间: config.裁决护盾持续秒,
+      来源单位: unit,
+      显示护盾条: true,
+      可驱散: false,
+    },
+    on创建前: 阿伦劳特裁决护盾创建前,
+    on清理: 阿伦劳特裁决护盾清理,
+    on引爆前: 阿伦劳特裁决护盾引爆前,
+    on引爆后: 阿伦劳特裁决护盾引爆后,
+  });
+  if (控制器 == null) return false;
+  context.裁决护盾控制器 = 控制器;
+  context.裁决护盾ID = 控制器.护盾ID;
+  return true;
+}
+
+function 阿伦劳特裁决护盾创建前(this: void, controller: 主动引爆护盾控制器): void {
+  const config = 阿伦劳特单位技能配置;
   创建单位坐标跟随特效(
-    unit,
+    controller.护盾目标,
     config.表现资源.裁决护盾特效路径,
     config.表现资源.裁决护盾特效键,
     config.表现资源.裁决护盾特效缩放,
     config.表现资源.裁决护盾特效高度,
   );
+}
 
-  const shieldId = 开始护盾(unit, {
-    类型: 护盾类型.通用,
-    数值: 护盾值,
-    持续时间: config.裁决护盾持续秒,
-    来源单位: unit,
-    显示护盾条: true,
-    可驱散: false,
-    标签: config.裁决护盾标签,
-    破碎回调: 阿伦劳特护盾破碎,
-    结束回调: 阿伦劳特护盾结束,
-  });
-  if (shieldId === 0) {
-    清理裁决护盾技能状态(unit);
-    return false;
-  }
-  context.裁决护盾ID = shieldId;
-  return true;
+function 阿伦劳特裁决护盾引爆前(this: void, controller: 主动引爆护盾控制器, _remaining: number): void {
+  播放裁决护盾引爆表现(controller.施法者);
+}
+
+function 阿伦劳特裁决护盾引爆后(this: void, controller: 主动引爆护盾控制器, _remaining: number): void {
+  结算裁决护盾引爆(controller.施法者);
 }
 
 function 播放裁决护盾引爆表现(this: void, unit: any): void {
@@ -200,13 +211,8 @@ function 结算裁决护盾引爆(this: void, unit: any): void {
 
 function 引爆裁决护盾(this: void, unit: any): void {
   if (!单位有效(unit) || GetUnitTypeId(unit) !== 暗形态单位ID) return;
-  if (查询单位标签护盾值(unit, 阿伦劳特单位技能配置.裁决护盾标签) <= 0) {
-    清理裁决护盾技能状态(unit);
-    return;
-  }
-  播放裁决护盾引爆表现(unit);
-  移除单位标签护盾(unit, 阿伦劳特单位技能配置.裁决护盾标签);
-  结算裁决护盾引爆(unit);
+  const context = 取阿伦劳特上下文(unit);
+  引爆主动引爆护盾(context?.裁决护盾控制器);
 }
 
 export function 释放神圣护甲(this: void, unit: any): boolean {

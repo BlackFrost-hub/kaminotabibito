@@ -23,7 +23,7 @@ local _____9ED8_8BA4_6301_7EED_65F6_95F4 = 1
 local _____9ED8_8BA4_4E0A_98D8_901F_5EA6 = 0.07
 local _____6700_5927_5C0F_6570_4F4D_6570 = 4
 local function _____6570_5B57_8F6C_5B57_7B26_4E32(value)
-    return tostring(value)
+    return tostring(nil, value)
 end
 local function _____9650_5236_5C0F_6570_4F4D_6570(decimalPlaces)
     if decimalPlaces <= 0 then

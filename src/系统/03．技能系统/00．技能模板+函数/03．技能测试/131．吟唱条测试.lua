@@ -39,22 +39,22 @@ local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
 end
 local function _____6D4B_8BD5_663E_793A_9ED8_8BA4_541F_5531_6761()
     _____663E_793A_541F_5531_6761({["总时长"] = 5, ["颜色ID"] = 2})
-    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os.time()
+    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os:time()
     debugLogForce(_____6A21_5757_540D, "显示金色吟唱条", "总时长=5秒", "颜色ID=2")
 end
 local function _____6D4B_8BD5_6307_5B9A_989C_8272()
     _____663E_793A_541F_5531_6761({["总时长"] = 4, ["颜色ID"] = 1})
-    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os.time()
+    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os:time()
     debugLogForce(_____6A21_5757_540D, "显示颜色1吟唱条", "总时长=4秒", "颜色ID=1")
 end
 local function _____6D4B_8BD5_81EA_5B9A_4E49_63D0_793A_6587_672C()
     _____663E_793A_541F_5531_6761({["总时长"] = 3, ["颜色ID"] = 3, ["提示文本"] = "自定义提示：准备施法！"})
-    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os.time()
+    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os:time()
     debugLogForce(_____6A21_5757_540D, "显示自定义提示吟唱条", "总时长=3秒", "颜色ID=3")
 end
 local function _____6D4B_8BD5_8FDE_7EED_8986_76D6()
     _____663E_793A_541F_5531_6761({["总时长"] = 10, ["颜色ID"] = 5})
-    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os.time()
+    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os:time()
     addDelayedCallback(
         1500,
         function()
@@ -65,12 +65,12 @@ local function _____6D4B_8BD5_8FDE_7EED_8986_76D6()
 end
 local function _____6D4B_8BD5_5230_65F6_81EA_52A8_5173_95ED()
     _____663E_793A_541F_5531_6761({["总时长"] = 2, ["颜色ID"] = 4, ["提示文本"] = "2秒后自动关闭"})
-    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os.time()
+    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os:time()
     debugLogForce(_____6A21_5757_540D, "显示吟唱条", "等待2秒后自动关闭")
 end
 local function _____6D4B_8BD5_624B_52A8_5173_95ED()
     _____663E_793A_541F_5531_6761({["总时长"] = 10, ["颜色ID"] = 2, ["提示文本"] = "手动关闭测试"})
-    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os.time()
+    _____6D4B_8BD5_542F_52A8_65F6_95F4 = os:time()
     addDelayedCallback(
         1500,
         function()

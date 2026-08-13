@@ -86,20 +86,44 @@ local _____83B7_53D6_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____require_result_7["
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____require_result_7["获取或创建瑟兰迪尔上下文"]
 local _____6E05_7406_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____require_result_7["清理瑟兰迪尔上下文"]
 local _____64AD_653E_745F_5170_8FEA_5C14_53F0_8BCD = ____require_result_7["播放瑟兰迪尔台词"]
+local ____require_result_8 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.13．教派学者.00．配置")
+local _____6559_6D3E_5B66_8005_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_8["教派学者单位技能配置"]
+local ____require_result_9 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.13．教派学者.02．数值与表现配置")
+local _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E = ____require_result_9["教派学者技能配置"]
+local _____6559_6D3E_5B66_8005_97F3_6548_914D_7F6E = ____require_result_9["教派学者音效配置"]
+local ____require_result_10 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_10["播放Boss坐标音效"]
 local GetUnitTypeId = jass.GetUnitTypeId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local ____require_result_8 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.08．Boss死亡音效")
-local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_97F3_6548 = ____require_result_8["尝试播放Boss死亡音效"]
-local ____require_result_9 = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙")
-local _____91CD_5EFA_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899 = ____require_result_9["重建亚伦柯斯安兹封锁墙"]
-local _____6E05_7406_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899 = ____require_result_9["清理亚伦柯斯安兹封锁墙"]
-local ____require_result_10 = require("系统.07．地形系统.06．可破坏物数据.04．祖地双灵卫力量之墙")
-local _____91CD_5EFA_7956_5730_53CC_7075_536B_529B_91CF_4E4B_5899 = ____require_result_10["重建祖地双灵卫力量之墙"]
-local _____6E05_7406_7956_5730_53CC_7075_536B_529B_91CF_4E4B_5899 = ____require_result_10["清理祖地双灵卫力量之墙"]
+local ____require_result_11 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.08．Boss死亡音效")
+local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_97F3_6548 = ____require_result_11["尝试播放Boss死亡音效"]
+local ____require_result_12 = require("系统.07．地形系统.06．可破坏物数据.02．亚伦柯斯与安兹乌尔恭封锁墙")
+local _____91CD_5EFA_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899 = ____require_result_12["重建亚伦柯斯安兹封锁墙"]
+local _____6E05_7406_4E9A_4F26_67EF_65AF_5B89_5179_5C01_9501_5899 = ____require_result_12["清理亚伦柯斯安兹封锁墙"]
+local ____require_result_13 = require("系统.07．地形系统.06．可破坏物数据.04．祖地双灵卫力量之墙")
+local _____91CD_5EFA_7956_5730_53CC_7075_536B_529B_91CF_4E4B_5899 = ____require_result_13["重建祖地双灵卫力量之墙"]
+local _____6E05_7406_7956_5730_53CC_7075_536B_529B_91CF_4E4B_5899 = ____require_result_13["清理祖地双灵卫力量之墙"]
 ____Boss_6218_8FD0_884C_5468_671F_56DE_8C03ID = 0
 local _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
+local _____6559_6D3E_5B66_8005_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6559_6D3E_5B66_8005_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local function _____662F_745F_5170_8FEA_5C14Boss(bossUnit)
     return bossUnit ~= nil and bossUnit ~= 0 and GetUnitTypeId(bossUnit) == _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID
+end
+local function _____662F_6559_6D3E_5B66_8005Boss(bossUnit)
+    return bossUnit ~= nil and bossUnit ~= 0 and GetUnitTypeId(bossUnit) == _____6559_6D3E_5B66_8005_5355_4F4D_7C7B_578BID
+end
+local function _____542F_52A8_6559_6D3E_5B66_8005Boss_8FD0_884C_65F6(bossUnit)
+    if not _____662F_6559_6D3E_5B66_8005Boss(bossUnit) then
+        return
+    end
+    _____64AD_653EBoss_5750_6807_97F3_6548(
+        _____6559_6D3E_5B66_8005_97F3_6548_914D_7F6E["战斗开启"],
+        GetUnitX(bossUnit),
+        GetUnitY(bossUnit),
+        _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["公共施法"]["音效裁断距离"]
+    )
 end
 local function _____542F_52A8_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(bossUnit)
     if not _____662F_745F_5170_8FEA_5C14Boss(bossUnit) then
@@ -164,11 +188,11 @@ local function _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs, 
     _____6E05_7406Boss_7BAD_5934_7279_6548(context["Boss单位"])
     _____767B_8BB0Boss_6B7B_4EA1_5EF6_8FDF_6E05_7406YD_6570_636E(context, nowMs)
     _____7ED3_675FBoss_6218_533A_57DF_97F3_9891(context, nowMs)
-    local ____require_result_13 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.07．异界Boss死亡奖励")
-    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_13["发放异界Boss死亡奖励"]
+    local ____require_result_16 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.07．异界Boss死亡奖励")
+    local _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1 = ____require_result_16["发放异界Boss死亡奖励"]
     _____53D1_653E_5F02_754CBoss_6B7B_4EA1_5956_52B1(context["Boss单位"])
-    local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
-    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_14["尝试播放Boss死亡主线剧情"]
+    local ____require_result_17 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.06．Boss死亡剧情索引")
+    local _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5 = ____require_result_17["尝试播放Boss死亡主线剧情"]
     if (_____9009_9879 and _____9009_9879["跳过死亡剧情"]) ~= true then
         _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5(context["Boss单位"])
     end
@@ -211,6 +235,7 @@ local function _____63A8_8FDBBoss_6218_542F_52A8_72B6_6001(context, nowMs)
         _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027(context)
         _____542F_52A8_8D6B_841D_663C_591C_88AB_52A8(context["Boss单位"])
         _____542F_52A8_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(context["Boss单位"])
+        _____542F_52A8_6559_6D3E_5B66_8005Boss_8FD0_884C_65F6(context["Boss单位"])
         _____5904_7406Boss_6218_62A4_536B_542F_52A8(context)
     end
 end
@@ -258,22 +283,22 @@ local function ____onBoss_6218_8FD0_884CTick()
             do
                 local context = activeContexts[i + 1]
                 if context == nil or context["是否已结束"] then
-                    goto __continue36
+                    goto __continue39
                 end
                 _____63A8_8FDBBoss_6218_542F_52A8_72B6_6001(context, nowMs)
                 if not context["是否已激活"] then
-                    goto __continue36
+                    goto __continue39
                 end
                 if _____5355_4F4D_662F_5426_6B7B_4EA1(context["Boss单位"]) then
                     _____7ED3_675FBoss_6218_8FD0_884C_4E0A_4E0B_6587(context, nowMs)
-                    goto __continue36
+                    goto __continue39
                 end
                 _____7EA0_504FBoss_4F4D_7F6E(context)
                 _____7EA0_504F_73A9_5BB6_82F1_96C4_4F4D_7F6E_5230Boss(context)
                 _____5904_7406Boss_6218_62A4_536BTick(context, nowMs)
                 _____5C1D_8BD5_515C_5E95_641C_654C_5E76_4E0B_4EE4(context, nowMs)
             end
-            ::__continue36::
+            ::__continue39::
             i = i + 1
         end
     end
@@ -329,8 +354,8 @@ ____exports["启动Boss战运行"] = function(bossUnit)
     _____91CD_5EFA_7956_5730_53CC_7075_536B_529B_91CF_4E4B_5899(bossUnit)
     _____786E_4FDDBoss_6218_8FD0_884C_9A71_52A8()
     if _____8BFB_53D6Boss_6218_5355_4F4D_5E03_5C14(bossUnit, "转换场景") then
-        local ____require_result_17 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-        local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_17["添加单位暂停"]
+        local ____require_result_20 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+        local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_20["添加单位暂停"]
         _____6DFB_52A0_5355_4F4D_6682_505C(bossUnit, "Boss战运行:转场等待")
         SetUnitInvulnerable(bossUnit, true)
         local nowMs = getServerTime()
@@ -342,6 +367,7 @@ ____exports["启动Boss战运行"] = function(bossUnit)
         if context["是否已激活"] then
             _____542F_52A8Boss_8840_6761_5F31_70B9_97E7_6027(context)
             _____542F_52A8_745F_5170_8FEA_5C14Boss_8FD0_884C_65F6(context["Boss单位"])
+            _____542F_52A8_6559_6D3E_5B66_8005Boss_8FD0_884C_65F6(context["Boss单位"])
         end
     end
     debugLogForce(

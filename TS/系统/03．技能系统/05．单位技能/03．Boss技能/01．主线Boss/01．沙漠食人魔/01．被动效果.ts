@@ -2,7 +2,7 @@
 
 import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 食人魔BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/08．食人魔';
-import { 沙漠食人魔技能配置 } from './02．数值与表现配置';
+import { 沙漠食人魔技能配置, 沙漠食人魔音效配置 } from './02．数值与表现配置';
 
 const { 转四位ID, 读取单位累计实数, 写入单位累计实数, 注册指定单位暴击率修正, 注册指定单位暴击后监听, 获取范围敌军, 取单位X, 取单位Y, 在坐标播放特效 } = require('系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具') as {
   转四位ID: (this: void, rawIdText: string) => number;
@@ -33,6 +33,9 @@ const { 是否已登记Boss技能测试目标 } = require('系统.01．单位系
 };
 const { 沙漠食人魔单位技能配置 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.01．沙漠食人魔.00．配置') as {
   沙漠食人魔单位技能配置: { 单位ID: string; 累计键: string; 暴击加成系数: number; 清空键: string };
+};
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
 };
 
 const jass = require('jass.common') as any;
@@ -113,6 +116,7 @@ function 造成第四击范围伤害(this: void, attacker: any, centerTarget: an
   const x = 取单位X(centerTarget);
   const y = 取单位Y(centerTarget);
   在坐标播放特效(沙漠食人魔技能配置.蓄力重击.爆炸特效, x, y, 0, 2.5, 1);
+  播放Boss坐标音效(沙漠食人魔音效配置.蓄力重击.爆炸, x, y, 沙漠食人魔音效配置.默认裁断距离);
   const targets = 获取范围敌军(attacker, x, y, 沙漠食人魔技能配置.蓄力重击.范围);
   写入单位累计实数(attacker, 第四击伤害中键, 1);
   for (let i = 0; i < targets.length; i++) {

@@ -11,7 +11,7 @@ local function createTwinSpiritGuardForm(id, name, modelFile, icon, scale, descr
     description = description,
 
     level = 40,
-    hp = 25760,
+  hp = 20608,
     mana = 1000,
     initialMana = 1000,
     manaRegen = 10.0,
@@ -24,7 +24,7 @@ local function createTwinSpiritGuardForm(id, name, modelFile, icon, scale, descr
     agilityPerLevel = 1,
     intelligencePerLevel = 1,
     primaryAttribute = 'STR',
-    damageBase = 1288,
+  damageBase = 1030,
     damageDice = 1,
     damageSides = 1,
     attackCooldown = 0.8,

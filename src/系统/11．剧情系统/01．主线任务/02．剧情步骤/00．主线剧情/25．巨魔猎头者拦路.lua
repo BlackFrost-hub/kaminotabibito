@@ -10,15 +10,13 @@ local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_
 local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["读取剧情运行时单位"]
 local ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
 local _____521B_5EFA_5E76_767B_8BB0_5267_60C5Boss_9884_7F6E_968F_4ECE = ____03_FF0E_5267_60C5Boss_9884_7F6E_6865_63A5["创建并登记剧情Boss预置随从"]
----
--- @noSelfInFile
-local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
+local _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168 = ____require_result_0["解除暂停并取消无敌安全"]
 do
     local ____25_FF0E_5DE8_9B54_730E_5934_8005_62E6_8DEF = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．第二章.25．巨魔猎头者拦路")
     ____exports["巨魔猎头者拦路剧情片段"] = ____25_FF0E_5DE8_9B54_730E_5934_8005_62E6_8DEF["巨魔猎头者拦路剧情片段"]
 end
-local PauseUnit = jass.PauseUnit
-local SetUnitInvulnerable = jass.SetUnitInvulnerable
+local _____5DE8_9B54_730E_5934_8005_5F85_6218_6682_505C_6765_6E90 = "剧情系统:巨魔猎头者待战"
 local _____6811_9B54_9996_9886_6218_524D_968F_4ECE_9884_7F6E = {{
     ["单位名"] = "巨魔猎头者",
     X = 1284.9,
@@ -56,8 +54,7 @@ ____exports["执行巨魔猎头者开战"] = function()
     _____8BBE_7F6E_89E6_53D1_5355_4F4D_63A7_5236_72B6_6001(false, false)
     local npc = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D("剧情运行时.巨魔猎头者守卫")
     if npc ~= nil and npc ~= 0 then
-        SetUnitInvulnerable(npc, false)
-        PauseUnit(npc, false)
+        _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(npc, _____5DE8_9B54_730E_5934_8005_5F85_6218_6682_505C_6765_6E90)
     end
 end
 ____exports["执行清理巨魔猎头者运行时引用"] = function()

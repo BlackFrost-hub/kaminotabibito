@@ -34,8 +34,12 @@ const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品�
 const { 发放任务物品 } = require("系统.09．表现系统.02．对话框系统.14．任务物品发放") as {
   发放任务物品: (this: void, unit: any, itemConfig: string | undefined) => number;
 };
-import { resolveRewardDisplayText, setQuestState } from "./03．任务状态";
-import { removeQuestMarkerAfterNpcTriggered } from "./09．NPC头顶与气泡特效";
+const GetRandomInt = jass.GetRandomInt as (this: void, 最小值: number, 最大值: number) => number;
+import { findAvailableQuestByNpc, resolveRewardDisplayText, setQuestState, 任务目标是否完成 } from "./03．任务状态";
+const { 任务内部限时是否有效 } = require("系统.08．任务系统.02．任务管理器") as {
+  任务内部限时是否有效: (this: void, questId: string) => boolean;
+};
+import { removeQuestMarkerAfterNpcTriggered, scheduleYellowQuestMarkerAfterBubbleFade } from "./09．NPC头顶与气泡特效";
 const { addDelayedCallback } = globalThis as unknown as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
 };
@@ -216,6 +220,44 @@ function isSubmitItemMatchedRequire(submitInfo: { itemId: number; itemCode: stri
   return false;
 }
 
+function 解析分别提交物品类型(this: void, 需求物品: string): number[] {
+  const 物品类型列表: number[] = [];
+  const 物品代码列表 = 需求物品.split("|");
+  for (let i = 0; i < 物品代码列表.length; i++) {
+    const 物品代码 = 物品代码列表[i].trim();
+    if (物品代码.length !== 4) continue;
+    const 物品类型ID = stringToFourCC(物品代码);
+    if (物品类型ID !== 0) 物品类型列表.push(物品类型ID);
+  }
+  return 物品类型列表;
+}
+
+function 查找缺少的分别提交物品(this: void, 英雄: any, 需求物品: string): string[] {
+  const 缺少物品名称列表: string[] = [];
+  const 物品代码列表 = 需求物品.split("|");
+  for (let i = 0; i < 物品代码列表.length; i++) {
+    const 物品代码 = 物品代码列表[i].trim();
+    if (物品代码.length !== 4) continue;
+    const 物品类型ID = stringToFourCC(物品代码);
+    if (物品类型ID === 0 || GetItemTypeTotalCountByChargesBJ(英雄, 物品类型ID) <= 0) {
+      缺少物品名称列表.push(getItemName(物品代码) || "指定药剂");
+    }
+  }
+  return 缺少物品名称列表;
+}
+
+function 消耗分别提交物品次数(this: void, 英雄: any, 需求物品: string): boolean {
+  const 物品类型列表 = 解析分别提交物品类型(需求物品);
+  if (物品类型列表.length === 0) return false;
+  for (let i = 0; i < 物品类型列表.length; i++) {
+    if (GetItemTypeTotalCountByChargesBJ(英雄, 物品类型列表[i]) <= 0) return false;
+  }
+  for (let i = 0; i < 物品类型列表.length; i++) {
+    if (!ConsumeItemTypeCountByChargesBJ(英雄, 物品类型列表[i], 1)) return false;
+  }
+  return true;
+}
+
 function pickNpcCompleteTextByBranch(raw: string, branchIndex: number): string {
   if (!raw || raw === "") return raw;
   if (branchIndex < 0) return raw;
@@ -253,10 +295,24 @@ export function handleQuestSubmit(params: {
   const requireCount = normalizeRequireCount(quest.需求数量);
   const questId = quest.任务ID != null ? quest.任务ID.toString() : "";
   const playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) || "冒险者";
+  const 在内部限时内完成 = questId !== "" && 任务内部限时是否有效(questId);
   let rewardBranchIndex = -1;
   const useGenericGiveFailHint = shouldUseGenericGiveFailHint(quest);
   let 待执行物品升级: 任务物品升级结果 | null = null;
   let 待消耗提交物品ID = 0;
+
+  function 发放随机奖励物品(this: void): boolean {
+    if (!quest.随机奖励物品 || quest.随机奖励物品 === "") return true;
+    const 奖励池 = quest.随机奖励物品.split("|");
+    if (奖励池.length === 0) return true;
+    const 随机物品 = 奖励池[GetRandomInt(0, 奖励池.length - 1)];
+    return 发放任务物品(hero, 随机物品) > 0;
+  }
+
+  function 执行内部限时额外奖励(this: void): void {
+    if (!在内部限时内完成 || !quest.限时完成奖励) return;
+    applyRewardWithContext(quest.限时完成奖励, { triggerPlayerId: dialogOwnerId });
+  }
 
   if (quest.类型 === "击杀" || quest.类型 === "目标击杀") {
     const done = isKillQuestObjectiveCompleted(dialogOwnerId, questId, requireCount);
@@ -271,14 +327,16 @@ export function handleQuestSubmit(params: {
         return;
       }
     }
-    if (quest.提交消耗物品) {
-      const 提交物品 = resolveSubmitItem(hero, quest.提交消耗物品);
-      if (提交物品.itemId === 0) {
-        showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r请携带任务要求的物品后再提交。");
-        return;
-      }
-      待消耗提交物品ID = 提交物品.itemId;
+  }
+
+  if (quest.提交消耗物品) {
+    const 提交物品 = resolveSubmitItem(hero, quest.提交消耗物品);
+    if (提交物品.itemId === 0) {
+      const 提交物品名称 = getItemName(quest.提交消耗物品) || "任务要求的物品";
+      showLocalHint(dialogOwnerId, `|cffffff00『系统提示』：|r请携带 |cffffcc00${提交物品名称}|r 后再提交。`);
+      return;
     }
+    待消耗提交物品ID = 提交物品.itemId;
   }
 
   function broadcastQuestComplete(): void {
@@ -323,9 +381,14 @@ export function handleQuestSubmit(params: {
     function 执行任务完成后动作(this: void): void {
       if (quest.完成后动作) quest.完成后动作(dialogOwnerId);
       清理任务结束NPC(quest);
+      if (npcUnit && findAvailableQuestByNpc(npcName, dialogOwnerId) != null) {
+        scheduleYellowQuestMarkerAfterBubbleFade(npcUnit);
+      }
     }
     if (quest.NPC完成对白) {
-      const completeRaw = pickNpcCompleteTextByBranch(quest.NPC完成对白, rewardBranchIndex);
+      const completeRaw = 在内部限时内完成 && quest.限时完成对白
+        ? quest.限时完成对白
+        : pickNpcCompleteTextByBranch(quest.NPC完成对白, rewardBranchIndex);
       const completeLines = parseDialogText(completeRaw, npcName, heroName);
       /** 必须带 npcUnit，否则 openNpcDialog 不会挂 qipao（与进行中/接取对白一致） */
       addDelayedCallback(10, () => {
@@ -350,6 +413,7 @@ export function handleQuestSubmit(params: {
     setQuestState(dialogOwnerId, questId, 2, playerName);
     const rewardResult = applyRewardWithContext(quest.奖励 || "", { triggerPlayerId: dialogOwnerId });
     rewardBranchIndex = rewardResult.matchedRuleIndex;
+    执行内部限时额外奖励();
     onComplete();
     return;
   }
@@ -360,6 +424,26 @@ export function handleQuestSubmit(params: {
       return;
     }
     const sourceUnit = hero;
+    if (quest.需求物品分别提交 === true) {
+      const 缺少物品名称列表 = 查找缺少的分别提交物品(sourceUnit, requireItem);
+      if (缺少物品名称列表.length > 0) {
+        showLocalHint(
+          dialogOwnerId,
+          `|cffffff00『系统提示』：|r还缺少：|cffff9900${缺少物品名称列表.join("、")}|r`
+        );
+        return;
+      }
+      if (!消耗分别提交物品次数(sourceUnit, requireItem)) {
+        showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444药剂次数扣除失败，请重试|r");
+        return;
+      }
+      setQuestState(dialogOwnerId, questId, 2, playerName);
+      const rewardResult = applyRewardWithContext(quest.奖励 || "", { triggerPlayerId: dialogOwnerId });
+      rewardBranchIndex = rewardResult.matchedRuleIndex;
+      执行内部限时额外奖励();
+      onComplete();
+      return;
+    }
     const submitInfo = resolveSubmitItem(sourceUnit, requireItem);
     const itemId = submitInfo.itemId;
     if (itemId === 0) {
@@ -404,6 +488,7 @@ export function handleQuestSubmit(params: {
           submittedItemLevel: submitInfo.itemLevel,
         });
         rewardBranchIndex = rewardResult.matchedRuleIndex;
+        执行内部限时额外奖励();
         onComplete();
       } else {
         showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r|cffff4444物品次数扣除失败，请重试|r");
@@ -418,6 +503,14 @@ export function handleQuestSubmit(params: {
     return;
   }
 
+  if (quest.类型 === "调查" && !任务目标是否完成(dialogOwnerId, questId)) {
+    showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r调查线索尚未全部确认，暂时无法提交任务。\n请继续在目标地点附近使用环境互动。" );
+    return;
+  }
+  if (quest.类型 === "防守" && !任务目标是否完成(dialogOwnerId, questId)) {
+    showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r花灵守护尚未完成，暂时无法提交任务。" );
+    return;
+  }
   if (待执行物品升级 != null && !执行任务物品升级(hero, 待执行物品升级)) {
     showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r灯笼升级失败，请重试。");
     return;
@@ -430,9 +523,18 @@ export function handleQuestSubmit(params: {
     showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r任务奖励物品发放失败，请重试。");
     return;
   }
+  if (!发放随机奖励物品()) {
+    showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r随机任务奖励物品发放失败，请重试。");
+    return;
+  }
+  if (在内部限时内完成 && quest.限时完成奖励物品 && 发放任务物品(hero, quest.限时完成奖励物品) <= 0) {
+    showLocalHint(dialogOwnerId, "|cffffff00『系统提示』：|r限时奖励物品发放失败，请重试。");
+    return;
+  }
   setQuestState(dialogOwnerId, questId, 2, playerName);
   const rewardResult = applyRewardWithContext(quest.奖励 || "", { triggerPlayerId: dialogOwnerId });
   rewardBranchIndex = rewardResult.matchedRuleIndex;
+  执行内部限时额外奖励();
   onComplete();
 }
 

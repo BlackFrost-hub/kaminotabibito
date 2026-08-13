@@ -11,16 +11,12 @@ const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩�
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
 };
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => (this: void) => void;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (this: void, unit: any, range: number, callback: (this: void, enteringUnit: any) => boolean, predicate?: (this: void, enteringUnit: any) => boolean) => () => void;
 };
 const { registerDeathListener, unregisterDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
   unregisterDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
 };
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -49,11 +45,9 @@ import { 应用第三章电影镜头 } from "./40-50．第三章电影镜头";
 import { 清理剧情运行时单位, 注册剧情运行时单位, 读取剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 尝试播放Boss死亡主线剧情 } from "../06．Boss死亡剧情索引";
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const ForGroup = jass.ForGroup as (this: void, whichGroup: any, callback: (this: void) => void) => void;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
@@ -71,7 +65,6 @@ const 菲尼克斯尔触发区域 = { X: 15429.9, Y: -4014.9, 朝向: 0 };
 interface 菲尼克斯尔现身状态 {
   Boss单位: any;
   已触发现身: boolean;
-  范围触发器?: any;
   取消范围监听?: (this: void) => void;
   已注册死亡监听: boolean;
   已创建神殿入口表现: boolean;
@@ -100,9 +93,7 @@ function 返回菲尼克斯尔触发区域(this: void): void {
 
 function 清理菲尼克斯尔范围监听(this: void, 状态: 菲尼克斯尔现身状态): void {
   if (状态.取消范围监听 != null) 状态.取消范围监听();
-  if (状态.范围触发器 != null && 状态.范围触发器 !== 0) safeDestroyTrigger(状态.范围触发器);
   状态.取消范围监听 = undefined;
-  状态.范围触发器 = undefined;
 }
 
 function 创建神殿入口表现(this: void, 状态: 菲尼克斯尔现身状态): void {
@@ -129,12 +120,10 @@ function 播放菲尼克斯尔现身(this: void, 触发单位: any): void {
   });
 }
 
-function on菲尼克斯尔范围触发(this: void): void {
+function on菲尼克斯尔范围触发(this: void, 触发单位: any): boolean {
   const 状态 = 当前菲尼克斯尔现身状态;
-  if (状态 == null || 状态.已触发现身 || 读取剧情进度() !== 43) return;
-
-  const 触发单位 = GetTriggerUnit();
-  if (!单位存活(触发单位) || !是玩家英雄组单位(触发单位)) return;
+  if (状态 == null || 状态.已触发现身 || 读取剧情进度() !== 43) return false;
+  if (!单位存活(触发单位)) return false;
 
   状态.已触发现身 = true;
   清理菲尼克斯尔范围监听(状态);
@@ -142,17 +131,16 @@ function on菲尼克斯尔范围触发(this: void): void {
   SetUnitFacing(状态.Boss单位, YDWEAngleBetweenUnitsSafe(状态.Boss单位, 触发单位));
   SetUnitFacing(触发单位, YDWEAngleBetweenUnitsSafe(触发单位, 状态.Boss单位));
   播放菲尼克斯尔现身(触发单位);
+  return true;
 }
 
 function 注册菲尼克斯尔范围监听(this: void, 状态: 菲尼克斯尔现身状态): void {
-  const trigger = CreateTrigger();
-  if (trigger == null || trigger === 0) return;
-  if (safeTriggerAddAction(trigger, on菲尼克斯尔范围触发) == null) {
-    safeDestroyTrigger(trigger);
-    return;
-  }
-  状态.范围触发器 = trigger;
-  状态.取消范围监听 = registerUnitInRangeTrigger(trigger, 状态.Boss单位, 菲尼克斯尔进入范围, null, false);
+  状态.取消范围监听 = registerOneShotUnitRangeListener(
+    状态.Boss单位,
+    菲尼克斯尔进入范围,
+    on菲尼克斯尔范围触发,
+    是玩家英雄组单位,
+  );
 }
 
 function on菲尼克斯尔死亡(this: void, dyingUnit: any, _killingUnit: any): void {

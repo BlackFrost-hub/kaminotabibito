@@ -5,8 +5,14 @@ const jass = require("jass.common") as any;
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
-const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
-  TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (
+    this: void,
+    unit: any,
+    range: number,
+    callback: (this: void, enteringUnit: any) => boolean,
+    predicate?: (this: void, enteringUnit: any) => boolean,
+  ) => () => void;
 };
 const { SetUnitFacingToFaceUnitTimed } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   SetUnitFacingToFaceUnitTimed: (this: void, whichUnit: any, target: any, duration: number) => void;
@@ -34,27 +40,18 @@ function 播放主线剧情片段(this: void, 片段ID: string, 上下文?: any)
   return 播放主线剧情片段实现(片段ID, 上下文);
 }
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
-const DestroyTrigger = jass.DestroyTrigger as (this: void, trig: any) => void;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const SetUnitFacingTimed = jass.SetUnitFacingTimed as (this: void, whichUnit: any, facing: number, duration: number) => void;
-const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 
 let 已初始化进度05核心 = false;
-let 进度05范围触发器: any = null;
+let 取消进度05范围监听: (() => void) | undefined;
 
-function on击败地精返回长老触发(this: void): void {
-  const 触发单位 = GetTriggerUnit();
-  if (!是玩家英雄组单位(触发单位)) return;
-  if (读取剧情进度() !== 4) return;
+function on击败地精返回长老触发(this: void, 触发单位: any): boolean {
+  if (读取剧情进度() !== 4) return false;
 
   const 片段ID = "jlc_goblin_defeated_return_elder";
   const 已开始播放 = 播放主线剧情片段(片段ID, { 片段ID, 触发配置名: "击败地精返回长老核心", 触发单位 });
-  if (已开始播放 && 进度05范围触发器 != null && 进度05范围触发器 !== 0) {
-    DestroyTrigger(进度05范围触发器);
-    进度05范围触发器 = null;
-  }
+  return 已开始播放;
 }
 
 export function 执行击败地精回村前置(this: void, 参数: 剧情动作参数表): void {
@@ -79,8 +76,11 @@ export function 初始化进度05_击败地精返回长老核心(this: void): vo
 
   const 长老单位 = YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit");
   if (长老单位 == null || 长老单位 === 0) return;
-  const trigger = CreateTrigger();
-  TriggerRegisterUnitInRangeSimple(trigger, 800, 长老单位);
-  TriggerAddAction(trigger, on击败地精返回长老触发);
-  进度05范围触发器 = trigger;
+  if (取消进度05范围监听 != null) 取消进度05范围监听();
+  取消进度05范围监听 = registerOneShotUnitRangeListener(
+    长老单位,
+    800,
+    on击败地精返回长老触发,
+    是玩家英雄组单位,
+  );
 }

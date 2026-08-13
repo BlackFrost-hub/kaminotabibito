@@ -56,7 +56,7 @@ ____exports["处理超位魔法残章天空坠落使用"] = function(ctx)
                 0.85
             )
             local units = _____53D6_5750_6807_8303_56F4_654C_4EBA(caster, x, y, 500)
-            local damage = 1800 + jass.GetHeroInt(caster, true) * 7
+            local damage = 1800 + jass:GetHeroInt(caster, true) * 7
             do
                 local i = 0
                 while i < #units do
@@ -69,7 +69,7 @@ ____exports["处理超位魔法残章天空坠落使用"] = function(ctx)
                         nil,
                         {
                             ["装备技能类型"] = "装备主动",
-                            ["物品ID"] = jass.GetItemTypeId(ctx["物品"]),
+                            ["物品ID"] = jass:GetItemTypeId(ctx["物品"]),
                             ["物品实例"] = ctx["物品"],
                             ["技能ID"] = ctx["技能ID"],
                             ["标签"] = "天空坠落",

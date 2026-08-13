@@ -27,12 +27,8 @@ const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserDa
 const { safeForForce } = require("系统.00．核心系统.07．联机安全工具") as {
   safeForForce: (this: void, whichForce: any, callback: (this: void) => void) => void;
 };
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => (this: void) => void;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (this: void, unit: any, range: number, callback: (this: void, enteringUnit: any) => boolean, predicate?: (this: void, enteringUnit: any) => boolean) => (this: void) => void;
 };
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -52,14 +48,12 @@ import { 读取语义单位引用, 执行通用剧情动作 } from "../../00．�
 
 const GetDestructableX = jass.GetDestructableX as (this: void, destructable: any) => number;
 const GetDestructableY = jass.GetDestructableY as (this: void, destructable: any) => number;
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetItemX = jass.GetItemX as (this: void, item: any) => number;
 const GetItemY = jass.GetItemY as (this: void, item: any) => number;
 const GetEnumPlayer = jass.GetEnumPlayer as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetPlayerState = jass.GetPlayerState as (this: void, player: any, state: any) => number;
 const GetRandomInt = jass.GetRandomInt as (this: void, lowBound: number, highBound: number) => number;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -117,17 +111,11 @@ interface 耶提尔战后奖励状态 {
   耶提尔: any;
   奖励档位: number;
   已领取: boolean;
-  领取触发器: any;
   取消领取监听: ((this: void) => void) | undefined;
 }
 
 interface 耶提尔战后奖励回调参数 {
   世代: number;
-}
-
-interface 耶提尔战后触发器清理参数 {
-  状态: 耶提尔战后奖励状态;
-  触发器: any;
 }
 
 let 当前耶提尔协战状态: 耶提尔协战状态 | undefined;
@@ -267,32 +255,10 @@ function 发放耶提尔存活奖励(this: void, 奖励档位: number): void {
   }
 }
 
-function on延迟销毁耶提尔战后触发器(this: void, variable?: any): void {
-  const 参数 = variable as 耶提尔战后触发器清理参数 | undefined;
-  if (参数 == null || 参数.触发器 == null || 参数.触发器 === 0) return;
-  const 取消监听 = 参数.状态.取消领取监听;
-  参数.状态.取消领取监听 = undefined;
-  if (取消监听 != null) 取消监听();
-  safeDestroyTrigger(参数.触发器);
-}
-
 function 清理耶提尔战后领取监听(this: void, 状态: 耶提尔战后奖励状态): void {
   const 取消监听 = 状态.取消领取监听;
   状态.取消领取监听 = undefined;
   if (取消监听 != null) 取消监听();
-
-  const 触发器 = 状态.领取触发器;
-  状态.领取触发器 = null;
-  if (触发器 != null && 触发器 !== 0) safeDestroyTrigger(触发器);
-}
-
-function 完成耶提尔战后一次性监听(this: void, 状态: 耶提尔战后奖励状态): void {
-  const 触发器 = 状态.领取触发器;
-  状态.领取触发器 = null;
-  if (触发器 != null && 触发器 !== 0) {
-    // 离开当前范围事件派发栈后，再注销中心监听并销毁业务触发器。
-    addDelayedCallback(1, on延迟销毁耶提尔战后触发器, { 状态, 触发器 } as 耶提尔战后触发器清理参数);
-  }
 }
 
 function 清空耶提尔战后奖励状态(this: void): void {
@@ -309,16 +275,16 @@ function on发放耶提尔战后奖励(this: void, variable?: any): void {
   发放耶提尔存活奖励(状态.奖励档位);
 }
 
-function on耶提尔战后奖励接近(this: void): void {
+function on耶提尔战后奖励接近(this: void, 进入单位: any): boolean {
   const 状态 = 当前耶提尔战后奖励状态;
-  if (状态 == null || 状态.已领取) return;
-  const 进入单位 = GetTriggerUnit();
-  if (!单位有效(进入单位) || !是玩家英雄组单位(进入单位)) return;
+  if (状态 == null || 状态.已领取) return true;
+  if (!单位有效(进入单位)) return false;
 
   状态.已领取 = true;
-  完成耶提尔战后一次性监听(状态);
+  状态.取消领取监听 = undefined;
   广播单位提示(状态.耶提尔, 耶提尔战后对白, 耶提尔战后对白持续毫秒);
   addDelayedCallback(耶提尔战后对白持续毫秒, on发放耶提尔战后奖励, { 世代: 状态.世代 } as 耶提尔战后奖励回调参数);
+  return true;
 }
 
 export function 布置耶提尔战后奖励NPC(this: void): void {
@@ -334,19 +300,11 @@ export function 布置耶提尔战后奖励NPC(this: void): void {
   SetUnitFacing(状态.耶提尔, 耶提尔战后朝向);
   IssueImmediateOrder(状态.耶提尔, "holdposition");
 
-  const 触发器 = CreateTrigger();
-  状态.领取触发器 = 触发器;
-  if (safeTriggerAddAction(触发器, on耶提尔战后奖励接近) == null) {
-    状态.领取触发器 = null;
-    safeDestroyTrigger(触发器);
-    return;
-  }
-  状态.取消领取监听 = registerUnitInRangeTrigger(
-    触发器,
+  状态.取消领取监听 = registerOneShotUnitRangeListener(
     状态.耶提尔,
     耶提尔战后奖励触发范围,
-    null,
-    false
+    on耶提尔战后奖励接近,
+    是玩家英雄组单位,
   );
 }
 
@@ -369,7 +327,6 @@ export function 结算耶提尔菲利斯协战(this: void): void {
     耶提尔: 状态.耶提尔,
     奖励档位,
     已领取: false,
-    领取触发器: null,
     取消领取监听: undefined,
   };
 }

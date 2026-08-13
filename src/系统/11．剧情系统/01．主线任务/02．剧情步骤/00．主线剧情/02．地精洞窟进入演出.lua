@@ -27,21 +27,23 @@ local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.05�
 local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_7["创建单位并登记排泄安全"]
 local ____require_result_8 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
 local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_8["立即移除单位并取消排泄登记"]
-local ____require_result_9 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_9.EC_CreateEffect
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
 local ____require_result_10 = require("lib.扩展函数.BJ函数.14．音效函数")
 local PlaySoundBJ = ____require_result_10.PlaySoundBJ
 local ____require_result_11 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.12．剧情电影镜头")
 local _____8FDB_5165_5267_60C5_7535_5F71_6A21_5F0F = ____require_result_11["进入剧情电影模式"]
 local _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934 = ____require_result_11["退出剧情电影模式并恢复镜头"]
-local ____require_result_12 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_12["添加单位暂停"]
-local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
-local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_13["注册剧情片段清理"]
-local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
-local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["注册剧情运行时单位"]
-local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["读取剧情运行时单位"]
-local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_14["清理剧情运行时单位"]
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
+local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_12["暂停并设置无敌安全"]
+local ____require_result_13 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
+local _____8BBE_7F6E_73A9_5BB6_82F1_96C4_7EC4_63A7_5236_72B6_6001 = ____require_result_13["设置玩家英雄组控制状态"]
+local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.13．剧情片段清理注册表")
+local _____6CE8_518C_5267_60C5_7247_6BB5_6E05_7406 = ____require_result_14["注册剧情片段清理"]
+local ____require_result_15 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
+local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["注册剧情运行时单位"]
+local _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["读取剧情运行时单位"]
+local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____require_result_15["清理剧情运行时单位"]
 local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0
 local function _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, _____4E0A_4E0B_6587)
     if _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0 == nil then
@@ -58,8 +60,6 @@ local KillUnit = jass.KillUnit
 local IssuePointOrder = jass.IssuePointOrder
 local SetUnitFacing = jass.SetUnitFacing
 local Player = jass.Player
-local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local PauseUnit = jass.PauseUnit
 local DisplayCineFilter = jass.DisplayCineFilter
 local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
@@ -149,22 +149,7 @@ local function _____6E05_7406_5730_7CBE_6D1E_7A9F_6F14_51FA()
         _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(_____9B54_6CD5_6838_5FC3)
     end
     _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____5730_7CBE_6D1E_7A9F_4E34_65F6_5355_4F4D_952E_524D_7F00 .. "100")
-    local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
-    if _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 then
-        local ____require_result_15 = require("lib.扩展函数.BJ函数.07．杂项")
-        local ForGroupBJ = ____require_result_15.ForGroupBJ
-        ForGroupBJ(
-            _____73A9_5BB6_82F1_96C4_7EC4,
-            function()
-                local unit = jass.GetEnumUnit()
-                if unit == nil or unit == 0 then
-                    return
-                end
-                PauseUnit(unit, false)
-                SetUnitInvulnerable(unit, false)
-            end
-        )
-    end
+    _____8BBE_7F6E_73A9_5BB6_82F1_96C4_7EC4_63A7_5236_72B6_6001(false, false)
     _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934()
 end
 local function ____on_5730_7CBE_6D1E_7A9F_8FDB_5165_89E6_53D1()
@@ -253,8 +238,7 @@ ____exports["执行地精洞窟祭坛演出开始"] = function()
     _____5E94_7528_5267_60C5_7535_5F71_955C_5934(_____5730_7CBE_6D1E_7A9F_955C_5934_9884_8BBE, 0)
     local bossUnit = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D("Boss.地精巫师")
     if _____6709_6548_5355_4F4D(bossUnit) then
-        SetUnitInvulnerable(bossUnit, true)
-        _____6DFB_52A0_5355_4F4D_6682_505C(bossUnit, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
+        _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168(bossUnit, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
     end
 end
 --- 按源 JASS 的时间顺序执行祭坛演员动作；阶段动作在跳过剧情时也会顺序消费。
@@ -312,16 +296,14 @@ ____exports["执行地精洞窟演员动作"] = function(_____53C2_6570)
             90,
             "8"
         )
-        EC_CreateEffect(
-            "Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdl",
-            -25959.4,
-            -14091,
-            0,
-            270,
-            2,
-            1,
-            2
-        )
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = "Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdl",
+            X = -25959.4,
+            Y = -14091,
+            ["面向角度"] = 270,
+            ["缩放"] = 2,
+            ["持续秒"] = 2
+        })
         _____64AD_653E_5730_7CBE_6D1E_7A9F_4EEA_5F0F_97F3_6548()
         return
     end
@@ -387,22 +369,7 @@ end
 ____exports["执行地精洞窟演出收尾"] = function()
     DisplayCineFilter(false)
     _____7ED3_675F_5730_7CBE_6D1E_7A9F_6F14_51FA_97F3_4E50()
-    local _____73A9_5BB6_82F1_96C4_7EC4 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
-    if _____73A9_5BB6_82F1_96C4_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_7EC4 ~= 0 then
-        local ____require_result_16 = require("lib.扩展函数.BJ函数.07．杂项")
-        local ForGroupBJ = ____require_result_16.ForGroupBJ
-        ForGroupBJ(
-            _____73A9_5BB6_82F1_96C4_7EC4,
-            function()
-                local unit = jass.GetEnumUnit()
-                if unit == nil or unit == 0 then
-                    return
-                end
-                SetUnitInvulnerable(unit, false)
-                PauseUnit(unit, false)
-            end
-        )
-    end
+    _____8BBE_7F6E_73A9_5BB6_82F1_96C4_7EC4_63A7_5236_72B6_6001(false, false)
     _____9000_51FA_5267_60C5_7535_5F71_6A21_5F0F_5E76_6062_590D_955C_5934()
 end
 ____exports["地精洞窟进入演出剧情动作注册表"] = {["JLC精灵村_地精洞窟演出前置"] = ____exports["执行地精洞窟演出前置"], ["JLC精灵村_地精洞窟祭坛演出开始"] = ____exports["执行地精洞窟祭坛演出开始"], ["JLC精灵村_地精洞窟演员动作"] = ____exports["执行地精洞窟演员动作"], ["JLC精灵村_地精洞窟演出收尾"] = ____exports["执行地精洞窟演出收尾"]}

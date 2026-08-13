@@ -1,8 +1,19 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ArraySlice = ____lualib.__TS__ArraySlice
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local ____exports = {}
 ---
 -- @noSelfInFile
-local _____7269_54C1_6D4B_8BD5_6700_5927_5E8F_53F7 = 191
+local _____7269_54C1_6D4B_8BD5_6700_5927_5E8F_53F7 = 192
+____exports["精灵药水测试装备列表"] = {
+    "星露生命精华",
+    "晨曦魔力精华",
+    "月影灵息精华",
+    "星曦复苏药剂",
+    "曦月澄明药剂",
+    "星月净愈药剂",
+    "精灵王城三花灵药"
+}
 ____exports["物品测试序号装备名表"] = {
     [1] = "回沙之书",
     [2] = "女妖头饰",
@@ -194,7 +205,8 @@ ____exports["物品测试序号装备名表"] = {
     [188] = "黑翼守护重盾",
     [189] = "滴管长枪投影",
     [190] = "真祖女武神血铠",
-    [191] = "英灵战乙女蔷薇镜"
+    [191] = "英灵战乙女蔷薇镜",
+    [192] = "星露生命精华"
 }
 local function _____53D6_5E8F_53F7_88C5_5907_540D(_____5E8F_53F7)
     return ____exports["物品测试序号装备名表"][_____5E8F_53F7] or ""
@@ -228,7 +240,21 @@ local function _____751F_6210_6D4B_8BD5_88C5_5907_987A_5E8F()
 end
 ____exports["物品主动技能测试命令列表"] = _____751F_6210_6D4B_8BD5_547D_4EE4_5217_8868()
 ____exports["物品主动技能测试发放顺序"] = _____751F_6210_6D4B_8BD5_88C5_5907_987A_5E8F()
-____exports["物品主动技能测试清理装备列表"] = ____exports["物品主动技能测试发放顺序"]
+local function _____751F_6210_6D4B_8BD5_6E05_7406_88C5_5907_5217_8868()
+    local result = __TS__ArraySlice(____exports["物品主动技能测试发放顺序"])
+    do
+        local i = 0
+        while i < #____exports["精灵药水测试装备列表"] do
+            local _____88C5_5907_540D = ____exports["精灵药水测试装备列表"][i + 1]
+            if __TS__ArrayIndexOf(result, _____88C5_5907_540D) < 0 then
+                result[#result + 1] = _____88C5_5907_540D
+            end
+            i = i + 1
+        end
+    end
+    return result
+end
+____exports["物品主动技能测试清理装备列表"] = _____751F_6210_6D4B_8BD5_6E05_7406_88C5_5907_5217_8868()
 local function _____751F_6210_6D4B_8BD5_547D_4EE4_8BF4_660E_5217_8868()
     local list = {}
     do
@@ -237,15 +263,15 @@ local function _____751F_6210_6D4B_8BD5_547D_4EE4_8BF4_660E_5217_8868()
             do
                 local _____88C5_5907_540D = _____53D6_5E8F_53F7_88C5_5907_540D(_____5E8F_53F7)
                 if _____88C5_5907_540D == "" then
-                    goto __continue13
+                    goto __continue17
                 end
                 list[#list + 1] = {
                     ["序号"] = _____5E8F_53F7,
                     ["命令"] = "wp" .. tostring(_____5E8F_53F7),
-                    ["装备名"] = _____88C5_5907_540D
+                    ["装备名"] = _____5E8F_53F7 == 192 and "全部精灵药水" or _____88C5_5907_540D
                 }
             end
-            ::__continue13::
+            ::__continue17::
             _____5E8F_53F7 = _____5E8F_53F7 + 1
         end
     end

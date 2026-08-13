@@ -37,6 +37,9 @@ const { 按名字反查物品ID } = require("系统.02．物品系统.13．物�
 const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
 };
+const { 登记采集物品实例 } = require("系统.02．物品系统.17．装备采集.02．核心") as {
+  登记采集物品实例: (this: void, 物品: any, 物品类型ID: number, 刷新区域名称: string) => boolean;
+};
 const { AddItemToStockBJ } = require("lib.扩展函数.BJ函数.03．物品与库存") as {
   AddItemToStockBJ: (this: void, itemId: number, whichUnit: any, currentStock: number, stockMax: number) => void;
 };
@@ -509,6 +512,7 @@ function 执行单条世界地图植物随机物品创建(this: void, 配置: �
     const y = 获取随机矩形Y(rect);
     const 物品 = 创建物品并注册排泄监听(物品类型ID, x, y);
     if (物品 != null && 物品 !== 0) {
+      登记采集物品实例(物品, 物品类型ID, 配置.矩形区域名称);
       已创建数量++;
     }
   }

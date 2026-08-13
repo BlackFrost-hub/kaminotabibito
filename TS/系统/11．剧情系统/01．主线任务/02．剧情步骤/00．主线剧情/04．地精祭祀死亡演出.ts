@@ -16,8 +16,15 @@ const { ModifyGateBJ, ForGroupBJ } = require("lib.扩展函数.BJ函数.07．杂
 const { SetUnitLifePercentBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   SetUnitLifePercentBJ: (this: void, whichUnit: any, percent: number) => void;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: {
+    模型路径: string;
+    X: number;
+    Y: number;
+    面向角度?: number;
+    缩放?: number;
+    持续秒?: number;
+  }) => any;
 };
 const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．单位配置表.02．Boss配置表") as {
   按名字反查Boss单位ID: (this: void, name: string) => string | undefined;
@@ -122,16 +129,14 @@ function on地精死亡血液特效(this: void): void {
     return;
   }
   血液特效次数 += 1;
-  EC_CreateEffect(
-    "Objects\\Spawnmodels\\Human\\HumanBlood\\BloodElfSpellThiefBlood.mdl",
-    GetUnitX(残血地精),
-    GetUnitY(残血地精),
-    0,
-    270,
-    1.5,
-    1,
-    2,
-  );
+  创建点特效({
+    模型路径: "Objects\\Spawnmodels\\Human\\HumanBlood\\BloodElfSpellThiefBlood.mdl",
+    X: GetUnitX(残血地精),
+    Y: GetUnitY(残血地精),
+    面向角度: 270,
+    缩放: 1.5,
+    持续秒: 2,
+  });
 }
 
 function 启动地精死亡血液特效(this: void): void {
@@ -144,7 +149,14 @@ function on神秘人第二黑洞(this: void): void {
   神秘人第二黑洞延迟ID = 0;
   const 神秘人 = 读取剧情运行时单位(地精死亡神秘人单位键);
   if (神秘人 == null || 神秘人 === 0) return;
-  EC_CreateEffect("war3mapImported\\blackhole.mdx", GetUnitX(神秘人), GetUnitY(神秘人), 0, 270, 3, 1, 4);
+  创建点特效({
+    模型路径: "war3mapImported\\blackhole.mdx",
+    X: GetUnitX(神秘人),
+    Y: GetUnitY(神秘人),
+    面向角度: 270,
+    缩放: 3,
+    持续秒: 4,
+  });
 }
 
 function on神秘人淡出(this: void): void {
@@ -176,7 +188,14 @@ function 播放地精抹除特效(this: void): void {
   地精抹除特效延迟ID = 0;
   const 残血地精 = 读取剧情运行时单位(地精死亡残血单位键);
   if (残血地精 == null || 残血地精 === 0) return;
-  EC_CreateEffect("war3mapImported\\Eraser.mdx", GetUnitX(残血地精), GetUnitY(残血地精), 0, 270, 2.2, 1, 2);
+  创建点特效({
+    模型路径: "war3mapImported\\Eraser.mdx",
+    X: GetUnitX(残血地精),
+    Y: GetUnitY(残血地精),
+    面向角度: 270,
+    缩放: 2.2,
+    持续秒: 2,
+  });
 }
 
 function on地精死亡演出移动英雄(this: void): void {
@@ -204,7 +223,14 @@ function 创建地精死亡神秘人演出(this: void, 残血地精: any): any {
   const 神秘人 = 创建单位并登记排泄安全(Player(PLAYER_NEUTRAL_PASSIVE), 神秘人单位ID, -26467.8, -13505.7, 315);
   if (神秘人 == null || 神秘人 === 0) return null;
   注册剧情运行时单位(地精死亡神秘人单位键, 神秘人);
-  EC_CreateEffect("war3mapImported\\blackhole.mdx", GetUnitX(神秘人), GetUnitY(神秘人), 0, 270, 3, 1, 4);
+  创建点特效({
+    模型路径: "war3mapImported\\blackhole.mdx",
+    X: GetUnitX(神秘人),
+    Y: GetUnitY(神秘人),
+    面向角度: 270,
+    缩放: 3,
+    持续秒: 4,
+  });
   IssuePointOrder(神秘人, "move", -26296.4, -13702.4);
   if (残血地精 != null && 残血地精 !== 0) {
     SetUnitFacing(神秘人, YDWEAngleBetweenUnitsSafe(神秘人, 残血地精));

@@ -35,8 +35,8 @@ const { 应用镜头预设给玩家 } = require("lib.扩展函数.封装函数.0
 const { safeForForce } = require("系统.00．核心系统.07．联机安全工具") as {
   safeForForce: (this: void, whichForce: any, callback: (this: void) => void) => void;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, scale: number, speed: number, duration: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; 面向角度?: number; 缩放?: number; 动画速度?: number; 持续秒?: number }) => any;
 };
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -52,6 +52,10 @@ const { 注册剧情运行时单位, 读取剧情运行时单位, 清理剧情�
   读取剧情运行时单位: (this: void, 语义名: string) => any;
   清理剧情运行时单位: (this: void, 语义名: string) => void;
 };
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, 来源: string) => boolean;
+  移除单位暂停: (this: void, unit: any, 来源: string) => boolean;
+};
 const { DzDoodadRemove } = require("lib.扩展函数.KK扩展API.00．装饰物函数") as {
   DzDoodadRemove: (this: void, doodad: number) => void;
 };
@@ -65,6 +69,7 @@ const { GetUnitsInRectMatching: BJGetUnitsInRectMatching } = require("lib.扩展
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 创建并冻结剧情Boss预置 } from "../../00．剧情系统核心工具/03．剧情Boss预置桥接";
 import { 进入剧情电影模式, 退出剧情电影模式并恢复镜头 } from "../../00．剧情系统核心工具/12．剧情电影镜头";
+import { 设置玩家英雄组控制状态 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 export { 护卫试炼后回村剧情片段, 教派最终Boss启动剧情片段 } from "../01．第一章/16．第一章最终Boss教派前置";
 
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -81,9 +86,7 @@ const IsPlayerInForce = jass.IsPlayerInForce as (this: void, whichPlayer: any, w
 const ShowUnit = jass.ShowUnit as (this: void, whichUnit: any, show: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, whichUnit: any, animation: string) => void;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (this: void, whichUnit: any, order: string, target: any) => boolean;
 const GetEnumPlayer = jass.GetEnumPlayer as (this: void) => any;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
@@ -94,6 +97,7 @@ const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 
 const 教派现场单位键前缀 = "剧情运行时.教派袭击现场.";
 const 教派现场树木: number[] = [];
+const 教派现场玩家暂停来源 = "剧情系统:教派现场玩家入场";
 
 interface 教派镜头预设参数 {
   X: number;
@@ -145,15 +149,7 @@ function 清理教派袭击现场对象(this: void): void {
 
 function 清理教派袭击现场(this: void): void {
   清理教派袭击现场对象();
-  const 玩家英雄组 = 教派现场玩家英雄组();
-  if (玩家英雄组 != null && 玩家英雄组 !== 0) {
-    ForGroupBJ(玩家英雄组, () => {
-      const unit = GetEnumUnit();
-      if (unit == null || unit === 0) return;
-      PauseUnit(unit, false);
-      SetUnitInvulnerable(unit, false);
-    });
-  }
+  设置玩家英雄组控制状态(false, false);
   退出剧情电影模式并恢复镜头();
 }
 
@@ -204,15 +200,7 @@ export function 执行护卫试炼后回村(this: void, 参数: 剧情动作参�
   清理语义单位("ZXCS", "DW");
   清理语义单位("ZXCS2", "DW");
   隐藏村内中立单位();
-  const 玩家英雄组 = 教派现场玩家英雄组();
-  if (玩家英雄组 != null && 玩家英雄组 !== 0) {
-    ForGroupBJ(玩家英雄组, () => {
-      const unit = GetEnumUnit();
-      if (unit == null || unit === 0) return;
-      PauseUnit(unit, true);
-      SetUnitInvulnerable(unit, true);
-    });
-  }
+  设置玩家英雄组控制状态(true, true);
   进入剧情电影模式();
 
   const 长老 = YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit");
@@ -282,7 +270,7 @@ function 执行教派现场玩家入场(this: void): void {
     SetUnitPosition(unit, -26846.7, -27820.8);
     SetUnitFacing(unit, YDWEAngleBetweenUnitsSafe(unit, 神秘人));
     SetUnitAnimation(unit, "Attack");
-    PauseUnit(unit, true);
+    添加单位暂停(unit, 教派现场玩家暂停来源);
   });
 }
 
@@ -293,21 +281,19 @@ function 执行教派现场玩家恢复(this: void): void {
   ForGroupBJ(玩家英雄组, () => {
     const unit = GetEnumUnit();
     if (unit == null || unit === 0) return;
-    PauseUnit(unit, false);
-    SetUnitInvulnerable(unit, false);
+    移除单位暂停(unit, 教派现场玩家暂停来源);
     if (神秘人 != null && 神秘人 !== 0) IssueTargetOrder(unit, "attack", 神秘人);
   });
   if (神秘人 != null && 神秘人 !== 0) {
-    EC_CreateEffect(
-      "Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl",
-      GetUnitX(神秘人),
-      GetUnitY(神秘人),
-      0,
-      270,
-      1.5,
-      1,
-      1,
-    );
+    创建点特效({
+      模型路径: "Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl",
+      X: GetUnitX(神秘人),
+      Y: GetUnitY(神秘人),
+      面向角度: 270,
+      缩放: 1.5,
+      动画速度: 1,
+      持续秒: 1,
+    });
   }
 }
 

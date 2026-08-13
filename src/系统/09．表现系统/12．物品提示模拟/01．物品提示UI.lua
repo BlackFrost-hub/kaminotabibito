@@ -114,7 +114,9 @@ local function _____521B_5EFAFdf_56FE_6807_5E27(name, parent, contextId)
     return DzCreateFrame(name, parent, contextId)
 end
 local function _____683C_5F0F_5316_6574_6570(value)
-    return tostring(math.floor(value + 0.5)
+    return tostring(
+        nil,
+        math.floor(value + 0.5)
     )
 end
 local function _____683C_5F0F_5316_91D1_8272_6574_6570(value)
@@ -134,7 +136,7 @@ local function _____8BA1_7B97_53EF_89C1_6587_672C_5BBD_5EA6(text)
     local index = 0
     while index < #text do
         do
-            local code = string.byte(text, index + 1) or 0
+            local code = string:byte(text, index + 1) or 0
             if code == 124 then
                 local nextIndex = _____53D6_989C_8272_7801_7ED3_675F_4F4D_7F6E(text, index)
                 if nextIndex > index then

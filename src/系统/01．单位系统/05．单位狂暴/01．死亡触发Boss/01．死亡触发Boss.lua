@@ -53,7 +53,7 @@ local function _____521D_59CB_5316_914D_7F6E_7F13_5B58()
         while i < #_____6B7B_4EA1_89E6_53D1Boss_914D_7F6E_8868 do
             do
                 local _____914D_7F6E = _____6B7B_4EA1_89E6_53D1Boss_914D_7F6E_8868[i + 1]
-                local _____89E6_53D1_5355_4F4DID = _____6309_540D_5B57_53CD_67E5_4EFB_610F_5355_4F4DID(_____914D_7F6E["触发单位名"])
+                local _____89E6_53D1_5355_4F4DID = _____914D_7F6E["触发单位ID"] or _____6309_540D_5B57_53CD_67E5_4EFB_610F_5355_4F4DID(_____914D_7F6E["触发单位名"])
                 local ____Boss_5355_4F4DID = _____6309_540D_5B57_53CD_67E5_4EFB_610F_5355_4F4DID(_____914D_7F6E["Boss单位名"])
                 if _____89E6_53D1_5355_4F4DID == nil or ____Boss_5355_4F4DID == nil then
                     goto __continue6

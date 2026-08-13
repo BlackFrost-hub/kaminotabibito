@@ -36,7 +36,7 @@ function _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65(_____4
     if owner == nil or owner == 0 or whichHero == nil or whichHero == 0 then
         return true
     end
-    local playerId = jass.GetPlayerId(owner)
+    local playerId = jass:GetPlayerId(owner)
     repeat
         local ____switch19 = _____4EFB_52A1.stage
         local ____cond19 = ____switch19 == 0
@@ -158,17 +158,17 @@ local function isPlayableHero(whichUnit)
     if whichUnit == nil or whichUnit == 0 then
         return false
     end
-    if jass.IsUnitType(whichUnit, jass.UNIT_TYPE_HERO) ~= true then
+    if jass:IsUnitType(whichUnit, jass.UNIT_TYPE_HERO) ~= true then
         return false
     end
-    local owner = jass.GetOwningPlayer(whichUnit)
+    local owner = jass:GetOwningPlayer(whichUnit)
     if owner == nil or owner == 0 then
         return false
     end
-    if jass.GetPlayerController(owner) == jass.MAP_CONTROL_COMPUTER then
+    if jass:GetPlayerController(owner) == jass.MAP_CONTROL_COMPUTER then
         return false
     end
-    local playerId = jass.GetPlayerId(owner) or -1
+    local playerId = jass:GetPlayerId(owner) or -1
     return playerId >= 0 and playerId <= 4
 end
 uiRegisteredPlayers = __TS__New(Set)
@@ -197,7 +197,7 @@ local function ____on_542F_52A8_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217()
     _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65(0)
 end
 local function registerHeroDependents(whichHero)
-    local owner = jass.GetOwningPlayer(whichHero)
+    local owner = jass:GetOwningPlayer(whichHero)
     if owner == nil or owner == 0 then
         return
     end
@@ -273,9 +273,9 @@ ____exports["是玩家英雄组单位"] = function(unit)
     end
     local _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 = ____exports["获取玩家英雄单位组"]()
     if _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 ~= nil and _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4 ~= 0 then
-        return jass.IsUnitInGroup(unit, _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4) == true
+        return jass:IsUnitInGroup(unit, _____73A9_5BB6_82F1_96C4_5355_4F4D_7EC4) == true
     end
-    local owner = jass.GetOwningPlayer(unit)
+    local owner = jass:GetOwningPlayer(unit)
     if owner == nil or owner == 0 then
         return false
     end
@@ -285,7 +285,7 @@ local function registerSingleHero(whichHero)
     if not isPlayableHero(whichHero) then
         return
     end
-    local owner = jass.GetOwningPlayer(whichHero)
+    local owner = jass:GetOwningPlayer(whichHero)
     if owner == nil or owner == 0 then
         return
     end

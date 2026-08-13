@@ -2,12 +2,8 @@
 
 const jass = require("jass.common") as any;
 
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
-};
-const { registerEnterRegionTrigger } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
-  registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => () => void;
+const { 创建矩形进入监听 } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
+  创建矩形进入监听: (this: void, rect: any, callback: (this: void) => void, filter?: any) => { 取消: (this: void) => void } | null;
 };
 const { 获取玩家英雄单位组, 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   获取玩家英雄单位组: (this: void) => any;
@@ -51,11 +47,7 @@ import { 读取语义单位引用, 设置玩家英雄组控制状态 } from "../
 import { 清理剧情运行时单位, 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 发布主线节点目标 } from "../../00．剧情系统核心工具/10．标准剧情动作";
 
-const CreateRegion = jass.CreateRegion as (this: void) => any;
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const RegionAddRect = jass.RegionAddRect as (this: void, region: any, rect: any) => void;
-const RemoveRegion = jass.RemoveRegion as (this: void, region: any) => void;
 const Player = jass.Player as (this: void, playerId: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
@@ -110,10 +102,7 @@ interface 封印核心场景状态 {
 }
 
 interface 封印核心入口监听状态 {
-  区域: any;
-  矩形: any;
-  触发器: any;
-  取消监听?: () => void;
+  取消: (this: void) => void;
   已触发: boolean;
 }
 
@@ -284,9 +273,7 @@ export function 创建封印核心七色光束(this: void): void {
 function 清理封印核心入口监听(this: void): void {
   const 状态 = 当前封印核心入口监听;
   if (状态 == null) return;
-  if (状态.取消监听 != null) 状态.取消监听();
-  if (句柄有效(状态.触发器)) safeDestroyTrigger(状态.触发器);
-  if (句柄有效(状态.区域)) RemoveRegion(状态.区域);
+  状态.取消();
   注销动态矩形区域(封印核心入口矩形键);
   当前封印核心入口监听 = undefined;
 }
@@ -320,29 +307,18 @@ export function 开始监听封印核心入口(this: void): void {
   if (读取剧情进度() !== 48 || 当前封印核心入口监听 != null) return;
   注册封印守卫战区域音乐();
 
-  const 区域 = CreateRegion();
   const 矩形 = 注册动态矩形区域(动态矩形区域配置表[封印核心入口矩形键]);
-  const 触发器 = CreateTrigger();
-  if (!句柄有效(区域) || !句柄有效(矩形) || !句柄有效(触发器)) {
-    if (句柄有效(区域)) RemoveRegion(区域);
-    if (句柄有效(触发器)) safeDestroyTrigger(触发器);
+  if (!句柄有效(矩形)) {
     注销动态矩形区域(封印核心入口矩形键);
     return;
   }
-
-  RegionAddRect(区域, 矩形);
-  if (safeTriggerAddAction(触发器, on封印核心入口触发) == null) {
-    RemoveRegion(区域);
-    safeDestroyTrigger(触发器);
+  const 监听 = 创建矩形进入监听(矩形, on封印核心入口触发, null);
+  if (监听 == null) {
     注销动态矩形区域(封印核心入口矩形键);
     return;
   }
-
   当前封印核心入口监听 = {
-    区域,
-    矩形,
-    触发器,
-    取消监听: registerEnterRegionTrigger(触发器, 区域, null),
+    取消: 监听.取消,
     已触发: false,
   };
 }

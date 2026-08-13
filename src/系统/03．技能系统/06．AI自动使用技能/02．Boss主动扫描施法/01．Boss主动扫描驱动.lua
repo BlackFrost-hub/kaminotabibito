@@ -31,7 +31,7 @@ function _____53D6_5355_4F4D_53E5_67C4ID(unit)
     if unit == nil or unit == 0 then
         return 0
     end
-    local handleId = jass.GetHandleId(unit)
+    local handleId = jass:GetHandleId(unit)
     return handleId or 0
 end
 function _____8BFB_53D6_6280_80FD_80FD_529BID(skillId)
@@ -256,10 +256,10 @@ local function _____662F_5426_6709_6548Boss_4E3B_52A8_76EE_6807(candidate, sourc
     if not SUC_MatchBasicTarget(candidate, source, true) then
         return false
     end
-    if jass.IsUnitType(candidate, jass.UNIT_TYPE_ANCIENT) then
+    if jass:IsUnitType(candidate, jass.UNIT_TYPE_ANCIENT) then
         return false
     end
-    if jass.IsUnitType(candidate, jass.UNIT_TYPE_SUMMONED) then
+    if jass:IsUnitType(candidate, jass.UNIT_TYPE_SUMMONED) then
         return false
     end
     return true
@@ -481,16 +481,16 @@ local function _____6267_884C_6280_80FD_4E0B_5355(unit, _____6280_80FD, _____547
             ____temp_16 = unit
         end
         local pointTarget = ____temp_16
-        local x = jass.GetUnitX(pointTarget)
-        local y = jass.GetUnitY(pointTarget)
+        local x = jass:GetUnitX(pointTarget)
+        local y = jass:GetUnitY(pointTarget)
         return IssuePointOrderById(unit, _____547D_4EE4ID, x, y) == true
     end
     if _____65BD_6CD5_76EE_6807_7C7B_578B == "单位或点" then
         if target ~= nil and target ~= 0 then
             return IssueTargetOrderById(unit, _____547D_4EE4ID, target) == true
         end
-        local x = jass.GetUnitX(unit)
-        local y = jass.GetUnitY(unit)
+        local x = jass:GetUnitX(unit)
+        local y = jass:GetUnitY(unit)
         return IssuePointOrderById(unit, _____547D_4EE4ID, x, y) == true
     end
     if target ~= nil and target ~= 0 then
@@ -534,7 +534,7 @@ local function _____9009_62E9_53EF_65BD_6CD5_6280_80FD(unit, _____914D_7F6E, ___
                     goto __continue112
                 end
                 local abilityId = _____8BFB_53D6_6280_80FD_80FD_529BID(skillId)
-                local _____6280_80FD_7B49_7EA7 = abilityId == 0 and 0 or jass.GetUnitAbilityLevel(unit, abilityId)
+                local _____6280_80FD_7B49_7EA7 = abilityId == 0 and 0 or jass:GetUnitAbilityLevel(unit, abilityId)
                 local coolMs = _____8BFB_53D6_6280_80FD_5F53_524D_51B7_5374_6BEB_79D2(unit, skillId)
                 local orderId = _____8BFB_53D6_6280_80FD_547D_4EE4_7F16_53F7(unit, skill)
                 if not _____662F_5426_6EE1_8DB3_6280_80FD_8FD0_884C_65F6_53EF_7528_6761_4EF6(unit, skill) then
@@ -640,7 +640,7 @@ local function _____5C1D_8BD5_9A71_52A8_5355_4E2ABoss(context)
     local ____skill__6280_80FDID_19 = skill["技能ID"]
     local ____temp_17
     if target ~= nil and target ~= 0 then
-        ____temp_17 = jass.GetUnitName(target)
+        ____temp_17 = jass:GetUnitName(target)
     else
         ____temp_17 = "无目标"
     end

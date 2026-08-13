@@ -7,6 +7,8 @@ export interface 死亡触发Boss配置 {
   配置ID: string;
   触发类型: Boss出现触发类型;
   触发单位名: string;
+  /** 指定原始四码单位 ID 时优先使用，适合未纳入名称反查表的单位。 */
+  触发单位ID?: string;
   Boss单位名: string;
   只触发一次?: boolean;
   需要加入血条Boss组?: boolean;
@@ -42,9 +44,10 @@ export const 死亡触发Boss配置表: 死亡触发Boss配置[] = [
     广播持续时间Ms: 5000,
   },
   {
-    配置ID: "狂暴沙漠蜘蛛_蜘蛛女皇",
+    配置ID: "nsbm_蜘蛛女皇",
     触发类型: "概率",
-    触发单位名: "狂暴沙漠蜘蛛",
+    触发单位名: "nsbm",
+    触发单位ID: "nsbm",
     Boss单位名: "蜘蛛女皇|cffff0000（BossLV25）|r",
     只触发一次: true,
     需要加入血条Boss组: true,

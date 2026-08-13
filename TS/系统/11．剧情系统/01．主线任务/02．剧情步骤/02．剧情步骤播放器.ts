@@ -2,9 +2,11 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
+const { 创建可取消任务组, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
+  创建可取消任务组: (this: void) => {
+    添加周期: (this: void, 间隔毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any) => number;
+    取消: (this: void, 任务ID: number) => void;
+  };
   getServerTime: (this: void) => number;
 };
 const { TransmissionFromUnitWithNameBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
@@ -106,6 +108,7 @@ const 剧情ESC最近按下时间表: Record<number, number | undefined> = {};
 let 当前片段: 剧情片段配置 | undefined;
 let 已初始化剧情步骤播放器 = false;
 const 剧情延迟任务列表: 剧情延迟任务[] = [];
+const 剧情延迟任务组 = 创建可取消任务组();
 let 剧情延迟任务扫描回调ID = 0;
 let 执行主线剧情动作函数: ((动作ID: string, 参数: 剧情动作参数表) => void) | undefined;
 
@@ -229,7 +232,7 @@ function 执行剧情延迟任务(this: void, 上下文: 剧情延迟任务): vo
 
 function 尝试停止剧情延迟任务扫描(this: void): void {
   if (剧情延迟任务列表.length > 0 || 剧情延迟任务扫描回调ID === 0) return;
-  removePeriodicCallback(剧情延迟任务扫描回调ID);
+  剧情延迟任务组.取消(剧情延迟任务扫描回调ID);
   剧情延迟任务扫描回调ID = 0;
 }
 
@@ -272,7 +275,7 @@ function on剧情延迟任务扫描(this: void): void {
 function 添加剧情延迟任务(this: void, 任务: 剧情延迟任务): void {
   剧情延迟任务列表.push(任务);
   if (剧情延迟任务扫描回调ID === 0) {
-    剧情延迟任务扫描回调ID = addPeriodicCallback(10, on剧情延迟任务扫描);
+    剧情延迟任务扫描回调ID = 剧情延迟任务组.添加周期(10, on剧情延迟任务扫描);
   }
 }
 

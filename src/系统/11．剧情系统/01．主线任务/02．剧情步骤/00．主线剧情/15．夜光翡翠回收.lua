@@ -1,7 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
 local __TS__Number = ____lualib.__TS__Number
-local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取当前剧情动作上下文"]
@@ -18,10 +17,10 @@ local ____require_result_2 = require("系统.01．单位系统.08．单位配置
 local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_2["按名字反查总单位ID"]
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_4.EC_CreateEffect
-local ____require_result_5 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterUnitInRangeSimple = ____require_result_5.TriggerRegisterUnitInRangeSimple
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
+local registerOneShotUnitRangeListener = ____require_result_5.registerOneShotUnitRangeListener
 local ____require_result_6 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
 local _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F = ____require_result_6["切换区域背景音乐表达式"]
 local ____require_result_7 = require("lib.扩展函数.BJ函数.05A．电影函数")
@@ -43,14 +42,10 @@ do
     local ____15_FF0E_591C_5149_7FE1_7FE0_56DE_6536 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.01．第一章.15．夜光翡翠回收")
     ____exports["沙漠情报商人回收夜光翡翠剧情片段"] = ____15_FF0E_591C_5149_7FE1_7FE0_56DE_6536["沙漠情报商人回收夜光翡翠剧情片段"]
 end
-local CreateTrigger = jass.CreateTrigger
 local CreateGroup = jass.CreateGroup
 local CreateUnit = jass.CreateUnit
-local DestroyTrigger = jass.DestroyTrigger
 local DestroyGroup = jass.DestroyGroup
 local FirstOfGroup = jass.FirstOfGroup
-local GetTriggerUnit = jass.GetTriggerUnit
-local GetTriggeringTrigger = jass.GetTriggeringTrigger
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitName = jass.GetUnitName
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -62,12 +57,11 @@ local IsPlayerInForce = jass.IsPlayerInForce
 local Player = jass.Player
 local Rect = jass.Rect
 local RemoveRect = jass.RemoveRect
-local TriggerAddAction = jass.TriggerAddAction
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local bj_QUESTMESSAGE_WARNING = jassGlobals.bj_QUESTMESSAGE_WARNING
 local bj_TIMETYPE_SET = jassGlobals.bj_TIMETYPE_SET
 local _____56DE_6751_5267_60C5_7247_6BB5ID = "jlc_return_village_after_guard_duel"
-local _____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868 = {}
+local _____88C2_7F1D_5165_53E3_76D1_542C_5217_8868 = {}
 local _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 = 0
 local function _____662F_6751_5185_65E7_7CBE_7075_62A4_536B(unit)
     if unit == nil or unit == 0 or GetUnitTypeId(unit) ~= stringToFourCCSafe("nhea") then
@@ -105,16 +99,16 @@ local function _____6E05_7406_6751_5185_65E7_7CBE_7075_62A4_536B()
 end
 local function _____6E05_7406_88C2_7F1D_56DE_6751_5165_53E3()
     do
-        local i = #_____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868 - 1
+        local i = #_____88C2_7F1D_5165_53E3_76D1_542C_5217_8868 - 1
         while i >= 0 do
-            local trigger = _____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868[i + 1]
-            if trigger ~= nil and trigger ~= 0 then
-                DestroyTrigger(trigger)
+            local cancel = _____88C2_7F1D_5165_53E3_76D1_542C_5217_8868[i + 1]
+            if cancel ~= nil then
+                cancel()
             end
             i = i - 1
         end
     end
-    __TS__ArraySetLength(_____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868, 0)
+    __TS__ArraySetLength(_____88C2_7F1D_5165_53E3_76D1_542C_5217_8868, 0)
     _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 = 0
 end
 local function _____6E05_7406_8BED_4E49_5355_4F4D(_____8868, _____952E)
@@ -124,45 +118,26 @@ local function _____6E05_7406_8BED_4E49_5355_4F4D(_____8868, _____952E)
     end
     YDUserDataClearTable("string", _____8868)
 end
-local function _____89E6_53D1_88C2_7F1D_56DE_6751()
+local function _____89E6_53D1_88C2_7F1D_56DE_6751(_____89E6_53D1_5355_4F4D)
     local _____5F53_524D_8FDB_5EA6 = __TS__Number(YDUserDataGetSafe("string", "剧情进度", "整数", "integer"))
     if _____5F53_524D_8FDB_5EA6 ~= 16 then
-        return
+        return false
     end
     if _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 <= 0 or getServerTime() < _____88C2_7F1D_5165_53E3_751F_6548_65F6_95F4_6BEB_79D2 then
-        return
-    end
-    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
-        return
-    end
-    local _____5F53_524D_89E6_53D1_5668 = GetTriggeringTrigger()
-    if _____5F53_524D_89E6_53D1_5668 ~= nil and _____5F53_524D_89E6_53D1_5668 ~= 0 then
-        do
-            local i = #_____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868 - 1
-            while i >= 0 do
-                if _____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868[i + 1] == _____5F53_524D_89E6_53D1_5668 then
-                    __TS__ArraySplice(_____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868, i, 1)
-                end
-                i = i - 1
-            end
-        end
-        DestroyTrigger(_____5F53_524D_89E6_53D1_5668)
+        return false
     end
     _____6E05_7406_88C2_7F1D_56DE_6751_5165_53E3()
     local _____4E0A_4E0B_6587 = {["片段ID"] = _____56DE_6751_5267_60C5_7247_6BB5ID, ["触发配置名"] = "裂缝回村入口", ["触发单位"] = _____89E6_53D1_5355_4F4D}
     local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
     local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_14["播放主线剧情片段"]
     _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____56DE_6751_5267_60C5_7247_6BB5ID, _____4E0A_4E0B_6587)
+    return true
 end
 local function _____6CE8_518C_88C2_7F1D_56DE_6751_5165_53E3(unit)
     if unit == nil or unit == 0 then
         return
     end
-    local trigger = CreateTrigger()
-    TriggerRegisterUnitInRangeSimple(trigger, 300, unit)
-    TriggerAddAction(trigger, _____89E6_53D1_88C2_7F1D_56DE_6751)
-    _____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868[#_____88C2_7F1D_5165_53E3_89E6_53D1_5668_5217_8868 + 1] = trigger
+    _____88C2_7F1D_5165_53E3_76D1_542C_5217_8868[#_____88C2_7F1D_5165_53E3_76D1_542C_5217_8868 + 1] = registerOneShotUnitRangeListener(unit, 300, _____89E6_53D1_88C2_7F1D_56DE_6751, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D)
 end
 ____exports["执行情报商人回收夜光翡翠"] = function(_____53C2_6570)
     local ____53C2_6570__9636_6BB5_15 = _____53C2_6570["阶段"]
@@ -176,16 +151,14 @@ ____exports["执行情报商人回收夜光翡翠"] = function(_____53C2_6570)
     local _____89E6_53D1_5355_4F4D = _____8BFB_53D6_5F53_524D_5267_60C5_52A8_4F5C_4E0A_4E0B_6587()["触发单位"]
     if _____9636_6BB5 == "交付" then
         if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then
-            EC_CreateEffect(
-                "war3mapImported\\BlueBalllight.mdl",
-                GetUnitX(_____89E6_53D1_5355_4F4D),
-                GetUnitY(_____89E6_53D1_5355_4F4D),
-                0,
-                270,
-                5,
-                1,
-                1.25
-            )
+            _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = "war3mapImported\\BlueBalllight.mdl",
+                X = GetUnitX(_____89E6_53D1_5355_4F4D),
+                Y = GetUnitY(_____89E6_53D1_5355_4F4D),
+                ["面向角度"] = 270,
+                ["缩放"] = 5,
+                ["持续秒"] = 1.25
+            })
         end
         return
     end

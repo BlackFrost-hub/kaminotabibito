@@ -22,6 +22,9 @@ const { 处理合成消耗装备属性, beginEquipItemMessageSilence, endEquipIt
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 是一次性打造壳类型ID } = require("./00．通用物品工具") as {
+  是一次性打造壳类型ID: (this: void, 物品类型ID: number) => boolean;
+};
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const GetItemCharges = jass.GetItemCharges as (item: any) => number;
 const SetItemCharges = jass.SetItemCharges as (item: any, charges: number) => void;
@@ -32,12 +35,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 
 const 合成调试模块 = "装备合成";
-const 一次性打造壳类型ID列表 = ["I01A", "I04U", "I09A", "I09L", "I09T"] as const;
-const 一次性打造壳类型ID集合 = new Set<number>();
-
-for (let i = 0; i < 一次性打造壳类型ID列表.length; i++) {
-  一次性打造壳类型ID集合.add(stringToFourCCSafe(一次性打造壳类型ID列表[i]));
-}
 
 function 输出合成调试日志(this: void, ...args: any[]): void {
   debugLogForce(合成调试模块, ...args);
@@ -115,6 +112,13 @@ const 合成配方定义列表: readonly 合成配方定义[] = [
   { 材料: [["熔墓之戒#I08U", 1], ["恶魔结晶#I091", 2], ["合成|打造#I09A", 1]], 产物: "亡墓恶戒#I09G" },
   { 材料: [["虚空板甲#I08N", 1], ["恶魔精魄#I093", 2], ["合成|打造#I09A", 1]], 产物: "虚空装甲#I09F" },
   { 材料: [["汭冥符文#I07Q", 1], ["火焰元素#I092", 2], ["炽热能量#I08Z", 3], ["食尸鬼头颅#I064", 1], ["合成|打造#I09A", 1]], 产物: "熔狱头骷#I09E" },
+  { 材料: [["星露花#I0H4", 3], ["精灵药水合成#I0HE", 1]], 产物: "星露生命精华#I0H7" },
+  { 材料: [["晨曦花#I0H5", 3], ["精灵药水合成#I0HE", 1]], 产物: "晨曦魔力精华#I0H8" },
+  { 材料: [["月影花#I0H6", 3], ["精灵药水合成#I0HE", 1]], 产物: "月影灵息精华#I0H9" },
+  { 材料: [["星露花#I0H4", 2], ["晨曦花#I0H5", 1], ["精灵生命药水#IEL1", 1], ["精灵药水合成#I0HE", 1]], 产物: "星曦复苏药剂#I0HA" },
+  { 材料: [["晨曦花#I0H5", 2], ["月影花#I0H6", 1], ["精灵魔法药水#IEM1", 1], ["精灵药水合成#I0HE", 1]], 产物: "曦月澄明药剂#I0HB" },
+  { 材料: [["星露花#I0H4", 1], ["月影花#I0H6", 2], ["精灵生命药水#IEL1", 1], ["精灵药水合成#I0HE", 1]], 产物: "星月净愈药剂#I0HC" },
+  { 材料: [["星露花#I0H4", 1], ["晨曦花#I0H5", 1], ["月影花#I0H6", 1], ["精灵生命药水#IEL1", 1], ["精灵魔法药水#IEM1", 1], ["精灵药水合成#I0HE", 1]], 产物: "精灵王城三花灵药#I0HD" },
 ];
 
 const 合成配方索引 = new Map<number, 合成配方[]>();
@@ -290,7 +294,7 @@ function 播放合成成功特效(this: void, 单位: any): void {
 
 export function 是一次性打造壳(this: void, 物品: any): boolean {
   if (物品 == null || 物品 === 0) return false;
-  return 一次性打造壳类型ID集合.has(GetItemTypeId(物品));
+  return 是一次性打造壳类型ID(GetItemTypeId(物品));
 }
 
 function 处理指定类型物品合成打造(this: void, 单位: any, 物品: any, 物品类型ID: number, 使用虚拟触发材料: boolean): void {
@@ -314,9 +318,10 @@ export function 处理通用物品合成打造(this: void, 单位: any, 物品: 
   处理指定类型物品合成打造(单位, 物品, GetItemTypeId(物品), false);
 }
 
-export function 处理一次性打造壳合成(this: void, 单位: any, 物品类型ID: number): void {
-  if (!一次性打造壳类型ID集合.has(物品类型ID)) return;
+export function 处理一次性打造壳合成(this: void, 单位: any, 物品类型ID: number, 物品?: any): void {
+  if (!是一次性打造壳类型ID(物品类型ID)) return;
   处理指定类型物品合成打造(单位, null, 物品类型ID, true);
+  if (物品 != null && 物品 !== 0) RemoveItem(物品);
 }
 
 初始化合成配方();

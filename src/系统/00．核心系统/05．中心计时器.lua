@@ -3,6 +3,9 @@ local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__StringPadStart = ____lualib.__TS__StringPadStart
 local __TS__ArrayFindIndex = ____lualib.__TS__ArrayFindIndex
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 ---
 -- @file 系统/00．核心系统/05．中心计时器.ts
@@ -431,6 +434,66 @@ function ____exports.removeDelayedCallback(id)
             d.active = false
         end
     end
+end
+local _____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0 = __TS__Class()
+_____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0.name = "可取消任务组实现"
+function _____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0.prototype.____constructor(self)
+    self["任务列表"] = {}
+end
+_____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0.prototype["添加延迟"] = function(self, _____6BEB_79D2, _____56DE_8C03, _____53D8_91CF)
+    local id = ____exports.addDelayedCallback(_____6BEB_79D2, _____56DE_8C03, _____53D8_91CF)
+    local ____self__4EFB_52A1_5217_8868_4 = self["任务列表"]
+    ____self__4EFB_52A1_5217_8868_4[#____self__4EFB_52A1_5217_8868_4 + 1] = {id = id, ["类型"] = "延迟"}
+    return id
+end
+_____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0.prototype["添加周期"] = function(self, _____95F4_9694_6BEB_79D2, _____56DE_8C03, _____53D8_91CF)
+    local id = ____exports.addPeriodicCallback(_____95F4_9694_6BEB_79D2, _____56DE_8C03, _____53D8_91CF)
+    local ____self__4EFB_52A1_5217_8868_5 = self["任务列表"]
+    ____self__4EFB_52A1_5217_8868_5[#____self__4EFB_52A1_5217_8868_5 + 1] = {id = id, ["类型"] = "周期"}
+    return id
+end
+_____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0.prototype["取消"] = function(self, _____4EFB_52A1ID)
+    if not (_____4EFB_52A1ID > 0) then
+        return
+    end
+    do
+        local i = #self["任务列表"] - 1
+        while i >= 0 do
+            do
+                local task = self["任务列表"][i + 1]
+                if task.id ~= _____4EFB_52A1ID then
+                    goto __continue80
+                end
+                if task["类型"] == "延迟" then
+                    ____exports.removeDelayedCallback(task.id)
+                else
+                    ____exports.removePeriodicCallback(task.id)
+                end
+                __TS__ArraySplice(self["任务列表"], i, 1)
+                return
+            end
+            ::__continue80::
+            i = i - 1
+        end
+    end
+end
+_____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0.prototype["清空"] = function(self)
+    do
+        local i = 0
+        while i < #self["任务列表"] do
+            local task = self["任务列表"][i + 1]
+            if task["类型"] == "延迟" then
+                ____exports.removeDelayedCallback(task.id)
+            else
+                ____exports.removePeriodicCallback(task.id)
+            end
+            i = i + 1
+        end
+    end
+    __TS__ArraySetLength(self["任务列表"], 0)
+end
+____exports["创建可取消任务组"] = function()
+    return __TS__New(_____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0)
 end
 function ____exports.onSecond(callback)
     _secondCallbacks[#_secondCallbacks + 1] = callback

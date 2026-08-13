@@ -1,6 +1,7 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_76EE_6807, _____8865_5145Boss_9B54_6CD5, _____521B_5EFA_65B9_5411_7279_6548, _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D, _____83B7_53D6_83F2_5229_65AF_4FB5_8680_6B8B_7559_76EE_6807, ____on_83F2_5229_65AF_4FB5_8680_6B8B_7559_5468_671F, _____521B_5EFA_4FB5_8680_6B8B_7559, ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, GetSpellTargetUnit, UNIT_STATE_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, doHeal, _____9B54_6CD5_589E_51CF, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_6C14_7075_65A9_6280_80FDID
+local _____53D6_76EE_6807, _____8865_5145Boss_9B54_6CD5, _____521B_5EFA_65B9_5411_7279_6548, _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D, _____83B7_53D6_83F2_5229_65AF_4FB5_8680_6B8B_7559_76EE_6807, _____6E05_7406_83F2_5229_65AF_4FB5_8680_7ED3_7B97_8BB0_5F55, _____672CTick_5141_8BB8_83F2_5229_65AF_4FB5_8680_7ED3_7B97, ____on_83F2_5229_65AF_4FB5_8680_6B8B_7559_5468_671F, _____521B_5EFA_4FB5_8680_6B8B_7559, ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548, GetUnitTypeId, GetHandleId, GetUnitX, GetUnitY, GetUnitState, GetSpellTargetUnit, UNIT_STATE_MANA, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_MAGIC, DAMAGE_TYPE_ENHANCED, WEAPON_TYPE_WHOKNOWS, _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF, _____521B_5EFA_6280_80FD_63D0_793A_5708, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4Ex, _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868, registerManualBuff, _____83F2_5229_65AFBuffID, _____521B_5EFA_70B9_7279_6548, _____8BBE_7F6E_7279_6548XYZ_8F74_65CB_8F6C, doHeal, _____9B54_6CD5_589E_51CF, getServerTime, _____83F2_5229_65AF_5355_4F4D_7C7B_578BID, _____5251_6C14_7075_65A9_6280_80FDID, _____83F2_5229_65AF_4FB5_8680_4E0A_6B21_7ED3_7B97_65F6_95F4_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.00．配置")
 local _____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["菲利斯单位技能配置"]
 local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.06．菲利斯.01．运行时上下文")
@@ -106,9 +107,41 @@ function _____83B7_53D6_83F2_5229_65AF_4FB5_8680_6B8B_7559_76EE_6807(variable)
     end
     return _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(context["Boss单位"])
 end
+function _____6E05_7406_83F2_5229_65AF_4FB5_8680_7ED3_7B97_8BB0_5F55(variable)
+    local context = variable
+    if context == nil then
+        return
+    end
+    local bossId = GetHandleId(context["Boss单位"])
+    if bossId ~= 0 then
+        __TS__Delete(_____83F2_5229_65AF_4FB5_8680_4E0A_6B21_7ED3_7B97_65F6_95F4_8868, bossId)
+    end
+end
+function _____672CTick_5141_8BB8_83F2_5229_65AF_4FB5_8680_7ED3_7B97(context, hero)
+    local bossId = GetHandleId(context["Boss单位"])
+    local heroId = GetHandleId(hero)
+    if bossId == 0 or heroId == 0 then
+        return false
+    end
+    local _____76EE_6807_7ED3_7B97_65F6_95F4_8868 = _____83F2_5229_65AF_4FB5_8680_4E0A_6B21_7ED3_7B97_65F6_95F4_8868[bossId]
+    if _____76EE_6807_7ED3_7B97_65F6_95F4_8868 == nil then
+        _____76EE_6807_7ED3_7B97_65F6_95F4_8868 = {}
+        _____83F2_5229_65AF_4FB5_8680_4E0A_6B21_7ED3_7B97_65F6_95F4_8868[bossId] = _____76EE_6807_7ED3_7B97_65F6_95F4_8868
+    end
+    local nowMs = getServerTime()
+    local lastMs = _____76EE_6807_7ED3_7B97_65F6_95F4_8868[heroId]
+    if lastMs ~= nil and nowMs - lastMs < _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]["侵蚀Tick秒"] * 1000 then
+        return false
+    end
+    _____76EE_6807_7ED3_7B97_65F6_95F4_8868[heroId] = nowMs
+    return true
+end
 function ____on_83F2_5229_65AF_4FB5_8680_6B8B_7559_5468_671F(hero, variable)
     local context = variable
     if context == nil or not _____5355_4F4D_6709_6548(context["Boss单位"]) or not _____5355_4F4D_6709_6548(hero) then
+        return
+    end
+    if not _____672CTick_5141_8BB8_83F2_5229_65AF_4FB5_8680_7ED3_7B97(context, hero) then
         return
     end
     local boss = context["Boss单位"]
@@ -149,6 +182,8 @@ end
 function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, width, effectScaleMultiplier)
     local boss = context["Boss单位"]
     local cfg = _____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]
+    local ____self_9 = context["清理"]
+    ____self_9["登记清理"](____self_9, "菲利斯-剑气灵斩侵蚀结算记录", _____6E05_7406_83F2_5229_65AF_4FB5_8680_7ED3_7B97_8BB0_5F55, context)
     local midX = (ax + bx) * 0.5
     local midY = (ay + by) * 0.5
     local _____6B8B_7559_7279_6548 = _____521B_5EFA_65B9_5411_7279_6548(
@@ -159,8 +194,8 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
         cfg["残留特效缩放"] * effectScaleMultiplier,
         cfg["侵蚀持续秒"]
     )
-    local ____self_8 = context["清理"]
-    ____self_8["登记限时特效"](____self_8, "菲利斯-剑气灵斩侵蚀残留特效", _____6B8B_7559_7279_6548, cfg["侵蚀持续秒"] * 1000)
+    local ____self_10 = context["清理"]
+    ____self_10["登记限时特效"](____self_10, "菲利斯-剑气灵斩侵蚀残留特效", _____6B8B_7559_7279_6548, cfg["侵蚀持续秒"] * 1000)
     local _____8DEF_5F84_9884_8B66 = _____521B_5EFA_6280_80FD_63D0_793A_5708({
         ["类型"] = "矩形",
         X = ax,
@@ -173,8 +208,8 @@ function _____521B_5EFA_4FB5_8680_6B8B_7559(context, ax, ay, bx, by, angle, widt
         ["可手动销毁"] = true
     })
     if _____8DEF_5F84_9884_8B66 ~= nil and _____8DEF_5F84_9884_8B66 ~= 0 then
-        local ____self_9 = context["清理"]
-        ____self_9["登记限时特效"](____self_9, "菲利斯-剑气灵斩路径预警", _____8DEF_5F84_9884_8B66, cfg["侵蚀持续秒"] * 1000)
+        local ____self_11 = context["清理"]
+        ____self_11["登记限时特效"](____self_11, "菲利斯-剑气灵斩路径预警", _____8DEF_5F84_9884_8B66, cfg["侵蚀持续秒"] * 1000)
     end
     _____521B_5EFA_7EBF_6BB5_5371_9669_533A({
         ["清理"] = context["清理"],
@@ -222,8 +257,8 @@ ____exports["释放菲利斯剑气灵斩"] = function(context)
         ["可手动销毁"] = true
     })
     if _____65BD_6CD5_9884_8B66 ~= nil and _____65BD_6CD5_9884_8B66 ~= 0 then
-        local ____self_10 = context["清理"]
-        ____self_10["登记限时特效"](____self_10, "菲利斯-剑气灵斩施法预警", _____65BD_6CD5_9884_8B66, cfg["施法硬直秒"] * 1000)
+        local ____self_12 = context["清理"]
+        ____self_12["登记限时特效"](____self_12, "菲利斯-剑气灵斩施法预警", _____65BD_6CD5_9884_8B66, cfg["施法硬直秒"] * 1000)
     end
     _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF({
         ["施法者"] = boss,
@@ -244,8 +279,8 @@ ____exports["释放菲利斯剑气灵斩"] = function(context)
                 cfg["剑气特效缩放"] * effectScaleMultiplier,
                 cfg["剑气特效持续秒"]
             )
-            local ____self_11 = context["清理"]
-            ____self_11["登记限时特效"](____self_11, "菲利斯-剑气灵斩剑气特效", _____5251_6C14_7279_6548, cfg["剑气特效持续秒"] * 1000)
+            local ____self_13 = context["清理"]
+            ____self_13["登记限时特效"](____self_13, "菲利斯-剑气灵斩剑气特效", _____5251_6C14_7279_6548, cfg["剑气特效持续秒"] * 1000)
             _____7ED3_7B97_5251_6C14_521D_59CB_547D_4E2D(
                 context,
                 ax,
@@ -282,6 +317,7 @@ function ____on_83F2_5229_65AF_5251_6C14_7075_65A9_751F_6548(castingUnit, spellA
 end
 local jass = require("jass.common")
 GetUnitTypeId = jass.GetUnitTypeId
+GetHandleId = jass.GetHandleId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitState = jass.GetUnitState
@@ -309,8 +345,11 @@ local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统
 doHeal = ____require_result_6.doHeal
 local ____require_result_7 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
 _____9B54_6CD5_589E_51CF = ____require_result_7["魔法增减"]
+local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
+getServerTime = ____require_result_8.getServerTime
 _____83F2_5229_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83F2_5229_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____5251_6C14_7075_65A9_6280_80FDID = stringToFourCC(_____83F2_5229_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["剑气灵斩"]["技能槽位"])
+_____83F2_5229_65AF_4FB5_8680_4E0A_6B21_7ED3_7B97_65F6_95F4_8868 = {}
 local _____5251_6C14_7075_65A9_5DF2_6CE8_518C = false
 ____exports["注册菲利斯剑气灵斩"] = function()
     if _____5251_6C14_7075_65A9_5DF2_6CE8_518C then

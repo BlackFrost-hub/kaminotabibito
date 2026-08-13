@@ -21,33 +21,28 @@ local _____6CE8_518C_4E16_754C_5730_56FE_5168_90E8_5355_4F4D_521B_5EFA_5B8C_6210
 local ____require_result_3 = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 local addSelectionListener = ____require_result_3.addSelectionListener
 local ____require_result_4 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
-local registerEnterRegionTrigger = ____require_result_4.registerEnterRegionTrigger
+local _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C = ____require_result_4["创建矩形进入监听"]
 local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_5.addDelayedCallback
-local ____require_result_6 = require("系统.00．核心系统.07．联机安全工具")
-local safeTriggerAddAction = ____require_result_6.safeTriggerAddAction
-local safeDestroyTrigger = ____require_result_6.safeDestroyTrigger
-local ____require_result_7 = require("系统.09．表现系统.06．广播提示消息.index")
-local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_7["广播单位提示"]
-local ____require_result_8 = require("lib.扩展函数.BJ函数.07．杂项")
-local ModifyGateBJ = ____require_result_8.ModifyGateBJ
-local ____require_result_9 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_9["是玩家英雄组单位"]
-local getRegisteredPlayerHero = ____require_result_9.getRegisteredPlayerHero
-local CreateRegion = jass.CreateRegion
-local CreateTrigger = jass.CreateTrigger
+local ____require_result_6 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_6["广播单位提示"]
+local ____require_result_7 = require("lib.扩展函数.BJ函数.07．杂项")
+local ModifyGateBJ = ____require_result_7.ModifyGateBJ
+local ____require_result_8 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_8["是玩家英雄组单位"]
+local getRegisteredPlayerHero = ____require_result_8.getRegisteredPlayerHero
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
 local GetTriggerUnit = jass.GetTriggerUnit
 local PingMinimap = jass.PingMinimap
 local Rect = jass.Rect
-local RegionAddRect = jass.RegionAddRect
+local RemoveRect = jass.RemoveRect
 local _____73A9_5BB6_6700_5C0FID = 0
 local _____73A9_5BB6_6700_5927ID = 5
 local _____5B88_95E8_89E6_53D1_534A_5F84 = 280
 local _____5B88_95E8_8B66_544A_5DF2_64AD_653E_8868 = {}
 local _____5165_53E3_6A21_5757_5DF2_521D_59CB_5316 = false
-local _____5B88_95E8_8303_56F4_89E6_53D1_5668 = nil
+local _____5B88_95E8_8303_56F4_76D1_542C = nil
 local _____672C_601D_96C5_5F85_5BF9_8BDD_73A9_5BB6 = nil
 local _____672C_601D_96C5_5F85_5BF9_8BDD_82F1_96C4 = nil
 local function _____53E5_67C4_6709_6548(handle)
@@ -264,23 +259,16 @@ local function ____on_8FDB_5165_7956_5730_5B88_95E8_8303_56F4()
     _____5F00_59CB_5B88_95E8_653E_884C_5E7F_64AD(hero)
 end
 local function _____6CE8_518C_5B88_95E8_8303_56F4()
-    if _____53E5_67C4_6709_6548(_____5B88_95E8_8303_56F4_89E6_53D1_5668) then
+    if _____5B88_95E8_8303_56F4_76D1_542C ~= nil then
         return
     end
     local cfg = _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["守门单位"]
-    local region = CreateRegion()
     local rect = Rect(cfg.X - _____5B88_95E8_89E6_53D1_534A_5F84, cfg.Y - _____5B88_95E8_89E6_53D1_534A_5F84, cfg.X + _____5B88_95E8_89E6_53D1_534A_5F84, cfg.Y + _____5B88_95E8_89E6_53D1_534A_5F84)
-    local trigger = CreateTrigger()
-    if not _____53E5_67C4_6709_6548(region) or not _____53E5_67C4_6709_6548(rect) or not _____53E5_67C4_6709_6548(trigger) then
+    if not _____53E5_67C4_6709_6548(rect) then
         return
     end
-    RegionAddRect(region, rect)
-    if safeTriggerAddAction(trigger, ____on_8FDB_5165_7956_5730_5B88_95E8_8303_56F4) == nil then
-        safeDestroyTrigger(trigger)
-        return
-    end
-    registerEnterRegionTrigger(trigger, region, nil)
-    _____5B88_95E8_8303_56F4_89E6_53D1_5668 = trigger
+    _____5B88_95E8_8303_56F4_76D1_542C = _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C(rect, ____on_8FDB_5165_7956_5730_5B88_95E8_8303_56F4, nil)
+    RemoveRect(rect)
 end
 local function ____on_7956_5730_53CC_7075_536B_5267_60C5_8FDB_5EA6_53D8_5316(newProgress, _oldProgress)
     if newProgress >= _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["开放剧情进度最小值"] and newProgress <= _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["开放剧情进度最大值"] then

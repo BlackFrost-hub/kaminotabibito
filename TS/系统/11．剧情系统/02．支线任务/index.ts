@@ -5,6 +5,7 @@ import { init as init莫特斯 } from "./04．莫特斯";
 import { init as init莫尔特斯 } from "./04．莫尔特斯";
 
 export * from "./01．支线NPC配置表";
+export * from "./00．通用小任务";
 
 export function init(this: void): void {
   init被驱逐的水怪();

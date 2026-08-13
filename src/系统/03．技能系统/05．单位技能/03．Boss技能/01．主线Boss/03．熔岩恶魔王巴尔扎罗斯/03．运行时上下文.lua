@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____on_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1_53F0_8BCD
+local ____on_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1_53F0_8BCD, _____521B_5EFA_5408_6CD5_51B3_6597_573A_666F_5355_4F4D
 local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
 local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．场地配置")
@@ -12,9 +12,12 @@ local ____14_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD = ____14_FF0E_53F0_8BCD_64AD_653E["播放巴尔扎罗斯台词"]
 function ____on_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1_53F0_8BCD(_context, dyingUnit, _killingUnit)
     _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD(dyingUnit, "死亡", 0)
+    _____521B_5EFA_5408_6CD5_51B3_6597_573A_666F_5355_4F4D()
 end
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("系统.11．剧情系统.02．支线任务.00．通用小任务.03．恶魔城支线.01．任务运行")
+_____521B_5EFA_5408_6CD5_51B3_6597_573A_666F_5355_4F4D = ____require_result_1["创建合法决斗场景单位"]
 local function _____521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587(boss, _____6E05_7406)
     local context = {
         ["Boss单位"] = boss,
@@ -71,7 +74,7 @@ ____exports["记录巴尔扎罗斯元素安全印记"] = function(boss, x, y)
     if context == nil then
         return
     end
-    local ____context__5143_7D20_5B89_5168_5370_8BB0_5217_8868_1 = context["元素安全印记列表"]
-    ____context__5143_7D20_5B89_5168_5370_8BB0_5217_8868_1[#____context__5143_7D20_5B89_5168_5370_8BB0_5217_8868_1 + 1] = {X = x, Y = y}
+    local ____context__5143_7D20_5B89_5168_5370_8BB0_5217_8868_2 = context["元素安全印记列表"]
+    ____context__5143_7D20_5B89_5168_5370_8BB0_5217_8868_2[#____context__5143_7D20_5B89_5168_5370_8BB0_5217_8868_2 + 1] = {X = x, Y = y}
 end
 return ____exports

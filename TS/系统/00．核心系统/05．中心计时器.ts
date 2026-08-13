@@ -379,6 +379,55 @@ export function removeDelayedCallback(id: number): void {
   }
 }
 
+/** 可由剧情片段、技能机制或场景控制器统一取消的任务组。 */
+export interface 可取消任务组 {
+  添加延迟(毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any): number;
+  添加周期(间隔毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any): number;
+  取消(任务ID: number): void;
+  清空(): void;
+}
+
+class 可取消任务组实现 implements 可取消任务组 {
+  private readonly 任务列表: Array<{ id: number; 类型: "延迟" | "周期" }> = [];
+
+  添加延迟(毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any): number {
+    const id = addDelayedCallback(毫秒, 回调, 变量);
+    this.任务列表.push({ id, 类型: "延迟" });
+    return id;
+  }
+
+  添加周期(间隔毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any): number {
+    const id = addPeriodicCallback(间隔毫秒, 回调, 变量);
+    this.任务列表.push({ id, 类型: "周期" });
+    return id;
+  }
+
+  取消(任务ID: number): void {
+    if (!(任务ID > 0)) return;
+    for (let i = this.任务列表.length - 1; i >= 0; i--) {
+      const task = this.任务列表[i];
+      if (task.id !== 任务ID) continue;
+      if (task.类型 === "延迟") removeDelayedCallback(task.id);
+      else removePeriodicCallback(task.id);
+      this.任务列表.splice(i, 1);
+      return;
+    }
+  }
+
+  清空(): void {
+    for (let i = 0; i < this.任务列表.length; i++) {
+      const task = this.任务列表[i];
+      if (task.类型 === "延迟") removeDelayedCallback(task.id);
+      else removePeriodicCallback(task.id);
+    }
+    this.任务列表.length = 0;
+  }
+}
+
+export function 创建可取消任务组(this: void): 可取消任务组 {
+  return new 可取消任务组实现();
+}
+
 export function onSecond(callback: () => void): void {
   _secondCallbacks.push(callback);
 }

@@ -27,6 +27,13 @@ const ITEM_TYPE_PURCHASABLE = jass.ITEM_TYPE_PURCHASABLE as any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 
 const 物编类型_物品 = 3;
+const 一次性打造壳物品ID列表 = ["I01A", "I04U", "I09A", "I09L", "I09T", "I0HE"] as const;
+const 一次性打造壳物品ID集合 = new Set<number>();
+
+for (let i = 0; i < 一次性打造壳物品ID列表.length; i++) {
+  一次性打造壳物品ID集合.add(stringToFourCCSafe(一次性打造壳物品ID列表[i]));
+}
+
 const 不走吃书残留清理物品ID: Record<number, true> = {
   [stringToFourCCSafe("I0FK")]: true,
   [stringToFourCCSafe("I0FL")]: true,
@@ -62,6 +69,15 @@ export function 是可清理吃书残留(this: void, 物品: any): boolean {
   if (GetItemCharges(物品) > 1) return false;
   if (IsItemPowerup(物品) !== true) return false;
   return getObjectPropertyIntegerSafe(物编类型_物品, 物品类型ID, "perishable") === 1;
+}
+
+export function 是一次性打造壳类型ID(this: void, 物品类型ID: number): boolean {
+  return 一次性打造壳物品ID集合.has(物品类型ID);
+}
+
+export function 是一次性打造壳(this: void, 物品: any): boolean {
+  if (物品 == null || 物品 === 0) return false;
+  return 是一次性打造壳类型ID(GetItemTypeId(物品));
 }
 
 export function 删除物品(this: void, 物品: any): void {

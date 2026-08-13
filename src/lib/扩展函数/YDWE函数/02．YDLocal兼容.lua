@@ -8,7 +8,7 @@ function ____exports.getSKey_PIndex(self)
     if type(jg.SKey_PIndex) == "number" and jg.SKey_PIndex ~= 0 then
         return jg.SKey_PIndex
     end
-    return jass.StringHash("parentIndex")
+    return jass:StringHash("parentIndex")
 end
 function sym(self, name)
     local ____G_name_1 = _G[name]
@@ -53,13 +53,13 @@ function loadStar_PIndex(self)
     if not YDHT then
         return 0
     end
-    local trig = jass.GetTriggeringTrigger()
+    local trig = jass:GetTriggeringTrigger()
     if not trig then
         return 0
     end
-    local hd = jass.GetHandleId(trig)
+    local hd = jass:GetHandleId(trig)
     local sk = ____exports.getSKey_PIndex(nil)
-    return jass.LoadInteger(YDHT, hd, sk) or 0
+    return jass:LoadInteger(YDHT, hd, sk) or 0
 end
 jass = require("jass.common")
 jglobals = require("jass.globals")
@@ -71,7 +71,7 @@ function ____exports.getSKey_Trigger(self)
     if type(jg.SKey_Trigger) == "number" and jg.SKey_Trigger ~= 0 then
         return jg.SKey_Trigger
     end
-    return jass.StringHash("Trigger")
+    return jass:StringHash("Trigger")
 end
 local _indexStack = {}
 local function ydlocHandle(self)
@@ -114,78 +114,78 @@ local function setG_LIndex(self, v)
     _G.G_LIndex = v
 end
 local function sh(self, s)
-    return jass.StringHash(s) or 0
+    return jass:StringHash(s) or 0
 end
 local function loadByHash(self, ____type, h, p, c)
     repeat
         local ____switch18 = ____type
         local ____cond18 = ____switch18 == "integer" or ____switch18 == "unitcode" or ____switch18 == "abilcode" or ____switch18 == "itemcode"
         if ____cond18 then
-            return jass.LoadInteger(h, p, c)
+            return jass:LoadInteger(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "real"
         if ____cond18 then
-            return jass.LoadReal(h, p, c)
+            return jass:LoadReal(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "boolean"
         if ____cond18 then
-            return jass.LoadBoolean(h, p, c)
+            return jass:LoadBoolean(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "string"
         if ____cond18 then
-            return jass.LoadStr(h, p, c)
+            return jass:LoadStr(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "unit"
         if ____cond18 then
-            return jass.LoadUnitHandle(h, p, c)
+            return jass:LoadUnitHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "group"
         if ____cond18 then
-            return jass.LoadGroupHandle(h, p, c)
+            return jass:LoadGroupHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "timer"
         if ____cond18 then
-            return jass.LoadTimerHandle(h, p, c)
+            return jass:LoadTimerHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "trigger"
         if ____cond18 then
-            return jass.LoadTriggerHandle(h, p, c)
+            return jass:LoadTriggerHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "item"
         if ____cond18 then
-            return jass.LoadItemHandle(h, p, c)
+            return jass:LoadItemHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "player"
         if ____cond18 then
-            return jass.LoadPlayerHandle(h, p, c)
+            return jass:LoadPlayerHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "location"
         if ____cond18 then
-            return jass.LoadLocationHandle(h, p, c)
+            return jass:LoadLocationHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "destructable"
         if ____cond18 then
-            return jass.LoadDestructableHandle(h, p, c)
+            return jass:LoadDestructableHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "force"
         if ____cond18 then
-            return jass.LoadForceHandle(h, p, c)
+            return jass:LoadForceHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "rect"
         if ____cond18 then
-            return jass.LoadRectHandle(h, p, c)
+            return jass:LoadRectHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "region"
         if ____cond18 then
-            return jass.LoadRegionHandle(h, p, c)
+            return jass:LoadRegionHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "sound"
         if ____cond18 then
-            return jass.LoadSoundHandle(h, p, c)
+            return jass:LoadSoundHandle(h, p, c)
         end
         ____cond18 = ____cond18 or ____switch18 == "effect"
         if ____cond18 then
-            return jass.LoadEffectHandle(h, p, c)
+            return jass:LoadEffectHandle(h, p, c)
         end
         do
             return nil
@@ -197,7 +197,7 @@ local function saveByHash(self, ____type, h, p, c, value)
         local ____switch20 = ____type
         local ____cond20 = ____switch20 == "integer" or ____switch20 == "unitcode" or ____switch20 == "abilcode" or ____switch20 == "itemcode"
         if ____cond20 then
-            jass.SaveInteger(
+            jass:SaveInteger(
                 h,
                 p,
                 c,
@@ -207,7 +207,7 @@ local function saveByHash(self, ____type, h, p, c, value)
         end
         ____cond20 = ____cond20 or ____switch20 == "real"
         if ____cond20 then
-            jass.SaveReal(
+            jass:SaveReal(
                 h,
                 p,
                 c,
@@ -217,12 +217,12 @@ local function saveByHash(self, ____type, h, p, c, value)
         end
         ____cond20 = ____cond20 or ____switch20 == "boolean"
         if ____cond20 then
-            jass.SaveBoolean(h, p, c, not not value)
+            jass:SaveBoolean(h, p, c, not not value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "string"
         if ____cond20 then
-            jass.SaveStr(
+            jass:SaveStr(
                 h,
                 p,
                 c,
@@ -232,67 +232,67 @@ local function saveByHash(self, ____type, h, p, c, value)
         end
         ____cond20 = ____cond20 or ____switch20 == "unit"
         if ____cond20 then
-            jass.SaveUnitHandle(h, p, c, value)
+            jass:SaveUnitHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "group"
         if ____cond20 then
-            jass.SaveGroupHandle(h, p, c, value)
+            jass:SaveGroupHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "timer"
         if ____cond20 then
-            jass.SaveTimerHandle(h, p, c, value)
+            jass:SaveTimerHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "trigger"
         if ____cond20 then
-            jass.SaveTriggerHandle(h, p, c, value)
+            jass:SaveTriggerHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "item"
         if ____cond20 then
-            jass.SaveItemHandle(h, p, c, value)
+            jass:SaveItemHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "player"
         if ____cond20 then
-            jass.SavePlayerHandle(h, p, c, value)
+            jass:SavePlayerHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "location"
         if ____cond20 then
-            jass.SaveLocationHandle(h, p, c, value)
+            jass:SaveLocationHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "destructable"
         if ____cond20 then
-            jass.SaveDestructableHandle(h, p, c, value)
+            jass:SaveDestructableHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "force"
         if ____cond20 then
-            jass.SaveForceHandle(h, p, c, value)
+            jass:SaveForceHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "rect"
         if ____cond20 then
-            jass.SaveRectHandle(h, p, c, value)
+            jass:SaveRectHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "region"
         if ____cond20 then
-            jass.SaveRegionHandle(h, p, c, value)
+            jass:SaveRegionHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "sound"
         if ____cond20 then
-            jass.SaveSoundHandle(h, p, c, value)
+            jass:SaveSoundHandle(h, p, c, value)
             return
         end
         ____cond20 = ____cond20 or ____switch20 == "effect"
         if ____cond20 then
-            jass.SaveEffectHandle(h, p, c, value)
+            jass:SaveEffectHandle(h, p, c, value)
             return
         end
     until true
@@ -329,15 +329,15 @@ end
 -- - 设置 G_LIndex = G_SIndex
 function ____exports.YDLocalInitialize(self)
     local YDLOC = ydlocHandle(nil)
-    local trig = jass.GetTriggeringTrigger()
+    local trig = jass:GetTriggeringTrigger()
     if not trig or not YDLOC then
         return
     end
-    local hd = jass.GetHandleId(trig)
-    local step = jass.LoadInteger(YDLOC, hd, STEP_KEY)
+    local hd = jass:GetHandleId(trig)
+    local step = jass:LoadInteger(YDLOC, hd, STEP_KEY)
     step = step + 3
-    jass.SaveInteger(YDLOC, hd, STEP_KEY, step)
-    jass.SaveInteger(YDLOC, hd, STEP_KEY2, step)
+    jass:SaveInteger(YDLOC, hd, STEP_KEY, step)
+    jass:SaveInteger(YDLOC, hd, STEP_KEY2, step)
     _indexStack[#_indexStack + 1] = getG_SIndex(nil)
     local newSIndex = hd * step
     setG_SIndex(nil, newSIndex)
@@ -351,7 +351,7 @@ function ____exports.YDLocal1Release(self)
     local YDLOC = ydlocHandle(nil)
     local sIndex = getG_SIndex(nil)
     if YDLOC and sIndex ~= 0 then
-        jass.FlushChildHashtable(YDLOC, sIndex)
+        jass:FlushChildHashtable(YDLOC, sIndex)
     end
     local prevIndex = #_indexStack > 0 and table.remove(_indexStack) or 0
     setG_SIndex(nil, prevIndex)
@@ -470,7 +470,7 @@ function ____exports.flushYDLocal5ParamPage(self)
     if type(p) ~= "number" or p == 0 or p ~= p then
         return
     end
-    jass.FlushChildHashtable(h, p)
+    jass:FlushChildHashtable(h, p)
 end
 --- YDLocal7Set - 返回值：写入到父级局部变量表
 -- 对应宏: YDHashSet(YDLOC, type, Star_PIndex, StringHash(name), value)
@@ -520,13 +520,13 @@ function ____exports.clearStar_PIndex(self)
     if not YDHT then
         return
     end
-    local trig = jass.GetTriggeringTrigger()
+    local trig = jass:GetTriggeringTrigger()
     if not trig then
         return
     end
-    local hd = jass.GetHandleId(trig)
+    local hd = jass:GetHandleId(trig)
     local sk = ____exports.getSKey_PIndex(nil)
-    jass.RemoveSavedInteger(YDHT, hd, sk)
+    jass:RemoveSavedInteger(YDHT, hd, sk)
 end
 ____exports.STEP_KEY = STEP_KEY
 ____exports.STEP_KEY2 = STEP_KEY2

@@ -2,36 +2,27 @@
 
 const jass = require("jass.common") as any;
 
-const { 发送头像提示给玩家, 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
+const { 发送头像提示给玩家, 广播单位提示, 播放广播对白序列 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   发送头像提示给玩家: (this: void, 玩家: any, 头像路径: string, 文本: string, 持续时间?: number) => void;
   广播单位提示: (this: void, 来源单位: any, 文本: string, 持续时间?: number) => void;
+  播放广播对白序列: (this: void, 配置: any) => void;
 };
-const { 广播提示玩家槽数, 广播提示喇叭头像, 广播提示滑入毫秒, 广播提示淡出毫秒 } = require("系统.09．表现系统.06．广播提示消息.00．常量定义") as {
+const { 广播提示玩家槽数, 广播提示喇叭头像 } = require("系统.09．表现系统.06．广播提示消息.00．常量定义") as {
   广播提示玩家槽数: number;
   广播提示喇叭头像: string;
-  广播提示滑入毫秒: number;
-  广播提示淡出毫秒: number;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, 延迟毫秒: number, 回调: (this: void) => void) => number;
-};
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (
     this: void,
-    trigger: any,
     unit: any,
     range: number,
-    filter?: any,
-    once?: boolean,
+    callback: (this: void, enteringUnit: any) => boolean,
+    predicate?: (this: void, enteringUnit: any) => boolean,
   ) => (this: void) => void;
 };
 const { registerDeathListener, unregisterDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
   unregisterDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
 };
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -46,14 +37,11 @@ import { 创建剧情NPC单位 } from "../../00．公共/02．剧情NPC创建";
 
 let 卡瑟拉已创建 = false;
 let 当前卡瑟拉单位: any = null;
-let 卡瑟拉入口范围触发器: any = null;
 let 取消卡瑟拉入口范围监听: ((this: void) => void) | undefined;
 let 卡瑟拉入口已触发 = false;
 let 卡瑟拉入口对白已完成 = false;
 let 已注册卡瑟拉死亡监听 = false;
 
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const Player = jass.Player as (this: void, playerId: number) => any;
 const PingMinimap = jass.PingMinimap as (this: void, x: number, y: number, duration: number) => void;
 
@@ -66,11 +54,7 @@ function 广播卡瑟拉挑战提示(this: void): void {
 
 function 注销卡瑟拉入口范围监听(this: void): void {
   if (取消卡瑟拉入口范围监听 != null) 取消卡瑟拉入口范围监听();
-  if (卡瑟拉入口范围触发器 != null && 卡瑟拉入口范围触发器 !== 0) {
-    safeDestroyTrigger(卡瑟拉入口范围触发器);
-  }
   取消卡瑟拉入口范围监听 = undefined;
-  卡瑟拉入口范围触发器 = null;
 }
 
 function 注销卡瑟拉死亡监听(this: void): void {
@@ -88,50 +72,30 @@ function on卡瑟拉入口对白结束(this: void): void {
   卡瑟拉入口对白已完成 = true;
 }
 
-const 卡瑟拉入口广播第一段停留毫秒 = 4800;
-const 卡瑟拉入口广播第二段停留毫秒 = 6800;
-const 卡瑟拉入口广播第三段停留毫秒 = 4200;
-
-function 取广播完整播放毫秒(this: void, 停留毫秒: number): number {
-  return 广播提示滑入毫秒 + 停留毫秒 + 广播提示淡出毫秒;
+function 读取卡瑟拉入口说话单位(this: void, _说话者键: string): any {
+  return 当前卡瑟拉单位;
 }
 
-function 播放卡瑟拉入口广播第三段(this: void): void {
-  广播单位提示(
-    当前卡瑟拉单位,
-    "潮汐战戟，还有你们想夺回的一切，都在这里。既然敢踏进我的领地，就用性命来证明你们配得上它。",
-    卡瑟拉入口广播第三段停留毫秒,
-  );
-  addDelayedCallback(取广播完整播放毫秒(卡瑟拉入口广播第三段停留毫秒), on卡瑟拉入口对白结束);
+function 播放卡瑟拉入口广播(this: void): void {
+  播放广播对白序列({
+    对白列表: [
+      { 说话者键: "卡瑟拉", 文本: "你们终于来到这里了……水龙蛇替我守住的最后一道屏障，竟也没能拦住你们。", 停留毫秒: 4800 },
+      { 说话者键: "卡瑟拉", 文本: "沃利尔斯还在奢望重返故海。可从我自深渊苏醒的那一刻起，这片湖底便只听从我的意志。", 停留毫秒: 6800 },
+      { 说话者键: "卡瑟拉", 文本: "潮汐战戟，还有你们想夺回的一切，都在这里。既然敢踏进我的领地，就用性命来证明你们配得上它。", 停留毫秒: 4200 },
+    ],
+    读取说话单位: 读取卡瑟拉入口说话单位,
+    播放单句: 广播单位提示,
+    播放完成: on卡瑟拉入口对白结束,
+  });
 }
 
-function 播放卡瑟拉入口广播第二段(this: void): void {
-  广播单位提示(
-    当前卡瑟拉单位,
-    "沃利尔斯还在奢望重返故海。可从我自深渊苏醒的那一刻起，这片湖底便只听从我的意志。",
-    卡瑟拉入口广播第二段停留毫秒,
-  );
-  addDelayedCallback(取广播完整播放毫秒(卡瑟拉入口广播第二段停留毫秒), 播放卡瑟拉入口广播第三段);
-}
-
-function 播放卡瑟拉入口广播第一段(this: void): void {
-  广播单位提示(
-    当前卡瑟拉单位,
-    "你们终于来到这里了……水龙蛇替我守住的最后一道屏障，竟也没能拦住你们。",
-    卡瑟拉入口广播第一段停留毫秒,
-  );
-  addDelayedCallback(取广播完整播放毫秒(卡瑟拉入口广播第一段停留毫秒), 播放卡瑟拉入口广播第二段);
-}
-
-function on卡瑟拉范围触发(this: void): void {
-  if (卡瑟拉入口已触发 || 当前卡瑟拉单位 == null || 当前卡瑟拉单位 === 0) return;
-
-  const 触发单位 = GetTriggerUnit();
-  if (触发单位 == null || 触发单位 === 0 || !是玩家英雄组单位(触发单位)) return;
+function on卡瑟拉范围触发(this: void, _触发单位: any): boolean {
+  if (卡瑟拉入口已触发 || 当前卡瑟拉单位 == null || 当前卡瑟拉单位 === 0) return true;
 
   卡瑟拉入口已触发 = true;
   清理卡瑟拉入口监听();
-  播放卡瑟拉入口广播第一段();
+  播放卡瑟拉入口广播();
+  return true;
 }
 
 function on卡瑟拉死亡(this: void, dyingUnit: any, _killingUnit: any): void {
@@ -140,15 +104,12 @@ function on卡瑟拉死亡(this: void, dyingUnit: any, _killingUnit: any): void 
 }
 
 function 注册卡瑟拉入口范围监听(this: void): void {
-  const trigger = CreateTrigger();
-  if (trigger == null || trigger === 0) return;
-  if (safeTriggerAddAction(trigger, on卡瑟拉范围触发) == null) {
-    safeDestroyTrigger(trigger);
-    return;
-  }
-
-  卡瑟拉入口范围触发器 = trigger;
-  取消卡瑟拉入口范围监听 = registerUnitInRangeTrigger(trigger, 当前卡瑟拉单位, 1000, null, false);
+  取消卡瑟拉入口范围监听 = registerOneShotUnitRangeListener(
+    当前卡瑟拉单位,
+    1000,
+    on卡瑟拉范围触发,
+    是玩家英雄组单位,
+  );
   registerDeathListener(on卡瑟拉死亡);
   已注册卡瑟拉死亡监听 = true;
 }

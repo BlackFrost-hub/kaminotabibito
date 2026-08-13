@@ -22,8 +22,8 @@ local ForGroupBJ = ____require_result_2.ForGroupBJ
 local GetPlayersAll = ____require_result_2.GetPlayersAll
 local ____require_result_3 = require("lib.扩展函数.BJ函数.04．矩形与区域")
 local RectContainsUnit = ____require_result_3.RectContainsUnit
-local ____require_result_4 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterUnitInRangeSimple = ____require_result_4.TriggerRegisterUnitInRangeSimple
+local ____require_result_4 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
+local registerOneShotUnitRangeListener = ____require_result_4.registerOneShotUnitRangeListener
 local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_5.YDUserDataGetSafe
 local YDWEAngleBetweenUnitsSafe = ____require_result_5.YDWEAngleBetweenUnitsSafe
@@ -38,7 +38,6 @@ local AddSpecialEffect = ____require_result_9.AddSpecialEffect
 local Condition = ____require_result_9.Condition
 local CreateFogModifierRect = ____require_result_9.CreateFogModifierRect
 local CreateItem = ____require_result_9.CreateItem
-local CreateTrigger = ____require_result_9.CreateTrigger
 local DestroyGroup = ____require_result_9.DestroyGroup
 local FirstOfGroup = ____require_result_9.FirstOfGroup
 local FogModifierStart = ____require_result_9.FogModifierStart
@@ -46,7 +45,6 @@ local FOG_OF_WAR_VISIBLE = ____require_result_9.FOG_OF_WAR_VISIBLE
 local GetEnumUnit = ____require_result_9.GetEnumUnit
 local GetFilterUnit = ____require_result_9.GetFilterUnit
 local GetRandomReal = ____require_result_9.GetRandomReal
-local GetTriggerUnit = ____require_result_9.GetTriggerUnit
 local GetUnitTypeId = ____require_result_9.GetUnitTypeId
 local GetUnitX = ____require_result_9.GetUnitX
 local GetUnitY = ____require_result_9.GetUnitY
@@ -59,8 +57,6 @@ local SetUnitFacing = ____require_result_9.SetUnitFacing
 local SetUnitFacingTimed = ____require_result_9.SetUnitFacingTimed
 local SetUnitOwner = ____require_result_9.SetUnitOwner
 local StopMusic = ____require_result_9.StopMusic
-local TriggerAddAction = ____require_result_9.TriggerAddAction
-local TriggerRegisterEnterRectSimple = ____require_result_9.TriggerRegisterEnterRectSimple
 local ____require_result_10 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local _____89E6_53D1_5355_4F4D_589E_52A0_57FA_7840_5168_5C5E_6027 = ____require_result_10["触发单位增加基础全属性"]
 local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0
@@ -331,65 +327,44 @@ local function _____89E6_53D1_5355_4F4D_5728_6751_53E3_653E_884C_77E9_5F62_5185(
     end
     return RectContainsUnit(rect, unit)
 end
-local function ____on_7CBE_7075_6751_6751_53E3_653E_884C_89E6_53D1()
+local function ____on_7CBE_7075_6751_6751_53E3_653E_884C_89E6_53D1(_____89E6_53D1_5355_4F4D)
     if _____5DF2_89E6_53D1_6751_53E3_653E_884C then
-        return
-    end
-    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
-        return
+        return true
     end
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() > 0 then
-        return
+        return true
     end
     if not _____89E6_53D1_5355_4F4D_5728_6751_53E3_653E_884C_77E9_5F62_5185(_____89E6_53D1_5355_4F4D) then
-        return
+        return false
     end
     if _____5199_5165_5E76_64AD_653E_5267_60C5("jlc_elven_village_gate_release", "精灵村村口放行核心", _____89E6_53D1_5355_4F4D) then
         _____5DF2_89E6_53D1_6751_53E3_653E_884C = true
+        return true
     end
+    return false
 end
-local function ____on_7CBE_7075_6751_957F_8001_53D1_5E03_4EFB_52A1_89E6_53D1()
-    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
-        return
-    end
+local function ____on_7CBE_7075_6751_957F_8001_53D1_5E03_4EFB_52A1_89E6_53D1(_____89E6_53D1_5355_4F4D)
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() >= 1 then
-        return
+        return true
     end
-    _____5199_5165_5E76_64AD_653E_5267_60C5("jlc_elven_village_elder_quest", "精灵村长老发布任务核心", _____89E6_53D1_5355_4F4D)
-end
-local function _____6CE8_518C_77E9_5F62_8FDB_5165(_____77E9_5F62_533A_57DF_540D_79F0, action)
-    local rect = _____83B7_53D6_77E9_5F62_533A_57DF(_____77E9_5F62_533A_57DF_540D_79F0)
-    if rect == nil or rect == 0 then
-        return
-    end
-    local trigger = CreateTrigger()
-    TriggerRegisterEnterRectSimple(trigger, rect)
-    TriggerAddAction(trigger, action)
-end
-local function _____6CE8_518C_5355_4F4D_8303_56F4(unit, range, action)
-    if unit == nil or unit == 0 then
-        return
-    end
-    local trigger = CreateTrigger()
-    TriggerRegisterUnitInRangeSimple(trigger, range, unit)
-    TriggerAddAction(trigger, action)
+    return _____5199_5165_5E76_64AD_653E_5267_60C5("jlc_elven_village_elder_quest", "精灵村长老发布任务核心", _____89E6_53D1_5355_4F4D)
 end
 ____exports["初始化进度01_精灵村长老发布任务核心"] = function()
     if _____5DF2_521D_59CB_5316_8FDB_5EA601_6838_5FC3 then
         return
     end
     _____5DF2_521D_59CB_5316_8FDB_5EA601_6838_5FC3 = true
-    _____6CE8_518C_5355_4F4D_8303_56F4(
+    registerOneShotUnitRangeListener(
         YDUserDataGetSafe("string", "主线NPC", "自然守护者", "unit"),
         500,
-        ____on_7CBE_7075_6751_6751_53E3_653E_884C_89E6_53D1
+        ____on_7CBE_7075_6751_6751_53E3_653E_884C_89E6_53D1,
+        _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D
     )
-    _____6CE8_518C_5355_4F4D_8303_56F4(
+    registerOneShotUnitRangeListener(
         YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit"),
         800,
-        ____on_7CBE_7075_6751_957F_8001_53D1_5E03_4EFB_52A1_89E6_53D1
+        ____on_7CBE_7075_6751_957F_8001_53D1_5E03_4EFB_52A1_89E6_53D1,
+        _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D
     )
 end
 return ____exports

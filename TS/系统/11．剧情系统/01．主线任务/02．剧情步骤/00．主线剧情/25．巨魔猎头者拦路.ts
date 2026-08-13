@@ -1,16 +1,16 @@
 /** @noSelfInFile */
 
-const jass = require("jass.common") as any;
-
 import type { 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 设置触发单位控制状态, 停止触发单位 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 清理剧情运行时单位, 读取剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 创建并登记剧情Boss预置随从 } from "../../00．剧情系统核心工具/03．剧情Boss预置桥接";
+const { 解除暂停并取消无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  解除暂停并取消无敌安全: (this: void, unit: any, 来源: string) => boolean;
+};
 export { 巨魔猎头者拦路剧情片段 } from "../02．第二章/25．巨魔猎头者拦路";
 
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
+const 巨魔猎头者待战暂停来源 = "剧情系统:巨魔猎头者待战";
 
 const 树魔首领战前随从预置 = [
   { 单位名: "巨魔猎头者", X: 1284.9, Y: -17119.0, 朝向: 135, 预创建后暂停: true, 预创建后无敌: true },
@@ -28,8 +28,7 @@ export function 执行巨魔猎头者开战(this: void): void {
   设置触发单位控制状态(false, false);
   const npc = 读取剧情运行时单位("剧情运行时.巨魔猎头者守卫");
   if (npc != null && npc !== 0) {
-    SetUnitInvulnerable(npc, false);
-    PauseUnit(npc, false);
+    解除暂停并取消无敌安全(npc, 巨魔猎头者待战暂停来源);
   }
 }
 

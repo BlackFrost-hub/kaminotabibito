@@ -16,11 +16,24 @@ const { 按名字反查总单位ID } = require("系统.01．单位系统.08．�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: {
+    模型路径: string;
+    X: number;
+    Y: number;
+    面向角度?: number;
+    缩放?: number;
+    持续秒?: number;
+  }) => any;
 };
-const { TriggerRegisterUnitInRangeSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
-  TriggerRegisterUnitInRangeSimple: (this: void, trig: any, range: number, whichUnit: any) => any;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (
+    this: void,
+    unit: any,
+    range: number,
+    callback: (this: void, enteringUnit: any) => boolean,
+    predicate?: (this: void, enteringUnit: any) => boolean,
+  ) => () => void;
 };
 const { 切换区域背景音乐表达式 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
   切换区域背景音乐表达式: (this: void, expr: string | undefined, add: boolean) => number;
@@ -62,14 +75,10 @@ import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．�
 import { 读取当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 export { 沙漠情报商人回收夜光翡翠剧情片段 } from "../01．第一章/15．夜光翡翠回收";
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const CreateGroup = jass.CreateGroup as (this: void) => any;
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
-const DestroyTrigger = jass.DestroyTrigger as (this: void, trig: any) => void;
 const DestroyGroup = jass.DestroyGroup as (this: void, whichGroup: any) => void;
 const FirstOfGroup = jass.FirstOfGroup as (this: void, whichGroup: any) => any;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetUnitName = jass.GetUnitName as (this: void, whichUnit: any) => string;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => number;
@@ -81,13 +90,12 @@ const IsPlayerInForce = jass.IsPlayerInForce as (this: void, whichPlayer: any, w
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const Rect = jass.Rect as (this: void, minX: number, minY: number, maxX: number, maxY: number) => any;
 const RemoveRect = jass.RemoveRect as (this: void, whichRect: any) => void;
-const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, actionFunc: (this: void) => void) => any;
 
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const bj_QUESTMESSAGE_WARNING = jassGlobals.bj_QUESTMESSAGE_WARNING as number;
 const bj_TIMETYPE_SET = jassGlobals.bj_TIMETYPE_SET as number;
 const 回村剧情片段ID = "jlc_return_village_after_guard_duel";
-const 裂缝入口触发器列表: any[] = [];
+const 裂缝入口监听列表: Array<() => void> = [];
 let 裂缝入口生效时间毫秒 = 0;
 
 function 是村内旧精灵护卫(this: void, unit: any): boolean {
@@ -117,11 +125,11 @@ function 清理村内旧精灵护卫(this: void): void {
 }
 
 function 清理裂缝回村入口(this: void): void {
-  for (let i = 裂缝入口触发器列表.length - 1; i >= 0; i--) {
-    const trigger = 裂缝入口触发器列表[i];
-    if (trigger != null && trigger !== 0) DestroyTrigger(trigger);
+  for (let i = 裂缝入口监听列表.length - 1; i >= 0; i--) {
+    const cancel = 裂缝入口监听列表[i];
+    if (cancel != null) cancel();
   }
-  裂缝入口触发器列表.length = 0;
+  裂缝入口监听列表.length = 0;
   裂缝入口生效时间毫秒 = 0;
 }
 
@@ -131,24 +139,13 @@ function 清理语义单位(this: void, 表: string, 键: string): void {
   YDUserDataClearTable("string", 表);
 }
 
-function 触发裂缝回村(this: void): void {
+function 触发裂缝回村(this: void, 触发单位: any): boolean {
   const 当前进度 = Number(YDUserDataGetSafe("string", "剧情进度", "整数", "integer"));
-  if (当前进度 !== 16) return;
+  if (当前进度 !== 16) return false;
   // 注册范围事件时，已经站在裂缝附近的英雄可能被引擎立即判定进入。
   // 延后一秒启用入口，防止 15 -> 16 收尾在创建裂缝的同一时点直接推进到 17。
-  if (裂缝入口生效时间毫秒 <= 0 || getServerTime() < 裂缝入口生效时间毫秒) return;
+  if (裂缝入口生效时间毫秒 <= 0 || getServerTime() < 裂缝入口生效时间毫秒) return false;
 
-  const 触发单位 = GetTriggerUnit();
-  if (!是玩家英雄组单位(触发单位)) return;
-
-  // 入口是一次性剧情资源；先销毁两处监听，避免同一帧或后续重复进入。
-  const 当前触发器 = GetTriggeringTrigger();
-  if (当前触发器 != null && 当前触发器 !== 0) {
-    for (let i = 裂缝入口触发器列表.length - 1; i >= 0; i--) {
-      if (裂缝入口触发器列表[i] === 当前触发器) 裂缝入口触发器列表.splice(i, 1);
-    }
-    DestroyTrigger(当前触发器);
-  }
   清理裂缝回村入口();
 
   const 上下文 = {
@@ -160,14 +157,12 @@ function 触发裂缝回村(this: void): void {
     播放主线剧情片段: (this: void, id: string, 上下文?: any) => boolean;
   };
   播放主线剧情片段(回村剧情片段ID, 上下文);
+  return true;
 }
 
 function 注册裂缝回村入口(this: void, unit: any): void {
   if (unit == null || unit === 0) return;
-  const trigger = CreateTrigger();
-  TriggerRegisterUnitInRangeSimple(trigger, 300, unit);
-  TriggerAddAction(trigger, 触发裂缝回村);
-  裂缝入口触发器列表.push(trigger);
+  裂缝入口监听列表.push(registerOneShotUnitRangeListener(unit, 300, 触发裂缝回村, 是玩家英雄组单位));
 }
 
 export function 执行情报商人回收夜光翡翠(this: void, 参数: 剧情动作参数表): void {
@@ -177,7 +172,14 @@ export function 执行情报商人回收夜光翡翠(this: void, 参数: 剧情�
   const 触发单位 = 读取当前剧情动作上下文().触发单位;
   if (阶段 === "交付") {
     if (触发单位 != null && 触发单位 !== 0) {
-      EC_CreateEffect("war3mapImported\\BlueBalllight.mdl", GetUnitX(触发单位), GetUnitY(触发单位), 0, 270, 5, 1, 1.25);
+      创建点特效({
+        模型路径: "war3mapImported\\BlueBalllight.mdl",
+        X: GetUnitX(触发单位),
+        Y: GetUnitY(触发单位),
+        面向角度: 270,
+        缩放: 5,
+        持续秒: 1.25,
+      });
     }
     return;
   }

@@ -92,8 +92,20 @@ const {
   清理瑟兰迪尔上下文: (this: void, boss: any) => void;
   播放瑟兰迪尔台词: (this: void, boss: any, 类型: string, index?: number) => void;
 };
+const { 教派学者单位技能配置 } = require("../../../05．单位技能/03．Boss技能/01．主线Boss/13．教派学者/00．配置") as {
+  教派学者单位技能配置: { 单位ID: string };
+};
+const { 教派学者技能配置, 教派学者音效配置 } = require("../../../05．单位技能/03．Boss技能/01．主线Boss/13．教派学者/02．数值与表现配置") as {
+  教派学者技能配置: { 公共施法: { 音效裁断距离: number } };
+  教派学者音效配置: { 战斗开启: string };
+};
+const { 播放Boss坐标音效 } = require("../../../05．单位技能/03．Boss技能/00．公共/00．Boss音效播放") as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
+};
 
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
+const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
+const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (whichUnit: any, flag: boolean) => void;
 const { 尝试播放Boss死亡音效 } = require("./08．Boss死亡音效") as {
   尝试播放Boss死亡音效: (this: void, bossUnit: any) => void;
@@ -109,9 +121,19 @@ const { 重建祖地双灵卫力量之墙, 清理祖地双灵卫力量之墙 } =
 
 let Boss战运行周期回调ID = 0;
 const 瑟兰迪尔单位类型ID = stringToFourCCSafe(瑟兰迪尔单位技能配置.单位ID);
+const 教派学者单位类型ID = stringToFourCCSafe(教派学者单位技能配置.单位ID);
 
 function 是瑟兰迪尔Boss(this: void, bossUnit: any): boolean {
   return bossUnit != null && bossUnit !== 0 && GetUnitTypeId(bossUnit) === 瑟兰迪尔单位类型ID;
+}
+
+function 是教派学者Boss(this: void, bossUnit: any): boolean {
+  return bossUnit != null && bossUnit !== 0 && GetUnitTypeId(bossUnit) === 教派学者单位类型ID;
+}
+
+function 启动教派学者Boss运行时(this: void, bossUnit: any): void {
+  if (!是教派学者Boss(bossUnit)) return;
+  播放Boss坐标音效(教派学者音效配置.战斗开启, GetUnitX(bossUnit), GetUnitY(bossUnit), 教派学者技能配置.公共施法.音效裁断距离);
 }
 
 function 启动瑟兰迪尔Boss运行时(this: void, bossUnit: any): void {
@@ -199,6 +221,7 @@ QuestMessageBJ(GetPlayersAll(), 获取Quest消息秘密(), 获取Boss战转场�
     启动Boss血条弱点韧性(context);
     启动赫萝昼夜被动(context.Boss单位);
     启动瑟兰迪尔Boss运行时(context.Boss单位);
+    启动教派学者Boss运行时(context.Boss单位);
     处理Boss战护卫启动(context);
   }
 }
@@ -308,6 +331,7 @@ export function 启动Boss战运行(this: void, bossUnit: any): void {
     if (context.是否已激活) {
       启动Boss血条弱点韧性(context);
       启动瑟兰迪尔Boss运行时(context.Boss单位);
+      启动教派学者Boss运行时(context.Boss单位);
     }
   }
 

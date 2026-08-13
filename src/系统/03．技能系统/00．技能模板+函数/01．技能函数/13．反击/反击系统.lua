@@ -6,7 +6,7 @@ local _____8BA1_7B97_4E24_70B9_8DDD_79BB, _____8DDD_79BB_6EE1_8DB3_6761_4EF6, __
 function _____8BA1_7B97_4E24_70B9_8DDD_79BB(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
-    return jass.SquareRoot(dx * dx + dy * dy)
+    return jass:SquareRoot(dx * dx + dy * dy)
 end
 function _____8DDD_79BB_6EE1_8DB3_6761_4EF6(_____8DDD_79BB, _____6761_4EF6)
     if _____6761_4EF6["最小距离"] ~= nil and _____8DDD_79BB < _____6761_4EF6["最小距离"] then

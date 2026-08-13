@@ -169,7 +169,7 @@ local function ____on_5F71_9AA8_9AB7_9AC5_5077_7A83_4FEE_6B63(damageContext)
     local nextGold = gold - stolen
     SetPlayerState(owner, PLAYER_STATE_RESOURCE_GOLD, nextGold > 0 and nextGold or 0)
     if gold < GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE) then
-        return damageContext.currentDamage + _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(context["Boss单位"], target, {["来源攻击力比例"] = cfg["贫血惩罚Boss攻击力比例"], ["目标最大生命比例"] = cfg["贫血惩罚目标最大生命比例"]})
+        return damageContext.currentDamage + _____8BA1_7B97_7EC4_5408_6280_80FD_4F24_5BB3(attacker, target, {["来源最大生命比例"] = cfg["贫血惩罚小弟最大生命比例"], ["总倍率"] = cfg["贫血惩罚伤害倍率"]})
     end
     return damageContext.currentDamage
 end

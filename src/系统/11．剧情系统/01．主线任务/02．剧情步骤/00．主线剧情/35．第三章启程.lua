@@ -26,20 +26,15 @@ local X_FixUnitStandingSafe = ____require_result_2.X_FixUnitStandingSafe
 local ____require_result_3 = require("lib.扩展函数.BJ函数.02．单位与英雄")
 local IsUnitAliveBJ = ____require_result_3.IsUnitAliveBJ
 local ____require_result_4 = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
-local registerUnitInRangeTrigger = ____require_result_4.registerUnitInRangeTrigger
-local ____require_result_5 = require("系统.00．核心系统.07．联机安全工具")
-local safeTriggerAddAction = ____require_result_5.safeTriggerAddAction
-local safeDestroyTrigger = ____require_result_5.safeDestroyTrigger
-local ____require_result_6 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_6["是玩家英雄组单位"]
-local ____require_result_7 = require("系统.11．剧情系统.01．主线任务.03．主线引导UI.01．主线引导配置表")
-local _____5237_65B0_4E3B_7EBF_8282_70B9_5F15_5BFC_914D_7F6E = ____require_result_7["刷新主线节点引导配置"]
+local registerOneShotUnitRangeListener = ____require_result_4.registerOneShotUnitRangeListener
+local ____require_result_5 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_5["是玩家英雄组单位"]
+local ____require_result_6 = require("系统.11．剧情系统.01．主线任务.03．主线引导UI.01．主线引导配置表")
+local _____5237_65B0_4E3B_7EBF_8282_70B9_5F15_5BFC_914D_7F6E = ____require_result_6["刷新主线节点引导配置"]
 do
     local ____35_FF0E_738B_57CE_6218_540E_4E0E_7B2C_4E09_7AE0_542F_7A0B = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.03．第三章.35．王城战后与第三章启程")
     ____exports["王城战后与第三章启程剧情片段"] = ____35_FF0E_738B_57CE_6218_540E_4E0E_7B2C_4E09_7AE0_542F_7A0B["王城战后与第三章启程剧情片段"]
 end
-local CreateTrigger = jass.CreateTrigger
-local GetTriggerUnit = jass.GetTriggerUnit
 local Player = jass.Player
 local _____7B2C_4E09_7AE0_542F_7A0B_8FDB_5EA6 = 36
 local _____738B_5BAB_542F_7A0B_4F20_9001_95E8_952E = "剧情运行时.王宫启程传送门"
@@ -55,11 +50,7 @@ local function _____6E05_7406_738B_5BAB_542F_7A0B_4F20_9001_95E8_76D1_542C(_____
     if _____72B6_6001["取消范围监听"] ~= nil then
         _____72B6_6001["取消范围监听"]()
     end
-    if _____72B6_6001["范围触发器"] ~= nil and _____72B6_6001["范围触发器"] ~= 0 then
-        safeDestroyTrigger(_____72B6_6001["范围触发器"])
-    end
     _____72B6_6001["取消范围监听"] = nil
-    _____72B6_6001["范围触发器"] = nil
 end
 local function _____5207_6362_5230_7194_5CA9_5C0F_9547_5F15_5BFC()
     _____8BBE_7F6E_4E3B_7EBF_8282_70B9_8FD0_884C_65F6_8986_76D6({
@@ -73,36 +64,21 @@ local function _____5207_6362_5230_7194_5CA9_5C0F_9547_5F15_5BFC()
     _____5237_65B0_4E3B_7EBF_8282_70B9_5F15_5BFC_914D_7F6E(_____7B2C_4E09_7AE0_542F_7A0B_8FDB_5EA6)
     _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807(_____7B2C_4E09_7AE0_542F_7A0B_8FDB_5EA6)
 end
-local function ____on_73A9_5BB6_62B5_8FBE_738B_5BAB_542F_7A0B_4F20_9001_95E8()
+local function ____on_73A9_5BB6_62B5_8FBE_738B_5BAB_542F_7A0B_4F20_9001_95E8(_____89E6_53D1_5355_4F4D)
     local _____72B6_6001 = _____5F53_524D_738B_5BAB_542F_7A0B_4F20_9001_95E8_72B6_6001
     if _____72B6_6001 == nil or _____72B6_6001["已切换熔岩小镇引导"] or _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= _____7B2C_4E09_7AE0_542F_7A0B_8FDB_5EA6 then
-        return
+        return false
     end
-    local _____89E6_53D1_5355_4F4D = GetTriggerUnit()
-    if not _____5355_4F4D_5B58_6D3B(_____89E6_53D1_5355_4F4D) or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____89E6_53D1_5355_4F4D) then
-        return
+    if not _____5355_4F4D_5B58_6D3B(_____89E6_53D1_5355_4F4D) then
+        return false
     end
     _____72B6_6001["已切换熔岩小镇引导"] = true
     _____6E05_7406_738B_5BAB_542F_7A0B_4F20_9001_95E8_76D1_542C(_____72B6_6001)
     _____5207_6362_5230_7194_5CA9_5C0F_9547_5F15_5BFC()
+    return true
 end
 local function _____6CE8_518C_738B_5BAB_542F_7A0B_4F20_9001_95E8_8303_56F4_76D1_542C(_____72B6_6001)
-    local trigger = CreateTrigger()
-    if trigger == nil or trigger == 0 then
-        return
-    end
-    if safeTriggerAddAction(trigger, ____on_73A9_5BB6_62B5_8FBE_738B_5BAB_542F_7A0B_4F20_9001_95E8) == nil then
-        safeDestroyTrigger(trigger)
-        return
-    end
-    _____72B6_6001["范围触发器"] = trigger
-    _____72B6_6001["取消范围监听"] = registerUnitInRangeTrigger(
-        trigger,
-        _____72B6_6001["传送门"],
-        _____738B_5BAB_542F_7A0B_4F20_9001_95E8_8FDB_5165_8303_56F4,
-        nil,
-        false
-    )
+    _____72B6_6001["取消范围监听"] = registerOneShotUnitRangeListener(_____72B6_6001["传送门"], _____738B_5BAB_542F_7A0B_4F20_9001_95E8_8FDB_5165_8303_56F4, ____on_73A9_5BB6_62B5_8FBE_738B_5BAB_542F_7A0B_4F20_9001_95E8, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D)
 end
 local function _____521B_5EFA_738B_5BAB_542F_7A0B_4F20_9001_95E8()
     local _____4F20_9001_95E8 = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____738B_5BAB_542F_7A0B_4F20_9001_95E8_952E)

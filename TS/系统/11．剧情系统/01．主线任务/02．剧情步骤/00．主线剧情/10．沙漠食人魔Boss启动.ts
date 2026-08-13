@@ -2,8 +2,8 @@
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
-const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
 };
 const 沙漠食人魔待战暂停来源 = "剧情系统:沙漠食人魔待战";
 
@@ -16,8 +16,15 @@ const { YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．
 const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
   PlaySoundBJ: (this: void, soundHandle: any) => void;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, size: number, speed: number, time: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: {
+    模型路径: string;
+    X: number;
+    Y: number;
+    面向角度?: number;
+    缩放?: number;
+    持续秒?: number;
+  }) => any;
 };
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
@@ -34,7 +41,6 @@ const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUni
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
@@ -45,19 +51,24 @@ const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 function 播放沙漠食人魔开战特效(this: void, bossUnit: any): void {
   const x = GetUnitX(bossUnit);
   const y = GetUnitY(bossUnit);
-  EC_CreateEffect("Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl", x, y, 0, 270, 2.5, 1, 1);
+  创建点特效({
+    模型路径: "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl",
+    X: x,
+    Y: y,
+    面向角度: 270,
+    缩放: 2.5,
+    持续秒: 1,
+  });
   for (let i = 1; i <= 6; i++) {
     const angle = (60 * i) * Math.PI / 180;
-    EC_CreateEffect(
-      "war3mapImported\\blood2022720203813.mdl",
-      x + Math.cos(angle) * 150,
-      y + Math.sin(angle) * 150,
-      0,
-      270,
-      2,
-      1,
-      1,
-    );
+    创建点特效({
+      模型路径: "war3mapImported\\blood2022720203813.mdl",
+      X: x + Math.cos(angle) * 150,
+      Y: y + Math.sin(angle) * 150,
+      面向角度: 270,
+      缩放: 2,
+      持续秒: 1,
+    });
   }
 }
 
@@ -72,8 +83,7 @@ export function 执行沙漠食人魔Boss前置(this: void): void {
   }
 
   SetUnitOwner(bossUnit, Player(PLAYER_NEUTRAL_AGGRESSIVE), true);
-  添加单位暂停(bossUnit, 沙漠食人魔待战暂停来源);
-  SetUnitInvulnerable(bossUnit, true);
+  暂停并设置无敌安全(bossUnit, 沙漠食人魔待战暂停来源);
 
   const 上下文 = 读取当前剧情动作上下文();
   if (上下文.触发单位 != null && 上下文.触发单位 !== 0) {

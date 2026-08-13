@@ -9,6 +9,10 @@ const { YDUserDataGetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函�
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDWEAngleBetweenUnitsSafe: (this: void, fromUnit: any, toUnit: any) => number;
 };
+const { 添加单位暂停, 释放单位暂停来源全部 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  释放单位暂停来源全部: (this: void, unit: any, source: string) => boolean;
+};
 const { GetPlayersAll, ForGroupBJ } = require("lib.扩展函数.BJ函数.07．杂项") as {
   GetPlayersAll: (this: void) => any;
   ForGroupBJ: (this: void, whichGroup: any, callback: (this: void) => void) => void;
@@ -16,8 +20,8 @@ const { GetPlayersAll, ForGroupBJ } = require("lib.扩展函数.BJ函数.07．�
 const { 切换区域背景音乐表达式 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
   切换区域背景音乐表达式: (this: void, expr: string | undefined, add: boolean) => number;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, scale: number, speed: number, duration: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; 面向角度?: number; 缩放?: number; 动画速度?: number; 持续秒?: number }) => any;
 };
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (this: void, modelName: string, targetWidget: any, attachPointName: string) => any;
 const { YDWETimerDestroyEffect } = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
@@ -86,8 +90,6 @@ const SetUnitX = jass.SetUnitX as (this: void, whichUnit: any, x: number) => voi
 const SetUnitY = jass.SetUnitY as (this: void, whichUnit: any, y: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, whichUnit: any, animation: string) => void;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (this: void, whichUnit: any, red: number, green: number, blue: number, alpha: number) => void;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
 const Player = jass.Player as (this: void, playerId: number) => any;
@@ -98,6 +100,7 @@ const bj_QUESTMESSAGE_UPDATED = (require("jass.globals") as any).bj_QUESTMESSAGE
 
 const 蒙面人死亡现场残影键 = "剧情运行时.蒙面人死亡.残影";
 const 蒙面人死亡击杀玩家键 = "剧情运行时.蒙面人死亡.击杀玩家";
+const 蒙面人死亡现场玩家暂停来源 = "剧情系统:蒙面人死亡现场";
 let 蒙面人死亡环境音乐延迟ID = 0;
 let 蒙面人死亡音乐已启动 = false;
 let 蒙面人死亡残影渐隐周期ID = 0;
@@ -202,8 +205,7 @@ function 启动蒙面人死亡胜利音乐(this: void): void {
 function 恢复蒙面人死亡玩家控制(this: void): void {
   const unit = GetEnumUnit();
   if (!句柄有效(unit)) return;
-  PauseUnit(unit, false);
-  SetUnitInvulnerable(unit, false);
+  释放单位暂停来源全部(unit, 蒙面人死亡现场玩家暂停来源);
 }
 
 function 清理蒙面人死亡现场(this: void): void {
@@ -249,7 +251,7 @@ function 布置蒙面人死亡现场英雄(this: void): void {
   SetUnitY(unit, -27820.8);
   SetUnitFacing(unit, YDWEAngleBetweenUnitsSafe(unit, 蒙面人死亡枚举残影));
   SetUnitAnimation(unit, "Attack");
-  PauseUnit(unit, true);
+  添加单位暂停(unit, 蒙面人死亡现场玩家暂停来源);
 }
 
 function 玩家英雄进入蒙面人死亡现场(this: void, 残影: any): void {
@@ -263,7 +265,7 @@ function 玩家英雄进入蒙面人死亡现场(this: void, 残影: any): void 
 function 释放蒙面人死亡现场英雄(this: void): void {
   const unit = GetEnumUnit();
   if (!句柄有效(unit)) return;
-  PauseUnit(unit, false);
+  释放单位暂停来源全部(unit, 蒙面人死亡现场玩家暂停来源);
   const radians = GetUnitFacing(unit) * bj_DEGTORAD;
   IssuePointOrder(unit, "move", GetUnitX(unit) + Cos(radians) * 150, GetUnitY(unit) + Sin(radians) * 150);
 }
@@ -303,11 +305,11 @@ export function 执行蒙面人死亡(this: void, _参数: 剧情动作参数表
   const 击杀玩家 = 读取蒙面人死亡击杀玩家(dyingUnit);
   注册剧情运行时单位(蒙面人死亡击杀玩家键, 击杀玩家);
   if (残影 != null && 残影 !== 0) {
-    EC_CreateEffect("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl", GetUnitX(残影), GetUnitY(残影), 0, 270, 2, 1, 3);
+    创建点特效({ 模型路径: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl", X: GetUnitX(残影), Y: GetUnitY(残影), 面向角度: 270, 缩放: 2, 动画速度: 1, 持续秒: 3 });
     const 残影流血特效 = AddSpecialEffectTarget("Objects\\Spawnmodels\\Human\\HumanBlood\\BloodElfSpellThiefBlood.mdl", 残影, "origin");
     if (残影流血特效 != null && 残影流血特效 !== 0) YDWETimerDestroyEffect(4, 残影流血特效);
   }
-  EC_CreateEffect("Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl", -26846.7, -27820.8, 0, 270, 1.65, 1, 3);
+  创建点特效({ 模型路径: "Abilities\\Spells\\Human\\Resurrect\\ResurrectCaster.mdl", X: -26846.7, Y: -27820.8, 面向角度: 270, 缩放: 1.65, 动画速度: 1, 持续秒: 3 });
   玩家英雄进入蒙面人死亡现场(残影);
 
   按结算键执行Boss死亡结算("蒙面人", dyingUnit, 击杀玩家);
@@ -316,7 +318,7 @@ export function 执行蒙面人死亡(this: void, _参数: 剧情动作参数表
 export function 执行蒙面人死亡残影遁走(this: void): void {
   const 残影 = 读取剧情运行时单位(蒙面人死亡现场残影键);
   if (!句柄有效(残影)) return;
-  EC_CreateEffect("war3mapImported\\[AKE]war3AKE.com - 8853914802857115659031497.mdl", GetUnitX(残影), GetUnitY(残影), 0, 270, 1.25, 1, 5);
+  创建点特效({ 模型路径: "war3mapImported\\[AKE]war3AKE.com - 8853914802857115659031497.mdl", X: GetUnitX(残影), Y: GetUnitY(残影), 面向角度: 270, 缩放: 1.25, 动画速度: 1, 持续秒: 5 });
   if (蒙面人死亡残影渐隐周期ID !== 0) removePeriodicCallback(蒙面人死亡残影渐隐周期ID);
   蒙面人死亡残影渐隐次数 = 0;
   蒙面人死亡残影渐隐周期ID = addPeriodicCallback(250, 更新蒙面人死亡残影渐隐);

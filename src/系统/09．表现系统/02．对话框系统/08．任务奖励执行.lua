@@ -45,16 +45,16 @@ function _____8BFB_53D6_8868_8FBE_5F0F_6570_5B57(_____72B6_6001)
                     _____6574_6570 = _____6574_6570 * 10 + _____6570_5B57
                 end
                 _____72B6_6001["位置"] = _____72B6_6001["位置"] + 1
-                goto __continue40
+                goto __continue46
             end
             if _____5B57_7B26 == "." and not _____6B63_5728_8BFB_53D6_5C0F_6570 then
                 _____6B63_5728_8BFB_53D6_5C0F_6570 = true
                 _____72B6_6001["位置"] = _____72B6_6001["位置"] + 1
-                goto __continue40
+                goto __continue46
             end
             break
         end
-        ::__continue40::
+        ::__continue46::
     end
     return _____5DF2_8BFB_53D6 and _____6574_6570 + _____5C0F_6570 or 0
 end
@@ -92,18 +92,18 @@ function _____8BFB_53D6_8868_8FBE_5F0F_4E58_9664(_____72B6_6001)
         do
             if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "*") then
                 _____6570_503C = _____6570_503C * _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C(_____72B6_6001)
-                goto __continue53
+                goto __continue59
             end
             if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "/") then
                 local _____9664_6570 = _____8BFB_53D6_8868_8FBE_5F0F_57FA_7840_503C(_____72B6_6001)
                 if _____9664_6570 ~= 0 then
                     _____6570_503C = _____6570_503C / _____9664_6570
                 end
-                goto __continue53
+                goto __continue59
             end
             break
         end
-        ::__continue53::
+        ::__continue59::
     end
     return _____6570_503C
 end
@@ -113,19 +113,21 @@ function _____8BFB_53D6_8868_8FBE_5F0F_52A0_51CF(_____72B6_6001)
         do
             if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "+") then
                 _____6570_503C = _____6570_503C + _____8BFB_53D6_8868_8FBE_5F0F_4E58_9664(_____72B6_6001)
-                goto __continue58
+                goto __continue64
             end
             if _____5C1D_8BD5_8BFB_53D6_8868_8FBE_5F0F_6807_8BB0(_____72B6_6001, "-") then
                 _____6570_503C = _____6570_503C - _____8BFB_53D6_8868_8FBE_5F0F_4E58_9664(_____72B6_6001)
-                goto __continue58
+                goto __continue64
             end
             break
         end
-        ::__continue58::
+        ::__continue64::
     end
     return _____6570_503C
 end
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local DzGetUnitNeededXP = japi.DzGetUnitNeededXP
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.02．GS单位属性")
 local GS_UnitPry = ____require_result_0.GS_UnitPry
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
@@ -135,8 +137,8 @@ local function getUserPlayers(self)
     do
         local i = 0
         while i < 4 do
-            local p = jass.Player(i)
-            if p and jass.GetPlayerController(p) == jass.MAP_CONTROL_USER then
+            local p = jass:Player(i)
+            if p and jass:GetPlayerController(p) == jass.MAP_CONTROL_USER then
                 out[#out + 1] = p
             end
             i = i + 1
@@ -147,62 +149,82 @@ end
 bindRewardParseHeroResolver(nil, getPlayerFirstHero)
 local function gainGold(self, players, value)
     for ____, p in ipairs(players) do
-        local cur = jass.GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
-        jass.SetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD, cur + value)
+        local cur = jass:GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
+        jass:SetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD, cur + value)
     end
 end
 local function gainLumber(self, players, value)
     for ____, p in ipairs(players) do
-        local cur = jass.GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_LUMBER) or 0
-        jass.SetPlayerState(p, jass.PLAYER_STATE_RESOURCE_LUMBER, cur + value)
+        local cur = jass:GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_LUMBER) or 0
+        jass:SetPlayerState(p, jass.PLAYER_STATE_RESOURCE_LUMBER, cur + value)
     end
 end
 local function gainExp(self, players, value)
     for ____, p in ipairs(players) do
         local hero = getPlayerFirstHero(nil, p)
         if hero then
-            jass.AddHeroXP(hero, value, true)
+            jass:AddHeroXP(hero, value, true)
         end
+    end
+end
+local function gainCurrentLevelNeededExpRate(players, rate)
+    if rate <= 0 then
+        return
+    end
+    for ____, p in ipairs(players) do
+        do
+            local hero = getPlayerFirstHero(nil, p)
+            if not hero then
+                goto __continue18
+            end
+            local level = jass:GetHeroLevel(hero)
+            local neededExp = DzGetUnitNeededXP(hero, level)
+            local value = jass:R2I(neededExp * rate)
+            if value > 0 then
+                jass:AddHeroXP(hero, value, true)
+            end
+        end
+        ::__continue18::
     end
 end
 local function gainLevel(self, players, value)
     for ____, p in ipairs(players) do
         local hero = getPlayerFirstHero(nil, p)
         if hero then
-            local lv = jass.GetHeroLevel(hero)
-            jass.SetHeroLevel(hero, lv + value, false)
+            local lv = jass:GetHeroLevel(hero)
+            jass:SetHeroLevel(hero, lv + value, false)
         end
     end
 end
 local function gainHeroStat(self, players, statName, value)
-    local integerValue = jass.R2I(value)
+    local integerValue = jass:R2I(value)
     for ____, p in ipairs(players) do
         do
             local hero = getPlayerFirstHero(nil, p)
             if not hero then
-                goto __continue21
+                goto __continue27
             end
             if statName == "力量" then
-                jass.SetHeroStr(
+                jass:SetHeroStr(
                     hero,
-                    jass.GetHeroStr(hero, false) + integerValue,
+                    jass:GetHeroStr(hero, false) + integerValue,
                     true
                 )
             elseif statName == "敏捷" then
-                jass.SetHeroAgi(
+                jass:SetHeroAgi(
                     hero,
-                    jass.GetHeroAgi(hero, false) + integerValue,
+                    jass:GetHeroAgi(hero, false) + integerValue,
                     true
                 )
             elseif statName == "智力" then
-                jass.SetHeroInt(
+                jass:SetHeroInt(
                     hero,
-                    jass.GetHeroInt(hero, false) + integerValue,
+                    jass:GetHeroInt(hero, false) + integerValue,
                     true
                 )
             end
         end
-        ::__continue21::
+        ::__continue27::
     end
 end
 local function gainAttack(players, value)
@@ -224,7 +246,7 @@ end
 local function _____83B7_53D6_5956_52B1_82F1_96C4_7B49_7EA7(triggerPlayerId)
     local ____temp_2
     if triggerPlayerId ~= nil then
-        ____temp_2 = jass.Player(triggerPlayerId)
+        ____temp_2 = jass:Player(triggerPlayerId)
     else
         ____temp_2 = nil
     end
@@ -236,7 +258,7 @@ local function _____83B7_53D6_5956_52B1_82F1_96C4_7B49_7EA7(triggerPlayerId)
         ____player_3 = nil
     end
     local hero = ____player_3
-    return hero and jass.GetHeroLevel(hero) or 1
+    return hero and jass:GetHeroLevel(hero) or 1
 end
 local function resolveAmountExpr(self, expr, triggerPlayerId)
     local _____72B6_6001 = {
@@ -277,7 +299,7 @@ local function executeOneRewardExpr(self, expr, triggerPlayerId)
         return
     end
     local allPlayers = getUserPlayers(nil)
-    local targetPlayers = ((string.find(text, "完成任务的玩家", nil, true) or 0) - 1 >= 0 or (string.find(text, "Player", nil, true) or 0) - 1 >= 0) and (triggerPlayerId ~= nil and ({jass.Player(triggerPlayerId)}) or ({})) or allPlayers
+    local targetPlayers = ((string.find(text, "完成任务的玩家", nil, true) or 0) - 1 >= 0 or (string.find(text, "Player", nil, true) or 0) - 1 >= 0) and (triggerPlayerId ~= nil and ({jass:Player(triggerPlayerId)}) or ({})) or allPlayers
     local payload = text
     local prefixes = {"所有玩家", "完成任务的玩家", "Player"}
     for ____, p in ipairs(prefixes) do
@@ -288,6 +310,23 @@ local function executeOneRewardExpr(self, expr, triggerPlayerId)
             end
             break
         end
+    end
+    local neededExpMarker = "升级所需经验的"
+    local neededExpMarkerPos = (string.find(payload, neededExpMarker, nil, true) or 0) - 1
+    if neededExpMarkerPos >= 0 then
+        local percentStart = neededExpMarkerPos + #neededExpMarker
+        local percentEnd = (string.find(
+            payload,
+            "%",
+            math.max(percentStart + 1, 1),
+            true
+        ) or 0) - 1
+        if percentEnd >= percentStart then
+            local percentText = __TS__StringTrim(__TS__StringSubstring(payload, percentStart, percentEnd))
+            local rate = resolveAmountExpr(nil, percentText, triggerPlayerId) / 100
+            gainCurrentLevelNeededExpRate(targetPlayers, rate)
+        end
+        return
     end
     if (string.find(payload, "经验", nil, true) or 0) - 1 >= 0 or (string.find(payload, "exp", nil, true) or 0) - 1 >= 0 then
         local value = resolveAmountExpr(
@@ -375,7 +414,7 @@ local function executeOneRewardExpr(self, expr, triggerPlayerId)
     for ____, _____5C5E_6027_540D in ipairs(_____767E_5206_6BD4_5C5E_6027_540D_5217_8868) do
         do
             if (string.find(payload, _____5C5E_6027_540D, nil, true) or 0) - 1 < 0 then
-                goto __continue89
+                goto __continue97
             end
             local value = resolveAmountExpr(
                 nil,
@@ -391,7 +430,7 @@ local function executeOneRewardExpr(self, expr, triggerPlayerId)
             end
             return
         end
-        ::__continue89::
+        ::__continue97::
     end
     if (string.find(payload, "力量", nil, true) or 0) - 1 >= 0 then
         local value = resolveAmountExpr(
@@ -449,17 +488,17 @@ function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
             do
                 local line = __TS__StringTrim(lines[lineIdx + 1])
                 if line == "" then
-                    goto __continue105
+                    goto __continue113
                 end
                 local colon = (string.find(line, ":", nil, true) or 0) - 1
                 if colon > 0 and _____662F_5426_5956_52B1_6761_4EF6(__TS__StringSubstring(line, 0, colon)) then
                     local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
                     local expr = __TS__StringTrim(__TS__StringSubstring(line, colon + 1))
                     if expr == "" then
-                        goto __continue105
+                        goto __continue113
                     end
                     if not isConditionMatchedWithContext(nil, cond, ctx) then
-                        goto __continue105
+                        goto __continue113
                     end
                     local parts = __TS__StringSplit(expr, ";")
                     for ____, p in ipairs(parts) do
@@ -474,7 +513,7 @@ function ____exports.applyRewardWithContext(self, rewardRaw, ctx)
                     executeOneRewardExpr(nil, p, ctx.triggerPlayerId)
                 end
             end
-            ::__continue105::
+            ::__continue113::
             lineIdx = lineIdx + 1
         end
     end
@@ -491,24 +530,24 @@ function ____exports.previewRewardMatchWithContext(self, rewardRaw, ctx)
             do
                 local line = __TS__StringTrim(lines[lineIdx + 1])
                 if line == "" then
-                    goto __continue117
+                    goto __continue125
                 end
                 local colon = (string.find(line, ":", nil, true) or 0) - 1
                 if colon <= 0 then
-                    goto __continue117
+                    goto __continue125
                 end
                 local cond = __TS__StringTrim(__TS__StringSubstring(line, 0, colon))
                 if not _____662F_5426_5956_52B1_6761_4EF6(cond) then
-                    goto __continue117
+                    goto __continue125
                 end
                 if __TS__StringTrim(__TS__StringSubstring(line, colon + 1)) == "" then
-                    goto __continue117
+                    goto __continue125
                 end
                 if isConditionMatchedWithContext(nil, cond, ctx) then
                     return {matchedRuleIndex = lineIdx, matchedCondition = cond}
                 end
             end
-            ::__continue117::
+            ::__continue125::
             lineIdx = lineIdx + 1
         end
     end

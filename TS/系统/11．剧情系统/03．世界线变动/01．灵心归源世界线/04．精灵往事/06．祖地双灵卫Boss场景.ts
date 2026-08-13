@@ -15,12 +15,8 @@ const { 启动剧情Boss战 } = require("系统.11．剧情系统.01．主线任
 const { register祖地双灵卫战斗结束Listener } = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.13．战斗结束事件") as {
   register祖地双灵卫战斗结束Listener: (this: void, listener: (this: void, red: any, azure: any) => void) => void;
 };
-const { registerEnterRegionTrigger } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
-  registerEnterRegionTrigger: (this: void, trigger: any, region: any, filter?: any) => (this: void) => void;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
+const { 创建矩形进入监听 } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
+  创建矩形进入监听: (this: void, rect: any, callback: (this: void) => void, filter?: any) => { 取消: (this: void) => void } | null;
 };
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -39,17 +35,13 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServ
   getServerTime: (this: void) => number;
 };
 
-const CreateRegion = jass.CreateRegion as (this: void) => any;
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const Rect = jass.Rect as (this: void, minX: number, minY: number, maxX: number, maxY: number) => any;
-const RegionAddRect = jass.RegionAddRect as (this: void, region: any, rect: any) => void;
 const RemoveRect = jass.RemoveRect as (this: void, rect: any) => void;
-const RemoveRegion = jass.RemoveRegion as (this: void, region: any) => void;
 
 const Boss预警刷新毫秒 = 100;
 let Boss场景模块已初始化 = false;
-let Boss入口触发器: any = null;
+let Boss入口监听: { 取消: (this: void) => void } | null = null;
 let Boss预警周期ID = 0;
 let Boss预警结束毫秒 = 0;
 
@@ -158,6 +150,8 @@ function on进入祖地双灵卫Boss入口(this: void): void {
   if (!祖地双灵卫副本状态.传送点已创建 || 祖地双灵卫副本状态.Boss场景已触发) return;
   const hero = GetTriggerUnit();
   if (!句柄有效(hero) || !是玩家英雄组单位(hero)) return;
+  if (Boss入口监听 != null) Boss入口监听.取消();
+  Boss入口监听 = null;
   祖地双灵卫副本状态.Boss场景已触发 = true;
   祖地双灵卫副本状态.Boss场景触发英雄 = hero;
   广播单位提示(hero, "怎么什么都没有？这里明明残留着很强的气息。", 4200);
@@ -165,26 +159,12 @@ function on进入祖地双灵卫Boss入口(this: void): void {
 }
 
 function 注册Boss入口(this: void): void {
-  if (句柄有效(Boss入口触发器)) return;
+  if (Boss入口监听 != null) return;
   const cfg = 祖地双灵卫副本配置.Boss入口;
-  const region = CreateRegion();
   const rect = Rect(cfg.X - cfg.半径, cfg.Y - cfg.半径, cfg.X + cfg.半径, cfg.Y + cfg.半径);
-  const trigger = CreateTrigger();
-  if (!句柄有效(region) || !句柄有效(rect) || !句柄有效(trigger)) {
-    if (句柄有效(trigger)) safeDestroyTrigger(trigger);
-    if (句柄有效(region)) RemoveRegion(region);
-    if (句柄有效(rect)) RemoveRect(rect);
-    return;
-  }
-  RegionAddRect(region, rect);
+  if (!句柄有效(rect)) return;
+  Boss入口监听 = 创建矩形进入监听(rect, on进入祖地双灵卫Boss入口, null);
   RemoveRect(rect);
-  if (safeTriggerAddAction(trigger, on进入祖地双灵卫Boss入口) == null) {
-    safeDestroyTrigger(trigger);
-    RemoveRegion(region);
-    return;
-  }
-  registerEnterRegionTrigger(trigger, region, null);
-  Boss入口触发器 = trigger;
 }
 
 function on祖地双灵卫战斗结束(this: void, _red: any, _azure: any): void {
@@ -205,4 +185,3 @@ export function init祖地双灵卫Boss场景(this: void): void {
   注册Boss入口();
   register祖地双灵卫战斗结束Listener(on祖地双灵卫战斗结束);
 }
-

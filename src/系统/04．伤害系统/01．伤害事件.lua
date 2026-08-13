@@ -5,22 +5,22 @@ function getEventUnitDamaged(self)
     return jass.EVENT_UNIT_DAMAGED
 end
 function ______pcall_8BFB_53D6Jass_4F24_5BB3_6765_6E90(self)
-    ______pcall_4F24_5BB3_6765_6E90 = jass.GetEventDamageSource()
+    ______pcall_4F24_5BB3_6765_6E90 = jass:GetEventDamageSource()
 end
 function ______pcall_8BFB_53D6_5168_5C40_4F24_5BB3_6765_6E90(self)
-    ______pcall_4F24_5BB3_6765_6E90 = GetEventDamageSource()
+    ______pcall_4F24_5BB3_6765_6E90 = GetEventDamageSource(nil)
 end
 function ______pcall_68C0_67E5_89E6_53D1_5668_542F_7528(self)
-    ______pcall_5E03_5C14_7ED3_679C = jass.IsTriggerEnabled(______pcall_89E6_53D1_5668) == true
+    ______pcall_5E03_5C14_7ED3_679C = jass:IsTriggerEnabled(______pcall_89E6_53D1_5668) == true
 end
 function ______pcall_8BC4_4F30_89E6_53D1_5668(self)
-    ______pcall_5E03_5C14_7ED3_679C = jass.TriggerEvaluate(______pcall_89E6_53D1_5668) == true
+    ______pcall_5E03_5C14_7ED3_679C = jass:TriggerEvaluate(______pcall_89E6_53D1_5668) == true
 end
 function ______pcall_6267_884C_89E6_53D1_5668(self)
-    jass.TriggerExecute(______pcall_89E6_53D1_5668)
+    jass:TriggerExecute(______pcall_89E6_53D1_5668)
 end
 function ______pcall_68C0_67E5_666E_901A_653B_51FB(self)
-    ______pcall_5E03_5C14_7ED3_679C = _____4F24_5BB3_51FD_6570.isNormalAttack() == true
+    ______pcall_5E03_5C14_7ED3_679C = _____4F24_5BB3_51FD_6570:isNormalAttack() == true
 end
 function ______pcall_5E94_7528_82F1_96C4_666E_653B_88C5_5907Dot(self)
     local entry = ______pcall_4F24_5BB3Entry
@@ -52,13 +52,13 @@ function onUnitDeathForDamage(dyingUnit)
     if isHeroUnit(nil, dyingUnit) then
         return
     end
-    jass.GroupRemoveUnit(UnitGroup, dyingUnit)
+    jass:GroupRemoveUnit(UnitGroup, dyingUnit)
     unregisterDamageUnit(nil, dyingUnit)
 end
 function onAnyUnitDamagedAction()
     local j = jass
-    local savedUnit = jass.GetTriggerUnit()
-    local savedDamage = jass.GetEventDamage()
+    local savedUnit = jass:GetTriggerUnit()
+    local savedDamage = jass:GetEventDamage()
     if savedDamage <= 0 then
         return
     end
@@ -88,7 +88,7 @@ function onAnyUnitDamagedAction()
         end
         local onDamageEvent = ____temp_6
         if onDamageEvent ~= nil then
-            onDamageEvent(savedUnit, savedSource, savedDamage)
+            onDamageEvent(nil, savedUnit, savedSource, savedDamage)
         end
     end
     local i = 0
@@ -182,14 +182,16 @@ function _____679A_4E3E_5DF2_6709_4F24_5BB3_5355_4F4D(self, u)
     if not u then
         return
     end
-    local lvl = jass.GetUnitAbilityLevel(u, ALOC)
+    local lvl = jass:GetUnitAbilityLevel(u, ALOC)
     if lvl > 0 then
         return
     end
     registerDamageUnit(nil, u)
 end
 function unitHidKey(self, unit)
-    return tostring(jass.GetHandleId(unit)
+    return tostring(
+        nil,
+        jass:GetHandleId(unit)
     )
 end
 function registerDamageUnit(self, unit)
@@ -200,19 +202,19 @@ function registerDamageUnit(self, unit)
     if DamageTriggerByUnitHid[hid] ~= nil then
         return
     end
-    if UnitGroup and not jass.IsUnitInGroup(unit, UnitGroup) then
-        jass.GroupAddUnit(UnitGroup, unit)
+    if UnitGroup and not jass:IsUnitInGroup(unit, UnitGroup) then
+        jass:GroupAddUnit(UnitGroup, unit)
     end
-    local ev = getEventUnitDamaged()
+    local ev = getEventUnitDamaged(nil)
     if ev == nil then
         return
     end
-    local trigger = jass.CreateTrigger()
+    local trigger = jass:CreateTrigger()
     if not trigger then
         return
     end
-    local action = jass.TriggerAddAction(trigger, onAnyUnitDamagedAction)
-    jass.TriggerRegisterUnitEvent(trigger, unit, ev)
+    local action = jass:TriggerAddAction(trigger, onAnyUnitDamagedAction)
+    jass:TriggerRegisterUnitEvent(trigger, unit, ev)
     DamageTriggerByUnitHid[hid] = trigger
     DamageTriggerActionByUnitHid[hid] = action
 end
@@ -227,9 +229,9 @@ function unregisterDamageUnit(self, unit)
     end
     local action = DamageTriggerActionByUnitHid[hid]
     if action ~= nil then
-        jass.TriggerRemoveAction(trigger, action)
+        jass:TriggerRemoveAction(trigger, action)
     end
-    jass.DestroyTrigger(trigger)
+    jass:DestroyTrigger(trigger)
     DamageTriggerByUnitHid[hid] = nil
     DamageTriggerActionByUnitHid[hid] = nil
 end
@@ -255,7 +257,7 @@ function initEnumUnit(self)
         forEachUnitInGroup(nil, grp, _____679A_4E3E_5DF2_6709_4F24_5BB3_5355_4F4D)
     end
     if grp then
-        jass.DestroyGroup(grp)
+        jass:DestroyGroup(grp)
     end
 end
 function initDamageEventOnce(self, intervalSeconds)
@@ -263,8 +265,8 @@ function initDamageEventOnce(self, intervalSeconds)
         return
     end
     DamageEventInitialized = true
-    UnitGroup = jass.CreateGroup()
-    initEnumUnit()
+    UnitGroup = jass:CreateGroup()
+    initEnumUnit(nil)
     registerDeathListener(nil, onUnitDeathForDamage)
     local ____ = intervalSeconds
 end
@@ -313,7 +315,7 @@ GroupEnumUnitsInRect = jass.GroupEnumUnitsInRect
 local function getUnitTypeHero(self)
     local ____jass_UNIT_TYPE_HERO_4 = jass.UNIT_TYPE_HERO
     if ____jass_UNIT_TYPE_HERO_4 == nil then
-        ____jass_UNIT_TYPE_HERO_4 = jass.ConvertUnitType(2)
+        ____jass_UNIT_TYPE_HERO_4 = jass:ConvertUnitType(2)
     end
     return ____jass_UNIT_TYPE_HERO_4
 end

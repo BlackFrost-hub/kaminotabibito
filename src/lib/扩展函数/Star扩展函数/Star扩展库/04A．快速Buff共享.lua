@@ -42,7 +42,7 @@ local YDUserDataGet = YDUserDataGetSafe
 local YDUserDataSet = YDUserDataSetSafe
 local YDWESetUnitAbilityDataReal = _____5B89_5168_8BBE_7F6E_5355_4F4D_6280_80FD_5B9E_6570_6570_636E
 local function EXSetUnitFacing(unit, angle)
-    japi.EXSetUnitFacing(unit, angle)
+    japi:EXSetUnitFacing(unit, angle)
 end
 local function sym(name)
     local ____G_name_5 = _G[name]
@@ -270,9 +270,9 @@ function ____exports.getSfbBuffId(id)
     return SFB_BUFF_ID[id]
 end
 function ____exports.getAngleBetweenUnits(u, tu)
-    return jass.Atan2(
-        jass.GetUnitY(tu) - jass.GetUnitY(u),
-        jass.GetUnitX(tu) - jass.GetUnitX(u)
+    return jass:Atan2(
+        jass:GetUnitY(tu) - jass:GetUnitY(u),
+        jass:GetUnitX(tu) - jass:GetUnitX(u)
     )
 end
 local function getAbilityOrderId(abilityId, fallbackOrderStr)
@@ -305,8 +305,8 @@ function ____exports.SFB_Init()
     if ____exports.SFB_Unit ~= nil and ____exports.SFB_Unit ~= 0 then
         return
     end
-    ____exports.SFB_Unit = jass.CreateUnit(
-        jass.Player(15),
+    ____exports.SFB_Unit = jass:CreateUnit(
+        jass:Player(15),
         SFB_UNIT_ID,
         0,
         0,
@@ -363,7 +363,7 @@ ____exports["SFB_施加原生目标Buff"] = function(sourceUnit, u, id, time, ab
     end
     local fac = ____exports.getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(caster, fac)
-    jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    jass:SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     SetUnitX(
         caster,
         GetUnitX(u)
@@ -435,7 +435,7 @@ ____exports["SFB_施加原生目标技能"] = function(u, abilityId, orderStr, _
     end
     local fac = ____exports.getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(caster, fac)
-    jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    jass:SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     if _____6301_7EED_65F6_95F4 > 0 then
         YDWESetUnitAbilityDataReal(
             caster,

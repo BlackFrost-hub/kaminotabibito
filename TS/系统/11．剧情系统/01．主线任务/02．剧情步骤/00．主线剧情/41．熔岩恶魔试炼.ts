@@ -21,16 +21,12 @@ const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩�
 const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   IsUnitAliveBJ: (this: void, whichUnit: any) => boolean;
 };
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => () => void;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (this: void, unit: any, range: number, callback: (this: void, enteringUnit: any) => boolean, predicate?: (this: void, enteringUnit: any) => boolean) => () => void;
 };
 const { registerDeathListener, unregisterDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
   unregisterDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
-};
-const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
-  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
-  safeDestroyTrigger: (this: void, trigger: any) => void;
 };
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
@@ -52,11 +48,9 @@ import { 发布主线节点目标 } from "../../00．剧情系统核心工具/10
 import { 启动剧情Boss战 } from "../../00．剧情系统核心工具/11．剧情Boss战启动桥接";
 import { 执行准备巴尔扎罗斯前导 } from "./42．巴尔扎罗斯前导";
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const CreateGroup = jass.CreateGroup as (this: void) => any;
 const DestroyGroup = jass.DestroyGroup as (this: void, group: any) => void;
 const FirstOfGroup = jass.FirstOfGroup as (this: void, group: any) => any;
-const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -86,7 +80,6 @@ interface 火山试炼状态 {
   世代: number;
   Boss单位: any;
   玩家单位?: any;
-  范围触发器?: any;
   取消范围监听?: () => void;
   暂停小怪列表: any[];
   已进入战斗: boolean;
@@ -109,9 +102,7 @@ function 播放主线剧情(this: void, 片段ID: string, 触发单位: any, 触
 
 function 清理火山试炼范围监听(this: void, 状态: 火山试炼状态): void {
   if (状态.取消范围监听 != null) 状态.取消范围监听();
-  if (状态.范围触发器 != null && 状态.范围触发器 !== 0) safeDestroyTrigger(状态.范围触发器);
   状态.取消范围监听 = undefined;
-  状态.范围触发器 = undefined;
 }
 
 function 恢复火山试炼范围小怪(this: void, 状态: 火山试炼状态): void {
@@ -142,12 +133,10 @@ function 暂停火山试炼范围小怪(this: void, 状态: 火山试炼状态, 
   DestroyGroup(group);
 }
 
-function on火山试炼范围触发(this: void): void {
+function on火山试炼范围触发(this: void, 触发单位: any): boolean {
   const 状态 = 当前火山试炼状态;
-  if (状态 == null || 状态.已进入战斗 || 读取剧情进度() !== 41) return;
-
-  const 触发单位 = GetTriggerUnit();
-  if (!单位存活(触发单位) || !是玩家英雄组单位(触发单位)) return;
+  if (状态 == null || 状态.已进入战斗 || 读取剧情进度() !== 41) return false;
+  if (!单位存活(触发单位)) return false;
 
   状态.已进入战斗 = true;
   状态.玩家单位 = 触发单位;
@@ -160,17 +149,16 @@ function on火山试炼范围触发(this: void): void {
   暂停火山试炼范围小怪(状态, 触发单位);
   应用第三章电影镜头(41);
   播放主线剧情("molten_realm_fire_trial", 触发单位, "熔岩恶魔试炼范围");
+  return true;
 }
 
 function 注册火山试炼范围监听(this: void, 状态: 火山试炼状态): void {
-  const trigger = CreateTrigger();
-  if (trigger == null || trigger === 0) return;
-  if (safeTriggerAddAction(trigger, on火山试炼范围触发) == null) {
-    safeDestroyTrigger(trigger);
-    return;
-  }
-  状态.范围触发器 = trigger;
-  状态.取消范围监听 = registerUnitInRangeTrigger(trigger, 状态.Boss单位, 火山试炼触发范围, null, false);
+  状态.取消范围监听 = registerOneShotUnitRangeListener(
+    状态.Boss单位,
+    火山试炼触发范围,
+    on火山试炼范围触发,
+    是玩家英雄组单位,
+  );
 }
 
 function 准备火山试炼Boss(this: void): any {

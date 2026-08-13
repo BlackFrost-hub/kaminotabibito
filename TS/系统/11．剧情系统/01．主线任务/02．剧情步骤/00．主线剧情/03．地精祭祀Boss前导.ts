@@ -1,8 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
 };
 const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 
@@ -46,11 +46,9 @@ export function 执行地精祭祀Boss前导激活(this: void, 参数: 剧情动
     const GroupAddUnit = jass.GroupAddUnit as (this: void, whichGroup: any, whichUnit: any) => boolean;
     GroupAddUnit(血条Boss组, bossUnit);
   }
-  const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
   const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
   SetUnitOwner(bossUnit, Player(PLAYER_NEUTRAL_AGGRESSIVE), true);
-  添加单位暂停(bossUnit, 剧情Boss预置暂停来源);
-  SetUnitInvulnerable(bossUnit, true);
+  暂停并设置无敌安全(bossUnit, 剧情Boss预置暂停来源);
 }
 
 export function 执行地精祭祀Boss战正式注册(this: void, 参数: 剧情动作参数表): void {

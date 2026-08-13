@@ -10,7 +10,7 @@ createRangedBossHeroUnit('N00U', '双重凤凰·菲尼克斯尔', {
   description = '双重凤凰·菲尼克斯尔',
 
   level = 40,
-  hp = 54000,
+  hp = 43200,
   mana = 2000,
   initialMana = 2000,
   manaRegen = 20.0,
@@ -25,7 +25,7 @@ createRangedBossHeroUnit('N00U', '双重凤凰·菲尼克斯尔', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 2200,
+  damageBase = 1760,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 0.9,

@@ -3,8 +3,8 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; 面向角度?: number; 缩放?: number; 动画速度?: number; 持续秒?: number }) => any;
 };
 const { CreateQuestBJ, GetLastCreatedQuestBJ } = require("lib.扩展函数.BJ函数.06．任务消息") as {
   CreateQuestBJ: (this: void, questType: number, title: string, description: string, icon: string) => any;
@@ -52,7 +52,15 @@ export function 执行精灵城章节承接(this: void): void {
 function 执行精灵城章节承接演出(this: void, 参数: Record<string, string | number | boolean>): void {
   const 长老 = 读取语义单位引用("主线NPC.精灵村长老");
   if (长老 != null && 长老 !== 0) {
-    EC_CreateEffect("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl", GetUnitX(长老), GetUnitY(长老), 0, 270, 2, 1, 1.5);
+    创建点特效({
+      模型路径: "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl",
+      X: GetUnitX(长老),
+      Y: GetUnitY(长老),
+      面向角度: 270,
+      缩放: 2,
+      动画速度: 1,
+      持续秒: 1.5,
+    });
   }
 
   const 阻挡名 = typeof 参数.隐藏阻挡 === "string" ? 参数.隐藏阻挡 : "gg_dest_B00X_0013";

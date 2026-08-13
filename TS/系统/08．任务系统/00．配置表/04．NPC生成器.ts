@@ -6,6 +6,9 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { 设单位名字 } = require("平台扩展API动作") as {
+  设单位名字: (this: void, 单位: any, 名称: string) => void;
+};
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
@@ -138,6 +141,10 @@ function createSingleNPC(npcConfig: 支线NPC配置, registerQuestId: boolean = 
   if (!unit) {
     debugLog("NPC生成器", "创建单位失败:", tostring(npcConfig.NPC配置名), "(" + unitCode + ")");
     return null;
+  }
+
+  if (npcConfig.NPC名称) {
+    设单位名字(unit, npcConfig.NPC名称);
   }
 
   if (npcConfig.模型路径) {

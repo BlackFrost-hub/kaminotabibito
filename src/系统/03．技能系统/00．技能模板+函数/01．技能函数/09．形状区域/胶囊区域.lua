@@ -19,7 +19,7 @@ local GetUnitY = jass.GetUnitY
 local CreateGroup = jass.CreateGroup
 local GroupAddUnit = jass.GroupAddUnit
 local function _____8BA1_7B97_5E73_65B9_6839(_____503C)
-    return jass.SquareRoot(_____503C)
+    return jass:SquareRoot(_____503C)
 end
 local function _____8BA1_7B97_5750_6807_8DDD_79BB(x1, y1, x2, y2)
     local dx = x2 - x1

@@ -74,5 +74,13 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.13．教派学者.10．受击反应观察")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 _____6CE8_518C_6559_6D3E_5B66_8005_6280_80FD_7ED3_6784()
 return ____exports

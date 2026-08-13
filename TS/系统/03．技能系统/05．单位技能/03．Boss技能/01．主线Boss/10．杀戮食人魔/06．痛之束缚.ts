@@ -2,7 +2,7 @@
 
 import { 杀戮食人魔单位技能配置 } from './00．配置';
 import { 获取杀戮食人魔上下文, 获取或创建杀戮食人魔上下文, type 杀戮食人魔运行时上下文 } from './01．运行时上下文';
-import { 杀戮食人魔技能配置 } from './02．数值与表现配置';
+import { 杀戮食人魔技能配置, 杀戮食人魔音效配置 } from './02．数值与表现配置';
 import { 食人魔BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/08．食人魔';
 import { 注册单位技能壳监听 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器';
 import { 提交预计算Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
@@ -21,6 +21,9 @@ const { addPeriodicCallback, removePeriodicCallback } = require('系统.00．核
 const { 获取Boss技能随机敌对英雄 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as { 获取Boss技能随机敌对英雄: (this: void, boss: any) => any };
 const { EC_CreateEffect } = require('lib.扩展函数.Star扩展函数.04．EC扩展库') as { EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, facing: number, size: number, speed: number, time: number) => any };
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as { stringToFourCCSafe: (this: void, text: string) => number };
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
+};
 const jass = require('jass.common') as any;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
@@ -101,6 +104,7 @@ function 建立痛之束缚(this: void, data: 痛之束缚待发数据): void {
   context.束缚闪电 = AddLightning(杀戮食人魔技能配置.痛之束缚.闪电代码, false, GetUnitX(boss), GetUnitY(boss), GetUnitX(target), GetUnitY(target));
   registerManualBuff(target, 食人魔BuffID.痛之束缚, 杀戮食人魔技能配置.痛之束缚.持续秒, 杀戮食人魔技能配置.痛之束缚.伤害转移比例, { sourceUnit: boss, sourceName: '杀戮食人魔-痛之束缚' });
   context.束缚周期ID = addPeriodicCallback(100, on痛之束缚周期, context);
+  播放Boss坐标音效(杀戮食人魔音效配置.痛之束缚.建立, GetUnitX(boss), GetUnitY(boss), 杀戮食人魔音效配置.默认裁断距离);
   if (!context.束缚清理已登记) {
     context.束缚清理已登记 = true;
     context.清理.登记清理('杀戮食人魔-痛之束缚', on痛之束缚上下文清理, context);

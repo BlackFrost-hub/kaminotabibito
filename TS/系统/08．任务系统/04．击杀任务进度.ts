@@ -103,7 +103,21 @@ function 播报击杀任务进度(this: void, 玩家ID: number, 配置: 任务�
 function 增加击杀任务进度(this: void, 玩家ID: number, 任务: QuestData, 配置: 任务配置, 死亡单位代码: string): void {
   if (!配置.目标单位 || !目标单位匹配(配置.目标单位, 死亡单位代码)) return;
   let 目标 = 任务.objectives[0];
-  if (配置.目标单位分别击杀 === true) {
+  if (配置.击杀目标组 && 配置.击杀目标组.length > 0) {
+    目标 = null as any;
+    for (let i = 0; i < 配置.击杀目标组.length; i++) {
+      const 目标组 = 配置.击杀目标组[i];
+      if (!目标组 || !目标单位匹配(目标组.目标单位, 死亡单位代码)) continue;
+      const 目标ID = "kill_group_" + tostring(i);
+      for (let j = 0; j < 任务.objectives.length; j++) {
+        if (任务.objectives[j] != null && 任务.objectives[j].id === 目标ID) {
+          目标 = 任务.objectives[j];
+          break;
+        }
+      }
+      break;
+    }
+  } else if (配置.目标单位分别击杀 === true) {
     目标 = null as any;
     const 目标ID = "kill_" + 死亡单位代码;
     for (let i = 0; i < 任务.objectives.length; i++) {

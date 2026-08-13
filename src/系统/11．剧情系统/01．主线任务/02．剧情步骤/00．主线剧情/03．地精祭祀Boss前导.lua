@@ -5,8 +5,8 @@ local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_0["添加单位暂停"]
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
+local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_0["暂停并设置无敌安全"]
 local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
@@ -36,15 +36,13 @@ ____exports["执行地精祭祀Boss前导激活"] = function(_____53C2_6570)
         local GroupAddUnit = jass.GroupAddUnit
         GroupAddUnit(_____8840_6761Boss_7EC4, bossUnit)
     end
-    local SetUnitInvulnerable = jass.SetUnitInvulnerable
     local SetUnitOwner = jass.SetUnitOwner
     SetUnitOwner(
         bossUnit,
         Player(PLAYER_NEUTRAL_AGGRESSIVE),
         true
     )
-    _____6DFB_52A0_5355_4F4D_6682_505C(bossUnit, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
-    SetUnitInvulnerable(bossUnit, true)
+    _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168(bossUnit, _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90)
 end
 ____exports["执行地精祭祀Boss战正式注册"] = function(_____53C2_6570)
     local bossUnit = _____8BFB_53D6_5730_7CBE_5DEB_5E08Boss()

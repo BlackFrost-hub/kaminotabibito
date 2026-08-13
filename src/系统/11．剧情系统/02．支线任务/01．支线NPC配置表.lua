@@ -73,6 +73,18 @@ __TS__SparseArrayPush(
 )
 __TS__SparseArrayPush(
     ____array_0,
+    {
+        ["NPC名称"] = "内务总管-语维",
+        ["任务ID"] = 10024,
+        ["NPC配置名"] = "失踪的精灵侍从",
+        ["单位ID"] = "e08R",
+        ["类型"] = "任务",
+        ["坐标X"] = 23021.7,
+        ["坐标Y"] = -23819.4,
+        ["朝向"] = 180,
+        ["自动创建"] = false,
+        ["启用"] = true
+    },
     table.unpack(_____6C61_67D3_4E4B_732B_7C73_4E9ANPC_914D_7F6E_5217_8868)
 )
 ____exports["支线NPC配置列表"] = {__TS__SparseArraySpread(____array_0)}

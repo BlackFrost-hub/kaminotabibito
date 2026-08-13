@@ -20,8 +20,14 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { 按名字反查总单位ID } = require("系统.01．单位系统.08．单位配置表.04．总单位配置表") as {
   按名字反查总单位ID: (this: void, name: string) => string | undefined;
 };
-const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
-  registerUnitInRangeTrigger: (this: void, trigger: any, unit: any, range: number, filter?: any, once?: boolean) => () => void;
+const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
+  registerOneShotUnitRangeListener: (
+    this: void,
+    unit: any,
+    range: number,
+    callback: (this: void, enteringUnit: any) => boolean,
+    predicate?: (this: void, enteringUnit: any) => boolean,
+  ) => () => void;
 };
 const { registerDeathListener, unregisterDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -92,7 +98,6 @@ const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing:
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
 const GetUnitX = jass.GetUnitX as (this: void, whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
-const TriggerAddAction = jass.TriggerAddAction as (this: void, whichTrigger: any, action: (this: void) => void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
 const GetPlayerState = jass.GetPlayerState as (this: void, whichPlayer: any, whichPlayerState: any) => number;
 const PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD as number;
@@ -276,28 +281,26 @@ function 赤尾前往下层仓库(this: void, 参数?: 剧情动作参数表): v
   );
 }
 
-function on锻造区证人范围触发(this: void): void {
-  if (已触发锻造区证人 || 读取剧情进度() !== 39) return;
-  const 触发单位 = GetTriggerUnit();
-  if (触发单位 == null || 触发单位 === 0 || !是玩家英雄组单位(触发单位)) return;
+function on锻造区证人范围触发(this: void, 触发单位: any): boolean {
+  if (已触发锻造区证人 || 读取剧情进度() !== 39) return false;
+  if (触发单位 == null || 触发单位 === 0) return false;
   已触发锻造区证人 = true;
   播放调查剧情("molten_realm_forge_witness", 触发单位, "恶魔城锻造区证人入口");
+  return true;
 }
 
-function on赤尾范围触发(this: void): void {
-  if (已触发赤尾交易 || 读取剧情进度() !== 39) return;
-  if (已支付赤尾定金) return;
-  const 触发单位 = GetTriggerUnit();
-  if (触发单位 == null || 触发单位 === 0 || !是玩家英雄组单位(触发单位)) return;
+function on赤尾范围触发(this: void, 触发单位: any): boolean {
+  if (已触发赤尾交易 || 读取剧情进度() !== 39) return false;
+  if (已支付赤尾定金) return false;
+  if (触发单位 == null || 触发单位 === 0) return false;
   已触发赤尾交易 = true;
   播放调查剧情("molten_realm_redtail_meet", 触发单位, "恶魔城赤尾交易入口");
+  return true;
 }
 
-function 注册单位范围入口(this: void, unit: any, range: number, action: (this: void) => void, 一次性 = true): () => void {
+function 注册单位范围入口(this: void, unit: any, range: number, action: (this: void, enteringUnit: any) => boolean): () => void {
   if (unit == null || unit === 0) return 空取消范围监听;
-  const trigger = CreateTrigger();
-  TriggerAddAction(trigger, action);
-  return registerUnitInRangeTrigger(trigger, unit, range, null, 一次性);
+  return registerOneShotUnitRangeListener(unit, range, action, 是玩家英雄组单位);
 }
 
 function 清理下层仓库入口监听(this: void): void {
@@ -639,7 +642,7 @@ export function 执行布置恶魔城调查(this: void, _参数: 剧情动作参
   const 赤尾 = 创建并登记调查单位("n03Z", 恶魔城调查场景站位表.赤尾, "主线NPC.赤尾");
 
   注册单位范围入口(锻造区证人, 调查范围, on锻造区证人范围触发);
-  取消赤尾范围监听 = 注册单位范围入口(赤尾, 调查范围, on赤尾范围触发, false);
+  取消赤尾范围监听 = 注册单位范围入口(赤尾, 调查范围, on赤尾范围触发);
   注册下层仓库入口监听();
 }
 

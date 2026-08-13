@@ -8,6 +8,7 @@ local ____08_FF0E_98DF_4EBA_9B54 = require("系统.05．Buff系统.03．Buff表.
 local _____98DF_4EBA_9B54BuffID = ____08_FF0E_98DF_4EBA_9B54["食人魔BuffID"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.01．沙漠食人魔.02．数值与表现配置")
 local _____6C99_6F20_98DF_4EBA_9B54_6280_80FD_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["沙漠食人魔技能配置"]
+local _____6C99_6F20_98DF_4EBA_9B54_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["沙漠食人魔音效配置"]
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8F6C_56DB_4F4DID = ____require_result_0["转四位ID"]
 local _____8BFB_53D6_5355_4F4D_7D2F_8BA1_5B9E_6570 = ____require_result_0["读取单位累计实数"]
@@ -31,6 +32,8 @@ local ____require_result_5 = require("系统.01．单位系统.06．仇恨系统
 local _____662F_5426_5DF2_767B_8BB0Boss_6280_80FD_6D4B_8BD5_76EE_6807 = ____require_result_5["是否已登记Boss技能测试目标"]
 local ____require_result_6 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.01．沙漠食人魔.00．配置")
 local _____6C99_6F20_98DF_4EBA_9B54_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_6["沙漠食人魔单位技能配置"]
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
+local _____64AD_653EBoss_5750_6807_97F3_6548 = ____require_result_7["播放Boss坐标音效"]
 local jass = require("jass.common")
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -91,11 +94,11 @@ local function ____on_6C99_6F20_98DF_4EBA_9B54_84C4_529B_76F8_5173_5355_4F4D_6B7
     __TS__Delete(_____84C4_529B_76EE_6807_8868, dyingHid)
 end
 local function _____6C99_6F20_98DF_4EBA_9B54_66B4_51FB_7387_4FEE_6B63(context)
-    local ____context__66B4_51FB_5F52_5C5E_5355_4F4D_7 = context["暴击归属单位"]
-    if ____context__66B4_51FB_5F52_5C5E_5355_4F4D_7 == nil then
-        ____context__66B4_51FB_5F52_5C5E_5355_4F4D_7 = context.attacker
+    local ____context__66B4_51FB_5F52_5C5E_5355_4F4D_8 = context["暴击归属单位"]
+    if ____context__66B4_51FB_5F52_5C5E_5355_4F4D_8 == nil then
+        ____context__66B4_51FB_5F52_5C5E_5355_4F4D_8 = context.attacker
     end
-    local attacker = ____context__66B4_51FB_5F52_5C5E_5355_4F4D_7
+    local attacker = ____context__66B4_51FB_5F52_5C5E_5355_4F4D_8
     if _____8BFB_53D6_5355_4F4D_7D2F_8BA1_5B9E_6570(attacker, _____7B2C_56DB_51FB_4F24_5BB3_4E2D_952E) > 0 then
         return 1
     end
@@ -126,6 +129,7 @@ local function _____9020_6210_7B2C_56DB_51FB_8303_56F4_4F24_5BB3(attacker, cente
         2.5,
         1
     )
+    _____64AD_653EBoss_5750_6807_97F3_6548(_____6C99_6F20_98DF_4EBA_9B54_97F3_6548_914D_7F6E["蓄力重击"]["爆炸"], x, y, _____6C99_6F20_98DF_4EBA_9B54_97F3_6548_914D_7F6E["默认裁断距离"])
     local targets = _____83B7_53D6_8303_56F4_654C_519B(attacker, x, y, _____6C99_6F20_98DF_4EBA_9B54_6280_80FD_914D_7F6E["蓄力重击"]["范围"])
     _____5199_5165_5355_4F4D_7D2F_8BA1_5B9E_6570(attacker, _____7B2C_56DB_51FB_4F24_5BB3_4E2D_952E, 1)
     do

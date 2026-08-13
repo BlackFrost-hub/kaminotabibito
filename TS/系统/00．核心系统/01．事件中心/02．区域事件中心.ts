@@ -3,12 +3,22 @@
 // Unit-specific events and unit-in-range events live in 03．单位特定事件中心.
 
 const jass = require("jass.common") as any;
+const { safeTriggerAddAction, safeDestroyTrigger } = require("系统.00．核心系统.07．联机安全工具") as {
+  safeTriggerAddAction: (this: void, trigger: any, callback: (this: void) => void) => { readonly id: number } | null;
+  safeDestroyTrigger: (this: void, trigger: any) => void;
+};
 
 type Listener = {
   trigger: any;
   active: boolean;
   once: boolean;
 };
+
+export interface 矩形进入监听注册 {
+  区域: any;
+  触发器: any;
+  取消: (this: void) => void;
+}
 
 const enterRegionListeners: Record<string, Listener[]> = {};
 const enterRegionRegistered: Record<string, boolean> = {};
@@ -146,6 +156,41 @@ export function registerEnterRegionTrigger(
   }
 
   return addListener(enterRegionListeners, key, trigger, false);
+}
+
+/** 为已有矩形创建独立 Region/Trigger，并在取消时统一销毁监听资源；矩形生命周期仍由调用方管理。 */
+export function 创建矩形进入监听(
+  this: void,
+  矩形: any,
+  回调: (this: void) => void,
+  过滤器?: any,
+): 矩形进入监听注册 | null {
+  if (矩形 == null || 矩形 === 0) return null;
+  const 区域 = jass.CreateRegion();
+  const 触发器 = jass.CreateTrigger();
+  if (区域 == null || 区域 === 0 || 触发器 == null || 触发器 === 0) {
+    if (触发器 != null && 触发器 !== 0) safeDestroyTrigger(触发器);
+    if (区域 != null && 区域 !== 0) jass.RemoveRegion(区域);
+    return null;
+  }
+
+  jass.RegionAddRect(区域, 矩形);
+  if (safeTriggerAddAction(触发器, 回调) == null) {
+    safeDestroyTrigger(触发器);
+    jass.RemoveRegion(区域);
+    return null;
+  }
+
+  const 取消监听 = registerEnterRegionTrigger(触发器, 区域, 过滤器);
+  let 已取消 = false;
+  function 取消(this: void): void {
+    if (已取消) return;
+    已取消 = true;
+    取消监听();
+    safeDestroyTrigger(触发器);
+    jass.RemoveRegion(区域);
+  }
+  return { 区域, 触发器, 取消 };
 }
 
 export {};

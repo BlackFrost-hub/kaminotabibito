@@ -17,13 +17,13 @@ local ____require_result_3 = require("系统.03．技能系统.00．技能模板
 local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_3["单位是否正在原生施法"]
 local _____7279_6B8A_903B_8F91_6620_5C04 = {}
 local function _____8718_86DB_5973_7687_53D7_51FB_55B7_5C04(_config, unit, source)
-    if jass.GetRandomInt(1, 8) ~= 1 then
+    if jass:GetRandomInt(1, 8) ~= 1 then
         return false
     end
     return _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["命令字串"] = "carrionswarm", ["施法方式"] = "对点", ["目标来源"] = "伤害来源坐标"}, unit, source)
 end
 local function _____8725_8734_602A_7269_53D7_51FB_55B7_706B(_config, unit, source)
-    if jass.GetRandomInt(1, 8) ~= 1 then
+    if jass:GetRandomInt(1, 8) ~= 1 then
         return false
     end
     return _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["命令字串"] = "breathoffire", ["施法方式"] = "对点", ["目标来源"] = "伤害来源坐标"}, unit, source)
@@ -31,12 +31,12 @@ end
 local function _____6E56_5E95_5143_7D20_53D7_51FB_8FDE_62DB(_config, unit, source)
     local executed = false
     executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = "A04X", ["施法方式"] = "对单位", ["目标来源"] = "伤害来源", ["下单归属"] = "中立敌对"}, unit, source) or executed
-    local skillId = jass.GetRandomInt(1, 2) == 1 and "A04Q" or "A04P"
+    local skillId = jass:GetRandomInt(1, 2) == 1 and "A04Q" or "A04P"
     executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = skillId, ["施法方式"] = "对单位", ["目标来源"] = "伤害来源", ["下单归属"] = "中立敌对"}, unit, source) or executed
     return executed
 end
 local function _____795E_7F57_6218_58EB_53D7_51FB_968F_673A_6280_80FD(_config, unit, source)
-    local roll = jass.GetRandomInt(1, 3)
+    local roll = jass:GetRandomInt(1, 3)
     local executed = false
     executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = "A0HA", ["施法方式"] = "立即", ["下单归属"] = "中立敌对", ["与伤害来源距离不大于"] = 450}, unit, source) or executed
     if not executed and roll == 3 then
@@ -45,14 +45,14 @@ local function _____795E_7F57_6218_58EB_53D7_51FB_968F_673A_6280_80FD(_config, u
     return executed
 end
 local function _____6BD4_90A3_540D_5C45_5929_5B50_53D7_51FB_968F_673A_6280_80FD(_config, unit, source)
-    if jass.GetRandomInt(1, 2) == 1 then
+    if jass:GetRandomInt(1, 2) == 1 then
         return false
     end
     local executed = false
     if GetUnitLifePercentBJ(unit) <= 70 then
         executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = "A0H5", ["施法方式"] = "立即", ["下单归属"] = "中立敌对"}, unit, source) or executed
     end
-    if (jass.GetUnitX(source) - jass.GetUnitX(unit)) * (jass.GetUnitX(source) - jass.GetUnitX(unit)) + (jass.GetUnitY(source) - jass.GetUnitY(unit)) * (jass.GetUnitY(source) - jass.GetUnitY(unit)) <= 1000 * 1000 then
+    if (jass:GetUnitX(source) - jass:GetUnitX(unit)) * (jass:GetUnitX(source) - jass:GetUnitX(unit)) + (jass:GetUnitY(source) - jass:GetUnitY(unit)) * (jass:GetUnitY(source) - jass:GetUnitY(unit)) <= 1000 * 1000 then
         if GetUnitLifePercentBJ(unit) <= 85 then
             executed = _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["技能ID"] = "A0H3", ["施法方式"] = "立即", ["下单归属"] = "中立敌对"}, unit, source) or executed
         end
@@ -70,7 +70,7 @@ local function _____6C34_89E6_987B_8303_56F4_7F20_7ED5(_config, unit, _source)
     return _____5C1D_8BD5_6267_884C_53D7_51FB_6280_80FD({["命令字串"] = "entanglingroots", ["施法方式"] = "对单位", ["目标来源"] = "伤害来源"}, unit, targets[1])
 end
 local function _____5947_5999_9E7F_53D7_51FB_53CD_5236(_config, unit, source)
-    if jass.GetUnitAbilityLevel(unit, BUFF_BLOODLUST) > 0 then
+    if jass:GetUnitAbilityLevel(unit, BUFF_BLOODLUST) > 0 then
         return false
     end
     local executed = false

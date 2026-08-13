@@ -3,10 +3,11 @@
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, callbackId: number) => void;
-  getServerTime: (this: void) => number;
+const { 创建可取消任务组 } = require("系统.00．核心系统.05．中心计时器") as {
+  创建可取消任务组: (this: void) => {
+    添加延迟: (this: void, 毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any) => number;
+    清空: (this: void) => void;
+  };
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -22,6 +23,10 @@ const { safeForForce } = require("系统.00．核心系统.07．联机安全工�
 const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
+const { 暂停并设置无敌安全, 解除暂停并取消无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
+  解除暂停并取消无敌安全: (this: void, unit: any, source: string) => boolean;
 };
 const { ModifyGateBJ, ForGroupBJ, SetTimeOfDay } = require("lib.扩展函数.BJ函数.07．杂项") as {
   ModifyGateBJ: (this: void, gateOperation: number, d: any) => void;
@@ -106,7 +111,6 @@ const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
 const SetItemPosition = jass.SetItemPosition as (this: void, whichItem: any, x: number, y: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
 const UnitAddItem = jass.UnitAddItem as (this: void, whichUnit: any, whichItem: any) => boolean;
@@ -146,8 +150,7 @@ interface 延迟执行记录 {
   隐藏阻挡?: string;
 }
 
-const 延迟执行任务: Array<{ dueTime: number; 记录: 延迟执行记录 }> = [];
-let 延迟执行扫描ID = 0;
+const 延迟执行任务组 = 创建可取消任务组();
 
 function maxNum(this: void, a: number, b: number): number {
   return a > b ? a : b;
@@ -178,36 +181,12 @@ function 执行延迟记录(this: void, 记录: 延迟执行记录): void {
   }
 }
 
-function on延迟执行扫描(this: void): void {
-  const now = getServerTime();
-  let writeIndex = 0;
-  for (let i = 0; i < 延迟执行任务.length; i++) {
-    const task = 延迟执行任务[i];
-    if (now >= task.dueTime) {
-      执行延迟记录(task.记录);
-      continue;
-    }
-    延迟执行任务[writeIndex] = task;
-    writeIndex++;
-  }
-  for (let i = 延迟执行任务.length - 1; i >= writeIndex; i--) {
-    延迟执行任务.pop();
-  }
-  if (延迟执行任务.length === 0 && 延迟执行扫描ID !== 0) {
-    removePeriodicCallback(延迟执行扫描ID);
-    延迟执行扫描ID = 0;
-  }
-}
-
 function 安排延迟执行(this: void, 秒数: number, 记录: 延迟执行记录): void {
   if (!(秒数 > 0)) {
     执行延迟记录(记录);
     return;
   }
-  延迟执行任务.push({ dueTime: getServerTime() + 秒数 * 1000, 记录 });
-  if (延迟执行扫描ID === 0) {
-    延迟执行扫描ID = addPeriodicCallback(10, on延迟执行扫描);
-  }
+  延迟执行任务组.添加延迟(秒数 * 1000, 执行延迟记录, 记录);
 }
 
 function 取参数文本(this: void, 参数: 剧情动作参数表, key: string): string {
@@ -280,11 +259,16 @@ function on设置枚举英雄暂停无敌(this: void): void {
   const unit = GetEnumUnit();
   if (unit == null || unit === 0) return;
   if (当前玩家英雄控制暂停) {
-    添加单位暂停(unit, 剧情玩家英雄控制暂停来源);
+    if (当前玩家英雄无敌) {
+      暂停并设置无敌安全(unit, 剧情玩家英雄控制暂停来源);
+    } else {
+      添加单位暂停(unit, 剧情玩家英雄控制暂停来源);
+    }
   } else {
-    移除单位暂停(unit, 剧情玩家英雄控制暂停来源);
+    if (!解除暂停并取消无敌安全(unit, 剧情玩家英雄控制暂停来源)) {
+      移除单位暂停(unit, 剧情玩家英雄控制暂停来源);
+    }
   }
-  SetUnitInvulnerable(unit, 当前玩家英雄无敌);
 }
 
 function 向商店添加物品(this: void, unit: any, 物品名列表: string): void {
@@ -333,11 +317,16 @@ export function 设置触发单位控制状态(this: void, 暂停: boolean, 无�
   const unit = 读取触发单位();
   if (unit == null || unit === 0) return;
   if (暂停) {
-    添加单位暂停(unit, 剧情触发单位控制暂停来源);
+    if (无敌) {
+      暂停并设置无敌安全(unit, 剧情触发单位控制暂停来源);
+    } else {
+      添加单位暂停(unit, 剧情触发单位控制暂停来源);
+    }
   } else {
-    移除单位暂停(unit, 剧情触发单位控制暂停来源);
+    if (!解除暂停并取消无敌安全(unit, 剧情触发单位控制暂停来源)) {
+      移除单位暂停(unit, 剧情触发单位控制暂停来源);
+    }
   }
-  SetUnitInvulnerable(unit, 无敌);
 }
 
 export function 停止触发单位(this: void): void {

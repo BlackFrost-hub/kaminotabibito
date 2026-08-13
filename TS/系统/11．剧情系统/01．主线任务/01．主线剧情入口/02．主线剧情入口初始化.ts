@@ -31,6 +31,9 @@ const { registerUnitInRangeTrigger } = require("系统.00．核心系统.01．�
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
 };
+const { 登记外部任务NPC单位 } = require("系统.08．任务系统.00．配置表.04．NPC生成器") as {
+  登记外部任务NPC单位: (this: void, 任务ID: number, 单位: any) => boolean;
+};
 const { 查找主线剧情片段 } = require("../02．剧情步骤/02．剧情步骤播放器") as {
   查找主线剧情片段: (this: void, 片段ID: string) => any;
 };
@@ -85,6 +88,9 @@ function 记录NPC运行时(this: void, 配置: 主线NPC初始化配置, unit: 
   if (unit == null || unit === 0) return;
   NPC运行时表[配置.配置名] = unit;
   注册剧情运行时单位(`主线NPC.${配置.配置名}`, unit);
+  if (配置.任务NPC任务ID != null) {
+    登记外部任务NPC单位(配置.任务NPC任务ID, unit);
+  }
 }
 
 function 初始化单个NPC(this: void, 配置: 主线NPC初始化配置): void {

@@ -5,8 +5,12 @@ const jglobals = require("jass.globals") as any;
 const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
   获取矩形区域: (this: void, 名称: string) => any;
 };
-const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+const { 添加单位暂停, 释放单位暂停来源全部 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  释放单位暂停来源全部: (this: void, unit: any, source: string) => boolean;
+};
+const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
+  暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
 };
 const 沙漠食人魔二阶段待战暂停来源 = "剧情系统:沙漠食人魔二阶段待战";
 
@@ -62,8 +66,8 @@ const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePe
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
-const { EC_CreateEffect } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
-  EC_CreateEffect: (this: void, path: string, x: number, y: number, z: number, fac: number, size: number, speed: number, time: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; Z?: number; 面向角度?: number; 缩放?: number; 动画速度?: number; 持续秒?: number }) => any;
 };
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取当前剧情动作上下文, 写入当前剧情动作上下文 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
@@ -76,8 +80,6 @@ const GetUnitY = jass.GetUnitY as (this: void, whichUnit: any) => number;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const IssuePointOrder = jass.IssuePointOrder as (this: void, whichUnit: any, order: string, x: number, y: number) => boolean;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, whichUnit: any, flag: boolean) => void;
-const PauseUnit = jass.PauseUnit as (this: void, whichUnit: any, flag: boolean) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const IssueTargetOrder = jass.IssueTargetOrder as (this: void, whichUnit: any, order: string, targetWidget: any) => boolean;
 const UnitSuspendDecay = jass.UnitSuspendDecay as (this: void, whichUnit: any, flag: boolean) => void;
@@ -100,6 +102,7 @@ let 待开战目标单位: any = null;
 let 待处理一阶段死亡单位: any = null;
 let 玩家英雄延迟恢复ID = 0;
 let 玩家英雄暂停组: any = null;
+const 沙漠食人魔一阶段死亡玩家暂停来源 = "剧情系统:沙漠食人魔一阶段死亡现场";
 let 二阶段显现周期ID = 0;
 let 二阶段显现次数 = 0;
 let 一阶段死亡X = 0;
@@ -144,7 +147,7 @@ function 暂停死亡点附近玩家英雄并看向裂隙(this: void, 裂隙: an
     if (unit == null || unit === 0) break;
     GroupRemoveUnit(范围单位组, unit);
     if (!IsUnitInGroup(unit, 玩家英雄组)) continue;
-    PauseUnit(unit, true);
+    添加单位暂停(unit, 沙漠食人魔一阶段死亡玩家暂停来源);
     GroupAddUnit(玩家英雄暂停组, unit);
     SetUnitFacing(unit, YDWEAngleBetweenUnitsSafe(unit, 裂隙));
     StarOther_PanCameraToTimedUnitForPlayer(GetOwningPlayer(unit), 裂隙, 0.75);
@@ -159,7 +162,7 @@ function 恢复玩家英雄控制(this: void): void {
     const unit = FirstOfGroup(玩家英雄暂停组);
     if (unit == null || unit === 0) break;
     GroupRemoveUnit(玩家英雄暂停组, unit);
-    PauseUnit(unit, false);
+    释放单位暂停来源全部(unit, 沙漠食人魔一阶段死亡玩家暂停来源);
   }
   DestroyGroup(玩家英雄暂停组);
   玩家英雄暂停组 = null;
@@ -191,7 +194,7 @@ export function 执行沙漠食人魔一阶段死亡前置(this: void, 参数: �
   if (riftTypeId > 0) {
     riftUnit = 创建单位并登记排泄安全(Player(PLAYER_NEUTRAL_PASSIVE), riftTypeId, 27531.2, 13562.4, 0);
     注册剧情运行时单位(裂隙运行时键, riftUnit);
-    EC_CreateEffect("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl", 27531.2, 13562.4, 0, 270, 2, 1, 1.5);
+    创建点特效({ 模型路径: "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl", X: 27531.2, Y: 13562.4, 面向角度: 270, 缩放: 2, 动画速度: 1, 持续秒: 1.5 });
   }
   暂停死亡点附近玩家英雄并看向裂隙(riftUnit, 一阶段死亡X, 一阶段死亡Y);
   if (玩家英雄延迟恢复ID !== 0) removeDelayedCallback(玩家英雄延迟恢复ID);
@@ -201,7 +204,7 @@ export function 执行沙漠食人魔一阶段死亡前置(this: void, 参数: �
 export function 执行沙漠食人魔裂隙来客入场(this: void): void {
   const riftUnit = 读取剧情运行时单位(裂隙运行时键);
   if (riftUnit == null || riftUnit === 0) return;
-  EC_CreateEffect("war3mapImported\\blackhole.mdx", GetUnitX(riftUnit), GetUnitY(riftUnit), 0, 270, 2, 1, 1.5);
+  创建点特效({ 模型路径: "war3mapImported\\blackhole.mdx", X: GetUnitX(riftUnit), Y: GetUnitY(riftUnit), 面向角度: 270, 缩放: 2, 动画速度: 1, 持续秒: 1.5 });
   const lizardTypeId = stringToFourCCSafe("h01I");
   if (lizardTypeId > 0) {
     const angle = Math.atan2(一阶段死亡Y - GetUnitY(riftUnit), 一阶段死亡X - GetUnitX(riftUnit)) * 180 / Math.PI;
@@ -225,13 +228,13 @@ export function 执行沙漠食人魔裂隙来客对峙(this: void): void {
 
 function on沙漠食人魔二阶段显现脉冲(this: void): void {
   if (二阶段显现次数 >= 12) {
-    EC_CreateEffect("war3mapImported\\blood2022720203813.mdl", 一阶段死亡X, 一阶段死亡Y, 0, 270, 2.5, 1, 1.5);
+    创建点特效({ 模型路径: "war3mapImported\\blood2022720203813.mdl", X: 一阶段死亡X, Y: 一阶段死亡Y, 面向角度: 270, 缩放: 2.5, 动画速度: 1, 持续秒: 1.5 });
     if (二阶段显现周期ID !== 0) removePeriodicCallback(二阶段显现周期ID);
     二阶段显现周期ID = 0;
     return;
   }
   二阶段显现次数 += 1;
-  EC_CreateEffect("war3mapImported\\desecrate.mdl", 一阶段死亡X, 一阶段死亡Y, 0, 270, 2, 1, 1.5);
+  创建点特效({ 模型路径: "war3mapImported\\desecrate.mdl", X: 一阶段死亡X, Y: 一阶段死亡Y, 面向角度: 270, 缩放: 2, 动画速度: 1, 持续秒: 1.5 });
 }
 
 export function 执行沙漠食人魔裂隙来客施法(this: void): void {
@@ -252,7 +255,7 @@ function 完成沙漠食人魔二阶段显现脉冲(this: void): void {
   if (二阶段显现周期ID === 0) return;
   removePeriodicCallback(二阶段显现周期ID);
   二阶段显现周期ID = 0;
-  EC_CreateEffect("war3mapImported\\blood2022720203813.mdl", 一阶段死亡X, 一阶段死亡Y, 0, 270, 2.5, 1, 1.5);
+    创建点特效({ 模型路径: "war3mapImported\\blood2022720203813.mdl", X: 一阶段死亡X, Y: 一阶段死亡Y, 面向角度: 270, 缩放: 2.5, 动画速度: 1, 持续秒: 1.5 });
 }
 
 export function 执行杀戮食人魔显现(this: void, 参数: 剧情动作参数表): void {
@@ -265,11 +268,10 @@ export function 执行杀戮食人魔显现(this: void, 参数: 剧情动作参�
   const bossUnit = 创建单位并登记排泄安全(Player(PLAYER_NEUTRAL_AGGRESSIVE), bossTypeId, 一阶段死亡X, 一阶段死亡Y, 270);
   if (bossUnit == null || bossUnit === 0) return;
   YDUserDataSetSafe("string", "Boss", "杀戮食人魔", "unit", bossUnit);
-  添加单位暂停(bossUnit, 沙漠食人魔二阶段待战暂停来源);
-  SetUnitInvulnerable(bossUnit, true);
+  暂停并设置无敌安全(bossUnit, 沙漠食人魔二阶段待战暂停来源);
   jass.SetUnitAnimationByIndex(bossUnit, 11);
-  EC_CreateEffect("war3mapImported\\desecrate.mdl", 一阶段死亡X, 一阶段死亡Y, 0, 270, 4, 1, 1.5);
-  EC_CreateEffect("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl", 一阶段死亡X, 一阶段死亡Y, 0, 270, 2, 1, 1.5);
+  创建点特效({ 模型路径: "war3mapImported\\desecrate.mdl", X: 一阶段死亡X, Y: 一阶段死亡Y, 面向角度: 270, 缩放: 4, 动画速度: 1, 持续秒: 1.5 });
+  创建点特效({ 模型路径: "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl", X: 一阶段死亡X, Y: 一阶段死亡Y, 面向角度: 270, 缩放: 2, 动画速度: 1, 持续秒: 1.5 });
   QuestMessageBJ(GetPlayersAll(), jglobals.bj_QUESTMESSAGE_WARNING, `？？：${GetUnitName(bossUnit)}`);
   const 显现音效 = jglobals.gg_snd_GWSY07;
   if (显现音效 != null && 显现音效 !== 0) PlaySoundBJ(显现音效);
@@ -282,7 +284,7 @@ export function 执行杀戮食人魔显现(this: void, 参数: 剧情动作参�
       if (unit == null || unit === 0) break;
       GroupRemoveUnit(临时组, unit);
       if (IsUnitInGroup(unit, 玩家英雄组)) {
-        PauseUnit(unit, false);
+        释放单位暂停来源全部(unit, 沙漠食人魔一阶段死亡玩家暂停来源);
         StarOther_PanCameraToTimedUnitForPlayer(GetOwningPlayer(unit), bossUnit, 0.5);
       }
     }
@@ -303,7 +305,7 @@ export function 执行沙漠食人魔二阶段演出收束(this: void): void {
 
   const 裂隙 = 读取剧情运行时单位(裂隙运行时键);
   if (裂隙 != null && 裂隙 !== 0) {
-    EC_CreateEffect("war3mapImported\\blackhole.mdx", GetUnitX(裂隙), GetUnitY(裂隙), 0, 270, 2, 1, 1.5);
+    创建点特效({ 模型路径: "war3mapImported\\blackhole.mdx", X: GetUnitX(裂隙), Y: GetUnitY(裂隙), 面向角度: 270, 缩放: 2, 动画速度: 1, 持续秒: 1.5 });
     立即移除单位并取消排泄登记(裂隙);
   }
   清理剧情运行时单位(裂隙运行时键);
@@ -311,7 +313,7 @@ export function 执行沙漠食人魔二阶段演出收束(this: void): void {
   if (bossUnit != null && bossUnit !== 0) {
     const 台词音效 = jglobals.gg_snd_GWSY04;
     if (台词音效 != null && 台词音效 !== 0) PlaySoundBJ(台词音效);
-    EC_CreateEffect("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl", GetUnitX(bossUnit), GetUnitY(bossUnit), 0, 270, 2, 1, 1.5);
+    创建点特效({ 模型路径: "Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl", X: GetUnitX(bossUnit), Y: GetUnitY(bossUnit), 面向角度: 270, 缩放: 2, 动画速度: 1, 持续秒: 1.5 });
   }
 }
 

@@ -176,3 +176,28 @@ export const 教派学者技能配置 = {
     读条提示: '锁链正在覆盖战场',
   },
 } as const;
+
+export const 教派学者音效配置 = {
+  战斗开启: 'Sound\\Boss\\Scholar\\SFX\\scholar_combat_start_64k.mp3',
+  受击: 'Sound\\Boss\\Scholar\\SFX\\scholar_hit_64k.mp3',
+  死亡结算: 'Sound\\Boss\\Scholar\\SFX\\scholar_death_64k.mp3',
+  弹幕击落: 'Sound\\Boss\\Scholar\\SFX\\scholar_projectile_destroy_64k.mp3',
+  深渊之牢: {
+    牢笼锁定: 'Sound\\Boss\\Scholar\\SFX\\scholar_prison_lock_64k.mp3',
+    离开命中: 'Sound\\Boss\\Scholar\\SFX\\scholar_prison_leave_64k.mp3',
+    无伤反噬: 'Sound\\Boss\\Scholar\\SFX\\scholar_prison_backlash_64k.mp3',
+  },
+  冥神魔门: {
+    魔门开启: 'Sound\\Boss\\Scholar\\SFX\\scholar_gate_open_64k.mp3',
+    召唤物出现: 'Sound\\Boss\\Scholar\\SFX\\scholar_gate_summon_64k.mp3',
+    魔门被摧毁: 'Sound\\Boss\\Scholar\\SFX\\scholar_gate_destroy_64k.mp3',
+  },
+  冥之念欲: {
+    起手自损: 'Sound\\Boss\\Scholar\\SFX\\scholar_mind_cast_64k.mp3',
+    预警提示: 'Sound\\Boss\\Scholar\\SFX\\scholar_mind_warn_64k.mp3',
+    结算惩罚: 'Sound\\Boss\\Scholar\\SFX\\scholar_mind_punish_64k.mp3',
+  },
+  邪狱追魂冥法: {
+    锁链捆绑: 'Sound\\Boss\\Scholar\\SFX\\scholar_chain_bind_64k.mp3',
+  },
+} as const;

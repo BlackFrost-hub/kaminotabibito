@@ -16,15 +16,17 @@ local tryAttachQuestMarkerForConfigNpc = ____09_FF0ENPC_5934_9876_4E0E_6C14_6CE1
 -- 根据 NPC 配置表统一创建 NPC，并维护“配置 -> 已创建单位”的索引。
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_0 = require("平台扩展API动作")
+local _____8BBE_5355_4F4D_540D_5B57 = ____require_result_0["设单位名字"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
 local __pcallModelUnit = 0
 local __pcallModelPath = ""
 local function __pcallSetUnitModelBody(self)
-    japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath)
+    japi:DzSetUnitModel(__pcallModelUnit, __pcallModelPath)
 end
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_1.debugLog
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLog = ____require_result_2.debugLog
 --- 维护已创建 NPC 的稳定查表，供同步入口按配置键回查真实单位。
 local g_npcUnitByRequireId = __TS__New(Map)
 local g_npcUnitByNpcNameId = __TS__New(Map)
@@ -45,7 +47,7 @@ local function registerCreatedNpcUnit(npcConfig, unit, registerQuestId)
     if not unit then
         return
     end
-    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(unit) or 0
+    local handleId = type(jass.GetHandleId) == "function" and jass:GetHandleId(unit) or 0
     if handleId > 0 then
         g_npcConfigByUnitHandleId:set(handleId, npcConfig)
     end
@@ -106,7 +108,7 @@ local function onNpcSetModelDelayed()
             "NPC生成器",
             "设置单位模型失败（已忽略）",
             ctx.npcLabel,
-            "model=" .. tostring(ctx.modelPath)
+            "model=" .. tostring(nil, ctx.modelPath)
         )
     end
 end
@@ -132,7 +134,7 @@ local function createSingleNPC(npcConfig, registerQuestId)
             nil,
             "NPC生成器",
             "配置不完整，跳过:",
-            tostring(npcConfig["NPC配置名"])
+            tostring(nil, npcConfig["NPC配置名"])
         )
         return nil
     end
@@ -153,16 +155,19 @@ local function createSingleNPC(npcConfig, registerQuestId)
             nil,
             "NPC生成器",
             "创建单位失败:",
-            tostring(npcConfig["NPC配置名"]),
+            tostring(nil, npcConfig["NPC配置名"]),
             ("(" .. unitCode) .. ")"
         )
         return nil
+    end
+    if npcConfig["NPC名称"] then
+        _____8BBE_5355_4F4D_540D_5B57(unit, npcConfig["NPC名称"])
     end
     if npcConfig["模型路径"] then
         scheduleSetUnitModel(
             unit,
             npcConfig["模型路径"],
-            tostring(npcConfig["NPC配置名"])
+            tostring(nil, npcConfig["NPC配置名"])
         )
     end
     runNpcInitAction(nil, unit, npcConfig["初始化动作"])
@@ -172,9 +177,9 @@ local function createSingleNPC(npcConfig, registerQuestId)
         nil,
         "NPC生成器",
         "成功创建NPC:",
-        tostring(npcConfig["NPC配置名"]),
+        tostring(nil, npcConfig["NPC配置名"]),
         "at",
-        ((("(" .. tostring(npcConfig["坐标X"])) .. ", ") .. tostring(npcConfig["坐标Y"])) .. ")"
+        ((("(" .. tostring(nil, npcConfig["坐标X"])) .. ", ") .. tostring(nil, npcConfig["坐标Y"])) .. ")"
     )
     return unit
 end
@@ -216,7 +221,7 @@ ____exports["按任务ID创建NPC"] = function(_____4EFB_52A1ID)
             nil,
             "NPC生成器",
             "未找到任务ID对应的NPC:",
-            tostring(_____4EFB_52A1ID)
+            tostring(nil, _____4EFB_52A1ID)
         )
         return nil
     end
@@ -225,9 +230,9 @@ ____exports["按任务ID创建NPC"] = function(_____4EFB_52A1ID)
             nil,
             "NPC生成器",
             "NPC未启用:",
-            tostring(npcConfig["NPC配置名"]),
+            tostring(nil, npcConfig["NPC配置名"]),
             "(任务ID:",
-            tostring(_____4EFB_52A1ID) .. ")"
+            tostring(nil, _____4EFB_52A1ID) .. ")"
         )
         return nil
     end
@@ -243,25 +248,25 @@ ____exports["获取全部NPC配置"] = function()
     return {table.unpack(_____652F_7EBFNPC_914D_7F6E_5217_8868)}
 end
 ____exports["按任务ID查找已创建NPC"] = function(_____4EFB_52A1ID)
-    local ____temp_2 = g_npcUnitByRequireId:get(_____4EFB_52A1ID)
-    if ____temp_2 == nil then
-        ____temp_2 = nil
+    local ____temp_3 = g_npcUnitByRequireId:get(_____4EFB_52A1ID)
+    if ____temp_3 == nil then
+        ____temp_3 = nil
     end
-    return ____temp_2
+    return ____temp_3
 end
 ____exports["按名称查找已创建NPC"] = function(____NPC_540D_79F0)
     if not ____NPC_540D_79F0 then
         return nil
     end
-    local ____temp_3 = g_npcUnitByNpcNameId:get(____NPC_540D_79F0)
-    if ____temp_3 == nil then
-        ____temp_3 = g_npcUnitByDisplayName:get(____NPC_540D_79F0)
+    local ____temp_4 = g_npcUnitByNpcNameId:get(____NPC_540D_79F0)
+    if ____temp_4 == nil then
+        ____temp_4 = g_npcUnitByDisplayName:get(____NPC_540D_79F0)
     end
-    local ____temp_3_4 = ____temp_3
-    if ____temp_3_4 == nil then
-        ____temp_3_4 = nil
+    local ____temp_4_5 = ____temp_4
+    if ____temp_4_5 == nil then
+        ____temp_4_5 = nil
     end
-    return ____temp_3_4
+    return ____temp_4_5
 end
 --- 按任务中的结构化配置创建唯一的提交 NPC，不覆盖开始 NPC 的任务 ID 索引。
 ____exports["创建任务结束NPC"] = function(_____4EFB_52A1)
@@ -324,7 +329,7 @@ ____exports["登记外部任务NPC单位"] = function(_____4EFB_52A1ID, _____535
     if not npcConfig then
         return false
     end
-    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(_____5355_4F4D) or 0
+    local handleId = type(jass.GetHandleId) == "function" and jass:GetHandleId(_____5355_4F4D) or 0
     if handleId > 0 and g_npcConfigByUnitHandleId:get(handleId) == npcConfig then
         return true
     end
@@ -337,7 +342,7 @@ ____exports["按单位查找NPC配置"] = function(_____5355_4F4D)
     if not _____5355_4F4D or _____5355_4F4D == 0 then
         return nil
     end
-    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(_____5355_4F4D) or 0
+    local handleId = type(jass.GetHandleId) == "function" and jass:GetHandleId(_____5355_4F4D) or 0
     if handleId <= 0 then
         return nil
     end

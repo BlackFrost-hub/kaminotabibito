@@ -2,7 +2,7 @@
 
 import { 杀戮食人魔单位技能配置 } from './00．配置';
 import { 获取或创建杀戮食人魔上下文, type 杀戮食人魔运行时上下文 } from './01．运行时上下文';
-import { 杀戮食人魔技能配置 } from './02．数值与表现配置';
+import { 杀戮食人魔技能配置, 杀戮食人魔音效配置 } from './02．数值与表现配置';
 import { 食人魔BuffID } from '../../../../../05．Buff系统/03．Buff表/01．Boss/01．主线Boss/08．食人魔';
 import { 注册单位技能壳监听 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器';
 import { 提交预计算Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
@@ -23,9 +23,8 @@ const { registerManualBuff, getBuffRuntime } = require('系统.05．Buff系统.0
 const { 单位是否免疫负面效果BuffID } = require('系统.05．Buff系统.06．负面效果免疫状态') as {
   单位是否免疫负面效果BuffID: (this: void, unit: any, buffID: string) => boolean;
 };
-const { 获取Boss技能随机敌对英雄, 获取Boss技能敌对英雄列表 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
-  获取Boss技能随机敌对英雄: (this: void, boss: any) => any;
-  获取Boss技能敌对英雄列表: (this: void, boss: any) => any[];
+const { 获取Boss技能随机敌对英雄 } = require('系统.01．单位系统.06．仇恨系统.05．技能目标选择') as {
+  获取Boss技能随机敌对英雄: (this: void, boss: any, centerUnit?: any, radius?: number, excludeList?: any[], filter?: (this: void, hero: any) => boolean) => any;
 };
 const { 取当前有效玩家人数 } = require('系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数') as {
   取当前有效玩家人数: (this: void) => number;
@@ -49,6 +48,9 @@ const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通�
 const { 通用物品技能槽位配置表 } = require('系统.02．物品系统.15．装备技能.03．主动技能.00．公共.02．通用物品技能槽位配置') as {
   通用物品技能槽位配置表: Array<{ 技能ID: string }>;
 };
+const { 播放Boss坐标音效 } = require('系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放') as {
+  播放Boss坐标音效: (this: void, path: string, x: number, y: number, cutoff: number) => void;
+};
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
@@ -59,7 +61,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const GetRandomInt = jass.GetRandomInt as (low: number, high: number) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
@@ -106,19 +107,18 @@ function on施加深渊魔咒(this: void, variable?: any): void {
     sourceName: '杀戮食人魔-深渊魔咒',
   });
   const runtime = getBuffRuntime(data.目标单位, 食人魔BuffID.深渊魔咒);
+  播放Boss坐标音效(杀戮食人魔音效配置.深渊魔咒.生效, GetUnitX(data.目标单位), GetUnitY(data.目标单位), 杀戮食人魔音效配置.默认裁断距离);
   debugLogForce('杀戮食人魔-深渊魔咒', '诅咒Buff施加诊断', 'bossHid=', GetHandleId(data.Boss单位), 'targetHid=', GetHandleId(data.目标单位), 'targetTypeId=', GetUnitTypeId(data.目标单位), 'targetImmune=', targetImmune, 'runtimeExists=', runtime != null, 'remaining=', runtime?.remaining ?? 0);
 }
 
 function 取随机转移目标(this: void, boss: any, cursedHero: any): any {
   if (取当前有效玩家人数() <= 1) return cursedHero;
-  const heroes = 获取Boss技能敌对英雄列表(boss);
-  const candidates: any[] = [];
-  for (let i = 0; i < heroes.length; i++) {
-    const hero = heroes[i];
-    if (hero !== cursedHero && 单位存活(hero) && getRegisteredPlayerHero(GetOwningPlayer(hero)) === hero) candidates.push(hero);
-  }
-  if (candidates.length === 0) return cursedHero;
-  return candidates[GetRandomInt(0, candidates.length - 1)];
+  const receiver = 获取Boss技能随机敌对英雄(boss, undefined, undefined, [cursedHero], 允许诅咒转移目标);
+  return receiver ?? cursedHero;
+}
+
+function 允许诅咒转移目标(this: void, hero: any): boolean {
+  return 单位存活(hero) && getRegisteredPlayerHero(GetOwningPlayer(hero)) === hero;
 }
 
 function 是物品技能(this: void, 技能ID: number): boolean {

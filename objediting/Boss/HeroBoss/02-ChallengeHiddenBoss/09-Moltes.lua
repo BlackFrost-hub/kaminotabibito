@@ -9,7 +9,7 @@ local moltes = createMeleeBossHeroUnit('N05W', '古木之蚀·莫尔特斯', {
   description = '古木之蚀·莫尔特斯',
 
   level = 35,
-  hp = 36800,
+  hp = 29440,
   mana = 1000,
   initialMana = 1000,
   manaRegen = 5.0,
@@ -20,7 +20,7 @@ local moltes = createMeleeBossHeroUnit('N05W', '古木之蚀·莫尔特斯', {
   strengthPerLevel = 1,
   agilityPerLevel = 1,
   intelligencePerLevel = 1,
-  damageBase = 1840,
+  damageBase = 1472,
   damageDice = 1,
   damageSides = 1,
   attackCooldown = 1.15,

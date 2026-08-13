@@ -19,10 +19,12 @@ const 快捷键技能模块 = require("系统.03．技能系统.04．快捷键�
   initBBTeleport?: (this: void) => void;
   initSwitchBag?: (this: void) => void;
   init挑战技能?: (this: void) => void;
+  init环境互动?: (this: void) => void;
 };
 快捷键技能模块.initBBTeleport?.();
 快捷键技能模块.initSwitchBag?.();
 快捷键技能模块.init挑战技能?.();
+快捷键技能模块.init环境互动?.();
 
 require("系统.03．技能系统.01．显示技能名字");
 

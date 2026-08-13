@@ -1,6 +1,6 @@
 local ____lualib = require("lualib_bundle")
-local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringTrim = ____lualib.__TS__StringTrim
+local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__Number = ____lualib.__TS__Number
@@ -62,6 +62,13 @@ end
 local function isEquipItemMessageSilenced()
     return _____88C5_5907_7269_54C1_6D88_606F_9759_9ED8_5C42_6570 > 0
 end
+local function _____5E94_8DF3_8FC7_88C5_5907_5C5E_6027_7ED3_7B97(itemData)
+    local itemType = itemData.type
+    if itemType == "任务" or itemType == "药剂" or itemType == "食品" then
+        return true
+    end
+    return __TS__StringTrim(tostring(itemData.PowerUP or "")) ~= "" and itemData["PowerUP仍结算装备属性"] ~= true
+end
 local _____88C5_5907_89C6_91CEBuffID = "C034"
 local _____88C5_5907_89C6_91CEBuff_663E_793A_6301_7EED_65F6_95F4 = 999999
 local _____4E0D_8D70_88C5_5907_7CFB_7EDF_7269_54C1ID_8868 = {I0FK = true, I0FL = true, I0E5 = true}
@@ -99,19 +106,19 @@ local function parsePrimaryBonus(self, s, primaryStr)
         do
             local idx = (string.find(p, "+", nil, true) or 0) - 1
             if idx < 0 then
-                goto __continue13
+                goto __continue15
             end
             local name = __TS__StringTrim(__TS__StringSubstring(p, 0, idx))
             local valStr = __TS__StringTrim(__TS__StringSubstring(p, idx + 1))
             local key = itemRelatedFns.NAME_TO_KEY[name]
             if not key then
-                goto __continue13
+                goto __continue15
             end
             local isPct = (string.find(valStr, "%", nil, true) or 0) - 1 >= 0
             local num = __TS__ParseFloat(valStr) or 0
             out[key] = (out[key] or 0) + (isPct and num / 100 or num)
         end
-        ::__continue13::
+        ::__continue15::
     end
     return out
 end
@@ -131,8 +138,7 @@ ____exports["处理合成消耗装备属性"] = function(unit, item, consumedCou
     if not itemData then
         return
     end
-    local skipType = itemData.type
-    if skipType == "任务" or skipType == "药剂" or skipType == "食品" or __TS__StringTrim(tostring(itemData.PowerUP or "")) ~= "" then
+    if _____5E94_8DF3_8FC7_88C5_5907_5C5E_6027_7ED3_7B97(itemData) then
         return
     end
     local charges = GetItemCharges(item)
@@ -171,11 +177,11 @@ ____exports["处理合成消耗装备属性"] = function(unit, item, consumedCou
         do
             local value = merged[e.key]
             if value == nil or value == 0 then
-                goto __continue28
+                goto __continue30
             end
             playerStats[#playerStats + 1] = {name = e.name, value = -value * mult}
         end
-        ::__continue28::
+        ::__continue30::
     end
     local tempReadMap = applyEquipStatsTS(unit, playerStats)
     if tempReadMap["视野"] ~= nil then
@@ -194,7 +200,7 @@ local function handleItemEvent(self, unit, item, isPickup)
     if isSpecialUnit(nil, unit) then
         return
     end
-    local player = jass.GetOwningPlayer(unit)
+    local player = jass:GetOwningPlayer(unit)
     local isDrop = not isPickup
     local skipFlag = equipShared.skipNextDrop
     if isDrop and skipFlag then
@@ -219,7 +225,7 @@ local function handleItemEvent(self, unit, item, isPickup)
             local displayName = ____temp_13 or idStr
             local border = "|cff606060────────────────────────|r"
             local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 player,
                 0,
                 0.01,
@@ -229,15 +235,14 @@ local function handleItemEvent(self, unit, item, isPickup)
         end
         return
     end
-    local skipType = itemData.type
-    if skipType == "任务" or skipType == "药剂" or skipType == "食品" or __TS__StringTrim(tostring(itemData.PowerUP or "")) ~= "" then
+    if _____5E94_8DF3_8FC7_88C5_5907_5C5E_6027_7ED3_7B97(itemData) then
         return
     end
     local isConsumable = isDrop and itemData.hot ~= nil
     if isPickup and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit.equipLimitWouldAllowPickup(unit, item) then
         return
     end
-    local charges = jass.GetItemCharges(item)
+    local charges = jass:GetItemCharges(item)
     local itemNamePlain = _____53BB_9664_989C_8272_4EE3_7801(tostring(itemData.name or ""))
     local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_15
     if _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0(itemNamePlain) then
@@ -289,8 +294,8 @@ local function handleItemEvent(self, unit, item, isPickup)
     for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
         addStat(nil, merged[e.key], e.name)
     end
-    local owner = jass.GetOwningPlayer(unit)
-    local playerName = jass.GetPlayerName(owner) or ""
+    local owner = jass:GetOwningPlayer(unit)
+    local playerName = jass:GetPlayerName(owner) or ""
     local actionText = isAdd and "获得" or "丢弃"
     local levelText = __TS__StringTrim(tostring(itemData.level or ""))
     local _____88C5_5907_539F_540D = itemData.name or "未知"
@@ -304,10 +309,10 @@ local function handleItemEvent(self, unit, item, isPickup)
             local isPct = itemRelatedFns["是否百分比装备属性名"](stat.name)
             local v = isPct and stat.value * 100 or stat.value
             local nearZero = v > -0.000001 and v < 0.000001
-            local vStr = nearZero and "0" or tostring(v)
+            local vStr = nearZero and "0" or tostring(nil, v)
             msg = msg .. (((" " .. stat.name) .. sign) .. vStr) .. (isPct and "%" or "")
         end
-        jass.DisplayTimedTextToPlayer(
+        jass:DisplayTimedTextToPlayer(
             player,
             0,
             0.01,
@@ -331,17 +336,19 @@ local function handleItemEvent(self, unit, item, isPickup)
             do
                 local statName = playerStats[i + 1].name
                 if statName == "移动速度" then
-                    goto __continue55
+                    goto __continue57
                 end
                 local val = tempReadMap[statName] ~= nil and tempReadMap[statName] or 0
                 local num = __TS__Number(val)
                 local isPct = itemRelatedFns["是否百分比装备属性名"](statName)
                 local nearZero = num > -0.000001 and num < 0.000001
-                local valStr = isPct and (nearZero and "0%" or tostring(jass.R2I(num * 1000 + 0.5) / 10
-                ) .. "%") or (nearZero and "0" or tostring(num))
+                local valStr = isPct and (nearZero and "0%" or tostring(
+                    nil,
+                    jass:R2I(num * 1000 + 0.5) / 10
+                ) .. "%") or (nearZero and "0" or tostring(nil, num))
                 test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
             end
-            ::__continue55::
+            ::__continue57::
             i = i + 1
         end
     end
@@ -357,10 +364,10 @@ local function handleItemEvent(self, unit, item, isPickup)
         end
         local ms = ____equipMovespeed_getMaxMovespeed2Info_21(equipMovespeed, ____unit_20, ____isDrop_19)
         if ms.value > 0 then
-            test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
+            test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(nil, ms.value)
         end
         if ms.value > 0 and ms.name ~= "" and ms.count >= 2 and not isEquipItemMessageSilenced() then
-            jass.DisplayTimedTextToPlayer(
+            jass:DisplayTimedTextToPlayer(
                 owner,
                 0,
                 0.02,
@@ -370,7 +377,7 @@ local function handleItemEvent(self, unit, item, isPickup)
         end
     end
     if #test5Parts > 0 and not isEquipItemMessageSilenced() then
-        jass.DisplayTimedTextToPlayer(
+        jass:DisplayTimedTextToPlayer(
             owner,
             0,
             0.02,

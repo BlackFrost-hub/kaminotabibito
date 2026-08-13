@@ -120,27 +120,27 @@ local function initTargetOrderEvent()
         return
     end
     targetInitialized = true
-    local trig = jass.CreateTrigger()
+    local trig = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(trig, ____exports.ORDER_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER)
-    jass.TriggerAddAction(trig, dispatchTargetOrder)
+    jass:TriggerAddAction(trig, dispatchTargetOrder)
 end
 local function initPointOrderEvent()
     if pointInitialized then
         return
     end
     pointInitialized = true
-    local trig = jass.CreateTrigger()
+    local trig = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(trig, ____exports.ORDER_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_ISSUED_POINT_ORDER)
-    jass.TriggerAddAction(trig, dispatchPointOrder)
+    jass:TriggerAddAction(trig, dispatchPointOrder)
 end
 local function initImmediateOrderEvent()
     if immediateInitialized then
         return
     end
     immediateInitialized = true
-    local trig = jass.CreateTrigger()
+    local trig = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(trig, ____exports.ORDER_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_ISSUED_ORDER)
-    jass.TriggerAddAction(trig, dispatchImmediateOrder)
+    jass:TriggerAddAction(trig, dispatchImmediateOrder)
 end
 function ____exports.registerTargetOrderListener(callback)
     if type(callback) ~= "function" then

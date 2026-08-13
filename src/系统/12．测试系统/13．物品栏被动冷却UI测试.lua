@@ -29,7 +29,7 @@ local function _____53E5_67C4_6709_6548(handle)
     return handle ~= nil and handle ~= 0
 end
 local function _____5F53_524D_6BEB_79D2()
-    return os.clock() * 1000
+    return os:clock() * 1000
 end
 local function _____662F_672C_5730_73A9_5BB6(player)
     if not _____53E5_67C4_6709_6548(player) then

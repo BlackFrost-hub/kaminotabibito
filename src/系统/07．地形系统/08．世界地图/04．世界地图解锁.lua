@@ -76,7 +76,7 @@ local function _____5904_7406_65C5_884C_5956_52B1(unit, _____914D_7F6E_7D22_5F15
     if _____914D_7F6E == nil then
         return
     end
-    local _____5B57_6BB5 = "旅行" .. tostring(_____914D_7F6E["旅行编号"])
+    local _____5B57_6BB5 = "旅行" .. tostring(nil, _____914D_7F6E["旅行编号"])
     if ____YD_5B89_5168_7248.YDUserDataGetSafe("unit", unit, _____5B57_6BB5, "boolean") == true then
         return
     end

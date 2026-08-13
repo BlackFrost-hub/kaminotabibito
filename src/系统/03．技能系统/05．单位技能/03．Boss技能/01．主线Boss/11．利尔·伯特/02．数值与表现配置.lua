@@ -113,4 +113,11 @@ ____exports["利尔伯特技能配置"] = {["正义审判"] = {
     ["读条标题"] = "检查",
     ["读条提示"] = "利尔·伯特正在检查装备"
 }}
+____exports["利尔伯特音效配置"] = {
+    ["默认裁断距离"] = 2800,
+    ["正义审判"] = {["审判命中"] = "Sound\\Boss\\Liberte\\SFX\\liberte_judgement_hit_64k.mp3"},
+    ["裂地斩"] = {["蓄力"] = "Sound\\Boss\\Liberte\\SFX\\liberte_ground_charge_64k.mp3", ["爆炸命中"] = "Sound\\Boss\\Liberte\\SFX\\liberte_ground_boom_64k.mp3"},
+    ["审判拷问"] = {["锁定"] = "Sound\\Boss\\Liberte\\SFX\\liberte_torture_lock_64k.mp3", ["结算命中"] = "Sound\\Boss\\Liberte\\SFX\\liberte_torture_settle_64k.mp3"},
+    ["检查"] = {["装备抽取"] = "Sound\\Boss\\Liberte\\SFX\\liberte_check_seize_64k.mp3", ["失败惩罚"] = "Sound\\Boss\\Liberte\\SFX\\liberte_check_punish_64k.mp3"}
+}
 return ____exports
