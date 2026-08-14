@@ -17,18 +17,14 @@ function _____9650_523601(value)
     return value
 end
 function _____683C_5F0F_5316_6570_503C(value)
-    return tostring(
-        nil,
-        math:floor(value + 0.5)
+    return tostring(math.floor(value + 0.5)
     )
 end
 function _____683C_5F0F_5316_79D2_6570(value)
     if not (value > 0) then
         return "0.0"
     end
-    return tostring(
-        nil,
-        math:floor(value * 10 + 0.5) / 10
+    return tostring(math.floor(value * 10 + 0.5) / 10
     )
 end
 function _____4ECE_4E16_754C_62A4_76FE_6761_5217_8868_79FB_9664(bar)
@@ -288,7 +284,7 @@ ____exports["创建世界坐标护盾条"] = function(_____53C2_6570)
     local id = _____4E0B_4E00_4E2A_4E16_754C_62A4_76FE_6761ID
     _____4E0B_4E00_4E2A_4E16_754C_62A4_76FE_6761ID = _____4E0B_4E00_4E2A_4E16_754C_62A4_76FE_6761ID + 1
     local parent = _____53D6_4E16_754C_62A4_76FE_6761_7236_5E27()
-    local suffix = tostring(nil, id)
+    local suffix = tostring(id)
     local root = _____521B_5EFA_8D34_56FE_5E27("WorldShieldBarRoot_" .. suffix, parent, _____62A4_76FE_6761_5E95_6846, _____4E16_754C_62A4_76FE_6761_5C42_7EA7)
     if root == 0 then
         return nil

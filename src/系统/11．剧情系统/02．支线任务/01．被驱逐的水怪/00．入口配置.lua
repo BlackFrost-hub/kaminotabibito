@@ -126,7 +126,7 @@ local function _____5B8C_6210_88AB_9A71_9010_7684_6C34_602A_4EFB_52A1_540E_6253_
         local _____73A9_5BB6ID = 0
         while _____73A9_5BB6ID < _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 do
             local _____73A9_5BB6 = Player(_____73A9_5BB6ID)
-            if _____73A9_5BB6 ~= nil and jass:GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
+            if _____73A9_5BB6 ~= nil and jass.GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
                 _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____5361_745F_62C9_5956_52B1_6C60ID, _____73A9_5BB6)
             end
             _____73A9_5BB6ID = _____73A9_5BB6ID + 1

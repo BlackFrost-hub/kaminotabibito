@@ -72,10 +72,10 @@ function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    return jass:LoadInteger(
+    return jass.LoadInteger(
         ht,
-        jass:StringHash(eventName),
-        jass:StringHash("index")
+        jass.StringHash(eventName),
+        jass.StringHash("index")
     )
 end
 function _____91CD_8BD5_6CE8_518C_541F_5531_6761Stes()

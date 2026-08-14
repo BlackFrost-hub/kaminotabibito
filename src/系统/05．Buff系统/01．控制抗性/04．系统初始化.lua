@@ -42,7 +42,7 @@ local function onControlResistDelayed()
     end
 end
 local function isAllowedPlayer(player)
-    local id = jass:GetPlayerId(player)
+    local id = jass.GetPlayerId(player)
     do
         local i = 0
         while i < #ALLOWED_PLAYERS do
@@ -55,13 +55,13 @@ local function isAllowedPlayer(player)
     return false
 end
 local function onSpellChannel(caster, abilityId)
-    if not isAllowedPlayer(jass:GetOwningPlayer(caster)) then
+    if not isAllowedPlayer(jass.GetOwningPlayer(caster)) then
         return
     end
     if isExcludedFromControlResist(nil, caster) then
         return
     end
-    local target = jass:GetSpellTargetUnit()
+    local target = jass.GetSpellTargetUnit()
     if target == nil then
         return
     end

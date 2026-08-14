@@ -137,8 +137,8 @@ local function getUserPlayers(self)
     do
         local i = 0
         while i < 4 do
-            local p = jass:Player(i)
-            if p and jass:GetPlayerController(p) == jass.MAP_CONTROL_USER then
+            local p = jass.Player(i)
+            if p and jass.GetPlayerController(p) == jass.MAP_CONTROL_USER then
                 out[#out + 1] = p
             end
             i = i + 1
@@ -149,21 +149,21 @@ end
 bindRewardParseHeroResolver(nil, getPlayerFirstHero)
 local function gainGold(self, players, value)
     for ____, p in ipairs(players) do
-        local cur = jass:GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
-        jass:SetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD, cur + value)
+        local cur = jass.GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD) or 0
+        jass.SetPlayerState(p, jass.PLAYER_STATE_RESOURCE_GOLD, cur + value)
     end
 end
 local function gainLumber(self, players, value)
     for ____, p in ipairs(players) do
-        local cur = jass:GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_LUMBER) or 0
-        jass:SetPlayerState(p, jass.PLAYER_STATE_RESOURCE_LUMBER, cur + value)
+        local cur = jass.GetPlayerState(p, jass.PLAYER_STATE_RESOURCE_LUMBER) or 0
+        jass.SetPlayerState(p, jass.PLAYER_STATE_RESOURCE_LUMBER, cur + value)
     end
 end
 local function gainExp(self, players, value)
     for ____, p in ipairs(players) do
         local hero = getPlayerFirstHero(nil, p)
         if hero then
-            jass:AddHeroXP(hero, value, true)
+            jass.AddHeroXP(hero, value, true)
         end
     end
 end
@@ -177,11 +177,11 @@ local function gainCurrentLevelNeededExpRate(players, rate)
             if not hero then
                 goto __continue18
             end
-            local level = jass:GetHeroLevel(hero)
+            local level = jass.GetHeroLevel(hero)
             local neededExp = DzGetUnitNeededXP(hero, level)
-            local value = jass:R2I(neededExp * rate)
+            local value = jass.R2I(neededExp * rate)
             if value > 0 then
-                jass:AddHeroXP(hero, value, true)
+                jass.AddHeroXP(hero, value, true)
             end
         end
         ::__continue18::
@@ -191,13 +191,13 @@ local function gainLevel(self, players, value)
     for ____, p in ipairs(players) do
         local hero = getPlayerFirstHero(nil, p)
         if hero then
-            local lv = jass:GetHeroLevel(hero)
-            jass:SetHeroLevel(hero, lv + value, false)
+            local lv = jass.GetHeroLevel(hero)
+            jass.SetHeroLevel(hero, lv + value, false)
         end
     end
 end
 local function gainHeroStat(self, players, statName, value)
-    local integerValue = jass:R2I(value)
+    local integerValue = jass.R2I(value)
     for ____, p in ipairs(players) do
         do
             local hero = getPlayerFirstHero(nil, p)
@@ -205,21 +205,21 @@ local function gainHeroStat(self, players, statName, value)
                 goto __continue27
             end
             if statName == "力量" then
-                jass:SetHeroStr(
+                jass.SetHeroStr(
                     hero,
-                    jass:GetHeroStr(hero, false) + integerValue,
+                    jass.GetHeroStr(hero, false) + integerValue,
                     true
                 )
             elseif statName == "敏捷" then
-                jass:SetHeroAgi(
+                jass.SetHeroAgi(
                     hero,
-                    jass:GetHeroAgi(hero, false) + integerValue,
+                    jass.GetHeroAgi(hero, false) + integerValue,
                     true
                 )
             elseif statName == "智力" then
-                jass:SetHeroInt(
+                jass.SetHeroInt(
                     hero,
-                    jass:GetHeroInt(hero, false) + integerValue,
+                    jass.GetHeroInt(hero, false) + integerValue,
                     true
                 )
             end
@@ -246,7 +246,7 @@ end
 local function _____83B7_53D6_5956_52B1_82F1_96C4_7B49_7EA7(triggerPlayerId)
     local ____temp_2
     if triggerPlayerId ~= nil then
-        ____temp_2 = jass:Player(triggerPlayerId)
+        ____temp_2 = jass.Player(triggerPlayerId)
     else
         ____temp_2 = nil
     end
@@ -258,7 +258,7 @@ local function _____83B7_53D6_5956_52B1_82F1_96C4_7B49_7EA7(triggerPlayerId)
         ____player_3 = nil
     end
     local hero = ____player_3
-    return hero and jass:GetHeroLevel(hero) or 1
+    return hero and jass.GetHeroLevel(hero) or 1
 end
 local function resolveAmountExpr(self, expr, triggerPlayerId)
     local _____72B6_6001 = {
@@ -299,7 +299,7 @@ local function executeOneRewardExpr(self, expr, triggerPlayerId)
         return
     end
     local allPlayers = getUserPlayers(nil)
-    local targetPlayers = ((string.find(text, "完成任务的玩家", nil, true) or 0) - 1 >= 0 or (string.find(text, "Player", nil, true) or 0) - 1 >= 0) and (triggerPlayerId ~= nil and ({jass:Player(triggerPlayerId)}) or ({})) or allPlayers
+    local targetPlayers = ((string.find(text, "完成任务的玩家", nil, true) or 0) - 1 >= 0 or (string.find(text, "Player", nil, true) or 0) - 1 >= 0) and (triggerPlayerId ~= nil and ({jass.Player(triggerPlayerId)}) or ({})) or allPlayers
     local payload = text
     local prefixes = {"所有玩家", "完成任务的玩家", "Player"}
     for ____, p in ipairs(prefixes) do

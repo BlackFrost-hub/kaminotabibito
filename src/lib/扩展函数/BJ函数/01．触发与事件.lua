@@ -7,7 +7,7 @@ local MAX_PLAYER_SLOTS = 16
 --- 为指定玩家注册单位事件
 -- 对应JASS: TriggerRegisterPlayerUnitEventSimple
 function ____exports.TriggerRegisterPlayerUnitEventSimple(trig, whichPlayer, whichEvent)
-    return jass:TriggerRegisterPlayerUnitEvent(trig, whichPlayer, whichEvent, nil)
+    return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, whichEvent, nil)
 end
 --- 为所有玩家注册单位事件
 -- 对应JASS: TriggerRegisterAnyUnitEventBJ
@@ -15,9 +15,9 @@ function ____exports.TriggerRegisterAnyUnitEventBJ(trig, whichEvent)
     do
         local index = 0
         while index < MAX_PLAYER_SLOTS do
-            jass:TriggerRegisterPlayerUnitEvent(
+            jass.TriggerRegisterPlayerUnitEvent(
                 trig,
-                jass:Player(index),
+                jass.Player(index),
                 whichEvent,
                 nil
             )
@@ -32,7 +32,7 @@ function ____exports.TriggerRegisterPlayerUnitEventForPlayers(trig, whichEvent)
         while i <= 7 do
             ____exports.TriggerRegisterPlayerUnitEventSimple(
                 trig,
-                jass:Player(i),
+                jass.Player(i),
                 whichEvent
             )
             i = i + 1
@@ -48,31 +48,31 @@ function ____exports.TriggerRegisterPlayerSelectionEventBJ(trig, whichPlayer, se
         if selectedEvent == nil or selectedEvent == nil then
             return nil
         end
-        return jass:TriggerRegisterPlayerUnitEvent(trig, whichPlayer, selectedEvent, nil)
+        return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, selectedEvent, nil)
     end
     if deselectedEvent == nil or deselectedEvent == nil then
         return nil
     end
-    return jass:TriggerRegisterPlayerUnitEvent(trig, whichPlayer, deselectedEvent, nil)
+    return jass.TriggerRegisterPlayerUnitEvent(trig, whichPlayer, deselectedEvent, nil)
 end
 function ____exports.ConditionalTriggerExecute(trig)
     if not trig then
         return
     end
-    if jass:TriggerEvaluate(trig) then
-        jass:TriggerExecute(trig)
+    if jass.TriggerEvaluate(trig) then
+        jass.TriggerExecute(trig)
     end
 end
 function ____exports.TriggerRegisterUnitInRangeSimple(trig, range, whichUnit)
-    return jass:TriggerRegisterUnitInRange(trig, whichUnit, range, nil)
+    return jass.TriggerRegisterUnitInRange(trig, whichUnit, range, nil)
 end
 --- 对齐 Blizzard.j：`GetAttackedUnitBJ` → `GetTriggerUnit()`
 function ____exports.GetAttackedUnitBJ()
-    return jass:GetTriggerUnit()
+    return jass.GetTriggerUnit()
 end
 function ____exports.TriggerRegisterEnterRectSimple(trig, r)
-    local rectRegion = jass:CreateRegion()
-    jass:RegionAddRect(rectRegion, r)
-    return jass:TriggerRegisterEnterRegion(trig, rectRegion, nil)
+    local rectRegion = jass.CreateRegion()
+    jass.RegionAddRect(rectRegion, r)
+    return jass.TriggerRegisterEnterRegion(trig, rectRegion, nil)
 end
 return ____exports

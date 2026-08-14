@@ -146,7 +146,7 @@ local function _____662F_5426_672C_5730_69FD_4F4D(_____72B6_6001)
 end
 local function _____83B7_53D6_89E6_53D1UI_73A9_5BB6()
     if japi.DzGetTriggerUIEventPlayer ~= nil then
-        return japi:DzGetTriggerUIEventPlayer()
+        return japi.DzGetTriggerUIEventPlayer()
     end
     return nil
 end
@@ -193,12 +193,12 @@ local function _____63D0_793A(_____72B6_6001, _____6587_672C)
 end
 local function _____8BBE_7F6E_6587_672C_5E27_6587_5B57(_____5E27, _____6587_672C)
     if _____5E27 ~= 0 then
-        japi:DzFrameSetText(_____5E27, _____6587_672C)
+        japi.DzFrameSetText(_____5E27, _____6587_672C)
     end
 end
 local function _____8BBE_7F6E_6587_672C_5E27_5B57_4F53_5927_5C0F(_____5E27, _____5B57_53F7)
     if _____5E27 ~= 0 then
-        japi:DzFrameSetFont(_____5E27, "Fonts\\dfst-m3u.ttf", _____5B57_53F7, 0)
+        japi.DzFrameSetFont(_____5E27, "Fonts\\dfst-m3u.ttf", _____5B57_53F7, 0)
     end
 end
 local function _____521B_5EFA_6587_672C_5E27(_____72B6_6001, _____540D_5B57, _____7236_5E27, _____6587_672C, x, y, _____5BBD_5EA6, _____9AD8_5EA6)
@@ -226,17 +226,17 @@ local function _____521B_5EFA_6587_672C_5E27(_____72B6_6001, _____540D_5B57, ___
         y
     )
     _____8BBE_7F6E_5E27_5C3A_5BF8(nil, _____6587_672C_5E27, {width = _____5BBD_5EA6, height = _____9AD8_5EA6})
-    japi:DzFrameSetTextAlignment(_____6587_672C_5E27, 0)
-    japi:DzFrameSetFont(_____6587_672C_5E27, "Fonts\\dfst-m3u.ttf", 0.0135, 0)
-    japi:DzFrameSetTextColor(
+    japi.DzFrameSetTextAlignment(_____6587_672C_5E27, 0)
+    japi.DzFrameSetFont(_____6587_672C_5E27, "Fonts\\dfst-m3u.ttf", 0.0135, 0)
+    japi.DzFrameSetTextColor(
         _____6587_672C_5E27,
         0,
         0,
         0,
         255
     )
-    japi:DzFrameSetPriority(_____6587_672C_5E27, 20)
-    japi:DzFrameSetText(_____6587_672C_5E27, _____6587_672C)
+    japi.DzFrameSetPriority(_____6587_672C_5E27, 20)
+    japi.DzFrameSetText(_____6587_672C_5E27, _____6587_672C)
     return _____6587_672C_5E27
 end
 local function _____521B_5EFA_6587_5B57_6309_94AE(_____72B6_6001, _____540D_5B57, _____7236_5E27, _____6587_5B57, x, y, _____5BBD_5EA6, _____9AD8_5EA6, _____70B9_51FB_51FD_6570)
@@ -264,9 +264,9 @@ local function _____521B_5EFA_6587_5B57_6309_94AE(_____72B6_6001, _____540D_5B57
         y
     )
     _____8BBE_7F6E_5E27_5C3A_5BF8(nil, _____6309_94AE, {width = _____5BBD_5EA6, height = _____9AD8_5EA6})
-    japi:DzFrameSetTextAlignment(_____6309_94AE, 18)
-    japi:DzFrameSetFont(_____6309_94AE, "Fonts\\dfst-m3u.ttf", 0.015, 0)
-    japi:DzFrameSetPriority(_____6309_94AE, 30)
+    japi.DzFrameSetTextAlignment(_____6309_94AE, 18)
+    japi.DzFrameSetFont(_____6309_94AE, "Fonts\\dfst-m3u.ttf", 0.015, 0)
+    japi.DzFrameSetPriority(_____6309_94AE, 30)
     _____8BBE_7F6E_6309_94AE_6587_672C(nil, _____6309_94AE, _____6587_5B57)
     _____8BBE_7F6E_5E27_70B9_51FB_4E8B_4EF6(nil, _____6309_94AE, _____70B9_51FB_51FD_6570, true)
     return _____6309_94AE
@@ -473,7 +473,7 @@ local function _____521B_5EFA_9009_9879_56FE_6807_6309_94AE(_____72B6_6001, ____
             _____69FD_4F4D_56FE_6807Y + _____69FD_4F4D_5185_5D4C_56FE_6807_504F_79FBY
         )
         _____8BBE_7F6E_5E27_5C3A_5BF8(nil, _____56FE_6807, {width = _____69FD_4F4D_5185_5D4C_56FE_6807_5BBD_5EA6, height = _____69FD_4F4D_5185_5D4C_56FE_6807_9AD8_5EA6})
-        japi:DzFrameSetPriority(_____56FE_6807, 20)
+        japi.DzFrameSetPriority(_____56FE_6807, 20)
     end
     local _____8FB9_6846 = _____521B_5EFA_5E27(
         nil,
@@ -509,7 +509,7 @@ local function _____521B_5EFA_9009_9879_56FE_6807_6309_94AE(_____72B6_6001, ____
         end
         _____8BBE_7F6E_5E27_5C3A_5BF8(nil, _____8FB9_6846, {width = _____69FD_4F4D_9009_4E2D_8FB9_6846_5BBD_5EA6, height = _____69FD_4F4D_9009_4E2D_8FB9_6846_9AD8_5EA6})
         _____8BBE_7F6E_5E27_8D34_56FE(nil, _____8FB9_6846, _____9009_4E2D_8FB9_6846_8D34_56FE)
-        japi:DzFrameSetPriority(_____8FB9_6846, 220)
+        japi.DzFrameSetPriority(_____8FB9_6846, 220)
     end
     local _____52FE_9009 = _____521B_5EFA_5E27(
         nil,
@@ -545,7 +545,7 @@ local function _____521B_5EFA_9009_9879_56FE_6807_6309_94AE(_____72B6_6001, ____
         end
         _____8BBE_7F6E_5E27_5C3A_5BF8(nil, _____52FE_9009, {width = _____69FD_4F4D_52FE_9009_5C3A_5BF8, height = _____69FD_4F4D_52FE_9009_5C3A_5BF8})
         _____8BBE_7F6E_5E27_8D34_56FE(nil, _____52FE_9009, _____52FE_9009_6807_8BB0_8D34_56FE)
-        japi:DzFrameSetPriority(_____52FE_9009, 240)
+        japi.DzFrameSetPriority(_____52FE_9009, 240)
     end
     local _____56FE_6807_6309_94AE = _____521B_5EFA_5E27(
         nil,
@@ -570,7 +570,7 @@ local function _____521B_5EFA_9009_9879_56FE_6807_6309_94AE(_____72B6_6001, ____
             _____69FD_4F4D_56FE_6807Y
         )
         _____8BBE_7F6E_5E27_5C3A_5BF8(nil, _____56FE_6807_6309_94AE, {width = _____69FD_4F4D_70B9_51FB_5BBD_5EA6, height = _____69FD_4F4D_70B9_51FB_9AD8_5EA6})
-        japi:DzFrameSetPriority(_____56FE_6807_6309_94AE, 30)
+        japi.DzFrameSetPriority(_____56FE_6807_6309_94AE, 30)
         _____8BBE_7F6E_5E27_70B9_51FB_4E8B_4EF6(nil, _____56FE_6807_6309_94AE, _____5956_52B1_9009_9879_70B9_51FB_51FD_6570_8868[_____5E8F_53F7 + 1], true)
     end
     _____72B6_6001["选项图标"][_____5E8F_53F7 + 1] = _____56FE_6807
@@ -709,7 +709,7 @@ local function _____521B_5EFA_9996_9886_5956_52B1_5185_5BB9(_____72B6_6001)
         )
         _____8BBE_7F6E_5E27_5C3A_5BF8(nil, _____72B6_6001["详情装饰"], {width = 0.58, height = 0.326})
         _____8BBE_7F6E_5E27_8D34_56FE(nil, _____72B6_6001["详情装饰"], _____8BE6_60C5_88C5_9970_8D34_56FE)
-        japi:DzFrameSetPriority(_____72B6_6001["详情装饰"], 6)
+        japi.DzFrameSetPriority(_____72B6_6001["详情装饰"], 6)
     end
     _____72B6_6001["详情图标"] = _____521B_5EFA_5E27(
         nil,

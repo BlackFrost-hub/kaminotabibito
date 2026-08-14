@@ -15,9 +15,6 @@ const { 按名字反查总单位ID } = require("系统.01．单位系统.08．�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
 };
-const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
-  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
-};
 const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
   立即移除单位并取消排泄登记: (this: void, unit: any) => void;
 };
@@ -46,12 +43,9 @@ import { 应用第三章电影镜头 } from "./40-50．第三章电影镜头";
 import { 读取语义单位引用, 设置玩家英雄组控制状态 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 清理剧情运行时单位, 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 发布主线节点目标 } from "../../00．剧情系统核心工具/10．标准剧情动作";
+import { 创建剧情场景单位, 定位剧情单位 } from "../../../00．公共/02．剧情NPC创建";
 
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const Player = jass.Player as (this: void, playerId: number) => any;
-const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
-const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
-const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
 const ForGroup = jass.ForGroup as (this: void, whichGroup: any, callback: (this: void) => void) => void;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
 const AddLightningEx = jass.AddLightningEx as (
@@ -120,10 +114,7 @@ function 单位存活(this: void, unit: any): boolean {
 }
 
 function 定位并停止单位(this: void, unit: any, 站位: { X: number; Y: number; 朝向: number }): void {
-  if (!句柄有效(unit)) return;
-  SetUnitPosition(unit, 站位.X, 站位.Y);
-  SetUnitFacing(unit, 站位.朝向);
-  IssueImmediateOrder(unit, "stop");
+  定位剧情单位(unit, 站位);
 }
 
 function on移动玩家到对白站位(this: void): void {
@@ -140,9 +131,17 @@ function 移动玩家队伍到对白站位(this: void): void {
 }
 
 function 创建占位单位(this: void, 单位名: string, 站位: { X: number; Y: number; 朝向: number }): any {
-  const 单位类型ID = stringToFourCCSafe(按名字反查总单位ID(单位名));
+  const 单位ID = 按名字反查总单位ID(单位名);
+  const 单位类型ID = stringToFourCCSafe(单位ID);
   if (!(单位类型ID > 0)) return null;
-  return 创建单位并登记排泄安全(Player(中立被动玩家ID), 单位类型ID, 站位.X, 站位.Y, 站位.朝向);
+  return 创建剧情场景单位({
+    单位ID: 单位ID!,
+    X: 站位.X,
+    Y: 站位.Y,
+    朝向: 站位.朝向,
+    玩家ID: 中立被动玩家ID,
+    登记死亡排泄: true,
+  });
 }
 
 function 读取或创建场景单位(

@@ -10,7 +10,7 @@ function ____exports.setFrameTexture(self, frame, texture)
         return false
     end
     if texture ~= "" then
-        japi:DzFrameSetTexture(frame, texture, 0)
+        japi.DzFrameSetTexture(frame, texture, 0)
     end
     return true
 end
@@ -39,7 +39,7 @@ function ____exports.setButtonText(self, frame, text)
     if not frame then
         return false
     end
-    japi:DzFrameSetText(frame, text)
+    japi.DzFrameSetText(frame, text)
     return true
 end
 return ____exports

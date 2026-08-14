@@ -137,14 +137,14 @@ end
 local function onUseItem(eventUnit, eventItem)
     local unit = eventUnit
     if unit == nil then
-        unit = jass:GetManipulatingUnit()
+        unit = jass.GetManipulatingUnit()
     end
     if unit == nil then
-        unit = jass:GetTriggerUnit()
+        unit = jass.GetTriggerUnit()
     end
     local item = eventItem
     if item == nil then
-        item = jass:GetManipulatedItem()
+        item = jass.GetManipulatedItem()
     end
     if not unit or not item then
         return
@@ -159,7 +159,7 @@ local function onUseItem(eventUnit, eventItem)
         return
     end
     local glob = _G
-    local key = (tostring(nil, unit) .. "_") .. idStr
+    local key = (tostring(unit) .. "_") .. idStr
     if glob.__EquipHealExecutedKey == key then
         return
     end

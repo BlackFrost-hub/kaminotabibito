@@ -26,6 +26,14 @@ do
         end
     end
 end
+do
+    local ____export = require("系统.11．剧情系统.00．公共.04．剧情单位移动控制")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
 function ____exports.init()
     ____init_5267_60C5_7269_54C1_6389_843D()
 end

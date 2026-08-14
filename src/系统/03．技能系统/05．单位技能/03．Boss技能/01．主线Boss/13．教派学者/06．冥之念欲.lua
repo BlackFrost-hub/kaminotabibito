@@ -20,31 +20,27 @@ local ____09_FF0E_975E_4F24_5BB3_751F_547D_79FB_9664 = require("系统.03．技�
 local _____6309_6BD4_4F8B_79FB_9664_6700_5927_751F_547D = ____09_FF0E_975E_4F24_5BB3_751F_547D_79FB_9664["按比例移除最大生命"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____23_FF0EBoss_65BD_6CD5_65F6_95F4_7EBF = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.23．Boss施法时间线")
+local _____6267_884CBoss_65BD_6CD5_65F6_95F4_7EBF = ____23_FF0EBoss_65BD_6CD5_65F6_95F4_7EBF["执行Boss施法时间线"]
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____5F00_59CB_786C_76F4 = ____require_result_1["开始硬直"]
-local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_2.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
-local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761 = ____require_result_3["显示常规技能吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
-local ____require_result_4 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
-local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_4["获取Boss技能敌对英雄列表"]
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
-local EC_CreateEffect = ____require_result_5.EC_CreateEffect
-local ____require_result_6 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_6.Sound3DII_CooPlayReuse
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
+local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_1.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
+local ____require_result_2 = require("系统.01．单位系统.06．仇恨系统.05．技能目标选择")
+local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_2["获取Boss技能敌对英雄列表"]
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.04．EC扩展库")
+local EC_CreateEffect = ____require_result_3.EC_CreateEffect
+local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_4.Sound3DII_CooPlayReuse
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetRandomInt = jass.GetRandomInt
 local GetRandomReal = jass.GetRandomReal
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local SetUnitAnimation = jass.SetUnitAnimation
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -59,30 +55,28 @@ local function _____53D6_5F97_51A5_4E4B_5FF5BuffID(_____7C7B_578B)
     end
     return _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E.Buff["冥之念赶"]
 end
-local function ____on_51A5_4E4B_5FF5_8BFB_6761_5173_95ED(variable)
-    local _____8BF7_6C42 = variable
-    if _____8BF7_6C42 == nil then
-        return
-    end
-    _____5173_95ED_541F_5531_6761(_____8BF7_6C42["通道"])
-end
 local function _____5F00_59CB_51A5_4E4B_5FF5_6B32_65BD_6CD5_8868_73B0(_____4E0A_4E0B_6587)
     local boss = _____4E0A_4E0B_6587["Boss单位"]
     local _____516C_5171 = _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["公共施法"]
     local _____914D_7F6E = _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["冥之念欲"]
-    _____5F00_59CB_786C_76F4(boss, _____516C_5171["通魔施法秒"])
-    SetUnitAnimation(boss, _____516C_5171["动作名"])
-    _____64AD_653E_6559_6D3E_5B66_8005_53F0_8BCD(boss, "冥之念欲")
-    _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761({
-        ["通道"] = _____914D_7F6E["读条通道"],
-        ["总时长"] = _____516C_5171["通魔施法秒"],
-        ["颜色ID"] = _____516C_5171["读条颜色ID"],
-        ["标题文本"] = _____914D_7F6E["读条标题"],
-        ["提示文本"] = _____914D_7F6E["读条提示"]
+    _____6267_884CBoss_65BD_6CD5_65F6_95F4_7EBF({
+        ["名称"] = "教派学者-冥之念欲",
+        ["单位"] = boss,
+        ["清理"] = _____4E0A_4E0B_6587["清理"],
+        ["施法秒"] = _____516C_5171["通魔施法秒"],
+        ["动作名"] = _____516C_5171["动作名"],
+        ["吟唱条"] = {
+            ["类型"] = "常规",
+            ["通道"] = _____914D_7F6E["读条通道"],
+            ["颜色ID"] = _____516C_5171["读条颜色ID"],
+            ["标题文本"] = _____914D_7F6E["读条标题"],
+            ["提示文本"] = _____914D_7F6E["读条提示"]
+        },
+        ["开始回调"] = function(unit)
+            _____64AD_653E_6559_6D3E_5B66_8005_53F0_8BCD(unit, "冥之念欲")
+        end,
+        ["延迟登记名"] = "教派学者-冥之念欲读条关闭"
     })
-    local _____56DE_8C03ID = addDelayedCallback(_____516C_5171["通魔施法秒"] * 1000, ____on_51A5_4E4B_5FF5_8BFB_6761_5173_95ED, {["通道"] = _____914D_7F6E["读条通道"], ["Boss单位"] = boss})
-    local ____self_8 = _____4E0A_4E0B_6587["清理"]
-    ____self_8["登记延迟回调"](____self_8, "教派学者-冥之念欲读条关闭", _____56DE_8C03ID)
 end
 local function _____7ED3_675F_51A5_4E4B_5FF5_6B32(_____72B6_6001, _____539F_56E0)
     if _____72B6_6001["已结束"] then
@@ -191,14 +185,14 @@ local function ____on_51A5_4E4B_5FF5_6B32_7ED3_7B97(variable)
             do
                 local target = _____76EE_6807_5217_8868[i + 1]
                 if not _____6559_6D3E_5B66_8005_5355_4F4D_5B58_6D3B(target) or not _____76EE_6807_8FDD_53CD_51A5_5FF5_89C4_5219(_____72B6_6001, target) then
-                    goto __continue28
+                    goto __continue27
                 end
                 _____8FDD_89C4_6570 = _____8FDD_89C4_6570 + 1
                 if _____7ED3_7B97_51A5_4E4B_5FF5_4F24_5BB3(_____72B6_6001, target) then
                     _____547D_4E2D_6570 = _____547D_4E2D_6570 + 1
                 end
             end
-            ::__continue28::
+            ::__continue27::
             i = i + 1
         end
     end
@@ -312,8 +306,8 @@ local function _____6DFB_52A0_51A5_4E4B_5FF5_8D76_5B89_5168_70B9(_____72B6_6001,
     local _____914D_7F6E = _____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["冥之念欲"]
     local _____89D2_5EA6 = GetRandomReal(_____6700_5C0F_89D2_5EA6, _____6700_5927_89D2_5EA6)
     local _____8DDD_79BB = GetRandomReal(_____914D_7F6E["念赶安全区最小距离"], _____914D_7F6E["念赶安全区最大距离"])
-    local ____72B6_6001__5B89_5168_70B9_5217_8868_9 = _____72B6_6001["安全点列表"]
-    ____72B6_6001__5B89_5168_70B9_5217_8868_9[#____72B6_6001__5B89_5168_70B9_5217_8868_9 + 1] = {
+    local ____72B6_6001__5B89_5168_70B9_5217_8868_6 = _____72B6_6001["安全点列表"]
+    ____72B6_6001__5B89_5168_70B9_5217_8868_6[#____72B6_6001__5B89_5168_70B9_5217_8868_6 + 1] = {
         X = _____6781_5750_6807X(_____72B6_6001["Boss快照X"], _____89D2_5EA6, _____8DDD_79BB),
         Y = _____6781_5750_6807Y(_____72B6_6001["Boss快照Y"], _____89D2_5EA6, _____8DDD_79BB)
     }
@@ -340,8 +334,8 @@ local function _____542F_52A8_51A5_4E4B_5FF5_6B32_673A_5236(_____4E0A_4E0B_6587,
         _____6DFB_52A0_51A5_4E4B_5FF5_8D76_5B89_5168_70B9(_____72B6_6001, _____914D_7F6E["念赶第二安全区角度最小"], _____914D_7F6E["念赶第二安全区角度最大"])
     end
     _____4E0A_4E0B_6587["冥之念欲状态"] = _____72B6_6001
-    local ____self_12 = _____4E0A_4E0B_6587["清理"]
-    ____self_12["登记清理"](____self_12, "教派学者-冥之念欲清理", ____on_51A5_4E4B_5FF5_6B32_6E05_7406, _____72B6_6001)
+    local ____self_9 = _____4E0A_4E0B_6587["清理"]
+    ____self_9["登记清理"](____self_9, "教派学者-冥之念欲清理", ____on_51A5_4E4B_5FF5_6B32_6E05_7406, _____72B6_6001)
     local _____79FB_9664_91CF = _____6309_6BD4_4F8B_79FB_9664_6700_5927_751F_547D(boss, _____914D_7F6E["自损最大生命比例"], true)
     EC_CreateEffect(
         _____914D_7F6E["自损特效路径"],
@@ -367,7 +361,7 @@ local function _____542F_52A8_51A5_4E4B_5FF5_6B32_673A_5236(_____4E0A_4E0B_6587,
             do
                 local target = _____72B6_6001["Buff目标列表"][i + 1]
                 if not _____6559_6D3E_5B66_8005_5355_4F4D_5B58_6D3B(target) then
-                    goto __continue41
+                    goto __continue40
                 end
                 registerManualBuff(
                     target,
@@ -377,14 +371,14 @@ local function _____542F_52A8_51A5_4E4B_5FF5_6B32_673A_5236(_____4E0A_4E0B_6587,
                     {sourceUnit = boss, effectSourceName = "冥之念" .. _____7C7B_578B, effectSourceType = "技能"}
                 )
             end
-            ::__continue41::
+            ::__continue40::
             i = i + 1
         end
     end
     _____521B_5EFA_51A5_4E4B_5FF5_9884_8B66(_____72B6_6001)
     local _____56DE_8C03ID = addDelayedCallback(_____914D_7F6E["等待秒"] * 1000, ____on_51A5_4E4B_5FF5_6B32_7ED3_7B97, _____72B6_6001)
-    local ____self_13 = _____4E0A_4E0B_6587["清理"]
-    ____self_13["登记延迟回调"](____self_13, "教派学者-冥之念欲结算", _____56DE_8C03ID)
+    local ____self_10 = _____4E0A_4E0B_6587["清理"]
+    ____self_10["登记延迟回调"](____self_10, "教派学者-冥之念欲结算", _____56DE_8C03ID)
     return true
 end
 local function ____on_51A5_4E4B_5FF5_6B32_5EF6_8FDF_542F_52A8(variable)
@@ -399,8 +393,8 @@ ____exports["释放教派学者冥之念欲"] = function(_____4E0A_4E0B_6587, __
     end
     _____5F00_59CB_51A5_4E4B_5FF5_6B32_65BD_6CD5_8868_73B0(_____4E0A_4E0B_6587)
     local _____56DE_8C03ID = addDelayedCallback(_____6559_6D3E_5B66_8005_6280_80FD_914D_7F6E["公共施法"]["通魔施法秒"] * 1000, ____on_51A5_4E4B_5FF5_6B32_5EF6_8FDF_542F_52A8, {["上下文"] = _____4E0A_4E0B_6587, ["指定类型"] = _____6307_5B9A_7C7B_578B})
-    local ____self_16 = _____4E0A_4E0B_6587["清理"]
-    ____self_16["登记延迟回调"](____self_16, "教派学者-冥之念欲显式释放", _____56DE_8C03ID)
+    local ____self_13 = _____4E0A_4E0B_6587["清理"]
+    ____self_13["登记延迟回调"](____self_13, "教派学者-冥之念欲显式释放", _____56DE_8C03ID)
     return true
 end
 ____exports["注册教派学者冥之念欲"] = function()

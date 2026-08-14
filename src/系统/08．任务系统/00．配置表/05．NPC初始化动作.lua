@@ -72,7 +72,7 @@ local function pickRandomDistinct(self, list, count)
     end
     local pool = {table.unpack(list)}
     while #pool > 0 and #out < count do
-        local idx = jass:GetRandomInt(1, #pool) or 1
+        local idx = jass.GetRandomInt(1, #pool) or 1
         local picked = pool[idx]
         out[#out + 1] = picked
         __TS__ArraySplice(pool, idx - 1, 1)

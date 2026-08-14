@@ -79,6 +79,7 @@ $wc3 = Join-Path $extension.FullName 'bin\wc3.exe'
 - 不要把打包失败误判成业务代码没生效；先确认 `.build` 产物和测试图时间戳。
 - 改 DzAPI UI、物品主动技能、事件中心、伤害流程这类进图表现时，尤其要做 `.build` 和 `.w3x` 双确认。
 - Warcraft VSCode `0.3.7` 的 Classic CLI 会按 UTF-8 读取地图内 `war3map.j`。如果原地图脚本是合法 GBK，会报 `stream did not contain valid UTF-8`。不要重写 TS 源文件，也不要只转换 `.build/war3map.j`，因为 `wc3 compile` 会重新从地图提取并覆盖它。
+- 本项目的雪月编辑器保存 `map.w3x` 后，可能重新生成同时包含 UTF-8 与 GBK 行的 `war3map.j`。此时优先运行 `npm run fix:map-jass-utf8`：脚本会解包源图、逐行无损归一化、二次解包验证，并在系统临时目录保留修改前备份。不要把该命令挂入普通 `npm run build`，因为它需要处理完整地图。
 - 遇到上述 GBK 错误时，在 `.build` 创建临时 `map.w3x` 副本；从原图提取 `war3map.j`，按 GBK 解码并显式写成无 BOM UTF-8，再用 `mpqcli add -p war3map.j -w -g warcraft3-map` 替换临时副本中的脚本。随后对临时副本运行：
 
 ```powershell

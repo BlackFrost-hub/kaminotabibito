@@ -32,8 +32,8 @@ function ____exports.applyArmorPenetration(self, damage, target, attacker)
     end
     local armorPierce = getAttackerArmorPierce(nil, attacker)
     local ignoreArmor = isIgnoreArmor(nil, attacker)
-    local originalReduction = calcArmorReduction(nil, originalArmor)
-    local piercedReduction = calcPiercedArmorReduction(nil, originalArmor, armorPierce, ignoreArmor)
+    local originalReduction = calcArmorReduction(originalArmor)
+    local piercedReduction = calcPiercedArmorReduction(originalArmor, armorPierce, ignoreArmor)
     local baseDamage = damage / (1 - originalReduction)
     return baseDamage * (1 - piercedReduction)
 end
@@ -152,8 +152,8 @@ end
 --- 获取蝼蚁专精加成
 -- 条件：目标非英雄且非恶魔种族
 function ____exports.getAntMasteryBonus(self, attacker, target)
-    local isHero = jass:IsUnitType(target, jass.UNIT_TYPE_HERO)
-    local isDemon = jass:GetUnitRace(target) == jass.RACE_DEMON
+    local isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(target) == jass.RACE_DEMON
     if isHero or isDemon then
         return 0
     end
@@ -162,8 +162,8 @@ end
 --- 获取Boss专精加成
 -- 条件：目标是英雄或恶魔种族
 function ____exports.getBossMasteryBonus(self, attacker, target)
-    local isHero = jass:IsUnitType(target, jass.UNIT_TYPE_HERO)
-    local isDemon = jass:GetUnitRace(target) == jass.RACE_DEMON
+    local isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(target) == jass.RACE_DEMON
     if not isHero and not isDemon then
         return 0
     end
@@ -175,8 +175,8 @@ function ____exports.getBossDmgPctBonus(self, attacker, target)
     if attacker == nil or target == nil then
         return 0
     end
-    local isHero = jass:IsUnitType(target, jass.UNIT_TYPE_HERO)
-    local isDemon = jass:GetUnitRace(target) == jass.RACE_DEMON
+    local isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(target) == jass.RACE_DEMON
     if not isHero and not isDemon then
         return 0
     end
@@ -188,8 +188,8 @@ function ____exports.getBossResistPct(self, target, attacker)
     if target == nil or attacker == nil then
         return 0
     end
-    local isHero = jass:IsUnitType(attacker, jass.UNIT_TYPE_HERO)
-    local isDemon = jass:GetUnitRace(attacker) == jass.RACE_DEMON
+    local isHero = jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(attacker) == jass.RACE_DEMON
     if not isHero and not isDemon then
         return 0
     end
@@ -201,8 +201,8 @@ function ____exports.getEliteDmgPctBonus(self, attacker, target)
     if attacker == nil or target == nil then
         return 0
     end
-    local isHero = jass:IsUnitType(target, jass.UNIT_TYPE_HERO)
-    local isDemon = jass:GetUnitRace(target) == jass.RACE_DEMON
+    local isHero = jass.IsUnitType(target, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(target) == jass.RACE_DEMON
     if not isHero and not isDemon then
         return 0
     end
@@ -214,8 +214,8 @@ function ____exports.getEliteResistPct(self, target, attacker)
     if target == nil or attacker == nil then
         return 0
     end
-    local isHero = jass:IsUnitType(attacker, jass.UNIT_TYPE_HERO)
-    local isDemon = jass:GetUnitRace(attacker) == jass.RACE_DEMON
+    local isHero = jass.IsUnitType(attacker, jass.UNIT_TYPE_HERO)
+    local isDemon = jass.GetUnitRace(attacker) == jass.RACE_DEMON
     if not isHero and not isDemon then
         return 0
     end
@@ -227,7 +227,7 @@ function ____exports.getDemonDmgPctBonus(self, attacker, target)
     if attacker == nil or target == nil then
         return 0
     end
-    if jass:GetUnitRace(target) ~= jass.RACE_DEMON then
+    if jass.GetUnitRace(target) ~= jass.RACE_DEMON then
         return 0
     end
     return getRealAttr(nil, attacker, "提高对恶魔族伤害%", 0)
@@ -238,14 +238,14 @@ function ____exports.getDemonResistPct(self, target, attacker)
     if target == nil or attacker == nil then
         return 0
     end
-    if jass:GetUnitRace(attacker) ~= jass.RACE_DEMON then
+    if jass.GetUnitRace(attacker) ~= jass.RACE_DEMON then
         return 0
     end
     return getRealAttr(nil, target, "受到恶魔族伤害减少%", 0)
 end
 --- 检查单位是否为召唤物
 function ____exports.isSummonedUnit(self, unit)
-    return jass:IsUnitType(unit, jass.UNIT_TYPE_SUMMONED)
+    return jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED)
 end
 --- 获取召唤物伤害修正
 function ____exports.getSummonDamageModifier(self, attacker, target, isPlayer, attrSource)

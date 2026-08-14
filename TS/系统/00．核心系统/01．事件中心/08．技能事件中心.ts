@@ -3,6 +3,16 @@
 
 const jass = require("jass.common") as any;
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, value: string) => number;
+};
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
+const 藤原妹红单位类型ID = stringToFourCCSafe("H00R");
+
 const playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件") as {
   registerPlayerUnitEventForPlayerIds: (this: void, trig: any, playerIds: readonly number[], eventId: any, filter?: any) => void;
 };
@@ -55,6 +65,19 @@ function onSpellEffect(): void {
   if (castingUnit == null) return;
   const spellAbilityId = jass.GetSpellAbilityId();
   if (spellAbilityId == null) return;
+
+  if (GetUnitTypeId(castingUnit) === 藤原妹红单位类型ID) {
+    debugLogForce(
+      "藤原妹红施法事件诊断",
+      "收到SPELL_EFFECT",
+      "施法者",
+      GetHandleId(castingUnit),
+      "技能ID",
+      spellAbilityId,
+      "监听数",
+      effectListeners.length,
+    );
+  }
 
   dispatchSpellListeners(effectListeners, castingUnit, spellAbilityId);
 }

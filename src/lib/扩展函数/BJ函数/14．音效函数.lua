@@ -218,24 +218,24 @@ if ____jglobals_MAP_LOCK_SPEED_40 == nil then
 end
 ____exports.MAP_LOCK_SPEED = ____jglobals_MAP_LOCK_SPEED_40
 function ____exports.StopSoundBJ(soundHandle, fadeOut)
-    jass:StopSound(soundHandle, false, fadeOut)
+    jass.StopSound(soundHandle, false, fadeOut)
 end
 function ____exports.CancelCineSceneBJ()
     ____exports.StopSoundBJ(____exports.bj_cineSceneLastSound, true)
-    jass:EndCinematicScene()
+    jass.EndCinematicScene()
 end
 function ____exports.CameraResetSmoothingFactorBJ()
-    jass:CameraSetSmoothingFactor(0)
+    jass.CameraSetSmoothingFactor(0)
 end
 function ____exports.SetCineModeVolumeGroupsImmediateBJ()
-    jass:VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_UNITMOVEMENT, ____exports.bj_CINEMODE_VOLUME_UNITMOVEMENT)
-    jass:VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_UNITSOUNDS, ____exports.bj_CINEMODE_VOLUME_UNITSOUNDS)
-    jass:VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_COMBAT, ____exports.bj_CINEMODE_VOLUME_COMBAT)
-    jass:VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_SPELLS, ____exports.bj_CINEMODE_VOLUME_SPELLS)
-    jass:VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_UI, ____exports.bj_CINEMODE_VOLUME_UI)
-    jass:VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_MUSIC, ____exports.bj_CINEMODE_VOLUME_MUSIC)
-    jass:VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_AMBIENTSOUNDS, ____exports.bj_CINEMODE_VOLUME_AMBIENTSOUNDS)
-    jass:VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_FIRE, ____exports.bj_CINEMODE_VOLUME_FIRE)
+    jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_UNITMOVEMENT, ____exports.bj_CINEMODE_VOLUME_UNITMOVEMENT)
+    jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_UNITSOUNDS, ____exports.bj_CINEMODE_VOLUME_UNITSOUNDS)
+    jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_COMBAT, ____exports.bj_CINEMODE_VOLUME_COMBAT)
+    jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_SPELLS, ____exports.bj_CINEMODE_VOLUME_SPELLS)
+    jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_UI, ____exports.bj_CINEMODE_VOLUME_UI)
+    jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_MUSIC, ____exports.bj_CINEMODE_VOLUME_MUSIC)
+    jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_AMBIENTSOUNDS, ____exports.bj_CINEMODE_VOLUME_AMBIENTSOUNDS)
+    jass.VolumeGroupSetVolume(____exports.SOUND_VOLUMEGROUP_FIRE, ____exports.bj_CINEMODE_VOLUME_FIRE)
 end
 function ____exports.SetCineModeVolumeGroupsBJ()
     if ____exports.bj_gameStarted then
@@ -243,7 +243,7 @@ function ____exports.SetCineModeVolumeGroupsBJ()
     else
         local t = ____exports.bj_volumeGroupsTimer
         if t ~= nil then
-            jass:TimerStart(t, ____exports.bj_GAME_STARTED_THRESHOLD, false, ____exports.SetCineModeVolumeGroupsImmediateBJ)
+            jass.TimerStart(t, ____exports.bj_GAME_STARTED_THRESHOLD, false, ____exports.SetCineModeVolumeGroupsImmediateBJ)
         end
     end
 end
@@ -251,7 +251,7 @@ function ____exports.GetSoundDurationBJ(soundHandle)
     if soundHandle == nil then
         return ____exports.bj_NOTHING_SOUND_DURATION
     end
-    return jass:GetSoundDuration(soundHandle) * 0.001
+    return jass.GetSoundDuration(soundHandle) * 0.001
 end
 function ____exports.GetTransmissionDuration(soundHandle, timeType, timeVal)
     local duration
@@ -270,18 +270,18 @@ function ____exports.GetTransmissionDuration(soundHandle, timeType, timeVal)
     return duration
 end
 function ____exports.WaitForSoundBJ(soundHandle, offset)
-    jass:TriggerWaitForSound(soundHandle, offset)
+    jass.TriggerWaitForSound(soundHandle, offset)
 end
 function ____exports.WaitTransmissionDuration(soundHandle, timeType, timeVal)
     if timeType == ____exports.bj_TIMETYPE_SET then
-        jass:TriggerSleepAction(timeVal)
+        jass.TriggerSleepAction(timeVal)
     elseif soundHandle == nil then
-        jass:TriggerSleepAction(____exports.bj_NOTHING_SOUND_DURATION)
+        jass.TriggerSleepAction(____exports.bj_NOTHING_SOUND_DURATION)
     elseif timeType == ____exports.bj_TIMETYPE_SUB then
         ____exports.WaitForSoundBJ(soundHandle, timeVal)
     elseif timeType == ____exports.bj_TIMETYPE_ADD then
         ____exports.WaitForSoundBJ(soundHandle, 0)
-        jass:TriggerSleepAction(timeVal)
+        jass.TriggerSleepAction(timeVal)
     end
 end
 function ____exports.EnableDawnDusk(flag)

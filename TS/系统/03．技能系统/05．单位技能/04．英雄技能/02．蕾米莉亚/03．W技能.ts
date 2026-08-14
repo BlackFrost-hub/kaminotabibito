@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 蕾米莉亚单位技能配置 } from "./00．配置";
+import { 蕾米莉亚BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/03．蕾米莉亚";
 import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
@@ -40,6 +41,13 @@ const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePe
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+  移除单位指定Buff: (this: void, target: any, buffID: string) => void;
+};
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, unit: any, duration: number) => void;
+};
 
 const jass = require("jass.common") as any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
@@ -70,6 +78,7 @@ interface 蕾米莉亚W上下文 {
   增加力量: number;
   周期次数: number;
   已启动: boolean;
+  目标属性记录: Record<number, boolean>;
 }
 
 const W配置 = 蕾米莉亚单位技能配置.W;
@@ -101,6 +110,7 @@ function 获取或创建W上下文(this: void, unit: any): 蕾米莉亚W上下�
     增加力量: 0,
     周期次数: 0,
     已启动: false,
+    目标属性记录: {},
   };
   上下文表[unitId] = created;
   return created;
@@ -115,24 +125,15 @@ function 调整英雄基础力量(this: void, hero: any, delta: number): void {
 function 创建跟随表现(this: void, context: 蕾米莉亚W上下文): void {
   const caster = context.施法者;
   const color = W配置.表现.顶点颜色;
-  const judgment = W配置.表现.审判;
-  const holyFire = W配置.表现.圣火;
+  const bloodMist = W配置.表现.血雾;
   const judgmentEffect = 创建单位坐标跟随特效(
     caster,
-    judgment.模型路径,
-    judgment.特效键,
-    judgment.缩放,
+    bloodMist.模型路径,
+    bloodMist.特效键,
+    bloodMist.缩放,
     W配置.表现.跟随高度,
   );
   设置特效颜色(judgmentEffect, color.红, color.绿, color.蓝, color.透明度);
-  const holyFireEffect = 创建单位坐标跟随特效(
-    caster,
-    holyFire.模型路径,
-    holyFire.特效键,
-    holyFire.缩放,
-    W配置.表现.跟随高度,
-  );
-  设置特效颜色(holyFireEffect, color.红, color.绿, color.蓝, color.透明度);
 }
 
 function 清理W上下文(this: void, context: 蕾米莉亚W上下文): void {
@@ -150,10 +151,11 @@ function 清理W上下文(this: void, context: 蕾米莉亚W上下文): void {
     GS_UnitPry(context.施法者, 1, 13, W配置.基础生命值百分比增量);
     调整英雄基础力量(context.施法者, -context.增加力量);
     调整玩家属性(context.施法者, "百分比生命回复", -W配置.百分比生命回复增量);
-    销毁单位坐标跟随特效(context.施法者, W配置.表现.审判.特效键);
-    销毁单位坐标跟随特效(context.施法者, W配置.表现.圣火.特效键);
+    销毁单位坐标跟随特效(context.施法者, W配置.表现.血雾.特效键);
+    移除单位指定Buff(context.施法者, 蕾米莉亚BuffID.红符法阵);
     context.已启动 = false;
   }
+  context.目标属性记录 = {};
   const unitId = 取单位句柄ID(context.施法者);
   if (unitId !== 0 && 上下文表[unitId] === context) delete 上下文表[unitId];
 }
@@ -167,15 +169,21 @@ function 目标允许W伤害(this: void, target: any): boolean {
 }
 
 function 创建W周期特效(this: void, caster: any): void {
-  const effect = W配置.表现.周期特效;
+  const effect = W配置.表现.周期爆炸;
   创建点特效({
     模型路径: effect.模型路径,
     X: GetUnitX(caster),
     Y: GetUnitY(caster),
-    Z轴角度: effect.Z轴角度,
     缩放: effect.缩放,
-    动画速度: effect.动画速度,
     持续秒: effect.持续秒,
+  });
+  const bloodMist = W配置.表现.周期血雾;
+  创建点特效({
+    模型路径: bloodMist.模型路径,
+    X: GetUnitX(caster),
+    Y: GetUnitY(caster),
+    缩放: bloodMist.缩放,
+    持续秒: bloodMist.持续秒,
   });
 }
 
@@ -184,14 +192,11 @@ function 准备W批量目标伤害(this: void, target: any, _index: number, vari
   if (context == null || !目标允许W伤害(target)) return undefined;
 
   const useFire = GetRandomInt(1, 2) === 1;
+  const targetId = GetHandleId(target) || 0;
+  if (targetId !== 0) context.目标属性记录[targetId] = useFire;
   const effectConfig = useFire ? W配置.表现.火属性 : W配置.表现.暗属性;
   const damageType = useFire ? DAMAGE_TYPE_FIRE : DAMAGE_TYPE_SHADOW_STRIKE;
-  创建点特效({
-    模型路径: effectConfig.特效模型路径,
-    X: GetUnitX(target),
-    Y: GetUnitY(target),
-    持续秒: effectConfig.特效持续秒,
-  });
+  if (useFire) 创建点特效({ 模型路径: effectConfig.特效模型路径, X: GetUnitX(target), Y: GetUnitY(target), 持续秒: effectConfig.特效持续秒 });
   const damage = context.伤害攻击力快照 * W配置.单次伤害攻击力倍率
     + (GetHeroStr(context.施法者, true) || 0) * W配置.单次伤害力量倍率;
   return {
@@ -202,6 +207,17 @@ function 准备W批量目标伤害(this: void, target: any, _index: number, vari
     attackType: ATTACK_TYPE_NORMAL,
     weaponType: WEAPON_TYPE_METAL_HEAVY_BASH,
   };
+}
+
+function 处理W目标结算后(this: void, target: any, _index: number, _成功: boolean, variable?: any): void {
+  const context = variable as 蕾米莉亚W上下文 | undefined;
+  if (context == null) return;
+  const targetId = GetHandleId(target) || 0;
+  if (context.目标属性记录[targetId] === false) {
+    const effect = W配置.表现.暗属性;
+    创建点特效({ 模型路径: effect.特效模型路径, X: GetUnitX(target), Y: GetUnitY(target), 持续秒: effect.特效持续秒 });
+  }
+  if (targetId !== 0) delete context.目标属性记录[targetId];
 }
 
 function 蕾米莉亚W周期Tick(this: void, variable?: any): void {
@@ -217,6 +233,9 @@ function 蕾米莉亚W周期Tick(this: void, variable?: any): void {
   }
 
   创建W周期特效(context.施法者);
+  if (W配置.周期语音?.路径 != null) {
+    Sound3DII_UnitPlayReuse(W配置.周期语音.路径, context.施法者, W配置.周期语音.裁断距离);
+  }
   context.周期次数 += 1;
   const targets = 获取范围敌军(
     context.施法者,
@@ -232,12 +251,14 @@ function 蕾米莉亚W周期Tick(this: void, variable?: any): void {
     技能实例ID: context.技能实例ID,
     伤害形态: "AOE",
     每目标处理器: 准备W批量目标伤害,
+    每目标结算后处理器: 处理W目标结算后,
     变量: context,
   });
 }
 
 function 播放W启动表现(this: void, caster: any): void {
   if (W配置.动作编号 >= 0) {
+    开始硬直(caster, W配置.动作硬直秒 ?? 0.1);
     SetUnitAnimationByIndex(caster, W配置.动作编号);
     SetUnitTimeScale(caster, W配置.动作速度);
   }
@@ -264,6 +285,9 @@ function 蕾米莉亚W延迟启动(this: void, variable?: any): void {
   GS_UnitPry(caster, 0, 13, W配置.基础生命值百分比增量);
   调整英雄基础力量(caster, context.增加力量);
   调整玩家属性(caster, "百分比生命回复", W配置.百分比生命回复增量);
+  registerManualBuff(caster, 蕾米莉亚BuffID.红符法阵, W配置.持续次数 * W配置.周期间隔毫秒 / 1000 + 0.3, 1, {
+    sourceName: "蕾米莉亚-红符法阵",
+  });
   创建跟随表现(context);
   context.周期回调ID = addPeriodicCallback(W配置.周期间隔毫秒, 蕾米莉亚W周期Tick, context);
 }

@@ -192,10 +192,10 @@ local function _____7FFB_8BD1_5956_52B1_6761_4EF6(_____539F_6587)
     local _____6587_672C = __TS__StringTrim(_____539F_6587)
     local _____7B49_7EA7 = _____8BFB_53D6_6761_4EF6_6570_5B57(_____6587_672C)
     if (string.find(_____6587_672C, "英雄等级≤", nil, true) or 0) - 1 == 0 or (string.find(_____6587_672C, "英雄等级<=", nil, true) or 0) - 1 == 0 then
-        return ("英雄等级" .. tostring(nil, _____7B49_7EA7)) .. "级及以下"
+        return ("英雄等级" .. tostring(_____7B49_7EA7)) .. "级及以下"
     end
     if (string.find(_____6587_672C, "英雄等级＞", nil, true) or 0) - 1 == 0 or (string.find(_____6587_672C, "英雄等级>", nil, true) or 0) - 1 == 0 then
-        return ("英雄等级高于" .. tostring(nil, _____7B49_7EA7)) .. "级"
+        return ("英雄等级高于" .. tostring(_____7B49_7EA7)) .. "级"
     end
     if (string.find(_____6587_672C, "装备等级", nil, true) or 0) - 1 == 0 then
         return "提交符合要求的装备时"
@@ -285,7 +285,7 @@ local function _____6784_5EFA_4EFB_52A1_76EE_6807(cfg)
                         goto __continue71
                     end
                     _____76EE_6807_5217_8868[#_____76EE_6807_5217_8868 + 1] = {
-                        id = "kill_group_" .. tostring(nil, i),
+                        id = "kill_group_" .. tostring(i),
                         description = "击杀" .. _____76EE_6807_7EC4["显示名"],
                         current = 0,
                         required = _____76EE_6807_7EC4["需求数量"],

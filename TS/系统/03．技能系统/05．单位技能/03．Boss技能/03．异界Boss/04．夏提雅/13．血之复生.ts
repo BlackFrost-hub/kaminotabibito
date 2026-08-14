@@ -12,6 +12,14 @@ import { 播放限时单位动画 } from '../../../../00．技能模板+函数/0
 import { 确保单位可设置飞行高度, GetUnitFlyHeight, SetUnitFlyHeight } from '../../../../00．技能模板+函数/01．技能函数/03．跳跃·击飞/01．跳跃系统/00．共享';
 import { 播放夏提雅台词 } from './18．台词播放';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+const { 暂停并设置无敌安全, 解除暂停并取消无敌安全 } = require('lib.扩展函数.自定义扩展函数.06．单位状态安全包装') as {
+  暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
+  解除暂停并取消无敌安全: (this: void, unit: any, source: string) => boolean;
+};
+const { 添加单位暂停, 移除单位暂停 } = require('lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统') as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
+};
 
 const { 读取Boss战运行上下文 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文') as {
   读取Boss战运行上下文: (this: void, boss: any) => any;
@@ -51,8 +59,6 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
-const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 const SetUnitPathing = jass.SetUnitPathing as (unit: any, flag: boolean) => void;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: string) => boolean;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
@@ -68,6 +74,8 @@ const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: 
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const 血之复生技能Key = '血之复生';
+const 血之复生Boss暂停来源 = 'Boss:夏提雅:血之复生';
+const 血之复生结晶暂停来源 = 'Boss:夏提雅:血之复生结晶';
 
 interface 复生结晶点 {
   X: number;
@@ -208,7 +216,24 @@ function 统计存活结晶(this: void, crystals: 固定受击次数机制单位
 }
 
 function 清理复生结晶(this: void, crystals: 固定受击次数机制单位实例[]): void {
-  for (let i = 0; i < crystals.length; i++) crystals[i].销毁();
+  for (let i = 0; i < crystals.length; i++) {
+    移除单位暂停(crystals[i].单位, 血之复生结晶暂停来源);
+    crystals[i].销毁();
+  }
+}
+
+interface 血之复生清理状态 {
+  Boss单位: any;
+  结晶列表: 固定受击次数机制单位实例[];
+  恢复复生表现: (this: void) => void;
+}
+
+function 清理夏提雅血之复生暂停状态(this: void, variable?: any): void {
+  const 状态 = variable as 血之复生清理状态 | undefined;
+  if (状态 == null) return;
+  状态.恢复复生表现();
+  清理复生结晶(状态.结晶列表);
+  解除暂停并取消无敌安全(状态.Boss单位, 血之复生Boss暂停来源);
 }
 
 function 完成复生成功(this: void, context: 夏提雅运行时上下文, 剩余结晶: number, 恢复复生表现: (this: void) => void): void {
@@ -227,8 +252,7 @@ function 完成复生成功(this: void, context: 夏提雅运行时上下文, �
   const delayedId = addDelayedCallback(cfg.复生成功恢复动作延迟秒 * 1000, function 夏提雅复生成功恢复行动(this: void): void {
     if (!单位有效(boss) || context.挑战已结束 || context.阶段 !== 'P3真祖血宴') return;
     SetUnitAnimationByIndex(boss, 0);
-    PauseUnit(boss, false);
-    SetUnitInvulnerable(boss, false);
+    解除暂停并取消无敌安全(boss, 血之复生Boss暂停来源);
     if (context.当前大型技能 === 血之复生技能Key) context.当前大型技能 = undefined;
   });
   context.清理.登记延迟回调('夏提雅-复生成功恢复行动', delayedId);
@@ -263,8 +287,12 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
   let executionId = 0;
 
   IssueImmediateOrder(boss, 'stop');
-  SetUnitInvulnerable(boss, true);
-  PauseUnit(boss, true);
+  暂停并设置无敌安全(boss, 血之复生Boss暂停来源);
+  context.清理.登记清理('夏提雅-血之复生暂停来源', 清理夏提雅血之复生暂停状态, {
+    Boss单位: boss,
+    结晶列表: crystals,
+    恢复复生表现,
+  } as 血之复生清理状态);
   移动夏提雅到场地中心(boss);
   重置夏提雅猎血连击(context);
   context.普通机制忙碌到Ms = getServerTime() + cfg.仪式秒 * 1000;
@@ -289,6 +317,7 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
       缩放: cfg.结晶缩放,
       on击破: function 夏提雅复生结晶击破(this: void, unit: any): void {
         播放结晶破裂(unit);
+        移除单位暂停(unit, 血之复生结晶暂停来源);
         const remaining = 统计存活结晶(crystals);
         if (remaining > 0) {
           广播单位提示(
@@ -303,15 +332,14 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
       },
     });
     if (crystal == null) continue;
-    PauseUnit(crystal.单位, true);
+    添加单位暂停(crystal.单位, 血之复生结晶暂停来源);
     SetUnitPathing(crystal.单位, false);
     crystals.push(crystal);
   }
 
   if (crystals.length <= 0) {
     恢复复生表现();
-    PauseUnit(boss, false);
-    SetUnitInvulnerable(boss, false);
+    解除暂停并取消无敌安全(boss, 血之复生Boss暂停来源);
     return false;
   }
 
@@ -327,12 +355,14 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
       if (event.原因 !== '完成' || context.挑战已结束) {
         恢复复生表现();
         清理复生结晶(crystals);
+        解除暂停并取消无敌安全(boss, 血之复生Boss暂停来源);
         return;
       }
       const remaining = 统计存活结晶(crystals);
       清理复生结晶(crystals);
       if (remaining <= 0) {
         恢复复生表现();
+        解除暂停并取消无敌安全(boss, 血之复生Boss暂停来源);
         播放夏提雅台词(boss, '复生失败');
         播放Boss坐标音效(夏提雅数值与表现配置.音效.血之复生失败, GetUnitX(boss), GetUnitY(boss), 夏提雅数值与表现配置.音效默认裁断距离);
         on复生失败(context);
@@ -344,8 +374,7 @@ export function 启动夏提雅血之复生(this: void, context: 夏提雅运行
   if (executionId === 0) {
     恢复复生表现();
     清理复生结晶(crystals);
-    PauseUnit(boss, false);
-    SetUnitInvulnerable(boss, false);
+    解除暂停并取消无敌安全(boss, 血之复生Boss暂停来源);
     return false;
   }
 

@@ -28,7 +28,7 @@ local function _____89C4_6574_6B21_6570(_____6B21_6570)
     if _____6B21_6570 == nil or _____6B21_6570 ~= _____6B21_6570 or _____6B21_6570 < 0 then
         return 0
     end
-    return math:floor(_____6B21_6570)
+    return math.floor(_____6B21_6570)
 end
 local function _____6700_7EC8_4F24_5BB3_8FBE_5230_8BA1_6570_9608_503C(_____53C2_6570, context)
     local _____9608_503C = _____53C2_6570["最终伤害计数阈值"] or 0

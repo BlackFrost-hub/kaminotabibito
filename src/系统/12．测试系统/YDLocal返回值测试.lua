@@ -93,10 +93,10 @@ local function testYDLocalReturn(self)
 end
 local function onYDLocalReturnTimerExpire()
     testYDLocalReturn(nil)
-    jass:DestroyTimer(jass:GetExpiredTimer())
+    jass.DestroyTimer(jass.GetExpiredTimer())
 end
 if ENABLED then
-    local tm = jass:CreateTimer()
-    jass:TimerStart(tm, 1, false, onYDLocalReturnTimerExpire)
+    local tm = jass.CreateTimer()
+    jass.TimerStart(tm, 1, false, onYDLocalReturnTimerExpire)
 end
 return ____exports

@@ -32,10 +32,20 @@ const { 发放任务物品 } = require("系统.09．表现系统.02．对话框�
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, 玩家: any) => any;
 };
-const { 按任务ID创建NPC, 按任务ID查找已创建NPC } = require("系统.08．任务系统.00．配置表.04．NPC生成器") as {
+interface NPC生成器模块 {
   按任务ID创建NPC: (this: void, 任务ID: number) => any;
   按任务ID查找已创建NPC: (this: void, 任务ID: number) => any;
-};
+}
+
+function 按任务ID创建NPC(this: void, 任务ID: number): any {
+  const NPC生成器 = require("系统.08．任务系统.00．配置表.04．NPC生成器") as NPC生成器模块;
+  return NPC生成器.按任务ID创建NPC(任务ID);
+}
+
+function 按任务ID查找已创建NPC(this: void, 任务ID: number): any {
+  const NPC生成器 = require("系统.08．任务系统.00．配置表.04．NPC生成器") as NPC生成器模块;
+  return NPC生成器.按任务ID查找已创建NPC(任务ID);
+}
 const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   广播单位提示: (this: void, 来源单位: any, 文本: string, 持续时间?: number) => void;
 };

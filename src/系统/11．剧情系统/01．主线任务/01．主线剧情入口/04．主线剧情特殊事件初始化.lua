@@ -181,7 +181,7 @@ local function _____542F_52A8_5EF6_8FDF_663E_793A(_____914D_7F6E)
     if _____914D_7F6E["延迟显示"] == nil then
         return
     end
-    _____5EF6_8FDF_663E_793A_4EFB_52A1_7EC4["添加延迟"](_____914D_7F6E["延迟显示"]["延迟秒数"] * 1000, _____6267_884C_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A, _____914D_7F6E)
+    _____5EF6_8FDF_663E_793A_4EFB_52A1_7EC4["添加延迟"](_____5EF6_8FDF_663E_793A_4EFB_52A1_7EC4, _____914D_7F6E["延迟显示"]["延迟秒数"] * 1000, _____6267_884C_4E3B_7EBF_5267_60C5_5EF6_8FDF_663E_793A, _____914D_7F6E)
 end
 local function _____547D_4E2D_6280_80FD_901A_9053_4E8B_4EF6_914D_7F6E(_____914D_7F6E, castingUnit, spellAbilityId)
     if castingUnit == nil or castingUnit == 0 then

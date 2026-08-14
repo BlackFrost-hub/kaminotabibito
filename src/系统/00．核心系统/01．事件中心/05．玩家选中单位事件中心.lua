@@ -18,7 +18,7 @@ local function isValidPlayer(whichPlayer)
     return not not whichPlayer and whichPlayer ~= 0
 end
 local function isRealUnit(whichUnit)
-    return not not whichUnit and whichUnit ~= 0 and jass:GetUnitTypeId(whichUnit) ~= 0
+    return not not whichUnit and whichUnit ~= 0 and jass.GetUnitTypeId(whichUnit) ~= 0
 end
 local function getUnitHandleId(whichUnit)
     if not whichUnit or whichUnit == 0 then
@@ -26,7 +26,7 @@ local function getUnitHandleId(whichUnit)
     end
     local ____temp_0
     if type(jass.GetHandleId) == "function" then
-        ____temp_0 = jass:GetHandleId(whichUnit)
+        ____temp_0 = jass.GetHandleId(whichUnit)
     else
         ____temp_0 = 0
     end
@@ -83,12 +83,12 @@ local function dispatchSelectionListeners(player, playerId, unit, isSelected)
     end
 end
 local function handleSelectionEvent(isSelected)
-    local player = jass:GetTriggerPlayer()
-    local rawUnit = jass:GetTriggerUnit()
+    local player = jass.GetTriggerPlayer()
+    local rawUnit = jass.GetTriggerUnit()
     if not isValidPlayer(player) then
         return
     end
-    local playerId = jass:GetPlayerId(player)
+    local playerId = jass.GetPlayerId(player)
     local unit = rawUnit
     if not isRealUnit(unit) then
         if not isSelected then
@@ -124,28 +124,28 @@ local function onPlayerUnitDeselectedAction()
 end
 local function ensureSelectionTriggers()
     if selectedTrigger == nil or selectedTrigger == 0 then
-        selectedTrigger = jass:CreateTrigger()
-        jass:TriggerAddAction(selectedTrigger, onPlayerUnitSelectedAction)
+        selectedTrigger = jass.CreateTrigger()
+        jass.TriggerAddAction(selectedTrigger, onPlayerUnitSelectedAction)
     end
     if deselectedTrigger == nil or deselectedTrigger == 0 then
-        deselectedTrigger = jass:CreateTrigger()
-        jass:TriggerAddAction(deselectedTrigger, onPlayerUnitDeselectedAction)
+        deselectedTrigger = jass.CreateTrigger()
+        jass.TriggerAddAction(deselectedTrigger, onPlayerUnitDeselectedAction)
     end
 end
 local function registerSelectionTriggersForPlayer(whichPlayer)
     if not isValidPlayer(whichPlayer) then
         return
     end
-    local playerId = jass:GetPlayerId(whichPlayer)
+    local playerId = jass.GetPlayerId(whichPlayer)
     if registeredPlayers[playerId] then
         return
     end
     ensureSelectionTriggers()
     if selectedTrigger ~= nil and selectedTrigger ~= 0 then
-        jass:TriggerRegisterPlayerUnitEvent(selectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, nil)
+        jass.TriggerRegisterPlayerUnitEvent(selectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_SELECTED, nil)
     end
     if deselectedTrigger ~= nil and deselectedTrigger ~= 0 then
-        jass:TriggerRegisterPlayerUnitEvent(deselectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_DESELECTED, nil)
+        jass.TriggerRegisterPlayerUnitEvent(deselectedTrigger, whichPlayer, jass.EVENT_PLAYER_UNIT_DESELECTED, nil)
     end
     registeredPlayers[playerId] = true
     initialized = true
@@ -209,7 +209,7 @@ function ____exports.seedSoleSelectedUnitForPlayer(whichPlayer, whichUnit)
     if not isValidPlayer(whichPlayer) then
         return
     end
-    local playerId = jass:GetPlayerId(whichPlayer)
+    local playerId = jass.GetPlayerId(whichPlayer)
     if not isRealUnit(whichUnit) then
         selectedCount[playerId] = 0
         selectedUnit[playerId] = nil

@@ -89,7 +89,7 @@ local function _____521B_5EFA_8D34_56FE_5E27(_____540D_79F0, _____7236_7EA7, ___
 end
 ____exports["创建单位血条帧组"] = function(_____69FD_4F4D)
     local parent = _____53D6_8840_6761_7236_5E27()
-    local suffix = tostring(nil, _____69FD_4F4D)
+    local suffix = tostring(_____69FD_4F4D)
     local root = _____521B_5EFA_8D34_56FE_5E27("UnitHeadHealthBarRoot_" .. suffix, parent, _____8840_6761_8D44_6E90["底框"], _____8840_6761_5C42_7EA7["根"])
     if root == 0 then
         return nil
@@ -102,7 +102,7 @@ ____exports["创建单位血条帧组"] = function(_____69FD_4F4D)
         local i = 0
         while i < _____8840_6761_5C3A_5BF8["最大护盾分段数"] do
             shields[#shields + 1] = _____521B_5EFA_8D34_56FE_5E27(
-                (("UnitHeadHealthBarShield_" .. suffix) .. "_") .. tostring(nil, i),
+                (("UnitHeadHealthBarShield_" .. suffix) .. "_") .. tostring(i),
                 root,
                 _____8840_6761_8D44_6E90["护盾"]["通用"],
                 _____8840_6761_5C42_7EA7["护盾"]

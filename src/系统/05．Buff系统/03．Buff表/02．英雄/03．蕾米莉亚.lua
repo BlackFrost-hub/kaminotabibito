@@ -1,0 +1,124 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+____exports["蕾米莉亚BuffID"] = {
+    ["红符法阵"] = "LML1",
+    ["血雾形态"] = "LML2",
+    ["红色不夜城"] = "LML3",
+    ["不夜城伤害吸血"] = "LML4",
+    ["绯色命运增益"] = "LML5",
+    ["绯色命运减益"] = "LML6",
+    ["恶魔突袭吸血"] = "LML7"
+}
+____exports["蕾米莉亚Buff表"] = {
+    [____exports["蕾米莉亚BuffID"]["红符法阵"]] = {
+        buffID = ____exports["蕾米莉亚BuffID"]["红符法阵"],
+        buffName = "红符法阵",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNFire.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 70,
+        canPurge = false,
+        tooltip = "红符法阵展开中：基础生命值提高10%，力量提高10%，每秒恢复最大生命值1%。"
+    },
+    [____exports["蕾米莉亚BuffID"]["血雾形态"]] = {
+        buffID = ____exports["蕾米莉亚BuffID"]["血雾形态"],
+        buffName = "血雾形态",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNUnholyAura.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 75,
+        canPurge = false,
+        tooltip = "血雾形态持续中：自身无敌并由血雾位置进行周期攻击。"
+    },
+    [____exports["蕾米莉亚BuffID"]["红色不夜城"]] = {
+        buffID = ____exports["蕾米莉亚BuffID"]["红色不夜城"],
+        buffName = "红色不夜城",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 80,
+        canPurge = false,
+        tooltip = "红色不夜城持续中：持续压制周围敌人并造成昼夜不同的强化伤害。"
+    },
+    [____exports["蕾米莉亚BuffID"]["不夜城伤害吸血"]] = {
+        buffID = ____exports["蕾米莉亚BuffID"]["不夜城伤害吸血"],
+        buffName = "不夜城伤害吸血",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNVampiricAura.blp",
+        effect = "",
+        type = "Buff:magic:positive",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 65,
+        canPurge = false,
+        ["data属性名"] = "伤害吸血",
+        tooltip = "伤害吸血提高5%，持续4秒。"
+    },
+    [____exports["蕾米莉亚BuffID"]["绯色命运增益"]] = {
+        buffID = ____exports["蕾米莉亚BuffID"]["绯色命运增益"],
+        buffName = "绯色命运增益",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNInnerFire.blp",
+        effect = "",
+        type = "Buff:magic:positive",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 60,
+        canPurge = false,
+        ["data属性名"] = "力量",
+        tooltip = "命运结果：力量提高20%，持续40秒；其他结果按技能说明结算。"
+    },
+    [____exports["蕾米莉亚BuffID"]["绯色命运减益"]] = {
+        buffID = ____exports["蕾米莉亚BuffID"]["绯色命运减益"],
+        buffName = "绯色命运减益",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNHowlOfTerror.blp",
+        effect = "",
+        type = "Debuff:magic:negative",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 60,
+        canPurge = false,
+        ["data属性名"] = "力量",
+        tooltip = "命运结果：力量降低20%，持续40秒；其他结果按技能说明结算。"
+    },
+    [____exports["蕾米莉亚BuffID"]["恶魔突袭吸血"]] = {
+        buffID = ____exports["蕾米莉亚BuffID"]["恶魔突袭吸血"],
+        buffName = "恶魔突袭吸血",
+        icon = "ReplaceableTextures\\CommandButtons\\BTNVampiricAura.blp",
+        effect = "",
+        type = "Buff:magic:positive",
+        interval = 0,
+        maxStack = 99,
+        stackRule = "stack",
+        stackRefresh = false,
+        dispelLevel = 3,
+        priority = 60,
+        canPurge = false,
+        ["data属性名"] = "伤害吸血",
+        tooltip = "恶魔突袭命中后获得伤害吸血，英雄目标每次提高3%，普通目标每次提高1%，持续3秒。"
+    }
+}
+____exports.default = ____exports["蕾米莉亚Buff表"]
+return ____exports

@@ -55,9 +55,9 @@ local function _____64AD_653E_5168_529B_98DE_8E22_97F3_6548(unit, soundKey)
     if unit == nil or unit == 0 or soundHandle == nil or soundHandle == 0 then
         return
     end
-    jass:AttachSoundToUnit(soundHandle, unit)
-    jass:SetSoundVolume(soundHandle, 127)
-    jass:StartSound(soundHandle)
+    jass.AttachSoundToUnit(soundHandle, unit)
+    jass.SetSoundVolume(soundHandle, 127)
+    jass.StartSound(soundHandle)
 end
 local ____R_65BD_6CD5_8868 = {}
 local function _____83B7_53D6R_4E0A_4E0B_6587(unit)
@@ -89,14 +89,14 @@ local function _____7ED3_675FR_65BD_6CD5(record)
         SetUnitTimeScale(record.unit, 1)
         ResetUnitAnimation(record.unit)
     end
-    local id = record.unit ~= nil and record.unit ~= 0 and jass:GetHandleId(record.unit) or 0
+    local id = record.unit ~= nil and record.unit ~= 0 and jass.GetHandleId(record.unit) or 0
     if id ~= 0 and ____R_65BD_6CD5_8868[id] == record then
         __TS__Delete(____R_65BD_6CD5_8868, id)
     end
 end
 local function _____91CA_653E_5168_529B_98DE_8E22(_context, unit, _____6280_80FD_5B9E_4F8BID)
     local cfg = _____9006_56DE_5341_516D_591C_5355_4F4D_6280_80FD_914D_7F6E.R
-    local unitId = jass:GetHandleId(unit)
+    local unitId = jass.GetHandleId(unit)
     local existing = ____R_65BD_6CD5_8868[unitId]
     if existing ~= nil then
         _____7ED3_675FR_65BD_6CD5(existing)

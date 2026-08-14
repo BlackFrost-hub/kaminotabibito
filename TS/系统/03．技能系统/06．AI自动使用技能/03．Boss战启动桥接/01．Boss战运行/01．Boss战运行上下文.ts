@@ -103,6 +103,25 @@ export function 获取全部Boss战运行上下文(this: void): Boss战运行上
   return result;
 }
 
+/** 返回最近启动且尚未结束的 TS Boss 战。 */
+export function 读取当前Boss战运行上下文(this: void): Boss战运行上下文 | undefined {
+  const contexts = 获取全部Boss战运行上下文();
+  let current: Boss战运行上下文 | undefined;
+  for (let i = 0; i < contexts.length; i++) {
+    const context = contexts[i];
+    if (context == null || context.是否已结束) continue;
+    if (current == null || context.运行代次 > current.运行代次) {
+      current = context;
+    }
+  }
+  return current;
+}
+
+export function 读取当前Boss战运行单位(this: void): any {
+  const context = 读取当前Boss战运行上下文();
+  return context == null ? undefined : context.Boss单位;
+}
+
 export function 清理Boss战运行上下文(this: void, bossUnit: any): void {
   const bossHandleId = 获取句柄ID(bossUnit);
   if (bossHandleId === 0) return;

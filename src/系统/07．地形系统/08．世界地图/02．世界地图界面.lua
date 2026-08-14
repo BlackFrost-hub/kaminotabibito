@@ -74,7 +74,7 @@ local function _____521B_5EFA_5730_56FE_5E95_56FE(_____5730_56FE_6839_5E27)
             )
             DzFrameSetTexture(
                 _____5E95_56FE,
-                ("war3mapImported\\map0" .. tostring(nil, _____5E8F_53F7)) .. ".blp",
+                ("war3mapImported\\map0" .. tostring(_____5E8F_53F7)) .. ".blp",
                 0
             )
             if _____5E8F_53F7 <= 4 then

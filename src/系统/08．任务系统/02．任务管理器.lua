@@ -141,7 +141,7 @@ function QuestManager.prototype.onQuestAbandoned(self, playerId, questId)
     if success then
         self["清理任务内部限时"](self, questId)
         if nativeHandle then
-            jass:DestroyQuest(nativeHandle)
+            jass.DestroyQuest(nativeHandle)
         end
         self:triggerUIRefresh(playerId, questId)
     end

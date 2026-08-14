@@ -34,6 +34,7 @@
 | 剧情迁移、对白时长、动作挂点 | [剧情规则](gameplay/story/README.md) |
 | 音效、配音、MIX、模型、贴图、特效 | [资源规则](resources/README.md) |
 | 构建、打包、中文文件安全修改 | [工具规则](tooling/README.md) |
+| Run Map 进入游戏后完全没有 Lua 功能 | [Run Map 无 Lua 功能诊断](tooling/runtime/run-map-no-lua-diagnosis.mdc) |
 | 维护规则目录或同步 Codex 技能 | [规则系统维护](core/codex-reference.mdc) |
 
 ## 自动注入与参考文档

@@ -102,7 +102,7 @@ function ____exports.getPlayerFirstHero(self, player)
         "英雄",
         "unit"
     )
-    if registeredHero ~= nil and registeredHero ~= 0 and jass:GetOwningPlayer(registeredHero) == player and jass:IsUnitType(registeredHero, jass.UNIT_TYPE_HERO) then
+    if registeredHero ~= nil and registeredHero ~= 0 and jass.GetOwningPlayer(registeredHero) == player and jass.IsUnitType(registeredHero, jass.UNIT_TYPE_HERO) then
         return registeredHero
     end
     local heroGroup = YDUserDataGet(
@@ -123,8 +123,8 @@ function ____exports.getPlayerFirstHero(self, player)
             if hero ~= nil then
                 return
             end
-            if jass:GetOwningPlayer(u) == player then
-                if jass:IsUnitType(u, jass.UNIT_TYPE_HERO) then
+            if jass.GetOwningPlayer(u) == player then
+                if jass.IsUnitType(u, jass.UNIT_TYPE_HERO) then
                     hero = u
                 end
             end

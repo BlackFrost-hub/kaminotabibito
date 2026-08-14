@@ -17,6 +17,6 @@ function ____exports.UnitRemoveItemSwapped(whichItem, whichHero)
         return
     end
     ____exports.bj_lastRemovedItem = whichItem
-    jass:UnitRemoveItem(whichHero, whichItem)
+    jass.UnitRemoveItem(whichHero, whichItem)
 end
 return ____exports

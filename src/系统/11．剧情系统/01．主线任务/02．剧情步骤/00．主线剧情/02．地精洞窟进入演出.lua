@@ -19,8 +19,8 @@ local ____require_result_3 = require("lib.扩展函数.BJ函数.05A．电影函�
 local CinematicFilterGenericBJ = ____require_result_3.CinematicFilterGenericBJ
 local ____require_result_4 = require("lib.扩展函数.BJ函数.07．杂项")
 local SetTimeOfDay = ____require_result_4.SetTimeOfDay
-local ____require_result_5 = require("lib.扩展函数.BJ函数.01．触发与事件")
-local TriggerRegisterEnterRectSimple = ____require_result_5.TriggerRegisterEnterRectSimple
+local ____require_result_5 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
+local _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C = ____require_result_5["创建矩形进入监听"]
 local ____require_result_6 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
 local _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F = ____require_result_6["切换区域背景音乐表达式"]
 local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
@@ -52,9 +52,7 @@ local function _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, __
     end
     return _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5_5B9E_73B0(_____7247_6BB5ID, _____4E0A_4E0B_6587)
 end
-local CreateTrigger = jass.CreateTrigger
 local GetTriggerUnit = jass.GetTriggerUnit
-local TriggerAddAction = jass.TriggerAddAction
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local KillUnit = jass.KillUnit
 local IssuePointOrder = jass.IssuePointOrder
@@ -65,6 +63,7 @@ local PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE
 local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
 local _____5DF2_521D_59CB_5316_8FDB_5EA602_6838_5FC3 = false
 local _____5DF2_89E6_53D1_5730_7CBE_6D1E_7A9F_6F14_51FA = false
+local _____5730_7CBE_6D1E_7A9F_5165_53E3_76D1_542C = nil
 local _____5730_7CBE_6D1E_7A9F_6F14_51FA_97F3_4E50_5DF2_542F_52A8 = false
 local _____5730_7CBE_6D1E_7A9F_796D_575B_6F14_51FA_5DF2_5F00_59CB = false
 local _____5730_7CBE_6D1E_7A9F_4E34_65F6_5355_4F4D_952E_524D_7F00 = "剧情运行时.地精洞窟演出."
@@ -166,6 +165,10 @@ local function ____on_5730_7CBE_6D1E_7A9F_8FDB_5165_89E6_53D1()
     local _____7247_6BB5ID = "jlc_goblin_cave_intro"
     if _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, {["片段ID"] = _____7247_6BB5ID, ["触发配置名"] = "地精洞窟进入演出核心", ["触发单位"] = _____89E6_53D1_5355_4F4D}) then
         _____5DF2_89E6_53D1_5730_7CBE_6D1E_7A9F_6F14_51FA = true
+        if _____5730_7CBE_6D1E_7A9F_5165_53E3_76D1_542C ~= nil then
+            _____5730_7CBE_6D1E_7A9F_5165_53E3_76D1_542C["取消"]()
+        end
+        _____5730_7CBE_6D1E_7A9F_5165_53E3_76D1_542C = nil
     end
 end
 ____exports["执行地精洞窟演出前置"] = function(_____53C2_6570)
@@ -383,8 +386,6 @@ ____exports["初始化进度02_地精洞窟进入演出核心"] = function()
     if rect == nil or rect == 0 then
         return
     end
-    local trigger = CreateTrigger()
-    TriggerRegisterEnterRectSimple(trigger, rect)
-    TriggerAddAction(trigger, ____on_5730_7CBE_6D1E_7A9F_8FDB_5165_89E6_53D1)
+    _____5730_7CBE_6D1E_7A9F_5165_53E3_76D1_542C = _____521B_5EFA_77E9_5F62_8FDB_5165_76D1_542C(rect, ____on_5730_7CBE_6D1E_7A9F_8FDB_5165_89E6_53D1)
 end
 return ____exports

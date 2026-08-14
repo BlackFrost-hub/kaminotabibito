@@ -11,10 +11,10 @@ local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技�
 local _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["夏提雅数值与表现配置"]
 local ____13_FF0E_8840_4E4B_590D_751F = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.13．血之复生")
 local _____542F_52A8_590F_63D0_96C5_8840_4E4B_590D_751F = ____13_FF0E_8840_4E4B_590D_751F["启动夏提雅血之复生"]
-local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
-local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____09_FF0E_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.09．伤害生命下限保护")
 local _____521B_5EFA_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4 = ____09_FF0E_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4["创建伤害生命下限保护"]
+local ____24_FF0E_975E_6B7B_4EA1Boss_6536_675F_65F6_95F4_7EBF = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.24．非死亡Boss收束时间线")
+local _____542F_52A8_975E_6B7B_4EA1Boss_6536_675F_65F6_95F4_7EBF = ____24_FF0E_975E_6B7B_4EA1Boss_6536_675F_65F6_95F4_7EBF["启动非死亡Boss收束时间线"]
 local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
 local _____4E3B_52A8_7ED3_675FBoss_6218_8FD0_884C = ____require_result_0["主动结束Boss战运行"]
 local ____require_result_1 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss自动技能注册表")
@@ -34,13 +34,10 @@ local YDWETimerDestroyEffectSafe = ____require_result_7.YDWETimerDestroyEffectSa
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local IsUnitType = jass.IsUnitType
-local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local PauseUnit = jass.PauseUnit
 local ShowUnit = jass.ShowUnit
 local AddSpecialEffect = jass.AddSpecialEffect
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____8840_4E4B_590D_751F_6280_80FDKey = "血之复生"
+local _____590F_63D0_96C5_6311_6218_6536_675F_6682_505C_6765_6E90 = "Boss:夏提雅:挑战收束"
 ____exports["启动夏提雅挑战收束"] = function(context, _____662F_5426_518D_6B21_6218_8D25)
     if _____662F_5426_518D_6B21_6218_8D25 == nil then
         _____662F_5426_518D_6B21_6218_8D25 = false
@@ -54,34 +51,34 @@ ____exports["启动夏提雅挑战收束"] = function(context, _____662F_5426_51
     context["当前大型技能"] = nil
     _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(context)
     _____5173_95ED_541F_5531_6761("大招")
-    SetUnitInvulnerable(boss, true)
-    PauseUnit(boss, true)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E
-    local effect = AddSpecialEffect(
-        cfg["表现资源"]["挑战结束离场特效路径"],
-        GetUnitX(boss),
-        GetUnitY(boss)
-    )
-    if effect ~= nil and effect ~= 0 then
-        YDWETimerDestroyEffectSafe(cfg["挑战收束"]["离场特效持续秒"], effect)
-    end
-    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["挑战收束"]["离场动画编号"], ["持续秒"] = cfg["挑战收束"]["离场延迟秒"], ["恢复动画编号"] = 0})
-    if _____662F_5426_518D_6B21_6218_8D25 then
-        _____5E7F_64AD_5355_4F4D_63D0_793A(boss, _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["台词"]["再次战败"][1], 3600)
-    end
-    local delayedId = addDelayedCallback(
-        cfg["挑战收束"]["离场延迟秒"] * 1000,
-        function()
+    return _____542F_52A8_975E_6B7B_4EA1Boss_6536_675F_65F6_95F4_7EBF({
+        ["名称"] = "夏提雅-挑战收束",
+        ["清理"] = context["清理"],
+        ["成员"] = {{["单位"] = boss, ["暂停来源"] = _____590F_63D0_96C5_6311_6218_6536_675F_6682_505C_6765_6E90, ["离场动画编号"] = cfg["挑战收束"]["离场动画编号"], ["恢复动画编号"] = 0}},
+        ["离场延迟秒"] = cfg["挑战收束"]["离场延迟秒"],
+        ["开始回调"] = function()
+            local effect = AddSpecialEffect(
+                cfg["表现资源"]["挑战结束离场特效路径"],
+                GetUnitX(boss),
+                GetUnitY(boss)
+            )
+            if effect ~= nil and effect ~= 0 then
+                YDWETimerDestroyEffectSafe(cfg["挑战收束"]["离场特效持续秒"], effect)
+            end
+            if _____662F_5426_518D_6B21_6218_8D25 then
+                _____5E7F_64AD_5355_4F4D_63D0_793A(boss, _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["台词"]["再次战败"][1], 3600)
+            end
+        end,
+        ["结算回调"] = function()
             ShowUnit(boss, false)
             _____4E3B_52A8_7ED3_675FBoss_6218_8FD0_884C(boss, {["跳过死亡音效"] = true, ["跳过死亡剧情"] = true})
             _____6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI(_____590F_63D0_96C5_5956_52B1_6C60ID)
             _____6E05_7406Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587(boss)
             _____6E05_7406_590F_63D0_96C5_8FD0_884C_65F6_4E0A_4E0B_6587(boss)
-        end
-    )
-    local ____self_8 = context["清理"]
-    ____self_8["登记延迟回调"](____self_8, "夏提雅-挑战收束离场", delayedId)
-    return true
+        end,
+        ["延迟登记名"] = "夏提雅-挑战收束离场"
+    })
 end
 local function _____590F_63D0_96C5_590D_751F_5931_8D25_540E_6536_675F(context)
     ____exports["启动夏提雅挑战收束"](context, false)

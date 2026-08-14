@@ -243,7 +243,7 @@ local function _____83B7_53D6_5355_4F4D_54C8_5E0C(unit)
     if unit == nil or unit == 0 then
         return 0
     end
-    return jass:GetHandleId(unit) or 0
+    return jass.GetHandleId(unit) or 0
 end
 local function _____6307_5B9A_5217_8868_6709_97F3_6548(list)
     return list ~= nil and #list > 0
@@ -273,8 +273,8 @@ local function _____6CE8_518C_82F1_96C4_6307_4EE4_4E8B_4EF6(whichHero)
     if heroId == 0 or _____5DF2_6CE8_518C_82F1_96C4_5355_4F4DID:has(heroId) then
         return
     end
-    local trigger = jass:CreateTrigger()
-    jass:TriggerAddAction(trigger, _____5904_7406_6307_4EE4_97F3_6548)
+    local trigger = jass.CreateTrigger()
+    jass.TriggerAddAction(trigger, _____5904_7406_6307_4EE4_97F3_6548)
     registerUnitEventTrigger(trigger, whichHero, EventUnitTargetInRange)
     _____5DF2_6CE8_518C_82F1_96C4_5355_4F4DID:add(heroId)
 end
@@ -283,7 +283,7 @@ local function _____626B_63CF_5DF2_6CE8_518C_82F1_96C4()
         local i = 0
         while i <= 15 do
             do
-                local player = jass:Player(i)
+                local player = jass.Player(i)
                 if player == nil or player == 0 then
                     goto __continue65
                 end

@@ -6,8 +6,8 @@ import { 清理夏提雅运行时上下文, 重置夏提雅猎血连击 } from '
 import { 夏提雅单位技能配置 } from './00．配置';
 import { 夏提雅数值与表现配置 } from './02．数值与表现配置';
 import { 启动夏提雅血之复生 } from './13．血之复生';
-import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
+import { 启动非死亡Boss收束时间线 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/24．非死亡Boss收束时间线';
 const { 主动结束Boss战运行 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动') as {
   主动结束Boss战运行: (this: void, boss: any, options?: any) => boolean;
 };
@@ -36,13 +36,10 @@ const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09�
 const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
-const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 const ShowUnit = jass.ShowUnit as (unit: any, flag: boolean) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: number) => any;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const 血之复生技能Key = '血之复生';
+const 夏提雅挑战收束暂停来源 = 'Boss:夏提雅:挑战收束';
 
 export function 启动夏提雅挑战收束(this: void, context: 夏提雅运行时上下文, 是否再次战败 = false): boolean {
   const boss = context.Boss单位;
@@ -52,24 +49,31 @@ export function 启动夏提雅挑战收束(this: void, context: 夏提雅运行
   context.当前大型技能 = undefined;
   重置夏提雅猎血连击(context);
   关闭吟唱条('大招');
-  SetUnitInvulnerable(boss, true);
-  PauseUnit(boss, true);
-
   const cfg = 夏提雅数值与表现配置;
-  const effect = AddSpecialEffect(cfg.表现资源.挑战结束离场特效路径, GetUnitX(boss), GetUnitY(boss));
-  if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(cfg.挑战收束.离场特效持续秒, effect);
-  播放限时单位动画({ 单位: boss, 动画编号: cfg.挑战收束.离场动画编号, 持续秒: cfg.挑战收束.离场延迟秒, 恢复动画编号: 0 });
-  if (是否再次战败) 广播单位提示(boss, 夏提雅单位技能配置.台词.再次战败[0], 3600);
-
-  const delayedId = addDelayedCallback(cfg.挑战收束.离场延迟秒 * 1000, function 夏提雅挑战离场(this: void): void {
-    ShowUnit(boss, false);
-    主动结束Boss战运行(boss, { 跳过死亡音效: true, 跳过死亡剧情: true });
-    打开Boss死亡首领奖励UI(夏提雅奖励池ID);
-    清理Boss自动技能启动上下文(boss);
-    清理夏提雅运行时上下文(boss);
+  return 启动非死亡Boss收束时间线({
+    名称: '夏提雅-挑战收束',
+    清理: context.清理,
+    成员: [{
+      单位: boss,
+      暂停来源: 夏提雅挑战收束暂停来源,
+      离场动画编号: cfg.挑战收束.离场动画编号,
+      恢复动画编号: 0,
+    }],
+    离场延迟秒: cfg.挑战收束.离场延迟秒,
+    开始回调: function 夏提雅挑战收束开始(this: void): void {
+      const effect = AddSpecialEffect(cfg.表现资源.挑战结束离场特效路径, GetUnitX(boss), GetUnitY(boss));
+      if (effect != null && effect !== 0) YDWETimerDestroyEffectSafe(cfg.挑战收束.离场特效持续秒, effect);
+      if (是否再次战败) 广播单位提示(boss, 夏提雅单位技能配置.台词.再次战败[0], 3600);
+    },
+    结算回调: function 夏提雅挑战离场(this: void): void {
+      ShowUnit(boss, false);
+      主动结束Boss战运行(boss, { 跳过死亡音效: true, 跳过死亡剧情: true });
+      打开Boss死亡首领奖励UI(夏提雅奖励池ID);
+      清理Boss自动技能启动上下文(boss);
+      清理夏提雅运行时上下文(boss);
+    },
+    延迟登记名: '夏提雅-挑战收束离场',
   });
-  context.清理.登记延迟回调('夏提雅-挑战收束离场', delayedId);
-  return true;
 }
 
 function 夏提雅复生失败后收束(this: void, context: 夏提雅运行时上下文): void {

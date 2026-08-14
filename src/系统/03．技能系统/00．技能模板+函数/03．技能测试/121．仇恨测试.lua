@@ -50,7 +50,7 @@ local function ____on_804A_5929_6D4B_8BD5()
     debugLogForce(
         _____6A21_5757_540D,
         "加仇恨 敌人ID=",
-        jass:GetHandleId(_____654C_4EBA),
+        jass.GetHandleId(_____654C_4EBA),
         "对大法师 仇恨=30"
     )
     debugLogForce(_____6A21_5757_540D, "步骤1完成：仅对第一个敌人注册30仇恨，并立即驱动其攻击大法师")

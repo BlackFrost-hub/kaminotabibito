@@ -112,20 +112,20 @@ local function tryConsumeRequiredResources(self, player, requiredResources, requ
     local key = string.lower(requiredResources)
     if key == "wood" or key == "lumber" or requiredResources == "能量碎片" then
         local state = jass.PLAYER_STATE_RESOURCE_LUMBER
-        local current = jass:GetPlayerState(player, state) or 0
+        local current = jass.GetPlayerState(player, state) or 0
         if current < cost then
             return false
         end
-        jass:SetPlayerState(player, state, current - cost)
+        jass.SetPlayerState(player, state, current - cost)
         return true
     end
     if key == "gold" then
         local state = jass.PLAYER_STATE_RESOURCE_GOLD
-        local current = jass:GetPlayerState(player, state) or 0
+        local current = jass.GetPlayerState(player, state) or 0
         if current < cost then
             return false
         end
-        jass:SetPlayerState(player, state, current - cost)
+        jass.SetPlayerState(player, state, current - cost)
         return true
     end
     return false
@@ -195,7 +195,7 @@ local function resolveSubmitItem(self, hero, requireItem)
             local slot = 0
             while slot < 6 do
                 do
-                    local item = jass:UnitItemInSlot(hero, slot)
+                    local item = jass.UnitItemInSlot(hero, slot)
                     if not item then
                         goto __continue38
                     end
@@ -221,7 +221,7 @@ local function resolveSubmitItem(self, hero, requireItem)
             local slot = 0
             while slot < 6 do
                 do
-                    local item = jass:UnitItemInSlot(hero, slot)
+                    local item = jass.UnitItemInSlot(hero, slot)
                     if not item then
                         goto __continue43
                     end
@@ -406,7 +406,7 @@ function ____exports.handleQuestSubmit(self, params)
     local parseDialogText = ____params_7.parseDialogText
     local openDialog = ____params_7.openDialog
     local refreshTaskUIForAllClientsSoon = ____params_7.refreshTaskUIForAllClientsSoon
-    local callbackOwner = jass:Player(dialogOwnerId)
+    local callbackOwner = jass.Player(dialogOwnerId)
     local ____callbackOwner_8
     if callbackOwner then
         ____callbackOwner_8 = getPlayerFirstHero(nil, callbackOwner)
@@ -418,7 +418,7 @@ function ____exports.handleQuestSubmit(self, params)
     local requiredResources = quest["需求资源"]
     local requireCount = normalizeRequireCount(nil, quest["需求数量"])
     local questId = quest["任务ID"] ~= nil and tostring(quest["任务ID"]) or ""
-    local playerName = jass:GetPlayerName(jass:Player(dialogOwnerId)) or "冒险者"
+    local playerName = jass.GetPlayerName(jass.Player(dialogOwnerId)) or "冒险者"
     local _____5728_5185_90E8_9650_65F6_5185_5B8C_6210 = questId ~= "" and _____4EFB_52A1_5185_90E8_9650_65F6_662F_5426_6709_6548(questId)
     local rewardBranchIndex = -1
     local useGenericGiveFailHint = shouldUseGenericGiveFailHint(nil, quest)
@@ -503,9 +503,9 @@ function ____exports.handleQuestSubmit(self, params)
         do
             local i = 0
             while i < 4 do
-                local p = jass:Player(i)
-                if p ~= nil and jass:GetPlayerController(p) == jass.MAP_CONTROL_USER then
-                    jass:DisplayTimedTextToPlayer(
+                local p = jass.Player(i)
+                if p ~= nil and jass.GetPlayerController(p) == jass.MAP_CONTROL_USER then
+                    jass.DisplayTimedTextToPlayer(
                         p,
                         0,
                         0,
@@ -540,7 +540,7 @@ function ____exports.handleQuestSubmit(self, params)
                 function()
                     openDialog(
                         nil,
-                        jass:Player(dialogOwnerId),
+                        jass.Player(dialogOwnerId),
                         npcUnit and ({
                             lines = completeLines,
                             npcUnit = npcUnit,

@@ -14,19 +14,19 @@ function _____786E_4FDD_667A_80FD_547D_4EE4ID()
     return _____667A_80FD_547D_4EE4ID
 end
 function _____5BA0_7269_79FB_4EA4_5904_7406_5668()
-    local _____76EE_6807_7269_54C1 = jass:GetOrderTargetItem()
+    local _____76EE_6807_7269_54C1 = jass.GetOrderTargetItem()
     if not _____662F_5426_6709_6548(_____76EE_6807_7269_54C1) then
         return
     end
-    local _____4E0B_8FBE_547D_4EE4ID = jass:GetIssuedOrderId() or 0
+    local _____4E0B_8FBE_547D_4EE4ID = jass.GetIssuedOrderId() or 0
     if _____4E0B_8FBE_547D_4EE4ID ~= _____786E_4FDD_667A_80FD_547D_4EE4ID() then
         return
     end
-    local _____82F1_96C4 = jass:GetTriggerUnit()
+    local _____82F1_96C4 = jass.GetTriggerUnit()
     if not _____662F_5426_6709_6548(_____82F1_96C4) or SoHeroHatm(_____82F1_96C4) < 6 then
         return
     end
-    local _____4E3B_4EBA = jass:GetOwningPlayer(_____82F1_96C4)
+    local _____4E3B_4EBA = jass.GetOwningPlayer(_____82F1_96C4)
     if not _____662F_5426_6709_6548(_____4E3B_4EBA) then
         return
     end
@@ -44,7 +44,7 @@ function _____5BA0_7269_79FB_4EA4_5904_7406_5668()
         GS_news(_____4E3B_4EBA, _____6D88_606F__4E24_8005_6EE1)
         return
     end
-    jass:UnitAddItem(_____5BA0_7269, _____76EE_6807_7269_54C1)
+    jass.UnitAddItem(_____5BA0_7269, _____76EE_6807_7269_54C1)
     GS_news(_____4E3B_4EBA, _____6D88_606F__79FB_4EA4_5BA0_7269)
 end
 jass = require("jass.common")
@@ -67,14 +67,14 @@ local function _____53D6_53E5_67C4ID(handle)
     if not _____662F_5426_6709_6548(handle) then
         return 0
     end
-    return jass:GetHandleId(handle) or 0
+    return jass.GetHandleId(handle) or 0
 end
 local function _____786E_4FDD_5BA0_7269_79FB_4EA4_89E6_53D1_5668()
     if _____5BA0_7269_79FB_4EA4_89E6_53D1_5668 ~= nil then
         return _____5BA0_7269_79FB_4EA4_89E6_53D1_5668
     end
-    _____5BA0_7269_79FB_4EA4_89E6_53D1_5668 = jass:CreateTrigger()
-    jass:TriggerAddAction(_____5BA0_7269_79FB_4EA4_89E6_53D1_5668, _____5BA0_7269_79FB_4EA4_5904_7406_5668)
+    _____5BA0_7269_79FB_4EA4_89E6_53D1_5668 = jass.CreateTrigger()
+    jass.TriggerAddAction(_____5BA0_7269_79FB_4EA4_89E6_53D1_5668, _____5BA0_7269_79FB_4EA4_5904_7406_5668)
     return _____5BA0_7269_79FB_4EA4_89E6_53D1_5668
 end
 ____exports["注册宠物移交英雄"] = function(whichHero)

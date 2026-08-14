@@ -74,7 +74,7 @@ local function onGlobalPointOrder(unit, _orderId, x, y)
     if unit == nil or unit == 0 then
         return
     end
-    local unitId = jass:GetHandleId(unit)
+    local unitId = jass.GetHandleId(unit)
     if not _____5DF2_6CE8_518C_5B9D_7BB1_82F1_96C4:has(unitId) then
         return
     end
@@ -84,7 +84,7 @@ local function onGlobalImmediateOrder(unit, orderId)
     if unit == nil or unit == 0 then
         return
     end
-    local unitId = jass:GetHandleId(unit)
+    local unitId = jass.GetHandleId(unit)
     if not _____5DF2_6CE8_518C_5B9D_7BB1_82F1_96C4:has(unitId) then
         return
     end
@@ -109,9 +109,9 @@ local function countOnJassStesTable(eventName)
     if ht == nil or ht == 0 then
         return -1
     end
-    return jass:LoadInteger(
+    return jass.LoadInteger(
         ht,
-        jass:StringHash(eventName),
+        jass.StringHash(eventName),
         helper:ydlStes_skeyIndex(nil)
     )
 end
@@ -125,8 +125,8 @@ local function tryRegisterTargetOrderStes()
         return
     end
     if g[TRIG_KEY] == nil then
-        local trig = jass:CreateTrigger()
-        jass:TriggerAddAction(trig, onUnitIssuedTargetOrder)
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(trig, onUnitIssuedTargetOrder)
         g[TRIG_KEY] = trig
     end
     helper:ydlStes_registerAfterGetTable(nil, g[TRIG_KEY], STES_EVENT_UNIT_TARGET_ORDER)
@@ -165,11 +165,11 @@ function ____exports.registerChestSystemHero(hero)
     ensureGlobalTargetOrderListener()
     local g = _G
     if g[TRIG_KEY] == nil then
-        local trig = jass:CreateTrigger()
-        jass:TriggerAddAction(trig, onUnitIssuedTargetOrder)
+        local trig = jass.CreateTrigger()
+        jass.TriggerAddAction(trig, onUnitIssuedTargetOrder)
         g[TRIG_KEY] = trig
     end
-    local ev = jass:ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
+    local ev = jass.ConvertUnitEvent(EVENT_UNIT_ISSUED_TARGET_ORDER)
     unitSpecificEventCenter.registerUnitEventTrigger(g[TRIG_KEY], hero, ev)
 end
 --- 初始化宝箱系统

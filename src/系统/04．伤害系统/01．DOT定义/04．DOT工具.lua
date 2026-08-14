@@ -12,7 +12,7 @@ function ____exports.unitHid(self, u)
     if u == nil or u == 0 then
         return 0
     end
-    return jass:GetHandleId(u)
+    return jass.GetHandleId(u)
 end
 --- pairs 迭代可能混用 number / string 键，不合并会导致「同目标两行状态」或 onDamage 读不到 cur、乘积误判。
 function ____exports.tabRowForHid(self, tab, hid)
@@ -76,7 +76,7 @@ function ____exports.getDotSourceDisplayName(self, u)
     if u == nil or u == 0 then
         return "未知"
     end
-    local n = jass:GetUnitName(u)
+    local n = jass.GetUnitName(u)
     if n ~= nil and n ~= nil and tostring(n) ~= "" then
         return tostring(n)
     end

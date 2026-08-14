@@ -4,7 +4,7 @@ local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local angleBetweenPoints, showTextTag, getUnitId, isInteractable, getOpenTime, cleanupOpening, startOpening, updateAllOpening, onChestCenterTimerTick, ensureRegisteredToCenterTimer, jass, DzUnitDisableAttack, GetRandomInt, forEachSorted, BJ_RADTODEG, DEFAULT_OPEN_TIME, INTERACT_RANGE, UPDATE_INTERVAL, PROGRESS_BAR_HEIGHT_OFFSET, isChestType, getChestConfig, _____89E6_53D1_5B9D_7BB1_51C6_5907_5F00_542F_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_4E2D_56DE_8C03, _____89E6_53D1_5B9D_7BB1_5F00_542F_5B8C_6210_56DE_8C03, _____521B_5EFA_8FDB_5EA6_6761_7279_6548, _____9500_6BC1_8FDB_5EA6_6761_7279_6548, dropItemsFromChestConfig, _____67E5_627E_5B9D_7BB1_4E3B_4EBA, _____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1, CreateFloatTextOnUnit, ORDER_MOVE, ORDER_SMART, ORDER_ATTACK, ORDER_STOP, ORDER_HOLD_POSITION, openingMap, movingMap, _registeredToCenterTimer, _tickCounter, CENTER_TIMER_TICKS
 function angleBetweenPoints(x1, y1, x2, y2)
-    return jass:Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
+    return jass.Atan2(y2 - y1, x2 - x1) * BJ_RADTODEG
 end
 function showTextTag(unit, text, red, green, blue)
     if type(CreateFloatTextOnUnit) == "function" then
@@ -23,7 +23,7 @@ function getUnitId(unit)
     if not unit then
         return 0
     end
-    return jass:GetHandleId(unit)
+    return jass.GetHandleId(unit)
 end
 function isInteractable(destructableType)
     return isChestType(destructableType)
@@ -38,7 +38,7 @@ function cleanupOpening(data, interrupted)
         _____9500_6BC1_8FDB_5EA6_6761_7279_6548(data.progressBar)
     end
     if interrupted then
-        local cfg = getChestConfig(jass:GetDestructableTypeId(data.target))
+        local cfg = getChestConfig(jass.GetDestructableTypeId(data.target))
         showTextTag(
             data.unit,
             "宝箱打开失败...",
@@ -53,20 +53,20 @@ function cleanupOpening(data, interrupted)
     end
 end
 function startOpening(unit, target, openTime)
-    jass:IssueImmediateOrder(unit, "stop")
+    jass.IssueImmediateOrder(unit, "stop")
     if openTime <= 0 then
         openTime = 1
     end
     local speed = 1 / openTime
-    local unitX = jass:GetUnitX(unit)
-    local unitY = jass:GetUnitY(unit)
+    local unitX = jass.GetUnitX(unit)
+    local unitY = jass.GetUnitY(unit)
     local progressBar = _____521B_5EFA_8FDB_5EA6_6761_7279_6548(unit, {["高度偏移"] = PROGRESS_BAR_HEIGHT_OFFSET, ["动画序号"] = 0, ["动画速度"] = speed})
     DzUnitDisableAttack(unit, true)
-    local targetX = jass:GetDestructableX(target)
-    local targetY = jass:GetDestructableY(target)
+    local targetX = jass.GetDestructableX(target)
+    local targetY = jass.GetDestructableY(target)
     local angle = angleBetweenPoints(unitX, unitY, targetX, targetY)
-    jass:SetUnitFacing(unit, angle)
-    local config = getChestConfig(jass:GetDestructableTypeId(target))
+    jass.SetUnitFacing(unit, angle)
+    local config = getChestConfig(jass.GetDestructableTypeId(target))
     local highRoll = config and config["高级掉落"] and GetRandomInt(1, 100) or nil
     if config ~= nil and highRoll ~= nil then
     end
@@ -113,7 +113,7 @@ function updateAllOpening()
     forEachSorted(
         openingMap,
         function(unitId, data)
-            local currentOrder = jass:GetUnitCurrentOrder(data.unit)
+            local currentOrder = jass.GetUnitCurrentOrder(data.unit)
             local completed = data.elapsed >= data.openTime
             local interrupted = currentOrder == ORDER_SMART or currentOrder == ORDER_ATTACK or currentOrder == ORDER_STOP or currentOrder == ORDER_HOLD_POSITION
             if not completed and not interrupted then
@@ -131,7 +131,7 @@ function updateAllOpening()
                 if completed then
                     local ____data_chestConfig_20 = data.chestConfig
                     if ____data_chestConfig_20 == nil then
-                        ____data_chestConfig_20 = getChestConfig(jass:GetDestructableTypeId(data.target))
+                        ____data_chestConfig_20 = getChestConfig(jass.GetDestructableTypeId(data.target))
                     end
                     local cfg = ____data_chestConfig_20
                     local ____cfg_21
@@ -167,8 +167,8 @@ function updateAllOpening()
                         ownerUnit
                     )
                     if cfg then
-                        local dropX = jass:GetDestructableX(data.target)
-                        local dropY = jass:GetDestructableY(data.target)
+                        local dropX = jass.GetDestructableX(data.target)
+                        local dropY = jass.GetDestructableY(data.target)
                         local _____9996_9886_5956_52B1_5DF2_63A5_7BA1 = _____89E6_53D1_5B9D_7BB1_9996_9886_5956_52B1(cfg, data.unit, data.target)
                         if _____9996_9886_5956_52B1_5DF2_63A5_7BA1 then
                         else
@@ -183,7 +183,7 @@ function updateAllOpening()
                         end
                     end
                     if data.target then
-                        jass:KillDestructable(data.target)
+                        jass.KillDestructable(data.target)
                     end
                 end
                 if not completed then
@@ -197,11 +197,11 @@ function updateAllOpening()
     forEachSorted(
         movingMap,
         function(unitId, data)
-            local currentOrder = jass:GetUnitCurrentOrder(data.unit)
-            local inRange = jass:IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE)
+            local currentOrder = jass.GetUnitCurrentOrder(data.unit)
+            local inRange = jass.IsUnitInRangeXY(data.unit, data.targetX, data.targetY, INTERACT_RANGE)
             local orderChanged = currentOrder ~= ORDER_MOVE and currentOrder ~= ORDER_SMART
             if inRange then
-                local targetType = jass:GetDestructableTypeId(data.target)
+                local targetType = jass.GetDestructableTypeId(data.target)
                 if targetType and isInteractable(targetType) then
                     local openTime = getOpenTime(targetType)
                     startOpening(data.unit, data.target, openTime)
@@ -370,16 +370,16 @@ function ____exports.onUnitTargetInteractable(unit, target)
     if not unit or not target then
         return
     end
-    local targetType = jass:GetDestructableTypeId(target)
+    local targetType = jass.GetDestructableTypeId(target)
     if not isInteractable(targetType) then
         return
     end
     local openTime = getOpenTime(targetType)
-    local targetX = jass:GetDestructableX(target)
-    local targetY = jass:GetDestructableY(target)
-    local inRange = jass:IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE)
+    local targetX = jass.GetDestructableX(target)
+    local targetY = jass.GetDestructableY(target)
+    local inRange = jass.IsUnitInRangeXY(unit, targetX, targetY, INTERACT_RANGE)
     if not inRange then
-        jass:IssuePointOrder(unit, "move", targetX, targetY)
+        jass.IssuePointOrder(unit, "move", targetX, targetY)
         local data = {unit = unit, target = target, targetX = targetX, targetY = targetY}
         local unitId = getUnitId(unit)
         if unitId ~= 0 then

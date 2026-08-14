@@ -12,7 +12,7 @@ function getOrCreateReuseSound(path)
         return hit
     end
     local m = getDefaultSoundModel()
-    local s = jass:CreateSound(
+    local s = jass.CreateSound(
         path,
         false,
         false,
@@ -61,18 +61,18 @@ function ____exports.Sound3DII_Mp3PlayReuse(path, player, model)
     if not s then
         return
     end
-    jass:SetSoundChannel(s, model.channel)
-    jass:SetSoundVolume(s, model.volume)
-    jass:SetSoundPitch(s, model.pitch)
-    local shouldPlay = not p or jass:GetLocalPlayer() == p
+    jass.SetSoundChannel(s, model.channel)
+    jass.SetSoundVolume(s, model.volume)
+    jass.SetSoundPitch(s, model.pitch)
+    local shouldPlay = not p or jass.GetLocalPlayer() == p
     if shouldPlay then
         local started = soundReuseHadStartedByPath
         if started[path] then
-            jass:StopSound(s, false, false)
+            jass.StopSound(s, false, false)
         else
             started[path] = true
         end
-        jass:StartSound(s)
+        jass.StartSound(s)
     end
     lastPlayedSound = s
 end

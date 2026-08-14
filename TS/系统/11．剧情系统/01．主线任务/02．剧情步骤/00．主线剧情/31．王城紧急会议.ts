@@ -4,6 +4,7 @@ import { 进入主线节点 } from "../../00．剧情系统核心工具/10．标
 import { 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import { 启动王城攻城战, 结束菲利斯攻城等待, 登记存活攻城单位为菲利斯护卫 } from "./31A．王城攻城战控制器";
 import { 准备耶提尔菲利斯协战 } from "./31B．耶提尔协战控制器";
+import { 创建剧情场景单位, 定位剧情单位 } from "../../../00．公共/02．剧情NPC创建";
 
 const { 开始第二章菲利斯攻城区域音乐 } = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐") as {
   开始第二章菲利斯攻城区域音乐: (this: void) => boolean;
@@ -17,13 +18,6 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { 按名字反查总单位ID } = require("系统.01．单位系统.08．单位配置表.04．总单位配置表") as {
   按名字反查总单位ID: (this: void, name: string) => string | undefined;
 };
-const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
-  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
-};
-
-const Player = jass.Player as (this: void, playerId: number) => any;
-const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facingAngle: number) => void;
-const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
 const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, whichUnit: any, height: number, rate: number) => void;
 const 中立被动玩家ID = 15;
 
@@ -58,14 +52,21 @@ function 读取或创建会议NPC(this: void, 预置: 会议席位预置): any {
   const 语义引用 = `主线NPC.${预置.角色名}`;
   let unit = 读取语义单位引用(语义引用);
   if (unit == null || unit === 0) {
-    const unitTypeId = stringToFourCCSafe(按名字反查总单位ID(预置.单位名));
+    const 单位ID = 按名字反查总单位ID(预置.单位名);
+    const unitTypeId = stringToFourCCSafe(单位ID);
     if (!(unitTypeId > 0)) return null;
-    unit = 创建单位并登记排泄安全(Player(中立被动玩家ID), unitTypeId, 预置.X, 预置.Y, 预置.朝向);
+    unit = 创建剧情场景单位({
+      单位ID: 单位ID!,
+      X: 预置.X,
+      Y: 预置.Y,
+      朝向: 预置.朝向,
+      玩家ID: 中立被动玩家ID,
+      登记死亡排泄: true,
+    });
   }
   if (unit == null || unit === 0) return null;
 
-  SetUnitPosition(unit, 预置.X, 预置.Y);
-  SetUnitFacing(unit, 预置.朝向);
+  定位剧情单位(unit, { ...预置, 命令: false });
   if (预置.飞行高度 != null) SetUnitFlyHeight(unit, 预置.飞行高度, 0);
   注册剧情运行时单位(语义引用, unit);
   return unit;
@@ -80,8 +81,7 @@ export function 布置王城会议席位(this: void): void {
 export function 归位内务总管语维(this: void): void {
   const 语维 = 读取语义单位引用("主线NPC.语维");
   if (语维 == null || 语维 === 0) return;
-  SetUnitPosition(语维, 语维原始位置.X, 语维原始位置.Y);
-  SetUnitFacing(语维, 语维原始位置.朝向);
+  定位剧情单位(语维, { ...语维原始位置, 命令: false });
   注册剧情运行时单位("主线NPC.语维", 语维);
 }
 

@@ -124,9 +124,9 @@ local function _____6267_884C_8BBE_7F6E_975EBoss_590D_6D3B_70B9(_____53C2_6570)
     end
     local _____65E7_590D_6D3B_70B9 = jglobals.udg_FHD
     if _____65E7_590D_6D3B_70B9 ~= nil and _____65E7_590D_6D3B_70B9 ~= 0 then
-        jass:RemoveLocation(_____65E7_590D_6D3B_70B9)
+        jass.RemoveLocation(_____65E7_590D_6D3B_70B9)
     end
-    jglobals.udg_FHD = jass:Location(_____914D_7F6E.X, _____914D_7F6E.Y)
+    jglobals.udg_FHD = jass.Location(_____914D_7F6E.X, _____914D_7F6E.Y)
 end
 local _____6807_51C6_5267_60C5_52A8_4F5C_6CE8_518C_8868 = {
     ["主线.写入进度"] = _____6267_884C_5199_5165_4E3B_7EBF_8FDB_5EA6,

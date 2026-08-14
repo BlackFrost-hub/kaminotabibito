@@ -23,7 +23,7 @@ local addDelayedCallback = ____require_result_1.addDelayedCallback
 local __pcallModelUnit = 0
 local __pcallModelPath = ""
 local function __pcallSetUnitModelBody(self)
-    japi:DzSetUnitModel(__pcallModelUnit, __pcallModelPath)
+    japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath)
 end
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_2.debugLog
@@ -47,7 +47,7 @@ local function registerCreatedNpcUnit(npcConfig, unit, registerQuestId)
     if not unit then
         return
     end
-    local handleId = type(jass.GetHandleId) == "function" and jass:GetHandleId(unit) or 0
+    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(unit) or 0
     if handleId > 0 then
         g_npcConfigByUnitHandleId:set(handleId, npcConfig)
     end
@@ -108,7 +108,7 @@ local function onNpcSetModelDelayed()
             "NPC生成器",
             "设置单位模型失败（已忽略）",
             ctx.npcLabel,
-            "model=" .. tostring(nil, ctx.modelPath)
+            "model=" .. tostring(ctx.modelPath)
         )
     end
 end
@@ -134,7 +134,7 @@ local function createSingleNPC(npcConfig, registerQuestId)
             nil,
             "NPC生成器",
             "配置不完整，跳过:",
-            tostring(nil, npcConfig["NPC配置名"])
+            tostring(npcConfig["NPC配置名"])
         )
         return nil
     end
@@ -155,7 +155,7 @@ local function createSingleNPC(npcConfig, registerQuestId)
             nil,
             "NPC生成器",
             "创建单位失败:",
-            tostring(nil, npcConfig["NPC配置名"]),
+            tostring(npcConfig["NPC配置名"]),
             ("(" .. unitCode) .. ")"
         )
         return nil
@@ -167,7 +167,7 @@ local function createSingleNPC(npcConfig, registerQuestId)
         scheduleSetUnitModel(
             unit,
             npcConfig["模型路径"],
-            tostring(nil, npcConfig["NPC配置名"])
+            tostring(npcConfig["NPC配置名"])
         )
     end
     runNpcInitAction(nil, unit, npcConfig["初始化动作"])
@@ -177,9 +177,9 @@ local function createSingleNPC(npcConfig, registerQuestId)
         nil,
         "NPC生成器",
         "成功创建NPC:",
-        tostring(nil, npcConfig["NPC配置名"]),
+        tostring(npcConfig["NPC配置名"]),
         "at",
-        ((("(" .. tostring(nil, npcConfig["坐标X"])) .. ", ") .. tostring(nil, npcConfig["坐标Y"])) .. ")"
+        ((("(" .. tostring(npcConfig["坐标X"])) .. ", ") .. tostring(npcConfig["坐标Y"])) .. ")"
     )
     return unit
 end
@@ -221,7 +221,7 @@ ____exports["按任务ID创建NPC"] = function(_____4EFB_52A1ID)
             nil,
             "NPC生成器",
             "未找到任务ID对应的NPC:",
-            tostring(nil, _____4EFB_52A1ID)
+            tostring(_____4EFB_52A1ID)
         )
         return nil
     end
@@ -230,9 +230,9 @@ ____exports["按任务ID创建NPC"] = function(_____4EFB_52A1ID)
             nil,
             "NPC生成器",
             "NPC未启用:",
-            tostring(nil, npcConfig["NPC配置名"]),
+            tostring(npcConfig["NPC配置名"]),
             "(任务ID:",
-            tostring(nil, _____4EFB_52A1ID) .. ")"
+            tostring(_____4EFB_52A1ID) .. ")"
         )
         return nil
     end
@@ -329,7 +329,7 @@ ____exports["登记外部任务NPC单位"] = function(_____4EFB_52A1ID, _____535
     if not npcConfig then
         return false
     end
-    local handleId = type(jass.GetHandleId) == "function" and jass:GetHandleId(_____5355_4F4D) or 0
+    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(_____5355_4F4D) or 0
     if handleId > 0 and g_npcConfigByUnitHandleId:get(handleId) == npcConfig then
         return true
     end
@@ -342,7 +342,7 @@ ____exports["按单位查找NPC配置"] = function(_____5355_4F4D)
     if not _____5355_4F4D or _____5355_4F4D == 0 then
         return nil
     end
-    local handleId = type(jass.GetHandleId) == "function" and jass:GetHandleId(_____5355_4F4D) or 0
+    local handleId = type(jass.GetHandleId) == "function" and jass.GetHandleId(_____5355_4F4D) or 0
     if handleId <= 0 then
         return nil
     end

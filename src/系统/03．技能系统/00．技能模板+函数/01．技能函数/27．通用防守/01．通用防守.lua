@@ -232,7 +232,7 @@ function _____5F00_59CB_4E0B_4E00_6CE2(variable)
             __TS__StringReplace(
                 _____6A21_677F,
                 "{波次}",
-                tostring(nil, _____72B6_6001["当前波次索引"])
+                tostring(_____72B6_6001["当前波次索引"])
             ),
             4200
         )

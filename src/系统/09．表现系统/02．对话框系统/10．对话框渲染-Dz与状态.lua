@@ -47,26 +47,26 @@ ____exports.g_questCallbacksByPlayer = {}
 local __dzPcallFrame = 0
 local __dzPcallPriority = 0
 local function __dzSetPriorityPcallBody(self)
-    japi:DzFrameSetPriority(__dzPcallFrame, __dzPcallPriority)
+    japi.DzFrameSetPriority(__dzPcallFrame, __dzPcallPriority)
 end
 function ____exports.dzShow(self, f, b)
     if f and f ~= 0 then
-        japi:DzFrameShow(f, b)
+        japi.DzFrameShow(f, b)
     end
 end
 function ____exports.dzSetText(self, f, s)
     if f and f ~= 0 then
-        japi:DzFrameSetText(f, s)
+        japi.DzFrameSetText(f, s)
     end
 end
 function ____exports.dzSetTexture(self, f, path)
     if f and f ~= 0 then
-        japi:DzFrameSetTexture(f, path, 0)
+        japi.DzFrameSetTexture(f, path, 0)
     end
 end
 function ____exports.dzSetAlpha(self, f, a)
     if f and f ~= 0 then
-        japi:DzFrameSetAlpha(f, a)
+        japi.DzFrameSetAlpha(f, a)
     end
 end
 function ____exports.dzSetPriority(self, f, p)
@@ -78,47 +78,47 @@ function ____exports.dzSetPriority(self, f, p)
 end
 function ____exports.dzSetAbsPoint(self, f, point, x, y)
     if f and f ~= 0 then
-        japi:DzFrameSetAbsolutePoint(f, point, x, y)
+        japi.DzFrameSetAbsolutePoint(f, point, x, y)
     end
 end
 function ____exports.dzSetSize(self, f, w, h)
     if f and f ~= 0 then
-        japi:DzFrameSetSize(f, w, h)
+        japi.DzFrameSetSize(f, w, h)
     end
 end
 function ____exports.dzClearPoints(self, f)
     if f and f ~= 0 then
-        japi:DzFrameClearAllPoints(f)
+        japi.DzFrameClearAllPoints(f)
     end
 end
 function ____exports.dzSetEnable(self, f, b)
     if f and f ~= 0 then
-        japi:DzFrameSetEnable(f, b)
+        japi.DzFrameSetEnable(f, b)
     end
 end
 function ____exports.dzSetFont(self, f, font, size)
     if f and f ~= 0 then
-        japi:DzFrameSetFont(f, font, size, 0)
+        japi.DzFrameSetFont(f, font, size, 0)
     end
 end
 function ____exports.dzCreate(self, template, tag)
-    local gameUI = japi:DzGetGameUI()
+    local gameUI = japi.DzGetGameUI()
     if not gameUI or gameUI == 0 then
         return 0
     end
-    return japi:DzCreateFrame(template, gameUI, tag)
+    return japi.DzCreateFrame(template, gameUI, tag)
 end
 function ____exports.dzGetLocalPlayer(self)
-    return jass:GetLocalPlayer()
+    return jass.GetLocalPlayer()
 end
 function ____exports.dzGetPlayerId(self, p)
-    return jass:GetPlayerId(p)
+    return jass.GetPlayerId(p)
 end
 function ____exports.dzPlayer(self, index)
-    return jass:Player(index)
+    return jass.Player(index)
 end
 function ____exports.dzLoadToc(self)
-    japi:DzLoadToc(____exports.TOC_PATH)
+    japi.DzLoadToc(____exports.TOC_PATH)
 end
 local g_tocLoaded = false
 function ____exports.dzLoadTocOnce(self)

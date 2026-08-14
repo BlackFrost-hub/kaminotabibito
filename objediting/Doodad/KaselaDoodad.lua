@@ -1,4 +1,4 @@
-local KASELA_INSULATING_CORAL_ID = 'D0B3'
+local KASELA_INSULATING_CORAL_ID = 'D0B4'
 local BASE_CORAL_ID = 'ZWcl'
 
 local function getCreateDefinition()

@@ -27,7 +27,7 @@ local function ____on_8BBE_7F6E_83AB_7279_65AF_8FDB_5165_6761_4EF6(player, comma
         0,
         0,
         6,
-        "[测试] RWXM[18] 已设置为完成：" .. tostring(nil, _____5DF2_5B8C_6210)
+        "[测试] RWXM[18] 已设置为完成：" .. tostring(_____5DF2_5B8C_6210)
     )
     debugLogForce(
         _____6A21_5757_540D,

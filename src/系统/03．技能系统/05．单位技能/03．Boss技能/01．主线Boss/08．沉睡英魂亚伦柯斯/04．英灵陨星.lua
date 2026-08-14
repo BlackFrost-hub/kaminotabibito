@@ -175,7 +175,7 @@ local function _____53D6_5893_7891_5916_56F4_52A0_6743_843D_70B9(field, tombston
     end
     local cfg = _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E
     local tombstone = tombstones[GetRandomInt(0, #tombstones - 1) + 1]
-    local toCenterFacing = jass:Atan2(field["中心Y"] - tombstone.Y, field["中心X"] - tombstone.X) * 57.29577951308232
+    local toCenterFacing = jass.Atan2(field["中心Y"] - tombstone.Y, field["中心X"] - tombstone.X) * 57.29577951308232
     local minDistance = cfg["旧誓墓碑"]["安魂范围"] + radius + cfg["英灵陨星"]["P2墓碑安全间隔"]
     do
         local attempt = 0

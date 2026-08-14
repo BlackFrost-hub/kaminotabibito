@@ -140,14 +140,14 @@ end
 ____exports["过滤敌方"] = function(_____5355_4F4D_5217_8868, _____6240_6709_8005)
     return ____exports["单位组过滤"](
         _____5355_4F4D_5217_8868,
-        function(u) return jass:IsUnitEnemy(u, _____6240_6709_8005) end
+        function(u) return jass.IsUnitEnemy(u, _____6240_6709_8005) end
     )
 end
 --- 只保留友方单位（不含自身）
 ____exports["过滤友方排除自身"] = function(_____5355_4F4D_5217_8868, _____6240_6709_8005)
     return ____exports["单位组过滤"](
         _____5355_4F4D_5217_8868,
-        function(u) return u ~= _____6240_6709_8005 and jass:IsUnitAlly(u, _____6240_6709_8005) end
+        function(u) return u ~= _____6240_6709_8005 and jass.IsUnitAlly(u, _____6240_6709_8005) end
     )
 end
 --- 按距离指定坐标从近到远排序
@@ -159,10 +159,10 @@ ____exports["单位组按距离排序"] = function(_____5355_4F4D_5217_8868, ___
     __TS__ArraySort(
         _____62F7_8D1D,
         function(____, a, b)
-            local dxA = jass:GetUnitX(a) - _____4E2D_5FC3X
-            local dyA = jass:GetUnitY(a) - _____4E2D_5FC3Y
-            local dxB = jass:GetUnitX(b) - _____4E2D_5FC3X
-            local dyB = jass:GetUnitY(b) - _____4E2D_5FC3Y
+            local dxA = jass.GetUnitX(a) - _____4E2D_5FC3X
+            local dyA = jass.GetUnitY(a) - _____4E2D_5FC3Y
+            local dxB = jass.GetUnitX(b) - _____4E2D_5FC3X
+            local dyB = jass.GetUnitY(b) - _____4E2D_5FC3Y
             return dxA * dxA + dyA * dyA - (dxB * dxB + dyB * dyB)
         end
     )
@@ -177,7 +177,7 @@ ____exports["单位组按生命排序"] = function(_____5355_4F4D_5217_8868)
     __TS__ArraySort(
         _____62F7_8D1D,
         function(____, a, b)
-            return jass:GetUnitState(a, jass.UNIT_STATE_LIFE) - jass:GetUnitState(b, jass.UNIT_STATE_LIFE)
+            return jass.GetUnitState(a, jass.UNIT_STATE_LIFE) - jass.GetUnitState(b, jass.UNIT_STATE_LIFE)
         end
     )
     return _____62F7_8D1D

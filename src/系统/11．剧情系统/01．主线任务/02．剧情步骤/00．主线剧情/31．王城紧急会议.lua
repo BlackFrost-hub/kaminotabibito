@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
 local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具")
 local _____505C_6B62_89E6_53D1_5355_4F4D = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["停止触发单位"]
@@ -14,6 +15,9 @@ local _____7ED3_675F_83F2_5229_65AF_653B_57CE_7B49_5F85 = ____31A_FF0E_738B_57CE
 local _____767B_8BB0_5B58_6D3B_653B_57CE_5355_4F4D_4E3A_83F2_5229_65AF_62A4_536B = ____31A_FF0E_738B_57CE_653B_57CE_6218_63A7_5236_5668["登记存活攻城单位为菲利斯护卫"]
 local ____31B_FF0E_8036_63D0_5C14_534F_6218_63A7_5236_5668 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.31B．耶提尔协战控制器")
 local _____51C6_5907_8036_63D0_5C14_83F2_5229_65AF_534F_6218 = ____31B_FF0E_8036_63D0_5C14_534F_6218_63A7_5236_5668["准备耶提尔菲利斯协战"]
+local ____02_FF0E_5267_60C5NPC_521B_5EFA = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
+local _____521B_5EFA_5267_60C5_573A_666F_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情场景单位"]
+local _____5B9A_4F4D_5267_60C5_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["定位剧情单位"]
 local ____require_result_0 = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐")
 local _____5F00_59CB_7B2C_4E8C_7AE0_83F2_5229_65AF_653B_57CE_533A_57DF_97F3_4E50 = ____require_result_0["开始第二章菲利斯攻城区域音乐"]
 local jass = require("jass.common")
@@ -21,11 +25,6 @@ local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
 local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_2["按名字反查总单位ID"]
-local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_3["创建单位并登记排泄安全"]
-local Player = jass.Player
-local SetUnitFacing = jass.SetUnitFacing
-local SetUnitPosition = jass.SetUnitPosition
 local SetUnitFlyHeight = jass.SetUnitFlyHeight
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
 local _____8BED_7EF4_539F_59CB_4F4D_7F6E = {X = 23021.7, Y = -23819.4, ["朝向"] = 180}
@@ -89,23 +88,27 @@ local function _____8BFB_53D6_6216_521B_5EFA_4F1A_8BAENPC(_____9884_7F6E)
     local _____8BED_4E49_5F15_7528 = "主线NPC." .. _____9884_7F6E["角色名"]
     local unit = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(_____8BED_4E49_5F15_7528)
     if unit == nil or unit == 0 then
-        local unitTypeId = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____9884_7F6E["单位名"]))
+        local _____5355_4F4DID = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____9884_7F6E["单位名"])
+        local unitTypeId = stringToFourCCSafe(_____5355_4F4DID)
         if not (unitTypeId > 0) then
             return nil
         end
-        unit = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-            Player(_____4E2D_7ACB_88AB_52A8_73A9_5BB6ID),
-            unitTypeId,
-            _____9884_7F6E.X,
-            _____9884_7F6E.Y,
-            _____9884_7F6E["朝向"]
-        )
+        unit = _____521B_5EFA_5267_60C5_573A_666F_5355_4F4D({
+            ["单位ID"] = _____5355_4F4DID,
+            X = _____9884_7F6E.X,
+            Y = _____9884_7F6E.Y,
+            ["朝向"] = _____9884_7F6E["朝向"],
+            ["玩家ID"] = _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID,
+            ["登记死亡排泄"] = true
+        })
     end
     if unit == nil or unit == 0 then
         return nil
     end
-    SetUnitPosition(unit, _____9884_7F6E.X, _____9884_7F6E.Y)
-    SetUnitFacing(unit, _____9884_7F6E["朝向"])
+    _____5B9A_4F4D_5267_60C5_5355_4F4D(
+        unit,
+        __TS__ObjectAssign({}, _____9884_7F6E, {["命令"] = false})
+    )
     if _____9884_7F6E["飞行高度"] ~= nil then
         SetUnitFlyHeight(unit, _____9884_7F6E["飞行高度"], 0)
     end
@@ -126,8 +129,10 @@ ____exports["归位内务总管语维"] = function()
     if _____8BED_7EF4 == nil or _____8BED_7EF4 == 0 then
         return
     end
-    SetUnitPosition(_____8BED_7EF4, _____8BED_7EF4_539F_59CB_4F4D_7F6E.X, _____8BED_7EF4_539F_59CB_4F4D_7F6E.Y)
-    SetUnitFacing(_____8BED_7EF4, _____8BED_7EF4_539F_59CB_4F4D_7F6E["朝向"])
+    _____5B9A_4F4D_5267_60C5_5355_4F4D(
+        _____8BED_7EF4,
+        __TS__ObjectAssign({}, _____8BED_7EF4_539F_59CB_4F4D_7F6E, {["命令"] = false})
+    )
     _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D("主线NPC.语维", _____8BED_7EF4)
 end
 ____exports["执行前往会议室任务"] = function()

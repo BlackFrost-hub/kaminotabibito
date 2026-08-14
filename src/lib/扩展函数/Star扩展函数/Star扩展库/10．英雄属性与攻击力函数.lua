@@ -33,7 +33,7 @@ local function getUnitPrimaryTypeFromSlk(self, u)
     if not SUC_IsValidUnit(u) then
         return -1
     end
-    local unitId = jass:GetUnitTypeId(u)
+    local unitId = jass.GetUnitTypeId(u)
     if unitId == 0 then
         return -1
     end
@@ -41,7 +41,7 @@ local function getUnitPrimaryTypeFromSlk(self, u)
         return -1
     end
     local script = ("(function() local _t=(require'jass.slk').unit; local _u=_t and _t['" .. tostring(unitId)) .. "']; if _u then return _u.Primary or '' else return '' end end)()"
-    local primary = japi:EXExecuteScript(script) or ""
+    local primary = japi.EXExecuteScript(script) or ""
     if primary == "STR" then
         return ____exports.PRIMARY_STR
     end
@@ -54,23 +54,23 @@ local function getUnitPrimaryTypeFromSlk(self, u)
     return -1
 end
 local function GAFC(self, x1, y1, x2, y2)
-    return jass:Atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD
+    return jass.Atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD
 end
 local function getHeroPrimaryGreenValue(self, u)
     local primaryType = getUnitPrimaryTypeFromSlk(nil, u)
     if primaryType == ____exports.PRIMARY_STR then
-        local total = jass:GetHeroStr(u, true)
-        local green = jass:GetHeroStr(u, false)
+        local total = jass.GetHeroStr(u, true)
+        local green = jass.GetHeroStr(u, false)
         return total - green
     end
     if primaryType == ____exports.PRIMARY_AGI then
-        local total = jass:GetHeroAgi(u, true)
-        local green = jass:GetHeroAgi(u, false)
+        local total = jass.GetHeroAgi(u, true)
+        local green = jass.GetHeroAgi(u, false)
         return total - green
     end
     if primaryType == ____exports.PRIMARY_INT then
-        local total = jass:GetHeroInt(u, true)
-        local green = jass:GetHeroInt(u, false)
+        local total = jass.GetHeroInt(u, true)
+        local green = jass.GetHeroInt(u, false)
         return total - green
     end
     return 0
@@ -79,11 +79,11 @@ function ____exports.SU_GetUnitModel(self, u)
     if not SUC_IsValidUnit(u) then
         return ""
     end
-    local unitId = jass:GetUnitTypeId(u)
+    local unitId = jass.GetUnitTypeId(u)
     local file = ""
     if japi ~= nil then
         local script = ("(function() local _t=(require'jass.slk').unit; local _u=_t and _t['" .. tostring(unitId)) .. "']; if _u then return _u.file or '' else return '' end end)()"
-        file = japi:EXExecuteScript(script) or ""
+        file = japi.EXExecuteScript(script) or ""
     end
     if #file > 0 then
         local suffix = string.lower(string.sub(file, -4))
@@ -102,7 +102,7 @@ function ____exports.SU_AddHeroState(self, u, id, typ, value)
     end
     local isAdd = typ == 0
     if id == ____exports.PRIMARY_STR then
-        local current = jass:GetHeroStr(u, false)
+        local current = jass.GetHeroStr(u, false)
         local ____jass_SetHeroStr_3 = jass.SetHeroStr
         local ____u_2 = u
         local ____isAdd_1
@@ -113,7 +113,7 @@ function ____exports.SU_AddHeroState(self, u, id, typ, value)
         end
         ____jass_SetHeroStr_3(jass, ____u_2, ____isAdd_1, false)
     elseif id == ____exports.PRIMARY_AGI then
-        local current = jass:GetHeroAgi(u, false)
+        local current = jass.GetHeroAgi(u, false)
         local ____jass_SetHeroAgi_6 = jass.SetHeroAgi
         local ____u_5 = u
         local ____isAdd_4
@@ -124,7 +124,7 @@ function ____exports.SU_AddHeroState(self, u, id, typ, value)
         end
         ____jass_SetHeroAgi_6(jass, ____u_5, ____isAdd_4, false)
     elseif id == ____exports.PRIMARY_INT then
-        local current = jass:GetHeroInt(u, false)
+        local current = jass.GetHeroInt(u, false)
         local ____jass_SetHeroInt_9 = jass.SetHeroInt
         local ____u_8 = u
         local ____isAdd_7
@@ -142,13 +142,13 @@ function ____exports.SU_GetHeroParmaryValue(self, u)
     end
     local typ = ____exports.SU_GetHeroParmary(nil, u)
     if typ == ____exports.PRIMARY_STR then
-        return jass:GetHeroStr(u, true)
+        return jass.GetHeroStr(u, true)
     end
     if typ == ____exports.PRIMARY_AGI then
-        return jass:GetHeroAgi(u, true)
+        return jass.GetHeroAgi(u, true)
     end
     if typ == ____exports.PRIMARY_INT then
-        return jass:GetHeroInt(u, true)
+        return jass.GetHeroInt(u, true)
     end
     return -1
 end
@@ -228,15 +228,15 @@ function ____exports.SU_GetUnitWhiteAtk(self, uOrA, aMaybe)
     local primaryGreen = getHeroPrimaryGreenValue(nil, u)
     local baseDmg = GetUnitStateJapi(
         u,
-        jass:ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
+        jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE)
     )
     local bonusDmg = GetUnitStateJapi(
         u,
-        jass:ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
+        jass.ConvertUnitState(UNIT_STATE_ATTACK1_BONUS)
     )
     local diceCount = GetUnitStateJapi(
         u,
-        jass:ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)
+        jass.ConvertUnitState(UNIT_STATE_ATTACK1_COUNT)
     )
     return baseDmg + bonusDmg * (diceCount + 1) / 2 - a * primaryGreen
 end

@@ -77,21 +77,21 @@ local function getActiveUserPlayerForUnit(unit)
     if unit == nil or unit == 0 then
         return nil
     end
-    local owner = jass:GetOwningPlayer(unit)
+    local owner = jass.GetOwningPlayer(unit)
     if owner == nil then
         return nil
     end
-    if jass:GetPlayerController(owner) ~= jass.MAP_CONTROL_USER then
+    if jass.GetPlayerController(owner) ~= jass.MAP_CONTROL_USER then
         return nil
     end
-    if jass:GetPlayerSlotState(owner) ~= jass.PLAYER_SLOT_STATE_PLAYING then
+    if jass.GetPlayerSlotState(owner) ~= jass.PLAYER_SLOT_STATE_PLAYING then
         return nil
     end
     return owner
 end
 --- 检查死亡单位是否触发金币平分（中立敌对或玩家8）
 local function isValidDyingUnit(dyingUnit)
-    if jass:IsUnitType(dyingUnit, jass.UNIT_TYPE_SUMMONED) == true then
+    if jass.IsUnitType(dyingUnit, jass.UNIT_TYPE_SUMMONED) == true then
         return false
     end
     local playerId = getUnitOwnerId(nil, dyingUnit)
@@ -138,26 +138,26 @@ local function _____5904_7406_5E73_5206_82F1_96C4(hero)
     if hero == _____5E73_5206_51FB_6740_8005 then
         return
     end
-    if jass:IsUnitAlly(hero, _____5E73_5206_51FB_6740_73A9_5BB6) ~= true then
+    if jass.IsUnitAlly(hero, _____5E73_5206_51FB_6740_73A9_5BB6) ~= true then
         return
     end
-    local ____temp_7 = jass:GetUnitX(hero)
+    local ____temp_7 = jass.GetUnitX(hero)
     if ____temp_7 == nil then
         ____temp_7 = 0
     end
     local heroX = ____temp_7
-    local ____temp_8 = jass:GetUnitY(hero)
+    local ____temp_8 = jass.GetUnitY(hero)
     if ____temp_8 == nil then
         ____temp_8 = 0
     end
     local heroY = ____temp_8
     local dx = heroX - _____5E73_5206_6B7B_4EA1X
     local dy = heroY - _____5E73_5206_6B7B_4EA1Y
-    local dist = jass:SquareRoot(dx * dx + dy * dy)
+    local dist = jass.SquareRoot(dx * dx + dy * dy)
     if dist > SHARE_RANGE then
         return
     end
-    local heroPlayer = jass:GetOwningPlayer(hero)
+    local heroPlayer = jass.GetOwningPlayer(hero)
     if heroPlayer == nil then
         return
     end
@@ -167,25 +167,25 @@ local function _____904D_5386_5355_4F4D_7EC4_5E76_6062_590D(group)
     if group == nil or group == 0 then
         return
     end
-    local scratch = jass:CreateGroup()
+    local scratch = jass.CreateGroup()
     while true do
-        local unit = jass:FirstOfGroup(group)
+        local unit = jass.FirstOfGroup(group)
         if not unit or unit == 0 then
             break
         end
-        jass:GroupRemoveUnit(group, unit)
-        jass:GroupAddUnit(scratch, unit)
+        jass.GroupRemoveUnit(group, unit)
+        jass.GroupAddUnit(scratch, unit)
         _____5904_7406_5E73_5206_82F1_96C4(unit)
     end
     while true do
-        local unit = jass:FirstOfGroup(scratch)
+        local unit = jass.FirstOfGroup(scratch)
         if not unit or unit == 0 then
             break
         end
-        jass:GroupRemoveUnit(scratch, unit)
-        jass:GroupAddUnit(group, unit)
+        jass.GroupRemoveUnit(scratch, unit)
+        jass.GroupAddUnit(group, unit)
     end
-    jass:DestroyGroup(scratch)
+    jass.DestroyGroup(scratch)
 end
 --- 处理单位死亡事件
 local function onUnitDeathHandler(dyingUnit, killer)
@@ -196,7 +196,7 @@ local function onUnitDeathHandler(dyingUnit, killer)
     if killerPlayer == nil then
         return
     end
-    local dyingUnitType = jass:GetUnitTypeId(dyingUnit)
+    local dyingUnitType = jass.GetUnitTypeId(dyingUnit)
     if not dyingUnitType then
         return
     end
@@ -205,16 +205,16 @@ local function onUnitDeathHandler(dyingUnit, killer)
         return
     end
     giveGoldToPlayer(killer, killerPlayer, baseBounty, false)
-    local shareGold = jass:R2I(baseBounty / 10) * 4
+    local shareGold = jass.R2I(baseBounty / 10) * 4
     if shareGold <= 0 then
         return
     end
-    local ____temp_9 = jass:GetUnitX(dyingUnit)
+    local ____temp_9 = jass.GetUnitX(dyingUnit)
     if ____temp_9 == nil then
         ____temp_9 = 0
     end
     local dyingX = ____temp_9
-    local ____temp_10 = jass:GetUnitY(dyingUnit)
+    local ____temp_10 = jass.GetUnitY(dyingUnit)
     if ____temp_10 == nil then
         ____temp_10 = 0
     end

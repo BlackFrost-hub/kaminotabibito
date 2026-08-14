@@ -6,10 +6,10 @@ local ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系
 local _____6E05_7406_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["清理安兹运行时上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.02．数值与表现配置")
 local _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["安兹乌尔恭数值与表现配置"]
-local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待")
-local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["播放限时单位动画"]
 local ____09_FF0E_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.08．机制触发.09．伤害生命下限保护")
 local _____521B_5EFA_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4 = ____09_FF0E_4F24_5BB3_751F_547D_4E0B_9650_4FDD_62A4["创建伤害生命下限保护"]
+local ____24_FF0E_975E_6B7B_4EA1Boss_6536_675F_65F6_95F4_7EBF = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.24．非死亡Boss收束时间线")
+local _____542F_52A8_975E_6B7B_4EA1Boss_6536_675F_65F6_95F4_7EBF = ____24_FF0E_975E_6B7B_4EA1Boss_6536_675F_65F6_95F4_7EBF["启动非死亡Boss收束时间线"]
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．台词播放")
 local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
 local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
@@ -28,12 +28,10 @@ local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSa
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local IsUnitType = jass.IsUnitType
-local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local PauseUnit = jass.PauseUnit
 local ShowUnit = jass.ShowUnit
 local AddSpecialEffect = jass.AddSpecialEffect
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+local _____5B89_5179_6311_6218_6536_675F_6682_505C_6765_6E90 = "Boss:安兹乌尔恭:挑战收束"
+local _____96C5_513F_8D1D_5FB7_6311_6218_6536_675F_6682_505C_6765_6E90 = "Boss:安兹乌尔恭:雅儿贝德挑战收束"
 local function _____64AD_653E_6311_6218_7ED3_675F_95E8_6249(x, y)
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
     local paths = {cfg["表现资源"]["挑战结束传送门框路径"], cfg["表现资源"]["挑战结束传送核心路径"], cfg["表现资源"]["挑战结束传送旋涡路径"]}
@@ -58,11 +56,7 @@ ____exports["启动安兹挑战收束"] = function(context)
     context["挑战已结束"] = true
     context["阶段"] = "挑战收束"
     context["当前大型技能"] = nil
-    SetUnitInvulnerable(boss, true)
-    PauseUnit(boss, true)
     if _____5355_4F4D_6709_6548(albedo) then
-        SetUnitInvulnerable(albedo, true)
-        PauseUnit(albedo, true)
         if context["雅儿贝德"] ~= nil then
             context["雅儿贝德"]["阶段状态"] = "终局拦截"
         end
@@ -73,18 +67,23 @@ ____exports["启动安兹挑战收束"] = function(context)
         ____opt_8["取消当前"](____opt_8, "清理", "安兹挑战收束")
     end
     local cfg = _____5B89_5179_4E4C_5C14_606D_6570_503C_4E0E_8868_73B0_914D_7F6E
-    _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["守护者模式"]["挑战收束安兹姿势动画编号"], ["持续秒"] = cfg["守护者模式"]["挑战收束离场延迟秒"], ["恢复动画编号"] = 0})
+    local _____6210_5458 = {{["单位"] = boss, ["暂停来源"] = _____5B89_5179_6311_6218_6536_675F_6682_505C_6765_6E90, ["离场动画编号"] = cfg["守护者模式"]["挑战收束安兹姿势动画编号"], ["恢复动画编号"] = 0}}
     if _____5355_4F4D_6709_6548(albedo) then
-        _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = albedo, ["动画编号"] = cfg["守护者模式"]["挑战收束雅儿贝德姿势动画编号"], ["持续秒"] = cfg["守护者模式"]["挑战收束离场延迟秒"], ["恢复动画编号"] = 1})
+        _____6210_5458[#_____6210_5458 + 1] = {["单位"] = albedo, ["暂停来源"] = _____96C5_513F_8D1D_5FB7_6311_6218_6536_675F_6682_505C_6765_6E90, ["离场动画编号"] = cfg["守护者模式"]["挑战收束雅儿贝德姿势动画编号"], ["恢复动画编号"] = 1}
     end
-    _____64AD_653E_6311_6218_7ED3_675F_95E8_6249(
-        GetUnitX(boss),
-        GetUnitY(boss)
-    )
-    _____64AD_653E_5B89_5179_53F0_8BCD(boss, "挑战结束")
-    local delayedId = addDelayedCallback(
-        cfg["守护者模式"]["挑战收束离场延迟秒"] * 1000,
-        function()
+    return _____542F_52A8_975E_6B7B_4EA1Boss_6536_675F_65F6_95F4_7EBF({
+        ["名称"] = "安兹-挑战收束",
+        ["清理"] = context["清理"],
+        ["成员"] = _____6210_5458,
+        ["离场延迟秒"] = cfg["守护者模式"]["挑战收束离场延迟秒"],
+        ["开始回调"] = function()
+            _____64AD_653E_6311_6218_7ED3_675F_95E8_6249(
+                GetUnitX(boss),
+                GetUnitY(boss)
+            )
+            _____64AD_653E_5B89_5179_53F0_8BCD(boss, "挑战结束")
+        end,
+        ["结算回调"] = function()
             local ____opt_14 = context["雅儿贝德"]
             local ____opt_12 = ____opt_14 and ____opt_14["成员生命周期"]
             if ____opt_12 ~= nil then
@@ -103,11 +102,9 @@ ____exports["启动安兹挑战收束"] = function(context)
             _____6253_5F00Boss_6B7B_4EA1_9996_9886_5956_52B1UI(context["模式"] == "守护者介入" and _____5B89_5179_5B88_62A4_8005_6311_6218_5956_52B1_6C60ID or _____5B89_5179_57FA_7840_6311_6218_5956_52B1_6C60ID)
             _____6E05_7406Boss_81EA_52A8_6280_80FD_542F_52A8_4E0A_4E0B_6587(boss)
             _____6E05_7406_5B89_5179_8FD0_884C_65F6_4E0A_4E0B_6587(boss)
-        end
-    )
-    local ____self_20 = context["清理"]
-    ____self_20["登记延迟回调"](____self_20, "安兹-挑战收束离场", delayedId)
-    return true
+        end,
+        ["延迟登记名"] = "安兹-挑战收束离场"
+    })
 end
 ____exports["绑定安兹挑战生命下限"] = function(context)
     if context["挑战生命下限保护"] ~= nil then

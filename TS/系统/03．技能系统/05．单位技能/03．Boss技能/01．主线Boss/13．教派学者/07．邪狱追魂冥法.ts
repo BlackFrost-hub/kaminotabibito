@@ -9,14 +9,14 @@ import { 创建固定受击次数机制单位, type 固定受击次数机制单�
 import { 创建持续单位连线, type 持续单位连线实例 } from '../../../../00．技能模板+函数/04．机制组件/07．机制连线/01．持续单位连线';
 import { 按比例移除最大生命 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/09．非伤害生命移除';
 import { 注册单位技能壳监听 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器';
+import { 执行Boss施法时间线 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/23．Boss施法时间线';
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, callbackId: number) => void;
 };
-const { 开始硬直, 施加快速减速Buff } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff') as {
-  开始硬直: (this: void, unit: any, duration: number) => void;
+const { 施加快速减速Buff } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff') as {
   施加快速减速Buff: (this: void, source: any, target: any, attackSlow: number, moveSlow: number, duration: number, sourceName?: string, sourceType?: string) => void;
 };
 const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require('系统.05．Buff系统.00．Buff系统') as {
@@ -26,10 +26,6 @@ const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require('
 };
 const { 常规BuffID } = require('系统.05．Buff系统.03．Buff表.00．Buff登记') as {
   常规BuffID: { 减速: string };
-};
-const { 显示大招吟唱条, 关闭吟唱条 } = require('系统.09．表现系统.08．吟唱条.06．对外接口') as {
-  显示大招吟唱条: (this: void, params: any) => void;
-  关闭吟唱条: (this: void, channel?: string) => void;
 };
 const { 吟唱条通道_大招 } = require('系统.09．表现系统.08．吟唱条.00．常量定义') as {
   吟唱条通道_大招: string;
@@ -54,7 +50,6 @@ const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const SetUnitAnimation = jass.SetUnitAnimation as (unit: any, animation: string) => void;
 const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 
@@ -81,10 +76,6 @@ interface 邪狱追魂释放请求 {
   上下文: 教派学者运行时上下文;
 }
 
-interface 邪狱追魂读条关闭请求 {
-  Boss单位: any;
-}
-
 const 邪狱追魂冥法技能ID = stringToFourCCSafe(教派学者单位技能配置.技能壳.邪狱追魂冥法);
 const 锁链单位状态表: Record<number, 邪狱锁链状态 | undefined> = {};
 const 邪狱追魂锁链减速来源 = '教派学者-邪狱追魂锁链';
@@ -95,22 +86,22 @@ function 读取当前难度N(this: void): number {
   return value === value && value > 0 ? value : 0;
 }
 
-function on邪狱追魂读条关闭(this: void, variable?: any): void {
-  const 请求 = variable as 邪狱追魂读条关闭请求 | undefined;
-  if (请求 == null) return;
-  关闭吟唱条(吟唱条通道_大招);
-}
-
 function 开始邪狱追魂施法表现(this: void, 上下文: 教派学者运行时上下文): void {
   const boss = 上下文.Boss单位;
   const 公共 = 教派学者技能配置.公共施法;
   const 配置 = 教派学者技能配置.邪狱追魂冥法;
-  开始硬直(boss, 公共.通魔施法秒);
-  SetUnitAnimation(boss, 公共.动作名);
-  播放教派学者台词(boss, '邪狱追魂冥法');
-  显示大招吟唱条({ 总时长: 公共.通魔施法秒, 颜色ID: 公共.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
-  const 回调ID = addDelayedCallback(公共.通魔施法秒 * 1000, on邪狱追魂读条关闭, { Boss单位: boss } as 邪狱追魂读条关闭请求);
-  上下文.清理.登记延迟回调('教派学者-邪狱追魂读条关闭', 回调ID);
+  执行Boss施法时间线({
+    名称: '教派学者-邪狱追魂冥法',
+    单位: boss,
+    清理: 上下文.清理,
+    施法秒: 公共.通魔施法秒,
+    动作名: 公共.动作名,
+    吟唱条: { 类型: '大招', 通道: 吟唱条通道_大招, 颜色ID: 公共.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 },
+    开始回调: function 邪狱追魂施法台词(this: void, unit: any): void {
+      播放教派学者台词(unit, '邪狱追魂冥法');
+    },
+    延迟登记名: '教派学者-邪狱追魂读条关闭',
+  });
 }
 
 function 结束单条邪狱锁链(this: void, 锁链: 邪狱锁链状态, 原因: string): void {

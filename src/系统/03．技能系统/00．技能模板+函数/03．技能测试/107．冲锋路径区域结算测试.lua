@@ -28,10 +28,10 @@ local _____8DEF_5F84_5BBD_5EA6 = _____8DEF_5F84_534A_5F84 * 2
 local _____524D_6447_65F6_95F4 = 1
 local _____51B2_950B_8DEF_5F84_524D_6447_63D0_793A = _____521B_5EFA_51B2_950B_8DEF_5F84_524D_6447_63D0_793A(_____51B2_950B_8DDD_79BB, _____8DEF_5F84_5BBD_5EA6, _____524D_6447_65F6_95F4)
 local function _____53D6_671D_5411_7EC8_70B9X(x, _____671D_5411_89D2, _____8DDD_79BB)
-    return x + jass:Cos(_____671D_5411_89D2 * jass.bj_DEGTORAD) * _____8DDD_79BB
+    return x + jass.Cos(_____671D_5411_89D2 * jass.bj_DEGTORAD) * _____8DDD_79BB
 end
 local function _____53D6_671D_5411_7EC8_70B9Y(y, _____671D_5411_89D2, _____8DDD_79BB)
-    return y + jass:Sin(_____671D_5411_89D2 * jass.bj_DEGTORAD) * _____8DDD_79BB
+    return y + jass.Sin(_____671D_5411_89D2 * jass.bj_DEGTORAD) * _____8DDD_79BB
 end
 local function _____51B2_950B_8DEF_5F84_533A_57DF__7ED3_675F_65E5_5FD7(_____5355_4F4D, _____539F_56E0, _____4F4D_79FBID)
     debugLogForce(

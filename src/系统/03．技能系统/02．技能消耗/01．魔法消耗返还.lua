@@ -32,7 +32,7 @@ function ____exports.calcTotalManaCost(unit, abilityId, level)
 end
 --- 获取魔法消耗属性
 function ____exports.getManaCostReduction(unit)
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if player == nil then
         return 0
     end

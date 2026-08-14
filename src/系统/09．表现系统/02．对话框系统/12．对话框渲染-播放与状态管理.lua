@@ -36,7 +36,7 @@ function ____exports.nextTypingProgress(self, current, step)
     return current + step
 end
 function ____exports.substringCompat(self, text, start, ____end)
-    return jass:SubString(text, start, ____end)
+    return jass.SubString(text, start, ____end)
 end
 function showContinueHint(self, state, visible)
     local localPlayer = dzGetLocalPlayer(nil)
@@ -99,7 +99,7 @@ local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 ____exports.STEP_LEN = 2
 ____exports.TICK = 0.03
 function ____exports.stringLengthCompat(self, text)
-    return jass:StringLength(text)
+    return jass.StringLength(text)
 end
 ____exports.LEFT_PORTRAIT_INDEX = 101
 ____exports.MID_PORTRAIT_INDEX = 102

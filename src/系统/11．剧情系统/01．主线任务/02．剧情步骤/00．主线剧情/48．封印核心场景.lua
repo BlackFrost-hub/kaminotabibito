@@ -13,6 +13,9 @@ local _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_
 local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["注册剧情运行时单位"]
 local ____10_FF0E_6807_51C6_5267_60C5_52A8_4F5C = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.10．标准剧情动作")
 local _____53D1_5E03_4E3B_7EBF_8282_70B9_76EE_6807 = ____10_FF0E_6807_51C6_5267_60C5_52A8_4F5C["发布主线节点目标"]
+local ____02_FF0E_5267_60C5NPC_521B_5EFA = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
+local _____521B_5EFA_5267_60C5_573A_666F_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情场景单位"]
+local _____5B9A_4F4D_5267_60C5_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["定位剧情单位"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -25,28 +28,22 @@ local ____require_result_2 = require("系统.01．单位系统.08．单位配置
 local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_2["按名字反查总单位ID"]
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
-local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_4["创建单位并登记排泄安全"]
-local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
-local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_5["立即移除单位并取消排泄登记"]
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
-local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_6["暂停并设置无敌安全"]
-local _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168 = ____require_result_6["解除暂停并取消无敌安全"]
-local ____require_result_7 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local IsUnitAliveBJ = ____require_result_7.IsUnitAliveBJ
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.17．闪电效果代码")
-local _____95EA_7535_6548_679C_4EE3_7801 = ____require_result_8["闪电效果代码"]
-local ____require_result_9 = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐")
-local _____6CE8_518C_5C01_5370_5B88_536B_6218_533A_57DF_97F3_4E50 = ____require_result_9["注册封印守卫战区域音乐"]
-local ____require_result_10 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
-local _____52A8_6001_77E9_5F62_533A_57DF_914D_7F6E_8868 = ____require_result_10["动态矩形区域配置表"]
-local _____6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_10["注册动态矩形区域"]
-local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_10["注销动态矩形区域"]
+local ____require_result_4 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_4["立即移除单位并取消排泄登记"]
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
+local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_5["暂停并设置无敌安全"]
+local _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168 = ____require_result_5["解除暂停并取消无敌安全"]
+local ____require_result_6 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_6.IsUnitAliveBJ
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.17．闪电效果代码")
+local _____95EA_7535_6548_679C_4EE3_7801 = ____require_result_7["闪电效果代码"]
+local ____require_result_8 = require("系统.07．地形系统.07．区域背景音乐.03．动态区域背景音乐")
+local _____6CE8_518C_5C01_5370_5B88_536B_6218_533A_57DF_97F3_4E50 = ____require_result_8["注册封印守卫战区域音乐"]
+local ____require_result_9 = require("系统.07．地形系统.09．动态矩形区域注册表.index")
+local _____52A8_6001_77E9_5F62_533A_57DF_914D_7F6E_8868 = ____require_result_9["动态矩形区域配置表"]
+local _____6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_9["注册动态矩形区域"]
+local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_9["注销动态矩形区域"]
 local GetTriggerUnit = jass.GetTriggerUnit
-local Player = jass.Player
-local SetUnitFacing = jass.SetUnitFacing
-local SetUnitPosition = jass.SetUnitPosition
-local IssueImmediateOrder = jass.IssueImmediateOrder
 local ForGroup = jass.ForGroup
 local GetEnumUnit = jass.GetEnumUnit
 local AddLightningEx = jass.AddLightningEx
@@ -81,12 +78,7 @@ local function _____5355_4F4D_5B58_6D3B(unit)
     return _____53E5_67C4_6709_6548(unit) and IsUnitAliveBJ(unit)
 end
 local function _____5B9A_4F4D_5E76_505C_6B62_5355_4F4D(unit, _____7AD9_4F4D)
-    if not _____53E5_67C4_6709_6548(unit) then
-        return
-    end
-    SetUnitPosition(unit, _____7AD9_4F4D.X, _____7AD9_4F4D.Y)
-    SetUnitFacing(unit, _____7AD9_4F4D["朝向"])
-    IssueImmediateOrder(unit, "stop")
+    _____5B9A_4F4D_5267_60C5_5355_4F4D(unit, _____7AD9_4F4D)
 end
 local function ____on_79FB_52A8_73A9_5BB6_5230_5BF9_767D_7AD9_4F4D()
     if _____5F53_524D_73A9_5BB6_5BF9_767D_7AD9_4F4D == nil then
@@ -107,17 +99,19 @@ local function _____79FB_52A8_73A9_5BB6_961F_4F0D_5230_5BF9_767D_7AD9_4F4D()
     _____5F53_524D_73A9_5BB6_5BF9_767D_7AD9_4F4D = nil
 end
 local function _____521B_5EFA_5360_4F4D_5355_4F4D(_____5355_4F4D_540D, _____7AD9_4F4D)
-    local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D))
+    local _____5355_4F4DID = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)
+    local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____5355_4F4DID)
     if not (_____5355_4F4D_7C7B_578BID > 0) then
         return nil
     end
-    return _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-        Player(_____4E2D_7ACB_88AB_52A8_73A9_5BB6ID),
-        _____5355_4F4D_7C7B_578BID,
-        _____7AD9_4F4D.X,
-        _____7AD9_4F4D.Y,
-        _____7AD9_4F4D["朝向"]
-    )
+    return _____521B_5EFA_5267_60C5_573A_666F_5355_4F4D({
+        ["单位ID"] = _____5355_4F4DID,
+        X = _____7AD9_4F4D.X,
+        Y = _____7AD9_4F4D.Y,
+        ["朝向"] = _____7AD9_4F4D["朝向"],
+        ["玩家ID"] = _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID,
+        ["登记死亡排泄"] = true
+    })
 end
 local function _____8BFB_53D6_6216_521B_5EFA_573A_666F_5355_4F4D(_____8BFB_53D6_5F15_7528, _____8FD0_884C_65F6_952E, _____5360_4F4D_5355_4F4D_540D, _____7AD9_4F4D)
     local unit = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(_____8BFB_53D6_5F15_7528)
@@ -139,20 +133,20 @@ local function _____521B_5EFA_5C01_5370_6838_5FC3_573A_666F_5355_4F4D(_____72B6_
     if _____91CC_79D1_7279 == nil then
         return false
     end
-    local ____72B6_6001__5355_4F4D_5217_8868_11 = _____72B6_6001["单位列表"]
-    ____72B6_6001__5355_4F4D_5217_8868_11[#____72B6_6001__5355_4F4D_5217_8868_11 + 1] = _____91CC_79D1_7279
+    local ____72B6_6001__5355_4F4D_5217_8868_10 = _____72B6_6001["单位列表"]
+    ____72B6_6001__5355_4F4D_5217_8868_10[#____72B6_6001__5355_4F4D_5217_8868_10 + 1] = _____91CC_79D1_7279
     local _____6559_7687 = _____8BFB_53D6_6216_521B_5EFA_573A_666F_5355_4F4D("主线NPC.封印核心教皇", "剧情运行时.封印核心教皇", "精灵审判官", ____exports["封印核心场景站位表"]["D教皇"])
     if _____6559_7687 == nil then
         return false
     end
-    local ____72B6_6001__5355_4F4D_5217_8868_12 = _____72B6_6001["单位列表"]
-    ____72B6_6001__5355_4F4D_5217_8868_12[#____72B6_6001__5355_4F4D_5217_8868_12 + 1] = _____6559_7687
+    local ____72B6_6001__5355_4F4D_5217_8868_11 = _____72B6_6001["单位列表"]
+    ____72B6_6001__5355_4F4D_5217_8868_11[#____72B6_6001__5355_4F4D_5217_8868_11 + 1] = _____6559_7687
     local _____5965_65AF_7279_5229_4E00_4E16 = _____8BFB_53D6_6216_521B_5EFA_573A_666F_5355_4F4D("主线NPC.封印核心奥斯特利一世", "剧情运行时.封印核心奥斯特利一世", "血精灵守护者", ____exports["封印核心场景站位表"]["E奥斯特利一世"])
     if _____5965_65AF_7279_5229_4E00_4E16 == nil then
         return false
     end
-    local ____72B6_6001__5355_4F4D_5217_8868_13 = _____72B6_6001["单位列表"]
-    ____72B6_6001__5355_4F4D_5217_8868_13[#____72B6_6001__5355_4F4D_5217_8868_13 + 1] = _____5965_65AF_7279_5229_4E00_4E16
+    local ____72B6_6001__5355_4F4D_5217_8868_12 = _____72B6_6001["单位列表"]
+    ____72B6_6001__5355_4F4D_5217_8868_12[#____72B6_6001__5355_4F4D_5217_8868_12 + 1] = _____5965_65AF_7279_5229_4E00_4E16
     _____5F53_524D_5C01_5370_6838_5FC3_5965_65AF_7279_5229_4E00_4E16_8BB0_5F55 = _____5965_65AF_7279_5229_4E00_4E16
     return true
 end
@@ -176,8 +170,8 @@ local function _____521B_5EFA_4E03_8272_95EA_7535(_____72B6_6001)
                 250.8
             )
             if _____53E5_67C4_6709_6548(_____95EA_7535) then
-                local ____72B6_6001__95EA_7535_5217_8868_14 = _____72B6_6001["闪电列表"]
-                ____72B6_6001__95EA_7535_5217_8868_14[#____72B6_6001__95EA_7535_5217_8868_14 + 1] = _____95EA_7535
+                local ____72B6_6001__95EA_7535_5217_8868_13 = _____72B6_6001["闪电列表"]
+                ____72B6_6001__95EA_7535_5217_8868_13[#____72B6_6001__95EA_7535_5217_8868_13 + 1] = _____95EA_7535
             end
             i = i + 1
         end
@@ -203,7 +197,7 @@ local function _____6E05_7406_5C01_5370_6838_5FC3_573A_666F_5355_4F4D(_____72B6_
             do
                 local _____8BB0_5F55 = _____72B6_6001["单位列表"][i + 1]
                 if _____8BB0_5F55 == _____5F53_524D_5C01_5370_6838_5FC3_5965_65AF_7279_5229_4E00_4E16_8BB0_5F55 then
-                    goto __continue30
+                    goto __continue29
                 end
                 _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(_____8BB0_5F55["单位"], (_____5C01_5370_6838_5FC3_7EAF_5BF9_767D_6765_6E90 .. ":") .. _____8BB0_5F55["运行时键"])
                 if _____8BB0_5F55["临时创建"] and _____53E5_67C4_6709_6548(_____8BB0_5F55["单位"]) then
@@ -211,7 +205,7 @@ local function _____6E05_7406_5C01_5370_6838_5FC3_573A_666F_5355_4F4D(_____72B6_
                 end
                 _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____8BB0_5F55["运行时键"])
             end
-            ::__continue30::
+            ::__continue29::
             i = i + 1
         end
     end
@@ -276,8 +270,8 @@ local function _____6E05_7406_5C01_5370_6838_5FC3_5165_53E3_76D1_542C()
     _____5F53_524D_5C01_5370_6838_5FC3_5165_53E3_76D1_542C = nil
 end
 local function _____64AD_653E_5C01_5370_6838_5FC3_7EAF_5BF9_767D(_____89E6_53D1_5355_4F4D)
-    local ____require_result_15 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
-    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_15["播放主线剧情片段"]
+    local ____require_result_14 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.02．剧情步骤播放器")
+    local _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5 = ____require_result_14["播放主线剧情片段"]
     local _____5DF2_64AD_653E = _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5("molten_realm_seal_core_dialogue", {["片段ID"] = "molten_realm_seal_core_dialogue", ["触发配置名"] = "封印核心入口", ["触发单位"] = _____89E6_53D1_5355_4F4D})
     if not _____5DF2_64AD_653E then
         ____exports["清理封印核心场景"]()

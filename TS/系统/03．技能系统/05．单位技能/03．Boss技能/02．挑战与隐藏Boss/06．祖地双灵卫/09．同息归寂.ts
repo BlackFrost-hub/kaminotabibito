@@ -11,6 +11,7 @@ import { 创建伤害生命下限保护 } from '../../../../00．技能模板+�
 import { 播放赤誓灵卫台词, 播放苍影灵卫台词 } from './12．台词播放';
 import { 派发祖地双灵卫战斗结束 } from './13．战斗结束事件';
 import { 播放Boss坐标音效 } from '../../00．公共/00．Boss音效播放';
+import { 启动非死亡Boss收束时间线 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/24．非死亡Boss收束时间线';
 const { 主动结束Boss战运行 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动') as {
   主动结束Boss战运行: (this: void, boss: any, options?: any) => boolean;
 };
@@ -28,12 +29,14 @@ const { registerManualBuff, 移除单位指定Buff } = require('系统.05．Buff
 const { doHeal } = require('系统.04．伤害系统.02．治疗系统.01．核心功能') as {
   doHeal: (this: void, params: any) => number;
 };
+const { 暂停并设置无敌安全, 解除暂停并取消无敌安全 } = require('lib.扩展函数.自定义扩展函数.06．单位状态安全包装') as {
+  暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
+  解除暂停并取消无敌安全: (this: void, unit: any, source: string) => boolean;
+};
 const jass = require('jass.common') as any;
 const japi = require('jass.japi') as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
-const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (unit: any, red: number, green: number, blue: number, alpha: number) => void;
 const SetUnitScale = jass.SetUnitScale as (unit: any, x: number, y: number, z: number) => void;
 const ShowUnit = jass.ShowUnit as (unit: any, flag: boolean) => void;
@@ -43,6 +46,8 @@ const AddSpecialEffect = jass.AddSpecialEffect as (model: string, x: number, y: 
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const DzSetUnitModel = japi.DzSetUnitModel as ((unit: any, model: string) => void) | undefined;
+const 灵魂崩解暂停来源 = 'Boss:祖地双灵卫:灵魂崩解';
+const 净化收束暂停来源 = 'Boss:祖地双灵卫:净化收束';
 
 function 取名称(this: void, context: 祖地双灵卫运行时上下文, unit: any): 祖地双灵卫名称 | undefined {
   if (unit === context.赤誓灵卫单位) return '赤誓灵卫';
@@ -54,13 +59,21 @@ function 取单位(this: void, context: 祖地双灵卫运行时上下文, name:
   return name === '赤誓灵卫' ? context.赤誓灵卫单位 : context.苍影灵卫单位;
 }
 
+function 清理双灵卫灵魂崩解暂停来源(this: void, variable?: any): void {
+  const context = variable as 祖地双灵卫运行时上下文 | undefined;
+  if (context == null) return;
+  解除暂停并取消无敌安全(context.赤誓灵卫单位, 灵魂崩解暂停来源);
+  解除暂停并取消无敌安全(context.苍影灵卫单位, 灵魂崩解暂停来源);
+  移除单位指定Buff(context.赤誓灵卫单位, 祖地双灵卫BuffID.灵魂崩解);
+  移除单位指定Buff(context.苍影灵卫单位, 祖地双灵卫BuffID.灵魂崩解);
+}
+
 function 进入灵魂崩解(this: void, context: 祖地双灵卫运行时上下文, name: 祖地双灵卫名称): void {
   const unit = 取单位(context, name);
   const member = context.联合生命周期.取成员(name);
   if (member == null || member.状态 === '崩解') return;
   context.联合生命周期.设置状态(name, '崩解', '生命达到同步崩解阈值');
-  PauseUnit(unit, true);
-  SetUnitInvulnerable(unit, true);
+  暂停并设置无敌安全(unit, 灵魂崩解暂停来源);
   registerManualBuff(unit, 祖地双灵卫BuffID.灵魂崩解, 3600, 1, { sourceName: '祖地双灵卫-灵魂崩解', tickWhilePaused: true });
   const animation = name === '赤誓灵卫' ? 祖地双灵卫数值与表现配置.动作.裂誓消散 : 祖地双灵卫数值与表现配置.动作.无面施法;
   if (context.崩解中的守卫 == null) 播放Boss坐标音效(祖地双灵卫数值与表现配置.音效.同息归寂, GetUnitX(unit), GetUnitY(unit), 祖地双灵卫数值与表现配置.音效默认裁断距离);
@@ -77,6 +90,7 @@ function 进入灵魂崩解(this: void, context: 祖地双灵卫运行时上下�
 
 export function 绑定祖地双灵卫同息生命下限(this: void, context: 祖地双灵卫运行时上下文): void {
   if (context.同息生命下限保护列表.length > 0) return;
+  context.清理.登记清理('祖地双灵卫-灵魂崩解暂停来源', 清理双灵卫灵魂崩解暂停来源, context);
   const units = [context.赤誓灵卫单位, context.苍影灵卫单位];
   for (let i = 0; i < units.length; i++) {
     const unit = units[i];
@@ -114,8 +128,7 @@ function 恢复崩解守卫(this: void, context: 祖地双灵卫运行时上下�
   const targetLife = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * 祖地双灵卫数值与表现配置.公共.同息回灌恢复比例;
   const healAmount = targetLife - GetUnitState(unit, UNIT_STATE_LIFE);
   if (healAmount > 0) doHeal({ HealSource: source, HealTarget: unit, HealAmount: healAmount, ItemHeal: false, HealEffect: false });
-  SetUnitInvulnerable(unit, false);
-  PauseUnit(unit, false);
+  解除暂停并取消无敌安全(unit, 灵魂崩解暂停来源);
   context.联合生命周期.设置状态(name, '活跃', '同步崩解超时回灌');
   移除单位指定Buff(unit, 祖地双灵卫BuffID.灵魂崩解);
   const reflux = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.魂力回灌特效路径, GetUnitX(unit), GetUnitY(unit));
@@ -135,10 +148,8 @@ export function 执行祖地双灵卫净化收束(this: void, context: 祖地双
   const azure = context.苍影灵卫单位;
   if (context.首次变异守卫 === '赤誓灵卫') 播放赤誓灵卫台词(red, '净化收束');
   else 播放苍影灵卫台词(azure, '净化收束');
-  PauseUnit(red, true);
-  PauseUnit(azure, true);
-  SetUnitInvulnerable(red, true);
-  SetUnitInvulnerable(azure, true);
+  解除暂停并取消无敌安全(red, 灵魂崩解暂停来源);
+  解除暂停并取消无敌安全(azure, 灵魂崩解暂停来源);
   const cleanupBuffs = [祖地双灵卫BuffID.双灵同誓, 祖地双灵卫BuffID.双蚀共鸣, 祖地双灵卫BuffID.灵魂崩解, 祖地双灵卫BuffID.净化反冲];
   for (let i = 0; i < cleanupBuffs.length; i++) {
     移除单位指定Buff(red, cleanupBuffs[i]);
@@ -152,22 +163,32 @@ export function 执行祖地双灵卫净化收束(this: void, context: 祖地双
   SetUnitScale(azure, 祖地双灵卫单位技能配置.单位.苍影灵卫.正常模型缩放, 祖地双灵卫单位技能配置.单位.苍影灵卫.正常模型缩放, 祖地双灵卫单位技能配置.单位.苍影灵卫.正常模型缩放);
   SetUnitVertexColor(red, 255, 255, 255, 210);
   SetUnitVertexColor(azure, 255, 255, 255, 210);
-  const effectA = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.最终净化归静特效路径, GetUnitX(red), GetUnitY(red));
-  const effectB = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.最终净化归静特效路径, GetUnitX(azure), GetUnitY(azure));
-  if (effectA != null && effectA !== 0) YDWETimerDestroyEffectSafe(祖地双灵卫数值与表现配置.P3.最终净化特效持续秒, effectA);
-  if (effectB != null && effectB !== 0) YDWETimerDestroyEffectSafe(祖地双灵卫数值与表现配置.P3.最终净化特效持续秒, effectB);
-  const delayedId = addDelayedCallback(祖地双灵卫数值与表现配置.P3.最终净化结算延迟毫秒, function 双灵卫净化结算(this: void): void {
-    主动结束Boss战运行(red, { 跳过死亡音效: true, 跳过死亡剧情: true });
-    主动结束Boss战运行(azure, { 跳过死亡音效: true, 跳过死亡剧情: true });
-    派发祖地双灵卫战斗结束(red, azure);
-    SetUnitVertexColor(red, 255, 255, 255, 0);
-    SetUnitVertexColor(azure, 255, 255, 255, 0);
-    ShowUnit(red, false);
-    ShowUnit(azure, false);
-    清理祖地双灵卫运行时上下文(context);
+  return 启动非死亡Boss收束时间线({
+    名称: '祖地双灵卫-净化收束',
+    清理: context.清理,
+    成员: [
+      { 单位: red, 暂停来源: 净化收束暂停来源 },
+      { 单位: azure, 暂停来源: 净化收束暂停来源 },
+    ],
+    离场延迟秒: 祖地双灵卫数值与表现配置.P3.最终净化结算延迟毫秒 * 0.001,
+    开始回调: function 双灵卫净化收束开始(this: void): void {
+      const effectA = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.最终净化归静特效路径, GetUnitX(red), GetUnitY(red));
+      const effectB = AddSpecialEffect(祖地双灵卫数值与表现配置.表现资源.公共.最终净化归静特效路径, GetUnitX(azure), GetUnitY(azure));
+      if (effectA != null && effectA !== 0) YDWETimerDestroyEffectSafe(祖地双灵卫数值与表现配置.P3.最终净化特效持续秒, effectA);
+      if (effectB != null && effectB !== 0) YDWETimerDestroyEffectSafe(祖地双灵卫数值与表现配置.P3.最终净化特效持续秒, effectB);
+    },
+    结算回调: function 双灵卫净化结算(this: void): void {
+      主动结束Boss战运行(red, { 跳过死亡音效: true, 跳过死亡剧情: true });
+      主动结束Boss战运行(azure, { 跳过死亡音效: true, 跳过死亡剧情: true });
+      派发祖地双灵卫战斗结束(red, azure);
+      SetUnitVertexColor(red, 255, 255, 255, 0);
+      SetUnitVertexColor(azure, 255, 255, 255, 0);
+      ShowUnit(red, false);
+      ShowUnit(azure, false);
+      清理祖地双灵卫运行时上下文(context);
+    },
+    延迟登记名: '祖地双灵卫-净化结算',
   });
-  context.清理.登记延迟回调('祖地双灵卫-净化结算', delayedId);
-  return true;
 }
 
 export function 更新祖地双灵卫同息归寂(this: void, context: 祖地双灵卫运行时上下文, now: number = getServerTime()): void {

@@ -31,7 +31,7 @@ function ____on_98DF_4EBA_9B54_5EF6_8FDF_6D4B_8BD5(variable)
     if data["上下文"]["玩家英雄"] ~= nil then
         ____temp_32 = GetOwningPlayer(data["上下文"]["玩家英雄"])
     else
-        ____temp_32 = jass:Player(0)
+        ____temp_32 = jass.Player(0)
     end
     local pid = GetPlayerId(____temp_32)
     local ____temp_33
@@ -167,7 +167,7 @@ function ____on_75DB_4E4B_675F_7F1A_5EF6_8FDF_6D4B_8BD5(variable)
     if context["玩家英雄"] ~= nil then
         ____temp_34 = GetOwningPlayer(context["玩家英雄"])
     else
-        ____temp_34 = jass:Player(0)
+        ____temp_34 = jass.Player(0)
     end
     local pid = GetPlayerId(____temp_34)
     local runtime = context["杀戮运行时"]
@@ -390,7 +390,7 @@ local function _____521B_5EFA_6216_83B7_53D6_98DF_4EBA_9B54_6D4B_8BD5_4E0A_4E0B_
     local _____5723_9A91_58EB = _____6700_8FD1_6D4B_8BD5_5723_9A91_58EB[pid]
     if not ____Boss_6D4B_8BD5_5355_4F4D_5B58_6D3B(_____5723_9A91_58EB) then
         _____5723_9A91_58EB = CreateUnit(
-            jass:Player(12),
+            jass.Player(12),
             _____6D4B_8BD5_5723_9A91_58EB_5355_4F4DID,
             _____6D4B_8BD5_4E2D_5FC3X - 220,
             _____6D4B_8BD5_4E2D_5FC3Y + 220,

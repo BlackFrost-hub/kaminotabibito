@@ -3,14 +3,14 @@ local ____exports = {}
 local _____8BBE_7F6E_751F_547D_767E_5206_6BD4, _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4, _____82F1_96C4_8131_6218_5B8C_6210, ____Boss_8131_6218_5B8C_6210, jass, GetUnitStateJapi, g, GetPlayersAll, QuestMessageBJ, getRegisteredPlayerHero, _____8131_6218_79FB_901F_6280_80FDID
 function _____8BBE_7F6E_751F_547D_767E_5206_6BD4(unit, pct)
     local maxLife = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE)
-    jass:SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife * (pct > 0 and pct or 0) * 0.01)
+    jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife * (pct > 0 and pct or 0) * 0.01)
 end
 function _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4(unit, pct)
     local maxMana = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA)
-    jass:SetUnitState(unit, jass.UNIT_STATE_MANA, maxMana * (pct > 0 and pct or 0) * 0.01)
+    jass.SetUnitState(unit, jass.UNIT_STATE_MANA, maxMana * (pct > 0 and pct or 0) * 0.01)
 end
 function _____82F1_96C4_8131_6218_5B8C_6210(_____73A9_5BB6_7F16_53F7)
-    local owner = jass:Player(_____73A9_5BB6_7F16_53F7)
+    local owner = jass.Player(_____73A9_5BB6_7F16_53F7)
     if owner == nil or owner == 0 then
         return
     end
@@ -18,29 +18,29 @@ function _____82F1_96C4_8131_6218_5B8C_6210(_____73A9_5BB6_7F16_53F7)
     if unit == nil or unit == 0 then
         return
     end
-    jass:DisplayTimedTextToPlayer(
+    jass.DisplayTimedTextToPlayer(
         owner,
         0,
         0,
         30,
         "|cffffff00『系统提示』：|r『进入脱战状态』！生命和魔法已恢复。"
     )
-    jass:UnitAddAbility(unit, _____8131_6218_79FB_901F_6280_80FDID)
+    jass.UnitAddAbility(unit, _____8131_6218_79FB_901F_6280_80FDID)
     _____8BBE_7F6E_751F_547D_767E_5206_6BD4(unit, 100)
     _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4(unit, 100)
-    jass:SetUnitPathing(unit, true)
+    jass.SetUnitPathing(unit, true)
 end
 function ____Boss_8131_6218_5B8C_6210()
     local boss = g.udg_Boss
     if boss == nil or boss == 0 then
         return
     end
-    if jass:IsUnitType(boss, jass.UNIT_TYPE_DEAD) then
+    if jass.IsUnitType(boss, jass.UNIT_TYPE_DEAD) then
         return
     end
     _____8BBE_7F6E_751F_547D_767E_5206_6BD4(boss, 100)
     _____8BBE_7F6E_9B54_6CD5_767E_5206_6BD4(boss, 100)
-    local bossName = jass:GetUnitName(boss)
+    local bossName = jass.GetUnitName(boss)
     QuestMessageBJ(
         GetPlayersAll(),
         jass.bj_QUESTMESSAGE_WARNING,
@@ -59,7 +59,7 @@ local function _____62E5_6709Buff(unit, buffId)
     if unit == nil or unit == 0 then
         return false
     end
-    return jass:GetUnitAbilityLevel(unit, buffId) > 0
+    return jass.GetUnitAbilityLevel(unit, buffId) > 0
 end
 local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_2.registerAppliedFinalDamageListener
@@ -88,17 +88,17 @@ local function _____662F_73A9_5BB6_82F1_96C4(unit)
     if unit == nil then
         return false
     end
-    return getRegisteredPlayerHero(jass:GetOwningPlayer(unit)) == unit
+    return getRegisteredPlayerHero(jass.GetOwningPlayer(unit)) == unit
 end
 local function _____53D6_73A9_5BB6_7F16_53F7(unit)
     if unit == nil then
         return -1
     end
-    local owner = jass:GetOwningPlayer(unit)
+    local owner = jass.GetOwningPlayer(unit)
     if owner == nil then
         return -1
     end
-    return jass:GetPlayerId(owner)
+    return jass.GetPlayerId(owner)
 end
 local function _____542F_52A8_82F1_96C4_8131_6218_8BA1_65F6(_____73A9_5BB6_7F16_53F7)
     if _____73A9_5BB6_7F16_53F7 < 0 or _____73A9_5BB6_7F16_53F7 > 3 then
@@ -142,10 +142,10 @@ local function _____68C0_67E5_79FB_9664_8131_6218Buff(unit, damage)
     local _____6700_5927_751F_547D = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE)
     local _____9608_503C = _____6700_5927_751F_547D * _____8131_6218_4F24_5BB3_9608_503C_6BD4_4F8B
     if damage >= _____9608_503C then
-        jass:UnitRemoveAbility(unit, _____8131_6218_79FB_901F_6280_80FDID)
-        jass:UnitRemoveAbility(unit, _____8131_6218BuffID)
-        local owner = jass:GetOwningPlayer(unit)
-        jass:DisplayTimedTextToPlayer(
+        jass.UnitRemoveAbility(unit, _____8131_6218_79FB_901F_6280_80FDID)
+        jass.UnitRemoveAbility(unit, _____8131_6218BuffID)
+        local owner = jass.GetOwningPlayer(unit)
+        jass.DisplayTimedTextToPlayer(
             owner,
             0,
             0,
@@ -155,7 +155,7 @@ local function _____68C0_67E5_79FB_9664_8131_6218Buff(unit, damage)
     end
 end
 local function _____5355_4F4D_53D7_4F24_4E8B_4EF6(unit, _attacker, damage, _snapshot)
-    if jass:IsUnitIllusion(unit) then
+    if jass.IsUnitIllusion(unit) then
         return
     end
     if damage < 1 then

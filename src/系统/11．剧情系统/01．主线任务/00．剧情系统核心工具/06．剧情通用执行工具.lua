@@ -193,7 +193,7 @@ local function _____5B89_6392_5EF6_8FDF_6267_884C(_____79D2_6570, _____8BB0_5F55
         _____6267_884C_5EF6_8FDF_8BB0_5F55(_____8BB0_5F55)
         return
     end
-    _____5EF6_8FDF_6267_884C_4EFB_52A1_7EC4["添加延迟"](_____79D2_6570 * 1000, _____6267_884C_5EF6_8FDF_8BB0_5F55, _____8BB0_5F55)
+    _____5EF6_8FDF_6267_884C_4EFB_52A1_7EC4["添加延迟"](_____5EF6_8FDF_6267_884C_4EFB_52A1_7EC4, _____79D2_6570 * 1000, _____6267_884C_5EF6_8FDF_8BB0_5F55, _____8BB0_5F55)
 end
 local function _____53D6_53C2_6570_6587_672C(_____53C2_6570, key)
     local value = _____53C2_6570[key]
@@ -449,8 +449,8 @@ ____exports["更新主线任务UI"] = function(_____4EFB_52A1_63CF_8FF0, _____63
             rewards = {},
             status = QuestStatus.UNDISCOVERED,
             icon = "ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp",
-            createdAt = os:time(),
-            updatedAt = os:time()
+            createdAt = os.time(),
+            updatedAt = os.time()
         })
         questDB:acceptQuest(0, _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     end
@@ -465,7 +465,7 @@ ____exports["更新主线任务UI"] = function(_____4EFB_52A1_63CF_8FF0, _____63
     local _____4EFB_52A1 = ____opt_result_27
     if _____4EFB_52A1 ~= nil and _____4EFB_52A1_63CF_8FF0 ~= "" then
         _____4EFB_52A1.description = _____4EFB_52A1_63CF_8FF0
-        _____4EFB_52A1.updatedAt = os:time()
+        _____4EFB_52A1.updatedAt = os.time()
     end
     _____89E6_53D1_4EFB_52A1UI_5237_65B0(0, _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     if _____63D0_793A_6587_672C ~= "" then

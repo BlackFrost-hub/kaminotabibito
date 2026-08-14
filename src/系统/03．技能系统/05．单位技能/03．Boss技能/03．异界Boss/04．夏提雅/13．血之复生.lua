@@ -25,36 +25,40 @@ local ____18_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．�
 local _____64AD_653E_590F_63D0_96C5_53F0_8BCD = ____18_FF0E_53F0_8BCD_64AD_653E["播放夏提雅台词"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
-local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
-local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_0["读取Boss战运行上下文"]
-local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
-local _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_1["取当前有效玩家人数"]
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local getServerTime = ____require_result_2.getServerTime
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local ____require_result_3 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
-local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_3["显示大招吟唱条"]
-local _____5173_95ED_541F_5531_6761 = ____require_result_3["关闭吟唱条"]
-local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
-local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_5.YDWETimerDestroyEffectSafe
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_6["设置特效缩放"]
-local ____require_result_7 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_7.doHeal
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装")
+local _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168 = ____require_result_0["暂停并设置无敌安全"]
+local _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168 = ____require_result_0["解除暂停并取消无敌安全"]
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_1["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_1["移除单位暂停"]
+local ____require_result_2 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
+local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_2["读取Boss战运行上下文"]
+local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.06．玩家人数")
+local _____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570 = ____require_result_3["取当前有效玩家人数"]
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local getServerTime = ____require_result_4.getServerTime
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_5 = require("系统.09．表现系统.08．吟唱条.06．对外接口")
+local _____663E_793A_5927_62DB_541F_5531_6761 = ____require_result_5["显示大招吟唱条"]
+local _____5173_95ED_541F_5531_6761 = ____require_result_5["关闭吟唱条"]
+local ____require_result_6 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_6["广播单位提示"]
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWETimerDestroyEffectSafe = ____require_result_7.YDWETimerDestroyEffectSafe
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_8["设置特效缩放"]
+local ____require_result_9 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_9.doHeal
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_8 = require("lib.扩展函数.BJ函数.12．数学函数")
-local CosBJ = ____require_result_8.CosBJ
-local SinBJ = ____require_result_8.SinBJ
+local ____require_result_10 = require("lib.扩展函数.BJ函数.12．数学函数")
+local CosBJ = ____require_result_10.CosBJ
+local SinBJ = ____require_result_10.SinBJ
 local GetUnitStateJapi = japi.GetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
-local SetUnitInvulnerable = jass.SetUnitInvulnerable
-local PauseUnit = jass.PauseUnit
 local SetUnitPathing = jass.SetUnitPathing
 local IssueImmediateOrder = jass.IssueImmediateOrder
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
@@ -70,6 +74,8 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local _____8840_4E4B_590D_751F_6280_80FDKey = "血之复生"
+local _____8840_4E4B_590D_751FBoss_6682_505C_6765_6E90 = "Boss:夏提雅:血之复生"
+local _____8840_4E4B_590D_751F_7ED3_6676_6682_505C_6765_6E90 = "Boss:夏提雅:血之复生结晶"
 local function _____53D6_590D_751F_7ED3_6676_53D7_51FB_6B21_6570()
     local _____73A9_5BB6_4EBA_6570 = __TS__Number(_____53D6_5F53_524D_6709_6548_73A9_5BB6_4EBA_6570()) or 1
     if _____73A9_5BB6_4EBA_6570 < 1 then
@@ -83,11 +89,11 @@ end
 local function _____53D6_590D_751F_7ED3_6676_70B9(boss)
     local cfg = _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["血之复生"]
     local battle = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(boss)
-    local ____opt_result_11
+    local ____opt_result_13
     if battle ~= nil then
-        ____opt_result_11 = battle["地点矩形"]
+        ____opt_result_13 = battle["地点矩形"]
     end
-    local rect = ____opt_result_11
+    local rect = ____opt_result_13
     if rect ~= nil and rect ~= 0 then
         local inset = cfg["场地边缘内缩"]
         return {
@@ -124,11 +130,11 @@ local function _____53D6_590D_751F_7ED3_6676_70B9(boss)
 end
 local function _____79FB_52A8_590F_63D0_96C5_5230_573A_5730_4E2D_5FC3(boss)
     local battle = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(boss)
-    local ____opt_result_14
+    local ____opt_result_16
     if battle ~= nil then
-        ____opt_result_14 = battle["地点矩形"]
+        ____opt_result_16 = battle["地点矩形"]
     end
-    local rect = ____opt_result_14
+    local rect = ____opt_result_16
     if rect ~= nil and rect ~= 0 then
         _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(
             boss,
@@ -179,9 +185,9 @@ local function _____767B_8BB0_590D_751F_6210_529F_7279_6548_6279_6B21(context, b
             _____64AD_653E_590D_751F_6210_529F_7279_6548_6279_6B21(boss, _____6301_7EED_79D2)
         end
     )
-    local ____self_15 = context["清理"]
-    ____self_15["登记延迟回调"](
-        ____self_15,
+    local ____self_17 = context["清理"]
+    ____self_17["登记延迟回调"](
+        ____self_17,
         "夏提雅-复生成功特效-" .. tostring(_____5E8F_53F7),
         delayedId
     )
@@ -232,9 +238,9 @@ local function _____767B_8BB0_590D_751F_6210_529F_56DE_8840(context, boss, _____
             _____6267_884C_590D_751F_6210_529F_56DE_8840(context, boss, _____6062_590D_91CF)
         end
     )
-    local ____self_16 = context["清理"]
-    ____self_16["登记延迟回调"](
-        ____self_16,
+    local ____self_18 = context["清理"]
+    ____self_18["登记延迟回调"](
+        ____self_18,
         "夏提雅-复生成功回血-" .. tostring(_____5E8F_53F7),
         delayedId
     )
@@ -277,8 +283,8 @@ local function _____7EDF_8BA1_5B58_6D3B_7ED3_6676(crystals)
     do
         local i = 0
         while i < #crystals do
-            local ____self_17 = crystals[i + 1]
-            if ____self_17["是否存活"](____self_17) then
+            local ____self_19 = crystals[i + 1]
+            if ____self_19["是否存活"](____self_19) then
                 count = count + 1
             end
             i = i + 1
@@ -290,11 +296,21 @@ local function _____6E05_7406_590D_751F_7ED3_6676(crystals)
     do
         local i = 0
         while i < #crystals do
-            local ____self_18 = crystals[i + 1]
-            ____self_18["销毁"](____self_18)
+            _____79FB_9664_5355_4F4D_6682_505C(crystals[i + 1]["单位"], _____8840_4E4B_590D_751F_7ED3_6676_6682_505C_6765_6E90)
+            local ____self_20 = crystals[i + 1]
+            ____self_20["销毁"](____self_20)
             i = i + 1
         end
     end
+end
+local function _____6E05_7406_590F_63D0_96C5_8840_4E4B_590D_751F_6682_505C_72B6_6001(variable)
+    local _____72B6_6001 = variable
+    if _____72B6_6001 == nil then
+        return
+    end
+    _____72B6_6001["恢复复生表现"]()
+    _____6E05_7406_590D_751F_7ED3_6676(_____72B6_6001["结晶列表"])
+    _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(_____72B6_6001["Boss单位"], _____8840_4E4B_590D_751FBoss_6682_505C_6765_6E90)
 end
 local function _____5B8C_6210_590D_751F_6210_529F(context, _____5269_4F59_7ED3_6676, _____6062_590D_590D_751F_8868_73B0)
     local boss = context["Boss单位"]
@@ -321,15 +337,14 @@ local function _____5B8C_6210_590D_751F_6210_529F(context, _____5269_4F59_7ED3_6
                 return
             end
             SetUnitAnimationByIndex(boss, 0)
-            PauseUnit(boss, false)
-            SetUnitInvulnerable(boss, false)
+            _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(boss, _____8840_4E4B_590D_751FBoss_6682_505C_6765_6E90)
             if context["当前大型技能"] == _____8840_4E4B_590D_751F_6280_80FDKey then
                 context["当前大型技能"] = nil
             end
         end
     )
-    local ____self_19 = context["清理"]
-    ____self_19["登记延迟回调"](____self_19, "夏提雅-复生成功恢复行动", delayedId)
+    local ____self_21 = context["清理"]
+    ____self_21["登记延迟回调"](____self_21, "夏提雅-复生成功恢复行动", delayedId)
 end
 ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_5931_8D25)
     local boss = context["Boss单位"]
@@ -370,8 +385,9 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
     local executor
     local executionId = 0
     IssueImmediateOrder(boss, "stop")
-    SetUnitInvulnerable(boss, true)
-    PauseUnit(boss, true)
+    _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168(boss, _____8840_4E4B_590D_751FBoss_6682_505C_6765_6E90)
+    local ____self_22 = context["清理"]
+    ____self_22["登记清理"](____self_22, "夏提雅-血之复生暂停来源", _____6E05_7406_590F_63D0_96C5_8840_4E4B_590D_751F_6682_505C_72B6_6001, {["Boss单位"] = boss, ["结晶列表"] = crystals, ["恢复复生表现"] = _____6062_590D_590D_751F_8868_73B0})
     _____79FB_52A8_590F_63D0_96C5_5230_573A_5730_4E2D_5FC3(boss)
     _____91CD_7F6E_590F_63D0_96C5_730E_8840_8FDE_51FB(context)
     context["普通机制忙碌到Ms"] = getServerTime() + cfg["仪式秒"] * 1000
@@ -398,6 +414,7 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
                     ["缩放"] = cfg["结晶缩放"],
                     ["on击破"] = function(unit)
                         _____64AD_653E_7ED3_6676_7834_88C2(unit)
+                        _____79FB_9664_5355_4F4D_6682_505C(unit, _____8840_4E4B_590D_751F_7ED3_6676_6682_505C_6765_6E90)
                         local remaining = _____7EDF_8BA1_5B58_6D3B_7ED3_6676(crystals)
                         if remaining > 0 then
                             _____5E7F_64AD_5355_4F4D_63D0_793A(
@@ -420,20 +437,19 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
                     end
                 })
                 if crystal == nil then
-                    goto __continue56
+                    goto __continue58
                 end
-                PauseUnit(crystal["单位"], true)
+                _____6DFB_52A0_5355_4F4D_6682_505C(crystal["单位"], _____8840_4E4B_590D_751F_7ED3_6676_6682_505C_6765_6E90)
                 SetUnitPathing(crystal["单位"], false)
                 crystals[#crystals + 1] = crystal
             end
-            ::__continue56::
+            ::__continue58::
             i = i + 1
         end
     end
     if #crystals <= 0 then
         _____6062_590D_590D_751F_8868_73B0()
-        PauseUnit(boss, false)
-        SetUnitInvulnerable(boss, false)
+        _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(boss, _____8840_4E4B_590D_751FBoss_6682_505C_6765_6E90)
         return false
     end
     executor = _____521B_5EFA_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668({["名称"] = "夏提雅-血之复生", ["清理"] = context["清理"], ["互斥组"] = "夏提雅大型技能"})
@@ -450,12 +466,14 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
                 if event["原因"] ~= "完成" or context["挑战已结束"] then
                     _____6062_590D_590D_751F_8868_73B0()
                     _____6E05_7406_590D_751F_7ED3_6676(crystals)
+                    _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(boss, _____8840_4E4B_590D_751FBoss_6682_505C_6765_6E90)
                     return
                 end
                 local remaining = _____7EDF_8BA1_5B58_6D3B_7ED3_6676(crystals)
                 _____6E05_7406_590D_751F_7ED3_6676(crystals)
                 if remaining <= 0 then
                     _____6062_590D_590D_751F_8868_73B0()
+                    _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(boss, _____8840_4E4B_590D_751FBoss_6682_505C_6765_6E90)
                     _____64AD_653E_590F_63D0_96C5_53F0_8BCD(boss, "复生失败")
                     _____64AD_653EBoss_5750_6807_97F3_6548(
                         _____590F_63D0_96C5_6570_503C_4E0E_8868_73B0_914D_7F6E["音效"]["血之复生失败"],
@@ -473,8 +491,7 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
     if executionId == 0 then
         _____6062_590D_590D_751F_8868_73B0()
         _____6E05_7406_590D_751F_7ED3_6676(crystals)
-        PauseUnit(boss, false)
-        SetUnitInvulnerable(boss, false)
+        _____89E3_9664_6682_505C_5E76_53D6_6D88_65E0_654C_5B89_5168(boss, _____8840_4E4B_590D_751FBoss_6682_505C_6765_6E90)
         return false
     end
     _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B({["单位"] = boss, ["动画编号"] = cfg["仪式动画编号"], ["持续秒"] = cfg["仪式秒"], ["恢复动画编号"] = 0})
@@ -485,8 +502,8 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
             _____5E94_7528_590D_751F_51BB_7ED3_9AD8_5EA6()
         end
     )
-    local ____self_22 = context["清理"]
-    ____self_22["登记延迟回调"](____self_22, "夏提雅-血之复生提前抬高", _____62AC_9AD8_52A8_753BID)
+    local ____self_25 = context["清理"]
+    ____self_25["登记延迟回调"](____self_25, "夏提雅-血之复生提前抬高", _____62AC_9AD8_52A8_753BID)
     local _____51BB_7ED3_52A8_753BID = addDelayedCallback(
         cfg["仪式动画冻结秒"] * 1000,
         function()
@@ -497,8 +514,8 @@ ____exports["启动夏提雅血之复生"] = function(context, ____on_590D_751F_
             SetUnitTimeScale(boss, 0)
         end
     )
-    local ____self_23 = context["清理"]
-    ____self_23["登记延迟回调"](____self_23, "夏提雅-血之复生冻结施法动画", _____51BB_7ED3_52A8_753BID)
+    local ____self_26 = context["清理"]
+    ____self_26["登记延迟回调"](____self_26, "夏提雅-血之复生冻结施法动画", _____51BB_7ED3_52A8_753BID)
     _____663E_793A_5927_62DB_541F_5531_6761({
         ["通道"] = "大招",
         ["总时长"] = cfg["仪式秒"],

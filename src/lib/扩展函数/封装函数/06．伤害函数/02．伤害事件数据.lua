@@ -12,32 +12,32 @@ local EVENT_DAMAGE_DATA_DAMAGE_AMOUNT = ____01_FF0E_4F24_5BB3_4E8B_4EF6_5E38_91C
 --- 伤害函数 - 伤害事件数据获取与设置
 local japi = require("jass.japi")
 function ____exports.EXGetEventDamageData(edd_type)
-    return japi:EXGetEventDamageData(edd_type)
+    return japi.EXGetEventDamageData(edd_type)
 end
 function ____exports.EXSetEventDamage(amount)
-    return japi:EXSetEventDamage(amount)
+    return japi.EXSetEventDamage(amount)
 end
 function ____exports.YDWEIsEventPhysicalDamage()
-    return 0 ~= japi:EXGetEventDamageData(EVENT_DAMAGE_DATA_IS_PHYSICAL)
+    return 0 ~= japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_IS_PHYSICAL)
 end
 function ____exports.YDWEIsEventAttackDamage()
-    return 0 ~= japi:EXGetEventDamageData(EVENT_DAMAGE_DATA_IS_ATTACK)
+    return 0 ~= japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_IS_ATTACK)
 end
 function ____exports.YDWEIsEventRangedDamage()
-    return 0 ~= japi:EXGetEventDamageData(EVENT_DAMAGE_DATA_IS_RANGED)
+    return 0 ~= japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_IS_RANGED)
 end
 local jass = require("jass.common")
 function ____exports.YDWEIsEventDamageType(damageType)
-    return damageType == jass:ConvertDamageType(japi:EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_TYPE))
+    return damageType == jass.ConvertDamageType(japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_TYPE))
 end
 function ____exports.YDWEIsEventWeaponType(weaponType)
-    return weaponType == jass:ConvertWeaponType(japi:EXGetEventDamageData(EVENT_DAMAGE_DATA_WEAPON_TYPE))
+    return weaponType == jass.ConvertWeaponType(japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_WEAPON_TYPE))
 end
 function ____exports.YDWEIsEventAttackType(attackType)
-    return attackType == jass:ConvertAttackType(japi:EXGetEventDamageData(EVENT_DAMAGE_DATA_ATTACK_TYPE))
+    return attackType == jass.ConvertAttackType(japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_ATTACK_TYPE))
 end
 function ____exports.YDWESetEventDamage(amount)
-    return japi:EXSetEventDamage(amount)
+    return japi.EXSetEventDamage(amount)
 end
 local function isFiniteNumber(n)
     return type(n) == "number" and not __TS__NumberIsNaN(n)
@@ -45,14 +45,14 @@ end
 local ______pcall_8BFB_53D6_4F24_5BB3_503C = 0
 local ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 = false
 local function ______pcall_8BFB_53D6Japi_4E8B_4EF6_4F24_5BB3(self)
-    local value = japi:GetEventDamage()
+    local value = japi.GetEventDamage()
     if isFiniteNumber(value) then
         ______pcall_8BFB_53D6_4F24_5BB3_503C = value
         ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 = true
     end
 end
 local function ______pcall_8BFB_53D6Ex_4E8B_4EF6_4F24_5BB3(self)
-    local value = japi:EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT)
+    local value = japi.EXGetEventDamageData(EVENT_DAMAGE_DATA_DAMAGE_AMOUNT)
     if isFiniteNumber(value) then
         ______pcall_8BFB_53D6_4F24_5BB3_503C = value
         ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 = true
@@ -73,6 +73,6 @@ function ____exports.readEventDamageAfterModify()
     if ______pcall_8BFB_53D6_4F24_5BB3_503C_6709_6548 then
         return ______pcall_8BFB_53D6_4F24_5BB3_503C
     end
-    return jass:GetEventDamage()
+    return jass.GetEventDamage()
 end
 return ____exports

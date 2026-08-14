@@ -22,17 +22,22 @@ local ____require_result_6 = require("系统.09．表现系统.02．对话框系
 local _____53D1_653E_4EFB_52A1_7269_54C1 = ____require_result_6["发放任务物品"]
 local ____require_result_7 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local getRegisteredPlayerHero = ____require_result_7.getRegisteredPlayerHero
-local ____require_result_8 = require("系统.08．任务系统.00．配置表.04．NPC生成器")
-local _____6309_4EFB_52A1ID_521B_5EFANPC = ____require_result_8["按任务ID创建NPC"]
-local _____6309_4EFB_52A1ID_67E5_627E_5DF2_521B_5EFANPC = ____require_result_8["按任务ID查找已创建NPC"]
-local ____require_result_9 = require("系统.09．表现系统.06．广播提示消息.index")
-local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_9["广播单位提示"]
-local ____require_result_10 = require("系统.08．任务系统.01．任务数据")
-local questDB = ____require_result_10.questDB
-local ____require_result_11 = require("系统.08．任务系统.02．任务管理器")
-local _____89E6_53D1_4EFB_52A1UI_5237_65B0 = ____require_result_11["触发任务UI刷新"]
-local ____require_result_12 = require("平台扩展API动作")
-local _____8BBE_5355_4F4D_540D_5B57 = ____require_result_12["设单位名字"]
+local function _____6309_4EFB_52A1ID_521B_5EFANPC(_____4EFB_52A1ID)
+    local ____NPC_751F_6210_5668 = require("系统.08．任务系统.00．配置表.04．NPC生成器")
+    return ____NPC_751F_6210_5668["按任务ID创建NPC"](_____4EFB_52A1ID)
+end
+local function _____6309_4EFB_52A1ID_67E5_627E_5DF2_521B_5EFANPC(_____4EFB_52A1ID)
+    local ____NPC_751F_6210_5668 = require("系统.08．任务系统.00．配置表.04．NPC生成器")
+    return ____NPC_751F_6210_5668["按任务ID查找已创建NPC"](_____4EFB_52A1ID)
+end
+local ____require_result_8 = require("系统.09．表现系统.06．广播提示消息.index")
+local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_8["广播单位提示"]
+local ____require_result_9 = require("系统.08．任务系统.01．任务数据")
+local questDB = ____require_result_9.questDB
+local ____require_result_10 = require("系统.08．任务系统.02．任务管理器")
+local _____89E6_53D1_4EFB_52A1UI_5237_65B0 = ____require_result_10["触发任务UI刷新"]
+local ____require_result_11 = require("平台扩展API动作")
+local _____8BBE_5355_4F4D_540D_5B57 = ____require_result_11["设单位名字"]
 local Player = jass.Player
 local RemoveUnit = jass.RemoveUnit
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -145,7 +150,7 @@ local _____5408_6CD5_51B3_6597_5357_4FA7_5355_4F4D = nil
 local _____5408_6CD5_51B3_6597_56DE_8C03ID = 0
 local _____5408_6CD5_51B3_6597_5DF2_7ED3_675F = false
 local function _____67E5_627E_6D3B_52A8_4EFB_52A1(_____73A9_5BB6ID, _____4EFB_52A1ID)
-    local _____4EFB_52A1_952E = tostring(nil, _____4EFB_52A1ID)
+    local _____4EFB_52A1_952E = tostring(_____4EFB_52A1ID)
     local _____6D3B_52A8_4EFB_52A1_5217_8868 = questDB.getPlayerActiveQuests(_____73A9_5BB6ID)
     do
         local i = 0
@@ -180,13 +185,13 @@ local function _____8BFB_53D6_4EFB_52A1_8FDB_5EA6(_____73A9_5BB6ID, _____4EFB_52
         return nil
     end
     local _____76EE_6807 = _____4EFB_52A1.objectives[1]
-    local ____temp_13
+    local ____temp_12
     if _____76EE_6807 == nil then
-        ____temp_13 = nil
+        ____temp_12 = nil
     else
-        ____temp_13 = {["当前"] = _____76EE_6807.current, ["需求"] = _____76EE_6807.required}
+        ____temp_12 = {["当前"] = _____76EE_6807.current, ["需求"] = _____76EE_6807.required}
     end
-    return ____temp_13
+    return ____temp_12
 end
 local function _____67E5_627E_8C03_67E5_70B9_914D_7F6E(_____8C03_67E5_70B9ID)
     do
@@ -207,12 +212,12 @@ local function _____6E05_7406_4EFB_52A1_8C03_67E5_70B9(_____4EFB_52A1ID)
             do
                 local _____914D_7F6E = _____6076_9B54_57CE_8C03_67E5_70B9_914D_7F6E_8868[i + 1]
                 if _____914D_7F6E["任务ID"] ~= _____4EFB_52A1ID then
-                    goto __continue18
+                    goto __continue20
                 end
                 _____6CE8_9500_73AF_5883_4E92_52A8_8C03_67E5_70B9(_____914D_7F6E.ID)
                 _____5DF2_8C03_67E5_70B9[_____914D_7F6E.ID] = false
             end
-            ::__continue18::
+            ::__continue20::
             i = i + 1
         end
     end
@@ -259,7 +264,7 @@ local function _____6CE8_518C_4EFB_52A1_8C03_67E5_70B9(_____4EFB_52A1ID)
             do
                 local _____914D_7F6E = _____6076_9B54_57CE_8C03_67E5_70B9_914D_7F6E_8868[i + 1]
                 if _____914D_7F6E["任务ID"] ~= _____4EFB_52A1ID then
-                    goto __continue32
+                    goto __continue34
                 end
                 _____6CE8_518C_73AF_5883_4E92_52A8_8C03_67E5_70B9({
                     ID = _____914D_7F6E.ID,
@@ -269,7 +274,7 @@ local function _____6CE8_518C_4EFB_52A1_8C03_67E5_70B9(_____4EFB_52A1ID)
                     ["触发回调"] = _____5904_7406_6076_9B54_57CE_73AF_5883_4E92_52A8
                 })
             end
-            ::__continue32::
+            ::__continue34::
             i = i + 1
         end
     end
@@ -285,13 +290,13 @@ local function ____on_7194_706B_9152_9001_8FBE_626B_63CF()
         _____505C_6B62_7194_706B_9152_9001_8FBE_626B_63CF()
         return
     end
-    local _____73A9_5BB6 = jass:Player(_____7194_706B_9152_63A5_53D6_73A9_5BB6ID)
+    local _____73A9_5BB6 = jass.Player(_____7194_706B_9152_63A5_53D6_73A9_5BB6ID)
     local _____82F1_96C4 = getRegisteredPlayerHero(_____73A9_5BB6)
     if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
         return
     end
-    local ____X_5DEE = jass:GetUnitX(_____82F1_96C4) - _____57CE_5916_5B88_536BX
-    local ____Y_5DEE = jass:GetUnitY(_____82F1_96C4) - _____57CE_5916_5B88_536BY
+    local ____X_5DEE = jass.GetUnitX(_____82F1_96C4) - _____57CE_5916_5B88_536BX
+    local ____Y_5DEE = jass.GetUnitY(_____82F1_96C4) - _____57CE_5916_5B88_536BY
     if ____X_5DEE * ____X_5DEE + ____Y_5DEE * ____Y_5DEE > _____57CE_5916_5B88_536B_89E6_53D1_8303_56F4 * _____57CE_5916_5B88_536B_89E6_53D1_8303_56F4 then
         return
     end
@@ -311,36 +316,36 @@ local function ____on_6076_9B54_57CE_4EFB_52A1_5355_4F4D_6B7B_4EA1(_____6B7B_4EA
     if _____6B7B_4EA1_5355_4F4D == nil or _____6B7B_4EA1_5355_4F4D == 0 then
         return
     end
-    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass:GetHandleId(_____6B7B_4EA1_5355_4F4D) == jass:GetHandleId(_____9057_5931_89D2_9970_6076_9B54_72AC) then
+    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass.GetHandleId(_____6B7B_4EA1_5355_4F4D) == jass.GetHandleId(_____9057_5931_89D2_9970_6076_9B54_72AC) then
         local _____73A9_5BB6ID = _____9057_5931_89D2_9970_63A5_53D6_73A9_5BB6ID
         _____9057_5931_89D2_9970_6076_9B54_72AC = nil
-        local ____temp_14
+        local ____temp_13
         if _____73A9_5BB6ID >= 0 then
-            ____temp_14 = getRegisteredPlayerHero(jass:Player(_____73A9_5BB6ID))
+            ____temp_13 = getRegisteredPlayerHero(jass.Player(_____73A9_5BB6ID))
         else
-            ____temp_14 = nil
+            ____temp_13 = nil
         end
-        local _____82F1_96C4 = ____temp_14
+        local _____82F1_96C4 = ____temp_13
         if _____82F1_96C4 ~= nil and _____82F1_96C4 ~= 0 and _____66F4_65B0_4EFB_52A1_76EE_6807(_____73A9_5BB6ID, ____exports["遗失角饰任务ID"], 1) then
             _____53D1_653E_4EFB_52A1_7269_54C1(_____82F1_96C4, _____9057_5931_89D2_9970_7269_54C1ID)
             _____5E7F_64AD_5355_4F4D_63D0_793A(_____82F1_96C4, "|cffffff00『任务进度』：|r从恶魔犬的项圈下找到了遗失的仪式角饰。把它带回给年轻恶魔。", 5000)
         end
     end
-    if jass:GetUnitTypeId(_____6B7B_4EA1_5355_4F4D) == stringToFourCCSafe("u004") then
+    if jass.GetUnitTypeId(_____6B7B_4EA1_5355_4F4D) == stringToFourCCSafe("u004") then
         do
             local _____73A9_5BB6ID = 0
             while _____73A9_5BB6ID < 4 do
                 do
                     local _____8FDB_5EA6 = _____8BFB_53D6_4EFB_52A1_8FDB_5EA6(_____73A9_5BB6ID, ____exports["迷宫缺灯任务ID"])
                     if _____8FDB_5EA6 == nil or _____8FDB_5EA6["当前"] < 3 or _____8FDB_5EA6["当前"] >= _____8FDB_5EA6["需求"] then
-                        goto __continue48
+                        goto __continue50
                     end
                     if _____66F4_65B0_4EFB_52A1_76EE_6807(_____73A9_5BB6ID, ____exports["迷宫缺灯任务ID"], _____8FDB_5EA6["需求"]) then
                         _____5E7F_64AD_5355_4F4D_63D0_793A(_____6B7B_4EA1_5355_4F4D, "|cffffff00『调查完成』：|r双翼究极恶魔已经倒下，迷宫外围的路线重新恢复安全。回去找测绘师复命吧。", 5200)
                     end
                     break
                 end
-                ::__continue48::
+                ::__continue50::
                 _____73A9_5BB6ID = _____73A9_5BB6ID + 1
             end
         end
@@ -498,22 +503,22 @@ ____exports["完成迷宫缺灯任务"] = function(______73A9_5BB6ID)
 end
 ____exports["接受遗失角饰任务"] = function(_____73A9_5BB6ID)
     _____9057_5931_89D2_9970_63A5_53D6_73A9_5BB6ID = _____73A9_5BB6ID
-    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass:GetUnitTypeId(_____9057_5931_89D2_9970_6076_9B54_72AC) ~= 0 then
-        jass:RemoveUnit(_____9057_5931_89D2_9970_6076_9B54_72AC)
+    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass.GetUnitTypeId(_____9057_5931_89D2_9970_6076_9B54_72AC) ~= 0 then
+        jass.RemoveUnit(_____9057_5931_89D2_9970_6076_9B54_72AC)
     end
     _____9057_5931_89D2_9970_6076_9B54_72AC = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-        jass:Player(12),
+        jass.Player(12),
         stringToFourCCSafe("n037"),
         22448.7,
         -19816.9,
         180
     )
-    local _____82F1_96C4 = getRegisteredPlayerHero(jass:Player(_____73A9_5BB6ID))
+    local _____82F1_96C4 = getRegisteredPlayerHero(jass.Player(_____73A9_5BB6ID))
     _____5E7F_64AD_5355_4F4D_63D0_793A(_____82F1_96C4, "|cffffff00『任务提示』：|r恶魔犬最后出现的位置在城外熔痕地带。仪式角饰应该还挂在它身上。", 5000)
 end
 ____exports["完成遗失角饰任务"] = function(______73A9_5BB6ID)
-    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass:GetUnitTypeId(_____9057_5931_89D2_9970_6076_9B54_72AC) ~= 0 then
-        jass:RemoveUnit(_____9057_5931_89D2_9970_6076_9B54_72AC)
+    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass.GetUnitTypeId(_____9057_5931_89D2_9970_6076_9B54_72AC) ~= 0 then
+        jass.RemoveUnit(_____9057_5931_89D2_9970_6076_9B54_72AC)
     end
     _____9057_5931_89D2_9970_6076_9B54_72AC = nil
     _____9057_5931_89D2_9970_63A5_53D6_73A9_5BB6ID = -1

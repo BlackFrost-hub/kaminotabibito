@@ -164,7 +164,7 @@ ____exports["创建世界坐标进度UI"] = function(_____53C2_6570)
     end
     local id = _____4E0B_4E00_4E2A_4E16_754C_5750_6807_8FDB_5EA6UIID
     _____4E0B_4E00_4E2A_4E16_754C_5750_6807_8FDB_5EA6UIID = _____4E0B_4E00_4E2A_4E16_754C_5750_6807_8FDB_5EA6UIID + 1
-    local suffix = tostring(nil, id)
+    local suffix = tostring(id)
     local parent = _____53D6_4E16_754C_5750_6807_8FDB_5EA6UI_7236_5E27()
     local ____type = _____53C2_6570["类型"] or "通用"
     local typeVisual = _____7C7B_578B_8868_73B0_8868[____type]

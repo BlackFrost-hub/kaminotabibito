@@ -35,7 +35,7 @@ ____exports["创建首领奖励标题贴图"] = function(_____7236_5E27, _____54
         )
         _____8BBE_7F6E_5E27_5C3A_5BF8(nil, _____6218_5229_54C1_6807_9898, {width = 0.096, height = 0.024})
         _____8BBE_7F6E_5E27_8D34_56FE(nil, _____6218_5229_54C1_6807_9898, _____6218_5229_54C1_9009_62E9_8D34_56FE)
-        japi:DzFrameSetPriority(_____6218_5229_54C1_6807_9898, 40)
+        japi.DzFrameSetPriority(_____6218_5229_54C1_6807_9898, 40)
     end
     local ____F7_63D0_793A = _____521B_5EFA_5E27(nil, {
         type = FrameType.BACKDROP,
@@ -56,7 +56,7 @@ ____exports["创建首领奖励标题贴图"] = function(_____7236_5E27, _____54
         )
         _____8BBE_7F6E_5E27_5C3A_5BF8(nil, ____F7_63D0_793A, {width = 0.096, height = 0.024})
         _____8BBE_7F6E_5E27_8D34_56FE(nil, ____F7_63D0_793A, ____F7_6253_5F00_5173_95ED_8D34_56FE)
-        japi:DzFrameSetPriority(____F7_63D0_793A, 40)
+        japi.DzFrameSetPriority(____F7_63D0_793A, 40)
     end
 end
 return ____exports

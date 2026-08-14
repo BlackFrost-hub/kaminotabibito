@@ -7,24 +7,20 @@ import { 播放教派学者台词 } from './09．台词播放';
 import { 距离平方XY } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 执行Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 注册单位技能壳监听 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器';
+import { 执行Boss施法时间线 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/23．Boss施法时间线';
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require('系统.00．核心系统.05．中心计时器') as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, callbackId: number) => void;
 };
-const { 开始硬直, 施加快速控制Buff } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff') as {
-  开始硬直: (this: void, unit: any, duration: number) => void;
+const { 施加快速控制Buff } = require('系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff') as {
   施加快速控制Buff: (this: void, source: any, target: any, controlId: number, duration: number, sourceName?: string, sourceType?: string) => void;
 };
 const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require('系统.05．Buff系统.00．Buff系统') as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   getBuffRuntime: (this: void, target: any, buffID: string) => any | null;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
-};
-const { 显示常规技能吟唱条, 关闭吟唱条 } = require('系统.09．表现系统.08．吟唱条.06．对外接口') as {
-  显示常规技能吟唱条: (this: void, params: any) => void;
-  关闭吟唱条: (this: void, channel?: string) => void;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -45,7 +41,6 @@ const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const SetUnitAnimation = jass.SetUnitAnimation as (unit: any, animation: string) => void;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -73,11 +68,6 @@ interface 深渊牢笼暗抗状态 {
   周期回调ID: number;
 }
 
-interface 教派学者读条关闭请求 {
-  通道: string;
-  Boss单位: any;
-}
-
 const 深渊之牢技能ID = stringToFourCCSafe(教派学者单位技能配置.技能壳.深渊之牢);
 let 深渊之牢已注册 = false;
 
@@ -87,22 +77,22 @@ function 修改单位实数属性(this: void, unit: any, attr: string, delta: nu
   YDUserDataSetSafe('unit', unit, attr, 'real', current + delta);
 }
 
-function on教派学者读条关闭(this: void, variable?: any): void {
-  const 请求 = variable as 教派学者读条关闭请求 | undefined;
-  if (请求 == null) return;
-  关闭吟唱条(请求.通道);
-}
-
 function 开始深渊之牢施法表现(this: void, 上下文: 教派学者运行时上下文): void {
   const boss = 上下文.Boss单位;
   const 公共 = 教派学者技能配置.公共施法;
   const 配置 = 教派学者技能配置.深渊之牢;
-  开始硬直(boss, 公共.通魔施法秒);
-  SetUnitAnimation(boss, 公共.动作名);
-  播放教派学者台词(boss, '深渊之牢');
-  显示常规技能吟唱条({ 通道: 配置.读条通道, 总时长: 公共.通魔施法秒, 颜色ID: 公共.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
-  const 回调ID = addDelayedCallback(公共.通魔施法秒 * 1000, on教派学者读条关闭, { 通道: 配置.读条通道, Boss单位: boss } as 教派学者读条关闭请求);
-  上下文.清理.登记延迟回调('教派学者-深渊之牢读条关闭', 回调ID);
+  执行Boss施法时间线({
+    名称: '教派学者-深渊之牢',
+    单位: boss,
+    清理: 上下文.清理,
+    施法秒: 公共.通魔施法秒,
+    动作名: 公共.动作名,
+    吟唱条: { 类型: '常规', 通道: 配置.读条通道, 颜色ID: 公共.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 },
+    开始回调: function 深渊之牢施法台词(this: void, unit: any): void {
+      播放教派学者台词(unit, '深渊之牢');
+    },
+    延迟登记名: '教派学者-深渊之牢读条关闭',
+  });
 }
 
 function 恢复深渊牢笼暗抗(this: void, variable?: any): void {

@@ -33,7 +33,7 @@ local function formatOneDecimal(n)
         return "0.0"
     end
     local scaled = round(clampMin(n, 0) * 10)
-    local intPart = jass:R2I(scaled / 10)
+    local intPart = jass.R2I(scaled / 10)
     local fracPart = scaled % 10
     return (tostring(intPart) .. ".") .. tostring(fracPart)
 end

@@ -76,7 +76,7 @@ function taskUITogglePanelPcallBody(self)
     local player = __togglePanelTriggerPlayer
     local ____temp_10
     if player ~= nil and player ~= 0 then
-        ____temp_10 = jass:GetPlayerId(player)
+        ____temp_10 = jass.GetPlayerId(player)
     else
         ____temp_10 = -1
     end
@@ -94,14 +94,14 @@ function isHumanPlayingPlayer(whichPlayer)
     if whichPlayer == nil or whichPlayer == 0 then
         return false
     end
-    local pid = jass:GetPlayerId(whichPlayer)
+    local pid = jass.GetPlayerId(whichPlayer)
     if type(pid) ~= "number" or pid < 0 or pid >= MAX_PLAYERS then
         return false
     end
-    if jass:GetPlayerController(whichPlayer) == jass.MAP_CONTROL_COMPUTER then
+    if jass.GetPlayerController(whichPlayer) == jass.MAP_CONTROL_COMPUTER then
         return false
     end
-    return jass:GetPlayerSlotState(whichPlayer) == jass.PLAYER_SLOT_STATE_PLAYING
+    return jass.GetPlayerSlotState(whichPlayer) == jass.PLAYER_SLOT_STATE_PLAYING
 end
 function ____exports.initTaskUIForPlayer(whichPlayer)
     if not ENABLE_TASK_UI_CLIENT then
@@ -110,7 +110,7 @@ function ____exports.initTaskUIForPlayer(whichPlayer)
     if not isHumanPlayingPlayer(whichPlayer) then
         return false
     end
-    local pid = jass:GetPlayerId(whichPlayer)
+    local pid = jass.GetPlayerId(whichPlayer)
     local ____opt_12 = taskUIs[pid]
     if (____opt_12 and ____opt_12.uiInitialized) == true then
         return true
@@ -156,7 +156,7 @@ refreshCallbackRegistered = false
 local function getTriggerPlayerId(self)
     local ____temp_0
     if japi.DzGetTriggerKeyPlayer ~= nil then
-        ____temp_0 = japi:DzGetTriggerKeyPlayer()
+        ____temp_0 = japi.DzGetTriggerKeyPlayer()
     else
         ____temp_0 = nil
     end
@@ -164,12 +164,12 @@ local function getTriggerPlayerId(self)
     if tp == nil or tp == 0 then
         return -1
     end
-    local pid = jass:GetPlayerId(tp)
+    local pid = jass.GetPlayerId(tp)
     return type(pid) == "number" and pid >= 0 and pid < MAX_PLAYERS and pid or -1
 end
 local function taskUIModulePlayClickSound()
-    local lp = jass:GetLocalPlayer()
-    local pid = jass:GetPlayerId(lp)
+    local lp = jass.GetLocalPlayer()
+    local pid = jass.GetPlayerId(lp)
     local ____temp_1
     if pid >= 0 and pid < MAX_PLAYERS then
         ____temp_1 = taskUIs[pid]
@@ -211,9 +211,9 @@ local function taskUIModuleNoopTabTooltip(_msg)
 end
 local function getTriggerPlayerOrLocal()
     if japi.DzGetTriggerKeyPlayer ~= nil then
-        return japi:DzGetTriggerKeyPlayer()
+        return japi.DzGetTriggerKeyPlayer()
     end
-    return jass:GetLocalPlayer()
+    return jass.GetLocalPlayer()
 end
 local function taskUIEntryClick()
     taskUIHotkeyTogglePanel(getTriggerPlayerOrLocal())
@@ -265,7 +265,7 @@ function TaskUI.prototype.ensureUiContextCaches(self)
             return registerMouseWheelHardware(nil, sync, cb, playerId)
         end,
         isVisible = function() return ____self.isVisible end,
-        isOwnedByLocalPlayer = function() return ____self.localPlayer == jass:GetLocalPlayer() end,
+        isOwnedByLocalPlayer = function() return ____self.localPlayer == jass.GetLocalPlayer() end,
         getCurrentPageCount = function() return ____self:getPageCountForCurrentCategory() end,
         getCurrentPage = function() return ____self.currentPage end,
         setCurrentPage = function(____, p)
@@ -318,7 +318,7 @@ function TaskUI.prototype.init(self, playerId)
     if self.uiInitialized then
         return true
     end
-    self.localPlayer = jass:Player(playerId)
+    self.localPlayer = jass.Player(playerId)
     self.localPlayerId = playerId
     pcallInitTarget = self
     do
@@ -428,7 +428,7 @@ function TaskUI.prototype.rebuildPages(self)
     )
     self.pagesDirty = false
     if self.isVisible then
-        local localPlayer = jass:GetLocalPlayer()
+        local localPlayer = jass.GetLocalPlayer()
         if self.localPlayer ~= nil and self.localPlayer == localPlayer then
             self:showCurrentCategory()
         end
@@ -534,13 +534,13 @@ function TaskUI.prototype.switchCategoryUI(self, ____type)
 end
 function TaskUI.prototype.switchCategorySync(self, player, ____type)
     self:switchCategoryState(____type)
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if player == localPlayer then
         self:switchCategoryUI(____type)
     end
 end
 function TaskUI.prototype.switchCategory(self, ____type)
-    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
+    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
     self:switchCategorySync(triggerPlayer, ____type)
 end
 function TaskUI.prototype.toggleExpandSync(self, player, questId)
@@ -552,7 +552,7 @@ function TaskUI.prototype.toggleExpandSync(self, player, questId)
         ____temp_7 = questId
     end
     self.expandedQuestId = ____temp_7
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if player == localPlayer then
         toggleExpandLocal(
             nil,
@@ -597,13 +597,13 @@ end
 function TaskUI.prototype.togglePanelSync(self, player)
     if self.isVisible then
         self:hidePanelState()
-        local localPlayer = jass:GetLocalPlayer()
+        local localPlayer = jass.GetLocalPlayer()
         if player == localPlayer then
             self:hidePanelUI()
         end
     else
         self:showPanelState()
-        local localPlayer = jass:GetLocalPlayer()
+        local localPlayer = jass.GetLocalPlayer()
         if player == localPlayer then
             self:showPanelUI()
         end
@@ -638,7 +638,7 @@ function TaskUI.prototype.hidePanelUI(self)
         for ____, ct in ipairs({QuestType.MAIN, QuestType.SIDE, QuestType.DAILY}) do
             local cv = self.precreatedListPool.categories[ct]
             if cv ~= nil then
-                japi:DzFrameShow(cv.root, false)
+                japi.DzFrameShow(cv.root, false)
             end
         end
     end
@@ -689,7 +689,7 @@ __togglePanelTriggerPlayer = nil
 local function taskUIHotkeySwitchCategory(player, ____type)
     local ____temp_11
     if player ~= nil and player ~= 0 then
-        ____temp_11 = jass:GetPlayerId(player)
+        ____temp_11 = jass.GetPlayerId(player)
     else
         ____temp_11 = -1
     end
@@ -711,7 +711,7 @@ function ____exports.initTaskUIForActivePlayers()
     do
         local i = 0
         while i < MAX_PLAYERS do
-            ____exports.initTaskUIForPlayer(jass:Player(i))
+            ____exports.initTaskUIForPlayer(jass.Player(i))
             i = i + 1
         end
     end

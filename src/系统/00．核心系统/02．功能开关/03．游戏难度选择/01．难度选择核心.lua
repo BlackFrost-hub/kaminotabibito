@@ -30,9 +30,9 @@ local ____require_result_9 = require("系统.00．核心系统.07．联机安全
 local safeTriggerAddAction = ____require_result_9.safeTriggerAddAction
 local safeDestroyTrigger = ____require_result_9.safeDestroyTrigger
 local _____6A21_5757_540D = "游戏难度选择"
-local _____4E2D_7ACB_654C_5BF9_73A9_5BB6 = jass:Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
-local _____663E_793A_5BF9_8BDD_6846_73A9_5BB6 = jass:Player(0)
-local _____7B2C_4E00_4E2A_96BE_5EA6_4F7F_8005_73A9_5BB6 = jass:Player(7)
+local _____4E2D_7ACB_654C_5BF9_73A9_5BB6 = jass.Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
+local _____663E_793A_5BF9_8BDD_6846_73A9_5BB6 = jass.Player(0)
+local _____7B2C_4E00_4E2A_96BE_5EA6_4F7F_8005_73A9_5BB6 = jass.Player(7)
 local _____5BF9_8BDD_6846_6807_9898 = "请选择游戏难度"
 local _____96BE_5EA6_4F7F_8005_521B_5EFAX = -607.1
 local _____96BE_5EA6_4F7F_8005_521B_5EFAY = 6.1
@@ -248,7 +248,7 @@ ____exports["显示游戏难度选择对话框"] = function()
         _____8BB0_5F55_9519_8BEF("创建难度对话框失败")
         return
     end
-    jass:DialogSetMessage(_____96BE_5EA6_9009_62E9_5BF9_8BDD_6846, _____5BF9_8BDD_6846_6807_9898)
+    jass.DialogSetMessage(_____96BE_5EA6_9009_62E9_5BF9_8BDD_6846, _____5BF9_8BDD_6846_6807_9898)
     do
         local i = 0
         while i < #_____6E38_620F_96BE_5EA6_914D_7F6E_8868 do

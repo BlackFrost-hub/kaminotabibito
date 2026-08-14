@@ -13,15 +13,15 @@ function releaseSoundPoolSlot(sound, taskId)
     if not sound then
         return
     end
-    local soundHid = jass:GetHandleId(sound)
+    local soundHid = jass.GetHandleId(sound)
     if soundPoolReleaseTaskBySoundHid[soundHid] ~= taskId then
         return
     end
     __TS__Delete(soundPoolReleaseTaskBySoundHid, soundHid)
-    local idx = jass:LoadInteger(hash, soundHid, KEY_INDEX)
-    local p = jass:LoadStr(hash, soundHid, KEY_PATH)
-    local ph = jass:StringHash(p)
-    jass:SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
+    local idx = jass.LoadInteger(hash, soundHid, KEY_INDEX)
+    local p = jass.LoadStr(hash, soundHid, KEY_PATH)
+    local ph = jass.StringHash(p)
+    jass.SaveBoolean(hash, ph, idx + KEY_ENABLED_SLOT_BASE, true)
 end
 function onSoundPoolReleaseCheck()
     local now = getServerTime()
@@ -65,7 +65,7 @@ local ____require_result_0 = require("系统.00．核心系统.05．中心计时
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 removePeriodicCallback = ____require_result_0.removePeriodicCallback
 getServerTime = ____require_result_0.getServerTime
-hash = jass:InitHashtable()
+hash = jass.InitHashtable()
 local KEY_COUNT = 1000
 KEY_INDEX = 1001
 KEY_PATH = 1004
@@ -103,7 +103,7 @@ local function scheduleSoundPoolRelease(sound, duration)
     if not sound then
         return
     end
-    local soundHid = jass:GetHandleId(sound)
+    local soundHid = jass.GetHandleId(sound)
     local oldTaskId = soundPoolReleaseTaskBySoundHid[soundHid] or 0
     if oldTaskId > 0 then
         cancelSoundPoolReleaseTask(oldTaskId)
@@ -127,7 +127,7 @@ function ____exports.createSoundInternal(path, cutoff, index, x, y, z, is3d, mod
     if model == nil then
         model = defaultSoundModel
     end
-    local sound = jass:CreateSound(
+    local sound = jass.CreateSound(
         path,
         false,
         is3d,
@@ -146,22 +146,22 @@ function ____exports.createSoundInternal(path, cutoff, index, x, y, z, is3d, mod
         z,
         cutoff
     )
-    local pathHash = jass:StringHash(path)
-    jass:SaveSoundHandle(hash, pathHash, index, sound)
-    jass:SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)
-    jass:SaveInteger(
+    local pathHash = jass.StringHash(path)
+    jass.SaveSoundHandle(hash, pathHash, index, sound)
+    jass.SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)
+    jass.SaveInteger(
         hash,
-        jass:GetHandleId(sound),
+        jass.GetHandleId(sound),
         KEY_INDEX,
         index
     )
-    jass:SaveStr(
+    jass.SaveStr(
         hash,
-        jass:GetHandleId(sound),
+        jass.GetHandleId(sound),
         KEY_PATH,
         path
     )
-    local duration = jass:GetSoundFileDuration(path) * 0.001
+    local duration = jass.GetSoundFileDuration(path) * 0.001
     if duration <= 0 or duration > 3600 then
         duration = 1
     end
@@ -173,8 +173,8 @@ function ____exports.getSoundInternal(path, cutoff, index, x, y, z, model)
     if model == nil then
         model = defaultSoundModel
     end
-    local pathHash = jass:StringHash(path)
-    local sound = jass:LoadSoundHandle(hash, pathHash, index)
+    local pathHash = jass.StringHash(path)
+    local sound = jass.LoadSoundHandle(hash, pathHash, index)
     if not sound then
         return nil
     end
@@ -185,12 +185,12 @@ function ____exports.getSoundInternal(path, cutoff, index, x, y, z, model)
         z,
         cutoff
     )
-    local duration = jass:GetSoundFileDuration(path) * 0.001
+    local duration = jass.GetSoundFileDuration(path) * 0.001
     if duration <= 0 or duration > 3600 then
         duration = 1
     end
     scheduleSoundPoolRelease(sound, duration)
-    jass:SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)
+    jass.SaveBoolean(hash, pathHash, index + KEY_ENABLED_SLOT_BASE, false)
     return sound
 end
 ____exports.hash = hash

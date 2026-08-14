@@ -43,9 +43,9 @@ local function _____64AD_653E_5355_4F4D_5168_5C40_97F3_6548(unit, soundKey)
     if unit == nil or unit == 0 or soundHandle == nil or soundHandle == 0 then
         return
     end
-    jass:AttachSoundToUnit(soundHandle, unit)
-    jass:SetSoundVolume(soundHandle, 127)
-    jass:StartSound(soundHandle)
+    jass.AttachSoundToUnit(soundHandle, unit)
+    jass.SetSoundVolume(soundHandle, 127)
+    jass.StartSound(soundHandle)
 end
 local ____Q_8DF3_8DC3_8BB0_5F55_8868 = {}
 local function _____83B7_53D6Q_4E0A_4E0B_6587(unit)

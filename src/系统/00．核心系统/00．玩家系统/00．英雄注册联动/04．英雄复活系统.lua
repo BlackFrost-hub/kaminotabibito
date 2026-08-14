@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____79FB_52A8_955C_5934_5230_73A9_5BB6, _____662F_5426_6709_6548, _____53D6_82F1_96C4_680F_69FD_4F4D, _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6, _____662F_73A9_5BB6_82F1_96C4, _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9, _____8BFB_53D6_5F53_524D_590D_6D3BBoss, ____on_590D_6D3B_955C_5934_79FB_52A8, _____65BD_52A0_590D_6D3B_65E0_654C, _____6267_884C_590D_6D3B, jass, g, YDUserDataGetSafe, YDUserDataSetSafe, GetRandomDirectionDeg, getRegisteredPlayerHero, addDelayedCallback, _____5F00_59CB_65E0_654C_5E27, _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321, StarOther_PanCameraToTimedForPlayer, _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C, _____663E_793A_51B7_5374_6570_5B57_6587_672C, DzFrameShow, GetUnitX, GetUnitY, ReviveHeroLoc, GetOwningPlayer, GetPlayerId, Location, RemoveLocation, SetUnitX, SetUnitY, _____590D_6D3B_65E0_654C_79D2, _____590D_6D3B_534A_5F84, _____590D_6D3B_63A8_8FDB_6B65_6570, _____590D_6D3B_6B21_6570_5C5E_6027, _____590D_6D3B_6B21_6570_8868, ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF, _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6587_672C_7EC4_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868
+local _____79FB_52A8_955C_5934_5230_73A9_5BB6, _____662F_5426_6709_6548, _____53D6_82F1_96C4_680F_69FD_4F4D, _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6, _____662F_73A9_5BB6_82F1_96C4, _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9, _____8BFB_53D6_5F53_524D_590D_6D3BBoss, ____on_590D_6D3B_955C_5934_79FB_52A8, _____65BD_52A0_590D_6D3B_65E0_654C, _____590D_6D3B_73A9_5BB6_82F1_96C4, jass, g, YDUserDataGetSafe, YDUserDataSetSafe, GetRandomDirectionDeg, getRegisteredPlayerHero, addDelayedCallback, _____5F00_59CB_65E0_654C_5E27, _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321, StarOther_PanCameraToTimedForPlayer, _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C, _____663E_793A_51B7_5374_6570_5B57_6587_672C, DzFrameShow, GetUnitX, GetUnitY, IsUnitType, ReviveHeroLoc, GetOwningPlayer, GetPlayerId, Location, RemoveLocation, SetUnitX, SetUnitY, _____590D_6D3B_65E0_654C_79D2, _____590D_6D3B_534A_5F84, _____590D_6D3B_63A8_8FDB_6B65_6570, _____590D_6D3B_6B21_6570_5C5E_6027, _____590D_6D3B_6B21_6570_8868, ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF, _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6587_672C_7EC4_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868
 function _____79FB_52A8_955C_5934_5230_73A9_5BB6(_____73A9_5BB6, x, y)
     StarOther_PanCameraToTimedForPlayer(_____73A9_5BB6, x, y, 0.1)
 end
@@ -93,20 +93,26 @@ function _____65BD_52A0_590D_6D3B_65E0_654C(hero)
     end
     _____5F00_59CB_65E0_654C_5E27(hero, _____590D_6D3B_65E0_654C_79D2)
 end
-function _____6267_884C_590D_6D3B(dyingUnit)
+function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_6B21_6570)
     if not _____662F_5426_6709_6548(dyingUnit) then
-        return
+        return false
     end
     if not _____662F_73A9_5BB6_82F1_96C4(dyingUnit) then
-        return
+        return false
     end
-    if jass:IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) ~= true then
-        return
+    if IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) ~= true then
+        return false
     end
     _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(_____53D6_82F1_96C4_680F_69FD_4F4D(dyingUnit))
-    local _____5269_4F59_6B21_6570 = YDUserDataGetSafe("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
+    local _____6D88_8017_590D_6D3B_6B21_6570_8
+    if _____6D88_8017_590D_6D3B_6B21_6570 then
+        _____6D88_8017_590D_6D3B_6B21_6570_8 = YDUserDataGetSafe("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
+    else
+        _____6D88_8017_590D_6D3B_6B21_6570_8 = nil
+    end
+    local _____5269_4F59_6B21_6570 = _____6D88_8017_590D_6D3B_6B21_6570_8
     if _____5269_4F59_6B21_6570 ~= nil and _____5269_4F59_6B21_6570 <= 0 then
-        return
+        return false
     end
     if _____5269_4F59_6B21_6570 ~= nil then
         YDUserDataSetSafe(
@@ -121,7 +127,7 @@ function _____6267_884C_590D_6D3B(dyingUnit)
     if _____662F_5426_6709_6548(boss) then
         local pos = _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss, dyingUnit)
         if pos == nil then
-            return
+            return false
         end
         local loc = Location(
             GetUnitX(boss),
@@ -144,7 +150,7 @@ function _____6267_884C_590D_6D3B(dyingUnit)
     else
         local _____590D_6D3B_70B9 = g.udg_FHD
         if not _____662F_5426_6709_6548(_____590D_6D3B_70B9) then
-            return
+            return false
         end
         ReviveHeroLoc(dyingUnit, _____590D_6D3B_70B9, true)
         _____65BD_52A0_590D_6D3B_65E0_654C(dyingUnit)
@@ -158,6 +164,7 @@ function _____6267_884C_590D_6D3B(dyingUnit)
             }
         )
     end
+    return true
 end
 jass = require("jass.common")
 local japi = require("jass.japi")
@@ -199,6 +206,7 @@ DzFrameShow = japi.DzFrameShow
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetUnitName = jass.GetUnitName
+IsUnitType = jass.IsUnitType
 ReviveHeroLoc = jass.ReviveHeroLoc
 local Cos = jass.Cos
 local Sin = jass.Sin
@@ -503,7 +511,12 @@ local function _____542F_52A8_82F1_96C4_680F_5012_8BA1_65F6(unit)
     end
 end
 local function ____on_82F1_96C4_6B7B_4EA1_5EF6_8FDF_590D_6D3B(variable)
-    _____6267_884C_590D_6D3B(variable)
+    _____590D_6D3B_73A9_5BB6_82F1_96C4(variable, true)
+end
+--- 立即复活已注册的玩家英雄，不消耗关卡团队复活次数。
+-- 调用方必须处于全局同步游戏逻辑，不能从 GetLocalPlayer 分支调用。
+____exports["直接复活玩家英雄"] = function(dyingUnit)
+    return _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, false)
 end
 local function _____82F1_96C4_6B7B_4EA1_5EF6_8FDF_590D_6D3B(dyingUnit, _____51FB_6740_8005)
     if not _____662F_73A9_5BB6_82F1_96C4(dyingUnit) then

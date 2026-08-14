@@ -31,8 +31,10 @@ const { CinematicFilterGenericBJ } = require("lib.扩展函数.BJ函数.05A．�
 const { SetTimeOfDay } = require("lib.扩展函数.BJ函数.07．杂项") as {
   SetTimeOfDay: (this: void, whatTime: number) => void;
 };
-const { TriggerRegisterEnterRectSimple } = require("lib.扩展函数.BJ函数.01．触发与事件") as {
-  TriggerRegisterEnterRectSimple: (this: void, trig: any, r: any) => any;
+const { 创建矩形进入监听 } = require("系统.00．核心系统.01．事件中心.02．区域事件中心") as {
+  创建矩形进入监听: (this: void, rect: any, callback: (this: void) => void, filter?: any) => {
+    取消: (this: void) => void;
+  } | null;
 };
 const { 切换区域背景音乐表达式 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
   切换区域背景音乐表达式: (this: void, expr: string | undefined, add: boolean) => number;
@@ -95,9 +97,7 @@ function 播放主线剧情片段(this: void, 片段ID: string, 上下文?: any)
   return 播放主线剧情片段实现(片段ID, 上下文);
 }
 
-const CreateTrigger = jass.CreateTrigger as (this: void) => any;
 const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
-const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, whichUnit: any, animationIndex: number) => void;
 const KillUnit = jass.KillUnit as (this: void, whichUnit: any) => void;
 const IssuePointOrder = jass.IssuePointOrder as (this: void, whichUnit: any, order: string, x: number, y: number) => boolean;
@@ -109,6 +109,7 @@ const 剧情Boss预置暂停来源 = "剧情系统:Boss预置";
 
 let 已初始化进度02核心 = false;
 let 已触发地精洞窟演出 = false;
+let 地精洞窟入口监听: { 取消: (this: void) => void } | null = null;
 let 地精洞窟演出音乐已启动 = false;
 let 地精洞窟祭坛演出已开始 = false;
 const 地精洞窟临时单位键前缀 = "剧情运行时.地精洞窟演出.";
@@ -194,6 +195,8 @@ function on地精洞窟进入触发(this: void): void {
   const 片段ID = "jlc_goblin_cave_intro";
   if (播放主线剧情片段(片段ID, { 片段ID, 触发配置名: "地精洞窟进入演出核心", 触发单位 })) {
     已触发地精洞窟演出 = true;
+    if (地精洞窟入口监听 != null) 地精洞窟入口监听.取消();
+    地精洞窟入口监听 = null;
   }
 }
 
@@ -326,7 +329,5 @@ export function 初始化进度02_地精洞窟进入演出核心(this: void): vo
 
   const rect = 获取矩形区域("地精洞窟.剧情进入区域");
   if (rect == null || rect === 0) return;
-  const trigger = CreateTrigger();
-  TriggerRegisterEnterRectSimple(trigger, rect);
-  TriggerAddAction(trigger, on地精洞窟进入触发);
+  地精洞窟入口监听 = 创建矩形进入监听(rect, on地精洞窟进入触发);
 }

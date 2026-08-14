@@ -47,9 +47,9 @@ local function _____64AD_653EW_914D_7F6E_8868_73B0(unit)
     if sound == nil or sound == 0 then
         return
     end
-    jass:AttachSoundToUnit(sound, unit)
-    jass:SetSoundVolume(sound, 127)
-    jass:StartSound(sound)
+    jass.AttachSoundToUnit(sound, unit)
+    jass.SetSoundVolume(sound, 127)
+    jass.StartSound(sound)
 end
 local function _____64AD_653E_957F_67AA_88C1_51B3_8FDE_7EED_7279_6548(target)
     local cfg = _____5B89_65AF_827E_5C14_5355_4F4D_6280_80FD_914D_7F6E.W

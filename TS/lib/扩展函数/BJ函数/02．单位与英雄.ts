@@ -1,5 +1,5 @@
 /** @noSelfInFile */
-import { RMaxBJ } from "./12．数学函数";
+import { PercentTo255, RMaxBJ } from "./12．数学函数";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -7,6 +7,7 @@ const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any
 const jglobals = require("jass.globals") as any;
 const UnitModifySkillPoints = jass.UnitModifySkillPoints as (whichHero: any, delta: number) => boolean;
 const GetHeroSkillPoints = jass.GetHeroSkillPoints as (whichHero: any) => number;
+const SetUnitVertexColor = jass.SetUnitVertexColor as (this: void, whichUnit: any, red: number, green: number, blue: number, alpha: number) => void;
 
 //=============================================================================
 // BJ 全局变量（Blizzard.j）
@@ -139,6 +140,17 @@ export function GetUnitLifePercentBJ(whichUnit: any): number {
 
 export function SetUnitLifePercentBJ(whichUnit: any, percent: number): void {
     jass.SetUnitState(whichUnit, jass.UNIT_STATE_LIFE, GetUnitStateJapi(whichUnit, jass.UNIT_STATE_MAX_LIFE) * RMaxBJ(0, percent) * 0.01);
+}
+
+/** 对齐 Blizzard.j：颜色参数为百分比，透明度参数为透明百分比。 */
+export function SetUnitVertexColorBJ(this: void, whichUnit: any, red: number, green: number, blue: number, transparency: number): void {
+    SetUnitVertexColor(
+        whichUnit,
+        PercentTo255(red),
+        PercentTo255(green),
+        PercentTo255(blue),
+        PercentTo255(100 - transparency),
+    );
 }
 
 /** `Unit.h` / `GetUnitStatePercent` 命名；与 `GetUnitLifePercentBJ` 语义一致（优先原生百分比 API） */

@@ -1,0 +1,185 @@
+---
+description: Warcraft VSCode Run Map 进入游戏后看似没有任何 Lua 功能时的运行时诊断流程；区分打包、Lua 入口和项目初始化失败
+alwaysApply: false
+---
+
+# Run Map 进入游戏后无 Lua 功能的正确排查
+
+## 核心判断
+
+“地图里有 `war3map.lua`”只证明文件被打包；“`war3map.j` 有 `exec-lua:war3map`”只证明存在启动调用。二者都不能证明项目初始化成功。
+
+Syzl 的 `main.lua` 在一个同步模块加载链中注册事件、UI、计时器和系统入口。任一顶层 `require`、配置校验或模块初始化报错，都可能在这些注册完成前终止启动。外层 `xpcall` 会阻止游戏崩溃，因此玩家看到的现象常常是“整张图没有任何 Lua 功能”。
+
+排查必须依次证明以下三层：
+
+1. **打包层**：生成图中存在 `war3map.lua`，JASS 中存在 `exec-lua:war3map`。
+2. **Lua 入口层**：游戏内能够显示入口诊断文字，证明 LuaEngine 已执行合并 Lua。
+3. **项目初始化层**：`dofile('main.lua')` 完整返回，且没有启动异常。
+
+只有第三层成功，才能判定 Lua 功能真正启动。
+
+## 固定路径语义
+
+当前项目默认路径关系：
+
+```text
+源图：C:\Users\Administrator\Desktop\syzl\map.w3x
+Run Map 生成图：C:\Users\Administrator\Desktop\syzl\.build\_warcraft_vscode_test.w3x
+```
+
+- `map.w3x` 是干净源图。
+- `.build/_warcraft_vscode_test.w3x` 是生成物。
+- 不要把 `warcraft.json` 的 `mapdir` 改成生成图。
+- 不要拿 `Maps` 目录中的旧测试图代替当前 `.build` 生成图诊断。
+
+## 第一步：确认诊断对象
+
+记录下列文件的大小与时间戳：
+
+```powershell
+Get-Item `
+  'C:\Users\Administrator\Desktop\syzl\map.w3x', `
+  'C:\Users\Administrator\Desktop\syzl\.build\war3map.j', `
+  'C:\Users\Administrator\Desktop\syzl\.build\war3map.lua', `
+  'C:\Users\Administrator\Desktop\syzl\.build\_warcraft_vscode_test.w3x'
+```
+
+如果代码刚修改过，先按构建规则刷新 TS，再运行当前 Warcraft VSCode 扩展的 `wc3.exe build <项目目录> -c`。不要仅凭 `src/**/*.lua` 推断生成图已更新。
+
+## 第二步：确认打包层
+
+从**当前生成图**临时解包并确认：
+
+- 存在 `war3map.j`。
+- 存在 `war3map.lua`。
+- `war3map.j` 包含：
+
+```jass
+call Cheat("exec-lua:war3map")
+```
+
+如果缺少这些内容，才继续查 compile、pack、`packlist.json`、JASS 注入或地图文件占用。若三项都存在，不要继续把问题归因于“Lua 没打包”。
+
+## 第三步：制作临时运行诊断图
+
+禁止直接修改正式 `.build/_warcraft_vscode_test.w3x`、仓库 `src`、`TS/main.ts` 或 `fix-lua-for-pack.js`。应把当前生成图解包到系统临时目录，仅修改临时副本中的 `war3map.lua`，再回包为单独的诊断 W3X。
+
+在合并 Lua 末尾的 `main()` 包装器中临时加入：
+
+```lua
+function main()
+    local jass = require('jass.common')
+    jass.DisplayTimedTextToPlayer(jass.Player(0), 0, 0, 60, 'LUA_ENTRY_OK')
+    xpcall(function()
+        dofile('main.lua')
+    end, function(msg)
+        local text = tostring(msg)
+        jass.DisplayTimedTextToPlayer(
+            jass.Player(0),
+            0,
+            0,
+            60,
+            'LUA_BOOT_ERROR: ' .. string.sub(text, -900)
+        )
+        local handler = geterrorhandler()
+        if handler and msg then
+            return handler(msg)
+        end
+    end)
+end
+```
+
+结果解释：
+
+- 看不到 `LUA_ENTRY_OK`：查 LuaEngine、`exec-lua`、JASS 入口或启动的地图是否正确。
+- 能看到 `LUA_ENTRY_OK`，随后有 `LUA_BOOT_ERROR`：Lua 正常，项目启动报错；按错误定位源码。
+- 只有 `LUA_ENTRY_OK`，没有错误：`main.lua` 已完整执行，启动链正常。
+
+## `LUA_BOOT_ERROR: nil` 的特殊处理
+
+Warcraft VSCode 当前合并 Lua 的内置 `require` 可能按以下方式吞掉原始错误：
+
+```lua
+local ok, ret = xpcall(f, errorhandler, module, filename)
+if not ok then
+    error()
+end
+```
+
+同时 `errorhandler` 可能返回 `print(msg)` 的返回值，而 `print` 返回 `nil`。因此外层最终只看到 `nil`，这不表示没有异常，也不表示必须修改业务入口。
+
+仅在临时诊断副本中把它改为保留原始异常：
+
+```lua
+local function errorhandler(msg)
+    if _errorhandler and msg then
+        _errorhandler(msg)
+    end
+    return msg
+end
+
+-- require 内部
+if not ok then
+    error(ret, 2)
+end
+```
+
+然后重新回包并运行临时诊断图。不要把这段诊断补丁写入仓库，也不要修改扩展安装目录。
+
+## 第四步：按真实错误修源码
+
+常见启动错误包括：
+
+- `critical dependency`：顶层 `require` 循环。先列出完整依赖环，再把确实只在运行阶段需要的依赖改为局部延迟 `require`；不要盲目删除模块。
+- `module ... not found`：检查模块名字节、包路径和生成图内模块表。PowerShell 乱码不等于文件字节损坏，应使用 UTF-8 API 验证。
+- 配置校验异常：例如重复任务 ID、重复注册键、非法配置。查出所有定义点，保留各自业务语义，为误填项选择全仓库未占用的新 ID；不要关闭校验器掩盖问题。
+- TSTL `self/nil` 或回调错误：按 TSTL 与编码安全规则修 TS，局部构建后再检查生成 Lua。
+
+每修复一个启动错误，都必须重新：
+
+1. 构建相关 TS。
+2. 必要时运行完整构建。
+3. 刷新 `.build/_warcraft_vscode_test.w3x`。
+4. 从新的生成图重新制作临时诊断图。
+5. 运行确认是否出现下一个启动错误。
+
+不要复用基于旧生成图制作的诊断 W3X。
+
+## 正确启动 Classic 诊断图
+
+本机雪月编辑器链路使用：
+
+```powershell
+& 'F:\1.9.4k3_雪月编辑器\bin\YDWEConfig.exe' `
+  -launchwar3 `
+  -loadfile '<临时诊断图绝对路径>'
+```
+
+雪月随后会以类似以下参数启动 Warcraft：
+
+```text
+war3.exe -loadfile "<地图>" -opengl -window -kkwe "F:\1.9.4k3_雪月编辑器"
+```
+
+- 不要直接使用 `War3.exe -loadfile` 猜测启动链；它可能无法进图并默认全屏。
+- 不要把 StarWE 当作当前编辑器。
+- AI 启动的 Warcraft 在诊断完成后必须由 AI 关闭；不要关闭用户自己启动的进程。
+
+## 本项目已验证案例
+
+一次“所有 Lua 功能消失”实际包含两个连续启动错误：
+
+1. `恶魔城入口配置 -> 任务运行 -> NPC生成器 -> 支线NPC配置表 -> 支线交互配置 -> 恶魔城入口配置` 形成顶层循环依赖，报 `critical dependency`。
+2. 打断循环后，静态支线配置校验继续启动并发现任务 ID `10026` 重复。
+
+这说明修复第一个错误后仍需重新运行诊断，直到只有入口成功提示且没有启动错误，不能在第一个异常消失后提前宣布完成。
+
+## 禁止事项
+
+- 不要因 `war3map.lua` 文件存在就宣布 Lua 正常。
+- 不要先换编辑器、改 `mapdir`、改生成图命名或复制旧地图碰运气。
+- 不要把临时诊断输出提交到正式 Lua、TS 或 W3X。
+- 不要修改 `fix-lua-for-pack.js` 来掩盖运行时错误。
+- 不要关闭配置校验、吞异常或删除独立任务来绕过启动失败。
+- 不要主动整文件重写中文 TS/Lua；按编码安全规则做局部补丁。

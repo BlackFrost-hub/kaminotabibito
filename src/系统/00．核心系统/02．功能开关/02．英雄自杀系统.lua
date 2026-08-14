@@ -13,7 +13,7 @@ local _____63D0_793A_65F6_95F4 = 5
 local function _____81EA_6740_547D_4EE4(whichPlayer, command)
     local hero = getRegisteredPlayerHero(whichPlayer)
     if hero == nil or hero == 0 then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             whichPlayer,
             0,
             0.02,
@@ -22,8 +22,8 @@ local function _____81EA_6740_547D_4EE4(whichPlayer, command)
         )
         return
     end
-    if jass:IsUnitType(hero, jass.UNIT_TYPE_DEAD) then
-        jass:DisplayTimedTextToPlayer(
+    if jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) then
+        jass.DisplayTimedTextToPlayer(
             whichPlayer,
             0,
             0.02,

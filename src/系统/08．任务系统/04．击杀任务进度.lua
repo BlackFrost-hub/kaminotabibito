@@ -141,7 +141,7 @@ local function _____589E_52A0_51FB_6740_4EFB_52A1_8FDB_5EA6(_____73A9_5BB6ID, __
                     if not _____76EE_6807_7EC4 or not _____76EE_6807_5355_4F4D_5339_914D(_____76EE_6807_7EC4["目标单位"], _____6B7B_4EA1_5355_4F4D_4EE3_7801) then
                         goto __continue31
                     end
-                    local _____76EE_6807ID = "kill_group_" .. tostring(nil, i)
+                    local _____76EE_6807ID = "kill_group_" .. tostring(i)
                     do
                         local j = 0
                         while j < #_____4EFB_52A1.objectives do

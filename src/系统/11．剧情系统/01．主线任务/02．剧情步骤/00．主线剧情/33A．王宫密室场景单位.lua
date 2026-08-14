@@ -4,26 +4,23 @@ local ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177 = require("系统.11�
 local _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528 = ____06_FF0E_5267_60C5_901A_7528_6267_884C_5DE5_5177["读取语义单位引用"]
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
 local _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D = ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D["注册剧情运行时单位"]
+local ____02_FF0E_5267_60C5NPC_521B_5EFA = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
+local _____521B_5EFA_5267_60C5_573A_666F_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情场景单位"]
+local _____5B9A_4F4D_5267_60C5_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["定位剧情单位"]
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
-local ____require_result_2 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
-local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_2["按名字反查总单位ID"]
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
-local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_4.createTimedEffect
+local ____require_result_1 = require("系统.01．单位系统.08．单位配置表.04．总单位配置表")
+local _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID = ____require_result_1["按名字反查总单位ID"]
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_2.YDUserDataGetSafe
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_3.createTimedEffect
 local ForGroup = jass.ForGroup
 local GetDestructableX = jass.GetDestructableX
 local GetDestructableY = jass.GetDestructableY
 local GetEnumUnit = jass.GetEnumUnit
-local IssueImmediateOrder = jass.IssueImmediateOrder
-local Player = jass.Player
-local SetUnitFacing = jass.SetUnitFacing
-local SetUnitPosition = jass.SetUnitPosition
 local _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID = 15
 local _____738B_5BAB_4F20_9001_95E8_5C01_5370_7279_6548 = "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl"
 ____exports["王宫密室场景站位表"] = {
@@ -56,12 +53,7 @@ ____exports["王宫密室对峙镜头预设"] = {
 ____exports["王宫密室演出特效表"] = {["里科特进入传承密室"] = {["模型路径"] = "Common\\Effect\\Form\\Portal\\RicketSecretRoomShift.mdx", ["持续秒"] = 3}, ["里科特战后撤离"] = {["模型路径"] = "Common\\Effect\\Form\\Portal\\RicketVoidEscape.mdx", ["持续秒"] = 3}, ["玩家队伍抵达传承密室"] = {["模型路径"] = "Common\\Effect\\Form\\Portal\\PalaceSecretRoomArrival.mdx", ["持续秒"] = 4}, ["里凡特开启传承密室门"] = {["模型路径"] = "Common\\Effect\\Form\\Portal\\RoyalBloodlineGate.mdx", ["持续秒"] = 8}}
 local _____5F53_524D_73A9_5BB6_961F_4F0D_8F6C_573A_7AD9_4F4D
 local function _____5B9A_4F4D_5355_4F4D(unit, _____7AD9_4F4D)
-    if unit == nil or unit == 0 then
-        return
-    end
-    SetUnitPosition(unit, _____7AD9_4F4D.X, _____7AD9_4F4D.Y)
-    SetUnitFacing(unit, _____7AD9_4F4D["朝向"])
-    IssueImmediateOrder(unit, "stop")
+    _____5B9A_4F4D_5267_60C5_5355_4F4D(unit, _____7AD9_4F4D)
 end
 local function ____on_79FB_52A8_679A_4E3E_73A9_5BB6_82F1_96C4_81F3_5BC6_5BA4()
     local _____7AD9_4F4D = _____5F53_524D_73A9_5BB6_961F_4F0D_8F6C_573A_7AD9_4F4D
@@ -85,17 +77,19 @@ end
 ____exports["读取或创建并定位王宫密室剧情单位"] = function(_____8BED_4E49_5F15_7528, _____5355_4F4D_540D, _____7AD9_4F4D)
     local unit = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(_____8BED_4E49_5F15_7528)
     if unit == nil or unit == 0 then
-        local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D))
+        local _____5355_4F4DID = _____6309_540D_5B57_53CD_67E5_603B_5355_4F4DID(_____5355_4F4D_540D)
+        local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____5355_4F4DID)
         if not (_____5355_4F4D_7C7B_578BID > 0) then
             return nil
         end
-        unit = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-            Player(_____4E2D_7ACB_88AB_52A8_73A9_5BB6ID),
-            _____5355_4F4D_7C7B_578BID,
-            _____7AD9_4F4D.X,
-            _____7AD9_4F4D.Y,
-            _____7AD9_4F4D["朝向"]
-        )
+        unit = _____521B_5EFA_5267_60C5_573A_666F_5355_4F4D({
+            ["单位ID"] = _____5355_4F4DID,
+            X = _____7AD9_4F4D.X,
+            Y = _____7AD9_4F4D.Y,
+            ["朝向"] = _____7AD9_4F4D["朝向"],
+            ["玩家ID"] = _____4E2D_7ACB_88AB_52A8_73A9_5BB6ID,
+            ["登记死亡排泄"] = true
+        })
     end
     if unit == nil or unit == 0 then
         return nil

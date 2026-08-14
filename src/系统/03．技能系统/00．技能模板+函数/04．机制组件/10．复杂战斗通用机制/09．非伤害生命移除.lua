@@ -22,7 +22,7 @@ ____exports["按比例移除当前生命"] = function(_____76EE_6807, _____6BD4_
         _____4E0D_81F4_6B7B = true
     end
     local jass = require("jass.common")
-    local life = jass:GetUnitState(_____76EE_6807, jass.UNIT_STATE_LIFE)
+    local life = jass.GetUnitState(_____76EE_6807, jass.UNIT_STATE_LIFE)
     return ____exports["执行非伤害生命移除"]({["目标"] = _____76EE_6807, ["数值"] = life * _____6BD4_4F8B, ["不致死"] = _____4E0D_81F4_6B7B})
 end
 ____exports["按比例移除最大生命"] = function(_____76EE_6807, _____6BD4_4F8B, _____4E0D_81F4_6B7B)

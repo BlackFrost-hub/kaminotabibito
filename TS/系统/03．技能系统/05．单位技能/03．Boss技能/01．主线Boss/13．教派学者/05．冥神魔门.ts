@@ -11,6 +11,7 @@ import { 创建召唤物 } from '../../../../00．技能模板+函数/01．技�
 import { 极坐标X, 极坐标Y, 读取单位攻击力, 读取单位最大生命 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 执行Boss单体技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 注册单位技能壳监听 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器';
+import { 执行Boss施法时间线 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/23．Boss施法时间线';
 
 const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -30,10 +31,6 @@ const { registerManualBuff, getBuffRuntime, 移除单位指定Buff } = require('
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   getBuffRuntime: (this: void, target: any, buffID: string) => any | null;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
-};
-const { 显示常规技能吟唱条, 关闭吟唱条 } = require('系统.09．表现系统.08．吟唱条.06．对外接口') as {
-  显示常规技能吟唱条: (this: void, params: any) => void;
-  关闭吟唱条: (this: void, channel?: string) => void;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require('lib.扩展函数.YDWE函数.09．YDUserData安全版') as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
@@ -59,7 +56,6 @@ const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const SetUnitAnimation = jass.SetUnitAnimation as (unit: any, animation: string) => void;
 const SetUnitState = jass.SetUnitState as (unit: any, state: any, value: number) => void;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -99,11 +95,6 @@ interface 魔门释放请求 {
   上下文: 教派学者运行时上下文;
 }
 
-interface 魔门读条关闭请求 {
-  通道: string;
-  Boss单位: any;
-}
-
 interface 魔门单位归属 {
   状态: 冥神魔门状态;
   类型: '门' | '召唤物';
@@ -133,21 +124,19 @@ function 修改单位实数属性(this: void, unit: any, attr: string, delta: nu
   设置单位实数属性(unit, attr, 读取单位实数属性(unit, attr) + delta);
 }
 
-function on魔门读条关闭(this: void, variable?: any): void {
-  const 请求 = variable as 魔门读条关闭请求 | undefined;
-  if (请求 == null) return;
-  关闭吟唱条(请求.通道);
-}
-
 function 开始冥神魔门施法表现(this: void, 上下文: 教派学者运行时上下文): void {
   const boss = 上下文.Boss单位;
   const 公共 = 教派学者技能配置.公共施法;
   const 配置 = 教派学者技能配置.冥神魔门;
-  开始硬直(boss, 公共.通魔施法秒);
-  SetUnitAnimation(boss, 公共.动作名);
-  显示常规技能吟唱条({ 通道: 配置.读条通道, 总时长: 公共.通魔施法秒, 颜色ID: 公共.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 });
-  const 回调ID = addDelayedCallback(公共.通魔施法秒 * 1000, on魔门读条关闭, { 通道: 配置.读条通道, Boss单位: boss } as 魔门读条关闭请求);
-  上下文.清理.登记延迟回调('教派学者-冥神魔门读条关闭', 回调ID);
+  执行Boss施法时间线({
+    名称: '教派学者-冥神魔门',
+    单位: boss,
+    清理: 上下文.清理,
+    施法秒: 公共.通魔施法秒,
+    动作名: 公共.动作名,
+    吟唱条: { 类型: '常规', 通道: 配置.读条通道, 颜色ID: 公共.读条颜色ID, 标题文本: 配置.读条标题, 提示文本: 配置.读条提示 },
+    延迟登记名: '教派学者-冥神魔门读条关闭',
+  });
 }
 
 function 结束魔门反噬(this: void, 上下文: 教派学者运行时上下文, 原因: string): void {

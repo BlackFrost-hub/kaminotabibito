@@ -90,6 +90,7 @@ const DzFrameShow = japi.DzFrameShow as (frame: number, visible: boolean) => voi
 const GetUnitX = jass.GetUnitX as (unit: any) => number;  
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitName = jass.GetUnitName as (unit: any) => string;
+const IsUnitType = jass.IsUnitType as (unit: any, whichUnitType: number) => boolean;
 const ReviveHeroLoc = jass.ReviveHeroLoc as (whichHero: any, loc: any, showExp: boolean) => void;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
@@ -367,19 +368,20 @@ function 施加复活无敌(this: void, hero: any): void {
 }
 
 function on英雄死亡延迟复活(this: void, variable?: any): void {
-  执行复活(variable);
+  复活玩家英雄(variable, true);
 }
 
-function 执行复活(this: void, dyingUnit: any): void {
-  if (!是否有效(dyingUnit)) return;
-  if (!是玩家英雄(dyingUnit)) return;
-  if (jass.IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) !== true) return;
+function 复活玩家英雄(this: void, dyingUnit: any, 消耗复活次数: boolean): boolean {
+  if (!是否有效(dyingUnit)) return false;
+  if (!是玩家英雄(dyingUnit)) return false;
+  if (IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) !== true) return false;
 
   隐藏英雄栏倒计时(取英雄栏槽位(dyingUnit));
 
-  const 剩余次数 = YDUserDataGetSafe("string", 复活次数表, 复活次数属性, "integer") as number | undefined;
-  if (剩余次数 != null && 剩余次数 <= 0) return;
-
+  const 剩余次数 = 消耗复活次数
+    ? (YDUserDataGetSafe("string", 复活次数表, 复活次数属性, "integer") as number | undefined)
+    : undefined;
+  if (剩余次数 != null && 剩余次数 <= 0) return false;
   if (剩余次数 != null) {
     YDUserDataSetSafe("string", 复活次数表, 复活次数属性, "integer", 剩余次数 - 1);
   }
@@ -387,7 +389,7 @@ function 执行复活(this: void, dyingUnit: any): void {
   const boss = 读取当前复活Boss();
   if (是否有效(boss)) {
     const pos = 寻找可通行复活点(boss, dyingUnit);
-    if (pos == null) return;
+    if (pos == null) return false;
 
     const loc = Location(GetUnitX(boss), GetUnitY(boss));
     ReviveHeroLoc(dyingUnit, loc, true);
@@ -398,11 +400,21 @@ function 执行复活(this: void, dyingUnit: any): void {
     addDelayedCallback(0, on复活镜头移动, { 玩家: GetOwningPlayer(dyingUnit), x: pos.x, y: pos.y });
   } else {
     const 复活点 = g.udg_FHD;
-    if (!是否有效(复活点)) return;
+    if (!是否有效(复活点)) return false;
     ReviveHeroLoc(dyingUnit, 复活点, true);
     施加复活无敌(dyingUnit);
     addDelayedCallback(0, on复活镜头移动, { 玩家: GetOwningPlayer(dyingUnit), x: GetUnitX(dyingUnit), y: GetUnitY(dyingUnit) });
   }
+
+  return true;
+}
+
+/**
+ * 立即复活已注册的玩家英雄，不消耗关卡团队复活次数。
+ * 调用方必须处于全局同步游戏逻辑，不能从 GetLocalPlayer 分支调用。
+ */
+export function 直接复活玩家英雄(this: void, dyingUnit: any): boolean {
+  return 复活玩家英雄(dyingUnit, false);
 }
 
 function 英雄死亡延迟复活(this: void, dyingUnit: any, 击杀者: any): void {

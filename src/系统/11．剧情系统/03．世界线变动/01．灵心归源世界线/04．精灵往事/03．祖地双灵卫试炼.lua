@@ -355,8 +355,8 @@ local function _____66F4_65B0_6301_7EED_4F24_5BB3_8BD5_70BC(now)
     end
     if state["进度UI"] ~= nil then
         local elapsedSeconds = elapsed > 0 and elapsed / 1000 or 0.1
-        local currentDps = jass:R2I(state["累计数值"] / elapsedSeconds)
-        state["进度UI"]["标题"] = ("持续输出 " .. tostring(nil, currentDps)) .. " DPS"
+        local currentDps = jass.R2I(state["累计数值"] / elapsedSeconds)
+        state["进度UI"]["标题"] = ("持续输出 " .. tostring(currentDps)) .. " DPS"
     end
     _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI(state["进度UI"], remaining, true)
     if elapsed < cfg["持续秒"] * 1000 then

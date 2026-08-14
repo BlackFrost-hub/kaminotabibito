@@ -10,6 +10,7 @@ local _____4E3B_7EBF_5267_60C5_53EF_7834_574F_7269_521D_59CB_5316_914D_7F6E_8868
 local _____4E3B_7EBF_5267_60C5_77E9_5F62_5165_53E3_914D_7F6E_8868 = ____01_FF0E_4E3B_7EBFNPC_521D_59CB_5316_914D_7F6E_8868["主线剧情矩形入口配置表"]
 local ____02_FF0E_5267_60C5NPC_521B_5EFA = require("系统.11．剧情系统.00．公共.02．剧情NPC创建")
 local _____521B_5EFA_5267_60C5NPC_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情NPC单位"]
+local _____521B_5EFA_5267_60C5_573A_666F_5355_4F4D = ____02_FF0E_5267_60C5NPC_521B_5EFA["创建剧情场景单位"]
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
 local ____08_FF0E_5267_60C5_8FD0_884C_65F6_5355_4F4D = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.08．剧情运行时单位")
@@ -60,8 +61,6 @@ local GetTriggeringTrigger = jass.GetTriggeringTrigger
 local SetDestructableInvulnerable = jass.SetDestructableInvulnerable
 local TriggerAddAction = jass.TriggerAddAction
 local DestroyTrigger = jass.DestroyTrigger
-local CreateUnit = jass.CreateUnit
-local Player = jass.Player
 local _____5DF2_8BF7_6C42_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = false
 local _____5DF2_6267_884C_521D_59CB_5316_4E3B_7EBF_5267_60C5_5165_53E3 = false
 local ____NPC_8FD0_884C_65F6_8868 = {}
@@ -91,9 +90,7 @@ local function _____8BB0_5F55_5165_53E3_89E6_53D1_5668_914D_7F6E(trigger, _____9
     if trigger == nil then
         return
     end
-    _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868[tostring(
-        nil,
-        GetHandleId(trigger)
+    _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868[tostring(GetHandleId(trigger)
     )] = _____914D_7F6E_5217_8868
 end
 local function _____5267_60C5_8FDB_5EA6_6EE1_8DB3_5165_53E3_914D_7F6E(_____914D_7F6E)
@@ -175,9 +172,7 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_89E6_53D1()
     if trigger == nil then
         return
     end
-    local _____914D_7F6E_5217_8868 = _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868[tostring(
-        nil,
-        GetHandleId(trigger)
+    local _____914D_7F6E_5217_8868 = _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868[tostring(GetHandleId(trigger)
     )]
     if _____914D_7F6E_5217_8868 == nil then
         return
@@ -193,9 +188,7 @@ local function ____on_4E3B_7EBF_5267_60C5_5165_53E3_89E6_53D1()
                 if _____914D_7F6E_5217_8868[i + 1]["触发后注销"] == true then
                     __TS__Delete(
                         _____89E6_53D1_5668ID_5BF9_5E94_5165_53E3_914D_7F6E_5217_8868,
-                        tostring(
-                            nil,
-                            GetHandleId(trigger)
+                        tostring(GetHandleId(trigger)
                         )
                     )
                     DestroyTrigger(trigger)
@@ -339,17 +332,13 @@ ____exports["动态创建并注册主线剧情全局单位入口"] = function(__
         return nil
     end
     local _____52A8_6001_914D_7F6E = _____914D_7F6E["动态创建"]
-    local unitTypeId = stringToFourCCSafe(_____52A8_6001_914D_7F6E["单位ID"])
-    if not (unitTypeId > 0) then
-        return nil
-    end
-    local unit = CreateUnit(
-        Player(math.max(0, _____52A8_6001_914D_7F6E["玩家ID"] - 1)),
-        unitTypeId,
-        _____52A8_6001_914D_7F6E.X,
-        _____52A8_6001_914D_7F6E.Y,
-        _____52A8_6001_914D_7F6E["朝向"]
-    )
+    local unit = _____521B_5EFA_5267_60C5_573A_666F_5355_4F4D({
+        ["单位ID"] = _____52A8_6001_914D_7F6E["单位ID"],
+        X = _____52A8_6001_914D_7F6E.X,
+        Y = _____52A8_6001_914D_7F6E.Y,
+        ["朝向"] = _____52A8_6001_914D_7F6E["朝向"],
+        ["玩家ID"] = math.max(0, _____52A8_6001_914D_7F6E["玩家ID"] - 1)
+    })
     if unit == nil or unit == 0 then
         return nil
     end
@@ -375,11 +364,11 @@ local function _____521D_59CB_5316_53EF_7834_574F_7269()
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_53EF_7834_574F_7269_521D_59CB_5316_914D_7F6E_8868[i + 1]
                 local destructable = _____83B7_53D6_5168_5C40_53E5_67C4(_____914D_7F6E["变量名"])
                 if destructable == nil then
-                    goto __continue68
+                    goto __continue67
                 end
                 SetDestructableInvulnerable(destructable, _____914D_7F6E["无敌"])
             end
-            ::__continue68::
+            ::__continue67::
             i = i + 1
         end
     end

@@ -55,7 +55,7 @@ import type {
   主线剧情入口配置,
   主线剧情全局单位入口配置,
 } from "./00．主线剧情入口类型";
-import { 创建剧情NPC单位 } from "../../00．公共/02．剧情NPC创建";
+import { 创建剧情NPC单位, 创建剧情场景单位 } from "../../00．公共/02．剧情NPC创建";
 import { 读取剧情进度 } from "../00．剧情系统核心工具/01．剧情动作上下文";
 import { 注册剧情运行时单位 } from "../00．剧情系统核心工具/08．剧情运行时单位";
 import { 初始化进度01_精灵村长老发布任务核心 } from "../02．剧情步骤/00．主线剧情/01．精灵村长老发布任务";
@@ -71,8 +71,6 @@ const GetTriggeringTrigger = jass.GetTriggeringTrigger as (this: void) => any;
 const SetDestructableInvulnerable = jass.SetDestructableInvulnerable as (this: void, destructable: any, flag: boolean) => void;
 const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: (this: void) => void) => any;
 const DestroyTrigger = jass.DestroyTrigger as (this: void, trig: any) => void;
-const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
-const Player = jass.Player as (this: void, playerId: number) => any;
 let 已请求初始化主线剧情入口 = false;
 let 已执行初始化主线剧情入口 = false;
 const NPC运行时表: Record<string, any> = {};
@@ -239,10 +237,13 @@ export function 动态创建并注册主线剧情全局单位入口(this: void, 
   const 配置 = 查找全局单位入口配置(配置名);
   if (配置 == null || 配置.动态创建 == null) return null;
   const 动态配置 = 配置.动态创建;
-  const unitTypeId = stringToFourCCSafe(动态配置.单位ID);
-  if (!(unitTypeId > 0)) return null;
-
-  const unit = CreateUnit(Player(Math.max(0, 动态配置.玩家ID - 1)), unitTypeId, 动态配置.X, 动态配置.Y, 动态配置.朝向);
+  const unit = 创建剧情场景单位({
+    单位ID: 动态配置.单位ID,
+    X: 动态配置.X,
+    Y: 动态配置.Y,
+    朝向: 动态配置.朝向,
+    玩家ID: Math.max(0, 动态配置.玩家ID - 1),
+  });
   if (unit == null || unit === 0) return null;
   动态入口单位表[配置名] = unit;
   if (配置.单位变量名 != null && 配置.单位变量名 !== "") jglobals[配置.单位变量名] = unit;

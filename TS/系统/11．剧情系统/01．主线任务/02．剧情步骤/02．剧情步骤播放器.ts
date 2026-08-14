@@ -4,8 +4,8 @@ const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 const { 创建可取消任务组, getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   创建可取消任务组: (this: void) => {
-    添加周期: (this: void, 间隔毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any) => number;
-    取消: (this: void, 任务ID: number) => void;
+    添加周期: (this: any, 间隔毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any) => number;
+    取消: (this: any, 任务ID: number) => void;
   };
   getServerTime: (this: void) => number;
 };

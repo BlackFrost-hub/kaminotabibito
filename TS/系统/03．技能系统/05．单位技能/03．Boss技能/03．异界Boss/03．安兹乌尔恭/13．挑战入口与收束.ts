@@ -4,8 +4,8 @@ import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能�
 import type { 安兹运行时上下文 } from './01．运行时上下文';
 import { 清理安兹运行时上下文 } from './01．运行时上下文';
 import { 安兹乌尔恭数值与表现配置 } from './02．数值与表现配置';
-import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 创建伤害生命下限保护 } from '../../../../00．技能模板+函数/04．机制组件/08．机制触发/09．伤害生命下限保护';
+import { 启动非死亡Boss收束时间线, type 非死亡Boss收束成员 } from '../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/24．非死亡Boss收束时间线';
 import { 播放安兹台词 } from './12．台词播放';
 const { 主动结束Boss战运行 } = require('系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动') as {
   主动结束Boss战运行: (this: void, boss: any, options?: any) => boolean;
@@ -30,12 +30,10 @@ const { YDWETimerDestroyEffectSafe } = require('lib.扩展函数.YDWE函数.09�
 const jass = require('jass.common') as any;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
-const SetUnitInvulnerable = jass.SetUnitInvulnerable as (unit: any, flag: boolean) => void;
-const PauseUnit = jass.PauseUnit as (unit: any, flag: boolean) => void;
 const ShowUnit = jass.ShowUnit as (unit: any, flag: boolean) => void;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
+const 安兹挑战收束暂停来源 = 'Boss:安兹乌尔恭:挑战收束';
+const 雅儿贝德挑战收束暂停来源 = 'Boss:安兹乌尔恭:雅儿贝德挑战收束';
 
 function 播放挑战结束门扉(this: void, x: number, y: number): void {
   const cfg = 安兹乌尔恭数值与表现配置;
@@ -53,31 +51,46 @@ export function 启动安兹挑战收束(this: void, context: 安兹运行时上
   context.挑战已结束 = true;
   context.阶段 = '挑战收束';
   context.当前大型技能 = undefined;
-  SetUnitInvulnerable(boss, true);
-  PauseUnit(boss, true);
   if (单位有效(albedo)) {
-    SetUnitInvulnerable(albedo, true);
-    PauseUnit(albedo, true);
     if (context.雅儿贝德 != null) context.雅儿贝德.阶段状态 = '终局拦截';
   }
   context.雅儿贝德?.独占状态?.取消当前('清理', '安兹挑战收束');
   const cfg = 安兹乌尔恭数值与表现配置;
-  播放限时单位动画({ 单位: boss, 动画编号: cfg.守护者模式.挑战收束安兹姿势动画编号, 持续秒: cfg.守护者模式.挑战收束离场延迟秒, 恢复动画编号: 0 });
-  if (单位有效(albedo)) 播放限时单位动画({ 单位: albedo, 动画编号: cfg.守护者模式.挑战收束雅儿贝德姿势动画编号, 持续秒: cfg.守护者模式.挑战收束离场延迟秒, 恢复动画编号: 1 });
-  播放挑战结束门扉(GetUnitX(boss), GetUnitY(boss));
-  播放安兹台词(boss, '挑战结束');
-  const delayedId = addDelayedCallback(cfg.守护者模式.挑战收束离场延迟秒 * 1000, function 安兹挑战离场(this: void): void {
-    context.雅儿贝德?.成员生命周期?.设置状态('雅儿贝德', '离场', '服从至尊命令');
-    context.雅儿贝德?.成员生命周期?.设置状态('安兹', '离场', '试炼结束');
-    if (单位有效(albedo)) ShowUnit(albedo, false);
-    ShowUnit(boss, false);
-    主动结束Boss战运行(boss, { 跳过死亡音效: true, 跳过死亡剧情: true });
-    打开Boss死亡首领奖励UI(context.模式 === '守护者介入' ? 安兹守护者挑战奖励池ID : 安兹基础挑战奖励池ID);
-    清理Boss自动技能启动上下文(boss);
-    清理安兹运行时上下文(boss);
+  const 成员: 非死亡Boss收束成员[] = [{
+    单位: boss,
+    暂停来源: 安兹挑战收束暂停来源,
+    离场动画编号: cfg.守护者模式.挑战收束安兹姿势动画编号,
+    恢复动画编号: 0,
+  }];
+  if (单位有效(albedo)) {
+    成员.push({
+      单位: albedo,
+      暂停来源: 雅儿贝德挑战收束暂停来源,
+      离场动画编号: cfg.守护者模式.挑战收束雅儿贝德姿势动画编号,
+      恢复动画编号: 1,
+    });
+  }
+  return 启动非死亡Boss收束时间线({
+    名称: '安兹-挑战收束',
+    清理: context.清理,
+    成员,
+    离场延迟秒: cfg.守护者模式.挑战收束离场延迟秒,
+    开始回调: function 安兹挑战收束开始(this: void): void {
+      播放挑战结束门扉(GetUnitX(boss), GetUnitY(boss));
+      播放安兹台词(boss, '挑战结束');
+    },
+    结算回调: function 安兹挑战离场(this: void): void {
+      context.雅儿贝德?.成员生命周期?.设置状态('雅儿贝德', '离场', '服从至尊命令');
+      context.雅儿贝德?.成员生命周期?.设置状态('安兹', '离场', '试炼结束');
+      if (单位有效(albedo)) ShowUnit(albedo, false);
+      ShowUnit(boss, false);
+      主动结束Boss战运行(boss, { 跳过死亡音效: true, 跳过死亡剧情: true });
+      打开Boss死亡首领奖励UI(context.模式 === '守护者介入' ? 安兹守护者挑战奖励池ID : 安兹基础挑战奖励池ID);
+      清理Boss自动技能启动上下文(boss);
+      清理安兹运行时上下文(boss);
+    },
+    延迟登记名: '安兹-挑战收束离场',
   });
-  context.清理.登记延迟回调('安兹-挑战收束离场', delayedId);
-  return true;
 }
 
 export function 绑定安兹挑战生命下限(this: void, context: 安兹运行时上下文): void {

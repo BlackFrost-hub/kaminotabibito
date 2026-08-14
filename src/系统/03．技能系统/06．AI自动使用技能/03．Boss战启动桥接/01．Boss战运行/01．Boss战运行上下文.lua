@@ -109,6 +109,38 @@ ____exports["获取全部Boss战运行上下文"] = function()
     end
     return result
 end
+--- 返回最近启动且尚未结束的 TS Boss 战。
+____exports["读取当前Boss战运行上下文"] = function()
+    local contexts = ____exports["获取全部Boss战运行上下文"]()
+    local current
+    do
+        local i = 0
+        while i < #contexts do
+            do
+                local context = contexts[i + 1]
+                if context == nil or context["是否已结束"] then
+                    goto __continue22
+                end
+                if current == nil or context["运行代次"] > current["运行代次"] then
+                    current = context
+                end
+            end
+            ::__continue22::
+            i = i + 1
+        end
+    end
+    return current
+end
+____exports["读取当前Boss战运行单位"] = function()
+    local context = ____exports["读取当前Boss战运行上下文"]()
+    local ____temp_0
+    if context == nil then
+        ____temp_0 = nil
+    else
+        ____temp_0 = context["Boss单位"]
+    end
+    return ____temp_0
+end
 ____exports["清理Boss战运行上下文"] = function(bossUnit)
     local bossHandleId = _____83B7_53D6_53E5_67C4ID(bossUnit)
     if bossHandleId == 0 then

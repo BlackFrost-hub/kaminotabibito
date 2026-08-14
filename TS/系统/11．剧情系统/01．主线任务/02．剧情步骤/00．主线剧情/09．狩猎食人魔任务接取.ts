@@ -1,14 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
-  暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
-};
 const 沙漠食人魔待战暂停来源 = "剧情系统:沙漠食人魔待战";
 
-const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
-};
 const { 按名字反查Boss单位ID } = require("系统.01．单位系统.08．单位配置表.02．Boss配置表") as {
   按名字反查Boss单位ID: (this: void, name: string) => string | undefined;
 };
@@ -45,9 +39,9 @@ const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 注册剧情Boss范围预置触发器 } from "../../00．剧情系统核心工具/03．剧情Boss预置桥接";
+import { 创建剧情场景单位 } from "../../../00．公共/02．剧情NPC创建";
 export { 蛇人族接受食人魔任务剧情片段 } from "../01．第一章/09．狩猎食人魔任务接取";
 
-const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const GetUnitLoc = jass.GetUnitLoc as (this: void, whichUnit: any) => any;
 const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveLocation = jass.RemoveLocation as (this: void, whichLocation: any) => void;
@@ -85,29 +79,37 @@ function 创建沙漠食人魔尸骨圈(this: void, bossUnit: any): void {
 
 export function 执行蛇人族接受食人魔任务(this: void, 参数: 剧情动作参数表): void {
   const 传送配置 = 读取剧情传送配置(食人魔任务传送配置ID);
-  const 次元裂缝单位ID = stringToFourCCSafe("e08L");
-  if (传送配置 != null && 次元裂缝单位ID > 0) {
-    const 裂缝单位 = CreateUnit(
-      Player(PLAYER_NEUTRAL_PASSIVE),
-      次元裂缝单位ID,
-      传送配置.入口中心X,
-      传送配置.入口中心Y,
-      0,
-    );
+  if (传送配置 != null) {
+    const 裂缝单位 = 创建剧情场景单位({
+      单位ID: "e08L",
+      X: 传送配置.入口中心X,
+      Y: 传送配置.入口中心Y,
+      朝向: 0,
+      玩家ID: PLAYER_NEUTRAL_PASSIVE,
+      YD表: "剧情",
+      YD键: "沙漠次元裂缝",
+      YD字段: "unit",
+    });
     if (裂缝单位 != null && 裂缝单位 !== 0) {
-      YDUserDataSetSafe("string", "剧情", "沙漠次元裂缝", "unit", 裂缝单位);
       注册食人魔任务传送();
     }
   }
 
   const bossRawId = 按名字反查Boss单位ID("沙漠食人魔");
-  const bossTypeId = stringToFourCCSafe(bossRawId);
-  if (!(bossTypeId > 0)) return;
-  const bossUnit = CreateUnit(Player(PLAYER_NEUTRAL_PASSIVE), bossTypeId, 28354.9, 13678.3, 270);
+  if (bossRawId == null) return;
+  const bossUnit = 创建剧情场景单位({
+    单位ID: bossRawId,
+    X: 28354.9,
+    Y: 13678.3,
+    朝向: 270,
+    玩家ID: PLAYER_NEUTRAL_PASSIVE,
+    YD表: "Boss",
+    YD键: "沙漠食人魔",
+    YD字段: "unit",
+    初始化无敌: true,
+    初始化暂停来源: 沙漠食人魔待战暂停来源,
+  });
   if (bossUnit == null || bossUnit === 0) return;
-
-  YDUserDataSetSafe("string", "Boss", "沙漠食人魔", "unit", bossUnit);
-  暂停并设置无敌安全(bossUnit, 沙漠食人魔待战暂停来源);
   注册剧情Boss范围预置触发器(
     bossUnit,
     Number(参数.注册范围) || 1000,

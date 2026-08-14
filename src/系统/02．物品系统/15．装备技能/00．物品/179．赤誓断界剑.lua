@@ -65,11 +65,11 @@ local function ____on_8A93_950B_5F3A_5316_7ED3_675F(context)
     end
 end
 local function ____on_8A93_950B_547D_4E2D(c)
-    local sx = jass:GetUnitX(c["单位"])
-    local sy = jass:GetUnitY(c["单位"])
-    local tx = jass:GetUnitX(c["目标"])
-    local ty = jass:GetUnitY(c["目标"])
-    local angle = jass:Atan2(ty - sy, tx - sx) * 57.2957795
+    local sx = jass.GetUnitX(c["单位"])
+    local sy = jass.GetUnitY(c["单位"])
+    local tx = jass.GetUnitX(c["目标"])
+    local ty = jass.GetUnitY(c["目标"])
+    local angle = jass.Atan2(ty - sy, tx - sx) * 57.2957795
     local units = _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D({
         X = sx,
         Y = sy,

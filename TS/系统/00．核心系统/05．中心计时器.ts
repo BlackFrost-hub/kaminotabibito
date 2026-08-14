@@ -46,6 +46,7 @@ const TimerStart = jass.TimerStart as (whichTimer: any, timeout: number, periodi
 const 调试输出 = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   safeExecute: (this: void, module: string, callback: (this: void) => void) => boolean;
   getCallbackDebugLabel: (this: void, callback: any) => string;
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
 const NORMAL_MON_DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -211,7 +212,18 @@ function getTimerCallbackModule(this: void, prefix: string, callback: any): stri
 
 function runPeriodicCallbacks(): void {
   const now = nowMs();
-  for (const p of _periodicCallbacks) {
+  let i = 0;
+  while (i < _periodicCallbacks.length) {
+    const p = _periodicCallbacks[i];
+    if (typeof p.intervalMs !== "number" || !(p.intervalMs > 0) || typeof p.lastRunTime !== "number" || typeof p.callback !== "function") {
+      调试输出.debugLogForce(
+        "中心计时器", "移除非法周期回调", "id", p.id,
+        "intervalType", typeof p.intervalMs, "intervalSource", 调试输出.getCallbackDebugLabel(p.intervalMs),
+        "callbackType", typeof p.callback, "callbackSource", 调试输出.getCallbackDebugLabel(p.callback),
+      );
+      _periodicCallbacks.splice(i, 1);
+      continue;
+    }
     if (now - p.lastRunTime >= p.intervalMs) {
       p.lastRunTime = now;
       _currentPeriodicCallback = p.callback;
@@ -220,6 +232,7 @@ function runPeriodicCallbacks(): void {
       _currentPeriodicCallback = undefined;
       _currentPeriodicVariable = undefined;
     }
+    i++;
   }
 }
 
@@ -229,6 +242,11 @@ function runDelayedCallbacks(): void {
   for (let i = 0; i < _delayedCallbacks.length; i++) {
     const d = _delayedCallbacks[i];
     if (!d.active) continue;
+    if (typeof d.dueTime !== "number" || typeof d.callback !== "function") {
+      调试输出.debugLogForce("中心计时器", "移除非法延迟回调", "id", d.id, "dueTimeType", typeof d.dueTime, "callbackType", typeof d.callback);
+      d.active = false;
+      continue;
+    }
     if (now >= d.dueTime) {
       d.active = false;
       _currentDelayedCallback = d.callback;
@@ -355,7 +373,22 @@ export function getGameDifficulty(): number {
   return _gameDifficulty;
 }
 
-export function addPeriodicCallback(intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any): number {
+export function addPeriodicCallback(intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any): number;
+export function addPeriodicCallback(intervalMs: any, callback: any, variable?: any): number {
+  if (typeof intervalMs === "function" && typeof callback === "number") {
+    调试输出.debugLogForce("中心计时器", "纠正旧式周期回调参数顺序", 调试输出.getCallbackDebugLabel(intervalMs), callback);
+    const oldCallback = intervalMs;
+    intervalMs = callback;
+    callback = oldCallback;
+  }
+  if (typeof intervalMs !== "number" || !(intervalMs > 0) || typeof callback !== "function") {
+    调试输出.debugLogForce(
+      "中心计时器", "拒绝非法周期回调",
+      "intervalType", typeof intervalMs, "intervalSource", 调试输出.getCallbackDebugLabel(intervalMs),
+      "callbackType", typeof callback, "callbackSource", 调试输出.getCallbackDebugLabel(callback),
+    );
+    return 0;
+  }
   const id = ++_periodicCallbackIdCounter;
   _periodicCallbacks.push({ id, intervalMs, lastRunTime: nowMs(), callback, variable });
   return id;
@@ -366,7 +399,18 @@ export function removePeriodicCallback(id: number): void {
   if (idx > -1) _periodicCallbacks.splice(idx, 1);
 }
 
-export function addDelayedCallback(delayMs: number, callback: (this: void, variable?: any) => void, variable?: any): number {
+export function addDelayedCallback(delayMs: number, callback: (this: void, variable?: any) => void, variable?: any): number;
+export function addDelayedCallback(delayMs: any, callback: any, variable?: any): number {
+  if (typeof delayMs === "function" && typeof callback === "number") {
+    调试输出.debugLogForce("中心计时器", "纠正旧式延迟回调参数顺序", 调试输出.getCallbackDebugLabel(delayMs), callback);
+    const oldCallback = delayMs;
+    delayMs = callback;
+    callback = oldCallback;
+  }
+  if (typeof delayMs !== "number" || delayMs !== delayMs || typeof callback !== "function") {
+    调试输出.debugLogForce("中心计时器", "拒绝非法延迟回调", "delayType", typeof delayMs, "callbackType", typeof callback);
+    return 0;
+  }
   const id = ++_delayedCallbackIdCounter;
   const safeDelay = maxNum(0, intFloor(delayMs));
   _delayedCallbacks.push({ id, dueTime: nowMs() + safeDelay, active: true, callback, variable });

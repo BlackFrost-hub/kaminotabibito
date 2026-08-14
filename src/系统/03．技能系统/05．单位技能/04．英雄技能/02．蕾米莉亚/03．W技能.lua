@@ -3,6 +3,8 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.02．蕾米莉亚.00．配置")
 local _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["蕾米莉亚单位技能配置"]
+local ____03_FF0E_857E_7C73_8389_4E9A = require("系统.05．Buff系统.03．Buff表.02．英雄.03．蕾米莉亚")
+local _____857E_7C73_8389_4E9ABuffID = ____03_FF0E_857E_7C73_8389_4E9A["蕾米莉亚BuffID"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
@@ -31,6 +33,11 @@ local addPeriodicCallback = ____require_result_6.addPeriodicCallback
 local removePeriodicCallback = ____require_result_6.removePeriodicCallback
 local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_7.registerDeathListener
+local ____require_result_8 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_8.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_8["移除单位指定Buff"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_9["开始硬直"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetHeroStr = jass.GetHeroStr
@@ -83,7 +90,8 @@ local function _____83B7_53D6_6216_521B_5EFAW_4E0A_4E0B_6587(unit)
         ["伤害攻击力快照"] = 0,
         ["增加力量"] = 0,
         ["周期次数"] = 0,
-        ["已启动"] = false
+        ["已启动"] = false,
+        ["目标属性记录"] = {}
     }
     _____4E0A_4E0B_6587_8868[unitId] = created
     return created
@@ -98,31 +106,16 @@ end
 local function _____521B_5EFA_8DDF_968F_8868_73B0(context)
     local caster = context["施法者"]
     local color = ____W_914D_7F6E["表现"]["顶点颜色"]
-    local judgment = ____W_914D_7F6E["表现"]["审判"]
-    local holyFire = ____W_914D_7F6E["表现"]["圣火"]
+    local bloodMist = ____W_914D_7F6E["表现"]["血雾"]
     local judgmentEffect = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
         caster,
-        judgment["模型路径"],
-        judgment["特效键"],
-        judgment["缩放"],
+        bloodMist["模型路径"],
+        bloodMist["特效键"],
+        bloodMist["缩放"],
         ____W_914D_7F6E["表现"]["跟随高度"]
     )
     _____8BBE_7F6E_7279_6548_989C_8272(
         judgmentEffect,
-        color["红"],
-        color["绿"],
-        color["蓝"],
-        color["透明度"]
-    )
-    local holyFireEffect = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
-        caster,
-        holyFire["模型路径"],
-        holyFire["特效键"],
-        holyFire["缩放"],
-        ____W_914D_7F6E["表现"]["跟随高度"]
-    )
-    _____8BBE_7F6E_7279_6548_989C_8272(
-        holyFireEffect,
         color["红"],
         color["绿"],
         color["蓝"],
@@ -144,10 +137,11 @@ local function _____6E05_7406W_4E0A_4E0B_6587(context)
         GS_UnitPry(context["施法者"], 1, 13, ____W_914D_7F6E["基础生命值百分比增量"])
         _____8C03_6574_82F1_96C4_57FA_7840_529B_91CF(context["施法者"], -context["增加力量"])
         _____8C03_6574_73A9_5BB6_5C5E_6027(context["施法者"], "百分比生命回复", -____W_914D_7F6E["百分比生命回复增量"])
-        _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(context["施法者"], ____W_914D_7F6E["表现"]["审判"]["特效键"])
-        _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(context["施法者"], ____W_914D_7F6E["表现"]["圣火"]["特效键"])
+        _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(context["施法者"], ____W_914D_7F6E["表现"]["血雾"]["特效键"])
+        _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["施法者"], _____857E_7C73_8389_4E9ABuffID["红符法阵"])
         context["已启动"] = false
     end
+    context["目标属性记录"] = {}
     local unitId = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
     if unitId ~= 0 and _____4E0A_4E0B_6587_8868[unitId] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, unitId)
@@ -169,15 +163,21 @@ local function _____76EE_6807_5141_8BB8W_4F24_5BB3(target)
     return true
 end
 local function _____521B_5EFAW_5468_671F_7279_6548(caster)
-    local effect = ____W_914D_7F6E["表现"]["周期特效"]
+    local effect = ____W_914D_7F6E["表现"]["周期爆炸"]
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = effect["模型路径"],
         X = GetUnitX(caster),
         Y = GetUnitY(caster),
-        ["Z轴角度"] = effect["Z轴角度"],
         ["缩放"] = effect["缩放"],
-        ["动画速度"] = effect["动画速度"],
         ["持续秒"] = effect["持续秒"]
+    })
+    local bloodMist = ____W_914D_7F6E["表现"]["周期血雾"]
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = bloodMist["模型路径"],
+        X = GetUnitX(caster),
+        Y = GetUnitY(caster),
+        ["缩放"] = bloodMist["缩放"],
+        ["持续秒"] = bloodMist["持续秒"]
     })
 end
 local function _____51C6_5907W_6279_91CF_76EE_6807_4F24_5BB3(target, _index, variable)
@@ -186,20 +186,26 @@ local function _____51C6_5907W_6279_91CF_76EE_6807_4F24_5BB3(target, _index, var
         return nil
     end
     local useFire = GetRandomInt(1, 2) == 1
-    local effectConfig = useFire and ____W_914D_7F6E["表现"]["火属性"] or ____W_914D_7F6E["表现"]["暗属性"]
-    local ____useFire_8
-    if useFire then
-        ____useFire_8 = DAMAGE_TYPE_FIRE
-    else
-        ____useFire_8 = DAMAGE_TYPE_SHADOW_STRIKE
+    local targetId = GetHandleId(target) or 0
+    if targetId ~= 0 then
+        context["目标属性记录"][targetId] = useFire
     end
-    local damageType = ____useFire_8
-    _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = effectConfig["特效模型路径"],
-        X = GetUnitX(target),
-        Y = GetUnitY(target),
-        ["持续秒"] = effectConfig["特效持续秒"]
-    })
+    local effectConfig = useFire and ____W_914D_7F6E["表现"]["火属性"] or ____W_914D_7F6E["表现"]["暗属性"]
+    local ____useFire_10
+    if useFire then
+        ____useFire_10 = DAMAGE_TYPE_FIRE
+    else
+        ____useFire_10 = DAMAGE_TYPE_SHADOW_STRIKE
+    end
+    local damageType = ____useFire_10
+    if useFire then
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = effectConfig["特效模型路径"],
+            X = GetUnitX(target),
+            Y = GetUnitY(target),
+            ["持续秒"] = effectConfig["特效持续秒"]
+        })
+    end
     local damage = context["伤害攻击力快照"] * ____W_914D_7F6E["单次伤害攻击力倍率"] + (GetHeroStr(context["施法者"], true) or 0) * ____W_914D_7F6E["单次伤害力量倍率"]
     return {
         ["伤害"] = damage,
@@ -209,6 +215,25 @@ local function _____51C6_5907W_6279_91CF_76EE_6807_4F24_5BB3(target, _index, var
         attackType = ATTACK_TYPE_NORMAL,
         weaponType = WEAPON_TYPE_METAL_HEAVY_BASH
     }
+end
+local function _____5904_7406W_76EE_6807_7ED3_7B97_540E(target, _index, ______6210_529F, variable)
+    local context = variable
+    if context == nil then
+        return
+    end
+    local targetId = GetHandleId(target) or 0
+    if context["目标属性记录"][targetId] == false then
+        local effect = ____W_914D_7F6E["表现"]["暗属性"]
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = effect["特效模型路径"],
+            X = GetUnitX(target),
+            Y = GetUnitY(target),
+            ["持续秒"] = effect["特效持续秒"]
+        })
+    end
+    if targetId ~= 0 then
+        __TS__Delete(context["目标属性记录"], targetId)
+    end
 end
 local function _____857E_7C73_8389_4E9AW_5468_671FTick(variable)
     local context = variable
@@ -224,6 +249,10 @@ local function _____857E_7C73_8389_4E9AW_5468_671FTick(variable)
         return
     end
     _____521B_5EFAW_5468_671F_7279_6548(context["施法者"])
+    local ____opt_11 = ____W_914D_7F6E["周期语音"]
+    if (____opt_11 and ____opt_11["路径"]) ~= nil then
+        Sound3DII_UnitPlayReuse(____W_914D_7F6E["周期语音"]["路径"], context["施法者"], ____W_914D_7F6E["周期语音"]["裁断距离"])
+    end
     context["周期次数"] = context["周期次数"] + 1
     local targets = _____83B7_53D6_8303_56F4_654C_519B(
         context["施法者"],
@@ -239,11 +268,13 @@ local function _____857E_7C73_8389_4E9AW_5468_671FTick(variable)
         ["技能实例ID"] = context["技能实例ID"],
         ["伤害形态"] = "AOE",
         ["每目标处理器"] = _____51C6_5907W_6279_91CF_76EE_6807_4F24_5BB3,
+        ["每目标结算后处理器"] = _____5904_7406W_76EE_6807_7ED3_7B97_540E,
         ["变量"] = context
     })
 end
 local function _____64AD_653EW_542F_52A8_8868_73B0(caster)
     if ____W_914D_7F6E["动作编号"] >= 0 then
+        _____5F00_59CB_786C_76F4(caster, ____W_914D_7F6E["动作硬直秒"] or 0.1)
         SetUnitAnimationByIndex(caster, ____W_914D_7F6E["动作编号"])
         SetUnitTimeScale(caster, ____W_914D_7F6E["动作速度"])
     end
@@ -269,6 +300,13 @@ local function _____857E_7C73_8389_4E9AW_5EF6_8FDF_542F_52A8(variable)
     GS_UnitPry(caster, 0, 13, ____W_914D_7F6E["基础生命值百分比增量"])
     _____8C03_6574_82F1_96C4_57FA_7840_529B_91CF(caster, context["增加力量"])
     _____8C03_6574_73A9_5BB6_5C5E_6027(caster, "百分比生命回复", ____W_914D_7F6E["百分比生命回复增量"])
+    registerManualBuff(
+        caster,
+        _____857E_7C73_8389_4E9ABuffID["红符法阵"],
+        ____W_914D_7F6E["持续次数"] * ____W_914D_7F6E["周期间隔毫秒"] / 1000 + 0.3,
+        1,
+        {sourceName = "蕾米莉亚-红符法阵"}
+    )
     _____521B_5EFA_8DDF_968F_8868_73B0(context)
     context["周期回调ID"] = addPeriodicCallback(____W_914D_7F6E["周期间隔毫秒"], _____857E_7C73_8389_4E9AW_5468_671FTick, context)
 end

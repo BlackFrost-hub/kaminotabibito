@@ -35,7 +35,7 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if not triggerPlayer or not npcConfig or not npcUnit then
         return
     end
-    local playerId = jass:GetPlayerId(triggerPlayer)
+    local playerId = jass.GetPlayerId(triggerPlayer)
     if playerId < 0 or playerId >= DIALOG_PLAYER_SLOTS then
         return
     end
@@ -43,7 +43,7 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
     if not hero then
         return
     end
-    if not jass:IsUnitInRange(hero, npcUnit, 350) then
+    if not jass.IsUnitInRange(hero, npcUnit, 350) then
         return
     end
     local npcName = resolveNpcDialogName(npcConfig)
@@ -124,7 +124,7 @@ function openDialogForConfiguredNpc(triggerPlayer, npcConfig, npcUnit)
             return
         end
     end
-    local heroName = jass:GetUnitName(hero)
+    local heroName = jass.GetUnitName(hero)
     local dialogData = buildDialogData(nil, npcName, heroName)
     if dialogData then
         openNpcDialog(
@@ -145,9 +145,9 @@ function onPlayerSelectedUnit(triggerPlayer, playerId, selectedUnit, isSelected)
         return
     end
     local registeredNpcConfig = _____6309_5355_4F4D_67E5_627ENPC_914D_7F6E(selectedUnit)
-    local selectedOwner = jass:GetOwningPlayer(selectedUnit)
+    local selectedOwner = jass.GetOwningPlayer(selectedUnit)
     local isRegisteredNpc = registeredNpcConfig ~= nil and registeredNpcConfig["启用"] == true
-    local unitName = jass:GetUnitName(selectedUnit)
+    local unitName = jass.GetUnitName(selectedUnit)
     local isTargetNpc = unitName == "人类农民" or registeredNpcConfig ~= nil and registeredNpcConfig["任务ID"] == 1000
     if isTargetNpc then
         local ____debugLogForce_3 = debugLogForce
@@ -157,23 +157,23 @@ function onPlayerSelectedUnit(triggerPlayer, playerId, selectedUnit, isSelected)
             "触发玩家",
             playerId + 1,
             "句柄",
-            jass:GetHandleId(selectedUnit),
+            jass.GetHandleId(selectedUnit),
             "名称",
             unitName,
             "单位ID",
-            fourCCToString(jass:GetUnitTypeId(selectedUnit)),
+            fourCCToString(jass.GetUnitTypeId(selectedUnit)),
             "所有者"
         )
         local ____selectedOwner_1
         if selectedOwner then
-            ____selectedOwner_1 = jass:GetPlayerId(selectedOwner) + 1
+            ____selectedOwner_1 = jass.GetPlayerId(selectedOwner) + 1
         else
             ____selectedOwner_1 = 0
         end
         __TS__SparseArrayPush(____array_2, ____selectedOwner_1, "已登记", isRegisteredNpc)
         ____debugLogForce_3(__TS__SparseArraySpread(____array_2))
     end
-    if not isRegisteredNpc and (not selectedOwner or selectedOwner ~= jass:Player(15)) then
+    if not isRegisteredNpc and (not selectedOwner or selectedOwner ~= jass.Player(15)) then
         if isTargetNpc then
             debugLogForce("任务对话入口", "入口拒绝", "原因", "未登记且不是中立被动")
         end
@@ -193,21 +193,21 @@ function onPlayerSelectedUnit(triggerPlayer, playerId, selectedUnit, isSelected)
         end
         return
     end
-    local isHeroInRange = jass:IsUnitInRange(hero, selectedUnit, 350) == true
+    local isHeroInRange = jass.IsUnitInRange(hero, selectedUnit, 350) == true
     if isTargetNpc then
         debugLogForce(
             "任务对话入口",
             "英雄范围检查",
             "英雄",
-            jass:GetUnitName(hero),
+            jass.GetUnitName(hero),
             "英雄X",
-            jass:GetUnitX(hero),
+            jass.GetUnitX(hero),
             "英雄Y",
-            jass:GetUnitY(hero),
+            jass.GetUnitY(hero),
             "NPC X",
-            jass:GetUnitX(selectedUnit),
+            jass.GetUnitX(selectedUnit),
             "NPC Y",
-            jass:GetUnitY(selectedUnit),
+            jass.GetUnitY(selectedUnit),
             "350码内",
             isHeroInRange,
             "任务ID",

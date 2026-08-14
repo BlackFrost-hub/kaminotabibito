@@ -3,15 +3,13 @@
 import { 读取语义单位引用 } from "../../00．剧情系统核心工具/06．剧情通用执行工具";
 import { 注册剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
 import type { 剧情镜头预设参数 } from "../../00．剧情系统核心工具/12．剧情电影镜头";
+import { 创建剧情场景单位, 定位剧情单位 } from "../../../00．公共/02．剧情NPC创建";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
-};
-const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
-  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
 const { 按名字反查总单位ID } = require("系统.01．单位系统.08．单位配置表.04．总单位配置表") as {
   按名字反查总单位ID: (this: void, name: string) => string | undefined;
@@ -27,10 +25,6 @@ const ForGroup = jass.ForGroup as (this: void, whichGroup: any, callback: (this:
 const GetDestructableX = jass.GetDestructableX as (this: void, destructable: any) => number;
 const GetDestructableY = jass.GetDestructableY as (this: void, destructable: any) => number;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
-const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, whichUnit: any, order: string) => boolean;
-const Player = jass.Player as (this: void, playerId: number) => any;
-const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facingAngle: number) => void;
-const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
 
 const 中立被动玩家ID = 15;
 const 王宫传送门封印特效 = "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdl";
@@ -83,10 +77,7 @@ export type 王宫密室演出特效键 = keyof typeof 王宫密室演出特效�
 let 当前玩家队伍转场站位: 王宫密室场景站位 | undefined;
 
 function 定位单位(this: void, unit: any, 站位: 王宫密室场景站位): void {
-  if (unit == null || unit === 0) return;
-  SetUnitPosition(unit, 站位.X, 站位.Y);
-  SetUnitFacing(unit, 站位.朝向);
-  IssueImmediateOrder(unit, "stop");
+  定位剧情单位(unit, 站位);
 }
 
 function on移动枚举玩家英雄至密室(this: void): void {
@@ -116,9 +107,17 @@ export function 读取或创建并定位王宫密室剧情单位(
 ): any {
   let unit = 读取语义单位引用(语义引用);
   if (unit == null || unit === 0) {
-    const 单位类型ID = stringToFourCCSafe(按名字反查总单位ID(单位名));
+    const 单位ID = 按名字反查总单位ID(单位名);
+    const 单位类型ID = stringToFourCCSafe(单位ID);
     if (!(单位类型ID > 0)) return null;
-    unit = 创建单位并登记排泄安全(Player(中立被动玩家ID), 单位类型ID, 站位.X, 站位.Y, 站位.朝向);
+    unit = 创建剧情场景单位({
+      单位ID: 单位ID!,
+      X: 站位.X,
+      Y: 站位.Y,
+      朝向: 站位.朝向,
+      玩家ID: 中立被动玩家ID,
+      登记死亡排泄: true,
+    });
   }
   if (unit == null || unit === 0) return null;
   定位单位(unit, 站位);

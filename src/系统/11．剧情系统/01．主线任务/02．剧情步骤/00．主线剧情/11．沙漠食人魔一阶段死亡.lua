@@ -328,7 +328,7 @@ ____exports["执行沙漠食人魔裂隙来客施法"] = function()
                 YDWEAngleBetweenUnitsSafe(lizardUnit, riftUnit)
             )
         end
-        jass:SetUnitAnimationByIndex(lizardUnit, 11)
+        jass.SetUnitAnimationByIndex(lizardUnit, 11)
     end
     if _____4E8C_9636_6BB5_663E_73B0_5468_671FID ~= 0 then
         removePeriodicCallback(_____4E8C_9636_6BB5_663E_73B0_5468_671FID)
@@ -382,7 +382,7 @@ ____exports["执行杀戮食人魔显现"] = function(_____53C2_6570)
         bossUnit
     )
     _____6682_505C_5E76_8BBE_7F6E_65E0_654C_5B89_5168(bossUnit, _____6C99_6F20_98DF_4EBA_9B54_4E8C_9636_6BB5_5F85_6218_6682_505C_6765_6E90)
-    jass:SetUnitAnimationByIndex(bossUnit, 11)
+    jass.SetUnitAnimationByIndex(bossUnit, 11)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = "war3mapImported\\desecrate.mdl",
         X = _____4E00_9636_6BB5_6B7B_4EA1X,

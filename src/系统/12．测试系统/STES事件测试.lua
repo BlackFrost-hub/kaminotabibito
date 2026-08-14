@@ -22,7 +22,7 @@ local function skeyIndex()
     if type(jg.STES_skey_index) == "number" and jg.STES_skey_index ~= 0 then
         return jg.STES_skey_index
     end
-    return jass:StringHash("index")
+    return jass.StringHash("index")
 end
 local function log(msg)
     local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
@@ -35,7 +35,7 @@ local function onLuaStesListenerAction()
             local from5 = YDLocal5Get(nil, "real", YD_LOCAL_REAL_KEY)
             local b = type(from5) == "number" and from5 or 0
             local quad = (b * b + 13 * b + 42) / (b + 1.0001)
-            local root = jass:SquareRoot(max(0, b + 16)) * 2.25
+            local root = jass.SquareRoot(max(0, b + 16)) * 2.25
             local ret = quad + root - min(b, 5) * 0.5 + 3.14159
             YDLocal7Set(nil, "real", YD_LOCAL_REAL_KEY, ret)
             log((((((("[STES事件测试-Lua] YDLocal5Get(real,\"" .. YD_LOCAL_REAL_KEY) .. "\")=") .. tostring(b)) .. " → YDLocal7Set 写回 real,\"") .. YD_LOCAL_REAL_KEY) .. "\"=") .. tostring(ret))
@@ -59,8 +59,8 @@ local function tryRegisterLuaListenerForJassStes()
         return
     end
     g[LUA_STES_REG_KEY] = true
-    local trig = jass:CreateTrigger()
-    jass:TriggerAddAction(trig, onLuaStesListenerAction)
+    local trig = jass.CreateTrigger()
+    jass.TriggerAddAction(trig, onLuaStesListenerAction)
     stesMod:STES_Register(trig, TEST_EVENT)
     log(("[STES事件测试] 已向「" .. TEST_EVENT) .. "」STES_Register Lua 触发器；与 JASS 注册共用同一张表，输入 333 可测 JASS→Lua")
 end
@@ -72,9 +72,9 @@ local function runAfterDelay()
         return
     end
     tryRegisterLuaListenerForJassStes()
-    local hash = jass:StringHash(TEST_EVENT)
+    local hash = jass.StringHash(TEST_EVENT)
     local sk = skeyIndex()
-    local count = jass:LoadInteger(ht, hash, sk)
+    local count = jass.LoadInteger(ht, hash, sk)
     log((((((("[STES事件测试] 表=" .. tostring(ht)) .. " 事件「") .. TEST_EVENT) .. "」count=") .. tostring(count)) .. " skey_index=") .. tostring(sk))
     if count <= 0 then
         log(("[STES事件测试] 计数为 0：事件「" .. TEST_EVENT) .. "」尚无 STES 注册（检查 JASS 是否已 Register、事件名是否一致）")

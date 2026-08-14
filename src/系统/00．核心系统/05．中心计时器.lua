@@ -2,6 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__StringPadStart = ____lualib.__TS__StringPadStart
+local __TS__TypeOf = ____lualib.__TS__TypeOf
 local __TS__ArrayFindIndex = ____lualib.__TS__ArrayFindIndex
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
@@ -226,18 +227,42 @@ local function getTimerCallbackModule(prefix, callback)
 end
 local function runPeriodicCallbacks()
     local now = nowMs()
-    for ____, p in ipairs(_periodicCallbacks) do
-        if now - p.lastRunTime >= p.intervalMs then
-            p.lastRunTime = now
-            _currentPeriodicCallback = p.callback
-            _currentPeriodicVariable = p.variable
-            _____8C03_8BD5_8F93_51FA.safeExecute(
-                getTimerCallbackModule("中心计时器-周期回调", p.callback),
-                executeCurrentPeriodicCallback
-            )
-            _currentPeriodicCallback = nil
-            _currentPeriodicVariable = nil
+    local i = 0
+    while i < #_periodicCallbacks do
+        do
+            local p = _periodicCallbacks[i + 1]
+            if type(p.intervalMs) ~= "number" or not (p.intervalMs > 0) or type(p.lastRunTime) ~= "number" or type(p.callback) ~= "function" then
+                _____8C03_8BD5_8F93_51FA.debugLogForce(
+                    "中心计时器",
+                    "移除非法周期回调",
+                    "id",
+                    p.id,
+                    "intervalType",
+                    __TS__TypeOf(p.intervalMs),
+                    "intervalSource",
+                    _____8C03_8BD5_8F93_51FA.getCallbackDebugLabel(p.intervalMs),
+                    "callbackType",
+                    __TS__TypeOf(p.callback),
+                    "callbackSource",
+                    _____8C03_8BD5_8F93_51FA.getCallbackDebugLabel(p.callback)
+                )
+                __TS__ArraySplice(_periodicCallbacks, i, 1)
+                goto __continue31
+            end
+            if now - p.lastRunTime >= p.intervalMs then
+                p.lastRunTime = now
+                _currentPeriodicCallback = p.callback
+                _currentPeriodicVariable = p.variable
+                _____8C03_8BD5_8F93_51FA.safeExecute(
+                    getTimerCallbackModule("中心计时器-周期回调", p.callback),
+                    executeCurrentPeriodicCallback
+                )
+                _currentPeriodicCallback = nil
+                _currentPeriodicVariable = nil
+            end
+            i = i + 1
         end
+        ::__continue31::
     end
 end
 local function runDelayedCallbacks()
@@ -249,6 +274,20 @@ local function runDelayedCallbacks()
             do
                 local d = _delayedCallbacks[i + 1]
                 if not d.active then
+                    goto __continue36
+                end
+                if type(d.dueTime) ~= "number" or type(d.callback) ~= "function" then
+                    _____8C03_8BD5_8F93_51FA.debugLogForce(
+                        "中心计时器",
+                        "移除非法延迟回调",
+                        "id",
+                        d.id,
+                        "dueTimeType",
+                        __TS__TypeOf(d.dueTime),
+                        "callbackType",
+                        __TS__TypeOf(d.callback)
+                    )
+                    d.active = false
                     goto __continue36
                 end
                 if now >= d.dueTime then
@@ -392,6 +431,32 @@ function ____exports.getGameDifficulty()
     return _gameDifficulty
 end
 function ____exports.addPeriodicCallback(intervalMs, callback, variable)
+    if type(intervalMs) == "function" and type(callback) == "number" then
+        _____8C03_8BD5_8F93_51FA.debugLogForce(
+            "中心计时器",
+            "纠正旧式周期回调参数顺序",
+            _____8C03_8BD5_8F93_51FA.getCallbackDebugLabel(intervalMs),
+            callback
+        )
+        local oldCallback = intervalMs
+        intervalMs = callback
+        callback = oldCallback
+    end
+    if type(intervalMs) ~= "number" or not (intervalMs > 0) or type(callback) ~= "function" then
+        _____8C03_8BD5_8F93_51FA.debugLogForce(
+            "中心计时器",
+            "拒绝非法周期回调",
+            "intervalType",
+            __TS__TypeOf(intervalMs),
+            "intervalSource",
+            _____8C03_8BD5_8F93_51FA.getCallbackDebugLabel(intervalMs),
+            "callbackType",
+            __TS__TypeOf(callback),
+            "callbackSource",
+            _____8C03_8BD5_8F93_51FA.getCallbackDebugLabel(callback)
+        )
+        return 0
+    end
     _periodicCallbackIdCounter = _periodicCallbackIdCounter + 1
     local id = _periodicCallbackIdCounter
     _periodicCallbacks[#_periodicCallbacks + 1] = {
@@ -413,6 +478,28 @@ function ____exports.removePeriodicCallback(id)
     end
 end
 function ____exports.addDelayedCallback(delayMs, callback, variable)
+    if type(delayMs) == "function" and type(callback) == "number" then
+        _____8C03_8BD5_8F93_51FA.debugLogForce(
+            "中心计时器",
+            "纠正旧式延迟回调参数顺序",
+            _____8C03_8BD5_8F93_51FA.getCallbackDebugLabel(delayMs),
+            callback
+        )
+        local oldCallback = delayMs
+        delayMs = callback
+        callback = oldCallback
+    end
+    if type(delayMs) ~= "number" or delayMs ~= delayMs or type(callback) ~= "function" then
+        _____8C03_8BD5_8F93_51FA.debugLogForce(
+            "中心计时器",
+            "拒绝非法延迟回调",
+            "delayType",
+            __TS__TypeOf(delayMs),
+            "callbackType",
+            __TS__TypeOf(callback)
+        )
+        return 0
+    end
     _delayedCallbackIdCounter = _delayedCallbackIdCounter + 1
     local id = _delayedCallbackIdCounter
     local safeDelay = maxNum(
@@ -462,7 +549,7 @@ _____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0.prototype["取消"] = function(self
             do
                 local task = self["任务列表"][i + 1]
                 if task.id ~= _____4EFB_52A1ID then
-                    goto __continue80
+                    goto __continue85
                 end
                 if task["类型"] == "延迟" then
                     ____exports.removeDelayedCallback(task.id)
@@ -472,7 +559,7 @@ _____53EF_53D6_6D88_4EFB_52A1_7EC4_5B9E_73B0.prototype["取消"] = function(self
                 __TS__ArraySplice(self["任务列表"], i, 1)
                 return
             end
-            ::__continue80::
+            ::__continue85::
             i = i - 1
         end
     end

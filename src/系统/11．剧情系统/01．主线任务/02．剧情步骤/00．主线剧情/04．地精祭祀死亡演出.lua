@@ -187,7 +187,7 @@ local function _____64AD_653E_5730_7CBE_62B9_9664_7279_6548()
     })
 end
 local function ____on_5730_7CBE_6B7B_4EA1_6F14_51FA_79FB_52A8_82F1_96C4()
-    local unit = jass:GetEnumUnit()
+    local unit = jass.GetEnumUnit()
     if unit == nil or unit == 0 then
         return
     end

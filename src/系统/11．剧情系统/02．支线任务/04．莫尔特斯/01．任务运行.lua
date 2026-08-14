@@ -43,7 +43,7 @@ function ____on_83AB_5C14_7279_65AF_6B7B_4EA1(_____6B7B_4EA1_5355_4F4D, ______51
     end
     _____6CE8_9500_83AB_5C14_7279_65AF_9760_8FD1_76D1_542C()
     _____6CE8_9500_83AB_5C14_7279_65AF_6B7B_4EA1_76D1_542C()
-    local _____4EFB_52A1ID = tostring(nil, _____83AB_5C14_7279_65AF_4EFB_52A1ID)
+    local _____4EFB_52A1ID = tostring(_____83AB_5C14_7279_65AF_4EFB_52A1ID)
     if questDB:updateObjective(0, _____4EFB_52A1ID, "obj1", 1) then
         _____89E6_53D1_4EFB_52A1UI_5237_65B0(0, _____4EFB_52A1ID)
     end
@@ -241,7 +241,7 @@ ____exports["完成莫尔特斯任务后打开首领奖励"] = function(______4E
         local _____73A9_5BB6ID = 0
         while _____73A9_5BB6ID < _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 do
             local _____73A9_5BB6 = Player(_____73A9_5BB6ID)
-            if _____73A9_5BB6 ~= nil and jass:GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
+            if _____73A9_5BB6 ~= nil and jass.GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
                 _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____83AB_5C14_7279_65AF_5956_52B1_6C60ID, _____73A9_5BB6)
             end
             _____73A9_5BB6ID = _____73A9_5BB6ID + 1

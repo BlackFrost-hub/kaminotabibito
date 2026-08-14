@@ -11,26 +11,17 @@ const { registerOneShotUnitRangeListener } = require("系统.00．核心系统.0
     predicate?: (this: void, enteringUnit: any) => boolean,
   ) => () => void;
 };
-const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩展函数.06．单位状态安全包装") as {
-  暂停并设置无敌安全: (this: void, unit: any, 来源: string) => boolean;
-};
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, unit: any) => boolean;
-};
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
-  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
-};
-const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
-  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
 import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 import { 发送剧情任务消息 } from "../../00．剧情系统核心工具/02．剧情动作桥接";
 import { 注册剧情运行时单位, 读取剧情运行时单位 } from "../../00．剧情系统核心工具/08．剧情运行时单位";
+import { 创建剧情场景单位 } from "../../../00．公共/02．剧情NPC创建";
 export { 克林姆德国王委托剧情片段 } from "../02．第二章/24．克林姆德王接见";
 
-const Player = jass.Player as (this: void, whichPlayer: number) => any;
 const RemoveDestructable = jass.RemoveDestructable as (this: void, whichDestructable: any) => void;
 const PLAYER_NEUTRAL_AGGRESSIVE = jass.PLAYER_NEUTRAL_AGGRESSIVE as number;
 const 巨魔猎头者待战暂停来源 = "剧情系统:巨魔猎头者待战";
@@ -80,17 +71,18 @@ function on巨魔猎头者范围触发(this: void, 触发单位: any): boolean {
 function 执行创建巨魔猎头者入口(this: void): void {
   const 已有单位 = 读取剧情运行时单位("剧情运行时.巨魔猎头者守卫");
   if (已有单位 != null && 已有单位 !== 0) return;
-  const 猎头者类型ID = stringToFourCCSafe("ohun");
-  if (!(猎头者类型ID > 0)) return;
-  const 猎头者 = 创建单位并登记排泄安全(
-    Player(PLAYER_NEUTRAL_AGGRESSIVE),
-    猎头者类型ID,
-    -2910.1,
-    -14065.8,
-    180,
-  );
+  const 猎头者 = 创建剧情场景单位({
+    单位ID: "ohun",
+    X: -2910.1,
+    Y: -14065.8,
+    朝向: 180,
+    玩家ID: PLAYER_NEUTRAL_AGGRESSIVE,
+    登记死亡排泄: true,
+    初始化命令: "stop",
+    初始化无敌: true,
+    初始化暂停来源: 巨魔猎头者待战暂停来源,
+  });
   if (猎头者 == null || 猎头者 === 0) return;
-  暂停并设置无敌安全(猎头者, 巨魔猎头者待战暂停来源);
   注册剧情运行时单位("剧情运行时.巨魔猎头者守卫", 猎头者);
 
   清理巨魔猎头者范围监听();

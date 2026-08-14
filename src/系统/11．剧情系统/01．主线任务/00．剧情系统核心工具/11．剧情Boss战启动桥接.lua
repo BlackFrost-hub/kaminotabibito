@@ -37,14 +37,14 @@ ____exports["启动剧情Boss战"] = function(bossUnit, _____53C2_6570)
     if not _____5DF2_767B_8BB0_81EA_52A8_6280_80FD then
         _____8BB0_5F55Boss_81EA_52A8_6280_80FD_542F_52A8(bossUnit, "Boss战.绑定单位")
     end
-    if jass:GetUnitName(bossUnit) == "树魔首领" then
+    if jass.GetUnitName(bossUnit) == "树魔首领" then
         debugLogForce(
             "树魔首领-主动施法诊断",
             "剧情开战桥接",
             "hid=",
-            jass:GetHandleId(bossUnit),
+            jass.GetHandleId(bossUnit),
             "typeId=",
-            jass:GetUnitTypeId(bossUnit),
+            jass.GetUnitTypeId(bossUnit),
             "已登记=",
             _____5DF2_767B_8BB0_81EA_52A8_6280_80FD,
             "登记后=",

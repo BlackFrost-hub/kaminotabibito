@@ -15,9 +15,9 @@ function ____exports.CreateImageBJ(file, size, where, zOffset, imageType)
     if where == nil or where == 0 then
         return nil
     end
-    local x = jass:GetLocationX(where)
-    local y = jass:GetLocationY(where)
-    ____exports.bj_lastCreatedImage = jass:CreateImage(
+    local x = jass.GetLocationX(where)
+    local y = jass.GetLocationY(where)
+    ____exports.bj_lastCreatedImage = jass.CreateImage(
         file,
         size,
         size,
@@ -36,7 +36,7 @@ function ____exports.ShowImageBJ(flag, whichImage)
     if whichImage == nil or whichImage == 0 then
         return
     end
-    jass:ShowImage(whichImage, flag)
+    jass.ShowImage(whichImage, flag)
 end
 function ____exports.SetImagePositionBJ(whichImage, where, zOffset)
     if whichImage == nil or whichImage == 0 then
@@ -45,15 +45,15 @@ function ____exports.SetImagePositionBJ(whichImage, where, zOffset)
     if where == nil or where == 0 then
         return
     end
-    local x = jass:GetLocationX(where)
-    local y = jass:GetLocationY(where)
-    jass:SetImagePosition(whichImage, x, y, zOffset)
+    local x = jass.GetLocationX(where)
+    local y = jass.GetLocationY(where)
+    jass.SetImagePosition(whichImage, x, y, zOffset)
 end
 function ____exports.SetImageColorBJ(whichImage, red, green, blue, alpha)
     if whichImage == nil or whichImage == 0 then
         return
     end
-    jass:SetImageColor(
+    jass.SetImageColor(
         whichImage,
         PercentTo255(red),
         PercentTo255(green),

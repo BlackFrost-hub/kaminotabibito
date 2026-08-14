@@ -5,8 +5,8 @@ const jglobals = require("jass.globals") as any;
 
 const { 创建可取消任务组 } = require("系统.00．核心系统.05．中心计时器") as {
   创建可取消任务组: (this: void) => {
-    添加延迟: (this: void, 毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any) => number;
-    清空: (this: void) => void;
+    添加延迟: (this: any, 毫秒: number, 回调: (this: void, variable?: any) => void, 变量?: any) => number;
+    清空: (this: any) => void;
   };
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe, YDWEAngleBetweenUnitsSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {

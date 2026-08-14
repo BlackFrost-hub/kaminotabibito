@@ -72,7 +72,7 @@ local function _____88C1_526A_5230_5B57_8282(value)
     if value >= 255 then
         return 255
     end
-    return jass:R2I(value)
+    return jass.R2I(value)
 end
 local function _____79FB_9664_8FDB_5EA6_6761_7279_6548(_____8FDB_5EA6_6761_7279_6548)
     if _____8FDB_5EA6_6761_7279_6548 == nil or _____8FDB_5EA6_6761_7279_6548 == 0 then

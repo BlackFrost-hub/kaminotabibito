@@ -18,3 +18,5 @@ export * from "./19．可抢占独占状态";
 export * from "./20．联合战斗成员生命周期";
 export * from "./21．不同技能序列状态";
 export * from "./22．限次周期执行器";
+export * from "./23．Boss施法时间线";
+export * from "./24．非死亡Boss收束时间线";

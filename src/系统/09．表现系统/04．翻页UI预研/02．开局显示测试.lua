@@ -53,11 +53,11 @@ local PAGE_EVENT_MOUSE_CLICK = 1
 local PAGE_EVENT_MOUSE_ENTER = 2
 local PAGE_EVENT_MOUSE_LEAVE = 3
 local function isLocalRenderTargetPlayer(self)
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if not localPlayer or localPlayer == 0 then
         return false
     end
-    return jass:GetPlayerId(localPlayer) == pageFlipTargetPlayerId
+    return jass.GetPlayerId(localPlayer) == pageFlipTargetPlayerId
 end
 local function showFrameLocal(self, frame, visible)
     if not frame or frame == 0 then
@@ -66,13 +66,13 @@ local function showFrameLocal(self, frame, visible)
     if not isLocalRenderTargetPlayer(nil) then
         return
     end
-    japi:DzFrameShow(frame, visible)
+    japi.DzFrameShow(frame, visible)
 end
 local function showIndicatorLocal(self, visible)
     if not pageIndicatorFrame or pageIndicatorFrame == 0 then
         return
     end
-    japi:DzFrameShow(pageIndicatorFrame, visible)
+    japi.DzFrameShow(pageIndicatorFrame, visible)
 end
 local function hideAllFlipFramesLocal(self)
     do
@@ -87,7 +87,7 @@ local function stopPageFlipTimer(self)
     if not pageFlipTimer or pageFlipTimer == 0 then
         return
     end
-    jass:PauseTimer(pageFlipTimer)
+    jass.PauseTimer(pageFlipTimer)
 end
 local function getPageBodyText(self, pageIndex)
     return PAGE_BODY_TEXTS[pageIndex + 1] or PAGE_BODY_TEXTS[1]
@@ -99,7 +99,7 @@ local function applyCurrentPageBodyTextLocal(self)
     if not isLocalRenderTargetPlayer(nil) then
         return
     end
-    japi:DzFrameSetText(
+    japi.DzFrameSetText(
         pageBodyTextFrame,
         getPageBodyText(nil, pageBodyTextPageIndex)
     )
@@ -135,7 +135,7 @@ local function startPageFlipForPlayer(self, player)
         return
     end
     pageFlipAnimating = true
-    pageFlipTargetPlayerId = jass:GetPlayerId(player)
+    pageFlipTargetPlayerId = jass.GetPlayerId(player)
     pageBodyTextPendingPageIndex = pageBodyTextPageIndex == 0 and 1 or 0
     hideAllFlipFramesLocal(nil)
     showIndicatorLocal(nil, false)
@@ -146,18 +146,18 @@ local function startPageFlipForPlayer(self, player)
         pageFlipAnimating = false
         return
     end
-    jass:TimerStart(pageFlipTimer, PAGE_TEST_FLIP_DURATION / frameCount, true, onPageFlipTimerTick)
+    jass.TimerStart(pageFlipTimer, PAGE_TEST_FLIP_DURATION / frameCount, true, onPageFlipTimerTick)
 end
 local function ensurePageFlipTimer(self)
     if pageFlipTimer and pageFlipTimer ~= 0 then
         return
     end
-    pageFlipTimer = jass:CreateTimer()
+    pageFlipTimer = jass.CreateTimer()
 end
 local function onPageHotspotEnter(self)
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if localPlayer and localPlayer ~= 0 then
-        pageFlipTargetPlayerId = jass:GetPlayerId(localPlayer)
+        pageFlipTargetPlayerId = jass.GetPlayerId(localPlayer)
     end
     if not pageFlipAnimating and #pageFlipFrames > 0 then
         hideAllFlipFramesLocal(nil)
@@ -166,9 +166,9 @@ local function onPageHotspotEnter(self)
     showIndicatorLocal(nil, true)
 end
 local function onPageHotspotLeave(self)
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if localPlayer and localPlayer ~= 0 then
-        pageFlipTargetPlayerId = jass:GetPlayerId(localPlayer)
+        pageFlipTargetPlayerId = jass.GetPlayerId(localPlayer)
     end
     if not pageFlipAnimating then
         hideAllFlipFramesLocal(nil)
@@ -176,18 +176,18 @@ local function onPageHotspotLeave(self)
     showIndicatorLocal(nil, false)
 end
 local function onPageHotspotClick(self)
-    local player = jass:GetLocalPlayer()
+    local player = jass.GetLocalPlayer()
     if not player or player == 0 then
         return
     end
     startPageFlipForPlayer(nil, player)
 end
 local function createSizedBackdropFrame(self, name, texture, priority)
-    local parent = japi:DzGetGameUI()
+    local parent = japi.DzGetGameUI()
     if not parent or parent == 0 then
         return nil
     end
-    local frame = japi:DzCreateFrameByTagName(
+    local frame = japi.DzCreateFrameByTagName(
         "BACKDROP",
         name,
         parent,
@@ -197,10 +197,10 @@ local function createSizedBackdropFrame(self, name, texture, priority)
     if not frame or frame == 0 then
         return nil
     end
-    japi:DzFrameSetSize(frame, PAGE_TEST_WIDTH, PAGE_TEST_HEIGHT)
-    japi:DzFrameSetAbsolutePoint(frame, 4, PAGE_TEST_CENTER_X, PAGE_TEST_CENTER_Y)
-    japi:DzFrameSetTexture(frame, texture, 0)
-    japi:DzFrameSetPriority(frame, priority)
+    japi.DzFrameSetSize(frame, PAGE_TEST_WIDTH, PAGE_TEST_HEIGHT)
+    japi.DzFrameSetAbsolutePoint(frame, 4, PAGE_TEST_CENTER_X, PAGE_TEST_CENTER_Y)
+    japi.DzFrameSetTexture(frame, texture, 0)
+    japi.DzFrameSetPriority(frame, priority)
     return frame
 end
 local function createPageBaseFrame(self)
@@ -211,7 +211,7 @@ local function createPageIndicatorFrame(self)
     if not frame or frame == 0 then
         return nil
     end
-    japi:DzFrameShow(frame, false)
+    japi.DzFrameShow(frame, false)
     return frame
 end
 local function createPageFlipFrames(self)
@@ -229,7 +229,7 @@ local function createPageFlipFrames(self)
                 if not frame or frame == 0 then
                     goto __continue45
                 end
-                japi:DzFrameShow(frame, false)
+                japi.DzFrameShow(frame, false)
                 frames[#frames + 1] = frame
             end
             ::__continue45::
@@ -239,14 +239,14 @@ local function createPageFlipFrames(self)
     return frames
 end
 local function createPageHotspotFrame(self)
-    local parent = japi:DzGetGameUI()
+    local parent = japi.DzGetGameUI()
     if not parent or parent == 0 then
         return nil
     end
     if not pageBaseFrame or pageBaseFrame == 0 then
         return nil
     end
-    local frame = japi:DzCreateFrameByTagName(
+    local frame = japi.DzCreateFrameByTagName(
         "GLUETEXTBUTTON",
         "PageFlipUiResearchHotspot",
         parent,
@@ -256,8 +256,8 @@ local function createPageHotspotFrame(self)
     if not frame or frame == 0 then
         return nil
     end
-    japi:DzFrameSetSize(frame, PAGE_TEST_HOTSPOT_WIDTH, PAGE_TEST_HOTSPOT_HEIGHT)
-    japi:DzFrameSetPoint(
+    japi.DzFrameSetSize(frame, PAGE_TEST_HOTSPOT_WIDTH, PAGE_TEST_HOTSPOT_HEIGHT)
+    japi.DzFrameSetPoint(
         frame,
         8,
         pageBaseFrame,
@@ -265,17 +265,17 @@ local function createPageHotspotFrame(self)
         0,
         0
     )
-    japi:DzFrameSetText(frame, "")
-    japi:DzFrameSetAlpha(frame, 0)
-    japi:DzFrameSetPriority(frame, PAGE_HOTSPOT_PRIORITY)
+    japi.DzFrameSetText(frame, "")
+    japi.DzFrameSetAlpha(frame, 0)
+    japi.DzFrameSetPriority(frame, PAGE_HOTSPOT_PRIORITY)
     return frame
 end
 local function createPageHotspotHintFrame(self, hotspotFrame)
-    local parent = japi:DzGetGameUI()
+    local parent = japi.DzGetGameUI()
     if not parent or parent == 0 then
         return nil
     end
-    local hintFrame = japi:DzCreateFrameByTagName(
+    local hintFrame = japi.DzCreateFrameByTagName(
         "TEXT",
         "PageFlipUiResearchHotspotHint",
         parent,
@@ -283,8 +283,8 @@ local function createPageHotspotHintFrame(self, hotspotFrame)
         0
     )
     if hintFrame and hintFrame ~= 0 then
-        japi:DzFrameSetSize(hintFrame, PAGE_TEST_HOTSPOT_WIDTH, PAGE_TEST_HOTSPOT_HEIGHT)
-        japi:DzFrameSetPoint(
+        japi.DzFrameSetSize(hintFrame, PAGE_TEST_HOTSPOT_WIDTH, PAGE_TEST_HOTSPOT_HEIGHT)
+        japi.DzFrameSetPoint(
             hintFrame,
             4,
             hotspotFrame,
@@ -292,25 +292,25 @@ local function createPageHotspotHintFrame(self, hotspotFrame)
             PAGE_HOTSPOT_HINT_OFFSET_X,
             PAGE_HOTSPOT_HINT_OFFSET_Y
         )
-        japi:DzFrameSetTextAlignment(hintFrame, -1)
-        japi:DzFrameSetTextAlignment(hintFrame, 18)
-        japi:DzFrameSetTextColor(
+        japi.DzFrameSetTextAlignment(hintFrame, -1)
+        japi.DzFrameSetTextAlignment(hintFrame, 18)
+        japi.DzFrameSetTextColor(
             hintFrame,
             PAGE_HOTSPOT_HINT_COLOR_R,
             PAGE_HOTSPOT_HINT_COLOR_G,
             PAGE_HOTSPOT_HINT_COLOR_B,
             PAGE_HOTSPOT_HINT_COLOR_A
         )
-        japi:DzFrameSetPriority(hintFrame, PAGE_HOTSPOT_PRIORITY - 1)
+        japi.DzFrameSetPriority(hintFrame, PAGE_HOTSPOT_PRIORITY - 1)
     end
     return hintFrame
 end
 local function createPageBodyTextFrame(self, baseFrame)
-    local parent = japi:DzGetGameUI()
+    local parent = japi.DzGetGameUI()
     if not parent or parent == 0 then
         return nil
     end
-    local textFrame = japi:DzCreateFrameByTagName(
+    local textFrame = japi.DzCreateFrameByTagName(
         "TEXT",
         "PageFlipUiResearchBodyText",
         parent,
@@ -320,8 +320,8 @@ local function createPageBodyTextFrame(self, baseFrame)
     if not textFrame or textFrame == 0 then
         return nil
     end
-    japi:DzFrameSetSize(textFrame, PAGE_BODY_TEXT_WIDTH, PAGE_BODY_TEXT_HEIGHT)
-    japi:DzFrameSetPoint(
+    japi.DzFrameSetSize(textFrame, PAGE_BODY_TEXT_WIDTH, PAGE_BODY_TEXT_HEIGHT)
+    japi.DzFrameSetPoint(
         textFrame,
         0,
         baseFrame,
@@ -329,17 +329,17 @@ local function createPageBodyTextFrame(self, baseFrame)
         PAGE_BODY_TEXT_OFFSET_X,
         PAGE_BODY_TEXT_OFFSET_Y
     )
-    japi:DzFrameSetTextAlignment(textFrame, -1)
-    japi:DzFrameSetTextAlignment(textFrame, 0)
-    japi:DzFrameSetFont(textFrame, PAGE_BODY_TEXT_FONT, PAGE_BODY_TEXT_FONT_SIZE, 0)
-    japi:DzFrameSetTextColor(
+    japi.DzFrameSetTextAlignment(textFrame, -1)
+    japi.DzFrameSetTextAlignment(textFrame, 0)
+    japi.DzFrameSetFont(textFrame, PAGE_BODY_TEXT_FONT, PAGE_BODY_TEXT_FONT_SIZE, 0)
+    japi.DzFrameSetTextColor(
         textFrame,
         80,
         48,
         24,
         255
     )
-    japi:DzFrameSetPriority(textFrame, PAGE_BODY_TEXT_PRIORITY)
+    japi.DzFrameSetPriority(textFrame, PAGE_BODY_TEXT_PRIORITY)
     return textFrame
 end
 local function bindPageHotspotEvents(self, frame)
@@ -369,19 +369,19 @@ function ____exports.initPageFlipUiResearchTest(self)
         pageHotspotHintTextFrame = createPageHotspotHintFrame(nil, pageHotspotFrame)
         bindPageHotspotEvents(nil, pageHotspotFrame)
     end
-    local localPlayer = jass:GetLocalPlayer()
+    local localPlayer = jass.GetLocalPlayer()
     if localPlayer and localPlayer ~= 0 then
-        japi:DzFrameShow(pageBaseFrame, false)
+        japi.DzFrameShow(pageBaseFrame, false)
         if pageHotspotFrame and pageHotspotFrame ~= 0 then
-            japi:DzFrameShow(pageHotspotFrame, false)
+            japi.DzFrameShow(pageHotspotFrame, false)
         end
         if pageBodyTextFrame and pageBodyTextFrame ~= 0 then
-            japi:DzFrameShow(pageBodyTextFrame, false)
+            japi.DzFrameShow(pageBodyTextFrame, false)
         end
         applyCurrentPageBodyTextLocal(nil)
         if pageHotspotHintTextFrame and pageHotspotHintTextFrame ~= 0 then
-            japi:DzFrameSetText(pageHotspotHintTextFrame, PAGE_HOTSPOT_HINT_TEXT)
-            japi:DzFrameShow(pageHotspotHintTextFrame, false)
+            japi.DzFrameSetText(pageHotspotHintTextFrame, PAGE_HOTSPOT_HINT_TEXT)
+            japi.DzFrameShow(pageHotspotHintTextFrame, false)
         end
     end
 end

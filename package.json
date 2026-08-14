@@ -8,6 +8,7 @@
     "build:files": "node scripts/build-files.js",
     "build:lua": "tstl",
     "fix:pack": "node scripts/fix-lua-for-pack.js",
+    "fix:map-jass-utf8": "node scripts/fix-map-jass-utf8.js",
     "check:boss-sfx-mono": "node scripts/check-boss-sfx-mono.js",
     "fix:boss-sfx-mono": "node scripts/check-boss-sfx-mono.js --fix"
   },

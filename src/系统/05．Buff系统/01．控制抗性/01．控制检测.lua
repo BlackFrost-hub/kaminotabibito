@@ -15,7 +15,7 @@ local ____require_result_2 = require("系统.05．Buff系统.01．控制抗性.0
 local EXCLUDED_UNIT_TYPES = ____require_result_2.EXCLUDED_UNIT_TYPES
 --- 检查单位是否被排除
 function ____exports.isExcludedFromControlResist(self, unit)
-    local unitTypeId = jass:GetUnitTypeId(unit)
+    local unitTypeId = jass.GetUnitTypeId(unit)
     return __TS__ArraySome(
         EXCLUDED_UNIT_TYPES,
         function(____, id) return stringToFourCC(id) == unitTypeId end
@@ -51,15 +51,15 @@ local PARALYSIS_ORDER_ID = 852252
 -- 
 -- 条件：当前命令为stop或麻痹状态
 function ____exports.isUnitControlled(self, unit)
-    local currentOrder = jass:GetUnitCurrentOrder(unit)
+    local currentOrder = jass.GetUnitCurrentOrder(unit)
     if currentOrder == STOP_ORDER_ID then
         return true
     end
     if currentOrder == PARALYSIS_ORDER_ID then
         return true
     end
-    local issuedOrder = jass:GetIssuedOrderId()
-    if jass:OrderId2String(issuedOrder) == "stop" then
+    local issuedOrder = jass.GetIssuedOrderId()
+    if jass.OrderId2String(issuedOrder) == "stop" then
         return true
     end
     return false

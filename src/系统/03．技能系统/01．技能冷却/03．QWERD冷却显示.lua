@@ -79,10 +79,10 @@ local function formatCooldown(cooldown)
     if not (cooldown > 0.05) then
         return ""
     end
-    local tenth = jass:R2I(cooldown * 10 + 0.5)
-    local sec = jass:R2I(tenth / 10)
+    local tenth = jass.R2I(cooldown * 10 + 0.5)
+    local sec = jass.R2I(tenth / 10)
     local decimal = tenth - sec * 10
-    return (tostring(jass:I2S(sec)) .. ".") .. tostring(jass:I2S(decimal))
+    return (tostring(jass.I2S(sec)) .. ".") .. tostring(jass.I2S(decimal))
 end
 local function _____6784_5EFA_663E_793A_6587_672C(hotkey, abilityId, cooldown)
     local cdText = formatCooldown(cooldown)

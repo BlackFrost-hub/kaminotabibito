@@ -60,4 +60,7 @@ Desktop.ini
 /_codex_blender_preview
 /_mcp_scripts
 /scripts
+!/scripts/
+/scripts/*
+!/scripts/fix-map-jass-utf8.js
 /map
