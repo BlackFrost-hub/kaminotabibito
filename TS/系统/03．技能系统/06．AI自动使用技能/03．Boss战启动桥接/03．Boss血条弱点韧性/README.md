@@ -5,6 +5,7 @@
 `08．对外接口.ts` 当前提供：
 
 - `设置Boss血条头像(Boss单位, 头像贴图路径)`：修改活动 Boss 的血条头像；传入空字符串恢复单位物编 `Art` 默认头像。Boss 运行状态尚未建立或已经结束时返回 `false`。
+- `调查Boss弱点(Boss单位, 来源单位?)`：同步显现活动 Boss 当前配置顺序中的第一个未显现弱点，并削减 1 点护盾。不会伪造伤害，也不会触发普通弱点击中的伤害加成、单弱点保护冷却或命中特效；返回 `Boss弱点调查结果`，调用方应根据 `成功` 和 `原因` 决定后续技能表现。
 
 ```typescript
 const { 设置Boss血条头像 } = require(
@@ -15,6 +16,19 @@ const { 设置Boss血条头像 } = require(
 
 设置Boss血条头像(Boss单位, "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp");
 ```
+
+```typescript
+const { 调查Boss弱点 } = require(
+  "系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.03．Boss血条弱点韧性.08．对外接口",
+) as {
+  调查Boss弱点: (this: void, Boss单位: any, 来源单位?: any) => Boss弱点调查结果;
+};
+
+const result = 调查Boss弱点(Boss单位, 施法者);
+// result.原因: 成功 / Boss状态不存在 / 弱点机制未启用 / ...
+```
+
+`调查Boss弱点()` 必须从同步游戏逻辑调用，不能放在 `GetLocalPlayer()` 分支。接口内部会校验 Boss 状态、弱点 UI 和伤害结算是否完成注册；Boss 处于破盾状态或已经没有未显现弱点时返回失败，不修改其他真实游戏数据。
 
 ## 多 Boss 血条
 

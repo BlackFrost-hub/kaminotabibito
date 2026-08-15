@@ -8,6 +8,7 @@ local registerSkillLearnListener = ____require_result_0.registerSkillLearnListen
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
 local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_1["调整玩家属性"]
 local _____8C03_6574_5355_4F4D_5C5E_6027 = ____require_result_1["调整单位属性"]
+local _____4E34_65F6_8C03_6574_62A4_7532 = ____require_result_1["临时调整护甲"]
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
 local _____5DF2_521D_59CB_5316 = false
@@ -38,6 +39,16 @@ local function _____5E94_7528_6210_957F_5C5E_6027(unit, attr, _____7B49_7EA7_589
         ____cond5 = ____cond5 or ____switch5 == "来源治疗率"
         if ____cond5 then
             _____8C03_6574_5355_4F4D_5C5E_6027(unit, attr["属性名"] or "治疗率", amount)
+            return
+        end
+        ____cond5 = ____cond5 or ____switch5 == "护甲"
+        if ____cond5 then
+            _____4E34_65F6_8C03_6574_62A4_7532(unit, amount)
+            return
+        end
+        ____cond5 = ____cond5 or ____switch5 == "单位属性"
+        if ____cond5 then
+            _____8C03_6574_5355_4F4D_5C5E_6027(unit, attr["属性名"], amount)
             return
         end
         ____cond5 = ____cond5 or ____switch5 == "玩家属性"

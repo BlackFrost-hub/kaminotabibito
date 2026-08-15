@@ -49,6 +49,7 @@ export interface DamageModifierContext {
   isIndependentSkillDamage?: boolean;
   isSingleTargetSkillDamage?: boolean;
   isAoeSkillDamage?: boolean;
+  忽略魔法抗性?: boolean;
   isDamageTransfer?: boolean;
 }
 

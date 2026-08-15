@@ -228,6 +228,7 @@ local function captureDamageTypeSnapshot()
         isIndependentSkillDamage = (skillContext and skillContext.isIndependentSkillDamage) == true,
         isSingleTargetSkillDamage = (skillContext and skillContext.isSingleTargetSkillDamage) == true,
         isAoeSkillDamage = (skillContext and skillContext.isAoeSkillDamage) == true,
+        ["忽略魔法抗性"] = (skillContext and skillContext["忽略魔法抗性"]) == true,
         isDamageTransfer = (skillContext and skillContext.isDamageTransfer) == true,
         isMetalDamage = _____4F24_5BB3_51FD_6570.isMetalDamage(),
         isWoodDamage = _____4F24_5BB3_51FD_6570.isWoodDamage(),
@@ -242,36 +243,36 @@ local function _____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3(source, target, amou
     if source == nil or source == 0 or target == nil or target == 0 or request == nil or request.damageType == nil or not (amount > 0) then
         return
     end
-    local ____array_42 = __TS__SparseArrayNew(source, target, amount)
-    local ____temp_38
-    if request.attack ~= nil then
-        ____temp_38 = request.attack
-    else
-        ____temp_38 = defaultAttack
-    end
-    __TS__SparseArrayPush(____array_42, ____temp_38)
-    local ____temp_39
-    if request.ranged ~= nil then
-        ____temp_39 = request.ranged
-    else
-        ____temp_39 = defaultRanged
-    end
-    __TS__SparseArrayPush(____array_42, ____temp_39)
+    local ____array_44 = __TS__SparseArrayNew(source, target, amount)
     local ____temp_40
-    if request.attackType ~= nil then
-        ____temp_40 = request.attackType
+    if request.attack ~= nil then
+        ____temp_40 = request.attack
     else
-        ____temp_40 = defaultAttackType
+        ____temp_40 = defaultAttack
     end
-    __TS__SparseArrayPush(____array_42, ____temp_40, request.damageType)
+    __TS__SparseArrayPush(____array_44, ____temp_40)
     local ____temp_41
-    if request.weaponType ~= nil then
-        ____temp_41 = request.weaponType
+    if request.ranged ~= nil then
+        ____temp_41 = request.ranged
     else
-        ____temp_41 = defaultWeaponType
+        ____temp_41 = defaultRanged
     end
-    __TS__SparseArrayPush(____array_42, ____temp_41)
-    UnitDamageTarget(__TS__SparseArraySpread(____array_42))
+    __TS__SparseArrayPush(____array_44, ____temp_41)
+    local ____temp_42
+    if request.attackType ~= nil then
+        ____temp_42 = request.attackType
+    else
+        ____temp_42 = defaultAttackType
+    end
+    __TS__SparseArrayPush(____array_44, ____temp_42, request.damageType)
+    local ____temp_43
+    if request.weaponType ~= nil then
+        ____temp_43 = request.weaponType
+    else
+        ____temp_43 = defaultWeaponType
+    end
+    __TS__SparseArrayPush(____array_44, ____temp_43)
+    UnitDamageTarget(__TS__SparseArraySpread(____array_44))
 end
 --- 检查是否免疫伤害
 local function checkImmune(target, isNormalAtk)
@@ -291,13 +292,13 @@ end
 -- @returns 伤害计算结果
 function ____exports.calculateDamage(target, attacker, baseDamage, originalAttacker, damageSnapshot)
     local damage = baseDamage
-    local ____temp_43
+    local ____temp_45
     if originalAttacker ~= nil and originalAttacker ~= 0 then
-        ____temp_43 = originalAttacker
+        ____temp_45 = originalAttacker
     else
-        ____temp_43 = attacker
+        ____temp_45 = attacker
     end
-    local rawAttacker = ____temp_43
+    local rawAttacker = ____temp_45
     local snapshot = damageSnapshot or captureDamageTypeSnapshot()
     local isPlayer = isPlayerUnit(nil, target)
     local isNormalAtk = snapshot.isNormalAttack
@@ -362,6 +363,7 @@ function ____exports.calculateDamage(target, attacker, baseDamage, originalAttac
         isIndependentSkillDamage = snapshot.isIndependentSkillDamage,
         isSingleTargetSkillDamage = snapshot.isSingleTargetSkillDamage,
         isAoeSkillDamage = snapshot.isAoeSkillDamage,
+        ["忽略魔法抗性"] = snapshot["忽略魔法抗性"],
         isDamageTransfer = snapshot.isDamageTransfer
     }
     damage = applyDamageBaseModifiers(baseContext)
@@ -390,7 +392,7 @@ function ____exports.calculateDamage(target, attacker, baseDamage, originalAttac
     if isPhysDmg then
         damage = applyArmorPenetration(nil, damage, target, attacker)
     end
-    if isMagicDmg and not isPhysDmg and not isEnhanceDmg then
+    if isMagicDmg and not isPhysDmg and not isEnhanceDmg and not snapshot["忽略魔法抗性"] then
         damage = applyMagicResist(nil, damage, target, attacker)
     end
     local dmgReductionPct = getRealAttr(nil, target, "伤害减少%", 0)
@@ -515,15 +517,15 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
     applyDamageTypeConversions(conversionContext)
     if conversionContext.reapplyDamage ~= nil then
         _____4F24_5BB3_51FD_6570.YDWESetEventDamage(0)
-        local ____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3_51 = _____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3
-        local ____temp_50
+        local ____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3_53 = _____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3
+        local ____temp_52
         if originalAttacker ~= nil and originalAttacker ~= 0 then
-            ____temp_50 = originalAttacker
+            ____temp_52 = originalAttacker
         else
-            ____temp_50 = attacker
+            ____temp_52 = attacker
         end
-        ____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3_51(
-            ____temp_50,
+        ____91CD_65B0_63D0_4EA4_8F6C_6362_4F24_5BB3_53(
+            ____temp_52,
             target,
             baseDamage,
             conversionContext.reapplyDamage,
@@ -616,6 +618,7 @@ function ____exports.onDamageEvent(target, attacker, baseDamage)
             isIndependentSkillDamage = snapshot.isIndependentSkillDamage,
             isSingleTargetSkillDamage = snapshot.isSingleTargetSkillDamage,
             isAoeSkillDamage = snapshot.isAoeSkillDamage,
+            ["忽略魔法抗性"] = snapshot["忽略魔法抗性"],
             isDamageTransfer = snapshot.isDamageTransfer
         })
     end

@@ -75,6 +75,8 @@ export interface 技能伤害参数 {
   标签?: string;
   伤害形态?: 技能伤害形态;
   参与技能伤害加成?: boolean;
+  /** 仅用于明确声明的机制，例如圆神状态；默认仍计算魔法抗性。 */
+  忽略魔法抗性?: boolean;
   isDamageTransfer?: boolean;
 }
 
@@ -129,6 +131,7 @@ export interface 技能伤害上下文 {
   isSingleTargetSkillDamage: boolean;
   isAoeSkillDamage: boolean;
   participatesInSkillDamageBonus: boolean;
+  忽略魔法抗性: boolean;
   isDamageTransfer: boolean;
 }
 
@@ -284,6 +287,7 @@ function 创建技能伤害上下文(this: void, 参数: 技能伤害上下文�
     isSingleTargetSkillDamage: damageShape === "单体",
     isAoeSkillDamage: damageShape === "AOE",
     participatesInSkillDamageBonus: 参数.参与技能伤害加成 !== false,
+    忽略魔法抗性: 参数.忽略魔法抗性 === true,
     isDamageTransfer: 参数.isDamageTransfer === true,
   };
 }

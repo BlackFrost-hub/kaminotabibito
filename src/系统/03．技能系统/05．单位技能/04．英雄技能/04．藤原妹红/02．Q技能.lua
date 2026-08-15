@@ -3,6 +3,8 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.04．藤原妹红.00．配置")
 local _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["藤原妹红单位技能配置"]
+local ____04_FF0E_85E4_539F_59B9_7EA2 = require("系统.05．Buff系统.03．Buff表.02．英雄.04．藤原妹红")
+local _____85E4_539F_59B9_7EA2BuffID = ____04_FF0E_85E4_539F_59B9_7EA2["藤原妹红BuffID"]
 local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.04．藤原妹红.00A．表现工具")
 local _____64AD_653E_85E4_539F_59B9_7EA2_5355_4F4D_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放藤原妹红单位音效"]
 local _____64AD_653E_85E4_539F_59B9_7EA2_914D_7F6E_52A8_4F5C = ____00A_FF0E_8868_73B0_5DE5_5177["播放藤原妹红配置动作"]
@@ -40,8 +42,11 @@ local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWESetUnitAbilityStateSafe = ____require_result_7.YDWESetUnitAbilityStateSafe
 local ____require_result_8 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_8.registerDeathListener
-local ____require_result_9 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local SetUnitVertexColorBJ = ____require_result_9.SetUnitVertexColorBJ
+local ____require_result_9 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_9.registerManualBuff
+local getBuffRuntime = ____require_result_9.getBuffRuntime
+local ____require_result_10 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local SetUnitVertexColorBJ = ____require_result_10.SetUnitVertexColorBJ
 local stringToFourCCSafe = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版").stringToFourCCSafe
 local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local _____666E_901AQ_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["普通Q技能ID"])
@@ -56,7 +61,11 @@ local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
+local GetUnitDefaultFlyHeight = jass.GetUnitDefaultFlyHeight
 local SetUnitFacing = jass.SetUnitFacing
+local SetUnitX = jass.SetUnitX
+local SetUnitY = jass.SetUnitY
+local SetUnitFlyHeight = jass.SetUnitFlyHeight
 local SetUnitPathing = jass.SetUnitPathing
 local SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable
 local UnitAddAbility = jass.UnitAddAbility
@@ -77,6 +86,7 @@ local RACE_DEMON = jass.RACE_DEMON
 local DEG_TO_RAD = 0.017453292519943295
 local _____666E_901AQ_4E0A_4E0B_6587_8868 = {}
 local _____7B26_5361Q_4E0A_4E0B_6587_8868 = {}
+local _____4E0B_4E00_4E2A_7B26_5361Q_707C_70E7_5B9E_4F8BID = 1
 local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
     if unit == nil or unit == 0 then
         return 0
@@ -115,6 +125,72 @@ local function _____666E_901AQ_79FB_52A8_8868_73B0Tick(variable)
     _____66F4_65B0_85E4_539F_59B9_7EA2_79FB_52A8_7279_6548(context["凤凰特效"], x, y)
     _____521B_5EFA_85E4_539F_59B9_7EA2_70B9_7279_6548(cfg["移动特效"], x, y)
 end
+local function _____666E_901AQ_643A_5E26_5355_4F4DTick(variable)
+    local context = variable
+    if context == nil or not _____5355_4F4D_5B58_6D3B(context["施法者"]) then
+        return
+    end
+    local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["普通Q"]
+    context["携带单位已移动秒"] = context["携带单位已移动秒"] + cfg["携带单位更新间隔毫秒"] * 0.001
+    if context["携带单位已移动秒"] <= cfg["携带单位抬升阶段秒"] then
+        context["携带单位飞行高度"] = context["携带单位飞行高度"] + cfg["携带单位高度增量"]
+    elseif context["携带单位飞行高度"] > 0 then
+        context["携带单位飞行高度"] = context["携带单位飞行高度"] - cfg["携带单位高度增量"]
+        if context["携带单位飞行高度"] < 0 then
+            context["携带单位飞行高度"] = 0
+        end
+    end
+    local x = GetUnitX(context["施法者"])
+    local y = GetUnitY(context["施法者"])
+    do
+        local i = 0
+        while i < #context["命中单位列表"] do
+            do
+                local target = context["命中单位列表"][i + 1]
+                if not _____5355_4F4D_5B58_6D3B(target) then
+                    goto __continue16
+                end
+                SetUnitX(target, x)
+                SetUnitY(target, y)
+                SetUnitFlyHeight(target, context["携带单位飞行高度"], 0)
+            end
+            ::__continue16::
+            i = i + 1
+        end
+    end
+end
+local function _____6062_590D_666E_901AQ_643A_5E26_5355_4F4D(context)
+    if context["携带单位回调ID"] ~= 0 then
+        removePeriodicCallback(context["携带单位回调ID"])
+        context["携带单位回调ID"] = 0
+    end
+    local casterAlive = _____5355_4F4D_5B58_6D3B(context["施法者"])
+    local x = casterAlive and GetUnitX(context["施法者"]) or 0
+    local y = casterAlive and GetUnitY(context["施法者"]) or 0
+    do
+        local i = 0
+        while i < #context["命中单位列表"] do
+            do
+                local target = context["命中单位列表"][i + 1]
+                if not _____5355_4F4D_5B58_6D3B(target) then
+                    goto __continue21
+                end
+                if casterAlive then
+                    SetUnitX(target, x)
+                    SetUnitY(target, y)
+                end
+                SetUnitPathing(target, true)
+                SetUnitFlyHeight(
+                    target,
+                    GetUnitDefaultFlyHeight(target),
+                    0
+                )
+            end
+            ::__continue21::
+            i = i + 1
+        end
+    end
+end
 local function _____666E_901AQ_547D_4E2D_8FC7_6EE4(_movingUnit, target, _moveId)
     return _____5355_4F4D_5B58_6D3B(target) and IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true and IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and IsUnitType(target, UNIT_TYPE_STRUCTURE) ~= true
 end
@@ -123,8 +199,8 @@ local function _____666E_901AQ_547D_4E2D(caster, target, _moveId)
     if context == nil or not _____666E_901AQ_547D_4E2D_8FC7_6EE4(caster, target, _moveId) then
         return
     end
-    local ____context__547D_4E2D_5355_4F4D_5217_8868_10 = context["命中单位列表"]
-    ____context__547D_4E2D_5355_4F4D_5217_8868_10[#____context__547D_4E2D_5355_4F4D_5217_8868_10 + 1] = target
+    local ____context__547D_4E2D_5355_4F4D_5217_8868_11 = context["命中单位列表"]
+    ____context__547D_4E2D_5355_4F4D_5217_8868_11[#____context__547D_4E2D_5355_4F4D_5217_8868_11 + 1] = target
     _____65BD_52A0_7729_6655(
         caster,
         target,
@@ -161,6 +237,7 @@ local function _____5904_7406_666E_901AQ_51B2_950B_7ED3_675F(caster, reason, mov
     if context == nil or context["位移ID"] ~= moveId then
         return
     end
+    _____6062_590D_666E_901AQ_643A_5E26_5355_4F4D(context)
     __TS__Delete(_____666E_901AQ_4E0A_4E0B_6587_8868, handleId)
     if context["移动表现回调ID"] ~= 0 then
         removePeriodicCallback(context["移动表现回调ID"])
@@ -220,6 +297,9 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_666E_901AQ(_context, caster, s
         ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) + _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D(caster) * cfg["命中伤害最大生命倍率"],
         ["命中单位列表"] = {},
         ["移动表现回调ID"] = 0,
+        ["携带单位回调ID"] = 0,
+        ["携带单位已移动秒"] = 0,
+        ["携带单位飞行高度"] = 0,
         ["位移ID"] = 0,
         ["技能实例ID"] = skillInstanceId
     }
@@ -236,6 +316,7 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_666E_901AQ(_context, caster, s
     _____666E_901AQ_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(caster)] = context
     _____521B_5EFA_85E4_539F_59B9_7EA2_70B9_7279_6548(cfg["移动特效"], startX, startY)
     context["移动表现回调ID"] = addPeriodicCallback(cfg["移动特效"]["触发间隔秒"] * 1000, _____666E_901AQ_79FB_52A8_8868_73B0Tick, context)
+    context["携带单位回调ID"] = addPeriodicCallback(cfg["携带单位更新间隔毫秒"], _____666E_901AQ_643A_5E26_5355_4F4DTick, context)
     context["位移ID"] = _____5F00_59CB_51B2_950B(caster, {
         ["角度"] = direction,
         ["距离"] = cfg["最大移动距离"],
@@ -359,8 +440,8 @@ local function _____8BB0_5F55_7B26_5361Q_76EE_6807(context, target)
         return false
     end
     context["灼烧单位表"][targetId] = true
-    local ____context__707C_70E7_5355_4F4D_5217_8868_11 = context["灼烧单位列表"]
-    ____context__707C_70E7_5355_4F4D_5217_8868_11[#____context__707C_70E7_5355_4F4D_5217_8868_11 + 1] = target
+    local ____context__707C_70E7_5355_4F4D_5217_8868_12 = context["灼烧单位列表"]
+    ____context__707C_70E7_5355_4F4D_5217_8868_12[#____context__707C_70E7_5355_4F4D_5217_8868_12 + 1] = target
     return true
 end
 local function _____51C6_5907_7B26_5361Q_9996_6B21_4F24_5BB3(target, _index, variable)
@@ -382,6 +463,10 @@ local function _____51C6_5907_7B26_5361Q_707C_70E7_4F24_5BB3(target, _index, var
     if context == nil or not _____7B26_5361Q_547D_4E2D_8FC7_6EE4(target, context["施法者"]) then
         return nil
     end
+    local burnBuff = getBuffRuntime(target, _____85E4_539F_59B9_7EA2BuffID["符卡Q灼烧"])
+    if burnBuff == nil or burnBuff.effect2 ~= context["灼烧实例ID"] then
+        return nil
+    end
     local effects = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡Q"]["灼烧命中特效"]
     do
         local i = 0
@@ -398,6 +483,31 @@ local function _____51C6_5907_7B26_5361Q_707C_70E7_4F24_5BB3(target, _index, var
         attackType = ATTACK_TYPE_NORMAL,
         weaponType = WEAPON_TYPE_WHOKNOWS
     }
+end
+local function _____767B_8BB0_7B26_5361Q_707C_70E7Buff(context)
+    local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡Q"]
+    local _____6301_7EED_79D2 = cfg["灼烧间隔秒"] * cfg["灼烧次数"] + cfg["灼烧Buff额外宽限秒"]
+    local _____6BCF_8DF3_4F24_5BB3 = context["伤害"] * cfg["灼烧伤害攻击力倍率"]
+    do
+        local i = 0
+        while i < #context["灼烧单位列表"] do
+            do
+                local target = context["灼烧单位列表"][i + 1]
+                if not _____7B26_5361Q_547D_4E2D_8FC7_6EE4(target, context["施法者"]) then
+                    goto __continue60
+                end
+                registerManualBuff(
+                    target,
+                    _____85E4_539F_59B9_7EA2BuffID["符卡Q灼烧"],
+                    _____6301_7EED_79D2,
+                    _____6BCF_8DF3_4F24_5BB3,
+                    {sourceName = "藤原妹红-符卡Q", effectSourceName = "符卡Q灼烧", effectSourceType = "技能", effectValue2 = context["灼烧实例ID"]}
+                )
+            end
+            ::__continue60::
+            i = i + 1
+        end
+    end
 end
 local function _____7B26_5361Q_707C_70E7Tick(variable)
     local context = variable
@@ -464,6 +574,7 @@ local function _____7B26_5361Q_79FB_52A8Tick(variable)
         end
         context["移动回调ID"] = 0
         if #context["灼烧单位列表"] > 0 then
+            _____767B_8BB0_7B26_5361Q_707C_70E7Buff(context)
             context["灼烧回调ID"] = addPeriodicCallback(cfg["灼烧间隔秒"] * 1000, _____7B26_5361Q_707C_70E7Tick, context)
         else
             __TS__Delete(
@@ -556,8 +667,10 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361Q(_context, caster, s
         ["灼烧次数"] = 0,
         ["灼烧单位表"] = {},
         ["灼烧单位列表"] = {},
+        ["灼烧实例ID"] = _____4E0B_4E00_4E2A_7B26_5361Q_707C_70E7_5B9E_4F8BID,
         ["技能实例ID"] = skillInstanceId
     }
+    _____4E0B_4E00_4E2A_7B26_5361Q_707C_70E7_5B9E_4F8BID = _____4E0B_4E00_4E2A_7B26_5361Q_707C_70E7_5B9E_4F8BID + 1
     _____7B26_5361Q_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(caster)] = context
     addDelayedCallback(cfg["启动延迟秒"] * 1000, _____5F00_59CB_7B26_5361Q_79FB_52A8, context)
 end
@@ -565,6 +678,7 @@ local function _____85E4_539F_59B9_7EA2Q_5355_4F4D_6B7B_4EA1(dyingUnit, _killing
     local unitId = _____53D6_5355_4F4D_53E5_67C4ID(dyingUnit)
     local normalContext = _____666E_901AQ_4E0A_4E0B_6587_8868[unitId]
     if normalContext ~= nil then
+        _____6062_590D_666E_901AQ_643A_5E26_5355_4F4D(normalContext)
         if normalContext["移动表现回调ID"] ~= 0 then
             removePeriodicCallback(normalContext["移动表现回调ID"])
         end

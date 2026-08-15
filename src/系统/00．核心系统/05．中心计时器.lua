@@ -217,8 +217,10 @@ local function executeCurrentPeriodicCallback()
     end
 end
 local function executeCurrentDelayedCallback()
-    if _currentDelayedCallback ~= nil then
-        _currentDelayedCallback(_currentDelayedVariable)
+    local callback = _currentDelayedCallback
+    local variable = _currentDelayedVariable
+    if callback ~= nil then
+        callback(variable)
     end
 end
 local function getTimerCallbackModule(prefix, callback)

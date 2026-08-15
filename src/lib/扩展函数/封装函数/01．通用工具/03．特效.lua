@@ -740,7 +740,7 @@ local function _____786E_4FDD_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
     end
     _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_56DE_8C03ID = addPeriodicCallback(_____5355_4F4D_5750_6807_8DDF_968F_7279_6548_95F4_9694_6BEB_79D2, ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick)
 end
-____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effectKey, scale, height, animSpeed, _____52A8_753B_7D22_5F15)
+____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effectKey, scale, height, animSpeed, _____52A8_753B_7D22_5F15, _____9762_5411_5F27_5EA6)
     if effectKey == nil then
         effectKey = "default"
     end
@@ -749,6 +749,9 @@ ____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effect
     end
     if height == nil then
         height = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_9ED8_8BA4_9AD8_5EA6
+    end
+    if _____9762_5411_5F27_5EA6 == nil then
+        _____9762_5411_5F27_5EA6 = 0
     end
     if not _____5355_4F4D_53EF_5750_6807_8DDF_968F(unit) or modelPath == "" then
         return nil
@@ -768,7 +771,7 @@ ____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effect
         x,
         y,
         height,
-        0,
+        _____9762_5411_5F27_5EA6,
         scale,
         animSpeed or 1,
         -1

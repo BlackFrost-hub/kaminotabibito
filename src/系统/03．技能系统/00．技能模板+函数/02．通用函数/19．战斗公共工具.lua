@@ -59,6 +59,12 @@ ____exports["读取单位攻击力"] = function(unit)
     end
     return __TS__Number(GetUnitStateJapi(unit, UNIT_STATE_ATTACK)) or 0
 end
+____exports["读取单位敏捷"] = function(unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    return __TS__Number(jass.GetHeroAgi(unit, true)) or 0
+end
 ____exports["读取单位最大生命"] = function(unit)
     if unit == nil or unit == 0 then
         return 0

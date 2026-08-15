@@ -11,6 +11,12 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
+const { removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  removeDelayedCallback: (this: void, id: number) => void;
+};
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
+  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
+};
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
@@ -57,6 +63,32 @@ const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any
 
 interface 蕾米莉亚D上下文 {
   施法者: any;
+  中段回调ID: number;
+  结算阶段回调ID: number;
+  结果回调ID: number;
+}
+
+const D上下文表: Record<number, 蕾米莉亚D上下文 | undefined> = {};
+
+function 取单位句柄ID(this: void, unit: any): number {
+  return unit == null || unit === 0 ? 0 : (jass.GetHandleId(unit) || 0);
+}
+
+function 清理蕾米莉亚D上下文(this: void, context: 蕾米莉亚D上下文): void {
+  if (context.中段回调ID !== 0) {
+    removeDelayedCallback(context.中段回调ID);
+    context.中段回调ID = 0;
+  }
+  if (context.结算阶段回调ID !== 0) {
+    removeDelayedCallback(context.结算阶段回调ID);
+    context.结算阶段回调ID = 0;
+  }
+  if (context.结果回调ID !== 0) {
+    removeDelayedCallback(context.结果回调ID);
+    context.结果回调ID = 0;
+  }
+  const unitId = 取单位句柄ID(context.施法者);
+  if (unitId !== 0 && D上下文表[unitId] === context) delete D上下文表[unitId];
 }
 
 function 调整英雄力量(this: void, hero: any, delta: number): void {
@@ -95,17 +127,24 @@ function 恢复生命魔法(this: void, caster: any): void {
 
 function 结算蕾米莉亚D结果(this: void, variable?: any): void {
   const context = variable as 蕾米莉亚D上下文 | undefined;
-  if (context == null || !单位存活(context.施法者)) return;
+  if (context == null) return;
+  context.结果回调ID = 0;
+  if (!单位存活(context.施法者)) {
+    清理蕾米莉亚D上下文(context);
+    return;
+  }
   const caster = context.施法者;
   const result = GetRandomInt(1, 100);
   if (result <= 25) {
     const delta = R2I(GetHeroStr(caster, true) * D配置.力量变化比例);
     施加临时力量结果(caster, delta, 蕾米莉亚BuffID.绯色命运增益, D配置.结果语音.增益);
+    清理蕾米莉亚D上下文(context);
     return;
   }
   if (result <= 50) {
     const delta = -R2I(GetHeroStr(caster, true) * D配置.力量变化比例);
     施加临时力量结果(caster, delta, 蕾米莉亚BuffID.绯色命运减益, D配置.结果语音.减益);
+    清理蕾米莉亚D上下文(context);
     return;
   }
   if (result <= 70) {
@@ -113,15 +152,18 @@ function 结算蕾米莉亚D结果(this: void, variable?: any): void {
     恢复生命魔法(caster);
     刷新技能冷却(caster, 蕾米莉亚单位技能配置.Q.技能ID);
     刷新技能冷却(caster, 蕾米莉亚单位技能配置.E.技能ID);
+    清理蕾米莉亚D上下文(context);
     return;
   }
   if (result <= 85) {
     Sound3DII_UnitPlayReuse(D配置.结果语音.永久增益, caster, 2000);
     调整英雄力量(caster, D配置.永久力量增减);
+    清理蕾米莉亚D上下文(context);
     return;
   }
   if (result <= 95) {
     调整英雄力量(caster, -D配置.永久力量增减);
+    清理蕾米莉亚D上下文(context);
     return;
   }
   SetUnitInvulnerable(caster, false);
@@ -139,28 +181,54 @@ function 结算蕾米莉亚D结果(this: void, variable?: any): void {
     标签: "蕾米莉亚-绯色命运",
     参与技能伤害加成: true,
   });
+  清理蕾米莉亚D上下文(context);
 }
 
 function 蕾米莉亚D结算阶段(this: void, variable?: any): void {
   const context = variable as 蕾米莉亚D上下文 | undefined;
-  if (context == null || !单位存活(context.施法者)) return;
+  if (context == null) return;
+  context.结算阶段回调ID = 0;
+  if (!单位存活(context.施法者)) {
+    清理蕾米莉亚D上下文(context);
+    return;
+  }
   Sound3DII_UnitPlayReuse(D配置.结算语音.路径, context.施法者, D配置.结算语音.裁断距离);
-  addDelayedCallback(D配置.随机延迟秒 * 1000, 结算蕾米莉亚D结果, context);
+  context.结果回调ID = addDelayedCallback(D配置.随机延迟秒 * 1000, 结算蕾米莉亚D结果, context);
 }
 
 function 蕾米莉亚D中段(this: void, variable?: any): void {
   const context = variable as 蕾米莉亚D上下文 | undefined;
-  if (context == null || !单位存活(context.施法者)) return;
+  if (context == null) return;
+  context.中段回调ID = 0;
+  if (!单位存活(context.施法者)) {
+    清理蕾米莉亚D上下文(context);
+    return;
+  }
   Sound3DII_UnitPlayReuse(D配置.中段语音.路径, context.施法者, D配置.中段语音.裁断距离);
-  addDelayedCallback(D配置.结算延迟秒 * 1000, 蕾米莉亚D结算阶段, context);
+  context.结算阶段回调ID = addDelayedCallback(D配置.结算延迟秒 * 1000, 蕾米莉亚D结算阶段, context);
 }
 
 function 处理蕾米莉亚D(this: void, caster: any, abilityId: number): void {
   if (abilityId !== D技能ID || GetUnitTypeId(caster) !== 单位类型ID || !单位存活(caster)) return;
+  const unitId = 取单位句柄ID(caster);
+  if (unitId === 0 || D上下文表[unitId] != null) return;
+  const context = {
+    施法者: caster,
+    中段回调ID: 0,
+    结算阶段回调ID: 0,
+    结果回调ID: 0,
+  } as 蕾米莉亚D上下文;
+  D上下文表[unitId] = context;
   Sound3DII_UnitPlayReuse(D配置.启动语音.路径, caster, D配置.启动语音.裁断距离);
-  addDelayedCallback(D配置.中段延迟秒 * 1000, 蕾米莉亚D中段, { 施法者: caster } as 蕾米莉亚D上下文);
+  context.中段回调ID = addDelayedCallback(D配置.中段延迟秒 * 1000, 蕾米莉亚D中段, context);
+}
+
+function 蕾米莉亚D单位死亡(this: void, dyingUnit: any, _killingUnit: any): void {
+  const context = D上下文表[取单位句柄ID(dyingUnit)];
+  if (context != null) 清理蕾米莉亚D上下文(context);
 }
 
 registerSpellEffectListener(处理蕾米莉亚D);
+registerDeathListener(蕾米莉亚D单位死亡);
 
 export {};

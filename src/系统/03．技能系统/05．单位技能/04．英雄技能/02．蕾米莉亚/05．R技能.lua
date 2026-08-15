@@ -29,8 +29,8 @@ local ____require_result_7 = require("系统.03．技能系统.00．技能模板
 local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
 local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____require_result_7["读取单位最大生命"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.03．对外接口")
-local _____5F00_59CB_8DF3_8DC3 = ____require_result_8["开始跳跃"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.02．原地击飞系统")
+local _____5F00_59CB_539F_5730_51FB_98DE = ____require_result_8["开始原地击飞"]
 local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
 local createTimedUnitEffect = ____require_result_9.createTimedUnitEffect
@@ -75,7 +75,6 @@ local SetUnitTimeScale = jass.SetUnitTimeScale
 local SetUnitAnimation = jass.SetUnitAnimation
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-local GetRandomReal = jass.GetRandomReal
 local _____4E0A_4E0B_6587_8868 = {}
 local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
     return (unit == nil or unit == 0) and 0 or (GetHandleId(unit) or 0)
@@ -126,14 +125,22 @@ local function ____R_64AD_653E_5468_671F_8868_73B0(caster)
         X = x,
         Y = y,
         ["缩放"] = field["缩放"],
-        ["持续秒"] = field["持续秒"]
+        ["持续秒"] = field["持续秒"],
+        ["红"] = field["红"],
+        ["绿"] = field["绿"],
+        ["蓝"] = field["蓝"],
+        ["透明度"] = field["透明度"]
     })
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = blink["模型路径"],
         X = x,
         Y = y,
         ["缩放"] = blink["缩放"],
-        ["持续秒"] = blink["持续秒"]
+        ["持续秒"] = blink["持续秒"],
+        ["红"] = blink["红"],
+        ["绿"] = blink["绿"],
+        ["蓝"] = blink["蓝"],
+        ["透明度"] = blink["透明度"]
     })
 end
 local function _____5904_7406R_76EE_6807(target, _index, variable)
@@ -142,20 +149,15 @@ local function _____5904_7406R_76EE_6807(target, _index, variable)
         return nil
     end
     _____5F00_59CB_786C_76F4(target, ____R_914D_7F6E["敌人暂停秒"])
-    _____5F00_59CB_8DF3_8DC3(
-        target,
-        {
-            ["角度"] = GetRandomReal(0, 360),
-            ["距离"] = ____R_914D_7F6E["击飞距离"],
-            ["持续时间"] = ____R_914D_7F6E["击飞持续秒"],
-            ["跳跃高度"] = GetRandomReal(____R_914D_7F6E["击飞高度最小"], ____R_914D_7F6E["击飞高度最大"]),
-            ["暂停单位"] = false,
-            ["主单位"] = data["上下文"]["施法者"],
-            ["主单位死亡时中断"] = true,
-            ["检查地形"] = true,
-            ["禁用碰撞"] = true
-        }
-    )
+    _____5F00_59CB_539F_5730_51FB_98DE(target, {
+        ["持续时间"] = ____R_914D_7F6E["击飞持续秒"],
+        ["最小高度"] = ____R_914D_7F6E["击飞高度最小"],
+        ["最大高度"] = ____R_914D_7F6E["击飞高度最大"],
+        ["暂停单位"] = false,
+        ["主单位"] = data["上下文"]["施法者"],
+        ["主单位死亡时中断"] = true,
+        ["中断已有跳跃"] = true
+    })
     local hit = ____R_914D_7F6E["命中特效"]
     createTimedUnitEffect(target, hit["挂点"], hit["模型路径"], hit["持续秒"])
     return {

@@ -7,6 +7,15 @@ const jass = require("jass.common") as any;
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, params: any) => void;
 };
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { 立即移除单位并注销排泄监听 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并注销排泄监听: (this: void, unit: any) => void;
+};
+const { SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.index") as {
+  SelectUnitForPlayerSingle: (this: void, unit: any, player: any) => void;
+};
 const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
@@ -20,12 +29,12 @@ const { 暂停并设置无敌安全, 解除暂停并取消无敌安全 } = requi
   暂停并设置无敌安全: (this: void, unit: any, source: string) => boolean;
   解除暂停并取消无敌安全: (this: void, unit: any, source: string) => boolean;
 };
-const { 获取范围敌军, 单位存活, 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
+const { 获取范围敌军, 读取单位攻击力 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   获取范围敌军: (this: void, source: any, x: number, y: number, radius: number) => any[];
-  单位存活: (this: void, unit: any) => boolean;
   读取单位攻击力: (this: void, unit: any) => number;
 };
-const { 读取单位最大生命 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 单位存活, 读取单位最大生命 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  单位存活: (this: void, unit: any) => boolean;
   读取单位最大生命: (this: void, unit: any) => number;
 };
 const { 造成批量AOE技能伤害, 创建独立技能伤害实例, 结束独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -63,6 +72,11 @@ const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
+const SetUnitX = jass.SetUnitX as (this: void, unit: any, x: number) => void;
+const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
 const ShowUnit = jass.ShowUnit as (this: void, unit: any, show: boolean) => void;
@@ -71,6 +85,8 @@ const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => 
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE as any;
+const 替身单位类型ID = stringToFourCCSafe(E配置.替身单位ID ?? "e08O");
+const 替身技能ID = stringToFourCCSafe(E配置.替身技能ID ?? "A0LG");
 
 interface 蕾米莉亚E上下文 {
   施法者: any;
@@ -82,6 +98,7 @@ interface 蕾米莉亚E上下文 {
   已启动: boolean;
   已暂停: boolean;
   目标属性记录: Record<number, boolean>;
+  替身?: any;
 }
 
 const 上下文表: Record<number, 蕾米莉亚E上下文 | undefined> = {};
@@ -89,6 +106,12 @@ let 死亡监听已注册 = false;
 
 function 取单位句柄ID(this: void, unit: any): number {
   return unit == null || unit === 0 ? 0 : GetHandleId(unit) || 0;
+}
+
+const 血雾替身本体表: Record<number, any> = {};
+
+export function 获取血雾本体(this: void, unit: any): any {
+  return 血雾替身本体表[取单位句柄ID(unit)];
 }
 
 function 获取或创建E上下文(this: void, unit: any): 蕾米莉亚E上下文 | undefined {
@@ -158,8 +181,8 @@ function 清理E上下文(this: void, context: 蕾米莉亚E上下文): void {
     context.周期回调ID = 0;
   }
   if (context.已启动) {
-    销毁单位坐标跟随特效(context.施法者, E配置.表现.血雾.特效键);
-    移除单位指定Buff(context.施法者, 蕾米莉亚BuffID.血雾形态);
+    const buffTarget = context.替身 != null && context.替身 !== 0 ? context.替身 : context.施法者;
+    移除单位指定Buff(buffTarget, 蕾米莉亚BuffID.血雾形态);
     ShowUnit(context.施法者, true);
     const maxLife = 读取单位最大生命(context.施法者);
     const life = jass.GetUnitState(context.施法者, jass.UNIT_STATE_LIFE) || 0;
@@ -170,6 +193,12 @@ function 清理E上下文(this: void, context: 蕾米莉亚E上下文): void {
     }
     context.已启动 = false;
   }
+  if (context.替身 != null && context.替身 !== 0) {
+    delete 血雾替身本体表[取单位句柄ID(context.替身)];
+    立即移除单位并注销排泄监听(context.替身);
+    context.替身 = undefined;
+  }
+  SelectUnitForPlayerSingle(context.施法者, GetOwningPlayer(context.施法者));
   if (context.已暂停) {
     解除暂停并取消无敌安全(context.施法者, E配置.暂停来源 ?? "蕾米莉亚-E-血雾形态");
     context.已暂停 = false;
@@ -192,12 +221,15 @@ function 蕾米莉亚E周期Tick(this: void, variable?: any): void {
   if (E配置.周期语音?.路径 != null && E配置.周期语音.路径 !== "") {
     Sound3DII_UnitPlayReuse(E配置.周期语音.路径, context.施法者, E配置.周期语音.裁断距离);
   }
-  创建点特效({ 模型路径: E配置.表现.周期爆炸.模型路径, X: GetUnitX(context.施法者), Y: GetUnitY(context.施法者), 缩放: E配置.表现.周期爆炸.缩放, 持续秒: E配置.表现.周期爆炸.持续秒 });
-  创建点特效({ 模型路径: E配置.表现.周期血雾.模型路径, X: GetUnitX(context.施法者), Y: GetUnitY(context.施法者), 缩放: E配置.表现.周期血雾.缩放, 持续秒: E配置.表现.周期血雾.持续秒 });
+  const center = context.替身 != null && context.替身 !== 0 ? context.替身 : context.施法者;
+  SetUnitX(context.施法者, GetUnitX(center));
+  SetUnitY(context.施法者, GetUnitY(center));
+  创建点特效({ 模型路径: E配置.表现.周期爆炸.模型路径, X: GetUnitX(center), Y: GetUnitY(center), Z轴角度: 270, 缩放: E配置.表现.周期爆炸.缩放, 持续秒: E配置.表现.周期爆炸.持续秒 });
+  创建点特效({ 模型路径: E配置.表现.周期血雾.模型路径, X: GetUnitX(center), Y: GetUnitY(center), Z轴角度: 270, 缩放: E配置.表现.周期血雾.缩放, 持续秒: E配置.表现.周期血雾.持续秒 });
   context.周期次数 += 1;
   造成批量AOE技能伤害({
     来源: context.施法者,
-    目标列表: 获取范围敌军(context.施法者, GetUnitX(context.施法者), GetUnitY(context.施法者), E配置.伤害范围 ?? 600),
+    目标列表: 获取范围敌军(context.施法者, GetUnitX(center), GetUnitY(center), E配置.伤害范围 ?? 600),
     来源类型: "单位技能",
     技能ID: E技能ID,
     技能实例ID: context.技能实例ID,
@@ -217,12 +249,24 @@ function 蕾米莉亚E延迟启动(this: void, variable?: any): void {
     return;
   }
   context.已启动 = true;
+  context.替身 = 创建单位并登记排泄安全(
+    GetOwningPlayer(context.施法者),
+    替身单位类型ID,
+    GetUnitX(context.施法者),
+    GetUnitY(context.施法者),
+    GetUnitFacing(context.施法者),
+  );
+  if (context.替身 != null && context.替身 !== 0) {
+    UnitAddAbility(context.替身, 替身技能ID);
+    血雾替身本体表[取单位句柄ID(context.替身)] = context.施法者;
+    SelectUnitForPlayerSingle(context.替身, GetOwningPlayer(context.施法者));
+  }
   ShowUnit(context.施法者, false);
   if (E配置.启动语音?.路径 != null && E配置.启动语音.路径 !== "") {
     Sound3DII_UnitPlayReuse(E配置.启动语音.路径, context.施法者, E配置.启动语音.裁断距离);
   }
-  创建单位坐标跟随特效(context.施法者, E配置.表现.血雾.模型路径, E配置.表现.血雾.特效键, E配置.表现.血雾.缩放, E配置.表现.跟随高度);
-  registerManualBuff(context.施法者, 蕾米莉亚BuffID.血雾形态, (E配置.持续次数 ?? 10) * (E配置.周期间隔毫秒 ?? 300) / 1000 + 0.3, 1, { sourceName: "蕾米莉亚-E-血雾形态" });
+  const buffTarget = context.替身 != null && context.替身 !== 0 ? context.替身 : context.施法者;
+  registerManualBuff(buffTarget, 蕾米莉亚BuffID.血雾形态, (E配置.持续次数 ?? 10) * (E配置.周期间隔毫秒 ?? 300) / 1000 + 0.3, 1, { sourceName: "蕾米莉亚-E-血雾形态" });
   context.周期回调ID = addPeriodicCallback(E配置.周期间隔毫秒 ?? 300, 蕾米莉亚E周期Tick, context);
 }
 

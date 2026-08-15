@@ -16,18 +16,17 @@ const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePe
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
-const { 执行战斗自身传送到坐标 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制") as {
-  执行战斗自身传送到坐标: (this: void, unit: any, x: number, y: number) => boolean;
+const { 开始冲锋, 停止位移 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口") as {
+  开始冲锋: (this: void, unit: any, params: any) => number;
+  停止位移: (this: void, id: number, reason?: string) => boolean;
 };
 const { 获取范围敌军 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   获取范围敌军: (this: void, source: any, x: number, y: number, radius: number) => any[];
 };
-const { 单位存活, 读取单位攻击力, 两点角度, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 单位存活, 读取单位攻击力, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
   读取单位攻击力: (this: void, unit: any) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
-  极坐标X: (this: void, x: number, angle: number, distance: number) => number;
-  极坐标Y: (this: void, y: number, angle: number, distance: number) => number;
 };
 const { 造成批量AOE技能伤害, 创建独立技能伤害实例, 结束独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成批量AOE技能伤害: (this: void, params: any) => number;
@@ -36,7 +35,7 @@ const { 造成批量AOE技能伤害, 创建独立技能伤害实例, 结束独�
 };
 const { createTimedUnitEffect, 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
-  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number) => any;
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
 };
 const { 调整玩家属性 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令") as {
@@ -78,6 +77,7 @@ interface 蕾米莉亚A0KR上下文 {
   伤害: number;
   周期回调ID: number;
   收尾回调ID: number;
+  位移ID: number;
   周期次数: number;
   已命中: Record<number, true>;
   已启动: boolean;
@@ -106,6 +106,7 @@ function 获取或创建A0KR上下文(this: void, unit: any): 蕾米莉亚A0KR�
     伤害: 0,
     周期回调ID: 0,
     收尾回调ID: 0,
+    位移ID: 0,
     周期次数: 0,
     已命中: {},
     已启动: false,
@@ -194,6 +195,10 @@ function A0KR收尾(this: void, variable?: any): void {
 }
 
 function 清理A0KR上下文(this: void, context: 蕾米莉亚A0KR上下文): void {
+  if (context.位移ID !== 0) {
+    停止位移(context.位移ID, "中断");
+    context.位移ID = 0;
+  }
   if (context.周期回调ID !== 0) {
     removePeriodicCallback(context.周期回调ID);
     context.周期回调ID = 0;
@@ -230,9 +235,6 @@ function A0KR周期Tick(this: void, variable?: any): void {
     return;
   }
   context.周期次数 += 1;
-  const nextX = 极坐标X(GetUnitX(context.施法者), context.方向角, A0KR配置.速度);
-  const nextY = 极坐标Y(GetUnitY(context.施法者), context.方向角, A0KR配置.速度);
-  执行战斗自身传送到坐标(context.施法者, nextX, nextY);
   const targets = 获取范围敌军(context.施法者, GetUnitX(context.施法者), GetUnitY(context.施法者), A0KR配置.命中范围);
   造成批量AOE技能伤害({
     来源: context.施法者,
@@ -260,9 +262,31 @@ function 释放蕾米莉亚A0KR(this: void, caster: any): void {
   context.已启动 = true;
   for (let i = 0; i < A0KR配置.表现.length; i++) {
     const effect = A0KR配置.表现[i];
-    创建单位坐标跟随特效(caster, effect.模型路径, effect.特效键, effect.缩放, A0KR配置.初始高度);
+    const 特效角度 = context.方向角 + (A0KR配置.特效朝向偏移 ?? 0);
+    // EXEffectMatRotateZ 的项目封装参数使用角度制；两点角度() 已经返回角度制。
+    创建单位坐标跟随特效(caster, effect.模型路径, effect.特效键, effect.缩放, A0KR配置.初始高度, undefined, undefined, 特效角度);
   }
   context.周期回调ID = addPeriodicCallback(A0KR配置.周期间隔毫秒, A0KR周期Tick, context);
+  const 持续时间 = A0KR配置.周期间隔毫秒 * A0KR配置.持续次数 / 1000;
+  context.位移ID = 开始冲锋(caster, {
+    角度: context.方向角,
+    距离: A0KR配置.速度 * A0KR配置.持续次数,
+    每秒速度: A0KR配置.速度 / (A0KR配置.周期间隔毫秒 / 1000),
+    持续时间,
+    检查地形: true,
+    暂停单位: false,
+    禁用碰撞: true,
+    朝向跟随位移: true,
+    结束回调: (_unit: any, _reason: string) => {
+      context.位移ID = 0;
+      if (context.周期回调ID !== 0) {
+        removePeriodicCallback(context.周期回调ID);
+        context.周期回调ID = 0;
+      }
+      if (context.收尾回调ID === 0) context.收尾回调ID = addDelayedCallback(150, A0KR收尾, context);
+    },
+  });
+  if (context.位移ID === 0) 清理A0KR上下文(context);
 }
 
 function 处理蕾米莉亚A0KR(this: void, caster: any, abilityId: number): void {

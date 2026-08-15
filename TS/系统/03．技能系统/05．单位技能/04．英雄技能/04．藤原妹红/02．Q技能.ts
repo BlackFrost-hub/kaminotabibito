@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 藤原妹红单位技能配置 } from "./00．配置";
+import { 藤原妹红BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/04．藤原妹红";
 import {
   播放藤原妹红单位音效,
   播放藤原妹红配置动作,
@@ -48,6 +49,10 @@ const { YDWESetUnitAbilityStateSafe } = require("lib.扩展函数.YDWE函数.09�
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+const { registerManualBuff, getBuffRuntime } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+  getBuffRuntime: (this: void, target: any, buffID: string) => { effect2?: number } | null;
+};
 const { SetUnitVertexColorBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
   SetUnitVertexColorBJ: (this: void, unit: any, red: number, green: number, blue: number, transparency: number) => void;
 };
@@ -67,7 +72,11 @@ const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
+const GetUnitDefaultFlyHeight = jass.GetUnitDefaultFlyHeight as (this: void, unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
+const SetUnitX = jass.SetUnitX as (this: void, unit: any, x: number) => void;
+const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
+const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, unit: any, height: number, rate: number) => void;
 const SetUnitPathing = jass.SetUnitPathing as (this: void, unit: any, enabled: boolean) => void;
 const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
 const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
@@ -93,6 +102,9 @@ interface 普通Q运行时上下文 {
   命中单位列表: any[];
   凤凰特效?: 藤原妹红移动特效;
   移动表现回调ID: number;
+  携带单位回调ID: number;
+  携带单位已移动秒: number;
+  携带单位飞行高度: number;
   位移ID: number;
   技能实例ID?: number;
 }
@@ -110,11 +122,13 @@ interface 符卡Q运行时上下文 {
   灼烧次数: number;
   灼烧单位表: Record<number, true | undefined>;
   灼烧单位列表: any[];
+  灼烧实例ID: number;
   技能实例ID?: number;
 }
 
 const 普通Q上下文表: Record<number, 普通Q运行时上下文 | undefined> = {};
 const 符卡Q上下文表: Record<number, 符卡Q运行时上下文 | undefined> = {};
+let 下一个符卡Q灼烧实例ID = 1;
 
 function 取单位句柄ID(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
@@ -153,6 +167,51 @@ function 普通Q移动表现Tick(this: void, variable?: any): void {
   创建藤原妹红点特效(cfg.移动特效, x, y);
 }
 
+function 普通Q携带单位Tick(this: void, variable?: any): void {
+  const context = variable as 普通Q运行时上下文 | undefined;
+  if (context == null || !单位存活(context.施法者)) return;
+
+  const cfg = 藤原妹红单位技能配置.普通Q;
+  context.携带单位已移动秒 += cfg.携带单位更新间隔毫秒 * 0.001;
+  if (context.携带单位已移动秒 <= cfg.携带单位抬升阶段秒) {
+    context.携带单位飞行高度 += cfg.携带单位高度增量;
+  } else if (context.携带单位飞行高度 > 0) {
+    context.携带单位飞行高度 -= cfg.携带单位高度增量;
+    if (context.携带单位飞行高度 < 0) context.携带单位飞行高度 = 0;
+  }
+
+  const x = GetUnitX(context.施法者);
+  const y = GetUnitY(context.施法者);
+  for (let i = 0; i < context.命中单位列表.length; i++) {
+    const target = context.命中单位列表[i];
+    if (!单位存活(target)) continue;
+    SetUnitX(target, x);
+    SetUnitY(target, y);
+    SetUnitFlyHeight(target, context.携带单位飞行高度, 0);
+  }
+}
+
+function 恢复普通Q携带单位(this: void, context: 普通Q运行时上下文): void {
+  if (context.携带单位回调ID !== 0) {
+    removePeriodicCallback(context.携带单位回调ID);
+    context.携带单位回调ID = 0;
+  }
+
+  const casterAlive = 单位存活(context.施法者);
+  const x = casterAlive ? GetUnitX(context.施法者) : 0;
+  const y = casterAlive ? GetUnitY(context.施法者) : 0;
+  for (let i = 0; i < context.命中单位列表.length; i++) {
+    const target = context.命中单位列表[i];
+    if (!单位存活(target)) continue;
+    if (casterAlive) {
+      SetUnitX(target, x);
+      SetUnitY(target, y);
+    }
+    SetUnitPathing(target, true);
+    SetUnitFlyHeight(target, GetUnitDefaultFlyHeight(target), 0);
+  }
+}
+
 function 普通Q命中过滤(this: void, _movingUnit: any, target: any, _moveId: number): boolean {
   return 单位存活(target)
     && IsUnitType(target, UNIT_TYPE_ANCIENT) !== true
@@ -188,6 +247,7 @@ function 处理普通Q冲锋结束(this: void, caster: any, reason: string, move
   const handleId = 取单位句柄ID(caster);
   const context = 普通Q上下文表[handleId];
   if (context == null || context.位移ID !== moveId) return;
+  恢复普通Q携带单位(context);
   delete 普通Q上下文表[handleId];
   if (context.移动表现回调ID !== 0) removePeriodicCallback(context.移动表现回调ID);
   销毁藤原妹红移动特效(context.凤凰特效);
@@ -235,6 +295,9 @@ function 释放藤原妹红普通Q(this: void, _context: any, caster: any, skill
     伤害: 读取单位攻击力(caster) + 读取单位最大生命(caster) * cfg.命中伤害最大生命倍率,
     命中单位列表: [],
     移动表现回调ID: 0,
+    携带单位回调ID: 0,
+    携带单位已移动秒: 0,
+    携带单位飞行高度: 0,
     位移ID: 0,
     技能实例ID: skillInstanceId,
   };
@@ -245,6 +308,7 @@ function 释放藤原妹红普通Q(this: void, _context: any, caster: any, skill
   普通Q上下文表[取单位句柄ID(caster)] = context;
   创建藤原妹红点特效(cfg.移动特效, startX, startY);
   context.移动表现回调ID = addPeriodicCallback(cfg.移动特效.触发间隔秒 * 1000, 普通Q移动表现Tick, context);
+  context.携带单位回调ID = addPeriodicCallback(cfg.携带单位更新间隔毫秒, 普通Q携带单位Tick, context);
   context.位移ID = 开始冲锋(caster, {
     角度: direction,
     距离: cfg.最大移动距离,
@@ -385,6 +449,8 @@ function 准备符卡Q首次伤害(this: void, target: any, _index: number, vari
 function 准备符卡Q灼烧伤害(this: void, target: any, _index: number, variable?: any): any {
   const context = variable as 符卡Q运行时上下文 | undefined;
   if (context == null || !符卡Q命中过滤(target, context.施法者)) return undefined;
+  const burnBuff = getBuffRuntime(target, 藤原妹红BuffID.符卡Q灼烧);
+  if (burnBuff == null || burnBuff.effect2 !== context.灼烧实例ID) return undefined;
   const effects = 藤原妹红单位技能配置.符卡Q.灼烧命中特效;
   for (let i = 0; i < effects.length; i++) {
     创建藤原妹红单位特效(target, effects[i], effects[i].挂点);
@@ -399,6 +465,22 @@ function 准备符卡Q灼烧伤害(this: void, target: any, _index: number, vari
   };
 }
 
+function 登记符卡Q灼烧Buff(this: void, context: 符卡Q运行时上下文): void {
+  const cfg = 藤原妹红单位技能配置.符卡Q;
+  const 持续秒 = cfg.灼烧间隔秒 * cfg.灼烧次数 + cfg.灼烧Buff额外宽限秒;
+  const 每跳伤害 = context.伤害 * cfg.灼烧伤害攻击力倍率;
+  for (let i = 0; i < context.灼烧单位列表.length; i++) {
+    const target = context.灼烧单位列表[i];
+    if (!符卡Q命中过滤(target, context.施法者)) continue;
+    registerManualBuff(target, 藤原妹红BuffID.符卡Q灼烧, 持续秒, 每跳伤害, {
+      sourceName: "藤原妹红-符卡Q",
+      effectSourceName: "符卡Q灼烧",
+      effectSourceType: "技能",
+      effectValue2: context.灼烧实例ID,
+    });
+  }
+}
+
 function 符卡Q灼烧Tick(this: void, variable?: any): void {
   const context = variable as 符卡Q运行时上下文 | undefined;
   if (context == null) return;
@@ -409,7 +491,7 @@ function 符卡Q灼烧Tick(this: void, variable?: any): void {
     delete 符卡Q上下文表[取单位句柄ID(context.施法者)];
     return;
   }
-  context.灼烧次数 += 1;
+    context.灼烧次数 += 1;
   造成批量AOE技能伤害({
     来源: context.施法者,
     目标列表: context.灼烧单位列表,
@@ -448,6 +530,7 @@ function 符卡Q移动Tick(this: void, variable?: any): void {
     if (context.移动回调ID !== 0) removePeriodicCallback(context.移动回调ID);
     context.移动回调ID = 0;
     if (context.灼烧单位列表.length > 0) {
+      登记符卡Q灼烧Buff(context);
       context.灼烧回调ID = addPeriodicCallback(cfg.灼烧间隔秒 * 1000, 符卡Q灼烧Tick, context);
     } else {
       delete 符卡Q上下文表[取单位句柄ID(context.施法者)];
@@ -524,8 +607,10 @@ function 释放藤原妹红符卡Q(this: void, _context: any, caster: any, skill
     灼烧次数: 0,
     灼烧单位表: {},
     灼烧单位列表: [],
+    灼烧实例ID: 下一个符卡Q灼烧实例ID,
     技能实例ID: skillInstanceId,
   };
+  下一个符卡Q灼烧实例ID += 1;
   符卡Q上下文表[取单位句柄ID(caster)] = context;
   addDelayedCallback(cfg.启动延迟秒 * 1000, 开始符卡Q移动, context);
 }
@@ -534,6 +619,7 @@ function 藤原妹红Q单位死亡(this: void, dyingUnit: any, _killingUnit: any
   const unitId = 取单位句柄ID(dyingUnit);
   const normalContext = 普通Q上下文表[unitId];
   if (normalContext != null) {
+    恢复普通Q携带单位(normalContext);
     if (normalContext.移动表现回调ID !== 0) removePeriodicCallback(normalContext.移动表现回调ID);
     销毁藤原妹红移动特效(normalContext.凤凰特效);
     delete 普通Q上下文表[unitId];

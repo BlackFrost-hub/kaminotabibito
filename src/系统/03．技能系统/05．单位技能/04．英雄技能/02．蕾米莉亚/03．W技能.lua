@@ -106,16 +106,31 @@ end
 local function _____521B_5EFA_8DDF_968F_8868_73B0(context)
     local caster = context["施法者"]
     local color = ____W_914D_7F6E["表现"]["顶点颜色"]
-    local bloodMist = ____W_914D_7F6E["表现"]["血雾"]
+    local judgment = ____W_914D_7F6E["表现"]["审判"]
+    local holyFire = ____W_914D_7F6E["表现"]["圣火"]
     local judgmentEffect = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
         caster,
-        bloodMist["模型路径"],
-        bloodMist["特效键"],
-        bloodMist["缩放"],
+        judgment["模型路径"],
+        judgment["特效键"],
+        judgment["缩放"],
         ____W_914D_7F6E["表现"]["跟随高度"]
     )
     _____8BBE_7F6E_7279_6548_989C_8272(
         judgmentEffect,
+        color["红"],
+        color["绿"],
+        color["蓝"],
+        color["透明度"]
+    )
+    local holyFireEffect = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
+        caster,
+        holyFire["模型路径"],
+        holyFire["特效键"],
+        holyFire["缩放"],
+        ____W_914D_7F6E["表现"]["跟随高度"]
+    )
+    _____8BBE_7F6E_7279_6548_989C_8272(
+        holyFireEffect,
         color["红"],
         color["绿"],
         color["蓝"],
@@ -137,7 +152,8 @@ local function _____6E05_7406W_4E0A_4E0B_6587(context)
         GS_UnitPry(context["施法者"], 1, 13, ____W_914D_7F6E["基础生命值百分比增量"])
         _____8C03_6574_82F1_96C4_57FA_7840_529B_91CF(context["施法者"], -context["增加力量"])
         _____8C03_6574_73A9_5BB6_5C5E_6027(context["施法者"], "百分比生命回复", -____W_914D_7F6E["百分比生命回复增量"])
-        _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(context["施法者"], ____W_914D_7F6E["表现"]["血雾"]["特效键"])
+        _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(context["施法者"], ____W_914D_7F6E["表现"]["审判"]["特效键"])
+        _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(context["施法者"], ____W_914D_7F6E["表现"]["圣火"]["特效键"])
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["施法者"], _____857E_7C73_8389_4E9ABuffID["红符法阵"])
         context["已启动"] = false
     end
@@ -163,21 +179,15 @@ local function _____76EE_6807_5141_8BB8W_4F24_5BB3(target)
     return true
 end
 local function _____521B_5EFAW_5468_671F_7279_6548(caster)
-    local effect = ____W_914D_7F6E["表现"]["周期爆炸"]
+    local effect = ____W_914D_7F6E["表现"]["周期特效"]
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = effect["模型路径"],
         X = GetUnitX(caster),
         Y = GetUnitY(caster),
+        ["Z轴角度"] = effect["Z轴角度"],
         ["缩放"] = effect["缩放"],
+        ["动画速度"] = effect["动画速度"],
         ["持续秒"] = effect["持续秒"]
-    })
-    local bloodMist = ____W_914D_7F6E["表现"]["周期血雾"]
-    _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = bloodMist["模型路径"],
-        X = GetUnitX(caster),
-        Y = GetUnitY(caster),
-        ["缩放"] = bloodMist["缩放"],
-        ["持续秒"] = bloodMist["持续秒"]
     })
 end
 local function _____51C6_5907W_6279_91CF_76EE_6807_4F24_5BB3(target, _index, variable)

@@ -6,9 +6,10 @@ const jass = require("jass.common") as any;
 const { registerSkillLearnListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSkillLearnListener: (this: void, callback: (this: void, unit: any, abilityId: number) => void) => void;
 };
-const { 调整玩家属性, 调整单位属性 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令") as {
+const { 调整玩家属性, 调整单位属性, 临时调整护甲 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令") as {
   调整玩家属性: (this: void, unit: any, attrName: string, delta: number) => void;
   调整单位属性: (this: void, unit: any, attrName: string, delta: number) => void;
+  临时调整护甲: (this: void, 单位: any, 数值: number) => void;
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
@@ -36,6 +37,12 @@ function 应用成长属性(this: void, unit: any, attr: (typeof 英雄技能成
       return;
     case "来源治疗率":
       调整单位属性(unit, attr.属性名 || "治疗率", amount);
+      return;
+    case "护甲":
+      临时调整护甲(unit, amount);
+      return;
+    case "单位属性":
+      调整单位属性(unit, attr.属性名, amount);
       return;
     case "玩家属性":
     default:

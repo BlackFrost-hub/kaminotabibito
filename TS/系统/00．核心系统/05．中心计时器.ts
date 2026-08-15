@@ -202,7 +202,10 @@ function executeCurrentPeriodicCallback(this: void): void {
 }
 
 function executeCurrentDelayedCallback(this: void): void {
-  if (_currentDelayedCallback != null) _currentDelayedCallback(_currentDelayedVariable);
+  // 先复制快照，避免回调重入或异常处理清空全局槽后再调用 nil。
+  const callback = _currentDelayedCallback;
+  const variable = _currentDelayedVariable;
+  if (callback != null) callback(variable);
 }
 
 function getTimerCallbackModule(this: void, prefix: string, callback: any): string {

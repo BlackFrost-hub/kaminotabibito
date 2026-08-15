@@ -34,8 +34,8 @@ const { 单位存活, 读取单位攻击力, 读取单位最大生命 } = requir
   读取单位攻击力: (this: void, unit: any) => number;
   读取单位最大生命: (this: void, unit: any) => number;
 };
-const { 开始跳跃 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.03．对外接口") as {
-  开始跳跃: (this: void, unit: any, params: any) => number;
+const { 开始原地击飞 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.02．原地击飞系统") as {
+  开始原地击飞: (this: void, unit: any, params: any) => number;
 };
 const { 创建点特效, createTimedUnitEffect, 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
@@ -91,7 +91,6 @@ const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale:
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
-const GetRandomReal = jass.GetRandomReal as (this: void, low: number, high: number) => number;
 
 interface 蕾米莉亚R上下文 {
   施法者: any;
@@ -153,24 +152,22 @@ function R播放周期表现(this: void, caster: any): void {
   const y = GetUnitY(caster);
   const field = R配置.周期法阵;
   const blink = R配置.周期闪烁;
-  创建点特效({ 模型路径: field.模型路径, X: x, Y: y, 缩放: field.缩放, 持续秒: field.持续秒 });
-  创建点特效({ 模型路径: blink.模型路径, X: x, Y: y, 缩放: blink.缩放, 持续秒: blink.持续秒 });
+  创建点特效({ 模型路径: field.模型路径, X: x, Y: y, 缩放: field.缩放, 持续秒: field.持续秒, 红: field.红, 绿: field.绿, 蓝: field.蓝, 透明度: field.透明度 });
+  创建点特效({ 模型路径: blink.模型路径, X: x, Y: y, 缩放: blink.缩放, 持续秒: blink.持续秒, 红: blink.红, 绿: blink.绿, 蓝: blink.蓝, 透明度: blink.透明度 });
 }
 
 function 处理R目标(this: void, target: any, _index: number, variable?: any): any {
   const data = variable as R目标处理变量 | undefined;
   if (data == null || !R目标允许(data.上下文.施法者, target)) return undefined;
   开始硬直(target, R配置.敌人暂停秒);
-  开始跳跃(target, {
-    角度: GetRandomReal(0, 360),
-    距离: R配置.击飞距离,
+  开始原地击飞(target, {
     持续时间: R配置.击飞持续秒,
-    跳跃高度: GetRandomReal(R配置.击飞高度最小, R配置.击飞高度最大),
+    最小高度: R配置.击飞高度最小,
+    最大高度: R配置.击飞高度最大,
     暂停单位: false,
     主单位: data.上下文.施法者,
     主单位死亡时中断: true,
-    检查地形: true,
-    禁用碰撞: true,
+    中断已有跳跃: true,
   });
   const hit = R配置.命中特效;
   createTimedUnitEffect(target, hit.挂点, hit.模型路径, hit.持续秒);

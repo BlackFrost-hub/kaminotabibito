@@ -1,0 +1,132 @@
+/** @noSelfInFile */
+
+/**
+ * 阿伦劳特 - 形态与状态管理
+ *
+ * 职责：
+ * - 光（H00F）/暗（H00G）形态判定
+ * - 原生 Buff 挂载/移除（B015 裁决审判、B018 天堂呼唤、B019 裁决制裁、B017 切换加攻），
+ *   供 Q/E/R 以统一方式判定强化状态（E 文件直接读 B015/B018）
+ * - 通用工具：目标过滤、角度/距离、单位存活
+ */
+
+import { 阿伦劳特单位技能配置 } from "./00．配置";
+
+const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, value: string) => number;
+};
+const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  removeDelayedCallback: (this: void, id: number) => void;
+};
+
+const 光形态单位ID = stringToFourCCSafe(阿伦劳特单位技能配置.光形态单位ID);
+const 暗形态单位ID = stringToFourCCSafe(阿伦劳特单位技能配置.暗形态单位ID);
+const B015 = stringToFourCCSafe(阿伦劳特单位技能配置.裁决审判强化BuffID);
+const B018 = stringToFourCCSafe(阿伦劳特单位技能配置.天堂呼唤强化BuffID);
+const B019 = stringToFourCCSafe(阿伦劳特单位技能配置.裁决制裁BuffID);
+const B017 = stringToFourCCSafe(阿伦劳特单位技能配置.切换加攻BuffID);
+
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
+const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
+const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
+const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+
+/** 是否为阿伦劳特（光/暗任一形态） */
+export function 是阿伦劳特英雄(this: void, unit: any): boolean {
+  if (unit == null || unit === 0) return false;
+  const id = GetUnitTypeId(unit);
+  return id === 光形态单位ID || id === 暗形态单位ID;
+}
+
+/** 光形态 */
+export function 是光形态(this: void, unit: any): boolean {
+  return unit != null && unit !== 0 && GetUnitTypeId(unit) === 光形态单位ID;
+}
+
+/** 暗形态 */
+export function 是暗形态(this: void, unit: any): boolean {
+  return unit != null && unit !== 0 && GetUnitTypeId(unit) === 暗形态单位ID;
+}
+
+/** 单位是否拥有指定原生 Buff（GetUnitAbilityLevel > 0） */
+export function 阿伦劳特拥有原生Buff(this: void, unit: any, buffId: number): boolean {
+  if (unit == null || unit === 0 || buffId === 0) return false;
+  return GetUnitAbilityLevel(unit, buffId) > 0;
+}
+
+/** 判定：拥有裁决审判（B015） */
+export function 拥有裁决审判(this: void, unit: any): boolean {
+  return 阿伦劳特拥有原生Buff(unit, B015);
+}
+
+/** 判定：拥有天堂呼唤（B018） */
+export function 拥有天堂呼唤(this: void, unit: any): boolean {
+  return 阿伦劳特拥有原生Buff(unit, B018);
+}
+
+interface 原生Buff记录 {
+  定时器ID: number;
+}
+
+const 原生Buff定时表: Record<number, Record<number, 原生Buff记录 | undefined> | undefined> = {};
+
+/** 给单位添加原生 Buff，持续 duration 秒后自动移除；重复添加刷新时长 */
+export function 添加原生Buff持续(this: void, unit: any, buffId: number, duration: number): void {
+  if (unit == null || unit === 0 || duration <= 0) return;
+  UnitAddAbility(unit, buffId);
+  const unitId = GetHandleId(unit);
+  let unitMap = 原生Buff定时表[unitId];
+  if (unitMap == null) {
+    unitMap = {};
+    原生Buff定时表[unitId] = unitMap;
+  }
+  const old = unitMap[buffId];
+  if (old != null && old.定时器ID !== 0) removeDelayedCallback(old.定时器ID);
+  const timerId = addDelayedCallback(Math.round(duration * 1000), () => {
+    UnitRemoveAbility(unit, buffId);
+    const map = 原生Buff定时表[unitId];
+    if (map != null) map[buffId] = undefined;
+  });
+  unitMap[buffId] = { 定时器ID: timerId };
+}
+
+/** 立即移除指定原生 Buff（含定时器清理） */
+export function 移除原生Buff(this: void, unit: any, buffId: number): void {
+  if (unit == null || unit === 0) return;
+  UnitRemoveAbility(unit, buffId);
+  const unitId = GetHandleId(unit);
+  const map = 原生Buff定时表[unitId];
+  if (map == null) return;
+  const record = map[buffId];
+  if (record != null && record.定时器ID !== 0) removeDelayedCallback(record.定时器ID);
+  map[buffId] = undefined;
+}
+
+/** 目标过滤：排除古树/机械/建筑 + 存活 */
+export function 是有效目标(this: void, target: any): boolean {
+  if (target == null || target === 0) return false;
+  if (IsUnitType(target, jass.UNIT_TYPE_DEAD as any)) return false;
+  if (IsUnitType(target, jass.UNIT_TYPE_ANCIENT as any)) return false;
+  if (IsUnitType(target, jass.UNIT_TYPE_MECHANICAL as any)) return false;
+  if (IsUnitType(target, jass.UNIT_TYPE_STRUCTURE as any)) return false;
+  return true;
+}
+
+/** 两点角度（度） */
+export function 两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
+  return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+}
+
+/** 两点距离 */
+export function 两点距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+export {};

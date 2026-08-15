@@ -29,6 +29,8 @@ local ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1 = require("lib.扩展函数
 local initItemIllusionSummonBridge = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1.initItemIllusionSummonBridge
 local ____SFB__6E05_7A7A_5E7B_8C61_7269_54C1_4E0A_4E0B_6587 = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1["SFB_清空幻象物品上下文"]
 local ____SFB__8BB0_5F55_5E7B_8C61_7269_54C1_4E0A_4E0B_6587 = ____04D_FF0E_5FEB_901FBuff_5E7B_8C61_7269_54C1["SFB_记录幻象物品上下文"]
+local ____09_FF0EYDUserData_5B89_5168_7248 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWEGetUnitAbilityDataRealSafe = ____09_FF0EYDUserData_5B89_5168_7248.YDWEGetUnitAbilityDataRealSafe
 function ____exports.SFB_setPositiveBuff(sourceUnit, u, id, time, effectSourceName, effectSourceType)
     if id == ____SFB__589E_76CABUFF["心灵之火"] then
         ____SFB__65BD_52A0_539F_751F_76EE_6807Buff(
@@ -187,21 +189,21 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effe
     local abilityId
     local orderStr
     repeat
-        local ____switch37 = id
-        local ____cond37 = ____switch37 == 0
-        if ____cond37 then
+        local ____switch43 = id
+        local ____cond43 = ____switch43 == 0
+        if ____cond43 then
             abilityId = ABILITY.STUN
             orderStr = ORDER.STUN
             break
         end
-        ____cond37 = ____cond37 or ____switch37 == 1
-        if ____cond37 then
+        ____cond43 = ____cond43 or ____switch43 == 1
+        if ____cond43 then
             abilityId = ABILITY.FREEZE
             orderStr = ORDER.FREEZE
             break
         end
-        ____cond37 = ____cond37 or ____switch37 == 2
-        if ____cond37 then
+        ____cond43 = ____cond43 or ____switch43 == 2
+        if ____cond43 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
@@ -213,20 +215,20 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effe
             )
             break
         end
-        ____cond37 = ____cond37 or ____switch37 == 3
-        if ____cond37 then
+        ____cond43 = ____cond43 or ____switch43 == 3
+        if ____cond43 then
             abilityId = ABILITY.POLYMORPH
             orderStr = ORDER.POLYMORPH
             break
         end
-        ____cond37 = ____cond37 or ____switch37 == 4
-        if ____cond37 then
+        ____cond43 = ____cond43 or ____switch43 == 4
+        if ____cond43 then
             abilityId = ABILITY.INVIS
             orderStr = ORDER.INVIS
             break
         end
-        ____cond37 = ____cond37 or ____switch37 == 5
-        if ____cond37 then
+        ____cond43 = ____cond43 or ____switch43 == 5
+        if ____cond43 then
             abilityId = ABILITY.SILENCE
             orderStr = ORDER.SILENCE
             YDWESetUnitAbilityDataReal(
@@ -316,12 +318,61 @@ end
 -- 
 -- 这不是 Buff，不进入 BuffUI，也不占用现有快速 Buff 类型编号。
 -- 默认持续时间 15 秒；如果母技能字段可被正常读取，会同步写入普通/英雄持续时间。
-function ____exports.SFB_setItemIllusion(sourceUnit, u, time)
+-- 
+-- 可选参数 输出倍率/承伤倍率：临时写入幻象技能字段 108/109（SFB 马甲为全局单例，
+-- 施放完成后立即还原为修改前的字段值，避免污染其他幻象物品调用）。
+function ____exports.SFB_setItemIllusion(sourceUnit, u, time, _____8F93_51FA_500D_7387, _____627F_4F24_500D_7387)
     if time == nil then
         time = 15
     end
     ____SFB__8BB0_5F55_5E7B_8C61_7269_54C1_4E0A_4E0B_6587(sourceUnit, u, time)
+    local _____4F7F_7528_500D_7387 = _____8F93_51FA_500D_7387 ~= nil or _____627F_4F24_500D_7387 ~= nil
+    local _____9A6C_7532 = SFB_Unit
+    local _____539F108 = 0
+    local _____539F109 = 0
+    if _____4F7F_7528_500D_7387 and _____9A6C_7532 ~= nil and _____9A6C_7532 ~= 0 then
+        _____539F108 = YDWEGetUnitAbilityDataRealSafe(_____9A6C_7532, ABILITY.ITEM_ILLUSION, 1, 108)
+        _____539F109 = YDWEGetUnitAbilityDataRealSafe(_____9A6C_7532, ABILITY.ITEM_ILLUSION, 1, 109)
+        if _____8F93_51FA_500D_7387 ~= nil then
+            YDWESetUnitAbilityDataReal(
+                _____9A6C_7532,
+                ABILITY.ITEM_ILLUSION,
+                1,
+                108,
+                _____8F93_51FA_500D_7387
+            )
+        end
+        if _____627F_4F24_500D_7387 ~= nil then
+            YDWESetUnitAbilityDataReal(
+                _____9A6C_7532,
+                ABILITY.ITEM_ILLUSION,
+                1,
+                109,
+                _____627F_4F24_500D_7387
+            )
+        end
+    end
     local ok = ____SFB__65BD_52A0_539F_751F_76EE_6807_6280_80FD(u, ABILITY.ITEM_ILLUSION, ORDER.ITEM_ILLUSION, time)
+    if _____4F7F_7528_500D_7387 and _____9A6C_7532 ~= nil and _____9A6C_7532 ~= 0 then
+        if _____8F93_51FA_500D_7387 ~= nil then
+            YDWESetUnitAbilityDataReal(
+                _____9A6C_7532,
+                ABILITY.ITEM_ILLUSION,
+                1,
+                108,
+                _____539F108
+            )
+        end
+        if _____627F_4F24_500D_7387 ~= nil then
+            YDWESetUnitAbilityDataReal(
+                _____9A6C_7532,
+                ABILITY.ITEM_ILLUSION,
+                1,
+                109,
+                _____539F109
+            )
+        end
+    end
     if not ok then
         ____SFB__6E05_7A7A_5E7B_8C61_7269_54C1_4E0A_4E0B_6587()
     end

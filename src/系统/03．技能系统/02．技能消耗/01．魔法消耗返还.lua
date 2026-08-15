@@ -6,12 +6,14 @@ local ____exports = {}
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
-local YDWEGetUnitAbilityDataIntegerSafe = ____require_result_0.YDWEGetUnitAbilityDataIntegerSafe
-local YDWEGetUnitAbilityDataRealSafe = ____require_result_0.YDWEGetUnitAbilityDataRealSafe
-local ____require_result_1 = require("系统.03．技能系统.02．技能消耗.00．消耗常量")
-local PERCENT_COST_THRESHOLD = ____require_result_1.PERCENT_COST_THRESHOLD
+local ____require_result_0 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
+local _____9B54_6CD5_589E_51CF = ____require_result_0["魔法增减"]
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
+local YDWEGetUnitAbilityDataIntegerSafe = ____require_result_1.YDWEGetUnitAbilityDataIntegerSafe
+local YDWEGetUnitAbilityDataRealSafe = ____require_result_1.YDWEGetUnitAbilityDataRealSafe
+local ____require_result_2 = require("系统.03．技能系统.02．技能消耗.00．消耗常量")
+local PERCENT_COST_THRESHOLD = ____require_result_2.PERCENT_COST_THRESHOLD
 --- 获取技能固定消耗
 function ____exports.getAbilityManaCost(unit, abilityId, level)
     return YDWEGetUnitAbilityDataIntegerSafe(unit, abilityId, level, 104)
@@ -53,5 +55,16 @@ ____exports["计算最终魔法消耗"] = function(unit, abilityId, level)
     end
     local finalCost = baseCost * (1 - reductionRatio)
     return finalCost > 0 and finalCost or 0
+end
+--- 统一耗尽单位当前魔法。用于“消耗全部魔法”的技能效果，避免技能文件直接写单位魔法状态。
+____exports["消耗单位全部当前魔法"] = function(unit)
+    if unit == nil or unit == 0 then
+        return 0
+    end
+    local currentMana = GetUnitStateJapi(unit, jass.UNIT_STATE_MANA)
+    if not (currentMana > 0) then
+        return 0
+    end
+    return _____9B54_6CD5_589E_51CF(unit, -currentMana, false, false)
 end
 return ____exports

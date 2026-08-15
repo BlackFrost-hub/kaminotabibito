@@ -8,6 +8,9 @@
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
+const { 魔法增减 } = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复") as {
+  魔法增减: (this: void, target: any, amount: number, showText?: boolean, showManaEffect?: boolean) => number;
+};
 const {
   YDUserDataGetSafe,
   YDWEGetUnitAbilityDataIntegerSafe,
@@ -88,6 +91,16 @@ export function 计算最终魔法消耗(this: void, unit: any, abilityId: numbe
 
   const finalCost = baseCost * (1 - reductionRatio);
   return finalCost > 0 ? finalCost : 0;
+}
+
+/**
+ * 统一耗尽单位当前魔法。用于“消耗全部魔法”的技能效果，避免技能文件直接写单位魔法状态。
+ */
+export function 消耗单位全部当前魔法(this: void, unit: any): number {
+  if (unit == null || unit === 0) return 0;
+  const currentMana = GetUnitStateJapi(unit, jass.UNIT_STATE_MANA);
+  if (!(currentMana > 0)) return 0;
+  return 魔法增减(unit, -currentMana, false, false);
 }
 
 export {};

@@ -33,6 +33,7 @@ local YDWEGetUnitAbilityDataStringUnsafe = ydweBase.YDWEGetUnitAbilityDataString
 local YDWEGetUnitAbilityDataIntegerUnsafe = ydweBase.YDWEGetUnitAbilityDataInteger
 local YDWEGetUnitAbilityDataRealUnsafe = ydweBase.YDWEGetUnitAbilityDataReal
 local YDWESetUnitAbilityStateUnsafe = ydweBase.YDWESetUnitAbilityState
+local YDWEGetUnitAbilityStateUnsafe = ydweBase.YDWEGetUnitAbilityState
 local YDWESetUnitAbilityDataRealUnsafe = ydweBase.YDWESetUnitAbilityDataReal
 local YDWETimerDestroyEffectUnsafe = ydweBase.YDWETimerDestroyEffect
 local YDWEAngleBetweenUnitsUnsafe = ydweBase.YDWEAngleBetweenUnits
@@ -121,6 +122,9 @@ function ____exports.YDWESetUnitAbilityStateSafe(unit, abilityId, stateType, val
         stateType,
         value
     )
+end
+function ____exports.YDWEGetUnitAbilityStateSafe(unit, abilityId, stateType)
+    return YDWEGetUnitAbilityStateUnsafe(nil, unit, abilityId, stateType)
 end
 function ____exports.YDWESetUnitAbilityDataRealSafe(unit, abilityId, level, dataType, value)
     return YDWESetUnitAbilityDataRealUnsafe(

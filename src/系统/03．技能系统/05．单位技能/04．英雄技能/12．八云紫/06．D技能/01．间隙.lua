@@ -1,0 +1,75 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00．配置")
+local _____516B_4E91_7D2B_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["八云紫单位技能配置"]
+local ____01_FF0E_88C2_9699_7CFB_7EDF = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.07．公共与单位壳.01．裂隙系统")
+local _____662F_516B_4E91_7D2B = ____01_FF0E_88C2_9699_7CFB_7EDF["是八云紫"]
+local _____8BA1_7B97_88C2_9699_53EF_8FBE_7EC8_70B9 = ____01_FF0E_88C2_9699_7CFB_7EDF["计算裂隙可达终点"]
+local _____521B_5EFA_516B_4E91_7D2B_88C2_9699 = ____01_FF0E_88C2_9699_7CFB_7EDF["创建八云紫裂隙"]
+local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local jass = require("jass.common")
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_1["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_1["移除单位暂停"]
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellEffectListener = ____require_result_2.registerSpellEffectListener
+local ____require_result_3 = require("平台扩展API动作")
+local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_3["技能_设置技能冷却时间"]
+local ____require_result_4 = require("平台扩展API取值")
+local _____6280_80FD__83B7_53D6_6280_80FD_6700_5927_51B7_5374_65F6_95F4 = ____require_result_4["技能_获取技能最大冷却时间"]
+local _____914D_7F6E = _____516B_4E91_7D2B_5355_4F4D_6280_80FD_914D_7F6E
+local ____D_6682_505C_6765_6E90 = "八云紫-D-间隙"
+local function _____83B7_53D6D_4E0A_4E0B_6587(hero)
+    return _____662F_516B_4E91_7D2B(hero) and ({["英雄"] = hero}) or nil
+end
+local function _____89E3_9664D_786C_76F4(variable)
+    local hero = variable
+    if hero ~= nil and hero ~= 0 then
+        _____79FB_9664_5355_4F4D_6682_505C(hero, ____D_6682_505C_6765_6E90)
+    end
+end
+local function _____91CA_653ED(_context, hero, skillInstanceId)
+    local startX = jass.GetUnitX(hero)
+    local startY = jass.GetUnitY(hero)
+    local ____end = _____8BA1_7B97_88C2_9699_53EF_8FBE_7EC8_70B9(
+        startX,
+        startY,
+        jass.GetSpellTargetX(),
+        jass.GetSpellTargetY()
+    )
+    _____6DFB_52A0_5355_4F4D_6682_505C(hero, ____D_6682_505C_6765_6E90)
+    jass.SetUnitAnimation(hero, "attack,2")
+    _____521B_5EFA_516B_4E91_7D2B_88C2_9699(
+        hero,
+        ____end.x,
+        ____end.y,
+        _____914D_7F6E["技能"].D["类型ID"],
+        skillInstanceId
+    )
+    addDelayedCallback(1200, _____89E3_9664D_786C_76F4, hero)
+end
+local function _____76D1_542CD_5237_65B0(caster, spellAbilityId)
+    if not _____662F_516B_4E91_7D2B(caster) or spellAbilityId == _____914D_7F6E["技能"].D["类型ID"] then
+        return
+    end
+    local maxCooldown = _____6280_80FD__83B7_53D6_6280_80FD_6700_5927_51B7_5374_65F6_95F4(caster, spellAbilityId) or 0
+    if maxCooldown < 5.95 then
+        return
+    end
+    _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(caster, _____914D_7F6E["技能"].D["类型ID"], 0, 5.5)
+end
+_____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
+    ["名称"] = "八云紫-间隙（D）",
+    ["单位类型ID"] = _____914D_7F6E["单位"]["英雄类型ID"],
+    ["技能ID"] = _____914D_7F6E["技能"].D["类型ID"],
+    ["获取或创建上下文"] = _____83B7_53D6D_4E0A_4E0B_6587,
+    ["释放技能"] = _____91CA_653ED,
+    ["创建独立技能实例"] = true,
+    ["独立技能来源类型"] = "单位技能",
+    ["技能实例持续时间秒"] = 4
+})
+registerSpellEffectListener(_____76D1_542CD_5237_65B0)
+return ____exports

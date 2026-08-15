@@ -679,7 +679,7 @@ function 确保单位坐标跟随特效Tick(this: void): void {
   单位坐标跟随特效回调ID = addPeriodicCallback(单位坐标跟随特效间隔毫秒, on单位坐标跟随特效Tick);
 }
 
-export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number): any {
+export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number, 面向弧度: number = 0): any {
   if (!单位可坐标跟随(unit) || modelPath === "") return null;
   const key = getUnitEffectKey(unit, effectKey);
   if (key === "") return null;
@@ -691,7 +691,7 @@ export function 创建单位坐标跟随特效(unit: any, modelPath: string, eff
 
   const x = GetUnitX(unit);
   const y = GetUnitY(unit);
-  const effect = EC_CreateEffect(规范化特效模型路径(modelPath), x, y, height, 0, scale, animSpeed ?? 1, -1);
+  const effect = EC_CreateEffect(规范化特效模型路径(modelPath), x, y, height, 面向弧度, scale, animSpeed ?? 1, -1);
   if (!effect) return null;
   安全设置特效坐标(effect, x, y);
   EXSetEffectZ(effect, EC_GetPointZ(x, y) + height);

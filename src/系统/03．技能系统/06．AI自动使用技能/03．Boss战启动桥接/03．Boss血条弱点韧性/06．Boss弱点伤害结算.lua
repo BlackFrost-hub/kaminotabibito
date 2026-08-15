@@ -49,7 +49,7 @@ function ____onBoss_5F31_70B9_8868_73B0_5237_65B0Tick()
             do
                 local state = states[i + 1]
                 if state["是否已结束"] or not state["是否伤害结算已注册"] then
-                    goto __continue83
+                    goto __continue96
                 end
                 hasActive = true
                 _____5904_7406_62A4_76FE_7834_788E_8BA1_65F6(state, now)
@@ -68,7 +68,7 @@ function ____onBoss_5F31_70B9_8868_73B0_5237_65B0Tick()
                     end
                 end
             end
-            ::__continue83::
+            ::__continue96::
             i = i + 1
         end
     end
@@ -294,15 +294,20 @@ local function _____53D6_5F31_70B9_51B7_5374_6BEB_79D2(state, weak)
     end
     return weak["类别"] == "武器" and ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["武器弱点冷却毫秒"] or ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["属性弱点冷却毫秒"]
 end
-local function _____6263_9664Boss_62A4_76FE(state)
+local function _____6263_9664Boss_62A4_76FE(state, _____6307_5B9A_524A_51CF_503C)
     local shieldValue = _____8BFB_53D6_62A4_76FE_503C(state)
     if shieldValue <= 0 then
         _____5237_65B0Boss_62A4_76FE_6587_672C(state, 0)
         return 0
     end
+    local ____53D6_6B63_6570_914D_7F6E_25 = _____53D6_6B63_6570_914D_7F6E
+    local ____6307_5B9A_524A_51CF_503C_24 = _____6307_5B9A_524A_51CF_503C
     local ____53D6_6B63_6570_914D_7F6E_23 = _____53D6_6B63_6570_914D_7F6E
     local ____opt_21 = state["配置"]
-    local reduceValue = ____53D6_6B63_6570_914D_7F6E_23(____opt_21 and ____opt_21["护盾命中削减值"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["护盾命中削减值"])
+    local reduceValue = ____53D6_6B63_6570_914D_7F6E_25(
+        ____6307_5B9A_524A_51CF_503C_24,
+        ____53D6_6B63_6570_914D_7F6E_23(____opt_21 and ____opt_21["护盾命中削减值"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["护盾命中削减值"])
+    )
     local nextValue = shieldValue - reduceValue
     _____5199_5165_62A4_76FE_503C(state, nextValue)
     _____5237_65B0Boss_62A4_76FE_6587_672C(state, nextValue > 0 and nextValue or 0)
@@ -316,33 +321,33 @@ local function _____89E6_53D1Boss_62A4_76FE_7834_788E(state, attacker)
     _____5199_5165_62A4_76FE_503C(state, 0)
     _____5237_65B0Boss_62A4_76FE_6587_672C(state, 0)
     _____8BBE_7F6EBoss_62A4_76FE_7834_788E_663E_793A(state)
-    local ____64AD_653E_5168_5458_672C_5730_97F3_6548_26 = _____64AD_653E_5168_5458_672C_5730_97F3_6548
-    local ____opt_24 = state["配置"]
-    ____64AD_653E_5168_5458_672C_5730_97F3_6548_26(____opt_24 and ____opt_24["护盾破碎音效路径"] or ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["护盾破碎音效路径"])
+    local ____64AD_653E_5168_5458_672C_5730_97F3_6548_28 = _____64AD_653E_5168_5458_672C_5730_97F3_6548
+    local ____opt_26 = state["配置"]
+    ____64AD_653E_5168_5458_672C_5730_97F3_6548_28(____opt_26 and ____opt_26["护盾破碎音效路径"] or ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["护盾破碎音效路径"])
     _____53D1_9001_5168_5458_4EFB_52A1_6D88_606F(bj_QUESTMESSAGE_WARNING, ____Boss_5F31_70B9_63D0_793A_6587_672C["护盾破碎提示"])
-    local ____temp_27
+    local ____temp_29
     if attacker ~= nil and attacker ~= 0 then
-        ____temp_27 = attacker
+        ____temp_29 = attacker
     else
-        ____temp_27 = state["Boss单位"]
+        ____temp_29 = state["Boss单位"]
     end
-    local source = ____temp_27
-    local ____53D6_6B63_6570_914D_7F6E_30 = _____53D6_6B63_6570_914D_7F6E
-    local ____opt_28 = state["配置"]
-    local controlDuration = ____53D6_6B63_6570_914D_7F6E_30(____opt_28 and ____opt_28["破盾控制持续秒"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["破盾控制持续秒"])
-    local ____53D6_975E_8D1F_914D_7F6E_33 = _____53D6_975E_8D1F_914D_7F6E
-    local ____opt_31 = state["配置"]
-    local controlType = ____53D6_975E_8D1F_914D_7F6E_33(____opt_31 and ____opt_31["破盾控制Buff类型"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["破盾控制Buff类型"])
+    local source = ____temp_29
+    local ____53D6_6B63_6570_914D_7F6E_32 = _____53D6_6B63_6570_914D_7F6E
+    local ____opt_30 = state["配置"]
+    local controlDuration = ____53D6_6B63_6570_914D_7F6E_32(____opt_30 and ____opt_30["破盾控制持续秒"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["破盾控制持续秒"])
+    local ____53D6_975E_8D1F_914D_7F6E_35 = _____53D6_975E_8D1F_914D_7F6E
+    local ____opt_33 = state["配置"]
+    local controlType = ____53D6_975E_8D1F_914D_7F6E_35(____opt_33 and ____opt_33["破盾控制Buff类型"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["破盾控制Buff类型"])
     if controlDuration > 0 then
         _____65BD_52A0_5FEB_901F_63A7_5236Buff(source, state["Boss单位"], controlType, controlDuration)
     end
     local now = getServerTime()
-    local ____53D6_6B63_6570_914D_7F6E_36 = _____53D6_6B63_6570_914D_7F6E
-    local ____opt_34 = state["配置"]
-    local brokenMs = ____53D6_6B63_6570_914D_7F6E_36(____opt_34 and ____opt_34["破碎护盾显示毫秒"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["破碎护盾显示毫秒"])
-    local ____53D6_6B63_6570_914D_7F6E_39 = _____53D6_6B63_6570_914D_7F6E
-    local ____opt_37 = state["配置"]
-    local restoreMs = ____53D6_6B63_6570_914D_7F6E_39(____opt_37 and ____opt_37["护盾冷却毫秒"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["护盾恢复延迟毫秒"])
+    local ____53D6_6B63_6570_914D_7F6E_38 = _____53D6_6B63_6570_914D_7F6E
+    local ____opt_36 = state["配置"]
+    local brokenMs = ____53D6_6B63_6570_914D_7F6E_38(____opt_36 and ____opt_36["破碎护盾显示毫秒"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["破碎护盾显示毫秒"])
+    local ____53D6_6B63_6570_914D_7F6E_41 = _____53D6_6B63_6570_914D_7F6E
+    local ____opt_39 = state["配置"]
+    local restoreMs = ____53D6_6B63_6570_914D_7F6E_41(____opt_39 and ____opt_39["护盾冷却毫秒"], ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["护盾恢复延迟毫秒"])
     state["护盾破碎切灰截止毫秒"] = now + brokenMs
     state["护盾恢复截止毫秒"] = now + brokenMs + restoreMs
 end
@@ -379,6 +384,71 @@ local function _____5904_7406Boss_5F31_70B9_547D_4E2D(state, weakIndex, attacker
         _____89E6_53D1Boss_62A4_76FE_7834_788E(state, attacker)
     end
     _____786E_4FDDBoss_5F31_70B9_8868_73B0_5237_65B0()
+end
+local function _____521B_5EFABoss_5F31_70B9_8C03_67E5_7ED3_679C(state, _____6210_529F, _____539F_56E0, _____5F31_70B9_7D22_5F15)
+    if _____5F31_70B9_7D22_5F15 == nil then
+        _____5F31_70B9_7D22_5F15 = -1
+    end
+    local weak = state ~= nil and state["配置"] ~= nil and _____5F31_70B9_7D22_5F15 >= 0 and state["配置"]["弱点列表"][_____5F31_70B9_7D22_5F15 + 1] or nil
+    return {
+        ["成功"] = _____6210_529F,
+        ["原因"] = _____539F_56E0,
+        ["弱点索引"] = _____5F31_70B9_7D22_5F15,
+        ["弱点键"] = weak and weak["弱点键"] or "",
+        ["当前护盾值"] = state ~= nil and _____8BFB_53D6_62A4_76FE_503C(state) or 0,
+        ["是否护盾破碎中"] = (state and state["是否护盾破碎中"]) == true
+    }
+end
+--- 显现配置顺序中的下一个未显现弱点，并直接削减护盾。
+-- 这是同步玩法接口：不伪造伤害，也不触发普通弱点击中的伤害加成、保护冷却和命中表现。
+____exports["调查Boss下一个未显现弱点"] = function(state, _____6765_6E90_5355_4F4D, _____62A4_76FE_524A_51CF_503C)
+    if _____62A4_76FE_524A_51CF_503C == nil then
+        _____62A4_76FE_524A_51CF_503C = 1
+    end
+    if state == nil or state["是否已结束"] then
+        return _____521B_5EFABoss_5F31_70B9_8C03_67E5_7ED3_679C(state, false, "Boss状态不存在")
+    end
+    if not state["是否启用机制UI"] or state["配置"] == nil or #state["配置"]["弱点列表"] <= 0 then
+        return _____521B_5EFABoss_5F31_70B9_8C03_67E5_7ED3_679C(state, false, "弱点机制未启用")
+    end
+    if not state["是否弱点已注册"] then
+        return _____521B_5EFABoss_5F31_70B9_8C03_67E5_7ED3_679C(state, false, "弱点UI尚未注册")
+    end
+    if not state["是否伤害结算已注册"] then
+        return _____521B_5EFABoss_5F31_70B9_8C03_67E5_7ED3_679C(state, false, "弱点结算尚未注册")
+    end
+    if state["是否护盾破碎中"] then
+        return _____521B_5EFABoss_5F31_70B9_8C03_67E5_7ED3_679C(state, false, "护盾破碎中")
+    end
+    local weakIndex = -1
+    do
+        local i = 0
+        while i < #state["配置"]["弱点列表"] do
+            if state["弱点已暴露列表"][i + 1] ~= true then
+                weakIndex = i
+                break
+            end
+            i = i + 1
+        end
+    end
+    if weakIndex < 0 then
+        return _____521B_5EFABoss_5F31_70B9_8C03_67E5_7ED3_679C(state, false, "没有未显现弱点")
+    end
+    local weak = state["配置"]["弱点列表"][weakIndex + 1]
+    _____663E_793ABoss_5F31_70B9_771F_5B9E_56FE_6807(state, weakIndex)
+    _____64AD_653E_5168_5458_672C_5730_97F3_6548(state["配置"]["弱点发现音效路径"] or ____Boss_5F31_70B9_53CD_9988_9ED8_8BA4_914D_7F6E["弱点发现音效路径"])
+    if state["配置"]["弱点发现提示启用"] ~= false then
+        _____53D1_9001_5168_5458_4EFB_52A1_6D88_606F(
+            bj_QUESTMESSAGE_UNITACQUIRED,
+            _____6784_9020_5F31_70B9_53D1_73B0_63D0_793A(_____6765_6E90_5355_4F4D, weak)
+        )
+    end
+    local shieldValue = _____6263_9664Boss_62A4_76FE(state, _____62A4_76FE_524A_51CF_503C)
+    if shieldValue <= 0 then
+        _____89E6_53D1Boss_62A4_76FE_7834_788E(state, _____6765_6E90_5355_4F4D)
+    end
+    _____786E_4FDDBoss_5F31_70B9_8868_73B0_5237_65B0()
+    return _____521B_5EFABoss_5F31_70B9_8C03_67E5_7ED3_679C(state, true, "成功", weakIndex)
 end
 local function ____onBoss_5F31_70B9_547D_4E2D_4F24_5BB3_4FEE_6B63(context)
     if context == nil then

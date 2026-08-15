@@ -30,6 +30,9 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
+const { 调整玩家属性 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令") as {
+  调整玩家属性: (this: void, unit: any, attributeName: string, delta: number) => void;
+};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -42,9 +45,9 @@ const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
+const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
-const DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE as any;
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
@@ -56,6 +59,10 @@ const Q配置 = 配置.Q as any;
 const Q技能ID = stringToFourCCSafe(Q配置.技能ID ?? "0003");
 const Q兼容技能ID = stringToFourCCSafe(Q配置.兼容技能ID ?? "A0LG");
 const 单位类型ID = 配置.单位类型ID as number;
+const 血雾替身单位类型ID = stringToFourCCSafe(配置.E?.替身单位ID ?? "e08O");
+const { 获取血雾本体 } = require("系统.03．技能系统.05．单位技能.04．英雄技能.02．蕾米莉亚.04．E技能") as {
+  获取血雾本体: (this: void, unit: any) => any;
+};
 
 interface Q上下文 {
   施法者: any;
@@ -85,17 +92,14 @@ function Q命中(this: void, event: { 上下文: Q上下文; 命中单位: any; 
   const targetLife = GetUnitState(target, UNIT_STATE_LIFE) || 0;
   const targetMaxLife = 读取单位最大生命(target);
   const belowHalf = targetMaxLife > 0 && targetLife < targetMaxLife * (Q配置.低血线 ?? 0.5);
-  const belowExecute = targetMaxLife > 0 && targetLife < targetMaxLife * (Q配置.斩杀线 ?? 0.1);
-  const damage = belowExecute
-    ? targetLife * (Q配置.低于斩杀线伤害倍率 ?? 1.5)
-    : context.伤害攻击力 * (belowHalf ? (Q配置.低血额外伤害倍率 ?? 1.5) : 1)
-      + context.伤害最大生命 * (belowHalf
-        ? (Q配置.低血最大生命倍率 ?? Q配置.最大生命倍率 ?? 0.1)
-        : (Q配置.最大生命倍率 ?? 0.1));
+  const damage = context.伤害攻击力 * (belowHalf ? (Q配置.低血额外伤害倍率 ?? 1.5) : 1)
+    + context.伤害最大生命 * (belowHalf
+      ? (Q配置.低血最大生命倍率 ?? Q配置.最大生命倍率 ?? 0.1)
+      : (Q配置.最大生命倍率 ?? 0.1));
   if (!(damage > 0)) return;
 
   开始击退(target, {
-    来源单位: context.施法者,
+    角度: 两点角度(GetUnitX(context.施法者), GetUnitY(context.施法者), GetUnitX(target), GetUnitY(target)),
     主单位: context.施法者,
     距离: Q配置.击退距离 ?? 250,
     持续时间: Q配置.击退持续秒 ?? 0.25,
@@ -104,31 +108,49 @@ function Q命中(this: void, event: { 上下文: Q上下文; 命中单位: any; 
     暂停单位: false,
   });
   施加眩晕(context.施法者, target, Q配置.眩晕秒 ?? 0.6, "蕾米莉亚-冈格尼尔", "技能");
-  造成单体技能伤害({
-    来源: context.施法者,
-    目标: target,
-    伤害: damage,
-    伤害类型: belowExecute ? DAMAGE_TYPE_MIND : DAMAGE_TYPE_NORMAL,
-    attack: false,
-    ranged: false,
-    attackType: ATTACK_TYPE_NORMAL,
-    weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
-    来源类型: "单位技能",
-    技能ID: Q技能ID,
-    技能实例ID: context.技能实例ID,
-    标签: "蕾米莉亚-神枪·冈格尼尔之枪",
-    参与技能伤害加成: true,
-  });
+  // 源 JASS 在伤害结算前临时获得 50% 护甲穿透和 100% 命中率，结算后立即恢复。
+  调整玩家属性(context.施法者, "护甲穿透", 0.50);
+  调整玩家属性(context.施法者, "命中率", 1.00);
+  try {
+    造成单体技能伤害({
+      来源: context.施法者,
+      目标: target,
+      伤害: damage,
+      伤害类型: DAMAGE_TYPE_NORMAL,
+      attack: false,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      weaponType: WEAPON_TYPE_METAL_HEAVY_SLICE,
+      来源类型: "单位技能",
+      技能ID: Q技能ID,
+      技能实例ID: context.技能实例ID,
+      标签: "蕾米莉亚-神枪·冈格尼尔之枪",
+      参与技能伤害加成: true,
+    });
+  } finally {
+    调整玩家属性(context.施法者, "命中率", -1.00);
+    调整玩家属性(context.施法者, "护甲穿透", -0.50);
+  }
+
+  // 斩杀线必须在实际伤害结算后判断，避免把伤害前的低血目标改成另一套伤害。
+  const lifeAfterDamage = GetUnitState(target, UNIT_STATE_LIFE) || 0;
+  if (单位存活(target) && targetMaxLife > 0 && lifeAfterDamage < targetMaxLife * (Q配置.斩杀线 ?? 0.1)) {
+    SetUnitState(target, UNIT_STATE_LIFE, 0);
+  }
 }
 
 function Q弹幕Tick(this: void, instance: any, _delta: number): void {
+  instance.蕾米莉亚Q表现累计秒 = (instance.蕾米莉亚Q表现累计秒 ?? 0) + _delta;
+  if (instance.蕾米莉亚Q表现累计秒 < 0.04) return;
+  instance.蕾米莉亚Q表现累计秒 -= 0.04;
   创建点特效({
     模型路径: Q配置.飞行表现?.模型路径 ?? "war3mapImported\\Shockwave_Fire.mdl",
     X: instance.当前X,
     Y: instance.当前Y,
     缩放: Q配置.飞行表现?.缩放 ?? 0.15,
     持续秒: Q配置.飞行表现?.持续秒 ?? 0.05,
-    Z轴角度: 270,
+    // Shockwave_Fire 的模型前向轴有 270 度基准偏移。
+    Z轴角度: (instance.当前方向角 ?? 0) + 270,
   });
 }
 
@@ -137,18 +159,19 @@ function Q弹幕结束(this: void, _reason: string, _id: number): void {
 }
 
 function 释放蕾米莉亚Q(this: void, _context: any, caster: any, 技能实例ID?: number): void {
+  const 真实施法者 = 获取血雾本体(caster) ?? caster;
   const targetUnit = GetSpellTargetUnit();
   const targetX = targetUnit != null && targetUnit !== 0 ? GetUnitX(targetUnit) : GetSpellTargetX();
   const targetY = targetUnit != null && targetUnit !== 0 ? GetUnitY(targetUnit) : GetSpellTargetY();
-  const level = GetUnitAbilityLevel(caster, Q技能ID) || 1;
+  const level = GetUnitAbilityLevel(真实施法者, Q技能ID) || GetUnitAbilityLevel(caster, Q技能ID) || 1;
   const skillInstanceId = 技能实例ID ?? 创建独立技能伤害实例({ 技能ID: Q技能ID, 来源类型: "单位技能", 持续时间秒: 1.2 });
   const context: Q上下文 = {
-    施法者: caster,
+    施法者: 真实施法者,
     技能实例ID: skillInstanceId,
     伤害攻击力: 读取单位攻击力(caster) * ((Q配置.攻击力基础倍率 ?? 1) + (Q配置.攻击力每级倍率 ?? 0.1) * level),
     伤害最大生命: 读取单位最大生命(caster) * (Q配置.最大生命倍率 ?? 0.1),
   };
-  Sound3DII_UnitPlayReuse(Q配置.音效?.路径 ?? "HeroVoice\\REmilia\\REmiliaQ.mp3", caster, Q配置.音效?.裁断距离 ?? 1250);
+  Sound3DII_UnitPlayReuse(Q配置.音效?.路径 ?? "HeroVoice\\REmilia\\REmiliaQ.mp3", 真实施法者, Q配置.音效?.裁断距离 ?? 1250);
   const angle = 两点角度(GetUnitX(caster), GetUnitY(caster), targetX, targetY);
   创建带上下文原生弹幕({
     上下文: context,
@@ -156,11 +179,13 @@ function 释放蕾米莉亚Q(this: void, _context: any, caster: any, 技能实�
     on命中: Q命中,
     on结束: Q弹幕结束,
     弹幕参数: {
-      所有者: caster,
+      所有者: 真实施法者,
       X: GetUnitX(caster),
       Y: GetUnitY(caster),
       方向角: angle,
-      速度: Q配置.速度 ?? 1200,
+    // TS 原生弹幕使用码/秒；源 JASS 的 80 会经过 0.66 / 0.04 换算为 1320。
+    速度: Q配置.速度 ?? 1320,
+      飞行高度: Q配置.飞行高度 ?? 75,
       生命周期: Q配置.生命周期秒 ?? 0.94,
       最大距离: Q配置.最大距离 ?? 1150,
       命中半径: Q配置.命中半径 ?? 200,
@@ -176,10 +201,10 @@ function 释放蕾米莉亚Q(this: void, _context: any, caster: any, 技能实�
 
 function 获取Q上下文(this: void, unit: any): Q上下文 { return { 施法者: unit, 技能实例ID: 0, 伤害攻击力: 0, 伤害最大生命: 0 }; }
 
-function 注册Q监听(this: void, skillId: number, name: string): void {
+function 注册Q监听(this: void, skillId: number, name: string, unitTypeId: number = 单位类型ID): void {
   注册单位技能壳监听({
     名称: name,
-    单位类型ID,
+    单位类型ID: unitTypeId,
     技能ID: skillId,
     获取或创建上下文: 获取Q上下文,
     释放技能: 释放蕾米莉亚Q,
@@ -191,5 +216,6 @@ function 注册Q监听(this: void, skillId: number, name: string): void {
 
 注册Q监听(Q技能ID, "蕾米莉亚-神枪·冈格尼尔之枪（Q）");
 if (Q兼容技能ID !== Q技能ID) 注册Q监听(Q兼容技能ID, "蕾米莉亚-神枪·冈格尼尔之枪（Q兼容壳）");
+注册Q监听(Q兼容技能ID, "蕾米莉亚-血雾替身Q", 血雾替身单位类型ID);
 
 export {};

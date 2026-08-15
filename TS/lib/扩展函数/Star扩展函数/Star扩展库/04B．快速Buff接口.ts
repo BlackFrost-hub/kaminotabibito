@@ -33,6 +33,7 @@ import {
 } from "./04A．快速Buff共享";
 import { SFB_施加自定义诅咒Buff } from "./04C．快速Buff诅咒";
 import { initItemIllusionSummonBridge, SFB_清空幻象物品上下文, SFB_记录幻象物品上下文 } from "./04D．快速Buff幻象物品";
+import { YDWEGetUnitAbilityDataRealSafe } from "../../YDWE函数/09．YDUserData安全版";
 
 const { 施加睡眠 } = require("系统.05．Buff系统.07．睡眠系统") as {
   施加睡眠: (this: void, 参数: { 来源单位?: any; 目标单位: any; 持续时间: number; 伤害阈值?: number; 保底时间?: number }) => boolean;
@@ -134,10 +135,36 @@ export function SFB_setParasite(sourceUnit: any, u: any, time: number): void {
  *
  * 这不是 Buff，不进入 BuffUI，也不占用现有快速 Buff 类型编号。
  * 默认持续时间 15 秒；如果母技能字段可被正常读取，会同步写入普通/英雄持续时间。
+ *
+ * 可选参数 输出倍率/承伤倍率：临时写入幻象技能字段 108/109（SFB 马甲为全局单例，
+ * 施放完成后立即还原为修改前的字段值，避免污染其他幻象物品调用）。
  */
-export function SFB_setItemIllusion(sourceUnit: any, u: any, time: number = 15): boolean {
+export function SFB_setItemIllusion(
+  sourceUnit: any,
+  u: any,
+  time: number = 15,
+  输出倍率?: number,
+  承伤倍率?: number,
+): boolean {
   SFB_记录幻象物品上下文(sourceUnit, u, time);
+
+  const 使用倍率 = 输出倍率 != null || 承伤倍率 != null;
+  const 马甲 = SFB_Unit;
+  let 原108 = 0;
+  let 原109 = 0;
+  if (使用倍率 && 马甲 != null && 马甲 !== 0) {
+    原108 = YDWEGetUnitAbilityDataRealSafe(马甲, ABILITY.ITEM_ILLUSION, 1, 108);
+    原109 = YDWEGetUnitAbilityDataRealSafe(马甲, ABILITY.ITEM_ILLUSION, 1, 109);
+    if (输出倍率 != null) YDWESetUnitAbilityDataReal(马甲, ABILITY.ITEM_ILLUSION, 1, 108, 输出倍率);
+    if (承伤倍率 != null) YDWESetUnitAbilityDataReal(马甲, ABILITY.ITEM_ILLUSION, 1, 109, 承伤倍率);
+  }
+
   const ok = SFB_施加原生目标技能(u, ABILITY.ITEM_ILLUSION, ORDER.ITEM_ILLUSION, time);
+
+  if (使用倍率 && 马甲 != null && 马甲 !== 0) {
+    if (输出倍率 != null) YDWESetUnitAbilityDataReal(马甲, ABILITY.ITEM_ILLUSION, 1, 108, 原108);
+    if (承伤倍率 != null) YDWESetUnitAbilityDataReal(马甲, ABILITY.ITEM_ILLUSION, 1, 109, 原109);
+  }
   if (!ok) SFB_清空幻象物品上下文();
   return ok;
 }

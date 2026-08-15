@@ -99,6 +99,7 @@ const { 获取当前技能伤害上下文 } = require("系统.04．伤害系统.
     isSingleTargetSkillDamage: boolean;
     isAoeSkillDamage: boolean;
     participatesInSkillDamageBonus: boolean;
+    忽略魔法抗性: boolean;
     isDamageTransfer: boolean;
   } | null;
 };
@@ -180,6 +181,7 @@ export interface DamageTypeSnapshot {
   isIndependentSkillDamage: boolean;
   isSingleTargetSkillDamage: boolean;
   isAoeSkillDamage: boolean;
+  忽略魔法抗性: boolean;
   isDamageTransfer: boolean;
   isMetalDamage: boolean;
   isWoodDamage: boolean;
@@ -262,6 +264,7 @@ function captureDamageTypeSnapshot(this: void): DamageTypeSnapshot {
     isIndependentSkillDamage: skillContext?.isIndependentSkillDamage === true,
     isSingleTargetSkillDamage: skillContext?.isSingleTargetSkillDamage === true,
     isAoeSkillDamage: skillContext?.isAoeSkillDamage === true,
+    忽略魔法抗性: skillContext?.忽略魔法抗性 === true,
     isDamageTransfer: skillContext?.isDamageTransfer === true,
     isMetalDamage: 伤害函数.isMetalDamage(),
     isWoodDamage: 伤害函数.isWoodDamage(),
@@ -429,6 +432,7 @@ export function calculateDamage(
     isIndependentSkillDamage: snapshot.isIndependentSkillDamage,
     isSingleTargetSkillDamage: snapshot.isSingleTargetSkillDamage,
     isAoeSkillDamage: snapshot.isAoeSkillDamage,
+    忽略魔法抗性: snapshot.忽略魔法抗性,
     isDamageTransfer: snapshot.isDamageTransfer,
   };
   damage = applyDamageBaseModifiers(baseContext);
@@ -462,7 +466,7 @@ export function calculateDamage(
   }
 
   // Step 4: 魔抗计算（魔法伤害）
-  if (isMagicDmg && !isPhysDmg && !isEnhanceDmg) {
+  if (isMagicDmg && !isPhysDmg && !isEnhanceDmg && !snapshot.忽略魔法抗性) {
     damage = applyMagicResist(damage, target, attacker);
   }
 
@@ -806,6 +810,7 @@ export function onDamageEvent(
       isIndependentSkillDamage: snapshot.isIndependentSkillDamage,
       isSingleTargetSkillDamage: snapshot.isSingleTargetSkillDamage,
       isAoeSkillDamage: snapshot.isAoeSkillDamage,
+      忽略魔法抗性: snapshot.忽略魔法抗性,
       isDamageTransfer: snapshot.isDamageTransfer,
     });
   }

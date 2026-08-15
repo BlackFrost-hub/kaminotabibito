@@ -15,16 +15,15 @@ local addDelayedCallback = ____require_result_2.addDelayedCallback
 local removeDelayedCallback = ____require_result_2.removeDelayedCallback
 local addPeriodicCallback = ____require_result_2.addPeriodicCallback
 local removePeriodicCallback = ____require_result_2.removePeriodicCallback
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.20．位移技能限制")
-local _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807 = ____require_result_3["执行战斗自身传送到坐标"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
+local _____5F00_59CB_51B2_950B = ____require_result_3["开始冲锋"]
+local _____505C_6B62_4F4D_79FB = ____require_result_3["停止位移"]
 local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____83B7_53D6_8303_56F4_654C_519B = ____require_result_4["获取范围敌军"]
 local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_5B58_6D3B = ____require_result_5["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
 local _____4E24_70B9_89D2_5EA6 = ____require_result_5["两点角度"]
-local _____6781_5750_6807X = ____require_result_5["极坐标X"]
-local _____6781_5750_6807Y = ____require_result_5["极坐标Y"]
 local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_6["造成批量AOE技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_6["创建独立技能伤害实例"]
@@ -79,6 +78,7 @@ local function _____83B7_53D6_6216_521B_5EFAA0KR_4E0A_4E0B_6587(unit)
         ["伤害"] = 0,
         ["周期回调ID"] = 0,
         ["收尾回调ID"] = 0,
+        ["位移ID"] = 0,
         ["周期次数"] = 0,
         ["已命中"] = {},
         ["已启动"] = false
@@ -177,6 +177,10 @@ local function ____A0KR_6536_5C3E(variable)
     end
 end
 local function _____6E05_7406A0KR_4E0A_4E0B_6587(context)
+    if context["位移ID"] ~= 0 then
+        _____505C_6B62_4F4D_79FB(context["位移ID"], "中断")
+        context["位移ID"] = 0
+    end
     if context["周期回调ID"] ~= 0 then
         removePeriodicCallback(context["周期回调ID"])
         context["周期回调ID"] = 0
@@ -220,17 +224,6 @@ local function ____A0KR_5468_671FTick(variable)
         return
     end
     context["周期次数"] = context["周期次数"] + 1
-    local nextX = _____6781_5750_6807X(
-        GetUnitX(context["施法者"]),
-        context["方向角"],
-        ____A0KR_914D_7F6E["速度"]
-    )
-    local nextY = _____6781_5750_6807Y(
-        GetUnitY(context["施法者"]),
-        context["方向角"],
-        ____A0KR_914D_7F6E["速度"]
-    )
-    _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(context["施法者"], nextX, nextY)
     local targets = _____83B7_53D6_8303_56F4_654C_519B(
         context["施法者"],
         GetUnitX(context["施法者"]),
@@ -273,17 +266,48 @@ local function _____91CA_653E_857E_7C73_8389_4E9AA0KR(caster)
         local i = 0
         while i < #____A0KR_914D_7F6E["表现"] do
             local effect = ____A0KR_914D_7F6E["表现"][i + 1]
+            local _____7279_6548_89D2_5EA6 = context["方向角"] + (____A0KR_914D_7F6E["特效朝向偏移"] or 0)
             _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
                 caster,
                 effect["模型路径"],
                 effect["特效键"],
                 effect["缩放"],
-                ____A0KR_914D_7F6E["初始高度"]
+                ____A0KR_914D_7F6E["初始高度"],
+                nil,
+                nil,
+                _____7279_6548_89D2_5EA6
             )
             i = i + 1
         end
     end
     context["周期回调ID"] = addPeriodicCallback(____A0KR_914D_7F6E["周期间隔毫秒"], ____A0KR_5468_671FTick, context)
+    local _____6301_7EED_65F6_95F4 = ____A0KR_914D_7F6E["周期间隔毫秒"] * ____A0KR_914D_7F6E["持续次数"] / 1000
+    context["位移ID"] = _____5F00_59CB_51B2_950B(
+        caster,
+        {
+            ["角度"] = context["方向角"],
+            ["距离"] = ____A0KR_914D_7F6E["速度"] * ____A0KR_914D_7F6E["持续次数"],
+            ["每秒速度"] = ____A0KR_914D_7F6E["速度"] / (____A0KR_914D_7F6E["周期间隔毫秒"] / 1000),
+            ["持续时间"] = _____6301_7EED_65F6_95F4,
+            ["检查地形"] = true,
+            ["暂停单位"] = false,
+            ["禁用碰撞"] = true,
+            ["朝向跟随位移"] = true,
+            ["结束回调"] = function(_unit, _reason)
+                context["位移ID"] = 0
+                if context["周期回调ID"] ~= 0 then
+                    removePeriodicCallback(context["周期回调ID"])
+                    context["周期回调ID"] = 0
+                end
+                if context["收尾回调ID"] == 0 then
+                    context["收尾回调ID"] = addDelayedCallback(150, ____A0KR_6536_5C3E, context)
+                end
+            end
+        }
+    )
+    if context["位移ID"] == 0 then
+        _____6E05_7406A0KR_4E0A_4E0B_6587(context)
+    end
 end
 local function _____5904_7406_857E_7C73_8389_4E9AA0KR(caster, abilityId)
     if abilityId ~= ____A0KR_6280_80FDID or GetUnitTypeId(caster) ~= _____5355_4F4D_7C7B_578BID or not _____5355_4F4D_5B58_6D3B(caster) then

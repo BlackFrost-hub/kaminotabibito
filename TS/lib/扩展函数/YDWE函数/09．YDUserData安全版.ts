@@ -35,6 +35,7 @@ const ydweBase = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
   YDWEGetUnitAbilityDataString: (this: void, unit: any, abilityId: number, level: number, dataType: number) => string;
   YDWEGetUnitAbilityDataInteger: (this: void, unit: any, abilityId: number, level: number, dataType: number) => number;
   YDWEGetUnitAbilityDataReal: (this: void, unit: any, abilityId: number, level: number, dataType: number) => number;
+  YDWEGetUnitAbilityState: (this: void, unit: any, abilityId: number, stateType: number) => number;
   YDWESetUnitAbilityState: (this: void, unit: any, abilityId: number, stateType: number, value: number) => boolean;
   YDWESetUnitAbilityDataReal: (this: void, unit: any, abilityId: number, level: number, dataType: number, value: number) => boolean;
   YDWETimerDestroyEffect: (this: void, duration: number, effect: any) => void;
@@ -54,6 +55,7 @@ const YDWEGetUnitAbilityDataStringUnsafe = ydweBase.YDWEGetUnitAbilityDataString
 const YDWEGetUnitAbilityDataIntegerUnsafe = ydweBase.YDWEGetUnitAbilityDataInteger as any;
 const YDWEGetUnitAbilityDataRealUnsafe = ydweBase.YDWEGetUnitAbilityDataReal as any;
 const YDWESetUnitAbilityStateUnsafe = ydweBase.YDWESetUnitAbilityState as any;
+const YDWEGetUnitAbilityStateUnsafe = ydweBase.YDWEGetUnitAbilityState as any;
 const YDWESetUnitAbilityDataRealUnsafe = ydweBase.YDWESetUnitAbilityDataReal as any;
 const YDWETimerDestroyEffectUnsafe = ydweBase.YDWETimerDestroyEffect as any;
 const YDWEAngleBetweenUnitsUnsafe = ydweBase.YDWEAngleBetweenUnits as any;
@@ -105,6 +107,10 @@ export function YDWEGetUnitAbilityDataRealSafe(this: void, unit: any, abilityId:
 
 export function YDWESetUnitAbilityStateSafe(this: void, unit: any, abilityId: number, stateType: number, value: number): boolean {
   return YDWESetUnitAbilityStateUnsafe(undefined, unit, abilityId, stateType, value);
+}
+
+export function YDWEGetUnitAbilityStateSafe(this: void, unit: any, abilityId: number, stateType: number): number {
+  return YDWEGetUnitAbilityStateUnsafe(undefined, unit, abilityId, stateType);
 }
 
 export function YDWESetUnitAbilityDataRealSafe(this: void, unit: any, abilityId: number, level: number, dataType: number, value: number): boolean {

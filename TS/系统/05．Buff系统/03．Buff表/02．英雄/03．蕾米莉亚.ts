@@ -16,7 +16,7 @@ export const 蕾米莉亚Buff表: Record<string, BuffData> = {
   [蕾米莉亚BuffID.红符法阵]: {
     buffID: 蕾米莉亚BuffID.红符法阵,
     buffName: "红符法阵",
-    icon: "ReplaceableTextures\\CommandButtons\\BTNFire.blp",
+    icon: "BuffIcon\\Hero\\Remilia\\scarlet_magic_circle.blp",
     effect: "",
     type: "Buff:magic:skill",
     interval: 0,
@@ -31,7 +31,7 @@ export const 蕾米莉亚Buff表: Record<string, BuffData> = {
   [蕾米莉亚BuffID.血雾形态]: {
     buffID: 蕾米莉亚BuffID.血雾形态,
     buffName: "血雾形态",
-    icon: "ReplaceableTextures\\CommandButtons\\BTNUnholyAura.blp",
+    icon: "BuffIcon\\Hero\\Remilia\\blood_mist_form.blp",
     effect: "",
     type: "Buff:magic:skill",
     interval: 0,
@@ -46,7 +46,7 @@ export const 蕾米莉亚Buff表: Record<string, BuffData> = {
   [蕾米莉亚BuffID.红色不夜城]: {
     buffID: 蕾米莉亚BuffID.红色不夜城,
     buffName: "红色不夜城",
-    icon: "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp",
+    icon: "BuffIcon\\Hero\\Remilia\\scarlet_devil_mansion.blp",
     effect: "",
     type: "Buff:magic:skill",
     interval: 0,
@@ -61,7 +61,7 @@ export const 蕾米莉亚Buff表: Record<string, BuffData> = {
   [蕾米莉亚BuffID.不夜城伤害吸血]: {
     buffID: 蕾米莉亚BuffID.不夜城伤害吸血,
     buffName: "不夜城伤害吸血",
-    icon: "ReplaceableTextures\\CommandButtons\\BTNVampiricAura.blp",
+    icon: "BuffIcon\\Hero\\Remilia\\mansion_lifesteal.blp",
     effect: "",
     type: "Buff:magic:positive",
     interval: 0,
@@ -77,7 +77,7 @@ export const 蕾米莉亚Buff表: Record<string, BuffData> = {
   [蕾米莉亚BuffID.绯色命运增益]: {
     buffID: 蕾米莉亚BuffID.绯色命运增益,
     buffName: "绯色命运增益",
-    icon: "ReplaceableTextures\\CommandButtons\\BTNInnerFire.blp",
+    icon: "BuffIcon\\Hero\\Remilia\\scarlet_fate_buff.blp",
     effect: "",
     type: "Buff:magic:positive",
     interval: 0,
@@ -93,7 +93,7 @@ export const 蕾米莉亚Buff表: Record<string, BuffData> = {
   [蕾米莉亚BuffID.绯色命运减益]: {
     buffID: 蕾米莉亚BuffID.绯色命运减益,
     buffName: "绯色命运减益",
-    icon: "ReplaceableTextures\\CommandButtons\\BTNHowlOfTerror.blp",
+    icon: "BuffIcon\\Hero\\Remilia\\scarlet_fate_debuff.blp",
     effect: "",
     type: "Debuff:magic:negative",
     interval: 0,
@@ -109,7 +109,7 @@ export const 蕾米莉亚Buff表: Record<string, BuffData> = {
   [蕾米莉亚BuffID.恶魔突袭吸血]: {
     buffID: 蕾米莉亚BuffID.恶魔突袭吸血,
     buffName: "恶魔突袭吸血",
-    icon: "ReplaceableTextures\\CommandButtons\\BTNVampiricAura.blp",
+    icon: "BuffIcon\\Hero\\Remilia\\demon_assault_lifesteal.blp",
     effect: "",
     type: "Buff:magic:positive",
     interval: 0,

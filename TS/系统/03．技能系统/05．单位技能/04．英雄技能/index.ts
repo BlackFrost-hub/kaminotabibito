@@ -9,4 +9,10 @@ export * from "./07．安斯艾尔/index";
 export * from "./08．提米诺斯/index";
 export * from "./09．欧菲莉亚/index";
 export * from "./10．欧尔贝克/index";
-
+export * from "./11．佐佐木小次郎/index";
+export * from "./13．坂井悠二/index";
+export * from "./14．铃仙/index";
+export * from "./14．黑崎一护/index";
+export * from "./15．鹿目圆/index";
+export * from "./16．塞拉斯/index";
+export * from "./17．Saber/index";

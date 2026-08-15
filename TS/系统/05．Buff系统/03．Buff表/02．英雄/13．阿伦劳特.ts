@@ -1,0 +1,173 @@
+/** @noSelfInFile */
+
+import type { BuffData } from "../../01．Buff表";
+
+/**
+ * 阿伦劳特 - 英雄 Buff 表
+ * 图标目录：imports\BuffIcon\Hero\Alaurent\（尚未生成，路径按迁移计划 §7.3 规划）
+ */
+export const 阿伦劳特BuffID = {
+  /** 光之圣剑形态（长期显示，治疗+10%、魔法伤害+5%） */
+  光之圣剑形态: "ALT1",
+  /** 裁决圣剑形态（长期显示，生命恢复+12%、受到治疗+12%） */
+  裁决圣剑形态: "ALT2",
+  /** 切换加攻（光切暗后攻击力+10%，2 秒，不可驱散） */
+  切换加攻: "ALT3",
+  /** 天堂呼唤（光 R 完成，攻击力+200%、魔法伤害降低30%，6 秒） */
+  天堂呼唤: "ALT4",
+  /** 裁决审判（暗 R 强化，开放 R2，6 秒） */
+  裁决审判: "ALT5",
+  /** 裁决吸引（暗 W 影响单位，最长 3 秒） */
+  裁决吸引: "ALT6",
+  /** 裁决减速（暗 W 敌人目标，移速-50%，2 秒） */
+  裁决减速: "ALT7",
+  /** 裁决加速（暗 W 友军目标，移速+50%，2 秒） */
+  裁决加速: "ALT8",
+  /** 裁决制裁（暗 Q 友军目标，最大攻击力+20%，3 秒） */
+  裁决制裁: "ALT9",
+} as const;
+
+export const 阿伦劳特Buff表: Record<string, BuffData> = {
+  [阿伦劳特BuffID.光之圣剑形态]: {
+    buffID: 阿伦劳特BuffID.光之圣剑形态,
+    buffName: "光之圣剑形态",
+    icon: "BuffIcon\\Hero\\Alaurent\\light_sword_form.blp",
+    effect: "",
+    type: "Buff:magic:positive",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "independent",
+    stackRefresh: false,
+    dispelLevel: 3,
+    priority: 90,
+    canPurge: false,
+    tooltip: "光之圣剑形态：治疗加成 +10%，魔法伤害加成 +5%。",
+  },
+  [阿伦劳特BuffID.裁决圣剑形态]: {
+    buffID: 阿伦劳特BuffID.裁决圣剑形态,
+    buffName: "裁决圣剑形态",
+    icon: "BuffIcon\\Hero\\Alaurent\\judgement_sword_form.blp",
+    effect: "",
+    type: "Buff:magic:positive",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "independent",
+    stackRefresh: false,
+    dispelLevel: 3,
+    priority: 90,
+    canPurge: false,
+    tooltip: "裁决圣剑形态：生命恢复效果 +12%，受到治疗 +12%。",
+  },
+  [阿伦劳特BuffID.切换加攻]: {
+    buffID: 阿伦劳特BuffID.切换加攻,
+    buffName: "切换加攻",
+    icon: "BuffIcon\\Hero\\Alaurent\\switch_attack_up.blp",
+    effect: "",
+    type: "Buff:magic:positive",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 75,
+    canPurge: false,
+    data属性名: "攻击力",
+    tooltip: "切换形态后 2 秒内攻击力 +10%。",
+  },
+  [阿伦劳特BuffID.天堂呼唤]: {
+    buffID: 阿伦劳特BuffID.天堂呼唤,
+    buffName: "天堂呼唤",
+    icon: "BuffIcon\\Hero\\Alaurent\\heaven_call.blp",
+    effect: "",
+    type: "Buff:magic:positive",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 85,
+    canPurge: false,
+    data属性名: "攻击力",
+    tooltip: "天堂呼唤：攻击力增幅到 300%，受到的魔法伤害降低 30%，持续 6 秒。",
+  },
+  [阿伦劳特BuffID.裁决审判]: {
+    buffID: 阿伦劳特BuffID.裁决审判,
+    buffName: "裁决审判",
+    icon: "BuffIcon\\Hero\\Alaurent\\judgement_trial.blp",
+    effect: "",
+    type: "Buff:magic:positive",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 85,
+    canPurge: false,
+    tooltip: "裁决审判：持续 6 秒，期间可使用裁决冲击（R）。",
+  },
+  [阿伦劳特BuffID.裁决吸引]: {
+    buffID: 阿伦劳特BuffID.裁决吸引,
+    buffName: "裁决吸引",
+    icon: "BuffIcon\\Hero\\Alaurent\\judgement_pull.blp",
+    effect: "",
+    type: "Debuff:magic:skill",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 70,
+    canPurge: false,
+    tooltip: "被裁决吸引牵引中，靠近施法者后结算。",
+  },
+  [阿伦劳特BuffID.裁决减速]: {
+    buffID: 阿伦劳特BuffID.裁决减速,
+    buffName: "裁决减速",
+    icon: "BuffIcon\\Hero\\Alaurent\\judgement_slow.blp",
+    effect: "",
+    type: "Debuff:magic:skill",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 60,
+    canPurge: true,
+    data属性名: "移动速度",
+    tooltip: "裁决吸引命中：移动速度降低 50%，持续 2 秒。",
+  },
+  [阿伦劳特BuffID.裁决加速]: {
+    buffID: 阿伦劳特BuffID.裁决加速,
+    buffName: "裁决加速",
+    icon: "BuffIcon\\Hero\\Alaurent\\judgement_haste.blp",
+    effect: "",
+    type: "Buff:magic:positive",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 60,
+    canPurge: true,
+    data属性名: "移动速度",
+    tooltip: "裁决吸引友军：移动速度提高 50%，持续 2 秒。",
+  },
+  [阿伦劳特BuffID.裁决制裁]: {
+    buffID: 阿伦劳特BuffID.裁决制裁,
+    buffName: "裁决制裁",
+    icon: "BuffIcon\\Hero\\Alaurent\\judgement_sanction.blp",
+    effect: "",
+    type: "Buff:magic:positive",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 75,
+    canPurge: true,
+    data属性名: "攻击力",
+    tooltip: "裁决制裁：最大攻击力提高 20%，持续 3 秒。",
+  },
+};
+
+export default 阿伦劳特Buff表;

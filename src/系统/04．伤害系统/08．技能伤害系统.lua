@@ -194,6 +194,7 @@ local function _____521B_5EFA_6280_80FD_4F24_5BB3_4E0A_4E0B_6587(_____53C2_6570)
         isSingleTargetSkillDamage = damageShape == "单体",
         isAoeSkillDamage = damageShape == "AOE",
         participatesInSkillDamageBonus = _____53C2_6570["参与技能伤害加成"] ~= false,
+        ["忽略魔法抗性"] = _____53C2_6570["忽略魔法抗性"] == true,
         isDamageTransfer = _____53C2_6570.isDamageTransfer == true
     }
 end

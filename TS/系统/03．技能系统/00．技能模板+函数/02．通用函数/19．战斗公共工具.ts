@@ -65,6 +65,11 @@ export function 读取单位攻击力(this: void, unit: any): number {
   return Number(GetUnitStateJapi(unit, UNIT_STATE_ATTACK)) || 0;
 }
 
+export function 读取单位敏捷(this: void, unit: any): number {
+  if (unit == null || unit === 0) return 0;
+  return Number(jass.GetHeroAgi(unit, true)) || 0;
+}
+
 export function 读取单位最大生命(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
   return Number(GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)) || 0;

@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import type { Boss血条弱点韧性运行状态, Boss弱点定义 } from "./00．类型";
+import type { Boss血条弱点韧性运行状态, Boss弱点定义, Boss弱点调查结果 } from "./00．类型";
 import {
   Boss弱点反馈默认配置,
   Boss弱点提示文本,
@@ -191,13 +191,16 @@ function 取弱点冷却毫秒(this: void, state: Boss血条弱点韧性运行�
   return weak.类别 === "武器" ? Boss弱点反馈默认配置.武器弱点冷却毫秒 : Boss弱点反馈默认配置.属性弱点冷却毫秒;
 }
 
-function 扣除Boss护盾(this: void, state: Boss血条弱点韧性运行状态): number {
+function 扣除Boss护盾(this: void, state: Boss血条弱点韧性运行状态, 指定削减值?: number): number {
   const shieldValue = 读取护盾值(state);
   if (shieldValue <= 0) {
     刷新Boss护盾文本(state, 0);
     return 0;
   }
-  const reduceValue = 取正数配置(state.配置?.护盾命中削减值, Boss弱点反馈默认配置.护盾命中削减值);
+  const reduceValue = 取正数配置(
+    指定削减值,
+    取正数配置(state.配置?.护盾命中削减值, Boss弱点反馈默认配置.护盾命中削减值),
+  );
   const nextValue = shieldValue - reduceValue;
   写入护盾值(state, nextValue);
   刷新Boss护盾文本(state, nextValue > 0 ? nextValue : 0);
@@ -255,6 +258,78 @@ function 处理Boss弱点命中(this: void, state: Boss血条弱点韧性运行�
     触发Boss护盾破碎(state, attacker);
   }
   确保Boss弱点表现刷新();
+}
+
+function 创建Boss弱点调查结果(
+  this: void,
+  state: Boss血条弱点韧性运行状态 | undefined,
+  成功: boolean,
+  原因: Boss弱点调查结果["原因"],
+  弱点索引: number = -1,
+): Boss弱点调查结果 {
+  const weak = state != null && state.配置 != null && 弱点索引 >= 0
+    ? state.配置.弱点列表[弱点索引]
+    : undefined;
+  return {
+    成功,
+    原因,
+    弱点索引,
+    弱点键: weak?.弱点键 ?? "",
+    当前护盾值: state != null ? 读取护盾值(state) : 0,
+    是否护盾破碎中: state?.是否护盾破碎中 === true,
+  };
+}
+
+/**
+ * 显现配置顺序中的下一个未显现弱点，并直接削减护盾。
+ * 这是同步玩法接口：不伪造伤害，也不触发普通弱点击中的伤害加成、保护冷却和命中表现。
+ */
+export function 调查Boss下一个未显现弱点(
+  this: void,
+  state: Boss血条弱点韧性运行状态 | undefined,
+  来源单位?: any,
+  护盾削减值: number = 1,
+): Boss弱点调查结果 {
+  if (state == null || state.是否已结束) {
+    return 创建Boss弱点调查结果(state, false, "Boss状态不存在");
+  }
+  if (!state.是否启用机制UI || state.配置 == null || state.配置.弱点列表.length <= 0) {
+    return 创建Boss弱点调查结果(state, false, "弱点机制未启用");
+  }
+  if (!state.是否弱点已注册) {
+    return 创建Boss弱点调查结果(state, false, "弱点UI尚未注册");
+  }
+  if (!state.是否伤害结算已注册) {
+    return 创建Boss弱点调查结果(state, false, "弱点结算尚未注册");
+  }
+  if (state.是否护盾破碎中) {
+    return 创建Boss弱点调查结果(state, false, "护盾破碎中");
+  }
+
+  let weakIndex = -1;
+  for (let i = 0; i < state.配置.弱点列表.length; i++) {
+    if (state.弱点已暴露列表[i] !== true) {
+      weakIndex = i;
+      break;
+    }
+  }
+  if (weakIndex < 0) {
+    return 创建Boss弱点调查结果(state, false, "没有未显现弱点");
+  }
+
+  const weak = state.配置.弱点列表[weakIndex];
+  显示Boss弱点真实图标(state, weakIndex);
+  播放全员本地音效(state.配置.弱点发现音效路径 ?? Boss弱点反馈默认配置.弱点发现音效路径);
+  if (state.配置.弱点发现提示启用 !== false) {
+    发送全员任务消息(bj_QUESTMESSAGE_UNITACQUIRED, 构造弱点发现提示(来源单位, weak));
+  }
+
+  const shieldValue = 扣除Boss护盾(state, 护盾削减值);
+  if (shieldValue <= 0) {
+    触发Boss护盾破碎(state, 来源单位);
+  }
+  确保Boss弱点表现刷新();
+  return 创建Boss弱点调查结果(state, true, "成功", weakIndex);
 }
 
 function onBoss弱点命中伤害修正(this: void, context: any): number {

@@ -5,6 +5,24 @@ import type { Boss战运行上下文 } from "../01．Boss战运行/01．Boss战�
 export type Boss弱点类别 = "武器" | "属性";
 export type Boss血条显示类型 = "主Boss" | "护卫";
 export type Boss护卫血条归属类型 = "共享" | "独立";
+export type Boss弱点调查原因 =
+  | "成功"
+  | "单位无效"
+  | "Boss状态不存在"
+  | "弱点机制未启用"
+  | "弱点UI尚未注册"
+  | "弱点结算尚未注册"
+  | "护盾破碎中"
+  | "没有未显现弱点";
+
+export interface Boss弱点调查结果 {
+  成功: boolean;
+  原因: Boss弱点调查原因;
+  弱点索引: number;
+  弱点键: string;
+  当前护盾值: number;
+  是否护盾破碎中: boolean;
+}
 
 export interface Boss弱点定义 {
   弱点键: string;

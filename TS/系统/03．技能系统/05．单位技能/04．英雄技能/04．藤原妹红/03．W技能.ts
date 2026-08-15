@@ -37,6 +37,10 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = requ
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
+const { 创建进度条特效, 销毁进度条特效 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.进度条特效") as {
+  创建进度条特效: (this: void, 单位: any, 选项?: { 高度偏移?: number; 缩放?: number; 动画序号?: number; 动画速度?: number }) => any;
+  销毁进度条特效: (this: void, 进度条特效: any) => void;
+};
 const { 开始击退, 停止位移 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口") as {
   开始击退: (this: void, unit: any, params: any) => number;
   停止位移: (this: void, id: number, reason?: string) => boolean;
@@ -112,8 +116,10 @@ interface 藤原妹红符卡W运行时上下文 {
   方向角: number;
   伤害: number;
   技能实例ID?: number;
+  进度条特效: any;
   推进回调ID: number;
   推进计时秒: number;
+  推进总计时秒: number;
   剩余位移数: number;
   位移ID列表: number[];
   活跃: boolean;
@@ -332,6 +338,10 @@ function 取藤原妹红符卡W上下文(this: void, caster: any): 藤原妹红�
 function 清理藤原妹红符卡W(this: void, context: 藤原妹红符卡W运行时上下文): void {
   if (!context.活跃) return;
   context.活跃 = false;
+  if (context.进度条特效 != null) {
+    销毁进度条特效(context.进度条特效);
+    context.进度条特效 = undefined;
+  }
   if (context.推进回调ID !== 0) {
     removePeriodicCallback(context.推进回调ID);
   context.推进回调ID = 0;
@@ -356,15 +366,35 @@ function 藤原妹红符卡W推进Tick(this: void, variable?: any): void {
   }
   const cfg = 藤原妹红单位技能配置.符卡W;
   context.推进计时秒 += cfg.推进表现间隔毫秒 * 0.001;
-  if (context.推进计时秒 < cfg.推进表现时间增量秒) return;
-  context.推进计时秒 -= cfg.推进表现时间增量秒;
-  const targetX = GetUnitX(context.目标);
-  const targetY = GetUnitY(context.目标);
-  const effectX = targetX + Cos(context.方向角 * BJ_DEGTORAD) * cfg.击退距离;
-  const effectY = targetY + Sin(context.方向角 * BJ_DEGTORAD) * cfg.击退距离;
-  for (let i = 0; i < cfg.命中特效.length; i++) {
-    创建藤原妹红点特效(cfg.命中特效[i], effectX, effectY, context.方向角);
+  context.推进总计时秒 += cfg.推进表现间隔毫秒 * 0.001;
+  if (context.推进计时秒 >= cfg.推进表现时间增量秒) {
+    context.推进计时秒 -= cfg.推进表现时间增量秒;
+    const targetX = GetUnitX(context.目标);
+    const targetY = GetUnitY(context.目标);
+    const effectX = targetX + Cos(context.方向角 * BJ_DEGTORAD) * cfg.击退距离;
+    const effectY = targetY + Sin(context.方向角 * BJ_DEGTORAD) * cfg.击退距离;
+    let successCount = 0;
+    for (let i = 0; i < cfg.命中特效.length; i++) {
+      const effect = 创建藤原妹红点特效(cfg.命中特效[i], effectX, effectY, context.方向角);
+      if (effect != null && effect !== 0) successCount += 1;
+    }
+    debugLogForce(
+      符卡W诊断模块,
+      "推进命中特效",
+      "请求数",
+      cfg.命中特效.length,
+      "成功数",
+      successCount,
+      "X",
+      effectX,
+      "Y",
+      effectY,
+    );
   }
+  if (context.推进总计时秒 < cfg.击退持续秒) return;
+  removePeriodicCallback(context.推进回调ID);
+  context.推进回调ID = 0;
+  if (context.剩余位移数 === 0) 清理藤原妹红符卡W(context);
 }
 
 function 藤原妹红符卡W目标位移结束(this: void, target: any, reason: string, displacementId: number): void {
@@ -396,7 +426,9 @@ function 藤原妹红符卡W目标位移结束(this: void, target: any, reason: 
     创建藤原妹红点特效(收尾特效, GetUnitX(target), GetUnitY(target));
   }
   context.剩余位移数 -= 1;
-  if (context.活跃 && context.剩余位移数 <= 0) 清理藤原妹红符卡W(context);
+  if (context.活跃 && context.剩余位移数 <= 0 && context.推进回调ID === 0) {
+    清理藤原妹红符卡W(context);
+  }
 }
 
 function 符卡W目标允许命中(this: void, caster: any, target: any): boolean {
@@ -414,6 +446,14 @@ function 结算藤原妹红符卡W(this: void, context: 藤原妹红符卡W运�
   const cfg = 藤原妹红单位技能配置.符卡W;
   const caster = context.施法者;
   const target = context.目标;
+  debugLogForce(
+    符卡W诊断模块,
+    "进入符卡W结算",
+    "施法者",
+    取单位句柄ID(caster),
+    "目标",
+    取单位句柄ID(target),
+  );
   const targetX = GetUnitX(target);
   const targetY = GetUnitY(target);
 
@@ -438,9 +478,11 @@ function 结算藤原妹红符卡W(this: void, context: 藤原妹红符卡W运�
   播放藤原妹红配置动作(caster, cfg.命中动作编号, cfg.命中动作速度);
 
   const targets = 获取范围敌军(caster, GetUnitX(caster), GetUnitY(caster), cfg.搜索范围);
+  let hitCount = 0;
   for (let i = 0; i < targets.length; i++) {
     const hitTarget = targets[i];
     if (!符卡W目标允许命中(caster, hitTarget)) continue;
+    hitCount += 1;
     造成单体技能伤害({
       来源: caster,
       目标: hitTarget,
@@ -471,11 +513,8 @@ function 结算藤原妹红符卡W(this: void, context: 藤原妹红符卡W运�
       藤原妹红符卡W位移表[displacementId] = context;
     }
   }
+  debugLogForce(符卡W诊断模块, "符卡W命中目标统计", "枚举数", targets.length, "合法命中数", hitCount);
 
-  if (context.剩余位移数 === 0) {
-    清理藤原妹红符卡W(context);
-    return;
-  }
   context.推进回调ID = addPeriodicCallback(cfg.推进表现间隔毫秒, 藤原妹红符卡W推进Tick, context);
 }
 
@@ -509,17 +548,35 @@ function 释放藤原妹红符卡W(this: void, _context: any, caster: any, skill
   关闭藤原妹红符卡模式(caster, true);
   const cfg = 藤原妹红单位技能配置.符卡W;
   播放藤原妹红单位音效(caster, cfg.全局音效键);
-  创建藤原妹红单位特效(caster, { 模型路径: cfg.目标预警特效, 持续秒: cfg.命中延迟秒 }, "origin");
+  const targetWarningEffect = 创建藤原妹红单位特效(target, { 模型路径: cfg.目标预警特效, 持续秒: cfg.命中延迟秒 }, "origin");
+  debugLogForce(
+    符卡W诊断模块,
+    "目标预警特效创建",
+    "目标",
+    取单位句柄ID(target),
+    "路径",
+    cfg.目标预警特效,
+    "成功",
+    targetWarningEffect != null && targetWarningEffect !== 0,
+  );
   const 方向角 = 两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target));
   SetUnitFacing(caster, 方向角);
   SetUnitFacing(target, 方向角 + 180);
   开始硬直(caster, cfg.硬直秒);
   播放藤原妹红配置动作(caster, cfg.动作编号, cfg.动作速度);
-  创建藤原妹红点特效(
-    cfg.进度条特效,
-    GetUnitX(caster),
-    GetUnitY(caster),
-    方向角,
+  const progressEffect = 创建进度条特效(caster, {
+    高度偏移: cfg.进度条高度偏移,
+    动画速度: cfg.进度条动画速度,
+  });
+  debugLogForce(
+    符卡W诊断模块,
+    "施法进度条创建",
+    "施法者",
+    casterId,
+    "成功",
+    progressEffect != null && progressEffect !== 0,
+    "命中延迟秒",
+    cfg.命中延迟秒,
   );
   const context: 藤原妹红符卡W运行时上下文 = {
     施法者: caster,
@@ -527,8 +584,10 @@ function 释放藤原妹红符卡W(this: void, _context: any, caster: any, skill
     方向角,
     伤害: 读取单位攻击力(caster) * cfg.伤害攻击力倍率,
     技能实例ID: skillInstanceId,
+    进度条特效: progressEffect,
     推进回调ID: 0,
     推进计时秒: 0,
+    推进总计时秒: 0,
     剩余位移数: 0,
     位移ID列表: [],
     活跃: true,

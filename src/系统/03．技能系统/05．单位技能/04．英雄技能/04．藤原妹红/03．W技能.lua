@@ -98,22 +98,25 @@ local ____require_result_3 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_3.addDelayedCallback
 local addPeriodicCallback = ____require_result_3.addPeriodicCallback
 local removePeriodicCallback = ____require_result_3.removePeriodicCallback
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
-local _____5F00_59CB_51FB_9000 = ____require_result_4["开始击退"]
-local _____505C_6B62_4F4D_79FB = ____require_result_4["停止位移"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-local _____65BD_52A0_7729_6655 = ____require_result_5["施加眩晕"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____5F00_59CB_786C_76F4 = ____require_result_6["开始硬直"]
-local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成批量AOE技能伤害"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.进度条特效")
+local _____521B_5EFA_8FDB_5EA6_6761_7279_6548 = ____require_result_4["创建进度条特效"]
+local _____9500_6BC1_8FDB_5EA6_6761_7279_6548 = ____require_result_4["销毁进度条特效"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
+local _____5F00_59CB_51FB_9000 = ____require_result_5["开始击退"]
+local _____505C_6B62_4F4D_79FB = ____require_result_5["停止位移"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
+local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_7["开始硬直"]
 local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_8["造成单体技能伤害"]
-local ____require_result_9 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_9.registerDeathListener
+_____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_8["造成批量AOE技能伤害"]
+local ____require_result_9 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_9["造成单体技能伤害"]
+local ____require_result_10 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_10.registerDeathListener
 local jass = require("jass.common")
-local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_10.debugLogForce
+local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_11.debugLogForce
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
@@ -138,9 +141,9 @@ WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
-local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____4E24_70B9_89D2_5EA6 = ____require_result_11["两点角度"]
-local _____8DDD_79BBXY = ____require_result_11["距离XY"]
+local ____require_result_12 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____4E24_70B9_89D2_5EA6 = ____require_result_12["两点角度"]
+local _____8DDD_79BBXY = ____require_result_12["距离XY"]
 local _____85E4_539F_59B9_7EA2_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local _____4E3B_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["主技能ID"])
 _____5F15_7206_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["引爆技能ID"])
@@ -184,13 +187,13 @@ ____exports["获取或创建藤原妹红W上下文"] = function(unit)
 end
 local function _____83B7_53D6_85E4_539F_59B9_7EA2W_4E0A_4E0B_6587(unit)
     local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    local ____temp_12
+    local ____temp_13
     if unitId == 0 then
-        ____temp_12 = nil
+        ____temp_13 = nil
     else
-        ____temp_12 = _____85E4_539F_59B9_7EA2W_4E0A_4E0B_6587_8868[unitId]
+        ____temp_13 = _____85E4_539F_59B9_7EA2W_4E0A_4E0B_6587_8868[unitId]
     end
-    return ____temp_12
+    return ____temp_13
 end
 local function _____6E05_7406_85E4_539F_59B9_7EA2W_72B6_6001(unit, shieldId)
     local context = _____83B7_53D6_85E4_539F_59B9_7EA2W_4E0A_4E0B_6587(unit)
@@ -331,6 +334,10 @@ local function _____6E05_7406_85E4_539F_59B9_7EA2_7B26_5361W(context)
         return
     end
     context["活跃"] = false
+    if context["进度条特效"] ~= nil then
+        _____9500_6BC1_8FDB_5EA6_6761_7279_6548(context["进度条特效"])
+        context["进度条特效"] = nil
+    end
     if context["推进回调ID"] ~= 0 then
         removePeriodicCallback(context["推进回调ID"])
         context["推进回调ID"] = 0
@@ -364,20 +371,44 @@ local function _____85E4_539F_59B9_7EA2_7B26_5361W_63A8_8FDBTick(variable)
     end
     local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡W"]
     context["推进计时秒"] = context["推进计时秒"] + cfg["推进表现间隔毫秒"] * 0.001
-    if context["推进计时秒"] < cfg["推进表现时间增量秒"] then
+    context["推进总计时秒"] = context["推进总计时秒"] + cfg["推进表现间隔毫秒"] * 0.001
+    if context["推进计时秒"] >= cfg["推进表现时间增量秒"] then
+        context["推进计时秒"] = context["推进计时秒"] - cfg["推进表现时间增量秒"]
+        local targetX = GetUnitX(context["目标"])
+        local targetY = GetUnitY(context["目标"])
+        local effectX = targetX + Cos(context["方向角"] * BJ_DEGTORAD) * cfg["击退距离"]
+        local effectY = targetY + Sin(context["方向角"] * BJ_DEGTORAD) * cfg["击退距离"]
+        local successCount = 0
+        do
+            local i = 0
+            while i < #cfg["命中特效"] do
+                local effect = _____521B_5EFA_85E4_539F_59B9_7EA2_70B9_7279_6548(cfg["命中特效"][i + 1], effectX, effectY, context["方向角"])
+                if effect ~= nil and effect ~= 0 then
+                    successCount = successCount + 1
+                end
+                i = i + 1
+            end
+        end
+        debugLogForce(
+            _____7B26_5361W_8BCA_65AD_6A21_5757,
+            "推进命中特效",
+            "请求数",
+            #cfg["命中特效"],
+            "成功数",
+            successCount,
+            "X",
+            effectX,
+            "Y",
+            effectY
+        )
+    end
+    if context["推进总计时秒"] < cfg["击退持续秒"] then
         return
     end
-    context["推进计时秒"] = context["推进计时秒"] - cfg["推进表现时间增量秒"]
-    local targetX = GetUnitX(context["目标"])
-    local targetY = GetUnitY(context["目标"])
-    local effectX = targetX + Cos(context["方向角"] * BJ_DEGTORAD) * cfg["击退距离"]
-    local effectY = targetY + Sin(context["方向角"] * BJ_DEGTORAD) * cfg["击退距离"]
-    do
-        local i = 0
-        while i < #cfg["命中特效"] do
-            _____521B_5EFA_85E4_539F_59B9_7EA2_70B9_7279_6548(cfg["命中特效"][i + 1], effectX, effectY, context["方向角"])
-            i = i + 1
-        end
+    removePeriodicCallback(context["推进回调ID"])
+    context["推进回调ID"] = 0
+    if context["剩余位移数"] == 0 then
+        _____6E05_7406_85E4_539F_59B9_7EA2_7B26_5361W(context)
     end
 end
 local function _____85E4_539F_59B9_7EA2_7B26_5361W_76EE_6807_4F4D_79FB_7ED3_675F(target, reason, displacementId)
@@ -391,12 +422,12 @@ local function _____85E4_539F_59B9_7EA2_7B26_5361W_76EE_6807_4F4D_79FB_7ED3_675F
         while i < #context["位移ID列表"] do
             do
                 if context["位移ID列表"][i + 1] ~= displacementId then
-                    goto __continue58
+                    goto __continue62
                 end
                 __TS__ArraySplice(context["位移ID列表"], i, 1)
                 break
             end
-            ::__continue58::
+            ::__continue62::
             i = i + 1
         end
     end
@@ -424,7 +455,7 @@ local function _____85E4_539F_59B9_7EA2_7B26_5361W_76EE_6807_4F4D_79FB_7ED3_675F
         )
     end
     context["剩余位移数"] = context["剩余位移数"] - 1
-    if context["活跃"] and context["剩余位移数"] <= 0 then
+    if context["活跃"] and context["剩余位移数"] <= 0 and context["推进回调ID"] == 0 then
         _____6E05_7406_85E4_539F_59B9_7EA2_7B26_5361W(context)
     end
 end
@@ -451,6 +482,14 @@ local function _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361W(context)
     local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡W"]
     local caster = context["施法者"]
     local target = context["目标"]
+    debugLogForce(
+        _____7B26_5361W_8BCA_65AD_6A21_5757,
+        "进入符卡W结算",
+        "施法者",
+        _____53D6_5355_4F4D_53E5_67C4ID(caster),
+        "目标",
+        _____53D6_5355_4F4D_53E5_67C4ID(target)
+    )
     local targetX = GetUnitX(target)
     local targetY = GetUnitY(target)
     local nearTargetX = targetX - Cos(context["方向角"] * BJ_DEGTORAD) * cfg["贴近目标距离"]
@@ -483,14 +522,16 @@ local function _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361W(context)
         GetUnitY(caster),
         cfg["搜索范围"]
     )
+    local hitCount = 0
     do
         local i = 0
         while i < #targets do
             do
                 local hitTarget = targets[i + 1]
                 if not _____7B26_5361W_76EE_6807_5141_8BB8_547D_4E2D(caster, hitTarget) then
-                    goto __continue71
+                    goto __continue75
                 end
+                hitCount = hitCount + 1
                 _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
                     ["来源"] = caster,
                     ["目标"] = hitTarget,
@@ -523,19 +564,23 @@ local function _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361W(context)
                 })
                 if displacementId > 0 then
                     context["剩余位移数"] = context["剩余位移数"] + 1
-                    local ____context__4F4D_79FBID_5217_8868_13 = context["位移ID列表"]
-                    ____context__4F4D_79FBID_5217_8868_13[#____context__4F4D_79FBID_5217_8868_13 + 1] = displacementId
+                    local ____context__4F4D_79FBID_5217_8868_14 = context["位移ID列表"]
+                    ____context__4F4D_79FBID_5217_8868_14[#____context__4F4D_79FBID_5217_8868_14 + 1] = displacementId
                     _____85E4_539F_59B9_7EA2_7B26_5361W_4F4D_79FB_8868[displacementId] = context
                 end
             end
-            ::__continue71::
+            ::__continue75::
             i = i + 1
         end
     end
-    if context["剩余位移数"] == 0 then
-        _____6E05_7406_85E4_539F_59B9_7EA2_7B26_5361W(context)
-        return
-    end
+    debugLogForce(
+        _____7B26_5361W_8BCA_65AD_6A21_5757,
+        "符卡W命中目标统计",
+        "枚举数",
+        #targets,
+        "合法命中数",
+        hitCount
+    )
     context["推进回调ID"] = addPeriodicCallback(cfg["推进表现间隔毫秒"], _____85E4_539F_59B9_7EA2_7B26_5361W_63A8_8FDBTick, context)
 end
 local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361W(_context, caster, skillInstanceId)
@@ -570,7 +615,17 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361W(_context, caster, s
     _____5173_95ED_85E4_539F_59B9_7EA2_7B26_5361_6A21_5F0F(caster, true)
     local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡W"]
     _____64AD_653E_85E4_539F_59B9_7EA2_5355_4F4D_97F3_6548(caster, cfg["全局音效键"])
-    _____521B_5EFA_85E4_539F_59B9_7EA2_5355_4F4D_7279_6548(caster, {["模型路径"] = cfg["目标预警特效"], ["持续秒"] = cfg["命中延迟秒"]}, "origin")
+    local targetWarningEffect = _____521B_5EFA_85E4_539F_59B9_7EA2_5355_4F4D_7279_6548(target, {["模型路径"] = cfg["目标预警特效"], ["持续秒"] = cfg["命中延迟秒"]}, "origin")
+    debugLogForce(
+        _____7B26_5361W_8BCA_65AD_6A21_5757,
+        "目标预警特效创建",
+        "目标",
+        _____53D6_5355_4F4D_53E5_67C4ID(target),
+        "路径",
+        cfg["目标预警特效"],
+        "成功",
+        targetWarningEffect ~= nil and targetWarningEffect ~= 0
+    )
     local _____65B9_5411_89D2 = _____4E24_70B9_89D2_5EA6(
         GetUnitX(caster),
         GetUnitY(caster),
@@ -581,11 +636,16 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361W(_context, caster, s
     SetUnitFacing(target, _____65B9_5411_89D2 + 180)
     _____5F00_59CB_786C_76F4(caster, cfg["硬直秒"])
     _____64AD_653E_85E4_539F_59B9_7EA2_914D_7F6E_52A8_4F5C(caster, cfg["动作编号"], cfg["动作速度"])
-    _____521B_5EFA_85E4_539F_59B9_7EA2_70B9_7279_6548(
-        cfg["进度条特效"],
-        GetUnitX(caster),
-        GetUnitY(caster),
-        _____65B9_5411_89D2
+    local progressEffect = _____521B_5EFA_8FDB_5EA6_6761_7279_6548(caster, {["高度偏移"] = cfg["进度条高度偏移"], ["动画速度"] = cfg["进度条动画速度"]})
+    debugLogForce(
+        _____7B26_5361W_8BCA_65AD_6A21_5757,
+        "施法进度条创建",
+        "施法者",
+        casterId,
+        "成功",
+        progressEffect ~= nil and progressEffect ~= 0,
+        "命中延迟秒",
+        cfg["命中延迟秒"]
     )
     local context = {
         ["施法者"] = caster,
@@ -593,8 +653,10 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361W(_context, caster, s
         ["方向角"] = _____65B9_5411_89D2,
         ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * cfg["伤害攻击力倍率"],
         ["技能实例ID"] = skillInstanceId,
+        ["进度条特效"] = progressEffect,
         ["推进回调ID"] = 0,
         ["推进计时秒"] = 0,
+        ["推进总计时秒"] = 0,
         ["剩余位移数"] = 0,
         ["位移ID列表"] = {},
         ["活跃"] = true
@@ -641,10 +703,10 @@ local function _____85E4_539F_59B9_7EA2W_5355_4F4D_6B7B_4EA1(dyingUnit, _killing
         do
             local context = _____85E4_539F_59B9_7EA2W_4E0A_4E0B_6587_8868[__TS__Number(key)]
             if context == nil then
-                goto __continue86
+                goto __continue89
             end
             if context["施法者"] ~= dyingUnit and context["护盾目标"] ~= dyingUnit then
-                goto __continue86
+                goto __continue89
             end
             local caster = context["施法者"]
             _____6E05_7406_85E4_539F_59B9_7EA2W_72B6_6001(caster, context["护盾ID"])
@@ -653,7 +715,7 @@ local function _____85E4_539F_59B9_7EA2W_5355_4F4D_6B7B_4EA1(dyingUnit, _killing
                 __TS__Number(key)
             )
         end
-        ::__continue86::
+        ::__continue89::
     end
 end
 ____exports["注册藤原妹红W技能"] = function()

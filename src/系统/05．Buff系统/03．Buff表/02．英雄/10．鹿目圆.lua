@@ -1,0 +1,136 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+____exports["鹿目圆BuffID"] = {
+    ["因果之力"] = "KMD1",
+    ["因果之矢蓄力"] = "KMD2",
+    ["因果之矢待发"] = "KMD3",
+    ["虹之雨"] = "KMD4",
+    ["圆神之力"] = "KMD5",
+    ["圆环之力一次强化"] = "KMD6",
+    ["圆环之力二次强化"] = "KMD7",
+    ["圆环之理"] = "KMD8"
+}
+____exports["鹿目圆Buff表"] = {
+    [____exports["鹿目圆BuffID"]["因果之力"]] = {
+        buffID = ____exports["鹿目圆BuffID"]["因果之力"],
+        buffName = "因果之力",
+        icon = "BuffIcon\\Hero\\KanameMadoka\\madoka_causal_power.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 10,
+        stackRule = "stack",
+        stackRefresh = false,
+        dispelLevel = 3,
+        priority = 60,
+        canPurge = false,
+        tooltip = "每层提高5%攻击速度，单层独立持续12秒；达到10层时驱散负面效果并恢复20%最大生命。"
+    },
+    [____exports["鹿目圆BuffID"]["因果之矢蓄力"]] = {
+        buffID = ____exports["鹿目圆BuffID"]["因果之矢蓄力"],
+        buffName = "因果之矢蓄力",
+        icon = "BuffIcon\\Hero\\KanameMadoka\\madoka_arrow_charge.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 70,
+        canPurge = false,
+        tooltip = "正在蓄力因果之矢；受到强控制会中断。"
+    },
+    [____exports["鹿目圆BuffID"]["因果之矢待发"]] = {
+        buffID = ____exports["鹿目圆BuffID"]["因果之矢待发"],
+        buffName = "因果之矢待发",
+        icon = "BuffIcon\\Hero\\KanameMadoka\\madoka_arrow_charge.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 72,
+        canPurge = false,
+        tooltip = "蓄力已完成，可在短时间内发射因果之矢。"
+    },
+    [____exports["鹿目圆BuffID"]["虹之雨"]] = {
+        buffID = ____exports["鹿目圆BuffID"]["虹之雨"],
+        buffName = "虹之雨",
+        icon = "BuffIcon\\Hero\\KanameMadoka\\madoka_rainbow_rain.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 65,
+        canPurge = false,
+        tooltip = "虹之雨持续中：区域内友军获得治疗，敌人受到风属性魔法伤害。"
+    },
+    [____exports["鹿目圆BuffID"]["圆神之力"]] = {
+        buffID = ____exports["鹿目圆BuffID"]["圆神之力"],
+        buffName = "圆神之力",
+        icon = "BuffIcon\\Hero\\KanameMadoka\\madoka_goddess_power.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 90,
+        canPurge = false,
+        tooltip = "化身圆神：普攻转为魔法伤害，魔法伤害提高20%且无视魔法抗性。"
+    },
+    [____exports["鹿目圆BuffID"]["圆环之力一次强化"]] = {
+        buffID = ____exports["鹿目圆BuffID"]["圆环之力一次强化"],
+        buffName = "圆环之力",
+        icon = "BuffIcon\\Hero\\KanameMadoka\\madoka_ring_power_one.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 75,
+        canPurge = false,
+        tooltip = "下一次普攻或指定技能获得一次圆环之力强化。"
+    },
+    [____exports["鹿目圆BuffID"]["圆环之力二次强化"]] = {
+        buffID = ____exports["鹿目圆BuffID"]["圆环之力二次强化"],
+        buffName = "圆环之力（二次强化）",
+        icon = "BuffIcon\\Hero\\KanameMadoka\\madoka_ring_power_two.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 2,
+        stackRule = "stack",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 76,
+        canPurge = false,
+        tooltip = "下一次普攻或指定技能获得二次圆环之力强化。"
+    },
+    [____exports["鹿目圆BuffID"]["圆环之理"]] = {
+        buffID = ____exports["鹿目圆BuffID"]["圆环之理"],
+        buffName = "圆环之理",
+        icon = "BuffIcon\\Hero\\KanameMadoka\\madoka_circle_truth.blp",
+        effect = "",
+        type = "Buff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 95,
+        canPurge = false,
+        tooltip = "圆环之理持续中：免疫控制，区域内敌人持续受暗属性伤害，友军持续恢复生命与魔法。"
+    }
+}
+____exports.default = ____exports["鹿目圆Buff表"]
+return ____exports

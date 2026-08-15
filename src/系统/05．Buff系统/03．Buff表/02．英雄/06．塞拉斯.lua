@@ -1,0 +1,121 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+____exports["塞拉斯BuffID"] = {
+    ["灼烧"] = "SLS2",
+    ["冻结"] = "SLS3",
+    ["雷击减速"] = "SLS4",
+    ["火焰附加攻击"] = "SLS5",
+    ["冰冻附加攻击"] = "SLS6",
+    ["雷击附加攻击"] = "SLS7",
+    ["大魔法化"] = "SLS8"
+}
+____exports["塞拉斯Buff表"] = {
+    [____exports["塞拉斯BuffID"]["灼烧"]] = {
+        buffID = ____exports["塞拉斯BuffID"]["灼烧"],
+        buffName = "灼烧",
+        icon = "BuffIcon\\Hero\\Sylas\\sylas_burn.blp",
+        effect = "",
+        type = "Debuff:magic:skill",
+        interval = 0,
+        maxStack = 99,
+        stackRule = "stack",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 65,
+        canPurge = true,
+        tooltip = "灼烧中：每秒受到已损失生命值1.5%的火焰伤害，每次火焰魔法命中叠加2层。"
+    },
+    [____exports["塞拉斯BuffID"]["冻结"]] = {
+        buffID = ____exports["塞拉斯BuffID"]["冻结"],
+        buffName = "冻结",
+        icon = "BuffIcon\\Hero\\Sylas\\sylas_freeze.blp",
+        effect = "",
+        type = "Debuff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 75,
+        canPurge = true,
+        tooltip = "被冰冻魔法冻结，无法行动。"
+    },
+    [____exports["塞拉斯BuffID"]["雷击减速"]] = {
+        buffID = ____exports["塞拉斯BuffID"]["雷击减速"],
+        buffName = "雷击净化",
+        icon = "BuffIcon\\Hero\\Sylas\\sylas_lightning_slow.blp",
+        effect = "",
+        type = "Debuff:magic:skill",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 60,
+        canPurge = true,
+        ["data属性名"] = "移动速度",
+        tooltip = "被雷击净化，移动速度大幅降低，持续1.4秒（介绍口径；JASS 1.2秒保留审计）。"
+    },
+    [____exports["塞拉斯BuffID"]["火焰附加攻击"]] = {
+        buffID = ____exports["塞拉斯BuffID"]["火焰附加攻击"],
+        buffName = "火焰附加攻击",
+        icon = "BuffIcon\\Hero\\Sylas\\sylas_fire_attack.blp",
+        effect = "",
+        type = "Buff:magic:positive",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 55,
+        canPurge = true,
+        tooltip = "下一次远程普通攻击追加当前魔法值40%的火焰伤害。"
+    },
+    [____exports["塞拉斯BuffID"]["冰冻附加攻击"]] = {
+        buffID = ____exports["塞拉斯BuffID"]["冰冻附加攻击"],
+        buffName = "冰冻附加攻击",
+        icon = "BuffIcon\\Hero\\Sylas\\sylas_ice_attack.blp",
+        effect = "",
+        type = "Buff:magic:positive",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 55,
+        canPurge = true,
+        tooltip = "下一次远程普通攻击追加当前魔法值40%的冰冻伤害。"
+    },
+    [____exports["塞拉斯BuffID"]["雷击附加攻击"]] = {
+        buffID = ____exports["塞拉斯BuffID"]["雷击附加攻击"],
+        buffName = "雷击附加攻击",
+        icon = "BuffIcon\\Hero\\Sylas\\sylas_lightning_attack.blp",
+        effect = "",
+        type = "Buff:magic:positive",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 55,
+        canPurge = true,
+        tooltip = "下一次远程普通攻击追加当前魔法值40%的雷击伤害。"
+    },
+    [____exports["塞拉斯BuffID"]["大魔法化"]] = {
+        buffID = ____exports["塞拉斯BuffID"]["大魔法化"],
+        buffName = "大魔法化",
+        icon = "BuffIcon\\Hero\\Sylas\\sylas_grand_magic.blp",
+        effect = "",
+        type = "Buff:magic:positive",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = false,
+        dispelLevel = 3,
+        priority = 80,
+        canPurge = false,
+        tooltip = "大魔法化：下一次普通魔法按二连击结算，所有效果二连击。"
+    }
+}
+____exports.default = ____exports["塞拉斯Buff表"]
+return ____exports

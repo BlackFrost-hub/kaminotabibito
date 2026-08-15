@@ -125,15 +125,24 @@ function 调整英雄基础力量(this: void, hero: any, delta: number): void {
 function 创建跟随表现(this: void, context: 蕾米莉亚W上下文): void {
   const caster = context.施法者;
   const color = W配置.表现.顶点颜色;
-  const bloodMist = W配置.表现.血雾;
+  const judgment = W配置.表现.审判;
+  const holyFire = W配置.表现.圣火;
   const judgmentEffect = 创建单位坐标跟随特效(
     caster,
-    bloodMist.模型路径,
-    bloodMist.特效键,
-    bloodMist.缩放,
+    judgment.模型路径,
+    judgment.特效键,
+    judgment.缩放,
     W配置.表现.跟随高度,
   );
   设置特效颜色(judgmentEffect, color.红, color.绿, color.蓝, color.透明度);
+  const holyFireEffect = 创建单位坐标跟随特效(
+    caster,
+    holyFire.模型路径,
+    holyFire.特效键,
+    holyFire.缩放,
+    W配置.表现.跟随高度,
+  );
+  设置特效颜色(holyFireEffect, color.红, color.绿, color.蓝, color.透明度);
 }
 
 function 清理W上下文(this: void, context: 蕾米莉亚W上下文): void {
@@ -151,7 +160,8 @@ function 清理W上下文(this: void, context: 蕾米莉亚W上下文): void {
     GS_UnitPry(context.施法者, 1, 13, W配置.基础生命值百分比增量);
     调整英雄基础力量(context.施法者, -context.增加力量);
     调整玩家属性(context.施法者, "百分比生命回复", -W配置.百分比生命回复增量);
-    销毁单位坐标跟随特效(context.施法者, W配置.表现.血雾.特效键);
+    销毁单位坐标跟随特效(context.施法者, W配置.表现.审判.特效键);
+    销毁单位坐标跟随特效(context.施法者, W配置.表现.圣火.特效键);
     移除单位指定Buff(context.施法者, 蕾米莉亚BuffID.红符法阵);
     context.已启动 = false;
   }
@@ -169,21 +179,15 @@ function 目标允许W伤害(this: void, target: any): boolean {
 }
 
 function 创建W周期特效(this: void, caster: any): void {
-  const effect = W配置.表现.周期爆炸;
+  const effect = W配置.表现.周期特效;
   创建点特效({
     模型路径: effect.模型路径,
     X: GetUnitX(caster),
     Y: GetUnitY(caster),
+    Z轴角度: effect.Z轴角度,
     缩放: effect.缩放,
+    动画速度: effect.动画速度,
     持续秒: effect.持续秒,
-  });
-  const bloodMist = W配置.表现.周期血雾;
-  创建点特效({
-    模型路径: bloodMist.模型路径,
-    X: GetUnitX(caster),
-    Y: GetUnitY(caster),
-    缩放: bloodMist.缩放,
-    持续秒: bloodMist.持续秒,
   });
 }
 
